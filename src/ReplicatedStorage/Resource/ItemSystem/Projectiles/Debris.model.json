@@ -1,0 +1,87 @@
+{
+  "className": "ParticleEmitter",
+  "properties": {
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.2,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 0.2,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Speed": {
+      "NumberRange": [
+        25.0,
+        25.0
+      ]
+    },
+    "LockedToPart": true,
+    "Transparency": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.5,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 0.5,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Color": {
+      "ColorSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "color": [
+              0.140948,
+              0.14226,
+              0.152422
+            ]
+          },
+          {
+            "time": 1.0,
+            "color": [
+              0.140948,
+              0.14226,
+              0.152422
+            ]
+          }
+        ]
+      }
+    },
+    "Lifetime": {
+      "NumberRange": [
+        2.0,
+        2.0
+      ]
+    },
+    "Enabled": false,
+    "Acceleration": [
+      0.0,
+      -35.0,
+      0.0
+    ],
+    "Rate": 100.0,
+    "SpreadAngle": [
+      100.0,
+      100.0
+    ],
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "Texture": "rbxassetid://1175725495"
+  }
+}

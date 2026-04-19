@@ -1,0 +1,50 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Bytecode (Base64):
+-- BgMcBGdhbWURUmVwbGljYXRlZFN0b3JhZ2UKR2V0U2VydmljZQdyZXF1aXJlA1N0ZApUYWJsZVV0aWxzBnNjcmlwdAZQYXJlbnQKRW51bVJhcml0eQJpZARuYW1lBWNvbG9yBkNvbW1vbgZDb2xvcjMHZnJvbVJHQgRSYXJlCVVsdHJhUmFyZQpVbHRyYSBSYXJlBEVwaWMJTGVnZW5kYXJ5BWluZGV4GnJlcXVpcmVWYWxpZEluZGV4QW5kRnJlZXplGkNPTExFQ1RfUkVXQVJEX1JFTU9URV9OQU1FEFNQSU5fUkVNT1RFX05BTUUIUkFSSVRJRVMTUkFSSVRZX0lEX1RPX1JBUklUWRpSZXdhcmRTcGlubmVyQ29sbGVjdFJld2FyZBFSZXdhcmRTcGlubmVyU3BpbgABDQAAAQAAhwGjAAAApAABAAAAAEBvAgIAvAAAFgMAAACfAAMCpAEFAAAAQEBNAgChBgAAAE0CAhgHAAAAnwECAqQCBQAAAEBApAMJAAAAgEBNAwMkCgAAAE0DA0oLAAAAnwICAv8DAAAFAAAA4gQPAE0FAnMQAAAAMAUE9AwAAABvBRAAMAUEWg0AAACkBRMAAEgQgYwG0wCMB90AjAjwAJ8FBAIwBQREDgAAAOIFDwBNBgKnFAAAADAGBfQMAAAAbwYUADAGBVoNAAAApAYTAABIEIGMB5gAjAjqAIwJTgCfBgQCMAYFRA4AAADiBg8ATQcC4RUAAAAwBwb0DAAAAG8HFgAwBwZaDQAAAKQHEwAASBCBjAgAAIwJfwCMCv8AnwcEAjAHBkQOAAAA4gcPAE0IArwXAAAAMAgH9AwAAABvCBcAMAgHWg0AAACkCBMAAEgQgYwJ/gCMCiYAjAspAJ8IBAIwCAdEDgAAAOIIDwBNCQK5GAAAADAJCPQMAAAAbwkYADAJCFoNAAAApAkTAABIEIGMCpAAjAtVAIwM/gCfCQQCMAkIRA4AAADFAwQGAQAAAP8EAAAAAAAAUgUDAMYGAADGBwAAZAUFADAICQIZAAAATQoJ9AwAAABqCQQKbgX6/wIAAABNBQEAGgAAAOIGHwBvByAAMAcGwxsAAABvByEAMAcGSRwAAAAwAwYcHQAAADAEBoMeAAAAnwUCAIIFAAAiAwEEAAAAQAMCAwMDBAQAAEBAAwUDBgMHBAAAgEADCAMJAwoDCwMMBQMMDQ4DDQMOAw8EAEgQgQMQAxEDEgMTAxQDFQMWAxcDGAMZAxoFBBscHR4DGwMcAAEAARgAAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAMAAQEAAAABAAABAAAAAAAAAAIBAAAAAQAAAQAAAAAAAAACAQAAAAEAAAEAAAAAAAAAAgEAAAABAAABAAAAAAAAAAIBAAAAAQAAAQAAAAAAAAAAAAQAAQAAAAEAAQAA/gAEAAABAAABAAABAAEA/AABAAAAAABblQ74vlht+h3Q+OO1gOjoK40ZjGlRZPk=
+
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
+-- Decompiled on 2026-04-18 23:45:25
+-- Luau version 6, Types version 3
+-- Time taken: 0.001825 seconds
+
+local EnumRarity = require(script.Parent.EnumRarity)
+local tbl = {}
+local tbl_2 = {
+    id = EnumRarity.Common;
+    name = "Common";
+    color = Color3.fromRGB(211, 221, 240);
+}
+tbl[1] = tbl_2
+tbl[2] = {
+    id = EnumRarity.Rare;
+    name = "Rare";
+    color = Color3.fromRGB(152, 234, 78);
+}
+tbl[3] = {
+    id = EnumRarity.UltraRare;
+    name = "Ultra Rare";
+    color = Color3.fromRGB(0, 127, 255);
+}
+tbl[4] = {
+    id = EnumRarity.Epic;
+    name = "Epic";
+    color = Color3.fromRGB(254, 38, 41);
+}
+tbl[5] = {
+    id = EnumRarity.Legendary;
+    name = "Legendary";
+    color = Color3.fromRGB(144, 85, 254);
+}
+tbl_2 = {}
+local var12 = tbl_2
+for i, v in tbl do
+    v.index = i
+    var12[v.id] = v
+end
+return require(game:GetService("ReplicatedStorage").Std.TableUtils).requireValidIndexAndFreeze({
+    COLLECT_REWARD_REMOTE_NAME = "RewardSpinnerCollectReward";
+    SPIN_REMOTE_NAME = "RewardSpinnerSpin";
+    RARITIES = tbl;
+    RARITY_ID_TO_RARITY = var12;
+})

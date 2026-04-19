@@ -1,0 +1,99 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Bytecode (Base64):
+-- BgNFBXByb3BzEGF0dGVtcHRFcXVpcEl0ZW0EbmFtZQxvblNlbGVjdEl0ZW0TYXR0ZW1wdEZhdm9yaXRlSXRlbQ5vbkZhdm9yaXRlSXRlbQhjYXRlZ29yeQZpcGFpcnMKY2F0ZWdvcmllcwV0aXRsZQdyZWNlaXB0BWl0ZW1zDGNhdGVnb3J5TmFtZQVlcnJvchttaXNzaW5nIGNhdGVnb3J5IHRpdGxlIGZvciAJZmF2b3JpdGVkBW93bmVkCHNlbGVjdGVkCGVxdWlwcGVkBWZhdmVkBE5vbmUIb25TZWxlY3QKb25GYXZvcml0ZQhtZXRhZGF0YQtjb3JuZXJQaXhlbAtwb3J0YWxSYXRpbwxwYWRkaW5nUmF0aW8Lc29ydEVuYWJsZWQMb25TZWxlY3RTb3J0DXNob3dGYXZvcml0ZWQRb25Ub2dnbGVGYXZvcml0ZWQHc2hvd0FsbAtvblRvZ2dsZUFsbApjb2xzUGVyUm93C3Jvd3NQZXJQYWdlBnJlbmRlcg5nYXJhZ2VDYXRlZ29yeRBnYXJhZ2VDYXRlZ29yaWVzDWdhcmFnZVJlY2VpcHQPZ2FyYWdlRmF2b3JpdGVkC0xvY2FsUGxheWVyCVBsYXllckd1aQtPYmplY3RMb2NhbAZWb2x1bWUOb25JdGVtU2VsZWN0ZWQEdHlwZQ1jYXRlZ29yeVRpdGxlBXByaWNlB2xpbWl0ZWQOYWRkUmVjZWlwdEl0ZW0Tc2V0Q2F0ZWdvcnlFcXVpcHBlZBhzZXRDYXRlZ29yeUl0ZW1GYXZvcml0ZWQEZ2FtZQdQbGF5ZXJzCkdldFNlcnZpY2URUmVwbGljYXRlZFN0b3JhZ2UHcmVxdWlyZQNTdGQFQXVkaW8FUm9hY3QKUm9hY3RSb2R1eA1jcmVhdGVFbGVtZW50BnNjcmlwdAZQYXJlbnQKUG9ydGFsQmFzZQ1QdXJlQ29tcG9uZW50D1BvcnRhbEN1c3RvbWl6ZQZleHRlbmQHY29ubmVjdAAIBQAFAAAAG/sAAABNAAAHAAAAAE0AAPYBAAAADgAKAPsAAABNAAAHAAAAAE0AAPYBAAAA+wEBAPsCAgBNAgJaAgAAAJ8AAwH7AAAATQAABwAAAABNAADrAwAAAPsBAQD7AgMA+wMCAPsEBACfAAUBggABAAQDAQMCAwMDBAA8AAEYAAAAAAAA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
+
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
+-- Decompiled on 2026-04-18 23:42:36
+-- Luau version 6, Types version 3
+-- Time taken: 0.005295 seconds
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+local any_extend_result1 = Roact.PureComponent:extend("PortalCustomize")
+local createElement_upvr = Roact.createElement
+local PortalBase_upvr = require(script.Parent.PortalBase)
+function any_extend_result1.render(arg1) -- Line 11
+    --[[ Upvalues[2]:
+        [1]: createElement_upvr (readonly)
+        [2]: PortalBase_upvr (readonly)
+    ]]
+    -- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+    local ipairs_result1, ipairs_result2, ipairs_result3 = ipairs(arg1.props.categories)
+    -- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+    -- KONSTANTERROR: [20] 13. Error Block 4 start (CF ANALYSIS FAILED)
+    -- KONSTANTERROR: [20] 13. Error Block 4 end (CF ANALYSIS FAILED)
+    -- KONSTANTERROR: [13] 9. Error Block 47 start (CF ANALYSIS FAILED)
+    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [20.8]
+    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [20.2147483650]
+    if nil == arg1.props.category then
+        for _, v in ipairs(arg1.props.receipt) do
+            ({})[v.category..v.name] = true
+            local _
+        end
+        -- KONSTANTWARNING: GOTO [51] #33
+    end
+    -- KONSTANTERROR: [13] 9. Error Block 47 end (CF ANALYSIS FAILED)
+end
+local Players_upvr = game:GetService("Players")
+local Audio_upvr = require(ReplicatedStorage.Std.Audio)
+return require(ReplicatedStorage.RoactRodux).connect(function(arg1, arg2) -- Line 92
+    return {
+        category = arg1.garageCategory;
+        categories = arg1.garageCategories;
+        receipt = arg1.garageReceipt;
+        favorited = arg1.garageFavorited;
+    }
+end, function(arg1) -- Line 100
+    --[[ Upvalues[2]:
+        [1]: Players_upvr (readonly)
+        [2]: Audio_upvr (readonly)
+    ]]
+    return {
+        onSelectItem = function(arg1_2, arg2, arg3, arg4) -- Line 102, Named "onSelectItem"
+            --[[ Upvalues[3]:
+                [1]: Players_upvr (copied, readonly)
+                [2]: Audio_upvr (copied, readonly)
+                [3]: arg1 (readonly)
+            ]]
+            if Players_upvr.LocalPlayer and Players_upvr.LocalPlayer.PlayerGui then
+                Audio_upvr.ObjectLocal(Players_upvr.LocalPlayer.PlayerGui, 6105461542, {
+                    Volume = 0.25;
+                })
+            end
+            if arg3.onItemSelected then
+                arg3.onItemSelected()
+            end
+            local tbl = {
+                type = "addReceiptItem";
+            }
+            tbl.category = arg1_2
+            tbl.categoryTitle = arg2
+            tbl.name = arg3.name
+            tbl.title = arg3.title
+            tbl.price = arg3.price
+            tbl.limited = arg3.limited
+            arg1(tbl)
+            if arg4.owned then
+                local tbl_2 = {
+                    type = "setCategoryEquipped";
+                }
+                tbl_2.category = arg1_2
+                tbl_2.name = arg3.name
+                arg1(tbl_2)
+            end
+        end;
+        onFavoriteItem = function(arg1_3, arg2, arg3) -- Line 126, Named "onFavoriteItem"
+            --[[ Upvalues[1]:
+                [1]: arg1 (readonly)
+            ]]
+            local tbl_3 = {
+                type = "setCategoryItemFavorited";
+            }
+            tbl_3.category = arg1_3
+            tbl_3.name = arg2
+            tbl_3.favorited = arg3
+            arg1(tbl_3)
+        end;
+    }
+end)(any_extend_result1)

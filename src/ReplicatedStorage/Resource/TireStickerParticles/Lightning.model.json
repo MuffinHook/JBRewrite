@@ -1,0 +1,168 @@
+{
+  "className": "ParticleEmitter",
+  "properties": {
+    "Texture": "rbxassetid://2989812416",
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.146172,
+            "value": 3.3125,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.177494,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.200696,
+            "value": 4.6875,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.233179,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.292343,
+            "value": 1.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.320186,
+            "value": 3.625,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.401392,
+            "value": 0.0624996,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.546404,
+            "value": 0.6875,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.598608,
+            "value": 4.1875,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.62761,
+            "value": 0.25,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.825986,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.843387,
+            "value": 3.3125,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.924594,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 2.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Speed": {
+      "NumberRange": [
+        1.789,
+        1.789
+      ]
+    },
+    "LockedToPart": true,
+    "ZOffset": 3.0,
+    "Color": {
+      "ColorSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "color": [
+              0.986465,
+              0.104753,
+              0.152575
+            ]
+          },
+          {
+            "time": 0.396667,
+            "color": [
+              0.307042,
+              0.890867,
+              0.998978
+            ]
+          },
+          {
+            "time": 0.603333,
+            "color": [
+              0.219028,
+              0.69073,
+              0.998688
+            ]
+          },
+          {
+            "time": 0.801667,
+            "color": [
+              0.176791,
+              0.90013,
+              0.998917
+            ]
+          },
+          {
+            "time": 1.0,
+            "color": [
+              0.180392,
+              0.843137,
+              1.0
+            ]
+          }
+        ]
+      }
+    },
+    "Lifetime": {
+      "NumberRange": [
+        0.3,
+        0.3
+      ]
+    },
+    "Rate": 2.0,
+    "LightEmission": 1.0,
+    "SpreadAngle": [
+      -100.78900146484375,
+      100.78900146484375
+    ],
+    "RotSpeed": {
+      "NumberRange": [
+        0.789,
+        0.789
+      ]
+    },
+    "Rotation": {
+      "NumberRange": [
+        -90.789,
+        90.789
+      ]
+    },
+    "FlipbookBlendFrames": {
+      "Bool": false
+    }
+  }
+}

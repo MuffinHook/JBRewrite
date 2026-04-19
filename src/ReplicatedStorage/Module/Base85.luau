@@ -1,0 +1,75 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Bytecode (Base64):
+-- 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
+
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
+-- Decompiled on 2026-04-18 23:39:23
+-- Luau version 6, Types version 3
+-- Time taken: 0.009075 seconds
+
+local module = {}
+local tbl_upvr = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '!', '#', '$', '%', '&', '(', ')', '*', '+', '-', ';', '<', '=', '>', '?', '@', '^', '_', '`', '{', '|', '}', '~'}
+function module.encode(arg1) -- Line 103
+    --[[ Upvalues[1]:
+        [1]: tbl_upvr (readonly)
+    ]]
+    -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+    local const_number = 1
+    local var12 = 1
+    local table_create_result1_3 = table.create(math.floor((#arg1 + 3) / 4) * 5)
+    while const_number <= #arg1 do
+        local string_byte_result1, string_byte_result2, string_byte_result3, string_byte_result4 = string.byte(arg1, const_number, const_number + 3)
+        local var18 = (string_byte_result1 or 0) * 16777216 + (string_byte_result2 or 0) * 65536 + (string_byte_result3 or 0) * 256 + (string_byte_result4 or 0)
+        for i = 4, 0, -1 do
+            table_create_result1_3[var12 + i] = tbl_upvr[math.floor(var18 % 85) + 1]
+            var18 = math.floor(var18 / 85)
+            local var19
+        end
+        var12 += 5
+    end
+    for i_2 = 1, const_number + 4 - #arg1 - 1 do
+        table_create_result1_3[var12 - i_2] = nil
+    end
+    return table.concat(table_create_result1_3)
+end
+local tbl_upvr_2 = {-- : First try: K:0: attempt to index nil with 't'
+
+function module.decode(arg1) -- Line 226
+    --[[ Upvalues[1]:
+        [1]: tbl_upvr_2 (readonly)
+    ]]
+    local table_create_result1_2 = table.create(math.floor(#arg1 * 4 / 5))
+    local var38
+    for i_3 = 1, #arg1 do
+        local var39 = tbl_upvr_2[string.byte(arg1, i_3)]
+        if not var39 then
+            return "invalid byte at "..i_3, ""
+        end
+        if 0 <= var39 then
+            local var40 = 0 * 85 + var39
+            var38 += 1
+            if var38 == 5 then
+                table.insert(table_create_result1_2, string.char(math.floor(var40 / 16777216 % 256), math.floor(var40 / 65536 % 256), math.floor(var40 / 256 % 256), math.floor(var40 % 256)))
+                var38 = 0
+            end
+        end
+    end
+    local var41
+    if 0 < var38 then
+        if var38 == 1 then
+            i_3 = #table_create_result1_2 - 1
+            return "corrupted base85 data at byte "..i_3, ""
+        end
+        i_3 = var38
+        for _ = i_3, 4 do
+            var41 = var41 * 85 + 84
+        end
+        for _ = 0, var38 - 2 do
+            table.insert(table_create_result1_2, string.char(math.floor(var41 / 16777216 % 256)))
+            var41 *= 256
+        end
+    end
+    return nil, table.concat(table_create_result1_2)
+end
+return module

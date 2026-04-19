@@ -1,0 +1,119 @@
+{
+  "className": "ParticleEmitter",
+  "properties": {
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "Texture": "rbxassetid://2200905294",
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.0986,
+            "value": 10.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.211137,
+            "value": 9.25,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.403712,
+            "value": 7.8125,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.632251,
+            "value": 10.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 10.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "LockedToPart": true,
+    "Transparency": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 1.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.0394432,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.704937,
+            "value": 0.8,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 1.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "ZOffset": 2.0,
+    "Color": {
+      "ColorSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "color": [
+              0.163424,
+              0.130144,
+              0.131044
+            ]
+          },
+          {
+            "time": 1.0,
+            "color": [
+              0.163424,
+              0.130144,
+              0.131044
+            ]
+          }
+        ]
+      }
+    },
+    "Lifetime": {
+      "NumberRange": [
+        3.0,
+        3.0
+      ]
+    },
+    "Enabled": false,
+    "Rate": 4.0,
+    "SpreadAngle": [
+      30.0,
+      30.0
+    ],
+    "RotSpeed": {
+      "NumberRange": [
+        -150.0,
+        150.0
+      ]
+    },
+    "Rotation": {
+      "NumberRange": [
+        -50.0,
+        50.0
+      ]
+    }
+  }
+}

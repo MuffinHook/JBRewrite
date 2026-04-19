@@ -1,0 +1,91 @@
+{
+  "className": "ParticleEmitter",
+  "properties": {
+    "Texture": "http://www.roblox.com/asset/?id=10080075007",
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.0285,
+            "value": 0.2,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.904,
+            "value": 0.2,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 0.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Speed": {
+      "NumberRange": [
+        1.5,
+        1.5
+      ]
+    },
+    "LockedToPart": true,
+    "Orientation": "FacingCameraWorldUp",
+    "Color": {
+      "ColorSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "color": [
+              0.238819,
+              0.484871,
+              0.99852
+            ]
+          },
+          {
+            "time": 1.0,
+            "color": [
+              0.238819,
+              0.484871,
+              0.99852
+            ]
+          }
+        ]
+      }
+    },
+    "Squash": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.1,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 0.1,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "TimeScale": 0.5,
+    "LightInfluence": 1.0,
+    "Lifetime": {
+      "NumberRange": [
+        2.5,
+        3.0
+      ]
+    },
+    "LightEmission": 0.20000000298023224,
+    "Rate": 5.0,
+    "FlipbookBlendFrames": {
+      "Bool": false
+    }
+  }
+}

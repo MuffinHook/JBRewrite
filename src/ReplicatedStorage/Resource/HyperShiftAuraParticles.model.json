@@ -1,0 +1,147 @@
+{
+  "className": "ParticleEmitter",
+  "properties": {
+    "Texture": "rbxassetid://559157924",
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.104027,
+            "value": 10.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.29698,
+            "value": 10.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.402685,
+            "value": 1.07527,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.598993,
+            "value": 1.1828,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.704698,
+            "value": 10.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.897651,
+            "value": 10.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 0.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Speed": {
+      "NumberRange": [
+        0.0,
+        0.0
+      ]
+    },
+    "LockedToPart": true,
+    "Transparency": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 1.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.102349,
+            "value": 0.497845,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.803691,
+            "value": 0.491379,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 1.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Color": {
+      "ColorSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "color": [
+              0.509911,
+              0.921981,
+              0.977432
+            ]
+          },
+          {
+            "time": 1.0,
+            "color": [
+              0.509911,
+              0.921981,
+              0.977432
+            ]
+          }
+        ]
+      }
+    },
+    "Squash": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": -1.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": -1.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "TimeScale": 0.5,
+    "Lifetime": {
+      "NumberRange": [
+        1.0,
+        2.5
+      ]
+    },
+    "LightEmission": 1.0,
+    "Rate": 8.0,
+    "RotSpeed": {
+      "NumberRange": [
+        10.0,
+        20.0
+      ]
+    },
+    "Rotation": {
+      "NumberRange": [
+        -90.0,
+        90.0
+      ]
+    },
+    "FlipbookBlendFrames": {
+      "Bool": false
+    }
+  }
+}

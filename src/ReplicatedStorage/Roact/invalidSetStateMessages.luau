@@ -1,0 +1,12 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Bytecode (Base64):
+-- BgMMB3JlcXVpcmUGc2NyaXB0BlBhcmVudBdDb21wb25lbnRMaWZlY3ljbGVQaGFzZQpXaWxsVXBkYXRlxAFzZXRTdGF0ZSBjYW5ub3QgYmUgdXNlZCBpbiB0aGUgd2lsbFVwZGF0ZSBsaWZlY3ljbGUgbWV0aG9kLgpDb25zaWRlciB1c2luZyB0aGUgZGlkVXBkYXRlIG1ldGhvZCBpbnN0ZWFkLCBvciB1c2luZyBnZXREZXJpdmVkU3RhdGVGcm9tUHJvcHMuCgpDaGVjayB0aGUgZGVmaW5pdGlvbiBvZiB3aWxsVXBkYXRlIGluIHRoZSBjb21wb25lbnQgJXEuDFNob3VsZFVwZGF0ZcMBc2V0U3RhdGUgY2Fubm90IGJlIHVzZWQgaW4gdGhlIHNob3VsZFVwZGF0ZSBsaWZlY3ljbGUgbWV0aG9kLgpzaG91bGRVcGRhdGUgbXVzdCBiZSBhIHB1cmUgZnVuY3Rpb24gdGhhdCBvbmx5IGRlcGVuZHMgb24gcHJvcHMgYW5kIHN0YXRlLgoKQ2hlY2sgdGhlIGRlZmluaXRpb24gb2Ygc2hvdWxkVXBkYXRlIGluIHRoZSBjb21wb25lbnQgJXEuBlJlbmRlcqcBc2V0U3RhdGUgY2Fubm90IGJlIHVzZWQgaW4gdGhlIHJlbmRlciBtZXRob2QuCnJlbmRlciBtdXN0IGJlIGEgcHVyZSBmdW5jdGlvbiB0aGF0IG9ubHkgZGVwZW5kcyBvbiBwcm9wcyBhbmQgc3RhdGUuCgpDaGVjayB0aGUgZGVmaW5pdGlvbiBvZiByZW5kZXIgaW4gdGhlIGNvbXBvbmVudCAlcS6/AXNldFN0YXRlIGNhbiBub3QgYmUgdXNlZCBpbiB0aGUgY3VycmVudCBzaXR1YXRpb24sIGJlY2F1c2UgUm9hY3QgZG9lc24ndCBrbm93CndoaWNoIHBhcnQgb2YgdGhlIGxpZmVjeWNsZSB0aGlzIGNvbXBvbmVudCBpcyBpbi4KClRoaXMgaXMgYSBidWcgaW4gUm9hY3QuCkl0IHdhcyB0cmlnZ2VyZWQgYnkgdGhlIGNvbXBvbmVudCAlcS4KB2RlZmF1bHQAAQQAAAECCwAAAg8AARsPAQoSHKMAAACkAAEAAAAAQKQDAwAAACBATQIDJAQAAABNAQIYBQAAAJ8AAgL/AQAAAAAAAE0CAJ0GAAAAbwMHAGoDAQJNAgBpCAAAAG8DCQBqAwECTQIAYAoAAABvAwsAagMBAm8CDAAwAgEaDQAAAIIBAgAOAwEEAAAAQAMCBAAAIEADAwMEAwUDBgMHAwgDCQMKAwsDDAABAAEYAAcAAAAAAAAAAAIAAgAAAAYAAAAGAAAABgAACAEAAAAAAA4PrwdW2G7APMvFk/cKIR5toVE6jM8APbLgJHl1yLM0Ujo+WrISqJE=
+
+local v0 = require(script.Parent.ComponentLifecyclePhase);
+return {
+    [v0.WillUpdate] = "setState cannot be used in the willUpdate lifecycle method.\nConsider using the didUpdate method instead, or using getDerivedStateFromProps.\n\nCheck the definition of willUpdate in the component %q.", 
+    [v0.ShouldUpdate] = "setState cannot be used in the shouldUpdate lifecycle method.\nshouldUpdate must be a pure function that only depends on props and state.\n\nCheck the definition of shouldUpdate in the component %q.", 
+    [v0.Render] = "setState cannot be used in the render method.\nrender must be a pure function that only depends on props and state.\n\nCheck the definition of render in the component %q.", 
+    default = "setState can not be used in the current situation, because Roact doesn't know\nwhich part of the lifecycle this component is in.\n\nThis is a bug in Roact.\nIt was triggered by the component %q.\n"
+};

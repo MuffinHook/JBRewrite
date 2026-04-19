@@ -1,0 +1,15 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Bytecode (Base64):
+-- BgMNBGdhbWURUmVwbGljYXRlZFN0b3JhZ2UKR2V0U2VydmljZQdyZXF1aXJlA1N0ZApUYWJsZVV0aWxzGnJlcXVpcmVWYWxpZEluZGV4QW5kRnJlZXplEFBMQVlfUkVNT1RFX05BTUURU09OR19JRF9BVFRSX05BTUUUU1RBUlRFRF9BVF9BVFRSX05BTUUKUGxheVJlbW90ZQZTb25nSWQJU3RhcnRlZEF0AAEFAAABAgAcowAAAKQAAQAAAABAbwICALwAABYDAAAAnwADAqQBBQAAAEBATQIAoQYAAABNAgIYBwAAAJ8BAgJNAgEACAAAAOIDDABvBA0AMAQDfwkAAABvBA4AMAQDxgoAAABvBA8AMAQDiQsAAACfAgIAggIAABADAQQAAABAAwIDAwMEBAAAQEADBQMGAwcDCAMJAwoFAwkKCwMLAwwDDQABAAEYAAAAAAAAAAEAAAAAAAABAAABAAABAAABAAD9AAEAAAAAANfdZA4Q023u2/iF87IAFPWnxXN65RkODw==
+
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
+-- Decompiled on 2026-04-18 23:43:06
+-- Luau version 6, Types version 3
+-- Time taken: 0.000578 seconds
+
+return require(game:GetService("ReplicatedStorage").Std.TableUtils).requireValidIndexAndFreeze({
+    PLAY_REMOTE_NAME = "PlayRemote";
+    SONG_ID_ATTR_NAME = "SongId";
+    STARTED_AT_ATTR_NAME = "StartedAt";
+})

@@ -1,0 +1,89 @@
+{
+  "className": "ParticleEmitter",
+  "properties": {
+    "Texture": "rbxasset://textures/particles/smoke_main.dds",
+    "Speed": {
+      "NumberRange": [
+        -2.0,
+        2.0
+      ]
+    },
+    "Transparency": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.4375,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.613466,
+            "value": 0.59375,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 1.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Color": {
+      "ColorSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "color": [
+              0.192157,
+              0.156863,
+              0.141176
+            ]
+          },
+          {
+            "time": 1.0,
+            "color": [
+              0.192157,
+              0.156863,
+              0.141176
+            ]
+          }
+        ]
+      }
+    },
+    "LightInfluence": 1.0,
+    "Enabled": false,
+    "Lifetime": {
+      "NumberRange": [
+        2.0,
+        2.0
+      ]
+    },
+    "Acceleration": [
+      0.0,
+      2.0,
+      0.0
+    ],
+    "LightEmission": 0.10000000149011612,
+    "Rate": 100.0,
+    "SpreadAngle": [
+      10.0,
+      10.0
+    ],
+    "RotSpeed": {
+      "NumberRange": [
+        -30.0,
+        30.0
+      ]
+    },
+    "Rotation": {
+      "NumberRange": [
+        -180.0,
+        180.0
+      ]
+    },
+    "FlipbookBlendFrames": {
+      "Bool": false
+    }
+  }
+}

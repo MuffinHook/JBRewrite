@@ -1,0 +1,707 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Bytecode (Base64):
+-- BgOmAQxBdXRvUmV0aXJlQXQHUmV0aXJlZAl3b3Jrc3BhY2UQR2V0U2VydmVyVGltZU5vdxB1cGRhdGVBdXRvUmV0aXJlBHRhc2sEd2FpdARUeXBlBE1ha2UGSGlkZGVuB0NoYXNzaXMIQmx1ZWJpcmQGU2Vhc29uBUxldmVsDFNlYXNvbkljb25JZAdKQlgwMDMxCk5vR2FyYWdlVUkHTm9UcmFkZQlEb05vdEdpdmUJQWRtaW5OdWtlBVByaWNlB1BvbGFpcmUKQmxhY2tXaWRvdwtBZXJpYWxTcGF3bgRIZWxpBkJpb25pYw1QaXp6YURlbGl2ZXJ5CEJyaWNrS2FyBVdZTkRSBkthdGFuYQ9FeGNsdWRlRnJvbVNhbGUIT3Jpb25NNDIKQmxhY2tiZWFyZAVDb2JyYQxFeHBlZGl0aW9uZXIFUmV2b3gFTWFudGEKU3Rvcm1yaWRlchdOb1RyYWRlV29ybGRHYXJhZ2VTcGF3bgZUYW5rZXIHSWNlYm9ybgVXZWRnZQdTY29ycGlvCkhhbW1lcmhlYWQITWF2ZXJpY2sFVmVub20LT0dMYU1hdGFkb3IJT0dNb25zdGVyA1hSSwdTdHJpa2VyCUNhcmJvbmFyYQhDaGFzc2lzMwpTcGVlZFlhY2h0DEZyb3N0Q3Jhd2xlcgpNb3RvcmN5Y2xlB0ZhbGNvblMJU3VjY2Vzc29yCkxhdmlvbGV0dGUITG9uZ2hvcm4ETGl0ZQZGaWFzY28IQXBlcnR1cmUGUG93ZXIxCVByaXNvbkJ1cwhQb3NlaWRvbgZTaG9ndW4YTm9HYXJhZ2VTcGF3blVubGVzc093bmVkCk5BU0NBUjc1dGgVTm9QaHlzaWNhbEdhcmFnZVNwYXduFkFsbG93Q3VzdG9taXplQW55d2hlcmUEU2VtaQhQYXJpc2lhbgZQcm90bzgFQ3Jvd24GQmFuZGl0CUVzY2FwZUJvdAdKYXZlbGluDURlc2VydENyYXdsZXIKU2hlbGxNYXJrNQdHb2xpYXRoDFNoZWxsQ2xhc3NpYwVCbG94eQdUaW55VG95BVNuYWtlB01hY2Fyb24KSmFja1JhYmJpdAhUb3dUcnVjawVNQ0wzNhZOb01haW5Xb3JsZEdhcmFnZVNwYXduCU1DTDM2RlJFRQdDZWxzaW9yBkJhZGdlcgpJY2VCcmVha2VyBkN1c3RvbQRUYW5rB05BU0NBUjIHTkFTQ0FSMQdCZWlnbmV0B0NvbmNlcHQGVG9yZXJvC1RyYWlsYmxhemVyBFJheTkJVGhlQ2FtcGVyCUJhbmFuYUNhcghTZW50aW5lbApUaGVSYXR0bGVyCFRoZUFnZW50DEludGVycm9nYXRvcgdWb2x0NHg0B0FpclRhaWwLQ3Jld0NhcHN1bGUKQmVhbUh5YnJpZAhEZWxvcmVhbgVEcm9uZQVCb3hlcglNb2x0ZW5NMTIDTGlhBERlamEDUmF5CkNoYWxsZW5nZXIFU3VydXMKTGl0dGxlQmlyZAVTbG9vcAdDcnVpc2VyBkNoaXJvbgpDeWJlcnRydWNrCFJvYWRzdGVyA0pldAVTdHVudAZSYXB0b3ICUjgGSmV0U2tpBlBhdHJvbARKZWVwCUZpcmV0cnVjawhBcmFjaG5pZAdUb3JwZWRvCUFtYnVsYW5jZQhHYW1lcGFzcwZXcmFpdGgEQk9TUwdDbGFzc2ljCUJsYWNrSGF3awNVRk8DU1VWBFZvbHQHTWNMYXJlbgNBVFYHTW9uc3RlcgdGZXJyYXJpB011c3RhbmcJRHVuZUJ1Z2d5CERpcnRiaWtlB0J1Z2F0dGkKTWluaUNvb3BlcgdQb3JzY2hlB1NXQVRWYW4EU1dBVAZQaWNrdXALTGFtYm9yZ2hpbmkGTW9kZWwzBkNhbWFybw1Ob0dhcmFnZVNwYXduCUJhbmtUcnVjawdKZXRQYWNrBXNwYXduAAMJAAEAAAAb+wAAAMYBAADGAgAAZAAUAE0FBDoAAAAADgURAE0FBIgBAAAAKwUOAE0GBDoAAAAApAcDAAAAIEC8Bwe3BAAAAJ8HAgImBQYHjAYAAH0FBAAGAAAAqQUBADAFBIgBAAAAbgDr/wIAAACCAAEABQMBAwIDAwQAACBAAwQA6wYFARgAAAAAAQAAAAAAAAAAAAAAAAAAAAABAAD+AAVsAwAAAAIAAQAAAAikAAIAAAQAgIwBPACfAAIB+wAAAJ8AAQFIAPn/ggABAAMDBgMHBAAEAIAA8wYAARgBAAAAAQD+BHQDAAAAEgAAAQAAiw6jAAAA/wAAAIQAAADiAQMAbwIEADACAREAAAAAbwIFADACAa0BAAAAqQIBADACAbYCAAAA4gIJAG8DBAAwAwIRAAAAAG8DCgAwAwKtAQAA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A4wBA40BA44BA48BA5ABA5EBAgAAAAAAiONAA5IBA5MBA5QBA5UBA5YBA5cBA5gBA5kBAgAAAAAAF+FAA5oBA5sBA5wBAgAAAAAAF/FAA50BA54BA58BA6ABBQUAARIOGAOhAQOiAQOjAQUGAAES9AENDgOkAQUFARKLAQ0OA6UBAgAAAAAAACRABgADBgOmAQQA8LOPBgECAAEBAAEIAB0AAgEAAAEAAAEAAAIBAAABAAABAAABAAABAAACAQAAAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAIBAAABAAABAAABAAABAAACAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAIBAAABAAABAAABAAABAAACAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAEAAAIBAAABAAABAAABAAACAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAIAAAEAAAEAAAEAAAEAAAEAAAIBAAABAAABAAABAAACAW8AAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAEAAAIBAAABAAACAAABAAACAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAwEAAAEAAAEAAAEAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAIAAAEAAAEAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAIBAAABAAABAAABAAACAQAAAQAAAQAAAQAAAQCKAgEAAAEAAAEAAAIBAAABAAABAAABAAABAAACAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAIBAAABAAABAAABAAABAAABAAACAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAEAAAMBAAABAAABAAACAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAIAAAEAAAIAAAEAAAEAAAEAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAEAAAIBAAABAAABAAABAAACAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAEAAAIBAAABAAABAAABAAACAQAAigAAAQAAAQAAAgEAAAEAAAEAAAEAAAIBAAABAAABAAACAgAAAQAAAQAAAQAAAQAAAgIAAAEAAAEAAAEAAAEAAAEAAAIBAAABAAABAAABAAACAQAAAQAAAQAAAwEAAAEAAAEAAAEAAAEAAAIAAAEAAAEAAAEAAAIBAAABAAABAAABAAABAAACAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAEAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAEAAAEAAAIBAAABAAABAAACAQAAAYkAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAIAAAEAAAEAAAEAAAEAAAEAAAEAAAMBAAABAAABAAABAAABAAABAAACAQAAAQAAAQAAAgEAAAEAAAEAAAIAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAgAAAgEAAAEAAAEAAAEAAAIBAAABAAABAAABAAACAQAAAQAAAQAAAgEAAAEAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAgAAAgEAAAEAAAEAAAMBAAABAAABAAABAAACAQAAAQCHAQAAAgEAAAEAAAEAAAMAAAEAAAEAAAEAAAIBAAABAAABAAABAAACAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAMAAAEAAAIBAAABAAABAAADAAABAAACAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAIBAAABAAABAAABAAABAAACAQAAAQAAAQAAAwEAAAEAAAEAAAMAAAEAAAIBAAABAAABAAADAAABAAACAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAIBAAABAAABAAABAAACAQAAAQAAAQAAAgAAAgEAAAEAAAEAAAIAAAIAAAEAAAEAAAEAAAEAAAMBAAABAAABAAACAQAAfgAAAQAAAQAAAgEAAAEAAAEAAAIBAAABAAABAAACAQAAAQAAAQAAAgEAAAEAAAEAAAIAAAIBAAABAAABAAACAQAAAQAAAQAAAgEAAAEAAAEAAAIAAAIBAAABAAABAAACAAACAQAAAQAAAQAAAgAAAgEAAAEAAAEAAAEAAAIBAAABAAABAAABAAACAQAAAQAAAQAAAgEAAAEAAAEAAAIAAAEAAAIAAAEAAAEAAAEAAAEAAAIBAAABAAABAAABAAABAAAEAQAAAQAAAQAAAQAAAQAAAQAAAgEAAAEAAAEAAAEAAAEAAAAABQAAAAEAAAAAAAAAAAAAAAAAAAAAAQAA/o0GAAcAAQAAAAAHAQAAAJEAAAB2AAAAdwAAAHcAAAB5AAAAgwAAAHMAAAAAAmJKJ/OBDo79CpEgCinryOoSUjCHUI5N8g==
+
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
+-- Decompiled on 2026-04-18 23:36:39
+-- Luau version 6, Types version 3
+-- Time taken: 0.017103 seconds
+
+local module_upvr = {{
+    Type = "Chassis";
+    Make = "Bluebird";
+    Hidden = true;
+}, {
+    Type = "Chassis";
+    Make = "JBX0031";
+    Season = 31;
+    Level = 10;
+    SeasonIconId = 129670585059455;
+}, {
+    Type = "Chassis";
+    Make = "AdminNuke";
+    Retired = true;
+    NoGarageUI = true;
+    NoTrade = true;
+    DoNotGive = true;
+}, {
+    Type = "Chassis";
+    Make = "Polaire";
+    Price = 850000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "BlackWidow";
+    Season = 30;
+    Level = 10;
+    SeasonIconId = 84258261610895;
+}, {
+    Type = "Heli";
+    Make = "Bionic";
+    Price = 1000000;
+    AerialSpawn = true;
+}, {
+    Type = "Chassis";
+    Make = "PizzaDelivery";
+    Hidden = true;
+}, {
+    Type = "Chassis";
+    Make = "BrickKar";
+    Season = 29;
+    SeasonIconId = 131867014795235;
+    Level = 10;
+}, {
+    Type = "Chassis";
+    Make = "WYNDR";
+    Hidden = true;
+}, {
+    Type = "Chassis";
+    Make = "Katana";
+    Season = 28;
+    Level = 10;
+    SeasonIconId = 96705351809392;
+}, {
+    Type = "Chassis";
+    Make = "OrionM42";
+    Hidden = true;
+    ExcludeFromSale = true;
+}, {
+    Type = "Chassis";
+    Make = "Blackbeard";
+    Season = 27;
+    Level = 10;
+    SeasonIconId = 78142656767840;
+}, {
+    Type = "Chassis";
+    Make = "Cobra";
+    Season = 26;
+    Level = 10;
+    SeasonIconId = 133407953333770;
+}, {
+    Type = "Chassis";
+    Make = "Expeditioner";
+    Hidden = true;
+}, {
+    Type = "Chassis";
+    Make = "Revox";
+    Season = 25;
+    Level = 10;
+    SeasonIconId = 134904400574650;
+}, {
+    Type = "Chassis";
+    Make = "Manta";
+    Hidden = true;
+}, {
+    Type = "Chassis";
+    Make = "Stormrider";
+    Season = 24;
+    SeasonIconId = 132412640219795;
+    Level = 10;
+}, {
+    Type = "Chassis";
+    Make = "Tanker";
+    Price = 80000;
+    NoTradeWorldGarageSpawn = true;
+}, {
+    Type = "Chassis";
+    Make = "Iceborn";
+    Price = 675000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Wedge";
+    Season = 23;
+    SeasonIconId = 106450572784202;
+    Level = 10;
+}, {
+    Type = "Chassis";
+    Make = "Scorpio";
+    Retired = true;
+    NoTrade = false;
+}, {
+    Type = "Chassis";
+    Make = "Hammerhead";
+    Hidden = true;
+}, {
+    Type = "Chassis";
+    Make = "Maverick";
+    Season = 22;
+    SeasonIconId = 18128198711;
+    Level = 10;
+}, {
+    Type = "Chassis";
+    Make = "Venom";
+    Hidden = true;
+}, {
+    Type = "Chassis";
+    Make = "OGLaMatador";
+    Hidden = true;
+}, {
+    Type = "Chassis";
+    Make = "OGMonster";
+    Level = 10;
+    Season = 21;
+    SeasonIconId = 17137444170;
+}, {
+    Type = "Chassis";
+    Make = "XRK";
+    Price = 299000;
+}, {
+    Type = "Chassis";
+    Make = "Striker";
+    Season = 20;
+    SeasonIconId = 16176423092;
+    Level = 10;
+}, {
+    Type = "Chassis";
+    Make = "Carbonara";
+    Price = 800000;
+    Retired = true;
+}, {
+    Type = "Chassis3";
+    Make = "SpeedYacht";
+    Price = 250000;
+}, {
+    Type = "Chassis";
+    Make = "FrostCrawler";
+    Season = 19;
+    SeasonIconId = 15624648397;
+    Level = 10;
+}, {
+    Type = "Motorcycle";
+    Make = "FalconS";
+    Price = 150000;
+}, {
+    Type = "Chassis";
+    Make = "Successor";
+    Price = 649000;
+}, {
+    Type = "Chassis";
+    Make = "Laviolette";
+    Hidden = true;
+}, {
+    Type = "Chassis";
+    Make = "Longhorn";
+    Season = 18;
+    SeasonIconId = 14952760017;
+    Level = 10;
+}, {
+    Type = "Chassis";
+    Make = "Fiasco";
+    Hidden = true;
+    Lite = true;
+}, {
+    Type = "Chassis";
+    Make = "Aperture";
+    Price = 899000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Power1";
+    Season = 17;
+    Level = 10;
+    SeasonIconId = 14279340201;
+}, {
+    Type = "Chassis";
+    Make = "PrisonBus";
+    Price = 150000;
+}, {
+    Type = "Chassis";
+    Make = "Poseidon";
+    Season = 16;
+    Level = 10;
+    SeasonIconId = 13686306316;
+}, {
+    Type = "Chassis";
+    Make = "Shogun";
+    Season = 15;
+    Level = 10;
+    SeasonIconId = 12995659550;
+}, {
+    Type = "Chassis";
+    Make = "NASCAR75th";
+    Hidden = true;
+    NoGarageSpawnUnlessOwned = true;
+}, {
+    Type = "Chassis";
+    Make = "Semi";
+    Price = 100000;
+    Lite = true;
+    NoPhysicalGarageSpawn = true;
+    AllowCustomizeAnywhere = true;
+}, {
+    Type = "Chassis";
+    Make = "Parisian";
+    Price = 720000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Proto8";
+    Season = 14;
+    Level = 10;
+    SeasonIconId = 12425001512;
+}, {
+    Type = "Chassis";
+    Make = "Crown";
+    Price = 666000;
+}, {
+    Type = "Chassis";
+    Make = "Bandit";
+    Season = 13;
+    Level = 10;
+    SeasonIconId = 11811058057;
+}, {
+    Type = "Heli";
+    Make = "EscapeBot";
+    Hidden = true;
+    AerialSpawn = true;
+}, {
+    Type = "Chassis";
+    Make = "Javelin";
+    Price = 929929;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "DesertCrawler";
+    Price = 229000;
+}, {
+    Type = "Chassis";
+    Make = "ShellMark5";
+    Price = 92000;
+}, {
+    Type = "Chassis";
+    Make = "Goliath";
+    Season = 12;
+    Level = 10;
+    SeasonIconId = 11183663040;
+}, {
+    Type = "Chassis";
+    Make = "ShellClassic";
+    Hidden = true;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Bloxy";
+    Season = 11;
+    Level = 10;
+    SeasonIconId = 10529387816;
+}, {
+    Type = "Chassis";
+    Make = "TinyToy";
+    Season = 11;
+    Level = 8;
+    SeasonIconId = 10529386892;
+}, {
+    Type = "Chassis";
+    Make = "Snake";
+    Price = 649000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Macaron";
+    Season = 10;
+    Level = 10;
+}, {
+    Type = "Chassis";
+    Make = "JackRabbit";
+    Season = 9;
+    Level = 8;
+}, {
+    Type = "Chassis";
+    Make = "TowTruck";
+    Price = 80000;
+}, {
+    Type = "Chassis";
+    Make = "MCL36";
+    Price = 200000;
+    Retired = true;
+    NoTrade = true;
+}, {
+    Type = "Chassis";
+    Make = "MCL36FREE";
+    NoMainWorldGarageSpawn = true;
+    Retired = true;
+    NoTrade = true;
+    NoGarageUI = true;
+}, {
+    Type = "Heli";
+    Make = "Celsior";
+    Season = 8;
+    Level = 10;
+}, {
+    Type = "Chassis";
+    Make = "Badger";
+    Price = 45000;
+}, {
+    Type = "Chassis";
+    Make = "IceBreaker";
+    Price = 500000;
+    Season = 7;
+    Level = 10;
+}, {
+    Type = "Custom";
+    Make = "Tank";
+    Price = 1000000;
+}, {
+    Type = "Chassis";
+    Make = "NASCAR2";
+    Lite = true;
+    Retired = true;
+    NoTrade = true;
+}, {
+    Type = "Chassis";
+    Make = "NASCAR1";
+    Price = 100000;
+    Retired = true;
+    NoTrade = true;
+}, {
+    Type = "Chassis";
+    Make = "Beignet";
+    Price = 500000;
+    Season = 6;
+    Level = 10;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Concept";
+    Price = 2500000;
+}, {
+    Type = "Chassis";
+    Make = "Torero";
+    Price = 599000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Trailblazer";
+    Price = 1000000;
+}, {
+    Type = "Chassis";
+    Make = "Ray9";
+    Price = 199000;
+}, {
+    Type = "Chassis";
+    Make = "TheCamper";
+    Price = 79000;
+}, {
+    Type = "Chassis";
+    Make = "BananaCar";
+    Price = 100000;
+    Season = 5;
+    Level = 10;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Sentinel";
+    Price = 250000;
+}, {
+    Type = "Chassis";
+    Make = "TheRattler";
+    Price = 100000;
+    Season = 4;
+    Level = 10;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "TheAgent";
+    Price = 600000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Interrogator";
+    Price = 30000;
+}, {
+    Type = "Chassis";
+    Make = "Volt4x4";
+    Price = 100000;
+    Season = 3;
+    Level = 10;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "AirTail";
+    Price = 600000;
+    Retired = true;
+}, {
+    Type = "Heli";
+    Make = "CrewCapsule";
+    Price = 100000;
+    Season = 2;
+    Level = 10;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "BeamHybrid";
+    Price = 100000;
+    Season = 1;
+    Level = 10;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Delorean";
+    Price = 175000;
+}, {
+    Type = "Heli";
+    Make = "Drone";
+    Price = 1000000;
+    AerialSpawn = true;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Boxer";
+    Price = 55000;
+}, {
+    Type = "Chassis";
+    Make = "MoltenM12";
+    Price = 599000;
+    Retired = true;
+}, {
+    Type = "Heli";
+    Make = "Lia";
+    Price = 1000000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Deja";
+    Price = 10000;
+    Lite = true;
+}, {
+    Type = "Chassis";
+    Make = "Ray";
+    Price = 25000;
+}, {
+    Type = "Chassis";
+    Make = "Challenger";
+    Price = 59000;
+}, {
+    Type = "Chassis";
+    Make = "Surus";
+    Price = 109000;
+}, {
+    Type = "Heli";
+    Make = "LittleBird";
+    Price = 190000;
+    AerialSpawn = true;
+}, {
+    Type = "Chassis3";
+    Make = "Sloop";
+    Price = 1000000;
+}, {
+    Type = "Chassis3";
+    Make = "Cruiser";
+    Price = 0;
+    NoTrade = true;
+}, {
+    Type = "Chassis";
+    Make = "Chiron";
+    Price = 600000;
+}, {
+    Type = "Chassis";
+    Make = "Cybertruck";
+    Price = 100000;
+}, {
+    Type = "Chassis";
+    Make = "Roadster";
+    Price = 600000;
+}, {
+    Type = "Chassis3";
+    Make = "Jet";
+    Price = 1000000;
+    NoMainWorldGarageSpawn = true;
+}, {
+    Type = "Chassis3";
+    Make = "Stunt";
+    Price = 300000;
+    NoMainWorldGarageSpawn = true;
+}, {
+    Type = "Chassis";
+    Make = "Raptor";
+    Price = 150000;
+    Season = 3;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "R8";
+    Price = 200000;
+    Season = 3;
+    Retired = true;
+}, {
+    Type = "Chassis3";
+    Make = "JetSki";
+    Price = 50000;
+    NoMainWorldGarageSpawn = true;
+}, {
+    Type = "Motorcycle";
+    Make = "Patrol";
+    Price = 45000;
+}, {
+    Type = "Chassis";
+    Make = "Jeep";
+    Price = 0;
+    Lite = true;
+    NoTrade = true;
+}, {
+    Type = "Chassis";
+    Make = "Firetruck";
+    Price = 175000;
+}, {
+    Type = "Chassis";
+    Make = "Arachnid";
+    Price = 750000;
+    Season = 2;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Torpedo";
+    Price = 750000;
+    Season = 2;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Ambulance";
+    Price = 90000;
+}, {
+    Type = "Chassis";
+    Make = "Wraith";
+    Gamepass = "BOSS";
+    NoTrade = true;
+}, {
+    Type = "Chassis";
+    Make = "Classic";
+    Price = 50000;
+    Retired = true;
+}, {
+    Type = "Heli";
+    Make = "BlackHawk";
+    Price = 1000000;
+    AerialSpawn = true;
+}, {
+    Type = "Heli";
+    Make = "UFO";
+    Price = 500000;
+    AerialSpawn = true;
+}, {
+    Type = "Chassis";
+    Make = "SUV";
+    Price = 40000;
+    Retired = true;
+}, {
+    Type = "Custom";
+    Make = "Volt";
+    Price = 1000000;
+}, {
+    Type = "Chassis";
+    Make = "McLaren";
+    Price = 300000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "ATV";
+    Price = 50000;
+}, {
+    Type = "Chassis";
+    Make = "Monster";
+    Price = 1000000;
+}, {
+    Type = "Chassis";
+    Make = "Ferrari";
+    Price = 200000;
+}, {
+    Type = "Chassis";
+    Make = "Mustang";
+    Price = 50000;
+    Retired = true;
+}, {
+    Type = "DuneBuggy";
+    Make = "DuneBuggy";
+    Price = 45000;
+}, {
+    Type = "Motorcycle";
+    Make = "Dirtbike";
+    Price = 35000;
+}, {
+    Type = "Chassis";
+    Make = "Bugatti";
+    Price = 500000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "MiniCooper";
+    Price = 25000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "Porsche";
+    Price = 70000;
+    Retired = true;
+}, {
+    Type = "Chassis";
+    Make = "SWATVan";
+    Gamepass = "SWAT";
+    NoTrade = true;
+}, {
+    Type = "Chassis";
+    Make = "Pickup";
+    Price = 9000;
+    Lite = true;
+}, {
+    Type = "Chassis";
+    Make = "Lamborghini";
+    Price = 100000;
+}, {
+    Type = "Heli";
+    Make = "Heli";
+    Price = 0;
+    NoTrade = true;
+    AerialSpawn = true;
+}, {
+    Type = "Chassis";
+    Make = "Model3";
+    Price = 16000;
+    Lite = true;
+}, {
+    Type = "Chassis";
+    Make = "Camaro";
+    Price = 0;
+    Lite = true;
+    NoTrade = true;
+}, {
+    Type = "Chassis";
+    Make = "BankTruck";
+    Price = 0;
+    NoGarageSpawn = true;
+    NoGarageUI = true;
+    NoTrade = true;
+}, {
+    Make = "JetPack";
+    Price = 50000;
+    NoMainWorldGarageSpawn = true;
+    NoGarageUI = true;
+    NoTrade = true;
+}}
+for _, v in module_upvr do
+    if v.Price ~= nil and v.Price <= 100000 and v.Level ~= 10 and v.Type ~= "Heli" then
+        v.Lite = true
+    end
+end
+local function updateAutoRetire_upvr() -- Line 875, Named "updateAutoRetire"
+    --[[ Upvalues[1]:
+        [1]: module_upvr (readonly)
+    ]]
+    for _, v_2 in module_upvr do
+        if v_2.AutoRetireAt and not v_2.Retired and v_2.AutoRetireAt - workspace:GetServerTimeNow() <= 0 then
+            v_2.Retired = true
+        end
+    end
+end
+updateAutoRetire_upvr()
+task.spawn(function() -- Line 883
+    --[[ Upvalues[1]:
+        [1]: updateAutoRetire_upvr (readonly)
+    ]]
+    while true do
+        task.wait(60)
+        updateAutoRetire_upvr()
+    end
+end)
+return module_upvr

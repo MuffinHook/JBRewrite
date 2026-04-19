@@ -1,0 +1,174 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Bytecode (Base64):
+-- BgNJBUNvbG9yBkNvbG9ycwhHZXRDb2xvcgZhc3NlcnQSRGVmYXVsdFJlZmxlY3RhbmNlD0RlZmF1bHRNYXRlcmlhbA9EaXNhYmxlTWF0ZXJpYWwSRGlzYWJsZVJlZmxlY3RhbmNlC1JlZmxlY3RhbmNlE092ZXJyaWRlUmVmbGVjdGFuY2UITWF0ZXJpYWwQT3ZlcnJpZGVNYXRlcmlhbAVlcnJvchlObyBjb2xvciBleGlzdHMgbmFtZWQ6ICVzBmZvcm1hdARQYXJ0BGdhbWURUmVwbGljYXRlZFN0b3JhZ2UKR2V0U2VydmljZQdyZXF1aXJlCFNldHRpbmdzCFJlc291cmNlC0h5cGVyQ2hyb21lEEh5cGVyQ2hyb21lVXRpbHMRSHlwZXJDaHJvbWVDb25zdHMGQ29sb3IzB2Zyb21SR0IERW51bQ1TbW9vdGhQbGFzdGljBkNocm9tZQpGYWxsQ2hyb21lBEdvbGQETmVvbg1SYWRpYW50WWVsbG93DVJhZGlhbnRPcmFuZ2UKUmFkaWFudEljZQpWYW50YWJsYWNrDFJhZGlhbnRHcmVlbg1NaWxpdGFyeUdyZWVuBUJsYWNrCE5hdnlCbHVlC0hvdHRlc3RQaW5rBk1hcm9vbglSZWFsR3JlZW4NRGFya2VzdFB1cnBsZQtEYXJrZXN0Qmx1ZQxEYXJrZXN0R3JlZW4NRGFya2VzdE1hcmluZQpEYXJrZXN0UmVkDERhcmtlc3RCcm93bg1SYWRpYW50UHVycGxlClNha3VyYVBpbmsKUmFkaWFudFJlZAtSYWRpYW50UGluawpSYWRpYW50U3VuEFJhZGlhbnRQb2xhckJsdWUDTXVkDFJhZGlhbnRXaGl0ZQlTbm93V2hpdGUZZ2V0TGlzdE9mSHlwZXJDaHJvbWVOYW1lcxBnZXRDb2xvckZyb21OYW1lEUNPTE9SX1RPX0lORk9fTUFQDExldmVsVG9Db2xvchBnZXRMZXZlbEZyb21OYW1lA25ldwFyBG1hdGgFY2xhbXABZwFiBVRvSFNWB2Zyb21IU1YQQ09MT1JfU0hJRlRfTkFNRQADAwECAAAAFPsCAACHAQIADgEFAPsCAACHAQIATQEBpAAAAACCAQIA+wIBAE0CAloBAAAAhwECAA4BBQD7AgEATQICWgEAAACHAQIAggECAMYB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
+
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
+-- Decompiled on 2026-04-18 23:36:16
+-- Luau version 6, Types version 3
+-- Time taken: 0.008098 seconds
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Settings_upvr = require(ReplicatedStorage.Resource.Settings)
+local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
+local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConsts)
+local module_upvr = {
+    Chrome = {
+        Color = Color3.fromRGB(248, 248, 248);
+        Reflectance = 1;
+        Material = Enum.Material.SmoothPlastic;
+    };
+    FallChrome = {
+        Color = Color3.fromRGB(207, 96, 36);
+        Reflectance = 0.4;
+        Material = Enum.Material.SmoothPlastic;
+    };
+    Gold = {
+        Color = Color3.fromRGB(188, 155, 93);
+        Reflectance = 0.3;
+    };
+    RadiantYellow = {
+        Color = Color3.fromRGB(112, 168, 38);
+        Material = Enum.Material.Neon;
+    };
+    RadiantOrange = {
+        Color = Color3.fromRGB(174, 108, 34);
+        Material = Enum.Material.Neon;
+    };
+    RadiantIce = {
+        Color = Color3.fromRGB(20, 104, 175);
+        Material = Enum.Material.Neon;
+    };
+    Vantablack = {
+        Color = Color3.fromRGB(0, 0, 0);
+        Material = Enum.Material.Neon;
+    };
+    RadiantGreen = {
+        Color = Color3.fromRGB(51, 171, 78);
+        Material = Enum.Material.Neon;
+    };
+    MilitaryGreen = {
+        Color = Color3.fromRGB(74, 83, 60);
+    };
+    Black = {
+        Color = Color3.fromRGB(0, 0, 0);
+        Reflectance = 0.02;
+    };
+    NavyBlue = {
+        Color = Color3.fromRGB(0, 42, 75);
+    };
+    HottestPink = {
+        Color = Color3.fromRGB(255, 91, 236);
+    };
+    Maroon = {
+        Color = Color3.fromRGB(92, 0, 23);
+    };
+    RealGreen = {
+        Color = Color3.fromRGB(26, 124, 0);
+    };
+    DarkestPurple = {
+        Color = Color3.fromRGB(30, 4, 41);
+        Reflectance = 0.02;
+    };
+    DarkestBlue = {
+        Color = Color3.fromRGB(1, 12, 46);
+        Reflectance = 0.02;
+    };
+    DarkestGreen = {
+        Color = Color3.fromRGB(0, 40, 14);
+        Reflectance = 0.02;
+    };
+    DarkestMarine = {
+        Color = Color3.fromRGB(0, 45, 44);
+        Reflectance = 0.02;
+    };
+    DarkestRed = {
+        Color = Color3.fromRGB(41, 0, 2);
+        Reflectance = 0.02;
+    };
+    DarkestBrown = {
+        Color = Color3.fromRGB(46, 22, 0);
+        Reflectance = 0.02;
+    };
+    RadiantPurple = {
+        Color = Color3.fromRGB(74, 58, 171);
+        Material = Enum.Material.Neon;
+    };
+    SakuraPink = {
+        Color = Color3.fromRGB(255, 118, 125);
+    };
+    RadiantRed = {
+        Color = Color3.fromRGB(163, 23, 2);
+        Material = Enum.Material.Neon;
+    };
+    RadiantPink = {
+        Color = Color3.fromRGB(181, 86, 158);
+        Material = Enum.Material.Neon;
+    };
+    RadiantSun = {
+        Color = Color3.fromRGB(182, 129, 99);
+        Material = Enum.Material.Neon;
+    };
+    RadiantPolarBlue = {
+        Color = Color3.fromRGB(0, 0, 165);
+        Material = Enum.Material.Neon;
+    };
+    Mud = {
+        Color = Color3.fromRGB(102, 86, 68);
+    };
+    RadiantWhite = {
+        Color = Color3.fromRGB(160, 160, 165);
+        Material = Enum.Material.Neon;
+    };
+    SnowWhite = {
+        Color = Color3.fromRGB(255, 255, 255);
+    };
+}
+for _, v in HyperChromeUtils.getListOfHyperChromeNames(), nil do
+    local var39 = HyperChromeConsts.COLOR_TO_INFO_MAP[HyperChromeUtils.getColorFromName(v)].LevelToColor[HyperChromeUtils.getLevelFromName(v)]
+    local any_ToHSV_result1, any_ToHSV_result2, any_ToHSV_result3 = Color3.new(math.clamp(var39.r, 0, 1), math.clamp(var39.g, 0, 1), math.clamp(var39.b, 0, 1)):ToHSV()
+    module_upvr[v] = {
+        Color = Color3.fromHSV(any_ToHSV_result1, any_ToHSV_result2, math.clamp(any_ToHSV_result3 * 2 / 3, 0, 1));
+        Reflectance = 0.1;
+    }
+end
+module_upvr[HyperChromeConsts.COLOR_SHIFT_NAME] = {
+    Color = Color3.fromRGB(1, 1, 1);
+    Reflectance = 0.1;
+}
+return {
+    GetColor = function(arg1) -- Line 150, Named "GetColor"
+        --[[ Upvalues[2]:
+            [1]: module_upvr (readonly)
+            [2]: Settings_upvr (readonly)
+        ]]
+        if module_upvr[arg1] then
+            return module_upvr[arg1].Color
+        end
+        if Settings_upvr.Colors[arg1] then
+            return Settings_upvr.Colors[arg1]
+        end
+        return nil
+    end;
+    Part = function(arg1, arg2, arg3) -- Line 158, Named "Part"
+        --[[ Upvalues[2]:
+            [1]: module_upvr (readonly)
+            [2]: Settings_upvr (readonly)
+        ]]
+        -- KONSTANTERROR: [0] 1. Error Block 59 start (CF ANALYSIS FAILED)
+        if arg1 == nil then
+        else
+        end
+        assert(true)
+        if arg2 == nil then
+            -- KONSTANTWARNING: GOTO [12] #10
+        end
+        -- KONSTANTERROR: [0] 1. Error Block 59 end (CF ANALYSIS FAILED)
+        -- KONSTANTERROR: [11] 9. Error Block 62 start (CF ANALYSIS FAILED)
+        assert(true)
+        if arg3 == nil then
+            -- KONSTANTWARNING: GOTO [20] #16
+        end
+        -- KONSTANTERROR: [11] 9. Error Block 62 end (CF ANALYSIS FAILED)
+    end;
+}

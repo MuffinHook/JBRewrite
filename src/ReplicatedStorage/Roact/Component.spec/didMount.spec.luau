@@ -1,0 +1,28 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Bytecode (Base64):
+-- BgMaBnJlbmRlcgtNeUNvbXBvbmVudAZleHRlbmQFdmFsdWUIZGlkTW91bnQQbW91bnRWaXJ0dWFsTm9kZQRUZXN0BmV4cGVjdAljYWxsQ291bnQCdG8FZXF1YWwEc2VsZg1jYXB0dXJlVmFsdWVzAm9mGVN0YXRlZnVsQ29tcG9uZW50SW5zdGFuY2UHcmVxdWlyZQZzY3JpcHQGUGFyZW50DWNyZWF0ZUVsZW1lbnQQY3JlYXRlUmVjb25jaWxlcgljcmVhdGVTcHkMTm9vcFJlbmRlcmVyBFR5cGUJQ29tcG9uZW50Aml0HnNob3VsZCBiZSBpbnZva2VkIHdoZW4gbW91bnRlZAAEAgEAAAAAAsYBAACCAQIAAAATAQEYAAAUAAAAAAkABQAAGAAFBA8PDw8PDwAAOQ8BBTQPAg4rDwMjFjn7AAAAbwIAALwAAJwBAAAAnwADAvsBAQCfAQECTQIBzAIAAAAwAgBqAwAAAMACBAAwAgCABQAAAPsCAgBSAwAAnwICAvsEAwBNAwS+BgAAAFIEAgDGBQAAbwYHAJ8DBAGkBQkAAACAQE0GAeQKAAAAnwUCAk0EBZILAAAATQMEewwAAACMBAEAnwMCAW8FDQC8AwGmDgAAAJ8DAwKkBgkAAACAQPsIBABNBwi8DwAAAE0IA7ANAAAAnwcCAJ8GAAJNBQaSCwAAAE0EBXsMAAAA+wYEAE0FBqYQAAAAnwQCAYIAAQARAwIDAwMEAwUGAAMBAwYDBwMIBAAAgEADCQMKAwsDDAMNAw4DDwEADAABGAAAAAAAAgACAAAAAgAABAAABAAAAAAAAAIAAAAAAAAAAAAAAgAAAAIAAAAAAAAAAAAAAAAAAAAAAQ0AAAAACgAAAAAfAAAHDwAAUA8BC0UPAhY6DwMhLw8ELCQPBTcZDwZCDlCkAAEAAAAAQKQEAwAAACBATQMEJAQAAABNAgMkBAAAAE0BAsoFAAAAnwACAqQBAQAAAABApAUDAAAAIEBNBAUkBAAAAE0DBCQEAAAATQIDiwYAAACfAQICpAIBAAAAAECkBgMAAAAgQE0FBiQEAAAATQQFJAQAAABNAwQABwAAAJ8CAgKkAwEAAAAAQKQHAwAAACBATQYHJAQAAABNBQYkBAAAAE0EBWoIAAAAnwMCAqQEAQAAAABApAgDAAAAIEBNBwgkBAAAAE0GByQEAAAATQUGEQkAAACfBAICpAUBAAAAAECkCQMAAAAgQE0ICSQEAAAATQcIJAQAAABNBgeICgAAAJ8FAgJSBgEAUgcDAJ8GAgKkBwwAAACwQG8IDQDZCQAAEgAFABIAAgASAAAAEgAGABIABACfBwMBggABAA4DEAQAAABAAxEEAAAgQAMSAxMDFAMVAxYDFwMYAxkEAACwQAMaAQEBAAEYAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAIAAAAAAAAAAAAAAgAAAgAAAAAAAAAAABcCAAAAAAEAAAECAAOjAAAAwAAAAIIAAgABBgIBAgEAARgAAAABAAAAAAPWal+XlzSk3+SuNQMtPY3exIWKxgI/Z9ZgdNe2pvHxHDEfQ98jR7Lo
+
+return function() --[[ Line: 1 ]]
+    local v0 = require(script.Parent.Parent.createElement);
+    local v1 = require(script.Parent.Parent.createReconciler);
+    local v2 = require(script.Parent.Parent.createSpy);
+    local v3 = require(script.Parent.Parent.NoopRenderer);
+    local v4 = require(script.Parent.Parent.Type);
+    local v5 = require(script.Parent.Parent.Component);
+    local v6 = v1(v3);
+    it("should be invoked when mounted", function() --[[ Line: 12 ]]
+        -- upvalues: v5 (copy), v2 (copy), v0 (copy), v6 (copy), v4 (copy)
+        local v7 = v5:extend("MyComponent");
+        local v8 = v2();
+        v7.didMount = v8.value;
+        v7.render = function(_) --[[ Line: 19 ]] --[[ Name: render ]]
+            return nil;
+        end;
+        local v10 = v0(v7);
+        v6.mountVirtualNode(v10, nil, "Test");
+        expect(v8.callCount).to.equal(1);
+        local v11 = v8:captureValues("self");
+        expect(v4.of(v11.self)).to.equal(v4.StatefulComponentInstance);
+    end);
+end;

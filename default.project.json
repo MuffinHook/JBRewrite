@@ -1,0 +1,44 @@
+{
+  "name": "JBRewrite",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedFirst": {
+      "$path": "src/ReplicatedFirst"
+    },
+    "ReplicatedStorage": {
+      "$attributes": {
+        "PrivateServerType": ""
+      },
+      "$path": "src/ReplicatedStorage"
+    },
+    "ServerScriptService": {
+      "$path": "src/ServerScriptService"
+    },
+    "ServerStorage": {
+      "$path": "src/ServerStorage"
+    },
+    "StarterGui": {
+      "$properties": {
+        "ResetPlayerGuiOnSpawn": false,
+        "VirtualCursorMode": "Enabled"
+      },
+      "$path": "src/StarterGui"
+    },
+    "StarterPlayer": {
+      "StarterCharacterScripts": {
+        "$path": "src/StarterPlayer/StarterCharacterScripts"
+      },
+      "StarterPlayerScripts": {
+        "$path": "src/StarterPlayer/StarterPlayerScripts"
+      },
+      "$properties": {
+        "AutoJumpEnabled": false,
+        "AvatarJointUpgrade_SerializedRollout": "Disabled",
+        "CameraMaxZoomDistance": 60.0,
+        "DevComputerCameraMovementMode": "Classic",
+        "DevTouchCameraMovementMode": "Classic",
+        "EnableMouseLockOption": false
+      }
+    }
+  }
+}

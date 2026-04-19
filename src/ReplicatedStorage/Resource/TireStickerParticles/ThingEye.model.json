@@ -1,0 +1,84 @@
+{
+  "className": "ParticleEmitter",
+  "properties": {
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "Texture": "rbxassetid://128593412127999",
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.75,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 0.75,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Speed": {
+      "NumberRange": [
+        50.0,
+        50.0
+      ]
+    },
+    "FlipbookLayout": "Custom",
+    "Transparency": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 1.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.05074,
+            "value": 1.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.0993657,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.200846,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.700317,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 1.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "LockedToPart": true,
+    "Brightness": 5.0,
+    "ShapeInOut": "Inward",
+    "Drag": 35.0,
+    "TimeScale": 0.20000000298023224,
+    "EmissionDirection": "Right",
+    "ShapePartial": 0.0,
+    "Shape": "Sphere",
+    "Lifetime": {
+      "NumberRange": [
+        0.53,
+        0.53
+      ]
+    },
+    "Rate": 2.0,
+    "ShapeStyle": "Surface"
+  }
+}

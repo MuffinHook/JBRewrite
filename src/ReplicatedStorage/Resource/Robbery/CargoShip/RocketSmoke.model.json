@@ -1,0 +1,141 @@
+{
+  "className": "ParticleEmitter",
+  "properties": {
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.0209059,
+            "value": 2.0625,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 6.0625,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Speed": {
+      "NumberRange": [
+        100.0,
+        100.0
+      ]
+    },
+    "Transparency": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 1.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.0359629,
+            "value": 0.55,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.315545,
+            "value": 0.41875,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.684455,
+            "value": 0.55625,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 1.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "ZOffset": 2.0,
+    "Color": {
+      "ColorSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "color": [
+              0.986358,
+              0.136187,
+              0.601892
+            ]
+          },
+          {
+            "time": 0.0733333,
+            "color": [
+              0.989868,
+              0.464866,
+              0.172168
+            ]
+          },
+          {
+            "time": 0.116667,
+            "color": [
+              0.198138,
+              0.291127,
+              0.372595
+            ]
+          },
+          {
+            "time": 0.32,
+            "color": [
+              0.423823,
+              0.483531,
+              0.612743
+            ]
+          },
+          {
+            "time": 1.0,
+            "color": [
+              0.118288,
+              0.132097,
+              0.161608
+            ]
+          }
+        ]
+      }
+    },
+    "EmissionDirection": "Back",
+    "LightInfluence": 1.0,
+    "Acceleration": [
+      0.0,
+      -2.0,
+      0.0
+    ],
+    "Lifetime": {
+      "NumberRange": [
+        2.0,
+        2.0
+      ]
+    },
+    "LightEmission": 0.4000000059604645,
+    "Rate": 30.0,
+    "RotSpeed": {
+      "NumberRange": [
+        25.0,
+        25.0
+      ]
+    },
+    "Rotation": {
+      "NumberRange": [
+        -100.0,
+        100.0
+      ]
+    },
+    "Texture": "http://www.roblox.com/asset/?id=4698415462",
+    "FlipbookBlendFrames": {
+      "Bool": false
+    }
+  }
+}

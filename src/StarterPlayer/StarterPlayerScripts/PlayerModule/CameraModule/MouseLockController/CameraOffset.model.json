@@ -1,0 +1,10 @@
+{
+  "className": "Vector3Value",
+  "properties": {
+    "Value": [
+      2.0,
+      1.0,
+      0.25
+    ]
+  }
+}

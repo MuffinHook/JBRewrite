@@ -1,0 +1,111 @@
+{
+  "className": "ParticleEmitter",
+  "properties": {
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 10.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 10.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Speed": {
+      "NumberRange": [
+        2.0,
+        2.0
+      ]
+    },
+    "Transparency": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 1.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.127178,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.818815,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 1.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Orientation": "FacingCameraWorldUp",
+    "Color": {
+      "ColorSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "color": [
+              0.160784,
+              0.352941,
+              0.137255
+            ]
+          },
+          {
+            "time": 1.0,
+            "color": [
+              0.160784,
+              0.352941,
+              0.137255
+            ]
+          }
+        ]
+      }
+    },
+    "LightInfluence": 1.0,
+    "Enabled": false,
+    "Acceleration": [
+      0.0,
+      -3.0,
+      0.0
+    ],
+    "Lifetime": {
+      "NumberRange": [
+        3.0,
+        3.0
+      ]
+    },
+    "Rate": 8.0,
+    "LightEmission": 0.5,
+    "RotSpeed": {
+      "NumberRange": [
+        -40.0,
+        40.0
+      ]
+    },
+    "SpreadAngle": [
+      -180.0,
+      180.0
+    ],
+    "Rotation": {
+      "NumberRange": [
+        -90.0,
+        90.0
+      ]
+    },
+    "Texture": "http://www.roblox.com/asset/?id=7018929807"
+  }
+}

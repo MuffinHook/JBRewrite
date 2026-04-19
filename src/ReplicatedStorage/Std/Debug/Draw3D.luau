@@ -1,0 +1,43 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Bytecode (Base64):
+-- BgMXB19wYXJlbnQJc2V0UGFyZW50CEluc3RhbmNlA25ldwRQYXJ0BmFzc2VydAhBbmNob3JlZAhDYW5Ub3VjaAhDYW5RdWVyeQpDYW5Db2xsaWRlBFNpemUERW51bQhQYXJ0VHlwZQRCYWxsBVNoYXBlBkNGcmFtZQZQYXJlbnQFcG9pbnQJTWFnbml0dWRlBkNvbG9yMwVDb2xvcgdWZWN0b3IzBGxpbmUABAIBAQAABAABAA8E+wEAADAAAVkAAAAAggABAAEDAQAGAgEYAAAAAQcAAAAABgMBAAARBQECBQMIAocPCAUaAQgEGwEukAEBAFIDAgArAwQApAMDAAAIEIBvBAQAnwMCAlICAwC7AQIDUgQCAKQDBgAAAFBAnwMCAakDAQAwAwJFBwAAAKkDAAAwAwL2CAAAAKkDAAAwAwJiCQAAAKkDAAAwAwLTCgAAAG8FDAAJBAUBWwMECzADAi8NAAAApAMRABA84MAwAwJ+EgAAAKQDFAAACDCBUgQAAJ8DAgIwAwKFEwAAAPsEAABNAwRZFQAAADADAiQWAAAAggICABcCAAAAAAAA4D8DAwMEBAAIEIADBQMGBAAAUEADBwMIAwkDCgIAAAAAAAAAQAcAAIA/AACAPwAAgD8AAAAAAwsDDAMNAw4EEDzgwAMPAxAEAAgwgQMBAxEACRIBGAABAAAAAAAAAQAAAAABAAABAAABAAABAAABAAAAAAEAAAABAAAAAAABAAAAAAEKAAAAAAsDAQAAEQUBAgUDCAiHDwgEDQIPAww2QlIDAgArAwQApAMCAAAEAIBvBAMAnwMCAlICAwC7AQIDUgQCAKQDBQAAAEBAnwMCASYEAQBNAwSqBgAAAKQECAAABHCAjAUBAIwGAACMBwAAnwQEAjAEAqQJAAAAqQQBADAEAkUKAAAAqQQAADAEAvYLAAAAqQQAADAEAmIMAAAAqQQAADAEAtMNAAAAbwUOAG8GDgA0NgUEBgMAAFIHAwCkBBAAAATwgJ8EBAIwBAIvEQAAAKQFEwAABCCBUgYAAFIHAQCfBQMCpAYTAAAEIIGMBwAAjAgAADkKAwBbCQoUnwYEAgkEBQYwBAKFEgAAAPsFAABNBAVZFQAAADAEAiQWAAAAggICABcDAwMEBAAEAIADBQMGBAAAQEADEwMUBAAEcIADFQMHAwgDCQMKApqZmZmZmbk/AxYEAATwgAMLAxAEAAQggQIAAAAAAADgPwMBAxEAGxcBGAAAAAAAAAABAAAAAAEAAAEAAAAAAAAAAQAAAQAAAQAAAQAAAQAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAEAAAAAARwAAAAAAgAAAQIHAAABDwABEhOjAAAA/wADAAAAAADGAQAAMAEAWQAAAADAAQEAEgAAADABAHkCAAAAwAEDABIAAAAwAQDiBAAAAMABBQASAAAAMAEAyQYAAACCAAIABwMBBgADAgYBAxIGAgMXAwABAgEAARgAAQABAAADAAAAAwAAABIAAAAPAQAAAAADQb4L5KiFM0BzemFw8k0HE8/Qze0HJOHvJOjU0cUVkQWesbH9ag1hsQ==
+
+local v0 = {
+    _parent = nil
+};
+v0.setParent = function(v1) --[[ Line: 6 ]] --[[ Name: setParent ]]
+    -- upvalues: v0 (copy)
+    v0._parent = v1;
+end;
+v0.point = function(v2, v3, v4) --[[ Line: 9 ]] --[[ Name: point ]]
+    -- upvalues: v0 (copy)
+    v3 = v3 or 0.5;
+    v4 = v4 or Instance.new("Part");
+    assert(v4);
+    v4.Anchored = true;
+    v4.CanTouch = false;
+    v4.CanQuery = false;
+    v4.CanCollide = false;
+    v4.Size = Vector3.new(1, 1, 1, 0) * v3 * 2;
+    v4.Shape = Enum.PartType.Ball;
+    v4.CFrame = CFrame.new(v2);
+    v4.Parent = v0._parent;
+    return v4;
+end;
+v0.line = function(v5, v6, v7) --[[ Line: 27 ]] --[[ Name: line ]]
+    -- upvalues: v0 (copy)
+    v7 = v7 or Instance.new("Part");
+    assert(v7);
+    local l_Magnitude_0 = (v6 - v5).Magnitude;
+    v7.Color = Color3.new(1, 0, 0);
+    v7.Anchored = true;
+    v7.CanTouch = false;
+    v7.CanQuery = false;
+    v7.CanCollide = false;
+    v7.Size = Vector3.new(0.1, 0.1, l_Magnitude_0);
+    v7.CFrame = CFrame.new(v5, v6) * CFrame.new(0, 0, -l_Magnitude_0 * 0.5);
+    v7.Parent = v0._parent;
+    return v7;
+end;
+return v0;

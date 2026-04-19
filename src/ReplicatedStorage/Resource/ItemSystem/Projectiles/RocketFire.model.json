@@ -1,0 +1,103 @@
+{
+  "className": "ParticleEmitter",
+  "properties": {
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 1.5625,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.12065,
+            "value": 2.125,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 6.9375,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Speed": {
+      "NumberRange": [
+        20.0,
+        20.0
+      ]
+    },
+    "Transparency": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.75,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 0.75,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "ZOffset": 1.0,
+    "Color": {
+      "ColorSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "color": [
+              0.268467,
+              0.778073,
+              0.99881
+            ]
+          },
+          {
+            "time": 0.496667,
+            "color": [
+              0.675883,
+              0.198169,
+              0.998749
+            ]
+          },
+          {
+            "time": 1.0,
+            "color": [
+              0.108721,
+              0.0205539,
+              0.147616
+            ]
+          }
+        ]
+      }
+    },
+    "EmissionDirection": "Back",
+    "LightInfluence": 1.0,
+    "Lifetime": {
+      "NumberRange": [
+        2.0,
+        2.0
+      ]
+    },
+    "Rate": 40.0,
+    "LightEmission": 0.5,
+    "SpreadAngle": [
+      -10.0,
+      10.0
+    ],
+    "Rotation": {
+      "NumberRange": [
+        -50.0,
+        50.0
+      ]
+    },
+    "Texture": "rbxassetid://1386449707"
+  }
+}

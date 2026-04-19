@@ -1,0 +1,225 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Bytecode (Base64):
+-- BgNlAm9zBWNsb2NrBkNGcmFtZQZBbmdsZXMEbWF0aANzaW4DbmV3BlVwZGF0ZQhJbnN0YW5jZQRQYXJ0BEVudW0IUGFydFR5cGUEQmFsbAVTaGFwZQRTaXplClRvcFN1cmZhY2UNQm90dG9tU3VyZmFjZQhHZXRDb2xvcgROYW1lBUNvbG9yCEFuY2hvcmVkC0dldEluc3RhbmNlBGdhbWURUmVwbGljYXRlZFN0b3JhZ2UKR2V0U2VydmljZQdyZXF1aXJlBVBhaW50BEdhbWUGR2FyYWdlC0h5cGVyQ2hyb21lEEh5cGVyQ2hyb21lVXRpbHMRSHlwZXJDaHJvbWVDb25zdHMGSGlkZGVuCUhpZGRlbkFsbAlEb05vdEdpdmUHTm9UcmFkZQlTbm93V2hpdGUFUHJpY2UDTXVkBFRhZ3MMUmFkaWFudFdoaXRlBE51a2ULUmFkaWFudFBpbmsKUmFkaWFudFJlZBBSYWRpYW50UG9sYXJCbHVlClNha3VyYVBpbmsLRGFya2VzdEJsdWUMRGFya2VzdEdyZWVuDURhcmtlc3RNYXJpbmUKRGFya2VzdFJlZAxEYXJrZXN0QnJvd24GU2Vhc29uBUxldmVsDFNlYXNvbkljb25JZA1EYXJrZXN0UHVycGxlCE5hdnlCbHVlC0hvdHRlc3RQaW5rBk1hcm9vbglSZWFsR3JlZW4NTWlsaXRhcnlHcmVlbg1SYWRpYW50UHVycGxlDFJhZGlhbnRHcmVlbgpSYWRpYW50SWNlDVJhZGlhbnRPcmFuZ2UKUmFkaWFudFN1bgpWYW50YWJsYWNrDVJhZGlhbnRZZWxsb3cER29sZAZZZWxsb3cFV2hpdGUDVklQBkNocm9tZQRCbHVlBUdyZWVuA1JlZAVNYXR0ZQVCbGFjawRHcmV5Bk9yYW5nZQRQaW5rBEN5YW4MRm9yZXN0IEdyZWVuBlB1cnBsZQxQYXN0ZWwgR3JlZW4NUGFzdGVsIFZpb2xldAtQYXN0ZWwgQmx1ZQtQYXN0ZWwgR3JheQtQYXN0ZWwgUGluaw1QYXN0ZWwgWWVsbG93DVBhc3RlbCBPcmFuZ2UMUGFzdGVsIEJyb3duBFNhbmQKSG90IE9yYW5nZQpTdXBlciBMaW1lC0RlZXAgUHVycGxlCkZhbGxDaHJvbWUZZ2V0TGlzdE9mSHlw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
+
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
+-- Decompiled on 2026-04-18 23:36:20
+-- Luau version 6, Types version 3
+-- Time taken: 0.008894 seconds
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local tbl = {{
+    Name = "SnowWhite";
+    Hidden = true;
+    HiddenAll = true;
+    DoNotGive = true;
+    NoTrade = true;
+}, {
+    Name = "Mud";
+    Price = 5000;
+}, {
+    Name = "RadiantWhite";
+    Hidden = true;
+    Tags = {"Nuke"};
+}, {
+    Name = "RadiantPink";
+    Hidden = true;
+    Tags = {"Nuke"};
+}, {
+    Name = "RadiantRed";
+    Hidden = true;
+    Tags = {"Nuke"};
+}, {
+    Name = "RadiantPolarBlue";
+    Hidden = true;
+    Tags = {"Nuke"};
+}, {
+    Name = "SakuraPink";
+    Price = 10000;
+}, {
+    Name = "DarkestBlue";
+    Price = 5000;
+}, {
+    Name = "DarkestGreen";
+    Price = 5000;
+}, {
+    Name = "DarkestMarine";
+    Price = 5000;
+}, {
+    Name = "DarkestRed";
+    Price = 5000;
+}, {
+    Name = "DarkestBrown";
+    Price = 5000;
+}, {
+    Name = "DarkestPurple";
+    Season = 13;
+    Level = 2;
+    SeasonIconId = 11811060890;
+}, {
+    Name = "NavyBlue";
+    Price = 5000;
+}, {
+    Name = "HottestPink";
+    Price = 5000;
+}, {
+    Name = "Maroon";
+    Price = 5000;
+}, {
+    Name = "RealGreen";
+    Price = 5000;
+}, {
+    Name = "MilitaryGreen";
+    Price = 5000;
+}, {
+    Name = "RadiantPurple";
+    Hidden = true;
+    Tags = {"Nuke"};
+}, {
+    Name = "RadiantGreen";
+    Hidden = true;
+    Tags = {"Nuke"};
+}, {
+    Name = "RadiantIce";
+    Hidden = true;
+    Tags = {"Nuke"};
+}, {
+    Name = "RadiantOrange";
+    Hidden = true;
+    Tags = {"Nuke"};
+}, {
+    Name = "RadiantSun";
+    Hidden = true;
+    Tags = {"Nuke"};
+}, {
+    Name = "Vantablack";
+    Season = 2;
+    Level = 5;
+}, {
+    Name = "RadiantYellow";
+    Hidden = true;
+    Tags = {"Nuke"};
+}, {
+    Name = "Gold";
+    Hidden = true;
+}, {
+    Name = "Yellow";
+    Price = 1000;
+}, {
+    Name = "White";
+    Price = 1000;
+}, {
+    Name = "Chrome";
+    Price = 1000;
+    VIP = true;
+    NoTrade = true;
+}, {
+    Name = "Blue";
+    Price = 1000;
+}, {
+    Name = "Green";
+    Price = 1000;
+}, {
+    Name = "Red";
+    Price = 1000;
+}, {
+    Name = "Matte";
+    Price = 1000;
+}, {
+    Name = "Black";
+    Price = 1000;
+}, {
+    Name = "Grey";
+    Price = 1000;
+}, {
+    Name = "Orange";
+    Price = 1000;
+}, {
+    Name = "Pink";
+    Price = 1000;
+}, {
+    Name = "Cyan";
+    Price = 1000;
+}, {
+    Name = "Forest Green";
+    Price = 1000;
+}, {
+    Name = "Purple";
+    Price = 1000;
+}, {
+    Name = "Pastel Green";
+    Price = 2000;
+}, {
+    Name = "Pastel Violet";
+    Price = 2000;
+}, {
+    Name = "Pastel Blue";
+    Price = 2000;
+}, {
+    Name = "Pastel Gray";
+    Price = 2000;
+}, {
+    Name = "Pastel Pink";
+    Price = 2000;
+}, {
+    Name = "Pastel Yellow";
+    Price = 2000;
+}, {
+    Name = "Pastel Orange";
+    Price = 2000;
+}, {
+    Name = "Pastel Brown";
+    Price = 2000;
+}, {
+    Name = "Sand";
+    Price = 5000;
+}, {
+    Name = "Hot Orange";
+    Price = 10000;
+}, {
+    Name = "Super Lime";
+    Price = 10000;
+}, {
+    Name = "Deep Purple";
+    Price = 12000;
+}, {
+    Name = "FallChrome";
+    Price = 5000;
+    Hidden = true;
+}}
+for _, v in require(ReplicatedStorage.HyperChrome.HyperChromeUtils).getListOfHyperChromeNames(), nil do
+    table.insert(tbl, 1, {
+        Name = v;
+        Hidden = true;
+        HiddenAll = true;
+    })
+end
+table.insert(tbl, 1, {
+    Name = require(ReplicatedStorage.HyperChrome.HyperChromeConsts).COLOR_SHIFT_NAME;
+    Hidden = true;
+    HiddenAll = true;
+    NoTrade = true;
+})
+local Paint_upvr = require(ReplicatedStorage.Game.Garage.Paint)
+return {
+    Items = tbl;
+    GetInstance = function(arg1) -- Line 268, Named "GetInstance"
+        --[[ Upvalues[1]:
+            [1]: Paint_upvr (readonly)
+        ]]
+        local Part = Instance.new("Part")
+        Part.Shape = Enum.PartType.Ball
+        Part.Size = Vector3.new(4, 4, 4)
+        Part.TopSurface = 0
+        Part.BottomSurface = 0
+        Part.Color = Paint_upvr.GetColor(arg1.Name)
+        Part.Anchored = true
+        Part.CFrame = CFrame.new()
+        return Part
+    end;
+    Update = function(arg1, arg2) -- Line 261, Named "Update"
+        local var72 = os.clock() / 2
+        arg1.CFrame = CFrame.Angles(0, var72 % (-math.pi*2), 0) * CFrame.Angles(math.sin(var72) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+    end;
+}
