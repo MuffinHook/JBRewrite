@@ -1,19 +1,6 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgNRCUNoYXJhY3RlcghIdW1hbm9pZA5GaW5kRmlyc3RDaGlsZAhSb290UGFydAtHZXRSb290UGFydAxzZXRtZXRhdGFibGUDbmV3BV9tYWlkCVNjcmVlbkd1aQhQb3NpdGlvbgZSYWRpdXMKQW5pbVJhZGl1cwtTdGFydFJhZGl1cwlFbmRSYWRpdXMHRW5hYmxlZAhJbnN0YW5jZQpJbWFnZUxhYmVsD0JvcmRlclNpemVQaXhlbBZCYWNrZ3JvdW5kVHJhbnNwYXJlbmN5BkNvbG9yMwtJbWFnZUNvbG9yMxdyYnhhc3NldGlkOi8vMjgxOTMyNjU0NwVJbWFnZQdWZWN0b3IyC0FuY2hvclBvaW50BlpJbmRleAtXb3JsZE1hcmtlcgROYW1lBUZyYW1lCEdpdmVUYXNrBVVEaW0yBFNpemUGUGFyZW50CkZyYW1lSW5uZXIIU2V0U2l6ZXMJU2V0UmFkaXVzClNldEVuYWJsZWQGX3NpemVzB1Zpc2libGUXSW1wb3J0YW50TG9jYXRpb25NYXJrZXIFcHJpbnQPc2V0dGluZyBlbmFibGVkDFNldFNjcmVlbkd1aQlGcmFtZUljb24GYXNzZXJ0D0NyZWF0ZUZyYW1lSWNvbgdEZXN0cm95EERlc3Ryb3lGcmFtZUljb24PcmJ4YXNzZXRpZDovLyVkBmZvcm1hdAdTZXRJY29uC1NldFBvc2l0aW9uC0dldFBvc2l0aW9uC09uQ29tcGxldGVkB0Nvbm5lY3QNQW5pbWF0ZVJhZGl1cwhfYWRvcm5lZQpTZXRBZG9ybmVlCkdldEFkb3JuZWUMQWJzb2x1dGVTaXplAVgBWRRXb3JsZFRvVmlld3BvcnRQb2ludAFaBG1hdGgDbWluCU1hZ25pdHVkZQZVcGRhdGUEZ2FtZQdQbGF5ZXJzCkdldFNlcnZpY2ULTG9jYWxQbGF5ZXIRUmVwbGljYXRlZFN0b3JhZ2UHcmVxdWlyZQRBbmltBk1vZHVsZQNTdGQETWFpZAl3b3Jrc3BhY2UNQ3VycmVudENhbWVyYQdfX2luZGV4ABIEAAEAAAAS+wAAAE0AAGkAAAAARwADAAAAAIDGAQAAggECAG8DAQC8AQADAgAAAJ8BAwJHAQMAAAAAgMYCAACCAgIATQIBRgMAAACCAgIABAMBAwIDAwMEAA0F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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:39:14
--- Luau version 6, Types version 3
--- Time taken: 0.012372 seconds
-
 local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local function _() -- Line 13, Named "GetRootPart"
-    --[[ Upvalues[1]:
-        [1]: LocalPlayer_upvr (readonly)
-    ]]
     local Character = LocalPlayer_upvr.Character
     if Character == nil then
         return nil
@@ -29,11 +16,6 @@ local module_2_upvr = {}
 module_2_upvr.__index = module_2_upvr
 local Maid_upvr = require(ReplicatedStorage.Std.Maid)
 function module_2_upvr.new() -- Line 31
-    --[[ Upvalues[3]:
-        [1]: module_2_upvr (readonly)
-        [2]: Maid_upvr (readonly)
-        [3]: tbl_upvr (readonly)
-    ]]
     local module = {}
     setmetatable(module, module_2_upvr)
     module._maid = Maid_upvr.new()
@@ -71,9 +53,6 @@ function module_2_upvr.new() -- Line 31
     return module
 end
 function module_2_upvr.SetSizes(arg1, arg2) -- Line 78
-    --[[ Upvalues[1]:
-        [1]: tbl_upvr (readonly)
-    ]]
     if not arg2 then
     end
     arg1._sizes = tbl_upvr
@@ -147,25 +126,22 @@ function module_2_upvr.GetPosition(arg1) -- Line 135
     return arg1.Position
 end
 function module_2_upvr.SetRadius(arg1, arg2) -- Line 138
-    -- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     arg1.Radius = arg2
     arg1.Frame.Size = UDim2.new(0, 2 * arg2, 0, 2 * arg2)
-    -- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [22] 16. Error Block 3 start (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [22] 16. Error Block 3 end (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [34] 23. Error Block 8 start (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     if arg1.FrameIcon.Visible == false then
         arg1.FrameIcon.Visible = true
     end
-    -- KONSTANTERROR: [34] 23. Error Block 8 end (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [45] 29. Error Block 7 start (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [45] 29. Error Block 7 end (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
 end
 local Anim_upvr = require(ReplicatedStorage.Module.Anim)
 function module_2_upvr.AnimateRadius(arg1, arg2) -- Line 154
-    --[[ Upvalues[1]:
-        [1]: Anim_upvr (readonly)
-    ]]
     if arg1.AnimRadius ~= nil then
         arg1.AnimRadius:Destroy()
         arg1.AnimRadius = nil
@@ -174,9 +150,6 @@ function module_2_upvr.AnimateRadius(arg1, arg2) -- Line 154
     arg1.EndRadius = arg2
     local any_new_result1 = Anim_upvr.new(0.1)
     any_new_result1.OnCompleted:Connect(function() -- Line 163
-        --[[ Upvalues[1]:
-            [1]: arg1 (readonly)
-        ]]
         arg1.AnimRadius:Destroy()
         arg1.AnimRadius = nil
         arg1:SetRadius(arg1.EndRadius)
@@ -192,12 +165,8 @@ function module_2_upvr.GetAdornee(arg1) -- Line 175
 end
 local CurrentCamera_upvr = workspace.CurrentCamera
 function module_2_upvr.Update(arg1) -- Line 178
-    --[[ Upvalues[2]:
-        [1]: CurrentCamera_upvr (readonly)
-        [2]: LocalPlayer_upvr (readonly)
-    ]]
-    -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
-    -- KONSTANTERROR: [0] 1. Error Block 82 start (CF ANALYSIS FAILED)
+    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     local var21
     if not arg1.Enabled then return end
     local AbsoluteSize = arg1.ScreenGui.AbsoluteSize
@@ -243,28 +212,28 @@ function module_2_upvr.Update(arg1) -- Line 178
     arg1.Frame.Position = UDim2.new(0, var21, 0, Y - var27)
     local Character_2 = LocalPlayer_upvr.Character
     if Character_2 == nil then
-        -- KONSTANTWARNING: GOTO [129] #93
+        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
     end
     local Humanoid_2 = Character_2:FindFirstChild("Humanoid")
     if Humanoid_2 == nil then
-        -- KONSTANTWARNING: GOTO [129] #93
+        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
     end
     local RootPart = Humanoid_2.RootPart
     if RootPart then
     end
     if true then
-        -- KONSTANTWARNING: GOTO [162] #118
+        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
     end
     local _ = 2
-    -- KONSTANTERROR: [0] 1. Error Block 82 end (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [161] 117. Error Block 43 start (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [161] 117. Error Block 43 end (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [149] 108. Error Block 60 start (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [161.51184059]
     if (RootPart.Position - arg1.Position).Magnitude <= arg1._sizes then
-        -- KONSTANTWARNING: GOTO [162] #118
+        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
     end
-    -- KONSTANTERROR: [149] 108. Error Block 60 end (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
 end
 function module_2_upvr.Destroy(arg1) -- Line 275
     arg1._maid:Destroy()

@@ -1,13 +1,3 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgOZARJJbnZpc2libGVUb0J1bGxldHMMR2V0QXR0cmlidXRlCkNhbkNvbGxpZGURY3VzdG9tQ29sbGlkZUZ1bmMOT25JdGVtRXF1aXBwZWQJRG9Ob3RIaWRlEE9uSXRlbVVuZXF1aXBwZWQMVXBkYXRlQ2FtZXJhFFVuYmluZEZyb21SZW5kZXJTdGVwBmFzc2VydAlDaGFyYWN0ZXIISHVtYW5vaWQORmluZEZpcnN0Q2hpbGQKVXBwZXJUb3JzbxB5aWVsZEZvclByb3BlcnR5C1ByaW1hcnlQYXJ0BEhlYWQETmVjawVXYWlzdApMb3dlclRvcnNvBFJvb3QMc2V0bWV0YXRhYmxlA25ldwRNYWlkBG1haWQGUGxheWVyCFJvb3RQYXJ0CUpvaW50TmVjawpKb2ludFdhaXN0CUpvaW50Um9vdAZMb2NrZWQSX2N1c3RvbUNvbGxpZGVGdW5jBUxvY2FsBHRhc2sFZGVmZXIIR2l2ZVRhc2sLTmV4dEludGVnZXIJR3VuQ2FtZXJhCHRvc3RyaW5nBEVudW0OUmVuZGVyUHJpb3JpdHkGQ2FtZXJhBVZhbHVlEEJpbmRUb1JlbmRlclN0ZXAbVHJhbnNmb3JtTG9jYWxNb3VzZVBvc2l0aW9uAXgBeRJWaWV3cG9ydFBvaW50VG9SYXkKSWdub3JlTGlzdBpGaWx0ZXJEZXNjZW5kYW50c0luc3RhbmNlcwpjb2xsaWRhYmxlBk9yaWdpbglEaXJlY3Rpb24IUG9zaXRpb24bUHJvamVjdE1vdXNlTG9jYXRpb25Ub1dvcmxkB2lzVG91Y2gJd29ya3NwYWNlDUN1cnJlbnRDYW1lcmEMVmlld3BvcnRTaXplAVgBWQdWZWN0b3IzCWlzR2FtZXBhZBBHZXRNb3VzZUxvY2F0aW9uCEluc3RhbmNlBUZyYW1lBVVEaW0yCWZyb21TY2FsZQRTaXplFkJhY2tncm91bmRUcmFuc3BhcmVuY3kQQ2xpcHNEZXNjZW5kYW50cwZQYXJlbnQKSW1hZ2VMYWJlbC5yYnhhc3NldDovL3RleHR1cmVzL3VpL0NvbnRyb2xzL1JhZGlhbEZpbGwucG5nBUltYWdlClVJR3JhZGllbnQOTnVtYmVyU2VxdWVuY2UWTnVtYmVyU2VxdWVuY2VLZXlwb2ludAxUcmFuc3BhcmVuY3kIUm90YXRpb24ZY3JlYXRlUHJvZ3Jlc3NCYXJHcmFkaWVudBNDaXJjdWxhclByb2dyZXNzQmFyBE5hbWUKZnJvbU9mZnNldAdWZWN0b3IyC0FuY2hvclBvaW50B1Zpc2libGULTnVtYmVyVmFsdWUIUHJvZ3Jlc3MLcHJvZ3Jlc3NCYXIJZ3JhZGllbnQxCWdyYWRpZW50Mg5VcGRhdGVQb3NpdGlvbgRtYXRoBWNsYW1wDlVwZGF0ZVByb2dyZXNzB0Rlc3Ryb3kCb3MFY2xvY2sHZ3VpTWFpZAlTY3JlZW5HdWkJR3VuUmVsb2FkB0VuYWJsZWQLTG9jYWxQbGF5ZXIJUGxheWVyR3VpDklnbm9yZUd1aUluc2V0Emd1blJlbG9hZFNjcmVlbkd1aRNjaXJjdWxhclByb2dyZXNzQmFyBkNvbmZpZwpSZWxvYWRUaW1lCUhlYXJ0YmVhdAdDb25uZWN0EnByb2dyZXNzQmFyVXBkYXRlchlTdGFydFJlbG9hZFByb2dyZXNzQ2lyY2xlElVwZGF0ZUNhbWVyYUxvY2tlZBVEZWZhdWx0RGlzYWJsZUNhbUxvY2sGVXBkYXRlDVVzZXJJbnB1dFR5cGUIS2V5Ym9hcmQHS2V5Q29kZQFWCEdhbWVwYWQxB0J1dHRvbkIJc2V0TG9ja2VkCHNldFZhbHVlCVVJU2V0dGluZwpJbnB1dEJlZ2FuBWVycm9yD1RPRE86IEltcGxlbWVudApJbnB1dEVuZGVkCURlc3Ryb3llZARnYW1lB1BsYXllcnMKR2V0U2VydmljZQpSdW5TZXJ2aWNlEVJlcGxpY2F0ZWRTdG9yYWdlB3JlcXVpcmUDU3RkCkl0ZW1DYW1lcmEER2FtZQpJdGVtU3lzdGVtDEdhbWVTZXR0aW5ncxNHYW1lU2V0dGluZ3NTZXJ2aWNlEFVzZXJJbnB1dFNlcnZpY2UKSW5wdXRVdGlscwdSYXljYXN0D1J4SW5zdGFuY2VVdGlscwZSYW5kb20NUmF5Y2FzdFBhcmFtcxFSZXNwZWN0Q2FuQ29sbGlkZQRJdGVtC19fQ2xhc3NOYW1lB19faW5kZXgAGAQBAAAABgMAAAUBBwtvAwAAvAEAEgEAAACfAQMCKgEDAAEAAICpAQAAggECAE0BANMCAAAAggECAAMDAQMCAwMA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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:37:19
--- Luau version 6, Types version 3
--- Time taken: 0.013438 seconds
-
 local Players_upvr = game:GetService("Players")
 local RunService_upvr = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -29,16 +19,6 @@ local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
 local LocalPlayer_upvr = Players_upvr.LocalPlayer
 local random_state_upvr = Random.new()
 local function new(arg1, arg2) -- Line 28
-    --[[ Upvalues[8]:
-        [1]: RxInstanceUtils_upvr (readonly)
-        [2]: module_2_upvr (readonly)
-        [3]: Maid_upvr (readonly)
-        [4]: customCollideFunc_upvr (readonly)
-        [5]: LocalPlayer_upvr (readonly)
-        [6]: ItemCamera_upvr (readonly)
-        [7]: random_state_upvr (readonly)
-        [8]: RunService_upvr (readonly)
-    ]]
     assert(arg1)
     local Character = arg1.Character
     assert(Character)
@@ -78,11 +58,6 @@ local function new(arg1, arg2) -- Line 28
     module_upvr.Local = var19
     if module_upvr.Local then
         module_upvr.Maid:GiveTask(task.defer(function() -- Line 67
-            --[[ Upvalues[3]:
-                [1]: ItemCamera_upvr (copied, readonly)
-                [2]: arg2 (readonly)
-                [3]: module_upvr (readonly)
-            ]]
             local var21
             if arg2 == nil then
                 var21 = false
@@ -92,25 +67,15 @@ local function new(arg1, arg2) -- Line 28
             ItemCamera_upvr.OnItemEquipped(var21, module_upvr.DoNotHide)
         end))
         module_upvr.Maid:GiveTask(function() -- Line 70
-            --[[ Upvalues[1]:
-                [1]: ItemCamera_upvr (copied, readonly)
-            ]]
             ItemCamera_upvr.OnItemUnequipped()
         end)
     end
     if module_upvr.Local then
         local var23_upvr = "GunCamera"..tostring(random_state_upvr:NextInteger(1, 1000000000))
         RunService_upvr:BindToRenderStep(var23_upvr, Enum.RenderPriority.Camera.Value + 1, function() -- Line 78
-            --[[ Upvalues[1]:
-                [1]: module_upvr (readonly)
-            ]]
             module_upvr:UpdateCamera()
         end)
         module_upvr.Maid:GiveTask(function() -- Line 81
-            --[[ Upvalues[2]:
-                [1]: RunService_upvr (copied, readonly)
-                [2]: var23_upvr (readonly)
-            ]]
             RunService_upvr:UnbindFromRenderStep(var23_upvr)
         end)
     end
@@ -123,12 +88,6 @@ end
 local CurrentCamera_upvr = workspace.CurrentCamera
 local Raycast_upvr = require(ReplicatedStorage.Std.Raycast)
 function module_2_upvr.ProjectMouseLocationToWorld(arg1, arg2) -- Line 91
-    --[[ Upvalues[4]:
-        [1]: CurrentCamera_upvr (readonly)
-        [2]: RaycastParams_new_result1_upvr (readonly)
-        [3]: Raycast_upvr (readonly)
-        [4]: customCollideFunc_upvr (readonly)
-    ]]
     local any_ViewportPointToRay_result1 = CurrentCamera_upvr:ViewportPointToRay(arg2.x, arg2.y)
     local var29
     RaycastParams_new_result1_upvr.FilterDescendantsInstances = arg1.IgnoreList
@@ -143,10 +102,6 @@ end
 local InputUtils_upvr = require(ReplicatedStorage.Std.InputUtils)
 local UserInputService_upvr = game:GetService("UserInputService")
 function module_2_upvr.GetMouseLocation(arg1) -- Line 104
-    --[[ Upvalues[2]:
-        [1]: InputUtils_upvr (readonly)
-        [2]: UserInputService_upvr (readonly)
-    ]]
     if InputUtils_upvr.isTouch() then
         local ViewportSize_2 = workspace.CurrentCamera.ViewportSize
         return Vector3.new(ViewportSize_2.X * 0.5, ViewportSize_2.Y * 0.5, 0)
@@ -160,15 +115,11 @@ end
 local tbl_upvr = {}
 tbl_upvr.__index = tbl_upvr
 function tbl_upvr.new() -- Line 125
-    --[[ Upvalues[2]:
-        [1]: tbl_upvr (readonly)
-        [2]: Maid_upvr (readonly)
-    ]]
     local module = {}
     setmetatable(module, tbl_upvr)
     module.maid = Maid_upvr.new()
     local function createProgressBarGradient(arg1, arg2) -- Line 130
-        -- KONSTANTERROR: [0] 1. Error Block 20 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         local Frame = Instance.new("Frame")
         local var38 = 0.5
         Frame.Size = UDim2.fromScale(var38, 1)
@@ -189,10 +140,10 @@ function tbl_upvr.new() -- Line 125
         ImageLabel.Size = UDim2.fromScale(var39, 1)
         if arg2 then
             var39 = 0
-            -- KONSTANTWARNING: GOTO [49] #37
+            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
         end
-        -- KONSTANTERROR: [0] 1. Error Block 20 end (CF ANALYSIS FAILED)
-        -- KONSTANTERROR: [48] 36. Error Block 22 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         var39 = -1
         ImageLabel.Position = UDim2.fromScale(var39, 0)
         ImageLabel.Image = "rbxasset://textures/ui/Controls/RadialFill.png"
@@ -212,7 +163,7 @@ function tbl_upvr.new() -- Line 125
         do
             return any
         end
-        -- KONSTANTERROR: [48] 36. Error Block 22 end (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     end
     local Frame_2 = Instance.new("Frame")
     Frame_2.Name = "CircularProgressBar"
@@ -243,13 +194,7 @@ local function Destroy(arg1) -- Line 187
 end
 tbl_upvr.Destroy = Destroy
 function module_2_upvr.StartReloadProgressCircle(arg1, arg2, arg3) -- Line 191
-    --[[ Upvalues[4]:
-        [1]: Players_upvr (readonly)
-        [2]: tbl_upvr (readonly)
-        [3]: Maid_upvr (readonly)
-        [4]: RunService_upvr (readonly)
-    ]]
-    -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "GunReload"
     ScreenGui.Enabled = false
@@ -267,12 +212,6 @@ function module_2_upvr.StartReloadProgressCircle(arg1, arg2, arg3) -- Line 191
     end
     local ReloadTime_upvw = arg1.Config.ReloadTime
     any_new_result1.progressBarUpdater = RunService_upvr.Heartbeat:Connect(function() -- Line 207
-        --[[ Upvalues[4]:
-            [1]: var49_upvw (read and write)
-            [2]: ReloadTime_upvw (read and write)
-            [3]: arg1 (readonly)
-            [4]: any_new_result1_upvr (readonly)
-        ]]
         local var52 = (os.clock() - var49_upvw) / ReloadTime_upvw
         if 1 <= var52 then
             arg1.Maid.guiMaid = nil
@@ -286,9 +225,6 @@ function module_2_upvr.StartReloadProgressCircle(arg1, arg2, arg3) -- Line 191
     ScreenGui.Enabled = true
 end
 function module_2_upvr.DefaultDisableCamLock(arg1) -- Line 223
-    --[[ Upvalues[1]:
-        [1]: ItemCamera_upvr (readonly)
-    ]]
     if arg1.Local then
         local Locked_upvr = ItemCamera_upvr.Locked
         if ItemCamera_upvr.Locked == true then
@@ -297,25 +233,15 @@ function module_2_upvr.DefaultDisableCamLock(arg1) -- Line 223
         end
         if Locked_upvr then
             arg1.Maid:GiveTask(function() -- Line 232
-                --[[ Upvalues[2]:
-                    [1]: ItemCamera_upvr (copied, readonly)
-                    [2]: Locked_upvr (readonly)
-                ]]
                 ItemCamera_upvr.Locked = Locked_upvr
             end)
         end
     end
 end
 function module_2_upvr.UpdateCamera(arg1) -- Line 238
-    --[[ Upvalues[1]:
-        [1]: ItemCamera_upvr (readonly)
-    ]]
     ItemCamera_upvr.Update()
 end
 function module_2_upvr.UpdateCameraLocked(arg1) -- Line 241
-    --[[ Upvalues[1]:
-        [1]: ItemCamera_upvr (readonly)
-    ]]
     if ItemCamera_upvr.Locked then
         ItemCamera_upvr.OnItemEquipped(true, arg1.DoNotHide)
     else
@@ -324,10 +250,6 @@ function module_2_upvr.UpdateCameraLocked(arg1) -- Line 241
 end
 local GameSettingsService_upvr = require(ReplicatedStorage.GameSettings.GameSettingsService)
 function module_2_upvr.InputBegan(arg1, arg2, arg3) -- Line 249
-    --[[ Upvalues[2]:
-        [1]: ItemCamera_upvr (readonly)
-        [2]: GameSettingsService_upvr (readonly)
-    ]]
     if arg3 then
     else
         if arg2.UserInputType ~= Enum.UserInputType.Keyboard or arg2.KeyCode ~= Enum.KeyCode.V or arg2.UserInputType == Enum.UserInputType.Gamepad1 then

@@ -1,13 +1,3 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:39:51
--- Luau version 6, Types version 3
--- Time taken: 0.005104 seconds
-
 local module_upvr = {
     dfs = function(arg1, arg2, arg3, arg4) -- Line 2, Named "dfs"
         if arg1 == nil then
@@ -30,13 +20,6 @@ local module_upvr = {
         end
         local module_upvr_2 = {}
         local function _dfs_upvr(arg1_2) -- Line 10, Named "_dfs"
-            --[[ Upvalues[5]:
-                [1]: module_upvr_2 (readonly)
-                [2]: var2_upvw (read and write)
-                [3]: arg1 (readonly)
-                [4]: arg3 (readonly)
-                [5]: _dfs_upvr (readonly)
-            ]]
             module_upvr_2[arg1_2] = true
             for _, v in ipairs(var2_upvw(arg1, arg1_2)) do
                 if not module_upvr_2[v] and (arg3 == nil or arg3(v)) then
@@ -68,9 +51,6 @@ local module_upvr = {
     end;
 }
 function module_upvr.weaklyConnectedComponents(arg1) -- Line 41
-    --[[ Upvalues[1]:
-        [1]: module_upvr (readonly)
-    ]]
     if arg1 == nil then
     else
     end
@@ -93,7 +73,7 @@ function module_upvr.weaklyConnectedComponents(arg1) -- Line 41
             table.insert({}, any_new_result1)
         end
     end
-    -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
     return {}
 end
 return module_upvr

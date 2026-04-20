@@ -1,19 +1,6 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMQEnZhbGlkYXRlUmV3YXJkRGF0YQhSYXJpdHlJZBNBYnNvbHV0ZVByb2JhYmlsaXR5K2FkZEFic29sdXRlUHJvYnNUb1Jld2FyZERhdGFGcm9tUmFyaXR5UHJvYnMaSW52YWxpZCByYXJpdHkgcHJvYmFiaWxpdHkGYXNzZXJ0BWVycm9yGk5vIGl0ZW1zIG9mIHJhcml0eSBleGlzdDogBHdhcm4QSXRlbXMgb2YgcmFyaXR5ICggZXhpc3QgYnV0IHRoYXQgcmFyaXR5IGhhcyAwIHByb2JhYmlsaXR5BG1hdGgDYWJzJEludmFsaWQgdG90YWwgcmFyaXR5IHByb2JhYmlsaXRpZXM6IBtObyBwcm9iYWJpbGl0eSBmb3IgcmFyaXR5OiBAUmFyaXR5IGhhcyAwIHByb2JhYmlsaXR5IGJ1dCBhIHJld2FyZCB3aXRoIGdpdmVuIHJhcml0eSBleGlzdHM6IAADCwIBAAAANPsCAABNAgLIAAAAAFIDAABSBAEAnwIDAf8CAAAAAAAAUgMAAMYEAADGBQAAZAMNAE0JB/MBAAAAhwgCCSsIBABNCAfzAQAAAIwJAABqCQIITQgH8wEAAACHCQIIlQkJAmoJAghuA/L/AgAAAP8DAAAAAAAAUgQBAMYFAADGBgAAZAQFAIcJAgcOCQMAhwoCB+wJCApqCQMHbgT6/wIAAABSBAAAxgUAAMYGAABkBAUATQoI8wEAAACHCQMKMAkISAMAAABuBPr/AgAAAIIAAQAEAwEDAgIAAAAAAADwPwMDAAUEARgAAAAAAAACAAEAAAABAAAAAQAAAAIAAAAA/AAGAAIAAAABAAEAAP4ABgAAAAEAAAEA/gAEBgAAAAAQAgAAAABy/wIAAAAAAABSAwAAxgQAAMYFAABkAw0ATQkH8wAAAACHCAIJKwgEAE0IB/MAAAAAjAkAAGoJAghNCAfzAAAAAIcJAgiVCQkBagkCCG4D8v8CAAAA/wMAAAAAAACMBAAAUgUBAMYGAADGBwAAZAUqAKkLAACMDAAAfQwGAAkAAACMDGQA1AkCAAwAAACpCwABqQsBAIEBCwQCAAAAbwwCAKQKBAAAADBAnwoDAQ0JCQAFAAAAhwoCCCsKBgCkCgcAAABgQG8MCABSDQgAcwsMDZ8KAgGHCgIIDgoJAA0JCAAFAACApAoKAAAAkEBvDAsAUg0IAG8ODABzCwwOnwoCAYcKAggOCgQAhwsCCOwKCQtqCgMIQwQECW4F1f8CAAAAeAYEDbsCBgKkBRAAADzggJ8FAgJvBhEAYAYHAAUAAACkBQcAAABgQG8HEgBSCAQAcwYHCJ8FAgFSBQAAxgYAAMYHAABkBRUATQsJ8wAAAACHCgMLTQsJ8wAAAAArCgcApAwHAAAAYEBvDhMAUg8LAHMNDg+fDAIBZQAIAA0KBwAFAACApAwKAAAAkEBvDhQAUg8LAHMNDg+fDAIBbgXq/wIAAACCAAEAFQMCAgAAAAAAAPA/AwUDBgQAADBAAgAAAAAAAAAAAwcEAABgQAMIAwkEAACQQAMKAwsCAAAAAAAAWUADDAMNBAA84IACLUMc6+I2Gj8DDgMPAxAAHAEBGAAAAQAAAAEAAAABAAAAAgAAAAD8AAYAAgIAAAABAAAAAAAAAAAAAAAAAAABAAAAAQAAAAAAAwAAAAEAAAAAAAADAAEAAAH0ABAAAAAAAAAAAQAAAAAAAwAAAAEAAAEAAQEAAAAAAAABAAEAAAAAAPoACR0AAAAAAgAAAQIAC6MAAAD/AAIAAAAAAMABAAASAAAAMAEAKAEAAADAAQIAMAEAyAMAAACCAAIABAYAAwQGAQMBAgABAQABGAAAAAQAAAAXAAAqAQAAAAACbHGfPdD9AISYBAGeEYdlBRxpiEletfU8
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:45:24
--- Luau version 6, Types version 3
--- Time taken: 0.004816 seconds
-
 local module_upvr = {}
 function module_upvr.addAbsoluteProbsToRewardDataFromRarityProbs(arg1, arg2) -- Line 5
-    --[[ Upvalues[1]:
-        [1]: module_upvr (readonly)
-    ]]
-    -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
     module_upvr.validateRewardData(arg1, arg2)
     local tbl = {}
     for _, v in arg1 do
@@ -29,7 +16,7 @@ function module_upvr.addAbsoluteProbsToRewardDataFromRarityProbs(arg1, arg2) -- 
         end
     end
     for _, v_3 in arg1 do
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         v_3.AbsoluteProbability = ({})[v_3.RarityId]
         local _
     end
@@ -74,12 +61,12 @@ function module_upvr.validateRewardData(arg1, arg2) -- Line 28
         error("Invalid total rarity probabilities: "..i_5)
     end
     for _, v_6 in arg1 do
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         local var45 = ({})[v_6.RarityId]
         if not var45 then
             error("No probability for rarity: "..v_6.RarityId)
         elseif var45 == 0 then
-            -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
             warn("Rarity has 0 probability but a reward with given rarity exists: "..v_6.RarityId)
         end
     end

@@ -1,39 +1,26 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMQDFNlZ21lbnRzQnlJZAlTZWdtZW50SWQGTGVuZ3RoDFNlZ21lbnRzTmV4dAJJZAtCcmFuY2hJbmRleBBDYWxjdWxhdGVTZWdtZW50FkNhbGN1bGF0ZURpc3RhbmNlQWhlYWQCQ0YHVmVjdG9yMwNuZXcBcBFDYWxjdWxhdGVQb3NpdGlvbgVTcGVlZAZPZmZzZXQJTW92ZVRyYWluAAUGAgAAAAAnTQMA4AAAAABNBABTAQAAAIcCAwRNAwKtAgAAAGABBAADAAAAUgMCAFIEAQCCAwMATQMCrQIAAAB9AxEAAQAAAE0EAOsDAAAATQUClAQAAACHAwQFDgMOAE0EAq0CAAAAJgEBBE0FAkoFAAAAhwQDBU0FAOAAAAAAhwIFBGUAAwBSAwIAUgQBAIIDAwBIAOj/UgMCAFIEAQCCAwMABgMBAwIDAwMEAwUDBgABBwEYAAAAAAABAAAAAQAAAwAAAAEAAAAAAQMAAAEAAAEAAAACAAD2DQAAAgAAAAARBQAAAABFmgEDAAMAAAAmBQQCggUCAFIFAQBNBwDgAAAAAIcGBwVNCAatAQAAACYHCAKMCgEAjAgDAIwJAQCoCBQATQwA6wIAAACHCwwFKwsCAKkMAACCDAIATQwGSgMAAACHBQsMTQwA4AAAAACHBgwFmgUDAAMAAABDDAcEggwCAE0MBq0BAAAAQwcHDIsI7P9SCAMATQoA4AAAAACHCQoITQsJrQEAAAAmCgsEjA0BAIwLAwCMDAEAqAsVAE0PAOsCAAAAhw4PCCsOAgCpDwAAgg8CAE0PCUoDAAAAhwgOD00PAOAAAAAAhwkPCJoIBAABAAAAORAKACYPEAKCDwIATQ8JrQEAAABDCgoPiwvr/6kLAACCCwIABAMBAwMDBAMGABUIARgAAAIAAgEAAAEAAAEAAAABAAABAQACAAABAAABAAIAAgAA9Q4BAAABAAABAAAAAQAAAQEAAgAAAQAAAQACAAACAAD1DQAWAAAAAAwCAQAABwAAAQgGEQEY+wIAAFIDAABSBAEAnwIDAw4CEQBNBAJgAAAAAIwHAACMCAAATQsCrQIAAABbCgsBJgkKA0w2AAKkBgUAABAwgJ8GBAIJBQQGTQcEkQYAAAAmBgQHggUDAKkEAACCBAIABwMJAgAAAAAAAOA/AwMDCgMLBAAQMIADDAA9DQEYAAAAAAEBAAEAAAAAAAAAAAAAAAAAAAIAPgAAAAAHAgEAAAARTQIALAAAAABNBABwAQAAAAkFAQJDAwQF+wQAAFIFAABSBgMAnwQDA00GBJQCAAAAMAYAUwMAAAAwBQBwAQAAAIIAAQAEAw4DDwMFAwIARRABGAAAAQAAAAIAAAABAAAAAQAKRgAAAAAFAAABAgARowAAAMAAAADAAQEAwAICABIAAADAAwMAEgAAAOIECAAwAATqBAAAADACBIQFAAAAMAEEZgYAAAAwAwR4BwAAAIIEAgAJBgAGAQYCBgMDBwMNAwgDEAUEBAUGBwQAAQIDAQABGAAAFCgACAARAQABAAEAAQAAAQAAAAAE/WlOCyjTQeJXwBTdvTHPJ41xWX/PrSQK
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:34:49
--- Luau version 6, Types version 3
--- Time taken: 0.003644 seconds
-
 local function CalculateSegment_upvr(arg1, arg2) -- Line 1, Named "CalculateSegment"
-    -- KONSTANTERROR: [35] 25. Error Block 8 start (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [35] 25. Error Block 8 end (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [0] 1. Error Block 15 start (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [35.131922]
     -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [35.3]
     if arg2 < nil then
     end
-    -- KONSTANTERROR: [0] 1. Error Block 15 end (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [12] 9. Error Block 14 start (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
     if nil <= arg2 then
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         if nil then
-            -- KONSTANTWARNING: GOTO [35] #25
+            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
         end
-        -- KONSTANTWARNING: GOTO [36] #26
+        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
     end
-    -- KONSTANTERROR: [12] 9. Error Block 14 end (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
 end
 return {
     CalculateSegment = CalculateSegment_upvr;
     CalculatePosition = function(arg1, arg2) -- Line 61, Named "CalculatePosition"
-        --[[ Upvalues[1]:
-            [1]: CalculateSegment_upvr (readonly)
-        ]]
         local CalculateSegment_result1, CalculateSegment_result2 = CalculateSegment_upvr(arg1, arg2)
         if CalculateSegment_result1 then
             local CF = CalculateSegment_result1.CF
@@ -70,9 +57,6 @@ return {
         return false
     end;
     MoveTrain = function(arg1, arg2) -- Line 69, Named "MoveTrain"
-        --[[ Upvalues[1]:
-            [1]: CalculateSegment_upvr (readonly)
-        ]]
         local CalculateSegment_result1_2, CalculateSegment_result2_2 = CalculateSegment_upvr(arg1, arg1.Offset + arg2 * arg1.Speed)
         arg1.SegmentId = CalculateSegment_result1_2.Id
         arg1.Offset = CalculateSegment_result2_2

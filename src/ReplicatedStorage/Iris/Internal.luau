@@ -1,13 +1,3 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgOuAQhfc3RhcnRlZBNfY29ubmVjdGVkRnVuY3Rpb25zBWRlYnVnDHByb2ZpbGViZWdpbg9JcmlzL0Nvbm5lY3Rpb24FcGNhbGwKcHJvZmlsZWVuZAtfc3RhY2tJbmRleAljb3JvdXRpbmUFeWllbGQFdmFsdWUDZ2V0CEludGVybmFsCl9jeWNsZVRpY2sObGFzdENoYW5nZVRpY2sQQ29ubmVjdGVkV2lkZ2V0cw1sYXN0Q3ljbGVUaWNrCF93aWRnZXRzBHR5cGULVXBkYXRlU3RhdGUSQ29ubmVjdGVkRnVuY3Rpb25zA3NldAhvbkNoYW5nZQdjaGFuZ2VkE19wb3N0Q3ljbGVDYWxsYmFja3MIRGlzYWJsZWQLX3Jvb3RXaWRnZXQNX3Jvb3RJbnN0YW5jZQZQYXJlbnQMRm9yY2VSZWZyZXNoCV9sYXN0VkRPTQ5fRGlzY2FyZFdpZGdldAZfX21vZGUCa3YMc2V0bWV0YXRhYmxlBV9WRE9NEl9nZW5lcmF0ZUVtcHR5VkRPTQR0YXNrBXNwYXduF19nbG9iYWxSZWZyZXNoUmVxdWVzdGVkHV9nZW5lcmF0ZVNlbGVjdGlvbkltYWdlT2JqZWN0FV9nZW5lcmF0ZVJvb3RJbnN0YW5jZQpfZGVsdGFUaW1lBXRhYmxlBWNsZWFyCF91c2VkSURzDnBhcmVudEluc3RhbmNlCUd1aUJhc2UyZANJc0ENQmFzZVBsYXllckd1aQVlcnJvcjNUaGUgSXJpcyBwYXJlbnQgaW5zdGFuY2Ugd2lsbCBub3QgZGlzcGxheSBhbnkgR1VJcy4UX2Z1bGxFcnJvclRyYWNlYmFja3MGc3RhdHVzD19jeWNsZUNvcm91dGluZQlzdXNwZW5kZWQGcmVzdW1lB3J1bm5pbmdQSXJpcyBjeWNsZUNvcm91dGluZSB0b29rIHRvIGxvbmcgdG8geWllbGQuIENvbm5lY3RlZCBmdW5jdGlvbnMgc2hvdWxkIG5vdCB5aWVsZC4TdW5yZWNvdmVyYWJsZSBzdGF0ZRxUb28gZmV3IGNhbGxzIHRvIElyaXMuRW5kKCkuCl9wdXNoZWRJZHMeVG9vIGZldyBjYWxscyB0byBJcmlzLlBvcElkKCkuBl9jeWNsZQVfTm9PcApfRXZlbnRDYWxsC19sYXN0V2lkZ2V0A0FsbAdJZlN0YXRlCklmQ2hpbGRyZW4IUmVxdWlyZWQIT3B0aW9uYWwIR2VuZXJhdGUHRGlzY2FyZAZVcGRhdGUEQXJncwZFdmVudHMLaGFzQ2hpbGRyZW4IaGFzU3RhdGUNR2VuZXJhdGVTdGF0ZQpDaGlsZEFkZGVkDkNoaWxkRGlzY2FyZGVkQmZpZWxkICUqIGlzIG1pc3NpbmcgZnJvbSB3aWRnZXQgJSosIGl0IGlzIHJlcXVpcmVkIGZvciBhbGwgd2lkZ2V0cwZmb3JtYXQGYXNzZXJ0TWZpZWxkICUqIGlzIG1pc3NpbmcgZnJvbSB3aWRnZXQgJSosIGl0IGlzIHJlcXVpcmVkIGZvciBhbGwgd2lkZ2V0cyB3aXRoIHN0YXRlUGZpZWxkICUqIGlzIG1pc3NpbmcgZnJvbSB3aWRnZXQgJSosIGl0IGlzIHJlcXVpcmVkIGZvciBhbGwgd2lkZ2V0cyB3aXRoIGNoaWxkcmVuCEFyZ05hbWVzEVdpZGdldENvbnN0cnVjdG9yBl9nZXRJRA9fQ29udGludWVXaWRnZXRFV2lkZ2V0IEFyZ3VtZW50cyBtdXN0IGJlIGEgcG9zaXRpdmUgbnVtYmVyLCBub3QgJSogb2YgdHlwZSAlKiBmb3IgJSouBnR5cGVvZgZmcmVlemUPX3JlZnJlc2hDb3VudGVyDV9HZW5OZXdXaWRnZXQMcGFyZW50V2lkZ2V0BldpbmRvdwdUb29sdGlwBlpJbmRleAdaT2Zmc2V0B1pVcGRhdGUISW5zdGFuY2ULTGF5b3V0T3JkZXIFVGFibGUKX3Jvd0N5Y2xlcwlfcm93SW5kZXgMX2RlZXBDb21wYXJlEXByb3ZpZGVkQXJndW1lbnRzCV9kZWVwQ29weQlhcmd1bWVudHMIX0lEU3RhY2sCSUQHX0luc2VydA10cmFja2VkRXZlbnRzB19jb25maWcMZ2V0bWV0YXRhYmxlClN0YXRlQ2xhc3MMX3dpZGdldFN0YXRlBXN0YXRlB3N0YXRlTVQHX19pbmRleAdfc3RhdGVzIXdpZGdldCAlKiBoYXMgbm8gZXZlbnQgb2YgbmFtZSAlKgRJbml0A0dldBBfR2V0UGFyZW50V2lkZ2V0AVIEUm9vdBRTZWxlY3Rpb25JbWFnZU9iamVjdAdEZXN0cm95A25ldwVGcmFtZQVVRGltMgpmcm9tT2Zmc2V0CFBvc2l0aW9uBFNpemUZU2VsZWN0aW9uSW1hZ2VPYmplY3RDb2xvchBCYWNrZ3JvdW5kQ29sb3IzIFNlbGVjdGlvbkltYWdlT2JqZWN0VHJhbnNwYXJlbmN5FkJhY2tncm91bmRUcmFuc3BhcmVuY3kPQm9yZGVyU2l6ZVBpeGVsCF91dGlsaXR5CFVJU3Ryb2tlH1NlbGVjdGlvbkltYWdlT2JqZWN0Qm9yZGVyQ29sb3ImU2VsZWN0aW9uSW1hZ2VPYmplY3RCb3JkZXJUcmFuc3BhcmVuY3kIVUlDb3JuZXINX25leHRXaWRnZXRJZAAEaW5mbwFsASsBOgZfbmV3SUQCOjoGY29uY2F0AVwFY2xvbmUHIDIuNS4wIAhfdmVyc2lvbglfc2h1dGRvd24NX3JlZnJlc2hMZXZlbAZjcmVhdGUNX3JlZnJlc2hTdGFjawtfcm9vdENvbmZpZwxfY29ubmVjdGlvbnMOX2luaXRGdW5jdGlvbnMEZ2FtZQpSdW5TZXJ2aWNlCkdldFNlcnZpY2UISXNTdHVkaW8HcmVxdWlyZQZzY3JpcHQFVHlwZXMAHAoAAQAAACf7AAAATQAAcAAAAAAOACIA+wAAAE0AAA8BAAAAxgEAAMYCAABkABUApAUEAAAMIIBvBgUAnwUCAaQFBwAAAGBAUgYEAJ8FAgOkBwkAACAggJ8HAQErBQkA+wcAAIwIAQAwCAdLCgAAAKQHDQAAMLCAqQgAAFIJBgCfBwMBbgDq/wIAAACkAA0AADCwgKkBAQCfAAIBSADa/4IAAQAOAwEDAgMDAwQEAAwggAMFAwYEAABgQAMHBAAgIIADCAMJAwoEADCwgABJAAEYAAAAAAEAAAAAAAEAAAABAAAAAQAAAQIAAAABAAAAAPkACwAAAPQOSgAAAAACAQAAAAADTQEAzAAAAACCAQIAAQMLAIMBDAEYAAAAhAAAAAALAwIAAAgFAAAFAwQPgTRNAwDMAAAAAJoBBgADAAAAKgIEAAEAAABNAwDMAAAAAIIDAgAwAQDMAAAAAPsDAABNAwOlAQAAAE0DA9QCAAAAMAMAjQMAAABNAwAtBAAAAMYEAADGBQAAZAMOAE0IB9wFAAAADQgLAAYAAAD7CQEATQkJ4AcAAABNCgdxCAAAAIcICQpNCAgVCQAAAFIJBwCfCAIBbgPx/wIAAABNAwCOCgAAAMYEAADGBQAAZAMDAFIIBwBSCQEAnwgCAW4D/P8CAAAATQMAzAAAAACCAwIACwMLAw0DDgMPAxADEQIAAAAAAADwvwMSAxMDFAMVAJABFgEYAAAAAAAAAgAAAgABAAAAAAAAAQAAAAABAAAAAQAAAAAAAAAAAP4ABgAAAAABAAD/AAMAAJEAAAAAAwACAAAAB/sAAABNAACOAAAAAPsBAQDGAgAAagIAAYIAAQABAxUAswEAARgAAAAAAAABtAAAAAAFAgAAAAcEAAAFAgQFC00EAI4BAAAAHAMEAJUCAwBNAwCOAQAAAGoBAwLZAwAAEgAAABIAAgCCAwIAAgIAAAAAAADwPwMVAQOwARcBGAAAAAABAAABAAAAsQAAAAAEAQEAAAALTQMAjQEAAACVAgMA+wMAAE0DA9QCAAAA8QICAAMAAACpAQABqQEBAIIBAgADAgAAAAAAAPA/Aw8DDgC/ARgBGAAAAAAAAAAAAAAAwAAAAAAGAAEAAAAL+wAAAE0AAI4AAAAAxgEAAMYCAABkAAIAUgUEAJ8FAQFuAP3/AgAAAIIAAQABAxkA6wEAARgAAAAAAAABAP8ABO0AAAAACQECAAAGAwAABQEC5QH7AQAATQEBogAAAAAOAQEAggABAPsBAQBNAQHnAQAAAPsCAQBNAgLUAgAAADACAdwDAAAA+wEBAE0BAX0EAAAARwEIAAAAAAD7AQEATQEBfQQAAABNAQEkBQAAAEcBBQAAAACA+wEAAE0BAYAGAAAAnwEBAfsBAQBNAQFaBwAAAMYCAADGAwAAZAEQAE0GBdwDAAAA+wcBAE0HB9QCAAAA8QYKAAcAAABNBgXcAwAAAA0GBgAIAAAA+wYBAE0GBosJAAAAUgcFAJ8GAgFuAe//AgAAAPsCAQBNAgJaBwAAAOIDCwBvBAwAMAQD4woAAACePQIDAwAAAKQBDgAAANBAnwEDAfsBAQD7AgEATQICvg8AAAAwAgFaBwAAAPsBAQD7AgEATQICIxAAAACfAgECMAIBvg8AAACkARMAAEgQgdkCAAASAgEAnwECAfsBAQBNAQGzFAAAAA4BIAD7AQEATQEBghUAAACfAQEB+wEBAKkCAAAwAgGzFAAAAPsBAQBNAQFaBwAAAMYCAADGAwAAZAEFAPsGAQBNBgaLCQAAAFIHBQCfBgIBbgH6/wIAAAD7AQEATQEBsxYAAACfAQEB+wEBAPsCAQBNAgIjEAAAAJ8CAQIwAgFaBwAAAPsBAQBNAgHUAgAAAJUCAhcwAgHUAgAAAPsBAQAwAAEbGAAAAKQBGwAAaJCB+wIBAE0CAgYcAAAAnwECAfsBAQBNAQFiHQAAAG8DHgC8AQH+HwAAAJ8BAwIrAQcA+wEBAE0BAWIdAAAAbwMgALwBAf4fAAAAnwEDAioBBQAAAACApAIiAAAAEEJvAyMAnwICAfsCAQBNAgJeJAAAAA4CCwD7AgEATQICDyUAAADGAwAAxgQAAGQCAgBSBwYAnwcBAW4C/f8CAAAAZQAhAKQCKAAAnGCC+wMBAE0DAxApAAAAnwICAvACDwAqAACApAMsAACsYIL7BAEATQQEECkAAACfAwIEKgQSAAAAAICkBiIAAAAQQlIHBQCMCAAAnwYDAWUACwDwAgYALQAAgKQDIgAAABBCbwQuAJ8DAgFlAAQApAMiAAAAEEJvBC8AnwMCAfsCAQBNAgJLMAAAAA0CCgAXAAAA+wIBAIwDAQAwAwJLMAAAAKQCIgAAABBCbwMxAIwEAACfAgMB+wMBAE0DA08yAAAAHAIDAA0CBgAzAAAApAIiAAAAEEJvAzQAjAQAAJ8CAwGCAAEANQMaAxsDDgMRAxwDHQMeAx8CAAAAAAAA8L8DIAMhBQEKAyIDIwQAANBAAyQDJQMmAycEAEgQgQMoAykDKgIAAAAAAADwPwMrAywDLQQAaJCBAy4DLwMwAzEDMgMzBAAAEEIDNAM1AwIDCQM2BACcYIIDNwM4AzkEAKxgggM6AzsDPAMIAz0DPgIAAAAAAAAAAAM/AQbRAUABGAAAAAABAwAAAAAAAAABAAAAAAAAAAAAAAABAAAAAwAAAAAAAQAAAAAAAAAAAAADAAAAAPwACgAAAAAAAAAAAAAAAQAAAAAAAQAAAAAAAAMAAAAACAAAAAMAAAABAAAAAQAAAAAAAQAAAAD/AAMAAAABAAAAAAAABQAAAAAAAQAAAQAAAAAABQAAAAAAAAAAAAAAAAAAAQABAAAABQAAAAIAAAAAAAEA/wAABwAAAAAAAQADAAAAAAABAAIAAAAAAAIAAgAAAAADAAAABQAAAAACAAAAAQAAAAAFAAAAAAABAAAAAATTAAAAAAAAAAAAAAGCAAEAAADCAkEBGABCAQAAAAMAAgAAAAn7AAAATQAAygAAAAD7AQAATQEBVQEAAAD7AgEAnwADAIIAAAACA0IDQwCrAwABGAAAAAAAAAAAAKwBAAAAEAICAAAHBAAABQIDD/UB4gIDAOIDBgD/BAAABwAAAG8FBwBvBggAbwcJAG8ICgBvCQsAbwoMAG8LDQDFBAUIAQAAADAEA+IEAAAA/wQAAAAAAAAwBANxBQAAADADAl0AAAAA4gMGAP8EAAACAAAAbwUOAG8GDwDFBAUDAQAAADAEA+IEAAAA/wQAAAAAAAAwBANxBQAAADADAgIBAAAA4gMGAP8EAAABAAAAbwUQAMUEBQIBAAAAMAQD4gQAAAD/BAAAAQAAAG8FEQDFBAUCAQAAADAEA3EFAAAAMAMCUwIAAAD/AwAAAAAAAE0EAl0AAAAATQQE4gQAAADGBQAAxgYAAGQEEwCHCwEIRwsCAAAAAICpCgABqQoBAG8MEgBSDggAUg8AALwMDI0TAAAAnwwEAlILDACeAQoDCwAAAKQJFQAAAEBBnwkDAYcJAQhqCQMIbgTs/wIAAABNBAJdAAAAAE0EBHEFAAAAxgUAAMYGAABkBAoAhwkBCEcJBgAAAACA+wkAAE0JCaYWAAAAagkDCGUAAgCHCQEIagkDCG4E9f8CAAAATQQBaw0AAAAOBC8ATQQCAgEAAABNBATiBAAAAMYFAADGBgAAZAQTAIcLAQhHCwIAAAAAgKkKAAGpCgEAbwwXAFIOCABSDwAAvAwMjRMAAACfDAQCUgsMAJ4BCgMLAAAApAkVAAAAQEGfCQMBhwkBCGoJAwhuBOz/AgAAAE0EAgIBAAAATQQEcQUAAADGBQAAxgYAAGQECgCHCQEIRwkGAAAAAID7CQAATQkJphYAAABqCQMIZQACAIcJAQhqCQMIbgT1/wIAAABNBAE5DAAAAA4ELwBNBAJTAgAAAE0EBOIEAAAAxgUAAMYGAABkBBMAhwsBCEcLAgAAAACAqQoAAakKAQBvDBgAUg4IAFIPAAC8DAyNEwAAAJ8MBAJSCwwAngEKAwsAAACkCRUAAABAQZ8JAwGHCQEIagkDCG4E7P8CAAAATQQCUwIAAABNBARxBQAAAMYFAADGBgAAZAQKAIcJAQhHCQYAAAAAgPsJAABNCQmmFgAAAGoJAwhlAAIAhwkBCGoJAwhuBPX/AgAAAPsEAABNBATgGQAAAGoDBAD7BAEATQQE2woAAABNBQPbCgAAAGoFBAD/BAAAAAAAAE0FA9sKAAAAxgYAAMYHAABkBQEAaggECW4F/v8CAAAAMAQDdxoAAABNBQNaCwAAAMYGAADGBwAAZAUNAPsLAQBNCwtaCwAAAIcKCwhHCggAAAAAgPsKAQBNCgpaCwAAANkLAAASAgAAEgAIAGoLCghuBfL/AgAAAIIAAQAbA0QDRQNGBQMAAQIDRwNIBQIEBQNJA0oDSwNMA00DTgNPA1ADFANRA1IDUwNUA1UEAABAQQNBA1YDVwMSA1gBCdACWQEYAAEBAAEBAQMBAQEAAPcACwAAAPQADgEAAQEAAP4ABAAAAPsABwEAAQAA/wADAAEAAP8A/AAMAAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAEA/gAFAAAAAAAAAQAAAgAAAAACAPsACQAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAQD+AAQAAAAAAAABAAABAAAAAAIA/AAJAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAABAP4ABAAAAAAAAAEAAAEAAAAAAgD8AAoAAAACAAAAAAACAAEAAAAAAf8AAwACAAAAAAEAAAAAAAEAAAAAAAD+AAdRAQAAABMDAQAACAUAAAUDAw8P4AH7AwAATQMDxAAAAACMBAMAnwMCAvsFAABNBQXgAQAAAIcEBQD7BgAATQYGvgIAAACHBQYDDgUHAPsFAABNBQXDAwAAAFIGAwBSBwAAnwUDAIIFAAD/BQAAAAAAAEcBLgAAAAAAuygBA1IHAQCkBgUAAABAQJ8GAgLwBgcABgAAAP8GAAABAAAAUgcBAMUGBwIBAAAAUgEGAFIGAQDGBwAAxggAAGQGGgCMDQAAtw0CAAkAAACpDAABqQwBAG8OBwBSEAkAuywJA1ISCQCkEQkAAACAQJ8RAgJSEgoAvA4OjQoAAACfDgUCUg0OAJ4BDAMNAAAApAsMAAAAsECfCwMBTQwEdw0AAACHCwwJagoFC24G5f8CAAAApAYPAAA4YIBSBwUAnwYCAfsHAABNBwdaEAAAAIcGBwMOBhAATQcGcQQAAACaAA0ABwAAAPsHAABNBwerEQAAAIwIAABgCAcABwAAAPsHAABNBweLEgAAAFIIBgCfBwIBxgYAAEcGCgAAAACA+wcAAE0HB/sTAAAAUggAAFIJBQBSCgIAUgsDAJ8HBQJlAAEAUgcGAE0IB8MUAAAATQkHcQQAAADwCSQAFQAAAE0JB3EEAAAA8AkgABYAAABNCQcNFwAAAE0KCCYYAAAA8QkEAAoAAACpCQEAMAkIdhkAAABNCQh2GQAAAA4JEwBNCQgmGAAAADAJBw0XAAAATQkH9BoAAAAOCQwATQkH9BoAAABNCgcNFwAAADAKCQ0XAAAATQkH9BoAAABNCgcNFwAAADAKCQAbAAAATQkIcQQAAADwCQkAHAAAgE0JCPAdAAAATQoIzB4AAAD7CwAATQsL1B8AAABqCwkK+wkAAE0JCcYgAAAATQoH2SEAAABSCwUAnwkDAioJDgAAAACA+wkAAE0JCUgiAAAAUgoFAJ8JAgIwCQf5IwAAADAFB9khAAAATQkEJiQAAABSCgcAnwkCAfsJAABNCQnUHwAAADAJB9wlAAAATQkIJhgAAACVCQkmMAkIJhgAAABNCQQ5JwAAAA4JFQCMCQAAMAkHJhgAAACpCQAAMAkHdhkAAAD7CQAATQoJSygAAACVCgomMAoJSygAAAD7CQAATQkJYSkAAAD7CgAATQoKSygAAABNCwesKgAAAGoLCQr7CQAATQkJvgIAAABqBwkD+wkAADAHCVUrAAAAggcCACwDWgMSAyQDWwMTBAAAQEADLANcA10EAACAQANUA1UEAACwQANYA14EADhggAMfA18DIANgA2EDYgNjA2QDZQNmA2cDaANpA2oDawMOA2wDbQNuA28DSwMRAgAAAAAAAPA/A04DCANwA3EDQwC9A3IBGAAAAAAABAAAAAIAAAAAAgAAAAAAAAMAAQABAAAAAAAAAQAAAAAABAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAA/gAGAAAAAgAAAAEAAAAAAgAAAAAAAgAAAAABAwAAAAAAAAAAAAAAAgACAAAAAAAAAAEAAAAAAAEAAAMAAAEAAAABAAABAAAAAAABAAAAAAAGAAAAAgAAAAAAAAADAAAAAAAAAAAEAAAAAAAAAQABAAAAAwAAAAABAAAAAAIAAAMAAAEAAAEAAAAAAAEAAAAAAAAAAAMAAAABAAAEvgEAAAADAAMAAAAH+wAAAE0AAMoAAAAA+wEBAPsCAgCfAAMAggAAAAEDQgDlBAABGAAAAAAAAABmAgAAAAMCAgAAAAXZAgAAEgIAABICAQASAAEAggICAAABDOQEAAEYAAAAAABlAgAAABIEAQAACQYAAAUEAw8PD7kB+wUAAE0FBWEAAAAA+wYAAE0GBksBAAAAhwQFBvsGAABNBga+AgAAAIcFBgT7BwAATQcH4AMAAACHBgcA/wcAAAAAAACePQcFBwAAAFIJBwBSCgcApAgFAAAAQECfCAMBMAMHrAYAAAAwAAdxBwAAADAFB8MIAAAA/wgAAAAAAAAwCAc6CQAAAE0IBSYKAAAAMAgHDQsAAABNCAY1DAAAAFIJBwCfCAICMAgH9A0AAABNBQfDCAAAAPsIAABNCAjIDgAAAE0ICCQPAAAADggKAE0IB/QNAAAA+wkAAE0JCcgOAAAATQkJJA8AAAAwCQgkDwAAAGUADwBNCAf0DQAAAPsKAABNCgrgAwAAAE0LBXEHAAAAhwkKC00JCWsQAAAAUgoFAFILBwCfCQMCMAkIJA8AAAAwAQfZEQAAAPsIAABNCAhIEgAAAFIJAQCfCAICMAgH+RMAAABNCAYmFAAAAFIJBwCfCAIBxggAAE0JBmsVAAAADglUAA4CMwBSCQIAxgoAAMYLAABkCR8AuygNA1IPDQCkDhYAAABwQJ8OAgLwDgsAFwAAgLs8DQNSDw0ApA4ZAAAAgEGfDgIC+w8AAE0PDxQaAAAA8Q4JAA8AAAD7DgAATQ4OMBsAAABSDwcAUhAMAFIRDQCfDgQCag4CDIcOAgz7DwAATQ8P1BwAAAAwDw6NHQAAAG4J4P8CAAAAMAIHGB4AAABSCQIAxgoAAMYLAABkCQUATQ4NLR8AAABNDwesBgAAAGoHDg9uCfr/AgAAAGUABAD/CQAAAAAAADAJBxgeAAAATQkGmSAAAABSCgcAnwkCAU0JBhUhAAAAUgoHAJ8JAgH/CQAAAAAAADAJB/8iAAAATQoHGB4AAABNCwf/IgAAAJ49CgMLAAAApAkFAAAAQECfCQMBTQkHGB4AAAAwCQduIwAAAE0IB/8iAAAAZQABAFIIBwDZCQAAEgIAABIABwAwCQhuIwAAAIIHAgAkA3ADCAMkAxIDIwQAAEBAA3EDEwNhA3MDZQNkA0kDZwN0Ax0DUQNtA24DbwNLA08EAABwQAMsA3UEAACAQQN2A3cDDgMPA3gDEANQAxQDeQN6AQ2iBGABGAAAAAAAAAABAAAAAQAAAAMAAQAAAAAAAAIAAQABAAEAAAAEAAAAAgAAAAAAAgACAAAAAAABAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAABAABAAAAAAAAAQAAAAIBAAACAQAAAAEAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAAAAD7AAgAAQAAAAEAAAAA/wAABAAAAAMAAAABAAAAAwAAAAEAAAAAAAAAAAIAAAABAAACAwAAAAAFIwIAAAAHAgEAAAcEAAAFAg8DHvsDAABNAwPgAAAAAIcCAwH7BAAATQQEvgEAAACHAwQATQQCOQIAAAAOBA8A+wQAAE0FBEsDAAAAlQUFBDAFBEsDAAAA+wQAAE0EBGEFAAAA+wUAAE0FBUsDAAAATQYDrAYAAABqBgQF+wQAADADBFUHAAAAggMCAAgDEgMkA04DCAIAAAAAAADwPwNwA3EDQwD3BFsBGAAAAAABAAAAAgAAAgAAAAAAAQAAAAAAAAAAAwAAAXgCAAAABQEBAAAAHE0BAMMAAAAADgELAPsDAABNAwPgAQAAAE0EAXECAAAAhwIDBE0CAqQDAAAAUgMBAFIEAACfAgMB+wMAAE0DA+ABAAAATQQAcQIAAACHAgMETQICoQQAAABSAwAAnwICAYwC//8wAgDcBQAAAIIAAQAGA2EDEgMTA1IDSgMRAI4FIAEYAAABAgAAAAAAAAAAAAAEAAAAAAAAAAAAAwAAAY8CAAAACAMBAAAIBQAABQMPAw9DTQQArAAAAABSBQEAcwMEBfsFAABNBQWfAQAAAIcEBQMOBBcA+wUAAE0FBZ8BAAAAhwQFA00EBC0CAAAATQUArAAAAABqAAQF+wUAAE0FBZ8BAAAAhwQFA/sFAABNBQXUAwAAADAFBI0EAAAA+wUAAE0FBZ8BAAAAhwQFA4IEAgDiBAcAMAMErAAAAAAwAgTMBQAAAPsFAABNBQXUAwAAADAFBI0EAAAA/wUBAAAAAABNBgCsAAAAAGoABQYwBQQtAgAAAP8FAAAAAAAAMAUEjgYAAAD7BwAATQcHFAgAAACePQQEBwAAAFIGBACkBQoAAACQQJ8FAwH7BQAATQUFnwEAAABqBAUDggQCAAsDcQN7AxADDgMPAwsDFQUFAAUEAgYDdgMjBAAAkEAApwV3ARgAAAAAAQAAAAABAAAAAAAAAAABAAAAAAAAAAABAAAAAAIBAAEAAQAAAAABAAAAAAAAAQAAAAIAAAAAAAAAAAEAAAABqAIAAAALAgEAAAcEAAAFAg8DLPsDAABNAwPgAAAAAE0EAHEBAAAAhwIDBE0CAloCAAAAhwMCAUcDAgAAAACAqQUAAakFAQBvBwMATQkAcQEAAABSCgEAvAcHjQQAAACfBwQCUgYHAJ4BBQMGAAAApAQGAAAAUECfBAMBTQUAOgcAAACHBAUBRwQJAAAAAIBNBANzCAAAAFIFAACfBAIBTQQAOgcAAACpBQEAagUEAU0EA38JAAAAUgUAAJ8EAgCCBAAACgMSAxMDTQN8A1QDVQQAAFBAA3MDfQN+AMUFQgEYAAAAAAAAAAABAQAAAAAAAAAAAAAAAAAAAAACAAAAAAEAAAABAAAAAgAAAADGAgAAAAUAAQAAAAz7AQAATQEBvgAAAAD7AwAATQMDYQEAAAD7BAAATQQESwIAAACHAgMEhwABAoIAAgADAyQDcAMIANgFfwEYAAAAAAAAAAAAAAAA2QIAAAACAAEAAAAI/wABAAAAAAD7AQAATQEB5wAAAAAwAQBzAQAAAIIAAgACAxsDgAEA5gUlARgAAAEAAAAAAOcCAAAABAABAAAAIfsAAAD7AgAATQIC4AEAAABNAQJ0AAAAAE0BATUCAAAA+wMAAE0DA+ABAAAATQIDdAAAAACfAQICMAEAfQMAAAD7AAAATQAAfQMAAAD7AQAATQEBYgQAAAAwAQAkBQAAAPsAAABNAADnBgAAAPsBAABNAQF9AwAAADABAPQHAAAAggABAAgDgQEDEgNJAxwDLwMdAxsDZwDzBSoBGAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAfUCAAAABgABAAAATfsAAABNAAC7AAAAAA4ABgD7AAAATQAAuwAAAAC8AABQAQAAAJ8AAgGkAAQAAAwggG8BBQCfAAICpAEIAAAcYICMAv//jAP//58BAwIwAQA7CQAAAKQBCgAADGCAjAIBAIwDAgCMBAEAjAUCAJ8BBQIwAQAvCwAAAPsBAABNAQHIDAAAAE0BAaoNAAAAMAEAnw4AAAD7AQAATQEByAwAAABNAQEADwAAADABADoQAAAAjAEAADABAI4RAAAA+wEAAE0BAbcSAAAATQEBbRMAAABSAgAAjAMBAPsEAABNBATIDAAAAE0EBA0UAAAA+wUAAE0FBcgMAAAATQUFSBUAAACfAQUB+wEAAE0BAbcSAAAATQEB9BYAAABSAgAAjAMCAJ8BAwH7AQAAMAABuwAAAACCAAEAFwOCAQODAQNnA4QBBAAMIIADhQEDhgEDhwEEABxggAOIAQQADGCAA4kBA3QDigEDiwEDjAEDjQEDjgEDjwEDkAEDkQEDkgEDkwEAgQYpARgAAAAAAQAAAAAAAwAAAAEAAAAAAAABAAAAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAIAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAgAAAQIDAAAADQEBAAAGAwAABQECY/sBAABNAQGWAAAAAA4BCAD7AQAATQEBlgAAAAD7AgAAxgMAADADApYAAAAAggECAIwCAQCQAwABQwECA28CAgCkAwUAABAwgFIEAQBvBQYAnwMDAg0DDwAHAAAARwMNAAAAAABSBAIAbwUIAFIGAwBzAgQGlQEBAaQEBQAAEDCAUgUBAG8GBgCfBAMCUgMEAEgA8P/7BQAATQUFBgkAAACHBAUCDgQIAPsFAABNBQUGCQAAAIcGBQKVBgYBagYFApUEBAFlAAYA+wUAAE0FBQYJAAAAjAYBAGoGBQKMBAEA+wYAAE0GBk8KAAAAHAUGAA0FBgALAACAUgYCAG8HDABSCAQAcwUGCIIFAgD7BQAATQUFng0AAAAOBQ8A+wUAAKkGAAAwBgWeDQAAAFIGAgBvBw4ApAgRAABA8ID7CQAATQkJTwoAAABvChIAnwgDAnMFBgiCBQIAUgYCAG8HDABSCAQAbwkMAKQKEQAAQPCA+wsAAE0LC08KAAAAbwwSAJ8KAwJzBQYKggUCABMDlAECAAAAAAAA8D8DlQEDAwOWAQQAEDCAA5cBAgAAAAAAAPC/A5gBAy4DPgIAAAAAAAAAAAOZAQOaAQObAQMsA5wBBABA8IADnQEAnwZaARgAAAAAAQAAAQAAAAEDAAABAQAAAAABAAAAAQAAAAEBAAAAAAD9BgAAAAEBAAAAAAABAAIAAAAAAQMAAAAAAAEAAAAAAQAAAAEAAAABAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAgAwAAAAsCAQAABwQAAAUCBAQ2UgIAAMYDAADGBAAAZAIuAIcHAQW7KAYDUgkGAKQIAQAAAABAnwgCAvAIFwACAACADgcSALsoBwNSCQcApAgBAAAAAECfCAIC8AgMAAIAAID7CAAATQgIxgMAAABSCQYAUgoHAJ8IAwIqCBcAAAAAgKkIAACCCAIAZQATAKkIAACCCAIAZQAQALsoBgNSCQYApAgBAAAAAECfCAICuygHA1IKBwCkCQEAAAAAQJ8JAgKaCAMACQAAAPEGAwAHAAAAqQgAAIIIAgBuAtH/AgAAAKkCAQCCAgIABAMTBAAAAEADLANsAM4GbAEYAAAAAAEBAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAMAAAMAAAAAAAAAAAAAAAAAAQD0ABEAUAMAAAAJAQEAAAYDAAAFAQQYpAECAAAEAIBSAgAAnwECAlICAADGAwAAxgQAAGQCDQC7KAYDUggGAKQHBAAAADBAnwcCAvAHBwAAAACA+wcAAE0HB0gFAAAAUggGAJ8HAgJqBwEFbgLy/wIAAACCAQIABgMsA54BBAAEAIADEwQAADBAA24A7QZuARgAAAAAAgAAAAEAAAAAAAABAAAAAAD+AAZuAwAAAAUBAAAAAOsB/wEAAAAAAABvAgAAMAIB3gEAAACpAgAAMAIBcAIAAACpAgAAMAIBkQMAAACMAgAAMAIB1AQAAACMAgAAMAIBGwUAAACpAgAAMAIBswYAAACMAgAAMAIBqwcAAACMAgEAMAIBtAgAAACkAgsAACiQgIwDEACfAgICMAIBOQwAAAD/AgAAAAAAADACAeANAAAAjAIBADACAUsOAAAAxgIAADACAX0PAAAA4gIVAG8DFgAwAwKsEAAAAG8DFwAwAwJxEQAAAE0DAX0PAAAAMAMC9BIAAACMAwAAMAMCDRMAAACMAwAAMAMCJhQAAAAwAgHnGAAAAE0CAecYAAAAMAIBVRkAAAD/AgAAAAAAADACATsaAAAATQIBOxoAAAAwAgHIGwAAAP8CAAABAAAAbwMWAMUCAwIBAAAAMAIBYRwAAAD/AgAAAAAAADACAQYdAAAA/wIAAAAAAAAwAgFPHgAAAKkCAAAwAgGeHwAAAMYCAAAwAgGWIAAAAP8CAAAAAAAAMAIBnyEAAAD/AgAAAAAAADACAY4iAAAA/wIAAAAAAAAwAgEPIwAAAP8CAAAAAAAAMAIBpSQAAAD/AgAAAAAAADACAXslAAAApAInAAAAYEJvBCgAvAICFikAAACfAgMCvAICCioAAACfAgICMAIBXisAAACkAi0AACjAgtkDAAASAAEAnwICAjACARAuAAAA/wIEAAAAAAAwAgJuLwAAAMADMAAwAwJfMQAAANkDAgASAAAAEgABADADAlMyAAAAwAMzADADAlk0AAAA2QMEABIAAQAwAwKlNQAAADACARQ2AAAA2QMFABIAAAASAAEAMAMBFTcAAADAAzgAMAMBpjkAAADZAwcAEgABABIAAAAwAwHrOgAAANkDCAASAAEAMAMBKzsAAADZAwkAEgABADADAfs8AAAA2QMKABIAAQAwAwHDPQAAANkDCwASAAEAMAMBiz4AAADZAwwAEgABADADATA/AAAA2QMNABIAAQAwAwHKQAAAANkDDgASAAEAMAMBk0EAAADZAw8AEgABADADASNCAAAA2QMQABIAAQAwAwGzQwAAANkDEQASAAEAMAMBgkQAAADZAxIAEgABADADAcRFAAAA2QMTABIAAQAwAwHGRgAAANkDFAASAAEAMAMBSEcAAABNAwEjQgAAAJ8DAQIwAwFaSAAAAE0DASNCAAAAnwMBAjADAb5JAAAAMAEApUoAAABNAwHIGwAAADADAMgbAAAAggECAEsDnwEDoAEDAQOhAQMOAysDKANfA6IBAywDowEEACiQgAOkAQMSAwgDHANxAxMDZwNkA2UFBRAREhMUA4ABA4EBAxsDQwOlAQN0A3ADLgM+A5oBA5QBA3sDGQMCA6YBA6cBA6gBBAAAYEIDqQEDqgEDqwEDNQMJBAAowIIDNwN6BgEDDAMWBgQDFwMYA3YDQAYIA0EDWQNyA2ADWwMgA3cDQgN/AyUDKgMpA1oDbANuAx8DJAMNFQABAgQFBwgKCw4PEBESExQVFhcYGQMAAQMAAAgAAAIAAPYAAAEAAAEA/gMAAAEAAAH7AAEAAAAAAP8AAAABAAAB/gABAQAAAQD9AQAAAAEAAAMAAPsABwAA+QMAAAABAAD8AwAAAAAAAP0AAAABAAAA/wAAAQAAAwD8AAMAAAABAPwAAQAAAAEA/gADAAAAAAD9AAAAAAkAAPcAAAAwAAEAzwAADQAAAADzAAAPAAAABO0OAAAAAHEAgQ4AAAAAbQCFAGUAAABVAEYAFwAAABkA0AAeAAAAEwDPAA4AAAANAOUADgAAAB4A1AAvAAAAHwCyAA0AAAAAAfIAAAACAAEA/QABCQAAAAsAAAACAAAABQAAAAQAAAACAAAAAwAAAP7///8HAAAABAAAAAQAAAACAAAABAAAAAQAAAACAAAAAwAAAAkAAAA6AAAALQAAABMAAAB/AAAAewAAALoAAAAwAAAAMQAAABsAAAAsAAAATgAAAA4AAAADAAAAAAIAAAECAAyjAAAApAABAAAAAECkAQMAAAAgQE0BASQEAAAATQEB7wUAAACfAAICwAEGAIIBAgAHA6wBBAAAAEADrQEEAAAgQAMdA64BBhoBGgEAARgAAAAAAAAAAAAAAgABAAAAABtES1LE1PQRPs2zwWv1Z08oNFNFsHaPOMU=
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:30:14
--- Luau version 6, Types version 3
--- Time taken: 0.047105 seconds
-
 return function(arg1) -- Line 3
     local module_upvr = {
         _version = " 2.5.0 ";
@@ -44,9 +34,6 @@ return function(arg1) -- Line 3
         _initFunctions = {};
         _fullErrorTracebacks = game:GetService("RunService"):IsStudio();
         _cycleCoroutine = coroutine.create(function() -- Line 73
-            --[[ Upvalues[1]:
-                [1]: module_upvr (readonly)
-            ]]
             while module_upvr._started do
                 for _, v in module_upvr._connectedFunctions do
                     debug.profilebegin("Iris/Connection")
@@ -67,10 +54,6 @@ return function(arg1) -- Line 3
         return arg1_2.value
     end
     function tbl.set(arg1_3, arg2, arg3) -- Line 144
-        --[[ Upvalues[2]:
-            [1]: arg1 (readonly)
-            [2]: module_upvr (readonly)
-        ]]
         if arg2 == arg1_3.value and arg3 ~= true then
             return arg1_3.value
         end
@@ -90,17 +73,10 @@ return function(arg1) -- Line 3
         local var15_upvr = #arg1_4.ConnectedFunctions + 1
         arg1_4.ConnectedFunctions[var15_upvr] = arg2
         return function() -- Line 179
-            --[[ Upvalues[2]:
-                [1]: arg1_4 (readonly)
-                [2]: var15_upvr (readonly)
-            ]]
             arg1_4.ConnectedFunctions[var15_upvr] = nil
         end
     end
     function tbl.changed(arg1_5) -- Line 191
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
         local var17
         if arg1_5.lastChangeTick + 1 ~= module_upvr._cycleTick then
             var17 = false
@@ -111,10 +87,6 @@ return function(arg1) -- Line 3
     end
     module_upvr.StateClass = tbl
     function module_upvr._cycle(arg1_6) -- Line 209
-        --[[ Upvalues[2]:
-            [1]: arg1 (readonly)
-            [2]: module_upvr (readonly)
-        ]]
         if arg1.Disabled then
         else
             module_upvr._rootWidget.lastCycleTick = module_upvr._cycleTick
@@ -132,9 +104,6 @@ return function(arg1) -- Line 3
             module_upvr._lastVDOM = module_upvr._VDOM
             module_upvr._VDOM = module_upvr._generateEmptyVDOM()
             task.spawn(function() -- Line 235
-                --[[ Upvalues[1]:
-                    [1]: module_upvr (copied, readonly)
-                ]]
                 for _, v_17 in module_upvr._postCycleCallbacks do
                     v_17()
                 end
@@ -164,14 +133,14 @@ return function(arg1) -- Line 3
                 for _, v_19 in module_upvr._connectedFunctions do
                     v_19()
                 end
-                -- KONSTANTWARNING: GOTO [203] #144
+                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
             end
             local coroutine_status_result1 = coroutine.status(module_upvr._cycleCoroutine)
             if coroutine_status_result1 == "suspended" then
                 local _, coroutine_resume_result2, _ = coroutine.resume(module_upvr._cycleCoroutine)
                 if coroutine_resume_result2 == false then
                     error(v_18, 0)
-                    -- KONSTANTWARNING: GOTO [203] #144
+                    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
                 end
             elseif coroutine_status_result1 == "running" then
                 error("Iris cycleCoroutine took to long to yield. Connected functions should not yield.")
@@ -190,10 +159,6 @@ return function(arg1) -- Line 3
     function module_upvr._NoOp() -- Line 322
     end
     function module_upvr.WidgetConstructor(arg1_7, arg2) -- Line 336
-        --[[ Upvalues[2]:
-            [1]: module_upvr (readonly)
-            [2]: arg1 (readonly)
-        ]]
         local tbl_4 = {
             All = {
                 Required = {"Generate", "Discard", "Update", "Args", "Events", "hasChildren", "hasState"};
@@ -272,20 +237,13 @@ return function(arg1) -- Line 3
         for i_11_upvr, _ in tbl_5.Events do
             if arg1.Events[i_11_upvr] == nil then
                 arg1.Events[i_11_upvr] = function() -- Line 427
-                    --[[ Upvalues[2]:
-                        [1]: module_upvr (copied, readonly)
-                        [2]: i_11_upvr (readonly)
-                    ]]
                     return module_upvr._EventCall(module_upvr._lastWidget, i_11_upvr)
                 end
             end
         end
     end
     function module_upvr._Insert(arg1_8, arg2, arg3) -- Line 445
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
-        -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
         local any__getID_result1 = module_upvr._getID(3)
         local var111 = module_upvr._widgets[arg1_8]
         if module_upvr._VDOM[any__getID_result1] then
@@ -322,13 +280,13 @@ return function(arg1) -- Line 3
         else
         end
         local parentWidget = var116.parentWidget
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         i_12 = var116.type
         if i_12 ~= "Window" then
-            -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
             i_12 = var116.type
             if i_12 ~= "Tooltip" then
-                -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                 i_12 = var116.ZIndex
                 v_12 = parentWidget.ZOffset
                 if i_12 ~= v_12 then
@@ -338,19 +296,19 @@ return function(arg1) -- Line 3
                 i_12 = parentWidget.ZUpdate
                 if i_12 then
                     i_12 = parentWidget.ZOffset
-                    -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                     var116.ZIndex = i_12
-                    -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                     i_12 = var116.Instance
                     if i_12 then
-                        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+                        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                         i_12 = var116.Instance
-                        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+                        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                         v_12 = var116.ZIndex
                         i_12.ZIndex = v_12
-                        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+                        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                         i_12 = var116.Instance
-                        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+                        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                         v_12 = var116.ZIndex
                         i_12.LayoutOrder = v_12
                     end
@@ -365,7 +323,7 @@ return function(arg1) -- Line 3
         end
         i_12 = module_upvr
         i_12 = i_12._deepCompare
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         v_12 = var116.providedArguments
         i_12 = i_12(v_12, tbl_6)
         if i_12 == false then
@@ -373,9 +331,9 @@ return function(arg1) -- Line 3
             i_12 = i_12._deepCopy
             v_12 = tbl_6
             i_12 = i_12(v_12)
-            -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
             var116.arguments = i_12
-            -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
             var116.providedArguments = tbl_6
             i_12 = var111.Update
             v_12 = var116
@@ -383,7 +341,7 @@ return function(arg1) -- Line 3
         end
         i_12 = module_upvr
         i_12 = i_12._cycleTick
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         var116.lastCycleTick = i_12
         i_12 = parentWidget.ZOffset
         i_12 += 1
@@ -391,10 +349,10 @@ return function(arg1) -- Line 3
         i_12 = var111.hasChildren
         if i_12 then
             i_12 = 0
-            -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
             var116.ZOffset = i_12
             i_12 = false
-            -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
             var116.ZUpdate = i_12
             i_12 = module_upvr
             v_12 = i_12._stackIndex
@@ -404,24 +362,21 @@ return function(arg1) -- Line 3
             i_12 = i_12._IDStack
             v_12 = module_upvr
             v_12 = v_12._stackIndex
-            -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
             i_12[v_12] = var116.ID
         end
         i_12 = module_upvr
         i_12 = i_12._VDOM
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         i_12[any__getID_result1] = var116
         i_12 = module_upvr
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         i_12._lastWidget = var116
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         return var116
     end
     function module_upvr._GenNewWidget(arg1_9, arg2, arg3, arg4) -- Line 546
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
-        -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
         local var135 = module_upvr._VDOM[module_upvr._IDStack[module_upvr._stackIndex]]
         local var136 = module_upvr._widgets[arg1_9]
         local module_2_upvr = {}
@@ -473,25 +428,13 @@ return function(arg1) -- Line 3
             var139 = module_2_upvr
         end
         function var139.__index(arg1_10, arg2_2) -- Line 612
-            --[[ Upvalues[2]:
-                [1]: module_upvr (copied, readonly)
-                [2]: module_2_upvr (readonly)
-            ]]
             return function() -- Line 613
-                --[[ Upvalues[3]:
-                    [1]: module_upvr (copied, readonly)
-                    [2]: module_2_upvr (copied, readonly)
-                    [3]: arg2_2 (readonly)
-                ]]
                 return module_upvr._EventCall(module_2_upvr, arg2_2)
             end
         end
         return module_2_upvr
     end
     function module_upvr._ContinueWidget(arg1_11, arg2) -- Line 631
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
         local var142 = module_upvr._VDOM[arg1_11]
         if module_upvr._widgets[arg2].hasChildren then
             local var143 = module_upvr
@@ -502,9 +445,6 @@ return function(arg1) -- Line 3
         return var142
     end
     function module_upvr._DiscardWidget(arg1_12) -- Line 654
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
         local parentWidget_2 = arg1_12.parentWidget
         if parentWidget_2 then
             module_upvr._widgets[parentWidget_2.type].ChildDiscarded(parentWidget_2, arg1_12)
@@ -513,9 +453,6 @@ return function(arg1) -- Line 3
         arg1_12.lastCycleTick = -1
     end
     function module_upvr._widgetState(arg1_13, arg2, arg3) -- Line 679
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
         local var145 = arg1_13.ID..arg2
         if module_upvr._states[var145] then
             module_upvr._states[var145].ConnectedWidgets[arg1_13.ID] = arg1_13
@@ -536,9 +473,6 @@ return function(arg1) -- Line 3
         return module
     end
     function module_upvr._EventCall(arg1_14, arg2) -- Line 709
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
         local var148 = module_upvr._widgets[arg1_14.type].Events[arg2]
         local var149
         if var148 == nil then
@@ -558,31 +492,19 @@ return function(arg1) -- Line 3
         return var148.Get(var149)
     end
     function module_upvr._GetParentWidget() -- Line 728
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
         return module_upvr._VDOM[module_upvr._IDStack[module_upvr._stackIndex]]
     end
     function module_upvr._generateEmptyVDOM() -- Line 742
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
         return {
             R = module_upvr._rootWidget;
         }
     end
     function module_upvr._generateRootInstance() -- Line 755
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
         module_upvr._rootInstance = module_upvr._widgets.Root.Generate(module_upvr._widgets.Root)
         module_upvr._rootInstance.Parent = module_upvr.parentInstance
         module_upvr._rootWidget.Instance = module_upvr._rootInstance
     end
     function module_upvr._generateSelectionImageObject() -- Line 769
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
         if module_upvr.SelectionImageObject then
             module_upvr.SelectionImageObject:Destroy()
         end
@@ -597,10 +519,7 @@ return function(arg1) -- Line 3
         module_upvr.SelectionImageObject = Frame
     end
     function module_upvr._getID(arg1_15) -- Line 799
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
-        -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
         local var152
         if module_upvr._nextWidgetId then
             var152 = module_upvr
@@ -616,7 +535,7 @@ return function(arg1) -- Line 3
         if module_upvr._usedIDs[var152] then
             local _usedIDs = module_upvr._usedIDs
             _usedIDs[var152] += 1
-            -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         else
             module_upvr._usedIDs[var152] = 1
         end
@@ -627,54 +546,48 @@ return function(arg1) -- Line 3
             module_upvr._newID = false
             return var152.."::"..table.concat(module_upvr._pushedIds, '\\')
         end
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         return var152..':'..1..':'..table.concat(module_upvr._pushedIds, '\\')
     end
     function module_upvr._deepCompare(arg1_16, arg2) -- Line 846
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
-        -- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
-        -- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
-        -- KONSTANTERROR: [50] 41. Error Block 14 start (CF ANALYSIS FAILED)
-        -- KONSTANTERROR: [50] 41. Error Block 14 end (CF ANALYSIS FAILED)
-        -- KONSTANTERROR: [4] 5. Error Block 24 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [50.8]
         if nil == "table" then
             -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [50.7]
             if nil then
-                -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                 if nil == "table" then
-                    -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                     if nil == false then
-                        -- KONSTANTWARNING: GOTO [50] #41
+                        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
                     end
-                    -- KONSTANTWARNING: GOTO [50] #41
+                    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
                 end
             end
         else
-            -- KONSTANTERROR: Expression was reused, decompilation is incorrect (x2)
+            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
             -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [50.9]
-            local function INLINED_2() -- Internal function, doesn't exist in bytecode
-                -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+            local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
+                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                 -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [50.6]
                 return nil ~= nil
             end
-            if nil ~= nil or INLINED_2() then
+            if nil ~= nil or decompInlinedCondition_2() then
             end
         end
-        -- KONSTANTERROR: [4] 5. Error Block 24 end (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     end
     function module_upvr._deepCopy(arg1_17) -- Line 877
-        --[[ Upvalues[1]:
-            [1]: module_upvr (readonly)
-        ]]
         for i_15, v_15 in arg1_17 do
             if type(v_15) == "table" then
                 table.clone(arg1_17)[i_15] = module_upvr._deepCopy(v_15)
             end
         end
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         return table.clone(arg1_17)
     end
     module_upvr._lastVDOM = module_upvr._generateEmptyVDOM()

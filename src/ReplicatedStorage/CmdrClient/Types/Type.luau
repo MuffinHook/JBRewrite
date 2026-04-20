@@ -1,24 +1,7 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMQD01ha2VGdXp6eUZpbmRlcgxHZXRUeXBlTmFtZXMJVHJhbnNmb3JtJk5vIHR5cGUgd2l0aCB0aGF0IG5hbWUgY291bGQgYmUgZm91bmQuCFZhbGlkYXRlDEF1dG9jb21wbGV0ZQVQYXJzZQR0eXBlDFJlZ2lzdGVyVHlwZQV0eXBlcxBNYWtlTGlzdGFibGVUeXBlB3JlcXVpcmUGc2NyaXB0BlBhcmVudAZTaGFyZWQEVXRpbAAGBAECAAAADPsBAABNAQE9AAAAAPsCAQC8AgKCAQAAAJ8CAgCfAQACUgIBAFIDAACfAgIAggIAAAIDAQMCAAUDARgAAAAAAAAAAAIAAAAGAAAAAAQBAAAAAAgcAgAAjAMAALcDAgACAAAAqQEAAakBAQBvAgAAggEDAAEDBAALBQEYAAAAAAAAAAAMAAAAAAEBAAAAAAGCAAIAAAAPBgEYABAAAAAAAgEAAAAAAhMBAACCAQIAAAATBwEYAAAUAAAAAAcBAQAAAB7iAQQA2QIAABICAAASAAAAMAIBIQAAAADAAgUAMAIBdgEAAADAAgYAMAIBqwIAAADAAgcAMAIBmwMAAABvBAgAUgUBALwCAN0JAAAAnwIEAW8ECgD7BQAATQUFJAsAAABSBgEAnwUCALwCAN0JAAAAnwIAAYIAAQAMAwMDBQMGAwcFBAABAgMGAQYCBgMDCAMJAwoDCwQAAQIDAwABGAABAAAAAAYAAAQAAAQAAAUAAAAAAQAAAAAAAAAAAQQAAAAAAgAAAQIAEaMAAACkAAEAAAAAQKQBAwAAACBATQEBJAQAAABNAQEkBAAAAE0BARIFAAAATQEBngYAAACfAAICwAEHABIAAACCAQIACAMMBAAAAEADDQQAACBAAw4DDwMQBgQBBAEAARgAAAAAAAAAAAAAAAAAAAIAAAEAAAAABX9x+snIjwYBEkQ5aBPjLaYPae29TbWQyA==
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:33:51
--- Luau version 6, Types version 3
--- Time taken: 0.001547 seconds
-
 local Util_upvr = require(script.Parent.Parent.Shared.Util)
 return function(arg1) -- Line 3
-    --[[ Upvalues[1]:
-        [1]: Util_upvr (readonly)
-    ]]
     local tbl = {
         Transform = function(arg1_2) -- Line 5, Named "Transform"
-            --[[ Upvalues[2]:
-                [1]: Util_upvr (copied, readonly)
-                [2]: arg1 (readonly)
-            ]]
             return Util_upvr.MakeFuzzyFinder(arg1:GetTypeNames())(arg1_2)
         end;
         Validate = function(arg1_3) -- Line 11, Named "Validate"

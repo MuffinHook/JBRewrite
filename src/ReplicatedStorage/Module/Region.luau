@@ -1,13 +1,3 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:39:38
--- Luau version 6, Types version 3
--- Time taken: 0.009212 seconds
-
 local var2_upvw
 if game:GetService("RunService"):IsServer() then
     var2_upvw = require(game:GetService("ServerStorage").Game.ServerPlayerUtils)
@@ -15,9 +5,6 @@ end
 local Signal_upvr = require(game:GetService("ReplicatedStorage").Std.Signal)
 local pointToObjectSpace_upvr = CFrame.new().pointToObjectSpace
 local function CastPoint_upvr(arg1, arg2) -- Line 47, Named "CastPoint"
-    --[[ Upvalues[1]:
-        [1]: pointToObjectSpace_upvr (readonly)
-    ]]
     local s_5 = arg1.s
     local var21 = pointToObjectSpace_upvr(arg1.c, arg2) + s_5 * 0.5
     local var22 = false
@@ -60,9 +47,6 @@ return {
         return module
     end;
     MakeRegion = function() -- Line 34, Named "MakeRegion"
-        --[[ Upvalues[1]:
-            [1]: Signal_upvr (readonly)
-        ]]
         return {
             Prisms = {};
             Names = {};
@@ -75,21 +59,18 @@ return {
         }
     end;
     Update = function(arg1, arg2) -- Line 84, Named "Update"
-        -- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         local const_number = 1
-        -- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
-        -- KONSTANTERROR: [104] 82. Error Block 22 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [105.9]
         ;({})[nil] = true
-        -- KONSTANTERROR: [104] 82. Error Block 22 end (CF ANALYSIS FAILED)
-        -- KONSTANTERROR: [12] 9. Error Block 2 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [106.10]
-        -- KONSTANTERROR: [12] 9. Error Block 2 end (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     end;
     RegionCastPoint = function(arg1, arg2) -- Line 52, Named "RegionCastPoint"
-        --[[ Upvalues[1]:
-            [1]: CastPoint_upvr (readonly)
-        ]]
         local Prisms_2 = arg1.Prisms
         for i = 1, #Prisms_2 do
             if CastPoint_upvr(Prisms_2[i], arg2) then
@@ -100,12 +81,7 @@ return {
     end;
     CastPoint = CastPoint_upvr;
     IsInRegionPlayerName = function(arg1, arg2) -- Line 63, Named "IsInRegionPlayerName"
-        --[[ Upvalues[3]:
-            [1]: Players_upvr (readonly)
-            [2]: var2_upvw (read and write)
-            [3]: CastPoint_upvr (readonly)
-        ]]
-        -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
         local SOME = Players_upvr:FindFirstChild(arg2)
         local var31
         if not SOME then return end
@@ -122,12 +98,12 @@ return {
             var31 = false
             return var31
         end
-        local function INLINED() -- Internal function, doesn't exist in bytecode
+        local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
             var31 = var31.getLastPosition(SOME)
             var31 = var2_upvw
             return var31
         end
-        if not var2_upvw or not INLINED() then
+        if not var2_upvw or not decompInlinedCondition() then
             var31 = PrimaryPart.Position
         end
         if 0 < Humanoid.Health then

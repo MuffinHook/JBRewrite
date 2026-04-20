@@ -1,16 +1,6 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMRCGNhdGVnb3J5EG1pc3NpbmcgY2F0ZWdvcnkGYXNzZXJ0BG5hbWUMbWlzc2luZyBuYW1lCWZhdm9yaXRlZBFtaXNzaW5nIGZhdm9yaXRlZAVwYWlycxhzZXRDYXRlZ29yeUl0ZW1GYXZvcml0ZWQXbWlzc2luZyBmYXZvcml0ZWQgdGFibGUPc2V0RmF2b3JpdGVkUmF3BGdhbWURUmVwbGljYXRlZFN0b3JhZ2UKR2V0U2VydmljZQdyZXF1aXJlBVJvZHV4DWNyZWF0ZVJlZHVjZXIAAwgCAAAAAEBNBAFrAAAAAEcEAgAAAACAqQMAAakDAQCBAQMEAQAAAG8EAQCkAgMAAAAgQJ8CAwFNBAFaBAAAAEcEAgAAAACAqQMAAakDAQCBAQMEBQAAAG8EBQCkAgMAAAAgQJ8CAwFNBAFQBgAAAEcEAgAAAACAqQMAAakDAQCBAQMEBwAAAG8EBwCkAgMAAAAgQJ8CAwH/AgAAAAAAAKQDCQAAAIBAUgQAAJ8DAgQXAwEAagcCBm4D/v8CAAAATQQBawAAAACHAwIEKwMFAE0DAWsAAAAA/wQAAAAAAABqBAIDTQQBawAAAACHAwIETQQBWgQAAABNBQFQBgAAAGoFAwSCAgIACgMBAwIDAwQAACBAAwQDBQMGAwcDCAQAAIBAAAUJARgAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAEAAAAAAf8AAwAAAAEAAAAAAgAAAAAAAAABBgAAAAAFAgAAAAAPTQQBUAAAAABHBAIAAAAAgKkDAAGpAwEAgQEDBAEAAABvBAEApAIDAAAAIECfAgMBTQIBUAAAAACCAgIABAMGAwoDAwQAACBAABQLARgAAAAAAAAAAAAAAAABAAAVAAAAAAYAAAECABmjAAAApAABAAAAAEBvAgIAvAAAFgMAAACfAAMCpAEFAAAAQEBNAgCnBgAAAJ8BAgJNAgHWBwAAAP8DAAAAAAAA4gQKAMAFCwAwBQR9CAAAAMAFDAAwBQRzCQAAAJ8CAwCCAgAADQMMBAAAAEADDQMOAw8EAABAQAMQAxEDCQMLBQIICQYABgECAAEBAAEYAAAAAAAAAAEAAAAAAgAAAAABAAAPAADwAAEAAAAAAiVn4Fc6+HxBKjqP0koE1iJVf/cjF6OKVg==
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:42:19
--- Luau version 6, Types version 3
--- Time taken: 0.002835 seconds
-
 return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
     setCategoryItemFavorited = function(arg1, arg2) -- Line 5, Named "setCategoryItemFavorited"
-        -- KONSTANTERROR: [0] 1. Error Block 28 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         local var6
         if arg2.category == nil then
             var6 = false
@@ -20,10 +10,10 @@ return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
         assert(var6, "missing category")
         if arg2.name == nil then
             var6 = false
-            -- KONSTANTWARNING: GOTO [18] #13
+            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
         end
-        -- KONSTANTERROR: [0] 1. Error Block 28 end (CF ANALYSIS FAILED)
-        -- KONSTANTERROR: [17] 12. Error Block 30 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         var6 = true
         assert(var6, "missing name")
         if arg2.favorited == nil then
@@ -48,7 +38,7 @@ return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
         do
             return var11
         end
-        -- KONSTANTERROR: [17] 12. Error Block 30 end (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     end;
     setFavoritedRaw = function(arg1, arg2) -- Line 20, Named "setFavoritedRaw"
         local var12

@@ -1,13 +1,3 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMLB1ZlY3RvcjIDbmV3AVkBWAFaD2NvbXB1dGVPZmZzZXRYWQ5jb21wdXRlV29ybGRYWQVVRGltMglmcm9tU2NhbGUMd29ybGRUb1NjYWxlFHJlbGF0aXZlV29ybGRUb1NjYWxlAAUXCQAAAABjKwEGAKQJAgAABACAjAoAAowLAAKfCQMCUgEJAE0LAXgDAAAACQoIC+wJCgZNCwF5BAAAAAkKCwlNDAF4AwAAAAkLDAlNDQB5BAAAACYMDQRNDgB7BQAAACYNDgUJEAYJJg8QCvURBglNEgF5BAAAAAkQERImDg8QCREHCSYQEQv1EgYJTRMBeAMAAAAJERITJg8QEQkSBglvFAcA7BUMAkMTFBUJERITWxIKByYQERIJEwcJbxUHAOwWDQNDFBUWCRITFFsTCwcmERITbxQHAPUVBgkJExQVTRQBeQQAAAAJEhMUJhAQEm8UBwD1FQYJCRMUFU0UAXgDAAAACRITFCYRERJgDgIAEAAAAFIQDgCMEgAAYBACABIAAACMEAAAYA8CABEAAABSEQ8AjBIAAGARAgASAAAAjBEAAKkSAQCMEwAAtxAMABMAAACpEgEAjBMAALcRCAATAAAAqRIBALcOBQAQAAAAtw8CABEAAACpEgABqRIBAFITEgBSFBAAUhURAFIWCQCCEwUACAMBAwIEAAQAgAMDAwQDBQIAAAAAAADwPwIAAAAAAADgPwADBgEYAAEAAAAAAAIAAAABAAABAAABAAABAAABAAAAAAAAAQAAAAAAAAcAAAAAAAABAAAAAAAAAQAAAAAAAAEAAAAAAAAFAAECAAABAgABAgAAAQQAAAAAAAAAAAAAAAAAAAIAAAAADgAAAAAWCwEAAAAa+wsAAE0LC0EAAAAAUgwCAFINAwBSDgQAUg8FAFIQBgBSEQcAUhIIAFITCQBSFAoAnwsKBUMUAAzsExQI7BITDngREgEJEBEEQw8QBkMVAQ3sFBUJ7BMUDngSEwEJERIFQxARB4IPAwACAwYCAAAAAAAA4D8AOAcBGAAAAAEBAQEBAQEBAfcLAAAAAAABAAAAAAABRQAAAAAMBgAAAAAMpAYCAAAEAIBvCAMAJgoAAuwJCgRDBwgJbwkDACYLAQPsCgsFQwgJCp8GAwCCBgAABAMIAwkEAAQAgAIAAAAAAADgPwBUCgEYAAAAAAAAAAAAAAAAVQAAAAAHBAAAAAAGpAQCAAAEAIDsBQAC7AYBA58EAwCCBAAAAwMIAwkEAAQAgABXCwEYAAAAAAAAWAAAAAACAAABAgARowAAAP8AAwAAAAAAwAEAADABAEEBAAAAwAECABIAAAAwAQBeAwAAAMABBAAwAQD9BQAAAMABBgAwAQD2BwAAAIIAAgAIBgADBgYBAwcGAgMKBgMDCwQAAQIDAQABGAAAAAIAADUAAAAcAAADAAADAQAAAAAE1NJ3ur1M2AD2Lreq2UDD2aTKYM7mFh27
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:40:47
--- Luau version 6, Types version 3
--- Time taken: 0.008831 seconds
-
 local module_upvr = {
     computeOffsetXY = function(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) -- Line 3, Named "computeOffsetXY"
         if not arg2 then
@@ -34,7 +24,7 @@ local module_upvr = {
             var28 = true
             if const_number >= 0 then
                 var28 = true
-                -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                 if var24 >= 0 then
                     if var25 >= const_number then
                         var28 = false
@@ -44,14 +34,11 @@ local module_upvr = {
                 end
             end
         end
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         return var28, 0, const_number, var21
     end;
 }
 function module_upvr.computeWorldXY(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11) -- Line 56
-    --[[ Upvalues[1]:
-        [1]: module_upvr (readonly)
-    ]]
     local any_computeOffsetXY_result1, any_computeOffsetXY_result2, any_computeOffsetXY_result3, any_computeOffsetXY_result4 = module_upvr.computeOffsetXY(arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11)
     return ((arg1 + any_computeOffsetXY_result2) / arg9 / any_computeOffsetXY_result4 - 0.5) * arg5 + arg7, ((arg2 + any_computeOffsetXY_result3) / arg10 / any_computeOffsetXY_result4 - 0.5) * arg6 + arg8
 end

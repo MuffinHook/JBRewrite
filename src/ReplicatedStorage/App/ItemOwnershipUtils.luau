@@ -1,30 +1,17 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMSBHR5cGUGc3RyaW5nCGdldFN0YXRlC2dhcmFnZU93bmVkCFZlaGljbGVzDmlzVmVoaWNsZU93bmVkG2lzVmVoaWNsZUN1c3RvbWl6YXRpb25Pd25lZAlpbnZlbnRvcnkISG9tZUl0ZW0PaXNIb21lSXRlbU93bmVkBGdhbWURUmVwbGljYXRlZFN0b3JhZ2UKR2V0U2VydmljZQdyZXF1aXJlA0FwcAVzdG9yZQRIb21lCWhvbWVTdG9yZQAEBgEBAAAAHbsoAANSAgAApAEBAAAAAECfAQIC8AEDAAIAAACpAQAAggECAPsBAAC8AQEWAwAAAJ8BAgJNAgEtBAAAAA4CAwBNAwKiBQAAACsDAgCpAwAAggMCAE0FAqIFAAAAhwQFACoEAgABAAAAqQMAAakDAQCCAwIABgMBBAAAAEADAgMDAwQDBQAIBgEYAAAAAAAAAAEAAgAAAAEAAQAAAAEAAgAAAAAAAAAJAAAAAAcCAQAAACO7KAADUgMAAKQCAQAAAABAnwICAvACCAACAACAuygBA1IDAQCkAgEAAAAAQJ8CAgLwAgMAAgAAAKkCAACCAgIA+wIAALwCAhYDAAAAnwICAk0DAi0EAAAAKwMCAKkEAACCBAIAhwQDACsEAgCpBQAAggUCAIcGBAEqBgIAAQAAAKkFAAGpBQEAggUCAAUDAQQAAABAAwIDAwMEABQHARgAAAAAAAAAAAAAAAAAAAEAAgAAAAEAAQEAAgEBAAIAAAAAABUAAAAABgEBAAAAIrsoAANSAgAApAEBAAAAAECfAQIC8AEDAAIAAACpAQAAggECAPsBAAC8AQEWAwAAAJ8BAgIOAQMATQIBgAQAAAArAgIAqQIAAIICAgBNAwGABAAAAE0CA+kFAAAAKwICAKkDAACCAwIAhwUCAJAEBQaMBQAAtwUCAAQAAACpAwABqQMBAIIDAgAHAwEEAAAAQAMCAwMDCAMJAgAAAAAAAAAAACQKARgAAAAAAAAAAQACAAAAAQAAAAEAAgAAAAEBAAIAAAAAAAAAJQAAAAAFAAABAgAkowAAAKQAAQAAAABAbwICALwAABYDAAAAnwADAqQBBQAAAEBATQIAwQYAAABNAgJ+BwAAAJ8BAgKkAgUAAABAQE0DAGoIAAAATQMDggkAAACfAgIC/wMDAAAAAADABAoAEgABADAEA9QLAAAAwAQMABIAAQAwBAO1DQAAAMAEDgASAAIAMAQDiQ8AAACCAwIAEAMLBAAAAEADDAMNAw4EAABAQAMPAxADEQMSBgADBgYBAwcGAgMKAwABAgEAARgAAAAAAAAAAgAAAAAAAAEAAAAAAAACAAIAAAAMAAAAEAAAAA8BAAAAAANvupQjN/v7s/SqObdIq6iMH6KDV11+/iI=
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:40:19
--- Luau version 6, Types version 3
--- Time taken: 0.003642 seconds
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local store_upvr = require(ReplicatedStorage.App.store)
 local module = {
     isVehicleOwned = function(arg1) -- Line 8, Named "isVehicleOwned"
-        --[[ Upvalues[1]:
-            [1]: store_upvr (readonly)
-        ]]
         local var4
         if type(arg1) ~= "string" then
             return false
         end
         local garageOwned = store_upvr:getState().garageOwned
-        local function INLINED() -- Internal function, doesn't exist in bytecode
+        local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
             var4 = garageOwned.Vehicles
             return var4
         end
-        if not garageOwned or not INLINED() then
+        if not garageOwned or not decompInlinedCondition() then
             var4 = false
             return var4
         end
@@ -36,9 +23,6 @@ local module = {
         return var4
     end;
     isVehicleCustomizationOwned = function(arg1, arg2) -- Line 20, Named "isVehicleCustomizationOwned"
-        --[[ Upvalues[1]:
-            [1]: store_upvr (readonly)
-        ]]
         local var6
         if type(arg1) ~= "string" or type(arg2) ~= "string" then
             return false
@@ -62,9 +46,6 @@ local module = {
 }
 local homeStore_upvr = require(ReplicatedStorage.Home.homeStore)
 function module.isHomeItemOwned(arg1) -- Line 36
-    --[[ Upvalues[1]:
-        [1]: homeStore_upvr (readonly)
-    ]]
     local var10
     if type(arg1) ~= "string" then
         return false

@@ -1,13 +1,3 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgOEAQlDaGFyYWN0ZXILUHJpbWFyeVBhcnQOQ29sbGlzaW9uR3JvdXAOUGxheWVyc0luVHJhaW4JVXNlQnVkZ2V0C09iamVjdExvY2FsBlZvbHVtZQtJc1NreWRpdmluZw1TdG9wU2t5ZGl2aW5nCElzRmx5aW5nDVBhcmFjaHV0ZVN0b3AVR2V0TG9jYWxWZWhpY2xlUGFja2V0Bk9uSnVtcAR0YXNrBHdhaXQJb25FeHBsb2RlBWRlbGF5C2ZsaW5nUGxheWVyE19taWxpdGFyeUZvcmNlZmllbGQMVHJhbnNwYXJlbmN5C3RvZ2dsZUZsYXNoCERpc2FibGVkDEdldEF0dHJpYnV0ZRBpc1NlcnZlckRpc2FibGVkCWdldFRlYW1JZAhFbnVtVGVhbQZQb2xpY2UKQ2FuQ29sbGlkZRJ1cGRhdGVQZXJtc1RvRW50ZXIIR2V0T3duZXIHR2V0TmFtZQNLZXkPU291bmRBdHRhY2htZW50DkZpbmRGaXJzdENoaWxkCEluc3RhbmNlA25ldwpBdHRhY2htZW50BE5hbWUGUGFyZW50CFBvc2l0aW9uEmdldFNvdW5kQXR0YWNobWVudAZjYW5jZWwHRGVzdHJveQ1wcm9taXNlRmFkZVRvEHNhZmVBY3RpdmVGYWRlVG8SUm9sbE9mZk1heERpc3RhbmNlElJvbGxPZmZNaW5EaXN0YW5jZQhHaXZlVGFzawZDcmVhdGUEUGxheQRCZWFtEFF1ZXJ5RGVzY2VuZGFudHMHRW5hYmxlZBFkaXNhYmxlRm9yY2VmaWVsZARTaXplAVkHVmVjdG9yMxF1cGRhdGVTZXJ2ZXJTdGF0ZQJvcwVjbG9jawlNYWduaXR1ZGUJX2Rpc3RGYWRlGUJlYW0sIEJhc2VQYXJ0I0ZvcmNlZmllbGQGbGluZWFyGUxvY2FsVHJhbnNwYXJlbmN5TW9kaWZpZXIGSWdub3JlAVgGUmFkaXVzBFBhcnQERW51bQhOb3JtYWxJZAxHZXRFbnVtSXRlbXMFRGVjYWwERmFjZRVyYnhhc3NldGlkOi8vNTAyODIzMTUHVGV4dHVyZQZDb2xvcjMHZnJvbVJHQgV0YWJsZQZpbnNlcnQJRG9Ob3RQbGF5DXBsYXllckhhc0l0ZW0NT25UZWFtQ2hhbmdlZAdDb25uZWN0E0dldENsYXNzQWRkZWRTaWduYWwWR2V0Q2xhc3NSZW1vdmluZ1NpZ25hbAZMb29wZWQab2JzZXJ2ZUxvY2FsQ2hhcmFjdGVyQWRkZWQJVHdlZW5JbmZvC0Vhc2luZ1N0eWxlBkJvdW5jZQ9FYXNpbmdEaXJlY3Rpb24CSW4EQmFjawNPdXQZR2V0QXR0cmlidXRlQ2hhbmdlZFNpZ25hbAVzcGF3bglIZWFydGJlYXQEZ2FtZQdQbGF5ZXJzCkdldFNlcnZpY2URUmVwbGljYXRlZFN0b3JhZ2UKUnVuU2VydmljZQxUd2VlblNlcnZpY2UHcmVxdWlyZQRHYW1lAkM0CEM0U3lzdGVtDUNoYXJhY3RlclV0aWwHRmFsbGluZwhHYW1lVXRpbApJdGVtU3lzdGVtDUJ1bGxldEVtaXR0ZXIJUGFyYWdsaWRlC1BsYXllclV0aWxzCUludmVudG9yeRNJbnZlbnRvcnlJdGVtQmluZGVyE0ludmVudG9yeUl0ZW1TeXN0ZW0IUmVzb3VyY2UIU2V0dGluZ3MDU3RkBUF1ZGlvBkJpbmRlcg5DaGFyYWN0ZXJVdGlscwRGYWRlBE1haWQLUmF0ZUxpbWl0ZXIHVmVoaWNsZQxWZWhpY2xlVXRpbHMLTG9jYWxQbGF5ZXISTWlsaXRhcnlGb3JjZWZpZWxkBVN0YXJ0ABMCAAEAAAAE+wAAAKkBAACfAAIBggABAAAAQQABGAAAAAFCAAAAAAkCCAAAAFD7AgAATQICaQAAAABNAgKbAQAAACsCAQCCAAEATQMCFAIAAADwAwIAAwAAgIIAAQD7AwEAjAUBALwDAwcEAAAAnwMDAisDAQCCAAEA+wMCAE0DA9EFAAAAUgQCAG8FBgDiBggAbwcJADAHBksHAAAAnwMEAfsDAwBNAwNSCgAAAJ8DAQIOAwQA+wMDAE0DA3ALAAAAnwMBAfsDBABNAwOSDAAAAJ8DAQIOAwQA+wMEAE0DA7YNAAAAnwMBAfsDBQBNAwOHDgAAAJ8DAQJHAwkAAAAAAPsDBgBNAwOjDwAAAJ8DAQGkAxIAAEQAgW8EEwCfAwIB+wMHAE0DA7YUAAAAUgQAAG8FFQCMBmIAjAdiAKkIAACfAwYBUgMBAKkEAQCfAwIBpAMXAABYAIFvBBgA2QUAABIAAQCfAwMBggABABkDAQMCAwMDBAMFAwYC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AAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAABEAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsBAAAAAAAAAAAAAAEAAAAAEqGn0ld1K/sFk7dAMYUF1qHRv8Ujk2O4Vg==
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:29:44
--- Luau version 6, Types version 3
--- Time taken: 0.041599 seconds
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio_upvr = require(ReplicatedStorage.Std.Audio)
 local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
@@ -18,16 +8,6 @@ local VehicleUtils_upvr = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local CharacterUtil_upvr = require(ReplicatedStorage.Game.CharacterUtil)
 local C4System_upvr = require(ReplicatedStorage.Game.C4.C4System)
 local function flingPlayer_upvr(arg1, arg2) -- Line 41, Named "flingPlayer"
-    --[[ Upvalues[8]:
-        [1]: LocalPlayer_upvr (readonly)
-        [2]: any_new_result1_upvr_2 (readonly)
-        [3]: Audio_upvr (readonly)
-        [4]: Falling_upvr (readonly)
-        [5]: Paraglide_upvr (readonly)
-        [6]: VehicleUtils_upvr (readonly)
-        [7]: CharacterUtil_upvr (readonly)
-        [8]: C4System_upvr (readonly)
-    ]]
     local PrimaryPart = LocalPlayer_upvr.Character.PrimaryPart
     if not PrimaryPart then
     else
@@ -49,9 +29,6 @@ local function flingPlayer_upvr(arg1, arg2) -- Line 41, Named "flingPlayer"
         C4System_upvr.onExplode(arg1, 100000, 98, 98, false)
         arg2(true)
         task.delay(0.2, function() -- Line 65
-            --[[ Upvalues[1]:
-                [1]: arg2 (readonly)
-            ]]
             arg2(false)
         end)
     end
@@ -68,23 +45,7 @@ local TweenService_upvr = game:GetService("TweenService")
 local RunService_upvr = game:GetService("RunService")
 local Fade_upvr = require(ReplicatedStorage.Std.Fade)
 require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -- Line 70
-    --[[ Upvalues[14]:
-        [1]: Maid_upvr (readonly)
-        [2]: BulletEmitter_upvr (readonly)
-        [3]: Audio_upvr (readonly)
-        [4]: InventoryItemSystem_upvr (readonly)
-        [5]: LocalPlayer_upvr (readonly)
-        [6]: PlayerUtils_upvr (readonly)
-        [7]: Settings_upvr (readonly)
-        [8]: GameUtil_upvr (readonly)
-        [9]: InventoryItemBinder_upvr (readonly)
-        [10]: CharacterUtils_upvr (readonly)
-        [11]: TweenService_upvr (readonly)
-        [12]: RunService_upvr (readonly)
-        [13]: Fade_upvr (readonly)
-        [14]: flingPlayer_upvr (readonly)
-    ]]
-    -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
     local any_new_result1_upvr = Maid_upvr.new()
     local var42_upvr = arg1.Position - Vector3.new(0, 1, 0) * arg1.Position.Y
     local var43_upvr = arg1.Size.X / 2
@@ -95,19 +56,12 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
     tbl_4_upvr.Part = arg1
     BulletEmitter_upvr._militaryForcefield = tbl_4_upvr
     any_new_result1_upvr:GiveTask(function() -- Line 89
-        --[[ Upvalues[2]:
-            [1]: BulletEmitter_upvr (copied, readonly)
-            [2]: tbl_4_upvr (readonly)
-        ]]
         if BulletEmitter_upvr._militaryForcefield == tbl_4_upvr then
             BulletEmitter_upvr._militaryForcefield = nil
         end
     end)
     local tbl_2_upvr = {}
     local function toggleFlash_upvr(arg1_2) -- Line 96, Named "toggleFlash"
-        --[[ Upvalues[1]:
-            [1]: tbl_2_upvr (readonly)
-        ]]
         local var51
         for _, v in tbl_2_upvr do
             if arg1_2 then
@@ -133,9 +87,6 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
         DoNotPlay = true;
     }))
     local function _() -- Line 114, Named "isServerDisabled"
-        --[[ Upvalues[1]:
-            [1]: arg1 (readonly)
-        ]]
         local var58
         if arg1:GetAttribute("Disabled") ~= true then
             var58 = false
@@ -168,17 +119,7 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
         end
     end
     any_new_result1_upvr:GiveTask(GameUtil_upvr.OnTeamChanged:Connect(function() -- Line 123, Named "updatePermsToEnter"
-        --[[ Upvalues[8]:
-            [1]: var61_upvw (read and write)
-            [2]: var62_upvw (read and write)
-            [3]: PlayerUtils_upvr (copied, readonly)
-            [4]: LocalPlayer_upvr (copied, readonly)
-            [5]: Settings_upvr (copied, readonly)
-            [6]: arg1 (readonly)
-            [7]: var60_upvw (read and write)
-            [8]: var115_upvw (read and write)
-        ]]
-        -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
         local var65 = var62_upvw
         if not var65 then
             if PlayerUtils_upvr.getTeamId(LocalPlayer_upvr) ~= Settings_upvr.EnumTeam.Police then
@@ -210,16 +151,6 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
         end
     end))
     any_new_result1_upvr:GiveTask(InventoryItemBinder_upvr:GetClassAddedSignal():Connect(function(arg1_3) -- Line 133
-        --[[ Upvalues[8]:
-            [1]: LocalPlayer_upvr (copied, readonly)
-            [2]: var62_upvw (read and write)
-            [3]: var67_upvw (read and write)
-            [4]: PlayerUtils_upvr (copied, readonly)
-            [5]: Settings_upvr (copied, readonly)
-            [6]: arg1 (readonly)
-            [7]: var60_upvw (read and write)
-            [8]: var115_upvw (read and write)
-        ]]
         if arg1_3:GetOwner() == LocalPlayer_upvr then
             local var72
             if arg1_3:GetName() == "Key" then
@@ -262,16 +193,6 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
         end
     end))
     any_new_result1_upvr:GiveTask(InventoryItemBinder_upvr:GetClassRemovingSignal():Connect(function(arg1_4) -- Line 139
-        --[[ Upvalues[8]:
-            [1]: LocalPlayer_upvr (copied, readonly)
-            [2]: var62_upvw (read and write)
-            [3]: var67_upvw (read and write)
-            [4]: PlayerUtils_upvr (copied, readonly)
-            [5]: Settings_upvr (copied, readonly)
-            [6]: arg1 (readonly)
-            [7]: var60_upvw (read and write)
-            [8]: var115_upvw (read and write)
-        ]]
         if arg1_4:GetOwner() == LocalPlayer_upvr then
             local var76
             if arg1_4:GetName() == "Key" then
@@ -314,10 +235,6 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
         end
     end))
     local function _() -- Line 147, Named "getSoundAttachment"
-        --[[ Upvalues[2]:
-            [1]: arg1 (readonly)
-            [2]: var43_upvr (readonly)
-        ]]
         if not arg1:FindFirstChild("SoundAttachment") then
             local Attachment_3 = Instance.new("Attachment")
             Attachment_3.Name = "SoundAttachment"
@@ -341,21 +258,12 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
         Looped = true;
     })
     any_new_result1_upvr:GiveTask(function() -- Line 166
-        --[[ Upvalues[2]:
-            [1]: var80_upvw (read and write)
-            [2]: any_ObjectLocal_result1_upvr (readonly)
-        ]]
         if var80_upvw then
             var80_upvw:cancel()
         end
         any_ObjectLocal_result1_upvr:Destroy()
     end)
     local function _(arg1_5, arg2) -- Line 173, Named "safeActiveFadeTo"
-        --[[ Upvalues[3]:
-            [1]: var80_upvw (read and write)
-            [2]: Audio_upvr (copied, readonly)
-            [3]: any_ObjectLocal_result1_upvr (readonly)
-        ]]
         if var80_upvw then
             var80_upvw:cancel()
         end
@@ -363,11 +271,6 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
     end
     local var86_upvw = false
     any_new_result1_upvr:GiveTask(CharacterUtils_upvr.observeLocalCharacterAdded(function(arg1_6, arg2) -- Line 181
-        --[[ Upvalues[3]:
-            [1]: var80_upvw (read and write)
-            [2]: any_ObjectLocal_result1_upvr (readonly)
-            [3]: var86_upvw (read and write)
-        ]]
         if var80_upvw then
             var80_upvw:cancel()
         end
@@ -376,23 +279,6 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
     end))
     local TweenInfo_new_result1_upvr_2 = TweenInfo.new(0.8, Enum.EasingStyle.Bounce, Enum.EasingDirection.In)
     local function disableForcefield_upvr() -- Line 192, Named "disableForcefield"
-        --[[ Upvalues[15]:
-            [1]: var60_upvw (read and write)
-            [2]: var67_upvw (read and write)
-            [3]: var62_upvw (read and write)
-            [4]: PlayerUtils_upvr (copied, readonly)
-            [5]: LocalPlayer_upvr (copied, readonly)
-            [6]: Settings_upvr (copied, readonly)
-            [7]: arg1 (readonly)
-            [8]: var115_upvw (read and write)
-            [9]: any_new_result1_upvr (readonly)
-            [10]: Audio_upvr (copied, readonly)
-            [11]: var43_upvr (readonly)
-            [12]: TweenService_upvr (copied, readonly)
-            [13]: TweenInfo_new_result1_upvr_2 (readonly)
-            [14]: var80_upvw (read and write)
-            [15]: any_ObjectLocal_result1_upvr (readonly)
-        ]]
         local var106
         if not var60_upvw then
         else
@@ -457,27 +343,6 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
         end
     end
     function var115_upvw() -- Line 211
-        --[[ Upvalues[19]:
-            [1]: var60_upvw (read and write)
-            [2]: var67_upvw (read and write)
-            [3]: var62_upvw (read and write)
-            [4]: PlayerUtils_upvr (copied, readonly)
-            [5]: LocalPlayer_upvr (copied, readonly)
-            [6]: Settings_upvr (copied, readonly)
-            [7]: arg1 (readonly)
-            [8]: var116_upvw (read and write)
-            [9]: any_new_result1_upvr (readonly)
-            [10]: Audio_upvr (copied, readonly)
-            [11]: var43_upvr (readonly)
-            [12]: TweenService_upvr (copied, readonly)
-            [13]: TweenInfo_new_result1_upvr_3 (readonly)
-            [14]: Size_upvr (readonly)
-            [15]: TweenInfo_new_result1_upvr (readonly)
-            [16]: Position_upvr (readonly)
-            [17]: var81_upvw (read and write)
-            [18]: var80_upvw (read and write)
-            [19]: any_ObjectLocal_result1_upvr (readonly)
-        ]]
         local var121
         if var60_upvw then
         else
@@ -532,9 +397,6 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
             }):Play()
             var121 = 0.5
             task.delay(var121, function() -- Line 225
-                --[[ Upvalues[1]:
-                    [1]: arg1 (copied, readonly)
-                ]]
                 for _, v_5 in arg1.Parent:QueryDescendants("Beam") do
                     v_5.Enabled = true
                 end
@@ -570,12 +432,6 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
     local Position_upvr = arg1.Position
     local var116_upvw = var115_upvw
     local function updateServerState() -- Line 249
-        --[[ Upvalues[4]:
-            [1]: arg1 (readonly)
-            [2]: var60_upvw (read and write)
-            [3]: disableForcefield_upvr (readonly)
-            [4]: var116_upvw (read and write)
-        ]]
         local var135
         if arg1:GetAttribute("Disabled") ~= true then
             var135 = false
@@ -617,32 +473,6 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
     local var143_upvr = var43_upvr + 50
     local var144_upvw = 0
     any_new_result1_upvr:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 268
-        --[[ Upvalues[24]:
-            [1]: var140_upvw (read and write)
-            [2]: LocalPlayer_upvr (copied, readonly)
-            [3]: var42_upvr (readonly)
-            [4]: var43_upvr (readonly)
-            [5]: var141_upvw (read and write)
-            [6]: any_new_result1_upvr (readonly)
-            [7]: Maid_upvr (copied, readonly)
-            [8]: arg1 (readonly)
-            [9]: Fade_upvr (copied, readonly)
-            [10]: var142_upvr (readonly)
-            [11]: var143_upvr (readonly)
-            [12]: var67_upvw (read and write)
-            [13]: var144_upvw (read and write)
-            [14]: var60_upvw (read and write)
-            [15]: disableForcefield_upvr (readonly)
-            [16]: var116_upvw (read and write)
-            [17]: flingPlayer_upvr (copied, readonly)
-            [18]: toggleFlash_upvr (readonly)
-            [19]: tbl_4_upvr (readonly)
-            [20]: var81_upvw (read and write)
-            [21]: var86_upvw (read and write)
-            [22]: var80_upvw (read and write)
-            [23]: Audio_upvr (copied, readonly)
-            [24]: any_ObjectLocal_result1_upvr (readonly)
-        ]]
         local os_clock_result1_2 = os.clock()
         local var179
         if os_clock_result1_2 < var140_upvw then
@@ -674,7 +504,7 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
                     any_new_result1_upvr._distFade:GiveTask(Fade_upvr.linear(v_6, "LocalTransparencyModifier", 0, 3))
                 end
             else
-                -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                 if not true and var141_upvw then
                     var141_upvw = false
                     any_new_result1_upvr._distFade = Maid_upvr.new()
@@ -759,18 +589,18 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
             i_7 = tbl_4_upvr
             i_7.Ignore = var192
             i_7 = var81_upvw
-            local function INLINED_3() -- Internal function, doesn't exist in bytecode
+            local function decompInlinedCondition_3() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
                 i_7 = var86_upvw
                 return i_7
             end
-            local function INLINED_4() -- Internal function, doesn't exist in bytecode
+            local function decompInlinedCondition_4() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
                 i_7 = var60_upvw
                 var81_upvw = var192
                 var86_upvw = i_7
                 i_7 = false
                 return i_7
             end
-            if var192 ~= i_7 or INLINED_3() or INLINED_4() then
+            if var192 ~= i_7 or decompInlinedCondition_3() or decompInlinedCondition_4() then
                 if var192 then
                     i_7 = var80_upvw
                     if i_7 then

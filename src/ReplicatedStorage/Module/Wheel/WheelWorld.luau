@@ -1,17 +1,4 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMXBG5leHQLR2V0Q2hpbGRyZW4IQmFzZVBhcnQDSXNBB0dldE1hc3MMc2V0bWV0YXRhYmxlBU1vZGVsBldoZWVscwNuZXcIU2V0TW9kZWwGYXNzZXJ0BXRhYmxlBmluc2VydAlDYWxjdWxhdGUIQWRkV2hlZWwGaXBhaXJzDF9hcHBseUZvcmNlcxBHZXRFZmZXaGVlbENvdW50DUVmZmVjdGl2ZU1hc3MLSWdub3JlTW9kZWwETWFzcwdEZXN0cm95B19faW5kZXgACAoBAQAAABeMAQAApAIBAAAAAEC8AwBoAgAAAJ8DAgMXAg0AbwkDALwHBv4EAAAAnwcDAg4HBAC8BwbHBQAAAJ8HAgJDAQEH+wcAAFIIBgCfBwICQwEBB24C8v8CAAAAggECAAYDAQQAAABAAwIDAwMEAwUABwUBGAABAAAAAAABAAAAAAEAAAACAAAA/AAGCAAAAAADAAEAAAAQ/wECAAAAAAD7AgAAnj0BAwIAAACkAAEAAAAAQJ8AAwLGAQAAMAEAOwIAAAD/AQAAAAAAADABAEQDAAAAggACAAQDBgQAAABAAwcDCAAUCQEYAAAAAAAAAAABAAABAAAAARUAAAAAAgIAAAAAAzABADsAAAAAggABAAEDBwAaCgEYAAABGwAAAAAFAgAAAAARuwEBA1IDAQCkAgEAAAAAQJ8CAgFNAwBEAgAAAJ40AwQBAAAAUgQBAKQCBQAAEDCAnwIDAbwCAC0GAAAAnwICAYIAAQAHAwsEAAAAQAMIAwwDDQQAEDCAAw4AHQ8BGAAAAAAAAQAAAAAAAAABAAABHgAAAAAIAQAAAAAOjAEAAKQCAQAAAABATQMARAIAAACfAgIEUQIEAE0HBmoDAAAADgcBAJUBAQRuAvv/AgAAgIIBAgAFAxAEAAAAQAMIAxECAAAAAAAA8D8AIhIBGAABAAAAAAABAAAB/gAFIwAAAAAJAQEAAAAljAEAAE0CADsAAAAARwIGAAAAAAD7AgAATQMAOwAAAACfAgICUgECALwCAHkBAAAAnwICAtgEAgIJAwEEjAYBAE0HAEQDAAAAHAQHAIwFAQCoBA0ATQgARAMAAACHBwgGMAMH5AQAAABNCABEAwAAAIcHCAZNCAA7AAAAADAIBxoFAAAAiwTz/zABAAkGAAAAggABAAcDBwMSAgAAAAAAAPA/AwgDEwMUAxUAKw4BGAABAAAAAQAAAAADAAABAAEAAAAAAAEAAAAAAgAAAAAAAP0FAAEsAAAAAAYBAAAAABKMAwEATQQARAAAAAAcAQQAjAIBAKgBBwBNBQBEAAAAAIcEBQO8BARQAQAAAJ8EAgGLAfn//wEAAAAAAAAwAQBEAAAAAIIAAQACAwgDFgA6FgEYAAAAAAAAAQAAAAAA/wMAAAABOwAAAAADAAABAgAcowAAAMAAAAASAAAA/wEEAAAAAAAwAQFuAQAAAMACAgASAAEAMAIB7wMAAADAAgQAMAIBNgUAAADAAgYAMAIBwgcAAADAAggAMAIBeQkAAADAAgoAEgAAADACAS0LAAAAwAIMADACAVANAAAAggECAA4GAAMXBgEDCQYCAwoGAwMPBgQDEgYFAw4GBgMWBwABAgMEBQYBAAEYAAYACwABAAEAAAAGAAADAAAFAAAJAAAADwAABwEAAAAAB/Wfr6FllSH19zdbDByfa6eFh7jVx1vFoA==
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:39:53
--- Luau version 6, Types version 3
--- Time taken: 0.003515 seconds
-
 local function GetMass_upvr(arg1) -- Line 7, Named "GetMass"
-    --[[ Upvalues[1]:
-        [1]: GetMass_upvr (readonly)
-    ]]
     local var7
     for _, v in next, arg1:GetChildren() do
         if v:IsA("BasePart") then
@@ -24,9 +11,6 @@ end
 local module_upvr = {}
 module_upvr.__index = module_upvr
 function module_upvr.new() -- Line 20
-    --[[ Upvalues[1]:
-        [1]: module_upvr (readonly)
-    ]]
     local setmetatable_result1 = setmetatable({}, module_upvr)
     setmetatable_result1.Model = nil
     setmetatable_result1.Wheels = {}
@@ -50,10 +34,7 @@ function module_upvr.GetEffWheelCount(arg1) -- Line 34
     return var17
 end
 function module_upvr.Calculate(arg1) -- Line 43
-    --[[ Upvalues[1]:
-        [1]: GetMass_upvr (readonly)
-    ]]
-    -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
     local var22 = 0
     if arg1.Model ~= nil then
         var22 = GetMass_upvr(arg1.Model)

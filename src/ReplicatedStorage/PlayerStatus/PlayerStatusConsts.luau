@@ -1,13 +1,3 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMNBGdhbWURUmVwbGljYXRlZFN0b3JhZ2UKR2V0U2VydmljZQdyZXF1aXJlA1N0ZApUYWJsZVV0aWxzFlBBSURfVU5CQU5fU1RBVFVTX05BTUUSQkFOTkVEX1NUQVRVU19OQU1FF0hBU19ET05FX0JBTl9DT1VOVF9OQU1FDFBhaWRVbmJhbm5lZAZCYW5uZWQIQmFuQ291bnQacmVxdWlyZVZhbGlkSW5kZXhBbmRGcmVlemUAAQUAAAECAB2jAAAApAABAAAAAEBvAgIAvAAAFgMAAACfAAMCpAEFAAAAQEBNAgChBgAAAE0CAhgHAAAAnwECAuICCwBvAwwAMAMCKAgAAABvAw0AMAMCxwkAAABvAw4AMAMCZwoAAABNAwEADwAAAFIEAgCfAwIAggMAABADAQQAAABAAwIDAwMEBAAAQEADBQMGAwcDCAMJBQMICQoDCgMLAwwDDQABAAEYAAAAAAAAAAEAAAAAAAACAgAAAQAAAQAAAgAAAAABAAAAAAC2TM6v7hAANjP0qTIFRL8vxlTZ24SIpK4=
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:45:13
--- Luau version 6, Types version 3
--- Time taken: 0.000475 seconds
-
 return require(game:GetService("ReplicatedStorage").Std.TableUtils).requireValidIndexAndFreeze({
     PAID_UNBAN_STATUS_NAME = "PaidUnbanned";
     BANNED_STATUS_NAME = "Banned";

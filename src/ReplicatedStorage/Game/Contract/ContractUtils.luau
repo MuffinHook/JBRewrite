@@ -1,20 +1,7 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:35:21
--- Luau version 6, Types version 3
--- Time taken: 0.006053 seconds
-
 local ContractConsts_upvr = require(script.Parent.ContractConsts)
 local CollectionService_upvr = game:GetService("CollectionService")
 local module_2_upvr = {}
 local function _(arg1) -- Line 5, Named "validateObj"
-    --[[ Upvalues[1]:
-        [1]: CollectionService_upvr (readonly)
-    ]]
     local var4
     if typeof(arg1) ~= "Instance" then
         var4 = false
@@ -26,11 +13,7 @@ local function _(arg1) -- Line 5, Named "validateObj"
     assert(var4)
 end
 function module_2_upvr.canReroll(arg1, arg2) -- Line 9
-    --[[ Upvalues[2]:
-        [1]: CollectionService_upvr (readonly)
-        [2]: module_2_upvr (readonly)
-    ]]
-    -- KONSTANTERROR: [0] 1. Error Block 24 start (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     local var5
     if typeof(arg1) ~= "Instance" then
         var5 = false
@@ -42,22 +25,18 @@ function module_2_upvr.canReroll(arg1, arg2) -- Line 9
     assert(var5)
     if typeof(arg2) ~= "boolean" then
         var5 = false
-        -- KONSTANTWARNING: GOTO [34] #27
+        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
     end
-    -- KONSTANTERROR: [0] 1. Error Block 24 end (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [33] 26. Error Block 27 start (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     var5 = true
     assert(var5, "Incorrect hasVIP passed")
     if arg2 then
-        -- KONSTANTWARNING: GOTO [44] #35
+        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
     end
-    -- KONSTANTERROR: [33] 26. Error Block 27 end (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
 end
 function module_2_upvr.getNumTimesRerolled(arg1) -- Line 15
-    --[[ Upvalues[2]:
-        [1]: CollectionService_upvr (readonly)
-        [2]: ContractConsts_upvr (readonly)
-    ]]
     local var6
     if typeof(arg1) ~= "Instance" then
         var6 = false
@@ -76,10 +55,6 @@ function module_2_upvr.getNumTimesRerolled(arg1) -- Line 15
     return var6
 end
 function module_2_upvr.getNumTimesRerolledObject(arg1) -- Line 23
-    --[[ Upvalues[2]:
-        [1]: CollectionService_upvr (readonly)
-        [2]: ContractConsts_upvr (readonly)
-    ]]
     local var8
     if typeof(arg1) ~= "Instance" then
         var8 = false
@@ -97,10 +72,6 @@ function module_2_upvr.getNumTimesRerolledObject(arg1) -- Line 23
     return SOME_2
 end
 function module_2_upvr.setNumTimesRerolled(arg1, arg2) -- Line 31
-    --[[ Upvalues[2]:
-        [1]: CollectionService_upvr (readonly)
-        [2]: ContractConsts_upvr (readonly)
-    ]]
     local var10
     if typeof(arg1) ~= "Instance" then
         var10 = false
@@ -136,10 +107,6 @@ function module_2_upvr.getQuantizedBlock(arg1, arg2) -- Line 43
     return var12
 end
 function module_2_upvr.getNextDeadline() -- Line 53
-    --[[ Upvalues[2]:
-        [1]: module_2_upvr (readonly)
-        [2]: ContractConsts_upvr (readonly)
-    ]]
     local module = {
         year = 2023;
         month = 7;

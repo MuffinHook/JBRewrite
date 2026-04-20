@@ -1,21 +1,7 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMRBHRpY2sIT25VcGRhdGUFRXZlbnQKRGlzY29ubmVjdApPbkNvbXBsZXRlDHNldG1ldGF0YWJsZQhEdXJhdGlvbgZhc3NlcnQIT25DYW5jZWwJSGVhcnRiZWF0B0Nvbm5lY3QDbmV3B0Rlc3Ryb3kEZ2FtZQpSdW5TZXJ2aWNlCkdldFNlcnZpY2UHX19pbmRleAAECQEDAAAAMKQBAQAAAABAnwEBAvsDAAAmAgED+wQBANQEAgACAAAAqQMAAakDAQAOAwEA+wIBAPsEAgBNBATOAgAAAA4EDAD7BQEA7AQCBfEEAgAEAAAAjAQBAPsFAgBNBQXOAgAAAFIGAABSBwIAUggEAJ8FBAEOAxIA+wQCAE0EBDYDAAAAvAQEGgQAAACfBAIB+wQCAMYFAAAwBQQ2AwAAAPsEAgBNBASzBQAAAA4EBAD7BAIATQQEswUAAACfBAEBggABAAYDAQQAAABAAwIDAwMEAwUAEAABGAAAAAEAAQAAAAABAQIAAAABAAEAAQIAAAAAAAACAQAAAAAAAQAAAAEAAAABAAAAAxEAAAAABwECAAAALP8CAwAAAAAA+wMAAJ49AgMDAAAApAEBAAAAAECfAQMCTQMA5QIAAAC7AQMCpAIEAAAAMECfAgIBTQIA5QIAAABNAwDOBQAAADADAc4FAAAATQMAswYAAAAwAwGzBgAAAE0DAMwHAAAAMAMBzAcAAACkAwkAAACAQJ8DAQL7BAEATQQE/QoAAADZBgAAEgADABIAAgASAAEAvAQExwsAAACfBAMCMAQBNgwAAACCAQIADQMGBAAAAEADBwMIBAAAMEADAgMFAwkDAQQAAIBAAwoDCwMDAQAFDAEYAAAAAAAAAAABAAAAAAABAAMAAAABAAAAAQAAAAIAAAEAAAAAAAAAAAAAABYGAAAAAAMBAAAAABVNAQA2AAAAACsBAgCpAQAAggECAE0BADYAAAAAvAEBGgEAAACfAQIBxgEAADABADYAAAAATQEAzAIAAAAOAQMATQEAzAIAAACfAQEBqQEBAIIBAgADAwMDBAMJACgNARgAAAABAAMAAAAAAQAAAQAAAQAAAgAqAAAAAAMAAAECABSjAAAApAABAAAAAEBvAgIAvAAAFgMAAACfAAMC/wEDAAAAAAAwAQFuBAAAAMACBQASAAEAEgAAADACAe8GAAAAwAIHADACAVAIAAAAggECAAkDDgQAAABAAw8DEAMRBgEDDAYCAw0CAQIBAAEYAAAAAAAAAAIAAQABAAAAACMAAA4BAAAAAAN8/4A6ui6+jK/g0ZPE99ufDOeXTk476js=
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:39:22
--- Luau version 6, Types version 3
--- Time taken: 0.003869 seconds
-
 local module_upvr = {}
 module_upvr.__index = module_upvr
 local RunService_upvr = game:GetService("RunService")
 function module_upvr.new(arg1) -- Line 5
-    --[[ Upvalues[2]:
-        [1]: module_upvr (readonly)
-        [2]: RunService_upvr (readonly)
-    ]]
     local setmetatable_result1_upvr = setmetatable({}, module_upvr)
     assert(arg1.Duration)
     setmetatable_result1_upvr.OnUpdate = arg1.OnUpdate
@@ -24,11 +10,6 @@ function module_upvr.new(arg1) -- Line 5
     local tick_result1_upvr = tick()
     local Duration_upvr = arg1.Duration
     setmetatable_result1_upvr.Event = RunService_upvr.Heartbeat:Connect(function(arg1_2) -- Line 16
-        --[[ Upvalues[3]:
-            [1]: tick_result1_upvr (readonly)
-            [2]: Duration_upvr (readonly)
-            [3]: setmetatable_result1_upvr (readonly)
-        ]]
         local var10 = tick_result1_upvr
         local var11
         if Duration_upvr > var11 then

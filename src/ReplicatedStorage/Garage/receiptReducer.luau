@@ -1,16 +1,6 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:42:25
--- Luau version 6, Types version 3
--- Time taken: 0.003273 seconds
-
 return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
     addReceiptItem = function(arg1, arg2) -- Line 5, Named "addReceiptItem"
-        -- KONSTANTERROR: [0] 1. Error Block 42 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         local var2
         if arg2.name == nil then
             var2 = false
@@ -20,17 +10,17 @@ return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
         assert(var2, "missing receipt item Name")
         if arg2.title == nil then
             var2 = false
-            -- KONSTANTWARNING: GOTO [18] #13
+            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
         end
-        -- KONSTANTERROR: [0] 1. Error Block 42 end (CF ANALYSIS FAILED)
-        -- KONSTANTERROR: [17] 12. Error Block 45 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         var2 = true
         assert(var2, "missing receipt item Title")
         if arg2.category == nil then
             var2 = false
-            -- KONSTANTWARNING: GOTO [30] #21
+            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
         end
-        -- KONSTANTERROR: [17] 12. Error Block 45 end (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     end;
     removeReceiptItem = function(arg1, arg2) -- Line 26, Named "removeReceiptItem"
         local var5
@@ -53,7 +43,7 @@ return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
                 table.insert({}, var6)
             end
         end
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         return {}
     end;
     removeReceiptCategory = function(arg1, arg2) -- Line 38, Named "removeReceiptCategory"
@@ -71,7 +61,7 @@ return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
                 table.insert({}, var10)
             end
         end
-        -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         return {}
     end;
     clearReceipt = function() -- Line 49, Named "clearReceipt"

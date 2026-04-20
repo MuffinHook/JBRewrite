@@ -1,23 +1,13 @@
 local SaleConsts_upvr = require(script.Parent.SaleConsts)
 local module_upvr = {
     getNumSalesPassed = function() -- Line 3, Named "getNumSalesPassed"
-        --[[ Upvalues[1]:
-            [1]: SaleConsts_upvr (readonly)
-        ]]
         return math.floor((workspace:GetServerTimeNow() - SaleConsts_upvr.FIRST_SALE_START_TIMESTAMP) / SaleConsts_upvr.SALE_DURATION_SECONDS)
     end;
 }
 function module_upvr.getNextSaleTime() -- Line 7
-    --[[ Upvalues[2]:
-        [1]: module_upvr (readonly)
-        [2]: SaleConsts_upvr (readonly)
-    ]]
     return SaleConsts_upvr.FIRST_SALE_START_TIMESTAMP + (module_upvr.getNumSalesPassed() + 1) * SaleConsts_upvr.SALE_DURATION_SECONDS
 end
 function module_upvr.getTimeToNextSale() -- Line 13
-    --[[ Upvalues[1]:
-        [1]: module_upvr (readonly)
-    ]]
     return module_upvr.getNextSaleTime() - workspace:GetServerTimeNow()
 end
 function module_upvr.formatRemaining(arg1) -- Line 18

@@ -1,17 +1,7 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMTBl9mcm9udA5GaW5kRmlyc3RDaGlsZAVWYWx1ZQVfYmFjawV0YWJsZQZpbnNlcnQGaXBhaXJzBFNpemUBWgZDRnJhbWUKTG9va1ZlY3RvcgtsaXN0U2VnbWVudAtsZW5ndGhDYWNoZQt0b3RhbExlbmd0aA5kaXJlY3Rpb25DYWNoZQtjb21wdXRlUmFpbBBjYWxjdWxhdGVTZWdtZW50CFBvc2l0aW9uEWNhbGN1bGF0ZVBvc2l0aW9uAAQSAgAAAACAAf8CAgAAAAAAqQMBAGoDAgCpAwEAagMCAf8DAAACAAAAUgQAAFIFAQDFAwQDAQAAAG8GAAC8BAEDAQAAAJ8EAwJNBATsAgAAAG8HAwC8BQEDAQAAAJ8FAwJNBQXsAgAAAPEAAgAEAAAAqQYAAakGAQAOBgIAUgcFACsHAQBSBwQAhwgCBysIDACpCAEAaggCB540AwUHAAAAUgkDAFIKBwCkCAYAABRAgJ8IAwFSAAEAUgEHAEgA3v//BAAAAAAAAIwFAACkBggAAABwQFIHAwCfBgIEUQYMAE0LCi8JAAAATQsLewoAAABDBQULnjQEBQsAAABSDQQAUg4LAKQMBgAAFECAnwwDAW4G8/8CAACA/wYAAAAAAACMCQEAHAcDAIwIAQCoBywAhwoDCXgPCQuVDg8LHA8DAM8NDg+VDA0LhwsDDG8OAAC8DAoDAQAAAJ8MAwJNDAzsAgAAAG8PAwC8DQoDAQAAAJ8NAwJNDQ3sAgAAAMYOAACaCwYADAAAAE0PCoUMAAAATQ4PaA0AAABlAAkAmgsHAA0AAABNDwqFDAAAAE0PD2gNAAAAOQ4PAGUAAQBvDg4AnjQGBQ4AAABSEAYAUhEOAKQPBgAAFECAnw8DAYsH1P/iBxMAMAMHvQ8AAAAwBAdtEAAAADAFB+YRAAAAMAYH0hIAAACCBwIAFAMBAwIDAwMEAwUDBgQAFECAAwcEAABwQAMIAwkCAAAAAAAA8D8DCgMLBwAAAAAAAIA/AAAAAAAAAAADDAMNAw4DDwUEDxAREgAFEAEYAAABAAEAAgAAAAAAAgAAAAAAAQAAAAAAAQAAAAEAAAABAAMAAQAAAAAAAAEB9RoAAQEAAAAAAQAAAAEBAAAAAAAA/QAFAAEAAAABAQAAAAAAAgAAAAAAAQAAAAAAAgEAAQAAAAABAAEAAAAAAAQCAAAAAAAA7xYBAAEAAQABAAAHAAAAAAgCAAAAABZNAgDmAAAAAM8BAQKMBAEATQUAvQEAAAAcAgUAjAMBAKgCDABNBwBtAgAAAIcGBwQmBQEGjAYAAGAFBAAGAAAAUgYEAFIHAQCCBgMAUgEFAIsC9P+CAAEAAwMOAwwDDQBLEQEYAAAAAQAAAAAAAQAAAAEAAAEAAAL7B0wAAAAADAMAAAAAEk0EAL0AAAAAhwMEAU0FAzsBAAAATQgA0gIAAACHBwgBTQsDLwQAAABNCwt7BQAAADkKCwBbCQoDQwgJAgkGBwhDBAUGggQCAAYDDAMSAw8CAAAAAAAA4D8DCAMJAFUTARgAAAABAAAAAAAAAAAAAAAAAABWAAAAAAIAAAECAA2jAAAA/wADAAAAAADAAQAAMAEA1wEAAADAAQIAMAEACgMAAADAAQQAMAEApAUAAACCAAIABgYAAxAGAQMRBgIDEwMAAQIBAAEYAAMAAQAARgAACgAABQEAAAAAAwSdBJ/JGfBQxu3P3FOj01N0hRPrNllung==
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:35:13
--- Luau version 6, Types version 3
--- Time taken: 0.004190 seconds
-
 return {
     computeRail = function(arg1, arg2) -- Line 5, Named "computeRail"
-        -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
-        -- KONSTANTERROR: [0] 1. Error Block 39 start (CF ANALYSIS FAILED)
+        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         local tbl = {
             [arg1] = true;
             [arg2] = true;
@@ -42,20 +32,20 @@ return {
             local _
         end
         local _ = 1
-        -- KONSTANTERROR: [0] 1. Error Block 39 end (CF ANALYSIS FAILED)
-        -- KONSTANTERROR: [101] 77. Error Block 36 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         if Z == var12 then
-            -- KONSTANTERROR: Expression was reused, decompilation is incorrect
+            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
         else
         end
         table.insert({}, Vector3.new(0, 1, 0))
-        -- KONSTANTERROR: [101] 77. Error Block 36 end (CF ANALYSIS FAILED)
-        -- KONSTANTERROR: [74] 57. Error Block 33 start (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [117.1247202]
         if Z == table.insert(var12, Z) then
-            -- KONSTANTWARNING: GOTO [110] #83
+            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
         end
-        -- KONSTANTERROR: [74] 57. Error Block 33 end (CF ANALYSIS FAILED)
+        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     end;
     calculateSegment = function(arg1, arg2) -- Line 75, Named "calculateSegment"
         local var23 = arg2 % arg1.totalLength

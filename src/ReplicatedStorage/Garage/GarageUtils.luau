@@ -1,24 +1,9 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgM5BkdhcmFnZQlHZXRUYWdnZWQLZ2V0Um9vdFBhcnQJQ2hhcmFjdGVyCFBvc2l0aW9uBmlwYWlycwZSZWdpb24ORmluZEZpcnN0Q2hpbGQIZ2V0UHJpc20GQ0ZyYW1lBFNpemUJQ2FzdFBvaW50GGlzUGxheWVySW5QaHlzaWNhbEdhcmFnZQtMb2NhbFBsYXllchBpblBoeXNpY2FsR2FyYWdlFUdldExvY2FsVmVoaWNsZVBhY2tldAlpblZlaGljbGUNRG9lc1BsYXllck93bgxFbnVtR2FtZXBhc3MNUHJlbWl1bUdhcmFnZRFnZXRJc0JhdHRsZVNlcnZlcgpoYXNQcmVtaXVtBkhpZGRlbglIaWRkZW5BbGwFTGV2ZWwGU2Vhc29uBVByaWNlHWlzVmVoaWNsZUN1c3RvbWl6YXRpb25MaW1pdGVkB1JldGlyZWQQaXNWZWhpY2xlTGltaXRlZAZ0eXBlb2YGbnVtYmVyHHNhdmVTbG90TnVtIG11c3QgYmUgYSBudW1iZXIGYXNzZXJ0B2Jvb2xlYW4XaXNWSVAgbXVzdCBiZSBhIGJvb2xlYW4OTlVNX1NBVkVfU0xPVFMTTlVNX0ZSRUVfU0FWRV9TTE9UUxJnZXRJc1NhdmVTbG90VmFsaWQEZ2FtZQdQbGF5ZXJzCkdldFNlcnZpY2URQ29sbGVjdGlvblNlcnZpY2URUmVwbGljYXRlZFN0b3JhZ2UHcmVxdWlyZQNTdGQOQ2hhcmFjdGVyVXRpbHMLUmVnaW9uVXRpbHMOR2FtZXBhc3NTeXN0ZW0IR2FtZXBhc3MNR2FtZXBhc3NVdGlscwRHYW1lDEdhcmFnZUNvbnN0cwdWZWhpY2xlDFZlaGljbGVVdGlscw1Qcml2YXRlU2VydmVyElByaXZhdGVTZXJ2ZXJVdGlscwAIDwEDAAAALakBAAD7AgAAbwQAALwCAgUBAAAAnwIDAvsDAQBNAwMbAgAAAE0EAGkDAAAAnwMCAisDAQCCAAEATQQDOwQAAACkBQYAAABQQFIGAgCfBQIEUQUVAG8MBwC8CgkDCAAAAJ8KAwIOChAA+wsCAE0LC5sJAAAATQwKhQoAAABNDQovCwAAAJ8LAwL7DAIATQwMoQwAAABSDQsAUg4EAJ8MAwIODAEAqQEBAG4F6v8CAACAggECAA0DAQMCAwMD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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:42:14
--- Luau version 6, Types version 3
--- Time taken: 0.008087 seconds
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local module_upvr = {}
 local CollectionService_upvr = game:GetService("CollectionService")
 local CharacterUtils_upvr = require(ReplicatedStorage.Std.CharacterUtils)
 local RegionUtils_upvr = require(ReplicatedStorage.Std.Region.RegionUtils)
 function module_upvr.isPlayerInPhysicalGarage(arg1) -- Line 13
-    --[[ Upvalues[3]:
-        [1]: CollectionService_upvr (readonly)
-        [2]: CharacterUtils_upvr (readonly)
-        [3]: RegionUtils_upvr (readonly)
-    ]]
     local any_getRootPart_result1 = CharacterUtils_upvr.getRootPart(arg1.Character)
     local var11
     if not any_getRootPart_result1 then return end
@@ -32,17 +17,10 @@ function module_upvr.isPlayerInPhysicalGarage(arg1) -- Line 13
 end
 local Players_upvr = game:GetService("Players")
 function module_upvr.inPhysicalGarage() -- Line 33
-    --[[ Upvalues[2]:
-        [1]: module_upvr (readonly)
-        [2]: Players_upvr (readonly)
-    ]]
     return module_upvr.isPlayerInPhysicalGarage(Players_upvr.LocalPlayer)
 end
 local VehicleUtils_upvr = require(ReplicatedStorage.Vehicle.VehicleUtils)
 function module_upvr.inVehicle() -- Line 36
-    --[[ Upvalues[1]:
-        [1]: VehicleUtils_upvr (readonly)
-    ]]
     local var18
     if VehicleUtils_upvr.GetLocalVehiclePacket() == nil then
         var18 = false
@@ -55,11 +33,6 @@ local GamepassSystem_upvr = require(ReplicatedStorage.Gamepass.GamepassSystem)
 local GamepassUtils_upvr = require(ReplicatedStorage.Gamepass.GamepassUtils)
 local PrivateServerUtils_upvr = require(ReplicatedStorage.PrivateServer.PrivateServerUtils)
 function module_upvr.hasPremium() -- Line 40
-    --[[ Upvalues[3]:
-        [1]: GamepassSystem_upvr (readonly)
-        [2]: GamepassUtils_upvr (readonly)
-        [3]: PrivateServerUtils_upvr (readonly)
-    ]]
     local any_DoesPlayerOwn_result1 = GamepassSystem_upvr.DoesPlayerOwn(GamepassUtils_upvr.EnumGamepass.PremiumGarage)
     if not any_DoesPlayerOwn_result1 then
         any_DoesPlayerOwn_result1 = PrivateServerUtils_upvr
@@ -102,9 +75,6 @@ function module_upvr.isVehicleLimited(arg1) -- Line 51
 end
 local GarageConsts_upvr = require(ReplicatedStorage.Game.Garage.GarageConsts)
 function module_upvr.getIsSaveSlotValid(arg1, arg2) -- Line 55
-    --[[ Upvalues[1]:
-        [1]: GarageConsts_upvr (readonly)
-    ]]
     local var29
     if typeof(arg1) ~= "number" then
         var29 = false

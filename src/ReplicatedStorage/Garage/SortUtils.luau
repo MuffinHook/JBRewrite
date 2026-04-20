@@ -1,22 +1,9 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:42:15
--- Luau version 6, Types version 3
--- Time taken: 0.012292 seconds
-
 local EnumSort_upvr = require(script.Parent.EnumSort)
 local module_upvr = {
     getSortFunc = function(arg1) -- Line 6, Named "getSortFunc"
-        --[[ Upvalues[1]:
-            [1]: EnumSort_upvr (readonly)
-        ]]
         if arg1 == EnumSort_upvr.Alphabetical then
             return function(arg1_2, arg2) -- Line 8
-                -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+                -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
                 local title = arg1_2.title
                 local var5
                 if arg1_2.isNone then
@@ -33,7 +20,7 @@ local module_upvr = {
         end
         if arg1 == EnumSort_upvr.Price then
             return function(arg1_3, arg2) -- Line 20
-                -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+                -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
                 local var8
                 if not arg1_3.priceSortMetric and not arg1_3.price then
                 end
@@ -63,7 +50,7 @@ local module_upvr = {
         end
         if arg1 == EnumSort_upvr.PriceLow then
             return function(arg1_4, arg2) -- Line 38
-                -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+                -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
                 local var11
                 if not var11 then
                     var11 = arg1_4.price
@@ -93,7 +80,7 @@ local module_upvr = {
         end
         if arg1 == EnumSort_upvr.Newest then
             return function(arg1_5, arg2) -- Line 56
-                -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+                -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
                 local var13
                 if not var13 then
                     var13 = arg1_5.primaryIndex
@@ -113,7 +100,7 @@ local module_upvr = {
         end
         if arg1 == EnumSort_upvr.Popular then
             return function(arg1_6, arg2) -- Line 68
-                -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+                -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
                 local var15
                 if not var15 then
                     var15 = arg1_6.primaryIndex + 9999
@@ -135,13 +122,9 @@ local module_upvr = {
     end;
 }
 function module_upvr.getTradeSortFunc(arg1) -- Line 83
-    --[[ Upvalues[2]:
-        [1]: EnumSort_upvr (readonly)
-        [2]: module_upvr (readonly)
-    ]]
     if arg1 == EnumSort_upvr.Popular then
         return function(arg1_7, arg2) -- Line 85
-            -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+            -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
             local var17 = arg1_7.tradePopularMetric or 0
             local var18
             if arg1_7.isNone then

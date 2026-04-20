@@ -1,13 +1,3 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgNdBHdhcm4Gc3RyaW5nBmZvcm1hdAV3YXJuZgNwb3MBWA1HcmFwaE1pblNwZWVkDV9nZXRBdHRyaWJ1dGUNR3JhcGhNYXhTcGVlZBBfZ2V0Q3VydmVWYWx1ZUF0BG1hdGgFY2xhbXAETGVycA9HZXRDdXJ2ZVZhbHVlQXQMX2dldFByb2dyZXNzCURlbHRhVGltZQ9fZ2V0VHJhbnNmb3JtZWQLR2V0UHJvZ3Jlc3MSX2dldFRyYW5zZm9ybWVkUmF3DkdldFByb2dyZXNzUmF3DVBsYXliYWNrU3RhdGUERW51bQdQbGF5aW5nAm9zBWNsb2NrCExhc3RUaWNrBVZhbHVlCEluc3RhbmNlA25ldwtOdW1iZXJWYWx1ZQZDcmVhdGUYR2V0UHJvcGVydHlDaGFuZ2VkU2lnbmFsB2Nvbm5lY3QLQ3JlYXRlVHdlZW4NQ29udHJvbFBvaW50cwpBdHRyaWJ1dGVzClBhdGhDbG9zZWQFdGFibGUGaW5zZXJ0B1RlbnNpb24QTGVuZ3RoSXRlcmF0aW9ucwxVcGRhdGVMZW5ndGgGU3BsaW5lEl9nZW5lcmF0ZVBvaW50RGF0YQhHZW5lcmF0ZRBDYWxjdWxhdGVWYWx1ZUF0IUNhbGN1bGF0ZVBvc2l0aW9uUmVsYXRpdmVUb0xlbmd0aCNDYWxjdWxhdGVEZXJpdmF0aXZlUmVsYXRpdmVUb0xlbmd0aAxfZ2V0VXBWZWN0b3IOX3R3aXN0VXB2ZWN0b3IJUG9pbnREYXRhBWZsb29yBnBvaW50cwZDRnJhbWUGbG9va0F0CHVwVmVjdG9yCFVwVmVjdG9yBXBhaXJzBGRhdGEHZGVncmVlcwZ0VmFsdWUNTG9vcEFuZ2xlRGlmZg5QZXJjZW50QmV0d2VlbgtfZ2V0VHdpc3RBdA1mcm9tQXhpc0FuZ2xlA3JhZAZ1bnBhY2sFcGNhbGwDZGlyAXQBWQRhY29zBUNyb3NzA0RvdARnYW1lDFR3ZWVuU2VydmljZQpHZXRTZXJ2aWNlBnNjcmlwdAVDdXJ2ZQlDdXJ2ZURhdGEORmluZEZpcnN0Q2hpbGQHcmVxdWlyZRBDYXRtdWxsUm9tU3BsaW5lC0dyYXBoQmV6aWVyBU1hdGhmDFVwVmVjdG9yRGF0YRFUcmFuc2Zvcm1GdW5jdGlvbhJBbmltYXRp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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:44:05
--- Luau version 6, Types version 3
--- Time taken: 0.021314 seconds
-
 local function _(arg1, ...) -- Line 45, Named "warnf"
     warn(string.format(arg1, ...))
 end
@@ -63,15 +53,9 @@ local module_2_upvr = {}
 local module = {}
 local NumPoints_upvr = CurveData_upvr.Attributes.NumPoints
 function module.GetCurveValueAt(arg1, arg2) -- Line 86
-    --[[ Upvalues[1]:
-        [1]: Mathf_upvr (readonly)
-    ]]
     return Mathf_upvr.Lerp(arg1:_getAttribute("GraphMinSpeed") or 0, arg1:_getAttribute("GraphMaxSpeed") or 1, math.clamp(arg1:_getCurveValueAt(arg2), 0, 1))
 end
 function module.GetProgress(arg1, arg2, arg3, arg4) -- Line 95
-    --[[ Upvalues[1]:
-        [1]: module_2_upvr (readonly)
-    ]]
     local any__getProgress_result1_2, any__getProgress_result2_3, any__getProgress_result3 = arg1:_getProgress(arg2, arg3)
     local DeltaTime = arg1.DeltaTime
     if not DeltaTime then
@@ -83,9 +67,6 @@ function module.GetProgress(arg1, arg2, arg3, arg4) -- Line 95
     return arg1:_getTransformed(any__getProgress_result1_2, any__getProgress_result2_3, any__getProgress_result3, module_2_upvr, DeltaTime)
 end
 function module.GetProgressRaw(arg1, arg2, arg3, arg4) -- Line 101
-    --[[ Upvalues[1]:
-        [1]: module_2_upvr (readonly)
-    ]]
     local any__getProgress_result1, any__getProgress_result2_2, any__getProgress_result3_2 = arg1:_getProgress(arg2, arg3)
     local DeltaTime_2 = arg1.DeltaTime
     if not DeltaTime_2 then
@@ -98,29 +79,16 @@ function module.GetProgressRaw(arg1, arg2, arg3, arg4) -- Line 101
 end
 local TweenService_upvr = game:GetService("TweenService")
 function module.CreateTween(arg1, arg2, arg3, arg4) -- Line 107
-    --[[ Upvalues[1]:
-        [1]: TweenService_upvr (readonly)
-    ]]
     local NumberValue_upvr = Instance.new("NumberValue")
     local any_Create_result1_upvr = TweenService_upvr:Create(NumberValue_upvr, arg2, {
         Value = 1;
     })
     any_Create_result1_upvr:GetPropertyChangedSignal("PlaybackState"):connect(function() -- Line 111
-        --[[ Upvalues[2]:
-            [1]: any_Create_result1_upvr (readonly)
-            [2]: arg1 (readonly)
-        ]]
         if any_Create_result1_upvr.PlaybackState == Enum.PlaybackState.Playing then
             arg1.LastTick = os.clock()
         end
     end)
     NumberValue_upvr:GetPropertyChangedSignal("Value"):connect(function() -- Line 117
-        --[[ Upvalues[4]:
-            [1]: arg1 (readonly)
-            [2]: NumberValue_upvr (readonly)
-            [3]: arg4 (readonly)
-            [4]: arg3 (readonly)
-        ]]
         local os_clock_result1 = os.clock()
         arg1.DeltaTime = os_clock_result1 - arg1.LastTick
         arg1.LastTick = os_clock_result1
@@ -129,11 +97,7 @@ function module.CreateTween(arg1, arg2, arg3, arg4) -- Line 107
     return any_Create_result1_upvr
 end
 function module.Generate(arg1) -- Line 128
-    --[[ Upvalues[2]:
-        [1]: CurveData_upvr (readonly)
-        [2]: CatmullRomSpline_upvr (readonly)
-    ]]
-    -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
     local ControlPoints = CurveData_upvr.ControlPoints
     local var39
     if CurveData_upvr.Attributes.PathClosed == true then
@@ -154,22 +118,13 @@ function module.Generate(arg1) -- Line 128
     arg1:_generatePointData()
 end
 function module._getAttribute(arg1, arg2) -- Line 159
-    --[[ Upvalues[1]:
-        [1]: CurveData_upvr (readonly)
-    ]]
     return CurveData_upvr.Attributes[arg2]
 end
 function module._getCurveValueAt(arg1, arg2) -- Line 162
-    --[[ Upvalues[1]:
-        [1]: var6_upvw (read and write)
-    ]]
     if not var6_upvw then return end
     return var6_upvw:CalculateValueAt(arg2)
 end
 function module._getProgress(arg1, arg2, arg3) -- Line 168
-    --[[ Upvalues[1]:
-        [1]: UpVectorData_upvr (readonly)
-    ]]
     local any_CalculatePositionRelativeToLength_result1 = arg1.Spline:CalculatePositionRelativeToLength(arg2)
     local any_CalculateDerivativeRelativeToLength_result1_2 = arg1.Spline:CalculateDerivativeRelativeToLength(arg2)
     local any__getUpVector_result1 = arg1:_getUpVector(arg2, any_CalculatePositionRelativeToLength_result1, any_CalculateDerivativeRelativeToLength_result1_2)
@@ -179,9 +134,6 @@ function module._getProgress(arg1, arg2, arg3) -- Line 168
     return any_CalculatePositionRelativeToLength_result1 + any__getUpVector_result1 * (arg3 or 0), any_CalculateDerivativeRelativeToLength_result1_2, any__getUpVector_result1
 end
 function module._getUpVector(arg1, arg2, arg3, arg4) -- Line 180
-    --[[ Upvalues[1]:
-        [1]: NumPoints_upvr (readonly)
-    ]]
     if not arg1.PointData then
         return Vector3.new(0, 1, 0)
     end
@@ -192,10 +144,7 @@ function module._getUpVector(arg1, arg2, arg3, arg4) -- Line 180
     return CFrame.lookAt(arg3, arg3 + arg4, var45.upVector).UpVector
 end
 function module._getTwistAt(arg1, arg2, arg3, arg4) -- Line 192
-    --[[ Upvalues[1]:
-        [1]: Mathf_upvr (readonly)
-    ]]
-    -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
     local var57
     for i_2, v in pairs(arg4.data) do
         local degrees = v.degrees
@@ -204,7 +153,7 @@ function module._getTwistAt(arg1, arg2, arg3, arg4) -- Line 192
                 local var60 = v
             end
             local var61 = v
-            local function INLINED() -- Internal function, doesn't exist in bytecode
+            local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
                 if v.tValue <= arg3 then
                     var57 = degrees
                 else
@@ -212,7 +161,7 @@ function module._getTwistAt(arg1, arg2, arg3, arg4) -- Line 192
                 end
                 return var57
             end
-            if nil or not INLINED() or var62 then break end
+            if nil or not decompInlinedCondition() or var62 then break end
         end
     end
     if not arg2 and var57 and not var62 then
@@ -243,16 +192,9 @@ function module._twistUpvector(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 245
     return arg2
 end
 function module._getTransformed(arg1, ...) -- Line 259
-    --[[ Upvalues[1]:
-        [1]: TransformFunction_upvr (readonly)
-    ]]
     local args_list_upvr = {...}
     if TransformFunction_upvr then
         local pcall_result1_3, pcall_result2 = pcall(function() -- Line 262
-            --[[ Upvalues[2]:
-                [1]: TransformFunction_upvr (copied, readonly)
-                [2]: args_list_upvr (readonly)
-            ]]
             return TransformFunction_upvr(unpack(args_list_upvr))
         end)
         if pcall_result1_3 then
@@ -263,16 +205,9 @@ function module._getTransformed(arg1, ...) -- Line 259
     return CFrame.lookAt(var77, var77 + var78, var79)
 end
 function module._getTransformedRaw(arg1, ...) -- Line 272
-    --[[ Upvalues[1]:
-        [1]: TransformFunction_upvr (readonly)
-    ]]
     local args_list_upvr_2 = {...}
     if TransformFunction_upvr then
         local pcall_result1_2, pcall_result2_2 = pcall(function() -- Line 275
-            --[[ Upvalues[2]:
-                [1]: TransformFunction_upvr (copied, readonly)
-                [2]: args_list_upvr_2 (readonly)
-            ]]
             return TransformFunction_upvr(unpack(args_list_upvr_2))
         end)
         if pcall_result1_2 then
@@ -283,10 +218,7 @@ function module._getTransformedRaw(arg1, ...) -- Line 272
     return var85, var86, var87
 end
 function module._generatePointData(arg1) -- Line 286
-    --[[ Upvalues[1]:
-        [1]: NumPoints_upvr (readonly)
-    ]]
-    -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
     local tbl = {
         points = {};
     }

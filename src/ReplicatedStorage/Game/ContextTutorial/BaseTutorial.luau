@@ -1,13 +1,3 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgM8Dl9vbkNsaWVudEV2ZW50DV9ydW5uaW5nVmFsdWUFVmFsdWUKX2VkZ2VWYWx1ZQdTZXRFZGdlBmlzT3BlbgVjbG9zZQVfbWFpZA51cGRhdGVQb3NpdGlvbgxzZXRtZXRhdGFibGUDbmV3C1JlbW90ZUV2ZW50DFdhaXRGb3JDaGlsZAxfcmVtb3RlRXZlbnQITWVzc2FnZXMNT25DbGllbnRFdmVudAdDb25uZWN0CEdpdmVUYXNrB1J1bm5pbmcYR2V0UHJvcGVydHlDaGFuZ2VkU2lnbmFsBEVkZ2UKRmlyZVNlcnZlchZzZXRXb3JsZE1hcmtlclBvc2l0aW9uCHBvc2l0aW9uBnVwZGF0ZQpHZXRSdW5uaW5nBG9wZW4Ob25DbG9zZUNsaWNrZWQKc2V0TWVzc2FnZQR0ZXh0BnR5cGVvZgdWZWN0b3IzCEluc3RhbmNlDFZlY3RvcjNWYWx1ZQNJc0EIUG9zaXRpb24HQ2hhbmdlZAhmdW5jdGlvbgVldmVyeQVlcnJvcidJbnZhbGlkIHR5cGUgZm9yIG1lc3NhZ2UgYHBvc2l0aW9uYDogJXMGZm9ybWF0E3NldFdvcmxkTWFya2VyU2l6ZXMFc2l6ZXMVc2V0V29ybGRNYXJrZXJFbmFibGVkBmFzc2VydAdEZXN0cm95BGdhbWURUmVwbGljYXRlZFN0b3JhZ2UKR2V0U2VydmljZQdyZXF1aXJlA1N0ZARNYWlkCEludGVydmFsEENvbnRleHRNZXNzYWdlVUkER2FtZQ5Db250ZXh0TWVzc2FnZQdfX2luZGV4DEJhc2VUdXRvcmlhbAtfX0NsYXNzTmFtZQAMAwABAQAAB6MAAAD7AAAA3QIAALwAAHoAAAAAnwAAAYIAAQABAwEAEgABGAABAAAAAAESAAAAAAQAAgAAACD7AAAATQAApAAAAABNAADsAQAAAA4ACgD7AQAA+wMAAE0DA1MCAAAATQMD7AEAAAC8AQEjAwAAAJ8BAwGCAAEA+wEBAE0BAREEAAAAnwEBAg4BBAD7AQEATQEBgwUAAACfAQEB+wEAAE0BAcEGAAAAxgIAADACAfkHAAAAggABAAgDAgMDAwQDBQMGAwcDCAMJABgAARgAAAAAAAEBAAAAAAAAAAAAAwAAAAABAAAAAgAAAAAAAhkAAAAABAABAAAAC/sA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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:35:15
--- Luau version 6, Types version 3
--- Time taken: 0.005464 seconds
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ContextMessageUI_upvr = require(ReplicatedStorage.Game.ContextMessage.ContextMessageUI)
 local module_upvr = {}
@@ -15,28 +5,16 @@ module_upvr.__index = module_upvr
 module_upvr.__ClassName = "BaseTutorial"
 local Maid_upvr = require(ReplicatedStorage.Std.Maid)
 function module_upvr.new(arg1, arg2) -- Line 9
-    --[[ Upvalues[3]:
-        [1]: module_upvr (readonly)
-        [2]: Maid_upvr (readonly)
-        [3]: ContextMessageUI_upvr (readonly)
-    ]]
     local module_upvr_2 = {}
     setmetatable(module_upvr_2, module_upvr)
     module_upvr_2._maid = Maid_upvr.new()
     module_upvr_2._remoteEvent = arg1:WaitForChild("RemoteEvent")
     module_upvr_2.Messages = arg2
     module_upvr_2._maid:GiveTask(module_upvr_2._remoteEvent.OnClientEvent:Connect(function(...) -- Line 18
-        --[[ Upvalues[1]:
-            [1]: module_upvr_2 (readonly)
-        ]]
         module_upvr_2:_onClientEvent(...)
     end))
     module_upvr_2._runningValue = arg1:WaitForChild("Running")
     module_upvr_2._maid:GiveTask(module_upvr_2._runningValue:GetPropertyChangedSignal("Value"):Connect(function() -- Line 24
-        --[[ Upvalues[2]:
-            [1]: module_upvr_2 (readonly)
-            [2]: ContextMessageUI_upvr (copied, readonly)
-        ]]
         if module_upvr_2._runningValue.Value then
             module_upvr_2:SetEdge(module_upvr_2._edgeValue.Value)
         else
@@ -49,29 +27,22 @@ function module_upvr.new(arg1, arg2) -- Line 9
     module_upvr_2._edgeValue = arg1:WaitForChild("Edge")
     module_upvr_2:SetEdge(module_upvr_2._edgeValue.Value)
     module_upvr_2._maid:GiveTask(module_upvr_2._edgeValue:GetPropertyChangedSignal("Value"):Connect(function() -- Line 40
-        --[[ Upvalues[1]:
-            [1]: module_upvr_2 (readonly)
-        ]]
         module_upvr_2:SetEdge(module_upvr_2._edgeValue.Value)
     end))
     return module_upvr_2
 end
 local Interval_upvr = require(ReplicatedStorage.Std.Interval)
 function module_upvr.SetEdge(arg1, arg2) -- Line 48
-    --[[ Upvalues[2]:
-        [1]: ContextMessageUI_upvr (readonly)
-        [2]: Interval_upvr (readonly)
-    ]]
-    -- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [4] 4. Error Block 2 start (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     do
         return
     end
-    -- KONSTANTERROR: [4] 4. Error Block 2 end (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [5] 5. Error Block 3 start (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     arg1._maid.updatePosition = nil
-    -- KONSTANTERROR: [5] 5. Error Block 3 end (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
 end
 function module_upvr.GetRunning(arg1) -- Line 87
     return arg1._runningValue.Value

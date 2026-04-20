@@ -69,7 +69,7 @@
 --            [6]: ScreenGui_upvr (readonly)
 --            [7]: PlayerGui_upvr (readonly)
 --        ]]
---        -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+--        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
 --        var15_upvw += 1
 --        local var17
 --        if arg1 ~= nil then
@@ -83,11 +83,11 @@
 --        var17 = TextLabel_upvr
 --        var17.Text = ""
 --        var17 = var18.tradeLoadingScreen
---        local function INLINED() -- Internal function, doesn't exist in bytecode
+--        local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
 --            var17 = var18.worldName
 --            return var17 == "TRADE_WORLD"
 --        end
---        if var17 or INLINED() then
+--        if var17 or decompInlinedCondition() then
 --            var17 = tbl_upvr
 --            var17 = var17.Trade
 --            UIAspectRatioConstraint_upvr.AspectRatio = var17.aspectRatio

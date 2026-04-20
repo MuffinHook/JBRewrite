@@ -1,13 +1,120 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
 
--- Bytecode (Base64):
--- BgM5BlBsYXllcgl3b3Jrc3BhY2UQR2V0U2VydmVyVGltZU5vdw9nZXRMYXN0U2hvdFRpbWUnR1VOX0VRVUlQX1RJTUVfQ09PTERPV05fU0lOQ0VfTEFTVF9TSE9UBkNvbmZpZw9FcXVpcFRpbWVGb3JjZWQFTG9jYWwVZ2V0U2hvdWxkQWRkRXF1aXBUaW1lE0xBU1RfU0hPVF9BVFRSX05BTUUMR2V0QXR0cmlidXRlDFNldEF0dHJpYnV0ZQ9zZXRMYXN0U2hvdFRpbWUfTEFTVF9TSE9UX1NFUlZFUl9USU1FX0FUVFJfTkFNRRVnZXRMYXN0U2hvdFNlcnZlclRpbWUVc2V0TGFzdFNob3RTZXJ2ZXJUaW1lI0xBU1RfU0hPVF9TRVJWRVJfR1VOX05BTUVfQVRUUl9OQU1FEmdldExhc3RTaG90R3VuTmFtZRJzZXRMYXN0U2hvdEd1bk5hbWUER2FtZQdHdW5TaG9wIUNVU1RPTV9TRVJWRVJfRVFVSVBfVElNRV9PQkpfTkFNRQ5GaW5kRmlyc3RDaGlsZBhnZXRDdXN0b21TZXJ2ZXJFcXVpcFRpbWUfRXF1aXAgdGltZSBtdXN0IGJlIG5vbi1uZWdhdGl2ZQZhc3NlcnQISW5zdGFuY2UDbmV3CUJvb2xWYWx1ZQROYW1lBlBhcmVudBhzZXRDdXN0b21TZXJ2ZXJFcXVpcFRpbWUJZ2V0Q29uZmlnCUVxdWlwVGltZQ5HVU5fRVFVSVBfVElNRQxnZXRFcXVpcFRpbWUcTkVYVF9TSE9UX1BPU1NJQkxFX0FUVFJfTkFNRRNnZXROZXh0U2hvdFBvc3NpYmxlE3NldE5leHRTaG90UG9zc2libGUTcmFuZG9tUG9pbnRJbkNpcmNsZQFYAVkHVmVjdG9yMxJWZWN0b3JUb1dvcmxkU3BhY2UEVW5pdBJnZXRCdWxsZXREaXJlY3Rpb24EZ2FtZRFSZXBsaWNhdGVkU3RvcmFnZQpHZXRTZXJ2aWNlB3JlcXVpcmUDQXBwDUl0ZW1EYXRhVXRpbHMKSXRlbVN5c3RlbQ9HdW5TeXN0ZW1Db25zdHMDU3RkCUdlb21VdGlscwZDRnJhbWUBOQAOBwECAAAAIk0BAPkAAAAApAICAAAAEEC8AgK3AwAAAJ8CAgL7BQAATQUF+gQAAABSBgEAnwUC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
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-KONSTANTERROR: After: Corrupted bytecode. If the `luau_load` is able to load this bytecode, then this is a bug
-K
-K
-K
-K
-K
-K
-K
+local ItemDataUtils = require(ReplicatedStorage.App.ItemDataUtils)
+local GunSystemConsts = require(ReplicatedStorage.Game.ItemSystem.GunSystemConsts)
+
+local GunUtils = {}
+
+local function getPlayerFromGun(gunOrPlayer)
+	return gunOrPlayer and (gunOrPlayer.Player or gunOrPlayer)
+end
+
+-- Decomp Error: Original GunUtils bytecode was corrupted; rebuilt from constants and weapon call sites.
+function GunUtils.getLastShotTime(player)
+	return player:GetAttribute(GunSystemConsts.LAST_SHOT_ATTR_NAME)
+end
+
+function GunUtils.setLastShotTime(player, time)
+	player:SetAttribute(GunSystemConsts.LAST_SHOT_ATTR_NAME, time)
+	GunUtils.setLastShotServerTime(player, time)
+end
+
+function GunUtils.getLastShotServerTime(player)
+	return player:GetAttribute(GunSystemConsts.LAST_SHOT_SERVER_TIME_ATTR_NAME)
+end
+
+function GunUtils.setLastShotServerTime(player, time)
+	player:SetAttribute(GunSystemConsts.LAST_SHOT_SERVER_TIME_ATTR_NAME, time)
+end
+
+function GunUtils.getLastShotGunName(player)
+	return player:GetAttribute(GunSystemConsts.LAST_SHOT_SERVER_GUN_NAME_ATTR_NAME)
+end
+
+function GunUtils.setLastShotGunName(player, gunName)
+	player:SetAttribute(GunSystemConsts.LAST_SHOT_SERVER_GUN_NAME_ATTR_NAME, gunName)
+end
+
+function GunUtils.getNextShotPossible(player)
+	return player:GetAttribute(GunSystemConsts.NEXT_SHOT_POSSIBLE_ATTR_NAME)
+end
+
+function GunUtils.setNextShotPossible(player, time)
+	player:SetAttribute(GunSystemConsts.NEXT_SHOT_POSSIBLE_ATTR_NAME, time)
+end
+
+function GunUtils.getCustomServerEquipTime(itemValue)
+	local value = itemValue and itemValue:FindFirstChild(GunSystemConsts.CUSTOM_SERVER_EQUIP_TIME_OBJ_NAME)
+	return value and value.Value or nil
+end
+
+function GunUtils.setCustomServerEquipTime(itemValue, equipTime)
+	assert(equipTime == nil or equipTime >= 0, "Equip time must be non-negative")
+	local value = itemValue:FindFirstChild(GunSystemConsts.CUSTOM_SERVER_EQUIP_TIME_OBJ_NAME)
+	if equipTime == nil then
+		if value then
+			value:Destroy()
+		end
+		return
+	end
+	if not value then
+		value = Instance.new("NumberValue")
+		value.Name = GunSystemConsts.CUSTOM_SERVER_EQUIP_TIME_OBJ_NAME
+		value.Parent = itemValue
+	end
+	value.Value = equipTime
+end
+
+function GunUtils.getConfig(itemName)
+	return ItemDataUtils.getConfig(itemName)
+end
+
+function GunUtils.getEquipTime(gunOrItemName)
+	local itemValue = gunOrItemName and gunOrItemName.inventoryItemValue
+	local customEquipTime = itemValue and GunUtils.getCustomServerEquipTime(itemValue)
+	if customEquipTime ~= nil then
+		return customEquipTime
+	end
+	local config = typeof(gunOrItemName) == "string" and GunUtils.getConfig(gunOrItemName) or gunOrItemName.Config
+	return config and config.EquipTime or GunSystemConsts.GUN_EQUIP_TIME
+end
+
+function GunUtils.getShouldAddEquipTime(gunOrPlayer)
+	local player = getPlayerFromGun(gunOrPlayer)
+	if not player then
+		return false
+	end
+	if gunOrPlayer and gunOrPlayer.Config and gunOrPlayer.Config.EquipTimeForced then
+		return true
+	end
+	if gunOrPlayer and gunOrPlayer.Local == false then
+		return false
+	end
+	local lastShotTime = GunUtils.getLastShotServerTime(player) or GunUtils.getLastShotTime(player)
+	if not lastShotTime then
+		return false
+	end
+	return workspace:GetServerTimeNow() - lastShotTime <= GunSystemConsts.GUN_EQUIP_TIME_COOLDOWN_SINCE_LAST_SHOT
+end
+
+function GunUtils.randomPointInCircle(radius)
+	local theta = math.random() * math.pi * 2
+	local r = math.sqrt(math.random()) * (radius or 1)
+	return Vector3.new(math.cos(theta) * r, math.sin(theta) * r, 0)
+end
+
+function GunUtils.getBulletDirection(tipCFrame, tipDirection, spread)
+	spread = spread or 0
+	if spread <= 0 then
+		return tipDirection.Unit
+	end
+	local offset = GunUtils.randomPointInCircle(spread)
+	local direction = (tipDirection.Unit + tipCFrame:VectorToWorldSpace(Vector3.new(offset.X, offset.Y, 0)) * 0.01).Unit
+	if direction.Magnitude ~= direction.Magnitude then
+		return tipDirection.Unit
+	end
+	return direction
+end
+
+return GunUtils

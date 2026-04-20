@@ -1,18 +1,8 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:39:25
--- Luau version 6, Types version 3
--- Time taken: 0.009032 seconds
-
 local module = {}
 local Bitbuf_upvr = require(script.Parent.Bitbuf)
 local Base85_upvr = require(script.Parent.Base85)
 local function isAxisAligned_upvr(arg1) -- Line 14, Named "isAxisAligned"
-    -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
     local var9
     for i = 4, 12 do
         local absolute = math.abs(({arg1:GetComponents()})[i])
@@ -49,10 +39,6 @@ local function _(arg1) -- Line 45, Named "isLegalOrientId"
     return var17
 end
 local function _(arg1) -- Line 52, Named "getOrientId"
-    --[[ Upvalues[2]:
-        [1]: isAxisAligned_upvr (readonly)
-        [2]: toNormalId_upvr (readonly)
-    ]]
     if not isAxisAligned_upvr(arg1) then
         return -1
     end
@@ -103,36 +89,25 @@ local function encodeMatrix_upvr(arg1) -- Line 69, Named "encodeMatrix"
     return {var30, var31, var32, var33}
 end
 function module.encode(arg1) -- Line 109
-    --[[ Upvalues[5]:
-        [1]: Bitbuf_upvr (readonly)
-        [2]: isAxisAligned_upvr (readonly)
-        [3]: toNormalId_upvr (readonly)
-        [4]: encodeMatrix_upvr (readonly)
-        [5]: Base85_upvr (readonly)
-    ]]
-    -- KONSTANTERROR: [0] 1. Error Block 25 start (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     local any_new_result1 = Bitbuf_upvr.new()
     local Position = arg1.Position
     any_new_result1:WriteFloat(32, Position.X)
     any_new_result1:WriteFloat(32, Position.Y)
     any_new_result1:WriteFloat(32, Position.Z)
     if not isAxisAligned_upvr(arg1) then
-        -- KONSTANTWARNING: GOTO [56] #45
+        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
     end
-    -- KONSTANTERROR: [0] 1. Error Block 25 end (CF ANALYSIS FAILED)
-    -- KONSTANTERROR: [30] 23. Error Block 23 start (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     local var41 = 6 * toNormalId_upvr(arg1.RightVector) + toNormalId_upvr(arg1.UpVector)
     if math.floor(var41 / 6) % 3 == var41 % 3 then
-        -- KONSTANTWARNING: GOTO [52] #41
+        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
     end
-    -- KONSTANTERROR: [30] 23. Error Block 23 end (CF ANALYSIS FAILED)
+    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
 end
 function module.decode(arg1) -- Line 133
-    --[[ Upvalues[2]:
-        [1]: Base85_upvr (readonly)
-        [2]: Bitbuf_upvr (readonly)
-    ]]
-    -- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
     local any_decode_result1, any_decode_result2 = Base85_upvr.decode(arg1)
     if any_decode_result1 then
         assert(any_decode_result1)

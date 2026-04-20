@@ -1,21 +1,8 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgNODHNldG1ldGF0YWJsZQRSb290BURlcHRoCEJyYW5jaGVzBExlYWYDbmV3CUNsYXNzTmFtZQZhc3NlcnQFdGFibGUGaW5zZXJ0CUFkZEJyYW5jaAVTdGF0ZQhDb21wbGV0ZQxDb21wbGV0ZVRyZWUHT25lU2hvdBJHZXREZWVwZXN0VW5sb2NrZWQHTWVzc2FnZQVJbm5lcgVUaXRsZQRUZXh0BEJvZHkOUHJvY2Vzc01lc3NhZ2UESWNvbgdWaXNpYmxlBVVEaW0yBEVudW0PRWFzaW5nRGlyZWN0aW9uA091dAtFYXNpbmdTdHlsZQRRdWFkDVR3ZWVuUG9zaXRpb24Ed2FpdAhQb3NpdGlvbgZyZW1vdmUIRHVyYXRpb24MUHJvY2Vzc1F1ZXVlBXNwYXduC1Nob3dNZXNzYWdlB1dlbGNvbWUPU2hvd05leHRNZXNzYWdlDVVzZXJJbnB1dFR5cGUMTW91c2VCdXR0b24xBHRpY2sOSWNvbklucHV0QmVnYW4OSWNvbk1vdXNlRW50ZXIEbmV4dAhjNno0aXNjOQVFdmVudAJlbQxHZXRTY3JlZW5HdWkIVHV0b3JpYWwKSW5wdXRCZWdhbgdDb25uZWN0Ck1vdXNlRW50ZXIESW5pdARUcmVlB19faW5kZXgVV2VsY29tZSB0byBKYWlsYnJlYWshNVRoaXMgdHV0b3JpYWwgd2lsbCB0ZWFjaCB5b3UgdGhlIGJhc2ljcyBvZiBKYWlsYnJlYWsuBkVzY2FwZQRUZWFtD0dldHRpbmcgU3RhcnRlZCRGaWd1cmUgb3V0IGhvdyB0byBlc2NhcGUgdGhlIHByaXNvbi4GR2V0Q2FyEkxpZmUgb2YgYSBDcmltaW5hbCdZb3UgZXNjYXBlZCEgTG9vayBmb3IgYSBjYXIgdG8gZHJpdmUuLi4KR2V0Q2FyRG9uZQdEcml2aW5nQVRoaXMgaXMgeW91ciBzdGFydGVyIGNhci4gWW91IGNhbiB1cGdyYWRlIGl0LCBhbmQgYnV5IG90aGVyIGNhcnMhC0JhbmtSb2JiZXJ5B1JvYmJlcnklR28gdG8gdGhlIGJhbmsgaW4gdGhlIGNpdHkgdG8gcm9iIGl0IQ9CYW5rUm9iYmVyeURvbmUQUm9iYmVyeSBDb21wbGV0ZUdFYXJuIG1vbmV5IGJ5IHJv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
-
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2026-04-18 23:34:50
--- Luau version 6, Types version 3
--- Time taken: 0.015469 seconds
-
 local tbl_upvr = {
     ClassName = "Tree";
 }
 tbl_upvr.__index = tbl_upvr
 function tbl_upvr.new() -- Line 28
-    --[[ Upvalues[1]:
-        [1]: tbl_upvr (readonly)
-    ]]
     local setmetatable_result1 = setmetatable({}, tbl_upvr)
     setmetatable_result1.Root = true
     setmetatable_result1.Depth = 1
@@ -24,9 +11,6 @@ function tbl_upvr.new() -- Line 28
     return setmetatable_result1
 end
 function tbl_upvr.AddBranch(arg1, arg2) -- Line 36
-    --[[ Upvalues[1]:
-        [1]: tbl_upvr (readonly)
-    ]]
     local var3
     if arg2.ClassName ~= tbl_upvr.ClassName then
         var3 = false
@@ -114,9 +98,6 @@ local function _(arg1) -- Line 120, Named "CompleteTree"
     end
 end
 local function GetDeepestUnlocked_upvr(arg1) -- Line 126, Named "GetDeepestUnlocked"
-    --[[ Upvalues[1]:
-        [1]: GetDeepestUnlocked_upvr (readonly)
-    ]]
     local var28 = true
     local var29
     if arg1.State ~= 4 then
@@ -160,24 +141,13 @@ local var34_upvw
 local tbl_upvr_2 = {}
 local var36_upvw = false
 local function _(arg1) -- Line 163, Named "ProcessMessage"
-    --[[ Upvalues[1]:
-        [1]: var34_upvw (read and write)
-    ]]
     var34_upvw.Message.Inner.Title.Text = arg1.Title
     var34_upvw.Message.Inner.Body.Text = arg1.Body
 end
 local function ProcessQueue_upvr() -- Line 167, Named "ProcessQueue"
-    --[[ Upvalues[3]:
-        [1]: var36_upvw (read and write)
-        [2]: var34_upvw (read and write)
-        [3]: tbl_upvr_2 (readonly)
-    ]]
     var36_upvw = true
     if var34_upvw.Icon.Visible then
         var34_upvw.Icon:TweenPosition(UDim2.new(1, 0, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function() -- Line 176
-            --[[ Upvalues[1]:
-                [1]: var34_upvw (copied, read and write)
-            ]]
             var34_upvw.Icon.Visible = false
         end)
         wait(0.5)
@@ -193,9 +163,6 @@ local function ProcessQueue_upvr() -- Line 167, Named "ProcessQueue"
         wait(popped.Duration)
     end
     var34_upvw.Message:TweenPosition(UDim2.new(1, 0, 1, -300), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function() -- Line 203
-        --[[ Upvalues[1]:
-            [1]: var34_upvw (copied, read and write)
-        ]]
         var34_upvw.Message.Visible = false
     end)
     wait(0.5)
@@ -204,11 +171,6 @@ local function ProcessQueue_upvr() -- Line 167, Named "ProcessQueue"
     var36_upvw = false
 end
 local function _(arg1) -- Line 218, Named "ShowMessage"
-    --[[ Upvalues[3]:
-        [1]: tbl_upvr_2 (readonly)
-        [2]: var36_upvw (read and write)
-        [3]: ProcessQueue_upvr (readonly)
-    ]]
     table.insert(tbl_upvr_2, arg1)
     if not var36_upvw then
         var36_upvw = true
@@ -216,13 +178,6 @@ local function _(arg1) -- Line 218, Named "ShowMessage"
     end
 end
 local function _() -- Line 225, Named "ShowNextMessage"
-    --[[ Upvalues[5]:
-        [1]: GetDeepestUnlocked_upvr (readonly)
-        [2]: tbl_upvr_3 (readonly)
-        [3]: tbl_upvr_2 (readonly)
-        [4]: var36_upvw (read and write)
-        [5]: ProcessQueue_upvr (readonly)
-    ]]
     table.insert(tbl_upvr_2, GetDeepestUnlocked_upvr(tbl_upvr_3.Welcome).Leaf)
     if not var36_upvw then
         var36_upvw = true
@@ -230,13 +185,6 @@ local function _() -- Line 225, Named "ShowNextMessage"
     end
 end
 local function _(arg1) -- Line 229, Named "Complete"
-    --[[ Upvalues[5]:
-        [1]: GetDeepestUnlocked_upvr (readonly)
-        [2]: tbl_upvr_3 (readonly)
-        [3]: tbl_upvr_2 (readonly)
-        [4]: var36_upvw (read and write)
-        [5]: ProcessQueue_upvr (readonly)
-    ]]
     arg1:Complete()
     table.insert(tbl_upvr_2, GetDeepestUnlocked_upvr(tbl_upvr_3.Welcome).Leaf)
     if not var36_upvw then
@@ -246,15 +194,6 @@ local function _(arg1) -- Line 229, Named "Complete"
 end
 return {
     Init = function(arg1) -- Line 236, Named "Init"
-        --[[ Upvalues[7]:
-            [1]: var34_upvw (read and write)
-            [2]: tbl_upvr_3 (readonly)
-            [3]: tbl_upvr_2 (readonly)
-            [4]: var36_upvw (read and write)
-            [5]: ProcessQueue_upvr (readonly)
-            [6]: GetDeepestUnlocked_upvr (readonly)
-            [7]: tbl_upvr (readonly)
-        ]]
         var34_upvw = arg1.GetScreenGui("Tutorial")
         table.insert(tbl_upvr_2, tbl_upvr_3.Welcome.Leaf)
         if not var36_upvw then
@@ -269,14 +208,6 @@ return {
         end
         local tick_result1_2_upvw = tick()
         var34_upvw.Icon.InputBegan:Connect(function(arg1_2) -- Line 246, Named "IconInputBegan"
-            --[[ Upvalues[6]:
-                [1]: tick_result1_2_upvw (read and write)
-                [2]: GetDeepestUnlocked_upvr (copied, readonly)
-                [3]: tbl_upvr_3 (copied, readonly)
-                [4]: tbl_upvr_2 (copied, readonly)
-                [5]: var36_upvw (copied, read and write)
-                [6]: ProcessQueue_upvr (copied, readonly)
-            ]]
             if arg1_2.UserInputType == Enum.UserInputType.MouseButton1 then
                 local tick_result1_3 = tick()
                 if tick_result1_3 - tick_result1_2_upvw < 0.5 then
@@ -291,14 +222,6 @@ return {
             end
         end)
         var34_upvw.Icon.MouseEnter:Connect(function(arg1_3) -- Line 256, Named "IconMouseEnter"
-            --[[ Upvalues[6]:
-                [1]: tick_result1_2_upvw (read and write)
-                [2]: GetDeepestUnlocked_upvr (copied, readonly)
-                [3]: tbl_upvr_3 (copied, readonly)
-                [4]: tbl_upvr_2 (copied, readonly)
-                [5]: var36_upvw (copied, read and write)
-                [6]: ProcessQueue_upvr (copied, readonly)
-            ]]
             local tick_result1 = tick()
             if tick_result1 - tick_result1_2_upvw < 0.5 then
                 return false
@@ -311,14 +234,6 @@ return {
             end
         end)
         arg1.em.c6z4isc9 = function(arg1_4, arg2) -- Line 267, Named "c6z4isc9"
-            --[[ Upvalues[6]:
-                [1]: tbl_upvr_3 (copied, readonly)
-                [2]: tbl_upvr (copied, readonly)
-                [3]: GetDeepestUnlocked_upvr (copied, readonly)
-                [4]: tbl_upvr_2 (copied, readonly)
-                [5]: var36_upvw (copied, read and write)
-                [6]: ProcessQueue_upvr (copied, readonly)
-            ]]
             for i_5, _ in next, arg1_4 do
                 local var45 = tbl_upvr_3[i_5]
                 if var45 and var45.State ~= 4 then
