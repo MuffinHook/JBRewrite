@@ -19,7 +19,7 @@ function any_extend_result1.render(arg1) -- Line 11
         Label = createElement_upvr("TextLabel", {
             BackgroundTransparency = 1;
             Font = Enum.Font.LuckiestGuy;
-            Text = "Bounty: %s":format(Format_upvr.Currency(arg1.props.amount));
+            Text = string.format("Bounty: %s", Format_upvr.Currency(arg1.props.amount));
             TextColor3 = Color3.new(0.8, 0, 0);
             TextStrokeColor3 = Color3.new(0.3, 0, 0);
             TextStrokeTransparency = 0.5;

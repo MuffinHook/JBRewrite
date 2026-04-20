@@ -45,7 +45,7 @@ function any_extend_result1.render(arg1) -- Line 16
                     Size = UDim2.new(0.9, 0, 1, 0);
                     Position = UDim2.new(0.5, 0, 0.5, 0);
                     AnchorPoint = Vector2.new(0.5, 0.5);
-                    Text = "%s: %d%%":format(var16.name, var17 * 100 or 0);
+                    Text = string.format("%s: %d%%", var16.name, var17 * 100 or 0);
                     TextXAlignment = Enum.TextXAlignment.Left;
                     Font = Enum.Font.Bangers;
                     LineHeight = 1;

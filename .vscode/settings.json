@@ -1,3 +1,8 @@
 {
-    "robloxLsp.workspace.maxPreload": 2000
+  "luau-lsp.sourcemap.enabled": true,
+  "luau-lsp.sourcemap.autogenerate": true,
+  "luau-lsp.sourcemap.rojoProjectFile": "default.project.json",
+  "luau-lsp.sourcemap.includeNonScripts": true,
+  "luau-lsp.platform.type": "roblox",
+  "luau-lsp.diagnostics.strictDatamodelTypes": false
 }

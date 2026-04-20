@@ -51,7 +51,7 @@ function module_upvr.new(arg1) -- Line 35
             for _, v in ipairs(arg1:FindFirstChild("Walls"):GetDescendants()) do
                 if v:IsA("Decal") then
                     if tbl_upvr_2[ceiled] then
-                        v.Texture = "rbxassetid://%d":format(tbl_upvr_2[ceiled])
+                        v.Texture = string.format("rbxassetid://%d", tbl_upvr_2[ceiled])
                     else
                         v.Texture = ""
                     end

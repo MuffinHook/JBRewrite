@@ -47,11 +47,12 @@ function any_extend_result1.render(arg1) -- Line 52
     if not arg1.state.cameraParts or #arg1.state.cameraParts == 0 then return end
     local tbl_5 = {}
     local tbl_4 = {}
+    local tbl_7 = {}
     for i_2 = 1, #arg1.state.cameraParts do
         local var38 = arg1.state.cameraParts[i_2]
         tbl_5[i_2] = var38.CFrame * CFrame.new(0, 0, -var38.Size.Z * 0.5)
         local CCTVName = var38:GetAttribute("CCTVName")
-        ;({})[i_2] = CCTVName
+        tbl_7[i_2] = CCTVName
         if var38:GetAttribute("CCTVDisabled") ~= true then
             CCTVName = false
         else
@@ -73,8 +74,8 @@ function any_extend_result1.render(arg1) -- Line 52
             layoutOrder = i_3;
             disabled = tbl_4[var41];
         })
-        local var43_upvr
     end
+    local var43_upvr = tbl_5
     local module = {
         Padding = createElement_upvr("UIPadding", {
             PaddingLeft = UDim.new(0.015625, 0);
@@ -140,7 +141,7 @@ function any_extend_result1.render(arg1) -- Line 52
                 Position = UDim2.new(0.5, 0, 0.6, 0);
                 TextColor3 = Color3.new(1, 1, 1);
                 TextScaled = true;
-                Text = "%02d/%02d":format(arg1.state.index, #var43_upvr);
+                Text = string.format("%02d/%02d", arg1.state.index, #var43_upvr);
                 Font = Enum.Font.LuckiestGuy;
             });
         });
@@ -159,7 +160,7 @@ function any_extend_result1.render(arg1) -- Line 52
         TextScaled = true;
     }
     -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    tbl.Text = ({})[arg1.state.index]
+    tbl.Text = tbl_7[arg1.state.index]
     tbl.Font = Enum.Font.LuckiestGuy
     tbl.TextXAlignment = Enum.TextXAlignment.Left
     tbl_6.Title = createElement_upvr("TextLabel", tbl)

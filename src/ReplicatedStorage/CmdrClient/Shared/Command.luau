@@ -44,11 +44,11 @@ function module_upvr.Parse(arg1, arg2) -- Line 51
             end
         end
         if var13 and false then
-            error("[Cmdr] Command %q: Required arguments cannot occur after optional arguments.":format(arg1.Name))
+            error(string.format("[Cmdr] Command %q: Required arguments cannot occur after optional arguments.", arg1.Name))
         elseif not var13 then
         end
         if arg1.RawArguments[i] == nil and var13 and arg2 ~= true then
-            return false, "Required argument #%d %s is missing.":format(i, v.Name)
+            return false, string.format("Required argument #%d %s is missing.", i, v.Name)
         end
         if arg1.RawArguments[i] or arg2 then
             arg1.Arguments[i] = Argument_upvr.new(arg1, v, arg1.RawArguments[i] or "")
@@ -65,7 +65,7 @@ function module_upvr.Validate(arg1, arg2) -- Line 83
         if not any_Validate_result1 then
         end
     end
-    return nil, "%s; #%d %s: %s":format("", i_2, v_2.Name, any_Validate_result2 or "error"):sub(3)
+    return nil, string.format("%s; #%d %s: %s", "", i_2, v_2.Name, any_Validate_result2 or "error"):sub(3)
 end
 function module_upvr.GetLastArgument(arg1) -- Line 102
     for i_3 = #arg1.Arguments, 1, -1 do
@@ -81,7 +81,7 @@ function module_upvr.GatherArgumentValues(arg1) -- Line 111
             ({})[i_4] = var30:GetValue()
         elseif type(arg1.ArgumentDefinitions[i_4]) == "table" then
             -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            ;({})[i_4] = arg1.ArgumentDefinitions[i_4].Default
+            ({})[i_4] = arg1.ArgumentDefinitions[i_4].Default
         end
     end
     -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.

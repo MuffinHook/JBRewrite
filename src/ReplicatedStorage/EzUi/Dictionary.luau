@@ -13,7 +13,7 @@ return {
                         ({})[i_2] = nil
                     else
                         -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                        ;({})[i_2] = v
+                        ({})[i_2] = v
                     end
                 end
             end

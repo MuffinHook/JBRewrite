@@ -9,7 +9,7 @@ local makeButton_upvr = require(script.Parent.makeButton)
 function any_extend_result1._makeButton(arg1, arg2, arg3, arg4) -- Line 14
     local module = {
         BackgroundTransparency = 1;
-        Size = UDim2.new(1, 1, 1);
+        Size = UDim2.new(1, 0, 1, 0);
     }
     module.LayoutOrder = arg4
     return createElement_upvr("Frame", module, {
@@ -20,10 +20,10 @@ local Dictionary_upvr = require(ReplicatedStorage.EzUi.Dictionary)
 function any_extend_result1.render(arg1) -- Line 27
     local module_2 = {}
     for i = 1, arg1.props.countInner do
-        module_2["%s_%d":format("inner", i)] = arg1:_makeButton("inner", i, i)
+        module_2[string.format("%s_%d", "inner", i)] = arg1:_makeButton("inner", i, i)
     end
     for i_2 = 1, arg1.props.countOuter do
-        module_2["%s_%d":format("outer", i_2)] = arg1:_makeButton("outer", i_2, i_2 + arg1.props.countInner)
+        module_2[string.format("%s_%d", "outer", i_2)] = arg1:_makeButton("outer", i_2, i_2 + arg1.props.countInner)
     end
     return createElement_upvr("Frame", {
         Visible = arg1.props.enabled;

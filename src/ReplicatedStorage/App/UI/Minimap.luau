@@ -33,7 +33,7 @@ function any_extend_result1.init(arg1) -- Line 23
 end
 local function makeMinimap_upvr(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 40, Named "makeMinimap"
     local module = {
-        Image = "rbxassetid://%d":format(arg3);
+        Image = string.format("rbxassetid://%d", arg3);
         ImageColor3 = arg1.props.mapImageColor3;
     }
     module.BackgroundTransparency = arg6
@@ -108,8 +108,7 @@ function any_extend_result1.didMount(arg1) -- Line 130
         else
         end
         tbl_15.trackVisible = true
-        var41 = arg1:setState
-        var41(tbl_15)
+        arg1:setState(tbl_15)
     end
 end
 local ColorUtils_upvr = require(ReplicatedStorage.Std.ColorUtils)
@@ -195,7 +194,7 @@ function any_extend_result1.render(arg1) -- Line 179
                         BackgroundTransparency = 1;
                         Size = UDim2.new(1, 0, 1, 0);
                         ImageColor3 = Color3.fromRGB(0, 0, 0);
-                        Image = "rbxassetid://%s":format(v_2.imageId);
+                        Image = string.format("rbxassetid://%s", v_2.imageId);
                     });
                 }
                 local scale = v_2.scale
@@ -223,7 +222,7 @@ function any_extend_result1.render(arg1) -- Line 179
                 })
             end
             assert(var194, "missing classname for label")
-            var177["label_%s":format(v_2.title)] = createElement_upvr(var194, tbl_45, tbl_28)
+            var177[string.format("label_%s", v_2.title)] = createElement_upvr(var194, tbl_45, tbl_28)
         end
     end
     var177._you = createElement_upvr("ImageLabel", {
@@ -375,9 +374,9 @@ function any_extend_result1.render(arg1) -- Line 179
             if not v_3.name then
                 error("circle missing name")
             end
-            local formatted = "circle_%s":format(v_3.name)
+            local formatted = string.format("circle_%s", v_3.name)
             if tbl_44[formatted] then
-                error("duplicate circle name %s":format(v_3.name))
+                error(string.format("duplicate circle name %s", v_3.name))
             end
             function var225(arg1_26) -- Line 419
                 return MinimapUtils_upvr.relativeWorldToScale(2 * arg1_26, 2 * arg1_26, arg1.props.mapWorldWidth, arg1.props.mapWorldHeight)

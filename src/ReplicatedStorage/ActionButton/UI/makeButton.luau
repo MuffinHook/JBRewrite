@@ -8,10 +8,10 @@ local UserInputService_upvr = game:GetService("UserInputService")
 local CircularProgressBar_upvr = require(script.Parent.CircularProgressBar)
 return function(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 9
     -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local formatted_4 = "%s_%d_%s":format(arg2, arg3, "pressed")
-    local formatted_5_upvr = "%s_%d_%s":format(arg2, arg3, "onReleased")
-    local var40_upvr = arg1["%s_%d_%s":format(arg2, arg3, "button")]
-    local var41 = arg1["%s_%d_%s":format(arg2, arg3, "keyCode")]
+    local formatted_4 = string.format("%s_%d_%s", arg2, arg3, "pressed")
+    local formatted_5_upvr = string.format("%s_%d_%s", arg2, arg3, "onReleased")
+    local var40_upvr = arg1[string.format("%s_%d_%s", arg2, arg3, "button")]
+    local var41 = arg1[string.format("%s_%d_%s", arg2, arg3, "keyCode")]
     local var42
     if not var42 then
         var42 = Color3.new(1, 1, 1)
@@ -26,7 +26,7 @@ return function(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 9
         AnchorPoint = Vector2.new(0.5, 0.5);
         Position = UDim2.new(0.5, 0, 0.5, 0);
         Active = false;
-        Image = arg1["%s_%d_%s":format(arg2, arg3, "image")];
+        Image = arg1[string.format("%s_%d_%s", arg2, arg3, "image")];
     }
     if not arg1[formatted_4] or not any_brightenBy_result1_2 then
     end
@@ -146,7 +146,7 @@ return function(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 9
     if not arg1[formatted_4] or not any_brightenBy_result1_2 then
     end
     module_4.ImageColor3 = var42
-    local formatted_2_upvr = "%s_%d_%s":format(arg2, arg3, "onPressed")
+    local formatted_2_upvr = string.format("%s_%d_%s", arg2, arg3, "onPressed")
     module_4[Roact_upvr.Event.InputBegan] = function(arg1_3, arg2_3) -- Line 108
         -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
         local var59

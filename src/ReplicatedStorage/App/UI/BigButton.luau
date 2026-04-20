@@ -16,7 +16,7 @@ function any_extend_result1.render(arg1) -- Line 11
         module.Icon = createElement_upvr("ImageLabel", {
             BackgroundTransparency = 1;
             Size = UDim2.new(1 * arg1.props.imageScale, 0, 1 * arg1.props.imageScale, 0);
-            Image = "rbxassetid://%d":format(arg1.props.imageId);
+            Image = string.format("rbxassetid://%d", arg1.props.imageId);
             AnchorPoint = Vector2.new(0.5, 0.5);
             Position = UDim2.new(0.5, 0, 0.5, 0);
         })

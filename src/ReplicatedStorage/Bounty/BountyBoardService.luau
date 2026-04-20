@@ -8,10 +8,10 @@ function module_upvr.init() -- Line 18
     module_upvr.updateBounties()
     BountyData_upvr:GetPropertyChangedSignal("Value"):Connect(module_upvr.updateBounties)
 end
-local function _(arg1) -- Line 23, Named "thumbnailBust"
-    return "rbxthumb://type=AvatarHeadShot&id=%d&w=420&h=420":format(arg1)
+local function _thumbnailBust(arg1) -- Line 23, Named "thumbnailBust"
+    return string.format("rbxthumb://type=AvatarHeadShot&id=%d&w=420&h=420", arg1)
 end
-local function _(arg1) -- Line 26, Named "comma"
+local function _comma(arg1) -- Line 26, Named "comma"
     local string_match_result1, string_match_result2, string_match_result3 = string.match(arg1, "^([^%d]*%d)(%d*)(.-)$")
     return string_match_result1..string_match_result2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3
 end
@@ -45,7 +45,7 @@ function module_upvr.updateGui(arg1, arg2) -- Line 38
             clone.NameText.Text = Players_upvr:GetPlayerByUserId(var18.UserId).DisplayName
             local string_match_result1_2, string_match_result2_2, string_match_result3_2 = string.match(var18.Bounty, "^([^%d]*%d)(%d*)(.-)$")
             clone.BountyText.Text = '$'..string_match_result1_2..string_match_result2_2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3_2
-            clone.ImageLabel.Image = "rbxthumb://type=AvatarHeadShot&id=%d&w=420&h=420":format(var18.UserId)
+            clone.ImageLabel.Image = string.format("rbxthumb://type=AvatarHeadShot&id=%d&w=420&h=420", var18.UserId)
         else
             clone:ClearAllChildren()
             clone.BackgroundTransparency = 1

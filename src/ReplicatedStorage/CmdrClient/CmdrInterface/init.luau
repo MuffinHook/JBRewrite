@@ -41,7 +41,7 @@ return function(arg1) -- Line 6
         end
         if any_Evaluate_result1 and var96 then
             local any_Validate_result1_4, any_Validate_result2 = any_Evaluate_result1:Validate()
-            module_4_upvr:SetIsValidInput(any_Validate_result1_4, "Validation errors: %s":format(any_Validate_result2 or ""))
+            module_4_upvr:SetIsValidInput(any_Validate_result1_4, string.format("Validation errors: %s", any_Validate_result2 or ""))
             local any_GetArgument_result1 = any_Evaluate_result1:GetArgument(#var94)
             local var100
             if any_GetArgument_result1 then
@@ -152,7 +152,7 @@ return function(arg1) -- Line 6
                         -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
                     end
                 else
-                    module_4_upvr:SetIsValidInput(false, "%q is not a valid command name. Use the help command to see all available commands.":format(popped_2))
+                    module_4_upvr:SetIsValidInput(false, string.format("%q is not a valid command name. Use the help command to see all available commands.", popped_2))
                 end
                 local module_5 = {var117}
                 for _, v_3 in pairs(arg1.Registry:GetCommandNames()) do

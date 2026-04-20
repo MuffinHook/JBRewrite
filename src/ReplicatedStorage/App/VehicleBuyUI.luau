@@ -230,7 +230,7 @@ return function() -- Line 17
         end;
         setVehicle = function(arg1, arg2, arg3) -- Line 246, Named "setVehicle"
             local var45 = arg1
-            TextLabel_2_upvr.Text = "Buy %s for %s?":format(var45, Format_upvr.Currency(arg2))
+            TextLabel_2_upvr.Text = string.format("Buy %s for %s?", var45, Format_upvr.Currency(arg2))
             TextButton_upvr_3.Visible = arg3
             if arg2 <= var34_upvw then
                 var45 = Color3.new(1, 1, 1)

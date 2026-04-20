@@ -60,7 +60,7 @@ function any_extend_result1._fetchStateButton(arg1, arg2, arg3, arg4, arg5) -- L
         any_getBestKeyCode_result1 = Roact_upvr
         any_getBestKeyCode_result1 = any_getBestKeyCode_result1.None
     end
-    arg2["%s_%d_%s":format(arg4, arg5, "keyCode")] = any_getBestKeyCode_result1
+    arg2[string.format("%s_%d_%s", arg4, arg5, "keyCode")] = any_getBestKeyCode_result1
     if arg3.useEvery then
         if not arg3.progressBinding then
             local any_createBinding_result1, any_createBinding_result2_2 = Roact_upvr.createBinding(0)
@@ -75,7 +75,7 @@ function any_extend_result1._fetchStateButton(arg1, arg2, arg3, arg4, arg5) -- L
         if not arg3._i then
             return
         end
-        local pressedKey = "%s_%d_%s":format(arg3._groupKey, arg3._i, "pressed")
+        local pressedKey = string.format("%s_%d_%s", arg3._groupKey, arg3._i, "pressed")
         if arg1.state[pressedKey] then
             arg1:setState({
                 [pressedKey] = false;
@@ -86,14 +86,14 @@ function any_extend_result1._fetchStateButton(arg1, arg2, arg3, arg4, arg5) -- L
             end
         end
     end
-    arg2["%s_%d_%s":format(arg4, arg5, "onReleased")] = releaseState
+    arg2[string.format("%s_%d_%s", arg4, arg5, "onReleased")] = releaseState
     arg3._releaseState = releaseState
     local function pressState(...) -- Line 114
         -- Decomp Error: Reconstructed the button press state transition from a failed Konstant control-flow block.
         if not arg3._i then
             return
         end
-        local pressedKey = "%s_%d_%s":format(arg3._groupKey, arg3._i, "pressed")
+        local pressedKey = string.format("%s_%d_%s", arg3._groupKey, arg3._i, "pressed")
         local wasPressed = arg1.state[pressedKey] == true
         if isToggle(arg3) and wasPressed then
             arg1:setState({
@@ -126,20 +126,20 @@ function any_extend_result1._fetchStateButton(arg1, arg2, arg3, arg4, arg5) -- L
             end
         end
     end
-    arg2["%s_%d_%s":format(arg4, arg5, "onPressed")] = pressState
+    arg2[string.format("%s_%d_%s", arg4, arg5, "onPressed")] = pressState
     arg3._pressState = pressState
     local image = arg3.image
     if not image then
         image = Roact_upvr
         image = image.None
     end
-    arg2["%s_%d_%s":format(arg4, arg5, "image")] = image
-    arg2["%s_%d_%s":format(arg4, arg5, "button")] = arg3
+    arg2[string.format("%s_%d_%s", arg4, arg5, "image")] = image
+    arg2[string.format("%s_%d_%s", arg4, arg5, "button")] = arg3
     if arg3._pressed then
-        arg2["%s_%d_%s":format(arg4, arg5, "pressed")] = true
+        arg2[string.format("%s_%d_%s", arg4, arg5, "pressed")] = true
     else
         -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        arg2["%s_%d_%s":format(arg4, arg5, "pressed")] = false
+        arg2[string.format("%s_%d_%s", arg4, arg5, "pressed")] = false
     end
     arg3._groupKey = arg4
     arg3._i = arg5
@@ -239,12 +239,12 @@ function any_extend_result1.didMount(arg1) -- Line 202
     end))
 end
 function any_extend_result1._copyStateButton(arg1, arg2, arg3, arg4) -- Line 272
-    local formatted = "%s_%d_%s":format(arg3, arg4, "onReleased")
-    local formatted_4 = "%s_%d_%s":format(arg3, arg4, "onPressed")
-    local formatted_2 = "%s_%d_%s":format(arg3, arg4, "image")
-    local formatted_6 = "%s_%d_%s":format(arg3, arg4, "pressed")
-    local formatted_3 = "%s_%d_%s":format(arg3, arg4, "keyCode")
-    local formatted_5 = "%s_%d_%s":format(arg3, arg4, "button")
+    local formatted = string.format("%s_%d_%s", arg3, arg4, "onReleased")
+    local formatted_4 = string.format("%s_%d_%s", arg3, arg4, "onPressed")
+    local formatted_2 = string.format("%s_%d_%s", arg3, arg4, "image")
+    local formatted_6 = string.format("%s_%d_%s", arg3, arg4, "pressed")
+    local formatted_3 = string.format("%s_%d_%s", arg3, arg4, "keyCode")
+    local formatted_5 = string.format("%s_%d_%s", arg3, arg4, "button")
     arg2[formatted] = arg1.state[formatted]
     arg2[formatted_4] = arg1.state[formatted_4]
     arg2[formatted_2] = arg1.state[formatted_2]

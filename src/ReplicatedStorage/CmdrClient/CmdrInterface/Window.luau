@@ -114,11 +114,8 @@ function module_upvr.SetVisible(arg1, arg2) -- Line 90
             return StarterGui_upvr:SetCore(var26_upvr, var24_upvr)
         end)
     end
-    var24_upvr = Entry_upvr
-    var24_upvr = var24_upvr.TextBox:ReleaseFocus
-    var24_upvr()
-    var24_upvr = arg1.AutoComplete:Hide
-    var24_upvr()
+    Entry_upvr.TextBox:ReleaseFocus()
+    arg1.AutoComplete:Hide()
     var24_upvr = arg1.PreviousMouseBehavior
     if var24_upvr then
         var24_upvr = UserInputService_upvr

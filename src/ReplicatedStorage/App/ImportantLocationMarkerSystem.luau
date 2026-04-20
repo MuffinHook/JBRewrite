@@ -33,7 +33,7 @@ function module.init() -- Line 16
         setmetatable(any_new_result1, tbl_3_upvr)
         local var21 = tbl_2_upvr[arg1.Name]
         if not var21 then
-            error("Missing important location marker entry for: %s":format(arg1.Name))
+            error(string.format("Missing important location marker entry for: %s", arg1.Name))
         end
         local ImageId = var21.ImageId
         local var23_upvr = arg1.Name..String_upvr.base85UUID(10)

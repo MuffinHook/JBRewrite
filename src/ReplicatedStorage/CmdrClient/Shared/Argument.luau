@@ -38,7 +38,7 @@ function module_upvr.new(arg1, arg2, arg3) -- Line 113
         module.RawValue = any_ParsePrefixedUnionType_result2
         module.Prefix = any_ParsePrefixedUnionType_result3
         if module.Type == nil then
-            error(`[Cmdr] {module.Name or "none"} has an unregistered type %q`:format(any_ParsePrefixedUnionType_result1 or "<none>"))
+            error(string.format(`[Cmdr] {module.Name or "none"} has an unregistered type %q`, any_ParsePrefixedUnionType_result1 or "<none>"))
         end
     end
     setmetatable(module, module_upvr)
@@ -94,8 +94,8 @@ function module_upvr.Transform(arg1) -- Line 173
                     -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
                 end
             else
+                local any_GetDefaultAutocomplete_result1_6, any_GetDefaultAutocomplete_result2_2 = arg1:GetDefaultAutocomplete()
                 local function decompInlinedCondition_3() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                    local any_GetDefaultAutocomplete_result1_6, any_GetDefaultAutocomplete_result2_2 = arg1:GetDefaultAutocomplete()
                     return any_GetDefaultAutocomplete_result2_2.IsPartial
                 end
                 if var81 == '*' or var81 == "**" or not decompInlinedCondition_3() and 0 < #any_GetDefaultAutocomplete_result1_6 then
@@ -192,21 +192,20 @@ function module_upvr.GetValue(arg1) -- Line 356
     if not arg1.Type.Listable then
         return arg1:ParseValue(1)
     end
+    local var133 = {}
     for i_3 = 1, #arg1.TransformedValues do
         local any_ParseValue_result1 = arg1:ParseValue(i_3)
         if type(any_ParseValue_result1) ~= "table" then
             error(`[Cmdr] Listable types must return a table from Parse {arg1.Type.Name}`)
         end
         for _, v_2 in pairs(any_ParseValue_result1) do
-            ({})[v_2] = true
-            local var133
+            var133[v_2] = true
         end
     end
     local tbl_4 = {}
     for i_5 in pairs(var133) do
         tbl_4[#tbl_4 + 1] = i_5
-        local var138
     end
-    return var138
+    return tbl_4
 end
 return module_upvr
