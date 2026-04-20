@@ -335,6 +335,7 @@ local nitroState = {
 	VehiclesRented = {},
 	Nitro          = 50,
 	NitroLastMax   = 50,
+	NitroForceUIUpdate = false,
 	AtGasStation   = false,
 }
 
@@ -649,7 +650,7 @@ local function lerpTable(from, to, alpha)
 end
 
 -- ── Sound system ──────────────────────────────────────────────
-local activeSounds = {}  -- soundKey → { Object, Proxy }
+local activeSounds = { _counter = 0}  -- soundKey → { Object, Proxy }
 
 function em.playOrStopWorldSound(playerName, soundName, params)
 	local source    = params.Source
@@ -660,12 +661,10 @@ function em.playOrStopWorldSound(playerName, soundName, params)
 
 	if params.TimeStop then maxTime = timeStart + params.TimeStop end
 
-	local proxyId = (activeSounds._counter or 0) + 1
+	local proxyId = activeSounds._counter + 1
 	activeSounds._counter = proxyId
 
-	local soundKey = params.Multi
-		and ("%s_%s_%d"):format(playerName, soundName, proxyId)
-		or  ("%s_%s"):format(playerName, soundName)
+	local soundKey = params.Multi and ("%s_%s_%d"):format(playerName, soundName, proxyId) or ("%s_%s"):format(playerName, soundName)
 
 	local existing = activeSounds[soundKey]
 	if existing then
@@ -691,14 +690,14 @@ function em.playOrStopWorldSound(playerName, soundName, params)
 	sound.Parent = source
 
 	if delay_ then
-		delay(delay_, function() sound:Play() end)
+		task.delay(delay_, function() sound:Play() end)
 	else
 		sound:Play()
 	end
 
 	activeSounds[soundKey] = { Object = sound, Proxy = proxyId }
 
-	delay(maxTime, function()
+	task.delay(maxTime, function()
 		local entry = activeSounds[soundKey]
 		if entry and proxyId >= entry.Proxy then
 			entry.Object:Stop()
@@ -711,13 +710,13 @@ end
 local function playSound(soundName, params, localOnly)
 	if not params.Source then return end
 	params.Play = true
-	if not localOnly then fireServer("e6yn0d8f", soundName, params) end
+	if not localOnly then fireServer("playOrStopWorldSound", soundName, params) end
 	em.playOrStopWorldSound(LocalPlayer.Name, soundName, params)
 end
 
 local function stopSound(soundName, localOnly)
 	local params = {}
-	if not localOnly then fireServer("e6yn0d8f", soundName, params) end
+	if not localOnly then fireServer("playOrStopWorldSound", soundName, params) end
 	em.playOrStopWorldSound(LocalPlayer.Name, soundName, params)
 end
 
@@ -744,13 +743,18 @@ local function spawnFireworks(count)
 		local firework = AlexParticles.Firework(state, newV3(math.random() * sizeX, sizeY, 0), velocity, newV3())
 		firework.ttl      = (sizeY - (sizeY * 0.3 + sizeY * 0.6 * math.random())) / velocity.magnitude
 		firework.OnDestroy = onBurst
-		wait(0.1 + math.random() * 0.05)
+		task.wait(0.1 + math.random() * 0.05)
 	end
 end
 
 function em.spawnFireworks(count) assert(count <= 50); spawnFireworks(count) end
 initConfig.Fireworks = spawnFireworks
 require(RS.Game.Party).Init({ Fireworks = spawnFireworks })
+
+function em.showNotification(data)
+	assert(data ~= nil); assert(data.Text ~= nil)
+	Notification.new({ Text = data.Text, Duration = data.Duration, Style = data.Style })
+end
 
 -- ── Arrest / social actions ───────────────────────────────────
 function em.showArrestBribedCooldown(data)
@@ -862,6 +866,62 @@ RunService.Stepped:Connect(function()
 	end
 end)
 
+local lastTiresPopped = false
+RunService.Heartbeat:Connect(function(dt)
+	debug.profilebegin("Vehicle Heartbeat")
+	local vp = State.vehiclePacket
+	if vp and not vp.Passenger then
+		if vp.Type == "Chassis" then
+			Classes.Chassis.Update(vp, dt)
+		elseif vp.Type == "Heli" then
+			Classes.Heli.Update(vp, dt)
+		elseif vp.Type == "Custom" then
+			if vp.Make == "Volt" then
+				Classes.Volt.Update(vp, dt)
+			end
+		elseif vp.Type == "Motorcycle" or vp.Type == "DuneBuggy" then
+			Classes.Chassis2.UpdateHQ(vp, dt)
+		end
+	end
+	debug.profileend()
+
+	if vp and not vp.Passenger and vp.Type ~= "Heli" and vp.Type ~= "Chassis3" then
+		local tiresPopped = vp.AreTiresPopped
+		local shouldUpdateNitroBar = false
+
+		if nitroState.NitroForceUIUpdate then
+			nitroState.NitroForceUIUpdate = false
+			shouldUpdateNitroBar = true
+		end
+		if VehicleUtils._forceUpdateNitroBar then
+			VehicleUtils._forceUpdateNitroBar = false
+			shouldUpdateNitroBar = true
+		end
+		if vp.Nitro then
+			nitroState.Nitro -= dt * 5
+			shouldUpdateNitroBar = true
+		end
+		if nitroState.Nitro < 0 then
+			nitroState.Nitro = 0
+			stopNitro()
+			shouldUpdateNitroBar = true
+		end
+		if tiresPopped then
+			stopNitro()
+			shouldUpdateNitroBar = true
+		elseif tiresPopped ~= lastTiresPopped and vp._isNitroPressed then
+			startNitro()
+			shouldUpdateNitroBar = true
+		end
+		if tiresPopped ~= lastTiresPopped then
+			lastTiresPopped = tiresPopped
+		end
+		if shouldUpdateNitroBar then
+			VehicleUtils.updateSpdBarRatio(nitroState.Nitro / Settings.Scalar.NitroMax)
+		end
+	end
+end)
+
 -- ── Camera look / head/neck rotation ─────────────────────────
 -- Per-player look spring data (other players)
 local LookState = {
@@ -920,7 +980,7 @@ RunService.Stepped:Connect(function()
 						State.lastLookSendTime = now
 						if Math.IsNaN(heading) then heading = 0 end
 						if Math.IsNaN(pitch)   then pitch   = 0 end
-						if em.hems then fireServer("rhe8ct8j", heading, pitch) end
+						if em.hems then fireServer("updatePlayerLookAngles", heading, pitch) end
 					end
 					debug.profileend()
 				end
@@ -1027,11 +1087,11 @@ local function updateChassisStepped(packet)
 end
 
 local function updateHeliLowQuality(packet, dt)
-	if not packet.Model then return end
-	if packet.HasProp       then Classes.Heli.SpinProp(packet, dt)        return end
-	if packet.IsUFO         then Classes.Heli.SpinUFO(packet, dt)         return end
-	if packet.IsCrewCapsule then Classes.Heli.SpinCrewCapsule(packet, dt) return end
-	if packet.IsDrone       then Classes.Heli.SpinDrone(packet, dt)              end
+	if not packet.Model then return; end;
+	if packet.HasProp       then Classes.Heli.SpinProp(packet, dt);        return end;
+	if packet.IsUFO         then Classes.Heli.SpinUFO(packet, dt);         return end;
+	if packet.IsCrewCapsule then Classes.Heli.SpinCrewCapsule(packet, dt); return end;
+	if packet.IsDrone       then Classes.Heli.SpinDrone(packet, dt);              end
 end
 
 -- ── Horn ──────────────────────────────────────────────────────
@@ -1059,7 +1119,7 @@ local function hornStart()
 			vp.Model:GetAttribute("VehicleHornLoopable"),
 			nil,
 			vp.Model:GetAttribute("VehicleHornVolume"))
-		fireServer("qgqa0qfy", true)
+		fireServer("playHornRemote", true)
 	end
 end
 
@@ -1068,7 +1128,7 @@ local function hornStop()
 	if vp and not vp.Passenger then
 		local s = vp.Model:FindFirstChild("BoundingBox"):FindFirstChild("_HornSound")
 		if s then s:Destroy() end
-		fireServer("qgqa0qfy", false)
+		fireServer("playHornRemote", false)
 	end
 end
 
@@ -1164,7 +1224,7 @@ require(RS.Game.DefaultActions).init({
 		if not character.PrimaryPart then return end
 		if Classes.Heli.Roped then return end
 		if Falling.IsRagdolling() then return end
-		if Paraglide.IsFlying() then return false end
+		if Paraglide.IsFlying() then return end
 		if not InventoryItemSystem.unequipAll() then return end
 		local equipped = ItemSystem.GetLocalEquipped()
 		if equipped and equipped.ItemData.Locked then return end
@@ -1483,7 +1543,7 @@ end
 VehicleBuyUI.onAction:Connect(function(action)
 	if action == "Buy" then
 		if not State.pendingVehicleId then cancelVehiclePurchase()
-		else fireServer("aui8hjlb", State.pendingVehicleId) end
+		else fireServer("handleVehiclePurchaseResult", State.pendingVehicleId) end
 	elseif action == "Cancel" then
 		cancelVehiclePurchase()
 	elseif action == "Cash" then
@@ -1534,7 +1594,7 @@ function em.showVehicleLockedMessage()
 	local msg = MainGui.SimpleMessage
 	msg.Visible = true
 	msg.Text    = Localization:FormatByKey("Vehicle.Locked")
-	delay(1, function() msg.Visible = false end)
+	task.delay(1, function() msg.Visible = false end)
 end
 
 -- ── Vehicle follow-camera setting ────────────────────────────
@@ -1660,7 +1720,7 @@ function em.exitVehicle()
 
 	if InputUtils.isTouch() then
 		State.isSprinting = true
-		if not not DefaultActions.sprintButton._pressed ~= true and DefaultActions.sprintButton._pressState then
+		if not DefaultActions.sprintButton._pressed and DefaultActions.sprintButton._pressState then
 			DefaultActions.sprintButton._pressState()
 		end
 	end
@@ -1749,7 +1809,12 @@ function em.spawnCrashParticles(part)
 	p.Size = part.Size; p.Parent = workspace
 	local emitter = RS.Resource.CrashParticle:Clone()
 	emitter.Parent = p
-	emitter:Emit(8); wait(); emitter:Emit(8); wait(); emitter:Emit(8); wait()
+	emitter:Emit(8)
+	task.wait()
+	emitter:Emit(8)
+	task.wait()
+	emitter:Emit(8)
+	task.wait()
 	game.Debris:AddItem(p, 5)
 end
 
@@ -1767,7 +1832,7 @@ end
 
 function em.showFaultyActionMessage()
 	MainGui.FaultyAction.Visible = true
-	wait(4)
+	task.wait(4)
 	MainGui.FaultyAction.Visible = false
 end
 
@@ -1878,6 +1943,7 @@ local function findDoorLight(doorModel)
 	if lv and lv:IsA("ObjectValue") and lv.Value and lv.Value:IsA("BasePart") then return lv.Value end
 	local m = doorModel:FindFirstChild("Model")
 	if m and m:FindFirstChild("Light") then return m.Light end
+	return nil
 end
 
 local function slideDoor(doorState)
@@ -1893,7 +1959,7 @@ local function slideDoor(doorState)
 			if light then light.Color = Color3.fromRGB(163, 75, 75) end
 		end
 	end
-	if doorState.State.NoAnimate then doorState.State.NoAnimate = false; return finish() end
+	if doorState.State.NoAnimate then doorState.State.NoAnimate = false;  finish() end
 	if open and light then light.Color = Color3.fromRGB(102, 137, 172) end
 	local maid     = doorState.doorMaid
 	local progress = 0
@@ -1903,12 +1969,17 @@ local function slideDoor(doorState)
 		local t = progress * 2
 		local alpha = t < 1 and 0.5*t*t or -0.5*((t-1)*(t-3)-1)
 		if not open then alpha = 1 - alpha end
+
 		doorModel.Model:SetPrimaryPartCFrame(closedCF:lerp(openCF, alpha))
 		if progress >= 1 then
 			maid.Stepped = nil
-			if open then doorModel.Model:SetPrimaryPartCFrame(openCF)
-			else doorModel.Model:SetPrimaryPartCFrame(closedCF)
-				if light then light.Color = Color3.fromRGB(163, 75, 75) end
+			if open then
+				doorModel.Model:SetPrimaryPartCFrame(openCF) 
+			else
+				doorModel.Model:SetPrimaryPartCFrame(closedCF)
+				if light then
+					light.Color = Color3.fromRGB(163, 75, 75) 
+				end
 			end
 		end
 	end)
@@ -1930,7 +2001,7 @@ local function swingDoor(doorState)
 			if light then light.Color = Color3.fromRGB(163, 75, 75) end
 		end
 	end
-	if doorState.State.NoAnimate then doorState.State.NoAnimate = false; return finish() end
+	if doorState.State.NoAnimate then doorState.State.NoAnimate = false; finish() end
 	if open and light then light.Color = Color3.fromRGB(102, 137, 172) end
 	local maid     = doorState.doorMaid
 	local progress = 0
@@ -2181,41 +2252,82 @@ function em.receiveDoorState(doorData)  receiveDoor(doorData)   end
 function em.receiveDoorsState(doorsData) receiveDoors(doorsData) end
 
 -- ── Sound / shadow settings ───────────────────────────────────
-local function addSliderSetting(name, title, order, soundGroup)
-	local cfg = { name = name, title = title,
-		type = Modules.gameSettingType.Slider, defaultValue = 100,
-		order = order, min = 0, max = 100, step = 1,
-		textMap = function(v) return ("%d%%"):format(v) end }
+type AddedGameSetting = {
+	onChanged: any,
+	getValue: (self: AddedGameSetting) -> any,
+}
+
+local function addGameSetting<T>(cfg: T): T & AddedGameSetting
 	GameSettingsService.add(cfg)
+	return cfg :: any
+end
+
+local function addSliderSetting(name, title, order, soundGroup)
+	local cfg = addGameSetting({
+		name = name,
+		title = title,
+		type = Modules.gameSettingType.Slider,
+		defaultValue = 100,
+		order = order,
+		min = 0,
+		max = 100,
+		step = 1,
+		textMap = function(v)
+			return ("%d%%"):format(v)
+		end,
+	})
+
 	local function apply(v)
 		Services.SoundService[soundGroup].Volume = math.clamp(v / 100, 0, 1)
 	end
-	apply(cfg:getValue())
+
+	apply(GameSettingsService.getValue(cfg))
 	cfg.onChanged:Connect(apply)
 end
-addSliderSetting("robberyMusic", "Robbery Music",  10, "RobberyMusic")
-addSliderSetting("otherRadios",  "Other Radios",   11, "OtherRadios")
+
+addSliderSetting("robberyMusic", "Robbery Music", 10, "RobberyMusic")
+addSliderSetting("otherRadios", "Other Radios", 11, "OtherRadios")
 
 local lightShadowsEnabled = true
 do
-	local cfg = { name = "lightShadows", title = "Light Shadows",
-		type = Modules.gameSettingType.Checkbox, defaultValue = true, order = 500 }
-	GameSettingsService.add(cfg)
-	cfg.onChanged:Connect(function(enabled)
+	local cfg = addGameSetting({
+		name = "lightShadows",
+		title = "Light Shadows",
+		type = Modules.gameSettingType.Checkbox,
+		defaultValue = true,
+		order = 500,
+	})
+
+	local function apply(enabled)
 		lightShadowsEnabled = enabled
-		for _, light in CollectionService:GetTagged("ShadowLight") do light.Shadows = enabled end
-	end)
+		for _, light in CollectionService:GetTagged("ShadowLight") do
+			light.Shadows = enabled
+		end
+	end
+
+	apply(GameSettingsService.getValue(cfg))
+	cfg.onChanged:Connect(apply)
+
 	CollectionService:GetInstanceAddedSignal("ShadowLight"):Connect(function(light)
 		light.Shadows = lightShadowsEnabled
 	end)
 end
 
 do
-	local cfg = { name = "sunShadows", title = "Sun Shadows",
-		type = Modules.gameSettingType.Checkbox, defaultValue = true, noSave = true, order = 510 }
-	GameSettingsService.add(cfg)
-	local function apply(enabled) game:GetService("Lighting").GlobalShadows = enabled end
-	apply(cfg:getValue())
+	local cfg = addGameSetting({
+		name = "sunShadows",
+		title = "Sun Shadows",
+		type = Modules.gameSettingType.Checkbox,
+		defaultValue = true,
+		noSave = true,
+		order = 510,
+	})
+
+	local function apply(enabled)
+		game:GetService("Lighting").GlobalShadows = enabled
+	end
+
+	apply(GameSettingsService.getValue(cfg))
 	cfg.onChanged:Connect(apply)
 end
 
@@ -2454,9 +2566,9 @@ end
 -- ── Queue join ────────────────────────────────────────────────
 function em.forwardEventAndDispatch(eventName, ...)
 	if eventName == "ems" then
-		delay(0.5, function() fireServer("jq86koa2", eventName) end)
+		task.delay(0.5, function() fireServer("forwardEventAndDispatch", eventName) end)
 	else
-		fireServer("jq86koa2", eventName)
+		fireServer("forwardEventAndDispatch", eventName)
 	end
 	assert(em[eventName], eventName)(...)
 end
@@ -2472,10 +2584,7 @@ function em.showSystemChatMessage(message, color)
 	end)
 end
 
-function em.showNotification(data)
-	assert(data ~= nil); assert(data.Text ~= nil)
-	Notification.new({ Text = data.Text, Duration = data.Duration, Style = data.Style })
-end
+
 
 function em.showBossNotification(message, extra)
 	assert(message ~= nil); Notification.notifyBoss(message, extra)
@@ -2529,7 +2638,7 @@ local function attemptVehicleEnter(seat)
 	if not State.vehiclePacket then fireServer("qhtaomcf", seat.Parent, seat) end
 end
 
-function em.showCircleActionNotAllowed() wait(); UI.CircleAction.NotAllowed() end
+function em.showCircleActionNotAllowed() task.wait(); UI.CircleAction.NotAllowed() end
 
 -- ── Walk speed ────────────────────────────────────────────────
 local InventoryItemUtils = require(RS.Inventory.InventoryItemUtils)
@@ -3010,7 +3119,7 @@ end)
 do
 	local resetEvent = Instance.new("BindableEvent")
 	resetEvent.Event:connect(function() fireServer("k60hnevw") end)
-	delay(2, function()
+	task.delay(2, function()
 		local ok, err = pcall(function() StarterGui:SetCore("ResetButtonCallback", resetEvent) end)
 		if not ok then print("MANUAL RESET ERROR", err) end
 	end)
@@ -3026,12 +3135,6 @@ do
 		while true do end
 	end)
 end
-
--- ── Special cleanup ───────────────────────────────────────────
-delay(10, function()
-	local machine = workspace:FindFirstChild("KreeksTimeMachine")
-	if machine and LocalPlayer.UserId == 140258990 then machine:Destroy() end
-end)
 
 -- ── Anti-cheat ────────────────────────────────────────────────
 local AntiCheat = {
@@ -3058,7 +3161,7 @@ local function onCharacterAdded_AntiCheat(character)
 				AntiCheat.stateChangeDelta = 0
 				if AntiCheat.backpackFlag then return end
 				AntiCheat.backpackFlag = true
-				fireServer("yqs1cu3t", "NoClip StrafingNoPhysics", false)
+				fireServer("reportClient", "NoClip StrafingNoPhysics", false)
 			end
 		end
 	end)
@@ -3067,13 +3170,13 @@ end
 if LocalPlayer.Character then onCharacterAdded_AntiCheat(LocalPlayer.Character) end
 LocalPlayer.CharacterAdded:Connect(onCharacterAdded_AntiCheat)
 
-spawn(function()
+task.spawn(function()
 	local ok, err = pcall(function()
 		LocalPlayer:WaitForChild("Backpack", 20).ChildAdded:Connect(function(item)
 			if item:IsA("BackpackItem") then
 				if AntiCheat.backpackFlag then return end
 				AntiCheat.backpackFlag = true
-				fireServer("yqs1cu3t", "BackpackTool", false)
+				fireServer("reportClient", "BackpackTool", false)
 			end
 		end)
 	end)
@@ -3098,7 +3201,7 @@ local function runCheatCheck()
 	if debug.getupvalues then detected = true end
 	if detected then
 		AntiCheat.reported = true
-		fireServer("yqs1cu3t", "Getupvalues", false)
+		fireServer("reportClient", "Getupvalues", false)
 	end
 end
 
@@ -3106,7 +3209,7 @@ threadLoopAdd(1, function()
 	local ok = pcall(runCheatCheck)
 	if not ok then
 		AntiCheat.reported = true
-		fireServer("yqs1cu3t", "FailedPcall", false)
+		fireServer("reportClient", "FailedPcall", false)
 	end
 end)
 
