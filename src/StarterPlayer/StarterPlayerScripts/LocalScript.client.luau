@@ -119,7 +119,7 @@ local function onClientEvent(eventName, ...)
 	assert(em[eventName], eventName)(...)
 end
 
-function em.ywx2xyj9(nameMap)
+function em.initializeEventNameMap(nameMap)
 	em.hems  = true
 	eventNameMap = nameMap
 end
@@ -212,7 +212,7 @@ require(RS.Game.ItemSkin.UI.UI).Init()
 local PoliceReportUI = require(RS.Game.PoliceReportUI.PoliceReportUI)
 PoliceReportUI.Init()
 
-function em.w46mpc4t(data)
+function em.showPoliceReport(data)
 	PoliceReportUI.Display(data)
 end
 
@@ -404,7 +404,7 @@ end
 Services.MarketplaceService.PromptGamePassPurchaseFinished:Connect(onGamePassPurchaseFinished)
 Services.MarketplaceService.PromptPurchaseFinished:Connect(onGamePassPurchaseFinished)
 
-function em.id40myec(passData) promptPurchase(passData) end
+function em.promptGamepassPurchase(passData) promptPurchase(passData) end
 
 local GamepassSystem = require(RS.Gamepass.GamepassSystem)
 GamepassSystem.Init()
@@ -465,14 +465,14 @@ VehicleSystem.RegisterModule(require(RS.Game.VehicleSystem.JetSki))
 VehicleSystem.RegisterModule(Jet)
 VehicleSystem.RegisterModule(require(RS.Game.Plane.Stunt))
 
-function em.thzlyviq(missileData, extraData)
+function em.updateVehicleMissileUI(missileData, extraData)
 	local packet = VehicleSystem.WaitForVehiclePacket(LocalPlayer)
 	if packet == nil then error("No vehicle exists for LocalPlayer") end
 	packet:UpdateMissileUI(missileData, extraData)
 end
 
 local Missile = require(RS.Game.Missile)
-function em.bj4dgn5q(a, b, c, d) Missile.LaunchMissile(a, b, c, d) end
+function em.launchMissile(a, b, c, d) Missile.LaunchMissile(a, b, c, d) end
 
 require(RS.Game.Robbery.PuzzleFlow).Init({ Event = Event, em = em })
 require(RS.Game.Robbery.PowerPlant.PowerPlant).Init({ Event = Event, em = em })
@@ -491,8 +491,8 @@ end)
 
 local Streetlights = require(RS.Game.Streetlights)
 Streetlights.init()
-function em.rx1h2lg9()       Streetlights.Flicker()         end
-function em.slz18r09(enabled) Streetlights.SetEnabled(enabled) end
+function em.flickerStreetlights()       Streetlights.Flicker()         end
+function em.setStreetlightsEnabled(enabled) Streetlights.SetEnabled(enabled) end
 
 require(RS.App.MinimapService).init()
 require(RS.Game.RoadSpikeSystem).Init({ Event = Event })
@@ -554,7 +554,7 @@ local SettingsState = {
 	current  = {},  -- live values
 }
 
-function em.tfy0g86o(settingsMap)
+function em.applyGameSettings(settingsMap)
 	SettingsState.current = settingsMap
 	for name, value in pairs(settingsMap) do
 		local setting = GameSettingsService.getByName and GameSettingsService.getByName(name)
@@ -651,7 +651,7 @@ end
 -- ── Sound system ──────────────────────────────────────────────
 local activeSounds = {}  -- soundKey → { Object, Proxy }
 
-function em.e6yn0d8f(playerName, soundName, params)
+function em.playOrStopWorldSound(playerName, soundName, params)
 	local source    = params.Source
 	local volume    = math.min(params.Volume or 0.5, 2)
 	local maxTime   = params.MaxTime or 1
@@ -712,13 +712,13 @@ local function playSound(soundName, params, localOnly)
 	if not params.Source then return end
 	params.Play = true
 	if not localOnly then fireServer("e6yn0d8f", soundName, params) end
-	em.e6yn0d8f(LocalPlayer.Name, soundName, params)
+	em.playOrStopWorldSound(LocalPlayer.Name, soundName, params)
 end
 
 local function stopSound(soundName, localOnly)
 	local params = {}
 	if not localOnly then fireServer("e6yn0d8f", soundName, params) end
-	em.e6yn0d8f(LocalPlayer.Name, soundName, params)
+	em.playOrStopWorldSound(LocalPlayer.Name, soundName, params)
 end
 
 -- ── Fireworks ─────────────────────────────────────────────────
@@ -748,14 +748,14 @@ local function spawnFireworks(count)
 	end
 end
 
-function em.at2y4lws(count) assert(count <= 50); spawnFireworks(count) end
+function em.spawnFireworks(count) assert(count <= 50); spawnFireworks(count) end
 initConfig.Fireworks = spawnFireworks
 require(RS.Game.Party).Init({ Fireworks = spawnFireworks })
 
 -- ── Arrest / social actions ───────────────────────────────────
-function em.vqyvrr03(data)
+function em.showArrestBribedCooldown(data)
 	if data.Bribed then
-		em.ropj1fju({ Title = "Arrest", Text = ("You are bribed! Wait %d seconds."):format(data.Bribed) })
+		em.showNotification({ Title = "Arrest", Text = ("You are bribed! Wait %d seconds."):format(data.Bribed) })
 	end
 end
 
@@ -764,9 +764,9 @@ local function attemptBreakout(player)    fireServer("lwe8eamu", player.Name) en
 local function attemptVehicleEject(v)     fireServer("d4lekogp", v)           end
 local function attemptVehicleHotwire(v, i) fireServer("df3viejr", v, i)       end
 
-function em.qeol5u0t(data)
+function em.showBreakoutCooldown(data)
 	if data.Cooldown then
-		em.ropj1fju({ Title = "Breakout", Text = ("Wait %d seconds."):format(data.Cooldown) })
+		em.showNotification({ Title = "Breakout", Text = ("Wait %d seconds."):format(data.Cooldown) })
 	end
 end
 
@@ -806,7 +806,7 @@ local function startNitro()
 	end
 
 	if nitroState.Nitro / nitroState.NitroLastMax <= 0.01 then
-		em.ii3wc6xy(true, true)
+		em.setNitroShopVisible(true, true)
 	end
 end
 
@@ -825,7 +825,7 @@ local function stopNitro()
 end
 
 -- ── Nitro UI ──────────────────────────────────────────────────
-function em.pd0xkej2(currentNitro, maxNitro)
+function em.updateNitroUI(currentNitro, maxNitro)
 	local displayNitro = Modules.RunUtils.isTradeWorld() and Settings.Scalar.NitroMax or currentNitro
 	nitroState.Nitro          = displayNitro
 	nitroState.NitroLastMax   = maxNitro
@@ -1072,7 +1072,7 @@ local function hornStop()
 	end
 end
 
-function em.qgqa0qfy(_name, part, play, soundId, looped, _dur, volume)
+function em.playHornRemote(_name, part, play, soundId, looped, _dur, volume)
 	playHorn(part, play, soundId, looped, 10, volume)
 end
 
@@ -1196,14 +1196,14 @@ require(RS.Game.DefaultActions).init({
 })
 
 -- ── Schedule / team updates ───────────────────────────────────
-function em.yr2z2sm8(schedule)
+function em.updateSchedule(schedule)
 	GameUtil.Schedule = schedule
 	if GameUtil.Team == Settings.EnumTeam.Prisoner and Modules.RunUtils.isMainWorld() then
-		em.ropj1fju({ Text = Localization:FormatByKey("Schedule." .. schedule) })
+		em.showNotification({ Text = Localization:FormatByKey("Schedule." .. schedule) })
 	end
 end
 
-function em.rhe8ct8j(playerName, heading, pitch)
+function em.updatePlayerLookAngles(playerName, heading, pitch)
 	local data = LookState.playerData[playerName]
 	if not data then
 		data = {
@@ -1230,7 +1230,7 @@ local CartBinder = require(RS.Game.Cart.CartBinder)
 local function onJump()
 	if State.vehiclePacket then
 		if LocalPlayer.Character and LocalPlayer.Character:GetAttribute("TankRoyaleAlive") then
-			em.ropj1fju({ Text = "You cannot exit Tanks in this gamemode." })
+			em.showNotification({ Text = "You cannot exit Tanks in this gamemode." })
 			return
 		end
 		VehicleUtils.OnVehicleJumpExited:Fire(State.vehiclePacket)
@@ -1286,8 +1286,8 @@ function GameUtil.removeDeathLighting()
 	end)
 end
 
-function em.bq8r2bzi()
-	wait()
+function em.onCharacterSpawned()
+	task.wait()
 	local character = LocalPlayer.Character
 	if not character then return end
 	local humanoid = character:FindFirstChild("Humanoid")
@@ -1313,20 +1313,20 @@ function em.bq8r2bzi()
 	end
 	if InputUtils.isTouch() then
 		State.isSprinting = true
-		if not not DefaultActions.sprintButton._pressed ~= true and DefaultActions.sprintButton._pressState then
+		if not DefaultActions.sprintButton._pressed and DefaultActions.sprintButton._pressState then
 			DefaultActions.sprintButton._pressState()
 		end
 	end
 	overrideDeathMessage = nil
 end
 
-function em.t6yqxhtu(silentDeath)
+function em.onLocalPlayerDied(silentDeath)
 	State.isFrozen    = false
 	State.isSprinting = false
 	State.isStunned   = false
 	CharacterUtil.IsCrawling = false
 	CharacterUtil.IsCrawlingChanged:Fire(false)
-	if not not DefaultActions.sprintButton._pressed ~= false and DefaultActions.sprintButton._pressState then
+	if DefaultActions.sprintButton._pressed and DefaultActions.sprintButton._pressState then
 		DefaultActions.sprintButton._pressState()
 	end
 	onJump()
@@ -1348,7 +1348,7 @@ function em.t6yqxhtu(silentDeath)
 			end
 			applyDeathLighting(DeathLighting.from, DeathLighting.to, progress)
 		end)
-		delay(0.5, function()
+		task.delay(0.5, function()
 			DeathGui.Frame.Size     = UDim2.new(1, 40, 0, 0)
 			DeathGui.Frame.Position = UDim2.new(0, -20, 0.5, 0)
 			DeathGui.Frame:TweenSizeAndPosition(
@@ -1371,7 +1371,7 @@ end)
 local appStore  = require(RS.App.store)
 local homeStore = require(RS.Home.homeStore)
 
-function em.kme0tgg1(data)
+function em.updateCash(data)
 	assert(data ~= nil)
 	local VehicleBuyUIInst = require(RS.App.VehicleBuyUI)()
 	VehicleBuyUIInst.setCash(data.Cash)
@@ -1382,7 +1382,7 @@ function em.kme0tgg1(data)
 	homeStore:dispatch({ type = "setCash", cash = data.Cash })
 end
 
-function em.k6462bo3(delta, reason)
+function em.showCashDelta(delta, reason)
 	State.cashPopCounter += 1
 	local id = State.cashPopCounter
 	if delta > 0 then
@@ -1428,7 +1428,7 @@ end
 for _, state in VehicleStateBinder:GetAll() do giveVehicleStateMaidTask(state) end
 VehicleStateBinder:GetClassAddedSignal():Connect(giveVehicleStateMaidTask)
 
-function em.dxdg69sw(playerName) LookState.playerData[playerName] = nil end
+function em.clearPlayerLookState(playerName) LookState.playerData[playerName] = nil end
 
 -- ── Zoom controller ───────────────────────────────────────────
 local ZoomController
@@ -1493,13 +1493,13 @@ VehicleBuyUI.onAction:Connect(function(action)
 	end
 end)
 
-function em.aui8hjlb(result)
+function em.handleVehiclePurchaseResult(result)
 	if result.Success then
 		VehicleBuyUI.setEnabled(false); spawnFireworks(5)
 	elseif result.NotEnoughMoney then
 		VehicleBuyUI.setEnabled(false); onJump(); CashBuyUI.Open()
 	elseif result.LowLevel then
-		em.ropj1fju({ Title = "Vehicle", Text = ("This requires level %d."):format(result.LowLevel) })
+		em.showNotification({ Title = "Vehicle", Text = ("This requires level %d."):format(result.LowLevel) })
 	else
 		VehicleBuyUI.setEnabled(false); onJump()
 	end
@@ -1509,11 +1509,11 @@ Modules.waitForChild(RS, "UpdateOwnedCashBillboard"):andThen(function(remote)
 	remote.OnClientEvent:Connect(function(owned) nitroState.VehiclesOwned = owned end)
 end)
 
-function em.e5m4ibm3(rented) nitroState.VehiclesRented = rented end
+function em.updateRentedVehicles(rented) nitroState.VehiclesRented = rented end
 
 local ItemUtils = require(RS.App.ItemUtils)
 
-function em.uv86pihh(vehicleId, passData, rentable)
+function em.showVehiclePurchasePrompt(vehicleId, passData, rentable)
 	State.pendingVehicleId = vehicleId
 	if passData then
 		promptPurchase(passData)
@@ -1524,13 +1524,13 @@ function em.uv86pihh(vehicleId, passData, rentable)
 		VehicleBuyUI.setEnabled(true)
 		Modules.EzUtils.selectIfGamepad(VehicleBuyUI.BuyButton)
 	elseif vehicleId == "EscapeBot" then
-		em.ropj1fju({ Text = "Roll the Legendary EscapeBot from a CEO Battle to fly" })
+		em.showNotification({ Text = "Roll the Legendary EscapeBot from a CEO Battle to fly" })
 	else
-		em.ropj1fju({ Text = "This vehicle cannot be purchased!" })
+		em.showNotification({ Text = "This vehicle cannot be purchased!" })
 	end
 end
 
-function em.mxzf1eyf()
+function em.showVehicleLockedMessage()
 	local msg = MainGui.SimpleMessage
 	msg.Visible = true
 	msg.Text    = Localization:FormatByKey("Vehicle.Locked")
@@ -1568,15 +1568,15 @@ GameSettingsService.add({
 -- ── Vehicle enter helpers ─────────────────────────────────────
 local function predicateWaitForMe(name) return name == LocalPlayer.Name end
 
-function em.thkq6fex(objValue, packet)
+function em.resolveStreamedVehiclePacket(objValue, packet)
 	Modules.StreamingHelperUtils.yieldForObjValuePopulated(objValue)
 	local _Packet = objValue.Value:WaitForChild("_Packet")
 	Modules.StreamingHelperUtils.yieldForAllValuesPopulated(_Packet)
 	Modules.TableUtils.mergeDeepInPlace(Modules.TableUtils.createTableFromObjectValues(_Packet), packet)
-	em.yrh8142b(packet)
+	em.waitForLocalVehicleSeat(packet)
 end
 
-function em.yrh8142b(packet)
+function em.waitForLocalVehicleSeat(packet)
 	local promises = {}
 	for _, child in packet.Model:GetChildren() do
 		if child:IsA("BasePart") and (child.Name == "Seat" or child.Name == "Passenger") then
@@ -1628,7 +1628,7 @@ VehicleUtils.OnVehicleEntered:Connect(function(packet)
 end)
 
 -- ── Vehicle exit ──────────────────────────────────────────────
-function em.edoa48re()
+function em.exitVehicle()
 	if State.enterVehiclePromise then State.enterVehiclePromise:cancel() end
 	if not State.vehiclePacket then return end
 
@@ -1722,18 +1722,18 @@ VehicleUtils.OnVehicleJumpExited:Connect(function(packet)
 end)
 
 -- ── Vehicle state helpers ─────────────────────────────────────
-function em.ylz3fyvx(updates)
+function em.updateCurrentVehiclePacket(updates)
 	if not State.vehiclePacket then return end
 	for k, v in next, updates do State.vehiclePacket[k] = v end
 end
 
-function em.jz4led4v()
+function em.forceHeliFallOutOfSky()
 	if not State.vehiclePacket then return end
 	if State.vehiclePacket.Type ~= "Heli" then return end
 	Classes.Heli.FallOutOfSky(State.vehiclePacket)
 end
 
-function em.r6mgllne(data)
+function em.spinOutVehicle(data)
 	if not State.vehiclePacket then error("no vehicle packet") end
 	if State.vehiclePacket.Type == "Chassis" then
 		Classes.Chassis.SpinOut(State.vehiclePacket, data)
@@ -1742,7 +1742,7 @@ function em.r6mgllne(data)
 	end
 end
 
-function em.mfulncxb(part)
+function em.spawnCrashParticles(part)
 	local p = Instance.new("Part")
 	p.Name = "CrashParticles"; p.Transparency = 1; p.Anchored = true; p.CanCollide = false
 	p.CFrame = part.CFrame + part.Parent.Engine.CFrame.LookVector * 5
@@ -1753,7 +1753,7 @@ function em.mfulncxb(part)
 	game.Debris:AddItem(p, 5)
 end
 
-function em.z8eqpw0w()
+function em.cancelOrDampenVelocity()
 	local character = LocalPlayer.Character
 	if not character then return end
 	local root = character.PrimaryPart
@@ -1765,7 +1765,7 @@ function em.z8eqpw0w()
 	end
 end
 
-function em.lxk2bjhj()
+function em.showFaultyActionMessage()
 	MainGui.FaultyAction.Visible = true
 	wait(4)
 	MainGui.FaultyAction.Visible = false
@@ -2161,7 +2161,7 @@ local function receiveDoors(doorsData)
 	end
 end
 
-function em.tznqskza(doorState)
+function em.openDoor(doorState)
 	if doorState.Resolved and doorState.OpenFun then
 		doorState.State.Open = true; doorState:OpenFun()
 	else
@@ -2169,7 +2169,7 @@ function em.tznqskza(doorState)
 	end
 end
 
-function em.rqs0egdz(doorState)
+function em.closeDoor(doorState)
 	if doorState.Resolved and doorState.CloseFun then
 		doorState.State.Open = false; doorState:CloseFun()
 	else
@@ -2177,8 +2177,8 @@ function em.rqs0egdz(doorState)
 	end
 end
 
-function em.vbv5o6pe(doorData)  receiveDoor(doorData)   end
-function em.u5xip6du(doorsData) receiveDoors(doorsData) end
+function em.receiveDoorState(doorData)  receiveDoor(doorData)   end
+function em.receiveDoorsState(doorsData) receiveDoors(doorsData) end
 
 -- ── Sound / shadow settings ───────────────────────────────────
 local function addSliderSetting(name, title, order, soundGroup)
@@ -2346,7 +2346,7 @@ local function stopRainThread()
 	end
 end
 
-function em.zmalhl4u(timeOfDay)
+function em.updateTimeOfDay(timeOfDay)
 	if timeOfDay == State.currentTimeOfDay then return end
 	if timeOfDay == "Day" then
 		transitionAmbient(Settings.Ambient[State.currentTimeOfDay], Settings.Ambient.Day)
@@ -2387,7 +2387,7 @@ State.nitroGuiHandle.Container.Close.MouseButton1Down:connect(function()
 	Modules.AlexWM.WindowClose(nitroWindow)
 end)
 
-function em.ii3wc6xy(open, skipGasStation)
+function em.setNitroShopVisible(open, skipGasStation)
 	if Modules.RunUtils.isTradeWorld() then return end
 	if open then
 		if not skipGasStation then nitroState.AtGasStation = true end
@@ -2397,7 +2397,7 @@ function em.ii3wc6xy(open, skipGasStation)
 		Modules.AlexWM.WindowClose(nitroWindow)
 	end
 end
-VehicleUtils.NitroShopVisible = em.ii3wc6xy
+VehicleUtils.NitroShopVisible = em.setNitroShopVisible
 
 task.spawn(function()
 	if not Settings.FetchedMarketplace then Settings.OnProductsFetched:Wait() end
@@ -2408,7 +2408,7 @@ task.spawn(function()
 				btn.Button.Title.Text = ("+%d"):format(product.Fuel)
 				btn.Button.MouseButton1Down:connect(function()
 					if Settings.Scalar.NitroMax - 25 <= nitroState.Nitro then
-						em.ropj1fju({ Title = "Rocket Fuel", Text = "You have a lot of fuel, go use it!" })
+						em.showNotification({ Title = "Rocket Fuel", Text = "You have a lot of fuel, go use it!" })
 					else
 						local hasPass = nitroState.AtGasStation
 							or GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.PremiumGarage)
@@ -2427,15 +2427,15 @@ if Modules.RunUtils.isMainWorld() then
 		local escaped = LocalPlayer:GetAttribute("HasEscaped") == true
 		initConfig.HasEscaped = escaped
 		if escaped then
-			em.ropj1fju({ Text = ("%s"):format(Localization:FormatByKey("Banner.EscapedDesc")), Duration = 6 })
-			em.ropj1fju({ Text = ("%s"):format(Localization:FormatByKey("Banner.Escaped")), Style = "Alert", Duration = 6 })
+			em.showNotification({ Text = ("%s"):format(Localization:FormatByKey("Banner.EscapedDesc")), Duration = 6 })
+			em.showNotification({ Text = ("%s"):format(Localization:FormatByKey("Banner.Escaped")), Style = "Alert", Duration = 6 })
 		end
 	end
 	updateHasEscaped()
 	LocalPlayer:GetAttributeChangedSignal("HasEscaped"):connect(updateHasEscaped)
 end
 
-function em.wzedh1rv()
+function em.popVehicleTires()
 	if State.vehiclePacket then VehicleUtils.setTireHealth(State.vehiclePacket.Model, 0) end
 end
 
@@ -2452,7 +2452,7 @@ local function cycleHelpMessage()
 end
 
 -- ── Queue join ────────────────────────────────────────────────
-function em.jq86koa2(eventName, ...)
+function em.forwardEventAndDispatch(eventName, ...)
 	if eventName == "ems" then
 		delay(0.5, function() fireServer("jq86koa2", eventName) end)
 	else
@@ -2465,25 +2465,25 @@ end
 require(RS.TeamSelect.TeamChooseUI).Init({ Event = Event, em = em, OnJump = onJump })
 
 -- ── Notifications / chat ──────────────────────────────────────
-function em.edkiemd4(message, color)
+function em.showSystemChatMessage(message, color)
 	local formatted = Modules.RichTextUtils.addColorToText(message, color)
 	pcall(function()
 		Services.TextChatService.TextChannels.RBXGeneral:DisplaySystemMessage(formatted, "BadimoSystemMessage")
 	end)
 end
 
-function em.ropj1fju(data)
+function em.showNotification(data)
 	assert(data ~= nil); assert(data.Text ~= nil)
 	Notification.new({ Text = data.Text, Duration = data.Duration, Style = data.Style })
 end
 
-function em.d6g6pkgq(message, extra)
+function em.showBossNotification(message, extra)
 	assert(message ~= nil); Notification.notifyBoss(message, extra)
 end
 
-initConfig.Notification = em.ropj1fju
+initConfig.Notification = em.showNotification
 
-function em.e1i6ygca()
+function em.applyStunEffect()
 	local duration = Settings.Time.Stunned
 	Modules.HapticEffect.basic(1, 1)
 	State.isStunned = true
@@ -2529,7 +2529,7 @@ local function attemptVehicleEnter(seat)
 	if not State.vehiclePacket then fireServer("qhtaomcf", seat.Parent, seat) end
 end
 
-function em.zxlvkf0j() wait(); UI.CircleAction.NotAllowed() end
+function em.showCircleActionNotAllowed() wait(); UI.CircleAction.NotAllowed() end
 
 -- ── Walk speed ────────────────────────────────────────────────
 local InventoryItemUtils = require(RS.Inventory.InventoryItemUtils)
@@ -2883,7 +2883,7 @@ local function vehicleSeatAction(entry, completed)
 	end
 	if entry.ShouldHotwire then
 		attemptVehicleHotwire(entry.Part.Parent)
-		em.ropj1fju({ Title = "Vehicle", Text = "Vehicle protected. Hold to hijack." })
+		em.showNotification({ Title = "Vehicle", Text = "Vehicle protected. Hold to hijack." })
 	end
 end
 
