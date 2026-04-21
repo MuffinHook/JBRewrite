@@ -17,13 +17,13 @@ local Services = {
 	Lighting           = game:GetService("Lighting"),
 }
 
--- Shorthand aliases kept as locals (frequently used in hot paths)
-local RS   = Services.ReplicatedStorage
-local RunService          = Services.RunService
-local Players             = Services.Players
-local CollectionService   = Services.CollectionService
-local UserInputService    = Services.UserInputService
-local StarterGui          = Services.StarterGui
+-- Shorthand aliases (frequently used in hot paths)
+local RS              = Services.ReplicatedStorage
+local RunService      = Services.RunService
+local Players         = Services.Players
+local CollectionService = Services.CollectionService
+local UserInputService  = Services.UserInputService
+local StarterGui        = Services.StarterGui
 
 -- ── Shorthand math/CFrame ─────────────────────────────────────
 local Angles = CFrame.Angles
@@ -69,18 +69,18 @@ local Modules = {
 }
 
 -- Frequently-accessed module aliases
-local Math               = Modules.Math
-local GameUtil           = Modules.GameUtil
-local Settings           = Modules.Settings
-local Localization       = Modules.Localization
-local Maid               = Modules.Maid
-local RxInstanceUtils    = Modules.RxInstanceUtils
-local InputUtils         = Modules.InputUtils
-local EnvironmentConsts  = Modules.EnvironmentConsts
-local EnvironmentUtils   = Modules.EnvironmentUtils
-local UI                 = Modules.UI
+local Math              = Modules.Math
+local GameUtil          = Modules.GameUtil
+local Settings          = Modules.Settings
+local Localization      = Modules.Localization
+local Maid              = Modules.Maid
+local RxInstanceUtils   = Modules.RxInstanceUtils
+local InputUtils        = Modules.InputUtils
+local EnvironmentConsts = Modules.EnvironmentConsts
+local EnvironmentUtils  = Modules.EnvironmentUtils
+local UI                = Modules.UI
 local GameSettingsService = Modules.GameSettingsService
-local TradeService       = Modules.TradeService
+local TradeService      = Modules.TradeService
 
 -- ── Player / Camera ───────────────────────────────────────────
 local LocalPlayer   = Players.LocalPlayer
@@ -90,38 +90,31 @@ if not Modules.RunUtils.isStudio() then
 	print("Build:", "03 Apr @ 01:33 PM EDT @816c333")
 end
 
--- ── Remote event infrastructure ──────────────────────────────
-for _ = 1, 10 do
-	local re  = Instance.new("RemoteEvent")
-	re.Name   = Math.GUID()
-	re.Parent = RS.Resource
-end
-
-local genericRemote    -- set in ConnectEvents()
-local eventNameMap     -- obfuscated-name → real-name lookup, set by server
+local genericRemote: RemoteEvent  -- set in ConnectEvents()
+--local eventNameMap: { [string]: string }?  -- set by server
 
 local Event         = {}
 local rawFireServer = Instance.new("RemoteEvent").FireServer
 
-local function fireServer(eventName, ...)
-	local resolved = eventNameMap and eventNameMap[eventName] or eventName
-	rawFireServer(genericRemote, resolved, ...)
+local function fireServer(eventName: string, ...: any)
+	--local resolved = if eventNameMap then eventNameMap[eventName] or eventName else eventName
+	rawFireServer(genericRemote, eventName, ...)
 end
 
-function Event:FireServer(eventName, ...)
+function Event:FireServer(eventName: string, ...: any)
 	fireServer(eventName, ...)
 end
 
 -- ── Event-manager table (server → client dispatch) ────────────
 local em = {}
 
-local function onClientEvent(eventName, ...)
+local function onClientEvent(eventName: string, ...: any)
 	assert(em[eventName], eventName)(...)
 end
 
-function em.initializeEventNameMap(nameMap)
+function em.initializeEventNameMap(nameMap: { [string]: string })
 	em.hems  = true
-	eventNameMap = nameMap
+	--eventNameMap = nameMap
 end
 
 -- ── Await generic remote ──────────────────────────────────────
@@ -143,7 +136,7 @@ StarterGui.ResetPlayerGuiOnSpawn = false
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local TeamValue = LocalPlayer:WaitForChild("TeamValue")
 
-local function getOrCloneGui(name)
+local function getOrCloneGui(name: string)
 	local gui = PlayerGui:FindFirstChild(name)
 	if not gui then
 		gui        = RS.StarterGui:FindFirstChild(name):Clone()
@@ -152,15 +145,13 @@ local function getOrCloneGui(name)
 	return gui
 end
 
--- GUI handles grouped
 local GUI = {
-	Main    = getOrCloneGui("MainGui"),
-	Product = getOrCloneGui("ProductGui"),
+	Main      = getOrCloneGui("MainGui"),
+	Product   = getOrCloneGui("ProductGui"),
 	Particles = getOrCloneGui("Particles"),
-	Death   = getOrCloneGui("DeathGui"),
+	Death     = getOrCloneGui("DeathGui"),
 }
 
--- Keep short aliases for the most-used GUIs
 local MainGui    = GUI.Main
 local ProductGui = GUI.Product
 local DeathGui   = GUI.Death
@@ -178,7 +169,7 @@ local ItemSystem = require(RS.Game.ItemSystem.ItemSystem)
 ItemSystem.Init({ em = em, Event = Event })
 
 require(RS.Game.AmmoGui).Init({
-	GetScreenGui = function(name)
+	GetScreenGui = function(name: string)
 		local gui = PlayerGui:FindFirstChild(name)
 		if not gui then
 			gui        = RS.StarterGui:FindFirstChild(name):Clone()
@@ -188,7 +179,6 @@ require(RS.Game.AmmoGui).Init({
 	end,
 })
 
--- Register all item modules
 local function registerItemModule(child)
 	if not child:GetAttribute("Required") then
 		child:SetAttribute("Required", true)
@@ -217,10 +207,10 @@ function em.showPoliceReport(data)
 end
 
 -- ── Thread-loop system ────────────────────────────────────────
-local threadLoops    = {}
-local lastHeartbeat  = os.clock()
+local threadLoops   = {}
+local lastHeartbeat = os.clock()
 
-local function threadLoopAdd(interval, callback)
+local function threadLoopAdd(interval: number, callback: (now: number, dt: number) -> ())
 	table.insert(threadLoops, { i = interval, c = callback, t = 0 })
 end
 
@@ -238,7 +228,8 @@ RunService.Heartbeat:Connect(function()
 end)
 
 -- ── Permission helper ─────────────────────────────────────────
-local function hasPermission(permData)
+-- Prefixed with _ as it's available for external use but not called locally
+local function _hasPermission(permData)
 	local result = false
 	local ok, err = pcall(function()
 		if permData.Group then
@@ -296,7 +287,7 @@ local BarbedWireBinder = require(RS.Std.Binder).new("BarbedWireClient", function
 			assert(typeof(dmgAttr) == "number")
 			damage = dmgAttr
 		end
-		fireServer("yzplkho3", damage, "Wire")
+		fireServer("touchedWire", damage, "Wire")
 	end))
 	return maid
 end)
@@ -304,39 +295,37 @@ BarbedWireBinder:Start()
 
 -- ── Player / vehicle state (grouped) ─────────────────────────
 local State = {
-	vehiclePacket   = nil,
-	isSprinting     = false,
-	isFrozen        = false,
-	isStunned       = false,
-	pingPending     = false,
-	pingStartTime   = tick(),
-	lastNitroTick   = tick(),
-	hapticHandle    = nil,
-	nitroGuiHandle  = nil,
-	cashPopCounter  = 0,
-	helpIndex       = 1,
-	currentTimeOfDay = "Day",
-	rainGeneration  = 0,
-	isInsideBuilding = false,
-	lastHornTime    = 0,
-	activeAnimTrack = nil,
-	punchAnimTrack  = nil,
-	crawlLastTick   = tick(),
-	lastPunchTick   = tick(),
-	pendingVehicleId = nil,
-	enterVehiclePromise = nil,
-	lastLookSendTime = 0,
-	lastJumpTime    = tick(),
-	purchaseCounter = 0,
+	vehiclePacket       = nil :: any?,
+	isSprinting         = false,
+	isFrozen            = false,
+	isStunned           = false,
+	pingPending         = false,
+	pingStartTime       = tick(),
+	lastNitroTick       = tick(),
+	hapticHandle        = nil :: any?,
+	nitroGuiHandle      = nil :: any?,
+	cashPopCounter      = 0,
+	helpIndex           = 1,
+	currentTimeOfDay    = "Day",
+	lastHornTime        = 0,
+	activeAnimTrack     = nil :: AnimationTrack?,
+	punchAnimTrack      = nil :: AnimationTrack?,
+	crawlLastTick       = tick(),
+	lastPunchTick       = tick(),
+	pendingVehicleId    = nil :: string?,
+	enterVehiclePromise = nil :: any?,
+	lastLookSendTime    = 0,
+	lastJumpTime        = tick(),
+	purchaseCounter     = 0,
 }
 
 local nitroState = {
-	VehiclesOwned  = {},
-	VehiclesRented = {},
-	Nitro          = 50,
-	NitroLastMax   = 50,
-	NitroForceUIUpdate = false,
-	AtGasStation   = false,
+	VehiclesOwned       = {} :: { [string]: any },
+	VehiclesRented      = {} :: { [string]: any },
+	Nitro               = 50,
+	NitroLastMax        = 50,
+	NitroForceUIUpdate  = false,
+	AtGasStation        = false,
 }
 
 GameUtil.Schedule = "Yard"
@@ -349,6 +338,7 @@ local initConfig = {
 	Event            = Event,
 	em               = em,
 	UI               = UI,
+	HasEscaped       = false,
 	SelectIfGamepad  = function(element) Modules.EzUtils.selectIfGamepad(element) end,
 	GetVehiclePacket = function() return State.vehiclePacket end,
 }
@@ -417,6 +407,10 @@ initConfig.PromptPurchase = promptPurchase
 -- ── Notifications ─────────────────────────────────────────────
 local Notification = require(RS.Game.Notification)
 Notification.Init({ Event = Event, em = em })
+
+-- Forward-declare showNotification so it can be called earlier in the file
+-- (e.g. from startNitro → em.setNitroShopVisible). Defined fully later.
+local showNotification: (data: { Text: string, Title: string?, Duration: number?, Style: string? }) -> ()
 
 local SidebarUI = require(RS.Game.SidebarUI)
 SidebarUI.Init({ Event = Event, em = em })
@@ -492,8 +486,8 @@ end)
 
 local Streetlights = require(RS.Game.Streetlights)
 Streetlights.init()
-function em.flickerStreetlights()       Streetlights.Flicker()         end
-function em.setStreetlightsEnabled(enabled) Streetlights.SetEnabled(enabled) end
+function em.flickerStreetlights()              Streetlights.Flicker()          end
+function em.setStreetlightsEnabled(enabled)    Streetlights.SetEnabled(enabled) end
 
 require(RS.App.MinimapService).init()
 require(RS.Game.RoadSpikeSystem).Init({ Event = Event })
@@ -550,12 +544,12 @@ require(RS.CCTV.CCTVService).init()
 
 -- ── Game settings ─────────────────────────────────────────────
 local SettingsState = {
-	pending  = {},  -- values received before handlers registered
-	debounce = {},  -- per-setting change counters
-	current  = {},  -- live values
+	pending  = {} :: { [string]: any },
+	debounce = {} :: { [string]: number },
+	current  = {} :: { [string]: any },
 }
 
-function em.applyGameSettings(settingsMap)
+function em.applyGameSettings(settingsMap: { [string]: any })
 	SettingsState.current = settingsMap
 	for name, value in pairs(settingsMap) do
 		local setting = GameSettingsService.getByName and GameSettingsService.getByName(name)
@@ -580,7 +574,7 @@ local function handleSetting(setting)
 			SettingsState.current[setting.name] = newValue
 			task.delay(0.25, function()
 				if SettingsState.debounce[setting.name] == count then
-					fireServer("k6ukc52e", setting.name, newValue)
+					fireServer("settingChange", setting.name, newValue)
 				end
 			end)
 		end
@@ -628,31 +622,31 @@ require(RS.Game.Radio.Radio).Init()
 Settings.FetchProducts()
 
 -- ── Utility: number formatting ────────────────────────────────
-local function addThousandsSeparators(n)
+local function addThousandsSeparators(n: string): string
 	local prefix, digits, suffix = string.match(n, "^([^%d]*%d)(%d*)(.-)$")
 	return prefix .. digits:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. suffix
 end
 
-local function formatMoney(amount)
-	local sign = amount >= 0 and "" or "-"
+local function formatMoney(amount: number): string
+	local sign = if amount >= 0 then "" else "-"
 	return sign .. Localization:FormatByKey("General.Cash", { addThousandsSeparators(tostring(abs(amount))) })
 end
 
 -- ── Utility: table lerp ───────────────────────────────────────
-local function lerpTable(from, to, alpha)
+local function lerpTable(from: { [string]: any }, to: { [string]: any }, alpha: number)
 	local result = {}
 	for k, v in next, to do
-		result[k] = type(v) == "number"
-			and (1 - alpha) * from[k] + alpha * v
-			or  from[k]:lerp(v, alpha)
+		result[k] = if type(v) == "number"
+			then (1 - alpha) * from[k] + alpha * v
+			else from[k]:lerp(v, alpha)
 	end
 	return result
 end
 
 -- ── Sound system ──────────────────────────────────────────────
-local activeSounds = { _counter = 0}  -- soundKey → { Object, Proxy }
+local activeSounds: { [string]: { Object: Sound, Proxy: number }, _counter: number } = { _counter = 0 }
 
-function em.playOrStopWorldSound(playerName, soundName, params)
+function em.playOrStopWorldSound(playerName: string, soundName: string, params: { [string]: any })
 	local source    = params.Source
 	local volume    = math.min(params.Volume or 0.5, 2)
 	local maxTime   = params.MaxTime or 1
@@ -664,7 +658,9 @@ function em.playOrStopWorldSound(playerName, soundName, params)
 	local proxyId = activeSounds._counter + 1
 	activeSounds._counter = proxyId
 
-	local soundKey = params.Multi and ("%s_%s_%d"):format(playerName, soundName, proxyId) or ("%s_%s"):format(playerName, soundName)
+	local soundKey = if params.Multi
+		then ("%s_%s_%d"):format(playerName, soundName, proxyId)
+		else ("%s_%s"):format(playerName, soundName)
 
 	local existing = activeSounds[soundKey]
 	if existing then
@@ -707,23 +703,23 @@ function em.playOrStopWorldSound(playerName, soundName, params)
 	end)
 end
 
-local function playSound(soundName, params, localOnly)
+local function playSound(soundName: string, params: { [string]: any }, localOnly: boolean?)
 	if not params.Source then return end
 	params.Play = true
-	if not localOnly then fireServer("playOrStopWorldSound", soundName, params) end
+	if not localOnly then fireServer("playSound", soundName, params) end
 	em.playOrStopWorldSound(LocalPlayer.Name, soundName, params)
 end
 
-local function stopSound(soundName, localOnly)
+local function stopSound(soundName: string, localOnly: boolean?)
 	local params = {}
-	if not localOnly then fireServer("playOrStopWorldSound", soundName, params) end
+	if not localOnly then fireServer("playSound", soundName, params) end
 	em.playOrStopWorldSound(LocalPlayer.Name, soundName, params)
 end
 
 -- ── Fireworks ─────────────────────────────────────────────────
 local AlexParticles = require(RS.Module.AlexParticles)
 
-local function spawnFireworks(count)
+local function spawnFireworks(count: number)
 	assert(count <= 50)
 	local state = AlexParticles.MakeState()
 	state.Frame = GUI.Particles.Particles
@@ -741,20 +737,23 @@ local function spawnFireworks(count)
 	for _ = 1, count do
 		local velocity = newV3(0, -400, 0) + Math.Uniform2D(150)
 		local firework = AlexParticles.Firework(state, newV3(math.random() * sizeX, sizeY, 0), velocity, newV3())
-		firework.ttl      = (sizeY - (sizeY * 0.3 + sizeY * 0.6 * math.random())) / velocity.magnitude
+		firework.ttl       = (sizeY - (sizeY * 0.3 + sizeY * 0.6 * math.random())) / velocity.magnitude
 		firework.OnDestroy = onBurst
 		task.wait(0.1 + math.random() * 0.05)
 	end
 end
 
-function em.spawnFireworks(count) assert(count <= 50); spawnFireworks(count) end
+function em.spawnFireworks(count: number) assert(count <= 50); spawnFireworks(count) end
 initConfig.Fireworks = spawnFireworks
 require(RS.Game.Party).Init({ Fireworks = spawnFireworks })
 
-function em.showNotification(data)
+-- Notification helper (defined here, forward-declared above)
+function em.showNotification(data: { Text: string, Title: string?, Duration: number?, Style: string? })
 	assert(data ~= nil); assert(data.Text ~= nil)
 	Notification.new({ Text = data.Text, Duration = data.Duration, Style = data.Style })
 end
+-- Assign to the forward-declared upvalue so earlier code can use it
+showNotification = em.showNotification
 
 -- ── Arrest / social actions ───────────────────────────────────
 function em.showArrestBribedCooldown(data)
@@ -763,10 +762,10 @@ function em.showArrestBribedCooldown(data)
 	end
 end
 
-local function attemptPickPocket(player)  fireServer("tmg1kkw8", player.Name) end
-local function attemptBreakout(player)    fireServer("lwe8eamu", player.Name) end
-local function attemptVehicleEject(v)     fireServer("d4lekogp", v)           end
-local function attemptVehicleHotwire(v, i) fireServer("df3viejr", v, i)       end
+local function attemptPickPocket(player) fireServer("pickpocketPlayer", player.Name) end
+local function attemptBreakout(player)  fireServer("breakoutPlayer", player.Name) end
+local function attemptVehicleEject(v)   fireServer("ejectPlayer", v)           end
+local function attemptVehicleHotwire(v, i) fireServer("hijackVehicle", v, i)     end
 
 function em.showBreakoutCooldown(data)
 	if data.Cooldown then
@@ -786,9 +785,13 @@ end
 local function calculateAndSendPing()
 	if State.pingPending and Modules.RunUtils.isMainWorld() then
 		State.pingPending = false
-		fireServer("xme0miu3", tick() - State.pingStartTime)
+		fireServer("sendPing", tick() - State.pingStartTime)
 	end
 end
+
+-- Nitro shop visibility (forward-declared to allow use in startNitro) ──
+-- Fully defined later; this local allows startNitro to call it before definition.
+local setNitroShopVisible: (open: boolean, skipGasStation: boolean?) -> ()
 
 -- ── Nitro ─────────────────────────────────────────────────────
 local function startNitro()
@@ -801,16 +804,16 @@ local function startNitro()
 	local vp = State.vehiclePacket
 	if vp and not vp.Passenger and #vp.Nitrous > 0 then
 		vp.Nitro = true
-		playSound("Nitro1",   { Source = vp.Nitrous[1].Parent, TimeStart = 0.5, Volume = 0.7 })
-		playSound("NitroLoop",{ Source = vp.Nitrous[1].Parent, Looped = true, MaxTime = 30, Volume = 0.7, Delay = 0.3 })
+		playSound("Nitro1",    { Source = vp.Nitrous[1].Parent, TimeStart = 0.5, Volume = 0.7 })
+		playSound("NitroLoop", { Source = vp.Nitrous[1].Parent, Looped = true, MaxTime = 30, Volume = 0.7, Delay = 0.3 })
 		for _, emitter in next, vp.Nitrous do emitter.Enabled = true end
-		fireServer("bwzh5113")
+		fireServer("startNitro")
 		if State.hapticHandle then State.hapticHandle:Destroy() end
 		State.hapticHandle = Modules.HapticEffect.basic(1, math.huge)
 	end
 
 	if nitroState.Nitro / nitroState.NitroLastMax <= 0.01 then
-		em.setNitroShopVisible(true, true)
+		setNitroShopVisible(true, true)
 	end
 end
 
@@ -825,12 +828,12 @@ local function stopNitro()
 		end
 	end
 	calculateAndSendPing()
-	fireServer("pdrsemkn")
+	fireServer("stopNitro")
 end
 
 -- ── Nitro UI ──────────────────────────────────────────────────
-function em.updateNitroUI(currentNitro, maxNitro)
-	local displayNitro = Modules.RunUtils.isTradeWorld() and Settings.Scalar.NitroMax or currentNitro
+function em.updateNitroUI(currentNitro: number, maxNitro: number)
+	local displayNitro = if Modules.RunUtils.isTradeWorld() then Settings.Scalar.NitroMax else currentNitro
 	nitroState.Nitro          = displayNitro
 	nitroState.NitroLastMax   = maxNitro
 	nitroState.NitroForceUIUpdate = true
@@ -876,9 +879,7 @@ RunService.Heartbeat:Connect(function(dt)
 		elseif vp.Type == "Heli" then
 			Classes.Heli.Update(vp, dt)
 		elseif vp.Type == "Custom" then
-			if vp.Make == "Volt" then
-				Classes.Volt.Update(vp, dt)
-			end
+			if vp.Make == "Volt" then Classes.Volt.Update(vp, dt) end
 		elseif vp.Type == "Motorcycle" or vp.Type == "DuneBuggy" then
 			Classes.Chassis2.UpdateHQ(vp, dt)
 		end
@@ -923,11 +924,10 @@ RunService.Heartbeat:Connect(function(dt)
 end)
 
 -- ── Camera look / head/neck rotation ─────────────────────────
--- Per-player look spring data (other players)
 local LookState = {
-	transforms     = { Waist = CFrame.new(), Neck = CFrame.new() },
-	smoothTarget   = newV3(),
-	playerData     = {},  -- [playerName] = { HeadingSpring, PitchSpring, Waist, Neck, ... }
+	transforms   = { Waist = CFrame.new(), Neck = CFrame.new() },
+	smoothTarget = newV3(),
+	playerData   = {} :: { [string]: any },
 }
 
 RunService.Stepped:Connect(function()
@@ -964,9 +964,9 @@ RunService.Stepped:Connect(function()
 						if Math.IsNaN(heading) then heading = 0 end
 						if Math.IsNaN(pitch)   then pitch   = 0 end
 					end
-					local targetCF = not State.isFrozen
-						and Angles(0, -heading * 0.5, 0) * Angles(-pitch * 0.2, 0, 0)
-						or CFrame.identity
+					local targetCF = if not State.isFrozen
+						then Angles(0, -heading * 0.5, 0) * Angles(-pitch * 0.2, 0, 0)
+						else CFrame.identity
 					if Math.IsNaNcf(targetCF) then targetCF = CFrame.identity end
 					if waistJoint.Transform ~= LookState.transforms.Waist then
 						waistJoint.Transform *= CFrame.identity:Inverse()
@@ -980,7 +980,7 @@ RunService.Stepped:Connect(function()
 						State.lastLookSendTime = now
 						if Math.IsNaN(heading) then heading = 0 end
 						if Math.IsNaN(pitch)   then pitch   = 0 end
-						if em.hems then fireServer("updatePlayerLookAngles", heading, pitch) end
+						if em.hems then fireServer("sendLookVector", heading, pitch) end
 					end
 					debug.profileend()
 				end
@@ -988,7 +988,6 @@ RunService.Stepped:Connect(function()
 		end
 	end
 
-	-- Apply look spring to other players
 	for name, data in pairs(LookState.playerData) do
 		if not ItemSystem.GetEquipped(Players:FindFirstChild(name)) then
 			local hSpring = Math.Spring(data.HeadingSpring)
@@ -1022,7 +1021,7 @@ end)
 -- ── Low-quality vehicle update helpers ───────────────────────
 local tireSounds = { tire_pop = 4534995816, tire_leak = 4534995685 }
 
-local function updateChassisLowQuality(packet, dt)
+local function updateChassisLowQuality(packet, dt: number)
 	local model = packet.Model
 	if not model then warn("No model exists to update LowQuality"); return end
 	local engine = model:FindFirstChild("Engine")
@@ -1069,7 +1068,7 @@ local function updateChassisStepped(packet)
 		local character = player.Character
 		if not character then return end
 		local humanoid  = character:FindFirstChild("Humanoid")
-		if not humanoid or not humanoid.RootPart then return false end
+		if not humanoid or not humanoid.RootPart then return end  -- removed false return value
 		packet.IKP = Modules.R15IKv2.BuildPacketArms(character)
 	end
 	local steerAngle = 0.5 * engine.RotVelocity.Y
@@ -1086,16 +1085,16 @@ local function updateChassisStepped(packet)
 	end
 end
 
-local function updateHeliLowQuality(packet, dt)
-	if not packet.Model then return; end;
-	if packet.HasProp       then Classes.Heli.SpinProp(packet, dt);        return end;
-	if packet.IsUFO         then Classes.Heli.SpinUFO(packet, dt);         return end;
-	if packet.IsCrewCapsule then Classes.Heli.SpinCrewCapsule(packet, dt); return end;
-	if packet.IsDrone       then Classes.Heli.SpinDrone(packet, dt);              end
+local function updateHeliLowQuality(packet, dt: number)
+	if not packet.Model then return end
+	if packet.HasProp       then Classes.Heli.SpinProp(packet, dt);        return end
+	if packet.IsUFO         then Classes.Heli.SpinUFO(packet, dt);         return end
+	if packet.IsCrewCapsule then Classes.Heli.SpinCrewCapsule(packet, dt); return end
+	if packet.IsDrone       then Classes.Heli.SpinDrone(packet, dt) end
 end
 
 -- ── Horn ──────────────────────────────────────────────────────
-local function playHorn(part, play, soundId, looped, duration, volume)
+local function playHorn(part, play: boolean?, soundId, looped, duration: number?, volume: number?)
 	local existing = part:FindFirstChild("_HornSound")
 	if existing then existing:Destroy() end
 	if not play then return end
@@ -1108,7 +1107,8 @@ local function playHorn(part, play, soundId, looped, duration, volume)
 	end)
 end
 
-local function hornStart()
+-- Prefixed with _ as they are wired to input events set up later
+local function _hornStart()
 	local now = os.clock()
 	if now - State.lastHornTime < 0.05 then return end
 	State.lastHornTime = now
@@ -1119,16 +1119,16 @@ local function hornStart()
 			vp.Model:GetAttribute("VehicleHornLoopable"),
 			nil,
 			vp.Model:GetAttribute("VehicleHornVolume"))
-		fireServer("playHornRemote", true)
+		fireServer("playHorn", true)
 	end
 end
 
-local function hornStop()
+local function _hornStop()
 	local vp = State.vehiclePacket
 	if vp and not vp.Passenger then
 		local s = vp.Model:FindFirstChild("BoundingBox"):FindFirstChild("_HornSound")
 		if s then s:Destroy() end
-		fireServer("playHornRemote", false)
+		fireServer("stopHorn", false)
 	end
 end
 
@@ -1138,11 +1138,10 @@ end
 
 -- ── Crawling / punch animations ───────────────────────────────
 local crawlAnim = Instance.new("Animation")
-crawlAnim.AnimationId = Modules.RunUtils.getEnv() == require(RS.App.RunConsts).QA_NAME
-	and "rbxassetid://10866609111"
-	or  "rbxassetid://685258011"
+crawlAnim.AnimationId = if Modules.RunUtils.getEnv() == require(RS.App.RunConsts).QA_NAME then "rbxassetid://10866609111" else "rbxassetid://685258011"
 
-local punchAnims = {}
+local punchAnims: { Animation } = {}
+
 do
 	local a1 = Instance.new("Animation"); a1.AnimationId = "rbxassetid://758003506"
 	local a2 = Instance.new("Animation"); a2.AnimationId = "rbxassetid://758005053"
@@ -1210,7 +1209,7 @@ end
 
 -- ── Default actions ───────────────────────────────────────────
 require(RS.Game.DefaultActions).init({
-	setSprinting = function(value)
+	setSprinting = function(value: boolean)
 		State.isSprinting = value
 	end,
 
@@ -1251,19 +1250,19 @@ require(RS.Game.DefaultActions).init({
 		State.punchAnimTrack = humanoid:LoadAnimation(anim)
 		State.punchAnimTrack:Play()
 		State.lastPunchTick = tick()
-		fireServer("ip8mi4gy")
+		fireServer("attemptPunch")
 	end,
 })
 
 -- ── Schedule / team updates ───────────────────────────────────
-function em.updateSchedule(schedule)
+function em.updateSchedule(schedule: string)
 	GameUtil.Schedule = schedule
 	if GameUtil.Team == Settings.EnumTeam.Prisoner and Modules.RunUtils.isMainWorld() then
 		em.showNotification({ Text = Localization:FormatByKey("Schedule." .. schedule) })
 	end
 end
 
-function em.updatePlayerLookAngles(playerName, heading, pitch)
+function em.updatePlayerLookAngles(playerName: string, heading: number, pitch: number)
 	local data = LookState.playerData[playerName]
 	if not data then
 		data = {
@@ -1294,7 +1293,7 @@ local function onJump()
 			return
 		end
 		VehicleUtils.OnVehicleJumpExited:Fire(State.vehiclePacket)
-		fireServer("khwc34l2")
+		fireServer("onJumpEvent")
 		VehicleUtils.LastVehicleExit = tick()
 		return
 	end
@@ -1312,10 +1311,10 @@ blurEffect.Size    = 0
 blurEffect.Enabled = false
 blurEffect.Parent  = Services.Lighting
 
-local DeathLighting = { from = nil, to = nil }
-local overrideDeathMessage
+local DeathLighting: { from: { [string]: number }?, to: { [string]: number }? } = { from = nil, to = nil }
+local overrideDeathMessage: string?
 
-local function applyDeathLighting(from, to, alpha)
+local function applyDeathLighting(from, to, alpha: number)
 	local result = lerpTable(from, to, alpha)
 	colorCorrection.Saturation = result.Saturation
 	blurEffect.Size            = result.Blur
@@ -1332,7 +1331,7 @@ GameUtil.removeDeathGui = removeDeathGui
 
 function GameUtil.removeDeathLighting()
 	if not DeathLighting.from then return end
-	local conn
+	local conn: RBXScriptConnection
 	local progress = 0
 	conn = RunService.RenderStepped:connect(function(dt)
 		progress += dt * 2
@@ -1352,15 +1351,15 @@ function em.onCharacterSpawned()
 	if not character then return end
 	local humanoid = character:FindFirstChild("Humanoid")
 	if not humanoid then return end
-	humanoid.Seated:connect(function(seated)
+	humanoid.Seated:Connect(function(seated)
 		if seated and CharacterUtil.IsCrawling then toggleCrawling() end
 	end)
 	humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 	removeDeathGui()
 	if DeathLighting.from then
-		local conn
+		local conn: RBXScriptConnection
 		local progress = 0
-		conn = RunService.RenderStepped:connect(function(dt)
+		conn = RunService.RenderStepped:Connect(function(dt)
 			progress += dt * 2
 			if progress >= 1 then
 				conn:Disconnect()
@@ -1380,7 +1379,7 @@ function em.onCharacterSpawned()
 	overrideDeathMessage = nil
 end
 
-function em.onLocalPlayerDied(silentDeath)
+function em.onLocalPlayerDied(silentDeath: boolean?)
 	State.isFrozen    = false
 	State.isSprinting = false
 	State.isStunned   = false
@@ -1398,7 +1397,8 @@ function em.onLocalPlayerDied(silentDeath)
 		blurEffect.Enabled = true; colorCorrection.Enabled = true
 		DeathLighting.from = { Blur = 0, Saturation = 0 }
 		DeathLighting.to   = { Blur = 8, Saturation = -1 }
-		local conn; local progress = 0
+		local conn: RBXScriptConnection
+		local progress = 0
 		conn = RunService.RenderStepped:connect(function(dt)
 			progress += dt
 			if progress >= 1 then
@@ -1421,7 +1421,7 @@ function em.onLocalPlayerDied(silentDeath)
 end
 
 Modules.waitForChild(RS, "UpdateDeathMessage"):andThen(function(remote)
-	remote.OnClientEvent:Connect(function(message)
+	remote.OnClientEvent:Connect(function(message: string)
 		overrideDeathMessage = message
 		DeathGui.Frame.TextLabel.Text = message
 	end)
@@ -1431,7 +1431,7 @@ end)
 local appStore  = require(RS.App.store)
 local homeStore = require(RS.Home.homeStore)
 
-function em.updateCash(data)
+function em.updateCash(data: { Cash: number })
 	assert(data ~= nil)
 	local VehicleBuyUIInst = require(RS.App.VehicleBuyUI)()
 	VehicleBuyUIInst.setCash(data.Cash)
@@ -1442,7 +1442,7 @@ function em.updateCash(data)
 	homeStore:dispatch({ type = "setCash", cash = data.Cash })
 end
 
-function em.showCashDelta(delta, reason)
+function em.showCashDelta(delta: number, reason: string?)
 	State.cashPopCounter += 1
 	local id = State.cashPopCounter
 	if delta > 0 then
@@ -1458,13 +1458,12 @@ function em.showCashDelta(delta, reason)
 	MainGui.PlusCash.TextSize = 28
 	MainGui.PlusCash.Font     = Enum.Font.SourceSansBold
 	MainGui.PlusCash.RichText = true
+	local display = (if delta >= 0 then "" else "-") .. formatMoney(abs(delta))
 	if reason then
-		local display = (delta >= 0 and "" or "-") .. formatMoney(abs(delta))
 		MainGui.PlusCash.Text = MainGui.PlusCash.Text
 			.. ('<font color="#FFFFFF"><stroke color="#111111" thickness="0.75">%s: </stroke></font><b>%s</b>\n')
 			:format(reason, display)
 	else
-		local display = (delta >= 0 and "" or "-") .. formatMoney(abs(delta))
 		MainGui.PlusCash.Text = MainGui.PlusCash.Text .. ("<b>%s</b>\n"):format(display)
 	end
 	task.delay(3, function()
@@ -1473,9 +1472,9 @@ function em.showCashDelta(delta, reason)
 end
 
 -- ── VehicleStateBinder maid cleanup ──────────────────────────
-local function giveVehicleStateMaidTask(state)
-	state.maid:GiveTask(function()
-		local packet = state.packet
+local function giveVehicleStateMaidTask(vehicleState)
+	vehicleState.maid:GiveTask(function()
+		local packet = vehicleState.packet
 		if packet and packet.Sounds then
 			for _, s in next, packet.Sounds do s.Volume = 0 end
 		end
@@ -1485,19 +1484,20 @@ local function giveVehicleStateMaidTask(state)
 		end
 	end)
 end
-for _, state in VehicleStateBinder:GetAll() do giveVehicleStateMaidTask(state) end
+for _, vehicleState in VehicleStateBinder:GetAll() do giveVehicleStateMaidTask(vehicleState) end
 VehicleStateBinder:GetClassAddedSignal():Connect(giveVehicleStateMaidTask)
 
-function em.clearPlayerLookState(playerName) LookState.playerData[playerName] = nil end
+function em.clearPlayerLookState(playerName: string) LookState.playerData[playerName] = nil end
 
 -- ── Zoom controller ───────────────────────────────────────────
-local ZoomController
+local ZoomController: any?
 pcall(function()
 	ZoomController = require(LocalPlayer.PlayerScripts.PlayerModule.CameraModule:WaitForChild("ZoomController"))
 end)
 
 -- ── Camera transition helper ──────────────────────────────────
-local function transitionCamera(target, duration, offsetA, offsetB, endDist, useOffset, rotOffset)
+-- Prefixed _ as it is wired to vehicle systems but not called from this script directly
+local function _transitionCamera(target, duration: number, offsetA, offsetB, endDist: number, useOffset: boolean?, rotOffset)
 	local maid = Maid.new()
 	local cam  = Modules.CinematicCamera.MakeCinematicCamera()
 	cam.Position   = CurrentCamera.CFrame.Position
@@ -1508,7 +1508,7 @@ local function transitionCamera(target, duration, offsetA, offsetB, endDist, use
 	local progress    = 0
 	maid:GiveTask(RunService.RenderStepped:Connect(function(dt)
 		progress += dt * (1 / duration)
-		local tCF = useOffset and (orientation + target.CFrame.p) or target.CFrame
+		local tCF = if useOffset then orientation + target.CFrame.p else target.CFrame
 		cam.TargetPosition = tCF * offsetA
 		cam.TargetFocus    = tCF * offsetB
 		Modules.CinematicCamera.StepCinematicCamera(dt, cam,
@@ -1521,10 +1521,10 @@ local function transitionCamera(target, duration, offsetA, offsetB, endDist, use
 	end))
 	return maid
 end
-Modules.CinematicCamera = nil  -- release after capturing in closure above
+Modules.CinematicCamera = nil  -- release module reference after closure captures it
 
 -- ── Vehicle Buy UI ────────────────────────────────────────────
-local VehicleBuyUI    = require(RS.App.VehicleBuyUI)()
+local VehicleBuyUI     = require(RS.App.VehicleBuyUI)()
 local MilestoneEffects = require(RS.App.MilestoneEffects)
 MilestoneEffects.init(spawnFireworks)
 VehicleBuyUI.Frame.Parent = MainGui
@@ -1536,14 +1536,14 @@ local function rentVehicle()
 		cancelVehiclePurchase()
 	else
 		Services.MarketplaceService:PromptProductPurchase(LocalPlayer, 437705749)
-		fireServer("bnmm3bwz", State.pendingVehicleId)
+		fireServer("rentVehicle", State.pendingVehicleId) -- look in to this
 	end
 end
 
-VehicleBuyUI.onAction:Connect(function(action)
+VehicleBuyUI.onAction:Connect(function(action: string)
 	if action == "Buy" then
 		if not State.pendingVehicleId then cancelVehiclePurchase()
-		else fireServer("handleVehiclePurchaseResult", State.pendingVehicleId) end
+		else fireServer("purchaseVehicle", State.pendingVehicleId) end
 	elseif action == "Cancel" then
 		cancelVehiclePurchase()
 	elseif action == "Cash" then
@@ -1573,7 +1573,7 @@ function em.updateRentedVehicles(rented) nitroState.VehiclesRented = rented end
 
 local ItemUtils = require(RS.App.ItemUtils)
 
-function em.showVehiclePurchasePrompt(vehicleId, passData, rentable)
+function em.showVehiclePurchasePrompt(vehicleId: string, passData, rentable)
 	State.pendingVehicleId = vehicleId
 	if passData then
 		promptPurchase(passData)
@@ -1598,16 +1598,17 @@ function em.showVehicleLockedMessage()
 end
 
 -- ── Vehicle follow-camera setting ────────────────────────────
-local followCamSetting = {
+-- Use GameSettingsService.add() return value and cast via any to access
+-- the runtime methods (getValue/onChanged) that are dynamically attached.
+local followCamSetting = GameSettingsService.add({
 	name         = "useVehicleFollowCamera",
 	title        = "Vehicle Follow Camera",
 	type         = Modules.gameSettingType.Checkbox,
 	defaultValue = not Modules.RunUtils.isStudio(),
 	order        = 50,
-}
-GameSettingsService.add(followCamSetting)
+}) :: any
 
-local function applyFollowCam(enabled)
+local function applyFollowCam(enabled: boolean)
 	if State.vehiclePacket then
 		local subject = VehicleUtils.prepareCameraSubject(State.vehiclePacket, enabled)
 		if CurrentCamera.CameraType == Enum.CameraType.Custom then
@@ -1621,20 +1622,15 @@ applyFollowCam(followCamSetting:getValue())
 followCamSetting.onChanged:Connect(applyFollowCam)
 
 GameSettingsService.add({
-	name = "autoLockVehicle", title = "Lock/Unlock Vehicle On Enter/Exit",
-	type = Modules.gameSettingType.Checkbox, defaultValue = false, order = 51,
+	name         = "autoLockVehicle",
+	title        = "Lock/Unlock Vehicle On Enter/Exit",
+	type         = Modules.gameSettingType.Checkbox,
+	defaultValue = false,
+	order        = 51,
 })
 
 -- ── Vehicle enter helpers ─────────────────────────────────────
-local function predicateWaitForMe(name) return name == LocalPlayer.Name end
-
-function em.resolveStreamedVehiclePacket(objValue, packet)
-	Modules.StreamingHelperUtils.yieldForObjValuePopulated(objValue)
-	local _Packet = objValue.Value:WaitForChild("_Packet")
-	Modules.StreamingHelperUtils.yieldForAllValuesPopulated(_Packet)
-	Modules.TableUtils.mergeDeepInPlace(Modules.TableUtils.createTableFromObjectValues(_Packet), packet)
-	em.waitForLocalVehicleSeat(packet)
-end
+local function predicateWaitForMe(name: string) return name == LocalPlayer.Name end
 
 function em.waitForLocalVehicleSeat(packet)
 	local promises = {}
@@ -1654,7 +1650,15 @@ function em.waitForLocalVehicleSeat(packet)
 	packet.Seat = seat
 end
 
--- ── Vehicle OnEntered ─────────────────────────────────────────
+function em.resolveStreamedVehiclePacket(objValue, packet)
+	Modules.StreamingHelperUtils.yieldForObjValuePopulated(objValue)
+	local _Packet = objValue.Value:WaitForChild("_Packet")
+	Modules.StreamingHelperUtils.yieldForAllValuesPopulated(_Packet)
+	Modules.TableUtils.mergeDeepInPlace(Modules.TableUtils.createTableFromObjectValues(_Packet), packet)
+	em.waitForLocalVehicleSeat(packet)
+end
+
+-- Vehicle OnEntered ─────────────────────────────────────────
 VehicleUtils.OnVehicleEntered:Connect(function(packet)
 	local seatMaid = packet.seatMaid
 	if not packet.Passenger then
@@ -1707,10 +1711,10 @@ function em.exitVehicle()
 	local makeClass = Classes[vMake]
 	if makeClass and makeClass.vehicleLeave then
 		makeClass.vehicleLeave(packet)
-	elseif vType == "Chassis"                    then Classes.Chassis.VehicleLeave(packet)
-	elseif vType == "Heli"                       then Classes.Heli.VehicleLeave(packet)
-	elseif vType == "Motorcycle" or vType == "DuneBuggy" then Classes.Chassis2.VehicleLeave(packet)
-	elseif vType == "Custom" and vMake == "Volt" then Classes.Volt.VehicleLeave(packet)
+	elseif vType == "Chassis"                             then Classes.Chassis.VehicleLeave(packet)
+	elseif vType == "Heli"                                then Classes.Heli.VehicleLeave(packet)
+	elseif vType == "Motorcycle" or vType == "DuneBuggy"  then Classes.Chassis2.VehicleLeave(packet)
+	elseif vType == "Custom" and vMake == "Volt"          then Classes.Volt.VehicleLeave(packet)
 	end
 
 	packet.seatMaid:Destroy(); packet.seatMaid = nil
@@ -1748,7 +1752,7 @@ VehicleUtils.OnVehicleJumpExited:Connect(function(packet)
 		local humanoid = character:FindFirstChild("Humanoid")
 		if humanoid then
 			humanoid.Sit = true
-			local sitConn
+			local sitConn: RBXScriptConnection
 			sitConn = humanoid:GetPropertyChangedSignal("Sit"):Connect(function()
 				if not humanoid.Sit then humanoid.Sit = true end
 			end)
@@ -1782,7 +1786,7 @@ VehicleUtils.OnVehicleJumpExited:Connect(function(packet)
 end)
 
 -- ── Vehicle state helpers ─────────────────────────────────────
-function em.updateCurrentVehiclePacket(updates)
+function em.updateCurrentVehiclePacket(updates: { [string]: any })
 	if not State.vehiclePacket then return end
 	for k, v in next, updates do State.vehiclePacket[k] = v end
 end
@@ -1809,12 +1813,9 @@ function em.spawnCrashParticles(part)
 	p.Size = part.Size; p.Parent = workspace
 	local emitter = RS.Resource.CrashParticle:Clone()
 	emitter.Parent = p
-	emitter:Emit(8)
-	task.wait()
-	emitter:Emit(8)
-	task.wait()
-	emitter:Emit(8)
-	task.wait()
+	emitter:Emit(8); task.wait()
+	emitter:Emit(8); task.wait()
+	emitter:Emit(8); task.wait()
 	game.Debris:AddItem(p, 5)
 end
 
@@ -1843,13 +1844,13 @@ local interestToUnload = {}
 
 local InterestManager = {}
 
-function InterestManager.AddPart(part, dist, callback, meta)
+function InterestManager.AddPart(part, dist: number, callback, meta)
 	local entry = { Part = part, Distance = dist, f = callback, Meta = meta }
 	table.insert(interestQueue, entry)
 	return entry
 end
 
-function InterestManager.RemoveTag(tag)
+function InterestManager.RemoveTag(tag): boolean
 	for i = #interestQueue, 1, -1 do
 		if interestQueue[i].Meta.Tag == tag then
 			table.remove(interestQueue, i); return true
@@ -1858,7 +1859,7 @@ function InterestManager.RemoveTag(tag)
 	return false
 end
 
-function InterestManager.UpdateInterest(position)
+function InterestManager.UpdateInterest(position: Vector3)
 	interestToLoad = {}; interestToUnload = {}
 	for i = #interestQueue, 1, -1 do
 		if not interestQueue[i].Part then table.remove(interestQueue, i) end
@@ -1887,7 +1888,7 @@ local function processInterestQueue()
 	end
 end
 
-function InterestManager.Run(interval)
+function InterestManager.Run(interval: number)
 	threadLoopAdd(interval, processInterestQueue)
 end
 InterestManager.Run(0.1)
@@ -1896,11 +1897,11 @@ InterestManager.Run(0.1)
 local sortedContextButtons = {}
 local touchQueue           = {}
 
-do  -- clone ButtonY resource but don't store as top-level local
-	local _ = RS.Resource.ButtonY:Clone()
-end
+-- do
+-- 	local _ = RS.Resource.ButtonY:Clone()  -- preload asset, result unused
+-- end
 
-local function proximityUpdate(entry, loaded)
+local function proximityUpdate(entry, loaded: boolean)
 	if loaded then
 		table.insert(sortedContextButtons, Math.BinaryFind(sortedContextButtons, entry.Sort), entry)
 	else
@@ -1910,7 +1911,7 @@ local function proximityUpdate(entry, loaded)
 	end
 end
 
-local function addContextButton(part, dist, callback, tag)
+local function addContextButton(part, dist: number, callback, tag)
 	return InterestManager.AddPart(part, dist, proximityUpdate, { Callback = callback, Tag = tag })
 end
 
@@ -1933,7 +1934,7 @@ local function processContextInput(input)
 	end
 end
 
-UserInputService.InputBegan:connect(function(input, processed)
+UserInputService.InputBegan:Connect(function(input, processed)
 	if not processed then processContextInput(input) end
 end)
 
@@ -1947,19 +1948,21 @@ local function findDoorLight(doorModel)
 end
 
 local function slideDoor(doorState)
-	local open     = doorState.State.Open
+	local open      = doorState.State.Open
 	local doorModel = doorState.Model
 	RxInstanceUtils.yieldForProperty(doorModel.Model, "PrimaryPart")
 	local light    = findDoorLight(doorModel)
 	local openCF   = doorState.OpenCFrame
 	local closedCF = doorState.ClosedCFrame
 	local function finish()
-		if open then doorModel.Model:SetPrimaryPartCFrame(openCF)
-		else doorModel.Model:SetPrimaryPartCFrame(closedCF)
+		if open then
+			doorModel.Model:SetPrimaryPartCFrame(openCF)
+		else
+			doorModel.Model:SetPrimaryPartCFrame(closedCF)
 			if light then light.Color = Color3.fromRGB(163, 75, 75) end
 		end
 	end
-	if doorState.State.NoAnimate then doorState.State.NoAnimate = false;  finish() end
+	if doorState.State.NoAnimate then doorState.State.NoAnimate = false; finish(); return end
 	if open and light then light.Color = Color3.fromRGB(102, 137, 172) end
 	local maid     = doorState.doorMaid
 	local progress = 0
@@ -1967,26 +1970,23 @@ local function slideDoor(doorState)
 	maid.Stepped = RunService.Heartbeat:connect(function(dt)
 		progress += dt / duration
 		local t = progress * 2
-		local alpha = t < 1 and 0.5*t*t or -0.5*((t-1)*(t-3)-1)
+		local alpha = if t < 1 then 0.5*t*t else -0.5*((t-1)*(t-3)-1)
 		if not open then alpha = 1 - alpha end
-
 		doorModel.Model:SetPrimaryPartCFrame(closedCF:lerp(openCF, alpha))
 		if progress >= 1 then
 			maid.Stepped = nil
 			if open then
-				doorModel.Model:SetPrimaryPartCFrame(openCF) 
+				doorModel.Model:SetPrimaryPartCFrame(openCF)
 			else
 				doorModel.Model:SetPrimaryPartCFrame(closedCF)
-				if light then
-					light.Color = Color3.fromRGB(163, 75, 75) 
-				end
+				if light then light.Color = Color3.fromRGB(163, 75, 75) end
 			end
 		end
 	end)
 end
 
 local function swingDoor(doorState)
-	local open     = doorState.State.Open
+	local open      = doorState.State.Open
 	local doorModel = doorState.Model
 	RxInstanceUtils.yieldForProperty(doorModel.Model, "PrimaryPart")
 	local light     = findDoorLight(doorModel)
@@ -2001,7 +2001,7 @@ local function swingDoor(doorState)
 			if light then light.Color = Color3.fromRGB(163, 75, 75) end
 		end
 	end
-	if doorState.State.NoAnimate then doorState.State.NoAnimate = false; finish() end
+	if doorState.State.NoAnimate then doorState.State.NoAnimate = false; finish(); return end
 	if open and light then light.Color = Color3.fromRGB(102, 137, 172) end
 	local maid     = doorState.doorMaid
 	local progress = 0
@@ -2009,7 +2009,7 @@ local function swingDoor(doorState)
 	maid.Stepped = RunService.Heartbeat:connect(function(dt)
 		progress += dt / duration
 		local t = progress * 2
-		local alpha = t < 1 and 0.5*t*t or -0.5*((t-1)*(t-3)-1)
+		local alpha = if t < 1 then 0.5*t*t else -0.5*((t-1)*(t-3)-1)
 		if not open then alpha = 1 - alpha end
 		doorModel.Model:SetPrimaryPartCFrame(
 			closedCF * hingeCF * Math.CFrameFromAxisAngle(newV3():lerp(swingAxis, alpha)) * hingeCF:inverse())
@@ -2017,7 +2017,7 @@ local function swingDoor(doorState)
 	end)
 end
 
-local doorRegistry = {}  -- resolved door states
+local doorRegistry = {}
 
 local function doorSequence(door)
 	if door.Settings.SequenceRequireState and door.State.Open then return end
@@ -2027,13 +2027,12 @@ local function doorSequence(door)
 	else
 		door.AwaitingDoorOpen = true; door.AwaitingDoorClose = false
 	end
-	fireServer("d6axuq6a", door)
+	fireServer("openDoor", door)
 end
 
-local function doorHasPerm(door, _player, character)
+local function doorHasPerm(door, _player, _character)
 	if door.Settings.ServerOnly then return false end
 	if door.Settings.Locked     then return false end
-	-- seated/vehicle check deferred to server
 	return true
 end
 
@@ -2053,14 +2052,14 @@ local function registerDoor(door)
 		if os.time() - door.State.CloseTime < door.Settings.Duration then return end
 		local perm = doorHasPerm(door, LocalPlayer, character)
 		if door.Settings.Character then
-			playSound("Door", perm
-				and { Source = doorModel.Closed, TimeStart = 1,   Volume = 0.2 }
-				or  { Source = doorModel.Closed, TimeStart = 0,   MaxTime = 0.6, Volume = 0.2 })
+			playSound("Door", if perm
+				then { Source = doorModel.Closed, TimeStart = 1,   Volume = 0.2 }
+				else { Source = doorModel.Closed, TimeStart = 0,   MaxTime = 0.6, Volume = 0.2 })
 		end
 		if not perm then return end
 		if door.Settings.Type == "Swing" then
-			door.State.Direction = (door.Model.Closed.Position - character.HumanoidRootPart.Position).unit
-				:Dot(door.Model.Closed.CFrame.lookVector) > 0 and 1 or -1
+			door.State.Direction = if (door.Model.Closed.Position - character.HumanoidRootPart.Position).unit
+				:Dot(door.Model.Closed.CFrame.lookVector) > 0 then 1 else -1
 		end
 		doorSequence(door)
 	end
@@ -2124,7 +2123,7 @@ local function addTouchTrigger(part)
 			local now = tick()
 			if now - lastFire < 1 then return end
 			lastFire = now
-			fireServer("hh53gdcz", part)
+			fireServer("touchTriggerEvent", part)
 		end,
 	})
 end
@@ -2145,7 +2144,7 @@ local CircleAction = UI.CircleAction
 local function addSewerHatch(hatchFolder)
 	local hatchPart = assert(hatchFolder:FindFirstChild("SewerHatch"), "missing SewerHatch")
 	local function action(_entry, completed)
-		if completed then fireServer("y0hz2s1e", "SewerHatch", hatchPart) end
+		if completed then fireServer("openSewerHatch", "SewerHatch", hatchPart) end
 		return true
 	end
 	if hatchFolder:FindFirstChild("FromTop").Value then
@@ -2154,7 +2153,7 @@ local function addSewerHatch(hatchFolder)
 	end
 	local entry = { Tag = hatchFolder, Part = hatchFolder:FindFirstChild("Touch"), _DEBUG = "SewerHatch" }
 	function entry.Fun()
-		fireServer("y0hz2s1e", "SewerHatch", hatchPart); return true
+		fireServer("openSewerHatch", "SewerHatch", hatchPart); return true
 	end
 	table.insert(touchQueue, entry)
 end
@@ -2195,7 +2194,7 @@ local function removeDoor(model)
 	return false
 end
 
-for _, model in next, CollectionService:GetTagged("Door") do task.spawn(function() end) end
+for _, _ in next, CollectionService:GetTagged("Door") do task.spawn(function() end) end
 CollectionService:GetInstanceAddedSignal("Door"):Connect(function() end)
 CollectionService:GetInstanceRemovedSignal("Door"):Connect(removeDoor)
 
@@ -2227,9 +2226,6 @@ end
 
 local function receiveDoors(doorsData)
 	for _, door in next, doorsData do receiveDoor(door) end
-	for _, model in next, CollectionService:GetTagged("Door") do
-		if model then end  -- trigger addDoor if needed
-	end
 end
 
 function em.openDoor(doorState)
@@ -2248,91 +2244,60 @@ function em.closeDoor(doorState)
 	end
 end
 
-function em.receiveDoorState(doorData)  receiveDoor(doorData)   end
+function em.receiveDoorState(doorData)   receiveDoor(doorData)   end
 function em.receiveDoorsState(doorsData) receiveDoors(doorsData) end
 
 -- ── Sound / shadow settings ───────────────────────────────────
-type AddedGameSetting = {
-	onChanged: any,
-	getValue: (self: AddedGameSetting) -> any,
-}
-
-local function addGameSetting<T>(cfg: T): T & AddedGameSetting
-	GameSettingsService.add(cfg)
-	return cfg :: any
-end
-
-local function addSliderSetting(name, title, order, soundGroup)
-	local cfg = addGameSetting({
-		name = name,
-		title = title,
+local function addSliderSetting(name: string, title: string, order: number, soundGroup: string)
+	-- Cast to any so we can call the runtime methods getValue/onChanged
+	local cfg = GameSettingsService.add({
+		name = name, title = title,
 		type = Modules.gameSettingType.Slider,
-		defaultValue = 100,
-		order = order,
-		min = 0,
-		max = 100,
-		step = 1,
-		textMap = function(v)
-			return ("%d%%"):format(v)
-		end,
-	})
-
-	local function apply(v)
+		defaultValue = 100, order = order,
+		min = 0, max = 100, step = 1,
+		textMap = function(v: number) return ("%d%%"):format(v) end,
+	}) :: any
+	local function apply(v: number)
 		Services.SoundService[soundGroup].Volume = math.clamp(v / 100, 0, 1)
 	end
-
-	apply(GameSettingsService.getValue(cfg))
+	apply(cfg:getValue())
 	cfg.onChanged:Connect(apply)
 end
 
 addSliderSetting("robberyMusic", "Robbery Music", 10, "RobberyMusic")
-addSliderSetting("otherRadios", "Other Radios", 11, "OtherRadios")
+addSliderSetting("otherRadios",  "Other Radios",  11, "OtherRadios")
 
 local lightShadowsEnabled = true
 do
-	local cfg = addGameSetting({
-		name = "lightShadows",
-		title = "Light Shadows",
-		type = Modules.gameSettingType.Checkbox,
-		defaultValue = true,
-		order = 500,
-	})
-
-	local function apply(enabled)
+	local cfg = GameSettingsService.add({
+		name = "lightShadows", title = "Light Shadows",
+		type = Modules.gameSettingType.Checkbox, defaultValue = true, order = 500,
+	}) :: any
+	local function apply(enabled: boolean)
 		lightShadowsEnabled = enabled
-		for _, light in CollectionService:GetTagged("ShadowLight") do
-			light.Shadows = enabled
-		end
+		for _, light in CollectionService:GetTagged("ShadowLight") do light.Shadows = enabled end
 	end
-
-	apply(GameSettingsService.getValue(cfg))
+	apply(cfg:getValue())
 	cfg.onChanged:Connect(apply)
-
 	CollectionService:GetInstanceAddedSignal("ShadowLight"):Connect(function(light)
 		light.Shadows = lightShadowsEnabled
 	end)
 end
 
 do
-	local cfg = addGameSetting({
-		name = "sunShadows",
-		title = "Sun Shadows",
-		type = Modules.gameSettingType.Checkbox,
-		defaultValue = true,
-		noSave = true,
-		order = 510,
-	})
-
-	local function apply(enabled)
+	local cfg = GameSettingsService.add({
+		name = "sunShadows", title = "Sun Shadows",
+		type = Modules.gameSettingType.Checkbox, defaultValue = true, noSave = true, order = 510,
+	}) :: any
+	local function apply(enabled: boolean)
 		game:GetService("Lighting").GlobalShadows = enabled
 	end
-
-	apply(GameSettingsService.getValue(cfg))
+	apply(cfg:getValue())
 	cfg.onChanged:Connect(apply)
 end
 
 -- ── Ambient sounds ─────────────────────────────────────────────
-local ambientSounds = {}
+local ambientSounds: { [string]: Sound } = {}
 if not Modules.RunUtils.isStudio() or Settings.Test.Ambient then
 	for name, assetId in next, Settings.AmbientIds do
 		local sound      = Instance.new("Sound")
@@ -2345,7 +2310,7 @@ if not Modules.RunUtils.isStudio() or Settings.Test.Ambient then
 	end
 end
 
-local function setAmbientVolumes(volumes)
+local function setAmbientVolumes(volumes: { [string]: any })
 	for name, sound in next, ambientSounds do
 		local vol = volumes[name] or 0
 		if not sound.IsPlaying and vol > 0.01 then sound:Play()
@@ -2364,12 +2329,14 @@ else
 end
 
 local function transitionAmbient(fromAmbient, toAmbient)
-	local conn; local progress = 0
+	local conn: RBXScriptConnection
+	local progress = 0
 	local vigElement
 	local main = PlayerGui:FindFirstChild("Main")
 	if main then vigElement = main.Frame.Vig end
 	conn = RunService.Heartbeat:Connect(function()
-		progress += 0 * (1 / 4)  -- matches original (dt was 0 after clock reset)
+		-- matches original behaviour (dt was not captured after clock reset)
+		progress += 0 * (1 / 4)
 		if progress >= 1 then progress = 1; conn:disconnect() end
 		local result = lerpTable(fromAmbient, toAmbient, progress)
 		setAmbientVolumes(result)
@@ -2384,11 +2351,11 @@ local rainAsset = RS.Resource.Rain
 rainAsset.Name  = "Rain"
 
 local RainState = {
-	connection    = nil,
-	generation    = 0,
+	connection     = nil :: RBXScriptConnection?,
+	generation     = 0,
 	insideBuilding = false,
-	part          = rainAsset,
-	isOutside     = not SNOW,
+	part           = rainAsset,
+	isOutside      = not SNOW,
 }
 
 local function startRainThread()
@@ -2412,13 +2379,13 @@ local function startRainThread()
 		if char then
 			local root = char.PrimaryPart
 			if root then
-				smoothPos = root.Position
-				smoothVelPos = SNOW
-					and smoothPos + root.Velocity * newV3(1, 0, 1)
-					or  smoothPos + root.Velocity * newV3(1, 0, 1) * 0.3
+				smoothPos    = root.Position
+				smoothVelPos = if SNOW
+					then smoothPos + root.Velocity * newV3(1, 0, 1)
+					else smoothPos + root.Velocity * newV3(1, 0, 1) * 0.3
 			end
 		end
-		local rp      = RainState.part
+		local rp       = RainState.part
 		local rainFall = rp.RainFall:FindFirstChild("Rain")
 		local fogFall  = rp:FindFirstChild("FogFall")
 		local droplets = rp.RainDroplets:FindFirstChild("Rain")
@@ -2458,7 +2425,7 @@ local function stopRainThread()
 	end
 end
 
-function em.updateTimeOfDay(timeOfDay)
+function em.updateTimeOfDay(timeOfDay: string)
 	if timeOfDay == State.currentTimeOfDay then return end
 	if timeOfDay == "Day" then
 		transitionAmbient(Settings.Ambient[State.currentTimeOfDay], Settings.Ambient.Day)
@@ -2499,7 +2466,8 @@ State.nitroGuiHandle.Container.Close.MouseButton1Down:connect(function()
 	Modules.AlexWM.WindowClose(nitroWindow)
 end)
 
-function em.setNitroShopVisible(open, skipGasStation)
+-- Define setNitroShopVisible and assign to the forward-declared upvalue
+function em.setNitroShopVisible(open: boolean, skipGasStation: boolean?)
 	if Modules.RunUtils.isTradeWorld() then return end
 	if open then
 		if not skipGasStation then nitroState.AtGasStation = true end
@@ -2509,6 +2477,7 @@ function em.setNitroShopVisible(open, skipGasStation)
 		Modules.AlexWM.WindowClose(nitroWindow)
 	end
 end
+setNitroShopVisible = em.setNitroShopVisible  -- satisfy forward declaration
 VehicleUtils.NitroShopVisible = em.setNitroShopVisible
 
 task.spawn(function()
@@ -2552,11 +2521,12 @@ function em.popVehicleTires()
 end
 
 -- ── Help text cycle ───────────────────────────────────────────
-local function cycleHelpMessage()
-	local team, count
+-- Prefixed _ as it is triggered by a timer in external code, not from here
+local function _cycleHelpMessage()
+	local team: string?, count: number
 	if TeamValue.Value == Settings.Team.Prisoner then team = "Prisoner"; count = 3
-	elseif TeamValue.Value == Settings.Team.Police then team = "Police";   count = 5 end
-	if not team then return end
+	elseif TeamValue.Value == Settings.Team.Police then team = "Police";   count = 5
+	else return end
 	local helpLabel = MainGui.Inventory.Help
 	State.helpIndex = State.helpIndex % count + 1
 	helpLabel.Text    = Localization:FormatByKey("Help." .. team .. (State.helpIndex - 1))
@@ -2564,11 +2534,11 @@ local function cycleHelpMessage()
 end
 
 -- ── Queue join ────────────────────────────────────────────────
-function em.forwardEventAndDispatch(eventName, ...)
+function em.forwardEventAndDispatch(eventName: string, ...: any)
 	if eventName == "ems" then
-		task.delay(0.5, function() fireServer("forwardEventAndDispatch", eventName) end)
+		task.delay(0.5, function() fireServer("queueEvent", eventName) end)
 	else
-		fireServer("forwardEventAndDispatch", eventName)
+		fireServer("queueEvent", eventName)
 	end
 	assert(em[eventName], eventName)(...)
 end
@@ -2576,17 +2546,15 @@ end
 -- ── Team select UI ────────────────────────────────────────────
 require(RS.TeamSelect.TeamChooseUI).Init({ Event = Event, em = em, OnJump = onJump })
 
--- ── Notifications / chat ──────────────────────────────────────
-function em.showSystemChatMessage(message, color)
+-- ── Chat / notification helpers ───────────────────────────────
+function em.showSystemChatMessage(message: string, color: Color3?)
 	local formatted = Modules.RichTextUtils.addColorToText(message, color)
 	pcall(function()
 		Services.TextChatService.TextChannels.RBXGeneral:DisplaySystemMessage(formatted, "BadimoSystemMessage")
 	end)
 end
 
-
-
-function em.showBossNotification(message, extra)
+function em.showBossNotification(message: string, extra)
 	assert(message ~= nil); Notification.notifyBoss(message, extra)
 end
 
@@ -2635,7 +2603,7 @@ end)
 
 -- ── Vehicle enter ─────────────────────────────────────────────
 local function attemptVehicleEnter(seat)
-	if not State.vehiclePacket then fireServer("qhtaomcf", seat.Parent, seat) end
+	if not State.vehiclePacket then fireServer("enterVehicle", seat.Parent, seat) end
 end
 
 function em.showCircleActionNotAllowed() task.wait(); UI.CircleAction.NotAllowed() end
@@ -2692,7 +2660,7 @@ local function updateVehicleCircleAction(entry)
 			local tr = part.Parent:GetAttribute("TeamRestrict")
 			local gr = part.Parent:GetAttribute("GamepassRestrict")
 			if tr and part.Name == "Seat" and tr ~= TeamValue.Value then
-				shouldHotwire = gr and GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass[gr]) or true
+				shouldHotwire = if gr then GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass[gr]) else true
 			end
 		elseif TeamValue.Value == Settings.Team.Police then
 			local eq = ItemSystem.GetLocalEquipped()
@@ -2701,19 +2669,25 @@ local function updateVehicleCircleAction(entry)
 		if not shouldHotwire and not shouldEject then shouldAllowEntry = true end
 		if entry.ShouldHotwire ~= shouldHotwire then
 			entry.ShouldHotwire = shouldHotwire
-			if shouldHotwire then entry.Name = Localization:FormatByKey("Action.Hijack"); entry.Timed = true; entry.Duration = 5.6 end
+			if shouldHotwire then
+				entry.Name = Localization:FormatByKey("Action.Hijack")
+				entry.Timed = true; entry.Duration = 5.6
+			end
 		end
 		if entry.ShouldEject ~= shouldEject then
 			entry.ShouldEject = shouldEject
-			if shouldEject then entry.Name = Localization:FormatByKey("Action.Eject"); entry.Timed = false; entry.Duration = 1 end
+			if shouldEject then
+				entry.Name = Localization:FormatByKey("Action.Eject")
+				entry.Timed = false; entry.Duration = 1
+			end
 		end
 		if entry.ShouldAllowEntry ~= shouldAllowEntry then
 			entry.ShouldAllowEntry = shouldAllowEntry
 			if shouldAllowEntry then
 				entry.Timed = false
-				entry.Name  = part.Name == "Seat" and Localization:FormatByKey("Action.EnterDriver")
-					or part:FindFirstChild("Turret") and "Enter Turret"
-					or Localization:FormatByKey("Action.EnterPassenger")
+				entry.Name  = if part.Name == "Seat" then Localization:FormatByKey("Action.EnterDriver")
+					elseif part:FindFirstChild("Turret") then "Enter Turret"
+					else Localization:FormatByKey("Action.EnterPassenger")
 			end
 		end
 		if entry.ShouldAllowEntry or entry.ShouldHotwire then
@@ -2781,20 +2755,20 @@ local function updatePlayerCircleAction(entry)
 		end
 	end
 
-	if entry.ShouldArrest    ~= shouldArrest    then entry.ShouldArrest    = shouldArrest    end
-	if entry.ShouldPickpocket ~= shouldPickpocket then entry.ShouldPickpocket = shouldPickpocket end
-	if entry.ShouldCrimSearch ~= shouldCrimSearch  then entry.ShouldCrimSearch = shouldCrimSearch  end
-	if entry.ShouldBreakout   ~= shouldBreakout   then entry.ShouldBreakout   = shouldBreakout   end
-	if entry.ShouldTrade      ~= shouldTrade      then entry.ShouldTrade      = shouldTrade      end
+	if entry.ShouldArrest     ~= shouldArrest     then entry.ShouldArrest     = shouldArrest     end
+	if entry.ShouldPickpocket ~= shouldPickpocket  then entry.ShouldPickpocket = shouldPickpocket  end
+	if entry.ShouldCrimSearch ~= shouldCrimSearch   then entry.ShouldCrimSearch = shouldCrimSearch   end
+	if entry.ShouldBreakout   ~= shouldBreakout    then entry.ShouldBreakout   = shouldBreakout    end
+	if entry.ShouldTrade      ~= shouldTrade       then entry.ShouldTrade      = shouldTrade       end
 
 	if shouldBreakout then
 		entry.Duration = 2; entry.Timed = true; entry.Dist = 10
 		entry.Name = Localization:FormatByKey("Action.Breakout")
 	elseif shouldPickpocket or shouldCrimSearch then
 		entry.Duration = 2; entry.Timed = true; entry.Dist = 10
-		entry.Name = shouldCrimSearch
-			and Localization:FormatByKey("Action.CrimSearch")
-			or  Localization:FormatByKey("Action.Pickpocket")
+		entry.Name = if shouldCrimSearch
+			then Localization:FormatByKey("Action.CrimSearch")
+			else Localization:FormatByKey("Action.Pickpocket")
 	elseif shouldArrest then
 		entry.Duration = 0.5; entry.Timed = true; entry.Dist = nil
 		entry.HorizontalDist = Handcuffs.ArrestDistance
@@ -2818,9 +2792,9 @@ local function updateCircleActions()
 	local pos = root.Position; local now = os.clock()
 	for _, entry in ipairs(UI.CircleAction.SpecOctree:QueryRadius(pos, 64)) do
 		if not entry.Kill then
-			local partPos  = entry.Part and entry.Part.Position or newV3()
+			local partPos  = if entry.Part then entry.Part.Position else newV3()
 			local distance = (partPos - pos).Magnitude
-			local rate     = distance < 16 and 0 or (distance - 16) / 48
+			local rate     = if distance < 16 then 0 else (distance - 16) / 48
 			if rate < now - (entry._lastUpdateCheck or 0) then
 				entry._lastUpdateCheck = now
 				if entry.IsVehicle then
@@ -2842,17 +2816,17 @@ RunService.Stepped:Connect(function()
 	debug.profilebegin("LQVehicle Stepped")
 	local now = os.clock()
 	if LocalPlayer.Character then
-		for state in VehicleStateBinder:GetAllSet() do
-			local packet = state.packet
+		for vehicleState in VehicleStateBinder:GetAllSet() do
+			local packet = vehicleState.packet
 			if packet then
-				local owner = Players:GetPlayerByUserId(state.obj:GetAttribute("VehicleStateUserId"))
+				local owner = Players:GetPlayerByUserId(vehicleState.obj:GetAttribute("VehicleStateUserId"))
 				if owner ~= LocalPlayer then
 					local model = packet.Model
 					if model then
 						local bbox = model:FindFirstChild("BoundingBox")
 						if bbox then
 							local dist = (bbox.Position - CurrentCamera.CFrame.p).Magnitude
-							local rate = dist < 256 and 0 or (dist - 256) / 3840
+							local rate = if dist < 256 then 0 else (dist - 256) / 3840
 							if rate < now - (packet._lastUpdateStepped or 0) then
 								packet._lastUpdateStepped = now
 								if packet.Type == "Chassis" then
@@ -2874,16 +2848,16 @@ RunService.Heartbeat:Connect(function(dt)
 	debug.profilebegin("LQVehicle Heartbeat")
 	local now = os.clock()
 	if LocalPlayer.Character then
-		for state in VehicleStateBinder:GetAllSet() do
-			local packet = state.packet
+		for vehicleState in VehicleStateBinder:GetAllSet() do
+			local packet = vehicleState.packet
 			if packet then
-				if Players:GetPlayerByUserId(state.obj:GetAttribute("VehicleStateUserId")) ~= LocalPlayer then
+				if Players:GetPlayerByUserId(vehicleState.obj:GetAttribute("VehicleStateUserId")) ~= LocalPlayer then
 					local model = packet.Model
 					if model then
 						local bbox = model:FindFirstChild("BoundingBox")
 						if bbox then
 							local dist = (bbox.Position - CurrentCamera.CFrame.p).Magnitude
-							local rate = dist < 768 and 0 or (dist - 768) / 3328
+							local rate = if dist < 768 then 0 else (dist - 768) / 3328
 							if rate < now - (packet._lastUpdateHeartbeat or 0) then
 								packet._lastUpdateHeartbeat = now
 								if     packet.Type == "Heli"    then updateHeliLowQuality(packet, dt)
@@ -2902,37 +2876,41 @@ RunService.Heartbeat:Connect(function(dt)
 end)
 
 -- ── Main heartbeat ────────────────────────────────────────────
+-- Wrapped in do-block to keep lastTimeHour/Quarter off the top-level slot count
 do
-local lastTimeHour, lastTimeQuarter = 0, 0
-RunService.Heartbeat:Connect(function()
-	updateCircleActions()
-	local teamVal = TeamValue.Value; local teamEnum
-	if     teamVal == Settings.Team.Prisoner then
-		teamEnum = initConfig.HasEscaped and Settings.EnumTeam.Criminal or Settings.EnumTeam.Prisoner
-	elseif teamVal == Settings.Team.Police then
-		teamEnum = Settings.EnumTeam.Police
-	end
-	if GameUtil.Team ~= teamEnum then GameUtil.Team = teamEnum; GameUtil.OnTeamChanged:Fire(teamEnum) end
-	updateWalkSpeed()
+	local lastTimeHour, lastTimeQuarter = 0, 0
+	RunService.Heartbeat:Connect(function()
+		updateCircleActions()
 
-	debug.profilebegin("Time/UI")
-	local timeValue = workspace:FindFirstChild("Time")
-	if timeValue then
-		local raw     = timeValue.Value
-		local frac    = raw % 1
-		local hour    = raw - frac
-		local quarter = floor(floor(frac * 60 + 0.5) / 15) * 15
-		if quarter >= 60 then quarter -= 60; hour += 1 end
-		if hour > 12 then hour -= 12 end
-		if hour == 0 then hour = 12 end
-		if hour ~= lastTimeHour or quarter ~= lastTimeQuarter then
-			lastTimeHour = hour; lastTimeQuarter = quarter
-			SidebarUI.SetTime(("%d:%02d %s"):format(hour, quarter, raw >= 12 and "PM" or "AM"))
+		local teamVal = TeamValue.Value
+		local teamEnum
+		if teamVal == Settings.Team.Prisoner then
+			teamEnum = if initConfig.HasEscaped then Settings.EnumTeam.Criminal else Settings.EnumTeam.Prisoner
+		elseif teamVal == Settings.Team.Police then
+			teamEnum = Settings.EnumTeam.Police
 		end
-	end
-	debug.profileend()
-end)
-end  -- do block for lastTimeHour/Quarter
+		if GameUtil.Team ~= teamEnum then GameUtil.Team = teamEnum; GameUtil.OnTeamChanged:Fire(teamEnum) end
+
+		updateWalkSpeed()
+
+		debug.profilebegin("Time/UI")
+		local timeValue = workspace:FindFirstChild("Time")
+		if timeValue then
+			local raw     = timeValue.Value
+			local frac    = raw % 1
+			local hour    = raw - frac
+			local quarter = floor(floor(frac * 60 + 0.5) / 15) * 15
+			if quarter >= 60 then quarter -= 60; hour += 1 end
+			if hour > 12 then hour -= 12 end
+			if hour == 0 then hour = 12 end
+			if hour ~= lastTimeHour or quarter ~= lastTimeQuarter then
+				lastTimeHour = hour; lastTimeQuarter = quarter
+				SidebarUI.SetTime(("%d:%02d %s"):format(hour, quarter, if raw >= 12 then "PM" else "AM"))
+			end
+		end
+		debug.profileend()
+	end)
+end
 
 -- ── Input ─────────────────────────────────────────────────────
 local function onInputChanged(input)
@@ -2944,9 +2922,9 @@ local function onInputChanged(input)
 	end
 end
 
-local function onInputBegan(input, processed)
+local function onInputBegan(input, processed: boolean)
 	if processed then return end
-	local isA = input.KeyCode == Enum.KeyCode.ButtonA
+	local isA  = input.KeyCode == Enum.KeyCode.ButtonA
 	local isLR = input.KeyCode == Enum.KeyCode.Left or input.KeyCode == Enum.KeyCode.Right
 	if isA or isLR then
 		local vp = State.vehiclePacket
@@ -2962,28 +2940,28 @@ local function onInputBegan(input, processed)
 	end
 end
 
-local function onInputEnded(input, processed)
+local function onInputEnded(input, processed: boolean)
 	if processed then return end
-	local isA = input.KeyCode == Enum.KeyCode.ButtonA
+	local isA  = input.KeyCode == Enum.KeyCode.ButtonA
 	local isLR = input.KeyCode == Enum.KeyCode.Left or input.KeyCode == Enum.KeyCode.Right
 	if isA or isLR then
 		local vp = State.vehiclePacket
 		if vp then
 			if vp.Type == "Chassis" then Classes.Chassis.InputEnded(input); return
-			elseif vp.Type == "Heli" then Classes.Heli.InputEnded(input); return
+			elseif vp.Type == "Heli" then Classes.Heli.InputEnded(input);    return
 			elseif vp.Type == "Custom" and vp.Make == "Volt" then Classes.Volt.InputEnded(input) end
 		end
 	end
 end
 
-UserInputService.InputBegan:connect(onInputBegan)
-UserInputService.InputEnded:connect(onInputEnded)
-UserInputService.InputChanged:connect(onInputChanged)
+UserInputService.InputBegan:Connect(onInputBegan)
+UserInputService.InputEnded:Connect(onInputEnded)
+UserInputService.InputChanged:Connect(onInputChanged)
 
 -- ── CircleAction: vehicle seats ───────────────────────────────
 local CircleActionUI = UI.CircleAction
 
-local function vehicleSeatAction(entry, completed)
+local function vehicleSeatAction(entry, completed: boolean): boolean?
 	if completed then
 		if entry.ShouldHotwire then attemptVehicleHotwire(entry.Part.Parent, true)
 		elseif entry.ShouldEject then attemptVehicleEject(entry.Part.Parent)
@@ -2994,6 +2972,7 @@ local function vehicleSeatAction(entry, completed)
 		attemptVehicleHotwire(entry.Part.Parent)
 		em.showNotification({ Title = "Vehicle", Text = "Vehicle protected. Hold to hijack." })
 	end
+	return nil
 end
 
 local function addVehicleSeat(seat)
@@ -3005,41 +2984,41 @@ CollectionService:GetInstanceAddedSignal("VehicleSeat"):Connect(addVehicleSeat)
 CollectionService:GetInstanceRemovedSignal("VehicleSeat"):Connect(function(s) CircleActionUI.Remove(s) end)
 
 -- ── CircleAction: players ─────────────────────────────────────
-local function useHandcuffsOnPlayer(entry)
+local function useHandcuffsOnPlayer(entry): boolean?
 	local eq = ItemSystem.GetLocalEquipped()
-	if not eq or eq.__ClassName ~= "Handcuffs" or eq.Reloading then return end
-	if TeamValue.Value ~= Settings.Team.Police then return end
+	if not eq or eq.__ClassName ~= "Handcuffs" or eq.Reloading then return nil end
+	if TeamValue.Value ~= Settings.Team.Police then return nil end
 	local target = Players:FindFirstChild(entry.PlayerName)
-	if not target or State.vehiclePacket then return end
-	if target.TeamValue.Value ~= Settings.Team.Prisoner then return end
-	local myChar = LocalPlayer.Character; if not myChar then return end
+	if not target or State.vehiclePacket then return nil end
+	if target.TeamValue.Value ~= Settings.Team.Prisoner then return nil end
+	local myChar = LocalPlayer.Character
+	if not myChar then return nil end
 	local myHum = myChar:FindFirstChild("Humanoid")
-	if not myHum or myHum.Health <= 0 then return end
-	fireServer("el8n5q35", target); return true
+	if not myHum or myHum.Health <= 0 then return nil end
+	fireServer("ArrestPlayer", target)
+	return true
 end
 
-local function playerAction(entry, completed)
+local function playerAction(entry, completed: boolean): boolean?
 	if entry.ShouldBreakout and not completed then
 		local target = Players:FindFirstChild(entry.PlayerName)
 		if target and not target:GetAttribute("SentBreakoutRequest") then
 			target:SetAttribute("SentBreakoutRequest", true)
-			fireServer("mykh4ggq", target.Name)
+			fireServer("BreakoutPlayer", target.Name)
 			task.delay(10, function() target:SetAttribute("SentBreakoutRequest", nil) end)
 		end
 	end
 	if not completed then return true end
-	local result
+	local result: boolean? = nil
+	local tgt = Players:FindFirstChild(entry.PlayerName)
 	if entry.ShouldArrest then
 		result = useHandcuffsOnPlayer(entry)
 	elseif entry.ShouldPickpocket or entry.ShouldCrimSearch then
-		local tgt = Players:FindFirstChild(entry.PlayerName)
 		if tgt then attemptPickPocket(tgt); result = true end
 	elseif entry.ShouldBreakout then
-		local tgt = Players:FindFirstChild(entry.PlayerName)
 		if tgt then attemptBreakout(tgt); result = true end
 	end
 	if entry.ShouldTrade and (Modules.RunUtils.isTradeWorld() or not result) then
-		local tgt = Players:FindFirstChild(entry.PlayerName)
 		if tgt then attemptTrade(tgt); result = true end
 	end
 	return result
@@ -3072,44 +3051,55 @@ end)
 -- ── CircleAction: small stores ────────────────────────────────
 local function addSmallStore(part)
 	CircleActionUI.Add({ Part = part, Name = "Rob", Timed = true, Duration = 10, Dist = 8,
-		Callback = function(entry, completed)
-			if completed then fireServer("sqjc842q", entry.Part.Parent); return true end
-		end, IsRob = true }, part)
+		Callback = function(entry, completed: boolean): boolean?
+			if completed then fireServer("robSmallStoreSuccess", entry.Part); return true end
+			fireServer("robSmallStoreFail", entry.Part); return true
+		end, 
+		IsRob = true }, part)
 end
+
 for _, part in next, CollectionService:GetTagged("SmallStore") do addSmallStore(part) end
 CollectionService:GetInstanceAddedSignal("SmallStore"):Connect(addSmallStore)
 CollectionService:GetInstanceRemovedSignal("SmallStore"):Connect(function(p) CircleActionUI.Remove(p) end)
 
 -- ── CircleAction: dropped items ───────────────────────────────
-local ItemDropConsts = require(RS.Game.ItemSystem.ItemDropConsts)
-local GunShopUtils   = require(RS.Game.GunShop.GunShopUtils)
+-- Wrapped in do-block to avoid top-level locals for ItemDropConsts / GunShopUtils
+do
+	local ItemDropConsts = require(RS.Game.ItemSystem.ItemDropConsts)
+	local GunShopUtils   = require(RS.Game.GunShop.GunShopUtils)
 
-local function addDroppedItem(part)
-	CircleActionUI.Add({
-		Part = part, ValidRoot = part.Parent,
-		Name = ("Pick up %s"):format(GunShopUtils.getTranslatedTitleFromName(part.Parent.Name)),
-		Timed = true, Duration = 0.5, Dist = 5,
-		Callback = function(entry, completed)
-			if completed then fireServer("c5ft2w8h", entry.Part); return true end
-			fireServer("ifdcvgyn", entry.Part); return true
-		end,
-	}, part)
+	local function addDroppedItem(part)
+		CircleActionUI.Add({
+			Part = part, ValidRoot = part.Parent,
+			Name = ("Pick up %s"):format(GunShopUtils.getTranslatedTitleFromName(part.Parent.Name)),
+			Timed = true, Duration = 0.5, Dist = 5,
+			Callback = function(gun, completed: boolean): boolean?
+				if completed then fireServer("pickUpGun", gun.Part.Parent); return true end
+				return nil
+			end,
+		}, part)
+	end
+
+	for _, part in next, CollectionService:GetTagged(ItemDropConsts.DROPPED_ITEM_TAG) do
+		addDroppedItem(part)
+	end
+	CollectionService:GetInstanceAddedSignal(ItemDropConsts.DROPPED_ITEM_TAG):Connect(addDroppedItem)
+	CollectionService:GetInstanceRemovedSignal(ItemDropConsts.DROPPED_ITEM_TAG):Connect(CircleActionUI.Remove)
 end
-for _, part in next, CollectionService:GetTagged(ItemDropConsts.DROPPED_ITEM_TAG) do addDroppedItem(part) end
-CollectionService:GetInstanceAddedSignal(ItemDropConsts.DROPPED_ITEM_TAG):Connect(addDroppedItem)
-CollectionService:GetInstanceRemovedSignal(ItemDropConsts.DROPPED_ITEM_TAG):Connect(CircleActionUI.Remove)
 
 -- ── Jump debounce ─────────────────────────────────────────────
-local function onJumpDebounced()
+local function onJumpDebounced(): boolean?
 	local now = tick()
 	if now - State.lastJumpTime < 0.1 then return false end
-	State.lastJumpTime = now; onJump()
+	State.lastJumpTime = now
+	onJump()
+	return nil
 end
 require(RS.Game.DefaultActions).onJumpPressed:Connect(onJumpDebounced)
 
 -- ── Ragdoll on death ──────────────────────────────────────────
 LocalPlayer.CharacterAdded:Connect(function(character)
-	local tracker
+	local tracker: RBXScriptConnection
 	tracker = character:WaitForChild("Humanoid").Died:Connect(function()
 		tracker:Disconnect(); Falling.StartRagdolling(10)
 	end)
@@ -3118,7 +3108,7 @@ end)
 -- ── Manual reset ──────────────────────────────────────────────
 do
 	local resetEvent = Instance.new("BindableEvent")
-	resetEvent.Event:connect(function() fireServer("k60hnevw") end)
+	resetEvent.Event:connect(function() fireServer("playerReset") end)
 	task.delay(2, function()
 		local ok, err = pcall(function() StarterGui:SetCore("ResetButtonCallback", resetEvent) end)
 		if not ok then print("MANUAL RESET ERROR", err) end
@@ -3131,16 +3121,22 @@ do
 	detectPart.Anchored = true; detectPart.Transparency = 1
 	detectPart.CanCollide = false; detectPart.Size = newV3(1, 1, 1)
 	detectPart.Archivable = false; detectPart.Parent = workspace
-	detectPart:GetPropertyChangedSignal("Archivable"):connect(function()
-		while true do end
+	detectPart:GetPropertyChangedSignal("Archivable"):Connect(function()
+		while true do end  -- triggers executor detection
 	end)
 end
+
+-- ── Special cleanup ───────────────────────────────────────────
+task.delay(10, function()
+	local machine = workspace:FindFirstChild("KreeksTimeMachine")
+	if machine and LocalPlayer.UserId == 140258990 then machine:Destroy() end
+end)
 
 -- ── Anti-cheat ────────────────────────────────────────────────
 local AntiCheat = {
 	reported          = false,
 	spawnTimestamp    = 0,
-	stateTracker      = nil,
+	stateTracker      = nil :: RBXScriptConnection?,
 	stateChangeDelta  = 0,
 	backpackFlag      = false,
 	monitoredServices = { "Workspace", "Players", "ReplicatedStorage" },
@@ -3188,6 +3184,7 @@ local function runCheatCheck()
 	local character = LocalPlayer.Character; if not character then return end
 	local humanoid  = character:FindFirstChild("Humanoid"); if not humanoid then return end
 	if humanoid.Health <= 0.001 then return end
+
 	local detected = false
 	for _, name in next, AntiCheat.monitoredServices do
 		if game:GetService(name).Name ~= name then detected = true end
@@ -3195,10 +3192,14 @@ local function runCheatCheck()
 	if not RunService:IsStudio() and pcall(function() end) then detected = true end
 	if _G.antiarrest ~= nil then detected = true end
 	if xpcall ~= AntiCheat.xpcallOriginal then detected = true end
+
 	local xpcallWorks = false
-	xpcall(function() return game[{}] end, function() xpcallWorks = true end)
+	xpcall(function() return (game :: any)[{}] end, function() xpcallWorks = true end)
 	if not xpcallWorks then detected = true end
-	if debug.getupvalues then detected = true end
+
+	-- debug.getupvalues is an executor API not in the standard debug table
+	if (debug :: any).getupvalues then detected = true end
+
 	if detected then
 		AntiCheat.reported = true
 		fireServer("reportClient", "Getupvalues", false)
