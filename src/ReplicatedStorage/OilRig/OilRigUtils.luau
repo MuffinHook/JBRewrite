@@ -169,8 +169,7 @@ function module.getTNTModel(arg1) -- Line 67
     var20 = CollectionService_upvr:HasTag(arg1, OilRigConsts_upvr.TAG_NAME)
     assert(var20, "Obj does not have oil rig robbery tag")
     local clone = ReplicatedStorage_upvr.OilRig.Res.TNT:Clone()
-    var20 = CollectionService_upvr:AddTag
-    var20(clone, OilRigConsts_upvr.TNT_MODEL_TAG_NAME)
+    CollectionService_upvr:AddTag(clone, OilRigConsts_upvr.TNT_MODEL_TAG_NAME)
     return clone
 end
 function module.updateTNTTimers(arg1, arg2) -- Line 73

@@ -23,7 +23,7 @@ function module_upvr.new(arg1, arg2) -- Line 12
     module_upvr_2._maid:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(module_upvr_2._obj, "Prompt", function(arg1_4, arg2_3) -- Line 29
         local tbl = {}
         tbl.Part = arg1_4
-        tbl.Name = "Grab %s":format(arg2)
+        tbl.Name = string.format("Grab %s", arg2)
         tbl.Timed = false
         tbl.Dist = 10
         tbl.Callback = action_upvr

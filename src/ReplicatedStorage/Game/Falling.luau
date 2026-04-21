@@ -21,7 +21,7 @@ local function _() -- Line 34, Named "GuiUpdateInput"
 end
 local function _() -- Line 42, Named "GuiPromptSkydive"
     var13_upvw.Enabled = true
-    var13_upvw.Button.Image = "rbxassetid://%d":format(4915090302)
+    var13_upvw.Button.Image = ("rbxassetid://%d"):format(4915090302)
     if UserInputService_upvr.GamepadEnabled then
         var13_upvw.Button.Gamepad.Image = ControllerImage_upvr.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
         var13_upvw.Button.Gamepad.Visible = true
@@ -31,7 +31,7 @@ local function _() -- Line 42, Named "GuiPromptSkydive"
 end
 local function _() -- Line 47, Named "GuiPromptParachute"
     var13_upvw.Enabled = true
-    var13_upvw.Button.Image = "rbxassetid://%d":format(4915089706)
+    var13_upvw.Button.Image = ("rbxassetid://%d"):format(4915089706)
     if UserInputService_upvr.GamepadEnabled then
         var13_upvw.Button.Gamepad.Image = ControllerImage_upvr.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
         var13_upvw.Button.Gamepad.Visible = true
@@ -56,7 +56,7 @@ local function _() -- Line 64, Named "getRootPart"
 end
 local function GetMass_upvr(arg1) -- Line 78, Named "GetMass"
     assert(arg1)
-    local var22
+    local var22 = 0
     for _, v in next, arg1:GetChildren() do
         if v:IsA("BasePart") then
             var22 += v:GetMass()
@@ -110,16 +110,14 @@ local function StartSkydiving_upvr() -- Line 124, Named "StartSkydiving"
     var29_upvw = var43
     var43 = var31_upvw
     if var43 then
-        var43 = var31_upvw:Stop
-        var43()
+        var31_upvw:Stop()
         var43 = nil
         var31_upvw = var43
     end
     var43 = CharacterAnim_upvr
     var43 = var43.getSkydiveTrack()
     var31_upvw = var43
-    var43 = var31_upvw:Play
-    var43(0.3)
+    var31_upvw:Play(0.3)
     var43 = GetMass_upvr(Humanoid.Parent)
     var33_upvw = var43
     var43 = Instance.new("VectorForce")
@@ -134,7 +132,7 @@ local function StartSkydiving_upvr() -- Line 124, Named "StartSkydiving"
     var43.Enabled = true
     var43 = var13_upvw
     var43 = var43.Button
-    var43.Image = "rbxassetid://%d":format(4915089706)
+    var43.Image = ("rbxassetid://%d"):format(4915089706)
     var43 = UserInputService_upvr
     var43 = var43.GamepadEnabled
     if var43 then
@@ -154,10 +152,8 @@ local function StartSkydiving_upvr() -- Line 124, Named "StartSkydiving"
     end
     var43 = var37_upvw
     if var43 ~= nil then
-        var43 = var37_upvw:Stop
-        var43()
-        var43 = var37_upvw:Destroy
-        var43()
+        var37_upvw:Stop()
+        var37_upvw:Destroy()
         var43 = nil
         var37_upvw = var43
     end
@@ -170,8 +166,7 @@ local function StartSkydiving_upvr() -- Line 124, Named "StartSkydiving"
     var37_upvw = var43
     var43 = var38_upvw
     if var43 then
-        var43 = var38_upvw:Disconnect
-        var43()
+        var38_upvw:Disconnect()
         var43 = nil
         var38_upvw = var43
     end
@@ -180,8 +175,7 @@ local function StartSkydiving_upvr() -- Line 124, Named "StartSkydiving"
     var38_upvw = var43
     var43 = var39_upvw
     if var43 then
-        var43 = var39_upvw:Destroy
-        var43()
+        var39_upvw:Destroy()
     end
     var43 = HapticEffect_upvr
     var43 = var43.basic(0.15, math.huge)
@@ -210,8 +204,7 @@ local function StopSkydiving_upvr() -- Line 163, Named "StopSkydiving"
         var37_upvw = var46
         var46 = var38_upvw
         if var46 then
-            var46 = var38_upvw:Disconnect
-            var46()
+            var38_upvw:Disconnect()
             var46 = nil
             var38_upvw = var46
         end
@@ -271,7 +264,7 @@ local function StartRagdolling_upvr(arg1) -- Line 193, Named "StartRagdolling"
     var28_upvw = tick()
     AlexRagdoll_upvr.Ragdoll(var54.Parent)
     any_new_result1_upvr_3:Fire()
-    var12_upvw:FireServer('h'.."uk26uhm":sub(3, 5):reverse():reverse():reverse().."".."".."xup2drsj":sub(4, 6):reverse():reverse():reverse():reverse():reverse()..""..'o')
+    var12_upvw:FireServer('h'..("uk26uhm"):sub(3, 5):reverse():reverse():reverse()..""..""..("xup2drsj"):sub(4, 6):reverse():reverse():reverse():reverse():reverse()..""..'o')
     return true
 end
 local function _(arg1) -- Line 233, Named "StartFalling"
@@ -327,7 +320,7 @@ local function StopFalling_upvr(arg1) -- Line 238, Named "StopFalling"
                 if Character_8.PrimaryPart then
                     -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
                     if not TagUtils_upvr.isPointInTag(Character_8.PrimaryPart.Position, "NoFallDamage") then
-                        var12_upvw:FireServer('r'.."iku3p88miu":sub(4, 7):reverse():reverse():reverse().."".."".."ek9bnb95":sub(4, 4):reverse():reverse():reverse():reverse():reverse().."".."hq", var70)
+                        var12_upvw:FireServer('r'..("iku3p88miu"):sub(4, 7):reverse():reverse():reverse()..""..""..("ek9bnb95"):sub(4, 4):reverse():reverse():reverse():reverse():reverse().."".."hq", var70)
                     end
                 end
             end
@@ -349,7 +342,7 @@ local function _() -- Line 270, Named "StartParachuting"
     Paraglide_upvr.Parachute()
     var73 = true
     var13_upvw.Enabled = var73
-    var73 = "rbxassetid://%d":format(4915090302)
+    var73 = ("rbxassetid://%d"):format(4915090302)
     var13_upvw.Button.Image = var73
     if UserInputService_upvr.GamepadEnabled then
         var73 = ControllerImage_upvr
@@ -438,7 +431,7 @@ local function _() -- Line 417, Named "AttemptUseParachute"
         Paraglide_upvr.Parachute()
         var83 = true
         var13_upvw.Enabled = var83
-        var83 = "rbxassetid://%d":format(4915090302)
+        var83 = ("rbxassetid://%d"):format(4915090302)
         var13_upvw.Button.Image = var83
         if UserInputService_upvr.GamepadEnabled then
             var83 = ControllerImage_upvr
@@ -508,7 +501,7 @@ return {
                 Paraglide_upvr.Parachute()
                 var95 = true
                 var13_upvw.Enabled = var95
-                var95 = "rbxassetid://%d":format(4915090302)
+                var95 = ("rbxassetid://%d"):format(4915090302)
                 var13_upvw.Button.Image = var95
                 if UserInputService_upvr.GamepadEnabled then
                     var95 = ControllerImage_upvr
@@ -546,7 +539,7 @@ return {
                 Paraglide_upvr.Parachute()
                 var97 = true
                 var13_upvw.Enabled = var97
-                var97 = "rbxassetid://%d":format(4915090302)
+                var97 = ("rbxassetid://%d"):format(4915090302)
                 var13_upvw.Button.Image = var97
                 if UserInputService_upvr.GamepadEnabled then
                     var97 = ControllerImage_upvr
@@ -572,7 +565,7 @@ return {
                     end
                     Paraglide_upvr.Parachute()
                     var13_upvw.Enabled = true
-                    var13_upvw.Button.Image = "rbxassetid://%d":format(4915090302)
+                    var13_upvw.Button.Image = ("rbxassetid://%d"):format(4915090302)
                     if UserInputService_upvr.GamepadEnabled then
                         var13_upvw.Button.Gamepad.Image = ControllerImage_upvr.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
                         var13_upvw.Button.Gamepad.Visible = true
@@ -603,7 +596,7 @@ return {
                     Paraglide_upvr.Parachute()
                     var100 = true
                     var13_upvw.Enabled = var100
-                    var100 = "rbxassetid://%d":format(4915090302)
+                    var100 = ("rbxassetid://%d"):format(4915090302)
                     var13_upvw.Button.Image = var100
                     if UserInputService_upvr.GamepadEnabled then
                         var100 = ControllerImage_upvr

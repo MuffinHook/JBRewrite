@@ -29,11 +29,11 @@ function module.getModel(arg1, arg2) -- Line 26
     if arg1 ~= "None" then
         local var29 = ItemSkinIds_upvr[arg1]
         if not var29 then
-            error("No skin by name of %s exists.":format(arg1))
+            error(string.format("No skin by name of %s exists.", arg1))
         end
         var28 = var29[var26]
         if not var28 then
-            error("Skin %s has no image id for item: %s":format(arg1, var26))
+            error(string.format("Skin %s has no image id for item: %s", arg1, var26))
         end
     end
     for _, v in clone:GetDescendants() do
@@ -41,7 +41,7 @@ function module.getModel(arg1, arg2) -- Line 26
             local ApplyGunTexture = v:GetAttribute("ApplyGunTexture")
             if ApplyGunTexture == true then
                 if var28 then
-                    ApplyGunTexture = "rbxassetid://%d":format(var28)
+                    ApplyGunTexture = string.format("rbxassetid://%d",var28)
                 else
                     ApplyGunTexture = ""
                 end

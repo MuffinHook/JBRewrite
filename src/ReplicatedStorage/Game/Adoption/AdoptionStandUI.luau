@@ -26,7 +26,7 @@ function module_upvr.setImageId(arg1) -- Line 57
     else
     end
     assert(true)
-    module_upvr.gui.Container.Left.Icon.ImageLabel.Image = "rbxassetid://%d":format(arg1)
+    module_upvr.gui.Container.Left.Icon.ImageLabel.Image = string.format("rbxassetid://%d", arg1)
 end
 local Format_upvr = require(ReplicatedStorage_upvr.Module.Format)
 function module_upvr.setPrice(arg1) -- Line 63
@@ -69,7 +69,7 @@ function module_upvr.setDescriptionTeam(arg1) -- Line 76
     else
         error("Invalid teamId for `setDescriptionTeam`")
     end
-    module_upvr.gui.Container.Right.Description.TextLabel.Text = "This breed does more damage when playing on the %s team!":format(var12)
+    module_upvr.gui.Container.Right.Description.TextLabel.Text = string.format("This breed does more damage when playing on the %s team!", var12)
 end
 function module_upvr.getName() -- Line 89
     local TextBox = module_upvr.gui.Container.Left.DogName.TextBox
@@ -119,7 +119,7 @@ function module_upvr._open() -- Line 109
     local var25_upvr = tbl_upvr[math.random(1, #tbl_upvr)]
     any_new_result1_2:GiveTask(Interval_upvr.every(0.5):Connect(function() -- Line 130
         var24_upvw = var24_upvw % 3 + 1
-        TextBox_2_upvr.PlaceholderText = "%s%s":format(var25_upvr, '.':rep(var24_upvw))
+        TextBox_2_upvr.PlaceholderText = string.format("%s%s", var25_upvr, string.rep('.', var24_upvw))
     end))
     any_new_result1_2:GiveTask(var17_upvr.Container.Close.MouseButton1Down:Connect(function() -- Line 135
         module_upvr.close()

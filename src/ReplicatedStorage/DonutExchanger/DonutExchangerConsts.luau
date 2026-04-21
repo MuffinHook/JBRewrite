@@ -39,7 +39,7 @@ local module = {
         Dialogue = {"I really needed this donut, been in here since 2017."};
     }};
 }
-local var28
+local var28 = 0
 for _, v in module.POSSIBLE_REWARDS do
     local var29
     if 0 >= v.Probability then

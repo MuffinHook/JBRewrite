@@ -61,8 +61,8 @@ function any_extend_result1._reparent(arg1) -- Line 63
             task.cancel(task_delay_result1_upvr)
         end
     end
-    task_delay_result1_upvr = arg1:_updateViewport
-    task_delay_result1_upvr()
+    local _task_delay_result1_upvr = task_delay_result1_upvr
+    arg1:_updateViewport()
 end
 local RunService_upvr = game:GetService("RunService")
 function any_extend_result1.didMount(arg1) -- Line 81

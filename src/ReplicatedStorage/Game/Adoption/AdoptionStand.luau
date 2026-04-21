@@ -63,9 +63,9 @@ function module_upvr.new(arg1) -- Line 18
         CircleAction_upvr.Remove(arg1)
     end)
     module_upvr_2._maid:GiveTask(module_upvr_2._breedIdValue.Changed:Connect(function() -- Line 81, Named "updateSpec"
-        tbl_upvr.Name = "Adopt %s":format(DogConsts_upvr.TITLE[module_upvr_2:GetBreedId()])
+        tbl_upvr.Name = string.format("Adopt %s", DogConsts_upvr.TITLE[module_upvr_2:GetBreedId()])
     end))
-    tbl_upvr.Name = "Adopt %s":format(DogConsts_upvr.TITLE[module_upvr_2:GetBreedId()])
+    tbl_upvr.Name = string.format("Adopt %s", DogConsts_upvr.TITLE[module_upvr_2:GetBreedId()])
     return module_upvr_2
 end
 function module_upvr.GetBreedId(arg1) -- Line 90

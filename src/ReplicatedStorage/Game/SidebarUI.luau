@@ -67,7 +67,7 @@ function module_2_upvr.Init(arg1) -- Line 31
                     var29_upvw = Confirmation_upvr.new("Are you sure you want to switch teams?")
                     var29_upvw.OnYes:Connect(function() -- Line 78
                         var29_upvw = nil
-                        Event_upvr:FireServer('j'.."".."dsapj1sw":sub(3, 4):reverse():reverse():reverse().."".."az0oc")
+                        Event_upvr:FireServer('j'..""..("dsapj1sw"):sub(3, 4):reverse():reverse():reverse().."".."az0oc")
                     end)
                     var29_upvw.OnNo:Connect(function() -- Line 82
                         var29_upvw = nil
@@ -207,8 +207,7 @@ function module_2_upvr.Init(arg1) -- Line 31
         var46(tbl_upvr)
         var46 = GamepassSystem_upvr
         var46 = var46.GetGamepassOwnedSignal(GamepassUtils_upvr.EnumGamepass.TradingVIP)
-        var46 = var46:Connect
-        var46(function() -- Line 207
+        var46:Connect(function() -- Line 207
             local var53
             if GamepassSystem_upvr.DoesPlayerOwn(GamepassUtils_upvr.EnumGamepass.TradingVIP) then
                 var53 = 10087230550
@@ -243,16 +242,14 @@ function module_2_upvr.Init(arg1) -- Line 31
     tbl_upvr(0)
     tbl_upvr = store_upvr
     tbl_upvr = tbl_upvr.changed
-    tbl_upvr = tbl_upvr:connect
-    tbl_upvr(function(arg1_6, arg2) -- Line 228
+    tbl_upvr:connect(function(arg1_6, arg2) -- Line 228
         if arg1_6.safesInventoryItems ~= arg2.safesInventoryItems then
             module_2_upvr.SetSafeCount(#arg1_6.safesInventoryItems)
         end
     end)
     tbl_upvr = UserInputService_upvr
     tbl_upvr = tbl_upvr.InputBegan
-    tbl_upvr = tbl_upvr:Connect
-    tbl_upvr(function(arg1_7) -- Line 238
+    tbl_upvr:Connect(function(arg1_7) -- Line 238
         if arg1_7.UserInputType == Enum.UserInputType.Gamepad1 and arg1_7.KeyCode == Enum.KeyCode.ButtonSelect and GuiService_upvr.SelectedObject ~= nil then
             Utils_upvr.selectIfGamepad(any_createRef_result1_upvr:getValue())
         end

@@ -34,7 +34,7 @@ return {
                 return false
             end
             CodesGui_upvr.CodeContainer.Background.CodeContainer.Code.Text = ""
-            Event_upvr:FireServer('p'.."b561y":sub(4, 4):reverse():reverse():reverse().."".."".."n2ulvilk":sub(5, 6):reverse().."".."".."qye482nlo":sub(5, 6):reverse():reverse():reverse():reverse():reverse().."".."61", Text)
+            Event_upvr:FireServer(('p'.."b561y"):sub(4, 4):reverse():reverse():reverse()..""..""..(("n2ulvilk"):sub(5, 6):reverse())..""..""..(("qye482nlo"):sub(5, 6):reverse():reverse():reverse():reverse():reverse()).."".."61", Text)
             AlexWM_upvr.WindowClose(any_MakeWindow_result1_upvr)
         end
         CodesGui_upvr.CodeContainer.Background.Redeem.MouseButton1Down:Connect(Submit_upvr)

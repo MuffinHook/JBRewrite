@@ -28,8 +28,7 @@ return TableUtils.requireValidIndexAndFreeze({
     REDEEM_REMOTE_NAME = "SeasonRedeemAward";
     LEVELS_AWARDED_VALUE_NAME = "LevelsAwarded";
     PRIZE_PURCHASE_REMOTE_NAME = "PrizePurchase";
-    PRIZE_BUY_TIER = {-- : First try: K:0: attempt to index nil with 't'
-;
+    PRIZE_BUY_TIER = {};
     PRIZE_PRODUCT_ID_TIER = tbl;
     PRIZE_TIER_PRODUCT_ID = TableUtils.requireValidIndexAndFreeze(tbl_3);
     SEASON_SUBTITLE = "Level up to win exclusive prizes!";

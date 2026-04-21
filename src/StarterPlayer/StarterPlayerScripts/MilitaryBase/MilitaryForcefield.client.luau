@@ -604,8 +604,7 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
                 if var192 then
                     i_7 = var80_upvw
                     if i_7 then
-                        i_7 = var80_upvw:cancel
-                        i_7()
+                        var80_upvw:cancel()
                     end
                     i_7 = Audio_upvr
                     i_7 = i_7.promiseFadeTo
@@ -616,8 +615,7 @@ require(ReplicatedStorage.Std.Binder).new("MilitaryForcefield", function(arg1) -
                 end
                 i_7 = var80_upvw
                 if i_7 then
-                    i_7 = var80_upvw:cancel
-                    i_7()
+                    var80_upvw:cancel()
                 end
                 i_7 = Audio_upvr
                 i_7 = i_7.promiseFadeTo

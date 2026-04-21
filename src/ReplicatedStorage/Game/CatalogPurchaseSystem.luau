@@ -8,7 +8,7 @@ local function catalogPurchase_upvr(arg1, arg2) -- Line 10, Named "catalogPurcha
     local tbl = {}
     tbl.Part = arg1
     tbl.Timed = false
-    tbl.Name = "Buy %s":format(arg2.displayNameObj.Value)
+    tbl.Name = string.format("Buy %s", arg2.displayNameObj.Value)
     tbl.Dist = 16
     function tbl.Callback(arg1_2, arg2_2) -- Line 12, Named "action"
         if arg2_2 then

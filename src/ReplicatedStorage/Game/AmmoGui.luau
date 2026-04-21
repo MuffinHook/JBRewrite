@@ -13,8 +13,8 @@ function module_2_upvr.new(arg1) -- Line 19
     local module = {}
     setmetatable(module, module_2_upvr)
     module_2_upvr.Gui.Enabled = true
-    module_2_upvr.Frame.ItemName.Text = "// %s":format(arg1)
-    module_2_upvr.Frame2.ItemName.Text = "// %s":format(arg1)
+    module_2_upvr.Frame.ItemName.Text = string.format("// %s", arg1)
+    module_2_upvr.Frame2.ItemName.Text = string.format("// %s", arg1)
     return module
 end
 function module_2_upvr.Update(arg1, arg2, arg3) -- Line 29
@@ -23,9 +23,9 @@ function module_2_upvr.Update(arg1, arg2, arg3) -- Line 29
     end
     local Frame = module_2_upvr.Frame
     local Frame2 = module_2_upvr.Frame2
-    Frame.Ammo.Text = "%d/":format(arg2)
+    Frame.Ammo.Text = string.format("%d/", arg2)
     Frame.MagSize.Text = arg3 or ""
-    Frame2.Ammo.Text = "%d/":format(arg2)
+    Frame2.Ammo.Text = string.format("%d/", arg2)
     local MagSize = Frame2.MagSize
     MagSize.Text = arg3 or ""
     if arg2 > 0 then

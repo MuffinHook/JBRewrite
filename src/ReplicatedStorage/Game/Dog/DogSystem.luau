@@ -8,7 +8,7 @@ function module_upvr.init() -- Line 9
         tbl[i] = {}
         for i_2, v_2 in pairs(v) do
             local Animation = Instance.new("Animation")
-            Animation.AnimationId = "rbxassetid://%d":format(v_2)
+            Animation.AnimationId = string.format("rbxassetid://%d", v_2)
             tbl[i][i_2] = Animation
         end
     end

@@ -1,7 +1,7 @@
 local Util_upvr = require(script.Parent.Parent.Shared.Util)
 local function validateVector(arg1, arg2) -- Line 3
     if arg1 == nil then
-        return false, "Invalid or missing number at position %d in Vector type.":format(arg2)
+        return false, string.format("Invalid or missing number at position %d in Vector type.", arg2)
     end
     return true
 end
