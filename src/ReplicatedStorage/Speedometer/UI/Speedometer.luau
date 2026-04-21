@@ -241,7 +241,7 @@ function any_extend_result1.render(arg1) -- Line 89
     tbl_17.TextColor3 = Color3.new(1, 1, var49)
     tbl_17.TextScaled = true
     tbl_17.Text = arg1.props.speed:map(function(arg1_4) -- Line 208
-        return "%03d":format(arg1_4)
+        return ("%03d"):format(arg1_4);
     end)
     tbl_17.Font = Enum.Font.Bangers
     tbl_11.Speed = createElement_upvr("TextLabel", tbl_17)
@@ -276,7 +276,7 @@ function any_extend_result1.render(arg1) -- Line 89
         tbl_16.TextScaled = true
         tbl_16.Text = arg1.props.distance:map(function(arg1_5) -- Line 232
             local string_match_result1_3, string_match_result2_3, string_match_result3 = string.match(math.floor(arg1_5 + 0.5), "^([^%d]*%d)(%d*)(.-)$")
-            return "%s mi":format(string_match_result1_3..string_match_result2_3:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3)
+            return ("%s mi"):format(string_match_result1_3..string_match_result2_3:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3)
         end)
         tbl_16.Font = Enum.Font.LuckiestGuy
         tbl_16.TextYAlignment = Enum.TextYAlignment.Bottom
@@ -397,7 +397,7 @@ function any_extend_result1.render(arg1) -- Line 89
         Position = UDim2.new(0.04, 0, 0.96, 0);
         TextColor3 = Color3.new(1, 1, 1);
         TextScaled = true;
-        Text = "%d/%d MISSILES":format(arg1.props.missileCount, arg1.props.missileMax);
+        Text = ("%d/%d MISSILES"):format(arg1.props.missileCount, arg1.props.missileMax);
         Font = Enum.Font.LuckiestGuy;
         Visible = arg1.props.missilesEnabled;
     })
@@ -582,7 +582,7 @@ function any_extend_result1.render(arg1) -- Line 89
                     TextScaled = true;
                     Text = arg1.props.distance:map(function(arg1_8) -- Line 509
                         local string_match_result1_2, string_match_result2, string_match_result3_3 = string.match(math.floor(arg1_8 + 0.5), "^([^%d]*%d)(%d*)(.-)$")
-                        return "%s mi":format(string_match_result1_2..string_match_result2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3_3)
+                        return ("%s mi"):format(string_match_result1_2..string_match_result2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3_3)
                     end);
                     Font = Enum.Font.LuckiestGuy;
                 });

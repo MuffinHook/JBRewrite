@@ -22,7 +22,7 @@ return function(arg1, arg2) -- Line 6
     end)
     task.delay(5, function() -- Line 25
         if any_defer_result1_upvr:getStatus() == Promise_upvr.Status.Started then
-            warn("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n":format(arg2:GetFullName(), arg1:GetTag()))
+            warn(("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n"):format(arg2:GetFullName(), arg1:GetTag()))
         end
     end)
     return any_defer_result1_upvr

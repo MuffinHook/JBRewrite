@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GlobalEventGui_upvr = ReplicatedStorage.App.Res:FindFirstChild("GlobalEventGui")
-GlobalEventGui_upvr.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+local Players = game:GetService("Players")
+local GlobalEventGui_upvr = ReplicatedStorage:WaitForChild("App"):WaitForChild("Res"):WaitForChild("GlobalEventGui"):Clone()
+GlobalEventGui_upvr.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
 local DialogueContainer_upvr = GlobalEventGui_upvr:FindFirstChild("DialogueContainer")
 local Sound_upvr = Instance.new("Sound")
 Sound_upvr.SoundId = "rbxassetid://215658476"

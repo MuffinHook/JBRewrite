@@ -1,24 +1,11 @@
 local Signal_upvr = require(game:GetService("ReplicatedStorage").Std.Signal)
-local function _(arg1, arg2) -- Line 16, Named "isManifestResolved"
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local function isManifestResolved(arg1, arg2) -- Line 16, Named "isManifestResolved"
     local var6 = 0
     for _ in pairs(arg1) do
         var6 += 1
     end
-    if var6 > arg2 then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    assert(true, var6)
-    if var6 ~= arg2 then
-    else
-    end
-    do
-        return true
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    assert(var6 <= arg2, var6)
+    return var6 == arg2
 end
 local function unbindNodeDescend_upvr(arg1, arg2) -- Line 26, Named "unbindNodeDescend"
     if arg1.instance == nil then
@@ -70,13 +57,14 @@ function module_upvr.new(arg1, arg2, arg3) -- Line 56
     module_2_upvr._rootInstToManifest = {}
     module_2_upvr._pendingRootInstSet = {}
     module_2_upvr._listeners = {}
+    local var32 = 1
     for _ in pairs(arg2) do
-        local var32
+        var32 += 1
     end
     module_2_upvr._manifestSizeTarget = var32
     task.delay(5, function() -- Line 77
         if not module_2_upvr._loaded then
-            warn("ManifestBinder %q is not loaded. Call :Start() on it!":format(module_2_upvr._tagName))
+            warn(("ManifestBinder %q is not loaded. Call :Start() on it!"):format(module_2_upvr._tagName))
         end
     end)
     return module_2_upvr
@@ -113,49 +101,33 @@ function module_upvr._stopBoundFn(arg1, arg2) -- Line 109
         if var44.Destroy then
             var44:Destroy()
         else
-            warn("[ManifestBinder._remove] - Class %q no longer has destroy, something destroyed it!":format(tostring(arg1._tagName)))
+            warn(("[ManifestBinder._remove] - Class %q no longer has destroy, something destroyed it!"):format(tostring(arg1._tagName)))
         end
         arg1._rootInstToClass[arg2] = nil
     end
 end
 function module_upvr._startBoundFn(arg1, arg2, arg3) -- Line 135
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     arg1:_stopBoundFn(arg2)
-    local var53
-    if var53 == true then
-        var53 = warn
-        var53("[ManifestBinder._startBoundFn] - Re-entered add. Still loading, probably caused by error in constructor.")
+    if arg1._pendingRootInstSet[arg2] == true then
+        warn("[ManifestBinder._startBoundFn] - Re-entered add. Still loading, probably caused by error in constructor.")
     else
-        var53 = arg1._pendingRootInstSet
-        var53[arg2] = true
-        var53 = nil
+        arg1._pendingRootInstSet[arg2] = true
+        local var53 = nil
         if typeof(arg1._constructor) == "function" then
             var53 = arg1._constructor(arg2, arg3)
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        if arg1._constructor.new then
+        elseif arg1._constructor.new then
             var53 = arg1._constructor.new(arg2, arg3)
         else
             error("Invalid constructor, expected table or function")
         end
-        local var54
         if arg1._pendingRootInstSet[arg2] ~= true then
-            local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                var54 = var54.ClassName
-                var54 = arg1._constructor
-                return var54
-            end
-            if type(arg1._constructor) ~= "table" or not decompInlinedCondition() then
-                var54 = arg1._constructor
-            end
-            warn("[ManifestBinder._startBoundFn] - Failed to load instance %q of %q, removed while loading!":format(arg2:GetFullName(), tostring(var54)))
+            local var54 = if type(arg1._constructor) == "table" then arg1._constructor.ClassName else arg1._constructor
+            warn(("[ManifestBinder._startBoundFn] - Failed to load instance %q of %q, removed while loading!"):format(arg2:GetFullName(), tostring(var54)))
             return
         end
         arg1._pendingRootInstSet[arg2] = nil
         if typeof(var53) ~= "table" or typeof(var53.Destroy) ~= "function" then
-            warn("[ManifestBinder._startBoundFn] - Bad class constructed for tag %q":format(arg1._tagName))
+            warn(("[ManifestBinder._startBoundFn] - Bad class constructed for tag %q"):format(arg1._tagName))
             return
         end
         arg1._rootInstToClass[arg2] = var53
@@ -198,50 +170,76 @@ function module_upvr._bindRoot(arg1, arg2) -- Line 186
         local parsePath_upvr_result1 = parsePath_upvr(v_2)
         local var82 = var76
         for i_5, v_3 in ipairs(parsePath_upvr_result1) do
-            local var86
-            if i_5 ~= #parsePath_upvr_result1 then
-                var86 = false
-            else
-                var86 = true
-            end
-            if not var82.children[v_3] then
-                local tbl = {}
-                local var88
+            local var86 = i_5 == #parsePath_upvr_result1
+            local tbl = var82.children[v_3]
+            if not tbl then
+                tbl = {}
+                var82.children[v_3] = tbl
             end
             if var86 then
-                var88 = tbl.alias
-                if var88 ~= nil then
-                    var88 = error
-                    var88("Multiple aliases assigned to one instance")
+                if tbl.alias ~= nil then
+                    error("Multiple aliases assigned to one instance")
                 end
                 tbl.alias = i_4
             else
-                var88 = tbl.children
-                if not var88 then
-                    var88 = {}
-                end
-                tbl.children = var88
-                var88 = tbl.connections
-                if not var88 then
-                    var88 = {}
-                end
-                tbl.connections = var88
+                tbl.children = tbl.children or {}
+                tbl.connections = tbl.connections or {}
             end
-            var82.children[v_3] = tbl
+            var82 = tbl
         end
     end
     debug.profileend()
     local function processNode_upvr(arg1_4) -- Line 232, Named "processNode"
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        local instance = assert(arg1_4.instance)
+        local children = arg1_4.children
         local alias = arg1_4.alias
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        tbl_2_upvr[alias] = assert(arg1_4.instance)
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+        local isLeaf = not children
+        if alias then
+            tbl_2_upvr[alias] = instance
+        end
+        if not isLeaf then
+            local function processAddChild(child)
+                local childNode = children[child.Name]
+                if not childNode or childNode.instance ~= nil then
+                    return
+                end
+                childNode.instance = child
+                processNode_upvr(childNode)
+            end
+            local function processDeleteChild(child)
+                local childNode = children[child.Name]
+                if not childNode or childNode.instance ~= child then
+                    return
+                end
+                arg1:_stopBoundFn(arg2)
+                unbindNodeDescend_upvr(childNode, tbl_2_upvr)
+                assert(childNode.instance == nil)
+                local replacement = instance:FindFirstChild(child.Name)
+                if replacement then
+                    local replacementNode = children[replacement.Name]
+                    if replacementNode and replacementNode.instance == nil then
+                        replacementNode.instance = replacement
+                        processNode_upvr(replacementNode)
+                    end
+                end
+            end
+            for _, child in ipairs(instance:GetChildren()) do
+                local childNode = children[child.Name]
+                if childNode and childNode.instance == nil then
+                    childNode.instance = child
+                    processNode_upvr(childNode)
+                end
+            end
+            table.insert(arg1_4.connections, instance.ChildAdded:Connect(processAddChild))
+            table.insert(arg1_4.connections, instance.ChildRemoved:Connect(processDeleteChild))
+        end
+        if isLeaf and isManifestResolved(tbl_2_upvr, arg1._manifestSizeTarget) then
+            arg1:_startBoundFn(arg2, tbl_2_upvr)
+        end
     end
+    debug.profilebegin("resolveBoundTree")
     processNode_upvr(var76)
+    debug.profileend()
 end
 function module_upvr._unbindRoot(arg1, arg2) -- Line 305
     arg1:_stopBoundFn(arg2)
@@ -306,19 +304,10 @@ function module_upvr.GetClassRemovingSignal(arg1) -- Line 364
     return arg1._classRemovingSignal
 end
 function module_upvr.Destroy(arg1) -- Line 374
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
     debug.profilebegin("ManifestBinder:Destroy")
-    local next_result1 = next(arg1._rootInstToClass)
-    local var119
-    while next_result1 ~= nil do
-        arg1:_stopBoundFn(next_result1)
-        if arg1._rootInstToClass[next_result1] ~= nil then
-            var119 = false
-        else
-            var119 = true
-        end
-        assert(var119, "Failed to remove")
-        var119 = arg1._rootInstToClass
+    for rootInst in pairs(arg1._rootInstToClass) do
+        arg1:_stopBoundFn(rootInst)
+        assert(arg1._rootInstToClass[rootInst] == nil, "Failed to remove")
     end
     table.clear(arg1._rootInstToClass)
     for _, v_5 in ipairs(arg1._connections) do

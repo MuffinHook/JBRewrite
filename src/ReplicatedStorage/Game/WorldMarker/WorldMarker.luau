@@ -11,7 +11,7 @@ local function _() -- Line 13, Named "GetRootPart"
     end
     return Humanoid.RootPart
 end
-local tbl_upvr = {4, {48, 0}, {192, 24}, {math.huge, 8}}
+local tbl_upvr = {{4, 0}, {48, 0}, {192, 24}, {math.huge, 8}}
 local module_2_upvr = {}
 module_2_upvr.__index = module_2_upvr
 local Maid_upvr = require(ReplicatedStorage.Std.Maid)
@@ -110,7 +110,7 @@ function module_2_upvr.SetIcon(arg1, arg2, arg3) -- Line 114
         if arg1.FrameIcon == nil then
             arg1:CreateFrameIcon()
         end
-        arg1.FrameIcon.Image = "rbxassetid://%d":format(arg2)
+        arg1.FrameIcon.Image = ("rbxassetid://%d"):format(arg2)
         if arg3 then
             arg1.FrameIcon.ImageColor3 = arg3
         end

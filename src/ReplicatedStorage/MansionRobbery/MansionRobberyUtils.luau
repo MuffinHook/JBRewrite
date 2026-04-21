@@ -88,9 +88,7 @@ function module_upvr.setIsElevatorMoving(arg1, arg2) -- Line 39
     assert(var11, "Invalid obj passed")
     var11 = CollectionService_upvr:HasTag(arg1, MansionRobberyConsts_upvr.TAG_NAME)
     assert(var11, "Obj does not have mansion robbery tag")
-    var11 = arg1
-    var11 = module_upvr.getEntranceElevatorModel(var11):SetAttribute
-    var11(MansionRobberyConsts_upvr.IS_ELEVATOR_MOVING_ATTR_NAME, arg2)
+    module_upvr.getEntranceElevatorModel(arg1):SetAttribute(MansionRobberyConsts_upvr.IS_ELEVATOR_MOVING_ATTR_NAME, arg2)
 end
 function module_upvr.getEntranceElevatorModel(arg1) -- Line 44
     local var12

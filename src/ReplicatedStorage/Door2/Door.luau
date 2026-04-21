@@ -67,30 +67,51 @@ end
 local RunService_upvr = game:GetService("RunService")
 local TweenService_upvr = game:GetService("TweenService")
 local DoorUtils_upvr = require(script.Parent.DoorUtils)
+local function getTargetPctOpen(arg1)
+    local pctOpen = arg1:GetAttribute(DoorConsts_upvr.PCT_OPEN_ATTR_NAME)
+    if pctOpen ~= nil then
+        return pctOpen
+    end
+    return arg1:GetAttribute(DoorConsts_upvr.OPEN_ATTR_NAME) == true and 1 or 0
+end
 function module_upvr._updateEndJ(arg1, arg2, arg3, arg4) -- Line 64
     local SOME_upvr = arg2:FindFirstChild(DoorConsts_upvr.INNER_MODEL_NAME)
     local PrimaryPart_upvr = arg2.PrimaryPart
+    if not SOME_upvr or not SOME_upvr.PrimaryPart or not PrimaryPart_upvr then
+        return
+    end
+    arg3 = if arg3 ~= nil then arg3 else getTargetPctOpen(arg2)
     local attribute_upvr = arg2:GetAttribute(DoorConsts_upvr.SHOULD_SWING_ATTR_NAME)
     local var23
     if attribute_upvr then
-        var23 = arg2:GetAttribute(DoorConsts_upvr.MAX_ANGLE_ATTR_NAME)
+        var23 = arg2:GetAttribute(DoorConsts_upvr.MAX_ANGLE_ATTR_NAME) or math.rad(90)
     else
         var23 = SOME_upvr.PrimaryPart.Size.X
     end
     local var24_upvr = arg3 * var23
+    arg1._lastValue = arg1._lastValue or 0
     if not arg4 then
         local var25_upvr = var24_upvr - arg1._lastValue
         local os_clock_result1_2_upvr = os.clock()
-        local var28_upvr = math.abs(var25_upvr) / math.abs(var23) * arg2:GetAttribute(DoorConsts_upvr.DURATION_ATTR_NAME)
-        local var29_upvr = Enum.EasingStyle[arg2:GetAttribute(DoorConsts_upvr.EASING_STYLE_ATTR_NAME)]
-        local var30_upvr = Enum.EasingDirection[arg2:GetAttribute(DoorConsts_upvr.EASING_DIRECTION_ATTR_NAME)]
+        local duration = arg2:GetAttribute(DoorConsts_upvr.DURATION_ATTR_NAME) or 0
+        if var25_upvr == 0 or var23 == 0 or duration <= 0 then
+            arg1._lastValue = var24_upvr
+            DoorUtils_upvr.setValue(arg2, var24_upvr)
+            if arg1._updateCallback then
+                arg1._updateCallback(var24_upvr, 1)
+            end
+            return
+        end
+        local var28_upvr = math.abs(var25_upvr) / math.abs(var23) * duration
+        local var29_upvr = Enum.EasingStyle[arg2:GetAttribute(DoorConsts_upvr.EASING_STYLE_ATTR_NAME) or "Quad"]
+        local var30_upvr = Enum.EasingDirection[arg2:GetAttribute(DoorConsts_upvr.EASING_DIRECTION_ATTR_NAME) or "Out"]
         local var31_upvw = 0
         local SOME_upvr_2 = PrimaryPart_upvr:FindFirstChild(DoorConsts_upvr.MOTOR_OBJ_NAME)
         arg1._maid._animator = RunService_upvr.Heartbeat:Connect(function() -- Line 90
             local os_clock_result1 = os.clock()
             local any_GetValue_result1 = TweenService_upvr:GetValue((os_clock_result1 - os_clock_result1_2_upvr) / var28_upvr, var29_upvr, var30_upvr)
-            var31_upvw = any_GetValue_result1
             local var35 = arg1._lastValue + var25_upvr * (any_GetValue_result1 - var31_upvw)
+            var31_upvw = any_GetValue_result1
             if var28_upvr <= os_clock_result1 - os_clock_result1_2_upvr then
                 var35 = var24_upvr
                 arg1._maid._animator = nil

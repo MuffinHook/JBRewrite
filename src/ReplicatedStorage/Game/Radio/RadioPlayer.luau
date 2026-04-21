@@ -33,7 +33,7 @@ function module_upvr.Init(arg1) -- Line 33
     end)
     module_upvr.OnPlaylistUpdated:Connect(function(arg1_2) -- Line 52
         if arg1_2.Persist then
-            var7_upvw:FireServer('n'.."baedz":sub(2, 2):reverse().."".."".."nt50eyyk3":sub(3, 7):reverse():reverse():reverse():reverse():reverse()..""..'6', arg1_2.Title, arg1_2.Songs)
+            var7_upvw:FireServer('n'..("baedz"):sub(2, 2):reverse()..""..""..("nt50eyyk3"):sub(3, 7):reverse():reverse():reverse():reverse():reverse()..""..'6', arg1_2.Title, arg1_2.Songs)
         end
     end)
     arg1.em.zgowty66 = function(arg1_3) -- Line 58, Named "zgowty66"
@@ -67,7 +67,7 @@ function module_upvr.PlayId(arg1, arg2, arg3) -- Line 65
         var22 = false
     end
     if MarketplaceService_upvr:GetProductInfo(arg1).AssetTypeId ~= Enum.AssetType.Audio.Value then
-        error("AssetId `%d` is not a valid audio asset.":format(arg1))
+        error(("AssetId `%d` is not a valid audio asset."):format(arg1))
         return false
     end
     module_upvr.Stop()
@@ -79,7 +79,7 @@ function module_upvr.PlayId(arg1, arg2, arg3) -- Line 65
         var23 = any_GetLocalVehiclePacket_result1_3.RadioSound
         assert(var23)
         var23.Volume = 0
-        var7_upvw:FireServer('s'.."".."zsfrcvgguxy":sub(3, 7):reverse().."".."yo", arg1, arg2)
+        var7_upvw:FireServer('s'..""..("zsfrcvgguxy"):sub(3, 7):reverse().."".."yo", arg1, arg2)
     else
         var23 = Audio_upvr.ObjectLocal(LocalPlayer_upvr, arg1, {
             DoNotPlay = true;
@@ -165,7 +165,7 @@ function module_upvr.Stop() -- Line 173
         local CurrentSound_upvr = module_upvr.CurrentSound
         module_upvr.CurrentSound = nil
         if CurrentSound_upvr:IsDescendantOf(workspace) then
-            var7_upvw:FireServer('e'.."xclp6xcag":sub(5, 5):reverse().."".."e8mna2")
+            var7_upvw:FireServer('e'..("xclp6xcag"):sub(5, 5):reverse().."".."e8mna2")
         else
             Audio_upvr.FadeTo(CurrentSound_upvr, 0, 1, function() -- Line 182
                 CurrentSound_upvr:Destroy()

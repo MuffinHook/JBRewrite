@@ -19,6 +19,14 @@ tbl.ELEVATOR_COUNTDOWN_TIME = var4
 tbl.IS_ELEVATOR_MOVING_ATTR_NAME = "IsElevatorMoving"
 tbl.BOSS_MODELS_FOLDER_NAME = "BossModels"
 tbl.SHIELD_MODELS_FOLDER_NAME = "Shields"
+tbl.ENTRANCE_ELEVATOR_NAME = "EntranceElevator"
+tbl.ARRIVAL_ELEVATOR_NAME = "ArrivalElevator"
+tbl.EXIT_ELEVATOR_PART_NAME = "ExitElevator"
+tbl.EXIT_TELEPORTS_FOLDER_NAME = "ExitTeleports"
+tbl.BOSS_ROOM_PLAYER_SPAWNS_FOLDER_NAME = "BossRoomPlayerSpawns"
+tbl.ATTEMPT_EXIT_ELEVATOR_REMOTE_NAME = "AttemptExitElevator"
+tbl.LAST_CLOSED_TIME_ATTR_NAME = "LastClosedTime"
+tbl.CHAR_PER_SECOND = 24
 if RunUtils.isStudio() then
     -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
 end
@@ -38,3 +46,4 @@ if RunUtils.isStudio() then
     -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
 end
 -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+return tbl

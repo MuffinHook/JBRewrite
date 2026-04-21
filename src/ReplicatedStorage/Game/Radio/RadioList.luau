@@ -51,8 +51,7 @@ function module_upvr.Populate(arg1, arg2) -- Line 26
             end)
             var27_upvw = var23
             var23 = arg1.Maid
-            var23 = var23:GiveTask
-            var23(function() -- Line 52
+            var23:GiveTask(function() -- Line 52
                 if var27_upvw then
                     var27_upvw:cancel()
                 end

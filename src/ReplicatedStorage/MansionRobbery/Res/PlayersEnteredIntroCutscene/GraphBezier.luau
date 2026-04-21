@@ -8,16 +8,7 @@ local module_upvr = {}
 module_upvr.__index = module_upvr
 function module_upvr.new(arg1) -- Line 12
     local setmetatable_result1 = setmetatable({}, module_upvr)
-    local var3
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var3[1] = unpack(arg1)
-        var3 = {}
-        return var3
-    end
-    if not arg1 or not decompInlinedCondition() then
-        var3 = {}
-    end
-    setmetatable_result1.keyframes = var3
+    setmetatable_result1.keyframes = arg1 and {unpack(arg1)} or {}
     return setmetatable_result1
 end
 function module_upvr.UpdateKeyframes(arg1, arg2) -- Line 19
@@ -39,6 +30,9 @@ function module_upvr.CalculateSegmentAt(arg1, arg2) -- Line 24
 end
 function module_upvr.CalculateSpeedAt(arg1, arg2) -- Line 41
     local any_CalculateSegmentAt_result1_2, any_CalculateSegmentAt_result2, any_CalculateSegmentAt_result3 = arg1:CalculateSegmentAt(arg2)
+    if not any_CalculateSegmentAt_result2 or not any_CalculateSegmentAt_result3 then
+        return 0
+    end
     local pos = any_CalculateSegmentAt_result2.pos
     local var11 = any_CalculateSegmentAt_result2.pos + any_CalculateSegmentAt_result2.right
     local pos_2 = any_CalculateSegmentAt_result3.pos
@@ -59,6 +53,12 @@ function module_upvr.CalculateSpeedAt(arg1, arg2) -- Line 41
 end
 function module_upvr.CalculatePositionAt(arg1, arg2) -- Line 74
     local any_CalculateSegmentAt_result1, any_CalculateSegmentAt_result2_2, any_CalculateSegmentAt_result3_2 = arg1:CalculateSegmentAt(arg2)
+    if not any_CalculateSegmentAt_result2_2 then
+        return Vector2.zero
+    end
+    if not any_CalculateSegmentAt_result3_2 then
+        return any_CalculateSegmentAt_result2_2.pos
+    end
     local pos_3 = any_CalculateSegmentAt_result2_2.pos
     local var24 = any_CalculateSegmentAt_result2_2.pos + any_CalculateSegmentAt_result2_2.right
     local pos_4 = any_CalculateSegmentAt_result3_2.pos
@@ -77,14 +77,14 @@ function module_upvr.CalculatePositionAt(arg1, arg2) -- Line 74
     return cubicBezier(any_CalculateSegmentAt_result1, pos_3, var24, var31, pos_4)
 end
 function module_upvr.CalculateValueAt(arg1, arg2) -- Line 106
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local const_number = 1
-    local var33
-    while var33 + 0.00001 < const_number do
-        local var34 = (var33 + const_number) / 2
-        if arg2 < arg1:CalculatePositionAt(var34).X then
+    local var33 = 0
+    local var34 = 1
+    while var33 + 0.00001 < var34 do
+        local midpoint = (var33 + var34) / 2
+        if arg2 < arg1:CalculatePositionAt(midpoint).X then
+            var34 = midpoint
         else
-            var33 = var34
+            var33 = midpoint
         end
     end
     local var35 = (var33 + var34) / 2

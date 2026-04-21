@@ -362,14 +362,12 @@ local function UpdateUI_upvr() -- Line 289, Named "UpdateUI"
             if var166 == var167 then
                 var166 = var167.HideFun
                 if var166 then
-                    var166 = var167:HideFun
-                    var166()
+                    var167:HideFun()
                 end
                 var166 = tbl_upvw
                 var166.Spec = nil
             end
-            var166 = any_new_result1_upvr:Remove
-            var166(var167)
+            any_new_result1_upvr:Remove(var167)
             var166 = table.remove
             var166(tbl_upvr, i_2)
         end

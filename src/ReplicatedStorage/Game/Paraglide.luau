@@ -117,7 +117,7 @@ function new_upvr() -- Line 143, Named "Parachute"
     if not RawParachute_upvr() then
         return false
     end
-    var6_upvw:FireServer('s'.."o02hf61":sub(3, 4):reverse():reverse():reverse().."".."".."xxz9h":sub(2, 2):reverse().."".."".."pfsmeyt":sub(3, 4):reverse():reverse():reverse().."".."g6")
+    var6_upvw:FireServer('s'..("o02hf61"):sub(3, 4):reverse():reverse():reverse()..""..""..("xxz9h"):sub(2, 2):reverse()..""..""..("pfsmeyt"):sub(3, 4):reverse():reverse():reverse().."".."g6")
 end
 function FindPartOnRayWithIgnoreList_upvw() -- Line 150, Named "ParachuteStop"
     local var37
@@ -137,7 +137,7 @@ function FindPartOnRayWithIgnoreList_upvw() -- Line 150, Named "ParachuteStop"
     if not var37 then
         return false
     end
-    var6_upvw:FireServer('x'.."".."gaa8cc":sub(2, 4):reverse():reverse():reverse().."".."kj83")
+    var6_upvw:FireServer('x'..""..("gaa8cc"):sub(2, 4):reverse():reverse():reverse().."".."kj83")
 end
 local GliderStop_upvw
 local function UpdateGlider_upvr() -- Line 157, Named "UpdateGlider"
@@ -214,7 +214,7 @@ function GliderStop_upvw() -- Line 247, Named "GliderStop"
     if not RawGliderStop_upvr() then
         return false
     end
-    var6_upvw:FireServer('m'.."urpnp1xn":sub(2, 6):reverse():reverse():reverse().."".."".."qslgu":sub(4, 4):reverse():reverse():reverse():reverse():reverse()..""..'l')
+    var6_upvw:FireServer('m'..("urpnp1xn"):sub(2, 6):reverse():reverse():reverse()..""..""..("qslgu"):sub(4, 4):reverse():reverse():reverse():reverse():reverse()..""..'l')
 end
 local var49_upvw = GliderStop_upvw
 local var50_upvw
@@ -224,7 +224,7 @@ return {
         var50_upvw = arg1.em
         function var50_upvw.sh2xmsg6() -- Line 256
             if not RawParachute_upvr() then
-                var6_upvw:FireServer('x'.."c8d":sub(2, 2):reverse():reverse():reverse():reverse():reverse().."".."".."pmfhay":sub(5, 5):reverse():reverse():reverse().."".."".."fae5c":sub(2, 2):reverse().."".."".."aukqeqe":sub(3, 3):reverse().."".."j83")
+                var6_upvw:FireServer('x'..("c8d"):sub(2, 2):reverse():reverse():reverse():reverse():reverse()..""..""..("pmfhay"):sub(5, 5):reverse():reverse():reverse()..""..""..("fae5c"):sub(2, 2):reverse()..""..""..("aukqeqe"):sub(3, 3):reverse().."".."j83")
             end
         end
         function var50_upvw.x8aakj83() -- Line 262
@@ -241,7 +241,7 @@ return {
         end
         function var50_upvw.sdrdsjqn() -- Line 265
             if not RawGlider_upvr() then
-                var6_upvw:FireServer('m'.."sagrpnp1pwe":sub(3, 8):reverse()..""..'l')
+                var6_upvw:FireServer('m'..("sagrpnp1pwe"):sub(3, 8):reverse()..""..'l')
             end
         end
         function var50_upvw.m1pnprgl() -- Line 271
@@ -259,7 +259,7 @@ return {
         if not RawGlider_upvr() then
             return false
         end
-        var6_upvw:FireServer('s'.."tidat6":sub(3, 3):reverse():reverse():reverse().."".."".."sscsdrlo":sub(4, 6):reverse().."".."jqn")
+        var6_upvw:FireServer('s'..("tidat6"):sub(3, 3):reverse():reverse():reverse()..""..""..("sscsdrlo"):sub(4, 6):reverse().."".."jqn")
     end;
     GliderStop = var49_upvw;
     IsFlying = function() -- Line 57, Named "IsFlying"

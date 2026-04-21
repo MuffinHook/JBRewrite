@@ -284,7 +284,7 @@ function module_upvr._launchWaitForEnter(arg1, arg2) -- Line 349
         else
             var99 = ""
         end
-        local formatted = "%s: \"Okay %s.. let's find his office.\"":format(any_filter_result1[math.random(1, #any_filter_result1)].DisplayName, var99)
+        local formatted = ("%s: \"Okay %s.. let's find his office.\""):format(any_filter_result1[math.random(1, #any_filter_result1)].DisplayName, var99)
         var99 = {}
         var99.type = "setDialogueText"
         var99.text = formatted
@@ -331,7 +331,7 @@ function module_upvr._launchIntroCutscene(arg1, arg2) -- Line 375
             end)
             mansionRobberyStore_upvr:dispatch({
                 type = "setDialogueText";
-                text = "%s: %s":format(any_filter_result1_3[math.random(1, #any_filter_result1_3)].DisplayName, arg1_12.Text);
+                text = ("%s: %s"):format(any_filter_result1_3[math.random(1, #any_filter_result1_3)].DisplayName, arg1_12.Text);
             })
         else
             mansionRobberyStore_upvr:dispatch({
@@ -377,13 +377,13 @@ function module_upvr._launchRunAwayEndCutscene(arg1, arg2) -- Line 461
         return MansionRobberyUtils_upvr.getIsPlayerInRobbery(arg1.obj, arg1_14)
     end)
     local var125 = any_filter_result1_2[math.random(1, #any_filter_result1_2)]
-    local formatted_2 = "%s: %s":format(var125.DisplayName, tbl_3[math.random(1, #tbl_3)])
+    local formatted_2 = ("%s: %s"):format(var125.DisplayName, tbl_3[math.random(1, #tbl_3)])
     mansionRobberyStore_upvr:dispatch({
         type = "setDialogueText";
         text = formatted_2;
     })
     local var129_upvr = tbl_4[math.random(1, #tbl_4)]
-    local formatted_3_upvr = "%s: %s":format(var125.DisplayName, "Let's follow him!")
+    local formatted_3_upvr = ("%s: %s"):format(var125.DisplayName, "Let's follow him!")
     arg2:GivePromise(Promise_upvr.delay(2 + utf8.len(formatted_2) / MansionRobberyConsts_upvr.CHAR_PER_SECOND):andThen(function() -- Line 523
         mansionRobberyStore_upvr:dispatch({
             type = "setDialogueText";

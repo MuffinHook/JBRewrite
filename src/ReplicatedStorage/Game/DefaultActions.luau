@@ -128,8 +128,7 @@ function module_upvr.init(arg1) -- Line 49
     for _, v in var43, any_GetAll_result2, any_GetAll_result3 do
         handleItem(v)
     end
-    var43 = InventoryItemBinder_upvr:GetClassAddedSignal():Connect
-    var43(handleItem)
+    InventoryItemBinder_upvr:GetClassAddedSignal():Connect(handleItem)
     if VehicleUtils_upvr.GetLocalVehiclePacket() == nil then
         var43 = false
     else

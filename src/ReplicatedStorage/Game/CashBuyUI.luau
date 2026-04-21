@@ -107,13 +107,13 @@ function module_upvr.SetupCashDrop() -- Line 119
         elseif arg1.InvalidWorld then
             var39 = "Cannot drop cash in current world."
         elseif arg1.TooLittleQuantity then
-            var39 = "Drop more than %s.":format(Format_upvr.Currency(arg1.TooLittleQuantity))
+            var39 = ("Drop more than %s."):format(Format_upvr.Currency(arg1.TooLittleQuantity))
         elseif arg1.TooMuchQuantity then
-            var39 = "Drop less than %s.":format(Format_upvr.Currency(arg1.TooMuchQuantity))
+            var39 = ("Drop less than %s."):format(Format_upvr.Currency(arg1.TooMuchQuantity))
         elseif arg1.Debounce then
-            var39 = "Wait %d seconds.":format(arg1.Debounce)
+            var39 = ("Wait %d seconds."):format(arg1.Debounce)
         elseif arg1.Daily then
-            var39 = "Can only donate %s per day.":format(Format_upvr.Currency(arg1.Quantity))
+            var39 = ("Can only donate %s per day."):format(Format_upvr.Currency(arg1.Quantity))
         elseif arg1.SmallVIP then
             var39 = "Donations disabled in small private servers."
         end
@@ -136,14 +136,14 @@ function module_upvr.SetupCashDrop() -- Line 119
         local tonumber_result1 = tonumber(Amount_upvr.Text)
         if not tonumber_result1 then
         else
-            var12_upvw:FireServer('w'.."jonkomw":sub(3, 3):reverse():reverse():reverse():reverse():reverse().."".."atlk3l", tonumber_result1)
+            var12_upvw:FireServer('w'..("jonkomw"):sub(3, 3):reverse():reverse():reverse():reverse():reverse().."".."atlk3l", tonumber_result1)
         end
     end
     ContainerDonate.Drop.MouseButton1Down:connect(AddedFun)
     local CircleAction_upvr = UI_upvr.CircleAction
     local function Action_upvr(arg1, arg2) -- Line 161, Named "Action"
         if arg2 then
-            var12_upvw:FireServer('g'.."h1xfm":sub(2, 2):reverse().."".."zm6gm0", arg1.Part.Parent)
+            var12_upvw:FireServer('g'..("h1xfm"):sub(2, 2):reverse().."".."zm6gm0", arg1.Part.Parent)
             return true
         end
     end
@@ -152,7 +152,7 @@ function module_upvr.SetupCashDrop() -- Line 119
             Part = arg1.PrimaryPart;
         }
         tbl.ValidRoot = arg1
-        tbl.Name = "Collect %s from %s":format(Format_upvr.Currency(arg1:WaitForChild("Amount", 2).Value), arg1:WaitForChild("PlayerName", 2).Value)
+        tbl.Name = ("Collect %s from %s"):format(Format_upvr.Currency(arg1:WaitForChild("Amount", 2).Value), arg1:WaitForChild("PlayerName", 2).Value)
         tbl.Timed = true
         tbl.Duration = 1
         tbl.Dist = 10
@@ -262,20 +262,20 @@ function module_upvr.UpdatePrices() -- Line 272
         i_2 = tbl_3[i_3]
         if i_2 == nil then
             i_2 = error
-            v_2 = "Missing product frame: %d":format(i_3)
+            v_2 = ("Missing product frame: %d"):format(i_3)
             i_2(v_2)
         end
     end
     for i_4 = 1, 5 do
-        local SOME = Gui_4.Container.Content.ContainerCash.ContainerProducts:FindFirstChild("ContainerProduct%d":format(i_4))
+        local SOME = Gui_4.Container.Content.ContainerCash.ContainerProducts:FindFirstChild(("ContainerProduct%d"):format(i_4))
         local var172_upvr = tbl_3[i_4]
         SOME.Product.ContainerAmount.Amount.Text = Format_upvr.Currency(var172_upvr.Cash)
         SOME.Product.ContainerCost.Amount.Text = utf8.char(57346)..Format_upvr.Comma(var172_upvr.Robux)
         if var172_upvr.ImageId then
-            SOME.Product.ContainerCash.Cash.Image = "rbxassetid://%d":format(var172_upvr.ImageId)
+            SOME.Product.ContainerCash.Cash.Image = ("rbxassetid://%d"):format(var172_upvr.ImageId)
         end
         -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        module_upvr.Maid["ContainerProduct%d":format(i_4)] = SOME.Product.MouseButton1Down:Connect(function() -- Line 299
+        module_upvr.Maid[("ContainerProduct%d"):format(i_4)] = SOME.Product.MouseButton1Down:Connect(function() -- Line 299
             task.spawn(Audio_upvr.ObjectLocal, LocalPlayer_upvr.PlayerGui, 6105461542, {
                 Volume = 0.15;
             })
@@ -298,7 +298,7 @@ function module_upvr.UpdatePrices() -- Line 272
                 else
                     HideFromUI_upvr = true
                 end
-                local formatted = "ContainerProduct%d_%s":format(i_6, v_4_upvr.Title)
+                local formatted = ("ContainerProduct%d_%s"):format(i_6, v_4_upvr.Title)
                 local clone_upvr_3 = ContainerPreset:Clone()
                 if HideFromUI_upvr then
                 else
@@ -309,7 +309,7 @@ function module_upvr.UpdatePrices() -- Line 272
                 end
                 clone_upvr_3.Product.ContainerTitle.Title.Text = v_4_upvr.Title
                 GamepassSystem_upvr.promiseImageId(v_4_upvr.PassId):andThen(function(arg1) -- Line 321
-                    clone_upvr_3.Product.ContainerImage.Thumbnail.Image = "rbxassetid://%d":format(arg1)
+                    clone_upvr_3.Product.ContainerImage.Thumbnail.Image = ("rbxassetid://%d"):format(arg1)
                 end)
                 if HideFromUI_upvr then
                 else
@@ -403,7 +403,7 @@ function module_upvr.SetupGiftingUI() -- Line 389
     for i_7, v_5_upvr in ipairs(GamepassData_upvr) do
         local GetGiftProductInfoFromGamepass_upvr_result1 = GetGiftProductInfoFromGamepass_upvr(v_5_upvr.Title)
         if v_5_upvr.PriceInRobux and not v_5_upvr.HideFromUI and GetGiftProductInfoFromGamepass_upvr_result1 and GetGiftProductInfoFromGamepass_upvr_result1.Robux then
-            local formatted_2 = "ContainerProduct%d_%s":format(i_7, v_5_upvr.Title)
+            local formatted_2 = ("ContainerProduct%d_%s"):format(i_7, v_5_upvr.Title)
             local clone_upvr_2 = ContainerPreset_2:Clone()
             clone_upvr_2.LayoutOrder = i_7
             clone_upvr_2.Name = formatted_2
@@ -412,7 +412,7 @@ function module_upvr.SetupGiftingUI() -- Line 389
                 DisplayName = v_5_upvr.Title
             end
             clone_upvr_2.Product.ContainerTitle.Title.Text = DisplayName
-            clone_upvr_2.Product.ContainerImage.Thumbnail.Image = "rbxassetid://%d":format(GetGiftProductInfoFromGamepass_upvr_result1.ImageId or 0)
+            clone_upvr_2.Product.ContainerImage.Thumbnail.Image = ("rbxassetid://%d"):format(GetGiftProductInfoFromGamepass_upvr_result1.ImageId or 0)
             clone_upvr_2.Product.ContainerCost.Amount.Text = utf8.char(57346)..Format_upvr.Comma(GetGiftProductInfoFromGamepass_upvr_result1.Robux)
             clone_upvr_2.Visible = true
             clone_upvr_2.Parent = ContainerPreset_2.Parent
