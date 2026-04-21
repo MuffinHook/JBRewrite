@@ -19,7 +19,7 @@ end
 function module_upvr.getCategoryData(arg1) -- Line 24
     local var25 = module_upvr.mapCategoryData[arg1]
     if not var25 then
-        error("No data exists for category: %s":format(arg1))
+        error(string.format("No data exists for category: %s", arg1));
     end
     return var25
 end

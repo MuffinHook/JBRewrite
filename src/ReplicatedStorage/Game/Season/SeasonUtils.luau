@@ -68,14 +68,14 @@ function module_upvr.formatRemaining(arg1) -- Line 55
     local floored_3 = math.floor(maximum % 3600 / 60)
     local floored_2 = math.floor(maximum % 60)
     if 0 < floored then
-        return "%dd %dh":format(floored, floored_4)
+        return string.format("%dd %dh", floored, floored_4)
     end
     if 0 < floored_4 then
-        return "%dh %dm":format(floored_4, floored_3)
+        return string.format("%dh %dm", floored_4, floored_3)
     end
     if 0 < floored_3 then
-        return "%dm %ds":format(floored_3, floored_2)
+        return string.format("%dm %ds", floored_3, floored_2)
     end
-    return "%ds":format(floored_2)
+    return string.format("%ds", floored_2)
 end
 return module_upvr

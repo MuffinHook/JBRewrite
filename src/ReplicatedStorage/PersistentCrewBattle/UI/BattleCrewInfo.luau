@@ -96,7 +96,7 @@ function any_extend_result1.render(arg1) -- Line 19
                     Position = UDim2.new(0.5, 0, 0.5, 0);
                     AnchorPoint = Vector2.new(0.5, 0.5);
                     Font = Enum.Font.FredokaOne;
-                    Text = "Checklist (%d/%d)":format(var16, PersistentCrewBattleConsts_upvr.NUM_ROBBERIES_TO_FINISH_ROUND);
+                    Text = string.format("Checklist (%d/%d)", var16, PersistentCrewBattleConsts_upvr.NUM_ROBBERIES_TO_FINISH_ROUND);
                     LineHeight = 1;
                     TextScaled = true;
                     TextColor3 = ColorUtils_upvr.brightenBy(arg1.props.backgroundColor, -0.5);

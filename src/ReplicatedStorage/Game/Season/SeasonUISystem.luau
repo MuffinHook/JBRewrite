@@ -22,7 +22,7 @@ function module_upvr.init() -- Line 33
     SeasonGui.Parent = LocalPlayer_upvr.PlayerGui
     module_upvr.gui = SeasonGui
     module_upvr._seasonState = -1
-    SeasonGui.Background.Title.Frame.SeasonNumWelcome.Text = "Welcome to SEASON %d":format(SeasonConsts_upvr.SEASON_NUM)
+    SeasonGui.Background.Title.Frame.SeasonNumWelcome.Text = string.format("Welcome to SEASON %d", SeasonConsts_upvr.SEASON_NUM)
     SeasonGui.Background.Title.Frame.SeasonNumWelcome.TextLabel.Text = SeasonGui.Background.Title.Frame.SeasonNumWelcome.Text
     SeasonGui.Background.Title.Frame.SeasonTitle.Text = SeasonConsts_upvr.SEASON_TITLE
     local any_new_result1_2 = Window_upvr.new()
@@ -55,7 +55,7 @@ function module_upvr._updateSeasonUi(arg1) -- Line 61
             gui.Background.Bottom.Container.ReviewButton.TextLabel.Text = "COMING SOON"
             return
         end
-        error("Invalid season state: %d":format(arg1))
+        error(string.format("Invalid season state: %d", arg1))
     end
 end
 local ContractUtils_upvr = require(ReplicatedStorage_upvr.Game.Contract.ContractUtils)
@@ -90,12 +90,12 @@ function module_upvr._updateDeadline() -- Line 80
         module_upvr._updateSeasonUi(var28)
     end
     for i = 2, SeasonConsts_upvr.MAX_REWARD_LEVEL do
-        local Buy = gui_3.Background.Body.Line.Container:FindFirstChild("%02d":format(i)).Reward:FindFirstChild("Buy")
+        local Buy = gui_3.Background.Body.Line.Container:FindFirstChild(string.format("%02d", i)).Reward:FindFirstChild("Buy")
         if Buy then
             Buy.Visible = any_isBuyEnabled_result1
         end
     end
-    gui_3.Background.DailyExpRefreshHelp.Text = "Daily XP reloads in <font color=\"rgb(255, 207, 0)\">%s</font>!":format(SeasonUtils_upvr.formatRemaining(ContractUtils_upvr.getQuantizedBlock(LevelConsts_upvr.DAILY_EXP_DURATION, LevelConsts_upvr.DAILY_EXP_DURATION_OFFSET) - workspace:GetServerTimeNow()))
+    gui_3.Background.DailyExpRefreshHelp.Text = string.format("Daily XP reloads in <font color=\"rgb(255, 207, 0)\">%s</font>!", SeasonUtils_upvr.formatRemaining(ContractUtils_upvr.getQuantizedBlock(LevelConsts_upvr.DAILY_EXP_DURATION, LevelConsts_upvr.DAILY_EXP_DURATION_OFFSET) - workspace:GetServerTimeNow()))
     -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
 end
 local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
@@ -154,7 +154,7 @@ function module_upvr._open() -- Line 125
         end
     end))
     EzUtils_upvr.selectIfGamepad(var48_upvr.Background.Bottom.Container.ReviewButton)
-    var48_upvr.Background.Bottom.Container.SeasonPass.Title.Text = "SEASON %d: %s":format(SeasonConsts_upvr.SEASON_NUM, SeasonConsts_upvr.SEASON_TITLE)
+    var48_upvr.Background.Bottom.Container.SeasonPass.Title.Text = string.format("SEASON %d: %s", SeasonConsts_upvr.SEASON_NUM, SeasonConsts_upvr.SEASON_TITLE)
     any_new_result1:GiveTask(var48_upvr.Background.Bottom.Container.SeasonPass.MouseButton1Down:Connect(function() -- Line 172
         if not RunUtils_upvr.isStudio() and SeasonUtils_upvr.getRemainingTime() <= 0 then
             Notification_upvr.new({
@@ -207,24 +207,24 @@ function module_upvr._open() -- Line 125
         end
     end)
     for i_2 = 2, SeasonConsts_upvr.MAX_REWARD_LEVEL do
-        var48_upvr.Background.Body.Line.Container:FindFirstChild("%02d":format(i_2)).Reward.Icon.Image = "rbxassetid://%d":format(var9_upvw.getClientLevelAward(i_2).imageId)
+        var48_upvr.Background.Body.Line.Container:FindFirstChild(string.format("%02d", i_2)).Reward.Icon.Image = string.format("rbxassetid://%d", var9_upvw.getClientLevelAward(i_2).imageId)
         local _
     end
     for i_3 = 1, SeasonConsts_upvr.NUM_BONUS_AWARDS do
         local any_getClientBonusAward_result1 = var9_upvw.getClientBonusAward(i_3)
-        local SOME = var48_upvr.Background.BonusAwards.Container:FindFirstChild("Bonus%02d":format(i_3))
-        SOME.Icon.Image = "rbxassetid://%d":format(any_getClientBonusAward_result1.imageId)
-        SOME.Desc.Text = "TOP %d%%":format(any_getClientBonusAward_result1.scoreLte * 100)
+        local SOME = var48_upvr.Background.BonusAwards.Container:FindFirstChild(string.format("Bonus%02d", i_3))
+        SOME.Icon.Image = string.format("rbxassetid://%d", any_getClientBonusAward_result1.imageId)
+        SOME.Desc.Text = string.format("TOP %d%%", any_getClientBonusAward_result1.scoreLte * 100)
         local var63
     end
     if SeasonConsts_upvr.SEASON_BONUS_ENABLED then
         local var64 = "CHECK LATER..."
         local SeasonBonusScore = LocalPlayer_upvr:FindFirstChild("SeasonBonusScore")
         if SeasonBonusScore then
-            var64 = "YOU: TOP %.2f%%":format(SeasonBonusScore.Value * 100)
+            var64 = string.format("YOU: TOP %.2f%%", SeasonBonusScore.Value * 100)
         end
         var48_upvr.Background.BonusAwards.Score.Text = var64
-        var48_upvr.Background.BonusAwards.Desc.Text = "Players in the top %d%% win this prize when the season ends.":format(math.max(0, any_getClientBonusAward_result1.scoreLte) * 100)
+        var48_upvr.Background.BonusAwards.Desc.Text = string.format("Players in the top %d%% win this prize when the season ends.", math.max(0, any_getClientBonusAward_result1.scoreLte) * 100)
     end
     -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
 end

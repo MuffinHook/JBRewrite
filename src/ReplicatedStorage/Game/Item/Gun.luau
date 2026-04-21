@@ -89,7 +89,7 @@ function module_upvr.Init(arg1) -- Line 89
         max = 100;
         step = 1;
         textMap = function(arg1_5) -- Line 131, Named "textMap"
-            return "%d%%":format(arg1_5)
+            return string.format("%d%%", arg1_5)
         end;
     }
     GameSettingsService_upvr.add(tbl)
@@ -105,7 +105,7 @@ function module_upvr.new(arg1, arg2, arg3) -- Line 142
     local any_getName_result1 = InventoryItemUtils_upvr.getName(arg2)
     local SOME_2 = ReplicatedStorage_upvr.Game.ItemConfig:FindFirstChild(any_getName_result1)
     if SOME_2 == nil then
-        error("No config file exists for item: %s":format(any_getName_result1))
+        error(string.format("No config file exists for item: %s", any_getName_result1))
     end
     any_new_result1_2.Config = require(SOME_2)
     any_new_result1_2.LastReplicateMousePosition = tick()
@@ -247,7 +247,7 @@ function module_upvr.SetupModel(arg1, arg2) -- Line 307
     end
     local SOME_3 = ReplicatedStorage_upvr.Resource.ItemSystem.Models:FindFirstChild(any_getName_result1_3)
     if SOME_3 == nil then
-        error("Could not find model for item `%s`":format(any_getName_result1_3))
+        error(string.format("Could not find model for item `%s`", any_getName_result1_3))
     end
     local clone_2 = SOME_3:Clone()
     for _, v_3 in clone_2:GetDescendants() do
@@ -287,13 +287,13 @@ function module_upvr.ApplySkinLocal(arg1, arg2) -- Line 353
     if arg2 ~= nil and arg2 ~= "None" then
         local var100 = ItemSkinIds_upvr[arg2]
         if var100 == nil then
-            error("No skin by name of %s exists.":format(arg2))
+            error(string.format("No skin by name of %s exists.", arg2))
         end
         local var101 = var100[arg1.__ClassName]
         if var101 == nil then
-            error("Skin %s has no image id for item: %s":format(arg2, arg1.__ClassName))
+            error(string.format("Skin %s has no image id for item: %s", arg2, arg1.__ClassName))
         end
-        var99 = "rbxassetid://%d":format(var101)
+        var99 = string.format("rbxassetid://%d", var101)
     end
     for _, v_4 in arg1.Model:GetDescendants() do
         if v_4:IsA("MeshPart") and v_4:GetAttribute("ApplyGunTexture") == true then

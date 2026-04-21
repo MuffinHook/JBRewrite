@@ -37,14 +37,14 @@ local function Update_upvr(arg1) -- Line 44, Named "Update"
             local SOME = BinderUtils_upvr.findFirstChild(InventoryItemBinder_upvr, ValidRoot_2)
             if _1 then
                 if SOME then
-                    arg1.Name = "Replace %s with %s":format(SOME:GetName(), _1:GetName())
+                    arg1.Name = string.format("Replace %s with %s", SOME:GetName(), _1:GetName())
                     var14 = 0.5
                 else
-                    arg1.Name = "Store %s":format(_1:GetName())
+                    arg1.Name = string.format("Store %s", _1:GetName())
                     var14 = 0.5
                 end
             elseif SOME then
-                arg1.Name = "Take out %s":format(SOME:GetName())
+                arg1.Name = string.format("Take out %s", SOME:GetName())
                 var14 = 0.5
             else
                 arg1.Name = "Inspect Drawer"
@@ -127,13 +127,13 @@ return {
             var30_upvw = var32
             local Cell = Settings_upvr.Time.Cell
             local CellTime = ScreenGui_upvr.CellTime
-            CellTime.Time.Text = "%ds":format(Cell)
+            CellTime.Time.Text = string.format("%ds", Cell)
             CellTime.Visible = true
             local tick_result1 = tick()
             repeat
                 wait(1)
                 if var32 ~= var30_upvw then return end
-                CellTime.Time.Text = "%ds":format(Settings_upvr.Time.Cell - tick() + tick_result1)
+                CellTime.Time.Text = string.format("%ds", Settings_upvr.Time.Cell - tick() + tick_result1)
             until Cell <= tick() - tick_result1
             if var32 ~= var30_upvw then
             else

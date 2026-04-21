@@ -18,7 +18,7 @@ function module_upvr.init() -- Line 18
     module_upvr.updateProgress(LocalPlayer_upvr)
     LevelSystem_upvr.getOnLevelChangedSignal():Connect(module_upvr.updateProgress)
     LevelSystem_upvr.getOnExpChangedSignal():Connect(module_upvr.updateProgress)
-    LevelGui2.Background.Body.SeasonNum.Text = "SEASON %d":format(SeasonConsts_upvr.SEASON_NUM)
+    LevelGui2.Background.Body.SeasonNum.Text = string.format("SEASON %d", SeasonConsts_upvr.SEASON_NUM)
     LevelGui2.Background.Body.InfoButton.MouseButton1Down:Connect(module_upvr.toggleInfo)
     LevelGui2.Background.Body.MouseButton1Down:Connect(module_upvr.toggleInfo)
     SeasonSystem_upvr.getSeasonPassOwnedSignal():Connect(function(arg1) -- Line 37
@@ -99,8 +99,8 @@ function module_upvr.setProgress(arg1, arg2) -- Line 82
     end
     local var27 = var26 / 1
     gui.Background.Body.Progress:TweenSize(UDim2.new(var23, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, var27, true)
-    gui.Background.Body.Level.Text = "LEVEL %d":format(arg1)
-    gui.Background.Body.ExpProgress.Text = "%d/%d":format(arg2, any_calculateExpNextLevel_result1)
+    gui.Background.Body.Level.Text = string.format("LEVEL %d", arg1)
+    gui.Background.Body.ExpProgress.Text = string.format("%d/%d", arg2, any_calculateExpNextLevel_result1)
     if SeasonSystem_upvr.doesPlayerOwnSeasonPass(LocalPlayer_upvr) then
     end
     if SeasonUtils_upvr.getRemainingTime() < 0 then

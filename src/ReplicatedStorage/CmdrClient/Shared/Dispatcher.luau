@@ -30,7 +30,7 @@ function module_2_upvr.Evaluate(arg1, arg2, arg3, arg4, arg5) -- Line 45
         end
         return false, any_Parse_result2
     end
-    return false, "%q is not a valid command name. Use the help command to see all available commands.":format(tostring(popped))
+    return false, string.format("%q is not a valid command name. Use the help command to see all available commands.", tostring(popped));
 end
 function module_2_upvr.EvaluateAndRun(arg1, arg2, arg3, arg4) -- Line 94
     -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
@@ -60,7 +60,7 @@ function module_2_upvr.EvaluateAndRun(arg1, arg2, arg3, arg4) -- Line 94
     end, var20)
     if not xpcall_result1 then
         var20 = warn
-        var20(`[Cmdr] Error occurred while evaluating command string %q\n{tostring(xpcall_result2)}`:format(arg2))
+        var20(string.format(`[Cmdr] Error occurred while evaluating command string %q\n{tostring(xpcall_result2)}`, arg2))
     end
     local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
         var20 = xpcall_result2
@@ -137,7 +137,7 @@ end
 local var47_upvw = false
 function module_2_upvr.RunHooks(arg1, arg2, arg3, ...) -- Line 236
     if not arg1.Registry.Hooks[arg2] then
-        error("[Cmdr] Invalid hook name: %q":format(arg2), 2)
+        error(string.format("[Cmdr] Invalid hook name: %q", arg2), 2)
     end
     if arg2 == "BeforeRun" and #arg1.Registry.Hooks[arg2] == 0 and arg3.Group ~= "DefaultUtil" and arg3.Group ~= "UserAlias" and arg3:HasImplementation() then
         if RunService_upvr:IsStudio() then

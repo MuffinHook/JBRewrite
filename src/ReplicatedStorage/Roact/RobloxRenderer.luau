@@ -26,7 +26,7 @@ local function v12(v10, v11) --[[ Line: 36 ]] --[[ Name: applyRef ]]
         v0.update(v10, v11);
         return;
     else
-        error(("Invalid ref: Expected type Binding but got %s"):format((typeof(v10))));
+        error(string.format(("Invalid ref: Expected type Binding but got %s"), (typeof(v10))));
         return;
     end;
 end;
@@ -64,7 +64,7 @@ local function v38(v23, v24, v25) --[[ Line: 70 ]] --[[ Name: attachBinding ]]
             if l_source_0 == nil then
                 l_source_0 = "<enable element tracebacks>";
             end;
-            local v36 = ("Error updating props:\n\t%s\nIn element:\n%s\n"):format(v34, l_source_0);
+            local v36 = string.format(("Error updating props:\n\t%s\nIn element:\n%s\n"), v34, l_source_0);
             error(v36, 0);
         end;
     end;
@@ -170,7 +170,7 @@ return {
             if l_source_1 == nil then
                 l_source_1 = "<enable element tracebacks>";
             end;
-            local v80 = ("Error applying props:\n\t%s\nIn element:\n%s\n"):format(v78, l_source_1);
+            local v80 = string.format(("Error applying props:\n\t%s\nIn element:\n%s\n"), v78, l_source_1);
             error(v80, 0);
         end;
         v76.Name = tostring(l_hostKey_0);
@@ -220,7 +220,7 @@ return {
             if l_source_2 == nil then
                 l_source_2 = "<enable element tracebacks>";
             end;
-            local v97 = ("Error updating props:\n\t%s\nIn element:\n%s\n"):format(v95, l_source_2);
+            local v97 = string.format(("Error updating props:\n\t%s\nIn element:\n%s\n"), v95, l_source_2);
             error(v97, 0);
         end;
         local v98 = v91.props[v1];

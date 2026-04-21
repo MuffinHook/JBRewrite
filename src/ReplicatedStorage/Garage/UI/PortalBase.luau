@@ -49,7 +49,7 @@ function any_extend_result1.render(arg1) -- Line 28
         local var46 = arg1.props.metadata[i]
         if (function(arg1_2, arg2, arg3) -- Line 67, Named "shouldShow"
             -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-            local any_gsub_result1_3 = arg3 or "":lower():gsub(' ', "")
+            local any_gsub_result1_3 = (arg3 or ""):lower():gsub(' ', "")
             local var41
             if 0 >= #any_gsub_result1_3 then
                 var41 = false
@@ -57,7 +57,7 @@ function any_extend_result1.render(arg1) -- Line 28
                 var41 = true
             end
             if var41 then
-                if string.find(arg1_2.title or "":lower():gsub(' ', ""), any_gsub_result1_3, 1, true) == nil then
+                if string.find((arg1_2.title or ""):lower():gsub(' ', ""), any_gsub_result1_3, 1, true) == nil then
                 else
                 end
             end

@@ -166,7 +166,7 @@ function module.launch(arg1, arg2) -- Line 30
         if var54 < 0 then
             var54 = 0
         end
-        clone_upvr.Stats.Time.TextLabel.Text = "%02d:%02d":format(math.floor(var54 / 60), math.floor(var54 % 60))
+        clone_upvr.Stats.Time.TextLabel.Text = string.format("%02d:%02d", math.floor(var54 / 60), math.floor(var54 % 60))
     end))
 end
 return module

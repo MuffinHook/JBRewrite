@@ -30,7 +30,7 @@ return {
                 local squareroot = math.sqrt(1 - math.clamp((Time_upvr.GetNowSync() - var15_upvw.CollectedAt) / var15_upvw.Timeout, 0, 1))
                 PowerPlantRobberyGui_upvr.Price.Value.Size = UDim2.new(squareroot, 0, 1, 0)
                 local string_match_result1, string_match_result2_2, string_match_result3_2 = string.match(math.floor(var15_upvw.BaseWorth * squareroot / 50 + 0.5) * 50, "^([^%d]*%d)(%d*)(.-)$")
-                PowerPlantRobberyGui_upvr.Price.TextLabel.Text = "Uranium Value: $%s":format(string_match_result1..string_match_result2_2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3_2)
+                PowerPlantRobberyGui_upvr.Price.TextLabel.Text = string.format("Uranium Value: $%s", string_match_result1..string_match_result2_2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3_2);
                 wait(0.1)
             end
         end

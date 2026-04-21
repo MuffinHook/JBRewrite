@@ -80,7 +80,7 @@ function module_5_upvr.getSpawnDataFromSpawnPart(arg1) -- Line 83
     local var28
     if attribute then
         if not attribute then
-            error("Blank attribute SPAWN_EXCLUSIVE_TEAM_NAME_ATTR_NAME for %s":format(arg1:GetFullName()))
+            error(string.format("Blank attribute SPAWN_EXCLUSIVE_TEAM_NAME_ATTR_NAME for %s", arg1:GetFullName()));
             return false
         end
         var28 = Settings_upvr.EnumTeam[attribute]

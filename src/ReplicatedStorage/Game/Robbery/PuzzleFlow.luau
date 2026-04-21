@@ -107,7 +107,7 @@ local tbl_upvr_2 = {
         local len_8 = #arg1.Grid[1]
         for i_11 = 1, len_3 do
             for i_12 = 1, len_8 do
-                local formatted = "%d.%d":format(i_12, i_11)
+                local formatted = string.format("%d.%d", i_12, i_11)
                 if FlowGui_upvr.Board.Inner:FindFirstChild(formatted) == nil then
                     local TextLabel = Instance.new("TextLabel")
                     TextLabel.Name = formatted
@@ -375,7 +375,7 @@ function tbl_upvr_2.Show(arg1) -- Line 204
             if var104_upvw then
                 var104_upvw.Size = UDim2.new(1 / len_5 * 0.5, 0, 1 / len_7 * 0.5, 0)
             end
-            local SOME = FlowGui_upvr.Board.Inner:FindFirstChild("%d.%d":format(var102_upvw, var103_upvw))
+            local SOME = FlowGui_upvr.Board.Inner:FindFirstChild(string.format("%d.%d", var102_upvw, var103_upvw))
             assert(SOME)
             SOME.Size = UDim2.new(1 / len_5 * 0.75, 0, 1 / len_7 * 0.75, 0)
             var104_upvw = SOME
@@ -404,14 +404,14 @@ function tbl_upvr_2.Show(arg1) -- Line 204
                     return
                 end
                 if arg1_8.KeyCode == Enum.KeyCode.ButtonA then
-                    local SOME_2 = FlowGui_upvr.Board.Inner:FindFirstChild("%d.%d":format(var102_upvw, var103_upvw))
+                    local SOME_2 = FlowGui_upvr.Board.Inner:FindFirstChild(string.format("%d.%d", var102_upvw, var103_upvw))
                     TouchStart_upvr(SOME_2.AbsolutePosition + SOME_2.AbsoluteSize * 0.5)
                 end
             end
         end))
         arg1.Maid:GiveTask(UserInputService_upvr.InputEnded:Connect(function(arg1_9) -- Line 386
             if arg1_9.UserInputType == Enum.UserInputType.Gamepad1 and arg1_9.KeyCode == Enum.KeyCode.ButtonA then
-                local SOME_3 = FlowGui_upvr.Board.Inner:FindFirstChild("%d.%d":format(var102_upvw, var103_upvw))
+                local SOME_3 = FlowGui_upvr.Board.Inner:FindFirstChild(string.format("%d.%d", var102_upvw, var103_upvw))
                 TouchStop_upvr(SOME_3.AbsolutePosition + SOME_3.AbsoluteSize * 0.5)
             end
         end))

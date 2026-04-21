@@ -16,12 +16,13 @@ function any_extend_result1.render(arg1) -- Line 18
     local paddingRatio = arg1.props.paddingRatio
     local cornerPixel = arg1.props.cornerPixel
     local var11
+    local var12
     if not arg1.props.upgraded then
-        local var12 = not arg1.props.inPhysical
+        var12 = not arg1.props.inPhysical
     end
     local maximum = math.max(arg1.state.remaining, 0)
     local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var11 = "%d:%02d COOLDOWN":format(math.floor(maximum / 60), maximum % 60)
+        var11 = string.format("%d:%02d COOLDOWN", math.floor(maximum / 60), maximum % 60);
         return var11
     end
     if 1 > maximum or not decompInlinedCondition() then

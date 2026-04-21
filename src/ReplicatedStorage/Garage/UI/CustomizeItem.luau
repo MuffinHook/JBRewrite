@@ -53,8 +53,7 @@ function any_extend_result1._reparent(arg1) -- Line 415
             end
         end)
     end
-    mountCount_upvr = arg1:_updateViewport
-    mountCount_upvr()
+    arg1:_updateViewport()
 end
 local RunService_upvr = game:GetService("RunService")
 function any_extend_result1.didMount(arg1) -- Line 434

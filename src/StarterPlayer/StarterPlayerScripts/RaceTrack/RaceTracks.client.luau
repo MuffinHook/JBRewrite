@@ -57,7 +57,7 @@ function any_extend_result1_upvr.render(arg1) -- Line 48
             name = v.Value;
             userId = tonumber(v.Name);
             time = attribute;
-            message = ("%d:%02d.%03d"):format(math.floor(attribute % 3600000 / 60000), math.floor(attribute % 60000 / 1000), math.floor(attribute % 1000));
+            message = string.format(("%d:%02d.%03d"), math.floor(attribute % 3600000 / 60000), math.floor(attribute % 60000 / 1000), math.floor(attribute % 1000));
         })
     end
     table.sort(tbl_3, function(arg1_3, arg2) -- Line 64

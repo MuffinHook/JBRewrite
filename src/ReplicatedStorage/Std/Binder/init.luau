@@ -27,7 +27,7 @@ v5.new = function(v6, v7, ...) --[[ Line: 43 ]] --[[ Name: new ]]
     delay(5, function() --[[ Line: 57 ]]
         -- upvalues: v8 (copy)
         if not v8._loaded then
-            warn(("Binder %q is not loaded. Call :Start() on it!"):format(v8._tagName));
+            warn(string.format(("Binder %q is not loaded. Call :Start() on it!"), v8._tagName));
         end;
     end);
     return v8;
@@ -126,7 +126,7 @@ end;
 v5.Bind = function(v30, v31) --[[ Line: 214 ]] --[[ Name: Bind ]]
     -- upvalues: l_RunService_0 (copy), l_CollectionService_0 (copy)
     if l_RunService_0:IsClient() then
-        warn(("[Binder.Bind] - Bindings '%s' done on the client! Will be disrupted upon server replication! %s"):format(v30._tagName, debug.traceback()));
+        warn(string.format(("[Binder.Bind] - Bindings '%s' done on the client! Will be disrupted upon server replication! %s"), v30._tagName, debug.traceback()));
     end;
     l_CollectionService_0:AddTag(v31, v30._tagName);
     return v30:Get(v31);
@@ -135,14 +135,14 @@ v5.Unbind = function(v32, v33) --[[ Line: 229 ]] --[[ Name: Unbind ]]
     -- upvalues: l_RunService_0 (copy), l_CollectionService_0 (copy)
     assert(typeof(v33) == "Instance", "Bad inst'");
     if l_RunService_0:IsClient() then
-        warn(("[Binder.Bind] - Unbinding '%s' done on the client! Might be disrupted upon server replication! %s"):format(v32._tagName, debug.traceback()));
+        warn(string.format(("[Binder.Bind] - Unbinding '%s' done on the client! Might be disrupted upon server replication! %s"), v32._tagName, debug.traceback()));
     end;
     l_CollectionService_0:RemoveTag(v33, v32._tagName);
 end;
 v5.BindClient = function(v34, v35) --[[ Line: 247 ]] --[[ Name: BindClient ]]
     -- upvalues: l_RunService_0 (copy), l_CollectionService_0 (copy)
     if not l_RunService_0:IsClient() then
-        warn(("[Binder.BindClient] - Bindings '%s' done on the server! Will be replicated!"):format(v34._tagName));
+        warn(string.format(("[Binder.BindClient] - Bindings '%s' done on the server! Will be replicated!"), v34._tagName));
     end;
     l_CollectionService_0:AddTag(v35, v34._tagName);
     return v34:Get(v35);
@@ -173,12 +173,12 @@ v5._add = function(v42, v43) --[[ Line: 273 ]] --[[ Name: _add ]]
         local v44 = nil;
         v44 = if type(v42._constructor) == "function" then v42._constructor(v43, unpack(v42._args)) else if v42._constructor.Create then v42._constructor:Create(v43, unpack(v42._args)) else v42._constructor.new(v43, unpack(v42._args));
         if v42._pendingInstSet[v43] ~= true then
-            warn(("[Binder._add] - Failed to load instance %q of %q, removed while loading!"):format(v43:GetFullName(), (tostring(type(v42._constructor) == "table" and v42._constructor.ClassName or v42._constructor))));
+            warn(string.format(("[Binder._add] - Failed to load instance %q of %q, removed while loading!"), v43:GetFullName(), (tostring(type(v42._constructor) == "table" and v42._constructor.ClassName or v42._constructor))));
             return;
         else
             v42._pendingInstSet[v43] = nil;
             if type(v44) ~= "table" or type(v44.Destroy) ~= "function" then
-                warn(("[Binder._add] - Bad class constructed for tag %q"):format(v42._tagName));
+                warn(string.format(("[Binder._add] - Bad class constructed for tag %q"), v42._tagName));
                 return;
             else
                 assert(v42._instToClass[v43] == nil, "Overwrote");
@@ -219,7 +219,7 @@ v5._remove = function(v48, v49) --[[ Line: 335 ]] --[[ Name: _remove ]]
             v50:Destroy();
             return;
         else
-            warn(("[Binder._remove] - Class %q no longer has destroy, something destroyed it!"):format((tostring(v48._tagName))));
+            warn(string.format(("[Binder._remove] - Class %q no longer has destroy, something destroyed it!"), (tostring(v48._tagName))));
             return;
         end;
     end;

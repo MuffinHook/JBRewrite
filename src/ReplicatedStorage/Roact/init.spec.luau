@@ -38,13 +38,13 @@ return function() --[[ Line: 1 ]]
             local _ = nil;
             if not if typeof(v3) == "string" then typeof(v0[v2]) == v3 else v0[v2] ~= nil then
                 local v5 = typeof(v3) == "boolean" and "present" or "of type " .. v3;
-                local v6 = ("Expected public API member %q to be %s, but instead it was of type %s"):format(tostring(v2), v5, (typeof(v0[v2])));
+                local v6 = string.format(("Expected public API member %q to be %s, but instead it was of type %s"), tostring(v2), v5, (typeof(v0[v2])));
                 error(v6);
             end;
         end;
         for v7 in pairs(v0) do
             if v1[v7] == nil then
-                local v8 = ("Found unknown public API key %q!"):format((tostring(v7)));
+                local v8 = string.format(("Found unknown public API key %q!"), (tostring(v7)));
                 error(v8);
             end;
         end;

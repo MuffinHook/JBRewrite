@@ -28,9 +28,9 @@ local function reportNode_upvr(arg1, arg2, arg3) -- Line 24, Named "reportNode"
     end
     local var17
     if arg1.status then
-        var17 = "%s[%s] %s":format(any_rep_result1_upvr:rep(var16), tbl_upvr[arg1.status] or '?', arg1.planNode.phrase)
+        var17 = string.format("%s[%s] %s", any_rep_result1_upvr:rep(var16), tbl_upvr[arg1.status] or '?', arg1.planNode.phrase)
     else
-        var17 = "%s%s":format(any_rep_result1_upvr:rep(var16), arg1.planNode.phrase)
+        var17 = string.format("%s%s", any_rep_result1_upvr:rep(var16), arg1.planNode.phrase)
     end
     table.insert(var15, var17)
     table.sort(arg1.children, compareNodes_upvr)
@@ -53,9 +53,9 @@ local function report(arg1) -- Line 70
 end
 local TestService_upvr = game:GetService("TestService")
 function module_2.report(arg1) -- Line 76
-    print(table.concat({"Test results:", table.concat(reportRoot_upvr(arg1), '\n'), "%d passed, %d failed, %d skipped":format(arg1.successCount, arg1.failureCount, arg1.skippedCount)}, '\n'))
+    print(table.concat({"Test results:", table.concat(reportRoot_upvr(arg1), '\n'), string.format("%d passed, %d failed, %d skipped", arg1.successCount, arg1.failureCount, arg1.skippedCount)}, '\n'))
     if 0 < arg1.failureCount then
-        print("%d test nodes reported failures.":format(arg1.failureCount))
+        print(string.format("%d test nodes reported failures.", arg1.failureCount))
     end
     if 0 < #arg1.errors then
         print("Errors reported by tests:")

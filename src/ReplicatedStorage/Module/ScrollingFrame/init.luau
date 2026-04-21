@@ -113,7 +113,7 @@ function tbl_upvr.__index(arg1, arg2) -- Line 52
     if tbl_upvr[arg2] then
         return tbl_upvr[arg2]
     end
-    error("[Scroller] - '%s' is not a valid member":format(tostring(arg2)))
+    error(string.format("[Scroller] - '%s' is not a valid member", tostring(arg2)));
 end
 function tbl_upvr.__newindex(arg1, arg2, arg3) -- Line 117
     local var11
@@ -162,7 +162,7 @@ function tbl_upvr.__newindex(arg1, arg2, arg3) -- Line 117
             arg1.Spring.Velocity = var11
             return
         end
-        error("[Scroller] - '%s' is not a valid member":format(tostring(arg2)))
+        error(string.format("[Scroller] - '%s' is not a valid member", tostring(arg2)))
     end
 end
 local tbl_upvr_2 = {

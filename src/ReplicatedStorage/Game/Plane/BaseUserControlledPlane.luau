@@ -394,7 +394,7 @@ local function MountLocalPlayer_upvr(arg1, arg2) -- Line 166, Named "MountLocalP
                 var179 /= var180
             end
             clone_upvw.Controls.Mouse.Dot.Position = UDim2.new(-(var178 * 0.9) * 0.5 + 0.5, 0, -(var179 * 0.9) * 0.5 + 0.5, 0)
-            clone_upvw.Controls.Altitude.Text = "%04d":format(arg1.PartWing.Position.Y)
+            clone_upvw.Controls.Altitude.Text = string.format("%04d", arg1.PartWing.Position.Y)
             clone_upvw.Controls.Throttle.Value.Size = UDim2.new(1, 0, var143_upvw, 0)
             clone_upvw.Controls.Throttle.Value.Position = UDim2.new(0, 0, 1 - var143_upvw, 0)
         end

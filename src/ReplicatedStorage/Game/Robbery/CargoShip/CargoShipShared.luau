@@ -7,7 +7,7 @@ function module.GetPath() -- Line 6
     local tbl = {}
     local var7
     for i = 1, #PathCargoShip:GetChildren() do
-        local assert_result1 = assert(PathCargoShip:FindFirstChild("Node%d":format(i)))
+        local assert_result1 = assert(PathCargoShip:FindFirstChild(string.format("Node%d", i)));
         assert_result1.CanCollide = false
         assert_result1.Transparency = 1
         table.insert(tbl, assert_result1.Position)

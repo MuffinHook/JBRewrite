@@ -64,7 +64,7 @@ function module_upvr.new(arg1, arg2, arg3) -- Line 56
     module_2_upvr._manifestSizeTarget = var32
     task.delay(5, function() -- Line 77
         if not module_2_upvr._loaded then
-            warn(("ManifestBinder %q is not loaded. Call :Start() on it!"):format(module_2_upvr._tagName))
+            warn(string.format(("ManifestBinder %q is not loaded. Call :Start() on it!"), module_2_upvr._tagName))
         end
     end)
     return module_2_upvr
@@ -101,7 +101,7 @@ function module_upvr._stopBoundFn(arg1, arg2) -- Line 109
         if var44.Destroy then
             var44:Destroy()
         else
-            warn(("[ManifestBinder._remove] - Class %q no longer has destroy, something destroyed it!"):format(tostring(arg1._tagName)))
+            warn(string.format(("[ManifestBinder._remove] - Class %q no longer has destroy, something destroyed it!"), tostring(arg1._tagName)))
         end
         arg1._rootInstToClass[arg2] = nil
     end
@@ -122,12 +122,12 @@ function module_upvr._startBoundFn(arg1, arg2, arg3) -- Line 135
         end
         if arg1._pendingRootInstSet[arg2] ~= true then
             local var54 = if type(arg1._constructor) == "table" then arg1._constructor.ClassName else arg1._constructor
-            warn(("[ManifestBinder._startBoundFn] - Failed to load instance %q of %q, removed while loading!"):format(arg2:GetFullName(), tostring(var54)))
+            warn(string.format(("[ManifestBinder._startBoundFn] - Failed to load instance %q of %q, removed while loading!"), arg2:GetFullName(), tostring(var54)))
             return
         end
         arg1._pendingRootInstSet[arg2] = nil
         if typeof(var53) ~= "table" or typeof(var53.Destroy) ~= "function" then
-            warn(("[ManifestBinder._startBoundFn] - Bad class constructed for tag %q"):format(arg1._tagName))
+            warn(string.format(("[ManifestBinder._startBoundFn] - Bad class constructed for tag %q"), arg1._tagName))
             return
         end
         arg1._rootInstToClass[arg2] = var53

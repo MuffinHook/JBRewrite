@@ -90,9 +90,9 @@ local function dequeueMaxEvents_upvr() -- Line 165, Named "dequeueMaxEvents"
         Store_upvr.EventsQueue = {}
         return Store_upvr.EventsQueue
     end
-    Logger_upvr:w("More than %d events queued! Sending %d.":format(500, 500))
+    Logger_upvr:w(string.format("More than %d events queued! Sending %d.", 500, 500));
     if 2000 < #Store_upvr.EventsQueue then
-        Logger_upvr:w("DROPPING EVENTS: More than %d events queued!":format(2000))
+        Logger_upvr:w(string.format("DROPPING EVENTS: More than %d events queued!", 2000));
     end
     for i_3 = 1, 500 do
         table.create(500)[i_3] = Store_upvr.EventsQueue[i_3]

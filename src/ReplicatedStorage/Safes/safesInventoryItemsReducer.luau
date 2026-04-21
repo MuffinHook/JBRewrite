@@ -24,7 +24,7 @@ function module.setSafesInventoryItems(arg1, arg2) -- Line 8
         assert(var12, "missing safeTierData")
         var12 = module_2
         table.insert(var12, {
-            name = ("%s_%s"):format(TypeEnum, i);
+            name = string.format(("%s_%s"), TypeEnum, i);
             typeEnum = TypeEnum;
             imageId = var11.ImageId;
             itemOwnedId = v.Id;

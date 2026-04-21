@@ -31,7 +31,7 @@ v2.connectPropertyChange = function(v7, v8, v9) --[[ Line: 55 ]] --[[ Name: conn
         return v7._instance:GetPropertyChangedSignal(v8);
     end);
     if not l_status_0 then
-        error(("Cannot get changed signal on property %q: %s"):format(tostring(v8), l_result_0), 0);
+        error(string.format(("Cannot get changed signal on property %q: %s"), tostring(v8), l_result_0), 0);
     end;
     v7:_connect("Change." .. v8, l_result_0, v9);
 end;

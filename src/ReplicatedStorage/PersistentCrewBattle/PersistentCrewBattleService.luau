@@ -137,7 +137,7 @@ function module_upvr.initBattleServer() -- Line 54
         arg1.OnClientEvent:Connect(function(arg1_4, arg2) -- Line 170
             persistentCrewStore_upvr:dispatch({
                 type = "setPenaltyText";
-                value = "%s +%ss":format(arg2, arg1_4);
+                value = string.format("%s +%ss", arg2, arg1_4);
             })
         end)
     end)

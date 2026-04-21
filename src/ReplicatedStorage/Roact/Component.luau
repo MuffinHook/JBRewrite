@@ -64,7 +64,7 @@ v10.setState = function(v21, v22) --[[ Line: 94 ]] --[[ Name: setState ]]
     local v23 = v21[v7];
     local l_lifecyclePhase_0 = v23.lifecyclePhase;
     if l_lifecyclePhase_0 == v1.ShouldUpdate or l_lifecyclePhase_0 == v1.WillUpdate or l_lifecyclePhase_0 == v1.Render then
-        local v25 = v4[v23.lifecyclePhase]:format((tostring(v23.componentClass)));
+        local v25 = string.format(v4[v23.lifecyclePhase], (tostring(v23.componentClass)));
         error(v25, 2);
     elseif l_lifecyclePhase_0 == v1.WillUnmount then
         return;
@@ -95,7 +95,7 @@ v10.setState = function(v21, v22) --[[ Line: 94 ]] --[[ Name: setState ]]
         v21:__update(nil, v28);
         return;
     else
-        local v31 = v4.default:format((tostring(v23.componentClass)));
+        local v31 = string.format(v4.default, (tostring(v23.componentClass)));
         error(v31, 2);
         return;
     end;
@@ -106,7 +106,7 @@ v10.getElementTraceback = function(v32) --[[ Line: 178 ]] --[[ Name: getElementT
 end;
 v10.render = function(v33) --[[ Line: 189 ]] --[[ Name: render ]]
     -- upvalues: v7 (copy)
-    local v34 = ("The component %q is missing the `render` method.\n`render` must be defined when creating a Roact component!"):format((tostring(v33[v7].componentClass)));
+    local v34 = string.format(("The component %q is missing the `render` method.\n`render` must be defined when creating a Roact component!"), (tostring(v33[v7].componentClass)));
     error(v34, 0);
 end;
 v10.__getContext = function(v35, v36) --[[ Line: 201 ]] --[[ Name: __getContext ]]
@@ -141,12 +141,12 @@ v10.__validateProps = function(v42, v43) --[[ Line: 244 ]] --[[ Name: __validate
             return;
         else
             if typeof(l_validateProps_0) ~= "function" then
-                error(("validateProps must be a function, but it is a %s.\nCheck the definition of the component %q."):format(typeof(l_validateProps_0), v42.__componentName));
+                error(string.format(("validateProps must be a function, but it is a %s.\nCheck the definition of the component %q."), typeof(l_validateProps_0), v42.__componentName));
             end;
             local v45, v46 = l_validateProps_0(v43);
             if not v45 then
                 v46 = v46 or "<Validator function did not supply a message>";
-                error(("Property validation failed in %s: %s\n\n%s"):format(v42.__componentName, tostring(v46), v42:getElementTraceback() or "<enable element tracebacks>"), 0);
+                error(string.format(("Property validation failed in %s: %s\n\n%s"), v42.__componentName, tostring(v46), v42:getElementTraceback() or "<enable element tracebacks>"), 0);
             end;
             return;
         end;
@@ -264,7 +264,7 @@ v10.__update = function(v62, v63, v64) --[[ Line: 381 ]] --[[ Name: __update ]]
         else
             v70 = v70 + 1;
             if v70 > 100 then
-                error(("The component %q has reached the setState update recursion limit.\nWhen using `setState` in `didUpdate`, make sure that it won't repeat infinitely!"):format((tostring(v67.componentClass))), 3);
+                error(string.format(("The component %q has reached the setState update recursion limit.\nWhen using `setState` in `didUpdate`, make sure that it won't repeat infinitely!"), (tostring(v67.componentClass))), 3);
             end;
             if v67.pendingState == nil then
                 return true;

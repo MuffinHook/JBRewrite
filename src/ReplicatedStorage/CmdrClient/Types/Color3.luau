@@ -33,13 +33,13 @@ local any_MakeSequenceType_result1_upvr = Util_upvr.MakeSequenceType({
     Prefixes = "# hexColor3 ! brickColor3";
     ValidateEach = function(arg1, arg2) -- Line 5, Named "ValidateEach"
         if arg1 == nil then
-            return false, "Invalid or missing number at position %d in Color3 type.":format(arg2)
+            return false, string.format("Invalid or missing number at position %d in Color3 type.", arg2);
         end
         if arg1 < 0 or 255 < arg1 then
-            return false, "Number out of acceptable range 0-255 at position %d in Color3 type.":format(arg2)
+            return false, string.format("Number out of acceptable range 0-255 at position %d in Color3 type.", arg2);
         end
         if arg1 % 1 ~= 0 then
-            return false, "Number is not an integer at position %d in Color3 type.":format(arg2)
+            return false, string.format("Number is not an integer at position %d in Color3 type.", arg2);
         end
         return true
     end;

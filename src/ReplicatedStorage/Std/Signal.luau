@@ -47,10 +47,10 @@ end;
 v5.Destroy = v5.Disconnect;
 setmetatable(v5, {
     __index = function(_, v11) --[[ Line: 110 ]] --[[ Name: __index ]]
-        error(("Attempt to get Connection::%s (not a valid member)"):format((tostring(v11))), 2);
+        error(string.format(("Attempt to get Connection::%s (not a valid member)"), (tostring(v11))), 2);
     end, 
     __newindex = function(_, v13, _) --[[ Line: 113 ]] --[[ Name: __newindex ]]
-        error(("Attempt to set Connection::%s (not a valid member)"):format((tostring(v13))), 2);
+        error(string.format(("Attempt to set Connection::%s (not a valid member)"), (tostring(v13))), 2);
     end
 });
 local v15 = {};
@@ -114,10 +114,10 @@ end;
 v15.Destroy = v15.DisconnectAll;
 setmetatable(v15, {
     __index = function(_, v29) --[[ Line: 194 ]] --[[ Name: __index ]]
-        error(("Attempt to get Signal::%s (not a valid member)"):format((tostring(v29))), 2);
+        error(string.format(("Attempt to get Signal::%s (not a valid member)"), (tostring(v29))), 2);
     end, 
     __newindex = function(_, v31, _) --[[ Line: 197 ]] --[[ Name: __newindex ]]
-        error(("Attempt to set Signal::%s (not a valid member)"):format((tostring(v31))), 2);
+        error(string.format(("Attempt to set Signal::%s (not a valid member)"), (tostring(v31))), 2);
     end
 });
 return v15;

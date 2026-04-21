@@ -20,7 +20,7 @@ v3.new = function() --[[ Line: 35 ]] --[[ Name: new ]]
         _currentConfig = setmetatable({}, {
             __index = function(_, v5) --[[ Line: 39 ]] --[[ Name: __index ]]
                 -- upvalues: v1 (ref)
-                local v6 = ("Invalid global configuration key %q. Valid configuration keys are: %s"):format(tostring(v5), table.concat(v1, ", "));
+                local v6 = string.format(("Invalid global configuration key %q. Valid configuration keys are: %s"), tostring(v5), table.concat(v1, ", "));
                 error(v6, 3);
             end
         })
@@ -44,11 +44,11 @@ v3.set = function(v8, v9) --[[ Line: 69 ]] --[[ Name: set ]]
     -- upvalues: v0 (copy), v1 (copy)
     for v10, v11 in pairs(v9) do
         if v0[v10] == nil then
-            local v12 = ("Invalid global configuration key %q (type %s). Valid configuration keys are: %s"):format(tostring(v10), typeof(v10), table.concat(v1, ", "));
+            local v12 = string.format(("Invalid global configuration key %q (type %s). Valid configuration keys are: %s"), tostring(v10), typeof(v10), table.concat(v1, ", "));
             error(v12, 3);
         end;
         if typeof(v11) ~= "boolean" then
-            local v13 = ("Invalid value %q (type %s) for global configuration key %q. Valid values are: true, false"):format(tostring(v11), typeof(v11), (tostring(v10)));
+            local v13 = string.format(("Invalid value %q (type %s) for global configuration key %q. Valid values are: true, false"), tostring(v11), typeof(v11), (tostring(v10)));
             error(v13, 3);
         end;
         v8._currentConfig[v10] = v11;

@@ -34,7 +34,7 @@ return function(v3, v4) --[[ Line: 6 ]]
         else
             for _, v15 in ipairs(v7) do
                 if v15:IsA("MeshPart") then
-                    v15.TextureID = ("rbxassetid://%d"):format(v11);
+                    v15.TextureID = string.format(("rbxassetid://%d"), v11);
                 end;
             end;
             return;

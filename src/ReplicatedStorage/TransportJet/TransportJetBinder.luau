@@ -48,7 +48,7 @@ function module_upvr.new(arg1) -- Line 28
                 local any_getRootPart_result1_upvr = CharacterUtils_upvr.getRootPart(Players_upvr.LocalPlayer.Character)
                 if var17_upvw then return end
                 var17_upvw = true
-                local any_new_result1_upvr_3 = Confirmation_upvr.new("Fly across the map for $%s?":format(TransportJetConsts_upvr.LAUNCH_COST_CASH))
+                local any_new_result1_upvr_3 = Confirmation_upvr.new(string.format("Fly across the map for $%s?", TransportJetConsts_upvr.LAUNCH_COST_CASH));
                 any_new_result1_upvr_3.Maid:GiveTask(any_new_result1_upvr_3.OnYes:Connect(function() -- Line 62
                     arg1:FindFirstChild(TransportJetConsts_upvr.REQUEST_LAUNCH_REMOTE_NAME):FireServer()
                 end))

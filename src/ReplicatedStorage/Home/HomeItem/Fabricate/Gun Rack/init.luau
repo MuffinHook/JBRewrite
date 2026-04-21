@@ -27,8 +27,9 @@ function tbl_upvr.new(arg1) -- Line 15
         local _1 = InventoryItemSystem_upvr.getEquippedFor(Players_upvr.LocalPlayer)[1]
         if _1 then
         end
+        local var14
         if not GunRackConsts_upvr.WHITELIST[_1:GetName()] then
-            local var14
+            var14 = nil
         end
         if any_GetItemName_result1 and _1 and any_GetItemName_result1 == var14 then
         end
@@ -37,20 +38,19 @@ function tbl_upvr.new(arg1) -- Line 15
             arg1_3.Timed = true
         else
             arg1_3.Timed = false
-            local var15
         end
         if var14 and any_GetItemName_result1 then
-            arg1_3.Name = "Replace %s with %s":format(GunShopUtils_upvr.getTranslatedTitleFromName(any_GetItemName_result1), GunShopUtils_upvr.getTranslatedTitleFromName(var14))
+            arg1_3.Name = string.format("Replace %s with %s", GunShopUtils_upvr.getTranslatedTitleFromName(any_GetItemName_result1), GunShopUtils_upvr.getTranslatedTitleFromName(var14))
             -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
         end
         if any_GetItemName_result1 then
-            arg1_3.Name = "Grab %s":format(GunShopUtils_upvr.getTranslatedTitleFromName(any_GetItemName_result1))
+            arg1_3.Name = string.format("Grab %s", GunShopUtils_upvr.getTranslatedTitleFromName(any_GetItemName_result1))
             -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
         end
         -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
         if var14 then
-            arg1_3.Name = "Mount %s":format(GunShopUtils_upvr.getTranslatedTitleFromName(var14))
+            arg1_3.Name = string.format("Mount %s", GunShopUtils_upvr.getTranslatedTitleFromName(var14))
         else
         end
         arg1_3.Enabled = nil

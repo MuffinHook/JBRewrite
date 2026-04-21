@@ -6,7 +6,7 @@ return function(arg1) -- Line 5
         position = UDim2.new(0.25, 0, 0.5, 0);
         text = any_createBinding_result1;
         onClick = function(arg1_2, arg2, arg3) -- Line 14, Named "onClick"
-            any_createBinding_result2_upvr("click %d":format(arg3))
+            any_createBinding_result2_upvr(string.format("click %d", arg3));
         end;
     }), arg1)
     return function() -- Line 20

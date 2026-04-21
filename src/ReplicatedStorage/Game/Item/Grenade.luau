@@ -78,7 +78,7 @@ local function GrenadeExplode_upvr(arg1, arg2) -- Line 59, Named "GrenadeExplode
 end
 local Joint_upvr = require(ReplicatedStorage_upvr.Std.Joint)
 function module_upvr.GrenadeThrow(arg1, arg2, arg3) -- Line 110
-    local clone_3_upvw = assert(ReplicatedStorage_upvr.Resource.ItemSystem.Models.Grenade, "Item model for %s does not exist.":format("Grenade")):Clone()
+    local clone_3_upvw = assert(ReplicatedStorage_upvr.Resource.ItemSystem.Models.Grenade, string.format("Item model for %s does not exist.", "Grenade")):Clone()
     clone_3_upvw.Model.Handle:Destroy()
     Joint_upvr.Weld(clone_3_upvw.Model.Base, clone_3_upvw.Skeleton.BoundingBox)
     clone_3_upvw.Model.Base.Anchored = false

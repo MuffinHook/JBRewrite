@@ -635,14 +635,14 @@ v29.GUID = function() --[[ Line: 542 ]] --[[ Name: GUID ]]
     -- upvalues: l_random_0 (copy)
     return ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(v452) --[[ Line: 544 ]]
         -- upvalues: l_random_0 (ref)
-        return ("%x"):format(v452 == "x" and l_random_0(0, 15) or l_random_0(8, 11));
+        return string.format(("%x"), v452 == "x" and l_random_0(0, 15) or l_random_0(8, 11));
     end);
 end;
 v29.ShortGUID = function() --[[ Line: 549 ]] --[[ Name: ShortGUID ]]
     -- upvalues: l_random_0 (copy)
     return ("xxx-yx"):gsub("[xy]", function(v453) --[[ Line: 551 ]]
         -- upvalues: l_random_0 (ref)
-        return ("%x"):format(v453 == "x" and l_random_0(0, 15) or l_random_0(8, 11));
+        return string.format(("%x"), v453 == "x" and l_random_0(0, 15) or l_random_0(8, 11));
     end);
 end;
 v29.Base85UUID = v22.base85UUID;
@@ -773,7 +773,7 @@ local function v504(v496) --[[ Line: 631 ]] --[[ Name: FormatMoney ]]
     local l_v497_0 = v497;
     local v500 = l_abs_0(v496);
     local v501, v502, v503 = string.match(v500, "^([^%d]*%d)(%d*)(.-)$");
-    return v498:format(l_v497_0, v501 .. v502:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v503);
+    return string.format(v498, l_v497_0, v501 .. v502:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v503);
 end;
 v29.comma = v495;
 v29.FormatMoney = v504;

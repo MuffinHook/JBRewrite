@@ -103,7 +103,7 @@ function any_extend_result1.render(arg1) -- Line 11
                         TextYAlignment = Enum.TextYAlignment.Top;
                         TextXAlignment = Enum.TextXAlignment.Left;
                         RichText = true;
-                        Text = " - One crew becomes <font color=\"rgb(252, 40, 47)\">CRIMINALS</font>, the other <font color=\"rgb(42, 204, 255)\">POLICE</font>.\n- <font color=\"rgb(252, 40, 47)\">CRIMINALS</font>, rob <u>%d</u> of the <u>%d</u> locations listed!\n- <font color=\"rgb(42, 204, 255)\">POLICE</font>, slow them down!\n- Arrests & deaths count as <u>time penalties</u>.\n- Teams switch next round.\n- The quickest crew to speedrun will claim victory & climb the ranks!":format(PersistentCrewBattleConsts_upvr.NUM_ROBBERIES_TO_FINISH_ROUND, PersistentCrewBattleConsts_upvr.NUM_ROBBERIES_AVAILABLE);
+                        Text = string.format(" - One crew becomes <font color=\"rgb(252, 40, 47)\">CRIMINALS</font>, the other <font color=\"rgb(42, 204, 255)\">POLICE</font>.\n- <font color=\"rgb(252, 40, 47)\">CRIMINALS</font>, rob <u>%d</u> of the <u>%d</u> locations listed!\n- <font color=\"rgb(42, 204, 255)\">POLICE</font>, slow them down!\n- Arrests & deaths count as <u>time penalties</u>.\n- Teams switch next round.\n- The quickest crew to speedrun will claim victory & climb the ranks!", PersistentCrewBattleConsts_upvr.NUM_ROBBERIES_TO_FINISH_ROUND, PersistentCrewBattleConsts_upvr.NUM_ROBBERIES_AVAILABLE);
                         LineHeight = 1;
                         TextScaled = true;
                         TextColor3 = Color3.new(1, 1, 1);

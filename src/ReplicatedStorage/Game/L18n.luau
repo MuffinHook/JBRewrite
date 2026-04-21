@@ -7,7 +7,7 @@ return function(arg1) -- Line 6
             if SurfaceGui_2 ~= nil then
                 local TextLabel_2 = SurfaceGui_2:FindFirstChild("TextLabel")
                 if TextLabel_2 ~= nil then
-                    TextLabel_2.Text = Localization_upvr:FormatByKey("world.%s":format(v.Name))
+                    TextLabel_2.Text = Localization_upvr:FormatByKey(string.format("world.%s", v.Name));
                 end
             end
         end

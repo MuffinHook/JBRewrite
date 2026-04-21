@@ -27,7 +27,7 @@ local function v2(v3) --[[ Line: 4 ]] --[[ Name: _recurse ]]
         end;
         if typeof(v5) == "table" then
             if not v2(v5) then
-                warn((("SubTable at %* was not safe"):format((tostring(v4)))));
+                warn((string.format(("SubTable at %* was not safe"), (tostring(v4)))));
                 return false;
             end;
         elseif typeof(v5) ~= "number" then

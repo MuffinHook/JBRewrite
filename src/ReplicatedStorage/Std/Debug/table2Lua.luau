@@ -18,12 +18,12 @@ return function(v1) --[[ Line: 3 ]] --[[ Name: table2Lua ]]
             local v7 = ("\t"):rep(v5);
             if v6 then
                 if typeof(v6) == "string" and not v6:find("\"") and not v6:find("'") and v6:sub(1, 1):match("[%w_]") then
-                    l_insert_0(v2, ("%s%s = {"):format(v7, v6));
+                    l_insert_0(v2, string.format(("%s%s = {"), v7, v6));
                 else
-                    l_insert_0(v2, ("%s[%q] = {"):format(v7, v6));
+                    l_insert_0(v2, string.format(("%s[%q] = {"), v7, v6));
                 end;
             else
-                l_insert_0(v2, ("%s{"):format(v7));
+                l_insert_0(v2, string.format(("%s{"), v7));
             end;
             local v8 = {};
             for v9, v10 in v4 do
@@ -41,15 +41,15 @@ return function(v1) --[[ Line: 3 ]] --[[ Name: table2Lua ]]
                 if type(l_v_0) == "table" then
                     v3(l_v_0, v5 + 1, l_k_0);
                 else
-                    l_v_0 = if typeof(l_v_0) == "Vector3" then ("Vector3.new(%s)"):format((tostring(l_v_0))) else if typeof(l_v_0) == "string" then ("%q"):format(l_v_0) else if typeof(l_v_0) == "Instance" then ("[%s]"):format(l_v_0:GetFullName()) else tostring(l_v_0);
+                    l_v_0 = if typeof(l_v_0) == "Vector3" then string.format(("Vector3.new(%s)"), (tostring(l_v_0))) else if typeof(l_v_0) == "string" then string.format(("%q"), l_v_0) else if typeof(l_v_0) == "Instance" then string.format(("[%s]"), l_v_0:GetFullName()) else tostring(l_v_0);
                     if typeof(l_k_0) == "string" and not l_k_0:find("\"") and not l_k_0:find("'") and l_k_0:sub(1, 1):match("[%w_]") then
-                        l_insert_0(v2, ("\t%s%s = %s,"):format(v7, l_k_0, l_v_0));
+                        l_insert_0(v2, string.format(("\t%s%s = %s,"), v7, l_k_0, l_v_0));
                     else
-                        l_insert_0(v2, ("\t%s[%q] = %s"):format(v7, l_k_0, l_v_0));
+                        l_insert_0(v2, string.format(("\t%s[%q] = %s"), v7, l_k_0, l_v_0));
                     end;
                 end;
             end;
-            l_insert_0(v2, ("%s},"):format(v7));
+            l_insert_0(v2, string.format(("%s},"), v7));
         end;
         v3(v1, 0);
         table.remove(v2);

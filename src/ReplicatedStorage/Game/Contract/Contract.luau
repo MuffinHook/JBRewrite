@@ -34,7 +34,7 @@ function module_upvr.new(arg1) -- Line 15
     local any_GetName_result1 = module_upvr_2:GetName()
     local SOME = Data_upvr:FindFirstChild(any_GetName_result1)
     if not SOME then
-        error("Cannot find client data module for contract: %s":format(any_GetName_result1))
+        error(string.format("Cannot find client data module for contract: %s", any_GetName_result1));
     end
     local var13_2 = require(SOME)
     if not var13_2.teamId then

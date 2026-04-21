@@ -67,7 +67,7 @@ function module_upvr.PlayId(arg1, arg2, arg3) -- Line 65
         var22 = false
     end
     if MarketplaceService_upvr:GetProductInfo(arg1).AssetTypeId ~= Enum.AssetType.Audio.Value then
-        error(("AssetId `%d` is not a valid audio asset."):format(arg1))
+        error(string.format(("AssetId `%d` is not a valid audio asset."), arg1))
         return false
     end
     module_upvr.Stop()

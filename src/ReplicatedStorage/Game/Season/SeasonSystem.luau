@@ -109,9 +109,9 @@ function module_upvr.displayReward() -- Line 107
             local any_getClientLevelAward_result1 = module_upvr.getClientLevelAward(var44_upvw)
         end
         if not any_getClientLevelAward_result1.imageId then
-            error("Missing `imageId` for client level award: %d":format(var44_upvw))
+            error(string.format("Missing `imageId` for client level award: %d", var44_upvw))
         end
-        Redeem_upvr.Container.Icon.Image = "rbxassetid://%d":format(any_getClientLevelAward_result1.imageId)
+        Redeem_upvr.Container.Icon.Image = string.format("rbxassetid://%d", any_getClientLevelAward_result1.imageId)
         module_upvr._maid.clickRedeem = Redeem_upvr.MouseButton1Down:Connect(function() -- Line 132, Named "redeem"
             module_upvr._maid.clickRedeem = nil
             Redeem_upvr.Visible = false

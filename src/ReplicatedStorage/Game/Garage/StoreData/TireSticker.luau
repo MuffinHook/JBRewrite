@@ -270,7 +270,7 @@ return {
             local Decal = Instance.new("Decal")
             Decal.Color3 = Color3.new(1, 1, 1)
             Decal.Face = Enum.NormalId.Left
-            Decal.Texture = "rbxassetid://%d":format(arg1.TextureId)
+            Decal.Texture = string.format("rbxassetid://%d", arg1.TextureId);
             Decal.Parent = clone_2
             local clone = Decal:Clone()
             clone.Face = Enum.NormalId.Right

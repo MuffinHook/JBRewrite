@@ -75,7 +75,7 @@ function module_upvr.init() -- Line 29
         (function(arg1) -- Line 155, Named "addRobberyMarker"
             local var78 = tbl_6_upvr[arg1.Name]
             if not var78 then
-                error("Missing robbery marker entry for: %s":format(arg1.Name))
+                error(string.format("Missing robbery marker entry for: %s", arg1.Name))
             end
             local ImageId_2 = var78.ImageId
             assert(ImageId_2)

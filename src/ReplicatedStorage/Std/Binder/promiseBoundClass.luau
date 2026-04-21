@@ -34,7 +34,7 @@ return function(v2, v3) --[[ Line: 5 ]]
         task.delay(5, function() --[[ Line: 26 ]]
             -- upvalues: v10 (copy), v0 (ref), v3 (copy), v2 (copy), v4 (copy)
             if v10:getStatus() == v0.Status.Started then
-                warn(("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n"):format(v3:GetFullName(), v2:GetTag()));
+                warn(string.format(("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n"), v3:GetFullName(), v2:GetTag()));
                 warn(v4);
             end;
         end);

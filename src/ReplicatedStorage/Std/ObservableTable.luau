@@ -61,7 +61,7 @@ v9._rawSet = function(v18, v19, v20) --[[ Line: 79 ]] --[[ Name: _rawSet ]]
             for _, v22 in v18._mapKeyToCallbacks[v19] do
                 local v24 = task.delay(0, function() --[[ Line: 91 ]]
                     -- upvalues: v19 (copy)
-                    local v23 = ("ObservableTable:Observe callback on %* took too long"):format(v19);
+                    local v23 = string.format(("ObservableTable:Observe callback on %* took too long"), v19);
                     warn(v23);
                 end);
                 xpcall(v22, v17, v20);
@@ -176,7 +176,7 @@ v9.UpdateMultiple = function(v39, v40, v41) --[[ Line: 144 ]] --[[ Name: UpdateM
     end;
     local v64 = task.delay(0, function() --[[ Line: 187 ]]
         -- upvalues: v1 (ref), v40 (copy)
-        local v63 = ("ObservableTable:Update callback on %* took too long: %*"):format(v1(v40), (debug.traceback()));
+        local v63 = string.format(("ObservableTable:Update callback on %* took too long: %*"), v1(v40), (debug.traceback()));
         warn(v63);
     end);
     local l_status_0, l_result_0 = pcall(v41, v59);

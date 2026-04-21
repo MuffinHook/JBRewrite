@@ -10,7 +10,7 @@ local function gather_upvr() -- Line 10, Named "gather"
         local NodesLanding = workspace:WaitForChild("NodesLanding")
         if NodesLanding then
             for i = 1, #NodesLanding:GetChildren() do
-                local assert_result1 = assert(NodesLanding:FindFirstChild("Node%d":format(i)))
+                local assert_result1 = assert(NodesLanding:FindFirstChild(string.format("Node%d", i)))
                 assert_result1.CanCollide = false
                 assert_result1.Transparency = 1
                 table.insert(tbl_upvr_2, assert_result1.Position)
@@ -20,7 +20,7 @@ local function gather_upvr() -- Line 10, Named "gather"
         local NodesTakeoff = workspace:WaitForChild("NodesTakeoff")
         if NodesTakeoff then
             for i_2 = 1, #NodesTakeoff:GetChildren() do
-                local assert_result1_2 = assert(NodesTakeoff:FindFirstChild("Node%d":format(i_2)))
+                local assert_result1_2 = assert(NodesTakeoff:FindFirstChild(string.format("Node%d", i_2)))
                 assert_result1_2.CanCollide = false
                 assert_result1_2.Transparency = 1
                 table.insert(tbl_upvr, assert_result1_2.Position)

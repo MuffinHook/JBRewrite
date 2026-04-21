@@ -47,7 +47,7 @@ function any_extend_result1.render(arg1) -- Line 11
             Size = UDim2.new(0.7, 0, 0.5, 0);
             Position = UDim2.new((0.25) / (mainRatio * 5 / 7), 0, 0.5, 0);
             AnchorPoint = Vector2.new(0, 0.5);
-            Text = "YOUR CASH: $%s":format(String_upvr.comma(arg1.props.cash));
+            Text = string.format("YOUR CASH: $%s", String_upvr.comma(arg1.props.cash));
             Font = Enum.Font.LuckiestGuy;
             LineHeight = 0.7;
             TextScaled = true;

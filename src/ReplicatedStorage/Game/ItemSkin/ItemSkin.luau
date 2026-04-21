@@ -17,7 +17,7 @@ function module_upvr.Init(arg1) -- Line 10
             error("Player has no item equipped.")
         end
         if any_GetLocalEquipped_result1_3.ApplySkin == nil then
-            error("Item %s does not suppory skins.":format(any_GetLocalEquipped_result1_3.__ClassName))
+            error(string.format("Item %s does not suppory skins.", any_GetLocalEquipped_result1_3.__ClassName))
         end
         if module_upvr.DoesPlayerOwn(arg1_3.Name) then
             any_GetLocalEquipped_result1_3:ApplySkin(arg1_3.Name)
@@ -33,7 +33,7 @@ function module_upvr.Init(arg1) -- Line 10
             error("Player has no item equipped.")
         end
         if any_GetLocalEquipped_result1.ApplySkin == nil then
-            error("Item %s does not suppory skins.":format(any_GetLocalEquipped_result1.__ClassName))
+            error(string.format("Item %s does not suppory skins.", any_GetLocalEquipped_result1.__ClassName))
         end
         Event_upvr:FireServer("m4dwvvqf", any_GetLocalEquipped_result1.inventoryItemValue, arg1_4.Name)
         Audio_upvr.ObjectLocal(any_GetLocalEquipped_result1.Model.Skeleton.BoundingBox, 4761679547)
@@ -42,7 +42,7 @@ function module_upvr.Init(arg1) -- Line 10
         local any_GetLocalEquipped_result1_2 = ItemSystem_upvr.GetLocalEquipped()
         if any_GetLocalEquipped_result1_2 ~= nil then
             if any_GetLocalEquipped_result1_2.ApplySkin == nil then
-                error("Item %s does not suppory skins.":format(any_GetLocalEquipped_result1_2.__ClassName))
+                error(string.format("Item %s does not suppory skins.", any_GetLocalEquipped_result1_2.__ClassName))
             end
             any_GetLocalEquipped_result1_2:ApplySkinLocal(InventoryItemUtils_upvr.getAttr(any_GetLocalEquipped_result1_2.inventoryItemValue, "SkinName"))
         end

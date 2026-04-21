@@ -234,7 +234,7 @@ local function MountLocalPlayer_upvr(arg1, arg2, arg3) -- Line 198, Named "Mount
                 if var93_upvw then return end
                 var93_upvw = true
                 arg1.Plane:SetControlsEnabled(false)
-                local any_new_result1 = Confirmation_upvr.new("Buy %d heat seeking missiles for $%s?":format(maximum, String_upvr.comma(maximum * JetConsts_upvr.MISSILE_COST_PER)))
+                local any_new_result1 = Confirmation_upvr.new(string.format("Buy %d heat seeking missiles for $%s?", maximum, String_upvr.comma(maximum * JetConsts_upvr.MISSILE_COST_PER)))
                 any_new_result1.Maid:GiveTask(any_new_result1.OnYes:Connect(function() -- Line 300
                     var6_upvw:FireServer('y'.."wxbbdq5vb":sub(3, 8):reverse():reverse():reverse():reverse():reverse()..""..'k')
                 end))
@@ -333,7 +333,7 @@ end
 function module_upvr.UpdateMissileUI(arg1, arg2, arg3) -- Line 388
     assert(arg2)
     arg1.MissilesConf.Count = arg2
-    arg1.Plane.PlaneGui:FindFirstChild("Missiles").Body.Current.Count.Text = "%d/%d":format(arg2, arg3)
+    arg1.Plane.PlaneGui:FindFirstChild("Missiles").Body.Current.Count.Text = string.format("%d/%d", arg2, arg3)
 end
 function module_upvr.Destroy(arg1) -- Line 395
     arg1.Plane:Destroy()

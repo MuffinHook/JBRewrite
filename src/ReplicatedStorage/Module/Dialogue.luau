@@ -64,7 +64,7 @@ function module_upvr.LoadData(arg1, arg2) -- Line 49
                 if v_upvr.Events ~= nil then
                     for _, v_2 in ipairs(v_upvr.Events) do
                         if arg1.MapEventSignal[v_2] == nil then
-                            error("Missing signal for event: %s":format(v_2))
+                            error(string.format("Missing signal for event: %s", v_2))
                         end
                         arg1.MapEventSignal[v_2]:Fire(v_upvr)
                     end
@@ -76,7 +76,7 @@ function module_upvr.LoadData(arg1, arg2) -- Line 49
         if v_upvr.Events ~= nil then
             for _, v_3 in ipairs(v_upvr.Events) do
                 if arg1.MapEventSignal[v_3] ~= nil then
-                    error("There already exists an event named: %s":format(v_3))
+                    error(string.format("There already exists an event named: %s", v_3))
                 end
                 local any_new_result1 = Signal_upvr.new()
                 arg1.MapEventSignal[v_3] = any_new_result1
@@ -100,7 +100,7 @@ function module_upvr.Connect(arg1, arg2, arg3) -- Line 87
 end
 function module_upvr.VerifyAllConnected(arg1) -- Line 99
     if 0 < #arg1.ListEventUnconnected then
-        error("Not all events are unconnected... remaining: %s":format(table.concat(arg1.ListEventUnconnected, ", ")))
+        error(string.format("Not all events are unconnected... remaining: %s", table.concat(arg1.ListEventUnconnected, ", ")))
     end
 end
 function module_upvr.Destroy(arg1) -- Line 104

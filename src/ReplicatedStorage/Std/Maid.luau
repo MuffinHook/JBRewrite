@@ -56,7 +56,7 @@ end;
 v0.__newindex = function(v9, v10, v11) --[[ Line: 67 ]] --[[ Name: __newindex ]]
     -- upvalues: v0 (copy)
     if v0[v10] ~= nil then
-        error(("'%s' is reserved"):format((tostring(v10))), 2);
+        error(string.format(("'%s' is reserved"), (tostring(v10))), 2);
     end;
     local l__tasks_0 = v9._tasks;
     local v13 = l__tasks_0[v10];

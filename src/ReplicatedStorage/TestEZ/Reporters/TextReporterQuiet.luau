@@ -19,7 +19,7 @@ local function reportNode_upvr(arg1, arg2, arg3) -- Line 22, Named "reportNode"
     end
     local var16
     if arg1.status ~= TestEnum_upvr.TestStatus.Success then
-        var16 = "%s[%s] %s":format(any_rep_result1_upvr:rep(var15), tbl_upvr[arg1.status] or '?', arg1.planNode.phrase)
+        var16 = string.format("%s[%s] %s", any_rep_result1_upvr:rep(var15), tbl_upvr[arg1.status] or '?', arg1.planNode.phrase)
     end
     table.insert(var14, var16)
     for _, v in ipairs(arg1.children) do
@@ -40,9 +40,9 @@ local function report(arg1) -- Line 61
 end
 local TestService_upvr = game:GetService("TestService")
 function module.report(arg1) -- Line 67
-    print(table.concat({"Test results:", table.concat(reportRoot_upvr(arg1), '\n'), "%d passed, %d failed, %d skipped":format(arg1.successCount, arg1.failureCount, arg1.skippedCount)}, '\n'))
+    print(table.concat({"Test results:", table.concat(reportRoot_upvr(arg1), '\n'), string.format("%d passed, %d failed, %d skipped", arg1.successCount, arg1.failureCount, arg1.skippedCount)}, '\n'))
     if 0 < arg1.failureCount then
-        print("%d test nodes reported failures.":format(arg1.failureCount))
+        print(string.format("%d test nodes reported failures.", arg1.failureCount))
     end
     if 0 < #arg1.errors then
         print("Errors reported by tests:")

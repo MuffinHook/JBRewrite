@@ -26,7 +26,7 @@ return function() --[[ Line: 7 ]] --[[ Name: createRef ]]
         end, 
         __tostring = function(_) --[[ Line: 30 ]] --[[ Name: __tostring ]]
             -- upvalues: v1 (copy)
-            return ("RoactRef(%s)"):format((tostring(v1:getValue())));
+            return string.format(("RoactRef(%s)"), (tostring(v1:getValue())));
         end
     });
     return v3;

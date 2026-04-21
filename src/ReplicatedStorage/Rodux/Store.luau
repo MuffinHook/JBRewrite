@@ -31,7 +31,7 @@ v13.new = function(v14, v15, v16, v17) --[[ Line: 41 ]] --[[ Name: new ]]
     assert(v18, "Bad argument #3 to Store.new, expected nil or table.");
     if v16 ~= nil then
         for v19 = 1, #v16 do
-            assert(typeof(v16[v19]) == "function", ("Expected the middleware ('%s') at index %d to be a function."):format(tostring(v16[v19]), v19));
+            assert(typeof(v16[v19]) == "function", string.format(("Expected the middleware ('%s') at index %d to be a function."), tostring(v16[v19]), v19));
         end;
     end;
     local v20 = {
@@ -87,13 +87,13 @@ v13.new = function(v14, v15, v16, v17) --[[ Line: 41 ]] --[[ Name: new ]]
 end;
 v13.getState = function(v29) --[[ Line: 108 ]] --[[ Name: getState ]]
     if v29._isDispatching then
-        error(("You may not call store:getState() while the reducer is executing. " .. "The reducer (%s) has already received the state as an argument. " .. "Pass it down from the top reducer instead of reading it from the store."):format((tostring(v29._reducer))));
+        error(string.format(("You may not call store:getState() while the reducer is executing. " .. "The reducer (%s) has already received the state as an argument. " .. "Pass it down from the top reducer instead of reading it from the store."), (tostring(v29._reducer))));
     end;
     return v29._state;
 end;
 v13.dispatch = function(v30, v31) --[[ Line: 129 ]] --[[ Name: dispatch ]]
     if typeof(v31) ~= "table" then
-        error(("Actions must be tables. " .. "Use custom middleware for %q actions."):format((typeof(v31))), 2);
+        error(string.format(("Actions must be tables. " .. "Use custom middleware for %q actions."), (typeof(v31))), 2);
     end;
     if v31.type == nil then
         error("Actions may not have an undefined 'type' property. " .. "Have you misspelled a constant? \n" .. tostring(v31), 2);

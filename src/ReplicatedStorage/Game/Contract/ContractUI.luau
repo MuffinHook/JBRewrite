@@ -28,7 +28,7 @@ function module_2_upvr.SetFrame(arg1, arg2) -- Line 30
     arg1._maid:GiveTask(arg1._frame.Background.Body.Bottom.Action.MouseButton1Down:Connect(function() -- Line 36
         Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105461542)
         if arg1._contract:GetStateId() == ContractConsts_upvr.enumState.ACTIVE then
-            local any_new_result1 = Confirmation_upvr.new("Re-roll for a random contract for $%s?":format(String_upvr.comma(ContractConsts_upvr.REROLL_PRICE)))
+            local any_new_result1 = Confirmation_upvr.new(string.format("Re-roll for a random contract for $%s?", String_upvr.comma(ContractConsts_upvr.REROLL_PRICE)))
             any_new_result1.Maid:GiveTask(any_new_result1.OnYes:Connect(function() -- Line 43
                 arg1._contract._contractActionRemote:FireServer()
             end))
@@ -84,7 +84,7 @@ function module_2_upvr._setMessage(arg1, arg2) -- Line 99
     arg1._frame.Background.Body.Top.ContractDesc.Text = arg2
 end
 function module_2_upvr._setRewardExp(arg1, arg2) -- Line 104
-    arg1._frame.Background.Body.Bottom.Reward.Amount.Text = "REWARD: %d XP":format(arg2)
+    arg1._frame.Background.Body.Bottom.Reward.Amount.Text = string.format("REWARD: %d XP", arg2)
 end
 local Settings_upvr = require(ReplicatedStorage.Resource.Settings)
 function module_2_upvr._setTeamId(arg1, arg2) -- Line 109
@@ -94,9 +94,9 @@ function module_2_upvr._setTeamId(arg1, arg2) -- Line 109
     elseif arg2 == Settings_upvr.EnumTeam.Criminal then
         var20 = 5955427564
     else
-        error("Invalid teamId: %d":format(arg2))
+        error(string.format("Invalid teamId: %d", arg2))
     end
-    arg1._frame.Background.Image = "rbxassetid://%d":format(var20)
+    arg1._frame.Background.Image = string.format("rbxassetid://%d", var20)
 end
 function module_2_upvr._updateProgress(arg1) -- Line 120
     local var21
@@ -112,7 +112,7 @@ function module_2_upvr._updateProgress(arg1) -- Line 120
     end
     Bottom.Progress.Visible = var22
     if var21 ~= nil then
-        var22 = "PROGRESS: %d/%d":format(arg1._contract:GetProgress(), arg1._contract:GetGoal())
+        var22 = string.format("PROGRESS: %d/%d", arg1._contract:GetProgress(), arg1._contract:GetGoal())
         Bottom.Progress.Text = var22
     end
 end

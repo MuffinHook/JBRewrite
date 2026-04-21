@@ -53,7 +53,7 @@ v11.connect = function(v14, v15) --[[ Line: 49 ]] --[[ Name: connect ]]
         disconnect = function() --[[ Line: 71 ]] --[[ Name: disconnect ]]
             -- upvalues: v16 (copy), v14 (copy), v10 (ref)
             if v16.disconnected then
-                error(("Listener connected at: \n%s\n" .. "was already disconnected at: \n%s\n"):format(tostring(v16.connectTraceback), (tostring(v16.disconnectTraceback))));
+                error(string.format(("Listener connected at: \n%s\n" .. "was already disconnected at: \n%s\n"), tostring(v16.connectTraceback), (tostring(v16.disconnectTraceback))));
             end;
             if v14._store and v14._store._isDispatching then
                 error("You may not unsubscribe from a store listener while the reducer is executing.");

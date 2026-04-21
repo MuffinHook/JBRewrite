@@ -139,7 +139,7 @@ function any_extend_result1.render(arg1) -- Line 38
         end
         tbl_4.NumPlayers = var48
         assert(var38, "missing classname for button")
-        tbl_2["button_%s":format(v_2_upvr.title)] = createElement_upvr(var38, tbl, tbl_4)
+        tbl_2[string.format("button_%s", v_2_upvr.title)] = createElement_upvr(var38, tbl, tbl_4);
     end
     return createElement_upvr(Minimap_upvr, Dictionary_upvr.merge(arg1.props, {
         containerSize = arg1.containerSize;

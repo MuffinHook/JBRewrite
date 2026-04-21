@@ -10,7 +10,7 @@ return function(arg1) -- Line 5
         value = any_createBinding_result1;
         updateValue = any_createBinding_result2;
         text = any_createBinding_result1:map(function(arg1_2) -- Line 20
-            return "%d":format((1 - arg1_2) * 0 + arg1_2 * 50)
+            return string.format("%d", (1 - arg1_2) * 0 + arg1_2 * 50);
         end);
     }), arg1)
     return function() -- Line 26

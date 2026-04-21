@@ -110,7 +110,7 @@ function tbl_upvr.GetArmingTeamId(arg1) -- Line 139
     return VaultUtils_upvr.getArmingTeamId(arg1.obj)
 end
 function tbl_upvr._updateDeadlineUi(arg1, arg2) -- Line 142
-    DoorUtils_upvr.getInnerModel(arg1._obj.Door).Timer.SurfaceGui.TextLabel.Text = "%02d:%02d":format(math.floor(arg2 / 60), arg2 % 60)
+    DoorUtils_upvr.getInnerModel(arg1._obj.Door).Timer.SurfaceGui.TextLabel.Text = string.format("%02d:%02d", math.floor(arg2 / 60), arg2 % 60)
 end
 local Format_upvr = require(ReplicatedStorage.Module.Format)
 function tbl_upvr._onAmountChanged(arg1) -- Line 148
@@ -122,7 +122,7 @@ function tbl_upvr._onAmountChanged(arg1) -- Line 148
     else
         SurfaceGui.TextLabel.BackgroundTransparency = 1
     end
-    SurfaceGui.TextLabel.Text = "%s":format(Format_upvr.Currency(arg1._amountValue.Value))
+    SurfaceGui.TextLabel.Text = string.format("%s", Format_upvr.Currency(arg1._amountValue.Value));
 end
 function tbl_upvr.GetDeadline(arg1) -- Line 160
     return arg1._deadlineValue.Value

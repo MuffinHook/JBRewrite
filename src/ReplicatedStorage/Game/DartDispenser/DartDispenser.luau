@@ -24,8 +24,8 @@ local Spring_upvr = require(ReplicatedStorage_upvr.Std.Spring)
 local RunService_upvr = game:GetService("RunService")
 function module_upvr._fire(arg1, arg2) -- Line 34
     local any_NextInteger_result1 = random_state_upvr:NextInteger(1, 1000000000)
-    local formatted_upvr = "update_%d":format(any_NextInteger_result1)
-    local formatted_upvr_2 = "part_%d":format(any_NextInteger_result1)
+    local formatted_upvr = string.format("update_%d", any_NextInteger_result1);
+    local formatted_upvr_2 = string.format("part_%d", any_NextInteger_result1);
     local var17_upvw = arg2.CFrame * Vector3.new(0, 0, -arg2.Size.Z * 0.5)
     local clone_upvw = ReplicatedStorage_upvr.Resource.Robbery.Tomb:FindFirstChild("Arrow"):Clone()
     clone_upvw.Parent = Folder_upvr

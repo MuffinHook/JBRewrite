@@ -48,7 +48,7 @@ function module_upvr.init() -- Line 39
         store = persistentCrewStore_upvr;
     }, {createElement_upvr(PersistentCrewApp_upvr, {
         attemptLeave = function() -- Line 46, Named "attemptLeave"
-            local any_new_result1_2 = Confirmation_upvr.new("Are you sure you want to leave? If you joined for less than ".."%d days":format(ClanConsts_upvr.CLAN_JOIN_COOLDOWN_DURATION / 86400)..", you'll have to wait to join another crew.")
+            local any_new_result1_2 = Confirmation_upvr.new("Are you sure you want to leave? If you joined for less than "..string.format("%d days", ClanConsts_upvr.CLAN_JOIN_COOLDOWN_DURATION / 86400)..", you'll have to wait to join another crew.")
             any_new_result1_2.Maid:GiveTask(any_new_result1_2.OnYes:Connect(function() -- Line 54
                 persistentCrewStore_upvr:dispatch({
                     type = "setNetworkMutexLocked";

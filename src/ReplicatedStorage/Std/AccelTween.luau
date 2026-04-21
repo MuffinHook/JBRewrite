@@ -34,7 +34,7 @@ v0.__index = function(v2, v3) --[[ Line: 54 ]] --[[ Name: __index ]]
         local v8 = os.clock();
         return v8 < v2._t1 and v2._t1 - v8 or 0;
     else
-        error(("Bad index %q"):format((tostring(v3))));
+        error(string.format(("Bad index %q"), (tostring(v3))));
         return;
     end;
 end;
@@ -55,7 +55,7 @@ v0.__newindex = function(v9, v10, v11) --[[ Line: 75 ]] --[[ Name: __newindex ]]
         v9:_setstate(v11, 0, nil, v11);
         return;
     else
-        error(("Bad index %q"):format((tostring(v10))));
+        error(string.format(("Bad index %q"), (tostring(v10))));
         return;
     end;
 end;

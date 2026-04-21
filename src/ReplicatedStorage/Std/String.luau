@@ -12,7 +12,7 @@ local v13 = {
         assert(v4 ~= nil);
         assert(v5 ~= nil);
         assert(v5 >= 0);
-        return ("%0." .. tostring(v5) .. "d"):format(v4);
+        return string.format(("%0." .. tostring(v5) .. "d"), v4);
     end, 
     base85UUID = function(v6) --[[ Line: 14 ]] --[[ Name: base85UUID ]]
         local v7 = {};
@@ -44,7 +44,7 @@ local function _(v14) --[[ Line: 43 ]] --[[ Name: formatCount ]]
     if v14 % 1 <= 0.001 then
         return (tostring((math.floor(v14))));
     else
-        return ("%.1f"):format(v14);
+        return string.format(("%.1f"), v14);
     end;
 end;
 v13.getShortHand = function(v16) --[[ Line: 51 ]] --[[ Name: getShortHand ]]
@@ -63,7 +63,7 @@ v13.getShortHand = function(v16) --[[ Line: 51 ]] --[[ Name: getShortHand ]]
     end;
     if v18 > 1 then
         local l_v16_0 = v16;
-        return (if l_v16_0 % 1 <= 0.001 then tostring((math.floor(l_v16_0))) else ("%.1f"):format(l_v16_0)) .. v17[v18];
+        return (if l_v16_0 % 1 <= 0.001 then tostring((math.floor(l_v16_0))) else string.format(("%.1f"), l_v16_0)) .. v17[v18];
     else
         return (tostring(v16));
     end;

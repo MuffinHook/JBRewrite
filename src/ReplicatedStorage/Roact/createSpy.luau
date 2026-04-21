@@ -28,7 +28,7 @@ return function(v1) --[[ Line: 11 ]] --[[ Name: createSpy ]]
         -- upvalues: v2 (copy)
         local v4 = select("#", ...);
         if v2.valuesLength ~= v4 then
-            error(("Expected %d arguments, but was called with %d arguments"):format(v2.valuesLength, v4), 2);
+            error(string.format(("Expected %d arguments, but was called with %d arguments"), v2.valuesLength, v4), 2);
         end;
         for v5 = 1, v4 do
             assert(select(v5, ...) == v2.values[v5], "value differs");
@@ -38,7 +38,7 @@ return function(v1) --[[ Line: 11 ]] --[[ Name: createSpy ]]
         -- upvalues: v2 (copy), v0 (ref)
         local v7 = select("#", ...);
         if v2.valuesLength ~= v7 then
-            error(("Expected %d arguments, but was called with %d arguments"):format(v2.valuesLength, v7), 2);
+            error(string.format(("Expected %d arguments, but was called with %d arguments"), v2.valuesLength, v7), 2);
         end;
         for v8 = 1, v7 do
             local v9 = select(v8, ...);
@@ -57,7 +57,7 @@ return function(v1) --[[ Line: 11 ]] --[[ Name: createSpy ]]
     end;
     setmetatable(v2, {
         __index = function(_, v15) --[[ Line: 70 ]] --[[ Name: __index ]]
-            error(("%q is not a valid member of spy"):format(v15));
+            error(string.format(("%q is not a valid member of spy"), v15));
         end
     });
     return v2;

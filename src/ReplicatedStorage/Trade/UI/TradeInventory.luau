@@ -108,7 +108,7 @@ function any_extend_result1.render(arg1) -- Line 29
     if not arg1.props.inventoryPlayers or not arg1.props.inventoryPlayers.selectedPlayer or not decompInlinedCondition() then
         var32 = "Player"
     end
-    tbl_9.Text = "%s's Inventory":format(var32)
+    tbl_9.Text = string.format("%s's Inventory", var32)
     tbl_9.TextXAlignment = Enum.TextXAlignment.Left
     tbl_9.Font = Enum.Font.Bangers
     tbl_9.LineHeight = 1

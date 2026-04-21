@@ -63,7 +63,7 @@ function module_upvr.SetupBeam(arg1) -- Line 66
     local Beam = Instance.new("Beam")
     Beam.Transparency = NumberSequence.new(0)
     Beam.TextureMode = Enum.TextureMode.Static
-    Beam.Texture = "rbxassetid://%d":format(4556309780)
+    Beam.Texture = string.format("rbxassetid://%d", 4556309780)
     Beam.TextureLength = 6
     Beam.Width0 = 6
     Beam.Width1 = 6

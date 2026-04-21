@@ -5,7 +5,7 @@ local function newEnvironment_upvr(arg1, arg2) -- Line 11, Named "newEnvironment
     local module_3 = {}
     if arg2 then
         if type(arg2) ~= "table" then
-            error("Bad argument #2 to newEnvironment. Expected table, got %s":format(typeof(arg2)), 2)
+            error(string.format("Bad argument #2 to newEnvironment. Expected table, got %s", typeof(arg2)), 2)
         end
         for i, v in pairs(arg2) do
             module_3[i] = v

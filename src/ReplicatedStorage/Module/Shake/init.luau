@@ -36,7 +36,7 @@ end
 local var8_upvw = 0
 function module_upvr.NextRenderName() -- Line 242
     var8_upvw += 1
-    return "__shake_%.4i__":format(var8_upvw)
+    return string.format("__shake_%.4i__", var8_upvw);
 end
 function module_upvr.Start(arg1) -- Line 255
     arg1._startTime = arg1.TimeFunction()

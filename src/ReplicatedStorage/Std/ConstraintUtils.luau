@@ -6,7 +6,7 @@
 local v5 = {
     customWeld = function(v0, v1, v2, v3) --[[ Line: 4 ]] --[[ Name: customWeld ]]
         local l_Weld_0 = Instance.new("Weld");
-        l_Weld_0.Name = ("%s->%s"):format(v0.Name, v1.Name);
+        l_Weld_0.Name = string.format(("%s->%s"), v0.Name, v1.Name);
         l_Weld_0.Part0 = v0;
         l_Weld_0.Part1 = v1;
         if v2 then
@@ -44,7 +44,7 @@ v5.weldModel = function(v10, v11) --[[ Line: 27 ]] --[[ Name: weldModel ]]
                 v5.weldModel(v14);
                 v5.weld(v14.PrimaryPart, l_PrimaryPart_0);
             else
-                warn(("Skipping %s, no primary part"):format(v14.Name));
+                warn(string.format(("Skipping %s, no primary part"), v14.Name));
             end;
         end;
     end;
@@ -52,7 +52,7 @@ v5.weldModel = function(v10, v11) --[[ Line: 27 ]] --[[ Name: weldModel ]]
 end;
 v5.customMotor = function(v15, v16, v17, v18) --[[ Line: 50 ]] --[[ Name: customMotor ]]
     local l_Motor_0 = Instance.new("Motor");
-    l_Motor_0.Name = ("%s->%s"):format(v15.Name, v16.Name);
+    l_Motor_0.Name = string.format(("%s->%s"), v15.Name, v16.Name);
     l_Motor_0.Part0 = v15;
     l_Motor_0.Part1 = v16;
     if v17 then

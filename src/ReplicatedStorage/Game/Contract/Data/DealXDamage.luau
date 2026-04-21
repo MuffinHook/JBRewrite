@@ -4,7 +4,7 @@ local module = {
 }
 local Format_upvr = require(ReplicatedStorage.Module.Format)
 function module.message(arg1) -- Line 7
-    return "Deal %s damage":format(Format_upvr.Comma(arg1:GetGoal()))
+    return string.format("Deal %s damage", Format_upvr.Comma(arg1:GetGoal()));
 end
 function module.goal() -- Line 10
     return math.random(18, 22) * 100

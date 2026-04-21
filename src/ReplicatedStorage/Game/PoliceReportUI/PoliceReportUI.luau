@@ -45,7 +45,7 @@ function module_upvr.Display(arg1) -- Line 15
         any_new_result1_upvr:GiveTask(var23)
         var15 += assert_result1
     end
-    Gui.Container.Bottom.Container.Sum.Text = "+%s":format(Math_upvr.FormatMoney(var15))
+    Gui.Container.Bottom.Container.Sum.Text = string.format("+%s", Math_upvr.FormatMoney(var15))
     any_new_result1_upvr:GiveTask(Gui.Container.Close.MouseButton1Down:Connect(function() -- Line 51
         module_upvr.Hide()
     end))

@@ -35,9 +35,9 @@ function any_extend_result1.render(arg1) -- Line 29
     end
     local var14
     if arg1.props.ranked then
-        var14 = "Enter ranked %d player crew battle?":format(arg1.props.battleNumPlayersPerTeam)
+        var14 = string.format("Enter ranked %d player crew battle?", arg1.props.battleNumPlayersPerTeam)
     else
-        var14 = "Enter %d player crew battle against %s's %s (%s)?":format(arg1.props.battleNumPlayersPerTeam, arg1.props.opposingClanOwnerName, arg1.props.clanName, arg1.props.clanDisplayRating or "N/A")
+        var14 = string.format("Enter %d player crew battle against %s's %s (%s)?", arg1.props.battleNumPlayersPerTeam, arg1.props.opposingClanOwnerName, arg1.props.clanName, arg1.props.clanDisplayRating or "N/A")
     end
     return createElement_upvr("Frame", {
         BorderSizePixel = 0;

@@ -29,7 +29,7 @@ function Hook(arg1) -- Line 39
         Volume = 0.3;
         TimePosition = 0.15;
     })
-    DialogueContainer_upvr.Icon.Icon.Image = ("https://www.roblox.com/bust-thumbnail/image?width=420&height=420&format=png&userId=%d"):format(arg1.UserId)
+    DialogueContainer_upvr.Icon.Icon.Image = string.format(("https://www.roblox.com/bust-thumbnail/image?width=420&height=420&format=png&userId=%d"), arg1.UserId)
     TypeWriteLabel_upvr(arg1.Text, Bio_upvr, 18, function(arg1_2) -- Line 43
         if arg1_2 % 2 == 0 then
             Sound_upvr:Play()

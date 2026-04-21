@@ -90,7 +90,7 @@ return function(v8) --[[ Line: 25 ]] --[[ Name: createReconciler ]]
             v37(v42, v43, v44);
             return;
         else
-            error(("%s\n%s"):format("Component returned invalid children:", v42.currentElement.source or "<enable element tracebacks>"), 0);
+            error(string.format(("%s\n%s"), "Component returned invalid children:", v42.currentElement.source or "<enable element tracebacks>"), 0);
             return;
         end;
     end;
@@ -123,7 +123,7 @@ return function(v8) --[[ Line: 25 ]] --[[ Name: createReconciler ]]
             end;
             return;
         else
-            error(("Unknown ElementKind %q"):format((tostring(v47))), 2);
+            error(string.format(("Unknown ElementKind %q"), (tostring(v47))), 2);
             return;
         end;
     end;
@@ -249,7 +249,7 @@ return function(v8) --[[ Line: 25 ]] --[[ Name: createReconciler ]]
                 v37(l_v76_3, l_hostParent_5, l_elements_1);
                 v76 = l_v76_3;
             else
-                error(("Unknown ElementKind %q"):format((tostring(v88))), 2);
+                error(string.format(("Unknown ElementKind %q"), (tostring(v88))), 2);
             end;
             if not v89 then
                 return v76;
@@ -368,7 +368,7 @@ return function(v8) --[[ Line: 25 ]] --[[ Name: createReconciler ]]
                 v37(v137, l_hostParent_7, l_elements_3);
                 return v137;
             else
-                error(("Unknown ElementKind %q"):format((tostring(v136))), 2);
+                error(string.format(("Unknown ElementKind %q"), (tostring(v136))), 2);
                 return v137;
             end;
         end;

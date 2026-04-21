@@ -9,7 +9,7 @@ return {
         assert(var2_upvr, "Symbols must be created using a string name!")
         var2_upvr = true
         local newproxy_result1_2 = newproxy(var2_upvr)
-        var2_upvr = "Symbol(%s)":format(arg1)
+        var2_upvr = string.format("Symbol(%s)", arg1);
         getmetatable(newproxy_result1_2).__tostring = function() -- Line 22
             return var2_upvr
         end

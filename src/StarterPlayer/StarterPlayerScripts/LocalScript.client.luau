@@ -659,8 +659,8 @@ function em.playOrStopWorldSound(playerName: string, soundName: string, params: 
 	activeSounds._counter = proxyId
 
 	local soundKey = if params.Multi
-		then ("%s_%s_%d"):format(playerName, soundName, proxyId)
-		else ("%s_%s"):format(playerName, soundName)
+		then string.format(("%s_%s_%d"), playerName, soundName, proxyId)
+		else string.format(("%s_%s"), playerName, soundName)
 
 	local existing = activeSounds[soundKey]
 	if existing then
@@ -758,7 +758,7 @@ showNotification = em.showNotification
 -- ── Arrest / social actions ───────────────────────────────────
 function em.showArrestBribedCooldown(data)
 	if data.Bribed then
-		em.showNotification({ Title = "Arrest", Text = ("You are bribed! Wait %d seconds."):format(data.Bribed) })
+		em.showNotification({ Title = "Arrest", Text = string.format(("You are bribed! Wait %d seconds."), data.Bribed) })
 	end
 end
 
@@ -769,7 +769,7 @@ local function attemptVehicleHotwire(v, i) fireServer("hijackVehicle", v, i)    
 
 function em.showBreakoutCooldown(data)
 	if data.Cooldown then
-		em.showNotification({ Title = "Breakout", Text = ("Wait %d seconds."):format(data.Cooldown) })
+		em.showNotification({ Title = "Breakout", Text = string.format(("Wait %d seconds."), data.Cooldown) })
 	end
 end
 
@@ -841,7 +841,7 @@ function em.updateNitroUI(currentNitro: number, maxNitro: number)
 	if h then
 		local bar = h.Container.Container.ContainerBar
 		bar.Value.Size = UDim2.new(displayNitro / Settings.Scalar.NitroMax, 0, 1, 0)
-		bar.ContainerFuel.Amount.Text = ("%d/%d"):format(displayNitro, Settings.Scalar.NitroMax)
+		bar.ContainerFuel.Amount.Text = string.format(("%d/%d"), displayNitro, Settings.Scalar.NitroMax)
 	end
 end
 
@@ -1461,10 +1461,9 @@ function em.showCashDelta(delta: number, reason: string?)
 	local display = (if delta >= 0 then "" else "-") .. formatMoney(abs(delta))
 	if reason then
 		MainGui.PlusCash.Text = MainGui.PlusCash.Text
-			.. ('<font color="#FFFFFF"><stroke color="#111111" thickness="0.75">%s: </stroke></font><b>%s</b>\n')
-			:format(reason, display)
+			.. string.format(('<font color="#FFFFFF"><stroke color="#111111" thickness="0.75">%s: </stroke></font><b>%s</b>\n'), reason, display)
 	else
-		MainGui.PlusCash.Text = MainGui.PlusCash.Text .. ("<b>%s</b>\n"):format(display)
+		MainGui.PlusCash.Text = MainGui.PlusCash.Text .. string.format(("<b>%s</b>\n"), display)
 	end
 	task.delay(3, function()
 		if State.cashPopCounter == id then MainGui.PlusCash.Visible = false end
@@ -1559,7 +1558,7 @@ function em.handleVehiclePurchaseResult(result)
 	elseif result.NotEnoughMoney then
 		VehicleBuyUI.setEnabled(false); onJump(); CashBuyUI.Open()
 	elseif result.LowLevel then
-		em.showNotification({ Title = "Vehicle", Text = ("This requires level %d."):format(result.LowLevel) })
+		em.showNotification({ Title = "Vehicle", Text = string.format(("This requires level %d."), result.LowLevel) })
 	else
 		VehicleBuyUI.setEnabled(false); onJump()
 	end
@@ -1802,7 +1801,7 @@ function em.spinOutVehicle(data)
 	if State.vehiclePacket.Type == "Chassis" then
 		Classes.Chassis.SpinOut(State.vehiclePacket, data)
 	else
-		error(("Cannot spin-out vehicle type: %s"):format(State.vehiclePacket.Type))
+		error(string.format(("Cannot spin-out vehicle type: %s"), State.vehiclePacket.Type))
 	end
 end
 
@@ -2255,7 +2254,7 @@ local function addSliderSetting(name: string, title: string, order: number, soun
 		type = Modules.gameSettingType.Slider,
 		defaultValue = 100, order = order,
 		min = 0, max = 100, step = 1,
-		textMap = function(v: number) return ("%d%%"):format(v) end,
+		textMap = function(v: number) return string.format(("%d%%"), v) end,
 	}) :: any
 	local function apply(v: number)
 		Services.SoundService[soundGroup].Volume = math.clamp(v / 100, 0, 1)
@@ -2486,7 +2485,7 @@ task.spawn(function()
 		if product.Type == "Nitro" then
 			local btn = State.nitroGuiHandle.Container.Container.ContainerButtons:FindFirstChild(product.Name)
 			if btn then
-				btn.Button.Title.Text = ("+%d"):format(product.Fuel)
+				btn.Button.Title.Text = string.format(("+%d"), product.Fuel)
 				btn.Button.MouseButton1Down:connect(function()
 					if Settings.Scalar.NitroMax - 25 <= nitroState.Nitro then
 						em.showNotification({ Title = "Rocket Fuel", Text = "You have a lot of fuel, go use it!" })
@@ -2508,8 +2507,8 @@ if Modules.RunUtils.isMainWorld() then
 		local escaped = LocalPlayer:GetAttribute("HasEscaped") == true
 		initConfig.HasEscaped = escaped
 		if escaped then
-			em.showNotification({ Text = ("%s"):format(Localization:FormatByKey("Banner.EscapedDesc")), Duration = 6 })
-			em.showNotification({ Text = ("%s"):format(Localization:FormatByKey("Banner.Escaped")), Style = "Alert", Duration = 6 })
+			em.showNotification({ Text = string.format(("%s"), Localization:FormatByKey("Banner.EscapedDesc")), Duration = 6 })
+			em.showNotification({ Text = string.format(("%s"), Localization:FormatByKey("Banner.Escaped")), Style = "Alert", Duration = 6 })
 		end
 	end
 	updateHasEscaped()
@@ -2905,7 +2904,7 @@ do
 			if hour == 0 then hour = 12 end
 			if hour ~= lastTimeHour or quarter ~= lastTimeQuarter then
 				lastTimeHour = hour; lastTimeQuarter = quarter
-				SidebarUI.SetTime(("%d:%02d %s"):format(hour, quarter, if raw >= 12 then "PM" else "AM"))
+				SidebarUI.SetTime(string.format(("%d:%02d %s"), hour, quarter, if raw >= 12 then "PM" else "AM"))
 			end
 		end
 		debug.profileend()
@@ -3071,7 +3070,7 @@ do
 	local function addDroppedItem(part)
 		CircleActionUI.Add({
 			Part = part, ValidRoot = part.Parent,
-			Name = ("Pick up %s"):format(GunShopUtils.getTranslatedTitleFromName(part.Parent.Name)),
+			Name = string.format(("Pick up %s"), GunShopUtils.getTranslatedTitleFromName(part.Parent.Name)),
 			Timed = true, Duration = 0.5, Dist = 5,
 			Callback = function(gun, completed: boolean): boolean?
 				if completed then fireServer("pickUpGun", gun.Part.Parent); return true end

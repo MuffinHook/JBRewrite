@@ -8,7 +8,7 @@ local v5 = {
     copyKeysSafe = function(v1, v2) --[[ Line: 5 ]] --[[ Name: copyKeysSafe ]]
         for v3, v4 in pairs(v2) do
             if v1[v3] ~= nil then
-                error(("Table `to` already has key `%s` = %s"):format(v3, v1[v3]), 2);
+                error(string.format(("Table `to` already has key `%s` = %s"), v3, v1[v3]), 2);
             end;
             v1[v3] = v4;
         end;
@@ -17,7 +17,7 @@ local v5 = {
 };
 local v8 = {
     __index = function(_, v7) --[[ Line: 15 ]] --[[ Name: __index ]]
-        error(("Table does not contain key `%s`"):format(v7), 2);
+        error(string.format(("Table does not contain key `%s`"), v7), 2);
     end
 };
 v5.requireValidIndex = function(v9) --[[ Line: 19 ]] --[[ Name: requireValidIndex ]]

@@ -13,11 +13,11 @@ local function _(arg1) -- Line 16, Named "FormatMoney"
         var7 = '-'
     end
     local string_match_result1_2, string_match_result2_2, string_match_result3 = string.match(math.abs(arg1), "^([^%d]*%d)(%d*)(.-)$")
-    return "%s$%s":format(var7, string_match_result1_2..string_match_result2_2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3)
+    return string.format("%s$%s", var7, string_match_result1_2..string_match_result2_2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3)
 end
 local function PlaySound_upvr(arg1, arg2) -- Line 20, Named "PlaySound"
     local Sound_upvr = Instance.new("Sound")
-    Sound_upvr.SoundId = "rbxassetid://%d":format(arg2)
+    Sound_upvr.SoundId = string.format("rbxassetid://%d", arg2)
     Sound_upvr.Volume = 0.75
     Sound_upvr.RollOffMode = Enum.RollOffMode.InverseTapered
     Sound_upvr.Parent = arg1

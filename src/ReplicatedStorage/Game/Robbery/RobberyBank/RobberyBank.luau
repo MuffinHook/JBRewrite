@@ -2,7 +2,7 @@ local RunService_upvr = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local function _(arg1, arg2) -- Line 18, Named "PlaySound"
     local Sound_upvr_2 = Instance.new("Sound")
-    Sound_upvr_2.SoundId = "rbxassetid://%d":format(arg2)
+    Sound_upvr_2.SoundId = string.format("rbxassetid://%d", arg2)
     Sound_upvr_2.Volume = 0.75
     Sound_upvr_2.Parent = arg1
     Sound_upvr_2:Play()

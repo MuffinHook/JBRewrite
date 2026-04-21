@@ -23,7 +23,7 @@ function module_upvr.init() -- Line 16
                 local var16 = any_getSortedHotbarItemsFor_result1[i]
                 if tbl_upvr[i] then
                     var16:SetKeyCode(tbl_upvr[i])
-                    var16:SetBindText("%d":format(i))
+                    var16:SetBindText(string.format("%d", i));
                 else
                     var16:SetKeyCode(nil)
                     var16:SetBindText(nil)

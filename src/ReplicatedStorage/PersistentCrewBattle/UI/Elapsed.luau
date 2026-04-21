@@ -78,7 +78,7 @@ function any_extend_result1.render(arg1) -- Line 31
     if not arg1.props.disabled then
     else
     end
-    tbl.Text = "%s--%s":format(arg1.props.prefix, arg1.props.suffix)
+    tbl.Text = string.format("%s--%s", arg1.props.prefix, arg1.props.suffix)
     tbl.TextXAlignment = arg1.props.textXAlignment
     tbl.Font = arg1.props.font
     tbl.LineHeight = 1

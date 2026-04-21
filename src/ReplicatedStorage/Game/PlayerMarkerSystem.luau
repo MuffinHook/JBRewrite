@@ -107,8 +107,9 @@ function module_upvr._rxChildAdded(arg1, arg2) -- Line 98
                     if var49 == Settings_upvr.EnumTeam.Criminal then
                     end
                 end
+                local Spotted = nil
                 if arg1:GetAttribute("CCTVSpotted") == true then
-                    local Spotted = var9_upvr.Spotted
+                    Spotted = var9_upvr.Spotted
                 end
                 if Spotted then
                     if not module_upvr._doesMarkerExist(arg1) then
@@ -152,7 +153,7 @@ function module_upvr._constructMarker(arg1) -- Line 169
     end
     assert(true)
     if module_upvr._mapPlayerIdPlayerMarker[arg1.UserId] then
-        error("Player marker already exists for: %s":format(arg1.Name))
+        error(string.format("Player marker already exists for: %s", arg1.Name));
     else
         local any_new_result1_2 = WorldMarker_upvr.new()
         any_new_result1_2:SetScreenGui(WorldMarkerSystem_upvr.gui)
@@ -176,7 +177,7 @@ function module_upvr._destructMarker(arg1) -- Line 193
     assert(true)
     local var57 = module_upvr._mapPlayerIdPlayerMarker[arg1.UserId]
     if not var57 then
-        error("Player marker does not exist for: %s":format(arg1.Name))
+        error(string.format("Player marker does not exist for: %s", arg1.Name))
     else
         module_upvr._mapPlayerIdPlayerMarker[arg1.UserId] = nil
         module_upvr._playerMarkerGroup:Remove(var57._worldMarker)

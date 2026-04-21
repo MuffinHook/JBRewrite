@@ -43,7 +43,7 @@ end
 function module_upvr.SetImageId(arg1, arg2) -- Line 62
     local var10
     if typeof(arg2) == "number" then
-        var10 = "rbxassetid://%d":format(var10)
+        var10 = string.format("rbxassetid://%d", var10);
     end
     arg1._itemFrame.Top.Icon.Image = var10
 end
@@ -83,7 +83,7 @@ function module_upvr.UpdateLevel(arg1) -- Line 95
     arg1._itemFrame.Bottom.Level.Visible = var12
     local var13
     if var12 then
-        arg1._itemFrame.Bottom.Level.Text = "LVL %d":format(arg1._level)
+        arg1._itemFrame.Bottom.Level.Text = string.format("LVL %d", arg1._level)
         if LevelUtils_upvr.yieldLevel(LocalPlayer_upvr) >= arg1._level then
             var13 = false
         else
@@ -99,7 +99,7 @@ function module_upvr.AddRequiredGamepass(arg1, arg2) -- Line 105
     local clone_upvr = GunShop_upvr.PresetRequiredIcon:Clone()
     clone_upvr.Parent = arg1._itemFrame.Bottom.RequiredContainer
     arg1._maid:GivePromise(GamepassSystem_upvr.promiseImageId(GamepassUtils_upvr.GetGamepassFromEnum(arg2).PassId):andThen(function(arg1_2) -- Line 112
-        clone_upvr.Image = "rbxassetid://%d":format(arg1_2)
+        clone_upvr.Image = string.format("rbxassetid://%d", arg1_2)
         clone_upvr.Visible = true
     end):catch(warn))
     arg1._maid:GiveTask(clone_upvr.MouseButton1Down:Connect(function() -- Line 118

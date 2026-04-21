@@ -61,7 +61,7 @@ function module_upvr.AddEdge(arg1, arg2, arg3) -- Line 40
         arg1:AddNode(arg3)
     end
     if arg1.MapNodeNode[arg2][arg3] ~= nil then
-        error("Edge already exists from `%s` to `%s`":format(arg2, arg3))
+        error(string.format("Edge already exists from `%s` to `%s`", arg2, arg3));
     end
     arg1.MapNodeNode[arg2][arg3] = true
 end

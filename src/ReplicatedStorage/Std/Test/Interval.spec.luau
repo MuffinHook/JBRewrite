@@ -27,7 +27,7 @@ local function v12(v1) --[[ Line: 4 ]] --[[ Name: getErr ]]
             task.delay(2, function() --[[ Line: 20 ]]
                 -- upvalues: l_v5_0 (ref), v11 (copy), v4 (copy), v3 (copy)
                 if not l_v5_0 and v11 > v4 * 2 then
-                    error("did not fire once: " .. tostring(v3) .. (" (%.2f, %.2f)"):format(v11, v4));
+                    error("did not fire once: " .. tostring(v3) .. string.format((" (%.2f, %.2f)"), v11, v4));
                 end;
             end);
             task.delay(v11, function() --[[ Line: 25 ]]

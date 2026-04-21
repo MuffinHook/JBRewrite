@@ -102,7 +102,7 @@ function module_upvr.SetupModel(arg1) -- Line 115
     local any_getName_result1 = InventoryItemUtils_upvr.getName(arg1.inventoryItemValue)
     local SOME = ReplicatedStorage_upvr.Resource.ItemSystem.Models:FindFirstChild(any_getName_result1)
     if SOME == nil then
-        error("Could not find model for item `%s`":format(any_getName_result1))
+        error(string.format("Could not find model for item `%s`", any_getName_result1))
     end
     local clone = SOME:Clone()
     arg1.Model = clone

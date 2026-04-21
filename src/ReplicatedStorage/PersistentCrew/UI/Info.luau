@@ -182,7 +182,7 @@ function any_extend_result1.render(arg1) -- Line 140
         var212 = {}
         var212.Button = createElement_upvr(TextButton_upvr, {
             size = UDim2.new(1, 0, 1, 0);
-            text = "%dv%d":format(v_2, v_2);
+            text = string.format("%dv%d", v_2, v_2);
             backgroundColor = Color3.fromRGB(88, 172, 246);
             onClick = arg1.onClickBattle(v_2);
             disabled = arg1.props.networkMutexLocked;
@@ -430,7 +430,7 @@ function any_extend_result1.render(arg1) -- Line 140
                 AnchorPoint = Vector2.new(0.5, 0.5);
                 Font = Enum.Font.FredokaOne;
                 TextXAlignment = Enum.TextXAlignment.Center;
-                Text = "RATING: %s":format(arg1.props.clanDisplayRating);
+                Text = string.format("RATING: %s", arg1.props.clanDisplayRating);
                 LineHeight = 1;
                 TextScaled = true;
                 TextColor3 = Color3.new(1, 1, 1);
@@ -453,7 +453,7 @@ function any_extend_result1.render(arg1) -- Line 140
             AnchorPoint = Vector2.new(0.5, 0.5);
             Font = Enum.Font.FredokaOne;
             TextXAlignment = Enum.TextXAlignment.Center;
-            Text = "Leaderboard unlocks at %d battles":format(PersistentCrewBattleConsts_upvr.NUM_PROVISIONAL_RATING_BATTLES);
+            Text = string.format("Leaderboard unlocks at %d battles", PersistentCrewBattleConsts_upvr.NUM_PROVISIONAL_RATING_BATTLES);
             LineHeight = 1;
             TextScaled = true;
             TextColor3 = Color3.new(1, 1, 1);
@@ -470,7 +470,7 @@ function any_extend_result1.render(arg1) -- Line 140
     local Center_2 = Enum.TextXAlignment.Center
     tbl_113.TextXAlignment = Center_2
     if var252 then
-        Center_2 = "%d online":format(var252)
+        Center_2 = string.format("%d online", var252)
     else
         Center_2 = "... online"
     end
@@ -502,7 +502,7 @@ function any_extend_result1.render(arg1) -- Line 140
             AnchorPoint = Vector2.new(0.5, 0.5);
             Font = Enum.Font.FredokaOne;
             TextXAlignment = Enum.TextXAlignment.Center;
-            Text = "%d battles":format(arg1.props.battlesPlayed or 0);
+            Text = string.format("%d battles", arg1.props.battlesPlayed or 0);
             LineHeight = 1;
             TextScaled = true;
             TextColor3 = Color3.new(0.7, 0.7, 0.7);
@@ -547,7 +547,7 @@ function any_extend_result1.render(arg1) -- Line 140
             Position = UDim2.new(0.5, 0, 0.5, 0);
             AnchorPoint = Vector2.new(0.5, 0.5);
             Font = Enum.Font.FredokaOne;
-            Text = "BATTLE (RANKED, %dv%d)":format(PersistentCrewBattleConsts_upvr.RANKED_BATTLE_TEAM_SIZE, PersistentCrewBattleConsts_upvr.RANKED_BATTLE_TEAM_SIZE);
+            Text = string.format("BATTLE (RANKED, %dv%d)", PersistentCrewBattleConsts_upvr.RANKED_BATTLE_TEAM_SIZE, PersistentCrewBattleConsts_upvr.RANKED_BATTLE_TEAM_SIZE);
             LineHeight = 1;
             TextScaled = true;
             TextColor3 = Color3.new(1, 1, 1);
@@ -683,7 +683,7 @@ function any_extend_result1.render(arg1) -- Line 140
             size = UDim2.new(1, 0, 1, 0);
             position = UDim2.new(1, 0, 0, 0);
             anchorPoint = Vector2.new(1, 0);
-            text = "MEMBERS (%d)":format(#arg1.props.members);
+            text = string.format("MEMBERS (%d)", #arg1.props.members);
             backgroundColor = Color3.fromRGB(88, 172, 246);
             disabled = not arg1.props.showRequests;
             onClick = arg1.props.onClickToggleRequests;
@@ -702,7 +702,7 @@ function any_extend_result1.render(arg1) -- Line 140
                 size = UDim2.new(1, 0, 1, 0);
                 position = UDim2.new(1, 0, 0, 0);
                 anchorPoint = Vector2.new(1, 0);
-                text = "REQUESTS (%d)":format(#arg1.props.joinRequests);
+                text = string.format("REQUESTS (%d)", #arg1.props.joinRequests);
                 backgroundColor = Color3.fromRGB(88, 172, 246);
                 disabled = arg1.props.showRequests;
                 onClick = arg1.props.onClickToggleRequests;

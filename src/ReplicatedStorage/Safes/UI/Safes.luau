@@ -29,8 +29,7 @@ function any_extend_result1.init(arg1) -- Line 24
             var12 = true
         end
         assert(var12, "missing typeEnum")
-        var12 = ReplicatedStorage_upvr:FindFirstChild(SafesConsts_upvr.SAFE_PURCHASE_REMOTE_NAME):FireServer
-        var12(typeEnum)
+        ReplicatedStorage_upvr:FindFirstChild(SafesConsts_upvr.SAFE_PURCHASE_REMOTE_NAME):FireServer(typeEnum)
     end
     function arg1.onSafeOpen(arg1_2) -- Line 49
         ReplicatedStorage_upvr:FindFirstChild(SafesConsts_upvr.SAFE_OPEN_REMOTE_NAME):FireServer(arg1_2)

@@ -143,9 +143,9 @@ function module_upvr.a(arg1, arg2) -- Line 163
     -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     if arg1.successCondition then
-        var25 = "Expected value of type %q, got value %q of type %s":format(arg2, tostring(arg1.value), type(arg1.value))
+        var25 = string.format("Expected value of type %q, got value %q of type %s", arg2, tostring(arg1.value), type(arg1.value))
     else
-        var25 = "Expected value not of type %q, got value %q of type %s":format(arg2, tostring(arg1.value), type(arg1.value))
+        var25 = string.format("Expected value not of type %q, got value %q of type %s", arg2, tostring(arg1.value), type(arg1.value))
     end
     if not true then
         error(var25 or "Assertion failed!", (3 or 1) + 1)
@@ -171,9 +171,9 @@ function module_upvr.ok(arg1) -- Line 191
     -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     if arg1.successCondition then
-        var26 = "Expected value %q to be non-nil":format(tostring(arg1.value))
+        var26 = string.format("Expected value %q to be non-nil", tostring(arg1.value))
     else
-        var26 = "Expected value %q to be nil":format(tostring(arg1.value))
+        var26 = string.format("Expected value %q to be nil", tostring(arg1.value))
     end
     if not true then
         error(var26 or "Assertion failed!", (3 or 1) + 1)
@@ -198,9 +198,9 @@ function module_upvr.equal(arg1, arg2) -- Line 212
     -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
     if arg1.successCondition then
-        var27 = "Expected value %q (%s), got %q (%s) instead":format(tostring(arg2), type(arg2), tostring(arg1.value), type(arg1.value))
+        var27 = string.format("Expected value %q (%s), got %q (%s) instead", tostring(arg2), type(arg2), tostring(arg1.value), type(arg1.value))
     else
-        var27 = "Expected anything but value %q (%s)":format(tostring(arg2), type(arg2))
+        var27 = string.format("Expected anything but value %q (%s)", tostring(arg2), type(arg2))
     end
     if not true then
         error(var27 or "Assertion failed!", (3 or 1) + 1)
@@ -272,7 +272,7 @@ function module_upvr.throw(arg1, arg2) -- Line 271
     local var32
     if arg2 then
         local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var32 = "threw: %s":format(pcall_result2)
+            var32 = string.format("threw: %s", pcall_result2)
             return var32
         end
         if not pcall_result2 or not decompInlinedCondition() then
@@ -289,7 +289,7 @@ function module_upvr.throw(arg1, arg2) -- Line 271
         end
     end
     if not var31 then
-        var32 = "Expected function to succeed, but it threw an error: %s":format(tostring(var32)) or "Assertion failed!"
+        var32 = string.format("Expected function to succeed, but it threw an error: %s", tostring(var32)) or "Assertion failed!"
         error(var32, (3 or 1) + 1)
     end
     arg1:_resetModifiers()

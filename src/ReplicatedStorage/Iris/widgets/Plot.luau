@@ -151,9 +151,9 @@ return function(arg1, arg2) -- Line 3
             local var25 = arg1_12.state.values.value[ceiled + 1]
             if var24 and var25 then
                 if math.floor(var24) == var24 and math.floor(var25) == var25 then
-                    arg1_12.Tooltip.Text = "%d: %d\n%d: %d":format(ceiled, var24, ceiled + 1, var25)
+                    arg1_12.Tooltip.Text = string.format("%d: %d\n%d: %d", ceiled, var24, ceiled + 1, var25)
                 else
-                    arg1_12.Tooltip.Text = "%d: %.3f\n%d: %.3f":format(ceiled, var24, ceiled + 1, var25)
+                    arg1_12.Tooltip.Text = string.format("%d: %.3f\n%d: %.3f", ceiled, var24, ceiled + 1, var25)
                 end
             end
             arg1_12.HoveredLine = var23
@@ -394,9 +394,9 @@ return function(arg1, arg2) -- Line 3
             local var85
             if var84 then
                 if math.floor(var84) == var84 then
-                    var85 = "%d: %d":format(ceiled_2, var84)
+                    var85 = string.format("%d: %d", ceiled_2, var84)
                 else
-                    var85 = "%d: %.3f":format(ceiled_2, var84)
+                    var85 = string.format("%d: %.3f", ceiled_2, var84)
                 end
                 arg1_21.Tooltip.Text = var85
             end

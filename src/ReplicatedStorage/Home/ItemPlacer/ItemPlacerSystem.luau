@@ -503,7 +503,7 @@ function module_upvr.createAndDrag(arg1) -- Line 510
                 })
                 return
             end
-            error("Unhandled result id: %d":format(arg1_7.id))
+            error(string.format("Unhandled result id: %d", arg1_7.id))
         end
     end)
     any_queryCurrentStandingHome_result1:AttemptCreateHomeItem(arg1)

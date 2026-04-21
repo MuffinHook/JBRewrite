@@ -43,11 +43,11 @@ function module_3_upvr.visualize(arg1, arg2, arg3) -- Line 70
             end
             table.insert(module_2, var20)
         else
-            local formatted = "%s%s":format(' ':rep(3 * var15), v_2.planNode.phrase or "")
+            local formatted = string.format("%s%s", ' ':rep(3 * var15), v_2.planNode.phrase or "")
             var20 = v_2.status
             if var20 then
                 var20 = formatted
-                formatted = var20.." (%s)":format(v_2.status)
+                formatted = var20..string.format(" (%s)", v_2.status)
             end
             var20 = table.insert
             var20(module_2, formatted)

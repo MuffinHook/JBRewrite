@@ -56,7 +56,7 @@ v5.promiseUserThumbnail = function(v15, v16, v17) --[[ Line: 32 ]] --[[ Name: pr
     end);
 end;
 v5.getHeadShot = function(v23) --[[ Line: 47 ]] --[[ Name: getHeadShot ]]
-    return (("rbxthumb://type=AvatarHeadShot&id=%*&w=180&h=180"):format(v23));
+    return (string.format(("rbxthumb://type=AvatarHeadShot&id=%*&w=180&h=180"), v23));
 end;
 local v24 = v3.new();
 v5.getPlayerMaid = function(v25) --[[ Line: 54 ]] --[[ Name: getPlayerMaid ]]

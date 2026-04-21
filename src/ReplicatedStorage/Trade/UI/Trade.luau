@@ -253,7 +253,7 @@ function any_extend_result1.render(arg1) -- Line 195
             if arg1.props.tradeInfo.msg then
                 var79 = arg1.props.tradeInfo.msg
             elseif arg1.props.tradeInfo.debugProbability then
-                var79 = "P(you better) [debug] = %.1f%%":format(arg1.props.tradeInfo.debugProbability * 100)
+                var79 = string.format("P(you better) [debug] = %.1f%%", arg1.props.tradeInfo.debugProbability * 100)
             end
         end
         ipairs_result3 = {}

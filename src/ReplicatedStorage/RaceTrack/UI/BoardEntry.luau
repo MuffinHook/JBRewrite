@@ -39,7 +39,7 @@ function any_extend_result1.render(arg1) -- Line 6
                     Size = UDim2.new(0.8, 0, 0.8, 0);
                     AnchorPoint = Vector2.new(0.5, 0.5);
                     Position = UDim2.new(0.5, 0, 0.65, 0);
-                    Text = ("#%d"):format(arg1.props.rank);
+                    Text = string.format(("#%d"), arg1.props.rank);
                     TextColor3 = Color3.new(1, 1, 1);
                     Font = Enum.Font.LuckiestGuy;
                     TextScaled = true;
@@ -61,7 +61,7 @@ function any_extend_result1.render(arg1) -- Line 6
                     AnchorPoint = Vector2.new(0.5, 0.5);
                     Position = UDim2.new(0.5, 0, 0.5, 0);
                     Size = UDim2.new(0.8, 0, 0.8, 0);
-                    Image = ("rbxthumb://type=AvatarHeadShot&w=150&h=150&id=%d"):format(arg1.props.userId);
+                    Image = string.format(("rbxthumb://type=AvatarHeadShot&w=150&h=150&id=%d"), arg1.props.userId);
                 });
             });
             Stats = createElement_upvr("Frame", {

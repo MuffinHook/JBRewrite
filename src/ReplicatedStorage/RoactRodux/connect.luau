@@ -4,7 +4,7 @@ local shallowEqual = require(script.Parent.shallowEqual)
 local StoreContext = require(script.Parent.StoreContext)
 
 local function formatMessage(lines, args)
-    return table.concat(lines, "\n"):format(unpack(args or {}))
+    return string.format(table.concat(lines, "\n"), unpack(args or {}))
 end
 
 local function validateMappedState(mappedState)
@@ -51,7 +51,7 @@ return function(mapStateToProps, mapDispatchToProps)
             }, { callStack }), 2)
         end
 
-        local name = ("RoduxConnection(%s)"):format(tostring(component))
+        local name = string.format(("RoduxConnection(%s)"), tostring(component))
         local Connection = Roact.Component:extend(name)
 
         function Connection.getDerivedStateFromProps(props, state)

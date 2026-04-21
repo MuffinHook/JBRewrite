@@ -102,7 +102,7 @@ function any_extend_result1.render(arg1) -- Line 87
     local clanColorTheirs = arg1.props.clanColorTheirs
     local var29
     if clanColorTheirs then
-        var29 = "rgb(%d, %d, %d)":format(clanColorTheirs.r * 255, clanColorTheirs.g * 255, clanColorTheirs.b * 255)
+        var29 = string.format("rgb(%d, %d, %d)", clanColorTheirs.r * 255, clanColorTheirs.g * 255, clanColorTheirs.b * 255)
     else
         var29 = "rgb(255, 255, 255)"
     end
@@ -151,7 +151,7 @@ function any_extend_result1.render(arg1) -- Line 87
                     });
                     Text = createElement_upvr("TextLabel", {
                         BackgroundTransparency = 1;
-                        Text = '.':rep(arg1.state.dots - 1).."ASSEMBLING %dv%d BATTLE":format(arg1.props.numPlayersPerTeam, arg1.props.numPlayersPerTeam)..'.':rep(arg1.state.dots - 1);
+                        Text = '.':rep(arg1.state.dots - 1)..string.format("ASSEMBLING %dv%d BATTLE", arg1.props.numPlayersPerTeam, arg1.props.numPlayersPerTeam)..'.':rep(arg1.state.dots - 1);
                         TextColor3 = Color3.new(1, 1, 1);
                         TextScaled = true;
                         Size = UDim2.new(1, 0, 1, 0);
@@ -173,7 +173,7 @@ function any_extend_result1.render(arg1) -- Line 87
                     });
                     Text = createElement_upvr("TextLabel", {
                         BackgroundTransparency = 1;
-                        Text = "<font color=\"".."rgb(%d, %d, %d)":format(clanColorOurs.r * 255, clanColorOurs.g * 255, clanColorOurs.b * 255).."\">%s</font>":format(arg1.props.clanNameOurs);
+                        Text = "<font color=\""..string.format("rgb(%d, %d, %d)", clanColorOurs.r * 255, clanColorOurs.g * 255, clanColorOurs.b * 255)..string.format("\">%s</font>", arg1.props.clanNameOurs);
                         RichText = true;
                         TextColor3 = Color3.new(1, 1, 1);
                         TextScaled = true;
@@ -196,7 +196,7 @@ function any_extend_result1.render(arg1) -- Line 87
                     });
                     Text = createElement_upvr("TextLabel", {
                         BackgroundTransparency = 1;
-                        Text = "<font color=\""..var29.."\">%s</font>":format(arg1.props.clanNameTheirs or "");
+                        Text = "<font color=\""..var29..string.format("\">%s</font>", arg1.props.clanNameTheirs or "");
                         RichText = true;
                         TextColor3 = Color3.new(1, 1, 1);
                         TextScaled = true;

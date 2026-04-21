@@ -173,7 +173,7 @@ function module_upvr.loadContracts(arg1) -- Line 142
     end
     gui.Background.Body.Main.ThankYou.Visible = tbl
     if tbl then
-        gui.Background.Body.Main.ThankYou.Text = "Season %d is over! Thanks for playing!":format(SeasonConsts_upvr.SEASON_NUM)
+        gui.Background.Body.Main.ThankYou.Text = string.format("Season %d is over! Thanks for playing!", SeasonConsts_upvr.SEASON_NUM)
     else
         for i_4, v_4 in ipairs(any_getContracts_result1) do
             if v_4:GetTeamId() == arg1 then
@@ -184,7 +184,7 @@ function module_upvr.loadContracts(arg1) -- Line 142
                 any_new_result1_4:SetFrame(clone)
                 any_new_result1_4:SetContract(v_4)
                 any_new_result1_4:SetLayoutOrder(i_4)
-                any_new_result1_4:SetTitle("CONTRACT %d":format(0 + 1))
+                any_new_result1_4:SetTitle(string.format("CONTRACT %d", 0 + 1))
                 table.insert(module_upvr._listContractUI, any_new_result1_4)
             end
         end
@@ -241,7 +241,7 @@ function module_upvr._open() -- Line 187
         var10_upvw.open()
         Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105461542)
     end))
-    gui_upvr.Background.Bottom.Container.SeasonPass.Title.Text = "SEASON %d: %s":format(SeasonConsts_upvr.SEASON_NUM, SeasonConsts_upvr.SEASON_TITLE)
+    gui_upvr.Background.Bottom.Container.SeasonPass.Title.Text = string.format("SEASON %d: %s", SeasonConsts_upvr.SEASON_NUM, SeasonConsts_upvr.SEASON_TITLE)
     any_new_result1_5:GiveTask(gui_upvr.Background.Bottom.Container.SeasonPass.MouseButton1Down:Connect(function() -- Line 240
         local any_getFirstProductByType_result1_3 = Settings_upvr.getFirstProductByType("SeasonPass")
         local var86

@@ -33,7 +33,7 @@ local function ItemFrameGen_upvr(arg1, arg2) -- Line 32, Named "ItemFrameGen"
         TextLabel_2.Size = UDim2.new(1, 0, 0.2, 0)
         TextLabel_2.Position = UDim2.new(0, 0, 0.75, 0)
         local string_match_result1_3, string_match_result2, string_match_result3_2 = string.match(arg1.Price, "^([^%d]*%d)(%d*)(.-)$")
-        TextLabel_2.Text = "$%s":format(string_match_result1_3..string_match_result2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3_2)
+        TextLabel_2.Text = string.format("$%s", string_match_result1_3..string_match_result2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3_2)
         TextLabel_2.BackgroundTransparency = 1
         TextLabel_2.TextColor3 = Color3.new(0, 1, 0)
         TextLabel_2.TextStrokeTransparency = 0.5
@@ -48,7 +48,7 @@ local function ItemFrameGen_upvr(arg1, arg2) -- Line 32, Named "ItemFrameGen"
         TextButton.Size = UDim2.new(0.8, 0, 0.2, 0)
         TextButton.Position = UDim2.new(0.1, 0, 0.75, 0)
         local string_match_result1_2, string_match_result2_3, string_match_result3 = string.match(arg1.Price, "^([^%d]*%d)(%d*)(.-)$")
-        TextButton.Text = "Buy $%s":format(string_match_result1_2..string_match_result2_3:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3)
+        TextButton.Text = string.format("Buy $%s", string_match_result1_2..string_match_result2_3:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3)
         TextButton.BorderSizePixel = 0
         TextButton.Font = Enum.Font.SourceSansBold
         TextButton.TextScaled = true

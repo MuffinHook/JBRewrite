@@ -1,11 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local function PlaySound_upvr(arg1, arg2) -- Line 23, Named "PlaySound"
     local Sound_upvr_2 = Instance.new("Sound")
-    Sound_upvr_2.SoundId = "rbxassetid://%d":format(arg2)
+    Sound_upvr_2.SoundId = string.format("rbxassetid://%d", arg2);
     Sound_upvr_2.Volume = 0.75
     Sound_upvr_2.Parent = arg1
     Sound_upvr_2:Play()
-    delay(1, function() -- Line 29
+    task.delay(1, function() -- Line 29
         game.Debris:AddItem(Sound_upvr_2, Sound_upvr_2.TimeLength)
     end)
 end
@@ -32,7 +32,7 @@ return function(arg1) -- Line 34
         for i = 0, 1, 0.015 do
             if var38_upvw ~= var40 then return end
             Sound_upvr.Volume = i
-            wait()
+            task.wait()
         end
     end
     local function FadeOutSound_upvr() -- Line 60, Named "FadeOutSound"
@@ -41,7 +41,7 @@ return function(arg1) -- Line 34
         for i_2 = 1, 0, -0.015 do
             if var38_upvw ~= var42 then return end
             Sound_upvr.Volume = i_2
-            wait()
+            task.wait()
         end
         Sound_upvr:Stop()
     end
@@ -52,17 +52,17 @@ return function(arg1) -- Line 34
         end
         var43_upvw = true
         PlaySound_upvr(LocalPlayer_upvr, 1837831244)
-        delay(1, function() -- Line 82
+        task.delay(1, function() -- Line 82
             PlaySound_upvr(LocalPlayer_upvr, 1843025542)
         end)
-        spawn(FadeInSound_upvr)
+        task.spawn(FadeInSound_upvr)
     end
     local function _() -- Line 87, Named "ExitRobbery"
         if not var43_upvw then
             return error("Player not in robbery")
         end
         var43_upvw = false
-        spawn(FadeOutSound_upvr)
+        task.spawn(FadeOutSound_upvr)
     end
     function em_upvr.wwgjdqav() -- Line 95
         EnterRobbery_upvr()
@@ -71,7 +71,7 @@ return function(arg1) -- Line 34
         if not var43_upvw then
         else
             var43_upvw = false
-            spawn(FadeOutSound_upvr)
+            task.spawn(FadeOutSound_upvr)
         end
     end
     local function _(arg1_2) -- Line 102, Named "Ease_InOutQuad"

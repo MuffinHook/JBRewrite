@@ -31,17 +31,17 @@ local v19 = {
             table.insert(v15, "\t(no messages)");
         end;
         if v16 > 0 then
-            table.insert(v15, ("\tErrors (%d) {"):format(v16));
+            table.insert(v15, string.format(("\tErrors (%d) {"), v16));
             table.insert(v15, v13(v14.errors, 2));
             table.insert(v15, "\t}");
         end;
         if v17 > 0 then
-            table.insert(v15, ("\tWarnings (%d) {"):format(v17));
+            table.insert(v15, string.format(("\tWarnings (%d) {"), v17));
             table.insert(v15, v13(v14.warnings, 2));
             table.insert(v15, "\t}");
         end;
         if v18 > 0 then
-            table.insert(v15, ("\tInfos (%d) {"):format(v18));
+            table.insert(v15, string.format(("\tInfos (%d) {"), v18));
             table.insert(v15, v13(v14.infos, 2));
             table.insert(v15, "\t}");
         end;
@@ -74,7 +74,7 @@ local v34 = {
     end, 
     warn = function(v27, ...) --[[ Line: 125 ]] --[[ Name: warn ]]
         -- upvalues: v1 (copy), v0 (ref)
-        local v28 = v27:format(...);
+        local v28 = string.format(v27, ...);
         for v29 in pairs(v1) do
             table.insert(v29.warnings, v28);
         end;
@@ -82,7 +82,7 @@ local v34 = {
         local v31 = "%s\n%s";
         local l_v28_0 = v28;
         local v33 = ("\t"):rep(1);
-        v31 = v31:format(l_v28_0, v33 .. v30:gsub("\n", "\n" .. v33));
+        v31 = string.format(v31, l_v28_0, v33 .. v30:gsub("\n", "\n" .. v33));
         if v0 then
             warn(v31);
         end;

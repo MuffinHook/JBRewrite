@@ -55,9 +55,9 @@ local function report(arg1) -- Line 66
 end
 local TestService_upvr = game:GetService("TestService")
 function module.report(arg1) -- Line 72
-    print(table.concat({"Test results:", table.concat(reportRoot_upvr(arg1), '\n'), "%d passed, %d failed, %d skipped":format(arg1.successCount, arg1.failureCount, arg1.skippedCount)}, '\n'))
+    print(table.concat({"Test results:", table.concat(reportRoot_upvr(arg1), '\n'), string.format("%d passed, %d failed, %d skipped", arg1.successCount, arg1.failureCount, arg1.skippedCount)}, '\n'))
     if 0 < arg1.failureCount then
-        print("%d test nodes reported failures.":format(arg1.failureCount))
+        print(string.format("%d test nodes reported failures.", arg1.failureCount))
     end
     if 0 < #arg1.errors then
         print("Errors reported by tests:")

@@ -11,7 +11,7 @@ v0.__index = function(v1, v2) --[[ Line: 6 ]] --[[ Name: __index ]]
     elseif v1._map[v2] then
         return v1._map[v2];
     else
-        error(("Enum does not contain item: `%s`"):format(v2));
+        error(string.format(("Enum does not contain item: `%s`"), v2));
         return;
     end;
 end;

@@ -20,14 +20,14 @@ return function(v1, v2) --[[ Line: 4 ]]
                 if l_TireMesh_0:FindFirstChildOfClass("Decal") then
                     for _, v8 in next, l_TireMesh_0:GetChildren() do
                         if v8:IsA("Decal") then
-                            v8.Texture = ("rbxassetid://%d"):format(v1.TextureId);
+                            v8.Texture = string.format(("rbxassetid://%d"), v1.TextureId);
                         end;
                     end;
                 else
                     local l_Decal_0 = Instance.new("Decal");
                     l_Decal_0.Color3 = Color3.new(1, 1, 1);
                     l_Decal_0.Face = Enum.NormalId.Left;
-                    l_Decal_0.Texture = ("rbxassetid://%d"):format(v1.TextureId);
+                    l_Decal_0.Texture = string.format(("rbxassetid://%d"), v1.TextureId);
                     l_Decal_0.Parent = l_TireMesh_0;
                     local v10 = l_Decal_0:Clone();
                     v10.Face = Enum.NormalId.Right;

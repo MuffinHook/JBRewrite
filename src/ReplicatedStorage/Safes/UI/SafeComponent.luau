@@ -50,7 +50,7 @@ function any_extend_result1.render(arg1) -- Line 26
     local udim2_2 = UDim2.new(0.5, 0, 0.5, 0)
     tbl_10.Position = udim2_2
     if arg1.props.imageId then
-        udim2_2 = "rbxassetid://%d":format(arg1.props.imageId)
+        udim2_2 = string.format("rbxassetid://%d", arg1.props.imageId);
     else
         udim2_2 = nil
     end

@@ -54,7 +54,7 @@ function module_upvr.open() -- Line 34
         local Name = arg1.Name
         local any_getCategoryData_result1 = GunShopUtils_upvr.getCategoryData(Name)
         if not any_getCategoryData_result1 then
-            i_2 = "No data for gun shop category: %s":format(Name)
+            i_2 = string.format("No data for gun shop category: %s", Name)
             error(i_2)
         end
         module_upvr.displayList(any_getCategoryData_result1)
@@ -85,13 +85,13 @@ function module_upvr.displayList(arg1) -- Line 78
         local Name_upvr = v_4.Name
         local any_GetConfig_result1 = ItemSystem_upvr.GetConfig(Name_upvr)
         if not any_GetConfig_result1 then
-            error("Missing item config for item: %s":format(Name_upvr))
+            error(string.format("Missing item config for item: %s", Name_upvr))
         end
         if not any_GetConfig_result1.Price then
-            error("Missing price data for item: %s":format(Name_upvr))
+            error(string.format("Missing price data for item: %s", Name_upvr))
         end
         if not any_GetConfig_result1.ImageId then
-            error("Missing image asset for item: %s":format(Name_upvr))
+            error(string.format("Missing image asset for item: %s", Name_upvr))
         end
         local var83
         if any_GetConfig_result1.ShopHidden and not GunShopSystem_upvr.doesPlayerOwn(Name_upvr) then
@@ -102,7 +102,7 @@ function module_upvr.displayList(arg1) -- Line 78
             any_new_result1_upvr_2:SetName(Name_upvr, GunShopUtils_upvr.getTranslatedTitleFromName(Name_upvr))
             any_new_result1_upvr_2:SetPrice(any_GetConfig_result1.Price)
             if not any_GetConfig_result1.ImageId then
-                error("Missing image asset for item: %s":format(Name_upvr))
+                error(string.format("Missing image asset for item: %s", Name_upvr))
             end
             any_new_result1_upvr_2:SetImageId(any_GetConfig_result1.ImageId)
             if any_GetConfig_result1.ImageColor then

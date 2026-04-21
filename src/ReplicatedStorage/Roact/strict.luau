@@ -8,12 +8,12 @@ return function(v0, v1) --[[ Line: 2 ]] --[[ Name: strict ]]
     return (setmetatable(v0, {
         __index = function(_, v3) --[[ Line: 6 ]] --[[ Name: __index ]]
             -- upvalues: v1 (ref)
-            local v4 = ("%q (%s) is not a valid member of %s"):format(tostring(v3), typeof(v3), v1);
+            local v4 = string.format(("%q (%s) is not a valid member of %s"), tostring(v3), typeof(v3), v1);
             error(v4, 2);
         end, 
         __newindex = function(_, v6, _) --[[ Line: 12 ]] --[[ Name: __newindex ]]
             -- upvalues: v1 (ref)
-            local v8 = ("%q (%s) is not a valid member of %s"):format(tostring(v6), typeof(v6), v1);
+            local v8 = string.format(("%q (%s) is not a valid member of %s"), tostring(v6), typeof(v6), v1);
             error(v8, 2);
         end
     }));

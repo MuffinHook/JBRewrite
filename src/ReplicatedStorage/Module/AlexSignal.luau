@@ -5,7 +5,7 @@ local function _() -- Line 8, Named "GUID"
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx":gsub("[xy]", function(arg1) -- Line 10
         if arg1 ~= 'x' or not random_upvr(0, 15) then
         end
-        return "%x":format(random_upvr(8, 11))
+        return string.format("%x", random_upvr(8, 11))
     end)
 end
 local function _() -- Line 15, Named "MakeListener"
@@ -13,7 +13,7 @@ local function _() -- Line 15, Named "MakeListener"
         g = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx":gsub("[xy]", function(arg1) -- Line 10
             if arg1 ~= 'x' or not random_upvr(0, 15) then
             end
-            return "%x":format(random_upvr(8, 11))
+            return string.format("%x", random_upvr(8, 11))
         end);
         Callback = nil;
         SignalName = nil;
@@ -37,7 +37,7 @@ function module_2.Listen(arg1, arg2) -- Line 35
         g = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx":gsub("[xy]", function(arg1_2) -- Line 10
             if arg1_2 ~= 'x' or not random_upvr(0, 15) then
             end
-            return "%x":format(random_upvr(8, 11))
+            return string.format("%x", random_upvr(8, 11))
         end);
         Callback = nil;
         SignalName = nil;

@@ -23,7 +23,7 @@ return function(v2, v3, v4) --[[ Line: 5 ]] --[[ Name: waitForChild ]]
             if v4 then
                 l_v2_FirstChild_0:GivePromise(v0.delay(v4):andThen(function() --[[ Line: 21 ]]
                     -- upvalues: v7 (copy), v2 (ref), v3 (ref)
-                    v7(("[waitForChild] Timeout: no child of `%s` with name `%s`"):format(v2.Name, v3));
+                    v7(string.format(("[waitForChild] Timeout: no child of `%s` with name `%s`"), v2.Name, v3));
                 end));
             end;
         end);

@@ -19,7 +19,7 @@ function module_upvr.MinSec(arg1) -- Line 20
     local var12 = arg1 % 60
     local var13 = ""
     if 0 < floored then
-        var13 = var13..("%d minute"):format(floored)
+        var13 = var13..string.format(("%d minute"), floored)
         if floored ~= 1 then
             var13 = var13..'s'
         end
@@ -28,7 +28,7 @@ function module_upvr.MinSec(arg1) -- Line 20
         var13 = var13.." and "
     end
     if 0 < var12 then
-        var13 = var13..("%d second"):format(var12)
+        var13 = var13..string.format(("%d second"), var12)
         if var12 ~= 1 then
             var13 = var13..'s'
         end

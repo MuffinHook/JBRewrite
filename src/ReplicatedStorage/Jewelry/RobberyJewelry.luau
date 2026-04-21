@@ -5,7 +5,7 @@ local CircleAction_upvr = require(ReplicatedStorage.Module.UI).CircleAction
 local var5_upvw
 local function PlaySound_upvr(arg1, arg2) -- Line 14, Named "PlaySound"
     local Sound_upvr = Instance.new("Sound")
-    Sound_upvr.SoundId = "rbxassetid://%d":format(arg2)
+    Sound_upvr.SoundId = string.format("rbxassetid://%d", arg2)
     Sound_upvr.Volume = 0.75
     Sound_upvr.Parent = arg1
     Sound_upvr:Play()

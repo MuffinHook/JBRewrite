@@ -88,7 +88,7 @@ v29.getLinkedChildren = function(v33, v34, v35) --[[ Line: 88 ]] --[[ Name: getL
                     v36[v40] = true;
                     table.insert(v37, v40);
                 else
-                    warn(("[BinderUtils.getLinkedChildren] - Double linked children at %q"):format(v39:GetFullName()));
+                    warn(string.format(("[BinderUtils.getLinkedChildren] - Double linked children at %q"), v39:GetFullName()));
                 end;
             end;
         end;

@@ -65,9 +65,9 @@ local v25 = {
         local v19 = 0;
         repeat
             v19 = v19 + 1;
-        until not v16:FindFirstChild(("_stack_value_%d"):format(v19));
+        until not v16:FindFirstChild(string.format(("_stack_value_%d"), v19));
         local l_NumberValue_0 = Instance.new("NumberValue");
-        l_NumberValue_0.Name = ("_stack_value_%d"):format(v19);
+        l_NumberValue_0.Name = string.format(("_stack_value_%d"), v19);
         l_NumberValue_0.Value = v16[v17];
         l_NumberValue_0.Parent = v16;
         v16[v17] = v18;
@@ -76,12 +76,12 @@ local v25 = {
         local v23 = 0;
         repeat
             v23 = v23 + 1;
-        until not v21:FindFirstChild(("_stack_value_%d"):format(v23));
+        until not v21:FindFirstChild(string.format(("_stack_value_%d"), v23));
         v23 = v23 - 1;
         if v23 <= 0 then
             return;
         else
-            local l_v21_FirstChild_0 = v21:FindFirstChild(("_stack_value_%d"):format(v23));
+            local l_v21_FirstChild_0 = v21:FindFirstChild(string.format(("_stack_value_%d"), v23));
             assert(l_v21_FirstChild_0 ~= nil);
             v21[v22] = l_v21_FirstChild_0.Value;
             l_v21_FirstChild_0:Destroy();

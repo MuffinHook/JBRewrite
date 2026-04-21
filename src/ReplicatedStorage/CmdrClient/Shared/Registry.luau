@@ -48,7 +48,7 @@ function module_3_upvr.RegisterTypePrefix(arg1, arg2, arg3) -- Line 224
     if not arg1.TypeAliases[arg2] then
         arg1.TypeAliases[arg2] = arg2
     end
-    arg1.TypeAliases[arg2] = "%s %s":format(arg1.TypeAliases[arg2], arg3)
+    arg1.TypeAliases[arg2] = string.format("%s %s", arg1.TypeAliases[arg2], arg3)
 end
 function module_3_upvr.RegisterTypeAlias(arg1, arg2, arg3) -- Line 240
     local var13
@@ -206,7 +206,7 @@ function module_3_upvr.GetTypeName(arg1, arg2) -- Line 493
 end
 function module_3_upvr.RegisterHook(arg1, arg2, arg3, arg4) -- Line 507
     if not arg1.Hooks[arg2] then
-        error("[Cmdr] Invalid hook name: %q":format(arg2), 2)
+        error(string.format("[Cmdr] Invalid hook name: %q", arg2), 2)
     end
     local tbl = {}
     tbl.callback = arg3

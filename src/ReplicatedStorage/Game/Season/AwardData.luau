@@ -13,7 +13,7 @@ local function gatherStoreData(arg1, arg2) -- Line 10
                 if not v.SeasonIconId then
                     SEASON_NUM_3 = v
                     print(SEASON_NUM_3)
-                    SEASON_NUM_3 = "Missing SeasonIconId for: %s:^":format(arg1)
+                    SEASON_NUM_3 = string.format("Missing SeasonIconId for: %s:^", arg1)
                     error(SEASON_NUM_3)
                 end
                 if 0 >= v.SeasonIconId then
@@ -95,7 +95,7 @@ gatherStoreData("Drift", require(ReplicatedStorage.Game.Garage.StoreData.Drift).
             local SEASON_NUM_2 = SeasonConsts_upvr.SEASON_NUM
             if Season_2.Value == SEASON_NUM_2 then
                 if not SeasonIconId then
-                    SEASON_NUM_2 = "Missing SeasonIconId for %s:%s":format(arg1, v_2.Name)
+                    SEASON_NUM_2 = string.format("Missing SeasonIconId for %s:%s", arg1, v_2.Name)
                     error(SEASON_NUM_2)
                 end
                 if 0 >= SeasonIconId.Value then

@@ -71,7 +71,7 @@ function any_extend_result1.render(arg1) -- Line 22
         var15 = arg1.props
         var15 = var15.userId
         if var15 then
-            var15 = "rbxthumb://type=AvatarHeadShot&w=150&h=150&id=%d":format(arg1.props.userId)
+            var15 = string.format("rbxthumb://type=AvatarHeadShot&w=150&h=150&id=%d", arg1.props.userId);
         end
     end
     tbl_3.Image = var15

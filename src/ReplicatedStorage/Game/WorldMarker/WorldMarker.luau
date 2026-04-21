@@ -110,7 +110,7 @@ function module_2_upvr.SetIcon(arg1, arg2, arg3) -- Line 114
         if arg1.FrameIcon == nil then
             arg1:CreateFrameIcon()
         end
-        arg1.FrameIcon.Image = ("rbxassetid://%d"):format(arg2)
+        arg1.FrameIcon.Image = string.format(("rbxassetid://%d"), arg2)
         if arg3 then
             arg1.FrameIcon.ImageColor3 = arg3
         end

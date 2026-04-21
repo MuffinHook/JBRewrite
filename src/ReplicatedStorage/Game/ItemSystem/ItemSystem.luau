@@ -417,7 +417,7 @@ function module_upvr._equip(arg1, arg2) -- Line 372
     end
     local var146 = tbl_7_upvr[BroadcastInputEnded]
     if not var146 then
-        BroadcastInputEnded = "No module for item: %s":format(any_getName_result1)
+        BroadcastInputEnded = string.format("No module for item: %s", any_getName_result1)
         error(BroadcastInputEnded)
     end
     BroadcastInputEnded = arg1

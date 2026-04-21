@@ -98,7 +98,7 @@ function module_3.run(arg1, arg2, arg3, arg4) -- Line 99
         extraEnvironment = {}
     end
     if type(arg2) ~= "table" then
-        error("Bad argument #1 to TestBootstrap:run. Expected table, got %s":format(typeof(arg2)), 2)
+        error(string.format("Bad argument #1 to TestBootstrap:run. Expected table, got %s", typeof(arg2)), 2)
     end
     for _, v_4 in ipairs(arg2) do
         for _, v_5 in ipairs(arg1:getModules(v_4)) do
@@ -112,7 +112,7 @@ function module_3.run(arg1, arg2, arg3, arg4) -- Line 99
     local tick_result1 = tick()
     var57.report(any_runPlan_result1)
     if var59.showTimingInfo or false then
-        print(table.concat({"Took %f seconds to locate test modules":format(tick_result1_2 - tick()), "Took %f seconds to create test plan":format(tick_result1_3 - tick_result1_2), "Took %f seconds to run tests":format(tick_result1 - tick_result1_3), "Took %f seconds to report tests":format(tick() - tick_result1)}, '\n'))
+        print(table.concat({string.format("Took %f seconds to locate test modules", tick_result1_2 - tick()), string.format("Took %f seconds to create test plan", tick_result1_3 - tick_result1_2), string.format("Took %f seconds to run tests", tick_result1 - tick_result1_3), string.format("Took %f seconds to report tests", tick() - tick_result1)}, '\n'))
     end
     return any_runPlan_result1
 end

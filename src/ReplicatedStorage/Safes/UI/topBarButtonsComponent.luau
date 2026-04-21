@@ -21,7 +21,7 @@ return function(arg1) -- Line 6
                 Size = UDim2.new(1, 0, 0.9, 0);
                 Position = UDim2.new(0.5, 0, 0.5, 0);
                 AnchorPoint = Vector2.new(0.5, 0.5);
-                Text = "$%s":format(String_upvr.comma(arg1.policyCashAvailable));
+                Text = string.format("$%s", String_upvr.comma(arg1.policyCashAvailable));
                 TextXAlignment = Enum.TextXAlignment.Center;
                 Font = Enum.Font.Bangers;
                 LineHeight = 1;

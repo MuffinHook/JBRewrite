@@ -93,7 +93,7 @@ v5.join = function(v26) --[[ Line: 93 ]] --[[ Name: join ]]
         assert(typeof(v26) == "table", "Expected arg #1 to be of type table");
         for v27, v28 in pairs(v26) do
             if v2.of(v28) ~= v2.Binding then
-                local v29 = ("Expected arg #1 to contain only bindings, but key %q had a non-binding value"):format((tostring(v27)));
+                local v29 = string.format(("Expected arg #1 to contain only bindings, but key %q had a non-binding value"), (tostring(v27)));
                 error(v29, 2);
             end;
         end;

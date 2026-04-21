@@ -7,7 +7,7 @@ local v0 = require(script.Parent.Parent.Type);
 local v1 = {};
 local v3 = {
     __tostring = function(v2) --[[ Line: 21 ]] --[[ Name: __tostring ]]
-        return ("RoactHostEvent(%s)"):format(v2.name);
+        return string.format(("RoactHostEvent(%s)"), v2.name);
     end
 };
 setmetatable(v1, {
