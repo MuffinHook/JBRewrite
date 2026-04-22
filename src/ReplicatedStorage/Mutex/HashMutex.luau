@@ -28,8 +28,7 @@ function module_2_upvr.ReleaseFor(arg1, arg2) -- Line 26
         var6(var5.thread)
         var6 = arg1._data
         var6[arg2] = nil
-        var6 = arg1:_fireKeyChangedCallbacks
-        var6(arg2)
+        arg1:_fireKeyChangedCallbacks(arg2)
     end
     if var5 == nil then
         var6 = false

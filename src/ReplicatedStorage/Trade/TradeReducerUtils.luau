@@ -1,6 +1,6 @@
 local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
 local VehicleData_upvr = require(ReplicatedStorage_upvr.Game.Garage.VehicleData)
-local function _(arg1) -- Line 14, Named "getVehicleDataForMake"
+local function getVehicleDataForMake(arg1) -- Line 14, Named "getVehicleDataForMake"
     for _, v in ipairs(VehicleData_upvr) do
         if v.Make == arg1 then
             return v
@@ -8,7 +8,7 @@ local function _(arg1) -- Line 14, Named "getVehicleDataForMake"
     end
 end
 local ItemSkinList_upvr = require(ReplicatedStorage_upvr.Game.ItemSkin.ItemSkinList)
-local function _(arg1) -- Line 24, Named "getItemSkinForName"
+local function getItemSkinForName(arg1) -- Line 24, Named "getItemSkinForName"
     for _, v_2 in ipairs(ItemSkinList_upvr) do
         if v_2.Name == arg1 then
             return v_2
@@ -26,12 +26,130 @@ local GarageTranslationUtils_upvr = require(ReplicatedStorage_upvr.Garage.Garage
 local String_upvr = require(ReplicatedStorage_upvr.Std.String)
 local PlayerUtils_upvr = require(ReplicatedStorage_upvr.Std.PlayerUtils)
 function module_upvr.buildItemProps(arg1) -- Line 37
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+    if not arg1 or not arg1.ItemType then
+        return nil
+    end
+
+    local itemType = arg1.ItemType
+    local function makeId()
+        if arg1.Id ~= nil then
+            return arg1.Id
+        end
+        if itemType == PlayerDataConsts_upvr.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
+            return string.format("%s.%s.%s", itemType, tostring(arg1.CategoryName), tostring(arg1.ItemName))
+        end
+        if itemType == PlayerDataConsts_upvr.VEHICLE_ITEM_TYPE then
+            return string.format("%s.%s", itemType, tostring(arg1.Make))
+        end
+        if itemType == PlayerDataConsts_upvr.ITEM_SKIN_ITEM_TYPE then
+            return string.format("%s.%s", itemType, tostring(arg1.SkinName))
+        end
+        if itemType == PlayerDataConsts_upvr.HOME_ITEM_TYPE then
+            return string.format("%s.%s", itemType, tostring(arg1.ItemName))
+        end
+        if itemType == PlayerDataConsts_upvr.SAFE_ITEM_TYPE then
+            return string.format("%s.%s", itemType, tostring(arg1.TypeEnum))
+        end
+        return string.format("%s.%s", itemType, tostring(arg1.ItemName))
+    end
+
+    local props = {
+        id = makeId();
+        itemOwnedId = arg1.Id;
+        itemOwned = arg1;
+        itemType = itemType;
+        created = arg1.CreationTime;
+        cash = arg1.Cash;
+        isOriginalOwner = arg1.IsOriginalOwner == true;
+    }
+
+    if itemType == PlayerDataConsts_upvr.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
+        local categoryName = arg1.CategoryName
+        local itemName = arg1.ItemName
+        if not categoryName or not itemName then
+            return nil
+        end
+
+        local itemData = StoreData_upvr.GetItemByName(categoryName, itemName)
+        if not itemData then
+            return nil
+        end
+
+        props.categoryName = categoryName
+        props.name = itemName
+        props.title = itemData.DisplayName or itemData.Name or itemName
+        props.categoryTitle = GarageTranslationUtils_upvr.getCategoryTitle(categoryName)
+        props.price = itemData.Price
+        props.level = itemData.Level
+        props.season = itemData.Season
+        props.topPct = itemData.TopPct
+        props.rarityIndex = itemData.RarityIndex or arg1.RarityId or 0
+
+        local ok, viewportProps = pcall(getViewportProps_upvr, arg1)
+        if ok and viewportProps then
+            for key, value in pairs(viewportProps) do
+                props[key] = value
+            end
+        end
+
+        return props
+    end
+
+    if itemType == PlayerDataConsts_upvr.VEHICLE_ITEM_TYPE then
+        local vehicleData = getVehicleDataForMake(arg1.Make)
+        if not vehicleData then
+            return nil
+        end
+
+        props.name = arg1.Make
+        props.title = vehicleData.Name or arg1.Make
+        props.categoryTitle = "Vehicle"
+        props.price = vehicleData.Price
+        props.level = vehicleData.Level
+        props.season = vehicleData.Season
+        props.rarityIndex = arg1.RarityId or 0
+
+        return props
+    end
+
+    if itemType == PlayerDataConsts_upvr.ITEM_SKIN_ITEM_TYPE then
+        local itemSkin = getItemSkinForName(arg1.SkinName)
+        if not itemSkin then
+            return nil
+        end
+
+        props.name = arg1.SkinName
+        props.title = arg1.SkinName
+        props.categoryTitle = "Item Skin"
+        props.rarityIndex = arg1.RarityId or 0
+        return props
+    end
+
+    if itemType == PlayerDataConsts_upvr.HOME_ITEM_TYPE then
+        props.name = arg1.ItemName
+        props.title = arg1.ItemName
+        props.categoryTitle = "Home Item"
+        props.rarityIndex = arg1.RarityId or 0
+        return props
+    end
+
+    if itemType == PlayerDataConsts_upvr.SAFE_ITEM_TYPE then
+        props.name = tostring(arg1.TypeEnum)
+        props.title = tostring(arg1.TypeEnum)
+        props.categoryTitle = "Safe"
+        props.rarityIndex = arg1.RarityId or 0
+        return props
+    end
+
+    if itemType == PlayerDataConsts_upvr.CONSUMABLE_ITEM_TYPE then
+        props.name = arg1.ItemName
+        props.title = arg1.ItemName
+        props.categoryTitle = "Consumable"
+        props.rarityIndex = arg1.RarityId or 0
+        return props
+    end
+
+    return nil
 end
 function module_upvr.getDefaults() -- Line 243
     return {

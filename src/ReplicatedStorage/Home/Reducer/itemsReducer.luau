@@ -1,98 +1,61 @@
 local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local function _(arg1) -- Line 6, Named "defaultSort"
+local function defaultSort(arg1) -- Line 6, Named "defaultSort"
     table.sort(arg1, function(arg1_2, arg2) -- Line 8
-        local var3
-        if var3 ~= arg2.limited then
-            var3 = arg2.limited
-            return var3
+        if arg1_2.limited ~= arg2.limited then
+            return arg2.limited
         end
-        var3 = arg1_2.season
-        if var3 ~= arg2.season then
-            if (arg2.season or math.huge) >= (arg1_2.season or math.huge) then
-                var3 = false
-            else
-                var3 = true
-            end
-            return var3
+        if arg1_2.season ~= arg2.season then
+            return (arg1_2.season or math.huge) < (arg2.season or math.huge)
         end
-        if arg1_2.name >= arg2.name then
-            var3 = false
-        else
-            var3 = true
-        end
-        return var3
+        return arg1_2.name < arg2.name
     end)
 end
 local module = {}
 local HomeItemUIUtils_upvr = require(ReplicatedStorage_upvr.Home.HomeItem.HomeItemUIUtils)
 function module.setFurnitureCategory(arg1, arg2) -- Line 20
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local children_2, NONE_2, NONE = ReplicatedStorage_upvr.Resource.HomeItem:GetChildren()
-    local var17
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [66.7]
-    local MaxPlaced_2 = nil:FindFirstChild("MaxPlaced")
-    if MaxPlaced_2 then
-        var17 = MaxPlaced_2.Value
-    else
-        var17 = nil
-    end
-    local function decompInlinedCondition_3() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [86.17]
-        return nil == nil
-    end
-    local function decompInlinedCondition_4() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        return 0.01 >= math.abs(arg2.upDot - nil)
-    end
-    if arg2.use == nil or arg2.use == 1 or arg2.upDot == nil or decompInlinedCondition_3() or decompInlinedCondition_4() then
-        local Name_upvr_2 = nil.Name
-        local tbl_4 = {
-            module = "HomeItem";
-            name = Name_upvr_2;
-            title = Name_upvr_2;
-        }
-        -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [108.9]
-        tbl_4.price = nil
-        -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [110.11]
-        tbl_4.level = nil
-        -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [112.13]
-        tbl_4.season = nil
-        -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [114.15]
-        tbl_4.topPct = nil
-        local var21 = true
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        if nil == nil then
-            var21 = true
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            if nil == nil then
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                var21 = not nil
+    local items = {}
+
+    for _, homeItem in ReplicatedStorage_upvr.Resource.HomeItem:GetChildren() do
+        local values = {}
+        for _, child in homeItem:GetChildren() do
+            if child:IsA("ValueBase") then
+                values[child.Name] = child.Value
             end
         end
-        tbl_4.limited = var21
-        tbl_4.maxPlaced = var17
-        local function getInst() -- Line 57
-            return HomeItemUIUtils_upvr.getModel(Name_upvr_2)
+
+        local itemUse = values.Use or 1
+        local itemUpDot = values.UpDot or 1
+        local useMatches = arg2.use == nil or itemUse == arg2.use
+        local upDotMatches = arg2.upDot == nil or math.abs(itemUpDot - arg2.upDot) <= 0.01
+
+        if useMatches and upDotMatches and not values.HiddenAll and not values.Hidden and not values.VIP then
+            local itemName = homeItem.Name
+            local tbl_4 = {
+                module = "HomeItem";
+                name = itemName;
+                title = itemName;
+                price = values.Price;
+                level = values.Level;
+                season = values.Season;
+                topPct = values.TopPct;
+                maxPlaced = values.MaxPlaced;
+            }
+
+            tbl_4.limited = tbl_4.level ~= nil or tbl_4.season ~= nil or (not tbl_4.price and not values.None)
+            tbl_4.available = not tbl_4.limited
+
+            function tbl_4.getInst() -- Line 57
+                return HomeItemUIUtils_upvr.getModel(itemName)
+            end
+
+            tbl_4.updateCamera = HomeItemUIUtils_upvr.getUpdateCamera()
+            tbl_4.getInstCompare = "HomeItem"..itemName
+            table.insert(items, tbl_4)
         end
-        tbl_4.getInst = getInst
-        tbl_4.updateCamera = HomeItemUIUtils_upvr.getUpdateCamera()
-        tbl_4.getInstCompare = "HomeItem"..Name_upvr_2
-        tbl_4.available = not tbl_4.limited
-        table.insert({}, tbl_4)
     end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [155.8]
-    if nil then
-    else
-    end
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [155.10]
-    if nil then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+
+    defaultSort(items)
+    return items
 end
 function module.setCategory(arg1, arg2) -- Line 69
     local var37_upvr
@@ -149,28 +112,7 @@ function module.setCategory(arg1, arg2) -- Line 69
             end
         end
     end
-    table.sort(module_2, function(arg1_4, arg2_3) -- Line 8
-        local var43
-        if var43 ~= arg2_3.limited then
-            var43 = arg2_3.limited
-            return var43
-        end
-        var43 = arg1_4.season
-        if var43 ~= arg2_3.season then
-            if (arg2_3.season or math.huge) >= (arg1_4.season or math.huge) then
-                var43 = false
-            else
-                var43 = true
-            end
-            return var43
-        end
-        if arg1_4.name >= arg2_3.name then
-            var43 = false
-        else
-            var43 = true
-        end
-        return var43
-    end)
+    defaultSort(module_2)
     return module_2
 end
 return require(ReplicatedStorage_upvr.Rodux).createReducer({}, module)

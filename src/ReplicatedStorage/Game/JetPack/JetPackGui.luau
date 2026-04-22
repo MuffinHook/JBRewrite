@@ -18,7 +18,7 @@ end
 local module_upvr = {
     OnRefillClicked = require(ReplicatedStorage_upvr.Std.Signal).new();
     MaxFuel = 10;
-    Fuel = module_upvr.MaxFuel;
+    Fuel = self.MaxFuel;
 }
 local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
 function module_upvr.Init() -- Line 27

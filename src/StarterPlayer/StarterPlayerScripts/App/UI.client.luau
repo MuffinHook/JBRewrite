@@ -69,6 +69,7 @@ local SpawnSelectionConsts = require(ReplicatedStorage.SpawnSelection.SpawnSelec
 local ChooseSpawn          = require(ReplicatedStorage.SpawnSelection.UI.ChooseSpawn)
 local OtherTradeServerListRodux = require(ReplicatedStorage.Trade.UI.OtherTradeServerListRodux)
 local RoactRodux           = require(ReplicatedStorage.RoactRodux)
+local appStore             = require(ReplicatedStorage.App.store)
 local CmdrExtSystem        = require(ReplicatedStorage.CmdrExt.CmdrExtSystem)
 local ActionButtonService  = require(ReplicatedStorage.ActionButton.ActionButtonService)
 local ChatUtils            = require(ReplicatedStorage.Chat.ChatUtils)
@@ -861,7 +862,13 @@ Roact.mount(
 		ResetOnSpawn   = false,
 		IgnoreGuiInset = true,
 		DisplayOrder   = 8,
-	}, { createElement(AppComp) }),
+	}, {
+		App = createElement(RoactRodux.StoreProvider, {
+			store = appStore,
+		}, {
+			App = createElement(AppComp),
+		}),
+	}),
 	Players.LocalPlayer.PlayerGui,
 	"AppUI"
 )
