@@ -1,26 +1,26 @@
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module = {}
-local Binder_upvr = require(ReplicatedStorage.Std.Binder)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-local RunService_upvr = game:GetService("RunService")
-function module.init() -- Line 8
-    local cframe_upvr = CFrame.new(0.292251587, -68.3681335, 4.94998169, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-    Binder_upvr.new("Turbine", function(arg1) -- Line 11
-        local any_new_result1 = Maid_upvr.new()
-        any_new_result1:GiveTask(RxInstanceUtils_upvr.observeProperty(arg1, "PrimaryPart", function(arg1_2, arg2) -- Line 13
-            if not arg1_2 then
-            else
-                arg2:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1_2, "Blade->Base", function(arg1_3, arg2_2) -- Line 18
-                    local os_clock_result1_upvr = os.clock()
-                    local var14_upvr = math.random() * math.pi * 2
-                    arg2_2:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 21
-                        arg1_3.C1 = cframe_upvr:Inverse() * CFrame.Angles(0, 0, -0.3 * (os.clock() - os_clock_result1_upvr) + var14_upvr) * cframe_upvr
-                    end))
-                end))
-            end
-        end))
-        return any_new_result1
-    end):Start()
-end
-return module
+local Binder = require(ReplicatedStorage.Std.Binder)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+return {
+	init = function() --[[ Name: init | Line: 8 | Upvalues: Binder (copy), Maid (copy), RxInstanceUtils (copy), RunService (copy) ]]
+		local v1 = CFrame.new(0.292251587, -68.3681335, 4.94998169, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+		Binder.new("Turbine", function(p1) --[[ Line: 11 | Upvalues: Maid (ref), RxInstanceUtils (ref), RunService (ref), v1 (copy) ]]
+			local v12 = Maid.new()
+			v12:GiveTask(RxInstanceUtils.observeProperty(p1, "PrimaryPart", function(p1, p2) --[[ Line: 13 | Upvalues: RxInstanceUtils (ref), RunService (ref), v1 (ref) ]]
+				if p1 then
+					p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Blade->Base", function(p1, p2) --[[ Line: 18 | Upvalues: RunService (ref), v1 (ref) ]]
+						local v12 = math.random() * math.pi * 2
+						local v2 = os.clock()
+						p2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 21 | Upvalues: v2 (copy), p1 (copy), v1 (ref), v12 (copy) ]]
+							local v13 = os.clock() - v2
+							p1.C1 = v1:Inverse() * CFrame.Angles(0, 0, -0.3 * v13 + v12) * v1
+						end))
+					end))
+				end
+			end))
+			return v12
+		end):Start()
+	end
+}

@@ -1,45 +1,47 @@
-local module_upvr = {
-    _data = {};
-    _observing = {};
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Promise = require(ReplicatedStorage.Std.Promise)
+require(ReplicatedStorage.Std.Signal)
+local t = {
+	_data = {},
+	_observing = {}
 }
-function module_upvr.setCachedPlayerPolicyInfo(arg1, arg2) -- Line 9
-    module_upvr._data[arg1.UserId] = arg2
-    local var5 = module_upvr._observing[arg1.UserId]
-    if var5 then
-        module_upvr._observing[arg1.UserId] = nil
-        for _, v in var5 do
-            v(arg2)
-        end
-    end
+function t.setCachedPlayerPolicyInfo(p1, p2) --[[ Line: 9 | Upvalues: t (copy) ]]
+	t._data[p1.UserId] = p2
+	local v1 = t._observing[p1.UserId]
+	if v1 then
+		t._observing[p1.UserId] = nil
+		for v2, v3 in v1 do
+			v3(p2)
+		end
+	end
 end
-function module_upvr.getCachedPlayerPolicyInfo(arg1) -- Line 19
-    return module_upvr._data[arg1.UserId]
+function t.getCachedPlayerPolicyInfo(p1) --[[ Line: 19 | Upvalues: t (copy) ]]
+	return t._data[p1.UserId]
 end
-local Promise_upvr = require(game:GetService("ReplicatedStorage").Std.Promise)
-function module_upvr.promiseCachedPlayerPolicyInfo(arg1) -- Line 22
-    local any_getCachedPlayerPolicyInfo_result1 = module_upvr.getCachedPlayerPolicyInfo(arg1)
-    if any_getCachedPlayerPolicyInfo_result1 then
-        return Promise_upvr.resolve(any_getCachedPlayerPolicyInfo_result1)
-    end
-    return Promise_upvr.new(function(arg1_2, arg2, arg3) -- Line 27
-        local UserId_upvr = arg1.UserId
-        if not module_upvr._observing[UserId_upvr] then
-            module_upvr._observing[UserId_upvr] = {}
-        end
-        if arg3(function() -- Line 34
-            if module_upvr._observing[UserId_upvr] then
-                local table_find_result1_2 = table.find(module_upvr._observing[UserId_upvr], arg1_2)
-                if table_find_result1_2 then
-                    table.remove(module_upvr._observing[UserId_upvr], table_find_result1_2)
-                end
-            end
-        end) then
-        else
-            table.insert(module_upvr._observing[UserId_upvr], arg1_2)
-        end
-    end)
+function t.promiseCachedPlayerPolicyInfo(p1) --[[ Line: 22 | Upvalues: t (copy), Promise (copy) ]]
+	local v1 = t.getCachedPlayerPolicyInfo(p1)
+	if v1 then
+		return Promise.resolve(v1)
+	else
+		return Promise.new(function(p12, p2, p3) --[[ Line: 27 | Upvalues: p1 (copy), t (ref) ]]
+			local UserId = p1.UserId
+			if not t._observing[UserId] then
+				t._observing[UserId] = {}
+			end
+			if not p3(function() --[[ Line: 34 | Upvalues: t (ref), UserId (copy), p12 (copy) ]]
+				if t._observing[UserId] then
+					local v1 = table.find(t._observing[UserId], p12)
+					if v1 then
+						table.remove(t._observing[UserId], v1)
+					end
+				end
+			end) then
+				table.insert(t._observing[UserId], p12)
+			end
+		end)
+	end
 end
-function module_upvr.removeCachedPlayerPolicyInfo(arg1) -- Line 48
-    module_upvr._data[arg1.UserId] = nil
+function t.removeCachedPlayerPolicyInfo(p1) --[[ Line: 48 | Upvalues: t (copy) ]]
+	t._data[p1.UserId] = nil
 end
-return module_upvr
+return t

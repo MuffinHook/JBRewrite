@@ -1,27 +1,28 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module = {
-    shortAngleDist = function(arg1, arg2) -- Line 7, Named "shortAngleDist"
-        local var3 = (arg2 - arg1) % (-math.pi*2)
-        return 2 * var3 % (-math.pi*2) - var3
-    end;
+local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+return {
+	shortAngleDist = function(p1, p2) --[[ Name: shortAngleDist | Line: 7 ]]
+		local v1 = (p2 - p1) % 6.283185307179586
+		return 2 * v1 % 6.283185307179586 - v1
+	end,
+	getNearestNonPolice = function(p1, p2) --[[ Name: getNearestNonPolice | Line: 12 | Upvalues: Players (copy), PlayerUtils (copy), Settings (copy) ]]
+		local v1 = p2 or (1 / 0)
+		local v2 = nil
+		for i, v in ipairs(Players:GetPlayers()) do
+			local v3 = PlayerUtils.getTeam(v)
+			if v3 and v3 ~= Settings.Team.Police then
+				local v4 = PlayerUtils.getRootPart(v)
+				if v4 then
+					local Magnitude = (v4.Position - p1).Magnitude
+					if Magnitude < v1 then
+						v1 = Magnitude
+						v2 = v
+					end
+				end
+			end
+		end
+		return v2
+	end
 }
-local Players_upvr = game:GetService("Players")
-local PlayerUtils_upvr = require(ReplicatedStorage.Game.PlayerUtils)
-local Settings_upvr = require(ReplicatedStorage.Resource.Settings)
-function module.getNearestNonPolice(arg1, arg2) -- Line 12
-    local var25
-    for _, v in ipairs(Players_upvr:GetPlayers()) do
-        local any_getTeam_result1_2 = PlayerUtils_upvr.getTeam(v)
-        if any_getTeam_result1_2 then
-            if any_getTeam_result1_2 ~= Settings_upvr.Team.Police then
-                local any_getRootPart_result1 = PlayerUtils_upvr.getRootPart(v)
-                if any_getRootPart_result1 then
-                    if (any_getRootPart_result1.Position - arg1).Magnitude < (arg2 or math.huge) then
-                    end
-                end
-            end
-        end
-    end
-    return nil
-end
-return module

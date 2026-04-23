@@ -1,34 +1,28 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMfBnJlbmRlcgtNeUNvbXBvbmVudAZleHRlbmQFdmFsdWUEaW5pdAFhEG1vdW50VmlydHVhbE5vZGUSU29tZSBDb21wb25lbnQgS2V5BmV4cGVjdAljYWxsQ291bnQCdG8FZXF1YWwEc2VsZgVwcm9wcw1jYXB0dXJlVmFsdWVzAm9mGVN0YXRlZnVsQ29tcG9uZW50SW5zdGFuY2UGdHlwZW9mBXRhYmxlB3JlcXVpcmUGc2NyaXB0BlBhcmVudA9hc3NlcnREZWVwRXF1YWwNY3JlYXRlRWxlbWVudBBjcmVhdGVSZWNvbmNpbGVyCWNyZWF0ZVNweQxOb29wUmVuZGVyZXIEVHlwZQlDb21wb25lbnQCaXQpc2hvdWxkIGJlIGludm9rZWQgd2l0aCBwcm9wcyB3aGVuIG1vdW50ZWQABAIBAAAAAALGAQAAggECAAAAFAEBGAAAFQAAAAAKAAYAAB0ABgUPDw8PDw8PAABTDwEFTg8CDkUPAxJBDwQoK1P7AAAAbwIAALwAAJwBAAAAnwADAvsBAQCfAQECTQIBzAIAAAAwAgATAwAAAMACBAAwAgCABQAAAOICBwCMAwUAMAMCgAYAAAD7AwIAUgQAAFIFAgCfAwMC+wUDAE0EBb4IAAAAUgUDAMYGAABvBwkAnwQEAaQGCwAAAKBATQcB5AwAAACfBgICTQUGkg0AAABNBAV7DgAAAIwFAQCfBAIBbwYPAG8HEAC8BAGmEQAAAJ8EBAKkBwsAAACgQPsJBABNCAm8EgAAAE0JBLAPAAAAnwgCAJ8HAAJNBgeSDQAAAE0FBnsOAAAA+wcEAE0GB6YTAAAAnwUCAaQHCwAAAKBATQkEBxAAAAC7LAkCpAgVAAAAQEGfCAICnwcCAk0GB5INAAAATQUGew4AAABvBhYAnwUCAfsFBQBNBgQHEAAAAFIHAgCfBQMBggABABcDAgMDAwQDBQYAAwEDBgUBBgMHAwgDCQQAAKBAAwoDCwMMAw0DDgMPAxADEQMSBAAAQEEDEwEADQABGAAAAAAAAgACAAAAAgAABAEAAAIAAAAEAAAAAAAAAgAAAAAAAAAAAAACAAAAAAIAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAQAAAAABDgAAAAALAAAAACMAAAgPAABcDwELUQ8CFkYPAyE7DwQsMA8FNyUPBkIaDwdND1ykAAEAAAAAQKQEAwAAACBATQMEJAQAAABNAgMkBAAAAE0BAmUFAAAAnwACAqQBAQAAAABApAUDAAAAIEBNBAUkBAAAAE0DBCQEAAAATQIDygYAAACfAQICpAIBAAAAAECkBgMAAAAgQE0FBiQEAAAATQQFJAQAAABNAwSLBwAAAJ8CAgKkAwEAAAAAQKQHAwAAACBATQYHJAQAAABNBQYkBAAAAE0EBQAIAAAAnwMCAqQEAQAAAABApAgDAAAAIEBNBwgkBAAAAE0GByQEAAAATQUGagkAAACfBAICpAUBAAAAAECkCQMAAAAgQE0ICSQEAAAATQcIJAQAAABNBgcRCgAAAJ8FAgKkBgEAAAAAQKQKAwAAACBATQkKJAQAAABNCAkkBAAAAE0HCIgLAAAAnwYCAlIHAgBSCAQAnwcCAqQIDQAAAMBAbwkOANkKAAASAAYAEgADABIAAQASAAcAEgAFABIAAACfCAMBggABAA8DFAQAAABAAxUEAAAgQAMWAxcDGAMZAxoDGwMcAx0DHgQAAMBAAx8BAQEAARgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAACAAAAAAAAAAAAAAIAAAIAAAAAAAAAAAAAHAIAAAAAAQAAAQIAA6MAAADAAAAAggACAAEGAgECAQABGAAAAAEAAAAAA8qwBzQFdTu6+HRtoAKXv3xaQmO57Zun4iuCRehrJ5JfYhNnGtbJq2I=
-
 return function() --[[ Line: 1 ]]
-    local v0 = require(script.Parent.Parent.assertDeepEqual);
-    local v1 = require(script.Parent.Parent.createElement);
-    local v2 = require(script.Parent.Parent.createReconciler);
-    local v3 = require(script.Parent.Parent.createSpy);
-    local v4 = require(script.Parent.Parent.NoopRenderer);
-    local v5 = require(script.Parent.Parent.Type);
-    local v6 = require(script.Parent.Parent.Component);
-    local v7 = v2(v4);
-    it("should be invoked with props when mounted", function() --[[ Line: 13 ]]
-        -- upvalues: v6 (copy), v3 (copy), v1 (copy), v7 (copy), v5 (copy), v0 (copy)
-        local v8 = v6:extend("MyComponent");
-        local v9 = v3();
-        v8.init = v9.value;
-        v8.render = function(_) --[[ Line: 20 ]] --[[ Name: render ]]
-            return nil;
-        end;
-        local v11 = {
-            a = 5
-        };
-        local v12 = v1(v8, v11);
-        v7.mountVirtualNode(v12, nil, "Some Component Key");
-        expect(v9.callCount).to.equal(1);
-        local v13 = v9:captureValues("self", "props");
-        expect(v5.of(v13.self)).to.equal(v5.StatefulComponentInstance);
-        expect((typeof(v13.props))).to.equal("table");
-        v0(v13.props, v11);
-    end);
-end;
+	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
+	local createElement = require(script.Parent.Parent.createElement)
+	local createReconciler = require(script.Parent.Parent.createReconciler)
+	local createSpy = require(script.Parent.Parent.createSpy)
+	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
+	local Type = require(script.Parent.Parent.Type)
+	local Component = require(script.Parent.Parent.Component)
+	local v1 = createReconciler(NoopRenderer)
+	it("should be invoked with props when mounted", function() --[[ Line: 13 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy), assertDeepEqual (copy) ]]
+		local v12 = Component:extend("MyComponent")
+		local v2 = createSpy()
+		v12.init = v2.value
+		function v12.render(p1) --[[ Line: 20 ]]
+			return nil
+		end
+		local t = {
+			a = 5
+		}
+		v1.mountVirtualNode(createElement(v12, t), nil, "Some Component Key")
+		expect(v2.callCount).to.equal(1)
+		local v4 = v2:captureValues("self", "props")
+		expect(Type.of(v4.self)).to.equal(Type.StatefulComponentInstance)
+		local v5 = expect
+		v5((typeof(v4.props))).to.equal("table")
+		assertDeepEqual(v4.props, t)
+	end)
+end

@@ -1,13 +1,7 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMMB3JlcXVpcmUGc2NyaXB0BlBhcmVudAZleHBlY3QFU3RvcmUCdG8CYmUCb2sCaXQLc2hvdWxkIGxvYWQIZGVzY3JpYmUFUm9kdXgABAYAAAAABwAAAQ8AABQUpAABAAAAAECkAgMAAAAgQE0BAiQEAAAAnwACAqQEBgAAAFBATQUAXgcAAACfBAICTQMEkggAAABNAgPMCQAAAE0BAhAKAAAAnwEBAYIAAQALAwEEAAAAQAMCBAAAIEADAwMEBAAAUEADBQMGAwcDCAADAAEYAAAAAAAAAAIAAAAAAAAAAAAAAAEEAAAAAAMAAAAAAAakAAEAAAAAQG8BAgDAAgMAnwADAYIAAQAEAwkEAAAAQAMKBgABAAIAARgAAAAAAAUDAAAAAAMAAAAAAAakAAEAAAAAQG8BAgDAAgMAnwADAYIAAQAEAwsEAAAAQAMMBgEBAQEAARgAAAAAAAcCAAAAAAEAAAECAAOjAAAAwAAAAIIAAgABBgIBAgEAARgAAAABAAAAAAMmQVvn/HEPtRSFMXNZQir6Voiwm/ZoltEh2tgeKsLdQXd5EHbmJY16
-
 return function() --[[ Line: 1 ]]
-    describe("Rodux", function() --[[ Line: 2 ]]
-        it("should load", function() --[[ Line: 3 ]]
-            local v0 = require(script.Parent);
-            expect(v0.Store).to.be.ok();
-        end);
-    end);
-end;
+	describe("Rodux", function() --[[ Line: 2 ]]
+		it("should load", function() --[[ Line: 3 ]]
+			expect(require(script.Parent).Store).to.be.ok()
+		end)
+	end)
+end

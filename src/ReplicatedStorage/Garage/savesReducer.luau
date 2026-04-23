@@ -1,56 +1,51 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local GarageConsts_upvr = require(ReplicatedStorage_upvr.Garage.GarageConsts)
-local module = {}
-local GamepassSystem_upvr = require(ReplicatedStorage_upvr.Gamepass.GamepassSystem)
-local GamepassUtils_upvr = require(ReplicatedStorage_upvr.Gamepass.GamepassUtils)
-local GarageUtils_upvr = require(ReplicatedStorage_upvr.Garage.GarageUtils)
-function module.setSaveSlot(arg1, arg2) -- Line 10
-    assert(arg2.name, "missing slot name")
-    assert(arg2.equipped, "missing slot equipped")
-    local module_3 = {}
-    for i, v in pairs(arg1) do
-        module_3[i] = v
-    end
-    local name = arg2.name
-    if GarageUtils_upvr.getIsSaveSlotValid(tonumber(name:match("%d+")), GamepassSystem_upvr.DoesPlayerOwn(GamepassUtils_upvr.EnumGamepass.VIP)) then
-        module_3[name] = arg2.equipped
-    end
-    local SOME_2 = ReplicatedStorage_upvr:FindFirstChild(GarageConsts_upvr.SLOT_SAVE_REMOTE_NAME)
-    if SOME_2 then
-        SOME_2:FireServer(name)
-    end
-    return module_3
-end
-function module.deleteSaveSlot(arg1, arg2) -- Line 30
-    assert(arg2.name, "missing slot name")
-    local module_2 = {}
-    for i_2, v_2 in pairs(arg1) do
-        module_2[i_2] = v_2
-    end
-    module_2[arg2.name] = nil
-    local SOME_3 = ReplicatedStorage_upvr:FindFirstChild(GarageConsts_upvr.SLOT_DELETE_REMOTE_NAME)
-    if SOME_3 then
-        i_2 = arg2.name
-        SOME_3:FireServer(i_2)
-    end
-    return module_2
-end
-function module.loadSaveSlot(arg1, arg2) -- Line 43
-    assert(arg2.name, "missing slot name")
-    local SOME = ReplicatedStorage_upvr:FindFirstChild(GarageConsts_upvr.SLOT_LOAD_REMOTE_NAME)
-    if SOME then
-        SOME:FireServer(arg2.name)
-    end
-    return arg1
-end
-function module.setSavesRaw(arg1, arg2) -- Line 51
-    local var27
-    if arg2.saves == nil then
-        var27 = false
-    else
-        var27 = true
-    end
-    assert(var27, "missing saves table")
-    return arg2.saves
-end
-return require(ReplicatedStorage_upvr.Rodux).createReducer({}, module)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
+local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
+local Rodux = require(ReplicatedStorage.Rodux)
+local GarageConsts = require(ReplicatedStorage.Garage.GarageConsts)
+local GarageUtils = require(ReplicatedStorage.Garage.GarageUtils)
+return Rodux.createReducer({}, {
+	setSaveSlot = function(p1, p2) --[[ Name: setSaveSlot | Line: 10 | Upvalues: GamepassSystem (copy), GamepassUtils (copy), GarageUtils (copy), ReplicatedStorage (copy), GarageConsts (copy) ]]
+		assert(p2.name, "missing slot name")
+		assert(p2.equipped, "missing slot equipped")
+		local t = {}
+		for k, v in pairs(p1) do
+			t[k] = v
+		end
+		local name_2 = p2.name
+		local equipped_2 = p2.equipped
+		if GarageUtils.getIsSaveSlotValid(tonumber(name_2:match("%d+")), (GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.VIP))) then
+			t[name_2] = equipped_2
+		end
+		local v3 = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_SAVE_REMOTE_NAME)
+		if v3 then
+			v3:FireServer(name_2)
+		end
+		return t
+	end,
+	deleteSaveSlot = function(p1, p2) --[[ Name: deleteSaveSlot | Line: 30 | Upvalues: ReplicatedStorage (copy), GarageConsts (copy) ]]
+		assert(p2.name, "missing slot name")
+		local t = {}
+		for k, v in pairs(p1) do
+			t[k] = v
+		end
+		t[p2.name] = nil
+		local v1 = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_DELETE_REMOTE_NAME)
+		if v1 then
+			v1:FireServer(p2.name)
+		end
+		return t
+	end,
+	loadSaveSlot = function(p1, p2) --[[ Name: loadSaveSlot | Line: 43 | Upvalues: ReplicatedStorage (copy), GarageConsts (copy) ]]
+		assert(p2.name, "missing slot name")
+		local v1 = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_LOAD_REMOTE_NAME)
+		if v1 then
+			v1:FireServer(p2.name)
+		end
+		return p1
+	end,
+	setSavesRaw = function(p1, p2) --[[ Name: setSavesRaw | Line: 51 ]]
+		assert(p2.saves ~= nil, "missing saves table")
+		return p2.saves
+	end
+})

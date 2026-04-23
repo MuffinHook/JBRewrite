@@ -1,33 +1,29 @@
-local SaleConsts_upvr = require(script.Parent.SaleConsts)
-local module_upvr = {
-    getNumSalesPassed = function() -- Line 3, Named "getNumSalesPassed"
-        return math.floor((workspace:GetServerTimeNow() - SaleConsts_upvr.FIRST_SALE_START_TIMESTAMP) / SaleConsts_upvr.SALE_DURATION_SECONDS)
-    end;
+local SaleConsts = require(script.Parent.SaleConsts)
+local t = {
+	getNumSalesPassed = function() --[[ Name: getNumSalesPassed | Line: 3 | Upvalues: SaleConsts (copy) ]]
+		return math.floor((workspace:GetServerTimeNow() - SaleConsts.FIRST_SALE_START_TIMESTAMP) / SaleConsts.SALE_DURATION_SECONDS)
+	end
 }
-function module_upvr.getNextSaleTime() -- Line 7
-    return SaleConsts_upvr.FIRST_SALE_START_TIMESTAMP + (module_upvr.getNumSalesPassed() + 1) * SaleConsts_upvr.SALE_DURATION_SECONDS
+function t.getNextSaleTime() --[[ Line: 7 | Upvalues: t (copy), SaleConsts (copy) ]]
+	return SaleConsts.FIRST_SALE_START_TIMESTAMP + (t.getNumSalesPassed() + 1) * SaleConsts.SALE_DURATION_SECONDS
 end
-function module_upvr.getTimeToNextSale() -- Line 13
-    return module_upvr.getNextSaleTime() - workspace:GetServerTimeNow()
+function t.getTimeToNextSale() --[[ Line: 13 | Upvalues: t (copy) ]]
+	return t.getNextSaleTime() - workspace:GetServerTimeNow()
 end
-function module_upvr.formatRemaining(arg1) -- Line 18
-    local maximum = math.max(0, arg1)
-    local floored = math.floor(maximum / 86400)
-    local floored_3 = math.floor(maximum % 86400 / 3600)
-    local floored_2 = math.floor(maximum % 3600 / 60)
-	local floored_4 = math.floor(maximum % 60)
-	
-    if 0 < floored then
-        return string.format("%dd %dh %dm %ds", floored, floored_3, floored_2, floored_4)
+function t.formatRemaining(p1) --[[ Line: 18 ]]
+	local v1 = math.max(0, p1)
+	local v2 = math.floor(v1 / 86400)
+	local v3 = math.floor(v1 % 86400 / 3600)
+	local v4 = math.floor(v1 % 3600 / 60)
+	local v5 = math.floor(v1 % 60)
+	if v2 > 0 then
+		return ("%dd %dh %dm %ds"):format(v2, v3, v4, v5)
+	elseif v3 > 0 then
+		return ("%dh %dm %ds"):format(v3, v4, v5)
+	elseif v4 > 0 then
+		return ("%dm %ds"):format(v4, v5)
+	else
+		return ("%ds"):format(v5)
 	end
-	
-    if 0 < floored_3 then
-        return string.format("%dh %dm %ds", floored_3, floored_2, floored_4)
-	end
-	
-    if 0 < floored_2 then
-        return string.format("%dm %ds", floored_2, floored_4)
-    end
-    return string.format("%ds", floored_4)
 end
-return module_upvr
+return t

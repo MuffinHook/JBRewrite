@@ -1,111 +1,104 @@
-local newproxy_result1_upvr = newproxy()
-local newproxy_result1_upvr_2 = newproxy()
-local function GetObjectCleanupFunction_upvr(arg1, arg2) -- Line 10, Named "GetObjectCleanupFunction"
-    local typeof_result1 = typeof(arg1)
-    if typeof_result1 == "function" then
-        return newproxy_result1_upvr
-    end
-    if typeof_result1 == "thread" then
-        return newproxy_result1_upvr_2
-    end
-    if arg2 then
-        return arg2
-    end
-    if typeof_result1 == "Instance" then
-        return "Destroy"
-    end
-    if typeof_result1 == "RBXScriptConnection" then
-        return "Disconnect"
-    end
-    if typeof_result1 == "table" then
-        if typeof(arg1.Destroy) == "function" then
-            return "Destroy"
-        end
-        if typeof(arg1.Disconnect) == "function" then
-            return "Disconnect"
-        end
-    end
-    error("Failed to get cleanup function for object "..typeof_result1..": "..tostring(arg1))
+local v1 = newproxy()
+local v2 = newproxy()
+local RunService = game:GetService("RunService")
+local function GetObjectCleanupFunction(p1, p2) --[[ Line: 10 | Upvalues: v1 (copy), v2 (copy) ]]
+	local v12 = typeof(p1)
+	if v12 == "function" then
+		return v1
+	elseif v12 == "thread" then
+		return v2
+	elseif p2 then
+		return p2
+	elseif v12 == "Instance" then
+		return "Destroy"
+	elseif v12 == "RBXScriptConnection" then
+		return "Disconnect"
+	else
+		if v12 == "table" then
+			if typeof(p1.Destroy) == "function" then
+				return "Destroy"
+			end
+			if typeof(p1.Disconnect) == "function" then
+				return "Disconnect"
+			end
+		end
+		error("Failed to get cleanup function for object " .. v12 .. ": " .. tostring(p1))
+	end
 end
-local module_upvr = {}
-module_upvr.__index = module_upvr
-function module_upvr.new() -- Line 46
-    local setmetatable_result1 = setmetatable({}, module_upvr)
-    setmetatable_result1._objects = {}
-    return setmetatable_result1
+local t = {}
+t.__index = t
+function t.new() --[[ Line: 46 | Upvalues: t (copy) ]]
+	local v2 = setmetatable({}, t)
+	v2._objects = {}
+	return v2
 end
-function module_upvr.Extend(arg1) -- Line 71
-    return arg1:Construct(module_upvr)
+function t.Extend(p1) --[[ Line: 71 | Upvalues: t (copy) ]]
+	return p1:Construct(t)
 end
-function module_upvr.Clone(arg1, arg2) -- Line 79
-    return arg1:Add(arg2:Clone())
+function t.Clone(p1, p2) --[[ Line: 79 ]]
+	return p1:Add(p2:Clone())
 end
-function module_upvr.Construct(arg1, arg2, ...) -- Line 116
-    local var6
-    local type_result1 = type(arg2)
-    if type_result1 == "table" then
-        var6 = arg2.new(...)
-    elseif type_result1 == "function" then
-        var6 = arg2(...)
-    end
-    return arg1:Add(var6)
+function t.Construct(p1, p2, ...) --[[ Line: 116 ]]
+	local v1 = nil
+	local v2 = type(p2)
+	if v2 == "table" then
+		v1 = p2.new(...)
+	elseif v2 == "function" then
+		v1 = p2(...)
+	end
+	return p1:Add(v1)
 end
-function module_upvr.Connect(arg1, arg2, arg3) -- Line 142
-    return arg1:Add(arg2:Connect(arg3))
+function t.Connect(p1, p2, p3) --[[ Line: 142 ]]
+	return p1:Add(p2:Connect(p3))
 end
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.BindToRenderStep(arg1, arg2, arg3, arg4) -- Line 159
-    RunService_upvr:BindToRenderStep(arg2, arg3, arg4)
-    arg1:Add(function() -- Line 161
-        RunService_upvr:UnbindFromRenderStep(arg2)
-    end)
+function t.BindToRenderStep(p1, p2, p3, p4) --[[ Line: 159 | Upvalues: RunService (copy) ]]
+	RunService:BindToRenderStep(p2, p3, p4)
+	p1:Add(function() --[[ Line: 161 | Upvalues: RunService (ref), p2 (copy) ]]
+		RunService:UnbindFromRenderStep(p2)
+	end)
 end
-function module_upvr.Add(arg1, arg2, arg3) -- Line 214
-    local tbl = {}
-    tbl[1] = arg2
-    tbl[2] = GetObjectCleanupFunction_upvr(arg2, arg3)
-    table.insert(arg1._objects, tbl)
-    return arg2
+function t.Add(p1, p2, p3) --[[ Line: 214 | Upvalues: GetObjectCleanupFunction (copy) ]]
+	local v1 = GetObjectCleanupFunction(p2, p3)
+	table.insert(p1._objects, { p2, v1 })
+	return p2
 end
-function module_upvr.Remove(arg1, arg2) -- Line 230
-    local _objects = arg1._objects
-    for i, v in ipairs(_objects) do
-        if v[1] == arg2 then
-            local len = #_objects
-            _objects[i] = _objects[len]
-            _objects[len] = nil
-            arg1:_cleanupObject(v[1], v[2])
-            return true
-        end
-    end
-    return false
+function t.Remove(p1, p2) --[[ Line: 230 ]]
+	local _objects = p1._objects
+	for i, v in ipairs(_objects) do
+		if v[1] == p2 then
+			local v1 = #_objects
+			_objects[i] = _objects[v1]
+			_objects[v1] = nil
+			p1:_cleanupObject(v[1], v[2])
+			return true
+		end
+	end
+	return false
 end
-function module_upvr.Clean(arg1) -- Line 249
-    for _, v_2 in ipairs(arg1._objects) do
-        arg1:_cleanupObject(v_2[1], v_2[2])
-    end
-    table.clear(arg1._objects)
+function t.Clean(p1) --[[ Line: 249 ]]
+	for i, v in ipairs(p1._objects) do
+		p1:_cleanupObject(v[1], v[2])
+	end
+	table.clear(p1._objects)
 end
-function module_upvr._cleanupObject(arg1, arg2, arg3) -- Line 256
-    if arg3 == newproxy_result1_upvr then
-        arg2()
-    else
-        if arg3 == newproxy_result1_upvr_2 then
-            coroutine.close(arg2)
-            return
-        end
-        arg2[arg3](arg2)
-    end
+function t._cleanupObject(p1, p2, p3) --[[ Line: 256 | Upvalues: v1 (copy), v2 (copy) ]]
+	if p3 == v1 then
+		p2()
+	elseif p3 == v2 then
+		coroutine.close(p2)
+	else
+		p2[p3](p2)
+	end
 end
-function module_upvr.AttachToInstance(arg1, arg2) -- Line 279
-    assert(arg2:IsDescendantOf(game), "Instance is not a descendant of the game hierarchy")
-    return arg1:Connect(arg2.AncestryChanged, function(arg1_2, arg2_2) -- Line 281
-        if not arg2_2 then
-            arg1:Destroy()
-        end
-    end)
+function t.AttachToInstance(p1, p2) --[[ Line: 279 ]]
+	assert(p2:IsDescendantOf(game), "Instance is not a descendant of the game hierarchy")
+	return p1:Connect(p2.AncestryChanged, function(p12, p2) --[[ Line: 281 | Upvalues: p1 (copy) ]]
+		if not p2 then
+			p1:Destroy()
+		end
+	end)
 end
-function module_upvr.Destroy(arg1) -- Line 291
-    arg1:Clean()
+function t.Destroy(p1) --[[ Line: 291 ]]
+	p1:Clean()
 end
-return module_upvr
+return t

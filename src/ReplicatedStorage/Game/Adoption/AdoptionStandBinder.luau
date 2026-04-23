@@ -1,1 +1,4 @@
-return require(game:GetService("ReplicatedStorage").Std.Binder).new(require(script.Parent.AdoptionStandConsts).TAG_NAME, require(script.Parent.AdoptionStand))
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Binder = require(ReplicatedStorage.Std.Binder)
+local AdoptionStandConsts = require(script.Parent.AdoptionStandConsts)
+return Binder.new(AdoptionStandConsts.TAG_NAME, require(script.Parent.AdoptionStand))

@@ -1,31 +1,12 @@
 {
   "className": "ParticleEmitter",
   "properties": {
-    "FlipbookBlendFrames": {
-      "Bool": false
-    },
-    "Size": {
-      "NumberSequence": {
-        "keypoints": [
-          {
-            "time": 0.0,
-            "value": 10.0,
-            "envelope": 0.0
-          },
-          {
-            "time": 1.0,
-            "value": 10.0,
-            "envelope": 0.0
-          }
-        ]
-      }
-    },
-    "Speed": {
-      "NumberRange": [
-        2.0,
-        2.0
-      ]
-    },
+    "Acceleration": [
+      0.0,
+      -3.0,
+      0.0
+    ],
+    "Rate": 8.0,
     "Transparency": {
       "NumberSequence": {
         "keypoints": [
@@ -52,7 +33,42 @@
         ]
       }
     },
+    "LightInfluence": 1.0,
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "LightEmission": 0.5,
     "Orientation": "FacingCameraWorldUp",
+    "Enabled": false,
+    "Lifetime": {
+      "NumberRange": [
+        3.0,
+        3.0
+      ]
+    },
+    "Rotation": {
+      "NumberRange": [
+        -90.0,
+        90.0
+      ]
+    },
+    "Texture": "http://www.roblox.com/asset/?id=7018929807",
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 10.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 10.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
     "Color": {
       "ColorSequence": {
         "keypoints": [
@@ -75,21 +91,6 @@
         ]
       }
     },
-    "LightInfluence": 1.0,
-    "Enabled": false,
-    "Acceleration": [
-      0.0,
-      -3.0,
-      0.0
-    ],
-    "Lifetime": {
-      "NumberRange": [
-        3.0,
-        3.0
-      ]
-    },
-    "Rate": 8.0,
-    "LightEmission": 0.5,
     "RotSpeed": {
       "NumberRange": [
         -40.0,
@@ -100,12 +101,11 @@
       -180.0,
       180.0
     ],
-    "Rotation": {
+    "Speed": {
       "NumberRange": [
-        -90.0,
-        90.0
+        2.0,
+        2.0
       ]
-    },
-    "Texture": "http://www.roblox.com/asset/?id=7018929807"
+    }
   }
 }

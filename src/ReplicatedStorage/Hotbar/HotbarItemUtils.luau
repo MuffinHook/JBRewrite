@@ -1,77 +1,57 @@
-local CollectionService_upvr = game:GetService("CollectionService")
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HotbarItemConsts_upvr = require(ReplicatedStorage.Hotbar.HotbarItemConsts)
-local InventoryItemConsts_upvr = require(ReplicatedStorage.Inventory.InventoryItemConsts)
+local HotbarItemConsts = require(ReplicatedStorage.Hotbar.HotbarItemConsts)
+local InventoryItemConsts = require(ReplicatedStorage.Inventory.InventoryItemConsts)
 return {
-    calculateNewIndex = function(arg1, arg2, arg3) -- Line 9, Named "calculateNewIndex"
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        do
-            return arg3
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end;
-    getOnHotbar = function(arg1) -- Line 27, Named "getOnHotbar"
-        assert(CollectionService_upvr:HasTag(arg1, InventoryItemConsts_upvr.TAG_NAME), "provided inventoryItemValue is not an InventoryItem")
-        return CollectionService_upvr:HasTag(arg1, HotbarItemConsts_upvr.TAG_NAME)
-    end;
-    setOnHotbar = function(arg1, arg2) -- Line 34, Named "setOnHotbar"
-        local any_HasTag_result1_2 = CollectionService_upvr:HasTag(arg1, InventoryItemConsts_upvr.TAG_NAME)
-        assert(any_HasTag_result1_2, "provided inventoryItemValue is not an InventoryItem")
-        if typeof(arg2) ~= "boolean" then
-            any_HasTag_result1_2 = false
-        else
-            any_HasTag_result1_2 = true
-        end
-        assert(any_HasTag_result1_2, "value must be a boolean")
-        if arg2 then
-            CollectionService_upvr:AddTag(arg1, HotbarItemConsts_upvr.TAG_NAME)
-        else
-            CollectionService_upvr:RemoveTag(arg1, HotbarItemConsts_upvr.TAG_NAME)
-        end
-    end;
-    getDisplayOrder = function(arg1) -- Line 46, Named "getDisplayOrder"
-        assert(CollectionService_upvr:HasTag(arg1, HotbarItemConsts_upvr.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
-        return arg1:GetAttribute(HotbarItemConsts_upvr.DISPLAY_ORDER_ATTR_NAME)
-    end;
-    setDisplayOrder = function(arg1, arg2) -- Line 53, Named "setDisplayOrder"
-        local any_HasTag_result1_3 = CollectionService_upvr:HasTag(arg1, HotbarItemConsts_upvr.TAG_NAME)
-        assert(any_HasTag_result1_3, "provided hotbarItemValue is not a HotbarItem")
-        if typeof(arg2) ~= "number" then
-            any_HasTag_result1_3 = false
-        else
-            any_HasTag_result1_3 = true
-        end
-        assert(any_HasTag_result1_3, "value must be a string")
-        arg1:SetAttribute(HotbarItemConsts_upvr.DISPLAY_ORDER_ATTR_NAME, arg2)
-    end;
-    getImageSrc = function(arg1) -- Line 62, Named "getImageSrc"
-        assert(CollectionService_upvr:HasTag(arg1, HotbarItemConsts_upvr.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
-        return arg1:GetAttribute(HotbarItemConsts_upvr.IMAGE_SRC_ATTR_NAME)
-    end;
-    setImageSrc = function(arg1, arg2) -- Line 69, Named "setImageSrc"
-        local any_HasTag_result1 = CollectionService_upvr:HasTag(arg1, HotbarItemConsts_upvr.TAG_NAME)
-        assert(any_HasTag_result1, "provided hotbarItemValue is not a HotbarItem")
-        if typeof(arg2) ~= "string" then
-            any_HasTag_result1 = false
-        else
-            any_HasTag_result1 = true
-        end
-        assert(any_HasTag_result1, "value must be a string")
-        arg1:SetAttribute(HotbarItemConsts_upvr.IMAGE_SRC_ATTR_NAME, arg2)
-    end;
-    setBind = function(arg1, arg2) -- Line 78, Named "setBind"
-        local any_HasTag_result1_4 = CollectionService_upvr:HasTag(arg1, HotbarItemConsts_upvr.TAG_NAME)
-        assert(any_HasTag_result1_4, "provided hotbarItemValue is not a HotbarItem")
-        if typeof(arg2) ~= "string" then
-            any_HasTag_result1_4 = false
-        else
-            any_HasTag_result1_4 = true
-        end
-        assert(any_HasTag_result1_4, "value must be a string")
-        arg1:SetAttribute(HotbarItemConsts_upvr.IMAGE_SRC_ATTR_NAME, arg2)
-    end;
+	calculateNewIndex = function(p1, p2, p3) --[[ Name: calculateNewIndex | Line: 9 ]]
+		if p1 == p2 then
+			return p3
+		elseif p2 < p3 then
+			if p2 < p1 and p1 <= p3 then
+				return p1 - 1
+			else
+				return p1
+			end
+		elseif p3 < p2 and (p1 < p2 and p3 <= p1) then
+			return p1 + 1
+		else
+			return p1
+		end
+	end,
+	getOnHotbar = function(p1) --[[ Name: getOnHotbar | Line: 27 | Upvalues: CollectionService (copy), InventoryItemConsts (copy), HotbarItemConsts (copy) ]]
+		assert(CollectionService:HasTag(p1, InventoryItemConsts.TAG_NAME), "provided inventoryItemValue is not an InventoryItem")
+		return CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME)
+	end,
+	setOnHotbar = function(p1, p2) --[[ Name: setOnHotbar | Line: 34 | Upvalues: CollectionService (copy), InventoryItemConsts (copy), HotbarItemConsts (copy) ]]
+		assert(CollectionService:HasTag(p1, InventoryItemConsts.TAG_NAME), "provided inventoryItemValue is not an InventoryItem")
+		assert(typeof(p2) == "boolean", "value must be a boolean")
+		if p2 then
+			CollectionService:AddTag(p1, HotbarItemConsts.TAG_NAME)
+		else
+			CollectionService:RemoveTag(p1, HotbarItemConsts.TAG_NAME)
+		end
+	end,
+	getDisplayOrder = function(p1) --[[ Name: getDisplayOrder | Line: 46 | Upvalues: CollectionService (copy), HotbarItemConsts (copy) ]]
+		assert(CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
+		return p1:GetAttribute(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME)
+	end,
+	setDisplayOrder = function(p1, p2) --[[ Name: setDisplayOrder | Line: 53 | Upvalues: CollectionService (copy), HotbarItemConsts (copy) ]]
+		assert(CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
+		assert(typeof(p2) == "number", "value must be a string")
+		p1:SetAttribute(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME, p2)
+	end,
+	getImageSrc = function(p1) --[[ Name: getImageSrc | Line: 62 | Upvalues: CollectionService (copy), HotbarItemConsts (copy) ]]
+		assert(CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
+		return p1:GetAttribute(HotbarItemConsts.IMAGE_SRC_ATTR_NAME)
+	end,
+	setImageSrc = function(p1, p2) --[[ Name: setImageSrc | Line: 69 | Upvalues: CollectionService (copy), HotbarItemConsts (copy) ]]
+		assert(CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
+		assert(typeof(p2) == "string", "value must be a string")
+		p1:SetAttribute(HotbarItemConsts.IMAGE_SRC_ATTR_NAME, p2)
+	end,
+	setBind = function(p1, p2) --[[ Name: setBind | Line: 78 | Upvalues: CollectionService (copy), HotbarItemConsts (copy) ]]
+		assert(CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
+		assert(typeof(p2) == "string", "value must be a string")
+		p1:SetAttribute(HotbarItemConsts.IMAGE_SRC_ATTR_NAME, p2)
+	end
 }

@@ -1,163 +1,154 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local module = {}
-local ManifestBinder_upvr = require(ReplicatedStorage_upvr.ManifestBinder)
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local HyperChromeConsts_upvr = require(ReplicatedStorage_upvr.HyperChrome.HyperChromeConsts)
-local RunService_upvr = game:GetService("RunService")
-local HyperChromeUtils_upvr = require(ReplicatedStorage_upvr.HyperChrome.HyperChromeUtils)
-local Binder_upvr = require(ReplicatedStorage_upvr.Std.Binder)
-local CurrentCamera_upvr = workspace.CurrentCamera
-function module.init() -- Line 16
-    ManifestBinder_upvr.new("Vehicle", {
-        body = "Model/Body";
-    }, function(arg1, arg2) -- Line 19
-        local any_new_result1_upvr_2 = Maid_upvr.new()
-        local function _() -- Line 21, Named "clearMaxLevelAura"
-            any_new_result1_upvr_2.maxLevelAuraAttachment = nil
-        end
-        local function _() -- Line 24, Named "clearNumberParticleEmitter"
-            any_new_result1_upvr_2.numberParticleEmitter = nil
-        end
-        local function _() -- Line 27, Named "clearHyperShiftAuraParticle"
-            any_new_result1_upvr_2.hyperShiftAuraParticle = nil
-            any_new_result1_upvr_2.hyperShiftParticleRainbowHeartbeat = nil
-        end
-        any_new_result1_upvr_2:GiveTask(arg1:GetAttributeChangedSignal(HyperChromeConsts_upvr.HYPERCHROME_NAME_ATTRIBUTE_NAME):Connect(function() -- Line 37
-            any_new_result1_upvr_2.maxLevelAuraAttachment = nil
-            any_new_result1_upvr_2.numberParticleEmitter = nil
-            any_new_result1_upvr_2.hyperShiftAuraParticle = nil
-            any_new_result1_upvr_2.hyperShiftParticleRainbowHeartbeat = nil
-            local attribute_2 = arg1:GetAttribute(HyperChromeConsts_upvr.HYPERCHROME_NAME_ATTRIBUTE_NAME)
-            if not attribute_2 then
-            else
-                if attribute_2 == HyperChromeConsts_upvr.COLOR_SHIFT_NAME then
-                    local Attachment_2 = Instance.new("Attachment")
-                    Attachment_2.Parent = arg2.body
-                    local clone_upvr = ReplicatedStorage_upvr.Resource:FindFirstChild(HyperChromeConsts_upvr.HYPERSHIFT_PARTICLE_RESOURCE_NAME):Clone()
-                    clone_upvr.Parent = Attachment_2
-                    any_new_result1_upvr_2.hyperShiftAuraParticle = Attachment_2
-                    any_new_result1_upvr_2.hyperShiftParticleRainbowHeartbeat = RunService_upvr.Heartbeat:Connect(function() -- Line 54
-                        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                        clone_upvr.Color = ColorSequence.new(Color3.fromHSV(os.clock() % HyperChromeConsts_upvr.RAINBOW_ANIMATION_CYCLE_TIME / HyperChromeConsts_upvr.RAINBOW_ANIMATION_CYCLE_TIME, 1, 0.65))
-                        local children, NONE_2, NONE = arg1.Model:GetChildren()
-                        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                        -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [66.7]
-                        if nil == "Trail" then
-                            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                            if nil then
-                                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                            end
-                        else
-                            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                            if nil == "UFO" and (nil == "Lights" or nil == "Beam" or nil == "Windows") then
-                            end
-                        end
-                        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    end)
-                    return
-                end
-                clone_upvr = attribute_2
-                local any_getLevelFromName_result1 = HyperChromeUtils_upvr.getLevelFromName(clone_upvr)
-                clone_upvr = HyperChromeConsts_upvr.COLOR_TO_INFO_MAP[HyperChromeUtils_upvr.getColorFromName(attribute_2)]
-                clone_upvr = clone_upvr.LevelToColor
-                local var23 = clone_upvr[any_getLevelFromName_result1]
-                if any_getLevelFromName_result1 ~= HyperChromeConsts_upvr.MAX_LEVEL then
-                    local SOME_3 = ReplicatedStorage_upvr.Resource:FindFirstChild(HyperChromeConsts_upvr.HYPERCHROME_NUMBER_PARTICLE_RESOURCE_NAME)
-                    assert(SOME_3, "No number hyperchrome emitter resource")
-                    local clone = SOME_3:Clone()
-                    clone.Texture = HyperChromeConsts_upvr.LEVEL_TO_INFO_MAP[any_getLevelFromName_result1].NumberImageId
-                    clone.Color = ColorSequence.new(var23)
-                    clone.Parent = arg2.body
-                    any_new_result1_upvr_2.numberParticleEmitter = clone
-                    return
-                end
-                local SOME_2 = ReplicatedStorage_upvr.Resource:FindFirstChild(HyperChromeConsts_upvr.MAX_LEVEL_HYPERCHROME_PARTICLE_RESOURCE_NAME)
-                assert(SOME_2, "No max level hyperchrome emitter resource")
-                local clone_2 = SOME_2:Clone()
-                local Attachment = Instance.new("Attachment")
-                clone_2.Color = ColorSequence.new(var23)
-                clone_2.Parent = Attachment
-                Attachment.Parent = arg2.body
-                any_new_result1_upvr_2.maxLevelAuraAttachment = Attachment
-            end
-        end))
-        any_new_result1_upvr_2:GiveTask(arg1.Destroying:Connect(function() -- Line 109
-            task.defer(any_new_result1_upvr_2.Destroy, any_new_result1_upvr_2)
-        end))
-        return any_new_result1_upvr_2
-    end):Start()
-    Binder_upvr.new("VehicleColorPart", function(arg1) -- Line 115
-        local any_new_result1_upvr = Maid_upvr.new()
-        local function updateHyperChrome() -- Line 117
-            local attribute = arg1:GetAttribute(HyperChromeConsts_upvr.HYPERCHROME_NAME_ATTRIBUTE_NAME)
-            if attribute ~= nil then
-                arg1.Color = Color3.new(0, 0, 0)
-                local var41 = HyperChromeConsts_upvr.COLOR_TO_INFO_MAP[HyperChromeUtils_upvr.getColorFromName(attribute)]
-                local Enum_NormalId_GetEnumItems_result1_upvr, Enum_NormalId_GetEnumItems_result2, Enum_NormalId_GetEnumItems_result3_2 = Enum.NormalId:GetEnumItems()
-                for _, v in Enum_NormalId_GetEnumItems_result1_upvr, Enum_NormalId_GetEnumItems_result2, Enum_NormalId_GetEnumItems_result3_2 do
-                    if v ~= Enum.NormalId.Bottom then
-                        local var45 = "HyperChrome"..v.Name
-                        if not arg1:FindFirstChild(var45) then
-                            local Texture = Instance.new("Texture")
-                            Texture.Name = var45
-                            Texture.StudsPerTileU = 55
-                            Texture.StudsPerTileV = 105
-                            Texture.Face = v
-                            Texture.Texture = "rbxassetid://11372133369"
-                            Texture.Parent = arg1
-                        end
-                        if var41 then
-                            Texture.Color3 = var41.LevelToColor[HyperChromeUtils_upvr.getLevelFromName(attribute)]
-                        end
-                        ;({})[v] = Texture
-                    end
-                end
-                if attribute ~= HyperChromeConsts_upvr.COLOR_SHIFT_NAME then
-                    Enum_NormalId_GetEnumItems_result1_upvr = false
-                else
-                    Enum_NormalId_GetEnumItems_result1_upvr = true
-                end
-                local tbl_upvr = {}
-                any_new_result1_upvr.angleShifter = RunService_upvr.Heartbeat:Connect(function() -- Line 150
-                    local CFrame = CurrentCamera_upvr.CFrame
-                    local LookVector = CFrame.LookVector
-                    local Position = arg1.Position
-                    if 256 < (CFrame.Position - Position).Magnitude then
-                    else
-                        local any_Angle_result1 = LookVector:Angle((Position - CFrame.Position).Unit)
-                        if math.rad(CurrentCamera_upvr.FieldOfView) * 0.95 < any_Angle_result1 then return end
-                        local var55 = LookVector:Angle(Vector3.new(1, 1, 1)) + any_Angle_result1
-                        local var56 = Position.X % 8096 / 8096 + Position.Y % 8096 / 8096 + Position.Z % 8096 / 8096
-                        for i_2, v_2 in tbl_upvr do
-                            v_2.OffsetStudsU = (var55 + var56 * 55) * 10
-                            v_2.OffsetStudsV = (var55 + var56 * 105) * 10
-                            if Enum_NormalId_GetEnumItems_result1_upvr then
-                                v_2.Color3 = Color3.fromHSV(os.clock() % HyperChromeConsts_upvr.RAINBOW_ANIMATION_CYCLE_TIME / HyperChromeConsts_upvr.RAINBOW_ANIMATION_CYCLE_TIME, 0.94, 1.35)
-                            end
-                        end
-                        if arg1.Color.R ~= 0 or arg1.Color.G ~= 0 or arg1.Color.B ~= 0 then
-                            i_2 = 0
-                            v_2 = 0
-                            arg1.Color = Color3.new(0, i_2, v_2)
-                        end
-                    end
-                end)
-            else
-                any_new_result1_upvr.angleShifter = nil
-                for _, v_3 in Enum.NormalId:GetEnumItems() do
-                    local SOME = arg1:FindFirstChild("HyperChrome"..v_3.Name)
-                    if SOME then
-                        SOME:Destroy()
-                    end
-                end
-            end
-        end
-        updateHyperChrome()
-        any_new_result1_upvr:GiveTask(arg1:GetAttributeChangedSignal(HyperChromeConsts_upvr.HYPERCHROME_NAME_ATTRIBUTE_NAME):Connect(updateHyperChrome))
-        return any_new_result1_upvr
-    end):Start()
-end
-return module
+local CurrentCamera = workspace.CurrentCamera
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConsts)
+local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local RunService = game:GetService("RunService")
+local Binder = require(ReplicatedStorage.Std.Binder)
+local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
+return {
+	init = function() --[[ Name: init | Line: 16 | Upvalues: ManifestBinder (copy), Maid (copy), HyperChromeConsts (copy), ReplicatedStorage (copy), RunService (copy), HyperChromeUtils (copy), Binder (copy), CurrentCamera (copy) ]]
+		local v1 = ManifestBinder.new("Vehicle", {
+			body = "Model/Body"
+		}, function(p1, p2) --[[ Line: 19 | Upvalues: Maid (ref), HyperChromeConsts (ref), ReplicatedStorage (ref), RunService (ref), HyperChromeUtils (ref) ]]
+			local v1 = Maid.new()
+			local function clearMaxLevelAura() --[[ Line: 21 | Upvalues: v1 (copy) ]]
+				v1.maxLevelAuraAttachment = nil
+			end
+			local function clearNumberParticleEmitter() --[[ Line: 24 | Upvalues: v1 (copy) ]]
+				v1.numberParticleEmitter = nil
+			end
+			local function clearHyperShiftAuraParticle() --[[ Line: 27 | Upvalues: v1 (copy) ]]
+				v1.hyperShiftAuraParticle = nil
+				v1.hyperShiftParticleRainbowHeartbeat = nil
+			end
+			v1:GiveTask(p1:GetAttributeChangedSignal(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME):Connect(function() --[[ Line: 37 | Upvalues: v1 (copy), p1 (copy), HyperChromeConsts (ref), p2 (copy), ReplicatedStorage (ref), RunService (ref), HyperChromeUtils (ref) ]]
+				v1.maxLevelAuraAttachment = nil
+				v1.numberParticleEmitter = nil
+				v1.hyperShiftAuraParticle = nil
+				v1.hyperShiftParticleRainbowHeartbeat = nil
+				local v12 = p1:GetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME)
+				if v12 then
+					if v12 == HyperChromeConsts.COLOR_SHIFT_NAME then
+						local Attachment = Instance.new("Attachment")
+						Attachment.Parent = p2.body
+						local v2 = ReplicatedStorage.Resource:FindFirstChild(HyperChromeConsts.HYPERSHIFT_PARTICLE_RESOURCE_NAME):Clone()
+						v2.Parent = Attachment
+						v1.hyperShiftAuraParticle = Attachment
+						v1.hyperShiftParticleRainbowHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 54 | Upvalues: HyperChromeConsts (ref), v2 (copy), p1 (ref) ]]
+							local v22 = ColorSequence.new(Color3.fromHSV(os.clock() % HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME / HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME, 1, 0.65))
+							v2.Color = v22
+							for v3, v4 in p1.Model:GetChildren() do
+								if v4.Name == "Trail" then
+									local Trail = v4:FindFirstChildOfClass("Trail")
+									if Trail then
+										Trail.Color = v22
+									end
+								elseif p1.Name == "UFO" and (v4.Name == "Lights" or (v4.Name == "Beam" or v4.Name == "Windows")) then
+									v4.Color = v22.Keypoints[1].Value
+								end
+							end
+						end)
+						return
+					end
+					local v3 = HyperChromeUtils.getLevelFromName(v12)
+					local v4 = HyperChromeConsts.COLOR_TO_INFO_MAP[HyperChromeUtils.getColorFromName(v12)].LevelToColor[v3]
+					if v3 == HyperChromeConsts.MAX_LEVEL then
+						local v5 = ReplicatedStorage.Resource:FindFirstChild(HyperChromeConsts.MAX_LEVEL_HYPERCHROME_PARTICLE_RESOURCE_NAME)
+						assert(v5, "No max level hyperchrome emitter resource")
+						local v6 = v5:Clone()
+						local Attachment = Instance.new("Attachment")
+						v6.Color = ColorSequence.new(v4)
+						v6.Parent = Attachment
+						Attachment.Parent = p2.body
+						v1.maxLevelAuraAttachment = Attachment
+					else
+						local v7 = ReplicatedStorage.Resource:FindFirstChild(HyperChromeConsts.HYPERCHROME_NUMBER_PARTICLE_RESOURCE_NAME)
+						assert(v7, "No number hyperchrome emitter resource")
+						local v8 = v7:Clone()
+						v8.Texture = HyperChromeConsts.LEVEL_TO_INFO_MAP[v3].NumberImageId
+						v8.Color = ColorSequence.new(v4)
+						v8.Parent = p2.body
+						v1.numberParticleEmitter = v8
+					end
+				end
+			end))
+			v1:GiveTask(p1.Destroying:Connect(function() --[[ Line: 109 | Upvalues: v1 (copy) ]]
+				task.defer(v1.Destroy, v1)
+			end))
+			return v1
+		end)
+		local v2 = Binder.new("VehicleColorPart", function(p1) --[[ Line: 115 | Upvalues: Maid (ref), HyperChromeConsts (ref), HyperChromeUtils (ref), RunService (ref), CurrentCamera (ref) ]]
+			local v1 = Maid.new()
+			local function updateHyperChrome() --[[ Line: 117 | Upvalues: p1 (copy), HyperChromeConsts (ref), HyperChromeUtils (ref), v1 (copy), RunService (ref), CurrentCamera (ref) ]]
+				local v12 = p1:GetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME)
+				if v12 == nil then
+					v1.angleShifter = nil
+					for v2, v3 in Enum.NormalId:GetEnumItems() do
+						local v4 = p1:FindFirstChild("HyperChrome" .. v3.Name)
+						if v4 then
+							v4:Destroy()
+						end
+					end
+				else
+					p1.Color = Color3.new(0/255, 0/255, 0/255)
+					local v5 = HyperChromeUtils.getColorFromName(v12)
+					local v6 = HyperChromeUtils.getLevelFromName(v12)
+					local v7 = HyperChromeConsts.COLOR_TO_INFO_MAP[v5]
+					local t = {}
+					for v8, v9 in Enum.NormalId:GetEnumItems() do
+						if v9 ~= Enum.NormalId.Bottom then
+							local v10 = "HyperChrome" .. v9.Name
+							local v11 = p1:FindFirstChild(v10)
+							if not v11 then
+								local Texture = Instance.new("Texture")
+								Texture.Name = v10
+								Texture.StudsPerTileU = 55
+								Texture.StudsPerTileV = 105
+								Texture.Face = v9
+								Texture.Texture = "rbxassetid://11372133369"
+								Texture.Parent = p1
+								v11 = Texture
+							end
+							if v7 then
+								v11.Color3 = v7.LevelToColor[v6]
+							end
+							t[v9] = v11
+						end
+					end
+					local isCOLOR_SHIFT_NAME = v12 == HyperChromeConsts.COLOR_SHIFT_NAME
+					v1.angleShifter = RunService.Heartbeat:Connect(function() --[[ Line: 150 | Upvalues: CurrentCamera (ref), p1 (ref), t (copy), isCOLOR_SHIFT_NAME (copy), HyperChromeConsts (ref) ]]
+						local v1 = CurrentCamera.CFrame
+						local LookVector = v1.LookVector
+						local Position = p1.Position
+						if not ((v1.Position - Position).Magnitude > 256) then
+							local v2 = math.rad(CurrentCamera.FieldOfView) * 0.95
+							local v3 = LookVector:Angle((Position - v1.Position).Unit)
+							if not (v2 < v3) then
+								local v4 = LookVector:Angle(Vector3.new(1, 1, 1)) + v3
+								local v5 = Position.X % 8096 / 8096 + Position.Y % 8096 / 8096 + Position.Z % 8096 / 8096
+								local v6 = (v4 + v5 * 55) * 10
+								local v7 = (v4 + v5 * 105) * 10
+								for v8, v9 in t do
+									v9.OffsetStudsU = v6
+									v9.OffsetStudsV = v7
+									if isCOLOR_SHIFT_NAME then
+										v9.Color3 = Color3.fromHSV(os.clock() % HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME / HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME, 0.94, 1.35)
+									end
+								end
+								if p1.Color.R ~= 0 or (p1.Color.G ~= 0 or p1.Color.B ~= 0) then
+									p1.Color = Color3.new(0/255, 0/255, 0/255)
+								end
+							end
+						end
+					end)
+				end
+			end
+			updateHyperChrome()
+			v1:GiveTask(p1:GetAttributeChangedSignal(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME):Connect(updateHyperChrome))
+			return v1
+		end)
+		v1:Start()
+		v2:Start()
+	end
+}

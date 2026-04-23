@@ -1,191 +1,220 @@
-local new_upvr = Vector3.new
-local _ = Vector3.new(0, 0, 0)
-local sin_upvr = math.sin
-local cos_upvr = math.cos
-local random_upvr = math.random
-local insert_upvr = table.insert
-local function _(arg1) -- Line 15, Named "RandomVector"
-    local random_upvr_result1_5 = random_upvr()
-    local random_upvr_result1_2 = random_upvr()
-    if random_upvr_result1_2 < random_upvr_result1_5 then
-        random_upvr_result1_2 = random_upvr_result1_5
-        random_upvr_result1_5 = random_upvr_result1_2
-    end
-    return new_upvr(random_upvr_result1_2 * arg1 * cos_upvr((-math.pi*2) * random_upvr_result1_5 / random_upvr_result1_2), random_upvr_result1_2 * arg1 * sin_upvr((-math.pi*2) * random_upvr_result1_5 / random_upvr_result1_2), 0)
+local RunService = game:GetService("RunService")
+local v1 = CFrame.new
+local Angles = CFrame.Angles
+local v2 = Vector3.new
+v1(0, 0, 0)
+local v3 = Vector3.new(0, 0, 0)
+local Dot = v3.Dot
+local Cross = v3.Cross
+local sin = math.sin
+local cos = math.cos
+local atan = math.atan
+local atan2 = math.atan2
+local tanh = math.tanh
+local floor = math.floor
+local abs = math.abs
+local log = math.log
+local max = math.max
+local random = math.random
+local deg = math.deg
+local insert = table.insert
+local remove = table.remove
+local function RandomVector(p1) --[[ Line: 15 | Upvalues: random (copy), cos (copy), sin (copy), v2 (copy) ]]
+	local v1 = random()
+	local v22 = random()
+	local v3
+	if v22 < v1 then
+		v22, v3 = v1, v22
+	else
+		v3 = v1
+	end
+	return v2(v22 * p1 * cos(6.283185307179586 * v3 / v22), v22 * p1 * sin(6.283185307179586 * v3 / v22), 0)
 end
-local function _() -- Line 34, Named "MakeParticle"
-    return {
-        Frame = nil;
-        p = Vector3.new(0, 0, 0);
-        v = Vector3.new(0, 0, 0);
-        a = Vector3.new(0, 0, 0);
-        t = tick();
-        ttl = 4;
-        Fake = false;
-    }
+local function MakeState() --[[ Line: 27 ]]
+	return {
+		Frame = nil,
+		Simulate = {},
+		Fireworks = {}
+	}
 end
-local function Single_upvw(arg1, arg2, arg3, arg4) -- Line 45, Named "Single"
-    local Frame_2 = Instance.new("Frame")
-    Frame_2.Size = UDim2.new(0, 2, 0, 2)
-    Frame_2.BackgroundColor3 = Color3.new(1, 1, 1)
-    Frame_2.BorderSizePixel = 0
-    Frame_2.ZIndex = 8
-    Frame_2.Parent = arg1.Frame
-    local module = {
-        Frame = nil;
-        p = Vector3.new(0, 0, 0);
-        v = Vector3.new(0, 0, 0);
-        a = Vector3.new(0, 0, 0);
-        t = tick();
-        ttl = 4;
-        Fake = false;
-        Frame = Frame_2;
-    }
-    module.p = arg2
-    module.v = arg3
-    module.a = arg4
-    insert_upvr(arg1.Simulate, module)
-    return module
+local function MakeParticle() --[[ Line: 34 ]]
+	return {
+		Frame = nil,
+		p = Vector3.new(0, 0, 0),
+		v = Vector3.new(0, 0, 0),
+		a = Vector3.new(0, 0, 0),
+		t = tick(),
+		ttl = 4,
+		Fake = false
+	}
 end
-local atan2_upvr = math.atan2
-local deg_upvr = math.deg
-local remove_upvr = table.remove
-local tanh_upvr = math.tanh
-local function Update_upvw(arg1, arg2) -- Line 78, Named "Update"
-    local tick_result1 = tick()
-    local Simulate = arg1.Simulate
-    for i_3 = #Simulate, 1, -1 do
-        local var39 = Simulate[i_3]
-        local p = var39.p
-        local var41 = var39.v + var39.a * arg2
-        local var42 = p + var41 * arg2
-        local x = var42.x
-        local y = var42.y
-        local var45 = x - p.x
-        local var46 = y - p.y
-        local var47 = (var45 * var45 + var46 * var46) ^ 0.5
-        var39.p = var42
-        var39.v = var41
-        local Frame = var39.Frame
-        if not var39.Fake then
-            if var47 < 2 then
-                Frame.Position = UDim2.new(0, x - 1, 0, y - 1)
-                Frame.Size = UDim2.new(0, 2, 0, 2)
-            else
-                Frame.Position = UDim2.new(0, x + (var45 - var47) * 0.5, 0, y + (var46 - var47) * 0.5)
-                Frame.Size = UDim2.new(0, var47, 0, 3)
-                Frame.Rotation = deg_upvr(atan2_upvr(var46, var45))
-            end
-        end
-        local var49 = tick_result1 - var39.t
-        local ttl = var39.ttl
-        if ttl <= var49 then
-            remove_upvr(Simulate, i_3)
-            var39.Frame:Destroy()
-        elseif ttl * 0.5 <= var49 then
-            var39.Frame.Transparency = tanh_upvr((var49 - ttl * 0.5) / (ttl * 0.5)) * 1.313
-        end
-    end
-    local Fireworks = arg1.Fireworks
-    for i_4 = #Fireworks, 1, -1 do
-        local var52 = Fireworks[i_4]
-        if var52.ttl <= tick_result1 - var52.t then
-            remove_upvr(Fireworks, i_4)
-            var52.Frame:Destroy()
-            if var52.OnDestroy then
-                var52:OnDestroy()
-            end
-            for _ = 1, 30 do
-                local var53 = 200 + random_upvr() * 100
-                local var5_result1 = random_upvr()
-                local random_upvr_result1_4 = random_upvr()
-                if random_upvr_result1_4 < var5_result1 then
-                    random_upvr_result1_4 = var5_result1
-                    var5_result1 = random_upvr_result1_4
-                end
-                local Single_upvw_result1_4 = Single_upvw(arg1, var52.p, new_upvr(random_upvr_result1_4 * var53 * cos_upvr((-math.pi*2) * var5_result1 / random_upvr_result1_4), random_upvr_result1_4 * var53 * sin_upvr((-math.pi*2) * var5_result1 / random_upvr_result1_4), 0), Vector3.new(0, 0, 0))
-                Single_upvw_result1_4.ttl = 1
-                Single_upvw_result1_4.Frame.BackgroundColor3 = Color3.fromHSV(random_upvr(), 0.9, 0.9)
-            end
-            for i_6 = 1, 10 do
-                var5_result1 = random_upvr()
-                local var57 = var5_result1
-                local var5_result1_2 = random_upvr()
-                if var5_result1_2 < var57 then
-                    var5_result1_2 = var57
-                    var57 = var5_result1_2
-                end
-                local Single_upvw_result1 = Single_upvw(arg1, var52.p, new_upvr(var5_result1_2 * 100 * cos_upvr((-math.pi*2) * var57 / var5_result1_2), var5_result1_2 * 100 * sin_upvr((-math.pi*2) * var57 / var5_result1_2), 0), Vector3.new(0, 0, 0))
-                Single_upvw_result1.ttl = 1.5
-                Single_upvw_result1.Frame.BackgroundColor3 = Color3.fromHSV(random_upvr(), 0.9, 0.9)
-            end
-        end
-        i_6 = random_upvr()
-        local var5_result1_3 = random_upvr()
-        if var5_result1_3 < i_6 then
-            var5_result1_3 = i_6
-            i_6 = var5_result1_3
-        end
-        Single_upvw(arg1, var52.p, new_upvr(var5_result1_3 * 60 * cos_upvr((-math.pi*2) * i_6 / var5_result1_3), var5_result1_3 * 60 * sin_upvr((-math.pi*2) * i_6 / var5_result1_3), 0), Vector3.new(0, 400, 0)).ttl = 0.8
-    end
+local function Single(p1, p2, p3, p4) --[[ Line: 45 | Upvalues: insert (copy) ]]
+	local Frame = Instance.new("Frame")
+	Frame.Size = UDim2.new(0, 2, 0, 2)
+	Frame.BackgroundColor3 = Color3.new(255/255, 255/255, 255/255)
+	Frame.BorderSizePixel = 0
+	Frame.ZIndex = 8
+	Frame.Parent = p1.Frame
+	local t = {
+		Frame = nil,
+		p = Vector3.new(0, 0, 0),
+		v = Vector3.new(0, 0, 0),
+		a = Vector3.new(0, 0, 0),
+		t = tick(),
+		ttl = 4,
+		Fake = false,
+		Frame = Frame,
+		p = p2,
+		v = p3,
+		a = p4
+	}
+	insert(p1.Simulate, t)
+	return t
 end
-local function Clear_upvw(arg1) -- Line 144, Named "Clear"
-    for _, v in next, arg1.Simulate do
-        v.Frame:Destroy()
-    end
-    arg1.Simulate = {}
+local function Firework(p1, p2, p3, p4) --[[ Line: 58 | Upvalues: Single (ref), insert (copy) ]]
+	local v1 = Single(p1, p2, p3, p4)
+	v1.Frame.Visible = false
+	insert(p1.Fireworks, v1)
+	return v1
 end
-local RunService_upvr = game:GetService("RunService")
+local function Explosion(p1, p2) --[[ Line: 64 | Upvalues: random (copy), Single (ref), cos (copy), sin (copy), v2 (copy) ]]
+	local v1 = Color3.fromHSV(random(), 0.9, 0.9)
+	for i = 1, 30 do
+		local v22
+		local v4 = 200 + random() * 100
+		local v5 = random()
+		local v6 = random()
+		if v6 < v5 then
+			v6, v22 = v5, v6
+		else
+			v22 = v5
+		end
+		local v7 = Single(p1, p2, v2(v6 * v4 * cos(6.283185307179586 * v22 / v6), v6 * v4 * sin(6.283185307179586 * v22 / v6), 0), Vector3.new(0, 0, 0))
+		v7.ttl = 1
+		v7.Frame.BackgroundColor3 = v1
+	end
+	local v8 = Color3.fromHSV(random(), 0.9, 0.9)
+	for j = 1, 10 do
+		local v9
+		local v11 = random()
+		local v12 = random()
+		if v12 < v11 then
+			v12, v9 = v11, v12
+		else
+			v9 = v11
+		end
+		local v13 = Single(p1, p2, v2(v12 * 100 * cos(6.283185307179586 * v9 / v12), v12 * 100 * sin(6.283185307179586 * v9 / v12), 0), Vector3.new(0, 0, 0))
+		v13.ttl = 1.5
+		v13.Frame.BackgroundColor3 = v8
+	end
+end
+local function Update(p1, p2) --[[ Line: 78 | Upvalues: atan2 (copy), deg (copy), remove (copy), tanh (copy), random (copy), Single (ref), cos (copy), sin (copy), v2 (copy) ]]
+	local v1 = tick()
+	local Simulate = p1.Simulate
+	for i = #Simulate, 1, -1 do
+		local v22 = Simulate[i]
+		local p = v22.p
+		local v3 = v22.v + v22.a * p2
+		local v4 = p + v3 * p2
+		local x_2 = v4.x
+		local y_2 = v4.y
+		local v5 = x_2 - p.x
+		local v6 = y_2 - p.y
+		local v7 = (v5 * v5 + v6 * v6) ^ 0.5
+		v22.p = v4
+		v22.v = v3
+		local Frame = v22.Frame
+		if not v22.Fake then
+			if v7 < 2 then
+				Frame.Position = UDim2.new(0, x_2 - 1, 0, y_2 - 1)
+				Frame.Size = UDim2.new(0, 2, 0, 2)
+			else
+				Frame.Position = UDim2.new(0, x_2 + (v5 - v7) * 0.5, 0, y_2 + (v6 - v7) * 0.5)
+				Frame.Size = UDim2.new(0, v7, 0, 3)
+				Frame.Rotation = deg((atan2(v6, v5)))
+			end
+		end
+		local v8 = v1 - v22.t
+		local ttl = v22.ttl
+		if ttl <= v8 then
+			remove(Simulate, i)
+			v22.Frame:Destroy()
+		elseif ttl * 0.5 <= v8 then
+			v22.Frame.Transparency = tanh((v8 - ttl * 0.5) / (ttl * 0.5)) * 1.313
+		end
+	end
+	local Fireworks = p1.Fireworks
+	for j = #Fireworks, 1, -1 do
+		local v10
+		local v11 = Fireworks[j]
+		if v1 - v11.t >= v11.ttl then
+			remove(Fireworks, j)
+			v11.Frame:Destroy()
+			if v11.OnDestroy then
+				v11:OnDestroy()
+			end
+			local v12 = Color3.fromHSV(random(), 0.9, 0.9)
+			for k = 1, 30 do
+				local v13
+				local v15 = 200 + random() * 100
+				local v16 = random()
+				local v17 = random()
+				if v17 < v16 then
+					v17, v13 = v16, v17
+				else
+					v13 = v16
+				end
+				local v18 = Single(p1, v11.p, v2(v17 * v15 * cos(6.283185307179586 * v13 / v17), v17 * v15 * sin(6.283185307179586 * v13 / v17), 0), Vector3.new(0, 0, 0))
+				v18.ttl = 1
+				v18.Frame.BackgroundColor3 = v12
+			end
+			local v19 = Color3.fromHSV(random(), 0.9, 0.9)
+			for n = 1, 10 do
+				local v20
+				local v22 = random()
+				local v23 = random()
+				if v23 < v22 then
+					v23, v20 = v22, v23
+				else
+					v20 = v22
+				end
+				local v24 = Single(p1, v11.p, v2(v23 * 100 * cos(6.283185307179586 * v20 / v23), v23 * 100 * sin(6.283185307179586 * v20 / v23), 0), Vector3.new(0, 0, 0))
+				v24.ttl = 1.5
+				v24.Frame.BackgroundColor3 = v19
+			end
+		end
+		local v26 = random()
+		local v27 = random()
+		if v27 < v26 then
+			v27, v10 = v26, v27
+		else
+			v10 = v26
+		end
+		Single(p1, v11.p, v2(v27 * 60 * cos(6.283185307179586 * v10 / v27), v27 * 60 * sin(6.283185307179586 * v10 / v27), 0), Vector3.new(0, 400, 0)).ttl = 0.8
+	end
+end
+local function Clear(p1) --[[ Line: 144 ]]
+	for v1, v2 in next, p1.Simulate do
+		v2.Frame:Destroy()
+	end
+	p1.Simulate = {}
+end
 return {
-    MakeState = function() -- Line 27, Named "MakeState"
-        return {
-            Frame = nil;
-            Simulate = {};
-            Fireworks = {};
-        }
-    end;
-    Single = Single_upvw;
-    Firework = function(arg1, arg2, arg3, arg4) -- Line 58, Named "Firework"
-        local Single_upvw_result1_2 = Single_upvw(arg1, arg2, arg3, arg4)
-        Single_upvw_result1_2.Frame.Visible = false
-        insert_upvr(arg1.Fireworks, Single_upvw_result1_2)
-        return Single_upvw_result1_2
-    end;
-    Explosion = function(arg1, arg2) -- Line 64, Named "Explosion"
-        for _ = 1, 30 do
-            local var18 = 200 + random_upvr() * 100
-            local random_upvr_result1 = random_upvr()
-            local random_upvr_result1_3 = random_upvr()
-            if random_upvr_result1_3 < random_upvr_result1 then
-                random_upvr_result1_3 = random_upvr_result1
-                random_upvr_result1 = random_upvr_result1_3
-            end
-            local Single_upvw_result1_3 = Single_upvw(arg1, arg2, new_upvr(random_upvr_result1_3 * var18 * cos_upvr((-math.pi*2) * random_upvr_result1 / random_upvr_result1_3), random_upvr_result1_3 * var18 * sin_upvr((-math.pi*2) * random_upvr_result1 / random_upvr_result1_3), 0), Vector3.new(0, 0, 0))
-            Single_upvw_result1_3.ttl = 1
-            Single_upvw_result1_3.Frame.BackgroundColor3 = Color3.fromHSV(random_upvr(), 0.9, 0.9)
-        end
-        for _ = 1, 10 do
-            random_upvr_result1 = random_upvr()
-            local var22 = random_upvr_result1
-            local var5_result1_4 = random_upvr()
-            if var5_result1_4 < var22 then
-                var5_result1_4 = var22
-                var22 = var5_result1_4
-            end
-            local Single_upvw_result1_5 = Single_upvw(arg1, arg2, new_upvr(var5_result1_4 * 100 * cos_upvr((-math.pi*2) * var22 / var5_result1_4), var5_result1_4 * 100 * sin_upvr((-math.pi*2) * var22 / var5_result1_4), 0), Vector3.new(0, 0, 0))
-            Single_upvw_result1_5.ttl = 1.5
-            Single_upvw_result1_5.Frame.BackgroundColor3 = Color3.fromHSV(random_upvr(), 0.9, 0.9)
-        end
-    end;
-    EasySimulate = function(arg1, arg2) -- Line 150, Named "EasySimulate"
-        local any_Connect_result1_upvr = RunService_upvr.Heartbeat:Connect(function(arg1_2) -- Line 151, Named "Heartbeat"
-            Update_upvw(arg1, arg1_2)
-        end)
-        delay(arg2, function() -- Line 155, Named "Finish"
-            any_Connect_result1_upvr:Disconnect()
-            Clear_upvw(arg1)
-        end)
-    end;
-    Update = Update_upvw;
-    Clear = Clear_upvw;
+	MakeState = MakeState,
+	Single = Single,
+	Firework = Firework,
+	Explosion = Explosion,
+	EasySimulate = function(p1, p2) --[[ Name: EasySimulate | Line: 150 | Upvalues: Update (ref), RunService (copy), Clear (ref) ]]
+		local function Heartbeat(p12) --[[ Line: 151 | Upvalues: Update (ref), p1 (copy) ]]
+			Update(p1, p12)
+		end
+		local v1 = RunService.Heartbeat:Connect(Heartbeat)
+		local function Finish() --[[ Line: 155 | Upvalues: v1 (copy), Clear (ref), p1 (copy) ]]
+			v1:Disconnect()
+			Clear(p1)
+		end
+		delay(p2, Finish)
+	end,
+	Update = Update,
+	Clear = Clear
 }

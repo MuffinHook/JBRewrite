@@ -1,12 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PersistentCrewBattleConsts_upvr = require(script.Parent.PersistentCrewBattleConsts)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, require(ReplicatedStorage.Std.BaseObject))
-local CrewsSurfaceGuiDisplay_upvr = require(script.Parent.CrewsSurfaceGuiDisplay)
-function module_upvr.new(arg1) -- Line 11
-    local any_new_result1 = CrewsSurfaceGuiDisplay_upvr.new(arg1, PersistentCrewBattleConsts_upvr.LEADERBOARD_DISPLAY_TYPE_ENUM.CrewsInServer)
-    setmetatable(any_new_result1, module_upvr)
-    return any_new_result1
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local CrewsSurfaceGuiDisplay = require(script.Parent.CrewsSurfaceGuiDisplay)
+local PersistentCrewBattleConsts = require(script.Parent.PersistentCrewBattleConsts)
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1) --[[ Line: 11 | Upvalues: CrewsSurfaceGuiDisplay (copy), PersistentCrewBattleConsts (copy), t (copy) ]]
+	local v1 = CrewsSurfaceGuiDisplay.new(p1, PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.CrewsInServer)
+	setmetatable(v1, t)
+	return v1
 end
-return require(ReplicatedStorage.Std.Binder).new(PersistentCrewBattleConsts_upvr.CREWS_IN_SERVER_DISPLAY_TAG_NAME, module_upvr)
+return Binder.new(PersistentCrewBattleConsts.CREWS_IN_SERVER_DISPLAY_TAG_NAME, t)

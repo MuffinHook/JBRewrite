@@ -1,19 +1,19 @@
-local PlasmaGun_upvr = require(game:GetService("ReplicatedStorage").Game.Item.PlasmaGun)
-local module_upvr = {
-    __ClassName = "PlasmaPistol";
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Gun = require(script.Parent.Gun)
+local PlasmaGun = require(ReplicatedStorage.Game.Item.PlasmaGun)
+local t = {
+	__ClassName = "PlasmaPistol"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, PlasmaGun_upvr)
-function module_upvr.Init(arg1) -- Line 9
+t.__index = t
+setmetatable(t, PlasmaGun)
+function t.Init(p1) --[[ Line: 9 ]] end
+function t.new(p1, p2, p3) --[[ Line: 10 | Upvalues: PlasmaGun (copy), t (copy) ]]
+	local v1 = PlasmaGun.new(p1, p2, p3)
+	setmetatable(v1, t)
+	v1:Setup(p3)
+	return v1
 end
-function module_upvr.new(arg1, arg2, arg3) -- Line 10
-    local any_new_result1 = PlasmaGun_upvr.new(arg1, arg2, arg3)
-    setmetatable(any_new_result1, module_upvr)
-    any_new_result1:Setup(arg3)
-    return any_new_result1
+function t.SetupModel(p1) --[[ Line: 16 | Upvalues: Gun (copy) ]]
+	Gun.SetupModel(p1)
 end
-local Gun_upvr = require(script.Parent.Gun)
-function module_upvr.SetupModel(arg1) -- Line 16
-    Gun_upvr.SetupModel(arg1)
-end
-return module_upvr
+return t

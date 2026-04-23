@@ -1,102 +1,89 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local module = {}
-local Players_upvr = game:GetService("Players")
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local TradeConsts_upvr = require(ReplicatedStorage_upvr.Trade.TradeConsts)
-local RunService_upvr = game:GetService("RunService")
-local TradeDesireConsts_upvr = require(ReplicatedStorage_upvr.Trade.TradeDesireConsts)
-function module.init() -- Line 9
-    local function onCharacterAdded_upvr(arg1) -- Line 10, Named "onCharacterAdded"
-        local any_GetPlayerFromCharacter_result1_upvr = Players_upvr:GetPlayerFromCharacter(arg1)
-        local Head = arg1:WaitForChild("Head", 3)
-        local any_new_result1_upvr_2 = Maid_upvr.new()
-        local clone_upvr = ReplicatedStorage_upvr.Trade.Res.TradeDesireGui:Clone()
-        clone_upvr.Parent = Players_upvr.LocalPlayer.PlayerGui
-        clone_upvr.Adornee = Head
-        clone_upvr.Enabled = true
-        any_new_result1_upvr_2:GiveTask(clone_upvr)
-        local any_new_result1_upvr = Maid_upvr.new()
-        any_new_result1_upvr_2:GiveTask(any_new_result1_upvr)
-        local function updateDesireText() -- Line 25
-            any_new_result1_upvr:DoCleaning()
-            local var18 = "TradeDesireText"
-            local attribute_2 = arg1:GetAttribute(var18)
-            if attribute_2 == nil then
-                var18 = false
-            else
-                var18 = true
-            end
-            clone_upvr.Bar.Visible = var18
-            var18 = false
-            if attribute_2 == nil then
-                if any_GetPlayerFromCharacter_result1_upvr ~= Players_upvr.LocalPlayer then
-                    var18 = false
-                else
-                    var18 = true
-                end
-            end
-            clone_upvr.Blank.Visible = var18
-            if attribute_2 then
-                clone_upvr.Bar.TextLabel.Text = attribute_2
-                if any_GetPlayerFromCharacter_result1_upvr:GetAttribute(TradeConsts_upvr.TRADING_VIP_ATTRIBUTE_NAME) then
-                    any_new_result1_upvr:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 34
-                        clone_upvr.Bar.TextLabel.TextColor3 = Color3.fromHSV(os.clock() % TradeDesireConsts_upvr.RAINBOW_ANIMATION_CYCLE_TIME / TradeDesireConsts_upvr.RAINBOW_ANIMATION_CYCLE_TIME, 1, 1)
-                    end))
-                end
-            end
-        end
-        updateDesireText()
-        any_new_result1_upvr_2:GiveTask(arg1:GetAttributeChangedSignal("TradeDesireText"):Connect(updateDesireText))
-        if any_GetPlayerFromCharacter_result1_upvr == Players_upvr.LocalPlayer then
-            local clone_upvr_2 = ReplicatedStorage_upvr.Trade.Res.TradeDesireEditGui:Clone()
-            clone_upvr_2.Parent = Players_upvr.LocalPlayer.PlayerGui
-            clone_upvr_2.Enabled = false
-            any_new_result1_upvr_2:GiveTask(clone_upvr_2)
-            local TextBox_upvr = clone_upvr_2.Bar.TextBox
-            any_new_result1_upvr_2:GiveTask(TextBox_upvr:GetPropertyChangedSignal("Text"):Connect(function() -- Line 53
-                local Text = TextBox_upvr.Text
-                if TradeDesireConsts_upvr.MAX_TEXT_LENGTH < #Text then
-                    Text = Text:sub(1, TradeDesireConsts_upvr.MAX_TEXT_LENGTH)
-                end
-                TextBox_upvr.Text = Text
-            end))
-            any_new_result1_upvr_2:GiveTask(clone_upvr_2.Bar.Submit.MouseButton1Down:Connect(function() -- Line 60, Named "attemptSetDesire"
-                clone_upvr_2.Enabled = false
-                ReplicatedStorage_upvr:FindFirstChild("SetTradeDesireRemote"):FireServer(TextBox_upvr.Text)
-            end))
-            any_new_result1_upvr_2:GiveTask(clone_upvr_2.Bar.TextBox.FocusLost:Connect(function(arg1_2) -- Line 67
-                if arg1_2 then
-                    clone_upvr_2.Enabled = false
-                    ReplicatedStorage_upvr:FindFirstChild("SetTradeDesireRemote"):FireServer(TextBox_upvr.Text)
-                end
-            end))
-            local function toggleDesireEdit() -- Line 73
-                clone_upvr_2.Enabled = not clone_upvr_2.Enabled
-                if clone_upvr_2.Enabled then
-                    clone_upvr_2.Bar.TextBox:CaptureFocus()
-                end
-            end
-            any_new_result1_upvr_2:GiveTask(clone_upvr.Bar.MouseButton1Down:Connect(toggleDesireEdit))
-            any_new_result1_upvr_2:GiveTask(clone_upvr.Blank.MouseButton1Down:Connect(toggleDesireEdit))
-        end
-        clone_upvr_2 = any_new_result1_upvr_2:GiveTask
-        clone_upvr_2(Head.AncestryChanged:Connect(function(arg1_3, arg2) -- Line 83
-            if not arg2 then
-                any_new_result1_upvr_2:DoCleaning()
-            end
-        end))
-    end
-    for _, v in ipairs(Players_upvr:GetPlayers()) do
-        if v.Character then
-            task.spawn(onCharacterAdded_upvr, v.Character)
-        end
-        v.CharacterAdded:Connect(onCharacterAdded_upvr)
-    end
-    Players_upvr.PlayerAdded:Connect(function(arg1) -- Line 89, Named "onPlayerAdded"
-        if arg1.Character then
-            task.spawn(onCharacterAdded_upvr, arg1.Character)
-        end
-        arg1.CharacterAdded:Connect(onCharacterAdded_upvr)
-    end)
-end
-return module
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Maid = require(ReplicatedStorage.Std.Maid)
+local TradeDesireConsts = require(ReplicatedStorage.Trade.TradeDesireConsts)
+local RunService = game:GetService("RunService")
+local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
+return {
+	init = function() --[[ Name: init | Line: 9 | Upvalues: Players (copy), Maid (copy), ReplicatedStorage (copy), TradeConsts (copy), RunService (copy), TradeDesireConsts (copy) ]]
+		local function onCharacterAdded(p1) --[[ Line: 10 | Upvalues: Players (ref), Maid (ref), ReplicatedStorage (ref), TradeConsts (ref), RunService (ref), TradeDesireConsts (ref) ]]
+			local v1 = Players:GetPlayerFromCharacter(p1)
+			local Head = p1:WaitForChild("Head", 3)
+			local v2 = Maid.new()
+			local v3 = ReplicatedStorage.Trade.Res.TradeDesireGui:Clone()
+			v3.Parent = Players.LocalPlayer.PlayerGui
+			v3.Adornee = Head
+			v3.Enabled = true
+			v2:GiveTask(v3)
+			local v4 = Maid.new()
+			v2:GiveTask(v4)
+			local function updateDesireText() --[[ Line: 25 | Upvalues: v4 (copy), p1 (copy), v3 (copy), v1 (copy), Players (ref), TradeConsts (ref), RunService (ref), TradeDesireConsts (ref) ]]
+				v4:DoCleaning()
+				local v12 = p1:GetAttribute("TradeDesireText")
+				v3.Bar.Visible = v12 ~= nil
+				v3.Blank.Visible = if v12 == nil then v1 == Players.LocalPlayer else false
+				if v12 then
+					v3.Bar.TextLabel.Text = v12
+					if v1:GetAttribute(TradeConsts.TRADING_VIP_ATTRIBUTE_NAME) then
+						v4:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 34 | Upvalues: TradeDesireConsts (ref), v3 (ref) ]]
+							v3.Bar.TextLabel.TextColor3 = Color3.fromHSV(os.clock() % TradeDesireConsts.RAINBOW_ANIMATION_CYCLE_TIME / TradeDesireConsts.RAINBOW_ANIMATION_CYCLE_TIME, 1, 1)
+						end))
+					end
+				end
+			end
+			updateDesireText()
+			v2:GiveTask(p1:GetAttributeChangedSignal("TradeDesireText"):Connect(updateDesireText))
+			if v1 == Players.LocalPlayer then
+				local v5 = ReplicatedStorage.Trade.Res.TradeDesireEditGui:Clone()
+				v5.Parent = Players.LocalPlayer.PlayerGui
+				v5.Enabled = false
+				v2:GiveTask(v5)
+				local TextBox = v5.Bar.TextBox
+				v2:GiveTask(TextBox:GetPropertyChangedSignal("Text"):Connect(function() --[[ Line: 53 | Upvalues: TextBox (copy), TradeDesireConsts (ref) ]]
+					local Text = TextBox.Text
+					if #Text > TradeDesireConsts.MAX_TEXT_LENGTH then
+						Text = Text:sub(1, TradeDesireConsts.MAX_TEXT_LENGTH)
+					end
+					TextBox.Text = Text
+				end))
+				local function attemptSetDesire() --[[ Line: 60 | Upvalues: TextBox (copy), v5 (copy), ReplicatedStorage (ref) ]]
+					v5.Enabled = false
+					ReplicatedStorage:FindFirstChild("SetTradeDesireRemote"):FireServer(TextBox.Text)
+				end
+				v2:GiveTask(v5.Bar.Submit.MouseButton1Down:Connect(attemptSetDesire))
+				v2:GiveTask(v5.Bar.TextBox.FocusLost:Connect(function(p1) --[[ Line: 67 | Upvalues: TextBox (copy), v5 (copy), ReplicatedStorage (ref) ]]
+					if p1 then
+						v5.Enabled = false
+						ReplicatedStorage:FindFirstChild("SetTradeDesireRemote"):FireServer(TextBox.Text)
+					end
+				end))
+				local function toggleDesireEdit() --[[ Line: 73 | Upvalues: v5 (copy) ]]
+					v5.Enabled = not v5.Enabled
+					if v5.Enabled then
+						v5.Bar.TextBox:CaptureFocus()
+					end
+				end
+				v2:GiveTask(v3.Bar.MouseButton1Down:Connect(toggleDesireEdit))
+				v2:GiveTask(v3.Blank.MouseButton1Down:Connect(toggleDesireEdit))
+			end
+			v2:GiveTask(Head.AncestryChanged:Connect(function(p1, p2) --[[ Line: 83 | Upvalues: v2 (copy) ]]
+				if not p2 then
+					v2:DoCleaning()
+				end
+			end))
+		end
+		local function onPlayerAdded(p1) --[[ Line: 89 | Upvalues: onCharacterAdded (copy) ]]
+			if p1.Character then
+				task.spawn(onCharacterAdded, p1.Character)
+			end
+			p1.CharacterAdded:Connect(onCharacterAdded)
+		end
+		for i, v in ipairs(Players:GetPlayers()) do
+			if v.Character then
+				task.spawn(onCharacterAdded, v.Character)
+			end
+			v.CharacterAdded:Connect(onCharacterAdded)
+		end
+		Players.PlayerAdded:Connect(onPlayerAdded)
+	end
+}

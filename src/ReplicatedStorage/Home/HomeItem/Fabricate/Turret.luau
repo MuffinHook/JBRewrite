@@ -1,229 +1,218 @@
-local Players_upvr = game:GetService("Players")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PlayerUtils_upvr = require(ReplicatedStorage.Game.PlayerUtils)
-local function _() -- Line 14, Named "randomVector"
-    return Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit
+local BulletEmitter = require(ReplicatedStorage.Game.ItemSystem.BulletEmitter)
+local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
+local Spring = require(ReplicatedStorage.Std.Spring)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local RayCast = require(ReplicatedStorage.Module.RayCast)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local RunService = game:GetService("RunService")
+require(ReplicatedStorage.Clan.ClanUtils)
+local function randomVector() --[[ Line: 14 ]]
+	local v1 = math.random() * 2 - 1
+	local v2 = math.random() * 2 - 1
+	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
 end
-local function offsetLookAtTarget_upvr(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 22, Named "offsetLookAtTarget"
-    if arg4 == 0 or arg5 == 0 or arg6 == 0 then
-        return 0, 0
-    end
-    local var4 = arg4 * arg4 + arg6 * arg6
-    if arg6 >= 0 or not math.atan(arg4 / arg6) then
-    end
-    if arg1 * arg1 >= var4 or not math.asin(arg1 / var4 ^ 0.5) then
-    end
-    local var5 = math.pi - math.atan(-arg4 / arg6) + math.asin(var4 ^ 0.5 / arg1)
-    local var8 = arg6 * math.cos(var5) + arg4 * math.sin(var5)
-    local var9 = arg5 * arg5 + var8 * var8
-    if var8 >= 0 or not math.atan(-arg5 / var8) then
-    end
-    if arg2 * arg2 >= var9 or not math.asin(arg2 / var9 ^ 0.5) then
-    end
-    return var5, math.atan(arg5 / var8) - math.asin(var9 ^ 0.5 / arg2)
+local function offsetLookAtTarget(p1, p2, p3, p4, p5, p6) --[[ Line: 22 ]]
+	if p4 == 0 or (p5 == 0 or p6 == 0) then
+		return 0, 0
+	else
+		local v1 = p4 * p4 + p6 * p6
+		local v2 = p6 < 0 and math.atan(p4 / p6) or math.pi - math.atan(-p4 / p6)
+		local v4 = v2 + (p1 * p1 < v1 and math.asin(p1 / v1 ^ 0.5) or math.asin(v1 ^ 0.5 / p1))
+		local v5 = p6 * math.cos(v4) + p4 * math.sin(v4)
+		local v6 = p5 * p5 + v5 * v5
+		local v7 = v5 < 0 and math.atan(-p5 / v5) or math.atan(p5 / v5)
+		return v4, v7 - (p2 * p2 < v6 and math.asin(p2 / v6 ^ 0.5) or math.asin(v6 ^ 0.5 / p2))
+	end
 end
-local function _(arg1, arg2) -- Line 36, Named "shortAngleDist"
-    local var10 = (arg2 - arg1) % (-math.pi*2)
-    return 2 * var10 % (-math.pi*2) - var10
+local function shortAngleDist(p1, p2) --[[ Line: 36 ]]
+	local v1 = (p2 - p1) % 6.283185307179586
+	return 2 * v1 % 6.283185307179586 - v1
 end
-local function getNearestPlayer_upvr(arg1, arg2) -- Line 41, Named "getNearestPlayer"
-    local var28
-    for _, v in ipairs(Players_upvr:GetPlayers()) do
-        local any_getRootPart_result1_5 = PlayerUtils_upvr.getRootPart(v)
-        if any_getRootPart_result1_5 then
-            if (any_getRootPart_result1_5.Position - arg1).Magnitude < (arg2 or math.huge) then
-            end
-        end
-    end
-    return nil
+local function getNearestPlayer(p1, p2) --[[ Line: 41 | Upvalues: Players (copy), PlayerUtils (copy) ]]
+	local v1 = p2 or (1 / 0)
+	local v2 = nil
+	for i, v in ipairs(Players:GetPlayers()) do
+		local v3 = PlayerUtils.getRootPart(v)
+		if v3 then
+			local Magnitude = (v3.Position - p1).Magnitude
+			if Magnitude < v1 then
+				v1 = Magnitude
+				v2 = v
+			end
+		end
+	end
+	return v2
 end
-local function getNearestOpp_upvr(arg1, arg2, arg3) -- Line 56, Named "getNearestOpp"
-    local var59
-    for _, v_2 in Players_upvr:GetPlayers() do
-        if not arg1:HasPermissionToEnter(v_2) then
-            local any_getHumanoid_result1_2 = PlayerUtils_upvr.getHumanoid(v_2)
-            if any_getHumanoid_result1_2 and 0 < any_getHumanoid_result1_2.Health then
-                local RootPart_2 = any_getHumanoid_result1_2.RootPart
-                if RootPart_2 then
-                    if (RootPart_2.Position - arg2).Magnitude < (arg3 or math.huge) then
-                    end
-                end
-            end
-        end
-    end
-    return nil
+local function getNearestOpp(p1, p2, p3) --[[ Line: 56 | Upvalues: Players (copy), PlayerUtils (copy) ]]
+	local v1 = p3 or (1 / 0)
+	local v2 = nil
+	for v3, v4 in Players:GetPlayers() do
+		if not p1:HasPermissionToEnter(v4) then
+			local v5 = PlayerUtils.getHumanoid(v4)
+			if v5 and v5.Health > 0 then
+				local RootPart = v5.RootPart
+				if RootPart then
+					local Magnitude = (RootPart.Position - p2).Magnitude
+					if Magnitude < v1 then
+						v1 = Magnitude
+						v2 = v4
+					end
+				end
+			end
+		end
+	end
+	return v2
 end
-local tbl_upvr = {
-    bullet_impact_bass = 2837091387;
-    reload = 6602025903;
-    shoot = 6602025330;
-    detected = 6602024939;
-    motor = 6602024532;
+local t = {
+	bullet_impact_bass = 2837091387,
+	reload = 6602025903,
+	shoot = 6602025330,
+	detected = 6602024939,
+	motor = 6602024532
 }
-local var64_upvw
-local module = {
-    init = function(arg1) -- Line 89, Named "init"
-        var64_upvw = arg1.Event
-    end;
+local v1 = nil
+return {
+	init = function(p1) --[[ Name: init | Line: 89 | Upvalues: v1 (ref) ]]
+		v1 = p1.Event
+	end,
+	setup = function(p1) --[[ Name: setup | Line: 92 | Upvalues: Spring (copy), BulletEmitter (copy), Players (copy), LocalPlayer (copy), v1 (ref), Audio (copy), t (copy), offsetLookAtTarget (copy), RunService (copy), PlayerUtils (copy), getNearestOpp (copy), getNearestPlayer (copy), RayCast (copy), Interval (copy) ]]
+		local _obj = p1._obj
+		local v12 = 0
+		local v2 = 0
+		local v3 = Spring.new(v12, 0, 0.6, 15)
+		local v4 = Spring.new(v2, 0, 0.6, 15)
+		local v5 = Spring.new(0, 0, 0.7, 70)
+		local v6 = BulletEmitter.new(true)
+		v6.IgnoreList = assert({})
+		v6.LifeSpan = 1
+		v6.IgnoreLocalPlayer = false
+		v6.ShieldBlockPct = 0.5
+		v6.GravityVector = Vector3.new(0, -49.05, 0)
+		p1._maid:GiveTask(v6.OnLocalHitPlayer:Connect(function(p12) --[[ Line: 110 | Upvalues: Players (ref), LocalPlayer (ref), p1 (copy), v1 (ref), Audio (ref), t (ref) ]]
+			local v12 = Players:GetPlayerFromCharacter(p12.Parent)
+			if v12 then
+				if v12 == LocalPlayer then
+					local v2 = p1:GetHome()
+					if not (v2 and v2:HasPermissionToEnter(v12)) then
+						v1:FireServer("xe6v1us6", 3, "Shot")
+					end
+				end
+				Audio.ObjectLocal(p12.RootPart, t.bullet_impact_bass, {
+					Volume = 1
+				})
+			end
+		end))
+		local v7 = os.clock()
+		local function updateRotation(p1) --[[ Line: 132 | Upvalues: v7 (ref), _obj (copy), offsetLookAtTarget (ref), v12 (ref), v2 (ref), v3 (copy), v4 (copy), v5 (copy) ]]
+			local v1 = os.clock()
+			local v22 = v1 - v7
+			v7 = v1
+			local v32 = _obj.Pivot.CFrame
+			local v42 = v32:PointToObjectSpace(p1)
+			local v52, v6 = offsetLookAtTarget(0.3935546875, 1.7648589611053467, nil, v42.x, v42.y, v42.z)
+			v12 = v6
+			local v72 = (v52 - v2) % 6.283185307179586
+			v2 = v2 + math.clamp(2 * v72 % 6.283185307179586 - v72, -2.5132741228718345 * v22, 2.5132741228718345 * v22)
+			local v8 = v3:SetTarget(v6)
+			local v9 = v4:SetTarget(v2)
+			local v10 = v5:Update()
+			_obj.Top:SetPrimaryPartCFrame(v32 * CFrame.Angles(0, v9, 0) * CFrame.Angles(v8, 0, 0) * CFrame.new(0, 0, v10))
+		end
+		p1._maid:GiveTask(v6)
+		local function fire() --[[ Line: 159 | Upvalues: _obj (copy), v6 (copy), v5 (copy), Audio (ref), t (ref) ]]
+			local v1 = _obj.Top.Tip.CFrame
+			v6:Emit(v1.p, v1.LookVector + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 0.01, 300)
+			v5:Accelerate(40)
+			Audio.ObjectLocal(_obj.Top.Tip, t.shoot, {
+				Volume = 0.5
+			})
+		end
+		local v8 = Audio.ObjectLocal(_obj.Pivot, t.motor, {
+			Looped = true,
+			DoNotPlay = true,
+			Volume = 0.3
+		})
+		local v9 = 20
+		local v10 = os.clock()
+		local v11 = nil
+		local v122 = os.clock()
+		p1._maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 179 | Upvalues: PlayerUtils (ref), LocalPlayer (ref), p1 (copy), v6 (copy), getNearestOpp (ref), getNearestPlayer (ref), _obj (copy), RayCast (ref), v11 (ref), v8 (copy), v122 (ref), Audio (ref), t (ref), v10 (ref), updateRotation (copy), v9 (ref), fire (copy) ]]
+			local v1 = os.clock()
+			local v2 = PlayerUtils.getRootPart(LocalPlayer)
+			if v2 then
+				if not ((v2.Position - p1._obj.PrimaryPart.Position).Magnitude > 128) then
+					v6:Update()
+					local v3 = nil
+					local v4 = nil
+					local v5 = p1:GetHome()
+					local v62 = v5:GetOwnerId()
+					if not (p1:GetGhosted() or p1:IsBeingDragged()) then
+						if v62 then
+							local v7 = getNearestOpp(v5, p1._obj.PrimaryPart.Position, 64)
+							if v7 then
+								local v82 = PlayerUtils.getRootPart(v7)
+								v4 = v82.Parent
+								v3 = v82.Position
+							end
+						else
+							local v92 = getNearestPlayer(p1._obj.PrimaryPart.Position, 64)
+							if v92 then
+								local v102 = PlayerUtils.getRootPart(v92)
+								v4 = v102.Parent
+								v3 = v102.Position
+							end
+						end
+					end
+					if v3 then
+						local Position = _obj.Top.Tip.Position
+						local v112 = v3 - Position
+						local v12, v13 = RayCast.RayIgnoreNonCollide(Position, v112.Unit, v112.Magnitude, _obj)
+						if (v13 - v3).Magnitude > 1 and (not v4 or v12 and not v12:IsDescendantOf(v4)) then
+							v3 = nil
+						end
+					end
+					if v3 then
+						if not v11 then
+							if not v8.IsPlaying then
+								v8:Play()
+							end
+							if v1 - v122 > 2 then
+								v122 = v1
+								Audio.ObjectLocal(_obj.Pivot, t.detected, {
+									Volume = 1
+								})
+								v10 = v1 + 0.5
+							end
+						end
+						updateRotation(v3)
+						if v1 - v10 > 0.1 then
+							v10 = v1
+							if v9 > 0 then
+								v9 = v9 - 1
+								fire()
+							else
+								v10 = v1 + 3
+								v9 = 20
+								Audio.ObjectLocal(_obj.Pivot, t.reload, {
+									Volume = 1
+								})
+							end
+						end
+					end
+					if not v3 and (v11 and v8.IsPlaying) then
+						v8:Stop()
+					end
+					v11 = v3
+				end
+			end
+		end))
+		local v13 = false
+		p1._maid:GiveTask(Interval.every(0.5):Connect(function() --[[ Line: 264 | Upvalues: v13 (ref), _obj (copy) ]]
+			v13 = not v13
+			_obj.Top.Light.Color = v13 and Color3.new(0/255, 255/255, 0/255) or Color3.new(255/255, 0/255, 0/255)
+		end))
+	end
 }
-local Spring_upvr = require(ReplicatedStorage.Std.Spring)
-local BulletEmitter_upvr = require(ReplicatedStorage.Game.ItemSystem.BulletEmitter)
-local LocalPlayer_upvr = Players_upvr.LocalPlayer
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local RunService_upvr = game:GetService("RunService")
-local RayCast_upvr = require(ReplicatedStorage.Module.RayCast)
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-function module.setup(arg1) -- Line 92
-    local _obj_upvr = arg1._obj
-    local var74_upvw = 0
-    local var75_upvw = 0
-    local any_new_result1_upvr = Spring_upvr.new(0, 0, 0.7, 70)
-    local any_new_result1_upvr_3 = BulletEmitter_upvr.new(true)
-    any_new_result1_upvr_3.IgnoreList = assert({})
-    any_new_result1_upvr_3.LifeSpan = 1
-    any_new_result1_upvr_3.IgnoreLocalPlayer = false
-    any_new_result1_upvr_3.ShieldBlockPct = 0.5
-    any_new_result1_upvr_3.GravityVector = Vector3.new(0, -49.049, 0)
-    arg1._maid:GiveTask(any_new_result1_upvr_3.OnLocalHitPlayer:Connect(function(arg1_2) -- Line 110
-        local any_GetPlayerFromCharacter_result1 = Players_upvr:GetPlayerFromCharacter(arg1_2.Parent)
-        if not any_GetPlayerFromCharacter_result1 then
-        else
-            if any_GetPlayerFromCharacter_result1 == LocalPlayer_upvr then
-                local var80 = true
-                local any_GetHome_result1_2 = arg1:GetHome()
-                if any_GetHome_result1_2 then
-                    if any_GetHome_result1_2:HasPermissionToEnter(any_GetPlayerFromCharacter_result1) then
-                        var80 = false
-                    end
-                end
-                if var80 then
-                    var64_upvw:FireServer('y'.."hsgepze0":sub(5, 6):reverse():reverse():reverse().."".."lkho3", 3, "Shot")
-                end
-            end
-            Audio_upvr.ObjectLocal(arg1_2.RootPart, tbl_upvr.bullet_impact_bass, {
-                Volume = 1;
-            })
-        end
-    end))
-    local os_clock_result1_3_upvw = os.clock()
-    local any_new_result1_upvr_2 = Spring_upvr.new(var74_upvw, 0, 0.6, 15)
-    local any_new_result1_upvr_4 = Spring_upvr.new(var75_upvw, 0, 0.6, 15)
-    local function updateRotation_upvr(arg1_3) -- Line 132, Named "updateRotation"
-        local os_clock_result1 = os.clock()
-        local var87 = os_clock_result1 - os_clock_result1_3_upvw
-        os_clock_result1_3_upvw = os_clock_result1
-        local CFrame_2 = _obj_upvr.Pivot.CFrame
-        local any_PointToObjectSpace_result1 = CFrame_2:PointToObjectSpace(arg1_3)
-        local offsetLookAtTarget_upvr_result1, offsetLookAtTarget_upvr_result2 = offsetLookAtTarget_upvr(0.3935546875, 1.7648589611053467, nil, any_PointToObjectSpace_result1.x, any_PointToObjectSpace_result1.y, any_PointToObjectSpace_result1.z)
-        var74_upvw = offsetLookAtTarget_upvr_result2
-        local var92 = (offsetLookAtTarget_upvr_result1 - var75_upvw) % (-math.pi*2)
-        var75_upvw += math.clamp(2 * var92 % (-math.pi*2) - var92, -2.5132741228718345 * var87, 2.5132741228718345 * var87)
-        _obj_upvr.Top:SetPrimaryPartCFrame(CFrame_2 * CFrame.Angles(0, any_new_result1_upvr_4:SetTarget(var75_upvw), 0) * CFrame.Angles(any_new_result1_upvr_2:SetTarget(var74_upvw), 0, 0) * CFrame.new(0, 0, any_new_result1_upvr:Update()))
-    end
-    arg1._maid:GiveTask(any_new_result1_upvr_3)
-    local function fire_upvr() -- Line 159, Named "fire"
-        local CFrame = _obj_upvr.Top.Tip.CFrame
-        any_new_result1_upvr_3:Emit(CFrame.p, CFrame.LookVector + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 0.01, 300)
-        any_new_result1_upvr:Accelerate(40)
-        Audio_upvr.ObjectLocal(_obj_upvr.Top.Tip, tbl_upvr.shoot, {
-            Volume = 0.5;
-        })
-    end
-    local var97_upvw
-    local any_ObjectLocal_result1_upvr = Audio_upvr.ObjectLocal(_obj_upvr.Pivot, tbl_upvr.motor, {
-        Looped = true;
-        DoNotPlay = true;
-        Volume = 0.3;
-    })
-    local os_clock_result1_2_upvw = os.clock()
-    local os_clock_result1_upvw = os.clock()
-    local var101_upvw = 20
-    arg1._maid:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 179
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        local os_clock_result1_4 = os.clock()
-        local any_getRootPart_result1_4 = PlayerUtils_upvr.getRootPart(LocalPlayer_upvr)
-        if not any_getRootPart_result1_4 then
-        else
-            if 128 < (any_getRootPart_result1_4.Position - arg1._obj.PrimaryPart.Position).Magnitude then return end
-            any_new_result1_upvr_3:Update()
-            local any_GetHome_result1 = arg1:GetHome()
-            local var105
-            if not arg1:GetGhosted() and not arg1:IsBeingDragged() then
-                if any_GetHome_result1:GetOwnerId() then
-                    local getNearestOpp_result1 = getNearestOpp_upvr(any_GetHome_result1, arg1._obj.PrimaryPart.Position, 64)
-                    if getNearestOpp_result1 then
-                        local any_getRootPart_result1_3 = PlayerUtils_upvr.getRootPart(getNearestOpp_result1)
-                        local _ = any_getRootPart_result1_3.Parent
-                        var105 = any_getRootPart_result1_3.Position
-                        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                    end
-                else
-                    local getNearestPlayer_upvr_result1 = getNearestPlayer_upvr(arg1._obj.PrimaryPart.Position, 64)
-                    if getNearestPlayer_upvr_result1 then
-                        local any_getRootPart_result1_2 = PlayerUtils_upvr.getRootPart(getNearestPlayer_upvr_result1)
-                        var105 = any_getRootPart_result1_2.Position
-                    end
-                end
-            end
-            local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                local any_RayIgnoreNonCollide_result1, any_RayIgnoreNonCollide_result2 = RayCast_upvr.RayIgnoreNonCollide(Position, var112.Unit, var112.Magnitude, _obj_upvr)
-                local var112 = var105 - Position
-                local Position = _obj_upvr.Top.Tip.Position
-                return 1 < (any_RayIgnoreNonCollide_result2 - var105).Magnitude
-            end
-            local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                return any_RayIgnoreNonCollide_result1:IsDescendantOf(any_getRootPart_result1_2.Parent)
-            end
-            if var105 and decompInlinedCondition() and (not any_getRootPart_result1_2.Parent or any_RayIgnoreNonCollide_result1 and not decompInlinedCondition_2()) then
-                var105 = nil
-            end
-            if var105 then
-                if not var97_upvw then
-                    if not any_ObjectLocal_result1_upvr.IsPlaying then
-                        any_ObjectLocal_result1_upvr:Play()
-                    end
-                    if 2 < os_clock_result1_4 - os_clock_result1_2_upvw then
-                        os_clock_result1_2_upvw = os_clock_result1_4
-                        Audio_upvr.ObjectLocal(_obj_upvr.Pivot, tbl_upvr.detected, {
-                            Volume = 1;
-                        })
-                        os_clock_result1_upvw = os_clock_result1_4 + 0.5
-                    end
-                end
-                updateRotation_upvr(var105)
-                if 0.1 < os_clock_result1_4 - os_clock_result1_upvw then
-                    os_clock_result1_upvw = os_clock_result1_4
-                    if 0 < var101_upvw then
-                        var101_upvw -= 1
-                        fire_upvr()
-                    else
-                        os_clock_result1_upvw = os_clock_result1_4 + 3
-                        var101_upvw = 20
-                        Audio_upvr.ObjectLocal(_obj_upvr.Pivot, tbl_upvr.reload, {
-                            Volume = 1;
-                        })
-                    end
-                end
-            end
-            if not var105 and var97_upvw and any_ObjectLocal_result1_upvr.IsPlaying then
-                any_ObjectLocal_result1_upvr:Stop()
-            end
-            var97_upvw = var105
-        end
-    end))
-    local var118_upvw = false
-    arg1._maid:GiveTask(Interval_upvr.every(0.5):Connect(function() -- Line 264
-        var118_upvw = not var118_upvw
-        local var119
-        local function decompInlinedCondition_3() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var119 = Color3.new(0, 1, 0)
-            return var119
-        end
-        if not var118_upvw or not decompInlinedCondition_3() then
-            var119 = Color3.new(1, 0, 0)
-        end
-        _obj_upvr.Top.Light.Color = var119
-    end))
-end
-return module

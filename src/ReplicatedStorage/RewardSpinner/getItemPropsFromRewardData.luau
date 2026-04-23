@@ -1,76 +1,52 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RewardSpinnerConsts_upvr = require(ReplicatedStorage.RewardSpinner.RewardSpinnerConsts)
-local String_upvr = require(ReplicatedStorage.Std.String)
-local TradeReducerUtils_upvr = require(ReplicatedStorage.Trade.TradeReducerUtils)
-return function(arg1) -- Line 7
-    local module = {}
-    if arg1.RarityId then
-        local var7 = RewardSpinnerConsts_upvr.RARITY_ID_TO_RARITY[arg1.RarityId]
-        if not var7 then
-            error("Invalid item rarity: "..tostring(arg1.RarityId))
-        end
-        module.rarityIndex = var7.index
-        local len = #RewardSpinnerConsts_upvr.RARITIES
-        module.rarityTitle = var7.name
-        module.bubbleColor = var7.color
-        if var7.index == len then
-            module.backGlowEnabled = true
-        elseif len - 2 <= var7.index then
-            module.frontGlowEnabled = true
-        end
-    end
-    if arg1.ImageId then
-        module.image = "rbxassetid://"..tostring(arg1.ImageId)
-    end
-    local var9
-    if arg1.Type == "Cash" then
-        module.typeTitle = "Cash"
-        if 0 < arg1.Amount then
-            var9 = '+'
-        else
-            var9 = ""
-        end
-        module.title = var9..'$'..String_upvr.comma(arg1.Amount)
-        return module
-    end
-    if arg1.Type == "Nitro" then
-        module.typeTitle = "Nitro"
-        if 0 < arg1.Amount then
-            var9 = '+'
-        else
-            var9 = ""
-        end
-        module.title = var9..String_upvr.comma(arg1.Amount)
-        return module
-    end
-    if arg1.Type == "HyperChrome" then
-        module.typeTitle = "Color"
-        module.title = "HyperChrome!"
-        var9 = "Level "
-        module.subTitle = var9..tostring(arg1.Level)
-        return module
-    end
-    if arg1.Type == "UniqueItem" then
-        var9 = arg1
-        local any_buildItemProps_result1 = TradeReducerUtils_upvr.buildItemProps(var9)
-        if not any_buildItemProps_result1 then
-            var9 = print
-            var9(arg1)
-            var9 = error
-            var9("No item props found for rewardData ^")
-        end
-        var9 = any_buildItemProps_result1.title
-        module.title = var9
-        var9 = any_buildItemProps_result1.categoryTitle
-        module.typeTitle = var9
-        var9 = any_buildItemProps_result1.getInst
-        module.getInst = var9
-        var9 = any_buildItemProps_result1.getInstCompare
-        module.getInstCompare = var9
-        var9 = any_buildItemProps_result1.updateCamera
-        module.updateCamera = var9
-        var9 = any_buildItemProps_result1.image
-        module.image = var9
-    end
-    return module
+local String = require(ReplicatedStorage.Std.String)
+local RewardSpinnerConsts = require(ReplicatedStorage.RewardSpinner.RewardSpinnerConsts)
+local TradeReducerUtils = require(ReplicatedStorage.Trade.TradeReducerUtils)
+return function(p1) --[[ Line: 7 | Upvalues: RewardSpinnerConsts (copy), String (copy), TradeReducerUtils (copy) ]]
+	local t = {}
+	if p1.RarityId then
+		local v1 = RewardSpinnerConsts.RARITY_ID_TO_RARITY[p1.RarityId]
+		if not v1 then
+			local v2 = error
+			v2("Invalid item rarity: " .. tostring(p1.RarityId))
+		end
+		t.rarityIndex = v1.index
+		local v3 = #RewardSpinnerConsts.RARITIES
+		t.rarityTitle = v1.name
+		t.bubbleColor = v1.color
+		if v1.index == v3 then
+			t.backGlowEnabled = true
+		elseif v3 - 2 <= v1.index then
+			t.frontGlowEnabled = true
+		end
+	end
+	if p1.ImageId then
+		t.image = "rbxassetid://" .. tostring(p1.ImageId)
+	end
+	if p1.Type == "Cash" then
+		t.typeTitle = "Cash"
+		local v4 = if p1.Amount > 0 then "+" else ""
+		t.title = v4 .. "$" .. String.comma(p1.Amount)
+	elseif p1.Type == "Nitro" then
+		t.typeTitle = "Nitro"
+		local v5 = if p1.Amount > 0 then "+" else ""
+		t.title = v5 .. String.comma(p1.Amount)
+	elseif p1.Type == "HyperChrome" then
+		t.typeTitle = "Color"
+		t.title = "HyperChrome!"
+		t.subTitle = "Level " .. tostring(p1.Level)
+	elseif p1.Type == "UniqueItem" then
+		local v6 = TradeReducerUtils.buildItemProps(p1)
+		if not v6 then
+			print(p1)
+			error("No item props found for rewardData ^")
+		end
+		t.title = v6.title
+		t.typeTitle = v6.categoryTitle
+		t.getInst = v6.getInst
+		t.getInstCompare = v6.getInstCompare
+		t.updateCamera = v6.updateCamera
+		t.image = v6.image
+	end
+	return t
 end

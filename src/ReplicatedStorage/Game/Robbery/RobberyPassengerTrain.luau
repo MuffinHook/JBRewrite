@@ -1,198 +1,240 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local CircleAction_upvr = require(ReplicatedStorage_upvr.Module.UI).CircleAction
-local var3_upvw
-local function _(arg1) -- Line 12, Named "comma"
-    local string_match_result1, string_match_result2, string_match_result3_2 = string.match(arg1, "^([^%d]*%d)(%d*)(.-)$")
-    return string_match_result1..string_match_result2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3_2
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TrainSystem = require(ReplicatedStorage.Game.TrainSystem)
+local Joint = require(ReplicatedStorage.Std.Joint)
+local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
+local v1 = nil
+local v2 = nil
+local v3 = nil
+local function comma(p1) --[[ Line: 12 ]]
+	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
+	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
 end
-local function _(arg1) -- Line 16, Named "FormatMoney"
-    local var7
-    if 0 <= arg1 then
-        var7 = ""
-    else
-        var7 = '-'
-    end
-    local string_match_result1_2, string_match_result2_2, string_match_result3 = string.match(math.abs(arg1), "^([^%d]*%d)(%d*)(.-)$")
-    return string.format("%s$%s", var7, string_match_result1_2..string_match_result2_2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3)
+local function FormatMoney(p1) --[[ Line: 16 ]]
+	local v3, v4, v5 = string.match(math.abs(p1), "^([^%d]*%d)(%d*)(.-)$")
+	return ("%s$%s"):format(if p1 >= 0 then "" else "-", v3 .. v4:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v5)
 end
-local function PlaySound_upvr(arg1, arg2) -- Line 20, Named "PlaySound"
-    local Sound_upvr = Instance.new("Sound")
-    Sound_upvr.SoundId = string.format("rbxassetid://%d", arg2)
-    Sound_upvr.Volume = 0.75
-    Sound_upvr.RollOffMode = Enum.RollOffMode.InverseTapered
-    Sound_upvr.Parent = arg1
-    Sound_upvr:Play()
-    delay(1, function() -- Line 27
-        game.Debris:AddItem(Sound_upvr, Sound_upvr.TimeLength)
-    end)
+local function PlaySound(p1, p2) --[[ Line: 20 ]]
+	local Sound = Instance.new("Sound")
+	Sound.SoundId = ("rbxassetid://%d"):format(p2)
+	Sound.Volume = 0.75
+	Sound.RollOffMode = Enum.RollOffMode.InverseTapered
+	Sound.Parent = p1
+	Sound:Play()
+	delay(1, function() --[[ Line: 27 | Upvalues: Sound (copy) ]]
+		game.Debris:AddItem(Sound, Sound.TimeLength)
+	end)
 end
-local function OpenRoofDoorRaw_upvr(arg1, arg2) -- Line 31, Named "OpenRoofDoorRaw"
-    local assert_result1 = assert(arg1.Model.Model:FindFirstChild("Glass"..tostring(arg2)), "missing glassPart")
-    if arg1.GlassIndexOpen[arg2] then return end
-    arg1.GlassIndexOpen[arg2] = true
-    assert_result1.CanCollide = false
-    assert_result1.Transparency = 1
-    PlaySound_upvr(assert_result1, 848150421)
-    CircleAction_upvr.Remove(assert_result1)
-    return true
+local function OpenRoofDoorRaw(p1, p2) --[[ Line: 31 | Upvalues: PlaySound (copy), CircleAction (copy) ]]
+	local v2 = assert(p1.Model.Model:FindFirstChild("Glass" .. tostring(p2)), "missing glassPart")
+	if not p1.GlassIndexOpen[p2] then
+		p1.GlassIndexOpen[p2] = true
+		v2.CanCollide = false
+		v2.Transparency = 1
+		PlaySound(v2, 848150421)
+		CircleAction.Remove(v2)
+		return true
+	end
 end
-local function _(arg1, arg2) -- Line 43, Named "OpenSideDoorRaw"
-    if arg1.DoorIndexOpen[arg2] then return end
-    arg1.DoorIndexOpen[arg2] = true
-    arg1.DoorOpenFuncs[arg2]()
-    CircleAction_upvr.Remove(assert(arg1.Model.Skeleton:FindFirstChild("Door"..tostring(arg2)), "missing doorModel"))
-    return true
+local function OpenSideDoorRaw(p1, p2) --[[ Line: 43 | Upvalues: CircleAction (copy) ]]
+	local v2 = assert(p1.Model.Skeleton:FindFirstChild("Door" .. tostring(p2)), "missing doorModel")
+	if not p1.DoorIndexOpen[p2] then
+		p1.DoorIndexOpen[p2] = true
+		p1.DoorOpenFuncs[p2]()
+		CircleAction.Remove(v2)
+		return true
+	end
 end
-local Joint_upvr = require(ReplicatedStorage_upvr.Std.Joint)
-local zero_cframe_upvr = CFrame.new()
-local function SetupPassengerCar_upvr(arg1) -- Line 54, Named "SetupPassengerCar"
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local tbl_3 = {}
-    local function GrabAction(arg1_2, arg2) -- Line 56
-        if arg2 then
-            arg1_2.IsMine = true
-            var3_upvw:FireServer('g'.."".."zkeug":sub(2, 4):reverse():reverse():reverse().."".."".."ra9k4lpb6gh":sub(5, 7):reverse()..""..'n', arg1.SystemId, arg1.Id, arg1_2.SpawnName, arg1_2.ItemName)
-        end
-        return true
-    end
-    arg1.Items = {}
-    local Model = arg1.Model
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    for i, v in Model.Model.Cash:GetChildren() do
-        local tbl = {
-            Part = v;
-            Name = "Grab Cash";
-            Timed = true;
-            Duration = 0.65;
-            Dist = 6;
-            Callback = GrabAction;
-            SpawnName = v.Name;
-            ItemName = "RackOfCash";
-        }
-        CircleAction_upvr.Add(tbl, v)
-        table.insert(tbl_3, tbl)
-        arg1.Items[v.Name] = v
-    end
-    if arg1.Name ~= "PassengerArmor" then
-        for i_2 = 1, 2 do
-            i = Model.Model:FindFirstChild("Glass"..tostring(i_2))
-            v = {}
-            v.Part = i
-            v.Name = "Break Glass"
-            v.ValidRoot = arg1.Model
-            v.Timed = true
-            v.NoRay = true
-            v.Duration = 1.5
-            v.Dist = 10
-            function v.Callback(arg1_3, arg2) -- Line 118, Named "Action"
-                if arg2 then
-                    if not OpenRoofDoorRaw_upvr(arg1, arg1_3.GlassIndex) then
-                        return false
-                    end
-                    var3_upvw:FireServer('t'.."zgdj18by4u":sub(2, 6):reverse():reverse():reverse():reverse():reverse().."".."c5", arg1.SystemId, arg1.Id, arg1_3.GlassIndex)
-                end
-                return true
-            end
-            v.GlassIndex = i_2
-            CircleAction_upvr.Add(v, i)
-            table.insert(tbl_3, v)
-            local _
-        end
-    end
-    for i_3 = 1, 2 do
-        i = Model.Skeleton:FindFirstChild("Door"..tostring(i_3))
-        if i then
-            v = i.PrimaryPart
-            local tbl_2 = {
-                Part = v;
-                Name = "Open Door";
-                ValidRoot = arg1.Model;
-                Timed = false;
-                NoRay = true;
-                Dist = 10;
-                Callback = function(arg1_4, arg2) -- Line 147, Named "SideDoorAction"
-                    if arg2 then
-                        local var39 = arg1
-                        local DoorIndex = arg1_4.DoorIndex
-                        if var39.DoorIndexOpen[DoorIndex] then
-                        else
-                            var39.DoorIndexOpen[DoorIndex] = true
-                            var39.DoorOpenFuncs[DoorIndex]()
-                            CircleAction_upvr.Remove(assert(var39.Model.Skeleton:FindFirstChild("Door"..tostring(DoorIndex)), "missing doorModel"))
-                        end
-                        if not true then
-                            return false
-                        end
-                        var3_upvw:FireServer('p'.."".."fmhhptm":sub(5, 5):reverse().."".."".."ggvwiyost":sub(5, 7):reverse():reverse():reverse():reverse():reverse().."".."5ee", arg1.SystemId, arg1.Id, arg1_4.DoorIndex)
-                    end
-                    return true
-                end;
-                DoorIndex = i_3;
-            }
-            CircleAction_upvr.Add(tbl_2, i)
-            table.insert(tbl_3, tbl_2)
-        end
-    end
-    arg1.CircleActionSpecs = tbl_3
-    arg1.GlassIndexOpen = {}
-    arg1.DoorIndexOpen = {}
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local v4 = CFrame.new()
+local function SetupPassengerCar(p1) --[[ Line: 54 | Upvalues: v1 (ref), CircleAction (copy), ReplicatedStorage (copy), Joint (copy), v4 (copy), OpenRoofDoorRaw (copy) ]]
+	local t = {}
+	local function GrabAction(p12, p2) --[[ Line: 56 | Upvalues: v1 (ref), p1 (copy) ]]
+		if p2 then
+			p12.IsMine = true
+			v1:FireServer("no98ghkm", p1.SystemId, p1.Id, p12.SpawnName, p12.ItemName)
+		end
+		return true
+	end
+	p1.Items = {}
+	local Model = p1.Model
+	if p1.Name == "PassengerArmor" then
+		for v12, v2 in Model.Model.Cash:GetChildren() do
+			local t2 = {
+				Part = v2,
+				Name = "Grab Cash",
+				Timed = true,
+				Duration = 0.65,
+				Dist = 6,
+				Callback = GrabAction,
+				SpawnName = v2.Name,
+				ItemName = "RackOfCash"
+			}
+			CircleAction.Add(t2, v2)
+			table.insert(t, t2)
+			p1.Items[v2.Name] = v2
+		end
+	else
+		local v3 = next
+		local v42, v5 = Model.Model.Spawns:GetChildren()
+		for v6, v7 in v3, v42, v5 do
+			local v8 = p1.ChosenItems[v7.Name]
+			if v8 then
+				local v9 = ReplicatedStorage.Resource.TrainGrabItems[v8]:Clone()
+				v9.CanCollide = false
+				Joint.CustomWeld(v9, p1.Base, (v7.CFrame * CFrame.new(0, v9.Size.Y * 0.5, 0) * CFrame.Angles(0, (math.random() - 0.5) * 2 * 0.1, 0)):toObjectSpace(p1.Base.CFrame), v4)
+				v9.Anchored = false
+				v9.Parent = Model
+				p1.Items[v7.Name] = v9
+				local t2 = {
+					Part = v9,
+					Name = ("Grab %s"):format(v8:lower()),
+					Timed = true,
+					Duration = 0.65,
+					Dist = 6,
+					Callback = GrabAction,
+					SpawnName = v7.Name,
+					ItemName = v8
+				}
+				CircleAction.Add(t2, v9)
+				table.insert(t, t2)
+			end
+			v7:Destroy()
+		end
+	end
+	if p1.Name ~= "PassengerArmor" then
+		local function Action(p12, p2) --[[ Line: 118 | Upvalues: OpenRoofDoorRaw (ref), p1 (copy), v1 (ref) ]]
+			if p2 and OpenRoofDoorRaw(p1, p12.GlassIndex) then
+				v1:FireServer("i" .. ("dls1l"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "qzvb", p1.SystemId, p1.Id, p12.GlassIndex)
+			elseif p2 then
+				return false
+			end
+			return true
+		end
+		for i = 1, 2 do
+			local v11 = Model.Model:FindFirstChild("Glass" .. tostring(i))
+			local t2 = {
+				Part = v11,
+				Name = "Break Glass",
+				ValidRoot = p1.Model,
+				Timed = true,
+				NoRay = true,
+				Duration = 1.5,
+				Dist = 10,
+				Callback = Action,
+				GlassIndex = i
+			}
+			CircleAction.Add(t2, v11)
+			table.insert(t, t2)
+		end
+	end
+	local function SideDoorAction(p12, p2) --[[ Line: 147 | Upvalues: p1 (copy), CircleAction (ref), v1 (ref) ]]
+		if p2 then
+			local v12 = p1
+			local DoorIndex = p12.DoorIndex
+			local v3 = assert(v12.Model.Skeleton:FindFirstChild("Door" .. tostring(DoorIndex)), "missing doorModel")
+			local v4
+			if v12.DoorIndexOpen[DoorIndex] then
+				v4 = nil
+			else
+				v12.DoorIndexOpen[DoorIndex] = true
+				v12.DoorOpenFuncs[DoorIndex]()
+				CircleAction.Remove(v3)
+				v4 = true
+			end
+			if v4 then
+				v1:FireServer("r" .. ("z8jlxqn5i"):sub(4, 5):reverse() .. "" .. "" .. ("mjscq"):sub(3, 3):reverse() .. "" .. "" .. ("w5419skn"):sub(5, 7):reverse():reverse():reverse() .. "y", p1.SystemId, p1.Id, p12.DoorIndex)
+			else
+				return false
+			end
+		end
+		return true
+	end
+	for j = 1, 2 do
+		local v12 = Model.Skeleton:FindFirstChild("Door" .. tostring(j))
+		if v12 then
+			local t2 = {
+				Part = v12.PrimaryPart,
+				Name = "Open Door",
+				ValidRoot = p1.Model,
+				Timed = false,
+				NoRay = true,
+				Dist = 10,
+				Callback = SideDoorAction,
+				DoorIndex = j
+			}
+			CircleAction.Add(t2, v12)
+			table.insert(t, t2)
+		end
+	end
+	p1.CircleActionSpecs = t
+	p1.GlassIndexOpen = {}
+	p1.DoorIndexOpen = {}
 end
-local function OnCarCreated_upvr(arg1) -- Line 180, Named "OnCarCreated"
-    if arg1.Name:sub(1, 9) == "Passenger" then
-        SetupPassengerCar_upvr(arg1)
-    end
+local function OnCarCreated(p1) --[[ Line: 180 | Upvalues: SetupPassengerCar (copy) ]]
+	if p1.Name:sub(1, 9) == "Passenger" then
+		SetupPassengerCar(p1)
+	end
 end
-local function OnCarDestroyed_upvr(arg1) -- Line 186, Named "OnCarDestroyed"
-    if arg1.Name:sub(1, 9) == "Passenger" then
-        if arg1.CircleActionSpecs then
-            for _, v_2 in next, arg1.CircleActionSpecs do
-                if not v_2.Kill then
-                    v_2.Kill = true
-                end
-            end
-            return
-        end
-        warn("Car.CircleActionSpecs is nil")
-        print(arg1)
-    end
+local function OnCarDestroyed(p1) --[[ Line: 186 ]]
+	if p1.Name:sub(1, 9) == "Passenger" then
+		if p1.CircleActionSpecs then
+			for v1, v2 in next, p1.CircleActionSpecs do
+				if not v2.Kill then
+					v2.Kill = true
+				end
+			end
+		else
+			warn("Car.CircleActionSpecs is nil")
+			print(p1)
+		end
+	end
 end
-local var44_upvw
-local var45_upvw
-local TrainSystem_upvr = require(ReplicatedStorage_upvr.Game.TrainSystem)
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
 return {
-    Init = function(arg1) -- Line 201, Named "Init"
-        var3_upvw = arg1.Event
-        var44_upvw = arg1.em
-        var45_upvw = arg1.ScreenGui
-        TrainSystem_upvr.Signals.OnCarCreated:Connect(OnCarCreated_upvr)
-        TrainSystem_upvr.Signals.OnCarDestroyed:Connect(OnCarDestroyed_upvr)
-        function var44_upvw.guekpl4n(arg1_5, arg2, arg3) -- Line 210
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            local any_GetSystemById_result1 = TrainSystem_upvr.GetSystemById(arg1_5)
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            do
-                return nil
-            end
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        end
-        function var44_upvw.t81jdgc5(arg1_6, arg2, arg3) -- Line 237
-            local any_GetSystemById_result1_2 = TrainSystem_upvr.GetSystemById(arg1_6)
-            if not any_GetSystemById_result1_2 then
-                return nil
-            end
-            local any_GetCarById_result1 = TrainSystem_upvr.GetCarById(any_GetSystemById_result1_2, arg2)
-            if not any_GetCarById_result1 then
-                return nil
-            end
-            OpenRoofDoorRaw_upvr(any_GetCarById_result1, arg3)
-            return true
-        end
-    end;
+	Init = function(p1) --[[ Name: Init | Line: 201 | Upvalues: v1 (ref), v2 (ref), v3 (ref), TrainSystem (copy), OnCarCreated (copy), OnCarDestroyed (copy), PlaySound (copy), LocalPlayer (copy), OpenRoofDoorRaw (copy) ]]
+		local em = p1.em
+		v1 = p1.Event
+		v2 = em
+		v3 = p1.ScreenGui
+		TrainSystem.Signals.OnCarCreated:Connect(OnCarCreated)
+		TrainSystem.Signals.OnCarDestroyed:Connect(OnCarDestroyed)
+		function em.no98ghkm(p1, p2, p3) --[[ Line: 210 | Upvalues: TrainSystem (ref), PlaySound (ref), LocalPlayer (ref) ]]
+			local v1 = TrainSystem.GetSystemById(p1)
+			if v1 then
+				local v2 = TrainSystem.GetCarById(v1, p2)
+				if v2 and v2.Items[p3] then
+					v2.Items[p3]:Destroy()
+					if v2.CircleActionSpecs then
+						for v3, v4 in v2.CircleActionSpecs do
+							if v4.SpawnName == p3 then
+								v4.Kill = true
+								if v4.IsMine then
+									PlaySound(LocalPlayer, 1988477690)
+								end
+								break
+							end
+						end
+					end
+					return true
+				else
+					return nil
+				end
+			else
+				return nil
+			end
+		end
+		function em.i1slqzvb(p1, p2, p3) --[[ Line: 237 | Upvalues: TrainSystem (ref), OpenRoofDoorRaw (ref) ]]
+			local v1 = TrainSystem.GetSystemById(p1)
+			if v1 then
+				local v2 = TrainSystem.GetCarById(v1, p2)
+				if v2 then
+					OpenRoofDoorRaw(v2, p3)
+					return true
+				else
+					return nil
+				end
+			else
+				return nil
+			end
+		end
+	end
 }

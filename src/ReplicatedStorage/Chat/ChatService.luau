@@ -1,157 +1,138 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_upvr = {
-    onMessageIncoming = require(ReplicatedStorage.Std.Signal).new();
-}
-local TextChatService_upvr = game:GetService("TextChatService")
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local RunUtils_upvr = require(ReplicatedStorage.App.RunUtils)
-local GamepassSystem_upvr = require(ReplicatedStorage.Gamepass.GamepassSystem)
-local GamepassUtils_upvr = require(ReplicatedStorage.Gamepass.GamepassUtils)
-local Color3_fromRGB_result1_upvr_2 = Color3.fromRGB(255, 191, 5)
-local Color3_fromRGB_result1_upvr_3 = Color3.fromRGB(255, 192, 203)
-local Color3_fromRGB_result1_upvr_4 = Color3.fromRGB(110, 197, 59)
-local AdminPermUtils_upvr = require(ReplicatedStorage.App.AdminPermUtils)
-local Color3_fromRGB_result1_upvr = Color3.fromRGB(235, 88, 88)
-local Players_upvr = game:GetService("Players")
-local Color3_fromHex_result1_upvr = Color3.fromHex("f1da10")
-local RichTextUtils_upvr = require(ReplicatedStorage.Std.RichTextUtils)
-function module_upvr.init() -- Line 22
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local class_ChatWindowConfiguration = TextChatService_upvr:FindFirstChildOfClass("ChatWindowConfiguration")
-    if class_ChatWindowConfiguration then
-        class_ChatWindowConfiguration.TextStrokeTransparency = 0.7
-    else
-        warn("ChatWindowConfiguration not found")
-    end
-    local any_new_result1_upvr = Maid_upvr.new()
-    local tbl_2_upvr = {}
-    local function setPlayerChatData_upvr(arg1) -- Line 36, Named "setPlayerChatData"
-        local tbl = {
-            Tags = {};
-        }
-        if RunUtils_upvr.isMainWorld() and GamepassSystem_upvr.doesPlayerOwnCached(arg1, GamepassUtils_upvr.EnumGamepass.VIP) then
-            tbl.ChatColor = Color3_fromRGB_result1_upvr_2
-            table.insert(tbl.Tags, {
-                TagText = "[VIP] ";
-                TagColor = Color3_fromRGB_result1_upvr_2;
-            })
-        end
-        if RunUtils_upvr.isTradeWorld() and GamepassSystem_upvr.doesPlayerOwnCached(arg1, GamepassUtils_upvr.EnumGamepass.TradingVIP) then
-            tbl.ChatColor = Color3_fromRGB_result1_upvr_3
-            table.insert(tbl.Tags, {
-                TagText = "[TradingVIP] ";
-                TagColor = Color3_fromRGB_result1_upvr_3;
-            })
-        end
-        if arg1:GetAttribute("IsPartner") then
-            table.insert(tbl.Tags, {
-                TagText = "[Star] ";
-                TagColor = Color3_fromRGB_result1_upvr_4;
-            })
-        end
-        if AdminPermUtils_upvr.isBadimo(arg1) then
-            tbl.ChatColor = Color3_fromRGB_result1_upvr
-            table.clear(tbl.Tags)
-            table.insert(tbl.Tags, {
-                TagText = "[Badimo] ";
-                TagColor = Color3_fromRGB_result1_upvr;
-            })
-        end
-        tbl_2_upvr[arg1] = tbl
-    end
-    for _, v in Players_upvr:GetPlayers() do
-        (function(arg1) -- Line 73, Named "playerAdded"
-            local any_new_result1 = Maid_upvr.new()
-            any_new_result1_upvr[arg1] = any_new_result1
-            setPlayerChatData_upvr(arg1)
-            any_new_result1:GiveTask(GamepassSystem_upvr.OnAnyPlayerAnyOwned:Connect(function(arg1_2, arg2) -- Line 77
-                if arg1_2 ~= arg1 then
-                else
-                    setPlayerChatData_upvr(arg1)
-                end
-            end))
-            any_new_result1:GiveTask(arg1:GetAttributeChangedSignal("IsPartner"):Connect(function() -- Line 83
-                setPlayerChatData_upvr(arg1)
-            end))
-        end)(v)
-        local var38
-    end
-    Players_upvr.PlayerAdded:Connect(var38)
-    Players_upvr.PlayerRemoving:Connect(function(arg1) -- Line 32, Named "playerRemoving"
-        any_new_result1_upvr[arg1] = nil
-        tbl_2_upvr[arg1] = nil
-    end)
-    function TextChatService_upvr.OnIncomingMessage(arg1) -- Line 92
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        local TextChatMessageProperties = Instance.new("TextChatMessageProperties")
-        local TextChannel = arg1.TextChannel
-        local var46
-        if TextChannel then
-            var46 = string.find(TextChannel.Name, "RBXTeam")
-        end
-        if arg1.TextSource == nil and arg1.Metadata == "BadimoSystemMessage" then
-            local var47 = Color3_fromHex_result1_upvr
-            if RichTextUtils_upvr.doesTextHaveColor(arg1.Text) then
-                var47 = RichTextUtils_upvr.extractColorFromText(arg1.Text)
-            else
-                TextChatMessageProperties.Text = RichTextUtils_upvr.addColorToText(arg1.Text, Color3_fromHex_result1_upvr)
-            end
-            TextChatMessageProperties.PrefixText = RichTextUtils_upvr.addColorToText("[System]", var47)..arg1.PrefixText
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        if var46 then
-            TextChatMessageProperties.Text = RichTextUtils_upvr.addColorToText(arg1.Text, BrickColor.new(string.sub(TextChannel.Name, var46 + 7)).Color)
-        else
-            local var48
-            if arg1.TextSource then
-                local UserId = arg1.TextSource.UserId
-                local any_GetPlayerByUserId_result1 = Players_upvr:GetPlayerByUserId(UserId)
-                if not any_GetPlayerByUserId_result1 then return end
-                local var51
-                if any_GetPlayerByUserId_result1:GetAttribute("ChatLoaded") ~= true and any_GetPlayerByUserId_result1 ~= Players_upvr.LocalPlayer then
-                    arg1.Status = Enum.TextChatMessageStatus.InvalidTextChannelPermissions
-                    return nil
-                end
-                local var52 = tbl_2_upvr[any_GetPlayerByUserId_result1]
-                if not var52 then return end
-                var51 = arg1.PrefixText
-                var48 = nil
-                for _, v_2 in var52.Tags, var48 do
-                    local var53
-                    if not var53 then
-                        var53 = Color3.new(1, 1, 1)
-                    end
-                    local var54 = v_2.TagText or ""
-                    if 0 < #var54 then
-                        var51 = RichTextUtils_upvr.addColorToText(var54, var53)..var51
-                    end
-                end
-                TextChatMessageProperties.PrefixText = var51
-                var48 = var52.ChatColor
-                if not var48 then
-                    var48 = Color3.new(1, 1, 1)
-                end
-                local var55
-                if UserId == 1 then
-                    var53 = Color3.fromHSV(math.random(), 1, 1)
-                    var55 = RichTextUtils_upvr.addColorToText(arg1.Text, var53)
-                else
-                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                    var55 = RichTextUtils_upvr.addColorToText(arg1.Text, var48)
-                end
-                TextChatMessageProperties.Text = var55
-            end
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end
-    function TextChatService_upvr.OnBubbleAdded(arg1, arg2) -- Line 147
-        if arg1.TextSource then
-            local BubbleChatMessageProperties = Instance.new("BubbleChatMessageProperties")
-            BubbleChatMessageProperties.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-            return BubbleChatMessageProperties
-        end
-    end
+local RunUtils = require(ReplicatedStorage.App.RunUtils)
+local TextChatService = game:GetService("TextChatService")
+local AdminPermUtils = require(ReplicatedStorage.App.AdminPermUtils)
+local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
+local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local RichTextUtils = require(ReplicatedStorage.Std.RichTextUtils)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local t = {}
+local v1 = Color3.fromRGB(110, 197, 59)
+local v2 = Color3.fromRGB(255, 192, 203)
+local v3 = Color3.fromRGB(255, 191, 5)
+local v4 = Color3.fromRGB(235, 88, 88)
+local v5 = Color3.fromHex("f1da10")
+t.onMessageIncoming = Signal.new()
+function t.init() --[[ Line: 22 | Upvalues: TextChatService (copy), Maid (copy), RunUtils (copy), GamepassSystem (copy), GamepassUtils (copy), v3 (copy), v2 (copy), v1 (copy), AdminPermUtils (copy), v4 (copy), Players (copy), v5 (copy), RichTextUtils (copy), t (copy) ]]
+	local ChatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
+	if ChatWindowConfiguration then
+		ChatWindowConfiguration.TextStrokeTransparency = 0.7
+	else
+		warn("ChatWindowConfiguration not found")
+	end
+	local v12 = Maid.new()
+	local t2 = {}
+	local function playerRemoving(p1) --[[ Line: 32 | Upvalues: v12 (copy), t2 (copy) ]]
+		v12[p1] = nil
+		t2[p1] = nil
+	end
+	local function setPlayerChatData(p1) --[[ Line: 36 | Upvalues: RunUtils (ref), GamepassSystem (ref), GamepassUtils (ref), v3 (ref), v2 (ref), v1 (ref), AdminPermUtils (ref), v4 (ref), t2 (copy) ]]
+		local t = {
+			Tags = {}
+		}
+		if RunUtils.isMainWorld() and GamepassSystem.doesPlayerOwnCached(p1, GamepassUtils.EnumGamepass.VIP) then
+			t.ChatColor = v3
+			table.insert(t.Tags, {
+				TagText = "[VIP] ",
+				TagColor = v3
+			})
+		end
+		if RunUtils.isTradeWorld() and GamepassSystem.doesPlayerOwnCached(p1, GamepassUtils.EnumGamepass.TradingVIP) then
+			t.ChatColor = v2
+			table.insert(t.Tags, {
+				TagText = "[TradingVIP] ",
+				TagColor = v2
+			})
+		end
+		if p1:GetAttribute("IsPartner") then
+			table.insert(t.Tags, {
+				TagText = "[Star] ",
+				TagColor = v1
+			})
+		end
+		if AdminPermUtils.isBadimo(p1) then
+			t.ChatColor = v4
+			table.clear(t.Tags)
+			table.insert(t.Tags, {
+				TagText = "[Badimo] ",
+				TagColor = v4
+			})
+		end
+		t2[p1] = t
+	end
+	local function playerAdded(p1) --[[ Line: 73 | Upvalues: Maid (ref), v12 (copy), setPlayerChatData (copy), GamepassSystem (ref) ]]
+		local v1 = Maid.new()
+		v12[p1] = v1
+		setPlayerChatData(p1)
+		v1:GiveTask(GamepassSystem.OnAnyPlayerAnyOwned:Connect(function(p12, p2) --[[ Line: 77 | Upvalues: p1 (copy), setPlayerChatData (ref) ]]
+			if p12 == p1 then
+				setPlayerChatData(p1)
+			end
+		end))
+		v1:GiveTask(p1:GetAttributeChangedSignal("IsPartner"):Connect(function() --[[ Line: 83 | Upvalues: setPlayerChatData (ref), p1 (copy) ]]
+			setPlayerChatData(p1)
+		end))
+	end
+	for v22, v32 in Players:GetPlayers() do
+		playerAdded(v32)
+	end
+	Players.PlayerAdded:Connect(playerAdded)
+	Players.PlayerRemoving:Connect(playerRemoving)
+	function TextChatService.OnIncomingMessage(p1) --[[ Line: 92 | Upvalues: v5 (ref), RichTextUtils (ref), Players (ref), t2 (copy), t (ref) ]]
+		local TextChatMessageProperties = Instance.new("TextChatMessageProperties")
+		local TextChannel = p1.TextChannel
+		local v1 = if TextChannel then string.find(TextChannel.Name, "RBXTeam") else nil
+		if p1.TextSource == nil and p1.Metadata == "BadimoSystemMessage" then
+			local v3 = v5
+			if RichTextUtils.doesTextHaveColor(p1.Text) then
+				v3 = RichTextUtils.extractColorFromText(p1.Text)
+			else
+				TextChatMessageProperties.Text = RichTextUtils.addColorToText(p1.Text, v5)
+			end
+			TextChatMessageProperties.PrefixText = RichTextUtils.addColorToText("[System]", v3) .. p1.PrefixText
+		elseif v1 then
+			TextChatMessageProperties.Text = RichTextUtils.addColorToText(p1.Text, BrickColor.new((string.sub(TextChannel.Name, v1 + 7))).Color)
+		elseif p1.TextSource then
+			local UserId = p1.TextSource.UserId
+			local v7 = Players:GetPlayerByUserId(UserId)
+			if v7 then
+				if v7:GetAttribute("ChatLoaded") == true or v7 == Players.LocalPlayer then
+					local v8 = t2[v7]
+					if v8 then
+						local PrefixText = p1.PrefixText
+						for v9, v10 in v8.Tags do
+							local v11 = v10.TagColor or Color3.new(255/255, 255/255, 255/255)
+							local v12 = v10.TagText or ""
+							if #v12 > 0 then
+								PrefixText = RichTextUtils.addColorToText(v12, v11) .. PrefixText
+							end
+						end
+						TextChatMessageProperties.PrefixText = PrefixText
+						local Text = p1.Text
+						local v13 = v8.ChatColor or Color3.new(255/255, 255/255, 255/255)
+						TextChatMessageProperties.Text = if UserId == 1 then RichTextUtils.addColorToText(Text, Color3.fromHSV(math.random(), 1, 1)) else RichTextUtils.addColorToText(Text, v13)
+					else
+						return
+					end
+				else
+					p1.Status = Enum.TextChatMessageStatus.InvalidTextChannelPermissions
+					return nil
+				end
+			else
+				return
+			end
+		end
+		t.onMessageIncoming:Fire(p1, TextChatMessageProperties)
+		return TextChatMessageProperties
+	end
+	function TextChatService.OnBubbleAdded(p1, p2) --[[ Line: 147 ]]
+		if p1.TextSource then
+			local BubbleChatMessageProperties = Instance.new("BubbleChatMessageProperties")
+			BubbleChatMessageProperties.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+			return BubbleChatMessageProperties
+		end
+	end
 end
-return module_upvr
+return t

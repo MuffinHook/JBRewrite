@@ -1,46 +1,36 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMMDGRpc2Nvbm5lY3RlZChMaXN0ZW5lcnMgY2FuIG9ubHkgYmUgZGlzY29ubmVjdGVkIG9uY2UuBmFzc2VydApkaXNjb25uZWN0BnR5cGVvZghmdW5jdGlvbi5DYW4gb25seSBzdWJzY3JpYmUgdG8gc2lnbmFscyB3aXRoIGEgZnVuY3Rpb24uCGNhbGxiYWNrCXN1YnNjcmliZQVwYWlycwRmaXJlDGNyZWF0ZVNpZ25hbAAFBAAEAAAHAAQADw8PDxf7AwAATQIDlwAAAABWAQIAgQEBBAEAAABvAgEApAADAAAAIECfAAMB+wAAAKkBAQAwAQCXAAAAAPsAAQD7AQIAxgIAAGoCAAH7AAMA+wECAMYCAABqAgABggABAAQDAQMCAwMEAAAgQAAkBAEYAAAAAAAAAAAAAAIAAAABAAAAAQAAAAElAAAAAAYCAwAADgADAgEPDw8CDxUPAx4GJLssAQNSBQEApAQBAAAAAECfBAIC8AQCAAIAAACpAwABqQMBAIEBAwQDAAAAbwQDAKQCBQAAAEBAnwIDAeICCAAwAQKmBgAAAKkDAAAwAwKXBwAAAPsDAAAOAwUA+wQBAIcDBAErAwIA+wMCAGoCAwH7AwEAagIDAdkDAAASAAIAEgIBABIAAQASAgIAggMCAAkDBQQAAABAAwYDBwMDBAAAQEADCAMBBQIGBwEAFAkBGAAAAAAAAAAAAAAAAAAAAAIBAAEAAAUAAAAAAQADAAIAAAAACBUAAAAACAEDAQAWAAMEAQ8PDwQHCg8FBwoPBBkEDwUZBCCjAQAAqQEBAN4BAACkAQEAAAAAQPsCAQCfAQIEFwEJAE0GBZcCAAAAKwYGAPsHAgCHBgcEKwYDAFIGBADdBwAAnwYAAW4B9v8CAAAAqQEAAN4BAACkAQEAAAAAQPsCAgCfAQIEFwEDAPsGAgDGBwAAagcGBG4B/P8CAAAAggABAAMDCgQAAABAAwEALwsBGAABAAEAAAAAAQAAAAAAAQAA/gAGAAIAAAAAAQAA/wADLwAAAAAGAAAAABcAAAUPAAAUDwECEgECBBAPAwUPDwQJCxT/AAAAAAAAAP8BAAAAAAAAqQIAANkDAAASAQL/EgAAABIAAQDZBAEAEgEC/xIAAAASAAEA4gUCADADBXsAAAAAMAQFvQEAAADBAgAAggUCAAMDCQMLBQIAAQIBAg8MARgAAAEAAQIAAAAbAAAADwEAAQAAABAAAAAAAQAAAQIHAAABDwABAgOjAAAAwAAAAIIAAgABBgMBAwEAARgADjUBAAAAAAR+6wIw/tOZiEwvaKSV5/RrX3F/bKs97wV5w8MXGa2rPpLkTtJMfXba
-
-return function() --[[ Line: 15 ]] --[[ Name: createSignal ]]
-    local v0 = {};
-    local v1 = {};
-    local v2 = false;
-    local function v6(_, v4) --[[ Line: 20 ]] --[[ Name: subscribe ]]
-        -- upvalues: v2 (ref), v0 (copy), v1 (copy)
-        assert(typeof(v4) == "function", "Can only subscribe to signals with a function.");
-        local v5 = {
-            callback = v4, 
-            disconnected = false
-        };
-        if v2 and not v0[v4] then
-            v1[v4] = v5;
-        end;
-        v0[v4] = v5;
-        return function() --[[ Line: 36 ]] --[[ Name: disconnect ]]
-            -- upvalues: v5 (copy), v0 (ref), v4 (copy), v1 (ref)
-            assert(not v5.disconnected, "Listeners can only be disconnected once.");
-            v5.disconnected = true;
-            v0[v4] = nil;
-            v1[v4] = nil;
-        end;
-    end;
-    local function v12(_, ...) --[[ Line: 47 ]] --[[ Name: fire ]]
-        -- upvalues: v2 (ref), v0 (copy), v1 (copy)
-        v2 = true;
-        for v8, v9 in pairs(v0) do
-            if not v9.disconnected and not v1[v8] then
-                v8(...);
-            end;
-        end;
-        v2 = false;
-        for v10, _ in pairs(v1) do
-            v1[v10] = nil;
-        end;
-    end;
-    return {
-        subscribe = v6, 
-        fire = v12
-    };
-end;
+return function() --[[ Name: createSignal | Line: 15 ]]
+	local t = {}
+	local t2 = {}
+	local v1 = false
+	return {
+		subscribe = function(p1, p2) --[[ Name: subscribe | Line: 20 | Upvalues: v1 (ref), t (copy), t2 (copy) ]]
+			assert(typeof(p2) == "function", "Can only subscribe to signals with a function.")
+			local t3 = {
+				callback = p2,
+				disconnected = false
+			}
+			if v1 and not t[p2] then
+				t2[p2] = t3
+			end
+			t[p2] = t3
+			return function() --[[ Name: disconnect | Line: 36 | Upvalues: t3 (copy), t (ref), p2 (copy), t2 (ref) ]]
+				assert(not t3.disconnected, "Listeners can only be disconnected once.")
+				t3.disconnected = true
+				t[p2] = nil
+				t2[p2] = nil
+			end
+		end,
+		fire = function(p1, ...) --[[ Name: fire | Line: 47 | Upvalues: v1 (ref), t (copy), t2 (copy) ]]
+			v1 = true
+			for k, v in pairs(t) do
+				if not (v.disconnected or t2[k]) then
+					k(...)
+				end
+			end
+			v1 = false
+			for k, v in pairs(t2) do
+				t2[k] = nil
+			end
+		end
+	}
+end

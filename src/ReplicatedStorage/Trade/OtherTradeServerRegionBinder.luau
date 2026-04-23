@@ -1,34 +1,39 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local BaseObject_upvr = require(ReplicatedStorage_upvr.Std.BaseObject)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-local RegionUtils_upvr = require(ReplicatedStorage_upvr.Std.Region.RegionUtils)
-local Interval_upvr = require(ReplicatedStorage_upvr.Std.Interval)
-local Players_upvr = game:GetService("Players")
-local store_upvr = require(ReplicatedStorage_upvr.App.store)
-function module_upvr.new(arg1) -- Line 17
-    local any_new_result1 = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1, module_upvr)
-    arg1.Parent = ReplicatedStorage_upvr
-    local any_getPrism_result1_upvr = RegionUtils_upvr.getPrism(arg1.CFrame, arg1.Size)
-    local var11_upvw = false
-    any_new_result1.maid:GiveTask(Interval_upvr.every(0.1):Connect(function() -- Line 24
-        local Character = Players_upvr.LocalPlayer.Character
-        if not Character then
-        else
-            local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
-            if not HumanoidRootPart then return end
-            local any_CastPoint_result1 = RegionUtils_upvr.CastPoint(any_getPrism_result1_upvr, HumanoidRootPart.Position)
-            if any_CastPoint_result1 ~= var11_upvw then
-                var11_upvw = any_CastPoint_result1
-                store_upvr:dispatch({
-                    type = "setOtherTradeServerListVisible";
-                    value = any_CastPoint_result1;
-                })
-            end
-        end
-    end))
-    return any_new_result1
+game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local store = require(ReplicatedStorage.App.store)
+require(ReplicatedStorage.Gamepass.GamepassSystem)
+require(ReplicatedStorage.Gamepass.GamepassUtils)
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)
+local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1) --[[ Line: 17 | Upvalues: BaseObject (copy), t (copy), RegionUtils (copy), ReplicatedStorage (copy), Interval (copy), Players (copy), store (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t)
+	local v3 = RegionUtils.getPrism(p1.CFrame, p1.Size)
+	p1.Parent = ReplicatedStorage
+	local v4 = false
+	v1.maid:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 24 | Upvalues: Players (ref), RegionUtils (ref), v3 (copy), v4 (ref), store (ref) ]]
+		local Character = Players.LocalPlayer.Character
+		if Character then
+			local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+			if HumanoidRootPart then
+				local v1 = RegionUtils.CastPoint(v3, HumanoidRootPart.Position)
+				if v1 ~= v4 then
+					v4 = v1
+					store:dispatch({
+						type = "setOtherTradeServerListVisible",
+						value = v1
+					})
+				end
+			end
+		end
+	end))
+	return v1
 end
-return require(ReplicatedStorage_upvr.Std.Binder).new(require(ReplicatedStorage_upvr.Trade.TradeConsts).OTHER_TRADE_SERVER_LIST_REGION_TAG_NAME, module_upvr)
+return Binder.new(TradeConsts.OTHER_TRADE_SERVER_LIST_REGION_TAG_NAME, t)

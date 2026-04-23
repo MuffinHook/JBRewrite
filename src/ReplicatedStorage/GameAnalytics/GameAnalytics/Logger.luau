@@ -1,40 +1,37 @@
 return {
-    _infoLogEnabled = false;
-    _infoLogAdvancedEnabled = false;
-    _debugEnabled = game:GetService("RunService"):IsStudio();
-    setDebugLog = function(arg1, arg2) -- Line 10, Named "setDebugLog"
-        arg1._debugEnabled = arg2
-    end;
-    setInfoLog = function(arg1, arg2) -- Line 14, Named "setInfoLog"
-        arg1._infoLogEnabled = arg2
-    end;
-    setVerboseLog = function(arg1, arg2) -- Line 18, Named "setVerboseLog"
-        arg1._infoLogAdvancedEnabled = arg2
-    end;
-    i = function(arg1, arg2) -- Line 22, Named "i"
-        if not arg1._infoLogEnabled then
-        else
-            print("Info/GameAnalytics: "..arg2)
-        end
-    end;
-    w = function(arg1, arg2) -- Line 38, Named "w"
-        warn("Warning/GameAnalytics: "..arg2)
-    end;
-    e = function(arg1, arg2) -- Line 50, Named "e"
-        task.spawn(function() -- Line 51
-            error("Error/GameAnalytics: "..arg2, 0)
-        end)
-    end;
-    d = function(arg1, arg2) -- Line 64, Named "d"
-        if not arg1._debugEnabled then
-        else
-            print("Debug/GameAnalytics: "..arg2)
-        end
-    end;
-    ii = function(arg1, arg2) -- Line 80, Named "ii"
-        if not arg1._infoLogAdvancedEnabled then
-        else
-            print("Verbose/GameAnalytics: "..arg2)
-        end
-    end;
+	_infoLogEnabled = false,
+	_infoLogAdvancedEnabled = false,
+	_debugEnabled = game:GetService("RunService"):IsStudio(),
+	setDebugLog = function(p1, p2) --[[ Name: setDebugLog | Line: 10 ]]
+		p1._debugEnabled = p2
+	end,
+	setInfoLog = function(p1, p2) --[[ Name: setInfoLog | Line: 14 ]]
+		p1._infoLogEnabled = p2
+	end,
+	setVerboseLog = function(p1, p2) --[[ Name: setVerboseLog | Line: 18 ]]
+		p1._infoLogAdvancedEnabled = p2
+	end,
+	i = function(p1, p2) --[[ Name: i | Line: 22 ]]
+		if p1._infoLogEnabled then
+			print("Info/GameAnalytics: " .. p2)
+		end
+	end,
+	w = function(p1, p2) --[[ Name: w | Line: 38 ]]
+		warn("Warning/GameAnalytics: " .. p2)
+	end,
+	e = function(p1, p2) --[[ Name: e | Line: 50 ]]
+		task.spawn(function() --[[ Line: 51 | Upvalues: p2 (copy) ]]
+			error("Error/GameAnalytics: " .. p2, 0)
+		end)
+	end,
+	d = function(p1, p2) --[[ Name: d | Line: 64 ]]
+		if p1._debugEnabled then
+			print("Debug/GameAnalytics: " .. p2)
+		end
+	end,
+	ii = function(p1, p2) --[[ Name: ii | Line: 80 ]]
+		if p1._infoLogAdvancedEnabled then
+			print("Verbose/GameAnalytics: " .. p2)
+		end
+	end
 }

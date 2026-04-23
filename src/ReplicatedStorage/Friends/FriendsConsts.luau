@@ -1,3 +1,4 @@
-return require(game:GetService("ReplicatedStorage").Std.TableUtils).requireValidIndexAndFreeze({
-    FRIEND_UPDATE_INTERVAL = 600;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Std.TableUtils).requireValidIndexAndFreeze({
+	FRIEND_UPDATE_INTERVAL = 600
 })

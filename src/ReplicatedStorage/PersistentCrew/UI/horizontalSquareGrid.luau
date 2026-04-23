@@ -1,45 +1,42 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local createElement_upvr = require(ReplicatedStorage.Roact).createElement
-local PaddedContainer_upvr = require(ReplicatedStorage.EzUi.PaddedContainer)
-local function horizontalSquareGridItem_upvr(arg1) -- Line 7, Named "horizontalSquareGridItem"
-    local var4 = 1 / (1 / arg1.aspectRatio + 1 / arg1.verticalPaddingRatio / arg1.aspectRatio)
-    return createElement_upvr(PaddedContainer_upvr, {
-        component = arg1.component;
-        props = arg1.props;
-        aspectRatio = var4;
-        verticalPaddingRatio = arg1.verticalPaddingRatio;
-        size = UDim2.fromScale(1 / var4, 1);
-        position = UDim2.fromScale(0.5 + (arg1.index - 1 - arg1.numItems / 2) / var4, 0);
-        paddingTop = 0;
-        paddingBottom = 0;
-        paddingRight = 0.5;
-        paddingLeft = 0.5;
-    })
+local Roact = require(ReplicatedStorage.Roact)
+local Dictionary = require(ReplicatedStorage.Std.Dictionary)
+local createElement = Roact.createElement
+local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
+local function horizontalSquareGridItem(p1) --[[ Line: 7 | Upvalues: createElement (copy), PaddedContainer (copy) ]]
+	local v1 = 1 / (1 / p1.aspectRatio + 1 / p1.verticalPaddingRatio / p1.aspectRatio)
+	return createElement(PaddedContainer, {
+		component = p1.component,
+		props = p1.props,
+		aspectRatio = v1,
+		verticalPaddingRatio = p1.verticalPaddingRatio,
+		size = UDim2.fromScale(1 / v1, 1),
+		position = UDim2.fromScale(0.5 + (p1.index - 1 - p1.numItems / 2) / v1, 0),
+		paddingTop = 0,
+		paddingBottom = 0,
+		paddingRight = 0.5,
+		paddingLeft = 0.5
+	})
 end
-local Dictionary_upvr = require(ReplicatedStorage.Std.Dictionary)
-return function(arg1) -- Line 23, Named "horizontalSquareGrid"
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local module = {}
-    local numItems = arg1.numItems
-    if not numItems then
-        numItems = #arg1.items
-    end
-    for i = 1, numItems do
-        module[i] = createElement_upvr(horizontalSquareGridItem_upvr, {
-            exposePaddedContainerProps = true;
-            index = i;
-            numItems = numItems;
-            component = arg1.component;
-            props = Dictionary_upvr.merge(arg1.items[i], arg1.itemMetadata);
-        })
-    end
-    return createElement_upvr(PaddedContainer_upvr, {
-        backgroundTransparency = 1;
-        backgroundColor = Color3.new(0, 0, 0);
-        aspectRatio = arg1.aspectRatio;
-        verticalPaddingRatio = arg1.verticalPaddingRatio;
-        size = UDim2.fromScale(1, 1);
-        paddingLeft = 0;
-        paddingRight = 0;
-    }, module)
+return function(p1) --[[ Name: horizontalSquareGrid | Line: 23 | Upvalues: createElement (copy), horizontalSquareGridItem (copy), Dictionary (copy), PaddedContainer (copy) ]]
+	local t = {}
+	local v1 = p1.numItems or #p1.items
+	for i = 1, v1 do
+		t[i] = createElement(horizontalSquareGridItem, {
+			exposePaddedContainerProps = true,
+			index = i,
+			numItems = v1,
+			component = p1.component,
+			props = Dictionary.merge(p1.items[i], p1.itemMetadata)
+		})
+	end
+	return createElement(PaddedContainer, {
+		backgroundTransparency = 1,
+		backgroundColor = Color3.new(0/255, 0/255, 0/255),
+		aspectRatio = p1.aspectRatio,
+		verticalPaddingRatio = p1.verticalPaddingRatio,
+		size = UDim2.fromScale(1, 1),
+		paddingLeft = 0,
+		paddingRight = 0
+	}, t)
 end

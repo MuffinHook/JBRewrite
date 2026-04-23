@@ -1,6 +1,7 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer(0, {
-    setSpawnSelectionReceivedAt = function(arg1, arg2) -- Line 5, Named "setSpawnSelectionReceivedAt"
-        assert(arg2.receivedAt, "missing receivedAt")
-        return arg2.receivedAt
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer(0, {
+	setSpawnSelectionReceivedAt = function(p1, p2) --[[ Name: setSpawnSelectionReceivedAt | Line: 5 ]]
+		assert(p2.receivedAt, "missing receivedAt")
+		return p2.receivedAt
+	end
 })

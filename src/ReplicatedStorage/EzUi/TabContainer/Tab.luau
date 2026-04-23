@@ -1,69 +1,53 @@
-local EzUi = script:FindFirstAncestor("EzUi")
-local Roact_upvr = require(EzUi.Parent.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("Tab")
-function any_extend_result1.init(arg1) -- Line 9
-    arg1:setState({
-        hover = false;
-    })
+local v1 = script:FindFirstAncestor("EzUi")
+local ColorUtils = require(v1.Parent.Std.ColorUtils)
+local Roact = require(v1.Parent.Roact)
+local createElement = Roact.createElement
+local v2 = Roact.PureComponent:extend("Tab")
+function v2.init(p1) --[[ Line: 9 ]]
+	p1:setState({
+		hover = false
+	})
 end
-local ColorUtils_upvr = require(EzUi.Parent.Std.ColorUtils)
-local createElement_upvr = Roact_upvr.createElement
-function any_extend_result1.render(arg1) -- Line 14
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var7
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var7 = var7.backgroundColor
-        var7 = arg1.props
-        return var7
-    end
-    local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var7 = var7.brightenTo(arg1.props.backgroundColor, 0.4)
-        var7 = ColorUtils_upvr
-        return var7
-    end
-    if not arg1.props.active or not decompInlinedCondition() or not arg1.state.hover or not decompInlinedCondition_2() then
-        var7 = ColorUtils_upvr
-        var7 = var7.brightenTo(arg1.props.backgroundColor, 0.2)
-    end
-    local module = {
-        UICorner = createElement_upvr("UICorner", {
-            CornerRadius = UDim.new(0, 6);
-        });
-    }
-    local tbl = {
-        BackgroundTransparency = 1;
-        Size = UDim2.new(0.6, 0, 0.6, 0);
-        Position = UDim2.new(0.2, 0, 0.2, 0);
-        Text = arg1.props.title;
-        Font = Enum.Font.LuckiestGuy;
-        LineHeight = 0.7;
-        TextScaled = true;
-    }
-    if not arg1.props.active or not Color3.new(1, 1, 1) then
-    end
-    tbl.TextColor3 = ColorUtils_upvr.saturateTo(ColorUtils_upvr.brightenBy(var7, 2), 0)
-    module.Title = createElement_upvr("TextLabel", tbl)
-    return createElement_upvr("TextButton", {
-        Size = arg1.props.scaleXBinding:map(function(arg1_2) -- Line 20
-            return UDim2.new(arg1_2, -arg1.props.paddingX, 1, 0)
-        end);
-        BorderSizePixel = 0;
-        BackgroundTransparency = 0;
-        BackgroundColor3 = var7;
-        LayoutOrder = arg1.props.layoutOrder;
-        Text = "";
-        AutoButtonColor = false;
-        [Roact_upvr.Event.MouseButton1Down] = arg1.props.onClick;
-        [Roact_upvr.Event.MouseEnter] = function() -- Line 33
-            arg1:setState({
-                hover = true;
-            })
-        end;
-        [Roact_upvr.Event.MouseLeave] = function() -- Line 38
-            arg1:setState({
-                hover = false;
-            })
-        end;
-    }, module)
+function v2.render(p1) --[[ Line: 14 | Upvalues: ColorUtils (copy), createElement (copy), Roact (copy) ]]
+	local v1 = p1.props.active and p1.props.backgroundColor or (p1.state.hover and ColorUtils.brightenTo(p1.props.backgroundColor, 0.4) or ColorUtils.brightenTo(p1.props.backgroundColor, 0.2))
+	local t = {
+		Size = p1.props.scaleXBinding:map(function(p12) --[[ Line: 20 | Upvalues: p1 (copy) ]]
+			return UDim2.new(p12, -p1.props.paddingX, 1, 0)
+		end),
+		BorderSizePixel = 0,
+		BackgroundTransparency = 0,
+		BackgroundColor3 = v1,
+		LayoutOrder = p1.props.layoutOrder,
+		Text = "",
+		AutoButtonColor = false,
+		[Roact.Event.MouseButton1Down] = p1.props.onClick,
+		[Roact.Event.MouseEnter] = function() --[[ Line: 33 | Upvalues: p1 (copy) ]]
+			p1:setState({
+				hover = true
+			})
+		end,
+		[Roact.Event.MouseLeave] = function() --[[ Line: 38 | Upvalues: p1 (copy) ]]
+			p1:setState({
+				hover = false
+			})
+		end
+	}
+	local t2 = {
+		UICorner = createElement("UICorner", {
+			CornerRadius = UDim.new(0, 6)
+		})
+	}
+	local t3 = {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0.6, 0, 0.6, 0),
+		Position = UDim2.new(0.2, 0, 0.2, 0),
+		Text = p1.props.title,
+		Font = Enum.Font.LuckiestGuy,
+		LineHeight = 0.7,
+		TextScaled = true
+	}
+	t3.TextColor3 = p1.props.active and Color3.new(255/255, 255/255, 255/255) or ColorUtils.saturateTo(ColorUtils.brightenBy(v1, 2), 0)
+	t2.Title = createElement("TextLabel", t3)
+	return createElement("TextButton", t, t2)
 end
-return any_extend_result1
+return v2

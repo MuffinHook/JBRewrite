@@ -1,242 +1,156 @@
-local Players_upvr = game:GetService("Players")
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RobberyMoneyUI_upvr = require(ReplicatedStorage.Game.RobberyMoneyUI.RobberyMoneyUI)
-local Settings_upvr = require(ReplicatedStorage.Resource.Settings)
-local DuffelBagConsts_upvr = require(script.Parent.DuffelBagConsts)
-local function _(arg1) -- Line 12, Named "GetDevProdByTier"
-    for _, v in ipairs(Settings_upvr.DevProduct) do
-        if v.Type == "DuffelBagUpgrade" and v.Tier == arg1 then
-            return v
-        end
-    end
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local RobberyMoneyUI = require(ReplicatedStorage.Game.RobberyMoneyUI.RobberyMoneyUI)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+local DuffelBagConsts = require(script.Parent.DuffelBagConsts)
+local function GetDevProdByTier(p1) --[[ Line: 12 | Upvalues: Settings (copy) ]]
+	for i, v in ipairs(Settings.DevProduct) do
+		if v.Type == "DuffelBagUpgrade" and v.Tier == p1 then
+			return v
+		end
+	end
 end
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function module_upvr.new(arg1) -- Line 25
-    local module_upvr_2 = {}
-    setmetatable(module_upvr_2, module_upvr)
-    module_upvr_2._obj = arg1
-    module_upvr_2._maid = Maid_upvr.new()
-    module_upvr_2._ownerMaid = Maid_upvr.new()
-    module_upvr_2._maid:GiveTask(module_upvr_2._ownerMaid)
-    module_upvr_2._ownerObj = arg1:WaitForChild(DuffelBagConsts_upvr.OWNER_VALUE_NAME, 2)
-    module_upvr_2._maid:GiveTask(module_upvr_2._ownerObj.Changed:Connect(function() -- Line 36
-        module_upvr_2:_handleOwner()
-    end))
-    module_upvr_2:_handleOwner()
-    local function _(arg1_2) -- Line 41, Named "updateParent"
-        module_upvr_2:_handleOwner()
-    end
-    module_upvr_2._maid:GiveTask(arg1.AncestryChanged:Connect(function(arg1_3, arg2) -- Line 44
-        module_upvr_2:_handleOwner()
-    end))
-    local SOME = arg1:WaitForChild(DuffelBagConsts_upvr.REMOTE_EVENT_NAME, 2)
-    module_upvr_2._maid:GiveTask(SOME.OnClientEvent:Connect(function(...) -- Line 50
-        module_upvr_2:_onClientEvent(...)
-    end))
-    module_upvr_2._remoteEvent = SOME
-    module_upvr_2._robberyEnumValue = arg1:WaitForChild(DuffelBagConsts_upvr.ROBBERY_ENUM_VALUE_NAME, 2)
-    return module_upvr_2
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 25 | Upvalues: t (copy), Maid (copy), DuffelBagConsts (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._obj = p1
+	t2._maid = Maid.new()
+	t2._ownerMaid = Maid.new()
+	t2._maid:GiveTask(t2._ownerMaid)
+	t2._ownerObj = p1:WaitForChild(DuffelBagConsts.OWNER_VALUE_NAME, 2)
+	t2._maid:GiveTask(t2._ownerObj.Changed:Connect(function() --[[ Line: 36 | Upvalues: t2 (copy) ]]
+		t2:_handleOwner()
+	end))
+	t2:_handleOwner()
+	local function updateParent(p1) --[[ Line: 41 | Upvalues: t2 (copy) ]]
+		t2:_handleOwner()
+	end
+	t2._maid:GiveTask(p1.AncestryChanged:Connect(function(p1, p2) --[[ Line: 44 | Upvalues: t2 (copy) ]]
+		t2:_handleOwner()
+	end))
+	local v2 = p1:WaitForChild(DuffelBagConsts.REMOTE_EVENT_NAME, 2)
+	t2._maid:GiveTask(v2.OnClientEvent:Connect(function(...) --[[ Line: 50 | Upvalues: t2 (copy) ]]
+		t2:_onClientEvent(...)
+	end))
+	t2._remoteEvent = v2
+	t2._robberyEnumValue = p1:WaitForChild(DuffelBagConsts.ROBBERY_ENUM_VALUE_NAME, 2)
+	return t2
 end
-local LocalPlayer_upvr = Players_upvr.LocalPlayer
-local MarketplaceService_upvr = game:GetService("MarketplaceService")
-function module_upvr._handleOwner(arg1) -- Line 60
-    arg1._ownerMaid:DoCleaning()
-    if not arg1:IsHeld() then
-    else
-        local var20
-        if arg1:GetOwner() == LocalPlayer_upvr then
-            RobberyMoneyUI_upvr.Show()
-            arg1._ownerMaid:GiveTask(function() -- Line 68
-                RobberyMoneyUI_upvr.Hide()
-            end)
-            local _obj = arg1._obj
-            local SOME_upvr = _obj:WaitForChild(DuffelBagConsts_upvr.AMOUNT_VALUE_NAME)
-            local SOME_5_upvr = _obj:WaitForChild(DuffelBagConsts_upvr.MAXIMUM_VALUE_NAME)
-            local SOME_4_upvr = _obj:WaitForChild(DuffelBagConsts_upvr.MULT_VALUE_NAME)
-            local SOME_upvr_3 = _obj:WaitForChild(DuffelBagConsts_upvr.MULT_ENABLED_VALUE_NAME)
-            local SOME_2_upvr = _obj:WaitForChild(DuffelBagConsts_upvr.TIER_VALUE_NAME)
-            local SOME_upvr_2 = _obj:WaitForChild(DuffelBagConsts_upvr.ROBBERY_ENUM_VALUE_NAME)
-            local function setAmountValue() -- Line 81
-                local var29
-                local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                    var29 = math.ceil(SOME_5_upvr.Value * SOME_4_upvr.Value)
-                    return var29
-                end
-                if not SOME_upvr_3.Value or not decompInlinedCondition() then
-                    var29 = SOME_5_upvr
-                    var29 = var29.Value
-                end
-                arg1:_setAmount(SOME_upvr.Value, var29)
-            end
-            local SOME_6_upvr = _obj:WaitForChild(DuffelBagConsts_upvr.FORMATTER_VALUE_NAME)
-            var20 = SOME_6_upvr.Value
-            arg1:_setFormatter(var20)
-            var20 = SOME_6_upvr:GetPropertyChangedSignal("Value")
-            var20 = var20:Connect(function() -- Line 88
-                arg1:_setFormatter(SOME_6_upvr.Value)
-                arg1:_setTier(SOME_2_upvr.Value, SOME_upvr_3.Value)
-                local var32
-                local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                    var32 = math.ceil(SOME_5_upvr.Value * SOME_4_upvr.Value)
-                    return var32
-                end
-                if not SOME_upvr_3.Value or not decompInlinedCondition_2() then
-                    var32 = SOME_5_upvr
-                    var32 = var32.Value
-                end
-                arg1:_setAmount(SOME_upvr.Value, var32)
-            end)
-            arg1._ownerMaid:GiveTask(var20)
-            var20 = SOME_upvr:GetPropertyChangedSignal("Value"):Connect(setAmountValue)
-            arg1._ownerMaid:GiveTask(var20)
-            var20 = SOME_5_upvr:GetPropertyChangedSignal("Value"):Connect(setAmountValue)
-            arg1._ownerMaid:GiveTask(var20)
-            var20 = DuffelBagConsts_upvr
-            var20 = var20.TIME_VALUE_NAME
-            local SOME_upvr_4 = _obj:WaitForChild(var20)
-            arg1:_setTime(SOME_upvr_4.Value)
-            arg1._ownerMaid:GiveTask(SOME_upvr_4:GetPropertyChangedSignal("Value"):Connect(function() -- Line 99
-                arg1:_setTime(SOME_upvr_4.Value)
-            end))
-            arg1:_setTier(SOME_2_upvr.Value, SOME_upvr_3.Value)
-            arg1._ownerMaid:GiveTask(SOME_2_upvr:GetPropertyChangedSignal("Value"):Connect(function() -- Line 104
-                arg1:_setTier(SOME_2_upvr.Value, SOME_upvr_3.Value)
-                local var36
-                local function decompInlinedCondition_3() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                    var36 = math.ceil(SOME_5_upvr.Value * SOME_4_upvr.Value)
-                    return var36
-                end
-                if not SOME_upvr_3.Value or not decompInlinedCondition_3() then
-                    var36 = SOME_5_upvr
-                    var36 = var36.Value
-                end
-                arg1:_setAmount(SOME_upvr.Value, var36)
-            end))
-            arg1._ownerMaid:GiveTask(SOME_4_upvr:GetPropertyChangedSignal("Value"):Connect(function() -- Line 109
-                local var38
-                local function decompInlinedCondition_4() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                    var38 = math.ceil(SOME_5_upvr.Value * SOME_4_upvr.Value)
-                    return var38
-                end
-                if not SOME_upvr_3.Value or not decompInlinedCondition_4() then
-                    var38 = SOME_5_upvr
-                    var38 = var38.Value
-                end
-                arg1:_setAmount(SOME_upvr.Value, var38)
-            end))
-            arg1._ownerMaid:GiveTask(SOME_upvr_3:GetPropertyChangedSignal("Value"):Connect(function() -- Line 112
-                arg1:_setTier(SOME_2_upvr.Value, SOME_upvr_3.Value)
-                local var40
-                local function decompInlinedCondition_5() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                    var40 = math.ceil(SOME_5_upvr.Value * SOME_4_upvr.Value)
-                    return var40
-                end
-                if not SOME_upvr_3.Value or not decompInlinedCondition_5() then
-                    var40 = SOME_5_upvr
-                    var40 = var40.Value
-                end
-                arg1:_setAmount(SOME_upvr.Value, var40)
-            end))
-            local SOME_3_upvr = _obj:WaitForChild(DuffelBagConsts_upvr.MESSAGE_VALUE_NAME)
-            var20 = arg1:_setMessage
-            var20(SOME_3_upvr.Value)
-            var20 = arg1._ownerMaid
-            var20 = var20:GiveTask
-            var20(SOME_3_upvr:GetPropertyChangedSignal("Value"):Connect(function() -- Line 119
-                arg1:_setMessage(SOME_3_upvr.Value)
-            end))
-            var20 = arg1._ownerMaid
-            var20 = var20:GiveTask
-            var20(RobberyMoneyUI_upvr.getUpgradeButton().MouseButton1Down:Connect(function() -- Line 123
-                -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                for _, v_2 in ipairs(Settings_upvr.DevProduct) do
-                    if v_2.Type == "DuffelBagUpgrade" then
-                        if v_2.Tier == SOME_2_upvr.Value + 1 then
-                            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                        end
-                    end
-                end
-                local var52
-                -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                assert(var52)
-                MarketplaceService_upvr:PromptProductPurchase(LocalPlayer_upvr, var52.Id)
-                -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            end))
-            var20 = arg1:_setRobbery
-            var20(SOME_upvr_2.Value)
-            var20 = arg1._ownerMaid
-            var20 = var20:GiveTask
-            var20(SOME_upvr_2:GetPropertyChangedSignal("Value"):Connect(function() -- Line 132
-                arg1:_setRobbery(SOME_upvr_2.Value)
-            end))
-            local function decompInlinedCondition_6() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                var20 = math.ceil(SOME_5_upvr.Value * SOME_4_upvr.Value)
-                return var20
-            end
-            if not SOME_upvr_3.Value or not decompInlinedCondition_6() then
-                var20 = SOME_5_upvr.Value
-            end
-            arg1:_setAmount(SOME_upvr.Value, var20)
-        end
-    end
+function t._handleOwner(p1) --[[ Line: 60 | Upvalues: LocalPlayer (copy), RobberyMoneyUI (copy), DuffelBagConsts (copy), Settings (copy), MarketplaceService (copy) ]]
+	p1._ownerMaid:DoCleaning()
+	if p1:IsHeld() and p1:GetOwner() == LocalPlayer then
+		RobberyMoneyUI.Show()
+		p1._ownerMaid:GiveTask(function() --[[ Line: 68 | Upvalues: RobberyMoneyUI (ref) ]]
+			RobberyMoneyUI.Hide()
+		end)
+		local _obj = p1._obj
+		local v1 = _obj:WaitForChild(DuffelBagConsts.AMOUNT_VALUE_NAME)
+		local v2 = _obj:WaitForChild(DuffelBagConsts.MAXIMUM_VALUE_NAME)
+		local v3 = _obj:WaitForChild(DuffelBagConsts.MULT_VALUE_NAME)
+		local v4 = _obj:WaitForChild(DuffelBagConsts.MULT_ENABLED_VALUE_NAME)
+		local v5 = _obj:WaitForChild(DuffelBagConsts.TIER_VALUE_NAME)
+		local v6 = _obj:WaitForChild(DuffelBagConsts.ROBBERY_ENUM_VALUE_NAME)
+		local function setAmountValue() --[[ Line: 81 | Upvalues: v4 (copy), v2 (copy), v3 (copy), p1 (copy), v1 (copy) ]]
+			p1:_setAmount(v1.Value, v4.Value and math.ceil(v2.Value * v3.Value) or v2.Value)
+		end
+		local v7 = _obj:WaitForChild(DuffelBagConsts.FORMATTER_VALUE_NAME)
+		p1:_setFormatter(v7.Value)
+		p1._ownerMaid:GiveTask(v7:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 88 | Upvalues: p1 (copy), v7 (copy), v5 (copy), v4 (copy), v2 (copy), v3 (copy), v1 (copy) ]]
+			p1:_setFormatter(v7.Value)
+			p1:_setTier(v5.Value, v4.Value)
+			p1:_setAmount(v1.Value, v4.Value and math.ceil(v2.Value * v3.Value) or v2.Value)
+		end))
+		p1._ownerMaid:GiveTask(v1:GetPropertyChangedSignal("Value"):Connect(setAmountValue))
+		p1._ownerMaid:GiveTask(v2:GetPropertyChangedSignal("Value"):Connect(setAmountValue))
+		local v8 = _obj:WaitForChild(DuffelBagConsts.TIME_VALUE_NAME)
+		p1:_setTime(v8.Value)
+		p1._ownerMaid:GiveTask(v8:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 99 | Upvalues: p1 (copy), v8 (copy) ]]
+			p1:_setTime(v8.Value)
+		end))
+		p1:_setTier(v5.Value, v4.Value)
+		p1._ownerMaid:GiveTask(v5:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 104 | Upvalues: p1 (copy), v5 (copy), v4 (copy), v2 (copy), v3 (copy), v1 (copy) ]]
+			p1:_setTier(v5.Value, v4.Value)
+			p1:_setAmount(v1.Value, v4.Value and math.ceil(v2.Value * v3.Value) or v2.Value)
+		end))
+		p1._ownerMaid:GiveTask(v3:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 109 | Upvalues: v4 (copy), v2 (copy), v3 (copy), p1 (copy), v1 (copy) ]]
+			p1:_setAmount(v1.Value, v4.Value and math.ceil(v2.Value * v3.Value) or v2.Value)
+		end))
+		p1._ownerMaid:GiveTask(v4:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 112 | Upvalues: p1 (copy), v5 (copy), v4 (copy), v2 (copy), v3 (copy), v1 (copy) ]]
+			p1:_setTier(v5.Value, v4.Value)
+			p1:_setAmount(v1.Value, v4.Value and math.ceil(v2.Value * v3.Value) or v2.Value)
+		end))
+		local v9 = _obj:WaitForChild(DuffelBagConsts.MESSAGE_VALUE_NAME)
+		p1:_setMessage(v9.Value)
+		p1._ownerMaid:GiveTask(v9:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 119 | Upvalues: p1 (copy), v9 (copy) ]]
+			p1:_setMessage(v9.Value)
+		end))
+		p1._ownerMaid:GiveTask(RobberyMoneyUI.getUpgradeButton().MouseButton1Down:Connect(function() --[[ Line: 123 | Upvalues: v5 (copy), Settings (ref), MarketplaceService (ref), LocalPlayer (ref) ]]
+			local v1 = v5.Value + 1
+			local v2 = nil
+			for i, v in ipairs(Settings.DevProduct) do
+				if v.Type == "DuffelBagUpgrade" and v.Tier == v1 then
+					v2 = v
+					break
+				end
+			end
+			assert(v2)
+			MarketplaceService:PromptProductPurchase(LocalPlayer, v2.Id)
+		end))
+		p1:_setRobbery(v6.Value)
+		p1._ownerMaid:GiveTask(v6:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 132 | Upvalues: p1 (copy), v6 (copy) ]]
+			p1:_setRobbery(v6.Value)
+		end))
+		p1:_setAmount(v1.Value, v4.Value and math.ceil(v2.Value * v3.Value) or v2.Value)
+	end
 end
-function module_upvr._setAmount(arg1, arg2, arg3) -- Line 139
-    RobberyMoneyUI_upvr.SetMoney(arg2, arg3)
+function t._setAmount(p1, p2, p3) --[[ Line: 139 | Upvalues: RobberyMoneyUI (copy) ]]
+	RobberyMoneyUI.SetMoney(p2, p3)
 end
-function module_upvr._setFormatter(arg1, arg2) -- Line 142
-    RobberyMoneyUI_upvr.SetFormatter(assert(RobberyMoneyUI_upvr.Formatter[arg2]))
+function t._setFormatter(p1, p2) --[[ Line: 142 | Upvalues: RobberyMoneyUI (copy) ]]
+	RobberyMoneyUI.SetFormatter((assert(RobberyMoneyUI.Formatter[p2])))
 end
-function module_upvr._setTime(arg1, arg2) -- Line 146
-    local var54
-    if var54 <= 0.001 then
-        var54 = nil
-    end
-    RobberyMoneyUI_upvr.SetTime(var54)
+function t._setTime(p1, p2) --[[ Line: 146 | Upvalues: RobberyMoneyUI (copy) ]]
+	if p2 <= 0.001 then
+		p2 = nil
+	end
+	RobberyMoneyUI.SetTime(p2)
 end
-function module_upvr._setTier(arg1, arg2, arg3) -- Line 152
-    if arg2 == nil then
-    else
-    end
-    assert(true)
-    if arg3 == nil then
-    else
-    end
-    assert(true)
-    RobberyMoneyUI_upvr.SetTier(arg2, arg3)
+function t._setTier(p1, p2, p3) --[[ Line: 152 | Upvalues: RobberyMoneyUI (copy) ]]
+	assert(p2 ~= nil)
+	assert(p3 ~= nil)
+	RobberyMoneyUI.SetTier(p2, p3)
 end
-function module_upvr._setMessage(arg1, arg2) -- Line 157
-    RobberyMoneyUI_upvr.SetMessage(arg2)
+function t._setMessage(p1, p2) --[[ Line: 157 | Upvalues: RobberyMoneyUI (copy) ]]
+	RobberyMoneyUI.SetMessage(p2)
 end
-function module_upvr._setRobbery(arg1, arg2) -- Line 160
-    RobberyMoneyUI_upvr.SetRobbery(arg2)
+function t._setRobbery(p1, p2) --[[ Line: 160 | Upvalues: RobberyMoneyUI (copy) ]]
+	RobberyMoneyUI.SetRobbery(p2)
 end
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-function module_upvr._onClientEvent(arg1, arg2) -- Line 163
-    if arg2 == DuffelBagConsts_upvr.net.PLAY_AWARD_SOUND then
-        Audio_upvr.ObjectLocal(script, 1988476450)
-    end
+function t._onClientEvent(p1, p2) --[[ Line: 163 | Upvalues: DuffelBagConsts (copy), Audio (copy) ]]
+	if p2 == DuffelBagConsts.net.PLAY_AWARD_SOUND then
+		Audio.ObjectLocal(script, 1988476450)
+	end
 end
-function module_upvr.IsHeld(arg1) -- Line 168
-    local any_GetOwner_result1 = arg1:GetOwner()
-    if any_GetOwner_result1 then
-        any_GetOwner_result1 = arg1._obj:IsDescendantOf(Players_upvr)
-    end
-    return any_GetOwner_result1
+function t.IsHeld(p1) --[[ Line: 168 | Upvalues: Players (copy) ]]
+	return p1:GetOwner() and p1._obj:IsDescendantOf(Players)
 end
-function module_upvr.GetOwner(arg1) -- Line 171
-    return arg1._ownerObj.Value
+function t.GetOwner(p1) --[[ Line: 171 ]]
+	return p1._ownerObj.Value
 end
-function module_upvr.GetRobbery(arg1) -- Line 174
-    return arg1._robberyEnumValue.Value
+function t.GetRobbery(p1) --[[ Line: 174 ]]
+	return p1._robberyEnumValue.Value
 end
-function module_upvr.GetRobberyChangedSignal(arg1) -- Line 177
-    return arg1._robberyEnumValue.Changed
+function t.GetRobberyChangedSignal(p1) --[[ Line: 177 ]]
+	return p1._robberyEnumValue.Changed
 end
-function module_upvr.Destroy(arg1) -- Line 180
-    arg1._maid:Destroy()
-    arg1._maid = nil
+function t.Destroy(p1) --[[ Line: 180 ]]
+	p1._maid:Destroy()
+	p1._maid = nil
 end
-return module_upvr
+return t

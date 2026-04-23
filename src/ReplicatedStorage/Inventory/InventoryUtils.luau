@@ -1,18 +1,12 @@
 return {
-    doesInventoryValueHave = function(arg1, arg2) -- Line 2, Named "doesInventoryValueHave"
-        assert(arg1, "missing inventoryValue")
-        local assert = assert
-        assert(arg2, "missing itemName")
-        if arg1:FindFirstChild(arg2) == nil then
-            assert = false
-        else
-            assert = true
-        end
-        return assert
-    end;
-    getInventoryItemValue = function(arg1, arg2) -- Line 8, Named "getInventoryItemValue"
-        assert(arg1, "missing inventoryValue")
-        assert(arg2, "missing itemName")
-        return arg1:FindFirstChild(arg2)
-    end;
+	doesInventoryValueHave = function(p1, p2) --[[ Name: doesInventoryValueHave | Line: 2 ]]
+		assert(p1, "missing inventoryValue")
+		assert(p2, "missing itemName")
+		return p1:FindFirstChild(p2) ~= nil
+	end,
+	getInventoryItemValue = function(p1, p2) --[[ Name: getInventoryItemValue | Line: 8 ]]
+		assert(p1, "missing inventoryValue")
+		assert(p2, "missing itemName")
+		return p1:FindFirstChild(p2)
+	end
 }

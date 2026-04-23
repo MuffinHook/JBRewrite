@@ -1,45 +1,46 @@
-local Audio_upvr = require(game:GetService("ReplicatedStorage").Std.Audio)
-local Gun_upvr = require(script.Parent.Gun)
-local module_upvr = {
-    __ClassName = "NerfPistol";
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Gun = require(script.Parent.Gun)
+local t = {
+	__ClassName = "NerfPistol"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Gun_upvr)
-function module_upvr.new(arg1, arg2, arg3) -- Line 11
-    local any_new_result1 = Gun_upvr.new(arg1, arg2, arg3)
-    setmetatable(any_new_result1, module_upvr)
-    any_new_result1.ApplySkin = false
-    any_new_result1:Setup(arg3)
-    return any_new_result1
+t.__index = t
+setmetatable(t, Gun)
+function t.new(p1, p2, p3) --[[ Line: 11 | Upvalues: Gun (copy), t (copy) ]]
+	local v1 = Gun.new(p1, p2, p3)
+	setmetatable(v1, t)
+	v1.ApplySkin = false
+	v1:Setup(p3)
+	return v1
 end
-function module_upvr.SetupBulletEmitter(arg1) -- Line 19
-    Gun_upvr.SetupBulletEmitter(arg1)
-    arg1.BulletEmitter.Color = Color3.fromRGB(253, 111, 24)
+function t.SetupBulletEmitter(p1) --[[ Line: 19 | Upvalues: Gun (copy) ]]
+	Gun.SetupBulletEmitter(p1)
+	p1.BulletEmitter.Color = Color3.fromRGB(253, 111, 24)
 end
-function module_upvr.ShootSound(arg1, arg2) -- Line 23
-    if not arg2 then
-        Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_pistol_shot_04, {
-            Pitch = 1;
-        })
-        delay(0.1, function() -- Line 26
-            Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_pistol_slide_fast_01, {
-                Volume = 0.3;
-                Pitch = 1 + math.random() * 0.1 - 0.05;
-            })
-        end)
-    end
+function t.ShootSound(p1, p2) --[[ Line: 23 | Upvalues: Audio (copy) ]]
+	if not p2 then
+		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_pistol_shot_04, {
+			Pitch = 1
+		})
+		delay(0.1, function() --[[ Line: 26 | Upvalues: Audio (ref), p1 (copy) ]]
+			Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_pistol_slide_fast_01, {
+				Volume = 0.3,
+				Pitch = 1 + math.random() * 0.1 - 0.05
+			})
+		end)
+	end
 end
-function module_upvr.ReloadDropAmmoSound(arg1) -- Line 35
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_pistol_remove_mag_01)
+function t.ReloadDropAmmoSound(p1) --[[ Line: 35 | Upvalues: Audio (copy) ]]
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_pistol_remove_mag_01)
 end
-function module_upvr.ReloadRefillAmmoSound(arg1) -- Line 38
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_pistol_insert_mag_01, {
-        RollOffMaxDistance = 129;
-    })
-    wait(0.4)
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_pistol_slide_fast_01, {
-        RollOffMaxDistance = 129;
-    })
-    wait(0.1)
+function t.ReloadRefillAmmoSound(p1) --[[ Line: 38 | Upvalues: Audio (copy) ]]
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_pistol_insert_mag_01, {
+		RollOffMaxDistance = 129
+	})
+	wait(0.4)
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_pistol_slide_fast_01, {
+		RollOffMaxDistance = 129
+	})
+	wait(0.1)
 end
-return module_upvr
+return t

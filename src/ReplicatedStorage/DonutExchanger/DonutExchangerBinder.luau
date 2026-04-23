@@ -1,26 +1,27 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local DonutExchangerConsts_upvr = require(script.Parent.DonutExchangerConsts)
-local BaseObject_upvr = require(ReplicatedStorage.Std.BaseObject)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-local CircleAction_upvr = require(ReplicatedStorage.Module.UI).CircleAction
-function module_upvr.new(arg1) -- Line 12
-    local any_new_result1_upvr = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1_upvr, module_upvr)
-    any_new_result1_upvr.maid:GiveTask(CircleAction_upvr.Add({
-        Name = "Talk";
-        Timed = false;
-        Dist = 10;
-        Callback = function(arg1_2, arg2) -- Line 16, Named "action"
-            if arg2 then
-                any_new_result1_upvr.obj:FindFirstChild(DonutExchangerConsts_upvr.EXCHANGE_DONUT_REMOTE_NAME):FireServer()
-            end
-            return true
-        end;
-        Part = any_new_result1_upvr.obj.PrimaryPart;
-        ValidRoot = any_new_result1_upvr.obj;
-    }, any_new_result1_upvr.obj))
-    return any_new_result1_upvr
+local DonutExchangerConsts = require(script.Parent.DonutExchangerConsts)
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1) --[[ Line: 12 | Upvalues: BaseObject (copy), t (copy), DonutExchangerConsts (copy), CircleAction (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t)
+	v1.maid:GiveTask(CircleAction.Add({
+		Name = "Talk",
+		Timed = false,
+		Dist = 10,
+		Callback = function(p1, p2) --[[ Name: action | Line: 16 | Upvalues: v1 (copy), DonutExchangerConsts (ref) ]]
+			if p2 then
+				v1.obj:FindFirstChild(DonutExchangerConsts.EXCHANGE_DONUT_REMOTE_NAME):FireServer()
+			end
+			return true
+		end,
+		Part = v1.obj.PrimaryPart,
+		ValidRoot = v1.obj
+	}, v1.obj))
+	return v1
 end
-return require(ReplicatedStorage.Std.Binder).new(DonutExchangerConsts_upvr.TAG_NAME, module_upvr)
+return Binder.new(DonutExchangerConsts.TAG_NAME, t)

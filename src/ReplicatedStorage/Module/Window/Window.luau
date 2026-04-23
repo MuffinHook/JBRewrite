@@ -1,58 +1,59 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Signal_upvr = require(ReplicatedStorage.Std.Signal)
-local module_upvr = {
-    __ClassName = "Window";
+local Signal = require(ReplicatedStorage.Std.Signal)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local t = {
+	__ClassName = "Window"
 }
-module_upvr.__index = module_upvr
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function module_upvr.new() -- Line 8
-    local module = {}
-    setmetatable(module, module_upvr)
-    module._maid = Maid_upvr.new()
-    module._isOpen = false
-    module._beforeOpenFun = nil
-    return module
+t.__index = t
+function t.new() --[[ Line: 8 | Upvalues: t (copy), Maid (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._maid = Maid.new()
+	t2._isOpen = false
+	t2._beforeOpenFun = nil
+	return t2
 end
-function module_upvr.GetOnOpenedSignal(arg1) -- Line 19
-    if not arg1._onOpened then
-        arg1._onOpened = Signal_upvr.new()
-        arg1._maid:GiveTask(arg1._onOpened)
-    end
-    return arg1._onOpened
+function t.GetOnOpenedSignal(p1) --[[ Line: 19 | Upvalues: Signal (copy) ]]
+	if not p1._onOpened then
+		p1._onOpened = Signal.new()
+		p1._maid:GiveTask(p1._onOpened)
+	end
+	return p1._onOpened
 end
-function module_upvr.GetOnClosedSignal(arg1) -- Line 26
-    if not arg1._onClosed then
-        arg1._onClosed = Signal_upvr.new()
-        arg1._maid:GiveTask(arg1._onClosed)
-    end
-    return arg1._onClosed
+function t.GetOnClosedSignal(p1) --[[ Line: 26 | Upvalues: Signal (copy) ]]
+	if not p1._onClosed then
+		p1._onClosed = Signal.new()
+		p1._maid:GiveTask(p1._onClosed)
+	end
+	return p1._onClosed
 end
-function module_upvr.Open(arg1) -- Line 33
-    assert(not arg1._isOpen)
-    arg1._isOpen = true
-    if arg1._beforeOpenFun then
-        arg1:_beforeOpenFun()
-    end
-    if arg1._onOpened then
-        arg1._onOpened:Fire()
-    end
+function t.Open(p1) --[[ Line: 33 ]]
+	assert(not p1._isOpen)
+	p1._isOpen = true
+	if p1._beforeOpenFun then
+		p1:_beforeOpenFun()
+	end
+	if p1._onOpened then
+		p1._onOpened:Fire()
+	end
 end
-function module_upvr.Close(arg1) -- Line 43
-    assert(arg1._isOpen)
-    arg1._isOpen = false
-    if arg1._onClosed then
-        arg1._onClosed:Fire()
-    end
+function t.Close(p1) --[[ Line: 43 ]]
+	assert(p1._isOpen)
+	p1._isOpen = false
+	if p1._onClosed then
+		p1._onClosed:Fire()
+	end
 end
-function module_upvr.IsOpen(arg1) -- Line 50
-    return arg1._isOpen
+function t.IsOpen(p1) --[[ Line: 50 ]]
+	return p1._isOpen
 end
-function module_upvr.Destroy(arg1) -- Line 53
-    assert(arg1._maid)
-    if arg1:IsOpen() then
-        arg1:Close()
-    end
-    arg1._maid = nil
-    arg1._maid:Destroy()
+function t.Destroy(p1) --[[ Line: 53 ]]
+	assert(p1._maid)
+	if p1:IsOpen() then
+		p1:Close()
+	end
+	local _maid_2 = p1._maid
+	p1._maid = nil
+	_maid_2:Destroy()
 end
-return module_upvr
+return t

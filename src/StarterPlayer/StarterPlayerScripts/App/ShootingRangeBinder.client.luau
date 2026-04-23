@@ -1,27 +1,29 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local DoorUtils_upvr = require(ReplicatedStorage.Door2.DoorUtils)
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-require(ReplicatedStorage.Std.Binder).new("ShootingRangeTarget", function(arg1) -- Line 8
-    local any_new_result1 = Maid_upvr.new()
-    local var7_upvw = true
-    local var8_upvw
-    any_new_result1:GiveTask(function() -- Line 13
-        var7_upvw = false
-        if var8_upvw then
-            var8_upvw:cancel()
-        end
-    end)
-    any_new_result1:GivePromise(DoorUtils_upvr.promiseInnerModel(arg1):andThen(function(arg1_2) -- Line 19
-        task.wait(0.5)
-        local ShootingRangePart = arg1_2:FindFirstChild("ShootingRangePart")
-        if ShootingRangePart then
-            ShootingRangePart.CanCollide = true
-        end
-        while var7_upvw do
-            var8_upvw = Promise_upvr.resolve():andThenCall(DoorUtils_upvr.setOpen, arg1, not DoorUtils_upvr.getOpen(arg1)):andThenCall(Promise_upvr.delay, DoorUtils_upvr.getDuration(arg1) or 1)
-            var8_upvw:await()
-        end
-    end))
-    return any_new_result1
+game:GetService("ServerStorage")
+local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Promise = require(ReplicatedStorage.Std.Promise)
+Binder.new("ShootingRangeTarget", function(p1) --[[ Line: 8 | Upvalues: Maid (copy), DoorUtils (copy), Promise (copy) ]]
+	local v1 = Maid.new()
+	local v2 = true
+	local v3 = nil
+	v1:GiveTask(function() --[[ Line: 13 | Upvalues: v2 (ref), v3 (ref) ]]
+		v2 = false
+		if v3 then
+			v3:cancel()
+		end
+	end)
+	v1:GivePromise(DoorUtils.promiseInnerModel(p1):andThen(function(p12) --[[ Line: 19 | Upvalues: v2 (ref), v3 (ref), Promise (ref), DoorUtils (ref), p1 (copy) ]]
+		task.wait(0.5)
+		local ShootingRangePart = p12:FindFirstChild("ShootingRangePart")
+		if ShootingRangePart then
+			ShootingRangePart.CanCollide = true
+		end
+		while v2 do
+			v3 = Promise.resolve():andThenCall(DoorUtils.setOpen, p1, not DoorUtils.getOpen(p1)):andThenCall(Promise.delay, DoorUtils.getDuration(p1) or 1)
+			v3:await()
+		end
+	end))
+	return v1
 end):Start()

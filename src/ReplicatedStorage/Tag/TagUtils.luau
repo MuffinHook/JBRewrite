@@ -1,16 +1,17 @@
-local module = {}
-local CollectionService_upvr = game:GetService("CollectionService")
-local RegionUtils_upvr = require(game:GetService("ReplicatedStorage").Std.Region.RegionUtils)
-function module.isPointInTag(arg1, arg2) -- Line 6
-    for _, v in ipairs(CollectionService_upvr:GetTagged(arg2)) do
-        assert(v:IsA("BasePart"))
-        if RegionUtils_upvr.CastPoint({
-            c = v.CFrame;
-            s = v.Size;
-        }, arg1) then
-            return true
-        end
-    end
-    return false
-end
-return module
+local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)
+return {
+	isPointInTag = function(p1, p2) --[[ Name: isPointInTag | Line: 6 | Upvalues: CollectionService (copy), RegionUtils (copy) ]]
+		for i, v in ipairs(CollectionService:GetTagged(p2)) do
+			assert(v:IsA("BasePart"))
+			if RegionUtils.CastPoint({
+				c = v.CFrame,
+				s = v.Size
+			}, p1) then
+				return true
+			end
+		end
+		return false
+	end
+}

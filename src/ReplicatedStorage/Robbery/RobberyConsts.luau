@@ -1,20 +1,18 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local Enumer = require(ReplicatedStorage.Std.Enumer)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-
-local robberyDefinitions = {
+local Enumer = require(ReplicatedStorage.Std.Enumer)
+local list = {
 	{
 		key = "BANK",
 		name = "Rising City Bank",
 		markerName = "Bank",
-		imageId = 136495546278020,
+		imageId = 136495546278020
 	},
 	{
 		key = "BANK2",
 		name = "Crater Bank",
 		markerName = "Bank2",
-		imageId = 73192489940892,
+		imageId = 73192489940892
 	},
 	{
 		key = "JEWELRY",
@@ -24,8 +22,8 @@ local robberyDefinitions = {
 		frameData = {
 			topImageId = 110457092688550,
 			cashImageId = 80371007738496,
-			color = Color3.fromRGB(133, 211, 241),
-		},
+			color = Color3.fromRGB(133, 211, 241)
+		}
 	},
 	{
 		key = "MUSEUM",
@@ -35,50 +33,50 @@ local robberyDefinitions = {
 		frameData = {
 			topImageId = 96419584292722,
 			cashImageId = 126600430568145,
-			color = Color3.fromRGB(228, 198, 131),
-		},
+			color = Color3.fromRGB(228, 198, 131)
+		}
 	},
 	{
 		key = "POWER_PLANT",
 		name = "Power Plant",
 		markerName = "PowerPlant",
-		imageId = 105699516772445,
+		imageId = 105699516772445
 	},
 	{
 		key = "TRAIN_PASSENGER",
 		name = "Passenger Train",
 		markerName = "TrainPassenger",
-		imageId = 83454536293678,
+		imageId = 83454536293678
 	},
 	{
 		key = "TRAIN_CARGO",
 		name = "Cargo Train",
 		markerName = "TrainCargo",
-		imageId = 76283666439593,
+		imageId = 76283666439593
 	},
 	{
 		key = "CARGO_SHIP",
 		name = "Cargo Ship",
 		markerName = "CargoShip",
-		imageId = 136506927209354,
+		imageId = 136506927209354
 	},
 	{
 		key = "CARGO_PLANE",
 		name = "Cargo Plane",
 		markerName = "CargoPlane",
-		imageId = 123283496361865,
+		imageId = 123283496361865
 	},
 	{
 		key = "STORE_GAS",
 		name = "Gas Station",
 		markerName = "Gas",
-		imageId = 86590402249605,
+		imageId = 86590402249605
 	},
 	{
 		key = "STORE_DONUT",
 		name = "Donut Store",
 		markerName = "Donut",
-		imageId = 111833711680255,
+		imageId = 111833711680255
 	},
 	{
 		key = "MONEY_TRUCK",
@@ -86,14 +84,14 @@ local robberyDefinitions = {
 		markerName = "MoneyTruck",
 		imageId = 124857469875945,
 		frameData = {
-			alternativeText = "BANK TRUCK",
-		},
+			alternativeText = "BANK TRUCK"
+		}
 	},
 	{
 		key = "HOME_VAULT",
 		name = "Home Vault",
 		markerName = "HomeVault",
-		imageId = 13279595483,
+		imageId = 13279595483
 	},
 	{
 		key = "TOMB",
@@ -103,8 +101,8 @@ local robberyDefinitions = {
 		frameData = {
 			topImageId = 110255279458511,
 			cashImageId = 97842711725911,
-			color = Color3.fromRGB(200, 129, 118),
-		},
+			color = Color3.fromRGB(200, 129, 118)
+		}
 	},
 	{
 		key = "CROWN_JEWEL",
@@ -114,14 +112,14 @@ local robberyDefinitions = {
 		frameData = {
 			topImageId = 119472027123966,
 			cashImageId = 100707132869946,
-			color = Color3.fromRGB(222, 108, 225),
-		},
+			color = Color3.fromRGB(222, 108, 225)
+		}
 	},
 	{
 		key = "MANSION",
 		name = "Mansion",
 		markerName = "Mansion",
-		imageId = 89104385607146,
+		imageId = 89104385607146
 	},
 	{
 		key = "OIL_RIG",
@@ -131,55 +129,43 @@ local robberyDefinitions = {
 		frameData = {
 			topImageId = 91153157851473,
 			cashImageId = 81160299342495,
-			color = Color3.fromRGB(121, 118, 196),
-		},
-	},
+			color = Color3.fromRGB(121, 118, 196)
+		}
+	}
 }
-
-local robberyKeys = {}
-for _, robberyData in ipairs(robberyDefinitions) do
-	assert(robberyData.key ~= nil, "Missing robbery key")
-	assert(robberyData.name ~= nil, "Missing robbery name")
-	table.insert(robberyKeys, robberyData.key)
+local t = {}
+for i, v in ipairs(list) do
+	local v1, v2
+	v1 = v.key ~= nil
+	assert(v1)
+	v2 = v.name ~= nil
+	assert(v2)
+	table.insert(t, v.key)
 end
-
-local RobberyEnum = Enumer(robberyKeys)
-
-local prettyNamesByEnum = {}
-local robberyDataByEnum = {}
-
-for _, robberyData in ipairs(robberyDefinitions) do
-	local robberyId = RobberyEnum[robberyData.key]
-	prettyNamesByEnum[robberyId] = robberyData.name
-	robberyDataByEnum[robberyId] = robberyData
+local v3 = Enumer(t)
+local t2 = {}
+local t3 = {}
+for i, v in ipairs(list) do
+	t2[v3[v.key]] = v.name
+	t3[v3[v.key]] = v
 end
-
 return TableUtils.requireValidIndexAndFreeze({
 	FOLDER_NAME = "RobberyFolder",
-	DATA_ROBBERY = robberyDataByEnum,
-	LIST_ROBBERY = robberyKeys,
-	ENUM_ROBBERY = RobberyEnum,
-	PRETTY_NAME = prettyNamesByEnum,
-
+	DATA_ROBBERY = t3,
+	LIST_ROBBERY = t,
+	ENUM_ROBBERY = v3,
+	PRETTY_NAME = t2,
 	STATUS_ATTR_NAME = "RobberyStatus",
 	ENUM_STATUS = Enumer({ "OPENED", "STARTED", "CLOSED" }),
 	DISABLE_AUTO_OPEN_ATTR_NAME = "RobberyDisableAutoOpen",
-
-	IGNORE_STATUS = {
-		RobberyEnum.STORE_GAS,
-		RobberyEnum.STORE_DONUT,
-		RobberyEnum.HOME_VAULT,
-	},
-
+	IGNORE_STATUS = { v3.STORE_GAS, v3.STORE_DONUT, v3.HOME_VAULT },
 	ROUND_MIN_DURATION = 180,
 	ROUND_MAX_DURATION = 420,
 	ROBBERY_STARTED_ROUND_PROTECTION_DURATION = 240,
 	IN_BETWEEN_ROUND_DURATION = 20,
 	NON_BOSS_DELAY = 5,
 	OPEN_DELAY = 30,
-
 	KEYCARD_DROP_CHANCE = 0.6,
 	CRIME_KEYCARD_DROP_CHANCE = 0.33,
-
-	ROBBERY_STATE_FOLDER_NAME = "RobberyState",
+	ROBBERY_STATE_FOLDER_NAME = "RobberyState"
 })

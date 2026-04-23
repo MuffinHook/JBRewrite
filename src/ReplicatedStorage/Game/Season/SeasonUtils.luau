@@ -1,81 +1,66 @@
-local HttpService_upvr = game:GetService("HttpService")
-local SeasonConsts_upvr = require(script.Parent.SeasonConsts)
-local module_upvr = {
-    getRemainingTime = function() -- Line 8, Named "getRemainingTime"
-        return SeasonConsts_upvr.SEASON_END_UNIX - DateTime.now().UnixTimestamp
-    end;
-    getRemainingBuyTime = function() -- Line 13, Named "getRemainingBuyTime"
-        return SeasonConsts_upvr.BUY_END_UNIX - DateTime.now().UnixTimestamp
-    end;
-    getSeasonExpMult = function() -- Line 18, Named "getSeasonExpMult"
-        if SeasonConsts_upvr.AUTOMATE_SEASON_XP_MULT then
-            if SeasonConsts_upvr.SEASON_XP_MULT_START_UNIX < DateTime.now().UnixTimestamp then
-                return SeasonConsts_upvr.SEASON_XP_MULT
-            end
-            return 1
-        end
-        return SeasonConsts_upvr.SEASON_XP_MULT
-    end;
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Promise = require(ReplicatedStorage.Std.Promise)
+local MarketplaceService = game:GetService("MarketplaceService")
+local SeasonConsts = require(script.Parent.SeasonConsts)
+local t = {
+	getRemainingTime = function() --[[ Name: getRemainingTime | Line: 8 | Upvalues: SeasonConsts (copy) ]]
+		local UnixTimestamp = DateTime.now().UnixTimestamp
+		return SeasonConsts.SEASON_END_UNIX - UnixTimestamp
+	end,
+	getRemainingBuyTime = function() --[[ Name: getRemainingBuyTime | Line: 13 | Upvalues: SeasonConsts (copy) ]]
+		local UnixTimestamp = DateTime.now().UnixTimestamp
+		return SeasonConsts.BUY_END_UNIX - UnixTimestamp
+	end,
+	getSeasonExpMult = function() --[[ Name: getSeasonExpMult | Line: 18 | Upvalues: SeasonConsts (copy) ]]
+		if SeasonConsts.AUTOMATE_SEASON_XP_MULT then
+			if DateTime.now().UnixTimestamp > SeasonConsts.SEASON_XP_MULT_START_UNIX then
+				return SeasonConsts.SEASON_XP_MULT
+			else
+				return 1
+			end
+		else
+			return SeasonConsts.SEASON_XP_MULT
+		end
+	end
 }
-function module_upvr.isBuyEnabled() -- Line 32
-    local var4 = false
-    if module_upvr.getRemainingTime() < 0 then
-        if 0 > module_upvr.getRemainingBuyTime() then
-            var4 = false
-        else
-            var4 = true
-        end
-    end
-    return var4
+function t.isBuyEnabled() --[[ Line: 32 | Upvalues: t (copy) ]]
+	return if t.getRemainingTime() < 0 then t.getRemainingBuyTime() >= 0 else false
 end
-local tbl_upvr = {}
-local Promise_upvr = require(game:GetService("ReplicatedStorage").Std.Promise)
-local MarketplaceService_upvr = game:GetService("MarketplaceService")
-function module_upvr.getProductPrice(arg1) -- Line 36
-    if tbl_upvr[arg1] then
-        return Promise_upvr.resolve(tbl_upvr[arg1])
-    end
-    return Promise_upvr.defer(function(arg1_2) -- Line 40
-        local PriceInRobux = MarketplaceService_upvr:GetProductInfo(arg1, Enum.InfoType.Product).PriceInRobux
-        tbl_upvr[arg1] = PriceInRobux
-        arg1_2(PriceInRobux)
-    end)
+local t2 = {}
+function t.getProductPrice(p1) --[[ Line: 36 | Upvalues: t2 (copy), Promise (copy), MarketplaceService (copy) ]]
+	if t2[p1] then
+		return Promise.resolve(t2[p1])
+	else
+		return Promise.defer(function(p12) --[[ Line: 40 | Upvalues: MarketplaceService (ref), p1 (copy), t2 (ref) ]]
+			local PriceInRobux = MarketplaceService:GetProductInfo(p1, Enum.InfoType.Product).PriceInRobux
+			t2[p1] = PriceInRobux
+			p12(PriceInRobux)
+		end)
+	end
 end
-function module_upvr.serializeLevelsAwarded(arg1) -- Line 47
-    local var10
-    if type(arg1) ~= "table" then
-        var10 = false
-    else
-        var10 = true
-    end
-    assert(var10)
-    return HttpService_upvr:JSONEncode(arg1)
+function t.serializeLevelsAwarded(p1) --[[ Line: 47 | Upvalues: HttpService (copy) ]]
+	assert(type(p1) == "table")
+	return HttpService:JSONEncode(p1)
 end
-function module_upvr.deserializeLevelsAwarded(arg1) -- Line 51
-    local var11
-    if type(arg1) ~= "string" then
-        var11 = false
-    else
-        var11 = true
-    end
-    assert(var11)
-    return HttpService_upvr:JSONDecode(arg1)
+function t.deserializeLevelsAwarded(p1) --[[ Line: 51 | Upvalues: HttpService (copy) ]]
+	assert(type(p1) == "string")
+	return HttpService:JSONDecode(p1)
 end
-function module_upvr.formatRemaining(arg1) -- Line 55
-    local maximum = math.max(0, arg1)
-    local floored = math.floor(maximum / 86400)
-    local floored_4 = math.floor(maximum % 86400 / 3600)
-    local floored_3 = math.floor(maximum % 3600 / 60)
-    local floored_2 = math.floor(maximum % 60)
-    if 0 < floored then
-        return string.format("%dd %dh", floored, floored_4)
-    end
-    if 0 < floored_4 then
-        return string.format("%dh %dm", floored_4, floored_3)
-    end
-    if 0 < floored_3 then
-        return string.format("%dm %ds", floored_3, floored_2)
-    end
-    return string.format("%ds", floored_2)
+function t.formatRemaining(p1) --[[ Line: 55 ]]
+	local v1 = math.max(0, p1)
+	local v2 = math.floor(v1 / 86400)
+	local v3 = math.floor(v1 % 86400 / 3600)
+	local v4 = math.floor(v1 % 3600 / 60)
+	local v5 = math.floor(v1 % 60)
+	if v2 > 0 then
+		return ("%dd %dh"):format(v2, v3)
+	elseif v3 > 0 then
+		return ("%dh %dm"):format(v3, v4)
+	elseif v4 > 0 then
+		return ("%dm %ds"):format(v4, v5)
+	else
+		return ("%ds"):format(v5)
+	end
 end
-return module_upvr
+return t

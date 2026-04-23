@@ -1,30 +1,30 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_upvr = {}
-local Players_upvr = game:GetService("Players")
-local Utils_upvr = require(ReplicatedStorage.EzUi.Utils)
-local InputUtils_upvr = require(ReplicatedStorage.Std.InputUtils)
-function module_upvr.init() -- Line 7
-    local HotbarGui_upvr = script.Parent.Res.HotbarGui
-    HotbarGui_upvr.Parent = Players_upvr.LocalPlayer.PlayerGui
-    HotbarGui_upvr.DisplayOrder = 11
-    module_upvr.gui = HotbarGui_upvr
-    HotbarGui_upvr.Container.Item:Destroy()
-    module_upvr.presetFrame = HotbarGui_upvr.Container.Item:Clone()
-    local function updateSize() -- Line 17
-        if Utils_upvr.isSmallScreen() then
-            HotbarGui_upvr.Container.Size = UDim2.new(0.7, 0, 1, 0)
-            HotbarGui_upvr.UIPadding.PaddingBottom = UDim.new(0.06, 0)
-        else
-            if InputUtils_upvr.isTouch() then
-                HotbarGui_upvr.Container.Size = UDim2.new(0.7, 0, 1, 0)
-                HotbarGui_upvr.UIPadding.PaddingBottom = UDim.new(0.01, 0)
-                return
-            end
-            HotbarGui_upvr.Container.Size = UDim2.new(0.4, 0, 1, 0)
-            HotbarGui_upvr.UIPadding.PaddingBottom = UDim.new(0.01, 0)
-        end
-    end
-    Utils_upvr.getViewportSizeChangedSignal():Connect(updateSize)
-    updateSize()
+local Utils = require(ReplicatedStorage.EzUi.Utils)
+local InputUtils = require(ReplicatedStorage.Std.InputUtils)
+local t = {}
+function t.init() --[[ Line: 7 | Upvalues: Players (copy), t (copy), Utils (copy), InputUtils (copy) ]]
+	local HotbarGui = script.Parent.Res.HotbarGui
+	HotbarGui.Parent = Players.LocalPlayer.PlayerGui
+	HotbarGui.DisplayOrder = 11
+	t.gui = HotbarGui
+	local v1 = HotbarGui.Container.Item:Clone()
+	HotbarGui.Container.Item:Destroy()
+	t.presetFrame = v1
+	local function updateSize() --[[ Line: 17 | Upvalues: Utils (ref), HotbarGui (copy), InputUtils (ref) ]]
+		if Utils.isSmallScreen() then
+			HotbarGui.Container.Size = UDim2.new(0.7, 0, 1, 0)
+			HotbarGui.UIPadding.PaddingBottom = UDim.new(0.06, 0)
+			return
+		end
+		if InputUtils.isTouch() then
+			HotbarGui.Container.Size = UDim2.new(0.7, 0, 1, 0)
+		else
+			HotbarGui.Container.Size = UDim2.new(0.4, 0, 1, 0)
+		end
+		HotbarGui.UIPadding.PaddingBottom = UDim.new(0.01, 0)
+	end
+	Utils.getViewportSizeChangedSignal():Connect(updateSize)
+	updateSize()
 end
-return module_upvr
+return t

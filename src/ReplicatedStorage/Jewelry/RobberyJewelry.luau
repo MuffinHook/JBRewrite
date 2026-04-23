@@ -1,131 +1,133 @@
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local CircleAction_upvr = require(ReplicatedStorage.Module.UI).CircleAction
-local var5_upvw
-local function PlaySound_upvr(arg1, arg2) -- Line 14, Named "PlaySound"
-    local Sound_upvr = Instance.new("Sound")
-    Sound_upvr.SoundId = string.format("rbxassetid://%d", arg2)
-    Sound_upvr.Volume = 0.75
-    Sound_upvr.Parent = arg1
-    Sound_upvr:Play()
-    delay(1, function() -- Line 20
-        game.Debris:AddItem(Sound_upvr, Sound_upvr.TimeLength)
-    end)
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local CamShaker = require(ReplicatedStorage.Game.CamShaker.CamShaker)
+local UI = require(ReplicatedStorage.Module.UI)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local CircleAction = UI.CircleAction
+local v1 = nil
+local v2 = nil
+local function PlaySound(p1, p2) --[[ Line: 14 ]]
+	local Sound = Instance.new("Sound")
+	Sound.SoundId = ("rbxassetid://%d"):format(p2)
+	Sound.Volume = 0.75
+	Sound.Parent = p1
+	Sound:Play()
+	delay(1, function() --[[ Line: 20 | Upvalues: Sound (copy) ]]
+		game.Debris:AddItem(Sound, Sound.TimeLength)
+	end)
 end
-local function AddedJewel_upvr(arg1) -- Line 25, Named "AddedJewel"
-    local function Action(arg1_2, arg2) -- Line 26
-        if arg2 then
-            var5_upvw:FireServer('d'.."wzxj6o1o":sub(4, 7):reverse():reverse():reverse():reverse():reverse().."".."uww", arg1.Name)
-            Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6875006205, {
-                Volume = 0.4;
-            })
-        end
-        return true
-    end
-    local tbl_2 = {}
-    tbl_2.Part = arg1
-    tbl_2.Name = "Grab Jewel"
-    tbl_2.Timed = true
-    tbl_2.Duration = 3
-    tbl_2.Dist = 8
-    tbl_2.Callback = Action
-    CircleAction_upvr.Add(tbl_2, arg1)
+local function AddedJewel(p1) --[[ Line: 25 | Upvalues: v1 (ref), Audio (copy), LocalPlayer (copy), CircleAction (copy) ]]
+	CircleAction.Add({
+		Part = p1,
+		Name = "Grab Jewel",
+		Timed = true,
+		Duration = 3,
+		Dist = 8,
+		Callback = function(p12, p2) --[[ Name: Action | Line: 26 | Upvalues: v1 (ref), p1 (copy), Audio (ref), LocalPlayer (ref) ]]
+			if p2 then
+				v1:FireServer("k" .. ("uoc0rvi9o"):sub(5, 6):reverse() .. "m5wlx", p1.Name)
+				Audio.ObjectLocal(LocalPlayer.PlayerGui, 6875006205, {
+					Volume = 0.4
+				})
+			end
+			return true
+		end
+	}, p1)
 end
-local function AddedLaserButton_upvr(arg1) -- Line 43, Named "AddedLaserButton"
-    local tbl = {}
-    tbl.Part = arg1
-    tbl.Name = ""
-    tbl.Dist = 8
-    function tbl.Callback(arg1_3, arg2) -- Line 44, Named "Action"
-        if arg2 then
-            var5_upvw:FireServer('d'.."utbr1vy":sub(5, 5):reverse().."".."".."e30u6oi":sub(5, 6):reverse():reverse():reverse().."".."".."pqpujv":sub(4, 5):reverse().."".."ww", "LaserButton")
-        end
-        return true
-    end
-    CircleAction_upvr.Add(tbl, arg1)
+local function AddedLaserButton(p1) --[[ Line: 43 | Upvalues: v1 (ref), CircleAction (copy) ]]
+	CircleAction.Add({
+		Part = p1,
+		Name = "",
+		Dist = 8,
+		Callback = function(p1, p2) --[[ Name: Action | Line: 44 | Upvalues: v1 (ref) ]]
+			if p2 then
+				v1:FireServer("k" .. ("m0jvrvmjdv"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("f5mwc"):sub(3, 3):reverse() .. "" .. "" .. ("f55i"):sub(3, 3):reverse() .. "" .. "" .. ("klwp"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "x", "LaserButton")
+			end
+			return true
+		end
+	}, p1)
 end
-local var11_upvw
-local TweenService_upvr = game:GetService("TweenService")
-local CamShaker_upvr = require(ReplicatedStorage.Game.CamShaker.CamShaker)
-local RunService_upvr = game:GetService("RunService")
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-local CollectionService_upvr = game:GetService("CollectionService")
 return {
-    Init = function(arg1) -- Line 58, Named "Init"
-        var5_upvw = arg1.Event
-        var11_upvw = arg1.em
-        local Sound_upvr_2 = Instance.new("Sound")
-        Sound_upvr_2.SoundId = "rbxassetid://1837825257"
-        Sound_upvr_2.Looped = true
-        Sound_upvr_2.Volume = 0
-        Sound_upvr_2.SoundGroup = game:GetService("SoundService").RobberyMusic
-        Sound_upvr_2.Parent = LocalPlayer_upvr.PlayerGui
-        local function FadeInSound_upvr() -- Line 69, Named "FadeInSound"
-            Sound_upvr_2:Play()
-            Audio_upvr.FadeTo(Sound_upvr_2, 1, 2)
-        end
-        local function FadeOutSound_upvr() -- Line 73, Named "FadeOutSound"
-            Audio_upvr.FadeTo(Sound_upvr_2, 0, 2)
-            task.wait(2)
-            Sound_upvr_2:Stop()
-        end
-        function var11_upvw.q0lvn6pr(arg1_4) -- Line 79
-            task.delay(0.2, function() -- Line 80
-                arg1_4.Transparency = 0.25
-                TweenService_upvr:Create(arg1_4, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false), {
-                    Transparency = 0.4;
-                }):Play()
-            end)
-        end
-        function var11_upvw.msjskw8t(arg1_5, arg2) -- Line 90
-            PlaySound_upvr(LocalPlayer_upvr, 1837831244)
-            delay(1, function() -- Line 92
-                PlaySound_upvr(LocalPlayer_upvr, 1843025542)
-            end)
-            spawn(FadeInSound_upvr)
-            if not arg1_5 then
-            else
-                for _, v_2_upvr in arg2 do
-                    v_2_upvr.CanCollide = true
-                    task.delay(2, function() -- Line 101
-                        v_2_upvr.CanCollide = false
-                    end)
-                end
-                local CurrentCamera_upvr = workspace.CurrentCamera
-                local CFrame_upvw = CurrentCamera_upvr.CFrame
-                local any_new_result1_upvr = CamShaker_upvr.new(Enum.RenderPriority.Camera.Value + 2, function(arg1_6) -- Line 107
-                    CFrame_upvw = CurrentCamera_upvr.CFrame
-                    CurrentCamera_upvr.CFrame *= arg1_6
-                end)
-                any_new_result1_upvr:Start()
-                any_new_result1_upvr:Shake(CamShaker_upvr.Presets.Explosion)
-                local any_Connect_result1_upvr = RunService_upvr.Heartbeat:Connect(function() -- Line 111
-                    CurrentCamera_upvr.CFrame = CFrame_upvw
-                end)
-                Promise_upvr.delay(2):andThenCall(function() -- Line 117
-                    any_new_result1_upvr:Stop()
-                    any_Connect_result1_upvr:Disconnect()
-                end)
-            end
-        end
-        function var11_upvw.dcihzbw0() -- Line 122
-            spawn(FadeOutSound_upvr)
-        end
-        for _, v in next, CollectionService_upvr:GetTagged("RobberyJewelryJewel") do
-            if v:GetAttribute("LaserButton") then
-                AddedLaserButton_upvr(v)
-            else
-                AddedJewel_upvr(v)
-            end
-        end
-        CollectionService_upvr:GetInstanceAddedSignal("RobberyJewelryJewel"):Connect(function(arg1_7) -- Line 133
-            if arg1_7:GetAttribute("LaserButton") then
-                AddedLaserButton_upvr(arg1_7)
-            else
-                AddedJewel_upvr(arg1_7)
-            end
-        end)
-        CollectionService_upvr:GetInstanceRemovedSignal("RobberyJewelryJewel"):Connect(CircleAction_upvr.Remove)
-    end;
+	Init = function(p1) --[[ Name: Init | Line: 58 | Upvalues: v1 (ref), v2 (ref), LocalPlayer (copy), Audio (copy), TweenService (copy), PlaySound (copy), CamShaker (copy), RunService (copy), Promise (copy), CollectionService (copy), AddedLaserButton (copy), AddedJewel (copy), CircleAction (copy) ]]
+		local em = p1.em
+		v1 = p1.Event
+		v2 = em
+		local Sound = Instance.new("Sound")
+		Sound.SoundId = "rbxassetid://1837825257"
+		Sound.Looped = true
+		Sound.Volume = 0
+		Sound.SoundGroup = game:GetService("SoundService").RobberyMusic
+		Sound.Parent = LocalPlayer.PlayerGui
+		local function FadeInSound() --[[ Line: 69 | Upvalues: Sound (copy), Audio (ref) ]]
+			Sound:Play()
+			Audio.FadeTo(Sound, 1, 2)
+		end
+		local function FadeOutSound() --[[ Line: 73 | Upvalues: Audio (ref), Sound (copy) ]]
+			Audio.FadeTo(Sound, 0, 2)
+			task.wait(2)
+			Sound:Stop()
+		end
+		function em.kx2z39za(p1) --[[ Line: 79 | Upvalues: TweenService (ref) ]]
+			task.delay(0.2, function() --[[ Line: 80 | Upvalues: p1 (copy), TweenService (ref) ]]
+				p1.Transparency = 0.25
+				TweenService:Create(p1, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false), {
+					Transparency = 0.4
+				}):Play()
+			end)
+		end
+		function em.yo65te3x(p1, p2) --[[ Line: 90 | Upvalues: PlaySound (ref), LocalPlayer (ref), FadeInSound (copy), CamShaker (ref), RunService (ref), Promise (ref) ]]
+			PlaySound(LocalPlayer, 1837831244)
+			delay(1, function() --[[ Line: 92 | Upvalues: PlaySound (ref), LocalPlayer (ref) ]]
+				PlaySound(LocalPlayer, 1843025542)
+			end)
+			spawn(FadeInSound)
+			if p1 then
+				for v1, v2 in p2 do
+					v2.CanCollide = true
+					task.delay(2, function() --[[ Line: 101 | Upvalues: v2 (copy) ]]
+						v2.CanCollide = false
+					end)
+				end
+				local CurrentCamera = workspace.CurrentCamera
+				local v3 = CurrentCamera.CFrame
+				local v4 = CamShaker.new(Enum.RenderPriority.Camera.Value + 2, function(p1) --[[ Line: 107 | Upvalues: v3 (ref), CurrentCamera (copy) ]]
+					v3 = CurrentCamera.CFrame
+					CurrentCamera.CFrame = CurrentCamera.CFrame * p1
+				end)
+				local v5 = RunService.Heartbeat:Connect(function() --[[ Line: 111 | Upvalues: CurrentCamera (copy), v3 (ref) ]]
+					CurrentCamera.CFrame = v3
+				end)
+				v4:Start()
+				v4:Shake(CamShaker.Presets.Explosion)
+				Promise.delay(2):andThenCall(function() --[[ Line: 117 | Upvalues: v4 (copy), v5 (copy) ]]
+					v4:Stop()
+					v5:Disconnect()
+				end)
+			end
+		end
+		function em.eckwjayf() --[[ Line: 122 | Upvalues: FadeOutSound (copy) ]]
+			spawn(FadeOutSound)
+		end
+		local v22 = next
+		local v3, v4 = CollectionService:GetTagged("RobberyJewelryJewel")
+		for v5, v6 in v22, v3, v4 do
+			if v6:GetAttribute("LaserButton") then
+				AddedLaserButton(v6)
+			else
+				AddedJewel(v6)
+			end
+		end
+		CollectionService:GetInstanceAddedSignal("RobberyJewelryJewel"):Connect(function(p1) --[[ Line: 133 | Upvalues: AddedLaserButton (ref), AddedJewel (ref) ]]
+			if p1:GetAttribute("LaserButton") then
+				AddedLaserButton(p1)
+			else
+				AddedJewel(p1)
+			end
+		end)
+		CollectionService:GetInstanceRemovedSignal("RobberyJewelryJewel"):Connect(CircleAction.Remove)
+	end
 }

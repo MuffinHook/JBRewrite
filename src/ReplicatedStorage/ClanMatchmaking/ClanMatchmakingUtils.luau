@@ -1,46 +1,31 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local ClanMatchmakingConsts_upvr = require(ReplicatedStorage_upvr.ClanMatchmaking.ClanMatchmakingConsts)
-local module = {
-    setIsClanReadiedUp = function(arg1, arg2) -- Line 7, Named "setIsClanReadiedUp"
-        local var4
-        if typeof(arg1) ~= "string" then
-            var4 = false
-        else
-            var4 = true
-        end
-        assert(var4, "Invalid clanId passed")
-        var4 = ReplicatedStorage_upvr:FindFirstChild(ClanMatchmakingConsts_upvr.CLAN_IS_READIED_UP_MODEL_NAME):FindFirstChild(arg1)
-        if arg2 then
-            if not var4 then
-                var4 = Instance.new("BoolValue")
-                var4.Name = arg1
-                var4.Parent = ReplicatedStorage_upvr:FindFirstChild(ClanMatchmakingConsts_upvr.CLAN_IS_READIED_UP_MODEL_NAME)
-            end
-        elseif var4 then
-            var4:Destroy()
-        end
-    end;
-    getIsClanReadiedUp = function(arg1) -- Line 25, Named "getIsClanReadiedUp"
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        local var6
-        if typeof(arg1) ~= "string" then
-            var6 = false
-        else
-            var6 = true
-        end
-        assert(var6, "Invalid clanId passed")
-        var6 = ReplicatedStorage_upvr:FindFirstChild(ClanMatchmakingConsts_upvr.CLAN_IS_READIED_UP_MODEL_NAME):FindFirstChild(arg1)
-        if not var6 then
-            return false
-        end
-        if var6 == nil then
-        else
-        end
-        return true
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ClanMatchmakingConsts = require(ReplicatedStorage.ClanMatchmaking.ClanMatchmakingConsts)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+return {
+	setIsClanReadiedUp = function(p1, p2) --[[ Name: setIsClanReadiedUp | Line: 7 | Upvalues: ReplicatedStorage (copy), ClanMatchmakingConsts (copy) ]]
+		assert(typeof(p1) == "string", "Invalid clanId passed")
+		local v2 = ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME)
+		local v3 = v2:FindFirstChild(p1)
+		if p2 then
+			if not v3 then
+				local v4 = Instance.new("BoolValue")
+				v4.Name = p1
+				v4.Parent = v2
+			end
+		elseif v3 then
+			v3:Destroy()
+		end
+	end,
+	getIsClanReadiedUp = function(p1) --[[ Name: getIsClanReadiedUp | Line: 25 | Upvalues: ReplicatedStorage (copy), ClanMatchmakingConsts (copy) ]]
+		assert(typeof(p1) == "string", "Invalid clanId passed")
+		local v2 = ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME):FindFirstChild(p1)
+		if v2 then
+			return v2 ~= nil
+		else
+			return false
+		end
+	end,
+	observeIsClanReadiedUp = function(p1, p2) --[[ Name: observeIsClanReadiedUp | Line: 34 | Upvalues: ReplicatedStorage (copy), ClanMatchmakingConsts (copy), RxInstanceUtils (copy) ]]
+		return RxInstanceUtils.observeChildrenNamed(ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME), p1, p2)
+	end
 }
-local RxInstanceUtils_upvr = require(ReplicatedStorage_upvr.Std.RxInstanceUtils)
-function module.observeIsClanReadiedUp(arg1, arg2) -- Line 34
-    return RxInstanceUtils_upvr.observeChildrenNamed(ReplicatedStorage_upvr:FindFirstChild(ClanMatchmakingConsts_upvr.CLAN_IS_READIED_UP_MODEL_NAME), arg1, arg2)
-end
-return module

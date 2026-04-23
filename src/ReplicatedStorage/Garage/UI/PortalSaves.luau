@@ -1,94 +1,71 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.Std.Audio)
 local Roact = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact.PureComponent:extend("PortalSaves")
-local createElement_upvr = Roact.createElement
-local PortalBase_upvr = require(script.Parent.PortalBase)
-function any_extend_result1.render(arg1) -- Line 11
-    local tbl = {}
-    local tbl_2 = {}
-    for _, v in ipairs(arg1.props.receipt) do
-        tbl_2[v.name] = true
-    end
-    for i_2 = 1, #arg1.props.items do
-        local var17_upvr = arg1.props.items[i_2]
-        local tbl_3 = {}
-        local var19 = tbl_2[var17_upvr.name]
-        tbl_3.selected = var19
-        if arg1.props.saves[var17_upvr.name] == nil then
-            var19 = false
-        else
-            var19 = true
-        end
-        tbl_3.filled = var19
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        tbl_3.getInstCompare = arg1.props.saves[var17_upvr.name]
-        var19 = arg1.props.saves[var17_upvr.name]
-        local var21 = var19
-        if var21 then
-            local var22_upvr = arg1.props.saves[var17_upvr.name]
-            function var21() -- Line 24
-                return var17_upvr.getInstForSelection(var22_upvr)
-            end
-        end
-        tbl_3.getInst = var21
-        function tbl_3.onSelect() -- Line 28
-            if not var17_upvr.available then
-            else
-                arg1.props.onSelectItem(var17_upvr)
-            end
-        end
-        tbl[i_2] = tbl_3
-    end
-    local module = {}
-    var17_upvr = "SAVES"
-    module.title = var17_upvr
-    var17_upvr = arg1.props
-    var17_upvr = var17_upvr.items
-    module.items = var17_upvr
-    module.metadata = tbl
-    var17_upvr = arg1.props
-    var17_upvr = var17_upvr.sortId
-    module.sortId = var17_upvr
-    var17_upvr = 5
-    module.colsPerRow = var17_upvr
-    var17_upvr = 2
-    module.rowsPerPage = var17_upvr
-    var17_upvr = arg1.props
-    var17_upvr = var17_upvr.cornerPixel
-    module.cornerPixel = var17_upvr
-    var17_upvr = arg1.props
-    var17_upvr = var17_upvr.portalRatio
-    module.portalRatio = var17_upvr
-    var17_upvr = arg1.props
-    var17_upvr = var17_upvr.paddingRatio
-    module.paddingRatio = var17_upvr
-    var17_upvr = arg1.props
-    var17_upvr = var17_upvr.onSelectSort
-    module.onSelectSort = var17_upvr
-    return createElement_upvr(PortalBase_upvr, module)
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+local createElement = Roact.createElement
+local PortalBase = require(script.Parent.PortalBase)
+local v1 = Roact.PureComponent:extend("PortalSaves")
+function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), PortalBase (copy) ]]
+	local t = {}
+	local t2 = {}
+	for i, v in ipairs(p1.props.receipt) do
+		t[v.name] = true
+	end
+	for i = 1, #p1.props.items do
+		local v1, v2
+		local v3 = p1.props.items[i]
+		local v4 = p1.props.saves[v3.name]
+		local t3 = {
+			selected = t[v3.name]
+		}
+		v1 = v4 ~= nil
+		t3.filled = v1
+		t3.getInstCompare = v4
+		v2 = v4 and function() --[[ Line: 24 | Upvalues: v3 (copy), v4 (copy) ]]
+			return v3.getInstForSelection(v4)
+		end
+		t3.getInst = v2
+		function t3.onSelect() --[[ Line: 28 | Upvalues: v3 (copy), p1 (copy) ]]
+			if v3.available then
+				p1.props.onSelectItem(v3)
+			end
+		end
+		t2[i] = t3
+	end
+	return createElement(PortalBase, {
+		title = "SAVES",
+		items = p1.props.items,
+		metadata = t2,
+		sortId = p1.props.sortId,
+		colsPerRow = 5,
+		rowsPerPage = 2,
+		cornerPixel = p1.props.cornerPixel,
+		portalRatio = p1.props.portalRatio,
+		paddingRatio = p1.props.paddingRatio,
+		onSelectSort = p1.props.onSelectSort
+	})
 end
-local Players_upvr = game:GetService("Players")
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-return require(ReplicatedStorage.RoactRodux).connect(function(arg1, arg2) -- Line 50
-    return {
-        receipt = arg1.garageReceipt;
-    }
-end, function(arg1) -- Line 54
-    return {
-        onSelectItem = function(arg1_2) -- Line 56, Named "onSelectItem"
-            if Players_upvr.LocalPlayer.PlayerGui then
-                Audio_upvr.ObjectLocal(Players_upvr.LocalPlayer.PlayerGui, 6105461542, {
-                    Volume = 0.25;
-                })
-            end
-            arg1({
-                type = "addReceiptItem";
-                category = "Saves";
-                categoryTitle = "Save";
-                name = arg1_2.name;
-                title = arg1_2.title;
-                filled = arg1_2.filled;
-            })
-        end;
-    }
-end)(any_extend_result1)
+return RoactRodux.connect(function(p1, p2) --[[ Line: 50 ]]
+	return {
+		receipt = p1.garageReceipt
+	}
+end, function(p1) --[[ Line: 54 | Upvalues: Players (copy), Audio (copy) ]]
+	return {
+		onSelectItem = function(p12) --[[ Name: onSelectItem | Line: 56 | Upvalues: Players (ref), Audio (ref), p1 (copy) ]]
+			if Players.LocalPlayer.PlayerGui then
+				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
+					Volume = 0.25
+				})
+			end
+			p1({
+				type = "addReceiptItem",
+				category = "Saves",
+				categoryTitle = "Save",
+				name = p12.name,
+				title = p12.title,
+				filled = p12.filled
+			})
+		end
+	}
+end)(v1)

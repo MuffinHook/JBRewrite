@@ -1,166 +1,139 @@
-local Players_upvr = game:GetService("Players")
+local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local InputUtils_upvr = require(ReplicatedStorage.Std.InputUtils)
-local var5_upvw = 0
-UserInputService.InputBegan:Connect(function(arg1) -- Line 14
-    if arg1.UserInputType ~= Enum.UserInputType.Gamepad1 then
-        var5_upvw = os.clock()
-    end
+require(ReplicatedStorage.App.RunConsts)
+require(ReplicatedStorage.App.RunUtils)
+local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
+local InputUtils = require(ReplicatedStorage.Std.InputUtils)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local v1 = 0
+UserInputService.InputBegan:Connect(function(p1) --[[ Line: 14 | Upvalues: v1 (ref) ]]
+	if p1.UserInputType ~= Enum.UserInputType.Gamepad1 then
+		v1 = os.clock()
+	end
 end)
-UserInputService.InputChanged:Connect(function(arg1) -- Line 19
-    if arg1.UserInputType ~= Enum.UserInputType.Gamepad1 then
-        var5_upvw = os.clock()
-    end
+UserInputService.InputChanged:Connect(function(p1) --[[ Line: 19 | Upvalues: v1 (ref) ]]
+	if p1.UserInputType ~= Enum.UserInputType.Gamepad1 then
+		v1 = os.clock()
+	end
 end)
-local function hasLineOfSight_upvr(arg1, arg2) -- Line 37, Named "hasLineOfSight"
-    local Position = workspace.CurrentCamera.CFrame.Position
-    local RaycastParams_new_result1 = RaycastParams.new()
-    RaycastParams_new_result1.FilterType = Enum.RaycastFilterType.Exclude
-    RaycastParams_new_result1.RespectCanCollide = true
-    RaycastParams_new_result1.FilterDescendantsInstances = {Players_upvr.LocalPlayer.Character, workspace.Items}
-    RaycastParams_new_result1.IgnoreWater = true
-    local workspace_Raycast_result1 = workspace:Raycast(Position, arg2 - Position, RaycastParams_new_result1)
-    if not workspace_Raycast_result1 then
-        return true
-    end
-    return workspace_Raycast_result1.Instance:IsDescendantOf(arg1)
+local function canAimAssist() --[[ Line: 25 | Upvalues: Players (copy), InputUtils (copy), v1 (ref) ]]
+	if Players.LocalPlayer:GetAttribute("AimbotEnabled") then
+		return true
+	else
+		return InputUtils.isGamepad() and os.clock() - v1 > 10 and true or false
+	end
 end
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local PlayerUtils_upvr = require(ReplicatedStorage.Game.PlayerUtils)
-local CollectionService_upvr = game:GetService("CollectionService")
-local RunService_upvr = game:GetService("RunService")
+local function hasLineOfSight(p1, p2) --[[ Line: 37 | Upvalues: Players (copy) ]]
+	local Position = workspace.CurrentCamera.CFrame.Position
+	local v1 = RaycastParams.new()
+	v1.FilterType = Enum.RaycastFilterType.Exclude
+	v1.RespectCanCollide = true
+	v1.FilterDescendantsInstances = { Players.LocalPlayer.Character, workspace.Items }
+	v1.IgnoreWater = true
+	local v2 = workspace:Raycast(Position, p2 - Position, v1)
+	if v2 then
+		return v2.Instance:IsDescendantOf(p1)
+	else
+		return true
+	end
+end
 return {
-    aimAssist = function(arg1, arg2) -- Line 61, Named "aimAssist"
-        local any_new_result1 = Maid_upvr.new()
-        local var17_upvr
-        if Players_upvr.LocalPlayer:GetAttribute("AimbotEnabled") ~= true then
-            var17_upvr = false
-        else
-            var17_upvr = true
-        end
-        local any_GetPivot_result1 = Players_upvr.LocalPlayer.Character:GetPivot()
-        local Position_upvr = any_GetPivot_result1.Position
-        local LookVector_upvr = any_GetPivot_result1.LookVector
-        local findBestCharacter_result1_upvr = (function() -- Line 68, Named "findBestCharacter"
-            local tbl_upvr = {}
-            local tbl_3_upvr = {}
-            local function handleCharacter(arg1_4) -- Line 71
-                if tbl_3_upvr[arg1_4] then
-                else
-                    tbl_3_upvr[arg1_4] = true
-                    local Humanoid = arg1_4:FindFirstChild("Humanoid")
-                    if not Humanoid then return end
-                    if Humanoid.Health == 0 then return end
-                    if arg1_4 == Players_upvr.LocalPlayer.Character then return end
-                    local any_GetPlayerFromCharacter_result1 = Players_upvr:GetPlayerFromCharacter(arg1_4)
-                    if any_GetPlayerFromCharacter_result1 and PlayerUtils_upvr.getTeam(any_GetPlayerFromCharacter_result1) == PlayerUtils_upvr.getTeam(Players_upvr.LocalPlayer) then return end
-                    local PrimaryPart = arg1_4.PrimaryPart
-                    if not PrimaryPart then return end
-                    local Head = arg1_4:FindFirstChild("Head")
-                    local var53 = Vector3.new(0, 0, 0)
-                    if Head then
-                        var53 = (Head.Position - PrimaryPart.Position) * Vector3.new(0, 1, 0) / 2
-                    end
-                    local var54 = PrimaryPart.CFrame * var53
-                    if not hasLineOfSight_upvr(arg1_4, var54) then return end
-                    table.insert(tbl_upvr, {
-                        humanoid = Humanoid;
-                        part = PrimaryPart;
-                        offset = var53;
-                        distance = (var54 - Position_upvr).Magnitude;
-                        dot = (var54 - Position_upvr).Unit:Dot(LookVector_upvr);
-                    })
-                end
-            end
-            for i, v in CollectionService_upvr:GetTagged("Humanoid") do
-                handleCharacter(v.Parent)
-            end
-            table.sort(tbl_upvr, function(arg1_5, arg2_3) -- Line 117
-                local var60
-                if arg2_3.dot >= arg1_5.dot then
-                    var60 = false
-                else
-                    var60 = true
-                end
-                return var60
-            end)
-            for i_2 = 1, #tbl_upvr do
-                i = tbl_upvr[i_2]
-                v = i.dot
-                if 0.9396926207859084 < v then
-                    v = i.distance
-                    if v <= 100 then
-                        return i
-                    end
-                end
-            end
-            return nil
-        end)()
-        if not findBestCharacter_result1_upvr then
-            return nil
-        end
-        local CurrentCamera_upvr = workspace.CurrentCamera
-        local part_upvr = findBestCharacter_result1_upvr.part
-        any_new_result1:GiveTask(RunService_upvr.RenderStepped:Connect(function(arg1_6) -- Line 133
-            local cframe_looking_at = CFrame.lookAt(CurrentCamera_upvr.CFrame.Position, part_upvr.CFrame * findBestCharacter_result1_upvr.offset)
-            local any_GetMouseLocation_result1 = arg1:GetMouseLocation()
-            local any_ViewportPointToRay_result1 = CurrentCamera_upvr:ViewportPointToRay(any_GetMouseLocation_result1.X, any_GetMouseLocation_result1.Y, 0)
-            local any_Dot_result1 = any_ViewportPointToRay_result1.Direction:Dot(CurrentCamera_upvr.CFrame.LookVector)
-            if any_Dot_result1 < 0.999 then
-                cframe_looking_at *= CFrame.fromAxisAngle(any_ViewportPointToRay_result1.Direction:Cross(CurrentCamera_upvr.CFrame.LookVector), math.acos(any_Dot_result1))
-            end
-            local var69 = part_upvr.CFrame * findBestCharacter_result1_upvr.offset
-            if not hasLineOfSight_upvr(part_upvr.Parent, var69) then
-                arg2()
-            else
-                if 100 < (Players_upvr.LocalPlayer.Character:GetPivot().Position - var69).Magnitude then
-                    arg2()
-                    return
-                end
-                local var70 = 1 - math.exp(-9 * arg1_6)
-                if var17_upvr then
-                    var70 = 1
-                end
-                CurrentCamera_upvr.CFrame = CurrentCamera_upvr.CFrame:Lerp(cframe_looking_at, var70)
-                if Players_upvr.LocalPlayer:GetAttribute("AimbotEnabled") then
-                    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                end
-                local var71
-                if InputUtils_upvr.isGamepad() and 10 < os.clock() - var5_upvw then
-                    var71 = true
-                else
-                    var71 = false
-                end
-                if not var71 then
-                    var71 = arg2
-                    var71()
-                    return
-                end
-                var71 = findBestCharacter_result1_upvr
-                var71 = var71.humanoid
-                var71 = var71.Health
-                if var71 == 0 then
-                    var71 = arg2
-                    var71()
-                    return
-                end
-                var71 = part_upvr:IsDescendantOf(workspace)
-                if not var71 then
-                    var71 = arg2
-                    var71()
-                end
-            end
-        end))
-        return any_new_result1
-    end;
-    canAimAssist = function() -- Line 25, Named "canAimAssist"
-        if Players_upvr.LocalPlayer:GetAttribute("AimbotEnabled") then
-            return true
-        end
-        if InputUtils_upvr.isGamepad() and 10 < os.clock() - var5_upvw then
-            return true
-        end
-        return false
-    end;
+	aimAssist = function(p1, p2) --[[ Name: aimAssist | Line: 61 | Upvalues: Maid (copy), Players (copy), PlayerUtils (copy), hasLineOfSight (copy), CollectionService (copy), RunService (copy), InputUtils (copy), v1 (ref) ]]
+		local v12 = Maid.new()
+		local CurrentCamera = workspace.CurrentCamera
+		local v2 = Players.LocalPlayer:GetAttribute("AimbotEnabled") == true
+		local v3 = Players.LocalPlayer.Character:GetPivot()
+		local Position = v3.Position
+		local LookVector = v3.LookVector
+		local function findBestCharacter() --[[ Line: 68 | Upvalues: Players (ref), PlayerUtils (ref), hasLineOfSight (ref), Position (copy), LookVector (copy), CollectionService (ref) ]]
+			local t = {}
+			local t2 = {}
+			local function handleCharacter(p1) --[[ Line: 71 | Upvalues: t2 (copy), Players (ref), PlayerUtils (ref), hasLineOfSight (ref), t (copy), Position (ref), LookVector (ref) ]]
+				if t2[p1] then
+					return
+				end
+				t2[p1] = true
+				local Humanoid = p1:FindFirstChild("Humanoid")
+				if Humanoid then
+					if Humanoid.Health == 0 or p1 == Players.LocalPlayer.Character then
+						return
+					end
+					local v1 = Players:GetPlayerFromCharacter(p1)
+					if v1 and PlayerUtils.getTeam(v1) == PlayerUtils.getTeam(Players.LocalPlayer) then
+						return
+					end
+					local PrimaryPart = p1.PrimaryPart
+					if PrimaryPart then
+						local Head = p1:FindFirstChild("Head")
+						local v2 = if Head then (Head.Position - PrimaryPart.Position) * Vector3.new(0, 1, 0) / 2 else Vector3.new(0, 0, 0)
+						local v3 = PrimaryPart.CFrame * v2
+						if hasLineOfSight(p1, v3) then
+							table.insert(t, {
+								humanoid = Humanoid,
+								part = PrimaryPart,
+								offset = v2,
+								distance = (v3 - Position).Magnitude,
+								dot = (v3 - Position).Unit:Dot(LookVector)
+							})
+						end
+					end
+				end
+			end
+			for v1, v2 in CollectionService:GetTagged("Humanoid") do
+				handleCharacter(v2.Parent)
+			end
+			table.sort(t, function(p1, p2) --[[ Line: 117 ]]
+				return p1.dot > p2.dot
+			end)
+			for i = 1, #t do
+				local v3 = t[i]
+				if v3.dot > 0.9396926207859084 and v3.distance <= 100 then
+					return v3
+				end
+			end
+			return nil
+		end
+		local v4 = findBestCharacter()
+		if v4 then
+			local part = v4.part
+			v12:GiveTask(RunService.RenderStepped:Connect(function(p12) --[[ Line: 133 | Upvalues: CurrentCamera (copy), part (copy), v4 (copy), p1 (copy), hasLineOfSight (ref), p2 (copy), Players (ref), v2 (copy), InputUtils (ref), v1 (ref) ]]
+				local v12 = CFrame.lookAt(CurrentCamera.CFrame.Position, part.CFrame * v4.offset)
+				local v22 = p1:GetMouseLocation()
+				local v3 = CurrentCamera:ViewportPointToRay(v22.X, v22.Y, 0)
+				local v42 = v3.Direction:Cross(CurrentCamera.CFrame.LookVector)
+				local v5 = v3.Direction:Dot(CurrentCamera.CFrame.LookVector)
+				if v5 < 0.999 then
+					v12 = v12 * CFrame.fromAxisAngle(v42, (math.acos(v5)))
+				end
+				local v7 = part.CFrame * v4.offset
+				if hasLineOfSight(part.Parent, v7) then
+					if (Players.LocalPlayer.Character:GetPivot().Position - v7).Magnitude > 100 then
+						p2()
+						return
+					end
+					local v8 = 1 - math.exp(-9 * p12)
+					if v2 then
+						v8 = 1
+					end
+					CurrentCamera.CFrame = CurrentCamera.CFrame:Lerp(v12, v8)
+					if if Players.LocalPlayer:GetAttribute("AimbotEnabled") then true else InputUtils.isGamepad() and os.clock() - v1 > 10 and true or false then
+						if v4.humanoid.Health == 0 or not part:IsDescendantOf(workspace) then
+							p2()
+						end
+					else
+						p2()
+					end
+				else
+					p2()
+				end
+			end))
+			return v12
+		else
+			return nil
+		end
+	end,
+	canAimAssist = canAimAssist
 }

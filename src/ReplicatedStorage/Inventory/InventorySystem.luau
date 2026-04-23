@@ -1,40 +1,39 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local InventoryConsts_upvr = require(script.Parent.InventoryConsts)
-local InventoryBinder_upvr = require(script.Parent.InventoryBinder)
-local module = {}
-local InventoryItemSystem_upvr = require(script.Parent.InventoryItemSystem)
-function module.init() -- Line 13
-    InventoryBinder_upvr:Start()
-    InventoryItemSystem_upvr.init()
-end
-function module.getFor(arg1) -- Line 17
-    local SOME = arg1:FindFirstChild(InventoryConsts_upvr.CURRENT_INVENTORY_VALUE_NAME)
-    if not SOME then
-    elseif SOME.Value then
-        return InventoryBinder_upvr:Get(SOME.Value)
-    end
-end
-local waitForChild_upvr = require(ReplicatedStorage.Std.waitForChild)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-local BinderUtils_upvr = require(ReplicatedStorage.Std.Binder.BinderUtils)
-function module.promiseFor(arg1) -- Line 26
-    return waitForChild_upvr(arg1, InventoryConsts_upvr.CURRENT_INVENTORY_VALUE_NAME):andThen(function(arg1_2) -- Line 27
-        local any_new_result1_upvr = Maid_upvr.new()
-        local any_new_result1 = Promise_upvr.new(function(arg1_3, arg2) -- Line 29
-            any_new_result1_upvr:GiveTask(RxInstanceUtils_upvr.observeProperty(arg1_2, "Value", function(arg1_4) -- Line 30
-                if arg1_4 then
-                    arg1_3(BinderUtils_upvr.promiseBoundClass(InventoryBinder_upvr, arg1_4))
-                else
-                    arg2()
-                end
-            end))
-        end)
-        any_new_result1:finally(function() -- Line 38
-            any_new_result1_upvr:Destroy()
-        end)
-        return any_new_result1
-    end)
-end
-return module
+local InventoryItemSystem = require(script.Parent.InventoryItemSystem)
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local BinderUtils = require(ReplicatedStorage.Std.Binder.BinderUtils)
+local InventoryConsts = require(script.Parent.InventoryConsts)
+local InventoryBinder = require(script.Parent.InventoryBinder)
+return {
+	init = function() --[[ Name: init | Line: 13 | Upvalues: InventoryBinder (copy), InventoryItemSystem (copy) ]]
+		InventoryBinder:Start()
+		InventoryItemSystem.init()
+	end,
+	getFor = function(p1) --[[ Name: getFor | Line: 17 | Upvalues: InventoryConsts (copy), InventoryBinder (copy) ]]
+		local v1 = p1:FindFirstChild(InventoryConsts.CURRENT_INVENTORY_VALUE_NAME)
+		if v1 and v1.Value then
+			return InventoryBinder:Get(v1.Value)
+		end
+	end,
+	promiseFor = function(p1) --[[ Name: promiseFor | Line: 26 | Upvalues: waitForChild (copy), InventoryConsts (copy), Maid (copy), Promise (copy), RxInstanceUtils (copy), BinderUtils (copy), InventoryBinder (copy) ]]
+		return waitForChild(p1, InventoryConsts.CURRENT_INVENTORY_VALUE_NAME):andThen(function(p1) --[[ Line: 27 | Upvalues: Maid (ref), Promise (ref), RxInstanceUtils (ref), BinderUtils (ref), InventoryBinder (ref) ]]
+			local v1 = Maid.new()
+			local v2 = Promise.new(function(p12, p2) --[[ Line: 29 | Upvalues: v1 (copy), RxInstanceUtils (ref), p1 (copy), BinderUtils (ref), InventoryBinder (ref) ]]
+				v1:GiveTask(RxInstanceUtils.observeProperty(p1, "Value", function(p1) --[[ Line: 30 | Upvalues: p12 (copy), BinderUtils (ref), InventoryBinder (ref), p2 (copy) ]]
+					if p1 then
+						p12(BinderUtils.promiseBoundClass(InventoryBinder, p1))
+					else
+						p2()
+					end
+				end))
+			end)
+			v2:finally(function() --[[ Line: 38 | Upvalues: v1 (copy) ]]
+				v1:Destroy()
+			end)
+			return v2
+		end)
+	end
+}

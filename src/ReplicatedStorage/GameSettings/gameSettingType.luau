@@ -1,1 +1,2 @@
-return require(game:GetService("ReplicatedStorage").Std.Enumer)({"Checkbox", "Slider"})
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Std.Enumer)({ "Checkbox", "Slider" })

@@ -1,6 +1,46 @@
 {
   "className": "ParticleEmitter",
   "properties": {
+    "Rate": 3.0,
+    "Transparency": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 1.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.0394432,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.696056,
+            "value": 0.5,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 1.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "LightEmission": 1.0,
+    "ZOffset": 2.0,
+    "Enabled": false,
+    "LockedToPart": true,
+    "Lifetime": {
+      "NumberRange": [
+        0.5,
+        0.5
+      ]
+    },
     "Texture": "rbxassetid://2200925370",
     "Size": {
       "NumberSequence": {
@@ -38,40 +78,6 @@
         ]
       }
     },
-    "Speed": {
-      "NumberRange": [
-        3.0,
-        3.0
-      ]
-    },
-    "LockedToPart": true,
-    "Transparency": {
-      "NumberSequence": {
-        "keypoints": [
-          {
-            "time": 0.0,
-            "value": 1.0,
-            "envelope": 0.0
-          },
-          {
-            "time": 0.0394432,
-            "value": 0.0,
-            "envelope": 0.0
-          },
-          {
-            "time": 0.696056,
-            "value": 0.5,
-            "envelope": 0.0
-          },
-          {
-            "time": 1.0,
-            "value": 1.0,
-            "envelope": 0.0
-          }
-        ]
-      }
-    },
-    "ZOffset": 2.0,
     "Color": {
       "ColorSequence": {
         "keypoints": [
@@ -94,15 +100,6 @@
         ]
       }
     },
-    "Lifetime": {
-      "NumberRange": [
-        0.5,
-        0.5
-      ]
-    },
-    "Enabled": false,
-    "LightEmission": 1.0,
-    "Rate": 3.0,
     "RotSpeed": {
       "NumberRange": [
         150.0,
@@ -113,8 +110,11 @@
       -100.0,
       100.0
     ],
-    "FlipbookBlendFrames": {
-      "Bool": false
+    "Speed": {
+      "NumberRange": [
+        3.0,
+        3.0
+      ]
     }
   }
 }

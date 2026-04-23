@@ -1,22 +1,13 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMQBmV4cGVjdAJvZgRUZXh0AnRvBWVxdWFsD0hvc3RDaGFuZ2VFdmVudAhTZWxlY3RlZAVuZXZlcgdyZXF1aXJlBnNjcmlwdAZQYXJlbnQEVHlwZQZDaGFuZ2UCaXQxc2hvdWxkIHlpZWxkIGNoYW5nZSBsaXN0ZW5lciBvYmplY3RzIHdoZW4gaW5kZXhlZC9zaG91bGQgeWllbGQgdGhlIHNhbWUgb2JqZWN0IHdoZW4gaW5kZXhlZCBhZ2FpbgAEBgACAAAFAAIADw8lpAIBAAAAAED7BAAATQMEvAIAAAD7BQEATQQF9QMAAACfAwIAnwIAAk0BApIEAAAATQABewUAAAD7AgAATQECZgYAAACfAAIBpAIBAAAAAED7BAAATQMEvAIAAAD7BQEATQQFbQcAAACfAwIAnwIAAk0BApIEAAAATQABewUAAAD7AgAATQECZgYAAACfAAIBggABAAgDAQQAAABAAwIDAwMEAwUDBgMHAAYAARgAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAABBwAAAAAIAAEAABAAAQMPDwAAIA8BAx0PAgYaIPsBAABNAAH1AAAAAPsCAABNAQL1AAAAAPsDAABNAgNtAQAAAKQFAwAAACBAUgYAAJ8FAgJNBAWSBAAAAE0DBHsFAAAAUgQBAJ8DAgGkBgMAAAAgQFIHAACfBgICTQUGNQYAAABNBAWSBAAAAE0DBHsFAAAAUgQCAJ8DAgGCAAEABwMDAwcDAQQAACBAAwQDBQMIAAsAARgAAAABAAABAAACAAAAAAAAAAAAAQAAAAAAAAAAAAAAAQwAAAAABQAAAAALAAACDwAAIg8BCxcipAABAAAAAECkBAMAAAAgQE0DBCQEAAAATQIDJAQAAABNAQIRBQAAAJ8AAgKkAQEAAAAAQKQEAwAAACBATQMEJAQAAABNAgOhBgAAAJ8BAgKkAggAAABwQG8DCQDZBAAAEgAAABIAAQCfAgMBpAIIAAAAcEBvAwoA2QQBABIAAQCfAgMBggABAAsDCQQAAABAAwoEAAAgQAMLAwwDDQMOBAAAcEADDwMQAgABAQABGAAAAAAAAAAAAAAAAgAAAAAAAAAAAgAAAAAAAAUAAAAAAAgCAAAAAAEAAAECAAOjAAAAwAAAAIIAAgABBgIBAgEAARgAAAABAAAAAAN+qWEN9ces80xtC5lHVnnjfXtY/q79i7PEg7PlRMqy+R/wLaJQlRMz
-
 return function() --[[ Line: 1 ]]
-    local v0 = require(script.Parent.Parent.Type);
-    local v1 = require(script.Parent.Change);
-    it("should yield change listener objects when indexed", function() --[[ Line: 6 ]]
-        -- upvalues: v0 (copy), v1 (copy)
-        expect(v0.of(v1.Text)).to.equal(v0.HostChangeEvent);
-        expect(v0.of(v1.Selected)).to.equal(v0.HostChangeEvent);
-    end);
-    it("should yield the same object when indexed again", function() --[[ Line: 11 ]]
-        -- upvalues: v1 (copy)
-        local l_Text_0 = v1.Text;
-        local l_Text_1 = v1.Text;
-        local l_Selected_0 = v1.Selected;
-        expect(l_Text_0).to.equal(l_Text_1);
-        expect(l_Text_0).never.to.equal(l_Selected_0);
-    end);
-end;
+	local Type = require(script.Parent.Parent.Type)
+	local Change = require(script.Parent.Change)
+	it("should yield change listener objects when indexed", function() --[[ Line: 6 | Upvalues: Type (copy), Change (copy) ]]
+		expect(Type.of(Change.Text)).to.equal(Type.HostChangeEvent)
+		expect(Type.of(Change.Selected)).to.equal(Type.HostChangeEvent)
+	end)
+	it("should yield the same object when indexed again", function() --[[ Line: 11 | Upvalues: Change (copy) ]]
+		local Text = Change.Text
+		expect(Text).to.equal(Change.Text)
+		expect(Text).never.to.equal(Change.Selected)
+	end)
+end

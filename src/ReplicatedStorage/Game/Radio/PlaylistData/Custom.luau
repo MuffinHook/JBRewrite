@@ -1,6 +1,6 @@
 return {
-    Title = "Custom";
-    Editable = true;
-    Persist = true;
-    Songs = {};
+	Title = "Custom",
+	Editable = true,
+	Persist = true,
+	Songs = {}
 }

@@ -1,1 +1,4 @@
-return require(game:GetService("ReplicatedStorage").Std.Binder).new(require(script.Parent.ProximityCamShakeConsts).TAG_NAME, require(script.Parent.ProximityCamShake))
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Binder = require(ReplicatedStorage.Std.Binder)
+local ProximityCamShakeConsts = require(script.Parent.ProximityCamShakeConsts)
+return Binder.new(ProximityCamShakeConsts.TAG_NAME, require(script.Parent.ProximityCamShake))

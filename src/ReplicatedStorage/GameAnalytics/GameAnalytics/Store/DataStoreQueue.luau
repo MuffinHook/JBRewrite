@@ -1,60 +1,64 @@
-local module_upvr = {
-    QR = true;
-    Queue = {};
-    Process = 0;
+local t = {
+	QR = true,
+	Queue = {},
+	Process = 0
 }
-local tbl_upvr = {}
-task.spawn(function() -- Line 7
-    while module_upvr.QR do
-        task.wait()
-        if 0 < #module_upvr.Queue then
-            local _1_upvr = module_upvr.Queue[1]
-            table.remove(module_upvr.Queue, 1)
-            if not tbl_upvr[_1_upvr.Key] then
-                tbl_upvr[_1_upvr.Key] = 0
-            end
-            local var5 = module_upvr
-            var5.Process += 1
-            var5 = _1_upvr.Delay + tbl_upvr[_1_upvr.Key] - DateTime.now().UnixTimestamp
-            local var6 = var5
-            if var6 <= 0 then
-                var6 = 0
-            end
-            task.delay(var6, function() -- Line 21
-                local var8
-                repeat
-                    tbl_upvr[_1_upvr.Key] = DateTime.now().UnixTimestamp
-                    local pcall_result1, pcall_result2, pcall_result3 = pcall(_1_upvr.Func)
-                    local var12 = pcall_result1
-                    local var13 = pcall_result2
-                    var8 = pcall_result3
-                    if not var12 then
-                        warn(var13)
-                    end
-                    if not var12 or var13 then break end
-                    if not _1_upvr.Delay then break end
-                    task.wait(_1_upvr.Delay)
-                until not var12 or var13
-                _1_upvr.Event:Fire(var12, var13, var8)
-                local var14 = module_upvr
-                var14.Process -= 1
-                tbl_upvr[_1_upvr.Key] = DateTime.now().UnixTimestamp
-            end)
-        end
-    end
+local t2 = {}
+task.spawn(function() --[[ Line: 7 | Upvalues: t (copy), t2 (copy) ]]
+	while t.QR do
+		task.wait()
+		if #t.Queue > 0 then
+			local v1 = t.Queue[1]
+			table.remove(t.Queue, 1)
+			if not t2[v1.Key] then
+				t2[v1.Key] = 0
+			end
+			local v2 = t
+			v2.Process = v2.Process + 1
+			local v3 = v1.Delay + t2[v1.Key] - DateTime.now().UnixTimestamp
+			if v3 <= 0 then
+				v3 = 0
+			end
+			task.delay(v3, function() --[[ Line: 21 | Upvalues: t2 (ref), v1 (copy), t (ref) ]]
+				while true do
+					t2[v1.Key] = DateTime.now().UnixTimestamp
+					local v12, v2, v3 = pcall(v1.Func)
+					if not v12 then
+						warn(v2)
+					end
+					local v4 = v2
+					if v12 and v4 then
+						local _2
+						_ = v12
+						_2 = v3
+						break
+					end
+					if not v1.Delay then
+						_ = v12
+						break
+					end
+					task.wait(v1.Delay)
+					if v12 and v4 then
+						_ = v12
+						break
+					end
+				end
+			end)
+		end
+	end
 end)
-function module_upvr.AddRequest(arg1, arg2, arg3) -- Line 40
-    local BindableEvent = Instance.new("BindableEvent")
-    local tbl = {}
-    tbl.Key = arg1
-    tbl.Delay = arg3
-    tbl.Func = arg2
-    tbl.Event = BindableEvent
-    table.insert(module_upvr.Queue, tbl)
-    local any_Wait_result1, any_Wait_result2, any_Wait_result3 = BindableEvent.Event:Wait()
-    return any_Wait_result1, any_Wait_result2, any_Wait_result3
+function t.AddRequest(p1, p2, p3) --[[ Line: 40 | Upvalues: t (copy) ]]
+	local v1 = Instance.new("BindableEvent")
+	table.insert(t.Queue, {
+		Key = p1,
+		Delay = p3,
+		Func = p2,
+		Event = v1
+	})
+	local v2, v3, v4 = v1.Event:Wait()
+	return v2, v3, v4
 end
-function module_upvr.RemoveKey(arg1) -- Line 54
-    tbl_upvr[arg1] = nil
+function t.RemoveKey(p1) --[[ Line: 54 | Upvalues: t2 (copy) ]]
+	t2[p1] = nil
 end
-return module_upvr
+return t

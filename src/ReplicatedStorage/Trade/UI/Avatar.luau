@@ -1,33 +1,29 @@
-local Roact = require(game:GetService("ReplicatedStorage").Roact)
-local any_extend_result1 = Roact.PureComponent:extend("Avatar")
-function any_extend_result1.init(arg1) -- Line 6
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local v1 = Roact.PureComponent:extend("Avatar")
+function v1.init(p1) --[[ Line: 6 ]] end
+function v1.render(p1) --[[ Line: 7 | Upvalues: createElement (copy) ]]
+	local t = {
+		Position = p1.props.position,
+		BorderSizePixel = 0,
+		BackgroundColor3 = Color3.new(0.7, 0.7, 0.7),
+		BackgroundTransparency = 0
+	}
+	t.Image = "rbxthumb://type=AvatarHeadShot&w=150&h=150&id=" .. tostring(p1.props.userId)
+	t.Size = p1.props.size
+	local t2 = {
+		UICorner = createElement("UICorner", {
+			CornerRadius = UDim.new(1, 0)
+		})
+	}
+	t2.UIStroke = p1.props.isFriend and createElement("UIStroke", {
+		Thickness = 1,
+		Color = Color3.fromHex("5cc76d")
+	})
+	t2.UIAspectRatio = createElement("UIAspectRatioConstraint", {
+		AspectRatio = 1
+	})
+	return createElement("ImageLabel", t, t2)
 end
-local createElement_upvr = Roact.createElement
-function any_extend_result1.render(arg1) -- Line 7
-    local module = {
-        UICorner = createElement_upvr("UICorner", {
-            CornerRadius = UDim.new(1, 0);
-        });
-    }
-    local isFriend = arg1.props.isFriend
-    if isFriend then
-        isFriend = createElement_upvr
-        isFriend = isFriend("UIStroke", {
-            Thickness = 1;
-            Color = Color3.fromHex("5cc76d");
-        })
-    end
-    module.UIStroke = isFriend
-    module.UIAspectRatio = createElement_upvr("UIAspectRatioConstraint", {
-        AspectRatio = 1;
-    })
-    return createElement_upvr("ImageLabel", {
-        Position = arg1.props.position;
-        BorderSizePixel = 0;
-        BackgroundColor3 = Color3.new(0.7, 0.7, 0.7);
-        BackgroundTransparency = 0;
-        Image = "rbxthumb://type=AvatarHeadShot&w=150&h=150&id="..tostring(arg1.props.userId);
-        Size = arg1.props.size;
-    }, module)
-end
-return any_extend_result1
+return v1

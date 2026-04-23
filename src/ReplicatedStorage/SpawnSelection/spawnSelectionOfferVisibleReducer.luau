@@ -1,5 +1,6 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer(false, {
-    setSpawnSelectionOfferVisible = function(arg1, arg2) -- Line 5, Named "setSpawnSelectionOfferVisible"
-        return arg2.visible
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer(false, {
+	setSpawnSelectionOfferVisible = function(p1, p2) --[[ Name: setSpawnSelectionOfferVisible | Line: 5 ]]
+		return p2.visible
+	end
 })

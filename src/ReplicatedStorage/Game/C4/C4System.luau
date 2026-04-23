@@ -1,81 +1,79 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local module_upvr = {}
-local var4_upvw
-local var5_upvw = false
-local CurrentCamera_upvr = workspace.CurrentCamera
-local CamShaker_upvr = require(ReplicatedStorage_upvr.Game.CamShaker.CamShaker)
-local RunService_upvr = game:GetService("RunService")
-local Promise_upvr = require(ReplicatedStorage_upvr.Std.Promise)
-function module_upvr.onExplode(arg1, arg2, arg3, arg4, arg5) -- Line 16
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var10
-    if not var5_upvw then
-    else
-        if not arg3 then
-            local const_number = 24
-        end
-        if not var10 then
-            var10 = 128
-        end
-        local Humanoid = LocalPlayer_upvr.Character:FindFirstChild("Humanoid")
-        local RootPart = Humanoid.RootPart
-        local var14 = RootPart.Position - arg1
-        if var14.Magnitude < arg2 then
-            if Humanoid.SeatPart then
-                Humanoid.Jump = true
-                task.wait(0.1)
-            end
-            task.spawn(var4_upvw.e1i6ygca)
-            local CFrame_upvw = CurrentCamera_upvr.CFrame
-            local any_new_result1_upvr = CamShaker_upvr.new(Enum.RenderPriority.Camera.Value + 2, function(arg1_2) -- Line 38
-                CFrame_upvw = CurrentCamera_upvr.CFrame
-                CurrentCamera_upvr.CFrame *= arg1_2
-            end)
-            any_new_result1_upvr:Start()
-            any_new_result1_upvr:Shake(CamShaker_upvr.Presets.Explosion)
-            local any_Connect_result1_upvr = RunService_upvr.Heartbeat:Connect(function() -- Line 42
-                CurrentCamera_upvr.CFrame = CFrame_upvw
-            end)
-            Promise_upvr.delay(2):andThen(function() -- Line 48
-                any_new_result1_upvr:Stop()
-                any_Connect_result1_upvr:Disconnect()
-            end)
-            if not arg5 then
-                RootPart:ApplyImpulse(RootPart.AssemblyMass * var14.Unit * ((var10 - const_number) * (1 - var14.Magnitude / arg2) + const_number))
-            end
-        end
-    end
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local CamShaker = require(ReplicatedStorage.Game.CamShaker.CamShaker)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local C4Consts = require(script.Parent.C4Consts)
+local C4Utils = require(script.Parent.C4Utils)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local C4Binder = require(script.Parent.C4Binder)
+local CurrentCamera = workspace.CurrentCamera
+local t = {}
+local v1 = nil
+local v2 = false
+function t.onExplode(p1, p2, p3, p4, p5) --[[ Line: 16 | Upvalues: v2 (ref), LocalPlayer (copy), v1 (ref), CurrentCamera (copy), CamShaker (copy), RunService (copy), Promise (copy) ]]
+	if v2 then
+		if not p3 then
+			p3 = 24
+		end
+		if not p4 then
+			p4 = 128
+		end
+		local Humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+		local RootPart = Humanoid.RootPart
+		local v12 = RootPart.Position - p1
+		if v12.Magnitude < p2 then
+			if Humanoid.SeatPart then
+				Humanoid.Jump = true
+				task.wait(0.1)
+			end
+			task.spawn(v1.e9kobedq)
+			local v22 = CurrentCamera.CFrame
+			local v3 = CamShaker.new(Enum.RenderPriority.Camera.Value + 2, function(p1) --[[ Line: 38 | Upvalues: v22 (ref), CurrentCamera (ref) ]]
+				v22 = CurrentCamera.CFrame
+				CurrentCamera.CFrame = CurrentCamera.CFrame * p1
+			end)
+			local v4 = RunService.Heartbeat:Connect(function() --[[ Line: 42 | Upvalues: CurrentCamera (ref), v22 (ref) ]]
+				CurrentCamera.CFrame = v22
+			end)
+			v3:Start()
+			v3:Shake(CamShaker.Presets.Explosion)
+			Promise.delay(2):andThen(function() --[[ Line: 48 | Upvalues: v3 (copy), v4 (copy) ]]
+				v3:Stop()
+				v4:Disconnect()
+			end)
+			if not p5 then
+				RootPart:ApplyImpulse(RootPart.AssemblyMass * v12.Unit * ((p4 - p3) * (1 - v12.Magnitude / p2) + p3))
+			end
+		end
+	end
 end
-local C4Binder_upvr = require(script.Parent.C4Binder)
-local RxInstanceUtils_upvr = require(ReplicatedStorage_upvr.Std.RxInstanceUtils)
-local C4Consts_upvr = require(script.Parent.C4Consts)
-local C4Utils_upvr = require(script.Parent.C4Utils)
-function module_upvr.init(arg1) -- Line 61
-    var4_upvw = arg1.em
-    var5_upvw = true
-    C4Binder_upvr:Start()
-    local function _(arg1_3) -- Line 66, Named "hide"
-        arg1_3._obj.PrimaryPart.Anchored = true
-        arg1_3._obj:SetPrimaryPartCFrame(CFrame.new(0, -100, 0))
-    end
-    C4Binder_upvr:GetClassAddedSignal():Connect(function(arg1_4) -- Line 70
-        RxInstanceUtils_upvr.yieldForProperty(arg1_4.obj, "PrimaryPart")
-        if arg1_4:GetCreator() == LocalPlayer_upvr then
-            arg1_4._obj.PrimaryPart.Anchored = true
-            arg1_4._obj:SetPrimaryPartCFrame(CFrame.new(0, -100, 0))
-        end
-        arg1_4._maid:GiveTask(arg1_4._creatorIdValue:GetPropertyChangedSignal("Value"):Connect(function() -- Line 75
-            if arg1_4:GetCreator() == LocalPlayer_upvr then
-                local var27 = arg1_4
-                var27._obj.PrimaryPart.Anchored = true
-                var27._obj:SetPrimaryPartCFrame(CFrame.new(0, -100, 0))
-            end
-        end))
-    end)
-    ReplicatedStorage_upvr:FindFirstChild(C4Consts_upvr.PLAY_EXPLOSION_REMOTE_NAME).OnClientEvent:Connect(function(arg1_5, arg2) -- Line 83
-        C4Utils_upvr.explosionVisual(arg1_5)
-    end)
-    ReplicatedStorage_upvr:FindFirstChild("C4ExplodedRemote").OnClientEvent:Connect(module_upvr.onExplode)
+function t.init(p1) --[[ Line: 61 | Upvalues: v1 (ref), v2 (ref), C4Binder (copy), RxInstanceUtils (copy), LocalPlayer (copy), ReplicatedStorage (copy), C4Consts (copy), C4Utils (copy), t (copy) ]]
+	v1 = p1.em
+	v2 = true
+	C4Binder:Start()
+	local function hide(p1) --[[ Line: 66 ]]
+		p1._obj.PrimaryPart.Anchored = true
+		p1._obj:SetPrimaryPartCFrame(CFrame.new(0, -100, 0))
+	end
+	C4Binder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 70 | Upvalues: RxInstanceUtils (ref), LocalPlayer (ref) ]]
+		RxInstanceUtils.yieldForProperty(p1.obj, "PrimaryPart")
+		if p1:GetCreator() == LocalPlayer then
+			p1._obj.PrimaryPart.Anchored = true
+			p1._obj:SetPrimaryPartCFrame(CFrame.new(0, -100, 0))
+		end
+		p1._maid:GiveTask(p1._creatorIdValue:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 75 | Upvalues: p1 (copy), LocalPlayer (ref) ]]
+			if p1:GetCreator() == LocalPlayer then
+				local v1 = p1
+				v1._obj.PrimaryPart.Anchored = true
+				v1._obj:SetPrimaryPartCFrame(CFrame.new(0, -100, 0))
+			end
+		end))
+	end)
+	ReplicatedStorage:FindFirstChild(C4Consts.PLAY_EXPLOSION_REMOTE_NAME).OnClientEvent:Connect(function(p1, p2) --[[ Line: 83 | Upvalues: C4Utils (ref) ]]
+		C4Utils.explosionVisual(p1)
+	end)
+	ReplicatedStorage:FindFirstChild("C4ExplodedRemote").OnClientEvent:Connect(t.onExplode)
 end
-return module_upvr
+return t

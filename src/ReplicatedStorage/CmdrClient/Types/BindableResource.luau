@@ -1,3 +1,3 @@
-return function(arg1) -- Line 1
-    arg1:RegisterType("bindableResource", arg1.Cmdr.Util.MakeEnumType("BindableResource", {"Chat"}))
+return function(p1) --[[ Line: 1 ]]
+	p1:RegisterType("bindableResource", p1.Cmdr.Util.MakeEnumType("BindableResource", { "Chat" }))
 end

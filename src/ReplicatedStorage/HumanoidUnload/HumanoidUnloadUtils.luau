@@ -1,15 +1,10 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local HumanoidUnloadConsts_upvr = require(ReplicatedStorage_upvr.HumanoidUnload.HumanoidUnloadConsts)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HumanoidUnloadConsts = require(ReplicatedStorage.HumanoidUnload.HumanoidUnloadConsts)
 return {
-    getMaxDistToLoad = function() -- Line 6, Named "getMaxDistToLoad"
-        local attribute = ReplicatedStorage_upvr:GetAttribute(HumanoidUnloadConsts_upvr.MAX_DIST_TO_LOAD_ATTR_NAME)
-        if not attribute then
-            attribute = HumanoidUnloadConsts_upvr
-            attribute = attribute.MAX_DIST_TO_LOAD
-        end
-        return attribute
-    end;
-    setMaxDistToLoad = function(arg1) -- Line 11, Named "setMaxDistToLoad"
-        ReplicatedStorage_upvr:SetAttribute(HumanoidUnloadConsts_upvr.MAX_DIST_TO_LOAD_ATTR_NAME, arg1)
-    end;
+	getMaxDistToLoad = function() --[[ Name: getMaxDistToLoad | Line: 6 | Upvalues: ReplicatedStorage (copy), HumanoidUnloadConsts (copy) ]]
+		return ReplicatedStorage:GetAttribute(HumanoidUnloadConsts.MAX_DIST_TO_LOAD_ATTR_NAME) or HumanoidUnloadConsts.MAX_DIST_TO_LOAD
+	end,
+	setMaxDistToLoad = function(p1) --[[ Name: setMaxDistToLoad | Line: 11 | Upvalues: ReplicatedStorage (copy), HumanoidUnloadConsts (copy) ]]
+		ReplicatedStorage:SetAttribute(HumanoidUnloadConsts.MAX_DIST_TO_LOAD_ATTR_NAME, p1)
+	end
 }

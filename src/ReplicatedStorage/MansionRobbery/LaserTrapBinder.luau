@@ -1,106 +1,101 @@
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BaseObject_upvr = require(ReplicatedStorage.Std.BaseObject)
-local DoorUtils_upvr = require(ReplicatedStorage.Door2.DoorUtils)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-local CharacterUtils_upvr = require(ReplicatedStorage.Std.CharacterUtils)
-local Players_upvr = game:GetService("Players")
-function module_upvr.new(arg1, arg2) -- Line 15
-    local any_new_result1_upvr = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1_upvr, module_upvr)
-    any_new_result1_upvr._flashing = false
-    any_new_result1_upvr.buttonsModel = nil
-    any_new_result1_upvr.maid:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1, "Buttons", function(arg1_2, arg2_2) -- Line 22
-        any_new_result1_upvr.buttonsModel = arg1_2
-        arg2_2:GiveTask(RxInstanceUtils_upvr.observeChildren(arg1_2, function(arg1_3, arg2_3) -- Line 24
-            arg2_3:GivePromise(DoorUtils_upvr.promiseInnerModel(arg1_3):andThen(function(arg1_4) -- Line 26
-                return RxInstanceUtils_upvr.waitForChild(arg1_4, "Touch")
-            end):andThen(function(arg1_5) -- Line 29
-                local os_clock_result1_2_upvw = os.clock()
-                arg2_3:GiveTask(arg1_5.Touched:Connect(function(arg1_6) -- Line 31
-                    local any_getAncestorPartHumanoid_result1 = CharacterUtils_upvr.getAncestorPartHumanoid(arg1_6)
-                    if not any_getAncestorPartHumanoid_result1 then
-                    else
-                        if any_getAncestorPartHumanoid_result1.Parent ~= Players_upvr.LocalPlayer.Character then return end
-                        if any_getAncestorPartHumanoid_result1:GetLimb(arg1_6) == Enum.Limb.Unknown then return end
-                        local os_clock_result1 = os.clock()
-                        if os_clock_result1 - os_clock_result1_2_upvw < 1 then return end
-                        if not any_new_result1_upvr._flashing then
-                            os_clock_result1_2_upvw = os_clock_result1
-                            any_getAncestorPartHumanoid_result1:TakeDamage(assert(arg1:GetAttribute("LaserTrapDamage"), "missing LaserTrapDamage"))
-                            arg2.replicateRemote:FireServer()
-                            any_new_result1_upvr:_flicker()
-                        end
-                    end
-                end))
-            end))
-        end))
-    end))
-    any_new_result1_upvr.maid:GiveTask(arg2.replicateRemote.OnClientEvent:Connect(function() -- Line 60
-        any_new_result1_upvr:_flicker()
-    end))
-    return any_new_result1_upvr
+local Audio = require(ReplicatedStorage.Std.Audio)
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
+local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1, p2) --[[ Line: 15 | Upvalues: BaseObject (copy), t (copy), RxInstanceUtils (copy), DoorUtils (copy), CharacterUtils (copy), Players (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t)
+	v1._flashing = false
+	v1.buttonsModel = nil
+	v1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Buttons", function(p12, p22) --[[ Line: 22 | Upvalues: v1 (copy), RxInstanceUtils (ref), DoorUtils (ref), CharacterUtils (ref), Players (ref), p1 (copy), p2 (copy) ]]
+		v1.buttonsModel = p12
+		p22:GiveTask(RxInstanceUtils.observeChildren(p12, function(p12, p22) --[[ Line: 24 | Upvalues: DoorUtils (ref), RxInstanceUtils (ref), CharacterUtils (ref), Players (ref), v1 (ref), p1 (ref), p2 (ref) ]]
+			p22:GivePromise(DoorUtils.promiseInnerModel(p12):andThen(function(p1) --[[ Line: 26 | Upvalues: RxInstanceUtils (ref) ]]
+				return RxInstanceUtils.waitForChild(p1, "Touch")
+			end):andThen(function(p12) --[[ Line: 29 | Upvalues: p22 (copy), CharacterUtils (ref), Players (ref), v1 (ref), p1 (ref), p2 (ref) ]]
+				local v12 = os.clock()
+				p22:GiveTask(p12.Touched:Connect(function(p12) --[[ Line: 31 | Upvalues: CharacterUtils (ref), Players (ref), v12 (ref), v1 (ref), p1 (ref), p2 (ref) ]]
+					local v13 = CharacterUtils.getAncestorPartHumanoid(p12)
+					if v13 and (v13.Parent == Players.LocalPlayer.Character and v13:GetLimb(p12) ~= Enum.Limb.Unknown) then
+						local v2 = os.clock()
+						if not (v2 - v12 < 1 or v1._flashing) then
+							v12 = v2
+							v13:TakeDamage((assert(p1:GetAttribute("LaserTrapDamage"), "missing LaserTrapDamage")))
+							p2.replicateRemote:FireServer()
+							v1:_flicker()
+						end
+					end
+				end))
+			end))
+		end))
+	end))
+	v1.maid:GiveTask(p2.replicateRemote.OnClientEvent:Connect(function() --[[ Line: 60 | Upvalues: v1 (copy) ]]
+		v1:_flicker()
+	end))
+	return v1
 end
-function module_upvr._setPartsVisible(arg1, arg2) -- Line 66
-    for _, v in assert(arg1.obj:FindFirstChild("Lasers"), "no lasersModel exists"):GetChildren(), nil do
-        if arg2 then
-            v.CanTouch = true
-            v.Transparency = 0.2
-        else
-            v.CanTouch = false
-            v.Transparency = 1
-        end
-    end
+function t._setPartsVisible(p1, p2) --[[ Line: 66 ]]
+	local Lasers = p1.obj:FindFirstChild("Lasers")
+	for v1, v2 in assert(Lasers, "no lasersModel exists"):GetChildren() do
+		if p2 then
+			v2.CanTouch = true
+			v2.Transparency = 0.2
+		else
+			v2.CanTouch = false
+			v2.Transparency = 1
+		end
+	end
 end
-function module_upvr._setTouchPartsTriggered(arg1) -- Line 79
-    local tbl_upvr = {}
-    local tbl_upvr_2 = {}
-    for _, v_2 in arg1.buttonsModel:GetChildren() do
-        local Touch = DoorUtils_upvr.getInnerModel(v_2):FindFirstChild("Touch")
-        tbl_upvr[Touch] = Touch.Transparency
-        tbl_upvr_2[Touch] = Touch.Color
-        Touch.Transparency = 0
-        Touch.Color = Color3.new(0.9, 0, 0)
-    end
-    return function() -- Line 90
-        for i_3, v_3 in tbl_upvr do
-            i_3.Transparency = v_3
-        end
-        for i_4, v_4 in tbl_upvr_2 do
-            i_4.Color = v_4
-        end
-    end
+function t._setTouchPartsTriggered(p1) --[[ Line: 79 | Upvalues: DoorUtils (copy) ]]
+	local t = {}
+	local t2 = {}
+	for v1, v2 in p1.buttonsModel:GetChildren() do
+		local Touch = DoorUtils.getInnerModel(v2):FindFirstChild("Touch")
+		t[Touch] = Touch.Transparency
+		t2[Touch] = Touch.Color
+		Touch.Transparency = 0
+		Touch.Color = Color3.new(0.9, 0, 0)
+	end
+	return function() --[[ Line: 90 | Upvalues: t (copy), t2 (copy) ]]
+		for v1, v2 in t do
+			v1.Transparency = v2
+		end
+		for v3, v4 in t2 do
+			v3.Color = v4
+		end
+	end
 end
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local RunService_upvr = game:GetService("RunService")
-function module_upvr._flicker(arg1) -- Line 99
-    if arg1._flashing then
-    else
-        arg1._flashing = true
-        Audio_upvr.ObjectLocal(arg1.obj:FindFirstChild("SoundPart"), 11793588989, {
-            Volume = 1;
-        })
-        for i_5 = 0, 6 do
-            local var40
-            if i_5 % 2 ~= 0 then
-                var40 = false
-            else
-                var40 = true
-            end
-            arg1:_setPartsVisible(var40)
-            repeat
-                RunService_upvr.Heartbeat:Wait()
-            until 0.7777777777777778 ^ (6 - i_5) * 0.06666666666666667 <= os.clock() - os.clock()
-        end
-        arg1:_setPartsVisible(true)
-        task.wait(2)
-        arg1:_setPartsVisible(false)
-        arg1:_setTouchPartsTriggered()()
-        arg1._flashing = false
-    end
+function t._flicker(p1) --[[ Line: 99 | Upvalues: Audio (copy), RunService (copy) ]]
+	if not p1._flashing then
+		p1._flashing = true
+		Audio.ObjectLocal(p1.obj:FindFirstChild("SoundPart"), 11793588989, {
+			Volume = 1
+		})
+		local v1 = p1:_setTouchPartsTriggered()
+		for i = 0, 6 do
+			local v2
+			v2 = i % 2 == 0
+			p1:_setPartsVisible(v2)
+			local v3 = os.clock()
+			repeat
+				RunService.Heartbeat:Wait()
+			until 0.7777777777777778 ^ (6 - i) * 0.06666666666666667 <= os.clock() - v3
+		end
+		p1:_setPartsVisible(true)
+		task.wait(2)
+		p1:_setPartsVisible(false)
+		v1()
+		p1._flashing = false
+	end
 end
-return require(ReplicatedStorage.ManifestBinder).new("LaserTrap", {
-    replicateRemote = "ReplicateRemote";
-}, module_upvr)
+return ManifestBinder.new("LaserTrap", {
+	replicateRemote = "ReplicateRemote"
+}, t)

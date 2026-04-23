@@ -1,41 +1,44 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage_upvr.Roact)
-local RoactRodux_upvr = require(ReplicatedStorage_upvr.RoactRodux)
-return function(arg1) -- Line 5
-    local any_extend_result1 = Roact_upvr.Component:extend("App")
-    local store_upvr = require(ReplicatedStorage_upvr.App.store)
-    function any_extend_result1.init(arg1_2) -- Line 9
-        store_upvr:dispatch({
-            type = "tradeInitiationsSet";
-            list = {{
-                name = "badcc";
-                userId = 1;
-            }, {
-                name = "asimo3089";
-                userId = 2;
-            }, {
-                name = "TWENTYMOREMINUTES";
-                userId = 3;
-            }};
-        })
-    end
-    local TradeInitiations_upvr = require(script.Parent.TradeInitiations)
-    function any_extend_result1.render(arg1_3) -- Line 28
-        return Roact_upvr.createElement(RoactRodux_upvr.StoreProvider, {
-            store = store_upvr;
-        }, {Roact_upvr.createElement(TradeInitiations_upvr, {
-            onAccept = function(arg1_4) -- Line 33, Named "onAccept"
-                print("accept", arg1_4)
-            end;
-            onDecline = function(arg1_5) -- Line 36, Named "onDecline"
-                print("decline", arg1_5)
-            end;
-        })})
-    end
-    function any_extend_result1.willUnmount(arg1_6) -- Line 42
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(any_extend_result1), arg1)
-    return function() -- Line 45
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (copy), RoactRodux (copy) ]]
+	local v1 = Roact.Component:extend("App")
+	local TradeInitiations = require(script.Parent.TradeInitiations)
+	local store = require(ReplicatedStorage.App.store)
+	function v1.init(p1) --[[ Line: 9 | Upvalues: store (copy) ]]
+		store:dispatch({
+			type = "tradeInitiationsSet",
+			list = {
+				{
+					name = "badcc",
+					userId = 1
+				},
+				{
+					name = "asimo3089",
+					userId = 2
+				},
+				{
+					name = "TWENTYMOREMINUTES",
+					userId = 3
+				}
+			}
+		})
+	end
+	function v1.render(p1) --[[ Line: 28 | Upvalues: Roact (ref), RoactRodux (ref), store (copy), TradeInitiations (copy) ]]
+		return Roact.createElement(RoactRodux.StoreProvider, {
+			store = store
+		}, { Roact.createElement(TradeInitiations, {
+				onAccept = function(p1) --[[ Name: onAccept | Line: 33 ]]
+					print("accept", p1)
+				end,
+				onDecline = function(p1) --[[ Name: onDecline | Line: 36 ]]
+					print("decline", p1)
+				end
+			}) })
+	end
+	function v1.willUnmount(p1) --[[ Line: 42 ]] end
+	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	return function() --[[ Line: 45 | Upvalues: Roact (ref), v2 (copy) ]]
+		Roact.unmount(v2)
+	end
 end

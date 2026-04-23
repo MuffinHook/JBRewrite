@@ -1,89 +1,87 @@
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BaseObject_upvr = require(ReplicatedStorage.Std.BaseObject)
-local PlaneConsts_upvr = require(ReplicatedStorage.Plane.PlaneConsts)
-local PlaneUtils_upvr = require(ReplicatedStorage.Plane.PlaneUtils)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.new(arg1) -- Line 14
-    local any_new_result1_upvr = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1_upvr, module_upvr)
-    any_new_result1_upvr.maid:GiveTask(RxInstanceUtils_upvr.observeAttribute(arg1, PlaneConsts_upvr.BORN_AT_ATTR_NAME, function(arg1_2, arg2) -- Line 18
-        if not arg1_2 then
-        else
-            arg2:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 22
-                any_new_result1_upvr:_update(arg1_2)
-            end))
-        end
-    end))
-    any_new_result1_upvr._lastPosition = Vector3.new()
-    return any_new_result1_upvr
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local PlaneConsts = require(ReplicatedStorage.Plane.PlaneConsts)
+local PlaneUtils = require(ReplicatedStorage.Plane.PlaneUtils)
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1) --[[ Line: 14 | Upvalues: BaseObject (copy), t (copy), RxInstanceUtils (copy), PlaneConsts (copy), RunService (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t)
+	v1.maid:GiveTask(RxInstanceUtils.observeAttribute(p1, PlaneConsts.BORN_AT_ATTR_NAME, function(p1, p2) --[[ Line: 18 | Upvalues: RunService (ref), v1 (copy) ]]
+		if p1 then
+			p2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 22 | Upvalues: v1 (ref), p1 (copy) ]]
+				v1:_update(p1)
+			end))
+		end
+	end))
+	v1._lastPosition = Vector3.new()
+	return v1
 end
-function module_upvr._update(arg1, arg2) -- Line 31
-    local var11 = workspace:GetServerTimeNow() - arg2
-    local any_GetDuration_result1 = arg1:GetDuration()
-    local any_GetPositionAt_result1 = arg1:GetPositionAt(var11)
-    arg1.obj:PivotTo(CFrame.new(any_GetPositionAt_result1, arg1._lastPosition) * CFrame.Angles(0, math.pi, 0) * CFrame.Angles(0, 0, math.cos(var11) * 0.4))
-    arg1._lastPosition = any_GetPositionAt_result1
-    if var11 < 1 then
-        local maximum = math.max(0, 1 - (var11 - 0) / 1)
-        arg1.obj.Engine.Transparency = maximum
-        arg1.obj.Wings.Transparency = maximum
-    elseif any_GetDuration_result1 - 1 < var11 then
-        local minimum = math.min(1, (var11 - any_GetDuration_result1 + 1) / 1)
-        arg1.obj.Engine.Transparency = minimum
-        arg1.obj.Wings.Transparency = minimum
-    end
+function t._update(p1, p2) --[[ Line: 31 ]]
+	local v1 = workspace:GetServerTimeNow() - p2
+	local v2 = p1:GetDuration()
+	local v3 = math.cos(v1)
+	local v4 = p1:GetPositionAt(v1)
+	p1.obj:PivotTo(CFrame.new(v4, p1._lastPosition) * CFrame.Angles(0, math.pi, 0) * CFrame.Angles(0, 0, v3 * 0.4))
+	p1._lastPosition = v4
+	if v1 < 1 then
+		local v5 = math.max(0, 1 - (v1 - 0) / 1)
+		p1.obj.Engine.Transparency = v5
+		p1.obj.Wings.Transparency = v5
+	elseif v2 - 1 < v1 then
+		local v6 = math.min(1, (v1 - v2 + 1) / 1)
+		p1.obj.Engine.Transparency = v6
+		p1.obj.Wings.Transparency = v6
+	end
 end
-function module_upvr.SetOrigin(arg1, arg2) -- Line 55
-    return PlaneUtils_upvr.setOrigin(arg1.obj, arg2)
+function t.SetOrigin(p1, p2) --[[ Line: 55 | Upvalues: PlaneUtils (copy) ]]
+	return PlaneUtils.setOrigin(p1.obj, p2)
 end
-function module_upvr.GetOrigin(arg1) -- Line 58
-    return PlaneUtils_upvr.getOrigin(arg1.obj)
+function t.GetOrigin(p1) --[[ Line: 58 | Upvalues: PlaneUtils (copy) ]]
+	return PlaneUtils.getOrigin(p1.obj)
 end
-function module_upvr.SetTarget(arg1, arg2) -- Line 61
-    return PlaneUtils_upvr.setTarget(arg1.obj, arg2)
+function t.SetTarget(p1, p2) --[[ Line: 61 | Upvalues: PlaneUtils (copy) ]]
+	return PlaneUtils.setTarget(p1.obj, p2)
 end
-function module_upvr.GetTarget(arg1) -- Line 64
-    return PlaneUtils_upvr.getTarget(arg1.obj)
+function t.GetTarget(p1) --[[ Line: 64 | Upvalues: PlaneUtils (copy) ]]
+	return PlaneUtils.getTarget(p1.obj)
 end
-function module_upvr.SetSpeed(arg1, arg2) -- Line 67
-    return PlaneUtils_upvr.setSpeed(arg1.obj, arg2)
+function t.SetSpeed(p1, p2) --[[ Line: 67 | Upvalues: PlaneUtils (copy) ]]
+	return PlaneUtils.setSpeed(p1.obj, p2)
 end
-function module_upvr.GetSpeed(arg1) -- Line 70
-    return PlaneUtils_upvr.getSpeed(arg1.obj)
+function t.GetSpeed(p1) --[[ Line: 70 | Upvalues: PlaneUtils (copy) ]]
+	return PlaneUtils.getSpeed(p1.obj)
 end
-function module_upvr.SetTypeEnum(arg1, arg2) -- Line 73
-    return PlaneUtils_upvr.setTypeEnum(arg1.obj, arg2)
+function t.SetTypeEnum(p1, p2) --[[ Line: 73 | Upvalues: PlaneUtils (copy) ]]
+	return PlaneUtils.setTypeEnum(p1.obj, p2)
 end
-function module_upvr.GetTypeEnum(arg1) -- Line 76
-    return PlaneUtils_upvr.getTypeEnum(arg1.obj)
+function t.GetTypeEnum(p1) --[[ Line: 76 | Upvalues: PlaneUtils (copy) ]]
+	return PlaneUtils.getTypeEnum(p1.obj)
 end
-function module_upvr.SetBornAt(arg1, arg2) -- Line 79
-    return PlaneUtils_upvr.setBornAt(arg1.obj, arg2)
+function t.SetBornAt(p1, p2) --[[ Line: 79 | Upvalues: PlaneUtils (copy) ]]
+	return PlaneUtils.setBornAt(p1.obj, p2)
 end
-function module_upvr.GetBornAt(arg1) -- Line 82
-    return PlaneUtils_upvr.getBornAt(arg1.obj)
+function t.GetBornAt(p1) --[[ Line: 82 | Upvalues: PlaneUtils (copy) ]]
+	return PlaneUtils.getBornAt(p1.obj)
 end
-function module_upvr.GetDuration(arg1) -- Line 85
-    local any_GetSpeed_result1 = arg1:GetSpeed()
-    local var17
-    if 0 >= any_GetSpeed_result1 then
-        var17 = false
-    else
-        var17 = true
-    end
-    assert(var17, "speed must be > 0")
-    var17 = (arg1:GetTarget() - arg1:GetOrigin()).Magnitude
-    return var17 / any_GetSpeed_result1
+function t.GetDuration(p1) --[[ Line: 85 ]]
+	local v1 = p1:GetOrigin()
+	local v2 = p1:GetTarget()
+	local v3 = p1:GetSpeed()
+	assert(v3 > 0, "speed must be > 0")
+	return (v2 - v1).Magnitude / v3
 end
-function module_upvr.GetPositionAt(arg1, arg2) -- Line 94
-    local any_GetOrigin_result1 = arg1:GetOrigin()
-    if not any_GetOrigin_result1 then return end
-    local any_GetTarget_result1 = arg1:GetTarget()
-    if not any_GetTarget_result1 then return end
-    return PlaneUtils_upvr.getPositionAt(arg2, any_GetOrigin_result1, any_GetTarget_result1, PlaneConsts_upvr.DRIFT_WIDTH, arg1:GetDuration())
+function t.GetPositionAt(p1, p2) --[[ Line: 94 | Upvalues: PlaneUtils (copy), PlaneConsts (copy) ]]
+	local v1 = p1:GetOrigin()
+	if v1 then
+		local v2 = p1:GetTarget()
+		if v2 then
+			return PlaneUtils.getPositionAt(p2, v1, v2, PlaneConsts.DRIFT_WIDTH, (p1:GetDuration()))
+		end
+	end
 end
-return require(ReplicatedStorage.Std.Binder).new(PlaneConsts_upvr.TAG_NAME, module_upvr)
+return Binder.new(PlaneConsts.TAG_NAME, t)

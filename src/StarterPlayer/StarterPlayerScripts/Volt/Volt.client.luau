@@ -1,1 +1,2 @@
-require(game:GetService("ReplicatedStorage").Volt.VoltBinder):Start()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.Volt.VoltBinder):Start()

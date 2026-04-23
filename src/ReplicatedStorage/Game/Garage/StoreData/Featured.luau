@@ -1,3 +1,4 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
-    GetItems = require(game:GetService("ReplicatedStorage").Sale.SaleShared).getOnSaleVehicleCustomizations;
+	GetItems = require(ReplicatedStorage.Sale.SaleShared).getOnSaleVehicleCustomizations
 }

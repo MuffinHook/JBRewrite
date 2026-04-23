@@ -1,511 +1,431 @@
-local Players_upvr = game:GetService("Players")
-local UserInputService_upvr = game:GetService("UserInputService")
+game:GetService("GuiService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
+local StreamingHelperUtils = require(ReplicatedStorage.App.StreamingHelperUtils)
+local Notification = require(ReplicatedStorage.Game.Notification)
+local HomeConsts = require(ReplicatedStorage.Home.HomeConsts)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Spring = require(ReplicatedStorage.Std.Spring)
 local Signal = require(ReplicatedStorage.Std.Signal)
-local HomeItemBinder_upvr = require(ReplicatedStorage.Home.HomeItem.HomeItemBinder)
-local ItemPlacerUtils_upvr = require(script.Parent.ItemPlacerUtils)
-local HomeSystem_upvr = require(script.Parent.Parent.HomeSystem)
-local HomeItemSystem_upvr = require(ReplicatedStorage.Home.HomeItem.HomeItemSystem)
-local homeStore_upvr = require(ReplicatedStorage.Home.homeStore)
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local function getClosestVecDual_upvr(arg1, arg2) -- Line 25, Named "getClosestVecDual"
-    local var16
-    for _, v in arg1 do
-        local any_Dot_result1 = v:Dot(arg2)
-        local var18 = any_Dot_result1
-        if (-math.huge) < math.abs(var18) then
-            if 0 < any_Dot_result1 then
-                var18 = 1
-            else
-                var18 = -1
-            end
-        end
-    end
-    return nil
+local HomeItemBinder = require(ReplicatedStorage.Home.HomeItem.HomeItemBinder)
+local BinderUtils = require(ReplicatedStorage.Std.Binder.BinderUtils)
+local ItemPlacerUtils = require(script.Parent.ItemPlacerUtils)
+local HomeSystem = require(script.Parent.Parent.HomeSystem)
+local HomeItemSystem = require(ReplicatedStorage.Home.HomeItem.HomeItemSystem)
+local PlacerApp = require(ReplicatedStorage.Home.UI.PlacerApp)
+local homeStore = require(ReplicatedStorage.Home.homeStore)
+local Roact = require(ReplicatedStorage.Roact)
+local InputUtils = require(ReplicatedStorage.Std.InputUtils)
+local createElement = Roact.createElement
+local function getClosestVecDual(p1, p2) --[[ Line: 25 ]]
+	local v1 = p1[1]
+	local v2 = (-1 / 0)
+	for v4, v5 in p1 do
+		local v3
+		local v6 = v5:Dot(p2)
+		local v7 = math.abs(v6)
+		if v2 < v7 then
+			v3 = if v6 > 0 then 1 else -1
+			v2 = v7
+			v1 = v5 * v3
+		end
+	end
+	return v1
 end
-local function rotBtwnUnit_upvr(arg1, arg2) -- Line 39, Named "rotBtwnUnit"
-    local any_Cross_result1 = arg1:Cross(arg2)
-    local any_Dot_result1_2 = arg1:Dot(arg2)
-    if any_Dot_result1_2 < -0.999 then
-        return CFrame.Angles(math.pi, 0, 0)
-    end
-    return CFrame.new(0, 0, 0, any_Cross_result1.x, any_Cross_result1.y, any_Cross_result1.z, any_Dot_result1_2 + 1)
+local function rotBtwnUnit(p1, p2) --[[ Line: 39 ]]
+	local v1 = p1:Cross(p2)
+	local v2 = p1:Dot(p2)
+	if v2 < -0.999 then
+		return CFrame.Angles(math.pi, 0, 0)
+	else
+		return CFrame.new(0, 0, 0, v1.x, v1.y, v1.z, v2 + 1)
+	end
 end
-local function _(arg1, arg2) -- Line 48, Named "roundN"
-    return math.floor(arg1 / arg2 + 0.5) * arg2
+local function roundN(p1, p2) --[[ Line: 48 ]]
+	return math.floor(p1 / p2 + 0.5) * p2
 end
-local module_upvr = {
-    _maid = nil;
-    _lastDragStart = 0;
-    _lastDragEnd = 0;
-    _currentHomeItem = nil;
-    onDragStarted = Signal.new();
-    onDragEnded = Signal.new();
+local t = {
+	_maid = nil,
+	_lastDragStart = 0,
+	_lastDragEnd = 0,
+	_currentHomeItem = nil,
+	onDragStarted = Signal.new(),
+	onDragEnded = Signal.new()
 }
-function module_upvr.init() -- Line 60
-    local any_new_result1_upvr_4 = Maid_upvr.new()
-    module_upvr._maid = any_new_result1_upvr_4
-    local tbl_upvr_2 = {}
-    HomeItemSystem_upvr.onCustomizeStarted:Connect(function() -- Line 66
-        local function inputBegan(arg1, arg2) -- Line 67
-            local var30 = false
-            if arg1.UserInputType == Enum.UserInputType.Gamepad1 then
-                if arg1.KeyCode ~= Enum.KeyCode.ButtonA then
-                    var30 = false
-                else
-                    var30 = true
-                end
-            end
-            if arg2 and not var30 then
-            elseif arg1.UserInputType == Enum.UserInputType.MouseButton1 or arg1.UserInputType == Enum.UserInputType.Touch or var30 then
-                if module_upvr.isDragging() then return end
-                if module_upvr.getTimeSinceLastDragEnd() < 0.1 then return end
-                if not HomeSystem_upvr.queryCurrentStandingHome() then return end
-                local any_raycastMouse_result1 = ItemPlacerUtils_upvr.raycastMouse(tbl_upvr_2, true)
-                if any_raycastMouse_result1 then
-                    for _, v_4 in ipairs(HomeItemBinder_upvr:GetAll()) do
-                        if any_raycastMouse_result1.Instance:IsDescendantOf(v_4:GetObj()) then
-                            module_upvr.startDrag(v_4)
-                            return
-                        end
-                    end
-                end
-            end
-        end
-        any_new_result1_upvr_4._listenForCustomizeTouch = UserInputService_upvr.TouchTap:Connect(inputBegan)
-        any_new_result1_upvr_4._listenForCustomizeClick = UserInputService_upvr.InputBegan:Connect(inputBegan)
-    end)
-    HomeItemSystem_upvr.onCustomizeEnded:Connect(function() -- Line 115
-        any_new_result1_upvr_4._listenForCustomizeClick = nil
-        any_new_result1_upvr_4._listenForCustomizeTouch = nil
-        if module_upvr.isDragging() then
-            module_upvr.stopDrag()
-        end
-    end)
-    HomeSystem_upvr.onExited:Connect(function() -- Line 123
-        any_new_result1_upvr_4._listenForCustomizeClick = nil
-        any_new_result1_upvr_4._listenForCustomizeTouch = nil
-        if module_upvr.isDragging() then
-            module_upvr.stopDrag()
-        end
-    end)
-    HomeItemSystem_upvr.onAttemptPlaceItem:Connect(function(arg1) -- Line 131
-        module_upvr.createAndDrag(arg1.name)
-    end)
-    HomeItemSystem_upvr.onAttemptDeleteItem:Connect(function() -- Line 136
-        module_upvr.attemptDeleteCurrentHomeItem()
-    end)
+function t.init() --[[ Line: 60 | Upvalues: Maid (copy), t (copy), HomeItemSystem (copy), HomeSystem (copy), ItemPlacerUtils (copy), HomeItemBinder (copy), UserInputService (copy) ]]
+	local v1 = Maid.new()
+	t._maid = v1
+	local t2 = {}
+	HomeItemSystem.onCustomizeStarted:Connect(function() --[[ Line: 66 | Upvalues: t (ref), HomeSystem (ref), ItemPlacerUtils (ref), t2 (copy), HomeItemBinder (ref), v1 (copy), UserInputService (ref) ]]
+		local function inputBegan(p1, p2) --[[ Line: 67 | Upvalues: t (ref), HomeSystem (ref), ItemPlacerUtils (ref), t2 (ref), HomeItemBinder (ref) ]]
+			local v1 = if p1.UserInputType == Enum.UserInputType.Gamepad1 then p1.KeyCode == Enum.KeyCode.ButtonA else false
+			if (not p2 or v1) and ((p1.UserInputType == Enum.UserInputType.MouseButton1 or (p1.UserInputType == Enum.UserInputType.Touch or v1)) and (not t.isDragging() and (not (t.getTimeSinceLastDragEnd() < 0.1) and HomeSystem.queryCurrentStandingHome()))) then
+				local v2 = ItemPlacerUtils.raycastMouse(t2, true)
+				if v2 then
+					local v3 = v2.Instance
+					for i, v in ipairs(HomeItemBinder:GetAll()) do
+						if v3:IsDescendantOf(v:GetObj()) then
+							t.startDrag(v)
+							return
+						end
+					end
+				end
+			end
+		end
+		v1._listenForCustomizeTouch = UserInputService.TouchTap:Connect(inputBegan)
+		v1._listenForCustomizeClick = UserInputService.InputBegan:Connect(inputBegan)
+	end)
+	HomeItemSystem.onCustomizeEnded:Connect(function() --[[ Line: 115 | Upvalues: v1 (copy), t (ref) ]]
+		v1._listenForCustomizeClick = nil
+		v1._listenForCustomizeTouch = nil
+		if t.isDragging() then
+			t.stopDrag()
+		end
+	end)
+	HomeSystem.onExited:Connect(function() --[[ Line: 123 | Upvalues: v1 (copy), t (ref) ]]
+		v1._listenForCustomizeClick = nil
+		v1._listenForCustomizeTouch = nil
+		if t.isDragging() then
+			t.stopDrag()
+		end
+	end)
+	HomeItemSystem.onAttemptPlaceItem:Connect(function(p1) --[[ Line: 131 | Upvalues: t (ref) ]]
+		t.createAndDrag(p1.name)
+	end)
+	HomeItemSystem.onAttemptDeleteItem:Connect(function() --[[ Line: 136 | Upvalues: t (ref) ]]
+		t.attemptDeleteCurrentHomeItem()
+	end)
 end
-function module_upvr.getTargetPosition(arg1) -- Line 142
-    local any_raycastMouse_result1_2 = ItemPlacerUtils_upvr.raycastMouse(arg1)
-    if any_raycastMouse_result1_2 then
-        local Instance = any_raycastMouse_result1_2.Instance
-        local any_PointToObjectSpace_result1 = Instance.CFrame:PointToObjectSpace(any_raycastMouse_result1_2.Position)
-        return Instance.CFrame:PointToWorldSpace(Vector3.new(math.floor(any_PointToObjectSpace_result1.x / 0.1 + 0.5) * 0.1, any_PointToObjectSpace_result1.y, math.floor(any_PointToObjectSpace_result1.z / 0.1 + 0.5) * 0.1)), any_raycastMouse_result1_2.Normal, Instance.CFrame
-    end
+function t.getTargetPosition(p1) --[[ Line: 142 | Upvalues: ItemPlacerUtils (copy) ]]
+	local v1 = ItemPlacerUtils.raycastMouse(p1)
+	if v1 then
+		local v2 = v1.Instance
+		local v3 = v2.CFrame:PointToObjectSpace(v1.Position)
+		return v2.CFrame:PointToWorldSpace((Vector3.new(math.floor(v3.x / 0.1 + 0.5) * 0.1, v3.y, math.floor(v3.z / 0.1 + 0.5) * 0.1))), v1.Normal, v2.CFrame
+	end
 end
-local LocalPlayer_upvr = Players_upvr.LocalPlayer
-local Spring_upvr = require(ReplicatedStorage.Std.Spring)
-local createElement_upvr = Roact_upvr.createElement
-local PlacerApp_upvr = require(ReplicatedStorage.Home.UI.PlacerApp)
-local RunService_upvr = game:GetService("RunService")
-local InputUtils_upvr = require(ReplicatedStorage.Std.InputUtils)
-function module_upvr.startDrag(arg1) -- Line 157
-    module_upvr._lastDragStart = os.clock()
-    local PrimaryPart = arg1:GetObj().PrimaryPart
-    local any_UntranslateCf_result1_upvr = arg1:UntranslateCf(PrimaryPart.CFrame)
-    local any_new_result1_upvr = Maid_upvr.new()
-    module_upvr._maid.placeMaid = any_new_result1_upvr
-    module_upvr._currentHomeItem = arg1
-    any_new_result1_upvr:GiveTask(function() -- Line 167
-        module_upvr._currentHomeItem = nil
-    end)
-    arg1:SetBeingDragged(true)
-    any_new_result1_upvr:GiveTask(function() -- Line 171
-        arg1:SetBeingDragged(false)
-    end)
-    homeStore_upvr:dispatch({
-        type = "setVisible";
-        value = false;
-    })
-    any_new_result1_upvr:GiveTask(function() -- Line 180
-        homeStore_upvr:dispatch({
-            type = "setVisible";
-            value = true;
-        })
-    end)
-    local var60_upvw = false
-    any_new_result1_upvr:GiveTask(function() -- Line 188
-        if not var60_upvw then
-            if arg1._obj then
-                arg1._obj:SetPrimaryPartCFrame(arg1:TranslateCf(any_UntranslateCf_result1_upvr))
-            end
-            if not arg1:IsPlaced() then
-                arg1:AttemptDelete()
-            end
-        end
-    end)
-    arg1:CacheSurfaces()
-    any_new_result1_upvr:GiveTask(function() -- Line 201
-        arg1:ClearCacheSurfaces()
-    end)
-    for _, v_2 in ipairs(arg1:GetObj():GetDescendants()) do
-        if v_2:IsA("BasePart") and v_2.CanCollide then
-            table.insert({}, v_2)
-            v_2.CanCollide = false
-        end
-    end
-    local tbl_upvr = {}
-    any_new_result1_upvr:GiveTask(function() -- Line 221
-        for _, v_3 in ipairs(tbl_upvr) do
-            v_3.CanCollide = true
-        end
-    end)
-    local Humanoid_upvr = LocalPlayer_upvr.Character:FindFirstChild("Humanoid")
-    any_new_result1_upvr:GiveTask(Humanoid_upvr.Changed:connect(function() -- Line 232
-        Humanoid_upvr.Jump = false
-    end))
-    if Humanoid_upvr.SeatPart then
-        Humanoid_upvr:ChangeState(Enum.HumanoidStateType.Jumping)
-    end
-    Humanoid_upvr:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-    any_new_result1_upvr:GiveTask(function() -- Line 239
-        Humanoid_upvr:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
-    end)
-    local Part_upvr = Instance.new("Part")
-    Part_upvr.Color = Color3.new(1, 0, 0)
-    Part_upvr.Anchored = true
-    Part_upvr.CanCollide = false
-    Part_upvr.TopSurface = 0
-    Part_upvr.BottomSurface = 0
-    Part_upvr.Size = PrimaryPart.Size + Vector3.new(0.10000, 0.10000, 0.10000)
-    Part_upvr.CFrame = PrimaryPart.CFrame
-    Part_upvr.Transparency = 1
-    Part_upvr.Parent = arg1:GetObj()
-    any_new_result1_upvr:GiveTask(Part_upvr)
-    local tbl_upvr_3 = {arg1:GetObj(), LocalPlayer_upvr.Character}
-    local var78 = any_UntranslateCf_result1_upvr
-    var78 -= var78.p
-    local var79_upvw = var78
-    local _, any_getTargetPosition_result2_2, any_getTargetPosition_result3 = module_upvr.getTargetPosition(tbl_upvr_3)
-    local UpVector_upvw = var79_upvw.UpVector
-    if any_getTargetPosition_result2_2:Dot(UpVector_upvw) < 0.99 then
-        var79_upvw = rotBtwnUnit_upvr(UpVector_upvw, any_getTargetPosition_result2_2) * var79_upvw
-        UpVector_upvw = any_getTargetPosition_result2_2
-    end
-    local any__alignMat_result1 = module_upvr._alignMat(any_getTargetPosition_result2_2, any_getTargetPosition_result3, var79_upvw)
-    local _, any_ToOrientation_result2_upvw, _ = any__alignMat_result1:Inverse() * any_UntranslateCf_result1_upvr:ToOrientation()
-    local p = any_UntranslateCf_result1_upvr.p
-    local any_new_result1_upvr_7 = Spring_upvr.new(any_ToOrientation_result2_upvw, 0, 0.8, 30)
-    local var90_upvw = 0
-    local function doRotate_upvr(arg1_2, arg2, arg3) -- Line 277, Named "doRotate"
-        local os_clock_result1 = os.clock()
-        local var92 = os_clock_result1 - arg3
-        local var93
-        if 0.1 < var92 then
-            var93 = math.min(12, var92 / 0.1 + 1)
-        else
-            var93 = 1
-        end
-        if os_clock_result1 - var90_upvw < 0.1 then
-        else
-            var90_upvw = os_clock_result1
-            if arg1_2 then
-                any_ToOrientation_result2_upvw += 0.08726646259971647 * var93
-            elseif arg2 then
-                any_ToOrientation_result2_upvw -= 0.08726646259971647 * var93
-            end
-            any_ToOrientation_result2_upvw = math.floor(any_ToOrientation_result2_upvw / 0.08726646259971647 + 0.5) * 0.08726646259971647
-            any_new_result1_upvr_7:SetTarget(any_ToOrientation_result2_upvw)
-        end
-    end
-    local function attemptPlaceCurrentHomeItem_upvr() -- Line 295, Named "attemptPlaceCurrentHomeItem"
-        module_upvr._maid.listenForFeedback = arg1._placeRemote.OnClientEvent:Connect(function(arg1_3) -- Line 296
-            module_upvr._maid.listenForFeedback = nil
-            if not arg1_3 and arg1._obj then
-                arg1._obj:SetPrimaryPartCFrame(arg1:TranslateCf(any_UntranslateCf_result1_upvr))
-            end
-        end)
-        local any_getTargetPosition_result1, any_getTargetPosition_result2_3, any_getTargetPosition_result3_3 = module_upvr.getTargetPosition(tbl_upvr_3)
-        arg1:SetServerCFrame(arg1:TranslateCf(module_upvr._alignMat(any_getTargetPosition_result2_3, any_getTargetPosition_result3_3, var79_upvw) * CFrame.Angles(0, any_ToOrientation_result2_upvw, 0) + any_getTargetPosition_result1))
-        var60_upvw = true
-        module_upvr.stopDrag()
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(createElement_upvr("ScreenGui", {
-        ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-        ResetOnSpawn = false;
-        IgnoreGuiInset = true;
-        DisplayOrder = 1;
-    }, {
-        PlacerContainer = createElement_upvr("Frame", {
-            BackgroundTransparency = 1;
-            Size = UDim2.fromScale(0.5, 0.08);
-            Position = UDim2.fromScale(0.5, 0.85);
-            AnchorPoint = Vector2.new(0.5, 1);
-        }, {
-            UIAspectRatioConstraint = createElement_upvr("UIAspectRatioConstraint", {
-                AspectRatio = 7;
-            });
-            PlacerApp = createElement_upvr(PlacerApp_upvr, {
-                aspectRatio = 7;
-                verticalPaddingRatio = 18.285714285714285;
-                onClickDelete = function() -- Line 333, Named "onClickDelete"
-                    module_upvr.attemptDeleteCurrentHomeItem()
-                end;
-                onClickPlace = function() -- Line 336, Named "onClickPlace"
-                    attemptPlaceCurrentHomeItem_upvr()
-                end;
-                onDownRight = function() -- Line 339, Named "onDownRight"
-                    local os_clock_result1_2_upvr = os.clock()
-                    any_new_result1_upvr.rotateHeartbeat = RunService_upvr.Heartbeat:Connect(function() -- Line 341
-                        local os_clock_result1_4 = os.clock()
-                        local var107 = os_clock_result1_4 - os_clock_result1_2_upvr
-                        local var108
-                        if 0.1 < var107 then
-                            var108 = math.min(12, var107 / 0.1 + 1)
-                        else
-                            var108 = 1
-                        end
-                        if os_clock_result1_4 - var90_upvw < 0.1 then
-                        else
-                            var90_upvw = os_clock_result1_4
-                            any_ToOrientation_result2_upvw -= 0.08726646259971647 * var108
-                            any_ToOrientation_result2_upvw = math.floor(any_ToOrientation_result2_upvw / 0.08726646259971647 + 0.5) * 0.08726646259971647
-                            any_new_result1_upvr_7:SetTarget(any_ToOrientation_result2_upvw)
-                        end
-                    end)
-                end;
-                onUpRight = function() -- Line 345, Named "onUpRight"
-                    any_new_result1_upvr.rotateHeartbeat = nil
-                end;
-                onDownLeft = function() -- Line 348, Named "onDownLeft"
-                    local os_clock_result1_upvr = os.clock()
-                    any_new_result1_upvr.rotateHeartbeat = RunService_upvr.Heartbeat:Connect(function() -- Line 350
-                        local os_clock_result1_5 = os.clock()
-                        local var112 = os_clock_result1_5 - os_clock_result1_upvr
-                        local var113
-                        if 0.1 < var112 then
-                            var113 = math.min(12, var112 / 0.1 + 1)
-                        else
-                            var113 = 1
-                        end
-                        if os_clock_result1_5 - var90_upvw < 0.1 then
-                        else
-                            var90_upvw = os_clock_result1_5
-                            any_ToOrientation_result2_upvw += 0.08726646259971647 * var113
-                            any_ToOrientation_result2_upvw = math.floor(any_ToOrientation_result2_upvw / 0.08726646259971647 + 0.5) * 0.08726646259971647
-                            any_new_result1_upvr_7:SetTarget(any_ToOrientation_result2_upvw)
-                        end
-                    end)
-                end;
-                onUpLeft = function() -- Line 354, Named "onUpLeft"
-                    any_new_result1_upvr.rotateHeartbeat = nil
-                end;
-                showPlace = InputUtils_upvr.isTouch();
-            });
-        });
-    }), Players_upvr.LocalPlayer.PlayerGui, "ItemPlacerGui")
-    any_new_result1_upvr:GiveTask(function() -- Line 364
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end)
-    any_new_result1_upvr:GiveTask(UserInputService_upvr.InputEnded:Connect(function(arg1_4, arg2) -- Line 369
-        if arg2 then
-        elseif arg1_4.UserInputType == Enum.UserInputType.MouseButton1 then
-            any_new_result1_upvr.rotateHeartbeat = nil
-        end
-    end))
-    any_new_result1_upvr:GiveTask(UserInputService_upvr.InputBegan:Connect(function(arg1_5, arg2) -- Line 377
-        if arg2 then
-        elseif arg1_5.UserInputType == Enum.UserInputType.Keyboard or arg1_5.UserInputType == Enum.UserInputType.Gamepad1 then
-            local var118_upvr = true
-            if arg1_5.KeyCode ~= Enum.KeyCode.Q then
-                if arg1_5.KeyCode ~= Enum.KeyCode.ButtonL2 then
-                    var118_upvr = false
-                else
-                    var118_upvr = true
-                end
-            end
-            local var119_upvr = true
-            if arg1_5.KeyCode ~= Enum.KeyCode.E then
-                if arg1_5.KeyCode ~= Enum.KeyCode.ButtonR2 then
-                    var119_upvr = false
-                else
-                    var119_upvr = true
-                end
-            end
-            if var119_upvr or var118_upvr then
-                any_new_result1_upvr.waitForEnd = arg1_5:GetPropertyChangedSignal("UserInputState"):Connect(function() -- Line 393
-                    if arg1_5.UserInputState == Enum.UserInputState.End then
-                        any_new_result1_upvr.waitForEnd = nil
-                        any_new_result1_upvr.rotateHeartbeat = nil
-                    end
-                end)
-                local os_clock_result1_3_upvr = os.clock()
-                any_new_result1_upvr.rotateHeartbeat = RunService_upvr.Heartbeat:Connect(function() -- Line 399
-                    doRotate_upvr(var118_upvr, var119_upvr, os_clock_result1_3_upvr)
-                end)
-            end
-        end
-    end))
-    local any_new_result1_upvr_3 = Spring_upvr.new(p, Vector3.new(), 0.8, 50)
-    local any_new_result1_upvr_5 = Spring_upvr.new(p, Vector3.new(), 0.7, 30)
-    local any_new_result1_upvr_6 = Spring_upvr.new(any__alignMat_result1.RightVector, Vector3.new(), 0.8, 50)
-    local any_new_result1_upvr_2 = Spring_upvr.new(any__alignMat_result1.UpVector, Vector3.new(), 0.8, 50)
-    any_new_result1_upvr:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 406
-        local any_getTargetPosition_result1_2, any_getTargetPosition_result2, any_getTargetPosition_result3_2 = module_upvr.getTargetPosition(tbl_upvr_3)
-        if any_getTargetPosition_result1_2 then
-            local any_SetTarget_result1, _ = any_new_result1_upvr_3:SetTarget(any_getTargetPosition_result1_2)
-            local _, any_SetTarget_result2 = any_new_result1_upvr_5:SetTarget(any_getTargetPosition_result1_2)
-            if any_getTargetPosition_result2:Dot(UpVector_upvw) < 0.99 then
-                var79_upvw = rotBtwnUnit_upvr(UpVector_upvw, any_getTargetPosition_result2) * var79_upvw
-                UpVector_upvw = any_getTargetPosition_result2
-            end
-            local any__alignMat_result1_2 = module_upvr._alignMat(any_getTargetPosition_result2, any_getTargetPosition_result3_2, var79_upvw)
-            local var136 = any_ToOrientation_result2_upvw
-            local any_TranslateCf_result1 = arg1:TranslateCf(any__alignMat_result1_2 * CFrame.Angles(0, var136, 0) + any_getTargetPosition_result1_2)
-            if arg1:IsWithinBoundsCached(any_TranslateCf_result1) and arg1:IsValidUpDot(any_TranslateCf_result1.UpVector:Dot(Vector3.new(0, 1, 0))) then
-                var136 = 1
-            else
-                var136 = 0.5
-            end
-            Part_upvr.Transparency = var136
-            arg1:SetCFrame(arg1:TranslateCf(CFrame.fromMatrix(Vector3.new(0, 0, 0), any_new_result1_upvr_6:SetTarget(any__alignMat_result1_2.RightVector).Unit, any_new_result1_upvr_2:SetTarget(any__alignMat_result1_2.UpVector).Unit) * CFrame.Angles(-any_SetTarget_result2.z * 0.0015, 0, any_SetTarget_result2.x * 0.0015) * CFrame.Angles(0, any_new_result1_upvr_7:Update(), 0) + any_SetTarget_result1))
-        end
-    end))
-    any_new_result1_upvr:GiveTask(UserInputService_upvr.InputBegan:Connect(function(arg1_6, arg2) -- Line 445, Named "inputBegan"
-        local var138 = false
-        if arg1_6.UserInputType == Enum.UserInputType.Gamepad1 then
-            if arg1_6.KeyCode ~= Enum.KeyCode.ButtonA then
-                var138 = false
-            else
-                var138 = true
-            end
-        end
-        if arg2 and not var138 then
-        elseif arg1_6.UserInputType == Enum.UserInputType.MouseButton1 or var138 then
-            attemptPlaceCurrentHomeItem_upvr()
-        end
-    end))
-    module_upvr.onDragStarted:Fire()
+function t.startDrag(p1) --[[ Line: 157 | Upvalues: t (copy), Maid (copy), homeStore (copy), LocalPlayer (copy), rotBtwnUnit (copy), Spring (copy), Roact (copy), createElement (copy), PlacerApp (copy), RunService (copy), InputUtils (copy), Players (copy), UserInputService (copy) ]]
+	t._lastDragStart = os.clock()
+	local PrimaryPart = p1:GetObj().PrimaryPart
+	local v1 = p1:UntranslateCf(PrimaryPart.CFrame)
+	local v2 = Maid.new()
+	t._maid.placeMaid = v2
+	t._currentHomeItem = p1
+	v2:GiveTask(function() --[[ Line: 167 | Upvalues: t (ref) ]]
+		t._currentHomeItem = nil
+	end)
+	p1:SetBeingDragged(true)
+	v2:GiveTask(function() --[[ Line: 171 | Upvalues: p1 (copy) ]]
+		p1:SetBeingDragged(false)
+	end)
+	homeStore:dispatch({
+		type = "setVisible",
+		value = false
+	})
+	v2:GiveTask(function() --[[ Line: 180 | Upvalues: homeStore (ref) ]]
+		homeStore:dispatch({
+			type = "setVisible",
+			value = true
+		})
+	end)
+	local v3 = false
+	v2:GiveTask(function() --[[ Line: 188 | Upvalues: v3 (ref), p1 (copy), v1 (copy) ]]
+		if not v3 then
+			if p1._obj then
+				p1._obj:SetPrimaryPartCFrame(p1:TranslateCf(v1))
+			end
+			if not p1:IsPlaced() then
+				p1:AttemptDelete()
+			end
+		end
+	end)
+	p1:CacheSurfaces()
+	v2:GiveTask(function() --[[ Line: 201 | Upvalues: p1 (copy) ]]
+		p1:ClearCacheSurfaces()
+	end)
+	local t2 = {}
+	for i, v in ipairs(p1:GetObj():GetDescendants()) do
+		if v:IsA("BasePart") and v.CanCollide then
+			table.insert(t2, v)
+			v.CanCollide = false
+		end
+	end
+	v2:GiveTask(function() --[[ Line: 221 | Upvalues: t2 (copy) ]]
+		for i, v in ipairs(t2) do
+			v.CanCollide = true
+		end
+	end)
+	local Humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+	v2:GiveTask(Humanoid.Changed:connect(function() --[[ Line: 232 | Upvalues: Humanoid (copy) ]]
+		Humanoid.Jump = false
+	end))
+	if Humanoid.SeatPart then
+		Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+	end
+	Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+	v2:GiveTask(function() --[[ Line: 239 | Upvalues: Humanoid (copy) ]]
+		Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+	end)
+	local Part = Instance.new("Part")
+	Part.Color = Color3.new(255/255, 0/255, 0/255)
+	Part.Anchored = true
+	Part.CanCollide = false
+	Part.TopSurface = 0
+	Part.BottomSurface = 0
+	Part.Size = PrimaryPart.Size + Vector3.new(0.1, 0.1, 0.1)
+	Part.CFrame = PrimaryPart.CFrame
+	Part.Transparency = 1
+	Part.Parent = p1:GetObj()
+	v2:GiveTask(Part)
+	local t3 = { p1:GetObj(), LocalPlayer.Character }
+	local v4 = v1
+	local v5 = v4 - v4.p
+	local _, v6, v7 = t.getTargetPosition(t3)
+	local UpVector = v5.UpVector
+	if v6:Dot(UpVector) < 0.99 then
+		v5 = rotBtwnUnit(UpVector, v6) * v5
+		UpVector = v6
+	end
+	local v8 = t._alignMat(v6, v7, v5)
+	local _2, v9, _3 = (v8:Inverse() * v1):ToOrientation()
+	local p = v1.p
+	local v10 = Spring.new(p, Vector3.new(), 0.8, 50)
+	local v11 = Spring.new(p, Vector3.new(), 0.7, 30)
+	local v12 = Spring.new(v8.RightVector, Vector3.new(), 0.8, 50)
+	local v13 = Spring.new(v8.UpVector, Vector3.new(), 0.8, 50)
+	local v14 = Spring.new(v9, 0, 0.8, 30)
+	local v15 = 0
+	local function doRotate(p1, p2, p3) --[[ Line: 277 | Upvalues: v15 (ref), v9 (ref), v14 (copy) ]]
+		local v1 = os.clock()
+		local v2 = v1 - p3
+		local v3 = if v2 > 0.1 then math.min(12, v2 / 0.1 + 1) else 1
+		if not (v1 - v15 < 0.1) then
+			v15 = v1
+			if p1 then
+				v9 = v9 + 0.08726646259971647 * v3
+			elseif p2 then
+				v9 = v9 - 0.08726646259971647 * v3
+			end
+			v9 = math.floor(v9 / 0.08726646259971647 + 0.5) * 0.08726646259971647
+			v14:SetTarget(v9)
+		end
+	end
+	local function attemptPlaceCurrentHomeItem() --[[ Line: 295 | Upvalues: t (ref), p1 (copy), v1 (copy), t3 (copy), v5 (ref), v9 (ref), v3 (ref) ]]
+		t._maid.listenForFeedback = p1._placeRemote.OnClientEvent:Connect(function(p12) --[[ Line: 296 | Upvalues: t (ref), p1 (ref), v1 (ref) ]]
+			t._maid.listenForFeedback = nil
+			if not p12 and p1._obj then
+				p1._obj:SetPrimaryPartCFrame(p1:TranslateCf(v1))
+			end
+		end)
+		local v12, v2, v32 = t.getTargetPosition(t3)
+		p1:SetServerCFrame((p1:TranslateCf(t._alignMat(v2, v32, v5) * CFrame.Angles(0, v9, 0) + v12)))
+		v3 = true
+		t.stopDrag()
+	end
+	local v16 = Roact.mount(createElement("ScreenGui", {
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		ResetOnSpawn = false,
+		IgnoreGuiInset = true,
+		DisplayOrder = 1
+	}, {
+		PlacerContainer = createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(0.5, 0.08),
+			Position = UDim2.fromScale(0.5, 0.85),
+			AnchorPoint = Vector2.new(0.5, 1)
+		}, {
+			UIAspectRatioConstraint = createElement("UIAspectRatioConstraint", {
+				AspectRatio = 7
+			}),
+			PlacerApp = createElement(PlacerApp, {
+				aspectRatio = 7,
+				verticalPaddingRatio = 18.285714285714285,
+				onClickDelete = function() --[[ Name: onClickDelete | Line: 333 | Upvalues: t (ref) ]]
+					t.attemptDeleteCurrentHomeItem()
+				end,
+				onClickPlace = function() --[[ Name: onClickPlace | Line: 336 | Upvalues: attemptPlaceCurrentHomeItem (copy) ]]
+					attemptPlaceCurrentHomeItem()
+				end,
+				onDownRight = function() --[[ Name: onDownRight | Line: 339 | Upvalues: v2 (copy), RunService (ref), v15 (ref), v9 (ref), v14 (copy) ]]
+					local v1 = os.clock()
+					v2.rotateHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 341 | Upvalues: v1 (copy), v15 (ref), v9 (ref), v14 (ref) ]]
+						local v2 = os.clock()
+						local v3 = v2 - v1
+						local v4 = if v3 > 0.1 then math.min(12, v3 / 0.1 + 1) else 1
+						if not (v2 - v15 < 0.1) then
+							v15 = v2
+							v9 = v9 - 0.08726646259971647 * v4
+							v9 = math.floor(v9 / 0.08726646259971647 + 0.5) * 0.08726646259971647
+							v14:SetTarget(v9)
+						end
+					end)
+				end,
+				onUpRight = function() --[[ Name: onUpRight | Line: 345 | Upvalues: v2 (copy) ]]
+					v2.rotateHeartbeat = nil
+				end,
+				onDownLeft = function() --[[ Name: onDownLeft | Line: 348 | Upvalues: v2 (copy), RunService (ref), v15 (ref), v9 (ref), v14 (copy) ]]
+					local v1 = os.clock()
+					v2.rotateHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 350 | Upvalues: v1 (copy), v15 (ref), v9 (ref), v14 (ref) ]]
+						local v2 = os.clock()
+						local v3 = v2 - v1
+						local v4 = if v3 > 0.1 then math.min(12, v3 / 0.1 + 1) else 1
+						if not (v2 - v15 < 0.1) then
+							v15 = v2
+							v9 = v9 + 0.08726646259971647 * v4
+							v9 = math.floor(v9 / 0.08726646259971647 + 0.5) * 0.08726646259971647
+							v14:SetTarget(v9)
+						end
+					end)
+				end,
+				onUpLeft = function() --[[ Name: onUpLeft | Line: 354 | Upvalues: v2 (copy) ]]
+					v2.rotateHeartbeat = nil
+				end,
+				showPlace = InputUtils.isTouch()
+			})
+		})
+	}), Players.LocalPlayer.PlayerGui, "ItemPlacerGui")
+	v2:GiveTask(function() --[[ Line: 364 | Upvalues: Roact (ref), v16 (copy) ]]
+		Roact.unmount(v16)
+	end)
+	v2:GiveTask(UserInputService.InputEnded:Connect(function(p1, p2) --[[ Line: 369 | Upvalues: v2 (copy) ]]
+		if not p2 and p1.UserInputType == Enum.UserInputType.MouseButton1 then
+			v2.rotateHeartbeat = nil
+		end
+	end))
+	v2:GiveTask(UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 377 | Upvalues: v2 (copy), RunService (ref), doRotate (copy) ]]
+		if not p2 and (p1.UserInputType == Enum.UserInputType.Keyboard or p1.UserInputType == Enum.UserInputType.Gamepad1) then
+			local v1 = p1.KeyCode == Enum.KeyCode.Q or p1.KeyCode == Enum.KeyCode.ButtonL2
+			local v22 = p1.KeyCode == Enum.KeyCode.E or p1.KeyCode == Enum.KeyCode.ButtonR2
+			if v22 or v1 then
+				local v3 = os.clock()
+				v2.waitForEnd = p1:GetPropertyChangedSignal("UserInputState"):Connect(function() --[[ Line: 393 | Upvalues: p1 (copy), v2 (ref) ]]
+					if p1.UserInputState == Enum.UserInputState.End then
+						v2.waitForEnd = nil
+						v2.rotateHeartbeat = nil
+					end
+				end)
+				v2.rotateHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 399 | Upvalues: doRotate (ref), v1 (copy), v22 (copy), v3 (copy) ]]
+					doRotate(v1, v22, v3)
+				end)
+			end
+		end
+	end))
+	v2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 406 | Upvalues: t (ref), t3 (copy), v10 (copy), v11 (copy), v14 (copy), UpVector (ref), v5 (ref), rotBtwnUnit (ref), v12 (copy), v13 (copy), p1 (copy), v9 (ref), Part (copy) ]]
+		local v1, v2, v3 = t.getTargetPosition(t3)
+		if v1 then
+			local v4, _ = v10:SetTarget(v1)
+			local _2, v52 = v11:SetTarget(v1)
+			local v6 = v14:Update()
+			if v2:Dot(UpVector) < 0.99 then
+				v5 = rotBtwnUnit(UpVector, v2) * v5
+				UpVector = v2
+			end
+			local v7 = t._alignMat(v2, v3, v5)
+			local v8 = CFrame.fromMatrix(Vector3.new(0, 0, 0), v12:SetTarget(v7.RightVector).Unit, v13:SetTarget(v7.UpVector).Unit)
+			local v92 = p1:TranslateCf(v7 * CFrame.Angles(0, v9, 0) + v1)
+			local v102 = p1:IsValidUpDot((v92.UpVector:Dot(Vector3.new(0, 1, 0))))
+			Part.Transparency = if p1:IsWithinBoundsCached(v92) and v102 then 1 else 0.5
+			p1:SetCFrame((p1:TranslateCf(v8 * CFrame.Angles(-v52.z * 0.0015, 0, v52.x * 0.0015) * CFrame.Angles(0, v6, 0) + v4)))
+		end
+	end))
+	local function inputBegan(p1, p2) --[[ Line: 445 | Upvalues: attemptPlaceCurrentHomeItem (copy) ]]
+		local v1 = if p1.UserInputType == Enum.UserInputType.Gamepad1 then p1.KeyCode == Enum.KeyCode.ButtonA else false
+		if (not p2 or v1) and (p1.UserInputType == Enum.UserInputType.MouseButton1 or v1) then
+			attemptPlaceCurrentHomeItem()
+		end
+	end
+	v2:GiveTask(UserInputService.InputBegan:Connect(inputBegan))
+	t.onDragStarted:Fire()
 end
-function module_upvr._alignMat(arg1, arg2, arg3) -- Line 465
-    local module = {arg2.LookVector, arg2.RightVector, arg2.UpVector}
-    local getClosestVecDual_result1 = getClosestVecDual_upvr(module, arg1)
-    if table.find(module, getClosestVecDual_result1) then
-        table.remove(module, table.find(module, getClosestVecDual_result1))
-    end
-    if table.find(module, -getClosestVecDual_result1) then
-        table.remove(module, table.find(module, -getClosestVecDual_result1))
-    end
-    return arg3 * rotBtwnUnit_upvr(Vector3.new(1, 0, 0), arg3:VectorToObjectSpace(getClosestVecDual_upvr(module, arg3:VectorToWorldSpace(Vector3.new(1, 0, 0)))))
+function t._alignMat(p1, p2, p3) --[[ Line: 465 | Upvalues: getClosestVecDual (copy), rotBtwnUnit (copy) ]]
+	local t = { p2.LookVector, p2.RightVector, p2.UpVector }
+	local v1 = getClosestVecDual(t, p1)
+	if table.find(t, v1) then
+		table.remove(t, table.find(t, v1))
+	end
+	if table.find(t, -v1) then
+		table.remove(t, table.find(t, -v1))
+	end
+	return p3 * rotBtwnUnit(Vector3.new(1, 0, 0), p3:VectorToObjectSpace((getClosestVecDual(t, p3:VectorToWorldSpace(Vector3.new(1, 0, 0))))))
 end
-function module_upvr.stopDrag() -- Line 489
-    module_upvr._maid.placeMaid = nil
-    module_upvr._lastDragEnd = os.clock()
-    module_upvr.onDragEnded:Fire()
+function t.stopDrag() --[[ Line: 489 | Upvalues: t (copy) ]]
+	t._maid.placeMaid = nil
+	t._lastDragEnd = os.clock()
+	t.onDragEnded:Fire()
 end
-function module_upvr.isDragging() -- Line 494
-    local _maid = module_upvr._maid
-    if _maid then
-        if module_upvr._maid.placeMaid == nil then
-            _maid = false
-        else
-            _maid = true
-        end
-    end
-    return _maid
+function t.isDragging() --[[ Line: 494 | Upvalues: t (copy) ]]
+	return t._maid and t._maid.placeMaid ~= nil
 end
-function module_upvr.attemptDeleteCurrentHomeItem() -- Line 497
-    assert(module_upvr.isDragging())
-    local _currentHomeItem = module_upvr._currentHomeItem
-    local var143
-    if _currentHomeItem == nil then
-        var143 = false
-    else
-        var143 = true
-    end
-    assert(var143)
-    module_upvr.stopDrag()
-    _currentHomeItem:AttemptDelete()
+function t.attemptDeleteCurrentHomeItem() --[[ Line: 497 | Upvalues: t (copy) ]]
+	assert(t.isDragging())
+	local _currentHomeItem = t._currentHomeItem
+	assert(_currentHomeItem ~= nil)
+	t.stopDrag()
+	_currentHomeItem:AttemptDelete()
 end
-function module_upvr.getTimeSinceLastDragStart() -- Line 504
-    return os.clock() - module_upvr._lastDragStart
+function t.getTimeSinceLastDragStart() --[[ Line: 504 | Upvalues: t (copy) ]]
+	return os.clock() - t._lastDragStart
 end
-function module_upvr.getTimeSinceLastDragEnd() -- Line 507
-    return os.clock() - module_upvr._lastDragEnd
+function t.getTimeSinceLastDragEnd() --[[ Line: 507 | Upvalues: t (copy) ]]
+	return os.clock() - t._lastDragEnd
 end
-local HomeConsts_upvr = require(ReplicatedStorage.Home.HomeConsts)
-local StreamingHelperUtils_upvr = require(ReplicatedStorage.App.StreamingHelperUtils)
-local BinderUtils_upvr = require(ReplicatedStorage.Std.Binder.BinderUtils)
-local Notification_upvr = require(ReplicatedStorage.Game.Notification)
-function module_upvr.createAndDrag(arg1) -- Line 510
-    local tbl = {
-        type = "setVisible";
-    }
-    local var149 = false
-    tbl.value = var149
-    homeStore_upvr:dispatch(tbl)
-    local function _() -- Line 515, Named "reopenUI"
-        homeStore_upvr:dispatch({
-            type = "setVisible";
-            value = true;
-        })
-    end
-    local any_queryCurrentStandingHome_result1 = HomeSystem_upvr.queryCurrentStandingHome()
-    if any_queryCurrentStandingHome_result1 == nil then
-        var149 = false
-    else
-        var149 = true
-    end
-    assert(var149)
-    HomeItemSystem_upvr._maid._listenNewItem = any_queryCurrentStandingHome_result1._homeItemNewRemote.OnClientEvent:Connect(function(arg1_7) -- Line 523
-        HomeItemSystem_upvr._maid._listenNewItem = nil
-        if arg1_7.id == HomeConsts_upvr.ENUM_HOME_ITEM_NEW_RESULT.SUCCESS then
-            StreamingHelperUtils_upvr.yieldForObjValuePopulated(arg1_7.modelPtr)
-            BinderUtils_upvr.promiseBoundClass(HomeItemBinder_upvr, arg1_7.modelPtr.Value):andThen(function(arg1_8) -- Line 529
-                module_upvr.startDrag(arg1_8)
-                module_upvr._maid.placeMaid:GiveTask(function() -- Line 532
-                    homeStore_upvr:dispatch({
-                        type = "setVisible";
-                        value = true;
-                    })
-                end)
-            end):catch(warn)
-        else
-            if arg1_7.id == HomeConsts_upvr.ENUM_HOME_ITEM_NEW_RESULT.TOO_MANY then
-                Notification_upvr.new({
-                    Text = "Too many items placed... try deleting some.";
-                })
-                homeStore_upvr:dispatch({
-                    type = "setVisible";
-                    value = true;
-                })
-                return
-            end
-            if arg1_7.id == HomeConsts_upvr.ENUM_HOME_ITEM_NEW_RESULT.ALL_OWNED_PLACED then
-                Notification_upvr.new({
-                    Text = "You placed all of these that you own...";
-                })
-                homeStore_upvr:dispatch({
-                    type = "setVisible";
-                    value = true;
-                })
-                return
-            end
-            if arg1_7.id == HomeConsts_upvr.ENUM_HOME_ITEM_NEW_RESULT.MAX_PLACED then
-                Notification_upvr.new({
-                    Text = "You reached the placement limit for this item...";
-                })
-                homeStore_upvr:dispatch({
-                    type = "setVisible";
-                    value = true;
-                })
-                return
-            end
-            error(string.format("Unhandled result id: %d", arg1_7.id))
-        end
-    end)
-    any_queryCurrentStandingHome_result1:AttemptCreateHomeItem(arg1)
+function t.createAndDrag(p1) --[[ Line: 510 | Upvalues: homeStore (copy), HomeSystem (copy), HomeItemSystem (copy), HomeConsts (copy), StreamingHelperUtils (copy), BinderUtils (copy), HomeItemBinder (copy), t (copy), Notification (copy) ]]
+	homeStore:dispatch({
+		type = "setVisible",
+		value = false
+	})
+	local function reopenUI() --[[ Line: 515 | Upvalues: homeStore (ref) ]]
+		homeStore:dispatch({
+			type = "setVisible",
+			value = true
+		})
+	end
+	local v1 = HomeSystem.queryCurrentStandingHome()
+	assert(v1 ~= nil)
+	HomeItemSystem._maid._listenNewItem = v1._homeItemNewRemote.OnClientEvent:Connect(function(p1) --[[ Line: 523 | Upvalues: HomeItemSystem (ref), HomeConsts (ref), StreamingHelperUtils (ref), BinderUtils (ref), HomeItemBinder (ref), t (ref), homeStore (ref), Notification (ref) ]]
+		HomeItemSystem._maid._listenNewItem = nil
+		if p1.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.SUCCESS then
+			StreamingHelperUtils.yieldForObjValuePopulated(p1.modelPtr)
+			BinderUtils.promiseBoundClass(HomeItemBinder, p1.modelPtr.Value):andThen(function(p1) --[[ Line: 529 | Upvalues: t (ref), homeStore (ref) ]]
+				t.startDrag(p1)
+				t._maid.placeMaid:GiveTask(function() --[[ Line: 532 | Upvalues: homeStore (ref) ]]
+					homeStore:dispatch({
+						type = "setVisible",
+						value = true
+					})
+				end)
+			end):catch(warn)
+		elseif p1.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.TOO_MANY then
+			Notification.new({
+				Text = "Too many items placed... try deleting some."
+			})
+			homeStore:dispatch({
+				type = "setVisible",
+				value = true
+			})
+		elseif p1.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.ALL_OWNED_PLACED then
+			Notification.new({
+				Text = "You placed all of these that you own..."
+			})
+			homeStore:dispatch({
+				type = "setVisible",
+				value = true
+			})
+		elseif p1.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.MAX_PLACED then
+			Notification.new({
+				Text = "You reached the placement limit for this item..."
+			})
+			homeStore:dispatch({
+				type = "setVisible",
+				value = true
+			})
+		else
+			error(("Unhandled result id: %d"):format(p1.id))
+		end
+	end)
+	v1:AttemptCreateHomeItem(p1)
 end
-return module_upvr
+return t

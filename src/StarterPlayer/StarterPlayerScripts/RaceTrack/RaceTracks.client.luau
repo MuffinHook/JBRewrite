@@ -1,107 +1,102 @@
-local Players_upvr = game:GetService("Players")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local createElement_upvr = Roact_upvr.createElement
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-local TrackService_upvr = require(ReplicatedStorage.RaceTrack.TrackService)
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-RxInstanceUtils_upvr.waitForChild(ReplicatedStorage, "RaceTrackScreenText"):andThen(function(arg1) -- Line 14
-    local var12_upvw
-    arg1.OnClientEvent:Connect(function(arg1_2) -- Line 16
-        TrackService_upvr.updateScreenText(arg1_2)
-        Audio_upvr.ObjectLocal(Players_upvr.LocalPlayer.PlayerGui, 6874682609, {
-            Volume = 0.8;
-        })
-        if var12_upvw then
-            var12_upvw:cancel()
-            var12_upvw = nil
-        end
-        var12_upvw = Promise_upvr.delay(3):andThen(function() -- Line 24
-            TrackService_upvr.updateScreenText("")
-        end)
-    end)
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local Board = require(ReplicatedStorage.RaceTrack.UI.Board)
+local TrackService = require(ReplicatedStorage.RaceTrack.TrackService)
+RxInstanceUtils.waitForChild(ReplicatedStorage, "RaceTrackScreenText"):andThen(function(p1) --[[ Line: 14 | Upvalues: TrackService (copy), Audio (copy), Players (copy), Promise (copy) ]]
+	local v1 = nil
+	p1.OnClientEvent:Connect(function(p1) --[[ Line: 16 | Upvalues: TrackService (ref), Audio (ref), Players (ref), v1 (ref), Promise (ref) ]]
+		TrackService.updateScreenText(p1)
+		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6874682609, {
+			Volume = 0.8
+		})
+		if v1 then
+			v1:cancel()
+			v1 = nil
+		end
+		v1 = Promise.delay(3):andThen(function() --[[ Line: 24 | Upvalues: TrackService (ref) ]]
+			TrackService.updateScreenText("")
+		end)
+	end)
 end)
-local any_extend_result1_upvr = Roact_upvr.PureComponent:extend("Board")
-function any_extend_result1_upvr.init(arg1) -- Line 31
-    arg1._maid = Maid_upvr.new()
+local v1 = Roact.PureComponent:extend("Board")
+function v1.init(p1) --[[ Line: 31 | Upvalues: Maid (copy) ]]
+	p1._maid = Maid.new()
 end
-function any_extend_result1_upvr._fetch(arg1) -- Line 34
-    arg1:setState({
-        numEntries = #arg1.props.dataFolder:GetChildren();
-    })
+function v1._fetch(p1) --[[ Line: 34 ]]
+	p1:setState({
+		numEntries = #p1.props.dataFolder:GetChildren()
+	})
 end
-function any_extend_result1_upvr.didMount(arg1) -- Line 39
-    arg1:_fetch()
-    arg1._maid:GiveTask(arg1.props.dataFolder.ChildAdded:Connect(function() -- Line 41
-        arg1:_fetch()
-    end))
-    arg1._maid:GiveTask(arg1.props.dataFolder.ChildRemoved:Connect(function() -- Line 44
-        arg1:_fetch()
-    end))
+function v1.didMount(p1) --[[ Line: 39 ]]
+	p1:_fetch()
+	p1._maid:GiveTask(p1.props.dataFolder.ChildAdded:Connect(function() --[[ Line: 41 | Upvalues: p1 (copy) ]]
+		p1:_fetch()
+	end))
+	p1._maid:GiveTask(p1.props.dataFolder.ChildRemoved:Connect(function() --[[ Line: 44 | Upvalues: p1 (copy) ]]
+		p1:_fetch()
+	end))
 end
-local Board_upvr = require(ReplicatedStorage.RaceTrack.UI.Board)
-function any_extend_result1_upvr.render(arg1) -- Line 48
-    local tbl_3 = {}
-    for _, v in ipairs(arg1.props.dataFolder:GetChildren()) do
-        local var28 = "Time"
-        local attribute = v:GetAttribute(var28)
-        if typeof(attribute) ~= "number" then
-            var28 = false
-        else
-            var28 = true
-        end
-        assert(var28, "time was not a number")
-        table.insert(tbl_3, {
-            name = v.Value;
-            userId = tonumber(v.Name);
-            time = attribute;
-            message = string.format(("%d:%02d.%03d"), math.floor(attribute % 3600000 / 60000), math.floor(attribute % 60000 / 1000), math.floor(attribute % 1000));
-        })
-    end
-    table.sort(tbl_3, function(arg1_3, arg2) -- Line 64
-        local var32
-        if arg1_3.time >= arg2.time then
-            var32 = false
-        else
-            var32 = true
-        end
-        return var32
-    end)
-    return createElement_upvr("SurfaceGui", {
-        ResetOnSpawn = false;
-        ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-        SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud;
-        PixelsPerStud = 80;
-        Adornee = arg1.props.adornee;
-    }, {
-        Board = createElement_upvr(Board_upvr, {
-            entries = tbl_3;
-        });
-    })
+function v1.render(p1) --[[ Line: 48 | Upvalues: createElement (copy), Board (copy) ]]
+	local t = {}
+	for i, v in ipairs(p1.props.dataFolder:GetChildren()) do
+		local v1
+		local v2 = v:GetAttribute("Time")
+		v1 = typeof(v2) == "number"
+		assert(v1, "time was not a number")
+		local v3 = math.floor(v2 % 3600000 / 60000)
+		local v4 = math.floor(v2 % 60000 / 1000)
+		local v5 = math.floor(v2 % 1000)
+		local t2 = {
+			name = v.Value
+		}
+		t2.userId = tonumber(v.Name)
+		t2.time = v2
+		t2.message = ("%d:%02d.%03d"):format(v3, v4, v5)
+		table.insert(t, t2)
+	end
+	table.sort(t, function(p1, p2) --[[ Line: 64 ]]
+		return p1.time < p2.time
+	end)
+	return createElement("SurfaceGui", {
+		ResetOnSpawn = false,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud,
+		PixelsPerStud = 80,
+		Adornee = p1.props.adornee
+	}, {
+		Board = createElement(Board, {
+			entries = t
+		})
+	})
 end
-function any_extend_result1_upvr.willUnmount(arg1) -- Line 79
-    arg1._maid:DoCleaning()
+function v1.willUnmount(p1) --[[ Line: 79 ]]
+	p1._maid:DoCleaning()
 end
-local tbl_2_upvr = {}
-tbl_2_upvr.__index = tbl_2_upvr
-function tbl_2_upvr.new(arg1) -- Line 86
-    local module = {}
-    setmetatable(module, tbl_2_upvr)
-    module._maid = Maid_upvr.new()
-    module._maid:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1.Parent.Parent, "Data", function(arg1_4, arg2) -- Line 91
-        local tbl = {}
-        tbl.adornee = arg1
-        tbl.dataFolder = arg1_4
-        local any_mount_result1_upvr = Roact_upvr.mount(createElement_upvr(any_extend_result1_upvr, tbl), Players_upvr.LocalPlayer.PlayerGui, "BoardGui")
-        arg2:GiveTask(function() -- Line 101
-            Roact_upvr.unmount(any_mount_result1_upvr)
-        end)
-    end))
-    return module
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 86 | Upvalues: t (copy), Maid (copy), RxInstanceUtils (copy), Roact (copy), createElement (copy), v1 (copy), Players (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._maid = Maid.new()
+	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1.Parent.Parent, "Data", function(p12, p2) --[[ Line: 91 | Upvalues: Roact (ref), createElement (ref), v1 (ref), p1 (copy), Players (ref) ]]
+		local v12 = Roact.mount(createElement(v1, {
+			adornee = p1,
+			dataFolder = p12
+		}), Players.LocalPlayer.PlayerGui, "BoardGui")
+		p2:GiveTask(function() --[[ Line: 101 | Upvalues: Roact (ref), v12 (copy) ]]
+			Roact.unmount(v12)
+		end)
+	end))
+	return t2
 end
-function tbl_2_upvr.Destroy(arg1) -- Line 108
-    arg1._maid:Destroy()
+function t.Destroy(p1) --[[ Line: 108 ]]
+	p1._maid:Destroy()
 end
-require(ReplicatedStorage.Std.Binder).new("RaceTrackBoard", tbl_2_upvr):Start()
+Binder.new("RaceTrackBoard", t):Start()

@@ -1,7 +1,9 @@
-local Roact_upvr = require(game:GetService("ReplicatedStorage").Roact)
-return function(arg1) -- Line 4
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(require(script.Parent.Board), {}), arg1)
-    return function() -- Line 7
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+return function(p1) --[[ Line: 4 | Upvalues: Roact (copy) ]]
+	local Board = require(script.Parent.Board)
+	local v1 = Roact.mount(Roact.createElement(Board, {}), p1)
+	return function() --[[ Line: 7 | Upvalues: Roact (ref), v1 (copy) ]]
+		Roact.unmount(v1)
+	end
 end

@@ -1,119 +1,112 @@
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local CurrentCamera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CameraShakeInstance_upvr = require(ReplicatedStorage.Game.CamShaker.CameraShakeInstance)
-local ProximityCamShakeConsts_upvr = require(script.Parent.ProximityCamShakeConsts)
-local function _(arg1) -- Line 16, Named "Ease_InOutQuad"
-    local var4
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var4 = 2 * arg1 * arg1
-        return var4
-    end
-    if arg1 >= 0.5 or not decompInlinedCondition() then
-        var4 = -1 - 2 * (arg1 - 2) * arg1
-    end
-    return var4
+local Maid = require(ReplicatedStorage.Std.Maid)
+local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local CamShaker = require(ReplicatedStorage.Game.CamShaker.CamShaker)
+local CameraShakeInstance = require(ReplicatedStorage.Game.CamShaker.CameraShakeInstance)
+local ProximityCamShakeConsts = require(script.Parent.ProximityCamShakeConsts)
+local v1 = Random.new()
+local function Ease_InOutQuad(p1) --[[ Line: 16 ]]
+	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
 end
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local function _() -- Line 23, Named "makeCamShakeInst"
-    local any_new_result1 = CameraShakeInstance_upvr.new(2, 6, 1, 1)
-    any_new_result1.PositionInfluence = Vector3.new(0.25, 0.25, 0.25)
-    any_new_result1.RotationInfluence = Vector3.new(1, 1, 1)
-    return any_new_result1
+local t = {}
+t.__index = t
+local function makeCamShakeInst() --[[ Line: 23 | Upvalues: CameraShakeInstance (copy) ]]
+	local v1 = CameraShakeInstance.new(2, 6, 1, 1)
+	v1.PositionInfluence = Vector3.new(0.25, 0.25, 0.25)
+	v1.RotationInfluence = Vector3.new(1, 1, 1)
+	return v1
 end
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function module_upvr.new(arg1) -- Line 30
-    local module_upvr_2 = {}
-    setmetatable(module_upvr_2, module_upvr)
-    module_upvr_2._maid = Maid_upvr.new()
-    if not arg1:GetAttribute(ProximityCamShakeConsts_upvr.ENABLED_ATTR_NAME) then
-        arg1:SetAttribute(ProximityCamShakeConsts_upvr.ENABLED_ATTR_NAME, false)
-    end
-    if not arg1:GetAttribute(ProximityCamShakeConsts_upvr.RADIUS_ATTR_NAME) then
-        arg1:SetAttribute(ProximityCamShakeConsts_upvr.RADIUS_ATTR_NAME, 32)
-    end
-    if not arg1:GetAttribute(ProximityCamShakeConsts_upvr.MAGNITUDE_ATTR_NAME) then
-        arg1:SetAttribute(ProximityCamShakeConsts_upvr.MAGNITUDE_ATTR_NAME, 1)
-    end
-    module_upvr_2._maid:GiveTask(arg1:GetAttributeChangedSignal(ProximityCamShakeConsts_upvr.ENABLED_ATTR_NAME):Connect(function() -- Line 47, Named "updateEnabled"
-        if arg1:GetAttribute(ProximityCamShakeConsts_upvr.ENABLED_ATTR_NAME) then
-            module_upvr_2:Listen(arg1)
-        else
-            module_upvr_2._maid._listenLoop = nil
-        end
-    end))
-    if arg1:GetAttribute(ProximityCamShakeConsts_upvr.ENABLED_ATTR_NAME) then
-        module_upvr_2:Listen(arg1)
-        return module_upvr_2
-    end
-    module_upvr_2._maid._listenLoop = nil
-    return module_upvr_2
+function t.new(p1) --[[ Line: 30 | Upvalues: t (copy), Maid (copy), ProximityCamShakeConsts (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._maid = Maid.new()
+	if not p1:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
+		p1:SetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME, false)
+	end
+	if not p1:GetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME) then
+		p1:SetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME, 32)
+	end
+	if not p1:GetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME) then
+		p1:SetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME, 1)
+	end
+	local function updateEnabled() --[[ Line: 47 | Upvalues: p1 (copy), ProximityCamShakeConsts (ref), t2 (copy) ]]
+		if p1:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
+			t2:Listen(p1)
+		else
+			t2._maid._listenLoop = nil
+		end
+	end
+	t2._maid:GiveTask(p1:GetAttributeChangedSignal(ProximityCamShakeConsts.ENABLED_ATTR_NAME):Connect(updateEnabled))
+	if p1:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
+		t2:Listen(p1)
+	else
+		t2._maid._listenLoop = nil
+	end
+	return t2
 end
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-local PlayerUtils_upvr = require(ReplicatedStorage.Game.PlayerUtils)
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-function module_upvr.Listen(arg1, arg2) -- Line 60
-    arg1._maid._listenLoop = Interval_upvr.every(0.5):Connect(function() -- Line 61
-        local any_getRootPart_result1 = PlayerUtils_upvr.getRootPart(LocalPlayer_upvr)
-        if not any_getRootPart_result1 then
-        elseif (any_getRootPart_result1.Position - arg2.Position).Magnitude / arg2:GetAttribute(ProximityCamShakeConsts_upvr.RADIUS_ATTR_NAME) <= 1 and not arg1._maid._camUpdater then
-            arg1:StartUpdater(arg2)
-        end
-    end)
+function t.Listen(p1, p2) --[[ Line: 60 | Upvalues: Interval (copy), PlayerUtils (copy), LocalPlayer (copy), ProximityCamShakeConsts (copy) ]]
+	p1._maid._listenLoop = Interval.every(0.5):Connect(function() --[[ Line: 61 | Upvalues: PlayerUtils (ref), LocalPlayer (ref), p2 (copy), ProximityCamShakeConsts (ref), p1 (copy) ]]
+		local v1 = PlayerUtils.getRootPart(LocalPlayer)
+		if v1 and ((v1.Position - p2.Position).Magnitude / p2:GetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME) <= 1 and not p1._maid._camUpdater) then
+			p1:StartUpdater(p2)
+		end
+	end)
 end
-local CurrentCamera_upvr = workspace.CurrentCamera
-local CamShaker_upvr = require(ReplicatedStorage.Game.CamShaker.CamShaker)
-local RunService_upvr = game:GetService("RunService")
-local random_state_upvr = Random.new()
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-function module_upvr.StartUpdater(arg1, arg2) -- Line 76
-    local CFrame_upvw = CurrentCamera_upvr.CFrame
-    local any_new_result1_3_upvr = CamShaker_upvr.new(Enum.RenderPriority.Camera.Value + 5, function(arg1_2) -- Line 79
-        CFrame_upvw = CurrentCamera_upvr.CFrame
-        CurrentCamera_upvr.CFrame *= arg1_2
-    end)
-    any_new_result1_3_upvr._renderName = "ProximityCamShake_"..tostring(random_state_upvr:NextInteger(1, 1000000000))
-    any_new_result1_3_upvr:Start()
-    local any_new_result1_2 = CameraShakeInstance_upvr.new(2, 6, 1, 1)
-    any_new_result1_2.PositionInfluence = Vector3.new(0.25, 0.25, 0.25)
-    any_new_result1_2.RotationInfluence = Vector3.new(1, 1, 1)
-    local any_ShakeSustain_result1_upvr = any_new_result1_3_upvr:ShakeSustain(any_new_result1_2)
-    arg1._maid._camUpdater = RunService_upvr.Heartbeat:Connect(function() -- Line 91
-        local var26 = (CurrentCamera_upvr.CFrame.Position - arg2.Position).Magnitude / arg2:GetAttribute(ProximityCamShakeConsts_upvr.RADIUS_ATTR_NAME)
-        local var27
-        if var27 < var26 or not arg2:GetAttribute(ProximityCamShakeConsts_upvr.ENABLED_ATTR_NAME) then
-            var27 = arg1
-            var27 = var27._maid
-            var27._stop = nil
-        else
-            var27 = 1 - var26
-            local var28 = var27
-            local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                var27 = 2 * var28 * var28
-                return var27
-            end
-            if var28 >= 0.5 or not decompInlinedCondition_2() then
-                var27 = -1 - 2 * (var28 - 2) * var28
-            end
-            var27 *= arg2:GetAttribute(ProximityCamShakeConsts_upvr.MAGNITUDE_ATTR_NAME)
-            any_ShakeSustain_result1_upvr:SetScaleMagnitude(var27)
-        end
-    end)
-    local any_Connect_result1_upvr = RunService_upvr.Heartbeat:Connect(function() -- Line 83
-        CurrentCamera_upvr.CFrame = CFrame_upvw
-    end)
-    arg1._maid._stop = function() -- Line 106
-        any_ShakeSustain_result1_upvr:StartFadeOut(1)
-        Promise_upvr.delay(1):andThen(function() -- Line 110
-            any_new_result1_3_upvr:Stop()
-            any_Connect_result1_upvr:Disconnect()
-        end):catch(warn)
-        if arg1._maid then
-            arg1._maid._camUpdater = nil
-        end
-    end
+function t.StartUpdater(p1, p2) --[[ Line: 76 | Upvalues: CurrentCamera (copy), CamShaker (copy), RunService (copy), v1 (copy), CameraShakeInstance (copy), ProximityCamShakeConsts (copy), Promise (copy) ]]
+	local v12 = Enum.RenderPriority.Camera.Value + 5
+	local v2 = CurrentCamera.CFrame
+	local v3 = CamShaker.new(v12, function(p1) --[[ Line: 79 | Upvalues: v2 (ref), CurrentCamera (ref) ]]
+		v2 = CurrentCamera.CFrame
+		CurrentCamera.CFrame = CurrentCamera.CFrame * p1
+	end)
+	local v4 = RunService.Heartbeat:Connect(function() --[[ Line: 83 | Upvalues: CurrentCamera (ref), v2 (ref) ]]
+		CurrentCamera.CFrame = v2
+	end)
+	v3._renderName = "ProximityCamShake_" .. tostring((v1:NextInteger(1, 1000000000)))
+	v3:Start()
+	local v6 = CameraShakeInstance.new(2, 6, 1, 1)
+	v6.PositionInfluence = Vector3.new(0.25, 0.25, 0.25)
+	v6.RotationInfluence = Vector3.new(1, 1, 1)
+	local v7 = v3:ShakeSustain(v6)
+	p1._maid._camUpdater = RunService.Heartbeat:Connect(function() --[[ Line: 91 | Upvalues: CurrentCamera (ref), p2 (copy), ProximityCamShakeConsts (ref), p1 (copy), v7 (copy) ]]
+		local v2 = (CurrentCamera.CFrame.Position - p2.Position).Magnitude / p2:GetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME)
+		if v2 > 1 or not p2:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
+			p1._maid._stop = nil
+		else
+			local v3 = 1 - v2
+			local v4, v5
+			if v3 < 0.5 then
+				v4 = 2 * v3 * v3
+				if not v4 then
+					v5 = v3
+					v4 = -1 - 2 * (v3 - 2) * v3
+				end
+			else
+				v5 = v3
+				v4 = -1 - 2 * (v3 - 2) * v3
+			end
+			v7:SetScaleMagnitude(v4 * p2:GetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME))
+		end
+	end)
+	function p1._maid._stop() --[[ Line: 106 | Upvalues: v7 (copy), Promise (ref), v3 (copy), v4 (copy), p1 (copy) ]]
+		v7:StartFadeOut(1)
+		Promise.delay(1):andThen(function() --[[ Line: 110 | Upvalues: v3 (ref), v4 (ref) ]]
+			v3:Stop()
+			v4:Disconnect()
+		end):catch(warn)
+		if p1._maid then
+			p1._maid._camUpdater = nil
+		end
+	end
 end
-function module_upvr.Destroy(arg1) -- Line 121
-    arg1._maid = nil
-    arg1._maid:Destroy()
+function t.Destroy(p1) --[[ Line: 121 ]]
+	local _maid = p1._maid
+	p1._maid = nil
+	_maid:Destroy()
 end
-return module_upvr
+return t

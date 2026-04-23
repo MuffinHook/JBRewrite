@@ -1,73 +1,53 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
-    addReceiptItem = function(arg1, arg2) -- Line 5, Named "addReceiptItem"
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        local var2
-        if arg2.name == nil then
-            var2 = false
-        else
-            var2 = true
-        end
-        assert(var2, "missing receipt item Name")
-        if arg2.title == nil then
-            var2 = false
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        var2 = true
-        assert(var2, "missing receipt item Title")
-        if arg2.category == nil then
-            var2 = false
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end;
-    removeReceiptItem = function(arg1, arg2) -- Line 26, Named "removeReceiptItem"
-        local var5
-        if arg2.name == nil then
-            var5 = false
-        else
-            var5 = true
-        end
-        assert(var5, "missing receipt item Name")
-        if arg2.category == nil then
-            var5 = false
-        else
-            var5 = true
-        end
-        assert(var5, "missing receipt item Category")
-        var5 = #arg1
-        for i = 1, var5 do
-            local var6 = arg1[i]
-            if var6.name ~= arg2.name or var6.category ~= arg2.category then
-                table.insert({}, var6)
-            end
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        return {}
-    end;
-    removeReceiptCategory = function(arg1, arg2) -- Line 38, Named "removeReceiptCategory"
-        local var9
-        if arg2.category == nil then
-            var9 = false
-        else
-            var9 = true
-        end
-        assert(var9, "missing receipt item Category")
-        var9 = #arg1
-        for i_2 = 1, var9 do
-            local var10 = arg1[i_2]
-            if var10.category ~= arg2.category then
-                table.insert({}, var10)
-            end
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        return {}
-    end;
-    clearReceipt = function() -- Line 49, Named "clearReceipt"
-        return {}
-    end;
-    setPage = function() -- Line 53, Named "setPage"
-        return {}
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer({}, {
+	addReceiptItem = function(p1, p2) --[[ Name: addReceiptItem | Line: 5 ]]
+		assert(p2.name ~= nil, "missing receipt item Name")
+		assert(p2.title ~= nil, "missing receipt item Title")
+		assert(p2.category ~= nil, "missing receipt item Category")
+		assert(p2.categoryTitle ~= nil, "missing receipt item CategoryTitle")
+		local t = {}
+		for i = 1, #p1 do
+			local v5 = p1[i]
+			if v5.category ~= p2.category then
+				table.insert(t, v5)
+			end
+		end
+		local t2 = {}
+		for k, v in pairs(p2) do
+			if k ~= "type" then
+				t2[k] = v
+			end
+		end
+		table.insert(t, t2)
+		return t
+	end,
+	removeReceiptItem = function(p1, p2) --[[ Name: removeReceiptItem | Line: 26 ]]
+		assert(p2.name ~= nil, "missing receipt item Name")
+		assert(p2.category ~= nil, "missing receipt item Category")
+		local t = {}
+		for i = 1, #p1 do
+			local v3 = p1[i]
+			if v3.name ~= p2.name or v3.category ~= p2.category then
+				table.insert(t, v3)
+			end
+		end
+		return t
+	end,
+	removeReceiptCategory = function(p1, p2) --[[ Name: removeReceiptCategory | Line: 38 ]]
+		assert(p2.category ~= nil, "missing receipt item Category")
+		local t = {}
+		for i = 1, #p1 do
+			local v2 = p1[i]
+			if v2.category ~= p2.category then
+				table.insert(t, v2)
+			end
+		end
+		return t
+	end,
+	clearReceipt = function() --[[ Name: clearReceipt | Line: 49 ]]
+		return {}
+	end,
+	setPage = function() --[[ Name: setPage | Line: 53 ]]
+		return {}
+	end
 })

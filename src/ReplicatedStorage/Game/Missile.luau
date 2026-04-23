@@ -1,122 +1,113 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local var2_upvw
-local var3_upvw
-local RayCast_upvr = require(ReplicatedStorage_upvr.Module.RayCast)
-local function CalculateConstants_upvr(arg1, arg2, arg3, arg4, arg5) -- Line 16, Named "CalculateConstants"
-    local var5 = arg4 or 0.25
-    local var6 = arg5
-    if not var6 then
-        var6 = {}
-    end
-    local var7 = arg1 + arg2 * var5 + Vector3.new(0, -98.10000000000001 * var5 * var5, 0)
-    local Unit = (arg3 - var7).Unit
-    local _, any_RayIgnoreNonCollideWithIgnoreList_result2 = RayCast_upvr.RayIgnoreNonCollideWithIgnoreList(var7, Unit, 999, var6)
-    local any_Dot_result1 = arg2:Dot(Unit)
-    return var7, var5, ((any_Dot_result1 * any_Dot_result1 + 3000 * (any_RayIgnoreNonCollideWithIgnoreList_result2 - var7).Magnitude) ^ 0.5 - any_Dot_result1) / 1500, any_RayIgnoreNonCollideWithIgnoreList_result2
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local v1 = nil
+local RayCast = require(ReplicatedStorage.Module.RayCast)
+local v2 = nil
+local function CalculateConstants(p1, p2, p3, p4, p5) --[[ Line: 16 | Upvalues: RayCast (copy) ]]
+	local v1 = p4 or 0.25
+	local v3 = p1 + p2 * v1 + Vector3.new(0, -98.10000000000001 * v1 * v1, 0)
+	local Unit = (p3 - v3).Unit
+	local _, v4 = RayCast.RayIgnoreNonCollideWithIgnoreList(v3, Unit, 999, p5 or {})
+	local v5 = p2:Dot(Unit)
+	return v3, v1, ((v5 * v5 + 3000 * (v4 - v3).Magnitude) ^ 0.5 - v5) / 1500, v4
 end
-local var12_upvw
-local tbl_upvr = {}
-tbl_upvr.__index = tbl_upvr
-function tbl_upvr.new(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 32
-    local setmetatable_result1 = setmetatable({}, tbl_upvr)
-    local var15
-    if not var15 then
-        var15 = "RocketPart"
-    end
-    setmetatable_result1.Rotation = CFrame.Angles(0, 0, 0)
-    if var15 == "RocketPart" then
-        setmetatable_result1.Rotation = CFrame.Angles(0, math.pi, 0)
-    end
-    local clone = ReplicatedStorage_upvr.Resource[var15]:Clone()
-    clone.CanCollide = false
-    clone.Anchored = true
-    clone.Parent = workspace
-    clone.CFrame = arg1 * setmetatable_result1.Rotation
-    setmetatable_result1.Part = clone
-    setmetatable_result1.Origin = arg1
-    setmetatable_result1.OriginVelocity = arg2
-    setmetatable_result1.Target = arg3
-    setmetatable_result1.DropPeriod = arg5
-    setmetatable_result1.IgnoreList = arg6
-    return setmetatable_result1
+local v3 = nil
+local t = {}
+t.__index = t
+function t.new(p1, p2, p3, p4, p5, p6) --[[ Line: 32 | Upvalues: t (copy), ReplicatedStorage (copy) ]]
+	local v2 = setmetatable({}, t)
+	if not p4 then
+		p4 = "RocketPart"
+	end
+	v2.Rotation = CFrame.Angles(0, 0, 0)
+	if p4 == "RocketPart" then
+		v2.Rotation = CFrame.Angles(0, math.pi, 0)
+	end
+	local v3 = ReplicatedStorage.Resource[p4]:Clone()
+	v3.CanCollide = false
+	v3.Anchored = true
+	v3.Parent = workspace
+	v3.CFrame = p1 * v2.Rotation
+	v2.Part = v3
+	v2.Origin = p1
+	v2.OriginVelocity = p2
+	v2.Target = p3
+	v2.DropPeriod = p5
+	v2.IgnoreList = p6
+	return v2
 end
-local RunService_upvr = game:GetService("RunService")
-function tbl_upvr.Animate(arg1, arg2) -- Line 57
-    local var18 = arg2
-    if not var18 then
-        var18 = var3_upvw
-        var18 = var18.GetNowSync()
-    end
-    local var19_upvw = var18
-    local OriginVelocity_upvr = arg1.OriginVelocity
-    local CalculateConstants_upvr_result1_upvr, CalculateConstants_result2_upvr, CalculateConstants_result3_upvr, CalculateConstants_upvr_result4 = CalculateConstants_upvr(arg1.Origin.p, OriginVelocity_upvr, arg1.Target, arg1.DropPeriod, arg1.IgnoreList)
-    local Unit_2_upvr = (arg1.Target - CalculateConstants_upvr_result1_upvr).Unit
-    local function Ignite_upvr() -- Line 70, Named "Ignite"
-        arg1.Part.Fire.Enabled = true
-        var2_upvw.ObjectLocal(arg1.Part, 1386598740, {
-            TimePosition = 0.5;
-            Volume = 0.5;
-        })
-        var2_upvw.ObjectLocal(arg1.Part, 9058734199, {
-            Volume = 0.6;
-            Pitch = 0.6;
-            EmitterSize = 25;
-        })
-    end
-    local var28_upvw = var19_upvw - 0.03333333333333333
-    local LookVector_upvr = (arg1.Origin * arg1.Rotation).LookVector
-    local any_Dot_result1_2_upvr = OriginVelocity_upvr:Dot(Unit_2_upvr)
-    arg1.Runtime = RunService_upvr.Heartbeat:Connect(function() -- Line 76, Named "Heartbeat"
-        local any_GetNowSync_result1 = var3_upvw.GetNowSync()
-        local var32 = any_GetNowSync_result1 - var19_upvw
-        local var33 = any_GetNowSync_result1 - var28_upvw
-        var28_upvw = any_GetNowSync_result1
-        if var32 - var33 < CalculateConstants_result2_upvr and CalculateConstants_result2_upvr <= var32 then
-            Ignite_upvr()
-        end
-        if var32 - var33 < CalculateConstants_result2_upvr + CalculateConstants_result3_upvr and CalculateConstants_result2_upvr + CalculateConstants_result3_upvr <= var32 then
-            arg1:Explode()
-        end
-        if var32 < CalculateConstants_result2_upvr then
-            arg1.Part.CFrame = arg1.Origin * arg1.Rotation + OriginVelocity_upvr * var32 + Vector3.new(0, -98.10000000000001 * var32 * var32, 0)
-        elseif var32 < CalculateConstants_result2_upvr + CalculateConstants_result3_upvr then
-            local var34 = var32 - CalculateConstants_result2_upvr
-            arg1.Part.CFrame = CFrame.new(var12_upvw, LookVector_upvr:Lerp(Unit_2_upvr, math.min(var34 * 10, 1))) + CalculateConstants_upvr_result1_upvr + any_Dot_result1_2_upvr * Unit_2_upvr * var34 + (Unit_2_upvr) * (750 * var34 * var34)
-        end
-    end)
+function t.Animate(p1, p2) --[[ Line: 57 | Upvalues: v2 (ref), CalculateConstants (copy), v1 (ref), v3 (ref), RunService (copy) ]]
+	local v22 = p2 or v2.GetNowSync()
+	local OriginVelocity = p1.OriginVelocity
+	local LookVector = (p1.Origin * p1.Rotation).LookVector
+	local v32, v4, v5, _ = CalculateConstants(p1.Origin.p, OriginVelocity, p1.Target, p1.DropPeriod, p1.IgnoreList)
+	local Unit = (p1.Target - v32).Unit
+	local v6 = OriginVelocity:Dot(Unit)
+	local v7 = v22 - 0.03333333333333333
+	local function Ignite() --[[ Line: 70 | Upvalues: p1 (copy), v1 (ref) ]]
+		p1.Part.Fire.Enabled = true
+		v1.ObjectLocal(p1.Part, 1386598740, {
+			TimePosition = 0.5,
+			Volume = 0.5
+		})
+		v1.ObjectLocal(p1.Part, 9058734199, {
+			Volume = 0.6,
+			Pitch = 0.6,
+			EmitterSize = 25
+		})
+	end
+	local function Heartbeat() --[[ Line: 76 | Upvalues: v2 (ref), v22 (ref), v7 (ref), v4 (copy), Ignite (copy), v5 (copy), p1 (copy), OriginVelocity (copy), LookVector (copy), Unit (copy), v3 (ref), v32 (copy), v6 (copy) ]]
+		local v1 = v2.GetNowSync()
+		local v23 = v1 - v22
+		local v33 = v1 - v7
+		v7 = v1
+		if v23 - v33 < v4 and v4 <= v23 then
+			Ignite()
+		end
+		if v23 - v33 < v4 + v5 and v4 + v5 <= v23 then
+			p1:Explode()
+		end
+		if v23 < v4 then
+			p1.Part.CFrame = p1.Origin * p1.Rotation + OriginVelocity * v23 + Vector3.new(0, -98.10000000000001 * v23 * v23, 0)
+		elseif v23 < v4 + v5 then
+			local v42 = v23 - v4
+			p1.Part.CFrame = CFrame.new(v3, (LookVector:Lerp(Unit, (math.min(v42 * 10, 1))))) + v32 + v6 * Unit * v42 + Unit * (750 * v42 * v42)
+		end
+	end
+	p1.Runtime = RunService.Heartbeat:Connect(Heartbeat)
 end
-function tbl_upvr.Explode(arg1) -- Line 100
-    delay(2, function() -- Line 101
-        arg1:Destroy()
-    end)
-    arg1.Part.Transparency = 1
-    arg1.Part.CanCollide = false
-    arg1.Part.Fire.Enabled = false
-    local Explosion = Instance.new("Explosion")
-    Explosion.ExplosionType = Enum.ExplosionType.NoCraters
-    Explosion.DestroyJointRadiusPercent = 0
-    Explosion.Position = arg1.Part.Position
-    Explosion.Parent = workspace
-    local Sound = Instance.new("Sound")
-    Sound.SoundId = "rbxassetid://55224766"
-    Sound.Parent = arg1.Part
-    Sound.Volume = 0.8
-    Sound:Play()
+function t.Explode(p1) --[[ Line: 100 ]]
+	delay(2, function() --[[ Line: 101 | Upvalues: p1 (copy) ]]
+		p1:Destroy()
+	end)
+	p1.Part.Transparency = 1
+	p1.Part.CanCollide = false
+	p1.Part.Fire.Enabled = false
+	local Explosion = Instance.new("Explosion")
+	Explosion.ExplosionType = Enum.ExplosionType.NoCraters
+	Explosion.DestroyJointRadiusPercent = 0
+	Explosion.Position = p1.Part.Position
+	Explosion.Parent = workspace
+	local Sound = Instance.new("Sound")
+	Sound.SoundId = "rbxassetid://55224766"
+	Sound.Parent = p1.Part
+	Sound.Volume = 0.8
+	Sound:Play()
 end
-function tbl_upvr.Destroy(arg1) -- Line 121
-    arg1.Part:Destroy()
-    arg1.Part = nil
-    arg1.Runtime:Disconnect()
-    arg1.Runtime = nil
+function t.Destroy(p1) --[[ Line: 121 ]]
+	p1.Part:Destroy()
+	p1.Part = nil
+	p1.Runtime:Disconnect()
+	p1.Runtime = nil
 end
 return {
-    CalculateConstants = CalculateConstants_upvr;
-    LaunchMissile = function(arg1, arg2, arg3, arg4, arg5, arg6, arg7) -- Line 131, Named "LaunchMissile"
-        tbl_upvr.new(arg1, arg2, arg3, arg5, arg6, arg7):Animate(arg4)
-    end;
-    Init = function() -- Line 135, Named "Init"
-        var12_upvw = Vector3.new()
-        var2_upvw = require(ReplicatedStorage_upvr.Std.Audio)
-        var3_upvw = require(ReplicatedStorage_upvr.Module.Time)
-    end;
+	CalculateConstants = CalculateConstants,
+	LaunchMissile = function(p1, p2, p3, p4, p5, p6, p7) --[[ Name: LaunchMissile | Line: 131 | Upvalues: t (copy) ]]
+		t.new(p1, p2, p3, p5, p6, p7):Animate(p4)
+	end,
+	Init = function() --[[ Name: Init | Line: 135 | Upvalues: v3 (ref), v1 (ref), ReplicatedStorage (copy), v2 (ref) ]]
+		v3 = Vector3.new()
+		v1 = require(ReplicatedStorage.Std.Audio)
+		v2 = require(ReplicatedStorage.Module.Time)
+	end
 }

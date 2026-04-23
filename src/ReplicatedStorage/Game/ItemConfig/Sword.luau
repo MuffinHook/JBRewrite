@@ -1,5 +1,6 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
-    Price = 20000;
-    ImageId = require(game:GetService("ReplicatedStorage").Resource.Settings).Images.Sword;
-    EquipTime = 0.5;
+	Price = 20000,
+	ImageId = require(ReplicatedStorage.Resource.Settings).Images.Sword,
+	EquipTime = 0.5
 }

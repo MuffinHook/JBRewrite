@@ -1,33 +1,29 @@
 return {
-    getPrimaryPart = function(arg1) -- Line 2, Named "getPrimaryPart"
-        local BoundingBox = arg1:FindFirstChild("BoundingBox")
-        if not BoundingBox then
-            BoundingBox = arg1.PrimaryPart
-        end
-        return BoundingBox
-    end;
-    setMaxLinkLength = function(arg1, arg2) -- Line 5, Named "setMaxLinkLength"
-        arg1:SetAttribute("MaxLinkLength", arg2)
-    end;
-    getMaxLinkLength = function(arg1) -- Line 8, Named "getMaxLinkLength"
-        return arg1:GetAttribute("MaxLinkLength")
-    end;
-    setIsLinked = function(arg1, arg2) -- Line 11, Named "setIsLinked"
-        arg1:SetAttribute("IsLinked", arg2)
-    end;
-    getIsLinked = function(arg1) -- Line 14, Named "getIsLinked"
-        return arg1:GetAttribute("IsLinked")
-    end;
-    getIsLinkedChangedSignal = function(arg1) -- Line 17, Named "getIsLinkedChangedSignal"
-        return arg1:GetAttributeChangedSignal("IsLinked")
-    end;
-    setDisabled = function(arg1, arg2) -- Line 20, Named "setDisabled"
-        arg1:SetAttribute("LinkDisabled", arg2)
-    end;
-    getDisabled = function(arg1) -- Line 23, Named "getDisabled"
-        return arg1:GetAttribute("LinkDisabled")
-    end;
-    getDisabledChangedSignal = function(arg1) -- Line 26, Named "getDisabledChangedSignal"
-        return arg1:GetAttributeChangedSignal("LinkDisabled")
-    end;
+	getPrimaryPart = function(p1) --[[ Name: getPrimaryPart | Line: 2 ]]
+		return p1:FindFirstChild("BoundingBox") or p1.PrimaryPart
+	end,
+	setMaxLinkLength = function(p1, p2) --[[ Name: setMaxLinkLength | Line: 5 ]]
+		p1:SetAttribute("MaxLinkLength", p2)
+	end,
+	getMaxLinkLength = function(p1) --[[ Name: getMaxLinkLength | Line: 8 ]]
+		return p1:GetAttribute("MaxLinkLength")
+	end,
+	setIsLinked = function(p1, p2) --[[ Name: setIsLinked | Line: 11 ]]
+		p1:SetAttribute("IsLinked", p2)
+	end,
+	getIsLinked = function(p1) --[[ Name: getIsLinked | Line: 14 ]]
+		return p1:GetAttribute("IsLinked")
+	end,
+	getIsLinkedChangedSignal = function(p1) --[[ Name: getIsLinkedChangedSignal | Line: 17 ]]
+		return p1:GetAttributeChangedSignal("IsLinked")
+	end,
+	setDisabled = function(p1, p2) --[[ Name: setDisabled | Line: 20 ]]
+		p1:SetAttribute("LinkDisabled", p2)
+	end,
+	getDisabled = function(p1) --[[ Name: getDisabled | Line: 23 ]]
+		return p1:GetAttribute("LinkDisabled")
+	end,
+	getDisabledChangedSignal = function(p1) --[[ Name: getDisabledChangedSignal | Line: 26 ]]
+		return p1:GetAttributeChangedSignal("LinkDisabled")
+	end
 }

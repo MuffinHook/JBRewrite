@@ -1,161 +1,133 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module = {}
-local BossNPCUtils_upvr = require(ReplicatedStorage.MansionRobbery.BossNPCUtils)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local BossNPCConsts_upvr = require(ReplicatedStorage.MansionRobbery.BossNPCConsts)
-local NPCUtils_upvr = require(ReplicatedStorage.NPC.NPCUtils)
-local Players_upvr = game:GetService("Players")
-local MansionRobberyUtils_upvr = require(ReplicatedStorage.MansionRobbery.MansionRobberyUtils)
-local GeomUtils_upvr = require(ReplicatedStorage.Std.GeomUtils)
-local RunService_upvr = game:GetService("RunService")
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local NPCShared_upvr = require(ReplicatedStorage.NPC.NPCShared)
-local NPCConsts_upvr = require(ReplicatedStorage.NPC.NPCConsts)
-function module.setup(arg1) -- Line 15
-    local obj_upvr = arg1.obj
-    local var15_upvw
-    var15_upvw = BossNPCUtils_upvr.getMovementState(obj_upvr)
-    arg1.maid:GiveTask(BossNPCUtils_upvr.getMovementStateChangedSignal(obj_upvr):Connect(function() -- Line 19, Named "handleMovement"
-        var15_upvw = BossNPCUtils_upvr.getMovementState(obj_upvr)
-    end))
-    local var16_upvw
-    arg1.maid.lastAttackMaidShared = nil
-    local function handleAttackState() -- Line 27
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        var16_upvw = BossNPCUtils_upvr.getAttackState(obj_upvr)
-        if not arg1:IsLocallyOwned() then return end
-        local any_new_result1 = Maid_upvr.new()
-        arg1.maid.lastAttackMaidShared = any_new_result1
-        local var18_upvw = true
-        any_new_result1:GiveTask(function() -- Line 38
-            var18_upvw = false
-        end)
-        if var16_upvw == BossNPCConsts_upvr.ATTACK_STATE.ExtendoWhack then
-            NPCUtils_upvr.setLookAt(obj_upvr, NPCUtils_upvr.getTarget(obj_upvr))
-            any_new_result1:GiveTask(function() -- Line 43
-                NPCUtils_upvr.setLookAt(obj_upvr, nil)
-            end)
-            any_new_result1:GiveTask(task.delay(BossNPCConsts_upvr.EXTENDO_WHACK_DURATION, function() -- Line 46
-                if var18_upvw then
-                    task.defer(BossNPCUtils_upvr.setAttackState, obj_upvr, BossNPCConsts_upvr.ATTACK_STATE.None)
-                end
-            end))
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        if var16_upvw == BossNPCConsts_upvr.ATTACK_STATE.LaserSweep then
-            NPCUtils_upvr.setLookAt(obj_upvr, NPCUtils_upvr.getTarget(obj_upvr))
-            any_new_result1:GiveTask(task.delay(BossNPCConsts_upvr.LASER_SWEEP_WARM_UP_DURATION, function() -- Line 55
-                local tbl_upvr = {}
-                for i, v in Players_upvr:GetPlayers() do
-                    if v.Character and v.Character.PrimaryPart and MansionRobberyUtils_upvr.getIsPlayerInRobbery(arg1.obj.Parent, v) then
-                        table.insert(tbl_upvr, v.Character.PrimaryPart)
-                    end
-                end
-                local CFrame_upvr = obj_upvr.PrimaryPart.CFrame
-                local function _() -- Line 73, Named "resort"
-                    local any_generate2DPointClockwiseComparisonFunction_result1_upvr_2 = GeomUtils_upvr.generate2DPointClockwiseComparisonFunction()
-                    table.sort(tbl_upvr, function(arg1_2, arg2) -- Line 75
-                        local any_PointToObjectSpace_result1_4 = CFrame_upvr:PointToObjectSpace(arg1_2.Position)
-                        local any_PointToObjectSpace_result1 = CFrame_upvr:PointToObjectSpace(arg2.Position)
-                        return any_generate2DPointClockwiseComparisonFunction_result1_upvr_2(Vector2.new(any_PointToObjectSpace_result1_4.X, -any_PointToObjectSpace_result1_4.Z), Vector2.new(any_PointToObjectSpace_result1.X, -any_PointToObjectSpace_result1.Z))
-                    end)
-                end
-                while true do
-                    i = 0
-                    if i >= #tbl_upvr then break end
-                    if not var18_upvw then break end
-                    i = table.sort
-                    v = tbl_upvr
-                    local any_generate2DPointClockwiseComparisonFunction_result1_upvr = GeomUtils_upvr.generate2DPointClockwiseComparisonFunction()
-                    i(v, function(arg1_3, arg2) -- Line 75
-                        local any_PointToObjectSpace_result1_3 = CFrame_upvr:PointToObjectSpace(arg1_3.Position)
-                        local any_PointToObjectSpace_result1_2 = CFrame_upvr:PointToObjectSpace(arg2.Position)
-                        return any_generate2DPointClockwiseComparisonFunction_result1_upvr(Vector2.new(any_PointToObjectSpace_result1_3.X, -any_PointToObjectSpace_result1_3.Z), Vector2.new(any_PointToObjectSpace_result1_2.X, -any_PointToObjectSpace_result1_2.Z))
-                    end)
-                    any_generate2DPointClockwiseComparisonFunction_result1_upvr = table.remove
-                    i = tbl_upvr
-                    v = 1
-                    any_generate2DPointClockwiseComparisonFunction_result1_upvr = any_generate2DPointClockwiseComparisonFunction_result1_upvr(i, v)
-                    i = NPCUtils_upvr
-                    i = i.setTarget
-                    v = obj_upvr
-                    i(v, any_generate2DPointClockwiseComparisonFunction_result1_upvr)
-                    i = NPCUtils_upvr
-                    i = i.setLookAt
-                    v = obj_upvr
-                    i(v, NPCUtils_upvr.getTarget(obj_upvr))
-                    i = task.wait
-                    v = BossNPCConsts_upvr
-                    v = v.LASER_SWEEP_TIME_BTWN_TARAGETS
-                    i(v)
-                end
-                any_generate2DPointClockwiseComparisonFunction_result1_upvr = var18_upvw
-                if any_generate2DPointClockwiseComparisonFunction_result1_upvr then
-                    any_generate2DPointClockwiseComparisonFunction_result1_upvr = task.defer
-                    i = BossNPCUtils_upvr
-                    i = i.setAttackState
-                    v = obj_upvr
-                    any_generate2DPointClockwiseComparisonFunction_result1_upvr(i, v, BossNPCConsts_upvr.ATTACK_STATE.None)
-                end
-            end))
-            any_new_result1:GiveTask(function() -- Line 103
-                NPCUtils_upvr.setLookAt(obj_upvr, nil)
-            end)
-        elseif var16_upvw == BossNPCConsts_upvr.ATTACK_STATE.AuraBlast then
-            local os_clock_result1_upvr = os.clock()
-            local var41_upvw
-            local Health_upvr = arg1.humanoid.Health
-            var41_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 111
-                local var43 = (os.clock() - os_clock_result1_upvr) / BossNPCConsts_upvr.AURA_BLAST_DURATION
-                if 1 <= var43 then
-                    var41_upvw:Disconnect()
-                    task.defer(BossNPCUtils_upvr.setAttackState, obj_upvr, BossNPCConsts_upvr.ATTACK_STATE.None)
-                else
-                    arg1.humanoid.Health = math.min(Health_upvr + var43 * BossNPCConsts_upvr.AURA_BLAST_PERCENT_HEALTH_TO_RECOVER / 100 * arg1.humanoid.MaxHealth, arg1.humanoid.MaxHealth)
-                end
-            end)
-            Audio_upvr.ObjectLocal(arg1.obj.PrimaryPart, 11793816932, {
-                Volume = 1;
-                RollOffMinDistance = 128;
-            })
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end
-    handleAttackState()
-    arg1.maid:GiveTask(BossNPCUtils_upvr.getAttackStateChangedSignal(obj_upvr):Connect(handleAttackState))
-    local function goToTargetPos_upvr(arg1_4) -- Line 131, Named "goToTargetPos"
-        if var16_upvw ~= BossNPCConsts_upvr.ATTACK_STATE.None and var16_upvw ~= BossNPCConsts_upvr.ATTACK_STATE.LockedNone then
-            NPCShared_upvr.move(arg1.humanoid, Vector3.new(0, 0, 0))
-        else
-            if var15_upvw == BossNPCConsts_upvr.MOVEMENT_STATE.StrafeTarget then
-                local any_getHomePosition_result1 = NPCUtils_upvr.getHomePosition(obj_upvr)
-                local var46 = arg1_4 - (arg1_4 - any_getHomePosition_result1).Unit * 20 - any_getHomePosition_result1
-                if 80 < var46.Magnitude then
-                    var46 = var46.Unit * 80
-                end
-                NPCShared_upvr.goTo(arg1, any_getHomePosition_result1 + var46)
-                return
-            end
-            if var15_upvw == BossNPCConsts_upvr.MOVEMENT_STATE.GoToTarget then
-                NPCShared_upvr.goTo(arg1, arg1_4)
-            end
-        end
-    end
-    function arg1.customUpdateTarget(arg1_5, arg2) -- Line 152
-        if NPCUtils_upvr.getTargetType(obj_upvr) == NPCConsts_upvr.DEST_TYPE.OBJ then
-            local any_getTarget_result1_upvr = NPCUtils_upvr.getTarget(obj_upvr)
-            if not any_getTarget_result1_upvr then
-                return false
-            end
-            arg2:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 159
-                goToTargetPos_upvr(any_getTarget_result1_upvr.Position)
-            end))
-            return true
-        end
-        any_getTarget_result1_upvr = false
-        return any_getTarget_result1_upvr
-    end
-end
-return module
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
+local BossNPCConsts = require(ReplicatedStorage.MansionRobbery.BossNPCConsts)
+local BossNPCUtils = require(ReplicatedStorage.MansionRobbery.BossNPCUtils)
+local NPCUtils = require(ReplicatedStorage.NPC.NPCUtils)
+local NPCConsts = require(ReplicatedStorage.NPC.NPCConsts)
+local NPCShared = require(ReplicatedStorage.NPC.NPCShared)
+local MansionRobberyUtils = require(ReplicatedStorage.MansionRobbery.MansionRobberyUtils)
+return {
+	setup = function(p1) --[[ Name: setup | Line: 15 | Upvalues: BossNPCUtils (copy), Maid (copy), BossNPCConsts (copy), NPCUtils (copy), Players (copy), MansionRobberyUtils (copy), GeomUtils (copy), RunService (copy), Audio (copy), NPCShared (copy), NPCConsts (copy) ]]
+		local obj = p1.obj
+		local v1 = nil
+		local function handleMovement() --[[ Line: 19 | Upvalues: v1 (ref), BossNPCUtils (ref), obj (copy) ]]
+			v1 = BossNPCUtils.getMovementState(obj)
+		end
+		v1 = BossNPCUtils.getMovementState(obj)
+		p1.maid:GiveTask(BossNPCUtils.getMovementStateChangedSignal(obj):Connect(handleMovement))
+		local v2 = nil
+		p1.maid.lastAttackMaidShared = nil
+		local function handleAttackState() --[[ Line: 27 | Upvalues: v2 (ref), BossNPCUtils (ref), obj (copy), p1 (copy), Maid (ref), BossNPCConsts (ref), NPCUtils (ref), Players (ref), MansionRobberyUtils (ref), GeomUtils (ref), RunService (ref), Audio (ref) ]]
+			v2 = BossNPCUtils.getAttackState(obj)
+			if p1:IsLocallyOwned() then
+				local v1 = Maid.new()
+				p1.maid.lastAttackMaidShared = v1
+				local v22 = true
+				v1:GiveTask(function() --[[ Line: 38 | Upvalues: v22 (ref) ]]
+					v22 = false
+				end)
+				if v2 == BossNPCConsts.ATTACK_STATE.ExtendoWhack then
+					NPCUtils.setLookAt(obj, NPCUtils.getTarget(obj))
+					v1:GiveTask(function() --[[ Line: 43 | Upvalues: NPCUtils (ref), obj (ref) ]]
+						NPCUtils.setLookAt(obj, nil)
+					end)
+					v1:GiveTask(task.delay(BossNPCConsts.EXTENDO_WHACK_DURATION, function() --[[ Line: 46 | Upvalues: v22 (ref), BossNPCUtils (ref), obj (ref), BossNPCConsts (ref) ]]
+						if v22 then
+							task.defer(BossNPCUtils.setAttackState, obj, BossNPCConsts.ATTACK_STATE.None)
+						end
+					end))
+				elseif v2 == BossNPCConsts.ATTACK_STATE.LaserSweep then
+					NPCUtils.setLookAt(obj, NPCUtils.getTarget(obj))
+					v1:GiveTask(task.delay(BossNPCConsts.LASER_SWEEP_WARM_UP_DURATION, function() --[[ Line: 55 | Upvalues: Players (ref), p1 (ref), MansionRobberyUtils (ref), obj (ref), GeomUtils (ref), v22 (ref), NPCUtils (ref), BossNPCConsts (ref), BossNPCUtils (ref) ]]
+						local t = {}
+						for v1, v2 in Players:GetPlayers() do
+							if v2.Character and v2.Character.PrimaryPart and MansionRobberyUtils.getIsPlayerInRobbery(p1.obj.Parent, v2) then
+								table.insert(t, v2.Character.PrimaryPart)
+							end
+						end
+						local v4 = obj.PrimaryPart.CFrame
+						local function resort() --[[ Line: 73 | Upvalues: GeomUtils (ref), t (copy), v4 (copy) ]]
+							local v1 = GeomUtils.generate2DPointClockwiseComparisonFunction()
+							table.sort(t, function(p1, p2) --[[ Line: 75 | Upvalues: v4 (ref), v1 (copy) ]]
+								local v12 = v4:PointToObjectSpace(p1.Position)
+								local v2 = v4:PointToObjectSpace(p2.Position)
+								return v1(Vector2.new(v12.X, -v12.Z), (Vector2.new(v2.X, -v2.Z)))
+							end)
+						end
+						while #t > 0 and v22 do
+							local v5 = GeomUtils.generate2DPointClockwiseComparisonFunction()
+							table.sort(t, function(p1, p2) --[[ Line: 75 | Upvalues: v4 (copy), v5 (copy) ]]
+								local v1 = v4:PointToObjectSpace(p1.Position)
+								local v2 = v4:PointToObjectSpace(p2.Position)
+								return v5(Vector2.new(v1.X, -v1.Z), (Vector2.new(v2.X, -v2.Z)))
+							end)
+							NPCUtils.setTarget(obj, (table.remove(t, 1)))
+							NPCUtils.setLookAt(obj, NPCUtils.getTarget(obj))
+							task.wait(BossNPCConsts.LASER_SWEEP_TIME_BTWN_TARAGETS)
+						end
+						if v22 then
+							task.defer(BossNPCUtils.setAttackState, obj, BossNPCConsts.ATTACK_STATE.None)
+						end
+					end))
+					v1:GiveTask(function() --[[ Line: 103 | Upvalues: NPCUtils (ref), obj (ref) ]]
+						NPCUtils.setLookAt(obj, nil)
+					end)
+				elseif v2 == BossNPCConsts.ATTACK_STATE.AuraBlast then
+					local v3 = os.clock()
+					local Health = p1.humanoid.Health
+					local v4 = nil
+					v4 = RunService.Heartbeat:Connect(function() --[[ Line: 111 | Upvalues: v3 (copy), BossNPCConsts (ref), v4 (ref), BossNPCUtils (ref), obj (ref), p1 (ref), Health (copy) ]]
+						local v1 = (os.clock() - v3) / BossNPCConsts.AURA_BLAST_DURATION
+						if v1 >= 1 then
+							v4:Disconnect()
+							task.defer(BossNPCUtils.setAttackState, obj, BossNPCConsts.ATTACK_STATE.None)
+						else
+							p1.humanoid.Health = math.min(Health + v1 * BossNPCConsts.AURA_BLAST_PERCENT_HEALTH_TO_RECOVER / 100 * p1.humanoid.MaxHealth, p1.humanoid.MaxHealth)
+						end
+					end)
+					Audio.ObjectLocal(p1.obj.PrimaryPart, 11793816932, {
+						Volume = 1,
+						RollOffMinDistance = 128
+					})
+				end
+			end
+		end
+		handleAttackState()
+		p1.maid:GiveTask(BossNPCUtils.getAttackStateChangedSignal(obj):Connect(handleAttackState))
+		local function goToTargetPos(p12) --[[ Line: 131 | Upvalues: v2 (ref), BossNPCConsts (ref), NPCShared (ref), p1 (copy), v1 (ref), NPCUtils (ref), obj (copy) ]]
+			if v2 == BossNPCConsts.ATTACK_STATE.None or v2 == BossNPCConsts.ATTACK_STATE.LockedNone then
+				if v1 == BossNPCConsts.MOVEMENT_STATE.StrafeTarget then
+					local v12 = NPCUtils.getHomePosition(obj)
+					local v22 = p12 - (p12 - v12).Unit * 20 - v12
+					if v22.Magnitude > 80 then
+						v22 = v22.Unit * 80
+					end
+					NPCShared.goTo(p1, v12 + v22)
+				elseif v1 == BossNPCConsts.MOVEMENT_STATE.GoToTarget then
+					NPCShared.goTo(p1, p12)
+				end
+			else
+				NPCShared.move(p1.humanoid, Vector3.new(0, 0, 0))
+			end
+		end
+		function p1.customUpdateTarget(p1, p2) --[[ Line: 152 | Upvalues: NPCUtils (ref), obj (copy), NPCConsts (ref), RunService (ref), goToTargetPos (copy) ]]
+			if NPCUtils.getTargetType(obj) == NPCConsts.DEST_TYPE.OBJ then
+				local v1 = NPCUtils.getTarget(obj)
+				if v1 then
+					p2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 159 | Upvalues: goToTargetPos (ref), v1 (copy) ]]
+						goToTargetPos(v1.Position)
+					end))
+					return true
+				else
+					return false
+				end
+			else
+				return false
+			end
+		end
+	end
+}

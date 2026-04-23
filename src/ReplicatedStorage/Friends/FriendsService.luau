@@ -1,75 +1,75 @@
-local Players_upvr = game:GetService("Players")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_upvr = {
-    friendsUpdated = require(ReplicatedStorage.Std.Signal).new();
-    _cachedLocal = {};
+local StarterGui = game:GetService("StarterGui")
+local FriendsConsts = require(ReplicatedStorage.Friends.FriendsConsts)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local t = {
+	friendsUpdated = require(ReplicatedStorage.Std.Signal).new(),
+	_cachedLocal = {}
 }
-function module_upvr.init() -- Line 12
-    module_upvr.monitorPlayer(Players_upvr.LocalPlayer)
+function t.init() --[[ Line: 12 | Upvalues: t (copy), Players (copy) ]]
+	t.monitorPlayer(Players.LocalPlayer)
 end
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-local FriendsConsts_upvr = require(ReplicatedStorage.Friends.FriendsConsts)
-local StarterGui_upvr = game:GetService("StarterGui")
-function module_upvr.monitorPlayer(arg1) -- Line 15
-    Interval_upvr.every(FriendsConsts_upvr.FRIEND_UPDATE_INTERVAL):Connect(function() -- Line 18
-        module_upvr.updateFriends(arg1)
-    end)
-    task.spawn(module_upvr.updateFriends, arg1)
-    pcall(function() -- Line 23
-        StarterGui_upvr:GetCore("PlayerFriendedEvent").Event:Connect(function(arg1_2) -- Line 24
-            local var10 = module_upvr._cachedLocal[arg1.UserId]
-            if var10 and not var10[arg1_2.UserId] then
-                var10[arg1_2.UserId] = true
-                module_upvr.friendsUpdated:Fire()
-            end
-        end)
-        StarterGui_upvr:GetCore("PlayerUnfriendedEvent").Event:Connect(function(arg1_3) -- Line 31
-            local var12 = module_upvr._cachedLocal[arg1.UserId]
-            if var12 and var12[arg1_3.UserId] then
-                var12[arg1_3.UserId] = nil
-                module_upvr.friendsUpdated:Fire()
-            end
-        end)
-    end)
+function t.monitorPlayer(p1) --[[ Line: 15 | Upvalues: Interval (copy), FriendsConsts (copy), t (copy), StarterGui (copy) ]]
+	Interval.every(FriendsConsts.FRIEND_UPDATE_INTERVAL):Connect(function() --[[ Line: 18 | Upvalues: t (ref), p1 (copy) ]]
+		t.updateFriends(p1)
+	end)
+	task.spawn(t.updateFriends, p1)
+	pcall(function() --[[ Line: 23 | Upvalues: StarterGui (ref), t (ref), p1 (copy) ]]
+		StarterGui:GetCore("PlayerFriendedEvent").Event:Connect(function(p12) --[[ Line: 24 | Upvalues: t (ref), p1 (ref) ]]
+			local v1 = t._cachedLocal[p1.UserId]
+			if v1 and not v1[p12.UserId] then
+				v1[p12.UserId] = true
+				t.friendsUpdated:Fire()
+			end
+		end)
+		StarterGui:GetCore("PlayerUnfriendedEvent").Event:Connect(function(p12) --[[ Line: 31 | Upvalues: t (ref), p1 (ref) ]]
+			local v1 = t._cachedLocal[p1.UserId]
+			if v1 and v1[p12.UserId] then
+				v1[p12.UserId] = nil
+				t.friendsUpdated:Fire()
+			end
+		end)
+	end)
 end
-function module_upvr.updateFriends(arg1) -- Line 40
-    if arg1 ~= Players_upvr.LocalPlayer then
-        error("Not meant to update friends for other players")
-        return
-    end
-    local tbl = {}
-    local pcall_result1, pcall_result2 = pcall(function() -- Line 46
-        return Players_upvr:GetFriendsAsync(arg1.UserId)
-    end)
-    if not pcall_result1 and module_upvr._cachedLocal[arg1.UserId] == nil then
-        module_upvr._cachedLocal[arg1.UserId] = {}
-        return module_upvr._cachedLocal[arg1.UserId]
-    end
-    while true do
-        for _, v in pcall_result2:GetCurrentPage() do
-            tbl[v.Id] = true
-        end
-        if pcall_result2.IsFinished then break end
-        pcall_result2:AdvanceToNextPageAsync()
-    end
-    module_upvr._cachedLocal[arg1.UserId] = tbl
-    module_upvr.friendsUpdated:Fire()
-    return module_upvr._cachedLocal[arg1.UserId]
+function t.updateFriends(p1) --[[ Line: 40 | Upvalues: Players (copy), t (copy) ]]
+	if p1 == Players.LocalPlayer then
+		local v1, v2 = pcall(function() --[[ Line: 46 | Upvalues: Players (ref), p1 (copy) ]]
+			return Players:GetFriendsAsync(p1.UserId)
+		end)
+		if v1 or t._cachedLocal[p1.UserId] ~= nil then
+			local t2 = {}
+			while true do
+				for v3, v4 in v2:GetCurrentPage() do
+					t2[v4.Id] = true
+				end
+				if v2.IsFinished then
+					t._cachedLocal[p1.UserId] = t2
+					t.friendsUpdated:Fire()
+					return t._cachedLocal[p1.UserId]
+				end
+				v2:AdvanceToNextPageAsync()
+			end
+		else
+			t._cachedLocal[p1.UserId] = {}
+			return t._cachedLocal[p1.UserId]
+		end
+	else
+		error("Not meant to update friends for other players")
+	end
 end
-function module_upvr.getIsFriendsWith(arg1, arg2, arg3) -- Line 66
-    if not arg1 then
-        warn("No player")
-        return false
-    end
-    if not module_upvr._cachedLocal[arg1.UserId] then
-        if arg3 then
-            return false
-        end
-        module_upvr.updateFriends(arg1)
-    end
-    if module_upvr._cachedLocal[arg1.UserId][arg2] ~= true then
-    else
-    end
-    return true
+function t.getIsFriendsWith(p1, p2, p3) --[[ Line: 66 | Upvalues: t (copy) ]]
+	if p1 then
+		if not t._cachedLocal[p1.UserId] then
+			if p3 then
+				return false
+			end
+			t.updateFriends(p1)
+		end
+		return t._cachedLocal[p1.UserId][p2] == true
+	else
+		warn("No player")
+		return false
+	end
 end
-return module_upvr
+return t

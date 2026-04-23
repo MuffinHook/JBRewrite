@@ -1,6 +1,73 @@
 {
   "className": "ParticleEmitter",
   "properties": {
+    "Rate": 4.0,
+    "Speed": {
+      "NumberRange": [
+        0.0,
+        0.0
+      ]
+    },
+    "Transparency": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 1.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.05,
+            "value": 0.25,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.75,
+            "value": 0.25,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 1.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "LightEmission": 1.0,
+    "Squash": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": -1.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": -1.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "LockedToPart": true,
+    "Rotation": {
+      "NumberRange": [
+        -90.0,
+        90.0
+      ]
+    },
+    "Lifetime": {
+      "NumberRange": [
+        2.0,
+        6.0
+      ]
+    },
+    "Texture": "rbxassetid://559157924",
     "Size": {
       "NumberSequence": {
         "keypoints": [
@@ -47,55 +114,6 @@
         ]
       }
     },
-    "Speed": {
-      "NumberRange": [
-        0.0,
-        0.0
-      ]
-    },
-    "Transparency": {
-      "NumberSequence": {
-        "keypoints": [
-          {
-            "time": 0.0,
-            "value": 1.0,
-            "envelope": 0.0
-          },
-          {
-            "time": 0.05,
-            "value": 0.25,
-            "envelope": 0.0
-          },
-          {
-            "time": 0.75,
-            "value": 0.25,
-            "envelope": 0.0
-          },
-          {
-            "time": 1.0,
-            "value": 1.0,
-            "envelope": 0.0
-          }
-        ]
-      }
-    },
-    "LockedToPart": true,
-    "Squash": {
-      "NumberSequence": {
-        "keypoints": [
-          {
-            "time": 0.0,
-            "value": -1.0,
-            "envelope": 0.0
-          },
-          {
-            "time": 1.0,
-            "value": -1.0,
-            "envelope": 0.0
-          }
-        ]
-      }
-    },
     "Color": {
       "ColorSequence": {
         "keypoints": [
@@ -118,29 +136,11 @@
         ]
       }
     },
-    "Lifetime": {
-      "NumberRange": [
-        2.0,
-        6.0
-      ]
-    },
-    "Rate": 4.0,
-    "LightEmission": 1.0,
     "RotSpeed": {
       "NumberRange": [
         -10.0,
         30.0
       ]
-    },
-    "Rotation": {
-      "NumberRange": [
-        -90.0,
-        90.0
-      ]
-    },
-    "FlipbookBlendFrames": {
-      "Bool": false
-    },
-    "Texture": "rbxassetid://559157924"
+    }
   }
 }

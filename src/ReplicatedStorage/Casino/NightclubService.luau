@@ -1,82 +1,55 @@
-local Players_upvr = game:GetService("Players")
-local module_upvr = {}
-local Audio_upvr = require(game:GetService("ReplicatedStorage").Std.Audio)
-function module_upvr.init() -- Line 8
-    local var4_upvw
-    local var5_upvw
-    Players_upvr.LocalPlayer:GetAttributeChangedSignal("NightclubMusicPlaying"):Connect(function() -- Line 11
-        if var5_upvw then
-            var5_upvw:cancel()
-            var5_upvw = nil
-        end
-        if var4_upvw then
-            local var7_upvr = var4_upvw
-            var4_upvw = nil
-            Audio_upvr.promiseFadeTo(var7_upvr, 0, 3):finally(function() -- Line 19
-                var7_upvr:Destroy()
-            end)
-        end
-        var7_upvr = module_upvr
-        var7_upvr = var7_upvr.isMusicPlaying()
-        if var7_upvr then
-            var7_upvr = Audio_upvr
-            var7_upvr = var7_upvr.ObjectLocal
-            var7_upvr = var7_upvr(Players_upvr.LocalPlayer.PlayerGui, 1839822990, {
-                Looped = true;
-                Volume = 0;
-            })
-            var4_upvw = var7_upvr
-            var7_upvr = var4_upvw
-            var7_upvr.SoundGroup = game:GetService("SoundService"):FindFirstChild("RobberyMusic")
-            var7_upvr = var4_upvw
-            var7_upvr.Name = "ClubMusic"
-            var7_upvr = Instance.new("ReverbSoundEffect")
-            local var10 = var7_upvr
-            var10.Enabled = module_upvr.isMusicMuffled()
-            var10.DecayTime = 5
-            var10.Parent = var4_upvw
-            var5_upvw = Audio_upvr.promiseFadeTo(var4_upvw, 0.4, 3):finally(function() -- Line 31
-                var5_upvw = nil
-            end)
-        end
-    end)
-    Players_upvr.LocalPlayer:GetAttributeChangedSignal("NightclubMusicMuffled"):Connect(function() -- Line 36
-        if var5_upvw then
-            var5_upvw:cancel()
-            var5_upvw = nil
-        end
-        local var14
-        if var4_upvw then
-            if module_upvr.isMusicMuffled() then
-                var14 = 0.04000000000000001
-            else
-                var14 = 0.4
-            end
-            function var14() -- Line 47
-                var5_upvw = nil
-            end
-            var5_upvw = Audio_upvr.promiseFadeTo(var4_upvw, var14, 0.1):finally(var14)
-            var14 = "ReverbSoundEffect"
-            var4_upvw:FindFirstChild(var14).Enabled = module_upvr.isMusicMuffled()
-        end
-    end)
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.Std.Audio)
+local t = {}
+function t.init() --[[ Line: 8 | Upvalues: Players (copy), Audio (copy), t (copy) ]]
+	local v1 = nil
+	local v2 = nil
+	Players.LocalPlayer:GetAttributeChangedSignal("NightclubMusicPlaying"):Connect(function() --[[ Line: 11 | Upvalues: v2 (ref), v1 (ref), Audio (ref), t (ref), Players (ref) ]]
+		if v2 then
+			v2:cancel()
+			v2 = nil
+		end
+		if v1 then
+			local v12 = v1
+			v1 = nil
+			Audio.promiseFadeTo(v12, 0, 3):finally(function() --[[ Line: 19 | Upvalues: v12 (copy) ]]
+				v12:Destroy()
+			end)
+		end
+		if t.isMusicPlaying() then
+			v1 = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 1839822990, {
+				Looped = true,
+				Volume = 0
+			})
+			v1.SoundGroup = game:GetService("SoundService"):FindFirstChild("RobberyMusic")
+			v1.Name = "ClubMusic"
+			local ReverbSoundEffect = Instance.new("ReverbSoundEffect")
+			ReverbSoundEffect.Enabled = t.isMusicMuffled()
+			ReverbSoundEffect.DecayTime = 5
+			ReverbSoundEffect.Parent = v1
+			v2 = Audio.promiseFadeTo(v1, 0.4, 3):finally(function() --[[ Line: 31 | Upvalues: v2 (ref) ]]
+				v2 = nil
+			end)
+		end
+	end)
+	Players.LocalPlayer:GetAttributeChangedSignal("NightclubMusicMuffled"):Connect(function() --[[ Line: 36 | Upvalues: v2 (ref), v1 (ref), Audio (ref), t (ref) ]]
+		if v2 then
+			v2:cancel()
+			v2 = nil
+		end
+		if v1 then
+			v2 = Audio.promiseFadeTo(v1, if t.isMusicMuffled() then 0.04000000000000001 else 0.4, 0.1):finally(function() --[[ Line: 47 | Upvalues: v2 (ref) ]]
+				v2 = nil
+			end)
+			v1:FindFirstChild("ReverbSoundEffect").Enabled = t.isMusicMuffled()
+		end
+	end)
 end
-function module_upvr.isMusicPlaying() -- Line 56
-    local var15
-    if Players_upvr.LocalPlayer:GetAttribute("NightclubMusicPlaying") ~= true then
-        var15 = false
-    else
-        var15 = true
-    end
-    return var15
+function t.isMusicPlaying() --[[ Line: 56 | Upvalues: Players (copy) ]]
+	return Players.LocalPlayer:GetAttribute("NightclubMusicPlaying") == true
 end
-function module_upvr.isMusicMuffled() -- Line 59
-    local var16
-    if Players_upvr.LocalPlayer:GetAttribute("NightclubMusicMuffled") ~= true then
-        var16 = false
-    else
-        var16 = true
-    end
-    return var16
+function t.isMusicMuffled() --[[ Line: 59 | Upvalues: Players (copy) ]]
+	return Players.LocalPlayer:GetAttribute("NightclubMusicMuffled") == true
 end
-return module_upvr
+return t

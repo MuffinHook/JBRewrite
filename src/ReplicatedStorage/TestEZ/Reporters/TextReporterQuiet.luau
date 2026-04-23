@@ -1,56 +1,53 @@
-local TestEnum_upvr = require(script.Parent.Parent.TestEnum)
-local tbl_upvr = {
-    [TestEnum_upvr.TestStatus.Success] = '+';
-    [TestEnum_upvr.TestStatus.Failure] = '-';
-    [TestEnum_upvr.TestStatus.Skipped] = '~';
+local TestService = game:GetService("TestService")
+local TestEnum = require(script.Parent.Parent.TestEnum)
+local v1 = (" "):rep(3)
+local t = {
+	[TestEnum.TestStatus.Success] = "+",
+	[TestEnum.TestStatus.Failure] = "-",
+	[TestEnum.TestStatus.Skipped] = "~"
 }
-local module = {}
-local any_rep_result1_upvr = ' ':rep(3)
-local function reportNode_upvr(arg1, arg2, arg3) -- Line 22, Named "reportNode"
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var13 = arg2
-    if not var13 then
-        var13 = {}
-    end
-    local var14 = var13
-    local var15 = arg3 or 0
-    if arg1.status == TestEnum_upvr.TestStatus.Skipped then
-        return var14
-    end
-    local var16
-    if arg1.status ~= TestEnum_upvr.TestStatus.Success then
-        var16 = string.format("%s[%s] %s", any_rep_result1_upvr:rep(var15), tbl_upvr[arg1.status] or '?', arg1.planNode.phrase)
-    end
-    table.insert(var14, var16)
-    for _, v in ipairs(arg1.children) do
-        reportNode_upvr(v, var14, var15 + 1)
-        local var20
-    end
-    return var20
+local t2 = {}
+local function v2(p1, p2, p3) --[[ Line: 22 | Upvalues: TestEnum (copy), t (copy), v1 (copy), v2 (copy) ]]
+	local v12 = p2 or {}
+	local v22 = p3 or 0
+	if p1.status == TestEnum.TestStatus.Skipped then
+		return v12
+	else
+		table.insert(v12, if p1.status == TestEnum.TestStatus.Success then nil else ("%s[%s] %s"):format(v1:rep(v22), t[p1.status] or "?", p1.planNode.phrase))
+		local v6 = v12
+		for i, v in ipairs(p1.children) do
+			v2(v, v6, v22 + 1)
+		end
+		return v6
+	end
 end
-local function reportRoot_upvr(arg1) -- Line 51, Named "reportRoot"
-    local module_2 = {}
-    for _, v_2 in ipairs(arg1.children) do
-        reportNode_upvr(v_2, module_2, 0)
-    end
-    return module_2
+local function reportRoot(p1) --[[ Line: 51 | Upvalues: v2 (copy) ]]
+	local t = {}
+	for i, v in ipairs(p1.children) do
+		v2(v, t, 0)
+	end
+	return t
 end
-local function report(arg1) -- Line 61
-    return table.concat(reportRoot_upvr(arg1), '\n')
+local function report(p1) --[[ Line: 61 | Upvalues: reportRoot (copy) ]]
+	return table.concat(reportRoot(p1), "\n")
 end
-local TestService_upvr = game:GetService("TestService")
-function module.report(arg1) -- Line 67
-    print(table.concat({"Test results:", table.concat(reportRoot_upvr(arg1), '\n'), string.format("%d passed, %d failed, %d skipped", arg1.successCount, arg1.failureCount, arg1.skippedCount)}, '\n'))
-    if 0 < arg1.failureCount then
-        print(string.format("%d test nodes reported failures.", arg1.failureCount))
-    end
-    if 0 < #arg1.errors then
-        print("Errors reported by tests:")
-        print("")
-        for _, v_3 in ipairs(arg1.errors) do
-            TestService_upvr:Error(v_3)
-            print("")
-        end
-    end
+function t2.report(p1) --[[ Line: 67 | Upvalues: reportRoot (copy), TestService (copy) ]]
+	local t = {}
+	local v1 = reportRoot(p1)
+	t[1] = "Test results:"
+	t[2] = table.concat(v1, "\n")
+	t[3] = ("%d passed, %d failed, %d skipped"):format(p1.successCount, p1.failureCount, p1.skippedCount)
+	print(table.concat(t, "\n"))
+	if p1.failureCount > 0 then
+		print(("%d test nodes reported failures."):format(p1.failureCount))
+	end
+	if #p1.errors > 0 then
+		print("Errors reported by tests:")
+		print("")
+		for i, v in ipairs(p1.errors) do
+			TestService:Error(v)
+			print("")
+		end
+	end
 end
-return module
+return t2

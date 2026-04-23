@@ -1,786 +1,732 @@
-local module_upvr = {
-    EGAResourceFlowType = require(script.GAResourceFlowType);
-    EGAProgressionStatus = require(script.GAProgressionStatus);
-    EGAErrorSeverity = require(script.GAErrorSeverity);
+local t = {
+	EGAResourceFlowType = require(script.GAResourceFlowType),
+	EGAProgressionStatus = require(script.GAProgressionStatus),
+	EGAErrorSeverity = require(script.GAErrorSeverity)
 }
-local Logger_upvr = require(script.Logger)
-local Threading_upvr = require(script.Threading)
-local State_upvr = require(script.State)
-local Validation_upvr = require(script.Validation)
-local Store_upvr = require(script.Store)
-local Events_upvr = require(script.Events)
-local Players_upvr = game:GetService("Players")
-local MarketplaceService_upvr = game:GetService("MarketplaceService")
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local tbl_6_upvr = {}
-local tbl_20_upvw = {}
-local tbl_5_upvw = {}
-local tbl_8_upvw = {}
-local tbl_9_upvw = {}
-local tbl_3_upvr = {}
-local function addToInitializationQueue_upvr(arg1, ...) -- Line 36, Named "addToInitializationQueue"
-    if tbl_9_upvw ~= nil then
-        local tbl_4 = {}
-        tbl_4.Func = arg1
-        tbl_4.Args = {...}
-        table.insert(tbl_9_upvw, tbl_4)
-        Logger_upvr:i("Added event to initialization queue")
-    else
-        Logger_upvr:w("Initialization queue already cleared.")
-    end
+local Logger = require(script.Logger)
+local Threading = require(script.Threading)
+local State = require(script.State)
+local Validation = require(script.Validation)
+local Store = require(script.Store)
+local Events = require(script.Events)
+local Utilities = require(script.Utilities)
+local Players = game:GetService("Players")
+local MarketplaceService = game:GetService("MarketplaceService")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalizationService = game:GetService("LocalizationService")
+local ScriptContext = game:GetService("ScriptContext")
+local Postie = require(script.Postie)
+local v1 = nil
+local t2 = {}
+local t3 = {}
+local t4 = {}
+local t5 = {}
+local t6 = {}
+local t7 = {}
+local function addToInitializationQueue(p1, ...) --[[ Line: 36 | Upvalues: t6 (ref), Logger (copy) ]]
+	if t6 == nil then
+		Logger:w("Initialization queue already cleared.")
+	else
+		table.insert(t6, {
+			Func = p1,
+			Args = { ... }
+		})
+		Logger:i("Added event to initialization queue")
+	end
 end
-local function addToInitializationQueueByUserId_upvr(arg1, arg2, ...) -- Line 50, Named "addToInitializationQueueByUserId"
-    if not module_upvr:isPlayerReady(arg1) then
-        if tbl_3_upvr[arg1] == nil then
-            tbl_3_upvr[arg1] = {}
-        end
-        local tbl_12 = {}
-        tbl_12.Func = arg2
-        tbl_12.Args = {...}
-        table.insert(tbl_3_upvr[arg1], tbl_12)
-        Logger_upvr:i("Added event to player initialization queue")
-    else
-        Logger_upvr:w("Player initialization queue already cleared.")
-    end
+local function addToInitializationQueueByUserId(p1, p2, ...) --[[ Line: 50 | Upvalues: t (copy), t7 (copy), Logger (copy) ]]
+	if t:isPlayerReady(p1) then
+		Logger:w("Player initialization queue already cleared.")
+	else
+		if t7[p1] == nil then
+			t7[p1] = {}
+		end
+		table.insert(t7[p1], {
+			Func = p2,
+			Args = { ... }
+		})
+		Logger:i("Added event to player initialization queue")
+	end
 end
-local function isSdkReady_upvr(arg1) -- Line 70, Named "isSdkReady"
-    local var21 = arg1.playerId or nil
-    local var22 = arg1.needsInitialized or true
-    if var22 and not State_upvr.Initialized then
-        if arg1.shouldWarn or false then
-            Logger_upvr:w((arg1.message or "").." SDK is not initialized")
-        end
-        return false
-    end
-    if var22 and var21 and not State_upvr:isEnabled(var21) then
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        if arg1.shouldWarn or false then
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            Logger_upvr:w((arg1.message or "").." SDK is disabled")
-        end
-        return false
-    end
-    if var22 and var21 and not State_upvr:sessionIsStarted(var21) then
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        if arg1.shouldWarn or false then
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            Logger_upvr:w((arg1.message or "").." Session has not started yet")
-        end
-        return false
-    end
-    return true
+local function isSdkReady(p1) --[[ Line: 70 | Upvalues: State (copy), Logger (copy) ]]
+	local v1 = p1.playerId or nil
+	local v2 = p1.needsInitialized or true
+	local v3 = p1.shouldWarn or false
+	local v4 = p1.message or ""
+	if v2 and not State.Initialized then
+		if v3 then
+			Logger:w(v4 .. " SDK is not initialized")
+		end
+	elseif v2 and (v1 and not State:isEnabled(v1)) then
+		if v3 then
+			Logger:w(v4 .. " SDK is disabled")
+		end
+	elseif v2 and (v1 and not State:sessionIsStarted(v1)) then
+		if v3 then
+			Logger:w(v4 .. " Session has not started yet")
+		end
+	else
+		return true
+	end
+	return false
 end
-function module_upvr.configureAvailableCustomDimensions01(arg1, arg2) -- Line 106
-    if isSdkReady_upvr({
-        needsInitialized = true;
-        shouldWarn = false;
-    }) then
-        Logger_upvr:w("Available custom dimensions must be set before SDK is initialized")
-    else
-        State_upvr:setAvailableCustomDimensions01(arg2)
-    end
+function t.configureAvailableCustomDimensions01(p1, p2) --[[ Line: 106 | Upvalues: isSdkReady (copy), Logger (copy), State (copy) ]]
+	if isSdkReady({
+		needsInitialized = true,
+		shouldWarn = false
+	}) then
+		Logger:w("Available custom dimensions must be set before SDK is initialized")
+	else
+		State:setAvailableCustomDimensions01(p2)
+	end
 end
-function module_upvr.configureAvailableCustomDimensions02(arg1, arg2) -- Line 115
-    if isSdkReady_upvr({
-        needsInitialized = true;
-        shouldWarn = false;
-    }) then
-        Logger_upvr:w("Available custom dimensions must be set before SDK is initialized")
-    else
-        State_upvr:setAvailableCustomDimensions02(arg2)
-    end
+function t.configureAvailableCustomDimensions02(p1, p2) --[[ Line: 115 | Upvalues: isSdkReady (copy), Logger (copy), State (copy) ]]
+	if isSdkReady({
+		needsInitialized = true,
+		shouldWarn = false
+	}) then
+		Logger:w("Available custom dimensions must be set before SDK is initialized")
+	else
+		State:setAvailableCustomDimensions02(p2)
+	end
 end
-function module_upvr.configureAvailableCustomDimensions03(arg1, arg2) -- Line 124
-    if isSdkReady_upvr({
-        needsInitialized = true;
-        shouldWarn = false;
-    }) then
-        Logger_upvr:w("Available custom dimensions must be set before SDK is initialized")
-    else
-        State_upvr:setAvailableCustomDimensions03(arg2)
-    end
+function t.configureAvailableCustomDimensions03(p1, p2) --[[ Line: 124 | Upvalues: isSdkReady (copy), Logger (copy), State (copy) ]]
+	if isSdkReady({
+		needsInitialized = true,
+		shouldWarn = false
+	}) then
+		Logger:w("Available custom dimensions must be set before SDK is initialized")
+	else
+		State:setAvailableCustomDimensions03(p2)
+	end
 end
-function module_upvr.configureAvailableResourceCurrencies(arg1, arg2) -- Line 133
-    if isSdkReady_upvr({
-        needsInitialized = true;
-        shouldWarn = false;
-    }) then
-        Logger_upvr:w("Available resource currencies must be set before SDK is initialized")
-    else
-        Events_upvr:setAvailableResourceCurrencies(arg2)
-    end
+function t.configureAvailableResourceCurrencies(p1, p2) --[[ Line: 133 | Upvalues: isSdkReady (copy), Logger (copy), Events (copy) ]]
+	if isSdkReady({
+		needsInitialized = true,
+		shouldWarn = false
+	}) then
+		Logger:w("Available resource currencies must be set before SDK is initialized")
+	else
+		Events:setAvailableResourceCurrencies(p2)
+	end
 end
-function module_upvr.configureAvailableResourceItemTypes(arg1, arg2) -- Line 142
-    if isSdkReady_upvr({
-        needsInitialized = true;
-        shouldWarn = false;
-    }) then
-        Logger_upvr:w("Available resource item types must be set before SDK is initialized")
-    else
-        Events_upvr:setAvailableResourceItemTypes(arg2)
-    end
+function t.configureAvailableResourceItemTypes(p1, p2) --[[ Line: 142 | Upvalues: isSdkReady (copy), Logger (copy), Events (copy) ]]
+	if isSdkReady({
+		needsInitialized = true,
+		shouldWarn = false
+	}) then
+		Logger:w("Available resource item types must be set before SDK is initialized")
+	else
+		Events:setAvailableResourceItemTypes(p2)
+	end
 end
-function module_upvr.configureBuild(arg1, arg2) -- Line 151
-    if isSdkReady_upvr({
-        needsInitialized = true;
-        shouldWarn = false;
-    }) then
-        Logger_upvr:w("Build version must be set before SDK is initialized.")
-    else
-        Events_upvr:setBuild(arg2)
-    end
+function t.configureBuild(p1, p2) --[[ Line: 151 | Upvalues: isSdkReady (copy), Logger (copy), Events (copy) ]]
+	if isSdkReady({
+		needsInitialized = true,
+		shouldWarn = false
+	}) then
+		Logger:w("Build version must be set before SDK is initialized.")
+	else
+		Events:setBuild(p2)
+	end
 end
-function module_upvr.configureAvailableGamepasses(arg1, arg2) -- Line 160
-    if isSdkReady_upvr({
-        needsInitialized = true;
-        shouldWarn = false;
-    }) then
-        Logger_upvr:w("Available gamepasses must be set before SDK is initialized.")
-    else
-        State_upvr:setAvailableGamepasses(arg2)
-    end
+function t.configureAvailableGamepasses(p1, p2) --[[ Line: 160 | Upvalues: isSdkReady (copy), Logger (copy), State (copy) ]]
+	if isSdkReady({
+		needsInitialized = true,
+		shouldWarn = false
+	}) then
+		Logger:w("Available gamepasses must be set before SDK is initialized.")
+	else
+		State:setAvailableGamepasses(p2)
+	end
 end
-function module_upvr.startNewSession(arg1, arg2, arg3) -- Line 169
-    Threading_upvr:performTaskOnGAThread(function() -- Line 170
-        if not State_upvr:isEventSubmissionEnabled() then
-        else
-            if not State_upvr.Initialized then
-                Logger_upvr:w("Cannot start new session. SDK is not initialized yet.")
-                return
-            end
-            State_upvr:startNewSession(arg2, arg3)
-        end
-    end)
+function t.startNewSession(p1, p2, p3) --[[ Line: 169 | Upvalues: Threading (copy), State (copy), Logger (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 170 | Upvalues: State (ref), Logger (ref), p2 (copy), p3 (copy) ]]
+		if State:isEventSubmissionEnabled() then
+			if State.Initialized then
+				State:startNewSession(p2, p3)
+			else
+				Logger:w("Cannot start new session. SDK is not initialized yet.")
+			end
+		end
+	end)
 end
-function module_upvr.endSession(arg1, arg2) -- Line 184
-    Threading_upvr:performTaskOnGAThread(function() -- Line 185
-        if not State_upvr:isEventSubmissionEnabled() then
-        else
-            State_upvr:endSession(arg2)
-        end
-    end)
+function t.endSession(p1, p2) --[[ Line: 184 | Upvalues: Threading (copy), State (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 185 | Upvalues: State (ref), p2 (copy) ]]
+		if State:isEventSubmissionEnabled() then
+			State:endSession(p2)
+		end
+	end)
 end
-function module_upvr.filterForBusinessEvent(arg1, arg2) -- Line 193
-    return string.gsub(arg2, "[^A-Za-z0-9%s%-_%.%(%)!%?]", "")
+function t.filterForBusinessEvent(p1, p2) --[[ Line: 193 ]]
+	return string.gsub(p2, "[^A-Za-z0-9%s%-_%.%(%)!%?]", "")
 end
-function module_upvr.addBusinessEvent(arg1, arg2, arg3) -- Line 197
-    Threading_upvr:performTaskOnGAThread(function() -- Line 198
-        if not State_upvr:isEventSubmissionEnabled() then
-        else
-            local tbl_2 = {}
-            tbl_2.playerId = arg2
-            tbl_2.needsInitialized = true
-            tbl_2.shouldWarn = false
-            tbl_2.message = "Could not add business event"
-            if not isSdkReady_upvr(tbl_2) then
-                if arg2 then
-                    addToInitializationQueueByUserId_upvr(arg2, module_upvr.addBusinessEvent, module_upvr, arg2, arg3)
-                else
-                    addToInitializationQueue_upvr(module_upvr.addBusinessEvent, module_upvr, arg2, arg3)
-                end
-            end
-            local var34 = arg3.itemType or ""
-            local var35 = arg3.cartType or ""
-            Events_upvr:addBusinessEvent(arg2, "USD", math.floor((arg3.amount or 0) * 0.7 * 0.35), var34, arg3.itemId or "", var35)
-            if var34 == "Gamepass" and var35 ~= "Website" then
-                local any_GetPlayerDataFromCache_result1 = Store_upvr:GetPlayerDataFromCache(arg2)
-                if not any_GetPlayerDataFromCache_result1.OwnedGamepasses then
-                    any_GetPlayerDataFromCache_result1.OwnedGamepasses = {}
-                end
-                table.insert(any_GetPlayerDataFromCache_result1.OwnedGamepasses, arg3.gamepassId or nil)
-                Store_upvr.PlayerCache[arg2] = any_GetPlayerDataFromCache_result1
-                Store_upvr:SavePlayerData(Players_upvr:GetPlayerByUserId(arg2))
-            end
-        end
-    end)
+function t.addBusinessEvent(p1, p2, p3) --[[ Line: 197 | Upvalues: Threading (copy), State (copy), isSdkReady (copy), addToInitializationQueueByUserId (copy), t (copy), addToInitializationQueue (copy), Events (copy), Players (copy), Store (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 198 | Upvalues: State (ref), isSdkReady (ref), p2 (copy), addToInitializationQueueByUserId (ref), t (ref), p3 (copy), addToInitializationQueue (ref), Events (ref), Players (ref), Store (ref) ]]
+		if State:isEventSubmissionEnabled() then
+			if isSdkReady({
+				playerId = p2,
+				needsInitialized = true,
+				shouldWarn = false,
+				message = "Could not add business event"
+			}) then
+				local v2 = p3.itemType or ""
+				local v4 = p3.cartType or ""
+				local v5 = math.floor((p3.amount or 0) * 0.7 * 0.35)
+				local v6 = p3.gamepassId or nil
+				Events:addBusinessEvent(p2, "USD", v5, v2, p3.itemId or "", v4)
+				if v2 == "Gamepass" and v4 ~= "Website" then
+					local v7 = Players:GetPlayerByUserId(p2)
+					local v8 = Store:GetPlayerDataFromCache(p2)
+					if not v8.OwnedGamepasses then
+						v8.OwnedGamepasses = {}
+					end
+					table.insert(v8.OwnedGamepasses, v6)
+					Store.PlayerCache[p2] = v8
+					Store:SavePlayerData(v7)
+				end
+			elseif p2 then
+				addToInitializationQueueByUserId(p2, t.addBusinessEvent, t, p2, p3)
+			else
+				addToInitializationQueue(t.addBusinessEvent, t, p2, p3)
+			end
+		end
+	end)
 end
-function module_upvr.addResourceEvent(arg1, arg2, arg3) -- Line 234
-    Threading_upvr:performTaskOnGAThread(function() -- Line 235
-        if not State_upvr:isEventSubmissionEnabled() then
-        else
-            local tbl_18 = {}
-            tbl_18.playerId = arg2
-            tbl_18.needsInitialized = true
-            tbl_18.shouldWarn = false
-            tbl_18.message = "Could not add resource event"
-            if not isSdkReady_upvr(tbl_18) then
-                if arg2 then
-                    addToInitializationQueueByUserId_upvr(arg2, module_upvr.addResourceEvent, module_upvr, arg2, arg3)
-                else
-                    addToInitializationQueue_upvr(module_upvr.addResourceEvent, module_upvr, arg2, arg3)
-                end
-            end
-            Events_upvr:addResourceEvent(arg2, arg3.flowType or 0, arg3.currency or "", arg3.amount or 0, arg3.itemType or "", arg3.itemId or "")
-        end
-    end)
+function t.addResourceEvent(p1, p2, p3) --[[ Line: 234 | Upvalues: Threading (copy), State (copy), isSdkReady (copy), addToInitializationQueueByUserId (copy), t (copy), addToInitializationQueue (copy), Events (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 235 | Upvalues: State (ref), isSdkReady (ref), p2 (copy), addToInitializationQueueByUserId (ref), t (ref), p3 (copy), addToInitializationQueue (ref), Events (ref) ]]
+		if State:isEventSubmissionEnabled() then
+			if isSdkReady({
+				playerId = p2,
+				needsInitialized = true,
+				shouldWarn = false,
+				message = "Could not add resource event"
+			}) then
+				Events:addResourceEvent(p2, p3.flowType or 0, p3.currency or "", p3.amount or 0, p3.itemType or "", p3.itemId or "")
+			elseif p2 then
+				addToInitializationQueueByUserId(p2, t.addResourceEvent, t, p2, p3)
+			else
+				addToInitializationQueue(t.addResourceEvent, t, p2, p3)
+			end
+		end
+	end)
 end
-function module_upvr.addProgressionEvent(arg1, arg2, arg3) -- Line 259
-    Threading_upvr:performTaskOnGAThread(function() -- Line 260
-        if not State_upvr:isEventSubmissionEnabled() then
-        else
-            local tbl_19 = {}
-            tbl_19.playerId = arg2
-            tbl_19.needsInitialized = true
-            tbl_19.shouldWarn = false
-            tbl_19.message = "Could not add progression event"
-            if not isSdkReady_upvr(tbl_19) then
-                if arg2 then
-                    addToInitializationQueueByUserId_upvr(arg2, module_upvr.addProgressionEvent, module_upvr, arg2, arg3)
-                else
-                    addToInitializationQueue_upvr(module_upvr.addProgressionEvent, module_upvr, arg2, arg3)
-                end
-            end
-            Events_upvr:addProgressionEvent(arg2, arg3.progressionStatus or 0, arg3.progression01 or "", arg3.progression02 or nil, arg3.progression03 or nil, arg3.score or nil)
-        end
-    end)
+function t.addProgressionEvent(p1, p2, p3) --[[ Line: 259 | Upvalues: Threading (copy), State (copy), isSdkReady (copy), addToInitializationQueueByUserId (copy), t (copy), addToInitializationQueue (copy), Events (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 260 | Upvalues: State (ref), isSdkReady (ref), p2 (copy), addToInitializationQueueByUserId (ref), t (ref), p3 (copy), addToInitializationQueue (ref), Events (ref) ]]
+		if State:isEventSubmissionEnabled() then
+			if isSdkReady({
+				playerId = p2,
+				needsInitialized = true,
+				shouldWarn = false,
+				message = "Could not add progression event"
+			}) then
+				Events:addProgressionEvent(p2, p3.progressionStatus or 0, p3.progression01 or "", p3.progression02 or nil, p3.progression03 or nil, p3.score or nil)
+			elseif p2 then
+				addToInitializationQueueByUserId(p2, t.addProgressionEvent, t, p2, p3)
+			else
+				addToInitializationQueue(t.addProgressionEvent, t, p2, p3)
+			end
+		end
+	end)
 end
-function module_upvr.addDesignEvent(arg1, arg2, arg3) -- Line 284
-    Threading_upvr:performTaskOnGAThread(function() -- Line 285
-        if not State_upvr:isEventSubmissionEnabled() then
-        else
-            local tbl_7 = {}
-            tbl_7.playerId = arg2
-            tbl_7.needsInitialized = true
-            tbl_7.shouldWarn = false
-            tbl_7.message = "Could not add design event"
-            if not isSdkReady_upvr(tbl_7) then
-                if arg2 then
-                    addToInitializationQueueByUserId_upvr(arg2, module_upvr.addDesignEvent, module_upvr, arg2, arg3)
-                else
-                    addToInitializationQueue_upvr(module_upvr.addDesignEvent, module_upvr, arg2, arg3)
-                end
-            end
-            Events_upvr:addDesignEvent(arg2, arg3.eventId or "", arg3.value or nil)
-        end
-    end)
+function t.addDesignEvent(p1, p2, p3) --[[ Line: 284 | Upvalues: Threading (copy), State (copy), isSdkReady (copy), addToInitializationQueueByUserId (copy), t (copy), addToInitializationQueue (copy), Events (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 285 | Upvalues: State (ref), isSdkReady (ref), p2 (copy), addToInitializationQueueByUserId (ref), t (ref), p3 (copy), addToInitializationQueue (ref), Events (ref) ]]
+		if State:isEventSubmissionEnabled() then
+			if isSdkReady({
+				playerId = p2,
+				needsInitialized = true,
+				shouldWarn = false,
+				message = "Could not add design event"
+			}) then
+				Events:addDesignEvent(p2, p3.eventId or "", p3.value or nil)
+			elseif p2 then
+				addToInitializationQueueByUserId(p2, t.addDesignEvent, t, p2, p3)
+			else
+				addToInitializationQueue(t.addDesignEvent, t, p2, p3)
+			end
+		end
+	end)
 end
-function module_upvr.addErrorEvent(arg1, arg2, arg3) -- Line 306
-    Threading_upvr:performTaskOnGAThread(function() -- Line 307
-        if not State_upvr:isEventSubmissionEnabled() then
-        else
-            local tbl_21 = {}
-            tbl_21.playerId = arg2
-            tbl_21.needsInitialized = true
-            tbl_21.shouldWarn = false
-            tbl_21.message = "Could not add error event"
-            if not isSdkReady_upvr(tbl_21) then
-                if arg2 then
-                    addToInitializationQueueByUserId_upvr(arg2, module_upvr.addErrorEvent, module_upvr, arg2, arg3)
-                else
-                    addToInitializationQueue_upvr(module_upvr.addErrorEvent, module_upvr, arg2, arg3)
-                end
-            end
-            Events_upvr:addErrorEvent(arg2, arg3.severity or 0, arg3.message or "")
-        end
-    end)
+function t.addErrorEvent(p1, p2, p3) --[[ Line: 306 | Upvalues: Threading (copy), State (copy), isSdkReady (copy), addToInitializationQueueByUserId (copy), t (copy), addToInitializationQueue (copy), Events (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 307 | Upvalues: State (ref), isSdkReady (ref), p2 (copy), addToInitializationQueueByUserId (ref), t (ref), p3 (copy), addToInitializationQueue (ref), Events (ref) ]]
+		if State:isEventSubmissionEnabled() then
+			if isSdkReady({
+				playerId = p2,
+				needsInitialized = true,
+				shouldWarn = false,
+				message = "Could not add error event"
+			}) then
+				Events:addErrorEvent(p2, p3.severity or 0, p3.message or "")
+			elseif p2 then
+				addToInitializationQueueByUserId(p2, t.addErrorEvent, t, p2, p3)
+			else
+				addToInitializationQueue(t.addErrorEvent, t, p2, p3)
+			end
+		end
+	end)
 end
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.setEnabledDebugLog(arg1, arg2) -- Line 328
-    if RunService_upvr:IsStudio() then
-        if arg2 then
-            Logger_upvr:setDebugLog(arg2)
-            Logger_upvr:i("Debug logging enabled")
-        else
-            Logger_upvr:i("Debug logging disabled")
-            Logger_upvr:setDebugLog(arg2)
-        end
-    end
-    Logger_upvr:i("setEnabledDebugLog can only be used in studio")
+function t.setEnabledDebugLog(p1, p2) --[[ Line: 328 | Upvalues: RunService (copy), Logger (copy) ]]
+	if RunService:IsStudio() then
+		if p2 then
+			Logger:setDebugLog(p2)
+			Logger:i("Debug logging enabled")
+		else
+			Logger:i("Debug logging disabled")
+			Logger:setDebugLog(p2)
+		end
+	else
+		Logger:i("setEnabledDebugLog can only be used in studio")
+	end
 end
-function module_upvr.setEnabledInfoLog(arg1, arg2) -- Line 342
-    if arg2 then
-        Logger_upvr:setInfoLog(arg2)
-        Logger_upvr:i("Info logging enabled")
-    else
-        Logger_upvr:i("Info logging disabled")
-        Logger_upvr:setInfoLog(arg2)
-    end
+function t.setEnabledInfoLog(p1, p2) --[[ Line: 342 | Upvalues: Logger (copy) ]]
+	if p2 then
+		Logger:setInfoLog(p2)
+		Logger:i("Info logging enabled")
+	else
+		Logger:i("Info logging disabled")
+		Logger:setInfoLog(p2)
+	end
 end
-function module_upvr.setEnabledVerboseLog(arg1, arg2) -- Line 352
-    if arg2 then
-        Logger_upvr:setVerboseLog(arg2)
-        Logger_upvr:ii("Verbose logging enabled")
-    else
-        Logger_upvr:ii("Verbose logging disabled")
-        Logger_upvr:setVerboseLog(arg2)
-    end
+function t.setEnabledVerboseLog(p1, p2) --[[ Line: 352 | Upvalues: Logger (copy) ]]
+	if p2 then
+		Logger:setVerboseLog(p2)
+		Logger:ii("Verbose logging enabled")
+	else
+		Logger:ii("Verbose logging disabled")
+		Logger:setVerboseLog(p2)
+	end
 end
-function module_upvr.setEnabledEventSubmission(arg1, arg2) -- Line 363
-    Threading_upvr:performTaskOnGAThread(function() -- Line 364
-        if arg2 then
-            State_upvr:setEventSubmission(arg2)
-            Logger_upvr:i("Event submission enabled")
-        else
-            Logger_upvr:i("Event submission disabled")
-            State_upvr:setEventSubmission(arg2)
-        end
-    end)
+function t.setEnabledEventSubmission(p1, p2) --[[ Line: 363 | Upvalues: Threading (copy), State (copy), Logger (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 364 | Upvalues: p2 (copy), State (ref), Logger (ref) ]]
+		if p2 then
+			State:setEventSubmission(p2)
+			Logger:i("Event submission enabled")
+		else
+			Logger:i("Event submission disabled")
+			State:setEventSubmission(p2)
+		end
+	end)
 end
-function module_upvr.setCustomDimension01(arg1, arg2, arg3) -- Line 375
-    Threading_upvr:performTaskOnGAThread(function() -- Line 376
-        if not Validation_upvr:validateDimension(State_upvr._availableCustomDimensions01, arg3) then
-            Logger_upvr:w("Could not set custom01 dimension value to '"..arg3.."'. Value not found in available custom01 dimension values")
-        else
-            local tbl_13 = {}
-            tbl_13.playerId = arg2
-            tbl_13.needsInitialized = true
-            tbl_13.shouldWarn = true
-            tbl_13.message = "Could not set custom01 dimension"
-            if not isSdkReady_upvr(tbl_13) then return end
-            State_upvr:setCustomDimension01(arg2, arg3)
-        end
-    end)
+function t.setCustomDimension01(p1, p2, p3) --[[ Line: 375 | Upvalues: Threading (copy), Validation (copy), State (copy), Logger (copy), isSdkReady (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 376 | Upvalues: Validation (ref), State (ref), p3 (copy), Logger (ref), isSdkReady (ref), p2 (copy) ]]
+		if Validation:validateDimension(State._availableCustomDimensions01, p3) then
+			if isSdkReady({
+				playerId = p2,
+				needsInitialized = true,
+				shouldWarn = true,
+				message = "Could not set custom01 dimension"
+			}) then
+				State:setCustomDimension01(p2, p3)
+			end
+		else
+			Logger:w("Could not set custom01 dimension value to \'" .. p3 .. "\'. Value not found in available custom01 dimension values")
+		end
+	end)
 end
-function module_upvr.setCustomDimension02(arg1, arg2, arg3) -- Line 390
-    Threading_upvr:performTaskOnGAThread(function() -- Line 391
-        if not Validation_upvr:validateDimension(State_upvr._availableCustomDimensions02, arg3) then
-            Logger_upvr:w("Could not set custom02 dimension value to '"..arg3.."'. Value not found in available custom02 dimension values")
-        else
-            local tbl_17 = {}
-            tbl_17.playerId = arg2
-            tbl_17.needsInitialized = true
-            tbl_17.shouldWarn = true
-            tbl_17.message = "Could not set custom02 dimension"
-            if not isSdkReady_upvr(tbl_17) then return end
-            State_upvr:setCustomDimension02(arg2, arg3)
-        end
-    end)
+function t.setCustomDimension02(p1, p2, p3) --[[ Line: 390 | Upvalues: Threading (copy), Validation (copy), State (copy), Logger (copy), isSdkReady (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 391 | Upvalues: Validation (ref), State (ref), p3 (copy), Logger (ref), isSdkReady (ref), p2 (copy) ]]
+		if Validation:validateDimension(State._availableCustomDimensions02, p3) then
+			if isSdkReady({
+				playerId = p2,
+				needsInitialized = true,
+				shouldWarn = true,
+				message = "Could not set custom02 dimension"
+			}) then
+				State:setCustomDimension02(p2, p3)
+			end
+		else
+			Logger:w("Could not set custom02 dimension value to \'" .. p3 .. "\'. Value not found in available custom02 dimension values")
+		end
+	end)
 end
-function module_upvr.setCustomDimension03(arg1, arg2, arg3) -- Line 405
-    Threading_upvr:performTaskOnGAThread(function() -- Line 406
-        if not Validation_upvr:validateDimension(State_upvr._availableCustomDimensions03, arg3) then
-            Logger_upvr:w("Could not set custom03 dimension value to '"..arg3.."'. Value not found in available custom03 dimension values")
-        else
-            local tbl_10 = {}
-            tbl_10.playerId = arg2
-            tbl_10.needsInitialized = true
-            tbl_10.shouldWarn = true
-            tbl_10.message = "Could not set custom03 dimension"
-            if not isSdkReady_upvr(tbl_10) then return end
-            State_upvr:setCustomDimension03(arg2, arg3)
-        end
-    end)
+function t.setCustomDimension03(p1, p2, p3) --[[ Line: 405 | Upvalues: Threading (copy), Validation (copy), State (copy), Logger (copy), isSdkReady (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 406 | Upvalues: Validation (ref), State (ref), p3 (copy), Logger (ref), isSdkReady (ref), p2 (copy) ]]
+		if Validation:validateDimension(State._availableCustomDimensions03, p3) then
+			if isSdkReady({
+				playerId = p2,
+				needsInitialized = true,
+				shouldWarn = true,
+				message = "Could not set custom03 dimension"
+			}) then
+				State:setCustomDimension03(p2, p3)
+			end
+		else
+			Logger:w("Could not set custom03 dimension value to \'" .. p3 .. "\'. Value not found in available custom03 dimension values")
+		end
+	end)
 end
-function module_upvr.setEnabledReportErrors(arg1, arg2) -- Line 420
-    Threading_upvr:performTaskOnGAThread(function() -- Line 421
-        State_upvr.ReportErrors = arg2
-    end)
+function t.setEnabledReportErrors(p1, p2) --[[ Line: 420 | Upvalues: Threading (copy), State (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 421 | Upvalues: State (ref), p2 (copy) ]]
+		State.ReportErrors = p2
+	end)
 end
-function module_upvr.setEnabledCustomUserId(arg1, arg2) -- Line 426
-    Threading_upvr:performTaskOnGAThread(function() -- Line 427
-        State_upvr.UseCustomUserId = arg2
-    end)
+function t.setEnabledCustomUserId(p1, p2) --[[ Line: 426 | Upvalues: Threading (copy), State (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 427 | Upvalues: State (ref), p2 (copy) ]]
+		State.UseCustomUserId = p2
+	end)
 end
-function module_upvr.setEnabledAutomaticSendBusinessEvents(arg1, arg2) -- Line 432
-    Threading_upvr:performTaskOnGAThread(function() -- Line 433
-        State_upvr.AutomaticSendBusinessEvents = arg2
-    end)
+function t.setEnabledAutomaticSendBusinessEvents(p1, p2) --[[ Line: 432 | Upvalues: Threading (copy), State (copy) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 433 | Upvalues: State (ref), p2 (copy) ]]
+		State.AutomaticSendBusinessEvents = p2
+	end)
 end
-function module_upvr.addGameAnalyticsTeleportData(arg1, arg2, arg3) -- Line 438
-    local tbl_11 = {}
-    for _, v in ipairs(arg2) do
-        local any_GetPlayerDataFromCache_result1_4 = Store_upvr:GetPlayerDataFromCache(v)
-        any_GetPlayerDataFromCache_result1_4.PlayerTeleporting = true
-        tbl_11[tostring(v)] = {
-            SessionID = any_GetPlayerDataFromCache_result1_4.SessionID;
-            Sessions = any_GetPlayerDataFromCache_result1_4.Sessions;
-            SessionStart = any_GetPlayerDataFromCache_result1_4.SessionStart;
-        }
-    end
-    arg3.gameanalyticsData = tbl_11
-    return arg3
+function t.addGameAnalyticsTeleportData(p1, p2, p3) --[[ Line: 438 | Upvalues: Store (copy) ]]
+	local t = {}
+	for i, v in ipairs(p2) do
+		local v1 = Store:GetPlayerDataFromCache(v)
+		v1.PlayerTeleporting = true
+		t[tostring(v)] = {
+			SessionID = v1.SessionID,
+			Sessions = v1.Sessions,
+			SessionStart = v1.SessionStart
+		}
+	end
+	p3.gameanalyticsData = t
+	return p3
 end
-function module_upvr.getRemoteConfigsValueAsString(arg1, arg2, arg3) -- Line 457
-    return State_upvr:getRemoteConfigsStringValue(arg2, arg3.key or "", arg3.defaultValue or nil)
+function t.getRemoteConfigsValueAsString(p1, p2, p3) --[[ Line: 457 | Upvalues: State (copy) ]]
+	return State:getRemoteConfigsStringValue(p2, p3.key or "", p3.defaultValue or nil)
 end
-function module_upvr.isRemoteConfigsReady(arg1, arg2) -- Line 463
-    return State_upvr:isRemoteConfigsReady(arg2)
+function t.isRemoteConfigsReady(p1, p2) --[[ Line: 463 | Upvalues: State (copy) ]]
+	return State:isRemoteConfigsReady(p2)
 end
-function module_upvr.getRemoteConfigsContentAsString(arg1, arg2) -- Line 467
-    return State_upvr:getRemoteConfigsContentAsString(arg2)
+function t.getRemoteConfigsContentAsString(p1, p2) --[[ Line: 467 | Upvalues: State (copy) ]]
+	return State:getRemoteConfigsContentAsString(p2)
 end
-local Postie_upvr = require(script.Postie)
-local Utilities_upvr = require(script.Utilities)
-local LocalizationService_upvr = game:GetService("LocalizationService")
-local var69_upvw
-function module_upvr.PlayerJoined(arg1, arg2) -- Line 471
-    local TeleportData_2 = arg2:GetJoinData().TeleportData
-    local var181
-    local any_GetPlayerData_result1 = Store_upvr:GetPlayerData(arg2)
-    if TeleportData_2 then
-        local gameanalyticsData = TeleportData_2.gameanalyticsData
-        if gameanalyticsData then
-            gameanalyticsData = TeleportData_2.gameanalyticsData[tostring(arg2.UserId)]
-        end
-        var181 = gameanalyticsData
-    end
-    local any_GetPlayerDataFromCache_result1_2 = Store_upvr:GetPlayerDataFromCache(arg2.UserId)
-    if any_GetPlayerDataFromCache_result1_2 then
-        if var181 then
-            any_GetPlayerDataFromCache_result1_2.SessionID = var181.SessionID
-            any_GetPlayerDataFromCache_result1_2.SessionStart = var181.SessionStart
-        end
-        any_GetPlayerDataFromCache_result1_2.PlayerTeleporting = false
-    else
-        local var185 = "unknown"
-        local any_invokeClient_result1_3, any_invokeClient_result2 = Postie_upvr.invokeClient("getPlatform", arg2, 5)
-        if any_invokeClient_result1_3 then
-            var185 = any_invokeClient_result2
-        end
-        for i_4, v_4 in pairs(Store_upvr.BasePlayerData) do
-            if not any_GetPlayerData_result1[i_4] then
-                if typeof(v_4) == "table" then
-                    any_GetPlayerData_result1[i_4] = Utilities_upvr:copyTable(v_4)
-                else
-                    any_GetPlayerData_result1[i_4] = v_4
-                end
-            end
-        end
-        local pcall_result1_2, pcall_result2 = pcall(function() -- Line 512
-            return LocalizationService_upvr:GetCountryRegionForPlayerAsync(arg2)
-        end)
-        if pcall_result1_2 then
-            any_GetPlayerData_result1.CountryCode = pcall_result2
-        end
-        local PlayerCache = Store_upvr.PlayerCache
-        PlayerCache[arg2.UserId] = any_GetPlayerData_result1
-        if var185 == "Console" then
-            PlayerCache = "uwp_console"
-        elseif var185 == "Mobile" then
-            PlayerCache = "uwp_mobile"
-        elseif var185 == "Desktop" then
-            PlayerCache = "uwp_desktop"
-        else
-            PlayerCache = "uwp_desktop"
-        end
-        any_GetPlayerData_result1.Platform = PlayerCache
-        any_GetPlayerData_result1.OS = any_GetPlayerData_result1.Platform.." 0.0.0"
-        if not pcall_result1_2 then
-            Events_upvr:addSdkErrorEvent(arg2.UserId, "event_validation", "player_joined", "string_empty_or_null", "country_code", "")
-        end
-        local var195 = ""
-        if State_upvr.UseCustomUserId then
-            local any_invokeClient_result1_4, any_invokeClient_result2_2 = Postie_upvr.invokeClient("getCustomUserId", arg2, 5)
-            if any_invokeClient_result1_4 then
-                var195 = any_invokeClient_result2_2
-            end
-        end
-        if not Utilities_upvr:isStringNullOrEmpty(var195) then
-            Logger_upvr:i("Using custom id: "..var195)
-            any_GetPlayerData_result1.CustomUserId = var195
-        end
-        module_upvr:startNewSession(arg2, var181)
-        local var198 = var69_upvw
-        if not var198 then
-            var198 = ReplicatedStorage_upvr:WaitForChild("OnPlayerReadyEvent")
-        end
-        var69_upvw = var198
-        var69_upvw:Fire(arg2)
-        if State_upvr.AutomaticSendBusinessEvents then
-            if any_GetPlayerData_result1.OwnedGamepasses == nil then
-                any_GetPlayerData_result1.OwnedGamepasses = {}
-                for _, v_5 in ipairs(State_upvr._availableGamepasses) do
-                    if MarketplaceService_upvr:UserOwnsGamePassAsync(arg2.UserId, v_5) then
-                        table.insert(any_GetPlayerData_result1.OwnedGamepasses, v_5)
-                    end
-                end
-                Store_upvr.PlayerCache[arg2.UserId] = any_GetPlayerData_result1
-                Store_upvr:SavePlayerData(arg2)
-            else
-                local ipairs_result1_10, ipairs_result2_7, ipairs_result3 = ipairs(State_upvr._availableGamepasses)
-                for _, v_6 in ipairs_result1_10, ipairs_result2_7, ipairs_result3 do
-                    if MarketplaceService_upvr:UserOwnsGamePassAsync(arg2.UserId, v_6) then
-                        table.insert({}, v_6)
-                    end
-                end
-                ipairs_result3 = any_GetPlayerData_result1.OwnedGamepasses
-                local ipairs_result1_12, ipairs_result2_6, ipairs_result3_6 = ipairs(ipairs_result3)
-                for _, v_7 in ipairs_result1_12, ipairs_result2_6, ipairs_result3_6 do
-                    ({})[v_7] = true
-                    local var209
-                end
-                ipairs_result2_6 = {}
-                local ipairs_result1_9, ipairs_result2_3, ipairs_result3_10 = ipairs(ipairs_result2_6)
-                for _, v_8 in ipairs_result1_9, ipairs_result2_3, ipairs_result3_10 do
-                    if not var209[v_8] then
-                        table.insert(any_GetPlayerData_result1.OwnedGamepasses, v_8)
-                        local var213 = tbl_6_upvr[v_8]
-                        if not var213 then
-                            var213 = MarketplaceService_upvr:GetProductInfo(v_8, Enum.InfoType.GamePass)
-                            tbl_6_upvr[v_8] = var213
-                        end
-                        module_upvr:addBusinessEvent(arg2.UserId, {
-                            amount = var213.PriceInRobux;
-                            itemType = "Gamepass";
-                            itemId = module_upvr:filterForBusinessEvent(var213.Name);
-                            cartType = "Website";
-                        })
-                    end
-                end
-                ipairs_result2_3 = arg2.UserId
-                Store_upvr.PlayerCache[ipairs_result2_3] = any_GetPlayerData_result1
-                Store_upvr:SavePlayerData(arg2)
-            end
-        end
-        local var215 = tbl_3_upvr[arg2.UserId]
-        if var215 then
-            tbl_3_upvr[arg2.UserId] = nil
-            for _, v_9 in ipairs(var215) do
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                v_9.Func(unpack(v_9.Args))
-            end
-            Logger_upvr:i("Player initialization queue called #"..(#var215).." events")
-        end
-    end
+function t.PlayerJoined(p1, p2) --[[ Line: 471 | Upvalues: Store (copy), Postie (copy), Utilities (copy), LocalizationService (copy), Events (copy), State (copy), Logger (copy), t (copy), v1 (ref), ReplicatedStorage (copy), MarketplaceService (copy), t2 (copy), t7 (copy) ]]
+	local TeleportData = p2:GetJoinData().TeleportData
+	local v12 = Store:GetPlayerData(p2)
+	local v2
+	if TeleportData then
+		local gameanalyticsData = TeleportData.gameanalyticsData
+		if gameanalyticsData then
+			gameanalyticsData = TeleportData.gameanalyticsData[tostring(p2.UserId)]
+		end
+		v2 = gameanalyticsData
+	else
+		v2 = nil
+	end
+	local v3 = Store:GetPlayerDataFromCache(p2.UserId)
+	if v3 then
+		if v2 then
+			v3.SessionID = v2.SessionID
+			v3.SessionStart = v2.SessionStart
+		end
+		v3.PlayerTeleporting = false
+	else
+		local v4, v5 = Postie.invokeClient("getPlatform", p2, 5)
+		local v6 = if v4 then v5 else "unknown"
+		for k, v in pairs(Store.BasePlayerData) do
+			if not v12[k] then
+				if typeof(v) == "table" then
+					v12[k] = Utilities:copyTable(v)
+				else
+					v12[k] = v
+				end
+			end
+		end
+		local v7, v8 = pcall(function() --[[ Line: 512 | Upvalues: LocalizationService (ref), p2 (copy) ]]
+			return LocalizationService:GetCountryRegionForPlayerAsync(p2)
+		end)
+		if v7 then
+			v12.CountryCode = v8
+		end
+		Store.PlayerCache[p2.UserId] = v12
+		v12.Platform = if v6 == "Console" then "uwp_console" elseif v6 == "Mobile" then "uwp_mobile" else "uwp_desktop"
+		v12.OS = v12.Platform .. " 0.0.0"
+		if not v7 then
+			Events:addSdkErrorEvent(p2.UserId, "event_validation", "player_joined", "string_empty_or_null", "country_code", "")
+		end
+		local v10 = ""
+		if State.UseCustomUserId then
+			local v11, v122 = Postie.invokeClient("getCustomUserId", p2, 5)
+			if v11 then
+				v10 = v122
+			end
+		end
+		if not Utilities:isStringNullOrEmpty(v10) then
+			Logger:i("Using custom id: " .. v10)
+			v12.CustomUserId = v10
+		end
+		t:startNewSession(p2, v2)
+		v1 = v1 or ReplicatedStorage:WaitForChild("OnPlayerReadyEvent")
+		v1:Fire(p2)
+		if State.AutomaticSendBusinessEvents then
+			if v12.OwnedGamepasses == nil then
+				v12.OwnedGamepasses = {}
+				for i, v in ipairs(State._availableGamepasses) do
+					if MarketplaceService:UserOwnsGamePassAsync(p2.UserId, v) then
+						table.insert(v12.OwnedGamepasses, v)
+					end
+				end
+			else
+				local list = {}
+				for i, v in ipairs(State._availableGamepasses) do
+					if MarketplaceService:UserOwnsGamePassAsync(p2.UserId, v) then
+						table.insert(list, v)
+					end
+				end
+				local t3 = {}
+				for i, v in ipairs(v12.OwnedGamepasses) do
+					t3[v] = true
+				end
+				for i, v in ipairs(list) do
+					if not t3[v] then
+						table.insert(v12.OwnedGamepasses, v)
+						local v14 = t2[v]
+						if not v14 then
+							local v15 = MarketplaceService:GetProductInfo(v, Enum.InfoType.GamePass)
+							t2[v] = v15
+							v14 = v15
+						end
+						t:addBusinessEvent(p2.UserId, {
+							amount = v14.PriceInRobux,
+							itemType = "Gamepass",
+							itemId = t:filterForBusinessEvent(v14.Name),
+							cartType = "Website"
+						})
+					end
+				end
+			end
+			Store.PlayerCache[p2.UserId] = v12
+			Store:SavePlayerData(p2)
+		end
+		local v16 = t7[p2.UserId]
+		if v16 then
+			t7[p2.UserId] = nil
+			for i, v in ipairs(v16) do
+				v.Func(unpack(v.Args))
+			end
+			Logger:i("Player initialization queue called #" .. #v16 .. " events")
+		end
+	end
 end
-function module_upvr.PlayerRemoved(arg1, arg2) -- Line 615
-    Store_upvr:SavePlayerData(arg2)
-    local any_GetPlayerDataFromCache_result1_3 = Store_upvr:GetPlayerDataFromCache(arg2.UserId)
-    if any_GetPlayerDataFromCache_result1_3 then
-        if not any_GetPlayerDataFromCache_result1_3.PlayerTeleporting then
-            module_upvr:endSession(arg2.UserId)
-            return
-        end
-        Store_upvr.PlayerCache[arg2.UserId] = nil
-        Store_upvr.DataStoreQueue.RemoveKey(arg2.UserId)
-    end
+function t.PlayerRemoved(p1, p2) --[[ Line: 615 | Upvalues: Store (copy), t (copy) ]]
+	Store:SavePlayerData(p2)
+	local v1 = Store:GetPlayerDataFromCache(p2.UserId)
+	if v1 and v1.PlayerTeleporting then
+		Store.PlayerCache[p2.UserId] = nil
+		Store.DataStoreQueue.RemoveKey(p2.UserId)
+	elseif v1 then
+		t:endSession(p2.UserId)
+	end
 end
-function module_upvr.isPlayerReady(arg1, arg2) -- Line 630
-    if Store_upvr:GetPlayerDataFromCache(arg2) then
-        return true
-    end
-    return false
+function t.isPlayerReady(p1, p2) --[[ Line: 630 | Upvalues: Store (copy) ]]
+	return Store:GetPlayerDataFromCache(p2) and true or false
 end
-function module_upvr.ProcessReceiptCallback(arg1, arg2) -- Line 638
-    local var220_upvw = tbl_6_upvr[arg2.ProductId]
-    if not var220_upvw then
-        pcall(function() -- Line 645
-            var220_upvw = MarketplaceService_upvr:GetProductInfo(arg2.ProductId, Enum.InfoType.Product)
-            tbl_6_upvr[arg2.ProductId] = var220_upvw
-        end)
-    end
-    if var220_upvw then
-        module_upvr:addBusinessEvent(arg2.PlayerId, {
-            amount = arg2.CurrencySpent;
-            itemType = "DeveloperProduct";
-            itemId = module_upvr:filterForBusinessEvent(var220_upvw.Name);
-        })
-    end
+function t.ProcessReceiptCallback(p1, p2) --[[ Line: 638 | Upvalues: t2 (copy), MarketplaceService (copy), t (copy) ]]
+	local v1 = t2[p2.ProductId]
+	if not v1 then
+		pcall(function() --[[ Line: 645 | Upvalues: v1 (ref), MarketplaceService (ref), p2 (copy), t2 (ref) ]]
+			v1 = MarketplaceService:GetProductInfo(p2.ProductId, Enum.InfoType.Product)
+			t2[p2.ProductId] = v1
+		end)
+	end
+	if v1 then
+		t:addBusinessEvent(p2.PlayerId, {
+			amount = p2.CurrencySpent,
+			itemType = "DeveloperProduct",
+			itemId = t:filterForBusinessEvent(v1.Name)
+		})
+	end
 end
-function module_upvr.GamepassPurchased(arg1, arg2, arg3, arg4) -- Line 661
-    local var223
-    if not var223 then
-        var223 = MarketplaceService_upvr:GetProductInfo(arg3, Enum.InfoType.GamePass)
-        tbl_6_upvr[arg3] = var223
-    end
-    local var224 = 0
-    local var225 = "GamePass"
-    if arg4 then
-        var224 = arg4.PriceInRobux
-        var225 = arg4.Name
-    elseif var223 then
-        var224 = var223.PriceInRobux
-        var225 = var223.Name
-    end
-    local tbl_14 = {
-        amount = var224 or 0;
-        itemType = "Gamepass";
-        itemId = module_upvr:filterForBusinessEvent(var225);
-    }
-    tbl_14.gamepassId = arg3
-    module_upvr:addBusinessEvent(arg2.UserId, tbl_14)
+function t.GamepassPurchased(p1, p2, p3, p4) --[[ Line: 661 | Upvalues: t2 (copy), MarketplaceService (copy), t (copy) ]]
+	local v1 = t2[p3]
+	if not v1 then
+		local v2 = MarketplaceService:GetProductInfo(p3, Enum.InfoType.GamePass)
+		t2[p3] = v2
+		v1 = v2
+	end
+	local v3 = 0
+	local v4 = "GamePass"
+	if p4 then
+		v3 = p4.PriceInRobux
+		v4 = p4.Name
+	elseif v1 then
+		v3 = v1.PriceInRobux
+		v4 = v1.Name
+	end
+	t:addBusinessEvent(p2.UserId, {
+		amount = v3 or 0,
+		itemType = "Gamepass",
+		itemId = t:filterForBusinessEvent(v4),
+		gamepassId = p3
+	})
 end
-local tbl_16_upvr = {"gameKey", "secretKey"}
-function module_upvr.initServer(arg1, arg2, arg3) -- Line 692
-    local tbl_15 = {}
-    tbl_15.gameKey = arg2
-    tbl_15.secretKey = arg3
-    module_upvr:initialize(tbl_15)
+local t8 = { "gameKey", "secretKey" }
+function t.initServer(p1, p2, p3) --[[ Line: 692 | Upvalues: t (copy) ]]
+	t:initialize({
+		gameKey = p2,
+		secretKey = p3
+	})
 end
-function module_upvr.initialize(arg1, arg2) -- Line 699
-    Threading_upvr:performTaskOnGAThread(function() -- Line 700
-        for i_2, var243 in ipairs(tbl_16_upvr) do
-            if arg2[var243] == nil then
-                Logger_upvr:e("Initialize '"..var243.."' option missing")
-                return
-            end
-        end
-        if arg2.enableInfoLog ~= nil and arg2.enableInfoLog then
-            module_upvr:setEnabledInfoLog(arg2.enableInfoLog)
-        end
-        if arg2.enableVerboseLog ~= nil and arg2.enableVerboseLog then
-            module_upvr:setEnabledVerboseLog(arg2.enableVerboseLog)
-        end
-        if arg2.availableCustomDimensions01 ~= nil and 0 < #arg2.availableCustomDimensions01 then
-            module_upvr:configureAvailableCustomDimensions01(arg2.availableCustomDimensions01)
-        end
-        if arg2.availableCustomDimensions02 ~= nil and 0 < #arg2.availableCustomDimensions02 then
-            module_upvr:configureAvailableCustomDimensions02(arg2.availableCustomDimensions02)
-        end
-        if arg2.availableCustomDimensions03 ~= nil and 0 < #arg2.availableCustomDimensions03 then
-            module_upvr:configureAvailableCustomDimensions03(arg2.availableCustomDimensions03)
-        end
-        if arg2.availableResourceCurrencies ~= nil and 0 < #arg2.availableResourceCurrencies then
-            module_upvr:configureAvailableResourceCurrencies(arg2.availableResourceCurrencies)
-        end
-        if arg2.availableResourceItemTypes ~= nil and 0 < #arg2.availableResourceItemTypes then
-            module_upvr:configureAvailableResourceItemTypes(arg2.availableResourceItemTypes)
-        end
-        if arg2.build ~= nil and 0 < #arg2.build then
-            module_upvr:configureBuild(arg2.build)
-        end
-        if arg2.availableGamepasses ~= nil and 0 < #arg2.availableGamepasses then
-            module_upvr:configureAvailableGamepasses(arg2.availableGamepasses)
-        end
-        if arg2.enableDebugLog ~= nil then
-            module_upvr:setEnabledDebugLog(arg2.enableDebugLog)
-        end
-        if arg2.automaticSendBusinessEvents ~= nil then
-            module_upvr:setEnabledAutomaticSendBusinessEvents(arg2.automaticSendBusinessEvents)
-        end
-        if arg2.reportErrors ~= nil then
-            module_upvr:setEnabledReportErrors(arg2.reportErrors)
-        end
-        if arg2.useCustomUserId ~= nil then
-            module_upvr:setEnabledCustomUserId(arg2.useCustomUserId)
-        end
-        if isSdkReady_upvr({
-            needsInitialized = true;
-            shouldWarn = false;
-        }) then
-            Logger_upvr:w("SDK already initialized. Can only be called once.")
-        else
-            local gameKey = arg2.gameKey
-            local secretKey = arg2.secretKey
-            var243 = gameKey
-            if not Validation_upvr:validateKeys(var243, secretKey) then
-                var243 = "SDK failed initialize. Game key or secret key is invalid. Can only contain characters A-z 0-9, gameKey is 32 length, secretKey is 40 length. Failed keys - gameKey: "..gameKey..", secretKey: "..secretKey
-                Logger_upvr:w(var243)
-                return
-            end
-            Events_upvr.GameKey = gameKey
-            Events_upvr.SecretKey = secretKey
-            i_2 = true
-            State_upvr.Initialized = i_2
-            function var243(arg1_2) -- Line 768
-                module_upvr:PlayerJoined(arg1_2)
-            end
-            Players_upvr.PlayerAdded:Connect(var243)
-            function var243(arg1_3) -- Line 773
-                module_upvr:PlayerRemoved(arg1_3)
-            end
-            Players_upvr.PlayerRemoving:Connect(var243)
-            i_2 = Players_upvr:GetPlayers()
-            local ipairs_result1_5, ipairs_result2_2, ipairs_result3_11 = ipairs(i_2)
-            for _, v_10 in ipairs_result1_5, ipairs_result2_2, ipairs_result3_11 do
-                coroutine.wrap(module_upvr.PlayerJoined)(module_upvr, v_10)
-            end
-            ipairs_result2_2 = tbl_9_upvw
-            local ipairs_result1_8, ipairs_result2_8, ipairs_result3_4 = ipairs(ipairs_result2_2)
-            for _, v_11 in ipairs_result1_8, ipairs_result2_8, ipairs_result3_4 do
-                task.spawn(v_11.Func, unpack(v_11.Args))
-            end
-            ipairs_result3_4 = "Server initialization queue called #"..(#tbl_9_upvw).." events"
-            Logger_upvr:i(ipairs_result3_4)
-            tbl_9_upvw = nil
-            Events_upvr:processEventQueue()
-        end
-    end)
+function t.initialize(p1, p2) --[[ Line: 699 | Upvalues: Threading (copy), t8 (copy), Logger (copy), t (copy), isSdkReady (copy), Validation (copy), Events (copy), State (copy), Players (copy), t6 (ref) ]]
+	Threading:performTaskOnGAThread(function() --[[ Line: 700 | Upvalues: t8 (ref), p2 (copy), Logger (ref), t (ref), isSdkReady (ref), Validation (ref), Events (ref), State (ref), Players (ref), t6 (ref) ]]
+		for i, v in ipairs(t8) do
+			if p2[v] == nil then
+				Logger:e("Initialize \'" .. v .. "\' option missing")
+				return
+			end
+		end
+		if p2.enableInfoLog ~= nil and p2.enableInfoLog then
+			t:setEnabledInfoLog(p2.enableInfoLog)
+		end
+		if p2.enableVerboseLog ~= nil and p2.enableVerboseLog then
+			t:setEnabledVerboseLog(p2.enableVerboseLog)
+		end
+		if p2.availableCustomDimensions01 ~= nil and #p2.availableCustomDimensions01 > 0 then
+			t:configureAvailableCustomDimensions01(p2.availableCustomDimensions01)
+		end
+		if p2.availableCustomDimensions02 ~= nil and #p2.availableCustomDimensions02 > 0 then
+			t:configureAvailableCustomDimensions02(p2.availableCustomDimensions02)
+		end
+		if p2.availableCustomDimensions03 ~= nil and #p2.availableCustomDimensions03 > 0 then
+			t:configureAvailableCustomDimensions03(p2.availableCustomDimensions03)
+		end
+		if p2.availableResourceCurrencies ~= nil and #p2.availableResourceCurrencies > 0 then
+			t:configureAvailableResourceCurrencies(p2.availableResourceCurrencies)
+		end
+		if p2.availableResourceItemTypes ~= nil and #p2.availableResourceItemTypes > 0 then
+			t:configureAvailableResourceItemTypes(p2.availableResourceItemTypes)
+		end
+		if p2.build ~= nil and #p2.build > 0 then
+			t:configureBuild(p2.build)
+		end
+		if p2.availableGamepasses ~= nil and #p2.availableGamepasses > 0 then
+			t:configureAvailableGamepasses(p2.availableGamepasses)
+		end
+		if p2.enableDebugLog ~= nil then
+			t:setEnabledDebugLog(p2.enableDebugLog)
+		end
+		if p2.automaticSendBusinessEvents ~= nil then
+			t:setEnabledAutomaticSendBusinessEvents(p2.automaticSendBusinessEvents)
+		end
+		if p2.reportErrors ~= nil then
+			t:setEnabledReportErrors(p2.reportErrors)
+		end
+		if p2.useCustomUserId ~= nil then
+			t:setEnabledCustomUserId(p2.useCustomUserId)
+		end
+		if isSdkReady({
+			needsInitialized = true,
+			shouldWarn = false
+		}) then
+			Logger:w("SDK already initialized. Can only be called once.")
+			return
+		end
+		local gameKey = p2.gameKey
+		local secretKey = p2.secretKey
+		if Validation:validateKeys(gameKey, secretKey) then
+			Events.GameKey = gameKey
+			Events.SecretKey = secretKey
+			State.Initialized = true
+			Players.PlayerAdded:Connect(function(p1) --[[ Line: 768 | Upvalues: t (ref) ]]
+				t:PlayerJoined(p1)
+			end)
+			Players.PlayerRemoving:Connect(function(p1) --[[ Line: 773 | Upvalues: t (ref) ]]
+				t:PlayerRemoved(p1)
+			end)
+			for i, v in ipairs(Players:GetPlayers()) do
+				coroutine.wrap(t.PlayerJoined)(t, v)
+			end
+			for i, v in ipairs(t6) do
+				task.spawn(v.Func, unpack(v.Args))
+			end
+			Logger:i("Server initialization queue called #" .. #t6 .. " events")
+			t6 = nil
+			Events:processEventQueue()
+		else
+			Logger:w("SDK failed initialize. Game key or secret key is invalid. Can only contain characters A-z 0-9, gameKey is 32 length, secretKey is 40 length. Failed keys - gameKey: " .. gameKey .. ", secretKey: " .. secretKey)
+		end
+	end)
 end
-if not ReplicatedStorage_upvr:FindFirstChild("GameAnalyticsRemoteConfigs") then
-    local RemoteEvent = Instance.new("RemoteEvent")
-    RemoteEvent.Name = "GameAnalyticsRemoteConfigs"
-    RemoteEvent.Parent = ReplicatedStorage_upvr
+if not ReplicatedStorage:FindFirstChild("GameAnalyticsRemoteConfigs") then
+	local GameAnalyticsRemoteConfigs = Instance.new("RemoteEvent")
+	GameAnalyticsRemoteConfigs.Name = "GameAnalyticsRemoteConfigs"
+	GameAnalyticsRemoteConfigs.Parent = ReplicatedStorage
 end
-if not ReplicatedStorage_upvr:FindFirstChild("OnPlayerReadyEvent") then
-    local BindableEvent = Instance.new("BindableEvent")
-    BindableEvent.Name = "OnPlayerReadyEvent"
-    BindableEvent.Parent = ReplicatedStorage_upvr
+if not ReplicatedStorage:FindFirstChild("OnPlayerReadyEvent") then
+	local OnPlayerReadyEvent = Instance.new("BindableEvent")
+	OnPlayerReadyEvent.Name = "OnPlayerReadyEvent"
+	OnPlayerReadyEvent.Parent = ReplicatedStorage
 end
-task.spawn(function() -- Line 808
-    tbl_20_upvw = Store_upvr:GetErrorDataStore(math.floor(os.time() / 3600))
-    while task.wait(3600) do
-        tbl_20_upvw = Store_upvr:GetErrorDataStore(math.floor(os.time() / 3600))
-        tbl_5_upvw = {}
-        tbl_8_upvw = {}
-    end
+task.spawn(function() --[[ Line: 808 | Upvalues: t3 (ref), Store (copy), t4 (ref), t5 (ref) ]]
+	t3 = Store:GetErrorDataStore((math.floor(os.time() / 3600)))
+	while task.wait(3600) do
+		t3 = Store:GetErrorDataStore((math.floor(os.time() / 3600)))
+		t4 = {}
+		t5 = {}
+	end
 end)
-task.spawn(function() -- Line 820
-    while task.wait(Store_upvr.AutoSaveData) do
-        for _, v_3 in pairs(tbl_8_upvw) do
-            local var259 = tbl_5_upvw[v_3]
-            tbl_5_upvw[v_3].countInDS = Store_upvr:IncrementErrorCount(tbl_20_upvw, v_3, var259.currentCount - var259.countInDS)
-            tbl_5_upvw[v_3].currentCount = tbl_5_upvw[v_3].countInDS
-        end
-    end
+task.spawn(function() --[[ Line: 820 | Upvalues: Store (copy), t5 (ref), t4 (ref), t3 (ref) ]]
+	while task.wait(Store.AutoSaveData) do
+		for k, v in pairs(t5) do
+			local v1 = t4[v]
+			t4[v].countInDS = Store:IncrementErrorCount(t3, v, v1.currentCount - v1.countInDS)
+			t4[v].currentCount = t4[v].countInDS
+		end
+	end
 end)
-local function ErrorHandler_upvr(arg1, arg2, arg3, arg4) -- Line 831, Named "ErrorHandler"
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var260 = "(null)"
-    if arg3 ~= nil then
-        var260 = arg3
-    end
-    local var261 = "(null)"
-    if arg1 ~= nil then
-        var261 = arg1
-    end
-    local var262 = "(null)"
-    if arg2 ~= nil then
-        var262 = arg2
-    end
-    local var263 = var260..": message="..var261..", trace="..var262
-    if 8192 < #var263 then
-    end
-    local var264
-    if arg4 then
-        var264 = arg4.UserId
-        local any_gsub_result1 = string.sub(var263, 1, 8192):gsub(arg4.Name, "[LocalPlayer]")
-    end
-    local var266 = any_gsub_result1
-    if 50 < #var266 then
-        var266 = string.sub(var266, 1, 50)
-    end
-    if tbl_5_upvw[var266] == nil then
-        tbl_8_upvw[#tbl_8_upvw + 1] = var266
-        tbl_5_upvw[var266] = {}
-        tbl_5_upvw[var266].countInDS = 0
-        tbl_5_upvw[var266].currentCount = 0
-    end
-    if 10 < tbl_5_upvw[var266].currentCount then
-    else
-        module_upvr:addErrorEvent(var264, {
-            severity = module_upvr.EGAErrorSeverity.error;
-            message = any_gsub_result1;
-        })
-        tbl_5_upvw[var266].currentCount = tbl_5_upvw[var266].currentCount + 1
-    end
+local function ErrorHandler(p1, p2, p3, p4) --[[ Line: 831 | Upvalues: t4 (ref), t5 (ref), t (copy) ]]
+	local v4 = if p3 == nil then "(null)" else p3 .. ": message=" .. if p1 == nil then "(null)" else p1 .. ", trace=" .. if p2 == nil then "(null)" else p2
+	if #v4 > 8192 then
+		v4 = string.sub(v4, 1, 8192)
+	end
+	local v6
+	if p4 then
+		v6 = p4.UserId
+		v4 = v4:gsub(p4.Name, "[LocalPlayer]")
+	else
+		v6 = nil
+	end
+	local v8 = if #v4 > 50 then string.sub(v4, 1, 50) else v4
+	if t4[v8] == nil then
+		t5[#t5 + 1] = v8
+		t4[v8] = {}
+		t4[v8].countInDS = 0
+		t4[v8].currentCount = 0
+	end
+	if not (t4[v8].currentCount > 10) then
+		t:addErrorEvent(v6, {
+			severity = t.EGAErrorSeverity.error,
+			message = v4
+		})
+		t4[v8].currentCount = t4[v8].currentCount + 1
+	end
 end
-local function _(arg1, arg2, arg3, arg4) -- Line 903, Named "ErrorHandlerFromClient"
-    if not State_upvr.ReportErrors then return end
-    return ErrorHandler_upvr(arg1, arg2, arg3, arg4)
+local function ErrorHandlerFromServer(p1, p2, p3) --[[ Line: 882 | Upvalues: State (copy), ErrorHandler (copy) ]]
+	if State.ReportErrors then
+		if p3 then
+			local v1 = nil
+			local v2, _ = pcall(function() --[[ Line: 893 | Upvalues: v1 (ref), p3 (copy) ]]
+				v1 = p3:GetFullName()
+			end)
+			if v2 then
+				return ErrorHandler(p1, p2, v1)
+			end
+		end
+	end
 end
-game:GetService("ScriptContext").Error:Connect(function(arg1, arg2, arg3) -- Line 882, Named "ErrorHandlerFromServer"
-    if not State_upvr.ReportErrors then return end
-    if not arg3 then return end
-    local var268_upvw
-    local pcall_result1_3, _ = pcall(function() -- Line 893
-        var268_upvw = arg3:GetFullName()
-    end)
-    if not pcall_result1_3 then return end
-    return ErrorHandler_upvr(arg1, arg2, var268_upvw)
-end)
-if not ReplicatedStorage_upvr:FindFirstChild("GameAnalyticsError") then
-    local RemoteEvent_2 = Instance.new("RemoteEvent")
-    RemoteEvent_2.Name = "GameAnalyticsError"
-    RemoteEvent_2.Parent = ReplicatedStorage_upvr
+local function ErrorHandlerFromClient(p1, p2, p3, p4) --[[ Line: 903 | Upvalues: State (copy), ErrorHandler (copy) ]]
+	if State.ReportErrors then
+		return ErrorHandler(p1, p2, p3, p4)
+	end
 end
-ReplicatedStorage_upvr.GameAnalyticsError.OnServerEvent:Connect(function(arg1, arg2, arg3, arg4) -- Line 921
-    if not State_upvr.ReportErrors then return end
+ScriptContext.Error:Connect(ErrorHandlerFromServer)
+if not ReplicatedStorage:FindFirstChild("GameAnalyticsError") then
+	local GameAnalyticsError = Instance.new("RemoteEvent")
+	GameAnalyticsError.Name = "GameAnalyticsError"
+	GameAnalyticsError.Parent = ReplicatedStorage
+end
+ReplicatedStorage.GameAnalyticsError.OnServerEvent:Connect(function(p1, p2, p3, p4) --[[ Line: 921 | Upvalues: State (copy), ErrorHandler (copy) ]]
+	if State.ReportErrors then
+		ErrorHandler(p2, p3, p4, p1)
+	end
 end)
-MarketplaceService_upvr.PromptGamePassPurchaseFinished:Connect(function(arg1, arg2, arg3) -- Line 927
-    if not State_upvr.AutomaticSendBusinessEvents or not arg3 then
-    else
-        module_upvr:GamepassPurchased(arg1, arg2)
-    end
+MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(p1, p2, p3) --[[ Line: 927 | Upvalues: State (copy), t (copy) ]]
+	if State.AutomaticSendBusinessEvents and p3 then
+		t:GamepassPurchased(p1, p2)
+	end
 end)
-return module_upvr
+return t

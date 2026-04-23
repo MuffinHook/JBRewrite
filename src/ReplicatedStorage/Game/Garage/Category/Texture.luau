@@ -1,5 +1,6 @@
-return function(arg1) -- Line 1
-    local Model = arg1.Model
-    if not Model then return end
-    return Model:FindFirstChild("Body", true)
+return function(p1) --[[ Line: 1 ]]
+	local Model = p1.Model
+	if Model then
+		return Model:FindFirstChild("Body", true)
+	end
 end

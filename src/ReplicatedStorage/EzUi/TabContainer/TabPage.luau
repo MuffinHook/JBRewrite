@@ -1,16 +1,15 @@
-local Roact_upvr = require(script:FindFirstAncestor("EzUi").Parent.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("TabPage")
-function any_extend_result1.init(arg1) -- Line 8
+local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
+local createElement = Roact.createElement
+local v2 = Roact.PureComponent:extend("TabPage")
+function v2.init(p1) --[[ Line: 8 ]] end
+function v2.render(p1) --[[ Line: 9 | Upvalues: createElement (copy), Roact (copy) ]]
+	return createElement("Frame", {
+		Size = UDim2.new(1, 0, 1, 0),
+		BorderSizePixel = 0,
+		BackgroundTransparency = p1.props.backgroundTransparency,
+		BackgroundColor3 = p1.props.backgroundColor,
+		LayoutOrder = p1.props.layoutOrder,
+		[Roact.Ref] = p1.props[Roact.Ref]
+	}, p1.props[Roact.Children])
 end
-local createElement_upvr = Roact_upvr.createElement
-function any_extend_result1.render(arg1) -- Line 9
-    return createElement_upvr("Frame", {
-        Size = UDim2.new(1, 0, 1, 0);
-        BorderSizePixel = 0;
-        BackgroundTransparency = arg1.props.backgroundTransparency;
-        BackgroundColor3 = arg1.props.backgroundColor;
-        LayoutOrder = arg1.props.layoutOrder;
-        [Roact_upvr.Ref] = arg1.props[Roact_upvr.Ref];
-    }, arg1.props[Roact_upvr.Children])
-end
-return any_extend_result1
+return v2

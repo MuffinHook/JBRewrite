@@ -1,49 +1,45 @@
--- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TableUtils = require(ReplicatedStorage.Std.TableUtils)
+local Enumer = require(ReplicatedStorage.Std.Enumer)
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
-local tbl = {
-    TAG_NAME = "MansionRobbery";
-    ROBBERY_REWARD = 13000;
-    ROBBERY_STATUS_ATTR_NAME = "RobberyStatus";
-    MAX_PLAYERS_IN_ELEVATOR = 3;
-    NUM_PLAYERS_IN_ELEVATOR_ATTR_NAME = "NumPlayersInElevator";
+local t = {
+	TAG_NAME = "MansionRobbery",
+	ROBBERY_REWARD = 13000,
+	ROBBERY_STATUS_ATTR_NAME = "RobberyStatus",
+	MAX_PLAYERS_IN_ELEVATOR = 3,
+	NUM_PLAYERS_IN_ELEVATOR_ATTR_NAME = "NumPlayersInElevator",
+	ELEVATOR_COUNTDOWN_INSTANCE_NAME = "ElevatorCountdown"
 }
-local var4 = "ElevatorCountdown"
-tbl.ELEVATOR_COUNTDOWN_INSTANCE_NAME = var4
-if RunUtils.isStudio() then
-    var4 = 7
-else
-    var4 = 15
-end
-tbl.ELEVATOR_COUNTDOWN_TIME = var4
-tbl.IS_ELEVATOR_MOVING_ATTR_NAME = "IsElevatorMoving"
-tbl.BOSS_MODELS_FOLDER_NAME = "BossModels"
-tbl.SHIELD_MODELS_FOLDER_NAME = "Shields"
-tbl.ENTRANCE_ELEVATOR_NAME = "EntranceElevator"
-tbl.ARRIVAL_ELEVATOR_NAME = "ArrivalElevator"
-tbl.EXIT_ELEVATOR_PART_NAME = "ExitElevator"
-tbl.EXIT_TELEPORTS_FOLDER_NAME = "ExitTeleports"
-tbl.BOSS_ROOM_PLAYER_SPAWNS_FOLDER_NAME = "BossRoomPlayerSpawns"
-tbl.ATTEMPT_EXIT_ELEVATOR_REMOTE_NAME = "AttemptExitElevator"
-tbl.LAST_CLOSED_TIME_ATTR_NAME = "LastClosedTime"
-tbl.CHAR_PER_SECOND = 24
-if RunUtils.isStudio() then
-    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-end
--- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
--- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-tbl.MAX_SHIELDS_UP = 3
-tbl.MIN_SHIELD_UP_TIME = 0.5
-tbl.MAX_SHIELD_UP_TIME = 6
-tbl.SHIELD_COOLDOWN_TIME = 3
-tbl.SHIELD_LAST_DOWN_TIME_ATTR_NAME = "ShieldLastDown"
-tbl.IN_ROBBERY_FOLDER_NAME = "InRobberyFolder"
-tbl.GUARDS_FOLDER_NAME = "GuardsFolder"
-tbl.PROGRESSION_STATE_ATTR_NAME = "MansionRobberyProgressionState"
-tbl.PROGRESSION_STATE = require(ReplicatedStorage.Std.Enumer)({"None", "WaitForEnter", "PlayersEnteredIntroCutscene", "WaitForDamage", "FirstGuards", "BossMovement", "RunAwayEndCutscene"})
-tbl.LAST_PROGRESSION_BORN_AT_ATTR_NAME = "MansionRobberyLastProgressionBornAt"
-if RunUtils.isStudio() then
-    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-end
--- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-return tbl
+t.ELEVATOR_COUNTDOWN_TIME = if RunUtils.isStudio() then 7 else 15
+t.IS_ELEVATOR_MOVING_ATTR_NAME = "IsElevatorMoving"
+t.BOSS_MODELS_FOLDER_NAME = "BossModels"
+t.SHIELD_MODELS_FOLDER_NAME = "Shields"
+t.MAX_SHIELDS_UP = if RunUtils.isStudio() then 1 else 3
+t.MIN_SHIELD_UP_TIME = 0.5
+t.MAX_SHIELD_UP_TIME = 6
+t.SHIELD_COOLDOWN_TIME = 3
+t.SHIELD_LAST_DOWN_TIME_ATTR_NAME = "ShieldLastDown"
+t.IN_ROBBERY_FOLDER_NAME = "InRobberyFolder"
+t.GUARDS_FOLDER_NAME = "GuardsFolder"
+t.PROGRESSION_STATE_ATTR_NAME = "MansionRobberyProgressionState"
+t.PROGRESSION_STATE = Enumer({ "None", "WaitForEnter", "PlayersEnteredIntroCutscene", "WaitForDamage", "FirstGuards", "BossMovement", "RunAwayEndCutscene" })
+t.LAST_PROGRESSION_BORN_AT_ATTR_NAME = "MansionRobberyLastProgressionBornAt"
+t.CHAR_PER_SECOND = if RunUtils.isStudio() then 100 else 50
+t.DELAY_BEFORE_REMOVING_PLAYER_FROM_INVITE_REFUND = 15
+t.DAMAGE_QUEUE_SIZE_FOR_BOSS_TARGETING = 15
+t.ON_JOIN_MANSION_INVITE_REFUND_KEY = "MansionInvitesToRefund"
+t.EXIT_TELEPORTS_FOLDER_NAME = "MansionRobberyExits"
+t.ENTRANCE_ELEVATOR_NAME = "EntranceElevator"
+t.ARRIVAL_ELEVATOR_NAME = "ArrivalElevator"
+t.BOSS_HEALTH = if RunUtils.isStudio() then 200 else 3400
+t.LAST_CLOSED_TIME_ATTR_NAME = "LastClosedTime"
+t.MIN_TIME_BETWEEN_ROBBERIES = 300
+t.TIMEOUT_PERIOD = 1200
+t.TIME_AFTER_BOSS_KILL_BEFORE_TELEPORT = 60
+t.NPC_WALK_SPEED_DEBUFF = 0.5
+t.NPC_HEALTH_DEBUFF = 0.8
+t.BOSS_ATTACK_INTERVAL = 7
+t.BOSS_ROOM_PLAYER_SPAWNS_FOLDER_NAME = "BossRoomPlayerSpawns"
+t.ATTEMPT_EXIT_ELEVATOR_REMOTE_NAME = "AttemptExitElevator"
+t.EXIT_ELEVATOR_PART_NAME = "ExitButton"
+return TableUtils.requireValidIndexAndFreeze(t)

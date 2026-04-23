@@ -1,182 +1,122 @@
---local ReplicatedStorage = game:GetService("ReplicatedStorage")
---local TeleportService_upvr = game:GetService("TeleportService")
---local ReplicatedFirst = game:GetService("ReplicatedFirst")
---if script.Parent ~= ReplicatedFirst then
---else
---    local tbl_upvr = {
---        Trade = {
---            image = "rbxassetid://9839090323";
---            aspectRatio = 2;
---        };
---        Battle = {
---            image = "rbxassetid://12668259770";
---            aspectRatio = 2;
---        };
---        Jailbreak = {
---            image = "rbxassetid://106002273326214";
---            aspectRatio = 2;
---        };
---    }
---    local ScreenGui_upvr = Instance.new("ScreenGui")
---    ScreenGui_upvr.IgnoreGuiInset = true
---    ScreenGui_upvr.DisplayOrder = 50
---    local Frame = Instance.new("Frame")
---    Frame.Parent = ScreenGui_upvr
---    Frame.Size = UDim2.new(1, 0, 1, 0)
---    Frame.BackgroundTransparency = 0
---    Frame.BackgroundColor3 = Color3.new(0, 0, 0)
---    Frame.BorderSizePixel = 0
---    local ImageLabel_upvr = Instance.new("ImageLabel")
---    ImageLabel_upvr.BackgroundTransparency = 1
---    ImageLabel_upvr.Size = UDim2.new(0.25, 0, 0.25, 0)
---    ImageLabel_upvr.AnchorPoint = Vector2.new(0.5, 0.5)
---    ImageLabel_upvr.Position = UDim2.new(0.5, 0, 0.5, 0)
---    ImageLabel_upvr.Parent = ScreenGui_upvr
---    local UIAspectRatioConstraint_upvr = Instance.new("UIAspectRatioConstraint")
---    UIAspectRatioConstraint_upvr.Parent = ImageLabel_upvr
---    local TextLabel_upvr = Instance.new("TextLabel")
---    TextLabel_upvr.BackgroundTransparency = 1
---    TextLabel_upvr.Size = UDim2.new(1, 0, 0.085, 0)
---    TextLabel_upvr.Position = UDim2.new(0, 0, 0.672, 0)
---    TextLabel_upvr.TextStrokeTransparency = 1
---    TextLabel_upvr.TextScaled = true
---    TextLabel_upvr.TextColor3 = Color3.new(1, 1, 1)
---    TextLabel_upvr.Font = Enum.Font.LuckiestGuy
---    TextLabel_upvr.Text = ""
---    TextLabel_upvr.Parent = ScreenGui_upvr
---    game:GetService("TweenService"):Create(ImageLabel_upvr, TweenInfo.new(1.5, Enum.EasingStyle.Back, Enum.EasingDirection.In, -1, true), {
---        ImageTransparency = 1;
---        Size = UDim2.fromScale(0.4, 0.4);
---    }):Play()
---    local function _(arg1) -- Line 59, Named "setTitle"
---        --[[ Upvalues[2]:
---            [1]: UIAspectRatioConstraint_upvr (readonly)
---            [2]: ImageLabel_upvr (readonly)
---        ]]
---        UIAspectRatioConstraint_upvr.AspectRatio = arg1.aspectRatio
---        ImageLabel_upvr.Image = arg1.image
---    end
---    local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
---    local var15_upvw = 0
---    local PlayerGui_upvr = LocalPlayer_upvr:WaitForChild("PlayerGui")
---    local function handleTeleport_upvr(arg1) -- Line 69, Named "handleTeleport"
---        --[[ Upvalues[7]:
---            [1]: var15_upvw (read and write)
---            [2]: TextLabel_upvr (readonly)
---            [3]: tbl_upvr (readonly)
---            [4]: UIAspectRatioConstraint_upvr (readonly)
---            [5]: ImageLabel_upvr (readonly)
---            [6]: ScreenGui_upvr (readonly)
---            [7]: PlayerGui_upvr (readonly)
---        ]]
---        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
---        var15_upvw += 1
---        local var17
---        if arg1 ~= nil then
---        else
---        end
---        var17 = arg1
---        if not var17 then
---            var17 = {}
---        end
---        local var18 = var17
---        var17 = TextLabel_upvr
---        var17.Text = ""
---        var17 = var18.tradeLoadingScreen
---        local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
---            var17 = var18.worldName
---            return var17 == "TRADE_WORLD"
---        end
---        if var17 or decompInlinedCondition() then
---            var17 = tbl_upvr
---            var17 = var17.Trade
---            UIAspectRatioConstraint_upvr.AspectRatio = var17.aspectRatio
---            ImageLabel_upvr.Image = var17.image
---        else
---            var17 = var18.battleLoadingScreen
---            if var17 then
---                var17 = tbl_upvr
---                var17 = var17.Battle
---                UIAspectRatioConstraint_upvr.AspectRatio = var17.aspectRatio
---                ImageLabel_upvr.Image = var17.image
---            else
---                var17 = tbl_upvr
---                var17 = var17.Jailbreak
---                UIAspectRatioConstraint_upvr.AspectRatio = var17.aspectRatio
---                ImageLabel_upvr.Image = var17.image
---                var17 = var18.migrationLoadingScreen
---                if var17 then
---                    var17 = TextLabel_upvr
---                    var17.Text = "Server Updating... Please wait!"
---                elseif true then
---                    var17 = task.delay
---                    var17(7, function() -- Line 86
---                        --[[ Upvalues[4]:
---                            [1]: ScreenGui_upvr (copied, readonly)
---                            [2]: var15_upvw (readonly)
---                            [3]: var15_upvw (copied, read and write)
---                            [4]: TextLabel_upvr (copied, readonly)
---                        ]]
---                        if ScreenGui_upvr.Parent ~= nil and var15_upvw == var15_upvw then
---                            TextLabel_upvr.Text = "Roblox is taking a while to load your data. Please wait."
---                        end
---                    end)
---                end
---            end
---        end
---        var17 = ScreenGui_upvr
---        var17.Parent = PlayerGui_upvr
---    end
---    local any_GetLocalPlayerTeleportData_result1 = TeleportService_upvr:GetLocalPlayerTeleportData()
---    if any_GetLocalPlayerTeleportData_result1 then
---        ReplicatedFirst:RemoveDefaultLoadingScreen()
---        handleTeleport_upvr(any_GetLocalPlayerTeleportData_result1)
---    else
---        local var22_upvw = false
---        task.delay(3, function() -- Line 102
---            --[[ Upvalues[2]:
---                [1]: var22_upvw (read and write)
---                [2]: handleTeleport_upvr (readonly)
---            ]]
---            if not var22_upvw then
---                handleTeleport_upvr()
---            end
---        end)
---    end
---    if not game:IsLoaded() then
---        game.Loaded:Wait()
---    end
---    if not LocalPlayer_upvr.Character then
---        LocalPlayer_upvr.CharacterAdded:Wait()
---    end
---    var22_upvw = true
---    ScreenGui_upvr.Parent = nil
---    require(ReplicatedStorage.Std.Maid).new():GiveTask(ReplicatedStorage:WaitForChild(require(ReplicatedStorage.WorldTeleport.WorldTeleportConsts).TELEPORT_HAPPENING_REMOTE).onClientEvent:Connect(function(arg1) -- Line 125
---        --[[ Upvalues[3]:
---            [1]: handleTeleport_upvr (readonly)
---            [2]: TeleportService_upvr (readonly)
---            [3]: ScreenGui_upvr (readonly)
---        ]]
---        handleTeleport_upvr(arg1)
---        TeleportService_upvr:SetTeleportGui(ScreenGui_upvr)
---        if arg1 and arg1.migrationLoadingScreen then
---        else
---            task.delay(10, function() -- Line 133
---                --[[ Upvalues[1]:
---                    [1]: ScreenGui_upvr (copied, readonly)
---                ]]
---                ScreenGui_upvr.Parent = nil
---            end)
---        end
---    end))
---    TeleportService_upvr.TeleportInitFailed:Connect(function(arg1) -- Line 139
---        --[[ Upvalues[2]:
---            [1]: LocalPlayer_upvr (readonly)
---            [2]: ScreenGui_upvr (readonly)
---        ]]
---        if arg1 ~= LocalPlayer_upvr then
---        else
---            ScreenGui_upvr.Parent = nil
---        end
---    end)
---end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local TweenService = game:GetService("TweenService")
+if script.Parent == ReplicatedFirst then
+	local t = {
+		Trade = {
+			image = "rbxassetid://9839090323",
+			aspectRatio = 2
+		},
+		Battle = {
+			image = "rbxassetid://12668259770",
+			aspectRatio = 2
+		},
+		Jailbreak = {
+			image = "rbxassetid://106002273326214",
+			aspectRatio = 2
+		}
+	}
+	local ScreenGui = Instance.new("ScreenGui")
+	ScreenGui.IgnoreGuiInset = true
+	ScreenGui.DisplayOrder = 50
+	local Frame = Instance.new("Frame")
+	Frame.Parent = ScreenGui
+	Frame.Size = UDim2.new(1, 0, 1, 0)
+	Frame.BackgroundTransparency = 0
+	Frame.BackgroundColor3 = Color3.new(0/255, 0/255, 0/255)
+	Frame.BorderSizePixel = 0
+	local ImageLabel = Instance.new("ImageLabel")
+	ImageLabel.BackgroundTransparency = 1
+	ImageLabel.Size = UDim2.new(0.25, 0, 0.25, 0)
+	ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+	ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+	ImageLabel.Parent = ScreenGui
+	local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+	UIAspectRatioConstraint.Parent = ImageLabel
+	local TextLabel = Instance.new("TextLabel")
+	TextLabel.BackgroundTransparency = 1
+	TextLabel.Size = UDim2.new(1, 0, 0.085, 0)
+	TextLabel.Position = UDim2.new(0, 0, 0.672, 0)
+	TextLabel.TextStrokeTransparency = 1
+	TextLabel.TextScaled = true
+	TextLabel.TextColor3 = Color3.new(255/255, 255/255, 255/255)
+	TextLabel.Font = Enum.Font.LuckiestGuy
+	TextLabel.Text = ""
+	TextLabel.Parent = ScreenGui
+	TweenService:Create(ImageLabel, TweenInfo.new(1.5, Enum.EasingStyle.Back, Enum.EasingDirection.In, -1, true), {
+		ImageTransparency = 1,
+		Size = UDim2.fromScale(0.4, 0.4)
+	}):Play()
+	local function setTitle(p1) --[[ Line: 59 | Upvalues: UIAspectRatioConstraint (copy), ImageLabel (copy) ]]
+		UIAspectRatioConstraint.AspectRatio = p1.aspectRatio
+		ImageLabel.Image = p1.image
+	end
+	local LocalPlayer = Players.LocalPlayer
+	local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+	local v1 = 0
+	local function handleTeleport(p1) --[[ Line: 69 | Upvalues: v1 (ref), TextLabel (copy), t (copy), UIAspectRatioConstraint (copy), ImageLabel (copy), ScreenGui (copy), PlayerGui (copy) ]]
+		v1 = v1 + 1
+		local v12 = v1
+		local v2 = p1 == nil
+		local v3 = p1 or {}
+		TextLabel.Text = ""
+		if v3.tradeLoadingScreen or v3.worldName == "TRADE_WORLD" then
+			local Trade = t.Trade
+			UIAspectRatioConstraint.AspectRatio = Trade.aspectRatio
+			ImageLabel.Image = Trade.image
+		elseif v3.battleLoadingScreen then
+			local Battle = t.Battle
+			UIAspectRatioConstraint.AspectRatio = Battle.aspectRatio
+			ImageLabel.Image = Battle.image
+		else
+			local Jailbreak = t.Jailbreak
+			UIAspectRatioConstraint.AspectRatio = Jailbreak.aspectRatio
+			ImageLabel.Image = Jailbreak.image
+			if v3.migrationLoadingScreen then
+				TextLabel.Text = "Server Updating... Please wait!"
+			elseif v2 then
+				task.delay(7, function() --[[ Line: 86 | Upvalues: ScreenGui (ref), v12 (copy), v1 (ref), TextLabel (ref) ]]
+					if ScreenGui.Parent ~= nil and v12 == v1 then
+						TextLabel.Text = "Roblox is taking a while to load your data. Please wait."
+					end
+				end)
+			end
+		end
+		ScreenGui.Parent = PlayerGui
+	end
+	local v2 = false
+	local v3 = TeleportService:GetLocalPlayerTeleportData()
+	if v3 then
+		ReplicatedFirst:RemoveDefaultLoadingScreen()
+		handleTeleport(v3)
+	else
+		task.delay(3, function() --[[ Line: 102 | Upvalues: v2 (ref), handleTeleport (copy) ]]
+			if not v2 then
+				handleTeleport()
+			end
+		end)
+	end
+	if not game:IsLoaded() then
+		game.Loaded:Wait()
+	end
+	if not LocalPlayer.Character then
+		LocalPlayer.CharacterAdded:Wait()
+	end
+	ScreenGui.Parent = nil
+	require(ReplicatedStorage.Std.Maid).new():GiveTask(ReplicatedStorage:WaitForChild(require(ReplicatedStorage.WorldTeleport.WorldTeleportConsts).TELEPORT_HAPPENING_REMOTE).onClientEvent:Connect(function(p1) --[[ Line: 125 | Upvalues: handleTeleport (copy), TeleportService (copy), ScreenGui (copy) ]]
+		handleTeleport(p1)
+		TeleportService:SetTeleportGui(ScreenGui)
+		if not (p1 and p1.migrationLoadingScreen) then
+			task.delay(10, function() --[[ Line: 133 | Upvalues: ScreenGui (ref) ]]
+				ScreenGui.Parent = nil
+			end)
+		end
+	end))
+	TeleportService.TeleportInitFailed:Connect(function(p1) --[[ Line: 139 | Upvalues: LocalPlayer (copy), ScreenGui (copy) ]]
+		if p1 == LocalPlayer then
+			ScreenGui.Parent = nil
+		end
+	end)
+end

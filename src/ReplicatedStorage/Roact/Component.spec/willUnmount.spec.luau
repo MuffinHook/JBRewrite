@@ -1,29 +1,20 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMbBnJlbmRlcgtNeUNvbXBvbmVudAZleHRlbmQFdmFsdWULd2lsbFVubW91bnQQbW91bnRWaXJ0dWFsTm9kZQRUZXN0EnVubW91bnRWaXJ0dWFsTm9kZQZleHBlY3QJY2FsbENvdW50AnRvBWVxdWFsBHNlbGYNY2FwdHVyZVZhbHVlcwJvZhlTdGF0ZWZ1bENvbXBvbmVudEluc3RhbmNlB3JlcXVpcmUGc2NyaXB0BlBhcmVudA1jcmVhdGVFbGVtZW50EGNyZWF0ZVJlY29uY2lsZXIJY3JlYXRlU3B5DE5vb3BSZW5kZXJlcgRUeXBlCUNvbXBvbmVudAJpdCBzaG91bGQgYmUgaW52b2tlZCB3aGVuIHVubW91bnRlZAAEAgEAAAAAAsYBAACCAQIAAAATAQEYAAAUAAAAAAoABQAAHAAFBQ8PDw8PDwAAPg8BBTkPAg4wDwMRLQ8EKBY++wAAAG8CAAC8AACcAQAAAJ8AAwL7AQEAnwEBAk0CAcwCAAAAMAIANAMAAADAAgQAMAIAgAUAAAD7AgIAUgMAAJ8CAgL7BAMATQMEvgYAAABSBAIAxgUAAG8GBwCfAwQC+wUDAE0EBQwIAAAAUgUDAJ8EAgGkBgoAAACQQE0HAeQLAAAAnwYCAk0FBpIMAAAATQQFew0AAACMBQEAnwQCAW8GDgC8BAGmDwAAAJ8EAwKkBwoAAACQQPsJBABNCAm8EAAAAE0JBLAOAAAAnwgCAJ8HAAJNBgeSDAAAAE0FBnsNAAAA+wcEAE0GB6YRAAAAnwUCAYIAAQASAwIDAwMEAwUGAAMBAwYDBwMIAwkEAACQQAMKAwsDDAMNAw4DDwMQAQAMAAEYAAAAAAACAAIAAAACAAAEAAAEAAAAAAAAAQAAAAACAAAAAAAAAAAAAAIAAAACAAAAAAAAAAAAAAAAAAAAAAENAAAAAAoAAAAAHwAABw8AAFAPAQtFDwIWOg8DIS8PBCwkDwU3GQ8GQg5QpAABAAAAAECkBAMAAAAgQE0DBCQEAAAATQIDJAQAAABNAQLKBQAAAJ8AAgKkAQEAAAAAQKQFAwAAACBATQQFJAQAAABNAwQkBAAAAE0CA4sGAAAAnwECAqQCAQAAAABApAYDAAAAIEBNBQYkBAAAAE0EBSQEAAAATQMEAAcAAACfAgICpAMBAAAAAECkBwMAAAAgQE0GByQEAAAATQUGJAQAAABNBAVqCAAAAJ8DAgKkBAEAAAAAQKQIAwAAACBATQcIJAQAAABNBgckBAAAAE0FBhEJAAAAnwQCAqQFAQAAAABApAkDAAAAIEBNCAkkBAAAAE0HCCQEAAAATQYHiAoAAACfBQICUgYBAFIHAwCfBgICpAcMAAAAsEBvCA0A2QkAABIABQASAAIAEgAAABIABgASAAQAnwcDAYIAAQAOAxEEAAAAQAMSBAAAIEADEwMUAxUDFgMXAxgDGQMaBAAAsEADGwEBAQABGAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAACAAAAAAAAAAAAAAIAAAIAAAAAAAAAAAAYAgAAAAABAAABAgADowAAAMAAAACCAAIAAQYCAQIBAAEYAAAAAQAAAAAD0I8HT+dbyRviS23bwId2AplCBSxv0oqIwvdKIxmxBlFDfBs4fcH5dw==
-
 return function() --[[ Line: 1 ]]
-    local v0 = require(script.Parent.Parent.createElement);
-    local v1 = require(script.Parent.Parent.createReconciler);
-    local v2 = require(script.Parent.Parent.createSpy);
-    local v3 = require(script.Parent.Parent.NoopRenderer);
-    local v4 = require(script.Parent.Parent.Type);
-    local v5 = require(script.Parent.Parent.Component);
-    local v6 = v1(v3);
-    it("should be invoked when unmounted", function() --[[ Line: 12 ]]
-        -- upvalues: v5 (copy), v2 (copy), v0 (copy), v6 (copy), v4 (copy)
-        local v7 = v5:extend("MyComponent");
-        local v8 = v2();
-        v7.willUnmount = v8.value;
-        v7.render = function(_) --[[ Line: 19 ]] --[[ Name: render ]]
-            return nil;
-        end;
-        local v10 = v0(v7);
-        local v11 = v6.mountVirtualNode(v10, nil, "Test");
-        v6.unmountVirtualNode(v11);
-        expect(v8.callCount).to.equal(1);
-        local v12 = v8:captureValues("self");
-        expect(v4.of(v12.self)).to.equal(v4.StatefulComponentInstance);
-    end);
-end;
+	local createElement = require(script.Parent.Parent.createElement)
+	local createReconciler = require(script.Parent.Parent.createReconciler)
+	local createSpy = require(script.Parent.Parent.createSpy)
+	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
+	local Type = require(script.Parent.Parent.Type)
+	local Component = require(script.Parent.Parent.Component)
+	local v1 = createReconciler(NoopRenderer)
+	it("should be invoked when unmounted", function() --[[ Line: 12 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy) ]]
+		local v12 = Component:extend("MyComponent")
+		local v2 = createSpy()
+		v12.willUnmount = v2.value
+		function v12.render(p1) --[[ Line: 19 ]]
+			return nil
+		end
+		v1.unmountVirtualNode((v1.mountVirtualNode(createElement(v12), nil, "Test")))
+		expect(v2.callCount).to.equal(1)
+		expect(Type.of(v2:captureValues("self").self)).to.equal(Type.StatefulComponentInstance)
+	end)
+end

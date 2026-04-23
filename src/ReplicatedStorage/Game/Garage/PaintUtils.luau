@@ -1,59 +1,36 @@
-local module_upvr = {
-    drill = function(arg1, arg2) -- Line 6, Named "drill"
-        local tbl = {}
-        local var10
-        for i, v in ipairs(arg2) do
-            tbl[i] = v
-        end
-        while var10 and 0 < #tbl do
-            i = tbl
-            var10 = var10:FindFirstChild(table.remove(i))
-        end
-        return var10
-    end;
-    getVehiclePath = function(arg1) -- Line 16, Named "getVehiclePath"
-        local var11 = arg1
-        local module = {arg1.Name}
-        while not var11:FindFirstChild("BoundingBox") do
-            local Parent = var11.Parent
-            if not Parent then
-                warn(table.concat(module, '.'))
-                error("getVehiclePath failed, reached nil")
-            end
-            table.insert(module, Parent.Name)
-        end
-        return module
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local t = {
+	drill = function(p1, p2) --[[ Name: drill | Line: 6 ]]
+		local t = {}
+		for i, v in ipairs(p2) do
+			t[i] = v
+		end
+		while p1 and #t > 0 do
+			p1 = p1:FindFirstChild(table.remove(t))
+		end
+		return p1
+	end,
+	getVehiclePath = function(p1) --[[ Name: getVehiclePath | Line: 16 ]]
+		local t = { p1.Name }
+		local v1 = p1
+		while not v1:FindFirstChild("BoundingBox") do
+			v1 = v1.Parent
+			if not v1 then
+				warn(table.concat(t, "."))
+				error("getVehiclePath failed, reached nil")
+			end
+			table.insert(t, v1.Name)
+		end
+		return t
+	end
 }
-local RunService_upvr = game:GetService("RunService")
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-function module_upvr.GetDefaultVehiclePart(arg1) -- Line 29
-    local any_getVehiclePath_result1 = module_upvr.getVehiclePath(arg1)
-    if RunService_upvr:IsServer() then
-        local any_drill_result1_2 = module_upvr.drill(ReplicatedStorage_upvr.Resource:FindFirstChild("Vehicles"), any_getVehiclePath_result1)
-        if not any_drill_result1_2 then
-            any_drill_result1_2 = module_upvr
-            any_drill_result1_2 = any_drill_result1_2.drill(ReplicatedStorage_upvr.Resource:FindFirstChild("Plane"), any_getVehiclePath_result1)
-            if not any_drill_result1_2 then
-                any_drill_result1_2 = module_upvr
-                any_drill_result1_2 = any_drill_result1_2.drill(ReplicatedStorage_upvr.Resource:FindFirstChild("Boat"), any_getVehiclePath_result1)
-                if not any_drill_result1_2 then
-                    any_drill_result1_2 = module_upvr
-                    any_drill_result1_2 = any_drill_result1_2.drill(game:GetService("ServerStorage").Resource:FindFirstChild("ServerVehicles"), any_getVehiclePath_result1)
-                end
-            end
-        end
-        return any_drill_result1_2
-    end
-    local any_drill_result1_4 = module_upvr.drill(ReplicatedStorage_upvr.Resource:FindFirstChild("Vehicles"), any_getVehiclePath_result1)
-    if not any_drill_result1_4 then
-        any_drill_result1_4 = module_upvr
-        any_drill_result1_4 = any_drill_result1_4.drill(ReplicatedStorage_upvr.Resource:FindFirstChild("Plane"), any_getVehiclePath_result1)
-        if not any_drill_result1_4 then
-            any_drill_result1_4 = module_upvr
-            any_drill_result1_4 = any_drill_result1_4.drill(ReplicatedStorage_upvr.Resource:FindFirstChild("Boat"), any_getVehiclePath_result1)
-        end
-    end
-    return any_drill_result1_4
+function t.GetDefaultVehiclePart(p1) --[[ Line: 29 | Upvalues: t (copy), RunService (copy), ReplicatedStorage (copy) ]]
+	local v1 = t.getVehiclePath(p1)
+	if RunService:IsServer() then
+		return t.drill(ReplicatedStorage.Resource:FindFirstChild("Vehicles"), v1) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Plane"), v1) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Boat"), v1) or t.drill(game:GetService("ServerStorage").Resource:FindFirstChild("ServerVehicles"), v1)
+	else
+		return t.drill(ReplicatedStorage.Resource:FindFirstChild("Vehicles"), v1) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Plane"), v1) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Boat"), v1)
+	end
 end
-return module_upvr
+return t

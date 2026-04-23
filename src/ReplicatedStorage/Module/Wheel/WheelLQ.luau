@@ -1,8 +1,8 @@
-local Wheel_upvr = require(script.Parent.Wheel)
-local module = {}
-module.__index = module
-setmetatable(module, Wheel_upvr)
-function module.new(arg1) -- Line 6
-    return Wheel_upvr.new(arg1, true)
+local Wheel = require(script.Parent.Wheel)
+local t = {}
+t.__index = t
+setmetatable(t, Wheel)
+function t.new(p1) --[[ Line: 6 | Upvalues: Wheel (copy) ]]
+	return Wheel.new(p1, true)
 end
-return module
+return t

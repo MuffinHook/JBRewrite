@@ -1,246 +1,281 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local VehicleData_upvr = require(ReplicatedStorage_upvr.Game.Garage.VehicleData)
-local function getVehicleDataForMake(arg1) -- Line 14, Named "getVehicleDataForMake"
-    for _, v in ipairs(VehicleData_upvr) do
-        if v.Make == arg1 then
-            return v
-        end
-    end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TradePopularSortData = require(script.Parent.TradePopularSortData)
+local ItemUtils = require(ReplicatedStorage.App.ItemUtils)
+local GarageTranslationUtils = require(ReplicatedStorage.Garage.GarageTranslationUtils)
+local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
+local StoreData = require(ReplicatedStorage.Game.Garage.StoreData)
+local VehicleData = require(ReplicatedStorage.Game.Garage.VehicleData)
+local SAFE_DATA = require(ReplicatedStorage.Safes.SafesConsts).SAFE_DATA
+local PopularSort = require(ReplicatedStorage.Garage.PopularSort)
+local PlayerUtils = require(ReplicatedStorage.Std.PlayerUtils)
+local getViewportProps = require(ReplicatedStorage.App.getViewportProps)
+local function getVehicleDataForMake(p1) --[[ Line: 14 | Upvalues: VehicleData (copy) ]]
+	for i, v in ipairs(VehicleData) do
+		if v.Make == p1 then
+			return v
+		end
+	end
 end
-local ItemSkinList_upvr = require(ReplicatedStorage_upvr.Game.ItemSkin.ItemSkinList)
-local function getItemSkinForName(arg1) -- Line 24, Named "getItemSkinForName"
-    for _, v_2 in ipairs(ItemSkinList_upvr) do
-        if v_2.Name == arg1 then
-            return v_2
-        end
-    end
+local ItemSkinList = require(ReplicatedStorage.Game.ItemSkin.ItemSkinList)
+local String = require(ReplicatedStorage.Std.String)
+local function getItemSkinForName(p1) --[[ Line: 24 | Upvalues: ItemSkinList (copy) ]]
+	for i, v in ipairs(ItemSkinList) do
+		if v.Name == p1 then
+			return v
+		end
+	end
 end
-local module_upvr = {}
-local PopularSort_upvr = require(ReplicatedStorage_upvr.Garage.PopularSort)
-local TradePopularSortData_upvr = require(script.Parent.TradePopularSortData)
-local ItemUtils_upvr = require(ReplicatedStorage_upvr.App.ItemUtils)
-local getViewportProps_upvr = require(ReplicatedStorage_upvr.App.getViewportProps)
-local PlayerDataConsts_upvr = require(ReplicatedStorage_upvr.PlayerData.PlayerDataConsts)
-local StoreData_upvr = require(ReplicatedStorage_upvr.Game.Garage.StoreData)
-local GarageTranslationUtils_upvr = require(ReplicatedStorage_upvr.Garage.GarageTranslationUtils)
-local String_upvr = require(ReplicatedStorage_upvr.Std.String)
-local PlayerUtils_upvr = require(ReplicatedStorage_upvr.Std.PlayerUtils)
-function module_upvr.buildItemProps(arg1) -- Line 37
-    if not arg1 or not arg1.ItemType then
-        return nil
-    end
-
-    local itemType = arg1.ItemType
-    local function makeId()
-        if arg1.Id ~= nil then
-            return arg1.Id
-        end
-        if itemType == PlayerDataConsts_upvr.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
-            return string.format("%s.%s.%s", itemType, tostring(arg1.CategoryName), tostring(arg1.ItemName))
-        end
-        if itemType == PlayerDataConsts_upvr.VEHICLE_ITEM_TYPE then
-            return string.format("%s.%s", itemType, tostring(arg1.Make))
-        end
-        if itemType == PlayerDataConsts_upvr.ITEM_SKIN_ITEM_TYPE then
-            return string.format("%s.%s", itemType, tostring(arg1.SkinName))
-        end
-        if itemType == PlayerDataConsts_upvr.HOME_ITEM_TYPE then
-            return string.format("%s.%s", itemType, tostring(arg1.ItemName))
-        end
-        if itemType == PlayerDataConsts_upvr.SAFE_ITEM_TYPE then
-            return string.format("%s.%s", itemType, tostring(arg1.TypeEnum))
-        end
-        return string.format("%s.%s", itemType, tostring(arg1.ItemName))
-    end
-
-    local props = {
-        id = makeId();
-        itemOwnedId = arg1.Id;
-        itemOwned = arg1;
-        itemType = itemType;
-        created = arg1.CreationTime;
-        cash = arg1.Cash;
-        isOriginalOwner = arg1.IsOriginalOwner == true;
-    }
-
-    if itemType == PlayerDataConsts_upvr.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
-        local categoryName = arg1.CategoryName
-        local itemName = arg1.ItemName
-        if not categoryName or not itemName then
-            return nil
-        end
-
-        local itemData = StoreData_upvr.GetItemByName(categoryName, itemName)
-        if not itemData then
-            return nil
-        end
-
-        props.categoryName = categoryName
-        props.name = itemName
-        props.title = itemData.DisplayName or itemData.Name or itemName
-        props.categoryTitle = GarageTranslationUtils_upvr.getCategoryTitle(categoryName)
-        props.price = itemData.Price
-        props.level = itemData.Level
-        props.season = itemData.Season
-        props.topPct = itemData.TopPct
-        props.rarityIndex = itemData.RarityIndex or arg1.RarityId or 0
-
-        local ok, viewportProps = pcall(getViewportProps_upvr, arg1)
-        if ok and viewportProps then
-            for key, value in pairs(viewportProps) do
-                props[key] = value
-            end
-        end
-
-        return props
-    end
-
-    if itemType == PlayerDataConsts_upvr.VEHICLE_ITEM_TYPE then
-        local vehicleData = getVehicleDataForMake(arg1.Make)
-        if not vehicleData then
-            return nil
-        end
-
-        props.name = arg1.Make
-        props.title = vehicleData.Name or arg1.Make
-        props.categoryTitle = "Vehicle"
-        props.price = vehicleData.Price
-        props.level = vehicleData.Level
-        props.season = vehicleData.Season
-        props.rarityIndex = arg1.RarityId or 0
-
-        return props
-    end
-
-    if itemType == PlayerDataConsts_upvr.ITEM_SKIN_ITEM_TYPE then
-        local itemSkin = getItemSkinForName(arg1.SkinName)
-        if not itemSkin then
-            return nil
-        end
-
-        props.name = arg1.SkinName
-        props.title = arg1.SkinName
-        props.categoryTitle = "Item Skin"
-        props.rarityIndex = arg1.RarityId or 0
-        return props
-    end
-
-    if itemType == PlayerDataConsts_upvr.HOME_ITEM_TYPE then
-        props.name = arg1.ItemName
-        props.title = arg1.ItemName
-        props.categoryTitle = "Home Item"
-        props.rarityIndex = arg1.RarityId or 0
-        return props
-    end
-
-    if itemType == PlayerDataConsts_upvr.SAFE_ITEM_TYPE then
-        props.name = tostring(arg1.TypeEnum)
-        props.title = tostring(arg1.TypeEnum)
-        props.categoryTitle = "Safe"
-        props.rarityIndex = arg1.RarityId or 0
-        return props
-    end
-
-    if itemType == PlayerDataConsts_upvr.CONSUMABLE_ITEM_TYPE then
-        props.name = arg1.ItemName
-        props.title = arg1.ItemName
-        props.categoryTitle = "Consumable"
-        props.rarityIndex = arg1.RarityId or 0
-        return props
-    end
-
-    return nil
+local t = {
+	buildItemProps = function(p1) --[[ Name: buildItemProps | Line: 37 | Upvalues: PopularSort (copy), TradePopularSortData (copy), ItemUtils (copy), getViewportProps (copy), PlayerDataConsts (copy), StoreData (copy), GarageTranslationUtils (copy), VehicleData (copy), ReplicatedStorage (copy), ItemSkinList (copy), String (copy), PlayerUtils (copy) ]]
+		local v1 = nil
+		local v2 = PopularSort.getRaw()
+		local v3 = TradePopularSortData.getPopularTradeItemData() or {}
+		local v4 = ItemUtils.getFullNameFromTable(p1)
+		local v5 = getViewportProps(p1)
+		if p1.ItemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
+			local CategoryName = p1.CategoryName
+			local ItemName = p1.ItemName
+			local v6 = StoreData.GetItemByName(CategoryName, ItemName)
+			if v6 and typeof(v6) == "table" then
+				if v6.NoTrade then
+					return
+				end
+				local v7 = ItemUtils.getTranslatedTitleFromItemTable(p1)
+				v1 = {
+					salesIndex = v2[CategoryName] and v2[CategoryName][ItemName],
+					categoryName = CategoryName,
+					categoryTitle = GarageTranslationUtils.getCategoryTitle(CategoryName),
+					title = v7,
+					price = v6.Price,
+					level = v6.Level,
+					season = v6.Season,
+					topPct = v6.TopPct,
+					vip = v6.VIP,
+					getInst = v5.getInst,
+					getInstCompare = v5.getInstCompare,
+					updateCamera = v5.updateCamera
+				}
+			else
+				warn("Missing vehCust for: " .. CategoryName .. "/" .. ItemName)
+				return
+			end
+		elseif p1.ItemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then
+			local Make = p1.Make
+			local v10 = nil
+			for i, v in ipairs(VehicleData) do
+				if v.Make == Make then
+					v10 = v
+					break
+				end
+			end
+			if v10 then
+				if v10.NoTrade then
+					return
+				end
+				v1 = {
+					salesIndex = v2.Vehicles[Make],
+					categoryTitle = "Vehicle",
+					title = ItemUtils.getTranslatedTitleFromItemTable(p1),
+					season = v10.Season,
+					level = v10.Level,
+					vip = v10.VIP,
+					topPct = v10.TopPct,
+					getInst = v5.getInst,
+					getInstCompare = v5.getInstCompare,
+					updateCamera = v5.updateCamera
+				}
+			else
+				warn("Missing vehicleConf for: " .. Make)
+				return
+			end
+		elseif p1.ItemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then
+			local ItemName = p1.ItemName
+			local v11 = ReplicatedStorage.Resource.HomeItem:FindFirstChild(ItemName)
+			if v11 then
+				if v11:FindFirstChild("NoTrade") then
+					return
+				end
+				local Level = v11:FindFirstChild("Level")
+				local Season = v11:FindFirstChild("Season")
+				local TopPct = v11:FindFirstChild("TopPct")
+				local t = {
+					title = ItemUtils.getTranslatedTitleFromItemTable(p1),
+					categoryTitle = "Furniture"
+				}
+				t.level = if Level == nil then nil else Level.Value or nil
+				t.season = if Season == nil then nil else Season.Value or nil
+				t.topPct = if TopPct == nil then nil else TopPct.Value or nil
+				t.getInst = v5.getInst
+				t.getInstCompare = v5.getInstCompare
+				t.updateCamera = v5.updateCamera
+				v1 = t
+			else
+				warn("Missing homeItemModel for: " .. ItemName)
+				return
+			end
+		elseif p1.ItemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then
+			local SkinName = p1.SkinName
+			local v15 = nil
+			for i, v in ipairs(ItemSkinList) do
+				if v.Name == SkinName then
+					v15 = v
+					break
+				end
+			end
+			if v15 then
+				if v15.NoTrade then
+					return
+				end
+				v1 = {
+					title = ItemUtils.getTranslatedTitleFromItemTable(p1),
+					categoryTitle = "Item Skin",
+					season = v15.Season,
+					level = v15.Level,
+					vip = v15.VIP,
+					topPct = v15.TopPct,
+					getInst = v5.getInst,
+					getInstCompare = v5.getInstCompare,
+					updateCamera = v5.updateCamera
+				}
+			else
+				return
+			end
+		elseif p1.ItemType == PlayerDataConsts.SAFE_ITEM_TYPE then
+			v1 = {
+				title = ItemUtils.getTranslatedTitleFromItemTable(p1),
+				categoryTitle = "Safe",
+				image = v5.image,
+				getInstCompare = v5.getInstCompare
+			}
+		elseif p1.ItemType == PlayerDataConsts.CONSUMABLE_ITEM_TYPE then
+			v1 = {
+				title = ItemUtils.getTranslatedTitleFromItemTable(p1),
+				categoryTitle = "Consumable",
+				image = v5.image,
+				getInstCompare = v5.getInstCompare
+			}
+		else
+			error("Unsupported ItemType", p1.ItemType)
+		end
+		if p1.Id then
+			v1.id = p1.Id
+		end
+		v1.itemType = assert(p1.ItemType, "missing ItemType")
+		v1.info = {}
+		local v16 = false
+		if p1.History then
+			local UserId = p1.History[1].UserId
+			local UserId_2 = p1.History[#p1.History].UserId
+			if UserId and UserId_2 then
+				v16 = UserId == UserId_2
+			end
+		end
+		v1.isOriginalOwner = v16
+		local v17 = v3[v4]
+		v1.uniqueCirculation = if v17 then v17.UniqueCirculation else 0
+		v1.timesTraded = if v17 then v17.TimesTraded else 0
+		if v1.uniqueCirculation > 0 then
+			v1.tradePopularMetric = v1.timesTraded / v1.uniqueCirculation
+		end
+		table.insert(v1.info, {
+			title = "Monthly Traded",
+			value = String.comma(v1.timesTraded)
+		})
+		table.insert(v1.info, {
+			title = "Monthly Unique",
+			value = String.comma(v1.uniqueCirculation)
+		})
+		if p1.History then
+			local UserId = p1.History[1].UserId
+			local t3 = {
+				title = "Original Owner",
+				value = tostring(UserId)
+			}
+			table.insert(v1.info, t3)
+			if UserId then
+				PlayerUtils.promiseNameFromUserId(UserId):andThen(function(p1) --[[ Line: 222 | Upvalues: t3 (copy) ]]
+					t3.value = p1
+				end):catch(warn)
+			end
+		end
+		if p1.CreationTime then
+			table.insert(v1.info, {
+				title = "Created At",
+				value = DateTime.fromUnixTimestamp(p1.CreationTime):FormatLocalTime("ll", "en-us")
+			})
+		end
+		return v1
+	end,
+	getDefaults = function() --[[ Name: getDefaults | Line: 243 ]]
+		return {
+			userId = nil,
+			displayName = nil,
+			ready = false,
+			accepted = false,
+			offerItems = {}
+		}
+	end
+}
+function t.update(p1, p2) --[[ Line: 252 | Upvalues: t (copy) ]]
+	local v1 = if p2.reset == true then t.getDefaults() else table.clone(p1)
+	if p2.userId ~= nil then
+		v1.userId = p2.userId
+	end
+	if p2.displayName ~= nil then
+		v1.displayName = p2.displayName
+	end
+	if p2.ready ~= nil then
+		v1.ready = p2.ready
+	end
+	if p2.accepted ~= nil then
+		v1.accepted = p2.accepted
+	end
+	if p2.itemsOwnedOffering ~= nil then
+		local t2 = {}
+		for i, v in ipairs(p2.itemsOwnedOffering) do
+			local v4 = t.buildItemProps(v)
+			if v4 then
+				table.insert(t2, v4)
+			end
+		end
+		v1.offerItems = t2
+	end
+	return v1
 end
-function module_upvr.getDefaults() -- Line 243
-    return {
-        userId = nil;
-        displayName = nil;
-        ready = false;
-        accepted = false;
-        offerItems = {};
-    }
+function t.addItem(p1, p2) --[[ Line: 283 ]]
+	local item = p2.item
+	assert(item ~= nil, "missing item")
+	local v2 = false
+	for i, v in ipairs(p1.offerItems) do
+		if v.id == item.id then
+			v2 = true
+			break
+		end
+	end
+	if v2 then
+		return p1
+	else
+		local v3 = table.clone(p1)
+		table.insert(v3.offerItems, item)
+		return v3
+	end
 end
-function module_upvr.update(arg1, arg2) -- Line 252
-    local var29
-    if arg2.reset == true then
-        var29 = module_upvr.getDefaults()
-    else
-        var29 = table.clone(arg1)
-    end
-    if arg2.userId ~= nil then
-        var29.userId = arg2.userId
-    end
-    if arg2.displayName ~= nil then
-        var29.displayName = arg2.displayName
-    end
-    if arg2.ready ~= nil then
-        var29.ready = arg2.ready
-    end
-    if arg2.accepted ~= nil then
-        var29.accepted = arg2.accepted
-    end
-    if arg2.itemsOwnedOffering ~= nil then
-        for _, v_3 in ipairs(arg2.itemsOwnedOffering) do
-            local any_buildItemProps_result1 = module_upvr.buildItemProps(v_3)
-            if any_buildItemProps_result1 then
-                table.insert({}, any_buildItemProps_result1)
-            end
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        var29.offerItems = {}
-    end
-    return var29
+function t.removeItem(p1, p2) --[[ Line: 301 ]]
+	local item = p2.item
+	assert(item ~= nil, "missing item")
+	for i = #p1.offerItems, 1, -1 do
+		if p1.offerItems[i].id == item.id then
+			local v2 = table.clone(p1)
+			table.remove(v2.offerItems, i)
+			return v2
+		end
+	end
+	return p1
 end
-function module_upvr.addItem(arg1, arg2) -- Line 283
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local var35
-    if arg2.item == nil then
-        var35 = false
-    else
-        var35 = true
-    end
-    assert(var35, "missing item")
-    var35 = ipairs(arg1.offerItems)
-    local ipairs_result1, ipairs_result2, ipairs_result3_2 = ipairs(arg1.offerItems)
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [27.9]
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [27.2147483650]
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.removeItemByIndex(p1, p2) --[[ Line: 315 ]]
+	assert(p2.index ~= nil, "missing item id")
+	local v2 = table.clone(p1)
+	table.remove(v2.offerItems, p2.index)
+	return v2
 end
-function module_upvr.removeItem(arg1, arg2) -- Line 301
-    local item = arg2.item
-    local var42
-    if item == nil then
-        var42 = false
-    else
-        var42 = true
-    end
-    assert(var42, "missing item")
-    var42 = -1
-    for i_4 = #arg1.offerItems, 1, var42 do
-        if arg1.offerItems[i_4].id == item.id then
-            local clone_2 = table.clone(arg1)
-            table.remove(clone_2.offerItems, i_4)
-            return clone_2
-        end
-    end
-    return arg1
-end
-function module_upvr.removeItemByIndex(arg1, arg2) -- Line 315
-    local var44
-    if arg2.index == nil then
-        var44 = false
-    else
-        var44 = true
-    end
-    assert(var44, "missing item id")
-    var44 = arg1
-    local clone = table.clone(var44)
-    var44 = table.remove
-    var44(clone.offerItems, arg2.index)
-    return clone
-end
-return module_upvr
+return t

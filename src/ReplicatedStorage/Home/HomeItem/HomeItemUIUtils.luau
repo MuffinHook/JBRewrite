@@ -1,49 +1,39 @@
-local module = {
-    getUpdateCamera = function() -- Line 4, Named "getUpdateCamera"
-        local var3_upvw
-        local var4_upvw
-        local cframe_upvw = CFrame.Angles(0, 0, 0)
-        return function(arg1, arg2) -- Line 8
-            if not arg2 then
-            else
-                if arg2 ~= var3_upvw then
-                    local any_GetBoundingBox_result1, any_GetBoundingBox_result2 = arg2:GetBoundingBox()
-                    _ = any_GetBoundingBox_result1 -- Setting global
-                    var4_upvw = any_GetBoundingBox_result2
-                    var3_upvw = arg2
-                    local UpDot = var3_upvw:FindFirstChild("UpDot")
-                    if UpDot then
-                        any_GetBoundingBox_result2 = UpDot.Value
-                        local var13 = any_GetBoundingBox_result2
-                        if var13 ~= 1 then
-                            if UpDot.Value == 0 then
-                                var13 = CFrame.Angles((math.pi/2), 0, (math.pi/2))
-                            else
-                                var13 = CFrame.Angles(0, 0, math.pi)
-                            end
-                            cframe_upvw = var13
-                        end
-                    end
-                end
-                local os_clock_result1 = os.clock()
-                arg1.CFrame = CFrame.new(0, 0, 0) * cframe_upvw * CFrame.Angles(0, os_clock_result1 % (-math.pi*2), 0) * CFrame.Angles(math.sin(os_clock_result1 * 0.5) * 0.3 - 0.4, 0, 0) * CFrame.new(0, 0, var4_upvw.Magnitude * 0.8)
-            end
-        end
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return {
+	getUpdateCamera = function() --[[ Name: getUpdateCamera | Line: 4 ]]
+		local v1 = nil
+		local v2 = nil
+		local v3 = CFrame.Angles(0, 0, 0)
+		return function(p1, p2) --[[ Line: 8 | Upvalues: v1 (ref), v2 (ref), v3 (ref) ]]
+			if p2 then
+				if p2 ~= v1 then
+					local v12, v22 = p2:GetBoundingBox()
+					_ = v12
+					v2 = v22
+					v1 = p2
+					local UpDot = p2:FindFirstChild("UpDot")
+					if UpDot and UpDot.Value ~= 1 then
+						v3 = if UpDot.Value == 0 then CFrame.Angles(1.5707963267948966, 0, 1.5707963267948966) else CFrame.Angles(0, 0, math.pi)
+					end
+				end
+				local v4 = os.clock()
+				p1.CFrame = CFrame.new(0, 0, 0) * v3 * CFrame.Angles(0, v4 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v4 * 0.5) * 0.3 - 0.4, 0, 0) * CFrame.new(0, 0, v2.Magnitude * 0.8)
+			end
+		end
+	end,
+	getModel = function(p1) --[[ Name: getModel | Line: 32 | Upvalues: ReplicatedStorage (copy) ]]
+		local v1 = ReplicatedStorage.Resource.HomeItem:FindFirstChild(p1)
+		if not v1 then
+			error("No HomeItem exists by name: " .. p1)
+		end
+		local v2 = v1:Clone()
+		local v3 = v2
+		for v4, v5 in v2:GetDescendants() do
+			if v5:IsA("LuaSourceContainer") then
+				v5:Destroy()
+			end
+		end
+		v3:SetPrimaryPartCFrame(v3.PrimaryPart.CFrame:ToObjectSpace((v3:GetBoundingBox())):Inverse())
+		return v3
+	end
 }
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-function module.getModel(arg1) -- Line 32
-    local SOME = ReplicatedStorage_upvr.Resource.HomeItem:FindFirstChild(arg1)
-    if not SOME then
-        error("No HomeItem exists by name: "..arg1)
-    end
-    local clone = SOME:Clone()
-    for _, v in clone:GetDescendants() do
-        if v:IsA("LuaSourceContainer") then
-            v:Destroy()
-        end
-    end
-    clone:SetPrimaryPartCFrame(clone.PrimaryPart.CFrame:ToObjectSpace(clone:GetBoundingBox()):Inverse())
-    return clone
-end
-return module

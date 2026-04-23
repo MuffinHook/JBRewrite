@@ -1,55 +1,53 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage_upvr.Roact)
-local EnumRarity_upvr = require(ReplicatedStorage_upvr.RewardSpinner.EnumRarity)
-local RoactRodux_upvr = require(ReplicatedStorage_upvr.RoactRodux)
-return function(arg1) -- Line 6
-    local any_extend_result1 = Roact_upvr.Component:extend("App")
-    local store_upvr = require(ReplicatedStorage_upvr.App.store)
-    local tbl_upvr = {}
-    local var11_upvw = 0
-    for _ = 1, 80 do
-        local tbl = {}
-        local var13 = "Cash"
-        tbl.Type = var13
-        if 0.5 < math.random() then
-            var13 = 1000
-        else
-            var13 = 0
-        end
-        tbl.Amount = var13
-        tbl.RarityId = EnumRarity_upvr.Epic
-        table.insert(tbl_upvr, tbl)
-    end
-    function any_extend_result1.init(arg1_2) -- Line 19
-        store_upvr:dispatch({
-            type = "setRewardSpinnerConfig";
-            items = tbl_upvr;
-            duration = 5;
-            winIndex = 77;
-            extraText = "Spin num: "..tostring(var11_upvw);
-        })
-    end
-    local RewardSpinner_upvr = require(script.Parent.RewardSpinner)
-    function any_extend_result1.render(arg1_3) -- Line 28
-        return Roact_upvr.createElement(RoactRodux_upvr.StoreProvider, {
-            store = store_upvr;
-        }, {Roact_upvr.createElement(RewardSpinner_upvr, {
-            onFinished = function() -- Line 33, Named "onFinished"
-                var11_upvw += 1
-                store_upvr:dispatch({
-                    type = "setRewardSpinnerConfig";
-                    items = tbl_upvr;
-                    duration = 5;
-                    winIndex = 77;
-                    extraText = "Spin num: "..tostring(var11_upvw);
-                })
-            end;
-        })})
-    end
-    function any_extend_result1.willUnmount(arg1_4) -- Line 46
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(any_extend_result1), arg1)
-    return function() -- Line 49
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+local EnumRarity = require(ReplicatedStorage.RewardSpinner.EnumRarity)
+return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), ReplicatedStorage (copy), EnumRarity (copy), RoactRodux (copy) ]]
+	local v1 = Roact.Component:extend("App")
+	local RewardSpinner = require(script.Parent.RewardSpinner)
+	local store = require(ReplicatedStorage.App.store)
+	local t = {}
+	local v2 = 0
+	for i = 1, 80 do
+		local v3
+		local t2 = {
+			Type = "Cash"
+		}
+		v3 = if math.random() > 0.5 then 1000 else 0
+		t2.Amount = v3
+		t2.RarityId = EnumRarity.Epic
+		table.insert(t, t2)
+	end
+	function v1.init(p1) --[[ Line: 19 | Upvalues: store (copy), t (copy), v2 (ref) ]]
+		local t2 = {
+			type = "setRewardSpinnerConfig",
+			items = t,
+			duration = 5,
+			winIndex = 77
+		}
+		t2.extraText = "Spin num: " .. tostring(v2)
+		store:dispatch(t2)
+	end
+	function v1.render(p1) --[[ Line: 28 | Upvalues: Roact (ref), RoactRodux (ref), store (copy), RewardSpinner (copy), v2 (ref), t (copy) ]]
+		return Roact.createElement(RoactRodux.StoreProvider, {
+			store = store
+		}, { Roact.createElement(RewardSpinner, {
+				onFinished = function() --[[ Name: onFinished | Line: 33 | Upvalues: v2 (ref), store (ref), t (ref) ]]
+					v2 = v2 + 1
+					local t2 = {
+						type = "setRewardSpinnerConfig",
+						items = t,
+						duration = 5,
+						winIndex = 77
+					}
+					t2.extraText = "Spin num: " .. tostring(v2)
+					store:dispatch(t2)
+				end
+			}) })
+	end
+	function v1.willUnmount(p1) --[[ Line: 46 ]] end
+	local v4 = Roact.mount(Roact.createElement(v1), p1)
+	return function() --[[ Line: 49 | Upvalues: Roact (ref), v4 (copy) ]]
+		Roact.unmount(v4)
+	end
 end

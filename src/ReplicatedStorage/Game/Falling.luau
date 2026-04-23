@@ -1,654 +1,498 @@
-local UserInputService_upvr = game:GetService("UserInputService")
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local AlexRagdoll_upvr = require(ReplicatedStorage_upvr.Module.AlexRagdoll)
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local Signal = require(ReplicatedStorage_upvr.Std.Signal)
-local Paraglide_upvr = require(ReplicatedStorage_upvr.Game.Paraglide)
-local Players_upvr = game:GetService("Players")
-local LocalPlayer_upvr = Players_upvr.LocalPlayer
-local var9_upvw
-local ControllerImage_upvr = require(ReplicatedStorage_upvr.ControllerImage)
-local TagUtils_upvr = require(ReplicatedStorage_upvr.Tag.TagUtils)
-local var12_upvw
-local var13_upvw
-local function _() -- Line 34, Named "GuiUpdateInput"
-    if UserInputService_upvr.GamepadEnabled then
-        var13_upvw.Button.Gamepad.Image = ControllerImage_upvr.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
-        var13_upvw.Button.Gamepad.Visible = true
-    else
-        var13_upvw.Button.Gamepad.Visible = false
-    end
+local CollectionService = game:GetService("CollectionService")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local AlexRagdoll = require(ReplicatedStorage.Module.AlexRagdoll)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSystem)
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local Paraglide = require(ReplicatedStorage.Game.Paraglide)
+local CharacterAnim = require(ReplicatedStorage.Game.CharacterAnim)
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local HapticEffect = require(ReplicatedStorage.App.HapticEffect)
+local LocalPlayer = Players.LocalPlayer
+local v1 = nil
+local RunUtils = require(ReplicatedStorage.App.RunUtils)
+local ControllerImage = require(ReplicatedStorage.ControllerImage)
+local TagUtils = require(ReplicatedStorage.Tag.TagUtils)
+local Raycast = require(ReplicatedStorage.Std.Raycast)
+local C4Consts = require(ReplicatedStorage.Game.C4.C4Consts)
+local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
+Vector3.new()
+local v2 = nil
+local v3 = nil
+local v4 = nil
+local function GuiUpdateInput() --[[ Line: 34 | Upvalues: UserInputService (copy), v4 (ref), ControllerImage (copy) ]]
+	if UserInputService.GamepadEnabled then
+		v4.Button.Gamepad.Image = ControllerImage.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
+		v4.Button.Gamepad.Visible = true
+	else
+		v4.Button.Gamepad.Visible = false
+	end
 end
-local function _() -- Line 42, Named "GuiPromptSkydive"
-    var13_upvw.Enabled = true
-    var13_upvw.Button.Image = string.format(("rbxassetid://%d"), 4915090302)
-    if UserInputService_upvr.GamepadEnabled then
-        var13_upvw.Button.Gamepad.Image = ControllerImage_upvr.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
-        var13_upvw.Button.Gamepad.Visible = true
-    else
-        var13_upvw.Button.Gamepad.Visible = false
-    end
+local function GuiPromptSkydive() --[[ Line: 42 | Upvalues: v4 (ref), UserInputService (copy), ControllerImage (copy) ]]
+	v4.Enabled = true
+	v4.Button.Image = ("rbxassetid://%d"):format(4915090302)
+	if UserInputService.GamepadEnabled then
+		v4.Button.Gamepad.Image = ControllerImage.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
+		v4.Button.Gamepad.Visible = true
+	else
+		v4.Button.Gamepad.Visible = false
+	end
 end
-local function _() -- Line 47, Named "GuiPromptParachute"
-    var13_upvw.Enabled = true
-    var13_upvw.Button.Image = string.format(("rbxassetid://%d"), 4915089706)
-    if UserInputService_upvr.GamepadEnabled then
-        var13_upvw.Button.Gamepad.Image = ControllerImage_upvr.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
-        var13_upvw.Button.Gamepad.Visible = true
-    else
-        var13_upvw.Button.Gamepad.Visible = false
-    end
+local function GuiPromptParachute() --[[ Line: 47 | Upvalues: v4 (ref), UserInputService (copy), ControllerImage (copy) ]]
+	v4.Enabled = true
+	v4.Button.Image = ("rbxassetid://%d"):format(4915089706)
+	if UserInputService.GamepadEnabled then
+		v4.Button.Gamepad.Image = ControllerImage.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
+		v4.Button.Gamepad.Visible = true
+	else
+		v4.Button.Gamepad.Visible = false
+	end
 end
-local function _() -- Line 52, Named "GuiPromptNone"
-    var13_upvw.Enabled = false
+local function GuiPromptNone() --[[ Line: 52 | Upvalues: v4 (ref) ]]
+	v4.Enabled = false
 end
-local function _() -- Line 56, Named "GetHumanoid"
-    local Character_9 = LocalPlayer_upvr.Character
-    if Character_9 == nil then
-        return nil
-    end
-    return Character_9:FindFirstChild("Humanoid")
+local function GetHumanoid() --[[ Line: 56 | Upvalues: LocalPlayer (copy) ]]
+	local Character = LocalPlayer.Character
+	if Character == nil then
+		return nil
+	else
+		return Character:FindFirstChild("Humanoid")
+	end
 end
-local function _() -- Line 64, Named "getRootPart"
-    local Character_10 = LocalPlayer_upvr.Character
-    if not Character_10 then return end
-    return Character_10.PrimaryPart
+local function getRootPart() --[[ Line: 64 | Upvalues: LocalPlayer (copy) ]]
+	local Character = LocalPlayer.Character
+	if Character then
+		return Character.PrimaryPart
+	end
 end
-local function GetMass_upvr(arg1) -- Line 78, Named "GetMass"
-    assert(arg1)
-    local var22 = 0
-    for _, v in next, arg1:GetChildren() do
-        if v:IsA("BasePart") then
-            var22 += v:GetMass()
-        end
-        var22 += GetMass_upvr(v)
-    end
-    return var22
+local function v5(p1) --[[ Line: 78 | Upvalues: v5 (copy) ]]
+	assert(p1)
+	local v1 = next
+	local v2, v3 = p1:GetChildren()
+	local sum = 0
+	for v4, v52 in v1, v2, v3 do
+		if v52:IsA("BasePart") then
+			sum = sum + v52:GetMass()
+		end
+		sum = sum + v5(v52)
+	end
+	return sum
 end
-local any_new_result1_upvr = Signal.new()
-local any_new_result1_upvr_3 = Signal.new()
-local any_new_result1_upvr_2 = Signal.new()
-local var26_upvw = false
-local var27_upvw = false
-local var28_upvw = 0
-local var29_upvw = false
-local var30_upvw = false
-local var31_upvw
-local var32_upvw
-local var33_upvw
-local var34_upvw = 0
-local var35_upvw = 0
-local var36_upvw = 0
-local var37_upvw
-local var38_upvw
-local var39_upvw
-local CharacterAnim_upvr = require(ReplicatedStorage_upvr.Game.CharacterAnim)
-local CharacterUtils_upvr = require(ReplicatedStorage_upvr.Std.CharacterUtils)
-local HapticEffect_upvr = require(ReplicatedStorage_upvr.App.HapticEffect)
-local function StartSkydiving_upvr() -- Line 124, Named "StartSkydiving"
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local var43
-    if var29_upvw ~= false then
-        var43 = false
-    else
-        var43 = true
-    end
-    assert(var43)
-    var43 = LocalPlayer_upvr
-    var43 = var43.Character
-    if var43 == nil then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local Humanoid = var43:FindFirstChild("Humanoid")
-    if Humanoid == nil then
-        var43 = false
-        return var43
-    end
-    var43 = true
-    var29_upvw = var43
-    var43 = var31_upvw
-    if var43 then
-        var31_upvw:Stop()
-        var43 = nil
-        var31_upvw = var43
-    end
-    var43 = CharacterAnim_upvr
-    var43 = var43.getSkydiveTrack()
-    var31_upvw = var43
-    var31_upvw:Play(0.3)
-    var43 = GetMass_upvr(Humanoid.Parent)
-    var33_upvw = var43
-    var43 = Instance.new("VectorForce")
-    var32_upvw = var43
-    var43 = var32_upvw
-    var43.Force = Vector3.new(0, 0, 0)
-    var43 = var32_upvw
-    var43.Attachment0 = CharacterUtils_upvr.getRootAttachment(Humanoid.RootPart)
-    var43 = var32_upvw
-    var43.Parent = Humanoid.RootPart
-    var43 = var13_upvw
-    var43.Enabled = true
-    var43 = var13_upvw
-    var43 = var43.Button
-    var43.Image = string.format(("rbxassetid://%d"), 4915089706)
-    var43 = UserInputService_upvr
-    var43 = var43.GamepadEnabled
-    if var43 then
-        var43 = var13_upvw
-        var43 = var43.Button
-        var43 = var43.Gamepad
-        var43.Image = ControllerImage_upvr.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
-        var43 = var13_upvw
-        var43 = var43.Button
-        var43 = var43.Gamepad
-        var43.Visible = true
-    else
-        var43 = var13_upvw
-        var43 = var43.Button
-        var43 = var43.Gamepad
-        var43.Visible = false
-    end
-    var43 = var37_upvw
-    if var43 ~= nil then
-        var37_upvw:Stop()
-        var37_upvw:Destroy()
-        var43 = nil
-        var37_upvw = var43
-    end
-    var43 = Audio_upvr
-    var43 = var43.ObjectLocal
-    var43 = var43(LocalPlayer_upvr.PlayerGui, 9058653424, {
-        Volume = 0;
-        Looped = true;
-    })
-    var37_upvw = var43
-    var43 = var38_upvw
-    if var43 then
-        var38_upvw:Disconnect()
-        var43 = nil
-        var38_upvw = var43
-    end
-    var43 = Audio_upvr
-    var43 = var43.FadeTo(var37_upvw, 0.4, 4)
-    var38_upvw = var43
-    var43 = var39_upvw
-    if var43 then
-        var39_upvw:Destroy()
-    end
-    var43 = HapticEffect_upvr
-    var43 = var43.basic(0.15, math.huge)
-    var39_upvw = var43
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local v6 = Signal.new()
+local v7 = Signal.new()
+local v8 = Signal.new()
+local v9 = false
+local v10 = false
+local v11 = 0
+local v12 = false
+local v13 = false
+local function IsSkydiving() --[[ Line: 106 | Upvalues: v12 (ref) ]]
+	return v12
 end
-local function StopSkydiving_upvr() -- Line 163, Named "StopSkydiving"
-    local var46
-    if var29_upvw ~= true then
-        var46 = false
-    else
-        var46 = true
-    end
-    assert(var46)
-    var29_upvw = false
-    if var31_upvw then
-        var31_upvw:Stop()
-        var31_upvw = nil
-    end
-    if var32_upvw then
-        var32_upvw:Destroy()
-    end
-    if var37_upvw then
-        local var47_upvw = var37_upvw
-        var46 = nil
-        var37_upvw = var46
-        var46 = var38_upvw
-        if var46 then
-            var38_upvw:Disconnect()
-            var46 = nil
-            var38_upvw = var46
-        end
-        var46 = Audio_upvr
-        var46 = var46.FadeTo(var47_upvw, 0, 0.1)
-        var38_upvw = var46
-        var46 = delay
-        var46(1, function() -- Line 183
-            var47_upvw:Destroy()
-            var47_upvw = nil
-        end)
-    end
-    if var39_upvw then
-        var39_upvw:Destroy()
-        var39_upvw = nil
-    end
+local function IsRagdolling() --[[ Line: 109 | Upvalues: v9 (ref) ]]
+	return v9
 end
-local InventoryItemSystem_upvr = require(ReplicatedStorage_upvr.Inventory.InventoryItemSystem)
-local function StartRagdolling_upvr(arg1) -- Line 193, Named "StartRagdolling"
-    local var54
-    if var54 == true then
-        if arg1 ~= nil then
-            var34_upvw = arg1
-        else
-            var54 = 1.2
-            var34_upvw = var54
-        end
-        var54 = tick()
-        var28_upvw = var54
-        var54 = true
-        return var54
-    end
-    local Character_5 = LocalPlayer_upvr.Character
-    if Character_5 == nil then
-        var54 = nil
-    else
-        var54 = Character_5:FindFirstChild("Humanoid")
-    end
-    if var54 == nil then
-        return false
-    end
-    if var54.Sit or var54.PlatformStand then
-        return false
-    end
-    for _, v_2 in ipairs(InventoryItemSystem_upvr.getEquippedFor(LocalPlayer_upvr)) do
-        if not InventoryItemSystem_upvr.toggleEquip(v_2) then
-            return false
-        end
-    end
-    if arg1 ~= nil then
-        var34_upvw = arg1
-    else
-        var34_upvw = 1.2
-    end
-    any_new_result1_upvr:Fire()
-    var26_upvw = true
-    var28_upvw = tick()
-    AlexRagdoll_upvr.Ragdoll(var54.Parent)
-    any_new_result1_upvr_3:Fire()
-    var12_upvw:FireServer('h'..("uk26uhm"):sub(3, 5):reverse():reverse():reverse()..""..""..("xup2drsj"):sub(4, 6):reverse():reverse():reverse():reverse():reverse()..""..'o')
-    return true
+local v14 = nil
+local v15 = nil
+local v16 = nil
+local v17 = 0
+local v18 = 0
+local v19 = 0
+local v20 = nil
+local v21 = nil
+local v22 = nil
+local function StartSkydiving() --[[ Line: 124 | Upvalues: v12 (ref), LocalPlayer (copy), v14 (ref), CharacterAnim (copy), v16 (ref), v5 (copy), v15 (ref), CharacterUtils (copy), v4 (ref), UserInputService (copy), ControllerImage (copy), v20 (ref), Audio (copy), v21 (ref), v22 (ref), HapticEffect (copy) ]]
+	assert(v12 == false)
+	local Character = LocalPlayer.Character
+	local v2 = if Character == nil then nil else Character:FindFirstChild("Humanoid")
+	if v2 == nil then
+		return false
+	end
+	v12 = true
+	if v14 then
+		v14:Stop()
+		v14 = nil
+	end
+	v14 = CharacterAnim.getSkydiveTrack()
+	v14:Play(0.3)
+	v16 = v5(v2.Parent)
+	v15 = Instance.new("VectorForce")
+	v15.Force = Vector3.new(0, 0, 0)
+	v15.Attachment0 = CharacterUtils.getRootAttachment(v2.RootPart)
+	v15.Parent = v2.RootPart
+	v4.Enabled = true
+	v4.Button.Image = ("rbxassetid://%d"):format(4915089706)
+	if UserInputService.GamepadEnabled then
+		v4.Button.Gamepad.Image = ControllerImage.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
+		v4.Button.Gamepad.Visible = true
+	else
+		v4.Button.Gamepad.Visible = false
+	end
+	if v20 ~= nil then
+		v20:Stop()
+		v20:Destroy()
+		v20 = nil
+	end
+	v20 = Audio.ObjectLocal(LocalPlayer.PlayerGui, 9058653424, {
+		Volume = 0,
+		Looped = true
+	})
+	if v21 then
+		v21:Disconnect()
+		v21 = nil
+	end
+	v21 = Audio.FadeTo(v20, 0.4, 4)
+	if v22 then
+		v22:Destroy()
+	end
+	v22 = HapticEffect.basic(0.15, (1 / 0))
 end
-local function _(arg1) -- Line 233, Named "StartFalling"
-    local var59
-    if var30_upvw ~= false then
-        var59 = false
-    else
-        var59 = true
-    end
-    assert(var59)
-    var35_upvw = arg1
-    var30_upvw = true
+local function StopSkydiving() --[[ Line: 163 | Upvalues: v12 (ref), v14 (ref), v15 (ref), v20 (ref), v21 (ref), Audio (copy), v22 (ref) ]]
+	assert(v12 == true)
+	v12 = false
+	if v14 then
+		v14:Stop()
+		v14 = nil
+	end
+	if v15 then
+		v15:Destroy()
+	end
+	if v20 then
+		local v2 = v20
+		v20 = nil
+		if v21 then
+			v21:Disconnect()
+			v21 = nil
+		end
+		v21 = Audio.FadeTo(v2, 0, 0.1)
+		delay(1, function() --[[ Line: 183 | Upvalues: v2 (ref) ]]
+			v2:Destroy()
+			v2 = nil
+		end)
+	end
+	if v22 then
+		v22:Destroy()
+		v22 = nil
+	end
 end
-local RunUtils_upvr = require(ReplicatedStorage_upvr.App.RunUtils)
-local function StopFalling_upvr(arg1) -- Line 238, Named "StopFalling"
-    local var69
-    if var30_upvw ~= true then
-        var69 = false
-    else
-        var69 = true
-    end
-    assert(var69)
-    var30_upvw = false
-    if var29_upvw == true then
-        StopSkydiving_upvr()
-    end
-    var69 = false
-    var13_upvw.Enabled = var69
-    if arg1 then
-        var69 = var35_upvw
-        local var70 = var69 - arg1
-        var69 = 32
-        if var69 < var70 then
-            var69 = var26_upvw
-            if var69 == false then
-                local Character_11 = LocalPlayer_upvr.Character
-                if not Character_11 then
-                    var69 = nil
-                else
-                    var69 = Character_11.PrimaryPart
-                end
-                if var69 and not TagUtils_upvr.isPointInTag(var69.Position, "NoRagdoll") then
-                    StartRagdolling_upvr()
-                end
-            end
-        end
-        if 24 < var70 then
-            if not RunUtils_upvr.isTradeWorld() then
-                local Character_8 = LocalPlayer_upvr.Character
-                if not Character_8 then
-                else
-                end
-                if Character_8.PrimaryPart then
-                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                    if not TagUtils_upvr.isPointInTag(Character_8.PrimaryPart.Position, "NoFallDamage") then
-                        var12_upvw:FireServer('r'..("iku3p88miu"):sub(4, 7):reverse():reverse():reverse()..""..""..("ek9bnb95"):sub(4, 4):reverse():reverse():reverse():reverse():reverse().."".."hq", var70)
-                    end
-                end
-            end
-        end
-    end
-    var36_upvw = 0
+local function StartRagdolling(p1) --[[ Line: 193 | Upvalues: v9 (ref), v17 (ref), v11 (ref), LocalPlayer (copy), InventoryItemSystem (copy), v6 (copy), AlexRagdoll (copy), v7 (copy), v2 (ref) ]]
+	if v9 == true then
+		v17 = if p1 == nil then 1.2 else p1
+		v11 = tick()
+		return true
+	else
+		local Character = LocalPlayer.Character
+		local v1 = if Character == nil then nil else Character:FindFirstChild("Humanoid")
+		if v1 ~= nil and not (v1.Sit or v1.PlatformStand) then
+			for i, v in ipairs(InventoryItemSystem.getEquippedFor(LocalPlayer)) do
+				local _ = not InventoryItemSystem.toggleEquip(v)
+			end
+			v17 = if p1 == nil then 1.2 else p1
+			v6:Fire()
+			v9 = true
+			v11 = tick()
+			AlexRagdoll.Ragdoll(v1.Parent)
+			v7:Fire()
+			v2:FireServer("l" .. ("as81bo"):sub(5, 5):reverse():reverse():reverse() .. "wt9cvb")
+			return true
+		end
+		return false
+	end
 end
-local function _() -- Line 270, Named "StartParachuting"
-    local var73
-    if Paraglide_upvr.IsFlying() ~= false then
-        var73 = false
-    else
-        var73 = true
-    end
-    assert(var73)
-    if var30_upvw == true then
-        StopFalling_upvr()
-    end
-    Paraglide_upvr.Parachute()
-    var73 = true
-    var13_upvw.Enabled = var73
-    var73 = string.format(("rbxassetid://%d"), 4915090302)
-    var13_upvw.Button.Image = var73
-    if UserInputService_upvr.GamepadEnabled then
-        var73 = ControllerImage_upvr
-        var73 = var73.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
-        var13_upvw.Button.Gamepad.Image = var73
-        var73 = true
-        var13_upvw.Button.Gamepad.Visible = var73
-    else
-        var73 = false
-        var13_upvw.Button.Gamepad.Visible = var73
-    end
+local function StartFalling(p1) --[[ Line: 233 | Upvalues: v13 (ref), v18 (ref) ]]
+	assert(v13 == false)
+	v18 = p1
+	v13 = true
 end
-local function _() -- Line 279, Named "StopParachuting"
-    local var74
-    if Paraglide_upvr.IsFlying() ~= true then
-        var74 = false
-    else
-        var74 = true
-    end
-    assert(var74)
-    Paraglide_upvr.ParachuteStop()
+local function StopFalling(p1) --[[ Line: 238 | Upvalues: v13 (ref), v12 (ref), StopSkydiving (copy), v4 (ref), v18 (ref), v9 (ref), LocalPlayer (copy), TagUtils (copy), StartRagdolling (copy), RunUtils (copy), v2 (ref), v19 (ref) ]]
+	assert(v13 == true)
+	v13 = false
+	if v12 == true then
+		StopSkydiving()
+	end
+	v4.Enabled = false
+	if p1 then
+		local v22 = v18 - p1
+		if v22 > 32 and v9 == false then
+			local Character = LocalPlayer.Character
+			local v3 = if Character then Character.PrimaryPart else nil
+			if v3 and not TagUtils.isPointInTag(v3.Position, "NoRagdoll") then
+				StartRagdolling()
+			end
+		end
+		if v22 > 24 and not RunUtils.isTradeWorld() then
+			local Character = LocalPlayer.Character
+			local v42 = if Character then Character.PrimaryPart else nil
+			if v42 and not TagUtils.isPointInTag(v42.Position, "NoFallDamage") then
+				v2:FireServer("u" .. ("tv52x"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("q36iwcx"):sub(2, 5):reverse() .. "hk", v22)
+			end
+		end
+	end
+	v19 = 0
 end
-local tbl_upvr = {}
-local RaycastParams_new_result1_upvr = RaycastParams.new()
-RaycastParams_new_result1_upvr.FilterType = Enum.RaycastFilterType.Exclude
-local var77_upvw
-local Raycast_upvr = require(ReplicatedStorage_upvr.Std.Raycast)
-local VehicleUtils_upvr = require(ReplicatedStorage_upvr.Vehicle.VehicleUtils)
-local var80_upvw
-local function Heartbeat_upvr() -- Line 291, Named "Heartbeat"
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local var81
-    if var81 ~= nil then
-        var81 = var77_upvw
-    else
-    end
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    var77_upvw = tick()
-    local Character_3 = LocalPlayer_upvr.Character
-    if Character_3 == nil then
-        var81 = nil
-    else
-        var81 = Character_3:FindFirstChild("Humanoid")
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if var30_upvw == true then
-        StopFalling_upvr()
-    end
-    if var80_upvw ~= nil then
-        var80_upvw = nil
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local function StartParachuting() --[[ Line: 270 | Upvalues: Paraglide (copy), v13 (ref), StopFalling (copy), v4 (ref), UserInputService (copy), ControllerImage (copy) ]]
+	assert(Paraglide.IsFlying() == false)
+	if v13 == true then
+		StopFalling()
+	end
+	Paraglide.Parachute()
+	v4.Enabled = true
+	v4.Button.Image = ("rbxassetid://%d"):format(4915090302)
+	if UserInputService.GamepadEnabled then
+		v4.Button.Gamepad.Image = ControllerImage.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
+		v4.Button.Gamepad.Visible = true
+	else
+		v4.Button.Gamepad.Visible = false
+	end
 end
-local function _() -- Line 417, Named "AttemptUseParachute"
-    local var83
-    if Paraglide_upvr.IsFlying() == true then
-        if Paraglide_upvr.IsFlying() ~= true then
-            var83 = false
-        else
-            var83 = true
-        end
-        assert(var83)
-        Paraglide_upvr.ParachuteStop()
-    end
-    if var29_upvw and Paraglide_upvr.IsFlying() == false then
-        if Paraglide_upvr.IsFlying() ~= false then
-            var83 = false
-        else
-            var83 = true
-        end
-        assert(var83)
-        if var30_upvw == true then
-            StopFalling_upvr()
-        end
-        Paraglide_upvr.Parachute()
-        var83 = true
-        var13_upvw.Enabled = var83
-        var83 = string.format(("rbxassetid://%d"), 4915090302)
-        var13_upvw.Button.Image = var83
-        if UserInputService_upvr.GamepadEnabled then
-            var83 = ControllerImage_upvr
-            var83 = var83.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
-            var13_upvw.Button.Gamepad.Image = var83
-            var83 = true
-            var13_upvw.Button.Gamepad.Visible = var83
-            return
-        end
-        var83 = false
-        var13_upvw.Button.Gamepad.Visible = var83
-    end
+local function StopParachuting() --[[ Line: 279 | Upvalues: Paraglide (copy) ]]
+	assert(Paraglide.IsFlying() == true)
+	Paraglide.ParachuteStop()
 end
-local var84_upvw
-local DefaultActions_upvr = require(ReplicatedStorage_upvr.Game.DefaultActions)
-local waitForChild_upvr = require(ReplicatedStorage_upvr.Std.waitForChild)
-local RunService_upvr = game:GetService("RunService")
-local CollectionService_upvr = game:GetService("CollectionService")
-local C4Consts_upvr = require(ReplicatedStorage_upvr.Game.C4.C4Consts)
+local t = {}
+local v23 = RaycastParams.new()
+v23.FilterType = Enum.RaycastFilterType.Exclude
+local v24 = nil
+local v25 = nil
+local function Heartbeat() --[[ Line: 291 | Upvalues: v25 (ref), LocalPlayer (copy), t (copy), v23 (copy), Raycast (copy), Paraglide (copy), v1 (ref), VehicleUtils (copy), v13 (ref), v18 (ref), StopFalling (copy), v19 (ref), v12 (ref), TagUtils (copy), StartSkydiving (copy), v15 (ref), v16 (ref), v24 (ref), v9 (ref), v10 (ref), v11 (ref), v17 (ref), v2 (ref) ]]
+	local v14 = tick()
+	v25 = v14
+	local Character = LocalPlayer.Character
+	local v22 = if Character == nil then nil else Character:FindFirstChild("Humanoid")
+	if v22 and (v22.RootPart and (v22.Health > 0.001 and (not v22.Sit and (not v22.PlatformStand and v22:GetState() ~= Enum.HumanoidStateType.Climbing)))) then
+		local RootPart = v22.RootPart
+		local v3 = RootPart.CFrame
+		if workspace:FindFirstChild("NetworkFixPart1") and not table.find(t, workspace.NetworkFixPart1) then
+			table.insert(t, workspace.NetworkFixPart1)
+		end
+		v23.FilterDescendantsInstances = t
+		local v6 = Raycast.collidable(v3.p, Vector3.new(0, -1, 0), v22.HipHeight + RootPart.Size.Y * 0.5 + 2, v23)
+		if v6 == nil then
+			local v7 = Paraglide.IsFlying() ~= true
+			if v1.IsFlying() == true then
+				v7 = false
+			end
+			if VehicleUtils.GetLocalVehiclePacket() ~= nil then
+				v7 = false
+			end
+			if v7 then
+				if v13 == false then
+					assert(v13 == false)
+					v18 = v3.Y
+					v13 = true
+				end
+			elseif v13 == true then
+				StopFalling(v3.Y)
+			end
+			if v13 == true and v18 < v3.Y then
+				v18 = v3.Y
+			end
+		elseif v13 == true then
+			local Y = v3.Y
+			if v6.Instance:IsA("Terrain") and v6.Material == Enum.Material.Water then
+				Y = nil
+			end
+			StopFalling(Y)
+		end
+		local Position = RootPart.Position
+		local AssemblyLinearVelocity = RootPart.AssemblyLinearVelocity
+		if v13 == true then
+			local v92 = math.abs(AssemblyLinearVelocity.Y)
+			if v19 < v92 then
+				v19 = v92
+			end
+			if v92 >= 50 and (v18 - v3.Y >= 30 and (v12 == false and not TagUtils.isPointInTag(Position, "NoParachute"))) then
+				StartSkydiving()
+			end
+			if v12 == true and v15 then
+				local v102 = v92 * 0.6 * math.abs(v92)
+				local v112 = 196.20000000000002 * v16 * 10
+				if v102 < 0 then
+					v102 = 0
+				elseif v112 < v102 then
+					v102 = v112
+				end
+				if AssemblyLinearVelocity.Y > 0 then
+					RootPart.AssemblyLinearVelocity = RootPart.AssemblyLinearVelocity * Vector3.new(1, 0, 1)
+				end
+				v15.Force = Vector3.new(0, v102, 0)
+			end
+		end
+		v24 = Position
+	else
+		if v13 == true then
+			StopFalling()
+		end
+		if v24 ~= nil then
+			v24 = nil
+		end
+	end
+	if v9 == true and (v10 == false and v17 < v14 - v11) then
+		v10 = true
+		v2:FireServer("s" .. "" .. ("ygnwz1j"):sub(4, 4):reverse():reverse():reverse() .. "" .. "" .. ("s1rmwu"):sub(2, 5):reverse() .. "" .. "" .. ("wm21tsffq"):sub(5, 5):reverse() .. "z")
+	end
+end
+local function AttemptUseParachute() --[[ Line: 417 | Upvalues: Paraglide (copy), v12 (ref), v13 (ref), StopFalling (copy), v4 (ref), UserInputService (copy), ControllerImage (copy) ]]
+	if Paraglide.IsFlying() == true then
+		assert(Paraglide.IsFlying() == true)
+		Paraglide.ParachuteStop()
+	end
+	if v12 and Paraglide.IsFlying() == false then
+		assert(Paraglide.IsFlying() == false)
+		if v13 == true then
+			StopFalling()
+		end
+		Paraglide.Parachute()
+		v4.Enabled = true
+		v4.Button.Image = ("rbxassetid://%d"):format(4915090302)
+		if UserInputService.GamepadEnabled then
+			v4.Button.Gamepad.Image = ControllerImage.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
+			v4.Button.Gamepad.Visible = true
+			return
+		end
+		v4.Button.Gamepad.Visible = false
+	end
+end
+local DefaultActions = require(ReplicatedStorage.Game.DefaultActions)
 return {
-    Init = function(arg1) -- Line 428, Named "Init"
-        var12_upvw = arg1.Event
-        var84_upvw = arg1.em
-        var13_upvw = ReplicatedStorage_upvr.StarterGui:FindFirstChild("FallingGui")
-        var13_upvw.Parent = LocalPlayer_upvr.PlayerGui
-        var9_upvw = require(ReplicatedStorage_upvr.Game.JetPack.JetPack)
-        function var84_upvw.hilf3hub(arg1_2) -- Line 436
-            if arg1_2 then
-                local Character_4 = LocalPlayer_upvr.Character
-                if Character_4 == nil then
-                    local _
-                else
-                end
-                if Character_4:FindFirstChild("Humanoid") then
-                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                    if 0 < Character_4:FindFirstChild("Humanoid").Health then
-                        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                        AlexRagdoll_upvr.Unragdoll(Character_4:FindFirstChild("Humanoid").Parent)
-                        any_new_result1_upvr_2:Fire()
-                    end
-                end
-            end
-            var26_upvw = false
-            var27_upvw = false
-        end
-        DefaultActions_upvr.onJumpPressed:Connect(function() -- Line 449
-            local var95
-            if Paraglide_upvr.IsFlying() == true then
-                if Paraglide_upvr.IsFlying() ~= true then
-                    var95 = false
-                else
-                    var95 = true
-                end
-                assert(var95)
-                Paraglide_upvr.ParachuteStop()
-            end
-            if var29_upvw and Paraglide_upvr.IsFlying() == false then
-                if Paraglide_upvr.IsFlying() ~= false then
-                    var95 = false
-                else
-                    var95 = true
-                end
-                assert(var95)
-                if var30_upvw == true then
-                    StopFalling_upvr()
-                end
-                Paraglide_upvr.Parachute()
-                var95 = true
-                var13_upvw.Enabled = var95
-                var95 = string.format(("rbxassetid://%d"), 4915090302)
-                var13_upvw.Button.Image = var95
-                if UserInputService_upvr.GamepadEnabled then
-                    var95 = ControllerImage_upvr
-                    var95 = var95.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
-                    var13_upvw.Button.Gamepad.Image = var95
-                    var95 = true
-                    var13_upvw.Button.Gamepad.Visible = var95
-                    return
-                end
-                var95 = false
-                var13_upvw.Button.Gamepad.Visible = var95
-            end
-        end)
-        var13_upvw.Button.MouseButton1Down:Connect(function() -- Line 452
-            local var97
-            if Paraglide_upvr.IsFlying() == true then
-                if Paraglide_upvr.IsFlying() ~= true then
-                    var97 = false
-                else
-                    var97 = true
-                end
-                assert(var97)
-                Paraglide_upvr.ParachuteStop()
-            end
-            if var29_upvw and Paraglide_upvr.IsFlying() == false then
-                if Paraglide_upvr.IsFlying() ~= false then
-                    var97 = false
-                else
-                    var97 = true
-                end
-                assert(var97)
-                if var30_upvw == true then
-                    StopFalling_upvr()
-                end
-                Paraglide_upvr.Parachute()
-                var97 = true
-                var13_upvw.Enabled = var97
-                var97 = string.format(("rbxassetid://%d"), 4915090302)
-                var13_upvw.Button.Image = var97
-                if UserInputService_upvr.GamepadEnabled then
-                    var97 = ControllerImage_upvr
-                    var97 = var97.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
-                    var13_upvw.Button.Gamepad.Image = var97
-                    var97 = true
-                    var13_upvw.Button.Gamepad.Visible = var97
-                    return
-                end
-                var97 = false
-                var13_upvw.Button.Gamepad.Visible = var97
-            end
-        end)
-        waitForChild_upvr(ReplicatedStorage_upvr, "AttemptUseParachute"):andThen(function(arg1_3) -- Line 455
-            arg1_3.OnClientEvent:Connect(function(arg1_4) -- Line 456
-                if arg1_4 then
-                    if Paraglide_upvr.IsFlying() ~= false then
-                    else
-                    end
-                    assert(true)
-                    if var30_upvw == true then
-                        StopFalling_upvr()
-                    end
-                    Paraglide_upvr.Parachute()
-                    var13_upvw.Enabled = true
-                    var13_upvw.Button.Image = string.format(("rbxassetid://%d"), 4915090302)
-                    if UserInputService_upvr.GamepadEnabled then
-                        var13_upvw.Button.Gamepad.Image = ControllerImage_upvr.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
-                        var13_upvw.Button.Gamepad.Visible = true
-                    else
-                        var13_upvw.Button.Gamepad.Visible = false
-                    end
-                end
-                local var100
-                if Paraglide_upvr.IsFlying() == true then
-                    if Paraglide_upvr.IsFlying() ~= true then
-                        var100 = false
-                    else
-                        var100 = true
-                    end
-                    assert(var100)
-                    Paraglide_upvr.ParachuteStop()
-                end
-                if var29_upvw and Paraglide_upvr.IsFlying() == false then
-                    if Paraglide_upvr.IsFlying() ~= false then
-                        var100 = false
-                    else
-                        var100 = true
-                    end
-                    assert(var100)
-                    if var30_upvw == true then
-                        StopFalling_upvr()
-                    end
-                    Paraglide_upvr.Parachute()
-                    var100 = true
-                    var13_upvw.Enabled = var100
-                    var100 = string.format(("rbxassetid://%d"), 4915090302)
-                    var13_upvw.Button.Image = var100
-                    if UserInputService_upvr.GamepadEnabled then
-                        var100 = ControllerImage_upvr
-                        var100 = var100.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
-                        var13_upvw.Button.Gamepad.Image = var100
-                        var100 = true
-                        var13_upvw.Button.Gamepad.Visible = var100
-                        return
-                    end
-                    var100 = false
-                    var13_upvw.Button.Gamepad.Visible = var100
-                end
-            end)
-        end)
-        RunService_upvr.Heartbeat:Connect(function() -- Line 465
-            Heartbeat_upvr()
-        end)
-        Paraglide_upvr.OnParachuteStopped:Connect(function() -- Line 469
-            var13_upvw.Enabled = false
-        end)
-        Players_upvr.LocalPlayer.CharacterAdded:Connect(function(arg1_5) -- Line 473
-            var26_upvw = false
-            table.insert(tbl_upvr, arg1_5)
-        end)
-        Players_upvr.LocalPlayer.CharacterRemoving:Connect(function(arg1_6) -- Line 477
-            local table_find_result1_2 = table.find(tbl_upvr, arg1_6)
-            if table_find_result1_2 then
-                table.remove(tbl_upvr, table_find_result1_2)
-            end
-        end)
-        if Players_upvr.LocalPlayer.Character then
-            table.insert(tbl_upvr, Players_upvr.LocalPlayer.Character)
-        end
-        CollectionService_upvr:GetInstanceAddedSignal(C4Consts_upvr.TAG_NAME):Connect(function(arg1_7) -- Line 487
-            table.insert(tbl_upvr, arg1_7)
-        end)
-        CollectionService_upvr:GetInstanceRemovedSignal(C4Consts_upvr.TAG_NAME):Connect(function(arg1_8) -- Line 490
-            local table_find_result1 = table.find(tbl_upvr, arg1_8)
-            if table_find_result1 then
-                table.remove(tbl_upvr, table_find_result1)
-            end
-        end)
-    end;
-    IsSkydiving = function() -- Line 106, Named "IsSkydiving"
-        return var29_upvw
-    end;
-    IsRagdolling = function() -- Line 109, Named "IsRagdolling"
-        return var26_upvw
-    end;
-    StopSkydiving = StopSkydiving_upvr;
-    StartRagdolling = StartRagdolling_upvr;
-    OnRagdoll = any_new_result1_upvr;
-    OnRagdolled = any_new_result1_upvr_3;
-    OnUnragdolled = any_new_result1_upvr_2;
+	Init = function(p1) --[[ Name: Init | Line: 428 | Upvalues: v2 (ref), v3 (ref), v4 (ref), ReplicatedStorage (copy), LocalPlayer (copy), v1 (ref), AlexRagdoll (copy), v8 (copy), v9 (ref), v10 (ref), DefaultActions (copy), Paraglide (copy), v12 (ref), v13 (ref), StopFalling (copy), UserInputService (copy), ControllerImage (copy), waitForChild (copy), RunService (copy), Heartbeat (copy), Players (copy), t (copy), CollectionService (copy), C4Consts (copy) ]]
+		local em = p1.em
+		v2 = p1.Event
+		v3 = em
+		v4 = ReplicatedStorage.StarterGui:FindFirstChild("FallingGui")
+		v4.Parent = LocalPlayer.PlayerGui
+		v1 = require(ReplicatedStorage.Game.JetPack.JetPack)
+		function em.swwmr1tz(p1) --[[ Line: 436 | Upvalues: LocalPlayer (ref), AlexRagdoll (ref), v8 (ref), v9 (ref), v10 (ref) ]]
+			if p1 then
+				local Character = LocalPlayer.Character
+				local v1 = if Character == nil then nil else Character:FindFirstChild("Humanoid")
+				if v1 and v1.Health > 0 then
+					AlexRagdoll.Unragdoll(v1.Parent)
+					v8:Fire()
+				end
+			end
+			v9 = false
+			v10 = false
+		end
+		DefaultActions.onJumpPressed:Connect(function() --[[ Line: 449 | Upvalues: Paraglide (ref), v12 (ref), v13 (ref), StopFalling (ref), v4 (ref), UserInputService (ref), ControllerImage (ref) ]]
+			if Paraglide.IsFlying() == true then
+				assert(Paraglide.IsFlying() == true)
+				Paraglide.ParachuteStop()
+			end
+			if v12 and Paraglide.IsFlying() == false then
+				assert(Paraglide.IsFlying() == false)
+				if v13 == true then
+					StopFalling()
+				end
+				Paraglide.Parachute()
+				v4.Enabled = true
+				v4.Button.Image = ("rbxassetid://%d"):format(4915090302)
+				if UserInputService.GamepadEnabled then
+					v4.Button.Gamepad.Image = ControllerImage.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
+					v4.Button.Gamepad.Visible = true
+					return
+				end
+				v4.Button.Gamepad.Visible = false
+			end
+		end)
+		v4.Button.MouseButton1Down:Connect(function() --[[ Line: 452 | Upvalues: Paraglide (ref), v12 (ref), v13 (ref), StopFalling (ref), v4 (ref), UserInputService (ref), ControllerImage (ref) ]]
+			if Paraglide.IsFlying() == true then
+				assert(Paraglide.IsFlying() == true)
+				Paraglide.ParachuteStop()
+			end
+			if v12 and Paraglide.IsFlying() == false then
+				assert(Paraglide.IsFlying() == false)
+				if v13 == true then
+					StopFalling()
+				end
+				Paraglide.Parachute()
+				v4.Enabled = true
+				v4.Button.Image = ("rbxassetid://%d"):format(4915090302)
+				if UserInputService.GamepadEnabled then
+					v4.Button.Gamepad.Image = ControllerImage.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
+					v4.Button.Gamepad.Visible = true
+					return
+				end
+				v4.Button.Gamepad.Visible = false
+			end
+		end)
+		waitForChild(ReplicatedStorage, "AttemptUseParachute"):andThen(function(p1) --[[ Line: 455 | Upvalues: Paraglide (ref), v13 (ref), StopFalling (ref), v4 (ref), UserInputService (ref), ControllerImage (ref), v12 (ref) ]]
+			p1.OnClientEvent:Connect(function(p1) --[[ Line: 456 | Upvalues: Paraglide (ref), v13 (ref), StopFalling (ref), v4 (ref), UserInputService (ref), ControllerImage (ref), v12 (ref) ]]
+				if p1 then
+					assert(Paraglide.IsFlying() == false)
+					if v13 == true then
+						StopFalling()
+					end
+					Paraglide.Parachute()
+					v4.Enabled = true
+					v4.Button.Image = ("rbxassetid://%d"):format(4915090302)
+					if UserInputService.GamepadEnabled then
+						v4.Button.Gamepad.Image = ControllerImage.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
+						v4.Button.Gamepad.Visible = true
+					else
+						v4.Button.Gamepad.Visible = false
+					end
+				else
+					if Paraglide.IsFlying() == true then
+						assert(Paraglide.IsFlying() == true)
+						Paraglide.ParachuteStop()
+					end
+					if v12 and Paraglide.IsFlying() == false then
+						assert(Paraglide.IsFlying() == false)
+						if v13 == true then
+							StopFalling()
+						end
+						Paraglide.Parachute()
+						v4.Enabled = true
+						v4.Button.Image = ("rbxassetid://%d"):format(4915090302)
+						if UserInputService.GamepadEnabled then
+							v4.Button.Gamepad.Image = ControllerImage.getImageIdForKeyCode(Enum.KeyCode.ButtonA)
+							v4.Button.Gamepad.Visible = true
+							return
+						end
+						v4.Button.Gamepad.Visible = false
+					end
+				end
+			end)
+		end)
+		RunService.Heartbeat:Connect(function() --[[ Line: 465 | Upvalues: Heartbeat (ref) ]]
+			Heartbeat()
+		end)
+		Paraglide.OnParachuteStopped:Connect(function() --[[ Line: 469 | Upvalues: v4 (ref) ]]
+			v4.Enabled = false
+		end)
+		Players.LocalPlayer.CharacterAdded:Connect(function(p1) --[[ Line: 473 | Upvalues: v9 (ref), t (ref) ]]
+			v9 = false
+			table.insert(t, p1)
+		end)
+		Players.LocalPlayer.CharacterRemoving:Connect(function(p1) --[[ Line: 477 | Upvalues: t (ref) ]]
+			local v1 = table.find(t, p1)
+			if v1 then
+				table.remove(t, v1)
+			end
+		end)
+		if Players.LocalPlayer.Character then
+			table.insert(t, Players.LocalPlayer.Character)
+		end
+		CollectionService:GetInstanceAddedSignal(C4Consts.TAG_NAME):Connect(function(p1) --[[ Line: 487 | Upvalues: t (ref) ]]
+			table.insert(t, p1)
+		end)
+		CollectionService:GetInstanceRemovedSignal(C4Consts.TAG_NAME):Connect(function(p1) --[[ Line: 490 | Upvalues: t (ref) ]]
+			local v1 = table.find(t, p1)
+			if v1 then
+				table.remove(t, v1)
+			end
+		end)
+	end,
+	IsSkydiving = IsSkydiving,
+	IsRagdolling = IsRagdolling,
+	StopSkydiving = StopSkydiving,
+	StartRagdolling = StartRagdolling,
+	OnRagdoll = v6,
+	OnRagdolled = v7,
+	OnUnragdolled = v8
 }

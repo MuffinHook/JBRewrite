@@ -1,18 +1,21 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local BaseObject_upvr = require(ReplicatedStorage_upvr.Std.BaseObject)
-local BountyConsts_upvr = require(ReplicatedStorage_upvr.Bounty.BountyConsts)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-local BountyBoardService_upvr = require(ReplicatedStorage_upvr.Bounty.BountyBoardService)
-function module_upvr.new(arg1) -- Line 12
-    local any_new_result1 = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1, module_upvr)
-    local clone = ReplicatedStorage_upvr.Bounty.Res.MostWanted:Clone()
-    any_new_result1.maid:GiveTask(clone)
-    clone.Parent = arg1:WaitForChild("Board")
-    clone.Board:AddTag(BountyConsts_upvr.BOARD_LIST_TAG_NAME)
-    BountyBoardService_upvr.updateGui(clone.Board, BountyBoardService_upvr.getTopBounties(4))
-    return any_new_result1
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Binder = require(ReplicatedStorage.Std.Binder)
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+require(ReplicatedStorage.Std.TableUtils)
+local BountyConsts = require(ReplicatedStorage.Bounty.BountyConsts)
+local BountyBoardService = require(ReplicatedStorage.Bounty.BountyBoardService)
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1) --[[ Line: 12 | Upvalues: BaseObject (copy), t (copy), ReplicatedStorage (copy), BountyConsts (copy), BountyBoardService (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t)
+	local Board = p1:WaitForChild("Board")
+	local v3 = ReplicatedStorage.Bounty.Res.MostWanted:Clone()
+	v1.maid:GiveTask(v3)
+	v3.Parent = Board
+	v3.Board:AddTag(BountyConsts.BOARD_LIST_TAG_NAME)
+	BountyBoardService.updateGui(v3.Board, (BountyBoardService.getTopBounties(4)))
+	return v1
 end
-return require(ReplicatedStorage_upvr.Std.Binder).new(BountyConsts_upvr.BOARD_TAG_NAME, module_upvr)
+return Binder.new(BountyConsts.BOARD_TAG_NAME, t)

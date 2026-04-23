@@ -1,9 +1,10 @@
-function GetItemByName(arg1) -- Line 7
-    local module = {}
-    module.Name = arg1
-    return module
+game:GetService("ReplicatedStorage")
+function GetItemByName(p1) --[[ Line: 7 ]]
+	return {
+		Name = p1
+	}
 end
 return {
-    Items = {};
-    GetItemByName = GetItemByName;
+	Items = {},
+	GetItemByName = GetItemByName
 }

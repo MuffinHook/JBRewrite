@@ -1,10 +1,11 @@
-local module = {}
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-function module.getConfig(arg1) -- Line 5
-    local SOME = ReplicatedStorage_upvr.Game.ItemConfig:FindFirstChild(arg1)
-    if SOME == nil then
-        return nil
-    end
-    return require(SOME)
-end
-return module
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return {
+	getConfig = function(p1) --[[ Name: getConfig | Line: 5 | Upvalues: ReplicatedStorage (copy) ]]
+		local v1 = ReplicatedStorage.Game.ItemConfig:FindFirstChild(p1)
+		if v1 == nil then
+			return nil
+		else
+			return require(v1)
+		end
+	end
+}

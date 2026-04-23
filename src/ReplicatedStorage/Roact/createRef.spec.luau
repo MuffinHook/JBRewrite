@@ -1,50 +1,39 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
 return function() --[[ Line: 1 ]]
-    local v0 = require(script.Parent.Binding);
-    local v1 = require(script.Parent.Type);
-    local v2 = require(script.Parent.createRef);
-    it("should create refs, which are specialized bindings", function() --[[ Line: 7 ]]
-        -- upvalues: v2 (copy), v1 (copy)
-        local v3 = v2();
-        expect(v1.of(v3)).to.equal(v1.Binding);
-        expect(v3.current).to.equal(nil);
-    end);
-    it("should have a 'current' field that is the same as the internal binding's value", function() --[[ Line: 14 ]]
-        -- upvalues: v2 (copy), v0 (copy)
-        local v4 = v2();
-        expect(v4.current).to.equal(nil);
-        v0.update(v4, 10);
-        expect(v4.current).to.equal(10);
-    end);
-    it("should support tostring on refs", function() --[[ Line: 23 ]]
-        -- upvalues: v2 (copy), v0 (copy)
-        local v5 = v2();
-        expect(v5.current).to.equal(nil);
-        expect((tostring(v5))).to.equal("RoactRef(nil)");
-        v0.update(v5, 10);
-        expect((tostring(v5))).to.equal("RoactRef(10)");
-    end);
-    it("should not allow assignments to the 'current' field", function() --[[ Line: 33 ]]
-        -- upvalues: v2 (copy), v0 (copy)
-        local v6 = v2();
-        expect(v6.current).to.equal(nil);
-        v0.update(v6, 99);
-        expect(v6.current).to.equal(99);
-        expect(function() --[[ Line: 41 ]]
-            -- upvalues: v6 (copy)
-            v6.current = 77;
-        end).to.throw();
-        expect(v6.current).to.equal(99);
-    end);
-    it("should return the same thing from getValue as its current field", function() --[[ Line: 48 ]]
-        -- upvalues: v2 (copy), v0 (copy)
-        local v7 = v2();
-        v0.update(v7, 10);
-        expect(v7:getValue()).to.equal(10);
-        expect(v7:getValue()).to.equal(v7.current);
-    end);
-end;
+	local Binding = require(script.Parent.Binding)
+	local Type = require(script.Parent.Type)
+	local createRef = require(script.Parent.createRef)
+	it("should create refs, which are specialized bindings", function() --[[ Line: 7 | Upvalues: createRef (copy), Type (copy) ]]
+		local v1 = createRef()
+		expect(Type.of(v1)).to.equal(Type.Binding)
+		expect(v1.current).to.equal(nil)
+	end)
+	it("should have a \'current\' field that is the same as the internal binding\'s value", function() --[[ Line: 14 | Upvalues: createRef (copy), Binding (copy) ]]
+		local v1 = createRef()
+		expect(v1.current).to.equal(nil)
+		Binding.update(v1, 10)
+		expect(v1.current).to.equal(10)
+	end)
+	it("should support tostring on refs", function() --[[ Line: 23 | Upvalues: createRef (copy), Binding (copy) ]]
+		local v1 = createRef()
+		expect(v1.current).to.equal(nil)
+		expect((tostring(v1))).to.equal("RoactRef(nil)")
+		Binding.update(v1, 10)
+		expect((tostring(v1))).to.equal("RoactRef(10)")
+	end)
+	it("should not allow assignments to the \'current\' field", function() --[[ Line: 33 | Upvalues: createRef (copy), Binding (copy) ]]
+		local v1 = createRef()
+		expect(v1.current).to.equal(nil)
+		Binding.update(v1, 99)
+		expect(v1.current).to.equal(99)
+		expect(function() --[[ Line: 41 | Upvalues: v1 (copy) ]]
+			v1.current = 77
+		end).to.throw()
+		expect(v1.current).to.equal(99)
+	end)
+	it("should return the same thing from getValue as its current field", function() --[[ Line: 48 | Upvalues: createRef (copy), Binding (copy) ]]
+		local v1 = createRef()
+		Binding.update(v1, 10)
+		expect(v1:getValue()).to.equal(10)
+		expect(v1:getValue()).to.equal(v1.current)
+	end)
+end

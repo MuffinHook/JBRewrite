@@ -1,56 +1,52 @@
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local function _(arg1, arg2) -- Line 7, Named "computePosition"
-    return CFrame.fromAxisAngle(arg1.axis, arg2 + arg1.angle0) * arg1.origin
+local Interval = require(ReplicatedStorage.Std.Interval)
+local Tracer = require(ReplicatedStorage.Game.Tracer)
+local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
+local function computePosition(p1, p2) --[[ Line: 7 ]]
+	return CFrame.fromAxisAngle(p1.axis, p2 + p1.angle0) * p1.origin
 end
-local module_upvr = {
-    list = {};
+local t = {
+	list = {}
 }
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-local GeomUtils_upvr = require(ReplicatedStorage.Std.GeomUtils)
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.init() -- Line 13
-    Interval_upvr.every(10):Connect(function() -- Line 14
-        local any_randomPointOnCircle_result1 = GeomUtils_upvr.randomPointOnCircle()
-        any_randomPointOnCircle_result1 = Vector3.new(any_randomPointOnCircle_result1.x, 0, any_randomPointOnCircle_result1.y) * 5000
-        local var10 = any_randomPointOnCircle_result1
-        local any_Cross_result1 = var10:Cross(Vector3.new(0, 1, 0))
-        local var12 = math.random() * 0.5 + 1
-        for _ = 1, 4 do
-            module_upvr.create(var10 + GeomUtils_upvr.randomPointOnSphere() * 50, any_Cross_result1, var12 + math.random() * 0.2)
-            task.wait()
-        end
-    end)
-    RunService_upvr.Heartbeat:Connect(function() -- Line 28
-        for i_2 = #module_upvr.list, 1, -1 do
-            local var16 = module_upvr.list[i_2]
-            local var17 = os.clock() - var16.bornAt
-            local lastPosition = var16.lastPosition
-            if not lastPosition then
-                lastPosition = CFrame.fromAxisAngle(var16.axis, 0 + var16.angle0) * var16.origin
-            end
-            local var19 = CFrame.fromAxisAngle(var16.axis, var17 + var16.angle0) * var16.origin
-            var16.lastPosition = var19
-            var16.tracer:Draw(lastPosition, var19)
-            if var16.lifetime < var17 then
-                table.remove(module_upvr.list, i_2)
-                var16.tracer:Destroy()
-            end
-        end
-    end)
+function t.init() --[[ Line: 13 | Upvalues: Interval (copy), GeomUtils (copy), t (copy), RunService (copy) ]]
+	Interval.every(10):Connect(function() --[[ Line: 14 | Upvalues: GeomUtils (ref), t (ref) ]]
+		local v1 = GeomUtils.randomPointOnCircle()
+		local v2 = Vector3.new(v1.x, 0, v1.y) * 5000
+		local v3 = v2:Cross(Vector3.new(0, 1, 0))
+		local v4 = math.random() * 0.5 + 1
+		for i = 1, 4 do
+			t.create(v2 + GeomUtils.randomPointOnSphere() * 50, v3, v4 + math.random() * 0.2)
+			task.wait()
+		end
+	end)
+	RunService.Heartbeat:Connect(function() --[[ Line: 28 | Upvalues: t (ref) ]]
+		local v1 = os.clock()
+		for i = #t.list, 1, -1 do
+			local v2 = t.list[i]
+			local v3 = v1 - v2.bornAt
+			local v4 = v2.lastPosition or CFrame.fromAxisAngle(v2.axis, 0 + v2.angle0) * v2.origin
+			local v5 = CFrame.fromAxisAngle(v2.axis, v3 + v2.angle0) * v2.origin
+			v2.lastPosition = v5
+			v2.tracer:Draw(v4, v5)
+			if v2.lifetime < v3 then
+				table.remove(t.list, i)
+				v2.tracer:Destroy()
+			end
+		end
+	end)
 end
-local Tracer_upvr = require(ReplicatedStorage.Game.Tracer)
-function module_upvr.create(arg1, arg2, arg3) -- Line 48
-    local any_new_result1 = Tracer_upvr.new()
-    any_new_result1:SetColor(Color3.new(1, 1, 1))
-    any_new_result1:SetThickness(1)
-    local tbl = {
-        bornAt = os.clock();
-        tracer = any_new_result1;
-    }
-    tbl.origin = arg1
-    tbl.axis = arg2
-    tbl.lifetime = arg3
-    tbl.angle0 = math.random() * math.pi
-    table.insert(module_upvr.list, tbl)
+function t.create(p1, p2, p3) --[[ Line: 48 | Upvalues: Tracer (copy), t (copy) ]]
+	local v1 = Tracer.new()
+	v1:SetColor(Color3.new(255/255, 255/255, 255/255))
+	v1:SetThickness(1)
+	table.insert(t.list, {
+		bornAt = os.clock(),
+		tracer = v1,
+		origin = p1,
+		axis = p2,
+		lifetime = p3,
+		angle0 = math.random() * math.pi
+	})
 end
-return module_upvr
+return t

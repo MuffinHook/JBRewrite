@@ -1,754 +1,604 @@
-local UserInputService_upvr = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local CurrentCamera = workspace.CurrentCamera
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local tbl_upvw_3 = {
-    MakeGroup = function() -- Line 14, Named "MakeGroup"
-        return {
-            Running = nil;
-        }
-    end;
-    MakeSpec = function() -- Line 19, Named "MakeSpec"
-        return {
-            Duration = nil;
-            Start = nil;
-            End = nil;
-            Cancel = nil;
-            Update = nil;
-        }
-    end;
-    Cancel = function(arg1) -- Line 28, Named "Cancel"
-        local Running_2 = arg1.Running
-        if Running_2 then
-            Running_2:Cancel()
-            arg1.Running = nil
-        end
-    end;
+local InputUtils = require(ReplicatedStorage.Std.InputUtils)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local Raycast = require(ReplicatedStorage.Std.Raycast)
+local Octree = require(ReplicatedStorage.Std.Octree)
+local t = {
+	MakeGroup = function() --[[ Name: MakeGroup | Line: 14 ]]
+		return {
+			Running = nil
+		}
+	end,
+	MakeSpec = function() --[[ Name: MakeSpec | Line: 19 ]]
+		return {
+			Duration = nil,
+			Start = nil,
+			End = nil,
+			Cancel = nil,
+			Update = nil
+		}
+	end,
+	Cancel = function(p1) --[[ Name: Cancel | Line: 28 ]]
+		local Running = p1.Running
+		if Running then
+			Running:Cancel()
+			p1.Running = nil
+		end
+	end
 }
-function tbl_upvw_3.Push(arg1, arg2) -- Line 35
-    tbl_upvw_3.Cancel(arg1)
-    assert(arg2.Duration)
-    assert(arg2.Start)
-    assert(arg2.End)
-    assert(arg2.Update)
-    if not arg2.Cancel then
-        arg2.Cancel = arg2.End
-    end
-    arg1.Running = arg2
+function t.Push(p1, p2) --[[ Line: 35 | Upvalues: t (ref) ]]
+	t.Cancel(p1)
+	assert(p2.Duration)
+	assert(p2.Start)
+	assert(p2.End)
+	assert(p2.Update)
+	if not p2.Cancel then
+		p2.Cancel = p2.End
+	end
+	p1.Running = p2
 end
-function tbl_upvw_3.Update(arg1, arg2) -- Line 46
-    local Running = arg1.Running
-    if not Running then
-    else
-        local os_clock_result1_3 = os.clock()
-        if not Running.Started then
-            Running.Started = os_clock_result1_3
-            Running:Start()
-        end
-        local var9 = os_clock_result1_3 - Running.Started
-        if Running.Elapsed then
-            var9 += Running.Elapsed
-        end
-        local var10 = var9 / Running.Duration
-        if 1 <= var10 then
-            var10 = 1
-        end
-        Running:Update(var10, arg2)
-        if 1 <= var10 then
-            Running:End()
-            arg1.Running = nil
-        end
-    end
+function t.Update(p1, p2) --[[ Line: 46 ]]
+	local Running = p1.Running
+	if Running then
+		local v1 = os.clock()
+		if not Running.Started then
+			Running.Started = v1
+			Running:Start()
+		end
+		local sum = v1 - Running.Started
+		if Running.Elapsed then
+			sum = sum + Running.Elapsed
+		end
+		local v2 = sum / Running.Duration
+		if v2 >= 1 then
+			v2 = 1
+		end
+		Running:Update(v2, p2)
+		if v2 >= 1 then
+			Running:End()
+			p1.Running = nil
+		end
+	end
 end
-local tbl_upvw = {
-    onVisibilityChanged = require(ReplicatedStorage.Std.Signal).new();
+local t2 = {
+	onVisibilityChanged = Signal.new()
 }
-local any_MakeGroup_result1_upvr = tbl_upvw_3.MakeGroup()
-local tbl_upvr = {}
-tbl_upvw.Specs = tbl_upvr
-local zero_vector3_upvr = Vector3.new()
-local any_new_result1_upvr = require(ReplicatedStorage.Std.Octree).new(Vector3.new(0, 50, 0), 8192, 8, 8)
-tbl_upvw.SpecOctree = any_new_result1_upvr
-function tbl_upvw.Add(arg1, arg2) -- Line 89
-    assert(arg2, "No key found, second param to Add must be nil")
-    arg1.Tag = arg2
-    if not arg1.Enabled then
-        arg1.Enabled = true
-    end
-    if not arg1.Priority then
-        arg1.Priority = 1
-    end
-    table.insert(tbl_upvr, arg1)
-    local var16
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var16 = var16.WorldPosition
-        var16 = arg1.Attachment
-        return var16
-    end
-    if not var16 and (not arg1.Attachment or not decompInlinedCondition()) then
-        local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var16 = var16.Position
-            var16 = arg1.Part
-            return var16
-        end
-        if not arg1.Part or not decompInlinedCondition_2() then
-            var16 = zero_vector3_upvr
-        end
-    end
-    any_new_result1_upvr:Insert(arg1, var16)
-    return function() -- Line 104
-        return tbl_upvw.Remove(arg2)
-    end
+local v1 = t.MakeGroup()
+local t3 = {}
+t2.Specs = t3
+local v2 = Vector3.new()
+local v3 = Octree.new(Vector3.new(0, 50, 0), 8192, 8, 8)
+t2.SpecOctree = v3
+local t4 = {}
+local v4 = 0
+function t2.Add(p1, p2) --[[ Line: 89 | Upvalues: t3 (copy), v2 (copy), v3 (copy), t2 (ref) ]]
+	assert(p2, "No key found, second param to Add must be nil")
+	p1.Tag = p2
+	if not p1.Enabled then
+		p1.Enabled = true
+	end
+	if not p1.Priority then
+		p1.Priority = 1
+	end
+	table.insert(t3, p1)
+	local WorldPosition = p1.WorldPosition
+	if not WorldPosition then
+		WorldPosition = p1.Attachment and p1.Attachment.WorldPosition or (p1.Part and p1.Part.Position or v2)
+	end
+	v3:Insert(p1, WorldPosition)
+	return function() --[[ Line: 104 | Upvalues: t2 (ref), p2 (copy) ]]
+		return t2.Remove(p2)
+	end
 end
-function tbl_upvw.Remove(arg1) -- Line 108
-    for i = #tbl_upvr, 1, -1 do
-        local var19 = tbl_upvr[i]
-        if var19.Tag == arg1 then
-            if tbl_upvw.Spec == var19 then
-                if var19.HideFun then
-                    var19:HideFun()
-                end
-                tbl_upvw.Spec = nil
-            end
-            any_new_result1_upvr:Remove(var19)
-            table.remove(tbl_upvr, i)
-            return true
-        end
-    end
-    return false
+function t2.Remove(p1) --[[ Line: 108 | Upvalues: t3 (copy), t2 (ref), v3 (copy) ]]
+	for i = #t3, 1, -1 do
+		local v1 = t3[i]
+		if v1.Tag == p1 then
+			if t2.Spec == v1 then
+				if v1.HideFun then
+					v1:HideFun()
+				end
+				t2.Spec = nil
+			end
+			v3:Remove(v1)
+			table.remove(t3, i)
+			return true
+		end
+	end
+	return false
 end
-local var20_upvw = 1
-local function _() -- Line 126, Named "GetCirclePct"
-    return var20_upvw
+local v5 = 1
+local function GetCirclePct() --[[ Line: 126 | Upvalues: v5 (ref) ]]
+	return v5
 end
-local function SetCirclePct_upvr(arg1) -- Line 129, Named "SetCirclePct"
-    var20_upvw = arg1
-    local Frame_7 = tbl_upvw.Frame
-    local Image_6 = Frame_7.OuterFrame.Left.Image
-    local Image_2 = Frame_7.OuterFrame.Right.Image
-    local clamped_2 = math.clamp(arg1 * 360, 0, 360)
-    Image_6.UIGradient.Rotation = math.clamp(clamped_2, 180, 360)
-    local clamped = math.clamp(clamped_2, 0, 180)
-    Image_2.UIGradient.Rotation = clamped
-    if arg1 >= 0.999 then
-        clamped = false
-    else
-        clamped = true
-    end
-    Image_6.Visible = clamped
-    Image_2.Visible = clamped
-    Frame_7.OuterFrame.OuterFull.Visible = not clamped
+local function SetCirclePct(p1) --[[ Line: 129 | Upvalues: v5 (ref), t2 (ref) ]]
+	v5 = p1
+	local Frame = t2.Frame
+	local Image = Frame.OuterFrame.Left.Image
+	local Image_2 = Frame.OuterFrame.Right.Image
+	local v1 = math.clamp(p1 * 360, 0, 360)
+	Image.UIGradient.Rotation = math.clamp(v1, 180, 360)
+	Image_2.UIGradient.Rotation = math.clamp(v1, 0, 180)
+	local v2 = p1 < 0.999
+	Image.Visible = v2
+	Image_2.Visible = v2
+	Frame.OuterFrame.OuterFull.Visible = not v2
 end
-local function _(arg1) -- Line 144, Named "SetCircleColor"
-    local Frame_3 = tbl_upvw.Frame
-    Frame_3.OuterFrame.Left.Image.ImageColor3 = arg1
-    Frame_3.OuterFrame.Right.Image.ImageColor3 = arg1
-    Frame_3.OuterFrame.OuterFull.ImageColor3 = arg1
+local function SetCircleColor(p1) --[[ Line: 144 | Upvalues: t2 (ref) ]]
+	local Frame = t2.Frame
+	Frame.OuterFrame.Left.Image.ImageColor3 = p1
+	Frame.OuterFrame.Right.Image.ImageColor3 = p1
+	Frame.OuterFrame.OuterFull.ImageColor3 = p1
 end
-local function _(arg1) -- Line 152, Named "SetCircleRadius"
-    local Frame_8 = tbl_upvw.Frame
-    Frame_8.OuterFrame.Size = UDim2.new(1, 2 * arg1, 1, 2 * arg1)
-    Frame_8.OuterFrame.Position = UDim2.new(0, -arg1, 0, -arg1)
+local function SetCircleRadius(p1) --[[ Line: 152 | Upvalues: t2 (ref) ]]
+	local Frame = t2.Frame
+	Frame.OuterFrame.Size = UDim2.new(1, 2 * p1, 1, 2 * p1)
+	Frame.OuterFrame.Position = UDim2.new(0, -p1, 0, -p1)
 end
-local function afSpin_Start_upvw() -- Line 160, Named "afSpin_Start"
-    var20_upvw = 0
-    local Frame_15 = tbl_upvw.Frame
-    local Image_8 = Frame_15.OuterFrame.Left.Image
-    local Image_7 = Frame_15.OuterFrame.Right.Image
-    Image_8.UIGradient.Rotation = 180
-    Image_7.UIGradient.Rotation = 0
-    Image_8.Visible = true
-    Image_7.Visible = true
-    Frame_15.OuterFrame.OuterFull.Visible = false
-    local Frame_6 = tbl_upvw.Frame
-    Frame_6.OuterFrame.Size = UDim2.new(1, 8, 1, 8)
-    Frame_6.OuterFrame.Position = UDim2.new(0, -4, 0, -4)
-    local Color3_fromRGB_result1_2 = Color3.fromRGB(214, 214, 214)
-    local Frame_4 = tbl_upvw.Frame
-    Frame_4.OuterFrame.Left.Image.ImageColor3 = Color3_fromRGB_result1_2
-    Frame_4.OuterFrame.Right.Image.ImageColor3 = Color3_fromRGB_result1_2
-    Frame_4.OuterFrame.OuterFull.ImageColor3 = Color3_fromRGB_result1_2
+local sin = math.sin
+local function afSpin_Start() --[[ Line: 160 | Upvalues: v5 (ref), t2 (ref) ]]
+	v5 = 0
+	local Frame = t2.Frame
+	local Image = Frame.OuterFrame.Left.Image
+	local Image_2 = Frame.OuterFrame.Right.Image
+	Image.UIGradient.Rotation = 180
+	Image_2.UIGradient.Rotation = 0
+	Image.Visible = true
+	Image_2.Visible = true
+	Frame.OuterFrame.OuterFull.Visible = false
+	local Frame_2 = t2.Frame
+	Frame_2.OuterFrame.Size = UDim2.new(1, 8, 1, 8)
+	Frame_2.OuterFrame.Position = UDim2.new(0, -4, 0, -4)
+	local v1 = Color3.fromRGB(214, 214, 214)
+	local Frame_3 = t2.Frame
+	Frame_3.OuterFrame.Left.Image.ImageColor3 = v1
+	Frame_3.OuterFrame.Right.Image.ImageColor3 = v1
+	Frame_3.OuterFrame.OuterFull.ImageColor3 = v1
 end
-local function afSpin_End_upvw() -- Line 165, Named "afSpin_End"
-    var20_upvw = 1
-    local Frame_5 = tbl_upvw.Frame
-    local Image_4 = Frame_5.OuterFrame.Left.Image
-    local Image_3 = Frame_5.OuterFrame.Right.Image
-    Image_4.UIGradient.Rotation = 360
-    Image_3.UIGradient.Rotation = 180
-    Image_4.Visible = false
-    Image_3.Visible = false
-    Frame_5.OuterFrame.OuterFull.Visible = true
-    local Frame_14 = tbl_upvw.Frame
-    Frame_14.OuterFrame.Size = UDim2.new(1, 16, 1, 16)
-    Frame_14.OuterFrame.Position = UDim2.new(0, -8, 0, -8)
-    local Color3_fromRGB_result1_6 = Color3.fromRGB(214, 214, 214)
-    local Frame_10 = tbl_upvw.Frame
-    Frame_10.OuterFrame.Left.Image.ImageColor3 = Color3_fromRGB_result1_6
-    Frame_10.OuterFrame.Right.Image.ImageColor3 = Color3_fromRGB_result1_6
-    Frame_10.OuterFrame.OuterFull.ImageColor3 = Color3_fromRGB_result1_6
+local function afSpin_End() --[[ Line: 165 | Upvalues: v5 (ref), t2 (ref) ]]
+	v5 = 1
+	local Frame = t2.Frame
+	local Image = Frame.OuterFrame.Left.Image
+	local Image_2 = Frame.OuterFrame.Right.Image
+	Image.UIGradient.Rotation = 360
+	Image_2.UIGradient.Rotation = 180
+	Image.Visible = false
+	Image_2.Visible = false
+	Frame.OuterFrame.OuterFull.Visible = true
+	local Frame_2 = t2.Frame
+	Frame_2.OuterFrame.Size = UDim2.new(1, 16, 1, 16)
+	Frame_2.OuterFrame.Position = UDim2.new(0, -8, 0, -8)
+	local v1 = Color3.fromRGB(214, 214, 214)
+	local Frame_3 = t2.Frame
+	Frame_3.OuterFrame.Left.Image.ImageColor3 = v1
+	Frame_3.OuterFrame.Right.Image.ImageColor3 = v1
+	Frame_3.OuterFrame.OuterFull.ImageColor3 = v1
 end
-local sin_upvr = math.sin
-local function afSpin_Update_upvw(arg1, arg2, arg3) -- Line 170, Named "afSpin_Update"
-    local var41 = sin_upvr(arg2) / 0.8414709848078965
-    SetCirclePct_upvr(var41)
-    local var42 = 214 - (1 - var41) * 64
-    local Color3_fromRGB_result1 = Color3.fromRGB(var42, var42, var42)
-    local Frame_16 = tbl_upvw.Frame
-    Frame_16.OuterFrame.Left.Image.ImageColor3 = Color3_fromRGB_result1
-    Frame_16.OuterFrame.Right.Image.ImageColor3 = Color3_fromRGB_result1
-    Frame_16.OuterFrame.OuterFull.ImageColor3 = Color3_fromRGB_result1
-    local var45 = var41 * 4 + 4
-    local Frame_13 = tbl_upvw.Frame
-    Frame_13.OuterFrame.Size = UDim2.new(1, 2 * var45, 1, 2 * var45)
-    Frame_13.OuterFrame.Position = UDim2.new(0, -var45, 0, -var45)
+local function afSpin_Update(p1, p2, p3) --[[ Line: 170 | Upvalues: sin (copy), SetCirclePct (copy), t2 (ref) ]]
+	local v1 = sin(p2) / 0.8414709848078965
+	SetCirclePct(v1)
+	local v2 = 214 - (1 - v1) * 64
+	local v3 = Color3.fromRGB(v2, v2, v2)
+	local Frame = t2.Frame
+	Frame.OuterFrame.Left.Image.ImageColor3 = v3
+	Frame.OuterFrame.Right.Image.ImageColor3 = v3
+	Frame.OuterFrame.OuterFull.ImageColor3 = v3
+	local v4 = v1 * 4 + 4
+	local Frame_2 = t2.Frame
+	Frame_2.OuterFrame.Size = UDim2.new(1, 2 * v4, 1, 2 * v4)
+	Frame_2.OuterFrame.Position = UDim2.new(0, -v4, 0, -v4)
 end
-sin_upvr = 1
-local var47_upvw = sin_upvr
-local function _(arg1, arg2, arg3, arg4, arg5) -- Line 184, Named "Ease_outBack"
-    if not arg5 then
-        local const_number = 1.70158
-    end
-    local var49 = arg1 / arg4 - 1
-    return arg3 * (var49 * var49 * ((const_number + 1) * var49 + const_number) + 1) + arg2
+local v6 = 1
+local function Ease_outBack(p1, p2, p3, p4, p5) --[[ Line: 184 ]]
+	p5 = p5 or 1.70158
+	local v1 = p1 / p4 - 1
+	return p3 * (v1 * v1 * ((p5 + 1) * v1 + p5) + 1) + p2
 end
-local function afPulse_Start_upvw() -- Line 191, Named "afPulse_Start"
-    local Color3_fromRGB_result1_5 = Color3.fromRGB(214, 214, 214)
-    local Frame_12 = tbl_upvw.Frame
-    Frame_12.OuterFrame.Left.Image.ImageColor3 = Color3_fromRGB_result1_5
-    Frame_12.OuterFrame.Right.Image.ImageColor3 = Color3_fromRGB_result1_5
-    Frame_12.OuterFrame.OuterFull.ImageColor3 = Color3_fromRGB_result1_5
-    local Frame_9 = tbl_upvw.Frame
-    Frame_9.OuterFrame.Size = UDim2.new(1, 0, 1, 0)
-    Frame_9.OuterFrame.Position = UDim2.new(0, -0, 0, -0)
+local function afPulse_Start() --[[ Line: 191 | Upvalues: t2 (ref) ]]
+	local v1 = Color3.fromRGB(214, 214, 214)
+	local Frame = t2.Frame
+	Frame.OuterFrame.Left.Image.ImageColor3 = v1
+	Frame.OuterFrame.Right.Image.ImageColor3 = v1
+	Frame.OuterFrame.OuterFull.ImageColor3 = v1
+	local Frame_2 = t2.Frame
+	Frame_2.OuterFrame.Size = UDim2.new(1, 0, 1, 0)
+	Frame_2.OuterFrame.Position = UDim2.new(0, -0, 0, -0)
 end
-local function afPulse_End_upvw() -- Line 196, Named "afPulse_End"
-    var20_upvw = 1
-    local Frame_2 = tbl_upvw.Frame
-    local Image = Frame_2.OuterFrame.Left.Image
-    local Image_5 = Frame_2.OuterFrame.Right.Image
-    Image.UIGradient.Rotation = 360
-    Image_5.UIGradient.Rotation = 180
-    Image.Visible = false
-    Image_5.Visible = false
-    Frame_2.OuterFrame.OuterFull.Visible = true
-    var47_upvw = 1
-    local Color3_fromRGB_result1_3 = Color3.fromRGB(214, 214, 214)
-    local Frame_19 = tbl_upvw.Frame
-    Frame_19.OuterFrame.Left.Image.ImageColor3 = Color3_fromRGB_result1_3
-    Frame_19.OuterFrame.Right.Image.ImageColor3 = Color3_fromRGB_result1_3
-    Frame_19.OuterFrame.OuterFull.ImageColor3 = Color3_fromRGB_result1_3
-    local Frame_18 = tbl_upvw.Frame
-    Frame_18.OuterFrame.Size = UDim2.new(1, 16, 1, 16)
-    Frame_18.OuterFrame.Position = UDim2.new(0, -8, 0, -8)
+local function afPulse_End() --[[ Line: 196 | Upvalues: v5 (ref), t2 (ref), v6 (ref) ]]
+	v5 = 1
+	local Frame = t2.Frame
+	local Image = Frame.OuterFrame.Left.Image
+	local Image_2 = Frame.OuterFrame.Right.Image
+	Image.UIGradient.Rotation = 360
+	Image_2.UIGradient.Rotation = 180
+	Image.Visible = false
+	Image_2.Visible = false
+	Frame.OuterFrame.OuterFull.Visible = true
+	v6 = 1
+	local v1 = Color3.fromRGB(214, 214, 214)
+	local Frame_2 = t2.Frame
+	Frame_2.OuterFrame.Left.Image.ImageColor3 = v1
+	Frame_2.OuterFrame.Right.Image.ImageColor3 = v1
+	Frame_2.OuterFrame.OuterFull.ImageColor3 = v1
+	local Frame_3 = t2.Frame
+	Frame_3.OuterFrame.Size = UDim2.new(1, 16, 1, 16)
+	Frame_3.OuterFrame.Position = UDim2.new(0, -8, 0, -8)
 end
-local function afPulse_Update_upvw(arg1, arg2, arg3) -- Line 203, Named "afPulse_Update"
-    SetCirclePct_upvr(var47_upvw * (1 - arg2) + arg2)
-    local var59 = 6
-    if not var59 then
-        var59 = 1.70158
-    end
-    local var60 = arg2 / 1 - 1
-    local var61 = 8 * (1 * (var60 * var60 * ((var59 + 1) * var60 + var59) + 1) + 0)
-    local Frame_11 = tbl_upvw.Frame
-    Frame_11.OuterFrame.Size = UDim2.new(1, 2 * var61, 1, 2 * var61)
-    Frame_11.OuterFrame.Position = UDim2.new(0, -var61, 0, -var61)
-    if arg1.Red then
-        local var63 = 40 - 40 * arg2
-        local var64 = 1 - arg2
-        local Color3_fromRGB_result1_4 = Color3.fromRGB(214 * var64 + 214 * arg2 + var63, 69 * var64 + 214 * arg2 + var63, 69 * var64 + 214 * arg2 + var63)
-        local Frame_17 = tbl_upvw.Frame
-        Frame_17.OuterFrame.Left.Image.ImageColor3 = Color3_fromRGB_result1_4
-        Frame_17.OuterFrame.Right.Image.ImageColor3 = Color3_fromRGB_result1_4
-        Frame_17.OuterFrame.OuterFull.ImageColor3 = Color3_fromRGB_result1_4
-    end
+local function afPulse_Update(p1, p2, p3) --[[ Line: 203 | Upvalues: SetCirclePct (copy), v6 (ref), t2 (ref) ]]
+	SetCirclePct(v6 * (1 - p2) + p2)
+	local v2 = 6 or 1.70158
+	local v3 = p2 / 1 - 1
+	local v4 = 8 * (1 * (v3 * v3 * ((v2 + 1) * v3 + v2) + 1) + 0)
+	local Frame = t2.Frame
+	Frame.OuterFrame.Size = UDim2.new(1, 2 * v4, 1, 2 * v4)
+	Frame.OuterFrame.Position = UDim2.new(0, -v4, 0, -v4)
+	if p1.Red then
+		local v5 = 40 - 40 * p2
+		local v62 = 1 - p2
+		local v7 = Color3.fromRGB(214 * v62 + 214 * p2 + v5, 69 * v62 + 214 * p2 + v5, 69 * v62 + 214 * p2 + v5)
+		local Frame_2 = t2.Frame
+		Frame_2.OuterFrame.Left.Image.ImageColor3 = v7
+		Frame_2.OuterFrame.Right.Image.ImageColor3 = v7
+		Frame_2.OuterFrame.OuterFull.ImageColor3 = v7
+	end
 end
-function tbl_upvw.NotAllowed() -- Line 216
-    local any_MakeSpec_result1_4 = tbl_upvw_3.MakeSpec()
-    any_MakeSpec_result1_4.Duration = 0.3
-    any_MakeSpec_result1_4.Start = afPulse_Start_upvw
-    any_MakeSpec_result1_4.End = afPulse_End_upvw
-    any_MakeSpec_result1_4.Update = afPulse_Update_upvw
-    any_MakeSpec_result1_4.Red = true
-    tbl_upvw_3.Push(any_MakeGroup_result1_upvr, any_MakeSpec_result1_4)
+function t2.NotAllowed() --[[ Line: 216 | Upvalues: t (ref), afPulse_Start (ref), afPulse_End (ref), afPulse_Update (ref), v1 (copy) ]]
+	local v12 = t.MakeSpec()
+	v12.Duration = 0.3
+	v12.Start = afPulse_Start
+	v12.End = afPulse_End
+	v12.Update = afPulse_Update
+	v12.Red = true
+	t.Push(v1, v12)
 end
-local function Press_upvr() -- Line 226, Named "Press"
-    local Spec_7 = tbl_upvw.Spec
-    if not Spec_7 then
-    else
-        Spec_7:Callback(false)
-        if Spec_7.Timed then
-            Spec_7.Pressed = true
-            Spec_7.PressedAt = os.clock()
-            local any_MakeSpec_result1_7 = tbl_upvw_3.MakeSpec()
-            any_MakeSpec_result1_7.Duration = Spec_7.Duration
-            any_MakeSpec_result1_7.Start = afSpin_Start_upvw
-            any_MakeSpec_result1_7.End = afSpin_End_upvw
-            any_MakeSpec_result1_7.Update = afSpin_Update_upvw
-            if Spec_7.GetAccumulation then
-                any_MakeSpec_result1_7.Elapsed = Spec_7.GetAccumulation()
-            end
-            tbl_upvw_3.Push(any_MakeGroup_result1_upvr, any_MakeSpec_result1_7)
-            Spec_7.Animation = any_MakeSpec_result1_7
-            return
-        end
-        if Spec_7:Callback(true) then
-            local any_MakeSpec_result1_5 = tbl_upvw_3.MakeSpec()
-            any_MakeSpec_result1_5.Duration = 0.3
-            any_MakeSpec_result1_5.Start = afPulse_Start_upvw
-            any_MakeSpec_result1_5.End = afPulse_End_upvw
-            any_MakeSpec_result1_5.Update = afPulse_Update_upvw
-            tbl_upvw_3.Push(any_MakeGroup_result1_upvr, any_MakeSpec_result1_5)
-            return
-        end
-        local any_MakeSpec_result1_2 = tbl_upvw_3.MakeSpec()
-        any_MakeSpec_result1_2.Duration = 0.3
-        any_MakeSpec_result1_2.Start = afPulse_Start_upvw
-        any_MakeSpec_result1_2.End = afPulse_End_upvw
-        any_MakeSpec_result1_2.Update = afPulse_Update_upvw
-        any_MakeSpec_result1_2.Red = true
-        tbl_upvw_3.Push(any_MakeGroup_result1_upvr, any_MakeSpec_result1_2)
-    end
+local function Press() --[[ Line: 226 | Upvalues: t2 (ref), t (ref), afSpin_Start (ref), afSpin_End (ref), afSpin_Update (ref), v1 (copy), afPulse_Start (ref), afPulse_End (ref), afPulse_Update (ref) ]]
+	local Spec = t2.Spec
+	if Spec then
+		Spec:Callback(false)
+		if Spec.Timed then
+			Spec.Pressed = true
+			Spec.PressedAt = os.clock()
+			local v12 = t.MakeSpec()
+			v12.Duration = Spec.Duration
+			v12.Start = afSpin_Start
+			v12.End = afSpin_End
+			v12.Update = afSpin_Update
+			if Spec.GetAccumulation then
+				v12.Elapsed = Spec.GetAccumulation()
+			end
+			t.Push(v1, v12)
+			Spec.Animation = v12
+		elseif Spec:Callback(true) then
+			local v2 = t.MakeSpec()
+			v2.Duration = 0.3
+			v2.Start = afPulse_Start
+			v2.End = afPulse_End
+			v2.Update = afPulse_Update
+			t.Push(v1, v2)
+		else
+			local v3 = t.MakeSpec()
+			v3.Duration = 0.3
+			v3.Start = afPulse_Start
+			v3.End = afPulse_End
+			v3.Update = afPulse_Update
+			v3.Red = true
+			t.Push(v1, v3)
+		end
+	end
 end
-local function Release_upvr() -- Line 261, Named "Release"
-    local Spec_2 = tbl_upvw.Spec
-    if Spec_2 then
-        Spec_2.Pressed = false
-        Spec_2.PressedAt = nil
-        if any_MakeGroup_result1_upvr.Running ~= nil and any_MakeGroup_result1_upvr.Running == Spec_2.Animation then
-            var47_upvw = var20_upvw
-            tbl_upvw_3.Cancel(any_MakeGroup_result1_upvr)
-            local any_MakeSpec_result1 = tbl_upvw_3.MakeSpec()
-            any_MakeSpec_result1.Duration = 0.3
-            any_MakeSpec_result1.Start = afPulse_Start_upvw
-            any_MakeSpec_result1.End = afPulse_End_upvw
-            any_MakeSpec_result1.Update = afPulse_Update_upvw
-            any_MakeSpec_result1.Red = true
-            tbl_upvw_3.Push(any_MakeGroup_result1_upvr, any_MakeSpec_result1)
-        end
-        Spec_2.Animation = nil
-        Spec_2.ScreenPosition = nil
-        tbl_upvw.Spec = nil
-        if Spec_2.ReleaseCallback then
-            Spec_2:ReleaseCallback(false)
-        end
-    end
+local function Release() --[[ Line: 261 | Upvalues: t2 (ref), v1 (copy), v6 (ref), v5 (ref), t (ref), afPulse_Start (ref), afPulse_End (ref), afPulse_Update (ref) ]]
+	local Spec = t2.Spec
+	if Spec then
+		Spec.Pressed = false
+		Spec.PressedAt = nil
+		if v1.Running ~= nil and v1.Running == Spec.Animation then
+			v6 = v5
+			t.Cancel(v1)
+			local v12 = t.MakeSpec()
+			v12.Duration = 0.3
+			v12.Start = afPulse_Start
+			v12.End = afPulse_End
+			v12.Update = afPulse_Update
+			v12.Red = true
+			t.Push(v1, v12)
+		end
+		Spec.Animation = nil
+		Spec.ScreenPosition = nil
+		t2.Spec = nil
+		if Spec.ReleaseCallback then
+			Spec:ReleaseCallback(false)
+		end
+	end
 end
-tbl_upvw.Press = Press_upvr
-tbl_upvw.Release = Release_upvr
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local tbl_upvw_2 = {}
-local var76_upvw = 0
-local Raycast_upvr = require(ReplicatedStorage.Std.Raycast)
-local function UpdateUI_upvr() -- Line 289, Named "UpdateUI"
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var166
-    for i_2 = #tbl_upvr, 1, -1 do
-        var166 = tbl_upvr
-        local var167 = var166[i_2]
-        var166 = var167.Kill
-        if not var166 then
-            var166 = var167.Part
-            if var166 then
-                var166 = var167.Part:IsDescendantOf(workspace)
-                if not var166 then
-                    var166 = true
-                    var167.Kill = var166
-                end
-            end
-        end
-        var166 = var167.Kill
-        if var166 then
-            var166 = tbl_upvw
-            var166 = var166.Spec
-            if var166 == var167 then
-                var166 = var167.HideFun
-                if var166 then
-                    var167:HideFun()
-                end
-                var166 = tbl_upvw
-                var166.Spec = nil
-            end
-            any_new_result1_upvr:Remove(var167)
-            var166 = table.remove
-            var166(tbl_upvr, i_2)
-        end
-    end
-    local Character = LocalPlayer_upvr.Character
-    if not Character then return end
-    local PrimaryPart_3 = Character.PrimaryPart
-    if not PrimaryPart_3 then return end
-    local Position = PrimaryPart_3.Position
-    local os_clock_result1 = os.clock()
-    var166 = ipairs(tbl_upvw_2)
-    local ipairs_result1_6, ipairs_result2_3, ipairs_result3_5 = ipairs(tbl_upvw_2)
-    for i_3, v in ipairs_result1_6, ipairs_result2_3, ipairs_result3_5 do
-        if not v.Kill then
-            local var175
-            if not var175 then
-                local function decompInlinedCondition_7() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                    var175 = var175.WorldPosition
-                    var175 = v.Attachment
-                    return var175
-                end
-                if not v.Attachment or not decompInlinedCondition_7() then
-                    var175 = v.Part
-                    if var175 then
-                        var175 = v.Part
-                        var175 = var175.Position
-                    end
-                end
-                if var175 then
-                    any_new_result1_upvr:Update(v, var175)
-                end
-            end
-        end
-    end
-    if 0.25 > os_clock_result1 - var76_upvw then
-        ipairs_result1_6 = false
-    else
-        ipairs_result1_6 = true
-    end
-    if ipairs_result1_6 then
-        var76_upvw = os_clock_result1
-        i_3 = 1
-        v = tbl_upvr
-        for i_4 = i_3, #v do
-            v = tbl_upvr[i_4]
-            if not v.Kill then
-                local PreUpdateFun = v.PreUpdateFun
-                if PreUpdateFun then
-                    PreUpdateFun = not v.Part
-                    if PreUpdateFun then
-                        PreUpdateFun = not v.Attachment
-                        if PreUpdateFun then
-                            PreUpdateFun = not v.WorldPosition
-                        end
-                    end
-                end
-                if PreUpdateFun then
-                    v:PreUpdateFun()
-                end
-                local var177
-                local function decompInlinedCondition_8() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                    var177 = var177.WorldPosition
-                    var177 = v.Attachment
-                    return var177
-                end
-                if not var177 and (not v.Attachment or not decompInlinedCondition_8()) then
-                    var177 = v.Part
-                    if var177 then
-                        var177 = v.Part
-                        var177 = var177.Position
-                    end
-                end
-                if var177 then
-                    any_new_result1_upvr:Update(v, var177)
-                end
-            end
-        end
-    end
-    local any_QueryRadius_result1 = any_new_result1_upvr:QueryRadius(Position, 256)
-    tbl_upvw_2 = any_QueryRadius_result1
-    for _, v_2 in ipairs(any_QueryRadius_result1) do
-        local Part_2 = v_2.Part
-        local Attachment_2 = v_2.Attachment
-        local var185
-        local function decompInlinedCondition_9() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var185 = Attachment_2.WorldPosition
-            return var185
-        end
-        local function decompInlinedCondition_10() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var185 = Part_2.Position
-            return var185
-        end
-        if not var185 and (Attachment_2 == nil or not decompInlinedCondition_9()) or Part_2 == nil or not decompInlinedCondition_10() then
-            var185 = zero_vector3_upvr
-        end
-        local var186 = var185 - Position
-        local Magnitude = var186.Magnitude
-        local Dist = v_2.Dist
-        local HorizontalDist = v_2.HorizontalDist
-        local VerticalDist = v_2.VerticalDist
-        if v_2.PreUpdateFun and (not Part_2 or Magnitude <= Dist) then
-            local PreUpdatePeriod = v_2.PreUpdatePeriod
-            if not PreUpdatePeriod then
-            end
-            if not v_2.LastPreUpdate or 0.2 <= os_clock_result1 - v_2.LastPreUpdate then
-                v_2.LastPreUpdate = os_clock_result1
-                v_2:PreUpdateFun()
-            end
-        end
-        local var192
-        if v_2.Enabled and (not tbl_upvw.Spec or v_2 == tbl_upvw.Spec or not tbl_upvw.Spec.Pressed) then
-            local var193 = false
-            if HorizontalDist ~= nil then
-                if Vector3.new(var186.X, 0, var186.Z).Magnitude > HorizontalDist then
-                    var193 = false
-                else
-                    var193 = true
-                end
-            end
-            local var194 = false
-            if VerticalDist ~= nil then
-                if Vector3.new(0, var186.Y, 0).Magnitude > VerticalDist then
-                    var194 = false
-                else
-                    var194 = true
-                    local var195
-                end
-            end
-            if Dist ~= nil then
-                if Magnitude > Dist then
-                    var192 = false
-                else
-                    var192 = true
-                end
-            else
-                var192 = var193 and var194
-            end
-            if var192 then
-                var195 = false
-                local var196
-                if v_2.NoRay then
-                    var195 = true
-                else
-                    local RaycastParams_new_result1 = RaycastParams.new()
-                    RaycastParams_new_result1.FilterDescendantsInstances = v_2.IgnoreOverride or {Character}
-                    var196 = var186.Unit
-                    local any_collidable_result1 = Raycast_upvr.collidable(Position, var196, Magnitude, RaycastParams_new_result1)
-                    var196 = nil
-                    if any_collidable_result1 then
-                        local Instance = any_collidable_result1.Instance
-                        var196 = any_collidable_result1.Position
-                    else
-                        var196 = Position + var186.Unit * Magnitude
-                    end
-                    if (var196 - var185).Magnitude <= 1 then
-                        var195 = true
-                    elseif Instance then
-                        if Instance == v_2.Part then
-                            var195 = true
-                        elseif v_2.ValidRoot and Instance:IsDescendantOf(v_2.ValidRoot) then
-                            var195 = true
-                            local var200
-                        end
-                    end
-                end
-                local function decompInlinedCondition_11() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                    var200 = v_2.Priority
-                    return Magnitude <= 999
-                end
-                if var195 and (decompInlinedCondition_11() or 1 < var200) then
-                    local var201 = v_2
-                end
-            end
-        end
-    end
-    local Spec = tbl_upvw.Spec
-    if Spec and var201 ~= Spec and Spec.Pressed then return end
-    if Spec and Spec.HideFun and var201 ~= Spec then
-        Spec:HideFun()
-    end
-    tbl_upvw.Spec = var201
-    if not var201 then return end
-    if var201.ShowFun and var201 ~= Spec then
-        var201:ShowFun()
-    end
-    if var201.Update then
-        var201:Update()
-    end
-    return true
+t2.Press = Press
+t2.Release = Release
+local function UpdateUI() --[[ Line: 289 | Upvalues: t3 (copy), t2 (ref), v3 (copy), LocalPlayer (copy), t4 (ref), v4 (ref), v2 (copy), Raycast (copy) ]]
+	local v1 = 999
+	local v22 = 1
+	local v32 = nil
+	for i = #t3, 1, -1 do
+		local v42 = t3[i]
+		if not v42.Kill and (v42.Part and not v42.Part:IsDescendantOf(workspace)) then
+			v42.Kill = true
+		end
+		if v42.Kill then
+			if t2.Spec == v42 then
+				if v42.HideFun then
+					v42:HideFun()
+				end
+				t2.Spec = nil
+			end
+			v3:Remove(v42)
+			table.remove(t3, i)
+		end
+	end
+	local Character = LocalPlayer.Character
+	if Character then
+		local PrimaryPart = Character.PrimaryPart
+		if PrimaryPart then
+			local Position = PrimaryPart.Position
+			local v5 = os.clock()
+			for i, v in ipairs(t4) do
+				if not (v.Kill or v.WorldPosition) then
+					local v6 = v.Attachment and v.Attachment.WorldPosition or v.Part and v.Part.Position
+					if v6 then
+						v3:Update(v, v6)
+					end
+				end
+			end
+			if v5 - v4 >= 0.25 then
+				v4 = v5
+				for j = 1, #t3 do
+					local v8 = t3[j]
+					if not v8.Kill then
+						if v8.PreUpdateFun and (not v8.Part and (not v8.Attachment and not v8.WorldPosition)) then
+							v8:PreUpdateFun()
+						end
+						local v10 = v8.WorldPosition or (v8.Attachment and v8.Attachment.WorldPosition or v8.Part and v8.Part.Position)
+						if v10 then
+							v3:Update(v8, v10)
+						end
+					end
+				end
+			end
+			local v11 = v3:QueryRadius(Position, 256)
+			t4 = v11
+			local t = { Character }
+			for i, v in ipairs(v11) do
+				local v12, v13, v14, v15
+				local Part = v.Part
+				local Attachment = v.Attachment
+				local v16 = v.WorldPosition or (Attachment == nil and (Part == nil and v2 or Part.Position) or Attachment.WorldPosition)
+				local v17 = v16 - Position
+				local v18 = Vector3.new(v17.X, 0, v17.Z)
+				local v19 = Vector3.new(0, v17.Y, 0)
+				local Magnitude = v17.Magnitude
+				local Magnitude_2 = v18.Magnitude
+				local Magnitude_3 = v19.Magnitude
+				local Dist = v.Dist
+				local HorizontalDist = v.HorizontalDist
+				local VerticalDist = v.VerticalDist
+				local IgnoreOverride = v.IgnoreOverride
+				if v.PreUpdateFun and (not Part or Magnitude <= Dist) and (not v.LastPreUpdate or (v.PreUpdatePeriod or 0.2) <= v5 - v.LastPreUpdate) then
+					v.LastPreUpdate = v5
+					v:PreUpdateFun()
+				end
+				if v.Enabled and (not t2.Spec or (v == t2.Spec or not t2.Spec.Pressed)) then
+					v12 = if HorizontalDist == nil then false else Magnitude_2 <= HorizontalDist
+					v13 = if VerticalDist == nil then false else Magnitude_3 <= VerticalDist
+					v14 = if Dist == nil then v12 and v13 else Magnitude <= Dist
+					if v14 then
+						local v21 = false
+						if v.NoRay then
+							v21 = true
+						else
+							local v222 = RaycastParams.new()
+							v222.FilterDescendantsInstances = IgnoreOverride or t
+							local v23 = Raycast.collidable(Position, v17.Unit, Magnitude, v222)
+							local v24 = nil
+							if v23 then
+								v24 = v23.Instance
+								v15 = v23.Position
+							else
+								v15 = Position + v17.Unit * Magnitude
+							end
+							if (v15 - v16).Magnitude <= 1 or v24 and (v24 == v.Part or v.ValidRoot and v24:IsDescendantOf(v.ValidRoot)) then
+								v21 = true
+							end
+						end
+						if v21 then
+							local Priority = v.Priority
+							if Magnitude <= v1 or v22 < Priority then
+								v1 = Magnitude
+								v22 = Priority
+								v32 = v
+							end
+						end
+					end
+				end
+			end
+			local Spec = t2.Spec
+			if not Spec or (v32 == Spec or not Spec.Pressed) then
+				if Spec and (Spec.HideFun and v32 ~= Spec) then
+					Spec:HideFun()
+				end
+				t2.Spec = v32
+				if v32 then
+					if v32.ShowFun and v32 ~= Spec then
+						v32:ShowFun()
+					end
+					if v32.Update then
+						v32:Update()
+					end
+					return true
+				end
+			end
+		end
+	end
 end
-local function ProcessSpec_upvr() -- Line 459, Named "ProcessSpec"
-    local Spec_3 = tbl_upvw.Spec
-    local var204
-    if not Spec_3 then
-    else
-        if not Spec_3.Pressed then return end
-        var204 = Spec_3.PressedAt
-        local var205 = os.clock() - var204
-        var204 = Spec_3.GetAccumulation
-        if var204 then
-            var204 = Spec_3.GetAccumulation()
-            var205 += var204
-        end
-        var204 = var205 / Spec_3.Duration
-        if 1 <= var204 then
-            var204 = 1
-        end
-        if Spec_3.WhilePressedUpdate then
-            Spec_3.WhilePressedUpdate(var204)
-        end
-        if Spec_3.ForceRelease then
-            Spec_3.ForceRelease = false
-            Release_upvr()
-            return
-        end
-        if var204 == 1 then
-            Spec_3.Pressed = false
-            Spec_3.PressedAt = nil
-            if Spec_3.ReleaseCallback then
-                Spec_3:ReleaseCallback(true)
-            end
-            if Spec_3:Callback(true) then
-                local any_MakeSpec_result1_6 = tbl_upvw_3.MakeSpec()
-                any_MakeSpec_result1_6.Duration = 0.5
-                any_MakeSpec_result1_6.Start = afPulse_Start_upvw
-                any_MakeSpec_result1_6.End = afPulse_End_upvw
-                any_MakeSpec_result1_6.Update = afPulse_Update_upvw
-                tbl_upvw_3.Push(any_MakeGroup_result1_upvr, any_MakeSpec_result1_6)
-                return
-            end
-            local any_MakeSpec_result1_3 = tbl_upvw_3.MakeSpec()
-            any_MakeSpec_result1_3.Duration = 0.3
-            any_MakeSpec_result1_3.Start = afPulse_Start_upvw
-            any_MakeSpec_result1_3.End = afPulse_End_upvw
-            any_MakeSpec_result1_3.Update = afPulse_Update_upvw
-            any_MakeSpec_result1_3.Red = true
-            tbl_upvw_3.Push(any_MakeGroup_result1_upvr, any_MakeSpec_result1_3)
-        end
-    end
+local function ProcessSpec() --[[ Line: 459 | Upvalues: t2 (ref), Release (copy), t (ref), afPulse_Start (ref), afPulse_End (ref), afPulse_Update (ref), v1 (copy) ]]
+	local Spec = t2.Spec
+	if Spec and Spec.Pressed then
+		local sum = os.clock() - Spec.PressedAt
+		if Spec.GetAccumulation then
+			sum = sum + Spec.GetAccumulation()
+		end
+		local v12 = sum / Spec.Duration
+		if v12 >= 1 then
+			v12 = 1
+		end
+		if Spec.WhilePressedUpdate then
+			Spec.WhilePressedUpdate(v12)
+		end
+		if Spec.ForceRelease then
+			Spec.ForceRelease = false
+			Release()
+		elseif v12 == 1 then
+			Spec.Pressed = false
+			Spec.PressedAt = nil
+			local v2 = Spec:Callback(true)
+			if Spec.ReleaseCallback then
+				Spec:ReleaseCallback(true)
+			end
+			if v2 then
+				local v3 = t.MakeSpec()
+				v3.Duration = 0.5
+				v3.Start = afPulse_Start
+				v3.End = afPulse_End
+				v3.Update = afPulse_Update
+				t.Push(v1, v3)
+				return
+			end
+			local v4 = t.MakeSpec()
+			v4.Duration = 0.3
+			v4.Start = afPulse_Start
+			v4.End = afPulse_End
+			v4.Update = afPulse_Update
+			v4.Red = true
+			t.Push(v1, v4)
+		end
+	end
 end
-local InputUtils_upvr = require(ReplicatedStorage.Std.InputUtils)
-local function UpdatePlatform_upvr() -- Line 504, Named "UpdatePlatform"
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local var209
-    if InputUtils_upvr.isTouch() then
-        var209 = nil
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if UserInputService_upvr:GetLastInputType() == Enum.UserInputType.Gamepad1 then
-        var209 = UserInputService_upvr:GetStringForKeyCode(Enum.KeyCode.ButtonY)
-        if var209 == "ButtonTriangle" then
-            var209 = "△"
-        elseif var209 == "ButtonY" then
-            var209 = 'Y'
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-    else
-        var209 = 'E'
-    end
-    if var209 == nil then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local function UpdatePlatform() --[[ Line: 504 | Upvalues: t2 (ref), UserInputService (copy), InputUtils (copy) ]]
+	local Frame = t2.Frame
+	local v1 = UserInputService:GetLastInputType()
+	local v2
+	if InputUtils.isTouch() then
+		v2 = nil
+	elseif v1 == Enum.UserInputType.Gamepad1 then
+		local v3 = UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonY)
+		v2 = if v3 == "ButtonTriangle" then "\226\150\179" elseif v3 == "ButtonY" then "Y" else v3
+	else
+		v2 = "E"
+	end
+	Frame.TextLabel.Visible = v2 ~= nil
+	Frame.PointLabel.Visible = v2 == nil
+	if v2 then
+		Frame.TextLabel.Text = v2
+	end
+	local Spec = t2.Spec
+	Frame.Hold.Visible = Spec and Spec.Timed
 end
-local var210_upvw
-function tbl_upvw.UpdateLogic(arg1) -- Line 530
-    if not UpdateUI_upvr() and tbl_upvw.Spec then
-        if tbl_upvw.Spec.HideFun then
-            tbl_upvw.Spec:HideFun()
-        end
-        Release_upvr()
-    end
-    UpdatePlatform_upvr()
-    ProcessSpec_upvr()
-    local var211
-    if tbl_upvw.Spec ~= var210_upvw then
-        if tbl_upvw.Spec == nil then
-            var211 = false
-        else
-            var211 = true
-        end
-        tbl_upvw.onVisibilityChanged:Fire(var211)
-    end
-    var210_upvw = tbl_upvw.Spec
+local v7 = nil
+function t2.UpdateLogic(p1) --[[ Line: 530 | Upvalues: UpdateUI (copy), t2 (ref), Release (copy), UpdatePlatform (copy), ProcessSpec (copy), v7 (ref) ]]
+	if not UpdateUI() and t2.Spec then
+		if t2.Spec.HideFun then
+			t2.Spec:HideFun()
+		end
+		Release()
+	end
+	UpdatePlatform()
+	ProcessSpec()
+	if t2.Spec ~= v7 then
+		t2.onVisibilityChanged:Fire(t2.Spec ~= nil)
+	end
+	v7 = t2.Spec
 end
-local CurrentCamera_upvr = workspace.CurrentCamera
-function tbl_upvw.UpdateVisual(arg1) -- Line 551
-    local Spec_4 = tbl_upvw.Spec
-    local Frame = tbl_upvw.Frame
-    local var215
-    if not Spec_4 then
-        Frame.Visible = false
-        var215 = arg1
-        tbl_upvw_3.Update(any_MakeGroup_result1_upvr, var215)
-    else
-        local Attachment = Spec_4.Attachment
-        local Part = Spec_4.Part
-        var215 = Spec_4.WorldPosition
-        local function decompInlinedCondition_12() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var215 = Attachment.WorldPosition
-            return var215
-        end
-        local function decompInlinedCondition_13() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var215 = Part.Position
-            return var215
-        end
-        if not var215 and (Attachment == nil or not decompInlinedCondition_12()) or Part == nil or not decompInlinedCondition_13() then
-            var215 = zero_vector3_upvr
-        end
-        local any_WorldToScreenPoint_result1, any_WorldToScreenPoint_result2 = CurrentCamera_upvr:WorldToScreenPoint(var215)
-        Frame.Visible = any_WorldToScreenPoint_result2
-        if any_WorldToScreenPoint_result2 then
-            Spec_4.ScreenPosition = Vector3.new(any_WorldToScreenPoint_result1.X, any_WorldToScreenPoint_result1.Y, 0)
-            Frame.Position = UDim2.new(0, any_WorldToScreenPoint_result1.X, 0, any_WorldToScreenPoint_result1.Y) - UDim2.new(0, Frame.AbsoluteSize.X * 0.5, 0, Frame.AbsoluteSize.Y * 0.5)
-            Frame.Help.Text = Spec_4.Name or ""
-            Frame.Help.Visible = not not Spec_4.Name
-        end
-        tbl_upvw_3.Update(any_MakeGroup_result1_upvr, arg1)
-    end
+function t2.UpdateVisual(p1) --[[ Line: 551 | Upvalues: t2 (ref), t (ref), v1 (copy), v2 (copy), CurrentCamera (copy) ]]
+	local Spec = t2.Spec
+	local Frame = t2.Frame
+	if Spec then
+		local Attachment = Spec.Attachment
+		local Part = Spec.Part
+		local WorldPosition = Spec.WorldPosition
+		if not WorldPosition and Attachment == nil then
+			WorldPosition = if Part == nil then v2 else Part.Position or v2
+		elseif not WorldPosition then
+			WorldPosition = Attachment.WorldPosition
+			if not WorldPosition then
+				WorldPosition = if Part == nil then v2 else Part.Position or v2
+			end
+		end
+		local v12, v22 = CurrentCamera:WorldToScreenPoint(WorldPosition)
+		Frame.Visible = v22
+		if v22 then
+			Spec.ScreenPosition = Vector3.new(v12.X, v12.Y, 0)
+			Frame.Position = UDim2.new(0, v12.X, 0, v12.Y) - UDim2.new(0, Frame.AbsoluteSize.X * 0.5, 0, Frame.AbsoluteSize.Y * 0.5)
+			Frame.Help.Text = Spec.Name or ""
+			Frame.Help.Visible = Spec.Name and true or false
+		end
+	else
+		Frame.Visible = false
+	end
+	t.Update(v1, p1)
 end
-local var220_upvw = false
-local var223_upvw
-UserInputService_upvr.InputBegan:connect(function(arg1, arg2) -- Line 602, Named "InputBegan"
-    if arg2 then
-    else
-        local UserInputType = arg1.UserInputType
-        if UserInputType == Enum.UserInputType.MouseButton1 then
-            local Spec_5 = tbl_upvw.Spec
-            if not Spec_5 then
-                UserInputType = nil
-            else
-                local ScreenPosition = Spec_5.ScreenPosition
-                if not ScreenPosition then
-                    UserInputType = false
-                elseif (arg1.Position - ScreenPosition).Magnitude < tbl_upvw.Frame.AbsoluteSize.X * 0.5 then
-                    var220_upvw = true
-                    Press_upvr()
-                    UserInputType = true
-                else
-                    UserInputType = false
-                end
-            end
-            if UserInputType then
-                var223_upvw = Enum.UserInputType.MouseButton1
-            end
-        end
-    end
-end)
-UserInputService_upvr.InputEnded:connect(function(arg1, arg2) -- Line 613, Named "InputEnded"
-    if arg2 then
-    elseif arg1.UserInputType == Enum.UserInputType.MouseButton1 and var223_upvw == Enum.UserInputType.MouseButton1 then
-        if not var220_upvw then return end
-        var220_upvw = false
-        Release_upvr()
-    end
-end)
-UserInputService_upvr.TouchStarted:connect(function(arg1) -- Line 577, Named "TouchStarted"
-    local Spec_6 = tbl_upvw.Spec
-    if not Spec_6 then return end
-    local ScreenPosition_2 = Spec_6.ScreenPosition
-    if not ScreenPosition_2 then
-        return false
-    end
-    if (arg1.Position - ScreenPosition_2).Magnitude < tbl_upvw.Frame.AbsoluteSize.X * 0.5 then
-        var220_upvw = true
-        Press_upvr()
-        return true
-    end
-    return false
-end)
-UserInputService_upvr.TouchEnded:connect(function(arg1) -- Line 594, Named "TouchEnded"
-    if not var220_upvw then
-    else
-        var220_upvw = false
-        Release_upvr()
-    end
-end)
-any_MakeGroup_result1_upvr = {}
-local var227 = any_MakeGroup_result1_upvr
-var227.CircleAction = tbl_upvw
-var227.Animation = tbl_upvw_3
-return var227
+local v8 = false
+local function TouchStarted(p1) --[[ Line: 577 | Upvalues: t2 (ref), v8 (ref), Press (copy) ]]
+	local Spec = t2.Spec
+	if Spec then
+		local ScreenPosition = Spec.ScreenPosition
+		if ScreenPosition and (p1.Position - ScreenPosition).Magnitude < t2.Frame.AbsoluteSize.X * 0.5 then
+			v8 = true
+			Press()
+			return true
+		else
+			return false
+		end
+	end
+end
+local function TouchEnded(p1) --[[ Line: 594 | Upvalues: v8 (ref), Release (copy) ]]
+	if v8 then
+		v8 = false
+		Release()
+	end
+end
+local v9 = nil
+local function InputBegan(p1, p2) --[[ Line: 602 | Upvalues: t2 (ref), v8 (ref), Press (copy), v9 (ref) ]]
+	if not p2 and p1.UserInputType == Enum.UserInputType.MouseButton1 then
+		local Spec = t2.Spec
+		local v1
+		if Spec then
+			local ScreenPosition = Spec.ScreenPosition
+			if ScreenPosition and (p1.Position - ScreenPosition).Magnitude < t2.Frame.AbsoluteSize.X * 0.5 then
+				v8 = true
+				Press()
+				v1 = true
+			else
+				v1 = false
+			end
+		else
+			v1 = nil
+		end
+		if v1 then
+			v9 = Enum.UserInputType.MouseButton1
+		end
+	end
+end
+local function InputEnded(p1, p2) --[[ Line: 613 | Upvalues: v9 (ref), v8 (ref), Release (copy) ]]
+	if not p2 and (p1.UserInputType == Enum.UserInputType.MouseButton1 and v9 == Enum.UserInputType.MouseButton1 and v8) then
+		v8 = false
+		Release()
+	end
+end
+UserInputService.InputBegan:connect(InputBegan)
+UserInputService.InputEnded:connect(InputEnded)
+UserInputService.TouchStarted:connect(TouchStarted)
+UserInputService.TouchEnded:connect(TouchEnded)
+return {
+	CircleAction = t2,
+	Animation = t
+}

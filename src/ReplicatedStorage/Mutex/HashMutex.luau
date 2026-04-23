@@ -1,89 +1,73 @@
-local module_2_upvr = {}
-module_2_upvr.__index = module_2_upvr
-function module_2_upvr.new() -- Line 4
-    local module = {}
-    setmetatable(module, module_2_upvr)
-    module._data = {}
-    module._observe = {}
-    return module
+local t = {}
+t.__index = t
+function t.new() --[[ Line: 4 | Upvalues: t (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._data = {}
+	t2._observe = {}
+	return t2
 end
-function module_2_upvr.AcquireFor(arg1, arg2, arg3) -- Line 13
-    if arg1._data[arg2] then
-        return false
-    end
-    arg1._data[arg2] = {
-        thread = task.delay(arg3, function() -- Line 18
-            arg1._data[arg2] = nil
-            arg1:_fireKeyChangedCallbacks(arg2)
-        end);
-    }
-    arg1:_fireKeyChangedCallbacks(arg2)
-    return true
+function t.AcquireFor(p1, p2, p3) --[[ Line: 13 ]]
+	if p1._data[p2] then
+		return false
+	else
+		p1._data[p2] = {
+			thread = task.delay(p3, function() --[[ Line: 18 | Upvalues: p1 (copy), p2 (copy) ]]
+				p1._data[p2] = nil
+				p1:_fireKeyChangedCallbacks(p2)
+			end)
+		}
+		p1:_fireKeyChangedCallbacks(p2)
+		return true
+	end
 end
-function module_2_upvr.ReleaseFor(arg1, arg2) -- Line 26
-    local var5 = arg1._data[arg2]
-    local var6
-    if var5 then
-        var6 = task.cancel
-        var6(var5.thread)
-        var6 = arg1._data
-        var6[arg2] = nil
-        arg1:_fireKeyChangedCallbacks(arg2)
-    end
-    if var5 == nil then
-        var6 = false
-    else
-        var6 = true
-    end
-    return var6
+function t.ReleaseFor(p1, p2) --[[ Line: 26 ]]
+	local v1 = p1._data[p2]
+	if v1 then
+		task.cancel(v1.thread)
+		p1._data[p2] = nil
+		p1:_fireKeyChangedCallbacks(p2)
+	end
+	return v1 ~= nil
 end
-function module_2_upvr._fireKeyChangedCallbacks(arg1, arg2) -- Line 36
-    local var11
-    if arg1._data[arg2] == nil then
-        var11 = false
-    else
-        var11 = true
-    end
-    if arg1._observe[arg2] then
-        for _, v in arg1._observe[arg2] do
-            v(var11)
-        end
-    end
+function t._fireKeyChangedCallbacks(p1, p2) --[[ Line: 36 ]]
+	local v1 = p1._data[p2] ~= nil
+	if p1._observe[p2] then
+		for v2, v3 in p1._observe[p2] do
+			v3(v1)
+		end
+	end
 end
-function module_2_upvr.AddKeyChangedCallback(arg1, arg2, arg3) -- Line 44
-    if not arg1._observe[arg2] then
-        arg1._observe[arg2] = {}
-    end
-    table.insert(arg1._observe[arg2], arg3)
-    return function() -- Line 49
-        if not arg1._observe[arg2] then
-            return false
-        end
-        local table_find_result1 = table.find(arg1._observe[arg2], arg3)
-        if not table_find_result1 then
-            return false
-        end
-        table.remove(arg1._observe[arg2], table_find_result1)
-        if #arg1._observe[arg2] == 0 then
-            arg1._observe[arg2] = nil
-        end
-        return true
-    end
+function t.AddKeyChangedCallback(p1, p2, p3) --[[ Line: 44 ]]
+	if not p1._observe[p2] then
+		p1._observe[p2] = {}
+	end
+	table.insert(p1._observe[p2], p3)
+	return function() --[[ Line: 49 | Upvalues: p1 (copy), p2 (copy), p3 (copy) ]]
+		if p1._observe[p2] then
+			local v1 = table.find(p1._observe[p2], p3)
+			if v1 then
+				table.remove(p1._observe[p2], v1)
+				if #p1._observe[p2] == 0 then
+					p1._observe[p2] = nil
+				end
+				return true
+			else
+				return false
+			end
+		else
+			return false
+		end
+	end
 end
-function module_2_upvr.ObserveKey(arg1, arg2, arg3) -- Line 64
-    local var14
-    if arg1._data[arg2] == nil then
-        var14 = false
-    else
-        var14 = true
-    end
-    arg3(var14)
-    return arg1:AddKeyChangedCallback(arg2, arg3)
+function t.ObserveKey(p1, p2, p3) --[[ Line: 64 ]]
+	p3(p1._data[p2] ~= nil)
+	return p1:AddKeyChangedCallback(p2, p3)
 end
-function module_2_upvr.Destroy(arg1) -- Line 69
-    for i_2 in arg1._data do
-        arg1:ReleaseFor(i_2)
-    end
-    setmetatable(arg1, nil)
+function t.Destroy(p1) --[[ Line: 69 ]]
+	for v1 in p1._data do
+		p1:ReleaseFor(v1)
+	end
+	setmetatable(p1, nil)
 end
-return module_2_upvr
+return t

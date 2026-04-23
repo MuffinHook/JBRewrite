@@ -1,278 +1,268 @@
-local GuiService_upvr = game:GetService("GuiService")
-local UserInputService_upvr = game:GetService("UserInputService")
-local RunService_upvr = game:GetService("RunService")
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("BigMinimap")
-any_extend_result1.defaultProps = {
-    visible = true;
-    mapScale = 1;
+local MinimapService = require(ReplicatedStorage.App.MinimapService)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
+local Roact = require(ReplicatedStorage.Roact)
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+local createElement = Roact.createElement
+local MinimapUtils = require(script.Parent.MinimapUtils)
+local Minimap = require(script.Parent.Minimap)
+local v1 = Roact.PureComponent:extend("BigMinimap")
+v1.defaultProps = {
+	visible = true,
+	mapScale = 1
 }
-function any_extend_result1.init(arg1) -- Line 22
-    arg1.horizontalRef = Roact_upvr.createRef()
-    arg1.verticalRef = Roact_upvr.createRef()
-    arg1.maid = Maid_upvr.new()
-    if arg1.props.containerSize then
-        arg1.containerSize = arg1.props.containerSize
-        arg1.updateContainerSize = arg1.props.updateContainerSize
-    else
-        local any_createBinding_result1, any_createBinding_result2 = Roact_upvr.createBinding(Vector2.new(512, 512))
-        arg1.containerSize = any_createBinding_result1
-        arg1.updateContainerSize = any_createBinding_result2
-    end
-    if arg1.props.containerRef then
-        arg1.containerRef = arg1.props.containerRef
-    else
-        arg1.containerRef = Roact_upvr.createRef()
-    end
-    arg1:setState({
-        crossHairEnabled = false;
-        inputType = Enum.UserInputType.Keyboard;
-    })
-    arg1.x = 0
-    arg1.y = 0
+function v1.init(p1) --[[ Line: 22 | Upvalues: Roact (copy), Maid (copy) ]]
+	p1.horizontalRef = Roact.createRef()
+	p1.verticalRef = Roact.createRef()
+	p1.maid = Maid.new()
+	if p1.props.containerSize then
+		local updateContainerSize = p1.props.updateContainerSize
+		p1.containerSize = p1.props.containerSize
+		p1.updateContainerSize = updateContainerSize
+	else
+		local v1, v2 = Roact.createBinding(Vector2.new(512, 512))
+		p1.containerSize = v1
+		p1.updateContainerSize = v2
+	end
+	if p1.props.containerRef then
+		p1.containerRef = p1.props.containerRef
+	else
+		p1.containerRef = Roact.createRef()
+	end
+	p1:setState({
+		crossHairEnabled = false,
+		inputType = Enum.UserInputType.Keyboard
+	})
+	p1.x = 0
+	p1.y = 0
 end
-local createElement_upvr = Roact_upvr.createElement
-local Minimap_upvr = require(script.Parent.Minimap)
-local Dictionary_upvr = require(ReplicatedStorage.EzUi.Dictionary)
-function any_extend_result1.render(arg1) -- Line 42
-    if not arg1.props.visible then return end
-    local module = {}
-    local tbl = {
-        ListLayout = createElement_upvr("UIListLayout", {
-            HorizontalAlignment = Enum.HorizontalAlignment.Left;
-            VerticalAlignment = Enum.VerticalAlignment.Center;
-            SortOrder = Enum.SortOrder.LayoutOrder;
-            FillDirection = Enum.FillDirection.Horizontal;
-            Padding = UDim.new(0, 4);
-        });
-    }
-    local tbl_2 = {}
-    local tbl_3 = {
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-        Size = UDim2.new(0.9, 0, 0.9, 0);
-        Position = UDim2.new(0.5, 0, 0.5, 0);
-    }
-    local vector2 = Vector2.new(0.5, 0.5)
-    tbl_3.AnchorPoint = vector2
-    if #arg1.props.waypoints == 0 then
-        vector2 = "Add Waypoint"
-    else
-        vector2 = "Remove Waypoint"
-    end
-    tbl_3.Text = vector2
-    tbl_3.Font = Enum.Font.LuckiestGuy
-    tbl_3.LineHeight = 0.7
-    tbl_3.TextScaled = true
-    tbl_3.TextXAlignment = Enum.TextXAlignment.Center
-    tbl_3.TextYAlignment = Enum.TextYAlignment.Center
-    tbl_3.TextColor3 = Color3.fromRGB(255, 255, 255)
-    tbl_3.ZIndex = 10
-    tbl_2.Title = createElement_upvr("TextLabel", tbl_3)
-    tbl_2.AspectRatio = createElement_upvr("UIAspectRatioConstraint", {
-        AspectRatio = 8;
-    })
-    tbl_2.UICorner = createElement_upvr("UICorner", {
-        CornerRadius = UDim.new(0.25, 0);
-    })
-    tbl.Waypoint = createElement_upvr("TextButton", {
-        BackgroundColor3 = arg1.props.color;
-        Size = UDim2.new(1, 0, 1, 0);
-        Text = "";
-        LayoutOrder = 1;
-        Selectable = true;
-        [Roact_upvr.Event.Activated] = function() -- Line 98
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            GuiService_upvr.SelectedObject = nil
-            local AbsoluteSize_3 = arg1.containerRef:getValue().AbsoluteSize
-            arg1:_setXY(AbsoluteSize_3.X * 0.5, AbsoluteSize_3.Y * 0.5)
-            do
-                return
-            end
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            arg1.props.onSetWaypoint(nil)
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        end;
-    }, tbl_2)
-    module.Buttons = createElement_upvr("Frame", {
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-        Size = UDim2.new(1, 0, 0.05, 0);
-        Position = UDim2.new(0, 0, 1, 4);
-    }, tbl)
-    return createElement_upvr(Minimap_upvr, Dictionary_upvr.merge(arg1.props, {
-        containerSize = arg1.containerSize;
-        updateContainerSize = arg1.updateContainerSize;
-        containerRef = arg1.containerRef;
-        containerChildren = {
-            LineHorizontal = createElement_upvr("Frame", {
-                BackgroundTransparency = 0;
-                Size = UDim2.new(1, 0, 0, 2);
-                AnchorPoint = Vector2.new(0, 0.5);
-                BackgroundColor3 = Color3.new(1, 1, 1);
-                BorderSizePixel = 1;
-                BorderColor3 = Color3.new(0.4, 0.4, 0.4);
-                ZIndex = 4;
-                Visible = arg1.state.crossHairEnabled;
-                [Roact_upvr.Ref] = arg1.horizontalRef;
-            });
-            LineVertical = createElement_upvr("Frame", {
-                BackgroundTransparency = 0;
-                Size = UDim2.new(0, 2, 1, 0);
-                AnchorPoint = Vector2.new(0.5, 0);
-                BackgroundColor3 = Color3.new(1, 1, 1);
-                BorderSizePixel = 1;
-                BorderColor3 = Color3.new(0.4, 0.4, 0.4);
-                ZIndex = 4;
-                Visible = arg1.state.crossHairEnabled;
-                [Roact_upvr.Ref] = arg1.verticalRef;
-            });
-        };
-    }), module)
+function v1.render(p1) --[[ Line: 42 | Upvalues: createElement (copy), Minimap (copy), Dictionary (copy), Roact (copy), GuiService (copy) ]]
+	if p1.props.visible then
+		local v3 = Dictionary.merge(p1.props, {
+			containerSize = p1.containerSize,
+			updateContainerSize = p1.updateContainerSize,
+			containerRef = p1.containerRef,
+			containerChildren = {
+				LineHorizontal = createElement("Frame", {
+					BackgroundTransparency = 0,
+					Size = UDim2.new(1, 0, 0, 2),
+					AnchorPoint = Vector2.new(0, 0.5),
+					BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
+					BorderSizePixel = 1,
+					BorderColor3 = Color3.new(102/255, 102/255, 102/255),
+					ZIndex = 4,
+					Visible = p1.state.crossHairEnabled,
+					[Roact.Ref] = p1.horizontalRef
+				}),
+				LineVertical = createElement("Frame", {
+					BackgroundTransparency = 0,
+					Size = UDim2.new(0, 2, 1, 0),
+					AnchorPoint = Vector2.new(0.5, 0),
+					BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
+					BorderSizePixel = 1,
+					BorderColor3 = Color3.new(102/255, 102/255, 102/255),
+					ZIndex = 4,
+					Visible = p1.state.crossHairEnabled,
+					[Roact.Ref] = p1.verticalRef
+				})
+			}
+		})
+		local t = {}
+		local t2 = {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 0.05, 0),
+			Position = UDim2.new(0, 0, 1, 4)
+		}
+		local t3 = {
+			ListLayout = createElement("UIListLayout", {
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Horizontal,
+				Padding = UDim.new(0, 4)
+			})
+		}
+		local t4 = {
+			BackgroundColor3 = p1.props.color,
+			Size = UDim2.new(1, 0, 1, 0),
+			Text = "",
+			LayoutOrder = 1,
+			Selectable = true,
+			[Roact.Event.Activated] = function() --[[ Line: 98 | Upvalues: p1 (copy), GuiService (ref) ]]
+				if #p1.props.waypoints == 0 then
+					p1:setState({
+						crossHairEnabled = true
+					})
+					if p1.state.inputType == Enum.UserInputType.Gamepad1 then
+						GuiService.SelectedObject = nil
+						local AbsoluteSize = p1.containerRef:getValue().AbsoluteSize
+						p1:_setXY(AbsoluteSize.X * 0.5, AbsoluteSize.Y * 0.5)
+					end
+				else
+					p1.props.onSetWaypoint(nil)
+				end
+			end
+		}
+		local t5 = {}
+		local t6 = {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.new(0.9, 0, 0.9, 0),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			AnchorPoint = Vector2.new(0.5, 0.5)
+		}
+		t6.Text = if #p1.props.waypoints == 0 then "Add Waypoint" else "Remove Waypoint"
+		t6.Font = Enum.Font.LuckiestGuy
+		t6.LineHeight = 0.7
+		t6.TextScaled = true
+		t6.TextXAlignment = Enum.TextXAlignment.Center
+		t6.TextYAlignment = Enum.TextYAlignment.Center
+		t6.TextColor3 = Color3.fromRGB(255, 255, 255)
+		t6.ZIndex = 10
+		t5.Title = createElement("TextLabel", t6)
+		t5.AspectRatio = createElement("UIAspectRatioConstraint", {
+			AspectRatio = 8
+		})
+		t5.UICorner = createElement("UICorner", {
+			CornerRadius = UDim.new(0.25, 0)
+		})
+		t3.Waypoint = createElement("TextButton", t4, t5)
+		t.Buttons = createElement("Frame", t2, t3)
+		return createElement(Minimap, v3, t)
+	end
 end
-function any_extend_result1._setXY(arg1, arg2, arg3) -- Line 140
-    local AbsoluteSize = arg1.containerRef:getValue().AbsoluteSize
-    arg1.x = math.clamp(arg2, 0, AbsoluteSize.X)
-    arg1.y = math.clamp(arg3, 0, AbsoluteSize.Y)
-    if arg1.state.crossHairEnabled then
-        arg1.horizontalRef:getValue().Position = UDim2.new(0, 0, 0, arg1.y)
-        arg1.verticalRef:getValue().Position = UDim2.new(0, arg1.x, 0, 0)
-    end
+function v1._setXY(p1, p2, p3) --[[ Line: 140 ]]
+	local AbsoluteSize = p1.containerRef:getValue().AbsoluteSize
+	p1.x = math.clamp(p2, 0, AbsoluteSize.X)
+	p1.y = math.clamp(p3, 0, AbsoluteSize.Y)
+	local v1 = p1.horizontalRef:getValue()
+	local v2 = p1.verticalRef:getValue()
+	if p1.state.crossHairEnabled then
+		v1.Position = UDim2.new(0, 0, 0, p1.y)
+		v2.Position = UDim2.new(0, p1.x, 0, 0)
+	end
 end
-local MinimapUtils_upvr = require(script.Parent.MinimapUtils)
-function any_extend_result1._hookVisible(arg1, arg2) -- Line 154
-    if arg2 then
-        local any_new_result1 = Maid_upvr.new()
-        arg1.maid.visibleMaid = any_new_result1
-        local any_GetGuiInset_result1_upvr = GuiService_upvr:GetGuiInset()
-        any_new_result1:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 161
-            if arg1.state.inputType == Enum.UserInputType.Keyboard then
-                local var36 = UserInputService_upvr:GetMouseLocation() - any_GetGuiInset_result1_upvr
-                local AbsolutePosition = arg1.containerRef:getValue().AbsolutePosition
-                arg1:_setXY(var36.X - AbsolutePosition.X, var36.Y - AbsolutePosition.Y)
-            end
-        end))
-        any_new_result1:GiveTask(UserInputService_upvr.InputBegan:Connect(function(arg1_2) -- Line 180
-            if not arg1.state.crossHairEnabled then
-            elseif arg1_2.UserInputType == Enum.UserInputType.MouseButton1 or arg1_2.UserInputType == Enum.UserInputType.Touch or arg1_2.UserInputType == Enum.UserInputType.Gamepad1 and arg1_2.KeyCode == Enum.KeyCode.ButtonA then
-                local any_getValue_result1 = arg1.containerRef:getValue()
-                local AbsoluteSize_2 = any_getValue_result1.AbsoluteSize
-                if arg1_2.UserInputType == Enum.UserInputType.Touch then
-                    local AbsolutePosition_2 = any_getValue_result1.AbsolutePosition
-                    arg1.x = arg1_2.Position.X - AbsolutePosition_2.X
-                    arg1.y = arg1_2.Position.Y - AbsolutePosition_2.Y
-                end
-                local x = arg1.x
-                local y = arg1.y
-                if x < 0 or y < 0 or AbsoluteSize_2.X < x or AbsoluteSize_2.Y < y then return end
-                local any_computeWorldXY_result1, any_computeWorldXY_result2 = MinimapUtils_upvr.computeWorldXY(x, y, arg1.props.worldPosition:getValue(), arg1.containerSize:getValue(), arg1.props.mapWorldWidth, arg1.props.mapWorldHeight, arg1.props.mapWorldCenterX, arg1.props.mapWorldCenterY, arg1.props.mapImageWidth, arg1.props.mapImageHeight, arg1.props.mapScale)
-                if arg1.props.onSetWaypoint then
-                    arg1.props.onSetWaypoint(Vector3.new(any_computeWorldXY_result1, 50, any_computeWorldXY_result2))
-                end
-                if arg1.props.onToggle then
-                    arg1.props.onToggle(false)
-                end
-                arg1:setState({
-                    crossHairEnabled = false;
-                })
-            end
-        end))
-    else
-        any_GetGuiInset_result1_upvr = nil
-        arg1.maid.visibleMaid = any_GetGuiInset_result1_upvr
-    end
+function v1._hookVisible(p1, p2) --[[ Line: 154 | Upvalues: Maid (copy), GuiService (copy), RunService (copy), UserInputService (copy), MinimapUtils (copy) ]]
+	if p2 then
+		local v1 = Maid.new()
+		p1.maid.visibleMaid = v1
+		local v2 = GuiService:GetGuiInset()
+		v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 161 | Upvalues: p1 (copy), UserInputService (ref), v2 (copy) ]]
+			local v1 = p1.containerRef:getValue()
+			if p1.state.inputType == Enum.UserInputType.Keyboard then
+				local v22 = UserInputService:GetMouseLocation() - v2
+				local AbsolutePosition = v1.AbsolutePosition
+				p1:_setXY(v22.X - AbsolutePosition.X, v22.Y - AbsolutePosition.Y)
+			end
+		end))
+		v1:GiveTask(UserInputService.InputBegan:Connect(function(p12) --[[ Line: 180 | Upvalues: p1 (copy), MinimapUtils (ref) ]]
+			if p1.state.crossHairEnabled and (p12.UserInputType == Enum.UserInputType.MouseButton1 or (p12.UserInputType == Enum.UserInputType.Touch or p12.UserInputType == Enum.UserInputType.Gamepad1 and p12.KeyCode == Enum.KeyCode.ButtonA)) then
+				local v1 = p1.containerRef:getValue()
+				local AbsoluteSize = v1.AbsoluteSize
+				if p12.UserInputType == Enum.UserInputType.Touch then
+					local AbsolutePosition = v1.AbsolutePosition
+					p1.x = p12.Position.X - AbsolutePosition.X
+					p1.y = p12.Position.Y - AbsolutePosition.Y
+				end
+				local x = p1.x
+				local y = p1.y
+				if not (x < 0 or (y < 0 or (AbsoluteSize.X < x or AbsoluteSize.Y < y))) then
+					local v2, v3 = MinimapUtils.computeWorldXY(x, y, p1.props.worldPosition:getValue(), p1.containerSize:getValue(), p1.props.mapWorldWidth, p1.props.mapWorldHeight, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapImageWidth, p1.props.mapImageHeight, p1.props.mapScale)
+					if p1.props.onSetWaypoint then
+						p1.props.onSetWaypoint((Vector3.new(v2, 50, v3)))
+					end
+					if p1.props.onToggle then
+						p1.props.onToggle(false)
+					end
+					p1:setState({
+						crossHairEnabled = false
+					})
+				end
+			end
+		end))
+	else
+		p1.maid.visibleMaid = nil
+	end
 end
-function any_extend_result1.didMount(arg1) -- Line 236
-    local function updateInputType() -- Line 237
-        local any_GetLastInputType_result1 = UserInputService_upvr:GetLastInputType()
-        if any_GetLastInputType_result1 == Enum.UserInputType.Gamepad1 or any_GetLastInputType_result1 == Enum.UserInputType.Keyboard or any_GetLastInputType_result1 == Enum.UserInputType.Touch then
-            if arg1.state.inputType ~= any_GetLastInputType_result1 then
-                arg1:setState({
-                    inputType = any_GetLastInputType_result1;
-                })
-            end
-        end
-    end
-    updateInputType()
-    arg1.maid:GiveTask(UserInputService_upvr.LastInputTypeChanged:Connect(updateInputType))
+function v1.didMount(p1) --[[ Line: 236 | Upvalues: UserInputService (copy) ]]
+	local function updateInputType() --[[ Line: 237 | Upvalues: UserInputService (ref), p1 (copy) ]]
+		local v1 = UserInputService:GetLastInputType()
+		if (v1 == Enum.UserInputType.Gamepad1 or (v1 == Enum.UserInputType.Keyboard or v1 == Enum.UserInputType.Touch)) and p1.state.inputType ~= v1 then
+			p1:setState({
+				inputType = v1
+			})
+		end
+	end
+	updateInputType()
+	p1.maid:GiveTask(UserInputService.LastInputTypeChanged:Connect(updateInputType))
 end
-function any_extend_result1.didUpdate(arg1, arg2, arg3) -- Line 254
-    if arg1.state.crossHairEnabled ~= arg3.crossHairEnabled then
-        arg1:_hookGamepad(arg1.state.crossHairEnabled)
-    end
-    if arg1.props.visible ~= arg2.visible then
-        arg1:_hookVisible(arg1.props.visible)
-    end
+function v1.didUpdate(p1, p2, p3) --[[ Line: 254 ]]
+	if p1.state.crossHairEnabled ~= p3.crossHairEnabled then
+		p1:_hookGamepad(p1.state.crossHairEnabled)
+	end
+	if p1.props.visible ~= p2.visible then
+		p1:_hookVisible(p1.props.visible)
+	end
 end
-local ContextActionService_upvr = game:GetService("ContextActionService")
-function any_extend_result1._hookGamepad(arg1, arg2) -- Line 262
-    if arg2 then
-        ContextActionService_upvr:BindActionAtPriority("sinkThumb1", function() -- Line 264
-            return Enum.ContextActionResult.Sink
-        end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.Thumbstick1)
-        ContextActionService_upvr:BindActionAtPriority("sinkJump", function() -- Line 267
-            return Enum.ContextActionResult.Sink
-        end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.ButtonA)
-        local var52_upvw
-        arg1.maid.selectionDragListen = UserInputService_upvr.InputChanged:Connect(function(arg1_3) -- Line 272
-            if arg1_3.UserInputType == Enum.UserInputType.Gamepad1 and arg1_3.KeyCode == Enum.KeyCode.Thumbstick1 then
-                var52_upvw = arg1_3
-            end
-        end)
-        arg1.maid.dragHeartbeat = RunService_upvr.Heartbeat:Connect(function(arg1_4) -- Line 280
-            -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-            local var55
-            local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                local Y = var52_upvw.Position.Y
-                var55 = var55.X
-                var55 = var55.Position
-                var55 = var52_upvw
-                return 0.1 < math.abs(var55)
-            end
-            if var55 and (decompInlinedCondition() or 0.1 < math.abs(Y)) then
-                arg1:_setXY(arg1.x + var55 * 10, arg1.y - Y * 10, true)
-            end
-        end)
-    else
-        ContextActionService_upvr:UnbindAction("sinkThumb1")
-        ContextActionService_upvr:UnbindAction("sinkJump")
-        arg1.maid.selectionDragListen = nil
-        arg1.maid.dragHeartbeat = nil
-    end
+function v1._hookGamepad(p1, p2) --[[ Line: 262 | Upvalues: ContextActionService (copy), UserInputService (copy), RunService (copy) ]]
+	if p2 then
+		ContextActionService:BindActionAtPriority("sinkThumb1", function() --[[ Line: 264 ]]
+			return Enum.ContextActionResult.Sink
+		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.Thumbstick1)
+		ContextActionService:BindActionAtPriority("sinkJump", function() --[[ Line: 267 ]]
+			return Enum.ContextActionResult.Sink
+		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.ButtonA)
+		local v1 = nil
+		p1.maid.selectionDragListen = UserInputService.InputChanged:Connect(function(p1) --[[ Line: 272 | Upvalues: v1 (ref) ]]
+			if p1.UserInputType == Enum.UserInputType.Gamepad1 and p1.KeyCode == Enum.KeyCode.Thumbstick1 then
+				v1 = p1
+			end
+		end)
+		p1.maid.dragHeartbeat = RunService.Heartbeat:Connect(function(p12) --[[ Line: 280 | Upvalues: v1 (ref), p1 (copy) ]]
+			if v1 then
+				local X = v1.Position.X
+				local Y = v1.Position.Y
+				if math.abs(X) > 0.1 or math.abs(Y) > 0.1 then
+					p1:_setXY(p1.x + X * 10, p1.y - Y * 10, true)
+				end
+			end
+		end)
+	else
+		ContextActionService:UnbindAction("sinkThumb1")
+		ContextActionService:UnbindAction("sinkJump")
+		p1.maid.selectionDragListen = nil
+		p1.maid.dragHeartbeat = nil
+	end
 end
-function any_extend_result1.willUnmount(arg1) -- Line 297
-    arg1:_hookGamepad(false)
-    arg1.maid:DoCleaning()
+function v1.willUnmount(p1) --[[ Line: 297 ]]
+	p1:_hookGamepad(false)
+	p1.maid:DoCleaning()
 end
-local MinimapService_upvr = require(ReplicatedStorage.App.MinimapService)
-return require(ReplicatedStorage.RoactRodux).connect(function(arg1, arg2) -- Line 302
-    return {
-        labels = arg1.minimapLabels;
-        waypoints = arg1.minimapWaypoints;
-        points = arg1.minimapPoints;
-        circles = arg1.minimapCircles;
-    }
-end, function(arg1) -- Line 309
-    return {
-        onSetWaypoint = function(arg1_5) -- Line 311, Named "onSetWaypoint"
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            MinimapService_upvr._addWaypointRemote:FireServer(arg1_5.X, arg1_5.Z)
-            do
-                return
-            end
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            arg1({
-                type = "removeWaypointCurrent";
-            })
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        end;
-    }
-end)(any_extend_result1)
+return RoactRodux.connect(function(p1, p2) --[[ Line: 302 ]]
+	return {
+		labels = p1.minimapLabels,
+		waypoints = p1.minimapWaypoints,
+		points = p1.minimapPoints,
+		circles = p1.minimapCircles
+	}
+end, function(p1) --[[ Line: 309 | Upvalues: MinimapService (copy) ]]
+	return {
+		onSetWaypoint = function(p12) --[[ Name: onSetWaypoint | Line: 311 | Upvalues: MinimapService (ref), p1 (copy) ]]
+			if p12 then
+				if MinimapService._addWaypointRemote then
+					MinimapService._addWaypointRemote:FireServer(p12.X, p12.Z)
+				end
+			else
+				p1({
+					type = "removeWaypointCurrent"
+				})
+			end
+		end
+	}
+end)(v1)

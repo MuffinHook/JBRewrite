@@ -1,1 +1,2 @@
-require(game:GetService("ReplicatedStorage").Door2.DoorBinder):Start()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.Door2.DoorBinder):Start()

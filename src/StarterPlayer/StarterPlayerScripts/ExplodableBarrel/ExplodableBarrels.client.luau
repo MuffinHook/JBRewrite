@@ -1,1 +1,2 @@
-require(game:GetService("ReplicatedStorage").ExplodableBarrel.ExplodableBarrelBinder):Start()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.ExplodableBarrel.ExplodableBarrelBinder):Start()

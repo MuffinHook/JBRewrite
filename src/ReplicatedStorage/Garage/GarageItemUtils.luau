@@ -1,17 +1,17 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_upvr = {}
-local ItemUtils_upvr = require(ReplicatedStorage.App.ItemUtils)
-function module_upvr.getVehicleCustomizationItemOwned(arg1, arg2) -- Line 6
-    return ItemUtils_upvr.createVehicleCustomizationItemTable(module_upvr.translateToItemOwnedCategoryName(arg1), arg2)
+local ItemUtils = require(ReplicatedStorage.App.ItemUtils)
+local OwnershipConsts = require(ReplicatedStorage.Ownership.OwnershipConsts)
+local t = {}
+function t.getVehicleCustomizationItemOwned(p1, p2) --[[ Line: 6 | Upvalues: t (copy), ItemUtils (copy) ]]
+	return ItemUtils.createVehicleCustomizationItemTable(t.translateToItemOwnedCategoryName(p1), p2)
 end
-local OwnershipConsts_upvr = require(ReplicatedStorage.Ownership.OwnershipConsts)
-function module_upvr.translateToItemOwnedCategoryName(arg1) -- Line 10
-    if OwnershipConsts_upvr.COLOR_CATEGORY_TYPES[arg1] then
-        return "Color"
-    end
-    if OwnershipConsts_upvr.TEXTURE_CATEGORY_TYPES[arg1] then
-        return "Texture"
-    end
-    return arg1
+function t.translateToItemOwnedCategoryName(p1) --[[ Line: 10 | Upvalues: OwnershipConsts (copy) ]]
+	if OwnershipConsts.COLOR_CATEGORY_TYPES[p1] then
+		return "Color"
+	elseif OwnershipConsts.TEXTURE_CATEGORY_TYPES[p1] then
+		return "Texture"
+	else
+		return p1
+	end
 end
-return module_upvr
+return t

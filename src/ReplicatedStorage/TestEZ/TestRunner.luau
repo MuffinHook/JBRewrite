@@ -1,136 +1,125 @@
-local TestEnum_upvr = require(script.Parent.TestEnum)
-local module_upvr = {
-    environment = {};
+local TestEnum = require(script.Parent.TestEnum)
+local TestSession = require(script.Parent.TestSession)
+local LifecycleHooks = require(script.Parent.LifecycleHooks)
+local t = {
+	environment = {}
 }
-local function wrapExpectContextWithPublicApi_upvr(arg1) -- Line 19, Named "wrapExpectContextWithPublicApi"
-    return setmetatable({
-        extend = function(...) -- Line 21, Named "extend"
-            arg1:extend(...)
-        end;
-    }, {
-        __call = function(arg1_2, ...) -- Line 25, Named "__call"
-            return arg1:startExpectationChain(...)
-        end;
-    })
+local function wrapExpectContextWithPublicApi(p1) --[[ Line: 19 ]]
+	local t = {
+		extend = function(...) --[[ Name: extend | Line: 21 | Upvalues: p1 (copy) ]]
+			p1:extend(...)
+		end
+	}
+	return setmetatable(t, {
+		__call = function(p12, ...) --[[ Name: __call | Line: 25 | Upvalues: p1 (copy) ]]
+			return p1:startExpectationChain(...)
+		end
+	})
 end
-local TestSession_upvr = require(script.Parent.TestSession)
-local LifecycleHooks_upvr = require(script.Parent.LifecycleHooks)
-function module_upvr.runPlan(arg1) -- Line 35
-    local any_new_result1 = TestSession_upvr.new(arg1)
-    local var10
-    if 0 >= #arg1:findNodes(function(arg1_3) -- Line 39
-        local var9
-        if arg1_3.modifier ~= TestEnum_upvr.NodeModifier.Focus then
-            var9 = false
-        else
-            var9 = true
-        end
-        return var9
-    end) then
-        var10 = false
-    else
-        var10 = true
-    end
-    any_new_result1.hasFocusNodes = var10
-    var10 = module_upvr
-    var10 = var10.runPlanNode
-    var10(any_new_result1, arg1, LifecycleHooks_upvr.new())
-    var10 = any_new_result1:finalize()
-    return var10
+function t.runPlan(p1) --[[ Line: 35 | Upvalues: TestSession (copy), LifecycleHooks (copy), TestEnum (copy), t (copy) ]]
+	local v1 = TestSession.new(p1)
+	local v2 = LifecycleHooks.new()
+	v1.hasFocusNodes = #p1:findNodes(function(p1) --[[ Line: 39 | Upvalues: TestEnum (ref) ]]
+		return p1.modifier == TestEnum.NodeModifier.Focus
+	end) > 0
+	t.runPlanNode(v1, p1, v2)
+	return v1:finalize()
 end
-function module_upvr.runPlanNode(arg1, arg2, arg3) -- Line 54
-    local function runCallback_upvr(arg1_4, arg2_2) -- Line 55, Named "runCallback"
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        _G.__TESTEZ_RUNNING_TEST__ = true
-        local var31_upvw = arg2_2 or ""
-        local getfenv_result1 = getfenv(arg1_4)
-        local var36_upvw
-        for i, v in pairs(module_upvr.environment) do
-            getfenv_result1[i] = v
-        end
-        local var38_upvw
-        function getfenv_result1.fail(arg1_5) -- Line 71
-            if arg1_5 == nil then
-            end
-            var36_upvw = false
-            var38_upvw = var31_upvw..debug.traceback(tostring("fail() was called."), 2)
-        end
-        getfenv_result1.expect = wrapExpectContextWithPublicApi_upvr(arg1:getExpectationContext())
-        local any_getContext_result1_upvr = arg1:getContext()
-        local xpcall_result1, xpcall_result2 = xpcall(function() -- Line 85
-            arg1_4(any_getContext_result1_upvr)
-        end, function(arg1_6) -- Line 88
-            return var31_upvw..debug.traceback(tostring(arg1_6), 2)
-        end)
-        if not xpcall_result1 then
-            var36_upvw = false
-            var38_upvw = xpcall_result2
-        end
-        _G.__TESTEZ_RUNNING_TEST__ = nil
-        return var36_upvw, var38_upvw
-    end
-    arg3:pushHooksFrom(arg2)
-    local var63
-    for _, v_4 in ipairs(arg3:getBeforeAllHooks()) do
-        local runCallback_upvr_result1_2, runCallback_result2 = runCallback_upvr(v_4, "beforeAll hook: ")
-        if not runCallback_upvr_result1_2 then
-            arg1:addDummyError("beforeAll", runCallback_result2)
-        end
-    end
-    if not nil then
-        for _, v_5 in ipairs(arg2.children) do
-            if v_5.type == TestEnum_upvr.NodeType.It then
-                arg1:pushNode(v_5)
-                if arg1:shouldSkip() then
-                    arg1:setSkipped()
-                else
-                    local runNode_result1, runNode_result2 = (function(arg1_7) -- Line 105, Named "runNode"
-                        for _, v_2 in ipairs(arg3:getBeforeEachHooks()) do
-                            local runCallback_upvr_result1_3, runCallback_upvr_result2 = runCallback_upvr(v_2, "beforeEach hook: ")
-                            if not runCallback_upvr_result1_3 then
-                                return false, runCallback_upvr_result2
-                            end
-                        end
-                        local runCallback_result1_2, runCallback_upvr_result2_2 = runCallback_upvr(arg1_7.callback)
-                        for _, v_3 in ipairs(arg3:getAfterEachHooks()) do
-                            local runCallback_result1, runCallback_result2_2 = runCallback_upvr(v_3, "afterEach hook: ")
-                            if not runCallback_result1 then
-                                if not runCallback_result1_2 then
-                                    return false, runCallback_upvr_result2_2.."\nWhile cleaning up the failed test another error was found:\n"..runCallback_result2_2
-                                end
-                                return false, runCallback_result2_2
-                            end
-                        end
-                        if not runCallback_result1_2 then
-                            return false, runCallback_upvr_result2_2
-                        end
-                        return true, nil
-                    end)(v_5)
-                    if runNode_result1 then
-                        arg1:setSuccess()
-                    else
-                        arg1:setError(runNode_result2)
-                    end
-                end
-                arg1:popNode()
-            elseif v_5.type == TestEnum_upvr.NodeType.Describe then
-                arg1:pushNode(v_5)
-                module_upvr.runPlanNode(arg1, v_5, arg3)
-                if v_5.loadError then
-                    arg1:setError("Error during planning: "..v_5.loadError)
-                else
-                    arg1:setStatusFromChildren()
-                end
-                arg1:popNode()
-            end
-        end
-    end
-    for _, v_6 in ipairs(arg3:getAfterAllHooks()) do
-        local runCallback_upvr_result1, runCallback_upvr_result2_3 = runCallback_upvr(v_6, "afterAll hook: ")
-        if not runCallback_upvr_result1 then
-            arg1:addDummyError("afterAll", runCallback_upvr_result2_3)
-        end
-    end
-    arg3:popHooks()
+function t.runPlanNode(p1, p2, p3) --[[ Line: 54 | Upvalues: t (copy), wrapExpectContextWithPublicApi (copy), TestEnum (copy) ]]
+	local function runCallback(p12, p2) --[[ Line: 55 | Upvalues: t (ref), wrapExpectContextWithPublicApi (ref), p1 (copy) ]]
+		_G.__TESTEZ_RUNNING_TEST__ = true
+		local v1 = getfenv(p12)
+		local v2 = true
+		local v3 = nil
+		local v4 = p2 or ""
+		for k, v in pairs(t.environment) do
+			v1[k] = v
+		end
+		function v1.fail(p1) --[[ Line: 71 | Upvalues: v2 (ref), v3 (ref), v4 (ref) ]]
+			if p1 == nil then
+				p1 = "fail() was called."
+			end
+			v2 = false
+			v3 = v4 .. debug.traceback(tostring(p1), 2)
+		end
+		v1.expect = wrapExpectContextWithPublicApi(p1:getExpectationContext())
+		local v5 = p1:getContext()
+		local v6, v7 = xpcall(function() --[[ Line: 85 | Upvalues: p12 (copy), v5 (copy) ]]
+			p12(v5)
+		end, function(p1) --[[ Line: 88 | Upvalues: v4 (ref) ]]
+			return v4 .. debug.traceback(tostring(p1), 2)
+		end)
+		if not v6 then
+			v2 = false
+			v3 = v7
+		end
+		_G.__TESTEZ_RUNNING_TEST__ = nil
+		return v2, v3
+	end
+	local function runNode(p1) --[[ Line: 105 | Upvalues: p3 (copy), runCallback (copy) ]]
+		for i, v in ipairs(p3:getBeforeEachHooks()) do
+			local v1, v2 = runCallback(v, "beforeEach hook: ")
+			if not v1 then
+				return false, v2
+			end
+		end
+		local v3, v4 = runCallback(p1.callback)
+		for i, v in ipairs(p3:getAfterEachHooks()) do
+			local v5, v6 = runCallback(v, "afterEach hook: ")
+			if not v5 and v3 then
+				return false, v6
+			elseif not v5 then
+				return false, v4 .. "\nWhile cleaning up the failed test another error was found:\n" .. v6
+			end
+		end
+		if v3 then
+			return true, nil
+		else
+			return false, v4
+		end
+	end
+	p3:pushHooksFrom(p2)
+	local v1 = false
+	for i, v in ipairs(p3:getBeforeAllHooks()) do
+		local v2, v3 = runCallback(v, "beforeAll hook: ")
+		if not v2 then
+			p1:addDummyError("beforeAll", v3)
+			v1 = true
+		end
+	end
+	if not v1 then
+		for i, v in ipairs(p2.children) do
+			if v.type == TestEnum.NodeType.It then
+				p1:pushNode(v)
+				if p1:shouldSkip() then
+					p1:setSkipped()
+				else
+					local v4, v5 = runNode(v)
+					if v4 then
+						p1:setSuccess()
+					else
+						p1:setError(v5)
+					end
+				end
+				p1:popNode()
+			elseif v.type == TestEnum.NodeType.Describe then
+				p1:pushNode(v)
+				t.runPlanNode(p1, v, p3)
+				if v.loadError then
+					p1:setError("Error during planning: " .. v.loadError)
+				else
+					p1:setStatusFromChildren()
+				end
+				p1:popNode()
+			end
+		end
+	end
+	for i, v in ipairs(p3:getAfterAllHooks()) do
+		local v6, v7 = runCallback(v, "afterAll hook: ")
+		if not v6 then
+			p1:addDummyError("afterAll", v7)
+		end
+	end
+	p3:popHooks()
 end
-return module_upvr
+return t

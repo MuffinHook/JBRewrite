@@ -1,311 +1,278 @@
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local RxInstanceUtils_upvr = require(ReplicatedStorage_upvr.Std.RxInstanceUtils)
-local Promise_upvr = require(ReplicatedStorage_upvr.Std.Promise)
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local Binder_upvr = require(ReplicatedStorage_upvr.Std.Binder)
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local CircleAction_upvr = require(ReplicatedStorage_upvr.Module.UI).CircleAction
-local TombRobberyConsts_upvr = require(script.Parent.TombRobberyConsts)
-local var10_upvw
-local module_upvr = {}
-local SoundService_upvr = game:GetService("SoundService")
-local waitForChild_upvr = require(ReplicatedStorage_upvr.Std.waitForChild)
-function module_upvr.init(arg1) -- Line 21
-    var10_upvw = arg1.Event
-    local var14_upvw
-    local var15_upvw
-    local var16_upvw
-    local var17_upvw
-    local function playMusic_upvr() -- Line 30, Named "playMusic"
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        local var18
-        if var17_upvw then
-            var17_upvw:cancel()
-            var17_upvw = nil
-        end
-        if not var14_upvw then
-            local tbl_4 = {}
-            var18 = true
-            tbl_4.Looped = var18
-            var18 = 0
-            tbl_4.Volume = var18
-            var14_upvw = Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 9062816634, tbl_4)
-            var14_upvw.SoundGroup = SoundService_upvr.RobberyMusic
-        end
-        if not var15_upvw then
-            local tbl_7 = {}
-            var18 = true
-            tbl_7.Looped = var18
-            var18 = 0
-            tbl_7.Volume = var18
-            var15_upvw = Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 9062816122, tbl_7)
-            var15_upvw.SoundGroup = SoundService_upvr.RobberyMusic
-        end
-        local tbl_5 = {}
-        if var16_upvw then
-            var18 = 1
-        else
-            var18 = 0
-        end
-        local var22 = 3
-        var18 = var15_upvw
-        if not var16_upvw then
-        else
-        end
-        tbl_5[1] = Audio_upvr.promiseFadeTo(var14_upvw, var18, var22)
-        tbl_5[2] = Audio_upvr.promiseFadeTo(var18, 0, 3)
-        var17_upvw = Promise_upvr.all(tbl_5):andThen(function() -- Line 46
-            var17_upvw = nil
-        end)
-    end
-    local function stopMusic_upvr() -- Line 50, Named "stopMusic"
-        if var17_upvw then
-            var17_upvw:cancel()
-            var17_upvw = nil
-        end
-        var17_upvw = Promise_upvr.all({Audio_upvr.promiseFadeTo(var14_upvw, 0, 1):andThen(function() -- Line 56
-            var14_upvw:Destroy()
-            var14_upvw = nil
-        end), Audio_upvr.promiseFadeTo(var15_upvw, 0, 1):andThen(function() -- Line 60
-            var15_upvw:Destroy()
-            var15_upvw = nil
-        end)}):andThen(function() -- Line 64
-            var17_upvw = nil
-        end)
-    end
-    local function changeTrack_upvr() -- Line 68, Named "changeTrack"
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        local var28
-        if not var14_upvw or not var15_upvw then
-        else
-            if var17_upvw then
-                var17_upvw:await()
-            end
-            if not var14_upvw or not var15_upvw then return end
-            local tbl_6 = {}
-            if var16_upvw then
-                var28 = 1
-            else
-                var28 = 0
-            end
-            local var30 = 2
-            var28 = var15_upvw
-            if not var16_upvw then
-            else
-            end
-            tbl_6[1] = Audio_upvr.promiseFadeTo(var14_upvw, var28, var30)
-            tbl_6[2] = Audio_upvr.promiseFadeTo(var28, 0, 2)
-            var17_upvw = Promise_upvr.all(tbl_6):andThen(function() -- Line 82
-                var17_upvw = nil
-            end)
-        end
-    end
-    waitForChild_upvr(LocalPlayer_upvr.PlayerGui, TombRobberyConsts_upvr.MUSIC_ENABLED_VALUE_NAME):andThen(function(arg1_2) -- Line 87
-        arg1_2.Changed:Connect(function(arg1_3) -- Line 88
-            if arg1_3 then
-                playMusic_upvr()
-            else
-                stopMusic_upvr()
-            end
-        end)
-        if arg1_2.Value then
-            playMusic_upvr()
-        end
-    end)
-    waitForChild_upvr(LocalPlayer_upvr.PlayerGui, TombRobberyConsts_upvr.MUSIC_TRACK_VALUE_NAME):andThen(function(arg1_4) -- Line 100
-        arg1_4.Changed:Connect(function(arg1_5) -- Line 101
-            var16_upvw = arg1_5
-            changeTrack_upvr()
-        end)
-        var16_upvw = arg1_4.Value
-        changeTrack_upvr()
-    end)
-    local function hookCharacter(arg1_6) -- Line 109
-        local Humanoid = arg1_6:WaitForChild("Humanoid")
-        local any_LoadAnimation_result1_upvr = Humanoid:LoadAnimation(ReplicatedStorage_upvr.Resource.CartDuckAnimation)
-        module_upvr._duckTrack = any_LoadAnimation_result1_upvr
-        local var39_upvw
-        var39_upvw = Humanoid.Died:Connect(function() -- Line 115
-            var39_upvw:Disconnect()
-            any_LoadAnimation_result1_upvr:Destroy()
-            module_upvr._duckTrack = nil
-        end)
-    end
-    if LocalPlayer_upvr.Character then
-        hookCharacter(LocalPlayer_upvr.Character)
-    end
-    LocalPlayer_upvr.CharacterAdded:Connect(hookCharacter)
-    module_upvr.setupSpikes()
-    module_upvr.setupGems()
-    module_upvr.setupWood()
-    module_upvr.setupBranches()
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local SoundService = game:GetService("SoundService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local CartSystem = require(ReplicatedStorage.Game.Cart.CartSystem)
+local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
+local TombRobberyConsts = require(script.Parent.TombRobberyConsts)
+local v1 = nil
+local t = {}
+function t.init(p1) --[[ Line: 21 | Upvalues: v1 (ref), Audio (copy), LocalPlayer (copy), SoundService (copy), Promise (copy), waitForChild (copy), TombRobberyConsts (copy), ReplicatedStorage (copy), t (copy) ]]
+	v1 = p1.Event
+	local v12 = nil
+	local v2 = nil
+	local v3 = nil
+	local v4 = nil
+	local function playMusic() --[[ Line: 30 | Upvalues: v4 (ref), v12 (ref), Audio (ref), LocalPlayer (ref), SoundService (ref), v2 (ref), Promise (ref), v3 (ref) ]]
+		if v4 then
+			v4:cancel()
+			v4 = nil
+		end
+		if not v12 then
+			v12 = Audio.ObjectLocal(LocalPlayer.PlayerGui, 9062816634, {
+				Looped = true,
+				Volume = 0
+			})
+			v12.SoundGroup = SoundService.RobberyMusic
+		end
+		if not v2 then
+			v2 = Audio.ObjectLocal(LocalPlayer.PlayerGui, 9062816122, {
+				Looped = true,
+				Volume = 0
+			})
+			v2.SoundGroup = SoundService.RobberyMusic
+		end
+		local t = {}
+		t[1] = Audio.promiseFadeTo(v12, if v3 then 1 else 0, 3)
+		t[2] = Audio.promiseFadeTo(v2, if v3 then 0 else 1, 3)
+		v4 = Promise.all(t):andThen(function() --[[ Line: 46 | Upvalues: v4 (ref) ]]
+			v4 = nil
+		end)
+	end
+	local function stopMusic() --[[ Line: 50 | Upvalues: v4 (ref), Promise (ref), Audio (ref), v12 (ref), v2 (ref) ]]
+		if v4 then
+			v4:cancel()
+			v4 = nil
+		end
+		v4 = Promise.all({ Audio.promiseFadeTo(v12, 0, 1):andThen(function() --[[ Line: 56 | Upvalues: v12 (ref) ]]
+				v12:Destroy()
+				v12 = nil
+			end), Audio.promiseFadeTo(v2, 0, 1):andThen(function() --[[ Line: 60 | Upvalues: v2 (ref) ]]
+				v2:Destroy()
+				v2 = nil
+			end) }):andThen(function() --[[ Line: 64 | Upvalues: v4 (ref) ]]
+			v4 = nil
+		end)
+	end
+	local function changeTrack() --[[ Line: 68 | Upvalues: v12 (ref), v2 (ref), v4 (ref), Promise (ref), Audio (ref), v3 (ref) ]]
+		if v12 and v2 then
+			if v4 then
+				v4:await()
+			end
+			if v12 and v2 then
+				local t = {}
+				t[1] = Audio.promiseFadeTo(v12, if v3 then 1 else 0, 2)
+				t[2] = Audio.promiseFadeTo(v2, if v3 then 0 else 1, 2)
+				v4 = Promise.all(t):andThen(function() --[[ Line: 82 | Upvalues: v4 (ref) ]]
+					v4 = nil
+				end)
+			end
+		end
+	end
+	waitForChild(LocalPlayer.PlayerGui, TombRobberyConsts.MUSIC_ENABLED_VALUE_NAME):andThen(function(p1) --[[ Line: 87 | Upvalues: playMusic (copy), stopMusic (copy) ]]
+		p1.Changed:Connect(function(p1) --[[ Line: 88 | Upvalues: playMusic (ref), stopMusic (ref) ]]
+			if p1 then
+				playMusic()
+			else
+				stopMusic()
+			end
+		end)
+		if p1.Value then
+			playMusic()
+		end
+	end)
+	waitForChild(LocalPlayer.PlayerGui, TombRobberyConsts.MUSIC_TRACK_VALUE_NAME):andThen(function(p1) --[[ Line: 100 | Upvalues: v3 (ref), changeTrack (copy) ]]
+		p1.Changed:Connect(function(p1) --[[ Line: 101 | Upvalues: v3 (ref), changeTrack (ref) ]]
+			v3 = p1
+			changeTrack()
+		end)
+		v3 = p1.Value
+		changeTrack()
+	end)
+	local function hookCharacter(p1) --[[ Line: 109 | Upvalues: ReplicatedStorage (ref), t (ref) ]]
+		local Humanoid = p1:WaitForChild("Humanoid")
+		local v1 = Humanoid:LoadAnimation(ReplicatedStorage.Resource.CartDuckAnimation)
+		t._duckTrack = v1
+		local v2 = nil
+		v2 = Humanoid.Died:Connect(function() --[[ Line: 115 | Upvalues: v2 (ref), v1 (copy), t (ref) ]]
+			v2:Disconnect()
+			v1:Destroy()
+			t._duckTrack = nil
+		end)
+	end
+	if LocalPlayer.Character then
+		hookCharacter(LocalPlayer.Character)
+	end
+	LocalPlayer.CharacterAdded:Connect(hookCharacter)
+	t.setupSpikes()
+	t.setupGems()
+	t.setupWood()
+	t.setupBranches()
 end
-local DoorUtils_upvr = require(ReplicatedStorage_upvr.Door2.DoorUtils)
-function module_upvr.setupSpikes() -- Line 143
-    local var42_upvw = 0
-    Binder_upvr.new(TombRobberyConsts_upvr.SPIKE_TAG_NAME, function(arg1) -- Line 145
-        RxInstanceUtils_upvr.yieldForProperty(arg1, "PrimaryPart")
-        local any_getInnerModel_result1 = DoorUtils_upvr.getInnerModel(arg1)
-        RxInstanceUtils_upvr.yieldForProperty(any_getInnerModel_result1, "PrimaryPart")
-        local var44_upvw = 0
-        any_getInnerModel_result1.PrimaryPart.Touched:Connect(function(arg1_7) -- Line 153
-            if arg1_7.Parent ~= LocalPlayer_upvr.Character then
-            else
-                if 32 < (arg1_7.Position - LocalPlayer_upvr.Character.PrimaryPart.Position).Magnitude then return end
-                local os_clock_result1 = os.clock()
-                if 1 < os_clock_result1 - var44_upvw and 0.5 < os_clock_result1 - var42_upvw then
-                    var44_upvw = os_clock_result1
-                    var42_upvw = os_clock_result1
-                    var10_upvw:FireServer('y'.."".."zpzrmy9":sub(2, 3):reverse().."".."lkho3", 36, "Spikes")
-                end
-            end
-        end)
-        DoorUtils_upvr.getDoorOpenChangedSignal(arg1):Connect(function() -- Line 168
-            if DoorUtils_upvr.getOpen(arg1) then
-                var44_upvw = 0
-            end
-        end)
-        return Maid_upvr.new()
-    end):Start()
+function t.setupSpikes() --[[ Line: 143 | Upvalues: Binder (copy), TombRobberyConsts (copy), RxInstanceUtils (copy), DoorUtils (copy), Maid (copy), LocalPlayer (copy), v1 (ref) ]]
+	local v12 = 0
+	Binder.new(TombRobberyConsts.SPIKE_TAG_NAME, function(p1) --[[ Line: 145 | Upvalues: RxInstanceUtils (ref), DoorUtils (ref), Maid (ref), LocalPlayer (ref), v12 (ref), v1 (ref) ]]
+		RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
+		local v13 = DoorUtils.getInnerModel(p1)
+		RxInstanceUtils.yieldForProperty(v13, "PrimaryPart")
+		local v2 = Maid.new()
+		local v3 = 0
+		v13.PrimaryPart.Touched:Connect(function(p1) --[[ Line: 153 | Upvalues: LocalPlayer (ref), v3 (ref), v12 (ref), v1 (ref) ]]
+			if p1.Parent == LocalPlayer.Character and not ((p1.Position - LocalPlayer.Character.PrimaryPart.Position).Magnitude > 32) then
+				local v13 = os.clock()
+				if v13 - v3 > 1 and v13 - v12 > 0.5 then
+					v3 = v13
+					v12 = v13
+					v1:FireServer("x" .. ("asu1v6ekfq"):sub(2, 7):reverse():reverse():reverse() .. "6", 36, "Spikes")
+				end
+			end
+		end)
+		DoorUtils.getDoorOpenChangedSignal(p1):Connect(function() --[[ Line: 168 | Upvalues: DoorUtils (ref), p1 (copy), v3 (ref) ]]
+			if DoorUtils.getOpen(p1) then
+				v3 = 0
+			end
+		end)
+		return v2
+	end):Start()
 end
-function module_upvr.setupGems() -- Line 178
-    Binder_upvr.new(TombRobberyConsts_upvr.GEM_TAG_NAME, function(arg1) -- Line 179
-        RxInstanceUtils_upvr.yieldForProperty(arg1, "PrimaryPart")
-        local any_new_result1_2 = Maid_upvr.new()
-        local function action(arg1_8, arg2) -- Line 183
-            if arg2 then
-                local SOME = arg1:FindFirstChild(TombRobberyConsts_upvr.GEM_COLLECT_REMOTE_NAME)
-                assert(SOME)
-                SOME:FireServer()
-                return true
-            end
-        end
-        local function preUpdateFun(arg1_9) -- Line 191
-            local var51
-            if arg1_9.Part.Transparency >= 0.999 then
-                var51 = false
-            else
-                var51 = true
-            end
-            arg1_9.Enabled = var51
-        end
-        local PrimaryPart_upvr = arg1.PrimaryPart
-        CircleAction_upvr.Add({
-            Part = PrimaryPart_upvr;
-            Name = "Collect";
-            NoRay = true;
-            Timed = false;
-            Dist = 8;
-            Callback = action;
-            PreUpdateFun = preUpdateFun;
-            PreUpdatePeriod = 0.5;
-        }, PrimaryPart_upvr)
-        any_new_result1_2:GiveTask(function() -- Line 206
-            CircleAction_upvr.Remove(PrimaryPart_upvr)
-        end)
-        return any_new_result1_2
-    end):Start()
+function t.setupGems() --[[ Line: 178 | Upvalues: Binder (copy), TombRobberyConsts (copy), RxInstanceUtils (copy), Maid (copy), CircleAction (copy) ]]
+	Binder.new(TombRobberyConsts.GEM_TAG_NAME, function(p1) --[[ Line: 179 | Upvalues: RxInstanceUtils (ref), Maid (ref), TombRobberyConsts (ref), CircleAction (ref) ]]
+		RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
+		local v1 = Maid.new()
+		local function action(p12, p2) --[[ Line: 183 | Upvalues: p1 (copy), TombRobberyConsts (ref) ]]
+			if p2 then
+				local v1 = p1:FindFirstChild(TombRobberyConsts.GEM_COLLECT_REMOTE_NAME)
+				assert(v1)
+				v1:FireServer()
+				return true
+			end
+		end
+		local function preUpdateFun(p1) --[[ Line: 191 ]]
+			p1.Enabled = p1.Part.Transparency < 0.999
+		end
+		local PrimaryPart = p1.PrimaryPart
+		CircleAction.Add({
+			Part = PrimaryPart,
+			Name = "Collect",
+			NoRay = true,
+			Timed = false,
+			Dist = 8,
+			Callback = action,
+			PreUpdateFun = preUpdateFun,
+			PreUpdatePeriod = 0.5
+		}, PrimaryPart)
+		v1:GiveTask(function() --[[ Line: 206 | Upvalues: CircleAction (ref), PrimaryPart (copy) ]]
+			CircleAction.Remove(PrimaryPart)
+		end)
+		return v1
+	end):Start()
 end
-function module_upvr.duck() -- Line 215
-    local _duckTrack_upvr = module_upvr._duckTrack
-    if not _duckTrack_upvr then
-    else
-        if module_upvr._duckPromise then
-            module_upvr._duckPromise:cancel()
-            module_upvr._duckPromise = nil
-        end
-        _duckTrack_upvr:Play()
-        module_upvr._duckPromise = Promise_upvr.delay(2):andThen(function() -- Line 225
-            _duckTrack_upvr:Stop()
-            module_upvr._duckPromise = nil
-        end)
-    end
+function t.duck() --[[ Line: 215 | Upvalues: t (copy), Promise (copy) ]]
+	local _duckTrack = t._duckTrack
+	if _duckTrack then
+		if t._duckPromise then
+			t._duckPromise:cancel()
+			t._duckPromise = nil
+		end
+		_duckTrack:Play()
+		t._duckPromise = Promise.delay(2):andThen(function() --[[ Line: 225 | Upvalues: _duckTrack (copy), t (ref) ]]
+			_duckTrack:Stop()
+			t._duckPromise = nil
+		end)
+	end
 end
-local CartSystem_upvr = require(ReplicatedStorage_upvr.Game.Cart.CartSystem)
-local function preUpdateFun_upvr(arg1) -- Line 230, Named "preUpdateFun"
-    local tbl_2 = {}
-    if LocalPlayer_upvr.Character then
-        table.insert(tbl_2, LocalPlayer_upvr.Character)
-        local any_getCartForCharacter_result1_2 = CartSystem_upvr.getCartForCharacter(LocalPlayer_upvr.Character)
-        if any_getCartForCharacter_result1_2 then
-            table.insert(tbl_2, any_getCartForCharacter_result1_2._obj)
-        end
-    end
-    arg1.IgnoreOverride = tbl_2
+local function preUpdateFun(p1) --[[ Line: 230 | Upvalues: LocalPlayer (copy), CartSystem (copy) ]]
+	local t = {}
+	if LocalPlayer.Character then
+		table.insert(t, LocalPlayer.Character)
+		local v1 = CartSystem.getCartForCharacter(LocalPlayer.Character)
+		if v1 then
+			table.insert(t, v1._obj)
+		end
+	end
+	p1.IgnoreOverride = t
 end
-function module_upvr.setupWood() -- Line 241
-    Binder_upvr.new(TombRobberyConsts_upvr.WOOD_TAG_NAME, function(arg1) -- Line 242
-        local any_new_result1 = Maid_upvr.new()
-        local function action(arg1_10, arg2) -- Line 244
-            if arg2 then
-                module_upvr.duck()
-                arg1_10.Enabled = false
-                Promise_upvr.delay(2):andThen(function() -- Line 248
-                    arg1_10.Enabled = true
-                end)
-                return true
-            end
-        end
-        local tbl_3 = {}
-        tbl_3.Part = arg1
-        tbl_3.Name = "Duck"
-        tbl_3.NoRay = true
-        tbl_3.Timed = false
-        tbl_3.Dist = 36
-        tbl_3.Callback = action
-        tbl_3.PreUpdateFun = preUpdateFun_upvr
-        tbl_3.PreUpdatePeriod = 0.2
-        CircleAction_upvr.Add(tbl_3, arg1)
-        any_new_result1:GiveTask(function() -- Line 265
-            CircleAction_upvr.Remove(arg1)
-        end)
-        local var68_upvw = 0
-        any_new_result1:GiveTask(arg1.Touched:Connect(function(arg1_11) -- Line 270
-            if not arg1_11:IsDescendantOf(LocalPlayer_upvr.Character) then
-            else
-                if 32 < (arg1_11.Position - LocalPlayer_upvr.Character.PrimaryPart.Position).Magnitude then return end
-                local os_clock_result1_2 = os.clock()
-                if os_clock_result1_2 - var68_upvw < 10 then return end
-                var68_upvw = os_clock_result1_2
-                if module_upvr._duckTrack and not module_upvr._duckTrack.IsPlaying then
-                    var10_upvw:FireServer('y'.."".."wmspzvtu":sub(4, 5):reverse():reverse():reverse().."".."".."bxshklh":sub(4, 6):reverse().."".."o3", 30, "Duck")
-                    Audio_upvr.ObjectLocal(arg1, 6875020869, {
-                        Volume = 0.6;
-                        RollOffMaxDistance = 64;
-                    })
-                    return
-                end
-                Audio_upvr.ObjectLocal(arg1, 3772601178, {
-                    Volume = 0.2;
-                    RollOffMaxDistance = 64;
-                })
-            end
-        end))
-        return any_new_result1
-    end):Start()
+function t.setupWood() --[[ Line: 241 | Upvalues: Binder (copy), TombRobberyConsts (copy), Maid (copy), t (copy), Promise (copy), preUpdateFun (copy), CircleAction (copy), LocalPlayer (copy), v1 (ref), Audio (copy) ]]
+	Binder.new(TombRobberyConsts.WOOD_TAG_NAME, function(p1) --[[ Line: 242 | Upvalues: Maid (ref), t (ref), Promise (ref), preUpdateFun (ref), CircleAction (ref), LocalPlayer (ref), v1 (ref), Audio (ref) ]]
+		local v12 = Maid.new()
+		CircleAction.Add({
+			Part = p1,
+			Name = "Duck",
+			NoRay = true,
+			Timed = false,
+			Dist = 36,
+			Callback = function(p1, p2) --[[ Name: action | Line: 244 | Upvalues: t (ref), Promise (ref) ]]
+				if p2 then
+					t.duck()
+					p1.Enabled = false
+					Promise.delay(2):andThen(function() --[[ Line: 248 | Upvalues: p1 (copy) ]]
+						p1.Enabled = true
+					end)
+					return true
+				end
+			end,
+			PreUpdateFun = preUpdateFun,
+			PreUpdatePeriod = 0.2
+		}, p1)
+		v12:GiveTask(function() --[[ Line: 265 | Upvalues: CircleAction (ref), p1 (copy) ]]
+			CircleAction.Remove(p1)
+		end)
+		local v2 = 0
+		v12:GiveTask(p1.Touched:Connect(function(p12) --[[ Line: 270 | Upvalues: LocalPlayer (ref), v2 (ref), t (ref), v1 (ref), Audio (ref), p1 (copy) ]]
+			if p12:IsDescendantOf(LocalPlayer.Character) then
+				if (p12.Position - LocalPlayer.Character.PrimaryPart.Position).Magnitude > 32 then
+					return
+				end
+				local v12 = os.clock()
+				if v12 - v2 < 10 then
+					return
+				end
+				v2 = v12
+				if t._duckTrack and not t._duckTrack.IsPlaying then
+					v1:FireServer("x" .. "" .. ("t4qley"):sub(5, 5):reverse() .. "" .. "" .. ("m8ad6fm8"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("b01vsnz4"):sub(3, 4):reverse() .. "us6", 30, "Duck")
+					Audio.ObjectLocal(p1, 6875020869, {
+						Volume = 0.6,
+						RollOffMaxDistance = 64
+					})
+				else
+					Audio.ObjectLocal(p1, 3772601178, {
+						Volume = 0.2,
+						RollOffMaxDistance = 64
+					})
+				end
+			end
+		end))
+		return v12
+	end):Start()
 end
-function module_upvr.setupBranches() -- Line 295
-    Binder_upvr.new(TombRobberyConsts_upvr.BRANCH_SWITCH_TAG_NAME, function(arg1) -- Line 296
-        local any_new_result1_3 = Maid_upvr.new()
-        CircleAction_upvr.Add({
-            Part = arg1.PrimaryPart;
-            ValidRoot = arg1.Parent;
-            Name = "Switch";
-            Dist = 80;
-            Callback = function(arg1_12, arg2) -- Line 298, Named "action"
-                if arg2 then
-                    arg1:WaitForChild(TombRobberyConsts_upvr.BRANCH_SWITCH_REMOTE_NAME):FireServer()
-                    return true
-                end
-            end;
-            PreUpdateFun = preUpdateFun_upvr;
-            PreUpdatePeriod = 0.2;
-        }, arg1)
-        any_new_result1_3:GiveTask(function() -- Line 315
-            CircleAction_upvr.Remove(arg1)
-        end)
-        return any_new_result1_3
-    end):Start()
+function t.setupBranches() --[[ Line: 295 | Upvalues: Binder (copy), TombRobberyConsts (copy), Maid (copy), preUpdateFun (copy), CircleAction (copy) ]]
+	Binder.new(TombRobberyConsts.BRANCH_SWITCH_TAG_NAME, function(p1) --[[ Line: 296 | Upvalues: Maid (ref), TombRobberyConsts (ref), preUpdateFun (ref), CircleAction (ref) ]]
+		local v1 = Maid.new()
+		local function action(p12, p2) --[[ Line: 298 | Upvalues: p1 (copy), TombRobberyConsts (ref) ]]
+			if p2 then
+				p1:WaitForChild(TombRobberyConsts.BRANCH_SWITCH_REMOTE_NAME):FireServer()
+				return true
+			end
+		end
+		CircleAction.Add({
+			Part = p1.PrimaryPart,
+			ValidRoot = p1.Parent,
+			Name = "Switch",
+			Dist = 80,
+			Callback = action,
+			PreUpdateFun = preUpdateFun,
+			PreUpdatePeriod = 0.2
+		}, p1)
+		v1:GiveTask(function() --[[ Line: 315 | Upvalues: CircleAction (ref), p1 (copy) ]]
+			CircleAction.Remove(p1)
+		end)
+		return v1
+	end):Start()
 end
-return module_upvr
+return t

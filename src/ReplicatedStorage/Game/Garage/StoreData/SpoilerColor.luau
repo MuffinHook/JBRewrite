@@ -1,23 +1,26 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local VehicleUtils_upvr = require(ReplicatedStorage.Vehicle.VehicleUtils)
-local Paint_upvr = require(ReplicatedStorage.Game.Garage.Paint)
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local Color = require(script.Parent.Color)
+local Paint = require(ReplicatedStorage.Game.Garage.Paint)
+local function GetInstance(p1) --[[ Line: 7 | Upvalues: VehicleUtils (copy), Paint (copy) ]]
+	local v1 = VehicleUtils.GetLocalVehicleModel()
+	assert(v1)
+	local v2 = v1:Clone()
+	VehicleUtils.CleanVehicleModel(v2)
+	v2.PrimaryPart = v2.BoundingBox
+	v2:SetPrimaryPartCFrame(CFrame.new(0, 0, 0))
+	local SpoilerPart = v2:FindFirstChild("SpoilerPart")
+	if SpoilerPart then
+		SpoilerPart.Color = Paint.GetColor(p1.Name)
+	end
+	return v2
+end
+local function Update(p1, p2) --[[ Line: 21 ]]
+	local v1 = os.clock() / 2
+	p1.CFrame = CFrame.Angles(0, math.cos(v1 % 6.283185307179586) * 0.1, 0) * CFrame.Angles(math.sin(v1) * 0.1 - 0.1, 0, 0) * CFrame.new(0, 0, p2.PrimaryPart.Size.Magnitude * 0.7)
+end
 return {
-    Items = require(script.Parent.Color).Items;
-    GetInstance = function(arg1) -- Line 7, Named "GetInstance"
-        local any_GetLocalVehicleModel_result1 = VehicleUtils_upvr.GetLocalVehicleModel()
-        assert(any_GetLocalVehicleModel_result1)
-        local clone = any_GetLocalVehicleModel_result1:Clone()
-        VehicleUtils_upvr.CleanVehicleModel(clone)
-        clone.PrimaryPart = clone.BoundingBox
-        clone:SetPrimaryPartCFrame(CFrame.new(0, 0, 0))
-        local SpoilerPart = clone:FindFirstChild("SpoilerPart")
-        if SpoilerPart then
-            SpoilerPart.Color = Paint_upvr.GetColor(arg1.Name)
-        end
-        return clone
-    end;
-    Update = function(arg1, arg2) -- Line 21, Named "Update"
-        local var7 = os.clock() / 2
-        arg1.CFrame = CFrame.Angles(0, math.cos(var7 % (-math.pi*2)) * 0.1, 0) * CFrame.Angles(math.sin(var7) * 0.1 - 0.1, 0, 0) * CFrame.new(0, 0, arg2.PrimaryPart.Size.Magnitude * 0.7)
-    end;
+	Items = Color.Items,
+	GetInstance = GetInstance,
+	Update = Update
 }

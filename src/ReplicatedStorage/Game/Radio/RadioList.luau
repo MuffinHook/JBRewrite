@@ -1,123 +1,107 @@
+local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local Signal_upvr = require(ReplicatedStorage.Std.Signal)
-function module_upvr.new(arg1) -- Line 13
-    assert(arg1)
-    local module = {}
-    setmetatable(module, module_upvr)
-    module.Gui = arg1
-    module.Maid = Maid_upvr.new()
-    module.OnRefreshRequested = Signal_upvr.new()
-    module.Maid:GiveTask(module.OnRefreshRequested)
-    module.ListItem = {}
-    return module
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local RadioPlayer = require(script.Parent.RadioPlayer)
+local RadioUtils = require(script.Parent.RadioUtils)
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 13 | Upvalues: t (copy), Maid (copy), Signal (copy) ]]
+	assert(p1)
+	local t2 = {}
+	setmetatable(t2, t)
+	t2.Gui = p1
+	t2.Maid = Maid.new()
+	t2.OnRefreshRequested = Signal.new()
+	t2.Maid:GiveTask(t2.OnRefreshRequested)
+	t2.ListItem = {}
+	return t2
 end
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-local MarketplaceService_upvr = game:GetService("MarketplaceService")
-local VehicleUtils_upvr = require(ReplicatedStorage.Vehicle.VehicleUtils)
-local RadioPlayer_upvr = require(script.Parent.RadioPlayer)
-local RadioUtils_upvr = require(script.Parent.RadioUtils)
-function module_upvr.Populate(arg1, arg2) -- Line 26
-    assert(arg2)
-    local ScrollingFrame_upvr = arg1.Gui.Container.Sidebar.ScrollingFrame
-    arg1.Maid:GiveTask(ScrollingFrame_upvr.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() -- Line 29
-        ScrollingFrame_upvr.CanvasSize = UDim2.new(0, 0, 0, ScrollingFrame_upvr.UIListLayout.AbsoluteContentSize.Y)
-    end))
-    for i_upvr, var35_upvr in ipairs(arg2.Songs) do
-        local clone_upvr = ScrollingFrame_upvr.ItemPreset:Clone()
-        clone_upvr.Name = var35_upvr.AssetId
-        local var23
-        if not var23 then
-            var23 = tostring(var35_upvr.AssetId)
-        end
-        clone_upvr.Title.Text = var23
-        if var35_upvr.Name == nil then
-            var23 = Promise_upvr
-            var23 = var23.resolve()
-            var23 = var23:andThen(function() -- Line 40
-                return MarketplaceService_upvr:GetProductInfo(var35_upvr.AssetId)
-            end)
-            var23 = var23:andThen(function(arg1_2) -- Line 43
-                var35_upvr.Name = tostring(arg1_2.Name)
-                clone_upvr.Title.Text = var35_upvr.Name
-            end)
-            local var27_upvw
-            var23 = var23:finally(function() -- Line 47
-                if var27_upvw then
-                    var27_upvw:cancel()
-                end
-            end)
-            var27_upvw = var23
-            var23 = arg1.Maid
-            var23:GiveTask(function() -- Line 52
-                if var27_upvw then
-                    var27_upvw:cancel()
-                end
-            end)
-        end
-        clone_upvr.Visible = true
-        clone_upvr.Parent = ScrollingFrame_upvr
-        clone_upvr.LayoutOrder = i_upvr
-        arg1.Maid:GiveTask(clone_upvr.Play.MouseButton1Down:Connect(function() -- Line 61
-            local any_GetLocalVehiclePacket_result1_2 = VehicleUtils_upvr.GetLocalVehiclePacket()
-            local any_IsPlayingThirdPerson_result1 = RadioPlayer_upvr.IsPlayingThirdPerson()
-            if not any_IsPlayingThirdPerson_result1 then
-                any_IsPlayingThirdPerson_result1 = false
-                if any_GetLocalVehiclePacket_result1_2 ~= nil then
-                    any_IsPlayingThirdPerson_result1 = not any_GetLocalVehiclePacket_result1_2.Passenger
-                end
-            end
-            RadioPlayer_upvr.PlayId(var35_upvr.AssetId, nil, any_IsPlayingThirdPerson_result1)
-        end))
-        var23 = arg2.Editable
-        clone_upvr.Delete.Visible = var23
-        if arg2.Editable then
-            arg1.Maid:GiveTask(clone_upvr.Delete.MouseButton1Down:Connect(function() -- Line 71
-                table.remove(arg2.Songs, i_upvr)
-                arg1.OnRefreshRequested:Fire()
-                RadioPlayer_upvr.OnPlaylistUpdated:Fire(arg2)
-            end))
-        end
-        arg1.Maid:GiveTask(clone_upvr)
-        if #arg1.ListItem ~= i_upvr - 1 then
-            var23 = false
-        else
-            var23 = true
-        end
-        assert(var23)
-        var23 = arg1.ListItem
-        table.insert(var23, clone_upvr)
-    end
-    if arg2.Editable then
-        i_upvr = arg2.Songs
-        ScrollingFrame_upvr.NewSong.LayoutOrder = #i_upvr + 1
-        function var35_upvr() -- Line 83
-            if RadioPlayer_upvr.CurrentSound == nil then
-                error("Attempted to add song when no song is playing!")
-            end
-            for _, v_2 in ipairs(arg2.Songs) do
-                if v_2.AssetId == RadioPlayer_upvr.CurrentSoundId then
-                    error("Attempted to add repeat song to playlist.")
-                end
-            end
-            if not RadioUtils_upvr.CheckOrPromptStereoGamepass() then
-                return false
-            end
-            local tbl = {}
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            tbl.AssetId = RadioPlayer_upvr.CurrentSoundId
-            table.insert(arg2.Songs, tbl)
-            arg1.OnRefreshRequested:Fire()
-            RadioPlayer_upvr.OnPlaylistUpdated:Fire(arg2)
-        end
-        arg1.Maid:GiveTask(ScrollingFrame_upvr.NewSong.Add.MouseButton1Down:Connect(var35_upvr))
-    end
-    ScrollingFrame_upvr.NewSong.Visible = arg2.Editable
+function t.Populate(p1, p2) --[[ Line: 26 | Upvalues: Promise (copy), MarketplaceService (copy), VehicleUtils (copy), RadioPlayer (copy), RadioUtils (copy) ]]
+	assert(p2)
+	local ScrollingFrame = p1.Gui.Container.Sidebar.ScrollingFrame
+	p1.Maid:GiveTask(ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() --[[ Line: 29 | Upvalues: ScrollingFrame (copy) ]]
+		ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
+	end))
+	for i, v in ipairs(p2.Songs) do
+		local v1
+		local v2 = ScrollingFrame.ItemPreset:Clone()
+		v2.Name = v.AssetId
+		local v3 = v.Name
+		if not v3 then
+			v3 = tostring(v.AssetId)
+		end
+		v2.Title.Text = v3
+		if v.Name == nil then
+			local v4 = nil
+			v4 = Promise.resolve():andThen(function() --[[ Line: 40 | Upvalues: MarketplaceService (ref), v (copy) ]]
+				return MarketplaceService:GetProductInfo(v.AssetId)
+			end):andThen(function(p1) --[[ Line: 43 | Upvalues: v (copy), v2 (copy) ]]
+				v.Name = tostring(p1.Name)
+				v2.Title.Text = v.Name
+			end):finally(function() --[[ Line: 47 | Upvalues: v4 (ref) ]]
+				if v4 then
+					v4:cancel()
+				end
+			end)
+			p1.Maid:GiveTask(function() --[[ Line: 52 | Upvalues: v4 (ref) ]]
+				if v4 then
+					v4:cancel()
+				end
+			end)
+		end
+		v2.Visible = true
+		v2.Parent = ScrollingFrame
+		v2.LayoutOrder = i
+		p1.Maid:GiveTask(v2.Play.MouseButton1Down:Connect(function() --[[ Line: 61 | Upvalues: VehicleUtils (ref), RadioPlayer (ref), v (copy) ]]
+			local v1 = VehicleUtils.GetLocalVehiclePacket()
+			local v3 = RadioPlayer.IsPlayingThirdPerson()
+			if not v3 then
+				v3 = if v1 == nil then false else not v1.Passenger
+			end
+			RadioPlayer.PlayId(v.AssetId, nil, v3)
+		end))
+		v2.Delete.Visible = p2.Editable
+		if p2.Editable then
+			p1.Maid:GiveTask(v2.Delete.MouseButton1Down:Connect(function() --[[ Line: 71 | Upvalues: p2 (copy), i (copy), p1 (copy), RadioPlayer (ref) ]]
+				table.remove(p2.Songs, i)
+				p1.OnRefreshRequested:Fire()
+				RadioPlayer.OnPlaylistUpdated:Fire(p2)
+			end))
+		end
+		p1.Maid:GiveTask(v2)
+		v1 = #p1.ListItem == i - 1
+		assert(v1)
+		table.insert(p1.ListItem, v2)
+	end
+	if p2.Editable then
+		ScrollingFrame.NewSong.LayoutOrder = #p2.Songs + 1
+		p1.Maid:GiveTask(ScrollingFrame.NewSong.Add.MouseButton1Down:Connect(function() --[[ Line: 83 | Upvalues: RadioPlayer (ref), p2 (copy), RadioUtils (ref), p1 (copy) ]]
+			if RadioPlayer.CurrentSound == nil then
+				error("Attempted to add song when no song is playing!")
+			end
+			local CurrentSoundId = RadioPlayer.CurrentSoundId
+			for i, v in ipairs(p2.Songs) do
+				if v.AssetId == CurrentSoundId then
+					error("Attempted to add repeat song to playlist.")
+				end
+			end
+			if not RadioUtils.CheckOrPromptStereoGamepass() then
+				return false
+			end
+			table.insert(p2.Songs, {
+				AssetId = CurrentSoundId
+			})
+			p1.OnRefreshRequested:Fire()
+			RadioPlayer.OnPlaylistUpdated:Fire(p2)
+		end))
+	end
+	ScrollingFrame.NewSong.Visible = p2.Editable
 end
-function module_upvr.Destroy(arg1) -- Line 105
-    arg1.Maid:Destroy()
-    arg1.Maid = nil
+function t.Destroy(p1) --[[ Line: 105 ]]
+	p1.Maid:Destroy()
+	p1.Maid = nil
 end
-return module_upvr
+return t

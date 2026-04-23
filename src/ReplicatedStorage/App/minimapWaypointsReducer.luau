@@ -1,57 +1,49 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
-    addWaypoint = function(arg1, arg2) -- Line 7, Named "addWaypoint"
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        local var2 = true
-        if arg2.position == nil then
-            if arg2.part == nil then
-                var2 = false
-            else
-                var2 = true
-            end
-        end
-        assert(var2, "missing position or part")
-        if arg2.priority == nil then
-            var2 = false
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        var2 = true
-        assert(var2, "missing priority")
-        if arg2.name == nil then
-            var2 = false
-        else
-            var2 = true
-        end
-        assert(var2, "missing name")
-        var2 = arg1
-        var2 = 1
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end;
-    removeWaypointByName = function(arg1, arg2) -- Line 38, Named "removeWaypointByName"
-        local var5
-        if arg2.name == nil then
-            var5 = false
-        else
-            var5 = true
-        end
-        assert(var5, "missing name")
-        var5 = arg1
-        local clone = table.clone(var5)
-        var5 = 1
-        for i = #clone, var5, -1 do
-            if clone[i].name == arg2.name then
-                table.remove(clone, i)
-                return clone
-            end
-        end
-        return clone
-    end;
-    removeWaypointCurrent = function(arg1) -- Line 50, Named "removeWaypointCurrent"
-        local clone_2 = table.clone(arg1)
-        if 0 < #clone_2 then
-            table.remove(clone_2, #clone_2)
-        end
-        return clone_2
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer({}, {
+	addWaypoint = function(p1, p2) --[[ Name: addWaypoint | Line: 7 ]]
+		assert(if p2.position == nil then p2.part ~= nil else true, "missing position or part")
+		assert(p2.priority ~= nil, "missing priority")
+		assert(p2.name ~= nil, "missing name")
+		local v4 = table.clone(p1)
+		for i = #v4, 1, -1 do
+			if v4[i].name == p2.name then
+				table.remove(v4, i)
+				break
+			end
+		end
+		local v5 = #v4 + 1
+		for j = 1, #v4 do
+			if v4[j].priority > p2.priority then
+				v5 = j
+				break
+			end
+		end
+		table.insert(v4, v5, {
+			position = p2.position,
+			part = p2.part,
+			priority = p2.priority,
+			name = p2.name,
+			minDist = p2.minDist or 48,
+			message = p2.message
+		})
+		return v4
+	end,
+	removeWaypointByName = function(p1, p2) --[[ Name: removeWaypointByName | Line: 38 ]]
+		assert(p2.name ~= nil, "missing name")
+		local v2 = table.clone(p1)
+		for i = #v2, 1, -1 do
+			if v2[i].name == p2.name then
+				table.remove(v2, i)
+				return v2
+			end
+		end
+		return v2
+	end,
+	removeWaypointCurrent = function(p1) --[[ Name: removeWaypointCurrent | Line: 50 ]]
+		local v1 = table.clone(p1)
+		if #v1 > 0 then
+			table.remove(v1, #v1)
+		end
+		return v1
+	end
 })

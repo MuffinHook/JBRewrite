@@ -1,70 +1,73 @@
-local var2_upvw
-local tbl_upvr = {}
-local function _(arg1) -- Line 10, Named "FromPart"
-    local module = {}
-    module.Part = arg1
-    return module
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.Module.Time)
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local CollectionService = game:GetService("CollectionService")
+local RunService = game:GetService("RunService")
+local v1 = nil
+local t = {}
+local function FromPart(p1) --[[ Line: 10 ]]
+	return {
+		Part = p1
+	}
 end
-local VehicleUtils_upvr = require(game:GetService("ReplicatedStorage").Vehicle.VehicleUtils)
-local var6_upvw
-local function Check_upvr() -- Line 17, Named "Check"
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local any_GetLocalVehiclePacket_result1 = VehicleUtils_upvr.GetLocalVehiclePacket()
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local Position = any_GetLocalVehiclePacket_result1.Model.PrimaryPart.Position
-    if var6_upvw ~= nil then
-        for _, v in ipairs(tbl_upvr) do
-            local Part = v.Part
-            local CFrame = Part.CFrame
-            local p = CFrame.p
-            if math.sign((var6_upvw - p).Unit:Dot(CFrame.LookVector)) ~= math.sign((Position - p).Unit:Dot(CFrame.LookVector)) and math.abs(Position - p:Dot(CFrame.RightVector)) <= Part.Size.X * 0.5 and math.abs(Position - p:Dot(CFrame.UpVector)) < 16 then
-                var2_upvw:FireServer('h'.."".."xjib4ww":sub(5, 5):reverse().."".."".."u2qsqu":sub(5, 5):reverse():reverse():reverse().."".."".."xinpz4":sub(3, 4):reverse():reverse():reverse().."".."puj", Part)
-            end
-        end
-    end
-    var6_upvw = Position
-    do
-        return
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if var6_upvw then
-        var6_upvw = nil
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local v2 = nil
+local function Check() --[[ Line: 17 | Upvalues: VehicleUtils (copy), v2 (ref), t (copy), v1 (ref) ]]
+	local v12 = VehicleUtils.GetLocalVehiclePacket()
+	if v12 == nil then
+		if v2 then
+			v2 = nil
+		end
+	elseif v12.Model:IsDescendantOf(workspace) then
+		local Position = v12.Model.PrimaryPart.Position
+		if v2 ~= nil then
+			for i, v in ipairs(t) do
+				local Part = v.Part
+				local v22 = Part.CFrame
+				local p = v22.p
+				local v3 = (v2 - p).Unit:Dot(v22.LookVector)
+				local v4 = (Position - p).Unit:Dot(v22.LookVector)
+				if math.sign(v3) ~= math.sign(v4) then
+					local v5 = (Position - p):Dot(v22.RightVector)
+					if math.abs(v5) <= Part.Size.X * 0.5 and math.abs(((Position - p):Dot(v22.UpVector))) < 16 then
+						v1:FireServer("a" .. ("cvqx0sn8"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("nwqycdqc"):sub(4, 5):reverse() .. "m8fr", Part)
+					end
+				end
+			end
+		end
+		v2 = Position
+	end
 end
-local var17_upvw = 0
-local function Stepped_upvr() -- Line 51, Named "Stepped"
-    local tick_result1 = tick()
-    if 0.1 < tick_result1 - var17_upvw then
-        var17_upvw = tick_result1
-        Check_upvr()
-    end
+local v3 = 0
+local function Stepped() --[[ Line: 51 | Upvalues: v3 (ref), Check (copy) ]]
+	local v1 = tick()
+	if v1 - v3 > 0.1 then
+		v3 = v1
+		Check()
+	end
 end
-local RunService_upvr = game:GetService("RunService")
-local CollectionService_upvr = game:GetService("CollectionService")
 return {
-    Init = function(arg1) -- Line 58, Named "Init"
-        var2_upvw = arg1.Event
-        RunService_upvr.Heartbeat:Connect(Stepped_upvr)
-        for _, v_2 in ipairs(CollectionService_upvr:GetTagged("RoadSpike")) do
-            table.insert(tbl_upvr, {
-                Part = v_2;
-            })
-        end
-        CollectionService_upvr:GetInstanceAddedSignal("RoadSpike"):Connect(function(arg1_2) -- Line 62, Named "AddedFun"
-            local tbl = {}
-            tbl.Part = arg1_2
-            table.insert(tbl_upvr, tbl)
-        end)
-        CollectionService_upvr:GetInstanceRemovedSignal("RoadSpike"):Connect(function(arg1_3) -- Line 66, Named "RemovedFun"
-            for i_2 = #tbl_upvr, 1, -1 do
-                if tbl_upvr[i_2].Part == arg1_3 then
-                    table.remove(tbl_upvr, i_2)
-                    return
-                end
-            end
-        end)
-    end;
+	Init = function(p1) --[[ Name: Init | Line: 58 | Upvalues: v1 (ref), RunService (copy), Stepped (copy), t (copy), CollectionService (copy) ]]
+		v1 = p1.Event
+		RunService.Heartbeat:Connect(Stepped)
+		local function AddedFun(p1) --[[ Line: 62 | Upvalues: t (ref) ]]
+			table.insert(t, {
+				Part = p1
+			})
+		end
+		local function RemovedFun(p1) --[[ Line: 66 | Upvalues: t (ref) ]]
+			for i = #t, 1, -1 do
+				if t[i].Part == p1 then
+					table.remove(t, i)
+					return
+				end
+			end
+		end
+		for i, v in ipairs(CollectionService:GetTagged("RoadSpike")) do
+			table.insert(t, {
+				Part = v
+			})
+		end
+		CollectionService:GetInstanceAddedSignal("RoadSpike"):Connect(AddedFun)
+		CollectionService:GetInstanceRemovedSignal("RoadSpike"):Connect(RemovedFun)
+	end
 }

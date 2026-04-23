@@ -1,178 +1,177 @@
-local new_2_upvr = Vector3.new
-local module_upvr = {}
-module_upvr.__index = module_upvr
-function module_upvr.new(arg1, arg2) -- Line 18
-    assert(arg1, "missing PartNode")
-    local setmetatable_result1 = setmetatable({}, module_upvr)
-    if not arg2 then
-        local Attachment = Instance.new("Attachment")
-        Attachment.Parent = arg1
-        setmetatable_result1.Attachment = Attachment
-        local VectorForce_2 = Instance.new("VectorForce")
-        VectorForce_2.RelativeTo = Enum.ActuatorRelativeTo.Attachment0
-        VectorForce_2.Attachment0 = Attachment
-        VectorForce_2.Force = Vector3.new()
-        VectorForce_2.Parent = arg1
-        setmetatable_result1.VectorForce = VectorForce_2
-        local Torque = Instance.new("Torque")
-        Torque.RelativeTo = Enum.ActuatorRelativeTo.World
-        Torque.Attachment0 = Attachment
-        Torque.Torque = Vector3.new()
-        Torque.Parent = arg1
-        setmetatable_result1.Torque = Torque
-    end
-    setmetatable_result1.PartNode = arg1
-    setmetatable_result1.dx = 0
-    setmetatable_result1.d2x = 0
-    setmetatable_result1.RotationVisual = 0
-    setmetatable_result1.VisualHeightFloat = 0
-    setmetatable_result1.EffectiveMass = 0
-    setmetatable_result1.IgnoreModel = nil
-    setmetatable_result1.HeightSuspension = 0
-    setmetatable_result1.RadiusVisual = 0
-    setmetatable_result1.Springk = 1.5
-    setmetatable_result1.SpringB = 3.5
-    setmetatable_result1.BHFric0 = 7
-    setmetatable_result1.BFFric0 = 0.02
-    setmetatable_result1.BFFric1 = 0.005
-    setmetatable_result1._version = 1
-    setmetatable_result1._applyForces = not arg2
-    return setmetatable_result1
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RayCast = require(ReplicatedStorage.Module.RayCast)
+local v1 = Vector3.new
+local v2 = v1()
+local Dot = v1().Dot
+local clamp = math.clamp
+local abs = math.abs
+local Angles = CFrame.Angles
+local t = {}
+t.__index = t
+function t.new(p1, p2) --[[ Line: 18 | Upvalues: t (copy) ]]
+	assert(p1, "missing PartNode")
+	local v2 = setmetatable({}, t)
+	if not p2 then
+		local Attachment = Instance.new("Attachment")
+		Attachment.Parent = p1
+		v2.Attachment = Attachment
+		local VectorForce = Instance.new("VectorForce")
+		VectorForce.RelativeTo = Enum.ActuatorRelativeTo.Attachment0
+		VectorForce.Attachment0 = Attachment
+		VectorForce.Force = Vector3.new()
+		VectorForce.Parent = p1
+		v2.VectorForce = VectorForce
+		local Torque = Instance.new("Torque")
+		Torque.RelativeTo = Enum.ActuatorRelativeTo.World
+		Torque.Attachment0 = Attachment
+		Torque.Torque = Vector3.new()
+		Torque.Parent = p1
+		v2.Torque = Torque
+	end
+	v2.PartNode = p1
+	v2.dx = 0
+	v2.d2x = 0
+	v2.RotationVisual = 0
+	v2.VisualHeightFloat = 0
+	v2.EffectiveMass = 0
+	v2.IgnoreModel = nil
+	v2.HeightSuspension = 0
+	v2.RadiusVisual = 0
+	v2.Springk = 1.5
+	v2.SpringB = 3.5
+	v2.BHFric0 = 7
+	v2.BFFric0 = 0.02
+	v2.BFFric1 = 0.005
+	v2._version = 1
+	v2._applyForces = not p2
+	return v2
 end
-function module_upvr.SetSuspensionHeight(arg1, arg2) -- Line 64
-    assert(arg2)
-    arg1.HeightSuspension = arg2
+function t.SetSuspensionHeight(p1, p2) --[[ Line: 64 ]]
+	assert(p2)
+	p1.HeightSuspension = p2
 end
-function module_upvr.SetVisualRadius(arg1, arg2) -- Line 68
-    assert(arg2)
-    arg1.RadiusVisual = arg2
+function t.SetVisualRadius(p1, p2) --[[ Line: 68 ]]
+	assert(p2)
+	p1.RadiusVisual = p2
 end
-function module_upvr.SetSpringConstants(arg1, arg2, arg3) -- Line 72
-    arg1.Springk = arg2
-    arg1.SpringB = arg3
+function t.SetSpringConstants(p1, p2, p3) --[[ Line: 72 ]]
+	p1.Springk = p2
+	p1.SpringB = p3
 end
-function module_upvr.SetHorizontalFriction(arg1, arg2) -- Line 75
-    arg1.BHFric0 = arg2
+function t.SetHorizontalFriction(p1, p2) --[[ Line: 75 ]]
+	p1.BHFric0 = p2
 end
-function module_upvr.SetForwardFriction(arg1, arg2) -- Line 78
-    arg1.BFFric0 = arg2
+function t.SetForwardFriction(p1, p2) --[[ Line: 78 ]]
+	p1.BFFric0 = p2
 end
-function module_upvr.SetForwardFriction2(arg1, arg2) -- Line 81
-    arg1.BFFric1 = arg2
+function t.SetForwardFriction2(p1, p2) --[[ Line: 81 ]]
+	p1.BFFric1 = p2
 end
-function module_upvr.SetVersion(arg1, arg2) -- Line 84
-    arg1._version = arg2
+function t.SetVersion(p1, p2) --[[ Line: 84 ]]
+	p1._version = p2
 end
-function module_upvr.SetApplyForces(arg1, arg2) -- Line 87
-    arg1._applyForces = arg2
+function t.SetApplyForces(p1, p2) --[[ Line: 87 ]]
+	p1._applyForces = p2
 end
-function module_upvr.SetExternalGroundAccel(arg1, arg2) -- Line 90
-    arg1._extGroundAccel = arg2
+function t.SetExternalGroundAccel(p1, p2) --[[ Line: 90 ]]
+	p1._extGroundAccel = p2
 end
-local Angles_upvr = CFrame.Angles
-local RayCast_upvr = require(game:GetService("ReplicatedStorage").Module.RayCast)
-local Dot_upvr = new_2_upvr().Dot
-local clamp_upvr = math.clamp
-local abs_upvr = math.abs
-function module_upvr.Update(arg1, arg2, arg3) -- Line 93
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local PartNode = arg1.PartNode
-    local VectorForce = arg1.VectorForce
-    local Torque_2 = arg1.Torque
-    local HeightSuspension = arg1.HeightSuspension
-    local CFrame = PartNode.CFrame
-    local _ = arg1.SpringB
-    local var19
-    if arg3 then
-        CFrame *= Angles_upvr(0, arg3, 0)
-    end
-    local p = CFrame.p
-    local var21 = -CFrame.UpVector
-    if arg1._version <= 1 then
-        p -= var21 * HeightSuspension * 0.5
-    end
-    local any_RayIgnoreNonCollide_result1, any_RayIgnoreNonCollide_result2, any_RayIgnoreNonCollide_result3 = RayCast_upvr.RayIgnoreNonCollide(p, var21, HeightSuspension, arg1.IgnoreModel)
-    local Dot_upvr_result1 = Dot_upvr(any_RayIgnoreNonCollide_result2 - p, var21)
-    local var26 = HeightSuspension - Dot_upvr_result1
-    local any_vectorToObjectSpace_result1 = CFrame:vectorToObjectSpace(PartNode.Velocity)
-    var19 = 0
-    if 0.01 < var26 then
-        local clamp_upvr_result1 = clamp_upvr(any_vectorToObjectSpace_result1.z, -1000, 1000)
-        var19 = -clamp_upvr(any_vectorToObjectSpace_result1.x, -1000, 1000) / 60 * arg1.BHFric0
-    end
-    local var29
-    local var30
-    if arg1._applyForces then
-        local any_VectorToObjectSpace_result1 = PartNode.CFrame:VectorToObjectSpace(any_RayIgnoreNonCollide_result3)
-        local var32
-        if arg1._extGroundAccel and 0.01 < var26 then
-            var32 += arg1._extGroundAccel
-        end
-        var29 = arg1.EffectiveMass * workspace.Gravity * var32
-        var30 = PartNode.CFrame:VectorToWorldSpace(var29):Cross(arg1.Attachment.WorldPosition - PartNode.Position)
-    end
-    if VectorForce then
-        any_VectorToObjectSpace_result1 = var29
-        local var33 = any_VectorToObjectSpace_result1
-        if not var33 then
-            var33 = Vector3.new()
-        end
-        VectorForce.Force = var33
-    end
-    if Torque_2 then
-        var33 = var30
-        local var34 = var33
-        if not var34 then
-            var34 = Vector3.new()
-        end
-        Torque_2.Torque = var34
-    end
-    local var35 = arg1.RotationVisual + clamp_upvr_result1 * arg2 / arg1.RadiusVisual
-    arg1.RotationVisual = var35
-    local var36
-    local var37
-    if arg1._version <= 1 then
-        var36 = (arg1.RadiusVisual * 2 + HeightSuspension) * 0.5 - Dot_upvr_result1
-        var37 = 0.2
-    else
-        var36 = arg1.RadiusVisual - Dot_upvr_result1
-        var37 = -arg1.RadiusVisual
-    end
-    if var37 < var36 then
-    end
-    local VisualHeightFloat = arg1.VisualHeightFloat
-    if VisualHeightFloat < var37 then
-        VisualHeightFloat = var37
-    else
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        VisualHeightFloat += (var37 - VisualHeightFloat) * 0.4
-    end
-    arg1.VisualHeightFloat = VisualHeightFloat
-    arg1.d2x = arg1.dx
-    arg1.dx = var26
-    return VisualHeightFloat, var35, clamp_upvr_result1 * arg2
+function t.Update(p1, p2, p3) --[[ Line: 93 | Upvalues: Angles (copy), RayCast (copy), Dot (copy), clamp (copy), abs (copy), v1 (copy) ]]
+	local PartNode = p1.PartNode
+	local VectorForce = p1.VectorForce
+	local Torque = p1.Torque
+	local HeightSuspension = p1.HeightSuspension
+	local v12 = PartNode.CFrame
+	local EffectiveMass = p1.EffectiveMass
+	local SpringB = p1.SpringB
+	local dx = p1.dx
+	local BHFric0 = p1.BHFric0
+	local BFFric0 = p1.BFFric0
+	if p3 then
+		v12 = v12 * Angles(0, p3, 0)
+	end
+	local p = v12.p
+	local v2 = -v12.UpVector
+	if p1._version <= 1 then
+		p = p - v2 * HeightSuspension * 0.5
+	end
+	local _, v3, v4 = RayCast.RayIgnoreNonCollide(p, v2, HeightSuspension, p1.IgnoreModel)
+	local v5 = Dot(v3 - p, v2)
+	local v6 = HeightSuspension - v5
+	local v8 = v12:vectorToObjectSpace(PartNode.Velocity)
+	local x = v8.x
+	local z = v8.z
+	local v9, v10
+	if v6 > 0.01 then
+		local v11 = clamp(x, -1000, 1000)
+		local v122 = clamp(z, -1000, 1000)
+		v9 = -v122 / 60 * BFFric0 - v122 * abs(v122) * p1.BFFric1 / 60
+		v10 = -v11 / 60 * BHFric0
+		z = v122
+	else
+		v10 = 0
+		v9 = 0
+	end
+	local v13 = math.clamp(-p1.Springk * v6 - SpringB * (v6 - dx) - SpringB * 0.5 * (v6 - 2 * dx + p1.d2x), -2, 2)
+	local v14, v15
+	if p1._applyForces then
+		local v16 = PartNode.CFrame:VectorToObjectSpace(v4)
+		local sum = v1(0, -v13, 0):Dot(v16) * v16 + v1(v10, 0, 0) + v1(0, 0, v9)
+		if p1._extGroundAccel and v6 > 0.01 then
+			sum = sum + p1._extGroundAccel
+		end
+		v14 = EffectiveMass * workspace.Gravity * sum
+		v15 = PartNode.CFrame:VectorToWorldSpace(v14):Cross(p1.Attachment.WorldPosition - PartNode.Position)
+	else
+		v14 = nil
+		v15 = nil
+	end
+	if VectorForce then
+		VectorForce.Force = v14 or Vector3.new()
+	end
+	if Torque then
+		Torque.Torque = v15 or Vector3.new()
+	end
+	local v21 = p1.RotationVisual + z * p2 / p1.RadiusVisual
+	p1.RotationVisual = v21
+	local v22, v23
+	if p1._version <= 1 then
+		v22 = (p1.RadiusVisual * 2 + HeightSuspension) * 0.5 - v5
+		v23 = 0.2
+	else
+		v22 = p1.RadiusVisual - v5
+		v23 = -p1.RadiusVisual
+	end
+	if v23 < v22 then
+		v22 = v23
+	end
+	local VisualHeightFloat = p1.VisualHeightFloat
+	local v24 = if VisualHeightFloat < v22 then v22 else VisualHeightFloat + (v22 - VisualHeightFloat) * 0.4
+	p1.VisualHeightFloat = v24
+	p1.d2x = dx
+	p1.dx = v6
+	return v24, v21, z * p2
 end
-local new_2_upvr_result1_upvr = new_2_upvr()
-function module_upvr.Clear(arg1) -- Line 205
-    if arg1.VectorForce then
-        arg1.VectorForce.Force = new_2_upvr_result1_upvr
-    end
-    if arg1.Torque then
-        arg1.Torque.Torque = new_2_upvr_result1_upvr
-    end
+function t.Clear(p1) --[[ Line: 205 | Upvalues: v2 (copy) ]]
+	if p1.VectorForce then
+		p1.VectorForce.Force = v2
+	end
+	if p1.Torque then
+		p1.Torque.Torque = v2
+	end
 end
-function module_upvr.Destroy(arg1) -- Line 213
-    if arg1.VectorForce then
-        arg1.VectorForce:Destroy()
-        arg1.VectorForce = nil
-    end
-    if arg1.Torque then
-        arg1.Torque:Destroy()
-        arg1.Torque = nil
-    end
-    if arg1.Attachment then
-        arg1.Attachment:Destroy()
-        arg1.Attachment = nil
-    end
+function t.Destroy(p1) --[[ Line: 213 ]]
+	if p1.VectorForce then
+		p1.VectorForce:Destroy()
+		p1.VectorForce = nil
+	end
+	if p1.Torque then
+		p1.Torque:Destroy()
+		p1.Torque = nil
+	end
+	if p1.Attachment then
+		p1.Attachment:Destroy()
+		p1.Attachment = nil
+	end
 end
-return module_upvr
+return t

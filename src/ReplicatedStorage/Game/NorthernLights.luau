@@ -1,26 +1,26 @@
-local module_upvr = {
-    _color = nil;
-    _targetColor = Color3.new(1, 1, 1);
+local RunService = game:GetService("RunService")
+local t = {
+	_color = nil,
+	_targetColor = Color3.new(255/255, 255/255, 255/255)
 }
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.init() -- Line 6
-    task.spawn(function() -- Line 7
-        local SkyLights_upvr = workspace:WaitForChild("SkyLights", 20)
-        if SkyLights_upvr then
-            local var6_upvw = 0
-            RunService_upvr.Heartbeat:Connect(function() -- Line 11
-                local tick_result1 = tick()
-                if 5 < tick_result1 - var6_upvw then
-                    var6_upvw = tick_result1
-                    module_upvr._color = module_upvr._targetColor
-                    module_upvr._targetColor = Color3.fromHSV(math.random(), 1, 1.5)
-                end
-                for _, v in ipairs(SkyLights_upvr:GetChildren()) do
-                    v.Decal.Color3 = module_upvr._color:lerp(module_upvr._targetColor, (tick_result1 - var6_upvw) / 5)
-                    local _
-                end
-            end)
-        end
-    end)
+function t.init() --[[ Line: 6 | Upvalues: RunService (copy), t (copy) ]]
+	task.spawn(function() --[[ Line: 7 | Upvalues: RunService (ref), t (ref) ]]
+		local SkyLights = workspace:WaitForChild("SkyLights", 20)
+		if SkyLights then
+			local v1 = 0
+			RunService.Heartbeat:Connect(function() --[[ Line: 11 | Upvalues: v1 (ref), t (ref), SkyLights (copy) ]]
+				local v12 = tick()
+				if v12 - v1 > 5 then
+					v1 = v12
+					t._color = t._targetColor
+					t._targetColor = Color3.fromHSV(math.random(), 1, 1.5)
+				end
+				local v2 = t._color:lerp(t._targetColor, (v12 - v1) / 5)
+				for i, v in ipairs(SkyLights:GetChildren()) do
+					v.Decal.Color3 = v2
+				end
+			end)
+		end
+	end)
 end
-return module_upvr
+return t

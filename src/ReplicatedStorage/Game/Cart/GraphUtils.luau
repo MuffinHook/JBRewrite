@@ -1,108 +1,92 @@
-local module_upvr = {
-    calculateDist = function(arg1, arg2) -- Line 5, Named "calculateDist"
-        local const_number = 1
-        local var3
-        repeat
-            local var4 = arg1[const_number]
-            local speedStart_2 = var4.speedStart
-            if not speedStart_2 then
-                speedStart_2 = var4.speed
-            end
-            local speedEnd_2 = var4.speedEnd
-            if not speedEnd_2 then
-                speedEnd_2 = var4.speed
-            end
-            local const_number_3 = 0
-            local timeUntil_2 = var4.timeUntil
-            local var9 = math.min(timeUntil_2, arg2) - const_number_3
-            var3 += (speedEnd_2 - speedStart_2) / (2 * (timeUntil_2 - const_number_3)) * var9 * var9 + speedStart_2 * var9
-        until #arg1 < const_number + 1 and arg2 < var4.timeUntil
-        return var3
-    end;
-    calculateSpeed = function(arg1, arg2) -- Line 23, Named "calculateSpeed"
-        for i = 1, #arg1 do
-            local var12 = arg1[i]
-            local const_number_2 = 0
-            local timeUntil = var12.timeUntil
-            if arg2 <= timeUntil then
-                local speedStart = var12.speedStart
-                if not speedStart then
-                    speedStart = var12.speed
-                end
-                local speedEnd = var12.speedEnd
-                if not speedEnd then
-                    speedEnd = var12.speed
-                end
-                return (speedEnd - speedStart) / (timeUntil - const_number_2) * (math.min(timeUntil, arg2) - const_number_2) + speedStart
-            end
-        end
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.Module.Table)
+local t = {
+	calculateDist = function(p1, p2) --[[ Name: calculateDist | Line: 5 ]]
+		local count = 1
+		local v1 = 0
+		local sum = 0
+		while true do
+			local v2 = p1[count]
+			local v3 = v2.speedStart or v2.speed
+			local timeUntil = v2.timeUntil
+			local v5 = math.min(timeUntil, p2) - v1
+			sum = sum + (((v2.speedEnd or v2.speed) - v3) / (2 * (timeUntil - v1)) * v5 * v5 + v3 * v5)
+			v1 = v2.timeUntil
+			count = count + 1
+			if #p1 < count or p2 < v1 then
+				return sum
+			end
+		end
+	end,
+	calculateSpeed = function(p1, p2) --[[ Name: calculateSpeed | Line: 23 ]]
+		local v1 = 0
+		for i = 1, #p1 do
+			local v2 = p1[i]
+			local timeUntil = v2.timeUntil
+			local v3 = math.min(timeUntil, p2) - v1
+			if p2 <= timeUntil then
+				local v4 = v2.speedStart or v2.speed
+				return ((v2.speedEnd or v2.speed) - v4) / (timeUntil - v1) * v3 + v4
+			end
+			v1 = v2.timeUntil
+		end
+	end
 }
-function module_upvr.calculateTime(arg1, arg2) -- Line 38
-    local f
-    if 0 >= #arg1 then
-        f = false
-    else
-        f = true
-    end
-    assert(f)
-    f = arg1
-    if module_upvr.calculateDist(f, arg1[#arg1].timeUntil) < arg2 then return end
-    local var18_upvw = 0
-    function f(arg1_2, arg2_2) -- Line 46
-        local var19 = (arg1_2 + arg2_2) * 0.5
-        local var20 = module_upvr.calculateDist(arg1, var19) - arg2
-        if math.abs(var20) < 0.000001 then
-            return var19
-        end
-        if math.abs(var20 - var18_upvw) < 0.000001 then return end
-        var18_upvw = var20
-        if 0 < var20 then
-            return f(arg1_2, var19)
-        end
-        return f(var19, arg2_2)
-    end
-    return f(0, arg1[#arg1].timeUntil)
+function t.calculateTime(p1, p2) --[[ Line: 38 | Upvalues: t (copy) ]]
+	assert(#p1 > 0)
+	if not (t.calculateDist(p1, p1[#p1].timeUntil) < p2) then
+		local v2 = 0
+		local function v3(p12, p22) --[[ Line: 46 | Upvalues: t (ref), p1 (copy), p2 (copy), v2 (ref), v3 (copy) ]]
+			local v1 = (p12 + p22) * 0.5
+			local v22 = t.calculateDist(p1, v1) - p2
+			if math.abs(v22) < 1e-6 then
+				return v1
+			else
+				if math.abs(v22 - v2) < 1e-6 then
+				else
+					v2 = v22
+					if v22 > 0 then
+						return v3(p12, v1)
+					else
+						return v3(v1, p22)
+					end
+				end
+			end
+		end
+		return v3(0, p1[#p1].timeUntil)
+	end
 end
-function module_upvr.constrainLastTimeToReachTarget(arg1, arg2) -- Line 67
-    local var25
-    if 1 < #arg1 then
-        var25 = arg1[#arg1 - 1]
-        var25 = var25.timeUntil
-        if arg2 < module_upvr.calculateDist(arg1, var25) then
-            return nil
-        end
-    end
-    local var26_upvw = 0
-    local function f_upvr(arg1_4, arg2_4) -- Line 76, Named "f"
-        local var27 = (arg1_4 + arg2_4) * 0.5
-        arg1[#arg1].timeUntil = var27
-        local var28 = module_upvr.calculateDist(arg1, var27) - arg2
-        if math.abs(var28) < 0.000001 then
-            return var27
-        end
-        if math.abs(var28 - var26_upvw) < 0.000001 then return end
-        var26_upvw = var28
-        if 0 < var28 then
-            return f_upvr(arg1_4, var27)
-        end
-        return f_upvr(var27, arg2_4)
-    end
-    local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var25 = var25.timeUntil
-        var25 = arg1[#arg1 - 1]
-        return var25
-    end
-    if 1 >= #arg1 or not decompInlinedCondition_2() then
-        var25 = 0
-    end
-    return f_upvr(var25, 10000000000)
+function t.constrainLastTimeToReachTarget(p1, p2) --[[ Line: 67 | Upvalues: t (copy) ]]
+	if #p1 > 1 and p2 < t.calculateDist(p1, p1[#p1 - 1].timeUntil) then
+		return nil
+	else
+		local v1 = 0
+		local function v2(p12, p22) --[[ Line: 76 | Upvalues: p1 (copy), t (ref), p2 (copy), v1 (ref), v2 (copy) ]]
+			local v12 = (p12 + p22) * 0.5
+			p1[#p1].timeUntil = v12
+			local v22 = t.calculateDist(p1, v12) - p2
+			if math.abs(v22) < 1e-6 then
+				return v12
+			else
+				if math.abs(v22 - v1) < 1e-6 then
+				else
+					v1 = v22
+					if v22 > 0 then
+						return v2(p12, v12)
+					else
+						return v2(v12, p22)
+					end
+				end
+			end
+		end
+		return v2(#p1 > 1 and p1[#p1 - 1].timeUntil or 0, 10000000000)
+	end
 end
-function module_upvr.cap(arg1) -- Line 98
-    table.insert(arg1, {
-        timeUntil = 10000000000;
-        speedStart = 0;
-        speedEnd = 0;
-    })
+function t.cap(p1) --[[ Line: 98 ]]
+	table.insert(p1, {
+		timeUntil = 10000000000,
+		speedStart = 0,
+		speedEnd = 0
+	})
 end
-return module_upvr
+return t

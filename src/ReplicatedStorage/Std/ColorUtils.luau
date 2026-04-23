@@ -1,37 +1,41 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMKBG1hdGgFY2xhbXAHY2xhbXAwMQVUb0hTVgZDb2xvcjMHZnJvbUhTVgpzYXR1cmF0ZUJ5CnNhdHVyYXRlVG8KYnJpZ2h0ZW5CeQpicmlnaHRlblRvAAYJAwAAAAAZjAUAAIwGAQA0LgAEBQYAAFIEAACkAwIAAAQAgJ8DBAKMBgAAjAcBADQuAQQGBwAAUgUBAKQEAgAABACAnwQEAowHAACMCAEANC4CBAcIAABSBgIApAUCAAAEAICfBQQCggMEAAMDAQMCBAAEAIAAAwMBGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAkCAQAAEAABAw8PAgAXDwMAFw8EABcXvAIAzQAAAACfAgIEjAYBAEMFBgEJAwMF+wYAAE0FBggBAAAAUgYCAFIHAwBSCAQAnwUEBFICBQBSAwYAUgQHAKQFBAAADCCAUgYCAFIHAwBSCAQAnwUEAIIFAAAFAwQDAwMFAwYEAAwggAAGBwEYAAAAAQAAAQAAAAAAAAAAAAEAAAAAAAAHAAAAAAkCAQAAEAABAw8PAgAUDwMAFA8EABQUvAIAzQAAAACfAgIE+wYAAE0FBggBAAAAUgYCAFIHAQBSCAQAnwUEBFICBQBSAQYAUgQHAKQFBAAADCCAUgYCAFIHAQBSCAQAnwUEAIIFAAAFAwQDAwMFAwYEAAwggAAMCAEYAAAAAQAAAAAAAAAAAAEAAAAAAAANAAAAAAkCAQAAEAABAw8PAgAXDwMAFw8EABcXvAIAzQAAAACfAgIEjAYBAEMFBgEJBAQF+wYAAE0FBggBAAAAUgYCAFIHAwBSCAQAnwUEBFICBQBSAwYAUgQHAKQFBAAADCCAUgYCAFIHAwBSCAQAnwUEAIIFAAAFAwQDAwMFAwYEAAwggAARCQEYAAAAAQAAAQAAAAAAAAAAAAEAAAAAAAASAAAAAAkCAQAAEAABAw8PAgAUDwMAFA8EABQUvAIAzQAAAACfAgIE+wYAAE0FBggBAAAAUgYCAFIHAwBSCAEAnwUEBFICBQBSAwYAUgEHAKQFBAAADCCAUgYCAFIHAwBSCAEAnwUEAIIFAAAFAwQDAwMFAwYEAAwggAAXCgEYAAAAAQAAAAAAAAAAAAEAAAAAAAAYAAAAAAIAAAECBwAAAQ8AARYXowAAAP8ABAAAAAAAwAEAADABAAgBAAAAwAECABIAAAAwAQDeAwAAAMABBAASAAAAMAEAEwUAAADAAQYAEgAAADABAJwHAAAAwAEIABIAAAAwAQCwCQAAAIIAAgAKBgADAwYBAwcGAgMIBgMDCQYEAwoFAAECAwQBAAEYAAEAAQAAAwAAAAYAAAAFAAAABgAAAAUBAAAAAAWf0X5AcVcPgq0VFNQ5+3SjHDGlFAdP4OPxljAk0sSllzf7WL7QRI0w
-
-local v3 = {
-    clamp01 = function(v0, v1, v2) --[[ Line: 3 ]] --[[ Name: clamp01 ]]
-        return math.clamp(v0, 0, 1), math.clamp(v1, 0, 1), (math.clamp(v2, 0, 1));
-    end
-};
-v3.saturateBy = function(v4, v5) --[[ Line: 6 ]] --[[ Name: saturateBy ]]
-    -- upvalues: v3 (copy)
-    local v6, v7, v8 = v4:ToHSV();
-    v7 = v7 * (1 + v5);
-    local v9, v10, v11 = v3.clamp01(v6, v7, v8);
-    return Color3.fromHSV(v9, v10, v11);
-end;
-v3.saturateTo = function(v12, v13) --[[ Line: 12 ]] --[[ Name: saturateTo ]]
-    -- upvalues: v3 (copy)
-    local v14, _, v16 = v12:ToHSV();
-    local v17, v18, v19 = v3.clamp01(v14, v13, v16);
-    return Color3.fromHSV(v17, v18, v19);
-end;
-v3.brightenBy = function(v20, v21) --[[ Line: 17 ]] --[[ Name: brightenBy ]]
-    -- upvalues: v3 (copy)
-    local v22, v23, v24 = v20:ToHSV();
-    v24 = v24 * (1 + v21);
-    local v25, v26, v27 = v3.clamp01(v22, v23, v24);
-    return Color3.fromHSV(v25, v26, v27);
-end;
-v3.brightenTo = function(v28, v29) --[[ Line: 23 ]] --[[ Name: brightenTo ]]
-    -- upvalues: v3 (copy)
-    local v30, v31, _ = v28:ToHSV();
-    local v33, v34, v35 = v3.clamp01(v30, v31, v29);
-    return Color3.fromHSV(v33, v34, v35);
-end;
-return v3;
+local t = {
+	clamp01 = function(p1, p2, p3) --[[ Name: clamp01 | Line: 3 ]]
+		return math.clamp(p1, 0, 1), math.clamp(p2, 0, 1), math.clamp(p3, 0, 1)
+	end
+}
+function t.saturateBy(p1, p2) --[[ Line: 6 | Upvalues: t (copy) ]]
+	local v1, v2, v3 = p1:ToHSV()
+	local v4, v5, v6 = t.clamp01(v1, v2 * (1 + p2), v3)
+	return Color3.fromHSV(v4, v5, v6)
+end
+function t.saturateTo(p1, p2) --[[ Line: 12 | Upvalues: t (copy) ]]
+	local v1, _, v2 = p1:ToHSV()
+	local v3, v4, v5 = t.clamp01(v1, p2, v2)
+	return Color3.fromHSV(v3, v4, v5)
+end
+function t.brightenBy(p1, p2) --[[ Line: 17 | Upvalues: t (copy) ]]
+	local v1, v2, v3 = p1:ToHSV()
+	local v4, v5, v6 = t.clamp01(v1, v2, v3 * (1 + p2))
+	return Color3.fromHSV(v4, v5, v6)
+end
+function t.brightenTo(p1, p2) --[[ Line: 23 | Upvalues: t (copy) ]]
+	local v1, v2, _ = p1:ToHSV()
+	local v3, v4, v5 = t.clamp01(v1, v2, p2)
+	return Color3.fromHSV(v3, v4, v5)
+end
+function t.hueBy(p1, p2) --[[ Line: 28 | Upvalues: t (copy) ]]
+	local v1, v2, v3 = p1:ToHSV()
+	local v4, v5, v6 = t.clamp01((v1 + p2) % 1, v2, v3)
+	return Color3.fromHSV(v4, v5, v6)
+end
+function t.hueTo(p1, p2) --[[ Line: 34 | Upvalues: t (copy) ]]
+	local _, v1, v2 = p1:ToHSV()
+	local v3, v4, v5 = t.clamp01(p2, v1, v2)
+	return Color3.fromHSV(v3, v4, v5)
+end
+function t.adjustBy(p1, p2, p3, p4) --[[ Line: 39 | Upvalues: t (copy) ]]
+	local v1, v2, v3 = p1:ToHSV()
+	local v4, v5, v6 = t.clamp01((v1 + p2) % 1, v2 * (1 + p3), v3 * (1 + p4))
+	return Color3.fromHSV(v4, v5, v6)
+end
+return t

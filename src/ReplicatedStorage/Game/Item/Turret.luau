@@ -1,302 +1,264 @@
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local R15IKv2_upvr = require(ReplicatedStorage.Module.R15IKv2)
-local CurrentCamera_upvr = workspace.CurrentCamera
-local Gun_upvr = require(script.Parent.Gun)
-local function _() -- Line 13, Named "RandomVector"
-    return Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit
+require(ReplicatedStorage.Std.Audio)
+local R15IKv2 = require(ReplicatedStorage.Module.R15IKv2)
+local Spring = require(ReplicatedStorage.Std.Spring)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+require(ReplicatedStorage.Inventory.InventoryItemUtils)
+local CurrentCamera = workspace.CurrentCamera
+local Gun = require(script.Parent.Gun)
+local function RandomVector() --[[ Line: 13 ]]
+	local v1 = math.random() * 2 - 1
+	local v2 = math.random() * 2 - 1
+	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
 end
-local module_upvr = {
-    __ClassName = "Turret";
+local t = {
+	__ClassName = "Turret"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Gun_upvr)
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-function module_upvr.new(arg1, arg2, arg3) -- Line 21
-    local any_new_result1_upvr = Gun_upvr.new(arg1, arg2)
-    setmetatable(any_new_result1_upvr, module_upvr)
-    any_new_result1_upvr.Maid:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg2, "TurretValue", function(arg1_2, arg2_2) -- Line 27
-        arg2_2:GiveTask(RxInstanceUtils_upvr.observeProperty(arg1_2, "Value", function(arg1_3, arg2_3) -- Line 29
-            any_new_result1_upvr.Model = arg1_3
-            arg2_3:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1_3, "BarrelMotor", function(arg1_4) -- Line 32
-                any_new_result1_upvr.BarrelMotor = arg1_4
-            end))
-            arg2_3:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1_3, "VerticalMotor", function(arg1_5) -- Line 37
-                any_new_result1_upvr.VerticalMotor = arg1_5
-            end))
-            arg2_3:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1_3, "HorizontalMotor", function(arg1_6) -- Line 42
-                any_new_result1_upvr.HorizontalMotor = arg1_6
-            end))
-            arg2_3:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1_3, "Flare", function(arg1_7, arg2_4) -- Line 47
-                arg2_4:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1_7, "ParticleEmitter", function(arg1_8) -- Line 49
-                    any_new_result1_upvr.FlareEmitter = arg1_8
-                end))
-            end))
-            arg2_3:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1_3, "Tips", function(arg1_9, arg2_5) -- Line 56
-                arg2_5:GiveTask(RxInstanceUtils_upvr.observeChildren(arg1_9, function() -- Line 57
-                    any_new_result1_upvr.Tips = arg1_9:GetChildren()
-                end))
-            end))
-            if any_new_result1_upvr.Local then
-                any_new_result1_upvr.Maid:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1_3, "UpdateHeatRemote", function(arg1_10) -- Line 67
-                    any_new_result1_upvr._updateHeatRemote = arg1_10
-                end))
-            end
-        end))
-    end))
-    any_new_result1_upvr:Setup()
-    any_new_result1_upvr:DefaultDisableCamLock()
-    return any_new_result1_upvr
+t.__index = t
+setmetatable(t, Gun)
+function t.new(p1, p2, p3) --[[ Line: 21 | Upvalues: Gun (copy), t (copy), RxInstanceUtils (copy) ]]
+	local v1 = Gun.new(p1, p2)
+	setmetatable(v1, t)
+	v1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p2, "TurretValue", function(p1, p2) --[[ Line: 27 | Upvalues: RxInstanceUtils (ref), v1 (copy) ]]
+		p2:GiveTask(RxInstanceUtils.observeProperty(p1, "Value", function(p1, p2) --[[ Line: 29 | Upvalues: v1 (ref), RxInstanceUtils (ref) ]]
+			v1.Model = p1
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "BarrelMotor", function(p1) --[[ Line: 32 | Upvalues: v1 (ref) ]]
+				v1.BarrelMotor = p1
+			end))
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "VerticalMotor", function(p1) --[[ Line: 37 | Upvalues: v1 (ref) ]]
+				v1.VerticalMotor = p1
+			end))
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "HorizontalMotor", function(p1) --[[ Line: 42 | Upvalues: v1 (ref) ]]
+				v1.HorizontalMotor = p1
+			end))
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Flare", function(p1, p2) --[[ Line: 47 | Upvalues: RxInstanceUtils (ref), v1 (ref) ]]
+				p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "ParticleEmitter", function(p1) --[[ Line: 49 | Upvalues: v1 (ref) ]]
+					v1.FlareEmitter = p1
+				end))
+			end))
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Tips", function(p1, p2) --[[ Line: 56 | Upvalues: RxInstanceUtils (ref), v1 (ref) ]]
+				p2:GiveTask(RxInstanceUtils.observeChildren(p1, function() --[[ Line: 57 | Upvalues: v1 (ref), p1 (copy) ]]
+					v1.Tips = p1:GetChildren()
+				end))
+			end))
+			if v1.Local then
+				v1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "UpdateHeatRemote", function(p1) --[[ Line: 67 | Upvalues: v1 (ref) ]]
+					v1._updateHeatRemote = p1
+				end))
+			end
+		end))
+	end))
+	v1:Setup()
+	v1:DefaultDisableCamLock()
+	return v1
 end
-local Spring_upvr = require(ReplicatedStorage.Std.Spring)
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.Setup(arg1) -- Line 83
-    arg1.IgnoreList = {arg1.Character, arg1.Model, workspace.Items}
-    arg1.LastShoot = 0
-    arg1.LastPlayerImpact = 0
-    arg1.SpringThirdMousePosition = Spring_upvr.new(Vector3.new(), Vector3.new(), 0.9, 30)
-    if arg1.Local then
-        arg1.SpringCamera = Spring_upvr.new(Vector3.new(), Vector3.new(), 0.6, 75)
-    end
-    arg1.SpringSpin = Spring_upvr.new(0, 0, 0.6, 7)
-    arg1.SpinTotal = 0
-    arg1.MouseDown = false
-    if not arg1.Tips then
-        arg1.Tips = {}
-    end
-    arg1.TipIndex = 1
-    arg1:SetupBulletEmitter()
-    if arg1.Local then
-        arg1:SetupCrossHair()
-    end
-    arg1:SetupShoot()
-    arg1.IK = R15IKv2_upvr.BuildPacketArms(arg1.Character)
-    arg1:UpdateMousePosition()
-    arg1.Maid:GiveTask(RunService_upvr.RenderStepped:Connect(function(arg1_11) -- Line 115
-        arg1:RenderStepped(arg1_11)
-    end))
-    arg1.Maid:GiveTask(RunService_upvr.Stepped:Connect(function() -- Line 118
-        arg1:Stepped()
-    end))
+function t.Setup(p1) --[[ Line: 83 | Upvalues: Spring (copy), R15IKv2 (copy), RunService (copy) ]]
+	p1.IgnoreList = { p1.Character, p1.Model, workspace.Items }
+	p1.LastShoot = 0
+	p1.LastPlayerImpact = 0
+	p1.SpringThirdMousePosition = Spring.new(Vector3.new(), Vector3.new(), 0.9, 30)
+	if p1.Local then
+		p1.SpringCamera = Spring.new(Vector3.new(), Vector3.new(), 0.6, 75)
+	end
+	p1.SpringSpin = Spring.new(0, 0, 0.6, 7)
+	p1.SpinTotal = 0
+	p1.MouseDown = false
+	if not p1.Tips then
+		p1.Tips = {}
+	end
+	p1.TipIndex = 1
+	p1:SetupBulletEmitter()
+	if p1.Local then
+		p1:SetupCrossHair()
+	end
+	p1:SetupShoot()
+	p1.IK = R15IKv2.BuildPacketArms(p1.Character)
+	p1:UpdateMousePosition()
+	p1.Maid:GiveTask(RunService.RenderStepped:Connect(function(p12) --[[ Line: 115 | Upvalues: p1 (copy) ]]
+		p1:RenderStepped(p12)
+	end))
+	p1.Maid:GiveTask(RunService.Stepped:Connect(function() --[[ Line: 118 | Upvalues: p1 (copy) ]]
+		p1:Stepped()
+	end))
 end
-module_upvr.ApplySkin = false
-module_upvr.Reload = false
-function module_upvr.BulletEmitterOnLocalHitPlayer(arg1, ...) -- Line 127
-    local tick_result1_2 = tick()
-    if 0.1 < tick_result1_2 - arg1.LastPlayerImpact then
-        arg1.LastPlayerImpact = tick_result1_2
-        Gun_upvr.BulletEmitterOnLocalHitPlayer(arg1, ...)
-    end
+t.ApplySkin = false
+t.Reload = false
+function t.BulletEmitterOnLocalHitPlayer(p1, ...) --[[ Line: 127 | Upvalues: Gun (copy) ]]
+	local v1 = tick()
+	if v1 - p1.LastPlayerImpact > 0.1 then
+		p1.LastPlayerImpact = v1
+		Gun.BulletEmitterOnLocalHitPlayer(p1, ...)
+	end
 end
-function module_upvr.TransformLocalMousePosition(arg1, arg2) -- Line 136
-    return arg1.SpringThirdMousePosition:SetTarget(arg2)
+function t.TransformLocalMousePosition(p1, p2) --[[ Line: 136 ]]
+	return p1.SpringThirdMousePosition:SetTarget(p2)
 end
-function module_upvr.UpdateArmJoints(arg1) -- Line 139
-    local IK = arg1.IK
-    local Model = arg1.Model
-    IK.RightArm = Model.RightArm.Position
-    IK.LeftArm = Model.LeftArm.Position
-    R15IKv2_upvr.Arms(IK)
+function t.UpdateArmJoints(p1) --[[ Line: 139 | Upvalues: R15IKv2 (copy) ]]
+	local IK = p1.IK
+	local Model = p1.Model
+	IK.RightArm = Model.RightArm.Position
+	IK.LeftArm = Model.LeftArm.Position
+	R15IKv2.Arms(IK)
 end
-function module_upvr.UpdateCamera(arg1) -- Line 151
-    local os_clock_result1 = os.clock()
-    local var27 = os_clock_result1 - (arg1._lastCameraUpdate or os_clock_result1)
-    arg1._lastCameraUpdate = os_clock_result1
-    local any_Update_result1 = arg1.SpringCamera:Update()
-    local var29 = CurrentCamera_upvr
-    var29.CFrame *= CFrame.Angles(0, any_Update_result1.X * var27 * 60, 0) * CFrame.Angles(any_Update_result1.Y * var27 * 60, 0, 0)
+function t.UpdateCamera(p1) --[[ Line: 151 | Upvalues: CurrentCamera (copy) ]]
+	local v1 = os.clock()
+	local v2 = v1 - (p1._lastCameraUpdate or v1)
+	p1._lastCameraUpdate = v1
+	local v3 = p1.SpringCamera:Update()
+	local v4 = CurrentCamera
+	v4.CFrame = v4.CFrame * (CFrame.Angles(0, v3.X * v2 * 60, 0) * CFrame.Angles(v3.Y * v2 * 60, 0, 0))
 end
-function module_upvr.RenderStepped(arg1, arg2) -- Line 160
-    arg1:UpdateMousePosition()
-    if arg1.Local then
-        arg1:UpdateCrossHair()
-        arg1:UpdateCamera()
-    end
+function t.RenderStepped(p1, p2) --[[ Line: 160 ]]
+	p1:UpdateMousePosition()
+	if p1.Local then
+		p1:UpdateCrossHair()
+		p1:UpdateCamera()
+	end
 end
-function module_upvr.Shoot(arg1) -- Line 170
-    local var30 = arg1.Tips[arg1.TipIndex]
-    arg1.Tip = var30
-    arg1.BulletEmitter:Emit(var30.Position, var30.CFrame.lookVector, arg1.Config.BulletSpeed)
-    arg1.TipIndex = arg1.TipIndex % #arg1.Tips + 1
-    if arg1.Local then
-        arg1.CrossHair.Spring:Accelerate(200)
-        arg1.SpringCamera:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * math.clamp(20 / (arg1.Model.Back.Position - CurrentCamera_upvr.CFrame.p).Magnitude, 0.1, 1) * 0.15 * 15)
-    end
+function t.Shoot(p1) --[[ Line: 170 | Upvalues: CurrentCamera (copy) ]]
+	local v1 = p1.Tips[p1.TipIndex]
+	p1.Tip = v1
+	p1.BulletEmitter:Emit(v1.Position, v1.CFrame.lookVector, p1.Config.BulletSpeed)
+	p1.TipIndex = p1.TipIndex % #p1.Tips + 1
+	if p1.Local then
+		p1.CrossHair.Spring:Accelerate(200)
+		local v3 = math.clamp(20 / (p1.Model.Back.Position - CurrentCamera.CFrame.p).Magnitude, 0.1, 1)
+		p1.SpringCamera:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * v3 * 0.15 * 15)
+	end
 end
-function module_upvr.ShootCheckConditions(arg1) -- Line 185
-    return true
+function t.ShootCheckConditions(p1) --[[ Line: 185 ]]
+	return true
 end
-function module_upvr.AnimateBarrel(arg1, arg2, arg3) -- Line 188
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if not arg1.Model then
-    else
-        local tick_result1 = tick()
-        if arg1.Sound then
-            arg1.Sound.Volume = arg3
-        end
-        local MaxHeat = arg1.Config.MaxHeat
-        local var33
-        if 0.6 <= arg3 and var33 < MaxHeat then
-            if not arg1.FlareEmitter.Enabled then
-                arg1.FlareEmitter.Enabled = true
-            end
-            if 1 / (10 + 30 * arg3) < tick_result1 - arg1.LastShoot then
-                var33 += arg2
-                if MaxHeat <= var33 then
-                    var33 += 3
-                    arg1:InputEnded({
-                        UserInputType = Enum.UserInputType.MouseButton1;
-                    })
-                end
-                arg1.LastShoot = tick_result1
-                if arg1.Local then
-                    arg1:_attemptShoot()
-                    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                end
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-        else
-            if arg1.FlareEmitter.Enabled then
-                arg1.FlareEmitter.Enabled = false
-            end
-            if 0 < var33 then
-                var33 -= arg2
-            end
-            if var33 < 0 then
-                var33 = 0
-            end
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        arg1.Model.Barrel.Color = arg1.Config.ColorNormal:Lerp(arg1.Config.ColorHeat, math.clamp(var33, 0, MaxHeat) / MaxHeat)
-        arg1.Model:SetAttribute("Heat", var33)
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end
+function t.AnimateBarrel(p1, p2, p3) --[[ Line: 188 ]]
+	if p1.Model then
+		local v1 = tick()
+		if p1.Sound then
+			p1.Sound.Volume = p3
+		end
+		local MaxHeat = p1.Config.MaxHeat
+		local sum = p1.Model:GetAttribute("Heat")
+		if p3 >= 0.6 and sum < MaxHeat then
+			if not p1.FlareEmitter.Enabled then
+				p1.FlareEmitter.Enabled = true
+			end
+			if 1 / (10 + 30 * p3) < v1 - p1.LastShoot then
+				sum = sum + p2
+				if MaxHeat <= sum then
+					p1:InputEnded({
+						UserInputType = Enum.UserInputType.MouseButton1
+					})
+					sum = sum + 3
+				end
+				p1.LastShoot = v1
+				if p1.Local then
+					p1:_attemptShoot()
+				end
+			end
+		else
+			if p1.FlareEmitter.Enabled then
+				p1.FlareEmitter.Enabled = false
+			end
+			if sum > 0 then
+				sum = sum - p2
+			end
+			if sum < 0 then
+				sum = 0
+			end
+		end
+		p1.Model.Barrel.Color = p1.Config.ColorNormal:Lerp(p1.Config.ColorHeat, math.clamp(sum, 0, MaxHeat) / MaxHeat)
+		p1.Model:SetAttribute("Heat", sum)
+	end
 end
-function module_upvr.Stepped(arg1) -- Line 234
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var35
-    if not arg1.Model then
-    else
-        if not arg1.HorizontalMotor then return end
-        if not arg1.BarrelMotor then return end
-        if not arg1.VerticalMotor then return end
-        local tick_result1_3 = tick()
-        local var37 = tick_result1_3 - (arg1.LastUpdate or tick_result1_3)
-        arg1.LastUpdate = tick_result1_3
-        local any_PointToObjectSpace_result1 = arg1.Model.Root.CFrame:PointToObjectSpace(arg1.MousePosition)
-        local x = any_PointToObjectSpace_result1.x
-        local z = any_PointToObjectSpace_result1.z
-        local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var35 = math.atan(x / z)
-            return var35
-        end
-        if z >= 0 or not decompInlinedCondition() then
-            var35 = math.pi - math.atan(-x / z)
-        end
-        local var43 = z * math.cos(var35) + x * math.sin(var35)
-        local var44 = any_PointToObjectSpace_result1.y - arg1.Model.AxisV.Position.Y + arg1.Model.Root.Position.Y
-        if var43 >= 0 or not math.atan(-var44 / var43) then
-        end
-        var35 = (var35 + math.pi) % (-math.pi*2) - math.pi
-        local clamped_2 = math.clamp(math.atan(var44 / var43), -0.47123889803846897, 0.6283185307179586)
-        local clamped = math.clamp(clamped_2, -0.25132741228718347, 0.3141592653589793)
-        arg1.JointWaist.Transform = CFrame.Angles(-clamped * 0.1, 0, 0)
-        arg1.JointNeck.Transform = CFrame.Angles(clamped, 0, 0)
-        local any_Update_result1_2 = arg1.SpringSpin:Update()
-        local var48 = arg1.SpinTotal + var37 * any_Update_result1_2
-        if (-math.pi*2) < var48 then
-            var48 -= (-math.pi*2)
-        end
-        arg1.SpinTotal = var48
-        arg1.BarrelMotor.C1 = CFrame.Angles(0, 0, -16 * var48)
-        arg1.VerticalMotor.C1 = CFrame.Angles(clamped_2, 0, 0)
-        arg1.HorizontalMotor.C1 = CFrame.Angles(0, var35, 0)
-        arg1:UpdateArmJoints()
-        arg1:AnimateBarrel(var37, any_Update_result1_2)
-    end
+function t.Stepped(p1) --[[ Line: 234 ]]
+	if p1.Model and (p1.HorizontalMotor and p1.BarrelMotor) then
+		if p1.VerticalMotor then
+			local v1 = tick()
+			local v2 = v1 - (p1.LastUpdate or v1)
+			p1.LastUpdate = v1
+			local v3 = p1.Model.Root.CFrame:PointToObjectSpace(p1.MousePosition)
+			local x = v3.x
+			local z = v3.z
+			local v4 = z < 0 and math.atan(x / z) or math.pi - math.atan(-x / z)
+			local v5 = z * math.cos(v4) + x * math.sin(v4)
+			local v6 = v3.y - p1.Model.AxisV.Position.Y + p1.Model.Root.Position.Y
+			local v9 = math.clamp(v5 < 0 and math.atan(-v6 / v5) or math.atan(v6 / v5), -0.47123889803846897, 0.6283185307179586)
+			local v10 = math.clamp(v9, -0.25132741228718347, 0.3141592653589793)
+			p1.JointWaist.Transform = CFrame.Angles(-v10 * 0.1, 0, 0)
+			p1.JointNeck.Transform = CFrame.Angles(v10, 0, 0)
+			local v11 = p1.SpringSpin:Update()
+			local sum = p1.SpinTotal + v2 * v11
+			if sum > 6.283185307179586 then
+				sum = sum - 6.283185307179586
+			end
+			p1.SpinTotal = sum
+			p1.BarrelMotor.C1 = CFrame.Angles(0, 0, -16 * sum)
+			p1.VerticalMotor.C1 = CFrame.Angles(v9, 0, 0)
+			p1.HorizontalMotor.C1 = CFrame.Angles(0, (v4 + math.pi) % 6.283185307179586 - math.pi, 0)
+			p1:UpdateArmJoints()
+			p1:AnimateBarrel(v2, v11)
+		end
+	end
 end
-function module_upvr.Heartbeat(arg1) -- Line 286
+function t.Heartbeat(p1) --[[ Line: 286 ]] end
+function t.InputBegan(p1, p2, p3) --[[ Line: 287 ]]
+	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		if p1.Model:GetAttribute("Heat") < p1.Config.MaxHeat then
+			p1.SpringSpin:SetTarget(1)
+			p1.MouseDown = true
+			if not p1.Sound then
+				local Sound = Instance.new("Sound")
+				Sound.SoundId = "rbxassetid://2198390391"
+				Sound.Volume = 0
+				Sound.Looped = true
+				Sound.Parent = p1.Model.Barrel
+				Sound:Play()
+				p1.Sound = Sound
+			end
+		end
+		if p1.Local then
+			p1:BroadcastInputBegan(p2)
+		end
+	end
 end
-function module_upvr.InputBegan(arg1, arg2, arg3) -- Line 287
-    local var51 = true
-    if arg2.UserInputType ~= Enum.UserInputType.MouseButton1 then
-        var51 = false
-        if arg2.UserInputType == Enum.UserInputType.Gamepad1 then
-            if arg2.KeyCode ~= Enum.KeyCode.ButtonR2 then
-                var51 = false
-            else
-                var51 = true
-            end
-        end
-    end
-    if var51 then
-        if arg1.Model:GetAttribute("Heat") < arg1.Config.MaxHeat then
-            arg1.SpringSpin:SetTarget(1)
-            arg1.MouseDown = true
-            if not arg1.Sound then
-                local Sound_2 = Instance.new("Sound")
-                Sound_2.SoundId = "rbxassetid://2198390391"
-                Sound_2.Volume = 0
-                Sound_2.Looped = true
-                Sound_2.Parent = arg1.Model.Barrel
-                Sound_2:Play()
-                arg1.Sound = Sound_2
-            end
-        end
-        if arg1.Local then
-            arg1:BroadcastInputBegan(arg2)
-        end
-    end
+function t.InputEnded(p1, p2, p3) --[[ Line: 312 ]]
+	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		p1.SpringSpin:SetTarget(0)
+		p1.MouseDown = false
+		delay(0.5, function() --[[ Line: 320 | Upvalues: p1 (copy) ]]
+			if p1.Sound and not p1.MouseDown then
+				p1.Sound:Destroy()
+				p1.Sound = nil
+			end
+		end)
+		if p1.Local then
+			p1:BroadcastInputEnded(p2)
+		end
+	end
 end
-function module_upvr.InputEnded(arg1, arg2, arg3) -- Line 312
-    local var55 = true
-    if arg2.UserInputType ~= Enum.UserInputType.MouseButton1 then
-        var55 = false
-        if arg2.UserInputType == Enum.UserInputType.Gamepad1 then
-            if arg2.KeyCode ~= Enum.KeyCode.ButtonR2 then
-                var55 = false
-            else
-                var55 = true
-            end
-        end
-    end
-    if var55 then
-        arg1.SpringSpin:SetTarget(0)
-        arg1.MouseDown = false
-        delay(0.5, function() -- Line 320
-            if arg1.Sound and not arg1.MouseDown then
-                arg1.Sound:Destroy()
-                arg1.Sound = nil
-            end
-        end)
-        if arg1.Local then
-            arg1:BroadcastInputEnded(arg2)
-        end
-    end
+function t.Unequip(p1) --[[ Line: 331 ]]
+	if p1.FlareEmitter then
+		p1.FlareEmitter.Enabled = false
+	end
+	if p1.Model and p1.Model:FindFirstChild("Barrel") then
+		p1.Model.Barrel.Color = p1.Config.ColorNormal
+	end
+	if p1.HorizontalMotor then
+		p1.HorizontalMotor.C1 = CFrame.new()
+	end
+	if p1.VerticalMotor then
+		p1.VerticalMotor.C1 = CFrame.new()
+	end
+	if p1.BarrelMotor then
+		p1.BarrelMotor.C1 = CFrame.new()
+	end
+	p1.SpinTotal = 0
+	if p1.Local and p1._updateHeatRemote then
+		p1._updateHeatRemote:FireServer(p1.Model:GetAttribute("Heat"))
+	end
+	if p1.Sound then
+		p1.Sound:Destroy()
+		p1.Sound = nil
+	end
 end
-function module_upvr.Unequip(arg1) -- Line 331
-    if arg1.FlareEmitter then
-        arg1.FlareEmitter.Enabled = false
-    end
-    if arg1.Model and arg1.Model:FindFirstChild("Barrel") then
-        arg1.Model.Barrel.Color = arg1.Config.ColorNormal
-    end
-    if arg1.HorizontalMotor then
-        arg1.HorizontalMotor.C1 = CFrame.new()
-    end
-    if arg1.VerticalMotor then
-        arg1.VerticalMotor.C1 = CFrame.new()
-    end
-    if arg1.BarrelMotor then
-        arg1.BarrelMotor.C1 = CFrame.new()
-    end
-    arg1.SpinTotal = 0
-    if arg1.Local and arg1._updateHeatRemote then
-        arg1._updateHeatRemote:FireServer(arg1.Model:GetAttribute("Heat"))
-    end
-    if arg1.Sound then
-        arg1.Sound:Destroy()
-        arg1.Sound = nil
-    end
-end
-return module_upvr
+return t

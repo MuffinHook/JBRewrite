@@ -1,13 +1,13 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local module = {}
-local waitForChild_upvr = require(ReplicatedStorage_upvr.Std.waitForChild)
-local AirDropConsts_upvr = require(ReplicatedStorage_upvr.AirDrop.AirDropConsts)
-function module.init(arg1) -- Line 6
-    local em_upvr = arg1.em
-    waitForChild_upvr(ReplicatedStorage_upvr, AirDropConsts_upvr.FIREWORK_FX_REMOTE_NAME):andThen(function(arg1_2) -- Line 8
-        arg1_2.OnClientEvent:Connect(function() -- Line 9
-            em_upvr.at2y4lws(10)
-        end)
-    end)
-end
-return module
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local AirDropConsts = require(ReplicatedStorage.AirDrop.AirDropConsts)
+return {
+	init = function(p1) --[[ Name: init | Line: 6 | Upvalues: waitForChild (copy), ReplicatedStorage (copy), AirDropConsts (copy) ]]
+		local em = p1.em
+		waitForChild(ReplicatedStorage, AirDropConsts.FIREWORK_FX_REMOTE_NAME):andThen(function(p1) --[[ Line: 8 | Upvalues: em (copy) ]]
+			p1.OnClientEvent:Connect(function() --[[ Line: 9 | Upvalues: em (ref) ]]
+				em.l2atqdos(10)
+			end)
+		end)
+	end
+}

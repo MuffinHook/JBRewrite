@@ -1,63 +1,57 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local tbl_upvr = {}
-tbl_upvr.__index = tbl_upvr
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function tbl_upvr.new(arg1) -- Line 8
-    local module = {}
-    setmetatable(module, tbl_upvr)
-    module._maid = Maid_upvr.new()
-    module._obj = arg1
-    return module
+local Binder = require(ReplicatedStorage.Std.Binder)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 8 | Upvalues: t (copy), Maid (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._maid = Maid.new()
+	t2._obj = p1
+	return t2
 end
-function tbl_upvr.SetValue(arg1, arg2) -- Line 17
-    local Light = arg1._obj:FindFirstChild("Light")
-    Light:FindFirstChildWhichIsA("Light", true).Enabled = arg2
-    local var6
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var6 = Enum.Material.Neon
-        return var6
-    end
-    if not arg2 or not decompInlinedCondition() then
-        var6 = Enum.Material.SmoothPlastic
-    end
-    Light.Material = var6
+function t.SetValue(p1, p2) --[[ Line: 17 ]]
+	local Light = p1._obj:FindFirstChild("Light")
+	Light:FindFirstChildWhichIsA("Light", true).Enabled = p2
+	Light.Material = p2 and Enum.Material.Neon or Enum.Material.SmoothPlastic
 end
-function tbl_upvr.Destroy(arg1) -- Line 22
-    arg1._maid = nil
-    arg1._maid:Destroy()
-    setmetatable(arg1, nil)
+function t.Destroy(p1) --[[ Line: 22 ]]
+	local _maid = p1._maid
+	p1._maid = nil
+	_maid:Destroy()
+	setmetatable(p1, nil)
 end
-local module_2_upvr = {
-    _enabled = false;
+local t2 = {
+	_enabled = false
 }
-local Binder_upvr = require(ReplicatedStorage.Std.Binder)
-function module_2_upvr.init() -- Line 31
-    local any_new_result1 = Binder_upvr.new("Streetlight", tbl_upvr)
-    module_2_upvr._binder = any_new_result1
-    any_new_result1:GetClassAddedSignal():Connect(function(arg1) -- Line 34
-        arg1:SetValue(module_2_upvr._enabled)
-    end)
-    any_new_result1:Start()
+function t2.init() --[[ Line: 31 | Upvalues: Binder (copy), t (copy), t2 (copy) ]]
+	local v1 = Binder.new("Streetlight", t)
+	t2._binder = v1
+	v1:GetClassAddedSignal():Connect(function(p1) --[[ Line: 34 | Upvalues: t2 (ref) ]]
+		p1:SetValue(t2._enabled)
+	end)
+	v1:Start()
 end
-function module_2_upvr.SetEnabled(arg1) -- Line 39
-    module_2_upvr._enabled = arg1
-    for _, v in ipairs(module_2_upvr._binder:GetAll()) do
-        if v.SetValue then
-            v:SetValue(arg1)
-        end
-        wait(math.random() * 0.1)
-    end
+function t2.SetEnabled(p1) --[[ Line: 39 | Upvalues: t2 (copy) ]]
+	t2._enabled = p1
+	for i, v in ipairs(t2._binder:GetAll()) do
+		if v.SetValue then
+			v:SetValue(p1)
+		end
+		wait(math.random() * 0.1)
+	end
 end
-function module_2_upvr.Flicker() -- Line 48
-    for _ = 1, 10 do
-        local var26 = not true
-        for _, v_2 in ipairs(module_2_upvr._binder:GetAll()) do
-            v_2:SetValue(var26)
-        end
-        wait(0.2)
-    end
-    for _, v_3 in ipairs(module_2_upvr._binder:GetAll()) do
-        v_3:SetValue(module_2_upvr._enabled)
-    end
+function t2.Flicker() --[[ Line: 48 | Upvalues: t2 (copy) ]]
+	local v1 = true
+	for i = 1, 10 do
+		v1 = not v1
+		for i2, v in ipairs(t2._binder:GetAll()) do
+			v:SetValue(v1)
+		end
+		wait(0.2)
+	end
+	for i, v in ipairs(t2._binder:GetAll()) do
+		v:SetValue(t2._enabled)
+	end
 end
-return module_2_upvr
+return t2

@@ -1,7 +1,9 @@
-local CmdrPermission_upvr = require(game:GetService("ReplicatedStorage").CmdrExt.CmdrPermission)
-return function(arg1) -- Line 5
-    arg1:RegisterHook("BeforeRun", function(arg1_2) -- Line 6
-        if CmdrPermission_upvr.groupAllowed(arg1_2.Executor, arg1_2.Group) then return end
-        return "You don't have permission to run this command"
-    end)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CmdrPermission = require(ReplicatedStorage.CmdrExt.CmdrPermission)
+return function(p1) --[[ Line: 5 | Upvalues: CmdrPermission (copy) ]]
+	p1:RegisterHook("BeforeRun", function(p1) --[[ Line: 6 | Upvalues: CmdrPermission (ref) ]]
+		if not CmdrPermission.groupAllowed(p1.Executor, p1.Group) then
+			return "You don\'t have permission to run this command"
+		end
+	end)
 end

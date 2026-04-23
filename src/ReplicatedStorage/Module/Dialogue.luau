@@ -1,112 +1,99 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Signal_upvr = require(ReplicatedStorage.Std.Signal)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function module_upvr.new() -- Line 9
-    local module = {}
-    setmetatable(module, module_upvr)
-    module.Maid = Maid_upvr.new()
-    module.OnMessage = Signal_upvr.new()
-    module.ListEventUnconnected = {}
-    module.MapEventSignal = {}
-    module.Speed = 1
-    return module
+local RunService = game:GetService("RunService")
+local Signal = require(ReplicatedStorage.Std.Signal)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Timeline = require(ReplicatedStorage.Module.Timeline)
+local t = {}
+t.__index = t
+function t.new() --[[ Line: 9 | Upvalues: t (copy), Maid (copy), Signal (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2.Maid = Maid.new()
+	t2.OnMessage = Signal.new()
+	t2.ListEventUnconnected = {}
+	t2.MapEventSignal = {}
+	t2.Speed = 1
+	return t2
 end
-local Timeline_upvr = require(ReplicatedStorage.Module.Timeline)
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.Run(arg1) -- Line 23
-    if not arg1.BornAt then
-        arg1.BornAt = workspace:GetServerTimeNow()
-    end
-    local var9_upvw = 0
-    local any_new_result1_upvw = Timeline_upvr.new(arg1.Seqs)
-    arg1.Maid:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 30
-        local workspace_GetServerTimeNow_result1 = workspace:GetServerTimeNow()
-        if 0.5 < workspace_GetServerTimeNow_result1 - var9_upvw then
-            var9_upvw = workspace_GetServerTimeNow_result1
-            if any_new_result1_upvw:Update(arg1.Speed * (workspace_GetServerTimeNow_result1 - arg1.BornAt)) then
-                any_new_result1_upvw = nil
-                arg1:Destroy()
-            end
-        end
-    end))
+function t.Run(p1) --[[ Line: 23 | Upvalues: Timeline (copy), RunService (copy) ]]
+	local v1 = Timeline.new(p1.Seqs)
+	if not p1.BornAt then
+		p1.BornAt = workspace:GetServerTimeNow()
+	end
+	local v2 = 0
+	p1.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 30 | Upvalues: v2 (ref), v1 (ref), p1 (copy) ]]
+		local v12 = workspace:GetServerTimeNow()
+		if v12 - v2 > 0.5 then
+			v2 = v12
+			if v1:Update(p1.Speed * (v12 - p1.BornAt)) then
+				v1 = nil
+				p1:Destroy()
+			end
+		end
+	end))
 end
-function module_upvr.SetBornAt(arg1, arg2) -- Line 43
-    arg1.BornAt = arg2
+function t.SetBornAt(p1, p2) --[[ Line: 43 ]]
+	p1.BornAt = p2
 end
-function module_upvr.SetSpeed(arg1, arg2) -- Line 46
-    arg1.Speed = arg2
+function t.SetSpeed(p1, p2) --[[ Line: 46 ]]
+	p1.Speed = p2
 end
-function module_upvr.LoadData(arg1, arg2) -- Line 49
-    local var21
-    if arg1.Data ~= nil then
-        var21 = false
-    else
-        var21 = true
-    end
-    assert(var21)
-    arg1.Data = arg2
-    local tbl = {}
-    var21 = ipairs(arg2)
-    for _, v_upvr in ipairs(arg2) do
-        local var26
-        if v_upvr.Duration == nil then
-            var26 = false
-        else
-            var26 = true
-        end
-        assert(var26)
-        var26 = {}
-        var26[1] = function(arg1_2) -- Line 55, Named "Callback"
-            if arg1_2 == 0 then
-                arg1.OnMessage:Fire(v_upvr)
-                if v_upvr.Events ~= nil then
-                    for _, v_2 in ipairs(v_upvr.Events) do
-                        if arg1.MapEventSignal[v_2] == nil then
-                            error(string.format("Missing signal for event: %s", v_2))
-                        end
-                        arg1.MapEventSignal[v_2]:Fire(v_upvr)
-                    end
-                end
-            end
-        end
-        var26[2] = v_upvr.Duration
-        table.insert(tbl, var26)
-        if v_upvr.Events ~= nil then
-            for _, v_3 in ipairs(v_upvr.Events) do
-                if arg1.MapEventSignal[v_3] ~= nil then
-                    error(string.format("There already exists an event named: %s", v_3))
-                end
-                local any_new_result1 = Signal_upvr.new()
-                arg1.MapEventSignal[v_3] = any_new_result1
-                arg1.Maid:GiveTask(any_new_result1)
-                table.insert(arg1.ListEventUnconnected, v_3)
-            end
-        end
-    end
-    arg1.Seqs = tbl
+function t.LoadData(p1, p2) --[[ Line: 49 | Upvalues: Signal (copy) ]]
+	assert(p1.Data == nil)
+	p1.Data = p2
+	local t = {}
+	for i, v in ipairs(p2) do
+		local v2
+		v2 = v.Duration ~= nil
+		assert(v2)
+		table.insert(t, { function(p12) --[[ Name: Callback | Line: 55 | Upvalues: p1 (copy), v (copy) ]]
+				if p12 == 0 then
+					p1.OnMessage:Fire(v)
+					if v.Events ~= nil then
+						for i, v2 in ipairs(v.Events) do
+							if p1.MapEventSignal[v2] == nil then
+								error(("Missing signal for event: %s"):format(v2))
+							end
+							p1.MapEventSignal[v2]:Fire(v)
+						end
+					end
+				end
+			end, v.Duration })
+		if v.Events ~= nil then
+			for i2, v3 in ipairs(v.Events) do
+				if p1.MapEventSignal[v3] ~= nil then
+					error(("There already exists an event named: %s"):format(v3))
+				end
+				local v32 = Signal.new()
+				p1.MapEventSignal[v3] = v32
+				p1.Maid:GiveTask(v32)
+				table.insert(p1.ListEventUnconnected, v3)
+			end
+		end
+	end
+	p1.Seqs = t
 end
-function module_upvr.Connect(arg1, arg2, arg3) -- Line 87
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local _ = #arg1.ListEventUnconnected
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [18.1157629005]
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.Connect(p1, p2, p3) --[[ Line: 87 ]]
+	for i = #p1.ListEventUnconnected, 1, -1 do
+		if p1.ListEventUnconnected[i] == p2 then
+			table.remove(p1.ListEventUnconnected, i)
+			break
+		end
+	end
+	if p1.MapEventSignal[p2] == nil then
+		error(("No signal exists for event: %s"):format(p2))
+	end
+	p1.MapEventSignal[p2]:Connect(p3)
 end
-function module_upvr.VerifyAllConnected(arg1) -- Line 99
-    if 0 < #arg1.ListEventUnconnected then
-        error(string.format("Not all events are unconnected... remaining: %s", table.concat(arg1.ListEventUnconnected, ", ")))
-    end
+function t.VerifyAllConnected(p1) --[[ Line: 99 ]]
+	if #p1.ListEventUnconnected > 0 then
+		error(("Not all events are unconnected... remaining: %s"):format(table.concat(p1.ListEventUnconnected, ", ")))
+	end
 end
-function module_upvr.Destroy(arg1) -- Line 104
-    arg1.MapEventSignal = nil
-    arg1.Maid:Destroy()
-    arg1.Maid = nil
-    setmetatable(arg1, nil)
+function t.Destroy(p1) --[[ Line: 104 ]]
+	p1.MapEventSignal = nil
+	p1.Maid:Destroy()
+	p1.Maid = nil
+	setmetatable(p1, nil)
 end
-return module_upvr
+return t

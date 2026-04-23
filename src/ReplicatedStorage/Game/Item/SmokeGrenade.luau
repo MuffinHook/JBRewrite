@@ -1,109 +1,115 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SmokeGrenadeBinder_upvr = require(ReplicatedStorage.Game.SmokeGrenade.SmokeGrenadeBinder)
-local Gun_upvr = require(script.Parent.Gun)
-local function getThrowableSmokeGrenade_upvr(arg1) -- Line 12, Named "getThrowableSmokeGrenade"
-    for _, v in ipairs(SmokeGrenadeBinder_upvr:GetAll()) do
-        if v:GetCreator() == arg1 and not v:GetThrown() then
-            return v
-        end
-    end
+require(ReplicatedStorage.Module.R15IKv2)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local SimulatedPhysicsProjectile = require(ReplicatedStorage.Module.SimulatedPhysicsProjectile)
+local SmokeGrenadeBinder = require(ReplicatedStorage.Game.SmokeGrenade.SmokeGrenadeBinder)
+local Notification = require(ReplicatedStorage.Game.Notification)
+require(ReplicatedStorage.Inventory.InventoryItemUtils)
+local Gun = require(script.Parent.Gun)
+local function getThrowableSmokeGrenade(p1) --[[ Line: 12 | Upvalues: SmokeGrenadeBinder (copy) ]]
+	for i, v in ipairs((SmokeGrenadeBinder:GetAll())) do
+		if v:GetCreator() == p1 and not v:GetThrown() then
+			return v
+		end
+	end
 end
-local function getNumActiveSmokeGrenade_upvr(arg1) -- Line 22, Named "getNumActiveSmokeGrenade"
-    local var16
-    for _, v_2 in ipairs(SmokeGrenadeBinder_upvr:GetAll()) do
-        if v_2:GetCreator() == arg1 and v_2:GetThrown() then
-            var16 += 1
-        end
-    end
-    return var16
+local function getNumActiveSmokeGrenade(p1) --[[ Line: 22 | Upvalues: SmokeGrenadeBinder (copy) ]]
+	local count = 0
+	for i, v in ipairs((SmokeGrenadeBinder:GetAll())) do
+		if v:GetCreator() == p1 and v:GetThrown() then
+			count = count + 1
+		end
+	end
+	return count
 end
-local function _() -- Line 34, Named "randomVector"
-    return Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit
+local function randomVector() --[[ Line: 34 ]]
+	local v1 = math.random() * 2 - 1
+	local v2 = math.random() * 2 - 1
+	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
 end
-local var17_upvw
-local module_upvr = {
-    __ClassName = "SmokeGrenade";
+local v2 = nil
+local t = {
+	__ClassName = "SmokeGrenade"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Gun_upvr)
-function module_upvr.Init(arg1) -- Line 44
-    var17_upvw = arg1.Event
+t.__index = t
+setmetatable(t, Gun)
+function t.Init(p1) --[[ Line: 44 | Upvalues: v2 (ref) ]]
+	v2 = p1.Event
 end
-function module_upvr.new(arg1, arg2, arg3) -- Line 47
-    local any_new_result1 = Gun_upvr.new(arg1, arg2, arg3)
-    setmetatable(any_new_result1, module_upvr)
-    any_new_result1:Setup(arg3)
-    return any_new_result1
+function t.new(p1, p2, p3) --[[ Line: 47 | Upvalues: Gun (copy), t (copy) ]]
+	local v1 = Gun.new(p1, p2, p3)
+	setmetatable(v1, t)
+	v1:Setup(p3)
+	return v1
 end
-module_upvr.ApplySkin = false
-function module_upvr.SetupArmWelds(arg1) -- Line 55
+t.ApplySkin = false
+function t.SetupArmWelds(p1) --[[ Line: 55 ]] end
+function t.UpdateArmIK(p1) --[[ Line: 56 ]]
+	local IK = p1.IK
+	IK.RightArm = p1.Model.Model.Hold.Position
+	IK.RightAngle = p1.Config.Motion.RightElbowAngle
 end
-function module_upvr.UpdateArmIK(arg1) -- Line 56
-    local IK = arg1.IK
-    IK.RightArm = arg1.Model.Model.Hold.Position
-    IK.RightAngle = arg1.Config.Motion.RightElbowAngle
+function t.SetupTip(p1) --[[ Line: 62 ]]
+	p1.TipOffset = Vector3.new()
 end
-function module_upvr.SetupTip(arg1) -- Line 62
-    arg1.TipOffset = Vector3.new()
+function t.BulletEmitterOnLocalHitPlayer(p1) --[[ Line: 65 ]] end
+function t.ShootBegin(p1, p2) --[[ Line: 66 | Upvalues: getNumActiveSmokeGrenade (copy), Notification (copy), getThrowableSmokeGrenade (copy), SimulatedPhysicsProjectile (copy), v2 (ref) ]]
+	tick()
+	local v1
+	if p1.Local then
+		if getNumActiveSmokeGrenade(p1.Player) >= 1 then
+			Notification.new({
+				Text = "Only one active smoke grenade allowed at a time."
+			})
+			error("Too many SmokeGrenade, detonate before launching more.")
+		end
+		local v22 = getThrowableSmokeGrenade(p1.Player)
+		if not v22 then
+			error("No throwable SmokeGrenade left in pool")
+		end
+		v1 = v22
+	else
+		v1 = nil
+	end
+	if not p1:ShootCheckConditions() then
+		return false
+	end
+	if p1.Local then
+		local v3 = p1.UpperTorso.CFrame * Vector3.new(0, 0, -2)
+		local v4, _ = SimulatedPhysicsProjectile.CalculateVelocityToHitTargetWithSpeed(v3, p1.MousePosition, 100, workspace.Gravity, false)
+		v1._obj.PrimaryPart.Anchored = false
+		v1._obj:SetPrimaryPartCFrame(CFrame.new(v3, v3 + v4))
+		v1:SetVelocity(v4)
+		local v5 = -0.25 * v4:Cross(Vector3.new(0, 1, 0))
+		v1:SetRotVelocity(v5 + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 5)
+		v1:SetThrown(true)
+		v1._maid:GiveTask(function() --[[ Line: 99 ]] end)
+		p1:SetNextShotPossible()
+		p1:DecrementAmmo()
+		v2:FireServer("i" .. ("v3p4ig"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("tpzkady"):sub(2, 3):reverse():reverse():reverse() .. "6p5r")
+		p1:ReloadDropAmmoVisual()
+		delay(0.1, function() --[[ Line: 109 | Upvalues: p1 (copy) ]]
+			if p1.Destroyed then
+				return false
+			end
+			p1:ReloadRefillAmmoVisual()
+		end)
+	end
+	if p1.Local then
+		p1:BroadcastInputBegan(p2)
+	end
 end
-function module_upvr.BulletEmitterOnLocalHitPlayer(arg1) -- Line 65
+function t.ShootEnd(p1, p2) --[[ Line: 121 ]]
+	if p1.Local then
+		p1:BroadcastInputEnded(p2)
+	end
 end
-local Notification_upvr = require(ReplicatedStorage.Game.Notification)
-local SimulatedPhysicsProjectile_upvr = require(ReplicatedStorage.Module.SimulatedPhysicsProjectile)
-function module_upvr.ShootBegin(arg1, arg2) -- Line 66
-    local var23
-    if arg1.Local then
-        if 1 <= getNumActiveSmokeGrenade_upvr(arg1.Player) then
-            Notification_upvr.new({
-                Text = "Only one active smoke grenade allowed at a time.";
-            })
-            error("Too many SmokeGrenade, detonate before launching more.")
-        end
-        var23 = getThrowableSmokeGrenade_upvr(arg1.Player)
-        if not var23 then
-            error("No throwable SmokeGrenade left in pool")
-        end
-    end
-    if not arg1:ShootCheckConditions() then
-        return false
-    end
-    if arg1.Local then
-        local var25 = arg1.UpperTorso.CFrame * Vector3.new(0, 0, -2)
-        local any_CalculateVelocityToHitTargetWithSpeed_result1, _ = SimulatedPhysicsProjectile_upvr.CalculateVelocityToHitTargetWithSpeed(var25, arg1.MousePosition, 100, workspace.Gravity, false)
-        var23._obj.PrimaryPart.Anchored = false
-        var23._obj:SetPrimaryPartCFrame(CFrame.new(var25, var25 + any_CalculateVelocityToHitTargetWithSpeed_result1))
-        var23:SetVelocity(any_CalculateVelocityToHitTargetWithSpeed_result1)
-        var23:SetRotVelocity(-0.25 * any_CalculateVelocityToHitTargetWithSpeed_result1:Cross(Vector3.new(0, 1, 0)) + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 5)
-        var23:SetThrown(true)
-        var23._maid:GiveTask(function() -- Line 99
-        end)
-        arg1:SetNextShotPossible()
-        arg1:DecrementAmmo()
-        var17_upvw:FireServer('u'.."jee9w33kp2w":sub(5, 7):reverse():reverse():reverse().."".."".."h4oce":sub(3, 4):reverse():reverse():reverse().."".."".."p29p3a":sub(3, 3):reverse()..""..'2')
-        arg1:ReloadDropAmmoVisual()
-        delay(0.1, function() -- Line 109
-            if arg1.Destroyed then
-                return false
-            end
-            arg1:ReloadRefillAmmoVisual()
-        end)
-    end
-    if arg1.Local then
-        arg1:BroadcastInputBegan(arg2)
-    end
+function t.ShootSound(p1, p2) --[[ Line: 126 | Upvalues: Audio (copy) ]]
+	if p2 then
+		Audio.ObjectLocal(p1.Model.Skeleton.BoundingBox, 2121005402)
+	end
 end
-function module_upvr.ShootEnd(arg1, arg2) -- Line 121
-    if arg1.Local then
-        arg1:BroadcastInputEnded(arg2)
-    end
-end
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-function module_upvr.ShootSound(arg1, arg2) -- Line 126
-    if arg2 then
-        Audio_upvr.ObjectLocal(arg1.Model.Skeleton.BoundingBox, 2121005402)
-    end
-end
-module_upvr.ScopeBegin = false
-module_upvr.ScopeEnd = false
-module_upvr.Reload = false
-return module_upvr
+t.ScopeBegin = false
+t.ScopeEnd = false
+t.Reload = false
+return t

@@ -1,40 +1,36 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local GunShop_upvr = ReplicatedStorage.Resource.GunShop
-function module_upvr.new() -- Line 8
-    local module = {}
-    setmetatable(module, module_upvr)
-    module._maid = Maid_upvr.new()
-    local clone_upvr = GunShop_upvr.PresetSlider:Clone()
-    clone_upvr.Name = "Slider"
-    module._sliderFrame = clone_upvr
-    module._maid:GiveTask(clone_upvr)
-    local UIListLayout_upvr = clone_upvr.UIListLayout
-    module._maid:GiveTask(UIListLayout_upvr:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() -- Line 22
-        clone_upvr.CanvasSize = UDim2.new(0, UIListLayout_upvr.AbsoluteContentSize.X + 20, 1, 0)
-    end))
-    module._listItem = {}
-    return module
+local Maid = require(ReplicatedStorage.Std.Maid)
+local GunShop = ReplicatedStorage.Resource.GunShop
+local t = {}
+t.__index = t
+function t.new() --[[ Line: 8 | Upvalues: t (copy), Maid (copy), GunShop (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._maid = Maid.new()
+	local Slider = GunShop.PresetSlider:Clone()
+	Slider.Name = "Slider"
+	t2._sliderFrame = Slider
+	t2._maid:GiveTask(Slider)
+	local UIListLayout = Slider.UIListLayout
+	t2._maid:GiveTask(UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() --[[ Line: 22 | Upvalues: Slider (copy), UIListLayout (copy) ]]
+		Slider.CanvasSize = UDim2.new(0, UIListLayout.AbsoluteContentSize.X + 20, 1, 0)
+	end))
+	t2._listItem = {}
+	return t2
 end
-function module_upvr.AddItem(arg1, arg2) -- Line 31
-    local var9 = 0
-    if 0 < #arg1._listItem then
-        var9 = arg1._listItem[#arg1._listItem]:GetLayoutOrder()
-    end
-    arg2:SetLayoutOrder(var9 + 1)
-    arg2:SetParent(arg1._sliderFrame)
-    table.insert(arg1._listItem, arg2)
+function t.AddItem(p1, p2) --[[ Line: 31 ]]
+	p2:SetLayoutOrder(if #p1._listItem > 0 then p1._listItem[#p1._listItem]:GetLayoutOrder() else 0 + 1)
+	p2:SetParent(p1._sliderFrame)
+	table.insert(p1._listItem, p2)
 end
-function module_upvr.SetParent(arg1, arg2) -- Line 40
-    arg1._sliderFrame.Parent = arg2
+function t.SetParent(p1, p2) --[[ Line: 40 ]]
+	p1._sliderFrame.Parent = p2
 end
-function module_upvr.Destroy(arg1) -- Line 43
-    for _, v in ipairs(arg1._listItem) do
-        v:Destroy()
-    end
-    arg1._maid:Destroy()
-    arg1._maid = nil
+function t.Destroy(p1) --[[ Line: 43 ]]
+	for i, v in ipairs(p1._listItem) do
+		v:Destroy()
+	end
+	p1._maid:Destroy()
+	p1._maid = nil
 end
-return module_upvr
+return t

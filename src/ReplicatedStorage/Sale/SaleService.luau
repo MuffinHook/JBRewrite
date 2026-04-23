@@ -1,15 +1,16 @@
-local module = {}
-local SaleShared_upvr = require(script.Parent.SaleShared)
-local store_upvr = require(game:GetService("ReplicatedStorage").App.store)
-function module.init() -- Line 6
-    SaleShared_upvr.onSaleRefresh:Connect(function() -- Line 7
-        local any_getState_result1 = store_upvr:getState()
-        store_upvr:dispatch({
-            type = "setPage";
-            pageName = any_getState_result1.garagePage;
-            categoryName = any_getState_result1.garageCategory;
-            sortId = any_getState_result1.garageSort;
-        })
-    end)
-end
-return module
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local store = require(ReplicatedStorage.App.store)
+local SaleShared = require(script.Parent.SaleShared)
+return {
+	init = function() --[[ Name: init | Line: 6 | Upvalues: SaleShared (copy), store (copy) ]]
+		SaleShared.onSaleRefresh:Connect(function() --[[ Line: 7 | Upvalues: store (ref) ]]
+			local v1 = store:getState()
+			store:dispatch({
+				type = "setPage",
+				pageName = v1.garagePage,
+				categoryName = v1.garageCategory,
+				sortId = v1.garageSort
+			})
+		end)
+	end
+}

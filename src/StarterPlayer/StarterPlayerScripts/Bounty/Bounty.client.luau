@@ -1,3 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-require(ReplicatedStorage.Bounty.BountyBoardBinder):Start()
-require(ReplicatedStorage.Bounty.BountyBoardService).init()
+local BountyBoardBinder = require(ReplicatedStorage.Bounty.BountyBoardBinder)
+local BountyBoardService = require(ReplicatedStorage.Bounty.BountyBoardService)
+BountyBoardBinder:Start()
+BountyBoardService.init()

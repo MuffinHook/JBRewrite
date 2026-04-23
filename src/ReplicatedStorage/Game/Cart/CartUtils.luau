@@ -1,62 +1,57 @@
 return {
-    computeRail = function(arg1, arg2) -- Line 5, Named "computeRail"
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        local tbl = {
-            [arg1] = true;
-            [arg2] = true;
-        }
-        local tbl_2 = {}
-        tbl_2[1] = arg1
-        tbl_2[2] = arg2
-        local var12
-        while true do
-            local Value = arg2:FindFirstChild("_front").Value
-            local var14
-            if arg1 ~= Value then
-                var14 = false
-            else
-                var14 = true
-            end
-            if not var14 or not arg2:FindFirstChild("_back").Value then
-                local var15 = Value
-            end
-            if tbl[var15] then break end
-            tbl[var15] = true
-            table.insert(tbl_2, var15)
-        end
-        for _, v in ipairs(tbl_2) do
-            local Z = v.Size.Z
-            var12 = {}
-            table.insert(var12, Z)
-            local _
-        end
-        local _ = 1
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        if Z == var12 then
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        else
-        end
-        table.insert({}, Vector3.new(0, 1, 0))
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [117.1247202]
-        if Z == table.insert(var12, Z) then
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end;
-    calculateSegment = function(arg1, arg2) -- Line 75, Named "calculateSegment"
-        local var23 = arg2 % arg1.totalLength
-        for i_2 = 1, #arg1.listSegment do
-            if var23 - arg1.lengthCache[i_2] < 0 then
-                return i_2, var23
-            end
-        end
-    end;
-    calculatePosition = function(arg1, arg2, arg3) -- Line 85, Named "calculatePosition"
-        local var25 = arg1.listSegment[arg2]
-        return var25.Position + arg1.directionCache[arg2] * (-var25.Size.Z * 0.5 + arg3)
-    end;
+	computeRail = function(p1, p2) --[[ Name: computeRail | Line: 5 ]]
+		local t = {
+			[p1] = true,
+			[p2] = true
+		}
+		local list = { p1, p2 }
+		while true do
+			local v1, v2
+			local v3 = p2:FindFirstChild("_front").Value
+			local v4 = p2:FindFirstChild("_back").Value
+			v1 = p1 == v3
+			v2 = if v1 and v4 then v4 else v3
+			if t[v2] then
+				local sum = 0
+				local t2 = {}
+				for i, v in ipairs(list) do
+					local Z = v.Size.Z
+					table.insert(t2, Z)
+					sum = sum + Z
+				end
+				local t3 = {}
+				for i = 1, #list do
+					local v5
+					local v6 = list[i]
+					local v7 = list[(i - 1 + 1) % #list + 1]
+					local v8 = v6:FindFirstChild("_front").Value
+					v5 = if v7 == v8 then v6.CFrame.LookVector elseif v7 == v6:FindFirstChild("_back").Value then -v6.CFrame.LookVector else Vector3.new(0, 1, 0)
+					table.insert(t3, v5)
+				end
+				return {
+					listSegment = list,
+					lengthCache = t2,
+					totalLength = sum,
+					directionCache = t3
+				}
+			end
+			t[v2] = true
+			table.insert(list, v2)
+			p2, p1 = v2, p2
+		end
+	end,
+	calculateSegment = function(p1, p2) --[[ Name: calculateSegment | Line: 75 ]]
+		local v1 = p2 % p1.totalLength
+		for i = 1, #p1.listSegment do
+			local v2 = v1 - p1.lengthCache[i]
+			if v2 < 0 then
+				return i, v1
+			end
+			v1 = v2
+		end
+	end,
+	calculatePosition = function(p1, p2, p3) --[[ Name: calculatePosition | Line: 85 ]]
+		local v1 = p1.listSegment[p2]
+		return v1.Position + p1.directionCache[p2] * (-v1.Size.Z * 0.5 + p3)
+	end
 }

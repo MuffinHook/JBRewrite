@@ -1,54 +1,51 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local module = {}
-local CollectionService_upvr = game:GetService("CollectionService")
-local C4Utils_upvr = require(ReplicatedStorage_upvr.Game.C4.C4Utils)
-local Interval_upvr = require(ReplicatedStorage_upvr.Std.Interval)
-function module.init() -- Line 7
-    local DestructibleBinder_upvr = require(script.Parent.DestructibleBinder)
-    DestructibleBinder_upvr:GetClassAddedSignal():Connect(function(arg1) -- Line 9
-        local any_GetPrefab_result1 = arg1:GetPrefab()
-        if CollectionService_upvr:HasTag(any_GetPrefab_result1, "Tree") then
-            arg1._maid:GiveTask(arg1:GetOnHitSignal():Connect(function() -- Line 12
-                local MeshPart = arg1:GetInst().MeshPart
-                MeshPart.CanCollide = false
-                local clone_upvr = ReplicatedStorage_upvr.Resource.Destructible.LeavesParticle:Clone()
-                local Attachment = Instance.new("Attachment")
-                Attachment.Parent = MeshPart
-                clone_upvr.Color = ColorSequence.new(MeshPart.Color)
-                clone_upvr.Parent = Attachment
-                clone_upvr:Emit(3)
-                clone_upvr.Enabled = true
-                delay(1.5, function() -- Line 25
-                    clone_upvr.Enabled = false
-                end)
-            end))
-        else
-            if CollectionService_upvr:HasTag(any_GetPrefab_result1, "Powerline") then
-                arg1._maid:GiveTask(arg1:GetOnHitSignal():Connect(function() -- Line 30
-                    local any_GetInst_result1 = arg1:GetInst()
-                    for _, v in ipairs(any_GetInst_result1:GetChildren()) do
-                        if v:IsA("BasePart") and v.Name == "Town_Wire" then
-                            v.CanCollide = false
-                        end
-                    end
-                    local MeshPart_2 = any_GetInst_result1.MeshPart
-                    MeshPart_2.Attachment.EmitFifteen:Emit(15)
-                    MeshPart_2.Attachment.EmitOne:Emit(1)
-                end))
-                return
-            end
-            if CollectionService_upvr:HasTag(any_GetPrefab_result1, "GasPump") then
-                arg1._maid:GiveTask(arg1:GetOnHitSignal():Connect(function() -- Line 45
-                    C4Utils_upvr.explosionVisual(arg1:GetInst().Base.Position)
-                end))
-            end
-        end
-    end)
-    DestructibleBinder_upvr:Start()
-    Interval_upvr.every(2):Connect(function() -- Line 53, Named "handleInsts"
-        for i in DestructibleBinder_upvr:GetAllSet(), nil do
-            i:Update()
-        end
-    end)
-end
-return module
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Interval = require(ReplicatedStorage.Std.Interval)
+local CollectionService = game:GetService("CollectionService")
+local C4Utils = require(ReplicatedStorage.Game.C4.C4Utils)
+return {
+	init = function() --[[ Name: init | Line: 7 | Upvalues: CollectionService (copy), ReplicatedStorage (copy), C4Utils (copy), Interval (copy) ]]
+		local DestructibleBinder = require(script.Parent.DestructibleBinder)
+		DestructibleBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 9 | Upvalues: CollectionService (ref), ReplicatedStorage (ref), C4Utils (ref) ]]
+			local v1 = p1:GetPrefab()
+			if CollectionService:HasTag(v1, "Tree") then
+				p1._maid:GiveTask(p1:GetOnHitSignal():Connect(function() --[[ Line: 12 | Upvalues: p1 (copy), ReplicatedStorage (ref) ]]
+					local MeshPart = p1:GetInst().MeshPart
+					MeshPart.CanCollide = false
+					local v1 = ReplicatedStorage.Resource.Destructible.LeavesParticle:Clone()
+					local Attachment = Instance.new("Attachment")
+					Attachment.Parent = MeshPart
+					v1.Color = ColorSequence.new(MeshPart.Color)
+					v1.Parent = Attachment
+					v1:Emit(3)
+					v1.Enabled = true
+					delay(1.5, function() --[[ Line: 25 | Upvalues: v1 (copy) ]]
+						v1.Enabled = false
+					end)
+				end))
+			elseif CollectionService:HasTag(v1, "Powerline") then
+				p1._maid:GiveTask(p1:GetOnHitSignal():Connect(function() --[[ Line: 30 | Upvalues: p1 (copy) ]]
+					local v1 = p1:GetInst()
+					for i, v in ipairs(v1:GetChildren()) do
+						if v:IsA("BasePart") and v.Name == "Town_Wire" then
+							v.CanCollide = false
+						end
+					end
+					local MeshPart = v1.MeshPart
+					MeshPart.Attachment.EmitFifteen:Emit(15)
+					MeshPart.Attachment.EmitOne:Emit(1)
+				end))
+			elseif CollectionService:HasTag(v1, "GasPump") then
+				p1._maid:GiveTask(p1:GetOnHitSignal():Connect(function() --[[ Line: 45 | Upvalues: p1 (copy), C4Utils (ref) ]]
+					C4Utils.explosionVisual(p1:GetInst().Base.Position)
+				end))
+			end
+		end)
+		DestructibleBinder:Start()
+		local function handleInsts() --[[ Line: 53 | Upvalues: DestructibleBinder (copy) ]]
+			for v1 in DestructibleBinder:GetAllSet() do
+				v1:Update()
+			end
+		end
+		Interval.every(2):Connect(handleInsts)
+	end
+}

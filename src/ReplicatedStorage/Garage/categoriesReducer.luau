@@ -1,25 +1,16 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_2 = {}
-local VehicleConf_upvr = require(ReplicatedStorage.Game.Garage.VehicleConf)
-local TableUtils_upvr = require(ReplicatedStorage.Std.TableUtils)
-local GarageTranslationUtils_upvr = require(ReplicatedStorage.Garage.GarageTranslationUtils)
-function module_2.setLocalVehiclePacket(arg1, arg2) -- Line 9
-    local var6
-    if arg2.packet == nil then
-        var6 = false
-    else
-        var6 = true
-    end
-    assert(var6, "missing Packet")
-    var6 = arg2.packet
-    var6 = TableUtils_upvr
-    var6 = var6.map
-    var6 = var6(VehicleConf_upvr.GetCategoriesByModel(var6), function(arg1_2) -- Line 12
-        local module = {}
-        module.name = arg1_2
-        module.title = GarageTranslationUtils_upvr.getCategoryTitle(arg1_2)
-        return module
-    end)
-    return var6
-end
-return require(ReplicatedStorage.Rodux).createReducer({}, module_2)
+local TableUtils = require(ReplicatedStorage.Std.TableUtils)
+local GarageTranslationUtils = require(ReplicatedStorage.Garage.GarageTranslationUtils)
+local Rodux = require(ReplicatedStorage.Rodux)
+local VehicleConf = require(ReplicatedStorage.Game.Garage.VehicleConf)
+return Rodux.createReducer({}, {
+	setLocalVehiclePacket = function(p1, p2) --[[ Name: setLocalVehiclePacket | Line: 9 | Upvalues: VehicleConf (copy), TableUtils (copy), GarageTranslationUtils (copy) ]]
+		assert(p2.packet ~= nil, "missing Packet")
+		return TableUtils.map(VehicleConf.GetCategoriesByModel(p2.packet), function(p1) --[[ Line: 12 | Upvalues: GarageTranslationUtils (ref) ]]
+			return {
+				name = p1,
+				title = GarageTranslationUtils.getCategoryTitle(p1)
+			}
+		end)
+	end
+})

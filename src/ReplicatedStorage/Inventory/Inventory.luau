@@ -1,15 +1,14 @@
-local module_upvr = {}
-module_upvr.__index = module_upvr
-function module_upvr.new(arg1) -- Line 6
-    local module = {}
-    setmetatable(module, module_upvr)
-    module.obj = arg1
-    return module
+local InventoryUtils = require(script.Parent.InventoryUtils)
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 6 | Upvalues: t (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2.obj = p1
+	return t2
 end
-local InventoryUtils_upvr = require(script.Parent.InventoryUtils)
-function module_upvr.HasItem(arg1, arg2) -- Line 14
-    return InventoryUtils_upvr.doesInventoryValueHave(arg1.obj, arg2)
+function t.HasItem(p1, p2) --[[ Line: 14 | Upvalues: InventoryUtils (copy) ]]
+	return InventoryUtils.doesInventoryValueHave(p1.obj, p2)
 end
-function module_upvr.Destroy(arg1) -- Line 17
-end
-return module_upvr
+function t.Destroy(p1) --[[ Line: 17 ]] end
+return t

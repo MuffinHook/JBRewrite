@@ -1,82 +1,82 @@
-local EzUi = script:FindFirstAncestor("EzUi")
-local Roact_upvr = require(EzUi.Parent.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("ViewportFrame")
-any_extend_result1.defaultProps = {
-    size = UDim2.new(1, 0, 1, 0);
-    position = UDim2.new(0, 0, 0, 0);
-    fieldOfView = 70;
+local RunService = game:GetService("RunService")
+local v1 = script:FindFirstAncestor("EzUi")
+local Dictionary = require(v1.Dictionary)
+local Maid = require(v1.Parent.Std.Maid)
+local Roact = require(v1.Parent.Roact)
+local createElement = Roact.createElement
+local v2 = Roact.PureComponent:extend("ViewportFrame")
+v2.defaultProps = {
+	size = UDim2.new(1, 0, 1, 0),
+	position = UDim2.new(0, 0, 0, 0),
+	fieldOfView = 70
 }
-local Maid_upvr = require(EzUi.Parent.Std.Maid)
-function any_extend_result1.init(arg1) -- Line 19
-    arg1.maid = Maid_upvr.new()
-    if arg1.props.cameraRef then
-        arg1.cameraRef = arg1.props.cameraRef
-    else
-        arg1.cameraRef = Roact_upvr.createRef()
-    end
-    if arg1.props.viewportRef then
-        arg1.viewportRef = arg1.props.viewportRef
-    else
-        arg1.viewportRef = Roact_upvr.createRef()
-    end
+function v2.init(p1) --[[ Line: 19 | Upvalues: Maid (copy), Roact (copy) ]]
+	p1.maid = Maid.new()
+	if p1.props.cameraRef then
+		p1.cameraRef = p1.props.cameraRef
+	else
+		p1.cameraRef = Roact.createRef()
+	end
+	if p1.props.viewportRef then
+		p1.viewportRef = p1.props.viewportRef
+	else
+		p1.viewportRef = Roact.createRef()
+	end
 end
-local createElement_upvr = Roact_upvr.createElement
-local Dictionary_upvr = require(EzUi.Dictionary)
-function any_extend_result1.render(arg1) -- Line 32
-    return createElement_upvr("ViewportFrame", {
-        BackgroundColor3 = arg1.props.backgroundColor;
-        BackgroundTransparency = arg1.props.backgroundTransparency;
-        BorderSizePixel = 0;
-        Position = arg1.props.position;
-        Size = arg1.props.size;
-        AnchorPoint = arg1.props.anchorPoint;
-        ZIndex = arg1.props.zIndex;
-        Ambient = Color3.new(1, 1, 1);
-        LightColor = Color3.new(1, 1, 1);
-        CurrentCamera = arg1.cameraRef;
-        [Roact_upvr.Ref] = arg1.viewportRef;
-    }, Dictionary_upvr.merge({
-        Camera = createElement_upvr("Camera", {
-            FieldOfView = arg1.props.fieldOfView;
-            [Roact_upvr.Ref] = arg1.cameraRef;
-        });
-    }, arg1.props[Roact_upvr.Children]))
+function v2.render(p1) --[[ Line: 32 | Upvalues: createElement (copy), Roact (copy), Dictionary (copy) ]]
+	return createElement("ViewportFrame", {
+		BackgroundColor3 = p1.props.backgroundColor,
+		BackgroundTransparency = p1.props.backgroundTransparency,
+		BorderSizePixel = 0,
+		Position = p1.props.position,
+		Size = p1.props.size,
+		AnchorPoint = p1.props.anchorPoint,
+		ZIndex = p1.props.zIndex,
+		Ambient = Color3.new(255/255, 255/255, 255/255),
+		LightColor = Color3.new(255/255, 255/255, 255/255),
+		CurrentCamera = p1.cameraRef,
+		[Roact.Ref] = p1.viewportRef
+	}, Dictionary.merge({
+		Camera = createElement("Camera", {
+			FieldOfView = p1.props.fieldOfView,
+			[Roact.Ref] = p1.cameraRef
+		})
+	}, p1.props[Roact.Children]))
 end
-function any_extend_result1._updateViewport(arg1) -- Line 56
-    local inst = arg1.maid.inst
-    if inst and inst.Parent ~= nil then
-        arg1.props.updateCamera(arg1.cameraRef:getValue(), inst)
-    end
+function v2._updateViewport(p1) --[[ Line: 56 ]]
+	local v1 = p1.cameraRef:getValue()
+	local inst = p1.maid.inst
+	if inst and inst.Parent ~= nil then
+		p1.props.updateCamera(v1, inst)
+	end
 end
-function any_extend_result1._reparent(arg1) -- Line 63
-    arg1.maid.inst = nil
-    if arg1.props.getInst then
-        local any_getValue_result1_upvr = arg1.viewportRef:getValue()
-        local task_delay_result1_upvr = task.delay(math.random() * 0.1, function() -- Line 70
-            local any_getInst_result1 = arg1.props.getInst()
-            arg1.maid.inst = any_getInst_result1
-            any_getInst_result1.Parent = any_getValue_result1_upvr
-        end)
-        arg1.maid.cancelDelayThread = function() -- Line 75
-            task.cancel(task_delay_result1_upvr)
-        end
-    end
-    local _task_delay_result1_upvr = task_delay_result1_upvr
-    arg1:_updateViewport()
+function v2._reparent(p1) --[[ Line: 63 ]]
+	local v1 = p1.viewportRef:getValue()
+	p1.maid.inst = nil
+	if p1.props.getInst then
+		local v2 = task.delay(math.random() * 0.1, function() --[[ Line: 70 | Upvalues: p1 (copy), v1 (copy) ]]
+			local v12 = p1.props.getInst()
+			p1.maid.inst = v12
+			v12.Parent = v1
+		end)
+		function p1.maid.cancelDelayThread() --[[ Line: 75 | Upvalues: v2 (copy) ]]
+			task.cancel(v2)
+		end
+	end
+	p1:_updateViewport()
 end
-local RunService_upvr = game:GetService("RunService")
-function any_extend_result1.didMount(arg1) -- Line 81
-    arg1:_reparent()
-    arg1.maid.updateCamera = RunService_upvr.Heartbeat:Connect(function() -- Line 83
-        arg1:_updateViewport()
-    end)
+function v2.didMount(p1) --[[ Line: 81 | Upvalues: RunService (copy) ]]
+	p1:_reparent()
+	p1.maid.updateCamera = RunService.Heartbeat:Connect(function() --[[ Line: 83 | Upvalues: p1 (copy) ]]
+		p1:_updateViewport()
+	end)
 end
-function any_extend_result1.didUpdate(arg1, arg2) -- Line 87
-    if arg1.props.getInstCompare and arg1.props.getInstCompare ~= arg2.getInstCompare or not arg1.props.getInstCompare and arg1.props.getInst ~= arg2.getInst then
-        arg1:_reparent()
-    end
+function v2.didUpdate(p1, p2) --[[ Line: 87 ]]
+	if p1.props.getInstCompare and p1.props.getInstCompare ~= p2.getInstCompare or not p1.props.getInstCompare and p1.props.getInst ~= p2.getInst then
+		p1:_reparent()
+	end
 end
-function any_extend_result1.willUnmount(arg1) -- Line 95
-    arg1.maid:DoCleaning()
+function v2.willUnmount(p1) --[[ Line: 95 ]]
+	p1.maid:DoCleaning()
 end
-return any_extend_result1
+return v2

@@ -1,25 +1,10 @@
-return function(arg1) -- Line 1
-    local Model_5 = arg1.Model
-    if not Model_5 then return end
-    local SecondBody = Model_5:FindFirstChild("SecondBody", true)
-    if not SecondBody then
-        SecondBody = true
-        if arg1.Make ~= "Tank" then
-            SecondBody = true
-            if arg1.Make ~= "TheRattler" then
-                SecondBody = true
-                if arg1.Make ~= "MCL36" then
-                    SecondBody = true
-                    if arg1.Make ~= "MCL36FREE" then
-                        if arg1.Make ~= "Sloop" then
-                            SecondBody = false
-                        else
-                            SecondBody = true
-                        end
-                    end
-                end
-            end
-        end
-    end
-    return SecondBody
+return function(p1) --[[ Line: 1 ]]
+	local Model = p1.Model
+	if Model then
+		local SecondBody = Model:FindFirstChild("SecondBody", true)
+		if not SecondBody then
+			SecondBody = if p1.Make == "Tank" or (p1.Make == "TheRattler" or (p1.Make == "MCL36" or p1.Make == "MCL36FREE")) then true else p1.Make == "Sloop"
+		end
+		return SecondBody
+	end
 end

@@ -1,74 +1,69 @@
-local module_2 = {}
-local tbl_upvr = {}
-local random_upvr = math.random
-local function _() -- Line 8, Named "GUID"
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx":gsub("[xy]", function(arg1) -- Line 10
-        if arg1 ~= 'x' or not random_upvr(0, 15) then
-        end
-        return string.format("%x", random_upvr(8, 11))
-    end)
+local t = {}
+local t2 = {}
+local random = math.random
+local function GUID() --[[ Line: 8 | Upvalues: random (copy) ]]
+	return ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(p1) --[[ Line: 10 | Upvalues: random (ref) ]]
+		return ("%x"):format(p1 == "x" and random(0, 15) or random(8, 11))
+	end)
 end
-local function _() -- Line 15, Named "MakeListener"
-    return {
-        g = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx":gsub("[xy]", function(arg1) -- Line 10
-            if arg1 ~= 'x' or not random_upvr(0, 15) then
-            end
-            return string.format("%x", random_upvr(8, 11))
-        end);
-        Callback = nil;
-        SignalName = nil;
-    }
+local function MakeListener() --[[ Line: 15 | Upvalues: random (copy) ]]
+	return {
+		g = ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(p1) --[[ Line: 10 | Upvalues: random (ref) ]]
+			return ("%x"):format(p1 == "x" and random(0, 15) or random(8, 11))
+		end),
+		Callback = nil,
+		SignalName = nil
+	}
 end
-function module_2.Broadcast(arg1, ...) -- Line 22
-    local args_list_upvr = {...}
-    for _, v_upvr in next, tbl_upvr do
-        if v_upvr.SignalName == arg1 then
-            local pcall_result1, pcall_result2 = pcall(function() -- Line 26
-                v_upvr:Callback(unpack(args_list_upvr))
-            end)
-            if not pcall_result1 then
-                warn("SIGNAL ERROR: ", pcall_result2)
-            end
-        end
-    end
+function t.Broadcast(p1, ...) --[[ Line: 22 | Upvalues: t2 (copy) ]]
+	local t = { ... }
+	for v1, v2 in next, t2 do
+		if v2.SignalName == p1 then
+			local v3, v4 = pcall(function() --[[ Line: 26 | Upvalues: v2 (copy), t (copy) ]]
+				v2:Callback(unpack(t))
+			end)
+			if not v3 then
+				warn("SIGNAL ERROR: ", v4)
+			end
+		end
+	end
 end
-function module_2.Listen(arg1, arg2) -- Line 35
-    local module = {
-        g = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx":gsub("[xy]", function(arg1_2) -- Line 10
-            if arg1_2 ~= 'x' or not random_upvr(0, 15) then
-            end
-            return string.format("%x", random_upvr(8, 11))
-        end);
-        Callback = nil;
-        SignalName = nil;
-    }
-    module.SignalName = arg1
-    module.Callback = arg2
-    table.insert(tbl_upvr, module)
-    return module
+function t.Listen(p1, p2) --[[ Line: 35 | Upvalues: random (copy), t2 (copy) ]]
+	local t = {
+		g = ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(p1) --[[ Line: 10 | Upvalues: random (ref) ]]
+			return ("%x"):format(p1 == "x" and random(0, 15) or random(8, 11))
+		end),
+		Callback = nil,
+		SignalName = nil,
+		SignalName = p1,
+		Callback = p2
+	}
+	table.insert(t2, t)
+	return t
 end
-function module_2.Close(arg1) -- Line 42
-    for i_2, v_2 in next, tbl_upvr do
-        if v_2.g == arg1.g then
-            return table.remove(tbl_upvr, i_2)
-        end
-    end
-    return false
+function t.Close(p1) --[[ Line: 42 | Upvalues: t2 (copy) ]]
+	local g = p1.g
+	for v1, v2 in next, t2 do
+		if v2.g == g then
+			return table.remove(t2, v1)
+		end
+	end
+	return false
 end
-function module_2.Closeg(arg1) -- Line 51
-    for i_3, v_3 in next, tbl_upvr do
-        if v_3.g == arg1 then
-            return table.remove(tbl_upvr, i_3)
-        end
-    end
-    return false
+function t.Closeg(p1) --[[ Line: 51 | Upvalues: t2 (copy) ]]
+	for v1, v2 in next, t2 do
+		if v2.g == p1 then
+			return table.remove(t2, v1)
+		end
+	end
+	return false
 end
-function module_2.Closef(arg1) -- Line 59
-    for i_4, v_4 in next, tbl_upvr do
-        if v_4.Callback == arg1 then
-            return table.remove(tbl_upvr, i_4)
-        end
-    end
-    return false
+function t.Closef(p1) --[[ Line: 59 | Upvalues: t2 (copy) ]]
+	for v1, v2 in next, t2 do
+		if v2.Callback == p1 then
+			return table.remove(t2, v1)
+		end
+	end
+	return false
 end
-return module_2
+return t

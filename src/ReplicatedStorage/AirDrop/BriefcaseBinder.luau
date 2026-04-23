@@ -1,262 +1,273 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BaseObject_upvr = require(ReplicatedStorage.Std.BaseObject)
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local BriefcaseConsts_upvr = require(ReplicatedStorage.AirDrop.BriefcaseConsts)
-local BriefcaseUtils_upvr = require(ReplicatedStorage.AirDrop.BriefcaseUtils)
-local tbl_upvr_2 = {9238451278, 9238451797, 9238452703, 9238452956, 9238453431, 9238453749}
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-local RunService_upvr = game:GetService("RunService")
-local CircleAction_upvr = require(ReplicatedStorage.Module.UI).CircleAction
-local AirDropUtils_upvr = require(ReplicatedStorage.AirDrop.AirDropUtils)
-local Players_upvr = game:GetService("Players")
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-local createElement_upvr = Roact_upvr.createElement
-local BriefcaseDisplay_upvr = require(ReplicatedStorage.AirDrop.UI.BriefcaseDisplay)
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-function module_upvr.new(arg1) -- Line 35
-    local any_new_result1_upvr = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1_upvr, module_upvr)
-    any_new_result1_upvr.maid:GiveTask(RxInstanceUtils_upvr.observeAttribute(arg1, BriefcaseConsts_upvr.BORN_AT_ATTR_NAME, function(arg1_2, arg2) -- Line 44
-        if not arg1_2 then
-        else
-            any_new_result1_upvr.maid.updatePositionThread = RunService_upvr.Heartbeat:Connect(function() -- Line 48
-                any_new_result1_upvr:_update(arg1_2)
-            end)
-        end
-    end))
-    local any_getOpenDuration_result1 = BriefcaseUtils_upvr.getOpenDuration(any_new_result1_upvr.obj)
-    assert(any_getOpenDuration_result1, "No opening duration for this briefcase")
-    local tbl_upvr = {
-        Name = "Open Crate";
-        Timed = true;
-        Duration = any_getOpenDuration_result1;
-        Dist = 10;
-        Callback = function(arg1_3, arg2) -- Line 54, Named "pressCallback"
-            any_new_result1_upvr:_pressed(arg1_3, arg2)
-            if arg2 then
-                return any_new_result1_upvr:_collect()
-            end
-        end;
-        ReleaseCallback = function(arg1_4, arg2) -- Line 60, Named "releaseCallback"
-            any_new_result1_upvr:_released(arg1_4, arg2)
-        end;
-        GetAccumulation = function() -- Line 76, Named "getCurrentAccumulation"
-            return any_new_result1_upvr.obj:GetAttribute(BriefcaseConsts_upvr.BRIEFCASE_PRESS_DURATION_ACCUMULATION_ATTRIBUTE_NAME)
-        end;
-        WhilePressedUpdate = function(arg1_5) -- Line 63, Named "whilePressedUpdate"
-            local ceiled = math.ceil(arg1_5 * #tbl_upvr_2)
-            for _, v in ipairs(arg1:FindFirstChild("Walls"):GetDescendants()) do
-                if v:IsA("Decal") then
-                    if tbl_upvr_2[ceiled] then
-                        v.Texture = string.format("rbxassetid://%d", tbl_upvr_2[ceiled])
-                    else
-                        v.Texture = ""
-                    end
-                end
-            end
-        end;
-    }
-    local function onCollectedChanged() -- Line 94
-        if any_new_result1_upvr:GetCollected() then
-            tbl_upvr.Enabled = false
-            arg1:FindFirstChild("Particles"):FindFirstChild("Dust").Enabled = true
-            arg1:FindFirstChild("Particles"):FindFirstChild("Planks").Enabled = true
-            local function _() -- Line 100, Named "onFinished"
-                arg1:FindFirstChild("Particles"):FindFirstChild("Dust").Enabled = false
-                arg1:FindFirstChild("Particles"):FindFirstChild("Planks").Enabled = false
-            end
-            local os_clock_result1_upvr_2 = os.clock()
-            local var30_upvw
-            var30_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 107
-                local var31 = os.clock() - os_clock_result1_upvr_2
-                if 0.4 < var31 then
-                    var31 = 0.4
-                    var30_upvw:Disconnect()
-                    var30_upvw = nil
-                    arg1:FindFirstChild("Particles"):FindFirstChild("Dust").Enabled = false
-                    arg1:FindFirstChild("Particles"):FindFirstChild("Planks").Enabled = false
-                end
-                arg1:FindFirstChild("Particles").Transparency = var31 / 0.4
-            end)
-        end
-    end
-    onCollectedChanged()
-    any_new_result1_upvr.maid:GiveTask(any_new_result1_upvr:GetCollectedChangedSignal():Connect(onCollectedChanged))
-    local function onLandedChanged() -- Line 124
-        if any_new_result1_upvr:GetLanded() then
-            any_new_result1_upvr.maid.updatePositionThread = nil
-            tbl_upvr.Part = any_new_result1_upvr.obj.PrimaryPart
-            tbl_upvr.ValidRoot = any_new_result1_upvr.obj
-            any_new_result1_upvr.maid:GiveTask(CircleAction_upvr.Add(tbl_upvr, any_new_result1_upvr.obj))
-            any_new_result1_upvr:_update(arg1:GetAttribute(BriefcaseConsts_upvr.BORN_AT_ATTR_NAME))
-            any_new_result1_upvr.maid:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 134
-                local var33 = not AirDropUtils_upvr.getPlayerIsInAmbulanceStretcher(Players_upvr.LocalPlayer)
-                if tbl_upvr.Enabled ~= var33 then
-                    tbl_upvr.Enabled = var33
-                end
-            end))
-            local os_clock_result1_upvr = os.clock()
-            local var36_upvw
-            local Chute_upvw = arg1:FindFirstChild("Chute")
-            var36_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 149
-                local var38 = os.clock() - os_clock_result1_upvr
-                if 1 < var38 then
-                    var38 = 1
-                    var36_upvw:Disconnect()
-                    var36_upvw = nil
-                end
-                if not Chute_upvw then
-                    Chute_upvw = arg1:FindFirstChild("Chute")
-                end
-                if Chute_upvw then
-                    Chute_upvw.Transparency = var38 / 1 * 0.75
-                end
-            end)
-        end
-    end
-    onLandedChanged()
-    any_new_result1_upvr.maid:GiveTask(any_new_result1_upvr:GetLandedChangedSignal():Connect(onLandedChanged))
-    any_new_result1_upvr.maid:GivePromise(Promise_upvr.all({RxInstanceUtils_upvr.waitForChild(arg1, "RarityProbsDisplay"), RxInstanceUtils_upvr.waitForChild(arg1, BriefcaseConsts_upvr.BRIEFCASE_RARITY_PROBABILITIES_FOLDER_NAME), RxInstanceUtils_upvr.waitForChild(arg1, BriefcaseConsts_upvr.RELEASE_REMOTE_NAME), RxInstanceUtils_upvr.waitForChild(arg1, BriefcaseConsts_upvr.HOLD_UPDATE_REMOTE_NAME)}):andThen(function(arg1_6) -- Line 177
-        local any_mount_result1_upvr = Roact_upvr.mount(createElement_upvr("SurfaceGui", {
-            ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-            ResetOnSpawn = false;
-            PixelsPerStud = 16;
-            Adornee = arg1_6[1];
-            Face = Enum.NormalId.Front;
-        }, {
-            Display = createElement_upvr(BriefcaseDisplay_upvr, {
-                probsFolder = arg1_6[2];
-            });
-        }), Players_upvr.LocalPlayer.PlayerGui, "BriefcaseGui")
-        any_new_result1_upvr.maid:GiveTask(function() -- Line 192
-            Roact_upvr.unmount(any_mount_result1_upvr)
-        end)
-        any_new_result1_upvr.maid:GiveTask(arg1_6[3].OnClientEvent:Connect(function() -- Line 197
-            if tbl_upvr.Pressed then
-                tbl_upvr.ForceRelease = true
-            end
-        end))
-        local _4_upvr = arg1_6[4]
-        any_new_result1_upvr.maid:GiveTask(Interval_upvr.every(0.3333333333333333):Connect(function() -- Line 202
-            if tbl_upvr.Pressed then
-                _4_upvr:FireServer()
-            end
-        end))
-    end))
-    return any_new_result1_upvr
+local Promise = require(ReplicatedStorage.Std.Promise)
+require(ReplicatedStorage.Std.Audio)
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local Roact = require(ReplicatedStorage.Roact)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local createElement = Roact.createElement
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
+local BriefcaseConsts = require(ReplicatedStorage.AirDrop.BriefcaseConsts)
+local BriefcaseUtils = require(ReplicatedStorage.AirDrop.BriefcaseUtils)
+local BriefcaseDisplay = require(ReplicatedStorage.AirDrop.UI.BriefcaseDisplay)
+local AirDropUtils = require(ReplicatedStorage.AirDrop.AirDropUtils)
+local t = { 9238451278, 9238451797, 9238452703, 9238452956, 9238453431, 9238453749 }
+local t2 = {}
+t2.__index = t2
+setmetatable(t2, BaseObject)
+function t2.new(p1) --[[ Line: 35 | Upvalues: BaseObject (copy), t2 (copy), RxInstanceUtils (copy), BriefcaseConsts (copy), RunService (copy), t (copy), BriefcaseUtils (copy), CircleAction (copy), AirDropUtils (copy), Players (copy), Promise (copy), createElement (copy), BriefcaseDisplay (copy), Roact (copy), Interval (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t2)
+	v1.maid:GiveTask(RxInstanceUtils.observeAttribute(p1, BriefcaseConsts.BORN_AT_ATTR_NAME, function(p1, p2) --[[ Line: 44 | Upvalues: v1 (copy), RunService (ref) ]]
+		if p1 then
+			v1.maid.updatePositionThread = RunService.Heartbeat:Connect(function() --[[ Line: 48 | Upvalues: v1 (ref), p1 (copy) ]]
+				v1:_update(p1)
+			end)
+		end
+	end))
+	local function pressCallback(p1, p2) --[[ Line: 54 | Upvalues: v1 (copy) ]]
+		v1:_pressed(p1, p2)
+		if p2 then
+			return v1:_collect()
+		end
+	end
+	local function releaseCallback(p1, p2) --[[ Line: 60 | Upvalues: v1 (copy) ]]
+		v1:_released(p1, p2)
+	end
+	local function whilePressedUpdate(p12) --[[ Line: 63 | Upvalues: t (ref), p1 (copy) ]]
+		local v2 = math.ceil(p12 * #t)
+		for i, v in ipairs(p1:FindFirstChild("Walls"):GetDescendants()) do
+			if v:IsA("Decal") then
+				if t[v2] then
+					v.Texture = ("rbxassetid://%d"):format(t[v2])
+				else
+					v.Texture = ""
+				end
+			end
+		end
+	end
+	local function getCurrentAccumulation() --[[ Line: 76 | Upvalues: v1 (copy), BriefcaseConsts (ref) ]]
+		return v1.obj:GetAttribute(BriefcaseConsts.BRIEFCASE_PRESS_DURATION_ACCUMULATION_ATTRIBUTE_NAME)
+	end
+	local v3 = BriefcaseUtils.getOpenDuration(v1.obj)
+	assert(v3, "No opening duration for this briefcase")
+	local t3 = {
+		Name = "Open Crate",
+		Timed = true,
+		Duration = v3,
+		Dist = 10,
+		Callback = pressCallback,
+		ReleaseCallback = releaseCallback,
+		GetAccumulation = getCurrentAccumulation,
+		WhilePressedUpdate = whilePressedUpdate
+	}
+	local function onCollectedChanged() --[[ Line: 94 | Upvalues: v1 (copy), t3 (copy), p1 (copy), RunService (ref) ]]
+		if v1:GetCollected() then
+			t3.Enabled = false
+			p1:FindFirstChild("Particles"):FindFirstChild("Dust").Enabled = true
+			p1:FindFirstChild("Particles"):FindFirstChild("Planks").Enabled = true
+			local function onFinished() --[[ Line: 100 | Upvalues: p1 (ref) ]]
+				p1:FindFirstChild("Particles"):FindFirstChild("Dust").Enabled = false
+				p1:FindFirstChild("Particles"):FindFirstChild("Planks").Enabled = false
+			end
+			local v12 = os.clock()
+			local v2 = nil
+			v2 = RunService.Heartbeat:Connect(function() --[[ Line: 107 | Upvalues: v12 (copy), v2 (ref), p1 (ref) ]]
+				local v1 = os.clock() - v12
+				if v1 > 0.4 then
+					v1 = 0.4
+					v2:Disconnect()
+					v2 = nil
+					p1:FindFirstChild("Particles"):FindFirstChild("Dust").Enabled = false
+					p1:FindFirstChild("Particles"):FindFirstChild("Planks").Enabled = false
+				end
+				p1:FindFirstChild("Particles").Transparency = v1 / 0.4
+			end)
+		end
+	end
+	onCollectedChanged()
+	v1.maid:GiveTask(v1:GetCollectedChangedSignal():Connect(onCollectedChanged))
+	local function onLandedChanged() --[[ Line: 124 | Upvalues: v1 (copy), t3 (copy), CircleAction (ref), p1 (copy), BriefcaseConsts (ref), RunService (ref), AirDropUtils (ref), Players (ref) ]]
+		if v1:GetLanded() then
+			v1.maid.updatePositionThread = nil
+			t3.Part = v1.obj.PrimaryPart
+			t3.ValidRoot = v1.obj
+			v1.maid:GiveTask(CircleAction.Add(t3, v1.obj))
+			v1:_update(p1:GetAttribute(BriefcaseConsts.BORN_AT_ATTR_NAME))
+			v1.maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 134 | Upvalues: t3 (ref), AirDropUtils (ref), Players (ref) ]]
+				local v1 = not AirDropUtils.getPlayerIsInAmbulanceStretcher(Players.LocalPlayer)
+				if t3.Enabled ~= v1 then
+					t3.Enabled = v1
+				end
+			end))
+			local Chute = p1:FindFirstChild("Chute")
+			local v12 = os.clock()
+			local v2 = nil
+			v2 = RunService.Heartbeat:Connect(function() --[[ Line: 149 | Upvalues: v12 (copy), v2 (ref), Chute (ref), p1 (ref) ]]
+				local v1 = os.clock() - v12
+				if v1 > 1 then
+					v1 = 1
+					v2:Disconnect()
+					v2 = nil
+				end
+				local v22 = v1 / 1
+				if not Chute then
+					Chute = p1:FindFirstChild("Chute")
+				end
+				if Chute then
+					Chute.Transparency = v22 * 0.75
+				end
+			end)
+		end
+	end
+	onLandedChanged()
+	v1.maid:GiveTask(v1:GetLandedChangedSignal():Connect(onLandedChanged))
+	v1.maid:GivePromise(Promise.all({
+		RxInstanceUtils.waitForChild(p1, "RarityProbsDisplay"),
+		RxInstanceUtils.waitForChild(p1, BriefcaseConsts.BRIEFCASE_RARITY_PROBABILITIES_FOLDER_NAME),
+		RxInstanceUtils.waitForChild(p1, BriefcaseConsts.RELEASE_REMOTE_NAME),
+		RxInstanceUtils.waitForChild(p1, BriefcaseConsts.HOLD_UPDATE_REMOTE_NAME)
+	}):andThen(function(p1) --[[ Line: 177 | Upvalues: createElement (ref), BriefcaseDisplay (ref), Roact (ref), Players (ref), v1 (copy), t3 (copy), Interval (ref) ]]
+		local v4 = p1[4]
+		local v6 = Roact.mount(createElement("SurfaceGui", {
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			ResetOnSpawn = false,
+			PixelsPerStud = 16,
+			Adornee = p1[1],
+			Face = Enum.NormalId.Front
+		}, {
+			Display = createElement(BriefcaseDisplay, {
+				probsFolder = p1[2]
+			})
+		}), Players.LocalPlayer.PlayerGui, "BriefcaseGui")
+		v1.maid:GiveTask(function() --[[ Line: 192 | Upvalues: Roact (ref), v6 (copy) ]]
+			Roact.unmount(v6)
+		end)
+		v1.maid:GiveTask(p1[3].OnClientEvent:Connect(function() --[[ Line: 197 | Upvalues: t3 (ref) ]]
+			if t3.Pressed then
+				t3.ForceRelease = true
+			end
+		end))
+		v1.maid:GiveTask(Interval.every(0.3333333333333333):Connect(function() --[[ Line: 202 | Upvalues: t3 (ref), v4 (copy) ]]
+			if t3.Pressed then
+				v4:FireServer()
+			end
+		end))
+	end))
+	return v1
 end
-function module_upvr._collect(arg1) -- Line 212
-    arg1.obj:FindFirstChild(BriefcaseConsts_upvr.COLLECT_REMOTE_NAME):FireServer()
-    return true
+function t2._collect(p1) --[[ Line: 212 | Upvalues: BriefcaseConsts (copy) ]]
+	p1.obj:FindFirstChild(BriefcaseConsts.COLLECT_REMOTE_NAME):FireServer()
+	return true
 end
-function module_upvr._pressed(arg1, arg2, arg3) -- Line 216
-    arg1.obj:FindFirstChild(BriefcaseConsts_upvr.PRESS_REMOTE_NAME):FireServer(arg3)
-    return true
+function t2._pressed(p1, p2, p3) --[[ Line: 216 | Upvalues: BriefcaseConsts (copy) ]]
+	p1.obj:FindFirstChild(BriefcaseConsts.PRESS_REMOTE_NAME):FireServer(p3)
+	return true
 end
-function module_upvr._released(arg1, arg2, arg3) -- Line 220
-    arg1.obj:FindFirstChild(BriefcaseConsts_upvr.RELEASE_REMOTE_NAME):FireServer(arg3)
-    return true
+function t2._released(p1, p2, p3) --[[ Line: 220 | Upvalues: BriefcaseConsts (copy) ]]
+	p1.obj:FindFirstChild(BriefcaseConsts.RELEASE_REMOTE_NAME):FireServer(p3)
+	return true
 end
-function module_upvr._update(arg1, arg2) -- Line 224
-    local var49 = workspace:GetServerTimeNow() - arg2
-    local any_GetDuration_result1 = arg1:GetDuration()
-    if any_GetDuration_result1 < var49 then
-        var49 = any_GetDuration_result1
-    end
-    if not arg1.obj.PrimaryPart then
-    else
-        arg1.obj:PivotTo(arg1:GetCFrameAt(var49) * CFrame.new(0, arg1.obj.PrimaryPart.Size.Y * 0.5, 0))
-    end
+function t2._update(p1, p2) --[[ Line: 224 ]]
+	local v1 = workspace:GetServerTimeNow() - p2
+	local v2 = p1:GetDuration()
+	if v2 < v1 then
+		v1 = v2
+	end
+	if p1.obj.PrimaryPart then
+		local v3 = p1:GetCFrameAt(v1)
+		p1.obj:PivotTo(v3 * CFrame.new(0, p1.obj.PrimaryPart.Size.Y * 0.5, 0))
+	end
 end
-function module_upvr.SetOrigin(arg1, arg2) -- Line 243
-    return BriefcaseUtils_upvr.setOrigin(arg1.obj, arg2)
+function t2.SetOrigin(p1, p2) --[[ Line: 243 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.setOrigin(p1.obj, p2)
 end
-function module_upvr.GetOrigin(arg1) -- Line 246
-    return BriefcaseUtils_upvr.getOrigin(arg1.obj)
+function t2.GetOrigin(p1) --[[ Line: 246 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.getOrigin(p1.obj)
 end
-function module_upvr.SetTarget(arg1, arg2) -- Line 249
-    return BriefcaseUtils_upvr.setTarget(arg1.obj, arg2)
+function t2.SetTarget(p1, p2) --[[ Line: 249 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.setTarget(p1.obj, p2)
 end
-function module_upvr.GetTarget(arg1) -- Line 252
-    return BriefcaseUtils_upvr.getTarget(arg1.obj)
+function t2.GetTarget(p1) --[[ Line: 252 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.getTarget(p1.obj)
 end
-function module_upvr.SetTargetNormal(arg1, arg2) -- Line 255
-    return BriefcaseUtils_upvr.setTargetNormal(arg1.obj, arg2)
+function t2.SetTargetNormal(p1, p2) --[[ Line: 255 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.setTargetNormal(p1.obj, p2)
 end
-function module_upvr.GetTargetNormal(arg1) -- Line 258
-    return BriefcaseUtils_upvr.getTargetNormal(arg1.obj)
+function t2.GetTargetNormal(p1) --[[ Line: 258 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.getTargetNormal(p1.obj)
 end
-function module_upvr.SetSpeed(arg1, arg2) -- Line 261
-    return BriefcaseUtils_upvr.setSpeed(arg1.obj, arg2)
+function t2.SetSpeed(p1, p2) --[[ Line: 261 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.setSpeed(p1.obj, p2)
 end
-function module_upvr.GetSpeed(arg1) -- Line 264
-    return BriefcaseUtils_upvr.getSpeed(arg1.obj)
+function t2.GetSpeed(p1) --[[ Line: 264 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.getSpeed(p1.obj)
 end
-function module_upvr.SetBornAt(arg1, arg2) -- Line 267
-    return BriefcaseUtils_upvr.setBornAt(arg1.obj, arg2)
+function t2.SetBornAt(p1, p2) --[[ Line: 267 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.setBornAt(p1.obj, p2)
 end
-function module_upvr.GetBornAt(arg1) -- Line 270
-    return BriefcaseUtils_upvr.getBornAt(arg1.obj)
+function t2.GetBornAt(p1) --[[ Line: 270 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.getBornAt(p1.obj)
 end
-function module_upvr.SetLanded(arg1, arg2) -- Line 273
-    return BriefcaseUtils_upvr.setLanded(arg1.obj, arg2)
+function t2.SetLanded(p1, p2) --[[ Line: 273 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.setLanded(p1.obj, p2)
 end
-function module_upvr.GetLanded(arg1) -- Line 276
-    return BriefcaseUtils_upvr.getLanded(arg1.obj)
+function t2.GetLanded(p1) --[[ Line: 276 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.getLanded(p1.obj)
 end
-function module_upvr.GetLandedChangedSignal(arg1) -- Line 279
-    return BriefcaseUtils_upvr.getLandedChangedSignal(arg1.obj)
+function t2.GetLandedChangedSignal(p1) --[[ Line: 279 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.getLandedChangedSignal(p1.obj)
 end
-function module_upvr.SetLandedTime(arg1, arg2) -- Line 282
-    return BriefcaseUtils_upvr.setLandedTime(arg1.obj, arg2)
+function t2.SetLandedTime(p1, p2) --[[ Line: 282 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.setLandedTime(p1.obj, p2)
 end
-function module_upvr.GetLandedTime(arg1) -- Line 285
-    return BriefcaseUtils_upvr.getLandedTime(arg1.obj)
+function t2.GetLandedTime(p1) --[[ Line: 285 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.getLandedTime(p1.obj)
 end
-function module_upvr.SetRarityProbabilities(arg1, arg2) -- Line 288
-    return BriefcaseUtils_upvr.setRarityProbabilities(arg1.obj, arg2)
+function t2.SetRarityProbabilities(p1, p2) --[[ Line: 288 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.setRarityProbabilities(p1.obj, p2)
 end
-function module_upvr.GetRarityProbabilities(arg1) -- Line 291
-    return BriefcaseUtils_upvr.getRarityProbabilities(arg1.obj)
+function t2.GetRarityProbabilities(p1) --[[ Line: 291 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.getRarityProbabilities(p1.obj)
 end
-function module_upvr.GetCollected(arg1) -- Line 294
-    return BriefcaseUtils_upvr.getCollected(arg1.obj)
+function t2.GetCollected(p1) --[[ Line: 294 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.getCollected(p1.obj)
 end
-function module_upvr.SetCollected(arg1, arg2) -- Line 297
-    return BriefcaseUtils_upvr.setCollected(arg1.obj, arg2)
+function t2.SetCollected(p1, p2) --[[ Line: 297 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.setCollected(p1.obj, p2)
 end
-function module_upvr.GetCollectedChangedSignal(arg1) -- Line 300
-    return BriefcaseUtils_upvr.getCollectedChangedSignal(arg1.obj)
+function t2.GetCollectedChangedSignal(p1) --[[ Line: 300 | Upvalues: BriefcaseUtils (copy) ]]
+	return BriefcaseUtils.getCollectedChangedSignal(p1.obj)
 end
-function module_upvr.GetDuration(arg1) -- Line 303
-    local any_GetSpeed_result1 = arg1:GetSpeed()
-    local var52
-    if 0 >= any_GetSpeed_result1 then
-        var52 = false
-    else
-        var52 = true
-    end
-    assert(var52, "speed must be > 0")
-    var52 = (arg1:GetTarget() - arg1:GetOrigin()).Magnitude
-    return var52 / any_GetSpeed_result1
+function t2.GetDuration(p1) --[[ Line: 303 ]]
+	local v1 = p1:GetOrigin()
+	local v2 = p1:GetTarget()
+	local v3 = p1:GetSpeed()
+	assert(v3 > 0, "speed must be > 0")
+	return (v2 - v1).Magnitude / v3
 end
-function module_upvr.GetPositionAt(arg1, arg2) -- Line 312
-    local any_GetOrigin_result1 = arg1:GetOrigin()
-    if not any_GetOrigin_result1 then return end
-    local any_GetTarget_result1_2 = arg1:GetTarget()
-    if not any_GetTarget_result1_2 then return end
-    return BriefcaseUtils_upvr.getPositionAt(arg2, any_GetOrigin_result1, any_GetTarget_result1_2, arg1:GetDuration())
+function t2.GetPositionAt(p1, p2) --[[ Line: 312 | Upvalues: BriefcaseUtils (copy) ]]
+	local v1 = p1:GetOrigin()
+	if v1 then
+		local v2 = p1:GetTarget()
+		if v2 then
+			return BriefcaseUtils.getPositionAt(p2, v1, v2, (p1:GetDuration()))
+		end
+	end
 end
-function module_upvr.GetCFrameAt(arg1, arg2) -- Line 324
-    local any_GetOrigin_result1_2 = arg1:GetOrigin()
-    if not any_GetOrigin_result1_2 then return end
-    local any_GetTarget_result1 = arg1:GetTarget()
-    if not any_GetTarget_result1 then return end
-    local any_GetTargetNormal_result1 = arg1:GetTargetNormal()
-    if not any_GetTargetNormal_result1 then return end
-    return BriefcaseUtils_upvr.getCFrameAt(arg2, any_GetOrigin_result1_2, any_GetTarget_result1, any_GetTargetNormal_result1, arg1:GetDuration())
+function t2.GetCFrameAt(p1, p2) --[[ Line: 324 | Upvalues: BriefcaseUtils (copy) ]]
+	local v1 = p1:GetOrigin()
+	if v1 then
+		local v2 = p1:GetTarget()
+		if v2 then
+			local v3 = p1:GetTargetNormal()
+			if v3 then
+				return BriefcaseUtils.getCFrameAt(p2, v1, v2, v3, (p1:GetDuration()))
+			end
+		end
+	end
 end
-return require(ReplicatedStorage.Std.Binder).new(BriefcaseConsts_upvr.TAG_NAME, module_upvr)
+return Binder.new(BriefcaseConsts.TAG_NAME, t2)

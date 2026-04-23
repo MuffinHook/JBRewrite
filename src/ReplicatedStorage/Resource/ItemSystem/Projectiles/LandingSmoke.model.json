@@ -1,34 +1,12 @@
 {
   "className": "ParticleEmitter",
   "properties": {
-    "Size": {
-      "NumberSequence": {
-        "keypoints": [
-          {
-            "time": 0.0,
-            "value": 0.0,
-            "envelope": 0.0
-          },
-          {
-            "time": 0.529277,
-            "value": 7.0625,
-            "envelope": 0.0
-          },
-          {
-            "time": 1.0,
-            "value": 8.75,
-            "envelope": 0.0
-          }
-        ]
-      }
-    },
-    "Speed": {
-      "NumberRange": [
-        3.0,
-        3.0
-      ]
-    },
-    "LockedToPart": true,
+    "Rate": 4.0,
+    "Acceleration": [
+      3.0,
+      -1.0,
+      0.0
+    ],
     "Transparency": {
       "NumberSequence": {
         "keypoints": [
@@ -50,7 +28,46 @@
         ]
       }
     },
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
     "ZOffset": 2.0,
+    "Enabled": false,
+    "LockedToPart": true,
+    "Rotation": {
+      "NumberRange": [
+        -50.0,
+        50.0
+      ]
+    },
+    "Lifetime": {
+      "NumberRange": [
+        2.0,
+        2.0
+      ]
+    },
+    "Texture": "rbxassetid://2200905294",
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.0,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.529277,
+            "value": 7.0625,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 8.75,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
     "Color": {
       "ColorSequence": {
         "keypoints": [
@@ -73,32 +90,15 @@
         ]
       }
     },
-    "Lifetime": {
-      "NumberRange": [
-        2.0,
-        2.0
-      ]
-    },
-    "Acceleration": [
-      3.0,
-      -1.0,
-      0.0
-    ],
-    "Enabled": false,
-    "Rate": 4.0,
     "SpreadAngle": [
       30.0,
       30.0
     ],
-    "Rotation": {
+    "Speed": {
       "NumberRange": [
-        -50.0,
-        50.0
+        3.0,
+        3.0
       ]
-    },
-    "Texture": "rbxassetid://2200905294",
-    "FlipbookBlendFrames": {
-      "Bool": false
     }
   }
 }

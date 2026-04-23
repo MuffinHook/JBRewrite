@@ -1,88 +1,62 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players_upvr = game:GetService("Players")
-local TradeConsts_upvr = require(ReplicatedStorage.Trade.TradeConsts)
-local module_2 = {
-    setPlayerTradeRequestsEnabled = function(arg1, arg2) -- Line 9, Named "setPlayerTradeRequestsEnabled"
-        local var5
-        if arg1.Parent ~= Players_upvr then
-            var5 = false
-        else
-            var5 = true
-        end
-        assert(var5, "Incorrect player passed")
-        if typeof(arg2) ~= "boolean" then
-            var5 = false
-        else
-            var5 = true
-        end
-        assert(var5, "Incorrect value passed")
-        arg1:SetAttribute(TradeConsts_upvr.ARE_TRADE_REQUESTS_ENABLED_ATTR_NAME, arg2)
-        return true
-    end;
-    getPlayerTradeRequestsEnabled = function(arg1) -- Line 15, Named "getPlayerTradeRequestsEnabled"
-        local var6
-        if arg1.Parent ~= Players_upvr then
-            var6 = false
-        else
-            var6 = true
-        end
-        assert(var6, "Incorrect player passed")
-        return arg1:GetAttribute(TradeConsts_upvr.ARE_TRADE_REQUESTS_ENABLED_ATTR_NAME)
-    end;
+local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
+local OwnershipConsts = require(ReplicatedStorage.Ownership.OwnershipConsts)
+local Players = game:GetService("Players")
+local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
+local TradeTranslationUtils = require(script.Parent.TradeTranslationUtils)
+return {
+	setPlayerTradeRequestsEnabled = function(p1, p2) --[[ Name: setPlayerTradeRequestsEnabled | Line: 9 | Upvalues: Players (copy), TradeConsts (copy) ]]
+		assert(p1.Parent == Players, "Incorrect player passed")
+		assert(typeof(p2) == "boolean", "Incorrect value passed")
+		p1:SetAttribute(TradeConsts.ARE_TRADE_REQUESTS_ENABLED_ATTR_NAME, p2)
+		return true
+	end,
+	getPlayerTradeRequestsEnabled = function(p1) --[[ Name: getPlayerTradeRequestsEnabled | Line: 15 | Upvalues: Players (copy), TradeConsts (copy) ]]
+		assert(p1.Parent == Players, "Incorrect player passed")
+		return p1:GetAttribute(TradeConsts.ARE_TRADE_REQUESTS_ENABLED_ATTR_NAME)
+	end,
+	getCategories = function() --[[ Name: getCategories | Line: 19 | Upvalues: PlayerDataConsts (copy), OwnershipConsts (copy), TradeConsts (copy), TradeTranslationUtils (copy) ]]
+		local t = {}
+		for k in pairs(PlayerDataConsts.ITEM_TYPE_SET) do
+			local count = (1 / 0)
+			if k == PlayerDataConsts.VEHICLE_ITEM_TYPE then
+				count = 100
+			elseif k == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then
+				count = 200
+			elseif k == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then
+				count = 300
+			elseif k == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
+				count = 400
+			end
+			if k == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
+				for i, v in ipairs(OwnershipConsts.VEHICLE_CUSTOMIZATION_CATEGORY_NAMES) do
+					if not TradeConsts.MAP_CATEGORY_IGNORE[v] then
+						table.insert(t, {
+							categoryName = v,
+							categoryTitle = TradeTranslationUtils.getCategoryTitle(v),
+							match = {
+								itemType = k,
+								categoryName = v
+							},
+							sortOrder = count
+						})
+						count = count + 1
+					end
+				end
+			elseif not TradeConsts.MAP_CATEGORY_IGNORE[k] then
+				table.insert(t, {
+					categoryName = k,
+					categoryTitle = TradeTranslationUtils.getCategoryTitle(k),
+					match = {
+						itemType = k
+					},
+					sortOrder = count
+				})
+			end
+		end
+		table.sort(t, function(p1, p2) --[[ Line: 67 ]]
+			return p1.sortOrder < p2.sortOrder
+		end)
+		return t
+	end
 }
-local PlayerDataConsts_upvr = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
-local OwnershipConsts_upvr = require(ReplicatedStorage.Ownership.OwnershipConsts)
-local TradeTranslationUtils_upvr = require(script.Parent.TradeTranslationUtils)
-function module_2.getCategories() -- Line 19
-    local module = {}
-    for i in pairs(PlayerDataConsts_upvr.ITEM_TYPE_SET) do
-        local var20
-        if i == PlayerDataConsts_upvr.VEHICLE_ITEM_TYPE then
-            var20 = 100
-        elseif i == PlayerDataConsts_upvr.HOME_ITEM_ITEM_TYPE then
-            var20 = 200
-        elseif i == PlayerDataConsts_upvr.ITEM_SKIN_ITEM_TYPE then
-            var20 = 300
-        elseif i == PlayerDataConsts_upvr.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
-            var20 = 400
-        end
-        if i == PlayerDataConsts_upvr.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
-            for i_2, v in ipairs(OwnershipConsts_upvr.VEHICLE_CUSTOMIZATION_CATEGORY_NAMES) do
-                if not TradeConsts_upvr.MAP_CATEGORY_IGNORE[v] then
-                    table.insert(module, {
-                        categoryName = v;
-                        categoryTitle = TradeTranslationUtils_upvr.getCategoryTitle(v);
-                        match = {
-                            itemType = i;
-                            categoryName = v;
-                        };
-                        sortOrder = var20;
-                    })
-                    var20 += 1
-                end
-            end
-        elseif not TradeConsts_upvr.MAP_CATEGORY_IGNORE[i] then
-            i_2 = {}
-            local var26 = i_2
-            var26.categoryName = i
-            var26.categoryTitle = TradeTranslationUtils_upvr.getCategoryTitle(i)
-            v = {}
-            local var27 = v
-            var27.itemType = i
-            var26.match = var27
-            var26.sortOrder = var20
-            table.insert(module, var26)
-        end
-    end
-    table.sort(module, function(arg1, arg2) -- Line 67
-        local var29
-        if arg1.sortOrder >= arg2.sortOrder then
-            var29 = false
-        else
-            var29 = true
-        end
-        return var29
-    end)
-    return module
-end
-return module_2

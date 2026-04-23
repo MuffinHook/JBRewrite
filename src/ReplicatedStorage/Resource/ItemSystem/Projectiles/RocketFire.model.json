@@ -1,8 +1,35 @@
 {
   "className": "ParticleEmitter",
   "properties": {
+    "Rate": 40.0,
+    "Transparency": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.75,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 0.75,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "LightInfluence": 1.0,
     "FlipbookBlendFrames": {
       "Bool": false
+    },
+    "LightEmission": 0.5,
+    "EmissionDirection": "Back",
+    "ZOffset": 1.0,
+    "Rotation": {
+      "NumberRange": [
+        -50.0,
+        50.0
+      ]
     },
     "Size": {
       "NumberSequence": {
@@ -25,29 +52,13 @@
         ]
       }
     },
-    "Speed": {
+    "Texture": "rbxassetid://1386449707",
+    "Lifetime": {
       "NumberRange": [
-        20.0,
-        20.0
+        2.0,
+        2.0
       ]
     },
-    "Transparency": {
-      "NumberSequence": {
-        "keypoints": [
-          {
-            "time": 0.0,
-            "value": 0.75,
-            "envelope": 0.0
-          },
-          {
-            "time": 1.0,
-            "value": 0.75,
-            "envelope": 0.0
-          }
-        ]
-      }
-    },
-    "ZOffset": 1.0,
     "Color": {
       "ColorSequence": {
         "keypoints": [
@@ -78,26 +89,15 @@
         ]
       }
     },
-    "EmissionDirection": "Back",
-    "LightInfluence": 1.0,
-    "Lifetime": {
-      "NumberRange": [
-        2.0,
-        2.0
-      ]
-    },
-    "Rate": 40.0,
-    "LightEmission": 0.5,
     "SpreadAngle": [
       -10.0,
       10.0
     ],
-    "Rotation": {
+    "Speed": {
       "NumberRange": [
-        -50.0,
-        50.0
+        20.0,
+        20.0
       ]
-    },
-    "Texture": "rbxassetid://1386449707"
+    }
   }
 }

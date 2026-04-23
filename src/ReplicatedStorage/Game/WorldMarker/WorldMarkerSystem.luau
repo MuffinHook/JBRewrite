@@ -1,37 +1,29 @@
-local module_upvr = {
-    Gui = nil;
-    _listGroup = {};
+local RunService = game:GetService("RunService")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local WorldMarkerGroup = require(script.Parent.WorldMarkerGroup)
+local t = {
+	Gui = nil,
+	_listGroup = {}
 }
-local WorldMarkerGroup_upvr = require(script.Parent.WorldMarkerGroup)
-function module_upvr.addGroup(arg1) -- Line 10
-    local var3
-    if arg1.__ClassName ~= WorldMarkerGroup_upvr.__ClassName then
-        var3 = false
-    else
-        var3 = true
-    end
-    assert(var3)
-    var3 = module_upvr
-    var3 = var3._listGroup
-    table.insert(var3, arg1)
+function t.addGroup(p1) --[[ Line: 10 | Upvalues: WorldMarkerGroup (copy), t (copy) ]]
+	assert(p1.__ClassName == WorldMarkerGroup.__ClassName)
+	table.insert(t._listGroup, p1)
 end
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.init() -- Line 14
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "WorldMarkersGui"
-    ScreenGui.Parent = LocalPlayer_upvr.PlayerGui
-    ScreenGui.Enabled = true
-    ScreenGui.IgnoreGuiInset = true
-    module_upvr.gui = ScreenGui
-    RunService_upvr.RenderStepped:Connect(function() -- Line 22
-        debug.profilebegin("WorldMarkerSystem Update")
-        for _, v in ipairs(module_upvr._listGroup) do
-            if v._enabled then
-                v:Update()
-            end
-        end
-        debug.profileend()
-    end)
+function t.init() --[[ Line: 14 | Upvalues: LocalPlayer (copy), t (copy), RunService (copy) ]]
+	local WorldMarkersGui = Instance.new("ScreenGui")
+	WorldMarkersGui.Name = "WorldMarkersGui"
+	WorldMarkersGui.Parent = LocalPlayer.PlayerGui
+	WorldMarkersGui.Enabled = true
+	WorldMarkersGui.IgnoreGuiInset = true
+	t.gui = WorldMarkersGui
+	RunService.RenderStepped:Connect(function() --[[ Line: 22 | Upvalues: t (ref) ]]
+		debug.profilebegin("WorldMarkerSystem Update")
+		for i, v in ipairs(t._listGroup) do
+			if v._enabled then
+				v:Update()
+			end
+		end
+		debug.profileend()
+	end)
 end
-return module_upvr
+return t

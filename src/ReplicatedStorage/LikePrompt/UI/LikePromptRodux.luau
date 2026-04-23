@@ -1,23 +1,24 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local LikePromptConsts_upvr = require(ReplicatedStorage_upvr.LikePrompt.LikePromptConsts)
-local store_upvr = require(ReplicatedStorage_upvr.App.store)
-return require(ReplicatedStorage_upvr.RoactRodux).connect(function(arg1, arg2) -- Line 7
-    return arg1.likePromptConfig
-end, function(arg1) -- Line 9
-    return {
-        onClickDone = function() -- Line 11, Named "onClickDone"
-            ReplicatedStorage_upvr:FindFirstChild(LikePromptConsts_upvr.LIKE_PROMPT_RESPONSE_REMOTE_NAME):FireServer(LikePromptConsts_upvr.RESPONSE_ENUM.Ok)
-            store_upvr:dispatch({
-                type = "setLikePromptConfig";
-                visible = false;
-            })
-        end;
-        onExpired = function() -- Line 19, Named "onExpired"
-            ReplicatedStorage_upvr:FindFirstChild(LikePromptConsts_upvr.LIKE_PROMPT_RESPONSE_REMOTE_NAME):FireServer(LikePromptConsts_upvr.RESPONSE_ENUM.RemindMeLater)
-            store_upvr:dispatch({
-                type = "setLikePromptConfig";
-                visible = false;
-            })
-        end;
-    }
-end)(require(script.Parent.LikePrompt))
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LikePrompt = require(script.Parent.LikePrompt)
+local store = require(ReplicatedStorage.App.store)
+local LikePromptConsts = require(ReplicatedStorage.LikePrompt.LikePromptConsts)
+return require(ReplicatedStorage.RoactRodux).connect(function(p1, p2) --[[ Line: 7 ]]
+	return p1.likePromptConfig
+end, function(p1) --[[ Line: 9 | Upvalues: ReplicatedStorage (copy), LikePromptConsts (copy), store (copy) ]]
+	return {
+		onClickDone = function() --[[ Name: onClickDone | Line: 11 | Upvalues: ReplicatedStorage (ref), LikePromptConsts (ref), store (ref) ]]
+			ReplicatedStorage:FindFirstChild(LikePromptConsts.LIKE_PROMPT_RESPONSE_REMOTE_NAME):FireServer(LikePromptConsts.RESPONSE_ENUM.Ok)
+			store:dispatch({
+				type = "setLikePromptConfig",
+				visible = false
+			})
+		end,
+		onExpired = function() --[[ Name: onExpired | Line: 19 | Upvalues: ReplicatedStorage (ref), LikePromptConsts (ref), store (ref) ]]
+			ReplicatedStorage:FindFirstChild(LikePromptConsts.LIKE_PROMPT_RESPONSE_REMOTE_NAME):FireServer(LikePromptConsts.RESPONSE_ENUM.RemindMeLater)
+			store:dispatch({
+				type = "setLikePromptConfig",
+				visible = false
+			})
+		end
+	}
+end)(LikePrompt)

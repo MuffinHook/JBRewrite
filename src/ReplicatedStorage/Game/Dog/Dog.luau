@@ -1,582 +1,580 @@
-local Players_upvr = game:GetService("Players")
-local LocalPlayer_upvr = Players_upvr.LocalPlayer
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService_upvr = game:GetService("RunService")
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local DogConsts_upvr = require(ReplicatedStorage.Game.Dog.DogConsts)
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-local PlayerUtils_upvr = require(ReplicatedStorage.Game.PlayerUtils)
-local DogSystem_upvr = require(script.Parent.DogSystem)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local Spring_upvr = require(ReplicatedStorage.Std.Spring)
-function module_upvr.new(arg1) -- Line 29
-    local module_upvr_2 = {}
-    setmetatable(module_upvr_2, module_upvr)
-    module_upvr_2._maid = Maid_upvr.new()
-    module_upvr_2._obj = arg1
-    module_upvr_2._mapAnimTrack = {}
-    module_upvr_2._damageRemote = arg1:WaitForChild(DogConsts_upvr.DAMAGE_REMOTE_NAME)
-    module_upvr_2._breedIdValue = arg1:WaitForChild(DogConsts_upvr.BREED_ID_VALUE_NAME)
-    module_upvr_2._animController = arg1:WaitForChild("AnimationController")
-    while not arg1.PrimaryPart do
-        task.wait(0.01)
-    end
-    module_upvr_2._bodyVelocity = arg1.PrimaryPart:WaitForChild(DogConsts_upvr.BODY_VELOCITY_NAME)
-    module_upvr_2._bodyGyro = arg1.PrimaryPart:WaitForChild(DogConsts_upvr.BODY_GYRO_NAME)
-    module_upvr_2:SetSpeed(0)
-    module_upvr_2:SetDirection(Vector3.new())
-    module_upvr_2:SetAnimSpeed(0)
-    module_upvr_2._stateId = nil
-    module_upvr_2._attackStateId = DogConsts_upvr.ATTACK_STATE.TO
-    module_upvr_2._animStateId = nil
-    module_upvr_2._animTrack = nil
-    module_upvr_2._goalPos = nil
-    module_upvr_2._targetSpeedSpring = Spring_upvr.new(0, 0, 1, 1)
-    module_upvr_2._lastUpdate = os.clock()
-    module_upvr_2._lastJump = os.clock()
-    module_upvr_2._lastAttack = os.clock()
-    module_upvr_2._lastAttackSend = os.clock()
-    module_upvr_2._lastAnimTransition = os.clock()
-    module_upvr_2._lastDiscoverOpp = os.clock()
-    module_upvr_2._lastDiscoverDog = os.clock()
-    module_upvr_2._lastStuckAt = os.clock()
-    module_upvr_2._ownerIdValue = arg1:WaitForChild(DogConsts_upvr.OWNER_ID_VALUE_NAME)
-    module_upvr_2._maid:GiveTask(module_upvr_2._ownerIdValue.Changed:Connect(function() -- Line 66
-        module_upvr_2:_updateOwner()
-    end))
-    module_upvr_2:_updateOwner()
-    module_upvr_2._targetIdValue = arg1:WaitForChild(DogConsts_upvr.TARGET_ID_VALUE_NAME)
-    module_upvr_2._maid:GiveTask(module_upvr_2._targetIdValue.Changed:Connect(function() -- Line 72
-        module_upvr_2:_updateTarget()
-    end))
-    module_upvr_2:_updateTarget()
-    module_upvr_2._maid:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 77
-        module_upvr_2:_updateAnimSpeed()
-    end))
-    module_upvr_2._barkRemote = arg1:WaitForChild(DogConsts_upvr.BARK_REMOTE_NAME)
-    module_upvr_2._maid:GiveTask(module_upvr_2._barkRemote.OnClientEvent:Connect(function() -- Line 82
-        module_upvr_2:_bark()
-    end))
-    module_upvr_2._animRemote = arg1:WaitForChild(DogConsts_upvr.ANIM_REMOTE_NAME)
-    module_upvr_2._maid:GiveTask(module_upvr_2._animRemote.OnClientEvent:Connect(function(arg1_2) -- Line 87
-        module_upvr_2:_playAnim(arg1_2)
-    end))
-    module_upvr_2._isMountedValue = arg1:WaitForChild(DogConsts_upvr.IS_MOUNTED_NAME)
-    module_upvr_2._maid:GiveTask(module_upvr_2._isMountedValue.Changed:Connect(function(arg1_3) -- Line 92
-        if arg1_3 then
-            module_upvr_2:SetAnimation(DogConsts_upvr.ANIM_STATE.REST)
-        else
-            module_upvr_2._obj:SetPrimaryPartCFrame(module_upvr_2._obj.PrimaryPart.CFrame * CFrame.new(0, 10, 0))
-        end
-        module_upvr_2:_setEnabled(not arg1_3)
-    end))
-    module_upvr_2._giveUpRemote = arg1:WaitForChild(DogConsts_upvr.GIVE_UP_REMOTE_NAME)
-    module_upvr_2._lastGiveUpSend = os.clock()
-    module_upvr_2:_updateBreed(module_upvr_2._breedIdValue.Value)
-    module_upvr_2._maid:GiveTask(module_upvr_2._breedIdValue.Changed:Connect(function(arg1_4) -- Line 106
-        module_upvr_2:_updateBreed(arg1_4)
-    end))
-    module_upvr_2:SetState(DogConsts_upvr.STATE.FOLLOW)
-    module_upvr_2:SetAnimation(DogConsts_upvr.ANIM_STATE.IDLE)
-    local Collider = module_upvr_2._obj:FindFirstChild("Collider")
-    if not Collider then
-        error("Dog is missing `Collider` part.")
-    end
-    module_upvr_2._collider = Collider
-    module_upvr_2:_setEnabled(true)
-    return module_upvr_2
+local RunService = game:GetService("RunService")
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Spring = require(ReplicatedStorage.Std.Spring)
+local DogConsts = require(ReplicatedStorage.Game.Dog.DogConsts)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local RayCast = require(ReplicatedStorage.Module.RayCast)
+local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local DogSystem = require(script.Parent.DogSystem)
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 29 | Upvalues: t (copy), Maid (copy), DogConsts (copy), Spring (copy), RunService (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._maid = Maid.new()
+	t2._obj = p1
+	t2._mapAnimTrack = {}
+	t2._damageRemote = p1:WaitForChild(DogConsts.DAMAGE_REMOTE_NAME)
+	t2._breedIdValue = p1:WaitForChild(DogConsts.BREED_ID_VALUE_NAME)
+	t2._animController = p1:WaitForChild("AnimationController")
+	while not p1.PrimaryPart do
+		task.wait(0.01)
+	end
+	t2._bodyVelocity = p1.PrimaryPart:WaitForChild(DogConsts.BODY_VELOCITY_NAME)
+	t2._bodyGyro = p1.PrimaryPart:WaitForChild(DogConsts.BODY_GYRO_NAME)
+	t2:SetSpeed(0)
+	t2:SetDirection((Vector3.new()))
+	t2:SetAnimSpeed(0)
+	t2._stateId = nil
+	t2._attackStateId = DogConsts.ATTACK_STATE.TO
+	t2._animStateId = nil
+	t2._animTrack = nil
+	t2._goalPos = nil
+	t2._targetSpeedSpring = Spring.new(0, 0, 1, 1)
+	t2._lastUpdate = os.clock()
+	t2._lastJump = os.clock()
+	t2._lastAttack = os.clock()
+	t2._lastAttackSend = os.clock()
+	t2._lastAnimTransition = os.clock()
+	t2._lastDiscoverOpp = os.clock()
+	t2._lastDiscoverDog = os.clock()
+	t2._lastStuckAt = os.clock()
+	t2._ownerIdValue = p1:WaitForChild(DogConsts.OWNER_ID_VALUE_NAME)
+	t2._maid:GiveTask(t2._ownerIdValue.Changed:Connect(function() --[[ Line: 66 | Upvalues: t2 (copy) ]]
+		t2:_updateOwner()
+	end))
+	t2:_updateOwner()
+	t2._targetIdValue = p1:WaitForChild(DogConsts.TARGET_ID_VALUE_NAME)
+	t2._maid:GiveTask(t2._targetIdValue.Changed:Connect(function() --[[ Line: 72 | Upvalues: t2 (copy) ]]
+		t2:_updateTarget()
+	end))
+	t2:_updateTarget()
+	t2._maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 77 | Upvalues: t2 (copy) ]]
+		t2:_updateAnimSpeed()
+	end))
+	t2._barkRemote = p1:WaitForChild(DogConsts.BARK_REMOTE_NAME)
+	t2._maid:GiveTask(t2._barkRemote.OnClientEvent:Connect(function() --[[ Line: 82 | Upvalues: t2 (copy) ]]
+		t2:_bark()
+	end))
+	t2._animRemote = p1:WaitForChild(DogConsts.ANIM_REMOTE_NAME)
+	t2._maid:GiveTask(t2._animRemote.OnClientEvent:Connect(function(p1) --[[ Line: 87 | Upvalues: t2 (copy) ]]
+		t2:_playAnim(p1)
+	end))
+	t2._isMountedValue = p1:WaitForChild(DogConsts.IS_MOUNTED_NAME)
+	t2._maid:GiveTask(t2._isMountedValue.Changed:Connect(function(p1) --[[ Line: 92 | Upvalues: t2 (copy), DogConsts (ref) ]]
+		if p1 then
+			t2:SetAnimation(DogConsts.ANIM_STATE.REST)
+		else
+			t2._obj:SetPrimaryPartCFrame(t2._obj.PrimaryPart.CFrame * CFrame.new(0, 10, 0))
+		end
+		t2:_setEnabled(not p1)
+	end))
+	t2._giveUpRemote = p1:WaitForChild(DogConsts.GIVE_UP_REMOTE_NAME)
+	t2._lastGiveUpSend = os.clock()
+	t2:_updateBreed(t2._breedIdValue.Value)
+	t2._maid:GiveTask(t2._breedIdValue.Changed:Connect(function(p1) --[[ Line: 106 | Upvalues: t2 (copy) ]]
+		t2:_updateBreed(p1)
+	end))
+	t2:SetState(DogConsts.STATE.FOLLOW)
+	t2:SetAnimation(DogConsts.ANIM_STATE.IDLE)
+	local Collider = t2._obj:FindFirstChild("Collider")
+	if not Collider then
+		error("Dog is missing `Collider` part.")
+	end
+	t2._collider = Collider
+	t2:_setEnabled(true)
+	return t2
 end
-function module_upvr._setEnabled(arg1, arg2) -- Line 123
-    arg1._enabled = arg2
+function t._setEnabled(p1, p2) --[[ Line: 123 ]]
+	p1._enabled = p2
 end
-function module_upvr._setForcesEnabled(arg1, arg2) -- Line 126
-    if arg2 then
-        arg1._bodyVelocity.MaxForce = DogConsts_upvr.BODY_VELOCITY_MAX_FORCE
-        arg1._bodyGyro.MaxTorque = DogConsts_upvr.BODY_GYRO_MAX_TORQUE
-    else
-        arg1._bodyVelocity.MaxForce = Vector3.new()
-        arg1._bodyGyro.MaxTorque = Vector3.new()
-    end
+function t._setForcesEnabled(p1, p2) --[[ Line: 126 | Upvalues: DogConsts (copy) ]]
+	if p2 then
+		p1._bodyVelocity.MaxForce = DogConsts.BODY_VELOCITY_MAX_FORCE
+		p1._bodyGyro.MaxTorque = DogConsts.BODY_GYRO_MAX_TORQUE
+	else
+		p1._bodyVelocity.MaxForce = Vector3.new()
+		p1._bodyGyro.MaxTorque = Vector3.new()
+	end
 end
-function module_upvr._updateBreed(arg1, arg2) -- Line 135
-    if arg2 == nil then
-    else
-    end
-    assert(true)
-    arg1:_loadAnimations(arg2)
+function t._updateBreed(p1, p2) --[[ Line: 135 ]]
+	assert(p2 ~= nil)
+	p1:_loadAnimations(p2)
 end
-function module_upvr._loadAnimations(arg1, arg2) -- Line 139
-    if arg2 == nil then
-    else
-    end
-    assert(true)
-    if arg1._mapAnimTrack[DogConsts_upvr.ANIM_STATE.WALK] ~= nil then
-    else
-    end
-    assert(true)
-    for i, v in pairs(DogSystem_upvr.getAnimInsts(arg2)) do
-        arg1._mapAnimTrack[i] = arg1._animController:LoadAnimation(v)
-    end
+function t._loadAnimations(p1, p2) --[[ Line: 139 | Upvalues: DogConsts (copy), DogSystem (copy) ]]
+	assert(p2 ~= nil)
+	assert(p1._mapAnimTrack[DogConsts.ANIM_STATE.WALK] == nil)
+	for k, v in pairs(DogSystem.getAnimInsts(p2)) do
+		p1._mapAnimTrack[k] = p1._animController:LoadAnimation(v)
+	end
 end
-function module_upvr._getAnimTrack(arg1, arg2) -- Line 148
-    local var28 = arg1._mapAnimTrack[arg2]
-    if not var28 then return end
-    return var28
+function t._getAnimTrack(p1, p2) --[[ Line: 148 ]]
+	local v1 = p1._mapAnimTrack[p2]
+	if v1 then
+		return v1
+	end
 end
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-local VehicleUtils_upvr = require(ReplicatedStorage.Vehicle.VehicleUtils)
-function module_upvr._updateOwner(arg1) -- Line 156
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local any_GetOwner_result1_2_upvr = arg1:GetOwner()
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [23.2]
-    nil:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 163
-        arg1:_updateLocalOwner()
-    end))
-    nil:GiveTask(arg1._obj.Mouth.Touched:Connect(function(...) -- Line 166
-        arg1:_onMouthTouched(...)
-    end))
-    nil:GiveTask(Interval_upvr.every(1):Connect(function() -- Line 169
-        local any_getRootPart_result1_2 = PlayerUtils_upvr.getRootPart(any_GetOwner_result1_2_upvr)
-        if not any_getRootPart_result1_2 then
-        elseif arg1._stateId ~= DogConsts_upvr.STATE.ATTACK and (DogConsts_upvr.TELEPORT_AFTER_DIST < (any_getRootPart_result1_2.Position - arg1._obj.PrimaryPart.Position).Magnitude or DogConsts_upvr.TELEPORT_AFTER_STUCK_FOR < os.clock() - arg1._lastStuckAt) then
-            arg1._obj:SetPrimaryPartCFrame(any_getRootPart_result1_2.CFrame * CFrame.new(0, 10, 5))
-        end
-    end))
-    arg1._maid:GiveTask(VehicleUtils_upvr.OnVehicleEntered:Connect(function(arg1_5, arg2) -- Line 187
-        if arg2 then
-        else
-            if not arg1_5.Model:FindFirstChild("DogSit") then return end
-            arg1:_setEnabled(false)
-            arg1:_setForcesEnabled(false)
-        end
-    end))
-    arg1._maid:GiveTask(VehicleUtils_upvr.OnVehicleExited:Connect(function(arg1_6, arg2) -- Line 198
-        if arg2 then
-        else
-            if not arg1_6.Model:FindFirstChild("DogSit") then return end
-            arg1:_setEnabled(true)
-            arg1:_setForcesEnabled(true)
-        end
-    end))
-    arg1:_setEnabled(true)
-    arg1:_setForcesEnabled(true)
-    nil:GiveTask(function() -- Line 212
-        arg1:_setEnabled(false)
-        arg1:_setForcesEnabled(false)
-    end)
-    do
-        return
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    arg1._maid.ownerMaid = nil
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t._updateOwner(p1) --[[ Line: 156 | Upvalues: Maid (copy), LocalPlayer (copy), RunService (copy), Interval (copy), PlayerUtils (copy), DogConsts (copy), VehicleUtils (copy) ]]
+	local v1 = p1:GetOwner()
+	if v1 then
+		local v2 = Maid.new()
+		p1._maid.ownerMaid = v2
+		if v1 == LocalPlayer then
+			v2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 163 | Upvalues: p1 (copy) ]]
+				p1:_updateLocalOwner()
+			end))
+			v2:GiveTask(p1._obj.Mouth.Touched:Connect(function(...) --[[ Line: 166 | Upvalues: p1 (copy) ]]
+				p1:_onMouthTouched(...)
+			end))
+			v2:GiveTask(Interval.every(1):Connect(function() --[[ Line: 169 | Upvalues: PlayerUtils (ref), v1 (copy), p1 (copy), DogConsts (ref) ]]
+				local v12 = PlayerUtils.getRootPart(v1)
+				if v12 and (p1._stateId ~= DogConsts.STATE.ATTACK and ((v12.Position - p1._obj.PrimaryPart.Position).Magnitude > DogConsts.TELEPORT_AFTER_DIST or os.clock() - p1._lastStuckAt > DogConsts.TELEPORT_AFTER_STUCK_FOR)) then
+					p1._obj:SetPrimaryPartCFrame(v12.CFrame * CFrame.new(0, 10, 5))
+				end
+			end))
+			p1._maid:GiveTask(VehicleUtils.OnVehicleEntered:Connect(function(p12, p2) --[[ Line: 187 | Upvalues: p1 (copy) ]]
+				if p2 then
+				elseif p12.Model:FindFirstChild("DogSit") then
+					p1:_setEnabled(false)
+					p1:_setForcesEnabled(false)
+				end
+			end))
+			p1._maid:GiveTask(VehicleUtils.OnVehicleExited:Connect(function(p12, p2) --[[ Line: 198 | Upvalues: p1 (copy) ]]
+				if p2 then
+				elseif p12.Model:FindFirstChild("DogSit") then
+					p1:_setEnabled(true)
+					p1:_setForcesEnabled(true)
+				end
+			end))
+			p1:_setEnabled(true)
+			p1:_setForcesEnabled(true)
+			v2:GiveTask(function() --[[ Line: 212 | Upvalues: p1 (copy) ]]
+				p1:_setEnabled(false)
+				p1:_setForcesEnabled(false)
+			end)
+		end
+	else
+		p1._maid.ownerMaid = nil
+	end
 end
-function module_upvr._updateTarget(arg1) -- Line 221
-    if arg1:GetTarget() then
-        arg1:SetState(DogConsts_upvr.STATE.ATTACK)
-    else
-        arg1:SetState(DogConsts_upvr.STATE.FOLLOW)
-    end
+function t._updateTarget(p1) --[[ Line: 221 | Upvalues: DogConsts (copy) ]]
+	if p1:GetTarget() then
+		p1:SetState(DogConsts.STATE.ATTACK)
+	else
+		p1:SetState(DogConsts.STATE.FOLLOW)
+	end
 end
-function module_upvr._onMouthTouched(arg1, arg2) -- Line 229
-    local os_clock_result1_2 = os.clock()
-    local any_GetTarget_result1 = arg1:GetTarget()
-    if any_GetTarget_result1 and arg2:IsDescendantOf(any_GetTarget_result1.Character) and os_clock_result1_2 - arg1._lastAttack < 2 and 1 < os_clock_result1_2 - arg1._lastAttackSend then
-        arg1._lastAttackSend = os_clock_result1_2
-        arg1._damageRemote:FireServer()
-    end
+function t._onMouthTouched(p1, p2) --[[ Line: 229 ]]
+	local v1 = os.clock()
+	local v2 = p1:GetTarget()
+	if v2 and (p2:IsDescendantOf(v2.Character) and (v1 - p1._lastAttack < 2 and v1 - p1._lastAttackSend > 1)) then
+		p1._lastAttackSend = v1
+		p1._damageRemote:FireServer()
+	end
 end
-function module_upvr.GetBreedId(arg1) -- Line 243
-    return arg1._breedIdValue.Value
+function t.GetBreedId(p1) --[[ Line: 243 ]]
+	return p1._breedIdValue.Value
 end
-function module_upvr._playAnim(arg1, arg2) -- Line 247
-    local any__getAnimTrack_result1 = arg1:_getAnimTrack(arg2)
-    if any__getAnimTrack_result1 then
-        any__getAnimTrack_result1:Play(0.25)
-    end
+function t._playAnim(p1, p2) --[[ Line: 247 ]]
+	local v1 = p1:_getAnimTrack(p2)
+	if v1 then
+		v1:Play(0.25)
+	end
 end
-function module_upvr._playAnimNetwork(arg1, arg2) -- Line 253
-    arg1:_playAnim(arg2)
-    arg1._animRemote:FireServer(arg2)
+function t._playAnimNetwork(p1, p2) --[[ Line: 253 ]]
+	p1:_playAnim(p2)
+	p1._animRemote:FireServer(p2)
 end
-function module_upvr.SetAnimation(arg1, arg2) -- Line 257
-    local var49
-    if arg2 == arg1._animStateId then
-        var49 = false
-    else
-        var49 = true
-    end
-    assert(var49)
-    if arg1._animTrack ~= nil then
-        var49 = nil
-        arg1._animTrack = var49
-        var49 = arg1._animTrack:Stop
-        var49(0.25)
-    end
-    arg1._animStateId = arg2
-    arg1._animTrack = arg1:_getAnimTrack(arg2)
-    if arg1._animTrack then
-        arg1._animTrack:Play(0.25)
-    end
-    if arg2 == DogConsts_upvr.ANIM_STATE.PET then
-        local any_GetOwner_result1_4 = arg1:GetOwner()
-        var49 = PlayerUtils_upvr
-        var49 = var49.getHumanoid(any_GetOwner_result1_4)
-        if var49 then
-            local any_getPetTrack_result1 = DogSystem_upvr.getPetTrack()
-            if any_getPetTrack_result1 then
-                if any_GetOwner_result1_4 == LocalPlayer_upvr then
-                    any_getPetTrack_result1:Play(0.25)
-                    local var53_upvw
-                    var53_upvw = any_getPetTrack_result1.Stopped:Connect(function() -- Line 281
-                        var53_upvw:Disconnect()
-                        arg1:SetAnimation(DogConsts_upvr.ANIM_STATE.IDLE_PLAY)
-                    end)
-                else
-                    Promise_upvr.delay(any_getPetTrack_result1.Length):andThen(function() -- Line 286
-                        arg1:SetAnimation(DogConsts_upvr.ANIM_STATE.IDLE_PLAY)
-                    end)
-                end
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-    elseif arg2 == DogConsts_upvr.ANIM_STATE.IDLE_PLAY then
-        var49 = 1
-        Promise_upvr.delay(var49):andThen(function() -- Line 293
-            arg1:SetAnimation(DogConsts_upvr.ANIM_STATE.IDLE)
-            arg1:_updateTarget()
-        end)
-    end
-    var49 = DogConsts_upvr.ANIM_SPS[arg1:GetBreedId()][arg1._animStateId]
-    if var49 and arg1._animTrack then
-        arg1._animTrack:AdjustSpeed(arg1._speed / var49)
-    end
-    arg1._lastAnimTransition = os.clock()
+function t.SetAnimation(p1, p2) --[[ Line: 257 | Upvalues: DogConsts (copy), PlayerUtils (copy), DogSystem (copy), LocalPlayer (copy), Promise (copy) ]]
+	assert(p2 ~= p1._animStateId)
+	if p1._animTrack ~= nil then
+		local _animTrack = p1._animTrack
+		p1._animTrack = nil
+		_animTrack:Stop(0.25)
+	end
+	p1._animStateId = p2
+	p1._animTrack = p1:_getAnimTrack(p2)
+	if p1._animTrack then
+		p1._animTrack:Play(0.25)
+	end
+	if p2 == DogConsts.ANIM_STATE.PET then
+		local v1 = p1:GetOwner()
+		if PlayerUtils.getHumanoid(v1) then
+			local v2 = DogSystem.getPetTrack()
+			if v2 and v1 == LocalPlayer then
+				v2:Play(0.25)
+				local v3 = nil
+				v3 = v2.Stopped:Connect(function() --[[ Line: 281 | Upvalues: v3 (ref), p1 (copy), DogConsts (ref) ]]
+					v3:Disconnect()
+					p1:SetAnimation(DogConsts.ANIM_STATE.IDLE_PLAY)
+				end)
+			elseif v2 then
+				Promise.delay(v2.Length):andThen(function() --[[ Line: 286 | Upvalues: p1 (copy), DogConsts (ref) ]]
+					p1:SetAnimation(DogConsts.ANIM_STATE.IDLE_PLAY)
+				end)
+			end
+		end
+	elseif p2 == DogConsts.ANIM_STATE.IDLE_PLAY then
+		Promise.delay(1):andThen(function() --[[ Line: 293 | Upvalues: p1 (copy), DogConsts (ref) ]]
+			p1:SetAnimation(DogConsts.ANIM_STATE.IDLE)
+			p1:_updateTarget()
+		end)
+	end
+	local v5 = DogConsts.ANIM_SPS[p1:GetBreedId()][p1._animStateId]
+	if v5 and p1._animTrack then
+		p1._animTrack:AdjustSpeed(p1._speed / v5)
+	end
+	p1._lastAnimTransition = os.clock()
 end
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-function module_upvr._bark(arg1) -- Line 309
-    if arg1._animStateId == DogConsts_upvr.ANIM_STATE.REST then
-        arg1:SetAnimation(DogConsts_upvr.ANIM_STATE.IDLE)
-    end
-    arg1:_playAnim(DogConsts_upvr.ANIM_STATE.BARK)
-    Audio_upvr.ObjectLocal(arg1._obj.PrimaryPart, DogConsts_upvr.BARK_SOUND_ID[arg1:GetBreedId()], {
-        Volume = 0.3;
-        Pitch = 1 + 0.1 * math.random();
-    })
+function t._bark(p1) --[[ Line: 309 | Upvalues: DogConsts (copy), Audio (copy) ]]
+	if p1._animStateId == DogConsts.ANIM_STATE.REST then
+		p1:SetAnimation(DogConsts.ANIM_STATE.IDLE)
+	end
+	p1:_playAnim(DogConsts.ANIM_STATE.BARK)
+	Audio.ObjectLocal(p1._obj.PrimaryPart, DogConsts.BARK_SOUND_ID[p1:GetBreedId()], {
+		Volume = 0.3,
+		Pitch = 1 + 0.1 * math.random()
+	})
 end
-function module_upvr.Bark(arg1) -- Line 320
-    arg1._barkRemote:FireServer()
-    arg1:_bark()
+function t.Bark(p1) --[[ Line: 320 ]]
+	p1._barkRemote:FireServer()
+	p1:_bark()
 end
-function module_upvr.SetState(arg1, arg2) -- Line 324
-    if arg2 == nil then
-    else
-    end
-    assert(true)
-    if arg2 == DogConsts_upvr.STATE.ATTACK then
-        arg1._attackStateId = DogConsts_upvr.ATTACK_STATE.TO
-        arg1._goToPosition = nil
-    end
-    arg1._stateId = arg2
+function t.SetState(p1, p2) --[[ Line: 324 | Upvalues: DogConsts (copy) ]]
+	assert(p2 ~= nil)
+	if p2 == DogConsts.STATE.ATTACK then
+		p1._attackStateId = DogConsts.ATTACK_STATE.TO
+		p1._goToPosition = nil
+	end
+	p1._stateId = p2
 end
-function module_upvr.DistanceTo(arg1, arg2) -- Line 333
-    return ((arg2 - arg1._obj.PrimaryPart.Position) * Vector3.new(1, 0, 1)).Magnitude
+function t.DistanceTo(p1, p2) --[[ Line: 333 ]]
+	return ((p2 - p1._obj.PrimaryPart.Position) * Vector3.new(1, 0, 1)).Magnitude
 end
-function module_upvr._getGoalRootPart(arg1) -- Line 337
-    local var58
-    if arg1._stateId == DogConsts_upvr.STATE.ATTACK then
-        var58 = arg1:GetTarget()
-    elseif arg1._stateId == DogConsts_upvr.STATE.FOLLOW then
-        var58 = arg1:GetOwner()
-    end
-    if not var58 then return end
-    return PlayerUtils_upvr.getRootPart(var58)
+function t._getGoalRootPart(p1) --[[ Line: 337 | Upvalues: DogConsts (copy), PlayerUtils (copy) ]]
+	local v1 = nil
+	if p1._stateId == DogConsts.STATE.ATTACK then
+		v1 = p1:GetTarget()
+	elseif p1._stateId == DogConsts.STATE.FOLLOW then
+		v1 = p1:GetOwner()
+	end
+	if v1 then
+		return PlayerUtils.getRootPart(v1)
+	end
 end
-function module_upvr._getGoalPos(arg1) -- Line 349
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    do
-        return
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t._getGoalPos(p1) --[[ Line: 349 | Upvalues: DogConsts (copy) ]]
+	local v1 = p1:_getGoalRootPart()
+	if v1 and p1._stateId == DogConsts.STATE.ATTACK then
+		if p1._attackStateId == DogConsts.ATTACK_STATE.TO then
+			return v1.Position + v1.Velocity * DogConsts.ATTACK_LEAD_TIME
+		end
+		if p1._attackStateId == DogConsts.ATTACK_STATE.AWAY then
+			return p1._goToPosition
+		end
+	elseif v1 and p1._stateId == DogConsts.STATE.FOLLOW then
+		local _lastRootPartPos = p1._lastRootPartPos
+		local Position = v1.Position
+		local v2 = false
+		if _lastRootPartPos and (Position - _lastRootPartPos).Magnitude > 0.1 or not (p1._goalPos and _lastRootPartPos) then
+			v2 = true
+		end
+		if v2 then
+			p1._lastRootPartPos = Position
+			local v3 = v1.CFrame * Vector3.new(-4, 0, 1)
+			local v4 = v1.CFrame * Vector3.new(4, 0, 1)
+			if p1:DistanceTo(v3) < p1:DistanceTo(v4) then
+				return v3
+			else
+				return v4
+			end
+		else
+			return p1._goalPos
+		end
+	elseif v1 and (p1._stateId ~= DogConsts.STATE.REST and p1._stateId ~= DogConsts.STATE.PET) then
+		error("Invalid state")
+	end
 end
-function module_upvr._getTargetSpeed(arg1, arg2, arg3) -- Line 398
-    local var59 = 0
-    if arg1._goalPos then
-        local var60 = (arg2 - arg1._goalPos).Magnitude / arg3
-        var59 = arg1._targetSpeedSpring:SetTarget(var60)
-        if var59 < var60 then
-            arg1._targetSpeedSpring.Freq = 3
-            return var59
-        end
-        arg1._targetSpeedSpring.Freq = 10
-    end
-    return var59
+function t._getTargetSpeed(p1, p2, p3) --[[ Line: 398 ]]
+	local v1
+	if p1._goalPos then
+		local v2 = (p2 - p1._goalPos).Magnitude / p3
+		local v3 = p1._targetSpeedSpring:SetTarget(v2)
+		if v3 < v2 then
+			p1._targetSpeedSpring.Freq = 3
+			return v3
+		end
+		p1._targetSpeedSpring.Freq = 10
+		v1 = v3
+	else
+		v1 = 0
+	end
+	return v1
 end
-function module_upvr._getGoalSpeed(arg1, arg2) -- Line 413
-    local var61 = DogConsts_upvr.TOP_SPEED[arg1:GetBreedId()]
-    if arg1._stateId == DogConsts_upvr.STATE.ATTACK then
-        return var61 * 0.8
-    end
-    local var62
-    if var62 == DogConsts_upvr.STATE.FOLLOW then
-        var62 = 0
-        if 1 <= arg2 then
-            local var63 = (arg2 - 6) / 122
-            var62 = math.max(arg1._targetSpeed + arg2 / 5, (1 - var63) * 10 + var63 * var61)
-        end
-        if var62 <= 4 then
-        end
-        return math.clamp(0, 0, var61)
-    end
+function t._getGoalSpeed(p1, p2) --[[ Line: 413 | Upvalues: DogConsts (copy) ]]
+	local v2 = DogConsts.TOP_SPEED[p1:GetBreedId()]
+	if p1._stateId == DogConsts.STATE.ATTACK then
+		return v2 * 0.8
+	end
+	if p1._stateId == DogConsts.STATE.FOLLOW then
+		local v3
+		if p2 >= 1 then
+			local v5 = (p2 - 6) / 122
+			v3 = math.max(p1._targetSpeed + p2 / 5, (1 - v5) * 10 + v5 * v2)
+		else
+			v3 = 0
+		end
+		if v3 <= 4 then
+			v3 = 0
+		end
+		return math.clamp(v3, 0, v2)
+	end
 end
-function module_upvr.Jump(arg1) -- Line 438
-    if not arg1._enabled then
-    else
-        arg1._lastJump = os.clock()
-        arg1._obj.PrimaryPart.Velocity = Vector3.new(0, 30, 0)
-    end
+function t.Jump(p1) --[[ Line: 438 ]]
+	if p1._enabled then
+		p1._lastJump = os.clock()
+		p1._obj.PrimaryPart.Velocity = Vector3.new(0, 30, 0)
+	end
 end
-function module_upvr._getNearestDog(arg1, arg2) -- Line 446
-    local any_GetOwner_result1_3 = arg1:GetOwner()
-    local any_getRootPart_result1_3 = PlayerUtils_upvr.getRootPart(any_GetOwner_result1_3)
-    local var81
-    if not any_getRootPart_result1_3 then return end
-    var81 = nil
-    for _, v_2 in ipairs(DogSystem_upvr.getAll()) do
-        if v_2 ~= arg1 then
-            if v_2:GetOwner().TeamValue.Value ~= any_GetOwner_result1_3.TeamValue.Value then
-                if (v_2._obj.PrimaryPart.Position - any_getRootPart_result1_3.Position).Magnitude < (arg2 or math.huge) then
-                    var81 = v_2
-                end
-            end
-        end
-    end
-    return var81
+function t._getNearestDog(p1, p2) --[[ Line: 446 | Upvalues: PlayerUtils (copy), DogSystem (copy) ]]
+	local v1 = p1:GetOwner()
+	local v2 = PlayerUtils.getRootPart(v1)
+	if v2 then
+		local v3 = p2 or (1 / 0)
+		local v4 = nil
+		for i, v in ipairs(DogSystem.getAll()) do
+			if v ~= p1 and v:GetOwner().TeamValue.Value ~= v1.TeamValue.Value then
+				local Magnitude = (v._obj.PrimaryPart.Position - v2.Position).Magnitude
+				if Magnitude < v3 then
+					v3 = Magnitude
+					v4 = v
+				end
+			end
+		end
+		return v4
+	end
 end
-function module_upvr._getNearestOpp(arg1, arg2) -- Line 471
-    local any_GetOwner_result1_5 = arg1:GetOwner()
-    local any_getRootPart_result1_4 = PlayerUtils_upvr.getRootPart(any_GetOwner_result1_5)
-    local var104
-    if not any_getRootPart_result1_4 then return end
-    var104 = nil
-    for _, v_3 in ipairs(Players_upvr:GetPlayers()) do
-        if v_3 ~= any_GetOwner_result1_5 then
-            if v_3.TeamValue.Value ~= any_GetOwner_result1_5.TeamValue.Value then
-                local any_getRootPart_result1_5 = PlayerUtils_upvr.getRootPart(v_3)
-                if any_getRootPart_result1_5 then
-                    if (any_getRootPart_result1_5.Position - any_getRootPart_result1_4.Position).Magnitude < (arg2 or math.huge) then
-                        var104 = v_3
-                    end
-                end
-            end
-        end
-    end
-    return var104
+function t._getNearestOpp(p1, p2) --[[ Line: 471 | Upvalues: PlayerUtils (copy), Players (copy) ]]
+	local v1 = p1:GetOwner()
+	local v2 = PlayerUtils.getRootPart(v1)
+	if v2 then
+		local v3 = p2 or (1 / 0)
+		local v4 = nil
+		for i, v in ipairs(Players:GetPlayers()) do
+			if v ~= v1 and v.TeamValue.Value ~= v1.TeamValue.Value then
+				local v5 = PlayerUtils.getRootPart(v)
+				if v5 then
+					local Magnitude = (v5.Position - v2.Position).Magnitude
+					if Magnitude < v3 then
+						v3 = Magnitude
+						v4 = v
+					end
+				end
+			end
+		end
+		return v4
+	end
 end
-function module_upvr._updateAnimSpeed(arg1) -- Line 499
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    if not arg1._enabled then
-    else
-        local any_getRootPart_result1 = PlayerUtils_upvr.getRootPart(arg1:GetOwner())
-        if not any_getRootPart_result1 then return end
-        local PrimaryPart_2 = arg1._obj.PrimaryPart
-        if arg1._stateId == DogConsts_upvr.STATE.REST or arg1._stateId == DogConsts_upvr.STATE.PET then
-            local var112 = PrimaryPart_2.Position - any_getRootPart_result1.Position
-            local Magnitude_2 = var112.Magnitude
-            if 8 < Magnitude_2 then
-                arg1:_updateTarget()
-            elseif Magnitude_2 < 4 and 0.75 < var112.Unit:Dot(any_getRootPart_result1.CFrame.LookVector) and arg1._stateId ~= DogConsts_upvr.STATE.PET then
-                arg1:SetAnimation(DogConsts_upvr.ANIM_STATE.PET)
-                arg1:SetState(DogConsts_upvr.STATE.PET)
-            end
-        end
-        local var114
-        if var114 == DogConsts_upvr.STATE.FOLLOW or arg1._stateId == DogConsts_upvr.STATE.ATTACK then
-            if PrimaryPart_2.Velocity.Magnitude < 1 then
-                local const_number = 0
-            end
-            if 1 < math.abs(const_number - arg1._animSpeed) or arg1._animSpeed ~= 0 and const_number == 0 then
-                arg1:SetAnimSpeed(const_number)
-            end
-        end
-        if arg1._stateId == DogConsts_upvr.STATE.FOLLOW and arg1._animStateId == DogConsts_upvr.ANIM_STATE.IDLE and 6 < os.clock() - arg1._lastAnimTransition then
-            arg1:SetState(DogConsts_upvr.STATE.REST)
-            arg1:SetAnimation(DogConsts_upvr.ANIM_STATE.REST)
-        end
-    end
+function t._updateAnimSpeed(p1) --[[ Line: 499 | Upvalues: PlayerUtils (copy), DogConsts (copy) ]]
+	if p1._enabled then
+		local v2 = PlayerUtils.getRootPart((p1:GetOwner()))
+		if v2 then
+			local PrimaryPart = p1._obj.PrimaryPart
+			if p1._stateId == DogConsts.STATE.REST or p1._stateId == DogConsts.STATE.PET then
+				local v3 = PrimaryPart.Position - v2.Position
+				local Magnitude = v3.Magnitude
+				local v4 = v3.Unit:Dot(v2.CFrame.LookVector)
+				if Magnitude > 8 then
+					p1:_updateTarget()
+				elseif Magnitude < 4 and (v4 > 0.75 and p1._stateId ~= DogConsts.STATE.PET) then
+					p1:SetAnimation(DogConsts.ANIM_STATE.PET)
+					p1:SetState(DogConsts.STATE.PET)
+				end
+			end
+			if p1._stateId == DogConsts.STATE.FOLLOW or p1._stateId == DogConsts.STATE.ATTACK then
+				local Magnitude = PrimaryPart.Velocity.Magnitude
+				if Magnitude < 1 then
+					Magnitude = 0
+				end
+				if math.abs(Magnitude - p1._animSpeed) > 1 or p1._animSpeed ~= 0 and Magnitude == 0 then
+					p1:SetAnimSpeed(Magnitude)
+				end
+			end
+			if p1._stateId == DogConsts.STATE.FOLLOW and (p1._animStateId == DogConsts.ANIM_STATE.IDLE and os.clock() - p1._lastAnimTransition > 6) then
+				p1:SetState(DogConsts.STATE.REST)
+				p1:SetAnimation(DogConsts.ANIM_STATE.REST)
+			end
+		end
+	end
 end
-function module_upvr._discoverDog(arg1) -- Line 550
-    arg1._lastDiscoverDog = os.clock()
-    local any__getNearestDog_result1 = arg1:_getNearestDog(DogConsts_upvr.CONFUSION_OPP_RADIUS)
-    if any__getNearestDog_result1 then
-        arg1:SetDirection(((any__getNearestDog_result1._obj.PrimaryPart.Position - arg1._obj.PrimaryPart.Position) * Vector3.new(1, 0, 1)).Unit)
-        arg1:Bark()
-        arg1:_playAnimNetwork(DogConsts_upvr.ANIM_STATE.POINT)
-        return true
-    end
+function t._discoverDog(p1) --[[ Line: 550 | Upvalues: DogConsts (copy) ]]
+	local v1 = os.clock()
+	local PrimaryPart = p1._obj.PrimaryPart
+	p1._lastDiscoverDog = v1
+	local v2 = p1:_getNearestDog(DogConsts.CONFUSION_OPP_RADIUS)
+	if v2 then
+		p1:SetDirection(((v2._obj.PrimaryPart.Position - PrimaryPart.Position) * Vector3.new(1, 0, 1)).Unit)
+		p1:Bark()
+		p1:_playAnimNetwork(DogConsts.ANIM_STATE.POINT)
+		return true
+	end
 end
-function module_upvr._discoverOpp(arg1) -- Line 567
-    arg1._lastDiscoverOpp = os.clock()
-    local any__getNearestOpp_result1_2 = arg1:_getNearestOpp(DogConsts_upvr.BARK_OPP_RADIUS)
-    if any__getNearestOpp_result1_2 then
-        arg1:_barkAt(((PlayerUtils_upvr.getRootPart(any__getNearestOpp_result1_2).Position - arg1._obj.PrimaryPart.Position) * Vector3.new(1, 0, 1)).Unit)
-        return true
-    end
+function t._discoverOpp(p1) --[[ Line: 567 | Upvalues: DogConsts (copy), PlayerUtils (copy) ]]
+	local v1 = os.clock()
+	local PrimaryPart = p1._obj.PrimaryPart
+	p1._lastDiscoverOpp = v1
+	local v2 = p1:_getNearestOpp(DogConsts.BARK_OPP_RADIUS)
+	if v2 then
+		p1:_barkAt(((PlayerUtils.getRootPart(v2).Position - PrimaryPart.Position) * Vector3.new(1, 0, 1)).Unit)
+		return true
+	end
 end
-function module_upvr._barkAt(arg1, arg2) -- Line 581
-    local var118
-    if math.abs(arg2.Magnitude - 1) >= 0.001 then
-        var118 = false
-    else
-        var118 = true
-    end
-    assert(var118)
-    arg1:SetDirection(arg2)
-    arg1:Bark()
-    arg1:_playAnimNetwork(DogConsts_upvr.ANIM_STATE.POINT)
+function t._barkAt(p1, p2) --[[ Line: 581 | Upvalues: DogConsts (copy) ]]
+	assert(math.abs(p2.Magnitude - 1) < 0.001)
+	p1:SetDirection(p2)
+	p1:Bark()
+	p1:_playAnimNetwork(DogConsts.ANIM_STATE.POINT)
 end
-local RayCast_upvr = require(ReplicatedStorage.Module.RayCast)
-function module_upvr._updateLocalOwner(arg1) -- Line 590
-    if not arg1._enabled then
-    else
-        local os_clock_result1 = os.clock()
-        arg1._lastUpdate = os_clock_result1
-        if arg1._stateId == DogConsts_upvr.STATE.FOLLOW or arg1._stateId == DogConsts_upvr.STATE.ATTACK then
-            local any__getGoalPos_result1 = arg1:_getGoalPos()
-            if not any__getGoalPos_result1 then return end
-            arg1._targetSpeed = arg1:_getTargetSpeed(any__getGoalPos_result1, os_clock_result1 - arg1._lastUpdate)
-            arg1._goalPos = any__getGoalPos_result1
-            local PrimaryPart = arg1._obj.PrimaryPart
-            local var123 = (any__getGoalPos_result1 - PrimaryPart.Position) * Vector3.new(1, 0, 1)
-            local Magnitude = var123.Magnitude
-            local any__getGoalSpeed_result1 = arg1:_getGoalSpeed(Magnitude)
-            arg1:SetSpeed(any__getGoalSpeed_result1)
-            if 0 < any__getGoalSpeed_result1 then
-                arg1:SetDirection(var123.Unit)
-            end
-            local var126 = 1
-            if arg1:GetBreedId() == DogConsts_upvr.ENUM_BREED.GERMAN then
-                var126 = -1
-            end
-            arg1._bodyGyro.CFrame = CFrame.new(Vector3.new(), arg1._direction * var126) + PrimaryPart.Position
-            arg1._bodyVelocity.Velocity = PrimaryPart.CFrame.LookVector * var126 * arg1._speed
-            if any__getGoalSpeed_result1 * 0.5 < math.abs(PrimaryPart.Velocity:Dot(PrimaryPart.CFrame.LookVector)) or any__getGoalSpeed_result1 < 5 then
-                arg1._lastStuckAt = os_clock_result1
-            end
-            if 0.1 < os_clock_result1 - arg1._lastStuckAt and 0.5 < os_clock_result1 - arg1._lastJump then
-                arg1:Jump()
-            end
-            if arg1._stateId == DogConsts_upvr.STATE.ATTACK then
-                if arg1._attackStateId == DogConsts_upvr.ATTACK_STATE.TO then
-                    local ATTACK_LEAD_TIME = DogConsts_upvr.ATTACK_LEAD_TIME
-                    if Magnitude <= any__getGoalSpeed_result1 * ATTACK_LEAD_TIME and not arg1._goToPosition then
-                        local var128 = math.random() * 8 + 16
-                        if 0.5 < math.random() then
-                            var128 = -var128
-                        end
-                        local var129 = math.random() * 8 + 16
-                        if 0.5 < math.random() then
-                            var129 = -var129
-                        end
-                        local var130 = any__getGoalPos_result1 + Vector3.new(var128, 0, var129)
-                        local Position = PrimaryPart.Position
-                        local _, any_RayIgnoreNonCollideWithIgnoreList_result2 = RayCast_upvr.RayIgnoreNonCollideWithIgnoreList(Position, (var130 - Position).Unit, (var130 - Position).Magnitude, {arg1._obj, arg1:_getGoalRootPart().Parent})
-                        arg1._goToPosition = any_RayIgnoreNonCollideWithIgnoreList_result2
-                        arg1._lastAttack = os.clock()
-                        arg1:Jump()
-                        arg1:Bark()
-                        Promise_upvr.delay(ATTACK_LEAD_TIME):andThen(function() -- Line 669
-                            arg1._attackStateId = DogConsts_upvr.ATTACK_STATE.AWAY
-                        end)
-                        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                    end
-                elseif arg1._attackStateId == DogConsts_upvr.ATTACK_STATE.AWAY and Magnitude <= 10 then
-                    arg1._goToPosition = nil
-                    arg1._attackStateId = DogConsts_upvr.ATTACK_STATE.TO
-                end
-                if DogConsts_upvr.GIVE_UP_AFTER_DIST < Magnitude and 1 < os_clock_result1 - arg1._lastGiveUpSend then
-                    arg1._lastGiveUpSend = os_clock_result1
-                    arg1._giveUpRemote:FireServer()
-                    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                end
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-        else
-            arg1._lastStuckAt = os_clock_result1
-        end
-        if arg1._animStateId == DogConsts_upvr.ANIM_STATE.IDLE or arg1._animStateId == DogConsts_upvr.ANIM_STATE.REST or 1.5 < os_clock_result1 - arg1._lastAnimTransition then
-            local any__getNearestDog_result1_2 = arg1:_getNearestDog(DogConsts_upvr.BARK_CONFUSION_RADIUS)
-            if any__getNearestDog_result1_2 then
-                if 1 < os_clock_result1 - arg1._lastDiscoverDog then
-                    arg1._lastDiscoverDog = os_clock_result1
-                    arg1:_barkAt(((any__getNearestDog_result1_2._obj.PrimaryPart.Position - arg1._obj.PrimaryPart.Position) * Vector3.new(1, 0, 1)).Unit)
-                    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                end
-            else
-                local any__getNearestOpp_result1 = arg1:_getNearestOpp(DogConsts_upvr.BARK_OPP_RADIUS)
-                if any__getNearestOpp_result1 and 10 < os_clock_result1 - arg1._lastDiscoverOpp then
-                    arg1._lastDiscoverOpp = os_clock_result1
-                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                    arg1:_barkAt(((PlayerUtils_upvr.getRootPart(any__getNearestOpp_result1).Position - arg1._obj.PrimaryPart.Position) * Vector3.new(1, 0, 1)).Unit)
-                end
-            end
-        end
-        if arg1._stateId == DogConsts_upvr.STATE.ATTACK and DogConsts_upvr.GIVE_UP_AFTER_STUCK_FOR < os_clock_result1 - arg1._lastStuckAt and 1 < os_clock_result1 - arg1._lastGiveUpSend then
-            arg1._lastGiveUpSend = os_clock_result1
-            arg1._giveUpRemote:FireServer()
-        end
-    end
+function t._updateLocalOwner(p1) --[[ Line: 590 | Upvalues: DogConsts (copy), RayCast (copy), Promise (copy), PlayerUtils (copy) ]]
+	if p1._enabled then
+		local v1 = os.clock()
+		local v2 = v1 - p1._lastUpdate
+		p1._lastUpdate = v1
+		if p1._stateId == DogConsts.STATE.FOLLOW or p1._stateId == DogConsts.STATE.ATTACK then
+			local v3 = p1:_getGoalPos()
+			if v3 then
+				p1._targetSpeed = p1:_getTargetSpeed(v3, v2)
+				p1._goalPos = v3
+				local PrimaryPart = p1._obj.PrimaryPart
+				local v4 = (v3 - PrimaryPart.Position) * Vector3.new(1, 0, 1)
+				local Magnitude = v4.Magnitude
+				local v5 = p1:_getGoalSpeed(Magnitude)
+				p1:SetSpeed(v5)
+				if v5 > 0 then
+					p1:SetDirection(v4.Unit)
+				end
+				local v6 = if p1:GetBreedId() == DogConsts.ENUM_BREED.GERMAN then -1 else 1
+				p1._bodyGyro.CFrame = CFrame.new(Vector3.new(), p1._direction * v6) + PrimaryPart.Position
+				p1._bodyVelocity.Velocity = PrimaryPart.CFrame.LookVector * v6 * p1._speed
+				if v5 * 0.5 < math.abs((PrimaryPart.Velocity:Dot(PrimaryPart.CFrame.LookVector))) or v5 < 5 then
+					p1._lastStuckAt = v1
+				end
+				if v1 - p1._lastStuckAt > 0.1 and v1 - p1._lastJump > 0.5 then
+					p1:Jump()
+				end
+				if p1._stateId == DogConsts.STATE.ATTACK then
+					if p1._attackStateId == DogConsts.ATTACK_STATE.TO then
+						local ATTACK_LEAD_TIME = DogConsts.ATTACK_LEAD_TIME
+						if Magnitude <= v5 * ATTACK_LEAD_TIME and not p1._goToPosition then
+							local v8 = math.random() * 8 + 16
+							if math.random() > 0.5 then
+								v8 = -v8
+							end
+							local v9 = math.random() * 8 + 16
+							if math.random() > 0.5 then
+								v9 = -v9
+							end
+							local v10 = v3 + Vector3.new(v8, 0, v9)
+							local Position = PrimaryPart.Position
+							local _, v12 = RayCast.RayIgnoreNonCollideWithIgnoreList(Position, (v10 - Position).Unit, (v10 - Position).Magnitude, { p1._obj, p1:_getGoalRootPart().Parent })
+							p1._goToPosition = v12
+							p1._lastAttack = os.clock()
+							p1:Jump()
+							p1:Bark()
+							Promise.delay(ATTACK_LEAD_TIME):andThen(function() --[[ Line: 669 | Upvalues: p1 (copy), DogConsts (ref) ]]
+								p1._attackStateId = DogConsts.ATTACK_STATE.AWAY
+							end)
+						end
+					elseif p1._attackStateId == DogConsts.ATTACK_STATE.AWAY and Magnitude <= 10 then
+						p1._goToPosition = nil
+						p1._attackStateId = DogConsts.ATTACK_STATE.TO
+					end
+					if DogConsts.GIVE_UP_AFTER_DIST < Magnitude and v1 - p1._lastGiveUpSend > 1 then
+						p1._lastGiveUpSend = v1
+						p1._giveUpRemote:FireServer()
+					end
+				end
+			else
+				return
+			end
+		else
+			p1._lastStuckAt = v1
+		end
+		if (p1._animStateId == DogConsts.ANIM_STATE.IDLE or p1._animStateId == DogConsts.ANIM_STATE.REST) and v1 - p1._lastAnimTransition > 1.5 then
+			local PrimaryPart = p1._obj.PrimaryPart
+			local v13 = p1:_getNearestDog(DogConsts.BARK_CONFUSION_RADIUS)
+			if v13 then
+				if v1 - p1._lastDiscoverDog > 1 then
+					p1._lastDiscoverDog = v1
+					p1:_barkAt(((v13._obj.PrimaryPart.Position - PrimaryPart.Position) * Vector3.new(1, 0, 1)).Unit)
+				end
+			else
+				local v14 = p1:_getNearestOpp(DogConsts.BARK_OPP_RADIUS)
+				if v14 and v1 - p1._lastDiscoverOpp > 10 then
+					p1._lastDiscoverOpp = v1
+					p1:_barkAt(((PlayerUtils.getRootPart(v14).Position - PrimaryPart.Position) * Vector3.new(1, 0, 1)).Unit)
+				end
+			end
+		end
+		if p1._stateId == DogConsts.STATE.ATTACK and (v1 - p1._lastStuckAt > DogConsts.GIVE_UP_AFTER_STUCK_FOR and v1 - p1._lastGiveUpSend > 1) then
+			p1._lastGiveUpSend = v1
+			p1._giveUpRemote:FireServer()
+		end
+	end
 end
-function module_upvr.SetDirection(arg1, arg2) -- Line 729
-    arg1._direction = arg2
+function t.SetDirection(p1, p2) --[[ Line: 729 ]]
+	p1._direction = p2
 end
-function module_upvr.SetSpeed(arg1, arg2) -- Line 732
-    local var138
-    if var138 < 0 then
-        var138 = 0
-    end
-    arg1._speed = var138
+function t.SetSpeed(p1, p2) --[[ Line: 732 ]]
+	if p2 < 0 then
+		p2 = 0
+	end
+	p1._speed = p2
 end
-function module_upvr.SetAnimSpeed(arg1, arg2) -- Line 738
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    arg1._animSpeed = arg2
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if arg1._animStateId ~= DogConsts_upvr.ANIM_STATE.SPRINT then
-        arg1:SetAnimation(DogConsts_upvr.ANIM_STATE.SPRINT)
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.SetAnimSpeed(p1, p2) --[[ Line: 738 | Upvalues: DogConsts (copy) ]]
+	p1._animSpeed = p2
+	if p2 > 21 then
+		if p1._animStateId ~= DogConsts.ANIM_STATE.SPRINT then
+			p1:SetAnimation(DogConsts.ANIM_STATE.SPRINT)
+		end
+	elseif p2 > 0.01 then
+		if p1._animStateId ~= DogConsts.ANIM_STATE.WALK then
+			p1:SetAnimation(DogConsts.ANIM_STATE.WALK)
+		end
+	elseif p1._animStateId ~= DogConsts.ANIM_STATE.IDLE then
+		p1:SetAnimation(DogConsts.ANIM_STATE.IDLE)
+	end
+	if p1._animStateId then
+		local v2 = DogConsts.ANIM_SPS[p1:GetBreedId()][p1._animStateId]
+		if v2 and p1._animTrack then
+			if p2 <= 0.01 then
+				p2 = 0.01
+			end
+			p1._animTrack:AdjustSpeed(p2 / v2)
+		end
+	end
 end
-function module_upvr.GetOwner(arg1) -- Line 766
-    local _ownerIdValue = arg1._ownerIdValue
-    if not _ownerIdValue then return end
-    return Players_upvr:GetPlayerByUserId(_ownerIdValue.Value)
+function t.GetOwner(p1) --[[ Line: 766 | Upvalues: Players (copy) ]]
+	local _ownerIdValue = p1._ownerIdValue
+	if _ownerIdValue then
+		return Players:GetPlayerByUserId(_ownerIdValue.Value)
+	end
 end
-function module_upvr.GetTarget(arg1) -- Line 775
-    local _targetIdValue = arg1._targetIdValue
-    if not _targetIdValue then return end
-    return Players_upvr:GetPlayerByUserId(_targetIdValue.Value)
+function t.GetTarget(p1) --[[ Line: 775 | Upvalues: Players (copy) ]]
+	local _targetIdValue = p1._targetIdValue
+	if _targetIdValue then
+		return Players:GetPlayerByUserId(_targetIdValue.Value)
+	end
 end
-function module_upvr.Destroy(arg1) -- Line 784
-    local _maid = arg1._maid
-    local var142
-    if _maid == nil then
-        var142 = false
-    else
-        var142 = true
-    end
-    assert(var142)
-    arg1._maid = nil
-    _maid:Destroy()
+function t.Destroy(p1) --[[ Line: 784 ]]
+	local _maid = p1._maid
+	assert(_maid ~= nil)
+	p1._maid = nil
+	_maid:Destroy()
 end
-return module_upvr
+return t

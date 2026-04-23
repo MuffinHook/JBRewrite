@@ -1,45 +1,40 @@
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local function _(arg1) -- Line 7, Named "f"
-    if arg1 / 2 % 1 < 0.5 then
-        return arg1 % 1
-    end
-    return 1 - arg1 % 1
+local Roact = require(ReplicatedStorage.Roact)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local function f(p1) --[[ Line: 7 ]]
+	if p1 / 2 % 1 < 0.5 then
+		return p1 % 1
+	else
+		return 1 - p1 % 1
+	end
 end
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local RunService_upvr = game:GetService("RunService")
-local TweenService_upvr = game:GetService("TweenService")
-return function(arg1) -- Line 14
-    local any_extend_result1 = Roact_upvr.Component:extend("App")
-    function any_extend_result1.init(arg1_2) -- Line 17
-        local any_createBinding_result1, any_createBinding_result2 = Roact_upvr.createBinding(1)
-        arg1_2.pctClosed = any_createBinding_result1
-        arg1_2.updatePctClosed = any_createBinding_result2
-        arg1_2.maid = Maid_upvr.new()
-    end
-    function any_extend_result1.didMount(arg1_3) -- Line 21
-        arg1_3.maid:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 22
-            local os_clock_result1 = os.clock()
-            local var12
-            if os_clock_result1 / 2 % 1 < 0.5 then
-                var12 = os_clock_result1 % 1
-            else
-                var12 = 1 - os_clock_result1 % 1
-            end
-            arg1_3.updatePctClosed(TweenService_upvr:GetValue(var12, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut))
-        end))
-    end
-    function any_extend_result1.willUnmount(arg1_4) -- Line 28
-        arg1_4.maid:DoCleaning()
-    end
-    local Eyelids_upvr = require(script.Parent.Eyelids)
-    function any_extend_result1.render(arg1_5) -- Line 31
-        return Roact_upvr.createElement(Eyelids_upvr, {
-            pctClosed = arg1_5.pctClosed;
-        })
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(any_extend_result1), arg1)
-    return function() -- Line 38
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+return function(p1) --[[ Line: 14 | Upvalues: Roact (copy), Maid (copy), RunService (copy), TweenService (copy) ]]
+	local v1 = Roact.Component:extend("App")
+	local Eyelids = require(script.Parent.Eyelids)
+	function v1.init(p1) --[[ Line: 17 | Upvalues: Roact (ref), Maid (ref) ]]
+		local v1, v2 = Roact.createBinding(1)
+		p1.pctClosed = v1
+		p1.updatePctClosed = v2
+		p1.maid = Maid.new()
+	end
+	function v1.didMount(p1) --[[ Line: 21 | Upvalues: RunService (ref), TweenService (ref) ]]
+		p1.maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 22 | Upvalues: p1 (copy), TweenService (ref) ]]
+			local v1 = os.clock()
+			p1.updatePctClosed(TweenService:GetValue(if v1 / 2 % 1 < 0.5 then v1 % 1 else 1 - v1 % 1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut))
+		end))
+	end
+	function v1.willUnmount(p1) --[[ Line: 28 ]]
+		p1.maid:DoCleaning()
+	end
+	function v1.render(p1) --[[ Line: 31 | Upvalues: Roact (ref), Eyelids (copy) ]]
+		return Roact.createElement(Eyelids, {
+			pctClosed = p1.pctClosed
+		})
+	end
+	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	return function() --[[ Line: 38 | Upvalues: Roact (ref), v2 (copy) ]]
+		Roact.unmount(v2)
+	end
 end

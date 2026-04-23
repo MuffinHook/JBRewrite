@@ -1,38 +1,35 @@
-local module_upvr = {
-    Comma = function(arg1) -- Line 6, Named "Comma"
-        local string_match_result1, string_match_result2, string_match_result3 = string.match(arg1, "^([^%d]*%d)(%d*)(.-)$")
-        return string_match_result1..string_match_result2:reverse():gsub("(%d%d%d)", "%1,"):reverse()..string_match_result3
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Localization = require(ReplicatedStorage.Module.Localization)
+local t = {
+	Comma = function(p1) --[[ Name: Comma | Line: 6 ]]
+		local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
+		return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
+	end
 }
-local Localization_upvr = require(game:GetService("ReplicatedStorage").Module.Localization)
-function module_upvr.Currency(arg1) -- Line 10
-    if arg1 == nil then
-    else
-    end
-    assert(true)
-    local rounded = math.floor(arg1 + 0.5)
-    local sign = if rounded < 0 then "-" else ""
-    return sign..Localization_upvr:FormatByKey("General.Cash", {module_upvr.Comma(math.abs(rounded))})
+function t.Currency(p1) --[[ Line: 10 | Upvalues: Localization (copy), t (copy) ]]
+	assert(p1 ~= nil)
+	local v2 = math.floor(p1 + 0.5)
+	return if v2 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", { t.Comma((math.abs(v2))) })
 end
-function module_upvr.MinSec(arg1) -- Line 20
-    local floored = math.floor(arg1 / 60)
-    local var12 = arg1 % 60
-    local var13 = ""
-    if 0 < floored then
-        var13 = var13..string.format(("%d minute"), floored)
-        if floored ~= 1 then
-            var13 = var13..'s'
-        end
-    end
-    if 0 < floored and 0 < var12 then
-        var13 = var13.." and "
-    end
-    if 0 < var12 then
-        var13 = var13..string.format(("%d second"), var12)
-        if var12 ~= 1 then
-            var13 = var13..'s'
-        end
-    end
-    return var13
+function t.MinSec(p1) --[[ Line: 20 ]]
+	local v1 = ""
+	local v2 = math.floor(p1 / 60)
+	local v3 = p1 % 60
+	if v2 > 0 then
+		v1 = v1 .. ("%d minute"):format(v2)
+		if v2 ~= 1 then
+			v1 = v1 .. "s"
+		end
+	end
+	if v2 > 0 and v3 > 0 then
+		v1 = v1 .. " and "
+	end
+	if v3 > 0 then
+		v1 = v1 .. ("%d second"):format(v3)
+		if v3 ~= 1 then
+			v1 = v1 .. "s"
+		end
+	end
+	return v1
 end
-return module_upvr
+return t

@@ -1,1 +1,2 @@
-require(game:GetService("ReplicatedStorage").RocketLauncher.RocketLauncherRocketBinder):Start()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.RocketLauncher.RocketLauncherRocketBinder):Start()

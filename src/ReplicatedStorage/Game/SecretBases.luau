@@ -1,162 +1,189 @@
-local RunService_upvr = game:GetService("RunService")
-local function _(arg1, arg2) -- Line 7, Named "EphThread"
-    local tick_result1_upvr = tick()
-    local var5_upvw
-    var5_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 10
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        var5_upvw:Disconnect()
-        do
-            return
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        if arg2(tick() - tick_result1_upvr) then
-            var5_upvw:Disconnect()
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
+require(ReplicatedStorage.Std.Promise)
+game:GetService("CollectionService")
+local RunService = game:GetService("RunService")
+local function EphThread(p1, p2) --[[ Line: 7 | Upvalues: RunService (copy) ]]
+	local v1 = tick()
+	local v2 = nil
+	v2 = RunService.Heartbeat:Connect(function() --[[ Line: 10 | Upvalues: p1 (copy), v1 (copy), p2 (copy), v2 (ref) ]]
+		local v12 = tick()
+		if p1 then
+			local v22 = (v12 - v1) / p1
+			local v3
+			if v22 >= 1 then
+				v22 = 1
+				v3 = true
+			else
+				v3 = false
+			end
+			if p2(v22) then
+				v3 = true
+			end
+			if v3 then
+				v2:Disconnect()
+			end
+		elseif p2(v12 - v1) then
+			v2:Disconnect()
+		end
+	end)
 end
-local tbl_upvr = {}
-local function AnimateDoor_upvr(arg1, arg2, arg3) -- Line 34, Named "AnimateDoor"
-    if tbl_upvr[arg1] then
-        return false
-    end
-    tbl_upvr[arg1] = true
-    local children = arg1:GetChildren()
-    local _1_upvr = children[1]
-    local _2_upvr = children[2]
-    local Unit = (_2_upvr.Position - _1_upvr.Position).Unit
-    local CFrame_upvr = _1_upvr.CFrame
-    local CFrame_upvr_2 = _2_upvr.CFrame
-    local var13_upvr = CFrame_upvr - Unit * arg2
-    local var14_upvr = CFrame_upvr_2 + Unit * arg2
-    _1_upvr.CanCollide = false
-    _2_upvr.CanCollide = false
-    local function var15_upvr(arg1_2) -- Line 47
-        _1_upvr.CFrame = CFrame_upvr:lerp(var13_upvr, arg1_2)
-        _2_upvr.CFrame = CFrame_upvr_2:lerp(var14_upvr, arg1_2)
-    end
-    local var17_upvr = arg3 * 0.5
-    local tick_result1_upvr_5 = tick()
-    local var19_upvw
-    var19_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 10
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        var19_upvw:Disconnect()
-        do
-            return
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        if var15_upvr(tick() - tick_result1_upvr_5) then
-            var19_upvw:Disconnect()
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end)
-    var17_upvr = delay
-    tick_result1_upvr_5 = arg3 * 0.5
-    var15_upvr = tick_result1_upvr_5 + 1
-    function tick_result1_upvr_5() -- Line 51
-        local function var21_upvr(arg1_3) -- Line 52
-            _1_upvr.CFrame = var13_upvr:lerp(CFrame_upvr, arg1_3)
-            _2_upvr.CFrame = var14_upvr:lerp(CFrame_upvr_2, arg1_3)
-        end
-        local var23_upvr = arg3 * 0.5
-        local tick_result1_upvr_4 = tick()
-        local var25_upvw
-        var25_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 10
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            var25_upvw:Disconnect()
-            do
-                return
-            end
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            if var21_upvr(tick() - tick_result1_upvr_4) then
-                var25_upvw:Disconnect()
-            end
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        end)
-    end
-    var17_upvr(var15_upvr, tick_result1_upvr_5)
-    var17_upvr = delay
-    var15_upvr = arg3 + 1.1
-    function tick_result1_upvr_5() -- Line 57
-        _1_upvr.CanCollide = true
-        _2_upvr.CanCollide = true
-        tbl_upvr[arg1] = nil
-    end
-    var17_upvr(var15_upvr, tick_result1_upvr_5)
+local t = {}
+local function AnimateDoor(p1, p2, p3) --[[ Line: 34 | Upvalues: t (copy), RunService (copy) ]]
+	if t[p1] then
+		return false
+	end
+	t[p1] = true
+	local v1 = p1:GetChildren()
+	local v2 = v1[1]
+	local v3 = v1[2]
+	local Unit = (v3.Position - v2.Position).Unit
+	local v4 = v2.CFrame
+	local v5 = v3.CFrame
+	local v6 = v4 - Unit * p2
+	local v7 = v5 + Unit * p2
+	v2.CanCollide = false
+	v3.CanCollide = false
+	local v8 = p3 * 0.5
+	local function f9(p1) --[[ Line: 47 | Upvalues: v2 (copy), v4 (copy), v6 (copy), v3 (copy), v5 (copy), v7 (copy) ]]
+		v2.CFrame = v4:lerp(v6, p1)
+		v3.CFrame = v5:lerp(v7, p1)
+	end
+	local v10 = tick()
+	local v11 = nil
+	v11 = RunService.Heartbeat:Connect(function() --[[ Line: 10 | Upvalues: v8 (copy), v10 (copy), f9 (copy), v11 (ref) ]]
+		local v1 = tick()
+		if v8 then
+			local v2 = (v1 - v10) / v8
+			local v3
+			if v2 >= 1 then
+				v2 = 1
+				v3 = true
+			else
+				v3 = false
+			end
+			if f9(v2) then
+				v3 = true
+			end
+			if v3 then
+				v11:Disconnect()
+			end
+		elseif f9(v1 - v10) then
+			v11:Disconnect()
+		end
+	end)
+	delay(p3 * 0.5 + 1, function() --[[ Line: 51 | Upvalues: p3 (copy), v2 (copy), v6 (copy), v4 (copy), v3 (copy), v7 (copy), v5 (copy), RunService (ref) ]]
+		local v1 = p3 * 0.5
+		local function f2(p1) --[[ Line: 52 | Upvalues: v2 (ref), v6 (ref), v4 (ref), v3 (ref), v7 (ref), v5 (ref) ]]
+			v2.CFrame = v6:lerp(v4, p1)
+			v3.CFrame = v7:lerp(v5, p1)
+		end
+		local v32 = tick()
+		local v42 = nil
+		v42 = RunService.Heartbeat:Connect(function() --[[ Line: 10 | Upvalues: v1 (copy), v32 (copy), f2 (copy), v42 (ref) ]]
+			local v12 = tick()
+			if v1 then
+				local v2 = (v12 - v32) / v1
+				local v3
+				if v2 >= 1 then
+					v2 = 1
+					v3 = true
+				else
+					v3 = false
+				end
+				if f2(v2) then
+					v3 = true
+				end
+				if v3 then
+					v42:Disconnect()
+				end
+			elseif f2(v12 - v32) then
+				v42:Disconnect()
+			end
+		end)
+	end)
+	delay(p3 + 1.1, function() --[[ Line: 57 | Upvalues: v2 (copy), v3 (copy), t (ref), p1 (copy) ]]
+		v2.CanCollide = true
+		v3.CanCollide = true
+		t[p1] = nil
+	end)
 end
-local DoorUtils_upvr = require(game:GetService("ReplicatedStorage").Door2.DoorUtils)
 return {
-    Init = function(arg1) -- Line 64, Named "Init"
-        local em = arg1.em
-        function em.i5xh5pu6(arg1_4, arg2, arg3) -- Line 67
-            AnimateDoor_upvr(arg1_4, arg2, arg3)
-        end
-        function em.wd45fu9q(arg1_5, arg2) -- Line 70
-            DoorUtils_upvr.setOpen(arg1_5, arg2)
-        end
-        local var29_upvw = false
-        function em.jebiop9c(arg1_6, arg2) -- Line 75
-            if var29_upvw then
-                return false
-            end
-            var29_upvw = true
-            delay(0, function() -- Line 80
-                local function var31_upvr(arg1_7) -- Line 81
-                    arg1_6:SetPrimaryPartCFrame(arg2 + Vector3.new(0, 20, 0) * arg1_7)
-                end
-                local const_number_upvr = 2
-                local tick_result1_upvr_2 = tick()
-                local var35_upvw
-                var35_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 10
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    var35_upvw:Disconnect()
-                    do
-                        return
-                    end
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    if var31_upvr(tick() - tick_result1_upvr_2) then
-                        var35_upvw:Disconnect()
-                    end
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                end)
-            end)
-            delay(4, function() -- Line 85
-                local function var37_upvr(arg1_8) -- Line 86
-                    arg1_6:SetPrimaryPartCFrame(arg2 + Vector3.new(0, 20, 0) * (1 - arg1_8))
-                end
-                local const_number_upvr_2 = 2
-                local tick_result1_upvr_3 = tick()
-                local var41_upvw
-                var41_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 10
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    var41_upvw:Disconnect()
-                    do
-                        return
-                    end
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    if var37_upvr(tick() - tick_result1_upvr_3) then
-                        var41_upvw:Disconnect()
-                    end
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                end)
-            end)
-            wait(6)
-            var29_upvw = false
-        end
-    end;
+	Init = function(p1) --[[ Name: Init | Line: 64 | Upvalues: AnimateDoor (copy), DoorUtils (copy), RunService (copy) ]]
+		local _ = p1.Event
+		local em = p1.em
+		function em.ukfy8gb8(p1, p2, p3) --[[ Line: 67 | Upvalues: AnimateDoor (ref) ]]
+			AnimateDoor(p1, p2, p3)
+		end
+		function em.hfdr6rmx(p1, p2) --[[ Line: 70 | Upvalues: DoorUtils (ref) ]]
+			DoorUtils.setOpen(p1, p2)
+		end
+		local v1 = false
+		function em.bsjrqs6c(p1, p2) --[[ Line: 75 | Upvalues: v1 (ref), RunService (ref) ]]
+			if v1 then
+				return false
+			end
+			v1 = true
+			delay(0, function() --[[ Line: 80 | Upvalues: p1 (copy), p2 (copy), RunService (ref) ]]
+				local function f1(p12) --[[ Line: 81 | Upvalues: p1 (ref), p2 (ref) ]]
+					p1:SetPrimaryPartCFrame(p2 + Vector3.new(0, 20, 0) * p12)
+				end
+				local v2 = tick()
+				local v3 = nil
+				local v4 = 2
+				v3 = RunService.Heartbeat:Connect(function() --[[ Line: 10 | Upvalues: v4 (copy), v2 (copy), f1 (copy), v3 (ref) ]]
+					local v1 = tick()
+					if v4 then
+						local v22 = (v1 - v2) / v4
+						local v32
+						if v22 >= 1 then
+							v22 = 1
+							v32 = true
+						else
+							v32 = false
+						end
+						if f1(v22) then
+							v32 = true
+						end
+						if v32 then
+							v3:Disconnect()
+						end
+					elseif f1(v1 - v2) then
+						v3:Disconnect()
+					end
+				end)
+			end)
+			delay(4, function() --[[ Line: 85 | Upvalues: p1 (copy), p2 (copy), RunService (ref) ]]
+				local function f1(p12) --[[ Line: 86 | Upvalues: p1 (ref), p2 (ref) ]]
+					p1:SetPrimaryPartCFrame(p2 + Vector3.new(0, 20, 0) * (1 - p12))
+				end
+				local v2 = tick()
+				local v3 = nil
+				local v4 = 2
+				v3 = RunService.Heartbeat:Connect(function() --[[ Line: 10 | Upvalues: v4 (copy), v2 (copy), f1 (copy), v3 (ref) ]]
+					local v1 = tick()
+					if v4 then
+						local v22 = (v1 - v2) / v4
+						local v32
+						if v22 >= 1 then
+							v22 = 1
+							v32 = true
+						else
+							v32 = false
+						end
+						if f1(v22) then
+							v32 = true
+						end
+						if v32 then
+							v3:Disconnect()
+						end
+					elseif f1(v1 - v2) then
+						v3:Disconnect()
+					end
+				end)
+			end)
+			wait(6)
+			v1 = false
+		end
+	end
 }

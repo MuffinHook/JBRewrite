@@ -1,91 +1,64 @@
-local module_upvr = {}
-module_upvr.__index = module_upvr
-function module_upvr.new() -- Line 3
-    local module = {}
-    setmetatable(module, module_upvr)
-    module.MapNodeNode = {}
-    module.ListNode = {}
-    return module
+local t = {}
+t.__index = t
+function t.new() --[[ Line: 3 | Upvalues: t (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2.MapNodeNode = {}
+	t2.ListNode = {}
+	return t2
 end
-function module_upvr.GetNeighbors(arg1, arg2) -- Line 12
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var7
-    if arg1.MapNodeNode[arg2] == nil then
-        var7 = false
-    else
-        var7 = true
-    end
-    assert(var7)
-    var7 = pairs(arg1.MapNodeNode[arg2])
-    for i in pairs(arg1.MapNodeNode[arg2]) do
-        table.insert({}, i)
-        local var12
-    end
-    return var12
+function t.GetNeighbors(p1, p2) --[[ Line: 12 ]]
+	assert(p1.MapNodeNode[p2] ~= nil)
+	local t = {}
+	for k in pairs(p1.MapNodeNode[p2]) do
+		table.insert(t, k)
+	end
+	return t
 end
-function module_upvr.GetUndirectedNeighbors(arg1, arg2) -- Line 20
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var25
-    if arg1.MapNodeNode[arg2] == nil then
-        var25 = false
-    else
-        var25 = true
-    end
-    assert(var25)
-    var25 = pairs(arg1.MapNodeNode[arg2])
-    local pairs_result1, pairs_result2_3, pairs_result3_2 = pairs(arg1.MapNodeNode[arg2])
-    for i_2 in pairs_result1, pairs_result2_3, pairs_result3_2 do
-        table.insert({}, i_2)
-        local var29
-    end
-    pairs_result1 = pairs(arg1.MapNodeNode)
-    for i_3, v in pairs(arg1.MapNodeNode) do
-        if v[arg2] then
-            table.insert(var29, i_3)
-        end
-    end
-    return var29
+function t.GetUndirectedNeighbors(p1, p2) --[[ Line: 20 ]]
+	assert(p1.MapNodeNode[p2] ~= nil)
+	local t = {}
+	for k in pairs(p1.MapNodeNode[p2]) do
+		table.insert(t, k)
+	end
+	for k, v in pairs(p1.MapNodeNode) do
+		if v[p2] then
+			table.insert(t, k)
+		end
+	end
+	return t
 end
-function module_upvr.AddNode(arg1, arg2) -- Line 33
-    if arg1.MapNodeNode[arg2] ~= nil then
-    else
-        arg1.MapNodeNode[arg2] = {}
-        table.insert(arg1.ListNode, arg2)
-    end
+function t.AddNode(p1, p2) --[[ Line: 33 ]]
+	if p1.MapNodeNode[p2] == nil then
+		p1.MapNodeNode[p2] = {}
+		table.insert(p1.ListNode, p2)
+	end
 end
-function module_upvr.AddEdge(arg1, arg2, arg3) -- Line 40
-    if arg1.MapNodeNode[arg2] == nil then
-        arg1:AddNode(arg2)
-    end
-    if arg1.MapNodeNode[arg3] == nil then
-        arg1:AddNode(arg3)
-    end
-    if arg1.MapNodeNode[arg2][arg3] ~= nil then
-        error(string.format("Edge already exists from `%s` to `%s`", arg2, arg3));
-    end
-    arg1.MapNodeNode[arg2][arg3] = true
+function t.AddEdge(p1, p2, p3) --[[ Line: 40 ]]
+	if p1.MapNodeNode[p2] == nil then
+		p1:AddNode(p2)
+	end
+	if p1.MapNodeNode[p3] == nil then
+		p1:AddNode(p3)
+	end
+	if p1.MapNodeNode[p2][p3] ~= nil then
+		error(("Edge already exists from `%s` to `%s`"):format(p2, p3))
+	end
+	p1.MapNodeNode[p2][p3] = true
 end
-function module_upvr.HasEdge(arg1, arg2, arg3) -- Line 52
-    local var33 = false
-    if arg1.MapNodeNode[arg2] ~= nil then
-        if arg1.MapNodeNode[arg2][arg3] ~= true then
-            var33 = false
-        else
-            var33 = true
-        end
-    end
-    return var33
+function t.HasEdge(p1, p2, p3) --[[ Line: 52 ]]
+	return if p1.MapNodeNode[p2] == nil then false else p1.MapNodeNode[p2][p3] == true
 end
-function module_upvr.Inverse(arg1) -- Line 55
-    local any_new_result1 = getmetatable(arg1).new()
-    for _, v_2 in ipairs(arg1.ListNode) do
-        any_new_result1:AddNode(v_2)
-    end
-    for i_5, v_3 in pairs(arg1.MapNodeNode) do
-        for i_6 in pairs(v_3) do
-            any_new_result1:AddEdge(i_6, i_5)
-        end
-    end
-    return any_new_result1
+function t.Inverse(p1) --[[ Line: 55 ]]
+	local v1 = getmetatable(p1).new()
+	for i, v in ipairs(p1.ListNode) do
+		v1:AddNode(v)
+	end
+	for k, v in pairs(p1.MapNodeNode) do
+		for k2 in pairs(v) do
+			v1:AddEdge(k2, k)
+		end
+	end
+	return v1
 end
-return module_upvr
+return t

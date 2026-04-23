@@ -1,10 +1,12 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
-    setSavedSetting = function(arg1, arg2) -- Line 6, Named "setSavedSetting"
-        if arg1[arg2.key] == arg2.value then
-            return arg1
-        end
-        local clone = table.clone(arg1)
-        clone[arg2.key] = arg2.value
-        return clone
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer({}, {
+	setSavedSetting = function(p1, p2) --[[ Name: setSavedSetting | Line: 6 ]]
+		if p1[p2.key] == p2.value then
+			return p1
+		else
+			local v1 = table.clone(p1)
+			v1[p2.key] = p2.value
+			return v1
+		end
+	end
 })

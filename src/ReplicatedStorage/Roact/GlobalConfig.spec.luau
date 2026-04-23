@@ -1,14 +1,8 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMMBmV4cGVjdAJ0bwJiZQJvawNzZXQDZ2V0B3JlcXVpcmUGc2NyaXB0BlBhcmVudAxHbG9iYWxDb25maWcCaXQfc2hvdWxkIGhhdmUgdGhlIGNvcnJlY3QgbWV0aG9kcwADBgABAAAEAAEADyakAwEAAAAAQPsEAACfAwICTQIDkgIAAABNAQLMAwAAAE0AARAEAAAAnwABAaQDAQAAAABA+wUAAE0EBVMFAAAAnwMCAk0CA5ICAAAATQECzAMAAABNAAEQBAAAAJ8AAQGkAwEAAAAAQPsFAABNBAVfBgAAAJ8DAgJNAgOSAgAAAE0BAswDAAAATQABEAQAAACfAAEBggABAAcDAQQAAABAAwIDAwMEAwUDBgAEAAEYAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAEFAAAAAAQAAAAABwAAAQ8AABAQpAABAAAAAECkAwMAAAAgQE0CAyQEAAAATQECjAUAAACfAAICpAEHAAAAYEBvAggA2QMAABIAAACfAQMBggABAAkDBwQAAABAAwgEAAAgQAMJAwoDCwQAAGBAAwwBAAEAARgAAAAAAAAAAAACAAAAAAAFAgAAAAABAAABAgADowAAAMAAAACCAAIAAQYBAQEBAAEYAAAAAQAAAAAC7NplV2EfLPzeHg/DMp8PQ+beXhm01euYoawTI/0vsCKvzJiUar2ZoQ==
-
 return function() --[[ Line: 1 ]]
-    local v0 = require(script.Parent.GlobalConfig);
-    it("should have the correct methods", function() --[[ Line: 4 ]]
-        -- upvalues: v0 (copy)
-        expect(v0).to.be.ok();
-        expect(v0.set).to.be.ok();
-        expect(v0.get).to.be.ok();
-    end);
-end;
+	local GlobalConfig = require(script.Parent.GlobalConfig)
+	it("should have the correct methods", function() --[[ Line: 4 | Upvalues: GlobalConfig (copy) ]]
+		expect(GlobalConfig).to.be.ok()
+		expect(GlobalConfig.set).to.be.ok()
+		expect(GlobalConfig.get).to.be.ok()
+	end)
+end

@@ -1,25 +1,28 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CurrentCamera_upvr = workspace.CurrentCamera
-local module_upvr = {}
-local InputUtils_upvr = require(ReplicatedStorage.Std.InputUtils)
-local UserInputService_upvr = game:GetService("UserInputService")
-function module_upvr.getMouseLocation(arg1) -- Line 8
-    if InputUtils_upvr.isTouch() and not arg1 then
-        local ViewportSize = CurrentCamera_upvr.ViewportSize
-        return Vector3.new(ViewportSize.X * 0.5, ViewportSize.Y * 0.375, 0)
-    end
-    return UserInputService_upvr:GetMouseLocation()
+local UserInputService = game:GetService("UserInputService")
+local InputUtils = require(ReplicatedStorage.Std.InputUtils)
+local Raycast = require(ReplicatedStorage.Std.Raycast)
+local CurrentCamera = workspace.CurrentCamera
+local t = {
+	getMouseLocation = function(p1) --[[ Name: getMouseLocation | Line: 8 | Upvalues: InputUtils (copy), CurrentCamera (copy), UserInputService (copy) ]]
+		if InputUtils.isTouch() and not p1 then
+			local ViewportSize = CurrentCamera.ViewportSize
+			return Vector3.new(ViewportSize.X * 0.5, ViewportSize.Y * 0.375, 0)
+		else
+			return UserInputService:GetMouseLocation()
+		end
+	end
+}
+function t.raycastMouse(p1, p2) --[[ Line: 19 | Upvalues: t (copy), CurrentCamera (copy), Raycast (copy) ]]
+	local v1 = t.getMouseLocation(p2)
+	local v2 = CurrentCamera:ViewportPointToRay(v1.X, v1.Y)
+	local v3 = RaycastParams.new()
+	v3.FilterDescendantsInstances = p1
+	local v4 = Raycast.collidable(v2.Origin, v2.Direction, 999, v3)
+	if v4 then
+		return v4
+	else
+		return nil
+	end
 end
-local Raycast_upvr = require(ReplicatedStorage.Std.Raycast)
-function module_upvr.raycastMouse(arg1, arg2) -- Line 19
-    local any_getMouseLocation_result1 = module_upvr.getMouseLocation(arg2)
-    local any_ViewportPointToRay_result1 = CurrentCamera_upvr:ViewportPointToRay(any_getMouseLocation_result1.X, any_getMouseLocation_result1.Y)
-    local RaycastParams_new_result1 = RaycastParams.new()
-    RaycastParams_new_result1.FilterDescendantsInstances = arg1
-    local any_collidable_result1 = Raycast_upvr.collidable(any_ViewportPointToRay_result1.Origin, any_ViewportPointToRay_result1.Direction, 999, RaycastParams_new_result1)
-    if any_collidable_result1 then
-        return any_collidable_result1
-    end
-    return nil
-end
-return module_upvr
+return t

@@ -1,39 +1,64 @@
-local tbl_upvr = {require(game:GetService("ReplicatedStorage").Sale.SaleConsts).CATEGORY_NAME, "Texture", "SecondTexture", "BodyColor", "SecondBodyColor", "Engine", "Glow", "Horn", "Rim", "WheelColor", "Drift", "TireSticker", "TireMesh", "SuspensionHeight", "Brakes", "WindowColor", "WindowTint", "InteriorMainColor", "InteriorDetailColor", "SeatColor", "Spoiler", "SpoilerColor", "HeadlightsColor"}
-local tbl_upvr_2 = {
-    Texture = require(script.Parent.Category.Texture);
-    SecondTexture = require(script.Parent.Category.SecondTexture);
-    BodyColor = require(script.Parent.Category.BodyColor);
-    SecondBodyColor = require(script.Parent.Category.SecondBodyColor);
-    Engine = require(script.Parent.Category.Engine);
-    Glow = require(script.Parent.Category.Glow);
-    Horn = require(script.Parent.Category.Horn);
-    Rim = require(script.Parent.Category.Rim);
-    WheelColor = require(script.Parent.Category.WheelColor);
-    Drift = require(script.Parent.Category.Drift);
-    TireSticker = require(script.Parent.Category.TireSticker);
-    TireMesh = require(script.Parent.Category.TireMesh);
-    SuspensionHeight = require(script.Parent.Category.SuspensionHeight);
-    Brakes = require(script.Parent.Category.Brakes);
-    WindowColor = require(script.Parent.Category.WindowColor);
-    WindowTint = require(script.Parent.Category.WindowTint);
-    InteriorMainColor = require(script.Parent.Category.InteriorMainColor);
-    InteriorDetailColor = require(script.Parent.Category.InteriorDetailColor);
-    SeatColor = require(script.Parent.Category.SeatColor);
-    Spoiler = require(script.Parent.Category.Spoiler);
-    SpoilerColor = require(script.Parent.Category.SpoilerColor);
-    HeadlightsColor = require(script.Parent.Category.HeadlightsColor);
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local t = {
+	require(ReplicatedStorage.Sale.SaleConsts).CATEGORY_NAME,
+	"Texture",
+	"SecondTexture",
+	"BodyColor",
+	"SecondBodyColor",
+	"Engine",
+	"Glow",
+	"Horn",
+	"Rim",
+	"WheelColor",
+	"Drift",
+	"TireSticker",
+	"TireMesh",
+	"SuspensionHeight",
+	"Brakes",
+	"WindowColor",
+	"WindowTint",
+	"InteriorMainColor",
+	"InteriorDetailColor",
+	"SeatColor",
+	"Spoiler",
+	"SpoilerColor",
+	"HeadlightsColor"
+}
+local t2 = {
+	Texture = require(script.Parent.Category.Texture),
+	SecondTexture = require(script.Parent.Category.SecondTexture),
+	BodyColor = require(script.Parent.Category.BodyColor),
+	SecondBodyColor = require(script.Parent.Category.SecondBodyColor),
+	Engine = require(script.Parent.Category.Engine),
+	Glow = require(script.Parent.Category.Glow),
+	Horn = require(script.Parent.Category.Horn),
+	Rim = require(script.Parent.Category.Rim),
+	WheelColor = require(script.Parent.Category.WheelColor),
+	Drift = require(script.Parent.Category.Drift),
+	TireSticker = require(script.Parent.Category.TireSticker),
+	TireMesh = require(script.Parent.Category.TireMesh),
+	SuspensionHeight = require(script.Parent.Category.SuspensionHeight),
+	Brakes = require(script.Parent.Category.Brakes),
+	WindowColor = require(script.Parent.Category.WindowColor),
+	WindowTint = require(script.Parent.Category.WindowTint),
+	InteriorMainColor = require(script.Parent.Category.InteriorMainColor),
+	InteriorDetailColor = require(script.Parent.Category.InteriorDetailColor),
+	SeatColor = require(script.Parent.Category.SeatColor),
+	Spoiler = require(script.Parent.Category.Spoiler),
+	SpoilerColor = require(script.Parent.Category.SpoilerColor),
+	HeadlightsColor = require(script.Parent.Category.HeadlightsColor)
 }
 return {
-    GetCategoriesByModel = function(arg1) -- Line 54, Named "GetCategoriesByModel"
-        for _, v in tbl_upvr do
-            local var5 = tbl_upvr_2[v]
-            if not var5 or var5(arg1) then
-                table.insert({}, v)
-            end
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        return {}
-    end;
-    CATEGORIES = tbl_upvr;
-    MAP_CATEGORY_TO_FUNC = tbl_upvr_2;
+	GetCategoriesByModel = function(p1) --[[ Name: GetCategoriesByModel | Line: 54 | Upvalues: t (copy), t2 (copy) ]]
+		local t3 = {}
+		for v1, v2 in t do
+			local v3 = t2[v2]
+			if not v3 or v3(p1) then
+				table.insert(t3, v2)
+			end
+		end
+		return t3
+	end,
+	CATEGORIES = t,
+	MAP_CATEGORY_TO_FUNC = t2
 }

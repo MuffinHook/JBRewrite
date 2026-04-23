@@ -1,38 +1,7 @@
 {
   "className": "ParticleEmitter",
   "properties": {
-    "Size": {
-      "NumberSequence": {
-        "keypoints": [
-          {
-            "time": 0.0,
-            "value": 1.6875,
-            "envelope": 0.0
-          },
-          {
-            "time": 0.102787,
-            "value": 7.125,
-            "envelope": 0.0
-          },
-          {
-            "time": 0.712544,
-            "value": 8.375,
-            "envelope": 0.0
-          },
-          {
-            "time": 1.0,
-            "value": 10.0,
-            "envelope": 0.0
-          }
-        ]
-      }
-    },
-    "Speed": {
-      "NumberRange": [
-        10.0,
-        10.0
-      ]
-    },
+    "Rate": 5.0,
     "Transparency": {
       "NumberSequence": {
         "keypoints": [
@@ -69,6 +38,50 @@
         ]
       }
     },
+    "LightInfluence": 1.0,
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "EmissionDirection": "Front",
+    "Lifetime": {
+      "NumberRange": [
+        2.0,
+        2.0
+      ]
+    },
+    "Rotation": {
+      "NumberRange": [
+        -100.0,
+        100.0
+      ]
+    },
+    "Texture": "http://www.roblox.com/asset/?id=4698415462",
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 1.6875,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.102787,
+            "value": 7.125,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.712544,
+            "value": 8.375,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 10.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
     "Color": {
       "ColorSequence": {
         "keypoints": [
@@ -91,35 +104,22 @@
         ]
       }
     },
-    "EmissionDirection": "Front",
-    "LightInfluence": 1.0,
-    "Lifetime": {
-      "NumberRange": [
-        2.0,
-        2.0
-      ]
-    },
-    "Acceleration": [
-      0.0,
-      4.0,
-      0.0
-    ],
-    "Rate": 5.0,
     "RotSpeed": {
       "NumberRange": [
         25.0,
         25.0
       ]
     },
-    "Rotation": {
+    "Speed": {
       "NumberRange": [
-        -100.0,
-        100.0
+        10.0,
+        10.0
       ]
     },
-    "FlipbookBlendFrames": {
-      "Bool": false
-    },
-    "Texture": "http://www.roblox.com/asset/?id=4698415462"
+    "Acceleration": [
+      0.0,
+      4.0,
+      0.0
+    ]
   }
 }

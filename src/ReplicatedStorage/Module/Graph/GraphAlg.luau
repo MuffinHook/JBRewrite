@@ -1,79 +1,62 @@
-local module_upvr = {
-    dfs = function(arg1, arg2, arg3, arg4) -- Line 2, Named "dfs"
-        if arg1 == nil then
-        else
-        end
-        assert(true, "missing Graph G")
-        if arg2 == nil then
-        else
-        end
-        assert(true, "missing start vertex v")
-        if typeof(arg3) ~= "nil" then
-            if typeof(arg3) ~= "function" then
-            else
-            end
-        end
-        assert(true, "invalid condition")
-        local var2_upvw = arg4
-        if not var2_upvw then
-            var2_upvw = arg1.GetNeighbors
-        end
-        local module_upvr_2 = {}
-        local function _dfs_upvr(arg1_2) -- Line 10, Named "_dfs"
-            module_upvr_2[arg1_2] = true
-            for _, v in ipairs(var2_upvw(arg1, arg1_2)) do
-                if not module_upvr_2[v] and (arg3 == nil or arg3(v)) then
-                    _dfs_upvr(v)
-                end
-            end
-        end
-        _dfs_upvr(arg2)
-        return module_upvr_2
-    end;
-    bfsSearch = function(arg1, arg2, arg3) -- Line 23, Named "bfsSearch"
-        local tbl = {
-            [arg2] = true;
-        }
-        local tbl_2 = {}
-        table.insert(tbl_2, arg2)
-        while 0 < #tbl_2 do
-            local popped = table.remove(tbl_2)
-            if arg3(popped) then
-                return popped
-            end
-            for _, v_2 in ipairs(arg1:GetNeighbors(popped)) do
-                if not tbl[v_2] then
-                    tbl[v_2] = true
-                    table.insert(tbl_2, v_2)
-                end
-            end
-        end
-    end;
+local t = {
+	dfs = function(p1, p2, p3, p4) --[[ Name: dfs | Line: 2 ]]
+		assert(p1 ~= nil, "missing Graph G")
+		assert(p2 ~= nil, "missing start vertex v")
+		assert(typeof(p3) == "nil" or typeof(p3) == "function", "invalid condition")
+		local v5 = p4 or p1.GetNeighbors
+		local t = {}
+		local function v6(p12) --[[ Line: 10 | Upvalues: t (copy), v5 (ref), p1 (copy), p3 (copy), v6 (copy) ]]
+			t[p12] = true
+			for i, v in ipairs(v5(p1, p12)) do
+				if not t[v] and (p3 == nil or p3(v)) then
+					v6(v)
+				end
+			end
+		end
+		v6(p2)
+		return t
+	end,
+	bfsSearch = function(p1, p2, p3) --[[ Name: bfsSearch | Line: 23 ]]
+		local t = {}
+		table.insert(t, p2)
+		local t2 = {
+			[p2] = true
+		}
+		while #t > 0 do
+			local v1 = table.remove(t)
+			if p3(v1) then
+				return v1
+			end
+			for i, v in ipairs(p1:GetNeighbors(v1)) do
+				if not t2[v] then
+					t2[v] = true
+					table.insert(t, v)
+				end
+			end
+		end
+	end
 }
-function module_upvr.weaklyConnectedComponents(arg1) -- Line 41
-    if arg1 == nil then
-    else
-    end
-    assert(true, "missing Graph G")
-    local tbl_3 = {}
-    for _, v_3 in ipairs(arg1.ListNode) do
-        if not tbl_3[v_3] then
-            tbl_3[v_3] = true
-            local any_dfs_result1 = module_upvr.dfs(arg1, v_3, nil, arg1.GetUndirectedNeighbors)
-            local any_new_result1 = getmetatable(arg1).new()
-            for i_4 in pairs(any_dfs_result1) do
-                tbl_3[i_4] = true
-                any_new_result1:AddNode(i_4)
-                for i_5 in pairs(arg1.MapNodeNode[i_4]) do
-                    if any_dfs_result1[i_5] then
-                        any_new_result1:AddEdge(i_4, i_5)
-                    end
-                end
-            end
-            table.insert({}, any_new_result1)
-        end
-    end
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    return {}
+function t.weaklyConnectedComponents(p1) --[[ Line: 41 | Upvalues: t (copy) ]]
+	assert(p1 ~= nil, "missing Graph G")
+	local t2 = {}
+	local t3 = {}
+	for i, v in ipairs(p1.ListNode) do
+		if not t2[v] then
+			t2[v] = true
+			local v2 = t.dfs(p1, v, nil, p1.GetUndirectedNeighbors)
+			local v3 = getmetatable(p1).new()
+			for k in pairs(v2) do
+				t2[k] = true
+				v3:AddNode(k)
+				for k2 in pairs(p1.MapNodeNode[k]) do
+					if v2[k2] then
+						v3:AddEdge(k, k2)
+					end
+				end
+			end
+			table.insert(t3, v3)
+		end
+	end
+	return t3
 end
-return module_upvr
+return t

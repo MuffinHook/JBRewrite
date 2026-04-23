@@ -1,50 +1,43 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMYBE1ha2UFTW9kZWwOR2V0RGVzY2VuZGFudHMIQmFzZVBhcnQDSXNBBE5hbWUKU2Vjb25kQm9keQV0YWJsZQZpbnNlcnQETm9uZQZpcGFpcnMITWVzaFBhcnQACVRleHR1cmVJRA9yYnhhc3NldGlkOi8vJWQGZm9ybWF0BGdhbWURUmVwbGljYXRlZFN0b3JhZ2UKR2V0U2VydmljZQdyZXF1aXJlBEdhbWUGR2FyYWdlElNwZWNpYWxUZXh0dXJlRGF0YQtUZXh0dXJlRGF0YQACDwICAAA9AAIODw8PCAkRDwkJEQ8KNgkPCzYJAwxOAg8KRg0PC0YNDwUgNQ8GIjMPCFoJDwlaCQ8CAGYPAwJkDwQEYmZNAgGtAAAAAE0DATsBAAAA/wQAAAAAAAC8BQNHAgAAAJ8FAgRkBRAAbwwDALwKCf4EAAAAnwoDAg4KCwBNCgm6BQAAAPAKCAAGAACAnjQEBQkAAABSCwQAUgwJAKQKCQAAIHCAnwoDAW4F7/8CAAAADgA5AE0FAD8KAAAAKwU2AE0FALoFAAAAxgYAAPsIAACHBwgFRwcFAAAAAAD7CAAAhwcIBYcGBwJlAAUA+wgBAIcHCAUOBwIA+wcBAIcGBwVHBhEAAAAAgKQHDAAAALBAUggEAJ8HAgRRBwgAbw4NALwMC/4EAAAAnwwDAg4MAwBvDA4AMAwLhA8AAABuB/f/AgAAgIIAAQCkBwwAAACwQFIIBACfBwIEUQcMAG8ODQC8DAv+BAAAAJ8MAwIODAcAbwwQAFIOBgC8DAyNEQAAAJ8MAwIwDAuEDwAAAG4H8/8CAACAggABAKQFDAAAALBAUgYEAJ8FAgRRBQgAbwwNALwKCf4EAAAAnwoDAg4KAwBvCg4AMAoJhA8AAABuBff/AgAAgIIAAQASAwEDAgMDAwQDBQMGAwcDCAMJBAAgcIADCgMLBAAAsEADDAMNAw4DDwMQAAYAARgAAAEAAwABAAAAAQAAAAAAAAAAAQAAAAAAAP4ABQAAAAEAAQEAAAABAAAAAQAAAQACAAEAAAAAAQAAAAABAAD+AAAGAAAAAAEAAAAAAQAAAAAAAP4AAAcAAAAAAQAAAAABAAD+AAYHAAAAAAYAAAECDwAAAw8AARwPAQcWDwIQDR2jAAAApAABAAAAAEBvAgIAvAAAFgMAAACfAAMCpAEFAAAAQEBNBAC9BgAAAE0DBCgHAAAATQID5wgAAACfAQICpAIFAAAAQEBNBQC9BgAAAE0EBSgHAAAATQMEBQkAAACfAgICwAMKABIAAgASAAEAggMCAAsDEQQAAABAAxIDEwMUBAAAQEADFQMWAxcDGAYAAQABAAEYAAEAAAAAAAEAAAAAAAAAAAEAAAAAAAAAAAIAAAABAAAAAAHD/q6vhWEyvvE6xDtiK+rUzetw1rbCCs+yvAh3jleLKbu+T+M5lX30
-
-local l_ReplicatedStorage_0 = game:GetService("ReplicatedStorage");
-local v1 = require(l_ReplicatedStorage_0.Game.Garage.SpecialTextureData);
-local v2 = require(l_ReplicatedStorage_0.Game.Garage.TextureData);
-return function(v3, v4) --[[ Line: 6 ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local l_Make_0 = v4.Make;
-    local l_Model_0 = v4.Model;
-    local v7 = {};
-    for _, v9 in l_Model_0:GetDescendants() do
-        if v9:IsA("BasePart") and v9.Name == "SecondBody" then
-            table.insert(v7, v9);
-        end;
-    end;
-    if v3 and not v3.None then
-        local l_Name_0 = v3.Name;
-        local v11 = nil;
-        if v2[l_Name_0] ~= nil then
-            v11 = v2[l_Name_0][l_Make_0];
-        elseif v1[l_Name_0] then
-            v11 = v1[l_Name_0];
-        end;
-        if v11 == nil then
-            for _, v13 in ipairs(v7) do
-                if v13:IsA("MeshPart") then
-                    v13.TextureID = "";
-                end;
-            end;
-            return;
-        else
-            for _, v15 in ipairs(v7) do
-                if v15:IsA("MeshPart") then
-                    v15.TextureID = string.format(("rbxassetid://%d"), v11);
-                end;
-            end;
-            return;
-        end;
-    else
-        for _, v17 in ipairs(v7) do
-            if v17:IsA("MeshPart") then
-                v17.TextureID = "";
-            end;
-        end;
-        return;
-    end;
-end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SpecialTextureData = require(ReplicatedStorage.Game.Garage.SpecialTextureData)
+local TextureData = require(ReplicatedStorage.Game.Garage.TextureData)
+return function(p1, p2) --[[ Line: 5 | Upvalues: TextureData (copy), SpecialTextureData (copy) ]]
+	local Make = p2.Make
+	local Model = p2.Model
+	local list = {}
+	for v1, v2 in Model:GetDescendants() do
+		if v2:IsA("BasePart") and (v2.Name == "SecondBody" and (Make ~= "Expeditioner" or not v2:IsDescendantOf(Model.Preset.Doors.Back))) then
+			table.insert(list, v2)
+		end
+	end
+	if p1 and not p1.None then
+		local v3 = p1.Name
+		local v4 = nil
+		if TextureData[v3] == nil then
+			if SpecialTextureData[v3] then
+				v4 = SpecialTextureData[v3]
+			end
+		else
+			v4 = TextureData[v3][Make]
+		end
+		if v4 == nil then
+			for i, v in ipairs(list) do
+				if v:IsA("MeshPart") then
+					v.TextureID = ""
+				end
+			end
+		else
+			for i, v in ipairs(list) do
+				if v:IsA("MeshPart") then
+					v.TextureID = ("rbxassetid://%d"):format(v4)
+				end
+			end
+		end
+	else
+		for i, v in ipairs(list) do
+			if v:IsA("MeshPart") then
+				v.TextureID = ""
+			end
+		end
+	end
+end

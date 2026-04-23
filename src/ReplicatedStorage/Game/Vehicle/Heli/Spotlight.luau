@@ -1,225 +1,215 @@
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local RunService_upvr = game:GetService("RunService")
-local CurrentCamera_upvr = workspace.CurrentCamera
-local UserInputService_upvr = game:GetService("UserInputService")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local RunService = game:GetService("RunService")
+local CurrentCamera = workspace.CurrentCamera
+local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local InputUtils_upvr = require(ReplicatedStorage.Std.InputUtils)
-local function _(arg1, arg2) -- Line 19, Named "ShortestAngle"
-    return (arg1 - arg2 + math.pi) % (-math.pi*2) - math.pi + arg2
+local RayCast = require(ReplicatedStorage.Module.RayCast)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Spring = require(ReplicatedStorage.Std.Spring)
+local Math = require(ReplicatedStorage.Module.Math)
+local InputUtils = require(ReplicatedStorage.Std.InputUtils)
+local function ShortestAngle(p1, p2) --[[ Line: 19 ]]
+	return (p1 - p2 + math.pi) % 6.283185307179586 - math.pi + p2
 end
-local function LookAt_upvr(arg1, arg2) -- Line 23, Named "LookAt"
-    local Unit = (arg2 - arg1).Unit
-    local any_Cross_result1 = Unit:Cross(Vector3.new(1, 0, 0))
-    return CFrame.fromMatrix(arg1, any_Cross_result1, any_Cross_result1:Cross(Unit))
+local function LookAt(p1, p2) --[[ Line: 23 ]]
+	local Unit = (p2 - p1).Unit
+	local v1 = Unit:Cross(Vector3.new(1, 0, 0))
+	return CFrame.fromMatrix(p1, v1, (v1:Cross(Unit)))
 end
-local SpotlightConstants_upvr = require(script.Parent.SpotlightConstants)
-local module_upvr_2 = {}
-module_upvr_2.__index = module_upvr_2
-local Spring_upvr = require(ReplicatedStorage.Std.Spring)
-function module_upvr_2.new(arg1) -- Line 35
-    assert(arg1)
-    local module_upvr = {}
-    setmetatable(module_upvr, module_upvr_2)
-    module_upvr.SpotlightMotor = arg1
-    module_upvr.Maid = Maid_upvr.new()
-    local Attachment = Instance.new("Attachment")
-    module_upvr.Attachment = Attachment
-    Attachment.Parent = module_upvr.SpotlightMotor.Part1
-    local PointLight = Instance.new("PointLight")
-    PointLight.Range = 32
-    PointLight.Enabled = false
-    PointLight.Parent = module_upvr.Attachment
-    module_upvr.PointLight = PointLight
-    local Beam = module_upvr.SpotlightMotor.Part0.Parent.Light.Beam
-    Beam.Attachment1 = Attachment
-    module_upvr.Beam = Beam
-    module_upvr.SpringMouseLocation = Spring_upvr.new(Vector3.new(), Vector3.new(), 0.8, 20)
-    module_upvr.SpringAngles = Spring_upvr.new(Vector3.new(), Vector3.new(), 0.8, 20)
-    module_upvr.LastMouseWorldPosition = nil
-    module_upvr.LastMouseWorldNormal = nil
-    module_upvr:SetAngles(Vector3.new())
-    module_upvr:SetDistance(0)
-    module_upvr:SetEnabled(false)
-    module_upvr.LastUpdateAngleDistance = 0
-    module_upvr.RemoteEvent = arg1:WaitForChild("RemoteEvent")
-    local OnValue_upvr = arg1:WaitForChild("OnValue")
-    module_upvr.OnValue = OnValue_upvr
-    module_upvr.Maid:GiveTask(OnValue_upvr:GetPropertyChangedSignal("Value"):Connect(function() -- Line 72
-        module_upvr:SetEnabled(OnValue_upvr.Value)
-    end))
-    local AngleValue_upvr = arg1:WaitForChild("AngleValue")
-    module_upvr.Maid:GiveTask(AngleValue_upvr:GetPropertyChangedSignal("Value"):Connect(function() -- Line 76
-        module_upvr:SetAngles(AngleValue_upvr.Value)
-    end))
-    local DistanceValue_upvr = arg1:WaitForChild("DistanceValue")
-    module_upvr.Maid:GiveTask(DistanceValue_upvr:GetPropertyChangedSignal("Value"):Connect(function() -- Line 80
-        module_upvr:SetDistance(DistanceValue_upvr.Value)
-    end))
-    module_upvr.PoliceValue = arg1:WaitForChild("PoliceValue")
-    module_upvr.IgnoreList = {workspace.Vehicles, LocalPlayer_upvr.Character}
-    return module_upvr
+local SpotlightConstants = require(script.Parent.SpotlightConstants)
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 35 | Upvalues: t (copy), Maid (copy), Spring (copy), LocalPlayer (copy) ]]
+	assert(p1)
+	local t2 = {}
+	setmetatable(t2, t)
+	t2.SpotlightMotor = p1
+	t2.Maid = Maid.new()
+	local Attachment = Instance.new("Attachment")
+	t2.Attachment = Attachment
+	Attachment.Parent = t2.SpotlightMotor.Part1
+	local PointLight = Instance.new("PointLight")
+	PointLight.Range = 32
+	PointLight.Enabled = false
+	PointLight.Parent = t2.Attachment
+	t2.PointLight = PointLight
+	local Beam = t2.SpotlightMotor.Part0.Parent.Light.Beam
+	Beam.Attachment1 = Attachment
+	t2.Beam = Beam
+	t2.SpringMouseLocation = Spring.new(Vector3.new(), Vector3.new(), 0.8, 20)
+	t2.SpringAngles = Spring.new(Vector3.new(), Vector3.new(), 0.8, 20)
+	t2.LastMouseWorldPosition = nil
+	t2.LastMouseWorldNormal = nil
+	t2:SetAngles((Vector3.new()))
+	t2:SetDistance(0)
+	t2:SetEnabled(false)
+	t2.LastUpdateAngleDistance = 0
+	t2.RemoteEvent = p1:WaitForChild("RemoteEvent")
+	local OnValue = p1:WaitForChild("OnValue")
+	t2.OnValue = OnValue
+	t2.Maid:GiveTask(OnValue:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 72 | Upvalues: t2 (copy), OnValue (copy) ]]
+		t2:SetEnabled(OnValue.Value)
+	end))
+	local AngleValue = p1:WaitForChild("AngleValue")
+	t2.Maid:GiveTask(AngleValue:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 76 | Upvalues: t2 (copy), AngleValue (copy) ]]
+		t2:SetAngles(AngleValue.Value)
+	end))
+	local DistanceValue = p1:WaitForChild("DistanceValue")
+	t2.Maid:GiveTask(DistanceValue:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 80 | Upvalues: t2 (copy), DistanceValue (copy) ]]
+		t2:SetDistance(DistanceValue.Value)
+	end))
+	t2.PoliceValue = p1:WaitForChild("PoliceValue")
+	t2.IgnoreList = { workspace.Vehicles, LocalPlayer.Character }
+	return t2
 end
-function module_upvr_2.TransformLocalMousePosition(arg1, arg2) -- Line 90
-    return arg2
+function t.TransformLocalMousePosition(p1, p2) --[[ Line: 90 ]]
+	return p2
 end
-local RayCast_upvr = require(ReplicatedStorage.Module.RayCast)
-function module_upvr_2.ProjectMouseLocationToWorld(arg1, arg2) -- Line 93
-    local any_ViewportPointToRay_result1 = CurrentCamera_upvr:ViewportPointToRay(arg2.x, arg2.y)
-    local _, any_RayIgnoreNonCollideWithIgnoreList_result2, any_RayIgnoreNonCollideWithIgnoreList_result3 = RayCast_upvr.RayIgnoreNonCollideWithIgnoreList(any_ViewportPointToRay_result1.Origin, any_ViewportPointToRay_result1.Direction, 999, arg1.IgnoreList)
-    return arg1:TransformLocalMousePosition(any_RayIgnoreNonCollideWithIgnoreList_result2), any_RayIgnoreNonCollideWithIgnoreList_result3
+function t.ProjectMouseLocationToWorld(p1, p2) --[[ Line: 93 | Upvalues: CurrentCamera (copy), RayCast (copy) ]]
+	local v1 = CurrentCamera:ViewportPointToRay(p2.x, p2.y)
+	local _, v2, v3 = RayCast.RayIgnoreNonCollideWithIgnoreList(v1.Origin, v1.Direction, 999, p1.IgnoreList)
+	return p1:TransformLocalMousePosition(v2), v3
 end
-function module_upvr_2.GetMouseLocation(arg1) -- Line 100
-    if InputUtils_upvr.isTouch() then
-        local ViewportSize = CurrentCamera_upvr.ViewportSize
-        return Vector3.new(ViewportSize.X * 0.5, ViewportSize.Y * 0.875, 0)
-    end
-    return UserInputService_upvr:GetMouseLocation()
+function t.GetMouseLocation(p1) --[[ Line: 100 | Upvalues: InputUtils (copy), CurrentCamera (copy), UserInputService (copy) ]]
+	if InputUtils.isTouch() then
+		local ViewportSize = CurrentCamera.ViewportSize
+		return Vector3.new(ViewportSize.X * 0.5, ViewportSize.Y * 0.875, 0)
+	else
+		return UserInputService:GetMouseLocation()
+	end
 end
-function module_upvr_2.SetEnabled(arg1, arg2) -- Line 111
-    if arg2 then
-        arg1.Maid.UpdateLoop = RunService_upvr.Heartbeat:Connect(function() -- Line 113
-            arg1:Update()
-        end)
-    else
-        arg1.Maid.UpdateLoop = nil
-    end
-    arg1.Beam.Enabled = arg2
-    arg1.PointLight.Enabled = arg2
-    if not arg2 or not Enum.Material.Neon then
-    end
-    arg1.Beam.Parent.Material = Enum.Material.Plastic
+function t.SetEnabled(p1, p2) --[[ Line: 111 | Upvalues: RunService (copy) ]]
+	if p2 then
+		p1.Maid.UpdateLoop = RunService.Heartbeat:Connect(function() --[[ Line: 113 | Upvalues: p1 (copy) ]]
+			p1:Update()
+		end)
+	else
+		p1.Maid.UpdateLoop = nil
+	end
+	p1.Beam.Enabled = p2
+	p1.PointLight.Enabled = p2
+	p1.Beam.Parent.Material = p2 and Enum.Material.Neon or Enum.Material.Plastic
 end
-function module_upvr_2.RequestToggle(arg1) -- Line 123
-    if arg1.OnValue.Value then
-        arg1.RemoteEvent:FireServer(SpotlightConstants_upvr.EVENT_DISABLE)
-        arg1:UnhookLocal()
-    else
-        arg1.RemoteEvent:FireServer(SpotlightConstants_upvr.EVENT_ENABLE)
-        arg1:HookLocal()
-    end
+function t.RequestToggle(p1) --[[ Line: 123 | Upvalues: SpotlightConstants (copy) ]]
+	if p1.OnValue.Value then
+		p1.RemoteEvent:FireServer(SpotlightConstants.EVENT_DISABLE)
+		p1:UnhookLocal()
+	else
+		p1.RemoteEvent:FireServer(SpotlightConstants.EVENT_ENABLE)
+		p1:HookLocal()
+	end
 end
-function module_upvr_2.HookLocal(arg1) -- Line 132
-    local var31
-    if arg1.Maid.LocalMaid ~= nil then
-        var31 = false
-    else
-        var31 = true
-    end
-    assert(var31)
-    var31 = Maid_upvr
-    var31 = var31.new()
-    arg1.Maid.LocalMaid = var31
-    var31 = "Part"
-    local any = Instance.new(var31)
-    var31 = Vector3.new(64, 64, 0.10000)
-    any.Size = var31
-    var31 = true
-    any.Anchored = var31
-    var31 = 1
-    any.Transparency = var31
-    var31 = false
-    any.CanCollide = var31
-    var31 = workspace
-    any.Parent = var31
-    var31 = Instance.new("Decal")
-    var31.Texture = "rbxassetid://5477999115"
-    var31.Face = Enum.NormalId.Front
-    var31.Transparency = 0.5
-    var31.Parent = any
-    arg1.FakeCircle = any
-    local any_ProjectMouseLocationToWorld_result1, any_ProjectMouseLocationToWorld_result2 = arg1:ProjectMouseLocationToWorld(arg1:GetMouseLocation())
-    arg1.LastMouseWorldPosition = any_ProjectMouseLocationToWorld_result1
-    arg1.LastMouseWorldNormal = any_ProjectMouseLocationToWorld_result2
-    arg1.Maid.LocalMaid:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 152
-        arg1:UpdateMousePosition()
-    end))
-    arg1.Maid.LocalMaid:GiveTask(function() -- Line 155
-        arg1.Attachment.Position = Vector3.new()
-    end)
-    arg1.Maid.LocalMaid:GiveTask(function() -- Line 158
-        arg1.FakeCircle:Destroy()
-        arg1.FakeCircle = nil
-    end)
+function t.HookLocal(p1) --[[ Line: 132 | Upvalues: Maid (copy), RunService (copy) ]]
+	assert(p1.Maid.LocalMaid == nil)
+	p1.Maid.LocalMaid = Maid.new()
+	local Part = Instance.new("Part")
+	Part.Size = Vector3.new(64, 64, 0.1)
+	Part.Anchored = true
+	Part.Transparency = 1
+	Part.CanCollide = false
+	Part.Parent = workspace
+	local Decal = Instance.new("Decal")
+	Decal.Texture = "rbxassetid://5477999115"
+	Decal.Face = Enum.NormalId.Front
+	Decal.Transparency = 0.5
+	Decal.Parent = Part
+	p1.FakeCircle = Part
+	local v1, v2 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
+	p1.LastMouseWorldPosition = v1
+	p1.LastMouseWorldNormal = v2
+	p1.Maid.LocalMaid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 152 | Upvalues: p1 (copy) ]]
+		p1:UpdateMousePosition()
+	end))
+	p1.Maid.LocalMaid:GiveTask(function() --[[ Line: 155 | Upvalues: p1 (copy) ]]
+		p1.Attachment.Position = Vector3.new()
+	end)
+	p1.Maid.LocalMaid:GiveTask(function() --[[ Line: 158 | Upvalues: p1 (copy) ]]
+		p1.FakeCircle:Destroy()
+		p1.FakeCircle = nil
+	end)
 end
-function module_upvr_2.UnhookLocal(arg1) -- Line 163
-    if arg1.Maid.LocalMaid ~= nil then
-        arg1.Maid.LocalMaid = nil
-    end
+function t.UnhookLocal(p1) --[[ Line: 163 ]]
+	if p1.Maid.LocalMaid ~= nil then
+		p1.Maid.LocalMaid = nil
+	end
 end
-function module_upvr_2.SetAngles(arg1, arg2) -- Line 168
-    arg1.SpringAngles:SetTarget(arg2)
+function t.SetAngles(p1, p2) --[[ Line: 168 ]]
+	p1.SpringAngles:SetTarget(p2)
 end
-function module_upvr_2.SetDistance(arg1, arg2) -- Line 171
-    arg1.Distance = arg2
+function t.SetDistance(p1, p2) --[[ Line: 171 ]]
+	p1.Distance = p2
 end
-function module_upvr_2.UpdateMousePosition(arg1) -- Line 175
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var38
-    if InputUtils_upvr.isTouch() then
-        local any_ProjectMouseLocationToWorld_result1_3, any_ProjectMouseLocationToWorld_result2_3 = arg1:ProjectMouseLocationToWorld(arg1:GetMouseLocation())
-        var38 = any_ProjectMouseLocationToWorld_result2_3
-    elseif InputUtils_upvr.isGamepad() then
-        local _, any_ProjectMouseLocationToWorld_result2_2 = arg1:ProjectMouseLocationToWorld(arg1:GetMouseLocation())
-        var38 = any_ProjectMouseLocationToWorld_result2_2
-    elseif UserInputService_upvr:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) or not arg1.LastMouseWorldPosition then
-        local any_ProjectMouseLocationToWorld_result1_2, any_ProjectMouseLocationToWorld_result2_4 = arg1:ProjectMouseLocationToWorld(arg1:GetMouseLocation())
-        var38 = any_ProjectMouseLocationToWorld_result2_4
-        arg1.LastMouseWorldPosition = any_ProjectMouseLocationToWorld_result1_2
-        arg1.LastMouseWorldNormal = var38
-    else
-        var38 = arg1.LastMouseWorldNormal
-    end
-    local var45 = arg1.LastMouseWorldPosition - arg1.Beam.Attachment0.WorldPosition
-    local Magnitude = var45.Magnitude
-    if 160 < Magnitude then
-        Magnitude = 160
-        if arg1.FakeCircle.Parent ~= nil then
-            arg1.FakeCircle.Parent = nil
-        end
-    else
-        local var47 = var45.Unit * Magnitude + arg1.Beam.Attachment0.WorldPosition
-        arg1.FakeCircle.CFrame = CFrame.new(var47, var47 + var38)
-        if arg1.FakeCircle.Parent ~= workspace then
-            arg1.FakeCircle.Parent = workspace
-        end
-    end
-    arg1:SetDistance(Magnitude)
-    local any_ToEulerAnglesXYZ_result1, any_ToEulerAnglesXYZ_result2, any_ToEulerAnglesXYZ_result3 = arg1.SpotlightMotor.Part1.CFrame:ToObjectSpace(LookAt_upvr(arg1.SpotlightMotor.Part1.Position, arg1.Beam.Attachment0.WorldPosition + arg1.SpotlightMotor.Part1.CFrame.LookVector * 160)):ToEulerAnglesXYZ()
-    local x = arg1.SpringAngles:Update().x
-    local vector3 = Vector3.new((any_ToEulerAnglesXYZ_result1 - x + math.pi) % (-math.pi*2) - math.pi + x, any_ToEulerAnglesXYZ_result2, any_ToEulerAnglesXYZ_result3)
-    arg1:SetAngles(vector3)
-    local tick_result1 = tick()
-    if 0.125 < tick_result1 - arg1.LastUpdateAngleDistance then
-        arg1.LastUpdateAngleDistance = tick_result1
-        arg1.RemoteEvent:FireServer(SpotlightConstants_upvr.EVENT_UPDATE_ANGLE_DISTANCE, vector3, Magnitude)
-    end
+function t.UpdateMousePosition(p1) --[[ Line: 175 | Upvalues: InputUtils (copy), UserInputService (copy), LookAt (copy), SpotlightConstants (copy) ]]
+	local v1, v2
+	if InputUtils.isTouch() then
+		local v3, v4 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
+		v1 = v3
+		v2 = v4
+	elseif InputUtils.isGamepad() then
+		local v5, v6 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
+		v1 = v5
+		v2 = v6
+	elseif UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) or not p1.LastMouseWorldPosition then
+		local v7, v8 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
+		p1.LastMouseWorldPosition = v7
+		p1.LastMouseWorldNormal = v8
+		v1 = v7
+		v2 = v8
+	else
+		v1 = p1.LastMouseWorldPosition
+		v2 = p1.LastMouseWorldNormal
+	end
+	local v9 = v1 - p1.Beam.Attachment0.WorldPosition
+	local Magnitude = v9.Magnitude
+	if Magnitude > 160 then
+		Magnitude = 160
+		if p1.FakeCircle.Parent ~= nil then
+			p1.FakeCircle.Parent = nil
+		end
+		v1 = p1.Beam.Attachment0.WorldPosition + p1.SpotlightMotor.Part1.CFrame.LookVector * 160
+	else
+		local v10 = v9.Unit * Magnitude + p1.Beam.Attachment0.WorldPosition
+		p1.FakeCircle.CFrame = CFrame.new(v10, v10 + v2)
+		if p1.FakeCircle.Parent ~= workspace then
+			p1.FakeCircle.Parent = workspace
+		end
+	end
+	p1:SetDistance(Magnitude)
+	local v11, v12, v13 = p1.SpotlightMotor.Part1.CFrame:ToObjectSpace(LookAt(p1.SpotlightMotor.Part1.Position, v1)):ToEulerAnglesXYZ()
+	local x = p1.SpringAngles:Update().x
+	local v14 = Vector3.new((v11 - x + math.pi) % 6.283185307179586 - math.pi + x, v12, v13)
+	p1:SetAngles(v14)
+	local v15 = tick()
+	if v15 - p1.LastUpdateAngleDistance > 0.125 then
+		p1.LastUpdateAngleDistance = v15
+		p1.RemoteEvent:FireServer(SpotlightConstants.EVENT_UPDATE_ANGLE_DISTANCE, v14, Magnitude)
+	end
 end
-local Math_upvr = require(ReplicatedStorage.Module.Math)
-function module_upvr_2.Update(arg1) -- Line 231
-    local any_Update_result1 = arg1.SpringAngles:Update()
-    local Distance = arg1.Distance
-    arg1.SpotlightMotor.C1 = CFrame.fromEulerAnglesXYZ(any_Update_result1.X, any_Update_result1.Y, any_Update_result1.Z)
-    local CFrame = arg1.SpotlightMotor.Part0.CFrame
-    arg1.Attachment.WorldPosition = CFrame.p + CFrame.LookVector * (Distance + 4)
-    arg1.Beam.TextureLength = Distance + 4
-    arg1.Beam.Width1 = Distance * 2 / 3
-    if arg1.Maid.LocalMaid == nil and arg1.PoliceValue.Value then
-        local Character_2 = LocalPlayer_upvr.Character
-        if Character_2 ~= nil then
-            local Humanoid_2 = Character_2:FindFirstChild("Humanoid")
-            if Humanoid_2 ~= nil then
-                local RootPart = Humanoid_2.RootPart
-                if RootPart ~= nil then
-                    arg1.IsLocalInSpotlight = Math_upvr.DoesFixedConeIntersectSphere(CFrame.p, CFrame.LookVector, Distance + 4, 0.23561944901923448, RootPart.Position, 3)
-                end
-            end
-        end
-    end
+function t.Update(p1) --[[ Line: 231 | Upvalues: LocalPlayer (copy), Math (copy) ]]
+	local v1 = p1.SpringAngles:Update()
+	local v2 = CFrame.fromEulerAnglesXYZ(v1.X, v1.Y, v1.Z)
+	local Distance = p1.Distance
+	p1.SpotlightMotor.C1 = v2
+	local v3 = p1.SpotlightMotor.Part0.CFrame
+	p1.Attachment.WorldPosition = v3.p + v3.LookVector * (Distance + 4)
+	p1.Beam.TextureLength = Distance + 4
+	p1.Beam.Width1 = Distance * 2 / 3
+	if p1.Maid.LocalMaid == nil and p1.PoliceValue.Value then
+		local Character = LocalPlayer.Character
+		if Character ~= nil then
+			local Humanoid = Character:FindFirstChild("Humanoid")
+			if Humanoid ~= nil then
+				local RootPart = Humanoid.RootPart
+				if RootPart ~= nil then
+					p1.IsLocalInSpotlight = Math.DoesFixedConeIntersectSphere(v3.p, v3.LookVector, Distance + 4, 0.23561944901923448, RootPart.Position, 3)
+				end
+			end
+		end
+	end
 end
-function module_upvr_2.Destroy(arg1) -- Line 274
-    arg1.IsLocalInSpotlight = false
-    arg1.Maid:Destroy()
-    arg1.Maid = nil
+function t.Destroy(p1) --[[ Line: 274 ]]
+	p1.IsLocalInSpotlight = false
+	p1.Maid:Destroy()
+	p1.Maid = nil
 end
-return module_upvr_2
+return t

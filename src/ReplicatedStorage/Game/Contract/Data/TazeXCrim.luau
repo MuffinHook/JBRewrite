@@ -1,8 +1,9 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
-    teamId = require(game:GetService("ReplicatedStorage").Resource.Settings).EnumTeam.Police;
-    message = function(arg1) -- Line 6
-        return string.format("Taze %d criminals.", arg1:GetGoal());
-    end;
-    goal = 6;
-    rewardExp = 30;
+	teamId = require(ReplicatedStorage.Resource.Settings).EnumTeam.Police,
+	message = function(p1) --[[ Line: 6 ]]
+		return ("Taze %d criminals."):format(p1:GetGoal())
+	end,
+	goal = 6,
+	rewardExp = 30
 }

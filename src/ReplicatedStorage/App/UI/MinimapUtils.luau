@@ -1,51 +1,38 @@
-local module_upvr = {
-    computeOffsetXY = function(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) -- Line 3, Named "computeOffsetXY"
-        if not arg2 then
-            local vector2_3 = Vector2.new(512, 512)
-        end
-        local var21 = arg9 * vector2_3.Y / arg7
-        local var22 = vector2_3.X * var21
-        local var23 = vector2_3.Y * var21
-        local var24 = arg7 * var21 - var22 - (1 - var21) * vector2_3.X
-        local var25 = arg8 * var21 - var23 - (1 - var21) * vector2_3.Y
-        local var26 = arg7 * var21 * (0.5 + (arg1.X - arg5) / arg3) - var22 * 0.5 - 0.5 * (1 - var21) * vector2_3.X
-        if var24 < var26 then
-            var26 = var24
-        end
-        if var26 < 0 then
-        end
-        if var25 < arg8 * var21 * (0.5 + (arg1.Z - arg6) / arg4) - var23 * 0.5 - 0.5 * (1 - var21) * vector2_3.Y then
-        end
-        if var25 < 0 then
-            local const_number = 0
-        end
-        local var28 = true
-        if 0 >= 0 then
-            var28 = true
-            if const_number >= 0 then
-                var28 = true
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                if var24 >= 0 then
-                    if var25 >= const_number then
-                        var28 = false
-                    else
-                        var28 = true
-                    end
-                end
-            end
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        return var28, 0, const_number, var21
-    end;
+local t = {
+	computeOffsetXY = function(p1, p2, p3, p4, p5, p6, p7, p8, p9) --[[ Name: computeOffsetXY | Line: 3 ]]
+		if not p2 then
+			p2 = Vector2.new(512, 512)
+		end
+		local v2 = p9 * p2.Y / p7
+		local v3 = p2.X * v2
+		local v4 = p2.Y * v2
+		local v7 = p7 * v2 - v3 - (1 - v2) * p2.X
+		local v8 = p8 * v2 - v4 - (1 - v2) * p2.Y
+		local v9 = p7 * v2 * (0.5 + (p1.X - p5) / p3) - v3 * 0.5 - 0.5 * (1 - v2) * p2.X
+		local v10 = p8 * v2 * (0.5 + (p1.Z - p6) / p4) - v4 * 0.5 - 0.5 * (1 - v2) * p2.Y
+		if v7 < v9 then
+			v9 = v7
+		end
+		if v9 < 0 then
+			v9 = 0
+		end
+		if v8 < v10 then
+			v10 = v8
+		end
+		if v10 < 0 then
+			v10 = 0
+		end
+		return v9 < 0 or (v10 < 0 or v7 < v9) or v8 < v10, v9, v10, v2
+	end
 }
-function module_upvr.computeWorldXY(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11) -- Line 56
-    local any_computeOffsetXY_result1, any_computeOffsetXY_result2, any_computeOffsetXY_result3, any_computeOffsetXY_result4 = module_upvr.computeOffsetXY(arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11)
-    return ((arg1 + any_computeOffsetXY_result2) / arg9 / any_computeOffsetXY_result4 - 0.5) * arg5 + arg7, ((arg2 + any_computeOffsetXY_result3) / arg10 / any_computeOffsetXY_result4 - 0.5) * arg6 + arg8
+function t.computeWorldXY(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11) --[[ Line: 56 | Upvalues: t (copy) ]]
+	local _, v1, v2, v3 = t.computeOffsetXY(p3, p4, p5, p6, p7, p8, p9, p10, p11)
+	return ((p1 + v1) / p9 / v3 - 0.5) * p5 + p7, ((p2 + v2) / p10 / v3 - 0.5) * p6 + p8
 end
-function module_upvr.worldToScale(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 84
-    return UDim2.fromScale(0.5 + (arg1 - arg3) / arg5, 0.5 + (arg2 - arg4) / arg6)
+function t.worldToScale(p1, p2, p3, p4, p5, p6) --[[ Line: 84 ]]
+	return UDim2.fromScale(0.5 + (p1 - p3) / p5, 0.5 + (p2 - p4) / p6)
 end
-function module_upvr.relativeWorldToScale(arg1, arg2, arg3, arg4) -- Line 87
-    return UDim2.fromScale(arg1 / arg3, arg2 / arg4)
+function t.relativeWorldToScale(p1, p2, p3, p4) --[[ Line: 87 ]]
+	return UDim2.fromScale(p1 / p3, p2 / p4)
 end
-return module_upvr
+return t

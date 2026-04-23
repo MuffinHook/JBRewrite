@@ -1,15 +1,10 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer(false, {
-    setSafesOpen = function(arg1, arg2) -- Line 5, Named "setSafesOpen"
-        local var2
-        if arg2.value == nil then
-            var2 = false
-        else
-            var2 = true
-        end
-        assert(var2, "missing value")
-        return arg2.value
-    end;
-    toggleSafesOpen = function(arg1) -- Line 9, Named "toggleSafesOpen"
-        return not arg1
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer(false, {
+	setSafesOpen = function(p1, p2) --[[ Name: setSafesOpen | Line: 5 ]]
+		assert(p2.value ~= nil, "missing value")
+		return p2.value
+	end,
+	toggleSafesOpen = function(p1) --[[ Name: toggleSafesOpen | Line: 9 ]]
+		return not p1
+	end
 })

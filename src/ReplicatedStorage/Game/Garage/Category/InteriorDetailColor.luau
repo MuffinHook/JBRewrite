@@ -1,13 +1,6 @@
-return function(arg1) -- Line 1
-    local Model = arg1.Model
-    if not Model then return end
-    local SecondInterior = Model:FindFirstChild("SecondInterior", true)
-    if not SecondInterior then
-        if arg1.Make ~= "Sloop" then
-            SecondInterior = false
-        else
-            SecondInterior = true
-        end
-    end
-    return SecondInterior
+return function(p1) --[[ Line: 1 ]]
+	local Model = p1.Model
+	if Model then
+		return Model:FindFirstChild("SecondInterior", true) or p1.Make == "Sloop"
+	end
 end

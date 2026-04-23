@@ -1,71 +1,51 @@
-local Basic_upvr = require(script.Parent.Basic)
-local tbl_upvr = {
-    Motion = {
-        Hip = {
-            Springs = {
-                ItemOffset = Vector3.new(0.69999, -0.5, 0);
-                ItemRotation = Vector3.new();
-                NeckRotation = Vector3.new();
-                WaistRotation = Vector3.new();
-            };
-        };
-        RightWristRotation = CFrame.new();
-        LeftWristRotation = CFrame.new();
-    };
+local Basic = require(script.Parent.Basic)
+local t = {
+	Motion = {
+		Hip = {
+			Springs = {
+				ItemOffset = Vector3.new(0.7, -0.5, 0),
+				ItemRotation = Vector3.new(),
+				NeckRotation = Vector3.new(),
+				WaistRotation = Vector3.new()
+			}
+		},
+		RightWristRotation = CFrame.new(),
+		LeftWristRotation = CFrame.new()
+	}
 }
-local module_upvr = {
-    __ClassName = "Flashlight";
+local t2 = {
+	__ClassName = "Flashlight"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Basic_upvr)
-function module_upvr.new(arg1, arg2, arg3) -- Line 23
-    local any_new_result1 = Basic_upvr.new(arg1, arg2, tbl_upvr, arg3)
-    setmetatable(any_new_result1, module_upvr)
-    any_new_result1.Enabled = false
-    any_new_result1.SpringItemOffset:SetTarget(Vector3.new(1, 0.60000, -1.5))
-    return any_new_result1
+t2.__index = t2
+setmetatable(t2, Basic)
+function t2.new(p1, p2, p3) --[[ Line: 23 | Upvalues: Basic (copy), t (copy), t2 (copy) ]]
+	local v1 = Basic.new(p1, p2, t, p3)
+	setmetatable(v1, t2)
+	v1.Enabled = false
+	v1.SpringItemOffset:SetTarget(Vector3.new(1, 0.6, -1.5))
+	return v1
 end
-function module_upvr.GetLeftArmPosition(arg1) -- Line 32
-    return nil
+function t2.GetLeftArmPosition(p1) --[[ Line: 32 ]]
+	return nil
 end
-function module_upvr.Toggle(arg1) -- Line 35
-    arg1.Enabled = not arg1.Enabled
-    local Model = arg1.Model
-    local var13
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var13 = Enum.Material.Neon
-        return var13
-    end
-    if not arg1.Enabled or not decompInlinedCondition() then
-        var13 = Enum.Material.Plastic
-    end
-    Model.Model.Light.Material = var13
-    for _, v in Model.Model:GetDescendants() do
-        if v:IsA("SpotLight") then
-            v.Enabled = arg1.Enabled
-        end
-    end
+function t2.Toggle(p1) --[[ Line: 35 ]]
+	p1.Enabled = not p1.Enabled
+	local Model = p1.Model
+	Model.Model.Light.Material = p1.Enabled and Enum.Material.Neon or Enum.Material.Plastic
+	for v2, v3 in Model.Model:GetDescendants() do
+		if v3:IsA("SpotLight") then
+			v3.Enabled = p1.Enabled
+		end
+	end
 end
-function module_upvr.InputBegan(arg1, arg2, arg3) -- Line 45
-    local var18 = true
-    if arg2.UserInputType ~= Enum.UserInputType.MouseButton1 then
-        var18 = false
-        if arg2.UserInputType == Enum.UserInputType.Gamepad1 then
-            if arg2.KeyCode ~= Enum.KeyCode.ButtonR2 then
-                var18 = false
-            else
-                var18 = true
-            end
-        end
-    end
-    if var18 then
-        arg1:Toggle()
-        if arg1.Local then
-            arg1:BroadcastInputBegan(arg2)
-        end
-    end
-    Basic_upvr.InputBegan(arg1, arg2, arg3)
+function t2.InputBegan(p1, p2, p3) --[[ Line: 45 | Upvalues: Basic (copy) ]]
+	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		p1:Toggle()
+		if p1.Local then
+			p1:BroadcastInputBegan(p2)
+		end
+	end
+	Basic.InputBegan(p1, p2, p3)
 end
-function module_upvr.InputEnded(arg1) -- Line 58
-end
-return module_upvr
+function t2.InputEnded(p1) --[[ Line: 58 ]] end
+return t2

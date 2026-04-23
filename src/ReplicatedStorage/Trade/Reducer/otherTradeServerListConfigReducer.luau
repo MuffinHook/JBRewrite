@@ -1,12 +1,13 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
-    setOtherTradeServerInfo = function(arg1, arg2) -- Line 5, Named "setOtherTradeServerInfo"
-        local clone_2 = table.clone(arg1)
-        clone_2.otherTradeServerInfo = arg2.value
-        return clone_2
-    end;
-    setOtherTradeServerListVisible = function(arg1, arg2) -- Line 10, Named "setOtherTradeServerListVisible"
-        local clone = table.clone(arg1)
-        clone.visible = arg2.value
-        return clone
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer({}, {
+	setOtherTradeServerInfo = function(p1, p2) --[[ Name: setOtherTradeServerInfo | Line: 5 ]]
+		local v1 = table.clone(p1)
+		v1.otherTradeServerInfo = p2.value
+		return v1
+	end,
+	setOtherTradeServerListVisible = function(p1, p2) --[[ Name: setOtherTradeServerListVisible | Line: 10 ]]
+		local v1 = table.clone(p1)
+		v1.visible = p2.value
+		return v1
+	end
 })

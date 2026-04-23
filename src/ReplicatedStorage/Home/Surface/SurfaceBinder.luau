@@ -1,1 +1,4 @@
-return require(game:GetService("ReplicatedStorage").Std.Binder).new(require(script.Parent.SurfaceConsts).TAG_NAME, require(script.Parent.Surface))
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Binder = require(ReplicatedStorage.Std.Binder)
+local SurfaceConsts = require(script.Parent.SurfaceConsts)
+return Binder.new(SurfaceConsts.TAG_NAME, require(script.Parent.Surface))

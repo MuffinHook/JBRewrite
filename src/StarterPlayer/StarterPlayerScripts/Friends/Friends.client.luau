@@ -1,1 +1,2 @@
-require(game:GetService("ReplicatedStorage").Friends.FriendsService).init()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.Friends.FriendsService).init()

@@ -1,5 +1,6 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer(false, {
-    setNetworkMutexLocked = function(arg1, arg2) -- Line 8, Named "setNetworkMutexLocked"
-        return arg2.value
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer(false, {
+	setNetworkMutexLocked = function(p1, p2) --[[ Name: setNetworkMutexLocked | Line: 8 ]]
+		return p2.value
+	end
 })

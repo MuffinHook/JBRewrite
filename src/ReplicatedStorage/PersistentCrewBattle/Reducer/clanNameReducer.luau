@@ -1,16 +1,9 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
-    setClanName = function(arg1, arg2) -- Line 5, Named "setClanName"
-        local var2
-        if arg2.clanId == nil then
-            var2 = false
-        else
-            var2 = true
-        end
-        assert(var2, "missing clanId")
-        var2 = arg1
-        local clone = table.clone(var2)
-        var2 = arg2.clanId
-        clone[var2] = arg2.value
-        return clone
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer({}, {
+	setClanName = function(p1, p2) --[[ Name: setClanName | Line: 5 ]]
+		assert(p2.clanId ~= nil, "missing clanId")
+		local v2 = table.clone(p1)
+		v2[p2.clanId] = p2.value
+		return v2
+	end
 })

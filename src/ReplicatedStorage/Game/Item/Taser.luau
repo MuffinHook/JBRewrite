@@ -1,213 +1,193 @@
-local Players_upvr = game:GetService("Players")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GunUtils_upvr = require(ReplicatedStorage.Game.GunShop.GunUtils)
-local InventoryItemUtils_upvr = require(ReplicatedStorage.Inventory.InventoryItemUtils)
-local Basic_upvr = require(script.Parent.Basic)
-local var6_upvw
-local module_upvr = {
-    __ClassName = "Taser";
+local GunUtils = require(ReplicatedStorage.Game.GunShop.GunUtils)
+local ItemSystem = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
+local CrossHair = require(ReplicatedStorage.Game.CrossHair)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
+local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
+local TagUtils = require(ReplicatedStorage.Tag.TagUtils)
+local Notification = require(ReplicatedStorage.Game.Notification)
+local LightningUtils = require(ReplicatedStorage.Game.LightningUtils)
+local Basic = require(script.Parent.Basic)
+local Taser = require(ReplicatedStorage.Game.ItemConfig.Taser)
+local GunSystemConsts = require(ReplicatedStorage.Game.ItemSystem.GunSystemConsts)
+local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
+local Raycast = require(ReplicatedStorage.Std.Raycast)
+local v2 = nil
+local t = {
+	__ClassName = "Taser"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Basic_upvr)
-local ItemSystem_upvr = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
-function module_upvr.Init(arg1) -- Line 29
-    var6_upvw = arg1.Event
-    arg1.em.q2xjkpyg = function(arg1_2, arg2) -- Line 32, Named "q2xjkpyg"
-        local any_GetEquipped_result1 = ItemSystem_upvr.GetEquipped(arg1_2)
-        if any_GetEquipped_result1 ~= nil and any_GetEquipped_result1.Draw then
-            any_GetEquipped_result1:Draw(arg2)
-        end
-    end
+t.__index = t
+setmetatable(t, Basic)
+function t.Init(p1) --[[ Line: 29 | Upvalues: v2 (ref), ItemSystem (copy) ]]
+	v2 = p1.Event
+	function p1.em.enmm5zqj(p1, p2) --[[ Line: 32 | Upvalues: ItemSystem (ref) ]]
+		local v1 = ItemSystem.GetEquipped(p1)
+		if v1 ~= nil and v1.Draw then
+			v1:Draw(p2)
+		end
+	end
 end
-local Taser_upvr = require(ReplicatedStorage.Game.ItemConfig.Taser)
-local GunSystemConsts_upvr = require(ReplicatedStorage.Game.ItemSystem.GunSystemConsts)
-function module_upvr.new(arg1, arg2, arg3) -- Line 41
-    local any_new_result1_upvr = Basic_upvr.new(arg1, arg2, Taser_upvr, arg3)
-    setmetatable(any_new_result1_upvr, module_upvr)
-    any_new_result1_upvr.Tip = any_new_result1_upvr.Model.Skeleton.Tip
-    any_new_result1_upvr.IgnoreList = {any_new_result1_upvr.Character, any_new_result1_upvr.Model}
-    if not InventoryItemUtils_upvr.getAttr(any_new_result1_upvr.inventoryItemValue, "NextUse") then
-        InventoryItemUtils_upvr.setAttr(any_new_result1_upvr.inventoryItemValue, "NextUse", os.clock())
-        InventoryItemUtils_upvr.setAttr(any_new_result1_upvr.inventoryItemValue, "LastUsedAt", 0)
-    end
-    if any_new_result1_upvr.Local then
-        any_new_result1_upvr:SetupCrossHair()
-    end
-    any_new_result1_upvr._customCollidableFunc = any_new_result1_upvr:_buildCustomCollidableFunc()
-    if any_new_result1_upvr.Local then
-        local var14 = InventoryItemUtils_upvr.getAttr(any_new_result1_upvr.inventoryItemValue, "NextUse") or 0
-        local var15 = InventoryItemUtils_upvr.getAttr(any_new_result1_upvr.inventoryItemValue, "LastUsedAt") or 0
-        local os_clock_result1_3 = os.clock()
-        if os_clock_result1_3 < var14 then
-            any_new_result1_upvr:StartReloadProgressCircle(var14 - var15, (os.clock()) - (os_clock_result1_3 - var15))
-            return any_new_result1_upvr
-        end
-        if GunUtils_upvr.getShouldAddEquipTime(any_new_result1_upvr) then
-            any_new_result1_upvr.IsEquipping = true
-            any_new_result1_upvr:StartReloadProgressCircle(GunSystemConsts_upvr.GUN_EQUIP_TIME)
-            any_new_result1_upvr.maid:GiveTask(task.delay(GunSystemConsts_upvr.GUN_EQUIP_TIME, function() -- Line 71
-                any_new_result1_upvr.IsEquipping = false
-            end))
-        end
-    end
-    return any_new_result1_upvr
+function t.new(p1, p2, p3) --[[ Line: 41 | Upvalues: Basic (copy), Taser (copy), t (copy), InventoryItemUtils (copy), GunUtils (copy), GunSystemConsts (copy) ]]
+	local v1 = Basic.new(p1, p2, Taser, p3)
+	setmetatable(v1, t)
+	v1.Tip = v1.Model.Skeleton.Tip
+	v1.IgnoreList = { v1.Character, v1.Model }
+	if not InventoryItemUtils.getAttr(v1.inventoryItemValue, "NextUse") then
+		InventoryItemUtils.setAttr(v1.inventoryItemValue, "NextUse", os.clock())
+		InventoryItemUtils.setAttr(v1.inventoryItemValue, "LastUsedAt", 0)
+	end
+	if v1.Local then
+		v1:SetupCrossHair()
+	end
+	v1._customCollidableFunc = v1:_buildCustomCollidableFunc()
+	if v1.Local then
+		local v3 = GunUtils.getShouldAddEquipTime(v1)
+		local v4 = InventoryItemUtils.getAttr(v1.inventoryItemValue, "NextUse") or 0
+		local v5 = InventoryItemUtils.getAttr(v1.inventoryItemValue, "LastUsedAt") or 0
+		local v6 = os.clock()
+		if v6 < v4 then
+			v1:StartReloadProgressCircle(v4 - v5, os.clock() - (v6 - v5))
+			return v1
+		elseif v3 then
+			v1.IsEquipping = true
+			v1:StartReloadProgressCircle(GunSystemConsts.GUN_EQUIP_TIME)
+			v1.maid:GiveTask(task.delay(GunSystemConsts.GUN_EQUIP_TIME, function() --[[ Line: 71 | Upvalues: v1 (copy) ]]
+				v1.IsEquipping = false
+			end))
+		end
+	end
+	return v1
 end
-function module_upvr._buildCustomCollidableFunc(arg1) -- Line 80
-    return function(arg1_3) -- Line 81
-        if arg1_3.CanCollide then
-            return true
-        end
-        if arg1._lastListCharacter then
-            for _, v in ipairs(arg1._lastListCharacter) do
-                if arg1_3:IsDescendantOf(v) then
-                    return true
-                end
-            end
-        end
-    end
+function t._buildCustomCollidableFunc(p1) --[[ Line: 80 ]]
+	return function(p12) --[[ Line: 81 | Upvalues: p1 (copy) ]]
+		if not p12.CanCollide and p1._lastListCharacter then
+			for i, v in ipairs(p1._lastListCharacter) do
+				local _ = p12:IsDescendantOf(v)
+			end
+		end
+		return true
+	end
 end
-function module_upvr.UpdateCrossHair(arg1) -- Line 94
-    arg1.CrossHair:Update(arg1:GetMouseLocation())
+function t.UpdateCrossHair(p1) --[[ Line: 94 ]]
+	p1.CrossHair:Update(p1:GetMouseLocation())
 end
-local CrossHair_upvr = require(ReplicatedStorage.Game.CrossHair)
-function module_upvr.SetupCrossHair(arg1) -- Line 97
-    arg1.CrossHair = CrossHair_upvr.Make()
-    arg1.CrossHair.Gui.Parent = arg1.Player.PlayerGui
-    arg1.Maid:GiveTask(function() -- Line 101
-        arg1.CrossHair:Destroy()
-        arg1.CrossHair = nil
-    end)
+function t.SetupCrossHair(p1) --[[ Line: 97 | Upvalues: CrossHair (copy) ]]
+	p1.CrossHair = CrossHair.Make()
+	p1.CrossHair.Gui.Parent = p1.Player.PlayerGui
+	p1.Maid:GiveTask(function() --[[ Line: 101 | Upvalues: p1 (copy) ]]
+		p1.CrossHair:Destroy()
+		p1.CrossHair = nil
+	end)
 end
-function module_upvr.Heartbeat(arg1) -- Line 107
-    Basic_upvr.Heartbeat(arg1)
-    if arg1.Local then
-        arg1:UpdateCrossHair()
-    end
+function t.Heartbeat(p1) --[[ Line: 107 | Upvalues: Basic (copy) ]]
+	Basic.Heartbeat(p1)
+	if p1.Local then
+		p1:UpdateCrossHair()
+	end
 end
-function module_upvr.GetLeftArmPosition(arg1) -- Line 113
-    return nil
+function t.GetLeftArmPosition(p1) --[[ Line: 113 ]]
+	return nil
 end
-local LightningUtils_upvr = require(ReplicatedStorage.Game.LightningUtils)
-function module_upvr.Draw(arg1, arg2) -- Line 116
-    if arg1._lastDraw and os.clock() - arg1._lastDraw < 1 then
-    else
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        arg1._lastDraw = os.clock()
-        local tbl_2 = {
-            Origin = arg1.Tip.Position;
-        }
-        tbl_2.Target = arg2
-        tbl_2.NumSegments = 10
-        tbl_2.OffsetRadius = 2
-        tbl_2.PartWidth = 0.1
-        tbl_2.Transparency = 0
-        tbl_2.Color = Color3.fromRGB(175, 130, 90)
-        game:GetService("Debris"):AddItem(LightningUtils_upvr.strikePosition(tbl_2), 0.1)
-        if arg1.Local then
-            var6_upvw:FireServer('q'.."m2a":sub(2, 2):reverse().."".."".."enxnpkjxa85a":sub(5, 8):reverse():reverse():reverse().."".."yg", arg2)
-        end
-    end
+function t.Draw(p1, p2) --[[ Line: 116 | Upvalues: LightningUtils (copy), v2 (ref) ]]
+	local v1 = os.clock()
+	if not (p1._lastDraw and v1 - p1._lastDraw < 1) then
+		p1._lastDraw = v1
+		local v22 = LightningUtils.strikePosition({
+			Origin = p1.Tip.Position,
+			Target = p2,
+			NumSegments = 10,
+			OffsetRadius = 2,
+			PartWidth = 0.1,
+			Transparency = 0,
+			Color = Color3.fromRGB(175, 130, 90)
+		})
+		game:GetService("Debris"):AddItem(v22, 0.1)
+		if p1.Local then
+			v2:FireServer("e" .. ("auynrozj"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ppemmyz"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "5zqj", p2)
+		end
+	end
 end
-local TagUtils_upvr = require(ReplicatedStorage.Tag.TagUtils)
-local Notification_upvr = require(ReplicatedStorage.Game.Notification)
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local LocalPlayer_upvr = Players_upvr.LocalPlayer
-local Raycast_upvr = require(ReplicatedStorage.Std.Raycast)
-local GeomUtils_upvr = require(ReplicatedStorage.Std.GeomUtils)
-local PlayerUtils_upvr = require(ReplicatedStorage.Game.PlayerUtils)
-function module_upvr.Tase(arg1, arg2) -- Line 155
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    if arg1.IsEquipping then
-        return false
-    end
-    local os_clock_result1 = os.clock()
-    if os_clock_result1 - InventoryItemUtils_upvr.getAttr(arg1.inventoryItemValue, "NextUse") < 0 then
-        return false
-    end
-    local Character = Players_upvr.LocalPlayer.Character
-    if not Character then
-        return false
-    end
-    if TagUtils_upvr.isPointInTag(Character.PrimaryPart.Position, "NoTaser") then
-        if arg1.Local then
-            Notification_upvr.new({
-                Text = "Tasers not allowed here.";
-            })
-        end
-        return false
-    end
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.taser_buzz)
-    arg1:UpdateMousePosition()
-    local var86
-    if arg1.Local then
-        arg1.CrossHair.Spring:Accelerate(600)
-        local tbl_3 = {}
-        for _, v_2 in Players_upvr:GetPlayers() do
-            if v_2 ~= LocalPlayer_upvr and v_2.Character then
-                table.insert(tbl_3, v_2.Character)
-            end
-        end
-        arg1._lastListCharacter = tbl_3
-        local Position_2 = arg1.Tip.Position
-        local var92 = arg1.MousePosition - arg1.Tip.Position
-        RaycastParams.new().FilterDescendantsInstances = arg1.IgnoreList
-        local any_collidable_result1_2 = Raycast_upvr.collidable(Position_2, var92.Unit, arg1.Config.Range)
-        if any_collidable_result1_2 then
-        else
-        end
-        if not any_collidable_result1_2.Instance then
-            for _, v_3 in tbl_3 do
-                local PrimaryPart_2 = v_3.PrimaryPart
-                if PrimaryPart_2 then
-                    local any_calcRayIntersectSphere_result1_2 = GeomUtils_upvr.calcRayIntersectSphere(Position_2, Position_2 + var92, PrimaryPart_2.Position, 3)
-                    if any_calcRayIntersectSphere_result1_2 then
-                        local var96 = any_calcRayIntersectSphere_result1_2
-                    end
-                end
-            end
-        end
-        arg1:Draw(var96)
-        local ReloadTime = arg1.Config.ReloadTime
-        local var98 = os_clock_result1 + ReloadTime
-        if v_3.PrimaryPart then
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            local any_getPlayerFromDescendant_result1 = PlayerUtils_upvr.getPlayerFromDescendant(v_3.PrimaryPart)
-            if any_getPlayerFromDescendant_result1 then
-                v_3 = 'm'.."syi":sub(2, 2):reverse().."".."".."z3r4w1bpc":sub(5, 8):reverse():reverse():reverse():reverse():reverse().."".."9g"
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                var6_upvw:FireServer(v_3, any_getPlayerFromDescendant_result1.Character:FindFirstChild("Humanoid"), v_3.PrimaryPart, var96)
-                var98 = os_clock_result1 + arg1.Config.ReloadTimeHit
-                arg1.CrossHair:Flare()
-                ReloadTime = arg1.Config.ReloadTimeHit
-            end
-        end
-        if arg1.Local then
-            arg1:StartReloadProgressCircle(ReloadTime)
-        end
-        InventoryItemUtils_upvr.setAttr(arg1.inventoryItemValue, "LastUsedAt", os_clock_result1)
-        InventoryItemUtils_upvr.setAttr(arg1.inventoryItemValue, "NextUse", var98)
-        arg1:BroadcastInputBegan(arg2)
-    end
-    GunUtils_upvr.setLastShotTime(arg1.Player, workspace:GetServerTimeNow())
-    return true
+function t.Tase(p1, p2) --[[ Line: 155 | Upvalues: InventoryItemUtils (copy), Players (copy), TagUtils (copy), Notification (copy), Audio (copy), LocalPlayer (copy), Raycast (copy), GeomUtils (copy), PlayerUtils (copy), v2 (ref), GunUtils (copy) ]]
+	if not p1.IsEquipping then
+		local v1 = os.clock()
+		if not (v1 - InventoryItemUtils.getAttr(p1.inventoryItemValue, "NextUse") < 0) then
+			local Character = Players.LocalPlayer.Character
+			if Character and TagUtils.isPointInTag(Character.PrimaryPart.Position, "NoTaser") then
+				if p1.Local then
+					Notification.new({
+						Text = "Tasers not allowed here."
+					})
+				end
+			elseif Character then
+				Audio.ObjectLocal(p1.Tip, p1.Config.Sound.taser_buzz)
+				p1:UpdateMousePosition()
+				if p1.Local then
+					p1.CrossHair.Spring:Accelerate(600)
+					local t = {}
+					for v22, v3 in Players:GetPlayers() do
+						if v3 ~= LocalPlayer and v3.Character then
+							table.insert(t, v3.Character)
+						end
+					end
+					p1._lastListCharacter = t
+					local Position = p1.Tip.Position
+					local v4 = p1.MousePosition - p1.Tip.Position
+					RaycastParams.new().FilterDescendantsInstances = p1.IgnoreList
+					local v5 = Raycast.collidable(Position, v4.Unit, p1.Config.Range)
+					local v6 = nil
+					local v7
+					if v5 then
+						v7 = v5.Position
+						v6 = v5.Instance
+					else
+						v7 = Position + v4.Unit * p1.Config.Range
+					end
+					if not v6 then
+						for v8, v9 in t do
+							local PrimaryPart = v9.PrimaryPart
+							if PrimaryPart then
+								local v10 = GeomUtils.calcRayIntersectSphere(Position, Position + v4, PrimaryPart.Position, 3)
+								if v10 then
+									v6 = v9.PrimaryPart
+									v7 = v10
+								end
+							end
+						end
+					end
+					p1:Draw(v7)
+					local ReloadTime = p1.Config.ReloadTime
+					local v11 = v1 + ReloadTime
+					if v6 then
+						local v12 = PlayerUtils.getPlayerFromDescendant(v6)
+						if v12 then
+							v2:FireServer("q" .. ("upskomtezlii"):sub(4, 9):reverse():reverse():reverse():reverse():reverse() .. "e", v12.Character:FindFirstChild("Humanoid"), v6, v7)
+							v11 = v1 + p1.Config.ReloadTimeHit
+							p1.CrossHair:Flare()
+							ReloadTime = p1.Config.ReloadTimeHit
+						end
+					end
+					if p1.Local then
+						p1:StartReloadProgressCircle(ReloadTime)
+					end
+					InventoryItemUtils.setAttr(p1.inventoryItemValue, "LastUsedAt", v1)
+					InventoryItemUtils.setAttr(p1.inventoryItemValue, "NextUse", v11)
+					p1:BroadcastInputBegan(p2)
+				end
+				GunUtils.setLastShotTime(p1.Player, workspace:GetServerTimeNow())
+				return true
+			end
+		end
+	end
+	return false
 end
-function module_upvr.InputBegan(arg1, arg2, arg3) -- Line 244
-    local var101 = true
-    if arg2.UserInputType ~= Enum.UserInputType.MouseButton1 then
-        var101 = false
-        if arg2.UserInputType == Enum.UserInputType.Gamepad1 then
-            if arg2.KeyCode ~= Enum.KeyCode.ButtonR2 then
-                var101 = false
-            else
-                var101 = true
-            end
-        end
-    end
-    if var101 then
-        arg1:Tase(arg2)
-    end
-    Basic_upvr.InputBegan(arg1, arg2, arg3)
+function t.InputBegan(p1, p2, p3) --[[ Line: 244 | Upvalues: Basic (copy) ]]
+	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		p1:Tase(p2)
+	end
+	Basic.InputBegan(p1, p2, p3)
 end
-function module_upvr.InputEnded(arg1) -- Line 254
-end
-return module_upvr
+function t.InputEnded(p1) --[[ Line: 254 ]] end
+return t

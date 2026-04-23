@@ -1,40 +1,40 @@
-local module_upvr = {}
-local Players_upvr = game:GetService("Players")
-function module_upvr.init() -- Line 5
-    module_upvr._handlePlayer(Players_upvr.LocalPlayer)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local t = {}
+function t.init() --[[ Line: 5 | Upvalues: t (copy), Players (copy) ]]
+	t._handlePlayer(Players.LocalPlayer)
 end
-function module_upvr._handlePlayer(arg1) -- Line 8
-    if arg1.Character then
-        module_upvr._handleCharacter(arg1.Character)
-    end
-    arg1.CharacterAdded:Connect(module_upvr._handleCharacter)
+function t._handlePlayer(p1) --[[ Line: 8 | Upvalues: t (copy) ]]
+	if p1.Character then
+		t._handleCharacter(p1.Character)
+	end
+	p1.CharacterAdded:Connect(t._handleCharacter)
 end
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-function module_upvr._handleCharacter(arg1) -- Line 14
-    local Animator = arg1:WaitForChild("Humanoid"):WaitForChild("Animator")
-    local any_LoadAnimation_result1_3 = Animator:LoadAnimation(arg1:WaitForChild("Animate"):WaitForChild("idle"):WaitForChild("Animation1"))
-    any_LoadAnimation_result1_3.Priority = Enum.AnimationPriority.Action
-    any_LoadAnimation_result1_3:AdjustSpeed(0)
-    module_upvr._idleTrack = any_LoadAnimation_result1_3
-    module_upvr._skydiveTrack = Animator:LoadAnimation(ReplicatedStorage_upvr.Resource.Skydive)
-    local any_LoadAnimation_result1 = Animator:LoadAnimation(ReplicatedStorage_upvr.Resource.RopeGrabAnimation)
-    any_LoadAnimation_result1.Priority = Enum.AnimationPriority.Action
-    any_LoadAnimation_result1:AdjustSpeed(0)
-    module_upvr._ropeGrabTrack = any_LoadAnimation_result1
-    local any_LoadAnimation_result1_2 = Animator:LoadAnimation(ReplicatedStorage_upvr.Resource.CarSitAnimation)
-    any_LoadAnimation_result1_2:AdjustSpeed(0)
-    module_upvr._carSitTrack = any_LoadAnimation_result1_2
+function t._handleCharacter(p1) --[[ Line: 14 | Upvalues: t (copy), ReplicatedStorage (copy) ]]
+	local Animator = p1:WaitForChild("Humanoid"):WaitForChild("Animator")
+	local v1 = Animator:LoadAnimation(p1:WaitForChild("Animate"):WaitForChild("idle"):WaitForChild("Animation1"))
+	v1.Priority = Enum.AnimationPriority.Action
+	v1:AdjustSpeed(0)
+	t._idleTrack = v1
+	t._skydiveTrack = Animator:LoadAnimation(ReplicatedStorage.Resource.Skydive)
+	local v2 = Animator:LoadAnimation(ReplicatedStorage.Resource.RopeGrabAnimation)
+	v2.Priority = Enum.AnimationPriority.Action
+	v2:AdjustSpeed(0)
+	t._ropeGrabTrack = v2
+	local v3 = Animator:LoadAnimation(ReplicatedStorage.Resource.CarSitAnimation)
+	v3:AdjustSpeed(0)
+	t._carSitTrack = v3
 end
-function module_upvr.getIdleTrack() -- Line 36
-    return module_upvr._idleTrack
+function t.getIdleTrack() --[[ Line: 36 | Upvalues: t (copy) ]]
+	return t._idleTrack
 end
-function module_upvr.getSkydiveTrack() -- Line 39
-    return module_upvr._skydiveTrack
+function t.getSkydiveTrack() --[[ Line: 39 | Upvalues: t (copy) ]]
+	return t._skydiveTrack
 end
-function module_upvr.getRopeGrabTrack() -- Line 42
-    return module_upvr._ropeGrabTrack
+function t.getRopeGrabTrack() --[[ Line: 42 | Upvalues: t (copy) ]]
+	return t._ropeGrabTrack
 end
-function module_upvr.getCarSitTrack() -- Line 45
-    return module_upvr._carSitTrack
+function t.getCarSitTrack() --[[ Line: 45 | Upvalues: t (copy) ]]
+	return t._carSitTrack
 end
-return module_upvr
+return t

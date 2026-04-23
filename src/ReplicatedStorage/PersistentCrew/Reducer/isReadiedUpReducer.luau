@@ -1,12 +1,7 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer(false, {
-    setIsReadiedUp = function(arg1, arg2) -- Line 5, Named "setIsReadiedUp"
-        local var2
-        if arg2.value == nil then
-            var2 = false
-        else
-            var2 = true
-        end
-        assert(var2, "isReadiedUp cannot be nil; try boolean")
-        return arg2.value
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer(false, {
+	setIsReadiedUp = function(p1, p2) --[[ Name: setIsReadiedUp | Line: 5 ]]
+		assert(p2.value ~= nil, "isReadiedUp cannot be nil; try boolean")
+		return p2.value
+	end
 })

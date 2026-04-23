@@ -1,12 +1,7 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
-    setMembers = function(arg1, arg2) -- Line 5, Named "setMembers"
-        local var2
-        if arg2.value == nil then
-            var2 = false
-        else
-            var2 = true
-        end
-        assert(var2, "members cannot be nil; try blank table?")
-        return arg2.value
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer({}, {
+	setMembers = function(p1, p2) --[[ Name: setMembers | Line: 5 ]]
+		assert(p2.value ~= nil, "members cannot be nil; try blank table?")
+		return p2.value
+	end
 })

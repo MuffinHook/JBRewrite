@@ -1,50 +1,45 @@
-local Players_upvr = game:GetService("Players")
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local ContractBinder_upvr = require(script.Parent.ContractBinder)
-local ContractConsts_upvr = require(script.Parent.ContractConsts)
-local module_upvr = {}
-function module_upvr.init() -- Line 10
-    ContractBinder_upvr:GetClassAddedSignal():Connect(function(arg1) -- Line 15
-        if arg1:GetPlayer() == Players_upvr.LocalPlayer then
-            arg1._maid:GiveTask(arg1:GetOnStateChangedSignal():Connect(function(arg1_2, arg2) -- Line 17
-                if arg1_2 == ContractConsts_upvr.enumState.ACTIVE or arg2 == ContractConsts_upvr.enumState.ACTIVE then
-                    if module_upvr._onAnyContractActiveTransition then
-                        module_upvr._onAnyContractActiveTransition:Fire(arg1)
-                    end
-                end
-            end))
-        end
-    end)
-    ContractBinder_upvr:GetClassRemovingSignal():Connect(function(arg1) -- Line 27
-        if arg1:GetPlayer() == Players_upvr.LocalPlayer and arg1:GetStateId() == ContractConsts_upvr.enumState.ACTIVE and module_upvr._onAnyContractActiveTransition then
-            module_upvr._onAnyContractActiveTransition:Fire()
-        end
-    end)
-    ContractBinder_upvr:Start()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Signal = require(ReplicatedStorage.Std.Signal)
+local BinderUtils = require(ReplicatedStorage.Std.Binder.BinderUtils)
+local ContractBinder = require(script.Parent.ContractBinder)
+local ContractConsts = require(script.Parent.ContractConsts)
+local t = {}
+function t.init() --[[ Line: 10 | Upvalues: ContractBinder (copy), Players (copy), ContractConsts (copy), t (copy) ]]
+	ContractBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 15 | Upvalues: Players (ref), ContractConsts (ref), t (ref) ]]
+		if p1:GetPlayer() == Players.LocalPlayer then
+			p1._maid:GiveTask(p1:GetOnStateChangedSignal():Connect(function(p12, p2) --[[ Line: 17 | Upvalues: ContractConsts (ref), t (ref), p1 (copy) ]]
+				if (p12 == ContractConsts.enumState.ACTIVE or p2 == ContractConsts.enumState.ACTIVE) and t._onAnyContractActiveTransition then
+					t._onAnyContractActiveTransition:Fire(p1)
+				end
+			end))
+		end
+	end)
+	ContractBinder:GetClassRemovingSignal():Connect(function(p1) --[[ Line: 27 | Upvalues: Players (ref), ContractConsts (ref), t (ref) ]]
+		if p1:GetPlayer() == Players.LocalPlayer and (p1:GetStateId() == ContractConsts.enumState.ACTIVE and t._onAnyContractActiveTransition) then
+			t._onAnyContractActiveTransition:Fire()
+		end
+	end)
+	ContractBinder:Start()
 end
-function module_upvr.getPlayerContractDataFolder(arg1) -- Line 38
-    if arg1 == nil then
-    else
-    end
-    assert(true)
-    return ReplicatedStorage_upvr:FindFirstChild(ContractConsts_upvr.CONTRACT_DATA_FOLDER_NAME):FindFirstChild(arg1.UserId)
+function t.getPlayerContractDataFolder(p1) --[[ Line: 38 | Upvalues: ReplicatedStorage (copy), ContractConsts (copy) ]]
+	assert(p1 ~= nil)
+	return ReplicatedStorage:FindFirstChild(ContractConsts.CONTRACT_DATA_FOLDER_NAME):FindFirstChild(p1.UserId)
 end
-local Signal_upvr = require(ReplicatedStorage_upvr.Std.Signal)
-function module_upvr.getAnyContractActiveTransitionSignal() -- Line 44
-    if not module_upvr._onAnyContractActiveTransition then
-        module_upvr._onAnyContractActiveTransition = Signal_upvr.new()
-    end
-    return module_upvr._onAnyContractActiveTransition
+function t.getAnyContractActiveTransitionSignal() --[[ Line: 44 | Upvalues: t (copy), Signal (copy) ]]
+	if not t._onAnyContractActiveTransition then
+		t._onAnyContractActiveTransition = Signal.new()
+	end
+	return t._onAnyContractActiveTransition
 end
-function module_upvr.getActiveContract(arg1) -- Line 50
-    for _, v in ipairs(module_upvr.getContracts()) do
-        if v:GetStateId() == ContractConsts_upvr.enumState.ACTIVE and v:GetTeamId() == arg1 then
-            return v
-        end
-    end
+function t.getActiveContract(p1) --[[ Line: 50 | Upvalues: t (copy), ContractConsts (copy) ]]
+	for i, v in ipairs((t.getContracts())) do
+		if v:GetStateId() == ContractConsts.enumState.ACTIVE and v:GetTeamId() == p1 then
+			return v
+		end
+	end
 end
-local BinderUtils_upvr = require(ReplicatedStorage_upvr.Std.Binder.BinderUtils)
-function module_upvr.getContracts() -- Line 59
-    return BinderUtils_upvr.getChildren(ContractBinder_upvr, module_upvr.getPlayerContractDataFolder(Players_upvr.LocalPlayer))
+function t.getContracts() --[[ Line: 59 | Upvalues: BinderUtils (copy), ContractBinder (copy), t (copy), Players (copy) ]]
+	return BinderUtils.getChildren(ContractBinder, t.getPlayerContractDataFolder(Players.LocalPlayer))
 end
-return module_upvr
+return t

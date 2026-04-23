@@ -1,245 +1,249 @@
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
+local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local function _() -- Line 13, Named "GetRootPart"
-    local Character = LocalPlayer_upvr.Character
-    if Character == nil then
-        return nil
-    end
-    local Humanoid = Character:FindFirstChild("Humanoid")
-    if Humanoid == nil then
-        return nil
-    end
-    return Humanoid.RootPart
+local Anim = require(ReplicatedStorage.Module.Anim)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local CurrentCamera = workspace.CurrentCamera
+local function GetRootPart() --[[ Line: 13 | Upvalues: LocalPlayer (copy) ]]
+	local Character = LocalPlayer.Character
+	if Character == nil then
+		return nil
+	else
+		local Humanoid = Character:FindFirstChild("Humanoid")
+		if Humanoid == nil then
+			return nil
+		else
+			return Humanoid.RootPart
+		end
+	end
 end
-local tbl_upvr = {{4, 0}, {48, 0}, {192, 24}, {math.huge, 8}}
-local module_2_upvr = {}
-module_2_upvr.__index = module_2_upvr
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function module_2_upvr.new() -- Line 31
-    local module = {}
-    setmetatable(module, module_2_upvr)
-    module._maid = Maid_upvr.new()
-    module.ScreenGui = nil
-    module.Position = nil
-    module.Radius = 8
-    module.AnimRadius = nil
-    module.StartRadius = nil
-    module.EndRadius = nil
-    module.Enabled = false
-    local ImageLabel = Instance.new("ImageLabel")
-    ImageLabel.BorderSizePixel = 0
-    ImageLabel.BackgroundTransparency = 1
-    ImageLabel.ImageColor3 = Color3.new(0, 0, 0)
-    ImageLabel.Image = "rbxassetid://2819326547"
-    ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-    ImageLabel.ZIndex = 1
-    ImageLabel.Name = "WorldMarker"
-    module.Frame = ImageLabel
-    module._maid:GiveTask(module.Frame)
-    local ImageLabel_2 = Instance.new("ImageLabel")
-    ImageLabel_2.BorderSizePixel = 0
-    ImageLabel_2.BackgroundTransparency = 1
-    ImageLabel_2.ImageColor3 = Color3.new(0.1, 0.1, 0.1)
-    ImageLabel_2.Image = "rbxassetid://2819326547"
-    ImageLabel_2.Size = UDim2.new(0.85, 0, 0.85, 0)
-    ImageLabel_2.Position = UDim2.new(0.5, 0, 0.5, 0)
-    ImageLabel_2.AnchorPoint = Vector2.new(0.5, 0.5)
-    ImageLabel_2.ZIndex = 2
-    ImageLabel_2.Parent = ImageLabel
-    module.FrameInner = ImageLabel_2
-    module:SetSizes(tbl_upvr)
-    module:SetRadius(module.Radius)
-    module:SetEnabled(true)
-    return module
+local t = {
+	4,
+	{ 48, 0 },
+	{ 192, 24 },
+	{ (1 / 0), 8 }
+}
+local t2 = {}
+t2.__index = t2
+function t2.new() --[[ Line: 31 | Upvalues: t2 (copy), Maid (copy), t (copy) ]]
+	local t3 = {}
+	setmetatable(t3, t2)
+	t3._maid = Maid.new()
+	t3.ScreenGui = nil
+	t3.Position = nil
+	t3.Radius = 8
+	t3.AnimRadius = nil
+	t3.StartRadius = nil
+	t3.EndRadius = nil
+	t3.Enabled = false
+	local WorldMarker = Instance.new("ImageLabel")
+	WorldMarker.BorderSizePixel = 0
+	WorldMarker.BackgroundTransparency = 1
+	WorldMarker.ImageColor3 = Color3.new(0/255, 0/255, 0/255)
+	WorldMarker.Image = "rbxassetid://2819326547"
+	WorldMarker.AnchorPoint = Vector2.new(0.5, 0.5)
+	WorldMarker.ZIndex = 1
+	WorldMarker.Name = "WorldMarker"
+	t3.Frame = WorldMarker
+	t3._maid:GiveTask(t3.Frame)
+	local ImageLabel = Instance.new("ImageLabel")
+	ImageLabel.BorderSizePixel = 0
+	ImageLabel.BackgroundTransparency = 1
+	ImageLabel.ImageColor3 = Color3.new(0.1, 0.1, 0.1)
+	ImageLabel.Image = "rbxassetid://2819326547"
+	ImageLabel.Size = UDim2.new(0.85, 0, 0.85, 0)
+	ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+	ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+	ImageLabel.ZIndex = 2
+	ImageLabel.Parent = WorldMarker
+	t3.FrameInner = ImageLabel
+	t3:SetSizes(t)
+	t3:SetRadius(t3.Radius)
+	t3:SetEnabled(true)
+	return t3
 end
-function module_2_upvr.SetSizes(arg1, arg2) -- Line 78
-    if not arg2 then
-    end
-    arg1._sizes = tbl_upvr
+function t2.SetSizes(p1, p2) --[[ Line: 78 | Upvalues: t (copy) ]]
+	p2 = p2 or t
+	p1._sizes = p2
 end
-function module_2_upvr.SetEnabled(arg1, arg2) -- Line 85
-    arg1.Enabled = arg2
-    arg1.Frame.Visible = arg2
-    if arg1.Frame.Name == "ImportantLocationMarker" then
-        print("setting enabled", arg2)
-    end
+function t2.SetEnabled(p1, p2) --[[ Line: 85 ]]
+	p1.Enabled = p2
+	p1.Frame.Visible = p2
+	if p1.Frame.Name == "ImportantLocationMarker" then
+		print("setting enabled", p2)
+	end
 end
-function module_2_upvr.SetScreenGui(arg1, arg2) -- Line 92
-    arg1.ScreenGui = arg2
-    arg1.Frame.Parent = arg1.ScreenGui
+function t2.SetScreenGui(p1, p2) --[[ Line: 92 ]]
+	p1.ScreenGui = p2
+	p1.Frame.Parent = p1.ScreenGui
 end
-function module_2_upvr.CreateFrameIcon(arg1) -- Line 97
-    local var14
-    if arg1.FrameIcon ~= nil then
-        var14 = false
-    else
-        var14 = true
-    end
-    assert(var14)
-    var14 = "ImageLabel"
-    local any = Instance.new(var14)
-    var14 = 0
-    any.BorderSizePixel = var14
-    var14 = 1
-    any.BackgroundTransparency = var14
-    var14 = UDim2.new(1, 0, 1, 0)
-    any.Size = var14
-    var14 = UDim2.new(0.5, 0, 0.5, 0)
-    any.Position = var14
-    var14 = Vector2.new(0.5, 0.5)
-    any.AnchorPoint = var14
-    var14 = 3
-    any.ZIndex = var14
-    var14 = arg1.FrameInner
-    any.Parent = var14
-    arg1.FrameIcon = any
+function t2.CreateFrameIcon(p1) --[[ Line: 97 ]]
+	assert(p1.FrameIcon == nil)
+	local ImageLabel = Instance.new("ImageLabel")
+	ImageLabel.BorderSizePixel = 0
+	ImageLabel.BackgroundTransparency = 1
+	ImageLabel.Size = UDim2.new(1, 0, 1, 0)
+	ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+	ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+	ImageLabel.ZIndex = 3
+	ImageLabel.Parent = p1.FrameInner
+	p1.FrameIcon = ImageLabel
 end
-function module_2_upvr.DestroyFrameIcon(arg1) -- Line 109
-    local var16
-    if arg1.FrameIcon == nil then
-        var16 = false
-    else
-        var16 = true
-    end
-    assert(var16)
-    arg1.FrameIcon:Destroy()
-    arg1.FrameIcon = nil
+function t2.DestroyFrameIcon(p1) --[[ Line: 109 ]]
+	assert(p1.FrameIcon ~= nil)
+	p1.FrameIcon:Destroy()
+	p1.FrameIcon = nil
 end
-function module_2_upvr.SetIcon(arg1, arg2, arg3) -- Line 114
-    if arg2 ~= nil then
-        if arg1.FrameIcon == nil then
-            arg1:CreateFrameIcon()
-        end
-        arg1.FrameIcon.Image = string.format(("rbxassetid://%d"), arg2)
-        if arg3 then
-            arg1.FrameIcon.ImageColor3 = arg3
-        end
-        arg1:SetRadius(arg1.Radius)
-    elseif arg1.FrameIcon ~= nil then
-        arg1:DestroyFrameIcon()
-    end
+function t2.SetIcon(p1, p2, p3) --[[ Line: 114 ]]
+	if p2 == nil then
+		if p1.FrameIcon ~= nil then
+			p1:DestroyFrameIcon()
+		end
+	else
+		if p1.FrameIcon == nil then
+			p1:CreateFrameIcon()
+		end
+		p1.FrameIcon.Image = ("rbxassetid://%d"):format(p2)
+		if p3 then
+			p1.FrameIcon.ImageColor3 = p3
+		end
+		p1:SetRadius(p1.Radius)
+	end
 end
-function module_2_upvr.SetPosition(arg1, arg2) -- Line 132
-    arg1.Position = arg2
+function t2.SetPosition(p1, p2) --[[ Line: 132 ]]
+	p1.Position = p2
 end
-function module_2_upvr.GetPosition(arg1) -- Line 135
-    return arg1.Position
+function t2.GetPosition(p1) --[[ Line: 135 ]]
+	return p1.Position
 end
-function module_2_upvr.SetRadius(arg1, arg2) -- Line 138
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    arg1.Radius = arg2
-    arg1.Frame.Size = UDim2.new(0, 2 * arg2, 0, 2 * arg2)
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if arg1.FrameIcon.Visible == false then
-        arg1.FrameIcon.Visible = true
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t2.SetRadius(p1, p2) --[[ Line: 138 ]]
+	p1.Radius = p2
+	p1.Frame.Size = UDim2.new(0, 2 * p2, 0, 2 * p2)
+	if p1.FrameIcon ~= nil then
+		if p2 < 8 then
+			if p1.FrameIcon.Visible == true then
+				p1.FrameIcon.Visible = false
+			end
+		elseif p1.FrameIcon.Visible == false then
+			p1.FrameIcon.Visible = true
+		end
+	end
 end
-local Anim_upvr = require(ReplicatedStorage.Module.Anim)
-function module_2_upvr.AnimateRadius(arg1, arg2) -- Line 154
-    if arg1.AnimRadius ~= nil then
-        arg1.AnimRadius:Destroy()
-        arg1.AnimRadius = nil
-    end
-    arg1.StartRadius = arg1.Radius
-    arg1.EndRadius = arg2
-    local any_new_result1 = Anim_upvr.new(0.1)
-    any_new_result1.OnCompleted:Connect(function() -- Line 163
-        arg1.AnimRadius:Destroy()
-        arg1.AnimRadius = nil
-        arg1:SetRadius(arg1.EndRadius)
-    end)
-    arg1.AnimRadius = any_new_result1
+function t2.AnimateRadius(p1, p2) --[[ Line: 154 | Upvalues: Anim (copy) ]]
+	if p1.AnimRadius ~= nil then
+		p1.AnimRadius:Destroy()
+		p1.AnimRadius = nil
+	end
+	p1.StartRadius = p1.Radius
+	p1.EndRadius = p2
+	local v1 = Anim.new(0.1)
+	v1.OnCompleted:Connect(function() --[[ Line: 163 | Upvalues: p1 (copy) ]]
+		p1.AnimRadius:Destroy()
+		p1.AnimRadius = nil
+		p1:SetRadius(p1.EndRadius)
+	end)
+	p1.AnimRadius = v1
 end
-function module_2_upvr.SetAdornee(arg1, arg2) -- Line 171
-    arg1._adornee = arg2
-    arg1.Position = arg1._adornee.Position
+function t2.SetAdornee(p1, p2) --[[ Line: 171 ]]
+	p1._adornee = p2
+	p1.Position = p1._adornee.Position
 end
-function module_2_upvr.GetAdornee(arg1) -- Line 175
-    return arg1._adornee
+function t2.GetAdornee(p1) --[[ Line: 175 ]]
+	return p1._adornee
 end
-local CurrentCamera_upvr = workspace.CurrentCamera
-function module_2_upvr.Update(arg1) -- Line 178
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local var21
-    if not arg1.Enabled then return end
-    local AbsoluteSize = arg1.ScreenGui.AbsoluteSize
-    local X = AbsoluteSize.X
-    local Y = AbsoluteSize.Y
-    if arg1._adornee then
-        arg1.Position = arg1._adornee.Position
-    end
-    if not arg1.Position then return end
-    local any_WorldToViewportPoint_result1 = CurrentCamera_upvr:WorldToViewportPoint(arg1.Position)
-    var21 = any_WorldToViewportPoint_result1.X
-    if any_WorldToViewportPoint_result1.Z >= 0 then
-    else
-    end
-    local var26 = arg1.Radius + 4
-    local var27 = arg1.Radius + 4
-    if var21 < var26 then
-        var21 = var26
-    end
-    if X - var26 < var21 then
-        var21 = X - var26
-    end
-    if any_WorldToViewportPoint_result1.Y < var27 then
-    end
-    if Y - var27 < var27 then
-        local var28 = Y - var27
-    end
-    if true then
-        local var29 = var21
-        local var30 = var28
-        var21 = X - var21
-        local var31 = Y - var28
-        if math.min(var21, var29) < math.min(var31, var30) then
-            if var21 < var29 then
-                var21 = var26
-            else
-                var21 = X - var26
-            end
-        elseif var31 < var30 then
-        else
-        end
-    end
-    arg1.Frame.Position = UDim2.new(0, var21, 0, Y - var27)
-    local Character_2 = LocalPlayer_upvr.Character
-    if Character_2 == nil then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    local Humanoid_2 = Character_2:FindFirstChild("Humanoid")
-    if Humanoid_2 == nil then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    local RootPart = Humanoid_2.RootPart
-    if RootPart then
-    end
-    if true then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    local _ = 2
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [161.51184059]
-    if (RootPart.Position - arg1.Position).Magnitude <= arg1._sizes then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t2.Update(p1) --[[ Line: 178 | Upvalues: CurrentCamera (copy), LocalPlayer (copy) ]]
+	if p1.Enabled then
+		local AbsoluteSize = p1.ScreenGui.AbsoluteSize
+		local X = AbsoluteSize.X
+		local Y = AbsoluteSize.Y
+		if p1._adornee then
+			p1.Position = p1._adornee.Position
+		end
+		if p1.Position then
+			local v1 = CurrentCamera:WorldToViewportPoint(p1.Position)
+			local X_2 = v1.X
+			local Y_2 = v1.Y
+			local v3 = p1.Radius + 4
+			local v4 = p1.Radius + 4
+			local v5
+			if X_2 < v3 then
+				X_2 = v3
+				v5 = true
+			else
+				v5 = false
+			end
+			if X - v3 < X_2 then
+				X_2 = X - v3
+				v5 = true
+			end
+			if Y_2 < v4 then
+				Y_2 = v4
+				v5 = true
+			end
+			if Y - v4 < Y_2 then
+				Y_2 = Y - v4
+				v5 = true
+			end
+			local v6, v7
+			if v1.Z < 0 then
+				v5 = true
+				v6 = X - X_2
+				v7 = Y - Y_2
+				if math.min(v6, X_2) < math.min(v7, Y_2) then
+					if v6 < X_2 then
+						v6 = v3
+					else
+						v6 = X - v3
+					end
+				elseif v7 < Y_2 then
+					v7 = v4
+				else
+					v7 = Y - v4
+				end
+			else
+				v7 = Y_2
+				v6 = X_2
+			end
+			p1.Frame.Position = UDim2.new(0, v6, 0, v7)
+			local v8 = (1 / 0)
+			local Character = LocalPlayer.Character
+			local v9
+			if Character == nil then
+				v9 = nil
+			else
+				local Humanoid = Character:FindFirstChild("Humanoid")
+				v9 = if Humanoid == nil then nil else Humanoid.RootPart
+			end
+			if v9 then
+				v8 = (v9.Position - p1.Position).Magnitude
+			end
+			local v10 = nil
+			if v5 then
+				v10 = p1._sizes[1]
+			else
+				for i = 2, #p1._sizes do
+					local v12 = p1._sizes[i][2]
+					if v8 <= p1._sizes[i][1] then
+						v10 = v12
+						break
+					end
+				end
+			end
+			assert(v10)
+			if p1.EndRadius ~= v10 then
+				p1:AnimateRadius(v10)
+			end
+			if p1.AnimRadius ~= nil then
+				local v13 = p1.AnimRadius:Update()
+				p1:SetRadius(p1.StartRadius * (1 - v13) + p1.EndRadius * v13)
+			end
+		end
+	end
 end
-function module_2_upvr.Destroy(arg1) -- Line 275
-    arg1._maid:Destroy()
-    arg1._maid = nil
-    arg1.ScreenGui = nil
-    arg1.Position = nil
-    setmetatable(arg1, nil)
+function t2.Destroy(p1) --[[ Line: 275 ]]
+	p1._maid:Destroy()
+	p1._maid = nil
+	p1.ScreenGui = nil
+	p1.Position = nil
+	setmetatable(p1, nil)
 end
-return module_2_upvr
+return t2

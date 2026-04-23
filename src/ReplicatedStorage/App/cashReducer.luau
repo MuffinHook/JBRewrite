@@ -1,6 +1,7 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer(0, {
-    setCash = function(arg1, arg2) -- Line 5, Named "setCash"
-        assert(arg2.cash, "missing cash value")
-        return arg2.cash
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer(0, {
+	setCash = function(p1, p2) --[[ Name: setCash | Line: 5 ]]
+		assert(p2.cash, "missing cash value")
+		return p2.cash
+	end
 })

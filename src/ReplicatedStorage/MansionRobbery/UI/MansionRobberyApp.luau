@@ -1,31 +1,31 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("App")
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function any_extend_result1.init(arg1) -- Line 11
-    arg1.maid = Maid_upvr.new()
+local Maid = require(ReplicatedStorage.Std.Maid)
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local Eyelids = require(script.Parent.Eyelids)
+local Subtitle = require(script.Parent.Subtitle)
+local v1 = Roact.PureComponent:extend("App")
+function v1.init(p1) --[[ Line: 11 | Upvalues: Maid (copy) ]]
+	p1.maid = Maid.new()
 end
-local createElement_upvr = Roact_upvr.createElement
-local Eyelids_upvr = require(script.Parent.Eyelids)
-local Subtitle_upvr = require(script.Parent.Subtitle)
-function any_extend_result1.render(arg1) -- Line 14
-    return Roact_upvr.createFragment({
-        Eyelids = createElement_upvr(Eyelids_upvr, {
-            pctClosed = arg1.props.pctClosed;
-        });
-        Subtitle = createElement_upvr(Subtitle_upvr, {
-            text = arg1.props.dialogueText;
-            charPerSecond = arg1.props.charPerSecond;
-        });
-    })
+function v1.render(p1) --[[ Line: 14 | Upvalues: createElement (copy), Eyelids (copy), Subtitle (copy), Roact (copy) ]]
+	return Roact.createFragment({
+		Eyelids = createElement(Eyelids, {
+			pctClosed = p1.props.pctClosed
+		}),
+		Subtitle = createElement(Subtitle, {
+			text = p1.props.dialogueText,
+			charPerSecond = p1.props.charPerSecond
+		})
+	})
 end
-function any_extend_result1.didMount(arg1) -- Line 25
+function v1.didMount(p1) --[[ Line: 25 ]] end
+function v1.willUnmount(p1) --[[ Line: 26 ]]
+	p1.maid:DoCleaning()
 end
-function any_extend_result1.willUnmount(arg1) -- Line 26
-    arg1.maid:DoCleaning()
-end
-return require(ReplicatedStorage.RoactRodux).connect(function(arg1, arg2) -- Line 29
-    return {
-        dialogueText = arg1.dialogueText;
-    }
-end)(any_extend_result1)
+return RoactRodux.connect(function(p1, p2) --[[ Line: 29 ]]
+	return {
+		dialogueText = p1.dialogueText
+	}
+end)(v1)

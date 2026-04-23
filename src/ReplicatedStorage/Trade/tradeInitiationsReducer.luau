@@ -1,26 +1,13 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
-    tradeInitiationsSet = function(arg1, arg2) -- Line 5, Named "tradeInitiationsSet"
-        local var2
-        if arg2.list == nil then
-            var2 = false
-        else
-            var2 = true
-        end
-        assert(var2, "missing list")
-        return arg2.list
-    end;
-    tradeInitiationsRemoveByIndex = function(arg1, arg2) -- Line 9, Named "tradeInitiationsRemoveByIndex"
-        local var3
-        if arg2.index == nil then
-            var3 = false
-        else
-            var3 = true
-        end
-        assert(var3, "missing index")
-        var3 = arg1
-        local clone = table.clone(var3)
-        var3 = table.remove
-        var3(clone, arg2.index)
-        return clone
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer({}, {
+	tradeInitiationsSet = function(p1, p2) --[[ Name: tradeInitiationsSet | Line: 5 ]]
+		assert(p2.list ~= nil, "missing list")
+		return p2.list
+	end,
+	tradeInitiationsRemoveByIndex = function(p1, p2) --[[ Name: tradeInitiationsRemoveByIndex | Line: 9 ]]
+		assert(p2.index ~= nil, "missing index")
+		local v2 = table.clone(p1)
+		table.remove(v2, p2.index)
+		return v2
+	end
 })

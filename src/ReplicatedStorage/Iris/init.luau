@@ -1,282 +1,246 @@
-local module_2_upvr = {}
-local var2_upvr = require(script.Internal)(module_2_upvr)
-module_2_upvr.Disabled = false
-module_2_upvr.Args = {}
-module_2_upvr.Events = {}
-function module_2_upvr.Init(arg1, arg2, arg3) -- Line 73
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var12
-    if var2_upvr._shutdown ~= false then
-        var12 = false
-    else
-        var12 = true
-    end
-    assert(var12, "Iris.Init() cannot be called once shutdown.")
-    var12 = true
-    if var2_upvr._started ~= false then
-        if arg3 ~= true then
-            var12 = false
-        else
-            var12 = true
-        end
-    end
-    assert(var12, "Iris.Init() can only be called once.")
-    if var2_upvr._started then
-        return module_2_upvr
-    end
-    if arg1 == nil then
-    end
-    if arg2 == nil then
-    end
-    var2_upvr.parentInstance = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-    var12 = true
-    var2_upvr._started = var12
-    var2_upvr._generateRootInstance()
-    var2_upvr._generateSelectionImageObject()
-    var12 = nil
-    for _, v in var2_upvr._initFunctions, var12 do
-        v()
-    end
-    local Heartbeat_upvw = game:GetService("RunService").Heartbeat
-    function var12() -- Line 100
-        if typeof(Heartbeat_upvw) == "function" then
-            if var2_upvr._started then
-                var2_upvr._cycle(Heartbeat_upvw())
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-        elseif Heartbeat_upvw ~= nil and Heartbeat_upvw ~= false then
-            var2_upvr._eventConnection = Heartbeat_upvw:Connect(function(...) -- Line 107
-                var2_upvr._cycle(...)
-            end)
-        end
-    end
-    task.spawn(var12)
-    return module_2_upvr
+require(script.Types)
+local t = {}
+local v1 = require(script.Internal)(t)
+t.Disabled = false
+t.Args = {}
+t.Events = {}
+function t.Init(p1, p2, p3) --[[ Line: 73 | Upvalues: v1 (copy), t (copy) ]]
+	assert(v1._shutdown == false, "Iris.Init() cannot be called once shutdown.")
+	assert(if v1._started == false then true else p3 == true, "Iris.Init() can only be called once.")
+	if not v1._started then
+		if p1 == nil then
+			p1 = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+		end
+		if p2 == nil then
+			p2 = game:GetService("RunService").Heartbeat
+		end
+		v1.parentInstance = p1
+		v1._started = true
+		v1._generateRootInstance()
+		v1._generateSelectionImageObject()
+		for v3, v4 in v1._initFunctions do
+			v4()
+		end
+		task.spawn(function() --[[ Line: 100 | Upvalues: p2 (ref), v1 (ref) ]]
+			if typeof(p2) == "function" then
+				while v1._started do
+					v1._cycle((p2()))
+				end
+			elseif p2 ~= nil and p2 ~= false then
+				v1._eventConnection = p2:Connect(function(...) --[[ Line: 107 | Upvalues: v1 (ref) ]]
+					v1._cycle(...)
+				end)
+			end
+		end)
+	end
+	return t
 end
-function module_2_upvr.Shutdown() -- Line 122
-    var2_upvr._started = false
-    var2_upvr._shutdown = true
-    if var2_upvr._eventConnection then
-        var2_upvr._eventConnection:Disconnect()
-    end
-    var2_upvr._eventConnection = nil
-    if var2_upvr._rootWidget then
-        if var2_upvr._rootWidget.Instance then
-            var2_upvr._widgets.Root.Discard(var2_upvr._rootWidget)
-        end
-        var2_upvr._rootInstance = nil
-    end
-    if var2_upvr.SelectionImageObject then
-        var2_upvr.SelectionImageObject:Destroy()
-    end
-    for _, v_2 in var2_upvr._connections do
-        v_2:Disconnect()
-    end
+function t.Shutdown() --[[ Line: 122 | Upvalues: v1 (copy) ]]
+	v1._started = false
+	v1._shutdown = true
+	if v1._eventConnection then
+		v1._eventConnection:Disconnect()
+	end
+	v1._eventConnection = nil
+	if v1._rootWidget then
+		if v1._rootWidget.Instance then
+			v1._widgets.Root.Discard(v1._rootWidget)
+		end
+		v1._rootInstance = nil
+	end
+	if v1.SelectionImageObject then
+		v1.SelectionImageObject:Destroy()
+	end
+	for v12, v2 in v1._connections do
+		v2:Disconnect()
+	end
 end
-function module_2_upvr.Connect(arg1, arg2) -- Line 159
-    if var2_upvr._started == false then
-        warn("Iris:Connect() was called before calling Iris.Init(); always initialise Iris first.")
-    end
-    local var17_upvr = #var2_upvr._connectedFunctions + 1
-    var2_upvr._connectedFunctions[var17_upvr] = arg2
-    return function() -- Line 165
-        var2_upvr._connectedFunctions[var17_upvr] = nil
-    end
+function t.Connect(p1, p2) --[[ Line: 159 | Upvalues: v1 (copy) ]]
+	if v1._started == false then
+		warn("Iris:Connect() was called before calling Iris.Init(); always initialise Iris first.")
+	end
+	local v12 = #v1._connectedFunctions + 1
+	v1._connectedFunctions[v12] = p2
+	return function() --[[ Line: 165 | Upvalues: v1 (ref), v12 (copy) ]]
+		v1._connectedFunctions[v12] = nil
+	end
 end
-function module_2_upvr.Append(arg1) -- Line 180
-    local any__GetParentWidget_result1 = var2_upvr._GetParentWidget()
-    local var20
-    if var2_upvr._config.Parent then
-        var20 = var2_upvr._config.Parent
-    else
-        var20 = var2_upvr._widgets[any__GetParentWidget_result1.type].ChildAdded(any__GetParentWidget_result1, {
-            type = "userInstance";
-        })
-    end
-    arg1.Parent = var20
+function t.Append(p1) --[[ Line: 180 | Upvalues: v1 (copy) ]]
+	local v12 = v1._GetParentWidget()
+	p1.Parent = v1._config.Parent or v1._widgets[v12.type].ChildAdded(v12, {
+		type = "userInstance"
+	})
 end
-function module_2_upvr.End() -- Line 218
-    if var2_upvr._stackIndex == 1 then
-        error("Too many calls to Iris.End().", 2)
-    end
-    var2_upvr._IDStack[var2_upvr._stackIndex] = nil
-    local var22 = var2_upvr
-    var22._stackIndex -= 1
+function t.End() --[[ Line: 218 | Upvalues: v1 (copy) ]]
+	if v1._stackIndex == 1 then
+		error("Too many calls to Iris.End().", 2)
+	end
+	v1._IDStack[v1._stackIndex] = nil
+	local v12 = v1
+	v12._stackIndex = v12._stackIndex - 1
 end
-function module_2_upvr.ForceRefresh() -- Line 243
-    var2_upvr._globalRefreshRequested = true
+function t.ForceRefresh() --[[ Line: 243 | Upvalues: v1 (copy) ]]
+	v1._globalRefreshRequested = true
 end
-function module_2_upvr.UpdateGlobalConfig(arg1) -- Line 265
-    for i_3, v_3 in arg1 do
-        var2_upvr._rootConfig[i_3] = v_3
-    end
-    module_2_upvr.ForceRefresh()
+function t.UpdateGlobalConfig(p1) --[[ Line: 265 | Upvalues: v1 (copy), t (copy) ]]
+	for v12, v2 in p1 do
+		v1._rootConfig[v12] = v2
+	end
+	t.ForceRefresh()
 end
-function module_2_upvr.PushConfig(arg1) -- Line 290
-    local any_State_result1 = module_2_upvr.State(-1)
-    if any_State_result1.value == -1 then
-        any_State_result1:set(arg1)
-    elseif var2_upvr._deepCompare(any_State_result1:get(), arg1) == false then
-        any_State_result1:set(arg1)
-        var2_upvr._refreshStack[var2_upvr._refreshLevel] = true
-        local var26 = var2_upvr
-        var26._refreshCounter += 1
-    end
-    local var27 = var2_upvr
-    var27._refreshLevel += 1
-    var2_upvr._config = setmetatable(arg1, {
-        __index = var2_upvr._config;
-    })
+function t.PushConfig(p1) --[[ Line: 290 | Upvalues: t (copy), v1 (copy) ]]
+	local v12 = t.State(-1)
+	if v12.value == -1 then
+		v12:set(p1)
+	elseif v1._deepCompare(v12:get(), p1) == false then
+		v12:set(p1)
+		v1._refreshStack[v1._refreshLevel] = true
+		local v2 = v1
+		v2._refreshCounter = v2._refreshCounter + 1
+	end
+	local v3 = v1
+	v3._refreshLevel = v3._refreshLevel + 1
+	v1._config = setmetatable(p1, {
+		__index = v1._config
+	})
 end
-function module_2_upvr.PopConfig() -- Line 318
-    local var29 = var2_upvr
-    var29._refreshLevel -= 1
-    if var2_upvr._refreshStack[var2_upvr._refreshLevel] == true then
-        local var30 = var2_upvr
-        var30._refreshCounter -= 1
-        var2_upvr._refreshStack[var2_upvr._refreshLevel] = nil
-    end
-    var2_upvr._config = getmetatable(var2_upvr._config).__index
+function t.PopConfig() --[[ Line: 318 | Upvalues: v1 (copy) ]]
+	local v12 = v1
+	v12._refreshLevel = v12._refreshLevel - 1
+	if v1._refreshStack[v1._refreshLevel] == true then
+		local v2 = v1
+		v2._refreshCounter = v2._refreshCounter - 1
+		v1._refreshStack[v1._refreshLevel] = nil
+	end
+	v1._config = getmetatable(v1._config).__index
 end
-module_2_upvr.TemplateConfig = require(script.config)
-module_2_upvr.UpdateGlobalConfig(module_2_upvr.TemplateConfig.colorDark)
-module_2_upvr.UpdateGlobalConfig(module_2_upvr.TemplateConfig.sizeDefault)
-module_2_upvr.UpdateGlobalConfig(module_2_upvr.TemplateConfig.utilityDefault)
-var2_upvr._globalRefreshRequested = false
-function module_2_upvr.PushId(arg1) -- Line 354
-    local var31
-    if typeof(arg1) ~= "string" then
-        var31 = false
-    else
-        var31 = true
-    end
-    assert(var31, "The ID argument to Iris.PushId() to be a string.")
-    var31 = true
-    var2_upvr._newID = var31
-    var31 = var2_upvr
-    var31 = var31._pushedIds
-    table.insert(var31, arg1)
+t.TemplateConfig = require(script.config)
+t.UpdateGlobalConfig(t.TemplateConfig.colorDark)
+t.UpdateGlobalConfig(t.TemplateConfig.sizeDefault)
+t.UpdateGlobalConfig(t.TemplateConfig.utilityDefault)
+v1._globalRefreshRequested = false
+function t.PushId(p1) --[[ Line: 354 | Upvalues: v1 (copy) ]]
+	assert(typeof(p1) == "string", "The ID argument to Iris.PushId() to be a string.")
+	v1._newID = true
+	table.insert(v1._pushedIds, p1)
 end
-function module_2_upvr.PopId() -- Line 367
-    if #var2_upvr._pushedIds == 0 then
-    else
-        table.remove(var2_upvr._pushedIds)
-    end
+function t.PopId() --[[ Line: 367 | Upvalues: v1 (copy) ]]
+	if #v1._pushedIds ~= 0 then
+		table.remove(v1._pushedIds)
+	end
 end
-function module_2_upvr.SetNextWidgetID(arg1) -- Line 397
-    var2_upvr._nextWidgetId = arg1
+function t.SetNextWidgetID(p1) --[[ Line: 397 | Upvalues: v1 (copy) ]]
+	v1._nextWidgetId = p1
 end
-function module_2_upvr.State(arg1) -- Line 439
-    local any__getID_result1_5 = var2_upvr._getID(2)
-    if var2_upvr._states[any__getID_result1_5] then
-        return var2_upvr._states[any__getID_result1_5]
-    end
-    local module_6 = {
-        ID = any__getID_result1_5;
-    }
-    module_6.value = arg1
-    module_6.lastChangeTick = module_2_upvr.Internal._cycleTick
-    module_6.ConnectedWidgets = {}
-    module_6.ConnectedFunctions = {}
-    setmetatable(module_6, var2_upvr.StateClass)
-    var2_upvr._states[any__getID_result1_5] = module_6
-    return module_6
+function t.State(p1) --[[ Line: 439 | Upvalues: v1 (copy), t (copy) ]]
+	local v12 = v1._getID(2)
+	if v1._states[v12] then
+		return v1._states[v12]
+	else
+		local t2 = {
+			ID = v12,
+			value = p1,
+			lastChangeTick = t.Internal._cycleTick,
+			ConnectedWidgets = {},
+			ConnectedFunctions = {}
+		}
+		setmetatable(t2, v1.StateClass)
+		v1._states[v12] = t2
+		return t2
+	end
 end
-function module_2_upvr.WeakState(arg1) -- Line 465
-    local any__getID_result1 = var2_upvr._getID(2)
-    if var2_upvr._states[any__getID_result1] then
-        if next(var2_upvr._states[any__getID_result1].ConnectedWidgets) == nil then
-            var2_upvr._states[any__getID_result1] = nil
-        else
-            return var2_upvr._states[any__getID_result1]
-        end
-    end
-    local module = {
-        ID = any__getID_result1;
-    }
-    module.value = arg1
-    module.lastChangeTick = module_2_upvr.Internal._cycleTick
-    module.ConnectedWidgets = {}
-    module.ConnectedFunctions = {}
-    setmetatable(module, var2_upvr.StateClass)
-    var2_upvr._states[any__getID_result1] = module
-    return module
+function t.WeakState(p1) --[[ Line: 465 | Upvalues: v1 (copy), t (copy) ]]
+	local v12 = v1._getID(2)
+	if v1._states[v12] then
+		if next(v1._states[v12].ConnectedWidgets) == nil then
+			v1._states[v12] = nil
+		else
+			return v1._states[v12]
+		end
+	end
+	local t2 = {
+		ID = v12,
+		value = p1,
+		lastChangeTick = t.Internal._cycleTick,
+		ConnectedWidgets = {},
+		ConnectedFunctions = {}
+	}
+	setmetatable(t2, v1.StateClass)
+	v1._states[v12] = t2
+	return t2
 end
-function module_2_upvr.VariableState(arg1, arg2) -- Line 524
-    local any__getID_result1_4 = var2_upvr._getID(2)
-    local var37 = var2_upvr._states[any__getID_result1_4]
-    if var37 then
-        if arg1 ~= var37.value then
-            var37:set(arg1)
-        end
-        return var37
-    end
-    local module_4 = {
-        ID = any__getID_result1_4;
-    }
-    module_4.value = arg1
-    module_4.lastChangeTick = module_2_upvr.Internal._cycleTick
-    module_4.ConnectedWidgets = {}
-    module_4.ConnectedFunctions = {}
-    setmetatable(module_4, var2_upvr.StateClass)
-    var2_upvr._states[any__getID_result1_4] = module_4
-    module_4:onChange(arg2)
-    return module_4
+function t.VariableState(p1, p2) --[[ Line: 524 | Upvalues: v1 (copy), t (copy) ]]
+	local v12 = v1._getID(2)
+	local v2 = v1._states[v12]
+	if v2 then
+		if p1 ~= v2.value then
+			v2:set(p1)
+		end
+		return v2
+	else
+		local t2 = {
+			ID = v12,
+			value = p1,
+			lastChangeTick = t.Internal._cycleTick,
+			ConnectedWidgets = {},
+			ConnectedFunctions = {}
+		}
+		setmetatable(t2, v1.StateClass)
+		v1._states[v12] = t2
+		t2:onChange(p2)
+		return t2
+	end
 end
-function module_2_upvr.TableState(arg1, arg2, arg3) -- Line 604
-    local var39 = arg1[arg2]
-    local any__getID_result1_3 = var2_upvr._getID(2)
-    local var41 = var2_upvr._states[any__getID_result1_3]
-    if var41 then
-        if var39 ~= var41.value then
-            var41:set(var39)
-        end
-        return var41
-    end
-    local module_3_upvr = {
-        ID = any__getID_result1_3;
-        value = var39;
-        lastChangeTick = module_2_upvr.Internal._cycleTick;
-        ConnectedWidgets = {};
-        ConnectedFunctions = {};
-    }
-    setmetatable(module_3_upvr, var2_upvr.StateClass)
-    var2_upvr._states[any__getID_result1_3] = module_3_upvr
-    module_3_upvr:onChange(function() -- Line 628
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        arg1[arg2] = module_3_upvr.value
-        do
-            return
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        arg1[arg2] = module_3_upvr.value
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end)
-    return module_3_upvr
+function t.TableState(p1, p2, p3) --[[ Line: 604 | Upvalues: v1 (copy), t (copy) ]]
+	local v12 = p1[p2]
+	local v2 = v1._getID(2)
+	local v3 = v1._states[v2]
+	if v3 then
+		if v12 ~= v3.value then
+			v3:set(v12)
+		end
+		return v3
+	else
+		local t2 = {
+			ID = v2,
+			value = v12,
+			lastChangeTick = t.Internal._cycleTick,
+			ConnectedWidgets = {},
+			ConnectedFunctions = {}
+		}
+		setmetatable(t2, v1.StateClass)
+		v1._states[v2] = t2
+		t2:onChange(function() --[[ Line: 628 | Upvalues: p3 (copy), t2 (copy), p1 (copy), p2 (copy) ]]
+			if p3 == nil then
+				p1[p2] = t2.value
+			elseif p3(t2.value) then
+				p1[p2] = t2.value
+			end
+		end)
+		return t2
+	end
 end
-function module_2_upvr.ComputedState(arg1, arg2) -- Line 657
-    local any__getID_result1_2 = var2_upvr._getID(2)
-    if var2_upvr._states[any__getID_result1_2] then
-        return var2_upvr._states[any__getID_result1_2]
-    end
-    local module_5_upvr = {
-        ID = any__getID_result1_2;
-        value = arg2(arg1.value);
-        lastChangeTick = module_2_upvr.Internal._cycleTick;
-        ConnectedWidgets = {};
-        ConnectedFunctions = {};
-    }
-    setmetatable(module_5_upvr, var2_upvr.StateClass)
-    var2_upvr._states[any__getID_result1_2] = module_5_upvr
-    arg1:onChange(function(arg1_2) -- Line 673
-        module_5_upvr:set(arg2(arg1_2))
-    end)
-    return module_5_upvr
+function t.ComputedState(p1, p2) --[[ Line: 657 | Upvalues: v1 (copy), t (copy) ]]
+	local v12 = v1._getID(2)
+	if v1._states[v12] then
+		return v1._states[v12]
+	else
+		local t2 = {
+			ID = v12,
+			value = p2(p1.value),
+			lastChangeTick = t.Internal._cycleTick,
+			ConnectedWidgets = {},
+			ConnectedFunctions = {}
+		}
+		setmetatable(t2, v1.StateClass)
+		v1._states[v12] = t2
+		p1:onChange(function(p1) --[[ Line: 673 | Upvalues: t2 (copy), p2 (copy) ]]
+			t2:set(p2(p1))
+		end)
+		return t2
+	end
 end
-module_2_upvr.ShowDemoWindow = require(script.demoWindow)(module_2_upvr)
-require(script.widgets)(var2_upvr)
-require(script.API)(module_2_upvr)
-return module_2_upvr
+t.ShowDemoWindow = require(script.demoWindow)(t)
+require(script.widgets)(v1)
+require(script.API)(t)
+return t

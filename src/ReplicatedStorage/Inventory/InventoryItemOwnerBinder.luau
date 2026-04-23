@@ -1,47 +1,48 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BaseObject_upvr = require(ReplicatedStorage.Std.BaseObject)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-local Signal_upvr = require(ReplicatedStorage.Std.Signal)
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-function module_upvr.new(arg1) -- Line 12
-    local any_new_result1_upvr = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1_upvr, module_upvr)
-    any_new_result1_upvr.Name = arg1.Name
-    any_new_result1_upvr._onCharacterChanged = Signal_upvr.new()
-    if not arg1.Value then
-    else
-        any_new_result1_upvr.maid.observeChar = RxInstanceUtils_upvr.observeProperty(arg1.Value, "PrimaryPart", function(arg1_3) -- Line 23
-            task.wait()
-            if arg1_3 then
-                any_new_result1_upvr.Character = arg1.Value
-            else
-                any_new_result1_upvr.Character = nil
-            end
-            any_new_result1_upvr._onCharacterChanged:Fire(any_new_result1_upvr.Character)
-        end)
-    end
-    any_new_result1_upvr.maid:GiveTask(arg1.Changed:Connect(function() -- Line 19, Named "update"
-        if not arg1.Value then
-        else
-            any_new_result1_upvr.maid.observeChar = RxInstanceUtils_upvr.observeProperty(arg1.Value, "PrimaryPart", function(arg1_2) -- Line 23
-                task.wait()
-                if arg1_2 then
-                    any_new_result1_upvr.Character = arg1.Value
-                else
-                    any_new_result1_upvr.Character = nil
-                end
-                any_new_result1_upvr._onCharacterChanged:Fire(any_new_result1_upvr.Character)
-            end)
-        end
-    end))
-    return any_new_result1_upvr
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+require(ReplicatedStorage.Std.Maid)
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1) --[[ Line: 12 | Upvalues: BaseObject (copy), t (copy), Signal (copy), RxInstanceUtils (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t)
+	v1.Name = p1.Name
+	v1._onCharacterChanged = Signal.new()
+	local function update() --[[ Line: 19 | Upvalues: p1 (copy), v1 (copy), RxInstanceUtils (ref) ]]
+		if p1.Value then
+			v1.maid.observeChar = RxInstanceUtils.observeProperty(p1.Value, "PrimaryPart", function(p12) --[[ Line: 23 | Upvalues: v1 (ref), p1 (ref) ]]
+				task.wait()
+				if p12 then
+					v1.Character = p1.Value
+				else
+					v1.Character = nil
+				end
+				v1._onCharacterChanged:Fire(v1.Character)
+			end)
+		end
+	end
+	if p1.Value then
+		v1.maid.observeChar = RxInstanceUtils.observeProperty(p1.Value, "PrimaryPart", function(p12) --[[ Line: 23 | Upvalues: v1 (copy), p1 (copy) ]]
+			task.wait()
+			if p12 then
+				v1.Character = p1.Value
+			else
+				v1.Character = nil
+			end
+			v1._onCharacterChanged:Fire(v1.Character)
+		end)
+	end
+	v1.maid:GiveTask(p1.Changed:Connect(update))
+	return v1
 end
-function module_upvr.GetAttribute(arg1, arg2) -- Line 38
-    return arg1["attr"..tostring(arg2)]
+function t.GetAttribute(p1, p2) --[[ Line: 38 ]]
+	return p1["attr" .. tostring(p2)]
 end
-function module_upvr.SetAttribute(arg1, arg2, arg3) -- Line 41
-    arg1["attr"..tostring(arg2)] = arg3
+function t.SetAttribute(p1, p2, p3) --[[ Line: 41 ]]
+	p1["attr" .. tostring(p2)] = p3
 end
-return require(ReplicatedStorage.Std.Binder).new("InventoryItemOwner", module_upvr)
+return Binder.new("InventoryItemOwner", t)

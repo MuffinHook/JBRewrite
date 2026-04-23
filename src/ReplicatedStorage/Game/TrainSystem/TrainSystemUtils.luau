@@ -1,64 +1,69 @@
-local function CalculateSegment_upvr(arg1, arg2) -- Line 1, Named "CalculateSegment"
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [35.131922]
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [35.3]
-    if arg2 < nil then
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    if nil <= arg2 then
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        if nil then
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local function CalculateSegment(p1, p2) --[[ Line: 1 ]]
+	local v1 = p1.SegmentsById[p1.SegmentId]
+	if not (p2 < v1.Length) then
+		repeat
+			local v2
+			p2 = p2 - v1.Length
+			v1 = p1.SegmentsById[v2[v1.BranchIndex]]
+			if not (v1.Length <= p2) then
+				break
+			end
+			v2 = p1.SegmentsNext[v1.Id]
+		until not v2
+	end
+	return v1, p2
+end
+local function CalculateDistanceAhead(p1, p2, p3, p4, p5) --[[ Line: 21 ]]
+	if p2 == p4 then
+		return p5 - p3
+	end
+	local v1 = p1.SegmentsById[p2]
+	local sum = v1.Length - p3
+	local v2 = p2
+	for i = 1, 3 do
+		local v3 = p1.SegmentsNext[v2]
+		if not v3 then
+			return false
+		end
+		v2 = v3[v1.BranchIndex]
+		v1 = p1.SegmentsById[v2]
+		if v2 == p4 then
+			return sum + p5
+		end
+		sum = sum + v1.Length
+	end
+	local v4 = p1.SegmentsById[p4]
+	local sum_2 = v4.Length - p5
+	local v5 = p4
+	for j = 1, 3 do
+		local v6 = p1.SegmentsNext[v5]
+		if not v6 then
+			break
+		end
+		v5 = v6[v4.BranchIndex]
+		v4 = p1.SegmentsById[v5]
+		if v5 == p2 then
+			return -sum_2 - p3
+		end
+		sum_2 = sum_2 + v4.Length
+	end
+	return false
 end
 return {
-    CalculateSegment = CalculateSegment_upvr;
-    CalculatePosition = function(arg1, arg2) -- Line 61, Named "CalculatePosition"
-        local CalculateSegment_result1, CalculateSegment_result2 = CalculateSegment_upvr(arg1, arg2)
-        if CalculateSegment_result1 then
-            local CF = CalculateSegment_result1.CF
-            return CF * Vector3.new(0, 0, CalculateSegment_result1.Length * 0.5 - CalculateSegment_result2), CF - CF.p
-        end
-        return false
-    end;
-    CalculateDistanceAhead = function(arg1, arg2, arg3, arg4, arg5) -- Line 21, Named "CalculateDistanceAhead"
-        if arg2 == arg4 then
-            return arg5 - arg3
-        end
-        local var3 = arg2
-        local var4 = arg1.SegmentsById[var3]
-        for _ = 1, 3 do
-            local var6 = arg1.SegmentsNext[var3]
-            if not var6 then
-                return false
-            end
-            if var6[var4.BranchIndex] == arg4 then
-                return var4.Length - arg3 + arg5
-            end
-        end
-        local var8 = arg4
-        local var9 = arg1.SegmentsById[var8]
-        for _ = 1, 3 do
-            local var11 = arg1.SegmentsNext[var8]
-            if not var11 then
-                return false
-            end
-            if var11[var9.BranchIndex] == arg2 then
-                return -var9.Length - arg5 - arg3
-            end
-        end
-        return false
-    end;
-    MoveTrain = function(arg1, arg2) -- Line 69, Named "MoveTrain"
-        local CalculateSegment_result1_2, CalculateSegment_result2_2 = CalculateSegment_upvr(arg1, arg1.Offset + arg2 * arg1.Speed)
-        arg1.SegmentId = CalculateSegment_result1_2.Id
-        arg1.Offset = CalculateSegment_result2_2
-    end;
+	CalculateSegment = CalculateSegment,
+	CalculatePosition = function(p1, p2) --[[ Name: CalculatePosition | Line: 61 | Upvalues: CalculateSegment (copy) ]]
+		local v1, v2 = CalculateSegment(p1, p2)
+		if v1 then
+			local CF = v1.CF
+			return CF * Vector3.new(0, 0, v1.Length * 0.5 - v2), CF - CF.p
+		else
+			return false
+		end
+	end,
+	CalculateDistanceAhead = CalculateDistanceAhead,
+	MoveTrain = function(p1, p2) --[[ Name: MoveTrain | Line: 69 | Upvalues: CalculateSegment (copy) ]]
+		local v1, v2 = CalculateSegment(p1, p1.Offset + p2 * p1.Speed)
+		p1.SegmentId = v1.Id
+		p1.Offset = v2
+	end
 }

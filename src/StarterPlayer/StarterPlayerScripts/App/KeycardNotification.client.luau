@@ -1,22 +1,25 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local var3_upvw = false
-local Players_upvr = game:GetService("Players")
-local Notification_upvr = require(ReplicatedStorage.Game.Notification)
-local var6_upvw = false
-local var7_upvw
-var7_upvw = require(ReplicatedStorage.Inventory.InventoryItemBinder):GetClassAddedSignal():Connect(function(arg1) -- Line 9
-    if not var3_upvw and arg1:GetOwner() == Players_upvr.LocalPlayer and arg1:GetName() == "Key" then
-        Notification_upvr.new({
-            Text = "This keycard grants you access into Police doors and Bank vaults!";
-        })
-        var3_upvw = true
-    elseif not var6_upvw and arg1:GetOwner() == Players_upvr.LocalPlayer and arg1:GetName() == "CrimeKey" then
-        Notification_upvr.new({
-            Text = "This crime card grants you access into Criminal Bases!";
-        })
-        var6_upvw = true
-    end
-    if var3_upvw and var6_upvw then
-        var7_upvw:Disconnect()
-    end
+local Notification = require(ReplicatedStorage.Game.Notification)
+local InventoryItemBinder = require(ReplicatedStorage.Inventory.InventoryItemBinder)
+local v1 = nil
+local v2 = false
+local v3 = false
+v1 = InventoryItemBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 9 | Upvalues: v2 (ref), Players (copy), Notification (copy), v3 (ref), v1 (ref) ]]
+	if v2 or (p1:GetOwner() ~= Players.LocalPlayer or p1:GetName() ~= "Key") then
+		if not v3 and (p1:GetOwner() == Players.LocalPlayer and p1:GetName() == "CrimeKey") then
+			Notification.new({
+				Text = "This crime card grants you access into Criminal Bases!"
+			})
+			v3 = true
+		end
+	else
+		Notification.new({
+			Text = "This keycard grants you access into Police doors and Bank vaults!"
+		})
+		v2 = true
+	end
+	if v2 and v3 then
+		v1:Disconnect()
+	end
 end)

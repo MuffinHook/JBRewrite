@@ -1,190 +1,151 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Animation_upvr = require(ReplicatedStorage_upvr.Module.Animation)
-local function _(arg1) -- Line 13, Named "Ease_InOutQuad"
-    local var3
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var3 = 2 * arg1 * arg1
-        return var3
-    end
-    if arg1 >= 0.5 or not decompInlinedCondition() then
-        var3 = -1 - 2 * (arg1 - 2) * arg1
-    end
-    return var3
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
+local JetPackUtil = require(ReplicatedStorage.Game.JetPack.JetPackUtil)
+local Animation = require(ReplicatedStorage.Module.Animation)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local function Ease_InOutQuad(p1) --[[ Line: 13 ]]
+	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
 end
-local EzUtils_upvr = require(ReplicatedStorage_upvr.EzUi.EzUtils)
-local function _(arg1) -- Line 19, Named "SelectIfGamepad"
-    EzUtils_upvr.selectIfGamepad(arg1)
+local function SelectIfGamepad(p1) --[[ Line: 19 | Upvalues: EzUtils (copy) ]]
+	EzUtils.selectIfGamepad(p1)
 end
-local module_upvr = {
-    OnRefillClicked = require(ReplicatedStorage_upvr.Std.Signal).new();
-    MaxFuel = 10;
-    Fuel = self.MaxFuel;
+local t = {
+	OnRefillClicked = Signal.new(),
+	MaxFuel = 10
 }
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-function module_upvr.Init() -- Line 27
-    local clone_upvw = ReplicatedStorage_upvr.Resource.JetPack.JetPackGui:Clone()
-    clone_upvw.Parent = LocalPlayer_upvr.PlayerGui
-    clone_upvw.Refill.Exit.MouseButton1Down:Connect(function() -- Line 32
-        clone_upvw.Refill.Visible = false
-    end)
-    clone_upvw.Refill.Left.Buy.MouseButton1Down:Connect(function() -- Line 35
-        module_upvr.OnRefillClicked:Fire("Standard")
-        clone_upvw.Refill.Visible = false
-    end)
-    clone_upvw.Refill.Right.Buy.MouseButton1Down:Connect(function() -- Line 39
-        module_upvr.OnRefillClicked:Fire("Rocket")
-        clone_upvw.Refill.Visible = false
-    end)
-    clone_upvw.Fuel.Refill.MouseButton1Down:Connect(function() -- Line 43
-        module_upvr.OnRefillClicked:Fire("Standard")
-    end)
-    module_upvr.Gui = clone_upvw
+t.Fuel = t.MaxFuel
+function t.Init() --[[ Line: 27 | Upvalues: ReplicatedStorage (copy), LocalPlayer (copy), t (copy) ]]
+	local v1 = ReplicatedStorage.Resource.JetPack.JetPackGui:Clone()
+	v1.Parent = LocalPlayer.PlayerGui
+	v1.Refill.Exit.MouseButton1Down:Connect(function() --[[ Line: 32 | Upvalues: v1 (ref) ]]
+		v1.Refill.Visible = false
+	end)
+	v1.Refill.Left.Buy.MouseButton1Down:Connect(function() --[[ Line: 35 | Upvalues: t (ref), v1 (ref) ]]
+		t.OnRefillClicked:Fire("Standard")
+		v1.Refill.Visible = false
+	end)
+	v1.Refill.Right.Buy.MouseButton1Down:Connect(function() --[[ Line: 39 | Upvalues: t (ref), v1 (ref) ]]
+		t.OnRefillClicked:Fire("Rocket")
+		v1.Refill.Visible = false
+	end)
+	v1.Fuel.Refill.MouseButton1Down:Connect(function() --[[ Line: 43 | Upvalues: t (ref) ]]
+		t.OnRefillClicked:Fire("Standard")
+	end)
+	t.Gui = v1
 end
-function module_upvr.OpenFuel() -- Line 56
-    local Gui_upvr = module_upvr.Gui
-    if module_upvr.AnimFuel then
-        module_upvr.AnimFuel:Destroy()
-        module_upvr.AnimFuel = nil
-    end
-    Gui_upvr.Fuel.Meter.Visible = true
-    Gui_upvr.Fuel.Meter.BackgroundTransparency = 1
-    Gui_upvr.Fuel.Meter.Value.BackgroundTransparency = 1
-    local tbl_3 = {
-        Duration = 0.5;
-    }
-    local function OnUpdate(arg1, arg2, arg3) -- Line 69
-        local var14 = arg3
-        local var15
-        local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var15 = 2 * var14 * var14
-            return var15
-        end
-        if var14 >= 0.5 or not decompInlinedCondition_2() then
-            var15 = -1 - 2 * (var14 - 2) * var14
-        end
-        Gui_upvr.Fuel.Meter.Value.Size = UDim2.new(var15 * module_upvr.Fuel / module_upvr.MaxFuel, 0, 1, 0)
-        Gui_upvr.Fuel.Meter.BackgroundTransparency = 1 - var15
-        Gui_upvr.Fuel.Meter.Value.BackgroundTransparency = 1 - var15
-    end
-    tbl_3.OnUpdate = OnUpdate
-    local function OnComplete() -- Line 75
-        module_upvr.AnimFuel = nil
-    end
-    tbl_3.OnComplete = OnComplete
-    module_upvr.AnimFuel = Animation_upvr.new(tbl_3)
+function t.OpenFuel() --[[ Line: 56 | Upvalues: t (copy), Animation (copy) ]]
+	local Gui = t.Gui
+	if t.AnimFuel then
+		t.AnimFuel:Destroy()
+		t.AnimFuel = nil
+	end
+	Gui.Fuel.Meter.Visible = true
+	Gui.Fuel.Meter.BackgroundTransparency = 1
+	Gui.Fuel.Meter.Value.BackgroundTransparency = 1
+	t.AnimFuel = Animation.new({
+		Duration = 0.5,
+		OnUpdate = function(p1, p2, p3) --[[ Name: OnUpdate | Line: 69 | Upvalues: Gui (copy), t (ref) ]]
+			local v1, v2
+			if p3 < 0.5 then
+				v1 = 2 * p3 * p3
+				if not v1 then
+					v2 = p3
+					v1 = -1 - 2 * (p3 - 2) * p3
+				end
+			else
+				v2 = p3
+				v1 = -1 - 2 * (p3 - 2) * p3
+			end
+			Gui.Fuel.Meter.Value.Size = UDim2.new(v1 * t.Fuel / t.MaxFuel, 0, 1, 0)
+			Gui.Fuel.Meter.BackgroundTransparency = 1 - v1
+			Gui.Fuel.Meter.Value.BackgroundTransparency = 1 - v1
+		end,
+		OnComplete = function() --[[ Name: OnComplete | Line: 75 | Upvalues: t (ref) ]]
+			t.AnimFuel = nil
+		end
+	})
 end
-function module_upvr.CloseFuel() -- Line 80
-    local Gui_upvr_2 = module_upvr.Gui
-    if module_upvr.AnimFuel then
-        module_upvr.AnimFuel:Destroy()
-        module_upvr.AnimFuel = nil
-    end
-    local tbl = {
-        Duration = 0.5;
-    }
-    local function OnUpdate(arg1, arg2, arg3) -- Line 89
-        local var18 = arg3
-        local var19
-        local function decompInlinedCondition_3() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var19 = 2 * var18 * var18
-            return var19
-        end
-        if var18 >= 0.5 or not decompInlinedCondition_3() then
-            var19 = -1 - 2 * (var18 - 2) * var18
-        end
-        local var20 = 1 - var19
-        var19 = Gui_upvr_2
-        var19 = var19.Fuel
-        var19 = var19.Meter
-        var19.BackgroundTransparency = 1 - var20
-        var19 = Gui_upvr_2
-        var19 = var19.Fuel
-        var19 = var19.Meter
-        var19 = var19.Value
-        var19.BackgroundTransparency = 1 - var20
-    end
-    tbl.OnUpdate = OnUpdate
-    local function OnComplete() -- Line 95
-        Gui_upvr_2.Fuel.Meter.Visible = false
-        module_upvr.AnimFuel = nil
-    end
-    tbl.OnComplete = OnComplete
-    module_upvr.AnimFuel = Animation_upvr.new(tbl)
+function t.CloseFuel() --[[ Line: 80 | Upvalues: t (copy), Animation (copy) ]]
+	local Gui = t.Gui
+	if t.AnimFuel then
+		t.AnimFuel:Destroy()
+		t.AnimFuel = nil
+	end
+	t.AnimFuel = Animation.new({
+		Duration = 0.5,
+		OnUpdate = function(p1, p2, p3) --[[ Name: OnUpdate | Line: 89 | Upvalues: Gui (copy) ]]
+			local v1, v2
+			if p3 < 0.5 then
+				v1 = 2 * p3 * p3
+				if not v1 then
+					v2 = p3
+					v1 = -1 - 2 * (p3 - 2) * p3
+				end
+			else
+				v2 = p3
+				v1 = -1 - 2 * (p3 - 2) * p3
+			end
+			local v3 = 1 - v1
+			Gui.Fuel.Meter.BackgroundTransparency = 1 - v3
+			Gui.Fuel.Meter.Value.BackgroundTransparency = 1 - v3
+		end,
+		OnComplete = function() --[[ Name: OnComplete | Line: 95 | Upvalues: Gui (copy), t (ref) ]]
+			Gui.Fuel.Meter.Visible = false
+			t.AnimFuel = nil
+		end
+	})
 end
-function module_upvr.IsFuelAnimating() -- Line 101
-    local var21
-    if module_upvr.AnimFuel == nil then
-        var21 = false
-    else
-        var21 = true
-    end
-    return var21
+function t.IsFuelAnimating() --[[ Line: 101 | Upvalues: t (copy) ]]
+	return t.AnimFuel ~= nil
 end
-function module_upvr.IsFuelOpen() -- Line 104
-    return module_upvr.Gui.Fuel.Meter.Visible
+function t.IsFuelOpen() --[[ Line: 104 | Upvalues: t (copy) ]]
+	return t.Gui.Fuel.Meter.Visible
 end
-function module_upvr.UpdateFuel(arg1, arg2) -- Line 107
-    assert(arg1)
-    assert(arg2)
-    if module_upvr.AnimFuel then
-        module_upvr.Fuel = arg1
-        module_upvr.MaxFuel = arg2
-    elseif 0.0001 < math.abs(arg1 - module_upvr.Fuel) then
-        module_upvr.Fuel = arg1
-        module_upvr.MaxFuel = arg2
-        module_upvr.Gui.Fuel.Meter.Value.Size = UDim2.new(module_upvr.Fuel / module_upvr.MaxFuel, 0, 1, 0)
-    end
+function t.UpdateFuel(p1, p2) --[[ Line: 107 | Upvalues: t (copy) ]]
+	assert(p1)
+	assert(p2)
+	if t.AnimFuel then
+		t.Fuel = p1
+		t.MaxFuel = p2
+	else
+		if math.abs(p1 - t.Fuel) > 0.0001 then
+			t.Fuel = p1
+			t.MaxFuel = p2
+			t.Gui.Fuel.Meter.Value.Size = UDim2.new(t.Fuel / t.MaxFuel, 0, 1, 0)
+		end
+	end
 end
-local JetPackUtil_upvr = require(ReplicatedStorage_upvr.Game.JetPack.JetPackUtil)
-function module_upvr.SetFuelType(arg1) -- Line 119
-    assert(arg1)
-    local var23 = JetPackUtil_upvr.Fuel[arg1]
-    assert(var23)
-    module_upvr.Gui.Fuel.Meter.Value.BackgroundColor3 = var23.MeterColor
+function t.SetFuelType(p1) --[[ Line: 119 | Upvalues: JetPackUtil (copy), t (copy) ]]
+	assert(p1)
+	local v1 = JetPackUtil.Fuel[p1]
+	assert(v1)
+	t.Gui.Fuel.Meter.Value.BackgroundColor3 = v1.MeterColor
 end
-function module_upvr.FlashRefill() -- Line 126
-    if module_upvr.FlashRefillOpen == true then
-    else
-        module_upvr.FlashRefillOpen = true
-        local Gui_upvr_3 = module_upvr.Gui
-        Gui_upvr_3.Fuel.Refill.Visible = true
-        Gui_upvr_3.Fuel.Refill.Transparency = 1
-        local tbl_2 = {
-            Duration = 0.5;
-        }
-        local function OnUpdate(arg1, arg2, arg3) -- Line 135
-            local var26
-            local function decompInlinedCondition_4() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                var26 = 2 * arg3 * arg3
-                return var26
-            end
-            if arg3 >= 0.5 or not decompInlinedCondition_4() then
-                var26 = -1 - 2 * (arg3 - 2) * arg3
-            end
-            Gui_upvr_3.Fuel.Refill.Transparency = 1 - var26
-        end
-        tbl_2.OnUpdate = OnUpdate
-        Animation_upvr.new(tbl_2)
-        task.delay(3, function() -- Line 139
-            Animation_upvr.new({
-                Duration = 0.5;
-                OnUpdate = function(arg1, arg2, arg3) -- Line 141, Named "OnUpdate"
-                    local var29
-                    local function decompInlinedCondition_5() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                        var29 = 2 * arg3 * arg3
-                        return var29
-                    end
-                    if arg3 >= 0.5 or not decompInlinedCondition_5() then
-                        var29 = -1 - 2 * (arg3 - 2) * arg3
-                    end
-                    Gui_upvr_3.Fuel.Refill.Transparency = var29
-                end;
-                OnComplete = function() -- Line 144, Named "OnComplete"
-                    Gui_upvr_3.Fuel.Refill.Visible = false
-                    module_upvr.FlashRefillOpen = false
-                end;
-            })
-        end)
-    end
+function t.FlashRefill() --[[ Line: 126 | Upvalues: t (copy), Animation (copy) ]]
+	if t.FlashRefillOpen ~= true then
+		t.FlashRefillOpen = true
+		local Gui = t.Gui
+		Gui.Fuel.Refill.Visible = true
+		Gui.Fuel.Refill.Transparency = 1
+		Animation.new({
+			Duration = 0.5,
+			OnUpdate = function(p1, p2, p3) --[[ Name: OnUpdate | Line: 135 | Upvalues: Gui (copy) ]]
+				Gui.Fuel.Refill.Transparency = 1 - (p3 < 0.5 and 2 * p3 * p3 or -1 - 2 * (p3 - 2) * p3)
+			end
+		})
+		task.delay(3, function() --[[ Line: 139 | Upvalues: Gui (copy), t (ref), Animation (ref) ]]
+			Animation.new({
+				Duration = 0.5,
+				OnUpdate = function(p1, p2, p3) --[[ Name: OnUpdate | Line: 141 | Upvalues: Gui (ref) ]]
+					Gui.Fuel.Refill.Transparency = p3 < 0.5 and 2 * p3 * p3 or -1 - 2 * (p3 - 2) * p3
+				end,
+				OnComplete = function() --[[ Name: OnComplete | Line: 144 | Upvalues: Gui (ref), t (ref) ]]
+					Gui.Fuel.Refill.Visible = false
+					t.FlashRefillOpen = false
+				end
+			})
+		end)
+	end
 end
-return module_upvr
+return t

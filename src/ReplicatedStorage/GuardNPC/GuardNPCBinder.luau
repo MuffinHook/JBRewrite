@@ -1,162 +1,155 @@
-local RunService_upvr = game:GetService("RunService")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local NPC_upvr = require(ReplicatedStorage.NPC.NPC)
-local GuardNPCConsts_upvr = require(ReplicatedStorage.GuardNPC.GuardNPCConsts)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, NPC_upvr)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local InventoryItemOwnerBinder_upvr = require(ReplicatedStorage.Inventory.InventoryItemOwnerBinder)
-local ItemSystem_upvr = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
-local Math_upvr = require(ReplicatedStorage.Module.Math)
-local MinimapService_upvr = require(ReplicatedStorage.App.MinimapService)
-local Players_upvr = game:GetService("Players")
-function module_upvr.new(arg1, arg2) -- Line 21
-    local any_new_result1_upvr_2 = NPC_upvr.new(arg1, arg2)
-    setmetatable(any_new_result1_upvr_2, module_upvr)
-    local any_new_result1_upvr = Maid_upvr.new()
-    any_new_result1_upvr_2._maid:GiveTask(any_new_result1_upvr)
-    local function observePlayerObj(arg1_2) -- Line 27
-        any_new_result1_upvr:DoCleaning()
-        if not arg1_2 then
-        else
-            any_new_result1_upvr:GivePromise(InventoryItemOwnerBinder_upvr:Promise(arg1_2):andThen(function(arg1_3) -- Line 32
-                local any_GetEquipped_result1 = ItemSystem_upvr.GetEquipped(arg1_3)
-                if any_GetEquipped_result1 then
-                    any_new_result1_upvr_2:_onItemEquipped(any_GetEquipped_result1)
-                end
-                any_new_result1_upvr:GiveTask(ItemSystem_upvr.onItemEquipped:Connect(function(arg1_4) -- Line 37
-                    if arg1_4.Player ~= arg1_3 then
-                    else
-                        any_new_result1_upvr_2:_onItemEquipped(arg1_4)
-                    end
-                end))
-            end))
-        end
-    end
-    observePlayerObj(arg2.characterToPlayerObj.Value)
-    any_new_result1_upvr_2._maid:GiveTask(arg2.characterToPlayerObj.Changed:Connect(observePlayerObj))
-    any_new_result1_upvr_2._maid:GiveTask(MinimapService_upvr.add({
-        part = any_new_result1_upvr_2.obj.PrimaryPart;
-        color = Color3.fromRGB(255, 204, 0);
-        name = Math_upvr.Base85UUID(5);
-        size = UDim2.new(0, 12, 0, 12);
-        flash = true;
-    }))
-    local function _() -- Line 58, Named "initializePlayerPushing"
-        local tbl_upvr = {}
-        any_new_result1_upvr_2._maid:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 60
-            for _, v in Players_upvr:GetPlayers() do
-                local Character = v.Character
-                local var32
-                if Character then
-                    var32 = Character.PrimaryPart
-                    var32 = var32.Position
-                    var32 = nil
-                    if tbl_upvr[v.UserId] then
-                        var32 = workspace:GetServerTimeNow() - tbl_upvr[v.UserId]
-                    else
-                        var32 = math.huge
-                    end
-                    if (var32 - any_new_result1_upvr_2.obj.PrimaryPart.Position).Magnitude <= GuardNPCConsts_upvr.DIST_TO_PUSH_WITHIN and GuardNPCConsts_upvr.TIME_BETWEEN_PUSHES < var32 then
-                        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                        tbl_upvr[v.UserId] = workspace:GetServerTimeNow()
-                        table.insert({}, Character)
-                    end
-                end
-            end
-            for _, v_2 in {} do
-                v_2.PrimaryPart:ApplyImpulse((v_2.PrimaryPart.Position - any_new_result1_upvr_2.obj.PrimaryPart.Position).Unit * GuardNPCConsts_upvr.PUSH_IMPULSE_MULTIPLIER)
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            end
-            return true
-        end))
-    end
-    return any_new_result1_upvr_2
+local ItemSystem = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
+local InventoryItemOwnerBinder = require(ReplicatedStorage.Inventory.InventoryItemOwnerBinder)
+local NPC = require(ReplicatedStorage.NPC.NPC)
+local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
+local GuardNPCShared = require(ReplicatedStorage.GuardNPC.GuardNPCShared)
+local GuardNPCUtils = require(ReplicatedStorage.GuardNPC.GuardNPCUtils)
+local GuardNPCConsts = require(ReplicatedStorage.GuardNPC.GuardNPCConsts)
+local NPCConsts = require(ReplicatedStorage.NPC.NPCConsts)
+local MinimapService = require(ReplicatedStorage.App.MinimapService)
+local Math = require(ReplicatedStorage.Module.Math)
+local Players = game:GetService("Players")
+local t = {}
+t.__index = t
+setmetatable(t, NPC)
+function t.new(p1, p2) --[[ Line: 21 | Upvalues: NPC (copy), t (copy), Maid (copy), InventoryItemOwnerBinder (copy), ItemSystem (copy), Math (copy), MinimapService (copy), RunService (copy), Players (copy), GuardNPCConsts (copy) ]]
+	local v1 = NPC.new(p1, p2)
+	setmetatable(v1, t)
+	local v3 = Maid.new()
+	v1._maid:GiveTask(v3)
+	local function observePlayerObj(p1) --[[ Line: 27 | Upvalues: v3 (copy), InventoryItemOwnerBinder (ref), ItemSystem (ref), v1 (copy) ]]
+		v3:DoCleaning()
+		if p1 then
+			v3:GivePromise(InventoryItemOwnerBinder:Promise(p1):andThen(function(p1) --[[ Line: 32 | Upvalues: ItemSystem (ref), v1 (ref), v3 (ref) ]]
+				local v12 = ItemSystem.GetEquipped(p1)
+				if v12 then
+					v1:_onItemEquipped(v12)
+				end
+				v3:GiveTask(ItemSystem.onItemEquipped:Connect(function(p12) --[[ Line: 37 | Upvalues: p1 (copy), v1 (ref) ]]
+					if p12.Player == p1 then
+						v1:_onItemEquipped(p12)
+					end
+				end))
+			end))
+		end
+	end
+	observePlayerObj(p2.characterToPlayerObj.Value)
+	v1._maid:GiveTask(p2.characterToPlayerObj.Changed:Connect(observePlayerObj))
+	v1._maid:GiveTask(MinimapService.add({
+		part = v1.obj.PrimaryPart,
+		color = Color3.fromRGB(255, 204, 0),
+		name = Math.Base85UUID(5),
+		size = UDim2.new(0, 12, 0, 12),
+		flash = true
+	}))
+	local function initializePlayerPushing() --[[ Line: 58 | Upvalues: v1 (copy), RunService (ref), Players (ref), GuardNPCConsts (ref) ]]
+		local t = {}
+		v1._maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 60 | Upvalues: Players (ref), v1 (ref), t (copy), GuardNPCConsts (ref) ]]
+			local v12 = workspace:GetServerTimeNow()
+			local t2 = {}
+			for v3, v4 in Players:GetPlayers() do
+				local v2
+				local Character = v4.Character
+				if Character then
+					v2 = if t[v4.UserId] then v12 - t[v4.UserId] else 1.797693134862316e308
+					if (Character.PrimaryPart.Position - v1.obj.PrimaryPart.Position).Magnitude <= GuardNPCConsts.DIST_TO_PUSH_WITHIN and GuardNPCConsts.TIME_BETWEEN_PUSHES < v2 then
+						t[v4.UserId] = v12
+						table.insert(t2, Character)
+					end
+				end
+			end
+			for v5, v6 in t2 do
+				v6.PrimaryPart:ApplyImpulse((v6.PrimaryPart.Position - v1.obj.PrimaryPart.Position).Unit * GuardNPCConsts.PUSH_IMPULSE_MULTIPLIER)
+			end
+			return true
+		end))
+	end
+	return v1
 end
-local NPCConsts_upvr = require(ReplicatedStorage.NPC.NPCConsts)
-local GeomUtils_upvr = require(ReplicatedStorage.Std.GeomUtils)
-local GuardNPCShared_upvr = require(ReplicatedStorage.GuardNPC.GuardNPCShared)
-local GuardNPCUtils_upvr = require(ReplicatedStorage.GuardNPC.GuardNPCUtils)
-function module_upvr._onItemEquipped(arg1, arg2) -- Line 96
-    arg2.SimulateLocal = true
-    arg2.MinimalFx = true
-    arg2.BulletEmitter.SimulateLocal = true
-    arg2.BulletEmitter.IgnoreLocalPlayer = false
-    arg2.BulletEmitter.ShieldBlockPct = 0.75
-    arg2.BulletEmitter.IgnoreGuards = true
-    arg2.BulletEmitter.Color = Color3.fromRGB(196, 40, 28)
-    local var37_upvr = math.random() * 100
-    local var38_upvw = 0
-    local zero_vector3_upvw = Vector3.new()
-    local os_clock_result1_upvw = os.clock()
-    local var41_upvw = false
-    local os_clock_result1_upvw_2 = os.clock()
-    local var43_upvw = 0
-    local function update_upvr() -- Line 118, Named "update"
-        local var44 = os.clock() + var37_upvr
-        if not arg1.obj.Humanoid or arg1.obj.Humanoid.Health <= 0 then
-            return false
-        end
-        if arg1:GetTargetType() == NPCConsts_upvr.DEST_TYPE.IDLE then
-            if 1.5 < var44 - var38_upvw then
-                local any_randomPointInCircle_result1 = GeomUtils_upvr.randomPointInCircle()
-                zero_vector3_upvw = Vector3.new(any_randomPointInCircle_result1.X, 0, any_randomPointInCircle_result1.Y)
-                var38_upvw = var44
-            end
-            local var46 = arg1.obj.PrimaryPart.Position + arg1.obj.PrimaryPart.CFrame.LookVector * 10
-            if arg1.obj.PrimaryPart.Velocity.Magnitude < 8 then
-                var46 += zero_vector3_upvw * 7
-            end
-            arg2:SetThirdMousePosition(var46)
-        else
-            local any_GetTarget_result1 = arg1:GetTarget()
-            if not any_GetTarget_result1 then
-                return false
-            end
-            if typeof(any_GetTarget_result1) ~= "Instance" then
-                return false
-            end
-            if 1 < var44 - os_clock_result1_upvw then
-                var41_upvw = GuardNPCShared_upvr.canSeeTarget(arg1.obj, any_GetTarget_result1, arg1.occlusionCastParams)
-                os_clock_result1_upvw = var44
-            end
-            if not var41_upvw then
-                return false
-            end
-            local Parent = any_GetTarget_result1.Parent
-            if not Parent then
-                return false
-            end
-            arg2.BulletSpread = GuardNPCUtils_upvr.getBulletSpread(arg1.obj)
-            arg2:SetThirdMousePosition(Parent:FindFirstChild("Head").Position)
-            local any_getTriggerPressFreq_result1 = GuardNPCUtils_upvr.getTriggerPressFreq(arg1.obj)
-            if 1 / any_getTriggerPressFreq_result1 < var44 - os_clock_result1_upvw_2 then
-                os_clock_result1_upvw_2 = var44
-                var43_upvw = math.random()
-                arg2:InputBegan({
-                    UserInputType = Enum.UserInputType.MouseButton1;
-                })
-                task.delay(math.min(0.5, 1 / any_getTriggerPressFreq_result1 * var43_upvw), function() -- Line 168
-                    if arg2.Destroyed then
-                    else
-                        arg2:InputEnded({
-                            UserInputType = Enum.UserInputType.MouseButton1;
-                        })
-                    end
-                end)
-                return true
-            end
-        end
-        return false
-    end
-    arg1._maid.itemHeartbeat = RunService_upvr.Heartbeat:Connect(function() -- Line 179
-        debug.profilebegin("GuardNPC Heartbeat")
-        update_upvr()
-        debug.profileend()
-    end)
+function t._onItemEquipped(p1, p2) --[[ Line: 96 | Upvalues: NPCConsts (copy), GeomUtils (copy), GuardNPCShared (copy), GuardNPCUtils (copy), RunService (copy) ]]
+	local v1 = math.random() * 100
+	p2.SimulateLocal = true
+	p2.MinimalFx = true
+	p2.BulletEmitter.SimulateLocal = true
+	p2.BulletEmitter.IgnoreLocalPlayer = false
+	p2.BulletEmitter.ShieldBlockPct = 0.75
+	p2.BulletEmitter.IgnoreGuards = true
+	p2.BulletEmitter.Color = Color3.fromRGB(196, 40, 28)
+	local v2 = 0
+	local v3 = Vector3.new()
+	local v4 = os.clock()
+	local v5 = 0
+	local v6 = false
+	local v7 = os.clock()
+	local function update() --[[ Line: 118 | Upvalues: v1 (copy), p1 (copy), NPCConsts (ref), v2 (ref), GeomUtils (ref), v3 (ref), p2 (copy), v7 (ref), v6 (ref), GuardNPCShared (ref), GuardNPCUtils (ref), v4 (ref), v5 (ref) ]]
+		local v12 = os.clock() + v1
+		if p1.obj.Humanoid and not (p1.obj.Humanoid.Health <= 0) then
+			if p1:GetTargetType() == NPCConsts.DEST_TYPE.IDLE then
+				if v12 - v2 > 1.5 then
+					local v22 = GeomUtils.randomPointInCircle()
+					v3 = Vector3.new(v22.X, 0, v22.Y)
+					v2 = v12
+				end
+				local sum = p1.obj.PrimaryPart.Position + p1.obj.PrimaryPart.CFrame.LookVector * 10
+				if p1.obj.PrimaryPart.Velocity.Magnitude < 8 then
+					sum = sum + v3 * 7
+				end
+				p2:SetThirdMousePosition(sum)
+			else
+				local v32 = p1:GetTarget()
+				if v32 and typeof(v32) == "Instance" then
+					if v12 - v7 > 1 then
+						v6 = GuardNPCShared.canSeeTarget(p1.obj, v32, p1.occlusionCastParams)
+						v7 = v12
+					end
+					if v6 then
+						local v42 = v32.Parent
+						if v42 then
+							local Position = v42:FindFirstChild("Head").Position
+							p2.BulletSpread = GuardNPCUtils.getBulletSpread(p1.obj)
+							p2:SetThirdMousePosition(Position)
+							local v52 = GuardNPCUtils.getTriggerPressFreq(p1.obj)
+							if 1 / v52 < v12 - v4 then
+								v4 = v12
+								v5 = math.random()
+								p2:InputBegan({
+									UserInputType = Enum.UserInputType.MouseButton1
+								})
+								task.delay(math.min(0.5, 1 / v52 * v5), function() --[[ Line: 168 | Upvalues: p2 (ref) ]]
+									if not p2.Destroyed then
+										p2:InputEnded({
+											UserInputType = Enum.UserInputType.MouseButton1
+										})
+									end
+								end)
+								return true
+							else
+								return false
+							end
+						else
+							return false
+						end
+					else
+						return false
+					end
+				else
+					return false
+				end
+			end
+		end
+		return false
+	end
+	p1._maid.itemHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 179 | Upvalues: update (copy) ]]
+		debug.profilebegin("GuardNPC Heartbeat")
+		update()
+		debug.profileend()
+	end)
 end
-return require(ReplicatedStorage.ManifestBinder).new(GuardNPCConsts_upvr.TAG_NAME, {
-    humanoid = "Humanoid";
-    characterToPlayerObj = GuardNPCConsts_upvr.CHARCTER_TO_PLAYER_OBJ_NAME;
-}, module_upvr)
+return ManifestBinder.new(GuardNPCConsts.TAG_NAME, {
+	humanoid = "Humanoid",
+	characterToPlayerObj = GuardNPCConsts.CHARCTER_TO_PLAYER_OBJ_NAME
+}, t)

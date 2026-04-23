@@ -1,131 +1,88 @@
-local DataStoreService_upvr = game:GetService("DataStoreService")
-local RunService_upvr = game:GetService("RunService")
-local DataStoreQueue_upvr = require(script.DataStoreQueue)
-local module_upvr = {}
-local IncrementErrorCount
-local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-    IncrementErrorCount = {}
-    return IncrementErrorCount
+local DataStoreService = game:GetService("DataStoreService")
+local RunService = game:GetService("RunService")
+local DataStoreQueue = require(script.DataStoreQueue)
+local t = {}
+t.PlayerDS = RunService:IsStudio() and {} or DataStoreService:GetDataStore("GA_PlayerDS_1.0.0")
+t.AutoSaveData = 180
+t.BasePlayerData = {
+	Sessions = 0,
+	Transactions = 0,
+	ProgressionTries = {},
+	CurrentCustomDimension01 = "",
+	CurrentCustomDimension02 = "",
+	CurrentCustomDimension03 = "",
+	ConfigsHash = "",
+	AbId = "",
+	AbVariantId = "",
+	InitAuthorized = false,
+	SdkConfig = {},
+	ClientServerTimeOffset = 0,
+	Configurations = {},
+	RemoteConfigsIsReady = false,
+	PlayerTeleporting = false,
+	OwnedGamepasses = nil,
+	CountryCode = "",
+	CustomUserId = ""
+}
+t.DataToSave = { "Sessions", "Transactions", "ProgressionTries", "CurrentCustomDimension01", "CurrentCustomDimension02", "CurrentCustomDimension03", "OwnedGamepasses" }
+t.PlayerCache = {}
+t.EventsQueue = {}
+t.DataStoreQueue = DataStoreQueue
+function t.GetPlayerData(p1, p2) --[[ Line: 45 | Upvalues: DataStoreQueue (copy), RunService (copy), t (copy) ]]
+	local UserId = p2.UserId
+	local v1, v2 = DataStoreQueue.AddRequest(UserId, function() --[[ Line: 47 | Upvalues: RunService (ref), t (ref), UserId (copy) ]]
+		return RunService:IsStudio() and ({} or (t.PlayerDS:GetAsync(UserId) or {})) or (t.PlayerDS:GetAsync(UserId) or {})
+	end, 7)
+	if not v1 then
+		v2 = {}
+	end
+	return v2
 end
-if not RunService_upvr:IsStudio() or not decompInlinedCondition() then
-    IncrementErrorCount = DataStoreService_upvr:GetDataStore("GA_PlayerDS_1.0.0")
+function t.GetPlayerDataFromCache(p1, p2) --[[ Line: 57 | Upvalues: t (copy) ]]
+	local v1 = t.PlayerCache[tonumber(p2)]
+	if v1 then
+		return v1
+	else
+		return t.PlayerCache[tostring(p2)]
+	end
 end
-module_upvr.PlayerDS = IncrementErrorCount
-IncrementErrorCount = 180
-module_upvr.AutoSaveData = IncrementErrorCount
-IncrementErrorCount = {}
-IncrementErrorCount.Sessions = 0
-IncrementErrorCount.Transactions = 0
-IncrementErrorCount.ProgressionTries = {}
-IncrementErrorCount.CurrentCustomDimension01 = ""
-IncrementErrorCount.CurrentCustomDimension02 = ""
-IncrementErrorCount.CurrentCustomDimension03 = ""
-IncrementErrorCount.ConfigsHash = ""
-IncrementErrorCount.AbId = ""
-IncrementErrorCount.AbVariantId = ""
-IncrementErrorCount.InitAuthorized = false
-IncrementErrorCount.SdkConfig = {}
-IncrementErrorCount.ClientServerTimeOffset = 0
-IncrementErrorCount.Configurations = {}
-IncrementErrorCount.RemoteConfigsIsReady = false
-IncrementErrorCount.PlayerTeleporting = false
-IncrementErrorCount.OwnedGamepasses = nil
-IncrementErrorCount.CountryCode = ""
-IncrementErrorCount.CustomUserId = ""
-module_upvr.BasePlayerData = IncrementErrorCount
-IncrementErrorCount = {}
-IncrementErrorCount[1] = "Sessions"
-IncrementErrorCount[2] = "Transactions"
-IncrementErrorCount[3] = "ProgressionTries"
-IncrementErrorCount[4] = "CurrentCustomDimension01"
-IncrementErrorCount[5] = "CurrentCustomDimension02"
-IncrementErrorCount[6] = "CurrentCustomDimension03"
-IncrementErrorCount[7] = "OwnedGamepasses"
-module_upvr.DataToSave = IncrementErrorCount
-IncrementErrorCount = {}
-module_upvr.PlayerCache = IncrementErrorCount
-IncrementErrorCount = {}
-module_upvr.EventsQueue = IncrementErrorCount
-module_upvr.DataStoreQueue = DataStoreQueue_upvr
-function IncrementErrorCount(arg1, arg2) -- Line 45, Named "GetPlayerData"
-    local UserId_upvr = arg2.UserId
-    local any_AddRequest_result1_2, any_AddRequest_result2_2 = DataStoreQueue_upvr.AddRequest(UserId_upvr, function() -- Line 47
-        local var8
-        local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var8 = {}
-            return var8
-        end
-        if not RunService_upvr:IsStudio() or not decompInlinedCondition_2() then
-            var8 = module_upvr
-            var8 = var8.PlayerDS:GetAsync(UserId_upvr)
-            if not var8 then
-                var8 = {}
-            end
-        end
-        return var8
-    end, 7)
-    if not any_AddRequest_result1_2 then
-        any_AddRequest_result2_2 = {}
-    end
-    return any_AddRequest_result2_2
+function t.GetErrorDataStore(p1, p2) --[[ Line: 66 | Upvalues: RunService (copy), DataStoreService (copy) ]]
+	local v1 = nil
+	if not pcall(function() --[[ Line: 68 | Upvalues: v1 (ref), RunService (ref), DataStoreService (ref), p2 (copy) ]]
+		v1 = RunService:IsStudio() and {} or DataStoreService:GetDataStore("GA_ErrorDS_1.0.0", p2)
+	end) then
+		v1 = {}
+	end
+	return v1
 end
-module_upvr.GetPlayerData = IncrementErrorCount
-function IncrementErrorCount(arg1, arg2) -- Line 57, Named "GetPlayerDataFromCache"
-    local var11 = module_upvr.PlayerCache[tonumber(arg2)]
-    if var11 then
-        return var11
-    end
-    return module_upvr.PlayerCache[tostring(arg2)]
+function t.SavePlayerData(p1, p2) --[[ Line: 79 | Upvalues: t (copy), RunService (copy), DataStoreQueue (copy) ]]
+	local v1 = t:GetPlayerDataFromCache(p2.UserId)
+	local t2 = {}
+	if v1 then
+		for k, v in pairs(t.DataToSave) do
+			t2[v] = v1[v]
+		end
+		local UserId = p2.UserId
+		if not RunService:IsStudio() then
+			DataStoreQueue.AddRequest(UserId, function() --[[ Line: 96 | Upvalues: t (ref), UserId (copy), t2 (copy) ]]
+				return t.PlayerDS:SetAsync(UserId, t2)
+			end, 7)
+		end
+	end
 end
-module_upvr.GetPlayerDataFromCache = IncrementErrorCount
-function IncrementErrorCount(arg1, arg2) -- Line 66, Named "GetErrorDataStore"
-    local var12_upvw
-    if not pcall(function() -- Line 68
-        local var14
-        local function decompInlinedCondition_3() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var14 = {}
-            return var14
-        end
-        if not RunService_upvr:IsStudio() or not decompInlinedCondition_3() then
-            var14 = DataStoreService_upvr:GetDataStore("GA_ErrorDS_1.0.0", arg2)
-        end
-        var12_upvw = var14
-    end) then
-        var12_upvw = {}
-    end
-    return var12_upvw
+function t.IncrementErrorCount(p1, p2, p3, p4) --[[ Line: 102 | Upvalues: RunService (copy), DataStoreQueue (copy) ]]
+	if p3 then
+		local v1
+		if RunService:IsStudio() then
+			v1 = 0
+		else
+			local v2, v3 = DataStoreQueue.AddRequest(p3, function() --[[ Line: 111 | Upvalues: p2 (copy), p3 (copy), p4 (copy) ]]
+				return p2:IncrementAsync(p3, p4)
+			end, 7)
+			_ = v2
+			v1 = v3
+		end
+		return v1
+	end
 end
-module_upvr.GetErrorDataStore = IncrementErrorCount
-function IncrementErrorCount(arg1, arg2) -- Line 79, Named "SavePlayerData"
-    local any_GetPlayerDataFromCache_result1 = module_upvr:GetPlayerDataFromCache(arg2.UserId)
-    local module_upvr_2 = {}
-    if not any_GetPlayerDataFromCache_result1 then
-    else
-        for var25, v in pairs(module_upvr.DataToSave) do
-            module_upvr_2[v] = any_GetPlayerDataFromCache_result1[v]
-        end
-        local UserId_upvr_2 = arg2.UserId
-        if not RunService_upvr:IsStudio() then
-            function var25() -- Line 96
-                return module_upvr.PlayerDS:SetAsync(UserId_upvr_2, module_upvr_2)
-            end
-            v = 7
-            DataStoreQueue_upvr.AddRequest(UserId_upvr_2, var25, v)
-        end
-    end
-end
-module_upvr.SavePlayerData = IncrementErrorCount
-function IncrementErrorCount(arg1, arg2, arg3, arg4) -- Line 102
-    if not arg3 then return end
-    local var26 = 0
-    if not RunService_upvr:IsStudio() then
-        local any_AddRequest_result1, any_AddRequest_result2 = DataStoreQueue_upvr.AddRequest(arg3, function() -- Line 111
-            return arg2:IncrementAsync(arg3, arg4)
-        end, 7)
-        _ = any_AddRequest_result1 -- Setting global
-        var26 = any_AddRequest_result2
-    end
-    return var26
-end
-module_upvr.IncrementErrorCount = IncrementErrorCount
-return module_upvr
+return t

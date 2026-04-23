@@ -1,4 +1,5 @@
-return require(game:GetService("ReplicatedStorage").Std.TableUtils).requireValidIndexAndFreeze({
-    TAG_NAME = "Plank";
-    REGEN_DURATION = 5;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Std.TableUtils).requireValidIndexAndFreeze({
+	TAG_NAME = "Plank",
+	REGEN_DURATION = 5
 })

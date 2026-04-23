@@ -1,35 +1,32 @@
-local module = {}
-local Players_upvr = game:GetService("Players")
-function module.getHacker(arg1) -- Line 4
-    local VaultHackerId = arg1:GetAttribute("VaultHackerId")
-    if VaultHackerId then
-        return Players_upvr:GetPlayerByUserId(VaultHackerId)
-    end
-    return nil
-end
-function module.setHacker(arg1, arg2) -- Line 12
-    local var4
-    if arg2 then
-        var4 = arg2.UserId
-    end
-    arg1:SetAttribute("VaultHackerId", var4)
-end
-function module.getHackerChangedSignal(arg1) -- Line 19
-    return arg1:GetAttributeChangedSignal("VaultHackerId")
-end
-function module.getDirection(arg1) -- Line 22
-    return arg1:GetAttribute("VaultDirection")
-end
-function module.setDirection(arg1, arg2) -- Line 25
-    arg1:SetAttribute("VaultDirection", arg2)
-end
-function module.getDirectionChangedSignal(arg1) -- Line 28
-    return arg1:GetAttributeChangedSignal("VaultDirection")
-end
-function module.getDisabled(arg1) -- Line 31
-    return arg1:GetAttribute("VaultDisabled")
-end
-function module.setDisabled(arg1, arg2) -- Line 34
-    arg1:SetAttribute("VaultDisabled", arg2)
-end
-return module
+local Players = game:GetService("Players")
+return {
+	getHacker = function(p1) --[[ Name: getHacker | Line: 4 | Upvalues: Players (copy) ]]
+		local v1 = p1:GetAttribute("VaultHackerId")
+		if v1 then
+			return Players:GetPlayerByUserId(v1)
+		else
+			return nil
+		end
+	end,
+	setHacker = function(p1, p2) --[[ Name: setHacker | Line: 12 ]]
+		p1:SetAttribute("VaultHackerId", if p2 then p2.UserId else nil)
+	end,
+	getHackerChangedSignal = function(p1) --[[ Name: getHackerChangedSignal | Line: 19 ]]
+		return p1:GetAttributeChangedSignal("VaultHackerId")
+	end,
+	getDirection = function(p1) --[[ Name: getDirection | Line: 22 ]]
+		return p1:GetAttribute("VaultDirection")
+	end,
+	setDirection = function(p1, p2) --[[ Name: setDirection | Line: 25 ]]
+		p1:SetAttribute("VaultDirection", p2)
+	end,
+	getDirectionChangedSignal = function(p1) --[[ Name: getDirectionChangedSignal | Line: 28 ]]
+		return p1:GetAttributeChangedSignal("VaultDirection")
+	end,
+	getDisabled = function(p1) --[[ Name: getDisabled | Line: 31 ]]
+		return p1:GetAttribute("VaultDisabled")
+	end,
+	setDisabled = function(p1, p2) --[[ Name: setDisabled | Line: 34 ]]
+		p1:SetAttribute("VaultDisabled", p2)
+	end
+}

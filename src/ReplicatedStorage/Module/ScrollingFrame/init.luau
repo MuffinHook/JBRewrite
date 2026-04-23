@@ -1,504 +1,431 @@
-local UserInputService_upvr = game:GetService("UserInputService")
-local MakeMaid_upvr = require(script.ScrollingFrameMaid).MakeMaid
-local tbl_upvr = {
-    ClassName = "Scroller";
+game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+game:GetService("ReplicatedStorage")
+local GuiService = game:GetService("GuiService")
+local MakeMaid = require(script.ScrollingFrameMaid).MakeMaid
+local SpringPhysics = require(script.SpringPhysics)
+local Signal = require(script.Signal)
+local t = {
+	ClassName = "Scroller"
 }
-tbl_upvr.__index = tbl_upvr
-tbl_upvr._Position = 0
-tbl_upvr._Min = 0
-tbl_upvr._Max = 100
-tbl_upvr._ViewSize = 50
-local SpringPhysics_upvr = require(script.SpringPhysics)
-local function new() -- Line 25
-    local setmetatable_result1_2 = setmetatable({}, tbl_upvr)
-    setmetatable_result1_2.Spring = SpringPhysics_upvr.Spring.New(0)
-    setmetatable_result1_2.Spring.Speed = 20
-    return setmetatable_result1_2
+t.__index = t
+t._Position = 0
+t._Min = 0
+t._Max = 100
+t._ViewSize = 50
+function t.new() --[[ Line: 25 | Upvalues: t (copy), SpringPhysics (copy) ]]
+	local v2 = setmetatable({}, t)
+	v2.Spring = SpringPhysics.Spring.New(0)
+	v2.Spring.Speed = 20
+	return v2
 end
-tbl_upvr.new = new
-function tbl_upvr.GetTimesOverBounds(arg1, arg2) -- Line 34
-    return arg1:GetDisplacementPastBounds(arg2) / arg1.BackBounceInputRange
+function t.GetTimesOverBounds(p1, p2) --[[ Line: 34 ]]
+	return p1:GetDisplacementPastBounds(p2) / p1.BackBounceInputRange
 end
-function tbl_upvr.GetDisplacementPastBounds(arg1, arg2) -- Line 38
-    if arg1.ContentMax < arg2 then
-        return arg2 - arg1.ContentMax
-    end
-    if arg2 < arg1.ContentMin then
-        return arg2
-    end
-    return 0
+function t.GetDisplacementPastBounds(p1, p2) --[[ Line: 38 ]]
+	if p1.ContentMax < p2 then
+		return p2 - p1.ContentMax
+	elseif p2 < p1.ContentMin then
+		return p2
+	else
+		return 0
+	end
 end
-function tbl_upvr.GetScale(arg1, arg2) -- Line 48
-    return 1 - 0.5 ^ math.abs(arg2)
+function t.GetScale(p1, p2) --[[ Line: 48 ]]
+	return 1 - 0.5 ^ math.abs(p2)
 end
-function tbl_upvr.__index(arg1, arg2) -- Line 52
-    if arg2 == "TotalContentLength" then
-        return arg1._Max - arg1._Min
-    end
-    if arg2 == "ViewSize" then
-        return arg1._ViewSize
-    end
-    if arg2 == "Max" then
-        return arg1._Max
-    end
-    if arg2 == "ContentMax" then
-        if arg1._Max <= arg1.ContentMin + arg1._ViewSize then
-            return arg1.ContentMin
-        end
-        return arg1._Max - arg1._ViewSize
-    end
-    if arg2 == "Min" or arg2 == "ContentMin" then
-        return arg1._Min
-    end
-    if arg2 == "Position" then
-        return arg1.Spring.Position
-    end
-    if arg2 == "BackBounceInputRange" then
-        return arg1._ViewSize
-    end
-    if arg2 == "BackBounceRenderRange" then
-        return arg1._ViewSize
-    end
-    if arg2 == "ContentScrollPercentSize" then
-        if arg1.TotalContentLength == 0 then
-            return 0
-        end
-        return arg1._ViewSize / arg1.TotalContentLength
-    end
-    if arg2 == "RenderedContentScrollPercentSize" then
-        return arg1.ContentScrollPercentSize * (1 - arg1:GetScale(arg1:GetTimesOverBounds(arg1.Position)))
-    end
-    if arg2 == "ContentScrollPercent" then
-        return (arg1.Position - arg1._Min) / (arg1.TotalContentLength - arg1._ViewSize)
-    end
-    if arg2 == "RenderedContentScrollPercent" then
-        local ContentScrollPercent = arg1.ContentScrollPercent
-        if ContentScrollPercent < 0 then
-            return 0
-        end
-        if 1 < ContentScrollPercent then
-            return 1
-        end
-        return ContentScrollPercent
-    end
-    if arg2 == "BoundedRenderPosition" then
-        local Position_4 = arg1.Position
-        local any_GetTimesOverBounds_result1 = arg1:GetTimesOverBounds(Position_4)
-        local any_GetScale_result1 = arg1:GetScale(any_GetTimesOverBounds_result1)
-        if 0 < any_GetTimesOverBounds_result1 then
-            return -arg1.ContentMax - any_GetScale_result1 * arg1.BackBounceRenderRange
-        end
-        if any_GetTimesOverBounds_result1 < 0 then
-            return arg1.ContentMin + any_GetScale_result1 * arg1.BackBounceRenderRange
-        end
-        return -Position_4
-    end
-    if arg2 == "Velocity" then
-        return arg1.Spring.Velocity
-    end
-    if arg2 == "Target" then
-        return arg1.Spring.Target
-    end
-    if arg2 == "AtRest" then
-        local var10 = false
-        if math.abs(arg1.Spring.Target - arg1.Spring.Position) < 0.00001 then
-            if math.abs(arg1.Spring.Velocity) >= 0.00001 then
-                var10 = false
-            else
-                var10 = true
-            end
-        end
-        return var10
-    end
-    if tbl_upvr[arg2] then
-        return tbl_upvr[arg2]
-    end
-    error(string.format("[Scroller] - '%s' is not a valid member", tostring(arg2)));
+function t.__index(p1, p2) --[[ Line: 52 | Upvalues: t (copy) ]]
+	if p2 == "TotalContentLength" then
+		return p1._Max - p1._Min
+	elseif p2 == "ViewSize" then
+		return p1._ViewSize
+	elseif p2 == "Max" then
+		return p1._Max
+	elseif p2 == "ContentMax" then
+		if p1._Max <= p1.ContentMin + p1._ViewSize then
+			return p1.ContentMin
+		else
+			return p1._Max - p1._ViewSize
+		end
+	elseif p2 == "Min" or p2 == "ContentMin" then
+		return p1._Min
+	elseif p2 == "Position" then
+		return p1.Spring.Position
+	elseif p2 == "BackBounceInputRange" or p2 == "BackBounceRenderRange" then
+		return p1._ViewSize
+	elseif p2 == "ContentScrollPercentSize" then
+		if p1.TotalContentLength == 0 then
+			return 0
+		else
+			return p1._ViewSize / p1.TotalContentLength
+		end
+	elseif p2 == "RenderedContentScrollPercentSize" then
+		return p1.ContentScrollPercentSize * (1 - p1:GetScale(p1:GetTimesOverBounds(p1.Position)))
+	elseif p2 == "ContentScrollPercent" then
+		return (p1.Position - p1._Min) / (p1.TotalContentLength - p1._ViewSize)
+	elseif p2 == "RenderedContentScrollPercent" then
+		local ContentScrollPercent = p1.ContentScrollPercent
+		if ContentScrollPercent < 0 then
+			return 0
+		elseif ContentScrollPercent > 1 then
+			return 1
+		else
+			return ContentScrollPercent
+		end
+	elseif p2 == "BoundedRenderPosition" then
+		local Position = p1.Position
+		local v1 = p1:GetTimesOverBounds(Position)
+		local v2 = p1:GetScale(v1)
+		if v1 > 0 then
+			return -p1.ContentMax - v2 * p1.BackBounceRenderRange
+		elseif v1 < 0 then
+			return p1.ContentMin + v2 * p1.BackBounceRenderRange
+		else
+			return -Position
+		end
+	else
+		if p2 == "Velocity" then
+			return p1.Spring.Velocity
+		end
+		if p2 == "Target" then
+			return p1.Spring.Target
+		end
+		if p2 == "AtRest" then
+			return if math.abs(p1.Spring.Target - p1.Spring.Position) < 0.00001 then math.abs(p1.Spring.Velocity) < 0.00001 else false
+		end
+		if t[p2] then
+			return t[p2]
+		end
+		error(("[Scroller] - \'%s\' is not a valid member"):format((tostring(p2))))
+	end
 end
-function tbl_upvr.__newindex(arg1, arg2, arg3) -- Line 117
-    local var11
-    if tbl_upvr[arg2] or arg2 == "Spring" then
-        rawset(arg1, arg2, var11)
-    else
-        if arg2 == "Min" or arg2 == "ContentMin" then
-            arg1._Min = var11
-            return
-        end
-        if arg2 == "Max" then
-            arg1._Max = var11
-            arg1.Target = arg1.Target
-            return
-        end
-        if arg2 == "TotalContentLength" then
-            arg1.Max = arg1._Min + var11
-            return
-        end
-        if arg2 == "ViewSize" then
-            arg1._ViewSize = var11
-            return
-        end
-        if arg2 == "Position" then
-            arg1.Spring.Position = var11
-            return
-        end
-        if arg2 == "TargetContentScrollPercent" then
-            arg1.Target = arg1._Min + var11 * (arg1.TotalContentLength - arg1._ViewSize)
-            return
-        end
-        if arg2 == "ContentScrollPercent" then
-            arg1.Position = arg1._Min + var11 * (arg1.TotalContentLength - arg1._ViewSize)
-            return
-        end
-        if arg2 == "Target" then
-            if arg1.ContentMax < var11 then
-                var11 = arg1.ContentMax
-            elseif var11 < arg1.ContentMin then
-                var11 = arg1.ContentMin
-            end
-            arg1.Spring.Target = var11
-            return
-        end
-        if arg2 == "Velocity" then
-            arg1.Spring.Velocity = var11
-            return
-        end
-        error(string.format("[Scroller] - '%s' is not a valid member", tostring(arg2)))
-    end
+function t.__newindex(p1, p2, p3) --[[ Line: 117 | Upvalues: t (copy) ]]
+	if t[p2] or p2 == "Spring" then
+		rawset(p1, p2, p3)
+	elseif p2 == "Min" or p2 == "ContentMin" then
+		p1._Min = p3
+	elseif p2 == "Max" then
+		p1._Max = p3
+		p1.Target = p1.Target
+	elseif p2 == "TotalContentLength" then
+		p1.Max = p1._Min + p3
+	elseif p2 == "ViewSize" then
+		p1._ViewSize = p3
+	elseif p2 == "Position" then
+		p1.Spring.Position = p3
+	elseif p2 == "TargetContentScrollPercent" then
+		p1.Target = p1._Min + p3 * (p1.TotalContentLength - p1._ViewSize)
+	elseif p2 == "ContentScrollPercent" then
+		p1.Position = p1._Min + p3 * (p1.TotalContentLength - p1._ViewSize)
+	elseif p2 == "Target" then
+		if p1.ContentMax < p3 then
+			p3 = p1.ContentMax
+		elseif p3 < p1.ContentMin then
+			p3 = p1.ContentMin
+		end
+		p1.Spring.Target = p3
+	elseif p2 == "Velocity" then
+		p1.Spring.Velocity = p3
+	else
+		error(("[Scroller] - \'%s\' is not a valid member"):format((tostring(p2))))
+	end
 end
-local tbl_upvr_2 = {
-    ClassName = "Base";
+local t2 = {
+	ClassName = "Base"
 }
-tbl_upvr_2.__index = tbl_upvr_2
-local function new(arg1) -- Line 153
-    local setmetatable_result1 = setmetatable({}, tbl_upvr_2)
-    setmetatable_result1.Maid = MakeMaid_upvr()
-    local var14 = arg1
-    if not var14 then
-        var14 = error("No Gui")
-    end
-    setmetatable_result1.Gui = var14
-    local Parent = setmetatable_result1.Gui.Parent
-    if not Parent then
-        Parent = error("No container")
-    end
-    setmetatable_result1.Container = Parent
-    return setmetatable_result1
+t2.__index = t2
+function t2.new(p1) --[[ Line: 153 | Upvalues: t2 (copy), MakeMaid (copy) ]]
+	local v2 = setmetatable({}, t2)
+	v2.Maid = MakeMaid()
+	v2.Gui = p1 or error("No Gui")
+	v2.Container = v2.Gui.Parent or error("No container")
+	return v2
 end
-tbl_upvr_2.new = new
-function tbl_upvr_2.Destroy(arg1) -- Line 163
-    arg1.Maid:DoCleaning()
-    arg1.Maid = nil
-    setmetatable(arg1, nil)
+function t2.Destroy(p1) --[[ Line: 163 ]]
+	p1.Maid:DoCleaning()
+	p1.Maid = nil
+	setmetatable(p1, nil)
 end
-local setmetatable_result1_4_upvr = setmetatable({}, tbl_upvr_2)
-setmetatable_result1_4_upvr.ClassName = "Scrollbar"
-setmetatable_result1_4_upvr.__index = setmetatable_result1_4_upvr
-local Signal_upvr = require(script.Signal)
-local function new(arg1, arg2) -- Line 174
-    local setmetatable_result1_upvr = setmetatable(tbl_upvr_2.new(arg1), setmetatable_result1_4_upvr)
-    local var19 = arg2
-    if not var19 then
-        var19 = error("No ScrollingFrame")
-    end
-    setmetatable_result1_upvr.ScrollingFrame = var19
-    setmetatable_result1_upvr.ParentScroller = setmetatable_result1_upvr.ScrollingFrame:GetScroller()
-    setmetatable_result1_upvr:UpdateRender()
-    setmetatable_result1_upvr.DraggingBegan = Signal_upvr.new()
-    setmetatable_result1_upvr.Maid.InputBeganGui = setmetatable_result1_upvr.Gui.InputBegan:connect(function(arg1_2) -- Line 183
-        if arg1_2.UserInputType == Enum.UserInputType.MouseButton1 then
-            setmetatable_result1_upvr:InputBegan(arg1_2)
-        end
-    end)
-    setmetatable_result1_upvr.Maid.InputBeganContainer = setmetatable_result1_upvr.Container.InputBegan:connect(function(arg1_3) -- Line 189
-        if arg1_3.UserInputType == Enum.UserInputType.MouseButton1 then
-            setmetatable_result1_upvr.LastContainerInputObject = arg1_3
-        end
-    end)
-    setmetatable_result1_upvr.Maid.InputEndedContainer = setmetatable_result1_upvr.Container.InputEnded:connect(function(arg1_4) -- Line 195
-        if arg1_4 == setmetatable_result1_upvr.LastContainerInputObject then
-            setmetatable_result1_upvr.ParentScroller.TargetContentScrollPercent = (arg1_4.Position.Y - setmetatable_result1_upvr.Container.AbsolutePosition.Y - setmetatable_result1_upvr.Container.AbsoluteSize.Y * setmetatable_result1_upvr.ParentScroller.ContentScrollPercentSize / 2) / (setmetatable_result1_upvr.Container.AbsoluteSize.Y * (1 - setmetatable_result1_upvr.ParentScroller.ContentScrollPercentSize))
-            setmetatable_result1_upvr.ParentScroller.Velocity = 0
-            setmetatable_result1_upvr.ScrollingFrame:FreeScroll()
-        end
-    end)
-    return setmetatable_result1_upvr
+local v1 = setmetatable({}, t2)
+v1.ClassName = "Scrollbar"
+v1.__index = v1
+function v1.new(p1, p2) --[[ Line: 174 | Upvalues: t2 (copy), v1 (copy), Signal (copy) ]]
+	local v3 = setmetatable(t2.new(p1), v1)
+	v3.ScrollingFrame = p2 or error("No ScrollingFrame")
+	v3.ParentScroller = v3.ScrollingFrame:GetScroller()
+	v3:UpdateRender()
+	v3.DraggingBegan = Signal.new()
+	v3.Maid.InputBeganGui = v3.Gui.InputBegan:connect(function(p1) --[[ Line: 183 | Upvalues: v3 (copy) ]]
+		if p1.UserInputType == Enum.UserInputType.MouseButton1 then
+			v3:InputBegan(p1)
+		end
+	end)
+	v3.Maid.InputBeganContainer = v3.Container.InputBegan:connect(function(p1) --[[ Line: 189 | Upvalues: v3 (copy) ]]
+		if p1.UserInputType == Enum.UserInputType.MouseButton1 then
+			v3.LastContainerInputObject = p1
+		end
+	end)
+	v3.Maid.InputEndedContainer = v3.Container.InputEnded:connect(function(p1) --[[ Line: 195 | Upvalues: v3 (copy) ]]
+		if p1 == v3.LastContainerInputObject then
+			v3.ParentScroller.TargetContentScrollPercent = (p1.Position.Y - v3.Container.AbsolutePosition.Y - v3.Container.AbsoluteSize.Y * v3.ParentScroller.ContentScrollPercentSize / 2) / (v3.Container.AbsoluteSize.Y * (1 - v3.ParentScroller.ContentScrollPercentSize))
+			v3.ParentScroller.Velocity = 0
+			v3.ScrollingFrame:FreeScroll()
+		end
+	end)
+	return v3
 end
-setmetatable_result1_4_upvr.new = new
-local function StopDrag(arg1) -- Line 211
-    arg1.ScrollingFrame:StopDrag()
+function v1.StopDrag(p1) --[[ Line: 211 ]]
+	p1.ScrollingFrame:StopDrag()
 end
-setmetatable_result1_4_upvr.StopDrag = StopDrag
-local function InputBegan(arg1, arg2) -- Line 215
-    local var2_result1 = MakeMaid_upvr()
-    local Position_5_upvr = arg2.Position
-    local ContentScrollPercent_upvr = arg1.ParentScroller.ContentScrollPercent
-    local any_GetVelocityTracker_result1_upvr = arg1.ScrollingFrame:GetVelocityTracker(0.25)
-    var2_result1.InputChanged = UserInputService_upvr.InputChanged:connect(function(arg1_5) -- Line 222
-        if arg1_5.UserInputType == Enum.UserInputType.MouseMovement then
-            arg1.ParentScroller.ContentScrollPercent = ContentScrollPercent_upvr + ((arg1_5.Position - Position_5_upvr).y) / (arg1.Container.AbsoluteSize.Y * (1 - arg1.ParentScroller.ContentScrollPercentSize))
-            arg1.ParentScroller.TargetContentScrollPercent = arg1.ParentScroller.ContentScrollPercent
-            arg1.ScrollingFrame:UpdateRender()
-            any_GetVelocityTracker_result1_upvr()
-        end
-    end)
-    var2_result1.InputEnded = UserInputService_upvr.InputEnded:connect(function(arg1_6) -- Line 235
-        if arg1_6 == arg2 then
-            arg1:StopDrag()
-        end
-    end)
-    arg1.Maid.UpdateMaid = var2_result1
-    arg1.ScrollingFrame.Maid.UpdateMaid = var2_result1
+function v1.InputBegan(p1, p2) --[[ Line: 215 | Upvalues: MakeMaid (copy), UserInputService (copy) ]]
+	local v1 = MakeMaid()
+	local Position = p2.Position
+	local ContentScrollPercent = p1.ParentScroller.ContentScrollPercent
+	local v2 = p1.ScrollingFrame:GetVelocityTracker(0.25)
+	v1.InputChanged = UserInputService.InputChanged:connect(function(p12) --[[ Line: 222 | Upvalues: Position (copy), p1 (copy), ContentScrollPercent (copy), v2 (copy) ]]
+		if p12.UserInputType == Enum.UserInputType.MouseMovement then
+			p1.ParentScroller.ContentScrollPercent = ContentScrollPercent + (p12.Position - Position).y / (p1.Container.AbsoluteSize.Y * (1 - p1.ParentScroller.ContentScrollPercentSize))
+			p1.ParentScroller.TargetContentScrollPercent = p1.ParentScroller.ContentScrollPercent
+			p1.ScrollingFrame:UpdateRender()
+			v2()
+		end
+	end)
+	v1.InputEnded = UserInputService.InputEnded:connect(function(p12) --[[ Line: 235 | Upvalues: p2 (copy), p1 (copy) ]]
+		if p12 == p2 then
+			p1:StopDrag()
+		end
+	end)
+	p1.Maid.UpdateMaid = v1
+	p1.ScrollingFrame.Maid.UpdateMaid = v1
 end
-setmetatable_result1_4_upvr.InputBegan = InputBegan
-local function UpdateRender(arg1) -- Line 245
-    if arg1.ParentScroller.ViewSize < arg1.ParentScroller.TotalContentLength then
-        local RenderedContentScrollPercentSize = arg1.ParentScroller.RenderedContentScrollPercentSize
-        arg1.Gui.Size = UDim2.new(UDim.new(RenderedContentScrollPercentSize, 0), arg1.Gui.Size.Y)
-        arg1.Gui.Position = UDim2.new(UDim.new((1 - RenderedContentScrollPercentSize) * arg1.ParentScroller.RenderedContentScrollPercent, 0), arg1.Gui.Position.Y)
-        arg1.Gui.Visible = true
-    else
-        arg1.Gui.Visible = false
-    end
+function v1.UpdateRender(p1) --[[ Line: 245 ]]
+	if p1.ParentScroller.TotalContentLength > p1.ParentScroller.ViewSize then
+		local RenderedContentScrollPercentSize = p1.ParentScroller.RenderedContentScrollPercentSize
+		p1.Gui.Size = UDim2.new(UDim.new(RenderedContentScrollPercentSize, 0), p1.Gui.Size.Y)
+		p1.Gui.Position = UDim2.new(UDim.new((1 - RenderedContentScrollPercentSize) * p1.ParentScroller.RenderedContentScrollPercent, 0), p1.Gui.Position.Y)
+		p1.Gui.Visible = true
+	else
+		p1.Gui.Visible = false
+	end
 end
-setmetatable_result1_4_upvr.UpdateRender = UpdateRender
-local setmetatable_result1_3_upvr = setmetatable({}, tbl_upvr_2)
-setmetatable_result1_3_upvr.ClassName = "ScrollingFrame"
-setmetatable_result1_3_upvr.__index = setmetatable_result1_3_upvr
-function setmetatable_result1_3_upvr.new(arg1, arg2) -- Line 265
-    local setmetatable_result1_upvr_2 = setmetatable(tbl_upvr_2.new(arg1), setmetatable_result1_3_upvr)
-    setmetatable_result1_upvr_2.Scrollbars = {}
-    setmetatable_result1_upvr_2.Scroller = tbl_upvr.new()
-    setmetatable_result1_upvr_2.Horizontal = arg2
-    setmetatable_result1_upvr_2.Maid:GiveTask(setmetatable_result1_upvr_2:BindInput(setmetatable_result1_upvr_2.Container))
-    setmetatable_result1_upvr_2.Maid.ContainerChanged = setmetatable_result1_upvr_2.Container.Changed:connect(function(arg1_7) -- Line 275
-        if arg1_7 == "AbsoluteSize" then
-            setmetatable_result1_upvr_2:UpdateScroller()
-            setmetatable_result1_upvr_2:FreeScroll()
-        end
-    end)
-    setmetatable_result1_upvr_2.Maid.GuiChanged = setmetatable_result1_upvr_2.Gui.Changed:connect(function(arg1_8) -- Line 282
-        if arg1_8 == "AbsoluteSize" then
-            setmetatable_result1_upvr_2:UpdateScroller()
-            setmetatable_result1_upvr_2:FreeScroll()
-        end
-    end)
-    setmetatable_result1_upvr_2:UpdateScroller()
-    setmetatable_result1_upvr_2:UpdateRender()
-    return setmetatable_result1_upvr_2
+local v2 = setmetatable({}, t2)
+v2.ClassName = "ScrollingFrame"
+v2.__index = v2
+function v2.new(p1, p2) --[[ Line: 265 | Upvalues: t2 (copy), v2 (copy), t (copy) ]]
+	local v3 = setmetatable(t2.new(p1), v2)
+	v3.Scrollbars = {}
+	v3.Scroller = t.new()
+	v3.Horizontal = p2
+	v3.Maid:GiveTask(v3:BindInput(v3.Container))
+	v3.Maid.ContainerChanged = v3.Container.Changed:connect(function(p1) --[[ Line: 275 | Upvalues: v3 (copy) ]]
+		if p1 == "AbsoluteSize" then
+			v3:UpdateScroller()
+			v3:FreeScroll()
+		end
+	end)
+	v3.Maid.GuiChanged = v3.Gui.Changed:connect(function(p1) --[[ Line: 282 | Upvalues: v3 (copy) ]]
+		if p1 == "AbsoluteSize" then
+			v3:UpdateScroller()
+			v3:FreeScroll()
+		end
+	end)
+	v3:UpdateScroller()
+	v3:UpdateRender()
+	return v3
 end
-function setmetatable_result1_3_upvr.GetScroller(arg1) -- Line 296
-    return arg1.Scroller
+function v2.GetScroller(p1) --[[ Line: 296 ]]
+	return p1.Scroller
 end
-function setmetatable_result1_3_upvr.AddScrollbar(arg1, arg2) -- Line 300
-    local any_new_result1 = setmetatable_result1_4_upvr.new(arg2, arg1)
-    table.insert(arg1.Scrollbars, any_new_result1)
-    arg1.Maid[arg2] = any_new_result1
+function v2.AddScrollbar(p1, p2) --[[ Line: 300 | Upvalues: v1 (copy) ]]
+	local v12 = v1.new(p2, p1)
+	table.insert(p1.Scrollbars, v12)
+	p1.Maid[p2] = v12
 end
-function setmetatable_result1_3_upvr.AddScrollbarFromContainer(arg1, arg2) -- Line 307
-    local ImageButton = Instance.new("ImageButton")
-    ImageButton.Size = UDim2.new(1, 0, 0, 100)
-    ImageButton.Name = "ScrollBar"
-    ImageButton.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
-    ImageButton.BorderSizePixel = 0
-    ImageButton.Image = ""
-    ImageButton.Parent = arg2
-    ImageButton.AutoButtonColor = false
-    ImageButton.ZIndex = arg2.ZIndex
-    ImageButton.Parent = arg2
-    return arg1:AddScrollbar(ImageButton)
+function v2.AddScrollbarFromContainer(p1, p2) --[[ Line: 307 ]]
+	local ScrollBar = Instance.new("ImageButton")
+	ScrollBar.Size = UDim2.new(1, 0, 0, 100)
+	ScrollBar.Name = "ScrollBar"
+	ScrollBar.BackgroundColor3 = Color3.new(204/255, 204/255, 204/255)
+	ScrollBar.BorderSizePixel = 0
+	ScrollBar.Image = ""
+	ScrollBar.Parent = p2
+	ScrollBar.AutoButtonColor = false
+	ScrollBar.ZIndex = p2.ZIndex
+	ScrollBar.Parent = p2
+	return p1:AddScrollbar(ScrollBar)
 end
-function setmetatable_result1_3_upvr.UpdateScroller(arg1) -- Line 322
-    if arg1.Horizontal then
-        arg1.Scroller.TotalContentLength = arg1.Gui.AbsoluteSize.x
-        arg1.Scroller.ViewSize = arg1.Container.AbsoluteSize.x
-    else
-        arg1.Scroller.TotalContentLength = arg1.Gui.AbsoluteSize.y
-        arg1.Scroller.ViewSize = arg1.Container.AbsoluteSize.y
-    end
+function v2.UpdateScroller(p1) --[[ Line: 322 ]]
+	if p1.Horizontal then
+		p1.Scroller.TotalContentLength = p1.Gui.AbsoluteSize.x
+		p1.Scroller.ViewSize = p1.Container.AbsoluteSize.x
+	else
+		p1.Scroller.TotalContentLength = p1.Gui.AbsoluteSize.y
+		p1.Scroller.ViewSize = p1.Container.AbsoluteSize.y
+	end
 end
-function setmetatable_result1_3_upvr.UpdateRender(arg1) -- Line 332
-    if arg1.Horizontal then
-        arg1.Gui.Position = UDim2.new(UDim.new(0, arg1.Scroller.BoundedRenderPosition), arg1.Gui.Position.Y)
-    else
-        arg1.Gui.Position = UDim2.new(arg1.Gui.Position.X, UDim.new(0, arg1.Scroller.BoundedRenderPosition))
-    end
-    for _, v in pairs(arg1.Scrollbars) do
-        v:UpdateRender()
-    end
+function v2.UpdateRender(p1) --[[ Line: 332 ]]
+	if p1.Horizontal then
+		p1.Gui.Position = UDim2.new(UDim.new(0, p1.Scroller.BoundedRenderPosition), p1.Gui.Position.Y)
+	else
+		p1.Gui.Position = UDim2.new(p1.Gui.Position.X, UDim.new(0, p1.Scroller.BoundedRenderPosition))
+	end
+	for k, v in pairs(p1.Scrollbars) do
+		v:UpdateRender()
+	end
 end
-function setmetatable_result1_3_upvr.StopUpdate(arg1) -- Line 343
-    arg1.Maid.UpdateMaid = nil
+function v2.StopUpdate(p1) --[[ Line: 343 ]]
+	p1.Maid.UpdateMaid = nil
 end
-function setmetatable_result1_3_upvr.StopDrag(arg1) -- Line 347
-    if arg1.Scroller:GetDisplacementPastBounds(arg1.Scroller.Position) == 0 then
-        if 0 < arg1.Scroller.Velocity then
-            arg1.Scroller.Target = math.max(arg1.Scroller.Target, arg1.Scroller.Position + arg1.Scroller.Velocity * 0.5)
-        else
-            arg1.Scroller.Target = math.min(arg1.Scroller.Target, arg1.Scroller.Position + arg1.Scroller.Velocity * 0.5)
-        end
-    end
-    arg1:FreeScroll()
+function v2.StopDrag(p1) --[[ Line: 347 ]]
+	local Position = p1.Scroller.Position
+	if p1.Scroller:GetDisplacementPastBounds(p1.Scroller.Position) == 0 then
+		if p1.Scroller.Velocity > 0 then
+			p1.Scroller.Target = math.max(p1.Scroller.Target, p1.Scroller.Position + p1.Scroller.Velocity * 0.5)
+		else
+			p1.Scroller.Target = math.min(p1.Scroller.Target, p1.Scroller.Position + p1.Scroller.Velocity * 0.5)
+		end
+	end
+	p1:FreeScroll()
 end
-local RunService_upvr = game:GetService("RunService")
-function setmetatable_result1_3_upvr.FreeScroll(arg1) -- Line 361
-    local var2_result1_4 = MakeMaid_upvr()
-    arg1:UpdateRender()
-    var2_result1_4.RenderStepped = RunService_upvr.RenderStepped:connect(function() -- Line 365
-        arg1:UpdateRender()
-        if arg1.Scroller.AtRest then
-            arg1:StopUpdate()
-        end
-    end)
-    arg1.Maid.UpdateMaid = var2_result1_4
+function v2.FreeScroll(p1) --[[ Line: 361 | Upvalues: MakeMaid (copy), RunService (copy) ]]
+	local v1 = MakeMaid()
+	p1:UpdateRender()
+	v1.RenderStepped = RunService.RenderStepped:connect(function() --[[ Line: 365 | Upvalues: p1 (copy) ]]
+		p1:UpdateRender()
+		if p1.Scroller.AtRest then
+			p1:StopUpdate()
+		end
+	end)
+	p1.Maid.UpdateMaid = v1
 end
-function setmetatable_result1_3_upvr.GetVelocityTracker(arg1, arg2) -- Line 375
-    arg1.Scroller.Velocity = 0
-    local tick_result1_3_upvw = tick()
-    local Position_2_upvw = arg1.Scroller.Position
-    local var47_upvw = arg2 or 1
-    return function() -- Line 382
-        local Position = arg1.Scroller.Position
-        tick_result1_3_upvw = tick()
-        Position_2_upvw = Position
-        arg1.Scroller.Velocity = arg1.Scroller.Velocity - (Position_2_upvw - Position) / ((0.0001) + (tick() - tick_result1_3_upvw)) * var47_upvw
-    end
+function v2.GetVelocityTracker(p1, p2) --[[ Line: 375 ]]
+	local v1 = p2 or 1
+	p1.Scroller.Velocity = 0
+	local v2 = tick()
+	local Position = p1.Scroller.Position
+	return function() --[[ Line: 382 | Upvalues: p1 (copy), v2 (ref), Position (ref), v1 (ref) ]]
+		local Position_2 = p1.Scroller.Position
+		local v12 = tick() - v2
+		v2 = tick()
+		local v22 = Position - Position_2
+		Position = Position_2
+		p1.Scroller.Velocity = p1.Scroller.Velocity - v22 / (0.0001 + v12) * v1
+	end
 end
-function setmetatable_result1_3_upvr.GetProcessInput(arg1, arg2) -- Line 393
-    local Position_3_upvr = arg2.Position
-    local Position_upvr = arg1.Scroller.Position
-    local any_GetVelocityTracker_result1_upvr_2 = arg1:GetVelocityTracker(0.25)
-    return function(arg1_9) -- Line 398
-        local var53
-        if arg1.Horizontal then
-            var53 = (arg1_9.Position - Position_3_upvr).x
-        else
-            var53 = (arg1_9.Position - Position_3_upvr).y
-        end
-        local var54 = Position_upvr - var53
-        arg1.Scroller.Position = var54
-        arg1.Scroller.Target = var54
-        arg1:UpdateRender()
-        any_GetVelocityTracker_result1_upvr_2()
-        return var53
-    end
+function v2.GetProcessInput(p1, p2) --[[ Line: 393 ]]
+	local Position = p1.Scroller.Position
+	local v1 = p1:GetVelocityTracker(0.25)
+	local Position_2 = p2.Position
+	return function(p12) --[[ Line: 398 | Upvalues: p1 (copy), Position_2 (copy), Position (copy), v1 (copy) ]]
+		local v12 = if p1.Horizontal then (p12.Position - Position_2).x else (p12.Position - Position_2).y
+		local v2 = Position - v12
+		p1.Scroller.Position = v2
+		p1.Scroller.Target = v2
+		p1:UpdateRender()
+		v1()
+		return v12
+	end
 end
-function setmetatable_result1_3_upvr.ScrollTo(arg1, arg2, arg3) -- Line 416
-    arg1.Scroller.Target = arg2
-    if arg3 then
-        arg1.Scroller.Position = arg1.Scroller.Target
-        arg1.Scroller.Velocity = 0
-    end
+function v2.ScrollTo(p1, p2, p3) --[[ Line: 416 ]]
+	p1.Scroller.Target = p2
+	if p3 then
+		p1.Scroller.Position = p1.Scroller.Target
+		p1.Scroller.Velocity = 0
+	end
 end
-function setmetatable_result1_3_upvr.ScrollToTop(arg1, arg2) -- Line 424
-    arg1:ScrollTo(arg1.Scroller.Min, arg2)
+function v2.ScrollToTop(p1, p2) --[[ Line: 424 ]]
+	p1:ScrollTo(p1.Scroller.Min, p2)
 end
-function setmetatable_result1_3_upvr.ScrollToBottom(arg1, arg2) -- Line 428
-    arg1:ScrollTo(arg1.Scroller.Max, arg2)
+function v2.ScrollToBottom(p1, p2) --[[ Line: 428 ]]
+	p1:ScrollTo(p1.Scroller.Max, p2)
 end
-local GuiService_upvr = game:GetService("GuiService")
-function setmetatable_result1_3_upvr.BindInput(arg1, arg2, arg3) -- Line 432
-    local var2_result1_3 = MakeMaid_upvr()
-    local var58_upvw = 0
-    var2_result1_3.GuiInputBegan = arg2.InputBegan:connect(function(arg1_10) -- Line 436
-        if arg1_10.UserInputType == Enum.UserInputType.MouseMovement then
-            local SelectedObject_3 = GuiService_upvr.SelectedObject
-            if SelectedObject_3 then
-                local tick_result1 = tick()
-                if 0.1 < tick_result1 - var58_upvw then
-                    var58_upvw = tick_result1
-                    if arg1.Horizontal then
-                        arg1.Scroller.Target = SelectedObject_3.AbsolutePosition.X - arg1.Gui.AbsolutePosition.X - 100
-                    end
-                    arg1:FreeScroll()
-                end
-            end
-        end
-        arg1:InputBegan(arg1_10, arg3)
-    end)
-    var2_result1_3.GuiInputChanged = arg2.InputChanged:connect(function(arg1_11) -- Line 453
-        if arg2.Active then
-            if arg1_11.UserInputType == Enum.UserInputType.MouseWheel then
-                arg1.Scroller.Target = arg1.Scroller.Target + -arg1_11.Position.z * 80
-                arg1:FreeScroll()
-            end
-        end
-    end)
-    var2_result1_3.AllInputBegan = UserInputService_upvr.InputBegan:Connect(function(arg1_12) -- Line 474
-        if arg1_12.UserInputType == Enum.UserInputType.Gamepad1 then
-            local SelectedObject_4 = GuiService_upvr.SelectedObject
-            if SelectedObject_4 then
-                if SelectedObject_4:IsDescendantOf(arg2) then
-                    arg1:InputBegan(arg1_12, arg3)
-                end
-            end
-        end
-    end)
-    local tick_result1_upvw = tick()
-    var2_result1_3.AllInputChanged = UserInputService_upvr.InputChanged:Connect(function(arg1_13) -- Line 484
-        if arg1_13.UserInputType == Enum.UserInputType.Gamepad1 then
-            if tick() - tick_result1_upvw < 0.01 then
-                return false
-            end
-            tick_result1_upvw = tick()
-            local SelectedObject_2 = GuiService_upvr.SelectedObject
-            if SelectedObject_2 and SelectedObject_2:IsDescendantOf(arg2) then
-                if arg1.Horizontal then
-                    arg1.Scroller.Target = SelectedObject_2.AbsolutePosition.X - arg1.Gui.AbsolutePosition.X - 200
-                end
-                arg1:FreeScroll()
-            end
-        end
-    end)
-    return var2_result1_3
+function v2.BindInput(p1, p2, p3) --[[ Line: 432 | Upvalues: MakeMaid (copy), GuiService (copy), UserInputService (copy) ]]
+	local v1 = MakeMaid()
+	local v2 = 0
+	v1.GuiInputBegan = p2.InputBegan:connect(function(p12) --[[ Line: 436 | Upvalues: GuiService (ref), v2 (ref), p1 (copy), p3 (copy) ]]
+		if p12.UserInputType == Enum.UserInputType.MouseMovement then
+			local SelectedObject = GuiService.SelectedObject
+			if SelectedObject then
+				local v1 = tick()
+				if v1 - v2 > 0.1 then
+					v2 = v1
+					if p1.Horizontal then
+						p1.Scroller.Target = SelectedObject.AbsolutePosition.X - p1.Gui.AbsolutePosition.X - 100
+					end
+					p1:FreeScroll()
+				end
+			end
+		end
+		p1:InputBegan(p12, p3)
+	end)
+	v1.GuiInputChanged = p2.InputChanged:connect(function(p12) --[[ Line: 453 | Upvalues: p2 (copy), p1 (copy) ]]
+		if p2.Active and p12.UserInputType == Enum.UserInputType.MouseWheel then
+			p1.Scroller.Target = p1.Scroller.Target + -p12.Position.z * 80
+			p1:FreeScroll()
+		end
+	end)
+	v1.AllInputBegan = UserInputService.InputBegan:Connect(function(p12) --[[ Line: 474 | Upvalues: GuiService (ref), p2 (copy), p1 (copy), p3 (copy) ]]
+		if p12.UserInputType == Enum.UserInputType.Gamepad1 then
+			local SelectedObject = GuiService.SelectedObject
+			if SelectedObject and SelectedObject:IsDescendantOf(p2) then
+				p1:InputBegan(p12, p3)
+			end
+		end
+	end)
+	local v3 = tick()
+	v1.AllInputChanged = UserInputService.InputChanged:Connect(function(p12) --[[ Line: 484 | Upvalues: v3 (ref), GuiService (ref), p2 (copy), p1 (copy) ]]
+		if p12.UserInputType == Enum.UserInputType.Gamepad1 then
+			if tick() - v3 < 0.01 then
+				return false
+			end
+			v3 = tick()
+			local SelectedObject = GuiService.SelectedObject
+			if SelectedObject and SelectedObject:IsDescendantOf(p2) then
+				if p1.Horizontal then
+					p1.Scroller.Target = SelectedObject.AbsolutePosition.X - p1.Gui.AbsolutePosition.X - 200
+				end
+				p1:FreeScroll()
+			end
+		end
+	end)
+	return v1
 end
-function setmetatable_result1_3_upvr.InputBegan(arg1, arg2, arg3) -- Line 518
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local var2_result1_2 = MakeMaid_upvr()
-    local var71_upvw = 0
-    if arg2.UserInputType == Enum.UserInputType.MouseButton1 then
-        local any_GetProcessInput_result1_upvr = arg1:GetProcessInput(arg2)
-        var2_result1_2.InputChanged = UserInputService_upvr.InputChanged:connect(function(arg1_14, arg2_2) -- Line 534
-            if arg1_14.UserInputType == Enum.UserInputType.MouseMovement then
-                var71_upvw += math.abs(any_GetProcessInput_result1_upvr(arg1_14))
-            end
-        end)
-    elseif arg2.UserInputType == Enum.UserInputType.Touch then
-        var2_result1_2.InputChanged = UserInputService_upvr.InputChanged:connect(function(arg1_15, arg2_3) -- Line 540, Named "Update"
-            if arg1_15.UserInputType == Enum.UserInputType.Touch then
-                var71_upvw += math.abs(any_GetProcessInput_result1_upvr(arg1_15))
-            end
-        end)
-    end
-    local tick_result1_4_upvr = tick()
-    function var2_result1_2.Cleanup() -- Line 549
-        arg1:UpdateRender()
-        if arg3 and arg3.OnClick then
-            local var76 = true
-            if tick() - tick_result1_4_upvr > 0.1 then
-                if var71_upvw >= 1 then
-                    var76 = false
-                else
-                    var76 = true
-                end
-            end
-            if var76 then
-                arg3.OnClick(arg2)
-            end
-        end
-    end
-    var2_result1_2.InputEnded = UserInputService_upvr.InputEnded:connect(function(arg1_16, arg2_4) -- Line 560
-        if arg1_16 == arg2 then
-            arg1:StopDrag()
-        end
-    end)
-    var2_result1_2.WindowFocusReleased = UserInputService_upvr.WindowFocusReleased:connect(function() -- Line 566
-        arg1:StopDrag()
-    end)
-    arg1.Maid.UpdateMaid = var2_result1_2
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function v2.InputBegan(p1, p2, p3) --[[ Line: 518 | Upvalues: MakeMaid (copy), UserInputService (copy) ]]
+	if p2.UserInputType == Enum.UserInputType.MouseButton1 or (p2.UserInputType == Enum.UserInputType.Touch or p2.UserInputType == Enum.UserInputType.Gamepad1 and p2.KeyCode == Enum.KeyCode.ButtonA) then
+		local v1 = MakeMaid()
+		local v2 = tick()
+		local v3 = 0
+		local v4 = p1:GetProcessInput(p2)
+		if p2.UserInputType == Enum.UserInputType.MouseButton1 then
+			v1.InputChanged = UserInputService.InputChanged:connect(function(p1, p2) --[[ Line: 534 | Upvalues: v3 (ref), v4 (copy) ]]
+				if p1.UserInputType == Enum.UserInputType.MouseMovement then
+					v3 = v3 + math.abs((v4(p1)))
+				end
+			end)
+		elseif p2.UserInputType == Enum.UserInputType.Touch then
+			local function Update(p1, p2) --[[ Line: 540 | Upvalues: v3 (ref), v4 (copy) ]]
+				if p1.UserInputType == Enum.UserInputType.Touch then
+					v3 = v3 + math.abs((v4(p1)))
+				end
+			end
+			v1.InputChanged = UserInputService.InputChanged:connect(Update)
+		end
+		function v1.Cleanup() --[[ Line: 549 | Upvalues: p1 (copy), p3 (copy), v2 (copy), v3 (ref), p2 (copy) ]]
+			p1:UpdateRender()
+			if p3 and p3.OnClick and if tick() - v2 <= 0.1 then true else v3 < 1 then
+				p3.OnClick(p2)
+			end
+		end
+		v1.InputEnded = UserInputService.InputEnded:connect(function(p12, p22) --[[ Line: 560 | Upvalues: p2 (copy), p1 (copy) ]]
+			if p12 == p2 then
+				p1:StopDrag()
+			end
+		end)
+		v1.WindowFocusReleased = UserInputService.WindowFocusReleased:connect(function() --[[ Line: 566 | Upvalues: p1 (copy) ]]
+			p1:StopDrag()
+		end)
+		p1.Maid.UpdateMaid = v1
+	end
 end
-return setmetatable_result1_3_upvr
+return v2

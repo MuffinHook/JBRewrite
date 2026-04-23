@@ -1,29 +1,23 @@
-local Util_upvr = require(script.Parent.Parent.Shared.Util)
-local Enum_UserInputType_GetEnumItems_result1_upvr = Enum.UserInputType:GetEnumItems()
-for _, v in pairs(Enum.KeyCode:GetEnumItems()) do
-    Enum_UserInputType_GetEnumItems_result1_upvr[#Enum_UserInputType_GetEnumItems_result1_upvr + 1] = v
+local Util = require(script.Parent.Parent.Shared.Util)
+local v1 = Enum.UserInputType:GetEnumItems()
+for k, v in pairs(Enum.KeyCode:GetEnumItems()) do
+	v1[#v1 + 1] = v
 end
-local tbl_upvr = {
-    Transform = function(arg1) -- Line 10, Named "Transform"
-        return Util_upvr.MakeFuzzyFinder(Enum_UserInputType_GetEnumItems_result1_upvr)(arg1)
-    end;
-    Validate = function(arg1) -- Line 16, Named "Validate"
-        local var11
-        if 0 >= #arg1 then
-            var11 = false
-        else
-            var11 = true
-        end
-        return var11
-    end;
-    Autocomplete = function(arg1) -- Line 20, Named "Autocomplete"
-        return Util_upvr.GetNames(arg1)
-    end;
-    Parse = function(arg1) -- Line 24, Named "Parse"
-        return arg1[1]
-    end;
+local t = {
+	Transform = function(p1) --[[ Name: Transform | Line: 10 | Upvalues: Util (copy), v1 (copy) ]]
+		return Util.MakeFuzzyFinder(v1)(p1)
+	end,
+	Validate = function(p1) --[[ Name: Validate | Line: 16 ]]
+		return #p1 > 0
+	end,
+	Autocomplete = function(p1) --[[ Name: Autocomplete | Line: 20 | Upvalues: Util (copy) ]]
+		return Util.GetNames(p1)
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 24 ]]
+		return p1[1]
+	end
 }
-return function(arg1) -- Line 29
-    arg1:RegisterType("userInput", tbl_upvr)
-    arg1:RegisterType("userInputs", Util_upvr.MakeListableType(tbl_upvr))
+return function(p1) --[[ Line: 29 | Upvalues: t (copy), Util (copy) ]]
+	p1:RegisterType("userInput", t)
+	p1:RegisterType("userInputs", Util.MakeListableType(t))
 end

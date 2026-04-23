@@ -1,23 +1,17 @@
 return {
-    new = function(arg1) -- Line 7, Named "new"
-        local module = {}
-        local tbl_upvr = {}
-        module.__index = tbl_upvr
-        if arg1 then
-            for i, v in pairs(getmetatable(arg1).__index) do
-                tbl_upvr[i] = v
-            end
-        end
-        function module.__newindex(arg1_2, arg2, arg3) -- Line 18
-            local var11
-            if tbl_upvr[arg2] ~= nil then
-                var11 = false
-            else
-                var11 = true
-            end
-            assert(var11, string.format("Cannot reassign %s in context", tostring(arg2)))
-            tbl_upvr[arg2] = arg3
-        end
-        return setmetatable({}, module)
-    end;
+	new = function(p1) --[[ Name: new | Line: 7 ]]
+		local t = {}
+		local t2 = {}
+		t.__index = t2
+		if p1 then
+			for k, v in pairs(getmetatable(p1).__index) do
+				t2[k] = v
+			end
+		end
+		function t.__newindex(p1, p2, p3) --[[ Line: 18 | Upvalues: t2 (copy) ]]
+			assert(t2[p2] == nil, string.format("Cannot reassign %s in context", (tostring(p2))))
+			t2[p2] = p3
+		end
+		return setmetatable({}, t)
+	end
 }

@@ -1,29 +1,27 @@
-local AdoptionStandConsts_upvr = require(script.Parent.AdoptionStandConsts)
-local module_upvr = {}
-local var3_upvw
-local waitForChild_upvr = require(game:GetService("ReplicatedStorage").Std.waitForChild)
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-function module_upvr.init() -- Line 10
-    var3_upvw = require(script.Parent.AdoptionStandBinder)
-    var3_upvw:Start()
-    waitForChild_upvr(LocalPlayer_upvr.PlayerGui, AdoptionStandConsts_upvr.DOGS_OWNED_VALUE_NAME):andThen(function(arg1) -- Line 15
-        module_upvr._dogsOwnedValue = arg1
-    end):catch(warn)
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local v1 = nil
+local AdoptionStandConsts = require(script.Parent.AdoptionStandConsts)
+local t = {}
+function t.init() --[[ Line: 10 | Upvalues: v1 (ref), waitForChild (copy), LocalPlayer (copy), AdoptionStandConsts (copy), t (copy) ]]
+	v1 = require(script.Parent.AdoptionStandBinder)
+	v1:Start()
+	waitForChild(LocalPlayer.PlayerGui, AdoptionStandConsts.DOGS_OWNED_VALUE_NAME):andThen(function(p1) --[[ Line: 15 | Upvalues: t (ref) ]]
+		t._dogsOwnedValue = p1
+	end):catch(warn)
 end
-function module_upvr.getDogName(arg1) -- Line 25
-    if not module_upvr._dogsOwnedValue then return end
-    local SOME = module_upvr._dogsOwnedValue:FindFirstChild(arg1)
-    if not SOME then return end
-    return SOME:FindFirstChild(AdoptionStandConsts_upvr.DOG_NAME_VALUE_NAME).Value
+function t.getDogName(p1) --[[ Line: 25 | Upvalues: t (copy), AdoptionStandConsts (copy) ]]
+	if t._dogsOwnedValue then
+		local v1 = t._dogsOwnedValue:FindFirstChild(p1)
+		if v1 then
+			return v1:FindFirstChild(AdoptionStandConsts.DOG_NAME_VALUE_NAME).Value
+		end
+	end
 end
-function module_upvr.doesOwn(arg1) -- Line 36
-    local var8
-    if not var8 then return end
-    if module_upvr._dogsOwnedValue:FindFirstChild(arg1) == nil then
-        var8 = false
-    else
-        var8 = true
-    end
-    return var8
+function t.doesOwn(p1) --[[ Line: 36 | Upvalues: t (copy) ]]
+	if t._dogsOwnedValue then
+		return t._dogsOwnedValue:FindFirstChild(p1) ~= nil
+	end
 end
-return module_upvr
+return t

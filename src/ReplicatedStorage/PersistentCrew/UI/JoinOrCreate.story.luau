@@ -1,26 +1,25 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage_upvr.Roact)
-local RoactRodux_upvr = require(ReplicatedStorage_upvr.RoactRodux)
-return function(arg1) -- Line 5
-    local any_extend_result1 = Roact_upvr.Component:extend("App")
-    function any_extend_result1.init(arg1_2) -- Line 9
-    end
-    local persistentCrewStore_upvr = require(ReplicatedStorage_upvr.PersistentCrew.persistentCrewStore)
-    local JoinOrCreate_upvr = require(script.Parent.JoinOrCreate)
-    function any_extend_result1.render(arg1_3) -- Line 11
-        return Roact_upvr.createElement(RoactRodux_upvr.StoreProvider, {
-            store = persistentCrewStore_upvr;
-        }, {Roact_upvr.createElement(JoinOrCreate_upvr, {
-            aspectRatio = 1.7777777777777777;
-            verticalPaddingRatio = 128;
-        }, {
-            AspectRatioConstraint = Roact_upvr.createElement("UIAspectRatioConstraint", {
-                AspectRatio = 1.7777777777777777;
-            });
-        })})
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(any_extend_result1), arg1)
-    return function() -- Line 27
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (copy), RoactRodux (copy) ]]
+	local v1 = Roact.Component:extend("App")
+	local JoinOrCreate = require(script.Parent.JoinOrCreate)
+	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
+	function v1.init(p1) --[[ Line: 9 ]] end
+	function v1.render(p1) --[[ Line: 11 | Upvalues: Roact (ref), RoactRodux (ref), persistentCrewStore (copy), JoinOrCreate (copy) ]]
+		return Roact.createElement(RoactRodux.StoreProvider, {
+			store = persistentCrewStore
+		}, { Roact.createElement(JoinOrCreate, {
+				aspectRatio = 1.7777777777777777,
+				verticalPaddingRatio = 128
+			}, {
+				AspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
+					AspectRatio = 1.7777777777777777
+				})
+			}) })
+	end
+	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	return function() --[[ Line: 27 | Upvalues: Roact (ref), v2 (copy) ]]
+		Roact.unmount(v2)
+	end
 end

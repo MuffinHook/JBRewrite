@@ -1,401 +1,335 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage_upvr.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("RewardSpinner")
-any_extend_result1.defaultProps = {
-    size = UDim2.new(1, 0, 1, 0);
-    position = UDim2.new(0.5, 0, 0.5, 0);
-    anchorPoint = Vector2.new(0.5, 0.5);
-    aspectRatio = 2.75;
-    cornerPixel = 4;
-    colsPerRow = 5.5;
-    primaryColor = Color3.fromRGB(215, 131, 255);
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Roact = require(ReplicatedStorage.Roact)
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+local createElement = Roact.createElement
+local Grid = require(ReplicatedStorage.EzUi.Grid)
+local GridUtils = require(ReplicatedStorage.EzUi.GridUtils)
+local rewardCardComponent = require(script.Parent.rewardCardComponent)
+local RewardSpinnerConsts = require(ReplicatedStorage.RewardSpinner.RewardSpinnerConsts)
+local v1 = Roact.PureComponent:extend("RewardSpinner")
+v1.defaultProps = {
+	size = UDim2.new(1, 0, 1, 0),
+	position = UDim2.new(0.5, 0, 0.5, 0),
+	anchorPoint = Vector2.new(0.5, 0.5),
+	aspectRatio = 2.75,
+	cornerPixel = 4,
+	colsPerRow = 5.5,
+	primaryColor = Color3.fromRGB(215, 131, 255)
 }
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local RewardSpinnerConsts_upvr = require(ReplicatedStorage_upvr.RewardSpinner.RewardSpinnerConsts)
-local Players_upvr = game:GetService("Players")
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-function any_extend_result1.init(arg1) -- Line 31
-    arg1.maid = Maid_upvr.new()
-    arg1.openMaid = Maid_upvr.new()
-    local any_createBinding_result1_2, any_createBinding_result2 = Roact_upvr.createBinding(math.ceil(arg1.props.colsPerRow * 0.5 + 0.5))
-    arg1.index = any_createBinding_result1_2
-    arg1.updateIndex = any_createBinding_result2
-    local any_createBinding_result1, any_createBinding_result2_2 = Roact_upvr.createBinding(false)
-    arg1.ticked = any_createBinding_result1
-    arg1.updateTicked = any_createBinding_result2_2
-    function arg1.onFinished() -- Line 39
-        local SOME = ReplicatedStorage_upvr:FindFirstChild(RewardSpinnerConsts_upvr.COLLECT_REWARD_REMOTE_NAME)
-        if SOME then
-            SOME:FireServer(arg1.props.config.topic)
-        end
-        arg1.openMaid:GiveTask(task.delay(1, function() -- Line 45
-            arg1.props.close()
-        end))
-    end
-    function arg1.playTick() -- Line 50
-        if Players_upvr.LocalPlayer then
-            Audio_upvr.ObjectLocal(Players_upvr.LocalPlayer.PlayerGui, 156286438)
-        end
-    end
+function v1.init(p1) --[[ Line: 31 | Upvalues: Maid (copy), Roact (copy), ReplicatedStorage (copy), RewardSpinnerConsts (copy), Players (copy), Audio (copy) ]]
+	p1.maid = Maid.new()
+	p1.openMaid = Maid.new()
+	local v2, v3 = Roact.createBinding((math.ceil(p1.props.colsPerRow * 0.5 + 0.5)))
+	p1.index = v2
+	p1.updateIndex = v3
+	local v4, v5 = Roact.createBinding(false)
+	p1.ticked = v4
+	p1.updateTicked = v5
+	function p1.onFinished() --[[ Line: 39 | Upvalues: ReplicatedStorage (ref), RewardSpinnerConsts (ref), p1 (copy) ]]
+		local v1 = ReplicatedStorage:FindFirstChild(RewardSpinnerConsts.COLLECT_REWARD_REMOTE_NAME)
+		if v1 then
+			v1:FireServer(p1.props.config.topic)
+		end
+		p1.openMaid:GiveTask(task.delay(1, function() --[[ Line: 45 | Upvalues: p1 (ref) ]]
+			p1.props.close()
+		end))
+	end
+	function p1.playTick() --[[ Line: 50 | Upvalues: Players (ref), Audio (ref) ]]
+		if Players.LocalPlayer then
+			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 156286438)
+		end
+	end
 end
-local rewardCardComponent_upvr = require(script.Parent.rewardCardComponent)
-local createElement_upvr = Roact_upvr.createElement
-local GridUtils_upvr = require(ReplicatedStorage_upvr.EzUi.GridUtils)
-local Grid_upvr = require(ReplicatedStorage_upvr.EzUi.Grid)
-function any_extend_result1.render(arg1) -- Line 56
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var21
-    if not arg1.props.config then return end
-    local primaryColor = arg1.props.config.primaryColor
-    if not primaryColor then
-        primaryColor = arg1.props
-        primaryColor = primaryColor.primaryColor
-    end
-    local aspectRatio = arg1.props.aspectRatio
-    local var24 = 1 - 0.03125 / aspectRatio
-    local var25 = var24 / 0.1515625 * aspectRatio
-    local var26 = 1 - 1 / var25 - 0.10309278350515465 / var25
-    local var27 = var26 / 1 * var25
-    local var28 = 1 - 0.03125 / aspectRatio
-    local var29 = var28 / 0.8015625 * aspectRatio
-    local var30 = 1 - 0.038986354775828465 / var29
-    local var31 = (1.138568129330254) * (var30 / 0.9610136452241715 * var29)
-    local colsPerRow_upvr = arg1.props.colsPerRow
-    local var33_upvr = 64 * var31 * 0.8015625 * 0.9610136452241715 * 0.8782961460446247
-    local tbl_5_upvr = {
-        aspectRatio = var31;
-        items = arg1.props.config.items;
-        component = rewardCardComponent_upvr;
-        verticalPaddingRatio = var33_upvr / var31;
-        rowsPerPage = 1;
-        colsPerRow = colsPerRow_upvr;
-        infHorizontal = true;
-    }
-    local module = {
-        AspectRatio = createElement_upvr("UIAspectRatioConstraint", {
-            AspectRatio = arg1.props.aspectRatio;
-        });
-        UICorner = createElement_upvr("UICorner", {
-            CornerRadius = UDim.new(0, arg1.props.cornerPixel);
-        });
-    }
-    local tbl_19 = {}
-    local tbl_18 = {
-        UICorner = createElement_upvr("UICorner", {
-            CornerRadius = UDim.new(0, arg1.props.cornerPixel);
-        });
-    }
-    local tbl_15 = {}
-    var21 = 0
-    tbl_15.Size = UDim2.new(0.9, 0, 0.9, var21)
-    tbl_15.Position = UDim2.fromScale(0.5, 0.5)
-    tbl_15.AnchorPoint = Vector2.new(0.5, 0.5)
-    tbl_15.BackgroundColor3 = primaryColor
-    local tbl_16 = {}
-    local tbl_12 = {}
-    var21 = UDim.new(1, 0)
-    tbl_12.CornerRadius = var21
-    tbl_16.UICorner = createElement_upvr("UICorner", tbl_12)
-    local tbl_26 = {}
-    var21 = 1
-    tbl_26.BackgroundTransparency = var21
-    var21 = UDim2.new(1, 0, 1, 0)
-    tbl_26.Size = var21
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var21 = "rbxassetid://"..tostring(arg1.props.config.iconImageId)
-        return var21
-    end
-    if not arg1.props.config.iconImageId or not decompInlinedCondition() then
-        var21 = nil
-    end
-    tbl_26.Image = var21
-    tbl_16.Image = createElement_upvr("ImageLabel", tbl_26)
-    tbl_18.Circle = createElement_upvr("Frame", tbl_15, tbl_16)
-    tbl_19.Icon = createElement_upvr("Frame", {
-        BackgroundColor3 = Color3.new(0, 0, 0);
-        BorderSizePixel = 0;
-        Size = UDim2.new(1 / var25, 0, 1, 0);
-    }, tbl_18)
-    local tbl_3 = {
-        UICorner = createElement_upvr("UICorner", {
-            CornerRadius = UDim.new(0, arg1.props.cornerPixel);
-        });
-    }
-    local tbl_7 = {
-        BorderSizePixel = 0;
-        BackgroundTransparency = 1;
-        BackgroundColor3 = Color3.new(1, 1, 1);
-    }
-    var21 = 0
-    tbl_7.Size = UDim2.new(0.5 - 0.10309278350515465 / var27, 0, 1, var21)
-    var21 = 0
-    tbl_7.Position = UDim2.new(0.10309278350515465 / var27, 0, 0, var21)
-    local tbl_21 = {}
-    local tbl_13 = {}
-    var21 = 1
-    tbl_13.BackgroundTransparency = var21
-    var21 = UDim2.new(1, 0, 1, 0)
-    tbl_13.Size = var21
-    var21 = UDim2.new(0.5, 0, 0.5, 0)
-    tbl_13.Position = var21
-    var21 = Vector2.new(0.5, 0.5)
-    tbl_13.AnchorPoint = var21
-    var21 = arg1.props
-    var21 = var21.config
-    var21 = var21.title
-    tbl_13.Text = var21
-    var21 = Enum.TextXAlignment.Left
-    tbl_13.TextXAlignment = var21
-    var21 = Enum.Font.Bangers
-    tbl_13.Font = var21
-    var21 = 1
-    tbl_13.LineHeight = var21
-    var21 = true
-    tbl_13.TextScaled = var21
-    tbl_13.TextColor3 = primaryColor
-    tbl_21.Text = createElement_upvr("TextLabel", tbl_13)
-    tbl_3.Container = createElement_upvr("Frame", tbl_7, tbl_21)
-    tbl_19.Title = createElement_upvr("Frame", {
-        BorderSizePixel = 0;
-        BackgroundColor3 = Color3.new(0, 0, 0);
-        Size = UDim2.new(var26, 0, 1, 0);
-        Position = UDim2.new(1 / var25 + 0.10309278350515465 / var25, 0, 0, 0);
-    }, tbl_3)
-    module.Top = createElement_upvr("Frame", {
-        BorderSizePixel = 0;
-        BackgroundTransparency = 1;
-        Position = UDim2.new(0.015625 / aspectRatio, 0, 0.015625, 0);
-        Size = UDim2.new(var24, 0, 0.1515625, 0);
-    }, tbl_19)
-    local tbl_27 = {
-        UICorner = createElement_upvr("UICorner", {
-            CornerRadius = UDim.new(0, arg1.props.cornerPixel);
-        });
-    }
-    local tbl_2 = {}
-    local tbl_9 = {
-        BackgroundColor3 = Color3.new(0.4, 0.4, 0.4);
-        BackgroundTransparency = 0;
-        BorderSizePixel = 0;
-        ClipsDescendants = true;
-    }
-    var21 = 0
-    tbl_9.Size = UDim2.new(1, 0, 1, var21)
-    local tbl_6 = {}
-    local tbl_25 = {}
-    var21 = UDim.new(0, arg1.props.cornerPixel)
-    tbl_25.CornerRadius = var21
-    tbl_6.UICorner = createElement_upvr("UICorner", tbl_25)
-    local tbl = {}
-    var21 = 0
-    tbl.BorderSizePixel = var21
-    var21 = 1
-    tbl.BackgroundTransparency = var21
-    var21 = Color3.new(1, 0, 0)
-    tbl.BackgroundColor3 = var21
-    var21 = UDim2.new(1, 0, 0.8782961460446247, 0)
-    tbl.Size = var21
-    var21 = Vector2.new(0, 0.5)
-    tbl.AnchorPoint = var21
-    var21 = arg1.index
-    var21 = var21:map(function(arg1_2) -- Line 253
-        return UDim2.new(-(arg1_2 - colsPerRow_upvr * 0.5 - 0.5) * GridUtils_upvr.getScaleX(tbl_5_upvr) - (arg1_2 - colsPerRow_upvr * 0.5 - 0.5) / var33_upvr, 0, 0.5, 0)
-    end)
-    tbl.Position = var21
-    var21 = {}
-    var21.Grid = createElement_upvr(Grid_upvr, tbl_5_upvr)
-    tbl_6.Slider = createElement_upvr("Frame", tbl, var21)
-    tbl_2.Container = createElement_upvr("Frame", tbl_9, tbl_6)
-    tbl_27.InnerBody = createElement_upvr("Frame", {
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-        Position = UDim2.new(0.019493177387914232 / var29, 0, 0.019493177387914232, 0);
-        Size = UDim2.new(var30, 0, 0.9610136452241715, 0);
-        ZIndex = 0;
-    }, tbl_2)
-    local tbl_8 = {}
-    local tbl_17 = {
-        BackgroundTransparency = 1;
-        Image = "rbxassetid://10065704207";
-        ImageColor3 = Color3.new(0, 0, 0);
-    }
-    var21 = 0
-    tbl_17.Size = UDim2.new(1, 0, 1, var21)
-    var21 = 0
-    tbl_17.Position = UDim2.new(0, 0, 0.5, var21)
-    tbl_17.Rotation = 180
-    tbl_8.Icon = createElement_upvr("ImageLabel", tbl_17)
-    tbl_27.ArrowTop = createElement_upvr("Frame", {
-        BackgroundTransparency = 1;
-        Size = UDim2.new(0.125 / var29, 0, 0.0625, 0);
-        AnchorPoint = Vector2.new(0.5, 0.5);
-        Position = UDim2.new(0.5, 0, 0.019493177387914232, 0);
-        ZIndex = 3;
-    }, tbl_8)
-    local tbl_24 = {}
-    local tbl_22 = {
-        BackgroundTransparency = 1;
-        Image = "rbxassetid://10065704207";
-        ImageColor3 = Color3.new(0, 0, 0);
-    }
-    var21 = 0
-    tbl_22.Size = UDim2.new(1, 0, 1, var21)
-    var21 = 0
-    tbl_22.Position = UDim2.new(0, 0, -0.5, var21)
-    tbl_22.Rotation = 0
-    tbl_24.Icon = createElement_upvr("ImageLabel", tbl_22)
-    tbl_27.ArrowBottom = createElement_upvr("Frame", {
-        BackgroundTransparency = 1;
-        Size = UDim2.new(0.125 / var29, 0, 0.0625, 0);
-        AnchorPoint = Vector2.new(0.5, 0.5);
-        Position = UDim2.new(0.5, 0, 0.9805068226120858, 0);
-        ZIndex = 3;
-    }, tbl_24)
-    module.Body = createElement_upvr("Frame", {
-        BorderSizePixel = 0;
-        BackgroundColor3 = Color3.new(0, 0, 0);
-        BackgroundTransparency = 0;
-        Position = UDim2.new(0.015625 / aspectRatio, 0, 0.1828125, 0);
-        Size = UDim2.new(var28, 0, 0.8015625, 0);
-    }, tbl_27)
-    local tbl_23 = {}
-    local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        tbl_10.Container = createElement_upvr("Frame", tbl_28, tbl_11)
-        tbl_11.Text = createElement_upvr("TextLabel", tbl_4)
-        tbl_4.TextColor3 = primaryColor
-        tbl_4.TextScaled = var21
-        var21 = true
-        tbl_4.LineHeight = var21
-        var21 = 1
-        tbl_4.Font = var21
-        var21 = Enum.Font.Bangers
-        tbl_4.TextXAlignment = var21
-        var21 = Enum.TextXAlignment.Right
-        tbl_4.Text = var21
-        var21 = arg1.props.config.extraText..' '
-        tbl_4.AnchorPoint = var21
-        var21 = Vector2.new(0.5, 0.5)
-        tbl_4.Position = var21
-        var21 = UDim2.new(0.5, 0, 0.5, 0)
-        tbl_4.Size = var21
-        var21 = UDim2.new(1, 0, 1, 0)
-        tbl_4.BackgroundTransparency = var21
-        var21 = 1
-        local tbl_4 = {}
-        local tbl_11 = {}
-        tbl_28.Position = UDim2.new(0, 0, 0, var21)
-        var21 = 0
-        tbl_28.Size = UDim2.new(1, 0, 1, var21)
-        var21 = 0
-        tbl_28.BackgroundColor3 = Color3.new(1, 1, 1)
-        tbl_28.BackgroundTransparency = 1
-        tbl_28.BorderSizePixel = 0
-        local tbl_28 = {}
-        tbl_10.UICorner = createElement_upvr("UICorner", tbl_20)
-        tbl_20.CornerRadius = UDim.new(0, 10)
-        local tbl_20 = {}
-        local tbl_10 = {}
-        tbl_14.Position = UDim2.new(0, 0, 0, 0)
-        tbl_14.Size = UDim2.new(1, 0, 1, 0)
-        tbl_14.BackgroundColor3 = Color3.new(0, 0, 0)
-        tbl_14.BorderSizePixel = 0
-        local tbl_14 = {}
-        return createElement_upvr("Frame", tbl_14, tbl_10)
-    end
-    if not arg1.props.config.extraText or not decompInlinedCondition_2() then
-    end
-    tbl_23.Title = nil
-    module.Bottom = createElement_upvr("Frame", {
-        BorderSizePixel = 0;
-        BackgroundTransparency = 1;
-        Position = UDim2.new(0.005, 0, 1, 0);
-        Size = UDim2.new(var24, 0, 0.1515625, 0);
-    }, tbl_23)
-    return createElement_upvr("Frame", {
-        BorderSizePixel = 0;
-        BackgroundTransparency = 0.8;
-        BackgroundColor3 = Color3.new(0, 0, 0);
-        Size = arg1.props.size;
-        Position = arg1.props.position;
-        AnchorPoint = arg1.props.anchorPoint;
-    }, module)
+function v1.render(p1) --[[ Line: 56 | Upvalues: rewardCardComponent (copy), createElement (copy), GridUtils (copy), Grid (copy) ]]
+	if p1.props.config then
+		local v1 = p1.props.config.primaryColor or p1.props.primaryColor
+		local aspectRatio = p1.props.aspectRatio
+		local v2 = 1 - 0.03125 / aspectRatio
+		local v3 = v2 / 0.1515625 * aspectRatio
+		local v4 = 1 - 1 / v3 - 0.10309278350515465 / v3
+		local v5 = v4 / 1 * v3
+		local v6 = 1 - 0.03125 / aspectRatio
+		local v7 = v6 / 0.8015625 * aspectRatio
+		local v8 = 1 - 0.038986354775828465 / v7
+		local v9 = 1.138568129330254 * (v8 / 0.9610136452241715 * v7)
+		local colsPerRow = p1.props.colsPerRow
+		local v10 = 64 * v9 * 0.8015625 * 0.9610136452241715 * 0.8782961460446247
+		local t = {
+			aspectRatio = v9,
+			items = p1.props.config.items,
+			component = rewardCardComponent,
+			verticalPaddingRatio = v10 / v9,
+			rowsPerPage = 1,
+			colsPerRow = colsPerRow,
+			infHorizontal = true
+		}
+		local t2 = {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 0.8,
+			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
+			Size = p1.props.size,
+			Position = p1.props.position,
+			AnchorPoint = p1.props.anchorPoint
+		}
+		local t3 = {
+			AspectRatio = createElement("UIAspectRatioConstraint", {
+				AspectRatio = p1.props.aspectRatio
+			}),
+			UICorner = createElement("UICorner", {
+				CornerRadius = UDim.new(0, p1.props.cornerPixel)
+			})
+		}
+		local t4 = {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0.015625 / aspectRatio, 0, 0.015625, 0),
+			Size = UDim2.new(v2, 0, 0.1515625, 0)
+		}
+		local t5 = {}
+		local t6 = {
+			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
+			BorderSizePixel = 0,
+			Size = UDim2.new(1 / v3, 0, 1, 0)
+		}
+		local t7 = {
+			UICorner = createElement("UICorner", {
+				CornerRadius = UDim.new(0, p1.props.cornerPixel)
+			})
+		}
+		local t8 = {
+			Size = UDim2.new(0.9, 0, 0.9, 0),
+			Position = UDim2.fromScale(0.5, 0.5),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = v1
+		}
+		local t9 = {
+			UICorner = createElement("UICorner", {
+				CornerRadius = UDim.new(1, 0)
+			})
+		}
+		local t10 = {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}
+		t10.Image = p1.props.config.iconImageId and "rbxassetid://" .. tostring(p1.props.config.iconImageId) or nil
+		t9.Image = createElement("ImageLabel", t10)
+		t7.Circle = createElement("Frame", t8, t9)
+		t5.Icon = createElement("Frame", t6, t7)
+		t5.Title = createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
+			Size = UDim2.new(v4, 0, 1, 0),
+			Position = UDim2.new(1 / v3 + 0.10309278350515465 / v3, 0, 0, 0)
+		}, {
+			UICorner = createElement("UICorner", {
+				CornerRadius = UDim.new(0, p1.props.cornerPixel)
+			}),
+			Container = createElement("Frame", {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
+				Size = UDim2.new(0.5 - 0.10309278350515465 / v5, 0, 1, 0),
+				Position = UDim2.new(0.10309278350515465 / v5, 0, 0, 0)
+			}, {
+				Text = createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, 0),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Text = p1.props.config.title,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					Font = Enum.Font.Bangers,
+					LineHeight = 1,
+					TextScaled = true,
+					TextColor3 = v1
+				})
+			})
+		})
+		t3.Top = createElement("Frame", t4, t5)
+		t3.Body = createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
+			BackgroundTransparency = 0,
+			Position = UDim2.new(0.015625 / aspectRatio, 0, 0.1828125, 0),
+			Size = UDim2.new(v6, 0, 0.8015625, 0)
+		}, {
+			UICorner = createElement("UICorner", {
+				CornerRadius = UDim.new(0, p1.props.cornerPixel)
+			}),
+			InnerBody = createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Position = UDim2.new(0.019493177387914232 / v7, 0, 0.019493177387914232, 0),
+				Size = UDim2.new(v8, 0, 0.9610136452241715, 0),
+				ZIndex = 0
+			}, {
+				Container = createElement("Frame", {
+					BackgroundColor3 = Color3.new(102/255, 102/255, 102/255),
+					BackgroundTransparency = 0,
+					BorderSizePixel = 0,
+					ClipsDescendants = true,
+					Size = UDim2.new(1, 0, 1, 0)
+				}, {
+					UICorner = createElement("UICorner", {
+						CornerRadius = UDim.new(0, p1.props.cornerPixel)
+					}),
+					Slider = createElement("Frame", {
+						BorderSizePixel = 0,
+						BackgroundTransparency = 1,
+						BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
+						Size = UDim2.new(1, 0, 0.8782961460446247, 0),
+						AnchorPoint = Vector2.new(0, 0.5),
+						Position = p1.index:map(function(p1) --[[ Line: 253 | Upvalues: colsPerRow (copy), GridUtils (ref), t (copy), v10 (copy) ]]
+							return UDim2.new(-(p1 - colsPerRow * 0.5 - 0.5) * GridUtils.getScaleX(t) - (p1 - colsPerRow * 0.5 - 0.5) / v10, 0, 0.5, 0)
+						end)
+					}, {
+						Grid = createElement(Grid, t)
+					})
+				})
+			}),
+			ArrowTop = createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0.125 / v7, 0, 0.0625, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.new(0.5, 0, 0.019493177387914232, 0),
+				ZIndex = 3
+			}, {
+				Icon = createElement("ImageLabel", {
+					BackgroundTransparency = 1,
+					Image = "rbxassetid://10065704207",
+					ImageColor3 = Color3.new(0/255, 0/255, 0/255),
+					Size = UDim2.new(1, 0, 1, 0),
+					Position = UDim2.new(0, 0, 0.5, 0),
+					Rotation = 180
+				})
+			}),
+			ArrowBottom = createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0.125 / v7, 0, 0.0625, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.new(0.5, 0, 0.9805068226120858, 0),
+				ZIndex = 3
+			}, {
+				Icon = createElement("ImageLabel", {
+					BackgroundTransparency = 1,
+					Image = "rbxassetid://10065704207",
+					ImageColor3 = Color3.new(0/255, 0/255, 0/255),
+					Size = UDim2.new(1, 0, 1, 0),
+					Position = UDim2.new(0, 0, -0.5, 0),
+					Rotation = 0
+				})
+			})
+		})
+		local t11 = {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0.005, 0, 1, 0),
+			Size = UDim2.new(v2, 0, 0.1515625, 0)
+		}
+		local t12 = {}
+		t12.Title = p1.props.config.extraText and createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
+			Size = UDim2.new(1, 0, 1, 0),
+			Position = UDim2.new(0, 0, 0, 0)
+		}, {
+			UICorner = createElement("UICorner", {
+				CornerRadius = UDim.new(0, 10)
+			}),
+			Container = createElement("Frame", {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
+				Size = UDim2.new(1, 0, 1, 0),
+				Position = UDim2.new(0, 0, 0, 0)
+			}, {
+				Text = createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, 0),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Text = p1.props.config.extraText .. " ",
+					TextXAlignment = Enum.TextXAlignment.Right,
+					Font = Enum.Font.Bangers,
+					LineHeight = 1,
+					TextScaled = true,
+					TextColor3 = v1
+				})
+			})
+		}) or nil
+		t3.Bottom = createElement("Frame", t11, t12)
+		return createElement("Frame", t2, t3)
+	end
 end
-local RunService_upvr = game:GetService("RunService")
-function any_extend_result1._spin(arg1) -- Line 347
-    local winIndex = arg1.props.config.winIndex
-    if #arg1.props.config.items - math.floor(arg1.props.colsPerRow * 0.5 + 0.5) < winIndex then
-        warn("winIndex is > maxVisibleIndex, player will see empty space")
-    end
-    local os_clock_result1_upvr = os.clock()
-    local duration_upvr = arg1.props.config.duration
-    local var83_upvw = false
-    local ceiled_upvr = math.ceil(arg1.props.colsPerRow * 0.5 + 0.5)
-    local var85_upvw = winIndex + math.clamp(math.random() - 0.5, -0.48, 0.48)
-    local var86_upvw = 0
-    arg1.maid.spinHeartbeat = RunService_upvr.Heartbeat:Connect(function() -- Line 361
-        local var87 = (os.clock() - os_clock_result1_upvr) / duration_upvr
-        local var88
-        if 1 <= var87 then
-            var87 = 1
-            if not var83_upvw then
-                var83_upvw = true
-                arg1.onFinished()
-                if arg1.props.onFinished then
-                    arg1.props.onFinished()
-                end
-                arg1.maid.spinHeartbeat = nil
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-        else
-            var83_upvw = false
-        end
-        var88 = var85_upvw - ceiled_upvr
-        local var89 = ceiled_upvr + var88 * (1 - math.pow(1 - var87, 2))
-        local var90 = var89 % 1
-        var88 = var86_upvw
-        if 0 >= var89 - var86_upvw then
-            var88 = false
-        else
-            var88 = true
-        end
-        local function decompInlinedCondition_3() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            return 0.5 < var88 % 1
-        end
-        if var88 and 0.5 < var90 and var88 % 1 < 0.5 or not var88 and var90 < 0.5 and decompInlinedCondition_3() then
-            arg1.playTick()
-        end
-        var86_upvw = var89
-        arg1.updateIndex(var89)
-    end)
+function v1._spin(p1) --[[ Line: 347 | Upvalues: RunService (copy) ]]
+	local v1 = 0
+	local duration = p1.props.config.duration
+	local v2 = os.clock()
+	local v3 = false
+	local v5 = math.ceil(p1.props.colsPerRow * 0.5 + 0.5)
+	local v8 = #p1.props.config.items - math.floor(p1.props.colsPerRow * 0.5 + 0.5)
+	local winIndex = p1.props.config.winIndex
+	if v8 < winIndex then
+		warn("winIndex is > maxVisibleIndex, player will see empty space")
+	end
+	local v10 = winIndex + math.clamp(math.random() - 0.5, -0.48, 0.48)
+	p1.maid.spinHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 361 | Upvalues: v2 (copy), duration (copy), v3 (ref), p1 (copy), v5 (copy), v10 (ref), v1 (ref) ]]
+		local v12 = (os.clock() - v2) / duration
+		if v12 >= 1 then
+			v12 = 1
+			if not v3 then
+				v3 = true
+				p1.onFinished()
+				if p1.props.onFinished then
+					p1.props.onFinished()
+				end
+				p1.maid.spinHeartbeat = nil
+			end
+		else
+			v3 = false
+		end
+		local v22 = v5 + (v10 - v5) * (1 - math.pow(1 - v12, 2))
+		local v32 = v22 % 1
+		local v4 = v1 % 1
+		local v52 = v22 - v1 > 0
+		if v52 and (v32 > 0.5 and v4 < 0.5) or not v52 and (v32 < 0.5 and v4 > 0.5) then
+			p1.playTick()
+		end
+		v1 = v22
+		p1.updateIndex(v22)
+	end)
 end
-function any_extend_result1.didMount(arg1) -- Line 399
-    if arg1.props.config then
-        arg1:_spin()
-    end
+function v1.didMount(p1) --[[ Line: 399 ]]
+	if p1.props.config then
+		p1:_spin()
+	end
 end
-function any_extend_result1.didUpdate(arg1, arg2, arg3) -- Line 404
-    if arg1.props.config ~= arg2.config then
-        arg1.openMaid:DoCleaning()
-        if arg1.props.config then
-            arg1:_spin()
-        end
-    end
+function v1.didUpdate(p1, p2, p3) --[[ Line: 404 ]]
+	if p1.props.config ~= p2.config then
+		p1.openMaid:DoCleaning()
+		if p1.props.config then
+			p1:_spin()
+		end
+	end
 end
-function any_extend_result1.willUnmount(arg1) -- Line 412
-    arg1.maid:DoCleaning()
+function v1.willUnmount(p1) --[[ Line: 412 ]]
+	p1.maid:DoCleaning()
 end
-return require(ReplicatedStorage_upvr.RoactRodux).connect(function(arg1, arg2) -- Line 415
-    return {
-        config = arg1.rewardSpinnerConfig;
-    }
-end, function(arg1) -- Line 419
-    return {
-        close = function() -- Line 421, Named "close"
-            arg1({
-                type = "setRewardSpinnerConfig";
-                items = nil;
-            })
-        end;
-    }
-end)(any_extend_result1)
+return RoactRodux.connect(function(p1, p2) --[[ Line: 415 ]]
+	return {
+		config = p1.rewardSpinnerConfig
+	}
+end, function(p1) --[[ Line: 419 ]]
+	return {
+		close = function() --[[ Name: close | Line: 421 | Upvalues: p1 (copy) ]]
+			p1({
+				type = "setRewardSpinnerConfig",
+				items = nil
+			})
+		end
+	}
+end)(v1)

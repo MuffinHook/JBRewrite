@@ -1,145 +1,140 @@
-local Players_upvr = game:GetService("Players")
+local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BaseObject_upvr = require(ReplicatedStorage.Std.BaseObject)
-local GeomUtils_upvr = require(ReplicatedStorage.Std.GeomUtils)
-local VehicleLinkUtils_upvr = require(ReplicatedStorage.VehicleLink.VehicleLinkUtils)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-function module_upvr.new(arg1, arg2) -- Line 18
-    local any_new_result1_3_upvr = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1_3_upvr, module_upvr)
-    any_new_result1_3_upvr.manifest = arg2
-    any_new_result1_3_upvr:_updateSeeking()
-    any_new_result1_3_upvr.maid:GiveTask(any_new_result1_3_upvr.manifest.networkOwnerIdObj.Changed:Connect(function() -- Line 24, Named "checkOwner"
-        any_new_result1_3_upvr:_updateSeeking()
-    end))
-    return any_new_result1_3_upvr
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
+local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local VehicleLinkUtils = require(ReplicatedStorage.VehicleLink.VehicleLinkUtils)
+local LoadingBar = require(ReplicatedStorage.Game.LoadingBar)
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1, p2) --[[ Line: 18 | Upvalues: BaseObject (copy), t (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t)
+	v1.manifest = p2
+	local function checkOwner() --[[ Line: 24 | Upvalues: v1 (copy) ]]
+		v1:_updateSeeking()
+	end
+	v1:_updateSeeking()
+	v1.maid:GiveTask(v1.manifest.networkOwnerIdObj.Changed:Connect(checkOwner))
+	return v1
 end
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function module_upvr._updateSeeking(arg1) -- Line 32
-    if arg1:GetOwner() == Players_upvr.LocalPlayer then
-        arg1.maid.seeking = Interval_upvr.every(0.25):Connect(function() -- Line 35
-            if VehicleLinkUtils_upvr.getDisabled(arg1.obj) then
-            elseif not VehicleLinkUtils_upvr.getIsLinked(arg1.obj) then
-                local any__getNearestObj_result1 = arg1:_getNearestObj(8)
-                if any__getNearestObj_result1 ~= arg1.nearestObj then
-                    arg1.nearestObj = any__getNearestObj_result1
-                    if any__getNearestObj_result1 then
-                        local any_new_result1 = Maid_upvr.new()
-                        arg1.maid.nearestMaid = any_new_result1
-                        arg1:_hookNearest(any_new_result1)
-                        return
-                    end
-                    arg1.maid.nearestMaid = nil
-                end
-            end
-        end)
-    else
-        arg1.maid.seeking = nil
-        arg1.maid.nearestMaid = nil
-    end
+function t._updateSeeking(p1) --[[ Line: 32 | Upvalues: Players (copy), Interval (copy), VehicleLinkUtils (copy), Maid (copy) ]]
+	if p1:GetOwner() == Players.LocalPlayer then
+		p1.maid.seeking = Interval.every(0.25):Connect(function() --[[ Line: 35 | Upvalues: VehicleLinkUtils (ref), p1 (copy), Maid (ref) ]]
+			if not (VehicleLinkUtils.getDisabled(p1.obj) or VehicleLinkUtils.getIsLinked(p1.obj)) then
+				local v1 = p1:_getNearestObj(8)
+				if v1 ~= p1.nearestObj then
+					p1.nearestObj = v1
+					if v1 then
+						local v2 = Maid.new()
+						p1.maid.nearestMaid = v2
+						p1:_hookNearest(v2)
+						return
+					end
+					p1.maid.nearestMaid = nil
+				end
+			end
+		end)
+	else
+		p1.maid.seeking = nil
+		p1.maid.nearestMaid = nil
+	end
 end
-local LoadingBar_upvr = require(ReplicatedStorage.Game.LoadingBar)
-local RunService_upvr = game:GetService("RunService")
-function module_upvr._hookNearest(arg1, arg2) -- Line 59
-    local nearestObj_upvr = arg1.nearestObj
-    local any__makePartVisualBall_result1_upvr = arg1:_makePartVisualBall()
-    any__makePartVisualBall_result1_upvr.Parent = workspace
-    arg2:GiveTask(any__makePartVisualBall_result1_upvr)
-    local any__makePartVisualBlock_result1_upvr = arg1:_makePartVisualBlock()
-    any__makePartVisualBlock_result1_upvr.Parent = workspace
-    arg2:GiveTask(any__makePartVisualBlock_result1_upvr)
-    local any_new_result1_2_upvr = LoadingBar_upvr.new()
-    arg2:GiveTask(any_new_result1_2_upvr)
-    any_new_result1_2_upvr:SetPosition(UDim2.new(0.5, 0, 0.6666666666666666, 0))
-    local any_getPrimaryPart_result1_2_upvr = VehicleLinkUtils_upvr.getPrimaryPart(nearestObj_upvr)
-    local os_clock_result1_upvr = os.clock()
-    local var23_upvw = 0
-    local function update() -- Line 74
-        local var24
-        if nearestObj_upvr:GetAttribute("VehicleHasDriver") == true then
-            var24 = 5
-        else
-            var24 = 1
-        end
-        local any_closestPointInPart_result1 = GeomUtils_upvr.closestPointInPart(any_getPrimaryPart_result1_2_upvr, arg1.obj.Position)
-        any__makePartVisualBall_result1_upvr.CFrame = CFrame.new(any_closestPointInPart_result1)
-        any__makePartVisualBlock_result1_upvr.Size = any_getPrimaryPart_result1_2_upvr.Size * 1.02
-        any__makePartVisualBlock_result1_upvr.CFrame = any_getPrimaryPart_result1_2_upvr.CFrame
-        local os_clock_result1 = os.clock()
-        local var27 = os_clock_result1 - os_clock_result1_upvr
-        any_new_result1_2_upvr:SetValue(math.min(1, var27 / var24))
-        if var24 < var27 and 1 < os_clock_result1 - var23_upvw then
-            var23_upvw = os_clock_result1
-            arg1.manifest.reqLinkRemote:FireServer(nearestObj_upvr, any_getPrimaryPart_result1_2_upvr.CFrame:PointToObjectSpace(any_closestPointInPart_result1))
-        end
-    end
-    arg2:GiveTask(RunService_upvr.Heartbeat:Connect(update))
-    update()
-    arg2:GiveTask(VehicleLinkUtils_upvr.getIsLinkedChangedSignal(arg1.obj):Connect(function() -- Line 99
-        if VehicleLinkUtils_upvr.getIsLinked(arg1.obj) then
-            arg2:DoCleaning()
-        end
-    end))
-    arg2:GiveTask(VehicleLinkUtils_upvr.getDisabledChangedSignal(arg1.obj):Connect(function() -- Line 105
-        if VehicleLinkUtils_upvr.getDisabled(arg1.obj) then
-            arg2:DoCleaning()
-        end
-    end))
+function t._hookNearest(p1, p2) --[[ Line: 59 | Upvalues: VehicleLinkUtils (copy), LoadingBar (copy), GeomUtils (copy), RunService (copy) ]]
+	local nearestObj = p1.nearestObj
+	local v1 = VehicleLinkUtils.getPrimaryPart(nearestObj)
+	local v2 = p1:_makePartVisualBall()
+	v2.Parent = workspace
+	p2:GiveTask(v2)
+	local v3 = p1:_makePartVisualBlock()
+	v3.Parent = workspace
+	p2:GiveTask(v3)
+	local v4 = LoadingBar.new()
+	p2:GiveTask(v4)
+	v4:SetPosition(UDim2.new(0.5, 0, 0.6666666666666666, 0))
+	local v5 = 0
+	local v6 = os.clock()
+	local function update() --[[ Line: 74 | Upvalues: nearestObj (copy), GeomUtils (ref), v1 (copy), p1 (copy), v2 (copy), v3 (copy), v6 (copy), v4 (copy), v5 (ref) ]]
+		local v12 = if nearestObj:GetAttribute("VehicleHasDriver") == true then 5 else 1
+		local v22 = GeomUtils.closestPointInPart(v1, p1.obj.Position)
+		v2.CFrame = CFrame.new(v22)
+		v3.Size = v1.Size * 1.02
+		v3.CFrame = v1.CFrame
+		local v32 = os.clock()
+		local v42 = v32 - v6
+		v4:SetValue((math.min(1, v42 / v12)))
+		if v12 < v42 and v32 - v5 > 1 then
+			v5 = v32
+			p1.manifest.reqLinkRemote:FireServer(nearestObj, v1.CFrame:PointToObjectSpace(v22))
+		end
+	end
+	p2:GiveTask(RunService.Heartbeat:Connect(update))
+	update()
+	p2:GiveTask(VehicleLinkUtils.getIsLinkedChangedSignal(p1.obj):Connect(function() --[[ Line: 99 | Upvalues: VehicleLinkUtils (ref), p1 (copy), p2 (copy) ]]
+		if VehicleLinkUtils.getIsLinked(p1.obj) then
+			p2:DoCleaning()
+		end
+	end))
+	p2:GiveTask(VehicleLinkUtils.getDisabledChangedSignal(p1.obj):Connect(function() --[[ Line: 105 | Upvalues: VehicleLinkUtils (ref), p1 (copy), p2 (copy) ]]
+		if VehicleLinkUtils.getDisabled(p1.obj) then
+			p2:DoCleaning()
+		end
+	end))
 end
-function module_upvr._makePartVisualBall(arg1) -- Line 111
-    local Part_2 = Instance.new("Part")
-    Part_2.Size = Vector3.new(1, 1, 1)
-    Part_2.CanCollide = false
-    Part_2.Color = Color3.new(1, 0, 0)
-    Part_2.Shape = Enum.PartType.Ball
-    Part_2.Transparency = 0.3
-    Part_2.TopSurface = 0
-    Part_2.BottomSurface = 0
-    Part_2.Anchored = true
-    return Part_2
+function t._makePartVisualBall(p1) --[[ Line: 111 ]]
+	local Part = Instance.new("Part")
+	Part.Size = Vector3.new(1, 1, 1)
+	Part.CanCollide = false
+	Part.Color = Color3.new(255/255, 0/255, 0/255)
+	Part.Shape = Enum.PartType.Ball
+	Part.Transparency = 0.3
+	Part.TopSurface = 0
+	Part.BottomSurface = 0
+	Part.Anchored = true
+	return Part
 end
-function module_upvr._makePartVisualBlock(arg1) -- Line 122
-    local Part = Instance.new("Part")
-    Part.CanCollide = false
-    Part.Color = Color3.new(0, 1, 0)
-    Part.Transparency = 0.8
-    Part.TopSurface = 0
-    Part.BottomSurface = 0
-    Part.Anchored = true
-    return Part
+function t._makePartVisualBlock(p1) --[[ Line: 122 ]]
+	local Part = Instance.new("Part")
+	Part.CanCollide = false
+	Part.Color = Color3.new(0/255, 255/255, 0/255)
+	Part.Transparency = 0.8
+	Part.TopSurface = 0
+	Part.BottomSurface = 0
+	Part.Anchored = true
+	return Part
 end
-function module_upvr._getPrimaryPart(arg1, arg2) -- Line 131
-    local BoundingBox = arg2:FindFirstChild("BoundingBox")
-    if not BoundingBox then
-        BoundingBox = arg2.PrimaryPart
-    end
-    return BoundingBox
+function t._getPrimaryPart(p1, p2) --[[ Line: 131 ]]
+	return p2:FindFirstChild("BoundingBox") or p2.PrimaryPart
 end
-local CollectionService_upvr = game:GetService("CollectionService")
-function module_upvr._getNearestObj(arg1, arg2) -- Line 134
-    local var60
-    for _, v in ipairs(CollectionService_upvr:GetTagged("HeliPickup")) do
-        if not arg1.obj:IsDescendantOf(v) then
-            local any_getPrimaryPart_result1_4 = VehicleLinkUtils_upvr.getPrimaryPart(v)
-            if any_getPrimaryPart_result1_4 then
-                if (arg1.obj.Position - GeomUtils_upvr.closestPointInPart(any_getPrimaryPart_result1_4, arg1.obj.Position)).Magnitude < arg2 then
-                end
-            end
-        end
-    end
-    return nil
+function t._getNearestObj(p1, p2) --[[ Line: 134 | Upvalues: CollectionService (copy), VehicleLinkUtils (copy), GeomUtils (copy) ]]
+	local v2 = nil
+	for i, v in ipairs((CollectionService:GetTagged("HeliPickup"))) do
+		if not p1.obj:IsDescendantOf(v) then
+			local v3 = VehicleLinkUtils.getPrimaryPart(v)
+			if v3 then
+				local Magnitude = (p1.obj.Position - GeomUtils.closestPointInPart(v3, p1.obj.Position)).Magnitude
+				if Magnitude < p2 then
+					p2 = Magnitude
+					v2 = v
+				end
+			end
+		end
+	end
+	return v2
 end
-function module_upvr.GetOwner(arg1) -- Line 157
-    return Players_upvr:GetPlayerByUserId(arg1.manifest.networkOwnerIdObj.Value)
+function t.GetOwner(p1) --[[ Line: 157 | Upvalues: Players (copy) ]]
+	return Players:GetPlayerByUserId(p1.manifest.networkOwnerIdObj.Value)
 end
-function module_upvr.Unattach(arg1) -- Line 162
-    arg1.manifest.reqUnlinkRemote:FireServer()
+function t.Unattach(p1) --[[ Line: 162 ]]
+	p1.manifest.reqUnlinkRemote:FireServer()
 end
-return require(ReplicatedStorage.ManifestBinder).new("VehicleLink", {
-    reqLinkRemote = "ReqLink";
-    reqUnlinkRemote = "ReqUnlink";
-    networkOwnerIdObj = "NetworkOwnerId";
-}, module_upvr)
+return ManifestBinder.new("VehicleLink", {
+	reqLinkRemote = "ReqLink",
+	reqUnlinkRemote = "ReqUnlink",
+	networkOwnerIdObj = "NetworkOwnerId"
+}, t)

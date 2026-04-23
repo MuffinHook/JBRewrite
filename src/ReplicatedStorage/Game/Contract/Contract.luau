@@ -1,158 +1,139 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_upvr = {}
-module_upvr.__index = module_upvr
-module_upvr.__ClassName = "Contract"
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local ContractConsts_upvr = require(script.Parent.ContractConsts)
-local Data_upvr = script.Parent.Data
-local SeasonUtils_upvr = require(ReplicatedStorage.Game.Season.SeasonUtils)
-function module_upvr.new(arg1) -- Line 15
-    local module_upvr_2 = {}
-    setmetatable(module_upvr_2, module_upvr)
-    module_upvr_2._maid = Maid_upvr.new()
-    module_upvr_2._obj = arg1
-    module_upvr_2.obj = module_upvr_2._obj
-    module_upvr_2._maid:GiveTask(function() -- Line 22
-        module_upvr_2._obj = nil
-        module_upvr_2.obj = nil
-    end)
-    module_upvr_2._stateValue = arg1:WaitForChild(ContractConsts_upvr.STATE_VALUE_NAME, 5)
-    local any_GetStateId_result1_2_upvw = module_upvr_2:GetStateId()
-    module_upvr_2._maid:GiveTask(module_upvr_2:GetStateValue():GetPropertyChangedSignal("Value"):Connect(function() -- Line 30
-        local any_GetStateId_result1 = module_upvr_2:GetStateId()
-        if module_upvr_2._onStateChanged then
-            module_upvr_2._onStateChanged:Fire(any_GetStateId_result1, any_GetStateId_result1_2_upvw)
-        end
-        any_GetStateId_result1_2_upvw = any_GetStateId_result1
-    end))
-    module_upvr_2._progressValue = arg1:WaitForChild(ContractConsts_upvr.PROGRESS_VALUE_NAME, 5)
-    module_upvr_2._goalValue = arg1:WaitForChild(ContractConsts_upvr.GOAL_VALUE_NAME, 5)
-    module_upvr_2._lastStateUpdateValue = arg1:WaitForChild(ContractConsts_upvr.LAST_STATE_UPDATE_VALUE_NAME, 5)
-    module_upvr_2._contractActionRemote = arg1:WaitForChild(ContractConsts_upvr.CONTRACT_ACTION_REMOTE_NAME, 5)
-    module_upvr_2._requireSeasonPassValue = arg1:WaitForChild(ContractConsts_upvr.REQUIRE_SEASON_PASS_VALUE_NAME, 5)
-    module_upvr_2._rerolledValue = arg1:WaitForChild(ContractConsts_upvr.REROLLED_VALUE_NAME, 5)
-    local any_GetName_result1 = module_upvr_2:GetName()
-    local SOME = Data_upvr:FindFirstChild(any_GetName_result1)
-    if not SOME then
-        error(string.format("Cannot find client data module for contract: %s", any_GetName_result1));
-    end
-    local var13_2 = require(SOME)
-    if not var13_2.teamId then
-        error("Missing `clientData.teamId` value")
-    end
-    module_upvr_2:SetTeamId(var13_2.teamId)
-    if not var13_2.rewardExp then
-        error("Missing `clientData.rewardExp` value")
-    end
-    module_upvr_2:SetRewardExp(var13_2.rewardExp * SeasonUtils_upvr.getSeasonExpMult())
-    if not var13_2.message then
-        error("Missing `clientData.message` value")
-    end
-    local var15
-    if type(var13_2.message) == "string" then
-        var15 = var13_2.message
-    elseif type(var13_2.message) == "function" then
-        var15 = var13_2.message(module_upvr_2)
-    end
-    module_upvr_2:SetMessage(var15)
-    return module_upvr_2
+local SeasonUtils = require(ReplicatedStorage.Game.Season.SeasonUtils)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local Data = script.Parent.Data
+local ContractConsts = require(script.Parent.ContractConsts)
+require(ReplicatedStorage.Game.Season.SeasonConsts)
+require(script.Parent.ContractUtils)
+local t = {}
+t.__index = t
+t.__ClassName = "Contract"
+function t.new(p1) --[[ Line: 15 | Upvalues: t (copy), Maid (copy), ContractConsts (copy), Data (copy), SeasonUtils (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._maid = Maid.new()
+	t2._obj = p1
+	t2.obj = t2._obj
+	t2._maid:GiveTask(function() --[[ Line: 22 | Upvalues: t2 (copy) ]]
+		t2._obj = nil
+		t2.obj = nil
+	end)
+	t2._stateValue = p1:WaitForChild(ContractConsts.STATE_VALUE_NAME, 5)
+	local v2 = t2:GetStateId()
+	t2._maid:GiveTask(t2:GetStateValue():GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 30 | Upvalues: t2 (copy), v2 (ref) ]]
+		local v1 = t2:GetStateId()
+		if t2._onStateChanged then
+			t2._onStateChanged:Fire(v1, v2)
+		end
+		v2 = v1
+	end))
+	t2._progressValue = p1:WaitForChild(ContractConsts.PROGRESS_VALUE_NAME, 5)
+	t2._goalValue = p1:WaitForChild(ContractConsts.GOAL_VALUE_NAME, 5)
+	t2._lastStateUpdateValue = p1:WaitForChild(ContractConsts.LAST_STATE_UPDATE_VALUE_NAME, 5)
+	t2._contractActionRemote = p1:WaitForChild(ContractConsts.CONTRACT_ACTION_REMOTE_NAME, 5)
+	t2._requireSeasonPassValue = p1:WaitForChild(ContractConsts.REQUIRE_SEASON_PASS_VALUE_NAME, 5)
+	t2._rerolledValue = p1:WaitForChild(ContractConsts.REROLLED_VALUE_NAME, 5)
+	local v3 = t2:GetName()
+	local v4 = Data:FindFirstChild(v3)
+	if not v4 then
+		error(("Cannot find client data module for contract: %s"):format(v3))
+	end
+	local v5 = require(v4)
+	if not v5.teamId then
+		error("Missing `clientData.teamId` value")
+	end
+	t2:SetTeamId(v5.teamId)
+	if not v5.rewardExp then
+		error("Missing `clientData.rewardExp` value")
+	end
+	t2:SetRewardExp(v5.rewardExp * SeasonUtils.getSeasonExpMult())
+	if not v5.message then
+		error("Missing `clientData.message` value")
+	end
+	local v7 = nil
+	if type(v5.message) == "string" then
+		v7 = v5.message
+	else
+		if type(v5.message) == "function" then
+			v7 = v5.message(t2)
+		end
+	end
+	t2:SetMessage(v7)
+	return t2
 end
-local Players_upvr = game:GetService("Players")
-function module_upvr.GetPlayer(arg1) -- Line 86
-    local any_GetPlayerByUserId_result1 = Players_upvr:GetPlayerByUserId(arg1._obj.Parent.Name)
-    local var18
-    if not any_GetPlayerByUserId_result1 then return end
-    if any_GetPlayerByUserId_result1.Parent ~= game:GetService("Players") then
-        var18 = false
-    else
-        var18 = true
-    end
-    assert(var18)
-    return any_GetPlayerByUserId_result1
+function t.GetPlayer(p1) --[[ Line: 86 | Upvalues: Players (copy) ]]
+	local v1 = Players:GetPlayerByUserId(p1._obj.Parent.Name)
+	if v1 then
+		local isParent = v1.Parent == game:GetService("Players")
+		assert(isParent)
+		return v1
+	end
 end
-function module_upvr.GetName(arg1) -- Line 95
-    return arg1._obj.Name
+function t.GetName(p1) --[[ Line: 95 ]]
+	return p1._obj.Name
 end
-function module_upvr.SetMessage(arg1, arg2) -- Line 98
-    if arg2 == nil then
-    else
-    end
-    assert(true)
-    if type(arg2) ~= "string" then
-    else
-    end
-    assert(true)
-    arg1._message = arg2
+function t.SetMessage(p1, p2) --[[ Line: 98 ]]
+	assert(p2 ~= nil)
+	assert(type(p2) == "string")
+	p1._message = p2
 end
-function module_upvr.GetMessage(arg1) -- Line 104
-    return arg1._message
+function t.GetMessage(p1) --[[ Line: 104 ]]
+	return p1._message
 end
-function module_upvr.GetRequireSeasonPassValue(arg1) -- Line 107
-    return arg1._requireSeasonPassValue
+function t.GetRequireSeasonPassValue(p1) --[[ Line: 107 ]]
+	return p1._requireSeasonPassValue
 end
-function module_upvr.GetRequireSeasonPass(arg1) -- Line 110
-    return arg1:GetRequireSeasonPassValue().Value
+function t.GetRequireSeasonPass(p1) --[[ Line: 110 ]]
+	return p1:GetRequireSeasonPassValue().Value
 end
-function module_upvr.GetStateValue(arg1) -- Line 113
-    return arg1._stateValue
+function t.GetStateValue(p1) --[[ Line: 113 ]]
+	return p1._stateValue
 end
-function module_upvr.GetStateId(arg1) -- Line 116
-    return arg1._stateValue.Value
+function t.GetStateId(p1) --[[ Line: 116 ]]
+	return p1._stateValue.Value
 end
-local Signal_upvr = require(ReplicatedStorage.Std.Signal)
-function module_upvr.GetOnStateChangedSignal(arg1) -- Line 119
-    if not arg1._onStateChanged then
-        arg1._onStateChanged = Signal_upvr.new()
-        arg1._maid:GiveTask(arg1._onStateChanged)
-    end
-    return arg1._onStateChanged
+function t.GetOnStateChangedSignal(p1) --[[ Line: 119 | Upvalues: Signal (copy) ]]
+	if not p1._onStateChanged then
+		p1._onStateChanged = Signal.new()
+		p1._maid:GiveTask(p1._onStateChanged)
+	end
+	return p1._onStateChanged
 end
-function module_upvr.GetProgressValue(arg1) -- Line 126
-    return arg1._progressValue
+function t.GetProgressValue(p1) --[[ Line: 126 ]]
+	return p1._progressValue
 end
-function module_upvr.GetProgress(arg1) -- Line 129
-    return arg1._progressValue.Value
+function t.GetProgress(p1) --[[ Line: 129 ]]
+	return p1._progressValue.Value
 end
-function module_upvr.SetTeamId(arg1, arg2) -- Line 132
-    arg1._teamId = arg2
+function t.SetTeamId(p1, p2) --[[ Line: 132 ]]
+	p1._teamId = p2
 end
-function module_upvr.GetTeamId(arg1) -- Line 135
-    return arg1._teamId
+function t.GetTeamId(p1) --[[ Line: 135 ]]
+	return p1._teamId
 end
-function module_upvr.SetGoal(arg1, arg2) -- Line 138
-    if arg2 == nil then
-    else
-    end
-    assert(true)
-    if type(arg2) ~= "number" then
-    else
-    end
-    assert(true)
-    arg1._goalValue.Value = arg2
+function t.SetGoal(p1, p2) --[[ Line: 138 ]]
+	assert(p2 ~= nil)
+	assert(type(p2) == "number")
+	p1._goalValue.Value = p2
 end
-function module_upvr.GetGoal(arg1) -- Line 143
-    return arg1._goalValue.Value
+function t.GetGoal(p1) --[[ Line: 143 ]]
+	return p1._goalValue.Value
 end
-function module_upvr.GetRewardExp(arg1) -- Line 146
-    return arg1._rewardExp
+function t.GetRewardExp(p1) --[[ Line: 146 ]]
+	return p1._rewardExp
 end
-function module_upvr.SetRewardExp(arg1, arg2) -- Line 149
-    arg1._rewardExp = arg2
+function t.SetRewardExp(p1, p2) --[[ Line: 149 ]]
+	p1._rewardExp = p2
 end
-function module_upvr.GetLastStateUpdate(arg1) -- Line 152
-    return arg1._lastStateUpdateValue.Value
+function t.GetLastStateUpdate(p1) --[[ Line: 152 ]]
+	return p1._lastStateUpdateValue.Value
 end
-function module_upvr.Destroy(arg1) -- Line 155
-    local var20
-    if arg1._maid == nil then
-        var20 = false
-    else
-        var20 = true
-    end
-    assert(var20)
-    arg1._maid:Destroy()
-    arg1._maid = nil
-    var20 = arg1
-    setmetatable(var20, nil)
+function t.Destroy(p1) --[[ Line: 155 ]]
+	assert(p1._maid ~= nil)
+	p1._maid:Destroy()
+	p1._maid = nil
+	setmetatable(p1, nil)
 end
-return module_upvr
+return t

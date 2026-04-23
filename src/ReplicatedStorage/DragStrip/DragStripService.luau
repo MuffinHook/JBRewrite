@@ -1,4 +1,3 @@
 return {
-    init = function() -- Line 2, Named "init"
-    end;
+	init = function() --[[ Name: init | Line: 2 ]] end
 }

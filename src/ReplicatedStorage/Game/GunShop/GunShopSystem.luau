@@ -1,60 +1,54 @@
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local RunService = game:GetService("RunService")
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GunShopConsts_upvr = require(script.Parent.GunShopConsts)
-local module_upvr = {
-    onAnyOwned = require(ReplicatedStorage.Std.Signal).new();
-    itemsValue = nil;
+local Signal = require(ReplicatedStorage.Std.Signal)
+local Region = require(ReplicatedStorage.Std.Region)
+local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local GunShopConsts = require(script.Parent.GunShopConsts)
+local t = {
+	onAnyOwned = Signal.new(),
+	itemsValue = nil
 }
-local waitForChild_upvr = require(ReplicatedStorage.Std.waitForChild)
-local Region_upvr = require(ReplicatedStorage.Std.Region)
-local RegionUtils_upvr = require(ReplicatedStorage.Std.Region.RegionUtils)
-local CollectionService_upvr = game:GetService("CollectionService")
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.init() -- Line 23
-    waitForChild_upvr(LocalPlayer_upvr, GunShopConsts_upvr.ITEMS_VALUE_NAME):andThen(function(arg1) -- Line 25
-        module_upvr.itemsValue = arg1
-        arg1.ChildAdded:Connect(function(arg1_2) -- Line 28
-            module_upvr.onAnyOwned:Fire(arg1_2.Name)
-        end)
-    end):catch(warn)
-    local GunShopUI_upvr = require(script.Parent.GunShopUI)
-    local any_new_result1_upvr = Region_upvr.new(RegionUtils_upvr.ConditionPlayer)
-    any_new_result1_upvr.OnObjAdded:Connect(function() -- Line 37
-        if not GunShopUI_upvr.isOpen() then
-            GunShopUI_upvr.open()
-        end
-    end)
-    any_new_result1_upvr.OnObjRemoved:Connect(function() -- Line 42
-        if GunShopUI_upvr.isOpen() then
-            GunShopUI_upvr.close()
-        end
-    end)
-    local function updatePrisms() -- Line 49
-        any_new_result1_upvr.Prisms = {}
-        for _, v in ipairs(CollectionService_upvr:GetTagged("GunShopRegion")) do
-            any_new_result1_upvr:AddPart(v)
-        end
-    end
-    updatePrisms()
-    CollectionService_upvr:GetInstanceAddedSignal("GunShopRegion"):Connect(updatePrisms)
-    CollectionService_upvr:GetInstanceRemovedSignal("GunShopRegion"):Connect(updatePrisms)
-    local tick_result1_upvw = tick()
-    RunService_upvr.Heartbeat:Connect(function() -- Line 62
-        local tick_result1 = tick()
-        if tick_result1 - tick_result1_upvw < 0.5 then
-        else
-            tick_result1_upvw = tick_result1
-            any_new_result1_upvr:Update({LocalPlayer_upvr}, true)
-        end
-    end)
+function t.init() --[[ Line: 23 | Upvalues: waitForChild (copy), LocalPlayer (copy), GunShopConsts (copy), t (copy), Region (copy), RegionUtils (copy), CollectionService (copy), RunService (copy) ]]
+	waitForChild(LocalPlayer, GunShopConsts.ITEMS_VALUE_NAME):andThen(function(p1) --[[ Line: 25 | Upvalues: t (ref) ]]
+		t.itemsValue = p1
+		p1.ChildAdded:Connect(function(p1) --[[ Line: 28 | Upvalues: t (ref) ]]
+			t.onAnyOwned:Fire(p1.Name)
+		end)
+	end):catch(warn)
+	local GunShopUI = require(script.Parent.GunShopUI)
+	local v1 = Region.new(RegionUtils.ConditionPlayer)
+	v1.OnObjAdded:Connect(function() --[[ Line: 37 | Upvalues: GunShopUI (copy) ]]
+		if not GunShopUI.isOpen() then
+			GunShopUI.open()
+		end
+	end)
+	v1.OnObjRemoved:Connect(function() --[[ Line: 42 | Upvalues: GunShopUI (copy) ]]
+		if GunShopUI.isOpen() then
+			GunShopUI.close()
+		end
+	end)
+	local function updatePrisms() --[[ Line: 49 | Upvalues: v1 (copy), CollectionService (ref) ]]
+		v1.Prisms = {}
+		for i, v in ipairs(CollectionService:GetTagged("GunShopRegion")) do
+			v1:AddPart(v)
+		end
+	end
+	updatePrisms()
+	CollectionService:GetInstanceAddedSignal("GunShopRegion"):Connect(updatePrisms)
+	CollectionService:GetInstanceRemovedSignal("GunShopRegion"):Connect(updatePrisms)
+	local v2 = tick()
+	RunService.Heartbeat:Connect(function() --[[ Line: 62 | Upvalues: v2 (ref), v1 (copy), LocalPlayer (ref) ]]
+		local v12 = tick()
+		if not (v12 - v2 < 0.5) then
+			v2 = v12
+			v1:Update({ LocalPlayer }, true)
+		end
+	end)
 end
-function module_upvr.doesPlayerOwn(arg1) -- Line 71
-    local var25
-    if LocalPlayer_upvr:WaitForChild(GunShopConsts_upvr.ITEMS_VALUE_NAME):FindFirstChild(arg1) == nil then
-        var25 = false
-    else
-        var25 = true
-    end
-    return var25
+function t.doesPlayerOwn(p1) --[[ Line: 71 | Upvalues: LocalPlayer (copy), GunShopConsts (copy) ]]
+	return LocalPlayer:WaitForChild(GunShopConsts.ITEMS_VALUE_NAME):FindFirstChild(p1) ~= nil
 end
-return module_upvr
+return t

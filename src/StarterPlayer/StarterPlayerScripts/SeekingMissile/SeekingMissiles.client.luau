@@ -1,1 +1,2 @@
-require(game:GetService("ReplicatedStorage").SeekingMissile.SeekingMissileBinder):Start()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.SeekingMissile.SeekingMissileBinder):Start()

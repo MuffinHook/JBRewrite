@@ -1,60 +1,63 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local module_upvr = {}
-local var3_upvw
-local ItemSystem_upvr = require(ReplicatedStorage_upvr.Game.ItemSystem.ItemSystem)
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local InventoryItemUtils_upvr = require(ReplicatedStorage_upvr.Inventory.InventoryItemUtils)
-function module_upvr.Init(arg1) -- Line 10
-    var3_upvw = require(ReplicatedStorage_upvr.Game.ItemSkin.UI.UI)
-    arg1.em.qrdwl12x = function(arg1_2) -- Line 15, Named "qrdwl12x"
-        assert(arg1_2)
-        module_upvr.ItemSkinsOwned = arg1_2
-        var3_upvw.UpdateOwned()
-    end
-    var3_upvw.OnSkinClick:Connect(function(arg1_3) -- Line 24
-        local any_GetLocalEquipped_result1_3 = ItemSystem_upvr.GetLocalEquipped()
-        if any_GetLocalEquipped_result1_3 == nil then
-            error("Player has no item equipped.")
-        end
-        if any_GetLocalEquipped_result1_3.ApplySkin == nil then
-            error(string.format("Item %s does not suppory skins.", any_GetLocalEquipped_result1_3.__ClassName))
-        end
-        if module_upvr.DoesPlayerOwn(arg1_3.Name) then
-            any_GetLocalEquipped_result1_3:ApplySkin(arg1_3.Name)
-        else
-            any_GetLocalEquipped_result1_3:ApplySkinLocal(arg1_3.Name)
-        end
-        Audio_upvr.ObjectLocal(any_GetLocalEquipped_result1_3.Model.Skeleton.BoundingBox, 4761679152)
-    end)
-    local Event_upvr = arg1.Event
-    var3_upvw.OnSkinBuyClick:Connect(function(arg1_4) -- Line 40
-        local any_GetLocalEquipped_result1 = ItemSystem_upvr.GetLocalEquipped()
-        if any_GetLocalEquipped_result1 == nil then
-            error("Player has no item equipped.")
-        end
-        if any_GetLocalEquipped_result1.ApplySkin == nil then
-            error(string.format("Item %s does not suppory skins.", any_GetLocalEquipped_result1.__ClassName))
-        end
-        Event_upvr:FireServer("m4dwvvqf", any_GetLocalEquipped_result1.inventoryItemValue, arg1_4.Name)
-        Audio_upvr.ObjectLocal(any_GetLocalEquipped_result1.Model.Skeleton.BoundingBox, 4761679547)
-    end)
-    var3_upvw.OnClosed:Connect(function() -- Line 51
-        local any_GetLocalEquipped_result1_2 = ItemSystem_upvr.GetLocalEquipped()
-        if any_GetLocalEquipped_result1_2 ~= nil then
-            if any_GetLocalEquipped_result1_2.ApplySkin == nil then
-                error(string.format("Item %s does not suppory skins.", any_GetLocalEquipped_result1_2.__ClassName))
-            end
-            any_GetLocalEquipped_result1_2:ApplySkinLocal(InventoryItemUtils_upvr.getAttr(any_GetLocalEquipped_result1_2.inventoryItemValue, "SkinName"))
-        end
-    end)
+game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.Std.Audio)
+require(ReplicatedStorage.Inventory.InventoryItemSystem)
+local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
+local ItemSystem = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
+local v1 = nil
+local t = {}
+function t.Init(p1) --[[ Line: 10 | Upvalues: v1 (ref), ReplicatedStorage (copy), t (copy), ItemSystem (copy), Audio (copy), InventoryItemUtils (copy) ]]
+	local v12 = p1.Event
+	v1 = require(ReplicatedStorage.Game.ItemSkin.UI.UI)
+	function p1.em.efbs1qej(p1) --[[ Line: 15 | Upvalues: t (ref), v1 (ref) ]]
+		assert(p1)
+		t.ItemSkinsOwned = p1
+		v1.UpdateOwned()
+	end
+	v1.OnSkinClick:Connect(function(p1) --[[ Line: 24 | Upvalues: ItemSystem (ref), t (ref), Audio (ref) ]]
+		local v1 = ItemSystem.GetLocalEquipped()
+		if v1 == nil then
+			error("Player has no item equipped.")
+		end
+		if v1.ApplySkin == nil then
+			error(("Item %s does not suppory skins."):format(v1.__ClassName))
+		end
+		if t.DoesPlayerOwn(p1.Name) then
+			v1:ApplySkin(p1.Name)
+		else
+			v1:ApplySkinLocal(p1.Name)
+		end
+		Audio.ObjectLocal(v1.Model.Skeleton.BoundingBox, 4761679152)
+	end)
+	v1.OnSkinBuyClick:Connect(function(p1) --[[ Line: 40 | Upvalues: ItemSystem (ref), v12 (copy), Audio (ref) ]]
+		local v1 = ItemSystem.GetLocalEquipped()
+		if v1 == nil then
+			error("Player has no item equipped.")
+		end
+		if v1.ApplySkin == nil then
+			error(("Item %s does not suppory skins."):format(v1.__ClassName))
+		end
+		v12:FireServer("o" .. ("jfjtfr"):sub(2, 3):reverse() .. "" .. "" .. ("t1n6l5n"):sub(3, 4):reverse() .. "" .. "" .. ("bgszyfh"):sub(3, 3):reverse():reverse():reverse() .. "2g", v1.inventoryItemValue, p1.Name)
+		Audio.ObjectLocal(v1.Model.Skeleton.BoundingBox, 4761679547)
+	end)
+	v1.OnClosed:Connect(function() --[[ Line: 51 | Upvalues: ItemSystem (ref), InventoryItemUtils (ref) ]]
+		local v1 = ItemSystem.GetLocalEquipped()
+		if v1 ~= nil then
+			if v1.ApplySkin == nil then
+				error(("Item %s does not suppory skins."):format(v1.__ClassName))
+			end
+			v1:ApplySkinLocal((InventoryItemUtils.getAttr(v1.inventoryItemValue, "SkinName")))
+		end
+	end)
 end
-function module_upvr.DoesPlayerOwn(arg1) -- Line 62
-    if arg1 == "None" then
-        return true
-    end
-    if module_upvr.ItemSkinsOwned == nil then
-        error("Item skins have not been synced on client yet.")
-    end
-    return module_upvr.ItemSkinsOwned[arg1]
+function t.DoesPlayerOwn(p1) --[[ Line: 62 | Upvalues: t (copy) ]]
+	if p1 == "None" then
+		return true
+	else
+		if t.ItemSkinsOwned == nil then
+			error("Item skins have not been synced on client yet.")
+		end
+		return t.ItemSkinsOwned[p1]
+	end
 end
-return module_upvr
+return t

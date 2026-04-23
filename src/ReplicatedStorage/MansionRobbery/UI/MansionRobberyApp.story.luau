@@ -1,28 +1,28 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage_upvr.Roact)
-local RoactRodux_upvr = require(ReplicatedStorage_upvr.RoactRodux)
-return function(arg1) -- Line 5
-    local any_extend_result1 = Roact_upvr.Component:extend("App")
-    local mansionRobberyStore_upvr = require(ReplicatedStorage_upvr.MansionRobbery.mansionRobberyStore)
-    function any_extend_result1.init(arg1_2) -- Line 9
-        mansionRobberyStore_upvr:dispatch({
-            type = "setDialogueText";
-            text = "hello, world!";
-        })
-        local any_createBinding_result1, any_createBinding_result2 = Roact_upvr.createBinding(0.4)
-        arg1_2.pctClosed = any_createBinding_result1
-        arg1_2.updatePctClosed = any_createBinding_result2
-    end
-    local MansionRobberyApp_upvr = require(script.Parent.MansionRobberyApp)
-    function any_extend_result1.render(arg1_3) -- Line 16
-        return Roact_upvr.createElement(RoactRodux_upvr.StoreProvider, {
-            store = mansionRobberyStore_upvr;
-        }, {Roact_upvr.createElement(MansionRobberyApp_upvr, {
-            pctClosed = arg1_3.pctClosed;
-        })})
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(any_extend_result1), arg1)
-    return function() -- Line 27
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (copy), RoactRodux (copy) ]]
+	local v1 = Roact.Component:extend("App")
+	local MansionRobberyApp = require(script.Parent.MansionRobberyApp)
+	local mansionRobberyStore = require(ReplicatedStorage.MansionRobbery.mansionRobberyStore)
+	function v1.init(p1) --[[ Line: 9 | Upvalues: mansionRobberyStore (copy), Roact (ref) ]]
+		mansionRobberyStore:dispatch({
+			type = "setDialogueText",
+			text = "hello, world!"
+		})
+		local v1, v2 = Roact.createBinding(0.4)
+		p1.pctClosed = v1
+		p1.updatePctClosed = v2
+	end
+	function v1.render(p1) --[[ Line: 16 | Upvalues: Roact (ref), RoactRodux (ref), mansionRobberyStore (copy), MansionRobberyApp (copy) ]]
+		return Roact.createElement(RoactRodux.StoreProvider, {
+			store = mansionRobberyStore
+		}, { Roact.createElement(MansionRobberyApp, {
+				pctClosed = p1.pctClosed
+			}) })
+	end
+	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	return function() --[[ Line: 27 | Upvalues: Roact (ref), v2 (copy) ]]
+		Roact.unmount(v2)
+	end
 end

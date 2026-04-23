@@ -1,185 +1,139 @@
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-return function(arg1) -- Line 6
-    local Util_upvr = arg1.Util
-    local module_4_upvr = require(script:WaitForChild("Window"))
-    module_4_upvr.Cmdr = arg1
-    local var5_upvr = require(script:WaitForChild("AutoComplete"))(arg1)
-    module_4_upvr.AutoComplete = var5_upvr
-    function module_4_upvr.ProcessEntry(arg1_2) -- Line 16
-        local any_TrimString_result1 = Util_upvr.TrimString(arg1_2)
-        if #any_TrimString_result1 == 0 then
-        else
-            module_4_upvr:AddLine(module_4_upvr:GetLabel()..' '..any_TrimString_result1, Color3.fromRGB(255, 223, 93))
-            module_4_upvr:AddLine(arg1.Dispatcher:EvaluateAndRun(any_TrimString_result1, LocalPlayer_upvr, {
-                IsHuman = true;
-            }))
-        end
-    end
-    function module_4_upvr.OnTextChanged(arg1_3) -- Line 31
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        local any_Evaluate_result1 = arg1.Dispatcher:Evaluate(arg1_3, LocalPlayer_upvr, true)
-        local popped_2 = table.remove(Util_upvr.SplitString(arg1_3), 1)
-        local var94
-        if any_Evaluate_result1 then
-            var94 = Util_upvr.MashExcessArguments(var94, #any_Evaluate_result1.Object.Args)
-            if #var94 ~= #any_Evaluate_result1.Object.Args then
-                local _ = false
-                -- KONSTANTWARNING: Skipped task `defvar` above
-            else
-            end
-        end
-        if popped_2 then
-            if 0 >= #var94 then
-            else
-            end
-        end
-        local var96
-        if arg1_3:sub(#arg1_3, #arg1_3):match("%s") and not true then
-            var96 = true
-            var94[#var94 + 1] = ""
-        end
-        if any_Evaluate_result1 and var96 then
-            local any_Validate_result1_4, any_Validate_result2 = any_Evaluate_result1:Validate()
-            module_4_upvr:SetIsValidInput(any_Validate_result1_4, string.format("Validation errors: %s", any_Validate_result2 or ""))
-            local any_GetArgument_result1 = any_Evaluate_result1:GetArgument(#var94)
-            local var100
-            if any_GetArgument_result1 then
-                var100 = any_GetArgument_result1.RawSegmentsAreAutocomplete
-                if var100 then
-                    var100 = ipairs(any_GetArgument_result1.RawSegments)
-                    local ipairs_result1_2, ipairs_result2, ipairs_result3 = ipairs(any_GetArgument_result1.RawSegments)
-                    for i, v in ipairs_result1_2, ipairs_result2, ipairs_result3 do
-                        ({})[1] = v
-                        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                        ;({})[2] = v
-                        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                        ;({})[i] = {}
-                        local var105
-                    end
-                else
-                    ipairs_result1_2 = any_GetArgument_result1:GetAutocomplete()
-                    local any_GetAutocomplete_result1_2, any_GetAutocomplete_result2_2 = any_GetArgument_result1:GetAutocomplete()
-                    ipairs_result3 = any_GetAutocomplete_result2_2
-                    local var108 = ipairs_result3
-                    if not var108 then
-                        var108 = {}
-                    end
-                    i = any_GetAutocomplete_result1_2
-                    for i_2, v_2 in pairs(i) do
-                        var105[i_2] = {any_GetArgument_result1.TextSegmentInProgress, v_2}
-                        local var113
-                    end
-                end
-                any_GetAutocomplete_result1_2 = true
-                if 0 < #var113 then
-                    local any_Validate_result1_3, any_Validate_result2_2 = any_GetArgument_result1:Validate()
-                    any_GetAutocomplete_result1_2 = any_Validate_result1_3
-                end
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                if not true and any_GetAutocomplete_result1_2 then
-                    module_4_upvr:HideInvalidState()
-                end
-                local module = {}
-                i_2 = true
-                if i_2 then
-                    v_2 = #arg1_3 - #var113
-                    if arg1_3:sub(#arg1_3, #arg1_3):match("%s") then
-                    else
-                    end
-                    i_2 = v_2 + 0
-                end
-                module.at = i_2
-                if #any_GetArgument_result1.RawSegments ~= 1 or not any_GetArgument_result1.Prefix then
-                end
-                module.prefix = ""
-                if #any_Evaluate_result1.Arguments == #any_Evaluate_result1.ArgumentDefinitions then
-                    if 0 >= #var113 then
-                    else
-                    end
-                end
-                module.isLast = true
-                module.numArgs = #var94
-                module.command = any_Evaluate_result1
-                module.arg = any_GetArgument_result1
-                if any_GetArgument_result1.Required then
-                else
-                end
-                module.name = any_GetArgument_result1.Name..'?'
-                module.type = any_GetArgument_result1.Type.DisplayName
-                if any_GetAutocomplete_result1_2 ~= false or not any_Validate_result2_2 then
-                end
-                module.description = any_GetArgument_result1.Object.Description
-                module.invalid = not any_GetAutocomplete_result1_2
-                module.isPartial = var108.IsPartial or false
-                do
-                    return var5_upvr:Show(var105, module)
-                end
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-        elseif popped_2 then
-            local var117
-            if #var94 == 0 then
-                module_4_upvr:SetIsValidInput(true)
-                local any_GetCommand_result1_4 = arg1.Registry:GetCommand(popped_2)
-                var117 = nil
-                local var119
-                if any_GetCommand_result1_4 then
-                    var119 = {}
-                    var119[1] = any_GetCommand_result1_4.Name
-                    var119[2] = any_GetCommand_result1_4.Name
-                    local tbl_4 = {}
-                    any_GetAutocomplete_result1_2 = any_GetCommand_result1_4.Name
-                    tbl_4.name = any_GetAutocomplete_result1_2
-                    any_GetAutocomplete_result1_2 = any_GetCommand_result1_4.Description
-                    tbl_4.description = any_GetAutocomplete_result1_2
-                    var119.options = tbl_4
-                    var117 = var119
-                    var119 = any_GetCommand_result1_4.Args
-                    if var119 then
-                        var119 = any_GetCommand_result1_4.Args[1]
-                    end
-                    if type(var119) == "function" then
-                    end
-                    if var119(any_Evaluate_result1) then
-                        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                        if not var119(any_Evaluate_result1).Optional and var119(any_Evaluate_result1).Default == nil then
-                            any_GetAutocomplete_result1_2 = "This command has required arguments."
-                            module_4_upvr:SetIsValidInput(false, any_GetAutocomplete_result1_2)
-                            module_4_upvr:HideInvalidState()
-                            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                        end
-                        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                    end
-                else
-                    module_4_upvr:SetIsValidInput(false, string.format("%q is not a valid command name. Use the help command to see all available commands.", popped_2))
-                end
-                local module_5 = {var117}
-                for _, v_3 in pairs(arg1.Registry:GetCommandNames()) do
-                    if popped_2:lower() == v_3:lower():sub(1, #popped_2) and (var117 == nil or var117[1] ~= popped_2) then
-                        local any_GetCommand_result1_2 = arg1.Registry:GetCommand(v_3)
-                        module_5[#module_5 + 1] = {
-                            options = {
-                                name = any_GetCommand_result1_2.Name;
-                                description = any_GetCommand_result1_2.Description;
-                            };
-                            popped_2, v_3
-                        }
-                    end
-                end
-                return var5_upvr:Show(module_5)
-            end
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        module_4_upvr:SetIsValidInput(false, "Use the help command to see all available commands.")
-        var5_upvr:Hide()
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end
-    module_4_upvr:UpdateLabel()
-    module_4_upvr:UpdateWindowHeight()
-    return {
-        Window = module_4_upvr;
-        AutoComplete = var5_upvr;
-    }
+local LocalPlayer = game:GetService("Players").LocalPlayer
+return function(p1) --[[ Line: 6 | Upvalues: LocalPlayer (copy) ]]
+	local Util = p1.Util
+	local Window = require(script:WaitForChild("Window"))
+	Window.Cmdr = p1
+	local v1 = require(script:WaitForChild("AutoComplete"))(p1)
+	Window.AutoComplete = v1
+	function Window.ProcessEntry(p12) --[[ Line: 16 | Upvalues: Util (copy), Window (copy), p1 (copy), LocalPlayer (ref) ]]
+		local v1 = Util.TrimString(p12)
+		if #v1 ~= 0 then
+			Window:AddLine(Window:GetLabel() .. " " .. v1, Color3.fromRGB(255, 223, 93))
+			Window:AddLine(p1.Dispatcher:EvaluateAndRun(v1, LocalPlayer, {
+				IsHuman = true
+			}))
+		end
+	end
+	function Window.OnTextChanged(p12) --[[ Line: 31 | Upvalues: p1 (copy), LocalPlayer (ref), Util (copy), Window (copy), v1 (copy) ]]
+		local v12 = p1.Dispatcher:Evaluate(p12, LocalPlayer, true)
+		local v2 = Util.SplitString(p12)
+		local v3 = table.remove(v2, 1)
+		local v4
+		if v12 then
+			local v5 = Util.MashExcessArguments(v2, #v12.Object.Args)
+			if #v5 == #v12.Object.Args then
+				v2 = v5
+				v4 = true
+			else
+				v2 = v5
+				v4 = false
+			end
+		else
+			v4 = false
+		end
+		local v6
+		if p12:sub(#p12, #p12):match("%s") and not v4 then
+			v2[#v2 + 1] = ""
+			v6 = true
+		end
+		if v12 and v6 then
+			local v7, v8 = v12:Validate()
+			Window:SetIsValidInput(v7, ("Validation errors: %s"):format(v8 or ""))
+			local t = {}
+			local v9 = v12:GetArgument(#v2)
+			if v9 then
+				local TextSegmentInProgress = v9.TextSegmentInProgress
+				local v10 = false
+				if v9.RawSegmentsAreAutocomplete then
+					for i, v in ipairs(v9.RawSegments) do
+						t[i] = { v, v }
+					end
+				else
+					local v11, v122 = v9:GetAutocomplete()
+					v10 = (v122 or {}).IsPartial or false
+					for k, v in pairs(v11) do
+						t[k] = { TextSegmentInProgress, v }
+					end
+				end
+				local v14
+				if #TextSegmentInProgress > 0 then
+					local v15, v16 = v9:Validate()
+					v14 = v15
+					v8 = v16
+				else
+					v14 = true
+				end
+				if not v4 and v14 then
+					Window:HideInvalidState()
+				end
+				local t2 = {}
+				local v18, v19
+				if v4 then
+					v18, v19 = #p12 - #TextSegmentInProgress + if p12:sub(#p12, #p12):match("%s") then -1 else 0, t
+				else
+					v18 = v4
+					v19 = t
+				end
+				t2.at = v18
+				t2.prefix = #v9.RawSegments == 1 and v9.Prefix or ""
+				t2.isLast = if #v12.Arguments == #v12.ArgumentDefinitions then #TextSegmentInProgress > 0 else false
+				t2.numArgs = #v2
+				t2.command = v12
+				t2.arg = v9
+				t2.name = v9.Name .. if v9.Required then "" else "?"
+				t2.type = v9.Type.DisplayName
+				t2.description = if v14 == false and v8 then v8 else v9.Object.Description
+				t2.invalid = not v14
+				t2.isPartial = v10
+				return v1:Show(v19, t2)
+			end
+		elseif v3 and #v2 == 0 then
+			Window:SetIsValidInput(true)
+			local v27 = p1.Registry:GetCommand(v3)
+			local v28 = nil
+			if v27 then
+				local v29 = v27.Args and v27.Args[1]
+				if type(v29) == "function" then
+					v29 = v29(v12)
+				end
+				if v29 and (not v29.Optional and v29.Default == nil) then
+					Window:SetIsValidInput(false, "This command has required arguments.")
+					Window:HideInvalidState()
+				end
+				v28 = {
+					v27.Name,
+					v27.Name,
+					options = {
+						name = v27.Name,
+						description = v27.Description
+					}
+				}
+			else
+				Window:SetIsValidInput(false, ("%q is not a valid command name. Use the help command to see all available commands."):format(v3))
+			end
+			local t = { v28 }
+			for k, v in pairs(p1.Registry:GetCommandNames()) do
+				if v3:lower() == v:lower():sub(1, #v3) and (v28 == nil or v28[1] ~= v3) then
+					local v31 = p1.Registry:GetCommand(v)
+					t[#t + 1] = {
+						v3,
+						v,
+						options = {
+							name = v31.Name,
+							description = v31.Description
+						}
+					}
+				end
+			end
+			return v1:Show(t)
+		end
+		Window:SetIsValidInput(false, "Use the help command to see all available commands.")
+		v1:Hide()
+	end
+	Window:UpdateLabel()
+	Window:UpdateWindowHeight()
+	return {
+		Window = Window,
+		AutoComplete = v1
+	}
 end

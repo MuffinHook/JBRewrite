@@ -1,53 +1,48 @@
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BaseObject_upvr = require(ReplicatedStorage.Std.BaseObject)
-local SpinnerConsts_upvr = require(script.Parent.SpinnerConsts)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-function module_upvr.new(arg1, arg2) -- Line 13
-    local any_new_result1_upvr = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1_upvr, module_upvr)
-    any_new_result1_upvr.manifest = arg2
-    any_new_result1_upvr._pos = 0
-    any_new_result1_upvr._vel = 0
-    any_new_result1_upvr:_updateSpinning()
-    any_new_result1_upvr.maid:GiveTask(arg1:GetAttributeChangedSignal(SpinnerConsts_upvr.ENABLED_ATTR_NAME):Connect(function() -- Line 21
-        any_new_result1_upvr:_updateSpinning()
-    end))
-    any_new_result1_upvr._fadeOut = false
-    return any_new_result1_upvr
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local DoorConsts = require(ReplicatedStorage.Door2.DoorConsts)
+local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
+local SpinnerConsts = require(script.Parent.SpinnerConsts)
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1, p2) --[[ Line: 13 | Upvalues: BaseObject (copy), t (copy), SpinnerConsts (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t)
+	v1.manifest = p2
+	v1._pos = 0
+	v1._vel = 0
+	v1:_updateSpinning()
+	v1.maid:GiveTask(p1:GetAttributeChangedSignal(SpinnerConsts.ENABLED_ATTR_NAME):Connect(function() --[[ Line: 21 | Upvalues: v1 (copy) ]]
+		v1:_updateSpinning()
+	end))
+	v1._fadeOut = false
+	return v1
 end
-local RunService_upvr = game:GetService("RunService")
-function module_upvr._updateSpinning(arg1) -- Line 28
-    local var8
-    if arg1.obj:GetAttribute(SpinnerConsts_upvr.ENABLED_ATTR_NAME) ~= true then
-        var8 = false
-    else
-        var8 = true
-    end
-    if var8 then
-        arg1._fadeOut = false
-        local var10_upvr = arg1.obj:GetAttribute(SpinnerConsts_upvr.ACCEL_ATTR_NAME) or 1
-        local var11_upvr = arg1.obj:GetAttribute(SpinnerConsts_upvr.DRAG_PCT_ATTR_NAME) or 0.05
-        arg1.maid.spinning = RunService_upvr.Heartbeat:Connect(function(arg1_2) -- Line 36
-            if not arg1._fadeOut then
-                local var12 = arg1
-                var12._vel += var10_upvr * 1 * arg1_2
-            end
-            local var13 = arg1
-            var13._vel *= 1 - var11_upvr
-            local var14 = arg1
-            var14._pos += arg1._vel * arg1_2
-            arg1.manifest.innerModel:PivotTo(arg1.obj:GetPivot() * CFrame.Angles(0, arg1._pos, 0))
-            if arg1._fadeOut and math.abs(arg1._vel) < 0.1 then
-                arg1.maid.spinning = nil
-            end
-        end)
-    else
-        var10_upvr = true
-        arg1._fadeOut = var10_upvr
-    end
+function t._updateSpinning(p1) --[[ Line: 28 | Upvalues: SpinnerConsts (copy), RunService (copy) ]]
+	if p1.obj:GetAttribute(SpinnerConsts.ENABLED_ATTR_NAME) == true then
+		local v2 = p1.obj:GetAttribute(SpinnerConsts.ACCEL_ATTR_NAME) or 1
+		local v3 = p1.obj:GetAttribute(SpinnerConsts.DRAG_PCT_ATTR_NAME) or 0.05
+		p1._fadeOut = false
+		p1.maid.spinning = RunService.Heartbeat:Connect(function(p12) --[[ Line: 36 | Upvalues: p1 (copy), v2 (copy), v3 (copy) ]]
+			if not p1._fadeOut then
+				local v1 = p1
+				v1._vel = v1._vel + v2 * 1 * p12
+			end
+			local v22 = p1
+			v22._vel = v22._vel * (1 - v3)
+			local v32 = p1
+			v32._pos = v32._pos + p1._vel * p12
+			p1.manifest.innerModel:PivotTo(p1.obj:GetPivot() * CFrame.Angles(0, p1._pos, 0))
+			if p1._fadeOut and math.abs(p1._vel) < 0.1 then
+				p1.maid.spinning = nil
+			end
+		end)
+	else
+		p1._fadeOut = true
+	end
 end
-return require(ReplicatedStorage.ManifestBinder).new(SpinnerConsts_upvr.TAG_NAME, {
-    innerModel = require(ReplicatedStorage.Door2.DoorConsts).INNER_MODEL_NAME;
-}, module_upvr)
+return ManifestBinder.new(SpinnerConsts.TAG_NAME, {
+	innerModel = DoorConsts.INNER_MODEL_NAME
+}, t)

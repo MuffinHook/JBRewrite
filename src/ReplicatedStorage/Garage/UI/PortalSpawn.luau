@@ -1,177 +1,125 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact.PureComponent:extend("PortalSpawn")
-local Players_upvr = game:GetService("Players")
-local GarageConsts_upvr = require(script.Parent.Parent.GarageConsts)
-local GamepassUtils_upvr = require(ReplicatedStorage.Gamepass.GamepassUtils)
-local createElement_upvr = Roact.createElement
-local PortalBase_upvr = require(script.Parent.PortalBase)
-function any_extend_result1.render(arg1) -- Line 12
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local tbl_5 = {}
-    local tbl_6 = {}
-    for i, v in ipairs(arg1.props.receipt) do
-        tbl_6[v.name] = true
-    end
-    local Vehicles_4 = arg1.props.owned.Vehicles
-    if Vehicles_4 then
-        i = Vehicles_4
-        for i_2, v_2 in pairs(i) do
-            if v_2 == true then
-                ({})[i_2] = true
-            end
-        end
-    end
-    local Vehicles_3 = arg1.props.favorited.Vehicles
-    if Vehicles_3 then
-        for i_3, v_3 in pairs(Vehicles_3) do
-            if v_3 == true then
-                ({})[i_3] = true
-            end
-        end
-    end
-    for i_4 = 1, #arg1.props.items do
-        local var160_upvr = arg1.props.items[i_4]
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        local var161 = ({})[var160_upvr.name] or false
-        local var162
-        if not var161 then
-            var162 = var160_upvr.price
-            if not not var162 then
-                var162 = var160_upvr.price
-                if var162 ~= 0 then
-                else
-                end
-            end
-        end
-        var162 = arg1.props
-        var162 = var162.premium
-        if not var162 then
-            var162 = arg1.props
-            var162 = var162.inPhysical
-            if not var162 then
-                var162 = var160_upvr.lite
-                if not var162 then
-                    var162 = Players_upvr
-                    var162 = var162.LocalPlayer
-                    if var162 then
-                        if Players_upvr.LocalPlayer:GetAttribute(GarageConsts_upvr.AERIAL_SPAWN_ATTR_NAME) ~= true then
-                            var162 = false
-                        else
-                            var162 = true
-                        end
-                    end
-                end
-            end
-        end
-        if not var162 then
-            if arg1.props.gamepassOwned[GamepassUtils_upvr.EnumGamepass.BOSS] then
-                if var160_upvr.name ~= "Wraith" then
-                else
-                end
-            end
-        end
-        var162 = true
-        if not var162 then
-            if arg1.props.gamepassOwned[GamepassUtils_upvr.EnumGamepass.SWAT] then
-                if var160_upvr.name ~= "SWATVan" then
-                else
-                end
-            end
-        end
-        var162 = true
-        local tbl_9_upvr = {
-            selected = tbl_6[var160_upvr.name];
-            owned = var161;
-        }
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        tbl_9_upvr.faved = ({})[var160_upvr.name] or false
-        local var164 = var161
-        if not var164 then
-            var164 = true
-            if var164 then
-                var164 = var160_upvr.available
-            end
-        end
-        tbl_9_upvr.masked = not var164
-        tbl_9_upvr.locked = not var162
-        function tbl_9_upvr.onSelect() -- Line 61
-            if not tbl_9_upvr.masked then
-                arg1.props.onClickSpawnVehicle(var160_upvr)
-            else
-                arg1.props.onAttemptPurchaseVehicle(var160_upvr, tbl_9_upvr)
-            end
-        end
-        function tbl_9_upvr.onFavorite(arg1_5) -- Line 68
-            if arg1.props.attemptFavoriteItem then
-                arg1.props.attemptFavoriteItem("Vehicles", var160_upvr.name, arg1_5)
-            end
-            arg1.props.onFavoriteItem("Vehicles", var160_upvr.name, arg1_5)
-        end
-        tbl_5[i_4] = tbl_9_upvr
-    end
-    local module_3 = {}
-    var160_upvr = "SPAWN"
-    module_3.title = var160_upvr
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.items
-    module_3.items = var160_upvr
-    module_3.metadata = tbl_5
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.sortId
-    module_3.sortId = var160_upvr
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.cornerPixel
-    module_3.cornerPixel = var160_upvr
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.portalRatio
-    module_3.portalRatio = var160_upvr
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.paddingRatio
-    module_3.paddingRatio = var160_upvr
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.onSelectSort
-    module_3.onSelectSort = var160_upvr
-    var160_upvr = true
-    module_3.sortEnabled = var160_upvr
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.showFavorited
-    module_3.showFavorited = var160_upvr
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.onToggleFavorited
-    module_3.onToggleFavorited = var160_upvr
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.showAll
-    module_3.showAll = var160_upvr
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.onToggleAll
-    module_3.onToggleAll = var160_upvr
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.colsPerRow
-    module_3.colsPerRow = var160_upvr
-    var160_upvr = arg1.props
-    var160_upvr = var160_upvr.rowsPerPage
-    module_3.rowsPerPage = var160_upvr
-    return createElement_upvr(PortalBase_upvr, module_3)
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+local createElement = Roact.createElement
+local PortalBase = require(script.Parent.PortalBase)
+local GarageConsts = require(script.Parent.Parent.GarageConsts)
+local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
+local v1 = Roact.PureComponent:extend("PortalSpawn")
+function v1.render(p1) --[[ Line: 12 | Upvalues: Players (copy), GarageConsts (copy), GamepassUtils (copy), createElement (copy), PortalBase (copy) ]]
+	local t = {}
+	local t2 = {}
+	for i, v in ipairs(p1.props.receipt) do
+		t[v.name] = true
+	end
+	local t3 = {}
+	local Vehicles = p1.props.owned.Vehicles
+	if Vehicles then
+		for k, v in pairs(Vehicles) do
+			if v == true then
+				t3[k] = true
+			end
+		end
+	end
+	local t4 = {}
+	local Vehicles_2 = p1.props.favorited.Vehicles
+	if Vehicles_2 then
+		for k, v in pairs(Vehicles_2) do
+			if v == true then
+				t4[k] = true
+			end
+		end
+	end
+	for i = 1, #p1.props.items do
+		local v1, v2
+		local v3 = p1.props.items[i]
+		local v4 = t3[v3.name] or false
+		v1 = v4 or (not v3.price or v3.price == 0)
+		local premium = p1.props.premium
+		if not premium then
+			premium = p1.props.inPhysical
+			if not premium then
+				premium = v3.lite
+				if not premium then
+					premium = Players.LocalPlayer
+					if premium then
+						premium = Players.LocalPlayer:GetAttribute(GarageConsts.AERIAL_SPAWN_ATTR_NAME) == true
+					end
+				end
+			end
+		end
+		local v5 = premium
+		if not v5 then
+			v5 = p1.props.gamepassOwned[GamepassUtils.EnumGamepass.BOSS]
+			if v5 then
+				v5 = v3.name == "Wraith"
+			end
+		end
+		if not v5 then
+			v5 = p1.props.gamepassOwned[GamepassUtils.EnumGamepass.SWAT]
+			if v5 then
+				v5 = v3.name == "SWATVan"
+			end
+		end
+		local t5 = {
+			selected = t[v3.name],
+			owned = v4,
+			faved = t4[v3.name] or false
+		}
+		v2 = v4 or v1 and v3.available
+		t5.masked = not v2
+		t5.locked = not v5
+		function t5.onSelect() --[[ Line: 61 | Upvalues: t5 (copy), p1 (copy), v3 (copy) ]]
+			if t5.masked then
+				p1.props.onAttemptPurchaseVehicle(v3, t5)
+			else
+				p1.props.onClickSpawnVehicle(v3)
+			end
+		end
+		function t5.onFavorite(p12) --[[ Line: 68 | Upvalues: p1 (copy), v3 (copy) ]]
+			if p1.props.attemptFavoriteItem then
+				p1.props.attemptFavoriteItem("Vehicles", v3.name, p12)
+			end
+			p1.props.onFavoriteItem("Vehicles", v3.name, p12)
+		end
+		t2[i] = t5
+	end
+	return createElement(PortalBase, {
+		title = "SPAWN",
+		items = p1.props.items,
+		metadata = t2,
+		sortId = p1.props.sortId,
+		cornerPixel = p1.props.cornerPixel,
+		portalRatio = p1.props.portalRatio,
+		paddingRatio = p1.props.paddingRatio,
+		onSelectSort = p1.props.onSelectSort,
+		sortEnabled = true,
+		showFavorited = p1.props.showFavorited,
+		onToggleFavorited = p1.props.onToggleFavorited,
+		showAll = p1.props.showAll,
+		onToggleAll = p1.props.onToggleAll,
+		colsPerRow = p1.props.colsPerRow,
+		rowsPerPage = p1.props.rowsPerPage
+	})
 end
-return require(ReplicatedStorage.RoactRodux).connect(function(arg1, arg2) -- Line 96
-    return {
-        receipt = arg1.garageReceipt;
-        inPhysical = arg1.garageInPhysical;
-        favorited = arg1.garageFavorited;
-        gamepassOwned = arg1.gamepassOwned;
-        premium = arg1.garagePremium;
-    }
-end, function(arg1) -- Line 105
-    return {
-        onFavoriteItem = function(arg1_6, arg2, arg3) -- Line 107, Named "onFavoriteItem"
-            local tbl_7 = {
-                type = "setCategoryItemFavorited";
-            }
-            tbl_7.category = arg1_6
-            tbl_7.name = arg2
-            tbl_7.favorited = arg3
-            arg1(tbl_7)
-        end;
-    }
-end)(any_extend_result1)
+return RoactRodux.connect(function(p1, p2) --[[ Line: 96 ]]
+	return {
+		receipt = p1.garageReceipt,
+		inPhysical = p1.garageInPhysical,
+		favorited = p1.garageFavorited,
+		gamepassOwned = p1.gamepassOwned,
+		premium = p1.garagePremium
+	}
+end, function(p1) --[[ Line: 105 ]]
+	return {
+		onFavoriteItem = function(p12, p2, p3) --[[ Name: onFavoriteItem | Line: 107 | Upvalues: p1 (copy) ]]
+			p1({
+				type = "setCategoryItemFavorited",
+				category = p12,
+				name = p2,
+				favorited = p3
+			})
+		end
+	}
+end)(v1)

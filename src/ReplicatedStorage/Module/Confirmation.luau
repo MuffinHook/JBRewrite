@@ -1,109 +1,106 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local EzUtils_upvr = require(ReplicatedStorage_upvr.EzUi.EzUtils)
-local var3_upvw = false
-local tbl_upvr = {}
-local function _() -- Line 16, Named "ProcessQueue"
-    if 0 < #tbl_upvr then
-        var3_upvw = true
-        table.remove(tbl_upvr, 1):Hook()
-    else
-        var3_upvw = false
-    end
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
+local GameUtil = require(ReplicatedStorage.Game.GameUtil)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local Localization = require(ReplicatedStorage.Module.Localization)
+local v1 = false
+local t = {}
+local function ProcessQueue() --[[ Line: 16 | Upvalues: t (copy), v1 (ref) ]]
+	if #t > 0 then
+		v1 = true
+		table.remove(t, 1):Hook()
+	else
+		v1 = false
+	end
 end
-local function _(arg1) -- Line 26, Named "SelectIfGamepad"
-    EzUtils_upvr.selectIfGamepad(arg1)
+local function SelectIfGamepad(p1) --[[ Line: 26 | Upvalues: EzUtils (copy) ]]
+	EzUtils.selectIfGamepad(p1)
 end
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local Localization_upvr = require(ReplicatedStorage_upvr.Module.Localization)
-local GameUtil_upvr = require(ReplicatedStorage_upvr.Game.GameUtil)
-local Settings_upvr = require(ReplicatedStorage_upvr.Resource.Settings)
-function module_upvr.Init(arg1) -- Line 32
-    local ConfirmationGui = ReplicatedStorage_upvr.StarterGui:FindFirstChild("ConfirmationGui")
-    ConfirmationGui.Parent = LocalPlayer_upvr.PlayerGui
-    module_upvr.Gui = ConfirmationGui
-    ConfirmationGui.Confirmation.Background.ContainerButtons.ContainerYes.Button.Message.Text = Localization_upvr:FormatByKey("General.Yes")
-    ConfirmationGui.Confirmation.Background.ContainerButtons.ContainerNo.Button.Message.Text = Localization_upvr:FormatByKey("General.No")
-    arg1.em.pbvjmani = function(arg1_2, arg2) -- Line 43, Named "pbvjmani"
-        local any_new_result1_upvw = module_upvr.new(arg1_2, arg2)
-        any_new_result1_upvw.OnYes:Connect(function() -- Line 46
-            any_new_result1_upvw = nil
-        end)
-        any_new_result1_upvw.OnNo:Connect(function() -- Line 49
-            any_new_result1_upvw = nil
-        end)
-    end
-    GameUtil_upvr.OnTeamChanged:Connect(function(arg1_3) -- Line 54
-        module_upvr.SetColor(Settings_upvr.TeamColor[arg1_3])
-    end)
-    module_upvr.SetColor(Settings_upvr.TeamColor[GameUtil_upvr.Team])
+local t2 = {}
+t2.__index = t2
+function t2.Init(p1) --[[ Line: 32 | Upvalues: ReplicatedStorage (copy), LocalPlayer (copy), t2 (copy), Localization (copy), GameUtil (copy), Settings (copy) ]]
+	local ConfirmationGui = ReplicatedStorage.StarterGui:FindFirstChild("ConfirmationGui")
+	ConfirmationGui.Parent = LocalPlayer.PlayerGui
+	t2.Gui = ConfirmationGui
+	ConfirmationGui.Confirmation.Background.ContainerButtons.ContainerYes.Button.Message.Text = Localization:FormatByKey("General.Yes")
+	ConfirmationGui.Confirmation.Background.ContainerButtons.ContainerNo.Button.Message.Text = Localization:FormatByKey("General.No")
+	function p1.em.p4rz6ffg(p1, p2) --[[ Line: 43 | Upvalues: t2 (ref) ]]
+		local v1 = t2.new(p1, p2)
+		v1.OnYes:Connect(function() --[[ Line: 46 | Upvalues: v1 (ref) ]]
+			v1 = nil
+		end)
+		v1.OnNo:Connect(function() --[[ Line: 49 | Upvalues: v1 (ref) ]]
+			v1 = nil
+		end)
+	end
+	GameUtil.OnTeamChanged:Connect(function(p1) --[[ Line: 54 | Upvalues: Settings (ref), t2 (ref) ]]
+		t2.SetColor(Settings.TeamColor[p1])
+	end)
+	t2.SetColor(Settings.TeamColor[GameUtil.Team])
 end
-function module_upvr.SetColor(arg1) -- Line 61
-    local Gui = module_upvr.Gui
-    Gui.Confirmation.Background.ImageColor3 = arg1
-    Gui.Confirmation.Background.ContainerButtons.ContainerYes.Button.ImageColor3 = arg1
-    Gui.Confirmation.Background.ContainerButtons.ContainerNo.Button.ImageColor3 = arg1
+function t2.SetColor(p1) --[[ Line: 61 | Upvalues: t2 (copy) ]]
+	local Gui = t2.Gui
+	Gui.Confirmation.Background.ImageColor3 = p1
+	Gui.Confirmation.Background.ContainerButtons.ContainerYes.Button.ImageColor3 = p1
+	Gui.Confirmation.Background.ContainerButtons.ContainerNo.Button.ImageColor3 = p1
 end
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local Signal_upvr = require(ReplicatedStorage_upvr.Std.Signal)
-function module_upvr.new(arg1, arg2) -- Line 69
-    local module = {}
-    setmetatable(module, module_upvr)
-    local var19 = false
-    if arg2 ~= nil then
-        var19 = arg2.SingleChoice
-    end
-    module.OptionSingleChoice = var19
-    module.Maid = Maid_upvr.new()
-    module.OnYes = Signal_upvr.new()
-    module.Maid:GiveTask(module.OnYes)
-    if not module.OptionSingleChoice then
-        module.OnNo = Signal_upvr.new()
-        module.Maid:GiveTask(module.OnNo)
-    end
-    module.Text = arg1
-    table.insert(tbl_upvr, module)
-    if var3_upvw == false then
-        if 0 < #tbl_upvr then
-            var3_upvw = true
-            table.remove(tbl_upvr, 1):Hook()
-            return module
-        end
-        var3_upvw = false
-    end
-    return module
+function t2.new(p1, p2) --[[ Line: 69 | Upvalues: t2 (copy), Maid (copy), Signal (copy), t (copy), v1 (ref) ]]
+	local t3 = {}
+	setmetatable(t3, t2)
+	t3.OptionSingleChoice = if p2 == nil then false else p2.SingleChoice
+	t3.Maid = Maid.new()
+	t3.OnYes = Signal.new()
+	t3.Maid:GiveTask(t3.OnYes)
+	if not t3.OptionSingleChoice then
+		t3.OnNo = Signal.new()
+		t3.Maid:GiveTask(t3.OnNo)
+	end
+	t3.Text = p1
+	table.insert(t, t3)
+	if v1 == false then
+		if #t > 0 then
+			v1 = true
+			table.remove(t, 1):Hook()
+			return t3
+		end
+		v1 = false
+	end
+	return t3
 end
-function module_upvr.Hook(arg1) -- Line 93
-    local Gui_2 = module_upvr.Gui
-    Gui_2.Enabled = true
-    Gui_2.Confirmation.Background.ContainerMessage.Message.Text = arg1.Text
-    local Button = Gui_2.Confirmation.Background.ContainerButtons.ContainerYes.Button
-    EzUtils_upvr.selectIfGamepad(Button)
-    arg1.Maid:GiveTask(Button.MouseButton1Down:Connect(function() -- Line 100
-        arg1.OnYes:Fire()
-        arg1:Destroy()
-    end))
-    local ContainerNo = Gui_2.Confirmation.Background.ContainerButtons.ContainerNo
-    ContainerNo.Visible = not arg1.OptionSingleChoice
-    if not arg1.OptionSingleChoice then
-        arg1.Maid:GiveTask(ContainerNo.Button.MouseButton1Down:Connect(function() -- Line 109
-            arg1.OnNo:Fire()
-            arg1:Destroy()
-        end))
-    end
+function t2.Hook(p1) --[[ Line: 93 | Upvalues: t2 (copy), EzUtils (copy) ]]
+	local Gui = t2.Gui
+	Gui.Enabled = true
+	Gui.Confirmation.Background.ContainerMessage.Message.Text = p1.Text
+	local Button = Gui.Confirmation.Background.ContainerButtons.ContainerYes.Button
+	EzUtils.selectIfGamepad(Button)
+	p1.Maid:GiveTask(Button.MouseButton1Down:Connect(function() --[[ Line: 100 | Upvalues: p1 (copy) ]]
+		p1.OnYes:Fire()
+		p1:Destroy()
+	end))
+	local ContainerNo = Gui.Confirmation.Background.ContainerButtons.ContainerNo
+	ContainerNo.Visible = not p1.OptionSingleChoice
+	local Button_2 = ContainerNo.Button
+	if not p1.OptionSingleChoice then
+		p1.Maid:GiveTask(Button_2.MouseButton1Down:Connect(function() --[[ Line: 109 | Upvalues: p1 (copy) ]]
+			p1.OnNo:Fire()
+			p1:Destroy()
+		end))
+	end
 end
-function module_upvr.Destroy(arg1) -- Line 115
-    if arg1.Maid ~= nil then
-        module_upvr.Gui.Enabled = false
-        arg1.Maid:Destroy()
-        arg1.Maid = nil
-        if 0 < #tbl_upvr then
-            var3_upvw = true
-            table.remove(tbl_upvr, 1):Hook()
-            return
-        end
-        var3_upvw = false
-    end
+function t2.Destroy(p1) --[[ Line: 115 | Upvalues: t2 (copy), t (copy), v1 (ref) ]]
+	if p1.Maid ~= nil then
+		t2.Gui.Enabled = false
+		p1.Maid:Destroy()
+		p1.Maid = nil
+		if #t > 0 then
+			v1 = true
+			table.remove(t, 1):Hook()
+			return
+		end
+		v1 = false
+	end
 end
-return module_upvr
+return t2

@@ -1,4 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-return require(ReplicatedStorage.Rodux).createReducer({}, {
-    tradeInventorySetItemsOwned = require(ReplicatedStorage.Trade.InventoryReducerUtils).setItemsOwned;
+local Rodux = require(ReplicatedStorage.Rodux)
+local InventoryReducerUtils = require(ReplicatedStorage.Trade.InventoryReducerUtils)
+return Rodux.createReducer({}, {
+	tradeInventorySetItemsOwned = InventoryReducerUtils.setItemsOwned
 })

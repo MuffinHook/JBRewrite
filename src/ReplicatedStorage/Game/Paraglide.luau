@@ -1,276 +1,281 @@
-local RunService_upvr = game:GetService("RunService")
+local RunService = game:GetService("RunService")
+game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
+local Audio = require(ReplicatedStorage.Std.Audio)
 local Signal = require(ReplicatedStorage.Std.Signal)
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local CurrentCamera_upvr = workspace.CurrentCamera
-local var6_upvw
-local TableUtils_upvr = require(ReplicatedStorage.Std.TableUtils)
-local CollectionService_upvr = game:GetService("CollectionService")
-local C4Consts_upvr = require(ReplicatedStorage.Game.C4.C4Consts)
-local new_upvr = Vector3.new
-local FindPartOnRayWithIgnoreList_upvw = workspace.FindPartOnRayWithIgnoreList
-local function fpor2_upvw(arg1, arg2, ...) -- Line 18, Named "fpor2"
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local magnitude = arg2.magnitude
-    local unit = arg2.unit
-    local args_list = {...}
-    TableUtils_upvr.concatInPlace(args_list, CollectionService_upvr:GetTagged(C4Consts_upvr.TAG_NAME))
-    local var15
-    if var15 then
-        var15 = table.insert
-        var15(args_list, workspace.NetworkFixPart1)
-    end
-    var15 = nil
-    repeat
-        local FindPartOnRayWithIgnoreList_upvw_result1, FindPartOnRayWithIgnoreList_upvw_result2, _ = FindPartOnRayWithIgnoreList_upvw(workspace, Ray.new(arg1, unit * (magnitude - 0)), args_list, false, true)
-        var15 = FindPartOnRayWithIgnoreList_upvw_result1
-        FindPartOnRayWithIgnoreList_upvw_result1 = var15
-        local var20 = FindPartOnRayWithIgnoreList_upvw_result1
-        if var20 then
-            var20 = var15.CanCollide
-        end
-        local var21 = var20
-        if not var21 then
-            table.insert(args_list, var15)
-        end
-    until var21 and magnitude - (arg1 - FindPartOnRayWithIgnoreList_upvw_result2).magnitude <= 0.001 and 4 < 0 + 1
-    if not var15 then
-    end
-    return var15, arg1 + unit * magnitude, new_upvr
+local C4Consts = require(ReplicatedStorage.Game.C4.C4Consts)
+local TableUtils = require(ReplicatedStorage.Std.TableUtils)
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local CurrentCamera = workspace.CurrentCamera
+local v1 = nil
+local v2 = nil
+local v3 = Vector3.new
+local FindPartOnRayWithIgnoreList = workspace.FindPartOnRayWithIgnoreList
+local function fpor2(p1, p2, ...) --[[ Line: 18 | Upvalues: TableUtils (copy), CollectionService (copy), C4Consts (copy), v3 (copy), FindPartOnRayWithIgnoreList (copy) ]]
+	local magnitude = p2.magnitude
+	local unit = p2.unit
+	local v1 = 0
+	local t = { ... }
+	TableUtils.concatInPlace(t, CollectionService:GetTagged(C4Consts.TAG_NAME))
+	if workspace:FindFirstChild("NetworkFixPart1") then
+		table.insert(t, workspace.NetworkFixPart1)
+	end
+	local count, v2 = 0, p1
+	while true do
+		local v32, v4
+		count = count + 1
+		local v6, v7, v8 = FindPartOnRayWithIgnoreList(workspace, Ray.new(v2, unit * (magnitude - v1)), t, false, true)
+		if v6 then
+			v6 = v6.CanCollide
+		end
+		local v9 = v6
+		if not v6 then
+			table.insert(t, v9)
+		end
+		v1 = (p1 - v7).magnitude
+		if v6 or (magnitude - v1 <= 0.001 or count > 4) then
+			if v9 then
+				v32 = v7
+				v4 = v8
+			else
+				v4 = v3
+				v32 = p1 + unit * magnitude
+			end
+			return v9, v32, v4
+		end
+		v2 = v7
+	end
 end
-new_upvr = nil
-FindPartOnRayWithIgnoreList_upvw = nil
-local any_new_result1_upvr = Signal.new()
-local any_new_result1_upvr_2 = Signal.new()
-local var24_upvw
-local function UpdateParachute_upvr() -- Line 60, Named "UpdateParachute"
-    local HumanoidRootPart = var24_upvw.HumanoidRootPart
-    local var27 = CurrentCamera_upvr.CFrame * CFrame.Angles(0.2, 0, 0)
-    local absolute = math.abs(var27.LookVector:Dot(Vector3.new(0, 1, 0)))
-    var24_upvw.Velocity.Velocity = Vector3.new(var27.LookVector.X, 0, var27.lookVector.Z) * 60 * math.max(0.5, absolute) + Vector3.new(0, absolute, 0) * -40
-    var24_upvw.Gyro.CFrame = CFrame.new(Vector3.new(), var27.lookVector) * CFrame.new(0, 0, math.clamp(HumanoidRootPart.RotVelocity.y, -4, 4) * 0.125)
-    local fpor2_result1_2, fpor2_upvw_result2 = fpor2_upvw(HumanoidRootPart.Position, Vector3.new(0, -4, 0), HumanoidRootPart.Parent)
-    if fpor2_result1_2 and not fpor2_result1_2:IsDescendantOf(workspace.Vehicles) then
-        FindPartOnRayWithIgnoreList_upvw()
-    end
+local v4 = nil
+local v5 = nil
+local v6 = Signal.new()
+local v7 = Signal.new()
+local v8 = nil
+local function IsFlying() --[[ Line: 57 | Upvalues: v8 (ref) ]]
+	return v8 ~= nil
 end
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local function RawParachute_upvr() -- Line 77, Named "RawParachute"
-    if var24_upvw then
-        print("Already has parachute")
-        return false
-    end
-    local Character_2 = LocalPlayer_upvr.Character
-    if not Character_2 then
-        return false
-    end
-    local Humanoid = Character_2:FindFirstChild("Humanoid")
-    if not Humanoid then
-        return false
-    end
-    local PrimaryPart = Character_2.PrimaryPart
-    if not PrimaryPart then
-        return false
-    end
-    if Humanoid.PlatformStand then
-        return false
-    end
-    if Humanoid.Sit then
-        return false
-    end
-    Humanoid.PlatformStand = true
-    Humanoid:ChangeState(Enum.HumanoidStateType.PlatformStanding)
-    var24_upvw = {}
-    var24_upvw.Type = "Parachute"
-    local BodyGyro_2 = Instance.new("BodyGyro")
-    BodyGyro_2.MaxTorque = Vector3.new(10000, 10000, 10000)
-    BodyGyro_2.CFrame = CurrentCamera_upvr.CFrame * CFrame.Angles(0.2, 0, 0)
-    BodyGyro_2.Parent = PrimaryPart
-    local BodyVelocity = Instance.new("BodyVelocity")
-    BodyVelocity.MaxForce = Vector3.new(1000000, 1000000, 1000000)
-    BodyVelocity.Velocity = Vector3.new(0, -1, 0)
-    BodyVelocity.Parent = PrimaryPart
-    var24_upvw.Gyro = BodyGyro_2
-    var24_upvw.Velocity = BodyVelocity
-    var24_upvw.HumanoidRootPart = PrimaryPart
-    var24_upvw.Humanoid = Humanoid
-    Audio_upvr.ObjectLocal(Humanoid.RootPart, 4482070135)
-    var24_upvw.Loop = RunService_upvr.Heartbeat:Connect(UpdateParachute_upvr)
-    return true
+local function UpdateParachute() --[[ Line: 60 | Upvalues: v8 (ref), CurrentCamera (copy), fpor2 (ref), v4 (ref) ]]
+	local HumanoidRootPart = v8.HumanoidRootPart
+	local v1 = CurrentCamera.CFrame * CFrame.Angles(0.2, 0, 0)
+	local v2 = math.clamp(HumanoidRootPart.RotVelocity.y, -4, 4)
+	local v42 = math.abs((v1.LookVector:Dot(Vector3.new(0, 1, 0))))
+	local v5 = Vector3.new(v1.LookVector.X, 0, v1.lookVector.Z)
+	v8.Velocity.Velocity = v5 * 60 * math.max(0.5, v42) + Vector3.new(0, v42, 0) * -40
+	v8.Gyro.CFrame = CFrame.new(Vector3.new(), v1.lookVector) * CFrame.new(0, 0, v2 * 0.125)
+	local v6, _ = fpor2(HumanoidRootPart.Position, Vector3.new(0, -4, 0), HumanoidRootPart.Parent)
+	if v6 and not v6:IsDescendantOf(workspace.Vehicles) then
+		v4()
+	end
 end
-local function _() -- Line 127, Named "RawParachuteStop"
-    if not var24_upvw then
-        return false
-    end
-    if var24_upvw.Type ~= "Parachute" then
-        return false
-    end
-    var24_upvw.Gyro:Destroy()
-    var24_upvw.Velocity:Destroy()
-    var24_upvw.Loop:Disconnect()
-    var24_upvw.Humanoid.PlatformStand = false
-    var24_upvw = nil
-    any_new_result1_upvr:Fire()
-    return true
+local function RawParachute() --[[ Line: 77 | Upvalues: v8 (ref), LocalPlayer (copy), CurrentCamera (copy), Audio (copy), RunService (copy), UpdateParachute (copy) ]]
+	if v8 then
+		print("Already has parachute")
+		return false
+	else
+		local Character = LocalPlayer.Character
+		if Character then
+			local Humanoid = Character:FindFirstChild("Humanoid")
+			if Humanoid then
+				local PrimaryPart = Character.PrimaryPart
+				if PrimaryPart then
+					if Humanoid.PlatformStand or Humanoid.Sit then
+						return false
+					else
+						Humanoid.PlatformStand = true
+						Humanoid:ChangeState(Enum.HumanoidStateType.PlatformStanding)
+						v8 = {
+							Type = "Parachute"
+						}
+						local BodyGyro = Instance.new("BodyGyro")
+						BodyGyro.MaxTorque = Vector3.new(10000, 10000, 10000)
+						BodyGyro.CFrame = CurrentCamera.CFrame * CFrame.Angles(0.2, 0, 0)
+						BodyGyro.Parent = PrimaryPart
+						local BodyVelocity = Instance.new("BodyVelocity")
+						BodyVelocity.MaxForce = Vector3.new(1000000, 1000000, 1000000)
+						BodyVelocity.Velocity = Vector3.new(0, -1, 0)
+						BodyVelocity.Parent = PrimaryPart
+						v8.Gyro = BodyGyro
+						v8.Velocity = BodyVelocity
+						v8.HumanoidRootPart = PrimaryPart
+						v8.Humanoid = Humanoid
+						Audio.ObjectLocal(Humanoid.RootPart, 4482070135)
+						v8.Loop = RunService.Heartbeat:Connect(UpdateParachute)
+						return true
+					end
+				else
+					return false
+				end
+			else
+				return false
+			end
+		else
+			return false
+		end
+	end
 end
-function new_upvr() -- Line 143, Named "Parachute"
-    if not RawParachute_upvr() then
-        return false
-    end
-    var6_upvw:FireServer('s'..("o02hf61"):sub(3, 4):reverse():reverse():reverse()..""..""..("xxz9h"):sub(2, 2):reverse()..""..""..("pfsmeyt"):sub(3, 4):reverse():reverse():reverse().."".."g6")
+local function RawParachuteStop() --[[ Line: 127 | Upvalues: v8 (ref), v6 (copy) ]]
+	if v8 and v8.Type == "Parachute" then
+		v8.Gyro:Destroy()
+		v8.Velocity:Destroy()
+		v8.Loop:Disconnect()
+		v8.Humanoid.PlatformStand = false
+		v8 = nil
+		v6:Fire()
+		return true
+	else
+		return false
+	end
 end
-function FindPartOnRayWithIgnoreList_upvw() -- Line 150, Named "ParachuteStop"
-    local var37
-    if not var24_upvw then
-        var37 = false
-    elseif var24_upvw.Type ~= "Parachute" then
-        var37 = false
-    else
-        var24_upvw.Gyro:Destroy()
-        var24_upvw.Velocity:Destroy()
-        var24_upvw.Loop:Disconnect()
-        var24_upvw.Humanoid.PlatformStand = false
-        var24_upvw = nil
-        any_new_result1_upvr:Fire()
-        var37 = true
-    end
-    if not var37 then
-        return false
-    end
-    var6_upvw:FireServer('x'..""..("gaa8cc"):sub(2, 4):reverse():reverse():reverse().."".."kj83")
+local function Parachute() --[[ Line: 143 | Upvalues: RawParachute (copy), v1 (ref) ]]
+	if not RawParachute() then
+		return false
+	end
+	v1:FireServer("g" .. ("t8x"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("nmkqmqyms"):sub(4, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ydl"):sub(2, 2):reverse() .. "sf")
 end
-local GliderStop_upvw
-local function UpdateGlider_upvr() -- Line 157, Named "UpdateGlider"
-    local HumanoidRootPart_2 = var24_upvw.HumanoidRootPart
-    local var40 = CurrentCamera_upvr.CFrame * CFrame.Angles(0.2, 0, 0)
-    local absolute_2 = math.abs(math.clamp(var40.lookVector:Dot(Vector3.new(0, 1, 0)), -1, -0.06))
-    var24_upvw.Velocity.Velocity = Vector3.new(var40.lookVector.X, 0, var40.lookVector.Z) * 60 * math.max(0.9, absolute_2) + Vector3.new(0, absolute_2, 0) * -90
-    var24_upvw.Gyro.CFrame = CFrame.new(Vector3.new(), var40.lookVector * 1) * CFrame.Angles(-1.8849555921538759, 0, 0)
-    local fpor2_result1, _ = fpor2_upvw(HumanoidRootPart_2.Position, Vector3.new(0, -3, 0), HumanoidRootPart_2.Parent)
-    if fpor2_result1 and not fpor2_result1:IsDescendantOf(workspace.Vehicles) and 1 < tick() - var24_upvw.Started then
-        GliderStop_upvw()
-    end
+v4 = function() --[[ Name: ParachuteStop | Line: 150 | Upvalues: v8 (ref), v6 (copy), v1 (ref) ]]
+	local v12
+	if v8 and v8.Type == "Parachute" then
+		v8.Gyro:Destroy()
+		v8.Velocity:Destroy()
+		v8.Loop:Disconnect()
+		v8.Humanoid.PlatformStand = false
+		v8 = nil
+		v6:Fire()
+		v12 = true
+	else
+		v12 = false
+	end
+	if not v12 then
+		return false
+	end
+	v1:FireServer("q" .. ("ieaznve"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("s9ls"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("b83yluf"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("ek53zzt1"):sub(5, 5):reverse():reverse():reverse() .. "uem")
 end
-local function RawGlider_upvr() -- Line 173, Named "RawGlider"
-    if var24_upvw then
-        print("Already has glider")
-        return false
-    end
-    local Character = LocalPlayer_upvr.Character
-    if not Character then
-        return false
-    end
-    local Humanoid_2 = Character:FindFirstChild("Humanoid")
-    if not Humanoid_2 then
-        return false
-    end
-    local PrimaryPart_2 = Character.PrimaryPart
-    if not PrimaryPart_2 then
-        return false
-    end
-    if Humanoid_2.PlatformStand then
-        return false
-    end
-    if Humanoid_2.Sit then
-        return false
-    end
-    Humanoid_2.PlatformStand = true
-    Humanoid_2:ChangeState(Enum.HumanoidStateType.PlatformStanding)
-    var24_upvw = {}
-    var24_upvw.Type = "Glider"
-    local BodyGyro = Instance.new("BodyGyro")
-    BodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-    BodyGyro.CFrame = CurrentCamera_upvr.CFrame * CFrame.Angles((-math.pi/2), 0, 0)
-    BodyGyro.Parent = PrimaryPart_2
-    local BodyVelocity_2 = Instance.new("BodyVelocity")
-    BodyVelocity_2.MaxForce = Vector3.new(1000000, 1000000, 1000000)
-    BodyVelocity_2.Velocity = Vector3.new(0, -1, 0)
-    BodyVelocity_2.Parent = PrimaryPart_2
-    var24_upvw.Gyro = BodyGyro
-    var24_upvw.Velocity = BodyVelocity_2
-    var24_upvw.HumanoidRootPart = PrimaryPart_2
-    var24_upvw.Humanoid = Humanoid_2
-    var24_upvw.Started = tick()
-    var24_upvw.Loop = RunService_upvr.Heartbeat:Connect(UpdateGlider_upvr)
-    return true
+local function UpdateGlider() --[[ Line: 157 | Upvalues: v8 (ref), CurrentCamera (copy), fpor2 (ref), v5 (ref) ]]
+	local HumanoidRootPart = v8.HumanoidRootPart
+	local v1 = CurrentCamera.CFrame * CFrame.Angles(0.2, 0, 0)
+	local v4 = math.abs((math.clamp(v1.lookVector:Dot(Vector3.new(0, 1, 0)), -1, -0.06)))
+	local v52 = Vector3.new(v1.lookVector.X, 0, v1.lookVector.Z)
+	v8.Velocity.Velocity = v52 * 60 * math.max(0.9, v4) + Vector3.new(0, v4, 0) * -90
+	v8.Gyro.CFrame = CFrame.new(Vector3.new(), v1.lookVector * 1) * CFrame.Angles(-1.8849555921538759, 0, 0)
+	local v6, _ = fpor2(HumanoidRootPart.Position, Vector3.new(0, -3, 0), HumanoidRootPart.Parent)
+	if v6 and (not v6:IsDescendantOf(workspace.Vehicles) and tick() - v8.Started > 1) then
+		v5()
+	end
 end
-local function RawGliderStop_upvr() -- Line 223, Named "RawGliderStop"
-    if not var24_upvw then
-        return false
-    end
-    if var24_upvw.Type ~= "Glider" then
-        return false
-    end
-    var24_upvw.Gyro:Destroy()
-    var24_upvw.Velocity:Destroy()
-    var24_upvw.Loop:Disconnect()
-    var24_upvw.Humanoid.PlatformStand = false
-    var24_upvw.Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-    var24_upvw = nil
-    any_new_result1_upvr_2:Fire()
-    return true
+local function RawGlider() --[[ Line: 173 | Upvalues: v8 (ref), LocalPlayer (copy), CurrentCamera (copy), RunService (copy), UpdateGlider (copy) ]]
+	if v8 then
+		print("Already has glider")
+		return false
+	else
+		local Character = LocalPlayer.Character
+		if Character then
+			local Humanoid = Character:FindFirstChild("Humanoid")
+			if Humanoid then
+				local PrimaryPart = Character.PrimaryPart
+				if PrimaryPart then
+					if Humanoid.PlatformStand or Humanoid.Sit then
+						return false
+					else
+						Humanoid.PlatformStand = true
+						Humanoid:ChangeState(Enum.HumanoidStateType.PlatformStanding)
+						v8 = {
+							Type = "Glider"
+						}
+						local BodyGyro = Instance.new("BodyGyro")
+						BodyGyro.MaxTorque = Vector3.new(inf, inf, inf)
+						BodyGyro.CFrame = CurrentCamera.CFrame * CFrame.Angles(-1.5707963267948966, 0, 0)
+						BodyGyro.Parent = PrimaryPart
+						local BodyVelocity = Instance.new("BodyVelocity")
+						BodyVelocity.MaxForce = Vector3.new(1000000, 1000000, 1000000)
+						BodyVelocity.Velocity = Vector3.new(0, -1, 0)
+						BodyVelocity.Parent = PrimaryPart
+						v8.Gyro = BodyGyro
+						v8.Velocity = BodyVelocity
+						v8.HumanoidRootPart = PrimaryPart
+						v8.Humanoid = Humanoid
+						v8.Started = tick()
+						v8.Loop = RunService.Heartbeat:Connect(UpdateGlider)
+						return true
+					end
+				else
+					return false
+				end
+			else
+				return false
+			end
+		else
+			return false
+		end
+	end
 end
-function GliderStop_upvw() -- Line 247, Named "GliderStop"
-    if not RawGliderStop_upvr() then
-        return false
-    end
-    var6_upvw:FireServer('m'..("urpnp1xn"):sub(2, 6):reverse():reverse():reverse()..""..""..("qslgu"):sub(4, 4):reverse():reverse():reverse():reverse():reverse()..""..'l')
+local function RawGliderStop() --[[ Line: 223 | Upvalues: v8 (ref), v7 (copy) ]]
+	if v8 and v8.Type == "Glider" then
+		v8.Gyro:Destroy()
+		v8.Velocity:Destroy()
+		v8.Loop:Disconnect()
+		v8.Humanoid.PlatformStand = false
+		v8.Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+		v8 = nil
+		v7:Fire()
+		return true
+	else
+		return false
+	end
 end
-local var49_upvw = GliderStop_upvw
-local var50_upvw
+local function Glider() --[[ Line: 240 | Upvalues: RawGlider (copy), v1 (ref) ]]
+	if not RawGlider() then
+		return false
+	end
+	v1:FireServer("d" .. ("ashj6e2"):sub(5, 5):reverse() .. "" .. "" .. ("x8cuhlli"):sub(4, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("a1ruj9s"):sub(3, 3):reverse() .. "m4")
+end
+v5 = function() --[[ Name: GliderStop | Line: 247 | Upvalues: RawGliderStop (copy), v1 (ref) ]]
+	if not RawGliderStop() then
+		return false
+	end
+	v1:FireServer("m" .. ("awfcg8s"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "6ascx8")
+end
 return {
-    Init = function(arg1) -- Line 254, Named "Init"
-        var6_upvw = arg1.Event
-        var50_upvw = arg1.em
-        function var50_upvw.sh2xmsg6() -- Line 256
-            if not RawParachute_upvr() then
-                var6_upvw:FireServer('x'..("c8d"):sub(2, 2):reverse():reverse():reverse():reverse():reverse()..""..""..("pmfhay"):sub(5, 5):reverse():reverse():reverse()..""..""..("fae5c"):sub(2, 2):reverse()..""..""..("aukqeqe"):sub(3, 3):reverse().."".."j83")
-            end
-        end
-        function var50_upvw.x8aakj83() -- Line 262
-            if not var24_upvw then
-            else
-                if var24_upvw.Type ~= "Parachute" then return end
-                var24_upvw.Gyro:Destroy()
-                var24_upvw.Velocity:Destroy()
-                var24_upvw.Loop:Disconnect()
-                var24_upvw.Humanoid.PlatformStand = false
-                var24_upvw = nil
-                any_new_result1_upvr:Fire()
-            end
-        end
-        function var50_upvw.sdrdsjqn() -- Line 265
-            if not RawGlider_upvr() then
-                var6_upvw:FireServer('m'..("sagrpnp1pwe"):sub(3, 8):reverse()..""..'l')
-            end
-        end
-        function var50_upvw.m1pnprgl() -- Line 271
-            RawGliderStop_upvr()
-        end
-        require(script.Parent.DefaultActions).onJumpPressed:Connect(function() -- Line 276
-            if var24_upvw and var24_upvw.Type == "Glider" then
-                var49_upvw()
-            end
-        end)
-    end;
-    Parachute = new_upvr;
-    ParachuteStop = FindPartOnRayWithIgnoreList_upvw;
-    Glider = function() -- Line 240, Named "Glider"
-        if not RawGlider_upvr() then
-            return false
-        end
-        var6_upvw:FireServer('s'..("tidat6"):sub(3, 3):reverse():reverse():reverse()..""..""..("sscsdrlo"):sub(4, 6):reverse().."".."jqn")
-    end;
-    GliderStop = var49_upvw;
-    IsFlying = function() -- Line 57, Named "IsFlying"
-        local var25
-        if var24_upvw == nil then
-            var25 = false
-        else
-            var25 = true
-        end
-        return var25
-    end;
-    OnParachuteStopped = any_new_result1_upvr;
-    OnGliderStopped = any_new_result1_upvr_2;
+	Init = function(p1) --[[ Name: Init | Line: 254 | Upvalues: v1 (ref), v2 (ref), RawParachute (copy), v8 (ref), v6 (copy), RawGlider (copy), RawGliderStop (copy), v5 (ref) ]]
+		local em = p1.em
+		v1 = p1.Event
+		v2 = em
+		function em.g8qmqdsf() --[[ Line: 256 | Upvalues: RawParachute (ref), v1 (ref) ]]
+			if not RawParachute() then
+				v1:FireServer("qa93zuem")
+			end
+		end
+		function em.qa93zuem() --[[ Line: 262 | Upvalues: v8 (ref), v6 (ref) ]]
+			if v8 then
+				if v8.Type == "Parachute" then
+					v8.Gyro:Destroy()
+					v8.Velocity:Destroy()
+					v8.Loop:Disconnect()
+					v8.Humanoid.PlatformStand = false
+					v8 = nil
+					v6:Fire()
+				end
+			end
+		end
+		function em.d6lhurm4() --[[ Line: 265 | Upvalues: RawGlider (ref), v1 (ref) ]]
+			if not RawGlider() then
+				v1:FireServer("m" .. "" .. ("nxcuyyr"):sub(3, 3):reverse() .. "" .. "" .. ("v3rfa6g"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "scx8")
+			end
+		end
+		function em.mc6ascx8() --[[ Line: 271 | Upvalues: RawGliderStop (ref) ]]
+			RawGliderStop()
+		end
+		require(script.Parent.DefaultActions).onJumpPressed:Connect(function() --[[ Line: 276 | Upvalues: v8 (ref), v5 (ref) ]]
+			if v8 and v8.Type == "Glider" then
+				v5()
+			end
+		end)
+	end,
+	Parachute = Parachute,
+	ParachuteStop = v4,
+	Glider = Glider,
+	GliderStop = v5,
+	IsFlying = IsFlying,
+	OnParachuteStopped = v6,
+	OnGliderStopped = v7
 }

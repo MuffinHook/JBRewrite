@@ -1,59 +1,50 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HyperChromeConsts_upvr = require(ReplicatedStorage.HyperChrome.HyperChromeConsts)
-local module_upvr_2 = {
-    getName = function(arg1, arg2) -- Line 7, Named "getName"
-        return HyperChromeConsts_upvr.HYPERCHROME_PREFIX..arg1..HyperChromeConsts_upvr.LEVEL_PREFIX..arg2
-    end;
-    getItemGroupName = function(arg1) -- Line 10, Named "getItemGroupName"
-        return HyperChromeConsts_upvr.HYPERCHROME_PREFIX..arg1
-    end;
-    getLevelFromName = function(arg1) -- Line 13, Named "getLevelFromName"
-        return tonumber(string.match(arg1, HyperChromeConsts_upvr.LEVEL_PREFIX.."(.*)"))
-    end;
+local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConsts)
+local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
+local t = {
+	getName = function(p1, p2) --[[ Name: getName | Line: 7 | Upvalues: HyperChromeConsts (copy) ]]
+		return HyperChromeConsts.HYPERCHROME_PREFIX .. p1 .. HyperChromeConsts.LEVEL_PREFIX .. p2
+	end,
+	getItemGroupName = function(p1) --[[ Name: getItemGroupName | Line: 10 | Upvalues: HyperChromeConsts (copy) ]]
+		return HyperChromeConsts.HYPERCHROME_PREFIX .. p1
+	end,
+	getLevelFromName = function(p1) --[[ Name: getLevelFromName | Line: 13 | Upvalues: HyperChromeConsts (copy) ]]
+		local match = string.match
+		return tonumber(match(p1, HyperChromeConsts.LEVEL_PREFIX .. "(.*)"))
+	end,
+	getColorFromName = function(p1) --[[ Name: getColorFromName | Line: 16 | Upvalues: HyperChromeConsts (copy) ]]
+		return string.match(p1, HyperChromeConsts.HYPERCHROME_PREFIX .. "(.*)" .. HyperChromeConsts.LEVEL_PREFIX)
+	end
 }
-local function getColorFromName(arg1) -- Line 16
-    return string.match(arg1, HyperChromeConsts_upvr.HYPERCHROME_PREFIX.."(.*)"..HyperChromeConsts_upvr.LEVEL_PREFIX)
+local MAX_LEVEL = HyperChromeConsts.MAX_LEVEL
+local t2 = {}
+local t3 = {}
+local t4 = {}
+for v1, v2 in HyperChromeConsts.COLOR_TO_INFO_MAP do
+	for i = 1, MAX_LEVEL do
+		table.insert(t2, (t.getName(v1, i)))
+		t3[v1] = true
+	end
 end
-module_upvr_2.getColorFromName = getColorFromName
-getColorFromName = {}
-local var18_upvr = getColorFromName
-local tbl = {}
-local module_upvr = {}
-for i, _ in HyperChromeConsts_upvr.COLOR_TO_INFO_MAP do
-    for i_2 = 1, HyperChromeConsts_upvr.MAX_LEVEL do
-        table.insert(var18_upvr, module_upvr_2.getName(i, i_2))
-        tbl[i] = true
-    end
+for v4, v5 in t3 do
+	table.insert(t4, v4)
 end
-for i_3, _ in tbl do
-    table.insert(module_upvr, i_3)
+function t.getListOfHyperChromeNames() --[[ Line: 38 | Upvalues: t2 (copy) ]]
+	return t2
 end
-function module_upvr_2.getListOfHyperChromeNames() -- Line 38
-    return var18_upvr
+local t5 = {
+	[HyperChromeConsts.COLOR_SHIFT_NAME] = true
+}
+for v6, v7 in t2 do
+	t5[v7] = true
 end
-for _, v_3 in var18_upvr do
-    ({
-        [HyperChromeConsts_upvr.COLOR_SHIFT_NAME] = true;
-    })[v_3] = true
-    local var22_upvr
+function t.isHyperChromeName(p1) --[[ Line: 47 | Upvalues: t5 (copy) ]]
+	return t5[p1] == true
 end
-function module_upvr_2.isHyperChromeName(arg1) -- Line 47
-    local var23
-    if var22_upvr[arg1] ~= true then
-        var23 = false
-    else
-        var23 = true
-    end
-    return var23
+function t.isHyperChromeItem(p1) --[[ Line: 53 | Upvalues: PlayerDataConsts (copy), t (copy) ]]
+	return p1.ItemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE and (p1.CategoryName == "Color" and t.isHyperChromeName(p1.ItemName)) and true or false
 end
-local PlayerDataConsts_upvr = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
-function module_upvr_2.isHyperChromeItem(arg1) -- Line 53
-    if arg1.ItemType == PlayerDataConsts_upvr.VEHICLE_CUSTOMIZATION_ITEM_TYPE and arg1.CategoryName == "Color" and module_upvr_2.isHyperChromeName(arg1.ItemName) then
-        return true
-    end
-    return false
+function t.getColors() --[[ Line: 62 | Upvalues: t4 (copy) ]]
+	return t4
 end
-function module_upvr_2.getColors() -- Line 62
-    return module_upvr
-end
-return module_upvr_2
+return t

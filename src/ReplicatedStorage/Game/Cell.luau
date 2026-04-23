@@ -1,149 +1,141 @@
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BinderUtils_upvr = require(ReplicatedStorage.Std.Binder.BinderUtils)
-local InventoryItemBinder_upvr = require(ReplicatedStorage.Inventory.InventoryItemBinder)
-local InventoryItemSystem_upvr = require(ReplicatedStorage.Inventory.InventoryItemSystem)
-local var6_upvw
-local CircleAction_upvr = require(ReplicatedStorage.Module.UI).CircleAction
-local var8_upvw
-local tbl_upvr = {}
-local function ShowFun_upvr(arg1) -- Line 32, Named "ShowFun"
-    local ValidRoot_3 = arg1.ValidRoot
-    ValidRoot_3:SetPrimaryPartCFrame(tbl_upvr[ValidRoot_3.Drawer].Opened)
+local BinderUtils = require(ReplicatedStorage.Std.Binder.BinderUtils)
+require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
+local UI = require(ReplicatedStorage.Module.UI)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+local InventoryItemBinder = require(ReplicatedStorage.Inventory.InventoryItemBinder)
+local InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSystem)
+local v1 = nil
+local v2 = nil
+local v3 = nil
+local CircleAction = UI.CircleAction
+local v4 = 0
+local v5 = nil
+local t = {}
+local function ShowFun(p1) --[[ Line: 32 | Upvalues: t (copy) ]]
+	local ValidRoot = p1.ValidRoot
+	ValidRoot:SetPrimaryPartCFrame(t[ValidRoot.Drawer].Opened)
 end
-local function HideFun_upvr(arg1) -- Line 38, Named "HideFun"
-    local ValidRoot = arg1.ValidRoot
-    ValidRoot:SetPrimaryPartCFrame(tbl_upvr[ValidRoot.Drawer].Closed)
+local function HideFun(p1) --[[ Line: 38 | Upvalues: t (copy) ]]
+	local ValidRoot = p1.ValidRoot
+	ValidRoot:SetPrimaryPartCFrame(t[ValidRoot.Drawer].Closed)
 end
-local var12_upvw = 0
-local function Update_upvr(arg1) -- Line 44, Named "Update"
-    local tick_result1_2 = tick()
-    local var14
-    if tick_result1_2 - var12_upvw < 0.1 then
-    else
-        var12_upvw = tick_result1_2
-        local _1 = InventoryItemSystem_upvr.getEquippedFor(LocalPlayer_upvr)[1]
-        local ValidRoot_2 = arg1.ValidRoot
-        var14 = nil
-        local var17 = var8_upvw
-        if var17 then
-            if var8_upvw.Model ~= ValidRoot_2.Parent.Parent then
-                var17 = false
-            else
-                var17 = true
-            end
-        end
-        if var17 then
-            local SOME = BinderUtils_upvr.findFirstChild(InventoryItemBinder_upvr, ValidRoot_2)
-            if _1 then
-                if SOME then
-                    arg1.Name = string.format("Replace %s with %s", SOME:GetName(), _1:GetName())
-                    var14 = 0.5
-                else
-                    arg1.Name = string.format("Store %s", _1:GetName())
-                    var14 = 0.5
-                end
-            elseif SOME then
-                arg1.Name = string.format("Take out %s", SOME:GetName())
-                var14 = 0.5
-            else
-                arg1.Name = "Inspect Drawer"
-                var14 = 0.5
-            end
-        else
-            arg1.Name = "Inspect Drawer"
-            var14 = 3
-        end
-        assert(var14)
-        arg1.Duration = var14
-    end
+local function Update(p1) --[[ Line: 44 | Upvalues: v4 (ref), InventoryItemSystem (copy), LocalPlayer (copy), v5 (ref), BinderUtils (copy), InventoryItemBinder (copy) ]]
+	local v1 = tick()
+	if not (v1 - v4 < 0.1) then
+		v4 = v1
+		local v2 = InventoryItemSystem.getEquippedFor(LocalPlayer)[1]
+		local ValidRoot = p1.ValidRoot
+		local v3 = v5
+		if v3 then
+			v3 = v5.Model == ValidRoot.Parent.Parent
+		end
+		local v42
+		if v3 then
+			local v52 = BinderUtils.findFirstChild(InventoryItemBinder, ValidRoot)
+			if v2 then
+				if v52 then
+					p1.Name = ("Replace %s with %s"):format(v52:GetName(), v2:GetName())
+				else
+					p1.Name = ("Store %s"):format(v2:GetName())
+				end
+			elseif v52 then
+				p1.Name = ("Take out %s"):format(v52:GetName())
+			else
+				p1.Name = "Inspect Drawer"
+			end
+			v42 = 0.5
+		else
+			p1.Name = "Inspect Drawer"
+			v42 = 3
+		end
+		assert(v42)
+		p1.Duration = v42
+	end
 end
-local function Action_upvr(arg1, arg2) -- Line 85, Named "Action"
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local _1_2 = InventoryItemSystem_upvr.getEquippedFor(LocalPlayer_upvr)[1]
-    local ValidRoot_4 = arg1.ValidRoot
-    local var21 = var8_upvw
-    if var21 then
-        if var8_upvw.Model ~= ValidRoot_4.Parent.Parent then
-            var21 = false
-        else
-            var21 = true
-        end
-    end
-    if var21 then
-        if _1_2 then
-            var6_upvw:FireServer('x'.."m01v6qmokfl":sub(4, 9):reverse():reverse():reverse()..""..'k', ValidRoot_4, _1_2.obj)
-        elseif BinderUtils_upvr.findFirstChild(InventoryItemBinder_upvr, ValidRoot_4) then
-            var6_upvw:FireServer('c'.."lvkglmbq":sub(3, 4):reverse().."".."".."xhvtx":sub(3, 3):reverse():reverse():reverse():reverse():reverse().."".."f8qg", ValidRoot_4)
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-    else
-        var6_upvw:FireServer('x'.."w41tt3zf":sub(3, 7):reverse().."".."".."ggs5a8":sub(2, 2):reverse():reverse():reverse():reverse():reverse()..""..'n', ValidRoot_4)
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local function Action(p1, p2) --[[ Line: 85 | Upvalues: InventoryItemSystem (copy), LocalPlayer (copy), v5 (ref), BinderUtils (copy), InventoryItemBinder (copy), v2 (ref) ]]
+	if p2 then
+		local v1 = InventoryItemSystem.getEquippedFor(LocalPlayer)[1]
+		local ValidRoot = p1.ValidRoot
+		local v22 = v5
+		if v22 then
+			v22 = v5.Model == ValidRoot.Parent.Parent
+		end
+		if v22 then
+			local v3 = BinderUtils.findFirstChild(InventoryItemBinder, ValidRoot)
+			if v1 then
+				v2:FireServer("e" .. ("toq2s"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("z58gxgqjb"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("e1ax"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("k45p4la3y"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "io", ValidRoot, v1.obj)
+			elseif v3 then
+				v2:FireServer("l" .. ("c18xqfs"):sub(3, 4):reverse() .. "" .. "" .. ("ekbeg"):sub(2, 4):reverse():reverse():reverse() .. "" .. "" .. ("sfcvqbwg9"):sub(5, 5):reverse() .. "c", ValidRoot)
+			end
+		else
+			v2:FireServer("b" .. "" .. ("jp0yh"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("t46s1s13"):sub(3, 5):reverse() .. "" .. "" .. ("tw3g3"):sub(2, 3):reverse():reverse():reverse() .. "c", ValidRoot)
+		end
+		return true
+	end
 end
-local function AddedFun_upvr(arg1) -- Line 105, Named "AddedFun"
-    CircleAction_upvr.Add({
-        Part = arg1.Parent.Handle;
-        WorldPosition = arg1.Parent.Handle.Position;
-        ValidRoot = arg1.Parent;
-        Name = "Inspect Drawer";
-        Timed = true;
-        Duration = 1;
-        Dist = 5;
-        Callback = Action_upvr;
-        Update = Update_upvr;
-        ShowFun = ShowFun_upvr;
-        HideFun = HideFun_upvr;
-    }, arg1)
-    tbl_upvr[arg1] = {
-        Closed = arg1.CFrame;
-        Opened = arg1.CFrame * CFrame.new(0, 0, -1.5);
-    }
+local function AddedFun(p1) --[[ Line: 105 | Upvalues: Action (copy), Update (copy), ShowFun (copy), HideFun (copy), CircleAction (copy), t (copy) ]]
+	CircleAction.Add({
+		Part = p1.Parent.Handle,
+		WorldPosition = p1.Parent.Handle.Position,
+		ValidRoot = p1.Parent,
+		Name = "Inspect Drawer",
+		Timed = true,
+		Duration = 1,
+		Dist = 5,
+		Callback = Action,
+		Update = Update,
+		ShowFun = ShowFun,
+		HideFun = HideFun
+	}, p1)
+	t[p1] = {
+		Closed = p1.CFrame,
+		Opened = p1.CFrame * CFrame.new(0, 0, -1.5)
+	}
 end
-local function RemovedFun_upvr(arg1) -- Line 123, Named "RemovedFun"
-    tbl_upvr[arg1] = nil
-    CircleAction_upvr.Remove(arg1)
+local function RemovedFun(p1) --[[ Line: 123 | Upvalues: t (copy), CircleAction (copy) ]]
+	t[p1] = nil
+	CircleAction.Remove(p1)
 end
-local var24_upvw
-local var25_upvw
-local Settings_upvr = require(ReplicatedStorage.Resource.Settings)
-local CollectionService_upvr = game:GetService("CollectionService")
 return {
-    Init = function(arg1) -- Line 128, Named "Init"
-        var24_upvw = arg1.Inventory
-        var6_upvw = arg1.Event
-        var25_upvw = arg1.em
-        function var25_upvw.a13d3zx8(arg1_2) -- Line 133
-            assert(arg1_2)
-            var8_upvw = arg1_2
-        end
-        local var30_upvw = 0
-        local ScreenGui_upvr = arg1.ScreenGui
-        function var25_upvw.dzjrhbvz() -- Line 139
-            local var32 = var30_upvw + 1
-            var30_upvw = var32
-            local Cell = Settings_upvr.Time.Cell
-            local CellTime = ScreenGui_upvr.CellTime
-            CellTime.Time.Text = string.format("%ds", Cell)
-            CellTime.Visible = true
-            local tick_result1 = tick()
-            repeat
-                wait(1)
-                if var32 ~= var30_upvw then return end
-                CellTime.Time.Text = string.format("%ds", Settings_upvr.Time.Cell - tick() + tick_result1)
-            until Cell <= tick() - tick_result1
-            if var32 ~= var30_upvw then
-            else
-                CellTime.Visible = false
-            end
-        end
-        for _, v in next, CollectionService_upvr:GetTagged("StashDrawer") do
-            AddedFun_upvr(v)
-        end
-        CollectionService_upvr:GetInstanceAddedSignal("StashDrawer"):Connect(AddedFun_upvr)
-        CollectionService_upvr:GetInstanceRemovedSignal("StashDrawer"):Connect(RemovedFun_upvr)
-    end;
+	Init = function(p1) --[[ Name: Init | Line: 128 | Upvalues: v1 (ref), v2 (ref), v3 (ref), v5 (ref), Settings (copy), CollectionService (copy), AddedFun (copy), RemovedFun (copy) ]]
+		v1 = p1.Inventory
+		local em = p1.em
+		v2 = p1.Event
+		v3 = em
+		local ScreenGui = p1.ScreenGui
+		function em.aa02dq4j(p1) --[[ Line: 133 | Upvalues: v5 (ref) ]]
+			assert(p1)
+			v5 = p1
+		end
+		local v22 = 0
+		function em.fwrmzn28() --[[ Line: 139 | Upvalues: v22 (ref), Settings (ref), ScreenGui (copy) ]]
+			local v1 = v22 + 1
+			v22 = v1
+			local Cell = Settings.Time.Cell
+			local CellTime = ScreenGui.CellTime
+			CellTime.Time.Text = ("%ds"):format(Cell)
+			CellTime.Visible = true
+			local v2 = tick()
+			while true do
+				wait(1)
+				if v1 ~= v1 then
+					break
+				end
+				CellTime.Time.Text = ("%ds"):format(Settings.Time.Cell - tick() + v2)
+				if Cell <= tick() - v2 and v1 == v1 then
+					CellTime.Visible = false
+				end
+			end
+		end
+		local v32 = next
+		local v4, v52 = CollectionService:GetTagged("StashDrawer")
+		for v6, v7 in v32, v4, v52 do
+			AddedFun(v7)
+		end
+		CollectionService:GetInstanceAddedSignal("StashDrawer"):Connect(AddedFun)
+		CollectionService:GetInstanceRemovedSignal("StashDrawer"):Connect(RemovedFun)
+	end
 }

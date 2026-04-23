@@ -1,100 +1,170 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SeekingMissileUtils_upvr = require(ReplicatedStorage.SeekingMissile.SeekingMissileUtils)
-local module_upvr = {}
-local Signal_upvr = require(ReplicatedStorage.Std.Signal)
-function module_upvr._init(arg1) -- Line 14
-    arg1._throttle = 1
-    arg1.forwardDrag = SeekingMissileUtils_upvr.getForwardDrag(arg1.obj)
-    arg1.lateralDrag = SeekingMissileUtils_upvr.getLateralDrag(arg1.obj)
-    arg1.ignoreList = {arg1.obj}
-    arg1.raycastParams = RaycastParams.new()
-    arg1.raycastParams.FilterDescendantsInstances = arg1.ignoreList
-    arg1._lastTargetPosition = nil
-    arg1._seeking = false
-    arg1._onFireExplodeRemote = Signal_upvr.new()
-    arg1.maid:GiveTask(arg1._onFireExplodeRemote)
-    arg1.onExploded = Signal_upvr.new()
-    arg1.maid:GiveTask(arg1.onExploded)
-    arg1.flagApplyingThrust = false
-    arg1.onApplyingThrustChanged = Signal_upvr.new()
-    arg1.maid:GiveTask(arg1.onApplyingThrustChanged)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
+local RunService = game:GetService("RunService")
+local SeekingMissileUtils = require(ReplicatedStorage.SeekingMissile.SeekingMissileUtils)
+require(ReplicatedStorage.Std.Raycast)
+local t = {
+	_init = function(p1) --[[ Name: _init | Line: 14 | Upvalues: SeekingMissileUtils (copy), Signal (copy) ]]
+		p1._throttle = 1
+		p1.forwardDrag = SeekingMissileUtils.getForwardDrag(p1.obj)
+		p1.lateralDrag = SeekingMissileUtils.getLateralDrag(p1.obj)
+		p1.ignoreList = { p1.obj }
+		p1.raycastParams = RaycastParams.new()
+		p1.raycastParams.FilterDescendantsInstances = p1.ignoreList
+		p1._lastTargetPosition = nil
+		p1._seeking = false
+		p1._onFireExplodeRemote = Signal.new()
+		p1.maid:GiveTask(p1._onFireExplodeRemote)
+		p1.onExploded = Signal.new()
+		p1.maid:GiveTask(p1.onExploded)
+		p1.flagApplyingThrust = false
+		p1.onApplyingThrustChanged = Signal.new()
+		p1.maid:GiveTask(p1.onApplyingThrustChanged)
+	end,
+	_getTargetPosition = function(p1) --[[ Name: _getTargetPosition | Line: 36 | Upvalues: SeekingMissileUtils (copy) ]]
+		local v1 = SeekingMissileUtils.getTargetPos(p1.obj)
+		local targetPartObj = p1.targetPartObj.Value
+		if targetPartObj then
+			v1 = targetPartObj.Position
+		end
+		return v1
+	end
+}
+function t._run(p1) --[[ Line: 46 | Upvalues: RunService (copy), t (copy), GeomUtils (copy), SeekingMissileUtils (copy) ]]
+	p1.lastDistance = (1 / 0)
+	p1.lastDistanceImprovement = 0
+	local v1 = false
+	local v2 = false
+	local v3 = false
+	local v4 = os.clock()
+	local v5 = 0
+	local Position = p1.obj.Position
+	p1.runMaid:GiveTask(RunService.Heartbeat:Connect(function(p12) --[[ Line: 57 | Upvalues: p1 (copy), t (ref), v5 (ref), GeomUtils (ref), v4 (copy), SeekingMissileUtils (ref), Position (ref), v1 (ref), v2 (ref), v3 (ref) ]]
+		local v12 = os.clock()
+		local obj = p1.obj
+		local AssemblyMass = obj.AssemblyMass
+		local v22 = t._getTargetPosition(p1)
+		assert(v22 ~= nil, "missing targetPosition")
+		local v42 = p1._lastTargetPosition or v22
+		p1._lastTargetPosition = v22
+		local v52 = obj.CFrame:VectorToObjectSpace(obj.AssemblyLinearVelocity)
+		local v6 = Vector3.new(0, 0, v52.Z)
+		local v7 = v52 - v6
+		local v8 = math.abs(v52.Z)
+		local Magnitude = v52.Magnitude
+		local v9 = v22 - v42
+		local Magnitude_2 = (v22 - obj.Position).Magnitude
+		v5 = (v5 * 24 + v9.Magnitude / p12) / 25
+		local _throttle = p1._throttle
+		local v11 = 1
+		local Position_2 = obj.Position
+		local v122
+		if v9.Magnitude > 0.1 then
+			local v13 = v5
+			local Unit = v9.Unit
+			if Magnitude_2 < 500 then
+				v11 = if math.max(400, v5 * 5 / 3) < Magnitude then _throttle * 0.95 else _throttle * 1.05
+			end
+			local v15 = GeomUtils.getTrajectoryInterceptTime(Position_2, v8, v22, v13, Unit) or 0
+			v122 = if v15 > 0 then v22 + Unit * v13 * v15 else v22
+		else
+			v122 = v22
+		end
+		local v16 = math.clamp(_throttle + (v11 - _throttle) * 0.9, 0, 1)
+		p1._throttle = v16
+		if p1._seeking then
+			p1.alignOrientation.CFrame = CFrame.lookAt(obj.Position, v122)
+		else
+			p1.alignOrientation.CFrame = obj.CFrame
+		end
+		local v17, v18
+		if v12 - v4 > SeekingMissileUtils.getDropDuration(obj) then
+			v17 = v16
+			v18 = true
+		else
+			v17 = v16
+			v18 = false
+		end
+		if v18 ~= p1.flagApplyingThrust then
+			p1.flagApplyingThrust = v18
+			p1.onApplyingThrustChanged:Fire(v18)
+		end
+		local v19
+		if v18 then
+			local v20 = -p1.lateralDrag * v7
+			if not p1._currentLateralForce then
+				p1._currentLateralForce = v20
+			end
+			p1._currentLateralForce = p1._currentLateralForce:Lerp(v20, if p12 <= 0.02 then 1 elseif p12 <= 0.05 then 0.3 else 0.1)
+			local v23 = -p1.forwardDrag * v6 * math.abs(v6.Magnitude)
+			v19 = Vector3.new(0, 0, -1) * AssemblyMass * 9.81 * 20 * SeekingMissileUtils.getAccel(obj) * v17 + v23 + p1._currentLateralForce
+		else
+			v19 = Vector3.new(0, 0, 0)
+		end
+		p1.vectorForce.Force = v19
+		local Magnitude_3 = (v22 - obj.Position).Magnitude
+		local v24 = SeekingMissileUtils.getLifeSpan(obj)
+		if p1._seeking then
+			if Magnitude_3 < p1.lastDistance - 0.1 then
+				p1.lastDistanceImprovement = v12
+			end
+			if v12 - p1.lastDistanceImprovement > SeekingMissileUtils.getNoImprovementExplodeDuration(obj) then
+				t._explode(p1)
+			end
+			p1.lastDistance = Magnitude_3
+			local v27 = math.min(1, (v12 - v4) / v24)
+			local v28 = v27 * 12 + (1 - v27) * 3
+			if Magnitude_3 <= v28 then
+				t._explode(p1)
+			end
+			if GeomUtils.calcRayIntersectSphere(Position, Position_2, v22, v28) then
+				t._explode(p1)
+			end
+		end
+		if not v1 and v24 <= v12 - v4 then
+			v1 = true
+			t._explode(p1)
+		end
+		if not v2 and v12 - v4 > SeekingMissileUtils.getConnectHitAfterDuration(obj) then
+			v2 = true
+			t._detectHit(p1)
+		end
+		if not v3 and v12 - v4 > SeekingMissileUtils.getSeekAfterDuration(obj) then
+			v3 = true
+			t._enableSeeking(p1)
+		end
+		Position = Position_2
+	end))
+	p1.alignOrientation.MaxTorque = 10000000000000
+	p1.runMaid:GiveTask(function() --[[ Line: 214 | Upvalues: p1 (copy) ]]
+		p1.vectorForce.Force = Vector3.new()
+		p1.alignOrientation.MaxTorque = 0
+	end)
 end
-function module_upvr._getTargetPosition(arg1) -- Line 36
-    local any_getTargetPos_result1 = SeekingMissileUtils_upvr.getTargetPos(arg1.obj)
-    local Value_2 = arg1.targetPartObj.Value
-    if Value_2 then
-        any_getTargetPos_result1 = Value_2.Position
-    end
-    return any_getTargetPos_result1
+function t._explode(p1) --[[ Line: 219 ]]
+	if not p1._didExplode then
+		p1._didExplode = true
+		local targetPartObj = p1.targetPartObj.Value
+		p1.onExploded:Fire(p1.obj.Position, targetPartObj, if targetPartObj then targetPartObj.CFrame:PointToObjectSpace(p1.obj.Position) else nil)
+		task.defer(p1.runMaid.DoCleaning, p1.runMaid)
+	end
 end
-local RunService_upvr = game:GetService("RunService")
-local GeomUtils_upvr = require(ReplicatedStorage.Std.GeomUtils)
-function module_upvr._run(arg1) -- Line 46
-    arg1.lastDistance = math.huge
-    arg1.lastDistanceImprovement = 0
-    local var11_upvw = 0
-    local os_clock_result1_upvr = os.clock()
-    local Position_upvw = arg1.obj.Position
-    local var14_upvw = false
-    local var15_upvw = false
-    local var16_upvw = false
-    arg1.runMaid:GiveTask(RunService_upvr.Heartbeat:Connect(function(arg1_2) -- Line 57
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        local any__getTargetPosition_result1 = module_upvr._getTargetPosition(arg1)
-        local var19
-        if any__getTargetPosition_result1 == nil then
-            var19 = false
-        else
-            var19 = true
-        end
-        assert(var19, "missing targetPosition")
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        var19 = arg1
-        var19._lastTargetPosition = any__getTargetPosition_result1
-        var19 = arg1.obj.CFrame:VectorToObjectSpace(arg1.obj.AssemblyLinearVelocity)
-        local var20 = any__getTargetPosition_result1 - any__getTargetPosition_result1
-        var11_upvw = (var11_upvw * 24 + var20.Magnitude / arg1_2) / 25
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end))
-    arg1.alignOrientation.MaxTorque = 10000000000000
-    arg1.runMaid:GiveTask(function() -- Line 214
-        arg1.vectorForce.Force = Vector3.new()
-        arg1.alignOrientation.MaxTorque = 0
-    end)
+function t._detectHit(p1) --[[ Line: 232 | Upvalues: t (copy) ]]
+	if not p1._didExplode then
+		p1.runMaid:GiveTask(p1.obj.Touched:Connect(function(p12) --[[ Line: 236 | Upvalues: p1 (copy), t (ref) ]]
+			if not (p12.Transparency > 0.5) then
+				for v1, v2 in p1.ignoreList do
+					if p12:IsDescendantOf(v2) then
+						return false
+					end
+				end
+				t._explode(p1)
+			end
+		end))
+	end
 end
-function module_upvr._explode(arg1) -- Line 219
-    if arg1._didExplode then
-    else
-        arg1._didExplode = true
-        local Value = arg1.targetPartObj.Value
-        local var23
-        if Value then
-            var23 = Value.CFrame:PointToObjectSpace(arg1.obj.Position)
-        end
-        arg1.onExploded:Fire(arg1.obj.Position, Value, var23)
-        task.defer(arg1.runMaid.DoCleaning, arg1.runMaid)
-    end
+function t._enableSeeking(p1) --[[ Line: 251 ]]
+	p1._seeking = true
 end
-function module_upvr._detectHit(arg1) -- Line 232
-    if arg1._didExplode then
-    else
-        arg1.runMaid:GiveTask(arg1.obj.Touched:Connect(function(arg1_3) -- Line 236
-            if 0.5 < arg1_3.Transparency then
-            else
-                for _, v in arg1.ignoreList do
-                    if arg1_3:IsDescendantOf(v) then
-                        return false
-                    end
-                end
-                module_upvr._explode(arg1)
-            end
-        end))
-    end
-end
-function module_upvr._enableSeeking(arg1) -- Line 251
-    arg1._seeking = true
-end
-return module_upvr
+return t

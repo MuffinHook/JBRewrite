@@ -1,2 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-return require(ReplicatedStorage.Std.Binder).new(require(ReplicatedStorage.Inventory.InventoryItemConsts).TAG_NAME, require(script.Parent.InventoryItem))
+local Binder = require(ReplicatedStorage.Std.Binder)
+local InventoryItemConsts = require(ReplicatedStorage.Inventory.InventoryItemConsts)
+return Binder.new(InventoryItemConsts.TAG_NAME, require(script.Parent.InventoryItem))

@@ -1,115 +1,121 @@
-return function(arg1, arg2) -- Line 3
-    local var2_upvw = 0
-    arg1.WidgetConstructor("Root", {
-        hasState = false;
-        hasChildren = true;
-        Args = {};
-        Events = {};
-        Generate = function(arg1_2) -- Line 12, Named "Generate"
-            local Folder = Instance.new("Folder")
-            Folder.Name = "Iris_Root"
-            if arg1._config.UseScreenGUIs then
-                local ScreenGui = Instance.new("ScreenGui")
-                ScreenGui.ResetOnSpawn = false
-                ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-                ScreenGui.ScreenInsets = arg1._config.ScreenInsets
-                ScreenGui.IgnoreGuiInset = arg1._config.IgnoreGuiInset
-                ScreenGui.DisplayOrder = arg1._config.DisplayOrderOffset
-            else
-                local Frame_2 = Instance.new("Frame")
-                Frame_2.AnchorPoint = Vector2.new(0.5, 0.5)
-                Frame_2.Position = UDim2.fromScale(0.5, 0.5)
-                Frame_2.Size = UDim2.fromScale(1, 1)
-                Frame_2.BackgroundTransparency = 1
-                Frame_2.ZIndex = arg1._config.DisplayOrderOffset
-            end
-            Frame_2.Name = "PseudoWindowScreenGui"
-            Frame_2.Parent = Folder
-            if arg1._config.UseScreenGUIs then
-                local ScreenGui_2 = Instance.new("ScreenGui")
-                ScreenGui_2.ResetOnSpawn = false
-                ScreenGui_2.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-                ScreenGui_2.DisplayOrder = arg1._config.DisplayOrderOffset + 1024
-                ScreenGui_2.ScreenInsets = arg1._config.ScreenInsets
-                ScreenGui_2.IgnoreGuiInset = arg1._config.IgnoreGuiInset
-            else
-                local Frame = Instance.new("Frame")
-                Frame.AnchorPoint = Vector2.new(0.5, 0.5)
-                Frame.Position = UDim2.fromScale(0.5, 0.5)
-                Frame.Size = UDim2.fromScale(1, 1)
-                Frame.BackgroundTransparency = 1
-                Frame.ZIndex = arg1._config.DisplayOrderOffset + 1024
-            end
-            Frame.Name = "PopupScreenGui"
-            Frame.Parent = Folder
-            local Frame_3 = Instance.new("Frame")
-            Frame_3.Name = "TooltipContainer"
-            Frame_3.AutomaticSize = Enum.AutomaticSize.XY
-            Frame_3.Size = UDim2.fromOffset(0, 0)
-            Frame_3.BackgroundTransparency = 1
-            Frame_3.BorderSizePixel = 0
-            arg2.UIListLayout(Frame_3, Enum.FillDirection.Vertical, UDim.new(0, arg1._config.PopupBorderSize))
-            Frame_3.Parent = Frame
-            local Frame_4 = Instance.new("Frame")
-            Frame_4.Name = "MenuBarContainer"
-            Frame_4.AutomaticSize = Enum.AutomaticSize.Y
-            Frame_4.Size = UDim2.fromScale(1, 0)
-            Frame_4.BackgroundTransparency = 1
-            Frame_4.BorderSizePixel = 0
-            Frame_4.Parent = Frame
-            local Frame_5 = Instance.new("Frame")
-            Frame_5.Name = "PseudoWindow"
-            Frame_5.AutomaticSize = Enum.AutomaticSize.XY
-            Frame_5.Size = UDim2.new(0, 0, 0, 0)
-            Frame_5.Position = UDim2.fromOffset(0, 22)
-            Frame_5.BackgroundTransparency = arg1._config.WindowBgTransparency
-            Frame_5.BackgroundColor3 = arg1._config.WindowBgColor
-            Frame_5.BorderSizePixel = arg1._config.WindowBorderSize
-            Frame_5.BorderColor3 = arg1._config.BorderColor
-            Frame_5.Selectable = false
-            Frame_5.SelectionGroup = true
-            Frame_5.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
-            Frame_5.SelectionBehaviorDown = Enum.SelectionBehavior.Stop
-            Frame_5.SelectionBehaviorLeft = Enum.SelectionBehavior.Stop
-            Frame_5.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
-            Frame_5.Visible = false
-            arg2.UIPadding(Frame_5, arg1._config.WindowPadding)
-            arg2.UIListLayout(Frame_5, Enum.FillDirection.Vertical, UDim.new(0, arg1._config.ItemSpacing.Y))
-            Frame_5.Parent = Frame_2
-            return Folder
-        end;
-        Update = function(arg1_3) -- Line 100, Named "Update"
-            if 0 < var2_upvw then
-                arg1_3.Instance.PseudoWindowScreenGui.PseudoWindow.Visible = true
-            end
-        end;
-        Discard = function(arg1_4) -- Line 108, Named "Discard"
-            var2_upvw = 0
-            arg1_4.Instance:Destroy()
-        end;
-        ChildAdded = function(arg1_5, arg2_2) -- Line 112, Named "ChildAdded"
-            local Instance = arg1_5.Instance
-            if arg2_2.type == "Window" then
-                return arg1_5.Instance
-            end
-            if arg2_2.type == "Tooltip" then
-                return Instance.PopupScreenGui.TooltipContainer
-            end
-            if arg2_2.type == "MenuBar" then
-                return Instance.PopupScreenGui.MenuBarContainer
-            end
-            local PseudoWindow = Instance.PseudoWindowScreenGui.PseudoWindow
-            var2_upvw += 1
-            PseudoWindow.Visible = true
-            return PseudoWindow
-        end;
-        ChildDiscarded = function(arg1_6, arg2_3) -- Line 131, Named "ChildDiscarded"
-            if arg2_3.type ~= "Window" and arg2_3.type ~= "Tooltip" and arg2_3.type ~= "MenuBar" then
-                var2_upvw -= 1
-                if var2_upvw == 0 then
-                    arg1_6.Instance.PseudoWindowScreenGui.PseudoWindow.Visible = false
-                end
-            end
-        end;
-    })
+require(script.Parent.Parent.Types)
+return function(p1, p2) --[[ Line: 3 ]]
+	local v1 = 0
+	p1.WidgetConstructor("Root", {
+		hasState = false,
+		hasChildren = true,
+		Args = {},
+		Events = {},
+		Generate = function(p12) --[[ Name: Generate | Line: 12 | Upvalues: p1 (copy), p2 (copy) ]]
+			local Iris_Root = Instance.new("Folder")
+			Iris_Root.Name = "Iris_Root"
+			local PseudoWindowScreenGui
+			if p1._config.UseScreenGUIs then
+				local ScreenGui = Instance.new("ScreenGui")
+				ScreenGui.ResetOnSpawn = false
+				ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+				ScreenGui.ScreenInsets = p1._config.ScreenInsets
+				ScreenGui.IgnoreGuiInset = p1._config.IgnoreGuiInset
+				ScreenGui.DisplayOrder = p1._config.DisplayOrderOffset
+				PseudoWindowScreenGui = ScreenGui
+			else
+				local Frame = Instance.new("Frame")
+				Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+				Frame.Position = UDim2.fromScale(0.5, 0.5)
+				Frame.Size = UDim2.fromScale(1, 1)
+				Frame.BackgroundTransparency = 1
+				Frame.ZIndex = p1._config.DisplayOrderOffset
+				PseudoWindowScreenGui = Frame
+			end
+			PseudoWindowScreenGui.Name = "PseudoWindowScreenGui"
+			PseudoWindowScreenGui.Parent = Iris_Root
+			local PopupScreenGui
+			if p1._config.UseScreenGUIs then
+				local ScreenGui = Instance.new("ScreenGui")
+				ScreenGui.ResetOnSpawn = false
+				ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+				ScreenGui.DisplayOrder = p1._config.DisplayOrderOffset + 1024
+				ScreenGui.ScreenInsets = p1._config.ScreenInsets
+				ScreenGui.IgnoreGuiInset = p1._config.IgnoreGuiInset
+				PopupScreenGui = ScreenGui
+			else
+				local Frame = Instance.new("Frame")
+				Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+				Frame.Position = UDim2.fromScale(0.5, 0.5)
+				Frame.Size = UDim2.fromScale(1, 1)
+				Frame.BackgroundTransparency = 1
+				Frame.ZIndex = p1._config.DisplayOrderOffset + 1024
+				PopupScreenGui = Frame
+			end
+			PopupScreenGui.Name = "PopupScreenGui"
+			PopupScreenGui.Parent = Iris_Root
+			local TooltipContainer = Instance.new("Frame")
+			TooltipContainer.Name = "TooltipContainer"
+			TooltipContainer.AutomaticSize = Enum.AutomaticSize.XY
+			TooltipContainer.Size = UDim2.fromOffset(0, 0)
+			TooltipContainer.BackgroundTransparency = 1
+			TooltipContainer.BorderSizePixel = 0
+			p2.UIListLayout(TooltipContainer, Enum.FillDirection.Vertical, UDim.new(0, p1._config.PopupBorderSize))
+			TooltipContainer.Parent = PopupScreenGui
+			local MenuBarContainer = Instance.new("Frame")
+			MenuBarContainer.Name = "MenuBarContainer"
+			MenuBarContainer.AutomaticSize = Enum.AutomaticSize.Y
+			MenuBarContainer.Size = UDim2.fromScale(1, 0)
+			MenuBarContainer.BackgroundTransparency = 1
+			MenuBarContainer.BorderSizePixel = 0
+			MenuBarContainer.Parent = PopupScreenGui
+			local PseudoWindow = Instance.new("Frame")
+			PseudoWindow.Name = "PseudoWindow"
+			PseudoWindow.AutomaticSize = Enum.AutomaticSize.XY
+			PseudoWindow.Size = UDim2.new(0, 0, 0, 0)
+			PseudoWindow.Position = UDim2.fromOffset(0, 22)
+			PseudoWindow.BackgroundTransparency = p1._config.WindowBgTransparency
+			PseudoWindow.BackgroundColor3 = p1._config.WindowBgColor
+			PseudoWindow.BorderSizePixel = p1._config.WindowBorderSize
+			PseudoWindow.BorderColor3 = p1._config.BorderColor
+			PseudoWindow.Selectable = false
+			PseudoWindow.SelectionGroup = true
+			PseudoWindow.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
+			PseudoWindow.SelectionBehaviorDown = Enum.SelectionBehavior.Stop
+			PseudoWindow.SelectionBehaviorLeft = Enum.SelectionBehavior.Stop
+			PseudoWindow.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
+			PseudoWindow.Visible = false
+			p2.UIPadding(PseudoWindow, p1._config.WindowPadding)
+			p2.UIListLayout(PseudoWindow, Enum.FillDirection.Vertical, UDim.new(0, p1._config.ItemSpacing.Y))
+			PseudoWindow.Parent = PseudoWindowScreenGui
+			return Iris_Root
+		end,
+		Update = function(p1) --[[ Name: Update | Line: 100 | Upvalues: v1 (ref) ]]
+			if v1 > 0 then
+				p1.Instance.PseudoWindowScreenGui.PseudoWindow.Visible = true
+			end
+		end,
+		Discard = function(p1) --[[ Name: Discard | Line: 108 | Upvalues: v1 (ref) ]]
+			v1 = 0
+			p1.Instance:Destroy()
+		end,
+		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 112 | Upvalues: v1 (ref) ]]
+			local v12 = p1.Instance
+			if p2.type == "Window" then
+				return p1.Instance
+			elseif p2.type == "Tooltip" then
+				return v12.PopupScreenGui.TooltipContainer
+			elseif p2.type == "MenuBar" then
+				return v12.PopupScreenGui.MenuBarContainer
+			else
+				local PseudoWindow = v12.PseudoWindowScreenGui.PseudoWindow
+				v1 = v1 + 1
+				PseudoWindow.Visible = true
+				return PseudoWindow
+			end
+		end,
+		ChildDiscarded = function(p1, p2) --[[ Name: ChildDiscarded | Line: 131 | Upvalues: v1 (ref) ]]
+			if p2.type ~= "Window" and (p2.type ~= "Tooltip" and p2.type ~= "MenuBar") then
+				v1 = v1 - 1
+				if v1 == 0 then
+					p1.Instance.PseudoWindowScreenGui.PseudoWindow.Visible = false
+				end
+			end
+		end
+	})
 end

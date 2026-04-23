@@ -1,44 +1,44 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Basic_upvr = require(script.Parent.Basic)
-local tbl_upvr = {
-    Motion = {
-        Hip = {
-            Springs = {
-                ItemOffset = Vector3.new();
-                ItemRotation = Vector3.new();
-                NeckRotation = Vector3.new();
-                WaistRotation = Vector3.new();
-            };
-        };
-        RightWristRotation = CFrame.new();
-        LeftWristRotation = CFrame.new();
-    };
+local v1 = script.Parent
+local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
+local TableUtils = require(ReplicatedStorage.Std.TableUtils)
+local Basic = require(v1.Basic)
+local t = {
+	Motion = {
+		Hip = {
+			Springs = {
+				ItemOffset = Vector3.new(),
+				ItemRotation = Vector3.new(),
+				NeckRotation = Vector3.new(),
+				WaistRotation = Vector3.new()
+			}
+		},
+		RightWristRotation = CFrame.new(),
+		LeftWristRotation = CFrame.new()
+	}
 }
-local module_upvr = {
-    __ClassName = "Custom";
+local t2 = {
+	__ClassName = "Custom"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Basic_upvr)
-local TableUtils_upvr = require(ReplicatedStorage.Std.TableUtils)
-local InventoryItemUtils_upvr = require(ReplicatedStorage.Inventory.InventoryItemUtils)
-function module_upvr.new(arg1, arg2, arg3) -- Line 26
-    local any_deepCopy_result1 = TableUtils_upvr.deepCopy(tbl_upvr)
-    local any_getAttr_result1 = InventoryItemUtils_upvr.getAttr(arg2, "ItemOffset")
-    if any_getAttr_result1 then
-        any_deepCopy_result1.Motion.Hip.Springs.ItemOffset = any_getAttr_result1
-    end
-    local any_new_result1 = Basic_upvr.new(arg1, arg2, any_deepCopy_result1, arg3)
-    any_new_result1.__ClassName = InventoryItemUtils_upvr.getName(arg2)
-    setmetatable(any_new_result1, module_upvr)
-    any_new_result1:DefaultDisableCamLock()
-    return any_new_result1
+t2.__index = t2
+setmetatable(t2, Basic)
+function t2.new(p1, p2, p3) --[[ Line: 26 | Upvalues: TableUtils (copy), t (copy), InventoryItemUtils (copy), Basic (copy), t2 (copy) ]]
+	local v1 = TableUtils.deepCopy(t)
+	local v2 = InventoryItemUtils.getAttr(p2, "ItemOffset")
+	if v2 then
+		v1.Motion.Hip.Springs.ItemOffset = v2
+	end
+	local v3 = Basic.new(p1, p2, v1, p3)
+	v3.__ClassName = InventoryItemUtils.getName(p2)
+	setmetatable(v3, t2)
+	v3:DefaultDisableCamLock()
+	return v3
 end
-function module_upvr.GetLeftArmPosition(arg1) -- Line 41
-    return nil
+function t2.GetLeftArmPosition(p1) --[[ Line: 41 ]]
+	return nil
 end
-function module_upvr.InputBegan(arg1, ...) -- Line 44
-    Basic_upvr.InputBegan(arg1, ...)
+function t2.InputBegan(p1, ...) --[[ Line: 44 | Upvalues: Basic (copy) ]]
+	Basic.InputBegan(p1, ...)
 end
-function module_upvr.InputEnded(arg1) -- Line 47
-end
-return module_upvr
+function t2.InputEnded(p1) --[[ Line: 47 ]] end
+return t2

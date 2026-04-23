@@ -1,131 +1,131 @@
-local Basic_upvr = require(script.Parent.Basic)
-local tbl_upvr = {
-    Motion = {
-        Hip = {
-            Springs = {
-                ItemOffset = Vector3.new(0, 0.80000, -1.7000);
-                ItemRotation = Vector3.new();
-                NeckRotation = Vector3.new();
-                WaistRotation = Vector3.new();
-            };
-        };
-        RightWristRotation = CFrame.new();
-        LeftWristRotation = CFrame.new();
-    };
-    FunSounds = {{
-        Name = "Siren";
-        IconId = "rbxassetid://4939739355";
-        SoundId = 690529934;
-    }, {
-        Name = "Drop Weapons";
-        SoundId = 8990461116;
-    }, {
-        Name = "Countdown";
-        SoundId = 8990459885;
-    }, {
-        Name = "ChampionTrumpets";
-        SoundId = 12413440203;
-    }};
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.ActionButton.ActionButtonService)
+local Basic = require(script.Parent.Basic)
+local t = {
+	Motion = {
+		Hip = {
+			Springs = {
+				ItemOffset = Vector3.new(0, 0.8, -1.7),
+				ItemRotation = Vector3.new(),
+				NeckRotation = Vector3.new(),
+				WaistRotation = Vector3.new()
+			}
+		},
+		RightWristRotation = CFrame.new(),
+		LeftWristRotation = CFrame.new()
+	},
+	FunSounds = {
+		{
+			Name = "Siren",
+			IconId = "rbxassetid://4939739355",
+			SoundId = 690529934
+		},
+		{
+			Name = "Drop Weapons",
+			SoundId = 8990461116
+		},
+		{
+			Name = "Countdown",
+			SoundId = 8990459885
+		},
+		{
+			Name = "ChampionTrumpets",
+			SoundId = 12413440203
+		}
+	}
 }
-local function _(arg1, arg2) -- Line 41, Named "wireup"
-    local Wire_5 = Instance.new("Wire")
-    Wire_5.SourceInstance = arg1
-    Wire_5.TargetInstance = arg2
-    Wire_5.Parent = arg2
-    return Wire_5
+local function wireup(p1, p2) --[[ Line: 41 ]]
+	local Wire = Instance.new("Wire")
+	Wire.SourceInstance = p1
+	Wire.TargetInstance = p2
+	Wire.Parent = p2
+	return Wire
 end
-local function _(arg1, arg2) -- Line 49, Named "split"
-    local TargetInstance_2 = arg1.TargetInstance
-    arg1.TargetInstance = arg2
-    local Wire_2 = Instance.new("Wire")
-    Wire_2.SourceInstance = arg2
-    Wire_2.TargetInstance = TargetInstance_2
-    Wire_2.Parent = TargetInstance_2
+local function split(p1, p2) --[[ Line: 49 ]]
+	local SourceInstance = p1.SourceInstance
+	local TargetInstance = p1.TargetInstance
+	p1.TargetInstance = p2
+	local Wire = Instance.new("Wire")
+	Wire.SourceInstance = p2
+	Wire.TargetInstance = TargetInstance
+	Wire.Parent = TargetInstance
 end
-local module_upvr = {
-    __ClassName = "Megaphone";
+local t2 = {
+	__ClassName = "Megaphone"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Basic_upvr)
-function module_upvr.new(arg1, arg2, arg3) -- Line 60
-    local any_new_result1 = Basic_upvr.new(arg1, arg2, tbl_upvr, arg3)
-    setmetatable(any_new_result1, module_upvr)
-    local AudioEmitter = Instance.new("AudioEmitter")
-    local AudioPlayer = Instance.new("AudioPlayer")
-    local Wire_7 = Instance.new("Wire")
-    local Wire_3 = Instance.new("Wire")
-    AudioPlayer.Volume = 0.5
-    AudioPlayer.Parent = AudioEmitter
-    Wire_7.Parent = AudioEmitter
-    Wire_7.SourceInstance = AudioPlayer
-    Wire_7.TargetInstance = AudioEmitter
-    Wire_3.Parent = AudioEmitter
-    Wire_3.TargetInstance = AudioEmitter
-    if arg1:FindFirstChild("AudioDeviceInput") then
-        Wire_3.SourceInstance = arg1.AudioDeviceInput
-    end
-    local AudioDistortion_2 = Instance.new("AudioDistortion", Wire_7)
-    AudioDistortion_2.Level = 0.4
-    local TargetInstance_3 = Wire_7.TargetInstance
-    Wire_7.TargetInstance = AudioDistortion_2
-    local Wire = Instance.new("Wire")
-    Wire.SourceInstance = AudioDistortion_2
-    Wire.TargetInstance = TargetInstance_3
-    Wire.Parent = TargetInstance_3
-    local AudioDistortion = Instance.new("AudioDistortion", Wire_3)
-    AudioDistortion.Level = 0.5
-    local TargetInstance_4 = Wire_3.TargetInstance
-    Wire_3.TargetInstance = AudioDistortion
-    local Wire_6 = Instance.new("Wire")
-    Wire_6.SourceInstance = AudioDistortion
-    Wire_6.TargetInstance = TargetInstance_4
-    Wire_6.Parent = TargetInstance_4
-    local AudioFader = Instance.new("AudioFader", Wire_3)
-    AudioFader.Volume = 2
-    local TargetInstance = Wire_3.TargetInstance
-    Wire_3.TargetInstance = AudioFader
-    local Wire_4 = Instance.new("Wire")
-    Wire_4.SourceInstance = AudioFader
-    Wire_4.TargetInstance = TargetInstance
-    Wire_4.Parent = TargetInstance
-    AudioEmitter.Parent = any_new_result1.Model.Model.Body.EmmitAttachment
-    any_new_result1.Model.Model.TeamColor.BrickColor = arg1.TeamColor
-    any_new_result1.AudioPlayer = AudioPlayer
-    any_new_result1.Maid:GiveTask(AudioEmitter)
-    if any_new_result1.Local then
-        Wire_3.TargetInstance = nil
-    end
-    any_new_result1:DefaultDisableCamLock()
-    return any_new_result1
+t2.__index = t2
+setmetatable(t2, Basic)
+function t2.new(p1, p2, p3) --[[ Line: 60 | Upvalues: Basic (copy), t (copy), t2 (copy) ]]
+	local v1 = Basic.new(p1, p2, t, p3)
+	setmetatable(v1, t2)
+	local AudioEmitter = Instance.new("AudioEmitter")
+	local AudioPlayer = Instance.new("AudioPlayer")
+	local Wire = Instance.new("Wire")
+	local Wire_2 = Instance.new("Wire")
+	AudioPlayer.Volume = 0.5
+	AudioPlayer.Parent = AudioEmitter
+	Wire.Parent = AudioEmitter
+	Wire.SourceInstance = AudioPlayer
+	Wire.TargetInstance = AudioEmitter
+	Wire_2.Parent = AudioEmitter
+	Wire_2.TargetInstance = AudioEmitter
+	if p1:FindFirstChild("AudioDeviceInput") then
+		Wire_2.SourceInstance = p1.AudioDeviceInput
+	end
+	local AudioDistortion = Instance.new("AudioDistortion", Wire)
+	AudioDistortion.Level = 0.4
+	local SourceInstance = Wire.SourceInstance
+	local TargetInstance = Wire.TargetInstance
+	Wire.TargetInstance = AudioDistortion
+	local Wire_3 = Instance.new("Wire")
+	Wire_3.SourceInstance = AudioDistortion
+	Wire_3.TargetInstance = TargetInstance
+	Wire_3.Parent = TargetInstance
+	local AudioDistortion_2 = Instance.new("AudioDistortion", Wire_2)
+	AudioDistortion_2.Level = 0.5
+	local SourceInstance_2 = Wire_2.SourceInstance
+	local TargetInstance_2 = Wire_2.TargetInstance
+	Wire_2.TargetInstance = AudioDistortion_2
+	local Wire_4 = Instance.new("Wire")
+	Wire_4.SourceInstance = AudioDistortion_2
+	Wire_4.TargetInstance = TargetInstance_2
+	Wire_4.Parent = TargetInstance_2
+	local AudioFader = Instance.new("AudioFader", Wire_2)
+	AudioFader.Volume = 2
+	local SourceInstance_3 = Wire_2.SourceInstance
+	local TargetInstance_3 = Wire_2.TargetInstance
+	Wire_2.TargetInstance = AudioFader
+	local Wire_5 = Instance.new("Wire")
+	Wire_5.SourceInstance = AudioFader
+	Wire_5.TargetInstance = TargetInstance_3
+	Wire_5.Parent = TargetInstance_3
+	AudioEmitter.Parent = v1.Model.Model.Body.EmmitAttachment
+	v1.Model.Model.TeamColor.BrickColor = p1.TeamColor
+	v1.AudioPlayer = AudioPlayer
+	v1.Maid:GiveTask(AudioEmitter)
+	if v1.Local then
+		Wire_2.TargetInstance = nil
+	end
+	v1:DefaultDisableCamLock()
+	return v1
 end
-function module_upvr.GetLeftArmPosition(arg1) -- Line 115
-    return nil
+function t2.GetLeftArmPosition(p1) --[[ Line: 115 ]]
+	return nil
 end
-function module_upvr.InputBegan(arg1, arg2, arg3) -- Line 118
-    local var31
-    if arg2.UserInputType ~= Enum.UserInputType.MouseButton1 then
-        var31 = false
-        if arg2.UserInputType == Enum.UserInputType.Gamepad1 then
-            if arg2.KeyCode ~= Enum.KeyCode.ButtonR2 then
-                var31 = false
-            else
-                var31 = true
-            end
-        end
-    end
-    if arg1.AudioPlayer and var31 then
-        local var32 = "rbxassetid://"..tbl_upvr.FunSounds[2].SoundId
-        if arg1.AudioPlayer.Asset ~= var32 then
-            arg1.AudioPlayer.Asset = var32
-            arg1.AudioPlayer.TimePosition = 0
-        end
-        arg1.AudioPlayer:Play()
-    end
-    if arg1.Local and var31 then
-        arg1:BroadcastInputBegan(arg2)
-    end
-    Basic_upvr.InputBegan(arg1, arg2, arg3)
+function t2.InputBegan(p1, p2, p3) --[[ Line: 118 | Upvalues: t (copy), Basic (copy) ]]
+	local v1 = if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false
+	if p1.AudioPlayer and v1 then
+		local v2 = "rbxassetid://" .. t.FunSounds[2].SoundId
+		if p1.AudioPlayer.Asset ~= v2 then
+			p1.AudioPlayer.Asset = v2
+			p1.AudioPlayer.TimePosition = 0
+		end
+		p1.AudioPlayer:Play()
+	end
+	if p1.Local and v1 then
+		p1:BroadcastInputBegan(p2)
+	end
+	Basic.InputBegan(p1, p2, p3)
 end
-function module_upvr.InputEnded(arg1) -- Line 137
-end
-return module_upvr
+function t2.InputEnded(p1) --[[ Line: 137 ]] end
+return t2

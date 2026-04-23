@@ -1,1 +1,4 @@
-return require(game:GetService("ReplicatedStorage").Std.Binder).new(require(script.Parent.HotbarItemConsts).TAG_NAME, require(script.Parent.HotbarItem))
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Binder = require(ReplicatedStorage.Std.Binder)
+local HotbarItemConsts = require(script.Parent.HotbarItemConsts)
+return Binder.new(HotbarItemConsts.TAG_NAME, require(script.Parent.HotbarItem))

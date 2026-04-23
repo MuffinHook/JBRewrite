@@ -1,29 +1,27 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage_upvr.Roact)
-local RoactRodux_upvr = require(ReplicatedStorage_upvr.RoactRodux)
-return function(arg1) -- Line 5
-    local any_extend_result1 = Roact_upvr.Component:extend("App")
-    local store_upvr = require(ReplicatedStorage_upvr.App.store)
-    function any_extend_result1.init(arg1_2) -- Line 9
-    end
-    store_upvr:dispatch({
-        type = "setSpawnSelectionOfferVisible";
-        visible = true;
-    })
-    store_upvr:dispatch({
-        type = "setLastDiedAt";
-        lastDiedAt = workspace:GetServerTimeNow();
-    })
-    local ChooseSpawn_upvr = require(script.Parent.ChooseSpawn)
-    function any_extend_result1.render(arg1_3) -- Line 18
-        return Roact_upvr.createElement(RoactRodux_upvr.StoreProvider, {
-            store = store_upvr;
-        }, {Roact_upvr.createElement(ChooseSpawn_upvr, {})})
-    end
-    function any_extend_result1.willUnmount(arg1_4) -- Line 25
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(any_extend_result1), arg1)
-    return function() -- Line 28
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (copy), RoactRodux (copy) ]]
+	local v1 = Roact.Component:extend("App")
+	local store = require(ReplicatedStorage.App.store)
+	local ChooseSpawn = require(script.Parent.ChooseSpawn)
+	function v1.init(p1) --[[ Line: 9 ]] end
+	store:dispatch({
+		type = "setSpawnSelectionOfferVisible",
+		visible = true
+	})
+	store:dispatch({
+		type = "setLastDiedAt",
+		lastDiedAt = workspace:GetServerTimeNow()
+	})
+	function v1.render(p1) --[[ Line: 18 | Upvalues: Roact (ref), RoactRodux (ref), store (copy), ChooseSpawn (copy) ]]
+		return Roact.createElement(RoactRodux.StoreProvider, {
+			store = store
+		}, { Roact.createElement(ChooseSpawn, {}) })
+	end
+	function v1.willUnmount(p1) --[[ Line: 25 ]] end
+	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	return function() --[[ Line: 28 | Upvalues: Roact (ref), v2 (copy) ]]
+		Roact.unmount(v2)
+	end
 end

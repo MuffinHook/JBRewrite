@@ -1,1 +1,4 @@
-return require(game:GetService("ReplicatedStorage").Std.Binder).new(require(script.Parent.ProximitySoundConsts).TAG_NAME, require(script.Parent.ProximitySound))
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Binder = require(ReplicatedStorage.Std.Binder)
+local ProximitySoundConsts = require(script.Parent.ProximitySoundConsts)
+return Binder.new(ProximitySoundConsts.TAG_NAME, require(script.Parent.ProximitySound))

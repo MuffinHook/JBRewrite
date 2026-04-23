@@ -1,148 +1,106 @@
-local RunService_upvr = game:GetService("RunService")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("PlayerTitle")
-any_extend_result1.defaultProps = {
-    size = UDim2.new(1, 0, 1, 0);
-    position = UDim2.new(0, 0, 0, 0);
-    aspectRatio = 1;
-    parentRatio = 1;
+local Spring = require(ReplicatedStorage.Std.Spring)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local v1 = Roact.PureComponent:extend("PlayerTitle")
+v1.defaultProps = {
+	size = UDim2.new(1, 0, 1, 0),
+	position = UDim2.new(0, 0, 0, 0),
+	aspectRatio = 1,
+	parentRatio = 1
 }
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local Spring_upvr = require(ReplicatedStorage.Std.Spring)
-function any_extend_result1.init(arg1) -- Line 15
-    arg1.maid = Maid_upvr.new()
-    arg1.spinSpring = Spring_upvr.new(0, 0, 0.8, 15)
-    arg1.scaleSpring = Spring_upvr.new(1, 0, 0.5, 40)
-    local any_createBinding_result1_2, any_createBinding_result2_2 = Roact_upvr.createBinding(0)
-    arg1.spin = any_createBinding_result1_2
-    arg1.updateSpin = any_createBinding_result2_2
-    local any_createBinding_result1, any_createBinding_result2 = Roact_upvr.createBinding(1)
-    arg1.scale = any_createBinding_result1
-    arg1.updateScale = any_createBinding_result2
+function v1.init(p1) --[[ Line: 15 | Upvalues: Maid (copy), Spring (copy), Roact (copy) ]]
+	p1.maid = Maid.new()
+	p1.spinSpring = Spring.new(0, 0, 0.8, 15)
+	p1.scaleSpring = Spring.new(1, 0, 0.5, 40)
+	local v1, v2 = Roact.createBinding(0)
+	p1.spin = v1
+	p1.updateSpin = v2
+	local v3, v4 = Roact.createBinding(1)
+	p1.scale = v3
+	p1.updateScale = v4
 end
-local createElement_upvr = Roact_upvr.createElement
-function any_extend_result1.render(arg1) -- Line 22
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local aspectRatio_upvr = arg1.props.aspectRatio
-    local var14 = arg1.props.size.X.Scale / arg1.props.size.Y.Scale
-    local var15
-    if arg1.props.size.X.Offset ~= 0 then
-        var14 = false
-    else
-        var14 = true
-    end
-    assert(var14, "cannot support nonzero offset")
-    if arg1.props.size.Y.Offset ~= 0 then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    assert(true, "cannot support nonzero offset")
-    local module = {
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-    }
-    var15 = (arg1.props.size.Y.Scale) * (arg1.props.parentRatio * var14) * 1
-    var15 = 0
-    module.Size = UDim2.new(arg1.props.size.X.Scale, 0, var15 / aspectRatio_upvr, var15)
-    module.Position = arg1.props.position
-    local module_2 = {}
-    local tbl_3 = {}
-    var15 = 0
-    tbl_3.BorderSizePixel = var15
-    var15 = 1
-    tbl_3.BackgroundTransparency = var15
-    var15 = Color3.new(0.1, 0.1, 0.1)
-    tbl_3.BackgroundColor3 = var15
-    var15 = Vector2.new(0.5, 0.5)
-    tbl_3.AnchorPoint = var15
-    var15 = UDim2.new(0.5 / aspectRatio_upvr, 0, 0.5, 0)
-    tbl_3.Position = var15
-    var15 = arg1.scale
-    var15 = var15:map(function(arg1_2) -- Line 40
-        return UDim2.new(arg1_2 / aspectRatio_upvr, 0, arg1_2, 0)
-    end)
-    tbl_3.Size = var15
-    if arg1.props.ready then
-        var15 = "rbxassetid://9474441364"
-    else
-        var15 = arg1.props
-        var15 = var15.userId
-        if var15 then
-            var15 = string.format("rbxthumb://type=AvatarHeadShot&w=150&h=150&id=%d", arg1.props.userId);
-        end
-    end
-    tbl_3.Image = var15
-    var15 = arg1.spin
-    tbl_3.Rotation = var15
-    var15 = {}
-    var15.UICorner = createElement_upvr("UICorner", {
-        CornerRadius = UDim.new(1, 0);
-    })
-    module_2.Icon = createElement_upvr("ImageLabel", tbl_3, var15)
-    local tbl_2 = {}
-    var15 = 1
-    tbl_2.BackgroundTransparency = var15
-    var15 = Color3.new(1, 0, 0)
-    tbl_2.BackgroundColor3 = var15
-    var15 = UDim2.new(1 - 1 / aspectRatio_upvr - 0.0078125, 0, 1, 0)
-    tbl_2.Size = var15
-    var15 = UDim2.new(1 / aspectRatio_upvr + 0.0078125, 0, 0, 0)
-    tbl_2.Position = var15
-    var15 = {}
-    local tbl = {
-        BackgroundTransparency = 1;
-        Size = UDim2.new(1, 0, 1, 0);
-        Position = UDim2.new(0.5, 0, 0.5, 0);
-        AnchorPoint = Vector2.new(0.5, 0.5);
-    }
-    if not arg1.props.ready or not Color3.fromRGB(0, 200, 90) then
-    end
-    tbl.TextColor3 = Color3.new(1, 1, 1)
-    tbl.Text = arg1.props.displayName
-    tbl.TextXAlignment = Enum.TextXAlignment.Left
-    tbl.Font = Enum.Font.Bangers
-    tbl.LineHeight = 1
-    tbl.TextScaled = true
-    var15.Text = createElement_upvr("TextLabel", tbl)
-    module_2.Title = createElement_upvr("Frame", tbl_2, var15)
-    do
-        return createElement_upvr("Frame", module, module_2)
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function v1.render(p1) --[[ Line: 22 | Upvalues: createElement (copy) ]]
+	local aspectRatio = p1.props.aspectRatio
+	assert(p1.props.size.X.Offset == 0, "cannot support nonzero offset")
+	assert(p1.props.size.Y.Offset == 0, "cannot support nonzero offset")
+	local t = {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.new(p1.props.size.X.Scale, 0, p1.props.size.Y.Scale * (p1.props.parentRatio * (p1.props.size.X.Scale / p1.props.size.Y.Scale)) * 1 / aspectRatio, 0),
+		Position = p1.props.position
+	}
+	local t2 = {}
+	local t3 = {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5 / aspectRatio, 0, 0.5, 0),
+		Size = p1.scale:map(function(p1) --[[ Line: 40 | Upvalues: aspectRatio (copy) ]]
+			return UDim2.new(p1 / aspectRatio, 0, p1, 0)
+		end)
+	}
+	t3.Image = if p1.props.ready then "rbxassetid://9474441364" else p1.props.userId and ("rbxthumb://type=AvatarHeadShot&w=150&h=150&id=%d"):format(p1.props.userId)
+	t3.Rotation = p1.spin
+	t2.Icon = createElement("ImageLabel", t3, {
+		UICorner = createElement("UICorner", {
+			CornerRadius = UDim.new(1, 0)
+		})
+	})
+	local t4 = {
+		BackgroundTransparency = 1,
+		BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
+		Size = UDim2.new(1 - 1 / aspectRatio - 0.0078125, 0, 1, 0),
+		Position = UDim2.new(1 / aspectRatio + 0.0078125, 0, 0, 0)
+	}
+	local t5 = {}
+	local t6 = {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		AnchorPoint = Vector2.new(0.5, 0.5)
+	}
+	t6.TextColor3 = p1.props.ready and Color3.fromRGB(0, 200, 90) or Color3.new(255/255, 255/255, 255/255)
+	t6.Text = p1.props.displayName
+	t6.TextXAlignment = Enum.TextXAlignment.Left
+	t6.Font = Enum.Font.Bangers
+	t6.LineHeight = 1
+	t6.TextScaled = true
+	t5.Text = createElement("TextLabel", t6)
+	t2.Title = createElement("Frame", t4, t5)
+	return createElement("Frame", t, t2)
 end
-function any_extend_result1.PopIcon(arg1) -- Line 75
-    arg1.scaleSpring:Accelerate(15)
-    local Target_upvr = arg1.scaleSpring.Target
-    arg1.maid.scaleHeartbeat = RunService_upvr.Heartbeat:Connect(function() -- Line 78
-        local any_Update_result1_2, any_Update_result2 = arg1.scaleSpring:Update()
-        local var27
-        if math.abs(Target_upvr - any_Update_result1_2) < 0.001 and math.abs(any_Update_result2) < 0.001 then
-            arg1.maid.scaleHeartbeat = nil
-            var27 = Target_upvr
-        end
-        arg1.updateScale(var27)
-    end)
+function v1.PopIcon(p1) --[[ Line: 75 | Upvalues: RunService (copy) ]]
+	p1.scaleSpring:Accelerate(15)
+	local Target = p1.scaleSpring.Target
+	p1.maid.scaleHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 78 | Upvalues: p1 (copy), Target (copy) ]]
+		local v1, v2 = p1.scaleSpring:Update()
+		if math.abs(Target - v1) < 0.001 and math.abs(v2) < 0.001 then
+			p1.maid.scaleHeartbeat = nil
+			v1 = Target
+		end
+		p1.updateScale(v1)
+	end)
 end
-function any_extend_result1.SpinIcon(arg1) -- Line 87
-    arg1.spinSpring:SetTarget(360)
-    arg1.spinSpring.p = 0
-    arg1.maid.spinHeartbeat = RunService_upvr.Heartbeat:Connect(function() -- Line 91
-        local any_Update_result1, any_Update_result2_2 = arg1.spinSpring:Update()
-        local var31
-        if math.abs(360 - any_Update_result1) < 0.001 and math.abs(any_Update_result2_2) < 0.001 then
-            arg1.maid.spinHeartbeat = nil
-            var31 = 0
-        end
-        arg1.updateSpin(var31)
-    end)
+function v1.SpinIcon(p1) --[[ Line: 87 | Upvalues: RunService (copy) ]]
+	p1.spinSpring:SetTarget(360)
+	p1.spinSpring.p = 0
+	p1.maid.spinHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 91 | Upvalues: p1 (copy) ]]
+		local v1, v2 = p1.spinSpring:Update()
+		if math.abs(360 - v1) < 0.001 and math.abs(v2) < 0.001 then
+			p1.maid.spinHeartbeat = nil
+			v1 = 0
+		end
+		p1.updateSpin(v1)
+	end)
 end
-function any_extend_result1.didUpdate(arg1, arg2, arg3) -- Line 100
-    if arg1.props.ready ~= arg2.ready and arg1.props.ready then
-        arg1:SpinIcon()
-        arg1:PopIcon()
-    end
+function v1.didUpdate(p1, p2, p3) --[[ Line: 100 ]]
+	if p1.props.ready ~= p2.ready and p1.props.ready then
+		p1:SpinIcon()
+		p1:PopIcon()
+	end
 end
-return any_extend_result1
+return v1

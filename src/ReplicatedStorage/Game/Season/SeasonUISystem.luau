@@ -1,302 +1,256 @@
-local Players_upvr = game:GetService("Players")
-local LocalPlayer_upvr = Players_upvr.LocalPlayer
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local LevelUtils_upvr = require(ReplicatedStorage_upvr.Game.Level2.LevelUtils)
-local EzUtils_upvr = require(ReplicatedStorage_upvr.EzUi.EzUtils)
-local LevelConsts_upvr = require(ReplicatedStorage_upvr.Game.Level2.LevelConsts)
-local SeasonConsts_upvr = require(script.Parent.SeasonConsts)
-local SeasonUtils_upvr = require(script.Parent.SeasonUtils)
-local var9_upvw
-local var10_upvw
-local function _(arg1) -- Line 28, Named "SelectIfGamepad"
-    EzUtils_upvr.selectIfGamepad(arg1)
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local MarketplaceService = game:GetService("MarketplaceService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.Std.Audio)
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Notification = require(ReplicatedStorage.Game.Notification)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local LevelSystem = require(ReplicatedStorage.Game.Level2.LevelSystem)
+local LevelUtils = require(ReplicatedStorage.Game.Level2.LevelUtils)
+local Window = require(ReplicatedStorage.Module.Window.Window)
+local GameUtil = require(ReplicatedStorage.Game.GameUtil)
+local RunUtils = require(ReplicatedStorage.App.RunUtils)
+local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
+local Utils = require(ReplicatedStorage.EzUi.Utils)
+local ContractUtils = require(ReplicatedStorage.Game.Contract.ContractUtils)
+local LevelConsts = require(ReplicatedStorage.Game.Level2.LevelConsts)
+local SeasonUIUtils = require(ReplicatedStorage.Game.Season.SeasonUIUtils)
+local SeasonConsts = require(script.Parent.SeasonConsts)
+local SeasonUtils = require(script.Parent.SeasonUtils)
+local v1 = nil
+local v2 = nil
+local function SelectIfGamepad(p1) --[[ Line: 28 | Upvalues: EzUtils (copy) ]]
+	EzUtils.selectIfGamepad(p1)
 end
-local module_upvr = {}
-local Window_upvr = require(ReplicatedStorage_upvr.Module.Window.Window)
-local GameUtil_upvr = require(ReplicatedStorage_upvr.Game.GameUtil)
-local waitForChild_upvr = require(ReplicatedStorage_upvr.Std.waitForChild)
-function module_upvr.init() -- Line 33
-    var9_upvw = require(script.Parent.SeasonSystem)
-    var10_upvw = require(ReplicatedStorage_upvr.Game.Contract.ContractUISystem)
-    local SeasonGui = ReplicatedStorage_upvr.StarterGui:FindFirstChild("SeasonGui")
-    SeasonGui.Parent = LocalPlayer_upvr.PlayerGui
-    module_upvr.gui = SeasonGui
-    module_upvr._seasonState = -1
-    SeasonGui.Background.Title.Frame.SeasonNumWelcome.Text = string.format("Welcome to SEASON %d", SeasonConsts_upvr.SEASON_NUM)
-    SeasonGui.Background.Title.Frame.SeasonNumWelcome.TextLabel.Text = SeasonGui.Background.Title.Frame.SeasonNumWelcome.Text
-    SeasonGui.Background.Title.Frame.SeasonTitle.Text = SeasonConsts_upvr.SEASON_TITLE
-    local any_new_result1_2 = Window_upvr.new()
-    any_new_result1_2:GetOnOpenedSignal():Connect(module_upvr._open)
-    any_new_result1_2:GetOnClosedSignal():Connect(module_upvr._close)
-    module_upvr._window = any_new_result1_2
-    GameUtil_upvr.getCenterWindowGroup():Add(any_new_result1_2)
-    waitForChild_upvr(ReplicatedStorage_upvr, SeasonConsts_upvr.PRIZE_PURCHASE_REMOTE_NAME, 30):andThen(function(arg1) -- Line 54
-        var9_upvw._prizePurchaseRemote = arg1
-    end):catch(warn)
-    SeasonGui.Background.BonusAwards.Visible = SeasonConsts_upvr.SEASON_BONUS_ENABLED
+local t = {}
+function t.init() --[[ Line: 33 | Upvalues: v1 (ref), v2 (ref), ReplicatedStorage (copy), LocalPlayer (copy), t (copy), SeasonConsts (copy), Window (copy), GameUtil (copy), waitForChild (copy) ]]
+	v1 = require(script.Parent.SeasonSystem)
+	v2 = require(ReplicatedStorage.Game.Contract.ContractUISystem)
+	local SeasonGui = ReplicatedStorage.StarterGui:FindFirstChild("SeasonGui")
+	SeasonGui.Parent = LocalPlayer.PlayerGui
+	t.gui = SeasonGui
+	t._seasonState = -1
+	SeasonGui.Background.Title.Frame.SeasonNumWelcome.Text = ("Welcome to SEASON %d"):format(SeasonConsts.SEASON_NUM)
+	SeasonGui.Background.Title.Frame.SeasonNumWelcome.TextLabel.Text = SeasonGui.Background.Title.Frame.SeasonNumWelcome.Text
+	SeasonGui.Background.Title.Frame.SeasonTitle.Text = SeasonConsts.SEASON_TITLE
+	local v12 = Window.new()
+	v12:GetOnOpenedSignal():Connect(t._open)
+	v12:GetOnClosedSignal():Connect(t._close)
+	t._window = v12
+	GameUtil.getCenterWindowGroup():Add(v12)
+	waitForChild(ReplicatedStorage, SeasonConsts.PRIZE_PURCHASE_REMOTE_NAME, 30):andThen(function(p1) --[[ Line: 54 | Upvalues: v1 (ref) ]]
+		v1._prizePurchaseRemote = p1
+	end):catch(warn)
+	SeasonGui.Background.BonusAwards.Visible = SeasonConsts.SEASON_BONUS_ENABLED
 end
-function module_upvr._updateSeasonUi(arg1) -- Line 61
-    module_upvr._seasonState = arg1
-    local gui = module_upvr.gui
-    if arg1 == 0 then
-        gui.Background.Timer.Title.Text = "SEASON ENDS"
-        gui.Background.Help.Text = SeasonConsts_upvr.SEASON_SUBTITLE
-        gui.Background.Bottom.Container.ReviewButton.TextLabel.Text = "CONTRACTS"
-    else
-        if arg1 == 1 then
-            gui.Background.Timer.Title.Text = "BUYING ENDS"
-            gui.Background.Help.Text = SeasonConsts_upvr.BUY_SUBTITLE
-            gui.Background.Bottom.Container.ReviewButton.TextLabel.Text = "COMING SOON"
-            return
-        end
-        if arg1 == 2 then
-            gui.Background.Timer.Title.Text = "SEASON ENDS"
-            gui.Background.Help.Text = SeasonConsts_upvr.POST_SUBTITLE
-            gui.Background.Bottom.Container.ReviewButton.TextLabel.Text = "COMING SOON"
-            return
-        end
-        error(string.format("Invalid season state: %d", arg1))
-    end
+function t._updateSeasonUi(p1) --[[ Line: 61 | Upvalues: t (copy), SeasonConsts (copy) ]]
+	t._seasonState = p1
+	local gui = t.gui
+	if p1 == 0 then
+		gui.Background.Timer.Title.Text = "SEASON ENDS"
+		gui.Background.Help.Text = SeasonConsts.SEASON_SUBTITLE
+		gui.Background.Bottom.Container.ReviewButton.TextLabel.Text = "CONTRACTS"
+	elseif p1 == 1 then
+		gui.Background.Timer.Title.Text = "BUYING ENDS"
+		gui.Background.Help.Text = SeasonConsts.BUY_SUBTITLE
+		gui.Background.Bottom.Container.ReviewButton.TextLabel.Text = "COMING SOON"
+	elseif p1 == 2 then
+		gui.Background.Timer.Title.Text = "SEASON ENDS"
+		gui.Background.Help.Text = SeasonConsts.POST_SUBTITLE
+		gui.Background.Bottom.Container.ReviewButton.TextLabel.Text = "COMING SOON"
+	else
+		error(("Invalid season state: %d"):format(p1))
+	end
 end
-local ContractUtils_upvr = require(ReplicatedStorage_upvr.Game.Contract.ContractUtils)
-function module_upvr._updateDeadline() -- Line 80
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local gui_3 = module_upvr.gui
-    local any_getRemainingTime_result1 = SeasonUtils_upvr.getRemainingTime()
-    local var26
-    if any_getRemainingTime_result1 >= 0 then
-        var26 = false
-    else
-        var26 = true
-    end
-    local any_isBuyEnabled_result1 = SeasonUtils_upvr.isBuyEnabled()
-    if any_isBuyEnabled_result1 then
-        gui_3.Background.Timer.Time.Text = SeasonUtils_upvr.formatRemaining(SeasonUtils_upvr.getRemainingBuyTime())
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    gui_3.Background.Timer.Time.Text = SeasonUtils_upvr.formatRemaining(any_getRemainingTime_result1)
-    local var28
-    if not var26 and not any_isBuyEnabled_result1 then
-        var28 = 0
-    elseif any_isBuyEnabled_result1 then
-        var28 = 1
-    else
-        var28 = 2
-    end
-    if module_upvr._seasonState ~= var28 then
-        module_upvr._updateSeasonUi(var28)
-    end
-    for i = 2, SeasonConsts_upvr.MAX_REWARD_LEVEL do
-        local Buy = gui_3.Background.Body.Line.Container:FindFirstChild(string.format("%02d", i)).Reward:FindFirstChild("Buy")
-        if Buy then
-            Buy.Visible = any_isBuyEnabled_result1
-        end
-    end
-    gui_3.Background.DailyExpRefreshHelp.Text = string.format("Daily XP reloads in <font color=\"rgb(255, 207, 0)\">%s</font>!", SeasonUtils_upvr.formatRemaining(ContractUtils_upvr.getQuantizedBlock(LevelConsts_upvr.DAILY_EXP_DURATION, LevelConsts_upvr.DAILY_EXP_DURATION_OFFSET) - workspace:GetServerTimeNow()))
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t._updateDeadline() --[[ Line: 80 | Upvalues: t (copy), SeasonUtils (copy), SeasonConsts (copy), ContractUtils (copy), LevelConsts (copy) ]]
+	local gui = t.gui
+	local v1 = SeasonUtils.getRemainingTime()
+	local v3 = SeasonUtils.isBuyEnabled()
+	if v3 then
+		gui.Background.Timer.Time.Text = SeasonUtils.formatRemaining((SeasonUtils.getRemainingBuyTime()))
+	else
+		gui.Background.Timer.Time.Text = SeasonUtils.formatRemaining(v1)
+	end
+	local v7 = if v1 < 0 or v3 then if v3 then 1 else 2 else 0
+	if t._seasonState ~= v7 then
+		t._updateSeasonUi(v7)
+	end
+	local Container = gui.Background.Body.Line.Container
+	for i = 2, SeasonConsts.MAX_REWARD_LEVEL do
+		local Buy = Container:FindFirstChild(("%02d"):format(i)).Reward:FindFirstChild("Buy")
+		if Buy then
+			Buy.Visible = v3
+		end
+	end
+	local v8 = ContractUtils.getQuantizedBlock(LevelConsts.DAILY_EXP_DURATION, LevelConsts.DAILY_EXP_DURATION_OFFSET)
+	gui.Background.DailyExpRefreshHelp.Text = ("Daily XP reloads in <font color=\"rgb(255, 207, 0)\">%s</font>!"):format(SeasonUtils.formatRemaining(v8 - workspace:GetServerTimeNow()))
 end
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local Utils_upvr = require(ReplicatedStorage_upvr.EzUi.Utils)
-local Interval_upvr = require(ReplicatedStorage_upvr.Std.Interval)
-local LevelSystem_upvr = require(ReplicatedStorage_upvr.Game.Level2.LevelSystem)
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local RunUtils_upvr = require(ReplicatedStorage_upvr.App.RunUtils)
-local Notification_upvr = require(ReplicatedStorage_upvr.Game.Notification)
-local Settings_upvr = require(ReplicatedStorage_upvr.Resource.Settings)
-local MarketplaceService_upvr = game:GetService("MarketplaceService")
-local SeasonUIUtils_upvr = require(ReplicatedStorage_upvr.Game.Season.SeasonUIUtils)
-function module_upvr._open() -- Line 125
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local var48_upvr
-    if module_upvr._maid ~= nil then
-        var48_upvr = false
-    else
-        var48_upvr = true
-    end
-    assert(var48_upvr)
-    local any_new_result1 = Maid_upvr.new()
-    var48_upvr = module_upvr
-    var48_upvr._maid = any_new_result1
-    var48_upvr = module_upvr
-    var48_upvr = var48_upvr.gui
-    if Utils_upvr.isSmallScreen() then
-        var48_upvr.Background.BonusAwards.Position = UDim2.new(-0.15, 0, 0, 2)
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    var48_upvr.Background.BonusAwards.Position = UDim2.new(1.01, 0, 0, 2)
-    var48_upvr.Enabled = true
-    any_new_result1:GiveTask(function() -- Line 140
-        var48_upvr.Enabled = false
-    end)
-    any_new_result1:GiveTask(Interval_upvr.every(1):Connect(module_upvr._updateDeadline))
-    module_upvr._updateDeadline()
-    module_upvr.updateProgress(LocalPlayer_upvr)
-    any_new_result1:GiveTask(LevelSystem_upvr.getOnLevelChangedSignal():Connect(module_upvr.updateProgress))
-    any_new_result1:GiveTask(LevelSystem_upvr.getOnExpChangedSignal():Connect(module_upvr.updateProgress))
-    any_new_result1:GiveTask(var9_upvw.getSeasonPassOwnedSignal():Connect(function(arg1) -- Line 150
-        if arg1 ~= LocalPlayer_upvr then
-        else
-            module_upvr.updateProgress(LocalPlayer_upvr)
-        end
-    end))
-    any_new_result1:GiveTask(var48_upvr.Background.Bottom.Container.ReviewButton.MouseButton1Down:Connect(function() -- Line 157
-        if SeasonUtils_upvr.getRemainingTime() < 0 then
-        else
-            Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105461542)
-            module_upvr.close()
-            var10_upvw.open()
-        end
-    end))
-    EzUtils_upvr.selectIfGamepad(var48_upvr.Background.Bottom.Container.ReviewButton)
-    var48_upvr.Background.Bottom.Container.SeasonPass.Title.Text = string.format("SEASON %d: %s", SeasonConsts_upvr.SEASON_NUM, SeasonConsts_upvr.SEASON_TITLE)
-    any_new_result1:GiveTask(var48_upvr.Background.Bottom.Container.SeasonPass.MouseButton1Down:Connect(function() -- Line 172
-        if not RunUtils_upvr.isStudio() and SeasonUtils_upvr.getRemainingTime() <= 0 then
-            Notification_upvr.new({
-                Text = "Season is over! Wait until next season.";
-            })
-        else
-            local var55 = 6105461542
-            Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, var55)
-            local any_getFirstProductByType_result1_3 = Settings_upvr.getFirstProductByType("SeasonPass")
-            if any_getFirstProductByType_result1_3 == nil then
-                var55 = false
-            else
-                var55 = true
-            end
-            assert(var55)
-            if not var9_upvw.doesPlayerOwnSeasonPass(LocalPlayer_upvr) then
-                MarketplaceService_upvr:PromptProductPurchase(LocalPlayer_upvr, any_getFirstProductByType_result1_3.Id)
-            end
-        end
-    end))
-    SeasonUIUtils_upvr.hookGiftContainer(var48_upvr.Background.GiftContainer, any_new_result1)
-    local function _() -- Line 187, Named "setOwnsSeasonPass"
-        var48_upvr.Background.Bottom.Container.SeasonPass.Buy.Visible = false
-        var48_upvr.Background.Bottom.Container.SeasonPass.Price.Visible = false
-        var48_upvr.Background.Bottom.Container.SeasonPass.Owned.Visible = true
-    end
-    if var9_upvw.doesPlayerOwnSeasonPass(LocalPlayer_upvr) then
-        var48_upvr.Background.Bottom.Container.SeasonPass.Buy.Visible = false
-        var48_upvr.Background.Bottom.Container.SeasonPass.Price.Visible = false
-        var48_upvr.Background.Bottom.Container.SeasonPass.Owned.Visible = true
-    else
-        any_new_result1:GiveTask(var9_upvw.getSeasonPassOwnedSignal():Connect(function(arg1) -- Line 195
-            if arg1 ~= LocalPlayer_upvr then
-            else
-                var48_upvr.Background.Bottom.Container.SeasonPass.Buy.Visible = false
-                var48_upvr.Background.Bottom.Container.SeasonPass.Price.Visible = false
-                var48_upvr.Background.Bottom.Container.SeasonPass.Owned.Visible = true
-            end
-        end))
-    end
-    any_new_result1:GiveTask(var48_upvr.Background.Close.MouseButton1Down:Connect(module_upvr.close))
-    local any_getFirstProductByType_result1_2 = Settings_upvr.getFirstProductByType("SeasonPass")
-    if any_getFirstProductByType_result1_2 and any_getFirstProductByType_result1_2.Robux then
-        var48_upvr.Background.Bottom.Container.SeasonPass.Price.Text = tostring(any_getFirstProductByType_result1_2.Robux)
-    end
-    Settings_upvr.OnProductsFetched:Connect(function() -- Line 206, Named "updatePrice"
-        local any_getFirstProductByType_result1 = Settings_upvr.getFirstProductByType("SeasonPass")
-        if any_getFirstProductByType_result1 and any_getFirstProductByType_result1.Robux then
-            var48_upvr.Background.Bottom.Container.SeasonPass.Price.Text = tostring(any_getFirstProductByType_result1.Robux)
-        end
-    end)
-    for i_2 = 2, SeasonConsts_upvr.MAX_REWARD_LEVEL do
-        var48_upvr.Background.Body.Line.Container:FindFirstChild(string.format("%02d", i_2)).Reward.Icon.Image = string.format("rbxassetid://%d", var9_upvw.getClientLevelAward(i_2).imageId)
-        local _
-    end
-    for i_3 = 1, SeasonConsts_upvr.NUM_BONUS_AWARDS do
-        local any_getClientBonusAward_result1 = var9_upvw.getClientBonusAward(i_3)
-        local SOME = var48_upvr.Background.BonusAwards.Container:FindFirstChild(string.format("Bonus%02d", i_3))
-        SOME.Icon.Image = string.format("rbxassetid://%d", any_getClientBonusAward_result1.imageId)
-        SOME.Desc.Text = string.format("TOP %d%%", any_getClientBonusAward_result1.scoreLte * 100)
-        local var63
-    end
-    if SeasonConsts_upvr.SEASON_BONUS_ENABLED then
-        local var64 = "CHECK LATER..."
-        local SeasonBonusScore = LocalPlayer_upvr:FindFirstChild("SeasonBonusScore")
-        if SeasonBonusScore then
-            var64 = string.format("YOU: TOP %.2f%%", SeasonBonusScore.Value * 100)
-        end
-        var48_upvr.Background.BonusAwards.Score.Text = var64
-        var48_upvr.Background.BonusAwards.Desc.Text = string.format("Players in the top %d%% win this prize when the season ends.", math.max(0, any_getClientBonusAward_result1.scoreLte) * 100)
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t._open() --[[ Line: 125 | Upvalues: t (copy), Maid (copy), Utils (copy), Interval (copy), LocalPlayer (copy), LevelSystem (copy), v1 (ref), SeasonUtils (copy), Audio (copy), v2 (ref), EzUtils (copy), SeasonConsts (copy), RunUtils (copy), Notification (copy), Settings (copy), MarketplaceService (copy), SeasonUIUtils (copy) ]]
+	assert(t._maid == nil)
+	local v12 = Maid.new()
+	t._maid = v12
+	local gui = t.gui
+	if Utils.isSmallScreen() then
+		gui.Background.BonusAwards.Position = UDim2.new(-0.15, 0, 0, 2)
+	else
+		gui.Background.BonusAwards.Position = UDim2.new(1.01, 0, 0, 2)
+	end
+	gui.Enabled = true
+	v12:GiveTask(function() --[[ Line: 140 | Upvalues: gui (copy) ]]
+		gui.Enabled = false
+	end)
+	v12:GiveTask(Interval.every(1):Connect(t._updateDeadline))
+	t._updateDeadline()
+	t.updateProgress(LocalPlayer)
+	v12:GiveTask(LevelSystem.getOnLevelChangedSignal():Connect(t.updateProgress))
+	v12:GiveTask(LevelSystem.getOnExpChangedSignal():Connect(t.updateProgress))
+	v12:GiveTask(v1.getSeasonPassOwnedSignal():Connect(function(p1) --[[ Line: 150 | Upvalues: LocalPlayer (ref), t (ref) ]]
+		if p1 == LocalPlayer then
+			t.updateProgress(LocalPlayer)
+		end
+	end))
+	v12:GiveTask(gui.Background.Bottom.Container.ReviewButton.MouseButton1Down:Connect(function() --[[ Line: 157 | Upvalues: SeasonUtils (ref), Audio (ref), LocalPlayer (ref), t (ref), v2 (ref) ]]
+		if not (SeasonUtils.getRemainingTime() < 0) then
+			Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
+			t.close()
+			v2.open()
+		end
+	end))
+	EzUtils.selectIfGamepad(gui.Background.Bottom.Container.ReviewButton)
+	gui.Background.Bottom.Container.SeasonPass.Title.Text = ("SEASON %d: %s"):format(SeasonConsts.SEASON_NUM, SeasonConsts.SEASON_TITLE)
+	v12:GiveTask(gui.Background.Bottom.Container.SeasonPass.MouseButton1Down:Connect(function() --[[ Line: 172 | Upvalues: RunUtils (ref), SeasonUtils (ref), Notification (ref), Audio (ref), LocalPlayer (ref), Settings (ref), v1 (ref), MarketplaceService (ref) ]]
+		if RunUtils.isStudio() or not (SeasonUtils.getRemainingTime() <= 0) then
+			Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
+			local v12 = Settings.getFirstProductByType("SeasonPass")
+			assert(v12 ~= nil)
+			if not v1.doesPlayerOwnSeasonPass(LocalPlayer) then
+				MarketplaceService:PromptProductPurchase(LocalPlayer, v12.Id)
+			end
+		else
+			Notification.new({
+				Text = "Season is over! Wait until next season."
+			})
+		end
+	end))
+	SeasonUIUtils.hookGiftContainer(gui.Background.GiftContainer, v12)
+	local function setOwnsSeasonPass() --[[ Line: 187 | Upvalues: gui (copy) ]]
+		gui.Background.Bottom.Container.SeasonPass.Buy.Visible = false
+		gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
+		gui.Background.Bottom.Container.SeasonPass.Owned.Visible = true
+	end
+	if v1.doesPlayerOwnSeasonPass(LocalPlayer) then
+		gui.Background.Bottom.Container.SeasonPass.Buy.Visible = false
+		gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
+		gui.Background.Bottom.Container.SeasonPass.Owned.Visible = true
+	else
+		v12:GiveTask(v1.getSeasonPassOwnedSignal():Connect(function(p1) --[[ Line: 195 | Upvalues: LocalPlayer (ref), gui (copy) ]]
+			if p1 == LocalPlayer then
+				gui.Background.Bottom.Container.SeasonPass.Buy.Visible = false
+				gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
+				gui.Background.Bottom.Container.SeasonPass.Owned.Visible = true
+			end
+		end))
+	end
+	v12:GiveTask(gui.Background.Close.MouseButton1Down:Connect(t.close))
+	local function updatePrice() --[[ Line: 206 | Upvalues: Settings (ref), gui (copy) ]]
+		local v1 = Settings.getFirstProductByType("SeasonPass")
+		if v1 and v1.Robux then
+			gui.Background.Bottom.Container.SeasonPass.Price.Text = tostring(v1.Robux)
+		end
+	end
+	local v22 = Settings.getFirstProductByType("SeasonPass")
+	if v22 and v22.Robux then
+		gui.Background.Bottom.Container.SeasonPass.Price.Text = tostring(v22.Robux)
+	end
+	Settings.OnProductsFetched:Connect(updatePrice)
+	local Container = gui.Background.Body.Line.Container
+	for i = 2, SeasonConsts.MAX_REWARD_LEVEL do
+		local v3 = v1.getClientLevelAward(i)
+		Container:FindFirstChild(("%02d"):format(i)).Reward.Icon.Image = ("rbxassetid://%d"):format(v3.imageId)
+	end
+	local Container_2 = gui.Background.BonusAwards.Container
+	local v4 = 0
+	for j = 1, SeasonConsts.NUM_BONUS_AWARDS do
+		local v5 = v1.getClientBonusAward(j)
+		local v6 = Container_2:FindFirstChild(("Bonus%02d"):format(j))
+		v6.Icon.Image = ("rbxassetid://%d"):format(v5.imageId)
+		v6.Desc.Text = ("TOP %d%%"):format(v5.scoreLte * 100)
+		v4 = math.max(v4, v5.scoreLte)
+	end
+	if SeasonConsts.SEASON_BONUS_ENABLED then
+		local SeasonBonusScore = LocalPlayer:FindFirstChild("SeasonBonusScore")
+		gui.Background.BonusAwards.Score.Text = if SeasonBonusScore then ("YOU: TOP %.2f%%"):format(SeasonBonusScore.Value * 100) else "CHECK LATER..."
+		gui.Background.BonusAwards.Desc.Text = ("Players in the top %d%% win this prize when the season ends."):format(v4 * 100)
+	end
 end
-function module_upvr._close() -- Line 248
-    local var66
-    if module_upvr._maid == nil then
-        var66 = false
-    else
-        var66 = true
-    end
-    assert(var66)
-    var66 = module_upvr
-    var66._maid = nil
-    var66 = module_upvr._maid:Destroy
-    var66()
+function t._close() --[[ Line: 248 | Upvalues: t (copy) ]]
+	assert(t._maid ~= nil)
+	local _maid = t._maid
+	t._maid = nil
+	_maid:Destroy()
 end
-function module_upvr.open() -- Line 254
-    module_upvr._window:Open()
+function t.open() --[[ Line: 254 | Upvalues: t (copy) ]]
+	t._window:Open()
 end
-function module_upvr.close() -- Line 257
-    module_upvr._window:Close()
+function t.close() --[[ Line: 257 | Upvalues: t (copy) ]]
+	t._window:Close()
 end
-function module_upvr.updateProgress(arg1) -- Line 260
-    if arg1 == LocalPlayer_upvr then
-        module_upvr.setProgress(LevelUtils_upvr.yieldLevel(arg1), LevelUtils_upvr.yieldExp(arg1))
-    end
+function t.updateProgress(p1) --[[ Line: 260 | Upvalues: LocalPlayer (copy), LevelUtils (copy), t (copy) ]]
+	if p1 == LocalPlayer then
+		local v1 = LevelUtils.yieldLevel(p1)
+		t.setProgress(v1, (LevelUtils.yieldExp(p1)))
+	end
 end
-local function setProgressFrameScale_upvr(arg1, arg2, arg3) -- Line 267, Named "setProgressFrameScale"
-    local Parent = arg1.Parent
-    if Parent == nil then
-    else
-        local Scale = Parent.Size.X.Scale
-        local var69 = (Scale - 1) * (1 / Scale) / 2
-        local var70 = (arg2 - 1) / (Scale * (SeasonConsts_upvr.MAX_REWARD_LEVEL - 1)) + var69
-        if arg3 then
-            local var71 = (arg3 - 1) / (Scale * (SeasonConsts_upvr.MAX_REWARD_LEVEL - 1)) + var69
-            var70 -= var71
-            arg1.Position = UDim2.new(UDim.new(var71, arg1.Position.X.Offset), arg1.Position.Y)
-        end
-        arg1.Size = UDim2.new(UDim.new(var70, arg1.Size.X.Offset), arg1.Size.Y)
-        arg1.Visible = true
-    end
+local function setProgressFrameScale(p1, p2, p3) --[[ Line: 267 | Upvalues: SeasonConsts (copy) ]]
+	local v1 = p1.Parent
+	if v1 ~= nil then
+		local Scale = v1.Size.X.Scale
+		local v2 = (Scale - 1) * (1 / Scale) / 2
+		local sum = (p2 - 1) / (Scale * (SeasonConsts.MAX_REWARD_LEVEL - 1)) + v2
+		if p3 then
+			local v3 = (p3 - 1) / (Scale * (SeasonConsts.MAX_REWARD_LEVEL - 1)) + v2
+			p1.Position = UDim2.new(UDim.new(v3, p1.Position.X.Offset), p1.Position.Y)
+			sum = sum - v3
+		end
+		p1.Size = UDim2.new(UDim.new(sum, p1.Size.X.Offset), p1.Size.Y)
+		p1.Visible = true
+	end
 end
-function module_upvr.setProgress(arg1, arg2) -- Line 284
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local MAX_DAILY_EXP = LevelConsts_upvr.MAX_DAILY_EXP
-    local var73
-    if var9_upvw.doesPlayerOwnSeasonPass(LocalPlayer_upvr) then
-        MAX_DAILY_EXP = LevelConsts_upvr.MAX_DAILY_EXP_SEASON_PASS
-    end
-    if Players_upvr.LocalPlayer:FindFirstChild(LevelConsts_upvr.DAILY_EXP_VALUE_NAME) then
-    end
-    if SeasonUtils_upvr.getRemainingTime() < 0 then
-    end
-    if SeasonConsts_upvr.MAX_REWARD_LEVEL <= var73 then
-        var73 = SeasonConsts_upvr.MAX_REWARD_LEVEL
-        local const_number = 0
-    end
-    local gui_2 = module_upvr.gui
-    local var77 = var73 + const_number / LevelUtils_upvr.calculateExpNextLevel(var73)
-    local any_calculateLevelFromExp_result1, _ = LevelUtils_upvr.calculateLevelFromExp(LevelUtils_upvr.calculateExpOfLevel(var73) + const_number + 0)
-    if SeasonConsts_upvr.MAX_REWARD_LEVEL <= any_calculateLevelFromExp_result1 then
-        any_calculateLevelFromExp_result1 = SeasonConsts_upvr.MAX_REWARD_LEVEL
-    end
-    local Progress1 = gui_2.Background.Body.Line.Bg.Progress1
-    local Parent_2 = Progress1.Parent
-    if Parent_2 == nil then
-    else
-        local Scale_2 = Parent_2.Size.X.Scale
-        Progress1.Size = UDim2.new(UDim.new((var77 - 1) / (Scale_2 * (SeasonConsts_upvr.MAX_REWARD_LEVEL - 1)) + (Scale_2 - 1) * (1 / Scale_2) / 2, Progress1.Size.X.Offset), Progress1.Size.Y)
-        Progress1.Visible = true
-    end
-    setProgressFrameScale_upvr(gui_2.Background.Body.Line.Bg.Progress2, any_calculateLevelFromExp_result1 + 0 / LevelUtils_upvr.calculateExpNextLevel(any_calculateLevelFromExp_result1), var77)
+function t.setProgress(p1, p2) --[[ Line: 284 | Upvalues: LevelConsts (copy), v1 (ref), LocalPlayer (copy), SeasonUtils (copy), Players (copy), SeasonConsts (copy), t (copy), LevelUtils (copy), setProgressFrameScale (copy) ]]
+	local MAX_DAILY_EXP = LevelConsts.MAX_DAILY_EXP
+	if v1.doesPlayerOwnSeasonPass(LocalPlayer) then
+		MAX_DAILY_EXP = LevelConsts.MAX_DAILY_EXP_SEASON_PASS
+	end
+	local sum = MAX_DAILY_EXP * SeasonUtils.getSeasonExpMult()
+	local v12 = Players.LocalPlayer:FindFirstChild(LevelConsts.DAILY_EXP_VALUE_NAME)
+	if v12 then
+		sum = sum - v12.Value
+	end
+	if SeasonUtils.getRemainingTime() < 0 then
+		sum = 0
+	end
+	if SeasonConsts.MAX_REWARD_LEVEL <= p1 then
+		p1 = SeasonConsts.MAX_REWARD_LEVEL
+		p2 = 0
+	end
+	local gui = t.gui
+	local v2 = p1 + p2 / LevelUtils.calculateExpNextLevel(p1)
+	local v3, v4 = LevelUtils.calculateLevelFromExp(LevelUtils.calculateExpOfLevel(p1) + p2 + sum)
+	if SeasonConsts.MAX_REWARD_LEVEL <= v3 then
+		v3 = SeasonConsts.MAX_REWARD_LEVEL
+		v4 = 0
+	end
+	local v5 = v3 + v4 / LevelUtils.calculateExpNextLevel(v3)
+	local Progress1 = gui.Background.Body.Line.Bg.Progress1
+	local v6 = Progress1.Parent
+	if v6 ~= nil then
+		local Scale = v6.Size.X.Scale
+		Progress1.Size = UDim2.new(UDim.new((v2 - 1) / (Scale * (SeasonConsts.MAX_REWARD_LEVEL - 1)) + (Scale - 1) * (1 / Scale) / 2, Progress1.Size.X.Offset), Progress1.Size.Y)
+		Progress1.Visible = true
+	end
+	setProgressFrameScale(gui.Background.Body.Line.Bg.Progress2, v5, v2)
 end
-return module_upvr
+return t

@@ -1,5 +1,5 @@
 return {
-    init = function() -- Line 2, Named "init"
-        require(script.Parent.TransportJetBinder):Start()
-    end;
+	init = function() --[[ Name: init | Line: 2 ]]
+		require(script.Parent.TransportJetBinder):Start()
+	end
 }

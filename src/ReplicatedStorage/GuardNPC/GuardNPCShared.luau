@@ -1,49 +1,62 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module = {}
-local function collidableFunc_upvr(arg1) -- Line 10, Named "collidableFunc"
-    if 0.999 <= arg1.Transparency then
-        return false
-    end
-    return arg1.CanCollide
+local Raycast = require(ReplicatedStorage.Std.Raycast)
+local GuardNPCConsts = require(ReplicatedStorage.GuardNPC.GuardNPCConsts)
+local GuardNPCUtils = require(ReplicatedStorage.GuardNPC.GuardNPCUtils)
+local t = {}
+local function collidableFunc(p1) --[[ Line: 10 ]]
+	if p1.Transparency >= 0.999 then
+		return false
+	else
+		return p1.CanCollide
+	end
 end
-local GuardNPCUtils_upvr = require(ReplicatedStorage.GuardNPC.GuardNPCUtils)
-local GuardNPCConsts_upvr = require(ReplicatedStorage.GuardNPC.GuardNPCConsts)
-local Raycast_upvr = require(ReplicatedStorage.Std.Raycast)
-function module.canSeeTarget(arg1, arg2, arg3) -- Line 17
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var6
-    if typeof(arg2) == "Vector3" then
-        return false
-    end
-    local Position = arg1.HumanoidRootPart.Position
-    var6 = GuardNPCUtils_upvr
-    var6 = var6.getMaxShootDist(arg1)
-    if not var6 then
-        var6 = GuardNPCConsts_upvr
-        var6 = var6.MAX_SHOOT_DIST
-    end
-    local any_getMaxAllowedShootDistanceFromDefenseTarget_result1 = GuardNPCUtils_upvr.getMaxAllowedShootDistanceFromDefenseTarget(arg1)
-    local var9
-    if not GuardNPCUtils_upvr.getIsTargetingInvolvedPlayer(arg1) and any_getMaxAllowedShootDistanceFromDefenseTarget_result1 and any_getMaxAllowedShootDistanceFromDefenseTarget_result1 < (arg2.Position - GuardNPCUtils_upvr.getDefenseTargetPos(arg1)).Magnitude then
-        return false
-    end
-    local var10 = arg2.Position - Position
-    var9 = var6
-    local minimum = math.min(var10.Magnitude, var9)
-    var9 = Position
-    local any_collidable_result1 = Raycast_upvr.collidable(var9, var10.Unit, minimum, arg3, collidableFunc_upvr)
-    var9 = nil
-    if any_collidable_result1 then
-        var9 = any_collidable_result1.Instance
-    else
-        var9 = nil
-    end
-    if var9 and (var9:IsDescendantOf(arg2.Parent) or var9:IsDescendantOf(workspace.Vehicles)) then
-        return true
-    end
-    if (Position + var10.Unit * minimum - arg2.Position).Magnitude < 1 then
-        return true
-    end
-    return false
+function t.canSeeTarget(p1, p2, p3) --[[ Line: 17 | Upvalues: GuardNPCUtils (copy), GuardNPCConsts (copy), Raycast (copy), collidableFunc (copy) ]]
+	if typeof(p2) == "Vector3" then
+		return false
+	else
+		local Position = p1.HumanoidRootPart.Position
+		local v1 = GuardNPCUtils.getMaxShootDist(p1) or GuardNPCConsts.MAX_SHOOT_DIST
+		local v2 = GuardNPCUtils.getMaxAllowedShootDistanceFromDefenseTarget(p1)
+		local v3, v4, v5, v6, v7, v8
+		if GuardNPCUtils.getIsTargetingInvolvedPlayer(p1) or not v2 then
+			v3 = p2.Position - Position
+			v4 = v3.Magnitude
+			v5 = math.min(v4, v1)
+			v6 = Raycast.collidable(Position, v3.Unit, v5, p3, collidableFunc)
+			if v6 then
+				v7 = v6.Instance
+				v8 = v6.Position
+			else
+				v8 = Position + v3.Unit * v5
+				v7 = nil
+			end
+			if v7 and (v7:IsDescendantOf(p2.Parent) or v7:IsDescendantOf(workspace.Vehicles)) then
+				return true
+			else
+				return (v8 - p2.Position).Magnitude < 1
+			end
+		else
+			if v2 < (p2.Position - GuardNPCUtils.getDefenseTargetPos(p1)).Magnitude then
+				return false
+			else
+				v3 = p2.Position - Position
+				v4 = v3.Magnitude
+				v5 = math.min(v4, v1)
+				v6 = Raycast.collidable(Position, v3.Unit, v5, p3, collidableFunc)
+				if v6 then
+					v7 = v6.Instance
+					v8 = v6.Position
+				else
+					v8 = Position + v3.Unit * v5
+					v7 = nil
+				end
+				if v7 and (v7:IsDescendantOf(p2.Parent) or v7:IsDescendantOf(workspace.Vehicles)) then
+					return true
+				else
+					return (v8 - p2.Position).Magnitude < 1
+				end
+			end
+		end
+	end
 end
-return module
+return t

@@ -1,38 +1,33 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WallColor = require(script.Parent.WallColor)
-local module = {}
-local tbl_upvr = {
-    DefaultReflectance = 0;
-    DefaultMaterial = Enum.Material.SmoothPlastic;
-    DisableReflectance = true;
+local Paint = require(ReplicatedStorage.Game.Garage.Paint)
+local t = {}
+local t2 = {
+	DefaultReflectance = 0,
+	DefaultMaterial = Enum.Material.SmoothPlastic,
+	DisableReflectance = true
 }
-module.getInstance = WallColor.getInstance
-module.updateCamera = WallColor.updateCamera
-module.getItems = WallColor.getItems
-local Paint_upvr = require(game:GetService("ReplicatedStorage").Game.Garage.Paint)
-function module.apply(arg1, arg2) -- Line 15
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local FlooringMaterial = arg2:FindFirstChild("FlooringMaterial")
-    local var14
-    if not FlooringMaterial then
-        var14 = warn
-        var14("Missing subModel")
-    else
-        var14 = 0
-        for _, v in FlooringMaterial:GetChildren() do
-            if v:IsA("BasePart") then
-                var14 += 1
-                if not arg1 or arg1.None then
-                    v.Color = v:GetAttribute("OriginalColor")
-                else
-                    tbl_upvr.DefaultMaterial = v.Material
-                    Paint_upvr.Part(v, arg1.Name, tbl_upvr)
-                end
-            end
-        end
-        if 0 >= var14 then
-        else
-        end
-        assert(true, "No parts to apply to")
-    end
+t.getInstance = WallColor.getInstance
+t.updateCamera = WallColor.updateCamera
+t.getItems = WallColor.getItems
+function t.apply(p1, p2) --[[ Line: 15 | Upvalues: t2 (copy), Paint (copy) ]]
+	local FlooringMaterial = p2:FindFirstChild("FlooringMaterial")
+	if FlooringMaterial then
+		local count = 0
+		for v1, v2 in FlooringMaterial:GetChildren() do
+			if v2:IsA("BasePart") then
+				count = count + 1
+				if p1 and not p1.None then
+					t2.DefaultMaterial = v2.Material
+					Paint.Part(v2, p1.Name, t2)
+				else
+					v2.Color = v2:GetAttribute("OriginalColor")
+				end
+			end
+		end
+		assert(count > 0, "No parts to apply to")
+	else
+		warn("Missing subModel")
+	end
 end
-return module
+return t

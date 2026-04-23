@@ -1,53 +1,54 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_3_upvr = {}
-local function _(arg1, arg2, arg3) -- Line 7, Named "lerp"
-    return (arg2 - arg1) * arg3 + arg1
+local _allAirDropData = require(ReplicatedStorage.AirDrop.Data._allAirDropData)
+local TableUtils = require(ReplicatedStorage.Std.TableUtils)
+local RewardDataUtils = require(ReplicatedStorage.RewardData.RewardDataUtils)
+local t = {}
+local function lerp(p1, p2, p3) --[[ Line: 7 ]]
+	return (p2 - p1) * p3 + p1
 end
-function module_3_upvr.getProportionOfMaxAirDropScalingDurationDone(arg1, arg2) -- Line 10
-    local DurationToGetMaxScaling = module_3_upvr.getAirDropTypeData(arg1).DurationToGetMaxScaling
-    return math.min(arg2, DurationToGetMaxScaling) / DurationToGetMaxScaling
+function t.getProportionOfMaxAirDropScalingDurationDone(p1, p2) --[[ Line: 10 | Upvalues: t (copy) ]]
+	local DurationToGetMaxScaling = t.getAirDropTypeData(p1).DurationToGetMaxScaling
+	return math.min(p2, DurationToGetMaxScaling) / DurationToGetMaxScaling
 end
-function module_3_upvr.getCurrentGuardWaveData(arg1, arg2) -- Line 16
-    local any_getAirDropTypeData_result1_3 = module_3_upvr.getAirDropTypeData(arg1)
-    local module = {}
-    local any_getProportionOfMaxAirDropScalingDurationDone_result1_3 = module_3_upvr.getProportionOfMaxAirDropScalingDurationDone(arg1, arg2)
-    for i, v in any_getAirDropTypeData_result1_3.BeginningData.GuardData do
-        module[i] = (any_getAirDropTypeData_result1_3.EndingData.GuardData[i] - v) * any_getProportionOfMaxAirDropScalingDurationDone_result1_3 + v
-    end
-    return module
+function t.getCurrentGuardWaveData(p1, p2) --[[ Line: 16 | Upvalues: t (copy) ]]
+	local v1 = t.getAirDropTypeData(p1)
+	local v2 = t.getProportionOfMaxAirDropScalingDurationDone(p1, p2)
+	local t2 = {}
+	for v3, v4 in v1.BeginningData.GuardData do
+		t2[v3] = (v1.EndingData.GuardData[v3] - v4) * v2 + v4
+	end
+	return t2
 end
-function module_3_upvr.getCurrentMoneyDropData(arg1, arg2) -- Line 28
-    local any_getAirDropTypeData_result1 = module_3_upvr.getAirDropTypeData(arg1)
-    local any_getProportionOfMaxAirDropScalingDurationDone_result1 = module_3_upvr.getProportionOfMaxAirDropScalingDurationDone(arg1, arg2)
-    local module_2 = {}
-    for i_2, v_2 in any_getAirDropTypeData_result1.BeginningData.MoneyDropData do
-        module_2[i_2] = (any_getAirDropTypeData_result1.EndingData.MoneyDropData[i_2] - v_2) * any_getProportionOfMaxAirDropScalingDurationDone_result1 + v_2
-    end
-    return module_2
+function t.getCurrentMoneyDropData(p1, p2) --[[ Line: 28 | Upvalues: t (copy) ]]
+	local v1 = t.getAirDropTypeData(p1)
+	local v2 = t.getProportionOfMaxAirDropScalingDurationDone(p1, p2)
+	local t2 = {}
+	for v3, v4 in v1.BeginningData.MoneyDropData do
+		t2[v3] = (v1.EndingData.MoneyDropData[v3] - v4) * v2 + v4
+	end
+	return t2
 end
-local _allAirDropData_upvr = require(ReplicatedStorage.AirDrop.Data._allAirDropData)
-function module_3_upvr.getAirDropTypeData(arg1) -- Line 39
-    return _allAirDropData_upvr[arg1]
+function t.getAirDropTypeData(p1) --[[ Line: 39 | Upvalues: _allAirDropData (copy) ]]
+	return _allAirDropData[p1]
 end
-function module_3_upvr.getCurrentAirDropRarityProbabilities(arg1, arg2) -- Line 42
-    local any_getAirDropTypeData_result1_2 = module_3_upvr.getAirDropTypeData(arg1)
-    local any_getProportionOfMaxAirDropScalingDurationDone_result1_2 = module_3_upvr.getProportionOfMaxAirDropScalingDurationDone(arg1, arg2)
-    local module_4 = {}
-    for i_3, v_3 in any_getAirDropTypeData_result1_2.BeginningData.RarityProbs do
-        local var26 = any_getAirDropTypeData_result1_2.EndingData.RarityProbs[i_3]
-        assert(var26, "No ending probability")
-        module_4[i_3] = (var26 - v_3) * any_getProportionOfMaxAirDropScalingDurationDone_result1_2 + v_3
-    end
-    return module_4
+function t.getCurrentAirDropRarityProbabilities(p1, p2) --[[ Line: 42 | Upvalues: t (copy) ]]
+	local v1 = t.getAirDropTypeData(p1)
+	local v2 = t.getProportionOfMaxAirDropScalingDurationDone(p1, p2)
+	local t2 = {}
+	for v3, v4 in v1.BeginningData.RarityProbs do
+		local v5 = v1.EndingData.RarityProbs[v3]
+		assert(v5, "No ending probability")
+		t2[v3] = (v5 - v4) * v2 + v4
+	end
+	return t2
 end
-local TableUtils_upvr = require(ReplicatedStorage.Std.TableUtils)
-local RewardDataUtils_upvr = require(ReplicatedStorage.RewardData.RewardDataUtils)
-function module_3_upvr.getCurrentDataForAirDrop(arg1, arg2) -- Line 54
-    local any_deepCopy_result1 = TableUtils_upvr.deepCopy(module_3_upvr.getAirDropTypeData(arg1))
-    any_deepCopy_result1.RarityProbabilities = module_3_upvr.getCurrentAirDropRarityProbabilities(arg1, arg2)
-    RewardDataUtils_upvr.addAbsoluteProbsToRewardDataFromRarityProbs(any_deepCopy_result1.RewardData, any_deepCopy_result1.RarityProbabilities)
-    any_deepCopy_result1.GuardData = module_3_upvr.getCurrentGuardWaveData(arg1, arg2)
-    any_deepCopy_result1.MoneyDropData = module_3_upvr.getCurrentMoneyDropData(arg1, arg2)
-    return any_deepCopy_result1
+function t.getCurrentDataForAirDrop(p1, p2) --[[ Line: 54 | Upvalues: t (copy), TableUtils (copy), RewardDataUtils (copy) ]]
+	local v1 = t.getCurrentAirDropRarityProbabilities(p1, p2)
+	local v2 = TableUtils.deepCopy(t.getAirDropTypeData(p1))
+	v2.RarityProbabilities = v1
+	RewardDataUtils.addAbsoluteProbsToRewardDataFromRarityProbs(v2.RewardData, v2.RarityProbabilities)
+	v2.GuardData = t.getCurrentGuardWaveData(p1, p2)
+	v2.MoneyDropData = t.getCurrentMoneyDropData(p1, p2)
+	return v2
 end
-return module_3_upvr
+return t

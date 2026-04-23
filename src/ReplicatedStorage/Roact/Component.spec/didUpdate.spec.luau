@@ -1,73 +1,58 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
 return function() --[[ Line: 1 ]]
-    local v0 = require(script.Parent.Parent.assertDeepEqual);
-    local v1 = require(script.Parent.Parent.createElement);
-    local v2 = require(script.Parent.Parent.createReconciler);
-    local v3 = require(script.Parent.Parent.createSpy);
-    local v4 = require(script.Parent.Parent.NoopRenderer);
-    local v5 = require(script.Parent.Parent.Type);
-    local v6 = require(script.Parent.Parent.Component);
-    local v7 = v2(v4);
-    it("should be invoked when updated via updateVirtualNode", function() --[[ Line: 13 ]]
-        -- upvalues: v6 (copy), v3 (copy), v1 (copy), v7 (copy), v5 (copy), v0 (copy)
-        local v8 = v6:extend("MyComponent");
-        local v9 = v3();
-        v8.didUpdate = v9.value;
-        v8.render = function(_) --[[ Line: 19 ]] --[[ Name: render ]]
-            return nil;
-        end;
-        local v11 = {
-            a = 5
-        };
-        local v12 = v1(v8, v11);
-        local v13 = v7.mountVirtualNode(v12, nil, "Test");
-        expect(v9.callCount).to.equal(0);
-        local v14 = {
-            a = 6, 
-            b = 2
-        };
-        local v15 = v1(v8, v14);
-        v7.updateVirtualNode(v13, v15);
-        expect(v9.callCount).to.equal(1);
-        local v16 = v9:captureValues("self", "oldProps", "oldState");
-        expect(v5.of(v16.self)).to.equal(v5.StatefulComponentInstance);
-        v0(v16.oldProps, v11);
-        v0(v16.oldState, {});
-    end);
-    it("should be invoked when updated via setState", function() --[[ Line: 50 ]]
-        -- upvalues: v6 (copy), v3 (copy), v1 (copy), v7 (copy), v5 (copy), v0 (copy)
-        local v17 = v6:extend("MyComponent");
-        local v18 = v3();
-        v17.didUpdate = v18.value;
-        local v19 = {
-            a = 4
-        };
-        local v20 = nil;
-        v17.init = function(v21) --[[ Line: 61 ]] --[[ Name: init ]]
-            -- upvalues: v20 (ref), v19 (copy)
-            v20 = function(...) --[[ Line: 62 ]]
-                -- upvalues: v21 (copy)
-                return v21:setState(...);
-            end;
-            v21:setState(v19);
-        end;
-        v17.render = function(_) --[[ Line: 69 ]] --[[ Name: render ]]
-
-        end;
-        local v23 = v1(v17);
-        v7.mountVirtualNode(v23, nil, "Test");
-        expect(v18.callCount).to.equal(0);
-        v20({
-            a = 5
-        });
-        expect(v18.callCount).to.equal(1);
-        local v24 = v18:captureValues("self", "oldProps", "oldState");
-        expect(v5.of(v24.self)).to.equal(v5.StatefulComponentInstance);
-        v0(v24.oldProps, {});
-        v0(v24.oldState, v19);
-    end);
-end;
+	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
+	local createElement = require(script.Parent.Parent.createElement)
+	local createReconciler = require(script.Parent.Parent.createReconciler)
+	local createSpy = require(script.Parent.Parent.createSpy)
+	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
+	local Type = require(script.Parent.Parent.Type)
+	local Component = require(script.Parent.Parent.Component)
+	local v1 = createReconciler(NoopRenderer)
+	it("should be invoked when updated via updateVirtualNode", function() --[[ Line: 13 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy), assertDeepEqual (copy) ]]
+		local v12 = Component:extend("MyComponent")
+		local v2 = createSpy()
+		v12.didUpdate = v2.value
+		function v12.render(p1) --[[ Line: 19 ]]
+			return nil
+		end
+		local t = {
+			a = 5
+		}
+		local v4 = v1.mountVirtualNode(createElement(v12, t), nil, "Test")
+		expect(v2.callCount).to.equal(0)
+		v1.updateVirtualNode(v4, (createElement(v12, {
+			a = 6,
+			b = 2
+		})))
+		expect(v2.callCount).to.equal(1)
+		local v6 = v2:captureValues("self", "oldProps", "oldState")
+		expect(Type.of(v6.self)).to.equal(Type.StatefulComponentInstance)
+		assertDeepEqual(v6.oldProps, t)
+		assertDeepEqual(v6.oldState, {})
+	end)
+	it("should be invoked when updated via setState", function() --[[ Line: 50 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy), assertDeepEqual (copy) ]]
+		local v12 = Component:extend("MyComponent")
+		local v2 = createSpy()
+		v12.didUpdate = v2.value
+		local t = {
+			a = 4
+		}
+		local v3 = nil
+		function v12.init(p1) --[[ Line: 61 | Upvalues: v3 (ref), t (copy) ]]
+			v3 = function(...) --[[ Line: 62 | Upvalues: p1 (copy) ]]
+				return p1:setState(...)
+			end
+			p1:setState(t)
+		end
+		function v12.render(p1) --[[ Line: 69 ]] end
+		v1.mountVirtualNode(createElement(v12), nil, "Test")
+		expect(v2.callCount).to.equal(0)
+		v3({
+			a = 5
+		})
+		expect(v2.callCount).to.equal(1)
+		local v5 = v2:captureValues("self", "oldProps", "oldState")
+		expect(Type.of(v5.self)).to.equal(Type.StatefulComponentInstance)
+		assertDeepEqual(v5.oldProps, {})
+		assertDeepEqual(v5.oldState, t)
+	end)
+end

@@ -1,13 +1,14 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
-    minimapSetSpawns = function(arg1, arg2) -- Line 5, Named "minimapSetSpawns"
-        local module = {}
-        for _, v in arg2.spawns do
-            assert(v.name, "missing name")
-            if not v.title then
-                v.title = v.name
-            end
-            table.insert(module, v)
-        end
-        return module
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer({}, {
+	minimapSetSpawns = function(p1, p2) --[[ Name: minimapSetSpawns | Line: 5 ]]
+		local t = {}
+		for v1, v2 in p2.spawns do
+			assert(v2.name, "missing name")
+			if not v2.title then
+				v2.title = v2.name
+			end
+			table.insert(t, v2)
+		end
+		return t
+	end
 })

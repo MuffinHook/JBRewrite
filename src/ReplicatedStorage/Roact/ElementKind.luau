@@ -1,40 +1,33 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMVBnR5cGVvZgV0YWJsZQJvZgZQb3J0YWwNZnJvbUNvbXBvbmVudAdyZXF1aXJlBnNjcmlwdAZQYXJlbnQGU3ltYm9sBnN0cmljdAhuZXdwcm94eQRIb3N0CEZ1bmN0aW9uCFN0YXRlZnVsCEZyYWdtZW50BW5hbWVkBnN0cmluZwhmdW5jdGlvbgxnZXRtZXRhdGFibGUHX19pbmRleAtFbGVtZW50S2luZAADAwEBAAAEAAEADwy7LAADUgIAAKQBAQAAAABAnwECAvABAwACAAAAxgEAAIIBAgD7AgAAhwEAAoIBAgADAwEEAAAAQAMCABkDARgAAAAAAAAAAQADAAAaAAAAAAUBAwAABgADAA8PDw/7AQAAmgAFAAEAAAD7AgEATQECEgAAAACCAQIA+wICALssAANSBAAApAMCAAAAEECfAwIChwECA4IBAgADAwQDAQQAABBAACcFARgAAAABAAAAAgAAAAAAAAAoAAAAAAkAAAECGwAABg8AAWIPAQpZDwITUA8DHEcPBCBDDwVDIGOjAAAApAABAAAAAECkAwMAAAAgQE0CAyQEAAAATQECkwUAAACfAAICpAEBAAAAAECkBAMAAAAgQE0DBCQEAAAATQIDjQYAAACfAQICpAIBAAAAAECkBQMAAAAgQE0EBSQEAAAATQMEEgcAAACfAgICpAMJAAAAgECpBAEAnwMCAuIEDgBNBQBRDwAAAG8GBwCfBQICMAUEEgcAAABNBQBRDwAAAG8GCgCfBQICMAUEKAoAAABNBQBRDwAAAG8GCwCfBQICMAUEiAsAAABNBQBRDwAAAG8GDACfBQICMAUEJgwAAABNBQBRDwAAAG8GDQCfBQICMAUEKQ0AAADABRAAEgADADAFBLwRAAAA/wUDAAAAAABNBgQoCgAAADAGBUESAAAATQYEiAsAAAAwBgVoEwAAAE0GBCYMAAAAMAYFSxQAAADABhUAEgACABIAAwASAAUAMAYEPBYAAAC7PAMDUgcDAKQGGAAAAHBBnwYCAjAEBm4ZAAAAUgYBAFIHBABvCBoAnwYDAYIDAgAbAwYEAAAAQAMHBAAAIEADCAMJAwoDBAMLBAAAgEADDAMNAw4DDwUFBwoLDA0DEAYAAwMDEQMSAwIGAQMFAxMEAABwQQMUAxUCAAEBAAEYAAoAAAAAAAAAAAEAAAAAAAAAAAEAAAAAAAAAAAIAAAACAQAAAAAAAQAAAAAAAQAAAAAAAQAAAAAAAQAAAAAAAwAAAAgAAQAAAAEAAAABAAAAAwAAAAAACAAAAAAAAAIAAAACAQAAAAACVBFWcyy/7oJm1Tznbjcf0EZ+dTUl/4JwlDmLGx5GgCdgDBLWX1bfjg==
-
-local v0 = require(script.Parent.Symbol);
-local v1 = require(script.Parent.strict);
-local v2 = require(script.Parent.Portal);
-local v3 = newproxy(true);
-local v5 = {
-    Portal = v0.named("Portal"), 
-    Host = v0.named("Host"), 
-    Function = v0.named("Function"), 
-    Stateful = v0.named("Stateful"), 
-    Fragment = v0.named("Fragment"), 
-    of = function(v4) --[[ Line: 25 ]] --[[ Name: of ]]
-        -- upvalues: v3 (copy)
-        if typeof(v4) ~= "table" then
-            return nil;
-        else
-            return v4[v3];
-        end;
-    end
-};
-local v6 = {
-    string = v5.Host, 
-    ["function"] = v5.Function, 
-    table = v5.Stateful
-};
-v5.fromComponent = function(v7) --[[ Line: 39 ]] --[[ Name: fromComponent ]]
-    -- upvalues: v2 (copy), v3 (copy), v6 (copy)
-    if v7 == v2 then
-        return v3.Portal;
-    else
-        return v6[typeof(v7)];
-    end;
-end;
-getmetatable(v3).__index = v5;
-v1(v5, "ElementKind");
-return v3;
+local Symbol = require(script.Parent.Symbol)
+local strict = require(script.Parent.strict)
+local Portal = require(script.Parent.Portal)
+local v1 = newproxy(true)
+local t = {
+	Portal = Symbol.named("Portal"),
+	Host = Symbol.named("Host"),
+	Function = Symbol.named("Function"),
+	Stateful = Symbol.named("Stateful"),
+	Fragment = Symbol.named("Fragment"),
+	of = function(p1) --[[ Name: of | Line: 25 | Upvalues: v1 (copy) ]]
+		if typeof(p1) == "table" then
+			return p1[v1]
+		else
+			return nil
+		end
+	end
+}
+local t2 = {
+	string = t.Host,
+	["function"] = t.Function,
+	table = t.Stateful
+}
+function t.fromComponent(p1) --[[ Line: 39 | Upvalues: Portal (copy), v1 (copy), t2 (copy) ]]
+	if p1 == Portal then
+		return v1.Portal
+	else
+		return t2[typeof(p1)]
+	end
+end
+getmetatable(v1).__index = t
+strict(t, "ElementKind")
+return v1

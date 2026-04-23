@@ -1,129 +1,111 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("Elapsed")
-any_extend_result1.defaultProps = {
-    size = UDim2.fromScale(1, 1);
-    position = UDim2.fromScale(0.5, 0.5);
-    anchorPoint = Vector2.new(0.5, 0.5);
-    createdAt = nil;
-    createdAtBinding = nil;
-    textXAlignment = Enum.TextXAlignment.Center;
-    prefix = "";
-    suffix = "";
-    disabled = false;
-    font = Enum.Font.FredokaOne;
-    textColor = Color3.new(0, 0, 0);
-    countDown = false;
-    alwaysShowHours = false;
-    alwaysShowMinutes = true;
-    alwaysShowSeconds = true;
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local v1 = Roact.PureComponent:extend("Elapsed")
+v1.defaultProps = {
+	size = UDim2.fromScale(1, 1),
+	position = UDim2.fromScale(0.5, 0.5),
+	anchorPoint = Vector2.new(0.5, 0.5),
+	createdAt = nil,
+	createdAtBinding = nil,
+	textXAlignment = Enum.TextXAlignment.Center,
+	prefix = "",
+	suffix = "",
+	disabled = false,
+	font = Enum.Font.FredokaOne,
+	textColor = Color3.new(0/255, 0/255, 0/255),
+	countDown = false,
+	alwaysShowHours = false,
+	alwaysShowMinutes = true,
+	alwaysShowSeconds = true
 }
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function any_extend_result1.init(arg1) -- Line 25
-    arg1:setState({
-        elapsed = 0;
-    })
-    arg1.maid = Maid_upvr.new()
+function v1.init(p1) --[[ Line: 25 | Upvalues: Maid (copy) ]]
+	p1:setState({
+		elapsed = 0
+	})
+	p1.maid = Maid.new()
 end
-local createElement_upvr = Roact_upvr.createElement
-function any_extend_result1.render(arg1) -- Line 31
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local elapsed_2 = arg1.props.elapsed
-    if not elapsed_2 then
-        elapsed_2 = arg1.state
-        elapsed_2 = elapsed_2.elapsed
-    end
-    local alwaysShowHours_2 = arg1.props.alwaysShowHours
-    if not alwaysShowHours_2 then
-        if 0 >= math.floor(elapsed_2 % 86400 / 3600) then
-            alwaysShowHours_2 = false
-        else
-            alwaysShowHours_2 = true
-        end
-    end
-    if not arg1.props.alwaysShowMinutes then
-        if not alwaysShowHours_2 then
-            if 0 >= math.floor(elapsed_2 % 3600 / 60) then
-            else
-            end
-        end
-    end
-    if not arg1.props.alwaysShowSeconds then
-        if not true then
-            if 0 > math.floor(elapsed_2 % 60) then
-            else
-            end
-        end
-    end
-    if alwaysShowHours_2 then
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    else
-    end
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    if true then
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    else
-    end
-    if true then
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    else
-    end
-    local module_2 = {}
-    local tbl = {
-        BackgroundTransparency = 1;
-        Size = UDim2.new(0.9, 0, 0.8, 0);
-        Position = UDim2.new(0.5, 0, 0.5, 0);
-        AnchorPoint = Vector2.new(0.5, 0.5);
-    }
-    if not arg1.props.disabled then
-    else
-    end
-    tbl.Text = string.format("%s--%s", arg1.props.prefix, arg1.props.suffix)
-    tbl.TextXAlignment = arg1.props.textXAlignment
-    tbl.Font = arg1.props.font
-    tbl.LineHeight = 1
-    tbl.TextScaled = true
-    tbl.TextColor3 = arg1.props.textColor
-    tbl[Roact_upvr.Children] = arg1.props[Roact_upvr.Children]
-    module_2.Text = createElement_upvr("TextLabel", tbl)
-    return createElement_upvr("Frame", {
-        BackgroundTransparency = 1;
-        BackgroundColor3 = Color3.new(1, 0, 0);
-        Size = arg1.props.size;
-        Position = arg1.props.position;
-        AnchorPoint = arg1.props.anchorPoint;
-    }, module_2)
+function v1.render(p1) --[[ Line: 31 | Upvalues: createElement (copy), Roact (copy) ]]
+	local v1 = p1.props.elapsed or p1.state.elapsed
+	local v2 = math.floor(v1 % 86400 / 3600)
+	local v3 = math.floor(v1 % 3600 / 60)
+	local v4 = math.floor(v1 % 60)
+	local alwaysShowHours = p1.props.alwaysShowHours
+	if not alwaysShowHours then
+		alwaysShowHours = v2 > 0
+	end
+	local alwaysShowMinutes = p1.props.alwaysShowMinutes
+	if not alwaysShowMinutes then
+		alwaysShowMinutes = alwaysShowHours or v3 > 0
+	end
+	local alwaysShowSeconds = p1.props.alwaysShowSeconds
+	if not alwaysShowSeconds then
+		alwaysShowSeconds = alwaysShowMinutes or v4 >= 0
+	end
+	local v8 = ("%s%s%s%s%s"):format(p1.props.prefix, if alwaysShowHours then ("%02d:"):format(v2) else "", if alwaysShowMinutes then ("%02d:"):format(v3) else "", if alwaysShowSeconds then ("%02d"):format(v4) else "", p1.props.suffix)
+	local v9 = ("%s--%s"):format(p1.props.prefix, p1.props.suffix)
+	local t = {
+		BackgroundTransparency = 1,
+		BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
+		Size = p1.props.size,
+		Position = p1.props.position,
+		AnchorPoint = p1.props.anchorPoint
+	}
+	local t2 = {}
+	local t3 = {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0.9, 0, 0.8, 0),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		AnchorPoint = Vector2.new(0.5, 0.5)
+	}
+	t3.Text = if p1.props.disabled then v9 else v8
+	t3.TextXAlignment = p1.props.textXAlignment
+	t3.Font = p1.props.font
+	t3.LineHeight = 1
+	t3.TextScaled = true
+	t3.TextColor3 = p1.props.textColor
+	t3[Roact.Children] = p1.props[Roact.Children]
+	t2.Text = createElement("TextLabel", t3)
+	return createElement("Frame", t, t2)
 end
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-function any_extend_result1._startCounting(arg1) -- Line 69
-    local function update() -- Line 70
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        if arg1.props.createdAtBinding then
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        if arg1.props.createdAt then
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end
-    update()
-    arg1.maid.counting = Interval_upvr.every(0.5):Connect(update)
+function v1._startCounting(p1) --[[ Line: 69 | Upvalues: Interval (copy) ]]
+	local function update() --[[ Line: 70 | Upvalues: p1 (copy) ]]
+		local v1 = workspace:GetServerTimeNow()
+		local v2
+		if p1.props.createdAtBinding then
+			v2 = p1.props.createdAtBinding:getValue()
+		elseif p1.props.createdAt then
+			v2 = p1.props.createdAt
+		else
+			warn("No createdAt exists")
+			v2 = 0
+		end
+		local v4 = if p1.props.countDown then v2 - v1 else v1 - v2
+		local t = {}
+		t.elapsed = math.max(0, (math.floor(v4)))
+		p1:setState(t)
+		if p1.props.onElapsed then
+			p1.props.onElapsed(v4)
+		end
+	end
+	update()
+	p1.maid.counting = Interval.every(0.5):Connect(update)
 end
-function any_extend_result1.didMount(arg1) -- Line 92
-    if not arg1.props.elapsed and not arg1.props.disabled then
-        arg1:_startCounting()
-    end
+function v1.didMount(p1) --[[ Line: 92 ]]
+	if not (p1.props.elapsed or p1.props.disabled) then
+		p1:_startCounting()
+	end
 end
-function any_extend_result1.didUpdate(arg1, arg2, arg3) -- Line 97
-    if arg1.props.elapsed or arg1.props.disabled then
-        arg1.maid.counting = nil
-    elseif arg1.maid.counting == nil then
-        arg1:_startCounting()
-    end
+function v1.didUpdate(p1, p2, p3) --[[ Line: 97 ]]
+	if p1.props.elapsed or p1.props.disabled then
+		p1.maid.counting = nil
+	elseif p1.maid.counting == nil then
+		p1:_startCounting()
+	end
 end
-function any_extend_result1.willUnmount(arg1) -- Line 106
-    arg1.maid:DoCleaning()
+function v1.willUnmount(p1) --[[ Line: 106 ]]
+	p1.maid:DoCleaning()
 end
-return any_extend_result1
+return v1

@@ -1,30 +1,19 @@
-return function(arg1, arg2) -- Line 1, Named "shallowEqual"
-    if arg1 == nil then
-        if arg2 ~= nil then
-        else
-        end
-        do
-            return true
-        end
-        local var9
-    end
-    if arg2 == nil then
-        if arg1 ~= nil then
-            var9 = false
-        else
-            var9 = true
-        end
-        return var9
-    end
-    for i, v in pairs(arg1) do
-        if v ~= arg2[i] then
-            return false
-        end
-    end
-    for i_2, v_2 in pairs(arg2) do
-        if v_2 ~= arg1[i_2] then
-            return false
-        end
-    end
-    return true
+return function(p1, p2) --[[ Name: shallowEqual | Line: 1 ]]
+	if p1 == nil then
+		return p2 == nil
+	end
+	if p2 == nil then
+		return p1 == nil
+	end
+	for k, v in pairs(p1) do
+		if v ~= p2[k] then
+			return false
+		end
+	end
+	for k, v in pairs(p2) do
+		if v ~= p1[k] then
+			return false
+		end
+	end
+	return true
 end

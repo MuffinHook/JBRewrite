@@ -1,114 +1,111 @@
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("CustomizeResult")
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function any_extend_result1.init(arg1) -- Line 13
-    arg1:setState({
-        hover = false;
-    })
-    arg1.maid = Maid_upvr.new()
-    arg1.cameraRef = Roact_upvr.createRef()
-    arg1.viewportRef = Roact_upvr.createRef()
+local Maid = require(ReplicatedStorage.Std.Maid)
+local PartUtils = require(ReplicatedStorage.Std.PartUtils)
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local Customize = require(ReplicatedStorage.Game.Garage.Customize)
+local StoreData = require(ReplicatedStorage.Game.Garage.StoreData)
+local v1 = Roact.PureComponent:extend("CustomizeResult")
+function v1.init(p1) --[[ Line: 13 | Upvalues: Maid (copy), Roact (copy) ]]
+	p1:setState({
+		hover = false
+	})
+	p1.maid = Maid.new()
+	p1.cameraRef = Roact.createRef()
+	p1.viewportRef = Roact.createRef()
 end
-local createElement_upvr = Roact_upvr.createElement
-function any_extend_result1.render(arg1) -- Line 21
-    return createElement_upvr("ViewportFrame", {
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-        Position = UDim2.new(0, 0, 0, 0);
-        Size = UDim2.new(1, 0, 1, 0);
-        Ambient = Color3.new(1, 1, 1);
-        LightColor = Color3.new(1, 1, 1);
-        CurrentCamera = arg1.cameraRef;
-        [Roact_upvr.Ref] = arg1.viewportRef;
-    }, {
-        Camera = createElement_upvr("Camera", {
-            FieldOfView = arg1.props.fieldOfView;
-            [Roact_upvr.Ref] = arg1.cameraRef;
-        });
-    })
+function v1.render(p1) --[[ Line: 21 | Upvalues: createElement (copy), Roact (copy) ]]
+	return createElement("ViewportFrame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Position = UDim2.new(0, 0, 0, 0),
+		Size = UDim2.new(1, 0, 1, 0),
+		Ambient = Color3.new(255/255, 255/255, 255/255),
+		LightColor = Color3.new(255/255, 255/255, 255/255),
+		CurrentCamera = p1.cameraRef,
+		[Roact.Ref] = p1.viewportRef
+	}, {
+		Camera = createElement("Camera", {
+			FieldOfView = p1.props.fieldOfView,
+			[Roact.Ref] = p1.cameraRef
+		})
+	})
 end
-local StoreData_upvr = require(ReplicatedStorage.Game.Garage.StoreData)
-local Customize_upvr = require(ReplicatedStorage.Game.Garage.Customize)
-function any_extend_result1._updateCustomize(arg1) -- Line 38
-    local var20
-    if not arg1.model then
-    else
-        local vehiclePacket = arg1.props.vehiclePacket
-        var20 = vehiclePacket.GarageSelection
-        if not var20 then
-            var20 = {}
-        end
-        for i, v in pairs(arg1.props.equipped) do
-            var20[i] = v
-        end
-        for _, v_2 in ipairs(arg1.props.receipt) do
-            var20[v_2.category] = v_2.name
-        end
-        Customize_upvr.ApplyAll(StoreData_upvr.GetMapFromSelection(var20), {
-            Model = arg1.model;
-            Make = vehiclePacket.Make;
-            Type = vehiclePacket.Type;
-        }, var20)
-    end
+function v1._updateCustomize(p1) --[[ Line: 38 | Upvalues: StoreData (copy), Customize (copy) ]]
+	if p1.model then
+		local vehiclePacket = p1.props.vehiclePacket
+		local v1 = vehiclePacket.GarageSelection or {}
+		for k, v in pairs(p1.props.equipped) do
+			v1[k] = v
+		end
+		for i, v in ipairs(p1.props.receipt) do
+			v1[v.category] = v.name
+		end
+		local v2 = StoreData.GetMapFromSelection(v1)
+		Customize.ApplyAll(v2, {
+			Model = p1.model,
+			Make = vehiclePacket.Make,
+			Type = vehiclePacket.Type
+		}, v1)
+	end
 end
-function any_extend_result1._removeModel(arg1) -- Line 57
-    if arg1.model then
-        arg1.model:Destroy()
-        arg1.model = nil
-    end
+function v1._removeModel(p1) --[[ Line: 57 ]]
+	if p1.model then
+		p1.model:Destroy()
+		p1.model = nil
+	end
 end
-local VehicleUtils_upvr = require(ReplicatedStorage.Vehicle.VehicleUtils)
-local PartUtils_upvr = require(ReplicatedStorage.Std.PartUtils)
-function any_extend_result1._updateModel(arg1) -- Line 63
-    arg1:_removeModel()
-    local vehiclePacket_2 = arg1.props.vehiclePacket
-    if not vehiclePacket_2 then
-    else
-        local Model = vehiclePacket_2.Model
-        if not Model then return end
-        local clone = Model:Clone()
-        VehicleUtils_upvr.CleanVehicleModel(clone)
-        PartUtils_upvr.setAnchored(clone, true)
-        clone.PrimaryPart = clone:FindFirstChild("BoundingBox")
-        clone:SetPrimaryPartCFrame(CFrame.new(0, 0, 0))
-        arg1.model = clone
-        clone.Parent = arg1.viewportRef:getValue()
-    end
+function v1._updateModel(p1) --[[ Line: 63 | Upvalues: VehicleUtils (copy), PartUtils (copy) ]]
+	p1:_removeModel()
+	local vehiclePacket = p1.props.vehiclePacket
+	if vehiclePacket then
+		local Model = vehiclePacket.Model
+		if Model then
+			local v1 = Model:Clone()
+			VehicleUtils.CleanVehicleModel(v1)
+			PartUtils.setAnchored(v1, true)
+			v1.PrimaryPart = v1:FindFirstChild("BoundingBox")
+			v1:SetPrimaryPartCFrame(CFrame.new(0, 0, 0))
+			p1.model = v1
+			v1.Parent = p1.viewportRef:getValue()
+		end
+	end
 end
-local RunService_upvr = game:GetService("RunService")
-function any_extend_result1.didMount(arg1) -- Line 84
-    arg1:_updateModel()
-    arg1.maid:GiveTask(function() -- Line 86
-        arg1:_removeModel()
-    end)
-    arg1:_updateCustomize()
-    local any_getValue_result1_upvr = arg1.cameraRef:getValue()
-    arg1.maid.moveCamera = RunService_upvr.Heartbeat:Connect(function() -- Line 91
-        if not arg1.model then
-        else
-            local any_GetExtentsSize_result1 = arg1.model:GetExtentsSize()
-            local var39 = os.clock() / 2
-            any_getValue_result1_upvr.CFrame = CFrame.Angles(0, var39 % (-math.pi*2), 0) * CFrame.Angles(-0.18849555921538758 + math.sin(var39 / 2) * math.pi * 0.01, 0, 0) * CFrame.new(0, 0, any_GetExtentsSize_result1.Magnitude * 0.66 + (math.cos(var39 * 2) * 0.5 + 0.5) * (any_GetExtentsSize_result1.Z / any_GetExtentsSize_result1.X) * 1.5)
-        end
-    end)
+function v1.didMount(p1) --[[ Line: 84 | Upvalues: RunService (copy) ]]
+	p1:_updateModel()
+	p1.maid:GiveTask(function() --[[ Line: 86 | Upvalues: p1 (copy) ]]
+		p1:_removeModel()
+	end)
+	p1:_updateCustomize()
+	local v1 = p1.cameraRef:getValue()
+	p1.maid.moveCamera = RunService.Heartbeat:Connect(function() --[[ Line: 91 | Upvalues: p1 (copy), v1 (copy) ]]
+		if p1.model then
+			local v12 = os.clock()
+			local v2 = p1.model:GetExtentsSize()
+			local v3 = v12 / 2
+			v1.CFrame = CFrame.Angles(0, v3 % 6.283185307179586, 0) * CFrame.Angles(-0.18849555921538758 + math.sin(v3 / 2) * math.pi * 0.01, 0, 0) * CFrame.new(0, 0, v2.Magnitude * 0.66 + (math.cos(v3 * 2) * 0.5 + 0.5) * (v2.Z / v2.X) * 1.5)
+		end
+	end)
 end
-function any_extend_result1.didUpdate(arg1, arg2, arg3) -- Line 105
-    if arg2.vehiclePacket ~= arg1.props.vehiclePacket then
-        arg1:_updateModel()
-        arg1:_updateCustomize()
-    end
-    if arg2.receipt ~= arg1.props.receipt or arg2.equipped ~= arg1.props.equipped then
-        arg1:_updateCustomize()
-    end
+function v1.didUpdate(p1, p2, p3) --[[ Line: 105 ]]
+	if p2.vehiclePacket ~= p1.props.vehiclePacket then
+		p1:_updateModel()
+		p1:_updateCustomize()
+	end
+	if p2.receipt ~= p1.props.receipt or p2.equipped ~= p1.props.equipped then
+		p1:_updateCustomize()
+	end
 end
-function any_extend_result1.willUnmount(arg1) -- Line 114
-    arg1.maid:DoCleaning()
+function v1.willUnmount(p1) --[[ Line: 114 ]]
+	p1.maid:DoCleaning()
 end
-return require(ReplicatedStorage.RoactRodux).connect(function(arg1, arg2) -- Line 117
-    return {
-        receipt = arg1.garageReceipt;
-        equipped = arg1.garageEquipped;
-        vehiclePacket = arg1.garageVehiclePacket;
-    }
-end)(any_extend_result1)
+return RoactRodux.connect(function(p1, p2) --[[ Line: 117 ]]
+	return {
+		receipt = p1.garageReceipt,
+		equipped = p1.garageEquipped,
+		vehiclePacket = p1.garageVehiclePacket
+	}
+end)(v1)

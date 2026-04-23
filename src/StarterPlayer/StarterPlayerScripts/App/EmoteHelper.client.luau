@@ -1,87 +1,82 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CharacterUtils_upvr = require(ReplicatedStorage.Std.CharacterUtils)
-local Joint_upvr = require(ReplicatedStorage.Std.Joint)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local RunService_upvr = game:GetService("RunService")
-CharacterUtils_upvr.observeLocalCharacterAdded(function(arg1, arg2) -- Line 8
-    local Humanoid_upvr = arg1:FindFirstChild("Humanoid")
-    task.wait(1)
-    local var8_upvw
-    local function _(arg1_2) -- Line 17, Named "StopAnimation"
-        arg2.emoteBallConnection = nil
-        local var9
-        if var8_upvw then
-            if arg1_2 then
-                var9 = 0
-            else
-                var9 = nil
-            end
-            var8_upvw:Stop(var9)
-            var8_upvw = nil
-        end
-    end
-    arg1:WaitForChild("Animate"):WaitForChild("PlayEmote").OnInvoke = function(arg1_3) -- Line 25
-        arg2.emoteBallConnection = nil
-        if var8_upvw then
-            var8_upvw:Stop(nil)
-            var8_upvw = nil
-        end
-        if Humanoid_upvr:GetState() ~= Enum.HumanoidStateType.Running then return end
-        var8_upvw = Humanoid_upvr:LoadAnimation(arg1_3)
-        var8_upvw.Priority = Enum.AnimationPriority.Action
-        var8_upvw:Play()
-        local any_getRootPart_result1_upvr = CharacterUtils_upvr.getRootPart(arg1)
-        if any_getRootPart_result1_upvr then
-            local Part_upvr = Instance.new("Part")
-            Part_upvr.Shape = Enum.PartType.Ball
-            Part_upvr.Size = Vector3.new(4, 4, 4)
-            Part_upvr.Name = "EmoteBall"
-            Part_upvr.CanCollide = true
-            Part_upvr.CollisionGroup = any_getRootPart_result1_upvr.CollisionGroup
-            Part_upvr.CustomPhysicalProperties = PhysicalProperties.new(0.01, 0, 0, 1, 1)
-            Part_upvr.CFrame = any_getRootPart_result1_upvr.CFrame * CFrame.new(0, 0, 1)
-            Part_upvr.Transparency = 1
-            Part_upvr.Parent = arg1
-            Joint_upvr.CustomWeld(Part_upvr, any_getRootPart_result1_upvr, CFrame.new(0, 0, 0), CFrame.new(0, 0, 0))
-            local any_new_result1 = Maid_upvr.new()
-            any_new_result1:GiveTask(function() -- Line 51
-                task.delay(0.25, function() -- Line 52
-                    Part_upvr:Destroy()
-                end)
-            end)
-            any_new_result1:GiveTask(var8_upvw.Stopped:Connect(function() -- Line 56
-                arg2.emoteBallConnection = nil
-                if var8_upvw then
-                    var8_upvw:Stop(nil)
-                    var8_upvw = nil
-                end
-            end))
-            any_new_result1:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 59
-                if 3 < (arg1.LowerTorso.Position - any_getRootPart_result1_upvr.Position).Magnitude then
-                    arg2.emoteBallConnection = nil
-                    if var8_upvw then
-                        var8_upvw:Stop(0)
-                        var8_upvw = nil
-                    end
-                end
-            end))
-            arg2.emoteBallConnection = any_new_result1
-        end
-        Part_upvr = true
-        return Part_upvr
-    end
-    arg2:GiveTask(Humanoid_upvr.StateChanged:Connect(function(arg1_4, arg2_2) -- Line 72
-        arg2.emoteBallConnection = nil
-        if var8_upvw then
-            var8_upvw:Stop(nil)
-            var8_upvw = nil
-        end
-    end))
-    arg2:GiveTask(Humanoid_upvr.Running:Connect(function(arg1_5) -- Line 75
-        arg2.emoteBallConnection = nil
-        if var8_upvw then
-            var8_upvw:Stop(nil)
-            var8_upvw = nil
-        end
-    end))
+local RunService = game:GetService("RunService")
+local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
+local Joint = require(ReplicatedStorage.Std.Joint)
+local Maid = require(ReplicatedStorage.Std.Maid)
+CharacterUtils.observeLocalCharacterAdded(function(p1, p2) --[[ Line: 8 | Upvalues: CharacterUtils (copy), Joint (copy), Maid (copy), RunService (copy) ]]
+	local Humanoid = p1:FindFirstChild("Humanoid")
+	local PlayEmote = p1:WaitForChild("Animate"):WaitForChild("PlayEmote")
+	task.wait(1)
+	local v1 = nil
+	local function StopAnimation(p1) --[[ Line: 17 | Upvalues: p2 (copy), v1 (ref) ]]
+		p2.emoteBallConnection = nil
+		if v1 then
+			v1:Stop(if p1 then 0 else nil)
+			v1 = nil
+		end
+	end
+	function PlayEmote.OnInvoke(p12) --[[ Line: 25 | Upvalues: p2 (copy), v1 (ref), Humanoid (copy), CharacterUtils (ref), p1 (copy), Joint (ref), Maid (ref), RunService (ref) ]]
+		p2.emoteBallConnection = nil
+		if v1 then
+			v1:Stop(nil)
+			v1 = nil
+		end
+		if Humanoid:GetState() == Enum.HumanoidStateType.Running then
+			v1 = Humanoid:LoadAnimation(p12)
+			v1.Priority = Enum.AnimationPriority.Action
+			v1:Play()
+			local v12 = CharacterUtils.getRootPart(p1)
+			if v12 then
+				local EmoteBall = Instance.new("Part")
+				EmoteBall.Shape = Enum.PartType.Ball
+				EmoteBall.Size = Vector3.new(4, 4, 4)
+				EmoteBall.Name = "EmoteBall"
+				EmoteBall.CanCollide = true
+				EmoteBall.CollisionGroup = v12.CollisionGroup
+				EmoteBall.CustomPhysicalProperties = PhysicalProperties.new(0.01, 0, 0, 1, 1)
+				EmoteBall.CFrame = v12.CFrame * CFrame.new(0, 0, 1)
+				EmoteBall.Transparency = 1
+				EmoteBall.Parent = p1
+				Joint.CustomWeld(EmoteBall, v12, CFrame.new(0, 0, 0), CFrame.new(0, 0, 0))
+				local v2 = Maid.new()
+				v2:GiveTask(function() --[[ Line: 51 | Upvalues: EmoteBall (copy) ]]
+					task.delay(0.25, function() --[[ Line: 52 | Upvalues: EmoteBall (ref) ]]
+						EmoteBall:Destroy()
+					end)
+				end)
+				v2:GiveTask(v1.Stopped:Connect(function() --[[ Line: 56 | Upvalues: p2 (ref), v1 (ref) ]]
+					p2.emoteBallConnection = nil
+					if v1 then
+						v1:Stop(nil)
+						v1 = nil
+					end
+				end))
+				v2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 59 | Upvalues: p1 (ref), v12 (copy), p2 (ref), v1 (ref) ]]
+					if (p1.LowerTorso.Position - v12.Position).Magnitude > 3 then
+						p2.emoteBallConnection = nil
+						if v1 then
+							v1:Stop(0)
+							v1 = nil
+						end
+					end
+				end))
+				p2.emoteBallConnection = v2
+			end
+			return true
+		end
+	end
+	p2:GiveTask(Humanoid.StateChanged:Connect(function(p1, p22) --[[ Line: 72 | Upvalues: p2 (copy), v1 (ref) ]]
+		p2.emoteBallConnection = nil
+		if v1 then
+			v1:Stop(nil)
+			v1 = nil
+		end
+	end))
+	p2:GiveTask(Humanoid.Running:Connect(function(p1) --[[ Line: 75 | Upvalues: p2 (copy), v1 (ref) ]]
+		p2.emoteBallConnection = nil
+		if v1 then
+			v1:Stop(nil)
+			v1 = nil
+		end
+	end))
 end)

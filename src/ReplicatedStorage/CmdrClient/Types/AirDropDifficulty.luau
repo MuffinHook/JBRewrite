@@ -1,24 +1,21 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local tbl_upvr = {}
-local any_MakeFuzzyFinder_result1_upvr = require(ReplicatedStorage.CmdrClient.Shared.Util).MakeFuzzyFinder(require(ReplicatedStorage.AirDrop.AirDropConsts).TYPE_ENUM_TO_NAME)
-function tbl_upvr.Transform(arg1) -- Line 9
-    return any_MakeFuzzyFinder_result1_upvr(arg1)
-end
-function tbl_upvr.Validate(arg1) -- Line 13
-    local var4
-    if 0 >= #arg1 then
-        var4 = false
-    else
-        var4 = true
-    end
-    return var4, "No valid airDropDifficulty with that name could be found."
-end
-function tbl_upvr.Autocomplete(arg1) -- Line 17
-    return arg1
-end
-function tbl_upvr.Parse(arg1) -- Line 21
-    return arg1[1]
-end
-return function(arg1) -- Line 26
-    arg1:RegisterType("airDropDifficulty", tbl_upvr)
+local Util = require(ReplicatedStorage.CmdrClient.Shared.Util)
+local TYPE_ENUM_TO_NAME = require(ReplicatedStorage.AirDrop.AirDropConsts).TYPE_ENUM_TO_NAME
+local v1 = Util.MakeFuzzyFinder(TYPE_ENUM_TO_NAME)
+local t = {
+	Transform = function(p1) --[[ Name: Transform | Line: 9 | Upvalues: v1 (copy) ]]
+		return v1(p1)
+	end,
+	Validate = function(p1) --[[ Name: Validate | Line: 13 ]]
+		return #p1 > 0, "No valid airDropDifficulty with that name could be found."
+	end,
+	Autocomplete = function(p1) --[[ Name: Autocomplete | Line: 17 ]]
+		return p1
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 21 ]]
+		return p1[1]
+	end
+}
+return function(p1) --[[ Line: 26 | Upvalues: t (copy) ]]
+	p1:RegisterType("airDropDifficulty", t)
 end

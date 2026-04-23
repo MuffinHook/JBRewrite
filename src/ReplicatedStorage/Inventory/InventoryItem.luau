@@ -1,98 +1,97 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local InventoryItemConsts_upvr = require(script.Parent.InventoryItemConsts)
-local InventoryItemUtils_upvr = require(script.Parent.InventoryItemUtils)
-local InventoryItemOwnerBinder_upvr = require(script.Parent.InventoryItemOwnerBinder)
-local module_upvr_2 = {}
-module_upvr_2.__index = module_upvr_2
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local Signal_upvr = require(ReplicatedStorage.Std.Signal)
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-function module_upvr_2.new(arg1) -- Line 14
-    local module_upvr = {}
-    setmetatable(module_upvr, module_upvr_2)
-    module_upvr.obj = arg1
-    module_upvr._maid = Maid_upvr.new()
-    module_upvr.onAttemptSelect = Signal_upvr.new()
-    module_upvr._maid:GiveTask(module_upvr.onAttemptSelect)
-    module_upvr.onAttemptDrop = Signal_upvr.new()
-    module_upvr._maid:GiveTask(module_upvr.onAttemptDrop)
-    module_upvr._maid:GiveTask(function() -- Line 25
-        InventoryItemUtils_upvr.setEquipped(module_upvr.obj, false)
-    end)
-    module_upvr._maid:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1, InventoryItemConsts_upvr.EQUIP_REMOTE_NAME, function(arg1_2, arg2) -- Line 34
-        arg2:GiveTask(arg1_2.OnClientEvent:Connect(function() -- Line 35
-            module_upvr:AttemptSelect()
-        end))
-    end))
-    module_upvr._maid:GiveTask(arg1:GetAttributeChangedSignal(InventoryItemConsts_upvr.EQUIPPED_ATTR_NAME):Connect(function() -- Line 42, Named "update"
-        local var13 = arg1:GetAttribute(InventoryItemConsts_upvr.EQUIPPED_ATTR_NAME) or 0
-        if (arg1:GetAttribute(InventoryItemConsts_upvr.EQUIPPED_LOCAL_ATTR_NAME) or 0) < var13 then
-            arg1:SetAttribute(InventoryItemConsts_upvr.EQUIPPED_LOCAL_ATTR_NAME, var13)
-        end
-    end))
-    local var14 = arg1:GetAttribute(InventoryItemConsts_upvr.EQUIPPED_ATTR_NAME) or 0
-    if (arg1:GetAttribute(InventoryItemConsts_upvr.EQUIPPED_LOCAL_ATTR_NAME) or 0) < var14 then
-        arg1:SetAttribute(InventoryItemConsts_upvr.EQUIPPED_LOCAL_ATTR_NAME, var14)
-    end
-    module_upvr._overriddenOwner = nil
-    return module_upvr
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local InventoryItemConsts = require(script.Parent.InventoryItemConsts)
+local InventoryItemUtils = require(script.Parent.InventoryItemUtils)
+local InventoryItemOwnerBinder = require(script.Parent.InventoryItemOwnerBinder)
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 14 | Upvalues: t (copy), Maid (copy), Signal (copy), InventoryItemUtils (copy), RxInstanceUtils (copy), InventoryItemConsts (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2.obj = p1
+	t2._maid = Maid.new()
+	t2.onAttemptSelect = Signal.new()
+	t2._maid:GiveTask(t2.onAttemptSelect)
+	t2.onAttemptDrop = Signal.new()
+	t2._maid:GiveTask(t2.onAttemptDrop)
+	t2._maid:GiveTask(function() --[[ Line: 25 | Upvalues: InventoryItemUtils (ref), t2 (copy) ]]
+		InventoryItemUtils.setEquipped(t2.obj, false)
+	end)
+	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, InventoryItemConsts.EQUIP_REMOTE_NAME, function(p1, p2) --[[ Line: 34 | Upvalues: t2 (copy) ]]
+		p2:GiveTask(p1.OnClientEvent:Connect(function() --[[ Line: 35 | Upvalues: t2 (ref) ]]
+			t2:AttemptSelect()
+		end))
+	end))
+	local function update() --[[ Line: 42 | Upvalues: p1 (copy), InventoryItemConsts (ref) ]]
+		local v1 = p1:GetAttribute(InventoryItemConsts.EQUIPPED_ATTR_NAME) or 0
+		if (p1:GetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME) or 0) < v1 then
+			p1:SetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME, v1)
+		end
+	end
+	t2._maid:GiveTask(p1:GetAttributeChangedSignal(InventoryItemConsts.EQUIPPED_ATTR_NAME):Connect(update))
+	local v2 = p1:GetAttribute(InventoryItemConsts.EQUIPPED_ATTR_NAME) or 0
+	if (p1:GetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME) or 0) < v2 then
+		p1:SetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME, v2)
+	end
+	t2._overriddenOwner = nil
+	return t2
 end
-function module_upvr_2.GetName(arg1) -- Line 56
-    return InventoryItemUtils_upvr.getName(arg1.obj)
+function t.GetName(p1) --[[ Line: 56 | Upvalues: InventoryItemUtils (copy) ]]
+	return InventoryItemUtils.getName(p1.obj)
 end
-function module_upvr_2.GetOwner(arg1) -- Line 59
-    local Parent = arg1.obj.Parent.Parent
-    if not Parent then
-    else
-        local any_Get_result1 = InventoryItemOwnerBinder_upvr:Get(Parent)
-        if any_Get_result1 then
-            return any_Get_result1
-        end
-        if Parent.Parent == game:GetService("Players") then
-            return Parent
-        end
-    end
+function t.GetOwner(p1) --[[ Line: 59 | Upvalues: InventoryItemOwnerBinder (copy) ]]
+	local v1 = p1.obj.Parent.Parent
+	if v1 then
+		local v2 = InventoryItemOwnerBinder:Get(v1)
+		if v2 then
+			return v2
+		end
+		if v1.Parent == game:GetService("Players") then
+			return v1
+		end
+	end
 end
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-function module_upvr_2.PromiseOwner(arg1) -- Line 74
-    local Parent_2 = arg1.obj.Parent.Parent
-    if not Parent_2 then return end
-    if Parent_2.Parent == game:GetService("Players") then
-        return Promise_upvr.resolve(Parent_2)
-    end
-    return InventoryItemOwnerBinder_upvr:Promise(Parent_2)
+function t.PromiseOwner(p1) --[[ Line: 74 | Upvalues: Promise (copy), InventoryItemOwnerBinder (copy) ]]
+	local v1 = p1.obj.Parent.Parent
+	if v1 then
+		if v1.Parent == game:GetService("Players") then
+			return Promise.resolve(v1)
+		else
+			return InventoryItemOwnerBinder:Promise(v1)
+		end
+	end
 end
-function module_upvr_2.GetAttr(arg1, ...) -- Line 84
-    return InventoryItemUtils_upvr.getAttr(arg1.obj, ...)
+function t.GetAttr(p1, ...) --[[ Line: 84 | Upvalues: InventoryItemUtils (copy) ]]
+	return InventoryItemUtils.getAttr(p1.obj, ...)
 end
-function module_upvr_2.SetAttr(arg1, ...) -- Line 87
-    InventoryItemUtils_upvr.setAttr(arg1.obj, ...)
+function t.SetAttr(p1, ...) --[[ Line: 87 | Upvalues: InventoryItemUtils (copy) ]]
+	InventoryItemUtils.setAttr(p1.obj, ...)
 end
-function module_upvr_2.GetEquipped(arg1, ...) -- Line 90
-    return InventoryItemUtils_upvr.getEquipped(arg1.obj, ...)
+function t.GetEquipped(p1, ...) --[[ Line: 90 | Upvalues: InventoryItemUtils (copy) ]]
+	return InventoryItemUtils.getEquipped(p1.obj, ...)
 end
-function module_upvr_2.SetEquipped(arg1, ...) -- Line 93
-    InventoryItemUtils_upvr.setEquipped(arg1.obj, ...)
+function t.SetEquipped(p1, ...) --[[ Line: 93 | Upvalues: InventoryItemUtils (copy) ]]
+	InventoryItemUtils.setEquipped(p1.obj, ...)
 end
-function module_upvr_2.GetEquippedSignal(arg1) -- Line 96
-    return InventoryItemUtils_upvr.getEquippedSignal(arg1.obj)
+function t.GetEquippedSignal(p1) --[[ Line: 96 | Upvalues: InventoryItemUtils (copy) ]]
+	return InventoryItemUtils.getEquippedSignal(p1.obj)
 end
-function module_upvr_2.AttemptSetEquipped(arg1, arg2) -- Line 99
-    if arg2 == nil then
-    else
-    end
-    assert(true, "missing value")
-    InventoryItemUtils_upvr.setEquipped(arg1.obj, arg2)
-    arg1.obj:FindFirstChild(InventoryItemConsts_upvr.EQUIP_REMOTE_NAME):FireServer(arg2)
+function t.AttemptSetEquipped(p1, p2) --[[ Line: 99 | Upvalues: InventoryItemUtils (copy), InventoryItemConsts (copy) ]]
+	assert(p2 ~= nil, "missing value")
+	InventoryItemUtils.setEquipped(p1.obj, p2)
+	p1.obj:FindFirstChild(InventoryItemConsts.EQUIP_REMOTE_NAME):FireServer(p2)
 end
-function module_upvr_2.AttemptSelect(arg1) -- Line 105
-    arg1.onAttemptSelect:Fire()
+function t.AttemptSelect(p1) --[[ Line: 105 ]]
+	p1.onAttemptSelect:Fire()
 end
-function module_upvr_2.AttemptDrop(arg1) -- Line 108
-    arg1.onAttemptDrop:Fire()
+function t.AttemptDrop(p1) --[[ Line: 108 ]]
+	p1.onAttemptDrop:Fire()
 end
-function module_upvr_2.Destroy(arg1) -- Line 111
-    arg1._maid:Destroy()
-    setmetatable(arg1, nil)
+function t.Destroy(p1) --[[ Line: 111 ]]
+	p1._maid:Destroy()
+	setmetatable(p1, nil)
 end
-return module_upvr_2
+return t

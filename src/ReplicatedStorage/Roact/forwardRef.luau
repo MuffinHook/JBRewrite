@@ -1,24 +1,15 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMPCnR5cGVDaGVja3MGdHlwZW9mCGZ1bmN0aW9uIEV4cGVjdGVkIGFyZyAjMSB0byBiZSBhIGZ1bmN0aW9uBmFzc2VydApmb3J3YXJkUmVmB3JlcXVpcmUGc2NyaXB0BlBhcmVudAZhc3NpZ24ETm9uZQtQcm9wTWFya2VycwNSZWYMR2xvYmFsQ29uZmlnA2dldAADBgEEAAAPAAQCDw8PDw8BAA0PAgILDfsCAACHAQAC+wIBAP8DAAAAAAAAUgQAAPsFAgCfAgQC+wMDAFIEAgBSBQEAnwMDAIIDAAAAABQAARgAAAEAAAAAAAIAAAAAFQAAAAAFAQQAAAcABAAPDw8PGfsCAABNAQJCAAAAAA4BDwC7LAADUgQAAKQDAgAAABBAnwMCAvADAgADAAAAqQIAAakCAQCBAQIEBAAAAG8DBACkAQYAAABQQJ8BAwHZAQAAEgIBABICAgASAgMAEgAAAIIBAgAHAwEDAgQAABBAAwMDBAMFBAAAUEABAA8GARgAAAAAAQAAAAAAAAAAAAAAAAAAAwAAAAAAEAAAAAAIAAABAhsAAAYPAAEyDwEKKQ8CEyAPAx4VDwQqCQ8FLQYzowAAAKQAAQAAAABApAMDAAAAIEBNAgMkBAAAAE0BAuMFAAAAnwACAqQBAQAAAABApAQDAAAAIEBNAwQkBAAAAE0CAz8GAAAAnwECAqQCAQAAAABApAYDAAAAIEBNBQYkBAAAAE0EBdQHAAAATQME3QgAAACfAgICpAQBAAAAAECkBwMAAAAgQE0GByQEAAAATQUGjAkAAACfBAICTQMEXwoAAACfAwEC/wQBAAAAAABqAQQCwAULABIAAwASAAIAEgAAABIABACCBQIADAMHBAAAAEADCAQAACBAAwkDCgMLAwwDDQMOAw8GAQEBAQABGAAAAAAAAAAAAAABAAAAAAAAAAABAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAIAAQcAAAAADQEAAAAAAk3XBVCC7jdwfxNvxM0p3uqPj5FcPhc9suPRgq2XcBS2J1DyIVvdZtA=
-
-local v0 = require(script.Parent.assign);
-local v1 = require(script.Parent.None);
-local v2 = require(script.Parent.PropMarkers.Ref);
-local v3 = require(script.Parent.GlobalConfig).get();
-local v4 = {
-    [v2] = v1
-};
-return function(v5) --[[ Line: 15 ]] --[[ Name: forwardRef ]]
-    -- upvalues: v3 (copy), v2 (copy), v0 (copy), v4 (copy)
-    if v3.typeChecks then
-        assert(typeof(v5) == "function", "Expected arg #1 to be a function");
-    end;
-    return function(v6) --[[ Line: 20 ]]
-        -- upvalues: v2 (ref), v0 (ref), v4 (ref), v5 (copy)
-        local v7 = v6[v2];
-        local v8 = v0({}, v6, v4);
-        return v5(v8, v7);
-    end;
-end;
+local assign = require(script.Parent.assign)
+local None = require(script.Parent.None)
+local Ref = require(script.Parent.PropMarkers.Ref)
+local v1 = require(script.Parent.GlobalConfig).get()
+local t = {
+	[Ref] = None
+}
+return function(p1) --[[ Name: forwardRef | Line: 15 | Upvalues: v1 (copy), Ref (copy), assign (copy), t (copy) ]]
+	if v1.typeChecks then
+		assert(typeof(p1) == "function", "Expected arg #1 to be a function")
+	end
+	return function(p12) --[[ Line: 20 | Upvalues: Ref (ref), assign (ref), t (ref), p1 (copy) ]]
+		return p1(assign({}, p12, t), p12[Ref])
+	end
+end

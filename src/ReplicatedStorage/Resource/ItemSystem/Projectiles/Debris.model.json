@@ -1,29 +1,18 @@
 {
   "className": "ParticleEmitter",
   "properties": {
-    "Size": {
-      "NumberSequence": {
-        "keypoints": [
-          {
-            "time": 0.0,
-            "value": 0.2,
-            "envelope": 0.0
-          },
-          {
-            "time": 1.0,
-            "value": 0.2,
-            "envelope": 0.0
-          }
-        ]
-      }
-    },
+    "Rate": 100.0,
+    "Acceleration": [
+      0.0,
+      -35.0,
+      0.0
+    ],
     "Speed": {
       "NumberRange": [
         25.0,
         25.0
       ]
     },
-    "LockedToPart": true,
     "Transparency": {
       "NumberSequence": {
         "keypoints": [
@@ -40,6 +29,34 @@
         ]
       }
     },
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "Enabled": false,
+    "LockedToPart": true,
+    "Lifetime": {
+      "NumberRange": [
+        2.0,
+        2.0
+      ]
+    },
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.2,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 0.2,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Texture": "rbxassetid://1175725495",
     "Color": {
       "ColorSequence": {
         "keypoints": [
@@ -62,26 +79,9 @@
         ]
       }
     },
-    "Lifetime": {
-      "NumberRange": [
-        2.0,
-        2.0
-      ]
-    },
-    "Enabled": false,
-    "Acceleration": [
-      0.0,
-      -35.0,
-      0.0
-    ],
-    "Rate": 100.0,
     "SpreadAngle": [
       100.0,
       100.0
-    ],
-    "FlipbookBlendFrames": {
-      "Bool": false
-    },
-    "Texture": "rbxassetid://1175725495"
+    ]
   }
 }

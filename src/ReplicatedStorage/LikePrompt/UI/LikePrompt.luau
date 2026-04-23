@@ -1,139 +1,145 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("LikePrompt")
-any_extend_result1.defaultProps = {
-    size = UDim2.fromScale(0.75, 0.05);
-    anchorPoint = Vector2.new(0.5, 0);
-    position = UDim2.fromScale(0.5, 0);
+local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
+local Roact = require(ReplicatedStorage.Roact)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local createElement = Roact.createElement
+local v1 = Roact.PureComponent:extend("LikePrompt")
+v1.defaultProps = {
+	size = UDim2.fromScale(0.75, 0.05),
+	anchorPoint = Vector2.new(0.5, 0),
+	position = UDim2.fromScale(0.5, 0)
 }
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function any_extend_result1.init(arg1) -- Line 14
-    arg1.maid = Maid_upvr.new()
-    arg1:setState({
-        remaining = 0;
-    })
+function v1.init(p1) --[[ Line: 14 | Upvalues: Maid (copy) ]]
+	p1.maid = Maid.new()
+	p1:setState({
+		remaining = 0
+	})
 end
-local createElement_upvr = Roact_upvr.createElement
-local PaddedContainer_upvr = require(ReplicatedStorage.EzUi.PaddedContainer)
-function any_extend_result1.render(arg1) -- Line 20
-    if not arg1.props.visible then return end
-    return createElement_upvr("Frame", {
-        BackgroundColor3 = Color3.new(0, 0, 0);
-        BackgroundTransparency = 0;
-        Size = arg1.props.size;
-        AnchorPoint = arg1.props.anchorPoint;
-        Position = arg1.props.position;
-    }, {
-        Corner = createElement_upvr("UICorner", {
-            CornerRadius = UDim.new(1, 0);
-        });
-        AspectRatio = createElement_upvr("UIAspectRatioConstraint", {
-            AspectRatio = 18;
-        });
-        Inner = createElement_upvr(PaddedContainer_upvr, {
-            aspectRatio = 18;
-            verticalPaddingRatio = 7.111111111111111;
-            backgroundTransparency = 1;
-        }, {
-            TitleContainer = createElement_upvr(PaddedContainer_upvr, {
-                backgroundTransparency = 1;
-                size = UDim2.fromScale(0.7944444444444444, 1);
-                paddingTop = 0;
-                paddingBottom = 0;
-                paddingLeft = 1;
-                paddingRight = 0.5;
-            }, {
-                Text = createElement_upvr("TextLabel", {
-                    BackgroundTransparency = 1;
-                    Size = UDim2.fromScale(1, 0.9);
-                    Position = UDim2.fromScale(0.5, 0.5);
-                    AnchorPoint = Vector2.new(0.5, 0.5);
-                    Font = Enum.Font.FredokaOne;
-                    Text = "Enjoying Jailbreak? Please thumbs up our game!";
-                    TextColor3 = Color3.new(1, 1, 1);
-                    TextScaled = true;
-                });
-            });
-            ButtonContainer = createElement_upvr(PaddedContainer_upvr, {
-                backgroundTransparency = 1;
-                size = UDim2.fromScale(0.15, 1);
-                position = UDim2.fromScale(0.7944444444444444, 0);
-                paddingTop = 0;
-                paddingBottom = 0;
-                paddingLeft = 0.5;
-                paddingRight = 0;
-            }, {
-                Button = createElement_upvr("TextButton", {
-                    BackgroundTransparency = 0;
-                    Size = UDim2.fromScale(1, 1);
-                    Text = "";
-                    BackgroundColor3 = Color3.fromRGB(1, 255, 171);
-                    Selectable = true;
-                    [Roact_upvr.Event.Activated] = arg1.props.onClickDone;
-                }, {
-                    Corner = createElement_upvr("UICorner", {
-                        CornerRadius = UDim.new(1, 0);
-                    });
-                    TitleContainer = createElement_upvr("Frame", {
-                        BackgroundTransparency = 1;
-                        Size = UDim2.fromScale(1, 1);
-                    }, {
-                        Text = createElement_upvr("TextLabel", {
-                            BackgroundTransparency = 1;
-                            Size = UDim2.fromScale(1, 1);
-                            Position = UDim2.fromScale(0.5, 0.5);
-                            AnchorPoint = Vector2.new(0.5, 0.5);
-                            Font = Enum.Font.FredokaOne;
-                            Text = "OK!";
-                            TextColor3 = Color3.new(0, 0, 0);
-                            TextScaled = true;
-                        });
-                    });
-                });
-            });
-            CountdownContainer = createElement_upvr("Frame", {
-                BackgroundTransparency = 1;
-                Size = UDim2.fromScale(0.05555555555555555, 1);
-                Position = UDim2.fromScale(0.9444444444444444, 0);
-            }, {
-                Text = createElement_upvr("TextLabel", {
-                    BackgroundTransparency = 1;
-                    Size = UDim2.fromScale(1, 0.8);
-                    Position = UDim2.fromScale(0.5, 0.5);
-                    AnchorPoint = Vector2.new(0.5, 0.5);
-                    Font = Enum.Font.FredokaOne;
-                    Text = tostring(math.max(0, math.floor(arg1.state.remaining)));
-                    TextColor3 = Color3.new(0.3, 0.3, 0.3);
-                    TextScaled = true;
-                });
-            });
-        });
-        Stroke = createElement_upvr("UIStroke", {
-            Thickness = 1;
-            Color = Color3.new(0.7, 0.7, 0.7);
-        });
-    })
+function v1.render(p1) --[[ Line: 20 | Upvalues: createElement (copy), PaddedContainer (copy), Roact (copy) ]]
+	if p1.props.visible then
+		local v1 = Color3.fromRGB(1, 255, 171)
+		local t = {
+			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
+			BackgroundTransparency = 0,
+			Size = p1.props.size,
+			AnchorPoint = p1.props.anchorPoint,
+			Position = p1.props.position
+		}
+		local t2 = {
+			Corner = createElement("UICorner", {
+				CornerRadius = UDim.new(1, 0)
+			}),
+			AspectRatio = createElement("UIAspectRatioConstraint", {
+				AspectRatio = 18
+			})
+		}
+		local t3 = {
+			TitleContainer = createElement(PaddedContainer, {
+				backgroundTransparency = 1,
+				size = UDim2.fromScale(0.7944444444444444, 1),
+				paddingTop = 0,
+				paddingBottom = 0,
+				paddingLeft = 1,
+				paddingRight = 0.5
+			}, {
+				Text = createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Size = UDim2.fromScale(1, 0.9),
+					Position = UDim2.fromScale(0.5, 0.5),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Font = Enum.Font.FredokaOne,
+					Text = "Enjoying Jailbreak? Please thumbs up our game!",
+					TextColor3 = Color3.new(255/255, 255/255, 255/255),
+					TextScaled = true
+				})
+			}),
+			ButtonContainer = createElement(PaddedContainer, {
+				backgroundTransparency = 1,
+				size = UDim2.fromScale(0.15, 1),
+				position = UDim2.fromScale(0.7944444444444444, 0),
+				paddingTop = 0,
+				paddingBottom = 0,
+				paddingLeft = 0.5,
+				paddingRight = 0
+			}, {
+				Button = createElement("TextButton", {
+					BackgroundTransparency = 0,
+					Size = UDim2.fromScale(1, 1),
+					Text = "",
+					BackgroundColor3 = v1,
+					Selectable = true,
+					[Roact.Event.Activated] = p1.props.onClickDone
+				}, {
+					Corner = createElement("UICorner", {
+						CornerRadius = UDim.new(1, 0)
+					}),
+					TitleContainer = createElement("Frame", {
+						BackgroundTransparency = 1,
+						Size = UDim2.fromScale(1, 1)
+					}, {
+						Text = createElement("TextLabel", {
+							BackgroundTransparency = 1,
+							Size = UDim2.fromScale(1, 1),
+							Position = UDim2.fromScale(0.5, 0.5),
+							AnchorPoint = Vector2.new(0.5, 0.5),
+							Font = Enum.Font.FredokaOne,
+							Text = "OK!",
+							TextColor3 = Color3.new(0/255, 0/255, 0/255),
+							TextScaled = true
+						})
+					})
+				})
+			})
+		}
+		local t4 = {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(0.05555555555555555, 1),
+			Position = UDim2.fromScale(0.9444444444444444, 0)
+		}
+		local t5 = {}
+		local t6 = {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 0.8),
+			Position = UDim2.fromScale(0.5, 0.5),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Font = Enum.Font.FredokaOne
+		}
+		t6.Text = tostring((math.max(0, (math.floor(p1.state.remaining)))))
+		t6.TextColor3 = Color3.new(0.3, 0.3, 0.3)
+		t6.TextScaled = true
+		t5.Text = createElement("TextLabel", t6)
+		t3.CountdownContainer = createElement("Frame", t4, t5)
+		t2.Inner = createElement(PaddedContainer, {
+			aspectRatio = 18,
+			verticalPaddingRatio = 7.111111111111111,
+			backgroundTransparency = 1
+		}, t3)
+		t2.Stroke = createElement("UIStroke", {
+			Thickness = 1,
+			Color = Color3.new(0.7, 0.7, 0.7)
+		})
+		return createElement("Frame", t, t2)
+	end
 end
-function any_extend_result1._update(arg1) -- Line 125
-    if not arg1.props.visible then
-    else
-        local var30 = arg1.props.countdownTil - workspace:GetServerTimeNow()
-        arg1:setState({
-            remaining = var30;
-        })
-        if 0 < arg1.state.remaining and var30 <= 0 and arg1.props.onExpired then
-            arg1.props.onExpired()
-        end
-    end
+function v1._update(p1) --[[ Line: 125 ]]
+	if p1.props.visible then
+		local v1 = p1.props.countdownTil - workspace:GetServerTimeNow()
+		p1:setState({
+			remaining = v1
+		})
+		if p1.state.remaining > 0 and (v1 <= 0 and p1.props.onExpired) then
+			p1.props.onExpired()
+		end
+	end
 end
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-function any_extend_result1.didMount(arg1) -- Line 140
-    arg1:_update()
-    arg1.maid:GiveTask(Interval_upvr.every(1):Connect(function() -- Line 142
-        arg1:_update()
-    end))
+function v1.didMount(p1) --[[ Line: 140 | Upvalues: Interval (copy) ]]
+	p1:_update()
+	p1.maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 142 | Upvalues: p1 (copy) ]]
+		p1:_update()
+	end))
 end
-function any_extend_result1.willUnmount(arg1) -- Line 146
-    arg1.maid:DoCleaning()
+function v1.willUnmount(p1) --[[ Line: 146 ]]
+	p1.maid:DoCleaning()
 end
-return any_extend_result1
+return v1

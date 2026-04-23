@@ -1,37 +1,42 @@
-local Roact_upvr = require(script:FindFirstAncestor("EzUi").Parent.Roact)
-local createElement_upvr = Roact_upvr.createElement
-local function testComponent_upvr(arg1) -- Line 6, Named "testComponent"
-    return createElement_upvr("TextLabel", {
-        BackgroundTransparency = 0.5;
-        BackgroundColor3 = arg1.color;
-        Size = arg1.size;
-        Position = arg1.position;
-        Text = arg1.title;
-    })
+local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
+local createElement = Roact.createElement
+local function testComponent(p1) --[[ Line: 6 | Upvalues: createElement (copy) ]]
+	return createElement("TextLabel", {
+		BackgroundTransparency = 0.5,
+		BackgroundColor3 = p1.color,
+		Size = p1.size,
+		Position = p1.position,
+		Text = p1.title
+	})
 end
-return function(arg1) -- Line 16
-    local any_mount_result1_upvr = Roact_upvr.mount(createElement_upvr("Frame", {
-        BackgroundTransparency = 0.5;
-        Size = UDim2.new(0.9, 0, 0.9, 0);
-        Position = UDim2.new(0.05, 0, 0.05, 0);
-    }, Roact_upvr.createElement(require(script.Parent.Grid), {
-        aspectRatio = 1;
-        paddingRatio = 100;
-        rowsPerPage = 3;
-        colsPerRow = 3;
-        component = testComponent_upvr;
-        items = {{
-            color = Color3.new(1, 0, 0);
-            title = '1';
-        }, {
-            color = Color3.new(0, 1, 0);
-            title = '2';
-        }, {
-            color = Color3.new(0, 0, 1);
-            title = '3';
-        }};
-    })), arg1)
-    return function() -- Line 50
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+return function(p1) --[[ Line: 16 | Upvalues: Roact (copy), createElement (copy), testComponent (copy) ]]
+	local Grid = require(script.Parent.Grid)
+	local v1 = Roact.mount(createElement("Frame", {
+		BackgroundTransparency = 0.5,
+		Size = UDim2.new(0.9, 0, 0.9, 0),
+		Position = UDim2.new(0.05, 0, 0.05, 0)
+	}, Roact.createElement(Grid, {
+		aspectRatio = 1,
+		paddingRatio = 100,
+		rowsPerPage = 3,
+		colsPerRow = 3,
+		component = testComponent,
+		items = {
+			{
+				color = Color3.new(255/255, 0/255, 0/255),
+				title = "1"
+			},
+			{
+				color = Color3.new(0/255, 255/255, 0/255),
+				title = "2"
+			},
+			{
+				color = Color3.new(0/255, 0/255, 255/255),
+				title = "3"
+			}
+		}
+	})), p1)
+	return function() --[[ Line: 50 | Upvalues: Roact (ref), v1 (copy) ]]
+		Roact.unmount(v1)
+	end
 end

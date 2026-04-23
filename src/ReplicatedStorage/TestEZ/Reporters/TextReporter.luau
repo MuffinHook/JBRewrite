@@ -1,69 +1,58 @@
-local TestEnum_upvr = require(script.Parent.Parent.TestEnum)
-local tbl_upvr = {
-    [TestEnum_upvr.TestStatus.Success] = '+';
-    [TestEnum_upvr.TestStatus.Failure] = '-';
-    [TestEnum_upvr.TestStatus.Skipped] = '~';
+local TestService = game:GetService("TestService")
+local TestEnum = require(script.Parent.Parent.TestEnum)
+local v1 = (" "):rep(3)
+local t = {
+	[TestEnum.TestStatus.Success] = "+",
+	[TestEnum.TestStatus.Failure] = "-",
+	[TestEnum.TestStatus.Skipped] = "~"
 }
-local module_2 = {}
-local function compareNodes_upvr(arg1, arg2) -- Line 20, Named "compareNodes"
-    local var4
-    if arg1.planNode.phrase:lower() >= arg2.planNode.phrase:lower() then
-        var4 = false
-    else
-        var4 = true
-    end
-    return var4
+local t2 = {}
+local function compareNodes(p1, p2) --[[ Line: 20 ]]
+	return p1.planNode.phrase:lower() < p2.planNode.phrase:lower()
 end
-local any_rep_result1_upvr = ' ':rep(3)
-local function reportNode_upvr(arg1, arg2, arg3) -- Line 24, Named "reportNode"
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var14 = arg2
-    if not var14 then
-        var14 = {}
-    end
-    local var15 = var14
-    local var16 = arg3 or 0
-    if arg1.status == TestEnum_upvr.TestStatus.Skipped then
-        return var15
-    end
-    local var17
-    if arg1.status then
-        var17 = string.format("%s[%s] %s", any_rep_result1_upvr:rep(var16), tbl_upvr[arg1.status] or '?', arg1.planNode.phrase)
-    else
-        var17 = string.format("%s%s", any_rep_result1_upvr:rep(var16), arg1.planNode.phrase)
-    end
-    table.insert(var15, var17)
-    table.sort(arg1.children, compareNodes_upvr)
-    for _, v in ipairs(arg1.children) do
-        reportNode_upvr(v, var15, var16 + 1)
-        local var21
-    end
-    return var21
+local function v2(p1, p2, p3) --[[ Line: 24 | Upvalues: TestEnum (copy), t (copy), v1 (copy), compareNodes (copy), v2 (copy) ]]
+	local v12 = p2 or {}
+	local v22 = p3 or 0
+	if p1.status == TestEnum.TestStatus.Skipped then
+		return v12
+	else
+		table.insert(v12, if p1.status then ("%s[%s] %s"):format(v1:rep(v22), t[p1.status] or "?", p1.planNode.phrase) else ("%s%s"):format(v1:rep(v22), p1.planNode.phrase))
+		table.sort(p1.children, compareNodes)
+		local v7 = v12
+		for i, v in ipairs(p1.children) do
+			v2(v, v7, v22 + 1)
+		end
+		return v7
+	end
 end
-local function reportRoot_upvr(arg1) -- Line 59, Named "reportRoot"
-    local module = {}
-    table.sort(arg1.children, compareNodes_upvr)
-    for _, v_2 in ipairs(arg1.children) do
-        reportNode_upvr(v_2, module, 0)
-    end
-    return module
+local function reportRoot(p1) --[[ Line: 59 | Upvalues: compareNodes (copy), v2 (copy) ]]
+	table.sort(p1.children, compareNodes)
+	local t = {}
+	for i, v in ipairs(p1.children) do
+		v2(v, t, 0)
+	end
+	return t
 end
-local function report(arg1) -- Line 70
-    return table.concat(reportRoot_upvr(arg1), '\n')
+local function report(p1) --[[ Line: 70 | Upvalues: reportRoot (copy) ]]
+	return table.concat(reportRoot(p1), "\n")
 end
-local TestService_upvr = game:GetService("TestService")
-function module_2.report(arg1) -- Line 76
-    print(table.concat({"Test results:", table.concat(reportRoot_upvr(arg1), '\n'), string.format("%d passed, %d failed, %d skipped", arg1.successCount, arg1.failureCount, arg1.skippedCount)}, '\n'))
-    if 0 < arg1.failureCount then
-        print(string.format("%d test nodes reported failures.", arg1.failureCount))
-    end
-    if 0 < #arg1.errors then
-        print("Errors reported by tests:")
-        print("")
-        for _, v_3 in ipairs(arg1.errors) do
-            TestService_upvr:Error(v_3)
-            print("")
-        end
-    end
+function t2.report(p1) --[[ Line: 76 | Upvalues: reportRoot (copy), TestService (copy) ]]
+	local t = {}
+	local v1 = reportRoot(p1)
+	t[1] = "Test results:"
+	t[2] = table.concat(v1, "\n")
+	t[3] = ("%d passed, %d failed, %d skipped"):format(p1.successCount, p1.failureCount, p1.skippedCount)
+	print(table.concat(t, "\n"))
+	if p1.failureCount > 0 then
+		print(("%d test nodes reported failures."):format(p1.failureCount))
+	end
+	if #p1.errors > 0 then
+		print("Errors reported by tests:")
+		print("")
+		for i, v in ipairs(p1.errors) do
+			TestService:Error(v)
+			print("")
+		end
+	end
 end
-return module_2
+return t2

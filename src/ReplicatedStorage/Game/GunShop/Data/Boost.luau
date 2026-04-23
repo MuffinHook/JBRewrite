@@ -1,5 +1,8 @@
-return {{
-    Name = "Binoculars";
-}, {
-    Name = "Flashlight";
-}}
+return {
+	{
+		Name = "Binoculars"
+	},
+	{
+		Name = "Flashlight"
+	}
+}

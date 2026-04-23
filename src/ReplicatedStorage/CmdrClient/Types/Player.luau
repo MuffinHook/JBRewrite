@@ -1,36 +1,31 @@
-local Util_upvr = require(script.Parent.Parent.Shared.Util)
-local tbl_upvr = {}
-local Players_upvr = game:GetService("Players")
-function tbl_upvr.Transform(arg1) -- Line 5
-    return Util_upvr.MakeFuzzyFinder(Players_upvr:GetPlayers())(arg1)
-end
-function tbl_upvr.Validate(arg1) -- Line 11
-    local var4
-    if 0 >= #arg1 then
-        var4 = false
-    else
-        var4 = true
-    end
-    return var4, "No player with that name could be found."
-end
-function tbl_upvr.Autocomplete(arg1) -- Line 15
-    return Util_upvr.GetNames(arg1)
-end
-function tbl_upvr.Parse(arg1) -- Line 19
-    return arg1[1]
-end
-function tbl_upvr.Default(arg1) -- Line 23
-    return arg1.Name
-end
-tbl_upvr.ArgumentOperatorAliases = {
-    me = '.';
-    all = '*';
-    others = "**";
-    random = '?';
+local Util = require(script.Parent.Parent.Shared.Util)
+local Players = game:GetService("Players")
+local t = {
+	Transform = function(p1) --[[ Name: Transform | Line: 5 | Upvalues: Util (copy), Players (copy) ]]
+		return Util.MakeFuzzyFinder(Players:GetPlayers())(p1)
+	end,
+	Validate = function(p1) --[[ Name: Validate | Line: 11 ]]
+		return #p1 > 0, "No player with that name could be found."
+	end,
+	Autocomplete = function(p1) --[[ Name: Autocomplete | Line: 15 | Upvalues: Util (copy) ]]
+		return Util.GetNames(p1)
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 19 ]]
+		return p1[1]
+	end,
+	Default = function(p1) --[[ Name: Default | Line: 23 ]]
+		return p1.Name
+	end,
+	ArgumentOperatorAliases = {
+		me = ".",
+		all = "*",
+		others = "**",
+		random = "?"
+	}
 }
-return function(arg1) -- Line 35
-    arg1:RegisterType("player", tbl_upvr)
-    arg1:RegisterType("players", Util_upvr.MakeListableType(tbl_upvr, {
-        Prefixes = "% teamPlayers";
-    }))
+return function(p1) --[[ Line: 35 | Upvalues: t (copy), Util (copy) ]]
+	p1:RegisterType("player", t)
+	p1:RegisterType("players", Util.MakeListableType(t, {
+		Prefixes = "% teamPlayers"
+	}))
 end

@@ -1,27 +1,25 @@
-local module = {}
-local tbl_upvr = {}
-for _, v in pairs(script.Spritesheets:GetChildren()) do
-    tbl_upvr[v.Name] = {}
-    for _, v_2 in pairs(v:GetChildren()) do
-        tbl_upvr[v.Name][v_2.Name] = require(v_2).new()
-    end
+local t = {}
+local t2 = {}
+for k, v in pairs(script.Spritesheets:GetChildren()) do
+	t[v.Name] = {}
+	for k2, v2 in pairs(v:GetChildren()) do
+		t[v.Name][v2.Name] = require(v2).new()
+	end
 end
-local function getImageInstance_upvr(arg1, arg2, arg3) -- Line 11, Named "getImageInstance"
-    local var17
-    if type(arg2) == "userdata" then
-        var17 = string.sub(tostring(var17), 14)
-    end
-    local var18 = tbl_upvr.XboxOne[arg3]
-    if not var18 then
-        warn("Could not find style: "..arg3)
-        return
-    end
-    return var18:GetSprite(arg1, var17)
+local function getImageInstance(p1, p2, p3) --[[ Line: 11 | Upvalues: t (copy) ]]
+	if type(p2) == "userdata" then
+		p2 = string.sub(tostring(p2), 14)
+	end
+	local v3 = t.XboxOne[p3]
+	if v3 then
+		return v3:GetSprite(p1, p2)
+	end
+	warn("Could not find style: " .. p3)
 end
-function module.GetImageLabel(arg1, arg2, arg3, arg4) -- Line 25
-    return getImageInstance_upvr("ImageLabel", arg2, arg3, arg4)
+function t2.GetImageLabel(p1, p2, p3, p4) --[[ Line: 25 | Upvalues: getImageInstance (copy) ]]
+	return getImageInstance("ImageLabel", p2, p3, p4)
 end
-function module.GetImageButton(arg1, arg2, arg3, arg4) -- Line 29
-    return getImageInstance_upvr("ImageButton", arg2, arg3, arg4)
+function t2.GetImageButton(p1, p2, p3, p4) --[[ Line: 29 | Upvalues: getImageInstance (copy) ]]
+	return getImageInstance("ImageButton", p2, p3, p4)
 end
-return module
+return t2

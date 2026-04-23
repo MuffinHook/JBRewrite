@@ -1,32 +1,26 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMUBnR5cGVvZgV0YWJsZQJ7CgZpbnNlcnQFcGFpcnMEICAgIANyZXAIdG9zdHJpbmcDID0gAQoBfQZzdHJpbmcGZm9ybWF0AiVxCSAoc3RyaW5nKQIgKAEpBmNvbmNhdAALcHJldHR5UHJpbnQAAg0CAQAAEQABAw8PBhUtDwcVLQ8CAZgBmQGQAQEA/wIAAAAAAAC7LAADUgQAAKQDAgAAABBAnwMCAvADTQADAACAgTQCBQQAAABSBAIAbwUEAKQDBgAAFDCAnwMDAaQDCAAAAHBAUgQAAJ8DAgQXAywAUgkCAG8KCQCVDAEKvAoKFgsAAACfCgMATDQAAqQIBgAAFDCAnwgAAbs/BgNSCwYApAoNAAAAwECfCgICnjQCBAoAAABSCQIApAgGAAAUMICfCAMBgTQCBQ4AAABSCQIAbwoOAKQIBgAAFDCAnwgDAVIJAgD7CgAAUgsHAJUMAQqfCgMATDQAAqQIBgAAFDCAnwgAAYE0AgUPAAAAUgkCAG8KDwCkCAYAABQwgJ8IAwFuA9P/AgAAAFIEAgBvBQkAUgcBALwFBRYLAAAAnwUDAEw0AAKkAwYAABQwgJ8DAAGBNAIFEAAAAFIEAgBvBRAApAMGAAAUMICfAwMBZQA9ALssAANSBAAApAMCAAAAEECfAwIC8AMTABEAAIBSBAIApAUTAABIEIFvBhQAUgcAAJ8FAwBMNAACpAMGAAAUMICfAwABgTQCBRUAAABSBAIAbwUVAKQDBgAAFDCAnwMDAWUAJAC7PwADUgYAAKQFDQAAAMBAnwUCAp40AgQFAAAAUgQCAKQDBgAAFDCAnwMDAYE0AgUWAAAAUgQCAG8FFgCkAwYAABQwgJ8DAwG7LAADUgYAAKQFAgAAABBAnwUCAp40AgQFAAAAUgQCAKQDBgAAFDCAnwMDAYE0AgUXAAAAUgQCAG8FFwCkAwYAABQwgJ8DAwGkAxkAAGAwgFIEAgBvBRoAnwMDAIIDAAAbAgAAAAAAAAAAAwEEAAAQQAMCAwMDBAQAFDCAAwUEAABwQAMGAgAAAAAAAPA/AwcDCAQAAMBAAwkDCgMLAwwDDQQASBCBAw4DDwMQAxEDEgQAYDCAAxMAAxQBGAABAAIAAAAAAAABAAAAAAAAAgAAAAABAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAgAAAAAAAAAAAQAAAAAAAPoACQAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAABAAAAAAAAAAIAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAMAAAAAAAQAAAAAAQAAAQIHAAABDwABAwSjAAAAwAAAABIAAACCAAIAAQYAAQABAAEYAAIAHwEAAAAAAf+HO4McC+nizUNRF/R1B4J0+r4yETaY9A9t1cWpb/ZueLEvuhN/mLs=
-
-local function v0(v1, v2) --[[ Line: 3 ]] --[[ Name: prettyPrint ]]
-    -- upvalues: v0 (copy)
-    v2 = v2 or 0;
-    local v3 = {};
-    if typeof(v1) == "table" then
-        table.insert(v3, "{\n");
-        for v4, v5 in pairs(v1) do
-            table.insert(v3, ("    "):rep(v2 + 1));
-            table.insert(v3, (tostring(v4)));
-            table.insert(v3, " = ");
-            table.insert(v3, v0(v5, v2 + 1));
-            table.insert(v3, "\n");
-        end;
-        table.insert(v3, ("    "):rep(v2));
-        table.insert(v3, "}");
-    elseif typeof(v1) == "string" then
-        table.insert(v3, string.format("%q", v1));
-        table.insert(v3, " (string)");
-    else
-        table.insert(v3, (tostring(v1)));
-        table.insert(v3, " (");
-        table.insert(v3, (typeof(v1)));
-        table.insert(v3, ")");
-    end;
-    return table.concat(v3, "");
-end;
-return v0;
+local function v1(p1, p2) --[[ Line: 3 | Upvalues: v1 (copy) ]]
+	local v12 = p2 or 0
+	local t = {}
+	if typeof(p1) == "table" then
+		table.insert(t, "{\n")
+		for k, v in pairs(p1) do
+			table.insert(t, ("    "):rep(v12 + 1))
+			table.insert(t, (tostring(k)))
+			table.insert(t, " = ")
+			table.insert(t, v1(v, v12 + 1))
+			table.insert(t, "\n")
+		end
+		table.insert(t, ("    "):rep(v12))
+		table.insert(t, "}")
+	elseif typeof(p1) == "string" then
+		table.insert(t, string.format("%q", p1))
+		table.insert(t, " (string)")
+	else
+		table.insert(t, (tostring(p1)))
+		table.insert(t, " (")
+		table.insert(t, (typeof(p1)))
+		table.insert(t, ")")
+	end
+	return table.concat(t, "")
+end
+return v1

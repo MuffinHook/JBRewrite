@@ -1,60 +1,52 @@
-local tbl_upvr = {}
-for _, v in script:GetChildren() do
-    tbl_upvr[v.Name] = false
+local RunService = game:GetService("RunService")
+local t = {}
+local t2 = {}
+for v1, v2 in script:GetChildren() do
+	t[v2.Name] = false
 end
-local module_2_upvr = {}
-local function GetCategoryByName_upvr(arg1) -- Line 8, Named "GetCategoryByName"
-    assert(arg1)
-    if not tbl_upvr[arg1] then
-        local SOME = script:FindFirstChild(arg1)
-        if not SOME then
-            print(string.format("No category module: %s", arg1))
-            error("No category module")
-        end
-        module_2_upvr[arg1] = require(SOME)
-        tbl_upvr[arg1] = true
-    end
-    return module_2_upvr[arg1]
+local function GetCategoryByName(p1) --[[ Line: 8 | Upvalues: t (copy), t2 (copy) ]]
+	assert(p1)
+	if not t[p1] then
+		local v1 = script:FindFirstChild(p1)
+		if not v1 then
+			print(("No category module: %s"):format(p1))
+			error("No category module")
+		end
+		t2[p1] = require(v1)
+		t[p1] = true
+	end
+	return t2[p1]
 end
-local RunService_upvr = game:GetService("RunService")
-local function GetItemByName_upvr(arg1, arg2) -- Line 21, Named "GetItemByName"
-    assert(arg1)
-    assert(arg2)
-    local GetCategoryByName_upvr_result1 = GetCategoryByName_upvr(arg1)
-    local var17
-    if GetCategoryByName_upvr_result1 then
-        var17 = assert
-        var17(GetCategoryByName_upvr_result1, arg1)
-        var17 = GetCategoryByName_upvr_result1.GetItemByName
-        if var17 then
-            var17 = GetCategoryByName_upvr_result1.GetItemByName(arg2)
-            return var17
-        end
-        if GetCategoryByName_upvr_result1.GetItems then
-            var17 = GetCategoryByName_upvr_result1.GetItems()
-        else
-            var17 = GetCategoryByName_upvr_result1.Items
-        end
-        for _, v_2 in var17 do
-            if v_2.Name == arg2 then
-                return v_2
-            end
-        end
-    end
-    if RunService_upvr:IsServer() then
-        warn(string.format("No CategoryName/ItemName: %s/%s", arg1, arg2))
-    end
-    return nil
+local function GetItemByName(p1, p2) --[[ Line: 21 | Upvalues: GetCategoryByName (copy), RunService (copy) ]]
+	assert(p1)
+	assert(p2)
+	local v1 = GetCategoryByName(p1)
+	if v1 then
+		assert(v1, p1)
+		if v1.GetItemByName then
+			return v1.GetItemByName(p2)
+		end
+		for v3, v4 in if v1.GetItems then v1.GetItems() else v1.Items do
+			if v4.Name == p2 then
+				return v4
+			end
+		end
+	end
+	local v5 = ("No CategoryName/ItemName: %s/%s"):format(p1, p2)
+	if RunService:IsServer() then
+		warn(v5)
+	end
+	return nil
 end
 return {
-    GetCategoryByName = GetCategoryByName_upvr;
-    GetItemByName = GetItemByName_upvr;
-    GetMapFromSelection = function(arg1) -- Line 50, Named "GetMapFromSelection"
-        assert(arg1)
-        local module = {}
-        for i_3, v_3 in pairs(arg1) do
-            module[i_3] = GetItemByName_upvr(i_3, v_3)
-        end
-        return module
-    end;
+	GetCategoryByName = GetCategoryByName,
+	GetItemByName = GetItemByName,
+	GetMapFromSelection = function(p1) --[[ Name: GetMapFromSelection | Line: 50 | Upvalues: GetItemByName (copy) ]]
+		assert(p1)
+		local t = {}
+		for k, v in pairs(p1) do
+			t[k] = GetItemByName(k, v)
+		end
+		return t
+	end
 }

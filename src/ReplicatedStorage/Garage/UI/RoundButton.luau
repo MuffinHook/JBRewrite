@@ -1,94 +1,63 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("RoundButton")
-any_extend_result1.defaultProps = {
-    size = UDim2.new(1, 0, 1, 0);
-    disabled = false;
+local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local v1 = Roact.PureComponent:extend("RoundButton")
+v1.defaultProps = {
+	size = UDim2.new(1, 0, 1, 0),
+	disabled = false
 }
-local createElement_upvr = Roact_upvr.createElement
-local ColorUtils_upvr = require(ReplicatedStorage.Std.ColorUtils)
-function any_extend_result1.render(arg1) -- Line 12
-    local aspectRatio = arg1.props.aspectRatio
-    local module = {
-        AutoButtonColor = not arg1.props.disabled;
-        Text = "";
-        BackgroundTransparency = 0;
-        BorderSizePixel = 0;
-    }
-    local var9
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var9 = var9.brightenTo(arg1.props.color, 0.1)
-        var9 = ColorUtils_upvr
-        return var9
-    end
-    if not arg1.props.disabled or not decompInlinedCondition() then
-        var9 = arg1.props
-        var9 = var9.color
-    end
-    module.BackgroundColor3 = var9
-    var9 = arg1.props
-    var9 = var9.position
-    module.Position = var9
-    var9 = arg1.props
-    var9 = var9.anchorPoint
-    module.AnchorPoint = var9
-    var9 = arg1.props
-    var9 = var9.size
-    module.Size = var9
-    var9 = arg1.props
-    var9 = var9.layoutOrder
-    module.LayoutOrder = var9
-    var9 = Roact_upvr
-    var9 = var9.Event
-    var9 = var9.Activated
-    module[var9] = arg1.props.onClick
-    var9 = {}
-    local var10 = false
-    if arg1.props.aspectRatio ~= nil then
-        var10 = createElement_upvr
-        var10 = var10("UIAspectRatioConstraint", {
-            AspectRatio = arg1.props.aspectRatio;
-        })
-    end
-    var9.AspectRatio = var10
-    var9.UICorner = createElement_upvr("UICorner", {
-        CornerRadius = UDim.new(1, 0);
-    })
-    var9.Title = createElement_upvr("TextLabel", {
-        BackgroundTransparency = 1;
-        Size = UDim2.new(0.7, 0, 0.7, 0);
-        Position = UDim2.new(0.5, 0, 0.5, 0);
-        AnchorPoint = Vector2.new(0.5, 0.5);
-        Text = arg1.props.title;
-        Font = Enum.Font.Bangers;
-        LineHeight = 0.9;
-        TextScaled = true;
-        TextColor3 = Color3.new(1, 1, 1);
-    }, {
-        UIStroke = createElement_upvr("UIStroke", {
-            Color = Color3.new(0, 0, 0);
-            Thickness = 1;
-        });
-    })
-    local var16 = false
-    if arg1.props.locked ~= nil then
-        var16 = createElement_upvr
-        local tbl = {
-            BorderSizePixel = 0;
-            BackgroundTransparency = 1;
-            Size = UDim2.new(0.6 / aspectRatio, 0, 0.6, 0);
-        }
-        local udim2 = UDim2.new(0.2 / aspectRatio, 0, 0.2, 0)
-        tbl.Position = udim2
-        if arg1.props.locked then
-            udim2 = "rbxassetid://8715708455"
-        else
-            udim2 = "rbxassetid://8715708824"
-        end
-        tbl.Image = udim2
-        var16 = var16("ImageLabel", tbl)
-    end
-    var9.Lock = var16
-    return createElement_upvr("TextButton", module, var9)
+function v1.render(p1) --[[ Line: 12 | Upvalues: createElement (copy), ColorUtils (copy), Roact (copy) ]]
+	local aspectRatio = p1.props.aspectRatio
+	local t = {
+		AutoButtonColor = not p1.props.disabled,
+		Text = "",
+		BackgroundTransparency = 0,
+		BorderSizePixel = 0
+	}
+	t.BackgroundColor3 = p1.props.disabled and ColorUtils.brightenTo(p1.props.color, 0.1) or p1.props.color
+	t.Position = p1.props.position
+	t.AnchorPoint = p1.props.anchorPoint
+	t.Size = p1.props.size
+	t.LayoutOrder = p1.props.layoutOrder
+	t[Roact.Event.Activated] = p1.props.onClick
+	local t2 = {}
+	t2.AspectRatio = if p1.props.aspectRatio == nil then false else createElement("UIAspectRatioConstraint", {
+	AspectRatio = p1.props.aspectRatio
+})
+	t2.UICorner = createElement("UICorner", {
+		CornerRadius = UDim.new(1, 0)
+	})
+	t2.Title = createElement("TextLabel", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0.7, 0, 0.7, 0),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Text = p1.props.title,
+		Font = Enum.Font.Bangers,
+		LineHeight = 0.9,
+		TextScaled = true,
+		TextColor3 = Color3.new(255/255, 255/255, 255/255)
+	}, {
+		UIStroke = createElement("UIStroke", {
+			Color = Color3.new(0/255, 0/255, 0/255),
+			Thickness = 1
+		})
+	})
+	local v5
+	if p1.props.locked == nil then
+		v5 = false
+	else
+		local t3 = {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0.6 / aspectRatio, 0, 0.6, 0),
+			Position = UDim2.new(0.2 / aspectRatio, 0, 0.2, 0)
+		}
+		t3.Image = if p1.props.locked then "rbxassetid://8715708455" else "rbxassetid://8715708824"
+		v5 = createElement("ImageLabel", t3)
+	end
+	t2.Lock = v5
+	return createElement("TextButton", t, t2)
 end
-return any_extend_result1
+return v1

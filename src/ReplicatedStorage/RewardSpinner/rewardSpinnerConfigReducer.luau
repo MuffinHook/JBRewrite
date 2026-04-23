@@ -1,24 +1,25 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module = {}
-local getItemPropsFromRewardData_upvr = require(ReplicatedStorage.RewardSpinner.getItemPropsFromRewardData)
-function module.setRewardSpinnerConfig(arg1, arg2) -- Line 7
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    if not arg2.items then
-        return nil
-    end
-    for _, v in arg2.items do
-        table.insert({}, getItemPropsFromRewardData_upvr(v))
-        local var13
-    end
-    return {
-        items = var13;
-        duration = arg2.duration;
-        winIndex = arg2.winIndex;
-        title = arg2.title;
-        iconImageId = arg2.iconImageId;
-        primaryColor = arg2.primaryColor;
-        topic = arg2.topic;
-        extraText = arg2.extraText;
-    }
-end
-return require(ReplicatedStorage.Rodux).createReducer(nil, module)
+local Rodux = require(ReplicatedStorage.Rodux)
+local getItemPropsFromRewardData = require(ReplicatedStorage.RewardSpinner.getItemPropsFromRewardData)
+return Rodux.createReducer(nil, {
+	setRewardSpinnerConfig = function(p1, p2) --[[ Name: setRewardSpinnerConfig | Line: 7 | Upvalues: getItemPropsFromRewardData (copy) ]]
+		if p2.items then
+			local t = {}
+			for v1, v2 in p2.items do
+				table.insert(t, (getItemPropsFromRewardData(v2)))
+			end
+			return {
+				items = t,
+				duration = p2.duration,
+				winIndex = p2.winIndex,
+				title = p2.title,
+				iconImageId = p2.iconImageId,
+				primaryColor = p2.primaryColor,
+				topic = p2.topic,
+				extraText = p2.extraText
+			}
+		else
+			return nil
+		end
+	end
+})

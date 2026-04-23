@@ -1,23 +1,24 @@
-local module_upvr = {}
-local var2_upvw = true
-local var3_upvw = true
-local StarterGui_upvr = game:GetService("StarterGui")
-function module_upvr.setEnabled(arg1) -- Line 8
-    var2_upvw = arg1
-    if arg1 == false then
-        var3_upvw = StarterGui_upvr:GetCore("ChatActive")
-        StarterGui_upvr:SetCore("ChatActive", false)
-    elseif not StarterGui_upvr:GetCore("ChatActive") then
-        StarterGui_upvr:SetCore("ChatActive", var3_upvw)
-    end
+game:GetService("TextChatService")
+local StarterGui = game:GetService("StarterGui")
+local t = {}
+local v1 = true
+local v2 = true
+function t.setEnabled(p1) --[[ Line: 8 | Upvalues: v1 (ref), v2 (ref), StarterGui (copy) ]]
+	v1 = p1
+	if p1 == false then
+		v2 = StarterGui:GetCore("ChatActive")
+		StarterGui:SetCore("ChatActive", false)
+	elseif not StarterGui:GetCore("ChatActive") then
+		StarterGui:SetCore("ChatActive", v2)
+	end
 end
-function module_upvr.getEnabled() -- Line 19
-    return var2_upvw
+function t.getEnabled() --[[ Line: 19 | Upvalues: v1 (ref) ]]
+	return v1
 end
-function module_upvr.hide() -- Line 22
-    module_upvr.setEnabled(false)
-    return function() -- Line 24
-        module_upvr.setEnabled(true)
-    end
+function t.hide() --[[ Line: 22 | Upvalues: t (copy) ]]
+	t.setEnabled(false)
+	return function() --[[ Line: 24 | Upvalues: t (ref) ]]
+		t.setEnabled(true)
+	end
 end
-return module_upvr
+return t

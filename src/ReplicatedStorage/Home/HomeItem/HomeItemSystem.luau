@@ -1,323 +1,292 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local Signal = require(ReplicatedStorage_upvr.Std.Signal)
-local Roact_upvr = require(ReplicatedStorage_upvr.Roact)
-local homeStore_upvr = require(ReplicatedStorage_upvr.Home.homeStore)
-local HomeItemBinder_upvr = require(script.Parent.HomeItemBinder)
-local HomeSystem_upvr = require(script.Parent.Parent.HomeSystem)
-local HomeItemConsts_upvr = require(script.Parent.HomeItemConsts)
-local module_upvr = {
-    _inventory = {};
-    _maid = Maid_upvr.new();
-    onCustomizeStarted = Signal.new();
-    onCustomizeEnded = Signal.new();
-    onAttemptPlaceItem = Signal.new();
-    onAttemptDeleteItem = Signal.new();
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BigButtonService = require(ReplicatedStorage.App.BigButtonService)
+local CashBuyUI = require(ReplicatedStorage.Game.CashBuyUI)
+local HomeConsts = require(ReplicatedStorage.Home.HomeConsts)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+local HomeApp = require(ReplicatedStorage.Home.UI.HomeApp)
+local homeStore = require(ReplicatedStorage.Home.homeStore)
+require(ReplicatedStorage.Module.Confirmation)
+require(ReplicatedStorage.Module.Format)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Utils = require(ReplicatedStorage.EzUi.Utils)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local HomeItemBinder = require(script.Parent.HomeItemBinder)
+local HomeSystem = require(script.Parent.Parent.HomeSystem)
+local HomeItemConsts = require(script.Parent.HomeItemConsts)
+local t = {
+	_inventory = {},
+	_maid = Maid.new(),
+	onCustomizeStarted = Signal.new(),
+	onCustomizeEnded = Signal.new(),
+	onAttemptPlaceItem = Signal.new(),
+	onAttemptDeleteItem = Signal.new()
 }
-local createElement_upvr = Roact_upvr.createElement
-local RoactRodux_upvr = require(ReplicatedStorage_upvr.RoactRodux)
-local Utils_upvr = require(ReplicatedStorage_upvr.EzUi.Utils)
-local HomeApp_upvr = require(ReplicatedStorage_upvr.Home.UI.HomeApp)
-local CashBuyUI_upvr = require(ReplicatedStorage_upvr.Game.CashBuyUI)
-local Players_upvr = game:GetService("Players")
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local BigButtonService_upvr = require(ReplicatedStorage_upvr.App.BigButtonService)
-local Interval_upvr = require(ReplicatedStorage_upvr.Std.Interval)
-local HomeConsts_upvr = require(ReplicatedStorage_upvr.Home.HomeConsts)
-local RxInstanceUtils_upvr = require(ReplicatedStorage_upvr.Std.RxInstanceUtils)
-local waitForChild_upvr = require(ReplicatedStorage_upvr.Std.waitForChild)
-function module_upvr.init() -- Line 33
-    HomeItemBinder_upvr:Start()
-    local tbl = {}
-    local tbl_8 = {}
-    local tbl_2 = {}
-    local var27 = 1
-    tbl_2.BackgroundTransparency = var27
-    if Utils_upvr.isSmallScreen() then
-        var27 = UDim2.fromScale(0.7, 0.5)
-    else
-        var27 = UDim2.fromScale(0.6, 0.5)
-    end
-    tbl_2.Size = var27
-    tbl_2.Position = UDim2.fromScale(0.5, 0.08)
-    tbl_2.AnchorPoint = Vector2.new(0.5, 0)
-    tbl_8.HomeContainer = createElement_upvr("Frame", tbl_2, {
-        UIAspectRatioConstraint = createElement_upvr("UIAspectRatioConstraint", {
-            AspectRatio = 3;
-        });
-        HomeApp = createElement_upvr(HomeApp_upvr, {
-            aspectRatio = 3;
-            verticalPaddingRatio = 128;
-            attemptPlaceItem = function(arg1) -- Line 58, Named "attemptPlaceItem"
-                if arg1.module == "HomeItem" then
-                    module_upvr.onAttemptPlaceItem:Fire(arg1)
-                else
-                    module_upvr.attemptEquip(arg1.module, arg1.name)
-                end
-            end;
-            attemptPreviewItem = function(arg1) -- Line 65, Named "attemptPreviewItem"
-                module_upvr.attemptPreview(arg1.module, arg1.name)
-            end;
-            attemptPurchaseItem = function(arg1) -- Line 68, Named "attemptPurchaseItem"
-                module_upvr.attemptPurchase(arg1.module, arg1.name)
-            end;
-            attemptDeleteItem = function() -- Line 71, Named "attemptDeleteItem"
-                module_upvr.onAttemptDeleteItem:Fire()
-            end;
-            promptCashPurchase = function() -- Line 74, Named "promptCashPurchase"
-                homeStore_upvr:dispatch({
-                    type = "setVisible";
-                    value = false;
-                })
-                CashBuyUI_upvr.Open()
-            end;
-            onSettingChanged = function(arg1, arg2) -- Line 83, Named "onSettingChanged"
-                HomeSystem_upvr.queryCurrentStandingHome():SetSavedSetting(arg1, arg2)
-            end;
-            exit = function() -- Line 87, Named "exit"
-                homeStore_upvr:dispatch({
-                    type = "setVisible";
-                    value = false;
-                })
-                local any_queryCurrentStandingHome_result1_2 = HomeSystem_upvr.queryCurrentStandingHome()
-                if any_queryCurrentStandingHome_result1_2 then
-                    any_queryCurrentStandingHome_result1_2:ReplicateCustomizing(false)
-                    module_upvr.onCustomizeEnded:Fire(any_queryCurrentStandingHome_result1_2)
-                end
-            end;
-        });
-    })
-    tbl[1] = Roact_upvr.createElement(RoactRodux_upvr.StoreProvider, {
-        store = homeStore_upvr;
-    }, tbl_8)
-    local any_mount_result1_upvr = Roact_upvr.mount(createElement_upvr("ScreenGui", {
-        ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-        ResetOnSpawn = false;
-        IgnoreGuiInset = true;
-        DisplayOrder = 8;
-    }, tbl), Players_upvr.LocalPlayer.PlayerGui, "HomeItemGui")
-    module_upvr._maid:GiveTask(function() -- Line 105
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end)
-    local tbl_5_upvr = {
-        name = "Home";
-        imageId = 13218368809;
-        displayOrder = 100;
-        enabled = false;
-        onClick = function() -- Line 114, Named "onClick"
-            if Players_upvr.LocalPlayer.PlayerGui then
-                Audio_upvr.ObjectLocal(Players_upvr.LocalPlayer.PlayerGui, 12617491114, {
-                    Volume = 0.2;
-                })
-            end
-            local var38 = not homeStore_upvr:getState().visible
-            homeStore_upvr:dispatch({
-                type = "setVisible";
-                value = var38;
-            })
-            local any_queryCurrentStandingHome_result1 = HomeSystem_upvr.queryCurrentStandingHome()
-            if any_queryCurrentStandingHome_result1 then
-                any_queryCurrentStandingHome_result1:ReplicateCustomizing(var38)
-                if var38 then
-                    module_upvr.onCustomizeStarted:Fire()
-                    return
-                end
-                module_upvr.onCustomizeEnded:Fire(any_queryCurrentStandingHome_result1)
-            end
-        end;
-    }
-    BigButtonService_upvr.add(tbl_5_upvr)
-    local function updateButtonVisibility_upvr(arg1) -- Line 137, Named "updateButtonVisibility"
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        local var47 = HomeSystem_upvr.queryCurrentStandingHome()
-        if var47 then
-            var47 = HomeSystem_upvr.queryCurrentStandingHome():HasPermissionToEdit(Players_upvr.LocalPlayer)
-        end
-        if var47 ~= true then
-            local _ = false
-            -- KONSTANTWARNING: Skipped task `defvar` above
-        else
-        end
-        local enabled = tbl_5_upvr.enabled
-        if true == enabled then
-        else
-        end
-        if not true then
-        else
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            tbl_5_upvr.enabled = true
-            BigButtonService_upvr.triggerUpdate:Fire()
-            if enabled then
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                if not true then
-                    arg1:ReplicateCustomizing(false)
-                    module_upvr.onCustomizeEnded:Fire(arg1)
-                    homeStore_upvr:dispatch({
-                        type = "setVisible";
-                        value = false;
-                    })
-                end
-            end
-        end
-    end
-    local any_new_result1_upvr = Maid_upvr.new()
-    HomeSystem_upvr.onEntered:Connect(function(arg1) -- Line 162
-        any_new_result1_upvr:DoCleaning()
-        updateButtonVisibility_upvr(arg1)
-        any_new_result1_upvr:GiveTask(Interval_upvr.every(1):Connect(function() -- Line 165
-            updateButtonVisibility_upvr(arg1)
-        end))
-    end)
-    HomeSystem_upvr.onExited:Connect(function(arg1) -- Line 169
-        any_new_result1_upvr:DoCleaning()
-        updateButtonVisibility_upvr(arg1)
-    end)
-    HomeSystem_upvr.onEntered:Connect(function(arg1) -- Line 174
-        local tbl_7 = {
-            type = "setHome";
-        }
-        tbl_7.value = arg1
-        homeStore_upvr:dispatch(tbl_7)
-    end)
-    HomeSystem_upvr.onExited:Connect(function() -- Line 180
-        homeStore_upvr:dispatch({
-            type = "setHome";
-            value = nil;
-        })
-    end)
-    module_upvr.onCustomizeEnded:Connect(function(arg1) -- Line 187
-        module_upvr.resetHomeCustomizationToEquipped(arg1)
-    end)
-    HomeSystem_upvr.onEntered:Connect(function(arg1) -- Line 192
-        RxInstanceUtils_upvr.observeChildren(arg1._obj:FindFirstChild(HomeConsts_upvr.SETTINGS_FOLDER_NAME), function(arg1_2, arg2) -- Line 195
-            homeStore_upvr:dispatch({
-                type = "setSavedSetting";
-                key = arg1_2.Name;
-                value = arg1_2.Value;
-            })
-            arg2:GiveTask(arg1_2:GetPropertyChangedSignal("Value"):Connect(function() -- Line 196, Named "update"
-                homeStore_upvr:dispatch({
-                    type = "setSavedSetting";
-                    key = arg1_2.Name;
-                    value = arg1_2.Value;
-                })
-            end))
-        end)
-    end)
-    waitForChild_upvr(ReplicatedStorage_upvr, HomeItemConsts_upvr.UPDATE_INVENTORY_REMOTE_NAME):andThen(function(arg1) -- Line 209
-        arg1.OnClientEvent:Connect(function(arg1_3) -- Line 210
-            local tbl_4 = {
-                type = "setInventory";
-            }
-            tbl_4.value = arg1_3
-            homeStore_upvr:dispatch(tbl_4)
-        end)
-    end):catch(warn)
-    waitForChild_upvr(ReplicatedStorage_upvr, HomeItemConsts_upvr.UPDATE_EQUIPPED_REMOTE_NAME):andThen(function(arg1) -- Line 220
-        arg1.OnClientEvent:Connect(function(arg1_4) -- Line 221
-            local tbl_6 = {
-                type = "setEquipped";
-            }
-            tbl_6.value = arg1_4
-            homeStore_upvr:dispatch(tbl_6)
-        end)
-    end):catch(warn)
-    local function updateQuantityPlaced_upvr() -- Line 230, Named "updateQuantityPlaced"
-        homeStore_upvr:dispatch({
-            type = "setQuantityPlaced";
-            value = module_upvr.getQuantityPlaced(Players_upvr.LocalPlayer);
-        })
-    end
-    homeStore_upvr:dispatch({
-        type = "setQuantityPlaced";
-        value = module_upvr.getQuantityPlaced(Players_upvr.LocalPlayer);
-    })
-    HomeItemBinder_upvr:GetClassAddedSignal():Connect(function(arg1) -- Line 239
-        homeStore_upvr:dispatch({
-            type = "setQuantityPlaced";
-            value = module_upvr.getQuantityPlaced(Players_upvr.LocalPlayer);
-        })
-        arg1._maid:GiveTask(updateQuantityPlaced_upvr)
-    end)
+function t.init() --[[ Line: 33 | Upvalues: HomeItemBinder (copy), Roact (copy), createElement (copy), RoactRodux (copy), homeStore (copy), Utils (copy), HomeApp (copy), t (copy), CashBuyUI (copy), HomeSystem (copy), Players (copy), Audio (copy), BigButtonService (copy), Maid (copy), Interval (copy), HomeConsts (copy), RxInstanceUtils (copy), waitForChild (copy), ReplicatedStorage (copy), HomeItemConsts (copy) ]]
+	HomeItemBinder:Start()
+	local t2 = {
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		ResetOnSpawn = false,
+		IgnoreGuiInset = true,
+		DisplayOrder = 8
+	}
+	local t3 = {}
+	local t5 = {}
+	local t6 = {
+		BackgroundTransparency = 1
+	}
+	t6.Size = if Utils.isSmallScreen() then UDim2.fromScale(0.7, 0.5) else UDim2.fromScale(0.6, 0.5)
+	t6.Position = UDim2.fromScale(0.5, 0.08)
+	t6.AnchorPoint = Vector2.new(0.5, 0)
+	t5.HomeContainer = createElement("Frame", t6, {
+		UIAspectRatioConstraint = createElement("UIAspectRatioConstraint", {
+			AspectRatio = 3
+		}),
+		HomeApp = createElement(HomeApp, {
+			aspectRatio = 3,
+			verticalPaddingRatio = 128,
+			attemptPlaceItem = function(p1) --[[ Name: attemptPlaceItem | Line: 58 | Upvalues: t (ref) ]]
+				if p1.module == "HomeItem" then
+					t.onAttemptPlaceItem:Fire(p1)
+				else
+					t.attemptEquip(p1.module, p1.name)
+				end
+			end,
+			attemptPreviewItem = function(p1) --[[ Name: attemptPreviewItem | Line: 65 | Upvalues: t (ref) ]]
+				t.attemptPreview(p1.module, p1.name)
+			end,
+			attemptPurchaseItem = function(p1) --[[ Name: attemptPurchaseItem | Line: 68 | Upvalues: t (ref) ]]
+				t.attemptPurchase(p1.module, p1.name)
+			end,
+			attemptDeleteItem = function() --[[ Name: attemptDeleteItem | Line: 71 | Upvalues: t (ref) ]]
+				t.onAttemptDeleteItem:Fire()
+			end,
+			promptCashPurchase = function() --[[ Name: promptCashPurchase | Line: 74 | Upvalues: homeStore (ref), CashBuyUI (ref) ]]
+				homeStore:dispatch({
+					type = "setVisible",
+					value = false
+				})
+				CashBuyUI.Open()
+			end,
+			onSettingChanged = function(p1, p2) --[[ Name: onSettingChanged | Line: 83 | Upvalues: HomeSystem (ref) ]]
+				HomeSystem.queryCurrentStandingHome():SetSavedSetting(p1, p2)
+			end,
+			exit = function() --[[ Name: exit | Line: 87 | Upvalues: homeStore (ref), HomeSystem (ref), t (ref) ]]
+				homeStore:dispatch({
+					type = "setVisible",
+					value = false
+				})
+				local v1 = HomeSystem.queryCurrentStandingHome()
+				if v1 then
+					v1:ReplicateCustomizing(false)
+					t.onCustomizeEnded:Fire(v1)
+				end
+			end
+		})
+	})
+	t3[1] = Roact.createElement(RoactRodux.StoreProvider, {
+		store = homeStore
+	}, t5)
+	local v6 = Roact.mount(createElement("ScreenGui", t2, t3), Players.LocalPlayer.PlayerGui, "HomeItemGui")
+	t._maid:GiveTask(function() --[[ Line: 105 | Upvalues: Roact (ref), v6 (copy) ]]
+		Roact.unmount(v6)
+	end)
+	local t7 = {
+		name = "Home",
+		imageId = 13218368809,
+		displayOrder = 100,
+		enabled = false,
+		onClick = function() --[[ Name: onClick | Line: 114 | Upvalues: Players (ref), Audio (ref), homeStore (ref), HomeSystem (ref), t (ref) ]]
+			if Players.LocalPlayer.PlayerGui then
+				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
+					Volume = 0.2
+				})
+			end
+			local v1 = not homeStore:getState().visible
+			homeStore:dispatch({
+				type = "setVisible",
+				value = v1
+			})
+			local v2 = HomeSystem.queryCurrentStandingHome()
+			if v2 then
+				v2:ReplicateCustomizing(v1)
+				if v1 then
+					t.onCustomizeStarted:Fire()
+					return
+				end
+				t.onCustomizeEnded:Fire(v2)
+			end
+		end
+	}
+	BigButtonService.add(t7)
+	local function updateButtonVisibility(p1) --[[ Line: 137 | Upvalues: HomeSystem (ref), Players (ref), t7 (copy), BigButtonService (ref), t (ref), homeStore (ref) ]]
+		local v1 = HomeSystem.queryCurrentStandingHome()
+		local v3 = (v1 and v1:HasPermissionToEdit(Players.LocalPlayer)) == true
+		local enabled = t7.enabled
+		if v3 ~= enabled then
+			t7.enabled = v3
+			BigButtonService.triggerUpdate:Fire()
+			if enabled and not v3 then
+				p1:ReplicateCustomizing(false)
+				t.onCustomizeEnded:Fire(p1)
+				homeStore:dispatch({
+					type = "setVisible",
+					value = false
+				})
+			end
+		end
+	end
+	local v7 = Maid.new()
+	HomeSystem.onEntered:Connect(function(p1) --[[ Line: 162 | Upvalues: v7 (copy), updateButtonVisibility (copy), Interval (ref) ]]
+		v7:DoCleaning()
+		updateButtonVisibility(p1)
+		v7:GiveTask(Interval.every(1):Connect(function() --[[ Line: 165 | Upvalues: updateButtonVisibility (ref), p1 (copy) ]]
+			updateButtonVisibility(p1)
+		end))
+	end)
+	HomeSystem.onExited:Connect(function(p1) --[[ Line: 169 | Upvalues: v7 (copy), updateButtonVisibility (copy) ]]
+		v7:DoCleaning()
+		updateButtonVisibility(p1)
+	end)
+	HomeSystem.onEntered:Connect(function(p1) --[[ Line: 174 | Upvalues: homeStore (ref) ]]
+		homeStore:dispatch({
+			type = "setHome",
+			value = p1
+		})
+	end)
+	HomeSystem.onExited:Connect(function() --[[ Line: 180 | Upvalues: homeStore (ref) ]]
+		homeStore:dispatch({
+			type = "setHome",
+			value = nil
+		})
+	end)
+	t.onCustomizeEnded:Connect(function(p1) --[[ Line: 187 | Upvalues: t (ref) ]]
+		t.resetHomeCustomizationToEquipped(p1)
+	end)
+	HomeSystem.onEntered:Connect(function(p1) --[[ Line: 192 | Upvalues: HomeConsts (ref), RxInstanceUtils (ref), homeStore (ref) ]]
+		RxInstanceUtils.observeChildren(p1._obj:FindFirstChild(HomeConsts.SETTINGS_FOLDER_NAME), function(p1, p2) --[[ Line: 195 | Upvalues: homeStore (ref) ]]
+			local function update() --[[ Line: 196 | Upvalues: homeStore (ref), p1 (copy) ]]
+				homeStore:dispatch({
+					type = "setSavedSetting",
+					key = p1.Name,
+					value = p1.Value
+				})
+			end
+			homeStore:dispatch({
+				type = "setSavedSetting",
+				key = p1.Name,
+				value = p1.Value
+			})
+			p2:GiveTask(p1:GetPropertyChangedSignal("Value"):Connect(update))
+		end)
+	end)
+	waitForChild(ReplicatedStorage, HomeItemConsts.UPDATE_INVENTORY_REMOTE_NAME):andThen(function(p1) --[[ Line: 209 | Upvalues: homeStore (ref) ]]
+		p1.OnClientEvent:Connect(function(p1) --[[ Line: 210 | Upvalues: homeStore (ref) ]]
+			homeStore:dispatch({
+				type = "setInventory",
+				value = p1
+			})
+		end)
+	end):catch(warn)
+	waitForChild(ReplicatedStorage, HomeItemConsts.UPDATE_EQUIPPED_REMOTE_NAME):andThen(function(p1) --[[ Line: 220 | Upvalues: homeStore (ref) ]]
+		p1.OnClientEvent:Connect(function(p1) --[[ Line: 221 | Upvalues: homeStore (ref) ]]
+			homeStore:dispatch({
+				type = "setEquipped",
+				value = p1
+			})
+		end)
+	end):catch(warn)
+	local function updateQuantityPlaced() --[[ Line: 230 | Upvalues: t (ref), Players (ref), homeStore (ref) ]]
+		homeStore:dispatch({
+			type = "setQuantityPlaced",
+			value = t.getQuantityPlaced(Players.LocalPlayer)
+		})
+	end
+	homeStore:dispatch({
+		type = "setQuantityPlaced",
+		value = t.getQuantityPlaced(Players.LocalPlayer)
+	})
+	HomeItemBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 239 | Upvalues: t (ref), Players (ref), homeStore (ref), updateQuantityPlaced (copy) ]]
+		homeStore:dispatch({
+			type = "setQuantityPlaced",
+			value = t.getQuantityPlaced(Players.LocalPlayer)
+		})
+		p1._maid:GiveTask(updateQuantityPlaced)
+	end)
 end
-function module_upvr.getQuantityPlaced(arg1) -- Line 245
-    if arg1 == nil then
-    else
-    end
-    assert(true)
-    local module = {}
-    for _, v in ipairs(HomeItemBinder_upvr:GetAll()) do
-        if v:GetOwner() == arg1 then
-            local Name = v._obj.Name
-            module[Name] = (module[Name] or 0) + 1
-        end
-    end
-    return module
+function t.getQuantityPlaced(p1) --[[ Line: 245 | Upvalues: HomeItemBinder (copy) ]]
+	assert(p1 ~= nil)
+	local t = {}
+	for i, v in ipairs(HomeItemBinder:GetAll()) do
+		if v:GetOwner() == p1 then
+			local v2 = v._obj.Name
+			t[v2] = (t[v2] or 0) + 1
+		end
+	end
+	return t
 end
-function module_upvr.attemptPurchase(arg1, arg2) -- Line 256
-    ReplicatedStorage_upvr:FindFirstChild(HomeItemConsts_upvr.PURCHASE_HOME_ITEM_REMOTE_NAME):FireServer(arg1, arg2)
+function t.attemptPurchase(p1, p2) --[[ Line: 256 | Upvalues: ReplicatedStorage (copy), HomeItemConsts (copy) ]]
+	ReplicatedStorage:FindFirstChild(HomeItemConsts.PURCHASE_HOME_ITEM_REMOTE_NAME):FireServer(p1, p2)
 end
-local function _(arg1, arg2) -- Line 260, Named "getItem"
-    for _, v_2 in arg1 do
-        if v_2.Name == arg2 then
-            return v_2
-        end
-    end
-    return nil
+local function getItem(p1, p2) --[[ Line: 260 ]]
+	for v1, v2 in p1 do
+		if v2.Name == p2 then
+			return v2
+		end
+	end
+	return nil
 end
-function module_upvr.attemptEquip(arg1, arg2) -- Line 268
-    ReplicatedStorage_upvr:FindFirstChild(HomeItemConsts_upvr.EQUIP_HOME_ITEM_REMOTE_NAME):FireServer(arg1, arg2)
+function t.attemptEquip(p1, p2) --[[ Line: 268 | Upvalues: ReplicatedStorage (copy), HomeItemConsts (copy) ]]
+	ReplicatedStorage:FindFirstChild(HomeItemConsts.EQUIP_HOME_ITEM_REMOTE_NAME):FireServer(p1, p2)
 end
-function module_upvr.attemptPreview(arg1, arg2) -- Line 272
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    assert(arg2, "itemName is nil")
-    assert(arg1, "moduleName is nil for itemName: "..tostring(arg2))
-    local SOME = ReplicatedStorage_upvr.Home.HomeData:FindFirstChild(arg1)
-    local var86
-    if not SOME then return end
-    var86 = "Module path does not exist"
-    assert(SOME, var86)
-    local SOME_2 = require(SOME)
-    if SOME_2.getItems == nil then
-        var86 = false
-    else
-        var86 = true
-    end
-    assert(var86, "Module does not have a getItems function")
-    if SOME_2.apply == nil then
-    else
-    end
-    assert(true, "Module does not have an apply function")
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [79.11]
-    if nil == arg2 then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.attemptPreview(p1, p2) --[[ Line: 272 | Upvalues: ReplicatedStorage (copy), HomeSystem (copy) ]]
+	assert(p2, "itemName is nil")
+	assert(p1, "moduleName is nil for itemName: " .. tostring(p2))
+	local v2 = ReplicatedStorage.Home.HomeData:FindFirstChild(p1)
+	if v2 then
+		assert(v2, "Module path does not exist")
+		local v3 = require(v2)
+		assert(v3.getItems ~= nil, "Module does not have a getItems function")
+		assert(v3.apply ~= nil, "Module does not have an apply function")
+		local v5 = nil
+		for v6, v7 in v3.getItems() do
+			if v7.Name == p2 then
+				v5 = v7
+				break
+			end
+		end
+		assert(v5 ~= nil, "Item does not exist")
+		v3.apply(v5, HomeSystem.queryCurrentStandingHome():GetObj())
+	end
 end
-function module_upvr.resetHomeCustomizationToEquipped(arg1) -- Line 292
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local children, NONE_2, NONE = ReplicatedStorage_upvr.Home.HomeData:GetChildren()
-    local var91
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [69.7]
-    nil.apply(var91, arg1:GetObj())
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if nil.apply(var91, arg1:GetObj()) == nil then
-    else
-    end
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    if nil.apply(var91, arg1:GetObj()) == nil then
-    else
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.resetHomeCustomizationToEquipped(p1) --[[ Line: 292 | Upvalues: homeStore (copy), ReplicatedStorage (copy) ]]
+	local equipped = homeStore:getState().equipped
+	for v3, v4 in ReplicatedStorage.Home.HomeData:GetChildren() do
+		local v1, v2
+		assert(v4, "Module path does not exist")
+		local v5 = require(v4)
+		local v6 = equipped[v4.Name]
+		v1 = v5.getItems ~= nil
+		assert(v1, "Module does not have a getItems function")
+		v2 = v5.apply ~= nil
+		assert(v2, "Module does not have an apply function")
+		local v7 = nil
+		for v8, v9 in v5.getItems() do
+			if v9.Name == v6 then
+				v7 = v9
+				break
+			end
+		end
+		v5.apply(v7, p1:GetObj())
+	end
 end
-function module_upvr.isCustomizing() -- Line 311
-    return homeStore_upvr:getState().visible
+function t.isCustomizing() --[[ Line: 311 | Upvalues: homeStore (copy) ]]
+	return homeStore:getState().visible
 end
-return module_upvr
+return t

@@ -1,15 +1,16 @@
-local Roact_upvr = require(script:FindFirstAncestor("EzUi").Parent.Roact)
-return function(arg1) -- Line 5
-    local any_createBinding_result1, any_createBinding_result2_upvr = Roact_upvr.createBinding("hello, world!")
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(require(script.Parent.TextButton), {
-        size = UDim2.new(0.5, 0, 0, 30);
-        position = UDim2.new(0.25, 0, 0.5, 0);
-        text = any_createBinding_result1;
-        onClick = function(arg1_2, arg2, arg3) -- Line 14, Named "onClick"
-            any_createBinding_result2_upvr(string.format("click %d", arg3));
-        end;
-    }), arg1)
-    return function() -- Line 20
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
+return function(p1) --[[ Line: 5 | Upvalues: Roact (copy) ]]
+	local v1, v2 = Roact.createBinding("hello, world!")
+	local TextButton = require(script.Parent.TextButton)
+	local v3 = Roact.mount(Roact.createElement(TextButton, {
+		size = UDim2.new(0.5, 0, 0, 30),
+		position = UDim2.new(0.25, 0, 0.5, 0),
+		text = v1,
+		onClick = function(p1, p2, p3) --[[ Name: onClick | Line: 14 | Upvalues: v2 (copy) ]]
+			v2(("click %d"):format(p3))
+		end
+	}), p1)
+	return function() --[[ Line: 20 | Upvalues: Roact (ref), v3 (copy) ]]
+		Roact.unmount(v3)
+	end
 end

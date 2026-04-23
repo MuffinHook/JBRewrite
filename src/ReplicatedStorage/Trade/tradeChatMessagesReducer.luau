@@ -1,24 +1,19 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
-    addTradeChatMessage = function(arg1, arg2) -- Line 5, Named "addTradeChatMessage"
-        assert(arg2.displayName, "No display name")
-        local text = arg2.text
-        assert(text, "No text")
-        if typeof(arg2.me) ~= "boolean" then
-            text = false
-        else
-            text = true
-        end
-        assert(text, "No me value passed")
-        local clone = table.clone(arg1)
-        table.insert(clone, {
-            displayName = arg2.displayName;
-            me = arg2.me;
-            text = arg2.text;
-            color = arg2.color;
-        })
-        return clone
-    end;
-    clearTradeChatMessages = function(arg1, arg2) -- Line 19, Named "clearTradeChatMessages"
-        return {}
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer({}, {
+	addTradeChatMessage = function(p1, p2) --[[ Name: addTradeChatMessage | Line: 5 ]]
+		assert(p2.displayName, "No display name")
+		assert(p2.text, "No text")
+		assert(typeof(p2.me) == "boolean", "No me value passed")
+		local v2 = table.clone(p1)
+		table.insert(v2, {
+			displayName = p2.displayName,
+			me = p2.me,
+			text = p2.text,
+			color = p2.color
+		})
+		return v2
+	end,
+	clearTradeChatMessages = function(p1, p2) --[[ Name: clearTradeChatMessages | Line: 19 ]]
+		return {}
+	end
 })

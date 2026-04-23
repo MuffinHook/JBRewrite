@@ -1,36 +1,37 @@
-local Audio_upvr = require(game:GetService("ReplicatedStorage").Std.Audio)
-local Gun_upvr = require(script.Parent.Gun)
-local module_upvr = {
-    __ClassName = "Uzi";
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Gun = require(script.Parent.Gun)
+local t = {
+	__ClassName = "Uzi"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Gun_upvr)
-function module_upvr.new(arg1, arg2, arg3) -- Line 11
-    local any_new_result1 = Gun_upvr.new(arg1, arg2, arg3)
-    setmetatable(any_new_result1, module_upvr)
-    any_new_result1:Setup(arg3)
-    return any_new_result1
+t.__index = t
+setmetatable(t, Gun)
+function t.new(p1, p2, p3) --[[ Line: 11 | Upvalues: Gun (copy), t (copy) ]]
+	local v1 = Gun.new(p1, p2, p3)
+	setmetatable(v1, t)
+	v1:Setup(p3)
+	return v1
 end
-function module_upvr.ShootSound(arg1, arg2) -- Line 18
-    if arg2 then
-        Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.dry_fire01, {
-            Volume = 0.4;
-            Pitch = 1 + math.random() * 0.1 - 0.05;
-        })
-    else
-        Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.shot_01, {
-            Pitch = 1 + math.random() * 0.1 - 0.05;
-        })
-    end
+function t.ShootSound(p1, p2) --[[ Line: 18 | Upvalues: Audio (copy) ]]
+	if p2 then
+		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.dry_fire01, {
+			Volume = 0.4,
+			Pitch = 1 + math.random() * 0.1 - 0.05
+		})
+	else
+		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.shot_01, {
+			Pitch = 1 + math.random() * 0.1 - 0.05
+		})
+	end
 end
-function module_upvr.ReloadDropAmmoSound(arg1) -- Line 29
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_semi_auto_rifle_magazine_unload_01, {
-        RollOffMaxDistance = 129;
-    })
+function t.ReloadDropAmmoSound(p1) --[[ Line: 29 | Upvalues: Audio (copy) ]]
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_semi_auto_rifle_magazine_unload_01, {
+		RollOffMaxDistance = 129
+	})
 end
-function module_upvr.ReloadRefillAmmoSound(arg1) -- Line 34
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_semi_auto_rifle_magazine_load_01, {
-        RollOffMaxDistance = 129;
-    })
+function t.ReloadRefillAmmoSound(p1) --[[ Line: 34 | Upvalues: Audio (copy) ]]
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_semi_auto_rifle_magazine_load_01, {
+		RollOffMaxDistance = 129
+	})
 end
-return module_upvr
+return t

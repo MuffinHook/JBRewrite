@@ -1,702 +1,705 @@
-local CurrentCamera_upvr = workspace.CurrentCamera
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local RunService_upvr = game:GetService("RunService")
-local UserInputService_upvr = game:GetService("UserInputService")
-local var5_upvw
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local WheelWorld_upvr = require(ReplicatedStorage_upvr.Module.Wheel.WheelWorld)
-local random_state_upvr = Random.new()
-local function _(arg1) -- Line 46, Named "RandomVector"
-    return Vector3.new(arg1 * (random_state_upvr:NextNumber() * 2 - 1), arg1 * (random_state_upvr:NextNumber() * 2 - 1), arg1 * (random_state_upvr:NextNumber() * 2 - 1))
+local CurrentCamera = workspace.CurrentCamera
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local v1 = nil
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Spring = require(ReplicatedStorage.Std.Spring)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local WheelWorld = require(ReplicatedStorage.Module.Wheel.WheelWorld)
+local Wheel = require(ReplicatedStorage.Module.Wheel.Wheel)
+local WheelLQ = require(ReplicatedStorage.Module.Wheel.WheelLQ)
+local CharacterAnim = require(ReplicatedStorage.Game.CharacterAnim)
+local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
+local DoorConsts = require(ReplicatedStorage.Door2.DoorConsts)
+local DefaultActions = require(ReplicatedStorage.Game.DefaultActions)
+local InputUtils = require(ReplicatedStorage.Std.InputUtils)
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local v2 = Random.new()
+local abs = math.abs
+local function RandomVector(p1) --[[ Line: 46 | Upvalues: v2 (copy) ]]
+	local v1 = p1 * (v2:NextNumber() * 2 - 1)
+	local v22 = p1 * (v2:NextNumber() * 2 - 1)
+	return Vector3.new(v1, v22, p1 * (v2:NextNumber() * 2 - 1))
 end
-local function SetHumanoidEnabled_upvr(arg1, arg2) -- Line 53, Named "SetHumanoidEnabled"
-    for _, v in next, Enum.HumanoidStateType:GetEnumItems() do
-        if v ~= Enum.HumanoidStateType.Dead and v ~= Enum.HumanoidStateType.None and v ~= Enum.HumanoidStateType.Jumping then
-            arg1:SetStateEnabled(v, arg2)
-        end
-    end
+local function SetHumanoidEnabled(p1, p2) --[[ Line: 53 ]]
+	local v1 = next
+	local v2, v3 = Enum.HumanoidStateType:GetEnumItems()
+	for v4, v5 in v1, v2, v3 do
+		if v5 ~= Enum.HumanoidStateType.Dead and (v5 ~= Enum.HumanoidStateType.None and v5 ~= Enum.HumanoidStateType.Jumping) then
+			p1:SetStateEnabled(v5, p2)
+		end
+	end
 end
-local module_upvr = {
-    __ClassName = "BaseUserControlledPlane";
+local t = {
+	__ClassName = "BaseUserControlledPlane"
 }
-module_upvr.__index = module_upvr
-function module_upvr.Init() -- Line 68
-    var5_upvw = require(LocalPlayer_upvr.PlayerScripts:WaitForChild("PlayerModule"))
+t.__index = t
+function t.Init() --[[ Line: 68 | Upvalues: v1 (ref), LocalPlayer (copy) ]]
+	v1 = require(LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"))
 end
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-function module_upvr.new(arg1, arg2) -- Line 71
-    local setmetatable_result1 = setmetatable({}, module_upvr)
-    setmetatable_result1.Id = arg1.Id
-    assert(setmetatable_result1.Id)
-    setmetatable_result1.Mass = arg1.Mass
-    setmetatable_result1.Maid = Maid_upvr.new()
-    setmetatable_result1.Model = arg1.Model
-    local Wing = setmetatable_result1.Model.Skeleton.Wing
-    local Thrust = setmetatable_result1.Model.Skeleton.Thrust
-    setmetatable_result1.PartBoundingBox = setmetatable_result1.Model.BoundingBox
-    setmetatable_result1.PartWing = Wing
-    setmetatable_result1.WingVectorForce = Wing.VectorForce
-    setmetatable_result1.WingAngularVelocity = Wing.AngularVelocity
-    setmetatable_result1.PartThrust = Thrust
-    setmetatable_result1.ThrustVectorForce = Thrust.VectorForce
-    setmetatable_result1.AreaWing = Wing.Size.X * Wing.Size.Z
-    setmetatable_result1.Seats = {}
-    setmetatable_result1:SetupSeats()
-    setmetatable_result1.CorrectingRoll = false
-    setmetatable_result1.CorrectingRollFlag = false
-    setmetatable_result1.OnTakeoff = nil
-    setmetatable_result1.OnLanding = nil
-    local tbl_10 = {
-        GRAVITY = 196.20000000000002;
-        ANGULAR_MAXTORQUE_FLYING = 100000000;
-        ANGULAR_MAXTORQUE_LANDING = 1000;
-        COEFFICIENT_DRAG = 0.8;
-        ROLL_ADJUSTMENT_TIMER = 0.1;
-        JOYSTICK_RECENTER_MULTIPLIER = 0.95;
-        MAX_THRUST = 700;
-        CAMERA_SHAKE_MIN_GS = 1.5;
-        CAMERA_SHAKE_COEFF_GS = 1;
-        CAMERA_OFFSET_CF = CFrame.new(0, 8, 25);
-        SOUND_RUMBLE_COEFF_GS = 0.3333333333333333;
-        SOUND_BREATHING_MIN_GS = 1;
-        SOUND_BREATHING_TIMER = 2;
-        SOUND_BREATHING_DURATION = 3;
-        SUSPENSION_HEIGHT_FRONT = 5;
-        SUSPENSION_HEIGHT_BACK = 4;
-        WHEEL_VISUAL_RADIUS_FRONT = 0.83;
-        WHEEL_VISUAL_RADIUS_BACK = 0.83;
-        THROTTLE_WHEEL_TURN_MIN = 0.2;
-        THROTTLE_TAKEOFF = 0.4;
-        HEIGHT_MAX = 5000;
-    }
-    if arg2 then
-        for i_2, v_2 in next, arg2 do
-            assert(tbl_10[i_2], i_2)
-            tbl_10[i_2] = v_2
-        end
-    end
-    setmetatable_result1.CONST = tbl_10
-    setmetatable_result1.Joystickx = 0
-    setmetatable_result1.Joysticky = 0
-    setmetatable_result1.InputYaw = 0
-    setmetatable_result1.Throttle = 0
-    setmetatable_result1._controlsEnabled = true
-    return setmetatable_result1
+function t.new(p1, p2) --[[ Line: 71 | Upvalues: t (copy), Maid (copy) ]]
+	local v2 = setmetatable({}, t)
+	v2.Id = p1.Id
+	assert(v2.Id)
+	v2.Mass = p1.Mass
+	v2.Maid = Maid.new()
+	v2.Model = p1.Model
+	local Wing = v2.Model.Skeleton.Wing
+	local Thrust = v2.Model.Skeleton.Thrust
+	v2.PartBoundingBox = v2.Model.BoundingBox
+	v2.PartWing = Wing
+	v2.WingVectorForce = Wing.VectorForce
+	v2.WingAngularVelocity = Wing.AngularVelocity
+	v2.PartThrust = Thrust
+	v2.ThrustVectorForce = Thrust.VectorForce
+	v2.AreaWing = Wing.Size.X * Wing.Size.Z
+	v2.Seats = {}
+	v2:SetupSeats()
+	v2.CorrectingRoll = false
+	v2.CorrectingRollFlag = false
+	v2.OnTakeoff = nil
+	v2.OnLanding = nil
+	local t2 = {
+		GRAVITY = 196.20000000000002,
+		ANGULAR_MAXTORQUE_FLYING = 100000000,
+		ANGULAR_MAXTORQUE_LANDING = 1000,
+		COEFFICIENT_DRAG = 0.8,
+		ROLL_ADJUSTMENT_TIMER = 0.1,
+		JOYSTICK_RECENTER_MULTIPLIER = 0.95,
+		MAX_THRUST = 700,
+		CAMERA_SHAKE_MIN_GS = 1.5,
+		CAMERA_SHAKE_COEFF_GS = 1,
+		CAMERA_OFFSET_CF = CFrame.new(0, 8, 25),
+		SOUND_RUMBLE_COEFF_GS = 0.3333333333333333,
+		SOUND_BREATHING_MIN_GS = 1,
+		SOUND_BREATHING_TIMER = 2,
+		SOUND_BREATHING_DURATION = 3,
+		SUSPENSION_HEIGHT_FRONT = 5,
+		SUSPENSION_HEIGHT_BACK = 4,
+		WHEEL_VISUAL_RADIUS_FRONT = 0.83,
+		WHEEL_VISUAL_RADIUS_BACK = 0.83,
+		THROTTLE_WHEEL_TURN_MIN = 0.2,
+		THROTTLE_TAKEOFF = 0.4,
+		HEIGHT_MAX = 5000
+	}
+	if p2 then
+		for v3, v4 in next, p2 do
+			assert(t2[v3], v3)
+			t2[v3] = v4
+		end
+	end
+	v2.CONST = t2
+	v2.Joystickx = 0
+	v2.Joysticky = 0
+	v2.InputYaw = 0
+	v2.Throttle = 0
+	v2._controlsEnabled = true
+	return v2
 end
-function module_upvr.SetupSeats(arg1) -- Line 148
-    table.insert(arg1.Seats, {
-        Part = arg1.Model:FindFirstChild("Seat");
-        Driver = true;
-    })
+function t.SetupSeats(p1) --[[ Line: 148 ]]
+	table.insert(p1.Seats, {
+		Part = p1.Model:FindFirstChild("Seat"),
+		Driver = true
+	})
 end
-function module_upvr.SetParticlesEnabled(arg1, arg2) -- Line 154
-    if not arg1.Model then
-    else
-        local Particles = arg1.Model:FindFirstChild("Particles")
-        if Particles then
-            for _, v_3 in next, Particles:GetChildren() do
-                v_3:FindFirstChildOfClass("ParticleEmitter").Enabled = arg2
-            end
-        end
-    end
+function t.SetParticlesEnabled(p1, p2) --[[ Line: 154 ]]
+	if p1.Model then
+		local Particles = p1.Model:FindFirstChild("Particles")
+		if Particles then
+			local v1 = next
+			local v2, v3 = Particles:GetChildren()
+			for v4, v5 in v1, v2, v3 do
+				v5:FindFirstChildOfClass("ParticleEmitter").Enabled = p2
+			end
+		end
+	end
 end
-local CharacterAnim_upvr = require(ReplicatedStorage_upvr.Game.CharacterAnim)
-local Spring_upvr = require(ReplicatedStorage_upvr.Std.Spring)
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local VehicleUtils_upvr = require(ReplicatedStorage_upvr.Vehicle.VehicleUtils)
-local DoorConsts_upvr = require(ReplicatedStorage_upvr.Door2.DoorConsts)
-local InputUtils_upvr = require(ReplicatedStorage_upvr.Std.InputUtils)
-local abs_upvr = math.abs
-local Wheel_upvr = require(ReplicatedStorage_upvr.Module.Wheel.Wheel)
-local ActionButtonService_upvr = require(ReplicatedStorage_upvr.ActionButton.ActionButtonService)
-local DefaultActions_upvr = require(ReplicatedStorage_upvr.Game.DefaultActions)
-local function MountLocalPlayer_upvr(arg1, arg2) -- Line 166, Named "MountLocalPlayer"
-    local any_getCarSitTrack_result1_upvr_2 = CharacterAnim_upvr.getCarSitTrack()
-    any_getCarSitTrack_result1_upvr_2:Play()
-    arg2.Maid:GiveTask(function() -- Line 171
-        any_getCarSitTrack_result1_upvr_2:Stop()
-    end)
-    any_getCarSitTrack_result1_upvr_2 = LocalPlayer_upvr
-    any_getCarSitTrack_result1_upvr_2 = any_getCarSitTrack_result1_upvr_2.Character
-    local var130 = any_getCarSitTrack_result1_upvr_2
-    if var130 then
-        local Humanoid_4 = var130:FindFirstChild("Humanoid")
-        if Humanoid_4 then
-            SetHumanoidEnabled_upvr(Humanoid_4, false)
-            Humanoid_4:ChangeState(Enum.HumanoidStateType.Seated)
-        end
-    end
-    if not arg2.Driver then
-    else
-        local any_new_result1_7_upvr = Spring_upvr.new(Vector3.new(), Vector3.new(), 0.8, 30)
-        local any_new_result1_13_upvr = Spring_upvr.new(0, 0, 0.6, 5)
-        local any_new_result1_2_upvr = Spring_upvr.new(0, 0, 0.7, 5)
-        local any_new_result1_16_upvr = Spring_upvr.new(0, 0, 0.95, 15)
-        arg2.CameraSpring = any_new_result1_7_upvr
-        local clone_upvw = ReplicatedStorage_upvr.Resource.Plane.PlaneGui:Clone()
-        clone_upvw.Parent = LocalPlayer_upvr.PlayerGui
-        arg1.PlaneGui = clone_upvw
-        local any_ObjectLocal_result1_upvr_4 = Audio_upvr.ObjectLocal(clone_upvw, 3378049562, {
-            Looped = true;
-            Volume = 0;
-            Pitch = 1;
-        })
-        arg1.SoundRumble = any_ObjectLocal_result1_upvr_4
-        local any_ObjectLocal_result1_upvr = Audio_upvr.ObjectLocal(clone_upvw, 3378078999, {
-            Looped = true;
-            Volume = 1.25;
-        })
-        arg1.SoundWind = any_ObjectLocal_result1_upvr
-        local any_ObjectLocal_result1_upvr_2 = Audio_upvr.ObjectLocal(clone_upvw, 9058670257, {
-            Looped = true;
-            Volume = 0;
-        })
-        arg1.SoundBreathing = any_ObjectLocal_result1_upvr_2
-        local var143_upvw = 0
-        local tbl_9_upvr = {0, 0, 0, 0}
-        local tick_result1_upvw_2 = tick()
-        local var146_upvw = true
-        local var147_upvw = 0
-        local var148_upvw = 0
-        if VehicleUtils_upvr.getTireHealth(arg1.Model) <= 0 then
-            var143_upvw = 0
-        end
-        arg2.Maid:GiveTask(VehicleUtils_upvr.getTireHealthChangedSignal(arg1.Model):Connect(function() -- Line 223, Named "updatePlaneHealth"
-            if VehicleUtils_upvr.getTireHealth(arg1.Model) <= 0 then
-                var143_upvw = 0
-            end
-        end))
-        arg1.IsFlying = false
-        local function RunTakeoff_upvr() -- Line 235, Named "RunTakeoff"
-            arg1.IsFlying = true
-            arg1.Model:FindFirstChild("SetIsFlyingRemote"):FireServer(arg1.IsFlying)
-            if arg1.OnTakeoff then
-                arg1.OnTakeoff()
-            end
-            Audio_upvr.ObjectLocal(clone_upvw, 3382610090)
-            for _, v_4 in next, arg1.WheelsConf do
-                v_4.Wheel:Clear()
-                v_4.Motor.C0 = CFrame.new()
-            end
-            any_new_result1_13_upvr:SetTarget(1)
-            arg1.WingAngularVelocity.MaxTorque = arg1.CONST.ANGULAR_MAXTORQUE_FLYING
-            clone_upvw.Controls.Mouse.Visible = true
-            clone_upvw.Controls.Altitude.Visible = true
-            arg1:SetParticlesEnabled(true)
-        end
-        local function RunLanding_upvr() -- Line 254, Named "RunLanding"
-            if arg1.IsFlying then
-                Audio_upvr.ObjectLocal(clone_upvw, 3382610090)
-            end
-            arg1.IsFlying = false
-            arg1.Model:FindFirstChild("SetIsFlyingRemote"):FireServer(arg1.IsFlying)
-            if arg1.OnLanding then
-                arg1.OnLanding()
-            end
-            any_new_result1_13_upvr:SetTarget(0)
-            arg1.WingAngularVelocity.MaxTorque = arg1.CONST.ANGULAR_MAXTORQUE_LANDING
-            clone_upvw.Controls.Mouse.Visible = false
-            clone_upvw.Controls.Altitude.Visible = false
-            arg1:SetParticlesEnabled(false)
-        end
-        local zero_vector3_upvw = Vector3.new()
-        local function HeartbeatWing_upvr(arg1_18) -- Line 271, Named "HeartbeatWing"
-            -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-            local PartWing = arg1.PartWing
-            local CFrame = PartWing.CFrame
-            local arcsine_2 = math.asin(CFrame.LookVector.Y)
-            if arcsine_2 ~= arcsine_2 then
-                arcsine_2 = 0
-            end
-            local arcsine = math.asin(CFrame.RightVector.Y)
-            if arcsine ~= arcsine then
-                arcsine = 0
-            end
-            arg1.ObservedPitch = arcsine_2
-            arg1.ObservedRoll = arcsine
-            if not arg1.IsFlying or not arg1.CONST.COEFFICIENT_DRAG then
-            end
-            local Velocity = PartWing.Velocity
-            if not arg1.IsFlying or not (math.cos(arcsine_2) * 0.95) then
-            end
-            if 0.001 < Velocity:Dot(Velocity) then
-            else
-            end
-            arg1.WingVectorForce.Force = Vector3.new(0, 0, 0)
-            local any_Update_result1_3 = any_new_result1_16_upvr:Update()
-            local var159 = 0
-            if arg1.IsFlying then
-                var159 = arg1.InputYaw * 0.5
-            end
-            arg1.WingAngularVelocity.AngularVelocity = Vector3.new(var148_upvw * 3 * (1 + -0.9 * any_Update_result1_3), var159, var147_upvw * 2.5 * (1 + 2 * any_Update_result1_3))
-            arg1.ObservedAcceleration = ((Velocity - zero_vector3_upvw) / arg1_18).Magnitude
-            zero_vector3_upvw = Velocity
-        end
-        local var160_upvw = 0
-        local function HeartbeatThrust_upvr(arg1_19) -- Line 323, Named "HeartbeatThrust"
-            local CFrame_2 = arg1.PartThrust.CFrame
-            local var162
-            local function decompInlinedCondition_4() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                var162 = var143_upvw / 3
-                return var162
-            end
-            if var143_upvw >= 0.3333333333333333 or not decompInlinedCondition_4() then
-                var162 = var143_upvw * var143_upvw
-            end
-            local tick_result1_6 = tick()
-            if arg1.CONST.HEIGHT_MAX < CFrame_2.Y then
-                var162 = 0
-                var160_upvw = tick_result1_6
-            end
-            if tick_result1_6 - var160_upvw < 5 then
-                var162 = 0
-            end
-            arg1.ThrustVectorForce.Force = (CFrame_2.LookVector * arg1.Mass) * (var162 * arg1.CONST.MAX_THRUST)
-        end
-        local var164_upvw = 0
-        local var165_upvw = 0
-        local function HeartbeatSounds_upvr(arg1_20) -- Line 341, Named "HeartbeatSounds"
-            local var166 = arg1.ObservedAcceleration / arg1.CONST.GRAVITY
-            if arg1.IsFlying == false then
-                var166 = 0
-            end
-            local var167 = 1 - math.exp(-var166 * arg1.CONST.SOUND_RUMBLE_COEFF_GS)
-            any_ObjectLocal_result1_upvr_4.Volume = var167 * 2
-            any_ObjectLocal_result1_upvr.Volume = (1.25 - var167 * 0.2) * (0.2 + 0.8 * any_new_result1_13_upvr:Update())
-            if arg1.CONST.SOUND_BREATHING_MIN_GS < var166 then
-                var164_upvw += arg1_20
-            else
-                var164_upvw = 0
-            end
-            if arg1.CONST.SOUND_BREATHING_TIMER < var164_upvw then
-                var165_upvw = arg1.CONST.SOUND_BREATHING_DURATION
-            end
-            var165_upvw -= arg1_20
-            if 0 < var165_upvw then
-                any_ObjectLocal_result1_upvr_2.Volume = (1 - math.exp(-var165_upvw)) * 0.4
-            end
-        end
-        local function HeartbeatWheels(arg1_21) -- Line 383
-            -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-            if arg1.IsFlying ~= false then
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-            -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [16.6]
-            local var168
-            if nil.Front then
-                local function decompInlinedCondition_5() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                    var168 = any_new_result1_2_upvr:Update() * math.pi * 0.2
-                    return var168
-                end
-                if var143_upvw >= arg1.CONST.THROTTLE_WHEEL_TURN_MIN or not decompInlinedCondition_5() then
-                end
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                local _, any_Update_result2_2 = nil.Wheel:Update(arg1_21, 0)
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                if nil.DoorModel then
-                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                    if nil.DoorModel:GetAttribute(DoorConsts_upvr.OPEN_ATTR_NAME) == true then
-                        any_Update_result2_2 = 0
-                    end
-                end
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                nil.Motor.C0 = CFrame.Angles(-any_Update_result2_2, -0, 0) * CFrame.new(0, -0, 0)
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                nil.MotorArm.C1 = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0) * nil.ArmOffset
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-        end
-        local tick_result1_upvw = tick()
-        local function HeartbeatControls_upvr(arg1_22) -- Line 404, Named "HeartbeatControls"
-            local tick_result1_5 = tick()
-            local var173 = tbl_9_upvr[1] - tbl_9_upvr[3]
-            if VehicleUtils_upvr.getTireHealth(arg1.Model) <= 0 then
-                var173 = 0
-            end
-            if InputUtils_upvr.isTouch() then
-                local any_GetMoveVector_result1 = var5_upvw:GetControls():GetMoveVector()
-                if 1 < any_GetMoveVector_result1.Magnitude then
-                    any_GetMoveVector_result1 = any_GetMoveVector_result1.Unit
-                end
-                var147_upvw = -any_GetMoveVector_result1.X
-                var148_upvw = -any_GetMoveVector_result1.Z
-            else
-            end
-            if 0 < var173 then
-                var143_upvw += arg1_22 * 0.2
-                tick_result1_upvw = tick_result1_5
-            elseif var173 < 0 then
-                var143_upvw -= arg1_22 * 0.2
-                tick_result1_upvw = tick_result1_5
-            end
-            if 1 < tick_result1_5 - tick_result1_upvw then
-                if arg1.CONST.THROTTLE_TAKEOFF < var143_upvw then
-                elseif 0.15 < var143_upvw then
-                    var143_upvw -= arg1_22 * 0.1
-                end
-            end
-            if var143_upvw < -0.06666666666666667 then
-                var143_upvw = -0.06666666666666667
-            end
-            if 1 < var143_upvw then
-                var143_upvw = 1
-            end
-            local var175
-            if var143_upvw < arg1.CONST.THROTTLE_TAKEOFF and arg1.CONST.THROTTLE_TAKEOFF <= var143_upvw then
-                RunTakeoff_upvr()
-            elseif arg1.CONST.THROTTLE_TAKEOFF < var143_upvw and var143_upvw <= arg1.CONST.THROTTLE_TAKEOFF then
-                RunLanding_upvr()
-            end
-            var143_upvw = var143_upvw
-            local var176 = tick_result1_upvw_2
-            local var177 = tick_result1_5 - var176
-            if arg1.CONST.ROLL_ADJUSTMENT_TIMER >= var177 then
-                var176 = false
-            else
-                var176 = true
-            end
-            if var176 then
-                var147_upvw += -arg1.ObservedRoll * 0.1 * (1 - math.exp(-(var177 - arg1.CONST.ROLL_ADJUSTMENT_TIMER)))
-            end
-            if var146_upvw then
-                var147_upvw *= arg1.CONST.JOYSTICK_RECENTER_MULTIPLIER
-                var148_upvw *= arg1.CONST.JOYSTICK_RECENTER_MULTIPLIER
-            end
-            if var147_upvw < -1 then
-                var147_upvw = -1
-            end
-            if 1 < var147_upvw then
-                var147_upvw = 1
-            end
-            if var148_upvw < -1 then
-                var148_upvw = -1
-            end
-            if 1 < var148_upvw then
-                var148_upvw = 1
-            end
-            if var175 < -1 then
-                var175 = -1
-            end
-            if 1 < var175 then
-                var175 = 1
-            end
-            arg1.Joystickx = var147_upvw
-            arg1.Joysticky = var148_upvw
-            arg1.InputYaw = var175
-            arg1.Throttle = var143_upvw
-        end
-        local function HeartbeatUI_upvr(arg1_23) -- Line 509, Named "HeartbeatUI"
-            local var178 = var147_upvw
-            local var179 = var148_upvw
-            local var180 = (var178 * var178 + var179 * var179) ^ 0.5
-            if 1 < var180 then
-                var178 /= var180
-                var179 /= var180
-            end
-            clone_upvw.Controls.Mouse.Dot.Position = UDim2.new(-(var178 * 0.9) * 0.5 + 0.5, 0, -(var179 * 0.9) * 0.5 + 0.5, 0)
-            clone_upvw.Controls.Altitude.Text = string.format("%04d", arg1.PartWing.Position.Y)
-            clone_upvw.Controls.Throttle.Value.Size = UDim2.new(1, 0, var143_upvw, 0)
-            clone_upvw.Controls.Throttle.Value.Position = UDim2.new(0, 0, 1 - var143_upvw, 0)
-        end
-        local function Heartbeat(arg1_24) -- Line 523
-            HeartbeatControls_upvr(arg1_24)
-            HeartbeatWing_upvr(arg1_24)
-            HeartbeatThrust_upvr(arg1_24)
-            HeartbeatSounds_upvr(arg1_24)
-            HeartbeatWheels(arg1_24)
-            HeartbeatUI_upvr(arg1_24)
-        end
-        arg2.Maid:GiveTask(RunService_upvr.Heartbeat:Connect(Heartbeat))
-        local var181_upvw = false
-        local var182_upvw
-        local any_new_result1_15_upvr = Spring_upvr.new(Vector3.new(), Vector3.new(), 0.8, 20)
-        local var184_upvw = 70
-        local function RenderSteppedCamera_upvr(arg1_25) -- Line 534, Named "RenderSteppedCamera"
-            if arg1.IsFlying then
-                if not var181_upvw then
-                    var181_upvw = true
-                    var182_upvw = arg1.PartWing.CFrame:toObjectSpace(CurrentCamera_upvr.CFrame)
-                    CurrentCamera_upvr.CameraType = Enum.CameraType.Scriptable
-                    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                end
-            elseif var181_upvw and any_new_result1_13_upvr:Update() < 0.001 then
-                var181_upvw = false
-                CurrentCamera_upvr.CameraType = Enum.CameraType.Custom
-                CurrentCamera_upvr.CFrame = arg1.PartWing.CFrame * var182_upvw
-            end
-            local var185 = not arg1.IsFlying
-            if not var185 then
-                var185 = not arg1._controlsEnabled
-            end
-            UserInputService_upvr.MouseIconEnabled = var185
-            if var185 then
-                if UserInputService_upvr.MouseBehavior == Enum.MouseBehavior.LockCenter then
-                    UserInputService_upvr.MouseBehavior = Enum.MouseBehavior.Default
-                    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                end
-            elseif UserInputService_upvr.MouseBehavior ~= Enum.MouseBehavior.LockCenter then
-                UserInputService_upvr.MouseBehavior = Enum.MouseBehavior.LockCenter
-            end
-            local var186 = 70
-            if var181_upvw then
-                var186 = math.clamp((arg1.PartWing.Velocity:Dot(arg1.PartWing.CFrame.LookVector) - 50) / 300, 0, 1) * 20 + 70
-                local vector3 = Vector3.new(var147_upvw * -2, var148_upvw * 2, 0)
-                local any_SetTarget_result1_2 = any_new_result1_15_upvr:SetTarget(vector3)
-                if not arg1.Model:GetAttribute("IsCameraLocked") then
-                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                    CurrentCamera_upvr.CFrame = arg1.PartWing.CFrame * var182_upvw:Lerp(arg1.CONST.CAMERA_OFFSET_CF * CFrame.new(any_new_result1_7_upvr:SetTarget(vector3)) * CFrame.Angles(-any_SetTarget_result1_2.y * 0.02, any_SetTarget_result1_2.x * 0.02, 0), any_new_result1_13_upvr:Update())
-                end
-                local var189 = arg1.ObservedAcceleration / arg1.CONST.GRAVITY
-                if arg1.CONST.CAMERA_SHAKE_MIN_GS < var189 then
-                    local var190 = (1 - math.exp(-(var189 - arg1.CONST.CAMERA_SHAKE_MIN_GS) * arg1.CONST.CAMERA_SHAKE_COEFF_GS)) * 15
-                    any_new_result1_7_upvr:Accelerate(Vector3.new(var190 * (random_state_upvr:NextNumber() * 2 - 1), var190 * (random_state_upvr:NextNumber() * 2 - 1), var190 * (random_state_upvr:NextNumber() * 2 - 1)))
-                end
-            end
-            var184_upvw += (var186 - var184_upvw) * 0.7
-            CurrentCamera_upvr.FieldOfView = var184_upvw
-        end
-        arg2.Maid:GiveTask(RunService_upvr.RenderStepped:Connect(function(arg1_26) -- Line 593, Named "RenderStepped"
-            RenderSteppedCamera_upvr(arg1_26)
-        end))
-        local tbl_4_upvr = {
-            [Enum.KeyCode.A] = 2;
-            [Enum.KeyCode.D] = 4;
-            [Enum.KeyCode.ButtonR2] = 1;
-            [Enum.KeyCode.ButtonL2] = 3;
-        }
-        arg2.Maid:GiveTask(UserInputService_upvr.InputBegan:Connect(function(arg1_27, arg2_4) -- Line 608, Named "InputBegan"
-            if arg2_4 then
-                return false
-            end
-            if arg1_27.UserInputType == Enum.UserInputType.Keyboard then
-                if arg1_27.KeyCode == Enum.KeyCode.Q then
-                    any_new_result1_16_upvr:SetTarget(1)
-                elseif arg1_27.KeyCode == Enum.KeyCode.LeftShift then
-                    for _, v_8 in next, arg1.WheelsConf do
-                        if not v_8.Front then
-                            v_8.Wheel:SetForwardFriction(3)
-                        end
-                    end
-                end
-            end
-            if tbl_4_upvr[arg1_27.KeyCode] then
-                tbl_9_upvr[tbl_4_upvr[arg1_27.KeyCode]] = 1
-                any_new_result1_2_upvr:SetTarget(tbl_9_upvr[2] - tbl_9_upvr[4])
-            end
-        end))
-        arg2.Maid:GiveTask(UserInputService_upvr.InputEnded:Connect(function(arg1_28, arg2_5) -- Line 633, Named "InputEnded"
-            if arg2_5 then
-                return false
-            end
-            if arg1_28.UserInputType == Enum.UserInputType.Keyboard then
-                if arg1_28.KeyCode == Enum.KeyCode.Q then
-                    any_new_result1_16_upvr:SetTarget(0)
-                elseif arg1_28.KeyCode == Enum.KeyCode.LeftShift then
-                    for _, v_9 in next, arg1.WheelsConf do
-                        v_9.Wheel:SetForwardFriction(0.02)
-                    end
-                end
-            end
-            if tbl_4_upvr[arg1_28.KeyCode] then
-                tbl_9_upvr[tbl_4_upvr[arg1_28.KeyCode]] = 0
-                any_new_result1_2_upvr:SetTarget(tbl_9_upvr[2] - tbl_9_upvr[4])
-            end
-        end))
-        local any_new_result1_12_upvr = Spring_upvr.new(Vector3.new(), Vector3.new(), 0.8, 20)
-        arg2.Maid:GiveTask(UserInputService_upvr.InputChanged:Connect(function(arg1_29) -- Line 659, Named "InputChanged"
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            var147_upvw -= arg1_29.Delta.X * 0.015
-            var148_upvw -= arg1_29.Delta.Y * 0.015
-            tick_result1_upvw_2 = tick()
-            var146_upvw = true
-            do
-                return
-            end
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        end))
-        local any_new_result1_6 = WheelWorld_upvr.new()
-        any_new_result1_6:SetModel(arg1.Model)
-        for _, v_5 in next, arg1.WheelsConf do
-            local var198
-            if 0 >= v_5.PartNode.CFrame:toObjectSpace(arg1.PartBoundingBox.CFrame).Z then
-                var198 = false
-            else
-                var198 = true
-            end
-            local any_new_result1_14 = Wheel_upvr.new(v_5.PartNode)
-            any_new_result1_14:SetSpringConstants(2, 3)
-            if var198 then
-                any_new_result1_14:SetVisualRadius(arg1.CONST.WHEEL_VISUAL_RADIUS_FRONT)
-                any_new_result1_14:SetSuspensionHeight(arg1.CONST.SUSPENSION_HEIGHT_FRONT)
-            else
-                any_new_result1_14:SetVisualRadius(arg1.CONST.WHEEL_VISUAL_RADIUS_BACK)
-                any_new_result1_14:SetSuspensionHeight(arg1.CONST.SUSPENSION_HEIGHT_BACK)
-            end
-            v_5.Front = var198
-            v_5.Wheel = any_new_result1_14
-            any_new_result1_6:AddWheel(any_new_result1_14)
-        end
-        arg2.Maid:GiveTask(any_new_result1_6)
-        local function _() -- Line 740, Named "ThrottleUpPress"
-            tbl_9_upvr[1] = 1
-        end
-        local function _() -- Line 743, Named "ThrottleUpRelease"
-            tbl_9_upvr[1] = 0
-        end
-        local function _() -- Line 746, Named "ThrottleDownPress"
-            tbl_9_upvr[3] = 1
-        end
-        local function _() -- Line 749, Named "ThrottleDownRelease"
-            tbl_9_upvr[3] = 0
-        end
-        local tbl_3 = {
-            primary = true;
-            priority = 1000;
-            saturateTo = 0;
-            image = "rbxassetid://7858765663";
-            keyCodes = {Enum.KeyCode.W, Enum.KeyCode.ButtonR2};
-        }
-        local function onPressed(arg1_30) -- Line 758
-            if arg1_30 == Enum.UserInputType.Gamepad1 then
-            else
-                tbl_9_upvr[1] = 1
-            end
-        end
-        tbl_3.onPressed = onPressed
-        local function onReleased(arg1_31) -- Line 764
-            if arg1_31 == Enum.UserInputType.Gamepad1 then
-            else
-                tbl_9_upvr[1] = 0
-            end
-        end
-        tbl_3.onReleased = onReleased
-        arg2.Maid:GiveTask(ActionButtonService_upvr.add(tbl_3))
-        arg2.Maid:GiveTask(ActionButtonService_upvr.add({
-            primary = true;
-            priority = 700;
-            saturateTo = 0;
-            image = "rbxassetid://7858764373";
-            keyCodes = {Enum.KeyCode.S, Enum.KeyCode.ButtonL2};
-            onPressed = function(arg1_32) -- Line 777, Named "onPressed"
-                if arg1_32 == Enum.UserInputType.Gamepad1 then
-                else
-                    tbl_9_upvr[3] = 1
-                end
-            end;
-            onReleased = function(arg1_33) -- Line 783, Named "onReleased"
-                if arg1_33 == Enum.UserInputType.Gamepad1 then
-                else
-                    tbl_9_upvr[3] = 0
-                end
-            end;
-        }))
-        ActionButtonService_upvr.setButtonPrimary(DefaultActions_upvr.jumpButton, false)
-        arg2.Maid:GiveTask(function() -- Line 791
-            ActionButtonService_upvr.setButtonPrimary(DefaultActions_upvr.jumpButton, true)
-        end)
-        arg2.Maid:GiveTask(clone_upvw)
-        clone_upvw.Controls.Visible = true
-        clone_upvw.Controls.Throttle.Line.Position = UDim2.new(0, -2, 1 - arg1.CONST.THROTTLE_TAKEOFF, 1)
-        RunLanding_upvr()
-    end
+local function MountLocalPlayer(p1, p2) --[[ Line: 166 | Upvalues: CharacterAnim (copy), LocalPlayer (copy), SetHumanoidEnabled (copy), Spring (copy), ReplicatedStorage (copy), Audio (copy), VehicleUtils (copy), DoorConsts (copy), InputUtils (copy), v1 (ref), RunService (copy), CurrentCamera (copy), UserInputService (copy), v2 (copy), abs (copy), WheelWorld (copy), Wheel (copy), ActionButtonService (copy), DefaultActions (copy) ]]
+	local v12 = CharacterAnim.getCarSitTrack()
+	v12:Play()
+	p2.Maid:GiveTask(function() --[[ Line: 171 | Upvalues: v12 (copy) ]]
+		v12:Stop()
+	end)
+	local Character = LocalPlayer.Character
+	if Character then
+		local Humanoid = Character:FindFirstChild("Humanoid")
+		if Humanoid then
+			SetHumanoidEnabled(Humanoid, false)
+			Humanoid:ChangeState(Enum.HumanoidStateType.Seated)
+		end
+	end
+	if p2.Driver then
+		local v22 = Spring.new(Vector3.new(), Vector3.new(), 0.8, 30)
+		local v3 = Spring.new(Vector3.new(), Vector3.new(), 0.8, 20)
+		local v4 = Spring.new(0, 0, 0.6, 5)
+		local v5 = Spring.new(0, 0, 0.7, 5)
+		local v6 = Spring.new(0, 0, 0.95, 15)
+		p2.CameraSpring = v22
+		local v7 = ReplicatedStorage.Resource.Plane.PlaneGui:Clone()
+		v7.Parent = LocalPlayer.PlayerGui
+		p1.PlaneGui = v7
+		local v8 = Audio.ObjectLocal(v7, 3378049562, {
+			Looped = true,
+			Volume = 0,
+			Pitch = 1
+		})
+		p1.SoundRumble = v8
+		local v9 = Audio.ObjectLocal(v7, 3378078999, {
+			Looped = true,
+			Volume = 1.25
+		})
+		p1.SoundWind = v9
+		local v10 = Audio.ObjectLocal(v7, 9058670257, {
+			Looped = true,
+			Volume = 0
+		})
+		p1.SoundBreathing = v10
+		local v11 = 0
+		local v122 = 0
+		local t = { 0, 0, 0, 0 }
+		local v13 = tick()
+		local v14 = true
+		local v15 = 0
+		local v16 = 0
+		local v17 = Vector3.new()
+		local v18 = 0
+		local function updatePlaneHealth() --[[ Line: 223 | Upvalues: VehicleUtils (ref), p1 (copy), v122 (ref) ]]
+			if VehicleUtils.getTireHealth(p1.Model) <= 0 then
+				v122 = 0
+			end
+		end
+		if VehicleUtils.getTireHealth(p1.Model) <= 0 then
+			v122 = 0
+		end
+		p2.Maid:GiveTask(VehicleUtils.getTireHealthChangedSignal(p1.Model):Connect(updatePlaneHealth))
+		p1.IsFlying = false
+		local v19 = false
+		local v20 = nil
+		local function RunTakeoff() --[[ Line: 235 | Upvalues: p1 (copy), Audio (ref), v7 (ref), v4 (copy) ]]
+			p1.IsFlying = true
+			p1.Model:FindFirstChild("SetIsFlyingRemote"):FireServer(p1.IsFlying)
+			if p1.OnTakeoff then
+				p1.OnTakeoff()
+			end
+			Audio.ObjectLocal(v7, 3382610090)
+			for v1, v2 in next, p1.WheelsConf do
+				v2.Wheel:Clear()
+				v2.Motor.C0 = CFrame.new()
+			end
+			v4:SetTarget(1)
+			p1.WingAngularVelocity.MaxTorque = p1.CONST.ANGULAR_MAXTORQUE_FLYING
+			v7.Controls.Mouse.Visible = true
+			v7.Controls.Altitude.Visible = true
+			p1:SetParticlesEnabled(true)
+		end
+		local function RunLanding() --[[ Line: 254 | Upvalues: p1 (copy), Audio (ref), v7 (ref), v4 (copy) ]]
+			if p1.IsFlying then
+				Audio.ObjectLocal(v7, 3382610090)
+			end
+			p1.IsFlying = false
+			p1.Model:FindFirstChild("SetIsFlyingRemote"):FireServer(p1.IsFlying)
+			if p1.OnLanding then
+				p1.OnLanding()
+			end
+			v4:SetTarget(0)
+			p1.WingAngularVelocity.MaxTorque = p1.CONST.ANGULAR_MAXTORQUE_LANDING
+			v7.Controls.Mouse.Visible = false
+			v7.Controls.Altitude.Visible = false
+			p1:SetParticlesEnabled(false)
+		end
+		local function HeartbeatWing(p12) --[[ Line: 271 | Upvalues: p1 (copy), v6 (copy), v16 (ref), v15 (ref), v17 (ref) ]]
+			local PartWing = p1.PartWing
+			local v1 = PartWing.CFrame
+			local v2 = math.asin(v1.LookVector.Y)
+			if v2 ~= v2 then
+				v2 = 0
+			end
+			local v3 = math.asin(v1.RightVector.Y)
+			if v3 ~= v3 then
+				v3 = 0
+			end
+			p1.ObservedPitch = v2
+			p1.ObservedRoll = v3
+			local Velocity = PartWing.Velocity
+			local v5 = Velocity:Dot(Velocity)
+			p1.WingVectorForce.Force = if v5 > 0.001 then (p1.IsFlying and p1.CONST.COEFFICIENT_DRAG or 0.1) * 0.5 * v5 * p1.AreaWing * -Velocity.Unit + (p1.IsFlying and math.cos(v2) * 0.95 or 0.1) * p1.CONST.GRAVITY * p1.Mass * Vector3.new(0, 1, 0) else Vector3.new(0, 0, 0)
+			local v10 = v6:Update()
+			p1.WingAngularVelocity.AngularVelocity = Vector3.new(v16 * 3 * (1 + -0.9 * v10), if p1.IsFlying then p1.InputYaw * 0.5 else 0, v15 * 2.5 * (1 + 2 * v10))
+			p1.ObservedAcceleration = ((Velocity - v17) / p12).Magnitude
+			v17 = Velocity
+		end
+		local v21 = 0
+		local function HeartbeatThrust(p12) --[[ Line: 323 | Upvalues: p1 (copy), v122 (ref), v21 (ref) ]]
+			local v1 = p1.PartThrust.CFrame
+			local v2
+			local v3 = tick()
+			if v1.Y > p1.CONST.HEIGHT_MAX then
+				v2 = 0
+				v21 = v3
+			end
+			if v3 - v21 < 5 then
+				v2 = 0
+			end
+			p1.ThrustVectorForce.Force = v1.LookVector * p1.Mass * (v2 * p1.CONST.MAX_THRUST)
+		end
+		local function HeartbeatSounds(p12) --[[ Line: 341 | Upvalues: p1 (copy), v8 (copy), v4 (copy), v9 (copy), v18 (ref), v11 (ref), v10 (copy) ]]
+			local v1 = p1.ObservedAcceleration / p1.CONST.GRAVITY
+			if p1.IsFlying == false then
+				v1 = 0
+			end
+			local v3 = 1 - math.exp(-v1 * p1.CONST.SOUND_RUMBLE_COEFF_GS)
+			v8.Volume = v3 * 2
+			v9.Volume = (1.25 - v3 * 0.2) * (0.2 + 0.8 * v4:Update())
+			v18 = if p1.CONST.SOUND_BREATHING_MIN_GS < v1 then v18 + p12 else 0
+			if v18 > p1.CONST.SOUND_BREATHING_TIMER then
+				v11 = p1.CONST.SOUND_BREATHING_DURATION
+			end
+			v11 = v11 - p12
+			if v11 > 0 then
+				v10.Volume = (1 - math.exp(-v11)) * 0.4
+			end
+		end
+		local function HeartbeatWheels(p12) --[[ Line: 383 | Upvalues: p1 (copy), v5 (copy), v122 (ref), DoorConsts (ref) ]]
+			if p1.IsFlying == false then
+				local v1 = v5:Update()
+				for v3, v4 in next, p1.WheelsConf do
+					local v2
+					v2 = v4.Front and v122 < p1.CONST.THROTTLE_WHEEL_TURN_MIN and v1 * math.pi * 0.2 or 0
+					local v52, v6 = v4.Wheel:Update(p12, v2)
+					if v4.DoorModel and v4.DoorModel:GetAttribute(DoorConsts.OPEN_ATTR_NAME) == true then
+						v6 = 0
+						v52 = 0
+					end
+					v4.Motor.C0 = CFrame.Angles(-v6, -v2, 0) * CFrame.new(0, -v52, 0)
+					v4.MotorArm.C1 = CFrame.new(0, v52, 0) * CFrame.Angles(0, v2, 0) * v4.ArmOffset
+				end
+			end
+		end
+		local v222 = v122
+		local v23 = tick()
+		local function HeartbeatControls(p12) --[[ Line: 404 | Upvalues: t (copy), VehicleUtils (ref), p1 (copy), InputUtils (ref), v1 (ref), v15 (ref), v16 (ref), v5 (copy), v122 (ref), v23 (ref), v222 (ref), RunTakeoff (copy), RunLanding (copy), v13 (ref), v14 (ref) ]]
+			local v12 = tick()
+			local v2 = t[1] - t[3]
+			if VehicleUtils.getTireHealth(p1.Model) <= 0 then
+				v2 = 0
+			end
+			local v3
+			if InputUtils.isTouch() then
+				local v4 = v1:GetControls():GetMoveVector()
+				if v4.Magnitude > 1 then
+					v4 = v4.Unit
+				end
+				local v52 = -v4.X
+				v15 = v52
+				v16 = -v4.Z
+				v3 = v5:SetTarget(v52)
+			else
+				v3 = v5:Update()
+			end
+			if v2 > 0 then
+				v122 = v122 + p12 * 0.2
+				v23 = v12
+			elseif v2 < 0 then
+				v122 = v122 - p12 * 0.2
+				v23 = v12
+			end
+			if v12 - v23 > 1 and (not (v122 > p1.CONST.THROTTLE_TAKEOFF) and v122 > 0.15) then
+				v122 = v122 - p12 * 0.1
+			end
+			if v122 < -0.06666666666666667 then
+				v122 = -0.06666666666666667
+			end
+			if v122 > 1 then
+				v122 = 1
+			end
+			if v222 < p1.CONST.THROTTLE_TAKEOFF and v122 >= p1.CONST.THROTTLE_TAKEOFF then
+				RunTakeoff()
+			elseif v222 > p1.CONST.THROTTLE_TAKEOFF and v122 <= p1.CONST.THROTTLE_TAKEOFF then
+				RunLanding()
+			end
+			v222 = v122
+			local v9 = v12 - v13
+			if p1.CONST.ROLL_ADJUSTMENT_TIMER < v9 then
+				v15 = v15 + -p1.ObservedRoll * 0.1 * (1 - math.exp(-(v9 - p1.CONST.ROLL_ADJUSTMENT_TIMER)))
+			end
+			if v14 then
+				v15 = v15 * p1.CONST.JOYSTICK_RECENTER_MULTIPLIER
+				v16 = v16 * p1.CONST.JOYSTICK_RECENTER_MULTIPLIER
+			end
+			if v15 < -1 then
+				v15 = -1
+			end
+			if v15 > 1 then
+				v15 = 1
+			end
+			if v16 < -1 then
+				v16 = -1
+			end
+			if v16 > 1 then
+				v16 = 1
+			end
+			if v3 < -1 then
+				v3 = -1
+			end
+			if v3 > 1 then
+				v3 = 1
+			end
+			p1.Joystickx = v15
+			p1.Joysticky = v16
+			p1.InputYaw = v3
+			p1.Throttle = v122
+		end
+		local function HeartbeatUI(p12) --[[ Line: 509 | Upvalues: v15 (ref), v16 (ref), v7 (ref), p1 (copy), v122 (ref) ]]
+			local v1 = v15
+			local v2 = v16
+			local v3 = (v1 * v1 + v2 * v2) ^ 0.5
+			if v3 > 1 then
+				v1 = v1 / v3
+				v2 = v2 / v3
+			end
+			v7.Controls.Mouse.Dot.Position = UDim2.new(-(v1 * 0.9) * 0.5 + 0.5, 0, -(v2 * 0.9) * 0.5 + 0.5, 0)
+			v7.Controls.Altitude.Text = ("%04d"):format(p1.PartWing.Position.Y)
+			v7.Controls.Throttle.Value.Size = UDim2.new(1, 0, v122, 0)
+			v7.Controls.Throttle.Value.Position = UDim2.new(0, 0, 1 - v122, 0)
+		end
+		local function Heartbeat(p1) --[[ Line: 523 | Upvalues: HeartbeatControls (copy), HeartbeatWing (copy), HeartbeatThrust (copy), HeartbeatSounds (copy), HeartbeatWheels (copy), HeartbeatUI (copy) ]]
+			HeartbeatControls(p1)
+			HeartbeatWing(p1)
+			HeartbeatThrust(p1)
+			HeartbeatSounds(p1)
+			HeartbeatWheels(p1)
+			HeartbeatUI(p1)
+		end
+		p2.Maid:GiveTask(RunService.Heartbeat:Connect(Heartbeat))
+		local v24 = 70
+		local function RenderSteppedCamera(p12) --[[ Line: 534 | Upvalues: v4 (copy), p1 (copy), v19 (ref), v20 (ref), CurrentCamera (ref), UserInputService (ref), v15 (ref), v16 (ref), v22 (copy), v3 (copy), v2 (ref), v24 (ref) ]]
+			local v1 = v4:Update()
+			if p1.IsFlying then
+				if not v19 then
+					v19 = true
+					v20 = p1.PartWing.CFrame:toObjectSpace(CurrentCamera.CFrame)
+					CurrentCamera.CameraType = Enum.CameraType.Scriptable
+				end
+			elseif v19 and v1 < 0.001 then
+				v19 = false
+				CurrentCamera.CameraType = Enum.CameraType.Custom
+				CurrentCamera.CFrame = p1.PartWing.CFrame * v20
+			end
+			local v23 = not p1.IsFlying or not p1._controlsEnabled
+			UserInputService.MouseIconEnabled = v23
+			if v23 then
+				if UserInputService.MouseBehavior == Enum.MouseBehavior.LockCenter then
+					UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+				end
+			elseif UserInputService.MouseBehavior ~= Enum.MouseBehavior.LockCenter then
+				UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+			end
+			local v32
+			if v19 then
+				v32 = math.clamp((p1.PartWing.Velocity:Dot(p1.PartWing.CFrame.LookVector) - 50) / 300, 0, 1) * 20 + 70
+				local v7 = Vector3.new(v15 * -2, v16 * 2, 0)
+				local v8 = v22:SetTarget(v7)
+				local v9 = v3:SetTarget(v7)
+				local v10 = p1.PartWing.CFrame
+				local v11 = v20
+				local v12 = p1.CONST.CAMERA_OFFSET_CF * CFrame.new(v8) * CFrame.Angles(-v9.y * 0.02, v9.x * 0.02, 0)
+				if not p1.Model:GetAttribute("IsCameraLocked") then
+					CurrentCamera.CFrame = v10 * v11:Lerp(v12, v1)
+				end
+				local v13 = p1.ObservedAcceleration / p1.CONST.GRAVITY
+				if p1.CONST.CAMERA_SHAKE_MIN_GS < v13 then
+					local v162 = (1 - math.exp(-(v13 - p1.CONST.CAMERA_SHAKE_MIN_GS) * p1.CONST.CAMERA_SHAKE_COEFF_GS)) * 15
+					v22:Accelerate((Vector3.new(v162 * (v2:NextNumber() * 2 - 1), v162 * (v2:NextNumber() * 2 - 1), v162 * (v2:NextNumber() * 2 - 1))))
+				end
+			else
+				v32 = 70
+			end
+			v24 = v24 + (v32 - v24) * 0.7
+			CurrentCamera.FieldOfView = v24
+		end
+		local function RenderStepped(p1) --[[ Line: 593 | Upvalues: RenderSteppedCamera (copy) ]]
+			RenderSteppedCamera(p1)
+		end
+		p2.Maid:GiveTask(RunService.RenderStepped:Connect(RenderStepped))
+		local t2 = {
+			[Enum.KeyCode.A] = 2,
+			[Enum.KeyCode.D] = 4,
+			[Enum.KeyCode.ButtonR2] = 1,
+			[Enum.KeyCode.ButtonL2] = 3
+		}
+		local function InputBegan(p12, p2) --[[ Line: 608 | Upvalues: v6 (copy), p1 (copy), t2 (copy), t (copy), v5 (copy) ]]
+			if p2 then
+				return false
+			end
+			if p12.UserInputType == Enum.UserInputType.Keyboard then
+				if p12.KeyCode == Enum.KeyCode.Q then
+					v6:SetTarget(1)
+				elseif p12.KeyCode == Enum.KeyCode.LeftShift then
+					for v1, v2 in next, p1.WheelsConf do
+						if not v2.Front then
+							v2.Wheel:SetForwardFriction(3)
+						end
+					end
+				end
+			end
+			if t2[p12.KeyCode] then
+				t[t2[p12.KeyCode]] = 1
+				v5:SetTarget(t[2] - t[4])
+			end
+		end
+		p2.Maid:GiveTask(UserInputService.InputBegan:Connect(InputBegan))
+		local function InputEnded(p12, p2) --[[ Line: 633 | Upvalues: v6 (copy), p1 (copy), t2 (copy), t (copy), v5 (copy) ]]
+			if p2 then
+				return false
+			end
+			if p12.UserInputType == Enum.UserInputType.Keyboard then
+				if p12.KeyCode == Enum.KeyCode.Q then
+					v6:SetTarget(0)
+				elseif p12.KeyCode == Enum.KeyCode.LeftShift then
+					for v1, v2 in next, p1.WheelsConf do
+						v2.Wheel:SetForwardFriction(0.02)
+					end
+				end
+			end
+			if t2[p12.KeyCode] then
+				t[t2[p12.KeyCode]] = 0
+				v5:SetTarget(t[2] - t[4])
+			end
+		end
+		p2.Maid:GiveTask(UserInputService.InputEnded:Connect(InputEnded))
+		local v25 = Spring.new(Vector3.new(), Vector3.new(), 0.8, 20)
+		local function InputChanged(p1) --[[ Line: 659 | Upvalues: v15 (ref), v16 (ref), v13 (ref), v14 (ref), v25 (copy), abs (ref), p2 (copy), RunService (ref), v5 (copy), t (copy), t2 (copy) ]]
+			if p1.UserInputType == Enum.UserInputType.MouseMovement then
+				v15 = v15 - p1.Delta.X * 0.015
+				v16 = v16 - p1.Delta.Y * 0.015
+				v13 = tick()
+				v14 = true
+			elseif p1.UserInputType == Enum.UserInputType.Gamepad1 then
+				local KeyCode = p1.KeyCode
+				if KeyCode == Enum.KeyCode.Thumbstick1 then
+					local function isJoyStickActive() --[[ Line: 669 | Upvalues: p1 (copy), v25 (ref), abs (ref) ]]
+						local v1 = v25:SetTarget(p1.Position)
+						local X = v1.X
+						local Y = v1.Y
+						return abs(X) > 0.24 or abs(Y) > 0.24, X, Y
+					end
+					local v1 = v25:SetTarget(p1.Position)
+					if if abs(v1.X) > 0.24 then true else abs(v1.Y) > 0.24 and not p2.Maid.joystickActiveThread then
+						local function update() --[[ Line: 677 | Upvalues: p1 (copy), v25 (ref), abs (ref), p2 (ref), v13 (ref), v14 (ref), v15 (ref), v16 (ref) ]]
+							local v1 = v25:SetTarget(p1.Position)
+							local X = v1.X
+							local Y = v1.Y
+							local v2 = abs(X) > 0.24 or abs(Y) > 0.24
+							if not v2 then
+								p2.Maid.joystickActiveThread = nil
+							end
+							v13 = tick()
+							v14 = not v2
+							local v3, v4
+							if abs(X) > 0.24 then
+								v3 = -X * abs(X)
+								v4 = Y
+							else
+								v3 = 0
+								v4 = Y
+							end
+							v15 = v3
+							v16 = if abs(v4) > 0.24 then v4 * abs(v4) else 0
+						end
+						update()
+						p2.Maid.joystickActiveThread = RunService.Heartbeat:Connect(update)
+					end
+				elseif KeyCode == Enum.KeyCode.Thumbstick2 then
+					local function isJoyStick2Active() --[[ Line: 693 | Upvalues: p1 (copy), abs (ref) ]]
+						local X = p1.Position.X
+						return abs(X) > 0.24, X
+					end
+					if abs(p1.Position.X) > 0.24 and not p2.Maid.joystickActiveThread then
+						local function update() --[[ Line: 699 | Upvalues: p1 (copy), abs (ref), p2 (ref), v5 (ref) ]]
+							local X = p1.Position.X
+							if not (abs(X) > 0.24) then
+								p2.Maid.joystick2ActiveThread = nil
+							end
+							v5:SetTarget(if abs(X) > 0.24 then -X * abs(X) else 0)
+						end
+						local X = p1.Position.X
+						if not (abs(X) > 0.24) then
+							p2.Maid.joystick2ActiveThread = nil
+						end
+						v5:SetTarget(if abs(X) > 0.24 then -X * abs(X) else 0)
+						p2.Maid.joystick2ActiveThread = RunService.Heartbeat:Connect(update)
+					end
+				elseif KeyCode == Enum.KeyCode.ButtonR2 or KeyCode == Enum.KeyCode.ButtonL2 then
+					local Z = p1.Position.Z
+					t[t2[KeyCode]] = Z > 0.05 and Z ^ 0.5 or 0
+				end
+			end
+		end
+		p2.Maid:GiveTask(UserInputService.InputChanged:Connect(InputChanged))
+		local v26 = WheelWorld.new()
+		v26:SetModel(p1.Model)
+		for v28, v29 in next, p1.WheelsConf do
+			local v27
+			v27 = v29.PartNode.CFrame:toObjectSpace(p1.PartBoundingBox.CFrame).Z > 0
+			local v30 = Wheel.new(v29.PartNode)
+			v30:SetSpringConstants(2, 3)
+			if v27 then
+				v30:SetVisualRadius(p1.CONST.WHEEL_VISUAL_RADIUS_FRONT)
+				v30:SetSuspensionHeight(p1.CONST.SUSPENSION_HEIGHT_FRONT)
+			else
+				v30:SetVisualRadius(p1.CONST.WHEEL_VISUAL_RADIUS_BACK)
+				v30:SetSuspensionHeight(p1.CONST.SUSPENSION_HEIGHT_BACK)
+			end
+			v29.Front = v27
+			v29.Wheel = v30
+			v26:AddWheel(v30)
+		end
+		p2.Maid:GiveTask(v26)
+		local function ThrottleUpPress() --[[ Line: 740 | Upvalues: t (copy) ]]
+			t[1] = 1
+		end
+		local function ThrottleUpRelease() --[[ Line: 743 | Upvalues: t (copy) ]]
+			t[1] = 0
+		end
+		local function ThrottleDownPress() --[[ Line: 746 | Upvalues: t (copy) ]]
+			t[3] = 1
+		end
+		local function ThrottleDownRelease() --[[ Line: 749 | Upvalues: t (copy) ]]
+			t[3] = 0
+		end
+		p2.Maid:GiveTask(ActionButtonService.add({
+			primary = true,
+			priority = 1000,
+			saturateTo = 0,
+			image = "rbxassetid://7858765663",
+			keyCodes = { Enum.KeyCode.W, Enum.KeyCode.ButtonR2 },
+			onPressed = function(p1) --[[ Name: onPressed | Line: 758 | Upvalues: t (copy) ]]
+				if p1 ~= Enum.UserInputType.Gamepad1 then
+					t[1] = 1
+				end
+			end,
+			onReleased = function(p1) --[[ Name: onReleased | Line: 764 | Upvalues: t (copy) ]]
+				if p1 ~= Enum.UserInputType.Gamepad1 then
+					t[1] = 0
+				end
+			end
+		}))
+		p2.Maid:GiveTask(ActionButtonService.add({
+			primary = true,
+			priority = 700,
+			saturateTo = 0,
+			image = "rbxassetid://7858764373",
+			keyCodes = { Enum.KeyCode.S, Enum.KeyCode.ButtonL2 },
+			onPressed = function(p1) --[[ Name: onPressed | Line: 777 | Upvalues: t (copy) ]]
+				if p1 ~= Enum.UserInputType.Gamepad1 then
+					t[3] = 1
+				end
+			end,
+			onReleased = function(p1) --[[ Name: onReleased | Line: 783 | Upvalues: t (copy) ]]
+				if p1 ~= Enum.UserInputType.Gamepad1 then
+					t[3] = 0
+				end
+			end
+		}))
+		ActionButtonService.setButtonPrimary(DefaultActions.jumpButton, false)
+		p2.Maid:GiveTask(function() --[[ Line: 791 | Upvalues: ActionButtonService (ref), DefaultActions (ref) ]]
+			ActionButtonService.setButtonPrimary(DefaultActions.jumpButton, true)
+		end)
+		p2.Maid:GiveTask(v7)
+		v7.Controls.Visible = true
+		v7.Controls.Throttle.Line.Position = UDim2.new(0, -2, 1 - p1.CONST.THROTTLE_TAKEOFF, 1)
+		RunLanding()
+	end
 end
-local WheelLQ_upvr = require(ReplicatedStorage_upvr.Module.Wheel.WheelLQ)
-local function MountThirdPlayer_upvr(arg1, arg2, arg3) -- Line 802, Named "MountThirdPlayer"
-    if not arg3.Driver then
-    else
-        local function HeartbeatWheels_upvr(arg1_34) -- Line 806, Named "HeartbeatWheels"
-            for _, v_6 in next, arg1.WheelsConf do
-                local any_Update_result1_2, any_Update_result2 = v_6.Wheel:Update(arg1_34)
-                v_6.Motor.C0 = CFrame.Angles(-any_Update_result2, -0, 0) * CFrame.new(0, -any_Update_result1_2, 0)
-                v_6.MotorArm.C1 = CFrame.new(0, any_Update_result1_2, 0) * CFrame.Angles(0, 0, 0) * v_6.ArmOffset
-            end
-        end
-        arg3.Maid:GiveTask(RunService_upvr.Heartbeat:Connect(function(arg1_35) -- Line 816, Named "Heartbeat"
-            HeartbeatWheels_upvr(arg1_35)
-        end))
-        local any_new_result1 = WheelWorld_upvr.new()
-        any_new_result1:SetModel(arg1.Model)
-        for _, v_7 in next, arg1.WheelsConf do
-            local var215
-            if 0 >= v_7.PartNode.CFrame:toObjectSpace(arg1.PartWing.CFrame).Z then
-                var215 = false
-            else
-                var215 = true
-            end
-            local any_new_result1_8 = WheelLQ_upvr.new(v_7.PartNode)
-            if var215 then
-                any_new_result1_8:SetVisualRadius(arg1.CONST.WHEEL_VISUAL_RADIUS_FRONT)
-                any_new_result1_8:SetSuspensionHeight(arg1.CONST.SUSPENSION_HEIGHT_FRONT)
-            else
-                any_new_result1_8:SetVisualRadius(arg1.CONST.WHEEL_VISUAL_RADIUS_BACK)
-                any_new_result1_8:SetSuspensionHeight(arg1.CONST.SUSPENSION_HEIGHT_BACK)
-            end
-            v_7.Front = var215
-            v_7.Wheel = any_new_result1_8
-            any_new_result1:AddWheel(any_new_result1_8)
-        end
-        arg3.Maid:GiveTask(any_new_result1)
-    end
+local function MountThirdPlayer(p1, p2, p3) --[[ Line: 802 | Upvalues: RunService (copy), WheelWorld (copy), WheelLQ (copy) ]]
+	if p3.Driver then
+		local function HeartbeatWheels(p12) --[[ Line: 806 | Upvalues: p1 (copy) ]]
+			for v1, v2 in next, p1.WheelsConf do
+				local v3, v4 = v2.Wheel:Update(p12)
+				v2.Motor.C0 = CFrame.Angles(-v4, -0, 0) * CFrame.new(0, -v3, 0)
+				v2.MotorArm.C1 = CFrame.new(0, v3, 0) * CFrame.Angles(0, 0, 0) * v2.ArmOffset
+			end
+		end
+		local function Heartbeat(p1) --[[ Line: 816 | Upvalues: HeartbeatWheels (copy) ]]
+			HeartbeatWheels(p1)
+		end
+		p3.Maid:GiveTask(RunService.Heartbeat:Connect(Heartbeat))
+		local v1 = WheelWorld.new()
+		v1:SetModel(p1.Model)
+		for v3, v4 in next, p1.WheelsConf do
+			local v2
+			v2 = v4.PartNode.CFrame:toObjectSpace(p1.PartWing.CFrame).Z > 0
+			local v5 = WheelLQ.new(v4.PartNode)
+			if v2 then
+				v5:SetVisualRadius(p1.CONST.WHEEL_VISUAL_RADIUS_FRONT)
+				v5:SetSuspensionHeight(p1.CONST.SUSPENSION_HEIGHT_FRONT)
+			else
+				v5:SetVisualRadius(p1.CONST.WHEEL_VISUAL_RADIUS_BACK)
+				v5:SetSuspensionHeight(p1.CONST.SUSPENSION_HEIGHT_BACK)
+			end
+			v4.Front = v2
+			v4.Wheel = v5
+			v1:AddWheel(v5)
+		end
+		p3.Maid:GiveTask(v1)
+	end
 end
-function module_upvr.MountPlayer(arg1, arg2, arg3) -- Line 840
-    if arg2 == LocalPlayer_upvr then
-        MountLocalPlayer_upvr(arg1, arg3)
-    else
-        MountThirdPlayer_upvr(arg1, arg2, arg3)
-    end
-    return true
+function t.MountPlayer(p1, p2, p3) --[[ Line: 840 | Upvalues: LocalPlayer (copy), MountLocalPlayer (copy), MountThirdPlayer (copy) ]]
+	if p2 == LocalPlayer then
+		MountLocalPlayer(p1, p3)
+	else
+		MountThirdPlayer(p1, p2, p3)
+	end
+	return true
 end
-local function UnmountLocalPlayer_upvr(arg1, arg2) -- Line 848, Named "UnmountLocalPlayer"
-    local Character = LocalPlayer_upvr.Character
-    if Character then
-        local Humanoid = Character:FindFirstChild("Humanoid")
-        if Humanoid then
-            SetHumanoidEnabled_upvr(Humanoid, true)
-            Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-        end
-    end
-    if not arg2.Driver then
-    else
-        arg1.ThrustVectorForce.Force = Vector3.new()
-        arg1.WingVectorForce.Force = Vector3.new()
-        arg1.WingAngularVelocity.AngularVelocity = Vector3.new()
-        arg1.WingAngularVelocity.MaxTorque = 0
-        arg1.SoundRumble:Destroy()
-        arg1.SoundRumble = nil
-        arg1.SoundWind:Destroy()
-        arg1.SoundWind = nil
-        arg1.SoundBreathing:Destroy()
-        arg1.SoundBreathing = nil
-        UserInputService_upvr.MouseIconEnabled = true
-        UserInputService_upvr.MouseBehavior = Enum.MouseBehavior.Default
-        arg1:SetParticlesEnabled(false)
-        CurrentCamera_upvr.CameraType = Enum.CameraType.Custom
-        CurrentCamera_upvr.FieldOfView = 70
-    end
+local function UnmountLocalPlayer(p1, p2) --[[ Line: 848 | Upvalues: LocalPlayer (copy), SetHumanoidEnabled (copy), UserInputService (copy), CurrentCamera (copy) ]]
+	local Character = LocalPlayer.Character
+	if Character then
+		local Humanoid = Character:FindFirstChild("Humanoid")
+		if Humanoid then
+			SetHumanoidEnabled(Humanoid, true)
+			Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+		end
+	end
+	if p2.Driver then
+		p1.ThrustVectorForce.Force = Vector3.new()
+		p1.WingVectorForce.Force = Vector3.new()
+		p1.WingAngularVelocity.AngularVelocity = Vector3.new()
+		p1.WingAngularVelocity.MaxTorque = 0
+		p1.SoundRumble:Destroy()
+		p1.SoundRumble = nil
+		p1.SoundWind:Destroy()
+		p1.SoundWind = nil
+		p1.SoundBreathing:Destroy()
+		p1.SoundBreathing = nil
+		UserInputService.MouseIconEnabled = true
+		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+		p1:SetParticlesEnabled(false)
+		CurrentCamera.CameraType = Enum.CameraType.Custom
+		CurrentCamera.FieldOfView = 70
+	end
 end
-local function _(arg1, arg2, arg3) -- Line 882, Named "UmmountThirdPlayer"
+local function UmmountThirdPlayer(p1, p2, p3) --[[ Line: 882 ]] end
+function t.UnmountSeat(p1, p2) --[[ Line: 883 | Upvalues: LocalPlayer (copy), UnmountLocalPlayer (copy) ]]
+	assert(p2)
+	assert(p2.Occupied)
+	if p2.Player ~= nil then
+		if p2.Player == LocalPlayer then
+			UnmountLocalPlayer(p1, p2)
+			return
+		end
+		local Player = p2.Player
+	end
 end
-function module_upvr.UnmountSeat(arg1, arg2) -- Line 883
-    assert(arg2)
-    assert(arg2.Occupied)
-    if arg2.Player ~= nil then
-        if arg2.Player == LocalPlayer_upvr then
-            UnmountLocalPlayer_upvr(arg1, arg2)
-            return
-        end
-    end
+function t.SetControlsEnabled(p1, p2) --[[ Line: 894 ]]
+	p1._controlsEnabled = p2
 end
-function module_upvr.SetControlsEnabled(arg1, arg2) -- Line 894
-    arg1._controlsEnabled = arg2
+function t.Destroy(p1) --[[ Line: 897 ]]
+	if p1.Maid then
+		p1.Maid:Destroy()
+		p1.Maid = nil
+	end
 end
-function module_upvr.Destroy(arg1) -- Line 897
-    if arg1.Maid then
-        arg1.Maid:Destroy()
-        arg1.Maid = nil
-    end
-end
-return module_upvr
+return t

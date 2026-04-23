@@ -1,39 +1,34 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
-local v0 = require(script.GlobalConfig);
-local v1 = require(script.createReconciler);
-local v2 = require(script.createReconcilerCompat);
-local v3 = require(script.RobloxRenderer);
-local v4 = require(script.strict);
-local v5 = require(script.Binding);
-local v6 = v1(v3);
-local v7 = v2(v6);
-return (v4({
-    Component = require(script.Component), 
-    createElement = require(script.createElement), 
-    createFragment = require(script.createFragment), 
-    oneChild = require(script.oneChild), 
-    PureComponent = require(script.PureComponent), 
-    None = require(script.None), 
-    Portal = require(script.Portal), 
-    createRef = require(script.createRef), 
-    forwardRef = require(script.forwardRef), 
-    createBinding = v5.create, 
-    joinBindings = v5.join, 
-    createContext = require(script.createContext), 
-    Change = require(script.PropMarkers.Change), 
-    Children = require(script.PropMarkers.Children), 
-    Event = require(script.PropMarkers.Event), 
-    Ref = require(script.PropMarkers.Ref), 
-    mount = v6.mountVirtualTree, 
-    unmount = v6.unmountVirtualTree, 
-    update = v6.updateVirtualTree, 
-    reify = v7.reify, 
-    teardown = v7.teardown, 
-    reconcile = v7.reconcile, 
-    setGlobalConfig = v0.set, 
-    UNSTABLE = {}
-}));
+local GlobalConfig = require(script.GlobalConfig)
+local createReconciler = require(script.createReconciler)
+local createReconcilerCompat = require(script.createReconcilerCompat)
+local RobloxRenderer = require(script.RobloxRenderer)
+local strict = require(script.strict)
+local Binding = require(script.Binding)
+local v1 = createReconciler(RobloxRenderer)
+local v2 = createReconcilerCompat(v1)
+return strict({
+	Component = require(script.Component),
+	createElement = require(script.createElement),
+	createFragment = require(script.createFragment),
+	oneChild = require(script.oneChild),
+	PureComponent = require(script.PureComponent),
+	None = require(script.None),
+	Portal = require(script.Portal),
+	createRef = require(script.createRef),
+	forwardRef = require(script.forwardRef),
+	createBinding = Binding.create,
+	joinBindings = Binding.join,
+	createContext = require(script.createContext),
+	Change = require(script.PropMarkers.Change),
+	Children = require(script.PropMarkers.Children),
+	Event = require(script.PropMarkers.Event),
+	Ref = require(script.PropMarkers.Ref),
+	mount = v1.mountVirtualTree,
+	unmount = v1.unmountVirtualTree,
+	update = v1.updateVirtualTree,
+	reify = v2.reify,
+	teardown = v2.teardown,
+	reconcile = v2.reconcile,
+	setGlobalConfig = GlobalConfig.set,
+	UNSTABLE = {}
+})

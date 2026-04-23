@@ -1,25 +1,25 @@
-local Roact_upvr = require(script:FindFirstAncestor("EzUi").Parent.Roact)
-local any_extend_result1 = Roact_upvr.Component:extend("TextBox")
-any_extend_result1.defaultProps = {
-    backgroundColor = Color3.new(1, 1, 1);
-    textColor = Color3.new(0, 0, 0);
-    borderSize = 0;
-    borderColor = Color3.new(0, 0, 0);
-    backgroundTransparency = 0;
+local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
+local createElement = Roact.createElement
+local v2 = Roact.Component:extend("TextBox")
+v2.defaultProps = {
+	backgroundColor = Color3.new(255/255, 255/255, 255/255),
+	textColor = Color3.new(0/255, 0/255, 0/255),
+	borderSize = 0,
+	borderColor = Color3.new(0/255, 0/255, 0/255),
+	backgroundTransparency = 0
 }
-local createElement_upvr = Roact_upvr.createElement
-function any_extend_result1.render(arg1) -- Line 16
-    return createElement_upvr("TextBox", {
-        BorderSizePixel = arg1.props.borderSize;
-        BorderColor3 = arg1.props.borderColor;
-        BackgroundTransparency = arg1.props.backgroundTransparency;
-        BackgroundColor3 = arg1.props.backgroundColor;
-        Text = arg1.props.text;
-        TextColor3 = arg1.props.textColor;
-        Size = arg1.props.size;
-        Position = arg1.props.position;
-        LayoutOrder = arg1.props.layoutOrder;
-        [Roact_upvr.Event.FocusLost] = arg1.props.onFocusLost;
-    })
+function v2.render(p1) --[[ Line: 16 | Upvalues: createElement (copy), Roact (copy) ]]
+	return createElement("TextBox", {
+		BorderSizePixel = p1.props.borderSize,
+		BorderColor3 = p1.props.borderColor,
+		BackgroundTransparency = p1.props.backgroundTransparency,
+		BackgroundColor3 = p1.props.backgroundColor,
+		Text = p1.props.text,
+		TextColor3 = p1.props.textColor,
+		Size = p1.props.size,
+		Position = p1.props.position,
+		LayoutOrder = p1.props.layoutOrder,
+		[Roact.Event.FocusLost] = p1.props.onFocusLost
+	})
 end
-return any_extend_result1
+return v2

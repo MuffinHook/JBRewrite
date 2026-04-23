@@ -1,34 +1,7 @@
 {
   "className": "ParticleEmitter",
   "properties": {
-    "Texture": "http://www.roblox.com/asset/?id=13009548575",
-    "Size": {
-      "NumberSequence": {
-        "keypoints": [
-          {
-            "time": 0.0,
-            "value": 0.56,
-            "envelope": 0.0
-          },
-          {
-            "time": 0.900937,
-            "value": 0.4,
-            "envelope": 0.0
-          },
-          {
-            "time": 1.0,
-            "value": 0.0,
-            "envelope": 0.0
-          }
-        ]
-      }
-    },
-    "Speed": {
-      "NumberRange": [
-        0.0,
-        0.0
-      ]
-    },
+    "Rate": 15.0,
     "Transparency": {
       "NumberSequence": {
         "keypoints": [
@@ -61,6 +34,47 @@
       }
     },
     "Brightness": 2.0,
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "LightEmission": 0.5,
+    "EmissionDirection": "Right",
+    "TimeScale": 0.5,
+    "Drag": 2.0,
+    "Rotation": {
+      "NumberRange": [
+        5.0,
+        25.0
+      ]
+    },
+    "Size": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.56,
+            "envelope": 0.0
+          },
+          {
+            "time": 0.900937,
+            "value": 0.4,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 0.0,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "Texture": "http://www.roblox.com/asset/?id=13009548575",
+    "Lifetime": {
+      "NumberRange": [
+        1.5,
+        2.5
+      ]
+    },
     "Color": {
       "ColorSequence": {
         "keypoints": [
@@ -83,29 +97,7 @@
         ]
       }
     },
-    "Drag": 2.0,
-    "TimeScale": 0.5,
-    "EmissionDirection": "Right",
-    "FlipbookFramerate": {
-      "NumberRange": [
-        32.0,
-        32.0
-      ]
-    },
     "FlipbookMode": "OneShot",
-    "Lifetime": {
-      "NumberRange": [
-        1.5,
-        2.5
-      ]
-    },
-    "Acceleration": [
-      0.0,
-      8.0,
-      0.0
-    ],
-    "LightEmission": 0.5,
-    "Rate": 15.0,
     "RotSpeed": {
       "NumberRange": [
         25.0,
@@ -116,15 +108,23 @@
       -4.0,
       4.0
     ],
-    "Rotation": {
+    "FlipbookFramerate": {
       "NumberRange": [
-        5.0,
-        25.0
+        32.0,
+        32.0
       ]
     },
-    "FlipbookBlendFrames": {
-      "Bool": false
-    }
+    "Speed": {
+      "NumberRange": [
+        0.0,
+        0.0
+      ]
+    },
+    "Acceleration": [
+      0.0,
+      8.0,
+      0.0
+    ]
   },
   "attributes": {
     "EmitCount": 1.0,

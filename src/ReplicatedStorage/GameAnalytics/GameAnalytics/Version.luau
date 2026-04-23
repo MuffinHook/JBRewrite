@@ -1,3 +1,3 @@
 return {
-    SdkVersion = "2.2.3";
+	SdkVersion = "2.2.3"
 }

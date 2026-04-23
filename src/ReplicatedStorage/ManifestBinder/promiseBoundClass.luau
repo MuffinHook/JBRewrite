@@ -1,29 +1,30 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-return function(arg1, arg2) -- Line 6
-    local any_Get_result1_2 = arg1:Get(arg2)
-    if any_Get_result1_2 then
-        return Promise_upvr.resolve(any_Get_result1_2)
-    end
-    local any_new_result1_upvr = Maid_upvr.new()
-    local any_defer_result1_upvr = Promise_upvr.defer(function(arg1_2) -- Line 12
-        local any_Get_result1 = arg1:Get(arg2)
-        if any_Get_result1 then
-            arg1_2(any_Get_result1)
-        else
-            any_new_result1_upvr:GiveTask(arg1:ObserveInstance(arg2, function(arg1_3) -- Line 17
-                arg1_2(arg1_3)
-            end))
-        end
-    end)
-    any_defer_result1_upvr:finally(function() -- Line 22
-        any_new_result1_upvr:Destroy()
-    end)
-    task.delay(5, function() -- Line 25
-        if any_defer_result1_upvr:getStatus() == Promise_upvr.Status.Started then
-            warn(string.format(("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n"), arg2:GetFullName(), arg1:GetTag()))
-        end
-    end)
-    return any_defer_result1_upvr
+local Promise = require(ReplicatedStorage.Std.Promise)
+local Maid = require(ReplicatedStorage.Std.Maid)
+return function(p1, p2) --[[ Line: 6 | Upvalues: Promise (copy), Maid (copy) ]]
+	local v1 = p1:Get(p2)
+	if v1 then
+		return Promise.resolve(v1)
+	else
+		local v2 = Maid.new()
+		local v3 = Promise.defer(function(p12) --[[ Line: 12 | Upvalues: p1 (copy), p2 (copy), v2 (copy) ]]
+			local v1 = p1:Get(p2)
+			if v1 then
+				p12(v1)
+			else
+				v2:GiveTask(p1:ObserveInstance(p2, function(p1) --[[ Line: 17 | Upvalues: p12 (copy) ]]
+					p12(p1)
+				end))
+			end
+		end)
+		v3:finally(function() --[[ Line: 22 | Upvalues: v2 (copy) ]]
+			v2:Destroy()
+		end)
+		task.delay(5, function() --[[ Line: 25 | Upvalues: v3 (copy), Promise (ref), p2 (copy), p1 (copy) ]]
+			if v3:getStatus() == Promise.Status.Started then
+				warn(("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n"):format(p2:GetFullName(), p1:GetTag()))
+			end
+		end)
+		return v3
+	end
 end

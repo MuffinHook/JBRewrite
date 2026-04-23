@@ -1,6 +1,6 @@
-local module = {}
-local ProximityCamShakeBinder_upvr = require(script.Parent.ProximityCamShakeBinder)
-function module.init() -- Line 4
-    ProximityCamShakeBinder_upvr:Start()
-end
-return module
+local ProximityCamShakeBinder = require(script.Parent.ProximityCamShakeBinder)
+return {
+	init = function() --[[ Name: init | Line: 4 | Upvalues: ProximityCamShakeBinder (copy) ]]
+		ProximityCamShakeBinder:Start()
+	end
+}

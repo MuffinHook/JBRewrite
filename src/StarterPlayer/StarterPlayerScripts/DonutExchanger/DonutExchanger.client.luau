@@ -1,1 +1,2 @@
-require(game:GetService("ReplicatedStorage").DonutExchanger.DonutExchangerBinder):Start()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.DonutExchanger.DonutExchangerBinder):Start()

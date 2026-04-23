@@ -1,24 +1,23 @@
-local Roact_upvr = require(game:GetService("ReplicatedStorage").Roact)
-return function(arg1) -- Line 4
-    local any_extend_result1 = Roact_upvr.Component:extend("App")
-    function any_extend_result1.init(arg1_2) -- Line 7
-    end
-    local ReportCrew_upvr = require(script.Parent.ReportCrew)
-    function any_extend_result1.render(arg1_3) -- Line 8
-        return Roact_upvr.createElement(ReportCrew_upvr, {
-            onSubmit = function(arg1_4, arg2) -- Line 10, Named "onSubmit"
-                print(arg1_4)
-                print(arg2)
-            end;
-            onClose = function() -- Line 14, Named "onClose"
-                print("wants to close")
-            end;
-        })
-    end
-    function any_extend_result1.willUnmount(arg1_5) -- Line 19
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(any_extend_result1), arg1)
-    return function() -- Line 22
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+return function(p1) --[[ Line: 4 | Upvalues: Roact (copy) ]]
+	local v1 = Roact.Component:extend("App")
+	local ReportCrew = require(script.Parent.ReportCrew)
+	function v1.init(p1) --[[ Line: 7 ]] end
+	function v1.render(p1) --[[ Line: 8 | Upvalues: Roact (ref), ReportCrew (copy) ]]
+		return Roact.createElement(ReportCrew, {
+			onSubmit = function(p1, p2) --[[ Name: onSubmit | Line: 10 ]]
+				print(p1)
+				print(p2)
+			end,
+			onClose = function() --[[ Name: onClose | Line: 14 ]]
+				print("wants to close")
+			end
+		})
+	end
+	function v1.willUnmount(p1) --[[ Line: 19 ]] end
+	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	return function() --[[ Line: 22 | Upvalues: Roact (ref), v2 (copy) ]]
+		Roact.unmount(v2)
+	end
 end

@@ -1,65 +1,59 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local module = {}
-local Binder_upvr = require(ReplicatedStorage_upvr.Std.Binder)
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local GameModeConsts_upvr = require(ReplicatedStorage_upvr.GameMode.GameModeConsts)
-local Players_upvr = game:GetService("Players")
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local Confirmation_upvr = require(ReplicatedStorage_upvr.Module.Confirmation)
-function module.init(arg1) -- Line 10
-    local em_upvr = arg1.em
-    Binder_upvr.new("GameMode", function(arg1_2) -- Line 13
-        local any_new_result1 = Maid_upvr.new()
-        local Name = arg1_2.Name
-        local var13 = Name
-        local SOME_2 = script.Parent.Mode:FindFirstChild(var13)
-        if SOME_2 == nil then
-            var13 = false
-        else
-            var13 = true
-        end
-        assert(var13, "No Client ModuleScript found for game mode "..Name)
-        require(SOME_2).launch(any_new_result1, arg1_2)
-        return any_new_result1
-    end):Start()
-    local SOME = ReplicatedStorage_upvr:FindFirstChild(GameModeConsts_upvr.GAME_MODE_WINNER_REMOTE_NAME)
-    if SOME then
-        SOME.OnClientEvent:Connect(function(arg1_3, arg2) -- Line 27
-            if arg1_3 == "BattleRoyale" or arg1_3 == "TankRoyale" then
-                local clone = ReplicatedStorage_upvr.GameMode.Res:FindFirstChild("BRGui"):Clone()
-                clone.Parent = Players_upvr.LocalPlayer.PlayerGui
-                clone.Enabled = true
-                clone.Winner.Player.Text = string.upper(arg2 or "Player")
-                if arg1_3 == "BattleRoyale" then
-                    clone.Winner.Title.Text = "JAILBREAK: BATTLE ROYALE"
-                elseif arg1_3 == "TankRoyale" then
-                    clone.Winner.Title.Text = "JAILBREAK: TANK ROYALE"
-                    clone.Winner.ImageLabel.ImageColor3 = Color3.fromRGB(78, 189, 72)
-                    clone.Winner.Player.TextColor3 = Color3.fromRGB(0, 255, 51)
-                    clone.Winner.Title.TextColor3 = Color3.fromRGB(0, 255, 51)
-                end
-                clone.Winner.Visible = true
-                Audio_upvr.ObjectLocal(Players_upvr.LocalPlayer.PlayerGui, 2820822548)
-                em_upvr.at2y4lws(5)
-                task.wait(6)
-                clone:Destroy()
-            end
-        end)
-    end
-    function em_upvr.bmgqmlak(arg1_4, arg2, arg3) -- Line 55
-        local any_new_result1_2_upvr = Confirmation_upvr.new(arg1_4)
-        any_new_result1_2_upvr.Maid:GiveTask(any_new_result1_2_upvr.OnYes:Connect(function() -- Line 57
-            print("YES")
-            if arg3 then
-                arg3:FireServer()
-            end
-        end))
-        any_new_result1_2_upvr.Maid:GiveTask(function() -- Line 63
-            print("no close!")
-        end)
-        task.delay(arg2, function() -- Line 66
-            any_new_result1_2_upvr:Destroy()
-        end)
-    end
-end
-return module
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local Binder = require(ReplicatedStorage.Std.Binder)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local GameModeConsts = require(ReplicatedStorage.GameMode.GameModeConsts)
+local Confirmation = require(ReplicatedStorage.Module.Confirmation)
+return {
+	init = function(p1) --[[ Name: init | Line: 10 | Upvalues: Binder (copy), Maid (copy), ReplicatedStorage (copy), GameModeConsts (copy), Players (copy), Audio (copy), Confirmation (copy) ]]
+		local em = p1.em
+		Binder.new("GameMode", function(p1) --[[ Line: 13 | Upvalues: Maid (ref) ]]
+			local v1 = Maid.new()
+			local v2 = p1.Name
+			local v3 = script.Parent.Mode:FindFirstChild(v2)
+			assert(v3 ~= nil, "No Client ModuleScript found for game mode " .. v2)
+			require(v3).launch(v1, p1)
+			return v1
+		end):Start()
+		local v1 = ReplicatedStorage:FindFirstChild(GameModeConsts.GAME_MODE_WINNER_REMOTE_NAME)
+		if v1 then
+			v1.OnClientEvent:Connect(function(p1, p2) --[[ Line: 27 | Upvalues: ReplicatedStorage (ref), Players (ref), Audio (ref), em (copy) ]]
+				if p1 == "BattleRoyale" or p1 == "TankRoyale" then
+					local v1 = ReplicatedStorage.GameMode.Res:FindFirstChild("BRGui"):Clone()
+					v1.Parent = Players.LocalPlayer.PlayerGui
+					v1.Enabled = true
+					v1.Winner.Player.Text = string.upper(p2 or "Player")
+					if p1 == "BattleRoyale" then
+						v1.Winner.Title.Text = "JAILBREAK: BATTLE ROYALE"
+					elseif p1 == "TankRoyale" then
+						v1.Winner.Title.Text = "JAILBREAK: TANK ROYALE"
+						v1.Winner.ImageLabel.ImageColor3 = Color3.fromRGB(78, 189, 72)
+						v1.Winner.Player.TextColor3 = Color3.fromRGB(0, 255, 51)
+						v1.Winner.Title.TextColor3 = Color3.fromRGB(0, 255, 51)
+					end
+					v1.Winner.Visible = true
+					Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 2820822548)
+					em.l2atqdos(5)
+					task.wait(6)
+					v1:Destroy()
+				end
+			end)
+		end
+		function em.a52k0ijd(p1, p2, p3) --[[ Line: 55 | Upvalues: Confirmation (ref) ]]
+			local v1 = Confirmation.new(p1)
+			v1.Maid:GiveTask(v1.OnYes:Connect(function() --[[ Line: 57 | Upvalues: p3 (copy) ]]
+				print("YES")
+				if p3 then
+					p3:FireServer()
+				end
+			end))
+			v1.Maid:GiveTask(function() --[[ Line: 63 ]]
+				print("no close!")
+			end)
+			task.delay(p2, function() --[[ Line: 66 | Upvalues: v1 (copy) ]]
+				v1:Destroy()
+			end)
+		end
+	end
+}

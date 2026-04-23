@@ -1,104 +1,73 @@
-local EzUi = script:FindFirstAncestor("EzUi")
-local Roact_upvr = require(EzUi.Parent.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("Grid")
-any_extend_result1.defaultProps = {
-    rowsPerPage = 3;
-    colsPerRow = 9;
-    itemAspectRatio = nil;
-    canvasHeight = 1;
-    infHorizontal = false;
-    reverseY = false;
+local v1 = script:FindFirstAncestor("EzUi")
+local Dictionary = require(v1.Dictionary)
+local Roact = require(v1.Parent.Roact)
+local createElement = Roact.createElement
+local GridUtils = require(script.Parent.GridUtils)
+local v2 = Roact.PureComponent:extend("Grid")
+v2.defaultProps = {
+	rowsPerPage = 3,
+	colsPerRow = 9,
+	itemAspectRatio = nil,
+	canvasHeight = 1,
+	infHorizontal = false,
+	reverseY = false
 }
-function any_extend_result1.init(arg1) -- Line 18
+function v2.init(p1) --[[ Line: 18 ]] end
+function v2.render(p1) --[[ Line: 19 | Upvalues: GridUtils (copy), Dictionary (copy), createElement (copy), Roact (copy) ]]
+	local aspectRatio = p1.props.aspectRatio
+	if p1.props.paddingRatio then
+		assert(aspectRatio, "aspectRatio is required when using paddingRatio.")
+		assert(p1.props.verticalPaddingRatio == nil, "cannot use paddingRatio & verticalPaddingRatio simultaneously.")
+		p1.props.verticalPaddingRatio = p1.props.paddingRatio / aspectRatio
+		p1.props.paddingRatio = nil
+	end
+	local v1 = p1.props.verticalPaddingRatio * aspectRatio
+	local colsPerRow = p1.props.colsPerRow
+	local rowsPerPage = p1.props.rowsPerPage
+	if p1.props.itemAspectRatio then
+		rowsPerPage = colsPerRow / aspectRatio * p1.props.itemAspectRatio
+		p1.props.rowsPerPage = rowsPerPage
+	end
+	local v2 = GridUtils.getRowRatio(p1.props)
+	local v3 = GridUtils.getColRatio(p1.props, v2)
+	local v4 = p1.props.itemDefaults or {}
+	local canvasHeight = p1.props.canvasHeight
+	local t = {}
+	for i = 1, #p1.props.items do
+		local v6, v7
+		if p1.props.infHorizontal then
+			v6 = 1
+			v7 = i
+		else
+			v6 = math.floor((i - 1) / colsPerRow) + 1
+			v7 = (i - 1) % colsPerRow + 1
+		end
+		if p1.props.reverseY then
+			v6 = rowsPerPage - v6 + 1
+		end
+		local v8 = UDim2.new(v3 / v2, 0, aspectRatio * 1 / v2 / canvasHeight, 0)
+		local v9 = UDim2.new(v3 / v2 * (v7 - 1) + 1 / v1 * v7, 0, aspectRatio / canvasHeight * ((v6 - 1) * 1 / v2 + v6 * 1 / v1), 0)
+		local v12 = Dictionary.merge(p1.props.items and p1.props.items[i] or {}, p1.props.metadata and p1.props.metadata[i] or {}, v4)
+		local v13 = v12.id or v12.name or #t + 1
+		local v14 = createElement(p1.props.component, Dictionary.merge({
+			size = v8,
+			position = v9,
+			aspectRatio = v3,
+			cornerPixel = 4,
+			paddingRatio = v2 / v1,
+			verticalPaddingRatio = v1 / v2,
+			parentAspectRatio = aspectRatio,
+			parentVerticalPaddingRatio = v1 / aspectRatio,
+			layoutOrder = 2 * v7,
+			index = i,
+			rowIndex = v6,
+			colIndex = v7
+		}, v12))
+		if t[v13] then
+			warn("An item already exists in grid by key: " .. v13)
+		end
+		t[v13] = v14
+	end
+	return Roact.createFragment(t)
 end
-local GridUtils_upvr = require(script.Parent.GridUtils)
-local Dictionary_upvr = require(EzUi.Dictionary)
-local createElement_upvr = Roact_upvr.createElement
-function any_extend_result1.render(arg1) -- Line 19
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local aspectRatio_2 = arg1.props.aspectRatio
-    local var32
-    if arg1.props.paddingRatio then
-        local var33 = aspectRatio_2
-        var32 = "aspectRatio is required when using paddingRatio."
-        assert(var33, var32)
-        var32 = arg1.props
-        var32 = var32.verticalPaddingRatio
-        if var32 ~= nil then
-            var33 = false
-        else
-            var33 = true
-        end
-        var32 = "cannot use paddingRatio & verticalPaddingRatio simultaneously."
-        assert(var33, var32)
-        var32 = arg1.props
-        var32 = var32.paddingRatio
-        arg1.props.verticalPaddingRatio = var32 / aspectRatio_2
-        arg1.props.paddingRatio = nil
-    end
-    local var34 = arg1.props.verticalPaddingRatio * aspectRatio_2
-    local colsPerRow = arg1.props.colsPerRow
-    var32 = arg1.props
-    var32 = var32.rowsPerPage
-    if arg1.props.itemAspectRatio then
-        var32 = colsPerRow / aspectRatio_2 * arg1.props.itemAspectRatio
-        arg1.props.rowsPerPage = var32
-    end
-    local any_getRowRatio_result1_2 = GridUtils_upvr.getRowRatio(arg1.props)
-    local any_getColRatio_result1 = GridUtils_upvr.getColRatio(arg1.props, any_getRowRatio_result1_2)
-    if not arg1.props.itemDefaults then
-    end
-    local canvasHeight_2 = arg1.props.canvasHeight
-    local module = {}
-    for i = 1, #arg1.props.items do
-        local var40
-        local var41
-        if arg1.props.infHorizontal then
-            var41 = 1
-            var40 = i
-        else
-            var41 = math.floor((i - 1) / colsPerRow) + 1
-            var40 = (i - 1) % colsPerRow + 1
-        end
-        if arg1.props.reverseY then
-            var41 = var32 - var41 + 1
-        end
-        if arg1.props.items then
-        end
-        if not arg1.props.items[i] then
-        end
-        local metadata = arg1.props.metadata
-        if metadata then
-            metadata = arg1.props.metadata[i]
-        end
-        if not metadata then
-        end
-        local any_merge_result1 = Dictionary_upvr.merge({}, {}, {})
-        local id = any_merge_result1.id
-        if not id then
-            id = any_merge_result1.name
-            if not id then
-                id = #module + 1
-            end
-        end
-        if module[id] then
-            warn("An item already exists in grid by key: "..id)
-        end
-        module[id] = createElement_upvr(arg1.props.component, Dictionary_upvr.merge({
-            size = UDim2.new(any_getColRatio_result1 / any_getRowRatio_result1_2, 0, aspectRatio_2 * 1 / any_getRowRatio_result1_2 / canvasHeight_2, 0);
-            position = UDim2.new(any_getColRatio_result1 / any_getRowRatio_result1_2 * (var40 - 1) + 1 / var34 * var40, 0, aspectRatio_2 / canvasHeight_2 * ((var41 - 1) * 1 / any_getRowRatio_result1_2 + var41 * 1 / var34), 0);
-            aspectRatio = any_getColRatio_result1;
-            cornerPixel = 4;
-            paddingRatio = any_getRowRatio_result1_2 / var34;
-            verticalPaddingRatio = var34 / any_getRowRatio_result1_2;
-            parentAspectRatio = aspectRatio_2;
-            parentVerticalPaddingRatio = var34 / aspectRatio_2;
-            layoutOrder = 2 * var40;
-            index = i;
-            rowIndex = var41;
-            colIndex = var40;
-        }, any_merge_result1))
-    end
-    return Roact_upvr.createFragment(module)
-end
-return any_extend_result1
+return v2

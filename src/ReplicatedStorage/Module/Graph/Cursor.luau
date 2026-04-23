@@ -1,30 +1,32 @@
-local module_2_upvr = {}
-module_2_upvr.__index = module_2_upvr
-function module_2_upvr.new(arg1, arg2) -- Line 6
-    assert(arg1)
-    assert(arg2)
-    local module = {}
-    setmetatable(module, module_2_upvr)
-    module.Graph = arg1
-    module.Node = arg2
-    return module
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Signal = require(ReplicatedStorage.Std.Signal)
+local t = {}
+t.__index = t
+function t.new(p1, p2) --[[ Line: 6 | Upvalues: t (copy) ]]
+	assert(p1)
+	assert(p2)
+	local t2 = {}
+	setmetatable(t2, t)
+	t2.Graph = p1
+	t2.Node = p2
+	return t2
 end
-local Signal_upvr = require(game:GetService("ReplicatedStorage").Std.Signal)
-function module_2_upvr.GetOnWalkedSignal(arg1) -- Line 18
-    if arg1._onWalkedSignal == nil then
-        arg1._onWalkedSignal = Signal_upvr.new()
-    end
-    return arg1._onWalkedSignal
+function t.GetOnWalkedSignal(p1) --[[ Line: 18 | Upvalues: Signal (copy) ]]
+	if p1._onWalkedSignal == nil then
+		p1._onWalkedSignal = Signal.new()
+	end
+	return p1._onWalkedSignal
 end
-function module_2_upvr.WalkTo(arg1, arg2) -- Line 24
-    assert(arg2)
-    if arg1.Graph:HasEdge(arg1.Node, arg2) then
-        arg1.Node = arg2
-        if arg1._onWalkedSignal then
-            arg1._onWalkedSignal:Fire(arg2)
-        end
-        return true
-    end
-    return false
+function t.WalkTo(p1, p2) --[[ Line: 24 ]]
+	assert(p2)
+	if p1.Graph:HasEdge(p1.Node, p2) then
+		p1.Node = p2
+		if p1._onWalkedSignal then
+			p1._onWalkedSignal:Fire(p2)
+		end
+		return true
+	else
+		return false
+	end
 end
-return module_2_upvr
+return t

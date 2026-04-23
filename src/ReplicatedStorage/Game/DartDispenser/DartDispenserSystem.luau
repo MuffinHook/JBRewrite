@@ -1,6 +1,6 @@
-local module = {}
-local DartDispenserBinder_upvr = require(script.Parent.DartDispenserBinder)
-function module.init() -- Line 4
-    DartDispenserBinder_upvr:Start()
-end
-return module
+local DartDispenserBinder = require(script.Parent.DartDispenserBinder)
+return {
+	init = function() --[[ Name: init | Line: 4 | Upvalues: DartDispenserBinder (copy) ]]
+		DartDispenserBinder:Start()
+	end
+}

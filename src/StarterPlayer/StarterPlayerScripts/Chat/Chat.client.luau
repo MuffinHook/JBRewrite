@@ -1,1 +1,2 @@
-require(game:GetService("ReplicatedStorage").Chat.ChatService).init()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.Chat.ChatService).init()

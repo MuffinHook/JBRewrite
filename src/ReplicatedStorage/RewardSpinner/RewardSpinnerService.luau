@@ -1,16 +1,16 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local module = {}
-local waitForChild_upvr = require(ReplicatedStorage_upvr.Std.waitForChild)
-local RewardSpinnerConsts_upvr = require(ReplicatedStorage_upvr.RewardSpinner.RewardSpinnerConsts)
-local store_upvr = require(ReplicatedStorage_upvr.App.store)
-local Dictionary_upvr = require(ReplicatedStorage_upvr.Std.Dictionary)
-function module.init() -- Line 8
-    waitForChild_upvr(ReplicatedStorage_upvr, RewardSpinnerConsts_upvr.SPIN_REMOTE_NAME):andThen(function(arg1) -- Line 9
-        arg1.OnClientEvent:Connect(function(arg1_2) -- Line 10
-            store_upvr:dispatch(Dictionary_upvr.merge({
-                type = "setRewardSpinnerConfig";
-            }, arg1_2))
-        end)
-    end)
-end
-return module
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Dictionary = require(ReplicatedStorage.Std.Dictionary)
+local RewardSpinnerConsts = require(ReplicatedStorage.RewardSpinner.RewardSpinnerConsts)
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local store = require(ReplicatedStorage.App.store)
+return {
+	init = function() --[[ Name: init | Line: 8 | Upvalues: waitForChild (copy), ReplicatedStorage (copy), RewardSpinnerConsts (copy), store (copy), Dictionary (copy) ]]
+		waitForChild(ReplicatedStorage, RewardSpinnerConsts.SPIN_REMOTE_NAME):andThen(function(p1) --[[ Line: 9 | Upvalues: store (ref), Dictionary (ref) ]]
+			p1.OnClientEvent:Connect(function(p1) --[[ Line: 10 | Upvalues: store (ref), Dictionary (ref) ]]
+				store:dispatch(Dictionary.merge({
+					type = "setRewardSpinnerConfig"
+				}, p1))
+			end)
+		end)
+	end
+}

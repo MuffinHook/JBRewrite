@@ -1,94 +1,89 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local store_upvr = require(ReplicatedStorage_upvr.App.store)
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local module_upvr = {
-    _updateRemote = nil;
-    _maid = Maid_upvr.new();
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SpawnSelectionConsts = require(script.Parent.SpawnSelectionConsts)
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+local store = require(ReplicatedStorage.App.store)
+local ClanUtils = require(ReplicatedStorage.Clan.ClanUtils)
+local CharacterUtil = require(ReplicatedStorage.Game.CharacterUtil)
+local PrivateServerUtils = require(ReplicatedStorage.PrivateServer.PrivateServerUtils)
+local Roact = require(ReplicatedStorage.Roact)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local t = {
+	_updateRemote = nil,
+	_maid = Maid.new()
 }
-local waitForChild_upvr = require(ReplicatedStorage_upvr.Std.waitForChild)
-function module_upvr.init() -- Line 20
-    waitForChild_upvr(ReplicatedStorage_upvr, "SpawnSelectionUpdateSpawnData"):andThen(function(arg1) -- Line 21
-        module_upvr._updateRemote = arg1
-        arg1.OnClientEvent:Connect(module_upvr._receiveSpawns)
-    end)
-    waitForChild_upvr(ReplicatedStorage_upvr, "SpawnSelectionOffer"):andThen(function(arg1) -- Line 25
-        module_upvr._offerRemote = arg1
-        arg1.OnClientEvent:Connect(function() -- Line 27
-            store_upvr:dispatch({
-                type = "setSpawnSelectionOfferVisible";
-                visible = true;
-            })
-        end)
-    end)
-    store_upvr.changed:connect(function(arg1, arg2) -- Line 35
-        if arg1.minimapSpawns ~= arg2.minimapSpawns then
-            module_upvr._maid.receiveSpawnsMaid = nil
-        end
-    end)
+function t.init() --[[ Line: 20 | Upvalues: waitForChild (copy), ReplicatedStorage (copy), t (copy), store (copy) ]]
+	waitForChild(ReplicatedStorage, "SpawnSelectionUpdateSpawnData"):andThen(function(p1) --[[ Line: 21 | Upvalues: t (ref) ]]
+		t._updateRemote = p1
+		p1.OnClientEvent:Connect(t._receiveSpawns)
+	end)
+	waitForChild(ReplicatedStorage, "SpawnSelectionOffer"):andThen(function(p1) --[[ Line: 25 | Upvalues: t (ref), store (ref) ]]
+		t._offerRemote = p1
+		p1.OnClientEvent:Connect(function() --[[ Line: 27 | Upvalues: store (ref) ]]
+			store:dispatch({
+				type = "setSpawnSelectionOfferVisible",
+				visible = true
+			})
+		end)
+	end)
+	store.changed:connect(function(p1, p2) --[[ Line: 35 | Upvalues: t (ref) ]]
+		if p1.minimapSpawns ~= p2.minimapSpawns then
+			t._maid.receiveSpawnsMaid = nil
+		end
+	end)
 end
-function module_upvr.requestShowSpawns() -- Line 41
-    module_upvr._updateRemote:FireServer()
+function t.requestShowSpawns() --[[ Line: 41 | Upvalues: t (copy) ]]
+	t._updateRemote:FireServer()
 end
-function module_upvr.attemptSelect(arg1) -- Line 44
-    ReplicatedStorage_upvr:FindFirstChild("SpawnSelectionSelect"):FireServer(arg1)
+function t.attemptSelect(p1) --[[ Line: 44 | Upvalues: ReplicatedStorage (copy) ]]
+	ReplicatedStorage:FindFirstChild("SpawnSelectionSelect"):FireServer(p1)
 end
-local ClanUtils_upvr = require(ReplicatedStorage_upvr.Clan.ClanUtils)
-local Players_upvr = game:GetService("Players")
-local PrivateServerUtils_upvr = require(ReplicatedStorage_upvr.PrivateServer.PrivateServerUtils)
-local Roact_upvr = require(ReplicatedStorage_upvr.Roact)
-local Interval_upvr = require(ReplicatedStorage_upvr.Std.Interval)
-local CharacterUtil_upvr = require(ReplicatedStorage_upvr.Game.CharacterUtil)
-local SpawnSelectionConsts_upvr = require(script.Parent.SpawnSelectionConsts)
-local Settings_upvr = require(ReplicatedStorage_upvr.Resource.Settings)
-function module_upvr._receiveSpawns(arg1) -- Line 50
-    local any_new_result1 = Maid_upvr.new()
-    module_upvr._maid.receiveSpawnsMaid = any_new_result1
-    local tbl = {}
-    for _, v in arg1 do
-        local tbl_2_upvr = {
-            name = assert(v.name, "missing spawnData.name");
-            useParachute = v.useParachute;
-            locked = v.locked;
-            position = assert(v.position, "missing spawnData.position");
-        }
-        if PrivateServerUtils_upvr.getIsBattleServer() then
-            local any_createBinding_result1, any_createBinding_result2_upvr = Roact_upvr.createBinding(0)
-            tbl_2_upvr.numEnemies = any_createBinding_result1
-            local any_getCurrentClanId_result1_upvr = ClanUtils_upvr.getCurrentClanId(Players_upvr.LocalPlayer)
-            any_new_result1:GiveTask(Interval_upvr.every(0.1):Connect(function() -- Line 64
-                local var45
-                for _, v_2 in Players_upvr:GetPlayers() do
-                    if ClanUtils_upvr.getCurrentClanId(v_2) ~= any_getCurrentClanId_result1_upvr then
-                        local Character_2 = v_2.Character
-                        if Character_2 then
-                            local any_getPositionFromCharacter_result1 = CharacterUtil_upvr.getPositionFromCharacter(Character_2)
-                            if any_getPositionFromCharacter_result1 and SpawnSelectionConsts_upvr.ENEMY_CHECK_RADIUS >= (any_getPositionFromCharacter_result1 - tbl_2_upvr.position).Magnitude then
-                                var45 += 1
-                            end
-                        end
-                    end
-                end
-                any_createBinding_result2_upvr(var45)
-            end))
-        end
-        if v.exclusiveTeamId then
-            any_createBinding_result2_upvr = Settings_upvr
-            any_createBinding_result2_upvr = any_createBinding_result2_upvr.TeamColor
-            tbl_2_upvr.backgroundColor = any_createBinding_result2_upvr[v.exclusiveTeamId]
-        else
-            any_createBinding_result2_upvr = 1
-            tbl_2_upvr.backgroundColor = Color3.new(any_createBinding_result2_upvr, 1, 1)
-        end
-        any_createBinding_result2_upvr = tbl
-        table.insert(any_createBinding_result2_upvr, tbl_2_upvr)
-    end
-    store_upvr:dispatch({
-        type = "minimapSetSpawns";
-        spawns = tbl;
-    })
-    store_upvr:dispatch({
-        type = "setSpawnSelectionReceivedAt";
-        receivedAt = workspace:GetServerTimeNow();
-    })
+function t._receiveSpawns(p1) --[[ Line: 50 | Upvalues: Maid (copy), t (copy), ClanUtils (copy), Players (copy), PrivateServerUtils (copy), Roact (copy), Interval (copy), CharacterUtil (copy), SpawnSelectionConsts (copy), Settings (copy), store (copy) ]]
+	local v1 = Maid.new()
+	t._maid.receiveSpawnsMaid = v1
+	local v2 = ClanUtils.getCurrentClanId(Players.LocalPlayer)
+	local t2 = {}
+	for v3, v4 in p1 do
+		local t3 = {}
+		t3.name = assert(v4.name, "missing spawnData.name")
+		t3.useParachute = v4.useParachute
+		t3.locked = v4.locked
+		t3.position = assert(v4.position, "missing spawnData.position")
+		if PrivateServerUtils.getIsBattleServer() then
+			local v5, v6 = Roact.createBinding(0)
+			t3.numEnemies = v5
+			v1:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 64 | Upvalues: Players (ref), ClanUtils (ref), v2 (copy), CharacterUtil (ref), t3 (copy), SpawnSelectionConsts (ref), v6 (copy) ]]
+				local count = 0
+				for v1, v22 in Players:GetPlayers() do
+					if ClanUtils.getCurrentClanId(v22) ~= v2 then
+						local Character = v22.Character
+						if Character then
+							local v3 = CharacterUtil.getPositionFromCharacter(Character)
+							if v3 and not ((v3 - t3.position).Magnitude > SpawnSelectionConsts.ENEMY_CHECK_RADIUS) then
+								count = count + 1
+							end
+						end
+					end
+				end
+				v6(count)
+			end))
+		end
+		if v4.exclusiveTeamId then
+			t3.backgroundColor = Settings.TeamColor[v4.exclusiveTeamId]
+		else
+			t3.backgroundColor = Color3.new(255/255, 255/255, 255/255)
+		end
+		table.insert(t2, t3)
+	end
+	store:dispatch({
+		type = "minimapSetSpawns",
+		spawns = t2
+	})
+	store:dispatch({
+		type = "setSpawnSelectionReceivedAt",
+		receivedAt = workspace:GetServerTimeNow()
+	})
 end
-return module_upvr
+return t

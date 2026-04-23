@@ -1,71 +1,74 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local DoorUtils_upvr = require(ReplicatedStorage.Door2.DoorUtils)
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-local RunService_upvr = game:GetService("RunService")
-local Joint_upvr = require(ReplicatedStorage.Std.Joint)
-local PlankConsts_upvr = require(script.Parent.PlankConsts)
-function module_upvr.new(arg1) -- Line 14
-    local module_upvr_2 = {}
-    setmetatable(module_upvr_2, module_upvr)
-    module_upvr_2._maid = Maid_upvr.new()
-    module_upvr_2._obj = arg1
-    module_upvr_2._maid:GiveTask(function() -- Line 20
-        module_upvr_2._obj = nil
-    end)
-    local var12_upvw
-    local var13_upvw
-    local tbl_upvr = {}
-    module_upvr_2._maid:GiveTask(DoorUtils_upvr.getDoorOpenChangedSignal(arg1):Connect(function() -- Line 27
-        if DoorUtils_upvr.getOpen(arg1) then
-            if var12_upvw then return end
-            var13_upvw = {}
-            var12_upvw = Promise_upvr.delay(DoorUtils_upvr.getDuration(arg1)):andThen(function() -- Line 35
-                local Model = Instance.new("Model")
-                for _, v in ipairs(arg1:GetDescendants()) do
-                    if v:IsA("BasePart") then
-                        local clone_upvr = v:Clone()
-                        clone_upvr.Parent = Model
-                        local var24_upvw
-                        var24_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 43
-                            if not clone_upvr:IsDescendantOf(workspace) then
-                                var24_upvw:Disconnect()
-                            elseif clone_upvr.Position.Y < -146.542 then
-                                var24_upvw:Disconnect()
-                                local BodyForce = Instance.new("BodyForce")
-                                BodyForce.Force = Vector3.new(0, 1, 0) * clone_upvr:GetMass() * workspace.Gravity * 0.9
-                                BodyForce.Parent = clone_upvr
-                                clone_upvr.AssemblyLinearVelocity = Vector3.new(0, 4, 0)
-                            end
-                        end)
-                        table.insert(var13_upvw, clone_upvr)
-                        tbl_upvr[v] = v.Transparency
-                        v.Transparency = 1
-                    end
-                end
-                Model.Parent = workspace
-                Joint_upvr.WeldAllTo(Model, Model:GetChildren()[1])
-            end):andThenCall(Promise_upvr.delay, PlankConsts_upvr.REGEN_DURATION):finally(function() -- Line 69
-                for _, v_2 in ipairs(arg1:GetDescendants()) do
-                    if tbl_upvr[v_2] then
-                        v_2.Transparency = tbl_upvr[v_2]
-                    end
-                end
-                for _, v_3 in ipairs(var13_upvw) do
-                    v_3:Destroy()
-                end
-                var13_upvw = nil
-            end):finally(function() -- Line 80
-                var12_upvw = nil
-            end)
-        end
-    end))
-    return module_upvr_2
+local RunService = game:GetService("RunService")
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local Joint = require(ReplicatedStorage.Std.Joint)
+require(ReplicatedStorage.Std.Audio)
+local PlankConsts = require(script.Parent.PlankConsts)
+local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 14 | Upvalues: t (copy), Maid (copy), DoorUtils (copy), Promise (copy), RunService (copy), Joint (copy), PlankConsts (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._maid = Maid.new()
+	t2._obj = p1
+	t2._maid:GiveTask(function() --[[ Line: 20 | Upvalues: t2 (copy) ]]
+		t2._obj = nil
+	end)
+	local t3 = {}
+	local v2 = nil
+	local v3 = nil
+	t2._maid:GiveTask(DoorUtils.getDoorOpenChangedSignal(p1):Connect(function() --[[ Line: 27 | Upvalues: DoorUtils (ref), p1 (copy), v3 (ref), v2 (ref), Promise (ref), RunService (ref), t3 (copy), Joint (ref), PlankConsts (ref) ]]
+		if DoorUtils.getOpen(p1) and not v3 then
+			v2 = {}
+			v3 = Promise.delay(DoorUtils.getDuration(p1)):andThen(function() --[[ Line: 35 | Upvalues: p1 (ref), RunService (ref), v2 (ref), t3 (ref), Joint (ref) ]]
+				local Model = Instance.new("Model")
+				for i, v in ipairs(p1:GetDescendants()) do
+					if v:IsA("BasePart") then
+						local v1 = v:Clone()
+						v1.Parent = Model
+						local v22 = nil
+						v22 = RunService.Heartbeat:Connect(function() --[[ Line: 43 | Upvalues: v1 (copy), v22 (ref) ]]
+							if v1:IsDescendantOf(workspace) then
+								if v1.Position.Y < -146.542 then
+									v22:Disconnect()
+									local BodyForce = Instance.new("BodyForce")
+									BodyForce.Force = Vector3.new(0, 1, 0) * v1:GetMass() * workspace.Gravity * 0.9
+									BodyForce.Parent = v1
+									v1.AssemblyLinearVelocity = Vector3.new(0, 4, 0)
+								end
+							else
+								v22:Disconnect()
+							end
+						end)
+						table.insert(v2, v1)
+						t3[v] = v.Transparency
+						v.Transparency = 1
+					end
+				end
+				Model.Parent = workspace
+				Joint.WeldAllTo(Model, Model:GetChildren()[1])
+			end):andThenCall(Promise.delay, PlankConsts.REGEN_DURATION):finally(function() --[[ Line: 69 | Upvalues: p1 (ref), t3 (ref), v2 (ref) ]]
+				for i, v in ipairs(p1:GetDescendants()) do
+					if t3[v] then
+						v.Transparency = t3[v]
+					end
+				end
+				for i, v in ipairs(v2) do
+					v:Destroy()
+				end
+				v2 = nil
+			end):finally(function() --[[ Line: 80 | Upvalues: v3 (ref) ]]
+				v3 = nil
+			end)
+		end
+	end))
+	return t2
 end
-function module_upvr.Destroy(arg1) -- Line 88
-    arg1._maid = nil
-    arg1._maid:Destroy()
+function t.Destroy(p1) --[[ Line: 88 ]]
+	local _maid = p1._maid
+	p1._maid = nil
+	_maid:Destroy()
 end
-return module_upvr
+return t

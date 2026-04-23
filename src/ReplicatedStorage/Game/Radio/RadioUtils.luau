@@ -1,16 +1,17 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GamepassUtils_upvr = require(ReplicatedStorage.Gamepass.GamepassUtils)
-local module_upvr = {}
-local GamepassSystem_upvr = require(ReplicatedStorage.Gamepass.GamepassSystem)
-function module_upvr.HasSteroGamepass() -- Line 7
-    return GamepassSystem_upvr.DoesPlayerOwn(GamepassUtils_upvr.EnumGamepass.Stereo)
+local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
+local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+local t = {
+	HasSteroGamepass = function() --[[ Name: HasSteroGamepass | Line: 7 | Upvalues: GamepassSystem (copy), GamepassUtils (copy) ]]
+		return GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.Stereo)
+	end
+}
+function t.CheckOrPromptStereoGamepass() --[[ Line: 10 | Upvalues: t (copy), GamepassUtils (copy), Settings (copy) ]]
+	local v1 = t.HasSteroGamepass()
+	if not v1 then
+		GamepassUtils.PromptPurchase(Settings.Gamepass.Stereo)
+	end
+	return v1
 end
-local Settings_upvr = require(ReplicatedStorage.Resource.Settings)
-function module_upvr.CheckOrPromptStereoGamepass() -- Line 10
-    local any_HasSteroGamepass_result1 = module_upvr.HasSteroGamepass()
-    if not any_HasSteroGamepass_result1 then
-        GamepassUtils_upvr.PromptPurchase(Settings_upvr.Gamepass.Stereo)
-    end
-    return any_HasSteroGamepass_result1
-end
-return module_upvr
+return t

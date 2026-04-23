@@ -1,3 +1,4 @@
-return require(game:GetService("ReplicatedStorage").Std.TableUtils).requireValidIndexAndFreeze({
-    GRAB_REMOTE_NAME = "GrabRemote";
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Std.TableUtils).requireValidIndexAndFreeze({
+	GRAB_REMOTE_NAME = "GrabRemote"
 })

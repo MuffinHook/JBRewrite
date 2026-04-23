@@ -1,301 +1,244 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Signal = require(ReplicatedStorage_upvr.Std.Signal)
-local Roact_upvr = require(ReplicatedStorage_upvr.Roact)
-local BigButtonService_upvr = require(ReplicatedStorage_upvr.App.BigButtonService)
-local module_2_upvr = {
-    onDevPanelToggle = Signal.new();
-    onGarageToggle = Signal.new();
+local UserInputService = game:GetService("UserInputService")
+local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Notification = require(script.Parent.Notification)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local RunUtils = require(ReplicatedStorage.App.RunUtils)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local Utils = require(ReplicatedStorage.EzUi.Utils)
+local Roact = require(ReplicatedStorage.Roact)
+require(ReplicatedStorage.Policy.PolicyService)
+local Confirmation = require(ReplicatedStorage.Module.Confirmation)
+local TeamShared = require(ReplicatedStorage.App.TeamShared)
+local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
+local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+local RunConsts = require(ReplicatedStorage.App.RunConsts)
+local WorldTeleportConsts = require(ReplicatedStorage.WorldTeleport.WorldTeleportConsts)
+require(ReplicatedStorage.PrivateServer.PrivateServerUtils)
+local createElement = Roact.createElement
+local store = require(ReplicatedStorage.App.store)
+local BigButtonService = require(ReplicatedStorage.App.BigButtonService)
+local TopbarHolder = require(ReplicatedStorage.App.UI.TopbarHolder)
+local t = {
+	onDevPanelToggle = Signal.new(),
+	onGarageToggle = Signal.new()
 }
-local any_createBinding_result1, any_createBinding_result2 = Roact_upvr.createBinding("4:00 PM")
-module_2_upvr.time = any_createBinding_result1
-module_2_upvr.updateTime = any_createBinding_result2
-local UserInputService_upvr = game:GetService("UserInputService")
-local TeamShared_upvr = require(ReplicatedStorage_upvr.App.TeamShared)
-local Players_upvr = game:GetService("Players")
-local Confirmation_upvr = require(ReplicatedStorage_upvr.Module.Confirmation)
-local Notification_upvr = require(script.Parent.Notification)
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local store_upvr = require(ReplicatedStorage_upvr.App.store)
-local RunUtils_upvr = require(ReplicatedStorage_upvr.App.RunUtils)
-local GamepassSystem_upvr = require(ReplicatedStorage_upvr.Gamepass.GamepassSystem)
-local GamepassUtils_upvr = require(ReplicatedStorage_upvr.Gamepass.GamepassUtils)
-local WorldTeleportConsts_upvr = require(ReplicatedStorage_upvr.WorldTeleport.WorldTeleportConsts)
-local RunConsts_upvr = require(ReplicatedStorage_upvr.App.RunConsts)
-local GuiService_upvr = game:GetService("GuiService")
-local Utils_upvr = require(ReplicatedStorage_upvr.EzUi.Utils)
-local Settings_upvr = require(ReplicatedStorage_upvr.Resource.Settings)
-local createElement_upvr = Roact_upvr.createElement
-local TopbarHolder_upvr = require(ReplicatedStorage_upvr.App.UI.TopbarHolder)
-function module_2_upvr.Init(arg1) -- Line 31
-    local em = arg1.em
-    local any_createRef_result1_upvr = Roact_upvr.createRef()
-    local tbl_2 = {
-        name = "Garage";
-        imageId = 8733342027;
-        displayOrder = 10;
-        ref = any_createRef_result1_upvr;
-    }
-    local function onClick() -- Line 43
-        module_2_upvr.onGarageToggle:Fire()
-    end
-    tbl_2.onClick = onClick
-    BigButtonService_upvr.add(tbl_2)
-    UserInputService_upvr.InputBegan:Connect(function(arg1_2, arg2) -- Line 48
-        if arg2 then
-        elseif arg1_2.KeyCode == Enum.KeyCode.DPadUp then
-            module_2_upvr.onGarageToggle:Fire()
-        end
-    end)
-    local var29_upvw
-    local Event_upvr = arg1.Event
-    TeamShared_upvr.promiseIsTeamSwitchingEnabled():andThen(function(arg1_3) -- Line 58
-        if arg1_3 then
-            local tbl_6 = {
-                name = "TeamSwitch";
-                imageId = 4912231691;
-                displayOrder = 20;
-            }
-            local function onClick() -- Line 64
-                local ChoosingTeam = Players_upvr.LocalPlayer:FindFirstChild("ChoosingTeam")
-                if ChoosingTeam and ChoosingTeam.Value then
-                else
-                    if var29_upvw ~= nil then
-                        var29_upvw:Destroy()
-                        var29_upvw = nil
-                        return
-                    end
-                    var29_upvw = Confirmation_upvr.new("Are you sure you want to switch teams?")
-                    var29_upvw.OnYes:Connect(function() -- Line 78
-                        var29_upvw = nil
-                        Event_upvr:FireServer('j'..""..("dsapj1sw"):sub(3, 4):reverse():reverse():reverse().."".."az0oc")
-                    end)
-                    var29_upvw.OnNo:Connect(function() -- Line 82
-                        var29_upvw = nil
-                    end)
-                end
-            end
-            tbl_6.onClick = onClick
-            BigButtonService_upvr.add(tbl_6)
-        end
-    end)
-    local tbl_4 = {
-        name = "Cash";
-        imageId = 4912231216;
-        displayOrder = 30;
-    }
-    local CashBuyUI_upvr = require(ReplicatedStorage_upvr.Game.CashBuyUI)
-    local function onClick() -- Line 95
-        if module_2_upvr.ShopAlreadyLoading then
-        else
-            if CashBuyUI_upvr.IsOpen == false then
-                if not CashBuyUI_upvr.Loaded then
-                    module_2_upvr.ShopAlreadyLoading = true
-                    Notification_upvr.new({
-                        Text = "Loading Store... Please wait!";
-                    })
-                    CashBuyUI_upvr.OnLoaded:Wait()
-                    module_2_upvr.ShopAlreadyLoading = false
-                end
-                CashBuyUI_upvr.Open()
-                return
-            end
-            CashBuyUI_upvr.Close()
-        end
-    end
-    tbl_4.onClick = onClick
-    BigButtonService_upvr.add(tbl_4)
-    local tbl_5 = {
-        name = "Safes";
-        imageId = 10313420284;
-        imageScale = 0.9;
-        displayOrder = 40;
-    }
-    local function onClick() -- Line 118
-        if Players_upvr.LocalPlayer.PlayerGui then
-            Audio_upvr.ObjectLocal(Players_upvr.LocalPlayer.PlayerGui, 6105461542, {
-                Volume = 0.15;
-            })
-        end
-        store_upvr:dispatch({
-            type = "toggleSafesOpen";
-        })
-    end
-    tbl_5.onClick = onClick
-    module_2_upvr.safesButton = tbl_5
-    BigButtonService_upvr.add(module_2_upvr.safesButton)
-    local tbl = {
-        name = "Settings";
-        imageId = 8733343021;
-        displayOrder = 50;
-    }
-    local function onClick() -- Line 133
-        module_2_upvr.onDevPanelToggle:Fire()
-    end
-    tbl.onClick = onClick
-    module_2_upvr.settingsButton = tbl
-    BigButtonService_upvr.add(module_2_upvr.settingsButton)
-    if RunUtils_upvr.isMainWorld() then
-    elseif RunUtils_upvr.isTradeWorld() then
-        local tbl_3 = {
-            name = "Trade";
-            imageId = 9857392770;
-            displayOrder = 60;
-        }
-        local function onClick() -- Line 153
-            if Players_upvr.LocalPlayer.PlayerGui then
-                Audio_upvr.ObjectLocal(Players_upvr.LocalPlayer.PlayerGui, 6105461542, {
-                    Volume = 0.15;
-                })
-            end
-            store_upvr:dispatch({
-                type = "setTradeInventoryOpen";
-                value = not store_upvr:getState().tradeInventoryOpen;
-            })
-        end
-        tbl_3.onClick = onClick
-        BigButtonService_upvr.add(tbl_3)
-    end
-    local var46
-    if RunUtils_upvr.isTradeWorld() then
-        local function _() -- Line 170, Named "doesHaveVIP"
-            return GamepassSystem_upvr.DoesPlayerOwn(GamepassUtils_upvr.EnumGamepass.TradingVIP)
-        end
-        local tbl_upvr = {
-            name = "GoHome";
-            displayOrder = 70;
-            onClick = function() -- Line 176, Named "onClick"
-                if Players_upvr.LocalPlayer.PlayerGui then
-                    Audio_upvr.ObjectLocal(Players_upvr.LocalPlayer.PlayerGui, 6105461542, {
-                        Volume = 0.15;
-                    })
-                end
-                if GamepassSystem_upvr.DoesPlayerOwn(GamepassUtils_upvr.EnumGamepass.TradingVIP) then
-                    if var29_upvw ~= nil then
-                        var29_upvw:Destroy()
-                        var29_upvw = nil
-                    else
-                        var29_upvw = Confirmation_upvr.new("Are you sure you want to return to Jailbreak?")
-                        var29_upvw.OnYes:Connect(function() -- Line 186
-                            var29_upvw = nil
-                            ReplicatedStorage_upvr:FindFirstChild(WorldTeleportConsts_upvr.TELEPORT_TO_WORLD_FROM_TEAM_SWITCH_NAME):FireServer(RunConsts_upvr.MAIN_WORLD_NAME)
-                        end)
-                        var29_upvw.OnNo:Connect(function() -- Line 193
-                            var29_upvw = nil
-                        end)
-                    end
-                end
-                GamepassUtils_upvr.PromptGamepass(GamepassUtils_upvr.EnumGamepass.TradingVIP)
-            end;
-        }
-        local function _() -- Line 202, Named "updateProps"
-            local var51
-            if GamepassSystem_upvr.DoesPlayerOwn(GamepassUtils_upvr.EnumGamepass.TradingVIP) then
-                var51 = 10087230550
-            else
-                var51 = 10087230159
-            end
-            tbl_upvr.imageId = var51
-        end
-        if GamepassSystem_upvr.DoesPlayerOwn(GamepassUtils_upvr.EnumGamepass.TradingVIP) then
-            var46 = 10087230550
-        else
-            var46 = 10087230159
-        end
-        tbl_upvr.imageId = var46
-        var46 = BigButtonService_upvr
-        var46 = var46.add
-        var46(tbl_upvr)
-        var46 = GamepassSystem_upvr
-        var46 = var46.GetGamepassOwnedSignal(GamepassUtils_upvr.EnumGamepass.TradingVIP)
-        var46:Connect(function() -- Line 207
-            local var53
-            if GamepassSystem_upvr.DoesPlayerOwn(GamepassUtils_upvr.EnumGamepass.TradingVIP) then
-                var53 = 10087230550
-            else
-                var53 = 10087230159
-            end
-            tbl_upvr.imageId = var53
-            BigButtonService_upvr.triggerUpdate:Fire()
-        end)
-    end
-    tbl_upvr = ReplicatedStorage_upvr
-    tbl_upvr = tbl_upvr.Game
-    tbl_upvr = tbl_upvr.GameUtil
-    local tbl_upvr_2_upvr = require(tbl_upvr)
-    function tbl_upvr(arg1_4) -- Line 214, Named "x3elq9f1"
-        if arg1_4 ~= "Criminal" then
-        else
-        end
-        if not true then
-            tbl_upvr_2_upvr.bounty = 0
-            tbl_upvr_2_upvr.onBountyChanged:Fire(tbl_upvr_2_upvr.bounty)
-        end
-    end
-    em.x3elq9f1 = tbl_upvr
-    function tbl_upvr(arg1_5) -- Line 221, Named "wtj2qmdk"
-        tbl_upvr_2_upvr.bounty = arg1_5
-        tbl_upvr_2_upvr.onBountyChanged:Fire(tbl_upvr_2_upvr.bounty)
-    end
-    em.wtj2qmdk = tbl_upvr
-    tbl_upvr = module_2_upvr
-    tbl_upvr = tbl_upvr.SetSafeCount
-    tbl_upvr(0)
-    tbl_upvr = store_upvr
-    tbl_upvr = tbl_upvr.changed
-    tbl_upvr:connect(function(arg1_6, arg2) -- Line 228
-        if arg1_6.safesInventoryItems ~= arg2.safesInventoryItems then
-            module_2_upvr.SetSafeCount(#arg1_6.safesInventoryItems)
-        end
-    end)
-    tbl_upvr = UserInputService_upvr
-    tbl_upvr = tbl_upvr.InputBegan
-    tbl_upvr:Connect(function(arg1_7) -- Line 238
-        if arg1_7.UserInputType == Enum.UserInputType.Gamepad1 and arg1_7.KeyCode == Enum.KeyCode.ButtonSelect and GuiService_upvr.SelectedObject ~= nil then
-            Utils_upvr.selectIfGamepad(any_createRef_result1_upvr:getValue())
-        end
-    end)
-    function tbl_upvr() -- Line 289, Named "getComponent"
-        local module = {}
-        local var60
-        if Utils_upvr.isSmallScreen() then
-            var60 = createElement_upvr
-            var60 = var60(TopbarHolder_upvr, {
-                color = Settings_upvr.TeamColor[tbl_upvr_2_upvr.Team];
-                buttons = BigButtonService_upvr.active;
-            })
-        else
-            var60 = nil
-        end
-        module.Buttons = var60
-        return createElement_upvr("ScreenGui", {
-            ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-            ScreenInsets = Enum.ScreenInsets.TopbarSafeInsets;
-            ResetOnSpawn = false;
-        }, module)
-    end
-    local var57_upvr = tbl_upvr
-    local any_mount_result1_upvr = Roact_upvr.mount(var57_upvr(), Players_upvr.LocalPlayer.PlayerGui, "SidebarGui")
-    local var64_upvw
-    Utils_upvr.getViewportSizeChangedSignal():Connect(function() -- Line 308
-        if var64_upvw then
-            task.cancel(var64_upvw)
-        end
-        var64_upvw = task.delay(0.1, function() -- Line 312
-            Roact_upvr.update(any_mount_result1_upvr, var57_upvr())
-            var64_upvw = nil
-        end)
-    end)
-    tbl_upvr_2_upvr.OnTeamChanged:Connect(function(arg1_8) -- Line 317
-        Roact_upvr.update(any_mount_result1_upvr, var57_upvr())
-    end)
+local v1, v2 = Roact.createBinding("4:00 PM")
+t.time = v1
+t.updateTime = v2
+function t.Init(p1) --[[ Line: 31 | Upvalues: ReplicatedStorage (copy), Roact (copy), BigButtonService (copy), t (copy), UserInputService (copy), TeamShared (copy), Players (copy), Confirmation (copy), Notification (copy), Audio (copy), store (copy), RunUtils (copy), GamepassSystem (copy), GamepassUtils (copy), WorldTeleportConsts (copy), RunConsts (copy), GuiService (copy), Utils (copy), Settings (copy), createElement (copy), TopbarHolder (copy) ]]
+	local em = p1.em
+	local v1 = p1.Event
+	local CashBuyUI = require(ReplicatedStorage.Game.CashBuyUI)
+	local v2 = Roact.createRef()
+	BigButtonService.add({
+		name = "Garage",
+		imageId = 8733342027,
+		displayOrder = 10,
+		ref = v2,
+		onClick = function() --[[ Name: onClick | Line: 43 | Upvalues: t (ref) ]]
+			t.onGarageToggle:Fire()
+		end
+	})
+	UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 48 | Upvalues: t (ref) ]]
+		if not p2 and p1.KeyCode == Enum.KeyCode.DPadUp then
+			t.onGarageToggle:Fire()
+		end
+	end)
+	local v3 = nil
+	TeamShared.promiseIsTeamSwitchingEnabled():andThen(function(p1) --[[ Line: 58 | Upvalues: BigButtonService (ref), Players (ref), v3 (ref), Confirmation (ref), v1 (copy) ]]
+		if p1 then
+			BigButtonService.add({
+				name = "TeamSwitch",
+				imageId = 4912231691,
+				displayOrder = 20,
+				onClick = function() --[[ Name: onClick | Line: 64 | Upvalues: Players (ref), v3 (ref), Confirmation (ref), v1 (ref) ]]
+					local ChoosingTeam = Players.LocalPlayer:FindFirstChild("ChoosingTeam")
+					if ChoosingTeam and ChoosingTeam.Value then
+					elseif v3 == nil then
+						v3 = Confirmation.new("Are you sure you want to switch teams?")
+						v3.OnYes:Connect(function() --[[ Line: 78 | Upvalues: v3 (ref), v1 (ref) ]]
+							v3 = nil
+							v1:FireServer("l" .. "" .. ("y29g6ufpx"):sub(4, 7):reverse() .. "" .. "" .. ("g1brs4r"):sub(5, 6):reverse() .. "2")
+						end)
+						v3.OnNo:Connect(function() --[[ Line: 82 | Upvalues: v3 (ref) ]]
+							v3 = nil
+						end)
+					else
+						v3:Destroy()
+						v3 = nil
+					end
+				end
+			})
+		end
+	end)
+	BigButtonService.add({
+		name = "Cash",
+		imageId = 4912231216,
+		displayOrder = 30,
+		onClick = function() --[[ Name: onClick | Line: 95 | Upvalues: t (ref), CashBuyUI (copy), Notification (ref) ]]
+			if t.ShopAlreadyLoading then
+			elseif CashBuyUI.IsOpen == false then
+				if not CashBuyUI.Loaded then
+					t.ShopAlreadyLoading = true
+					Notification.new({
+						Text = "Loading Store... Please wait!"
+					})
+					CashBuyUI.OnLoaded:Wait()
+					t.ShopAlreadyLoading = false
+				end
+				CashBuyUI.Open()
+			else
+				CashBuyUI.Close()
+			end
+		end
+	})
+	t.safesButton = {
+		name = "Safes",
+		imageId = 10313420284,
+		imageScale = 0.9,
+		displayOrder = 40,
+		onClick = function() --[[ Name: onClick | Line: 118 | Upvalues: Players (ref), Audio (ref), store (ref) ]]
+			if Players.LocalPlayer.PlayerGui then
+				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
+					Volume = 0.15
+				})
+			end
+			store:dispatch({
+				type = "toggleSafesOpen"
+			})
+		end
+	}
+	BigButtonService.add(t.safesButton)
+	t.settingsButton = {
+		name = "Settings",
+		imageId = 8733343021,
+		displayOrder = 50,
+		onClick = function() --[[ Name: onClick | Line: 133 | Upvalues: t (ref) ]]
+			t.onDevPanelToggle:Fire()
+		end
+	}
+	BigButtonService.add(t.settingsButton)
+	if not RunUtils.isMainWorld() and RunUtils.isTradeWorld() then
+		BigButtonService.add({
+			name = "Trade",
+			imageId = 9857392770,
+			displayOrder = 60,
+			onClick = function() --[[ Name: onClick | Line: 153 | Upvalues: Players (ref), Audio (ref), store (ref) ]]
+				if Players.LocalPlayer.PlayerGui then
+					Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
+						Volume = 0.15
+					})
+				end
+				store:dispatch({
+					type = "setTradeInventoryOpen",
+					value = not store:getState().tradeInventoryOpen
+				})
+			end
+		})
+	end
+	if RunUtils.isTradeWorld() then
+		local function doesHaveVIP() --[[ Line: 170 | Upvalues: GamepassSystem (ref), GamepassUtils (ref) ]]
+			return GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP)
+		end
+		local t2 = {
+			name = "GoHome",
+			displayOrder = 70,
+			onClick = function() --[[ Name: onClick | Line: 176 | Upvalues: Players (ref), Audio (ref), GamepassSystem (ref), GamepassUtils (ref), v3 (ref), Confirmation (ref), ReplicatedStorage (ref), WorldTeleportConsts (ref), RunConsts (ref) ]]
+				if Players.LocalPlayer.PlayerGui then
+					Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
+						Volume = 0.15
+					})
+				end
+				if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then
+					if v3 == nil then
+						v3 = Confirmation.new("Are you sure you want to return to Jailbreak?")
+						v3.OnYes:Connect(function() --[[ Line: 186 | Upvalues: v3 (ref), ReplicatedStorage (ref), WorldTeleportConsts (ref), RunConsts (ref) ]]
+							v3 = nil
+							ReplicatedStorage:FindFirstChild(WorldTeleportConsts.TELEPORT_TO_WORLD_FROM_TEAM_SWITCH_NAME):FireServer(RunConsts.MAIN_WORLD_NAME)
+						end)
+						v3.OnNo:Connect(function() --[[ Line: 193 | Upvalues: v3 (ref) ]]
+							v3 = nil
+						end)
+					else
+						v3:Destroy()
+						v3 = nil
+					end
+				else
+					GamepassUtils.PromptGamepass(GamepassUtils.EnumGamepass.TradingVIP)
+				end
+			end
+		}
+		local function updateProps() --[[ Line: 202 | Upvalues: t2 (copy), GamepassSystem (ref), GamepassUtils (ref) ]]
+			t2.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
+		end
+		t2.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
+		BigButtonService.add(t2)
+		GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.TradingVIP):Connect(function() --[[ Line: 207 | Upvalues: t2 (copy), GamepassSystem (ref), GamepassUtils (ref), BigButtonService (ref) ]]
+			t2.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
+			BigButtonService.triggerUpdate:Fire()
+		end)
+	end
+	local GameUtil = require(ReplicatedStorage.Game.GameUtil)
+	function em.zyfagb6d(p1) --[[ Line: 214 | Upvalues: GameUtil (copy) ]]
+		if not (p1 == "Criminal") then
+			GameUtil.bounty = 0
+			GameUtil.onBountyChanged:Fire(GameUtil.bounty)
+		end
+	end
+	function em.rglritaz(p1) --[[ Line: 221 | Upvalues: GameUtil (copy) ]]
+		GameUtil.bounty = p1
+		GameUtil.onBountyChanged:Fire(GameUtil.bounty)
+	end
+	t.SetSafeCount(0)
+	store.changed:connect(function(p1, p2) --[[ Line: 228 | Upvalues: t (ref) ]]
+		if p1.safesInventoryItems ~= p2.safesInventoryItems then
+			t.SetSafeCount(#p1.safesInventoryItems)
+		end
+	end)
+	UserInputService.InputBegan:Connect(function(p1) --[[ Line: 238 | Upvalues: GuiService (ref), Utils (ref), v2 (copy) ]]
+		if p1.UserInputType == Enum.UserInputType.Gamepad1 and (p1.KeyCode == Enum.KeyCode.ButtonSelect and GuiService.SelectedObject ~= nil) then
+			Utils.selectIfGamepad(v2:getValue())
+		end
+	end)
+	local function getComponent() --[[ Line: 289 | Upvalues: Settings (ref), GameUtil (copy), Utils (ref), createElement (ref), TopbarHolder (ref), BigButtonService (ref) ]]
+		local v2 = Utils.isSmallScreen()
+		local t = {
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			ScreenInsets = Enum.ScreenInsets.TopbarSafeInsets,
+			ResetOnSpawn = false
+		}
+		local t2 = {}
+		t2.Buttons = if v2 then createElement(TopbarHolder, {
+	color = Settings.TeamColor[GameUtil.Team],
+	buttons = BigButtonService.active
+}) else nil
+		return createElement("ScreenGui", t, t2)
+	end
+	local v5 = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "SidebarGui")
+	local v6 = nil
+	Utils.getViewportSizeChangedSignal():Connect(function() --[[ Line: 308 | Upvalues: v6 (ref), Roact (ref), v5 (copy), getComponent (copy) ]]
+		if v6 then
+			task.cancel(v6)
+		end
+		v6 = task.delay(0.1, function() --[[ Line: 312 | Upvalues: Roact (ref), v5 (ref), getComponent (ref), v6 (ref) ]]
+			Roact.update(v5, getComponent())
+			v6 = nil
+		end)
+	end)
+	GameUtil.OnTeamChanged:Connect(function(p1) --[[ Line: 317 | Upvalues: Roact (ref), v5 (copy), getComponent (copy) ]]
+		Roact.update(v5, getComponent())
+	end)
 end
-function module_2_upvr.SetTime(arg1) -- Line 321
-    module_2_upvr.updateTime(arg1)
+function t.SetTime(p1) --[[ Line: 321 | Upvalues: t (copy) ]]
+	t.updateTime(p1)
 end
-function module_2_upvr.SetSafeCount(arg1) -- Line 324
-    if module_2_upvr.safesButton then
-        module_2_upvr.safesButton.count = arg1
-        BigButtonService_upvr.triggerUpdate:Fire()
-    end
+function t.SetSafeCount(p1) --[[ Line: 324 | Upvalues: t (copy), BigButtonService (copy) ]]
+	if t.safesButton then
+		t.safesButton.count = p1
+		BigButtonService.triggerUpdate:Fire()
+	end
 end
-return module_2_upvr
+return t

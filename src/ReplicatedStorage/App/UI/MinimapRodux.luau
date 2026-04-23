@@ -1,6 +1,9 @@
-return require(game:GetService("ReplicatedStorage").RoactRodux).connect(function(arg1, arg2) -- Line 5
-    return {
-        points = arg1.minimapPoints;
-        circles = arg1.minimapCircles;
-    }
-end)(require(script.Parent.Minimap))
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+local Minimap = require(script.Parent.Minimap)
+return RoactRodux.connect(function(p1, p2) --[[ Line: 5 ]]
+	return {
+		points = p1.minimapPoints,
+		circles = p1.minimapCircles
+	}
+end)(Minimap)

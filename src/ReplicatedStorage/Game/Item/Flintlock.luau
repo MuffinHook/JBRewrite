@@ -1,84 +1,88 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local Joint_upvr = require(ReplicatedStorage.Std.Joint)
-local Gun_upvr = require(script.Parent.Gun)
-local zero_cframe_upvr = CFrame.new()
-local function FromAxisAngle_upvr(arg1) -- Line 12, Named "FromAxisAngle"
-    local X = arg1.X
-    local Y = arg1.Y
-    local Z = arg1.Z
-    local var9 = (X * X + Y * Y + Z * Z) ^ 0.5
-    if 0.00001 < var9 then
-        local var10 = math.sin(var9 * 0.5) / var9
-        return CFrame.new(0, 0, 0, var10 * X, var10 * Y, var10 * Z, math.cos(var9 * 0.5))
-    end
-    return zero_cframe_upvr
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Joint = require(ReplicatedStorage.Std.Joint)
+local Spring = require(ReplicatedStorage.Std.Spring)
+local RayCast = require(ReplicatedStorage.Module.RayCast)
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local Gun = require(script.Parent.Gun)
+local v2 = CFrame.new()
+local function FromAxisAngle(p1) --[[ Line: 12 | Upvalues: v2 (copy) ]]
+	local X = p1.X
+	local Y = p1.Y
+	local Z = p1.Z
+	local v1 = (X * X + Y * Y + Z * Z) ^ 0.5
+	if v1 > 0.00001 then
+		local v22 = math.sin(v1 * 0.5) / v1
+		return CFrame.new(0, 0, 0, v22 * X, v22 * Y, v22 * Z, (math.cos(v1 * 0.5)))
+	else
+		return v2
+	end
 end
-local module_upvr = {
-    __ClassName = "Flintlock";
+local t = {
+	__ClassName = "Flintlock"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Gun_upvr)
-function module_upvr.new(arg1, arg2, arg3) -- Line 27
-    local any_new_result1 = Gun_upvr.new(arg1, arg2, arg3)
-    setmetatable(any_new_result1, module_upvr)
-    any_new_result1:Setup(arg3)
-    return any_new_result1
+t.__index = t
+setmetatable(t, Gun)
+function t.new(p1, p2, p3) --[[ Line: 27 | Upvalues: Gun (copy), t (copy) ]]
+	local v1 = Gun.new(p1, p2, p3)
+	setmetatable(v1, t)
+	v1:Setup(p3)
+	return v1
 end
-local Spring_upvr = require(ReplicatedStorage.Std.Spring)
-function module_upvr.SetupModel(arg1) -- Line 34
-    Gun_upvr.SetupModel(arg1)
-    local Lever = arg1.Model.Motion.Lever
-    Lever.Anchored = false
-    arg1.MotorLever = Joint_upvr.Motor(Lever, arg1.BoundingBox)
-    arg1.SpringLever = Spring_upvr.new(Vector3.new(0, 0, 0), Vector3.new(), 0.8, 20)
-    arg1.SpringKnockback = Spring_upvr.new(0, 0, 0.9, 20)
+function t.SetupModel(p1) --[[ Line: 34 | Upvalues: Gun (copy), Joint (copy), Spring (copy) ]]
+	Gun.SetupModel(p1)
+	local Lever = p1.Model.Motion.Lever
+	local v1 = Joint.Motor(Lever, p1.BoundingBox)
+	Lever.Anchored = false
+	local v2 = Spring.new(Vector3.new(0, 0, 0), Vector3.new(), 0.8, 20)
+	local v3 = Spring.new(0, 0, 0.9, 20)
+	p1.MotorLever = v1
+	p1.SpringLever = v2
+	p1.SpringKnockback = v3
 end
-function module_upvr.UpdateItemSprings(arg1) -- Line 49
-    Gun_upvr.UpdateItemSprings(arg1)
-    arg1.LeverPosition = arg1.SpringLever:Update()
-    arg1.KnockbackPosition = arg1.SpringKnockback:Update()
+function t.UpdateItemSprings(p1) --[[ Line: 49 | Upvalues: Gun (copy) ]]
+	Gun.UpdateItemSprings(p1)
+	p1.LeverPosition = p1.SpringLever:Update()
+	p1.KnockbackPosition = p1.SpringKnockback:Update()
 end
-local VehicleUtils_upvr = require(ReplicatedStorage.Vehicle.VehicleUtils)
-local os_clock_result1_upvw = os.clock()
-function module_upvr.UpdateItemJoints(arg1) -- Line 59
-    Gun_upvr.UpdateItemJoints(arg1)
-    arg1.MotorLever.C1 = FromAxisAngle_upvr(arg1.LeverPosition)
-    if 0.1 < arg1.KnockbackPosition and not VehicleUtils_upvr.GetLocalVehiclePacket() and not arg1.Humanoid.Sit then
-        arg1.RootPart.CFrame = arg1.RootPart.CFrame * CFrame.new(0, 0, arg1.KnockbackPosition * 60 * (os.clock() - os_clock_result1_upvw))
-    end
-    os_clock_result1_upvw = os.clock()
+local v3 = os.clock()
+function t.UpdateItemJoints(p1) --[[ Line: 59 | Upvalues: Gun (copy), FromAxisAngle (copy), VehicleUtils (copy), v3 (ref) ]]
+	Gun.UpdateItemJoints(p1)
+	p1.MotorLever.C1 = FromAxisAngle(p1.LeverPosition)
+	if p1.KnockbackPosition > 0.1 and not (VehicleUtils.GetLocalVehiclePacket() or p1.Humanoid.Sit) then
+		p1.RootPart.CFrame = p1.RootPart.CFrame * CFrame.new(0, 0, p1.KnockbackPosition * 60 * (os.clock() - v3))
+	end
+	v3 = os.clock()
 end
-function module_upvr.SetupArmWelds(arg1) -- Line 69
-    Joint_upvr.Weld(arg1.Model.Skeleton.RightArm, arg1.BoundingBox)
-    arg1.Model.Skeleton.RightArm.Anchored = false
+function t.SetupArmWelds(p1) --[[ Line: 69 | Upvalues: Joint (copy) ]]
+	Joint.Weld(p1.Model.Skeleton.RightArm, p1.BoundingBox)
+	p1.Model.Skeleton.RightArm.Anchored = false
 end
-function module_upvr.UpdateArmIK(arg1) -- Line 73
-    local IK = arg1.IK
-    IK.RightArm = arg1.Model.Skeleton.RightArm.Position
-    IK.RightAngle = arg1.Config.Motion.RightElbowAngle
+function t.UpdateArmIK(p1) --[[ Line: 73 ]]
+	local IK = p1.IK
+	IK.RightArm = p1.Model.Skeleton.RightArm.Position
+	IK.RightAngle = p1.Config.Motion.RightElbowAngle
 end
-local RayCast_upvr = require(ReplicatedStorage.Module.RayCast)
-function module_upvr.ShootSound(arg1, arg2) -- Line 79
-    if not arg2 then
-        Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.flintlock_shoot, {
-            Pitch = 0.7;
-            Volume = 0.7;
-        })
-        arg1.SpringLever:Accelerate(Vector3.new(30, 0, 0))
-        if RayCast_upvr.RayIgnoreNonCollide(arg1.RootPart.Position, -arg1.RootPart.CFrame.LookVector, 5, arg1.Character) == nil then
-            arg1.SpringKnockback:Accelerate(50)
-        end
-    end
+function t.ShootSound(p1, p2) --[[ Line: 79 | Upvalues: Audio (copy), RayCast (copy) ]]
+	if not p2 then
+		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.flintlock_shoot, {
+			Pitch = 0.7,
+			Volume = 0.7
+		})
+		p1.SpringLever:Accelerate(Vector3.new(30, 0, 0))
+		if RayCast.RayIgnoreNonCollide(p1.RootPart.Position, -p1.RootPart.CFrame.LookVector, 5, p1.Character) == nil then
+			p1.SpringKnockback:Accelerate(50)
+		end
+	end
 end
-function module_upvr.ReloadDropAmmoSound(arg1) -- Line 91
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.flintlock_reload_open, {
-        RollOffMaxDistance = 129;
-    })
+function t.ReloadDropAmmoSound(p1) --[[ Line: 91 | Upvalues: Audio (copy) ]]
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.flintlock_reload_open, {
+		RollOffMaxDistance = 129
+	})
 end
-function module_upvr.ReloadRefillAmmoSound(arg1) -- Line 96
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.flintlock_reload_close, {
-        RollOffMaxDistance = 129;
-    })
+function t.ReloadRefillAmmoSound(p1) --[[ Line: 96 | Upvalues: Audio (copy) ]]
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.flintlock_reload_close, {
+		RollOffMaxDistance = 129
+	})
 end
-return module_upvr
+return t

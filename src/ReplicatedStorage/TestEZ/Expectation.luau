@@ -1,298 +1,211 @@
-local module_upvr = {}
-local tbl_upvr_2 = {
-    to = true;
-    be = true;
-    been = true;
-    have = true;
-    was = true;
-    at = true;
+local t = {}
+local t2 = {
+	to = true,
+	be = true,
+	been = true,
+	have = true,
+	was = true,
+	at = true
 }
-local tbl_upvr = {
-    never = true;
+local t3 = {
+	never = true
 }
-local function _(arg1, arg2, arg3) -- Line 42, Named "assertLevel"
-    if not arg1 then
-        error(arg2 or "Assertion failed!", (arg3 or 1) + 1)
-    end
+local function assertLevel(p1, p2, p3) --[[ Line: 42 ]]
+	local v1 = p2 or "Assertion failed!"
+	local v2 = p3 or 1
+	if not p1 then
+		error(v1, v2 + 1)
+	end
 end
-local function _(arg1, arg2) -- Line 54, Named "bindSelf"
-    return function(arg1_2, ...) -- Line 55
-        if arg1_2 == arg1 then
-            return arg2(arg1, ...)
-        end
-        return arg2(arg1, arg1_2, ...)
-    end
+local function bindSelf(p1, p2) --[[ Line: 54 ]]
+	return function(p12, ...) --[[ Line: 55 | Upvalues: p1 (copy), p2 (copy) ]]
+		if p12 == p1 then
+			return p2(p1, ...)
+		else
+			return p2(p1, p12, ...)
+		end
+	end
 end
-local function _(arg1, arg2, arg3) -- Line 64, Named "formatMessage"
-    if arg1 then
-        return arg2
-    end
-    return arg3
+local function formatMessage(p1, p2, p3) --[[ Line: 64 ]]
+	if p1 then
+		return p2
+	else
+		return p3
+	end
 end
-function module_upvr.new(arg1) -- Line 75
-    local module_upvr_2 = {}
-    module_upvr_2.value = arg1
-    module_upvr_2.successCondition = true
-    module_upvr_2.condition = false
-    module_upvr_2.matchers = {}
-    module_upvr_2._boundMatchers = {}
-    setmetatable(module_upvr_2, module_upvr)
-    local a_2_upvr = module_upvr_2.a
-    function module_upvr_2.a(arg1_3, ...) -- Line 55
-        if arg1_3 == module_upvr_2 then
-            return a_2_upvr(module_upvr_2, ...)
-        end
-        return a_2_upvr(module_upvr_2, arg1_3, ...)
-    end
-    module_upvr_2.an = module_upvr_2.a
-    a_2_upvr = module_upvr_2.ok
-    function module_upvr_2.ok(arg1_4, ...) -- Line 55
-        if arg1_4 == module_upvr_2 then
-            return a_2_upvr(module_upvr_2, ...)
-        end
-        return a_2_upvr(module_upvr_2, arg1_4, ...)
-    end
-    a_2_upvr = module_upvr_2.equal
-    function module_upvr_2.equal(arg1_5, ...) -- Line 55
-        if arg1_5 == module_upvr_2 then
-            return a_2_upvr(module_upvr_2, ...)
-        end
-        return a_2_upvr(module_upvr_2, arg1_5, ...)
-    end
-    a_2_upvr = module_upvr_2.throw
-    function module_upvr_2.throw(arg1_6, ...) -- Line 55
-        if arg1_6 == module_upvr_2 then
-            return a_2_upvr(module_upvr_2, ...)
-        end
-        return a_2_upvr(module_upvr_2, arg1_6, ...)
-    end
-    a_2_upvr = module_upvr_2.near
-    function module_upvr_2.near(arg1_7, ...) -- Line 55
-        if arg1_7 == module_upvr_2 then
-            return a_2_upvr(module_upvr_2, ...)
-        end
-        return a_2_upvr(module_upvr_2, arg1_7, ...)
-    end
-    return module_upvr_2
+function t.new(p1) --[[ Line: 75 | Upvalues: t (copy) ]]
+	local t2 = {
+		value = p1,
+		successCondition = true,
+		condition = false,
+		matchers = {},
+		_boundMatchers = {}
+	}
+	setmetatable(t2, t)
+	local a = t2.a
+	function t2.a(p1, ...) --[[ Line: 55 | Upvalues: t2 (copy), a (copy) ]]
+		if p1 == t2 then
+			return a(t2, ...)
+		else
+			return a(t2, p1, ...)
+		end
+	end
+	t2.an = t2.a
+	local ok = t2.ok
+	function t2.ok(p1, ...) --[[ Line: 55 | Upvalues: t2 (copy), ok (copy) ]]
+		if p1 == t2 then
+			return ok(t2, ...)
+		else
+			return ok(t2, p1, ...)
+		end
+	end
+	local equal = t2.equal
+	function t2.equal(p1, ...) --[[ Line: 55 | Upvalues: t2 (copy), equal (copy) ]]
+		if p1 == t2 then
+			return equal(t2, ...)
+		else
+			return equal(t2, p1, ...)
+		end
+	end
+	local throw = t2.throw
+	function t2.throw(p1, ...) --[[ Line: 55 | Upvalues: t2 (copy), throw (copy) ]]
+		if p1 == t2 then
+			return throw(t2, ...)
+		else
+			return throw(t2, p1, ...)
+		end
+	end
+	local near = t2.near
+	function t2.near(p1, ...) --[[ Line: 55 | Upvalues: t2 (copy), near (copy) ]]
+		if p1 == t2 then
+			return near(t2, ...)
+		else
+			return near(t2, p1, ...)
+		end
+	end
+	return t2
 end
-function module_upvr.checkMatcherNameCollisions(arg1) -- Line 96
-    if tbl_upvr_2[arg1] or tbl_upvr[arg1] or module_upvr[arg1] then
-        return false
-    end
-    return true
+function t.checkMatcherNameCollisions(p1) --[[ Line: 96 | Upvalues: t2 (copy), t3 (copy), t (copy) ]]
+	return not (t2[p1] or (t3[p1] or t[p1]))
 end
-function module_upvr.extend(arg1, arg2) -- Line 104
-    local var16 = arg2
-    if not var16 then
-        var16 = {}
-    end
-    arg1.matchers = var16
-    local pairs_result1, pairs_result2, pairs_result3 = pairs(arg1.matchers)
-    for i, v_upvr in pairs_result1, pairs_result2, pairs_result3 do
-        local function var20_upvr(arg1_8, ...) -- Line 108
-            local value = arg1.value
-            local v_upvr_result1 = v_upvr(value, ...)
-            if v_upvr_result1.pass ~= arg1.successCondition then
-                value = false
-            else
-                value = true
-            end
-            if not value then
-                error(v_upvr_result1.message or "Assertion failed!", (3 or 1) + 1)
-            end
-            arg1:_resetModifiers()
-            return arg1
-        end
-        arg1._boundMatchers[i] = function(arg1_9, ...) -- Line 55
-            if arg1_9 == arg1 then
-                return var20_upvr(arg1, ...)
-            end
-            return var20_upvr(arg1, arg1_9, ...)
-        end
-    end
-    return arg1
+function t.extend(p1, p2) --[[ Line: 104 ]]
+	p1.matchers = p2 or {}
+	for k, v in pairs(p1.matchers) do
+		local function f2(p12, ...) --[[ Line: 108 | Upvalues: v (copy), p1 (copy) ]]
+			local v1 = v(p1.value, ...)
+			local v2 = v1.message or "Assertion failed!"
+			local v3 = 3 or 1
+			if v1.pass ~= p1.successCondition then
+				error(v2, v3 + 1)
+			end
+			p1:_resetModifiers()
+			return p1
+		end
+		p1._boundMatchers[k] = function(p12, ...) --[[ Line: 55 | Upvalues: p1 (copy), f2 (copy) ]]
+			if p12 == p1 then
+				return f2(p1, ...)
+			else
+				return f2(p1, p12, ...)
+			end
+		end
+	end
+	return p1
 end
-function module_upvr.__index(arg1, arg2) -- Line 121
-    if tbl_upvr_2[arg2] then
-        return arg1
-    end
-    if tbl_upvr[arg2] then
-        local any_extend_result1 = module_upvr.new(arg1.value):extend(arg1.matchers)
-        any_extend_result1.successCondition = not arg1.successCondition
-        return any_extend_result1
-    end
-    if arg1._boundMatchers[arg2] then
-        return arg1._boundMatchers[arg2]
-    end
-    return module_upvr[arg2]
+function t.__index(p1, p2) --[[ Line: 121 | Upvalues: t2 (copy), t3 (copy), t (copy) ]]
+	if t2[p2] then
+		return p1
+	elseif t3[p2] then
+		local v1 = t.new(p1.value):extend(p1.matchers)
+		v1.successCondition = not p1.successCondition
+		return v1
+	elseif p1._boundMatchers[p2] then
+		return p1._boundMatchers[p2]
+	else
+		return t[p2]
+	end
 end
-function module_upvr._resetModifiers(arg1) -- Line 154
-    arg1.successCondition = true
+function t._resetModifiers(p1) --[[ Line: 154 ]]
+	p1.successCondition = true
 end
-function module_upvr.a(arg1, arg2) -- Line 163
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local var25
-    if type(arg1.value) ~= arg2 then
-        var25 = false
-    else
-        var25 = true
-    end
-    if var25 ~= arg1.successCondition then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if arg1.successCondition then
-        var25 = string.format("Expected value of type %q, got value %q of type %s", arg2, tostring(arg1.value), type(arg1.value))
-    else
-        var25 = string.format("Expected value not of type %q, got value %q of type %s", arg2, tostring(arg1.value), type(arg1.value))
-    end
-    if not true then
-        error(var25 or "Assertion failed!", (3 or 1) + 1)
-    end
-    arg1:_resetModifiers()
-    do
-        return arg1
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.a(p1, p2) --[[ Line: 163 ]]
+	local v2 = type(p1.value) == p2 == p1.successCondition
+	local v4 = ("Expected value of type %q, got value %q of type %s"):format(p2, tostring(p1.value), (type(p1.value)))
+	local v8 = if p1.successCondition then v4 else ("Expected value not of type %q, got value %q of type %s"):format(p2, tostring(p1.value), (type(p1.value))) or "Assertion failed!"
+	local v9 = 3 or 1
+	if not v2 then
+		error(v8, v9 + 1)
+	end
+	p1:_resetModifiers()
+	return p1
 end
-module_upvr.an = module_upvr.a
-function module_upvr.ok(arg1) -- Line 191
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local var26
-    if arg1.value == nil then
-        var26 = false
-    else
-        var26 = true
-    end
-    if var26 ~= arg1.successCondition then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if arg1.successCondition then
-        var26 = string.format("Expected value %q to be non-nil", tostring(arg1.value))
-    else
-        var26 = string.format("Expected value %q to be nil", tostring(arg1.value))
-    end
-    if not true then
-        error(var26 or "Assertion failed!", (3 or 1) + 1)
-    end
-    arg1:_resetModifiers()
-    do
-        return arg1
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+t.an = t.a
+function t.ok(p1) --[[ Line: 191 ]]
+	local v1 = ("Expected value %q to be non-nil"):format((tostring(p1.value)))
+	local v4 = if p1.successCondition then v1 else ("Expected value %q to be nil"):format((tostring(p1.value))) or "Assertion failed!"
+	local v5 = 3 or 1
+	if p1.value ~= nil ~= p1.successCondition then
+		error(v4, v5 + 1)
+	end
+	p1:_resetModifiers()
+	return p1
 end
-function module_upvr.equal(arg1, arg2) -- Line 212
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local var27
-    if arg1.value ~= arg2 then
-        var27 = false
-    else
-        var27 = true
-    end
-    if var27 ~= arg1.successCondition then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if arg1.successCondition then
-        var27 = string.format("Expected value %q (%s), got %q (%s) instead", tostring(arg2), type(arg2), tostring(arg1.value), type(arg1.value))
-    else
-        var27 = string.format("Expected anything but value %q (%s)", tostring(arg2), type(arg2))
-    end
-    if not true then
-        error(var27 or "Assertion failed!", (3 or 1) + 1)
-    end
-    arg1:_resetModifiers()
-    do
-        return arg1
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.equal(p1, p2) --[[ Line: 212 ]]
+	local v5 = ("Expected value %q (%s), got %q (%s) instead"):format(tostring(p2), type(p2), tostring(p1.value), (type(p1.value)))
+	local v8 = if p1.successCondition then v5 else ("Expected anything but value %q (%s)"):format(tostring(p2), (type(p2))) or "Assertion failed!"
+	local v9 = 3 or 1
+	if p1.value == p2 ~= p1.successCondition then
+		error(v8, v9 + 1)
+	end
+	p1:_resetModifiers()
+	return p1
 end
-function module_upvr.near(arg1, arg2, arg3) -- Line 238
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local var28
-    if type(arg1.value) ~= "number" then
-        var28 = false
-    else
-        var28 = true
-    end
-    assert(var28, "Expectation value must be a number to use 'near'")
-    if type(arg2) ~= "number" then
-        var28 = false
-    else
-        var28 = true
-    end
-    assert(var28, "otherValue must be a number")
-    var28 = true
-    if type(arg3) ~= "number" then
-        if arg3 ~= nil then
-            var28 = false
-        else
-            var28 = true
-        end
-    end
-    assert(var28, "limit must be a number or nil")
-    if math.abs(arg1.value - arg2) > (arg3 or 1e-07) then
-        var28 = false
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    var28 = true
-    if var28 ~= arg1.successCondition then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.near(p1, p2, p3) --[[ Line: 238 ]]
+	assert(type(p1.value) == "number", "Expectation value must be a number to use \'near\'")
+	assert(type(p2) == "number", "otherValue must be a number")
+	assert(type(p3) == "number" or p3 == nil, "limit must be a number or nil")
+	local v4 = p3 or 1e-7
+	local v7 = math.abs(p1.value - p2) <= v4 == p1.successCondition
+	local v8 = ("Expected value to be near %f (within %f) but got %f instead"):format(p2, v4, p1.value)
+	local v11 = if p1.successCondition then v8 else ("Expected value to not be near %f (within %f) but got %f instead"):format(p2, v4, p1.value) or "Assertion failed!"
+	local v12 = 3 or 1
+	if not v7 then
+		error(v11, v12 + 1)
+	end
+	p1:_resetModifiers()
+	return p1
 end
-function module_upvr.throw(arg1, arg2) -- Line 271
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local pcall_result1, pcall_result2 = pcall(arg1.value)
-    local var31
-    if pcall_result1 == arg1.successCondition then
-        var31 = false
-    else
-        var31 = true
-    end
-    if arg2 and not pcall_result1 then
-        if arg1.successCondition then
-            if pcall_result2:find(arg2, 1, true) == nil then
-                var31 = false
-            else
-                var31 = true
-            end
-        elseif pcall_result2:find(arg2, 1, true) ~= nil then
-            var31 = false
-        else
-            var31 = true
-        end
-    end
-    local var32
-    if arg2 then
-        local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var32 = string.format("threw: %s", pcall_result2)
-            return var32
-        end
-        if not pcall_result2 or not decompInlinedCondition() then
-            var32 = "did not throw."
-        end
-        var32 = arg2
-        if arg1.successCondition then
-        else
-        end
-    else
-        var32 = pcall_result2
-        if arg1.successCondition then
-        else
-        end
-    end
-    if not var31 then
-        var32 = string.format("Expected function to succeed, but it threw an error: %s", tostring(var32)) or "Assertion failed!"
-        error(var32, (3 or 1) + 1)
-    end
-    arg1:_resetModifiers()
-    return arg1
+function t.throw(p1, p2) --[[ Line: 271 ]]
+	local v1, v2 = pcall(p1.value)
+	local v3 = v1 ~= p1.successCondition
+	if p2 and not v1 then
+		v3 = if p1.successCondition then v2:find(p2, 1, true) ~= nil else v2:find(p2, 1, true) == nil
+	end
+	local v4
+	if p2 then
+		local v6, v7
+		if v2 then
+			v6 = ("threw: %s"):format(v2)
+			if v6 then
+				v7 = p2
+			else
+				v7 = p2
+				v6 = "did not throw."
+			end
+		else
+			v7 = p2
+			v6 = "did not throw."
+		end
+		local v8 = ("Expected function to throw an error containing %q, but it %s"):format(v7, v6)
+		v4 = if p1.successCondition then v8 else ("Expected function to never throw an error containing %q, but it threw: %s"):format(p2, (tostring(v2)))
+	else
+		v4 = if p1.successCondition then "Expected function to throw an error, but it did not throw." else ("Expected function to succeed, but it threw an error: %s"):format((tostring(v2)))
+	end
+	local v11 = v4 or "Assertion failed!"
+	local v12 = 3 or 1
+	if not v3 then
+		error(v11, v12 + 1)
+	end
+	p1:_resetModifiers()
+	return p1
 end
-return module_upvr
+return t

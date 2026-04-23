@@ -1,92 +1,111 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgM6CFRpcmVNZXNoDkZpbmRGaXJzdENoaWxkB0Rlc3Ryb3kLUHJpbWFyeVBhcnQFcHJpbnQLR2V0RnVsbE5hbWULR2V0Q2hpbGRyZW4FZXJyb3I6VmVoaWNsZSB3aGVlbCBtb2RlbCBpcyBtaXNzaW5nIGBXaGVlbGAgcGFydCBhcyBQcmltYXJ5UGFydAZQYXJlbnQGRW5naW5lBkNGcmFtZQhQb3NpdGlvbhJQb2ludFRvT2JqZWN0U3BhY2UBWAVDbG9uZQRTaXplBE5hbWUIQW5jaG9yZWQKQ2FuQ29sbGlkZQhDYW5RdWVyeQhDYW5Ub3VjaAhNYXNzbGVzcw9Jbm5lcldoZWVsU2NhbGUISW5zdGFuY2UDbmV3DFZlY3RvcjNWYWx1ZQ1Jbm5lcldoZWVsUGN0B1ZlY3RvcjMFVmFsdWUGQW5nbGVzC0JvdW5kaW5nQm94CUJsYW5rV2VsZAJDMRB1cGRhdGVXaGVlbE1vZGVsBU1vZGVsB0NsYXNzaWMIUmVzb3VyY2UaQ291bGQgbm90IGZpbmQgdGlyZSBtZXNoOiAOR2V0RGVzY2VuZGFudHMDSXNBA3N1YgVXaGVlbAZXaGVlbHMLV2hlZWxNb2RlbHMLVGlyZVN0aWNrZXINR2V0SXRlbUJ5TmFtZQNSaW0EZ2FtZRFSZXBsaWNhdGVkU3RvcmFnZQpHZXRTZXJ2aWNlB3JlcXVpcmUDU3RkBUpvaW50BEdhbWUGR2FyYWdlCUN1c3RvbWl6ZQlTdG9yZURhdGEAAw4BBAAAMAAECQ8PDw8PCZgBCg8BAKMBDwIJmgEPAxyHAQ8EHYYBDwUoew8GOWoPB1dMDwh5KqMBbwMAALwBAAMBAAAAnwEDAg4BBAC8AgFQAgAAAJ8CAgHGAQAATQIAmwMAAAArAhAApAMFAAAAQEC8BACyBgAAAJ8EAgCfAwABpAMFAAAAQEC8BABoBwAAAJ8EAgCfAwABpAMJAAAAgEBvBAoAnwMCAcYDAABSBAIATQQEJAsAAABvBwwAvAUEAwEAAACfBQMCUgMFAEcDAgAAAACASAD2/8YFAABHBQ8AAAAAgE0HA4UNAAAATQkCOw4AAAC8BwfGDwAAAJ8HAwJNBgd5EAAAAIwH//+3BgIABwAAAKkFAAGpBQEA+wYAALwGBjoRAAAAnwYCAk0IAJsDAAAATQcI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
-
-local l_ReplicatedStorage_0 = game:GetService("ReplicatedStorage");
-local v1 = require(l_ReplicatedStorage_0.Std.Joint);
-local v2 = require(l_ReplicatedStorage_0.Game.Garage.Customize.TireSticker);
-local v3 = require(l_ReplicatedStorage_0.Game.Garage.Customize.Rim);
-local v4 = require(l_ReplicatedStorage_0.Game.Garage.StoreData);
-return function(v5, v6, v7) --[[ Line: 8 ]]
-    -- upvalues: l_ReplicatedStorage_0 (copy), v1 (copy), v4 (copy), v2 (copy), v3 (copy)
-    local l_Model_0 = v6.Model;
-    if not v5 then
-        v5 = {
-            Name = "Classic"
-        };
-    end;
-    local l_FirstChild_0 = l_ReplicatedStorage_0.Resource.TireMesh:FindFirstChild(v5.Name);
-    if not l_FirstChild_0 then
-        error("Could not find tire mesh: " .. v5.Name);
-    end;
-    local function v20(v10) --[[ Line: 20 ]] --[[ Name: updateWheelModel ]]
-        -- upvalues: l_FirstChild_0 (copy), v5 (ref), l_Model_0 (copy), v1 (ref)
-        local l_TireMesh_0 = v10:FindFirstChild("TireMesh");
-        if l_TireMesh_0 then
-            l_TireMesh_0:Destroy();
-            l_TireMesh_0 = nil;
-        end;
-        local l_PrimaryPart_0 = v10.PrimaryPart;
-        if not l_PrimaryPart_0 then
-            print(v10:GetFullName());
-            print(v10:GetChildren());
-            error("Vehicle wheel model is missing `Wheel` part as PrimaryPart");
-        end;
-        local v13 = nil;
-        local l_l_PrimaryPart_0_0 = l_PrimaryPart_0;
-        repeat
-            l_l_PrimaryPart_0_0 = l_l_PrimaryPart_0_0.Parent;
-            v13 = l_l_PrimaryPart_0_0:FindFirstChild("Engine");
-        until v13 ~= nil;
-        local v15 = nil;
-        if v15 == nil then
-            v15 = v13.CFrame:PointToObjectSpace(l_PrimaryPart_0.Position).X < -1;
-        end;
-        local v16 = l_FirstChild_0:Clone();
-        v16.Size = v10.PrimaryPart.Size;
-        v16.Name = "TireMesh";
-        v16.Anchored = false;
-        v16.CanCollide = false;
-        v16.CanQuery = false;
-        v16.CanTouch = false;
-        v16.Massless = true;
-        v16.Parent = v10;
-        local l_InnerWheelScale_0 = v10:FindFirstChild("InnerWheelScale");
-        if not l_InnerWheelScale_0 then
-            l_InnerWheelScale_0 = Instance.new("Vector3Value");
-            l_InnerWheelScale_0.Name = "InnerWheelScale";
-            l_InnerWheelScale_0.Parent = v10;
-        end;
-        l_InnerWheelScale_0.Value = v5.InnerWheelScale or Vector3.new(1, v5.InnerWheelPct or 0.7, v5.InnerWheelPct or 0.7);
-        local v18 = CFrame.Angles(0, 0, 0);
-        if not v15 then
-            v18 = CFrame.Angles(0, 3.141592653589793, 0);
-        end;
-        if l_Model_0:FindFirstChild("BoundingBox").Anchored then
-            v16.Anchored = true;
-            v16.CFrame = l_PrimaryPart_0.CFrame * v18;
-            return;
-        else
-            local v19 = v1.BlankWeld(v16, l_PrimaryPart_0);
-            v19.C1 = v18;
-            v19.Parent = v16;
-            return;
-        end;
-    end;
-    for _, v22 in l_Model_0:GetDescendants() do
-        if v22:IsA("Model") and v22.Name:sub(1, 5) == "Wheel" and v22.Name ~= "Wheels" and v22.Name ~= "WheelModels" then
-            v20(v22);
-        end;
-    end;
-    if v7 then
-        if v7.TireSticker then
-            local v23 = v4.GetItemByName("TireSticker", v7.TireSticker);
-            v2(v23, v6);
-        end;
-        if v7.Rim then
-            local v24 = v4.GetItemByName("Rim", v7.Rim);
-            v3(v24, v6, v7);
-        end;
-    end;
-end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Joint = require(ReplicatedStorage.Std.Joint)
+local TireSticker = require(ReplicatedStorage.Game.Garage.Customize.TireSticker)
+local Rim = require(ReplicatedStorage.Game.Garage.Customize.Rim)
+local StoreData = require(ReplicatedStorage.Game.Garage.StoreData)
+local t = {
+	Trailblazer = true,
+	BlackWidow = true,
+	Semi = true
+}
+return function(p1, p2, p3) --[[ Line: 14 | Upvalues: ReplicatedStorage (copy), Joint (copy), t (copy), StoreData (copy), TireSticker (copy), Rim (copy) ]]
+	local Model = p2.Model
+	if not p1 then
+		p1 = {
+			Name = "Classic"
+		}
+	end
+	local v1 = ReplicatedStorage.Resource.TireMesh:FindFirstChild(p1.Name)
+	if not v1 then
+		error("Could not find tire mesh: " .. p1.Name)
+	end
+	local function updateWheelModel(p12) --[[ Line: 26 | Upvalues: v1 (copy), p1 (ref), Model (copy), Joint (ref), t (ref), p2 (copy) ]]
+		local TireMesh = p12:FindFirstChild("TireMesh")
+		if TireMesh then
+			TireMesh:Destroy()
+		end
+		local PrimaryPart = p12.PrimaryPart
+		if not PrimaryPart then
+			print(p12:GetFullName())
+			print(p12:GetChildren())
+			error("Vehicle wheel model is missing `Wheel` part as PrimaryPart")
+		end
+		local v12 = PrimaryPart
+		local v2
+		repeat
+			v12 = v12.Parent
+			v2 = v12:FindFirstChild("Engine")
+		until v2 ~= nil
+		local v3 = nil
+		if v3 == nil then
+			v3 = v2.CFrame:PointToObjectSpace(PrimaryPart.Position).X < -1
+		end
+		local TireMesh_2 = v1:Clone()
+		TireMesh_2.Size = p12.PrimaryPart.Size
+		TireMesh_2.Name = "TireMesh"
+		TireMesh_2.Anchored = false
+		TireMesh_2.CanCollide = false
+		TireMesh_2.CanQuery = false
+		TireMesh_2.CanTouch = false
+		TireMesh_2.Massless = true
+		TireMesh_2.Parent = p12
+		local InnerWheelScale = p12:FindFirstChild("InnerWheelScale")
+		if not InnerWheelScale then
+			local InnerWheelScale_2 = Instance.new("Vector3Value")
+			InnerWheelScale_2.Name = "InnerWheelScale"
+			InnerWheelScale_2.Parent = p12
+			InnerWheelScale = InnerWheelScale_2
+		end
+		local InnerWheelScale_2 = p1.InnerWheelScale
+		if not InnerWheelScale_2 then
+			InnerWheelScale_2 = Vector3.new(1, p1.InnerWheelPct or 0.7, p1.InnerWheelPct or 0.7)
+		end
+		InnerWheelScale.Value = InnerWheelScale_2
+		local v6 = CFrame.Angles(0, 0, 0)
+		if not v3 then
+			v6 = CFrame.Angles(0, math.pi, 0)
+		end
+		if Model:FindFirstChild("BoundingBox").Anchored then
+			TireMesh_2.Anchored = true
+			TireMesh_2.CFrame = PrimaryPart.CFrame * v6
+		else
+			local v8 = Joint.BlankWeld(TireMesh_2, PrimaryPart)
+			v8.C1 = v6
+			v8.Parent = TireMesh_2
+		end
+		if t[p2.Make] and p12.Name:find("Back") then
+			for i = 1, 2 do
+				local v10
+				local v11 = Instance.fromExisting(TireMesh_2)
+				v11.Name = "Dual" .. i
+				v11.Size = v11.Size * Vector3.new(0.5, 1, 1)
+				v10 = if i == 1 then -1 else 1
+				v11.CFrame = TireMesh_2.CFrame * CFrame.new(v11.Size.X * v10 / 2, 0, 0)
+				v11.Parent = TireMesh_2
+				Joint.Weld(v11, TireMesh_2)
+			end
+			TireMesh_2.Transparency = 1
+		end
+	end
+	if Model:FindFirstChild("WheelModels") then
+		for v2, v3 in Model.WheelModels:GetChildren() do
+			if v3:IsA("Model") then
+				updateWheelModel(v3)
+			end
+		end
+	else
+		for v4, v5 in Model:GetDescendants() do
+			if v5:IsA("Model") and (v5.Name:sub(1, 5) == "Wheel" and (v5.Name ~= "Wheels" and v5.Name ~= "WheelModels")) then
+				updateWheelModel(v5)
+			end
+		end
+	end
+	if p3 then
+		if p3.TireSticker then
+			TireSticker(StoreData.GetItemByName("TireSticker", p3.TireSticker), p2)
+		end
+		if p3.Rim then
+			Rim(StoreData.GetItemByName("Rim", p3.Rim), p2, p3)
+		end
+	end
+end

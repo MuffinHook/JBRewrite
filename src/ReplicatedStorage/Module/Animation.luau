@@ -1,51 +1,47 @@
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.new(arg1) -- Line 5
-    local setmetatable_result1_upvr = setmetatable({}, module_upvr)
-    assert(arg1.Duration)
-    setmetatable_result1_upvr.OnUpdate = arg1.OnUpdate
-    setmetatable_result1_upvr.OnComplete = arg1.OnComplete
-    setmetatable_result1_upvr.OnCancel = arg1.OnCancel
-    local tick_result1_upvr = tick()
-    local Duration_upvr = arg1.Duration
-    setmetatable_result1_upvr.Event = RunService_upvr.Heartbeat:Connect(function(arg1_2) -- Line 16
-        local var10 = tick_result1_upvr
-        local var11
-        if Duration_upvr > var11 then
-            var10 = false
-        else
-            var10 = true
-        end
-        if var10 then
-            var11 = Duration_upvr
-        end
-        if setmetatable_result1_upvr.OnUpdate then
-            local var12 = var11 / Duration_upvr
-            if var12 ~= var12 then
-                var12 = 1
-            end
-            setmetatable_result1_upvr.OnUpdate(arg1_2, var11, var12)
-        end
-        if var10 then
-            setmetatable_result1_upvr.Event:Disconnect()
-            setmetatable_result1_upvr.Event = nil
-            if setmetatable_result1_upvr.OnComplete then
-                setmetatable_result1_upvr.OnComplete()
-            end
-        end
-    end)
-    return setmetatable_result1_upvr
+local RunService = game:GetService("RunService")
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 5 | Upvalues: t (copy), RunService (copy) ]]
+	local v2 = setmetatable({}, t)
+	assert(p1.Duration)
+	local Duration_2 = p1.Duration
+	v2.OnUpdate = p1.OnUpdate
+	v2.OnComplete = p1.OnComplete
+	v2.OnCancel = p1.OnCancel
+	local v3 = tick()
+	v2.Event = RunService.Heartbeat:Connect(function(p1) --[[ Line: 16 | Upvalues: v3 (copy), Duration_2 (copy), v2 (copy) ]]
+		local v1 = tick() - v3
+		local v22 = Duration_2 <= v1
+		if v22 then
+			v1 = Duration_2
+		end
+		if v2.OnUpdate then
+			local v32 = v1 / Duration_2
+			if v32 ~= v32 then
+				v32 = 1
+			end
+			v2.OnUpdate(p1, v1, v32)
+		end
+		if v22 then
+			v2.Event:Disconnect()
+			v2.Event = nil
+			if v2.OnComplete then
+				v2.OnComplete()
+			end
+		end
+	end)
+	return v2
 end
-function module_upvr.Destroy(arg1) -- Line 40
-    if not arg1.Event then
-        return false
-    end
-    arg1.Event:Disconnect()
-    arg1.Event = nil
-    if arg1.OnCancel then
-        arg1.OnCancel()
-    end
-    return true
+function t.Destroy(p1) --[[ Line: 40 ]]
+	if p1.Event then
+		p1.Event:Disconnect()
+		p1.Event = nil
+		if p1.OnCancel then
+			p1.OnCancel()
+		end
+		return true
+	else
+		return false
+	end
 end
-return module_upvr
+return t

@@ -1,122 +1,114 @@
-local NPCConsts_upvr = require(game:GetService("ReplicatedStorage").NPC.NPCConsts)
-local module_upvr = {
-    getTargetType = function(arg1) -- Line 6, Named "getTargetType"
-        return arg1:GetAttribute(NPCConsts_upvr.DEST_TYPE_ATTR_NAME)
-    end;
-    setTargetType = function(arg1, arg2) -- Line 9, Named "setTargetType"
-        arg1:SetAttribute(NPCConsts_upvr.DEST_TYPE_ATTR_NAME, arg2)
-    end;
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local NPCConsts = require(ReplicatedStorage.NPC.NPCConsts)
+local t = {
+	getTargetType = function(p1) --[[ Name: getTargetType | Line: 6 | Upvalues: NPCConsts (copy) ]]
+		return p1:GetAttribute(NPCConsts.DEST_TYPE_ATTR_NAME)
+	end,
+	setTargetType = function(p1, p2) --[[ Name: setTargetType | Line: 9 | Upvalues: NPCConsts (copy) ]]
+		p1:SetAttribute(NPCConsts.DEST_TYPE_ATTR_NAME, p2)
+	end
 }
-function module_upvr.getTarget(arg1) -- Line 12
-    local any_getTargetType_result1 = module_upvr.getTargetType(arg1)
-    if any_getTargetType_result1 == NPCConsts_upvr.DEST_TYPE.POS or any_getTargetType_result1 == NPCConsts_upvr.DEST_TYPE.IDLE then
-        return arg1:GetAttribute(NPCConsts_upvr.DEST_POS_ATTR_NAME)
-    end
-    if any_getTargetType_result1 == NPCConsts_upvr.DEST_TYPE.OBJ then
-        local SOME_4 = arg1:FindFirstChild(NPCConsts_upvr.DEST_OBJ_VALUE_NAME)
-        if SOME_4 then
-            return SOME_4.Value
-        end
-    end
-    return nil
+function t.getTarget(p1) --[[ Line: 12 | Upvalues: t (copy), NPCConsts (copy) ]]
+	local v1 = t.getTargetType(p1)
+	if v1 == NPCConsts.DEST_TYPE.POS or v1 == NPCConsts.DEST_TYPE.IDLE then
+		return p1:GetAttribute(NPCConsts.DEST_POS_ATTR_NAME)
+	elseif v1 == NPCConsts.DEST_TYPE.OBJ then
+		local v2 = p1:FindFirstChild(NPCConsts.DEST_OBJ_VALUE_NAME)
+		if v2 then
+			return v2.Value
+		else
+			return nil
+		end
+	else
+		return nil
+	end
 end
-function module_upvr.setTarget(arg1, arg2, arg3) -- Line 24
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if typeof(arg2) == "Instance" and arg2:IsA("BasePart") or arg2 == nil then
-        local OBJ = NPCConsts_upvr.DEST_TYPE.OBJ
-    else
-        error("Unknown targetType")
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if OBJ == NPCConsts_upvr.DEST_TYPE.POS or OBJ == NPCConsts_upvr.DEST_TYPE.IDLE then
-        arg1:SetAttribute(NPCConsts_upvr.DEST_POS_ATTR_NAME, arg2)
-    elseif OBJ == NPCConsts_upvr.DEST_TYPE.OBJ then
-        local SOME_3 = arg1:FindFirstChild(NPCConsts_upvr.DEST_OBJ_VALUE_NAME)
-        if not SOME_3 then
-            error("Could not find destObj")
-        end
-        SOME_3.Value = arg2
-    end
-    if module_upvr.getTargetType(arg1) ~= OBJ then
-        module_upvr.setTargetType(arg1, OBJ)
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.setTarget(p1, p2, p3) --[[ Line: 24 | Upvalues: NPCConsts (copy), t (copy) ]]
+	if p3 == nil and typeof(p2) == "Vector3" then
+		p3 = NPCConsts.DEST_TYPE.POS
+	elseif p3 == nil and (typeof(p2) == "Instance" and p2:IsA("BasePart") or p2 == nil) then
+		p3 = NPCConsts.DEST_TYPE.OBJ
+	elseif p3 == nil then
+		error("Unknown targetType")
+	end
+	if p3 == NPCConsts.DEST_TYPE.POS or p3 == NPCConsts.DEST_TYPE.IDLE then
+		p1:SetAttribute(NPCConsts.DEST_POS_ATTR_NAME, p2)
+	elseif p3 == NPCConsts.DEST_TYPE.OBJ then
+		local v1 = p1:FindFirstChild(NPCConsts.DEST_OBJ_VALUE_NAME)
+		if not v1 then
+			error("Could not find destObj")
+		end
+		v1.Value = p2
+	end
+	if t.getTargetType(p1) ~= p3 then
+		t.setTargetType(p1, p3)
+	end
 end
-function module_upvr.setHomePosition(arg1, arg2) -- Line 47
-    arg1:SetAttribute(NPCConsts_upvr.HOME_POSITION_OBJ_NAME, arg2)
+function t.setHomePosition(p1, p2) --[[ Line: 47 | Upvalues: NPCConsts (copy) ]]
+	p1:SetAttribute(NPCConsts.HOME_POSITION_OBJ_NAME, p2)
 end
-function module_upvr.getHomePosition(arg1) -- Line 52
-    return arg1:GetAttribute(NPCConsts_upvr.HOME_POSITION_OBJ_NAME)
+function t.getHomePosition(p1) --[[ Line: 52 | Upvalues: NPCConsts (copy) ]]
+	return p1:GetAttribute(NPCConsts.HOME_POSITION_OBJ_NAME)
 end
-function module_upvr.getLookAtType(arg1) -- Line 55
-    return arg1:GetAttribute(NPCConsts_upvr.LOOK_AT_TYPE_ATTR_NAME)
+function t.getLookAtType(p1) --[[ Line: 55 | Upvalues: NPCConsts (copy) ]]
+	return p1:GetAttribute(NPCConsts.LOOK_AT_TYPE_ATTR_NAME)
 end
-function module_upvr.setLookAtType(arg1, arg2) -- Line 58
-    arg1:SetAttribute(NPCConsts_upvr.LOOK_AT_TYPE_ATTR_NAME, arg2)
+function t.setLookAtType(p1, p2) --[[ Line: 58 | Upvalues: NPCConsts (copy) ]]
+	p1:SetAttribute(NPCConsts.LOOK_AT_TYPE_ATTR_NAME, p2)
 end
-function module_upvr.getLookAt(arg1) -- Line 61
-    local any_getLookAtType_result1 = module_upvr.getLookAtType(arg1)
-    if any_getLookAtType_result1 == NPCConsts_upvr.DEST_TYPE.POS or any_getLookAtType_result1 == NPCConsts_upvr.DEST_TYPE.IDLE then
-        return arg1:GetAttribute(NPCConsts_upvr.LOOK_AT_POS_ATTR_NAME)
-    end
-    if any_getLookAtType_result1 == NPCConsts_upvr.DEST_TYPE.OBJ then
-        local SOME = arg1:FindFirstChild(NPCConsts_upvr.LOOK_AT_OBJ_VALUE_NAME)
-        if SOME then
-            return SOME.Value
-        end
-    end
-    return nil
+function t.getLookAt(p1) --[[ Line: 61 | Upvalues: t (copy), NPCConsts (copy) ]]
+	local v1 = t.getLookAtType(p1)
+	if v1 == NPCConsts.DEST_TYPE.POS or v1 == NPCConsts.DEST_TYPE.IDLE then
+		return p1:GetAttribute(NPCConsts.LOOK_AT_POS_ATTR_NAME)
+	elseif v1 == NPCConsts.DEST_TYPE.OBJ then
+		local v2 = p1:FindFirstChild(NPCConsts.LOOK_AT_OBJ_VALUE_NAME)
+		if v2 then
+			return v2.Value
+		else
+			return nil
+		end
+	else
+		return nil
+	end
 end
-function module_upvr.setLookAt(arg1, arg2, arg3) -- Line 73
-    if arg3 == nil then
-        if typeof(arg2) == "Vector3" then
-            local POS = NPCConsts_upvr.DEST_TYPE.POS
-        elseif typeof(arg2) == "Instance" and arg2:IsA("BasePart") or arg2 == nil then
-        else
-            error("Unknown targetType")
-        end
-    end
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        return NPCConsts_upvr.DEST_TYPE.OBJ == NPCConsts_upvr.DEST_TYPE.IDLE
-    end
-    if NPCConsts_upvr.DEST_TYPE.OBJ == NPCConsts_upvr.DEST_TYPE.POS or decompInlinedCondition() then
-        arg1:SetAttribute(NPCConsts_upvr.LOOK_AT_POS_ATTR_NAME, arg2)
-    else
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        if NPCConsts_upvr.DEST_TYPE.OBJ == NPCConsts_upvr.DEST_TYPE.OBJ then
-            local SOME_5 = arg1:FindFirstChild(NPCConsts_upvr.LOOK_AT_OBJ_VALUE_NAME)
-            if not SOME_5 then
-                error("Could not find destObj")
-            end
-            SOME_5.Value = arg2
-        end
-    end
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    if module_upvr.getLookAtType(arg1) ~= NPCConsts_upvr.DEST_TYPE.OBJ then
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        module_upvr.setLookAtType(arg1, NPCConsts_upvr.DEST_TYPE.OBJ)
-    end
+function t.setLookAt(p1, p2, p3) --[[ Line: 73 | Upvalues: NPCConsts (copy), t (copy) ]]
+	if p3 == nil and typeof(p2) == "Vector3" then
+		p3 = NPCConsts.DEST_TYPE.POS
+	elseif p3 == nil and (typeof(p2) == "Instance" and p2:IsA("BasePart") or p2 == nil) then
+		p3 = NPCConsts.DEST_TYPE.OBJ
+	elseif p3 == nil then
+		error("Unknown targetType")
+	end
+	if p3 == NPCConsts.DEST_TYPE.POS or p3 == NPCConsts.DEST_TYPE.IDLE then
+		p1:SetAttribute(NPCConsts.LOOK_AT_POS_ATTR_NAME, p2)
+	elseif p3 == NPCConsts.DEST_TYPE.OBJ then
+		local v1 = p1:FindFirstChild(NPCConsts.LOOK_AT_OBJ_VALUE_NAME)
+		if not v1 then
+			error("Could not find destObj")
+		end
+		v1.Value = p2
+	end
+	if t.getLookAtType(p1) ~= p3 then
+		t.setLookAtType(p1, p3)
+	end
 end
-local Players_upvr = game:GetService("Players")
-function module_upvr.getNetworkOwner(arg1) -- Line 96
-    local attribute = arg1:GetAttribute(NPCConsts_upvr.NETWORK_OWNER_ID_ATTR_NAME)
-    if not attribute then return end
-    return Players_upvr:GetPlayerByUserId(attribute)
+function t.getNetworkOwner(p1) --[[ Line: 96 | Upvalues: NPCConsts (copy), Players (copy) ]]
+	local v1 = p1:GetAttribute(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME)
+	if v1 then
+		return Players:GetPlayerByUserId(v1)
+	end
 end
-function module_upvr.setExtrapolateTargetMovement(arg1, arg2) -- Line 103
-    return arg1:SetAttribute(NPCConsts_upvr.EXTRAPOLATE_TARGET_MOVEMENT_ATTR_NAME, arg2)
+function t.setExtrapolateTargetMovement(p1, p2) --[[ Line: 103 | Upvalues: NPCConsts (copy) ]]
+	return p1:SetAttribute(NPCConsts.EXTRAPOLATE_TARGET_MOVEMENT_ATTR_NAME, p2)
 end
-function module_upvr.getExtrapolateTargetMovement(arg1) -- Line 106
-    return arg1:GetAttribute(NPCConsts_upvr.EXTRAPOLATE_TARGET_MOVEMENT_ATTR_NAME)
+function t.getExtrapolateTargetMovement(p1) --[[ Line: 106 | Upvalues: NPCConsts (copy) ]]
+	return p1:GetAttribute(NPCConsts.EXTRAPOLATE_TARGET_MOVEMENT_ATTR_NAME)
 end
-function module_upvr.setCustomNetworkOwnership(arg1, arg2) -- Line 109
-    arg1:SetAttribute(NPCConsts_upvr.CUSTOM_NETWORK_OWNERSHIP_ATTR_NAME, arg2)
+function t.setCustomNetworkOwnership(p1, p2) --[[ Line: 109 | Upvalues: NPCConsts (copy) ]]
+	p1:SetAttribute(NPCConsts.CUSTOM_NETWORK_OWNERSHIP_ATTR_NAME, p2)
 end
-function module_upvr.getCustomNetworkOwnership(arg1) -- Line 112
-    return arg1:GetAttribute(NPCConsts_upvr.CUSTOM_NETWORK_OWNERSHIP_ATTR_NAME)
+function t.getCustomNetworkOwnership(p1) --[[ Line: 112 | Upvalues: NPCConsts (copy) ]]
+	return p1:GetAttribute(NPCConsts.CUSTOM_NETWORK_OWNERSHIP_ATTR_NAME)
 end
-return module_upvr
+return t

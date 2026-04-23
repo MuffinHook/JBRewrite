@@ -1,21 +1,23 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BaseObject_upvr = require(ReplicatedStorage.Std.BaseObject)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-local CollectionService_upvr = game:GetService("CollectionService")
-local SeekingMissileConsts_upvr = require(ReplicatedStorage.SeekingMissile.SeekingMissileConsts)
-local SeekingMissileBinder_upvr = require(ReplicatedStorage.SeekingMissile.SeekingMissileBinder)
-local RocketLauncherUtils_upvr = require(ReplicatedStorage.RocketLauncher.RocketLauncherUtils)
-function module_upvr.new(arg1) -- Line 14
-    local any_new_result1 = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1, module_upvr)
-    assert(CollectionService_upvr:HasTag(any_new_result1.obj, SeekingMissileConsts_upvr.TAG_NAME), "Must be seeking missile")
-    SeekingMissileBinder_upvr:Promise(any_new_result1.obj):andThen(function(arg1_2) -- Line 19
-        arg1_2.onExploded:Connect(function(arg1_3) -- Line 20
-            RocketLauncherUtils_upvr.explodeAt(arg1_3)
-        end)
-    end)
-    return any_new_result1
+local RocketLauncherConsts = require(ReplicatedStorage.RocketLauncher.RocketLauncherConsts)
+local RocketLauncherUtils = require(ReplicatedStorage.RocketLauncher.RocketLauncherUtils)
+local SeekingMissileBinder = require(ReplicatedStorage.SeekingMissile.SeekingMissileBinder)
+local SeekingMissileConsts = require(ReplicatedStorage.SeekingMissile.SeekingMissileConsts)
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1) --[[ Line: 14 | Upvalues: BaseObject (copy), t (copy), CollectionService (copy), SeekingMissileConsts (copy), SeekingMissileBinder (copy), RocketLauncherUtils (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t)
+	assert(CollectionService:HasTag(v1.obj, SeekingMissileConsts.TAG_NAME), "Must be seeking missile")
+	SeekingMissileBinder:Promise(v1.obj):andThen(function(p1) --[[ Line: 19 | Upvalues: RocketLauncherUtils (ref) ]]
+		p1.onExploded:Connect(function(p1) --[[ Line: 20 | Upvalues: RocketLauncherUtils (ref) ]]
+			RocketLauncherUtils.explodeAt(p1)
+		end)
+	end)
+	return v1
 end
-return require(ReplicatedStorage.Std.Binder).new(require(ReplicatedStorage.RocketLauncher.RocketLauncherConsts).ROCKET_TAG_NAME, module_upvr)
+return Binder.new(RocketLauncherConsts.ROCKET_TAG_NAME, t)

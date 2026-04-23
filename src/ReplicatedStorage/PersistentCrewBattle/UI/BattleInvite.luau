@@ -1,149 +1,140 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local PersistentCrewBattleConsts_upvr = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("BattleInvite")
-any_extend_result1.defaultProps = {
-    size = UDim2.new(1, 0, 1, 0);
-    position = UDim2.new(0, 0, 0, 0);
-    aspectRatio = 6;
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
+local TradeButton = require(ReplicatedStorage.Trade.UI.TradeButton)
+local v1 = Roact.PureComponent:extend("BattleInvite")
+v1.defaultProps = {
+	size = UDim2.new(1, 0, 1, 0),
+	position = UDim2.new(0, 0, 0, 0),
+	aspectRatio = 6
 }
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-function any_extend_result1.init(arg1) -- Line 16
-    arg1:setState({
-        remaining = 0;
-        createdAt = workspace:GetServerTimeNow();
-    })
-    function arg1.onAccept() -- Line 21
-        arg1.props.onAccept(arg1.props.index)
-    end
-    function arg1.onDecline() -- Line 24
-        arg1.props.onDecline(arg1.props.index)
-    end
-    arg1.maid = Maid_upvr.new()
+function v1.init(p1) --[[ Line: 16 | Upvalues: Maid (copy) ]]
+	p1:setState({
+		remaining = 0,
+		createdAt = workspace:GetServerTimeNow()
+	})
+	function p1.onAccept() --[[ Line: 21 | Upvalues: p1 (copy) ]]
+		p1.props.onAccept(p1.props.index)
+	end
+	function p1.onDecline() --[[ Line: 24 | Upvalues: p1 (copy) ]]
+		p1.props.onDecline(p1.props.index)
+	end
+	p1.maid = Maid.new()
 end
-local createElement_upvr = Roact_upvr.createElement
-local TradeButton_upvr = require(ReplicatedStorage.Trade.UI.TradeButton)
-function any_extend_result1.render(arg1) -- Line 29
-    local aspectRatio = arg1.props.aspectRatio
-    local var13
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var13 = Color3.fromRGB(255, 215, 0)
-        return var13
-    end
-    if not arg1.props.ranked or not decompInlinedCondition() then
-        var13 = Color3.new(1, 1, 1)
-    end
-    local var14
-    if arg1.props.ranked then
-        var14 = string.format("Enter ranked %d player crew battle?", arg1.props.battleNumPlayersPerTeam)
-    else
-        var14 = string.format("Enter %d player crew battle against %s's %s (%s)?", arg1.props.battleNumPlayersPerTeam, arg1.props.opposingClanOwnerName, arg1.props.clanName, arg1.props.clanDisplayRating or "N/A")
-    end
-    return createElement_upvr("Frame", {
-        BorderSizePixel = 0;
-        BackgroundColor3 = Color3.new(0, 0, 0);
-        BackgroundTransparency = 0.5;
-        Size = arg1.props.size;
-        Position = arg1.props.position;
-        AnchorPoint = arg1.props.anchorPoint;
-    }, {
-        AspectRatio = createElement_upvr("UIAspectRatioConstraint", {
-            AspectRatio = arg1.props.aspectRatio;
-        });
-        UICorner = createElement_upvr("UICorner", {
-            CornerRadius = UDim.new(0, 4);
-        });
-        Title = createElement_upvr("Frame", {
-            BackgroundTransparency = 1;
-            BackgroundColor3 = Color3.new(1, 0, 0);
-            Size = UDim2.new(0.96875, 0, 0.5 - 0.03125 * aspectRatio, 0);
-            Position = UDim2.new(0.015625, 0, 0.015625 * aspectRatio, 0);
-        }, {
-            Text = createElement_upvr("TextLabel", {
-                BackgroundTransparency = 1;
-                Size = UDim2.new(1, 0, 1, 0);
-                Position = UDim2.new(0.5, 0, 0.5, 0);
-                AnchorPoint = Vector2.new(0.5, 0.5);
-                TextColor3 = var13;
-                Text = var14;
-                TextXAlignment = Enum.TextXAlignment.Left;
-                Font = Enum.Font.FredokaOne;
-                LineHeight = 1;
-                TextScaled = true;
-            });
-        });
-        Time = createElement_upvr("Frame", {
-            BorderSizePixel = 0;
-            BackgroundTransparency = 1;
-            BackgroundColor3 = Color3.new(1, 0, 0);
-            Size = UDim2.new(0.3177083333333333, 0, 0.5 - 0.03125 * aspectRatio, 0);
-            Position = UDim2.new(0.015625, 0, 0.5 + 0.015625 * aspectRatio, 0);
-        }, {
-            Text = createElement_upvr("TextLabel", {
-                BackgroundTransparency = 1;
-                Size = UDim2.new(1, 0, 1, 0);
-                Position = UDim2.new(0.5, 0, 0.5, 0);
-                AnchorPoint = Vector2.new(0.5, 0.5);
-                TextColor3 = Color3.new(1, 0, 0);
-                Text = tostring(arg1.state.remaining)..'s';
-                TextXAlignment = Enum.TextXAlignment.Left;
-                TextYAlignment = Enum.TextYAlignment.Bottom;
-                Font = Enum.Font.FredokaOne;
-                LineHeight = 1;
-                TextScaled = true;
-            });
-        });
-        Accept = createElement_upvr(TradeButton_upvr, {
-            backgroundColor = Color3.fromRGB(42, 170, 255);
-            size = UDim2.new(0.25, 0, 0.5 - 0.015625 * aspectRatio, 0);
-            position = UDim2.new(0.734375, 0, 0.5, 0);
-            aspectRatio = Roact_upvr.None;
-            text = "Accept";
-            onClick = arg1.onAccept;
-            cornerPixel = 0;
-            cornerScale = 1;
-        });
-        Decline = createElement_upvr(TradeButton_upvr, {
-            backgroundColor = Color3.fromRGB(255, 58, 43);
-            size = UDim2.new(0.25, 0, 0.5 - 0.015625 * aspectRatio, 0);
-            position = UDim2.new(0.46875, 0, 0.5, 0);
-            aspectRatio = Roact_upvr.None;
-            text = "Decline";
-            onClick = arg1.onDecline;
-            cornerPixel = 0;
-            cornerScale = 1;
-        });
-    })
+function v1.render(p1) --[[ Line: 29 | Upvalues: createElement (copy), TradeButton (copy), Roact (copy) ]]
+	local aspectRatio = p1.props.aspectRatio
+	local v1 = p1.props.ranked and Color3.fromRGB(255, 215, 0) or Color3.new(255/255, 255/255, 255/255)
+	local v2 = if p1.props.ranked then ("Enter ranked %d player crew battle?"):format(p1.props.battleNumPlayersPerTeam) else ("Enter %d player crew battle against %s\'s %s (%s)?"):format(p1.props.battleNumPlayersPerTeam, p1.props.opposingClanOwnerName, p1.props.clanName, p1.props.clanDisplayRating or "N/A")
+	local t = {
+		AspectRatio = createElement("UIAspectRatioConstraint", {
+			AspectRatio = p1.props.aspectRatio
+		}),
+		UICorner = createElement("UICorner", {
+			CornerRadius = UDim.new(0, 4)
+		}),
+		Title = createElement("Frame", {
+			BackgroundTransparency = 1,
+			BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
+			Size = UDim2.new(0.96875, 0, 0.5 - 0.03125 * aspectRatio, 0),
+			Position = UDim2.new(0.015625, 0, 0.015625 * aspectRatio, 0)
+		}, {
+			Text = createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				TextColor3 = v1,
+				Text = v2,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Font = Enum.Font.FredokaOne,
+				LineHeight = 1,
+				TextScaled = true
+			})
+		})
+	}
+	local t2 = {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
+		Size = UDim2.new(0.3177083333333333, 0, 0.5 - 0.03125 * aspectRatio, 0),
+		Position = UDim2.new(0.015625, 0, 0.5 + 0.015625 * aspectRatio, 0)
+	}
+	local t3 = {}
+	local t4 = {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		TextColor3 = Color3.new(255/255, 0/255, 0/255)
+	}
+	t4.Text = tostring(p1.state.remaining) .. "s"
+	t4.TextXAlignment = Enum.TextXAlignment.Left
+	t4.TextYAlignment = Enum.TextYAlignment.Bottom
+	t4.Font = Enum.Font.FredokaOne
+	t4.LineHeight = 1
+	t4.TextScaled = true
+	t3.Text = createElement("TextLabel", t4)
+	t.Time = createElement("Frame", t2, t3)
+	t.Accept = createElement(TradeButton, {
+		backgroundColor = Color3.fromRGB(42, 170, 255),
+		size = UDim2.new(0.25, 0, 0.5 - 0.015625 * aspectRatio, 0),
+		position = UDim2.new(0.734375, 0, 0.5, 0),
+		aspectRatio = Roact.None,
+		text = "Accept",
+		onClick = p1.onAccept,
+		cornerPixel = 0,
+		cornerScale = 1
+	})
+	t.Decline = createElement(TradeButton, {
+		backgroundColor = Color3.fromRGB(255, 58, 43),
+		size = UDim2.new(0.25, 0, 0.5 - 0.015625 * aspectRatio, 0),
+		position = UDim2.new(0.46875, 0, 0.5, 0),
+		aspectRatio = Roact.None,
+		text = "Decline",
+		onClick = p1.onDecline,
+		cornerPixel = 0,
+		cornerScale = 1
+	})
+	return createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
+		BackgroundTransparency = 0.5,
+		Size = p1.props.size,
+		Position = p1.props.position,
+		AnchorPoint = p1.props.anchorPoint
+	}, t)
 end
-function any_extend_result1._hookObj(arg1) -- Line 124
-    arg1:setState({
-        createdAt = arg1.props.obj:GetAttribute(PersistentCrewBattleConsts_upvr.INVITE_CREATED_AT_ATTR_NAME);
-    })
-    arg1.maid.listenForInviteCreatedAtChanged = arg1.props.obj:GetAttributeChangedSignal(PersistentCrewBattleConsts_upvr.INVITE_CREATED_AT_ATTR_NAME):Connect(function() -- Line 130
-        arg1:setState({
-            createdAt = arg1.props.obj:GetAttribute(PersistentCrewBattleConsts_upvr.INVITE_CREATED_AT_ATTR_NAME);
-        })
-    end)
+function v1._hookObj(p1) --[[ Line: 124 | Upvalues: PersistentCrewBattleConsts (copy) ]]
+	p1:setState({
+		createdAt = p1.props.obj:GetAttribute(PersistentCrewBattleConsts.INVITE_CREATED_AT_ATTR_NAME)
+	})
+	p1.maid.listenForInviteCreatedAtChanged = p1.props.obj:GetAttributeChangedSignal(PersistentCrewBattleConsts.INVITE_CREATED_AT_ATTR_NAME):Connect(function() --[[ Line: 130 | Upvalues: p1 (copy), PersistentCrewBattleConsts (ref) ]]
+		p1:setState({
+			createdAt = p1.props.obj:GetAttribute(PersistentCrewBattleConsts.INVITE_CREATED_AT_ATTR_NAME)
+		})
+	end)
 end
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-function any_extend_result1.didMount(arg1) -- Line 136
-    if arg1.props.obj then
-        arg1:_hookObj()
-    end
-    local function update() -- Line 140
-        arg1:setState({
-            remaining = math.floor(math.max(0, (PersistentCrewBattleConsts_upvr.INVITE_TIMEOUT_DURATION) - (workspace:GetServerTimeNow() - arg1.state.createdAt)));
-        })
-    end
-    update()
-    arg1.maid:GiveTask(Interval_upvr.every(1):Connect(update))
+function v1.didMount(p1) --[[ Line: 136 | Upvalues: PersistentCrewBattleConsts (copy), Interval (copy) ]]
+	if p1.props.obj then
+		p1:_hookObj()
+	end
+	local function update() --[[ Line: 140 | Upvalues: p1 (copy), PersistentCrewBattleConsts (ref) ]]
+		local t = {}
+		t.remaining = math.floor((math.max(0, PersistentCrewBattleConsts.INVITE_TIMEOUT_DURATION - (workspace:GetServerTimeNow() - p1.state.createdAt))))
+		p1:setState(t)
+	end
+	update()
+	p1.maid:GiveTask(Interval.every(1):Connect(update))
 end
-function any_extend_result1.didUpdate(arg1, arg2, arg3) -- Line 151
-    if arg1.props.obj ~= arg2.obj and arg1.props.obj then
-        arg1:_hookObj()
-    end
+function v1.didUpdate(p1, p2, p3) --[[ Line: 151 ]]
+	if p1.props.obj ~= p2.obj and p1.props.obj then
+		p1:_hookObj()
+	end
 end
-function any_extend_result1.willUnmount(arg1) -- Line 158
-    arg1.maid:DoCleaning()
+function v1.willUnmount(p1) --[[ Line: 158 ]]
+	p1.maid:DoCleaning()
 end
-return any_extend_result1
+return v1

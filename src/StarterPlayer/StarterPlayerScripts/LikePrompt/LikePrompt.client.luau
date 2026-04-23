@@ -1,1 +1,2 @@
-require(game:GetService("ReplicatedStorage").LikePrompt.LikePromptService).init()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.LikePrompt.LikePromptService).init()

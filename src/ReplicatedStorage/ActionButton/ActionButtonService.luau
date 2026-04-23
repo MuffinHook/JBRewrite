@@ -1,115 +1,96 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TableUtils_upvr = require(ReplicatedStorage.Std.TableUtils)
-local module_upvr = {
-    triggerUpdate = require(ReplicatedStorage.Std.Signal).new();
-    active = {};
-    enabled = true;
+local Signal = require(ReplicatedStorage.Std.Signal)
+local TableUtils = require(ReplicatedStorage.Std.TableUtils)
+local t = {
+	triggerUpdate = Signal.new(),
+	active = {},
+	enabled = true
 }
-function module_upvr.add(arg1) -- Line 9
-    table.insert(module_upvr.active, arg1)
-    module_upvr.triggerUpdate:Fire()
-    return function() -- Line 16
-        local table_find_result1_3 = table.find(module_upvr.active, arg1)
-        if not table_find_result1_3 then
-            error("Could not find ActionButton, already removed?")
-        end
-        table.remove(module_upvr.active, table_find_result1_3)
-        if arg1._pressed then
-            arg1._pressed = nil
-            if arg1.onReleased then
-                arg1.onReleased()
-            end
-        end
-        module_upvr.triggerUpdate:Fire()
-    end
+function t.add(p1) --[[ Line: 9 | Upvalues: t (copy) ]]
+	table.insert(t.active, p1)
+	t.triggerUpdate:Fire()
+	return function() --[[ Line: 16 | Upvalues: t (ref), p1 (copy) ]]
+		local v1 = table.find(t.active, p1)
+		if not v1 then
+			error("Could not find ActionButton, already removed?")
+		end
+		table.remove(t.active, v1)
+		if p1._pressed then
+			p1._pressed = nil
+			if p1.onReleased then
+				p1.onReleased()
+			end
+		end
+		t.triggerUpdate:Fire()
+	end
 end
-function module_upvr.pushHide() -- Line 31
-    module_upvr.enabled = false
-    module_upvr.triggerUpdate:Fire()
-    return function() -- Line 34
-        module_upvr.enabled = true
-        module_upvr.triggerUpdate:Fire()
-    end
+function t.pushHide() --[[ Line: 31 | Upvalues: t (copy) ]]
+	t.enabled = false
+	t.triggerUpdate:Fire()
+	return function() --[[ Line: 34 | Upvalues: t (ref) ]]
+		t.enabled = true
+		t.triggerUpdate:Fire()
+	end
 end
-function module_upvr.hide() -- Line 39
-    module_upvr.enabled = false
-    module_upvr.triggerUpdate:Fire()
+function t.hide() --[[ Line: 39 | Upvalues: t (copy) ]]
+	t.enabled = false
+	t.triggerUpdate:Fire()
 end
-function module_upvr.show() -- Line 43
-    module_upvr.enabled = true
-    module_upvr.triggerUpdate:Fire()
+function t.show() --[[ Line: 43 | Upvalues: t (copy) ]]
+	t.enabled = true
+	t.triggerUpdate:Fire()
 end
-function module_upvr.setButtonPrimary(arg1, arg2) -- Line 47
-    arg1.primary = arg2
-    module_upvr.triggerUpdate:Fire()
+function t.setButtonPrimary(p1, p2) --[[ Line: 47 | Upvalues: t (copy) ]]
+	p1.primary = p2
+	t.triggerUpdate:Fire()
 end
-function module_upvr.setButtonPriority(arg1, arg2) -- Line 51
-    arg1.priority = arg2
-    module_upvr.triggerUpdate:Fire()
+function t.setButtonPriority(p1, p2) --[[ Line: 51 | Upvalues: t (copy) ]]
+	p1.priority = p2
+	t.triggerUpdate:Fire()
 end
-function module_upvr.setButtonKeyCodes(arg1, arg2) -- Line 55
-    arg1.keyCodes = arg2
-    module_upvr.triggerUpdate:Fire()
+function t.setButtonKeyCodes(p1, p2) --[[ Line: 55 | Upvalues: t (copy) ]]
+	p1.keyCodes = p2
+	t.triggerUpdate:Fire()
 end
-function module_upvr.addButtonKeyCode(arg1, arg2) -- Line 59
-    if not table.find(arg1.keyCodes, arg2) then
-        table.insert(arg1.keyCodes, arg2)
-        module_upvr.triggerUpdate:Fire()
-    end
+function t.addButtonKeyCode(p1, p2) --[[ Line: 59 | Upvalues: t (copy) ]]
+	if not table.find(p1.keyCodes, p2) then
+		table.insert(p1.keyCodes, p2)
+		t.triggerUpdate:Fire()
+	end
 end
-function module_upvr.removeButtonKeyCode(arg1, arg2) -- Line 65
-    local table_find_result1_2 = table.find(arg1.keyCodes, arg2)
-    if table_find_result1_2 then
-        table.remove(arg1.keyCodes, table_find_result1_2)
-        module_upvr.triggerUpdate:Fire()
-    end
+function t.removeButtonKeyCode(p1, p2) --[[ Line: 65 | Upvalues: t (copy) ]]
+	local v1 = table.find(p1.keyCodes, p2)
+	if v1 then
+		table.remove(p1.keyCodes, v1)
+		t.triggerUpdate:Fire()
+	end
 end
-function module_upvr.setButtonEnabled(arg1, arg2) -- Line 72
-    arg1.disabled = not arg2
-    if arg1._pressed then
-        arg1._pressed = nil
-        if arg1.onReleased then
-            arg1.onReleased()
-        end
-    end
-    module_upvr.triggerUpdate:Fire()
+function t.setButtonEnabled(p1, p2) --[[ Line: 72 | Upvalues: t (copy) ]]
+	p1.disabled = not p2
+	if p1._pressed then
+		p1._pressed = nil
+		if p1.onReleased then
+			p1.onReleased()
+		end
+	end
+	t.triggerUpdate:Fire()
 end
-function module_upvr.getDataInner() -- Line 82
-    local any_filter_result1 = TableUtils_upvr.filter(module_upvr.active, function(arg1) -- Line 83
-        local var10 = not arg1.disabled
-        if var10 then
-            var10 = arg1.primary
-        end
-        return var10
-    end)
-    table.sort(any_filter_result1, function(arg1, arg2) -- Line 86
-        local var13
-        if (arg2.priority or 1) >= (arg1.priority or 1) then
-            var13 = false
-        else
-            var13 = true
-        end
-        return var13
-    end)
-    return any_filter_result1
+function t.getDataInner() --[[ Line: 82 | Upvalues: TableUtils (copy), t (copy) ]]
+	local v1 = TableUtils.filter(t.active, function(p1) --[[ Line: 83 ]]
+		return not p1.disabled and p1.primary
+	end)
+	table.sort(v1, function(p1, p2) --[[ Line: 86 ]]
+		return (p1.priority or 1) > (p2.priority or 1)
+	end)
+	return v1
 end
-function module_upvr.getDataOuter() -- Line 91
-    local any_filter_result1_2 = TableUtils_upvr.filter(module_upvr.active, function(arg1) -- Line 92
-        local var15 = not arg1.disabled
-        if var15 then
-            var15 = not arg1.primary
-        end
-        return var15
-    end)
-    table.sort(any_filter_result1_2, function(arg1, arg2) -- Line 95
-        local var18
-        if (arg2.priority or 1) >= (arg1.priority or 1) then
-            var18 = false
-        else
-            var18 = true
-        end
-        return var18
-    end)
-    return any_filter_result1_2
+function t.getDataOuter() --[[ Line: 91 | Upvalues: TableUtils (copy), t (copy) ]]
+	local v1 = TableUtils.filter(t.active, function(p1) --[[ Line: 92 ]]
+		return not p1.disabled and not p1.primary
+	end)
+	table.sort(v1, function(p1, p2) --[[ Line: 95 ]]
+		return (p1.priority or 1) > (p2.priority or 1)
+	end)
+	return v1
 end
-return module_upvr
+return t

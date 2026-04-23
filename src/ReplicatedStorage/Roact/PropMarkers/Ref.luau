@@ -1,6 +1,1 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMGB3JlcXVpcmUGc2NyaXB0BlBhcmVudAZTeW1ib2wFbmFtZWQDUmVmAAEFAAABAgsAAAIPAAEQDwEMBRGjAAAApAABAAAAAECkBAMAAAAgQE0DBCQEAAAATQIDJAQAAABNAQKTBQAAAJ8AAgJNAQBRBgAAAG8CBwCfAQICggECAAgDAQQAAABAAwIEAAAgQAMDAwQDBQMGAAEAARgAAAAAAAAAAAAAAAACAAAAAgEAAAAAALI/ueRrnC7ogPvTcOtEorUFeDv/Y9JelAinaXS6XseByKVOj+RMD78=
-
-return (require(script.Parent.Parent.Symbol).named("Ref"));
+return require(script.Parent.Parent.Symbol).named("Ref")

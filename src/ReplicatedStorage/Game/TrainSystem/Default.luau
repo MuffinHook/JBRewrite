@@ -1,78 +1,86 @@
-local function SetVelocity_upvr(arg1, arg2, arg3) -- Line 8, Named "SetVelocity"
-    for _, v in next, arg1:GetChildren() do
-        if v:IsA("BasePart") then
-            v.Velocity = arg2
-            v.RotVelocity = arg3
-        end
-        SetVelocity_upvr(v, arg2, arg3)
-    end
-    return true
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Joint = require(ReplicatedStorage.Std.Joint)
+local TrainSystemUtils = require(script.Parent.TrainSystemUtils)
+local function v1(p1, p2, p3) --[[ Line: 8 | Upvalues: v1 (copy) ]]
+	local v12 = next
+	local v2, v3 = p1:GetChildren()
+	for v4, v5 in v12, v2, v3 do
+		if v5:IsA("BasePart") then
+			v5.Velocity = p2
+			v5.RotVelocity = p3
+		end
+		v1(v5, p2, p3)
+	end
+	return true
 end
-local Joint_upvr = require(game:GetService("ReplicatedStorage").Std.Joint)
-local TweenService_upvr = game:GetService("TweenService")
-local RunService_upvr = game:GetService("RunService")
-local TrainSystemUtils_upvr = require(script.Parent.TrainSystemUtils)
 return {
-    MakeCar = function(arg1) -- Line 19, Named "MakeCar"
-        local Model = arg1.Model
-        local Base_upvr = arg1.Base
-        local Length = arg1.Length
-        Joint_upvr.WeldAllTo(Model.Model, Base_upvr)
-        Joint_upvr.Weld(Model.FrontBogeyRoot, Base_upvr)
-        Joint_upvr.Weld(Model.BackBogeyRoot, Base_upvr)
-        Model.FrontBogeyRoot.Anchored = false
-        Model.BackBogeyRoot.Anchored = false
-        Model.FrontBogey.Anchored = false
-        Model.BackBogey.Anchored = false
-        Base_upvr.Anchored = true
-        arg1.BogeyMotorFront = Joint_upvr.BlankMotor(Model.FrontBogey, Model.FrontBogeyRoot)
-        arg1.BogeyMotorBack = Joint_upvr.BlankMotor(Model.BackBogey, Model.BackBogeyRoot)
-        arg1.BogeyOffsetFront = (Model.FrontBogeyRoot.Position - Base_upvr.CFrame * Vector3.new(0, 0, -Length * 0.5)).Magnitude
-        arg1.BogeyOffsetBack = (Model.BackBogeyRoot.Position - Base_upvr.CFrame * Vector3.new(0, 0, Length * 0.5)).Magnitude
-        local Skeleton_upvr = Model:FindFirstChild("Skeleton")
-        if Skeleton_upvr then
-            arg1.DoorOpenFuncs = {}
-            local function setupDoor(arg1_2) -- Line 48
-                local SOME_upvr = Skeleton_upvr:FindFirstChild("Door"..tostring(arg1_2))
-                if not SOME_upvr then
-                else
-                    Joint_upvr.WeldAllTo(SOME_upvr, SOME_upvr.PrimaryPart)
-                    SOME_upvr.PrimaryPart.Anchored = false
-                    local any_Motor_result1_upvr = Joint_upvr.Motor(SOME_upvr.PrimaryPart, Base_upvr)
-                    arg1.DoorOpenFuncs[arg1_2] = function() -- Line 56
-                        local tick_result1_upvr = tick()
-                        local var16_upvw
-                        var16_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 60, Named "Heartbeat"
-                            local var17 = (tick() - tick_result1_upvr) / 1
-                            if 1 <= var17 then
-                                var16_upvw:Disconnect()
-                                var17 = 1
-                            end
-                            any_Motor_result1_upvr.C1 = CFrame.new(SOME_upvr.PrimaryPart.Size.X * TweenService_upvr:GetValue(var17, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), 0, 0)
-                        end)
-                    end
-                end
-            end
-            setupDoor(1)
-            setupDoor(2)
-        end
-    end;
-    MoveCar = function(arg1, arg2, arg3, arg4) -- Line 78, Named "MoveCar"
-        local any_CalculatePosition_result1, any_CalculatePosition_result2_2 = TrainSystemUtils_upvr.CalculatePosition(arg2, arg2.Offset + arg4 + arg1.BogeyOffsetBack)
-        local any_CalculatePosition_result1_2, any_CalculatePosition_result2 = TrainSystemUtils_upvr.CalculatePosition(arg2, arg2.Offset + arg4 + arg1.Length - arg1.BogeyOffsetFront)
-        local cframe = CFrame.new(Vector3.new(), (any_CalculatePosition_result1_2 - any_CalculatePosition_result1).Unit)
-        arg1.Base.CFrame = cframe + (any_CalculatePosition_result1 + any_CalculatePosition_result1_2) * 0.5
-        local any_toObjectSpace_result1 = any_CalculatePosition_result2:toObjectSpace(cframe)
-        local any_toObjectSpace_result1_2 = any_CalculatePosition_result2_2:toObjectSpace(cframe)
-        if arg1.InvertBogey then
-            any_toObjectSpace_result1 = any_toObjectSpace_result1:inverse()
-            any_toObjectSpace_result1_2 = any_toObjectSpace_result1_2:inverse()
-        end
-        arg1.BogeyMotorFront.C0 = arg1.BogeyMotorFront.C0:lerp(any_toObjectSpace_result1, 0.1)
-        arg1.BogeyMotorBack.C0 = arg1.BogeyMotorBack.C0:lerp(any_toObjectSpace_result1_2, 0.1)
-    end;
-    DestroyCar = function(arg1) -- Line 100, Named "DestroyCar"
-        arg1.Model:Destroy()
-        return true
-    end;
+	MakeCar = function(p1) --[[ Name: MakeCar | Line: 19 | Upvalues: Joint (copy), TweenService (copy), RunService (copy) ]]
+		local Model = p1.Model
+		local Base = p1.Base
+		local Length = p1.Length
+		Joint.WeldAllTo(Model.Model, Base)
+		Joint.Weld(Model.FrontBogeyRoot, Base)
+		Joint.Weld(Model.BackBogeyRoot, Base)
+		local v1 = Joint.BlankMotor(Model.FrontBogey, Model.FrontBogeyRoot)
+		local v2 = Joint.BlankMotor(Model.BackBogey, Model.BackBogeyRoot)
+		Model.FrontBogeyRoot.Anchored = false
+		Model.BackBogeyRoot.Anchored = false
+		Model.FrontBogey.Anchored = false
+		Model.BackBogey.Anchored = false
+		Base.Anchored = true
+		local Magnitude = (Model.FrontBogeyRoot.Position - Base.CFrame * Vector3.new(0, 0, -Length * 0.5)).Magnitude
+		local Magnitude_2 = (Model.BackBogeyRoot.Position - Base.CFrame * Vector3.new(0, 0, Length * 0.5)).Magnitude
+		p1.BogeyMotorFront = v1
+		p1.BogeyMotorBack = v2
+		p1.BogeyOffsetFront = Magnitude
+		p1.BogeyOffsetBack = Magnitude_2
+		local Skeleton = Model:FindFirstChild("Skeleton")
+		if Skeleton then
+			p1.DoorOpenFuncs = {}
+			local function setupDoor(p12) --[[ Line: 48 | Upvalues: Skeleton (copy), Joint (ref), Base (copy), p1 (copy), TweenService (ref), RunService (ref) ]]
+				local v1 = Skeleton:FindFirstChild("Door" .. tostring(p12))
+				if v1 then
+					Joint.WeldAllTo(v1, v1.PrimaryPart)
+					local v2 = Joint.Motor(v1.PrimaryPart, Base)
+					v1.PrimaryPart.Anchored = false
+					p1.DoorOpenFuncs[p12] = function() --[[ Line: 56 | Upvalues: TweenService (ref), v2 (copy), v1 (copy), RunService (ref) ]]
+						local v12 = tick()
+						local v22 = nil
+						local function Heartbeat() --[[ Line: 60 | Upvalues: v12 (copy), v22 (ref), TweenService (ref), v2 (ref), v1 (ref) ]]
+							local v13 = (tick() - v12) / 1
+							if v13 >= 1 then
+								v22:Disconnect()
+								v13 = 1
+							end
+							v2.C1 = CFrame.new(v1.PrimaryPart.Size.X * TweenService:GetValue(v13, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), 0, 0)
+						end
+						v22 = RunService.Heartbeat:Connect(Heartbeat)
+					end
+				end
+			end
+			setupDoor(1)
+			setupDoor(2)
+		end
+	end,
+	MoveCar = function(p1, p2, p3, p4) --[[ Name: MoveCar | Line: 78 | Upvalues: TrainSystemUtils (copy) ]]
+		local Speed = p2.Speed
+		local v1, v2 = TrainSystemUtils.CalculatePosition(p2, p2.Offset + p4 + p1.BogeyOffsetBack)
+		local v3, v4 = TrainSystemUtils.CalculatePosition(p2, p2.Offset + p4 + p1.Length - p1.BogeyOffsetFront)
+		local v5 = CFrame.new(Vector3.new(), (v3 - v1).Unit)
+		p1.Base.CFrame = v5 + (v1 + v3) * 0.5
+		local v6 = v4:toObjectSpace(v5)
+		local v7 = v2:toObjectSpace(v5)
+		if p1.InvertBogey then
+			local v8 = v6:inverse()
+			v6, v7 = v8, v7:inverse()
+		end
+		p1.BogeyMotorFront.C0 = p1.BogeyMotorFront.C0:lerp(v6, 0.1)
+		p1.BogeyMotorBack.C0 = p1.BogeyMotorBack.C0:lerp(v7, 0.1)
+	end,
+	DestroyCar = function(p1) --[[ Name: DestroyCar | Line: 100 ]]
+		p1.Model:Destroy()
+		return true
+	end
 }

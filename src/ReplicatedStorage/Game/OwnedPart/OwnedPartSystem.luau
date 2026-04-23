@@ -1,7 +1,7 @@
-local module = {}
-local var2_upvw
-function module.init() -- Line 4
-    var2_upvw = require(script.Parent.OwnedPartBinder)
-    var2_upvw:Start()
-end
-return module
+local v1 = nil
+return {
+	init = function() --[[ Name: init | Line: 4 | Upvalues: v1 (ref) ]]
+		v1 = require(script.Parent.OwnedPartBinder)
+		v1:Start()
+	end
+}

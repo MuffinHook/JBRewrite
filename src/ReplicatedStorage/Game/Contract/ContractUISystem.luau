@@ -1,307 +1,290 @@
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local EzUtils_upvr = require(ReplicatedStorage_upvr.EzUi.EzUtils)
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local Promise_upvr = require(ReplicatedStorage_upvr.Std.Promise)
-local GameUtil_upvr = require(ReplicatedStorage_upvr.Game.GameUtil)
-local ContractBinder_upvr = require(script.Parent.ContractBinder)
-local ContractUI_upvr = require(script.Parent.ContractUI)
-local SeasonConsts_upvr = require(ReplicatedStorage_upvr.Game.Season.SeasonConsts)
-local var10_upvw
-local var11_upvw
-local function _(arg1) -- Line 28, Named "SelectIfGamepad"
-    EzUtils_upvr.selectIfGamepad(arg1)
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local MarketplaceService = game:GetService("MarketplaceService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local GameUtil = require(ReplicatedStorage.Game.GameUtil)
+local Window = require(ReplicatedStorage.Module.Window.Window)
+local ContractBinder = require(script.Parent.ContractBinder)
+local ContractUI = require(script.Parent.ContractUI)
+local SeasonConsts = require(ReplicatedStorage.Game.Season.SeasonConsts)
+local ContractConsts = require(script.Parent.ContractConsts)
+local SeasonUIUtils = require(ReplicatedStorage.Game.Season.SeasonUIUtils)
+local SeasonUtils = require(ReplicatedStorage.Game.Season.SeasonUtils)
+local SeasonSystem = require(ReplicatedStorage.Game.Season.SeasonSystem)
+local v1 = nil
+local v2 = nil
+local function SelectIfGamepad(p1) --[[ Line: 28 | Upvalues: EzUtils (copy) ]]
+	EzUtils.selectIfGamepad(p1)
 end
-local module_upvr = {}
-local waitForChild_upvr = require(ReplicatedStorage_upvr.Std.waitForChild)
-local ContractConsts_upvr = require(script.Parent.ContractConsts)
-local Interval_upvr = require(ReplicatedStorage_upvr.Std.Interval)
-local Window_upvr = require(ReplicatedStorage_upvr.Module.Window.Window)
-function module_upvr.init() -- Line 33
-    var10_upvw = require(ReplicatedStorage_upvr.Game.Season.SeasonUISystem)
-    var11_upvw = require(script.Parent.ContractSystem)
-    local ContractsGui = ReplicatedStorage_upvr.StarterGui:FindFirstChild("ContractsGui")
-    ContractsGui.Parent = LocalPlayer_upvr.PlayerGui
-    module_upvr.gui = ContractsGui
-    local ContractPopupGui_upvr = ReplicatedStorage_upvr.StarterGui:FindFirstChild("ContractPopupGui")
-    ContractPopupGui_upvr.Parent = LocalPlayer_upvr.PlayerGui
-    module_upvr.popupGui = ContractPopupGui_upvr
-    module_upvr._contractPreset = ContractsGui.Background.Body.Main.Preset
-    module_upvr._contractPreset.Visible = false
-    waitForChild_upvr(LocalPlayer_upvr, ContractConsts_upvr.DEADLINE_VALUE_NAME):andThen(function(arg1) -- Line 48
-        module_upvr._deadlineValue = arg1
-        Interval_upvr.every(1):Connect(module_upvr._updateDeadline)
-        module_upvr._updateDeadline()
-        module_upvr._deadlineValue:GetPropertyChangedSignal("Value"):Connect(module_upvr._updateDeadline)
-    end)
-    local any_new_result1 = Window_upvr.new()
-    any_new_result1:GetOnOpenedSignal():Connect(module_upvr._open)
-    any_new_result1:GetOnClosedSignal():Connect(module_upvr._close)
-    module_upvr._window = any_new_result1
-    GameUtil_upvr.getCenterWindowGroup():Add(any_new_result1)
-    local function _(arg1) -- Line 62, Named "hookContract"
-        arg1._maid:GiveTask(arg1:GetOnStateChangedSignal():Connect(function(arg1_2, arg2) -- Line 63
-            if arg1_2 == ContractConsts_upvr.enumState.COMPLETED or arg1_2 == ContractConsts_upvr.enumState.FAILED or arg1_2 == ContractConsts_upvr.enumState.ABORTED then
-                local var24
-                if arg1_2 == ContractConsts_upvr.enumState.COMPLETED then
-                    Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105462848)
-                    var24 = "COMPLETED"
-                elseif arg1_2 == ContractConsts_upvr.enumState.FAILED then
-                    var24 = "FAILED"
-                    Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105462626)
-                elseif arg1_2 == ContractConsts_upvr.enumState.ABORTED then
-                    var24 = "ABORTED"
-                    Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105462626)
-                end
-                local clone_3_upvw = module_upvr._contractPreset:Clone()
-                clone_3_upvw.Size = UDim2.new(1, 0, 1, 0)
-                clone_3_upvw.Visible = true
-                clone_3_upvw.Parent = ContractPopupGui_upvr.Container
-                local any_new_result1_2_upvw = ContractUI_upvr.new()
-                any_new_result1_2_upvw:SetFrame(clone_3_upvw)
-                any_new_result1_2_upvw:SetContract(arg1)
-                any_new_result1_2_upvw:SetTitle(var24)
-                Promise_upvr.delay(10):andThen(function() -- Line 94
-                    any_new_result1_2_upvw:Destroy()
-                    any_new_result1_2_upvw = nil
-                end):andThen(function() -- Line 98
-                    clone_3_upvw:Destroy()
-                    clone_3_upvw = nil
-                end)
-            end
-        end))
-    end
-    for _, v_upvr in ipairs(ContractBinder_upvr:GetAll()) do
-        if v_upvr:GetPlayer() == LocalPlayer_upvr then
-            v_upvr._maid:GiveTask(v_upvr:GetOnStateChangedSignal():Connect(function(arg1, arg2) -- Line 63
-                if arg1 == ContractConsts_upvr.enumState.COMPLETED or arg1 == ContractConsts_upvr.enumState.FAILED or arg1 == ContractConsts_upvr.enumState.ABORTED then
-                    local var33
-                    if arg1 == ContractConsts_upvr.enumState.COMPLETED then
-                        Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105462848)
-                        var33 = "COMPLETED"
-                    elseif arg1 == ContractConsts_upvr.enumState.FAILED then
-                        var33 = "FAILED"
-                        Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105462626)
-                    elseif arg1 == ContractConsts_upvr.enumState.ABORTED then
-                        var33 = "ABORTED"
-                        Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105462626)
-                    end
-                    local clone_upvw = module_upvr._contractPreset:Clone()
-                    clone_upvw.Size = UDim2.new(1, 0, 1, 0)
-                    clone_upvw.Visible = true
-                    clone_upvw.Parent = ContractPopupGui_upvr.Container
-                    local any_new_result1_upvw = ContractUI_upvr.new()
-                    any_new_result1_upvw:SetFrame(clone_upvw)
-                    any_new_result1_upvw:SetContract(v_upvr)
-                    any_new_result1_upvw:SetTitle(var33)
-                    Promise_upvr.delay(10):andThen(function() -- Line 94
-                        any_new_result1_upvw:Destroy()
-                        any_new_result1_upvw = nil
-                    end):andThen(function() -- Line 98
-                        clone_upvw:Destroy()
-                        clone_upvw = nil
-                    end)
-                end
-            end))
-        end
-    end
-    ContractBinder_upvr:GetClassAddedSignal():Connect(function(arg1) -- Line 110
-        if arg1:GetPlayer() == LocalPlayer_upvr then
-            arg1._maid:GiveTask(arg1:GetOnStateChangedSignal():Connect(function(arg1_3, arg2) -- Line 63
-                if arg1_3 == ContractConsts_upvr.enumState.COMPLETED or arg1_3 == ContractConsts_upvr.enumState.FAILED or arg1_3 == ContractConsts_upvr.enumState.ABORTED then
-                    local var40
-                    if arg1_3 == ContractConsts_upvr.enumState.COMPLETED then
-                        Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105462848)
-                        var40 = "COMPLETED"
-                    elseif arg1_3 == ContractConsts_upvr.enumState.FAILED then
-                        var40 = "FAILED"
-                        Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105462626)
-                    elseif arg1_3 == ContractConsts_upvr.enumState.ABORTED then
-                        var40 = "ABORTED"
-                        Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105462626)
-                    end
-                    local clone_2_upvw = module_upvr._contractPreset:Clone()
-                    clone_2_upvw.Size = UDim2.new(1, 0, 1, 0)
-                    clone_2_upvw.Visible = true
-                    clone_2_upvw.Parent = ContractPopupGui_upvr.Container
-                    local any_new_result1_3_upvw = ContractUI_upvr.new()
-                    any_new_result1_3_upvw:SetFrame(clone_2_upvw)
-                    any_new_result1_3_upvw:SetContract(arg1)
-                    any_new_result1_3_upvw:SetTitle(var40)
-                    Promise_upvr.delay(10):andThen(function() -- Line 94
-                        any_new_result1_3_upvw:Destroy()
-                        any_new_result1_3_upvw = nil
-                    end):andThen(function() -- Line 98
-                        clone_2_upvw:Destroy()
-                        clone_2_upvw = nil
-                    end)
-                end
-            end))
-        end
-    end)
+local t = {}
+function t.init() --[[ Line: 33 | Upvalues: v1 (ref), ReplicatedStorage (copy), v2 (ref), LocalPlayer (copy), t (copy), waitForChild (copy), ContractConsts (copy), Interval (copy), Window (copy), GameUtil (copy), Audio (copy), ContractUI (copy), Promise (copy), ContractBinder (copy) ]]
+	v1 = require(ReplicatedStorage.Game.Season.SeasonUISystem)
+	v2 = require(script.Parent.ContractSystem)
+	local ContractsGui = ReplicatedStorage.StarterGui:FindFirstChild("ContractsGui")
+	ContractsGui.Parent = LocalPlayer.PlayerGui
+	t.gui = ContractsGui
+	local ContractPopupGui = ReplicatedStorage.StarterGui:FindFirstChild("ContractPopupGui")
+	ContractPopupGui.Parent = LocalPlayer.PlayerGui
+	t.popupGui = ContractPopupGui
+	t._contractPreset = ContractsGui.Background.Body.Main.Preset
+	t._contractPreset.Visible = false
+	waitForChild(LocalPlayer, ContractConsts.DEADLINE_VALUE_NAME):andThen(function(p1) --[[ Line: 48 | Upvalues: t (ref), Interval (ref) ]]
+		t._deadlineValue = p1
+		Interval.every(1):Connect(t._updateDeadline)
+		t._updateDeadline()
+		t._deadlineValue:GetPropertyChangedSignal("Value"):Connect(t._updateDeadline)
+	end)
+	local v12 = Window.new()
+	v12:GetOnOpenedSignal():Connect(t._open)
+	v12:GetOnClosedSignal():Connect(t._close)
+	t._window = v12
+	GameUtil.getCenterWindowGroup():Add(v12)
+	local function hookContract(p1) --[[ Line: 62 | Upvalues: ContractConsts (ref), Audio (ref), LocalPlayer (ref), t (ref), ContractPopupGui (copy), ContractUI (ref), Promise (ref) ]]
+		p1._maid:GiveTask(p1:GetOnStateChangedSignal():Connect(function(p12, p2) --[[ Line: 63 | Upvalues: ContractConsts (ref), Audio (ref), LocalPlayer (ref), t (ref), ContractPopupGui (ref), ContractUI (ref), p1 (copy), Promise (ref) ]]
+			if p12 == ContractConsts.enumState.COMPLETED or (p12 == ContractConsts.enumState.FAILED or p12 == ContractConsts.enumState.ABORTED) then
+				local v1 = nil
+				if p12 == ContractConsts.enumState.COMPLETED then
+					Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105462848)
+					v1 = "COMPLETED"
+				elseif p12 == ContractConsts.enumState.FAILED then
+					Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105462626)
+					v1 = "FAILED"
+				elseif p12 == ContractConsts.enumState.ABORTED then
+					Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105462626)
+					v1 = "ABORTED"
+				end
+				local v2 = t._contractPreset:Clone()
+				v2.Size = UDim2.new(1, 0, 1, 0)
+				v2.Visible = true
+				v2.Parent = ContractPopupGui.Container
+				local v3 = ContractUI.new()
+				v3:SetFrame(v2)
+				v3:SetContract(p1)
+				v3:SetTitle(v1)
+				Promise.delay(10):andThen(function() --[[ Line: 94 | Upvalues: v3 (ref) ]]
+					v3:Destroy()
+					v3 = nil
+				end):andThen(function() --[[ Line: 98 | Upvalues: v2 (ref) ]]
+					v2:Destroy()
+					v2 = nil
+				end)
+			end
+		end))
+	end
+	for i, v in ipairs(ContractBinder:GetAll()) do
+		if v:GetPlayer() == LocalPlayer then
+			v._maid:GiveTask(v:GetOnStateChangedSignal():Connect(function(p1, p2) --[[ Line: 63 | Upvalues: ContractConsts (ref), Audio (ref), LocalPlayer (ref), t (ref), ContractPopupGui (copy), ContractUI (ref), v (copy), Promise (ref) ]]
+				if p1 == ContractConsts.enumState.COMPLETED or (p1 == ContractConsts.enumState.FAILED or p1 == ContractConsts.enumState.ABORTED) then
+					local v1 = nil
+					if p1 == ContractConsts.enumState.COMPLETED then
+						Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105462848)
+						v1 = "COMPLETED"
+					elseif p1 == ContractConsts.enumState.FAILED then
+						Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105462626)
+						v1 = "FAILED"
+					elseif p1 == ContractConsts.enumState.ABORTED then
+						Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105462626)
+						v1 = "ABORTED"
+					end
+					local v2 = t._contractPreset:Clone()
+					v2.Size = UDim2.new(1, 0, 1, 0)
+					v2.Visible = true
+					v2.Parent = ContractPopupGui.Container
+					local v3 = ContractUI.new()
+					v3:SetFrame(v2)
+					v3:SetContract(v)
+					v3:SetTitle(v1)
+					Promise.delay(10):andThen(function() --[[ Line: 94 | Upvalues: v3 (ref) ]]
+						v3:Destroy()
+						v3 = nil
+					end):andThen(function() --[[ Line: 98 | Upvalues: v2 (ref) ]]
+						v2:Destroy()
+						v2 = nil
+					end)
+				end
+			end))
+		end
+	end
+	ContractBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 110 | Upvalues: LocalPlayer (ref), ContractConsts (ref), Audio (ref), t (ref), ContractPopupGui (copy), ContractUI (ref), Promise (ref) ]]
+		if p1:GetPlayer() == LocalPlayer then
+			p1._maid:GiveTask(p1:GetOnStateChangedSignal():Connect(function(p12, p2) --[[ Line: 63 | Upvalues: ContractConsts (ref), Audio (ref), LocalPlayer (ref), t (ref), ContractPopupGui (ref), ContractUI (ref), p1 (copy), Promise (ref) ]]
+				if p12 == ContractConsts.enumState.COMPLETED or (p12 == ContractConsts.enumState.FAILED or p12 == ContractConsts.enumState.ABORTED) then
+					local v1 = nil
+					if p12 == ContractConsts.enumState.COMPLETED then
+						Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105462848)
+						v1 = "COMPLETED"
+					elseif p12 == ContractConsts.enumState.FAILED then
+						Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105462626)
+						v1 = "FAILED"
+					elseif p12 == ContractConsts.enumState.ABORTED then
+						Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105462626)
+						v1 = "ABORTED"
+					end
+					local v2 = t._contractPreset:Clone()
+					v2.Size = UDim2.new(1, 0, 1, 0)
+					v2.Visible = true
+					v2.Parent = ContractPopupGui.Container
+					local v3 = ContractUI.new()
+					v3:SetFrame(v2)
+					v3:SetContract(p1)
+					v3:SetTitle(v1)
+					Promise.delay(10):andThen(function() --[[ Line: 94 | Upvalues: v3 (ref) ]]
+						v3:Destroy()
+						v3 = nil
+					end):andThen(function() --[[ Line: 98 | Upvalues: v2 (ref) ]]
+						v2:Destroy()
+						v2 = nil
+					end)
+				end
+			end))
+		end
+	end)
 end
-local SeasonUtils_upvr = require(ReplicatedStorage_upvr.Game.Season.SeasonUtils)
-function module_upvr._updateDeadline() -- Line 116
-    module_upvr.gui.Background.Timer.Time.Text = SeasonUtils_upvr.formatRemaining(math.max(0, module_upvr._deadlineValue.Value - DateTime.now().UnixTimestamp))
+function t._updateDeadline() --[[ Line: 116 | Upvalues: t (copy), SeasonUtils (copy) ]]
+	t.gui.Background.Timer.Time.Text = SeasonUtils.formatRemaining((math.max(0, t._deadlineValue.Value - DateTime.now().UnixTimestamp)))
 end
-function module_upvr.clearContracts() -- Line 127
-    local _contractPreset_2 = module_upvr._contractPreset
-    for _, v_2 in ipairs(module_upvr.gui:GetChildren()) do
-        if v_2.ClassName == _contractPreset_2.ClassName and v_2 ~= _contractPreset_2 then
-            v_2:Destroy()
-        end
-    end
-    if module_upvr._listContractUI then
-        for _, v_3 in ipairs(module_upvr._listContractUI) do
-            v_3:Destroy()
-        end
-        module_upvr._listContractUI = nil
-    end
+function t.clearContracts() --[[ Line: 127 | Upvalues: t (copy) ]]
+	local _contractPreset = t._contractPreset
+	for i, v in ipairs(t.gui:GetChildren()) do
+		if v.ClassName == _contractPreset.ClassName and v ~= _contractPreset then
+			v:Destroy()
+		end
+	end
+	if t._listContractUI then
+		for i, v in ipairs(t._listContractUI) do
+			v:Destroy()
+		end
+		t._listContractUI = nil
+	end
 end
-function module_upvr.loadContracts(arg1) -- Line 142
-    module_upvr._lastTeamIdLoaded = arg1
-    local gui = module_upvr.gui
-    local _contractPreset = module_upvr._contractPreset
-    assert(not module_upvr._listContractUI)
-    local tbl = {}
-    module_upvr._listContractUI = tbl
-    local any_getContracts_result1 = var11_upvw.getContracts()
-    if #any_getContracts_result1 ~= 0 then
-        tbl = false
-    else
-        tbl = true
-    end
-    gui.Background.Body.Main.ThankYou.Visible = tbl
-    if tbl then
-        gui.Background.Body.Main.ThankYou.Text = string.format("Season %d is over! Thanks for playing!", SeasonConsts_upvr.SEASON_NUM)
-    else
-        for i_4, v_4 in ipairs(any_getContracts_result1) do
-            if v_4:GetTeamId() == arg1 then
-                local clone = _contractPreset:Clone()
-                clone.Visible = true
-                clone.Parent = _contractPreset.Parent
-                local any_new_result1_4 = ContractUI_upvr.new()
-                any_new_result1_4:SetFrame(clone)
-                any_new_result1_4:SetContract(v_4)
-                any_new_result1_4:SetLayoutOrder(i_4)
-                any_new_result1_4:SetTitle(string.format("CONTRACT %d", 0 + 1))
-                table.insert(module_upvr._listContractUI, any_new_result1_4)
-            end
-        end
-    end
+function t.loadContracts(p1) --[[ Line: 142 | Upvalues: t (copy), v2 (ref), SeasonConsts (copy), ContractUI (copy) ]]
+	t._lastTeamIdLoaded = p1
+	local gui = t.gui
+	local _contractPreset = t._contractPreset
+	assert(not t._listContractUI)
+	t._listContractUI = {}
+	local v22 = v2.getContracts()
+	local v3 = #v22 == 0
+	gui.Background.Body.Main.ThankYou.Visible = v3
+	if v3 then
+		gui.Background.Body.Main.ThankYou.Text = ("Season %d is over! Thanks for playing!"):format(SeasonConsts.SEASON_NUM)
+	else
+		local count = 0
+		for i, v in ipairs(v22) do
+			if v:GetTeamId() == p1 then
+				count = count + 1
+				local v4 = _contractPreset:Clone()
+				v4.Visible = true
+				v4.Parent = _contractPreset.Parent
+				local v5 = ContractUI.new()
+				v5:SetFrame(v4)
+				v5:SetContract(v)
+				v5:SetLayoutOrder(i)
+				v5:SetTitle(("CONTRACT %d"):format(count))
+				table.insert(t._listContractUI, v5)
+			end
+		end
+	end
 end
-function module_upvr.reloadContracts() -- Line 182
-    module_upvr.clearContracts()
-    module_upvr.loadContracts(module_upvr._lastTeamIdLoaded)
+function t.reloadContracts() --[[ Line: 182 | Upvalues: t (copy) ]]
+	t.clearContracts()
+	t.loadContracts(t._lastTeamIdLoaded)
 end
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local Settings_upvr = require(ReplicatedStorage_upvr.Resource.Settings)
-local SeasonSystem_upvr = require(ReplicatedStorage_upvr.Game.Season.SeasonSystem)
-local MarketplaceService_upvr = game:GetService("MarketplaceService")
-local SeasonUIUtils_upvr = require(ReplicatedStorage_upvr.Game.Season.SeasonUIUtils)
-function module_upvr._open() -- Line 187
-    assert(not module_upvr._maid)
-    local any_new_result1_5 = Maid_upvr.new()
-    module_upvr._maid = any_new_result1_5
-    local gui_upvr = module_upvr.gui
-    gui_upvr.Enabled = true
-    any_new_result1_5:GiveTask(function() -- Line 194
-        gui_upvr.Enabled = false
-    end)
-    local var78
-    if GameUtil_upvr.Team == Settings_upvr.EnumTeam.Police then
-        var78 = Settings_upvr.EnumTeam.Police
-    else
-        var78 = Settings_upvr.EnumTeam.Criminal
-    end
-    module_upvr.clearContracts()
-    module_upvr.loadContracts(var78)
-    any_new_result1_5:GiveTask(ContractBinder_upvr:GetClassAddedSignal():Connect(function(arg1) -- Line 207
-        if arg1:GetPlayer() == LocalPlayer_upvr then
-            module_upvr.reloadContracts()
-        end
-    end))
-    any_new_result1_5:GiveTask(ContractBinder_upvr:GetClassRemovingSignal():Connect(function(arg1) -- Line 212
-        if arg1:GetPlayer() == LocalPlayer_upvr then
-            Promise_upvr.delay(0.1):andThenCall(module_upvr.reloadContracts)
-        end
-    end))
-    any_new_result1_5:GiveTask(gui_upvr.Background.Body.Side.Criminal.Button.MouseButton1Down:Connect(function() -- Line 219
-        module_upvr.clearContracts()
-        module_upvr.loadContracts(Settings_upvr.EnumTeam.Criminal)
-        Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105461542)
-    end))
-    any_new_result1_5:GiveTask(gui_upvr.Background.Body.Side.Police.Button.MouseButton1Down:Connect(function() -- Line 224
-        module_upvr.clearContracts()
-        module_upvr.loadContracts(Settings_upvr.EnumTeam.Police)
-        Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105461542)
-    end))
-    any_new_result1_5:GiveTask(gui_upvr.Background.Bottom.Container.RewardButton.MouseButton1Down:Connect(function() -- Line 230
-        module_upvr.close()
-        var10_upvw.open()
-        Audio_upvr.ObjectLocal(LocalPlayer_upvr.PlayerGui, 6105461542)
-    end))
-    gui_upvr.Background.Bottom.Container.SeasonPass.Title.Text = string.format("SEASON %d: %s", SeasonConsts_upvr.SEASON_NUM, SeasonConsts_upvr.SEASON_TITLE)
-    any_new_result1_5:GiveTask(gui_upvr.Background.Bottom.Container.SeasonPass.MouseButton1Down:Connect(function() -- Line 240
-        local any_getFirstProductByType_result1_3 = Settings_upvr.getFirstProductByType("SeasonPass")
-        local var86
-        if any_getFirstProductByType_result1_3 == nil then
-            var86 = false
-        else
-            var86 = true
-        end
-        assert(var86)
-        var86 = LocalPlayer_upvr
-        var86 = var86.PlayerGui
-        Audio_upvr.ObjectLocal(var86, 6105461542)
-        var86 = LocalPlayer_upvr
-        if not SeasonSystem_upvr.doesPlayerOwnSeasonPass(var86) then
-            MarketplaceService_upvr:PromptProductPurchase(LocalPlayer_upvr, any_getFirstProductByType_result1_3.Id)
-        end
-    end))
-    EzUtils_upvr.selectIfGamepad(gui_upvr.Background.Bottom.Container.SeasonPass)
-    SeasonUIUtils_upvr.hookGiftContainer(gui_upvr.Background.GiftContainer, any_new_result1_5)
-    local function _() -- Line 252, Named "setOwnsSeasonPass"
-        gui_upvr.Background.Bottom.Container.SeasonPass.Buy.Visible = false
-        gui_upvr.Background.Bottom.Container.SeasonPass.Price.Visible = false
-        gui_upvr.Background.Bottom.Container.SeasonPass.Owned.Visible = true
-    end
-    if SeasonSystem_upvr.doesPlayerOwnSeasonPass(LocalPlayer_upvr) then
-        gui_upvr.Background.Bottom.Container.SeasonPass.Buy.Visible = false
-        gui_upvr.Background.Bottom.Container.SeasonPass.Price.Visible = false
-        gui_upvr.Background.Bottom.Container.SeasonPass.Owned.Visible = true
-    else
-        any_new_result1_5:GiveTask(SeasonSystem_upvr.getSeasonPassOwnedSignal():Connect(function(arg1) -- Line 260
-            if arg1 ~= LocalPlayer_upvr then
-            else
-                gui_upvr.Background.Bottom.Container.SeasonPass.Buy.Visible = false
-                gui_upvr.Background.Bottom.Container.SeasonPass.Price.Visible = false
-                gui_upvr.Background.Bottom.Container.SeasonPass.Owned.Visible = true
-            end
-        end))
-    end
-    any_new_result1_5:GiveTask(gui_upvr.Background.Close.MouseButton1Down:Connect(module_upvr.close))
-    local any_getFirstProductByType_result1 = Settings_upvr.getFirstProductByType("SeasonPass")
-    if any_getFirstProductByType_result1 and any_getFirstProductByType_result1.Robux then
-        gui_upvr.Background.Bottom.Container.SeasonPass.Price.Text = tostring(any_getFirstProductByType_result1.Robux)
-    end
-    Settings_upvr.OnProductsFetched:Connect(function() -- Line 271, Named "updatePrice"
-        local any_getFirstProductByType_result1_2 = Settings_upvr.getFirstProductByType("SeasonPass")
-        if any_getFirstProductByType_result1_2 and any_getFirstProductByType_result1_2.Robux then
-            gui_upvr.Background.Bottom.Container.SeasonPass.Price.Text = tostring(any_getFirstProductByType_result1_2.Robux)
-        end
-    end)
+function t._open() --[[ Line: 187 | Upvalues: t (copy), Maid (copy), GameUtil (copy), Settings (copy), ContractBinder (copy), LocalPlayer (copy), Promise (copy), Audio (copy), v1 (ref), SeasonConsts (copy), SeasonSystem (copy), MarketplaceService (copy), EzUtils (copy), SeasonUIUtils (copy) ]]
+	assert(not t._maid)
+	local v2 = Maid.new()
+	t._maid = v2
+	local gui = t.gui
+	gui.Enabled = true
+	v2:GiveTask(function() --[[ Line: 194 | Upvalues: gui (copy) ]]
+		gui.Enabled = false
+	end)
+	local v3 = if GameUtil.Team == Settings.EnumTeam.Police then Settings.EnumTeam.Police else Settings.EnumTeam.Criminal
+	t.clearContracts()
+	t.loadContracts(v3)
+	v2:GiveTask(ContractBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 207 | Upvalues: LocalPlayer (ref), t (ref) ]]
+		if p1:GetPlayer() == LocalPlayer then
+			t.reloadContracts()
+		end
+	end))
+	v2:GiveTask(ContractBinder:GetClassRemovingSignal():Connect(function(p1) --[[ Line: 212 | Upvalues: LocalPlayer (ref), Promise (ref), t (ref) ]]
+		if p1:GetPlayer() == LocalPlayer then
+			Promise.delay(0.1):andThenCall(t.reloadContracts)
+		end
+	end))
+	v2:GiveTask(gui.Background.Body.Side.Criminal.Button.MouseButton1Down:Connect(function() --[[ Line: 219 | Upvalues: t (ref), Settings (ref), Audio (ref), LocalPlayer (ref) ]]
+		t.clearContracts()
+		t.loadContracts(Settings.EnumTeam.Criminal)
+		Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
+	end))
+	v2:GiveTask(gui.Background.Body.Side.Police.Button.MouseButton1Down:Connect(function() --[[ Line: 224 | Upvalues: t (ref), Settings (ref), Audio (ref), LocalPlayer (ref) ]]
+		t.clearContracts()
+		t.loadContracts(Settings.EnumTeam.Police)
+		Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
+	end))
+	v2:GiveTask(gui.Background.Bottom.Container.RewardButton.MouseButton1Down:Connect(function() --[[ Line: 230 | Upvalues: t (ref), v1 (ref), Audio (ref), LocalPlayer (ref) ]]
+		t.close()
+		v1.open()
+		Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
+	end))
+	gui.Background.Bottom.Container.SeasonPass.Title.Text = ("SEASON %d: %s"):format(SeasonConsts.SEASON_NUM, SeasonConsts.SEASON_TITLE)
+	v2:GiveTask(gui.Background.Bottom.Container.SeasonPass.MouseButton1Down:Connect(function() --[[ Line: 240 | Upvalues: Settings (ref), Audio (ref), LocalPlayer (ref), SeasonSystem (ref), MarketplaceService (ref) ]]
+		local v1 = Settings.getFirstProductByType("SeasonPass")
+		assert(v1 ~= nil)
+		Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
+		if not SeasonSystem.doesPlayerOwnSeasonPass(LocalPlayer) then
+			MarketplaceService:PromptProductPurchase(LocalPlayer, v1.Id)
+		end
+	end))
+	EzUtils.selectIfGamepad(gui.Background.Bottom.Container.SeasonPass)
+	SeasonUIUtils.hookGiftContainer(gui.Background.GiftContainer, v2)
+	local function setOwnsSeasonPass() --[[ Line: 252 | Upvalues: gui (copy) ]]
+		gui.Background.Bottom.Container.SeasonPass.Buy.Visible = false
+		gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
+		gui.Background.Bottom.Container.SeasonPass.Owned.Visible = true
+	end
+	if SeasonSystem.doesPlayerOwnSeasonPass(LocalPlayer) then
+		gui.Background.Bottom.Container.SeasonPass.Buy.Visible = false
+		gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
+		gui.Background.Bottom.Container.SeasonPass.Owned.Visible = true
+	else
+		v2:GiveTask(SeasonSystem.getSeasonPassOwnedSignal():Connect(function(p1) --[[ Line: 260 | Upvalues: LocalPlayer (ref), gui (copy) ]]
+			if p1 == LocalPlayer then
+				gui.Background.Bottom.Container.SeasonPass.Buy.Visible = false
+				gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
+				gui.Background.Bottom.Container.SeasonPass.Owned.Visible = true
+			end
+		end))
+	end
+	v2:GiveTask(gui.Background.Close.MouseButton1Down:Connect(t.close))
+	local function updatePrice() --[[ Line: 271 | Upvalues: Settings (ref), gui (copy) ]]
+		local v1 = Settings.getFirstProductByType("SeasonPass")
+		if v1 and v1.Robux then
+			gui.Background.Bottom.Container.SeasonPass.Price.Text = tostring(v1.Robux)
+		end
+	end
+	local v4 = Settings.getFirstProductByType("SeasonPass")
+	if v4 and v4.Robux then
+		gui.Background.Bottom.Container.SeasonPass.Price.Text = tostring(v4.Robux)
+	end
+	Settings.OnProductsFetched:Connect(updatePrice)
 end
-function module_upvr._close() -- Line 282
-    local _maid = module_upvr._maid
-    assert(_maid)
-    module_upvr._maid = nil
-    _maid:Destroy()
+function t._close() --[[ Line: 282 | Upvalues: t (copy) ]]
+	local _maid = t._maid
+	assert(_maid)
+	t._maid = nil
+	_maid:Destroy()
 end
-function module_upvr.open() -- Line 288
-    module_upvr._window:Open()
+function t.open() --[[ Line: 288 | Upvalues: t (copy) ]]
+	t._window:Open()
 end
-function module_upvr.close() -- Line 291
-    module_upvr._window:Close()
+function t.close() --[[ Line: 291 | Upvalues: t (copy) ]]
+	t._window:Close()
 end
-return module_upvr
+return t

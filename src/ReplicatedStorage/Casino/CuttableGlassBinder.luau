@@ -1,44 +1,40 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BaseObject_upvr = require(ReplicatedStorage.Std.BaseObject)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-local CircleAction_upvr = require(ReplicatedStorage.Module.UI).CircleAction
-function module_upvr.new(arg1, arg2) -- Line 11
-    local any_new_result1 = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1, module_upvr)
-    local tbl = {
-        Attachment = arg2.promptAttachment;
-    }
-    tbl.ValidRoot = arg1
-    tbl.Name = "Break"
-    tbl.NoRay = true
-    tbl.Timed = true
-    tbl.Duration = 0.5
-    tbl.Dist = 8
-    function tbl.Callback(arg1_2, arg2_2) -- Line 15, Named "action"
-        if arg2_2 then
-            arg1:FindFirstChild("CutRemote"):FireServer()
-            return true
-        end
-    end
-    function tbl.PreUpdateFun(arg1_3) -- Line 22, Named "preUpdateFun"
-        local var6
-        if arg1:GetAttribute("IsCut") ~= false then
-            var6 = false
-        else
-            var6 = true
-        end
-        arg1_3.Enabled = var6
-    end
-    tbl.PreUpdatePeriod = 0.5
-    CircleAction_upvr.Add(tbl, arg1)
-    any_new_result1.maid:GiveTask(function() -- Line 38
-        CircleAction_upvr.Remove(arg1)
-    end)
-    return any_new_result1
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
+local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1, p2) --[[ Line: 11 | Upvalues: BaseObject (copy), t (copy), CircleAction (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t)
+	local function action(p12, p2) --[[ Line: 15 | Upvalues: p1 (copy) ]]
+		if p2 then
+			p1:FindFirstChild("CutRemote"):FireServer()
+			return true
+		end
+	end
+	local function preUpdateFun(p12) --[[ Line: 22 | Upvalues: p1 (copy) ]]
+		p12.Enabled = p1:GetAttribute("IsCut") == false
+	end
+	CircleAction.Add({
+		Attachment = p2.promptAttachment,
+		ValidRoot = p1,
+		Name = "Break",
+		NoRay = true,
+		Timed = true,
+		Duration = 0.5,
+		Dist = 8,
+		Callback = action,
+		PreUpdateFun = preUpdateFun,
+		PreUpdatePeriod = 0.5
+	}, p1)
+	v1.maid:GiveTask(function() --[[ Line: 38 | Upvalues: CircleAction (ref), p1 (copy) ]]
+		CircleAction.Remove(p1)
+	end)
+	return v1
 end
-return require(ReplicatedStorage.ManifestBinder).new("CuttableGlass", {
-    holeAttachment = "Hole";
-    promptAttachment = "Prompt";
-}, module_upvr)
+return ManifestBinder.new("CuttableGlass", {
+	holeAttachment = "Hole",
+	promptAttachment = "Prompt"
+}, t)

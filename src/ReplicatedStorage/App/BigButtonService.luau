@@ -1,13 +1,14 @@
-local module_upvr = {
-    triggerUpdate = require(game:GetService("ReplicatedStorage").Std.Signal).new();
-    active = {};
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local t = {
+	triggerUpdate = require(ReplicatedStorage.Std.Signal).new(),
+	active = {}
 }
-function module_upvr.add(arg1) -- Line 7
-    table.insert(module_upvr.active, arg1)
-    module_upvr.triggerUpdate:Fire()
-    return function() -- Line 10
-        table.remove(module_upvr.active, table.find(module_upvr.active, arg1))
-        module_upvr.triggerUpdate:Fire()
-    end
+function t.add(p1) --[[ Line: 7 | Upvalues: t (copy) ]]
+	table.insert(t.active, p1)
+	t.triggerUpdate:Fire()
+	return function() --[[ Line: 10 | Upvalues: t (ref), p1 (copy) ]]
+		table.remove(t.active, (table.find(t.active, p1)))
+		t.triggerUpdate:Fire()
+	end
 end
-return module_upvr
+return t

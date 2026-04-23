@@ -1,363 +1,385 @@
+local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local PathfindingService = game:GetService("PathfindingService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local NPCConsts_upvr = require(ReplicatedStorage.NPC.NPCConsts)
-local module_upvr = {}
-local Signal_upvr = require(ReplicatedStorage.Std.Signal)
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local NPCUtils_upvr = require(ReplicatedStorage.NPC.NPCUtils)
-local RunService_upvr = game:GetService("RunService")
-local GeomUtils_upvr = require(ReplicatedStorage.Std.GeomUtils)
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-local Region_upvr = require(ReplicatedStorage.Std.Region)
-local RegionUtils_upvr = require(ReplicatedStorage.Std.Region.RegionUtils)
-function module_upvr.setup(arg1) -- Line 23
-    local obj_upvr = arg1.obj
-    arg1.maid:GiveTask(function() -- Line 26
-        if arg1._path then
-            arg1._path:Destroy()
-            arg1._path = nil
-        end
-        arg1._waypoints = nil
-    end)
-    arg1._waypoints = nil
-    arg1._nextWaypointIndex = nil
-    arg1.maid.reachedConnection = nil
-    arg1._lastJump = 0
-    arg1.onWaypoint = Signal_upvr.new()
-    function arg1.shouldMoveToNextWaypointFunc() -- Line 41
-        return true
-    end
-    arg1.lookAtConstraint = nil
-    arg1.maid:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(obj_upvr, NPCConsts_upvr.LOOK_AT_CONSTRAINT_NAME, function(arg1_2, arg2) -- Line 50
-        arg1.lookAtConstraint = arg1_2
-        arg2:GiveTask(function() -- Line 52
-            arg1.lookAtConstraint = nil
-        end)
-    end))
-    local function updateTarget_upvr() -- Line 59, Named "updateTarget"
-        local any_new_result1 = Maid_upvr.new()
-        arg1.maid.targetMaid = any_new_result1
-        if not arg1:IsLocallyOwned() then
-        else
-            if arg1.customUpdateTarget and arg1:customUpdateTarget(any_new_result1) == true then return end
-            local any_getTargetType_result1 = NPCUtils_upvr.getTargetType(obj_upvr)
-            if any_getTargetType_result1 then
-                if any_getTargetType_result1 == NPCConsts_upvr.DEST_TYPE.OBJ then
-                    if not NPCUtils_upvr.getTarget(obj_upvr) then
-                    else
-                        any_new_result1:GiveTask(RunService_upvr.PostSimulation:Connect(function() -- Line 81
-                            -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-                            local var21
-                            if not obj_upvr.PrimaryPart then
-                            else
-                                local any_getTarget_result1 = NPCUtils_upvr.getTarget(obj_upvr)
-                                local Position = any_getTarget_result1.Position
-                                local Magnitude = (any_getTarget_result1.Velocity * Vector3.new(1, 0, 1)).Magnitude
-                                local Position_2 = obj_upvr.PrimaryPart.Position
-                                var21 = nil
-                                if 0.1 < Magnitude then
-                                    var21 = (any_getTarget_result1.Velocity * Vector3.new(1, 0, 1)).Unit
-                                else
-                                    var21 = Vector3.new(0, 0, 0)
-                                end
-                                if not GeomUtils_upvr.getTrajectoryInterceptTime(Position_2, obj_upvr.PrimaryPart.Velocity.Magnitude, Position, Magnitude, var21) then
-                                end
-                                if NPCUtils_upvr.getExtrapolateTargetMovement(obj_upvr) then
-                                end
-                                local var26 = true
-                                if arg1.hasAllowedRegion then
-                                    var26 = arg1.allowedRegion:CastPoint(Position)
-                                end
-                                local any_getHomePosition_result1 = NPCUtils_upvr.getHomePosition(obj_upvr)
-                                if var26 then
-                                    module_upvr.goTo(arg1, Position + (var21 * Magnitude) * (math.clamp(((Position - Position_2) * Vector3.new(1, 0, 1)).Magnitude / 36, 0, 1) * 3))
-                                    return
-                                end
-                                if any_getHomePosition_result1 and not arg1.allowedRegion:CastPoint(Position_2) then
-                                    module_upvr.goTo(arg1, any_getHomePosition_result1)
-                                    return
-                                end
-                                module_upvr.move(arg1.humanoid, Vector3.new(0, 0, 0))
-                            end
-                        end))
-                    end
-                end
-                if any_getTargetType_result1 == NPCConsts_upvr.DEST_TYPE.POS then
-                    local any_getTarget_result1_3_upvr = NPCUtils_upvr.getTarget(obj_upvr)
-                    if not any_getTarget_result1_3_upvr then
-                    else
-                        any_new_result1:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 141
-                            module_upvr.goTo(arg1, any_getTarget_result1_3_upvr)
-                        end))
-                    end
-                end
-                any_getTarget_result1_3_upvr = NPCConsts_upvr
-                any_getTarget_result1_3_upvr = any_getTarget_result1_3_upvr.DEST_TYPE
-                any_getTarget_result1_3_upvr = any_getTarget_result1_3_upvr.IDLE
-                if any_getTargetType_result1 == any_getTarget_result1_3_upvr then
-                    any_getTarget_result1_3_upvr = nil
-                    local var30_upvw = any_getTarget_result1_3_upvr
-                    any_new_result1:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 147
-                        if var30_upvw then
-                            module_upvr.goTo(arg1, var30_upvw)
-                        end
-                    end))
-                    any_new_result1:GiveTask(Interval_upvr.every(2):Connect(function() -- Line 152
-                        local any_getTarget_result1_2 = NPCUtils_upvr.getTarget(obj_upvr)
-                        if not any_getTarget_result1_2 then
-                        else
-                            local var34 = GeomUtils_upvr.randomPointOnCircle() * 16
-                            if math.random() < 0.5 then
-                                var30_upvw = any_getTarget_result1_2 + Vector3.new(var34.X, 0, var34.Y)
-                            end
-                        end
-                    end))
-                    return
-                end
-                error("invalid targeType", any_getTargetType_result1)
-            end
-        end
-    end
-    updateTarget_upvr()
-    arg1.maid:GiveTask(obj_upvr:GetAttributeChangedSignal(NPCConsts_upvr.DEST_POS_ATTR_NAME):Connect(updateTarget_upvr))
-    arg1.maid:GiveTask(obj_upvr:GetAttributeChangedSignal(NPCConsts_upvr.DEST_TYPE_ATTR_NAME):Connect(updateTarget_upvr))
-    arg1.maid:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(obj_upvr, NPCConsts_upvr.DEST_OBJ_VALUE_NAME, function(arg1_3, arg2) -- Line 173
-        updateTarget_upvr()
-        arg2:GiveTask(arg1_3.Changed:Connect(updateTarget_upvr))
-    end))
-    arg1.maid:GiveTask(obj_upvr:GetAttributeChangedSignal(NPCConsts_upvr.NETWORK_OWNER_ID_ATTR_NAME):Connect(updateTarget_upvr))
-    local function updateLookAt_upvr() -- Line 181, Named "updateLookAt"
-        local any_new_result1_2 = Maid_upvr.new()
-        arg1.maid.lookAtMaid = any_new_result1_2
-        if not arg1:IsLocallyOwned() then
-        else
-            local any_getLookAtType_result1 = NPCUtils_upvr.getLookAtType(obj_upvr)
-            if any_getLookAtType_result1 then
-                if any_getLookAtType_result1 == NPCConsts_upvr.DEST_TYPE.OBJ then
-                    local any_getLookAt_result1_upvr = NPCUtils_upvr.getLookAt(obj_upvr)
-                    if not any_getLookAt_result1_upvr then return end
-                    any_new_result1_2.runtime = RunService_upvr.Heartbeat:Connect(function() -- Line 196
-                        module_upvr.lookAt(arg1, any_getLookAt_result1_upvr.Position)
-                    end)
-                else
-                    any_getLookAt_result1_upvr = NPCConsts_upvr
-                    any_getLookAt_result1_upvr = any_getLookAt_result1_upvr.DEST_TYPE
-                    any_getLookAt_result1_upvr = any_getLookAt_result1_upvr.POS
-                    if any_getLookAtType_result1 == any_getLookAt_result1_upvr then
-                        any_getLookAt_result1_upvr = NPCUtils_upvr
-                        any_getLookAt_result1_upvr = any_getLookAt_result1_upvr.getLookAt(obj_upvr)
-                        local var40_upvr = any_getLookAt_result1_upvr
-                        if not var40_upvr then return end
-                        any_new_result1_2.runtime = RunService_upvr.Heartbeat:Connect(function() -- Line 204
-                            module_upvr.lookAt(arg1, var40_upvr)
-                        end)
-                    end
-                end
-            end
-            var40_upvr = any_new_result1_2:GiveTask
-            var40_upvr(function() -- Line 209
-                if arg1.lookAtConstraint then
-                    arg1.lookAtConstraint.Enabled = false
-                end
-            end)
-        end
-    end
-    updateLookAt_upvr()
-    arg1.maid:GiveTask(obj_upvr:GetAttributeChangedSignal(NPCConsts_upvr.LOOK_AT_POS_ATTR_NAME):Connect(updateLookAt_upvr))
-    arg1.maid:GiveTask(obj_upvr:GetAttributeChangedSignal(NPCConsts_upvr.LOOK_AT_TYPE_ATTR_NAME):Connect(updateLookAt_upvr))
-    arg1.maid:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(obj_upvr, NPCConsts_upvr.LOOK_AT_OBJ_VALUE_NAME, function(arg1_4, arg2) -- Line 219
-        updateLookAt_upvr()
-        arg2:GiveTask(arg1_4.Changed:Connect(updateLookAt_upvr))
-    end))
-    arg1.maid:GiveTask(obj_upvr:GetAttributeChangedSignal(NPCConsts_upvr.NETWORK_OWNER_ID_ATTR_NAME):Connect(updateLookAt_upvr))
-    arg1.maid:GiveTask(Interval_upvr.every(1):Connect(function() -- Line 226
-        module_upvr._createNewPath(arg1)
-        module_upvr._updatePathfind(arg1)
-    end))
-    arg1.maid:GiveTask(Interval_upvr.every(1):Connect(function() -- Line 233
-        if arg1:IsLocallyOwned() then
-            local tbl = {
-                [Enum.HumanoidStateType.Dead] = true;
-                [Enum.HumanoidStateType.Running] = true;
-                [Enum.HumanoidStateType.Jumping] = true;
-                [Enum.HumanoidStateType.Landed] = true;
-                [Enum.HumanoidStateType.Freefall] = true;
-            }
-            local humanoid = arg1.humanoid
-            for _, v in ipairs(Enum.HumanoidStateType:GetEnumItems()) do
-                if v ~= Enum.HumanoidStateType.None and humanoid:GetStateEnabled(v) and not tbl[v] then
-                    humanoid:SetStateEnabled(v, false)
-                end
-            end
-            if not tbl[humanoid:GetState()] then
-                humanoid:ChangeState(Enum.HumanoidStateType.Running)
-            end
-        end
-    end))
-    local RaycastParams_new_result1_upvr = RaycastParams.new()
-    RaycastParams_new_result1_upvr.FilterType = Enum.RaycastFilterType.Blacklist
-    RaycastParams_new_result1_upvr.FilterDescendantsInstances = {}
-    RaycastParams_new_result1_upvr.IgnoreWater = true
-    arg1.occlusionCastParams = RaycastParams_new_result1_upvr
-    arg1.maid:GiveTask(Interval_upvr.every(1):Connect(function() -- Line 259
-        RaycastParams_new_result1_upvr.FilterDescendantsInstances = module_upvr._buildOcclusionBlacklist(arg1)
-    end))
-    arg1.allowedRegion = Region_upvr.new(RegionUtils_upvr.NilCondition)
-    arg1.maid:GiveTask(arg1.allowedRegion)
-    arg1.hasAllowedRegion = false
-    arg1.maid:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(obj_upvr, NPCConsts_upvr.ALLOWED_PRISMS_FOLDER_NAME, function(arg1_5, arg2) -- Line 271
-        arg2:GiveTask(RxInstanceUtils_upvr.observeChildren(arg1_5, function(arg1_6, arg2_2) -- Line 275
-            local tbl_4_upvr = {
-                c = CFrame.new();
-                s = Vector3.new();
-            }
-            arg2_2:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1_6, 'c', function(arg1_7) -- Line 278
-                tbl_4_upvr.c = arg1_7.Value
-            end))
-            arg2_2:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg1_6, 's', function(arg1_8) -- Line 283
-                tbl_4_upvr.s = arg1_8.Value
-            end))
-            local any_AddPrism_result1 = arg1.allowedRegion:AddPrism(tbl_4_upvr)
-            arg2_2:GiveTask(any_AddPrism_result1)
-            if 0 >= #arg1_5:GetChildren() then
-                any_AddPrism_result1 = false
-            else
-                any_AddPrism_result1 = true
-            end
-            arg1.hasAllowedRegion = any_AddPrism_result1
-            arg2_2:GiveTask(function() -- Line 289, Named "f"
-                local var61
-                if 0 >= #arg1_5:GetChildren() then
-                    var61 = false
-                else
-                    var61 = true
-                end
-                arg1.hasAllowedRegion = var61
-            end)
-        end))
-    end))
-    arg1.maid:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(obj_upvr, NPCConsts_upvr.HOME_POSITION_OBJ_NAME, function(arg1_9, arg2) -- Line 306
-        arg1.homePosition = NPCUtils_upvr.getHomePosition(obj_upvr)
-        arg2:GiveTask(arg1_9.Changed:Connect(function() -- Line 307, Named "update"
-            arg1.homePosition = NPCUtils_upvr.getHomePosition(obj_upvr)
-        end))
-        arg2:GiveTask(function() -- Line 312
-            arg1.homePosition = nil
-        end)
-    end))
+local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local Region = require(ReplicatedStorage.Std.Region)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Raycast = require(ReplicatedStorage.Std.Raycast)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local NPCConsts = require(ReplicatedStorage.NPC.NPCConsts)
+local NPCUtils = require(ReplicatedStorage.NPC.NPCUtils)
+local DestructibleConsts = require(ReplicatedStorage.Game.Destructible.DestructibleConsts)
+local t = {}
+function t.setup(p1) --[[ Line: 23 | Upvalues: Signal (copy), RxInstanceUtils (copy), NPCConsts (copy), Maid (copy), NPCUtils (copy), RunService (copy), GeomUtils (copy), t (copy), Interval (copy), Region (copy), RegionUtils (copy) ]]
+	local obj = p1.obj
+	p1.maid:GiveTask(function() --[[ Line: 26 | Upvalues: p1 (copy) ]]
+		if p1._path then
+			p1._path:Destroy()
+			p1._path = nil
+		end
+		p1._waypoints = nil
+	end)
+	p1._waypoints = nil
+	p1._nextWaypointIndex = nil
+	p1.maid.reachedConnection = nil
+	p1._lastJump = 0
+	p1.onWaypoint = Signal.new()
+	function p1.shouldMoveToNextWaypointFunc() --[[ Line: 41 ]]
+		return true
+	end
+	p1.lookAtConstraint = nil
+	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.LOOK_AT_CONSTRAINT_NAME, function(p12, p2) --[[ Line: 50 | Upvalues: p1 (copy) ]]
+		p1.lookAtConstraint = p12
+		p2:GiveTask(function() --[[ Line: 52 | Upvalues: p1 (ref) ]]
+			p1.lookAtConstraint = nil
+		end)
+	end))
+	local function updateTarget() --[[ Line: 59 | Upvalues: Maid (ref), p1 (copy), NPCUtils (ref), obj (copy), NPCConsts (ref), RunService (ref), GeomUtils (ref), t (ref), Interval (ref) ]]
+		local v1 = Maid.new()
+		p1.maid.targetMaid = v1
+		if p1:IsLocallyOwned() and (not p1.customUpdateTarget or p1:customUpdateTarget(v1) ~= true) then
+			local v2 = NPCUtils.getTargetType(obj)
+			if v2 and v2 == NPCConsts.DEST_TYPE.OBJ then
+				if NPCUtils.getTarget(obj) then
+					v1:GiveTask(RunService.PostSimulation:Connect(function() --[[ Line: 81 | Upvalues: obj (ref), NPCUtils (ref), GeomUtils (ref), p1 (ref), t (ref) ]]
+						if obj.PrimaryPart then
+							local v1 = NPCUtils.getTarget(obj)
+							local Position = v1.Position
+							local Magnitude = (v1.Velocity * Vector3.new(1, 0, 1)).Magnitude
+							local Position_2 = obj.PrimaryPart.Position
+							local v2 = if Magnitude > 0.1 then (v1.Velocity * Vector3.new(1, 0, 1)).Unit else Vector3.new(0, 0, 0)
+							local v3 = GeomUtils.getTrajectoryInterceptTime(Position_2, obj.PrimaryPart.Velocity.Magnitude, Position, Magnitude, v2)
+							local Magnitude_3 = ((Position - Position_2) * Vector3.new(1, 0, 1)).Magnitude
+							if not v3 then
+								v3 = math.clamp(Magnitude_3 / 36, 0, 1) * 3
+							end
+							local v4 = if NPCUtils.getExtrapolateTargetMovement(obj) then Position + v2 * Magnitude * v3 else Position
+							local v5, v6
+							if p1.hasAllowedRegion then
+								local v7 = p1.allowedRegion:CastPoint(Position)
+								v5, v6 = v7, p1.allowedRegion:CastPoint(Position_2)
+							else
+								v5 = true
+								v6 = true
+							end
+							local v9 = NPCUtils.getHomePosition(obj)
+							if v5 then
+								t.goTo(p1, v4)
+							elseif v9 and not v6 then
+								t.goTo(p1, v9)
+							else
+								t.move(p1.humanoid, Vector3.new(0, 0, 0))
+							end
+						end
+					end))
+				end
+			elseif v2 and v2 == NPCConsts.DEST_TYPE.POS then
+				local v3 = NPCUtils.getTarget(obj)
+				if v3 then
+					v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 141 | Upvalues: t (ref), p1 (ref), v3 (copy) ]]
+						t.goTo(p1, v3)
+					end))
+				end
+			elseif v2 and v2 == NPCConsts.DEST_TYPE.IDLE then
+				local v4 = nil
+				v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 147 | Upvalues: v4 (ref), t (ref), p1 (ref) ]]
+					if v4 then
+						t.goTo(p1, v4)
+					end
+				end))
+				v1:GiveTask(Interval.every(2):Connect(function() --[[ Line: 152 | Upvalues: NPCUtils (ref), obj (ref), GeomUtils (ref), v4 (ref) ]]
+					local v1 = NPCUtils.getTarget(obj)
+					if v1 then
+						local v2 = GeomUtils.randomPointOnCircle() * 16
+						if math.random() < 0.5 then
+							v4 = v1 + Vector3.new(v2.X, 0, v2.Y)
+						end
+					end
+				end))
+			elseif v2 then
+				error("invalid targeType", v2)
+			end
+		end
+	end
+	updateTarget()
+	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.DEST_POS_ATTR_NAME):Connect(updateTarget))
+	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.DEST_TYPE_ATTR_NAME):Connect(updateTarget))
+	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.DEST_OBJ_VALUE_NAME, function(p1, p2) --[[ Line: 173 | Upvalues: updateTarget (copy) ]]
+		updateTarget()
+		p2:GiveTask(p1.Changed:Connect(updateTarget))
+	end))
+	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME):Connect(updateTarget))
+	local function updateLookAt() --[[ Line: 181 | Upvalues: Maid (ref), p1 (copy), NPCUtils (ref), obj (copy), NPCConsts (ref), RunService (ref), t (ref) ]]
+		local v1 = Maid.new()
+		p1.maid.lookAtMaid = v1
+		if p1:IsLocallyOwned() then
+			local v2 = NPCUtils.getLookAtType(obj)
+			if v2 and v2 == NPCConsts.DEST_TYPE.OBJ then
+				local v3 = NPCUtils.getLookAt(obj)
+				if v3 then
+					v1.runtime = RunService.Heartbeat:Connect(function() --[[ Line: 196 | Upvalues: t (ref), p1 (ref), v3 (copy) ]]
+						t.lookAt(p1, v3.Position)
+					end)
+				else
+					return
+				end
+			elseif v2 and v2 == NPCConsts.DEST_TYPE.POS then
+				local v4 = NPCUtils.getLookAt(obj)
+				if v4 then
+					v1.runtime = RunService.Heartbeat:Connect(function() --[[ Line: 204 | Upvalues: t (ref), p1 (ref), v4 (copy) ]]
+						t.lookAt(p1, v4)
+					end)
+				else
+					return
+				end
+			end
+			v1:GiveTask(function() --[[ Line: 209 | Upvalues: p1 (ref) ]]
+				if p1.lookAtConstraint then
+					p1.lookAtConstraint.Enabled = false
+				end
+			end)
+		end
+	end
+	updateLookAt()
+	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.LOOK_AT_POS_ATTR_NAME):Connect(updateLookAt))
+	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.LOOK_AT_TYPE_ATTR_NAME):Connect(updateLookAt))
+	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.LOOK_AT_OBJ_VALUE_NAME, function(p1, p2) --[[ Line: 219 | Upvalues: updateLookAt (copy) ]]
+		updateLookAt()
+		p2:GiveTask(p1.Changed:Connect(updateLookAt))
+	end))
+	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME):Connect(updateLookAt))
+	p1.maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 226 | Upvalues: t (ref), p1 (copy) ]]
+		t._createNewPath(p1)
+		t._updatePathfind(p1)
+	end))
+	p1.maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 233 | Upvalues: p1 (copy) ]]
+		if p1:IsLocallyOwned() then
+			local t = {
+				[Enum.HumanoidStateType.Dead] = true,
+				[Enum.HumanoidStateType.Running] = true,
+				[Enum.HumanoidStateType.Jumping] = true,
+				[Enum.HumanoidStateType.Landed] = true,
+				[Enum.HumanoidStateType.Freefall] = true
+			}
+			local humanoid = p1.humanoid
+			for i, v in ipairs(Enum.HumanoidStateType:GetEnumItems()) do
+				if v ~= Enum.HumanoidStateType.None and (humanoid:GetStateEnabled(v) and not t[v]) then
+					humanoid:SetStateEnabled(v, false)
+				end
+			end
+			if not t[humanoid:GetState()] then
+				humanoid:ChangeState(Enum.HumanoidStateType.Running)
+			end
+		end
+	end))
+	local v1 = RaycastParams.new()
+	v1.FilterType = Enum.RaycastFilterType.Blacklist
+	v1.FilterDescendantsInstances = {}
+	v1.IgnoreWater = true
+	p1.occlusionCastParams = v1
+	p1.maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 259 | Upvalues: v1 (copy), t (ref), p1 (copy) ]]
+		v1.FilterDescendantsInstances = t._buildOcclusionBlacklist(p1)
+	end))
+	p1.allowedRegion = Region.new(RegionUtils.NilCondition)
+	p1.maid:GiveTask(p1.allowedRegion)
+	p1.hasAllowedRegion = false
+	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.ALLOWED_PRISMS_FOLDER_NAME, function(p12, p2) --[[ Line: 271 | Upvalues: RxInstanceUtils (ref), p1 (copy) ]]
+		p2:GiveTask(RxInstanceUtils.observeChildren(p12, function(p13, p2) --[[ Line: 275 | Upvalues: RxInstanceUtils (ref), p1 (ref), p12 (copy) ]]
+			local t = {
+				c = CFrame.new(),
+				s = Vector3.new()
+			}
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p13, "c", function(p1) --[[ Line: 278 | Upvalues: t (copy) ]]
+				t.c = p1.Value
+			end))
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p13, "s", function(p1) --[[ Line: 283 | Upvalues: t (copy) ]]
+				t.s = p1.Value
+			end))
+			p2:GiveTask((p1.allowedRegion:AddPrism(t)))
+			local function f() --[[ Line: 289 | Upvalues: p1 (ref), p12 (ref) ]]
+				p1.hasAllowedRegion = #p12:GetChildren() > 0
+			end
+			p1.hasAllowedRegion = #p12:GetChildren() > 0
+			p2:GiveTask(f)
+		end))
+	end))
+	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.HOME_POSITION_OBJ_NAME, function(p12, p2) --[[ Line: 306 | Upvalues: p1 (copy), NPCUtils (ref), obj (copy) ]]
+		local function update() --[[ Line: 307 | Upvalues: p1 (ref), NPCUtils (ref), obj (ref) ]]
+			p1.homePosition = NPCUtils.getHomePosition(obj)
+		end
+		p1.homePosition = NPCUtils.getHomePosition(obj)
+		p2:GiveTask(p12.Changed:Connect(update))
+		p2:GiveTask(function() --[[ Line: 312 | Upvalues: p1 (ref) ]]
+			p1.homePosition = nil
+		end)
+	end))
 end
-local CollectionService_upvr = game:GetService("CollectionService")
-local Players_upvr = game:GetService("Players")
-local DestructibleConsts_upvr = require(ReplicatedStorage.Game.Destructible.DestructibleConsts)
-function module_upvr._buildOcclusionBlacklist(arg1) -- Line 319
-    local module_2 = {arg1.obj}
-    local tbl_3 = {}
-    for _, v_2 in CollectionService_upvr:GetTagged("Humanoid") do
-        tbl_3[v_2] = true
-        table.insert(module_2, v_2.Parent)
-    end
-    for _, v_3 in ipairs(Players_upvr:GetPlayers()) do
-        if v_3.Character then
-            local Humanoid = v_3.Character:FindFirstChild("Humanoid")
-            if Humanoid and not tbl_3[Humanoid.Parent] then
-                table.insert(module_2, Humanoid.Parent)
-            end
-        end
-    end
-    for _, v_4 in CollectionService_upvr:GetTagged(DestructibleConsts_upvr.SPAWN_TAG_NAME) do
-        if v_4:FindFirstChild(DestructibleConsts_upvr.INSTANCE_VALUE_NAME) and v_4[DestructibleConsts_upvr.INSTANCE_VALUE_NAME].Value then
-            table.insert(module_2, v_4[DestructibleConsts_upvr.INSTANCE_VALUE_NAME].Value)
-        end
-    end
-    return module_2
+function t._buildOcclusionBlacklist(p1) --[[ Line: 319 | Upvalues: CollectionService (copy), Players (copy), DestructibleConsts (copy) ]]
+	local t = { p1.obj }
+	local t2 = {}
+	for v1, v2 in CollectionService:GetTagged("Humanoid") do
+		t2[v2] = true
+		table.insert(t, v2.Parent)
+	end
+	for i, v in ipairs(Players:GetPlayers()) do
+		if v.Character then
+			local Humanoid = v.Character:FindFirstChild("Humanoid")
+			if Humanoid and not t2[Humanoid.Parent] then
+				table.insert(t, Humanoid.Parent)
+			end
+		end
+	end
+	for v5, v6 in CollectionService:GetTagged(DestructibleConsts.SPAWN_TAG_NAME) do
+		if v6:FindFirstChild(DestructibleConsts.INSTANCE_VALUE_NAME) and v6[DestructibleConsts.INSTANCE_VALUE_NAME].Value then
+			table.insert(t, v6[DestructibleConsts.INSTANCE_VALUE_NAME].Value)
+		end
+	end
+	return t
 end
-local PathfindingService_upvr = game:GetService("PathfindingService")
-function module_upvr._createNewPath(arg1) -- Line 343
-    if arg1._path then
-        arg1._path:Destroy()
-        arg1._path = nil
-    end
-    arg1._path = PathfindingService_upvr:CreatePath({
-        AgentHeight = 4;
-        AgentRadius = 2;
-        WaypointSpacing = math.huge;
-        Costs = arg1.agentCosts;
-    })
+function t._createNewPath(p1) --[[ Line: 343 | Upvalues: PathfindingService (copy) ]]
+	if p1._path then
+		p1._path:Destroy()
+		p1._path = nil
+	end
+	p1._path = PathfindingService:CreatePath({
+		AgentHeight = 4,
+		AgentRadius = 2,
+		WaypointSpacing = (1 / 0),
+		Costs = p1.agentCosts
+	})
 end
-function module_upvr.pathfindTo(arg1, arg2) -- Line 355
-    arg1._pathfindTo = arg2
+function t.pathfindTo(p1, p2) --[[ Line: 355 ]]
+	p1._pathfindTo = p2
 end
-function module_upvr._updatePathfind(arg1) -- Line 358
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    module_upvr.move(arg1.humanoid, Vector3.new(0, 0, 0))
-    do
-        return
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if arg1.maid.reachedConnection then
-        arg1.maid.reachedConnection = nil
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t._updatePathfind(p1) --[[ Line: 358 | Upvalues: NPCConsts (copy), t (copy) ]]
+	local _pathfindTo = p1._pathfindTo
+	if _pathfindTo then
+		local v1, _ = pcall(function() --[[ Line: 361 | Upvalues: p1 (copy), _pathfindTo (copy) ]]
+			p1._path:ComputeAsync(p1.obj.PrimaryPart.Position + p1.obj.PrimaryPart.CFrame.UpVector * -4, _pathfindTo)
+		end)
+		if p1.Destroy == nil then
+			return
+		end
+		local v2 = v1 and p1._path.Status == Enum.PathStatus.Success
+		p1._doesPathfindingPathExist = v2
+		if v2 then
+			p1._waypoints = p1._path:GetWaypoints()
+			if not p1.maid.reachedConnection then
+				p1.maid.reachedConnection = p1.humanoid.MoveToFinished:Connect(function(p12) --[[ Line: 378 | Upvalues: p1 (copy), NPCConsts (ref), t (ref) ]]
+					if p12 and (p1._waypoints and p1._nextWaypointIndex < #p1._waypoints) then
+						local v1 = p1
+						v1._nextWaypointIndex = v1._nextWaypointIndex + 1
+						local v2 = p1._waypoints[p1._nextWaypointIndex]
+						p1.onWaypoint:Fire(v2)
+						if p1.obj:GetAttribute(NPCConsts.JUMPING_DISABLED_ATTR_NAME) ~= true and v2.Action == Enum.PathWaypointAction.Jump then
+							p1._lastJump = os.clock()
+							p1.humanoid.Jump = true
+						end
+						if p1.shouldMoveToNextWaypointFunc(v2) then
+							t.moveTo(p1.humanoid, v2.Position)
+						end
+					else
+						t.move(p1.humanoid, Vector3.new(0, 0, 0))
+						p1.maid.reachedConnection = nil
+					end
+				end)
+			end
+			p1._nextWaypointIndex = 2
+			local v3 = p1._waypoints[p1._nextWaypointIndex]
+			if v3 then
+				p1.onWaypoint:Fire(v3)
+				if p1.obj:GetAttribute(NPCConsts.JUMPING_DISABLED_ATTR_NAME) ~= true and v3.Action == Enum.PathWaypointAction.Jump then
+					p1._lastJump = os.clock()
+					p1.humanoid.Jump = true
+				end
+				if p1.shouldMoveToNextWaypointFunc(v3) then
+					t.moveTo(p1.humanoid, v3.Position)
+				end
+			else
+				t.move(p1.humanoid, Vector3.new(0, 0, 0))
+			end
+		else
+			t.move(p1.humanoid, Vector3.new(0, 0, 0))
+		end
+	elseif p1.maid.reachedConnection then
+		p1.maid.reachedConnection = nil
+	end
 end
-function module_upvr.lookAt(arg1, arg2) -- Line 426
-    if arg1.lookAtConstraint ~= nil then
-        if arg2 ~= nil then
-            if not arg1.lookAtConstraint.Enabled then
-                arg1.lookAtConstraint.Enabled = true
-            end
-            arg1.lookAtConstraint.CFrame = CFrame.lookAt(arg1.lookAtConstraint.Attachment0.WorldPosition, arg2)
-            return
-        end
-        if arg1.lookAtConstraint.Enabled then
-            arg1.lookAtConstraint.Enabled = false
-        end
-    end
+function t.lookAt(p1, p2) --[[ Line: 426 ]]
+	if p1.lookAtConstraint ~= nil then
+		if p2 == nil then
+			if p1.lookAtConstraint.Enabled then
+				p1.lookAtConstraint.Enabled = false
+			end
+		else
+			if not p1.lookAtConstraint.Enabled then
+				p1.lookAtConstraint.Enabled = true
+			end
+			p1.lookAtConstraint.CFrame = CFrame.lookAt(p1.lookAtConstraint.Attachment0.WorldPosition, p2)
+		end
+	end
 end
-function module_upvr.goTo(arg1, arg2) -- Line 441
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    arg1._lastTargetOcclusionCheck = 0
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.goTo(p1, p2) --[[ Line: 441 | Upvalues: t (copy), NPCConsts (copy) ]]
+	local humanoid = p1.humanoid
+	local v1 = os.clock()
+	if not p1._lastTargetOcclusionCheck then
+		p1._lastTargetOcclusionCheck = 0
+	end
+	if v1 - p1._lastTargetOcclusionCheck > 1 then
+		p1._lastTargetOcclusionCheck = v1
+		p1._isTargetNonOccludedCached = t.isNonOccluded(humanoid.RootPart, p2, p1.occlusionCastParams)
+	end
+	if t.getDistTo(humanoid.RootPart, p2) >= humanoid.Parent:GetAttribute(NPCConsts.MIN_DIST_TO_TARGET_ATTR_NAME) then
+		if p1._isTargetNonOccludedCached then
+			t.zigZagTowards(humanoid, p2)
+			p1._pathfindTo = nil
+			return
+		end
+		t.pathfindTo(p1, p2)
+		if not p1._doesPathfindingPathExist then
+			t.moveTowards(humanoid, p2)
+		end
+	else
+		t.move(humanoid, Vector3.new(0, 0, 0))
+	end
 end
-local Raycast_upvr = require(ReplicatedStorage.Std.Raycast)
-function module_upvr.isNonOccluded(arg1, arg2, arg3) -- Line 468
-    local Position_3 = arg1.Position
-    local var119 = arg2 - Position_3
-    if var119.Magnitude < 0.1 then
-        return false
-    end
-    local any_collidable_result1 = Raycast_upvr.collidable(Position_3, var119.Unit, var119.Magnitude, arg3)
-    if not any_collidable_result1 then
-        return true
-    end
-    local Position_4 = any_collidable_result1.Position
-    if (Position_4 - arg2).Magnitude >= 0.1 then
-        Position_4 = false
-    else
-        Position_4 = true
-    end
-    return Position_4
+function t.isNonOccluded(p1, p2, p3) --[[ Line: 468 | Upvalues: Raycast (copy) ]]
+	local Position = p1.Position
+	local v1 = p2 - Position
+	if v1.Magnitude < 0.1 then
+		return false
+	else
+		local v2 = Raycast.collidable(Position, v1.Unit, v1.Magnitude, p3)
+		if v2 then
+			return (v2.Position - p2).Magnitude < 0.1
+		else
+			return true
+		end
+	end
 end
-function module_upvr.moveTo(arg1, arg2) -- Line 481
-    arg1:MoveTo(arg2)
+function t.moveTo(p1, p2) --[[ Line: 481 ]]
+	p1:MoveTo(p2)
 end
-function module_upvr.moveTowards(arg1, arg2) -- Line 484
-    module_upvr.move(arg1, (arg2 - arg1.RootPart.Position).Unit)
+function t.moveTowards(p1, p2) --[[ Line: 484 | Upvalues: t (copy) ]]
+	t.move(p1, (p2 - p1.RootPart.Position).Unit)
 end
-function module_upvr.zigZagTowards(arg1, arg2) -- Line 488
-    local var122 = arg2 - arg1.RootPart.Position
-    module_upvr.move(arg1, var122.Unit + (var122.Unit:Cross(Vector3.new(0, 1, 0))) * (math.cos(os.clock() * 7 + arg1.Parent:GetAttribute(NPCConsts_upvr.FREQ_OFFSET_ATTR_NAME)) * math.clamp(var122.Magnitude / 24, 0, 1)) * 0.3 * arg1.Parent:GetAttribute(NPCConsts_upvr.SIDE_STRAFE_MULT_ATTR_NAME))
+function t.zigZagTowards(p1, p2) --[[ Line: 488 | Upvalues: NPCConsts (copy), t (copy) ]]
+	local v1 = p1.Parent:GetAttribute(NPCConsts.SIDE_STRAFE_MULT_ATTR_NAME)
+	local v2 = p1.Parent:GetAttribute(NPCConsts.FREQ_OFFSET_ATTR_NAME)
+	local v3 = p2 - p1.RootPart.Position
+	local v5 = math.clamp(v3.Magnitude / 24, 0, 1)
+	local v6 = v3.Unit:Cross(Vector3.new(0, 1, 0))
+	t.move(p1, v3.Unit + v6 * (math.cos(os.clock() * 7 + v2) * v5) * 0.3 * v1)
 end
-function module_upvr.move(arg1, arg2) -- Line 498
-    arg1:Move(arg2)
+function t.move(p1, p2) --[[ Line: 498 ]]
+	p1:Move(p2)
 end
-function module_upvr.getDistTo(arg1, arg2) -- Line 501
-    return ((arg2 - arg1.Position) * Vector3.new(1, 0, 1)).Magnitude
+function t.getDistTo(p1, p2) --[[ Line: 501 ]]
+	return ((p2 - p1.Position) * Vector3.new(1, 0, 1)).Magnitude
 end
-return module_upvr
+return t

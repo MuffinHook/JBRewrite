@@ -1,1 +1,2 @@
-require(game:GetService("ReplicatedStorage").Tooltip.TooltipService).init()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.Tooltip.TooltipService).init()

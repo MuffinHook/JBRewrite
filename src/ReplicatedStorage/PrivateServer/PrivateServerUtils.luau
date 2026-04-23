@@ -1,33 +1,28 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local PrivateServerConsts_upvr = require(ReplicatedStorage_upvr.PrivateServer.PrivateServerConsts)
-local module_upvr = {}
-local RxInstanceUtils_upvr = require(ReplicatedStorage_upvr.Std.RxInstanceUtils)
-function module_upvr.promiseGetPrivateServerType() -- Line 6
-    return RxInstanceUtils_upvr.waitForAttribute(ReplicatedStorage_upvr, PrivateServerConsts_upvr.SERVER_TYPE_ATTR_NAME):timeout(10)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PrivateServerConsts = require(ReplicatedStorage.PrivateServer.PrivateServerConsts)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local t = {
+	promiseGetPrivateServerType = function() --[[ Name: promiseGetPrivateServerType | Line: 6 | Upvalues: RxInstanceUtils (copy), ReplicatedStorage (copy), PrivateServerConsts (copy) ]]
+		return RxInstanceUtils.waitForAttribute(ReplicatedStorage, PrivateServerConsts.SERVER_TYPE_ATTR_NAME):timeout(10)
+	end
+}
+function t.promiseGetIsBattleServer() --[[ Line: 9 | Upvalues: t (copy), PrivateServerConsts (copy) ]]
+	return t.promiseGetPrivateServerType():andThen(function(p1) --[[ Line: 10 | Upvalues: PrivateServerConsts (ref) ]]
+		return p1 == PrivateServerConsts.BATTLE_SERVER_SERVER_TYPE
+	end)
 end
-function module_upvr.promiseGetIsBattleServer() -- Line 9
-    return module_upvr.promiseGetPrivateServerType():andThen(function(arg1) -- Line 10
-        local var6
-        if arg1 ~= PrivateServerConsts_upvr.BATTLE_SERVER_SERVER_TYPE then
-            var6 = false
-        else
-            var6 = true
-        end
-        return var6
-    end)
+function t.getPrivateServerType() --[[ Line: 14 | Upvalues: t (copy) ]]
+	local v1, v2 = t.promiseGetPrivateServerType():await()
+	if not v1 then
+		error(v2)
+	end
+	return v2
 end
-function module_upvr.getPrivateServerType() -- Line 14
-    local any_await_result1, any_await_result2 = module_upvr.promiseGetPrivateServerType():await()
-    if not any_await_result1 then
-        error(any_await_result2)
-    end
-    return any_await_result2
+function t.getIsBattleServer() --[[ Line: 21 | Upvalues: t (copy) ]]
+	local v1, v2 = t.promiseGetIsBattleServer():await()
+	if not v1 then
+		error(v2)
+	end
+	return v2
 end
-function module_upvr.getIsBattleServer() -- Line 21
-    local any_await_result1_2, any_await_result2_2 = module_upvr.promiseGetIsBattleServer():await()
-    if not any_await_result1_2 then
-        error(any_await_result2_2)
-    end
-    return any_await_result2_2
-end
-return module_upvr
+return t

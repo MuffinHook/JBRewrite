@@ -1,186 +1,194 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local GunSystemConsts_upvr = require(ReplicatedStorage_upvr.Game.ItemSystem.GunSystemConsts)
-local Gun_upvr = require(script.Parent.Gun)
-local function _() -- Line 11, Named "RandomVector"
-    return Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.Std.Audio)
+require(ReplicatedStorage.Module.R15IKv2)
+local Joint = require(ReplicatedStorage.Std.Joint)
+require(ReplicatedStorage.Inventory.InventoryItemUtils)
+local GunSystemConsts = require(ReplicatedStorage.Game.ItemSystem.GunSystemConsts)
+local Gun = require(script.Parent.Gun)
+local function RandomVector() --[[ Line: 11 ]]
+	local v1 = math.random() * 2 - 1
+	local v2 = math.random() * 2 - 1
+	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
 end
-local function CalculateProjectileVelocity_upvr(arg1, arg2, arg3) -- Line 17, Named "CalculateProjectileVelocity"
-    local var5 = arg2 - arg1
-    local var6 = (var5.x * var5.x + var5.z * var5.z) ^ 0.5
-    local var7 = 0.7853981633974483
-    local Gravity = workspace.Gravity
-    local var9 = arg3 * arg3 * arg3 * arg3 - Gravity * (Gravity * var6 * var6 + 2 * var5.Y * arg3 * arg3)
-    if 0 <= var9 then
-        local var10 = var9 ^ 0.5
-        var7 = math.min(math.atan((arg3 * arg3 + var10) / (Gravity * var6)), math.atan((arg3 * arg3 - var10) / (Gravity * var6)))
-    end
-    return Vector3.new(arg3 * var5.x / var6 * math.cos(var7), arg3 * math.sin(var7), arg3 * var5.z / var6 * math.cos(var7)), (var6) / (arg3 * math.cos(var7))
+local function CalculateProjectileVelocity(p1, p2, p3) --[[ Line: 17 ]]
+	local v1 = p2 - p1
+	local v2 = (v1.x * v1.x + v1.z * v1.z) ^ 0.5
+	local Gravity = workspace.Gravity
+	local v3 = p3 * p3 * p3 * p3 - Gravity * (Gravity * v2 * v2 + 2 * v1.Y * p3 * p3)
+	local v4
+	if v3 >= 0 then
+		local v5 = v3 ^ 0.5
+		v4 = math.min(math.atan((p3 * p3 + v5) / (Gravity * v2)), (math.atan((p3 * p3 - v5) / (Gravity * v2))))
+	else
+		v4 = 0.7853981633974483
+	end
+	return Vector3.new(p3 * v1.x / v2 * math.cos(v4), p3 * math.sin(v4), p3 * v1.z / v2 * math.cos(v4)), v2 / (p3 * math.cos(v4))
 end
-local module_upvr = {
-    __ClassName = "Grenade";
+local t = {
+	__ClassName = "Grenade"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Gun_upvr)
-function module_upvr.new(arg1, arg2, arg3) -- Line 37
-    local any_new_result1 = Gun_upvr.new(arg1, arg2, arg3)
-    setmetatable(any_new_result1, module_upvr)
-    any_new_result1:Setup(arg3)
-    any_new_result1.ShootProxy = 1
-    return any_new_result1
+t.__index = t
+setmetatable(t, Gun)
+function t.new(p1, p2, p3) --[[ Line: 37 | Upvalues: Gun (copy), t (copy) ]]
+	local v1 = Gun.new(p1, p2, p3)
+	setmetatable(v1, t)
+	v1:Setup(p3)
+	v1.ShootProxy = 1
+	return v1
 end
-function module_upvr.SetupArmWelds(arg1) -- Line 49
+function t.SetupArmWelds(p1) --[[ Line: 49 ]] end
+function t.UpdateArmIK(p1) --[[ Line: 50 ]]
+	local IK = p1.IK
+	IK.RightArm = p1.Model.Model.Base.Position
+	IK.RightAngle = p1.Config.Motion.RightElbowAngle
 end
-function module_upvr.UpdateArmIK(arg1) -- Line 50
-    local IK = arg1.IK
-    IK.RightArm = arg1.Model.Model.Base.Position
-    IK.RightAngle = arg1.Config.Motion.RightElbowAngle
+function t.SetupTip(p1) --[[ Line: 56 ]]
+	p1.TipOffset = Vector3.new()
 end
-function module_upvr.SetupTip(arg1) -- Line 56
-    arg1.TipOffset = Vector3.new()
+local function GrenadeExplode(p1, p2) --[[ Line: 59 | Upvalues: ReplicatedStorage (copy), Audio (copy), GunSystemConsts (copy) ]]
+	local Position = p2.Skeleton.BoundingBox.Position
+	if p1.BulletEmitter.Bullets then
+		for i = 1, 30 do
+			local Unit = Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit
+			p1.BulletEmitter:Emit(Position, Unit, 400)
+		end
+	end
+	local Part = Instance.new("Part")
+	Part.Size = Vector3.new(0.1, 0.1, 0.1)
+	Part.CanCollide = false
+	Part.Anchored = true
+	Part.Transparency = 1
+	Part.Position = Position
+	Part.Parent = workspace
+	local v4 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Explosion:Clone()
+	v4.Parent = Part
+	v4:Emit(4)
+	local v5 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Debris:Clone()
+	v5.Parent = Part
+	v5:Emit(50)
+	local v6 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Smoke:Clone()
+	v6.Parent = Part
+	v6:Emit(3)
+	local v7 = ReplicatedStorage.Resource.ItemSystem.Projectiles.LandingSmoke:Clone()
+	v7.Enabled = true
+	v7.Parent = Part
+	delay(5 - v7.Lifetime.Max, function() --[[ Line: 97 | Upvalues: v7 (copy) ]]
+		v7.Enabled = false
+	end)
+	game.Debris:AddItem(Part, 5)
+	Audio.ObjectLocal(Part, p1.Config.Sound.explosion_large_02, {
+		Volume = 1
+	}).EmitterSize = 20
+	if p1.Local then
+		p1.inventoryItemValue:FindFirstChild(GunSystemConsts.DAMAGE_REMOTE_NAME):FireServer(Position)
+	end
 end
-local function GrenadeExplode_upvr(arg1, arg2) -- Line 59, Named "GrenadeExplode"
-    local Position = arg2.Skeleton.BoundingBox.Position
-    if arg1.BulletEmitter.Bullets then
-        for _ = 1, 30 do
-            arg1.BulletEmitter:Emit(Position, Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit, 400)
-        end
-    end
-    local Part = Instance.new("Part")
-    Part.Size = Vector3.new(0.10000, 0.10000, 0.10000)
-    Part.CanCollide = false
-    Part.Anchored = true
-    Part.Transparency = 1
-    Part.Position = Position
-    Part.Parent = workspace
-    local clone = ReplicatedStorage_upvr.Resource.ItemSystem.Projectiles.Explosion:Clone()
-    clone.Parent = Part
-    clone:Emit(4)
-    local clone_4 = ReplicatedStorage_upvr.Resource.ItemSystem.Projectiles.Debris:Clone()
-    clone_4.Parent = Part
-    clone_4:Emit(50)
-    local clone_5 = ReplicatedStorage_upvr.Resource.ItemSystem.Projectiles.Smoke:Clone()
-    clone_5.Parent = Part
-    clone_5:Emit(3)
-    local clone_6_upvr = ReplicatedStorage_upvr.Resource.ItemSystem.Projectiles.LandingSmoke:Clone()
-    clone_6_upvr.Enabled = true
-    clone_6_upvr.Parent = Part
-    delay(5 - clone_6_upvr.Lifetime.Max, function() -- Line 97
-        clone_6_upvr.Enabled = false
-    end)
-    game.Debris:AddItem(Part, 5)
-    Audio_upvr.ObjectLocal(Part, arg1.Config.Sound.explosion_large_02, {
-        Volume = 1;
-    }).EmitterSize = 20
-    if arg1.Local then
-        arg1.inventoryItemValue:FindFirstChild(GunSystemConsts_upvr.DAMAGE_REMOTE_NAME):FireServer(Position)
-    end
+function t.GrenadeThrow(p1, p2, p3) --[[ Line: 110 | Upvalues: ReplicatedStorage (copy), Joint (copy), CalculateProjectileVelocity (copy), GrenadeExplode (copy), GunSystemConsts (copy) ]]
+	local v1 = assert(ReplicatedStorage.Resource.ItemSystem.Models.Grenade, ("Item model for %s does not exist."):format("Grenade")):Clone()
+	v1.Model.Handle:Destroy()
+	Joint.Weld(v1.Model.Base, v1.Skeleton.BoundingBox)
+	v1.Model.Base.Anchored = false
+	v1.Skeleton.BoundingBox.Anchored = false
+	v1.Parent = workspace.Items
+	v1.PrimaryPart = v1.Skeleton.BoundingBox
+	local PrimaryPart = v1.PrimaryPart
+	PrimaryPart.Velocity = CalculateProjectileVelocity(p1.Model.Skeleton.BoundingBox.Position, p2, 100)
+	v1:SetPrimaryPartCFrame(CFrame.new(Vector3.new(), PrimaryPart.Velocity) + p1.Model.Skeleton.BoundingBox.Position)
+	PrimaryPart.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.9, 0.5, 20, 1)
+	delay(0, function() --[[ Line: 131 | Upvalues: PrimaryPart (copy) ]]
+		PrimaryPart.CanCollide = true
+	end)
+	delay(p3, function() --[[ Line: 134 | Upvalues: GrenadeExplode (ref), p1 (copy), v1 (ref) ]]
+		GrenadeExplode(p1, v1)
+		v1.Model.Base.CanCollide = true
+		local v12 = math.random() * 2 - 1
+		local v2 = math.random() * 2 - 1
+		v1.Model.Base.Velocity = Vector3.new(v12, v2, math.random() * 2 - 1).Unit * 50
+	end)
+	delay(p3 + 2, function() --[[ Line: 141 | Upvalues: v1 (ref) ]]
+		v1:Destroy()
+	end)
+	if p1.Local then
+		p1.inventoryItemValue:FindFirstChild(GunSystemConsts.SHOOT_REMOTE_NAME):FireServer()
+	end
 end
-local Joint_upvr = require(ReplicatedStorage_upvr.Std.Joint)
-function module_upvr.GrenadeThrow(arg1, arg2, arg3) -- Line 110
-    local clone_3_upvw = assert(ReplicatedStorage_upvr.Resource.ItemSystem.Models.Grenade, string.format("Item model for %s does not exist.", "Grenade")):Clone()
-    clone_3_upvw.Model.Handle:Destroy()
-    Joint_upvr.Weld(clone_3_upvw.Model.Base, clone_3_upvw.Skeleton.BoundingBox)
-    clone_3_upvw.Model.Base.Anchored = false
-    clone_3_upvw.Skeleton.BoundingBox.Anchored = false
-    clone_3_upvw.Parent = workspace.Items
-    clone_3_upvw.PrimaryPart = clone_3_upvw.Skeleton.BoundingBox
-    local PrimaryPart_upvr = clone_3_upvw.PrimaryPart
-    PrimaryPart_upvr.Velocity = CalculateProjectileVelocity_upvr(arg1.Model.Skeleton.BoundingBox.Position, arg2, 100)
-    clone_3_upvw:SetPrimaryPartCFrame(CFrame.new(Vector3.new(), PrimaryPart_upvr.Velocity) + arg1.Model.Skeleton.BoundingBox.Position)
-    PrimaryPart_upvr.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.9, 0.5, 20, 1)
-    delay(0, function() -- Line 131
-        PrimaryPart_upvr.CanCollide = true
-    end)
-    delay(arg3, function() -- Line 134
-        GrenadeExplode_upvr(arg1, clone_3_upvw)
-        clone_3_upvw.Model.Base.CanCollide = true
-        clone_3_upvw.Model.Base.Velocity = Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 50
-    end)
-    delay(arg3 + 2, function() -- Line 141
-        clone_3_upvw:Destroy()
-    end)
-    if arg1.Local then
-        arg1.inventoryItemValue:FindFirstChild(GunSystemConsts_upvr.SHOOT_REMOTE_NAME):FireServer()
-    end
+function t.BulletEmitterOnLocalHitPlayer(p1) --[[ Line: 150 ]] end
+function t.ShootBegin(p1, p2) --[[ Line: 151 ]]
+	if not p1:ShootCheckConditions() then
+		return false
+	end
+	p1:DecrementAmmo()
+	p1:SetNextShotPossible()
+	p1.GrenadeHeldAt = tick()
+	local v1 = p1.ShootProxy + 1
+	p1.ShootProxy = v1
+	p1.SpringItemOffset:SetTarget(p1.Config.Motion.Raise.Springs.ItemOffset)
+	p1.SpringItemRotation:SetTarget(p1.Config.Motion.Raise.Springs.ItemRotation)
+	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Raise.Springs.NeckRotation)
+	local v2 = p1.Model.Model.Handle:Clone()
+	v2:ClearAllChildren()
+	v2.CanCollide = true
+	v2.Anchored = false
+	v2.Parent = workspace
+	local v3 = math.random() * 2 - 1
+	local v4 = math.random() * 2 - 1
+	v2.Velocity = Vector3.new(v3, v4, math.random() * 2 - 1).Unit * 50
+	delay(5, function() --[[ Line: 173 | Upvalues: v2 (copy) ]]
+		v2:Destroy()
+	end)
+	p1.Model.Model.Handle.Transparency = 1
+	delay(p1.Config.FuseTime, function() --[[ Line: 179 | Upvalues: p1 (copy), v1 (copy), p2 (copy) ]]
+		if not p1.Destroyed then
+			if p1.ShootProxy ~= v1 then
+				return false
+			end
+			p1:ShootEnd(p2)
+		end
+	end)
+	if p1.Local then
+		p1:BroadcastInputBegan(p2)
+	end
 end
-function module_upvr.BulletEmitterOnLocalHitPlayer(arg1) -- Line 150
+function t.ShootEnd(p1, p2) --[[ Line: 193 ]]
+	if not p1.GrenadeHeldAt then
+		return false
+	end
+	local v1 = p1.Config.FuseTime - (tick() - p1.GrenadeHeldAt)
+	p1.GrenadeHeldAt = nil
+	p1.SpringItemOffset:SetTarget(p1.Config.Motion.Launch.Springs.ItemOffset)
+	p1.SpringItemRotation:SetTarget(p1.Config.Motion.Launch.Springs.ItemRotation)
+	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Launch.Springs.NeckRotation)
+	delay(0.2, function() --[[ Line: 203 | Upvalues: p1 (copy) ]]
+		p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
+		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
+		p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
+	end)
+	local Model = p1.Model
+	Model.Model.Base.Transparency = 1
+	Model.Model.Handle.Transparency = 1
+	delay(p1.Config.ReloadTime, function() --[[ Line: 213 | Upvalues: p1 (copy), Model (copy) ]]
+		if p1.Destroyed then
+			return false
+		end
+		Model.Model.Base.Transparency = 0
+		Model.Model.Handle.Transparency = 0
+	end)
+	p1:GrenadeThrow(p1.MousePosition, v1)
+	if p1.Local then
+		p1:BroadcastInputEnded(p2)
+	end
 end
-function module_upvr.ShootBegin(arg1, arg2) -- Line 151
-    if not arg1:ShootCheckConditions() then
-        return false
-    end
-    arg1:DecrementAmmo()
-    arg1:SetNextShotPossible()
-    arg1.GrenadeHeldAt = tick()
-    local var30_upvr = arg1.ShootProxy + 1
-    arg1.ShootProxy = var30_upvr
-    arg1.SpringItemOffset:SetTarget(arg1.Config.Motion.Raise.Springs.ItemOffset)
-    arg1.SpringItemRotation:SetTarget(arg1.Config.Motion.Raise.Springs.ItemRotation)
-    arg1.SpringNeckRotation:SetTarget(arg1.Config.Motion.Raise.Springs.NeckRotation)
-    local clone_2_upvr = arg1.Model.Model.Handle:Clone()
-    clone_2_upvr:ClearAllChildren()
-    clone_2_upvr.CanCollide = true
-    clone_2_upvr.Anchored = false
-    clone_2_upvr.Parent = workspace
-    clone_2_upvr.Velocity = Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 50
-    delay(5, function() -- Line 173
-        clone_2_upvr:Destroy()
-    end)
-    arg1.Model.Model.Handle.Transparency = 1
-    delay(arg1.Config.FuseTime, function() -- Line 179
-        if arg1.Destroyed then
-        else
-            if arg1.ShootProxy ~= var30_upvr then
-                return false
-            end
-            arg1:ShootEnd(arg2)
-        end
-    end)
-    if arg1.Local then
-        arg1:BroadcastInputBegan(arg2)
-    end
+function t.ShootOther(p1) --[[ Line: 227 ]] end
+function t.ShootSound(p1, p2) --[[ Line: 228 | Upvalues: Audio (copy) ]]
+	if p2 then
+		Audio.ObjectLocal(p1.Model.Skeleton.BoundingBox, p1.Config.Sound.gun_pistol_dry_fire_01, {
+			Volume = 0.6,
+			Pitch = 1 + math.random() * 0.1 - 0.05
+		})
+	end
 end
-function module_upvr.ShootEnd(arg1, arg2) -- Line 193
-    if not arg1.GrenadeHeldAt then
-        return false
-    end
-    arg1.GrenadeHeldAt = nil
-    arg1.SpringItemOffset:SetTarget(arg1.Config.Motion.Launch.Springs.ItemOffset)
-    arg1.SpringItemRotation:SetTarget(arg1.Config.Motion.Launch.Springs.ItemRotation)
-    arg1.SpringNeckRotation:SetTarget(arg1.Config.Motion.Launch.Springs.NeckRotation)
-    delay(0.2, function() -- Line 203
-        arg1.SpringItemOffset:SetTarget(arg1.Config.Motion.Hip.Springs.ItemOffset)
-        arg1.SpringItemRotation:SetTarget(arg1.Config.Motion.Hip.Springs.ItemRotation)
-        arg1.SpringNeckRotation:SetTarget(arg1.Config.Motion.Hip.Springs.NeckRotation)
-    end)
-    local Model_upvr = arg1.Model
-    Model_upvr.Model.Base.Transparency = 1
-    Model_upvr.Model.Handle.Transparency = 1
-    delay(arg1.Config.ReloadTime, function() -- Line 213
-        if arg1.Destroyed then
-            return false
-        end
-        Model_upvr.Model.Base.Transparency = 0
-        Model_upvr.Model.Handle.Transparency = 0
-    end)
-    arg1:GrenadeThrow(arg1.MousePosition, (arg1.Config.FuseTime) - (tick() - arg1.GrenadeHeldAt))
-    if arg1.Local then
-        arg1:BroadcastInputEnded(arg2)
-    end
-end
-function module_upvr.ShootOther(arg1) -- Line 227
-end
-function module_upvr.ShootSound(arg1, arg2) -- Line 228
-    if arg2 then
-        Audio_upvr.ObjectLocal(arg1.Model.Skeleton.BoundingBox, arg1.Config.Sound.gun_pistol_dry_fire_01, {
-            Volume = 0.6;
-            Pitch = 1 + math.random() * 0.1 - 0.05;
-        })
-    end
-end
-module_upvr.ApplySkin = false
-module_upvr.ScopeBegin = false
-module_upvr.ScopeEnd = false
-module_upvr.Reload = false
-return module_upvr
+t.ApplySkin = false
+t.ScopeBegin = false
+t.ScopeEnd = false
+t.Reload = false
+return t

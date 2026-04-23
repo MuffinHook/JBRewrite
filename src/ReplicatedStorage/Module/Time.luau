@@ -1,7 +1,7 @@
+local function GetNowSync() --[[ Line: 1 ]]
+	return workspace:GetServerTimeNow()
+end
 return {
-    Init = function() -- Line 4, Named "Init"
-    end;
-    GetNowSync = function() -- Line 1, Named "GetNowSync"
-        return workspace:GetServerTimeNow()
-    end;
+	Init = function() --[[ Name: Init | Line: 4 ]] end,
+	GetNowSync = GetNowSync
 }

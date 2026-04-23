@@ -1,73 +1,121 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.Std.Audio)
 local Roact = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact.PureComponent:extend("PortalCustomize")
-local createElement_upvr = Roact.createElement
-local PortalBase_upvr = require(script.Parent.PortalBase)
-function any_extend_result1.render(arg1) -- Line 11
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local ipairs_result1, ipairs_result2, ipairs_result3 = ipairs(arg1.props.categories)
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [20.8]
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [20.2147483650]
-    if nil == arg1.props.category then
-        for _, v in ipairs(arg1.props.receipt) do
-            ({})[v.category..v.name] = true
-            local _
-        end
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+local createElement = Roact.createElement
+local PortalBase = require(script.Parent.PortalBase)
+local v1 = Roact.PureComponent:extend("PortalCustomize")
+function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), PortalBase (copy) ]]
+	local category = p1.props.category
+	local v1 = nil
+	for i, v in ipairs(p1.props.categories) do
+		if v.name == category then
+			v1 = v.title
+			break
+		end
+	end
+	local t = {}
+	local t2 = {}
+	for i, v in ipairs(p1.props.receipt) do
+		t[v.category .. v.name] = true
+	end
+	for i = 1, #p1.props.items do
+		local v2, v3, v4
+		local v5 = p1.props.items[i]
+		local categoryName = v5.categoryName
+		local v6 = nil
+		for i2, v in ipairs(p1.props.categories) do
+			if v.name == categoryName then
+				v6 = v.title
+				break
+			end
+		end
+		if not v6 then
+			error("missing category title for " .. categoryName)
+		end
+		v2 = if p1.props.favorited[categoryName] then p1.props.favorited[categoryName][v5.name] == true else false
+		v3 = if p1.props.owned[categoryName] then p1.props.owned[categoryName][v5.name] == true else false
+		local t3 = {
+			selected = t[v5.categoryName .. v5.name]
+		}
+		v4 = v5.name == (p1.props.equipped[categoryName] or "None")
+		t3.equipped = v4
+		t3.owned = v3
+		t3.faved = v2
+		function t3.onSelect() --[[ Line: 60 | Upvalues: p1 (copy), categoryName (copy), v5 (copy), v6 (ref), t3 (copy) ]]
+			if p1.props.attemptEquipItem then
+				p1.props.attemptEquipItem(categoryName, v5.name)
+			end
+			p1.props.onSelectItem(categoryName, v6, v5, t3)
+		end
+		function t3.onFavorite(p12) --[[ Line: 66 | Upvalues: p1 (copy), categoryName (copy), v5 (copy) ]]
+			if p1.props.attemptFavoriteItem then
+				p1.props.attemptFavoriteItem(categoryName, v5.name, p12)
+			end
+			p1.props.onFavoriteItem(categoryName, v5.name, p12)
+		end
+		t2[i] = t3
+	end
+	return createElement(PortalBase, {
+		title = v1,
+		items = p1.props.items,
+		metadata = t2,
+		cornerPixel = p1.props.cornerPixel,
+		portalRatio = p1.props.portalRatio,
+		paddingRatio = p1.props.paddingRatio,
+		sortEnabled = true,
+		onSelectSort = p1.props.onSelectSort,
+		showFavorited = p1.props.showFavorited,
+		onToggleFavorited = p1.props.onToggleFavorited,
+		showAll = p1.props.showAll,
+		onToggleAll = p1.props.onToggleAll,
+		colsPerRow = p1.props.colsPerRow,
+		rowsPerPage = p1.props.rowsPerPage
+	})
 end
-local Players_upvr = game:GetService("Players")
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-return require(ReplicatedStorage.RoactRodux).connect(function(arg1, arg2) -- Line 92
-    return {
-        category = arg1.garageCategory;
-        categories = arg1.garageCategories;
-        receipt = arg1.garageReceipt;
-        favorited = arg1.garageFavorited;
-    }
-end, function(arg1) -- Line 100
-    return {
-        onSelectItem = function(arg1_2, arg2, arg3, arg4) -- Line 102, Named "onSelectItem"
-            if Players_upvr.LocalPlayer and Players_upvr.LocalPlayer.PlayerGui then
-                Audio_upvr.ObjectLocal(Players_upvr.LocalPlayer.PlayerGui, 6105461542, {
-                    Volume = 0.25;
-                })
-            end
-            if arg3.onItemSelected then
-                arg3.onItemSelected()
-            end
-            local tbl = {
-                type = "addReceiptItem";
-            }
-            tbl.category = arg1_2
-            tbl.categoryTitle = arg2
-            tbl.name = arg3.name
-            tbl.title = arg3.title
-            tbl.price = arg3.price
-            tbl.limited = arg3.limited
-            arg1(tbl)
-            if arg4.owned then
-                local tbl_2 = {
-                    type = "setCategoryEquipped";
-                }
-                tbl_2.category = arg1_2
-                tbl_2.name = arg3.name
-                arg1(tbl_2)
-            end
-        end;
-        onFavoriteItem = function(arg1_3, arg2, arg3) -- Line 126, Named "onFavoriteItem"
-            local tbl_3 = {
-                type = "setCategoryItemFavorited";
-            }
-            tbl_3.category = arg1_3
-            tbl_3.name = arg2
-            tbl_3.favorited = arg3
-            arg1(tbl_3)
-        end;
-    }
-end)(any_extend_result1)
+return RoactRodux.connect(function(p1, p2) --[[ Line: 92 ]]
+	return {
+		category = p1.garageCategory,
+		categories = p1.garageCategories,
+		receipt = p1.garageReceipt,
+		favorited = p1.garageFavorited
+	}
+end, function(p1) --[[ Line: 100 | Upvalues: Players (copy), Audio (copy) ]]
+	return {
+		onSelectItem = function(p12, p2, p3, p4) --[[ Name: onSelectItem | Line: 102 | Upvalues: Players (ref), Audio (ref), p1 (copy) ]]
+			if Players.LocalPlayer and Players.LocalPlayer.PlayerGui then
+				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
+					Volume = 0.25
+				})
+			end
+			if p3.onItemSelected then
+				p3.onItemSelected()
+			end
+			p1({
+				type = "addReceiptItem",
+				category = p12,
+				categoryTitle = p2,
+				name = p3.name,
+				title = p3.title,
+				price = p3.price,
+				limited = p3.limited
+			})
+			if p4.owned then
+				p1({
+					type = "setCategoryEquipped",
+					category = p12,
+					name = p3.name
+				})
+			end
+		end,
+		onFavoriteItem = function(p12, p2, p3) --[[ Name: onFavoriteItem | Line: 126 | Upvalues: p1 (copy) ]]
+			p1({
+				type = "setCategoryItemFavorited",
+				category = p12,
+				name = p2,
+				favorited = p3
+			})
+		end
+	}
+end)(v1)

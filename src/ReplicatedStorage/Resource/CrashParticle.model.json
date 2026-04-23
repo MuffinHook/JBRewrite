@@ -1,8 +1,21 @@
 {
   "className": "ParticleEmitter",
   "properties": {
+    "Rate": 25.0,
+    "LightInfluence": 1.0,
     "FlipbookBlendFrames": {
       "Bool": false
+    },
+    "LightEmission": 1.0,
+    "EmissionDirection": "Back",
+    "Enabled": false,
+    "Orientation": "VelocityParallel",
+    "ZOffset": 1.0,
+    "Rotation": {
+      "NumberRange": [
+        90.0,
+        90.0
+      ]
     },
     "Size": {
       "NumberSequence": {
@@ -20,7 +33,13 @@
         ]
       }
     },
-    "ZOffset": 1.0,
+    "Texture": "http://www.roblox.com/asset/?id=6740271308",
+    "Lifetime": {
+      "NumberRange": [
+        1.0,
+        1.0
+      ]
+    },
     "Color": {
       "ColorSequence": {
         "keypoints": [
@@ -42,25 +61,6 @@
           }
         ]
       }
-    },
-    "Orientation": "VelocityParallel",
-    "EmissionDirection": "Back",
-    "LightInfluence": 1.0,
-    "Lifetime": {
-      "NumberRange": [
-        1.0,
-        1.0
-      ]
-    },
-    "Enabled": false,
-    "LightEmission": 1.0,
-    "Rate": 25.0,
-    "Rotation": {
-      "NumberRange": [
-        90.0,
-        90.0
-      ]
-    },
-    "Texture": "http://www.roblox.com/asset/?id=6740271308"
+    }
   }
 }

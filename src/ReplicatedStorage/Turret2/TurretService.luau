@@ -1,28 +1,29 @@
-local module = {}
-local Binder_upvr = require(game:GetService("ReplicatedStorage").Std.Binder)
-local Turret_upvr = require(script.Parent.Turret)
-local TurretConsts_upvr = require(script.Parent.TurretConsts)
-local RunService_upvr = game:GetService("RunService")
-function module.init() -- Line 7
-    local any_new_result1 = Binder_upvr.new("Turret2", Turret_upvr)
-    any_new_result1:GetClassAddedSignal():Connect(function(arg1) -- Line 9
-        local SOME_2_upvr = arg1.Model:FindFirstChild(TurretConsts_upvr.TARGET_PTR_NAME)
-        arg1.Maid:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 11
-            if SOME_2_upvr.Value then
-                local Value = SOME_2_upvr.Value
-                assert(Value:IsA("BasePart"))
-                arg1:PointAt(Value.Position)
-            else
-                arg1:PointAt()
-            end
-            arg1:Update()
-        end))
-        arg1.Maid:GiveTask(arg1.onLocalPlayerHit:Connect(function() -- Line 21
-            local SOME = arg1.Model:FindFirstChild(TurretConsts_upvr.REPORT_HIT_REMOTE_NAME)
-            assert(SOME)
-            SOME:FireServer()
-        end))
-    end)
-    any_new_result1:Start()
-end
-return module
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Turret = require(script.Parent.Turret)
+local TurretConsts = require(script.Parent.TurretConsts)
+local Binder = require(ReplicatedStorage.Std.Binder)
+return {
+	init = function() --[[ Name: init | Line: 7 | Upvalues: Binder (copy), Turret (copy), TurretConsts (copy), RunService (copy) ]]
+		local v1 = Binder.new("Turret2", Turret)
+		v1:GetClassAddedSignal():Connect(function(p1) --[[ Line: 9 | Upvalues: TurretConsts (ref), RunService (ref) ]]
+			local v1 = p1.Model:FindFirstChild(TurretConsts.TARGET_PTR_NAME)
+			p1.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 11 | Upvalues: v1 (copy), p1 (copy) ]]
+				if v1.Value then
+					local v12 = v1.Value
+					assert(v12:IsA("BasePart"))
+					p1:PointAt(v12.Position)
+				else
+					p1:PointAt()
+				end
+				p1:Update()
+			end))
+			p1.Maid:GiveTask(p1.onLocalPlayerHit:Connect(function() --[[ Line: 21 | Upvalues: p1 (copy), TurretConsts (ref) ]]
+				local v1 = p1.Model:FindFirstChild(TurretConsts.REPORT_HIT_REMOTE_NAME)
+				assert(v1)
+				v1:FireServer()
+			end))
+		end)
+		v1:Start()
+	end
+}

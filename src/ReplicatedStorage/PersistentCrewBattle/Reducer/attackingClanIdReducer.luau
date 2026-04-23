@@ -1,5 +1,6 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer(nil, {
-    setAttackingClanId = function(arg1, arg2) -- Line 5, Named "setAttackingClanId"
-        return arg2.value
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer(nil, {
+	setAttackingClanId = function(p1, p2) --[[ Name: setAttackingClanId | Line: 5 ]]
+		return p2.value
+	end
 })

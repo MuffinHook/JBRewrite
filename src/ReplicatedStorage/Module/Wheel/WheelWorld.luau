@@ -1,55 +1,53 @@
-local function GetMass_upvr(arg1) -- Line 7, Named "GetMass"
-    local var7
-    for _, v in next, arg1:GetChildren() do
-        if v:IsA("BasePart") then
-            var7 += v:GetMass()
-        end
-        var7 += GetMass_upvr(v)
-    end
-    return var7
+local function v1(p1) --[[ Line: 7 | Upvalues: v1 (copy) ]]
+	local v12 = next
+	local v2, v3 = p1:GetChildren()
+	local sum = 0
+	for v4, v5 in v12, v2, v3 do
+		if v5:IsA("BasePart") then
+			sum = sum + v5:GetMass()
+		end
+		sum = sum + v1(v5)
+	end
+	return sum
 end
-local module_upvr = {}
-module_upvr.__index = module_upvr
-function module_upvr.new() -- Line 20
-    local setmetatable_result1 = setmetatable({}, module_upvr)
-    setmetatable_result1.Model = nil
-    setmetatable_result1.Wheels = {}
-    return setmetatable_result1
+local t = {}
+t.__index = t
+function t.new() --[[ Line: 20 | Upvalues: t (copy) ]]
+	local v2 = setmetatable({}, t)
+	v2.Model = nil
+	v2.Wheels = {}
+	return v2
 end
-function module_upvr.SetModel(arg1, arg2) -- Line 26
-    arg1.Model = arg2
+function t.SetModel(p1, p2) --[[ Line: 26 ]]
+	p1.Model = p2
 end
-function module_upvr.AddWheel(arg1, arg2) -- Line 29
-    assert(arg2)
-    table.insert(arg1.Wheels, arg2)
-    arg1:Calculate()
+function t.AddWheel(p1, p2) --[[ Line: 29 ]]
+	assert(p2)
+	table.insert(p1.Wheels, p2)
+	p1:Calculate()
 end
-function module_upvr.GetEffWheelCount(arg1) -- Line 34
-    local var17
-    for _, v_2 in ipairs(arg1.Wheels) do
-        if v_2._applyForces then
-            var17 += 1
-        end
-    end
-    return var17
+function t.GetEffWheelCount(p1) --[[ Line: 34 ]]
+	local count = 0
+	for i, v in ipairs(p1.Wheels) do
+		if v._applyForces then
+			count = count + 1
+		end
+	end
+	return count
 end
-function module_upvr.Calculate(arg1) -- Line 43
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var22 = 0
-    if arg1.Model ~= nil then
-        var22 = GetMass_upvr(arg1.Model)
-    end
-    for i_3 = 1, #arg1.Wheels do
-        arg1.Wheels[i_3].EffectiveMass = (var22) * (1 / arg1:GetEffWheelCount())
-        arg1.Wheels[i_3].IgnoreModel = arg1.Model
-        local _
-    end
-    arg1.Mass = var22
+function t.Calculate(p1) --[[ Line: 43 | Upvalues: v1 (copy) ]]
+	local v12 = if p1.Model == nil then 0 else v1(p1.Model)
+	local v3 = v12 * (1 / p1:GetEffWheelCount())
+	for i = 1, #p1.Wheels do
+		p1.Wheels[i].EffectiveMass = v3
+		p1.Wheels[i].IgnoreModel = p1.Model
+	end
+	p1.Mass = v12
 end
-function module_upvr.Destroy(arg1) -- Line 58
-    for i_4 = 1, #arg1.Wheels do
-        arg1.Wheels[i_4]:Destroy()
-    end
-    arg1.Wheels = {}
+function t.Destroy(p1) --[[ Line: 58 ]]
+	for i = 1, #p1.Wheels do
+		p1.Wheels[i]:Destroy()
+	end
+	p1.Wheels = {}
 end
-return module_upvr
+return t

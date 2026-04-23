@@ -1,143 +1,148 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local DestructibleConsts_upvr = require(script.Parent.DestructibleConsts)
-local Folder_upvr = Instance.new("Folder")
-Folder_upvr.Parent = workspace
-local module_2_upvr = {}
-module_2_upvr.__index = module_2_upvr
-function module_2_upvr.new(arg1) -- Line 21
-    local module = {}
-    setmetatable(module, module_2_upvr)
-    module._obj = arg1
-    module._objName = arg1.Name
-    module._maid = Maid_upvr.new()
-    module:_setup(arg1, module._maid)
-    return module
+local Debris = game:GetService("Debris")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CurrentCamera = workspace.CurrentCamera
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local RateLimiter = require(ReplicatedStorage.Std.RateLimiter)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local DestructibleConsts = require(script.Parent.DestructibleConsts)
+local v1 = Instance.new("Folder")
+v1.Parent = workspace
+local v2 = RateLimiter.new(50)
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 21 | Upvalues: t (copy), Maid (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._obj = p1
+	t2._objName = p1.Name
+	t2._maid = Maid.new()
+	t2:_setup(p1, t2._maid)
+	return t2
 end
-local Signal_upvr = require(ReplicatedStorage_upvr.Std.Signal)
-function module_2_upvr.GetOnHitSignal(arg1) -- Line 32
-    if not arg1._onHitSignal then
-        arg1._onHitSignal = Signal_upvr.new()
-        arg1._maid:GiveTask(arg1._onHitSignal)
-    end
-    return arg1._onHitSignal
+function t.GetOnHitSignal(p1) --[[ Line: 32 | Upvalues: Signal (copy) ]]
+	if not p1._onHitSignal then
+		p1._onHitSignal = Signal.new()
+		p1._maid:GiveTask(p1._onHitSignal)
+	end
+	return p1._onHitSignal
 end
-function module_2_upvr.GetInst(arg1) -- Line 39
-    return arg1._instValue.Value
+function t.GetInst(p1) --[[ Line: 39 ]]
+	return p1._instValue.Value
 end
-function module_2_upvr.GetPrefab(arg1) -- Line 42
-    return ReplicatedStorage_upvr:FindFirstChild(DestructibleConsts_upvr.PREFAB_FOLDER_NAME):FindFirstChild(arg1._objName)
+function t.GetPrefab(p1) --[[ Line: 42 | Upvalues: ReplicatedStorage (copy), DestructibleConsts (copy) ]]
+	return ReplicatedStorage:FindFirstChild(DestructibleConsts.PREFAB_FOLDER_NAME):FindFirstChild(p1._objName)
 end
-local RxInstanceUtils_upvr = require(ReplicatedStorage_upvr.Std.RxInstanceUtils)
-function module_2_upvr._setup(arg1, arg2, arg3) -- Line 46
-    if not arg2:FindFirstChild(DestructibleConsts_upvr.INSTANCE_VALUE_NAME) then
-        local ObjectValue = Instance.new("ObjectValue")
-        ObjectValue.Name = DestructibleConsts_upvr.INSTANCE_VALUE_NAME
-        ObjectValue.Value = nil
-        ObjectValue.Parent = arg2
-    end
-    arg1._instValue = ObjectValue
-    arg1._wasTouched = false
-    arg3:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(arg2, DestructibleConsts_upvr.BROADCAST_COLLIDE_REMOTE_NAME, function(arg1_2, arg2_2) -- Line 61
-        arg1._broadcastCollideRemote = arg1_2
-        arg2_2:GiveTask(arg1_2.OnClientEvent:Connect(function(arg1_3) -- Line 63
-            if arg1._wasTouched then
-            else
-                arg1:_handleHitPosition(arg1_3)
-            end
-        end))
-    end))
-    arg3:GiveTask(ObjectValue.Changed:Connect(function() -- Line 73
-        arg1:_handleInst()
-    end))
-    arg1:_handleInst()
+function t._setup(p1, p2, p3) --[[ Line: 46 | Upvalues: DestructibleConsts (copy), RxInstanceUtils (copy) ]]
+	local v1 = p2:FindFirstChild(DestructibleConsts.INSTANCE_VALUE_NAME)
+	if not v1 then
+		local v2 = Instance.new("ObjectValue")
+		v2.Name = DestructibleConsts.INSTANCE_VALUE_NAME
+		v2.Value = nil
+		v2.Parent = p2
+		v1 = v2
+	end
+	p1._instValue = v1
+	p1._wasTouched = false
+	p3:GiveTask(RxInstanceUtils.observeOneChildNamed(p2, DestructibleConsts.BROADCAST_COLLIDE_REMOTE_NAME, function(p12, p2) --[[ Line: 61 | Upvalues: p1 (copy) ]]
+		p1._broadcastCollideRemote = p12
+		p2:GiveTask(p12.OnClientEvent:Connect(function(p12) --[[ Line: 63 | Upvalues: p1 (ref) ]]
+			if not p1._wasTouched then
+				p1:_handleHitPosition(p12)
+			end
+		end))
+	end))
+	p3:GiveTask(v1.Changed:Connect(function() --[[ Line: 73 | Upvalues: p1 (copy) ]]
+		p1:_handleInst()
+	end))
+	p1:_handleInst()
 end
-local Debris_upvr = game:GetService("Debris")
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-function module_2_upvr._handleHitPosition(arg1, arg2) -- Line 78
-    arg1._wasTouched = true
-    local Value = arg1._instValue.Value
-    if not Value then
-    else
-        if arg1._onHitSignal then
-            arg1._onHitSignal:Fire()
-        end
-        local PrimaryPart = Value.PrimaryPart
-        PrimaryPart.Anchored = false
-        local var17 = (arg2 + PrimaryPart.Position) * 0.5
-        local Unit = (PrimaryPart.Position - arg2).Unit
-        PrimaryPart:ApplyImpulseAtPosition(Unit * PrimaryPart.AssemblyMass * 30, var17)
-        local Part = Instance.new("Part")
-        Part.Name = "CrashParticles"
-        Part.Transparency = 1
-        Part.Anchored = true
-        Part.CanCollide = false
-        Part.CFrame = CFrame.lookAt(var17, var17 + Unit)
-        Part.Size = Vector3.new(4, 1, 1)
-        Part.Parent = workspace
-        local clone = ReplicatedStorage_upvr.Resource.CrashParticle:Clone()
-        clone.Parent = Part
-        clone:Emit(10)
-        Debris_upvr:AddItem(Part, 5)
-        Audio_upvr.ObjectLocal(PrimaryPart, 7018764077, {
-            Volume = 0.15;
-            RollOffMaxDistance = 128;
-            PlaybackSpeed = math.random() * 0.1 + 0.95;
-        })
-        task.wait()
-        Value:BreakJoints()
-        task.wait(DestructibleConsts_upvr.DURATION)
-        Value:Destroy()
-    end
+function t._handleHitPosition(p1, p2) --[[ Line: 78 | Upvalues: ReplicatedStorage (copy), Debris (copy), Audio (copy), DestructibleConsts (copy) ]]
+	local _instValue = p1._instValue
+	p1._wasTouched = true
+	local v1 = _instValue.Value
+	if v1 then
+		if p1._onHitSignal then
+			p1._onHitSignal:Fire()
+		end
+		local PrimaryPart = v1.PrimaryPart
+		PrimaryPart.Anchored = false
+		local v2 = (p2 + PrimaryPart.Position) * 0.5
+		local Unit = (PrimaryPart.Position - p2).Unit
+		PrimaryPart:ApplyImpulseAtPosition(Unit * PrimaryPart.AssemblyMass * 30, v2)
+		local CrashParticles = Instance.new("Part")
+		CrashParticles.Name = "CrashParticles"
+		CrashParticles.Transparency = 1
+		CrashParticles.Anchored = true
+		CrashParticles.CanCollide = false
+		CrashParticles.CFrame = CFrame.lookAt(v2, v2 + Unit)
+		CrashParticles.Size = Vector3.new(4, 1, 1)
+		CrashParticles.Parent = workspace
+		local v3 = ReplicatedStorage.Resource.CrashParticle:Clone()
+		v3.Parent = CrashParticles
+		v3:Emit(10)
+		Debris:AddItem(CrashParticles, 5)
+		Audio.ObjectLocal(PrimaryPart, 7018764077, {
+			Volume = 0.15,
+			RollOffMaxDistance = 128,
+			PlaybackSpeed = math.random() * 0.1 + 0.95
+		})
+		task.wait()
+		v1:BreakJoints()
+		task.wait(DestructibleConsts.DURATION)
+		v1:Destroy()
+	end
 end
-local any_new_result1_upvr = require(ReplicatedStorage_upvr.Std.RateLimiter).new(50)
-local CurrentCamera_upvr = workspace.CurrentCamera
-function module_2_upvr._handleInst(arg1) -- Line 122
-    debug.profilebegin("DestructibleSpawn.handleInst")
-    local _instValue_upvr = arg1._instValue
-    local _obj = arg1._obj
-    local Value_2 = _instValue_upvr.Value
-    if not any_new_result1_upvr:CanUseBudget(1) then
-    else
-        local Magnitude = (CurrentCamera_upvr.CFrame.p - _obj.Value.p).Magnitude
-        if not Value_2 and Magnitude < DestructibleConsts_upvr.MAX_DIST_TO_LOAD then
-            any_new_result1_upvr:UseBudget(1)
-            local any_new_result1 = Maid_upvr.new()
-            arg1._maid._instMaid = any_new_result1
-            any_new_result1:GiveTask(function() -- Line 138
-                arg1._wasTouched = false
-            end)
-            local clone_2 = ReplicatedStorage_upvr:FindFirstChild(DestructibleConsts_upvr.PREFAB_FOLDER_NAME):FindFirstChild(_obj.Name):Clone()
-            clone_2:SetPrimaryPartCFrame(_obj.Value)
-            clone_2.Parent = Folder_upvr
-            _instValue_upvr.Value = clone_2
-            any_new_result1:GiveTask(clone_2.PrimaryPart.Touched:Connect(function(arg1_4) -- Line 151
-                if arg1_4:IsDescendantOf(Folder_upvr) then
-                else
-                    if not arg1_4:IsDescendantOf(workspace:FindFirstChild("Vehicles")) then return end
-                    if arg1._wasTouched then return end
-                    arg1._wasTouched = true
-                    local Position = arg1_4.Position
-                    arg1._broadcastCollideRemote:FireServer(Position)
-                    arg1:_handleHitPosition(Position)
-                end
-            end))
-            any_new_result1:GiveTask(clone_2.AncestryChanged:Connect(function(arg1_5, arg2) -- Line 169
-                if not arg2 then
-                    _instValue_upvr.Value = nil
-                end
-            end))
-        elseif Value_2 and DestructibleConsts_upvr.MAX_DIST_TO_LOAD < Magnitude then
-            any_new_result1_upvr:UseBudget(1)
-            Value_2:Destroy()
-        end
-        debug.profileend()
-    end
+function t._handleInst(p1) --[[ Line: 122 | Upvalues: v2 (copy), CurrentCamera (copy), DestructibleConsts (copy), Maid (copy), ReplicatedStorage (copy), v1 (copy) ]]
+	debug.profilebegin("DestructibleSpawn.handleInst")
+	local _instValue = p1._instValue
+	local _obj = p1._obj
+	local _maid = p1._maid
+	local v12 = _instValue.Value
+	if v2:CanUseBudget(1) then
+		local Magnitude = (CurrentCamera.CFrame.p - _obj.Value.p).Magnitude
+		if v12 or not (Magnitude < DestructibleConsts.MAX_DIST_TO_LOAD) then
+			if v12 and DestructibleConsts.MAX_DIST_TO_LOAD < Magnitude then
+				v2:UseBudget(1)
+				v12:Destroy()
+			end
+		else
+			v2:UseBudget(1)
+			local v22 = Maid.new()
+			_maid._instMaid = v22
+			v22:GiveTask(function() --[[ Line: 138 | Upvalues: p1 (copy) ]]
+				p1._wasTouched = false
+			end)
+			local v3 = ReplicatedStorage:FindFirstChild(DestructibleConsts.PREFAB_FOLDER_NAME):FindFirstChild(_obj.Name):Clone()
+			v3:SetPrimaryPartCFrame(_obj.Value)
+			v3.Parent = v1
+			_instValue.Value = v3
+			v22:GiveTask(v3.PrimaryPart.Touched:Connect(function(p12) --[[ Line: 151 | Upvalues: v1 (ref), p1 (copy) ]]
+				if p12:IsDescendantOf(v1) then
+				elseif p12:IsDescendantOf(workspace:FindFirstChild("Vehicles")) then
+					if not p1._wasTouched then
+						p1._wasTouched = true
+						local Position = p12.Position
+						p1._broadcastCollideRemote:FireServer(Position)
+						p1:_handleHitPosition(Position)
+					end
+				end
+			end))
+			v22:GiveTask(v3.AncestryChanged:Connect(function(p1, p2) --[[ Line: 169 | Upvalues: _instValue (copy) ]]
+				if not p2 then
+					_instValue.Value = nil
+				end
+			end))
+		end
+		debug.profileend()
+	end
 end
-module_2_upvr.Update = module_2_upvr._handleInst
-function module_2_upvr.Destroy(arg1) -- Line 181
-    arg1._maid = nil
-    arg1._maid:Destroy()
-    setmetatable(arg1, nil)
+t.Update = t._handleInst
+function t.Destroy(p1) --[[ Line: 181 ]]
+	local _maid = p1._maid
+	p1._maid = nil
+	_maid:Destroy()
+	setmetatable(p1, nil)
 end
-return module_2_upvr
+return t

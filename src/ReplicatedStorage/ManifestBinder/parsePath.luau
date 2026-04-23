@@ -1,9 +1,9 @@
-return function(arg1) -- Line 1, Named "parsePath"
-    local string_split_result1 = string.split(arg1, '/')
-    for i = #string_split_result1, 1, -1 do
-        if string_split_result1[i] == "" then
-            table.remove(string_split_result1, i)
-        end
-    end
-    return string_split_result1
+return function(p1) --[[ Name: parsePath | Line: 1 ]]
+	local v1 = string.split(p1, "/")
+	for i = #v1, 1, -1 do
+		if v1[i] == "" then
+			table.remove(v1, i)
+		end
+	end
+	return v1
 end

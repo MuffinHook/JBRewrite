@@ -1,39 +1,38 @@
-local module_2_upvr = {}
-module_2_upvr.__index = module_2_upvr
-module_2_upvr.__ClassName = "WorldMarkerGroup"
-function module_2_upvr.new() -- Line 4
-    local module = {}
-    setmetatable(module, module_2_upvr)
-    module._listWorldMarker = {}
-    module._enabled = true
-    return module
+local t = {}
+t.__index = t
+t.__ClassName = "WorldMarkerGroup"
+function t.new() --[[ Line: 4 | Upvalues: t (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._listWorldMarker = {}
+	t2._enabled = true
+	return t2
 end
-function module_2_upvr.Add(arg1, arg2) -- Line 13
-    arg2:SetEnabled(arg1._enabled)
-    table.insert(arg1._listWorldMarker, arg2)
+function t.Add(p1, p2) --[[ Line: 13 ]]
+	p2:SetEnabled(p1._enabled)
+	table.insert(p1._listWorldMarker, p2)
 end
-function module_2_upvr.Remove(arg1, arg2) -- Line 17
-    local table_find_result1 = table.find(arg1._listWorldMarker, arg2)
-    assert(table_find_result1, "Removing worldMarker that doesn't exist in _listWorldMarker")
-    table.remove(arg1._listWorldMarker, table_find_result1)
+function t.Remove(p1, p2) --[[ Line: 17 ]]
+	local v1 = table.find(p1._listWorldMarker, p2)
+	assert(v1, "Removing worldMarker that doesn\'t exist in _listWorldMarker")
+	table.remove(p1._listWorldMarker, v1)
 end
-function module_2_upvr.Update(arg1) -- Line 22
-    if not arg1._enabled then
-    else
-        for var4 = #arg1._listWorldMarker, 1, -1 do
-            local var5 = arg1._listWorldMarker[var4]
-            assert(var5.Update, "destroyed/nil worldMarker is being Updated")
-            var5:Update()
-        end
-    end
+function t.Update(p1) --[[ Line: 22 ]]
+	if p1._enabled then
+		for i = #p1._listWorldMarker, 1, -1 do
+			local v1 = p1._listWorldMarker[i]
+			assert(v1.Update, "destroyed/nil worldMarker is being Updated")
+			v1:Update()
+		end
+	end
 end
-function module_2_upvr.SetEnabled(arg1, arg2) -- Line 32
-    arg1._enabled = arg2
-    for _, v in ipairs(arg1._listWorldMarker) do
-        v:SetEnabled(arg2)
-    end
+function t.SetEnabled(p1, p2) --[[ Line: 32 ]]
+	p1._enabled = p2
+	for i, v in ipairs(p1._listWorldMarker) do
+		v:SetEnabled(p2)
+	end
 end
-function module_2_upvr.GetAll(arg1) -- Line 38
-    return arg1._listWorldMarker
+function t.GetAll(p1) --[[ Line: 38 ]]
+	return p1._listWorldMarker
 end
-return module_2_upvr
+return t

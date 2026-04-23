@@ -1,40 +1,41 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module = {}
-local var3_upvw
-local function _(arg1) -- Line 9, Named "getMilestoneId"
-    if 1000000 <= arg1 then
-        return math.floor(arg1 / 1000000)
-    end
-    if 500000 <= arg1 then
-        return 0.5
-    end
-    if 100000 <= arg1 then
-        return 0.1
-    end
-    return 0
+local Notification = require(ReplicatedStorage.Game.Notification)
+local Format = require(ReplicatedStorage.Module.Format)
+local t = {}
+local v1 = nil
+local v2 = nil
+local function getMilestoneId(p1) --[[ Line: 9 ]]
+	if p1 >= 1000000 then
+		return math.floor(p1 / 1000000)
+	elseif p1 >= 500000 then
+		return 0.5
+	elseif p1 >= 100000 then
+		return 0.1
+	else
+		return 0
+	end
 end
-function module.init(arg1) -- Line 20
-    var3_upvw = arg1
+function t.init(p1) --[[ Line: 20 | Upvalues: v2 (ref) ]]
+	v2 = p1
 end
-local Format_upvr = require(ReplicatedStorage.Module.Format)
-local Notification_upvr = require(ReplicatedStorage.Game.Notification)
-local function playEffect_upvr(arg1) -- Line 24, Named "playEffect"
-    if var3_upvw then
-        task.spawn(var3_upvw, 12)
-    end
-    Notification_upvr.new({
-        Text = string.format("You reached %s\nCongratulations!", Format_upvr.Currency(arg1 * 1000000));
-        Style = "Gift";
-    })
+local function playEffect(p1) --[[ Line: 24 | Upvalues: v2 (ref), Format (copy), Notification (copy) ]]
+	if v2 then
+		task.spawn(v2, 12)
+	end
+	Notification.new({
+		Text = string.format("You reached %s\nCongratulations!", (Format.Currency(p1 * 1000000))),
+		Style = "Gift"
+	})
 end
-local var7_upvw
-function module.cashUpdate(arg1) -- Line 32
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    if 1000000 <= arg1 then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.cashUpdate(p1) --[[ Line: 32 | Upvalues: v1 (ref), playEffect (copy) ]]
+	if v1 == nil then
+		v1 = if p1 >= 1000000 then math.floor(p1 / 1000000) elseif p1 >= 500000 then 0.5 elseif p1 >= 100000 then 0.1 else 0
+	else
+		local v2 = if p1 >= 1000000 then math.floor(p1 / 1000000) elseif p1 >= 500000 then 0.5 elseif p1 >= 100000 then 0.1 else 0
+		if v1 < v2 then
+			v1 = v2
+			playEffect(v2)
+		end
+	end
 end
-return module
+return t

@@ -1,118 +1,132 @@
-local function _(arg1, arg2, arg3, arg4, arg5) -- Line 1, Named "CubicBezierCurve"
-    local var1 = 1 - arg1
-    return var1 * var1 * var1 * arg2 + 3 * var1 * var1 * arg1 * arg3 + 3 * var1 * arg1 * arg1 * arg4 + arg1 * arg1 * arg1 * arg5
+local function CubicBezierCurve(p1, p2, p3, p4, p5) --[[ Line: 1 ]]
+	local v1 = 1 - p1
+	return v1 * v1 * v1 * p2 + 3 * v1 * v1 * p1 * p3 + 3 * v1 * p1 * p1 * p4 + p1 * p1 * p1 * p5
 end
-local function _(arg1, arg2, arg3, arg4, arg5) -- Line 6, Named "DCubicBezierCurve"
-    local var2 = 1 - arg1
-    return 3 * var2 * var2 * (arg3 - arg2) + 6 * var2 * arg1 * (arg4 - arg3) + 3 * arg1 * arg1 * (arg5 - arg4)
+local function DCubicBezierCurve(p1, p2, p3, p4, p5) --[[ Line: 6 ]]
+	local v1 = 1 - p1
+	return 3 * v1 * v1 * (p3 - p2) + 6 * v1 * p1 * (p4 - p3) + 3 * p1 * p1 * (p5 - p4)
 end
-local function ApproximateVectorCubicBezierCurveLength_upvr(arg1, arg2, arg3, arg4, arg5) -- Line 10, Named "ApproximateVectorCubicBezierCurveLength"
-    local var5 = 0
-    for i = 1, arg1 do
-        local var6 = (i - 1) / arg1
-        local var7 = 1 - var6
-        var5 += (3 * var7 * var7 * (arg3 - arg2) + 6 * var7 * var6 * (arg4 - arg3) + 3 * var6 * var6 * (arg5 - arg4)).Magnitude / arg1
-    end
-    return var5
+local function ApproximateVectorCubicBezierCurveLength(p1, p2, p3, p4, p5) --[[ Line: 10 ]]
+	local sum = 0
+	for i = 1, p1 do
+		local v1 = (i - 1) / p1
+		local v2 = 1 - v1
+		sum = sum + (3 * v2 * v2 * (p3 - p2) + 6 * v2 * v1 * (p4 - p3) + 3 * v1 * v1 * (p5 - p4)).Magnitude / p1
+	end
+	return sum
 end
-local module_upvr = {}
-module_upvr.__index = module_upvr
-function module_upvr.new() -- Line 22
-    local setmetatable_result1 = setmetatable({}, module_upvr)
-    setmetatable_result1.Points = nil
-    setmetatable_result1.NumPoints = nil
-    setmetatable_result1.LastIndex = nil
-    setmetatable_result1.OffsetStart = 0
-    setmetatable_result1.OffsetEnd = 0
-    setmetatable_result1.t = 0
-    setmetatable_result1.lengthCache = {}
-    return setmetatable_result1
+local t = {}
+t.__index = t
+function t.new() --[[ Line: 22 | Upvalues: t (copy) ]]
+	local v2 = setmetatable({}, t)
+	v2.Points = nil
+	v2.NumPoints = nil
+	v2.LastIndex = nil
+	v2.OffsetStart = 0
+	v2.OffsetEnd = 0
+	v2.t = 0
+	v2.lengthCache = {}
+	return v2
 end
-function module_upvr.SetNodeOffset(arg1, arg2, arg3) -- Line 33
-    assert(arg2)
-    assert(arg3)
-    arg1.OffsetStart = arg2
-    arg1.OffsetEnd = arg3
+function t.SetNodeOffset(p1, p2, p3) --[[ Line: 33 ]]
+	assert(p2)
+	assert(p3)
+	p1.OffsetStart = p2
+	p1.OffsetEnd = p3
 end
-function module_upvr.SetPoints(arg1, arg2) -- Line 39
-    arg1.Points = arg2
-    arg1.NumPoints = #arg2
-    arg1:_recomputeLengthCache()
+function t.SetPoints(p1, p2) --[[ Line: 39 ]]
+	p1.Points = p2
+	p1.NumPoints = #p2
+	p1:_recomputeLengthCache()
 end
-function module_upvr._recomputeLengthCache(arg1) -- Line 45
-    for i_2 = 1, arg1.NumPoints do
-        local any_GetPoint_result1_3 = arg1:GetPoint(i_2)
-        local any_GetPoint_result1_2 = arg1:GetPoint(i_2 + 1)
-        local Magnitude_2 = (any_GetPoint_result1_2 - any_GetPoint_result1_3).Magnitude
-        arg1.lengthCache[i_2] = ApproximateVectorCubicBezierCurveLength_upvr(10000, any_GetPoint_result1_3, any_GetPoint_result1_3 + (any_GetPoint_result1_2 - arg1:GetPoint(i_2 - 1)).Unit * Magnitude_2 / 3, any_GetPoint_result1_2 - (arg1:GetPoint(i_2 + 2) - any_GetPoint_result1_3).Unit * Magnitude_2 / 3, any_GetPoint_result1_2)
-    end
+function t._recomputeLengthCache(p1) --[[ Line: 45 | Upvalues: ApproximateVectorCubicBezierCurveLength (copy) ]]
+	for i = 1, p1.NumPoints do
+		local v1 = p1:GetPoint(i)
+		local v2 = p1:GetPoint(i + 1)
+		local Magnitude = (v2 - v1).Magnitude
+		local v3 = v1 + (v2 - p1:GetPoint(i - 1)).Unit * Magnitude / 3
+		p1.lengthCache[i] = ApproximateVectorCubicBezierCurveLength(10000, v1, v3, v2 - (p1:GetPoint(i + 2) - v1).Unit * Magnitude / 3, v2)
+	end
 end
-function module_upvr.GetPoint(arg1, arg2) -- Line 55
-    return arg1.Points[(arg2 - 1) % arg1.NumPoints + 1]
+function t.GetPoint(p1, p2) --[[ Line: 55 ]]
+	return p1.Points[(p2 - 1) % p1.NumPoints + 1]
 end
-function module_upvr.ApproximateLength(arg1, arg2) -- Line 58
-    local var16 = 0
-    for i_3 = arg1.OffsetStart + 1, arg1.NumPoints - arg1.OffsetEnd do
-        local any_GetPoint_result1 = arg1:GetPoint(i_3)
-        local any_GetPoint_result1_4 = arg1:GetPoint(i_3 + 1)
-        local Magnitude_3 = (any_GetPoint_result1_4 - any_GetPoint_result1).Magnitude
-        var16 += ApproximateVectorCubicBezierCurveLength_upvr(arg2, any_GetPoint_result1, any_GetPoint_result1 + (any_GetPoint_result1_4 - arg1:GetPoint(i_3 - 1)).Unit * Magnitude_3 / 3, any_GetPoint_result1_4 - (arg1:GetPoint(i_3 + 2) - any_GetPoint_result1).Unit * Magnitude_3 / 3, any_GetPoint_result1_4)
-    end
-    return var16
+function t.ApproximateLength(p1, p2) --[[ Line: 58 | Upvalues: ApproximateVectorCubicBezierCurveLength (copy) ]]
+	local sum = 0
+	for i = p1.OffsetStart + 1, p1.NumPoints - p1.OffsetEnd do
+		local v1 = p1:GetPoint(i)
+		local v2 = p1:GetPoint(i + 1)
+		local Magnitude = (v2 - v1).Magnitude
+		sum = sum + ApproximateVectorCubicBezierCurveLength(p2, v1, v1 + (v2 - p1:GetPoint(i - 1)).Unit * Magnitude / 3, v2 - (p1:GetPoint(i + 2) - v1).Unit * Magnitude / 3, v2)
+	end
+	return sum
 end
-function module_upvr.Step(arg1, arg2) -- Line 73
-    local t = arg1.t
-    local var21 = t * (arg1.NumPoints - arg1.OffsetStart - arg1.OffsetEnd) + arg1.OffsetStart
-    local var22 = var21 % 1
-    local var23 = math.floor(var21) + 1
-    local var24
-    local var25
-    local var26
-    local var27
-    if arg1.LastIndex == var23 then
-        var24 = arg1._p0
-        var25 = arg1._c0
-        var26 = arg1._c1
-        var27 = arg1._p1
-    else
-        var24 = arg1:GetPoint(var23)
-        var27 = arg1:GetPoint(var23 + 1)
-        local Magnitude_4 = (var27 - var24).Magnitude
-        var25 = var24 + (var27 - arg1:GetPoint(var23 - 1)).Unit * Magnitude_4 / 3
-        var26 = var27 - (arg1:GetPoint(var23 + 2) - var24).Unit * Magnitude_4 / 3
-        arg1._p0 = var24
-        arg1._c0 = var25
-        arg1._c1 = var26
-        arg1._p1 = var27
-    end
-    arg1.LastIndex = var23
-    local var29 = var25
-    local var30 = var26
-    local var31 = 1 - var22
-    local var32 = 3 * var31 * var31 * (var29 - var24) + 6 * var31 * var22 * (var30 - var29) + 3 * var22 * var22 * (var27 - var30)
-    local Magnitude = var32.Magnitude
-    local var34 = 1 - var22
-    if 0 < Magnitude then
-        arg1.t = t + arg2 / Magnitude / (arg1.NumPoints - arg1.OffsetStart - arg1.OffsetEnd)
-    end
-    return var34 * var34 * var34 * var24 + 3 * var34 * var34 * var22 * var25 + 3 * var34 * var22 * var22 * var26 + var22 * var22 * var22 * var27, var32
+function t.Step(p1, p2) --[[ Line: 73 ]]
+	local t = p1.t
+	local v1 = t * (p1.NumPoints - p1.OffsetStart - p1.OffsetEnd) + p1.OffsetStart
+	local v2 = v1 % 1
+	local v3 = math.floor(v1) + 1
+	local v4, v5, v6, v7
+	if p1.LastIndex == v3 then
+		v4 = p1._p0
+		v5 = p1._c0
+		v6 = p1._c1
+		v7 = p1._p1
+	else
+		local v8 = p1:GetPoint(v3)
+		local v9 = p1:GetPoint(v3 + 1)
+		local Magnitude = (v9 - v8).Magnitude
+		v5 = v8 + (v9 - p1:GetPoint(v3 - 1)).Unit * Magnitude / 3
+		v6 = v9 - (p1:GetPoint(v3 + 2) - v8).Unit * Magnitude / 3
+		p1._p0 = v8
+		p1._c0 = v5
+		p1._c1 = v6
+		p1._p1 = v9
+		v4 = v8
+		v7 = v9
+	end
+	p1.LastIndex = v3
+	local v10 = 1 - v2
+	local v11 = 3 * v10 * v10 * (v5 - v4) + 6 * v10 * v2 * (v6 - v5) + 3 * v2 * v2 * (v7 - v6)
+	local Magnitude = v11.Magnitude
+	local v12 = 1 - v2
+	if Magnitude > 0 then
+		p1.t = t + p2 / Magnitude / (p1.NumPoints - p1.OffsetStart - p1.OffsetEnd)
+	end
+	return v12 * v12 * v12 * v4 + 3 * v12 * v12 * v2 * v5 + 3 * v12 * v2 * v2 * v6 + v2 * v2 * v2 * v7, v11
 end
-function module_upvr.GetWorldPositionAt(arg1, arg2) -- Line 112
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [63.9]
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.GetWorldPositionAt(p1, p2) --[[ Line: 112 | Upvalues: ApproximateVectorCubicBezierCurveLength (copy) ]]
+	local count = 1 + p1.OffsetStart
+	while true do
+		local v1, v2
+		local v3 = p1:GetPoint(count)
+		local v4 = p1:GetPoint(count + 1)
+		local Magnitude = (v4 - v3).Magnitude
+		local v5 = v3 + (v4 - p1:GetPoint(count - 1)).Unit * Magnitude / 3
+		local v6 = v4 - (p1:GetPoint(count + 2) - v3).Unit * Magnitude / 3
+		local v7 = p1.lengthCache[(count - 1) % p1.NumPoints + 1]
+		if v7 then
+			v1 = v3
+			v2 = v4
+		else
+			v7, v1, v2 = ApproximateVectorCubicBezierCurveLength(10000, v3, v5, v6, v4), v3, v4
+		end
+		if p2 < v7 then
+			local v9 = p2 / v7
+			local v10 = 1 - v9
+			local v11 = 1 - v9
+			return v10 * v10 * v10 * v1 + 3 * v10 * v10 * v9 * v5 + 3 * v10 * v9 * v9 * v6 + v9 * v9 * v9 * v2, 3 * v11 * v11 * (v5 - v1) + 6 * v11 * v9 * (v6 - v5) + 3 * v9 * v9 * (v2 - v6)
+		end
+		count = count + 1
+		p2 = p2 - v7
+	end
 end
-function module_upvr.Reset(arg1) -- Line 139
-    arg1.t = 0
-    arg1._p0 = nil
-    arg1._c0 = nil
-    arg1._c1 = nil
-    arg1._p1 = nil
-    arg1.LastIndex = nil
+function t.Reset(p1) --[[ Line: 139 ]]
+	p1.t = 0
+	p1._p0 = nil
+	p1._c0 = nil
+	p1._c1 = nil
+	p1._p1 = nil
+	p1.LastIndex = nil
 end
-return module_upvr
+return t

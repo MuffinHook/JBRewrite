@@ -1,5 +1,8 @@
-local module = {}
-for i, v in ipairs(require(script.Parent.VehicleData)) do
-    module[i] = v.Make
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Enumer = require(ReplicatedStorage.Std.Enumer)
+local VehicleData = require(script.Parent.VehicleData)
+local t = {}
+for i, v in ipairs(VehicleData) do
+	t[i] = v.Make
 end
-return require(game:GetService("ReplicatedStorage").Std.Enumer)(module)
+return Enumer(t)

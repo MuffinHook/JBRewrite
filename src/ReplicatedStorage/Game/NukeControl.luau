@@ -1,284 +1,262 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local function SetVisible_upvr(arg1, arg2) -- Line 26, Named "SetVisible"
-    for _, v in ipairs(arg1:GetChildren()) do
-        local children = v:IsA("BasePart")
-        if children then
-            if arg2 then
-                children = 0
-            else
-                children = 1
-            end
-            v.Transparency = children
-        end
-        SetVisible_upvr(v, arg2)
-    end
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local CurrentCamera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+local CollectionService = game:GetService("CollectionService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local Silo = require(ReplicatedStorage.Game.Silo)
+local Nuke = require(ReplicatedStorage.Game.Nuke)
+local Shockwave = require(ReplicatedStorage.Game.Shockwave)
+local Falling = require(ReplicatedStorage.Game.Falling)
+local CharacterUtil = require(ReplicatedStorage.Game.CharacterUtil)
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local Confirmation = require(ReplicatedStorage.Module.Confirmation)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local CamShaker = require(ReplicatedStorage.Game.CamShaker.CamShaker)
+local Format = require(ReplicatedStorage.Module.Format)
+local UI = require(ReplicatedStorage.Module.UI)
+local Joint = require(ReplicatedStorage.Std.Joint)
+local CircleAction = UI.CircleAction
+local v1 = nil
+local function v2(p1, p2) --[[ Line: 26 | Upvalues: v2 (copy) ]]
+	for i, v in ipairs(p1:GetChildren()) do
+		local v1
+		if v:IsA("BasePart") then
+			v1 = if p2 then 0 else 1
+			v.Transparency = v1
+		end
+		v2(v, p2)
+	end
 end
-local module = {}
-local var11_upvw
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local Silo_upvr = require(ReplicatedStorage_upvr.Game.Silo)
-local CamShaker_upvr = require(ReplicatedStorage_upvr.Game.CamShaker.CamShaker)
-local CurrentCamera_upvr = workspace.CurrentCamera
-local Nuke_upvr = require(ReplicatedStorage_upvr.Game.Nuke)
-local RunService_upvr = game:GetService("RunService")
-local Shockwave_upvr = require(ReplicatedStorage_upvr.Game.Shockwave)
-local VehicleUtils_upvr = require(ReplicatedStorage_upvr.Vehicle.VehicleUtils)
-local CharacterUtil_upvr = require(ReplicatedStorage_upvr.Game.CharacterUtil)
-local Falling_upvr = require(ReplicatedStorage_upvr.Game.Falling)
-local MarketplaceService_upvr = game:GetService("MarketplaceService")
-local Confirmation_upvr = require(ReplicatedStorage_upvr.Module.Confirmation)
-local Format_upvr = require(ReplicatedStorage_upvr.Module.Format)
-local CircleAction_upvr = require(ReplicatedStorage_upvr.Module.UI).CircleAction
-local CollectionService_upvr = game:GetService("CollectionService")
-local Joint_upvr = require(ReplicatedStorage_upvr.Std.Joint)
-local TweenService_upvr = game:GetService("TweenService")
-function module.Init(arg1) -- Line 37
-    var11_upvw = arg1.Event
-    local em = arg1.em
-    function em.mhtt3u3k(arg1_2) -- Line 41
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        if arg1_2 == nil then
-        else
-        end
-        assert(true)
-        if arg1_2.Nuke == nil then
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        assert(true)
-        if arg1_2.Shockwave == nil then
-        else
-        end
-        assert(true)
-        local any_ObjectLocal_result1_upvr = Audio_upvr.ObjectLocal(LocalPlayer_upvr, 9058580326, {
-            Looped = true;
-            Volume = 0;
-            Pitch = 0.35;
-        })
-        Audio_upvr.FadeTo(any_ObjectLocal_result1_upvr, 0.5, 5)
-        local any_new_result1 = Silo_upvr.new(workspace:WaitForChild("Silo", 1))
-        local any_new_result1_2_upvr = CamShaker_upvr.new(Enum.RenderPriority.Camera.Value + 1, function(arg1_3) -- Line 54
-            CurrentCamera_upvr.CFrame *= arg1_3
-        end)
-        any_new_result1_2_upvr:Start()
-        local any_new_result1_upvr_2 = Nuke_upvr.new()
-        any_new_result1:Open()
-        local tick_result1_upvr_3 = tick()
-        local var43_upvw
-        local var44_upvr = any_new_result1.Model.Tube.Position + Vector3.new(0, any_new_result1.Model.Tube.Size.Y * 0.5, 0)
-        var43_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 65
-            local var45 = (tick() - tick_result1_upvr_3) / 5
-            if 1 < var45 then
-                var45 = 1
-                var43_upvw:Disconnect()
-            end
-            any_new_result1_upvr_2.Model:SetPrimaryPartCFrame(CFrame.new(var44_upvr) * CFrame.Angles((math.pi/2), 0, 0) * CFrame.new(0, 0, 48 * (1 - var45) + 12 * var45))
-        end)
-        any_new_result1.OnOpened:Connect(function() -- Line 81
-            arg1_2.Nuke.Origin = any_new_result1_upvr_2.Model.PrimaryPart.CFrame.p
-            any_new_result1_upvr_2:Launch(arg1_2.Nuke)
-            Audio_upvr.ObjectLocal(LocalPlayer_upvr, 2205008075)
-            local any_ObjectLocal_result1_upvw_2 = Audio_upvr.ObjectLocal(LocalPlayer_upvr, 4828205974, {
-                Volume = 0;
-                Looped = true;
-            })
-            Audio_upvr.FadeTo(any_ObjectLocal_result1_upvw_2, 0.8, 0.5)
-            local any_ShakeSustain_result1_upvr = any_new_result1_2_upvr:ShakeSustain(CamShaker_upvr.Presets.Vibration)
-            any_new_result1_upvr_2.OnImpact:Connect(function() -- Line 90
-                Audio_upvr.FadeTo(any_ObjectLocal_result1_upvr, 0, 5)
-                delay(5, function() -- Line 92
-                    any_ObjectLocal_result1_upvr:Destroy()
-                end)
-                Audio_upvr.ObjectLocal(LocalPlayer_upvr, 2205008239, {
-                    Volume = 1;
-                })
-                any_new_result1_2_upvr:Shake(CamShaker_upvr.Presets.Explosion)
-                any_ShakeSustain_result1_upvr:StartFadeOut(1)
-                Audio_upvr.FadeTo(any_ObjectLocal_result1_upvw_2, 0, 0.5)
-                delay(0.5, function() -- Line 100
-                    any_ObjectLocal_result1_upvw_2:Destroy()
-                    any_ObjectLocal_result1_upvw_2 = nil
-                end)
-                local clone_2_upvr = ReplicatedStorage_upvr.Resource.MushroomCloud:Clone()
-                clone_2_upvr.CFrame = CFrame.new(arg1_2.Nuke.Target) + Vector3.new(0, 261.645, 0)
-                clone_2_upvr.Transparency = 1
-                clone_2_upvr.Parent = workspace
-                local function _() -- Line 110, Named "FadeInCloud"
-                    local tick_result1_upvr_5 = tick()
-                    local var57_upvw
-                    var57_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 114
-                        local var58 = (tick() - tick_result1_upvr_5) / 5
-                        if 1 < var58 then
-                            var58 = 1
-                            var57_upvw:Disconnect()
-                        end
-                        clone_2_upvr.Transparency = 1 * (1 - var58) + 0 * var58
-                    end)
-                end
-                local function _() -- Line 125, Named "FadeOutCloud"
-                    local tick_result1_upvr = tick()
-                    local var61_upvw
-                    var61_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 129
-                        local var62 = (tick() - tick_result1_upvr) / 2
-                        if 1 < var62 then
-                            var62 = 1
-                            var61_upvw:Disconnect()
-                        end
-                        clone_2_upvr.Transparency = 0 * (1 - var62) + 1 * var62
-                    end)
-                end
-                local tick_result1_upvr_4 = tick()
-                local var65_upvw
-                var65_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 114
-                    local var66 = (tick() - tick_result1_upvr_4) / 5
-                    if 1 < var66 then
-                        var66 = 1
-                        var65_upvw:Disconnect()
-                    end
-                    clone_2_upvr.Transparency = 1 * (1 - var66) + 0 * var66
-                end)
-                tick_result1_upvr_4 = Shockwave_upvr
-                tick_result1_upvr_4 = tick_result1_upvr_4.new(arg1_2.Nuke.Target, arg1_2.Shockwave)
-                local var67 = tick_result1_upvr_4
-                var67.OnPastLocalPlayer:Connect(function() -- Line 144
-                    var11_upvw:FireServer("czvldnyr")
-                    local any_GetLocalVehiclePacket_result1 = VehicleUtils_upvr.GetLocalVehiclePacket()
-                    if any_GetLocalVehiclePacket_result1 ~= nil then
-                        if any_GetLocalVehiclePacket_result1.Make == "AdminNuke" and not any_GetLocalVehiclePacket_result1.Passenger then
-                            VehicleUtils_upvr.Classes.Chassis.runAction(true)
-                            return
-                        end
-                        CharacterUtil_upvr.OnJump()
-                        task.wait(0.1)
-                    end
-                    Falling_upvr.StartRagdolling(5)
-                end)
-                var67.OnDestroyed:Connect(function() -- Line 158
-                    any_new_result1_2_upvr:Stop()
-                    local tick_result1_upvr_2 = tick()
-                    local var73_upvw
-                    var73_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 129
-                        local var74 = (tick() - tick_result1_upvr_2) / 2
-                        if 1 < var74 then
-                            var74 = 1
-                            var73_upvw:Disconnect()
-                        end
-                        clone_2_upvr.Transparency = 0 * (1 - var74) + 1 * var74
-                    end)
-                end)
-            end)
-        end)
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end
-    function em.uqhnlpn9() -- Line 166
-        local pcall_result1, pcall_result2 = pcall(function() -- Line 167
-            return MarketplaceService_upvr:GetProductInfo(980194938, Enum.InfoType.Product)
-        end)
-        local var78_upvr
-        local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var78_upvr = pcall_result2.PriceInRobux
-            return var78_upvr
-        end
-        if not pcall_result1 or not pcall_result2 or not decompInlinedCondition() then
-            var78_upvr = 16000
-        end
-        local any_new_result1_upvw = Confirmation_upvr.new("Do you want to buy Uranium to launch a Nuke?")
-        any_new_result1_upvw.OnYes:Connect(function() -- Line 172
-            any_new_result1_upvw = nil
-            local any_new_result1_upvw_2 = Confirmation_upvr.new(string.format("Are you SURE? It costs %s Robux.", Format_upvr.Comma(var78_upvr)))
-            any_new_result1_upvw_2.OnYes:Connect(function() -- Line 177
-                MarketplaceService_upvr:PromptProductPurchase(LocalPlayer_upvr, 980194938)
-                any_new_result1_upvw_2 = nil
-            end)
-            any_new_result1_upvw_2.OnNo:Connect(function() -- Line 182
-                any_new_result1_upvw_2 = nil
-            end)
-        end)
-        any_new_result1_upvw.OnNo:Connect(function() -- Line 186
-            any_new_result1_upvw = nil
-        end)
-    end
-    local function Action_upvr(arg1_4, arg2) -- Line 191, Named "Action"
-        if arg2 then
-            var11_upvw:FireServer('u'.."xdbvdl0":sub(5, 5):reverse():reverse():reverse().."".."".."a9fpovl1nn":sub(4, 6):reverse():reverse():reverse().."".."96u")
-            return true
-        end
-    end
-    local var85_upvw
-    local function AddedFun(arg1_5) -- Line 198
-        var85_upvw = arg1_5
-        local Button = arg1_5:WaitForChild("Button")
-        CircleAction_upvr.Add({
-            Part = Button;
-            ValidRoot = Button.Parent;
-            Name = "Launch Nuke";
-            Timed = true;
-            Duration = 3;
-            Dist = 10;
-            Callback = Action_upvr;
-        }, arg1_5)
-    end
-    for _, v_2 in ipairs(CollectionService_upvr:GetTagged("NukeUranium")) do
-        AddedFun(v_2)
-    end
-    CollectionService_upvr:GetInstanceAddedSignal("NukeUranium"):Connect(AddedFun)
-    CollectionService_upvr:GetInstanceRemovedSignal("NukeUranium"):Connect(function(arg1_6) -- Line 212, Named "RemovedFun"
-        var85_upvw = nil
-        CircleAction_upvr.Remove(arg1_6)
-    end)
-    function em.joj45cwd(arg1_7) -- Line 222
-        if var85_upvw ~= nil then
-            local Visual_2 = var85_upvw:FindFirstChild("Visual")
-            if Visual_2 ~= nil then
-                SetVisible_upvr(Visual_2, arg1_7)
-            end
-        end
-    end
-    CollectionService_upvr:GetInstanceAddedSignal("C4Nuke"):Connect(function(arg1_8) -- Line 231
-        local any_new_result1_upvr = CamShaker_upvr.new(Enum.RenderPriority.Camera.Value + 1, function(arg1_9) -- Line 238
-            CurrentCamera_upvr.CFrame *= arg1_9
-        end)
-        any_new_result1_upvr:Start()
-        Audio_upvr.ObjectLocal(LocalPlayer_upvr, 2205008075)
-        local any_ObjectLocal_result1_upvw = Audio_upvr.ObjectLocal(LocalPlayer_upvr, 4828205974, {
-            Volume = 0;
-            Looped = true;
-        })
-        Audio_upvr.FadeTo(any_ObjectLocal_result1_upvw, 0.8, 0.5)
-        local clone = ReplicatedStorage_upvr.Resource.Nuke:Clone()
-        local Base = clone.Base
-        clone.PrimaryPart = Base
-        local Position = (arg1_8.CFrame * CFrame.new(0, 0, 0)).Position
-        clone.Parent = workspace
-        Joint_upvr.WeldAllTo(clone, Base)
-        Base.Anchored = true
-        clone:PivotTo(CFrame.new((arg1_8.CFrame * CFrame.new(0, 0, -400)).Position, Position))
-        TweenService_upvr:Create(Base, TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-            CFrame = Base.CFrame - Base.CFrame.Position + Position;
-        }):Play()
-        task.wait(2)
-        clone:Destroy()
-        Audio_upvr.ObjectLocal(LocalPlayer_upvr, 2205008239, {
-            Volume = 1;
-        })
-        any_new_result1_upvr:ShakeSustain(CamShaker_upvr.Presets.Vibration):StartFadeOut(1)
-        any_new_result1_upvr:Shake(CamShaker_upvr.Presets.Explosion)
-        Audio_upvr.FadeTo(any_ObjectLocal_result1_upvw, 0, 0.5)
-        task.delay(0.5, function() -- Line 272
-            any_ObjectLocal_result1_upvw:Destroy()
-            any_ObjectLocal_result1_upvw = nil
-        end)
-        Shockwave_upvr.new(Position, {
-            Duration = 1;
-            MaxRadius = 150;
-            EndTransparency = 1;
-            StartTransparency = 0;
-            FxDisabled = true;
-        }).OnDestroyed:Connect(function() -- Line 284
-            any_new_result1_upvr:Stop()
-        end)
-    end)
-end
-return module
+return {
+	Init = function(p1) --[[ Name: Init | Line: 37 | Upvalues: v1 (ref), Audio (copy), LocalPlayer (copy), Silo (copy), CamShaker (copy), CurrentCamera (copy), Nuke (copy), RunService (copy), ReplicatedStorage (copy), Shockwave (copy), VehicleUtils (copy), CharacterUtil (copy), Falling (copy), MarketplaceService (copy), Confirmation (copy), Format (copy), CircleAction (copy), CollectionService (copy), v2 (copy), Joint (copy), TweenService (copy) ]]
+		v1 = p1.Event
+		local em = p1.em
+		function em.qx3dpfz6(p1) --[[ Line: 41 | Upvalues: Audio (ref), LocalPlayer (ref), Silo (ref), CamShaker (ref), CurrentCamera (ref), Nuke (ref), RunService (ref), ReplicatedStorage (ref), Shockwave (ref), v1 (ref), VehicleUtils (ref), CharacterUtil (ref), Falling (ref) ]]
+			assert(p1 ~= nil)
+			assert(p1.Nuke ~= nil)
+			assert(p1.Shockwave ~= nil)
+			local v2 = Audio.ObjectLocal(LocalPlayer, 9058580326, {
+				Looped = true,
+				Volume = 0,
+				Pitch = 0.35
+			})
+			Audio.FadeTo(v2, 0.5, 5)
+			local v3 = Silo.new(workspace:WaitForChild("Silo", 1))
+			local v5 = v3.Model.Tube.Position + Vector3.new(0, v3.Model.Tube.Size.Y * 0.5, 0)
+			local v7 = CamShaker.new(Enum.RenderPriority.Camera.Value + 1, function(p1) --[[ Line: 54 | Upvalues: CurrentCamera (ref) ]]
+				CurrentCamera.CFrame = CurrentCamera.CFrame * p1
+			end)
+			v7:Start()
+			local v8 = Nuke.new()
+			v3:Open()
+			local v9 = tick()
+			local v10 = nil
+			v10 = RunService.Heartbeat:Connect(function() --[[ Line: 65 | Upvalues: v9 (copy), v10 (ref), v8 (copy), v5 (copy) ]]
+				local v1 = (tick() - v9) / 5
+				if v1 > 1 then
+					v10:Disconnect()
+					v1 = 1
+				end
+				v8.Model:SetPrimaryPartCFrame(CFrame.new(v5) * CFrame.Angles(1.5707963267948966, 0, 0) * CFrame.new(0, 0, 48 * (1 - v1) + 12 * v1))
+			end)
+			v3.OnOpened:Connect(function() --[[ Line: 81 | Upvalues: p1 (copy), v8 (copy), Audio (ref), LocalPlayer (ref), v7 (copy), CamShaker (ref), v2 (copy), ReplicatedStorage (ref), RunService (ref), Shockwave (ref), v1 (ref), VehicleUtils (ref), CharacterUtil (ref), Falling (ref) ]]
+				p1.Nuke.Origin = v8.Model.PrimaryPart.CFrame.p
+				v8:Launch(p1.Nuke)
+				Audio.ObjectLocal(LocalPlayer, 2205008075)
+				local v12 = Audio.ObjectLocal(LocalPlayer, 4828205974, {
+					Volume = 0,
+					Looped = true
+				})
+				Audio.FadeTo(v12, 0.8, 0.5)
+				local v22 = v7:ShakeSustain(CamShaker.Presets.Vibration)
+				v8.OnImpact:Connect(function() --[[ Line: 90 | Upvalues: Audio (ref), v2 (ref), LocalPlayer (ref), v7 (ref), CamShaker (ref), v22 (copy), v12 (ref), ReplicatedStorage (ref), p1 (ref), RunService (ref), Shockwave (ref), v1 (ref), VehicleUtils (ref), CharacterUtil (ref), Falling (ref) ]]
+					Audio.FadeTo(v2, 0, 5)
+					delay(5, function() --[[ Line: 92 | Upvalues: v2 (ref) ]]
+						v2:Destroy()
+					end)
+					Audio.ObjectLocal(LocalPlayer, 2205008239, {
+						Volume = 1
+					})
+					v7:Shake(CamShaker.Presets.Explosion)
+					v22:StartFadeOut(1)
+					Audio.FadeTo(v12, 0, 0.5)
+					delay(0.5, function() --[[ Line: 100 | Upvalues: v12 (ref) ]]
+						v12:Destroy()
+						v12 = nil
+					end)
+					local v13 = ReplicatedStorage.Resource.MushroomCloud:Clone()
+					v13.CFrame = CFrame.new(p1.Nuke.Target) + Vector3.new(0, 261.646, 0)
+					v13.Transparency = 1
+					v13.Parent = workspace
+					local function FadeInCloud() --[[ Line: 110 | Upvalues: RunService (ref), v13 (copy) ]]
+						local v1 = tick()
+						local v2 = nil
+						v2 = RunService.Heartbeat:Connect(function() --[[ Line: 114 | Upvalues: v1 (copy), v2 (ref), v13 (ref) ]]
+							local v12 = (tick() - v1) / 5
+							if v12 > 1 then
+								v2:Disconnect()
+								v12 = 1
+							end
+							v13.Transparency = 1 * (1 - v12) + 0 * v12
+						end)
+					end
+					local function FadeOutCloud() --[[ Line: 125 | Upvalues: RunService (ref), v13 (copy) ]]
+						local v1 = tick()
+						local v2 = nil
+						v2 = RunService.Heartbeat:Connect(function() --[[ Line: 129 | Upvalues: v1 (copy), v2 (ref), v13 (ref) ]]
+							local v12 = (tick() - v1) / 2
+							if v12 > 1 then
+								v2:Disconnect()
+								v12 = 1
+							end
+							v13.Transparency = 0 * (1 - v12) + 1 * v12
+						end)
+					end
+					local v23 = tick()
+					local v3 = nil
+					v3 = RunService.Heartbeat:Connect(function() --[[ Line: 114 | Upvalues: v23 (copy), v3 (ref), v13 (copy) ]]
+						local v1 = (tick() - v23) / 5
+						if v1 > 1 then
+							v3:Disconnect()
+							v1 = 1
+						end
+						v13.Transparency = 1 * (1 - v1) + 0 * v1
+					end)
+					local v4 = Shockwave.new(p1.Nuke.Target, p1.Shockwave)
+					v4.OnPastLocalPlayer:Connect(function() --[[ Line: 144 | Upvalues: v1 (ref), VehicleUtils (ref), CharacterUtil (ref), Falling (ref) ]]
+						v1:FireServer("j" .. ("x669lyj"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("no8ta8ph1czx"):sub(5, 9):reverse():reverse():reverse() .. "m")
+						local v12 = VehicleUtils.GetLocalVehiclePacket()
+						if v12 ~= nil then
+							if v12.Make == "AdminNuke" and not v12.Passenger then
+								VehicleUtils.Classes.Chassis.runAction(true)
+								return
+							end
+							CharacterUtil.OnJump()
+							task.wait(0.1)
+						end
+						Falling.StartRagdolling(5)
+					end)
+					v4.OnDestroyed:Connect(function() --[[ Line: 158 | Upvalues: v7 (ref), RunService (ref), v13 (copy) ]]
+						v7:Stop()
+						local v1 = tick()
+						local v2 = nil
+						v2 = RunService.Heartbeat:Connect(function() --[[ Line: 129 | Upvalues: v1 (copy), v2 (ref), v13 (ref) ]]
+							local v12 = (tick() - v1) / 2
+							if v12 > 1 then
+								v2:Disconnect()
+								v12 = 1
+							end
+							v13.Transparency = 0 * (1 - v12) + 1 * v12
+						end)
+					end)
+				end)
+			end)
+		end
+		function em.mlmt6v4d() --[[ Line: 166 | Upvalues: MarketplaceService (ref), Confirmation (ref), Format (ref), LocalPlayer (ref) ]]
+			local v1, v2 = pcall(function() --[[ Line: 167 | Upvalues: MarketplaceService (ref) ]]
+				return MarketplaceService:GetProductInfo(980194938, Enum.InfoType.Product)
+			end)
+			local v3 = v1 and v2 and v2.PriceInRobux or 16000
+			local v4 = Confirmation.new("Do you want to buy Uranium to launch a Nuke?")
+			v4.OnYes:Connect(function() --[[ Line: 172 | Upvalues: v4 (ref), Confirmation (ref), Format (ref), v3 (copy), MarketplaceService (ref), LocalPlayer (ref) ]]
+				v4 = nil
+				local v1 = Confirmation.new(string.format("Are you SURE? It costs %s Robux.", Format.Comma(v3)))
+				v1.OnYes:Connect(function() --[[ Line: 177 | Upvalues: MarketplaceService (ref), LocalPlayer (ref), v1 (ref) ]]
+					MarketplaceService:PromptProductPurchase(LocalPlayer, 980194938)
+					v1 = nil
+				end)
+				v1.OnNo:Connect(function() --[[ Line: 182 | Upvalues: v1 (ref) ]]
+					v1 = nil
+				end)
+			end)
+			v4.OnNo:Connect(function() --[[ Line: 186 | Upvalues: v4 (ref) ]]
+				v4 = nil
+			end)
+		end
+		local function Action(p1, p2) --[[ Line: 191 | Upvalues: v1 (ref) ]]
+			if p2 then
+				v1:FireServer("z" .. "" .. ("aidmekvo"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("b6wv0"):sub(3, 3):reverse() .. "clj")
+				return true
+			end
+		end
+		local v12 = nil
+		local function AddedFun(p1) --[[ Line: 198 | Upvalues: v12 (ref), Action (copy), CircleAction (ref) ]]
+			v12 = p1
+			local Button = p1:WaitForChild("Button")
+			CircleAction.Add({
+				Part = Button,
+				ValidRoot = Button.Parent,
+				Name = "Launch Nuke",
+				Timed = true,
+				Duration = 3,
+				Dist = 10,
+				Callback = Action
+			}, p1)
+		end
+		local function RemovedFun(p1) --[[ Line: 212 | Upvalues: v12 (ref), CircleAction (ref) ]]
+			v12 = nil
+			CircleAction.Remove(p1)
+		end
+		for i, v in ipairs(CollectionService:GetTagged("NukeUranium")) do
+			AddedFun(v)
+		end
+		CollectionService:GetInstanceAddedSignal("NukeUranium"):Connect(AddedFun)
+		CollectionService:GetInstanceRemovedSignal("NukeUranium"):Connect(RemovedFun)
+		function em.lw1ioe8o(p1) --[[ Line: 222 | Upvalues: v12 (ref), v2 (ref) ]]
+			if v12 ~= nil then
+				local Visual = v12:FindFirstChild("Visual")
+				if Visual ~= nil then
+					v2(Visual, p1)
+				end
+			end
+		end
+		CollectionService:GetInstanceAddedSignal("C4Nuke"):Connect(function(p1) --[[ Line: 231 | Upvalues: CamShaker (ref), CurrentCamera (ref), Audio (ref), LocalPlayer (ref), ReplicatedStorage (ref), Joint (ref), TweenService (ref), Shockwave (ref) ]]
+			local v2 = CamShaker.new(Enum.RenderPriority.Camera.Value + 1, function(p1) --[[ Line: 238 | Upvalues: CurrentCamera (ref) ]]
+				CurrentCamera.CFrame = CurrentCamera.CFrame * p1
+			end)
+			v2:Start()
+			Audio.ObjectLocal(LocalPlayer, 2205008075)
+			local v3 = Audio.ObjectLocal(LocalPlayer, 4828205974, {
+				Volume = 0,
+				Looped = true
+			})
+			Audio.FadeTo(v3, 0.8, 0.5)
+			local v4 = v2:ShakeSustain(CamShaker.Presets.Vibration)
+			local v5 = ReplicatedStorage.Resource.Nuke:Clone()
+			local Base = v5.Base
+			v5.PrimaryPart = Base
+			local Position = (p1.CFrame * CFrame.new(0, 0, -400)).Position
+			local Position_2 = (p1.CFrame * CFrame.new(0, 0, 0)).Position
+			v5.Parent = workspace
+			Joint.WeldAllTo(v5, Base)
+			Base.Anchored = true
+			v5:PivotTo(CFrame.new(Position, Position_2))
+			TweenService:Create(Base, TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+				CFrame = Base.CFrame - Base.CFrame.Position + Position_2
+			}):Play()
+			task.wait(2)
+			v5:Destroy()
+			Audio.ObjectLocal(LocalPlayer, 2205008239, {
+				Volume = 1
+			})
+			v4:StartFadeOut(1)
+			v2:Shake(CamShaker.Presets.Explosion)
+			Audio.FadeTo(v3, 0, 0.5)
+			task.delay(0.5, function() --[[ Line: 272 | Upvalues: v3 (ref) ]]
+				v3:Destroy()
+				v3 = nil
+			end)
+			Shockwave.new(Position_2, {
+				Duration = 1,
+				MaxRadius = 150,
+				EndTransparency = 1,
+				StartTransparency = 0,
+				FxDisabled = true
+			}).OnDestroyed:Connect(function() --[[ Line: 284 | Upvalues: v2 (copy) ]]
+				v2:Stop()
+			end)
+		end)
+	end
+}

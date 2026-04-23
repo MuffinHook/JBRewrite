@@ -1,8 +1,9 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
-    teamId = require(game:GetService("ReplicatedStorage").Resource.Settings).EnumTeam.Criminal;
-    message = function(arg1) -- Line 6
-        return string.format("Rob the Tomb %d times!", arg1:GetGoal());
-    end;
-    goal = 4;
-    rewardExp = 60;
+	teamId = require(ReplicatedStorage.Resource.Settings).EnumTeam.Criminal,
+	message = function(p1) --[[ Line: 6 ]]
+		return ("Rob the Tomb %d times!"):format(p1:GetGoal())
+	end,
+	goal = 4,
+	rewardExp = 60
 }

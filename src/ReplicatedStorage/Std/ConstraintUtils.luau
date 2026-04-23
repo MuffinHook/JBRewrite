@@ -1,75 +1,78 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
-local v5 = {
-    customWeld = function(v0, v1, v2, v3) --[[ Line: 4 ]] --[[ Name: customWeld ]]
-        local l_Weld_0 = Instance.new("Weld");
-        l_Weld_0.Name = string.format(("%s->%s"), v0.Name, v1.Name);
-        l_Weld_0.Part0 = v0;
-        l_Weld_0.Part1 = v1;
-        if v2 then
-            l_Weld_0.C0 = v2;
-        end;
-        if v3 then
-            l_Weld_0.C1 = v3;
-        end;
-        l_Weld_0.Parent = v0;
-        return l_Weld_0;
-    end
-};
-v5.blankWeld = function(v6, v7) --[[ Line: 19 ]] --[[ Name: blankWeld ]]
-    -- upvalues: v5 (copy)
-    return v5.customWeld(v6, v7, nil, nil);
-end;
-v5.weld = function(v8, v9) --[[ Line: 23 ]] --[[ Name: weld ]]
-    -- upvalues: v5 (copy)
-    return v5.customWeld(v8, v9, v8.CFrame:ToObjectSpace(v9.CFrame), nil);
-end;
-v5.weldModel = function(v10, v11) --[[ Line: 27 ]] --[[ Name: weldModel ]]
-    -- upvalues: v5 (copy)
-    local l_PrimaryPart_0 = v10.PrimaryPart;
-    if l_PrimaryPart_0 == nil then
-        error("Missing `PrimaryPart` of root model.");
-    end;
-    for _, v14 in ipairs(v10:GetChildren()) do
-        if v14:IsA("BasePart") then
-            if v14 ~= l_PrimaryPart_0 then
-                v5.weld(v14, l_PrimaryPart_0);
-                v14.Anchored = false;
-            end;
-        elseif v14:IsA("Model") and not v11 then
-            if v14.PrimaryPart then
-                v5.weldModel(v14);
-                v5.weld(v14.PrimaryPart, l_PrimaryPart_0);
-            else
-                warn(string.format(("Skipping %s, no primary part"), v14.Name));
-            end;
-        end;
-    end;
-    l_PrimaryPart_0.Anchored = false;
-end;
-v5.customMotor = function(v15, v16, v17, v18) --[[ Line: 50 ]] --[[ Name: customMotor ]]
-    local l_Motor_0 = Instance.new("Motor");
-    l_Motor_0.Name = string.format(("%s->%s"), v15.Name, v16.Name);
-    l_Motor_0.Part0 = v15;
-    l_Motor_0.Part1 = v16;
-    if v17 then
-        l_Motor_0.C0 = v17;
-    end;
-    if v18 then
-        l_Motor_0.C1 = v18;
-    end;
-    l_Motor_0.Parent = v15;
-    return l_Motor_0;
-end;
-v5.blankMotor = function(v20, v21) --[[ Line: 65 ]] --[[ Name: blankMotor ]]
-    -- upvalues: v5 (copy)
-    return v5.customMotor(v20, v21, nil, nil);
-end;
-v5.motor = function(v22, v23) --[[ Line: 69 ]] --[[ Name: motor ]]
-    -- upvalues: v5 (copy)
-    return v5.customMotor(v22, v23, v22.CFrame:ToObjectSpace(v23.CFrame), nil);
-end;
-return v5;
+local t = {
+	customWeld = function(p1, p2, p3, p4) --[[ Name: customWeld | Line: 4 ]]
+		local Weld = Instance.new("Weld")
+		Weld.Name = ("%s->%s"):format(p1.Name, p2.Name)
+		Weld.Part0 = p1
+		Weld.Part1 = p2
+		if p3 then
+			Weld.C0 = p3
+		end
+		if p4 then
+			Weld.C1 = p4
+		end
+		Weld.Parent = p1
+		return Weld
+	end
+}
+function t.blankWeld(p1, p2) --[[ Line: 19 | Upvalues: t (copy) ]]
+	return t.customWeld(p1, p2, nil, nil)
+end
+function t.weld(p1, p2) --[[ Line: 23 | Upvalues: t (copy) ]]
+	return t.customWeld(p1, p2, p1.CFrame:ToObjectSpace(p2.CFrame), nil)
+end
+function t.weldModel(p1, p2) --[[ Line: 27 | Upvalues: t (copy) ]]
+	local PrimaryPart = p1.PrimaryPart
+	if PrimaryPart == nil then
+		error("Missing `PrimaryPart` of root model.")
+	end
+	for i, v in ipairs(p1:GetChildren()) do
+		if v:IsA("BasePart") then
+			if v ~= PrimaryPart then
+				t.weld(v, PrimaryPart)
+				v.Anchored = false
+			end
+		elseif v:IsA("Model") and not p2 then
+			if v.PrimaryPart then
+				t.weldModel(v)
+				t.weld(v.PrimaryPart, PrimaryPart)
+			else
+				warn(("Skipping %s, no primary part"):format(v.Name))
+			end
+		end
+	end
+	PrimaryPart.Anchored = false
+end
+function t.customMotor(p1, p2, p3, p4) --[[ Line: 50 ]]
+	local Motor = Instance.new("Motor")
+	Motor.Name = ("%s->%s"):format(p1.Name, p2.Name)
+	Motor.Part0 = p1
+	Motor.Part1 = p2
+	if p3 then
+		Motor.C0 = p3
+	end
+	if p4 then
+		Motor.C1 = p4
+	end
+	Motor.Parent = p1
+	return Motor
+end
+function t.blankMotor(p1, p2) --[[ Line: 65 | Upvalues: t (copy) ]]
+	return t.customMotor(p1, p2, nil, nil)
+end
+function t.motor(p1, p2) --[[ Line: 69 | Upvalues: t (copy) ]]
+	return t.customMotor(p1, p2, p1.CFrame:ToObjectSpace(p2.CFrame), nil)
+end
+local function setJointOffset(p1, p2, p3) --[[ Line: 74 ]]
+	if p1.ClassName == "AnimationConstraint" then
+		p1["Attachment" .. p2].CFrame = p3
+	else
+		p1["C" .. p2] = p3
+	end
+end
+function t.setJointC0(p1, p2) --[[ Line: 81 | Upvalues: setJointOffset (copy) ]]
+	return setJointOffset(p1, "0", p2)
+end
+function t.setJointC1(p1, p2) --[[ Line: 84 | Upvalues: setJointOffset (copy) ]]
+	return setJointOffset(p1, "1", p2)
+end
+return t

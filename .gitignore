@@ -12,3 +12,4 @@ sourcemap.json
 /*.rag_db
 /*.claude
 /*.vscode
+/*memory

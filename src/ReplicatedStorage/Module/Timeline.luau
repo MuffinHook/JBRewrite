@@ -1,52 +1,55 @@
-local module_upvr = {}
-module_upvr.__index = module_upvr
-function module_upvr.new(arg1) -- Line 38
-    assert(arg1)
-    local setmetatable_result1 = setmetatable({}, module_upvr)
-    setmetatable_result1.Data = arg1
-    setmetatable_result1.Seqi = 1
-    setmetatable_result1.CumulativeSeqAge = 0
-    arg1[1][1](0, 0)
-    return setmetatable_result1
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 38 | Upvalues: t (copy) ]]
+	assert(p1)
+	local v2 = setmetatable({}, t)
+	v2.Data = p1
+	v2.Seqi = 1
+	v2.CumulativeSeqAge = 0
+	p1[1][1](0, 0)
+	return v2
 end
-function module_upvr.Update(arg1, arg2) -- Line 48
-    local Data = arg1.Data
-    local Seqi = arg1.Seqi
-    local var7
-    if #Data < Seqi then
-        return true
-    end
-    for i = Seqi, #Data do
-        local var8 = Data[i]
-        if arg2 < var7 then break end
-        if Seqi < i then
-            Data[i - 1][1](1, Data[i - 1][2])
-            var8[1](0, 0)
-            arg1.Seqi = i
-            arg1.CumulativeSeqAge = var7
-        end
-        var7 += var8[2]
-    end
-    local Seqi_2 = arg1.Seqi
-    local var10 = Data[Seqi_2]
-    local _2 = var10[2]
-    var7 -= _2
-    if var7 + _2 <= arg2 then
-        var10[1](1, _2)
-        arg1.Seqi = Seqi_2 + 1
-        return true
-    end
-    local var12 = (arg2 - var7) / _2
-    if var12 ~= 0 and var12 ~= 1 then
-        var10[1](var12, arg2 - var7)
-    end
-    return false
+function t.Update(p1, p2) --[[ Line: 48 ]]
+	local CumulativeSeqAge = p1.CumulativeSeqAge
+	local Data = p1.Data
+	local Seqi = p1.Seqi
+	if #Data < Seqi then
+		return true
+	end
+	for i = Seqi, #Data do
+		local v1 = Data[i]
+		if p2 < CumulativeSeqAge then
+			break
+		end
+		if Seqi < i then
+			Data[i - 1][1](1, Data[i - 1][2])
+			v1[1](0, 0)
+			p1.Seqi = i
+			p1.CumulativeSeqAge = CumulativeSeqAge
+		end
+		CumulativeSeqAge = CumulativeSeqAge + v1[2]
+	end
+	local Seqi_2 = p1.Seqi
+	local v3 = Data[Seqi_2]
+	local v4 = v3[2]
+	local v5 = CumulativeSeqAge - v4
+	if v5 + v4 <= p2 then
+		v3[1](1, v4)
+		p1.Seqi = Seqi_2 + 1
+		return true
+	else
+		local v6 = (p2 - v5) / v4
+		if v6 ~= 0 and v6 ~= 1 then
+			v3[1](v6, p2 - v5)
+		end
+		return false
+	end
 end
-function module_upvr.GetTotalLifespan(arg1) -- Line 86
-    local var15 = 0
-    for i_2 = 1, #arg1.Data do
-        var15 += arg1.Data[i_2][2]
-    end
-    return var15
+function t.GetTotalLifespan(p1) --[[ Line: 86 ]]
+	local sum = 0
+	for i = 1, #p1.Data do
+		sum = sum + p1.Data[i][2]
+	end
+	return sum
 end
-return module_upvr
+return t

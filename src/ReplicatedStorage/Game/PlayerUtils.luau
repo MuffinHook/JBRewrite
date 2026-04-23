@@ -1,78 +1,75 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Settings_upvr = require(ReplicatedStorage_upvr.Resource.Settings)
-local Players_upvr = game:GetService("Players")
-local LocalPlayer_upvr = Players_upvr.LocalPlayer
-local var5_upvw
-local module_upvr = {
-    init = function() -- Line 16, Named "init"
-        var5_upvw = require(ReplicatedStorage_upvr.Inventory.InventoryItemSystem)
-    end;
+game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
+require(ReplicatedStorage.Std.Region.RegionUtils)
+local GameUtil = require(ReplicatedStorage.Game.GameUtil)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+local Players = game:GetService("Players")
+local Teams = game:GetService("Teams")
+local LocalPlayer = Players.LocalPlayer
+local v1 = nil
+local PlayerConsts = require(script.Parent.PlayerConsts)
+local t = {
+	init = function() --[[ Name: init | Line: 16 | Upvalues: v1 (ref), ReplicatedStorage (copy) ]]
+		v1 = require(ReplicatedStorage.Inventory.InventoryItemSystem)
+	end,
+	getLastVehicleSpawnedAt = function() --[[ Name: getLastVehicleSpawnedAt | Line: 19 | Upvalues: LocalPlayer (copy), PlayerConsts (copy) ]]
+		local v1 = LocalPlayer:FindFirstChild(PlayerConsts.LAST_VEHICLE_SPAWNED_AT_VALUE_NAME)
+		assert(v1)
+		return v1.Value
+	end,
+	getHumanoid = function(p1) --[[ Name: getHumanoid | Line: 24 ]]
+		local Character = p1.Character
+		if Character then
+			return Character:FindFirstChild("Humanoid")
+		end
+	end,
+	getRootPart = function(p1) --[[ Name: getRootPart | Line: 31 ]]
+		local Character = p1.Character
+		if Character then
+			return Character.PrimaryPart
+		end
+	end,
+	getTeam = function(p1) --[[ Name: getTeam | Line: 39 ]]
+		local TeamValue = p1:FindFirstChild("TeamValue")
+		return TeamValue and TeamValue.Value
+	end,
+	getTeamId = function(p1) --[[ Name: getTeamId | Line: 43 | Upvalues: Teams (copy), Settings (copy) ]]
+		if p1.Team == Teams:FindFirstChild("Prisoner") then
+			return Settings.EnumTeam.Prisoner
+		elseif p1.Team == Teams:FindFirstChild("Criminal") then
+			return Settings.EnumTeam.Criminal
+		elseif p1.Team == Teams:FindFirstChild("Police") then
+			return Settings.EnumTeam.Police
+		else
+			return nil
+		end
+	end,
+	hasKey = function() --[[ Name: hasKey | Line: 53 | Upvalues: GameUtil (copy), Settings (copy), v1 (ref), LocalPlayer (copy) ]]
+		if GameUtil.Team == Settings.EnumTeam.Police then
+			return true
+		else
+			return v1.playerHasItem(LocalPlayer, "Key")
+		end
+	end,
+	getPlayerFromDescendant = function(p1) --[[ Name: getPlayerFromDescendant | Line: 59 | Upvalues: Players (copy) ]]
+		if p1 then
+			for i, v in ipairs(Players:GetPlayers()) do
+				if v.Character and p1:IsDescendantOf(v.Character) then
+					return v
+				end
+			end
+		end
+	end
 }
-local PlayerConsts_upvr = require(script.Parent.PlayerConsts)
-function module_upvr.getLastVehicleSpawnedAt() -- Line 19
-    local SOME = LocalPlayer_upvr:FindFirstChild(PlayerConsts_upvr.LAST_VEHICLE_SPAWNED_AT_VALUE_NAME)
-    assert(SOME)
-    return SOME.Value
+function t.isInVehicle(p1) --[[ Line: 71 | Upvalues: CharacterUtils (copy), t (copy) ]]
+	return t.isHumanoidInVehicle((CharacterUtils.getHumanoid(p1.Character)))
 end
-function module_upvr.getHumanoid(arg1) -- Line 24
-    local Character_2 = arg1.Character
-    if not Character_2 then return end
-    return Character_2:FindFirstChild("Humanoid")
+function t.isHumanoidInVehicle(p1) --[[ Line: 75 ]]
+	if p1 then
+		return p1.Parent:GetAttribute("InVehicle") == true
+	else
+		return false
+	end
 end
-function module_upvr.getRootPart(arg1) -- Line 31
-    local Character = arg1.Character
-    if not Character then return end
-    return Character.PrimaryPart
-end
-function module_upvr.getTeam(arg1) -- Line 39
-    local TeamValue = arg1:FindFirstChild("TeamValue")
-    local var12 = TeamValue
-    if var12 then
-        var12 = TeamValue.Value
-    end
-    return var12
-end
-local Teams_upvr = game:GetService("Teams")
-function module_upvr.getTeamId(arg1) -- Line 43
-    if arg1.Team == Teams_upvr:FindFirstChild("Prisoner") then
-        return Settings_upvr.EnumTeam.Prisoner
-    end
-    if arg1.Team == Teams_upvr:FindFirstChild("Criminal") then
-        return Settings_upvr.EnumTeam.Criminal
-    end
-    if arg1.Team == Teams_upvr:FindFirstChild("Police") then
-        return Settings_upvr.EnumTeam.Police
-    end
-    return nil
-end
-local GameUtil_upvr = require(ReplicatedStorage_upvr.Game.GameUtil)
-function module_upvr.hasKey() -- Line 53
-    if GameUtil_upvr.Team == Settings_upvr.EnumTeam.Police then
-        return true
-    end
-    return var5_upvw.playerHasItem(LocalPlayer_upvr, "Key")
-end
-function module_upvr.getPlayerFromDescendant(arg1) -- Line 59
-    if not arg1 then
-    else
-        for _, v in ipairs(Players_upvr:GetPlayers()) do
-            if v.Character and arg1:IsDescendantOf(v.Character) then
-                return v
-            end
-        end
-    end
-end
-local CharacterUtils_upvr = require(ReplicatedStorage_upvr.Std.CharacterUtils)
-function module_upvr.isInVehicle(arg1) -- Line 71
-    return module_upvr.isHumanoidInVehicle(CharacterUtils_upvr.getHumanoid(arg1.Character))
-end
-function module_upvr.isHumanoidInVehicle(arg1) -- Line 75
-    if not arg1 then
-        return false
-    end
-    if arg1.Parent:GetAttribute("InVehicle") ~= true then
-    else
-    end
-    return true
-end
-return module_upvr
+return t

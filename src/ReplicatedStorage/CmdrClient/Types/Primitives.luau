@@ -1,198 +1,132 @@
-local Util_upvr = require(script.Parent.Parent.Shared.Util)
-local tbl_upvr_6 = {}
-local function Validate(arg1) -- Line 4
-    if arg1 == nil then
-    else
-    end
-    return true
-end
-tbl_upvr_6.Validate = Validate
-local function Parse(arg1) -- Line 8
-    return tostring(arg1)
-end
-tbl_upvr_6.Parse = Parse
-local tbl_upvr_3 = {}
-local function Transform(arg1) -- Line 14
-    return tonumber(arg1)
-end
-tbl_upvr_3.Transform = Transform
-local function Validate(arg1) -- Line 18
-    if arg1 == nil then
-    else
-    end
-    return true
-end
-tbl_upvr_3.Validate = Validate
-local function Parse(arg1) -- Line 22
-    return arg1
-end
-tbl_upvr_3.Parse = Parse
-local tbl_upvr_2 = {}
-local function Transform(arg1) -- Line 28
-    return tonumber(arg1)
-end
-tbl_upvr_2.Transform = Transform
-local function Validate(arg1) -- Line 32
-    local var5 = false
-    if arg1 ~= nil then
-        if arg1 ~= math.floor(arg1) then
-            var5 = false
-        else
-            var5 = true
-        end
-    end
-    return var5, "Only whole numbers are valid."
-end
-tbl_upvr_2.Validate = Validate
-local function Parse(arg1) -- Line 36
-    return arg1
-end
-tbl_upvr_2.Parse = Parse
-local tbl_upvr_7 = {}
-local function Transform(arg1) -- Line 42
-    return tonumber(arg1)
-end
-tbl_upvr_7.Transform = Transform
-local function Validate(arg1) -- Line 46
-    local var8 = false
-    if arg1 ~= nil then
-        var8 = false
-        if arg1 == math.floor(arg1) then
-            if 0 >= arg1 then
-                var8 = false
-            else
-                var8 = true
-            end
-        end
-    end
-    return var8, "Only positive whole numbers are valid."
-end
-tbl_upvr_7.Validate = Validate
-local function Parse(arg1) -- Line 50
-    return arg1
-end
-tbl_upvr_7.Parse = Parse
-local tbl_upvr_4 = {}
-local function Transform(arg1) -- Line 56
-    return tonumber(arg1)
-end
-tbl_upvr_4.Transform = Transform
-local function Validate(arg1) -- Line 60
-    local var10 = false
-    if arg1 ~= nil then
-        var10 = false
-        if arg1 == math.floor(arg1) then
-            if 0 > arg1 then
-                var10 = false
-            else
-                var10 = true
-            end
-        end
-    end
-    return var10, "Only non-negative whole numbers are valid."
-end
-tbl_upvr_4.Validate = Validate
-local function Parse(arg1) -- Line 64
-    return arg1
-end
-tbl_upvr_4.Parse = Parse
-local tbl_upvr = {}
-local function Transform(arg1) -- Line 70
-    return tonumber(arg1)
-end
-tbl_upvr.Transform = Transform
-local function Validate(arg1) -- Line 74
-    local var13 = false
-    if arg1 ~= nil then
-        var13 = false
-        if arg1 == math.floor(arg1) then
-            var13 = false
-            if 0 <= arg1 then
-                if arg1 > 255 then
-                    var13 = false
-                else
-                    var13 = true
-                end
-            end
-        end
-    end
-    return var13, "Only bytes are valid."
-end
-tbl_upvr.Validate = Validate
-local function Parse(arg1) -- Line 78
-    return arg1
-end
-tbl_upvr.Parse = Parse
-local tbl_upvr_5 = {}
-local function Transform(arg1) -- Line 84
-    return tonumber(arg1)
-end
-tbl_upvr_5.Transform = Transform
-local function Validate(arg1) -- Line 88
-    local var15 = false
-    if arg1 ~= nil then
-        var15 = false
-        if arg1 == math.floor(arg1) then
-            var15 = false
-            if 0 <= arg1 then
-                if arg1 > 9 then
-                    var15 = false
-                else
-                    var15 = true
-                end
-            end
-        end
-    end
-    return var15, "Only digits are valid."
-end
-tbl_upvr_5.Validate = Validate
-local function Parse(arg1) -- Line 92
-    return arg1
-end
-tbl_upvr_5.Parse = Parse
-local any_MakeDictionary_result1_upvr = Util_upvr.MakeDictionary({"true", 't', "yes", 'y', "on", "enable", "enabled", '1', '+'})
-local any_MakeDictionary_result1_upvr_2 = Util_upvr.MakeDictionary({"false", 'f', "no", 'n', "off", "disable", "disabled", '0', '-'})
-local tbl_upvw = {
-    Transform = function(arg1) -- Line 103, Named "Transform"
-        return arg1:lower()
-    end;
-    Validate = function(arg1) -- Line 107, Named "Validate"
-        local var21 = true
-        if any_MakeDictionary_result1_upvr[arg1] == nil then
-            if any_MakeDictionary_result1_upvr_2[arg1] == nil then
-                var21 = false
-            else
-                var21 = true
-            end
-        end
-        return var21, "Please use true/yes/on or false/no/off."
-    end;
-    Parse = function(arg1) -- Line 111, Named "Parse"
-        if any_MakeDictionary_result1_upvr[arg1] then
-            return true
-        end
-        if any_MakeDictionary_result1_upvr_2[arg1] then
-            return false
-        end
-        return nil
-    end;
+local Util = require(script.Parent.Parent.Shared.Util)
+local t = {
+	Validate = function(p1) --[[ Name: Validate | Line: 4 ]]
+		return p1 ~= nil
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 8 ]]
+		return tostring(p1)
+	end
 }
-function any_MakeDictionary_result1_upvr(arg1) -- Line 123
-    arg1:RegisterType("string", tbl_upvr_6)
-    arg1:RegisterType("number", tbl_upvr_3)
-    arg1:RegisterType("integer", tbl_upvr_2)
-    arg1:RegisterType("positiveInteger", tbl_upvr_7)
-    arg1:RegisterType("nonNegativeInteger", tbl_upvr_4)
-    arg1:RegisterType("byte", tbl_upvr)
-    arg1:RegisterType("digit", tbl_upvr_5)
-    arg1:RegisterType("boolean", tbl_upvw)
-    arg1:RegisterType("strings", Util_upvr.MakeListableType(tbl_upvr_6))
-    arg1:RegisterType("numbers", Util_upvr.MakeListableType(tbl_upvr_3))
-    arg1:RegisterType("integers", Util_upvr.MakeListableType(tbl_upvr_2))
-    arg1:RegisterType("positiveIntegers", Util_upvr.MakeListableType(tbl_upvr_7))
-    arg1:RegisterType("nonNegativeIntegers", Util_upvr.MakeListableType(tbl_upvr_4))
-    arg1:RegisterType("bytes", Util_upvr.MakeListableType(tbl_upvr))
-    arg1:RegisterType("digits", Util_upvr.MakeListableType(tbl_upvr_5))
-    arg1:RegisterType("booleans", Util_upvr.MakeListableType(tbl_upvw))
+local t2 = {
+	Transform = function(p1) --[[ Name: Transform | Line: 14 ]]
+		return tonumber(p1)
+	end,
+	Validate = function(p1) --[[ Name: Validate | Line: 18 ]]
+		return p1 ~= nil
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 22 ]]
+		return p1
+	end
+}
+local t3 = {
+	Transform = function(p1) --[[ Name: Transform | Line: 28 ]]
+		return tonumber(p1)
+	end,
+	Validate = function(p1) --[[ Name: Validate | Line: 32 ]]
+		return if p1 == nil then false else p1 == math.floor(p1), "Only whole numbers are valid."
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 36 ]]
+		return p1
+	end
+}
+local t4 = {
+	Transform = function(p1) --[[ Name: Transform | Line: 42 ]]
+		return tonumber(p1)
+	end,
+	Validate = function(p1) --[[ Name: Validate | Line: 46 ]]
+		return if p1 == nil or p1 ~= math.floor(p1) then false else p1 > 0, "Only positive whole numbers are valid."
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 50 ]]
+		return p1
+	end
+}
+local t5 = {
+	Transform = function(p1) --[[ Name: Transform | Line: 56 ]]
+		return tonumber(p1)
+	end,
+	Validate = function(p1) --[[ Name: Validate | Line: 60 ]]
+		return if p1 == nil or p1 ~= math.floor(p1) then false else p1 >= 0, "Only non-negative whole numbers are valid."
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 64 ]]
+		return p1
+	end
+}
+local t6 = {
+	Transform = function(p1) --[[ Name: Transform | Line: 70 ]]
+		return tonumber(p1)
+	end,
+	Validate = function(p1) --[[ Name: Validate | Line: 74 ]]
+		return if p1 == nil or (p1 ~= math.floor(p1) or not (p1 >= 0)) then false else p1 <= 255, "Only bytes are valid."
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 78 ]]
+		return p1
+	end
+}
+local t7 = {
+	Transform = function(p1) --[[ Name: Transform | Line: 84 ]]
+		return tonumber(p1)
+	end,
+	Validate = function(p1) --[[ Name: Validate | Line: 88 ]]
+		return if p1 == nil or (p1 ~= math.floor(p1) or not (p1 >= 0)) then false else p1 <= 9, "Only digits are valid."
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 92 ]]
+		return p1
+	end
+}
+local v1 = Util.MakeDictionary({
+	"true",
+	"t",
+	"yes",
+	"y",
+	"on",
+	"enable",
+	"enabled",
+	"1",
+	"+"
+})
+local v2 = Util.MakeDictionary({
+	"false",
+	"f",
+	"no",
+	"n",
+	"off",
+	"disable",
+	"disabled",
+	"0",
+	"-"
+})
+local t8 = {
+	Transform = function(p1) --[[ Name: Transform | Line: 103 ]]
+		return p1:lower()
+	end,
+	Validate = function(p1) --[[ Name: Validate | Line: 107 | Upvalues: v1 (copy), v2 (copy) ]]
+		return if v1[p1] == nil then v2[p1] ~= nil else true, "Please use true/yes/on or false/no/off."
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 111 | Upvalues: v1 (copy), v2 (copy) ]]
+		if v1[p1] then
+			return true
+		elseif v2[p1] then
+			return false
+		else
+			return nil
+		end
+	end
+}
+return function(p1) --[[ Line: 123 | Upvalues: t (copy), t2 (copy), t3 (copy), t4 (copy), t5 (copy), t6 (copy), t7 (copy), t8 (ref), Util (copy) ]]
+	p1:RegisterType("string", t)
+	p1:RegisterType("number", t2)
+	p1:RegisterType("integer", t3)
+	p1:RegisterType("positiveInteger", t4)
+	p1:RegisterType("nonNegativeInteger", t5)
+	p1:RegisterType("byte", t6)
+	p1:RegisterType("digit", t7)
+	p1:RegisterType("boolean", t8)
+	p1:RegisterType("strings", Util.MakeListableType(t))
+	p1:RegisterType("numbers", Util.MakeListableType(t2))
+	p1:RegisterType("integers", Util.MakeListableType(t3))
+	p1:RegisterType("positiveIntegers", Util.MakeListableType(t4))
+	p1:RegisterType("nonNegativeIntegers", Util.MakeListableType(t5))
+	p1:RegisterType("bytes", Util.MakeListableType(t6))
+	p1:RegisterType("digits", Util.MakeListableType(t7))
+	p1:RegisterType("booleans", Util.MakeListableType(t8))
 end
-return any_MakeDictionary_result1_upvr

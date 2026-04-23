@@ -1,22 +1,26 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BaseObject_upvr = require(ReplicatedStorage.Std.BaseObject)
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-function module_upvr.new(arg1) -- Line 11
-    local any_new_result1 = BaseObject_upvr.new(arg1)
-    setmetatable(any_new_result1, module_upvr)
-    return any_new_result1
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local NetObjPoolItemBinder = require(ReplicatedStorage.NetObjPool.NetObjPoolItemBinder)
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new(p1) --[[ Line: 11 | Upvalues: BaseObject (copy), t (copy) ]]
+	local v1 = BaseObject.new(p1)
+	setmetatable(v1, t)
+	return v1
 end
-local NetObjPoolItemBinder_upvr = require(ReplicatedStorage.NetObjPool.NetObjPoolItemBinder)
-function module_upvr.Get(arg1) -- Line 17
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local any_GetAll_result1, any_GetAll_result2, any_GetAll_result3 = NetObjPoolItemBinder_upvr:GetAll()
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [20.7]
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+function t.Get(p1) --[[ Line: 17 | Upvalues: NetObjPoolItemBinder (copy) ]]
+	local v1 = nil
+	for v2, v3 in NetObjPoolItemBinder:GetAll() do
+		if v3:GetPoolObj() == p1.obj and v3:GetActive() == true then
+			v1 = v3
+			break
+		end
+	end
+	if not v1 then
+		error("Nothing exists in this pool...")
+	end
+	return v1
 end
-return require(ReplicatedStorage.Std.Binder).new("NetObjPool", module_upvr)
+return Binder.new("NetObjPool", t)

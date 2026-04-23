@@ -1,45 +1,36 @@
-local UserInputService_upvr = game:GetService("UserInputService")
-local module = {
-    rotatedLine = function(arg1, arg2, arg3, arg4, arg5) -- Line 8, Named "rotatedLine"
-        local var3 = arg3 - arg1
-        local var4 = arg4 - arg2
-        return (arg1 + arg3) * 0.5, (arg2 + arg4) * 0.5, math.sqrt(var4 * var4 * arg5 * arg5 + var3 * var3), math.atan2(var4 * arg5, var3)
-    end;
+local GamepadService = game:GetService("GamepadService")
+local GuiService = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+local CurrentCamera = workspace.CurrentCamera
+return {
+	rotatedLine = function(p1, p2, p3, p4, p5) --[[ Name: rotatedLine | Line: 8 ]]
+		local v1 = p3 - p1
+		local v2 = p4 - p2
+		return (p1 + p3) * 0.5, (p2 + p4) * 0.5, math.sqrt(v2 * v2 * p5 * p5 + v1 * v1), math.atan2(v2 * p5, v1)
+	end,
+	isSmallScreen = function() --[[ Name: isSmallScreen | Line: 18 | Upvalues: CurrentCamera (copy) ]]
+		return math.min(CurrentCamera.ViewportSize.X, CurrentCamera.ViewportSize.y) <= 500
+	end,
+	shouldHaveTouchControls = function() --[[ Name: shouldHaveTouchControls | Line: 24 | Upvalues: UserInputService (copy) ]]
+		return UserInputService.TouchEnabled
+	end,
+	getViewportSizeChangedSignal = function() --[[ Name: getViewportSizeChangedSignal | Line: 27 ]]
+		return workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize")
+	end,
+	selectIfGamepad = function(p1) --[[ Name: selectIfGamepad | Line: 30 | Upvalues: GuiService (copy), GamepadService (copy), UserInputService (copy) ]]
+		if GuiService.AutoSelectGuiEnabled then
+			GamepadService:EnableGamepadCursor(p1)
+		elseif UserInputService:GetLastInputType() == Enum.UserInputType.Gamepad1 then
+			GuiService.SelectedObject = p1
+		end
+	end,
+	isGuiAncestryVisible = function(p1) --[[ Name: isGuiAncestryVisible | Line: 40 ]]
+		while (not p1:IsA("GuiObject") or p1.Visible) and (not p1:IsA("ScreenGui") or p1.Enabled) do
+			p1 = p1.Parent
+			if not p1 then
+				return true
+			end
+		end
+		return false
+	end
 }
-local CurrentCamera_upvr = workspace.CurrentCamera
-function module.isSmallScreen() -- Line 18
-    local X = CurrentCamera_upvr.ViewportSize.X
-    if math.min(X, CurrentCamera_upvr.ViewportSize.y) > 500 then
-        X = false
-    else
-        X = true
-    end
-    return X
-end
-function module.shouldHaveTouchControls() -- Line 24
-    return UserInputService_upvr.TouchEnabled
-end
-function module.getViewportSizeChangedSignal() -- Line 27
-    return workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize")
-end
-local GuiService_upvr = game:GetService("GuiService")
-local GamepadService_upvr = game:GetService("GamepadService")
-function module.selectIfGamepad(arg1) -- Line 30
-    if GuiService_upvr.AutoSelectGuiEnabled then
-        GamepadService_upvr:EnableGamepadCursor(arg1)
-    elseif UserInputService_upvr:GetLastInputType() == Enum.UserInputType.Gamepad1 then
-        GuiService_upvr.SelectedObject = arg1
-    end
-end
-function module.isGuiAncestryVisible(arg1) -- Line 40
-    repeat
-        if arg1:IsA("GuiObject") and not arg1.Visible then
-            return false
-        end
-        if arg1:IsA("ScreenGui") and not arg1.Enabled then
-            return false
-        end
-    until not arg1.Parent
-    return true
-end
-return module

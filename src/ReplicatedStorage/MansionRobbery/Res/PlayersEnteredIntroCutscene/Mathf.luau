@@ -1,186 +1,163 @@
-local module_upvr = {
-    FrameDelta = function(arg1, arg2) -- Line 5, Named "FrameDelta"
-        return 1 - (1 - arg1) ^ (arg2 * 60)
-    end;
-    SafeLerp = function(arg1, arg2, arg3) -- Line 11, Named "SafeLerp"
-        if arg1 == nil or 1 <= arg3 then
-            return arg2
-        end
-        if arg2 == nil or arg3 <= 0 then
-            return arg1
-        end
-        if typeof(arg1) == "Color3" then
-            local var2 = 1 - arg3
-            return Color3.new((arg1.R ^ 2 * var2 + arg2.R ^ 2 * arg3) ^ 0.5, (arg1.G ^ 2 * var2 + arg2.G ^ 2 * arg3) ^ 0.5, (arg1.B ^ 2 * var2 + arg2.B ^ 2 * arg3) ^ 0.5)
-        end
-        return arg1 * (1 - arg3) + arg2 * arg3
-    end;
-    PercentBetween = function(arg1, arg2, arg3) -- Line 33, Named "PercentBetween"
-        if arg3 - arg2 == 0 then
-            return 1
-        end
-        return math.clamp((arg1 - arg2) / (arg3 - arg2), 0, 1)
-    end;
-    Round = function(arg1, arg2, arg3) -- Line 37, Named "Round"
-        return math.floor(arg1 / arg2 + (arg3 or 0.5)) * arg2
-    end;
-    RoundNumber = function(arg1) -- Line 41, Named "RoundNumber"
-        local var3
-        local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var3 = math.floor(arg1 + 0.5)
-            return var3
-        end
-        if 0 > arg1 or not decompInlinedCondition() then
-            var3 = math.ceil(arg1 - 0.5)
-        end
-        return var3
-    end;
-    Lerp = function(arg1, arg2, arg3) -- Line 45, Named "Lerp"
-        return arg1 * (1 - arg3) + arg2 * arg3
-    end;
-    SmoothLerp = function(arg1, arg2, arg3, arg4) -- Line 49, Named "SmoothLerp"
-        local var4 = 1 - math.pow(1 - arg3, arg4)
-        if type(arg1) == "number" then
-            return (1 - var4) * arg1 + arg2 * var4
-        end
-        return arg1:Lerp(arg2, var4)
-    end;
-    LerpTowards = function(arg1, arg2, arg3) -- Line 57, Named "LerpTowards"
-        if arg1 < arg2 then
-            return math.clamp(arg1 + arg3, arg1, arg2)
-        end
-        return math.clamp(arg1 - arg3, arg2, arg1)
-    end;
-    Wrap = function(arg1, arg2, arg3) -- Line 65, Named "Wrap"
-        return arg2 + (arg1 - arg2) % (arg3 - arg2)
-    end;
-    Cubic_Interpolate = function(arg1, arg2, arg3, arg4, arg5) -- Line 69, Named "Cubic_Interpolate"
-        local var5 = (arg4 - arg3) - (arg1 - arg2)
-        return var5 * arg5 ^ 3 + (arg1 - arg2 - var5) * arg5 ^ 2 + (arg3 - arg1) * arg5 + arg2
-    end;
-    SlerpVector = function(arg1, arg2, arg3) -- Line 80, Named "SlerpVector"
-        return CFrame.new(Vector3.new(0, 0, 0), arg1):Lerp(CFrame.new(Vector3.new(0, 0, 0), arg2), arg3).LookVector
-    end;
-    RandomizeVector = function(arg1, arg2, arg3) -- Line 84, Named "RandomizeVector"
-        return (CFrame.new(Vector3.new(), arg2) * CFrame.Angles(0, 0, arg1:NextNumber(0, (-math.pi*2))) * CFrame.Angles(math.acos(arg1:NextNumber(math.cos(arg3), 1)), 0, 0)).LookVector * arg2.Magnitude
-    end;
-    LerpColor3 = function(arg1, arg2, arg3) -- Line 92, Named "LerpColor3"
-        local var6 = 1 - arg3
-        return Color3.new((arg1.R ^ 2 * var6 + arg2.R ^ 2 * arg3) ^ 0.5, (arg1.G ^ 2 * var6 + arg2.G ^ 2 * arg3) ^ 0.5, (arg1.B ^ 2 * var6 + arg2.B ^ 2 * arg3) ^ 0.5)
-    end;
-    InPart = function(arg1, arg2, arg3) -- Line 104, Named "InPart"
-        local any_PointToObjectSpace_result1 = arg1.CFrame:PointToObjectSpace(arg2)
-        local var8 = arg1.Size * (arg3 or 1)
-        if math.abs(any_PointToObjectSpace_result1.x) <= var8.x / 2 and math.abs(any_PointToObjectSpace_result1.y) <= var8.y / 2 and math.abs(any_PointToObjectSpace_result1.z) <= var8.z / 2 then
-            return true
-        end
-        return false
-    end;
-    IK = function(arg1, arg2, arg3, arg4) -- Line 115, Named "IK"
-        local var9
-        if arg3 + arg4 <= (arg1 - arg2).magnitude then
-            return CFrame.new(arg1, arg2), 0, 0
-        end
-        var9 = arg4
-        if (arg1 - arg2).magnitude < math.max(arg3, arg4) - math.min(arg3, var9) then
-            return CFrame.new(arg1, arg2), 0, math.pi
-        end
-        local cframe = CFrame.new(arg1, arg2)
-        local any_pointToObjectSpace_result1 = cframe:pointToObjectSpace(arg2)
-        var9 = any_pointToObjectSpace_result1.z ^ 2
-        var9 = arg3 ^ 2
-        var9 = 2
-        local var12 = (var9 - arg4 ^ 2 + var9) / (var9 * any_pointToObjectSpace_result1.z)
-        var9 = 1 - (var12 / arg3) ^ 2
-        local var13 = math.sqrt(var9) * arg3
-        var9 = math.asin(var13 / (var12 ^ 2 + var13 ^ 2) ^ 0.5)
-        local var14 = -var9
-        local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var9 = (-math.pi) + math.asin(-var13 / ((any_pointToObjectSpace_result1.z - var12) ^ 2 + var13 ^ 2) ^ 0.5)
-            return var9
-        end
-        if var12 >= any_pointToObjectSpace_result1.z or not decompInlinedCondition_2() then
-            var9 = -math.asin(-var13 / ((any_pointToObjectSpace_result1.z - var12) ^ 2 + var13 ^ 2) ^ 0.5)
-        end
-        return cframe, var14, var9 - var14
-    end;
-    Vector3ToPixel = function(arg1, arg2, arg3) -- Line 135, Named "Vector3ToPixel"
-        local X = arg3.AbsoluteSize.X
-        local Y = arg3.AbsoluteSize.Y
-        local var17 = arg2.CoordinateFrame * CFrame.Angles(0, 0, -arg2:GetRoll()):inverse() * arg1
-        local var18 = 1 / math.tan(math.rad(arg2.FieldOfView) / 2)
-        local var19 = X / 2 * (1 + var17.x / -var17.z * var18 * Y / X)
-        local var20 = Y / 2 * (1 + var17.y / -var17.z * var18)
-        if 0 < var17.z then
-            var19 = 20000
-            var20 = 20000
-        end
-        return var19, Y - var20 - 36
-    end;
-    LerpAngle = function(arg1, arg2, arg3) -- Line 150, Named "LerpAngle"
-        local var21
-        if arg1 - arg2 < 180 then
-            var21 = arg1 + (arg2 - arg1) * arg3
-        else
-            var21 = arg1 + (360 + arg2 - arg1) * arg3
-        end
-        return (var21 - 180) % 360 - 180
-    end;
+local t = {
+	FrameDelta = function(p1, p2) --[[ Name: FrameDelta | Line: 5 ]]
+		return 1 - (1 - p1) ^ (p2 * 60)
+	end,
+	SafeLerp = function(p1, p2, p3) --[[ Name: SafeLerp | Line: 11 ]]
+		if p1 == nil or p3 >= 1 then
+			return p2
+		elseif p2 == nil or p3 <= 0 then
+			return p1
+		elseif typeof(p1) == "Color3" then
+			local v1 = 1 - p3
+			return Color3.new((p1.R ^ 2 * v1 + p2.R ^ 2 * p3) ^ 0.5, (p1.G ^ 2 * v1 + p2.G ^ 2 * p3) ^ 0.5, (p1.B ^ 2 * v1 + p2.B ^ 2 * p3) ^ 0.5)
+		else
+			return p1 * (1 - p3) + p2 * p3
+		end
+	end,
+	PercentBetween = function(p1, p2, p3) --[[ Name: PercentBetween | Line: 33 ]]
+		if p3 - p2 == 0 then
+			return 1
+		else
+			return math.clamp((p1 - p2) / (p3 - p2), 0, 1)
+		end
+	end,
+	Round = function(p1, p2, p3) --[[ Name: Round | Line: 37 ]]
+		return math.floor(p1 / p2 + (p3 or 0.5)) * p2
+	end,
+	RoundNumber = function(p1) --[[ Name: RoundNumber | Line: 41 ]]
+		return p1 >= 0 and math.floor(p1 + 0.5) or math.ceil(p1 - 0.5)
+	end,
+	Lerp = function(p1, p2, p3) --[[ Name: Lerp | Line: 45 ]]
+		return p1 * (1 - p3) + p2 * p3
+	end,
+	SmoothLerp = function(p1, p2, p3, p4) --[[ Name: SmoothLerp | Line: 49 ]]
+		local v1 = 1 - math.pow(1 - p3, p4)
+		if type(p1) == "number" then
+			return (1 - v1) * p1 + p2 * v1
+		else
+			return p1:Lerp(p2, v1)
+		end
+	end,
+	LerpTowards = function(p1, p2, p3) --[[ Name: LerpTowards | Line: 57 ]]
+		if p1 < p2 then
+			return math.clamp(p1 + p3, p1, p2)
+		else
+			return math.clamp(p1 - p3, p2, p1)
+		end
+	end,
+	Wrap = function(p1, p2, p3) --[[ Name: Wrap | Line: 65 ]]
+		return p2 + (p1 - p2) % (p3 - p2)
+	end,
+	Cubic_Interpolate = function(p1, p2, p3, p4, p5) --[[ Name: Cubic_Interpolate | Line: 69 ]]
+		local v1 = p4 - p3 - (p1 - p2)
+		return v1 * p5 ^ 3 + (p1 - p2 - v1) * p5 ^ 2 + (p3 - p1) * p5 + p2
+	end,
+	SlerpVector = function(p1, p2, p3) --[[ Name: SlerpVector | Line: 80 ]]
+		return CFrame.new(Vector3.new(0, 0, 0), p1):Lerp(CFrame.new(Vector3.new(0, 0, 0), p2), p3).LookVector
+	end,
+	RandomizeVector = function(p1, p2, p3) --[[ Name: RandomizeVector | Line: 84 ]]
+		local v1 = CFrame.new(Vector3.new(), p2) * CFrame.Angles(0, 0, p1:NextNumber(0, 6.283185307179586))
+		local Angles = CFrame.Angles
+		return (v1 * Angles(math.acos((p1:NextNumber(math.cos(p3), 1))), 0, 0)).LookVector * p2.Magnitude
+	end,
+	LerpColor3 = function(p1, p2, p3) --[[ Name: LerpColor3 | Line: 92 ]]
+		local v1 = 1 - p3
+		return Color3.new((p1.R ^ 2 * v1 + p2.R ^ 2 * p3) ^ 0.5, (p1.G ^ 2 * v1 + p2.G ^ 2 * p3) ^ 0.5, (p1.B ^ 2 * v1 + p2.B ^ 2 * p3) ^ 0.5)
+	end,
+	InPart = function(p1, p2, p3) --[[ Name: InPart | Line: 104 ]]
+		local v1 = p1.CFrame:PointToObjectSpace(p2)
+		local v2 = p1.Size * (p3 or 1)
+		if math.abs(v1.x) <= v2.x / 2 and (math.abs(v1.y) <= v2.y / 2 and math.abs(v1.z) <= v2.z / 2) then
+			return true
+		else
+			return false
+		end
+	end,
+	IK = function(p1, p2, p3, p4) --[[ Name: IK | Line: 115 ]]
+		if p3 + p4 <= (p1 - p2).magnitude then
+			return CFrame.new(p1, p2), 0, 0
+		elseif (p1 - p2).magnitude < math.max(p3, p4) - math.min(p3, p4) then
+			return CFrame.new(p1, p2), 0, math.pi
+		else
+			local v1 = CFrame.new(p1, p2)
+			local v2 = v1:pointToObjectSpace(p2)
+			local v3 = (v2.z ^ 2 - p4 ^ 2 + p3 ^ 2) / (2 * v2.z)
+			local v4 = math.sqrt(1 - (v3 / p3) ^ 2) * p3
+			local v5 = -math.asin(v4 / (v3 ^ 2 + v4 ^ 2) ^ 0.5)
+			local v6, v7
+			if v3 < v2.z then
+				v6 = -3.141592653589793 + math.asin(-v4 / ((v2.z - v3) ^ 2 + v4 ^ 2) ^ 0.5)
+				if not v6 then
+					v7 = -v4 / ((v2.z - v3) ^ 2 + v4 ^ 2) ^ 0.5
+					v6 = -math.asin(v7)
+				end
+			else
+				v7 = -v4 / ((v2.z - v3) ^ 2 + v4 ^ 2) ^ 0.5
+				v6 = -math.asin(v7)
+			end
+			return v1, v5, v6 - v5
+		end
+	end,
+	Vector3ToPixel = function(p1, p2, p3) --[[ Name: Vector3ToPixel | Line: 135 ]]
+		local X = p3.AbsoluteSize.X
+		local Y = p3.AbsoluteSize.Y
+		local v1 = (p2.CoordinateFrame * CFrame.Angles(0, 0, -p2:GetRoll())):inverse() * p1
+		local v3 = 1 / math.tan(math.rad(p2.FieldOfView) / 2)
+		local v4 = X / 2 * (1 + v1.x / -v1.z * v3 * Y / X)
+		local v5 = Y / 2 * (1 + v1.y / -v1.z * v3)
+		if v1.z > 0 then
+			v4 = 20000
+			v5 = 20000
+		end
+		return v4, Y - v5 - 36
+	end,
+	LerpAngle = function(p1, p2, p3) --[[ Name: LerpAngle | Line: 150 ]]
+		return (if p1 - p2 < 180 then p1 + (p2 - p1) * p3 else p1 + (360 + p2 - p1) * p3 - 180) % 360 - 180
+	end
 }
-function module_upvr.LerpTowardsAngle(arg1, arg2, arg3) -- Line 162
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var22
-    if 180 < math.abs(arg2 - arg1) then
-        if arg2 < var22 then
-            var22 += 360
-        else
-        end
-    end
-    return module_upvr.LerpTowards(var22, arg2 + 360, arg3)
+function t.LerpTowardsAngle(p1, p2, p3) --[[ Line: 162 | Upvalues: t (copy) ]]
+	if math.abs(p2 - p1) > 180 then
+		if p2 < p1 then
+			p1 = p1 + 360
+		else
+			p2 = p2 + 360
+		end
+	end
+	return t.LerpTowards(p1, p2, p3)
 end
-function module_upvr.LerpAngle2(arg1, arg2, arg3) -- Line 174
-    arg1 += 180
-    local var23 = arg1
-    arg2 += 180
-    local var24 = arg2
-    difference = math.abs(var24 - var23) -- Setting global
-    if 180 < difference then
-        if var23 < var24 then
-            var24 -= 360
-        else
-            var23 -= 360
-        end
-    end
-    return module_upvr.Wrap(module_upvr.Lerp(var23 - 180, var24 - 180, arg3), -180, 180)
+function t.LerpAngle2(p1, p2, p3) --[[ Line: 174 | Upvalues: t (copy) ]]
+	local sum = p1 + 180
+	local sum_2 = p2 + 180
+	difference = math.abs(sum_2 - sum)
+	if difference > 180 then
+		if sum < sum_2 then
+			sum_2 = sum_2 - 360
+		else
+			sum = sum - 360
+		end
+	end
+	return t.Wrap(t.Lerp(sum - 180, sum_2 - 180, p3), -180, 180)
 end
-function module_upvr.AngleDistance(arg1, arg2) -- Line 194
-    arg1 = math.deg(arg1)
-    local var25 = arg1
-    arg2 = math.deg(arg2)
-    local var26 = arg2
-    difference = math.abs(var26 - var25) -- Setting global
-    if 180 < difference then
-        if var26 < var25 then
-            var26 += 360
-        else
-            var25 += 360
-        end
-    end
-    return math.rad(var25 - var26)
+function t.AngleDistance(p1, p2) --[[ Line: 194 ]]
+	local v1 = math.deg(p1)
+	local v2 = math.deg(p2)
+	difference = math.abs(v2 - v1)
+	local v3, v4
+	if difference > 180 then
+		if v2 < v1 then
+			v3 = v1
+			v4 = v2 + 360
+		else
+			v3 = v1 + 360
+			v4 = v2
+		end
+	else
+		v3 = v1
+		v4 = v2
+	end
+	return math.rad(v3 - v4)
 end
-function module_upvr.InterpolateCFrame(arg1, arg2, arg3) -- Line 211
-    local var27
-    local function decompInlinedCondition_3() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var27 = arg1
-        return var27
-    end
-    local function decompInlinedCondition_4() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var27 = arg2
-        return var27
-    end
-    if arg3 >= 0.001 or not decompInlinedCondition_3() or 0.999 >= arg3 or not decompInlinedCondition_4() then
-        var27 = arg1:lerp(arg2, arg3)
-    end
-    return var27
+function t.InterpolateCFrame(p1, p2, p3) --[[ Line: 211 ]]
+	return if p3 < 0.001 and p1 then p1 elseif p3 > 0.999 and p2 then p2 else p1:lerp(p2, p3)
 end
-return module_upvr
+return t

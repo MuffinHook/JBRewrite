@@ -1,71 +1,60 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local tbl_upvr = {}
-tbl_upvr.__index = tbl_upvr
-local RunService_upvr = game:GetService("RunService")
-function tbl_upvr.new(arg1, arg2) -- Line 10
-    local setmetatable_result1_upvr = setmetatable({}, tbl_upvr)
-    local tick_result1_upvr = tick()
-    setmetatable_result1_upvr.Event = RunService_upvr.Heartbeat:Connect(function(arg1_2) -- Line 13, Named "Heartbeat"
-        local var6 = tick() - tick_result1_upvr
-        if 1 <= var6 then
-            var6 = 1
-            setmetatable_result1_upvr.Event:Disconnect()
-            setmetatable_result1_upvr.Done = true
-        end
-        arg2(var6, arg1_2)
-    end)
-    setmetatable_result1_upvr.Done = false
-    return setmetatable_result1_upvr
+local NetSync = require(ReplicatedStorage.Module.NetSync)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local RunService = game:GetService("RunService")
+local t = {}
+t.__index = t
+function t.new(p1, p2) --[[ Line: 10 | Upvalues: t (copy), RunService (copy) ]]
+	local v2 = setmetatable({}, t)
+	local v3 = tick()
+	local function Heartbeat(p1) --[[ Line: 13 | Upvalues: v3 (copy), v2 (copy), p2 (copy) ]]
+		local v1 = tick() - v3
+		if v1 >= 1 then
+			v2.Event:Disconnect()
+			v2.Done = true
+			v1 = 1
+		end
+		p2(v1, p1)
+	end
+	v2.Event = RunService.Heartbeat:Connect(Heartbeat)
+	v2.Done = false
+	return v2
 end
-function tbl_upvr.Destroy(arg1) -- Line 27
-    arg1.Event:Disconnect()
-    arg1.Event = nil
-    arg1.Done = true
+function t.Destroy(p1) --[[ Line: 27 ]]
+	p1.Event:Disconnect()
+	p1.Event = nil
+	p1.Done = true
 end
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local NetSync_upvr = require(ReplicatedStorage.Module.NetSync)
 return {
-    Init = function(arg1) -- Line 33, Named "Init"
-        local var9_upvw
-        local function Update(arg1_3) -- Line 59
-            -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-            if not arg1_3.Tagged then
-                return false
-            end
-            if arg1_3.Type ~= "TrackSwitch" then
-                return false
-            end
-            local var10
-            if var9_upvw and not var9_upvw.Done then
-                var9_upvw:Destroy()
-            end
-            local Inst = arg1_3.Inst
-            local Rail = Inst.Parent.Parent.Rail
-            if arg1_3.Flipped then
-                var10 = 0
-            else
-                var10 = 1
-            end
-            if not Rail:FindFirstChild("Invert") or not (1 - var10) then
-            end
-            var10 = var10
-            Rail.Transparency = var10
-            local Parent_upvr = Inst.Parent
-            Parent_upvr.PrimaryPart = Parent_upvr.Root
-            local Root_upvr = Parent_upvr.Parent.Model.Root
-            var9_upvw = tbl_upvr.new(0.5, function(arg1_4, arg2) -- Line 81
-                local Rot = arg1_3.Rot
-                if arg1_3.Flipped then
-                    Rot = -0.9424777960769379
-                else
-                    Rot = 0
-                end
-                arg1_3.Rot = Rot * arg1_4 + (Rot or 0) * (1 - arg1_4)
-                Parent_upvr:SetPrimaryPartCFrame(Root_upvr.CFrame * CFrame.Angles(0, 0, arg1_3.Rot))
-            end)
-            Audio_upvr.ObjectLocal(Inst, 2803301098)
-        end
-        NetSync_upvr.Signals.InstAddedSignal:Connect(Update)
-        NetSync_upvr.Signals.UpdatedSignal:Connect(Update)
-    end;
+	Init = function(p1) --[[ Name: Init | Line: 33 | Upvalues: t (copy), Audio (copy), NetSync (copy) ]]
+		local _ = p1.Event
+		local em = p1.em
+		local v1 = nil
+		local function Update(p1) --[[ Line: 59 | Upvalues: v1 (ref), t (ref), Audio (ref) ]]
+			if not p1.Tagged then
+				return false
+			end
+			if p1.Type ~= "TrackSwitch" then
+				return false
+			end
+			if v1 and not v1.Done then
+				v1:Destroy()
+			end
+			local Inst = p1.Inst
+			local Rail = Inst.Parent.Parent.Rail
+			local Invert = Rail:FindFirstChild("Invert")
+			local v12 = if p1.Flipped then 0 else 1
+			Rail.Transparency = Invert and 1 - v12 or v12
+			local v3 = Inst.Parent
+			v3.PrimaryPart = v3.Root
+			local Root = v3.Parent.Model.Root
+			v1 = t.new(0.5, function(p12, p2) --[[ Line: 81 | Upvalues: p1 (copy), v3 (copy), Root (copy) ]]
+				p1.Rot = if p1.Flipped then -0.9424777960769379 else 0 * p12 + (p1.Rot or 0) * (1 - p12)
+				v3:SetPrimaryPartCFrame(Root.CFrame * CFrame.Angles(0, 0, p1.Rot))
+			end)
+			Audio.ObjectLocal(Inst, 2803301098)
+		end
+		NetSync.Signals.InstAddedSignal:Connect(Update)
+		NetSync.Signals.UpdatedSignal:Connect(Update)
+	end
 }

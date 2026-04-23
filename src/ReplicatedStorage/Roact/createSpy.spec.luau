@@ -1,110 +1,69 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
 return function() --[[ Line: 1 ]]
-    local v0 = require(script.Parent.createSpy);
-    describe("createSpy", function() --[[ Line: 4 ]]
-        -- upvalues: v0 (copy)
-        it("should create spies", function() --[[ Line: 5 ]]
-            -- upvalues: v0 (ref)
-            local v1 = v0(function() --[[ Line: 6 ]]
-
-            end);
-            expect(v1).to.be.ok();
-        end);
-        it("should throw if spies are indexed by an invalid key", function() --[[ Line: 11 ]]
-            -- upvalues: v0 (ref)
-            local v2 = v0(function() --[[ Line: 12 ]]
-
-            end);
-            expect(function() --[[ Line: 14 ]]
-                -- upvalues: v2 (copy)
-                return v2.test;
-            end).to.throw();
-        end);
-    end);
-    describe("value", function() --[[ Line: 20 ]]
-        -- upvalues: v0 (copy)
-        it("should increment callCount when called", function() --[[ Line: 21 ]]
-            -- upvalues: v0 (ref)
-            local v3 = v0(function() --[[ Line: 22 ]]
-
-            end);
-            v3.value();
-            expect(v3.callCount).to.equal(1);
-        end);
-        it("should store all values passed", function() --[[ Line: 28 ]]
-            -- upvalues: v0 (ref)
-            local v4 = v0(function() --[[ Line: 29 ]]
-
-            end);
-            v4.value(1, true, "3");
-            expect(v4.valuesLength).to.equal(3);
-            expect(v4.values[1]).to.equal(1);
-            expect(v4.values[2]).to.equal(true);
-            expect(v4.values[3]).to.equal("3");
-        end);
-        it("should return the value of the inner function", function() --[[ Line: 38 ]]
-            -- upvalues: v0 (ref)
-            local v5 = v0(function() --[[ Line: 39 ]]
-                return true;
-            end);
-            expect(v5.value()).to.equal(true);
-        end);
-    end);
-    describe("assertCalledWith", function() --[[ Line: 47 ]]
-        -- upvalues: v0 (copy)
-        it("should throw if the number of values differs", function() --[[ Line: 48 ]]
-            -- upvalues: v0 (ref)
-            local v6 = v0(function() --[[ Line: 49 ]]
-
-            end);
-            v6.value(1, 2);
-            expect(function() --[[ Line: 52 ]]
-                -- upvalues: v6 (copy)
-                v6:assertCalledWith(1);
-            end).to.throw();
-        end);
-        it("should throw if any value differs", function() --[[ Line: 57 ]]
-            -- upvalues: v0 (ref)
-            local v7 = v0(function() --[[ Line: 58 ]]
-
-            end);
-            v7.value(1, 2);
-            expect(function() --[[ Line: 61 ]]
-                -- upvalues: v7 (copy)
-                v7:assertCalledWith(1, 3);
-            end).to.throw();
-            expect(function() --[[ Line: 65 ]]
-                -- upvalues: v7 (copy)
-                v7:assertCalledWith(2, 3);
-            end).to.throw();
-        end);
-    end);
-    describe("captureValues", function() --[[ Line: 71 ]]
-        -- upvalues: v0 (copy)
-        it("should throw if the number of values differs", function() --[[ Line: 72 ]]
-            -- upvalues: v0 (ref)
-            local v8 = v0(function() --[[ Line: 73 ]]
-
-            end);
-            v8.value(1, 2);
-            expect(function() --[[ Line: 76 ]]
-                -- upvalues: v8 (copy)
-                v8:captureValues("a");
-            end).to.throw();
-        end);
-        it("should capture all values in a table", function() --[[ Line: 81 ]]
-            -- upvalues: v0 (ref)
-            local v9 = v0(function() --[[ Line: 82 ]]
-
-            end);
-            v9.value(1, 2);
-            local v10 = v9:captureValues("a", "b");
-            expect(v10.a).to.equal(1);
-            expect(v10.b).to.equal(2);
-        end);
-    end);
-end;
+	local createSpy = require(script.Parent.createSpy)
+	describe("createSpy", function() --[[ Line: 4 | Upvalues: createSpy (copy) ]]
+		it("should create spies", function() --[[ Line: 5 | Upvalues: createSpy (ref) ]]
+			expect((createSpy(function() --[[ Line: 6 ]] end))).to.be.ok()
+		end)
+		it("should throw if spies are indexed by an invalid key", function() --[[ Line: 11 | Upvalues: createSpy (ref) ]]
+			local v1 = createSpy(function() --[[ Line: 12 ]] end)
+			expect(function() --[[ Line: 14 | Upvalues: v1 (copy) ]]
+				return v1.test
+			end).to.throw()
+		end)
+	end)
+	describe("value", function() --[[ Line: 20 | Upvalues: createSpy (copy) ]]
+		it("should increment callCount when called", function() --[[ Line: 21 | Upvalues: createSpy (ref) ]]
+			local v1 = createSpy(function() --[[ Line: 22 ]] end)
+			v1.value()
+			expect(v1.callCount).to.equal(1)
+		end)
+		it("should store all values passed", function() --[[ Line: 28 | Upvalues: createSpy (ref) ]]
+			local v1 = createSpy(function() --[[ Line: 29 ]] end)
+			v1.value(1, true, "3")
+			expect(v1.valuesLength).to.equal(3)
+			expect(v1.values[1]).to.equal(1)
+			expect(v1.values[2]).to.equal(true)
+			expect(v1.values[3]).to.equal("3")
+		end)
+		it("should return the value of the inner function", function() --[[ Line: 38 | Upvalues: createSpy (ref) ]]
+			expect(createSpy(function() --[[ Line: 39 ]]
+				return true
+			end).value()).to.equal(true)
+		end)
+	end)
+	describe("assertCalledWith", function() --[[ Line: 47 | Upvalues: createSpy (copy) ]]
+		it("should throw if the number of values differs", function() --[[ Line: 48 | Upvalues: createSpy (ref) ]]
+			local v1 = createSpy(function() --[[ Line: 49 ]] end)
+			v1.value(1, 2)
+			expect(function() --[[ Line: 52 | Upvalues: v1 (copy) ]]
+				v1:assertCalledWith(1)
+			end).to.throw()
+		end)
+		it("should throw if any value differs", function() --[[ Line: 57 | Upvalues: createSpy (ref) ]]
+			local v1 = createSpy(function() --[[ Line: 58 ]] end)
+			v1.value(1, 2)
+			expect(function() --[[ Line: 61 | Upvalues: v1 (copy) ]]
+				v1:assertCalledWith(1, 3)
+			end).to.throw()
+			expect(function() --[[ Line: 65 | Upvalues: v1 (copy) ]]
+				v1:assertCalledWith(2, 3)
+			end).to.throw()
+		end)
+	end)
+	describe("captureValues", function() --[[ Line: 71 | Upvalues: createSpy (copy) ]]
+		it("should throw if the number of values differs", function() --[[ Line: 72 | Upvalues: createSpy (ref) ]]
+			local v1 = createSpy(function() --[[ Line: 73 ]] end)
+			v1.value(1, 2)
+			expect(function() --[[ Line: 76 | Upvalues: v1 (copy) ]]
+				v1:captureValues("a")
+			end).to.throw()
+		end)
+		it("should capture all values in a table", function() --[[ Line: 81 | Upvalues: createSpy (ref) ]]
+			local v1 = createSpy(function() --[[ Line: 82 ]] end)
+			v1.value(1, 2)
+			local v2 = v1:captureValues("a", "b")
+			expect(v2.a).to.equal(1)
+			expect(v2.b).to.equal(2)
+		end)
+	end)
+end

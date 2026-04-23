@@ -1,45 +1,47 @@
-local CollectionService_upvr = game:GetService("CollectionService")
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local module = {}
-local function _(arg1) -- Line 7, Named "getRobberyMarkerForName"
-    for _, v in CollectionService_upvr:GetTagged("RobberyMarker"), nil do
-        if v.Name == arg1 then
-            return v
-        end
-    end
-    return nil
+local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
+local MinimapService = require(script.Parent.MinimapService)
+local t = {}
+local function getRobberyMarkerForName(p1) --[[ Line: 7 | Upvalues: CollectionService (copy) ]]
+	for v1, v2 in CollectionService:GetTagged("RobberyMarker") do
+		if v2.Name == p1 then
+			return v2
+		end
+	end
+	return nil
 end
-local MinimapService_upvr = require(script.Parent.MinimapService)
-local Dictionary_upvr = require(ReplicatedStorage_upvr.EzUi.Dictionary)
-function module.init() -- Line 16
-    task.spawn(function() -- Line 17
-        local var10_upvw = 0
-        ReplicatedStorage_upvr.App:WaitForChild("SetRobberyWaypointRemote").OnClientEvent:Connect(function(arg1) -- Line 20
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            local var11 = var10_upvw + 1
-            var10_upvw = var11
-            local var12
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            local var13
-            if var13 then
-                MinimapService_upvr.addWaypoint(Dictionary_upvr.merge(arg1, {
-                    part = var13;
-                }))
-            else
-                warn("No part found for marker name", arg1.markerName)
-                task.wait(1)
-            end
-            if nil then
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-            if var10_upvw ~= var11 then
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        end)
-    end)
+function t.init() --[[ Line: 16 | Upvalues: ReplicatedStorage (copy), CollectionService (copy), MinimapService (copy), Dictionary (copy) ]]
+	task.spawn(function() --[[ Line: 17 | Upvalues: ReplicatedStorage (ref), CollectionService (ref), MinimapService (ref), Dictionary (ref) ]]
+		local SetRobberyWaypointRemote = ReplicatedStorage.App:WaitForChild("SetRobberyWaypointRemote")
+		local v1 = 0
+		SetRobberyWaypointRemote.OnClientEvent:Connect(function(p1) --[[ Line: 20 | Upvalues: v1 (ref), CollectionService (ref), MinimapService (ref), Dictionary (ref) ]]
+			local v12 = v1 + 1
+			v1 = v12
+			while true do
+				local markerName = p1.markerName
+				local v2 = nil
+				local v3 = false
+				for v4, v5 in CollectionService:GetTagged("RobberyMarker") do
+					if v5.Name == markerName then
+						v2 = v5
+						break
+					end
+				end
+				if v2 then
+					MinimapService.addWaypoint(Dictionary.merge(p1, {
+						part = v2
+					}))
+					v3 = true
+				else
+					warn("No part found for marker name", p1.markerName)
+					task.wait(1)
+				end
+				if v3 or v12 ~= v12 then
+					return
+				end
+			end
+		end)
+	end)
 end
-return module
+return t

@@ -1,12 +1,9 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer(require(script.Parent.EnumSort).Popular, {
-    setSort = function(arg1, arg2) -- Line 7, Named "setSort"
-        local var2
-        if arg2.id == nil then
-            var2 = false
-        else
-            var2 = true
-        end
-        assert(var2, "missing id")
-        return arg2.id
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Rodux = require(ReplicatedStorage.Rodux)
+local EnumSort = require(script.Parent.EnumSort)
+return Rodux.createReducer(EnumSort.Popular, {
+	setSort = function(p1, p2) --[[ Name: setSort | Line: 7 ]]
+		assert(p2.id ~= nil, "missing id")
+		return p2.id
+	end
 })

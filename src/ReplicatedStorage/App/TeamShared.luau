@@ -1,51 +1,48 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local RunUtils_upvr = require(ReplicatedStorage_upvr.App.RunUtils)
-local module_upvr = {}
-local Promise_upvr = require(ReplicatedStorage_upvr.Std.Promise)
-local PrivateServerUtils_upvr = require(ReplicatedStorage_upvr.PrivateServer.PrivateServerUtils)
-function module_upvr.promiseIsTeamSwitchingEnabled() -- Line 9
-    if not RunUtils_upvr.isMainWorld() then
-        return Promise_upvr.resolve(false)
-    end
-    return PrivateServerUtils_upvr.promiseGetIsBattleServer():andThen(function(arg1) -- Line 13
-        return not arg1
-    end)
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Promise = require(ReplicatedStorage.Std.Promise)
+local RunUtils = require(ReplicatedStorage.App.RunUtils)
+local PrivateServerUtils = require(ReplicatedStorage.PrivateServer.PrivateServerUtils)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+local t = {
+	promiseIsTeamSwitchingEnabled = function() --[[ Name: promiseIsTeamSwitchingEnabled | Line: 9 | Upvalues: RunUtils (copy), Promise (copy), PrivateServerUtils (copy) ]]
+		if RunUtils.isMainWorld() then
+			return PrivateServerUtils.promiseGetIsBattleServer():andThen(function(p1) --[[ Line: 13 ]]
+				return not p1
+			end)
+		else
+			return Promise.resolve(false)
+		end
+	end
+}
+function t.isTeamSwitchingEnabled() --[[ Line: 18 | Upvalues: t (copy) ]]
+	local v1, v2 = t.promiseIsTeamSwitchingEnabled():await()
+	return v1 and v2
 end
-function module_upvr.isTeamSwitchingEnabled() -- Line 18
-    local any_await_result1, any_await_result2 = module_upvr.promiseIsTeamSwitchingEnabled():await()
-    return any_await_result1 and any_await_result2
+function t.isTeamFull(p1) --[[ Line: 25 | Upvalues: Players (copy), ReplicatedStorage (copy), RunUtils (copy), Settings (copy) ]]
+	local v1 = Players:GetPlayers()
+	local count = 0
+	local count_2 = 0
+	for v2, v3 in v1 do
+		local ChoosingTeam = v3:FindFirstChild("ChoosingTeam")
+		if ChoosingTeam and not (ChoosingTeam and ChoosingTeam.Value) then
+			local v4 = v3.Team and v3.Team.Name
+			if v4 == "Police" then
+				count_2 = count_2 + 1
+			elseif v4 == "Prisoner" or v4 == "Criminal" then
+				count = count + 1
+			end
+		end
+	end
+	local VipOwnerId = ReplicatedStorage:FindFirstChild("VipOwnerId")
+	if RunUtils.isStudio() or (VipOwnerId or p1 ~= Settings.EnumTeam.Prisoner and p1 ~= Settings.EnumTeam.Criminal) then
+		return false
+	else
+		if math.max(math.ceil(#v1 * 0.8), 1) <= count then
+			return true
+		else
+			return false
+		end
+	end
 end
-local Players_upvr = game:GetService("Players")
-local Settings_upvr = require(ReplicatedStorage_upvr.Resource.Settings)
-function module_upvr.isTeamFull(arg1) -- Line 25
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local players = Players_upvr:GetPlayers()
-    local var20
-    for i, v in players do
-        local ChoosingTeam = v:FindFirstChild("ChoosingTeam")
-        local var22
-        if ChoosingTeam and (not ChoosingTeam or not ChoosingTeam.Value) then
-            local Team = v.Team
-            if Team then
-            end
-            if v.Team.Name == "Police" then
-            else
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                if v.Team.Name == "Prisoner" or v.Team.Name == "Criminal" then
-                    var20 += 1
-                end
-            end
-        end
-    end
-    if not RunUtils_upvr.isStudio() and not ReplicatedStorage_upvr:FindFirstChild("VipOwnerId") and (arg1 == Settings_upvr.EnumTeam.Prisoner or arg1 == Settings_upvr.EnumTeam.Criminal) then
-        v = #players * 0.8
-        i = math.ceil(v)
-        v = 1
-        if math.max(i, v) <= var20 then
-            i = true
-            return i
-        end
-    end
-    return false
-end
-return module_upvr
+return t

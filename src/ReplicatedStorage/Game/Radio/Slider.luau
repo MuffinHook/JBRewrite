@@ -1,100 +1,91 @@
-local UserInputService_upvr = game:GetService("UserInputService")
-local RunService_upvr = game:GetService("RunService")
+local GuiService = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local Spring_upvr = require(ReplicatedStorage.Std.Spring)
-local Signal_upvr = require(ReplicatedStorage.Std.Signal)
-function module_upvr.new(arg1) -- Line 11
-    assert(arg1)
-    local module = {}
-    setmetatable(module, module_upvr)
-    module.Gui = arg1
-    module.Maid = Maid_upvr.new()
-    module.Value = 0
-    module.SpringSlider = Spring_upvr.new(module.Value, 0, 0.8, 50)
-    module.OnValueChanged = Signal_upvr.new()
-    module:Setup()
-    module:UpdatePosition(module.Value)
-    return module
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Spring = require(ReplicatedStorage.Std.Spring)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 11 | Upvalues: t (copy), Maid (copy), Spring (copy), Signal (copy) ]]
+	assert(p1)
+	local t2 = {}
+	setmetatable(t2, t)
+	t2.Gui = p1
+	t2.Maid = Maid.new()
+	t2.Value = 0
+	t2.SpringSlider = Spring.new(t2.Value, 0, 0.8, 50)
+	t2.OnValueChanged = Signal.new()
+	t2:Setup()
+	t2:UpdatePosition(t2.Value)
+	return t2
 end
-function module_upvr.Setup(arg1) -- Line 27
-    local function StartDragger_upvr(arg1_2) -- Line 29, Named "StartDragger"
-        arg1.Maid.DragHeartbeat = RunService_upvr.Heartbeat:Connect(function() -- Line 30
-            arg1.Value = arg1:GetMouseValue()
-            if arg1.Value ~= arg1.Value then
-                arg1.OnValueChanged:Fire(arg1.Value)
-                if arg1.Maid.PositionHeartbeat == nil then
-                    arg1:StartUpdateThread()
-                end
-            end
-        end)
-        if not arg1_2 then
-            arg1.Maid.DragEnd = UserInputService_upvr.InputEnded:Connect(function(arg1_3) -- Line 41
-                if arg1_3.UserInputType == Enum.UserInputType.MouseButton1 or arg1_3.UserInputType == Enum.UserInputType.Touch then
-                    arg1.Maid.DragHeartbeat = nil
-                    arg1.Maid.DragEnd = nil
-                end
-            end)
-        else
-            arg1.Maid.DragEnd = arg1_2:GetPropertyChangedSignal("UserInputState"):Connect(function() -- Line 51
-                if arg1_2.UserInputState == Enum.UserInputState.End then
-                    arg1.Maid.DragHeartbeat = nil
-                    arg1.Maid.DragEnd = nil
-                end
-            end)
-        end
-    end
-    arg1.Maid:GiveTask(arg1.Gui.ContainerKnob.Knob.InputBegan:Connect(function(arg1_4, arg2) -- Line 62
-        if arg2 then
-        elseif arg1_4.UserInputType == Enum.UserInputType.MouseButton1 or arg1_4.UserInputType == Enum.UserInputType.Touch then
-            arg1.Value = arg1:GetMouseValue()
-            arg1.OnValueChanged:Fire(arg1.Value)
-            if arg1.Maid.PositionHeartbeat == nil then
-                arg1:StartUpdateThread()
-            end
-            StartDragger_upvr(arg1_4)
-        end
-    end))
+function t.Setup(p1) --[[ Line: 27 | Upvalues: RunService (copy), UserInputService (copy) ]]
+	local function StartDragger(p12) --[[ Line: 29 | Upvalues: p1 (copy), RunService (ref), UserInputService (ref) ]]
+		p1.Maid.DragHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 30 | Upvalues: p1 (ref) ]]
+			local v1 = p1.Value
+			p1.Value = p1:GetMouseValue()
+			if v1 ~= p1.Value then
+				p1.OnValueChanged:Fire(p1.Value)
+				if p1.Maid.PositionHeartbeat == nil then
+					p1:StartUpdateThread()
+				end
+			end
+		end)
+		if p12 then
+			p1.Maid.DragEnd = p12:GetPropertyChangedSignal("UserInputState"):Connect(function() --[[ Line: 51 | Upvalues: p12 (copy), p1 (ref) ]]
+				if p12.UserInputState == Enum.UserInputState.End then
+					p1.Maid.DragHeartbeat = nil
+					p1.Maid.DragEnd = nil
+				end
+			end)
+		else
+			p1.Maid.DragEnd = UserInputService.InputEnded:Connect(function(p12) --[[ Line: 41 | Upvalues: p1 (ref) ]]
+				if p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch then
+					p1.Maid.DragHeartbeat = nil
+					p1.Maid.DragEnd = nil
+				end
+			end)
+		end
+	end
+	p1.Maid:GiveTask(p1.Gui.ContainerKnob.Knob.InputBegan:Connect(function(p12, p2) --[[ Line: 62 | Upvalues: p1 (copy), StartDragger (copy) ]]
+		if not p2 and (p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch) then
+			p1.Value = p1:GetMouseValue()
+			p1.OnValueChanged:Fire(p1.Value)
+			if p1.Maid.PositionHeartbeat == nil then
+				p1:StartUpdateThread()
+			end
+			StartDragger(p12)
+		end
+	end))
 end
-local GuiService_upvr = game:GetService("GuiService")
-function module_upvr.GetMouseValue(arg1) -- Line 76
-    local ContainerKnob = arg1.Gui.ContainerKnob
-    return math.clamp(math.floor(((UserInputService_upvr:GetMouseLocation() - ContainerKnob.AbsolutePosition - GuiService_upvr:GetGuiInset()) / ContainerKnob.AbsoluteSize).X * 24 + 0.5) / 24, 0, 1)
+function t.GetMouseValue(p1) --[[ Line: 76 | Upvalues: UserInputService (copy), GuiService (copy) ]]
+	local ContainerKnob = p1.Gui.ContainerKnob
+	return math.clamp(math.floor(((UserInputService:GetMouseLocation() - ContainerKnob.AbsolutePosition - GuiService:GetGuiInset()) / ContainerKnob.AbsoluteSize).X * 24 + 0.5) / 24, 0, 1)
 end
-function module_upvr.SetValue(arg1, arg2) -- Line 86
-    arg1.Value = arg2
-    arg1.SpringSlider.p = arg2
-    arg1.SpringSlider:SetTarget(arg2)
-    arg1:UpdatePosition(arg2)
-    arg1.OnValueChanged:Fire(arg2)
+function t.SetValue(p1, p2) --[[ Line: 86 ]]
+	p1.Value = p2
+	p1.SpringSlider.p = p2
+	p1.SpringSlider:SetTarget(p2)
+	p1:UpdatePosition(p2)
+	p1.OnValueChanged:Fire(p2)
 end
-function module_upvr.StartUpdateThread(arg1) -- Line 93
-    local var15
-    if arg1.Maid.PositionHeartbeat ~= nil then
-        var15 = false
-    else
-        var15 = true
-    end
-    assert(var15)
-    var15 = RunService_upvr
-    var15 = var15.Heartbeat
-    var15 = var15:Connect(function() -- Line 95
-        local any_SetTarget_result1, any_SetTarget_result2 = arg1.SpringSlider:SetTarget(arg1.Value)
-        arg1:UpdatePosition(any_SetTarget_result1)
-        if math.abs(arg1.Value - any_SetTarget_result1) < 0.001 and math.abs(any_SetTarget_result2) < 0.001 then
-            arg1.Maid.PositionHeartbeat = nil
-        end
-    end)
-    arg1.Maid.PositionHeartbeat = var15
+function t.StartUpdateThread(p1) --[[ Line: 93 | Upvalues: RunService (copy) ]]
+	assert(p1.Maid.PositionHeartbeat == nil)
+	p1.Maid.PositionHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 95 | Upvalues: p1 (copy) ]]
+		local v1, v2 = p1.SpringSlider:SetTarget(p1.Value)
+		p1:UpdatePosition(v1)
+		if math.abs(p1.Value - v1) < 0.001 and math.abs(v2) < 0.001 then
+			p1.Maid.PositionHeartbeat = nil
+		end
+	end)
 end
-function module_upvr.UpdatePosition(arg1, arg2) -- Line 103
-    arg1.Gui.ContainerKnob.Knob.Position = UDim2.new(arg2, 0, 0.5, 0)
+function t.UpdatePosition(p1, p2) --[[ Line: 103 ]]
+	p1.Gui.ContainerKnob.Knob.Position = UDim2.new(p2, 0, 0.5, 0)
 end
-function module_upvr.Destroy(arg1) -- Line 107
-    arg1.Gui = nil
-    arg1.Maid:Destroy()
-    arg1.Maid = nil
+function t.Destroy(p1) --[[ Line: 107 ]]
+	p1.Gui = nil
+	p1.Maid:Destroy()
+	p1.Maid = nil
 end
-return module_upvr
+return t

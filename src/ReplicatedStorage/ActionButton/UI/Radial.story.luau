@@ -1,50 +1,48 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-return function(arg1) -- Line 6
-    local any_extend_result1 = Roact_upvr.Component:extend("App")
-    function any_extend_result1.init(arg1_2) -- Line 9
-        arg1_2:setState({
-            countInner = 1;
-            countOuter = 1;
-        })
-        arg1_2._maid = Maid_upvr.new()
-        arg1_2._maid:GiveTask(Interval_upvr.every(0.1):Connect(function() -- Line 15
-            arg1_2:setState({
-                countOuter = arg1_2.state.countOuter % 21 + 1;
-            })
-        end))
-        arg1_2._maid:GiveTask(Interval_upvr.every(1):Connect(function() -- Line 20
-            arg1_2:setState({
-                countInner = arg1_2.state.countInner % 2 + 1;
-            })
-        end))
-    end
-    local Radial_upvr = require(script.Parent.Radial)
-    function any_extend_result1.render(arg1_3) -- Line 26
-        ({})[1] = {
-            image = "rbxassetid://7858404863";
-            onClick = function(arg1_4) -- Line 31, Named "onClick"
-                print("clicked jump")
-            end;
-        }
-        ;({})[1] = {
-            image = "rbxassetid://4939759147";
-            title = "Crawl";
-        }
-        return Roact_upvr.createElement(Radial_upvr, {
-            position = UDim2.new(0.25, 0, 0.25, 0);
-            size = UDim2.new(0.5, 0, 0.5, 0);
-            countInner = arg1_3.state.countInner;
-            countOuter = arg1_3.state.countOuter;
-        })
-    end
-    function any_extend_result1.willUnmount(arg1_5) -- Line 49
-        arg1_5._maid:Destroy()
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(any_extend_result1), arg1)
-    return function() -- Line 54
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local Roact = require(ReplicatedStorage.Roact)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Interval = require(ReplicatedStorage.Std.Interval)
+return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), Maid (copy), Interval (copy) ]]
+	local v1 = Roact.Component:extend("App")
+	local Radial = require(script.Parent.Radial)
+	function v1.init(p1) --[[ Line: 9 | Upvalues: Maid (ref), Interval (ref) ]]
+		p1:setState({
+			countInner = 1,
+			countOuter = 1
+		})
+		p1._maid = Maid.new()
+		p1._maid:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 15 | Upvalues: p1 (copy) ]]
+			p1:setState({
+				countOuter = p1.state.countOuter % 21 + 1
+			})
+		end))
+		p1._maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 20 | Upvalues: p1 (copy) ]]
+			p1:setState({
+				countInner = p1.state.countInner % 2 + 1
+			})
+		end))
+	end
+	function v1.render(p1) --[[ Line: 26 | Upvalues: Roact (ref), Radial (copy) ]]
+		local _ = {
+			{
+				image = "rbxassetid://7858404863",
+				onClick = function(p1) --[[ Name: onClick | Line: 31 ]]
+					print("clicked jump")
+				end
+			}
+		}
+		return Roact.createElement(Radial, {
+			position = UDim2.new(0.25, 0, 0.25, 0),
+			size = UDim2.new(0.5, 0, 0.5, 0),
+			countInner = p1.state.countInner,
+			countOuter = p1.state.countOuter
+		})
+	end
+	function v1.willUnmount(p1) --[[ Line: 49 ]]
+		p1._maid:Destroy()
+	end
+	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	return function() --[[ Line: 54 | Upvalues: Roact (ref), v2 (copy) ]]
+		Roact.unmount(v2)
+	end
 end

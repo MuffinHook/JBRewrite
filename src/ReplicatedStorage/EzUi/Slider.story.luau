@@ -1,19 +1,20 @@
-local Roact_upvr = require(script:FindFirstAncestor("EzUi").Parent.Roact)
-return function(arg1) -- Line 5
-    local any_createBinding_result1, any_createBinding_result2 = Roact_upvr.createBinding(0)
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(require(script.Parent.Slider), {
-        size = UDim2.new(0.5, 0, 0, 30);
-        position = UDim2.new(0.25, 0, 0.5, 0);
-        min = 0;
-        max = 50;
-        step = 1;
-        value = any_createBinding_result1;
-        updateValue = any_createBinding_result2;
-        text = any_createBinding_result1:map(function(arg1_2) -- Line 20
-            return string.format("%d", (1 - arg1_2) * 0 + arg1_2 * 50);
-        end);
-    }), arg1)
-    return function() -- Line 26
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
+return function(p1) --[[ Line: 5 | Upvalues: Roact (copy) ]]
+	local v1, v2 = Roact.createBinding(0)
+	local Slider = require(script.Parent.Slider)
+	local v3 = Roact.mount(Roact.createElement(Slider, {
+		size = UDim2.new(0.5, 0, 0, 30),
+		position = UDim2.new(0.25, 0, 0.5, 0),
+		min = 0,
+		max = 50,
+		step = 1,
+		value = v1,
+		updateValue = v2,
+		text = v1:map(function(p1) --[[ Line: 20 ]]
+			return ("%d"):format((1 - p1) * 0 + p1 * 50)
+		end)
+	}), p1)
+	return function() --[[ Line: 26 | Upvalues: Roact (ref), v3 (copy) ]]
+		Roact.unmount(v3)
+	end
 end

@@ -1,50 +1,37 @@
-local Expectation_upvr = require(script.Parent.Expectation)
-local function _(arg1) -- Line 4, Named "copy"
-    local module = {}
-    for i, v in pairs(arg1) do
-        module[i] = v
-    end
-    return module
+local Expectation = require(script.Parent.Expectation)
+local checkMatcherNameCollisions = Expectation.checkMatcherNameCollisions
+local function copy(p1) --[[ Line: 4 ]]
+	local t = {}
+	for k, v in pairs(p1) do
+		t[k] = v
+	end
+	return t
 end
-local module_3_upvr = {}
-module_3_upvr.__index = module_3_upvr
-function module_3_upvr.new(arg1) -- Line 17
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local module_2 = {}
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    for i_2, v_2 in pairs(arg1._extensions) do
-        ({})[i_2] = v_2
-        local var20
-    end
-    local var21 = var20
-    if not var21 then
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        var21 = {}
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end
-    module_2._extensions = var21
-    do
-        return setmetatable(module_2, module_3_upvr)
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 17 | Upvalues: t (copy) ]]
+	local t2 = {}
+	local v1
+	if p1 then
+		local t3 = {}
+		for k, v in pairs(p1._extensions) do
+			t3[k] = v
+		end
+		v1 = t3 or {}
+	else
+		v1 = {}
+	end
+	t2._extensions = v1
+	return setmetatable(t2, t)
 end
-function module_3_upvr.startExpectationChain(arg1, ...) -- Line 25
-    return Expectation_upvr.new(...):extend(arg1._extensions)
+function t.startExpectationChain(p1, ...) --[[ Line: 25 | Upvalues: Expectation (copy) ]]
+	return Expectation.new(...):extend(p1._extensions)
 end
-local checkMatcherNameCollisions_upvr = Expectation_upvr.checkMatcherNameCollisions
-function module_3_upvr.extend(arg1, arg2) -- Line 29
-    for i_3, v_3 in pairs(arg2) do
-        local var30
-        if arg1._extensions[i_3] ~= nil then
-            var30 = false
-        else
-            var30 = true
-        end
-        assert(var30, string.format("Cannot reassign %q in expect.extend", i_3))
-        var30 = checkMatcherNameCollisions_upvr(i_3)
-        assert(var30, string.format("Cannot overwrite matcher %q; it already exists", i_3))
-        arg1._extensions[i_3] = v_3
-    end
+function t.extend(p1, p2) --[[ Line: 29 | Upvalues: checkMatcherNameCollisions (copy) ]]
+	for k, v in pairs(p2) do
+		assert(p1._extensions[k] == nil, string.format("Cannot reassign %q in expect.extend", k))
+		assert(checkMatcherNameCollisions(k), string.format("Cannot overwrite matcher %q; it already exists", k))
+		p1._extensions[k] = v
+	end
 end
-return module_3_upvr
+return t

@@ -1,72 +1,58 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("TextButton")
-any_extend_result1.defaultProps = {
-    font = Enum.Font.FredokaOne;
-    backgroundColor = Color3.new(1, 1, 1);
-    borderSize = 0;
-    borderColor = Color3.new(0, 0, 0);
-    disabled = false;
-    text = "";
-    cornerRadius = 4;
+local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local v1 = Roact.PureComponent:extend("TextButton")
+v1.defaultProps = {
+	font = Enum.Font.FredokaOne,
+	backgroundColor = Color3.new(255/255, 255/255, 255/255),
+	borderSize = 0,
+	borderColor = Color3.new(0/255, 0/255, 0/255),
+	disabled = false,
+	text = "",
+	cornerRadius = 4
 }
-local createElement_upvr = Roact_upvr.createElement
-local ColorUtils_upvr = require(ReplicatedStorage.Std.ColorUtils)
-function any_extend_result1.render(arg1) -- Line 18
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var7
-    if not var7 then
-        var7 = {}
-    end
-    if arg1.props.aspectRatio then
-        var7.AspectRatio = createElement_upvr("UIAspectRatioConstraint", {
-            AspectRatio = arg1.props.aspectRatio;
-        })
-    end
-    if arg1.props.disabled then
-        local any_brightenBy_result1 = ColorUtils_upvr.brightenBy(arg1.props.backgroundColor, -0.5)
-    else
-    end
-    if arg1.props.text then
-        var7.Text = createElement_upvr("TextLabel", {
-            BackgroundTransparency = 1;
-            Size = UDim2.new(0.9, 0, 0.9, 0);
-            Position = UDim2.new(0.5, 0, 0.5, 0);
-            AnchorPoint = Vector2.new(0.5, 0.5);
-            Text = arg1.props.text;
-            LineHeight = 1;
-            TextScaled = true;
-            TextColor3 = arg1.props.textColor or ColorUtils_upvr.brightenBy(arg1.props.backgroundColor, -0.65);
-            Font = arg1.props.font;
-        })
-    end
-    if arg1.props.cornerRadius then
-        var7.CornerRadius = createElement_upvr("UICorner", {
-            CornerRadius = UDim.new(0, arg1.props.cornerRadius);
-        })
-    end
-    local module = {
-        AnchorPoint = arg1.props.anchorPoint;
-        BorderSizePixel = arg1.props.borderSize;
-        BorderColor3 = arg1.props.borderColor;
-    }
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    module.BackgroundColor3 = arg1.props.backgroundColor
-    module.Text = ""
-    module.Size = arg1.props.size
-    module.TextScaled = true
-    module.Position = arg1.props.position
-    module.LayoutOrder = arg1.props.layoutOrder
-    module.Visible = arg1.props.visible
-    local disabled = arg1.props.disabled
-    module.AutoButtonColor = not disabled
-    if not arg1.props.disabled then
-        disabled = arg1.props
-        disabled = disabled.onClick
-    else
-        disabled = nil
-    end
-    module[Roact_upvr.Event.Activated] = disabled
-    return createElement_upvr("TextButton", module, var7)
+function v1.render(p1) --[[ Line: 18 | Upvalues: Roact (copy), createElement (copy), ColorUtils (copy) ]]
+	local v1 = p1.props[Roact.Children] or {}
+	if p1.props.aspectRatio then
+		v1.AspectRatio = createElement("UIAspectRatioConstraint", {
+			AspectRatio = p1.props.aspectRatio
+		})
+	end
+	local v2 = if p1.props.disabled then ColorUtils.brightenBy(p1.props.backgroundColor, -0.5) else p1.props.backgroundColor
+	local v3 = ColorUtils.brightenBy(v2, -0.65)
+	if p1.props.text then
+		v1.Text = createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0.9, 0, 0.9, 0),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Text = p1.props.text,
+			LineHeight = 1,
+			TextScaled = true,
+			TextColor3 = p1.props.textColor or v3,
+			Font = p1.props.font
+		})
+	end
+	if p1.props.cornerRadius then
+		v1.CornerRadius = createElement("UICorner", {
+			CornerRadius = UDim.new(0, p1.props.cornerRadius)
+		})
+	end
+	local t = {
+		AnchorPoint = p1.props.anchorPoint,
+		BorderSizePixel = p1.props.borderSize,
+		BorderColor3 = p1.props.borderColor,
+		BackgroundColor3 = v2,
+		Text = "",
+		Size = p1.props.size,
+		TextScaled = true,
+		Position = p1.props.position,
+		LayoutOrder = p1.props.layoutOrder,
+		Visible = p1.props.visible,
+		AutoButtonColor = not p1.props.disabled
+	}
+	t[Roact.Event.Activated] = if p1.props.disabled then nil else p1.props.onClick
+	return createElement("TextButton", t, v1)
 end
-return any_extend_result1
+return v1

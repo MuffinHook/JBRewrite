@@ -1,70 +1,70 @@
+local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module = {}
-local BinderUtils_upvr = require(ReplicatedStorage.Std.Binder.BinderUtils)
-local DoorBinder_upvr = require(ReplicatedStorage.Door2.DoorBinder)
-local Region_upvr = require(ReplicatedStorage.Std.Region)
-local RegionUtils_upvr = require(ReplicatedStorage.Std.Region.RegionUtils)
-local DoorUtils_upvr = require(ReplicatedStorage.Door2.DoorUtils)
-local Promise_upvr = require(ReplicatedStorage.Std.Promise)
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-function module.setup(arg1, arg2, arg3) -- Line 15
-    local SOME_upvr_2 = arg1._obj:WaitForChild(arg2.doorName or "FakeDoor")
-    local var14_upvr = arg2.spikesName or "Spikes"
-    local var15_upvr = arg2.referenceName or "Shelving"
-    local spikeSizeMin_upvr = arg2.spikeSizeMin
-    local spikeSizeMax_upvr = arg2.spikeSizeMax
-    local offsetCf_upvr = arg2.offsetCf
-    local var24_upvw
-    var24_upvw = BinderUtils_upvr.promiseBoundClass(DoorBinder_upvr, SOME_upvr_2):tap(function(arg1_2) -- Line 32
-        local SOME_upvr_4 = arg1._obj:FindFirstChild(var14_upvr)
-        local SOME_upvr_3 = arg1._obj:FindFirstChild(var15_upvr)
-        arg1_2:SetUpdateCallback(function(arg1_3, arg2_2) -- Line 35
-            local var22 = spikeSizeMin_upvr * (1 - arg2_2) + spikeSizeMax_upvr * arg2_2
-            SOME_upvr_4.Size = Vector3.new(SOME_upvr_4.Size.X, SOME_upvr_4.Size.Y, var22)
-            SOME_upvr_4.CFrame = SOME_upvr_3.CFrame * offsetCf_upvr * CFrame.new(0, 0, -var22 * 0.5)
-        end)
-    end):andThen(function() -- Line 41
-        var24_upvw = nil
-    end)
-    arg1._maid:GiveTask(function() -- Line 44
-        if var24_upvw then
-            var24_upvw:cancel()
-            var24_upvw = nil
-        end
-    end)
-    local any_new_result1_upvr = Region_upvr.new(RegionUtils_upvr.ConditionPlayer)
-    local SOME_upvr = arg1._obj:FindFirstChild(arg2.regionName or "Region")
-    local tbl_upvr = {}
-    local function _() -- Line 54, Named "updatePrism"
-        tbl_upvr.c = SOME_upvr.CFrame
-        tbl_upvr.s = SOME_upvr.Size
-    end
-    tbl_upvr.c = SOME_upvr.CFrame
-    tbl_upvr.s = SOME_upvr.Size
-    any_new_result1_upvr:AddPrism(tbl_upvr)
-    arg1._maid:GiveTask(any_new_result1_upvr)
-    local damageAmount_upvr = arg2.damageAmount
-    local var31_upvr = arg2.doorCloseDelay or 1
-    local audioId_upvr = arg2.audioId
-    arg1._maid:GiveTask(any_new_result1_upvr.OnObjAdded:Connect(function() -- Line 61
-        if not DoorUtils_upvr.getOpen(SOME_upvr_2) then
-            arg3:FireServer('y'.."qf6znoh":sub(4, 4):reverse():reverse():reverse():reverse():reverse().."".."".."rpjfja":sub(2, 2):reverse().."".."".."qqhohklw84r":sub(4, 7):reverse():reverse():reverse()..""..'3', damageAmount_upvr, "Spikes")
-            DoorUtils_upvr.setOpen(SOME_upvr_2, true)
-            Promise_upvr.delay(var31_upvr):andThen(function() -- Line 66
-                DoorUtils_upvr.setOpen(SOME_upvr_2, false)
-            end)
-            Audio_upvr.ObjectLocal(SOME_upvr_2.PrimaryPart, audioId_upvr, {
-                Volume = 0.5;
-                RollOffMaxDistance = 64;
-            })
-        end
-    end))
-    arg1._maid:GiveTask(Interval_upvr.every(0.2):Connect(function() -- Line 72
-        tbl_upvr.c = SOME_upvr.CFrame
-        tbl_upvr.s = SOME_upvr.Size
-        any_new_result1_upvr:Update({LocalPlayer_upvr})
-    end))
-end
-return module
+local Region = require(ReplicatedStorage.Std.Region)
+local Promise = require(ReplicatedStorage.Std.Promise)
+local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)
+local BinderUtils = require(ReplicatedStorage.Std.Binder.BinderUtils)
+local DoorBinder = require(ReplicatedStorage.Door2.DoorBinder)
+local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Interval = require(ReplicatedStorage.Std.Interval)
+return {
+	setup = function(p1, p2, p3) --[[ Name: setup | Line: 15 | Upvalues: BinderUtils (copy), DoorBinder (copy), Region (copy), RegionUtils (copy), DoorUtils (copy), Promise (copy), Audio (copy), Interval (copy), LocalPlayer (copy) ]]
+		local v2 = p2.spikesName or "Spikes"
+		local v3 = p2.referenceName or "Shelving"
+		local offsetCf = p2.offsetCf
+		local spikeSizeMin = p2.spikeSizeMin
+		local spikeSizeMax = p2.spikeSizeMax
+		local damageAmount = p2.damageAmount
+		local audioId = p2.audioId
+		local v5 = p2.doorCloseDelay or 1
+		local v6 = nil
+		local v7 = p1._obj:WaitForChild(p2.doorName or "FakeDoor")
+		v6 = BinderUtils.promiseBoundClass(DoorBinder, v7):tap(function(p12) --[[ Line: 32 | Upvalues: p1 (copy), v2 (copy), v3 (copy), spikeSizeMin (copy), spikeSizeMax (copy), offsetCf (copy) ]]
+			local v1 = p1._obj:FindFirstChild(v2)
+			local v22 = p1._obj:FindFirstChild(v3)
+			p12:SetUpdateCallback(function(p1, p2) --[[ Line: 35 | Upvalues: spikeSizeMin (ref), spikeSizeMax (ref), v1 (copy), v22 (copy), offsetCf (ref) ]]
+				local v12 = spikeSizeMin * (1 - p2) + spikeSizeMax * p2
+				v1.Size = Vector3.new(v1.Size.X, v1.Size.Y, v12)
+				v1.CFrame = v22.CFrame * offsetCf * CFrame.new(0, 0, -v12 * 0.5)
+			end)
+		end):andThen(function() --[[ Line: 41 | Upvalues: v6 (ref) ]]
+			v6 = nil
+		end)
+		p1._maid:GiveTask(function() --[[ Line: 44 | Upvalues: v6 (ref) ]]
+			if v6 then
+				v6:cancel()
+				v6 = nil
+			end
+		end)
+		local v8 = Region.new(RegionUtils.ConditionPlayer)
+		local v9 = p1._obj:FindFirstChild(p2.regionName or "Region")
+		local t = {}
+		local function updatePrism() --[[ Line: 54 | Upvalues: t (copy), v9 (copy) ]]
+			t.c = v9.CFrame
+			t.s = v9.Size
+		end
+		t.c = v9.CFrame
+		t.s = v9.Size
+		v8:AddPrism(t)
+		p1._maid:GiveTask(v8)
+		p1._maid:GiveTask(v8.OnObjAdded:Connect(function() --[[ Line: 61 | Upvalues: DoorUtils (ref), v7 (copy), p3 (copy), damageAmount (copy), Promise (ref), v5 (copy), Audio (ref), audioId (copy) ]]
+			if not DoorUtils.getOpen(v7) then
+				p3:FireServer("xe6v1us6", damageAmount, "Spikes")
+				DoorUtils.setOpen(v7, true)
+				Promise.delay(v5):andThen(function() --[[ Line: 66 | Upvalues: DoorUtils (ref), v7 (ref) ]]
+					DoorUtils.setOpen(v7, false)
+				end)
+				Audio.ObjectLocal(v7.PrimaryPart, audioId, {
+					Volume = 0.5,
+					RollOffMaxDistance = 64
+				})
+			end
+		end))
+		p1._maid:GiveTask(Interval.every(0.2):Connect(function() --[[ Line: 72 | Upvalues: t (copy), v9 (copy), v8 (copy), LocalPlayer (ref) ]]
+			t.c = v9.CFrame
+			t.s = v9.Size
+			v8:Update({ LocalPlayer })
+		end))
+	end
+}

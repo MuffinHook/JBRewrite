@@ -1,128 +1,128 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local Joint_upvr = require(ReplicatedStorage.Std.Joint)
-local Gun_upvr = require(script.Parent.Gun)
-local module_upvr = {
-    __ClassName = "Shotgun";
+local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Joint = require(ReplicatedStorage.Std.Joint)
+local Spring = require(ReplicatedStorage.Std.Spring)
+local Gun = require(script.Parent.Gun)
+local t = {
+	__ClassName = "Shotgun"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Gun_upvr)
-function module_upvr.new(arg1, arg2, arg3) -- Line 14
-    local any_new_result1_upvr = Gun_upvr.new(arg1, arg2, arg3)
-    setmetatable(any_new_result1_upvr, module_upvr)
-    any_new_result1_upvr:Setup(arg3)
-    any_new_result1_upvr.LastHitBucketTime = 0
-    any_new_result1_upvr.LastHitBucketCount = 0
-    any_new_result1_upvr.BulletEmitter.BulletWhizEnabled = false
-    any_new_result1_upvr:_updateAmmoVisual()
-    any_new_result1_upvr.Maid:GiveTask(any_new_result1_upvr.inventoryItemValue:GetAttributeChangedSignal("AmmoCurrentLocal"):Connect(function() -- Line 25
-        any_new_result1_upvr:_updateAmmoVisual()
-    end))
-    return any_new_result1_upvr
+t.__index = t
+setmetatable(t, Gun)
+function t.new(p1, p2, p3) --[[ Line: 14 | Upvalues: Gun (copy), t (copy) ]]
+	local v1 = Gun.new(p1, p2, p3)
+	setmetatable(v1, t)
+	v1:Setup(p3)
+	v1.LastHitBucketTime = 0
+	v1.LastHitBucketCount = 0
+	v1.BulletEmitter.BulletWhizEnabled = false
+	v1:_updateAmmoVisual()
+	v1.Maid:GiveTask(v1.inventoryItemValue:GetAttributeChangedSignal("AmmoCurrentLocal"):Connect(function() --[[ Line: 25 | Upvalues: v1 (copy) ]]
+		v1:_updateAmmoVisual()
+	end))
+	return v1
 end
-local Spring_upvr = require(ReplicatedStorage.Std.Spring)
-function module_upvr.SetupModel(arg1) -- Line 31
-    Gun_upvr.SetupModel(arg1)
-    local Pump = arg1.Model.Motion.Pump
-    Pump.Anchored = false
-    arg1.MotorPump = Joint_upvr.Motor(Pump, arg1.BoundingBox)
-    arg1.SpringPump = Spring_upvr.new(Vector3.new(), Vector3.new(), 0.9, 20)
+function t.SetupModel(p1) --[[ Line: 31 | Upvalues: Gun (copy), Joint (copy), Spring (copy) ]]
+	Gun.SetupModel(p1)
+	local Pump = p1.Model.Motion.Pump
+	local v1 = Joint.Motor(Pump, p1.BoundingBox)
+	Pump.Anchored = false
+	local v2 = Spring.new(Vector3.new(), Vector3.new(), 0.9, 20)
+	p1.MotorPump = v1
+	p1.SpringPump = v2
 end
-function module_upvr.SetupArmWelds(arg1) -- Line 44
-    Joint_upvr.Weld(arg1.Model.Skeleton.LeftArm, arg1.Model.Motion.Pump)
-    Joint_upvr.Weld(arg1.Model.Skeleton.RightArm, arg1.BoundingBox)
-    arg1.Model.Skeleton.LeftArm.Anchored = false
-    arg1.Model.Skeleton.RightArm.Anchored = false
+function t.SetupArmWelds(p1) --[[ Line: 44 | Upvalues: Joint (copy) ]]
+	Joint.Weld(p1.Model.Skeleton.LeftArm, p1.Model.Motion.Pump)
+	Joint.Weld(p1.Model.Skeleton.RightArm, p1.BoundingBox)
+	p1.Model.Skeleton.LeftArm.Anchored = false
+	p1.Model.Skeleton.RightArm.Anchored = false
 end
-function module_upvr.UpdateItemSprings(arg1) -- Line 50
-    Gun_upvr.UpdateItemSprings(arg1)
-    arg1.PumpPosition = arg1.SpringPump:Update()
+function t.UpdateItemSprings(p1) --[[ Line: 50 | Upvalues: Gun (copy) ]]
+	Gun.UpdateItemSprings(p1)
+	p1.PumpPosition = p1.SpringPump:Update()
 end
-function module_upvr.UpdateItemJoints(arg1) -- Line 55
-    Gun_upvr.UpdateItemJoints(arg1)
-    arg1.MotorPump.C1 = CFrame.new(arg1.PumpPosition)
+function t.UpdateItemJoints(p1) --[[ Line: 55 | Upvalues: Gun (copy) ]]
+	Gun.UpdateItemJoints(p1)
+	p1.MotorPump.C1 = CFrame.new(p1.PumpPosition)
 end
-function module_upvr.ReloadDropAmmoVisual(arg1) -- Line 59
+function t.ReloadDropAmmoVisual(p1) --[[ Line: 59 ]] end
+function t.ReloadRefillAmmoVisual(p1) --[[ Line: 60 ]] end
+function t.BulletEmitterOnLocalHitPlayer(p1, ...) --[[ Line: 63 | Upvalues: Gun (copy) ]]
+	local v1 = tick()
+	if v1 - p1.LastHitBucketTime > 0.5 then
+		p1.LastHitBucketTime = v1
+		p1.LastHitBucketCount = 0
+	end
+	p1.LastHitBucketCount = p1.LastHitBucketCount + 1
+	if p1.LastHitBucketCount <= 10 then
+		Gun.BulletEmitterOnLocalHitPlayer(p1, ...)
+	end
 end
-function module_upvr.ReloadRefillAmmoVisual(arg1) -- Line 60
+function t.BulletEmitterShieldDamage(p1, ...) --[[ Line: 76 | Upvalues: Gun (copy) ]]
+	local v1 = tick()
+	if v1 - p1.LastHitBucketTime > 0.5 then
+		p1.LastHitBucketTime = v1
+		p1.LastHitBucketCount = 0
+	end
+	p1.LastHitBucketCount = p1.LastHitBucketCount + 1
+	if p1.LastHitBucketCount <= 10 then
+		Gun.BulletEmitterShieldDamage(p1, ...)
+	end
 end
-function module_upvr.BulletEmitterOnLocalHitPlayer(arg1, ...) -- Line 63
-    local tick_result1_2 = tick()
-    if 0.5 < tick_result1_2 - arg1.LastHitBucketTime then
-        arg1.LastHitBucketTime = tick_result1_2
-        arg1.LastHitBucketCount = 0
-    end
-    arg1.LastHitBucketCount += 1
-    if arg1.LastHitBucketCount <= 10 then
-        Gun_upvr.BulletEmitterOnLocalHitPlayer(arg1, ...)
-    end
+function t.ShootSound(p1, p2) --[[ Line: 89 | Upvalues: Audio (copy) ]]
+	if not p2 then
+		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_shotgun_shot_01, {
+			Pitch = 1 + math.random() * 0.1 - 0.05,
+			Volume = 0.4
+		})
+		task.delay(0.3, function() --[[ Line: 97 | Upvalues: Audio (ref), p1 (copy) ]]
+			Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_shotgun_cock_01, {
+				Pitch = 1 + math.random() * 0.1 - 0.05
+			})
+			p1.SpringPump:Accelerate(Vector3.new(0, 0, 35))
+		end)
+	end
 end
-function module_upvr.BulletEmitterShieldDamage(arg1, ...) -- Line 76
-    local tick_result1 = tick()
-    if 0.5 < tick_result1 - arg1.LastHitBucketTime then
-        arg1.LastHitBucketTime = tick_result1
-        arg1.LastHitBucketCount = 0
-    end
-    arg1.LastHitBucketCount += 1
-    if arg1.LastHitBucketCount <= 10 then
-        Gun_upvr.BulletEmitterShieldDamage(arg1, ...)
-    end
+function t._updateAmmoVisual(p1, p2) --[[ Line: 107 | Upvalues: InventoryItemUtils (copy) ]]
+	if p1.Local then
+		local Ammo = p1.Model:FindFirstChild("Model"):FindFirstChild("Ammo")
+		if not p2 then
+			p2 = InventoryItemUtils.getAttr(p1.inventoryItemValue, "AmmoCurrentLocal") - 1
+		end
+		local v1 = #Ammo:GetChildren()
+		for i = 1, v1 do
+			local v2 = Ammo:FindFirstChild((tostring(v1 - i + 1)))
+			if i <= p2 then
+				v2.Transparency = 0
+			else
+				v2.Transparency = 1
+			end
+		end
+	end
 end
-function module_upvr.ShootSound(arg1, arg2) -- Line 89
-    if not arg2 then
-        Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_shotgun_shot_01, {
-            Pitch = 1 + math.random() * 0.1 - 0.05;
-            Volume = 0.4;
-        })
-        task.delay(0.3, function() -- Line 97
-            Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_shotgun_cock_01, {
-                Pitch = 1 + math.random() * 0.1 - 0.05;
-            })
-            arg1.SpringPump:Accelerate(Vector3.new(0, 0, 35))
-        end)
-    end
+function t.ReloadDropAmmoSound(p1) --[[ Line: 127 | Upvalues: Audio (copy) ]]
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_shotgun_dry_fire_01, {
+		Pitch = 0.5,
+		RollOffMaxDistance = 64
+	})
 end
-local InventoryItemUtils_upvr = require(ReplicatedStorage.Inventory.InventoryItemUtils)
-function module_upvr._updateAmmoVisual(arg1, arg2) -- Line 107
-    local var18
-    if not arg1.Local then
-    else
-        local Ammo = arg1.Model:FindFirstChild("Model"):FindFirstChild("Ammo")
-        if not var18 then
-            var18 = InventoryItemUtils_upvr.getAttr(arg1.inventoryItemValue, "AmmoCurrentLocal") - 1
-        end
-        local len = #Ammo:GetChildren()
-        for i_2 = 1, len do
-            if i_2 <= var18 then
-                Ammo:FindFirstChild(tostring(len - i_2 + 1)).Transparency = 0
-            else
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                Ammo:FindFirstChild(tostring(len - i_2 + 1)).Transparency = 1
-            end
-        end
-    end
+function t.ReloadRefillAmmoSound(p1) --[[ Line: 130 | Upvalues: Audio (copy) ]]
+	for i = 1, 4 do
+		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_shotgun_cock_01, {
+			Pitch = 0.9,
+			RollOffMaxDistance = 64
+		})
+		if not p1._updateAmmoVisual then
+			return
+		end
+		p1:_updateAmmoVisual(i)
+		task.wait(0.375)
+	end
+	task.wait(0.1)
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_shotgun_dry_fire_01, {
+		Pitch = 0.5,
+		RollOffMaxDistance = 64
+	})
+	p1.SpringPump:Accelerate(Vector3.new(0, 0, 35))
 end
-function module_upvr.ReloadDropAmmoSound(arg1) -- Line 127
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_shotgun_dry_fire_01, {
-        Pitch = 0.5;
-        RollOffMaxDistance = 64;
-    })
-end
-function module_upvr.ReloadRefillAmmoSound(arg1) -- Line 130
-    for i = 1, 4 do
-        Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_shotgun_cock_01, {
-            Pitch = 0.9;
-            RollOffMaxDistance = 64;
-        })
-        if not arg1._updateAmmoVisual then return end
-        arg1:_updateAmmoVisual(i)
-        task.wait(0.375)
-    end
-    task.wait(0.1)
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.gun_shotgun_dry_fire_01, {
-        Pitch = 0.5;
-        RollOffMaxDistance = 64;
-    })
-    arg1.SpringPump:Accelerate(Vector3.new(0, 0, 35))
-end
-return module_upvr
+return t

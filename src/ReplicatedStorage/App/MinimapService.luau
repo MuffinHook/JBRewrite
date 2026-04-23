@@ -1,81 +1,66 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Roact = require(ReplicatedStorage_upvr.Roact)
-local store_upvr = require(ReplicatedStorage_upvr.App.store)
-local module_upvr = {}
-local any_createBinding_result1, any_createBinding_result2_2 = Roact.createBinding(Color3.new(1, 1, 1))
-module_upvr.mapImageColor3 = any_createBinding_result1
-module_upvr.updateMapImageColor3 = any_createBinding_result2_2
-local any_createBinding_result1_2, any_createBinding_result2 = Roact.createBinding(Vector3.new(0, 0, 0))
-module_upvr.mapWorldPosition = any_createBinding_result1_2
-module_upvr.mapUpdateWorldPosition = any_createBinding_result2
-local any_createBinding_result1_3, any_createBinding_result2_3 = Roact.createBinding(Vector3.new(1, 0, 1).Unit)
-module_upvr.mapWorldDirection = any_createBinding_result1_3
-module_upvr.mapUpdateWorldDirection = any_createBinding_result2_3
-local waitForChild_upvr = require(ReplicatedStorage_upvr.Std.waitForChild)
-local MinimapConsts_upvr = require(ReplicatedStorage_upvr.App.MinimapConsts)
-function module_upvr.init() -- Line 15
-    waitForChild_upvr(ReplicatedStorage_upvr, MinimapConsts_upvr.ADD_WAYPOINT_REMOTE_NAME):andThen(function(arg1) -- Line 16
-        arg1.OnClientEvent:Connect(module_upvr.addWaypoint)
-        module_upvr._addWaypointRemote = arg1
-    end)
-    waitForChild_upvr(ReplicatedStorage_upvr, MinimapConsts_upvr.REMOVE_WAYPOINT_REMOTE_NAME):andThen(function(arg1) -- Line 20
-        arg1.OnClientEvent:Connect(module_upvr.removeWaypointByName)
-    end)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Dictionary = require(ReplicatedStorage.Std.Dictionary)
+local Roact = require(ReplicatedStorage.Roact)
+local waitForChild = require(ReplicatedStorage.Std.waitForChild)
+local MinimapConsts = require(ReplicatedStorage.App.MinimapConsts)
+local store = require(ReplicatedStorage.App.store)
+local t = {}
+local v1, v2 = Roact.createBinding(Color3.new(255/255, 255/255, 255/255))
+t.mapImageColor3 = v1
+t.updateMapImageColor3 = v2
+local v3, v4 = Roact.createBinding(Vector3.new(0, 0, 0))
+t.mapWorldPosition = v3
+t.mapUpdateWorldPosition = v4
+local v5, v6 = Roact.createBinding((Vector3.new(1, 0, 1)).Unit)
+t.mapWorldDirection = v5
+t.mapUpdateWorldDirection = v6
+function t.init() --[[ Line: 15 | Upvalues: waitForChild (copy), ReplicatedStorage (copy), MinimapConsts (copy), t (copy) ]]
+	waitForChild(ReplicatedStorage, MinimapConsts.ADD_WAYPOINT_REMOTE_NAME):andThen(function(p1) --[[ Line: 16 | Upvalues: t (ref) ]]
+		p1.OnClientEvent:Connect(t.addWaypoint)
+		t._addWaypointRemote = p1
+	end)
+	waitForChild(ReplicatedStorage, MinimapConsts.REMOVE_WAYPOINT_REMOTE_NAME):andThen(function(p1) --[[ Line: 20 | Upvalues: t (ref) ]]
+		p1.OnClientEvent:Connect(t.removeWaypointByName)
+	end)
 end
-function module_upvr.add(arg1) -- Line 24
-    local var15
-    if arg1.name == nil then
-        var15 = false
-    else
-        var15 = true
-    end
-    assert(var15, "minimap point missing unique name")
-    local tbl_3 = {
-        type = "addMinimapPoint";
-    }
-    tbl_3.point = arg1
-    store_upvr:dispatch(tbl_3)
-    return function() -- Line 30
-        store_upvr:dispatch({
-            type = "removeMinimapPoint";
-            name = arg1.name;
-        })
-    end
+function t.add(p1) --[[ Line: 24 | Upvalues: store (copy) ]]
+	assert(p1.name ~= nil, "minimap point missing unique name")
+	store:dispatch({
+		type = "addMinimapPoint",
+		point = p1
+	})
+	return function() --[[ Line: 30 | Upvalues: store (ref), p1 (copy) ]]
+		store:dispatch({
+			type = "removeMinimapPoint",
+			name = p1.name
+		})
+	end
 end
-function module_upvr.addCircle(arg1) -- Line 38
-    local var19
-    if arg1.name == nil then
-        var19 = false
-    else
-        var19 = true
-    end
-    assert(var19, "minimap circle missing unique name")
-    local tbl_2 = {
-        type = "addMinimapCircle";
-    }
-    tbl_2.circle = arg1
-    store_upvr:dispatch(tbl_2)
-    return function() -- Line 44
-        store_upvr:dispatch({
-            type = "removeMinimapCircle";
-            name = arg1.name;
-        })
-    end
+function t.addCircle(p1) --[[ Line: 38 | Upvalues: store (copy) ]]
+	assert(p1.name ~= nil, "minimap circle missing unique name")
+	store:dispatch({
+		type = "addMinimapCircle",
+		circle = p1
+	})
+	return function() --[[ Line: 44 | Upvalues: store (ref), p1 (copy) ]]
+		store:dispatch({
+			type = "removeMinimapCircle",
+			name = p1.name
+		})
+	end
 end
-local Dictionary_upvr = require(ReplicatedStorage_upvr.Std.Dictionary)
-function module_upvr.addWaypoint(arg1) -- Line 51
-    store_upvr:dispatch(Dictionary_upvr.merge({
-        type = "addWaypoint";
-    }, arg1))
-    return function() -- Line 56
-        return module_upvr.removeWaypointByName(arg1.name)
-    end
+function t.addWaypoint(p1) --[[ Line: 51 | Upvalues: store (copy), Dictionary (copy), t (copy) ]]
+	store:dispatch(Dictionary.merge({
+		type = "addWaypoint"
+	}, p1))
+	return function() --[[ Line: 56 | Upvalues: t (ref), p1 (copy) ]]
+		return t.removeWaypointByName(p1.name)
+	end
 end
-function module_upvr.removeWaypointByName(arg1) -- Line 60
-    local tbl = {
-        type = "removeWaypointByName";
-    }
-    tbl.name = arg1
-    store_upvr:dispatch(tbl)
+function t.removeWaypointByName(p1) --[[ Line: 60 | Upvalues: store (copy) ]]
+	store:dispatch({
+		type = "removeWaypointByName",
+		name = p1
+	})
 end
-return module_upvr
+return t

@@ -1,12 +1,12 @@
-local module = {}
-local MilitaryTurretBinder_upvr = require(script.Parent.MilitaryTurretBinder)
-function module.init(arg1) -- Line 4
-    local Event_upvr = arg1.Event
-    MilitaryTurretBinder_upvr:GetClassAddedSignal():Connect(function(arg1_2) -- Line 7
-        arg1_2._maid:GiveTask(arg1_2.onBulletHit:Connect(function(arg1_3) -- Line 8
-            Event_upvr:FireServer('y'.."rp4lpza":sub(4, 6):reverse():reverse():reverse().."".."kho3", arg1_3, "Shot")
-        end))
-    end)
-    MilitaryTurretBinder_upvr:Start()
-end
-return module
+local MilitaryTurretBinder = require(script.Parent.MilitaryTurretBinder)
+return {
+	init = function(p1) --[[ Name: init | Line: 4 | Upvalues: MilitaryTurretBinder (copy) ]]
+		local v1 = p1.Event
+		MilitaryTurretBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 7 | Upvalues: v1 (copy) ]]
+			p1._maid:GiveTask(p1.onBulletHit:Connect(function(p1) --[[ Line: 8 | Upvalues: v1 (ref) ]]
+				v1:FireServer("x" .. ("n16ep"):sub(3, 4):reverse():reverse():reverse() .. "" .. "" .. ("kk1vcv"):sub(3, 4):reverse():reverse():reverse():reverse():reverse() .. "us6", p1, "Shot")
+			end))
+		end)
+		MilitaryTurretBinder:Start()
+	end
+}

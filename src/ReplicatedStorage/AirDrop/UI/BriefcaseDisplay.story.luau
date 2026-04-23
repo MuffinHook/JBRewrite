@@ -1,24 +1,23 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local EnumRarity_upvr = require(ReplicatedStorage.RewardSpinner.EnumRarity)
-return function(arg1) -- Line 5
-    local any_extend_result1 = Roact_upvr.Component:extend("App")
-    local BriefcaseDisplay_upvr = require(script.Parent.BriefcaseDisplay)
-    function any_extend_result1.render(arg1_2) -- Line 8
-        return Roact_upvr.createElement(BriefcaseDisplay_upvr, {
-            probs = {
-                [EnumRarity_upvr.Common] = 75;
-                [EnumRarity_upvr.Rare] = 20;
-                [EnumRarity_upvr.UltraRare] = 5;
-                [EnumRarity_upvr.Epic] = 0;
-                [EnumRarity_upvr.Legendary] = 0;
-            };
-        })
-    end
-    function any_extend_result1.willUnmount(arg1_3) -- Line 19
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(any_extend_result1), arg1)
-    return function() -- Line 22
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local Roact = require(ReplicatedStorage.Roact)
+local EnumRarity = require(ReplicatedStorage.RewardSpinner.EnumRarity)
+return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), EnumRarity (copy) ]]
+	local v1 = Roact.Component:extend("App")
+	local BriefcaseDisplay = require(script.Parent.BriefcaseDisplay)
+	function v1.render(p1) --[[ Line: 8 | Upvalues: Roact (ref), BriefcaseDisplay (copy), EnumRarity (ref) ]]
+		return Roact.createElement(BriefcaseDisplay, {
+			probs = {
+				[EnumRarity.Common] = 75,
+				[EnumRarity.Rare] = 20,
+				[EnumRarity.UltraRare] = 5,
+				[EnumRarity.Epic] = 0,
+				[EnumRarity.Legendary] = 0
+			}
+		})
+	end
+	function v1.willUnmount(p1) --[[ Line: 19 ]] end
+	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	return function() --[[ Line: 22 | Upvalues: Roact (ref), v2 (copy) ]]
+		Roact.unmount(v2)
+	end
 end

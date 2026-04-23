@@ -1,54 +1,51 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local module = {
-    getUpdateCamera = function() -- Line 6, Named "getUpdateCamera"
-        local var4_upvw
-        local var5_upvw
-        return function(arg1, arg2) -- Line 9
-            if not arg2 then
-            else
-                if arg2 ~= var4_upvw then
-                    local any_GetBoundingBox_result1, any_GetBoundingBox_result2 = arg2:GetBoundingBox()
-                    _ = any_GetBoundingBox_result1 -- Setting global
-                    var5_upvw = any_GetBoundingBox_result2
-                    var4_upvw = arg2
-                end
-                local os_clock_result1 = os.clock()
-                arg1.CFrame = CFrame.new(0, 0, 0) * CFrame.Angles(0, os_clock_result1 % (-math.pi*2), 0) * CFrame.Angles(math.sin(os_clock_result1 * 0.5) * 0.3 - 0.4, 0, 0) * CFrame.new(0, 0, var5_upvw.Magnitude * 0.8)
-            end
-        end
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ItemSkinIds = require(ReplicatedStorage.Game.ItemSkin.ItemSkinIds)
+return {
+	getUpdateCamera = function() --[[ Name: getUpdateCamera | Line: 6 ]]
+		local v1 = nil
+		local v2 = nil
+		return function(p1, p2) --[[ Line: 9 | Upvalues: v1 (ref), v2 (ref) ]]
+			if p2 then
+				if p2 ~= v1 then
+					local v12, v22 = p2:GetBoundingBox()
+					_ = v12
+					v2 = v22
+					v1 = p2
+				end
+				local v3 = os.clock()
+				p1.CFrame = CFrame.new(0, 0, 0) * CFrame.Angles(0, v3 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v3 * 0.5) * 0.3 - 0.4, 0, 0) * CFrame.new(0, 0, v2.Magnitude * 0.8)
+			end
+		end
+	end,
+	getModel = function(p1, p2) --[[ Name: getModel | Line: 26 | Upvalues: ReplicatedStorage (copy), ItemSkinIds (copy) ]]
+		local v1 = p2 or "RocketLauncher"
+		assert(v1)
+		local v2 = ReplicatedStorage.Resource.ItemSystem.Models:FindFirstChild(v1):Clone()
+		local v3 = v2:GetBoundingBox()
+		v2.PrimaryPart = v2:FindFirstChild("Skeleton"):FindFirstChild("BoundingBox")
+		v2:SetPrimaryPartCFrame(v2.PrimaryPart.CFrame:ToObjectSpace(v3):Inverse())
+		local v4, v5
+		if p1 == "None" then
+			v4 = v2
+			v5 = nil
+		else
+			local v6 = ItemSkinIds[p1]
+			if not v6 then
+				error(("No skin by name of %s exists."):format(p1))
+			end
+			v5 = v6[v1]
+			if not v5 then
+				error(("Skin %s has no image id for item: %s"):format(p1, v1))
+			end
+			v4 = v2
+		end
+		for v8, v9 in v4:GetDescendants() do
+			local v7
+			if v9:IsA("MeshPart") and v9:GetAttribute("ApplyGunTexture") == true then
+				v7 = if v5 then ("rbxassetid://%d"):format(v5) else ""
+				v9.TextureID = v7
+			end
+		end
+		return v4
+	end
 }
-local ItemSkinIds_upvr = require(ReplicatedStorage_upvr.Game.ItemSkin.ItemSkinIds)
-function module.getModel(arg1, arg2) -- Line 26
-    local var26 = arg2 or "RocketLauncher"
-    assert(var26)
-    local clone = ReplicatedStorage_upvr.Resource.ItemSystem.Models:FindFirstChild(var26):Clone()
-    clone.PrimaryPart = clone:FindFirstChild("Skeleton"):FindFirstChild("BoundingBox")
-    clone:SetPrimaryPartCFrame(clone.PrimaryPart.CFrame:ToObjectSpace(clone:GetBoundingBox()):Inverse())
-    local var28
-    if arg1 ~= "None" then
-        local var29 = ItemSkinIds_upvr[arg1]
-        if not var29 then
-            error(string.format("No skin by name of %s exists.", arg1))
-        end
-        var28 = var29[var26]
-        if not var28 then
-            error(string.format("Skin %s has no image id for item: %s", arg1, var26))
-        end
-    end
-    for _, v in clone:GetDescendants() do
-        if v:IsA("MeshPart") then
-            local ApplyGunTexture = v:GetAttribute("ApplyGunTexture")
-            if ApplyGunTexture == true then
-                if var28 then
-                    ApplyGunTexture = string.format("rbxassetid://%d",var28)
-                else
-                    ApplyGunTexture = ""
-                end
-                v.TextureID = ApplyGunTexture
-            end
-        end
-    end
-    return clone
-end
-return module

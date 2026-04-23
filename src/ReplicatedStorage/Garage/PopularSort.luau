@@ -1,10 +1,10 @@
-local module_upvr = {
-    _value = require(script.Parent.fallbackPopularSortData);
+local t = {
+	_value = require(script.Parent.fallbackPopularSortData)
 }
-function module_upvr.setRaw(arg1) -- Line 3
-    module_upvr._value = arg1
+function t.setRaw(p1) --[[ Line: 3 | Upvalues: t (copy) ]]
+	t._value = p1
 end
-function module_upvr.getRaw() -- Line 6
-    return module_upvr._value
+function t.getRaw() --[[ Line: 6 | Upvalues: t (copy) ]]
+	return t._value
 end
-return module_upvr
+return t

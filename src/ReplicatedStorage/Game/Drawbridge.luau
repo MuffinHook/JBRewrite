@@ -1,96 +1,81 @@
-local RunService_upvr = game:GetService("RunService")
-local function _(arg1) -- Line 5, Named "Ease_InOutQuad"
-    local var2
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var2 = 2 * arg1 * arg1
-        return var2
-    end
-    if arg1 >= 0.5 or not decompInlinedCondition() then
-        var2 = -1 - 2 * (arg1 - 2) * arg1
-    end
-    return var2
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunUtils = require(ReplicatedStorage.App.RunUtils)
+local function Ease_InOutQuad(p1) --[[ Line: 5 ]]
+	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
 end
-local tbl_upvr = {}
-tbl_upvr.__index = tbl_upvr
-function tbl_upvr.new(arg1, arg2) -- Line 11
-    if arg1 == nil then
-    else
-    end
-    assert(true)
-    if arg2 == nil then
-    else
-    end
-    assert(true)
-    local module = {}
-    setmetatable(module, tbl_upvr)
-    module.HingeCF = arg2.CFrame
-    module.Model = arg1
-    module.Model.PrimaryPart = arg2
-    module.Event = nil
-    module.Angle = 0
-    return module
+local t = {}
+t.__index = t
+function t.new(p1, p2) --[[ Line: 11 | Upvalues: t (copy) ]]
+	assert(p1 ~= nil)
+	assert(p2 ~= nil)
+	local t2 = {}
+	setmetatable(t2, t)
+	t2.HingeCF = p2.CFrame
+	t2.Model = p1
+	t2.Model.PrimaryPart = p2
+	t2.Event = nil
+	t2.Angle = 0
+	return t2
 end
-function tbl_upvr.AnimateToAngle(arg1, arg2, arg3) -- Line 27
-    if arg2 == nil then
-    else
-    end
-    assert(true)
-    if arg3 == nil then
-    else
-    end
-    assert(true)
-    if arg1.Event ~= nil then
-        arg1.Event:Disconnect()
-        arg1.Event = nil
-    end
-    local tick_result1_upvr = tick()
-    local Angle_upvr = arg1.Angle
-    arg1.Event = RunService_upvr.Heartbeat:Connect(function() -- Line 37
-        local var8 = (tick() - tick_result1_upvr) / arg3
-        if 1 < var8 then
-            var8 = 1
-            arg1.Event:Disconnect()
-            arg1.Event = nil
-        end
-        local var9 = var8
-        local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var8 = 2 * var9 * var9
-            return var8
-        end
-        if var9 >= 0.5 or not decompInlinedCondition_2() then
-            var8 = -1 - 2 * (var9 - 2) * var9
-        end
-        arg1.Angle = Angle_upvr * (1 - var8) + arg2 * var8
-        arg1.Model:PivotTo(arg1.HingeCF * CFrame.Angles(arg1.Angle, 0, 0))
-    end)
+function t.AnimateToAngle(p1, p2, p3) --[[ Line: 27 | Upvalues: RunService (copy) ]]
+	assert(p2 ~= nil)
+	assert(p3 ~= nil)
+	if p1.Event ~= nil then
+		p1.Event:Disconnect()
+		p1.Event = nil
+	end
+	local Angle = p1.Angle
+	local v3 = tick()
+	p1.Event = RunService.Heartbeat:Connect(function() --[[ Line: 37 | Upvalues: v3 (copy), p3 (copy), p1 (copy), Angle (copy), p2 (copy) ]]
+		local v1 = (tick() - v3) / p3
+		if v1 > 1 then
+			p1.Event:Disconnect()
+			p1.Event = nil
+			v1 = 1
+		end
+		local v2, v32
+		if v1 < 0.5 then
+			v2 = 2 * v1 * v1
+			if not v2 then
+				v32 = v1
+				v2 = -1 - 2 * (v1 - 2) * v1
+			end
+		else
+			v32 = v1
+			v2 = -1 - 2 * (v1 - 2) * v1
+		end
+		p1.Angle = Angle * (1 - v2) + p2 * v2
+		p1.Model:PivotTo(p1.HingeCF * CFrame.Angles(p1.Angle, 0, 0))
+	end)
 end
-local module_2_upvr = {}
-local RunUtils_upvr = require(game:GetService("ReplicatedStorage").App.RunUtils)
-function module_2_upvr._initSpawned(arg1) -- Line 53
-    arg1.Model = workspace:WaitForChild("Drawbridge", 5)
-    if arg1.Model == nil then
-        if RunUtils_upvr.isMainWorld() and not RunService_upvr:IsStudio() then
-            error("Missing `Drawbridge` in Workspace.")
-        else
-            return
-        end
-    end
-    arg1.Door0 = tbl_upvr.new(arg1.Model.Model.RoadA.Bridge, arg1.Model.Model.RoadA.Hinge)
+local t2 = {
+	_initSpawned = function(p1) --[[ Name: _initSpawned | Line: 53 | Upvalues: RunUtils (copy), RunService (copy), t (copy) ]]
+		p1.Model = workspace:WaitForChild("Drawbridge", 5)
+		if p1.Model == nil then
+			if RunUtils.isMainWorld() and not RunService:IsStudio() then
+				error("Missing `Drawbridge` in Workspace.")
+			else
+				return
+			end
+		end
+		p1.Door0 = t.new(p1.Model.Model.RoadA.Bridge, p1.Model.Model.RoadA.Hinge)
+	end
+}
+function t2.Init(p1) --[[ Line: 66 | Upvalues: t2 (copy) ]]
+	task.spawn(t2._initSpawned, t2)
+	function p1.em.fbs2dwjk(p1) --[[ Line: 71 | Upvalues: t2 (ref) ]]
+		if p1 then
+			t2.Open()
+		else
+			t2.Close()
+		end
+	end
 end
-function module_2_upvr.Init(arg1) -- Line 66
-    task.spawn(module_2_upvr._initSpawned, module_2_upvr)
-    arg1.em.fehikwrk = function(arg1_2) -- Line 71, Named "fehikwrk"
-        if arg1_2 then
-            module_2_upvr.Open()
-        else
-            module_2_upvr.Close()
-        end
-    end
+function t2.Open() --[[ Line: 79 | Upvalues: t2 (copy) ]]
+	t2.Door0:AnimateToAngle(0.9424777960769379, 10)
 end
-function module_2_upvr.Open() -- Line 79
-    module_2_upvr.Door0:AnimateToAngle(0.9424777960769379, 10)
+function t2.Close() --[[ Line: 83 | Upvalues: t2 (copy) ]]
+	t2.Door0:AnimateToAngle(0, 10)
 end
-function module_2_upvr.Close() -- Line 83
-    module_2_upvr.Door0:AnimateToAngle(0, 10)
-end
-return module_2_upvr
+return t2

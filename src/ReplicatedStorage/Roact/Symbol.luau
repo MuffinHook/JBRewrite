@@ -1,17 +1,11 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMKBHR5cGUGc3RyaW5nLFN5bWJvbHMgbXVzdCBiZSBjcmVhdGVkIHVzaW5nIGEgc3RyaW5nIG5hbWUhBmFzc2VydAhuZXdwcm94eQpTeW1ib2woJXMpBmZvcm1hdAxnZXRtZXRhdGFibGUKX190b3N0cmluZwVuYW1lZAADAQABAAAEAAEADwL7AAAAggACAAAAGAABGAAAGQAAAAAFAQAAAA8AAAMDAhUCDwEPEw8CEw8iuygAA1IEAACkAwEAAAAAQJ8DAgLwAwIAAgAAAKkCAAGpAgEAgQECBAMAAABvAwMApAEFAAAAQECfAQMBpAEHAAAAYECpAgEAnwECAm8CCABSBAAAvAICjQkAAACfAgMCuzwBA1IEAQCkAwsAAACgQJ8DAgLZBAAAEgACADAEAwYMAAAAggECAA0DAQQAAABAAwIDAwMEBAAAQEADBQQAAGBAAwYDBwMIBAAAoEADCQEAEQoBGAAAAAAAAAAAAAAAAAAAAAIAAAACAAAAAAIAAAAAAAAAAAQSAAAAAAIAAAECBwAAAQ8AAQYHowAAAP8AAQAAAAAAwAEAADABAFEBAAAAggACAAIGAQMKAQEBAAEYAAgACAAADgEAAAAAAvcWTn3pVfCDxdIk6drOUwXXjoAIAAhRzLdOO0z6phb9Q7MzI6PauJU=
-
 return {
-    named = function(v0) --[[ Line: 17 ]] --[[ Name: named ]]
-        assert(type(v0) == "string", "Symbols must be created using a string name!");
-        local v1 = newproxy(true);
-        local v2 = string.format(("Symbol(%s)"), v0);
-        getmetatable(v1).__tostring = function() --[[ Line: 24 ]]
-            -- upvalues: v2 (copy)
-            return v2;
-        end;
-        return v1;
-    end
-};
+	named = function(p1) --[[ Name: named | Line: 17 ]]
+		assert(type(p1) == "string", "Symbols must be created using a string name!")
+		local v2 = newproxy(true)
+		local v3 = ("Symbol(%s)"):format(p1)
+		getmetatable(v2).__tostring = function() --[[ Line: 24 | Upvalues: v3 (copy) ]]
+			return v3
+		end
+		return v2
+	end
+}

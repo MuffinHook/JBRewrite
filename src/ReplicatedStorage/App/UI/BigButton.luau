@@ -1,57 +1,58 @@
-local Roact_upvr = require(game:GetService("ReplicatedStorage").Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("BigButton")
-any_extend_result1.defaultProps = {
-    color = Color3.new(1, 0, 0);
-    size = UDim2.new(1, 0, 1, 0);
-    imageScale = 1;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local v1 = Roact.PureComponent:extend("BigButton")
+v1.defaultProps = {
+	color = Color3.new(255/255, 0/255, 0/255),
+	size = UDim2.new(1, 0, 1, 0),
+	imageScale = 1
 }
-local createElement_upvr = Roact_upvr.createElement
-function any_extend_result1.render(arg1) -- Line 11
-    local module = {
-        AspectRatio = createElement_upvr("UIAspectRatioConstraint", {
-            AspectRatio = 1;
-        });
-    }
-    if arg1.props.imageId then
-        module.Icon = createElement_upvr("ImageLabel", {
-            BackgroundTransparency = 1;
-            Size = UDim2.new(1 * arg1.props.imageScale, 0, 1 * arg1.props.imageScale, 0);
-            Image = string.format("rbxassetid://%d", arg1.props.imageId);
-            AnchorPoint = Vector2.new(0.5, 0.5);
-            Position = UDim2.new(0.5, 0, 0.5, 0);
-        })
-    end
-    if arg1.props.count then
-        module.ContainerCount = createElement_upvr("ImageLabel", {
-            BackgroundTransparency = 1;
-            Image = "rbxassetid://4915102010";
-            Position = UDim2.new(0.125, 0, 0, 0);
-            Size = UDim2.new(0.75, 0, 1, 0);
-        }, {
-            AspectRatio = createElement_upvr("UIAspectRatioConstraint", {
-                AspectRatio = 3;
-            });
-            Label = createElement_upvr("TextLabel", {
-                BackgroundTransparency = 1;
-                Font = Enum.Font.SourceSansBold;
-                Text = arg1.props.count;
-                Size = UDim2.new(1, 0, 1, 0);
-                TextScaled = true;
-                TextColor3 = Color3.new(1, 1, 1);
-            });
-        })
-    end
-    return createElement_upvr("ImageButton", {
-        Size = arg1.props.size;
-        AnchorPoint = Vector2.new(0.5, 0.5);
-        Position = UDim2.new(0.5, 0, 0.5, 0);
-        BackgroundTransparency = 1;
-        Image = "rbxassetid://4876179727";
-        ImageColor3 = arg1.props.color;
-        Visible = arg1.props.enabled;
-        LayoutOrder = arg1.props.displayOrder;
-        [Roact_upvr.Ref] = arg1.props.ref;
-        [Roact_upvr.Event.MouseButton1Down] = arg1.props.onClick;
-    }, module)
+function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), Roact (copy) ]]
+	local t = {
+		AspectRatio = createElement("UIAspectRatioConstraint", {
+			AspectRatio = 1
+		})
+	}
+	if p1.props.imageId then
+		t.Icon = createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1 * p1.props.imageScale, 0, 1 * p1.props.imageScale, 0),
+			Image = ("rbxassetid://%d"):format(p1.props.imageId),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(0.5, 0, 0.5, 0)
+		})
+	end
+	if p1.props.count then
+		t.ContainerCount = createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			Image = "rbxassetid://4915102010",
+			Position = UDim2.new(0.125, 0, 0, 0),
+			Size = UDim2.new(0.75, 0, 1, 0)
+		}, {
+			AspectRatio = createElement("UIAspectRatioConstraint", {
+				AspectRatio = 3
+			}),
+			Label = createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Font = Enum.Font.SourceSansBold,
+				Text = p1.props.count,
+				Size = UDim2.new(1, 0, 1, 0),
+				TextScaled = true,
+				TextColor3 = Color3.new(255/255, 255/255, 255/255)
+			})
+		})
+	end
+	return createElement("ImageButton", {
+		Size = p1.props.size,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		BackgroundTransparency = 1,
+		Image = "rbxassetid://4876179727",
+		ImageColor3 = p1.props.color,
+		Visible = p1.props.enabled,
+		LayoutOrder = p1.props.displayOrder,
+		[Roact.Ref] = p1.props.ref,
+		[Roact.Event.MouseButton1Down] = p1.props.onClick
+	}, t)
 end
-return any_extend_result1
+return v1

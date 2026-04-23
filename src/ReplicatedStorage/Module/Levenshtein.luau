@@ -1,33 +1,28 @@
-return function(arg1, arg2) -- Line 2
-    local string_len_result1_2 = string.len(arg1)
-    local string_len_result1 = string.len(arg2)
-    local module = {}
-    if string_len_result1_2 == 0 then
-        return string_len_result1
-    end
-    if string_len_result1 == 0 then
-        return string_len_result1_2
-    end
-    if arg1 == arg2 then
-        return 0
-    end
-    for i = 0, string_len_result1_2 do
-        module[i] = {}
-        module[i][0] = i
-    end
-    for i_2 = 0, string_len_result1 do
-        module[0][i_2] = i_2
-    end
-    for i_3 = 1, string_len_result1_2 do
-        for i_4 = 1, string_len_result1 do
-            local var13
-            if arg1:byte(i_3) == arg2:byte(i_4) then
-                var13 = 0
-            else
-                var13 = 1
-            end
-            module[i_3][i_4] = math.min(module[i_3 - 1][i_4] + 1, module[i_3][i_4 - 1] + 1, module[i_3 - 1][i_4 - 1] + var13)
-        end
-    end
-    return module[string_len_result1_2][string_len_result1]
+return function(p1, p2) --[[ Line: 2 ]]
+	local v1 = string.len(p1)
+	local v2 = string.len(p2)
+	local t = {}
+	if v1 == 0 then
+		return v2
+	elseif v2 == 0 then
+		return v1
+	elseif p1 == p2 then
+		return 0
+	else
+		for i = 0, v1 do
+			t[i] = {}
+			t[i][0] = i
+		end
+		for j = 0, v2 do
+			t[0][j] = j
+		end
+		for k = 1, v1 do
+			for n = 1, v2 do
+				local v3
+				v3 = if p1:byte(k) == p2:byte(n) then 0 else 1
+				t[k][n] = math.min(t[k - 1][n] + 1, t[k][n - 1] + 1, t[k - 1][n - 1] + v3)
+			end
+		end
+		return t[v1][v2]
+	end
 end

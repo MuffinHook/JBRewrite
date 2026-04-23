@@ -1,63 +1,58 @@
-local TestEnum_upvr = require(script.Parent.TestEnum)
-local tbl_upvr = {
-    [TestEnum_upvr.TestStatus.Success] = '+';
-    [TestEnum_upvr.TestStatus.Failure] = '-';
-    [TestEnum_upvr.TestStatus.Skipped] = '~';
+local TestEnum = require(script.Parent.TestEnum)
+local t = {
+	[TestEnum.TestStatus.Success] = "+",
+	[TestEnum.TestStatus.Failure] = "-",
+	[TestEnum.TestStatus.Skipped] = "~"
 }
-local module_3_upvr = {}
-module_3_upvr.__index = module_3_upvr
-function module_3_upvr.new(arg1) -- Line 25
-    local module_4 = {
-        successCount = 0;
-        failureCount = 0;
-        skippedCount = 0;
-    }
-    module_4.planNode = arg1
-    module_4.children = {}
-    module_4.errors = {}
-    setmetatable(module_4, module_3_upvr)
-    return module_4
+local t2 = {}
+t2.__index = t2
+function t2.new(p1) --[[ Line: 25 | Upvalues: t2 (copy) ]]
+	local t = {
+		successCount = 0,
+		failureCount = 0,
+		skippedCount = 0,
+		planNode = p1,
+		children = {},
+		errors = {}
+	}
+	setmetatable(t, t2)
+	return t
 end
-function module_3_upvr.createNode(arg1) -- Line 43
-    local module = {}
-    module.planNode = arg1
-    module.children = {}
-    module.errors = {}
-    module.status = nil
-    return module
+function t2.createNode(p1) --[[ Line: 43 ]]
+	return {
+		planNode = p1,
+		children = {},
+		errors = {},
+		status = nil
+	}
 end
-function module_3_upvr.visitAllNodes(arg1, arg2, arg3) -- Line 57
-    for _, v in ipairs((arg3 or arg1).children) do
-        arg2(v)
-        arg1:visitAllNodes(arg2, v)
-    end
+function t2.visitAllNodes(p1, p2, p3) --[[ Line: 57 ]]
+	for i, v in ipairs((p3 or p1).children) do
+		p2(v)
+		p1:visitAllNodes(p2, v)
+	end
 end
-function module_3_upvr.visualize(arg1, arg2, arg3) -- Line 70
-    local var15 = arg3 or 0
-    local module_2 = {}
-    for _, v_2 in ipairs((arg2 or arg1).children) do
-        if v_2.planNode.type == TestEnum_upvr.NodeType.It then
-            local var20
-            if v_2.messages and 0 < #v_2.messages then
-                var20 = var20.."\n "..' ':rep(3 * var15)..table.concat(v_2.messages, "\n "..' ':rep(3 * var15))
-            end
-            table.insert(module_2, var20)
-        else
-            local formatted = string.format("%s%s", ' ':rep(3 * var15), v_2.planNode.phrase or "")
-            var20 = v_2.status
-            if var20 then
-                var20 = formatted
-                formatted = var20..string.format(" (%s)", v_2.status)
-            end
-            var20 = table.insert
-            var20(module_2, formatted)
-            var20 = #v_2.children
-            if 0 < var20 then
-                var20 = arg1:visualize(v_2, var15 + 1)
-                table.insert(module_2, var20)
-            end
-        end
-    end
-    return table.concat(module_2, '\n')
+function t2.visualize(p1, p2, p3) --[[ Line: 70 | Upvalues: TestEnum (copy), t (copy) ]]
+	local v1 = p3 or 0
+	local t2 = {}
+	for i, v in ipairs((p2 or p1).children) do
+		if v.planNode.type == TestEnum.NodeType.It then
+			local v3 = ("%s[%s] %s"):format((" "):rep(3 * v1), t[v.status] or "?", v.planNode.phrase)
+			if v.messages and #v.messages > 0 then
+				v3 = v3 .. "\n " .. (" "):rep(3 * v1) .. table.concat(v.messages, "\n " .. (" "):rep(3 * v1))
+			end
+			table.insert(t2, v3)
+		else
+			local v4 = ("%s%s"):format((" "):rep(3 * v1), v.planNode.phrase or "")
+			if v.status then
+				v4 = v4 .. (" (%s)"):format(v.status)
+			end
+			table.insert(t2, v4)
+			if #v.children > 0 then
+				table.insert(t2, (p1:visualize(v, v1 + 1)))
+			end
+		end
+	end
+	return table.concat(t2, "\n")
 end
-return module_3_upvr
+return t2

@@ -1,375 +1,350 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local RunUtils_upvr = require(ReplicatedStorage_upvr.App.RunUtils)
-local TeamShared_upvr = require(ReplicatedStorage_upvr.App.TeamShared)
-local EzUtils_upvr = require(ReplicatedStorage_upvr.EzUi.EzUtils)
-local Roact_upvr = require(ReplicatedStorage_upvr.Roact)
-local tbl_upvr = {
-    City2_Start = {
-        p = Vector3.new(-93.269, 62.1699, 431.170);
-        LookVector = Vector3.new(0.17000, -0.2599, 0.94999);
-    };
-    PoliceBase1 = {
-        p = Vector3.new(-1173.1, 43.3499, -1573.4);
-        LookVector = Vector3.new(0.01999, -0.0199, -1);
-    };
-    City2_Stop = {
-        p = Vector3.new(39.0299, 62.1699, 1179.23);
-        LookVector = Vector3.new(0.17000, -0.2599, 0.94999);
-    };
-    Prisoner_Cells = {
-        p = Vector3.new(-1391.6, 4.09999, -1963.1);
-        LookVector = Vector3.new(-0.7799, -0.3000, -0.5500);
-    };
-    Prisoner_Yard = {
-        p = Vector3.new(-1145.5, 18.8500, -1858.0);
-        LookVector = Vector3.new(-0.7099, -0, 0.70999);
-    };
-    Prisoner_Foodcourt = {
-        p = Vector3.new(-1424.4, 45.4900, -1763.4);
-        LookVector = Vector3.new(-0.0099, -0.4900, -0.8700);
-    };
-    City1_Start = {
-        p = Vector3.new(-1088.8, 117.120, -2020.9);
-        LookVector = Vector3.new(-0.5, -0.0199, 0.86000);
-    };
-    City1_Stop = {
-        p = Vector3.new(-1301.4, 68.3300, -1581.1);
-        LookVector = Vector3.new(-0.4600, -0.0199, 0.88999);
-    };
-    City3_Start = {
-        p = Vector3.new(655.739, 71.5699, -1052.7);
-        LookVector = Vector3.new(-0.5699, 0.02999, -0.8199);
-    };
-    City3_Stop = {
-        p = Vector3.new(230.679, 57.8600, -1542.0);
-        LookVector = Vector3.new(-0.5500, 0.02999, -0.8299);
-    };
+local CurrentCamera = workspace.CurrentCamera
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Teams = game:GetService("Teams")
+local VoiceChatService = game:GetService("VoiceChatService")
+local RunUtils = require(ReplicatedStorage.App.RunUtils)
+local v1 = RunUtils.isStudio()
+local Localization = require(ReplicatedStorage.Module.Localization)
+local CinematicCamera = require(ReplicatedStorage.Module.CinematicCamera)
+require(ReplicatedStorage.Game.GameUtil)
+local InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSystem)
+local TeamShared = require(ReplicatedStorage.App.TeamShared)
+local WorldTeleportConsts = require(ReplicatedStorage.WorldTeleport.WorldTeleportConsts)
+local RunConsts = require(ReplicatedStorage.App.RunConsts)
+local ScreenFade = require(ReplicatedStorage.App.ScreenFade)
+local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
+local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
+local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
+local Notification = require(ReplicatedStorage.Game.Notification)
+local WorldMarkerSystem = require(ReplicatedStorage.Game.WorldMarker.WorldMarkerSystem)
+local Settings = require(ReplicatedStorage.Resource.Settings)
+local Roact = require(ReplicatedStorage.Roact)
+local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local TeamSelectConsts = require(ReplicatedStorage.TeamSelect.TeamSelectConsts)
+local TeamSelect = require(ReplicatedStorage.TeamSelect.UI.TeamSelect)
+local createElement = Roact.createElement
+local t = {
+	City2_Start = {
+		p = Vector3.new(-93.27, 62.17, 431.17),
+		LookVector = Vector3.new(0.17, -0.26, 0.95)
+	},
+	PoliceBase1 = {
+		p = Vector3.new(-1173.16, 43.35, -1573.47),
+		LookVector = Vector3.new(0.02, -0.02, -1)
+	},
+	City2_Stop = {
+		p = Vector3.new(39.03, 62.17, 1179.24),
+		LookVector = Vector3.new(0.17, -0.26, 0.95)
+	},
+	Prisoner_Cells = {
+		p = Vector3.new(-1391.62, 4.1, -1963.13),
+		LookVector = Vector3.new(-0.78, -0.3, -0.55)
+	},
+	Prisoner_Yard = {
+		p = Vector3.new(-1145.53, 18.85, -1858.03),
+		LookVector = Vector3.new(-0.71, -0, 0.71)
+	},
+	Prisoner_Foodcourt = {
+		p = Vector3.new(-1424.46, 45.49, -1763.45),
+		LookVector = Vector3.new(-0.01, -0.49, -0.87)
+	},
+	City1_Start = {
+		p = Vector3.new(-1088.8, 117.12, -2020.93),
+		LookVector = Vector3.new(-0.5, -0.02, 0.86)
+	},
+	City1_Stop = {
+		p = Vector3.new(-1301.44, 68.33, -1581.19),
+		LookVector = Vector3.new(-0.46, -0.02, 0.89)
+	},
+	City3_Start = {
+		p = Vector3.new(655.74, 71.57, -1052.78),
+		LookVector = Vector3.new(-0.57, 0.03, -0.82)
+	},
+	City3_Stop = {
+		p = Vector3.new(230.68, 57.86, -1542.1),
+		LookVector = Vector3.new(-0.55, 0.03, -0.83)
+	},
+	PoliceBase2 = {
+		p = Vector3.new(739.13, 38.91, 1125.97),
+		LookVector = Vector3.new(-0.81, 0.09, -0.57)
+	}
 }
-local tbl_3 = {
-    p = Vector3.new(739.130, 38.9099, 1125.96);
-    LookVector = Vector3.new(-0.8100, 0.09000, -0.5699);
+local t2 = {}
+for v2, v3 in t do
+	t2[v2] = {
+		p = Vector3.new(0, 0, 0),
+		LookVector = Vector3.new(0, 0, -1)
+	}
+end
+local function SelectIfGamepad(p1) --[[ Line: 63 | Upvalues: EzUtils (copy) ]]
+	EzUtils.selectIfGamepad(p1)
+end
+local function Ease_InOutQuad(p1) --[[ Line: 67 ]]
+	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
+end
+local v4 = nil
+local v5 = nil
+local v6 = nil
+local t3 = {
+	ColorCorrection = nil,
+	Maid = Maid.new()
 }
-tbl_upvr.PoliceBase2 = tbl_3
-tbl_3 = {}
-local var22_upvr = tbl_3
-for i, _ in tbl_upvr do
-    var22_upvr[i] = {
-        p = Vector3.new(0, 0, 0);
-        LookVector = Vector3.new(0, 0, -1);
-    }
+function t3.Init(p1) --[[ Line: 79 | Upvalues: v4 (ref), v5 (ref), v6 (ref), Lighting (copy), t3 (copy), TeamShared (copy), v1 (copy), Settings (copy) ]]
+	v4 = p1.Event
+	v5 = p1.em
+	v6 = p1.OnJump
+	t3.ColorCorrection = Lighting:FindFirstChild("ColorCorrection")
+	function v5.rh1aeent() --[[ Line: 88 | Upvalues: t3 (ref) ]]
+		t3.Hide()
+	end
+	function v5.zijzuhxq(p1) --[[ Line: 93 | Upvalues: TeamShared (ref), t3 (ref) ]]
+		if TeamShared.isTeamSwitchingEnabled() then
+			t3.Show(p1)
+		end
+	end
+	if not v1 or Settings.Test.ChooseTeamInitially then
+		v5.zijzuhxq(true)
+	end
 end
-local function _(arg1) -- Line 63, Named "SelectIfGamepad"
-    EzUtils_upvr.selectIfGamepad(arg1)
+function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), CinematicCamera (copy), RunUtils (copy), t2 (copy), t (copy), CurrentCamera (copy), RunService (copy), TeamShared (copy), Notification (copy), Localization (copy), v4 (ref), Roact (copy), EzUtils (copy), Teams (copy), VoiceChatService (copy), Players (copy), ReplicatedStorage (copy), TeamSelectConsts (copy), GamepassSystem (copy), GamepassUtils (copy), WorldTeleportConsts (copy), RunConsts (copy), createElement (copy), TeamSelect (copy), CharacterUtils (copy), InventoryItemSystem (copy), v6 (ref), v5 (ref), WorldMarkerSystem (copy) ]]
+	local Maid = t3.Maid
+	local ColorCorrection = t3.ColorCorrection
+	assert(ColorCorrection)
+	local v1 = nil
+	local v2 = ScreenFade.new()
+	local v3 = 0
+	local v42 = 0
+	local v52 = CinematicCamera.MakeCinematicCamera()
+	local function UpdateCamera() --[[ Line: 120 | Upvalues: v42 (ref), ColorCorrection (copy), RunUtils (ref), t2 (ref), t (ref), v3 (ref), v52 (copy) ]]
+		v42 = v42 + 1
+		ColorCorrection.TintColor = Color3.new(255/255, 255/255, 255/255)
+		local v1 = if RunUtils.isStudio() then t2 else t
+		v3 = v3 % 3 + 1
+		local v2 = v1["City" .. v3 .. "_Start"]
+		local v32 = v1["City" .. v3 .. "_Stop"]
+		local v4 = CFrame.new(Vector3.new(), v2.LookVector) + v2.p
+		local v5 = CFrame.new(Vector3.new(), v32.LookVector) + v32.p
+		v52.StartPosition = v4.p
+		v52.TargetPosition = v5.p
+		v52.LookVector = v4.LookVector
+		v52.TargetLookVector = nil
+	end
+	local v62 = tick()
+	local v7 = p1 ~= nil
+	local function RenderStepped(p1) --[[ Line: 142 | Upvalues: v62 (ref), CurrentCamera (ref), v7 (ref), UpdateCamera (copy), v42 (ref), ColorCorrection (copy), CinematicCamera (ref), v52 (copy) ]]
+		local v1 = tick()
+		local v2 = v1 - v62
+		if CurrentCamera.CameraType ~= Enum.CameraType.Scriptable then
+			CurrentCamera.CameraType = Enum.CameraType.Scriptable
+		end
+		if v7 then
+			if v2 >= 24 then
+				UpdateCamera()
+				v62 = v1
+			end
+			local v3 = v2 / 24
+			if v3 <= 0.1 and v42 ~= 1 then
+				local v4 = v3 / 0.1
+				local v5, v6
+				if v4 < 0.5 then
+					v5 = 2 * v4 * v4
+					if not v5 then
+						v6 = v4
+						v5 = -1 - 2 * (v4 - 2) * v4
+					end
+				else
+					v6 = v4
+					v5 = -1 - 2 * (v4 - 2) * v4
+				end
+				ColorCorrection.TintColor = Color3.new(v5, v5, v5)
+			elseif v3 >= 0.9 then
+				local v72 = 1 - (v3 - 0.9) / 0.1
+				local v8, v9
+				if v72 < 0.5 then
+					v8 = 2 * v72 * v72
+					if not v8 then
+						v9 = v72
+						v8 = -1 - 2 * (v72 - 2) * v72
+					end
+				else
+					v9 = v72
+					v8 = -1 - 2 * (v72 - 2) * v72
+				end
+				ColorCorrection.TintColor = Color3.new(v8, v8, v8)
+			end
+			CinematicCamera.StepCinematicCamera(p1, v52, 0.1, v3)
+		end
+	end
+	Maid:GiveTask(RunService.RenderStepped:Connect(RenderStepped))
+	UpdateCamera()
+	local v8 = false
+	local function play() --[[ Line: 172 | Upvalues: v8 (ref), TeamShared (ref), v1 (ref), Notification (ref), Localization (ref), v2 (copy), v4 (ref), Maid (copy) ]]
+		if v8 then
+		elseif TeamShared.isTeamFull(v1) then
+			v1 = nil
+			Notification.new({
+				Text = Localization:FormatByKey("Teams.TeamFull")
+			})
+		else
+			v8 = true
+			v2:FadeToLinear(0, 0.3)
+			v4:FireServer("c" .. "" .. ("bds94b"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("wfb5itc"):sub(3, 6):reverse():reverse():reverse():reverse():reverse() .. "x", v1)
+			Maid:GiveTask(task.delay(2, function() --[[ Line: 184 | Upvalues: v2 (ref), v8 (ref) ]]
+				v2:Set(1)
+				v8 = false
+			end))
+		end
+	end
+	local v9 = Roact.createRef()
+	local function getComponent() --[[ Line: 192 | Upvalues: EzUtils (ref), Teams (ref), RunUtils (ref), VoiceChatService (ref), Players (ref), Notification (ref), ReplicatedStorage (ref), TeamSelectConsts (ref), GamepassSystem (ref), GamepassUtils (ref), WorldTeleportConsts (ref), RunConsts (ref), createElement (ref), v7 (ref), TeamSelect (ref), v9 (copy), v1 (ref), play (copy) ]]
+		EzUtils.isSmallScreen()
+		local sum = 0
+		local sum_2 = 0
+		for v2, v3 in Teams:GetChildren() do
+			if v3.Name == "Police" then
+				sum_2 = sum_2 + #v3:GetPlayers()
+			else
+				sum = sum + #v3:GetPlayers()
+			end
+		end
+		local v4 = RunUtils.getPlaceType() == "Default"
+		local _ = RunUtils.getPlaceType() == "VoiceChat"
+		local v5 = RunUtils.getPlaceType() == "Pro"
+		local t = {}
+		local t2 = {
+			onClicked = function() --[[ Name: onClicked | Line: 207 | Upvalues: v4 (copy), VoiceChatService (ref), Players (ref), Notification (ref), ReplicatedStorage (ref), TeamSelectConsts (ref) ]]
+				local v1 = if v4 then "VoiceChat" else "Default"
+				local v2, v3 = pcall(function() --[[ Line: 209 | Upvalues: VoiceChatService (ref), Players (ref) ]]
+					return VoiceChatService:IsVoiceEnabledForUserIdAsync(Players.LocalPlayer.UserId)
+				end)
+				if v4 and not (v2 and v3) then
+					Notification.new({
+						Text = "Enable voice chat to join voice chat servers!"
+					})
+				else
+					ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(v1)
+				end
+			end
+		}
+		t2.text = if v4 then "VOICECHAT SERVERS" else "MAIN SERVERS"
+		local t3 = {
+			onClicked = function() --[[ Name: onClicked | Line: 225 | Upvalues: v5 (copy), VoiceChatService (ref), Players (ref), Notification (ref), ReplicatedStorage (ref), TeamSelectConsts (ref) ]]
+				local v1 = if v5 then "VoiceChat" else "Pro"
+				local v2, v3 = pcall(function() --[[ Line: 227 | Upvalues: VoiceChatService (ref), Players (ref) ]]
+					return VoiceChatService:IsVoiceEnabledForUserIdAsync(Players.LocalPlayer.UserId)
+				end)
+				if v5 and not (v2 and v3) then
+					Notification.new({
+						Text = "Enable voice chat to join voice chat servers!"
+					})
+				elseif v5 or not (Players.LocalPlayer.AccountAge < 60) then
+					if v5 or Players.LocalPlayer:GetAttribute("ProServerAccess") then
+						ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(v1)
+					else
+						Notification.new({
+							Text = "You need $5 million to enter High Roller servers!"
+						})
+					end
+				else
+					Notification.new({
+						Text = "Your account needs to be 60 days old to enter High Roller servers."
+					})
+				end
+			end
+		}
+		t3.text = if v5 then "VOICECHAT SERVERS" else "HIGH ROLLER SERVERS"
+		t[1] = t2
+		t[2] = t3
+		t[3] = {
+			onClicked = function() --[[ Name: onClicked | Line: 252 | Upvalues: GamepassSystem (ref), GamepassUtils (ref), ReplicatedStorage (ref), WorldTeleportConsts (ref), RunConsts (ref) ]]
+				if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then
+					ReplicatedStorage:FindFirstChild(WorldTeleportConsts.TELEPORT_TO_WORLD_FROM_TEAM_SWITCH_NAME):FireServer(RunConsts.TRADE_WORLD_NAME)
+				else
+					GamepassUtils.PromptGamepass(GamepassUtils.EnumGamepass.TradingVIP)
+				end
+			end,
+			text = "TRADE WORLD"
+		}
+		if workspace:GetServerTimeNow() < TeamSelectConsts.OG_JB_END_TIME then
+			table.insert(t, 1, {
+				onClicked = function() --[[ Name: onClicked | Line: 267 | Upvalues: ReplicatedStorage (ref), TeamSelectConsts (ref) ]]
+					ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer("Hang")
+				end,
+				text = "OG JAILBREAK",
+				textColor = Color3.fromHex("e88839")
+			})
+		end
+		local v8 = Players.LocalPlayer:GetAttribute("AllowCriminalSpawn")
+		return createElement("ScreenGui", {
+			IgnoreGuiInset = true,
+			Enabled = v7
+		}, {
+			TeamSelect = createElement(TeamSelect, {
+				size = UDim2.fromScale(1, 1),
+				numPolice = sum_2,
+				numCriminals = sum,
+				criminalButtonRef = v9,
+				allowCriminal = if v8 == nil then false else v8,
+				onTeamSelected = function(p1) --[[ Name: onTeamSelected | Line: 293 | Upvalues: v1 (ref), play (ref) ]]
+					v1 = p1
+					play()
+				end,
+				serverButtons = t
+			})
+		})
+	end
+	local v10 = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "TeamSelectGui")
+	if v9:getValue() then
+		EzUtils.selectIfGamepad((v9:getValue()))
+	end
+	Maid:GiveTask(function() --[[ Line: 307 | Upvalues: Roact (ref), v10 (copy) ]]
+		Roact.unmount(v10)
+	end)
+	local function update() --[[ Line: 311 | Upvalues: Roact (ref), v10 (copy), getComponent (copy) ]]
+		Roact.update(v10, getComponent())
+	end
+	for v12, v13 in Teams:GetChildren() do
+		Maid:GiveTask(v13.PlayerAdded:Connect(update))
+		Maid:GiveTask(v13.PlayerRemoved:Connect(update))
+	end
+	Maid:GiveTask(function() --[[ Line: 320 | Upvalues: CurrentCamera (ref), CharacterUtils (ref), Players (ref), v2 (copy) ]]
+		CurrentCamera.CameraType = Enum.CameraType.Custom
+		local v1 = CharacterUtils.getHumanoid(Players.LocalPlayer.Character)
+		if v1 then
+			CurrentCamera.CameraSubject = v1
+		end
+		v2:FadeToLinear(1, 0.3)
+		task.delay(0.3, function() --[[ Line: 327 | Upvalues: v2 (ref) ]]
+			v2:Destroy()
+		end)
+	end)
+	InventoryItemSystem.unequipAll()
+	v6()
+	v5.dmg39zpa(true)
+	Maid:GiveTask(function() --[[ Line: 336 | Upvalues: ColorCorrection (copy) ]]
+		ColorCorrection.TintColor = Color3.new(255/255, 255/255, 255/255)
+	end)
+	if not p1 then
+		v2:FadeToLinear(0, 0.3)
+		Maid:GiveTask(task.delay(0.4, function() --[[ Line: 342 | Upvalues: v7 (ref), Roact (ref), v10 (copy), getComponent (copy), v2 (copy) ]]
+			v7 = true
+			Roact.update(v10, getComponent())
+			v2:FadeToLinear(1, 0.3)
+		end))
+	end
+	local gui = WorldMarkerSystem.gui
+	if gui then
+		gui.Enabled = false
+		Maid:GiveTask(function() --[[ Line: 352 | Upvalues: gui (copy) ]]
+			gui.Enabled = true
+		end)
+	end
 end
-local function _(arg1) -- Line 67, Named "Ease_InOutQuad"
-    local var24
-    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-        var24 = 2 * arg1 * arg1
-        return var24
-    end
-    if arg1 >= 0.5 or not decompInlinedCondition() then
-        var24 = -1 - 2 * (arg1 - 2) * arg1
-    end
-    return var24
+function t3.Hide() --[[ Line: 360 | Upvalues: t3 (copy) ]]
+	t3.Maid:DoCleaning()
 end
-local var25_upvw
-local var26_upvw
-local var27_upvw
-local module_upvr = {
-    ColorCorrection = nil;
-    Maid = require(ReplicatedStorage_upvr.Std.Maid).new();
-}
-local Lighting_upvr = game:GetService("Lighting")
-local any_isStudio_result1_upvr = RunUtils_upvr.isStudio()
-local Settings_upvr = require(ReplicatedStorage_upvr.Resource.Settings)
-function module_upvr.Init(arg1) -- Line 79
-    var25_upvw = arg1.Event
-    var26_upvw = arg1.em
-    var27_upvw = arg1.OnJump
-    module_upvr.ColorCorrection = Lighting_upvr:FindFirstChild("ColorCorrection")
-    function var26_upvw.pce3mz4c() -- Line 88
-        module_upvr.Hide()
-    end
-    function var26_upvw.iqhsv859(arg1_2) -- Line 93
-        if not TeamShared_upvr.isTeamSwitchingEnabled() then
-        else
-            module_upvr.Show(arg1_2)
-        end
-    end
-    if any_isStudio_result1_upvr and not Settings_upvr.Test.ChooseTeamInitially then
-    else
-        var26_upvw.iqhsv859(true)
-    end
-end
-local ScreenFade_upvr = require(ReplicatedStorage_upvr.App.ScreenFade)
-local CinematicCamera_upvr = require(ReplicatedStorage_upvr.Module.CinematicCamera)
-local CurrentCamera_upvr = workspace.CurrentCamera
-local RunService_upvr = game:GetService("RunService")
-local Notification_upvr = require(ReplicatedStorage_upvr.Game.Notification)
-local Localization_upvr = require(ReplicatedStorage_upvr.Module.Localization)
-local Teams_upvr = game:GetService("Teams")
-local VoiceChatService_upvr = game:GetService("VoiceChatService")
-local Players_upvr = game:GetService("Players")
-local TeamSelectConsts_upvr = require(ReplicatedStorage_upvr.TeamSelect.TeamSelectConsts)
-local GamepassSystem_upvr = require(ReplicatedStorage_upvr.Gamepass.GamepassSystem)
-local GamepassUtils_upvr = require(ReplicatedStorage_upvr.Gamepass.GamepassUtils)
-local WorldTeleportConsts_upvr = require(ReplicatedStorage_upvr.WorldTeleport.WorldTeleportConsts)
-local RunConsts_upvr = require(ReplicatedStorage_upvr.App.RunConsts)
-local createElement_upvr = Roact_upvr.createElement
-local TeamSelect_upvr = require(ReplicatedStorage_upvr.TeamSelect.UI.TeamSelect)
-local CharacterUtils_upvr = require(ReplicatedStorage_upvr.Std.CharacterUtils)
-local InventoryItemSystem_upvr = require(ReplicatedStorage_upvr.Inventory.InventoryItemSystem)
-local WorldMarkerSystem_upvr = require(ReplicatedStorage_upvr.Game.WorldMarker.WorldMarkerSystem)
-function module_upvr.Show(arg1) -- Line 106
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local Maid_upvr = module_upvr.Maid
-    local ColorCorrection_upvr = module_upvr.ColorCorrection
-    assert(ColorCorrection_upvr)
-    local var61_upvw
-    local any_new_result1_upvr = ScreenFade_upvr.new()
-    local var63_upvw = 0
-    local any_MakeCinematicCamera_result1_upvr = CinematicCamera_upvr.MakeCinematicCamera()
-    local var65_upvw = 0
-    local function UpdateCamera_upvr() -- Line 120, Named "UpdateCamera"
-        var63_upvw += 1
-        local var66 = ColorCorrection_upvr
-        var66.TintColor = Color3.new(1, 1, 1)
-        if RunUtils_upvr.isStudio() then
-            var66 = var22_upvr
-        else
-            var66 = tbl_upvr
-        end
-        var65_upvw = var65_upvw % 3 + 1
-        local var67 = var66["City"..var65_upvw.."_Start"]
-        local var68 = var66["City"..var65_upvw.."_Stop"]
-        local var69 = CFrame.new(Vector3.new(), var67.LookVector) + var67.p
-        any_MakeCinematicCamera_result1_upvr.StartPosition = var69.p
-        any_MakeCinematicCamera_result1_upvr.TargetPosition = (CFrame.new(Vector3.new(), var68.LookVector) + var68.p).p
-        any_MakeCinematicCamera_result1_upvr.LookVector = var69.LookVector
-        any_MakeCinematicCamera_result1_upvr.TargetLookVector = nil
-    end
-    local var70_upvw
-    if arg1 == nil then
-        var70_upvw = false
-    else
-        var70_upvw = true
-    end
-    local tick_result1_2_upvw = tick()
-    Maid_upvr:GiveTask(RunService_upvr.RenderStepped:Connect(function(arg1_3) -- Line 142, Named "RenderStepped"
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        CurrentCamera_upvr.CameraType = Enum.CameraType.Scriptable
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end))
-    UpdateCamera_upvr()
-    local var78_upvw = false
-    local function play_upvr() -- Line 172, Named "play"
-        if var78_upvw then
-        else
-            if TeamShared_upvr.isTeamFull(var61_upvw) then
-                var61_upvw = nil
-                Notification_upvr.new({
-                    Text = Localization_upvr:FormatByKey("Teams.TeamFull");
-                })
-                return
-            end
-            var78_upvw = true
-            any_new_result1_upvr:FadeToLinear(0, 0.3)
-            var25_upvw:FireServer('d'.."".."vwurcqv":sub(3, 3):reverse():reverse():reverse():reverse():reverse().."".."".."eug9g9uf":sub(4, 4):reverse():reverse():reverse().."".."".."zgcflrr":sub(3, 3):reverse().."".."".."u4um9g2":sub(5, 5):reverse():reverse():reverse().."".."n2f", var61_upvw)
-            Maid_upvr:GiveTask(task.delay(2, function() -- Line 184
-                any_new_result1_upvr:Set(1)
-                var78_upvw = false
-            end))
-        end
-    end
-    local any_createRef_result1_upvr = Roact_upvr.createRef()
-    local function getComponent_upvr() -- Line 192, Named "getComponent"
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        local var90
-        if EzUtils_upvr.isSmallScreen() then
-        else
-        end
-        var90 = Teams_upvr:GetChildren()
-        local children_upvr, NONE, NONE_3 = Teams_upvr:GetChildren()
-        for _, v_2 in children_upvr, NONE, NONE_3 do
-            if v_2.Name == "Police" then
-            else
-            end
-        end
-        if RunUtils_upvr.getPlaceType() ~= "Default" then
-            children_upvr = false
-        else
-            children_upvr = true
-        end
-        if RunUtils_upvr.getPlaceType() ~= "VoiceChat" then
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        if RunUtils_upvr.getPlaceType() ~= "Pro" then
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        local var94_upvr = true
-        local tbl = {}
-        local tbl_4 = {}
-        local function onClicked() -- Line 207
-            local var97
-            if children_upvr then
-                var97 = "VoiceChat"
-            else
-                var97 = "Default"
-            end
-            local pcall_result1_2, pcall_result2 = pcall(function() -- Line 209
-                return VoiceChatService_upvr:IsVoiceEnabledForUserIdAsync(Players_upvr.LocalPlayer.UserId)
-            end)
-            if children_upvr and not (pcall_result1_2 and pcall_result2) then
-                Notification_upvr.new({
-                    Text = "Enable voice chat to join voice chat servers!";
-                })
-            else
-                ReplicatedStorage_upvr.TeamSelect:FindFirstChild(TeamSelectConsts_upvr.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(var97)
-            end
-        end
-        tbl_4.onClicked = onClicked
-        if children_upvr then
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-        tbl_4.text = "MAIN SERVERS"
-        local tbl_5 = {}
-        local function onClicked() -- Line 225
-            local var103
-            if var94_upvr then
-                var103 = "VoiceChat"
-            else
-                var103 = "Pro"
-            end
-            local pcall_result1, pcall_result2_2 = pcall(function() -- Line 227
-                return VoiceChatService_upvr:IsVoiceEnabledForUserIdAsync(Players_upvr.LocalPlayer.UserId)
-            end)
-            if var94_upvr and not (pcall_result1 and pcall_result2_2) then
-                Notification_upvr.new({
-                    Text = "Enable voice chat to join voice chat servers!";
-                })
-            else
-                if not var94_upvr and Players_upvr.LocalPlayer.AccountAge < 60 then
-                    Notification_upvr.new({
-                        Text = "Your account needs to be 60 days old to enter High Roller servers.";
-                    })
-                    return
-                end
-                if not var94_upvr and not Players_upvr.LocalPlayer:GetAttribute("ProServerAccess") then
-                    Notification_upvr.new({
-                        Text = "You need $5 million to enter High Roller servers!";
-                    })
-                    return
-                end
-                ReplicatedStorage_upvr.TeamSelect:FindFirstChild(TeamSelectConsts_upvr.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(var103)
-            end
-        end
-        tbl_5.onClicked = onClicked
-        if var94_upvr then
-        else
-        end
-        tbl_5.text = "HIGH ROLLER SERVERS"
-        local tbl_2 = {}
-        local function onClicked() -- Line 252
-            if not GamepassSystem_upvr.DoesPlayerOwn(GamepassUtils_upvr.EnumGamepass.TradingVIP) then
-                GamepassUtils_upvr.PromptGamepass(GamepassUtils_upvr.EnumGamepass.TradingVIP)
-            else
-                ReplicatedStorage_upvr:FindFirstChild(WorldTeleportConsts_upvr.TELEPORT_TO_WORLD_FROM_TEAM_SWITCH_NAME):FireServer(RunConsts_upvr.TRADE_WORLD_NAME)
-            end
-        end
-        tbl_2.onClicked = onClicked
-        tbl_2.text = "TRADE WORLD"
-        tbl[1] = tbl_4
-        tbl[2] = tbl_5
-        tbl[3] = tbl_2
-        if workspace:GetServerTimeNow() < TeamSelectConsts_upvr.OG_JB_END_TIME then
-            table.insert(tbl, 1, {
-                onClicked = function() -- Line 267, Named "onClicked"
-                    ReplicatedStorage_upvr.TeamSelect:FindFirstChild(TeamSelectConsts_upvr.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer("Hang")
-                end;
-                text = "OG JAILBREAK";
-                textColor = Color3.fromHex("e88839");
-            })
-        end
-        local var112 = false
-        local AllowCriminalSpawn = Players_upvr.LocalPlayer:GetAttribute("AllowCriminalSpawn")
-        if AllowCriminalSpawn ~= nil then
-            var112 = AllowCriminalSpawn
-        end
-        return createElement_upvr("ScreenGui", {
-            IgnoreGuiInset = true;
-            Enabled = var70_upvw;
-        }, {
-            TeamSelect = createElement_upvr(TeamSelect_upvr, {
-                size = UDim2.fromScale(1, 1);
-                numPolice = 0 + #v_2:GetPlayers();
-                numCriminals = 0 + #v_2:GetPlayers();
-                criminalButtonRef = any_createRef_result1_upvr;
-                allowCriminal = var112;
-                onTeamSelected = function(arg1_4) -- Line 293, Named "onTeamSelected"
-                    var61_upvw = arg1_4
-                    play_upvr()
-                end;
-                serverButtons = tbl;
-            });
-        })
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(getComponent_upvr(), Players_upvr.LocalPlayer.PlayerGui, "TeamSelectGui")
-    if any_createRef_result1_upvr:getValue() then
-        EzUtils_upvr.selectIfGamepad(any_createRef_result1_upvr:getValue())
-    end
-    Maid_upvr:GiveTask(function() -- Line 307
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end)
-    local function update() -- Line 311
-        Roact_upvr.update(any_mount_result1_upvr, getComponent_upvr())
-    end
-    for var129, var127 in Teams_upvr:GetChildren() do
-        Maid_upvr:GiveTask(var127.PlayerAdded:Connect(update))
-        Maid_upvr:GiveTask(var127.PlayerRemoved:Connect(update))
-        local _
-    end
-    Maid_upvr:GiveTask(function() -- Line 320
-        CurrentCamera_upvr.CameraType = Enum.CameraType.Custom
-        local any_getHumanoid_result1 = CharacterUtils_upvr.getHumanoid(Players_upvr.LocalPlayer.Character)
-        if any_getHumanoid_result1 then
-            CurrentCamera_upvr.CameraSubject = any_getHumanoid_result1
-        end
-        any_new_result1_upvr:FadeToLinear(1, 0.3)
-        task.delay(0.3, function() -- Line 327
-            any_new_result1_upvr:Destroy()
-        end)
-    end)
-    InventoryItemSystem_upvr.unequipAll()
-    var27_upvw()
-    var26_upvw.t6yqxhtu(true)
-    Maid_upvr:GiveTask(function() -- Line 336
-        ColorCorrection_upvr.TintColor = Color3.new(1, 1, 1)
-    end)
-    if not arg1 then
-        var129 = 0.3
-        any_new_result1_upvr:FadeToLinear(0, var129)
-        var129 = 0.4
-        function var127() -- Line 342
-            var70_upvw = true
-            Roact_upvr.update(any_mount_result1_upvr, getComponent_upvr())
-            any_new_result1_upvr:FadeToLinear(1, 0.3)
-        end
-        Maid_upvr:GiveTask(task.delay(var129, var127))
-    end
-    local gui_upvr = WorldMarkerSystem_upvr.gui
-    if gui_upvr then
-        gui_upvr.Enabled = false
-        function var129() -- Line 352
-            gui_upvr.Enabled = true
-        end
-        Maid_upvr:GiveTask(var129)
-    end
-end
-function module_upvr.Hide() -- Line 360
-    module_upvr.Maid:DoCleaning()
-end
-return module_upvr
+return t3

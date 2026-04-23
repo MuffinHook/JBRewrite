@@ -1,28 +1,29 @@
-local var1_upvw
-local var2_upvw = false
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local function Check_upvr() -- Line 6, Named "Check"
-    local April2020LiveEvent = ReplicatedStorage_upvr.Resource:FindFirstChild("April2020LiveEvent")
-    if April2020LiveEvent ~= nil then
-        var2_upvw = true
-        wait(0.1)
-        require(April2020LiveEvent:WaitForChild("April2020LiveEvent")).Init(var1_upvw)
-        var1_upvw = nil
-        print("Loaded april 2020 live event")
-    end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local v1 = nil
+local v2 = false
+local function Check() --[[ Line: 6 | Upvalues: ReplicatedStorage (copy), v2 (ref), v1 (ref) ]]
+	local April2020LiveEvent = ReplicatedStorage.Resource:FindFirstChild("April2020LiveEvent")
+	if April2020LiveEvent ~= nil then
+		v2 = true
+		local April2020LiveEvent_2 = April2020LiveEvent:WaitForChild("April2020LiveEvent")
+		wait(0.1)
+		require(April2020LiveEvent_2).Init(v1)
+		v1 = nil
+		print("Loaded april 2020 live event")
+	end
 end
-local function Launch_upvr() -- Line 18, Named "Launch"
-    while var2_upvw == false do
-        local pcall_result1, pcall_result2 = pcall(Check_upvr)
-        if not pcall_result1 then
-            warn(pcall_result2)
-        end
-        wait(1)
-    end
+local function Launch() --[[ Line: 18 | Upvalues: v2 (ref), Check (copy) ]]
+	while v2 == false do
+		local v1, v22 = pcall(Check)
+		if not v1 then
+			warn(v22)
+		end
+		wait(1)
+	end
 end
 return {
-    Init = function(arg1) -- Line 27, Named "Init"
-        var1_upvw = arg1
-        spawn(Launch_upvr)
-    end;
+	Init = function(p1) --[[ Name: Init | Line: 27 | Upvalues: v1 (ref), Launch (copy) ]]
+		v1 = p1
+		spawn(Launch)
+	end
 }

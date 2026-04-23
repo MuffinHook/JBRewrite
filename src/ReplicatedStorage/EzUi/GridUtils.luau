@@ -1,21 +1,16 @@
-local module_upvr = {
-    getRowRatio = function(arg1) -- Line 3, Named "getRowRatio"
-        local var2 = arg1.verticalPaddingRatio * arg1.aspectRatio
-        return 1 / ((1) / (arg1.aspectRatio * arg1.rowsPerPage) - 1 / var2 - (1) / (var2 * arg1.rowsPerPage))
-    end;
+local t = {
+	getRowRatio = function(p1) --[[ Name: getRowRatio | Line: 3 ]]
+		local v1 = p1.verticalPaddingRatio * p1.aspectRatio
+		return 1 / (1 / (p1.aspectRatio * p1.rowsPerPage) - 1 / v1 - 1 / (v1 * p1.rowsPerPage))
+	end
 }
-function module_upvr.getColRatio(arg1, arg2) -- Line 7
-    local var3 = arg1.verticalPaddingRatio * arg1.aspectRatio
-    local var4 = arg2
-    if not var4 then
-        var4 = module_upvr
-        var4 = var4.getRowRatio(arg1)
-    end
-    local var5 = var4
-    return var5 / arg1.colsPerRow - var5 / var3 - var5 / var3 / arg1.colsPerRow
+function t.getColRatio(p1, p2) --[[ Line: 7 | Upvalues: t (copy) ]]
+	local v1 = p1.verticalPaddingRatio * p1.aspectRatio
+	local v2 = p2 or t.getRowRatio(p1)
+	return v2 / p1.colsPerRow - v2 / v1 - v2 / v1 / p1.colsPerRow
 end
-function module_upvr.getScaleX(arg1) -- Line 12
-    local var6 = arg1.verticalPaddingRatio * arg1.aspectRatio
-    return 1 / arg1.colsPerRow - 1 / var6 - 1 / var6 / arg1.colsPerRow
+function t.getScaleX(p1) --[[ Line: 12 ]]
+	local v1 = p1.verticalPaddingRatio * p1.aspectRatio
+	return 1 / p1.colsPerRow - 1 / v1 - 1 / v1 / p1.colsPerRow
 end
-return module_upvr
+return t

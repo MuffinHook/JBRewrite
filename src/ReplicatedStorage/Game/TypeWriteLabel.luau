@@ -1,22 +1,22 @@
-local RunService_upvr = game:GetService("RunService")
-return function(arg1, arg2, arg3, arg4) -- Line 3
-    arg2.Text = arg1
-    arg2.MaxVisibleGraphemes = 0
-    local utf8_len_result1_upvr = utf8.len(arg1)
-    local os_clock_result1_upvr = os.clock()
-    local var6_upvr = utf8_len_result1_upvr / (arg3 or 25)
-    local var7_upvw
-    var7_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 19
-        local var8 = (os.clock() - os_clock_result1_upvr) / var6_upvr
-        if 1 < var8 then
-            var8 = 1
-            var7_upvw:Disconnect()
-        end
-        local var9 = var8 * utf8_len_result1_upvr
-        arg2.MaxVisibleGraphemes = var9
-        if arg4 then
-            arg4(var9)
-        end
-    end)
-    return var7_upvw
+local RunService = game:GetService("RunService")
+return function(p1, p2, p3, p4) --[[ Line: 3 | Upvalues: RunService (copy) ]]
+	p2.Text = p1
+	p2.MaxVisibleGraphemes = 0
+	local v1 = os.clock()
+	local v2 = utf8.len(p1)
+	local v3 = v2 / (p3 or 25)
+	local v4 = nil
+	v4 = RunService.Heartbeat:Connect(function() --[[ Line: 19 | Upvalues: v1 (copy), v3 (copy), v4 (ref), v2 (copy), p2 (copy), p4 (copy) ]]
+		local v12 = (os.clock() - v1) / v3
+		if v12 > 1 then
+			v4:Disconnect()
+			v12 = 1
+		end
+		local v22 = v12 * v2
+		p2.MaxVisibleGraphemes = v22
+		if p4 then
+			p4(v22)
+		end
+	end)
+	return v4
 end

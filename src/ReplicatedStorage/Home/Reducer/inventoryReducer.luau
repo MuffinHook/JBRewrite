@@ -1,5 +1,6 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer({}, {
-    setInventory = function(arg1, arg2) -- Line 6, Named "setInventory"
-        return arg2.value
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer({}, {
+	setInventory = function(p1, p2) --[[ Name: setInventory | Line: 6 ]]
+		return p2.value
+	end
 })

@@ -1,5 +1,6 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer(nil, {
-    setPenaltyText = function(arg1, arg2) -- Line 5, Named "setPenaltyText"
-        return arg2.value
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer(nil, {
+	setPenaltyText = function(p1, p2) --[[ Name: setPenaltyText | Line: 5 ]]
+		return p2.value
+	end
 })

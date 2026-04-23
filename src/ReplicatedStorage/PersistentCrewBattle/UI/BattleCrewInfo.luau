@@ -1,174 +1,153 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact_upvr.PureComponent:extend("BattleCrewInfo")
-any_extend_result1.defaultProps = {
-    backgroundColor = Color3.new(0, 0, 0);
-    size = UDim2.fromScale(0.5, 0.5);
-    anchorPoint = Vector2.new(0.5, 0.5);
-    position = UDim2.fromScale(0.5, 0.5);
-    attacking = false;
+local Roact = require(ReplicatedStorage.Roact)
+local Dictionary = require(ReplicatedStorage.Std.Dictionary)
+local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
+local createElement = Roact.createElement
+local Elapsed = require(script.Parent.Elapsed)
+local BattleRobberyStatus = require(script.Parent.BattleRobberyStatus)
+local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
+local v1 = Roact.PureComponent:extend("BattleCrewInfo")
+v1.defaultProps = {
+	backgroundColor = Color3.new(0/255, 0/255, 0/255),
+	size = UDim2.fromScale(0.5, 0.5),
+	anchorPoint = Vector2.new(0.5, 0.5),
+	position = UDim2.fromScale(0.5, 0.5),
+	attacking = false
 }
-local ColorUtils_upvr = require(ReplicatedStorage.Std.ColorUtils)
-local createElement_upvr = Roact_upvr.createElement
-local BattleRobberyStatus_upvr = require(script.Parent.BattleRobberyStatus)
-local Dictionary_upvr = require(ReplicatedStorage.Std.Dictionary)
-local Elapsed_upvr = require(script.Parent.Elapsed)
-local PersistentCrewBattleConsts_upvr = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
-function any_extend_result1.render(arg1) -- Line 19
-    local tbl = {}
-    local var16
-    for i, v in arg1.props.robberiesCompleted do
-        if v.robberyCompleted then
-            var16 += 1
-        end
-        tbl["Robbery_"..tostring(v.robberyType)] = createElement_upvr(BattleRobberyStatus_upvr, {
-            rowIndex = i;
-            robberyType = v.robberyType;
-            robberyCompleted = v.robberyCompleted;
-            backgroundColor = ColorUtils_upvr.saturateBy(arg1.props.backgroundColor, -0.9);
-        })
-    end
-    local module = {
-        UICorners = createElement_upvr("UICorner", {
-            CornerRadius = UDim.new(0, 4);
-        });
-        TitleContainer = createElement_upvr("Frame", {
-            BackgroundTransparency = 1;
-            Size = UDim2.new(1, 0, 1, 0);
-        }, {
-            Text = createElement_upvr("TextLabel", {
-                BackgroundTransparency = 1;
-                Size = UDim2.new(1, 0, 1, 0);
-                Position = UDim2.new(0.5, 0, 0.5, 0);
-                AnchorPoint = Vector2.new(0.5, 0.5);
-                Font = Enum.Font.Bangers;
-                Text = arg1.props.clanName;
-                LineHeight = 1;
-                TextScaled = true;
-                TextColor3 = ColorUtils_upvr.brightenBy(arg1.props.backgroundColor, -0.5);
-            });
-        });
-    }
-    local attacking_2 = arg1.props.attacking
-    if attacking_2 then
-        attacking_2 = createElement_upvr
-        attacking_2 = attacking_2("Frame", {
-            BorderSizePixel = 0;
-            BackgroundColor3 = arg1.props.backgroundColor;
-            Size = UDim2.new(0.5, -2, 0.8, 0);
-            AnchorPoint = Vector2.new(0, 0);
-            Position = UDim2.new(0, 0, 1, 4);
-        }, {
-            UICorners = createElement_upvr("UICorner", {
-                CornerRadius = UDim.new(0, 4);
-            });
-            ElapsedContainer = createElement_upvr(Elapsed_upvr, {
-                font = Enum.Font.FredokaOne;
-                textColor = ColorUtils_upvr.brightenBy(arg1.props.backgroundColor, -0.5);
-                createdAt = arg1.props.createdAt;
-                elapsed = arg1.props.elapsed;
-                disabled = arg1.props.disabled;
-                prefix = "Time Taken: ";
-            });
-        })
-    end
-    module.TakenContainer = attacking_2
-    local attacking = arg1.props.attacking
-    if attacking then
-        attacking = createElement_upvr
-        attacking = attacking("Frame", {
-            BorderSizePixel = 0;
-            BackgroundColor3 = arg1.props.backgroundColor;
-            Size = UDim2.new(0.5, -2, 0.8, 0);
-            AnchorPoint = Vector2.new(0, 0);
-            Position = UDim2.new(0.5, 2, 1, 4);
-        }, Dictionary_upvr.merge({
-            UICorners = createElement_upvr("UICorner", {
-                CornerRadius = UDim.new(0, 4);
-            });
-            TitleContainer = createElement_upvr("Frame", {
-                BackgroundTransparency = 1;
-                Size = UDim2.new(1, 0, 1, 0);
-            }, {
-                Text = createElement_upvr("TextLabel", {
-                    BackgroundTransparency = 1;
-                    Size = UDim2.new(0.9, 0, 0.8, 0);
-                    Position = UDim2.new(0.5, 0, 0.5, 0);
-                    AnchorPoint = Vector2.new(0.5, 0.5);
-                    Font = Enum.Font.FredokaOne;
-                    Text = string.format("Checklist (%d/%d)", var16, PersistentCrewBattleConsts_upvr.NUM_ROBBERIES_TO_FINISH_ROUND);
-                    LineHeight = 1;
-                    TextScaled = true;
-                    TextColor3 = ColorUtils_upvr.brightenBy(arg1.props.backgroundColor, -0.5);
-                });
-            });
-        }, tbl))
-    end
-    module.RobberyList = attacking
-    attacking = not arg1.props.attacking
-    local var36 = attacking
-    if var36 then
-        var36 = createElement_upvr
-        var36 = var36("Frame", {
-            BorderSizePixel = 0;
-            BackgroundColor3 = arg1.props.backgroundColor;
-            Size = UDim2.new(0.5, -2, 0.8, 0);
-            AnchorPoint = Vector2.new(0, 0);
-            Position = UDim2.new(0, 0, 1, 4);
-        }, {
-            UICorners = createElement_upvr("UICorner", {
-                CornerRadius = UDim.new(0, 4);
-            });
-            ElapsedContainer = createElement_upvr(Elapsed_upvr, {
-                font = Enum.Font.FredokaOne;
-                textColor = ColorUtils_upvr.brightenBy(arg1.props.backgroundColor, -0.5);
-                createdAt = arg1.props.createdAt;
-                elapsed = arg1.props.elapsed;
-                disabled = arg1.props.disabled;
-                prefix = "Time Taken: ";
-            });
-        })
-    end
-    module.BeatContainer = var36
-    var36 = not arg1.props.attacking
-    local var41 = var36
-    if var41 then
-        var41 = createElement_upvr
-        var41 = var41("Frame", {
-            BorderSizePixel = 0;
-            BackgroundColor3 = arg1.props.backgroundColor;
-            Size = UDim2.new(0.5, -2, 0.8, 0);
-            AnchorPoint = Vector2.new(0, 0);
-            Position = UDim2.new(0.5, 2, 1, 4);
-        }, {
-            UICorners = createElement_upvr("UICorner", {
-                CornerRadius = UDim.new(0, 4);
-            });
-            TitleContainer = createElement_upvr("Frame", {
-                BackgroundTransparency = 1;
-                Size = UDim2.new(1, 0, 1, 0);
-            }, {
-                Text = createElement_upvr("TextLabel", {
-                    BackgroundTransparency = 1;
-                    Size = UDim2.new(0.9, 0, 0.8, 0);
-                    Position = UDim2.new(0.5, 0, 0.5, 0);
-                    AnchorPoint = Vector2.new(0.5, 0.5);
-                    Font = Enum.Font.FredokaOne;
-                    Text = "Beat their time!";
-                    LineHeight = 1;
-                    TextScaled = true;
-                    TextColor3 = ColorUtils_upvr.brightenBy(arg1.props.backgroundColor, -0.5);
-                });
-            });
-        })
-    end
-    module.Help = var41
-    return createElement_upvr("Frame", {
-        BorderSizePixel = 0;
-        BackgroundColor3 = arg1.props.backgroundColor;
-        Size = arg1.props.size;
-        AnchorPoint = arg1.props.anchorPoint;
-        Position = arg1.props.position;
-    }, Dictionary_upvr.merge(arg1.props[Roact_upvr.Children], module))
+function v1.render(p1) --[[ Line: 19 | Upvalues: ColorUtils (copy), createElement (copy), BattleRobberyStatus (copy), Dictionary (copy), Roact (copy), Elapsed (copy), PersistentCrewBattleConsts (copy) ]]
+	local v1 = ColorUtils.saturateBy(p1.props.backgroundColor, -0.9)
+	local count = 0
+	local t = {}
+	for v2, v3 in p1.props.robberiesCompleted do
+		if v3.robberyCompleted then
+			count = count + 1
+		end
+		t["Robbery_" .. tostring(v3.robberyType)] = createElement(BattleRobberyStatus, {
+			rowIndex = v2,
+			robberyType = v3.robberyType,
+			robberyCompleted = v3.robberyCompleted,
+			backgroundColor = v1
+		})
+	end
+	local t3 = {
+		UICorners = createElement("UICorner", {
+			CornerRadius = UDim.new(0, 4)
+		}),
+		TitleContainer = createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			Text = createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Font = Enum.Font.Bangers,
+				Text = p1.props.clanName,
+				LineHeight = 1,
+				TextScaled = true,
+				TextColor3 = ColorUtils.brightenBy(p1.props.backgroundColor, -0.5)
+			})
+		})
+	}
+	t3.TakenContainer = p1.props.attacking and createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundColor3 = p1.props.backgroundColor,
+		Size = UDim2.new(0.5, -2, 0.8, 0),
+		AnchorPoint = Vector2.new(0, 0),
+		Position = UDim2.new(0, 0, 1, 4)
+	}, {
+		UICorners = createElement("UICorner", {
+			CornerRadius = UDim.new(0, 4)
+		}),
+		ElapsedContainer = createElement(Elapsed, {
+			font = Enum.Font.FredokaOne,
+			textColor = ColorUtils.brightenBy(p1.props.backgroundColor, -0.5),
+			createdAt = p1.props.createdAt,
+			elapsed = p1.props.elapsed,
+			disabled = p1.props.disabled,
+			prefix = "Time Taken: "
+		})
+	})
+	t3.RobberyList = p1.props.attacking and createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundColor3 = p1.props.backgroundColor,
+		Size = UDim2.new(0.5, -2, 0.8, 0),
+		AnchorPoint = Vector2.new(0, 0),
+		Position = UDim2.new(0.5, 2, 1, 4)
+	}, Dictionary.merge({
+		UICorners = createElement("UICorner", {
+			CornerRadius = UDim.new(0, 4)
+		}),
+		TitleContainer = createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			Text = createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0.9, 0, 0.8, 0),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Font = Enum.Font.FredokaOne,
+				Text = ("Checklist (%d/%d)"):format(count, PersistentCrewBattleConsts.NUM_ROBBERIES_TO_FINISH_ROUND),
+				LineHeight = 1,
+				TextScaled = true,
+				TextColor3 = ColorUtils.brightenBy(p1.props.backgroundColor, -0.5)
+			})
+		})
+	}, t))
+	t3.BeatContainer = not p1.props.attacking and createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundColor3 = p1.props.backgroundColor,
+		Size = UDim2.new(0.5, -2, 0.8, 0),
+		AnchorPoint = Vector2.new(0, 0),
+		Position = UDim2.new(0, 0, 1, 4)
+	}, {
+		UICorners = createElement("UICorner", {
+			CornerRadius = UDim.new(0, 4)
+		}),
+		ElapsedContainer = createElement(Elapsed, {
+			font = Enum.Font.FredokaOne,
+			textColor = ColorUtils.brightenBy(p1.props.backgroundColor, -0.5),
+			createdAt = p1.props.createdAt,
+			elapsed = p1.props.elapsed,
+			disabled = p1.props.disabled,
+			prefix = "Time Taken: "
+		})
+	})
+	t3.Help = not p1.props.attacking and createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundColor3 = p1.props.backgroundColor,
+		Size = UDim2.new(0.5, -2, 0.8, 0),
+		AnchorPoint = Vector2.new(0, 0),
+		Position = UDim2.new(0.5, 2, 1, 4)
+	}, {
+		UICorners = createElement("UICorner", {
+			CornerRadius = UDim.new(0, 4)
+		}),
+		TitleContainer = createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			Text = createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0.9, 0, 0.8, 0),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Font = Enum.Font.FredokaOne,
+				Text = "Beat their time!",
+				LineHeight = 1,
+				TextScaled = true,
+				TextColor3 = ColorUtils.brightenBy(p1.props.backgroundColor, -0.5)
+			})
+		})
+	})
+	return createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundColor3 = p1.props.backgroundColor,
+		Size = p1.props.size,
+		AnchorPoint = p1.props.anchorPoint,
+		Position = p1.props.position
+	}, Dictionary.merge(p1.props[Roact.Children], t3))
 end
-return any_extend_result1
+return v1

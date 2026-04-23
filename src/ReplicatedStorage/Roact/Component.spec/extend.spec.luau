@@ -1,29 +1,20 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMaClRoZSBTZW5hdGUGZXh0ZW5kBmV4cGVjdAJ0bwJiZQJvawJvZgVlcXVhbBZTdGF0ZWZ1bENvbXBvbmVudENsYXNzBUZyYW5rBVNoZWV2BXRocm93BkZvb0Jhcgh0b3N0cmluZwFhBnN0cmluZwRmaW5kB3JlcXVpcmUGc2NyaXB0BlBhcmVudARUeXBlCUNvbXBvbmVudAJpdBRzaG91bGQgYmUgZXh0ZW5kYWJsZSlzaG91bGQgcHJldmVudCBleHRlbmRpbmcgYSB1c2VyIGNvbXBvbmVudBdzaG91bGQgdXNlIGEgZ2l2ZW4gbmFtZQAGBgACAAAJAAIBDw8PAAAhIfsAAABvAgAAvAAAnAEAAACfAAMCpAQDAAAAIEBSBQAAnwQCAk0DBJIEAAAATQIDzAUAAABNAQIQBgAAAJ8BAQGkAwMAAAAgQPsFAQBNBAW8BwAAAFIFAACfBAIAnwMAAk0CA5IEAAAATQECewgAAAD7AwEATQIDmgkAAACfAQIBggABAAoDAQMCAwMEAAAgQAMEAwUDBgMHAwgDCQAGAAEYAAAAAAACAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABBwAAAAADAAEAAAQAAQAPBvsAAABvAgAAvAAAnAEAAACfAAMBggABAAIDCgMCABAAARgAAAAAAAERAAAAAAUAAQAACAABAQ8PAAAQEPsAAABvAgAAvAAAnAEAAACfAAMCpAMDAAAAIEDZBAAAEgAAAJ8DAgJNAgOSBAAAAE0BAtsFAAAAnwEBAYIAAQAGAwsDAgMDBAAAIEADBAMMAQENAAEYAAAAAAACAAAAAAIAAAAAAQ4AAAAACQABAAAMAAECDw8AACUDAQUgJfsAAABvAgAAvAAAnAEAAACfAAMCuz8AA1ICAACkAQMAAAAgQJ8BAgKkBQUAAABAQFIGAQCfBQICTQQFkgYAAABNAwTMBwAAAE0CA4AIAAAAbwMJAJ8CAgGkBQUAAABAQG8IAAC8BgFWCgAAAJ8GAwCfBQACTQQFkgYAAABNAwTMBwAAAE0CAxALAAAAnwIBAYIAAQAMAw0DAgMOBAAAIEADAwQAAEBAAwQDBQMPAxADEQMGABUAARgAAAAAAAIAAAAAAgAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAABFgAAAAAGAAAAAAsAAAIPAAAqDwELHyqkAAEAAAAAQKQEAwAAACBATQMEJAQAAABNAgMkBAAAAE0BAhEFAAAAnwACAqQBAQAAAABApAUDAAAAIEBNBAUkBAAAAE0DBCQEAAAATQIDiAYAAACfAQICpAIIAAAAcEBvAwkA2QQAABIAAQASAAAAnwIDAaQCCAAAAHBAbwMKANkEAQASAAEAnwIDAaQCCAAAAHBAbwMLANkEAgASAAEAnwIDAYIAAQAMAxIEAAAAQAMTBAAAIEADFAMVAxYDFwQAAHBAAxgDGQMaAwACAwEAARgAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAgAAAAAAAAcAAAAAAAgAAAAAAAgCAAAAAAEAAAECAAOjAAAAwAAAAIIAAgABBgQBBAEAARgAAAABAAAAAAUmgmFJKSgcBRRGC92YpM3EkFYMclYCwT3kR88O3g1D/ZY6WNcIAVmk
-
 return function() --[[ Line: 1 ]]
-    local v0 = require(script.Parent.Parent.Type);
-    local v1 = require(script.Parent.Parent.Component);
-    it("should be extendable", function() --[[ Line: 6 ]]
-        -- upvalues: v1 (copy), v0 (copy)
-        local v2 = v1:extend("The Senate");
-        expect(v2).to.be.ok();
-        expect(v0.of(v2)).to.equal(v0.StatefulComponentClass);
-    end);
-    it("should prevent extending a user component", function() --[[ Line: 13 ]]
-        -- upvalues: v1 (copy)
-        local v3 = v1:extend("Sheev");
-        expect(function() --[[ Line: 16 ]]
-            -- upvalues: v3 (copy)
-            v3:extend("Frank");
-        end).to.throw();
-    end);
-    it("should use a given name", function() --[[ Line: 21 ]]
-        -- upvalues: v1 (copy)
-        local v4 = tostring((v1:extend("FooBar")));
-        expect(v4).to.be.a("string");
-        expect(v4:find("FooBar")).to.be.ok();
-    end);
-end;
+	local Type = require(script.Parent.Parent.Type)
+	local Component = require(script.Parent.Parent.Component)
+	it("should be extendable", function() --[[ Line: 6 | Upvalues: Component (copy), Type (copy) ]]
+		local v1 = Component:extend("The Senate")
+		expect(v1).to.be.ok()
+		expect(Type.of(v1)).to.equal(Type.StatefulComponentClass)
+	end)
+	it("should prevent extending a user component", function() --[[ Line: 13 | Upvalues: Component (copy) ]]
+		local v1 = Component:extend("Sheev")
+		expect(function() --[[ Line: 16 | Upvalues: v1 (copy) ]]
+			v1:extend("Frank")
+		end).to.throw()
+	end)
+	it("should use a given name", function() --[[ Line: 21 | Upvalues: Component (copy) ]]
+		local v2 = tostring((Component:extend("FooBar")))
+		expect(v2).to.be.a("string")
+		expect(v2:find("FooBar")).to.be.ok()
+	end)
+end

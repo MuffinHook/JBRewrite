@@ -1,7 +1,43 @@
 {
   "className": "ParticleEmitter",
   "properties": {
-    "Texture": "http://www.roblox.com/asset/?id=10080075007",
+    "Rate": 5.0,
+    "Speed": {
+      "NumberRange": [
+        1.5,
+        1.5
+      ]
+    },
+    "LightInfluence": 1.0,
+    "FlipbookBlendFrames": {
+      "Bool": false
+    },
+    "LightEmission": 0.20000000298023224,
+    "Squash": {
+      "NumberSequence": {
+        "keypoints": [
+          {
+            "time": 0.0,
+            "value": 0.1,
+            "envelope": 0.0
+          },
+          {
+            "time": 1.0,
+            "value": 0.1,
+            "envelope": 0.0
+          }
+        ]
+      }
+    },
+    "TimeScale": 0.5,
+    "Orientation": "FacingCameraWorldUp",
+    "LockedToPart": true,
+    "Lifetime": {
+      "NumberRange": [
+        2.5,
+        3.0
+      ]
+    },
     "Size": {
       "NumberSequence": {
         "keypoints": [
@@ -28,14 +64,7 @@
         ]
       }
     },
-    "Speed": {
-      "NumberRange": [
-        1.5,
-        1.5
-      ]
-    },
-    "LockedToPart": true,
-    "Orientation": "FacingCameraWorldUp",
+    "Texture": "http://www.roblox.com/asset/?id=10080075007",
     "Color": {
       "ColorSequence": {
         "keypoints": [
@@ -57,35 +86,6 @@
           }
         ]
       }
-    },
-    "Squash": {
-      "NumberSequence": {
-        "keypoints": [
-          {
-            "time": 0.0,
-            "value": 0.1,
-            "envelope": 0.0
-          },
-          {
-            "time": 1.0,
-            "value": 0.1,
-            "envelope": 0.0
-          }
-        ]
-      }
-    },
-    "TimeScale": 0.5,
-    "LightInfluence": 1.0,
-    "Lifetime": {
-      "NumberRange": [
-        2.5,
-        3.0
-      ]
-    },
-    "LightEmission": 0.20000000298023224,
-    "Rate": 5.0,
-    "FlipbookBlendFrames": {
-      "Bool": false
     }
   }
 }

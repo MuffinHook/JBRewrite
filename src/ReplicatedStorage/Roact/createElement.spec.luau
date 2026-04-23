@@ -1,102 +1,81 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMwBUZyYW1lBmV4cGVjdAJ0bwJiZQJvawJvZgVlcXVhbAdFbGVtZW50BEhvc3QIRnVuY3Rpb24DRm9vBmV4dGVuZAhTdGF0ZWZ1bAZQb3J0YWwLU3RyaW5nVmFsdWUFVmFsdWUFcHJvcHMISW50VmFsdWUFQ2hpbGQHY2FwdHVyZQh3YXJuaW5ncw1jcmVhdGVFbGVtZW50BGZpbmQIQ2hpbGRyZW4Gc291cmNlAWEGc3RyaW5nDmVsZW1lbnRUcmFjaW5nBnNjb3BlZAdyZXF1aXJlBnNjcmlwdAZQYXJlbnQJQ29tcG9uZW50C0VsZW1lbnRLaW5kDEdsb2JhbENvbmZpZwdMb2dnaW5nBFR5cGULUHJvcE1hcmtlcnMCaXQkc2hvdWxkIGNyZWF0ZSBuZXcgcHJpbWl0aXZlIGVsZW1lbnRzJXNob3VsZCBjcmVhdGUgbmV3IGZ1bmN0aW9uYWwgZWxlbWVudHMlc2hvdWxkIGNyZWF0ZSBuZXcgc3RhdGVmdWwgY29tcG9uZW50cyFzaG91bGQgY3JlYXRlIG5ldyBwb3J0YWwgZWxlbWVudHMTc2hvdWxkIGFjY2VwdCBwcm9wcyBzaG91bGQgYWNjZXB0IHByb3BzIGFuZCBjaGlsZHJlbilzaG91bGQgYWNjZXB0IGNoaWxkcmVuIHdpdGggd2l0aG91dCBwcm9wcz9zaG91bGQgd2FybiBvbmNlIGlmIGNoaWxkcmVuIGlzIHNwZWNpZmllZCBpbiB0d28gZGlmZmVyZW50IHdheXM2c2hvdWxkIGhhdmUgYSBgc291cmNlYCBtZW1iZXIgaWYgZWxlbWVudFRyYWNpbmcgaXMgc2V0AA4GAAMAAAoAAwEPDw8PAAAvL/sAAABvAQAAnwACAqQEAgAAABBAUgUAAJ8EAgJNAwSSAwAAAE0CA8wEAAAATQECEAUAAACfAQEBpAMCAAAAEED7BQEATQQFvAYAAABSBQAAnwQCAJ8DAAJNAgOSAwAAAE0BAnsHAAAA+wMBAE0CA5cIAAAAnwECAaQDAgAAABBA+wUCAE0EBbwGAAAAUgUAAJ8EAgCfAwACTQIDkgMAAABNAQJ7BwAAAPsDAgBNAgMoCQAAAJ8BAgGCAAEACgMBAwIEAAAQQAMDAwQDBQMGAwcDCAMJAAwAARgAAAACAAAAAAAAAAAA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
-
 return function() --[[ Line: 1 ]]
-    local v0 = require(script.Parent.Component);
-    local v1 = require(script.Parent.ElementKind);
-    local v2 = require(script.Parent.GlobalConfig);
-    local v3 = require(script.Parent.Logging);
-    local v4 = require(script.Parent.Type);
-    local v5 = require(script.Parent.Portal);
-    local v6 = require(script.Parent.PropMarkers.Children);
-    local v7 = require(script.Parent.createElement);
-    it("should create new primitive elements", function() --[[ Line: 12 ]]
-        -- upvalues: v7 (copy), v4 (copy), v1 (copy)
-        local v8 = v7("Frame");
-        expect(v8).to.be.ok();
-        expect(v4.of(v8)).to.equal(v4.Element);
-        expect(v1.of(v8)).to.equal(v1.Host);
-    end);
-    it("should create new functional elements", function() --[[ Line: 20 ]]
-        -- upvalues: v7 (copy), v4 (copy), v1 (copy)
-        local v9 = v7(function() --[[ Line: 21 ]]
-
-        end);
-        expect(v9).to.be.ok();
-        expect(v4.of(v9)).to.equal(v4.Element);
-        expect(v1.of(v9)).to.equal(v1.Function);
-    end);
-    it("should create new stateful components", function() --[[ Line: 28 ]]
-        -- upvalues: v0 (copy), v7 (copy), v4 (copy), v1 (copy)
-        local v10 = v0:extend("Foo");
-        local v11 = v7(v10);
-        expect(v11).to.be.ok();
-        expect(v4.of(v11)).to.equal(v4.Element);
-        expect(v1.of(v11)).to.equal(v1.Stateful);
-    end);
-    it("should create new portal elements", function() --[[ Line: 38 ]]
-        -- upvalues: v7 (copy), v5 (copy), v4 (copy), v1 (copy)
-        local v12 = v7(v5);
-        expect(v12).to.be.ok();
-        expect(v4.of(v12)).to.equal(v4.Element);
-        expect(v1.of(v12)).to.equal(v1.Portal);
-    end);
-    it("should accept props", function() --[[ Line: 46 ]]
-        -- upvalues: v7 (copy)
-        local v13 = v7("StringValue", {
-            Value = "Foo"
-        });
-        expect(v13).to.be.ok();
-        expect(v13.props.Value).to.equal("Foo");
-    end);
-    it("should accept props and children", function() --[[ Line: 55 ]]
-        -- upvalues: v7 (copy), v6 (copy)
-        local v14 = v7("IntValue");
-        local v15 = v7("StringValue", {
-            Value = "Foo"
-        }, {
-            Child = v14
-        });
-        expect(v15).to.be.ok();
-        expect(v15.props.Value).to.equal("Foo");
-        expect(v15.props[v6]).to.be.ok();
-        expect(v15.props[v6].Child).to.equal(v14);
-    end);
-    it("should accept children with without props", function() --[[ Line: 70 ]]
-        -- upvalues: v7 (copy), v6 (copy)
-        local v16 = v7("IntValue");
-        local v17 = v7("StringValue", nil, {
-            Child = v16
-        });
-        expect(v17).to.be.ok();
-        expect(v17.props[v6]).to.be.ok();
-        expect(v17.props[v6].Child).to.equal(v16);
-    end);
-    it("should warn once if children is specified in two different ways", function() --[[ Line: 82 ]]
-        -- upvalues: v3 (copy), v7 (copy), v6 (copy)
-        local v19 = v3.capture(function() --[[ Line: 83 ]]
-            -- upvalues: v7 (ref), v6 (ref)
-            for _ = 1, 2 do
-                v7("Frame", {
-                    [v6] = {}
-                }, {});
-            end;
-        end);
-        expect(#v19.warnings).to.equal(1);
-        expect(v19.warnings[1]:find("createElement")).to.be.ok();
-        expect(v19.warnings[1]:find("Children")).to.be.ok();
-    end);
-    it("should have a `source` member if elementTracing is set", function() --[[ Line: 98 ]]
-        -- upvalues: v2 (copy), v7 (copy)
-        local v20 = {
-            elementTracing = true
-        };
-        v2.scoped(v20, function() --[[ Line: 103 ]]
-            -- upvalues: v7 (ref)
-            local v21 = v7("StringValue");
-            expect(v21.source).to.be.a("string");
-        end);
-    end);
-end;
+	local Component = require(script.Parent.Component)
+	local ElementKind = require(script.Parent.ElementKind)
+	local GlobalConfig = require(script.Parent.GlobalConfig)
+	local Logging = require(script.Parent.Logging)
+	local Type = require(script.Parent.Type)
+	local Portal = require(script.Parent.Portal)
+	local Children = require(script.Parent.PropMarkers.Children)
+	local createElement = require(script.Parent.createElement)
+	it("should create new primitive elements", function() --[[ Line: 12 | Upvalues: createElement (copy), Type (copy), ElementKind (copy) ]]
+		local v1 = createElement("Frame")
+		expect(v1).to.be.ok()
+		expect(Type.of(v1)).to.equal(Type.Element)
+		expect(ElementKind.of(v1)).to.equal(ElementKind.Host)
+	end)
+	it("should create new functional elements", function() --[[ Line: 20 | Upvalues: createElement (copy), Type (copy), ElementKind (copy) ]]
+		local v1 = createElement(function() --[[ Line: 21 ]] end)
+		expect(v1).to.be.ok()
+		expect(Type.of(v1)).to.equal(Type.Element)
+		expect(ElementKind.of(v1)).to.equal(ElementKind.Function)
+	end)
+	it("should create new stateful components", function() --[[ Line: 28 | Upvalues: Component (copy), createElement (copy), Type (copy), ElementKind (copy) ]]
+		local v1 = createElement((Component:extend("Foo")))
+		expect(v1).to.be.ok()
+		expect(Type.of(v1)).to.equal(Type.Element)
+		expect(ElementKind.of(v1)).to.equal(ElementKind.Stateful)
+	end)
+	it("should create new portal elements", function() --[[ Line: 38 | Upvalues: createElement (copy), Portal (copy), Type (copy), ElementKind (copy) ]]
+		local v1 = createElement(Portal)
+		expect(v1).to.be.ok()
+		expect(Type.of(v1)).to.equal(Type.Element)
+		expect(ElementKind.of(v1)).to.equal(ElementKind.Portal)
+	end)
+	it("should accept props", function() --[[ Line: 46 | Upvalues: createElement (copy) ]]
+		local v1 = createElement("StringValue", {
+			Value = "Foo"
+		})
+		expect(v1).to.be.ok()
+		expect(v1.props.Value).to.equal("Foo")
+	end)
+	it("should accept props and children", function() --[[ Line: 55 | Upvalues: createElement (copy), Children (copy) ]]
+		local v1 = createElement("IntValue")
+		local v2 = createElement("StringValue", {
+			Value = "Foo"
+		}, {
+			Child = v1
+		})
+		expect(v2).to.be.ok()
+		expect(v2.props.Value).to.equal("Foo")
+		expect(v2.props[Children]).to.be.ok()
+		expect(v2.props[Children].Child).to.equal(v1)
+	end)
+	it("should accept children with without props", function() --[[ Line: 70 | Upvalues: createElement (copy), Children (copy) ]]
+		local v1 = createElement("IntValue")
+		local v2 = createElement("StringValue", nil, {
+			Child = v1
+		})
+		expect(v2).to.be.ok()
+		expect(v2.props[Children]).to.be.ok()
+		expect(v2.props[Children].Child).to.equal(v1)
+	end)
+	it("should warn once if children is specified in two different ways", function() --[[ Line: 82 | Upvalues: Logging (copy), createElement (copy), Children (copy) ]]
+		local v1 = Logging.capture(function() --[[ Line: 83 | Upvalues: createElement (ref), Children (ref) ]]
+			for i = 1, 2 do
+				createElement("Frame", {
+					[Children] = {}
+				}, {})
+			end
+		end)
+		expect(#v1.warnings).to.equal(1)
+		expect(v1.warnings[1]:find("createElement")).to.be.ok()
+		expect(v1.warnings[1]:find("Children")).to.be.ok()
+	end)
+	it("should have a `source` member if elementTracing is set", function() --[[ Line: 98 | Upvalues: GlobalConfig (copy), createElement (copy) ]]
+		GlobalConfig.scoped({
+			elementTracing = true
+		}, function() --[[ Line: 103 | Upvalues: createElement (ref) ]]
+			expect(createElement("StringValue").source).to.be.a("string")
+		end)
+	end)
+end

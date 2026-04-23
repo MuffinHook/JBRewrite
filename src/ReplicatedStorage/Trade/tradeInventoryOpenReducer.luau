@@ -1,12 +1,7 @@
-return require(game:GetService("ReplicatedStorage").Rodux).createReducer(false, {
-    setTradeInventoryOpen = function(arg1, arg2) -- Line 5, Named "setTradeInventoryOpen"
-        local var2
-        if arg2.value == nil then
-            var2 = false
-        else
-            var2 = true
-        end
-        assert(var2, "missing value")
-        return arg2.value
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Rodux).createReducer(false, {
+	setTradeInventoryOpen = function(p1, p2) --[[ Name: setTradeInventoryOpen | Line: 5 ]]
+		assert(p2.value ~= nil, "missing value")
+		return p2.value
+	end
 })

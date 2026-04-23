@@ -1,44 +1,45 @@
-local BaseObject_upvr = require(game:GetService("ReplicatedStorage").Std.BaseObject)
-local Part_upvr = Instance.new("Part")
-Part_upvr.Name = "TracerRoot"
-Part_upvr.Anchored = true
-Part_upvr.CFrame = CFrame.new(0, 0, 0)
-Part_upvr.CanCollide = false
-Part_upvr.Transparency = 1
-Part_upvr.Parent = workspace
-local Folder_upvr = Instance.new("Folder")
-Folder_upvr.Name = "TracerLines"
-Folder_upvr.Parent = workspace
-local module_upvr = {}
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, BaseObject_upvr)
-function module_upvr.new() -- Line 19
-    local any_new_result1 = BaseObject_upvr.new()
-    setmetatable(any_new_result1, module_upvr)
-    any_new_result1:_setup()
-    any_new_result1:SetColor(Color3.fromRGB(255, 235, 141))
-    return any_new_result1
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local TracerRoot = Instance.new("Part")
+TracerRoot.Name = "TracerRoot"
+TracerRoot.Anchored = true
+TracerRoot.CFrame = CFrame.new(0, 0, 0)
+TracerRoot.CanCollide = false
+TracerRoot.Transparency = 1
+TracerRoot.Parent = workspace
+local TracerLines = Instance.new("Folder")
+TracerLines.Name = "TracerLines"
+TracerLines.Parent = workspace
+local t = {}
+t.__index = t
+setmetatable(t, BaseObject)
+function t.new() --[[ Line: 19 | Upvalues: BaseObject (copy), t (copy) ]]
+	local v1 = BaseObject.new()
+	setmetatable(v1, t)
+	v1:_setup()
+	v1:SetColor(Color3.fromRGB(255, 235, 141))
+	return v1
 end
-function module_upvr.SetColor(arg1, arg2) -- Line 28
-    arg1.lineHandle.Color3 = arg2
+function t.SetColor(p1, p2) --[[ Line: 28 ]]
+	p1.lineHandle.Color3 = p2
 end
-function module_upvr.SetThickness(arg1, arg2) -- Line 31
-    arg1.lineHandle.Thickness = arg2
+function t.SetThickness(p1, p2) --[[ Line: 31 ]]
+	p1.lineHandle.Thickness = p2
 end
-function module_upvr._setup(arg1) -- Line 34
-    local LineHandleAdornment = Instance.new("LineHandleAdornment")
-    LineHandleAdornment.Adornee = Part_upvr
-    LineHandleAdornment.Transparency = 0.1
-    LineHandleAdornment.Thickness = 2
-    LineHandleAdornment.SizeRelativeOffset = Vector3.new(0, 0, 0)
-    LineHandleAdornment.Length = 0
-    LineHandleAdornment.CFrame = CFrame.new()
-    LineHandleAdornment.Parent = Folder_upvr
-    arg1.maid:GiveTask(LineHandleAdornment)
-    arg1.lineHandle = LineHandleAdornment
+function t._setup(p1) --[[ Line: 34 | Upvalues: TracerRoot (copy), TracerLines (copy) ]]
+	local LineHandleAdornment = Instance.new("LineHandleAdornment")
+	LineHandleAdornment.Adornee = TracerRoot
+	LineHandleAdornment.Transparency = 0.1
+	LineHandleAdornment.Thickness = 2
+	LineHandleAdornment.SizeRelativeOffset = Vector3.new(0, 0, 0)
+	LineHandleAdornment.Length = 0
+	LineHandleAdornment.CFrame = CFrame.new()
+	LineHandleAdornment.Parent = TracerLines
+	p1.maid:GiveTask(LineHandleAdornment)
+	p1.lineHandle = LineHandleAdornment
 end
-function module_upvr.Draw(arg1, arg2, arg3) -- Line 46
-    arg1.lineHandle.Length = (arg3 - arg2).Magnitude
-    arg1.lineHandle.CFrame = CFrame.lookAt(arg2, arg3)
+function t.Draw(p1, p2, p3) --[[ Line: 46 ]]
+	p1.lineHandle.Length = (p3 - p2).Magnitude
+	p1.lineHandle.CFrame = CFrame.lookAt(p2, p3)
 end
-return module_upvr
+return t

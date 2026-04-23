@@ -1,36 +1,18 @@
-local ProximitySoundConsts_upvr = require(script.Parent.ProximitySoundConsts)
+local ProximitySoundConsts = require(script.Parent.ProximitySoundConsts)
 return {
-    setEnabled = function(arg1, arg2) -- Line 4, Named "setEnabled"
-        if arg1 == nil then
-        else
-        end
-        assert(true)
-        if arg2 == nil then
-        else
-        end
-        assert(true)
-        arg1:SetAttribute(ProximitySoundConsts_upvr.ENABLED_ATTR_NAME, arg2)
-    end;
-    setRadius = function(arg1, arg2) -- Line 9, Named "setRadius"
-        if arg1 == nil then
-        else
-        end
-        assert(true)
-        if arg2 == nil then
-        else
-        end
-        assert(true)
-        arg1:SetAttribute(ProximitySoundConsts_upvr.RADIUS_ATTR_NAME, arg2)
-    end;
-    setId = function(arg1, arg2) -- Line 14, Named "setId"
-        if arg1 == nil then
-        else
-        end
-        assert(true)
-        if typeof(arg2) ~= "number" then
-        else
-        end
-        assert(true)
-        arg1:SetAttribute(ProximitySoundConsts_upvr.ID_ATTR_NAME, arg2)
-    end;
+	setEnabled = function(p1, p2) --[[ Name: setEnabled | Line: 4 | Upvalues: ProximitySoundConsts (copy) ]]
+		assert(p1 ~= nil)
+		assert(p2 ~= nil)
+		p1:SetAttribute(ProximitySoundConsts.ENABLED_ATTR_NAME, p2)
+	end,
+	setRadius = function(p1, p2) --[[ Name: setRadius | Line: 9 | Upvalues: ProximitySoundConsts (copy) ]]
+		assert(p1 ~= nil)
+		assert(p2 ~= nil)
+		p1:SetAttribute(ProximitySoundConsts.RADIUS_ATTR_NAME, p2)
+	end,
+	setId = function(p1, p2) --[[ Name: setId | Line: 14 | Upvalues: ProximitySoundConsts (copy) ]]
+		assert(p1 ~= nil)
+		assert(typeof(p2) == "number")
+		p1:SetAttribute(ProximitySoundConsts.ID_ATTR_NAME, p2)
+	end
 }

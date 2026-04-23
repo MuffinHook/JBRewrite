@@ -1,211 +1,189 @@
-local Util_upvr = require(script.Parent.Util)
-local function unescapeOperators_upvr(arg1) -- Line 3, Named "unescapeOperators"
-    local var10
-    for _, v in ipairs({"%.", "%?", "%*", "%*%*"}) do
-        var10 = var10:gsub('\\'..v, v:gsub("%%", ""))
-    end
-    return var10
+local Util = require(script.Parent.Util)
+local function unescapeOperators(p1) --[[ Line: 3 ]]
+	for i, v in ipairs({ "%.", "%?", "%*", "%*%*" }) do
+		p1 = p1:gsub("\\" .. v, v:gsub("%%", ""))
+	end
+	return p1
 end
-local module_upvr = {}
-module_upvr.__index = module_upvr
-function module_upvr.new(arg1, arg2, arg3) -- Line 113
-    local module = {}
-    module.Command = arg1
-    module.Type = nil
-    module.Name = arg2.Name
-    module.Object = arg2
-    local var13 = false
-    if arg2.Default == nil then
-        if arg2.Optional == true then
-            var13 = false
-        else
-            var13 = true
-        end
-    end
-    module.Required = var13
-    module.Executor = arg1.Executor
-    module.RawValue = arg3
-    module.RawSegments = {}
-    module.TransformedValues = {}
-    module.Prefix = ""
-    module.TextSegmentInProgress = ""
-    module.RawSegmentsAreAutocomplete = false
-    if type(arg2.Type) == "table" then
-        module.Type = arg2.Type
-    else
-        local any_ParsePrefixedUnionType_result1, any_ParsePrefixedUnionType_result2, any_ParsePrefixedUnionType_result3 = Util_upvr.ParsePrefixedUnionType(arg1.Cmdr.Registry:GetTypeName(arg2.Type), arg3)
-        module.Type = arg1.Dispatcher.Registry:GetType(any_ParsePrefixedUnionType_result1)
-        module.RawValue = any_ParsePrefixedUnionType_result2
-        module.Prefix = any_ParsePrefixedUnionType_result3
-        if module.Type == nil then
-            error(string.format(`[Cmdr] {module.Name or "none"} has an unregistered type %q`, any_ParsePrefixedUnionType_result1 or "<none>"))
-        end
-    end
-    setmetatable(module, module_upvr)
-    module:Transform()
-    return module
+local t = {}
+t.__index = t
+function t.new(p1, p2, p3) --[[ Line: 113 | Upvalues: Util (copy), t (copy) ]]
+	local t2 = {
+		Command = p1,
+		Type = nil,
+		Name = p2.Name,
+		Object = p2
+	}
+	t2.Required = if p2.Default == nil then p2.Optional ~= true else false
+	t2.Executor = p1.Executor
+	t2.RawValue = p3
+	t2.RawSegments = {}
+	t2.TransformedValues = {}
+	t2.Prefix = ""
+	t2.TextSegmentInProgress = ""
+	t2.RawSegmentsAreAutocomplete = false
+	if type(p2.Type) == "table" then
+		t2.Type = p2.Type
+	else
+		local v2, v3, v4 = Util.ParsePrefixedUnionType(p1.Cmdr.Registry:GetTypeName(p2.Type), p3)
+		t2.Type = p1.Dispatcher.Registry:GetType(v2)
+		t2.RawValue = v3
+		t2.Prefix = v4
+		if t2.Type == nil then
+			error(("[Cmdr] %* has an unregistered type %%q"):format(t2.Name or "none"):format(v2 or "<none>"))
+		end
+	end
+	setmetatable(t2, t)
+	t2:Transform()
+	return t2
 end
-function module_upvr.GetDefaultAutocomplete(arg1) -- Line 156
-    if arg1.Type.Autocomplete then
-        local any_Autocomplete_result1, any_Autocomplete_result2 = arg1.Type.Autocomplete(arg1:TransformSegment(""))
-        local var19 = any_Autocomplete_result2
-        if not var19 then
-            var19 = {}
-        end
-        return any_Autocomplete_result1, var19
-    end
-    return {}
+function t.GetDefaultAutocomplete(p1) --[[ Line: 156 ]]
+	if p1.Type.Autocomplete then
+		local v1, v2 = p1.Type.Autocomplete(p1:TransformSegment(""))
+		return v1, v2 or {}
+	else
+		return {}
+	end
 end
-function module_upvr.Transform(arg1) -- Line 173
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var81
-    if var81 ~= 0 then
-    else
-        var81 = arg1.RawValue
-        if arg1.Type.ArgumentOperatorAliases then
-            var81 = arg1.Type.ArgumentOperatorAliases[var81] or var81
-        end
-        if var81 == '.' and arg1.Type.Default then
-            var81 = arg1.Type.Default(arg1.Executor) or ""
-            arg1.RawSegmentsAreAutocomplete = true
-        end
-        if var81 == '?' and arg1.Type.Autocomplete then
-            local any_GetDefaultAutocomplete_result1_3, any_GetDefaultAutocomplete_result2_6 = arg1:GetDefaultAutocomplete()
-            if not any_GetDefaultAutocomplete_result2_6.IsPartial and 0 < #any_GetDefaultAutocomplete_result1_3 then
-                var81 = any_GetDefaultAutocomplete_result1_3[math.random(1, #any_GetDefaultAutocomplete_result1_3)]
-                arg1.RawSegmentsAreAutocomplete = true
-            end
-        end
-        if arg1.Type.Listable and 0 < #arg1.RawValue then
-            local any_match_result1 = var81:match("^%?(%d+)$")
-            if any_match_result1 then
-                local tonumber_result1_2 = tonumber(any_match_result1)
-                if tonumber_result1_2 and 0 < tonumber_result1_2 then
-                    local tbl_5 = {}
-                    local any_GetDefaultAutocomplete_result1_4, any_GetDefaultAutocomplete_result2_5 = arg1:GetDefaultAutocomplete()
-                    if not any_GetDefaultAutocomplete_result2_5.IsPartial and 0 < #any_GetDefaultAutocomplete_result1_4 then
-                        for _ = 1, math.min(tonumber_result1_2, #any_GetDefaultAutocomplete_result1_4) do
-                            table.insert(tbl_5, table.remove(any_GetDefaultAutocomplete_result1_4, math.random(1, #any_GetDefaultAutocomplete_result1_4)))
-                        end
-                        var81 = table.concat(tbl_5, ',')
-                        arg1.RawSegmentsAreAutocomplete = true
-                        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                    end
-                    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                end
-            else
-                local any_GetDefaultAutocomplete_result1_6, any_GetDefaultAutocomplete_result2_2 = arg1:GetDefaultAutocomplete()
-                local function decompInlinedCondition_3() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                    return any_GetDefaultAutocomplete_result2_2.IsPartial
-                end
-                if var81 == '*' or var81 == "**" or not decompInlinedCondition_3() and 0 < #any_GetDefaultAutocomplete_result1_6 then
-                    if var81 == "**" then
-                        if arg1.Type.Default then
-                            for i_7, v_3 in ipairs(any_GetDefaultAutocomplete_result1_6) do
-                                if v_3 == (arg1.Type.Default(arg1.Executor) or "") then
-                                    table.remove(any_GetDefaultAutocomplete_result1_6, i_7)
-                                end
-                            end
-                        end
-                    end
-                    var81 = table.concat(any_GetDefaultAutocomplete_result1_6, ',')
-                    arg1.RawSegmentsAreAutocomplete = true
-                end
-            end
-            var81 = unescapeOperators_upvr(var81)
-            local any_SplitStringSimple_result1_2 = Util_upvr.SplitStringSimple(var81, ',')
-            if #any_SplitStringSimple_result1_2 == 0 then
-                any_SplitStringSimple_result1_2 = {""}
-            end
-            if var81:sub(#var81, #var81) == ',' then
-                any_SplitStringSimple_result1_2[#any_SplitStringSimple_result1_2 + 1] = ""
-            end
-            for i_8, v_4 in ipairs(any_SplitStringSimple_result1_2) do
-                arg1.RawSegments[i_8] = v_4
-                arg1.TransformedValues[i_8] = {arg1:TransformSegment(v_4)}
-            end
-            arg1.TextSegmentInProgress = any_SplitStringSimple_result1_2[#any_SplitStringSimple_result1_2]
-            return
-        end
-        arg1.RawSegments[1] = unescapeOperators_upvr(unescapeOperators_upvr(var81))
-        local tbl_3 = {}
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        tbl_3[1] = arg1:TransformSegment(unescapeOperators_upvr(var81))
-        arg1.TransformedValues[1] = tbl_3
-        arg1.TextSegmentInProgress = arg1.RawValue
-    end
+function t.Transform(p1) --[[ Line: 173 | Upvalues: unescapeOperators (copy), Util (copy) ]]
+	if #p1.TransformedValues == 0 then
+		local RawValue = p1.RawValue
+		if p1.Type.ArgumentOperatorAliases then
+			RawValue = p1.Type.ArgumentOperatorAliases[RawValue] or RawValue
+		end
+		if RawValue == "." and p1.Type.Default then
+			RawValue = p1.Type.Default(p1.Executor) or ""
+			p1.RawSegmentsAreAutocomplete = true
+		end
+		if RawValue == "?" and p1.Type.Autocomplete then
+			local v1, v2 = p1:GetDefaultAutocomplete()
+			if not v2.IsPartial and #v1 > 0 then
+				RawValue = v1[math.random(1, #v1)]
+				p1.RawSegmentsAreAutocomplete = true
+			end
+		end
+		if p1.Type.Listable and #p1.RawValue > 0 then
+			local v3 = RawValue:match("^%?(%d+)$")
+			if v3 then
+				local v4 = tonumber(v3)
+				if v4 and v4 > 0 then
+					local t = {}
+					local v5, v6 = p1:GetDefaultAutocomplete()
+					if not v6.IsPartial and #v5 > 0 then
+						for i = 1, math.min(v4, #v5) do
+							local remove = table.remove
+							table.insert(t, remove(v5, math.random(1, #v5)))
+						end
+						local v7 = table.concat(t, ",")
+						p1.RawSegmentsAreAutocomplete = true
+						RawValue = v7
+					end
+				end
+			elseif RawValue == "*" or RawValue == "**" then
+				local v8, v9 = p1:GetDefaultAutocomplete()
+				if not v9.IsPartial and #v8 > 0 then
+					if RawValue == "**" and p1.Type.Default then
+						local v10 = p1.Type.Default(p1.Executor) or ""
+						for i, v in ipairs(v8) do
+							if v == v10 then
+								table.remove(v8, i)
+							end
+						end
+					end
+					local v11 = table.concat(v8, ",")
+					p1.RawSegmentsAreAutocomplete = true
+					RawValue = v11
+				end
+			end
+			local v12 = unescapeOperators(RawValue)
+			local v13 = Util.SplitStringSimple(v12, ",")
+			if #v13 == 0 then
+				v13 = { "" }
+			end
+			if v12:sub(#v12, #v12) == "," then
+				v13[#v13 + 1] = ""
+			end
+			for i, v in ipairs(v13) do
+				p1.RawSegments[i] = v
+				p1.TransformedValues[i] = { p1:TransformSegment(v) }
+			end
+			p1.TextSegmentInProgress = v13[#v13]
+		else
+			local v14 = unescapeOperators(RawValue)
+			p1.RawSegments[1] = unescapeOperators(v14)
+			p1.TransformedValues[1] = { p1:TransformSegment(v14) }
+			p1.TextSegmentInProgress = p1.RawValue
+		end
+	end
 end
-function module_upvr.TransformSegment(arg1, arg2) -- Line 266
-    if arg1.Type.Transform then
-        return arg1.Type.Transform(arg2, arg1.Executor)
-    end
-    return arg2
+function t.TransformSegment(p1, p2) --[[ Line: 266 ]]
+	if p1.Type.Transform then
+		return p1.Type.Transform(p2, p1.Executor)
+	else
+		return p2
+	end
 end
-function module_upvr.GetTransformedValue(arg1, arg2) -- Line 278
-    return unpack(arg1.TransformedValues[arg2])
+function t.GetTransformedValue(p1, p2) --[[ Line: 278 ]]
+	return unpack(p1.TransformedValues[p2])
 end
-function module_upvr.Validate(arg1, arg2) -- Line 289
-    if arg1.RawValue == nil or #arg1.RawValue == 0 and arg1.Required == false then
-        return true
-    end
-    if arg1.Required and (arg1.RawSegments[1] == nil or #arg1.RawSegments[1] == 0) then
-        return false, "This argument is required."
-    end
-    if arg1.Type.Validate or arg1.Type.ValidateOnce then
-        for i_2 = 1, #arg1.TransformedValues do
-            if arg1.Type.Validate then
-                local any_Validate_result1, any_Validate_result2 = arg1.Type.Validate(arg1:GetTransformedValue(i_2))
-                if not any_Validate_result1 then
-                    return any_Validate_result1, any_Validate_result2 or "Invalid value"
-                end
-            end
-            if arg2 then
-                if arg1.Type.ValidateOnce then
-                    local any_ValidateOnce_result1_2, any_ValidateOnce_result2_2 = arg1.Type.ValidateOnce(arg1:GetTransformedValue(i_2))
-                    if not any_ValidateOnce_result1_2 then
-                        return any_ValidateOnce_result1_2, any_ValidateOnce_result2_2
-                    end
-                end
-            end
-        end
-        return true
-    end
-    return true
+function t.Validate(p1, p2) --[[ Line: 289 ]]
+	if p1.RawValue ~= nil and (#p1.RawValue ~= 0 or p1.Required ~= false) then
+		if p1.Required and (p1.RawSegments[1] == nil or #p1.RawSegments[1] == 0) then
+			return false, "This argument is required."
+		elseif p1.Type.Validate or p1.Type.ValidateOnce then
+			for i = 1, #p1.TransformedValues do
+				if p1.Type.Validate then
+					local v1, v2 = p1.Type.Validate(p1:GetTransformedValue(i))
+					if not v1 then
+						return v1, v2 or "Invalid value"
+					end
+				end
+				if p2 and p1.Type.ValidateOnce then
+					local v3, v4 = p1.Type.ValidateOnce(p1:GetTransformedValue(i))
+					if not v3 then
+						return v3, v4
+					end
+				end
+			end
+		end
+	end
+	return true
 end
-function module_upvr.GetAutocomplete(arg1) -- Line 330
-    if arg1.Type.Autocomplete then
-        return arg1.Type.Autocomplete(arg1:GetTransformedValue(#arg1.TransformedValues))
-    end
-    return {}
+function t.GetAutocomplete(p1) --[[ Line: 330 ]]
+	if p1.Type.Autocomplete then
+		return p1.Type.Autocomplete(p1:GetTransformedValue(#p1.TransformedValues))
+	else
+		return {}
+	end
 end
-function module_upvr.ParseValue(arg1, arg2) -- Line 343
-    if arg1.Type.Parse then
-        return arg1.Type.Parse(arg1:GetTransformedValue(arg2))
-    end
-    return arg1:GetTransformedValue(arg2)
+function t.ParseValue(p1, p2) --[[ Line: 343 ]]
+	if p1.Type.Parse then
+		return p1.Type.Parse(p1:GetTransformedValue(p2))
+	else
+		return p1:GetTransformedValue(p2)
+	end
 end
-function module_upvr.GetValue(arg1) -- Line 356
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    if #arg1.RawValue == 0 and not arg1.Required and arg1.Object.Default ~= nil then
-        return arg1.Object.Default
-    end
-    if not arg1.Type.Listable then
-        return arg1:ParseValue(1)
-    end
-    local var133 = {}
-    for i_3 = 1, #arg1.TransformedValues do
-        local any_ParseValue_result1 = arg1:ParseValue(i_3)
-        if type(any_ParseValue_result1) ~= "table" then
-            error(`[Cmdr] Listable types must return a table from Parse {arg1.Type.Name}`)
-        end
-        for _, v_2 in pairs(any_ParseValue_result1) do
-            var133[v_2] = true
-        end
-    end
-    local tbl_4 = {}
-    for i_5 in pairs(var133) do
-        tbl_4[#tbl_4 + 1] = i_5
-    end
-    return tbl_4
+function t.GetValue(p1) --[[ Line: 356 ]]
+	if #p1.RawValue == 0 and (not p1.Required and p1.Object.Default ~= nil) then
+		return p1.Object.Default
+	elseif p1.Type.Listable then
+		local tbl = {}
+		for i = 1, #p1.TransformedValues do
+			local v1 = p1:ParseValue(i)
+			if type(v1) ~= "table" then
+				error((("[Cmdr] Listable types must return a table from Parse %*"):format(p1.Type.Name)))
+			end
+			for k, v in pairs(v1) do
+				tbl[v] = true
+			end
+		end
+		local t = {}
+		for k in pairs(tbl) do
+			t[#t + 1] = k
+		end
+		return t
+	else
+		return p1:ParseValue(1)
+	end
 end
-return module_upvr
+return t

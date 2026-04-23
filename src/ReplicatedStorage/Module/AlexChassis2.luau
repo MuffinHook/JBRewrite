@@ -1,686 +1,647 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
-local Math_upvr = require(ReplicatedStorage.Module.Math)
-local R15IKv2_upvr = require(ReplicatedStorage.Module.R15IKv2)
-local CurrentCamera_upvr = workspace.CurrentCamera
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local new_upvr_2 = CFrame.new
-local new_upvr = Vector3.new
-local Angles_upvr = CFrame.Angles
-local new_upvr_result1_upvr = new_upvr()
-local vectorToObjectSpace_upvr = new_upvr_2().vectorToObjectSpace
-local tbl_5_upvr = {
-    tire_pop = 4534995816;
-    tire_leak = 4534995685;
+local Math = require(ReplicatedStorage.Module.Math)
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local RayCast = require(ReplicatedStorage.Module.RayCast)
+local Time = require(ReplicatedStorage.Module.Time)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local R15IKv2 = require(ReplicatedStorage.Module.R15IKv2)
+local C4Binder = require(ReplicatedStorage.Game.C4.C4Binder)
+local ChassisShared = require(ReplicatedStorage.Module.ChassisShared)
+local CurrentCamera = workspace.CurrentCamera
+local v1 = nil
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local PhysicsLagService = require(ReplicatedStorage.App.PhysicsLagService)
+local RunConsts = require(ReplicatedStorage.App.RunConsts)
+local RunUtils = require(ReplicatedStorage.App.RunUtils)
+local LocalPlayer = Players.LocalPlayer
+local EnvironmentConsts = require(ReplicatedStorage.Environment.EnvironmentConsts)
+local EnvironmentUtils = require(ReplicatedStorage.Environment.EnvironmentUtils)
+local AccelTween = require(ReplicatedStorage.Std.AccelTween)
+require(ReplicatedStorage.Std.Debug.Draw3D)
+local InputUtils = require(ReplicatedStorage.Std.InputUtils)
+local Interval = require(ReplicatedStorage.Std.Interval)
+require(ReplicatedStorage.Std.Maid)
+local v2 = CFrame.new
+local v3 = Vector3.new
+local Angles = CFrame.Angles
+local v4 = v2()
+local v5 = v3()
+local vectorToObjectSpace = v4.vectorToObjectSpace
+local WorldSpringSetTarget = Math.WorldSpringSetTarget
+local WorldSpringUpdate = Math.WorldSpringUpdate
+local t = {
+	tire_pop = 4534995816,
+	tire_leak = 4534995685
 }
-local function _(arg1, arg2, arg3) -- Line 40, Named "rotateAxisAngle"
-    local any_Dot_result1 = arg1:Dot(arg2)
-    return any_Dot_result1 * arg1 + math.cos(arg3) * (arg1 - any_Dot_result1 * arg2) + math.sin(arg3) * arg1:Cross(arg2)
+local function rotateAxisAngle(p1, p2, p3) --[[ Line: 40 ]]
+	local v1 = math.sin(p3)
+	local v2 = math.cos(p3)
+	local v3 = p1:Cross(p2)
+	local v4 = p1:Dot(p2)
+	return v4 * p1 + v2 * (p1 - v4 * p2) + v1 * v3
 end
-local function GetMoveVector_upvw() -- Line 67, Named "GetMoveVector"
-    return Vector3.new()
+local function GetMoveVector() --[[ Line: 67 ]]
+	return Vector3.new()
 end
-local ControlModule = LocalPlayer_upvr.PlayerScripts:WaitForChild("PlayerModule", 5).ControlModule
+local ControlModule = LocalPlayer.PlayerScripts:WaitForChild("PlayerModule", 5).ControlModule
 if ControlModule then
-    local ControlModule_2_upvw = require(ControlModule)
-    function GetMoveVector_upvw() -- Line 74, Named "GetMoveVector"
-        return ControlModule_2_upvw:GetMoveVector()
-    end
+	local v6 = require(ControlModule)
+	GetMoveVector = function() --[[ Name: GetMoveVector | Line: 74 | Upvalues: v6 (ref) ]]
+		return v6:GetMoveVector()
+	end
 end
-local function SetHumanoidEnabled_upvr(arg1, arg2) -- Line 80, Named "SetHumanoidEnabled"
-    for _, v in Enum.HumanoidStateType:GetEnumItems() do
-        if v ~= Enum.HumanoidStateType.Dead and v ~= Enum.HumanoidStateType.None and v ~= Enum.HumanoidStateType.Jumping then
-            arg1:FindFirstChildOfClass("Humanoid"):SetStateEnabled(v, arg2)
-        end
-    end
-    arg1:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Seated)
+local function SetHumanoidEnabled(p1, p2) --[[ Line: 80 ]]
+	local Humanoid = p1:FindFirstChildOfClass("Humanoid")
+	for v1, v2 in Enum.HumanoidStateType:GetEnumItems() do
+		if v2 ~= Enum.HumanoidStateType.Dead and (v2 ~= Enum.HumanoidStateType.None and v2 ~= Enum.HumanoidStateType.Jumping) then
+			Humanoid:SetStateEnabled(v2, p2)
+		end
+	end
+	Humanoid:ChangeState(Enum.HumanoidStateType.Seated)
 end
-local Animation_upvr_2 = Instance.new("Animation")
-local Animation_upvr_4 = Instance.new("Animation")
-local Animation_upvr = Instance.new("Animation")
-local Animation_upvr_3 = Instance.new("Animation")
-if require(ReplicatedStorage.App.RunUtils).getEnv() == require(ReplicatedStorage.App.RunConsts).QA_NAME then
-    print("Using QA bike animations")
-    Animation_upvr_2.AnimationId = "rbxassetid://15294902930"
-    Animation_upvr_4.AnimationId = "rbxassetid://15294915556"
-    Animation_upvr.AnimationId = "rbxassetid://15294919049"
-    Animation_upvr_3.AnimationId = "rbxassetid://15294921314"
+local Animation = Instance.new("Animation")
+local Animation_2 = Instance.new("Animation")
+local Animation_3 = Instance.new("Animation")
+local Animation_4 = Instance.new("Animation")
+if RunUtils.getEnv() == RunConsts.QA_NAME then
+	print("Using QA bike animations")
+	Animation.AnimationId = "rbxassetid://15294902930"
+	Animation_2.AnimationId = "rbxassetid://15294915556"
+	Animation_3.AnimationId = "rbxassetid://15294919049"
+	Animation_4.AnimationId = "rbxassetid://15294921314"
 else
-    Animation_upvr_2.AnimationId = "rbxassetid://15280711198"
-    Animation_upvr_4.AnimationId = "rbxassetid://15280801186"
-    Animation_upvr.AnimationId = "rbxassetid://15280806101"
-    Animation_upvr_3.AnimationId = "rbxassetid://15280808439"
+	Animation.AnimationId = "rbxassetid://15280711198"
+	Animation_2.AnimationId = "rbxassetid://15280801186"
+	Animation_3.AnimationId = "rbxassetid://15280806101"
+	Animation_4.AnimationId = "rbxassetid://15280808439"
 end
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-local function hookAnimations_upvr(arg1, arg2, arg3) -- Line 113, Named "hookAnimations"
-    local Animator = arg3:FindFirstChildOfClass("Humanoid"):WaitForChild("Animator", 10)
-    local any_LoadAnimation_result1_upvr_4 = Animator:LoadAnimation(Animation_upvr_2)
-    local any_LoadAnimation_result1_upvr_2 = Animator:LoadAnimation(Animation_upvr_4)
-    local any_LoadAnimation_result1_upvr = Animator:LoadAnimation(Animation_upvr)
-    local any_LoadAnimation_result1_upvr_3 = Animator:LoadAnimation(Animation_upvr_3)
-    local tbl_upvr_2 = {{
-        track = any_LoadAnimation_result1_upvr_4;
-    }, {
-        track = any_LoadAnimation_result1_upvr_2;
-    }, {
-        track = any_LoadAnimation_result1_upvr;
-    }, {
-        track = any_LoadAnimation_result1_upvr_3;
-    }}
-    arg2:GiveTask(Interval_upvr.every(0.1):Connect(function() -- Line 128
-        local any_VectorToObjectSpace_result1 = arg1.CFrame:VectorToObjectSpace(arg1.RotVelocity)
-        local clamped_3 = math.clamp(any_VectorToObjectSpace_result1.Y / 0.5, 0, 1)
-        local clamped_4 = math.clamp(-any_VectorToObjectSpace_result1.Y / 0.5, 0, 1)
-        local var44 = math.clamp(math.abs(arg1.CFrame:VectorToObjectSpace(arg1.Velocity).Z) / 20, 0, 1) * math.clamp(1 - math.max(clamped_3, clamped_4) * 2, 0, 1)
-        tbl_upvr_2[1].weight = 1 - math.max(var44, clamped_3, clamped_4)
-        tbl_upvr_2[2].weight = var44
-        tbl_upvr_2[3].weight = clamped_3
-        tbl_upvr_2[4].weight = clamped_4
-        for i_2, v_2 in ipairs(tbl_upvr_2) do
-            if 0.1 < v_2.weight then
-                table.insert({}, i_2)
-            else
-                v_2.track:Stop(0.5)
-            end
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        for _, v_3 in ipairs({}) do
-            local var51 = tbl_upvr_2[v_3]
-            if not var51.track.IsPlaying then
-                var51.track:Play(0.25)
-            end
-            var51.track:AdjustWeight(var51.weight, 0.25)
-        end
-    end))
-    arg2:GiveTask(function() -- Line 162
-        any_LoadAnimation_result1_upvr_4:Stop()
-        any_LoadAnimation_result1_upvr_4:Destroy()
-        any_LoadAnimation_result1_upvr_2:Stop()
-        any_LoadAnimation_result1_upvr_2:Destroy()
-        any_LoadAnimation_result1_upvr:Stop()
-        any_LoadAnimation_result1_upvr:Destroy()
-        any_LoadAnimation_result1_upvr_3:Stop()
-        any_LoadAnimation_result1_upvr_3:Destroy()
-    end)
+local function hookAnimations(p1, p2, p3) --[[ Line: 113 | Upvalues: Animation (copy), Animation_2 (copy), Animation_3 (copy), Animation_4 (copy), Interval (copy) ]]
+	local Animator = p3:FindFirstChildOfClass("Humanoid"):WaitForChild("Animator", 10)
+	local v1 = Animator:LoadAnimation(Animation)
+	local v2 = Animator:LoadAnimation(Animation_2)
+	local v3 = Animator:LoadAnimation(Animation_3)
+	local v4 = Animator:LoadAnimation(Animation_4)
+	local t = {
+		{
+			track = v1
+		},
+		{
+			track = v2
+		},
+		{
+			track = v3
+		},
+		{
+			track = v4
+		}
+	}
+	p2:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 128 | Upvalues: p1 (copy), t (copy) ]]
+		local v1 = p1.CFrame:VectorToObjectSpace(p1.Velocity)
+		local v2 = p1.CFrame:VectorToObjectSpace(p1.RotVelocity)
+		local v3 = math.abs(v1.Z)
+		local v5 = math.clamp(v2.Y / 0.5, 0, 1)
+		local v7 = math.clamp(-v2.Y / 0.5, 0, 1)
+		local v8 = math.clamp(v3 / 20, 0, 1)
+		local v10 = v8 * math.clamp(1 - math.max(v5, v7) * 2, 0, 1)
+		t[1].weight = 1 - math.max(v10, v5, v7)
+		t[2].weight = v10
+		t[3].weight = v5
+		t[4].weight = v7
+		local list = {}
+		for i, v in ipairs(t) do
+			if v.weight > 0.1 then
+				table.insert(list, i)
+			else
+				v.track:Stop(0.5)
+			end
+		end
+		for i, v in ipairs(list) do
+			local v12 = t[v]
+			if not v12.track.IsPlaying then
+				v12.track:Play(0.25)
+			end
+			v12.track:AdjustWeight(v12.weight, 0.25)
+		end
+	end))
+	p2:GiveTask(function() --[[ Line: 162 | Upvalues: v1 (copy), v2 (copy), v3 (copy), v4 (copy) ]]
+		v1:Stop()
+		v1:Destroy()
+		v2:Stop()
+		v2:Destroy()
+		v3:Stop()
+		v3:Destroy()
+		v4:Stop()
+		v4:Destroy()
+	end)
 end
-local tbl_upvr = {
-    Dirtbike = {};
+local t2 = {
+	Dirtbike = {}
 }
-local function VehicleEnter(arg1, arg2) -- Line 179
-    SetHumanoidEnabled_upvr(arg2, false)
-    hookAnimations_upvr(arg1.Model:FindFirstChild("Engine"), arg1.seatMaid, arg2)
+local function VehicleEnter(p1, p2) --[[ Line: 179 | Upvalues: SetHumanoidEnabled (copy), hookAnimations (copy) ]]
+	SetHumanoidEnabled(p2, false)
+	hookAnimations(p1.Model:FindFirstChild("Engine"), p1.seatMaid, p2)
 end
-tbl_upvr.Dirtbike.VehicleEnter = VehicleEnter
-local function UpdateWheel(arg1, arg2) -- Line 187
-    local vh = arg2.vh
-    if arg2.Front then
-        local cframe_axis_angle = CFrame.fromAxisAngle(Vector3.new(0, 1, 1).unit, -arg1.VisualTurnAngle)
-        if arg2.HoldJoint then
-            arg2.HoldJoint.C1 = new_upvr_2(0, -vh, 0) * new_upvr_2(0, arg2.HoldSize.Y * 1.5 - 0.1, arg2.HoldSize.Z * 0.5 - 0.05) * cframe_axis_angle * Angles_upvr(0, 0, math.pi)
-        end
-        arg2.VisualJoint.C1 = new_upvr_2(0, -vh + arg2.VisualHalfHeight, 0) * cframe_axis_angle * Angles_upvr(arg1.WheelRotation, 0, 0)
-    elseif arg2.Back then
-        if arg2.HoldJoint then
-            arg2.HoldJoint.C1 = new_upvr_2(0, -vh, 0) * new_upvr_2(0, arg2.HoldSize.Y * 1.5, -arg2.HoldSize.Z * 0.5 + 0.05) * Angles_upvr(0, 0, math.pi)
-        end
-        arg2.VisualJoint.C1 = new_upvr_2(0, -vh + arg2.VisualHalfHeight, 0) * Angles_upvr(arg1.WheelRotation, 0, 0)
-    end
+t2.Dirtbike.VehicleEnter = VehicleEnter
+local function UpdateWheel(p1, p2) --[[ Line: 187 | Upvalues: v2 (copy), Angles (copy) ]]
+	local vh = p2.vh
+	if p2.Front then
+		local v1 = CFrame.fromAxisAngle((Vector3.new(0, 1, 1)).unit, -p1.VisualTurnAngle)
+		if p2.HoldJoint then
+			p2.HoldJoint.C1 = v2(0, -vh, 0) * v2(0, p2.HoldSize.Y * 1.5 - 0.1, p2.HoldSize.Z * 0.5 - 0.05) * v1 * Angles(0, 0, math.pi)
+		end
+		p2.VisualJoint.C1 = v2(0, -vh + p2.VisualHalfHeight, 0) * v1 * Angles(p1.WheelRotation, 0, 0)
+	elseif p2.Back then
+		if p2.HoldJoint then
+			p2.HoldJoint.C1 = v2(0, -vh, 0) * v2(0, p2.HoldSize.Y * 1.5, -p2.HoldSize.Z * 0.5 + 0.05) * Angles(0, 0, math.pi)
+		end
+		p2.VisualJoint.C1 = v2(0, -vh + p2.VisualHalfHeight, 0) * Angles(p1.WheelRotation, 0, 0)
+	end
 end
-tbl_upvr.Dirtbike.UpdateWheel = UpdateWheel
-local function UpdateHQ(arg1, arg2) -- Line 207
-    local Engine_2 = arg1.Model.Engine
-    local var61 = CFrame.fromAxisAngle(Engine_2.CFrame.LookVector, arg1.VisualLeanAngle * 0.4) * Vector3.new(0, 1, 0)
-    local any_Cross_result1 = Engine_2.CFrame.LookVector:Cross(var61)
-    for _, v_4 in next, arg1.Stable do
-        v_4.Align.Enabled = true
-        v_4.Align.PrimaryAxis = any_Cross_result1
-        v_4.Torque.Enabled = true
-        v_4.Torque.Torque = Engine_2.AssemblyMass * new_upvr(-Engine_2.CFrame.LookVector:Dot(var61) * 70 - Engine_2.CFrame:VectorToObjectSpace(Engine_2.RotVelocity).X * 8, 0, 0)
-    end
+t2.Dirtbike.UpdateWheel = UpdateWheel
+local function UpdateHQ(p1, p2) --[[ Line: 207 | Upvalues: v3 (copy) ]]
+	local Engine = p1.Model.Engine
+	local v1 = CFrame.fromAxisAngle(Engine.CFrame.LookVector, p1.VisualLeanAngle * 0.4) * Vector3.new(0, 1, 0)
+	local v2 = Engine.CFrame.LookVector:Cross(v1)
+	for v32, v4 in next, p1.Stable do
+		v4.Align.Enabled = true
+		v4.Align.PrimaryAxis = v2
+		v4.Torque.Enabled = true
+		local v5 = Engine.CFrame:VectorToObjectSpace(Engine.RotVelocity)
+		v4.Torque.Torque = Engine.AssemblyMass * v3(-Engine.CFrame.LookVector:Dot(v1) * 70 - v5.X * 8, 0, 0)
+	end
 end
-tbl_upvr.Dirtbike.UpdateHQ = UpdateHQ
-local function UpdateLQ(arg1, arg2) -- Line 229
+t2.Dirtbike.UpdateHQ = UpdateHQ
+local function UpdateLQ(p1, p2) --[[ Line: 229 ]] end
+t2.Dirtbike.UpdateLQ = UpdateLQ
+local function IKP(p1, p2) --[[ Line: 230 | Upvalues: R15IKv2 (copy), Angles (copy) ]]
+	local VisualTurnAngle = p1.VisualTurnAngle
+	if VisualTurnAngle then
+		local IKP = p1.IKP
+		IKP.RightArm = p1.Model.Handlebar.RightHand.Position
+		IKP.LeftArm = p1.Model.Handlebar.LeftHand.Position
+		IKP.RightAngle = -0.95 + VisualTurnAngle
+		IKP.LeftAngle = 0.95 + VisualTurnAngle
+		R15IKv2.Arms(IKP)
+		p1.HandlebarJoint.C1 = Angles(0, -VisualTurnAngle, 0)
+	end
 end
-tbl_upvr.Dirtbike.UpdateLQ = UpdateLQ
-local function IKP(arg1, arg2) -- Line 230
-    local VisualTurnAngle = arg1.VisualTurnAngle
-    if not VisualTurnAngle then
-    else
-        local IKP = arg1.IKP
-        IKP.RightArm = arg1.Model.Handlebar.RightHand.Position
-        IKP.LeftArm = arg1.Model.Handlebar.LeftHand.Position
-        IKP.RightAngle = -0.95 + VisualTurnAngle
-        IKP.LeftAngle = 0.95 + VisualTurnAngle
-        R15IKv2_upvr.Arms(IKP)
-        arg1.HandlebarJoint.C1 = Angles_upvr(0, -VisualTurnAngle, 0)
-    end
+t2.Dirtbike.IKP = IKP
+t2.Patrol = {}
+t2.Patrol.VehicleEnter = t2.Dirtbike.VehicleEnter
+t2.Patrol.UpdateWheel = t2.Dirtbike.UpdateWheel
+t2.Patrol.UpdateHQ = t2.Dirtbike.UpdateHQ
+t2.Patrol.UpdateLQ = t2.Dirtbike.UpdateLQ
+t2.Patrol.IKP = t2.Dirtbike.IKP
+t2.FalconS = {}
+t2.FalconS.VehicleEnter = t2.Dirtbike.VehicleEnter
+t2.FalconS.UpdateWheel = t2.Dirtbike.UpdateWheel
+t2.FalconS.UpdateHQ = t2.Dirtbike.UpdateHQ
+t2.FalconS.UpdateLQ = t2.Dirtbike.UpdateLQ
+t2.FalconS.IKP = t2.Dirtbike.IKP
+t2.DuneBuggy = {}
+local function VehicleEnter_2(p1, p2) --[[ Line: 263 | Upvalues: SetHumanoidEnabled (copy) ]]
+	SetHumanoidEnabled(p2, false)
 end
-tbl_upvr.Dirtbike.IKP = IKP
-tbl_upvr.Patrol = {}
-tbl_upvr.Patrol.VehicleEnter = tbl_upvr.Dirtbike.VehicleEnter
-tbl_upvr.Patrol.UpdateWheel = tbl_upvr.Dirtbike.UpdateWheel
-tbl_upvr.Patrol.UpdateHQ = tbl_upvr.Dirtbike.UpdateHQ
-tbl_upvr.Patrol.UpdateLQ = tbl_upvr.Dirtbike.UpdateLQ
-tbl_upvr.Patrol.IKP = tbl_upvr.Dirtbike.IKP
-tbl_upvr.FalconS = {}
-tbl_upvr.FalconS.VehicleEnter = tbl_upvr.Dirtbike.VehicleEnter
-tbl_upvr.FalconS.UpdateWheel = tbl_upvr.Dirtbike.UpdateWheel
-tbl_upvr.FalconS.UpdateHQ = tbl_upvr.Dirtbike.UpdateHQ
-tbl_upvr.FalconS.UpdateLQ = tbl_upvr.Dirtbike.UpdateLQ
-tbl_upvr.FalconS.IKP = tbl_upvr.Dirtbike.IKP
-tbl_upvr.DuneBuggy = {}
-local function VehicleEnter(arg1, arg2) -- Line 263
-    SetHumanoidEnabled_upvr(arg2, false)
+t2.DuneBuggy.VehicleEnter = VehicleEnter_2
+local function UpdateWheel_2(p1, p2) --[[ Line: 266 | Upvalues: v2 (copy), Angles (copy) ]]
+	local Pivot = p2.Pivot
+	local vh = p2.vh
+	if p2.Front then
+		local v1 = CFrame.fromAxisAngle((Vector3.new(0, 1, 0.5)).unit, -p1.VisualTurnAngle)
+		p2.VisualJoint.C1 = v2(0, -vh + p2.VisualHalfHeight, 0) * v1 * Angles(p1.WheelRotation, 0, 0)
+	elseif p2.Back then
+		p2.VisualJoint.C1 = v2(0, -vh + p2.VisualHalfHeight, 0) * Angles(p1.WheelRotation, 0, 0)
+	end
+	p2.PivotJoint.C1 = Pivot.CFrame:toObjectSpace(v2(Pivot.Position, p2.VisualModelRoot.Position)) * v2(0, 0, -2)
 end
-tbl_upvr.DuneBuggy.VehicleEnter = VehicleEnter
-tbl_upvr.DuneBuggy.UpdateWheel = function(arg1, arg2) -- Line 266, Named "UpdateWheel"
-    local Pivot = arg2.Pivot
-    if arg2.Front then
-        arg2.VisualJoint.C1 = new_upvr_2(0, -arg2.vh + arg2.VisualHalfHeight, 0) * CFrame.fromAxisAngle(Vector3.new(0, 1, 0.5).unit, -arg1.VisualTurnAngle) * Angles_upvr(arg1.WheelRotation, 0, 0)
-    elseif arg2.Back then
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        arg2.VisualJoint.C1 = new_upvr_2(0, -arg2.vh + arg2.VisualHalfHeight, 0) * Angles_upvr(arg1.WheelRotation, 0, 0)
-    end
-    arg2.PivotJoint.C1 = Pivot.CFrame:toObjectSpace(new_upvr_2(Pivot.Position, arg2.VisualModelRoot.Position)) * new_upvr_2(0, 0, -2)
+t2.DuneBuggy.UpdateWheel = UpdateWheel_2
+local function UpdateHQ_2(p1, p2) --[[ Line: 279 ]]
+	local Engine = p1.Model.Engine
 end
-local function UpdateHQ(arg1, arg2) -- Line 279
+t2.DuneBuggy.UpdateHQ = UpdateHQ_2
+local function UpdateLQ_2(p1, p2) --[[ Line: 292 ]] end
+t2.DuneBuggy.UpdateLQ = UpdateLQ_2
+local function IKP_2(p1, p2) --[[ Line: 293 | Upvalues: v2 (copy), v3 (copy), R15IKv2 (copy) ]]
+	local Character = p1.Character
+	if Character and Character:IsDescendantOf(workspace) then
+		local v1 = Character.PrimaryPart.CFrame * v2(0, 0, -1.5)
+		local VisualTurnAngle = p1.VisualTurnAngle
+		if VisualTurnAngle then
+			local IKP = p1.IKP
+			IKP.RightArm = v1 * v3(math.cos(VisualTurnAngle) * 0.8, math.sin(VisualTurnAngle) * -0.8, 0)
+			IKP.LeftArm = v1 * v3(math.cos(VisualTurnAngle) * -0.8, math.sin(VisualTurnAngle) * 0.8, 0)
+			IKP.RightAngle = -0.6 + VisualTurnAngle
+			IKP.LeftAngle = 0.6 + VisualTurnAngle
+			R15IKv2.Arms(IKP)
+		end
+	end
 end
-tbl_upvr.DuneBuggy.UpdateHQ = UpdateHQ
-local function UpdateLQ(arg1, arg2) -- Line 292
+t2.DuneBuggy.IKP = IKP_2
+local t3 = { 0, 0, 0, 0 }
+local function updateFOV(p1) --[[ Line: 319 | Upvalues: CurrentCamera (copy) ]]
+	local v1 = (p1.LastFakeGear or 1) ^ 0.5 * (p1.Model.Engine.AssemblyLinearVelocity.Magnitude / 120)
+	if v1 ~= v1 then
+		v1 = 0
+	end
+	local v2 = math.clamp(v1, 0, 3)
+	local v3, v4
+	if v2 < 0.825155 then
+		v3 = v2 * v2 * v2
+		if not v3 then
+			v4 = v2
+			v3 = 1 - math.exp(-v2)
+		end
+	else
+		v4 = v2
+		v3 = 1 - math.exp(-v2)
+	end
+	local FieldOfView = CurrentCamera.FieldOfView
+	CurrentCamera.FieldOfView = FieldOfView + (v3 * 30 * (p1.Config.FOVMult or 1) + 70 - FieldOfView) * 0.7
 end
-tbl_upvr.DuneBuggy.UpdateLQ = UpdateLQ
-tbl_upvr.DuneBuggy.IKP = function(arg1, arg2) -- Line 293, Named "IKP"
-    local Character_5 = arg1.Character
-    if not Character_5 then
-    else
-        if not Character_5:IsDescendantOf(workspace) then return end
-        local var67 = Character_5.PrimaryPart.CFrame * new_upvr_2(0, 0, -1.5)
-        local VisualTurnAngle_2 = arg1.VisualTurnAngle
-        if not VisualTurnAngle_2 then return end
-        local IKP_3 = arg1.IKP
-        IKP_3.RightArm = var67 * new_upvr(math.cos(VisualTurnAngle_2) * 0.8, math.sin(VisualTurnAngle_2) * -0.8, 0)
-        IKP_3.LeftArm = var67 * new_upvr(math.cos(VisualTurnAngle_2) * -0.8, math.sin(VisualTurnAngle_2) * 0.8, 0)
-        IKP_3.RightAngle = -0.6 + VisualTurnAngle_2
-        IKP_3.LeftAngle = 0.6 + VisualTurnAngle_2
-        R15IKv2_upvr.Arms(IKP_3)
-    end
+local function VehicleEnter_3(p1) --[[ Line: 334 | Upvalues: LocalPlayer (copy), R15IKv2 (copy), t2 (copy), RunService (copy), updateFOV (copy), CurrentCamera (copy), t3 (copy) ]]
+	local Character = LocalPlayer.Character
+	if Character then
+		p1.IKP = R15IKv2.BuildPacketArms(Character)
+		t2[p1.Make].VehicleEnter(p1, Character)
+		p1.seatMaid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 345 | Upvalues: updateFOV (ref), p1 (copy) ]]
+			updateFOV(p1)
+		end))
+		p1.seatMaid:GiveTask(function() --[[ Line: 348 | Upvalues: CurrentCamera (ref) ]]
+			CurrentCamera.FieldOfView = 70
+		end)
+		function p1.setForward(p1) --[[ Line: 352 | Upvalues: t3 (ref) ]]
+			t3[1] = if p1 then 1 else 0
+		end
+		function p1.setBackward(p1) --[[ Line: 355 | Upvalues: t3 (ref) ]]
+			t3[2] = if p1 then 1 else 0
+		end
+		if not p1.Passenger then
+			p1.Model.Engine:FindFirstChild("NoGravForce").Enabled = true
+		end
+	end
 end
-local tbl_2_upvr = {0, 0, 0, 0}
-local function updateFOV_upvr(arg1) -- Line 319, Named "updateFOV"
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var71 = ((arg1.LastFakeGear or 1) ^ 0.5) * (arg1.Model.Engine.AssemblyLinearVelocity.Magnitude / 120)
-    if var71 ~= var71 then
-        var71 = 0
-    end
-    local clamped_2 = math.clamp(var71, 0, 3)
-    if clamped_2 >= 0.825155 or not (clamped_2 * clamped_2 * clamped_2) then
-    end
-    local FieldOfView = CurrentCamera_upvr.FieldOfView
-    CurrentCamera_upvr.FieldOfView = FieldOfView + ((1 - math.exp(-clamped_2)) * 30 * (arg1.Config.FOVMult or 1) + 70 - FieldOfView) * 0.7
+local function VehicleLeave(p1) --[[ Line: 365 | Upvalues: LocalPlayer (copy), SetHumanoidEnabled (copy), CurrentCamera (copy), v5 (copy) ]]
+	local Character = LocalPlayer.Character
+	if Character then
+		SetHumanoidEnabled(Character, true)
+		CurrentCamera.FieldOfView = 70
+		p1.IKP = nil
+		if not p1.Passenger then
+			local Model = p1.Model
+			if Model then
+				local Engine = Model:FindFirstChild("Engine")
+				if Engine then
+					local NoGravForce = Engine:FindFirstChild("NoGravForce")
+					if NoGravForce then
+						NoGravForce.Enabled = false
+					end
+				end
+			end
+			for k, v in pairs(p1.Sounds) do
+				v.Volume = 0
+			end
+			for v1, v2 in next, p1.Wheels do
+				v2.VectorForce.Force = v5
+			end
+			for v3, v4 in next, p1.Stable do
+				v4.Torque.Torque = v5
+			end
+		end
+	end
 end
-local RunService_upvr = game:GetService("RunService")
-local C4Binder_upvr = require(ReplicatedStorage.Game.C4.C4Binder)
-local RayCast_upvr = require(ReplicatedStorage.Module.RayCast)
-local WorldSpringSetTarget_upvr = Math_upvr.WorldSpringSetTarget
-local WorldSpringUpdate_upvr = Math_upvr.WorldSpringUpdate
-local PhysicsLagService_upvr = require(ReplicatedStorage.App.PhysicsLagService)
-local function UpdateWheels_upvr(arg1, arg2, arg3) -- Line 398, Named "UpdateWheels"
-    local tbl_3 = {}
-    local pairs_result1, pairs_result2_2, _ = pairs(C4Binder_upvr:GetAllSet())
-    local var127
-    for i_5 in pairs_result1, pairs_result2_2, var127 do
-        tbl_3[#tbl_3 + 1] = i_5._obj
-    end
-    tbl_3[#tbl_3 + 1] = arg1.Model
-    tbl_3[#tbl_3 + 1] = LocalPlayer_upvr.Character
-    var127 = tbl_upvr
-    var127 = true
-    for _, v_5 in next, arg1.Wheels do
-        v_5.IgnoreModel = tbl_3
-        local var128 = (arg1.Config.Height or 1) + (arg1.Model:GetAttribute("GarageSuspensionHeight") or 0)
-        local Part = v_5.Part
-        local any_RayIgnoreNonCollideWithIgnoreList_result1, any_RayIgnoreNonCollideWithIgnoreList_result2, _ = RayCast_upvr.RayIgnoreNonCollideWithIgnoreList(Part.Position, -Part.CFrame.UpVector, var128 + 1, tbl_3)
-        v_5.Hit = any_RayIgnoreNonCollideWithIgnoreList_result1
-        v_5.vh = math.clamp((Part.Position - any_RayIgnoreNonCollideWithIgnoreList_result2).Magnitude, var128 * 0.1, var128 * 1.1)
-        var127[arg1.Make].UpdateWheel(arg1, v_5)
-        local Spring = v_5.Spring
-        local var134
-        if arg3 then
-            if any_RayIgnoreNonCollideWithIgnoreList_result1 then
-                var134 = WorldSpringSetTarget_upvr
-                var134(Spring, any_RayIgnoreNonCollideWithIgnoreList_result2 + new_upvr(0, var128, 0))
-            else
-                var134 = nil
-                Spring.Target = var134
-            end
-            var134 = WorldSpringUpdate_upvr
-            var134(Spring, arg2)
-            var134 = Spring.f3
-            var134 = var134.y
-            if var134 < 0 then
-                var134 = 0
-            end
-            local var135 = 200 + 5 / arg2
-            if var135 < var134 then
-            end
-            local var136 = 1
-            if 2 <= PhysicsLagService_upvr.getEstimatedPhysicsStepsMult() then
-                var136 /= 2
-            end
-            local var137 = Part.AssemblyMass * v_5.MassProp * new_upvr(0, var135, 0) * math.clamp(var136, 0, 1)
-            local var138 = Vector3.new(0, 0, 0) + v_5.ForceFriction
-            if any_RayIgnoreNonCollideWithIgnoreList_result1 then
-                var138 += v_5.ForceDrive
-                var138 += var137
-            end
-            if 1 < var137.Magnitude then
-            end
-            v_5.IsOnGround = not not any_RayIgnoreNonCollideWithIgnoreList_result1
-            if not v_5.IsOnGround then
-                var127 = false
-            end
-            v_5.VectorForce.Force = var138
-        end
-    end
-    arg1.AllOnGround = var127
+local function UpdateWheels(p1, p2, p3) --[[ Line: 398 | Upvalues: C4Binder (copy), LocalPlayer (copy), t2 (copy), RayCast (copy), WorldSpringSetTarget (copy), v3 (copy), WorldSpringUpdate (copy), PhysicsLagService (copy) ]]
+	local t = {}
+	for k in pairs(C4Binder:GetAllSet()) do
+		t[#t + 1] = k._obj
+	end
+	t[#t + 1] = p1.Model
+	t[#t + 1] = LocalPlayer.Character
+	local UpdateWheel = t2[p1.Make].UpdateWheel
+	local v1 = true
+	for v2, v32 in next, p1.Wheels do
+		v32.IgnoreModel = t
+		local v4 = (p1.Config.Height or 1) + (p1.Model:GetAttribute("GarageSuspensionHeight") or 0)
+		local Part = v32.Part
+		local v5, v6, _ = RayCast.RayIgnoreNonCollideWithIgnoreList(Part.Position, -Part.CFrame.UpVector, v4 + 1, t)
+		v32.Hit = v5
+		v32.vh = math.clamp((Part.Position - v6).Magnitude, v4 * 0.1, v4 * 1.1)
+		UpdateWheel(p1, v32)
+		local Spring = v32.Spring
+		if p3 then
+			if v5 then
+				WorldSpringSetTarget(Spring, v6 + v3(0, v4, 0))
+			else
+				Spring.Target = nil
+			end
+			WorldSpringUpdate(Spring, p2)
+			local y = Spring.f3.y
+			if y < 0 then
+				y = 0
+			end
+			local v7 = 200 + 5 / p2
+			if v7 < y then
+				y = v7
+			end
+			local v8 = Part.AssemblyMass * v32.MassProp * v3(0, y, 0)
+			local ForceDrive = v32.ForceDrive
+			local v9 = 1
+			if PhysicsLagService.getEstimatedPhysicsStepsMult() >= 2 then
+				v9 = v9 / 2
+			end
+			local v10 = v8 * math.clamp(v9, 0, 1)
+			local v11 = Vector3.new(0, 0, 0) + v32.ForceFriction
+			if v5 then
+				v11 = v11 + ForceDrive + v10
+			end
+			if v10.Magnitude > 1 then
+				local Unit = v10.Unit
+			end
+			v32.IsOnGround = v5 and true or false
+			if not v32.IsOnGround then
+				v1 = false
+			end
+			v32.VectorForce.Force = v11
+		end
+	end
+	p1.AllOnGround = v1
 end
-local function _(arg1, arg2, arg3) -- Line 481, Named "Blend"
-    return math.exp((-(arg1 - arg2) ^ 2) / (2 * arg3 * arg3))
+local function Blend(p1, p2, p3) --[[ Line: 481 ]]
+	return math.exp(-(p1 - p2) ^ 2 / (2 * p3 * p3))
 end
-local function UpdateSounds_upvr(arg1, arg2) -- Line 484, Named "UpdateSounds"
-    arg1.Sounds.Idle.Volume = 0.5 * math.exp(-(arg2 - 0) ^ 2 / 0.18) * 0.7
-    arg1.Sounds.High.Volume = 0.5 * (0.86 * math.exp(-(arg2 - 1) ^ 2 / 0.72) + 0.4 * math.exp(-(arg2 - 0.3) ^ 2 / 0.32000000000000006))
-    arg1.Sounds.Idle.Pitch = 0.9 + (arg2 - 0.4) * 0.3
-    arg1.Sounds.High.Pitch = 0.9 + (arg2 - 0.4) * 1
+local function UpdateSounds(p1, p2) --[[ Line: 484 ]]
+	local v1 = math.exp(-(p2 - 0) ^ 2 / 0.18)
+	local v2 = 0.86 * math.exp(-(p2 - 1) ^ 2 / 0.72) + 0.4 * math.exp(-(p2 - 0.3) ^ 2 / 0.32000000000000006)
+	p1.Sounds.Idle.Volume = 0.5 * v1 * 0.7
+	p1.Sounds.High.Volume = 0.5 * v2
+	p1.Sounds.Idle.Pitch = 0.9 + (p2 - 0.4) * 0.3
+	p1.Sounds.High.Pitch = 0.9 + (p2 - 0.4) * 1
 end
-local InputUtils_upvr = require(ReplicatedStorage.Std.InputUtils)
-local Time_upvr = require(ReplicatedStorage.Module.Time)
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local ChassisShared_upvr = require(ReplicatedStorage.Module.ChassisShared)
-local AccelTween_upvr = require(ReplicatedStorage.Std.AccelTween)
-local EnvironmentUtils_upvr = require(ReplicatedStorage.Environment.EnvironmentUtils)
-local EnvironmentConsts_upvr = require(ReplicatedStorage.Environment.EnvironmentConsts)
-local VehicleUtils_upvr = require(ReplicatedStorage.Vehicle.VehicleUtils)
-local var283_upvw
-local tbl_6_upvr = {
-    [Enum.KeyCode.A] = 4;
-    [Enum.KeyCode.D] = 3;
-    [Enum.KeyCode.ButtonR2] = 1;
-    [Enum.KeyCode.ButtonL2] = 2;
-    [Enum.KeyCode.Left] = 4;
-    [Enum.KeyCode.Right] = 3;
+local function UpdateHQ_3(p1, p2) --[[ Line: 495 | Upvalues: t3 (copy), InputUtils (copy), LocalPlayer (copy), GetMoveVector (ref), Time (copy), Audio (copy), t (copy), vectorToObjectSpace (copy), ChassisShared (copy), AccelTween (copy), v3 (copy), EnvironmentUtils (copy), EnvironmentConsts (copy), Math (copy), v5 (copy), UpdateWheels (copy), t2 (copy), UpdateSounds (copy), VehicleUtils (copy) ]]
+	local v1 = tick()
+	local Model = p1.Model
+	local _cachedEngine = p1._cachedEngine
+	if not _cachedEngine or _cachedEngine.Parent ~= Model then
+		local Engine = Model:FindFirstChild("Engine")
+		p1._cachedEngine = Engine
+		_cachedEngine = Engine
+	end
+	if _cachedEngine then
+		local Wheels = p1.Wheels
+		local Gears = p1.Config.Gears
+		local v2 = t3[1] - t3[2]
+		local v32 = t3[3] - t3[4]
+		if InputUtils.isTouch() then
+			local Character = LocalPlayer.Character
+			if Character and Character:FindFirstChild("Humanoid") then
+				local X = GetMoveVector().X
+				local v4 = math.clamp(X, -1, 1)
+				v32 = v4 * math.abs(v4)
+			end
+		end
+		if p1.LockMovement then
+			v2 = 0
+			v32 = 0
+		end
+		local Config = p1.Config
+		local u = Config.u
+		local v = Config.v
+		local v52 = Config.b * (1 + p1.GarageBrakes)
+		local v6 = Model:GetAttribute("VehicleTiresLastPop") or 0
+		local v8 = math.min((Time.GetNowSync() - v6) / p1.DisableDuration, 1) < 0.999
+		if v8 then
+			v52 = v52 * 10
+			u = 1
+			v2 = 0
+		end
+		if p1.AreTiresPopped ~= v8 then
+			if v8 then
+				local t4 = {
+					Volume = 1
+				}
+				Audio.ObjectLocal(_cachedEngine, t.tire_pop, t4)
+				Audio.ObjectLocal(_cachedEngine, t.tire_leak, t4)
+			end
+			p1.AreTiresPopped = v8
+		end
+		local v9 = vectorToObjectSpace(_cachedEngine.CFrame, _cachedEngine.Velocity)
+		local count = p1.Gear or 1
+		local v10 = p1.LastGear or 1
+		local v11 = p1.LastGearSwitch or 0
+		local v12 = p1.t3 or 0
+		p1.LastFakeGear = v10 * (1 - v12) + count * v12
+		local v13
+		if v10 == count then
+			v13 = Gears[2 + count]
+		else
+			v13 = Gears[2 + v10] * (1 - v12 * v12) + Gears[2 + count] * v12 * v12
+			local v14 = v12 + p2 * 1 / 0.23
+			p1.t3 = v14
+			if v14 >= 1 then
+				p1.LastGear = count
+				p1.t3 = 0
+			end
+		end
+		local HandBrake = ChassisShared.HandBrake
+		if HandBrake then
+			HandBrake = v32 ~= 0
+		end
+		local DriftSqueal = p1.Sounds.DriftSqueal
+		local Volume = DriftSqueal.Volume
+		local v16 = if v9.magnitude > 30 and HandBrake then Volume + (0.3 - Volume) * 0.06 else Volume + (0 - Volume) * 0.1
+		if math.abs(DriftSqueal.Volume - v16) > 0.001 then
+			DriftSqueal.Volume = v16
+		end
+		if HandBrake ~= Model:GetAttribute("VehicleIsDrifting") then
+			Model:SetAttribute("VehicleIsDrifting", HandBrake)
+			Model:FindFirstChild("RelayDriftingRemote"):FireServer(HandBrake)
+		end
+		local Preset = Model:FindFirstChild("Preset")
+		if Preset and HandBrake then
+			for v18, v19 in Preset:GetChildren() do
+				if v19.Name == "Drift" then
+					local ParticleEmitter = v19:FindFirstChildOfClass("ParticleEmitter")
+					if ParticleEmitter then
+						ParticleEmitter:Emit(1)
+					end
+				end
+			end
+		end
+		local v20 = p1.Throttle or 0
+		local v21 = v20 + (v2 - v20) * 0.1
+		p1.Throttle = v21
+		local v22 = math.abs(v9.Z) / Wheels[1].VisualHalfHeight
+		local v24 = p1.RPMSlow2 or 0
+		local v25 = v24 + (v22 * Gears[1] * Gears[2 + count] * 30 / math.pi - v24) * 0.2
+		p1.RPMSlow2 = v25
+		if v1 - v11 > 0.3 and (v2 > 0 and (p1.Config.RPMTopLine < v25 and count < 5)) then
+			p1.LastGearSwitch = v1
+			count = count + 1
+		elseif v1 - v11 > 0.3 and (v25 < p1.Config.RPMTopLine / 4 + 1000 and count > 1) then
+			p1.LastGearSwitch = v1
+			count = count - 1
+		end
+		p1.Gear = count
+		local Nitro = p1.Nitro
+		local v26 = Config.f + p1.GarageEngineSpeed * 1.1 + 1.2
+		local v28 = Config.TurnSpeed * v32
+		local v322 = math.clamp(1 - (Config.TurnCurveCoeff or 1) * math.sqrt((math.clamp((math.abs(v9.Z) - 20) / 180, 0, 1))), 0.05, 1) * 0.65
+		if not p1._turnAngleTween then
+			p1._turnAngleTween = AccelTween.new(Config.TurnTweenMaxAccel or 15)
+		end
+		if p1._turnAngleTween.t ~= v28 then
+			p1._turnAngleTween.t = v28
+		end
+		local p = p1._turnAngleTween.p
+		p1.VisualLeanAngle = p
+		p1.VisualTurnAngle = p * v322
+		p1.Angle = v28 * v322
+		for v36, v37 in next, Wheels do
+			local v33, v34, sum, v35
+			local Part = v37.Part
+			local v38 = Part.CFrame
+			if v37.Front and v37.IsOnGround then
+				v38 = v38 * CFrame.Angles(0, -p1.Angle, 0)
+			end
+			local v39 = vectorToObjectSpace(v38, Part.Velocity)
+			local v40 = -u * v3(0, 0, v39.Z)
+			local v41 = -v * v3(0, 0, v39.Z)
+			local sum_2 = (v40 + v41 * math.abs(v39.Z)) * _cachedEngine.AssemblyMass
+			local v42 = 12 * (1 / 60 / p2) * _cachedEngine.AssemblyMass
+			if v37.Front then
+				if EnvironmentUtils.getPrecipitation() == EnvironmentConsts.PRECIPITATION_ENUM.Rain then
+					v42 = v42 * 0.85
+				end
+				sum_2 = sum_2 + -v3(v42 * math.clamp(v39.X, -30, 30), 0, 0)
+			elseif v37.Back then
+				if ChassisShared.HandBrake then
+					v42 = v42 * Config.DriftFrictionMult
+				end
+				sum_2 = sum_2 + -v3(v42 * math.clamp(v39.X, -30, 30), 0, 0)
+			end
+			v37.ForceFriction = Math.Clampv3(sum_2, -1000000, 1000000)
+			v33 = v37.Back and true or false
+			if v33 then
+				v34 = v2 > 0 and Gears[2 + count] or Gears[2]
+				sum = -v26 * _cachedEngine.AssemblyMass * Vector3.new(0, 0, 1) * Gears[1] * v34 * v21
+				if -v9.Z > 0 and v2 < 0 then
+					sum = sum - math.sign(v2) * v52 * Vector3.new(0, 0, 1) * _cachedEngine.AssemblyMass
+				end
+			else
+				sum = v5
+			end
+			if Nitro and v37.Back then
+				v35 = Nitro and 33 * _cachedEngine.AssemblyMass or 0
+				sum = sum + v35 / 2 * Vector3.new(0, -0.1, -1)
+			end
+			v37.ForceDrive = sum
+		end
+		if v2 == 0 then
+			local _ = math.abs(v9.Z) < 1
+		end
+		_cachedEngine.NoGravForce.Force = Vector3.new(0, 1, 0) * _cachedEngine.AssemblyMass * workspace.Gravity * (1 - if Nitro then 30 else 100 / 196.20000000000002)
+		p1.WheelRotation = (p1.WheelRotation + v9.Z * p2 / Wheels[1].VisualHalfHeight) % 6.283185307179586
+		UpdateWheels(p1, p2, true)
+		t2[p1.Make].UpdateHQ(p1, p2)
+		local v48 = math.clamp(v22 * Gears[1] * v13 * 30 / math.pi / p1.Config.RPMTopLine, 0, 1)
+		local v49 = p1.RPMSlow or 0
+		local v50 = v49 + (v48 - v49) * 0.5
+		p1.RPMSlow = v50
+		UpdateSounds(p1, v50)
+		local v51 = v2 <= 0
+		if p1._lastBrakelightsEnabled ~= v51 then
+			p1._lastBrakelightsEnabled = v51
+			VehicleUtils.setBrakelightsEnabled(Model, v51)
+		end
+	end
+end
+local function UpdateStepped(p1) --[[ Line: 800 | Upvalues: t2 (copy) ]]
+	local IKP = p1.IKP
+	if IKP then
+		local IKP_2 = t2[p1.Make].IKP
+		if IKP_2 then
+			IKP_2(p1, IKP)
+		end
+	end
+end
+local function UpdateLQ_3(p1, p2) --[[ Line: 810 | Upvalues: vectorToObjectSpace (copy), UpdateWheels (copy), UpdateSounds (copy) ]]
+	local Model = p1.Model
+	local _cachedEngine = p1._cachedEngine
+	if not _cachedEngine or _cachedEngine.Parent ~= Model then
+		local Engine = Model:FindFirstChild("Engine")
+		p1._cachedEngine = Engine
+		_cachedEngine = Engine
+	end
+	if _cachedEngine then
+		local Gears = p1.Config.Gears
+		local v1 = vectorToObjectSpace(_cachedEngine.CFrame, _cachedEngine.Velocity)
+		p1.VisualTurnAngle = -_cachedEngine.RotVelocity.Y * 0.3
+		local Wheels = p1.Wheels
+		p1.WheelRotation = (p1.WheelRotation + v1.Z * p2 / Wheels[1].VisualHalfHeight) % 6.283185307179586
+		UpdateWheels(p1, p2, false)
+		local v4 = math.clamp(math.abs(v1.Z) * 60 * p2 / Wheels[1].VisualHalfHeight * Gears[1] * Gears[3] * 60 / 6.283185307179586 / p1.Config.RPMTopLine, 0, 1)
+		local v5 = p1.RPMSlow or 0
+		local v6 = v5 + (v4 - v5) * 0.1
+		p1.RPMSlow = v6
+		UpdateSounds(p1, v6)
+	end
+end
+local function SetEvent(p1) --[[ Line: 858 | Upvalues: v1 (ref) ]]
+	v1 = p1
+end
+local t4 = {
+	[Enum.KeyCode.A] = 4,
+	[Enum.KeyCode.D] = 3,
+	[Enum.KeyCode.ButtonR2] = 1,
+	[Enum.KeyCode.ButtonL2] = 2,
+	[Enum.KeyCode.Left] = 4,
+	[Enum.KeyCode.Right] = 3
 }
-UserInputService.InputBegan:connect(function(arg1, arg2) -- Line 873, Named "InputBegan"
-    if arg2 then
-    elseif arg1.UserInputType == Enum.UserInputType.Keyboard then
-        local KeyCode_2 = arg1.KeyCode
-        if tbl_6_upvr[KeyCode_2] then
-            tbl_2_upvr[tbl_6_upvr[KeyCode_2]] = 1
-        end
-    end
-end)
-UserInputService.InputEnded:connect(function(arg1, arg2) -- Line 884, Named "InputEnded"
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    do
-        return
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-end)
-UserInputService.InputChanged:connect(function(arg1) -- Line 900, Named "InputChanged"
-    if arg1.UserInputType == Enum.UserInputType.Gamepad1 then
-        local KeyCode = arg1.KeyCode
-        local var288
-        if KeyCode == Enum.KeyCode.Thumbstick1 then
-            local X = arg1.Position.X
-            local function decompInlinedCondition_5() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                var288 = (-X) ^ 2
-                return var288
-            end
-            if X >= -0.24 or not decompInlinedCondition_5() then
-                var288 = 0
-            end
-            tbl_2_upvr[4] = var288
-            local function decompInlinedCondition_6() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                var288 = X ^ 2
-                return var288
-            end
-            if 0.24 >= X or not decompInlinedCondition_6() then
-                var288 = 0
-            end
-            tbl_2_upvr[3] = var288
-            return
-        end
-        if KeyCode == Enum.KeyCode.ButtonR2 or KeyCode == Enum.KeyCode.ButtonL2 then
-            local Z = arg1.Position.Z
-            var288 = tbl_6_upvr
-            local function decompInlinedCondition_7() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                var288 = Z ^ 0.5
-                return var288
-            end
-            if 0.05 >= Z or not decompInlinedCondition_7() then
-                var288 = 0
-            end
-            tbl_2_upvr[var288[KeyCode]] = var288
-        end
-    end
-end)
+local function InputBegan(p1, p2) --[[ Line: 873 | Upvalues: t4 (copy), t3 (copy) ]]
+	if not p2 and p1.UserInputType == Enum.UserInputType.Keyboard then
+		local KeyCode = p1.KeyCode
+		if t4[KeyCode] then
+			t3[t4[KeyCode]] = 1
+		end
+	end
+end
+local function InputEnded(p1, p2) --[[ Line: 884 | Upvalues: t4 (copy), t3 (copy) ]]
+	if not p2 and p1.UserInputType == Enum.UserInputType.Keyboard then
+		local KeyCode = p1.KeyCode
+		if t4[KeyCode] then
+			t3[t4[KeyCode]] = 0
+		end
+	elseif not p2 and p1.UserInputType == Enum.UserInputType.Gamepad1 then
+		local KeyCode = p1.KeyCode
+		if KeyCode == Enum.KeyCode.ButtonR2 or KeyCode == Enum.KeyCode.ButtonL2 then
+			t3[t4[KeyCode]] = 0
+		end
+	end
+end
+local function InputChanged(p1) --[[ Line: 900 | Upvalues: t3 (copy), t4 (copy) ]]
+	if p1.UserInputType == Enum.UserInputType.Gamepad1 then
+		local KeyCode = p1.KeyCode
+		if KeyCode == Enum.KeyCode.Thumbstick1 then
+			local Position = p1.Position
+			local X = Position.X
+			local Y = Position.Y
+			t3[4] = X < -0.24 and (-X) ^ 2 or 0
+			t3[3] = X > 0.24 and X ^ 2 or 0
+		elseif KeyCode == Enum.KeyCode.ButtonR2 or KeyCode == Enum.KeyCode.ButtonL2 then
+			local Z = p1.Position.Z
+			t3[t4[KeyCode]] = Z > 0.05 and Z ^ 0.5 or 0
+		end
+	end
+end
+UserInputService.InputBegan:connect(InputBegan)
+UserInputService.InputEnded:connect(InputEnded)
+UserInputService.InputChanged:connect(InputChanged)
 return {
-    VehicleEnter = function(arg1) -- Line 334, Named "VehicleEnter"
-        local Character_2 = LocalPlayer_upvr.Character
-        if not Character_2 then
-        else
-            arg1.IKP = R15IKv2_upvr.BuildPacketArms(Character_2)
-            tbl_upvr[arg1.Make].VehicleEnter(arg1, Character_2)
-            arg1.seatMaid:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 345
-                updateFOV_upvr(arg1)
-            end))
-            arg1.seatMaid:GiveTask(function() -- Line 348
-                CurrentCamera_upvr.FieldOfView = 70
-            end)
-            function arg1.setForward(arg1_2) -- Line 352
-                local var78
-                if arg1_2 then
-                    var78 = 1
-                else
-                    var78 = 0
-                end
-                tbl_2_upvr[1] = var78
-            end
-            function arg1.setBackward(arg1_3) -- Line 355
-                local var79
-                if arg1_3 then
-                    var79 = 1
-                else
-                    var79 = 0
-                end
-                tbl_2_upvr[2] = var79
-            end
-            if not arg1.Passenger then
-                arg1.Model.Engine:FindFirstChild("NoGravForce").Enabled = true
-            end
-        end
-    end;
-    VehicleLeave = function(arg1) -- Line 365, Named "VehicleLeave"
-        local Character_3 = LocalPlayer_upvr.Character
-        if not Character_3 then
-        else
-            SetHumanoidEnabled_upvr(Character_3, true)
-            CurrentCamera_upvr.FieldOfView = 70
-            arg1.IKP = nil
-            if arg1.Passenger then return end
-            local Model_5 = arg1.Model
-            if Model_5 then
-                local Engine = Model_5:FindFirstChild("Engine")
-                if Engine then
-                    local NoGravForce = Engine:FindFirstChild("NoGravForce")
-                    if NoGravForce then
-                        NoGravForce.Enabled = false
-                    end
-                end
-            end
-            for _, v_6 in pairs(arg1.Sounds) do
-                v_6.Volume = 0
-            end
-            for _, v_7 in next, arg1.Wheels do
-                v_7.VectorForce.Force = new_upvr_result1_upvr
-            end
-            for _, v_8 in next, arg1.Stable do
-                v_8.Torque.Torque = new_upvr_result1_upvr
-            end
-        end
-    end;
-    UpdateHQ = function(arg1, arg2) -- Line 495, Named "UpdateHQ"
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        local tick_result1_2 = tick()
-        local Model_3 = arg1.Model
-        local _cachedEngine_2 = arg1._cachedEngine
-        if not _cachedEngine_2 or _cachedEngine_2.Parent ~= Model_3 then
-            arg1._cachedEngine = Model_3:FindFirstChild("Engine")
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        if not Model_3:FindFirstChild("Engine") then
-        else
-            local Wheels_3 = arg1.Wheels
-            local Gears_3 = arg1.Config.Gears
-            if InputUtils_upvr.isTouch() then
-                local Character_4 = LocalPlayer_upvr.Character
-                if Character_4 and Character_4:FindFirstChild("Humanoid") then
-                    local _ = math.clamp(GetMoveVector_upvw().X, -1, 1)
-                end
-            end
-            if arg1.LockMovement then
-                local const_number = 0
-            end
-            local Config_2 = arg1.Config
-            local var235 = (Time_upvr.GetNowSync() - (Model_3:GetAttribute("VehicleTiresLastPop") or 0)) / arg1.DisableDuration
-            if math.min(var235, 1) >= 0.999 then
-                var235 = false
-            else
-                var235 = true
-            end
-            if var235 then
-                local const_number_2 = 0
-            end
-            if arg1.AreTiresPopped ~= var235 then
-                if var235 then
-                    local tbl_4 = {
-                        Volume = 1;
-                    }
-                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                    Audio_upvr.ObjectLocal(Model_3:FindFirstChild("Engine"), tbl_5_upvr.tire_pop, tbl_4)
-                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                    Audio_upvr.ObjectLocal(Model_3:FindFirstChild("Engine"), tbl_5_upvr.tire_leak, tbl_4)
-                end
-                arg1.AreTiresPopped = var235
-            end
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            local vectorToObjectSpace_upvr_result1_2 = vectorToObjectSpace_upvr(Model_3:FindFirstChild("Engine").CFrame, Model_3:FindFirstChild("Engine").Velocity)
-            local var239 = arg1.Gear or 1
-            local var240 = arg1.LastGear or 1
-            local var241 = arg1.t3 or 0
-            arg1.LastFakeGear = var240 * (1 - var241) + var239 * var241
-            if var240 ~= var239 then
-                local var242 = var241 + arg2 * 1 / 0.23
-                arg1.t3 = var242
-                if 1 <= var242 then
-                    arg1.LastGear = var239
-                    arg1.t3 = 0
-                    -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                end
-            else
-            end
-            local HandBrake = ChassisShared_upvr.HandBrake
-            if HandBrake then
-                if const_number == 0 then
-                    HandBrake = false
-                else
-                    HandBrake = true
-                end
-            end
-            local var244
-            var244 = arg1.Sounds
-            local DriftSqueal = var244.DriftSqueal
-            var244 = DriftSqueal.Volume
-            if 30 < vectorToObjectSpace_upvr_result1_2.magnitude and HandBrake then
-                var244 += (0.3 - var244) * 0.06
-            else
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                var244 += (0.3 - var244) * 0.1
-            end
-            if 0.001 < math.abs(DriftSqueal.Volume - var244) then
-                DriftSqueal.Volume = var244
-            end
-            if HandBrake ~= Model_3:GetAttribute("VehicleIsDrifting") then
-                Model_3:SetAttribute("VehicleIsDrifting", HandBrake)
-                Model_3:FindFirstChild("RelayDriftingRemote"):FireServer(HandBrake)
-            end
-            local Preset_2 = Model_3:FindFirstChild("Preset")
-            local var247
-            if Preset_2 and HandBrake then
-                for _, v_9 in Preset_2:GetChildren() do
-                    if v_9.Name == "Drift" then
-                        local class_ParticleEmitter = v_9:FindFirstChildOfClass("ParticleEmitter")
-                        if class_ParticleEmitter then
-                            class_ParticleEmitter:Emit(1)
-                        end
-                    end
-                end
-            end
-            local var252 = arg1.Throttle or 0
-            arg1.Throttle = var252 + (const_number_2 - var252) * 0.1
-            local var254 = math.abs(vectorToObjectSpace_upvr_result1_2.Z) / Wheels_3[1].VisualHalfHeight
-            local var255 = arg1.RPMSlow2 or 0
-            local var256 = var255 + (var254 * Gears_3[1] * Gears_3[2 + var247] * 30 / math.pi - var255) * 0.2
-            arg1.RPMSlow2 = var256
-            if 0.3 < tick_result1_2 - (arg1.LastGearSwitch or 0) then
-                if 0 < const_number_2 and arg1.Config.RPMTopLine < var256 and var247 < 5 then
-                    var247 += 1
-                    arg1.LastGearSwitch = tick_result1_2
-                elseif var256 < arg1.Config.RPMTopLine / 4 + 1000 and 1 < var247 then
-                    var247 -= 1
-                    arg1.LastGearSwitch = tick_result1_2
-                end
-            end
-            arg1.Gear = var247
-            local Nitro = arg1.Nitro
-            local var258 = Config_2.TurnSpeed * const_number
-            local var259 = math.clamp(1 - (Config_2.TurnCurveCoeff or 1) * math.sqrt(math.clamp((math.abs(vectorToObjectSpace_upvr_result1_2.Z) - 20) / 180, 0, 1)), 0.05, 1) * 0.65
-            if not arg1._turnAngleTween then
-                arg1._turnAngleTween = AccelTween_upvr.new(Config_2.TurnTweenMaxAccel or 15)
-            end
-            if arg1._turnAngleTween.t ~= var258 then
-                arg1._turnAngleTween.t = var258
-            end
-            local p = arg1._turnAngleTween.p
-            arg1.VisualLeanAngle = p
-            arg1.VisualTurnAngle = p * var259
-            arg1.Angle = var258 * var259
-            for _, v_10 in next, Wheels_3 do
-                local var262
-                if v_10.Front and v_10.IsOnGround then
-                    var262 *= CFrame.Angles(0, -arg1.Angle, 0)
-                end
-                local vectorToObjectSpace_upvr_result1 = vectorToObjectSpace_upvr(var262, v_10.Part.Velocity)
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                local var264 = (-1 * new_upvr(0, 0, vectorToObjectSpace_upvr_result1.Z) + -Config_2.v * new_upvr(0, 0, vectorToObjectSpace_upvr_result1.Z) * math.abs(vectorToObjectSpace_upvr_result1.Z)) * Model_3:FindFirstChild("Engine").AssemblyMass
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                local var265 = (12) * ((1/60) / arg2) * Model_3:FindFirstChild("Engine").AssemblyMass
-                if v_10.Front then
-                    if EnvironmentUtils_upvr.getPrecipitation() == EnvironmentConsts_upvr.PRECIPITATION_ENUM.Rain then
-                        var265 *= 0.85
-                    end
-                    var264 += -new_upvr(var265 * math.clamp(vectorToObjectSpace_upvr_result1.X, -30, 30), 0, 0)
-                elseif v_10.Back then
-                    if ChassisShared_upvr.HandBrake then
-                        var265 *= Config_2.DriftFrictionMult
-                    end
-                    var264 += -new_upvr(var265 * math.clamp(vectorToObjectSpace_upvr_result1.X, -30, 30), 0, 0)
-                end
-                local any_Clampv3_result1_2 = Math_upvr.Clampv3(var264, -1000000, 1000000)
-                v_10.ForceFriction = any_Clampv3_result1_2
-                if v_10.Back then
-                    any_Clampv3_result1_2 = true
-                else
-                    any_Clampv3_result1_2 = false
-                end
-                if any_Clampv3_result1_2 then
-                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                    local var267
-                    local function decompInlinedCondition_3() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                        var267 = Gears_3[2 + var247]
-                        return var267
-                    end
-                    if 0 >= const_number_2 or not decompInlinedCondition_3() then
-                        var267 = Gears_3[2]
-                    end
-                    if 0 < -vectorToObjectSpace_upvr_result1_2.Z and const_number_2 < 0 then
-                        var267 = (math.sign(const_number_2)) * (Config_2.b * (1 + arg1.GarageBrakes) * 10)
-                        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                        var267 = Model_3:FindFirstChild("Engine").AssemblyMass
-                        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-                    end
-                else
-                    local var268
-                end
-                if Nitro and v_10.Back then
-                    local function decompInlinedCondition_4() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                        var267 = 33 * Model_3:FindFirstChild("Engine").AssemblyMass
-                        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                        return var267
-                    end
-                    if not Nitro or not decompInlinedCondition_4() then
-                        var267 = 0
-                    end
-                    var267 = Vector3.new(0, -0.1000, -1)
-                    var268 += var267 / 2 * var267
-                end
-                v_10.ForceDrive = var268
-            end
-            if const_number_2 ~= 0 or math.abs(vectorToObjectSpace_upvr_result1_2.Z) >= 1 then
-            end
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            if Nitro then
-            else
-            end
-            Model_3:FindFirstChild("Engine").NoGravForce.Force = Vector3.new(0, 1, 0) * Model_3:FindFirstChild("Engine").AssemblyMass * workspace.Gravity * (1 - 100 / 196.20000000000002)
-            arg1.WheelRotation = (arg1.WheelRotation + vectorToObjectSpace_upvr_result1_2.Z * arg2 / Wheels_3[1].VisualHalfHeight) % (-math.pi*2)
-            UpdateWheels_upvr(arg1, arg2, true)
-            tbl_upvr[arg1.Make].UpdateHQ(arg1, arg2)
-            local var269 = arg1.RPMSlow or 0
-            local var270 = var269 + (math.clamp(var254 * Gears_3[1] * Gears_3[2 + var239] * 30 / math.pi / arg1.Config.RPMTopLine, 0, 1) - var269) * 0.5
-            arg1.RPMSlow = var270
-            UpdateSounds_upvr(arg1, var270)
-            if const_number_2 > 0 then
-                local _ = false
-                -- KONSTANTWARNING: Skipped task `defvar` above
-            else
-            end
-            if arg1._lastBrakelightsEnabled ~= true then
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                arg1._lastBrakelightsEnabled = true
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                VehicleUtils_upvr.setBrakelightsEnabled(Model_3, true)
-            end
-        end
-    end;
-    UpdateLQ = function(arg1, arg2) -- Line 810, Named "UpdateLQ"
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        local Model = arg1.Model
-        local _cachedEngine = arg1._cachedEngine
-        if not _cachedEngine or _cachedEngine.Parent ~= Model then
-            arg1._cachedEngine = Model:FindFirstChild("Engine")
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        if not Model:FindFirstChild("Engine") then
-        else
-            local Gears = arg1.Config.Gears
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            local var11_result1_3 = vectorToObjectSpace_upvr(Model:FindFirstChild("Engine").CFrame, Model:FindFirstChild("Engine").Velocity)
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            arg1.VisualTurnAngle = -Model:FindFirstChild("Engine").RotVelocity.Y * 0.3
-            local Wheels_2 = arg1.Wheels
-            arg1.WheelRotation = (arg1.WheelRotation + var11_result1_3.Z * arg2 / Wheels_2[1].VisualHalfHeight) % (-math.pi*2)
-            UpdateWheels_upvr(arg1, arg2, false)
-            local var281 = arg1.RPMSlow or 0
-            local var282 = var281 + (math.clamp(math.abs(var11_result1_3.Z) * 60 * arg2 / Wheels_2[1].VisualHalfHeight * Gears[1] * Gears[3] * 60 / (-math.pi*2) / arg1.Config.RPMTopLine, 0, 1) - var281) * 0.1
-            arg1.RPMSlow = var282
-            UpdateSounds_upvr(arg1, var282)
-        end
-    end;
-    UpdateStepped = function(arg1) -- Line 800, Named "UpdateStepped"
-        local IKP_4 = arg1.IKP
-        if IKP_4 then
-            local IKP_7 = tbl_upvr[arg1.Make].IKP
-            if IKP_7 then
-                IKP_7(arg1, IKP_4)
-            end
-        end
-    end;
-    SetEvent = function(arg1) -- Line 858, Named "SetEvent"
-        var283_upvw = arg1
-    end;
+	VehicleEnter = VehicleEnter_3,
+	VehicleLeave = VehicleLeave,
+	UpdateHQ = UpdateHQ_3,
+	UpdateLQ = UpdateLQ_3,
+	UpdateStepped = UpdateStepped,
+	SetEvent = SetEvent
 }

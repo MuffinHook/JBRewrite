@@ -1,115 +1,113 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local var2_upvw
-local var3_upvw
-local tbl_upvr = {}
-tbl_upvr.__index = tbl_upvr
-function tbl_upvr.new(arg1, arg2) -- Line 10
-    local setmetatable_result1 = setmetatable({}, tbl_upvr)
-    setmetatable_result1.p0 = arg1
-    setmetatable_result1.v0 = arg2
-    local clone = ReplicatedStorage_upvr.Resource.HeliBomb:Clone()
-    var2_upvw.WeldAllTo(clone, clone.Rocket)
-    clone.Rocket.Anchored = true
-    clone.Rocket.CFrame = arg1
-    clone.Parent = workspace
-    setmetatable_result1.Model = clone
-    return setmetatable_result1
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RayCast = require(ReplicatedStorage.Module.RayCast)
+local v1 = nil
+local v2 = nil
+local t = {}
+t.__index = t
+function t.new(p1, p2) --[[ Line: 10 | Upvalues: t (copy), ReplicatedStorage (copy), v1 (ref) ]]
+	local v2 = setmetatable({}, t)
+	v2.p0 = p1
+	v2.v0 = p2
+	local v3 = ReplicatedStorage.Resource.HeliBomb:Clone()
+	v1.WeldAllTo(v3, v3.Rocket)
+	v3.Rocket.Anchored = true
+	v3.Rocket.CFrame = p1
+	v3.Parent = workspace
+	v2.Model = v3
+	return v2
 end
-local zero_vector3_upvr = Vector3.new()
-local cframe_upvr = CFrame.Angles(0, math.pi, 0)
-local RayCast_upvr = require(ReplicatedStorage_upvr.Module.RayCast)
-local RunService_upvr = game:GetService("RunService")
-function tbl_upvr.Animate(arg1, arg2) -- Line 29
-    local var11 = arg2
-    if not var11 then
-        var11 = var3_upvw
-        var11 = var11.GetNowSync()
-    end
-    local var12_upvw = var11
-    arg1.Runtime = RunService_upvr.Heartbeat:Connect(function() -- Line 37, Named "Heartbeat"
-        local any_GetNowSync_result1_2 = var3_upvw.GetNowSync()
-        local var20 = any_GetNowSync_result1_2 - var12_upvw
-        local var21 = any_GetNowSync_result1_2 - var12_upvw
-        var12_upvw = any_GetNowSync_result1_2
-        local var22 = arg1.v0 * var20 + Vector3.new(0, -98.10000000000001 * var20 * var20, 0)
-        arg1.Model.Rocket.CFrame = CFrame.new(zero_vector3_upvr, arg1.p0.LookVector:Lerp(Vector3.new(0, -1, 0), math.min(1, var20 * 1.3333333333333333))) * cframe_upvr + arg1.p0.p + var22
-        if var20 - var21 < 0.3 and 0.3 < var20 then
-            arg1.Model.Fire.Particle.Enabled = true
-        end
-        if 0.3 < var20 then
-            local any_RayIgnoreNonCollide_result1_2, any_RayIgnoreNonCollide_result2 = RayCast_upvr.RayIgnoreNonCollide(arg1.p0.p + var22, Vector3.new(0, -1, 0), math.abs(arg1.v0.Y + -196.20000000000002 * var20) * var21, arg1.Model)
-            if any_RayIgnoreNonCollide_result1_2 then
-                arg1:Explode(any_RayIgnoreNonCollide_result2)
-            end
-        end
-        if 5 < var20 and not arg1.Exploded then
-            arg1:Destroy()
-        end
-    end)
+local v3 = Vector3.new()
+local v4 = CFrame.Angles(0, math.pi, 0)
+function t.Animate(p1, p2) --[[ Line: 29 | Upvalues: v2 (ref), v3 (copy), v4 (copy), RayCast (copy), RunService (copy) ]]
+	local v22 = p2 or v2.GetNowSync()
+	local v32 = v22
+	local function Heartbeat() --[[ Line: 37 | Upvalues: v2 (ref), v22 (ref), v32 (ref), p1 (copy), v3 (ref), v4 (ref), RayCast (ref) ]]
+		local v1 = v2.GetNowSync()
+		local v23 = v1 - v22
+		local v33 = v1 - v32
+		v32 = v1
+		local v42 = p1.v0 * v23 + Vector3.new(0, -98.10000000000001 * v23 * v23, 0)
+		p1.Model.Rocket.CFrame = CFrame.new(v3, (p1.p0.LookVector:Lerp(Vector3.new(0, -1, 0), (math.min(1, v23 * 1.3333333333333333))))) * v4 + p1.p0.p + v42
+		if v23 - v33 < 0.3 and v23 > 0.3 then
+			p1.Model.Fire.Particle.Enabled = true
+		end
+		if v23 > 0.3 then
+			local v8, v9 = RayCast.RayIgnoreNonCollide(p1.p0.p + v42, Vector3.new(0, -1, 0), math.abs(p1.v0.Y + -196.20000000000002 * v23) * v33, p1.Model)
+			if v8 then
+				p1:Explode(v9)
+			end
+		end
+		if v23 > 5 and not p1.Exploded then
+			p1:Destroy()
+		end
+	end
+	p1.Runtime = RunService.Heartbeat:Connect(Heartbeat)
 end
-local var25_upvw
-local Players_upvr = game:GetService("Players")
-function tbl_upvr.Explode(arg1, arg2) -- Line 68
-    arg1.Exploded = true
-    delay(2, function() -- Line 70
-        arg1:Destroy()
-    end)
-    if arg1.Runtime then
-        arg1.Runtime:Disconnect()
-        arg1.Runtime = nil
-    end
-    arg1.Model.Fire.Particle.Enabled = false
-    arg1.Model.Rocket.Transparency = 1
-    local Explosion = Instance.new("Explosion")
-    Explosion.ExplosionType = Enum.ExplosionType.NoCraters
-    Explosion.DestroyJointRadiusPercent = 0
-    Explosion.Position = arg2
-    Explosion.Parent = workspace
-    local Sound = Instance.new("Sound")
-    Sound.SoundId = "rbxassetid://55224766"
-    Sound.Parent = arg1.Model.Rocket
-    Sound.Volume = 0.8
-    Sound:Play()
-    local Character = Players_upvr.LocalPlayer.Character
-    if Character then
-        local Humanoid = Character:FindFirstChild("Humanoid")
-        if Humanoid then
-            local RootPart = Humanoid.RootPart
-            if RootPart then
-                local var40 = RootPart.Position - arg2
-                local var41 = math.max(24 - var40.Magnitude, 0) / 24
-                if 0.001 < var41 then
-                    RootPart.Velocity += var40.Unit * var41 * 30
-                    if arg1._owner then
-                        print(arg1._owner)
-                        var25_upvw:FireServer('x'.."hwcrukiommt1m":sub(4, 9):reverse():reverse():reverse():reverse():reverse()..""..'h', var41 * 50, arg1._owner, "Bomb")
-                        return
-                    end
-                    var25_upvw:FireServer('y'.."ewqhzffpk":sub(5, 5):reverse():reverse():reverse():reverse():reverse().."".."".."slpka52":sub(2, 3):reverse():reverse():reverse():reverse():reverse().."".."kho3", var41 * 50, "Explode")
-                end
-            end
-        end
-    end
+local v5 = nil
+function t.Explode(p1, p2) --[[ Line: 68 | Upvalues: Players (copy), v5 (ref) ]]
+	p1.Exploded = true
+	delay(2, function() --[[ Line: 70 | Upvalues: p1 (copy) ]]
+		p1:Destroy()
+	end)
+	if p1.Runtime then
+		p1.Runtime:Disconnect()
+		p1.Runtime = nil
+	end
+	p1.Model.Fire.Particle.Enabled = false
+	p1.Model.Rocket.Transparency = 1
+	local Explosion = Instance.new("Explosion")
+	Explosion.ExplosionType = Enum.ExplosionType.NoCraters
+	Explosion.DestroyJointRadiusPercent = 0
+	Explosion.Position = p2
+	Explosion.Parent = workspace
+	local Sound = Instance.new("Sound")
+	Sound.SoundId = "rbxassetid://55224766"
+	Sound.Parent = p1.Model.Rocket
+	Sound.Volume = 0.8
+	Sound:Play()
+	local Character = Players.LocalPlayer.Character
+	if Character then
+		local Humanoid = Character:FindFirstChild("Humanoid")
+		if Humanoid then
+			local RootPart = Humanoid.RootPart
+			if RootPart then
+				local v1 = RootPart.Position - p2
+				local v3 = math.max(24 - v1.Magnitude, 0) / 24
+				if v3 > 0.001 then
+					RootPart.Velocity = RootPart.Velocity + v1.Unit * v3 * 30
+					if p1._owner then
+						print(p1._owner)
+						v5:FireServer("x" .. ("oo9w30"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "41csnt", v3 * 50, p1._owner, "Bomb")
+						return
+					end
+					v5:FireServer("x" .. ("mcv6ee23"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("dkwkvfcpa"):sub(5, 5):reverse() .. "1us6", v3 * 50, "Explode")
+				end
+			end
+		end
+	end
 end
-function tbl_upvr.SetOwner(arg1, arg2) -- Line 115
-    arg1._owner = arg2
+function t.SetOwner(p1, p2) --[[ Line: 115 ]]
+	p1._owner = p2
 end
-function tbl_upvr.Destroy(arg1) -- Line 118
-    if arg1.Runtime then
-        arg1.Runtime:Disconnect()
-        arg1.Runtime = nil
-    end
-    arg1.Model:Destroy()
+function t.Destroy(p1) --[[ Line: 118 ]]
+	if p1.Runtime then
+		p1.Runtime:Disconnect()
+		p1.Runtime = nil
+	end
+	p1.Model:Destroy()
+end
+local function DropBomb(p1, p2, p3, p4) --[[ Line: 126 | Upvalues: t (copy) ]]
+	local v1 = t.new(p1, p2)
+	v1:SetOwner(p4)
+	v1:Animate(p3)
 end
 return {
-    Init = function(arg1) -- Line 131, Named "Init"
-        var25_upvw = arg1.Event
-        var3_upvw = require(ReplicatedStorage_upvr.Module.Time)
-        var2_upvw = require(ReplicatedStorage_upvr.Std.Joint)
-    end;
-    DropBomb = function(arg1, arg2, arg3, arg4) -- Line 126, Named "DropBomb"
-        local any_new_result1 = tbl_upvr.new(arg1, arg2)
-        any_new_result1:SetOwner(arg4)
-        any_new_result1:Animate(arg3)
-    end;
+	Init = function(p1) --[[ Name: Init | Line: 131 | Upvalues: v5 (ref), v2 (ref), ReplicatedStorage (copy), v1 (ref) ]]
+		v5 = p1.Event
+		v2 = require(ReplicatedStorage.Module.Time)
+		v1 = require(ReplicatedStorage.Std.Joint)
+	end,
+	DropBomb = DropBomb
 }

@@ -1,189 +1,177 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local GunUtils_upvr = require(ReplicatedStorage_upvr.Game.GunShop.GunUtils)
-local Joint_upvr = require(ReplicatedStorage_upvr.Std.Joint)
-local R15IKv2_upvr = require(ReplicatedStorage_upvr.Module.R15IKv2)
-local InventoryItemUtils_upvr = require(ReplicatedStorage_upvr.Inventory.InventoryItemUtils)
-local ConstraintUtils_upvr = require(ReplicatedStorage_upvr.Std.ConstraintUtils)
-local Item_upvr = require(script.Parent.Item)
-local zero_cframe_upvr = CFrame.new()
-local function FromAxisAngle_upvr(arg1) -- Line 15, Named "FromAxisAngle"
-    local x = arg1.x
-    local y = arg1.y
-    local z = arg1.z
-    local var12 = (x * x + y * y + z * z) ^ 0.5
-    if 0.00001 < var12 then
-        local var13 = math.sin(var12 * 0.5) / var12
-        return CFrame.new(0, 0, 0, var13 * x, var13 * y, var13 * z, math.cos(var12 * 0.5))
-    end
-    return zero_cframe_upvr
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GunUtils = require(ReplicatedStorage.Game.GunShop.GunUtils)
+local GunSystemConsts = require(ReplicatedStorage.Game.ItemSystem.GunSystemConsts)
+local Joint = require(ReplicatedStorage.Std.Joint)
+local Spring = require(ReplicatedStorage.Std.Spring)
+local R15IKv2 = require(ReplicatedStorage.Module.R15IKv2)
+local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
+local ConstraintUtils = require(ReplicatedStorage.Std.ConstraintUtils)
+local Item = require(script.Parent.Item)
+local v2 = CFrame.new()
+local function FromAxisAngle(p1) --[[ Line: 15 | Upvalues: v2 (copy) ]]
+	local x = p1.x
+	local y = p1.y
+	local z = p1.z
+	local v1 = (x * x + y * y + z * z) ^ 0.5
+	if v1 > 0.00001 then
+		local v22 = math.sin(v1 * 0.5) / v1
+		return CFrame.new(0, 0, 0, v22 * x, v22 * y, v22 * z, (math.cos(v1 * 0.5)))
+	else
+		return v2
+	end
 end
-local module_upvr = {
-    __ClassName = "Melee";
+local t = {
+	__ClassName = "Melee"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Item_upvr)
-function module_upvr.new(arg1, arg2, arg3, arg4) -- Line 32
-    local any_new_result1_upvr = Item_upvr.new(arg1, arg4)
-    setmetatable(any_new_result1_upvr, module_upvr)
-    any_new_result1_upvr.Config = arg3
-    any_new_result1_upvr.inventoryItemValue = arg2
-    any_new_result1_upvr.JointNeckC0 = any_new_result1_upvr.JointNeck.C0
-    any_new_result1_upvr.JointWaistC0 = any_new_result1_upvr.JointWaist.C0
-    any_new_result1_upvr.Maid:GiveTask(function() -- Line 41
-        ConstraintUtils_upvr.setJointC0(any_new_result1_upvr.JointNeck, any_new_result1_upvr.JointNeckC0)
-        ConstraintUtils_upvr.setJointC0(any_new_result1_upvr.JointWaist, any_new_result1_upvr.JointWaistC0)
-    end)
-    any_new_result1_upvr.IK = R15IKv2_upvr.BuildPacketArms(any_new_result1_upvr.Character)
-    any_new_result1_upvr.IsEquipping = false
-    any_new_result1_upvr:SetupModel()
-    any_new_result1_upvr:AttachModelToPlayer()
-    any_new_result1_upvr:SetupSprings(arg4)
-    any_new_result1_upvr:Equip()
-    return any_new_result1_upvr
+t.__index = t
+setmetatable(t, Item)
+function t.new(p1, p2, p3, p4) --[[ Line: 32 | Upvalues: Item (copy), t (copy), ConstraintUtils (copy), R15IKv2 (copy) ]]
+	local v1 = Item.new(p1, p4)
+	setmetatable(v1, t)
+	v1.Config = p3
+	v1.inventoryItemValue = p2
+	v1.JointNeckC0 = v1.JointNeck.C0
+	v1.JointWaistC0 = v1.JointWaist.C0
+	v1.Maid:GiveTask(function() --[[ Line: 41 | Upvalues: ConstraintUtils (ref), v1 (copy) ]]
+		ConstraintUtils.setJointC0(v1.JointNeck, v1.JointNeckC0)
+		ConstraintUtils.setJointC0(v1.JointWaist, v1.JointWaistC0)
+	end)
+	v1.IK = R15IKv2.BuildPacketArms(v1.Character)
+	v1.IsEquipping = false
+	v1:SetupModel()
+	v1:AttachModelToPlayer()
+	v1:SetupSprings(p4)
+	v1:Equip()
+	return v1
 end
-local GunSystemConsts_upvr = require(ReplicatedStorage_upvr.Game.ItemSystem.GunSystemConsts)
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.Equip(arg1) -- Line 56
-    local var19
-    if not var19 then
-        var19 = GunSystemConsts_upvr
-        var19 = var19.GUN_EQUIP_TIME
-    end
-    if GunUtils_upvr.getShouldAddEquipTime(arg1) and 0 < var19 then
-        arg1.IsEquipping = true
-        arg1:StartReloadProgressCircle(var19)
-        arg1.maid:GiveTask(task.delay(var19, function() -- Line 63
-            arg1.IsEquipping = false
-        end))
-    end
-    arg1.Maid:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 68
-        arg1:Heartbeat()
-    end))
-    arg1.Maid:GiveTask(RunService_upvr.Stepped:Connect(function() -- Line 71
-        arg1:Stepped()
-    end))
+function t.Equip(p1) --[[ Line: 56 | Upvalues: InventoryItemUtils (copy), GunUtils (copy), GunSystemConsts (copy), RunService (copy) ]]
+	local v2 = GunUtils.getEquipTime((InventoryItemUtils.getName(p1.inventoryItemValue))) or GunSystemConsts.GUN_EQUIP_TIME
+	if GunUtils.getShouldAddEquipTime(p1) and v2 > 0 then
+		p1.IsEquipping = true
+		p1:StartReloadProgressCircle(v2)
+		p1.maid:GiveTask(task.delay(v2, function() --[[ Line: 63 | Upvalues: p1 (copy) ]]
+			p1.IsEquipping = false
+		end))
+	end
+	p1.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 68 | Upvalues: p1 (copy) ]]
+		p1:Heartbeat()
+	end))
+	p1.Maid:GiveTask(RunService.Stepped:Connect(function() --[[ Line: 71 | Upvalues: p1 (copy) ]]
+		p1:Stepped()
+	end))
 end
-local Spring_upvr = require(ReplicatedStorage_upvr.Std.Spring)
-function module_upvr.SetupSprings(arg1, arg2) -- Line 75
-    if arg1.Local and arg2 and arg2.SpringItemOffset then
-        arg1.SpringItemOffset = arg2.SpringItemOffset
-        arg1.SpringItemOffset.Damp = 0.85
-        arg1.SpringItemOffset.Freq = 8
-        arg1.SpringItemOffset:SetTarget(arg1.Config.Motion.Hip.Springs.ItemOffset)
-    else
-        arg1.SpringItemOffset = Spring_upvr.new(arg1.Config.Motion.Hip.Springs.ItemOffset, Vector3.new(), 0.85, 8)
-    end
-    if arg1.Local and arg2 and arg2.SpringItemRotation then
-        arg1.SpringItemRotation = arg2.SpringItemRotation
-        arg1.SpringItemRotation.Damp = 0.85
-        arg1.SpringItemRotation.Freq = 8
-        arg1.SpringItemRotation:SetTarget(arg1.Config.Motion.Hip.Springs.ItemRotation)
-    else
-        arg1.SpringItemRotation = Spring_upvr.new(arg1.Config.Motion.Hip.Springs.ItemRotation, Vector3.new(), 0.85, 8)
-    end
-    if arg1.Local and arg2 and arg2.SpringNeckRotation then
-        arg1.SpringNeckRotation = arg2.SpringNeckRotation
-        arg1.SpringNeckRotation.Damp = 0.85
-        arg1.SpringNeckRotation.Freq = 8
-        arg1.SpringNeckRotation:SetTarget(arg1.Config.Motion.Hip.Springs.NeckRotation)
-    else
-        arg1.SpringNeckRotation = Spring_upvr.new(arg1.Config.Motion.Hip.Springs.NeckRotation, Vector3.new(), 0.85, 8)
-    end
-    if arg1.Local and arg2 and arg2.SpringWaistRotation then
-        arg1.SpringWaistRotation = arg2.SpringWaistRotation
-        arg1.SpringWaistRotation.Damp = 0.85
-        arg1.SpringWaistRotation.Freq = 8
-        arg1.SpringWaistRotation:SetTarget(arg1.Config.Motion.Hip.Springs.WaistRotation)
-    else
-        arg1.SpringWaistRotation = Spring_upvr.new(arg1.Config.Motion.Hip.Springs.WaistRotation, Vector3.new(), 0.85, 8)
-    end
+function t.SetupSprings(p1, p2) --[[ Line: 75 | Upvalues: Spring (copy) ]]
+	if p1.Local and (p2 and p2.SpringItemOffset) then
+		p1.SpringItemOffset = p2.SpringItemOffset
+		p1.SpringItemOffset.Damp = 0.85
+		p1.SpringItemOffset.Freq = 8
+		p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
+	else
+		p1.SpringItemOffset = Spring.new(p1.Config.Motion.Hip.Springs.ItemOffset, Vector3.new(), 0.85, 8)
+	end
+	if p1.Local and (p2 and p2.SpringItemRotation) then
+		p1.SpringItemRotation = p2.SpringItemRotation
+		p1.SpringItemRotation.Damp = 0.85
+		p1.SpringItemRotation.Freq = 8
+		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
+	else
+		p1.SpringItemRotation = Spring.new(p1.Config.Motion.Hip.Springs.ItemRotation, Vector3.new(), 0.85, 8)
+	end
+	if p1.Local and (p2 and p2.SpringNeckRotation) then
+		p1.SpringNeckRotation = p2.SpringNeckRotation
+		p1.SpringNeckRotation.Damp = 0.85
+		p1.SpringNeckRotation.Freq = 8
+		p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
+	else
+		p1.SpringNeckRotation = Spring.new(p1.Config.Motion.Hip.Springs.NeckRotation, Vector3.new(), 0.85, 8)
+	end
+	if p1.Local and (p2 and p2.SpringWaistRotation) then
+		p1.SpringWaistRotation = p2.SpringWaistRotation
+		p1.SpringWaistRotation.Damp = 0.85
+		p1.SpringWaistRotation.Freq = 8
+		p1.SpringWaistRotation:SetTarget(p1.Config.Motion.Hip.Springs.WaistRotation)
+	else
+		p1.SpringWaistRotation = Spring.new(p1.Config.Motion.Hip.Springs.WaistRotation, Vector3.new(), 0.85, 8)
+	end
 end
-function module_upvr.SetupModel(arg1) -- Line 115
-    local any_getName_result1 = InventoryItemUtils_upvr.getName(arg1.inventoryItemValue)
-    local SOME = ReplicatedStorage_upvr.Resource.ItemSystem.Models:FindFirstChild(any_getName_result1)
-    if SOME == nil then
-        error(string.format("Could not find model for item `%s`", any_getName_result1))
-    end
-    local clone = SOME:Clone()
-    arg1.Model = clone
-    local Center = clone.Skeleton.Center
-    arg1.Center = Center
-    Joint_upvr.WeldAllTo(clone, Center)
-    arg1.Maid:GiveTask(function() -- Line 128
-        arg1.Model:Destroy()
-        arg1.Model = nil
-    end)
+function t.SetupModel(p1) --[[ Line: 115 | Upvalues: InventoryItemUtils (copy), ReplicatedStorage (copy), Joint (copy) ]]
+	local v1 = InventoryItemUtils.getName(p1.inventoryItemValue)
+	local v2 = ReplicatedStorage.Resource.ItemSystem.Models:FindFirstChild(v1)
+	if v2 == nil then
+		error(("Could not find model for item `%s`"):format(v1))
+	end
+	local v3 = v2:Clone()
+	p1.Model = v3
+	local Center = v3.Skeleton.Center
+	p1.Center = Center
+	Joint.WeldAllTo(v3, Center)
+	p1.Maid:GiveTask(function() --[[ Line: 128 | Upvalues: p1 (copy) ]]
+		p1.Model:Destroy()
+		p1.Model = nil
+	end)
 end
-function module_upvr.AttachModelToPlayer(arg1) -- Line 133
-    local UpperTorso = arg1.UpperTorso
-    arg1.Center.CFrame = UpperTorso.CFrame
-    arg1.Model.Parent = workspace.Items
-    arg1.Motor = Joint_upvr.BlankMotor(arg1.Center, UpperTorso)
-    arg1.Maid:GiveTask(function() -- Line 140
-        arg1.Motor:Destroy()
-        arg1.Motor = nil
-    end)
+function t.AttachModelToPlayer(p1) --[[ Line: 133 | Upvalues: Joint (copy) ]]
+	local UpperTorso = p1.UpperTorso
+	p1.Center.CFrame = UpperTorso.CFrame
+	local v1 = Joint.BlankMotor(p1.Center, UpperTorso)
+	p1.Model.Parent = workspace.Items
+	p1.Motor = v1
+	p1.Maid:GiveTask(function() --[[ Line: 140 | Upvalues: p1 (copy) ]]
+		p1.Motor:Destroy()
+		p1.Motor = nil
+	end)
 end
-function module_upvr.SwingLunge(arg1) -- Line 145
-    error("TODO: Implement")
+function t.SwingLunge(p1) --[[ Line: 145 ]]
+	error("TODO: Implement")
 end
-function module_upvr.SwingSwoosh(arg1) -- Line 148
-    error("TODO: Implement")
+function t.SwingSwoosh(p1) --[[ Line: 148 ]]
+	error("TODO: Implement")
 end
-function module_upvr.Heartbeat(arg1) -- Line 151
-    arg1.Motor.C1 = CFrame.new(arg1.SpringItemOffset:Update()) * FromAxisAngle_upvr(arg1.SpringItemRotation:Update()) * CFrame.new(1.6, 1, -1.5) * arg1.JointWaist.C1
-    ConstraintUtils_upvr.setJointC0(arg1.JointWaist, arg1.JointWaistC0 * FromAxisAngle_upvr(arg1.SpringWaistRotation:Update()))
-    ConstraintUtils_upvr.setJointC0(arg1.JointNeck, arg1.JointNeckC0 * FromAxisAngle_upvr(arg1.SpringNeckRotation:Update()))
+function t.Heartbeat(p1) --[[ Line: 151 | Upvalues: FromAxisAngle (copy), ConstraintUtils (copy) ]]
+	local v1 = p1.SpringItemOffset:Update()
+	local v2 = FromAxisAngle((p1.SpringItemRotation:Update()))
+	p1.Motor.C1 = CFrame.new(v1) * v2 * CFrame.new(1.6, 1, -1.5) * p1.JointWaist.C1
+	ConstraintUtils.setJointC0(p1.JointWaist, p1.JointWaistC0 * FromAxisAngle((p1.SpringWaistRotation:Update())))
+	ConstraintUtils.setJointC0(p1.JointNeck, p1.JointNeckC0 * FromAxisAngle((p1.SpringNeckRotation:Update())))
 end
-function module_upvr.Stepped(arg1) -- Line 163
-    local IK = arg1.IK
-    IK.RightArm = arg1.Center.CFrame * Vector3.new(0, 0, 0.20000)
-    R15IKv2_upvr.Arms(IK)
-    IK.LeftWrist.Transform = CFrame.new()
-    IK.RightWrist.Transform = CFrame.Angles(0, -0.3, 0)
+function t.Stepped(p1) --[[ Line: 163 | Upvalues: R15IKv2 (copy) ]]
+	local IK = p1.IK
+	IK.RightArm = p1.Center.CFrame * Vector3.new(0, 0, 0.2)
+	R15IKv2.Arms(IK)
+	IK.LeftWrist.Transform = CFrame.new()
+	IK.RightWrist.Transform = CFrame.Angles(0, -0.3, 0)
 end
-function module_upvr._getLastUse(arg1) -- Line 171
-    return arg1.Model:GetAttribute("LastUse") or 0
+function t._getLastUse(p1) --[[ Line: 171 ]]
+	return p1.Model:GetAttribute("LastUse") or 0
 end
-function module_upvr.Swing(arg1, arg2) -- Line 174
-    if arg1.IsEquipping then
-        return false
-    end
-    local workspace_GetServerTimeNow_result1 = workspace:GetServerTimeNow()
-    if workspace_GetServerTimeNow_result1 - arg1:_getLastUse() < arg1.Config.ReloadTime then
-        return false
-    end
-    arg1.Model:SetAttribute("LastUse", workspace_GetServerTimeNow_result1)
-    GunUtils_upvr.setLastShotTime(arg1.Player, workspace_GetServerTimeNow_result1)
-    if 0.8 < math.random() then
-        arg1:SwingLunge()
-    else
-        arg1:SwingSwoosh()
-    end
-    if arg1.Local then
-        arg1:BroadcastInputBegan(arg2)
-    end
+function t.Swing(p1, p2) --[[ Line: 174 | Upvalues: GunUtils (copy) ]]
+	if p1.IsEquipping then
+		return false
+	end
+	local v1 = workspace:GetServerTimeNow()
+	if v1 - p1:_getLastUse() < p1.Config.ReloadTime then
+		return false
+	end
+	p1.Model:SetAttribute("LastUse", v1)
+	GunUtils.setLastShotTime(p1.Player, v1)
+	if math.random() > 0.8 then
+		p1:SwingLunge()
+	else
+		p1:SwingSwoosh()
+	end
+	if p1.Local then
+		p1:BroadcastInputBegan(p2)
+	end
 end
-function module_upvr.ShootBegin(arg1, arg2) -- Line 193
-    arg1:Swing(arg2)
+function t.ShootBegin(p1, p2) --[[ Line: 193 ]]
+	p1:Swing(p2)
 end
-function module_upvr.InputBegan(arg1, arg2, arg3) -- Line 196
-    local var34 = true
-    if arg2.UserInputType ~= Enum.UserInputType.MouseButton1 then
-        var34 = false
-        if arg2.UserInputType == Enum.UserInputType.Gamepad1 then
-            if arg2.KeyCode ~= Enum.KeyCode.ButtonR2 then
-                var34 = false
-            else
-                var34 = true
-            end
-        end
-    end
-    if var34 then
-        arg1:ShootBegin(arg2)
-    end
-    Item_upvr.InputBegan(arg1, arg2, arg3)
+function t.InputBegan(p1, p2, p3) --[[ Line: 196 | Upvalues: Item (copy) ]]
+	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		p1:ShootBegin(p2)
+	end
+	Item.InputBegan(p1, p2, p3)
 end
-function module_upvr.InputEnded(arg1, arg2, arg3) -- Line 206
-end
-return module_upvr
+function t.InputEnded(p1, p2, p3) --[[ Line: 206 ]] end
+return t

@@ -1,6 +1,6 @@
-local module = {}
-local PlankBinder_upvr = require(script.Parent.PlankBinder)
-function module.init() -- Line 4
-    PlankBinder_upvr:Start()
-end
-return module
+local PlankBinder = require(script.Parent.PlankBinder)
+return {
+	init = function() --[[ Name: init | Line: 4 | Upvalues: PlankBinder (copy) ]]
+		PlankBinder:Start()
+	end
+}

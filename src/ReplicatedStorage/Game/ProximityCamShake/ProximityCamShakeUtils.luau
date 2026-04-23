@@ -1,24 +1,15 @@
-local ProximityCamShakeConsts_upvr = require(script.Parent.ProximityCamShakeConsts)
+local ProximityCamShakeConsts = require(script.Parent.ProximityCamShakeConsts)
 return {
-    setEnabled = function(arg1, arg2) -- Line 4, Named "setEnabled"
-        if arg2 == nil then
-        else
-        end
-        assert(true)
-        arg1:SetAttribute(ProximityCamShakeConsts_upvr.ENABLED_ATTR_NAME, arg2)
-    end;
-    setRadius = function(arg1, arg2) -- Line 8, Named "setRadius"
-        if arg2 == nil then
-        else
-        end
-        assert(true)
-        arg1:SetAttribute(ProximityCamShakeConsts_upvr.RADIUS_ATTR_NAME, arg2)
-    end;
-    setMagnitude = function(arg1, arg2) -- Line 12, Named "setMagnitude"
-        if arg2 == nil then
-        else
-        end
-        assert(true)
-        arg1:SetAttribute(ProximityCamShakeConsts_upvr.MAGNITUDE_ATTR_NAME, arg2)
-    end;
+	setEnabled = function(p1, p2) --[[ Name: setEnabled | Line: 4 | Upvalues: ProximityCamShakeConsts (copy) ]]
+		assert(p2 ~= nil)
+		p1:SetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME, p2)
+	end,
+	setRadius = function(p1, p2) --[[ Name: setRadius | Line: 8 | Upvalues: ProximityCamShakeConsts (copy) ]]
+		assert(p2 ~= nil)
+		p1:SetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME, p2)
+	end,
+	setMagnitude = function(p1, p2) --[[ Name: setMagnitude | Line: 12 | Upvalues: ProximityCamShakeConsts (copy) ]]
+		assert(p2 ~= nil)
+		p1:SetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME, p2)
+	end
 }

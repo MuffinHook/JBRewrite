@@ -1,477 +1,493 @@
-local table_2 = table
-local string_2 = string
-local next_upvr = next
-local pcall_upvr = pcall
-local game_upvr = game
-local format_upvr = string_2.format
-local match_upvr = string_2.match
-local gmatch_upvr = string_2.gmatch
-local concat_upvr = table_2.concat
-local typeof_upvr = typeof
-if not typeof_upvr then
-    typeof_upvr = type
+local v1 = table
+local v2 = ipairs
+local v3 = string
+local v4 = next
+local v5 = pcall
+local v6 = game
+local v7 = workspace
+local v8 = math
+local v9 = tostring
+local v10 = tonumber
+local v11 = getmetatable
+local format = v3.format
+local char = v3.char
+local gsub = v3.gsub
+local match = v3.match
+local rep = v3.rep
+local sub = v3.sub
+local gmatch = v3.gmatch
+local concat = v1.concat
+local insert = v1.insert
+local huge = v8.huge
+local v12 = typeof or type
+local v13 = setmetatable({}, {
+	__mode = "k"
+})
+for v14, v15 in v4, {
+	"and",
+	"break",
+	"do",
+	"else",
+	"elseif",
+	"end",
+	"false",
+	"for",
+	"function",
+	"if",
+	"in",
+	"local",
+	"nil",
+	"not",
+	"or",
+	"repeat",
+	"return",
+	"then",
+	"true",
+	"until",
+	"while",
+	"continue"
+} do
+	v13[v15] = true
 end
-local tbl = {"and", "break", "do", "else", "elseif", "end", "false", "for", "function", "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while", "continue"}
-for _, v in next_upvr, tbl do
-    setmetatable({}, {
-        __mode = 'k';
-    })[v] = true
-    local var20_upvw
+local v17 = v1.find or function(p1, p2) --[[ Line: 68 | Upvalues: v2 (copy) ]]
+	for v1, v22 in v2(p1) do
+		if v22 == p2 then
+			return v1
+		end
+	end
 end
-tbl = table_2.find
-local var22_upvw = tbl
-if not var22_upvw then
-    local ipairs_upvr = ipairs
-    function var22_upvw(arg1, arg2) -- Line 68
-        for i_2, v_2 in ipairs_upvr(arg1) do
-            if v_2 == arg2 then
-                return i_2
-            end
-        end
-    end
+local v19 = v1.clone or function(p1) --[[ Line: 80 | Upvalues: v4 (copy) ]]
+	local t = {}
+	for v1, v2 in v4, p1 do
+		t[v1] = v2
+	end
+	return t
 end
-var22_upvw = table_2.clone
-local var30_upvw = var22_upvw
-if not var30_upvw then
-    function var30_upvw(arg1) -- Line 80
-        local module_2 = {}
-        for i_3, v_3 in next_upvr, arg1 do
-            module_2[i_3] = v_3
-        end
-        return module_2
-    end
+local function CheckType(p1, p2, ...) --[[ Line: 92 | Upvalues: v12 (copy), v17 (ref), format (copy), concat (copy) ]]
+	local t = { ... }
+	local v1 = v12(p1)
+	if not v17(t, v1) then
+		error(format("LuaEncode: Incorrect type for `%s`: `%s` expected, got `%s`", p2, concat(t, ", "), v1), 0)
+	end
+	return p1
 end
-local function CheckType_upvr(arg1, arg2, ...) -- Line 92, Named "CheckType"
-    local args_list = {...}
-    local typeof_upvr_result1 = typeof_upvr(arg1)
-    if not var22_upvw(args_list, typeof_upvr_result1) then
-        error(format_upvr("LuaEncode: Incorrect type for `%s`: `%s` expected, got `%s`", arg2, concat_upvr(args_list, ", "), typeof_upvr_result1), 0)
-    end
-    return arg1
-end
-local module_3_upvr = {
-    ['"'] = "\\\"";
-    ['\\'] = "\\\\";
-    ['\a'] = "\\a";
-    ['\b'] = "\\b";
-    ['\t'] = "\\t";
-    ['\n'] = "\\n";
-    ['\v'] = "\\v";
-    ['\f'] = "\\f";
-    ['\r'] = "\\r";
+local t = {
+	["\""] = "\\\"",
+	["\\"] = "\\\\",
+	["\7"] = "\\a",
+	["\8"] = "\\b",
+	["\t"] = "\\t",
+	["\n"] = "\\n",
+	["\11"] = "\\v",
+	["\f"] = "\\f",
+	["\r"] = "\\r"
 }
-for i_4 = 0, 255 do
-    local any_char_result1 = string_2.char(i_4)
-    if not module_3_upvr[any_char_result1] and (i_4 < 32 or 126 < i_4) then
-        module_3_upvr[any_char_result1] = '\\'..i_4
-    end
+for i = 0, 255 do
+	local v20 = char(i)
+	if not t[v20] and (i < 32 or i > 126) then
+		t[v20] = "\\" .. i
+	end
 end
-local gsub_upvr = string_2.gsub
-local function SerializeString_upvw(arg1) -- Line 139, Named "SerializeString"
-    return '"'..gsub_upvr(arg1, "[%z\\\"\x01-\x1F\x7F-\xFF]", module_3_upvr)..'"'
+local function SerializeString(p1) --[[ Line: 139 | Upvalues: gsub (copy), t (copy) ]]
+	return "\"" .. gsub(p1, "[%z\\\"\1-\31\127-\255]", t) .. "\""
 end
-function module_3_upvr(arg1) -- Line 147, Named "CommentBlock"
-    local var46
-    for i_5 in gmatch_upvr(arg1, "%](=*)%]") do
-        if #var46 <= #i_5 then
-            var46 = i_5..'='
-        end
-    end
-    return "--["..var46..'['..arg1..']'..var46..']'
+local function CommentBlock(p1) --[[ Line: 147 | Upvalues: gmatch (copy) ]]
+	local v1 = ""
+	for v2 in gmatch(p1, "%](=*)%]") do
+		if #v1 <= #v2 then
+			v1 = v2 .. "="
+		end
+	end
+	return "--[" .. v1 .. "[" .. p1 .. "]" .. v1 .. "]"
 end
-local function _(arg1) -- Line 163, Named "IsService"
-    local pcall_upvr_result1_2, pcall_upvr_result2 = pcall_upvr(game_upvr.FindService, game_upvr, arg1.ClassName)
-    if pcall_upvr_result1_2 and pcall_upvr_result2 then
-        return true
-    end
-    return false
+local function IsService(p1) --[[ Line: 163 | Upvalues: v5 (copy), v6 (copy) ]]
+	local v1, v2 = v5(v6.FindService, v6, p1.ClassName)
+	return v1 and v2 and true or false
 end
-local workspace_upvr = workspace
-local function EvaluateInstancePath_upvw(arg1, arg2) -- Line 175, Named "EvaluateInstancePath"
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    local pcall_upvr_result1, pcall_upvr_result2_3 = pcall_upvr(game_upvr.FindService, game_upvr, arg1.ClassName)
-    local var58
-    if pcall_upvr_result1 and pcall_upvr_result2_3 then
-        var58 = true
-    else
-        var58 = false
-    end
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local function v21(p1, p2) --[[ Line: 175 | Upvalues: v6 (copy), v5 (copy), SerializeString (ref), v13 (ref), match (copy), v7 (copy), v21 (ref) ]]
+	local v1 = p2 or ""
+	local v2 = p1.Name
+	local ClassName = p1.ClassName
+	local v3 = p1.Parent
+	local v4
+	if v3 == v6 then
+		local v52, v62 = v5(v6.FindService, v6, p1.ClassName)
+		v4 = if v52 and v62 and true or false then ":GetService(" .. SerializeString(ClassName) .. ")" .. v1 elseif v13[v2] or not match(v2, "^[A-Za-z_][A-Za-z0-9_]*$") then "[" .. SerializeString(v2) .. "]" .. v1 else "." .. v2 .. v1
+	else
+		v4 = if v13[v2] or not match(v2, "^[A-Za-z_][A-Za-z0-9_]*$") then "[" .. SerializeString(v2) .. "]" .. v1 else "." .. v2 .. v1
+	end
+	if v3 then
+		if v3 == v6 then
+			return "game" .. v4
+		elseif v3 == v7 then
+			return "workspace" .. v4
+		else
+			return v21(v3, v4)
+		end
+	end
 end
-local rep_upvr = string_2.rep
-local sub_upvr = string_2.sub
-local insert_upvr = table_2.insert
-local huge_upvr = math.huge
-local tostring_upvr = tostring
-local tonumber_upvr = tonumber
-local getmetatable_upvr = getmetatable
-local function LuaEncode_upvr(arg1, arg2) -- Line 236, Named "LuaEncode"
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    CheckType_upvr(arg1, "inputTable", "table")
-    CheckType_upvr(arg2, "options", "table", "nil")
-    local var66
-    if arg2 then
-        var66 = CheckType_upvr
-        var66(arg2.Prettify, "options.Prettify", "boolean", "nil")
-        var66 = CheckType_upvr
-        var66(arg2.PrettyPrinting, "options.PrettyPrinting", "boolean", "nil")
-        var66 = CheckType_upvr
-        var66(arg2.IndentCount, "options.IndentCount", "number", "nil")
-        var66 = CheckType_upvr
-        var66(arg2.OutputWarnings, "options.OutputWarnings", "boolean", "nil")
-        var66 = CheckType_upvr
-        var66(arg2.StackLimit, "options.StackLimit", "number", "nil")
-        var66 = CheckType_upvr
-        var66(arg2.FunctionsReturnRaw, "options.FunctionsReturnRaw", "boolean", "nil")
-        var66 = CheckType_upvr
-        var66(arg2.UseInstancePaths, "options.UseInstancePaths", "boolean", "nil")
-        var66 = CheckType_upvr
-        var66(arg2._StackLevel, "options._StackLevel", "number", "nil")
-        var66 = CheckType_upvr
-        var66(arg2._VisitedTables, "options._StackLevel", "table", "nil")
-    end
-    var66 = arg2
-    if not var66 then
-        var66 = {}
-    end
-    local var67_upvw = var66
-    if var67_upvw.Prettify ~= nil or var67_upvw.PrettyPrinting ~= nil then
-    end
-    if var67_upvw.Prettify == nil or not var67_upvw.Prettify or var67_upvw.PrettyPrinting then
-    end
-    local IndentCount_upvr = var67_upvw.IndentCount
-    if not IndentCount_upvr then
-        if var67_upvw.PrettyPrinting then
-            IndentCount_upvr = 4
-        else
-            IndentCount_upvr = 0
-        end
-    end
-    if var67_upvw.OutputWarnings == nil then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    local var69 = var67_upvw.StackLimit or 500
-    if var67_upvw.FunctionsReturnRaw ~= nil then
-    end
-    if var67_upvw.UseInstancePaths == nil then
-    else
-    end
-    local var70_upvr = var67_upvw._StackLevel or 1
-    if not var67_upvw._VisitedTables then
-        ({})[arg1] = true
-    end
-    if var69 <= var70_upvr then
-        return "{--[[LuaEncode: Stack level limit of `"..var69.."` reached]]}"
-    end
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    if var67_upvw.PrettyPrinting then
-    else
-    end
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    if var67_upvw.PrettyPrinting then
-        local _ = ", "
-    else
-    end
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    if var67_upvw.PrettyPrinting then
-    else
-    end
-    local rep_upvr_result1 = rep_upvr(' ', IndentCount_upvr)
-    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-    if not var67_upvw.PrettyPrinting or not rep_upvr(rep_upvr_result1, var70_upvr) then
-    end
-    local var73 = rep_upvr_result1
-    if 0 >= #var73 or not sub_upvr(var73, 1, -IndentCount_upvr - 1) then
-    end
-    local tbl_3_upvr = {}
-    local function _(arg1_2, arg2_2) -- Line 301, Named "TypeCase"
-        return tbl_3_upvr[arg1_2](arg2_2, false)
-    end
-    local const_string_upvr_2 = ','
-    local function Args_upvr(...) -- Line 308, Named "Args"
-        local module_4 = {}
-        for _, v_4 in next_upvr, {...} do
-            insert_upvr(module_4, tbl_3_upvr[typeof_upvr(v_4)](v_4, false))
-        end
-        return concat_upvr(module_4, const_string_upvr_2)
-    end
-    local function _(arg1_3, arg2_3) -- Line 319, Named "Params"
-        local module = {}
-        module[1] = arg1_3
-        module[2] = tbl_3_upvr.table(arg2_3, false)
-        return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)("..concat_upvr(module, const_string_upvr_2)..')'
-    end
-    local var84_upvw = 1
-    function tbl_3_upvr.number(arg1_4, arg2_4) -- Line 325
-        if arg2_4 and arg1_4 == var84_upvw then
-            var84_upvw += 1
-            return nil, true
-        end
-        if arg1_4 == huge_upvr then
-            return "math.huge"
-        end
-        if arg1_4 == -huge_upvr then
-            return "-math.huge"
-        end
-        return format_upvr("%.14g", arg1_4)
-    end
-    function tbl_3_upvr.string(arg1_5, arg2_5) -- Line 346
-        if arg2_5 and not var20_upvw[arg1_5] and match_upvr(arg1_5, "^[A-Za-z_][A-Za-z0-9_]*$") then
-            return arg1_5, true
-        end
-        return SerializeString_upvw(arg1_5)
-    end
-    local tbl_2_upvr = {}
-    local PrettyPrinting_upvr = var67_upvw.PrettyPrinting
-    function tbl_3_upvr.table(arg1_6, arg2_6) -- Line 355
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        local var89
-        if tbl_2_upvr[arg1_6] then
-            if arg1_6 == arg1 then
-                var89 = " (of parent)"
-            else
-                var89 = ""
-            end
-            return format_upvr("{--[[LuaEncode: Duplicate reference%s]]}", var89)
-        end
-        tbl_2_upvr[arg1_6] = true
-        local var30_result1 = var30_upvw(var67_upvw)
-        if not arg2_6 then
-        end
-        var30_result1.Prettify = PrettyPrinting_upvr
-        if arg2_6 then
-            if PrettyPrinting_upvr or not IndentCount_upvr then
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-        else
-        end
-        var30_result1.IndentCount = IndentCount_upvr
-        if arg2_6 then
-        else
-        end
-        var30_result1._StackLevel = var70_upvr + 1
-        var30_result1._VisitedTables = tbl_2_upvr
-        return LuaEncode_upvr(arg1_6, var30_result1)
-    end
-    function tbl_3_upvr.boolean(arg1_7) -- Line 387
-        return tostring_upvr(arg1_7)
-    end
-    tbl_3_upvr["nil"] = function(arg1_8) -- Line 391
-        return "nil"
-    end
-    local FunctionsReturnRaw_upvr = var67_upvw.FunctionsReturnRaw
-    tbl_3_upvr["function"] = function(arg1_9) -- Line 395
-        if FunctionsReturnRaw_upvr then
-            return arg1_9()
-        end
-        return "function() --[[LuaEncode: `options.FunctionsReturnRaw` false; can't serialize functions]] return end"
-    end
-    function tbl_3_upvr.Axes(arg1_10) -- Line 409
-        for i_7, v_5 in next_upvr, {
-            ["Enum.Axis.X"] = arg1_10.X;
-            ["Enum.Axis.Y"] = arg1_10.Y;
-            ["Enum.Axis.Z"] = arg1_10.Z;
-        } do
-            if v_5 then
-                insert_upvr({}, i_7)
-            end
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        return "Axes.new("..concat_upvr({}, const_string_upvr_2)..')'
-    end
-    function tbl_3_upvr.BrickColor(arg1_11) -- Line 426
-        local var100 = PrettyPrinting_upvr
-        if var100 then
-            var100 = tbl_3_upvr.string(arg1_11.Name, false)
-        end
-        local var101 = "BrickColor.new("..var100
-        if not var101 then
-            var101 = arg1_11.Number..')'
-        end
-        return var101
-    end
-    function tbl_3_upvr.CFrame(arg1_12) -- Line 432
-        return "CFrame.new("..Args_upvr(arg1_12:components())..')'
-    end
-    function tbl_3_upvr.CatalogSearchParams(arg1_13) -- Line 436
-        return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)("..concat_upvr({"CatalogSearchParams.new()", tbl_3_upvr.table({
-            SearchKeyword = arg1_13.SearchKeyword;
-            MinPrice = arg1_13.MinPrice;
-            MaxPrice = arg1_13.MaxPrice;
-            SortType = arg1_13.SortType;
-            CategoryFilter = arg1_13.CategoryFilter;
-            BundleTypes = arg1_13.BundleTypes;
-            AssetTypes = arg1_13.AssetTypes;
-        }, false)}, const_string_upvr_2)..')'
-    end
-    function tbl_3_upvr.Color3(arg1_14) -- Line 448
-        return "Color3.new("..Args_upvr(arg1_14.R, arg1_14.G, arg1_14.B)
-    end
-    function tbl_3_upvr.ColorSequence(arg1_15) -- Line 453
-        return "ColorSequence.new("..tbl_3_upvr.table(arg1_15.Keypoints, false)..')'
-    end
-    function tbl_3_upvr.ColorSequenceKeypoint(arg1_16) -- Line 457
-        return "ColorSequenceKeypoint.new("..Args_upvr(arg1_16.Time, arg1_16.Value)..')'
-    end
-    function tbl_3_upvr.DateTime(arg1_17) -- Line 462
-        return "DateTime.fromUnixTimestamp("..arg1_17.UnixTimestamp..')'
-    end
-    function tbl_3_upvr.DockWidgetPluginGuiInfo(arg1_18) -- Line 469
-        local tostring_upvr_result1 = tostring_upvr(arg1_18)
-        local InitialDockState = Enum.InitialDockState
-        local var113
-        if var113 ~= '1' then
-            InitialDockState = false
-        else
-            InitialDockState = true
-        end
-        if match_upvr(tostring_upvr_result1, "InitialEnabledShouldOverrideRestore:(%w+)") ~= '1' then
-            var113 = false
-        else
-            var113 = true
-        end
-        return "DockWidgetPluginGuiInfo.new("..Args_upvr(InitialDockState[match_upvr(tostring_upvr_result1, "InitialDockState:(%w+)")], InitialDockState, var113, tonumber_upvr(match_upvr(tostring_upvr_result1, "FloatingXSize:(%w+)")), tonumber_upvr(match_upvr(tostring_upvr_result1, "FloatingYSize:(%w+)")), tonumber_upvr(match_upvr(tostring_upvr_result1, "MinWidth:(%w+)")), tonumber_upvr(match_upvr(tostring_upvr_result1, "MinHeight:(%w+)")))..')'
-    end
-    function tbl_3_upvr.Enum(arg1_19) -- Line 491
-        return "Enum."..tostring_upvr(arg1_19)
-    end
-    function tbl_3_upvr.EnumItem(arg1_20) -- Line 496
-        return tostring_upvr(arg1_20)
-    end
-    function tbl_3_upvr.Enums(arg1_21) -- Line 501
-        return "Enum"
-    end
-    function tbl_3_upvr.Faces(arg1_22) -- Line 505
-        for i_8, v_6 in next_upvr, {
-            ["Enum.NormalId.Top"] = arg1_22.Top;
-            ["Enum.NormalId.Bottom"] = arg1_22.Bottom;
-            ["Enum.NormalId.Left"] = arg1_22.Left;
-            ["Enum.NormalId.Right"] = arg1_22.Right;
-            ["Enum.NormalId.Back"] = arg1_22.Back;
-            ["Enum.NormalId.Front"] = arg1_22.Front;
-        } do
-            if v_6 then
-                insert_upvr({}, i_8)
-            end
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        return "Faces.new("..concat_upvr({}, const_string_upvr_2)..')'
-    end
-    function tbl_3_upvr.FloatCurveKey(arg1_23) -- Line 525
-        return "FloatCurveKey.new("..Args_upvr(arg1_23.Time, arg1_23.Value, arg1_23.Interpolation)..')'
-    end
-    function tbl_3_upvr.Font(arg1_24) -- Line 529
-        return "Font.new("..Args_upvr(arg1_24.Family, arg1_24.Weight, arg1_24.Style)..')'
-    end
-    local UseInstancePaths_upvr = var67_upvw.UseInstancePaths
-    local const_string_upvr = ""
-    function tbl_3_upvr.Instance(arg1_25) -- Line 535
-        local var136
-        if UseInstancePaths_upvr then
-            local EvaluateInstancePath_result1_2 = EvaluateInstancePath_upvw(arg1_25)
-            if EvaluateInstancePath_result1_2 then
-                return EvaluateInstancePath_result1_2
-            end
-        end
-        var136 = "Instance.new("
-        local var138 = var136..tbl_3_upvr.string(arg1_25.ClassName, false)..')'
-        var136 = ""
-        for i_9 in gmatch_upvr(var138, "%](=*)%]") do
-            if #var136 <= #i_9 then
-                var136 = i_9..'='
-            end
-        end
-        return "nil"..const_string_upvr.."--["..var136..'['..var138..']'..var136..']'
-    end
-    function tbl_3_upvr.NumberRange(arg1_26) -- Line 550
-        return "NumberRange.new("..Args_upvr(arg1_26.Min, arg1_26.Max)..')'
-    end
-    function tbl_3_upvr.NumberSequence(arg1_27) -- Line 554
-        return "NumberSequence.new("..tbl_3_upvr.table(arg1_27.Keypoints, false)..')'
-    end
-    function tbl_3_upvr.NumberSequenceKeypoint(arg1_28) -- Line 558
-        return "NumberSequenceKeypoint.new("..Args_upvr(arg1_28.Time, arg1_28.Value, arg1_28.Envelope)..')'
-    end
-    function tbl_3_upvr.OverlapParams(arg1_29) -- Line 562
-        return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)("..concat_upvr({"OverlapParams.new()", tbl_3_upvr.table({
-            FilterDescendantsInstances = arg1_29.FilterDescendantsInstances;
-            FilterType = arg1_29.FilterType;
-            MaxParts = arg1_29.MaxParts;
-            CollisionGroup = arg1_29.CollisionGroup;
-            RespectCanCollide = arg1_29.RespectCanCollide;
-        }, false)}, const_string_upvr_2)..')'
-    end
-    function tbl_3_upvr.PathWaypoint(arg1_30) -- Line 572
-        return "PathWaypoint.new("..Args_upvr(arg1_30.Position, arg1_30.Action, arg1_30.Label)..')'
-    end
-    function tbl_3_upvr.PhysicalProperties(arg1_31) -- Line 576
-        return "PhysicalProperties.new("..Args_upvr(arg1_31.Density, arg1_31.Friction, arg1_31.Elasticity, arg1_31.FrictionWeight, arg1_31.ElasticityWeight)..')'
-    end
-    function tbl_3_upvr.Random() -- Line 582
-        return "Random.new()"
-    end
-    function tbl_3_upvr.Ray(arg1_32) -- Line 586
-        return "Ray.new("..Args_upvr(arg1_32.Origin, arg1_32.Direction)..')'
-    end
-    function tbl_3_upvr.RaycastParams(arg1_33) -- Line 590
-        return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)("..concat_upvr({"RaycastParams.new()", tbl_3_upvr.table({
-            FilterDescendantsInstances = arg1_33.FilterDescendantsInstances;
-            FilterType = arg1_33.FilterType;
-            IgnoreWater = arg1_33.IgnoreWater;
-            CollisionGroup = arg1_33.CollisionGroup;
-            RespectCanCollide = arg1_33.RespectCanCollide;
-        }, false)}, const_string_upvr_2)..')'
-    end
-    function tbl_3_upvr.Rect(arg1_34) -- Line 600
-        return "Rect.new("..Args_upvr(arg1_34.Min, arg1_34.Max)..')'
-    end
-    function tbl_3_upvr.Region3(arg1_35) -- Line 607
-        local CFrame_2 = arg1_35.CFrame
-        local Size = arg1_35.Size
-        return "Region3.new("..Args_upvr(CFrame_2 * CFrame.new(-Size / 2), CFrame_2 * CFrame.new(Size / 2))..')'
-    end
-    function tbl_3_upvr.Region3int16(arg1_36) -- Line 619
-        return "Region3int16.new("..Args_upvr(arg1_36.Min, arg1_36.Max)..')'
-    end
-    function tbl_3_upvr.TweenInfo(arg1_37) -- Line 623
-        return "TweenInfo.new("..Args_upvr(arg1_37.Time, arg1_37.EasingStyle, arg1_37.EasingDirection, arg1_37.RepeatCount, arg1_37.Reverses, arg1_37.DelayTime)..')'
-    end
-    function tbl_3_upvr.RotationCurveKey(arg1_38) -- Line 637
-        return "RotationCurveKey.new("..Args_upvr(arg1_38.Time, arg1_38.Value, arg1_38.Interpolation)..')'
-    end
-    function tbl_3_upvr.UDim(arg1_39) -- Line 641
-        return "UDim.new("..Args_upvr(arg1_39.Scale, arg1_39.Offset)..')'
-    end
-    function tbl_3_upvr.UDim2(arg1_40) -- Line 645
-        return "UDim2.new("..Args_upvr(arg1_40.X.Scale, arg1_40.X.Offset, arg1_40.Y.Scale, arg1_40.Y.Offset)..')'
-    end
-    function tbl_3_upvr.Vector2(arg1_41) -- Line 658
-        return "Vector2.new("..Args_upvr(arg1_41.X, arg1_41.Y)..')'
-    end
-    function tbl_3_upvr.Vector2int16(arg1_42) -- Line 662
-        return "Vector2int16.new("..Args_upvr(arg1_42.X, arg1_42.Y)..')'
-    end
-    function tbl_3_upvr.Vector3(arg1_43) -- Line 666
-        return "Vector3.new("..Args_upvr(arg1_43.X, arg1_43.Y, arg1_43.Z)..')'
-    end
-    function tbl_3_upvr.Vector3int16(arg1_44) -- Line 670
-        return "Vector3int16.new("..Args_upvr(arg1_44.X, arg1_44.Y, arg1_44.Z)..')'
-    end
-    function tbl_3_upvr.userdata(arg1_45) -- Line 675
-        if getmetatable_upvr(arg1_45) then
-            return "newproxy(true)"
-        end
-        return "newproxy()"
-    end
-    Args_upvr = next_upvr
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [526.25]
-    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
+local function v22(p1, p2) --[[ Line: 236 | Upvalues: CheckType (copy), rep (copy), sub (copy), v4 (copy), v12 (copy), insert (copy), concat (copy), huge (copy), format (copy), v13 (ref), match (copy), SerializeString (ref), v19 (ref), v22 (copy), v9 (copy), v10 (copy), v21 (ref), gmatch (copy), v11 (copy), v5 (copy) ]]
+	CheckType(p1, "inputTable", "table")
+	CheckType(p2, "options", "table", "nil")
+	if p2 then
+		CheckType(p2.Prettify, "options.Prettify", "boolean", "nil")
+		CheckType(p2.PrettyPrinting, "options.PrettyPrinting", "boolean", "nil")
+		CheckType(p2.IndentCount, "options.IndentCount", "number", "nil")
+		CheckType(p2.OutputWarnings, "options.OutputWarnings", "boolean", "nil")
+		CheckType(p2.StackLimit, "options.StackLimit", "number", "nil")
+		CheckType(p2.FunctionsReturnRaw, "options.FunctionsReturnRaw", "boolean", "nil")
+		CheckType(p2.UseInstancePaths, "options.UseInstancePaths", "boolean", "nil")
+		CheckType(p2._StackLevel, "options._StackLevel", "number", "nil")
+		CheckType(p2._VisitedTables, "options._StackLevel", "table", "nil")
+	end
+	local v2 = p2 or {}
+	if v2.Prettify == nil then
+		local isPrettyPrinting = v2.PrettyPrinting == nil
+	end
+	local v3 = if v2.Prettify == nil then v2.PrettyPrinting and v2.PrettyPrinting else v2.Prettify or v2.PrettyPrinting and v2.PrettyPrinting
+	local IndentCount = v2.IndentCount
+	if not IndentCount then
+		IndentCount = if v3 then 4 else 0
+	end
+	local v42 = if v2.OutputWarnings == nil then true else v2.OutputWarnings
+	local v52 = v2.StackLimit or 500
+	local isFunctionsReturnRaw = v2.FunctionsReturnRaw == nil
+	local FunctionsReturnRaw = v2.FunctionsReturnRaw
+	local v6 = if v2.UseInstancePaths == nil then true else v2.UseInstancePaths
+	local v7 = v2._StackLevel or 1
+	local v8 = v2._VisitedTables or {
+		[p1] = true
+	}
+	if v52 <= v7 then
+		return "{--[[LuaEncode: Stack level limit of `" .. v52 .. "` reached]]}"
+	else
+		local v92 = if v3 then "\n" else ""
+		local v102 = if v3 then ", " else ","
+		local v112 = if v3 then " " else ""
+		local v122 = rep(" ", IndentCount)
+		local v132 = v3 and rep(v122, v7) or v122
+		local v14 = #v132 > 0 and sub(v132, 1, -IndentCount - 1) or ""
+		local v16 = 1
+		local t = {}
+		local function TypeCase(p1, p2) --[[ Line: 301 | Upvalues: t (copy) ]]
+			return t[p1](p2, false)
+		end
+		local function Args(...) --[[ Line: 308 | Upvalues: v4 (ref), v12 (ref), t (copy), insert (ref), concat (ref), v102 (copy) ]]
+			local t2 = {}
+			for v1, v2 in v4, { ... } do
+				insert(t2, (t[v12(v2)](v2, false)))
+			end
+			return concat(t2, v102)
+		end
+		local function Params(p1, p2) --[[ Line: 319 | Upvalues: concat (ref), t (copy), v102 (copy) ]]
+			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ p1, (t.table(p2, false)) }, v102) .. ")"
+		end
+		function t.number(p1, p2) --[[ Line: 325 | Upvalues: v16 (ref), huge (ref), format (ref) ]]
+			if p2 and p1 == v16 then
+				v16 = v16 + 1
+				return nil, true
+			elseif p1 == huge then
+				return "math.huge"
+			elseif p1 == -huge then
+				return "-math.huge"
+			else
+				return format("%.14g", p1)
+			end
+		end
+		function t.string(p1, p2) --[[ Line: 346 | Upvalues: v13 (ref), match (ref), SerializeString (ref) ]]
+			if p2 and (not v13[p1] and match(p1, "^[A-Za-z_][A-Za-z0-9_]*$")) then
+				return p1, true
+			else
+				return SerializeString(p1)
+			end
+		end
+		function t.table(p12, p2) --[[ Line: 355 | Upvalues: v8 (copy), format (ref), p1 (copy), v19 (ref), v2 (ref), v3 (copy), IndentCount (copy), v7 (copy), v22 (ref) ]]
+			if v8[p12] then
+				return format("{--[[LuaEncode: Duplicate reference%s]]}", if p12 == p1 then " (of parent)" else "")
+			else
+				v8[p12] = true
+				local v4 = v19(v2)
+				v4.Prettify = v3
+				v4.IndentCount = if p2 then if v3 then 1 else IndentCount or 1 else IndentCount
+				v4._StackLevel = if p2 then 1 else v7 + 1
+				v4._VisitedTables = v8
+				return v22(p12, v4)
+			end
+		end
+		function t.boolean(p1) --[[ Line: 387 | Upvalues: v9 (ref) ]]
+			return v9(p1)
+		end
+		t["nil"] = function(p1) --[[ Line: 391 ]]
+			return "nil"
+		end
+		t["function"] = function(p1) --[[ Line: 395 | Upvalues: FunctionsReturnRaw (copy) ]]
+			if FunctionsReturnRaw then
+				return p1()
+			else
+				return "function() --[[LuaEncode: `options.FunctionsReturnRaw` false; can\'t serialize functions]] return end"
+			end
+		end
+		function t.Axes(p1) --[[ Line: 409 | Upvalues: v4 (ref), insert (ref), concat (ref), v102 (copy) ]]
+			local t = {}
+			for v1, v2 in v4, {
+				["Enum.Axis.X"] = p1.X,
+				["Enum.Axis.Y"] = p1.Y,
+				["Enum.Axis.Z"] = p1.Z
+			} do
+				if v2 then
+					insert(t, v1)
+				end
+			end
+			return "Axes.new(" .. concat(t, v102) .. ")"
+		end
+		function t.BrickColor(p1) --[[ Line: 426 | Upvalues: v3 (copy), t (copy) ]]
+			local v2 = v3
+			if v2 then
+				v2 = t.string(p1.Name, false)
+			end
+			return "BrickColor.new(" .. v2 or p1.Number .. ")"
+		end
+		function t.CFrame(p1) --[[ Line: 432 | Upvalues: Args (copy) ]]
+			return "CFrame.new(" .. Args(p1:components()) .. ")"
+		end
+		function t.CatalogSearchParams(p1) --[[ Line: 436 | Upvalues: concat (ref), t (copy), v102 (copy) ]]
+			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ "CatalogSearchParams.new()", (t.table({
+					SearchKeyword = p1.SearchKeyword,
+					MinPrice = p1.MinPrice,
+					MaxPrice = p1.MaxPrice,
+					SortType = p1.SortType,
+					CategoryFilter = p1.CategoryFilter,
+					BundleTypes = p1.BundleTypes,
+					AssetTypes = p1.AssetTypes
+				}, false)) }, v102) .. ")"
+		end
+		function t.Color3(p1) --[[ Line: 448 | Upvalues: Args (copy) ]]
+			return "Color3.new(" .. Args(p1.R, p1.G, p1.B)
+		end
+		function t.ColorSequence(p1) --[[ Line: 453 | Upvalues: t (copy) ]]
+			return "ColorSequence.new(" .. t.table(p1.Keypoints, false) .. ")"
+		end
+		function t.ColorSequenceKeypoint(p1) --[[ Line: 457 | Upvalues: Args (copy) ]]
+			return "ColorSequenceKeypoint.new(" .. Args(p1.Time, p1.Value) .. ")"
+		end
+		function t.DateTime(p1) --[[ Line: 462 ]]
+			return "DateTime.fromUnixTimestamp(" .. p1.UnixTimestamp .. ")"
+		end
+		function t.DockWidgetPluginGuiInfo(p1) --[[ Line: 469 | Upvalues: v9 (ref), Args (copy), match (ref), v10 (ref) ]]
+			local v1 = v9(p1)
+			return "DockWidgetPluginGuiInfo.new(" .. Args(Enum.InitialDockState[match(v1, "InitialDockState:(%w+)")], match(v1, "InitialEnabled:(%w+)") == "1", match(v1, "InitialEnabledShouldOverrideRestore:(%w+)") == "1", v10(match(v1, "FloatingXSize:(%w+)")), v10(match(v1, "FloatingYSize:(%w+)")), v10(match(v1, "MinWidth:(%w+)")), (v10(match(v1, "MinHeight:(%w+)")))) .. ")"
+		end
+		function t.Enum(p1) --[[ Line: 491 | Upvalues: v9 (ref) ]]
+			return "Enum." .. v9(p1)
+		end
+		function t.EnumItem(p1) --[[ Line: 496 | Upvalues: v9 (ref) ]]
+			return v9(p1)
+		end
+		function t.Enums(p1) --[[ Line: 501 ]]
+			return "Enum"
+		end
+		function t.Faces(p1) --[[ Line: 505 | Upvalues: v4 (ref), insert (ref), concat (ref), v102 (copy) ]]
+			local t = {}
+			for v1, v2 in v4, {
+				["Enum.NormalId.Top"] = p1.Top,
+				["Enum.NormalId.Bottom"] = p1.Bottom,
+				["Enum.NormalId.Left"] = p1.Left,
+				["Enum.NormalId.Right"] = p1.Right,
+				["Enum.NormalId.Back"] = p1.Back,
+				["Enum.NormalId.Front"] = p1.Front
+			} do
+				if v2 then
+					insert(t, v1)
+				end
+			end
+			return "Faces.new(" .. concat(t, v102) .. ")"
+		end
+		function t.FloatCurveKey(p1) --[[ Line: 525 | Upvalues: Args (copy) ]]
+			return "FloatCurveKey.new(" .. Args(p1.Time, p1.Value, p1.Interpolation) .. ")"
+		end
+		function t.Font(p1) --[[ Line: 529 | Upvalues: Args (copy) ]]
+			return "Font.new(" .. Args(p1.Family, p1.Weight, p1.Style) .. ")"
+		end
+		function t.Instance(p1) --[[ Line: 535 | Upvalues: v6 (copy), v21 (ref), v112 (copy), t (copy), gmatch (ref) ]]
+			local v1, v2, v3, v4, v5
+			if v6 then
+				local v62 = v21(p1)
+				if v62 then
+					return v62
+				else
+					v1 = v112
+					v2 = p1.ClassName
+					v3 = "Instance.new(" .. t.string(v2, false) .. ")"
+					v4 = ""
+					v5 = "nil"
+					for v7 in gmatch(v3, "%](=*)%]") do
+						if #v4 <= #v7 then
+							v4 = v7 .. "="
+						end
+					end
+					return v5 .. v112 .. "--[" .. v4 .. "[" .. v3 .. "]" .. v4 .. "]"
+				end
+			else
+				v1 = v112
+				v2 = p1.ClassName
+				v3 = "Instance.new(" .. t.string(v2, false) .. ")"
+				v4 = ""
+				v5 = "nil"
+				for v7 in gmatch(v3, "%](=*)%]") do
+					if #v4 <= #v7 then
+						v4 = v7 .. "="
+					end
+				end
+				return v5 .. v112 .. "--[" .. v4 .. "[" .. v3 .. "]" .. v4 .. "]"
+			end
+		end
+		function t.NumberRange(p1) --[[ Line: 550 | Upvalues: Args (copy) ]]
+			return "NumberRange.new(" .. Args(p1.Min, p1.Max) .. ")"
+		end
+		function t.NumberSequence(p1) --[[ Line: 554 | Upvalues: t (copy) ]]
+			return "NumberSequence.new(" .. t.table(p1.Keypoints, false) .. ")"
+		end
+		function t.NumberSequenceKeypoint(p1) --[[ Line: 558 | Upvalues: Args (copy) ]]
+			return "NumberSequenceKeypoint.new(" .. Args(p1.Time, p1.Value, p1.Envelope) .. ")"
+		end
+		function t.OverlapParams(p1) --[[ Line: 562 | Upvalues: concat (ref), t (copy), v102 (copy) ]]
+			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ "OverlapParams.new()", (t.table({
+					FilterDescendantsInstances = p1.FilterDescendantsInstances,
+					FilterType = p1.FilterType,
+					MaxParts = p1.MaxParts,
+					CollisionGroup = p1.CollisionGroup,
+					RespectCanCollide = p1.RespectCanCollide
+				}, false)) }, v102) .. ")"
+		end
+		function t.PathWaypoint(p1) --[[ Line: 572 | Upvalues: Args (copy) ]]
+			return "PathWaypoint.new(" .. Args(p1.Position, p1.Action, p1.Label) .. ")"
+		end
+		function t.PhysicalProperties(p1) --[[ Line: 576 | Upvalues: Args (copy) ]]
+			return "PhysicalProperties.new(" .. Args(p1.Density, p1.Friction, p1.Elasticity, p1.FrictionWeight, p1.ElasticityWeight) .. ")"
+		end
+		function t.Random() --[[ Line: 582 ]]
+			return "Random.new()"
+		end
+		function t.Ray(p1) --[[ Line: 586 | Upvalues: Args (copy) ]]
+			return "Ray.new(" .. Args(p1.Origin, p1.Direction) .. ")"
+		end
+		function t.RaycastParams(p1) --[[ Line: 590 | Upvalues: concat (ref), t (copy), v102 (copy) ]]
+			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ "RaycastParams.new()", (t.table({
+					FilterDescendantsInstances = p1.FilterDescendantsInstances,
+					FilterType = p1.FilterType,
+					IgnoreWater = p1.IgnoreWater,
+					CollisionGroup = p1.CollisionGroup,
+					RespectCanCollide = p1.RespectCanCollide
+				}, false)) }, v102) .. ")"
+		end
+		function t.Rect(p1) --[[ Line: 600 | Upvalues: Args (copy) ]]
+			return "Rect.new(" .. Args(p1.Min, p1.Max) .. ")"
+		end
+		function t.Region3(p1) --[[ Line: 607 | Upvalues: Args (copy) ]]
+			local v1 = p1.CFrame
+			local Size = p1.Size
+			return "Region3.new(" .. Args(v1 * CFrame.new(-Size / 2), v1 * CFrame.new(Size / 2)) .. ")"
+		end
+		function t.Region3int16(p1) --[[ Line: 619 | Upvalues: Args (copy) ]]
+			return "Region3int16.new(" .. Args(p1.Min, p1.Max) .. ")"
+		end
+		function t.TweenInfo(p1) --[[ Line: 623 | Upvalues: Args (copy) ]]
+			return "TweenInfo.new(" .. Args(p1.Time, p1.EasingStyle, p1.EasingDirection, p1.RepeatCount, p1.Reverses, p1.DelayTime) .. ")"
+		end
+		function t.RotationCurveKey(p1) --[[ Line: 637 | Upvalues: Args (copy) ]]
+			return "RotationCurveKey.new(" .. Args(p1.Time, p1.Value, p1.Interpolation) .. ")"
+		end
+		function t.UDim(p1) --[[ Line: 641 | Upvalues: Args (copy) ]]
+			return "UDim.new(" .. Args(p1.Scale, p1.Offset) .. ")"
+		end
+		function t.UDim2(p1) --[[ Line: 645 | Upvalues: Args (copy) ]]
+			return "UDim2.new(" .. Args(p1.X.Scale, p1.X.Offset, p1.Y.Scale, p1.Y.Offset) .. ")"
+		end
+		function t.Vector2(p1) --[[ Line: 658 | Upvalues: Args (copy) ]]
+			return "Vector2.new(" .. Args(p1.X, p1.Y) .. ")"
+		end
+		function t.Vector2int16(p1) --[[ Line: 662 | Upvalues: Args (copy) ]]
+			return "Vector2int16.new(" .. Args(p1.X, p1.Y) .. ")"
+		end
+		function t.Vector3(p1) --[[ Line: 666 | Upvalues: Args (copy) ]]
+			return "Vector3.new(" .. Args(p1.X, p1.Y, p1.Z) .. ")"
+		end
+		function t.Vector3int16(p1) --[[ Line: 670 | Upvalues: Args (copy) ]]
+			return "Vector3int16.new(" .. Args(p1.X, p1.Y, p1.Z) .. ")"
+		end
+		function t.userdata(p1) --[[ Line: 675 | Upvalues: v11 (ref) ]]
+			if v11(p1) then
+				return "newproxy(true)"
+			else
+				return "newproxy()"
+			end
+		end
+		local v17 = ""
+		for v25, v26 in v4, p1 do
+			local v18, v192, v20, v212, v222, v23, v24
+			local v27 = v12(v25)
+			local v28 = v12(v26)
+			if t[v27] and t[v28] then
+				v18 = v3 and v92 .. v132 or ""
+				local v29 = false
+				local v30, v31, v32 = v5(t[v27], v25, true)
+				local v33, v34 = v5(t[v28], v26, false)
+				if v30 and (v33 and v34) then
+					if v31 then
+						v192 = if v32 and v31 then v31 else format("[%s]", v31)
+						v20 = if v3 then " = " else "="
+						v212 = v192 .. v20 or ""
+					else
+						v212 = ""
+					end
+					v29 = true
+					v18 = v18 .. v212 .. v34
+				elseif v42 then
+					v222 = if v30 then if v33 then "key/value" else "value" else "key"
+					if v30 then
+						v23 = v28
+						if v33 then
+							v24 = "(Failed to get error message)"
+						else
+							v24 = SerializeString(v34)
+							if not v24 then
+								v24 = "(Failed to get error message)"
+							end
+						end
+					else
+						v24 = SerializeString(v31)
+						if v24 then
+							v23 = v28
+						elseif v33 then
+							v24 = "(Failed to get error message)"
+						else
+							v24 = SerializeString(v34)
+							if not v24 then
+								v24 = "(Failed to get error message)"
+							end
+						end
+					end
+					local v38 = format("LuaEncode: Failed to encode %s of DataType `%s`: %s", v222, v23, v24)
+					v39 = ""
+					v40 = v18
+					for v41 in gmatch(v38, "%](=*)%]") do
+						if #v39 <= #v41 then
+							v39 = v41 .. "="
+						end
+					end
+					v18 = v40 .. "--[" .. v39 .. "[" .. v38 .. "]" .. v39 .. "]"
+				end
+				if v4(p1, v25) then
+					if v29 then
+						v18 = v18 .. ","
+					end
+				else
+					v18 = v18 .. v92 .. v14
+				end
+				v17 = v17 .. v18
+			end
+		end
+		return "{" .. v17 .. "}"
+	end
 end
-return LuaEncode_upvr
+return v22

@@ -1,521 +1,401 @@
-local Players_upvr = game:GetService("Players")
-local LocalPlayer_upvr = Players_upvr.LocalPlayer
+local CollectionService = game:GetService("CollectionService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
+local DefaultActions = require(ReplicatedStorage.Game.DefaultActions)
+local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
 local Signal = require(ReplicatedStorage.Std.Signal)
-local InventoryItemUtils_upvr = require(ReplicatedStorage.Inventory.InventoryItemUtils)
-local var6_upvw
-local tbl_7_upvr = {}
-local tbl_6_upvr = {}
-local tbl_3_upvr = {}
-local module_upvr = {
-    OnLocalItemEquipped = Signal.new();
-    OnLocalItemUnequipped = Signal.new();
-    onItemEquipped = Signal.new();
+local Interval = require(ReplicatedStorage.Std.Interval)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local JetPack = require(ReplicatedStorage.Game.JetPack.JetPack)
+local CharacterUtil = require(ReplicatedStorage.Game.CharacterUtil)
+local Falling = require(ReplicatedStorage.Game.Falling)
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local CharacterBinder = require(ReplicatedStorage.App.CharacterBinder)
+local ItemDataUtils = require(ReplicatedStorage.App.ItemDataUtils)
+local InventoryItemOwnerBinder = require(ReplicatedStorage.Inventory.InventoryItemOwnerBinder)
+local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
+local InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSystem)
+local InventoryItemBinder = require(ReplicatedStorage.Inventory.InventoryItemBinder)
+local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
+local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)
+local v1 = nil
+local t = {}
+local t2 = {}
+local t3 = {}
+local t4 = {
+	OnLocalItemEquipped = Signal.new(),
+	OnLocalItemUnequipped = Signal.new(),
+	onItemEquipped = Signal.new()
 }
-local InventoryItemSystem_upvr = require(ReplicatedStorage.Inventory.InventoryItemSystem)
-local CharacterUtil_upvr = require(ReplicatedStorage.Game.CharacterUtil)
-local Falling_upvr = require(ReplicatedStorage.Game.Falling)
-local JetPack_upvr = require(ReplicatedStorage.Game.JetPack.JetPack)
-local PlayerUtils_upvr = require(ReplicatedStorage.Game.PlayerUtils)
-local VehicleUtils_upvr = require(ReplicatedStorage.Vehicle.VehicleUtils)
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local CharacterBinder_upvr = require(ReplicatedStorage.App.CharacterBinder)
-local InventoryItemOwnerBinder_upvr = require(ReplicatedStorage.Inventory.InventoryItemOwnerBinder)
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-local DefaultActions_upvr = require(ReplicatedStorage.Game.DefaultActions)
-local ActionButtonService_upvr = require(ReplicatedStorage.ActionButton.ActionButtonService)
-local CharacterUtils_upvr = require(ReplicatedStorage.Std.CharacterUtils)
-local CollectionService_upvr = game:GetService("CollectionService")
-local RegionUtils_upvr = require(ReplicatedStorage.Std.Region.RegionUtils)
-local InventoryItemBinder_upvr = require(ReplicatedStorage.Inventory.InventoryItemBinder)
-function module_upvr.Init(arg1) -- Line 35
-    var6_upvw = arg1.Event
-    local em = arg1.em
-    function em.acox1hpp(arg1_2, arg2, arg3) -- Line 39
-        local any_GetEquipped_result1_2 = module_upvr.GetEquipped(arg1_2)
-        if any_GetEquipped_result1_2 ~= nil then
-            local tbl = {}
-            tbl.UserInputType = arg2
-            tbl.KeyCode = arg3
-            any_GetEquipped_result1_2:InputBegan(tbl, false)
-        end
-    end
-    function em.o9yta4in(arg1_3, arg2, arg3) -- Line 48
-        local any_GetEquipped_result1 = module_upvr.GetEquipped(arg1_3)
-        if any_GetEquipped_result1 ~= nil then
-            local tbl_11 = {}
-            tbl_11.UserInputType = arg2
-            tbl_11.KeyCode = arg3
-            any_GetEquipped_result1:InputEnded(tbl_11, false)
-        end
-    end
-    InventoryItemSystem_upvr.addEquipCondition(function() -- Line 61
-        return not tbl_6_upvr[LocalPlayer_upvr]
-    end)
-    InventoryItemSystem_upvr.addEquipCondition(function() -- Line 64
-        if CharacterUtil_upvr.IsCrawling then
-            return false
-        end
-        if Falling_upvr.IsRagdolling() then
-            return false
-        end
-        if JetPack_upvr.IsFlying() then
-            return false
-        end
-        local any_getHumanoid_result1 = PlayerUtils_upvr.getHumanoid(LocalPlayer_upvr)
-        if not any_getHumanoid_result1 then
-            return false
-        end
-        if any_getHumanoid_result1.Health <= 0.001 then
-            return false
-        end
-        return true
-    end)
-    local function updateCharacter() -- Line 85
-        local any_GetLocalVehiclePacket_result1_4 = VehicleUtils_upvr.GetLocalVehiclePacket()
-        if any_GetLocalVehiclePacket_result1_4 then
-            local var41 = false
-            local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                local Seat_2 = any_GetLocalVehiclePacket_result1_4.Seat
-                return Seat_2:FindFirstChild("Lean")
-            end
-            if 0.1 < tick() - VehicleUtils_upvr.LastVehicleExit and (decompInlinedCondition() or Seat_2:FindFirstChild("Items")) then
-                var41 = true
-            end
-            if not var41 then
-                return false
-            end
-        end
-        return true
-    end
-    InventoryItemSystem_upvr.addEquipCondition(updateCharacter)
-    local function handleEquipped_upvr(arg1_4) -- Line 107, Named "handleEquipped"
-        if tbl_6_upvr[arg1_4:GetOwner()] then
-            module_upvr._unequip(arg1_4:GetOwner())
-            warn("An item was already equipped, choosing newer server state.")
-        end
-        local any__equip_result1_upvr = module_upvr._equip(arg1_4:GetOwner(), arg1_4.obj)
-        if any__equip_result1_upvr.SetLeaning then
-            local any_GetLocalVehiclePacket_result1 = VehicleUtils_upvr.GetLocalVehiclePacket()
-            if any_GetLocalVehiclePacket_result1 then
-                local Seat = any_GetLocalVehiclePacket_result1.Seat
-                local var50
-                if Seat:FindFirstChild("Lean") then
-                    if 0 >= any_GetLocalVehiclePacket_result1.Model:FindFirstChild("Engine").CFrame:PointToObjectSpace(Seat.Position).X then
-                        var50 = false
-                    else
-                        var50 = true
-                    end
-                    any__equip_result1_upvr:SetLeaning(true, var50)
-                end
-            end
-        end
-        if any__equip_result1_upvr.Model then
-            local Character_upvr = arg1_4:GetOwner().Character
-            local Parent_upvr_2 = any__equip_result1_upvr.Model.Parent
-            if not any__equip_result1_upvr.Model then
-            elseif Character_upvr.Parent then
-                any__equip_result1_upvr.Model.Parent = Parent_upvr_2
-            else
-                any__equip_result1_upvr.Model.Parent = nil
-            end
-            arg1_4._maid.listenParent = Character_upvr.AncestryChanged:Connect(function() -- Line 139, Named "updateParent"
-                if not any__equip_result1_upvr.Model then
-                else
-                    if Character_upvr.Parent then
-                        any__equip_result1_upvr.Model.Parent = Parent_upvr_2
-                        return
-                    end
-                    any__equip_result1_upvr.Model.Parent = nil
-                end
-            end)
-        end
-        Character_upvr = InventoryItemUtils_upvr
-        Character_upvr = Character_upvr.getLocked
-        Parent_upvr_2 = arg1_4.obj
-        Character_upvr = Character_upvr(Parent_upvr_2)
-        if not Character_upvr then
-            Character_upvr = Audio_upvr
-            Character_upvr = Character_upvr.ObjectLocal
-            Parent_upvr_2 = any__equip_result1_upvr.RootPart
-            Character_upvr(Parent_upvr_2, 690572276, {
-                Volume = 0.8;
-            })
-        end
-    end
-    function updateCharacter(arg1_5) -- Line 159
-        local obj_upvr = arg1_5.obj
-        arg1_5.maid:GiveTask(InventoryItemSystem_upvr.onInventoryItemEquipped:Connect(function(arg1_6) -- Line 163
-            if arg1_6:GetOwner().Character == obj_upvr then
-                handleEquipped_upvr(arg1_6)
-            end
-        end))
-        for _, v in InventoryItemSystem_upvr.getEquipped() do
-            if v:GetOwner().Character == obj_upvr then
-                handleEquipped_upvr(v)
-            end
-        end
-    end
-    local var54 = updateCharacter
-    for _, v_2 in CharacterBinder_upvr:GetAll() do
-        var54(v_2)
-    end
-    CharacterBinder_upvr:GetClassAddedSignal():Connect(var54)
-    InventoryItemSystem_upvr.onInventoryItemEquipped:Connect(function(arg1_7) -- Line 182
-        local any_GetOwner_result1_upvr = arg1_7:GetOwner()
-        if typeof(any_GetOwner_result1_upvr) == "table" and getmetatable(any_GetOwner_result1_upvr) == InventoryItemOwnerBinder_upvr:GetConstructor() then
-            if any_GetOwner_result1_upvr.Character then
-                handleEquipped_upvr(arg1_7)
-            end
-            arg1_7._maid:GiveTask(any_GetOwner_result1_upvr._onCharacterChanged:Connect(function() -- Line 188
-                if any_GetOwner_result1_upvr.Character then
-                    handleEquipped_upvr(arg1_7)
-                end
-            end))
-        end
-    end)
-    local function handleUnequippedRaw_upvr(arg1_8, arg2) -- Line 196, Named "handleUnequippedRaw"
-        tbl_3_upvr[arg1_8] = arg2
-        task.delay(1, function() -- Line 204
-            if tbl_3_upvr[arg1_8] == arg2 then
-                tbl_3_upvr[arg1_8] = nil
-            end
-        end)
-        if arg2.IsLeaning then
-            arg2:SetLeaning(false)
-        end
-        module_upvr._unequip(arg1_8)
-    end
-    local function clearUnknownOwners_upvr() -- Line 217, Named "clearUnknownOwners"
-        for i_3, v_3 in tbl_6_upvr do
-            local var73 = false
-            local Character = i_3.Character
-            if not Character or not Character.PrimaryPart or not Character.PrimaryPart:IsDescendantOf(workspace) then
-                var73 = true
-            end
-            if var73 then
-                handleUnequippedRaw_upvr(i_3, v_3)
-            end
-        end
-    end
-    Interval_upvr.every(1):Connect(clearUnknownOwners_upvr)
-    InventoryItemSystem_upvr.onInventoryItemUnequipped:Connect(function(arg1_9) -- Line 232, Named "handleUnequipped"
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        local any_GetOwner_result1 = arg1_9:GetOwner()
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [22.3]
-        handleUnequippedRaw_upvr(any_GetOwner_result1, nil)
-        do
-            return
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        clearUnknownOwners_upvr()
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end)
-    local priority_upvr = DefaultActions_upvr.crawlButton.priority
-    local priority_upvr_2 = DefaultActions_upvr.sprintButton.priority
-    module_upvr.OnLocalItemEquipped:Connect(function(arg1_10) -- Line 248
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        local Maid = arg1_10.Maid
-        local ShootBegin_2 = arg1_10.ShootBegin
-        local var121
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        var121 = 1050
-        -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [32.6]
-        nil.priority = var121
-        if ShootBegin_2.saturateTo ~= nil then
-            var121 = ShootBegin_2.saturateTo
-        else
-            var121 = 0
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        nil.saturateTo = var121
-        var121 = true
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        nil.noSink = var121
-        var121 = ShootBegin_2.keyCodes
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        nil.keyCodes = var121
-        var121 = "rbxassetid://4939736393"
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        nil.image = var121
-        function var121() -- Line 261, Named "onPressed"
-            arg1_10:InputBegan({
-                UserInputType = Enum.UserInputType.MouseButton1;
-            })
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        nil.onPressed = var121
-        function var121() -- Line 264, Named "onReleased"
-            if not arg1_10.InputEnded then
-            else
-                arg1_10:InputEnded({
-                    UserInputType = Enum.UserInputType.MouseButton1;
-                })
-            end
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        nil.onReleased = var121
-        -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [62.5]
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        Maid:GiveTask(nil(nil))
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        if arg1_10.Reload then
-            local tbl_14 = {
-                priority = 750;
-                image = "rbxassetid://4939737424";
-            }
-            local tbl_10 = {}
-            var121 = Enum.KeyCode.R
-            tbl_10[1] = var121
-            tbl_14.keyCodes = tbl_10
-            local function onPressed() -- Line 277
-                arg1_10:InputBegan({
-                    UserInputType = Enum.UserInputType.Keyboard;
-                    KeyCode = Enum.KeyCode.R;
-                })
-            end
-            tbl_14.onPressed = onPressed
-            Maid:GiveTask(ActionButtonService_upvr.add(tbl_14))
-        end
-        local ScopeBegin_2 = arg1_10.ScopeBegin
-        if ScopeBegin_2 then
-            if typeof(arg1_10.ScopeBegin) ~= "function" then
-                ScopeBegin_2 = false
-            else
-                ScopeBegin_2 = true
-            end
-        end
-        if ScopeBegin_2 then
-            local tbl_4 = {}
-            var121 = 975
-            tbl_4.priority = var121
-            var121 = "rbxassetid://4939736720"
-            tbl_4.image = var121
-            var121 = true
-            tbl_4.touchIsToggle = var121
-            var121 = {}
-            var121[1] = Enum.KeyCode.Q
-            var121[2] = Enum.KeyCode.ButtonL2
-            tbl_4.keyCodes = var121
-            var121 = true
-            tbl_4.noSink = var121
-            function var121() -- Line 290, Named "onPressed"
-                arg1_10:InputBegan({
-                    UserInputType = Enum.UserInputType.MouseButton2;
-                })
-            end
-            tbl_4.onPressed = var121
-            function var121() -- Line 293, Named "onReleased"
-                if not arg1_10.InputEnded then
-                else
-                    arg1_10:InputEnded({
-                        UserInputType = Enum.UserInputType.MouseButton2;
-                    })
-                end
-            end
-            tbl_4.onReleased = var121
-            Maid:GiveTask(ActionButtonService_upvr.add(tbl_4))
-        end
-        if arg1_10.ApplySkin then
-            if typeof(arg1_10.ApplySkin) == "function" then
-                local var113_upvw = false
-                local function checkFlagToggleSkins_upvr() -- Line 303, Named "checkFlagToggleSkins"
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    if not CharacterUtils_upvr.getRootPart(Players_upvr.LocalPlayer.Character) then return end
-                    local any_GetTagged_result1_2, any_GetTagged_result2, any_GetTagged_result3_2 = CollectionService_upvr:GetTagged("GunSkinUIRegion")
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                    -- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [28.7]
-                    -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-                end
-                var121 = Interval_upvr
-                var121 = var121.every(0.1)
-                var121 = var121:Connect(function() -- Line 321
-                    checkFlagToggleSkins_upvr()
-                end)
-                Maid:GiveTask(var121)
-                checkFlagToggleSkins_upvr()
-            end
-        end
-        if not ScopeBegin_2 then
-            ActionButtonService_upvr.setButtonPriority(DefaultActions_upvr.crawlButton, 900)
-            ActionButtonService_upvr.setButtonPriority(DefaultActions_upvr.sprintButton, 950)
-            Maid:GiveTask(function() -- Line 331
-                ActionButtonService_upvr.setButtonPriority(DefaultActions_upvr.crawlButton, priority_upvr)
-                ActionButtonService_upvr.setButtonPriority(DefaultActions_upvr.sprintButton, priority_upvr_2)
-            end)
-        end
-        local any_GetLocalVehiclePacket_result1_2 = VehicleUtils_upvr.GetLocalVehiclePacket()
-        if any_GetLocalVehiclePacket_result1_2 == nil then
-        else
-        end
-        if not true or any_GetLocalVehiclePacket_result1_2.Passenger then
-            var121 = false
-            ActionButtonService_upvr.setButtonEnabled(DefaultActions_upvr.radioButton, var121)
-            function var121() -- Line 342
-                ActionButtonService_upvr.setButtonEnabled(DefaultActions_upvr.radioButton, true)
-            end
-            Maid:GiveTask(var121)
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end)
-    InventoryItemBinder_upvr:GetClassAddedSignal():Connect(function(arg1_11) -- Line 348
-        arg1_11._maid:GiveTask(arg1_11.onAttemptDrop:Connect(function() -- Line 349
-            if arg1_11:GetOwner() ~= Players_upvr.LocalPlayer then
-            else
-                var6_upvw:FireServer('i'.."uohs0zrbr":sub(3, 6):reverse().."".."".."ru0vkte2":sub(5, 6):reverse():reverse():reverse():reverse():reverse()..""..'3')
-            end
-        end))
-    end)
+function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryItemSystem (copy), t2 (copy), LocalPlayer (copy), CharacterUtil (copy), Falling (copy), JetPack (copy), PlayerUtils (copy), VehicleUtils (copy), InventoryItemUtils (copy), Audio (copy), CharacterBinder (copy), InventoryItemOwnerBinder (copy), t3 (copy), Interval (copy), DefaultActions (copy), ActionButtonService (copy), CharacterUtils (copy), Players (copy), CollectionService (copy), RegionUtils (copy), InventoryItemBinder (copy) ]]
+	v1 = p1.Event
+	local em = p1.em
+	function em.ogsbqczn(p1, p2, p3) --[[ Line: 39 | Upvalues: t4 (ref) ]]
+		local v1 = t4.GetEquipped(p1)
+		if v1 ~= nil then
+			v1:InputBegan({
+				UserInputType = p2,
+				KeyCode = p3
+			}, false)
+		end
+	end
+	function em.p2ylc2nx(p1, p2, p3) --[[ Line: 48 | Upvalues: t4 (ref) ]]
+		local v1 = t4.GetEquipped(p1)
+		if v1 ~= nil then
+			v1:InputEnded({
+				UserInputType = p2,
+				KeyCode = p3
+			}, false)
+		end
+	end
+	InventoryItemSystem.addEquipCondition(function() --[[ Line: 61 | Upvalues: t2 (ref), LocalPlayer (ref) ]]
+		return not t2[LocalPlayer]
+	end)
+	InventoryItemSystem.addEquipCondition(function() --[[ Line: 64 | Upvalues: CharacterUtil (ref), Falling (ref), JetPack (ref), PlayerUtils (ref), LocalPlayer (ref) ]]
+		if CharacterUtil.IsCrawling or (Falling.IsRagdolling() or JetPack.IsFlying()) then
+			return false
+		else
+			local v1 = PlayerUtils.getHumanoid(LocalPlayer)
+			if v1 then
+				return not (v1.Health <= 0.001)
+			else
+				return false
+			end
+		end
+	end)
+	InventoryItemSystem.addEquipCondition(function() --[[ Line: 85 | Upvalues: VehicleUtils (ref) ]]
+		local v1 = VehicleUtils.GetLocalVehiclePacket()
+		local v2 = tick()
+		if v1 then
+			local v3 = false
+			if v2 - VehicleUtils.LastVehicleExit > 0.1 then
+				local Seat = v1.Seat
+				if Seat:FindFirstChild("Lean") or Seat:FindFirstChild("Items") then
+					v3 = true
+				end
+			end
+			if v3 then
+				return true
+			else
+				return false
+			end
+		else
+			return true
+		end
+	end)
+	local function handleEquipped(p1) --[[ Line: 107 | Upvalues: t2 (ref), t4 (ref), VehicleUtils (ref), InventoryItemUtils (ref), Audio (ref) ]]
+		if t2[p1:GetOwner()] then
+			t4._unequip(p1:GetOwner())
+			warn("An item was already equipped, choosing newer server state.")
+		end
+		local v1 = t4._equip(p1:GetOwner(), p1.obj)
+		if v1.SetLeaning then
+			local v2 = VehicleUtils.GetLocalVehiclePacket()
+			if v2 then
+				local Seat = v2.Seat
+				if Seat:FindFirstChild("Lean") then
+					v1:SetLeaning(true, v2.Model:FindFirstChild("Engine").CFrame:PointToObjectSpace(Seat.Position).X > 0)
+				end
+			end
+		end
+		if v1.Model then
+			local Character = p1:GetOwner().Character
+			local v4 = v1.Model.Parent
+			local function updateParent() --[[ Line: 139 | Upvalues: v1 (copy), Character (copy), v4 (copy) ]]
+				if v1.Model then
+					if Character.Parent then
+						v1.Model.Parent = v4
+					else
+						v1.Model.Parent = nil
+					end
+				end
+			end
+			if v1.Model then
+				if Character.Parent then
+					v1.Model.Parent = v4
+				else
+					v1.Model.Parent = nil
+				end
+			end
+			p1._maid.listenParent = Character.AncestryChanged:Connect(updateParent)
+		end
+		if not InventoryItemUtils.getLocked(p1.obj) then
+			Audio.ObjectLocal(v1.RootPart, 690572276, {
+				Volume = 0.8
+			})
+		end
+	end
+	local function updateCharacter(p1) --[[ Line: 159 | Upvalues: InventoryItemSystem (ref), handleEquipped (copy) ]]
+		local obj = p1.obj
+		p1.maid:GiveTask(InventoryItemSystem.onInventoryItemEquipped:Connect(function(p1) --[[ Line: 163 | Upvalues: obj (copy), handleEquipped (ref) ]]
+			if p1:GetOwner().Character == obj then
+				handleEquipped(p1)
+			end
+		end))
+		for v1, v2 in InventoryItemSystem.getEquipped() do
+			if v2:GetOwner().Character == obj then
+				handleEquipped(v2)
+			end
+		end
+	end
+	for v12, v2 in CharacterBinder:GetAll() do
+		updateCharacter(v2)
+	end
+	CharacterBinder:GetClassAddedSignal():Connect(updateCharacter)
+	InventoryItemSystem.onInventoryItemEquipped:Connect(function(p1) --[[ Line: 182 | Upvalues: InventoryItemOwnerBinder (ref), handleEquipped (copy) ]]
+		local v1 = p1:GetOwner()
+		if typeof(v1) == "table" and getmetatable(v1) == InventoryItemOwnerBinder:GetConstructor() then
+			if v1.Character then
+				handleEquipped(p1)
+			end
+			p1._maid:GiveTask(v1._onCharacterChanged:Connect(function() --[[ Line: 188 | Upvalues: v1 (copy), handleEquipped (ref), p1 (copy) ]]
+				if v1.Character then
+					handleEquipped(p1)
+				end
+			end))
+		end
+	end)
+	local function handleUnequippedRaw(p1, p2) --[[ Line: 196 | Upvalues: t3 (ref), t4 (ref) ]]
+		t3[p1] = p2
+		task.delay(1, function() --[[ Line: 204 | Upvalues: t3 (ref), p1 (copy), p2 (copy) ]]
+			if t3[p1] == p2 then
+				t3[p1] = nil
+			end
+		end)
+		if p2.IsLeaning then
+			p2:SetLeaning(false)
+		end
+		t4._unequip(p1)
+	end
+	local function clearUnknownOwners() --[[ Line: 217 | Upvalues: t2 (ref), handleUnequippedRaw (copy) ]]
+		for v2, v3 in t2 do
+			local v1
+			local Character = v2.Character
+			v1 = not (Character and (Character.PrimaryPart and Character.PrimaryPart:IsDescendantOf(workspace)))
+			if v1 then
+				handleUnequippedRaw(v2, v3)
+			end
+		end
+	end
+	Interval.every(1):Connect(clearUnknownOwners)
+	local function handleUnequipped(p1) --[[ Line: 232 | Upvalues: InventoryItemUtils (ref), t4 (ref), handleUnequippedRaw (copy), clearUnknownOwners (copy) ]]
+		local v1 = InventoryItemUtils.getName(p1.obj)
+		local v2 = p1:GetOwner()
+		if v2 then
+			local v3 = t4.GetEquipped(v2)
+			if v3 and v3.__ClassName == v1 then
+				handleUnequippedRaw(v2, v3)
+			end
+		else
+			clearUnknownOwners()
+		end
+	end
+	InventoryItemSystem.onInventoryItemUnequipped:Connect(handleUnequipped)
+	local priority = DefaultActions.crawlButton.priority
+	local priority_2 = DefaultActions.sprintButton.priority
+	t4.OnLocalItemEquipped:Connect(function(p1) --[[ Line: 248 | Upvalues: ActionButtonService (ref), CharacterUtils (ref), Players (ref), CollectionService (ref), RegionUtils (ref), Interval (ref), DefaultActions (ref), priority (copy), priority_2 (copy), VehicleUtils (ref) ]]
+		local Maid = p1.Maid
+		if p1.ShootBegin then
+			local v1 = p1.ShootActionButtonConfig or {}
+			local t = {}
+			t.primary = if v1.primary == nil then true else v1.primary
+			t.priority = if v1.priority == nil then 1050 else v1.priority
+			t.saturateTo = if v1.saturateTo == nil then 0 else v1.saturateTo
+			t.noSink = true
+			t.keyCodes = v1.keyCodes
+			t.image = "rbxassetid://4939736393"
+			function t.onPressed() --[[ Line: 261 | Upvalues: p1 (copy) ]]
+				p1:InputBegan({
+					UserInputType = Enum.UserInputType.MouseButton1
+				})
+			end
+			function t.onReleased() --[[ Line: 264 | Upvalues: p1 (copy) ]]
+				if p1.InputEnded then
+					p1:InputEnded({
+						UserInputType = Enum.UserInputType.MouseButton1
+					})
+				end
+			end
+			Maid:GiveTask(ActionButtonService.add(t))
+		end
+		if p1.Reload then
+			Maid:GiveTask(ActionButtonService.add({
+				priority = 750,
+				image = "rbxassetid://4939737424",
+				keyCodes = { Enum.KeyCode.R },
+				onPressed = function() --[[ Name: onPressed | Line: 277 | Upvalues: p1 (copy) ]]
+					p1:InputBegan({
+						UserInputType = Enum.UserInputType.Keyboard,
+						KeyCode = Enum.KeyCode.R
+					})
+				end
+			}))
+		end
+		local ScopeBegin = p1.ScopeBegin
+		if ScopeBegin then
+			ScopeBegin = typeof(p1.ScopeBegin) == "function"
+		end
+		if ScopeBegin then
+			Maid:GiveTask(ActionButtonService.add({
+				priority = 975,
+				image = "rbxassetid://4939736720",
+				touchIsToggle = true,
+				keyCodes = { Enum.KeyCode.Q, Enum.KeyCode.ButtonL2 },
+				noSink = true,
+				onPressed = function() --[[ Name: onPressed | Line: 290 | Upvalues: p1 (copy) ]]
+					p1:InputBegan({
+						UserInputType = Enum.UserInputType.MouseButton2
+					})
+				end,
+				onReleased = function() --[[ Name: onReleased | Line: 293 | Upvalues: p1 (copy) ]]
+					if p1.InputEnded then
+						p1:InputEnded({
+							UserInputType = Enum.UserInputType.MouseButton2
+						})
+					end
+				end
+			}))
+		end
+		if p1.ApplySkin and typeof(p1.ApplySkin) == "function" then
+			local v5 = false
+			local function checkFlagToggleSkins() --[[ Line: 303 | Upvalues: CharacterUtils (ref), Players (ref), CollectionService (ref), RegionUtils (ref), v5 (ref), p1 (copy) ]]
+				local v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+				if v1 then
+					local v2 = false
+					for v3, v4 in CollectionService:GetTagged("GunSkinUIRegion") do
+						if RegionUtils.isPointInPart(v4, v1.Position) then
+							v2 = true
+							break
+						end
+					end
+					if v2 ~= v5 then
+						p1:InputBegan({
+							FlagToggleSkins = v2
+						})
+						v5 = v2
+					end
+				end
+			end
+			Maid:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 321 | Upvalues: checkFlagToggleSkins (copy) ]]
+				checkFlagToggleSkins()
+			end))
+			checkFlagToggleSkins()
+		end
+		if not ScopeBegin then
+			ActionButtonService.setButtonPriority(DefaultActions.crawlButton, 900)
+			ActionButtonService.setButtonPriority(DefaultActions.sprintButton, 950)
+			Maid:GiveTask(function() --[[ Line: 331 | Upvalues: ActionButtonService (ref), DefaultActions (ref), priority (ref), priority_2 (ref) ]]
+				ActionButtonService.setButtonPriority(DefaultActions.crawlButton, priority)
+				ActionButtonService.setButtonPriority(DefaultActions.sprintButton, priority_2)
+			end)
+		end
+		local v6 = VehicleUtils.GetLocalVehiclePacket()
+		if v6 == nil or v6.Passenger then
+			ActionButtonService.setButtonEnabled(DefaultActions.radioButton, false)
+			Maid:GiveTask(function() --[[ Line: 342 | Upvalues: ActionButtonService (ref), DefaultActions (ref) ]]
+				ActionButtonService.setButtonEnabled(DefaultActions.radioButton, true)
+			end)
+		end
+	end)
+	InventoryItemBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 348 | Upvalues: Players (ref), v1 (ref) ]]
+		p1._maid:GiveTask(p1.onAttemptDrop:Connect(function() --[[ Line: 349 | Upvalues: p1 (copy), Players (ref), v1 (ref) ]]
+			if p1:GetOwner() == Players.LocalPlayer then
+				v1:FireServer("x" .. ("cutr"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("sdartlwu"):sub(4, 5):reverse():reverse():reverse() .. "1qyd")
+			end
+		end))
+	end)
 end
-function module_upvr.Register(arg1) -- Line 357
-    local __ClassName = arg1.__ClassName
-    assert(__ClassName)
-    if tbl_7_upvr[arg1.__ClassName] ~= nil then
-        __ClassName = false
-    else
-        __ClassName = true
-    end
-    assert(__ClassName)
-    tbl_7_upvr[arg1.__ClassName] = arg1
+function t4.Register(p1) --[[ Line: 357 | Upvalues: t (copy) ]]
+	assert(p1.__ClassName)
+	assert(t[p1.__ClassName] == nil)
+	t[p1.__ClassName] = p1
 end
-local ItemDataUtils_upvr = require(ReplicatedStorage.App.ItemDataUtils)
-function module_upvr.GetConfig(arg1) -- Line 362
-    return ItemDataUtils_upvr.getConfig(arg1)
+function t4.GetConfig(p1) --[[ Line: 362 | Upvalues: ItemDataUtils (copy) ]]
+	return ItemDataUtils.getConfig(p1)
 end
-function module_upvr.GetEquipped(arg1) -- Line 365
-    return tbl_6_upvr[arg1]
+function t4.GetEquipped(p1) --[[ Line: 365 | Upvalues: t2 (copy) ]]
+	return t2[p1]
 end
-function module_upvr.GetLocalEquipped() -- Line 369
-    return module_upvr.GetEquipped(LocalPlayer_upvr)
+function t4.GetLocalEquipped() --[[ Line: 369 | Upvalues: t4 (copy), LocalPlayer (copy) ]]
+	return t4.GetEquipped(LocalPlayer)
 end
-local UserInputService_upvr = game:GetService("UserInputService")
-function module_upvr._equip(arg1, arg2) -- Line 372
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    assert(arg1, "missing player")
-    assert(arg2, "missing inventoryItemValue")
-    local var143 = arg2
-    local any_getName_result1 = InventoryItemUtils_upvr.getName(var143)
-    local BroadcastInputEnded
-    if InventoryItemUtils_upvr.getAttr(arg2, "CustomItem") ~= true then
-        var143 = false
-    else
-        var143 = true
-    end
-    if var143 then
-        BroadcastInputEnded = "Custom"
-    else
-        BroadcastInputEnded = any_getName_result1
-    end
-    local var146 = tbl_7_upvr[BroadcastInputEnded]
-    if not var146 then
-        BroadcastInputEnded = string.format("No module for item: %s", any_getName_result1)
-        error(BroadcastInputEnded)
-    end
-    BroadcastInputEnded = arg1
-    local any_new_result1_upvr = var146.new(BroadcastInputEnded, arg2, tbl_3_upvr[arg1])
-    BroadcastInputEnded = any_new_result1_upvr.Local
-    if BroadcastInputEnded then
-        BroadcastInputEnded = any_new_result1_upvr.Maid
-        BroadcastInputEnded = BroadcastInputEnded:GiveTask
-        BroadcastInputEnded(UserInputService_upvr.InputBegan:Connect(function(arg1_12, arg2_2) -- Line 385
-            any_new_result1_upvr:InputBegan(arg1_12, arg2_2)
-        end))
-        BroadcastInputEnded = any_new_result1_upvr.Maid
-        BroadcastInputEnded = BroadcastInputEnded:GiveTask
-        BroadcastInputEnded(UserInputService_upvr.InputEnded:Connect(function(...) -- Line 388
-            any_new_result1_upvr:InputEnded(...)
-        end))
-        BroadcastInputEnded = any_new_result1_upvr.ShootBegin
-        if BroadcastInputEnded == nil then
-            BroadcastInputEnded = any_new_result1_upvr.Maid
-            BroadcastInputEnded = BroadcastInputEnded:GiveTask
-            BroadcastInputEnded(UserInputService_upvr.TouchStarted:connect(function(arg1_13, arg2_3) -- Line 399
-                if arg2_3 then
-                    return false
-                end
-                any_new_result1_upvr:InputBegan({
-                    UserInputType = Enum.UserInputType.MouseButton1;
-                    Position = arg1_13.Position;
-                })
-            end))
-            BroadcastInputEnded = any_new_result1_upvr.Maid
-            BroadcastInputEnded = BroadcastInputEnded:GiveTask
-            BroadcastInputEnded(UserInputService_upvr.TouchEnded:connect(function(arg1_14, arg2_4) -- Line 405
-                if arg2_4 then
-                    return false
-                end
-                any_new_result1_upvr:InputEnded({
-                    UserInputType = Enum.UserInputType.MouseButton1;
-                    Position = arg1_14.Position;
-                })
-            end))
-        end
-        function BroadcastInputEnded(arg1_15, arg2_5) -- Line 414, Named "BroadcastInputBegan"
-            if arg2_5 == nil then
-            else
-            end
-            assert(true)
-            var6_upvw:FireServer("acox1hpp", arg2_5.UserInputType, arg2_5.KeyCode)
-        end
-        any_new_result1_upvr.BroadcastInputBegan = BroadcastInputEnded
-        function BroadcastInputEnded(arg1_16, arg2_6) -- Line 418
-            if arg2_6 == nil then
-            else
-            end
-            assert(true)
-            var6_upvw:FireServer('o'.."cju4aty9td0":sub(4, 8):reverse().."".."".."uim":sub(2, 2):reverse():reverse():reverse():reverse():reverse()..""..'n', arg2_6.UserInputType, arg2_6.KeyCode)
-        end
-        any_new_result1_upvr.BroadcastInputEnded = BroadcastInputEnded
-    end
-    BroadcastInputEnded = tbl_6_upvr
-    BroadcastInputEnded[arg1] = any_new_result1_upvr
-    BroadcastInputEnded = any_new_result1_upvr.Local
-    if BroadcastInputEnded then
-        BroadcastInputEnded = ipairs(UserInputService_upvr:GetKeysPressed())
-        local ipairs_result1_2, ipairs_result2, ipairs_result3 = ipairs(UserInputService_upvr:GetKeysPressed())
-        for _, v_4 in ipairs_result1_2, ipairs_result2, ipairs_result3 do
-            any_new_result1_upvr:InputBegan(v_4)
-            local var157
-        end
-        ipairs_result1_2 = ipairs(UserInputService_upvr:GetMouseButtonsPressed())
-        local ipairs_result1, ipairs_result2_2, ipairs_result3_2 = ipairs(UserInputService_upvr:GetMouseButtonsPressed())
-        for _, v_5 in ipairs_result1, ipairs_result2_2, ipairs_result3_2 do
-            if v_5.UserInputType ~= Enum.UserInputType.MouseButton1 then
-                var157:InputBegan(v_5)
-            end
-        end
-    end
-    ipairs_result1 = var157.Local
-    if ipairs_result1 then
-        ipairs_result1 = module_upvr
-        ipairs_result1 = ipairs_result1.OnLocalItemEquipped:Fire
-        ipairs_result1(var157)
-    end
-    ipairs_result1 = module_upvr
-    ipairs_result1 = ipairs_result1.onItemEquipped:Fire
-    ipairs_result1(var157)
-    return var157
+function t4._equip(p1, p2) --[[ Line: 372 | Upvalues: InventoryItemUtils (copy), t (copy), t3 (copy), UserInputService (copy), v1 (ref), t2 (copy), t4 (copy) ]]
+	assert(p1, "missing player")
+	assert(p2, "missing inventoryItemValue")
+	local v12 = InventoryItemUtils.getName(p2)
+	local v5 = t[if InventoryItemUtils.getAttr(p2, "CustomItem") == true then "Custom" else v12]
+	if not v5 then
+		error(("No module for item: %s"):format(v12))
+	end
+	local v6 = v5.new(p1, p2, t3[p1])
+	if v6.Local then
+		v6.Maid:GiveTask(UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 385 | Upvalues: v6 (copy) ]]
+			v6:InputBegan(p1, p2)
+		end))
+		v6.Maid:GiveTask(UserInputService.InputEnded:Connect(function(...) --[[ Line: 388 | Upvalues: v6 (copy) ]]
+			v6:InputEnded(...)
+		end))
+		if v6.ShootBegin == nil then
+			v6.Maid:GiveTask(UserInputService.TouchStarted:connect(function(p1, p2) --[[ Line: 399 | Upvalues: v6 (copy) ]]
+				if p2 then
+					return false
+				end
+				v6:InputBegan({
+					UserInputType = Enum.UserInputType.MouseButton1,
+					Position = p1.Position
+				})
+			end))
+			v6.Maid:GiveTask(UserInputService.TouchEnded:connect(function(p1, p2) --[[ Line: 405 | Upvalues: v6 (copy) ]]
+				if p2 then
+					return false
+				end
+				v6:InputEnded({
+					UserInputType = Enum.UserInputType.MouseButton1,
+					Position = p1.Position
+				})
+			end))
+		end
+		function v6.BroadcastInputBegan(p1, p2) --[[ Line: 414 | Upvalues: v1 (ref) ]]
+			assert(p2 ~= nil)
+			v1:FireServer("ogsbqczn", p2.UserInputType, p2.KeyCode)
+		end
+		function v6.BroadcastInputEnded(p1, p2) --[[ Line: 418 | Upvalues: v1 (ref) ]]
+			assert(p2 ~= nil)
+			v1:FireServer("p" .. ("t2dblf"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("lclyh"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("pn2l"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "x", p2.UserInputType, p2.KeyCode)
+		end
+	end
+	t2[p1] = v6
+	if v6.Local then
+		for i, v in ipairs(UserInputService:GetKeysPressed()) do
+			v6:InputBegan(v)
+		end
+		for i, v in ipairs(UserInputService:GetMouseButtonsPressed()) do
+			if v.UserInputType ~= Enum.UserInputType.MouseButton1 then
+				v6:InputBegan(v)
+			end
+		end
+	end
+	if v6.Local then
+		t4.OnLocalItemEquipped:Fire(v6)
+	end
+	t4.onItemEquipped:Fire(v6)
+	return v6
 end
-function module_upvr._unequip(arg1) -- Line 445
-    assert(arg1, "missing player")
-    local var161 = tbl_6_upvr[arg1]
-    if not var161 then
-        return false
-    end
-    var161:Destroy()
-    tbl_6_upvr[arg1] = nil
-    if var161.Local then
-        module_upvr.OnLocalItemUnequipped:Fire()
-    end
-    return true
+function t4._unequip(p1) --[[ Line: 445 | Upvalues: t2 (copy), t4 (copy) ]]
+	assert(p1, "missing player")
+	local v1 = t2[p1]
+	if v1 then
+		v1:Destroy()
+		t2[p1] = nil
+		if v1.Local then
+			t4.OnLocalItemUnequipped:Fire()
+		end
+		return true
+	else
+		return false
+	end
 end
-return module_upvr
+return t4

@@ -1,32 +1,27 @@
-local module_2 = {}
-local TradeReducerUtils_upvr = require(game:GetService("ReplicatedStorage").Trade.TradeReducerUtils)
-function module_2.setItemsOwned(arg1, arg2) -- Line 5
-    local var7
-    if arg2.itemsOwned == nil then
-        var7 = false
-    else
-        var7 = true
-    end
-    assert(var7, "missing itemsOwned")
-    local module = {}
-    var7 = {}
-    for i = 1, #arg2.itemsOwned do
-        local any_buildItemProps_result1 = TradeReducerUtils_upvr.buildItemProps(arg2.itemsOwned[i])
-        if any_buildItemProps_result1 then
-            any_buildItemProps_result1.timeSortMetric = -i
-            any_buildItemProps_result1.primaryIndex = i
-            local var10 = (var7[any_buildItemProps_result1.getInstCompare] or 0) + 1
-            var7[any_buildItemProps_result1.getInstCompare] = var10
-            any_buildItemProps_result1.number = var10
-            table.insert(module, any_buildItemProps_result1)
-        end
-    end
-    for i_2 = 1, #module do
-        local var11 = module[i_2]
-        if var7[var11.getInstCompare] <= 1 then
-            var11.number = nil
-        end
-    end
-    return module
-end
-return module_2
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TradeReducerUtils = require(ReplicatedStorage.Trade.TradeReducerUtils)
+return {
+	setItemsOwned = function(p1, p2) --[[ Name: setItemsOwned | Line: 5 | Upvalues: TradeReducerUtils (copy) ]]
+		assert(p2.itemsOwned ~= nil, "missing itemsOwned")
+		local t = {}
+		local t2 = {}
+		for i = 1, #p2.itemsOwned do
+			local v2 = TradeReducerUtils.buildItemProps(p2.itemsOwned[i])
+			if v2 then
+				v2.timeSortMetric = -i
+				v2.primaryIndex = i
+				local v3 = (t[v2.getInstCompare] or 0) + 1
+				t[v2.getInstCompare] = v3
+				v2.number = v3
+				table.insert(t2, v2)
+			end
+		end
+		for j = 1, #t2 do
+			local v4 = t2[j]
+			if t[v4.getInstCompare] <= 1 then
+				v4.number = nil
+			end
+		end
+		return t2
+	end
+}

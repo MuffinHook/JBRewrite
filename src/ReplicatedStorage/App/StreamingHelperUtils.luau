@@ -1,83 +1,76 @@
-local module = {
-    yieldForAllValuesPopulated = function(arg1) -- Line 5, Named "yieldForAllValuesPopulated"
-        local current_thread_upvr = coroutine.running()
-        for _, v_upvr in arg1:GetDescendants() do
-            if v_upvr:IsA("ValueBase") and v_upvr.Value == nil then
-                local var8_upvw
-                local task_delay_result1_upvw = task.delay(5, function() -- Line 13
-                    var8_upvw:Disconnect()
-                    var8_upvw = nil
-                    warn("[StreamingHelperUtils] Timed out waiting for value to populate: ", v_upvr:GetFullName())
-                    task.spawn(current_thread_upvr)
-                end)
-                var8_upvw = v_upvr.Changed:Connect(function() -- Line 19
-                    if v_upvr.Value ~= nil then
-                        var8_upvw:Disconnect()
-                        var8_upvw = nil
-                        task.cancel(task_delay_result1_upvw)
-                        task_delay_result1_upvw = nil
-                        task.spawn(current_thread_upvr)
-                    end
-                end)
-                coroutine.yield()
-            end
-        end
-    end;
-    yieldForObjValuePopulated = function(arg1) -- Line 33, Named "yieldForObjValuePopulated"
-        if arg1.Value == nil then
-            local var13_upvw
-            local current_thread_upvr_2 = coroutine.running()
-            var13_upvw = arg1.Changed:Connect(function() -- Line 38
-                if arg1.Value ~= nil then
-                    var13_upvw:Disconnect()
-                    var13_upvw = nil
-                    task.spawn(current_thread_upvr_2)
-                end
-            end)
-            coroutine.yield()
-        end
-    end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Maid = require(ReplicatedStorage.Std.Maid)
+return {
+	yieldForAllValuesPopulated = function(p1) --[[ Name: yieldForAllValuesPopulated | Line: 5 ]]
+		local v1 = coroutine.running()
+		for v2, v3 in p1:GetDescendants() do
+			if v3:IsA("ValueBase") and v3.Value == nil then
+				local v4 = nil
+				local v5 = task.delay(5, function() --[[ Line: 13 | Upvalues: v4 (ref), v3 (copy), v1 (copy) ]]
+					v4:Disconnect()
+					v4 = nil
+					warn("[StreamingHelperUtils] Timed out waiting for value to populate: ", v3:GetFullName())
+					task.spawn(v1)
+				end)
+				v4 = v3.Changed:Connect(function() --[[ Line: 19 | Upvalues: v3 (copy), v4 (ref), v5 (ref), v1 (copy) ]]
+					if v3.Value ~= nil then
+						v4:Disconnect()
+						v4 = nil
+						task.cancel(v5)
+						v5 = nil
+						task.spawn(v1)
+					end
+				end)
+				coroutine.yield()
+			end
+		end
+	end,
+	yieldForObjValuePopulated = function(p1) --[[ Name: yieldForObjValuePopulated | Line: 33 ]]
+		local v1 = coroutine.running()
+		if p1.Value == nil then
+			local v2 = nil
+			v2 = p1.Changed:Connect(function() --[[ Line: 38 | Upvalues: p1 (copy), v2 (ref), v1 (copy) ]]
+				if p1.Value ~= nil then
+					v2:Disconnect()
+					v2 = nil
+					task.spawn(v1)
+				end
+			end)
+			coroutine.yield()
+		end
+	end,
+	createTableFromObjectValuesAndListen = function(p1, p2) --[[ Name: createTableFromObjectValuesAndListen | Line: 48 | Upvalues: Maid (copy) ]]
+		assert(if typeof(p1) == "Instance" then p1:IsA("Folder") else false, "Invalid objectValues passed")
+		if not p2 then
+			p2 = {}
+		end
+		local v2 = Maid.new()
+		local function v3(p1, p2) --[[ Line: 54 | Upvalues: v3 (copy), v2 (copy) ]]
+			local function processObject(p1) --[[ Line: 55 | Upvalues: p2 (copy), v3 (ref), v2 (ref) ]]
+				local v1 = p1.Name
+				local v22 = if p1:GetAttribute("_TypeOfName") == "number" then tonumber(v1) else v1
+				if p1:IsA("Folder") then
+					local v32 = p2[v22]
+					if not v32 then
+						v32 = {}
+						p2[v22] = v32
+					end
+					v3(p1, v32)
+				else
+					p2[v22] = p1.Value
+					v2:GiveTask(p1.Changed:Connect(function() --[[ Line: 70 | Upvalues: p2 (ref), v22 (ref), p1 (copy) ]]
+						p2[v22] = p1.Value
+					end))
+				end
+			end
+			for v1, v22 in p1:GetChildren() do
+				processObject(v22)
+			end
+			v2:GiveTask(p1.ChildAdded:Connect(function(p1) --[[ Line: 78 | Upvalues: processObject (copy) ]]
+				processObject(p1)
+			end))
+		end
+		v3(p1, p2)
+		return p2, v2
+	end
 }
-local Maid_upvr = require(game:GetService("ReplicatedStorage").Std.Maid)
-function module.createTableFromObjectValuesAndListen(arg1, arg2) -- Line 48
-    local var16 = false
-    local var17
-    if typeof(arg1) == "Instance" then
-        var16 = arg1:IsA("Folder")
-    end
-    assert(var16, "Invalid objectValues passed")
-    if not var17 then
-        var17 = {}
-    end
-    local any_new_result1_upvr = Maid_upvr.new()
-    local function recursiveHelper_upvr(arg1_2, arg2_2) -- Line 54, Named "recursiveHelper"
-        local function processObject_upvr(arg1_3) -- Line 55, Named "processObject"
-            local var24_upvw
-            if arg1_3:GetAttribute("_TypeOfName") == "number" then
-                var24_upvw = tonumber(arg1_3.Name)
-            end
-            if arg1_3:IsA("Folder") then
-                local var25 = arg2_2[var24_upvw]
-                if not var25 then
-                    var25 = {}
-                    arg2_2[var24_upvw] = var25
-                end
-                recursiveHelper_upvr(arg1_3, var25)
-            else
-                arg2_2[var24_upvw] = arg1_3.Value
-                any_new_result1_upvr:GiveTask(arg1_3.Changed:Connect(function() -- Line 70
-                    arg2_2[var24_upvw] = arg1_3.Value
-                end))
-            end
-        end
-        for _, v_2 in arg1_2:GetChildren() do
-            processObject_upvr(v_2)
-        end
-        any_new_result1_upvr:GiveTask(arg1_2.ChildAdded:Connect(function(arg1_4) -- Line 78
-            processObject_upvr(arg1_4)
-        end))
-    end
-    recursiveHelper_upvr(arg1, var17)
-    return var17, any_new_result1_upvr
-end
-return module

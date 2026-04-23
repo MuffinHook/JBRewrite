@@ -1,328 +1,291 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local function PlaySound_upvr(arg1, arg2) -- Line 23, Named "PlaySound"
-    local Sound_upvr_2 = Instance.new("Sound")
-    Sound_upvr_2.SoundId = string.format("rbxassetid://%d", arg2);
-    Sound_upvr_2.Volume = 0.75
-    Sound_upvr_2.Parent = arg1
-    Sound_upvr_2:Play()
-    task.delay(1, function() -- Line 29
-        game.Debris:AddItem(Sound_upvr_2, Sound_upvr_2.TimeLength)
-    end)
+local UI = require(ReplicatedStorage.Module.UI)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
+local CollectionService = game:GetService("CollectionService")
+local RunService = game:GetService("RunService")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local function PlaySound(p1, p2) --[[ Line: 23 ]]
+	local Sound = Instance.new("Sound")
+	Sound.SoundId = ("rbxassetid://%d"):format(p2)
+	Sound.Volume = 0.75
+	Sound.Parent = p1
+	Sound:Play()
+	delay(1, function() --[[ Line: 29 | Upvalues: Sound (copy) ]]
+		game.Debris:AddItem(Sound, Sound.TimeLength)
+	end)
 end
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local RunService_upvr = game:GetService("RunService")
-local GeomUtils_upvr = require(ReplicatedStorage.Std.GeomUtils)
-local UI_upvr = require(ReplicatedStorage.Module.UI)
-local CollectionService_upvr = game:GetService("CollectionService")
-return function(arg1) -- Line 34
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local Event_upvr = arg1.Event
-    local em_upvr = arg1.em
-    local Sound_upvr = Instance.new("Sound")
-    Sound_upvr.SoundId = "rbxassetid://1841825097"
-    Sound_upvr.Looped = true
-    Sound_upvr.SoundGroup = game:GetService("SoundService").RobberyMusic
-    Sound_upvr.Parent = LocalPlayer_upvr.PlayerGui
-    local var38_upvw = 0
-    local function FadeInSound_upvr() -- Line 46, Named "FadeInSound"
-        local var40 = var38_upvw + 1
-        var38_upvw = var40
-        Sound_upvr:Play()
-        for i = 0, 1, 0.015 do
-            if var38_upvw ~= var40 then return end
-            Sound_upvr.Volume = i
-            task.wait()
-        end
-    end
-    local function FadeOutSound_upvr() -- Line 60, Named "FadeOutSound"
-        local var42 = var38_upvw + 1
-        var38_upvw = var42
-        for i_2 = 1, 0, -0.015 do
-            if var38_upvw ~= var42 then return end
-            Sound_upvr.Volume = i_2
-            task.wait()
-        end
-        Sound_upvr:Stop()
-    end
-    local var43_upvw = false
-    local function EnterRobbery_upvr() -- Line 76, Named "EnterRobbery"
-        if var43_upvw then
-            return error("Already in robbery")
-        end
-        var43_upvw = true
-        PlaySound_upvr(LocalPlayer_upvr, 1837831244)
-        task.delay(1, function() -- Line 82
-            PlaySound_upvr(LocalPlayer_upvr, 1843025542)
-        end)
-        task.spawn(FadeInSound_upvr)
-    end
-    local function _() -- Line 87, Named "ExitRobbery"
-        if not var43_upvw then
-            return error("Player not in robbery")
-        end
-        var43_upvw = false
-        task.spawn(FadeOutSound_upvr)
-    end
-    function em_upvr.wwgjdqav() -- Line 95
-        EnterRobbery_upvr()
-    end
-    function em_upvr.zivj88bp() -- Line 98
-        if not var43_upvw then
-        else
-            var43_upvw = false
-            task.spawn(FadeOutSound_upvr)
-        end
-    end
-    local function _(arg1_2) -- Line 102, Named "Ease_InOutQuad"
-        local var45
-        local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var45 = 2 * arg1_2 * arg1_2
-            return var45
-        end
-        if arg1_2 >= 0.5 or not decompInlinedCondition() then
-            var45 = -1 - 2 * (arg1_2 - 2) * arg1_2
-        end
-        return var45
-    end
-    local tbl_upvw = {}
-    local any_new_result1_upvr = Maid_upvr.new()
-    local var48_upvw
-    function em_upvr.xykvglgj(arg1_3) -- Line 108
-        if not var48_upvw then
-            return false
-        end
-        var48_upvw:Disconnect()
-        var48_upvw = nil
-        any_new_result1_upvr:DoCleaning()
-        for _, v in next, arg1_3 do
-            v.Part.Transparency = 1
-            v.Part.Color = Color3.fromRGB(153, 153, 153)
-        end
-    end
-    function em_upvr.yva2ki1r(arg1_4) -- Line 120
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        if var48_upvw then
-            em_upvr.xykvglgj()
-        end
-        for _, v_2 in next, arg1_4 do
-            v_2.Part.Transparency = 0
-        end
-        for _, v_3_upvr in ipairs(arg1_4) do
-            local tick_result1_2_upvw = tick()
-            any_new_result1_upvr:GiveTask(v_3_upvr.Part.Touched:Connect(function(arg1_5) -- Line 130
-                if not arg1_5:IsDescendantOf(LocalPlayer_upvr.Character) then
-                else
-                    local tick_result1 = tick()
-                    if tick_result1 - tick_result1_2_upvw < 0.2 then return end
-                    if 0.5 <= tick_result1 - v_3_upvr.LastDamage then
-                        tick_result1_2_upvw = tick_result1
-                        v_3_upvr.LastDamage = tick_result1
-                        Event_upvr:FireServer('a'.."".."auv6byw1":sub(5, 5):reverse().."".."".."qipae3w":sub(3, 3):reverse():reverse():reverse():reverse():reverse().."".."".."w3i2dn9":sub(3, 5):reverse().."".."".."l2vmfi":sub(3, 3):reverse()..""..'g')
-                    end
-                end
-            end))
-            local _
-        end
-        local function _(arg1_6) -- Line 146, Named "getPeriod"
-            return 0.5 * arg1_6.Duration * arg1_6._speed
-        end
-        var48_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 149
-            -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-            for _, v_4 in next, arg1_4 do
-                local var83
-                if not v_4._speed then
-                    v_4._speed = 0
-                    v_4._offset = 0
-                end
-                local Part = v_4.Part
-                local var85
-                var83 = tbl_upvw
-                var83 = var83.SecurityTripped
-                if var83 then
-                    var83 = Color3.fromRGB(253, 106, 97)
-                    var85 = var83
-                else
-                    var83 = Color3.fromRGB(153, 153, 153)
-                    var85 = var83
-                end
-                Part.Color = var85
-                var83 = 1
-                if tbl_upvw.SecurityTripped then
-                    var83 = 2
-                end
-                local workspace_GetServerTimeNow_result1 = workspace:GetServerTimeNow()
-                local var87 = 0.5 * v_4.Duration * v_4._speed
-                if var83 ~= v_4._speed then
-                    v_4._speed = var83
-                    local var88 = 0.5 * v_4.Duration * v_4._speed
-                    v_4._offset += (var88 - var87) * workspace_GetServerTimeNow_result1
-                    var87 = var88
-                end
-                local var89 = GeomUtils_upvr.waveTriangle(var87 * workspace_GetServerTimeNow_result1 - v_4._offset) / 2 + 0.5
-                if var89 >= 0.5 or not (2 * var89 * var89) then
-                end
-                Part.CFrame = v_4.StartCF:lerp(v_4.EndCF, -1 - 2 * (var89 - 2) * var89)
-            end
-        end)
-    end
-    function em_upvr.esytu38w(arg1_7) -- Line 184
-        tbl_upvw = arg1_7
-    end
-    local CircleAction_upvr = UI_upvr.CircleAction
-    local function Action(arg1_8, arg2) -- Line 190
-        if arg2 then
-            PlaySound_upvr(LocalPlayer_upvr, 1843025542)
-            Event_upvr:FireServer('o'.."twikn9zb5q":sub(5, 9):reverse():reverse():reverse().."".."d6", arg1_8.Part)
-            return true
-        end
-    end
-    local function PreUpdateFun(arg1_9) -- Line 197
-        local var91
-        if arg1_9.Part.Parent.Arm.Transparency >= 0.5 then
-            var91 = false
-        else
-            var91 = true
-        end
-        arg1_9.Enabled = var91
-    end
-    local function AddedFun(arg1_10) -- Line 200
-        local tbl = {}
-        tbl.Part = arg1_10
-        tbl.ValidRoot = arg1_10.Parent
-        tbl.Name = "Place Dynamite"
-        tbl.Timed = true
-        tbl.Duration = 1
-        tbl.Dist = 10
-        tbl.Callback = Action
-        tbl.PreUpdateFun = PreUpdateFun
-        tbl.PreUpdatePeriod = 0.1
-        CircleAction_upvr.Add(tbl, arg1_10)
-    end
-    local function RemovedFun(arg1_11) -- Line 214
-        CircleAction_upvr.Remove(arg1_11)
-    end
-    for _, v_5 in next, CollectionService_upvr:GetTagged("Museum_DynamiteNode") do
-        CircleAction_upvr.Add({
-            Part = v_5;
-            ValidRoot = v_5.Parent;
-            Name = "Place Dynamite";
-            Timed = true;
-            Duration = 1;
-            Dist = 10;
-            Callback = Action;
-            PreUpdateFun = PreUpdateFun;
-            PreUpdatePeriod = 0.1;
-        }, v_5)
-    end
-    CollectionService_upvr:GetInstanceAddedSignal("Museum_DynamiteNode"):Connect(AddedFun)
-    CollectionService_upvr:GetInstanceRemovedSignal("Museum_DynamiteNode"):Connect(RemovedFun)
-    local function Action_upvr(arg1_12, arg2) -- Line 225, Named "Action"
-        if arg2 then
-            PlaySound_upvr(LocalPlayer_upvr, 1988477690)
-            PlaySound_upvr(LocalPlayer_upvr, 8473658289)
-            Event_upvr:FireServer('z'.."oxclssv3":sub(2, 6):reverse():reverse():reverse().."".."e5", arg1_12.Part)
-            return true
-        end
-    end
-    local function PreUpdateFun_upvr(arg1_13) -- Line 234, Named "PreUpdateFun"
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        local HidePart = arg1_13.HidePart
-        if not HidePart then
-            HidePart = arg1_13.Part
-        end
-        if HidePart.Transparency >= 0.999 then
-        else
-        end
-        arg1_13.Enabled = true
-    end
-    local function AddedFun(arg1_14) -- Line 242
-        local var97
-        local var98
-        local var99 = 2
-        local Name = arg1_14.Name
-        if Name == "DonutNode" then
-            Name = "Giant Donut"
-            var97 = arg1_14.Parent.Model.Bread
-        elseif Name == "SpinnerRim" then
-            Name = "Spinner Rim"
-        elseif Name == "DinoBone" then
-            Name = "Bone"
-            var99 = 1
-        elseif Name == "MummyNode" then
-            Name = "Mummy"
-            var97 = arg1_14.Parent.Glass
-            var98 = arg1_14.Parent
-            var99 = 3
-        elseif Name == "Picture" then
-            var98 = arg1_14.Parent
-        end
-        local tbl_3 = {}
-        tbl_3.Part = arg1_14
-        tbl_3.Name = "Grab "..Name
-        tbl_3.Timed = true
-        tbl_3.Duration = var99
-        tbl_3.Dist = 10
-        tbl_3.Callback = Action_upvr
-        tbl_3.PreUpdateFun = PreUpdateFun_upvr
-        tbl_3.PreUpdatePeriod = 0.5
-        tbl_3.HidePart = var97
-        tbl_3.ValidRoot = var98
-        CircleAction_upvr.Add(tbl_3, arg1_14)
-    end
-    local function RemovedFun(arg1_15) -- Line 277
-        CircleAction_upvr.Remove(arg1_15)
-    end
-    for _, v_6 in next, CollectionService_upvr:GetTagged("Museum_Item") do
-        AddedFun(v_6)
-        local var104
-    end
-    CollectionService_upvr:GetInstanceAddedSignal("Museum_Item"):Connect(var104)
-    CollectionService_upvr:GetInstanceRemovedSignal("Museum_Item"):Connect(RemovedFun)
-    function Action_upvr(arg1_16, arg2) -- Line 290, Named "Action"
-        if arg2 then
-            PlaySound_upvr(LocalPlayer_upvr, 1837831244)
-            Event_upvr:FireServer('q'.."b99umt0rs":sub(4, 7):reverse().."".."5ye", arg1_16.Part)
-            return true
-        end
-    end
-    local var105_upvr = Action_upvr
-    function PreUpdateFun_upvr(arg1_17) -- Line 299, Named "PreUpdateFun"
-        local var107
-        if arg1_17.Part.Reflectance >= 0.15 then
-            var107 = false
-        else
-            var107 = true
-        end
-        arg1_17.Enabled = var107
-    end
-    local var106_upvr = PreUpdateFun_upvr
-    for _, v_7 in next, CollectionService_upvr:GetTagged("Museum_Lever") do
-        CircleAction_upvr.Add({
-            Part = v_7;
-            Name = "Pull Lever";
-            Timed = true;
-            Duration = 1;
-            Dist = 10;
-            Callback = var105_upvr;
-            PreUpdateFun = var106_upvr;
-            PreUpdatePeriod = 0.5;
-        }, v_7)
-        local _
-    end
-    CollectionService_upvr:GetInstanceAddedSignal("Museum_Lever"):Connect(function(arg1_18) -- Line 304, Named "AddedFun"
-        local tbl_2 = {}
-        tbl_2.Part = arg1_18
-        tbl_2.Name = "Pull Lever"
-        tbl_2.Timed = true
-        tbl_2.Duration = 1
-        tbl_2.Dist = 10
-        tbl_2.Callback = var105_upvr
-        tbl_2.PreUpdateFun = var106_upvr
-        tbl_2.PreUpdatePeriod = 0.5
-        CircleAction_upvr.Add(tbl_2, arg1_18)
-    end)
-    CollectionService_upvr:GetInstanceRemovedSignal("Museum_Lever"):Connect(function(arg1_19) -- Line 317, Named "RemovedFun"
-        CircleAction_upvr.Remove(arg1_19)
-    end)
+return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (copy), Maid (copy), RunService (copy), GeomUtils (copy), UI (copy), CollectionService (copy) ]]
+	local v1 = p1.Event
+	local em = p1.em
+	local ScreenGui = p1.ScreenGui
+	local Sound = Instance.new("Sound")
+	Sound.SoundId = "rbxassetid://1841825097"
+	Sound.Looped = true
+	Sound.SoundGroup = game:GetService("SoundService").RobberyMusic
+	Sound.Parent = LocalPlayer.PlayerGui
+	local v2 = 0
+	local function FadeInSound() --[[ Line: 46 | Upvalues: v2 (ref), Sound (copy) ]]
+		local v1 = v2 + 1
+		v2 = v1
+		Sound:Play()
+		for i = 0, 1, 0.015 do
+			if v1 ~= v1 then
+				break
+			end
+			Sound.Volume = i
+			wait()
+		end
+	end
+	local function FadeOutSound() --[[ Line: 60 | Upvalues: v2 (ref), Sound (copy) ]]
+		local v1 = v2 + 1
+		v2 = v1
+		for i = 1, 0, -0.015 do
+			if v1 ~= v1 then
+				return
+			end
+			Sound.Volume = i
+			wait()
+		end
+		Sound:Stop()
+	end
+	local v3 = false
+	local function EnterRobbery() --[[ Line: 76 | Upvalues: v3 (ref), PlaySound (ref), LocalPlayer (ref), FadeInSound (copy) ]]
+		if v3 then
+			return error("Already in robbery")
+		end
+		v3 = true
+		PlaySound(LocalPlayer, 1837831244)
+		delay(1, function() --[[ Line: 82 | Upvalues: PlaySound (ref), LocalPlayer (ref) ]]
+			PlaySound(LocalPlayer, 1843025542)
+		end)
+		spawn(FadeInSound)
+	end
+	local function ExitRobbery() --[[ Line: 87 | Upvalues: v3 (ref), FadeOutSound (copy) ]]
+		if not v3 then
+			return error("Player not in robbery")
+		end
+		v3 = false
+		spawn(FadeOutSound)
+	end
+	function em.dhqg05sg() --[[ Line: 95 | Upvalues: EnterRobbery (copy) ]]
+		EnterRobbery()
+	end
+	function em.exsgze3l() --[[ Line: 98 | Upvalues: v3 (ref), FadeOutSound (copy) ]]
+		if v3 then
+			v3 = false
+			spawn(FadeOutSound)
+		else
+			error("Player not in robbery")
+		end
+	end
+	local function Ease_InOutQuad(p1) --[[ Line: 102 ]]
+		return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
+	end
+	local t = {}
+	local v4 = Maid.new()
+	local v5 = nil
+	function em.aad1ukee(p1) --[[ Line: 108 | Upvalues: v5 (ref), v4 (copy) ]]
+		if not v5 then
+			return false
+		end
+		v5:Disconnect()
+		v5 = nil
+		v4:DoCleaning()
+		for v1, v2 in next, p1 do
+			v2.Part.Transparency = 1
+			v2.Part.Color = Color3.fromRGB(153, 153, 153)
+		end
+	end
+	function em.impi1r3j(p1) --[[ Line: 120 | Upvalues: v5 (ref), em (copy), v4 (copy), LocalPlayer (ref), v1 (copy), RunService (ref), t (ref), GeomUtils (ref) ]]
+		if v5 then
+			em.aad1ukee()
+		end
+		for v12, v2 in next, p1 do
+			v2.Part.Transparency = 0
+		end
+		local v3 = tick()
+		for i, v in ipairs(p1) do
+			v4:GiveTask(v.Part.Touched:Connect(function(p1) --[[ Line: 130 | Upvalues: LocalPlayer (ref), v3 (ref), v (copy), v1 (ref) ]]
+				if p1:IsDescendantOf(LocalPlayer.Character) then
+					local v12 = tick()
+					if not (v12 - v3 < 0.2) and v12 - v.LastDamage >= 0.5 then
+						v3 = v12
+						v.LastDamage = v12
+						v1:FireServer("y" .. ("pa5upbdeq"):sub(2, 5):reverse():reverse():reverse():reverse():reverse() .. "pwp")
+					end
+				end
+			end))
+		end
+		local function getPeriod(p1) --[[ Line: 146 ]]
+			return 0.5 * p1.Duration * p1._speed
+		end
+		v5 = RunService.Heartbeat:Connect(function() --[[ Line: 149 | Upvalues: p1 (copy), t (ref), GeomUtils (ref) ]]
+			for v3, v4 in next, p1 do
+				local v1, v2
+				if not v4._speed then
+					v4._speed = 0
+					v4._offset = 0
+				end
+				local Part = v4.Part
+				v1 = if t.SecurityTripped then Color3.fromRGB(253, 106, 97) else Color3.fromRGB(153, 153, 153)
+				Part.Color = v1
+				v2 = if t.SecurityTripped then 2 else 1
+				local v7 = workspace:GetServerTimeNow()
+				local v8 = 0.5 * v4.Duration * v4._speed
+				if v2 ~= v4._speed then
+					v4._speed = v2
+					local v9 = 0.5 * v4.Duration * v4._speed
+					v4._offset = v4._offset + (v9 - v8) * v7
+					v8 = v9
+				end
+				local v10 = GeomUtils.waveTriangle(v8 * v7 - v4._offset) / 2 + 0.5
+				Part.CFrame = v4.StartCF:lerp(v4.EndCF, v10 < 0.5 and 2 * v10 * v10 or -1 - 2 * (v10 - 2) * v10)
+			end
+		end)
+	end
+	function em.ckvvbfd2(p1) --[[ Line: 184 | Upvalues: t (ref) ]]
+		t = p1
+	end
+	local CircleAction = UI.CircleAction
+	local function Action(p1, p2) --[[ Line: 190 | Upvalues: PlaySound (ref), LocalPlayer (ref), v1 (copy) ]]
+		if p2 then
+			PlaySound(LocalPlayer, 1843025542)
+			v1:FireServer("r" .. "" .. ("p9cm02a8gq"):sub(5, 6):reverse() .. "" .. "" .. ("q5fhmdj"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("vum2"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("pw8wcyud"):sub(5, 6):reverse() .. "w", p1.Part)
+			return true
+		end
+	end
+	local function PreUpdateFun(p1) --[[ Line: 197 ]]
+		p1.Enabled = p1.Part.Parent.Arm.Transparency < 0.5
+	end
+	local function AddedFun(p1) --[[ Line: 200 | Upvalues: Action (copy), PreUpdateFun (copy), CircleAction (copy) ]]
+		CircleAction.Add({
+			Part = p1,
+			ValidRoot = p1.Parent,
+			Name = "Place Dynamite",
+			Timed = true,
+			Duration = 1,
+			Dist = 10,
+			Callback = Action,
+			PreUpdateFun = PreUpdateFun,
+			PreUpdatePeriod = 0.1
+		}, p1)
+	end
+	local function RemovedFun(p1) --[[ Line: 214 | Upvalues: CircleAction (copy) ]]
+		CircleAction.Remove(p1)
+	end
+	local v6 = next
+	local v7, v8 = CollectionService:GetTagged("Museum_DynamiteNode")
+	for v9, v10 in v6, v7, v8 do
+		CircleAction.Add({
+			Part = v10,
+			ValidRoot = v10.Parent,
+			Name = "Place Dynamite",
+			Timed = true,
+			Duration = 1,
+			Dist = 10,
+			Callback = Action,
+			PreUpdateFun = PreUpdateFun,
+			PreUpdatePeriod = 0.1
+		}, v10)
+	end
+	CollectionService:GetInstanceAddedSignal("Museum_DynamiteNode"):Connect(AddedFun)
+	CollectionService:GetInstanceRemovedSignal("Museum_DynamiteNode"):Connect(RemovedFun)
+	local function Action_2(p1, p2) --[[ Line: 225 | Upvalues: PlaySound (ref), LocalPlayer (ref), v1 (copy) ]]
+		if p2 then
+			PlaySound(LocalPlayer, 1988477690)
+			PlaySound(LocalPlayer, 8473658289)
+			v1:FireServer("r" .. ("ntohwid"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("pmc3uf"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ly1zsxv"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("vo0hayob"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "pj", p1.Part)
+			return true
+		end
+	end
+	local function PreUpdateFun_2(p1) --[[ Line: 234 ]]
+		p1.Enabled = (p1.HidePart or p1.Part).Transparency < 0.999
+	end
+	local function AddedFun_2(p1) --[[ Line: 242 | Upvalues: Action_2 (copy), PreUpdateFun_2 (copy), CircleAction (copy) ]]
+		local v1 = nil
+		local v2 = nil
+		local v3 = 2
+		local v4 = p1.Name
+		if v4 == "DonutNode" then
+			v1 = p1.Parent.Model.Bread
+			v4 = "Giant Donut"
+		elseif v4 == "SpinnerRim" then
+			v4 = "Spinner Rim"
+		elseif v4 == "DinoBone" then
+			v4 = "Bone"
+			v3 = 1
+		elseif v4 == "MummyNode" then
+			v1 = p1.Parent.Glass
+			v2 = p1.Parent
+			v4 = "Mummy"
+			v3 = 3
+		elseif v4 == "Picture" then
+			v2 = p1.Parent
+		end
+		CircleAction.Add({
+			Part = p1,
+			Name = "Grab " .. v4,
+			Timed = true,
+			Duration = v3,
+			Dist = 10,
+			Callback = Action_2,
+			PreUpdateFun = PreUpdateFun_2,
+			PreUpdatePeriod = 0.5,
+			HidePart = v1,
+			ValidRoot = v2
+		}, p1)
+	end
+	local function RemovedFun_2(p1) --[[ Line: 277 | Upvalues: CircleAction (copy) ]]
+		local _ = p1.Name
+		CircleAction.Remove(p1)
+	end
+	local v11 = next
+	local v12, v13 = CollectionService:GetTagged("Museum_Item")
+	for v14, v15 in v11, v12, v13 do
+		AddedFun_2(v15)
+	end
+	CollectionService:GetInstanceAddedSignal("Museum_Item"):Connect(AddedFun_2)
+	CollectionService:GetInstanceRemovedSignal("Museum_Item"):Connect(RemovedFun_2)
+	local function Action_3(p1, p2) --[[ Line: 290 | Upvalues: PlaySound (ref), LocalPlayer (ref), v1 (copy) ]]
+		if p2 then
+			PlaySound(LocalPlayer, 1837831244)
+			v1:FireServer("z" .. ("wabix"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("uzby1rmb"):sub(5, 7):reverse() .. "v", p1.Part)
+			return true
+		end
+	end
+	local function PreUpdateFun_3(p1) --[[ Line: 299 ]]
+		p1.Enabled = p1.Part.Reflectance < 0.15
+	end
+	local function AddedFun_3(p1) --[[ Line: 304 | Upvalues: Action_3 (copy), PreUpdateFun_3 (copy), CircleAction (copy) ]]
+		CircleAction.Add({
+			Part = p1,
+			Name = "Pull Lever",
+			Timed = true,
+			Duration = 1,
+			Dist = 10,
+			Callback = Action_3,
+			PreUpdateFun = PreUpdateFun_3,
+			PreUpdatePeriod = 0.5
+		}, p1)
+	end
+	local function RemovedFun_3(p1) --[[ Line: 317 | Upvalues: CircleAction (copy) ]]
+		CircleAction.Remove(p1)
+	end
+	local v16 = next
+	local v17, v18 = CollectionService:GetTagged("Museum_Lever")
+	for v19, v20 in v16, v17, v18 do
+		CircleAction.Add({
+			Part = v20,
+			Name = "Pull Lever",
+			Timed = true,
+			Duration = 1,
+			Dist = 10,
+			Callback = Action_3,
+			PreUpdateFun = PreUpdateFun_3,
+			PreUpdatePeriod = 0.5
+		}, v20)
+	end
+	CollectionService:GetInstanceAddedSignal("Museum_Lever"):Connect(AddedFun_3)
+	CollectionService:GetInstanceRemovedSignal("Museum_Lever"):Connect(RemovedFun_3)
 end

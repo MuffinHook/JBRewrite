@@ -1,21 +1,23 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local VehicleUtils_upvr = require(ReplicatedStorage.Vehicle.VehicleUtils)
-local getDefaultVehicleModel_upvr = require(ReplicatedStorage.Game.getDefaultVehicleModel)
-local SecondTexture_upvr = require(ReplicatedStorage.Game.Garage.Customize.SecondTexture)
-local clone = table.clone(require(script.Parent.Texture))
-function clone.GetInstance(arg1) -- Line 7
-    local any_GetLocalVehiclePacketForCustomize_result1 = VehicleUtils_upvr.GetLocalVehiclePacketForCustomize()
-    local getDefaultVehicleModel_upvr_result1 = getDefaultVehicleModel_upvr(any_GetLocalVehiclePacketForCustomize_result1.Make, any_GetLocalVehiclePacketForCustomize_result1.Type)
-    local tbl = {
-        Model = getDefaultVehicleModel_upvr_result1;
-        Make = any_GetLocalVehiclePacketForCustomize_result1.Make;
-        Type = any_GetLocalVehiclePacketForCustomize_result1.Type;
-    }
-    if arg1.None then
-        SecondTexture_upvr(nil, tbl)
-        return getDefaultVehicleModel_upvr_result1
-    end
-    SecondTexture_upvr(arg1, tbl)
-    return getDefaultVehicleModel_upvr_result1
+local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
+local SecondTexture = require(ReplicatedStorage.Game.Garage.Customize.SecondTexture)
+local getDefaultVehicleModel = require(ReplicatedStorage.Game.getDefaultVehicleModel)
+local Texture = require(script.Parent.Texture)
+local function GetInstance(p1) --[[ Line: 7 | Upvalues: VehicleUtils (copy), getDefaultVehicleModel (copy), SecondTexture (copy) ]]
+	local v1 = VehicleUtils.GetLocalVehiclePacketForCustomize()
+	local v2 = getDefaultVehicleModel(v1.Make, v1.Type)
+	local t = {
+		Model = v2,
+		Make = v1.Make,
+		Type = v1.Type
+	}
+	if p1.None then
+		SecondTexture(nil, t)
+	else
+		SecondTexture(p1, t)
+	end
+	return v2
 end
-return clone
+local v1 = table.clone(Texture)
+v1.GetInstance = GetInstance
+return v1

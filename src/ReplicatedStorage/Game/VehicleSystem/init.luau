@@ -1,224 +1,173 @@
+game:GetService("CollectionService")
+game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players_upvr = game:GetService("Players")
-local tbl_upvr_2 = {}
-local tbl_upvr = {}
-local function _(arg1) -- Line 23, Named "Isv2"
-    local var6
-    if arg1.Meta == nil then
-        var6 = false
-    else
-        var6 = true
-    end
-    return var6
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local StreamingHelperUtils = require(ReplicatedStorage.App.StreamingHelperUtils)
+local TableUtils = require(ReplicatedStorage.Std.TableUtils)
+local Players = game:GetService("Players")
+local Binder = require(ReplicatedStorage.Std.Binder)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local LocalPlayer = Players.LocalPlayer
+local t = {}
+local t2 = {}
+local t3 = {}
+local function RegisterModule(p1) --[[ Line: 19 | Upvalues: t3 (copy) ]]
+	assert(p1.__ClassName ~= nil)
+	t3[p1.__ClassName] = p1
 end
-local tbl_upvr_3 = {}
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local Binder_upvr = require(ReplicatedStorage.Std.Binder)
-local StreamingHelperUtils_upvr = require(ReplicatedStorage.App.StreamingHelperUtils)
-local TableUtils_upvr = require(ReplicatedStorage.Std.TableUtils)
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-local LocalPlayer_upvr = Players_upvr.LocalPlayer
-local function GetVehiclePacket_upvr(arg1) -- Line 208, Named "GetVehiclePacket"
-    for i_5 = 1, #tbl_upvr_2 do
-        local var52 = tbl_upvr_2[i_5]
-        for i_6 = 1, #var52.Seats do
-            local var53 = var52.Seats[i_6]
-            if var53.Occupied and var53.Player == arg1 then
-                return var52, var53
-            end
-        end
-    end
-    return nil
+local function Isv2(p1) --[[ Line: 23 ]]
+	return p1.Meta ~= nil
+end
+local function Init(p1) --[[ Line: 26 | Upvalues: t2 (copy), t3 (copy), Maid (copy), Players (copy), t (copy), Binder (copy), StreamingHelperUtils (copy), TableUtils (copy), RxInstanceUtils (copy), LocalPlayer (copy) ]]
+	local _ = p1.Event
+	local function v1(p1, p2) --[[ Line: 31 | Upvalues: v1 (copy) ]]
+		for v12, v2 in next, p1 do
+			if type(v2) == "table" then
+				v1(v2, p2)
+			else
+				p2[v12] = v2
+			end
+		end
+	end
+	local function ProcessPacket(p1) --[[ Line: 41 | Upvalues: t2 (ref), t3 (ref), Maid (ref), Players (ref), t (ref), v1 (copy) ]]
+		assert(p1)
+		local Id = p1.Id
+		assert(Id)
+		if t2[Id] == nil then
+			local v12 = t3[p1.ClassName]
+			if v12 == nil then
+				error("No vehicle module has been registered for class name: " .. p1.ClassName)
+			end
+			if v12.FromPacket then
+				v12.FromPacket(p1)
+			else
+				p1 = v12.new(p1)
+			end
+			if p1.Maid == nil then
+				warn("No maid for vehicle packet", p1)
+			end
+			assert(p1.Seats, "Vehicle needs seats")
+			local Maid_2 = p1.Maid
+			for v2, v3 in p1.Seats do
+				local PlayerName = v3.Part:WaitForChild("PlayerName")
+				v3.Occupied = false
+				v3.Maid = Maid.new()
+				local function update() --[[ Line: 70 | Upvalues: v3 (copy), Players (ref), PlayerName (copy), p1 (ref) ]]
+					local Occupied = v3.Occupied
+					local v1 = Players:FindFirstChild(PlayerName.Value)
+					local v2 = v1 ~= nil
+					if v2 then
+						v3.Player = v1
+						v3.Occupied = v2
+						v3.Maid:DoCleaning()
+					end
+					if v2 ~= Occupied and v2 then
+						p1:MountPlayer(v3.Player, v3)
+					elseif v2 ~= Occupied then
+						p1:UnmountSeat(v3)
+					end
+					if not v2 then
+						v3.Player = v1
+						v3.Occupied = v2
+						v3.Maid:DoCleaning()
+					end
+				end
+				update()
+				Maid_2:GiveTask(PlayerName.Changed:Connect(update))
+			end
+			table.insert(t, p1)
+			t2[Id] = p1
+		else
+			if t2[Id].Meta ~= nil then
+				v1(p1, t2[Id].Meta)
+			else
+				v1(p1, t2[Id])
+			end
+		end
+	end
+	local function removeIdFromList(p1) --[[ Line: 113 | Upvalues: t (ref), t2 (ref) ]]
+		for i = #t, 1, -1 do
+			local v1, v2
+			local v3 = t[i]
+			v1 = v3.Meta ~= nil
+			v2 = if v1 then v3.Meta.Id else v3.Id
+			assert(v2)
+			if v2 == p1 then
+				t2[v2] = nil
+				table.remove(t, i)
+				if v3.Seats then
+					for j = 1, #v3.Seats do
+						local v4 = v3.Seats[j]
+						if v4.Occupied then
+							v3:UnmountSeat(v4)
+							v4.Maid:DoCleaning()
+						end
+					end
+				end
+				v3:Destroy()
+			end
+		end
+	end
+	Binder.new("VehicleSystemPacket", function(p1) --[[ Line: 140 | Upvalues: Maid (ref), StreamingHelperUtils (ref), TableUtils (ref), ProcessPacket (copy), removeIdFromList (copy), RxInstanceUtils (ref) ]]
+		task.wait()
+		local v1 = Maid.new()
+		StreamingHelperUtils.yieldForAllValuesPopulated(p1)
+		local v2 = TableUtils.createTableFromObjectValues(p1)
+		local v3 = if v2.Meta ~= nil then v2.Meta.Id else v2.Id
+		local function create() --[[ Line: 154 | Upvalues: ProcessPacket (ref), v2 (copy) ]]
+			ProcessPacket(v2)
+		end
+		local function destroy() --[[ Line: 157 | Upvalues: removeIdFromList (ref), v3 (ref) ]]
+			removeIdFromList(v3)
+		end
+		v1:GiveTask(RxInstanceUtils.observeOneChildNamed(v2.Model, "BoundingBox", function(p1, p2) --[[ Line: 161 | Upvalues: ProcessPacket (ref), v2 (copy), destroy (copy) ]]
+			ProcessPacket(v2)
+			p2:GiveTask(destroy)
+		end))
+		return v1
+	end):Start()
+	function p1.em.ih5093c4(p1) --[[ Line: 169 | Upvalues: t2 (ref), LocalPlayer (ref) ]]
+		local v1 = t2[p1]
+		assert(v1)
+		v1:FollowPlayer(LocalPlayer)
+	end
+end
+local function GetVehiclePacket(p1) --[[ Line: 208 | Upvalues: t (copy) ]]
+	for i = 1, #t do
+		local v1 = t[i]
+		for j = 1, #v1.Seats do
+			local v2 = v1.Seats[j]
+			if v2.Occupied and v2.Player == p1 then
+				return v1, v2
+			end
+		end
+	end
+	return nil
 end
 return {
-    Init = function(arg1) -- Line 26, Named "Init"
-        local function DeepTransfer_upvr(arg1_2, arg2) -- Line 31, Named "DeepTransfer"
-            for i, v in next, arg1_2 do
-                if type(v) == "table" then
-                    DeepTransfer_upvr(v, arg2)
-                else
-                    arg2[i] = v
-                end
-            end
-        end
-        local function ProcessPacket_upvr(arg1_3) -- Line 41, Named "ProcessPacket"
-            -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            assert(arg1_3)
-            local Id = arg1_3.Id
-            assert(Id)
-            local var25_upvw
-            if tbl_upvr_3[Id] == nil then
-                local var26 = tbl_upvr[var25_upvw.ClassName]
-                if var26 == nil then
-                    error("No vehicle module has been registered for class name: "..var25_upvw.ClassName)
-                end
-                if var26.FromPacket then
-                    var26.FromPacket(var25_upvw)
-                else
-                    var25_upvw = var26.new(var25_upvw)
-                end
-                if var25_upvw.Maid == nil then
-                    warn("No maid for vehicle packet", var25_upvw)
-                end
-                assert(var25_upvw.Seats, "Vehicle needs seats")
-                for _, v_2_upvr in var25_upvw.Seats do
-                    local PlayerName_upvr = v_2_upvr.Part:WaitForChild("PlayerName")
-                    v_2_upvr.Occupied = false
-                    v_2_upvr.Maid = Maid_upvr.new()
-                    local function update() -- Line 70
-                        local SOME = Players_upvr:FindFirstChild(PlayerName_upvr.Value)
-                        local var29
-                        if SOME == nil then
-                            var29 = false
-                        else
-                            var29 = true
-                        end
-                        if var29 then
-                            v_2_upvr.Player = SOME
-                            v_2_upvr.Occupied = var29
-                            v_2_upvr.Maid:DoCleaning()
-                        end
-                        if var29 ~= v_2_upvr.Occupied then
-                            if var29 then
-                                var25_upvw:MountPlayer(v_2_upvr.Player, v_2_upvr)
-                            else
-                                var25_upvw:UnmountSeat(v_2_upvr)
-                            end
-                        end
-                        if not var29 then
-                            v_2_upvr.Player = SOME
-                            v_2_upvr.Occupied = var29
-                            v_2_upvr.Maid:DoCleaning()
-                        end
-                    end
-                    update()
-                    var25_upvw.Maid:GiveTask(PlayerName_upvr.Changed:Connect(update))
-                    local _
-                end
-                table.insert(tbl_upvr_2, var25_upvw)
-                tbl_upvr_3[Id] = var25_upvw
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-            if tbl_upvr_3[Id].Meta == nil then
-                -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-            end
-            -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        end
-        local function removeIdFromList_upvr(arg1_4) -- Line 113, Named "removeIdFromList"
-            -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-            for i_3 = #tbl_upvr_2, 1, -1 do
-                local var39 = tbl_upvr_2[i_3]
-                local var40
-                if var39.Meta == nil then
-                    var40 = false
-                else
-                    var40 = true
-                end
-                if var40 then
-                    var40 = var39.Meta
-                    local _ = var40.Id
-                else
-                end
-                var40 = assert
-                var40(var39.Id)
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                if var39.Id == arg1_4 then
-                    var40 = tbl_upvr_3
-                    -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                    var40[var39.Id] = nil
-                    var40 = table.remove
-                    var40(tbl_upvr_2, i_3)
-                    var40 = var39.Seats
-                    if var40 then
-                        var40 = #var39.Seats
-                        for i_4 = 1, var40 do
-                            local var42 = var39.Seats[i_4]
-                            if var42.Occupied then
-                                var39:UnmountSeat(var42)
-                                var42.Maid:DoCleaning()
-                            end
-                        end
-                    end
-                    var40 = var39:Destroy
-                    var40()
-                end
-            end
-        end
-        Binder_upvr.new("VehicleSystemPacket", function(arg1_5) -- Line 140
-            -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-            task.wait()
-            local any_new_result1 = Maid_upvr.new()
-            StreamingHelperUtils_upvr.yieldForAllValuesPopulated(arg1_5)
-            local any_createTableFromObjectValues_result1_upvr = TableUtils_upvr.createTableFromObjectValues(arg1_5)
-            local create
-            if any_createTableFromObjectValues_result1_upvr.Meta == nil then
-                create = false
-            else
-                create = true
-            end
-            if create then
-                create = any_createTableFromObjectValues_result1_upvr.Meta
-            else
-            end
-            function create() -- Line 154
-                ProcessPacket_upvr(any_createTableFromObjectValues_result1_upvr)
-            end
-            local Id_upvw = any_createTableFromObjectValues_result1_upvr.Id
-            local function destroy_upvr() -- Line 157, Named "destroy"
-                removeIdFromList_upvr(Id_upvw)
-            end
-            any_new_result1:GiveTask(RxInstanceUtils_upvr.observeOneChildNamed(any_createTableFromObjectValues_result1_upvr.Model, "BoundingBox", function(arg1_6, arg2) -- Line 161
-                ProcessPacket_upvr(any_createTableFromObjectValues_result1_upvr)
-                arg2:GiveTask(destroy_upvr)
-            end))
-            return any_new_result1
-        end):Start()
-        arg1.em.ugi9mg46 = function(arg1_7) -- Line 169, Named "ugi9mg46"
-            local var49 = tbl_upvr_3[arg1_7]
-            assert(var49)
-            var49:FollowPlayer(LocalPlayer_upvr)
-        end
-    end;
-    RegisterModule = function(arg1) -- Line 19, Named "RegisterModule"
-        local var5
-        if arg1.__ClassName == nil then
-            var5 = false
-        else
-            var5 = true
-        end
-        assert(var5)
-        var5 = arg1.__ClassName
-        tbl_upvr[var5] = arg1
-    end;
-    GetVehiclePacket = GetVehiclePacket_upvr;
-    WaitForVehiclePacket = function(arg1) -- Line 220, Named "WaitForVehiclePacket"
-        while os.clock() - os.clock() < 5 do
-            local GetVehiclePacket_upvr_result1, GetVehiclePacket_upvr_result2 = GetVehiclePacket_upvr(arg1)
-            if GetVehiclePacket_upvr_result1 ~= nil then
-                return GetVehiclePacket_upvr_result1, GetVehiclePacket_upvr_result2
-            end
-            task.wait()
-        end
-        return nil
-    end;
-    GetPlayerSeat = function(arg1, arg2) -- Line 231, Named "GetPlayerSeat"
-        if arg1 == nil then
-        else
-        end
-        assert(true)
-        if arg2 == nil then
-        else
-        end
-        assert(true)
-        for i_7 = 1, #arg1.Seats do
-            local var58 = arg1.Seats[i_7]
-            if var58.Occupied and var58.Player == arg2 then
-                return var58
-            end
-        end
-        return nil
-    end;
+	Init = Init,
+	RegisterModule = RegisterModule,
+	GetVehiclePacket = GetVehiclePacket,
+	WaitForVehiclePacket = function(p1) --[[ Name: WaitForVehiclePacket | Line: 220 | Upvalues: GetVehiclePacket (copy) ]]
+		local v1 = os.clock()
+		while os.clock() - v1 < 5 do
+			local v2, v3 = GetVehiclePacket(p1)
+			if v2 ~= nil then
+				return v2, v3
+			end
+			task.wait()
+		end
+		return nil
+	end,
+	GetPlayerSeat = function(p1, p2) --[[ Name: GetPlayerSeat | Line: 231 ]]
+		assert(p1 ~= nil)
+		assert(p2 ~= nil)
+		for i = 1, #p1.Seats do
+			local v3 = p1.Seats[i]
+			if v3.Occupied and v3.Player == p2 then
+				return v3
+			end
+		end
+		return nil
+	end
 }

@@ -1,139 +1,147 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local tbl_upvr = {
-    explosion_large_02 = 2205008239;
-    nitro_loop = 9058734199;
-    nitro_ignite = 1386598740;
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Signal = require(ReplicatedStorage.Std.Signal)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local RayCast = require(ReplicatedStorage.Module.RayCast)
+local RocketLauncherUtils = require(ReplicatedStorage.RocketLauncher.RocketLauncherUtils)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local t = {
+	explosion_large_02 = 2205008239,
+	nitro_loop = 9058734199,
+	nitro_ignite = 1386598740
 }
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local Signal_upvr = require(ReplicatedStorage_upvr.Std.Signal)
-function module_upvr.new() -- Line 17
-    local module = {}
-    setmetatable(module, module_upvr)
-    module.Maid = Maid_upvr.new()
-    module.OnRocketQueueEmptied = Signal_upvr.new()
-    module.OnRocketExploded = Signal_upvr.new()
-    module:Setup()
-    return module
+local t2 = {}
+t2.__index = t2
+function t2.new() --[[ Line: 17 | Upvalues: t2 (copy), Maid (copy), Signal (copy) ]]
+	local t = {}
+	setmetatable(t, t2)
+	t.Maid = Maid.new()
+	t.OnRocketQueueEmptied = Signal.new()
+	t.OnRocketExploded = Signal.new()
+	t:Setup()
+	return t
 end
-function module_upvr.CreatePart(arg1, arg2, arg3) -- Line 28
-    local clone = ReplicatedStorage_upvr.Resource.ItemSystem.Projectiles.Rocket:Clone()
-    clone.CFrame = CFrame.new(Vector3.new(), arg3) + arg2
-    clone.Parent = workspace
-    arg1:AddSmoke(clone)
-    Audio_upvr.ObjectLocal(clone, tbl_upvr.nitro_ignite, {
-        Pitch = 0.7;
-        TimePosition = 0.6;
-        Volume = 0.3;
-    })
-    local any_ObjectLocal_result1 = Audio_upvr.ObjectLocal(clone, tbl_upvr.nitro_loop, {
-        Pitch = 0.6;
-        Volume = 1;
-    })
-    any_ObjectLocal_result1.Looped = true
-    any_ObjectLocal_result1.EmitterSize = 25
-    any_ObjectLocal_result1.Parent = clone
-    return clone
+function t2.CreatePart(p1, p2, p3) --[[ Line: 28 | Upvalues: ReplicatedStorage (copy), Audio (copy), t (copy) ]]
+	local v1 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Rocket:Clone()
+	v1.CFrame = CFrame.new(Vector3.new(), p3) + p2
+	v1.Parent = workspace
+	p1:AddSmoke(v1)
+	Audio.ObjectLocal(v1, t.nitro_ignite, {
+		Pitch = 0.7,
+		TimePosition = 0.6,
+		Volume = 0.3
+	})
+	local v2 = Audio.ObjectLocal(v1, t.nitro_loop, {
+		Pitch = 0.6,
+		Volume = 1
+	})
+	v2.Looped = true
+	v2.EmitterSize = 25
+	v2.Parent = v1
+	return v1
 end
-function module_upvr.AddSmoke(arg1, arg2) -- Line 44
-    ReplicatedStorage_upvr.Resource.ItemSystem.Projectiles.RocketFire:Clone().Parent = arg2
-    ReplicatedStorage_upvr.Resource.ItemSystem.Projectiles.RocketSmoke:Clone().Parent = arg2
+function t2.AddSmoke(p1, p2) --[[ Line: 44 | Upvalues: ReplicatedStorage (copy) ]]
+	ReplicatedStorage.Resource.ItemSystem.Projectiles.RocketFire:Clone().Parent = p2
+	ReplicatedStorage.Resource.ItemSystem.Projectiles.RocketSmoke:Clone().Parent = p2
 end
-function module_upvr.Launch(arg1, arg2, arg3, arg4) -- Line 50
-    assert(arg2)
-    assert(arg3)
-    assert(arg4)
-    local tbl = {}
-    tbl[1] = arg2
-    tbl[2] = arg3
-    tbl[3] = arg4
-    tbl[4] = arg1:CreatePart(arg2, arg3)
-    tbl[5] = 6
-    table.insert(arg1.ListRocket, tbl)
+function t2.Launch(p1, p2, p3, p4) --[[ Line: 50 ]]
+	assert(p2)
+	assert(p3)
+	assert(p4)
+	local t = {
+		p2,
+		p3,
+		p4,
+		p1:CreatePart(p2, p3),
+		6
+	}
+	table.insert(p1.ListRocket, t)
 end
-local RunService_upvr = game:GetService("RunService")
-function module_upvr.Setup(arg1) -- Line 66
-    arg1.ListRocket = {}
-    arg1.IgnoreList = {}
-    local any_Connect_result1_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 70
-        arg1:Update()
-    end)
-    arg1.Maid:GiveTask(function() -- Line 74
-        if 0 < #arg1.ListRocket then
-            arg1.OnRocketQueueEmptied:Connect(function() -- Line 77
-                any_Connect_result1_upvw:Disconnect()
-                any_Connect_result1_upvw = nil
-                arg1.OnRocketQueueEmptied:Destroy()
-                arg1.OnRocketQueueEmptied = nil
-                arg1.OnRocketExploded:Destroy()
-                arg1.OnRocketExploded = nil
-            end)
-        else
-            any_Connect_result1_upvw:Disconnect()
-            any_Connect_result1_upvw = nil
-            arg1.OnRocketQueueEmptied:Destroy()
-            arg1.OnRocketQueueEmptied = nil
-            arg1.OnRocketExploded:Destroy()
-            arg1.OnRocketExploded = nil
-        end
-    end)
+function t2.Setup(p1) --[[ Line: 66 | Upvalues: RunService (copy) ]]
+	p1.ListRocket = {}
+	p1.IgnoreList = {}
+	local v1 = RunService.Heartbeat:Connect(function() --[[ Line: 70 | Upvalues: p1 (copy) ]]
+		p1:Update()
+	end)
+	p1.Maid:GiveTask(function() --[[ Line: 74 | Upvalues: p1 (copy), v1 (ref) ]]
+		if #p1.ListRocket > 0 then
+			p1.OnRocketQueueEmptied:Connect(function() --[[ Line: 77 | Upvalues: v1 (ref), p1 (ref) ]]
+				v1:Disconnect()
+				v1 = nil
+				p1.OnRocketQueueEmptied:Destroy()
+				p1.OnRocketQueueEmptied = nil
+				p1.OnRocketExploded:Destroy()
+				p1.OnRocketExploded = nil
+			end)
+		else
+			v1:Disconnect()
+			v1 = nil
+			p1.OnRocketQueueEmptied:Destroy()
+			p1.OnRocketQueueEmptied = nil
+			p1.OnRocketExploded:Destroy()
+			p1.OnRocketExploded = nil
+		end
+	end)
 end
-local RayCast_upvr = require(ReplicatedStorage_upvr.Module.RayCast)
-function module_upvr.Update(arg1) -- Line 95
-    local tick_result1 = tick()
-    local var47 = tick_result1 - (arg1.LastUpdate or tick_result1)
-    arg1.LastUpdate = tick_result1
-    local len = #arg1.ListRocket
-    for i = len, 1, -1 do
-        local var49 = arg1.ListRocket[i]
-        local _2 = var49[2]
-        local _3 = var49[3]
-        local _4_2 = var49[4]
-        local _5 = var49[5]
-        if 0 < _5 then
-            local var54
-            if nil == nil then
-                local any_RayIgnoreNonCollideWithIgnoreList_result1_2, any_RayIgnoreNonCollideWithIgnoreList_result2_2, _, _ = RayCast_upvr.RayIgnoreNonCollideWithIgnoreList(var49[1], _2, _3 * var47, arg1.IgnoreList)
-                var54 = any_RayIgnoreNonCollideWithIgnoreList_result2_2
-                if any_RayIgnoreNonCollideWithIgnoreList_result1_2 ~= nil then
-                    _5 = 0
-                end
-            end
-            _4_2.CFrame = CFrame.new(Vector3.new(), _2) + var54
-            _4_2.Velocity = _2 * _3
-            var49[1] = var54
-            var49[2] = _2
-            var49[3] = _3
-            var49[5] = _5 - var47
-        else
-            _4_2.Transparency = 1
-            game.Debris:AddItem(_4_2, 1)
-            for _, v in next, _4_2:GetChildren() do
-                if v:IsA("Sound") then
-                    Audio_upvr.FadeOut(v, 0.3)
-                elseif v:IsA("ParticleEmitter") then
-                    v.Enabled = false
-                end
-            end
-            -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-            arg1:ExplodeAt(var49[1])
-            var49[4] = nil
-            table.remove(arg1.ListRocket, i)
-        end
-    end
-    if 0 < len and #arg1.ListRocket == 0 then
-        arg1.OnRocketQueueEmptied:Fire()
-    end
+function t2.Update(p1) --[[ Line: 95 | Upvalues: RayCast (copy), Audio (copy) ]]
+	local v1 = tick()
+	local v2 = v1 - (p1.LastUpdate or v1)
+	p1.LastUpdate = v1
+	local v3 = #p1.ListRocket
+	for i = v3, 1, -1 do
+		local v4
+		local v5 = p1.ListRocket[i]
+		local v6 = v5[1]
+		local v7 = v5[2]
+		local v8 = v5[3]
+		local v9 = v5[4]
+		local v10 = v5[5]
+		if v10 > 0 then
+			local v11 = v8 * v2
+			if nil == nil then
+				local v12, v13, _, _2 = RayCast.RayIgnoreNonCollideWithIgnoreList(v6, v7, v11, p1.IgnoreList)
+				if v12 == nil then
+					v4 = v13
+				else
+					v4 = v13
+					v10 = 0
+				end
+			else
+				v4 = nil
+			end
+			v9.CFrame = CFrame.new(Vector3.new(), v7) + v4
+			v9.Velocity = v7 * v8
+			v5[1] = v4
+			v5[2] = v7
+			v5[3] = v8
+			v5[5] = v10 - v2
+		else
+			v9.Transparency = 1
+			game.Debris:AddItem(v9, 1)
+			local v14 = next
+			local v15, v16 = v9:GetChildren()
+			for v17, v18 in v14, v15, v16 do
+				if v18:IsA("Sound") then
+					Audio.FadeOut(v18, 0.3)
+				elseif v18:IsA("ParticleEmitter") then
+					v18.Enabled = false
+				end
+			end
+			p1:ExplodeAt(v6)
+			v5[4] = nil
+			table.remove(p1.ListRocket, i)
+		end
+	end
+	if v3 > 0 and #p1.ListRocket == 0 then
+		p1.OnRocketQueueEmptied:Fire()
+	end
 end
-local RocketLauncherUtils_upvr = require(ReplicatedStorage_upvr.RocketLauncher.RocketLauncherUtils)
-function module_upvr.ExplodeAt(arg1, arg2) -- Line 147
-    RocketLauncherUtils_upvr.explodeAt(arg2)
-    arg1.OnRocketExploded:Fire(arg2)
+function t2.ExplodeAt(p1, p2) --[[ Line: 147 | Upvalues: RocketLauncherUtils (copy) ]]
+	RocketLauncherUtils.explodeAt(p2)
+	p1.OnRocketExploded:Fire(p2)
 end
-function module_upvr.Destroy(arg1) -- Line 151
-    arg1.Maid:Destroy()
-    arg1.Maid = nil
+function t2.Destroy(p1) --[[ Line: 151 ]]
+	p1.Maid:Destroy()
+	p1.Maid = nil
 end
-return module_upvr
+return t2

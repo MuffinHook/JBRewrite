@@ -1,13 +1,14 @@
-return (function(arg1) -- Line 1, Named "readonlytable"
-    local module = {}
-    module.__index = arg1
-    module.__metatable = false
-    function module.__newindex(arg1_2, arg2, arg3) -- Line 5
-        error("Attempt to modify read-only table: "..arg1_2..", key="..arg2..", value="..arg3)
-    end
-    return setmetatable({}, module)
-end)({
-    Start = "Start";
-    Complete = "Complete";
-    Fail = "Fail";
+local function readonlytable(p1) --[[ Line: 1 ]]
+	return setmetatable({}, {
+		__index = p1,
+		__metatable = false,
+		__newindex = function(p1, p2, p3) --[[ Name: __newindex | Line: 5 ]]
+			error("Attempt to modify read-only table: " .. p1 .. ", key=" .. p2 .. ", value=" .. p3)
+		end
+	})
+end
+return readonlytable({
+	Start = "Start",
+	Complete = "Complete",
+	Fail = "Fail"
 })

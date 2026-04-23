@@ -1,1 +1,2 @@
-return require(game:GetService("ReplicatedStorage").Std.RateLimiter)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+return require(ReplicatedStorage.Std.RateLimiter)

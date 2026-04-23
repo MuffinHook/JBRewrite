@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local PolicyService_upvr = require(ReplicatedStorage.Policy.PolicyService)
-require(ReplicatedStorage.Policy.promisePolicyInfoForPlayer)(LocalPlayer_upvr):andThen(function(arg1) -- Line 8
-    PolicyService_upvr.setCachedPlayerPolicyInfo(LocalPlayer_upvr, arg1)
+local Players = game:GetService("Players")
+local promisePolicyInfoForPlayer = require(ReplicatedStorage.Policy.promisePolicyInfoForPlayer)
+local PolicyService = require(ReplicatedStorage.Policy.PolicyService)
+local LocalPlayer = Players.LocalPlayer
+promisePolicyInfoForPlayer(LocalPlayer):andThen(function(p1) --[[ Line: 8 | Upvalues: PolicyService (copy), LocalPlayer (copy) ]]
+	PolicyService.setCachedPlayerPolicyInfo(LocalPlayer, p1)
 end)

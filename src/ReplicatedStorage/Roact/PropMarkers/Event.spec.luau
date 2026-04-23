@@ -1,22 +1,13 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- BgMQBmV4cGVjdAJvZhFNb3VzZUJ1dHRvbjFDbGljawJ0bwVlcXVhbAlIb3N0RXZlbnQHVG91Y2hlZAVuZXZlcgdyZXF1aXJlBnNjcmlwdAZQYXJlbnQEVHlwZQVFdmVudAJpdCdzaG91bGQgeWllbGQgZXZlbnQgb2JqZWN0cyB3aGVuIGluZGV4ZWQvc2hvdWxkIHlpZWxkIHRoZSBzYW1lIG9iamVjdCB3aGVuIGluZGV4ZWQgYWdhaW4ABAYAAgAABQACAA8PJaQCAQAAAABA+wQAAE0DBLwCAAAA+wUBAE0EBdoDAAAAnwMCAJ8CAAJNAQKSBAAAAE0AAXsFAAAA+wIAAE0BAioGAAAAnwACAaQCAQAAAABA+wQAAE0DBLwCAAAA+wUBAE0EBSwHAAAAnwMCAJ8CAAJNAQKSBAAAAE0AAXsFAAAA+wIAAE0BAioGAAAAnwACAYIAAQAIAwEEAAAAQAMCAwMDBAMFAwYDBwAGAAEYAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAQcAAAAACAABAAAQAAEDDw8AACAPAQMdDwIGGiD7AQAATQAB2gAAAAD7AgAATQEC2gAAAAD7AwAATQIDLAEAAACkBQMAAAAgQFIGAACfBQICTQQFkgQAAABNAwR7BQAAAFIEAQCfAwIBpAYDAAAAIEBSBwAAnwYCAk0FBjUGAAAATQQFkgQAAABNAwR7BQAAAFIEAgCfAwIBggABAAcDAwMHAwEEAAAgQAMEAwUDCAALAAEYAAAAAQAAAQAAAgAAAAAAAAAAAAEAAAAAAAAAAAAAAAEMAAAAAAUAAAAACwAAAg8AACIPAQsXIqQAAQAAAABApAQDAAAAIEBNAwQkBAAAAE0CAyQEAAAATQECEQUAAACfAAICpAEBAAAAAECkBAMAAAAgQE0DBCQEAAAATQIDNgYAAACfAQICpAIIAAAAcEBvAwkA2QQAABIAAAASAAEAnwIDAaQCCAAAAHBAbwMKANkEAQASAAEAnwIDAYIAAQALAwkEAAAAQAMKBAAAIEADCwMMAw0DDgQAAHBAAw8DEAIAAQEAARgAAAAAAAAAAAAAAAIAAAAAAAAAAAIAAAAAAAAFAAAAAAAIAgAAAAABAAABAgADowAAAMAAAACCAAIAAQYCAQIBAAEYAAAAAQAAAAAD7A5oqP7+zkLeygI81QIx/gRf5DJoToQclH7KAobHxWOb5rARj56TVQ==
-
 return function() --[[ Line: 1 ]]
-    local v0 = require(script.Parent.Parent.Type);
-    local v1 = require(script.Parent.Event);
-    it("should yield event objects when indexed", function() --[[ Line: 6 ]]
-        -- upvalues: v0 (copy), v1 (copy)
-        expect(v0.of(v1.MouseButton1Click)).to.equal(v0.HostEvent);
-        expect(v0.of(v1.Touched)).to.equal(v0.HostEvent);
-    end);
-    it("should yield the same object when indexed again", function() --[[ Line: 11 ]]
-        -- upvalues: v1 (copy)
-        local l_MouseButton1Click_0 = v1.MouseButton1Click;
-        local l_MouseButton1Click_1 = v1.MouseButton1Click;
-        local l_Touched_0 = v1.Touched;
-        expect(l_MouseButton1Click_0).to.equal(l_MouseButton1Click_1);
-        expect(l_MouseButton1Click_0).never.to.equal(l_Touched_0);
-    end);
-end;
+	local Type = require(script.Parent.Parent.Type)
+	local v1 = require(script.Parent.Event)
+	it("should yield event objects when indexed", function() --[[ Line: 6 | Upvalues: Type (copy), v1 (copy) ]]
+		expect(Type.of(v1.MouseButton1Click)).to.equal(Type.HostEvent)
+		expect(Type.of(v1.Touched)).to.equal(Type.HostEvent)
+	end)
+	it("should yield the same object when indexed again", function() --[[ Line: 11 | Upvalues: v1 (copy) ]]
+		local MouseButton1Click = v1.MouseButton1Click
+		expect(MouseButton1Click).to.equal(v1.MouseButton1Click)
+		expect(MouseButton1Click).never.to.equal(v1.Touched)
+	end)
+end

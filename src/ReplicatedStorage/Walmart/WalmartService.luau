@@ -1,61 +1,59 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local module = {
-    init = function() -- Line 13, Named "init"
-    end;
+game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
+local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
+require(ReplicatedStorage.Policy.PolicyService)
+local Binder = require(ReplicatedStorage.Std.Binder)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Region = require(ReplicatedStorage.Std.Region)
+local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)
+return {
+	init = function() --[[ Name: init | Line: 13 ]] end,
+	setupModel = function() --[[ Name: setupModel | Line: 23 | Upvalues: ReplicatedStorage (copy), Players (copy), GamepassUtils (copy), Binder (copy), Maid (copy), Region (copy), RegionUtils (copy), GamepassSystem (copy), Interval (copy) ]]
+		local WalmartBrand = ReplicatedStorage:WaitForChild("WalmartBrand", 5)
+		if WalmartBrand then
+			WalmartBrand.Parent = workspace
+			local WalmartGui = ReplicatedStorage:FindFirstChild("StarterGui"):FindFirstChild("WalmartGui")
+			if WalmartGui then
+				WalmartGui.Parent = Players.LocalPlayer:FindFirstChild("PlayerGui")
+				WalmartGui.Background.Close.Activated:Connect(function() --[[ Line: 43 | Upvalues: WalmartGui (copy) ]]
+					WalmartGui.Enabled = false
+				end)
+				WalmartGui.Background.Buy.Activated:Connect(function() --[[ Line: 47 | Upvalues: GamepassUtils (ref) ]]
+					GamepassUtils.PromptGamepass(GamepassUtils.EnumGamepass.Walmart)
+				end)
+				Binder.new("WalmartPurchaseRegion", function(p1) --[[ Line: 51 | Upvalues: Maid (ref), Region (ref), RegionUtils (ref), GamepassSystem (ref), Players (ref), GamepassUtils (ref), WalmartGui (copy), Interval (ref) ]]
+					local v1 = Maid.new()
+					local v2 = Maid.new()
+					local v3 = Region.new(RegionUtils.ConditionPlayer)
+					v3:AddPart(p1)
+					v1:GiveTask(v3)
+					v1:GiveTask(v3.OnObjAdded:Connect(function(p1) --[[ Line: 58 | Upvalues: v2 (copy), GamepassSystem (ref), Players (ref), GamepassUtils (ref), WalmartGui (ref) ]]
+						v2:DoCleaning()
+						if not GamepassSystem.doesPlayerOwnCached(Players.LocalPlayer, GamepassUtils.EnumGamepass.Walmart) then
+							WalmartGui.Enabled = true
+							v2:GiveTask(task.delay(2, function() --[[ Line: 66 ]] end))
+						end
+					end))
+					v1:GiveTask(v3.OnObjRemoved:Connect(function(p1) --[[ Line: 70 | Upvalues: v2 (copy), WalmartGui (ref) ]]
+						v2:DoCleaning()
+						WalmartGui.Enabled = false
+					end))
+					v1:GiveTask(Interval.every(0.3333333333333333):Connect(function() --[[ Line: 75 | Upvalues: v3 (copy), Players (ref) ]]
+						v3:Update({ Players.LocalPlayer })
+					end))
+					return v1
+				end):Start()
+				GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.Walmart):Connect(function() --[[ Line: 83 | Upvalues: WalmartGui (copy) ]]
+					WalmartGui.Enabled = false
+				end)
+			else
+				warn("Could not find StarterGui/WalmartGui..")
+			end
+		else
+			warn("Could not find WalmartBrand model..")
+		end
+	end
 }
-local Players_upvr = game:GetService("Players")
-local GamepassUtils_upvr = require(ReplicatedStorage_upvr.Gamepass.GamepassUtils)
-local Binder_upvr = require(ReplicatedStorage_upvr.Std.Binder)
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local Region_upvr = require(ReplicatedStorage_upvr.Std.Region)
-local RegionUtils_upvr = require(ReplicatedStorage_upvr.Std.Region.RegionUtils)
-local GamepassSystem_upvr = require(ReplicatedStorage_upvr.Gamepass.GamepassSystem)
-local Interval_upvr = require(ReplicatedStorage_upvr.Std.Interval)
-function module.setupModel() -- Line 23
-    local WalmartBrand = ReplicatedStorage_upvr:WaitForChild("WalmartBrand", 5)
-    if not WalmartBrand then
-        warn("Could not find WalmartBrand model..")
-    else
-        WalmartBrand.Parent = workspace
-        local WalmartGui_upvr = ReplicatedStorage_upvr:FindFirstChild("StarterGui"):FindFirstChild("WalmartGui")
-        if not WalmartGui_upvr then
-            warn("Could not find StarterGui/WalmartGui..")
-            return
-        end
-        WalmartGui_upvr.Parent = Players_upvr.LocalPlayer:FindFirstChild("PlayerGui")
-        WalmartGui_upvr.Background.Close.Activated:Connect(function() -- Line 43
-            WalmartGui_upvr.Enabled = false
-        end)
-        WalmartGui_upvr.Background.Buy.Activated:Connect(function() -- Line 47
-            GamepassUtils_upvr.PromptGamepass(GamepassUtils_upvr.EnumGamepass.Walmart)
-        end)
-        Binder_upvr.new("WalmartPurchaseRegion", function(arg1) -- Line 51
-            local any_new_result1 = Maid_upvr.new()
-            local any_new_result1_3_upvr = Maid_upvr.new()
-            local any_new_result1_2_upvr = Region_upvr.new(RegionUtils_upvr.ConditionPlayer)
-            any_new_result1_2_upvr:AddPart(arg1)
-            any_new_result1:GiveTask(any_new_result1_2_upvr)
-            any_new_result1:GiveTask(any_new_result1_2_upvr.OnObjAdded:Connect(function(arg1_2) -- Line 58
-                any_new_result1_3_upvr:DoCleaning()
-                if GamepassSystem_upvr.doesPlayerOwnCached(Players_upvr.LocalPlayer, GamepassUtils_upvr.EnumGamepass.Walmart) then
-                else
-                    WalmartGui_upvr.Enabled = true
-                    any_new_result1_3_upvr:GiveTask(task.delay(2, function() -- Line 66
-                    end))
-                end
-            end))
-            any_new_result1:GiveTask(any_new_result1_2_upvr.OnObjRemoved:Connect(function(arg1_3) -- Line 70
-                any_new_result1_3_upvr:DoCleaning()
-                WalmartGui_upvr.Enabled = false
-            end))
-            any_new_result1:GiveTask(Interval_upvr.every(0.3333333333333333):Connect(function() -- Line 75
-                any_new_result1_2_upvr:Update({Players_upvr.LocalPlayer})
-            end))
-            return any_new_result1
-        end):Start()
-        GamepassSystem_upvr.GetGamepassOwnedSignal(GamepassUtils_upvr.EnumGamepass.Walmart):Connect(function() -- Line 83
-            WalmartGui_upvr.Enabled = false
-        end)
-    end
-end
-return module

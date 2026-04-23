@@ -1,153 +1,173 @@
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TableUtils_upvr = require(ReplicatedStorage.Std.TableUtils)
-local HotbarItemBinder_upvr = require(script.Parent.HotbarItemBinder)
-local HotbarItemUtils_upvr = require(script.Parent.HotbarItemUtils)
-local module_upvr = {
-    isDragging = false;
+local Maid = require(ReplicatedStorage.Std.Maid)
+local TableUtils = require(ReplicatedStorage.Std.TableUtils)
+local InventoryItemBinder = require(ReplicatedStorage.Inventory.InventoryItemBinder)
+local InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSystem)
+local HotbarItemConsts = require(script.Parent.HotbarItemConsts)
+local HotbarItemBinder = require(script.Parent.HotbarItemBinder)
+local HotbarItemUtils = require(script.Parent.HotbarItemUtils)
+local t = {
+	isDragging = false
 }
-local Players_upvr = game:GetService("Players")
-local HotbarItemConsts_upvr = require(script.Parent.HotbarItemConsts)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local RunService_upvr = game:GetService("RunService")
-local UserInputService_upvr = game:GetService("UserInputService")
-local InventoryItemBinder_upvr = require(ReplicatedStorage.Inventory.InventoryItemBinder)
-local InventoryItemSystem_upvr = require(ReplicatedStorage.Inventory.InventoryItemSystem)
-function module_upvr.init() -- Line 16
-    require(script.Parent.HotbarItemRes).init()
-    local tbl_upvr = {Enum.KeyCode.One, Enum.KeyCode.Two, Enum.KeyCode.Three, Enum.KeyCode.Four, Enum.KeyCode.Five, Enum.KeyCode.Six, Enum.KeyCode.Seven, Enum.KeyCode.Eight, Enum.KeyCode.Nine, Enum.KeyCode.Zero}
-    local function updateDisplayOrder_upvr() -- Line 32, Named "updateDisplayOrder"
-        if module_upvr.isDragging then
-        else
-            local any_getSortedHotbarItemsFor_result1 = module_upvr.getSortedHotbarItemsFor(Players_upvr.LocalPlayer)
-            for i = 1, #any_getSortedHotbarItemsFor_result1 do
-                local var16 = any_getSortedHotbarItemsFor_result1[i]
-                if tbl_upvr[i] then
-                    var16:SetKeyCode(tbl_upvr[i])
-                    var16:SetBindText(string.format("%d", i));
-                else
-                    var16:SetKeyCode(nil)
-                    var16:SetBindText(nil)
-                end
-            end
-        end
-    end
-    HotbarItemBinder_upvr:GetClassAddedSignal():Connect(function(arg1) -- Line 50
-        if arg1:GetOwner() ~= Players_upvr.LocalPlayer then
-        else
-            if not HotbarItemUtils_upvr.getDisplayOrder(arg1.obj) then
-                HotbarItemUtils_upvr.setDisplayOrder(arg1.obj, math.max(unpack(TableUtils_upvr.map(module_upvr.getHotbarItemsFor(arg1:GetOwner()), function(arg1_2) -- Line 58
-                    local var19 = HotbarItemUtils_upvr.getDisplayOrder(arg1_2.obj) or 0
-                    if 50 < var19 then
-                        var19 = 0
-                    end
-                    return var19
-                end))) + 1)
-            end
-            updateDisplayOrder_upvr()
-            arg1._maid:GiveTask(arg1.obj:GetAttributeChangedSignal(HotbarItemConsts_upvr.DISPLAY_ORDER_ATTR_NAME):Connect(updateDisplayOrder_upvr))
-            arg1._maid:GiveTask(arg1.onDragStarted:Connect(function() -- Line 76
-                assert(not module_upvr.isDragging, "somehow hotbar is already dragging")
-                module_upvr.isDragging = true
-                local any_new_result1 = Maid_upvr.new()
-                any_new_result1:GiveTask(function() -- Line 80
-                    module_upvr.isDragging = false
-                end)
-                arg1._maid._dragMaid = any_new_result1
-                local any_getSortedHotbarItemsFor_result1_upvr = module_upvr.getSortedHotbarItemsFor(arg1:GetOwner())
-                local len_upvr = #any_getSortedHotbarItemsFor_result1_upvr
-                arg1:SetSize(1.2)
-                any_new_result1:GiveTask(function() -- Line 89
-                    arg1:SetSize(1)
-                    arg1:Spin()
-                end)
-                local table_find_result1_upvw = table.find(any_getSortedHotbarItemsFor_result1_upvr, arg1)
-                local X = arg1._frame.Parent.UIListLayout.AbsoluteContentSize.X
-                local var29_upvr = arg1._frame.Parent.AbsolutePosition.X + arg1._frame.Parent.AbsoluteSize.X * 0.5 - X * 0.5
-                local var30_upvr = X / len_upvr
-                any_new_result1:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 103
-                    table_find_result1_upvw = math.floor((UserInputService_upvr:GetMouseLocation().X - var29_upvr) / var30_upvr) + 1
-                    if table_find_result1_upvw < 1 then
-                        table_find_result1_upvw = 1
-                    elseif len_upvr < table_find_result1_upvw then
-                        table_find_result1_upvw = len_upvr
-                    end
-                    for i_2, v in ipairs(any_getSortedHotbarItemsFor_result1_upvr) do
-                        HotbarItemUtils_upvr.setDisplayOrder(v.obj, HotbarItemUtils_upvr.calculateNewIndex(i_2, table_find_result1_upvw, table_find_result1_upvw))
-                    end
-                end))
-                any_new_result1:GiveTask(UserInputService_upvr.InputEnded:Connect(function(arg1_3) -- Line 121
-                    if arg1_3.UserInputType == Enum.UserInputType.MouseButton1 or arg1_3.UserInputType == Enum.UserInputType.Touch or arg1_3.UserInputType == Enum.UserInputType.Gamepad1 then
-                        arg1._maid._dragMaid = nil
-                        updateDisplayOrder_upvr()
-                    end
-                end))
-            end))
-            arg1._maid:GiveTask(arg1:GetInventoryItem():GetEquippedSignal():Connect(function() -- Line 137
-                local any_GetInventoryItem_result1 = arg1:GetInventoryItem()
-                local var39
-                if any_GetInventoryItem_result1 and any_GetInventoryItem_result1:GetEquipped() then
-                    var39 = true
-                end
-                arg1:SetDropVisible(var39)
-            end))
-            if arg1:GetInventoryItem():GetEquipped() then
-                arg1:SetDropVisible(arg1:GetInventoryItem():GetEquipped())
-            end
-        end
-    end)
-    HotbarItemBinder_upvr:GetClassRemovingSignal():Connect(function(arg1) -- Line 153
-        if arg1:GetOwner() ~= Players_upvr.LocalPlayer then
-        else
-            task.defer(updateDisplayOrder_upvr)
-        end
-    end)
-    HotbarItemBinder_upvr:Start()
-    UserInputService_upvr.InputBegan:Connect(function(arg1, arg2) -- Line 164
-        if arg2 then
-        elseif arg1.UserInputType == Enum.UserInputType.Keyboard then
-            for _, v_2 in ipairs(module_upvr.getHotbarItemsFor(Players_upvr.LocalPlayer)) do
-                if arg1.KeyCode == v_2.keyCode then
-                    local any_Get_result1 = InventoryItemBinder_upvr:Get(v_2.obj)
-                    assert(any_Get_result1, "hotbarItem is somehow not simultaneously inventoryItem")
-                    any_Get_result1:AttemptSelect()
-                end
-            end
-        end
-    end)
-    UserInputService_upvr.InputBegan:Connect(function(arg1, arg2) -- Line 181
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        do
-            return false
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end)
+function t.init() --[[ Line: 16 | Upvalues: t (copy), Players (copy), HotbarItemBinder (copy), TableUtils (copy), HotbarItemUtils (copy), HotbarItemConsts (copy), Maid (copy), RunService (copy), UserInputService (copy), InventoryItemBinder (copy), InventoryItemSystem (copy) ]]
+	require(script.Parent.HotbarItemRes).init()
+	local t2 = {
+		Enum.KeyCode.One,
+		Enum.KeyCode.Two,
+		Enum.KeyCode.Three,
+		Enum.KeyCode.Four,
+		Enum.KeyCode.Five,
+		Enum.KeyCode.Six,
+		Enum.KeyCode.Seven,
+		Enum.KeyCode.Eight,
+		Enum.KeyCode.Nine,
+		Enum.KeyCode.Zero
+	}
+	local function updateDisplayOrder() --[[ Line: 32 | Upvalues: t (ref), Players (ref), t2 (copy) ]]
+		if not t.isDragging then
+			local v1 = t.getSortedHotbarItemsFor(Players.LocalPlayer)
+			for i = 1, #v1 do
+				local v2 = v1[i]
+				if t2[i] then
+					v2:SetKeyCode(t2[i])
+					v2:SetBindText(("%d"):format(i))
+				else
+					v2:SetKeyCode(nil)
+					v2:SetBindText(nil)
+				end
+			end
+		end
+	end
+	HotbarItemBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 50 | Upvalues: Players (ref), TableUtils (ref), t (ref), HotbarItemUtils (ref), updateDisplayOrder (copy), HotbarItemConsts (ref), Maid (ref), RunService (ref), UserInputService (ref) ]]
+		if p1:GetOwner() == Players.LocalPlayer then
+			local function f2(p1) --[[ Line: 58 | Upvalues: HotbarItemUtils (ref) ]]
+				local v1 = HotbarItemUtils.getDisplayOrder(p1.obj) or 0
+				if v1 > 50 then
+					v1 = 0
+				end
+				return v1
+			end
+			local v4 = math.max(unpack(TableUtils.map(t.getHotbarItemsFor(p1:GetOwner()), f2)))
+			if not HotbarItemUtils.getDisplayOrder(p1.obj) then
+				HotbarItemUtils.setDisplayOrder(p1.obj, v4 + 1)
+			end
+			updateDisplayOrder()
+			p1._maid:GiveTask(p1.obj:GetAttributeChangedSignal(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME):Connect(updateDisplayOrder))
+			p1._maid:GiveTask(p1.onDragStarted:Connect(function() --[[ Line: 76 | Upvalues: t (ref), Maid (ref), p1 (copy), RunService (ref), UserInputService (ref), HotbarItemUtils (ref), updateDisplayOrder (ref) ]]
+				assert(not t.isDragging, "somehow hotbar is already dragging")
+				t.isDragging = true
+				local v2 = Maid.new()
+				v2:GiveTask(function() --[[ Line: 80 | Upvalues: t (ref) ]]
+					t.isDragging = false
+				end)
+				p1._maid._dragMaid = v2
+				local v3 = t.getSortedHotbarItemsFor(p1:GetOwner())
+				local v4 = #v3
+				p1:SetSize(1.2)
+				v2:GiveTask(function() --[[ Line: 89 | Upvalues: p1 (ref) ]]
+					p1:SetSize(1)
+					p1:Spin()
+				end)
+				local v5 = table.find(v3, p1)
+				local v6 = v5
+				local X = p1._frame.Parent.UIListLayout.AbsoluteContentSize.X
+				local v7 = p1._frame.Parent.AbsolutePosition.X + p1._frame.Parent.AbsoluteSize.X * 0.5 - X * 0.5
+				local v8 = X / v4
+				v2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 103 | Upvalues: UserInputService (ref), v7 (copy), v6 (ref), v8 (copy), v4 (copy), v3 (copy), HotbarItemUtils (ref), v5 (copy) ]]
+					v6 = math.floor((UserInputService:GetMouseLocation().X - v7) / v8) + 1
+					if v6 < 1 then
+						v6 = 1
+					elseif v4 < v6 then
+						v6 = v4
+					end
+					for i, v in ipairs(v3) do
+						HotbarItemUtils.setDisplayOrder(v.obj, HotbarItemUtils.calculateNewIndex(i, v5, v6))
+					end
+				end))
+				v2:GiveTask(UserInputService.InputEnded:Connect(function(p12) --[[ Line: 121 | Upvalues: p1 (ref), updateDisplayOrder (ref) ]]
+					if p12.UserInputType == Enum.UserInputType.MouseButton1 or (p12.UserInputType == Enum.UserInputType.Touch or p12.UserInputType == Enum.UserInputType.Gamepad1) then
+						p1._maid._dragMaid = nil
+						updateDisplayOrder()
+					end
+				end))
+			end))
+			p1._maid:GiveTask(p1:GetInventoryItem():GetEquippedSignal():Connect(function() --[[ Line: 137 | Upvalues: p1 (copy) ]]
+				local v1 = p1:GetInventoryItem()
+				p1:SetDropVisible(v1 and v1:GetEquipped() and true or false)
+			end))
+			if p1:GetInventoryItem():GetEquipped() then
+				p1:SetDropVisible(p1:GetInventoryItem():GetEquipped())
+			end
+		end
+	end)
+	HotbarItemBinder:GetClassRemovingSignal():Connect(function(p1) --[[ Line: 153 | Upvalues: Players (ref), updateDisplayOrder (copy) ]]
+		if p1:GetOwner() == Players.LocalPlayer then
+			task.defer(updateDisplayOrder)
+		end
+	end)
+	HotbarItemBinder:Start()
+	UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 164 | Upvalues: t (ref), Players (ref), InventoryItemBinder (ref) ]]
+		if not p2 and p1.UserInputType == Enum.UserInputType.Keyboard then
+			for i, v in ipairs((t.getHotbarItemsFor(Players.LocalPlayer))) do
+				if p1.KeyCode == v.keyCode then
+					local v2 = InventoryItemBinder:Get(v.obj)
+					assert(v2, "hotbarItem is somehow not simultaneously inventoryItem")
+					v2:AttemptSelect()
+				end
+			end
+		end
+	end)
+	UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 181 | Upvalues: InventoryItemSystem (ref), Players (ref), t (ref) ]]
+		if p2 then
+			return false
+		end
+		if p1.UserInputType == Enum.UserInputType.Gamepad1 then
+			local v1 = nil
+			if p1.KeyCode == Enum.KeyCode.ButtonL1 then
+				v1 = -1
+			elseif p1.KeyCode == Enum.KeyCode.ButtonR1 then
+				v1 = 1
+			end
+			if v1 then
+				local v2 = InventoryItemSystem.getEquippedFor(Players.LocalPlayer)
+				local v3 = t.getSortedHotbarItemsFor(Players.LocalPlayer)
+				local v4 = v2[1]
+				local sum = if v1 < 0 then #v3 else 1
+				if v4 then
+					for i = 1, #v3 do
+						if v3[i].obj == v4.obj then
+							sum = i
+							break
+						end
+					end
+					sum = sum + v1
+					if sum <= 0 then
+						sum = 0
+					elseif #v3 + 1 <= sum then
+						sum = #v3 + 1
+					end
+					InventoryItemSystem.unequipAll()
+				end
+				if v3[sum] then
+					InventoryItemSystem.toggleEquip(v3[sum]:GetInventoryItem())
+				end
+			end
+		end
+	end)
 end
-function module_upvr.getHotbarItemsFor(arg1) -- Line 223
-    return TableUtils_upvr.filter(HotbarItemBinder_upvr:GetAll(), function(arg1_4) -- Line 224
-        local var50
-        if arg1_4:GetOwner() ~= arg1 then
-            var50 = false
-        else
-            var50 = true
-        end
-        return var50
-    end)
+function t.getHotbarItemsFor(p1) --[[ Line: 223 | Upvalues: TableUtils (copy), HotbarItemBinder (copy) ]]
+	return TableUtils.filter(HotbarItemBinder:GetAll(), function(p12) --[[ Line: 224 | Upvalues: p1 (copy) ]]
+		return p12:GetOwner() == p1
+	end)
 end
-function module_upvr.getSortedHotbarItemsFor(arg1) -- Line 228
-    local any_getHotbarItemsFor_result1 = module_upvr.getHotbarItemsFor(arg1)
-    table.sort(any_getHotbarItemsFor_result1, function(arg1_5, arg2) -- Line 230
-        local var53
-        if (HotbarItemUtils_upvr.getDisplayOrder(arg1_5.obj) or 0) >= (HotbarItemUtils_upvr.getDisplayOrder(arg2.obj) or 0) then
-            var53 = false
-        else
-            var53 = true
-        end
-        return var53
-    end)
-    return any_getHotbarItemsFor_result1
+function t.getSortedHotbarItemsFor(p1) --[[ Line: 228 | Upvalues: t (copy), HotbarItemUtils (copy) ]]
+	local v1 = t.getHotbarItemsFor(p1)
+	table.sort(v1, function(p1, p2) --[[ Line: 230 | Upvalues: HotbarItemUtils (ref) ]]
+		return (HotbarItemUtils.getDisplayOrder(p1.obj) or 0) < (HotbarItemUtils.getDisplayOrder(p2.obj) or 0)
+	end)
+	return v1
 end
-return module_upvr
+return t

@@ -1,130 +1,121 @@
--- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
-
--- Bytecode (Base64):
--- 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
-
-local l_RunService_0 = game:GetService("RunService");
-local v1 = require(script.Parent.Signal);
-local v2 = {};
-v2.__index = v2;
-local v3 = nil;
-local v4 = nil;
-local v5 = nil;
-v2.every = function(v6) --[[ Line: 13 ]] --[[ Name: every ]]
-    -- upvalues: v2 (copy), v1 (copy), v5 (ref), v4 (ref), l_RunService_0 (copy), v3 (ref)
-    assert(type(v6) == "number", "Bad argument #1 to Interval.every, must be a number.");
-    assert(v6 == v6, "Bad argument #1 to Interval.every, must not be NaN.");
-    assert(v6 < 1e999, "Bad argument #1 to Interval.every, must not be infinity.");
-    if v6 < 0.016666666666666666 then
-        warn("Interval.every: duration is less than 1/60, changing to 1/60");
-        v6 = 0.016666666666666666;
-    end;
-    local v7 = {};
-    setmetatable(v7, v2);
-    v7._signal = v1.new();
-    local v8 = {
-        signal = v7._signal, 
-        endTime = os.clock() + v6, 
-        duration = v6
-    };
-    v5(v8);
-    if v4 == nil then
-        v4 = l_RunService_0.Heartbeat:Connect(function() --[[ Line: 35 ]]
-            -- upvalues: v3 (ref), v5 (ref)
-            debug.profilebegin("Std::Interval");
-            local v9 = os.clock();
-            while v3 ~= nil and v3.endTime <= v9 do
-                local l_v3_0 = v3;
-                v3 = l_v3_0.next;
-                if v3 then
-                    v3.previous = nil;
-                end;
-                local v11 = l_v3_0.endTime - l_v3_0.duration;
-                l_v3_0.endTime = l_v3_0.endTime + l_v3_0.duration;
-                l_v3_0.next = nil;
-                v5(l_v3_0);
-                l_v3_0.signal:Fire(v9 - v11);
-            end;
-            debug.profileend();
-        end);
-    end;
-    v7._node = v8;
-    return v7;
-end;
-v5 = function(v12) --[[ Line: 67 ]] --[[ Name: _insert ]]
-    -- upvalues: v3 (ref)
-    if v3 == nil then
-        v3 = v12;
-        return;
-    else
-        if v3.endTime < v12.endTime then
-            local l_v3_1 = v3;
-            local l_next_0 = l_v3_1.next;
-            while l_next_0 ~= nil and l_next_0.endTime < v12.endTime do
-                l_v3_1 = l_next_0;
-                l_next_0 = l_v3_1.next;
-            end;
-            l_v3_1.next = v12;
-            v12.previous = l_v3_1;
-            if l_next_0 ~= nil then
-                v12.next = l_next_0;
-                l_next_0.previous = v12;
-                return;
-            end;
-        else
-            v12.next = v3;
-            v3.previous = v12;
-            v3 = v12;
-        end;
-        return;
-    end;
-end;
-local function _(v15) --[[ Line: 99 ]] --[[ Name: _remove ]]
-    -- upvalues: v3 (ref), v4 (ref)
-    local l_next_1 = v15.next;
-    if v3 == v15 then
-        if l_next_1 == nil then
-            v4:Disconnect();
-            v4 = nil;
-        else
-            l_next_1.previous = nil;
-        end;
-        v3 = l_next_1;
-        return;
-    else
-        local l_previous_0 = v15.previous;
-        l_previous_0.next = l_next_1;
-        if l_next_1 ~= nil then
-            l_next_1.previous = l_previous_0;
-        end;
-        return;
-    end;
-end;
-v2.Connect = function(v19, v20) --[[ Line: 122 ]] --[[ Name: Connect ]]
-    v19._signal:Connect(v20);
-    return v19;
-end;
-v2.Destroy = function(v21) --[[ Line: 127 ]] --[[ Name: Destroy ]]
-    -- upvalues: v3 (ref), v4 (ref)
-    local l__node_0 = v21._node;
-    local l_next_2 = l__node_0.next;
-    if v3 == l__node_0 then
-        if l_next_2 == nil then
-            v4:Disconnect();
-            v4 = nil;
-        else
-            l_next_2.previous = nil;
-        end;
-        v3 = l_next_2;
-    else
-        local l_previous_1 = l__node_0.previous;
-        l_previous_1.next = l_next_2;
-        if l_next_2 ~= nil then
-            l_next_2.previous = l_previous_1;
-        end;
-    end;
-    v21._signal:Destroy();
-    v21._signal = nil;
-end;
-v2.Disconnect = v2.Destroy;
-return v2;
+local RunService = game:GetService("RunService")
+local Signal = require(script.Parent.Signal)
+local t = {}
+t.__index = t
+local v1 = nil
+local function _getCallerName(p1) --[[ Line: 10 ]]
+	local count = 0
+	for v2 in p1:gmatch("[^\n]+") do
+		local v1
+		count = count + 1
+		if count == 2 then
+			local v3 = v2:match("%.?([%w_]+):%d+")
+			local v4 = v2:match("function (%w+)")
+			if v3 and v4 then
+				return v3 .. "." .. v4
+			else
+				v1 = v4 or (v3 or "Unknown")
+				return v1
+			end
+		end
+	end
+	return "Unknown"
+end
+local function _insert(p1) --[[ Line: 29 | Upvalues: v1 (ref) ]]
+	if v1 == nil then
+		v1 = p1
+	elseif v1.endTime < p1.endTime then
+		local v12 = v1
+		local v2 = v12.next
+		while v2 ~= nil and v2.endTime < p1.endTime do
+			v2, v12 = v2.next, v2
+		end
+		v12.next = p1
+		p1.previous = v12
+		if v2 ~= nil then
+			p1.next = v2
+			v2.previous = p1
+		end
+	else
+		p1.next = v1
+		v1.previous = p1
+		v1 = p1
+	end
+end
+RunService.Heartbeat:Connect(function() --[[ Line: 62 | Upvalues: v1 (ref), _insert (ref) ]]
+	local v12 = os.clock()
+	while v1 ~= nil and v1.endTime <= v12 do
+		local v2 = v1
+		v1 = v2.next
+		if v1 then
+			v1.previous = nil
+		end
+		local v3 = v2.endTime - v2.duration
+		v2.endTime = v2.endTime + v2.duration
+		v2.next = nil
+		_insert(v2)
+		debug.profilebegin("Interval::" .. v2.name)
+		v2.signal:Fire(v12 - v3)
+		debug.profileend()
+	end
+end)
+function t.every(p1) --[[ Line: 84 | Upvalues: t (copy), Signal (copy), _getCallerName (copy), _insert (ref) ]]
+	assert(type(p1) == "number", "Bad argument #1 to Interval.every, must be a number.")
+	assert(p1 == p1, "Bad argument #1 to Interval.every, must not be NaN.")
+	assert(p1 < (1 / 0), "Bad argument #1 to Interval.every, must not be infinity.")
+	if not (p1 >= 1 / 60) then
+		warn("Interval.every: duration is less than 1/60, changing to 1/60")
+		p1 = 1 / 60
+	end
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._signal = Signal.new()
+	local t3 = {
+		name = _getCallerName((debug.traceback())),
+		signal = t2._signal,
+		endTime = os.clock() + p1,
+		duration = p1
+	}
+	_insert(t3)
+	t2._node = t3
+	return t2
+end
+local function _remove(p1) --[[ Line: 115 | Upvalues: v1 (ref) ]]
+	local v12 = p1.next
+	if v1 == p1 then
+		if v12 ~= nil then
+			v12.previous = nil
+		end
+		v1 = v12
+	else
+		local previous = p1.previous
+		previous.next = v12
+		if v12 ~= nil then
+			v12.previous = previous
+		end
+	end
+end
+function t.Connect(p1, p2) --[[ Line: 135 ]]
+	p1._signal:Connect(p2)
+	return p1
+end
+function t.Destroy(p1) --[[ Line: 140 | Upvalues: v1 (ref) ]]
+	local _node = p1._node
+	local v12 = _node.next
+	if v1 == _node then
+		if v12 ~= nil then
+			v12.previous = nil
+		end
+		v1 = v12
+	else
+		local previous = _node.previous
+		previous.next = v12
+		if v12 ~= nil then
+			v12.previous = previous
+		end
+	end
+	p1._signal:Destroy()
+	p1._signal = nil
+end
+t.Disconnect = t.Destroy
+return t

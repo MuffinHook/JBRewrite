@@ -1,38 +1,35 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local AirDropConsts_upvr = require(ReplicatedStorage.AirDrop.AirDropConsts)
-local module = {
-    getPlayerIsInAmbulanceStretcher = function(arg1) -- Line 8, Named "getPlayerIsInAmbulanceStretcher"
-        assert(arg1, "No player passed")
-        local SOME = arg1:FindFirstChild(AirDropConsts_upvr.IN_AMBULANCE_STRETCHER_OBJ_NAME)
-        if not SOME then
-            return false
-        end
-        return SOME.Value
-    end;
-    setPlayerIsInAmbulanceStretcher = function(arg1, arg2) -- Line 16, Named "setPlayerIsInAmbulanceStretcher"
-        local var5 = arg1
-        assert(var5, "No player passed")
-        if typeof(arg2) ~= "boolean" then
-            var5 = false
-        else
-            var5 = true
-        end
-        assert(var5, "Incorrect value type passed")
-        if not arg1:FindFirstChild(AirDropConsts_upvr.IN_AMBULANCE_STRETCHER_OBJ_NAME) then
-            local BoolValue = Instance.new("BoolValue")
-            BoolValue.Name = AirDropConsts_upvr.IN_AMBULANCE_STRETCHER_OBJ_NAME
-            BoolValue.Parent = arg1
-        end
-        BoolValue.Value = arg2
-        return true
-    end;
+local AirDropConsts = require(ReplicatedStorage.AirDrop.AirDropConsts)
+local Players = game:GetService("Players")
+local RunUtils = require(ReplicatedStorage.App.RunUtils)
+return {
+	getPlayerIsInAmbulanceStretcher = function(p1) --[[ Name: getPlayerIsInAmbulanceStretcher | Line: 8 | Upvalues: AirDropConsts (copy) ]]
+		assert(p1, "No player passed")
+		local v1 = p1:FindFirstChild(AirDropConsts.IN_AMBULANCE_STRETCHER_OBJ_NAME)
+		if v1 then
+			return v1.Value
+		else
+			return false
+		end
+	end,
+	setPlayerIsInAmbulanceStretcher = function(p1, p2) --[[ Name: setPlayerIsInAmbulanceStretcher | Line: 16 | Upvalues: AirDropConsts (copy) ]]
+		assert(p1, "No player passed")
+		assert(typeof(p2) == "boolean", "Incorrect value type passed")
+		local v2 = p1:FindFirstChild(AirDropConsts.IN_AMBULANCE_STRETCHER_OBJ_NAME)
+		if not v2 then
+			local v3 = Instance.new("BoolValue")
+			v3.Name = AirDropConsts.IN_AMBULANCE_STRETCHER_OBJ_NAME
+			v3.Parent = p1
+			v2 = v3
+		end
+		v2.Value = p2
+		return true
+	end,
+	getGuardHealthDebuffMultiplier = function() --[[ Name: getGuardHealthDebuffMultiplier | Line: 29 | Upvalues: RunUtils (copy), Players (copy) ]]
+		if RunUtils.isVIPServer() then
+			return 1
+		else
+			return (30 - math.min(#Players:GetPlayers(), 30)) / 60 + 0.5
+		end
+	end
 }
-local RunUtils_upvr = require(ReplicatedStorage.App.RunUtils)
-local Players_upvr = game:GetService("Players")
-function module.getGuardHealthDebuffMultiplier() -- Line 29
-    if RunUtils_upvr.isVIPServer() then
-        return 1
-    end
-    return (30 - math.min(#Players_upvr:GetPlayers(), 30)) / 60 + 0.5
-end
-return module

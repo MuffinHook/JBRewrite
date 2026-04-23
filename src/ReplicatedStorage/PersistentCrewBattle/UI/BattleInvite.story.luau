@@ -1,19 +1,18 @@
-local Roact_upvr = require(game:GetService("ReplicatedStorage").Roact)
-return function(arg1) -- Line 4
-    local any_extend_result1 = Roact_upvr.Component:extend("App")
-    function any_extend_result1.init(arg1_2) -- Line 7
-    end
-    local BattleInvite_upvr = require(script.Parent.BattleInvite)
-    function any_extend_result1.render(arg1_3) -- Line 8
-        return Roact_upvr.createElement(BattleInvite_upvr, {
-            battleNumPlayersPerTeam = 3;
-            ranked = true;
-        })
-    end
-    function any_extend_result1.willUnmount(arg1_4) -- Line 17
-    end
-    local any_mount_result1_upvr = Roact_upvr.mount(Roact_upvr.createElement(any_extend_result1), arg1)
-    return function() -- Line 20
-        Roact_upvr.unmount(any_mount_result1_upvr)
-    end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+return function(p1) --[[ Line: 4 | Upvalues: Roact (copy) ]]
+	local v1 = Roact.Component:extend("App")
+	local BattleInvite = require(script.Parent.BattleInvite)
+	function v1.init(p1) --[[ Line: 7 ]] end
+	function v1.render(p1) --[[ Line: 8 | Upvalues: Roact (ref), BattleInvite (copy) ]]
+		return Roact.createElement(BattleInvite, {
+			battleNumPlayersPerTeam = 3,
+			ranked = true
+		})
+	end
+	function v1.willUnmount(p1) --[[ Line: 17 ]] end
+	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	return function() --[[ Line: 20 | Upvalues: Roact (ref), v2 (copy) ]]
+		Roact.unmount(v2)
+	end
 end

@@ -1,349 +1,284 @@
-return function(arg1, arg2) -- Line 3
-    local function _(arg1_2, arg2_2) -- Line 4, Named "openTab"
-        if 0 < arg1_2.state.index.value then
-        else
-            arg1_2.state.index:set(arg2_2)
-        end
-    end
-    local function closeTab_upvr(arg1_3, arg2_3) -- Line 12, Named "closeTab"
-        if arg1_3.state.index.value ~= arg2_3 then
-        else
-            for i_2 = arg2_3 - 1, 1, -1 do
-                if arg1_3.Tabs[i_2].state.isOpened.value == true then
-                    arg1_3.state.index:set(i_2)
-                    return
-                end
-            end
-            for i_3 = arg2_3, #arg1_3.Tabs do
-                if arg1_3.Tabs[i_3].state.isOpened.value == true then
-                    arg1_3.state.index:set(i_3)
-                    return
-                end
-            end
-            arg1_3.state.index:set(0)
-        end
-    end
-    local tbl = {
-        hasState = true;
-        hasChildren = true;
-        Args = {};
-        Events = {};
-    }
-    local function Generate(arg1_4) -- Line 43
-        local Frame_2 = Instance.new("Frame")
-        Frame_2.Name = "Iris_TabBar"
-        Frame_2.AutomaticSize = Enum.AutomaticSize.Y
-        Frame_2.Size = UDim2.fromScale(1, 0)
-        Frame_2.BackgroundTransparency = 1
-        Frame_2.BorderSizePixel = 0
-        arg2.UIListLayout(Frame_2, Enum.FillDirection.Vertical, UDim.new()).VerticalAlignment = Enum.VerticalAlignment.Bottom
-        local Frame_3 = Instance.new("Frame")
-        Frame_3.Name = "Bar"
-        Frame_3.AutomaticSize = Enum.AutomaticSize.Y
-        Frame_3.Size = UDim2.fromScale(1, 0)
-        Frame_3.BackgroundTransparency = 1
-        Frame_3.BorderSizePixel = 0
-        arg2.UIListLayout(Frame_3, Enum.FillDirection.Horizontal, UDim.new(0, arg1._config.ItemInnerSpacing.X))
-        Frame_3.Parent = Frame_2
-        local Frame_5 = Instance.new("Frame")
-        Frame_5.Name = "Underline"
-        Frame_5.Size = UDim2.new(1, 0, 0, 1)
-        Frame_5.BackgroundColor3 = arg1._config.TabActiveColor
-        Frame_5.BackgroundTransparency = arg1._config.TabActiveTransparency
-        Frame_5.BorderSizePixel = 0
-        Frame_5.LayoutOrder = 1
-        Frame_5.Parent = Frame_2
-        local Frame_4 = Instance.new("Frame")
-        Frame_4.Name = "TabContainer"
-        Frame_4.AutomaticSize = Enum.AutomaticSize.Y
-        Frame_4.Size = UDim2.fromScale(1, 0)
-        Frame_4.BackgroundTransparency = 1
-        Frame_4.BorderSizePixel = 0
-        Frame_4.LayoutOrder = 2
-        Frame_4.ClipsDescendants = true
-        Frame_4.Parent = Frame_2
-        arg1_4.ChildContainer = Frame_4
-        arg1_4.Tabs = {}
-        return Frame_2
-    end
-    tbl.Generate = Generate
-    local function Update(arg1_5) -- Line 90
-    end
-    tbl.Update = Update
-    local function ChildAdded(arg1_6, arg2_4) -- Line 91
-        local var9
-        if arg2_4.type ~= "Tab" then
-            var9 = false
-        else
-            var9 = true
-        end
-        assert(var9, "Only Iris.Tab can be parented to Iris.TabBar.")
-        var9 = arg2_4.ChildContainer
-        var9.Parent = arg1_6.ChildContainer
-        var9 = #arg1_6.Tabs + 1
-        arg2_4.Index = var9
-        var9 = arg1_6.state
-        var9 = var9.index
-        var9 = var9.ConnectedWidgets
-        var9[arg2_4.ID] = arg2_4
-        var9 = table.insert
-        var9(arg1_6.Tabs, arg2_4)
-        var9 = arg1_6.Instance.Bar
-        return var9
-    end
-    tbl.ChildAdded = ChildAdded
-    function tbl.ChildDiscarded(arg1_7, arg2_5) -- Line 101
-        local Index = arg2_5.Index
-        table.remove(arg1_7.Tabs, Index)
-        for i = Index, #arg1_7.Tabs do
-            arg1_7.Tabs[i].Index = i
-        end
-        closeTab_upvr(arg1_7, Index)
-    end
-    local function GenerateState(arg1_8) -- Line 111
-        if arg1_8.state.index == nil then
-            arg1_8.state.index = arg1._widgetState(arg1_8, "index", 1)
-        end
-    end
-    tbl.GenerateState = GenerateState
-    local function UpdateState(arg1_9) -- Line 116
-    end
-    tbl.UpdateState = UpdateState
-    local function Discard(arg1_10) -- Line 118
-        arg1_10.Instance:Destroy()
-    end
-    tbl.Discard = Discard
-    arg1.WidgetConstructor("TabBar", tbl)
-    local tbl_2 = {
-        hasState = true;
-        hasChildren = true;
-        Args = {
-            Text = 1;
-            Hideable = 2;
-        };
-        Events = {
-            clicked = arg2.EVENTS.click(function(arg1_11) -- Line 132
-                return arg1_11.Instance
-            end);
-            hovered = arg2.EVENTS.hover(function(arg1_12) -- Line 135
-                return arg1_12.Instance
-            end);
-            selected = {
-                Init = function(arg1_13) -- Line 139
-                end;
-                Get = function(arg1_14) -- Line 140
-                    local var20
-                    if arg1_14.lastSelectedTick ~= arg1._cycleTick then
-                        var20 = false
-                    else
-                        var20 = true
-                    end
-                    return var20
-                end;
-            };
-            unselected = {
-                Init = function(arg1_15) -- Line 145
-                end;
-                Get = function(arg1_16) -- Line 146
-                    local var24
-                    if arg1_16.lastUnselectedTick ~= arg1._cycleTick then
-                        var24 = false
-                    else
-                        var24 = true
-                    end
-                    return var24
-                end;
-            };
-            active = {
-                Init = function(arg1_17) -- Line 151
-                end;
-                Get = function(arg1_18) -- Line 152
-                    local var28
-                    if arg1_18.state.index.value ~= arg1_18.Index then
-                        var28 = false
-                    else
-                        var28 = true
-                    end
-                    return var28
-                end;
-            };
-            opened = {
-                Init = function(arg1_19) -- Line 157
-                end;
-                Get = function(arg1_20) -- Line 158
-                    local var32
-                    if arg1_20.lastOpenedTick ~= arg1._cycleTick then
-                        var32 = false
-                    else
-                        var32 = true
-                    end
-                    return var32
-                end;
-            };
-            closed = {
-                Init = function(arg1_21) -- Line 163
-                end;
-                Get = function(arg1_22) -- Line 164
-                    local var36
-                    if arg1_22.lastClosedTick ~= arg1._cycleTick then
-                        var36 = false
-                    else
-                        var36 = true
-                    end
-                    return var36
-                end;
-            };
-        };
-    }
-    function tbl_2.Generate(arg1_23) -- Line 169
-        local TextButton_2 = Instance.new("TextButton")
-        TextButton_2.Name = "Iris_Tab"
-        TextButton_2.AutomaticSize = Enum.AutomaticSize.XY
-        TextButton_2.BackgroundColor3 = arg1._config.TabColor
-        TextButton_2.BackgroundTransparency = arg1._config.TabTransparency
-        TextButton_2.BorderSizePixel = 0
-        TextButton_2.Text = ""
-        TextButton_2.AutoButtonColor = false
-        arg1_23.ButtonColors = {
-            Color = arg1._config.TabColor;
-            Transparency = arg1._config.TabTransparency;
-            HoveredColor = arg1._config.TabHoveredColor;
-            HoveredTransparency = arg1._config.TabHoveredTransparency;
-            ActiveColor = arg1._config.TabActiveColor;
-            ActiveTransparency = arg1._config.TabActiveTransparency;
-        }
-        arg2.UIPadding(TextButton_2, Vector2.new(arg1._config.FramePadding.X, 0))
-        arg2.applyFrameStyle(TextButton_2, true, true)
-        arg2.UIListLayout(TextButton_2, Enum.FillDirection.Horizontal, UDim.new(0, arg1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
-        arg2.applyInteractionHighlights("Background", TextButton_2, TextButton_2, arg1_23.ButtonColors)
-        arg2.applyButtonClick(TextButton_2, function() -- Line 192
-            arg1_23.state.index:set(arg1_23.Index)
-        end)
-        local TextLabel = Instance.new("TextLabel")
-        TextLabel.Name = "TextLabel"
-        TextLabel.AutomaticSize = Enum.AutomaticSize.XY
-        TextLabel.BackgroundTransparency = 1
-        TextLabel.BorderSizePixel = 0
-        arg2.applyTextStyle(TextLabel)
-        arg2.UIPadding(TextLabel, Vector2.new(0, arg1._config.FramePadding.Y))
-        TextLabel.Parent = TextButton_2
-        local var41 = arg1._config.TextSize + (arg1._config.FramePadding.Y - 1) * 2
-        local TextButton = Instance.new("TextButton")
-        TextButton.Name = "CloseButton"
-        TextButton.Size = UDim2.fromOffset(var41, var41)
-        TextButton.BackgroundTransparency = 1
-        TextButton.BorderSizePixel = 0
-        TextButton.Text = ""
-        TextButton.AutoButtonColor = false
-        TextButton.LayoutOrder = 1
-        arg2.UICorner(TextButton)
-        arg2.applyButtonClick(TextButton, function() -- Line 219
-            arg1_23.state.isOpened:set(false)
-            closeTab_upvr(arg1_23.parentWidget, arg1_23.Index)
-        end)
-        arg2.applyInteractionHighlights("Background", TextButton, TextButton, {
-            Color = arg1._config.TabColor;
-            Transparency = 1;
-            HoveredColor = arg1._config.ButtonHoveredColor;
-            HoveredTransparency = arg1._config.ButtonHoveredTransparency;
-            ActiveColor = arg1._config.ButtonActiveColor;
-            ActiveTransparency = arg1._config.ButtonActiveTransparency;
-        })
-        TextButton.Parent = TextButton_2
-        local ImageLabel = Instance.new("ImageLabel")
-        ImageLabel.Name = "Icon"
-        ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-        ImageLabel.Position = UDim2.fromScale(0.5, 0.5)
-        ImageLabel.Size = UDim2.fromOffset(math.floor(0.7 * var41), math.floor(0.7 * var41))
-        ImageLabel.BackgroundTransparency = 1
-        ImageLabel.BorderSizePixel = 0
-        ImageLabel.Image = arg2.ICONS.MULTIPLICATION_SIGN
-        ImageLabel.ImageTransparency = 1
-        arg2.applyInteractionHighlights("Image", TextButton_2, ImageLabel, {
-            Color = arg1._config.TextColor;
-            Transparency = 1;
-            HoveredColor = arg1._config.TextColor;
-            HoveredTransparency = arg1._config.TextTransparency;
-            ActiveColor = arg1._config.TextColor;
-            ActiveTransparency = arg1._config.TextTransparency;
-        })
-        ImageLabel.Parent = TextButton
-        local Frame = Instance.new("Frame")
-        Frame.Name = "TabContainer"
-        Frame.AutomaticSize = Enum.AutomaticSize.Y
-        Frame.Size = UDim2.fromScale(1, 0)
-        Frame.BackgroundTransparency = 1
-        Frame.BorderSizePixel = 0
-        Frame.ClipsDescendants = true
-        arg2.UIListLayout(Frame, Enum.FillDirection.Vertical, UDim.new(0, arg1._config.ItemSpacing.Y))
-        arg2.UIPadding(Frame, Vector2.new(0, arg1._config.ItemSpacing.Y)).PaddingBottom = UDim.new()
-        arg1_23.ChildContainer = Frame
-        return TextButton_2
-    end
-    function tbl_2.Update(arg1_24) -- Line 270
-        local Instance_2 = arg1_24.Instance
-        local Text = arg1_24.arguments.Text
-        Instance_2.TextLabel.Text = Text
-        if arg1_24.arguments.Hideable == true then
-            Text = true
-        else
-            Text = false
-        end
-        Instance_2.CloseButton.Visible = Text
-    end
-    function tbl_2.ChildAdded(arg1_25, arg2_6) -- Line 278
-        return arg1_25.ChildContainer
-    end
-    function tbl_2.GenerateState(arg1_26) -- Line 281
-        arg1_26.state.index = arg1_26.parentWidget.state.index
-        arg1_26.state.index.ConnectedWidgets[arg1_26.ID] = arg1_26
-        if arg1_26.state.isOpened == nil then
-            arg1_26.state.isOpened = arg1._widgetState(arg1_26, "isOpened", true)
-        end
-    end
-    function tbl_2.UpdateState(arg1_27) -- Line 289
-        local Instance = arg1_27.Instance
-        local ChildContainer = arg1_27.ChildContainer
-        if arg1_27.state.isOpened.lastChangeTick == arg1._cycleTick then
-            if arg1_27.state.isOpened.value == true then
-                arg1_27.lastOpenedTick = arg1._cycleTick + 1
-                local parentWidget = arg1_27.parentWidget
-                if 0 < parentWidget.state.index.value then
-                else
-                    parentWidget.state.index:set(arg1_27.Index)
-                end
-                Instance.Visible = true
-            else
-                arg1_27.lastClosedTick = arg1._cycleTick + 1
-                closeTab_upvr(arg1_27.parentWidget, arg1_27.Index)
-                Instance.Visible = false
-            end
-        end
-        if arg1_27.state.index.lastChangeTick == arg1._cycleTick then
-            if arg1_27.state.index.value == arg1_27.Index then
-                arg1_27.ButtonColors.Color = arg1._config.TabActiveColor
-                arg1_27.ButtonColors.Transparency = arg1._config.TabActiveTransparency
-                Instance.BackgroundColor3 = arg1._config.TabActiveColor
-                Instance.BackgroundTransparency = arg1._config.TabActiveTransparency
-                ChildContainer.Visible = true
-                arg1_27.lastSelectedTick = arg1._cycleTick + 1
-                return
-            end
-            arg1_27.ButtonColors.Color = arg1._config.TabColor
-            arg1_27.ButtonColors.Transparency = arg1._config.TabTransparency
-            Instance.BackgroundColor3 = arg1._config.TabColor
-            Instance.BackgroundTransparency = arg1._config.TabTransparency
-            ChildContainer.Visible = false
-            arg1_27.lastUnselectedTick = arg1._cycleTick + 1
-        end
-    end
-    function tbl_2.Discard(arg1_28) -- Line 323
-        if arg1_28.state.isOpened.value == true then
-            closeTab_upvr(arg1_28.parentWidget, arg1_28.Index)
-        end
-        arg1_28.Instance:Destroy()
-        arg1_28.ChildContainer:Destroy()
-        arg2.discardState(arg1_28)
-    end
-    arg1.WidgetConstructor("Tab", tbl_2)
+require(script.Parent.Parent.Types)
+return function(p1, p2) --[[ Line: 3 ]]
+	local function openTab(p1, p2) --[[ Line: 4 ]]
+		if not (p1.state.index.value > 0) then
+			p1.state.index:set(p2)
+		end
+	end
+	local function closeTab(p1, p2) --[[ Line: 12 ]]
+		if p1.state.index.value == p2 then
+			for i = p2 - 1, 1, -1 do
+				if p1.Tabs[i].state.isOpened.value == true then
+					p1.state.index:set(i)
+					return
+				end
+			end
+			for j = p2, #p1.Tabs do
+				if p1.Tabs[j].state.isOpened.value == true then
+					p1.state.index:set(j)
+					return
+				end
+			end
+			p1.state.index:set(0)
+		end
+	end
+	p1.WidgetConstructor("TabBar", {
+		hasState = true,
+		hasChildren = true,
+		Args = {},
+		Events = {},
+		Generate = function(p12) --[[ Name: Generate | Line: 43 | Upvalues: p2 (copy), p1 (copy) ]]
+			local Iris_TabBar = Instance.new("Frame")
+			Iris_TabBar.Name = "Iris_TabBar"
+			Iris_TabBar.AutomaticSize = Enum.AutomaticSize.Y
+			Iris_TabBar.Size = UDim2.fromScale(1, 0)
+			Iris_TabBar.BackgroundTransparency = 1
+			Iris_TabBar.BorderSizePixel = 0
+			p2.UIListLayout(Iris_TabBar, Enum.FillDirection.Vertical, UDim.new()).VerticalAlignment = Enum.VerticalAlignment.Bottom
+			local Bar = Instance.new("Frame")
+			Bar.Name = "Bar"
+			Bar.AutomaticSize = Enum.AutomaticSize.Y
+			Bar.Size = UDim2.fromScale(1, 0)
+			Bar.BackgroundTransparency = 1
+			Bar.BorderSizePixel = 0
+			p2.UIListLayout(Bar, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X))
+			Bar.Parent = Iris_TabBar
+			local Underline = Instance.new("Frame")
+			Underline.Name = "Underline"
+			Underline.Size = UDim2.new(1, 0, 0, 1)
+			Underline.BackgroundColor3 = p1._config.TabActiveColor
+			Underline.BackgroundTransparency = p1._config.TabActiveTransparency
+			Underline.BorderSizePixel = 0
+			Underline.LayoutOrder = 1
+			Underline.Parent = Iris_TabBar
+			local TabContainer = Instance.new("Frame")
+			TabContainer.Name = "TabContainer"
+			TabContainer.AutomaticSize = Enum.AutomaticSize.Y
+			TabContainer.Size = UDim2.fromScale(1, 0)
+			TabContainer.BackgroundTransparency = 1
+			TabContainer.BorderSizePixel = 0
+			TabContainer.LayoutOrder = 2
+			TabContainer.ClipsDescendants = true
+			TabContainer.Parent = Iris_TabBar
+			p12.ChildContainer = TabContainer
+			p12.Tabs = {}
+			return Iris_TabBar
+		end,
+		Update = function(p1) --[[ Name: Update | Line: 90 ]] end,
+		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 91 ]]
+			assert(p2.type == "Tab", "Only Iris.Tab can be parented to Iris.TabBar.")
+			p2.ChildContainer.Parent = p1.ChildContainer
+			p2.Index = #p1.Tabs + 1
+			p1.state.index.ConnectedWidgets[p2.ID] = p2
+			table.insert(p1.Tabs, p2)
+			return p1.Instance.Bar
+		end,
+		ChildDiscarded = function(p1, p2) --[[ Name: ChildDiscarded | Line: 101 | Upvalues: closeTab (copy) ]]
+			local Index = p2.Index
+			table.remove(p1.Tabs, Index)
+			for i = Index, #p1.Tabs do
+				p1.Tabs[i].Index = i
+			end
+			closeTab(p1, Index)
+		end,
+		GenerateState = function(p12) --[[ Name: GenerateState | Line: 111 | Upvalues: p1 (copy) ]]
+			if p12.state.index == nil then
+				p12.state.index = p1._widgetState(p12, "index", 1)
+			end
+		end,
+		UpdateState = function(p1) --[[ Name: UpdateState | Line: 116 ]] end,
+		Discard = function(p1) --[[ Name: Discard | Line: 118 ]]
+			p1.Instance:Destroy()
+		end
+	})
+	p1.WidgetConstructor("Tab", {
+		hasState = true,
+		hasChildren = true,
+		Args = {
+			Text = 1,
+			Hideable = 2
+		},
+		Events = {
+			clicked = p2.EVENTS.click(function(p1) --[[ Line: 132 ]]
+				return p1.Instance
+			end),
+			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 135 ]]
+				return p1.Instance
+			end),
+			selected = {
+				Init = function(p1) --[[ Line: 139 ]] end,
+				Get = function(p12) --[[ Line: 140 | Upvalues: p1 (copy) ]]
+					return p12.lastSelectedTick == p1._cycleTick
+				end
+			},
+			unselected = {
+				Init = function(p1) --[[ Line: 145 ]] end,
+				Get = function(p12) --[[ Line: 146 | Upvalues: p1 (copy) ]]
+					return p12.lastUnselectedTick == p1._cycleTick
+				end
+			},
+			active = {
+				Init = function(p1) --[[ Line: 151 ]] end,
+				Get = function(p1) --[[ Line: 152 ]]
+					return p1.state.index.value == p1.Index
+				end
+			},
+			opened = {
+				Init = function(p1) --[[ Line: 157 ]] end,
+				Get = function(p12) --[[ Line: 158 | Upvalues: p1 (copy) ]]
+					return p12.lastOpenedTick == p1._cycleTick
+				end
+			},
+			closed = {
+				Init = function(p1) --[[ Line: 163 ]] end,
+				Get = function(p12) --[[ Line: 164 | Upvalues: p1 (copy) ]]
+					return p12.lastClosedTick == p1._cycleTick
+				end
+			}
+		},
+		Generate = function(p12) --[[ Name: Generate | Line: 169 | Upvalues: p1 (copy), p2 (copy), closeTab (copy) ]]
+			local Iris_Tab = Instance.new("TextButton")
+			Iris_Tab.Name = "Iris_Tab"
+			Iris_Tab.AutomaticSize = Enum.AutomaticSize.XY
+			Iris_Tab.BackgroundColor3 = p1._config.TabColor
+			Iris_Tab.BackgroundTransparency = p1._config.TabTransparency
+			Iris_Tab.BorderSizePixel = 0
+			Iris_Tab.Text = ""
+			Iris_Tab.AutoButtonColor = false
+			p12.ButtonColors = {
+				Color = p1._config.TabColor,
+				Transparency = p1._config.TabTransparency,
+				HoveredColor = p1._config.TabHoveredColor,
+				HoveredTransparency = p1._config.TabHoveredTransparency,
+				ActiveColor = p1._config.TabActiveColor,
+				ActiveTransparency = p1._config.TabActiveTransparency
+			}
+			p2.UIPadding(Iris_Tab, Vector2.new(p1._config.FramePadding.X, 0))
+			p2.applyFrameStyle(Iris_Tab, true, true)
+			p2.UIListLayout(Iris_Tab, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
+			p2.applyInteractionHighlights("Background", Iris_Tab, Iris_Tab, p12.ButtonColors)
+			p2.applyButtonClick(Iris_Tab, function() --[[ Line: 192 | Upvalues: p12 (copy) ]]
+				p12.state.index:set(p12.Index)
+			end)
+			local TextLabel = Instance.new("TextLabel")
+			TextLabel.Name = "TextLabel"
+			TextLabel.AutomaticSize = Enum.AutomaticSize.XY
+			TextLabel.BackgroundTransparency = 1
+			TextLabel.BorderSizePixel = 0
+			p2.applyTextStyle(TextLabel)
+			p2.UIPadding(TextLabel, Vector2.new(0, p1._config.FramePadding.Y))
+			TextLabel.Parent = Iris_Tab
+			local v1 = p1._config.TextSize + (p1._config.FramePadding.Y - 1) * 2
+			local CloseButton = Instance.new("TextButton")
+			CloseButton.Name = "CloseButton"
+			CloseButton.Size = UDim2.fromOffset(v1, v1)
+			CloseButton.BackgroundTransparency = 1
+			CloseButton.BorderSizePixel = 0
+			CloseButton.Text = ""
+			CloseButton.AutoButtonColor = false
+			CloseButton.LayoutOrder = 1
+			p2.UICorner(CloseButton)
+			p2.applyButtonClick(CloseButton, function() --[[ Line: 219 | Upvalues: p12 (copy), closeTab (ref) ]]
+				p12.state.isOpened:set(false)
+				closeTab(p12.parentWidget, p12.Index)
+			end)
+			p2.applyInteractionHighlights("Background", CloseButton, CloseButton, {
+				Color = p1._config.TabColor,
+				Transparency = 1,
+				HoveredColor = p1._config.ButtonHoveredColor,
+				HoveredTransparency = p1._config.ButtonHoveredTransparency,
+				ActiveColor = p1._config.ButtonActiveColor,
+				ActiveTransparency = p1._config.ButtonActiveTransparency
+			})
+			CloseButton.Parent = Iris_Tab
+			local Icon = Instance.new("ImageLabel")
+			Icon.Name = "Icon"
+			Icon.AnchorPoint = Vector2.new(0.5, 0.5)
+			Icon.Position = UDim2.fromScale(0.5, 0.5)
+			Icon.Size = UDim2.fromOffset(math.floor(0.7 * v1), (math.floor(0.7 * v1)))
+			Icon.BackgroundTransparency = 1
+			Icon.BorderSizePixel = 0
+			Icon.Image = p2.ICONS.MULTIPLICATION_SIGN
+			Icon.ImageTransparency = 1
+			p2.applyInteractionHighlights("Image", Iris_Tab, Icon, {
+				Color = p1._config.TextColor,
+				Transparency = 1,
+				HoveredColor = p1._config.TextColor,
+				HoveredTransparency = p1._config.TextTransparency,
+				ActiveColor = p1._config.TextColor,
+				ActiveTransparency = p1._config.TextTransparency
+			})
+			Icon.Parent = CloseButton
+			local TabContainer = Instance.new("Frame")
+			TabContainer.Name = "TabContainer"
+			TabContainer.AutomaticSize = Enum.AutomaticSize.Y
+			TabContainer.Size = UDim2.fromScale(1, 0)
+			TabContainer.BackgroundTransparency = 1
+			TabContainer.BorderSizePixel = 0
+			TabContainer.ClipsDescendants = true
+			p2.UIListLayout(TabContainer, Enum.FillDirection.Vertical, UDim.new(0, p1._config.ItemSpacing.Y))
+			p2.UIPadding(TabContainer, Vector2.new(0, p1._config.ItemSpacing.Y)).PaddingBottom = UDim.new()
+			p12.ChildContainer = TabContainer
+			return Iris_Tab
+		end,
+		Update = function(p1) --[[ Name: Update | Line: 270 ]]
+			local v1 = p1.Instance
+			v1.TextLabel.Text = p1.arguments.Text
+			v1.CloseButton.Visible = p1.arguments.Hideable == true
+		end,
+		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 278 ]]
+			return p1.ChildContainer
+		end,
+		GenerateState = function(p12) --[[ Name: GenerateState | Line: 281 | Upvalues: p1 (copy) ]]
+			p12.state.index = p12.parentWidget.state.index
+			p12.state.index.ConnectedWidgets[p12.ID] = p12
+			if p12.state.isOpened == nil then
+				p12.state.isOpened = p1._widgetState(p12, "isOpened", true)
+			end
+		end,
+		UpdateState = function(p12) --[[ Name: UpdateState | Line: 289 | Upvalues: p1 (copy), closeTab (copy) ]]
+			local v1 = p12.Instance
+			local ChildContainer = p12.ChildContainer
+			if p12.state.isOpened.lastChangeTick == p1._cycleTick then
+				if p12.state.isOpened.value == true then
+					p12.lastOpenedTick = p1._cycleTick + 1
+					local parentWidget = p12.parentWidget
+					local Index = p12.Index
+					if not (parentWidget.state.index.value > 0) then
+						parentWidget.state.index:set(Index)
+					end
+					v1.Visible = true
+				else
+					p12.lastClosedTick = p1._cycleTick + 1
+					closeTab(p12.parentWidget, p12.Index)
+					v1.Visible = false
+				end
+			end
+			if p12.state.index.lastChangeTick == p1._cycleTick then
+				if p12.state.index.value == p12.Index then
+					p12.ButtonColors.Color = p1._config.TabActiveColor
+					p12.ButtonColors.Transparency = p1._config.TabActiveTransparency
+					v1.BackgroundColor3 = p1._config.TabActiveColor
+					v1.BackgroundTransparency = p1._config.TabActiveTransparency
+					ChildContainer.Visible = true
+					p12.lastSelectedTick = p1._cycleTick + 1
+					return
+				end
+				p12.ButtonColors.Color = p1._config.TabColor
+				p12.ButtonColors.Transparency = p1._config.TabTransparency
+				v1.BackgroundColor3 = p1._config.TabColor
+				v1.BackgroundTransparency = p1._config.TabTransparency
+				ChildContainer.Visible = false
+				p12.lastUnselectedTick = p1._cycleTick + 1
+			end
+		end,
+		Discard = function(p1) --[[ Name: Discard | Line: 323 | Upvalues: closeTab (copy), p2 (copy) ]]
+			if p1.state.isOpened.value == true then
+				closeTab(p1.parentWidget, p1.Index)
+			end
+			p1.Instance:Destroy()
+			p1.ChildContainer:Destroy()
+			p2.discardState(p1)
+		end
+	})
 end

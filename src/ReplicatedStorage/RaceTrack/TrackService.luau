@@ -1,5 +1,6 @@
-local module = {}
-local any_createBinding_result1, any_createBinding_result2 = require(game:GetService("ReplicatedStorage").Roact).createBinding("")
-module.screenText = any_createBinding_result1
-module.updateScreenText = any_createBinding_result2
-return module
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local t = {}
+local v1, v2 = require(ReplicatedStorage.Roact).createBinding("")
+t.screenText = v1
+t.updateScreenText = v2
+return t

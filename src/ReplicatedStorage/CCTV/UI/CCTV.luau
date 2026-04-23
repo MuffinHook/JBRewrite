@@ -1,334 +1,280 @@
+local RunService = game:GetService("RunService")
+local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local Roact_upvr = require(ReplicatedStorage.Roact)
-local CollectionService_upvr = game:GetService("CollectionService")
-local function wipeTags_upvr(arg1) -- Line 12, Named "wipeTags"
-    for _, v in ipairs(CollectionService_upvr:GetTags(arg1)) do
-        CollectionService_upvr:RemoveTag(arg1, v)
-    end
+local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Interval = require(ReplicatedStorage.Std.Interval)
+local Roact = require(ReplicatedStorage.Roact)
+local BaseObject = require(ReplicatedStorage.Std.BaseObject)
+local createElement = Roact.createElement
+local function wipeTags(p1) --[[ Line: 12 | Upvalues: CollectionService (copy) ]]
+	for i, v in ipairs((CollectionService:GetTags(p1))) do
+		CollectionService:RemoveTag(p1, v)
+	end
 end
-local function _(arg1) -- Line 18, Named "wipeTagsRecursively"
-    wipeTags_upvr(arg1)
-    for _, v_2 in ipairs(arg1:GetDescendants()) do
-        wipeTags_upvr(v_2)
-    end
+local function wipeTagsRecursively(p1) --[[ Line: 18 | Upvalues: wipeTags (copy) ]]
+	wipeTags(p1)
+	for i, v in ipairs(p1:GetDescendants()) do
+		wipeTags(v)
+	end
 end
-local tbl_9_upvr = {}
-tbl_9_upvr.__index = tbl_9_upvr
-function tbl_9_upvr.new(arg1) -- Line 27
-    local module_2 = {}
-    setmetatable(module_2, tbl_9_upvr)
-    module_2.character = arg1
-    module_2._maid = Maid_upvr.new()
-    module_2.onScreen = false
-    module_2.lastOnScreenChanged = 0
-    local Model_upvr = Instance.new("Model")
-    local tbl_4_upvr = {}
-    local function shouldCopy_upvr(arg1_2) -- Line 41, Named "shouldCopy"
-        if arg1_2:IsA("BasePart") or arg1_2:IsA("Shirt") or arg1_2:IsA("Pants") or arg1_2:IsA("CharacterMesh") or arg1_2:IsA("WrapTarget") or arg1_2:IsA("Decal") or arg1_2:IsA("Accessory") or arg1_2:IsA("Humanoid") then
-            return true
-        end
-        return false
-    end
-    local function copy_upvr(arg1_3, arg2) -- Line 56, Named "copy"
-        -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-        local clone_3 = arg1_3:Clone()
-        if not clone_3 then return end
-        if arg1_3:IsA("CharacterAppearance") then
-            local SOME_2 = arg2:FindFirstChild(clone_3.Name)
-            if SOME_2 then
-                tbl_4_upvr[SOME_2] = nil
-                SOME_2:Destroy()
-            end
-        end
-        clone_3:ClearAllChildren()
-        clone_3.Parent = arg2
-        wipeTags_upvr(clone_3)
-        if clone_3:IsA("BasePart") then
-            clone_3.Anchored = true
-            tbl_4_upvr[clone_3] = arg1_3
-        elseif clone_3:IsA("Humanoid") then
-            clone_3.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-        end
-        for _, v_3 in ipairs(arg1_3:GetChildren()) do
-            copy_upvr(v_3, clone_3)
-        end
-        return clone_3
-    end
-    for _, v_4 in ipairs(arg1:GetChildren()) do
-        if not shouldCopy_upvr(v_4) then
-        else
-            copy_upvr(v_4, Model_upvr)
-        end
-    end
-    module_2._maid:GiveTask(arg1.ChildAdded:Connect(function(arg1_4) -- Line 82, Named "handleObj"
-        if not shouldCopy_upvr(arg1_4) then
-        else
-            copy_upvr(arg1_4, Model_upvr)
-        end
-    end))
-    module_2.characterClone = Model_upvr
-    module_2.cloneRef = tbl_4_upvr
-    module_2._maid:GiveTask(Model_upvr)
-    return module_2
+local t = {}
+t.__index = t
+function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), wipeTags (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2.character = p1
+	t2._maid = Maid.new()
+	t2.onScreen = false
+	t2.lastOnScreenChanged = 0
+	local Model = Instance.new("Model")
+	local t3 = {}
+	local function shouldCopy(p1) --[[ Line: 41 ]]
+		return (p1:IsA("BasePart") or (p1:IsA("Shirt") or (p1:IsA("Pants") or (p1:IsA("CharacterMesh") or (p1:IsA("WrapTarget") or (p1:IsA("Decal") or (p1:IsA("Accessory") or p1:IsA("Humanoid")))))))) and true or false
+	end
+	local function v2(p1, p2) --[[ Line: 56 | Upvalues: t3 (copy), wipeTags (ref), v2 (copy) ]]
+		local v1 = p1:Clone()
+		if v1 then
+			if p1:IsA("CharacterAppearance") then
+				local v22 = p2:FindFirstChild(v1.Name)
+				if v22 then
+					t3[v22] = nil
+					v22:Destroy()
+				end
+			end
+			v1:ClearAllChildren()
+			v1.Parent = p2
+			wipeTags(v1)
+			if v1:IsA("BasePart") then
+				v1.Anchored = true
+				t3[v1] = p1
+			elseif v1:IsA("Humanoid") then
+				v1.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+			end
+			for i, v in ipairs(p1:GetChildren()) do
+				v2(v, v1)
+			end
+			return v1
+		end
+	end
+	local function handleObj(p1) --[[ Line: 82 | Upvalues: shouldCopy (copy), v2 (copy), Model (copy) ]]
+		if shouldCopy(p1) then
+			v2(p1, Model)
+		end
+	end
+	for i, v in ipairs(p1:GetChildren()) do
+		if shouldCopy(v) then
+			v2(v, Model)
+		end
+	end
+	t2._maid:GiveTask(p1.ChildAdded:Connect(handleObj))
+	t2.characterClone = Model
+	t2.cloneRef = t3
+	t2._maid:GiveTask(Model)
+	return t2
 end
-function tbl_9_upvr.Update(arg1) -- Line 98
-    for i_5, v_5 in pairs(arg1.cloneRef) do
-        i_5.CFrame = v_5.CFrame
-    end
+function t.Update(p1) --[[ Line: 98 ]]
+	for k, v in pairs(p1.cloneRef) do
+		k.CFrame = v.CFrame
+	end
 end
-function tbl_9_upvr.Destroy(arg1) -- Line 103
-    arg1._maid:Destroy()
-    setmetatable(arg1, nil)
+function t.Destroy(p1) --[[ Line: 103 ]]
+	p1._maid:Destroy()
+	setmetatable(p1, nil)
 end
-local any_extend_result1 = Roact_upvr.PureComponent:extend("CCTV")
-any_extend_result1.defaultProps = {
-    active = true;
+local v1 = Roact.PureComponent:extend("CCTV")
+v1.defaultProps = {
+	active = true
 }
-function any_extend_result1.init(arg1) -- Line 112
-    arg1.cameraRef = Roact_upvr.createRef()
-    arg1.viewportRef = Roact_upvr.createRef()
-    arg1.fuzzRef = Roact_upvr.createRef()
-    arg1._maid = Maid_upvr.new()
+function v1.init(p1) --[[ Line: 112 | Upvalues: Roact (copy), Maid (copy) ]]
+	p1.cameraRef = Roact.createRef()
+	p1.viewportRef = Roact.createRef()
+	p1.fuzzRef = Roact.createRef()
+	p1._maid = Maid.new()
 end
-local createElement_upvr = Roact_upvr.createElement
-function any_extend_result1.render(arg1) -- Line 118
-    local module = {}
-    local var55 = 0
-    module.BorderSizePixel = var55
-    local var56
-    if not arg1.props.disabled then
-        var55 = 1
-    else
-        var55 = 0
-    end
-    module.BackgroundTransparency = var55
-    module.BackgroundColor3 = Color3.new(0.4, 0, 0)
-    module.Size = arg1.props.size
-    module.Position = arg1.props.position
-    module.LayoutOrder = arg1.props.layoutOrder
-    module.AnchorPoint = Vector2.new(0.5, 0.5)
-    module.ClipsDescendants = true
-    local module_3 = {}
-    local tbl_5 = {}
-    var56 = UDim.new(0.015625, 0)
-    tbl_5.CornerRadius = var56
-    module_3.UICorner = createElement_upvr("UICorner", tbl_5)
-    local tbl_2 = {}
-    var56 = Color3.new(1, 0, 0)
-    tbl_2.Color = var56
-    var56 = 2
-    tbl_2.Thickness = var56
-    var56 = arg1.props
-    var56 = var56.active
-    tbl_2.Enabled = var56
-    module_3.UIStroke = createElement_upvr("UIStroke", tbl_2)
-    local tbl_8 = {}
-    var56 = arg1.props
-    var56 = var56.aspectRatio
-    tbl_8.AspectRatio = var56
-    module_3.AspectRatio = createElement_upvr("UIAspectRatioConstraint", tbl_8)
-    local tbl_3 = {}
-    var56 = 1
-    tbl_3.BackgroundTransparency = var56
-    var56 = UDim2.new(1, 0, 1, 0)
-    tbl_3.Size = var56
-    var56 = arg1.cameraRef
-    tbl_3.CurrentCamera = var56
-    var56 = 1
-    tbl_3.ZIndex = var56
-    var56 = not arg1.props.disabled
-    tbl_3.Visible = var56
-    var56 = Roact_upvr
-    var56 = var56.Ref
-    tbl_3[var56] = arg1.viewportRef
-    var56 = {}
-    var56.UICorner = createElement_upvr("UICorner", {
-        CornerRadius = UDim.new(0.015625, 0);
-    })
-    var56.Camera = createElement_upvr("Camera", {
-        FieldOfView = arg1.props.fieldOfView;
-        CFrame = arg1.props.cameraCFrame;
-        [Roact_upvr.Ref] = arg1.cameraRef;
-    })
-    module_3.ViewportFrame = createElement_upvr("ViewportFrame", tbl_3, var56)
-    local tbl = {}
-    var56 = 1
-    tbl.BackgroundTransparency = var56
-    var56 = "rbxassetid://8260530429"
-    tbl.Image = var56
-    var56 = 0.5
-    tbl.ImageTransparency = var56
-    var56 = UDim2.new(1.1, 0, 1.1, 0)
-    tbl.Size = var56
-    var56 = UDim2.new(0.5, 0, 0.5, 0)
-    tbl.Position = var56
-    var56 = Vector2.new(0.5, 0.5)
-    tbl.AnchorPoint = var56
-    var56 = 10
-    tbl.ZIndex = var56
-    var56 = Roact_upvr
-    var56 = var56.Ref
-    tbl[var56] = arg1.fuzzRef
-    var56 = {}
-    var56.UICorner = createElement_upvr("UICorner", {
-        CornerRadius = UDim.new(0.015625, 0);
-    })
-    module_3.Fuzz = createElement_upvr("ImageLabel", tbl, var56)
-    local tbl_6 = {}
-    var56 = arg1.props
-    var56 = var56.flash
-    tbl_6.BackgroundTransparency = var56
-    var56 = Color3.new(1, 1, 1)
-    tbl_6.BackgroundColor3 = var56
-    var56 = UDim2.new(1, 1, 1)
-    tbl_6.Size = var56
-    var56 = 20
-    tbl_6.ZIndex = var56
-    if arg1.props.flash == nil then
-        var56 = false
-    else
-        var56 = true
-    end
-    tbl_6.Visible = var56
-    module_3.Flash = createElement_upvr("Frame", tbl_6)
-    return createElement_upvr("Frame", module, module_3)
+function v1.render(p1) --[[ Line: 118 | Upvalues: createElement (copy), Roact (copy) ]]
+	local t = {
+		BorderSizePixel = 0
+	}
+	t.BackgroundTransparency = if p1.props.disabled then 0 else 1
+	t.BackgroundColor3 = Color3.new(102/255, 0/255, 0/255)
+	t.Size = p1.props.size
+	t.Position = p1.props.position
+	t.LayoutOrder = p1.props.layoutOrder
+	t.AnchorPoint = Vector2.new(0.5, 0.5)
+	t.ClipsDescendants = true
+	local t2 = {
+		UICorner = createElement("UICorner", {
+			CornerRadius = UDim.new(0.015625, 0)
+		}),
+		UIStroke = createElement("UIStroke", {
+			Color = Color3.new(255/255, 0/255, 0/255),
+			Thickness = 2,
+			Enabled = p1.props.active
+		}),
+		AspectRatio = createElement("UIAspectRatioConstraint", {
+			AspectRatio = p1.props.aspectRatio
+		}),
+		ViewportFrame = createElement("ViewportFrame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			CurrentCamera = p1.cameraRef,
+			ZIndex = 1,
+			Visible = not p1.props.disabled,
+			[Roact.Ref] = p1.viewportRef
+		}, {
+			UICorner = createElement("UICorner", {
+				CornerRadius = UDim.new(0.015625, 0)
+			}),
+			Camera = createElement("Camera", {
+				FieldOfView = p1.props.fieldOfView,
+				CFrame = p1.props.cameraCFrame,
+				[Roact.Ref] = p1.cameraRef
+			})
+		}),
+		Fuzz = createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			Image = "rbxassetid://8260530429",
+			ImageTransparency = 0.5,
+			Size = UDim2.new(1.1, 0, 1.1, 0),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			ZIndex = 10,
+			[Roact.Ref] = p1.fuzzRef
+		}, {
+			UICorner = createElement("UICorner", {
+				CornerRadius = UDim.new(0.015625, 0)
+			})
+		})
+	}
+	local t3 = {
+		BackgroundTransparency = p1.props.flash,
+		BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
+		Size = UDim2.new(1, 1, 1),
+		ZIndex = 20
+	}
+	t3.Visible = p1.props.flash ~= nil
+	t2.Flash = createElement("Frame", t3)
+	return createElement("Frame", t, t2)
 end
-function any_extend_result1._clear(arg1) -- Line 181
-    for _, v_6 in ipairs(arg1.viewportRef:getValue():GetChildren()) do
-        if not v_6:IsA("UICorner") and not v_6:IsA("Camera") then
-            v_6:Destroy()
-        end
-    end
+function v1._clear(p1) --[[ Line: 181 ]]
+	for i, v in ipairs(p1.viewportRef:getValue():GetChildren()) do
+		if not (v:IsA("UICorner") or v:IsA("Camera")) then
+			v:Destroy()
+		end
+	end
 end
-local Players_upvr = game:GetService("Players")
-local ManifestBinder_upvr = require(ReplicatedStorage.ManifestBinder)
-local BaseObject_upvr = require(ReplicatedStorage.Std.BaseObject)
-local Interval_upvr = require(ReplicatedStorage.Std.Interval)
-local RunService_upvr = game:GetService("RunService")
-function any_extend_result1._redraw(arg1) -- Line 189
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    arg1:_clear()
-    local any_new_result1_5 = Maid_upvr.new()
-    arg1._maid.canvasMaid = any_new_result1_5
-    local any_getValue_result1_upvr = arg1.viewportRef:getValue()
-    local distance = arg1.props.distance
-    local cameraCFrame_upvr = arg1.props.cameraCFrame
-    local var113 = 2 * distance * math.tan(math.rad(arg1.props.fieldOfView / 2))
-    local vector3 = Vector3.new(var113 * arg1.props.aspectRatio, var113, distance)
-    local tbl_7 = {workspace:FindFirstChild("Items")}
-    for _, v_7 in ipairs(Players_upvr:GetPlayers()) do
-        if v_7.Character then
-            table.insert(tbl_7, v_7.Character)
-        end
-    end
-    local OverlapParams_new_result1 = OverlapParams.new()
-    OverlapParams_new_result1.FilterType = Enum.RaycastFilterType.Blacklist
-    OverlapParams_new_result1.FilterDescendantsInstances = tbl_7
-    for _, v_8 in ipairs(workspace:GetPartBoundsInBox(cameraCFrame_upvr * CFrame.new(0, 0, -vector3.z * 0.5), vector3, OverlapParams_new_result1)) do
-        local clone = v_8:Clone()
-        if clone then
-            wipeTags_upvr(clone)
-            for _, v_9 in ipairs(clone:GetDescendants()) do
-                wipeTags_upvr(v_9)
-            end
-            clone.Parent = any_getValue_result1_upvr
-        end
-    end
-    local any_new_result1 = ManifestBinder_upvr.new("Character", {
-        HumanoidRootPart = "HumanoidRootPart";
-    }, function(arg1_5) -- Line 222
-        return BaseObject_upvr.new(arg1_5)
-    end)
-    any_new_result1:Start()
-    local tbl_10_upvr = {}
-    local function _(arg1_6) -- Line 234, Named "onCharacterAdded"
-        local any_new_result1_3 = tbl_9_upvr.new(arg1_6)
-        tbl_10_upvr[arg1_6] = any_new_result1_3
-        any_new_result1_3.characterClone.Parent = any_getValue_result1_upvr
-    end
-    local function _(arg1_7) -- Line 239, Named "onCharacterRemoving"
-        local var132 = tbl_10_upvr[arg1_7]
-        if var132 then
-            var132:Destroy()
-        end
-        tbl_10_upvr[arg1_7] = nil
-    end
-    for _, v_10 in any_new_result1:GetAll() do
-        local obj_3 = v_10.obj
-        local any_new_result1_4 = tbl_9_upvr.new(obj_3)
-        tbl_10_upvr[obj_3] = any_new_result1_4
-        any_new_result1_4.characterClone.Parent = any_getValue_result1_upvr
-        local var138_upvr
-    end
-    any_new_result1:GetClassAddedSignal():Connect(function(arg1_8) -- Line 249
-        local obj = arg1_8.obj
-        local any_new_result1_2 = tbl_9_upvr.new(obj)
-        var138_upvr[obj] = any_new_result1_2
-        any_new_result1_2.characterClone.Parent = any_getValue_result1_upvr
-    end)
-    any_new_result1:GetClassRemovingSignal():Connect(function(arg1_9) -- Line 252
-        local obj_2 = arg1_9.obj
-        local var144 = var138_upvr[obj_2]
-        if var144 then
-            var144:Destroy()
-        end
-        var138_upvr[obj_2] = nil
-    end)
-    any_new_result1_5:GiveTask(function() -- Line 255
-        for _, v_11 in var138_upvr do
-            v_11:Destroy()
-        end
-        table.clear(var138_upvr)
-    end)
-    any_new_result1_5:GiveTask(Interval_upvr.every(0.1):Connect(function() -- Line 262
-        for _, v_12 in var138_upvr do
-            local PrimaryPart_2 = v_12.character.PrimaryPart
-            local var161
-            if PrimaryPart_2 then
-                var161 = cameraCFrame_upvr
-                var161 = var161.p
-                local var162 = PrimaryPart_2.Position - var161
-                var161 = false
-                if var162.Magnitude < arg1.props.distance then
-                    if math.cos(math.rad(arg1.props.aspectRatio * arg1.props.fieldOfView / 2)) >= var162.Unit:Dot(cameraCFrame_upvr.LookVector) then
-                        var161 = false
-                    else
-                        var161 = true
-                    end
-                end
-                if var161 ~= v_12.onScreen then
-                    v_12.onScreen = var161
-                    v_12.lastOnScreenChanged = os.clock()
-                    if var161 and arg1.props.onCharacterEnter then
-                        arg1.props.onCharacterEnter(v_12.character)
-                    end
-                end
-            end
-            local function decompInlinedCondition_2() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-                return os.clock() - v_12.lastOnScreenChanged < 1
-            end
-            if v_12.onScreen or decompInlinedCondition_2() then
-                v_12:Update()
-            end
-        end
-    end))
-    local var164_upvr = math.random() * 512
-    local any_getValue_result1_upvr_2 = arg1.fuzzRef:getValue()
-    any_new_result1_5:GiveTask(RunService_upvr.Heartbeat:Connect(function() -- Line 294
-        any_getValue_result1_upvr_2.Position = UDim2.new(0.5, 0, math.cos(os.clock() * 512 + var164_upvr) * 0.05 + 0.5, 0)
-    end))
+function v1._redraw(p1) --[[ Line: 189 | Upvalues: Maid (copy), Players (copy), wipeTags (copy), ManifestBinder (copy), BaseObject (copy), t (copy), Interval (copy), RunService (copy) ]]
+	p1:_clear()
+	local v1 = Maid.new()
+	p1._maid.canvasMaid = v1
+	local v2 = p1.viewportRef:getValue()
+	local distance = p1.props.distance
+	local cameraCFrame = p1.props.cameraCFrame
+	local v5 = 2 * distance * math.tan((math.rad(p1.props.fieldOfView / 2)))
+	local v7 = Vector3.new(v5 * p1.props.aspectRatio, v5, distance)
+	local t2 = { workspace:FindFirstChild("Items") }
+	for i, v in ipairs(Players:GetPlayers()) do
+		if v.Character then
+			table.insert(t2, v.Character)
+		end
+	end
+	local v8 = OverlapParams.new()
+	v8.FilterType = Enum.RaycastFilterType.Blacklist
+	v8.FilterDescendantsInstances = t2
+	for i, v in ipairs((workspace:GetPartBoundsInBox(cameraCFrame * CFrame.new(0, 0, -v7.z * 0.5), v7, v8))) do
+		local v10 = v:Clone()
+		if v10 then
+			wipeTags(v10)
+			for i2, v11 in ipairs(v10:GetDescendants()) do
+				wipeTags(v11)
+			end
+			v10.Parent = v2
+		end
+	end
+	local v11 = ManifestBinder.new("Character", {
+		HumanoidRootPart = "HumanoidRootPart"
+	}, function(p1) --[[ Line: 222 | Upvalues: BaseObject (ref) ]]
+		return BaseObject.new(p1)
+	end)
+	v11:Start()
+	local t3 = {}
+	local function onCharacterAdded(p1) --[[ Line: 234 | Upvalues: t (ref), t3 (copy), v2 (copy) ]]
+		local v1 = t.new(p1)
+		t3[p1] = v1
+		v1.characterClone.Parent = v2
+	end
+	local function onCharacterRemoving(p1) --[[ Line: 239 | Upvalues: t3 (copy) ]]
+		local v1 = t3[p1]
+		if v1 then
+			v1:Destroy()
+		end
+		t3[p1] = nil
+	end
+	for v12, v13 in v11:GetAll() do
+		local obj = v13.obj
+		local v14 = t.new(obj)
+		t3[obj] = v14
+		v14.characterClone.Parent = v2
+	end
+	v11:GetClassAddedSignal():Connect(function(p1) --[[ Line: 249 | Upvalues: t (ref), t3 (copy), v2 (copy) ]]
+		local obj = p1.obj
+		local v1 = t.new(obj)
+		t3[obj] = v1
+		v1.characterClone.Parent = v2
+	end)
+	v11:GetClassRemovingSignal():Connect(function(p1) --[[ Line: 252 | Upvalues: t3 (copy) ]]
+		local obj = p1.obj
+		local v1 = t3[obj]
+		if v1 then
+			v1:Destroy()
+		end
+		t3[obj] = nil
+	end)
+	v1:GiveTask(function() --[[ Line: 255 | Upvalues: t3 (copy) ]]
+		for v1, v2 in t3 do
+			v2:Destroy()
+		end
+		table.clear(t3)
+	end)
+	v1:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 262 | Upvalues: t3 (copy), cameraCFrame (copy), p1 (copy) ]]
+		local v1 = os.clock()
+		for v3, v4 in t3 do
+			local v2
+			local PrimaryPart = v4.character.PrimaryPart
+			if PrimaryPart then
+				local v5 = PrimaryPart.Position - cameraCFrame.p
+				local v6 = v5.Unit:Dot(cameraCFrame.LookVector)
+				v2 = if v5.Magnitude < p1.props.distance then math.cos((math.rad(p1.props.aspectRatio * p1.props.fieldOfView / 2))) < v6 else false
+				if v2 ~= v4.onScreen then
+					v4.onScreen = v2
+					v4.lastOnScreenChanged = v1
+					if v2 and p1.props.onCharacterEnter then
+						p1.props.onCharacterEnter(v4.character)
+					end
+				end
+			end
+			if v4.onScreen or v1 - v4.lastOnScreenChanged < 1 then
+				v4:Update()
+			end
+		end
+	end))
+	local v15 = p1.fuzzRef:getValue()
+	local v16 = math.random() * 512
+	v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 294 | Upvalues: v16 (copy), v15 (copy) ]]
+		v15.Position = UDim2.new(0.5, 0, math.cos(os.clock() * 512 + v16) * 0.05 + 0.5, 0)
+	end))
 end
-function any_extend_result1.didUpdate(arg1, arg2) -- Line 299
-    if 0.1 < (arg1.props.cameraCFrame.p - arg2.cameraCFrame.p).Magnitude then
-        arg1:_redraw()
-    end
+function v1.didUpdate(p1, p2) --[[ Line: 299 ]]
+	if (p1.props.cameraCFrame.p - p2.cameraCFrame.p).Magnitude > 0.1 then
+		p1:_redraw()
+	end
 end
-function any_extend_result1.didMount(arg1) -- Line 304
-    arg1:_redraw()
+function v1.didMount(p1) --[[ Line: 304 ]]
+	p1:_redraw()
 end
-function any_extend_result1.willUnmount(arg1) -- Line 307
-    arg1._maid:DoCleaning()
+function v1.willUnmount(p1) --[[ Line: 307 ]]
+	p1._maid:DoCleaning()
 end
-return any_extend_result1
+return v1

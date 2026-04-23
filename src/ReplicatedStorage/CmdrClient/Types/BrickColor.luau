@@ -1,44 +1,246 @@
-local Util_upvr = require(script.Parent.Parent.Shared.Util)
-local tbl_upvr = {
-    Prefixes = "% teamColor";
+local Util = require(script.Parent.Parent.Shared.Util)
+local v1 = Util.MakeFuzzyFinder({
+	"White",
+	"Grey",
+	"Light yellow",
+	"Brick yellow",
+	"Light green (Mint)",
+	"Light reddish violet",
+	"Pastel Blue",
+	"Light orange brown",
+	"Nougat",
+	"Bright red",
+	"Med. reddish violet",
+	"Bright blue",
+	"Bright yellow",
+	"Earth orange",
+	"Black",
+	"Dark grey",
+	"Dark green",
+	"Medium green",
+	"Lig. Yellowich orange",
+	"Bright green",
+	"Dark orange",
+	"Light bluish violet",
+	"Transparent",
+	"Tr. Red",
+	"Tr. Lg blue",
+	"Tr. Blue",
+	"Tr. Yellow",
+	"Light blue",
+	"Tr. Flu. Reddish orange",
+	"Tr. Green",
+	"Tr. Flu. Green",
+	"Phosph. White",
+	"Light red",
+	"Medium red",
+	"Medium blue",
+	"Light grey",
+	"Bright violet",
+	"Br. yellowish orange",
+	"Bright orange",
+	"Bright bluish green",
+	"Earth yellow",
+	"Bright bluish violet",
+	"Tr. Brown",
+	"Medium bluish violet",
+	"Tr. Medi. reddish violet",
+	"Med. yellowish green",
+	"Med. bluish green",
+	"Light bluish green",
+	"Br. yellowish green",
+	"Lig. yellowish green",
+	"Med. yellowish orange",
+	"Br. reddish orange",
+	"Bright reddish violet",
+	"Light orange",
+	"Tr. Bright bluish violet",
+	"Gold",
+	"Dark nougat",
+	"Silver",
+	"Neon orange",
+	"Neon green",
+	"Sand blue",
+	"Sand violet",
+	"Medium orange",
+	"Sand yellow",
+	"Earth blue",
+	"Earth green",
+	"Tr. Flu. Blue",
+	"Sand blue metallic",
+	"Sand violet metallic",
+	"Sand yellow metallic",
+	"Dark grey metallic",
+	"Black metallic",
+	"Light grey metallic",
+	"Sand green",
+	"Sand red",
+	"Dark red",
+	"Tr. Flu. Yellow",
+	"Tr. Flu. Red",
+	"Gun metallic",
+	"Red flip/flop",
+	"Yellow flip/flop",
+	"Silver flip/flop",
+	"Curry",
+	"Fire Yellow",
+	"Flame yellowish orange",
+	"Reddish brown",
+	"Flame reddish orange",
+	"Medium stone grey",
+	"Royal blue",
+	"Dark Royal blue",
+	"Bright reddish lilac",
+	"Dark stone grey",
+	"Lemon metalic",
+	"Light stone grey",
+	"Dark Curry",
+	"Faded green",
+	"Turquoise",
+	"Light Royal blue",
+	"Medium Royal blue",
+	"Rust",
+	"Brown",
+	"Reddish lilac",
+	"Lilac",
+	"Light lilac",
+	"Bright purple",
+	"Light purple",
+	"Light pink",
+	"Light brick yellow",
+	"Warm yellowish orange",
+	"Cool yellow",
+	"Dove blue",
+	"Medium lilac",
+	"Slime green",
+	"Smoky grey",
+	"Dark blue",
+	"Parsley green",
+	"Steel blue",
+	"Storm blue",
+	"Lapis",
+	"Dark indigo",
+	"Sea green",
+	"Shamrock",
+	"Fossil",
+	"Mulberry",
+	"Forest green",
+	"Cadet blue",
+	"Electric blue",
+	"Eggplant",
+	"Moss",
+	"Artichoke",
+	"Sage green",
+	"Ghost grey",
+	"Lilac",
+	"Plum",
+	"Olivine",
+	"Laurel green",
+	"Quill grey",
+	"Crimson",
+	"Mint",
+	"Baby blue",
+	"Carnation pink",
+	"Persimmon",
+	"Maroon",
+	"Gold",
+	"Daisy orange",
+	"Pearl",
+	"Fog",
+	"Salmon",
+	"Terra Cotta",
+	"Cocoa",
+	"Wheat",
+	"Buttermilk",
+	"Mauve",
+	"Sunrise",
+	"Tawny",
+	"Rust",
+	"Cashmere",
+	"Khaki",
+	"Lily white",
+	"Seashell",
+	"Burgundy",
+	"Cork",
+	"Burlap",
+	"Beige",
+	"Oyster",
+	"Pine Cone",
+	"Fawn brown",
+	"Hurricane grey",
+	"Cloudy grey",
+	"Linen",
+	"Copper",
+	"Dirt brown",
+	"Bronze",
+	"Flint",
+	"Dark taupe",
+	"Burnt Sienna",
+	"Institutional white",
+	"Mid gray",
+	"Really black",
+	"Really red",
+	"Deep orange",
+	"Alder",
+	"Dusty Rose",
+	"Olive",
+	"New Yeller",
+	"Really blue",
+	"Navy blue",
+	"Deep blue",
+	"Cyan",
+	"CGA brown",
+	"Magenta",
+	"Pink",
+	"Deep orange",
+	"Teal",
+	"Toothpaste",
+	"Lime green",
+	"Camo",
+	"Grime",
+	"Lavender",
+	"Pastel light blue",
+	"Pastel orange",
+	"Pastel violet",
+	"Pastel blue-green",
+	"Pastel green",
+	"Pastel yellow",
+	"Pastel brown",
+	"Royal purple",
+	"Hot pink"
+})
+local t = {
+	Prefixes = "% teamColor",
+	Transform = function(p1) --[[ Name: Transform | Line: 219 | Upvalues: v1 (copy) ]]
+		local t = {}
+		for k, v in pairs(v1(p1)) do
+			t[k] = BrickColor.new(v)
+		end
+		return t
+	end,
+	Validate = function(p1) --[[ Name: Validate | Line: 227 ]]
+		return #p1 > 0, "No valid brick colors with that name could be found."
+	end,
+	Autocomplete = function(p1) --[[ Name: Autocomplete | Line: 231 | Upvalues: Util (copy) ]]
+		return Util.GetNames(p1)
+	end,
+	Parse = function(p1) --[[ Name: Parse | Line: 235 ]]
+		return p1[1]
+	end
 }
-local any_MakeFuzzyFinder_result1_upvr = Util_upvr.MakeFuzzyFinder({"White", "Grey", "Light yellow", "Brick yellow", "Light green (Mint)", "Light reddish violet", "Pastel Blue", "Light orange brown", "Nougat", "Bright red", "Med. reddish violet", "Bright blue", "Bright yellow", "Earth orange", "Black", "Dark grey", "Dark green", "Medium green", "Lig. Yellowich orange", "Bright green", "Dark orange", "Light bluish violet", "Transparent", "Tr. Red", "Tr. Lg blue", "Tr. Blue", "Tr. Yellow", "Light blue", "Tr. Flu. Reddish orange", "Tr. Green", "Tr. Flu. Green", "Phosph. White", "Light red", "Medium red", "Medium blue", "Light grey", "Bright violet", "Br. yellowish orange", "Bright orange", "Bright bluish green", "Earth yellow", "Bright bluish violet", "Tr. Brown", "Medium bluish violet", "Tr. Medi. reddish violet", "Med. yellowish green", "Med. bluish green", "Light bluish green", "Br. yellowish green", "Lig. yellowish green", "Med. yellowish orange", "Br. reddish orange", "Bright reddish violet", "Light orange", "Tr. Bright bluish violet", "Gold", "Dark nougat", "Silver", "Neon orange", "Neon green", "Sand blue", "Sand violet", "Medium orange", "Sand yellow", "Earth blue", "Earth green", "Tr. Flu. Blue", "Sand blue metallic", "Sand violet metallic", "Sand yellow metallic", "Dark grey metallic", "Black metallic", "Light grey metallic", "Sand green", "Sand red", "Dark red", "Tr. Flu. Yellow", "Tr. Flu. Red", "Gun metallic", "Red flip/flop", "Yellow flip/flop", "Silver flip/flop", "Curry", "Fire Yellow", "Flame yellowish orange", "Reddish brown", "Flame reddish orange", "Medium stone grey", "Royal blue", "Dark Royal blue", "Bright reddish lilac", "Dark stone grey", "Lemon metalic", "Light stone grey", "Dark Curry", "Faded green", "Turquoise", "Light Royal blue", "Medium Royal blue", "Rust", "Brown", "Reddish lilac", "Lilac", "Light lilac", "Bright purple", "Light purple", "Light pink", "Light brick yellow", "Warm yellowish orange", "Cool yellow", "Dove blue", "Medium lilac", "Slime green", "Smoky grey", "Dark blue", "Parsley green", "Steel blue", "Storm blue", "Lapis", "Dark indigo", "Sea green", "Shamrock", "Fossil", "Mulberry", "Forest green", "Cadet blue", "Electric blue", "Eggplant", "Moss", "Artichoke", "Sage green", "Ghost grey", "Lilac", "Plum", "Olivine", "Laurel green", "Quill grey", "Crimson", "Mint", "Baby blue", "Carnation pink", "Persimmon", "Maroon", "Gold", "Daisy orange", "Pearl", "Fog", "Salmon", "Terra Cotta", "Cocoa", "Wheat", "Buttermilk", "Mauve", "Sunrise", "Tawny", "Rust", "Cashmere", "Khaki", "Lily white", "Seashell", "Burgundy", "Cork", "Burlap", "Beige", "Oyster", "Pine Cone", "Fawn brown", "Hurricane grey", "Cloudy grey", "Linen", "Copper", "Dirt brown", "Bronze", "Flint", "Dark taupe", "Burnt Sienna", "Institutional white", "Mid gray", "Really black", "Really red", "Deep orange", "Alder", "Dusty Rose", "Olive", "New Yeller", "Really blue", "Navy blue", "Deep blue", "Cyan", "CGA brown", "Magenta", "Pink", "Deep orange", "Teal", "Toothpaste", "Lime green", "Camo", "Grime", "Lavender", "Pastel light blue", "Pastel orange", "Pastel violet", "Pastel blue-green", "Pastel green", "Pastel yellow", "Pastel brown", "Royal purple", "Hot pink"})
-function tbl_upvr.Transform(arg1) -- Line 219
-    local module = {}
-    for i, v in pairs(any_MakeFuzzyFinder_result1_upvr(arg1)) do
-        module[i] = BrickColor.new(v)
-    end
-    return module
-end
-function tbl_upvr.Validate(arg1) -- Line 227
-    local var13
-    if 0 >= #arg1 then
-        var13 = false
-    else
-        var13 = true
-    end
-    return var13, "No valid brick colors with that name could be found."
-end
-function tbl_upvr.Autocomplete(arg1) -- Line 231
-    return Util_upvr.GetNames(arg1)
-end
-local function Parse(arg1) -- Line 235
-    return arg1[1]
-end
-tbl_upvr.Parse = Parse
-local tbl_upvr_2 = {
-    Transform = tbl_upvr.Transform;
-    Validate = tbl_upvr.Validate;
-    Autocomplete = tbl_upvr.Autocomplete;
-    Parse = function(arg1) -- Line 245, Named "Parse"
-        return arg1[1].Color
-    end;
+local t2 = {
+	Transform = t.Transform,
+	Validate = t.Validate,
+	Autocomplete = t.Autocomplete,
+	Parse = function(p1) --[[ Name: Parse | Line: 245 ]]
+		return p1[1].Color
+	end
 }
-return function(arg1) -- Line 250
-    arg1:RegisterType("brickColor", tbl_upvr)
-    arg1:RegisterType("brickColors", Util_upvr.MakeListableType(tbl_upvr, {
-        Prefixes = "% teamColors";
-    }))
-    arg1:RegisterType("brickColor3", tbl_upvr_2)
-    arg1:RegisterType("brickColor3s", Util_upvr.MakeListableType(tbl_upvr_2))
+return function(p1) --[[ Line: 250 | Upvalues: t (copy), Util (copy), t2 (copy) ]]
+	p1:RegisterType("brickColor", t)
+	p1:RegisterType("brickColors", Util.MakeListableType(t, {
+		Prefixes = "% teamColors"
+	}))
+	p1:RegisterType("brickColor3", t2)
+	p1:RegisterType("brickColor3s", Util.MakeListableType(t2))
 end

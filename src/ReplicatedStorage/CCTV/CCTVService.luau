@@ -1,31 +1,32 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_upvr = {
-    onRequestPrompt = require(ReplicatedStorage.Std.Signal).new();
+local Binder = require(ReplicatedStorage.Std.Binder)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Signal = require(ReplicatedStorage.Std.Signal)
+local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
+local CameraBinder = require(script.Parent.CameraBinder)
+local t = {
+	onRequestPrompt = Signal.new()
 }
-local CameraBinder_upvr = require(script.Parent.CameraBinder)
-local Binder_upvr = require(ReplicatedStorage.Std.Binder)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local CircleAction_upvr = require(ReplicatedStorage.Module.UI).CircleAction
-function module_upvr.init() -- Line 12
-    CameraBinder_upvr:Start()
-    Binder_upvr.new("CCTVPrompt", function(arg1) -- Line 15
-        local any_new_result1 = Maid_upvr.new()
-        local tbl = {}
-        tbl.Part = arg1
-        tbl.Name = "Open Security Cameras"
-        tbl.Timed = false
-        tbl.Dist = 8
-        function tbl.Callback(arg1_2, arg2) -- Line 17, Named "action"
-            if arg2 then
-                module_upvr.onRequestPrompt:Fire()
-            end
-            return true
-        end
-        CircleAction_upvr.Add(tbl, arg1)
-        any_new_result1:GiveTask(function() -- Line 31
-            CircleAction_upvr.Remove(arg1)
-        end)
-        return any_new_result1
-    end):Start()
+function t.init() --[[ Line: 12 | Upvalues: CameraBinder (copy), Binder (copy), Maid (copy), t (copy), CircleAction (copy) ]]
+	CameraBinder:Start()
+	Binder.new("CCTVPrompt", function(p1) --[[ Line: 15 | Upvalues: Maid (ref), t (ref), CircleAction (ref) ]]
+		local v1 = Maid.new()
+		CircleAction.Add({
+			Part = p1,
+			Name = "Open Security Cameras",
+			Timed = false,
+			Dist = 8,
+			Callback = function(p1, p2) --[[ Name: action | Line: 17 | Upvalues: t (ref) ]]
+				if p2 then
+					t.onRequestPrompt:Fire()
+				end
+				return true
+			end
+		}, p1)
+		v1:GiveTask(function() --[[ Line: 31 | Upvalues: CircleAction (ref), p1 (copy) ]]
+			CircleAction.Remove(p1)
+		end)
+		return v1
+	end):Start()
 end
-return module_upvr
+return t

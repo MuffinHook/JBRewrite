@@ -1,83 +1,61 @@
-local Roact = require(game:GetService("ReplicatedStorage").Roact)
-local createElement_upvr = Roact.createElement
-local function makeGradient_upvr(arg1, arg2, arg3) -- Line 5, Named "makeGradient"
-    local module = {
-        BackgroundTransparency = 1;
-    }
-    local var4 = 0.5
-    module.Size = UDim2.fromScale(var4, 1)
-    local var5
-    if arg2 then
-        var4 = 0
-    else
-        var4 = 0.5
-    end
-    module.Position = UDim2.fromScale(var4, 0)
-    module.ClipsDescendants = true
-    local module_2 = {}
-    local tbl_2 = {
-        BackgroundTransparency = 1;
-        ImageTransparency = arg1.transparency;
-        ImageColor3 = arg1.color;
-    }
-    var5 = 2
-    tbl_2.Size = UDim2.fromScale(var5, 1)
-    tbl_2.Image = "rbxasset://textures/ui/Controls/RadialFill.png"
-    if arg2 then
-        var5 = 0
-    else
-        var5 = -1
-    end
-    tbl_2.Position = UDim2.fromScale(var5, 0)
-    local tbl = {}
-    var5 = createElement_upvr
-    var5 = var5("UIGradient", {
-        Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(0.4999, 0), NumberSequenceKeypoint.new(0.5, 1), NumberSequenceKeypoint.new(1, 1)});
-        Rotation = arg3:map(function(arg1_2) -- Line 28
-            local var12 = 360
-            local var13
-            if var13 then
-                var12 = 180
-            else
-                var12 = 0
-            end
-            if arg2 then
-                var13 = 360
-            else
-                var13 = 180
-            end
-            return math.clamp(math.clamp(arg1_2 * 360, 0, var12), var12, var13)
-        end);
-    })
-    tbl.Gradient = var5
-    module_2.Image = createElement_upvr("ImageLabel", tbl_2, tbl)
-    return createElement_upvr("Frame", module, module_2)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Roact = require(ReplicatedStorage.Roact)
+local createElement = Roact.createElement
+local function makeGradient(p1, p2, p3) --[[ Line: 5 | Upvalues: createElement (copy) ]]
+	local t = {
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(0.5, 1)
+	}
+	t.Position = UDim2.fromScale(if p2 then 0 else 0.5, 0)
+	t.ClipsDescendants = true
+	local t2 = {}
+	local t3 = {
+		BackgroundTransparency = 1,
+		ImageTransparency = p1.transparency,
+		ImageColor3 = p1.color,
+		Size = UDim2.fromScale(2, 1),
+		Image = "rbxasset://textures/ui/Controls/RadialFill.png"
+	}
+	t3.Position = UDim2.fromScale(if p2 then 0 else -1, 0)
+	t2.Image = createElement("ImageLabel", t3, {
+		Gradient = createElement("UIGradient", {
+			Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 0),
+				NumberSequenceKeypoint.new(0.4999, 0),
+				NumberSequenceKeypoint.new(0.5, 1),
+				NumberSequenceKeypoint.new(1, 1)
+			}),
+			Rotation = p3:map(function(p1) --[[ Line: 28 | Upvalues: p2 (copy) ]]
+				return math.clamp(math.clamp(p1 * 360, 0, 360), if p2 then 180 else 0, if p2 then 360 else 180)
+			end)
+		})
+	})
+	return createElement("Frame", t, t2)
 end
-local any_extend_result1 = Roact.PureComponent:extend("CircularProgressBar")
-any_extend_result1.defaultProps = {
-    size = UDim2.fromScale(1, 1);
-    position = UDim2.fromScale(0.5, 0.5);
-    anchorPoint = Vector2.new(0.5, 0.5);
-    transparency = 0;
-    color = Color3.new(1, 1, 1);
-    zIndex = 1;
+local v1 = Roact.PureComponent:extend("CircularProgressBar")
+v1.defaultProps = {
+	size = UDim2.fromScale(1, 1),
+	position = UDim2.fromScale(0.5, 0.5),
+	anchorPoint = Vector2.new(0.5, 0.5),
+	transparency = 0,
+	color = Color3.new(255/255, 255/255, 255/255),
+	zIndex = 1
 }
-function any_extend_result1.init(arg1) -- Line 46
+function v1.init(p1) --[[ Line: 46 ]] end
+function v1.render(p1) --[[ Line: 47 | Upvalues: createElement (copy), makeGradient (copy) ]]
+	return createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = p1.props.size,
+		Position = p1.props.position,
+		AnchorPoint = p1.props.anchorPoint,
+		ZIndex = p1.props.zIndex,
+		Visible = p1.props.visible
+	}, {
+		UIAspectRatioConstraint = createElement("UIAspectRatioConstraint", {
+			AspectRatio = 1
+		}),
+		Gradient1 = makeGradient(p1.props, true, p1.props.progressBinding),
+		Gradient2 = makeGradient(p1.props, false, p1.props.progressBinding)
+	})
 end
-function any_extend_result1.render(arg1) -- Line 47
-    return createElement_upvr("Frame", {
-        BackgroundTransparency = 1;
-        Size = arg1.props.size;
-        Position = arg1.props.position;
-        AnchorPoint = arg1.props.anchorPoint;
-        ZIndex = arg1.props.zIndex;
-        Visible = arg1.props.visible;
-    }, {
-        UIAspectRatioConstraint = createElement_upvr("UIAspectRatioConstraint", {
-            AspectRatio = 1;
-        });
-        Gradient1 = makeGradient_upvr(arg1.props, true, arg1.props.progressBinding);
-        Gradient2 = makeGradient_upvr(arg1.props, false, arg1.props.progressBinding);
-    })
-end
-return any_extend_result1
+return v1

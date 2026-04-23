@@ -1,44 +1,32 @@
-local module_upvr = {
-    getAll = function(arg1, arg2) -- Line 2, Named "getAll"
-        if arg1 == nil then
-        else
-        end
-        assert(true)
-        if arg2 == nil then
-        else
-        end
-        assert(true)
-        for _, v in ipairs(arg1:GetAll()) do
-            if v:GetOwner() == arg2 then
-                table.insert({}, v)
-            end
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        return {}
-    end,
-    getPool = function(arg1, arg2) -- Line 13, Named "getPool"
-        if arg1 == nil then
-        else
-        end
-        assert(true)
-        if arg2 == nil then
-        else
-        end
-        assert(true)
-        for _, v_2 in ipairs(arg1:GetAll()) do
-            if v_2:GetOwner() == arg2 and v_2:IsInPool() then
-                table.insert({}, v_2)
-            end
-        end
-        -- Decomp Logic Error: Konstant reused an expression here; surrounding logic was preserved for review.
-        return {}
-    end;
+local t = {
+	getAll = function(p1, p2) --[[ Name: getAll | Line: 2 ]]
+		assert(p1 ~= nil)
+		assert(p2 ~= nil)
+		local t = {}
+		for i, v in ipairs(p1:GetAll()) do
+			if v:GetOwner() == p2 then
+				table.insert(t, v)
+			end
+		end
+		return t
+	end,
+	getPool = function(p1, p2) --[[ Name: getPool | Line: 13 ]]
+		assert(p1 ~= nil)
+		assert(p2 ~= nil)
+		local t = {}
+		for i, v in ipairs(p1:GetAll()) do
+			if v:GetOwner() == p2 and v:IsInPool() then
+				table.insert(t, v)
+			end
+		end
+		return t
+	end
 }
-function module_upvr.cleanPool(arg1, arg2) -- Line 24
-    local any_getPool_result1 = module_upvr.getPool(arg1, arg2)
-    print(string.format("removing %d items from pool %s", #any_getPool_result1, arg2.Name))
-    for _, v_3 in ipairs(any_getPool_result1) do
-        v_3._obj:Destroy()
-    end
+function t.cleanPool(p1, p2) --[[ Line: 24 | Upvalues: t (copy) ]]
+	local v1 = t.getPool(p1, p2)
+	print(("removing %d items from pool %s"):format(#v1, p2.Name))
+	for i, v in ipairs(v1) do
+		v._obj:Destroy()
+	end
 end
-return module_upvr
+return t

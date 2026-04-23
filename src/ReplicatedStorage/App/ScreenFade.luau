@@ -1,57 +1,59 @@
-local module_upvr = {}
-module_upvr.__index = module_upvr
-local function _makeFadeGui_upvr() -- Line 10, Named "_makeFadeGui"
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.DisplayOrder = 100
-    ScreenGui.IgnoreGuiInset = true
-    ScreenGui.ClipToDeviceSafeArea = false
-    ScreenGui.ScreenInsets = Enum.ScreenInsets.None
-    ScreenGui.SafeAreaCompatibility = Enum.SafeAreaCompatibility.None
-    ScreenGui.ResetOnSpawn = false
-    ScreenGui.Name = "_Fade"
-    local Frame = Instance.new("Frame")
-    Frame.Position = UDim2.fromScale(0, 0)
-    Frame.Size = UDim2.fromScale(1, 1)
-    Frame.BorderSizePixel = 0
-    Frame.Interactable = false
-    Frame.BackgroundTransparency = 1
-    Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    Frame.Parent = ScreenGui
-    return ScreenGui, Frame
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local Maid = require(ReplicatedStorage.Std.Maid)
+require(ReplicatedStorage.Std.Signal)
+local t = {}
+t.__index = t
+local function _makeFadeGui() --[[ Line: 10 ]]
+	local _Fade = Instance.new("ScreenGui")
+	_Fade.DisplayOrder = 100
+	_Fade.IgnoreGuiInset = true
+	_Fade.ClipToDeviceSafeArea = false
+	_Fade.ScreenInsets = Enum.ScreenInsets.None
+	_Fade.SafeAreaCompatibility = Enum.SafeAreaCompatibility.None
+	_Fade.ResetOnSpawn = false
+	_Fade.Name = "_Fade"
+	local Frame = Instance.new("Frame")
+	Frame.Position = UDim2.fromScale(0, 0)
+	Frame.Size = UDim2.fromScale(1, 1)
+	Frame.BorderSizePixel = 0
+	Frame.Interactable = false
+	Frame.BackgroundTransparency = 1
+	Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	Frame.Parent = _Fade
+	return _Fade, Frame
 end
-local Maid_upvr = require(game:GetService("ReplicatedStorage").Std.Maid)
-local Players_upvr = game:GetService("Players")
-function module_upvr.new() -- Line 29
-    local module = {}
-    setmetatable(module, module_upvr)
-    module.maid = Maid_upvr.new()
-    local _makeFadeGui_result1, _makeFadeGui_result2 = _makeFadeGui_upvr()
-    module.maid:GiveTask(_makeFadeGui_result1)
-    _makeFadeGui_result1.Parent = Players_upvr.LocalPlayer.PlayerGui
-    module.frame = _makeFadeGui_result2
-    return module
+function t.new() --[[ Line: 29 | Upvalues: t (copy), Maid (copy), _makeFadeGui (copy), Players (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2.maid = Maid.new()
+	local v2, v3 = _makeFadeGui()
+	t2.maid:GiveTask(v2)
+	v2.Parent = Players.LocalPlayer.PlayerGui
+	t2.frame = v3
+	return t2
 end
-local TweenService_upvr = game:GetService("TweenService")
-function module_upvr._FadeTo(arg1, arg2, arg3) -- Line 43
-    if arg1._tween then
-        arg1._tween:Cancel()
-    end
-    local tbl = {}
-    tbl.BackgroundTransparency = arg2
-    arg1._tween = TweenService_upvr:Create(arg1.frame, arg3, tbl)
-    arg1._tween:Play()
+function t._FadeTo(p1, p2, p3) --[[ Line: 43 | Upvalues: TweenService (copy) ]]
+	if p1._tween then
+		p1._tween:Cancel()
+	end
+	p1._tween = TweenService:Create(p1.frame, p3, {
+		BackgroundTransparency = p2
+	})
+	p1._tween:Play()
 end
-function module_upvr.FadeToLinear(arg1, arg2, arg3) -- Line 56
-    arg1:_FadeTo(arg2, TweenInfo.new(arg3, 0))
+function t.FadeToLinear(p1, p2, p3) --[[ Line: 56 ]]
+	p1:_FadeTo(p2, TweenInfo.new(p3, 0))
 end
-function module_upvr.Set(arg1, arg2) -- Line 60
-    if arg1._tween then
-        arg1._tween:Cancel()
-    end
-    arg1.frame.BackgroundTransparency = arg2
+function t.Set(p1, p2) --[[ Line: 60 ]]
+	if p1._tween then
+		p1._tween:Cancel()
+	end
+	p1.frame.BackgroundTransparency = p2
 end
-function module_upvr.Destroy(arg1) -- Line 67
-    arg1.maid:Destroy()
-    setmetatable(arg1, nil)
+function t.Destroy(p1) --[[ Line: 67 ]]
+	p1.maid:Destroy()
+	setmetatable(p1, nil)
 end
-return module_upvr
+return t

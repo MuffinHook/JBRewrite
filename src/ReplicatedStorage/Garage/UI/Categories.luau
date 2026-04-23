@@ -1,101 +1,97 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RoactRodux = require(ReplicatedStorage.RoactRodux)
+local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local Roact = require(ReplicatedStorage.Roact)
-local any_extend_result1 = Roact.PureComponent:extend("Categories")
-any_extend_result1.defaultProps = {
-    categoriesPerPage = 10;
+local createElement = Roact.createElement
+local CategoryItem = require(script.Parent.CategoryItem)
+local v1 = Roact.PureComponent:extend("Categories")
+v1.defaultProps = {
+	categoriesPerPage = 10
 }
-function any_extend_result1.init(arg1) -- Line 13
+function v1.init(p1) --[[ Line: 13 ]] end
+function v1.render(p1) --[[ Line: 14 | Upvalues: createElement (copy), CategoryItem (copy), Dictionary (copy) ]]
+	local mainRatio = p1.props.mainRatio
+	local paddingRatio = p1.props.paddingRatio
+	local cornerPixel = p1.props.cornerPixel
+	local categoriesPerPage = p1.props.categoriesPerPage
+	local v2 = 1 / (1 / (mainRatio * categoriesPerPage) - 1 / paddingRatio + 1 / paddingRatio / categoriesPerPage)
+	local t = {}
+	for k, v in pairs(p1.props.categories) do
+		local v3
+		local t2 = {
+			layoutOrder = 2 * k,
+			mainRatio = v2,
+			paddingRatio = paddingRatio,
+			cornerPixel = cornerPixel,
+			title = v.title
+		}
+		v3 = p1.props.selectedCategory == v.name
+		t2.selected = v3
+		function t2.onSelect() --[[ Line: 39 | Upvalues: p1 (copy), v (copy) ]]
+			p1.props.setCategory(v.name, p1.props.sortId)
+		end
+		table.insert(t, (createElement(CategoryItem, t2)))
+		table.insert(t, (createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 0.6,
+			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
+			Size = UDim2.new(1, 0, 1, 0),
+			LayoutOrder = 2 * k + 1
+		}, {
+			AspectRatio = createElement("UIAspectRatioConstraint", {
+				AspectRatio = paddingRatio
+			})
+		})))
+	end
+	return createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 0,
+		BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
+		Size = UDim2.new(1, 0, 1, 0),
+		LayoutOrder = p1.props.layoutOrder
+	}, {
+		AspectRatio = createElement("UIAspectRatioConstraint", {
+			AspectRatio = mainRatio
+		}),
+		UICorner = createElement("UICorner", {
+			CornerRadius = UDim.new(0, cornerPixel)
+		}),
+		ScrollingFrame = createElement("ScrollingFrame", {
+			BackgroundTransparency = 1,
+			BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
+			BorderSizePixel = 0,
+			ScrollBarThickness = 4,
+			ScrollBarImageColor3 = Color3.new(255/255, 255/255, 255/255),
+			CanvasSize = UDim2.new(0, 0, (1 + mainRatio / paddingRatio) * #p1.props.categories / categoriesPerPage - mainRatio / paddingRatio, 0),
+			Size = UDim2.new(1, 0, 1, 0),
+			ElasticBehavior = Enum.ElasticBehavior.Always,
+			VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left,
+			VerticalScrollBarInset = Enum.ScrollBarInset.None,
+			ScrollingDirection = Enum.ScrollingDirection.Y
+		}, Dictionary.merge({
+			ListLayout = createElement("UIListLayout", {
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Top,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical
+			})
+		}, t))
+	})
 end
-local createElement_upvr = Roact.createElement
-local CategoryItem_upvr = require(script.Parent.CategoryItem)
-local Dictionary_upvr = require(ReplicatedStorage.EzUi.Dictionary)
-function any_extend_result1.render(arg1) -- Line 14
-    local mainRatio = arg1.props.mainRatio
-    local paddingRatio = arg1.props.paddingRatio
-    local cornerPixel = arg1.props.cornerPixel
-    local categoriesPerPage = arg1.props.categoriesPerPage
-    local tbl = {}
-    for i, v_upvr in pairs(arg1.props.categories) do
-        local tbl_3 = {
-            layoutOrder = 2 * i;
-            mainRatio = 1 / ((1) / (mainRatio * categoriesPerPage) - 1 / paddingRatio + 1 / paddingRatio / categoriesPerPage);
-            paddingRatio = paddingRatio;
-            cornerPixel = cornerPixel;
-        }
-        local title = v_upvr.title
-        tbl_3.title = title
-        if arg1.props.selectedCategory ~= v_upvr.name then
-            title = false
-        else
-            title = true
-        end
-        tbl_3.selected = title
-        function tbl_3.onSelect() -- Line 39
-            arg1.props.setCategory(v_upvr.name, arg1.props.sortId)
-        end
-        table.insert(tbl, createElement_upvr(CategoryItem_upvr, tbl_3))
-        table.insert(tbl, createElement_upvr("Frame", {
-            BorderSizePixel = 0;
-            BackgroundTransparency = 0.6;
-            BackgroundColor3 = Color3.new(0, 0, 0);
-            Size = UDim2.new(1, 0, 1, 0);
-            LayoutOrder = 2 * i + 1;
-        }, {
-            AspectRatio = createElement_upvr("UIAspectRatioConstraint", {
-                AspectRatio = paddingRatio;
-            });
-        }))
-    end
-    return createElement_upvr("Frame", {
-        BorderSizePixel = 0;
-        BackgroundTransparency = 0;
-        BackgroundColor3 = Color3.new(0.1, 0.1, 0.1);
-        Size = UDim2.new(1, 0, 1, 0);
-        LayoutOrder = arg1.props.layoutOrder;
-    }, {
-        AspectRatio = createElement_upvr("UIAspectRatioConstraint", {
-            AspectRatio = mainRatio;
-        });
-        UICorner = createElement_upvr("UICorner", {
-            CornerRadius = UDim.new(0, cornerPixel);
-        });
-        ScrollingFrame = createElement_upvr("ScrollingFrame", {
-            BackgroundTransparency = 1;
-            BackgroundColor3 = Color3.new(1, 1, 1);
-            BorderSizePixel = 0;
-            ScrollBarThickness = 4;
-            ScrollBarImageColor3 = Color3.new(1, 1, 1);
-            CanvasSize = UDim2.new(0, 0, (1 + mainRatio / paddingRatio) * #arg1.props.categories / categoriesPerPage - mainRatio / paddingRatio, 0);
-            Size = UDim2.new(1, 0, 1, 0);
-            ElasticBehavior = Enum.ElasticBehavior.Always;
-            VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left;
-            VerticalScrollBarInset = Enum.ScrollBarInset.None;
-            ScrollingDirection = Enum.ScrollingDirection.Y;
-        }, Dictionary_upvr.merge({
-            ListLayout = createElement_upvr("UIListLayout", {
-                HorizontalAlignment = Enum.HorizontalAlignment.Center;
-                VerticalAlignment = Enum.VerticalAlignment.Top;
-                SortOrder = Enum.SortOrder.LayoutOrder;
-                FillDirection = Enum.FillDirection.Vertical;
-            });
-        }, tbl));
-    })
-end
-return require(ReplicatedStorage.RoactRodux).connect(function(arg1, arg2) -- Line 103
-    return {
-        categories = arg1.garageCategories;
-        selectedCategory = arg1.garageCategory;
-        sortId = arg1.garageSort;
-    }
-end, function(arg1) -- Line 109
-    return {
-        setCategory = function(arg1_2, arg2) -- Line 111, Named "setCategory"
-            local tbl_2 = {
-                type = "setCategory";
-            }
-            tbl_2.categoryName = arg1_2
-            tbl_2.sortId = arg2
-            arg1(tbl_2)
-        end;
-    }
-end)(any_extend_result1)
+return RoactRodux.connect(function(p1, p2) --[[ Line: 103 ]]
+	return {
+		categories = p1.garageCategories,
+		selectedCategory = p1.garageCategory,
+		sortId = p1.garageSort
+	}
+end, function(p1) --[[ Line: 109 ]]
+	return {
+		setCategory = function(p12, p2) --[[ Name: setCategory | Line: 111 | Upvalues: p1 (copy) ]]
+			p1({
+				type = "setCategory",
+				categoryName = p12,
+				sortId = p2
+			})
+		end
+	}
+end)(v1)

@@ -1,53 +1,49 @@
 local PlayerModule = game:GetService("Players").LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")
-local var1_2_upvr = require(PlayerModule)
-local module = {}
-local ManualJump_upvr = PlayerModule:WaitForChild("ControlModule"):WaitForChild("ManualJump")
-function module.setIsJumping(arg1) -- Line 11
-    ManualJump_upvr.Value = arg1
+local ManualJump = PlayerModule:WaitForChild("ControlModule"):WaitForChild("ManualJump")
+local CameraSensitivity = PlayerModule:WaitForChild("CameraModule"):WaitForChild("CameraSensitivity")
+local v1 = require(PlayerModule)
+local v2 = v1:GetControls()
+local t = {
+	setIsJumping = function(p1) --[[ Name: setIsJumping | Line: 11 | Upvalues: ManualJump (copy) ]]
+		ManualJump.Value = p1
+	end,
+	setCameraSensitivity = function(p1) --[[ Name: setCameraSensitivity | Line: 14 | Upvalues: CameraSensitivity (copy) ]]
+		CameraSensitivity.Value = p1
+	end
+}
+local function getCameraController() --[[ Line: 17 | Upvalues: v1 (copy) ]]
+	local v12 = v1:GetCameras()
+	if v12 then
+		local activeCameraController = v12.activeCameraController
+		if activeCameraController then
+			return activeCameraController
+		else
+			return nil
+		end
+	else
+		return nil
+	end
 end
-local CameraSensitivity_upvr = PlayerModule:WaitForChild("CameraModule"):WaitForChild("CameraSensitivity")
-function module.setCameraSensitivity(arg1) -- Line 14
-    CameraSensitivity_upvr.Value = arg1
+function t.getCameraToSubjectDistance() --[[ Line: 27 | Upvalues: v1 (copy) ]]
+	local v12 = v1:GetCameras()
+	local v2 = v12 and v12.activeCameraController or nil
+	if v2 then
+		return v2:GetCameraToSubjectDistance()
+	else
+		return nil
+	end
 end
-local function _() -- Line 17, Named "getCameraController"
-    local any_GetCameras_result1_3 = var1_2_upvr:GetCameras()
-    if any_GetCameras_result1_3 then
-        local activeCameraController_2 = any_GetCameras_result1_3.activeCameraController
-        if activeCameraController_2 then
-            return activeCameraController_2
-        end
-    end
-    return nil
+function t.setCameraToSubjectDistance(p1) --[[ Line: 34 | Upvalues: v1 (copy) ]]
+	local v12 = v1:GetCameras()
+	local v2 = v12 and v12.activeCameraController or nil
+	if v2 then
+		v2:SetCameraToSubjectDistance(p1)
+		return true
+	else
+		return false
+	end
 end
-function module.getCameraToSubjectDistance() -- Line 27
-    local any_GetCameras_result1 = var1_2_upvr:GetCameras()
-    if any_GetCameras_result1 then
-        if any_GetCameras_result1.activeCameraController then
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-    end
-    local var12
-    if var12 then
-        return var12:GetCameraToSubjectDistance()
-    end
-    return nil
+function t.getMoveVector() --[[ Line: 42 | Upvalues: v2 (copy) ]]
+	return v2:GetMoveVector()
 end
-function module.setCameraToSubjectDistance(arg1) -- Line 34
-    local any_GetCameras_result1_2 = var1_2_upvr:GetCameras()
-    if any_GetCameras_result1_2 then
-        if any_GetCameras_result1_2.activeCameraController then
-            -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-        end
-    end
-    local var15
-    if var15 then
-        var15:SetCameraToSubjectDistance(arg1)
-        return true
-    end
-    return false
-end
-local any_GetControls_result1_upvr = var1_2_upvr:GetControls()
-function module.getMoveVector() -- Line 42
-    return any_GetControls_result1_upvr:GetMoveVector()
-end
-return module
+return t

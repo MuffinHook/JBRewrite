@@ -1,55 +1,43 @@
-local Basic_upvr = require(script.Parent.Basic)
-local tbl_upvr = {
-    Motion = {
-        Hip = {
-            Springs = {
-                ItemOffset = Vector3.new(1, 1, -1.5);
-                ItemRotation = Vector3.new();
-                NeckRotation = Vector3.new();
-                WaistRotation = Vector3.new();
-            };
-        };
-        RightWristRotation = CFrame.Angles(0, (math.pi/2), 0);
-        LeftWristRotation = CFrame.new();
-    };
+local Basic = require(script.Parent.Basic)
+local t = {
+	Motion = {
+		Hip = {
+			Springs = {
+				ItemOffset = Vector3.new(1, 1, -1.5),
+				ItemRotation = Vector3.new(),
+				NeckRotation = Vector3.new(),
+				WaistRotation = Vector3.new()
+			}
+		},
+		RightWristRotation = CFrame.Angles(0, 1.5707963267948966, 0),
+		LeftWristRotation = CFrame.new()
+	}
 }
-local var6_upvw
-local module_upvr = {
-    __ClassName = "Glider";
+local v2 = nil
+local t2 = {
+	__ClassName = "Glider"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Basic_upvr)
-function module_upvr.Init(arg1) -- Line 25
-    var6_upvw = arg1.Event
+t2.__index = t2
+setmetatable(t2, Basic)
+function t2.Init(p1) --[[ Line: 25 | Upvalues: v2 (ref) ]]
+	v2 = p1.Event
 end
-function module_upvr.new(arg1, arg2, arg3) -- Line 28
-    local any_new_result1 = Basic_upvr.new(arg1, arg2, tbl_upvr, arg3)
-    setmetatable(any_new_result1, module_upvr)
-    return any_new_result1
+function t2.new(p1, p2, p3) --[[ Line: 28 | Upvalues: Basic (copy), t (copy), t2 (copy) ]]
+	local v1 = Basic.new(p1, p2, t, p3)
+	setmetatable(v1, t2)
+	return v1
 end
-function module_upvr.GetLeftArmPosition(arg1) -- Line 34
-    return nil
+function t2.GetLeftArmPosition(p1) --[[ Line: 34 ]]
+	return nil
 end
-function module_upvr.ShootBegin(arg1, arg2) -- Line 37
-    var6_upvw:FireServer('l'.."".."ov5qey3":sub(2, 3):reverse().."".."".."rvu54akg":sub(3, 5):reverse():reverse():reverse().."".."54")
+function t2.ShootBegin(p1, p2) --[[ Line: 37 | Upvalues: v2 (ref) ]]
+	v2:FireServer("k" .. ("ialwnl1sco"):sub(4, 7):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("r5gc0"):sub(2, 3):reverse():reverse():reverse() .. "x")
 end
-function module_upvr.InputBegan(arg1, arg2, arg3) -- Line 40
-    local var10 = true
-    if arg2.UserInputType ~= Enum.UserInputType.MouseButton1 then
-        var10 = false
-        if arg2.UserInputType == Enum.UserInputType.Gamepad1 then
-            if arg2.KeyCode ~= Enum.KeyCode.ButtonR2 then
-                var10 = false
-            else
-                var10 = true
-            end
-        end
-    end
-    if var10 then
-        arg1:ShootBegin(arg2)
-    end
-    Basic_upvr.InputBegan(arg1, arg2, arg3)
+function t2.InputBegan(p1, p2, p3) --[[ Line: 40 | Upvalues: Basic (copy) ]]
+	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		p1:ShootBegin(p2)
+	end
+	Basic.InputBegan(p1, p2, p3)
 end
-function module_upvr.InputEnded(arg1) -- Line 50
-end
-return module_upvr
+function t2.InputEnded(p1) --[[ Line: 50 ]] end
+return t2

@@ -1,156 +1,112 @@
-local module_2_upvr = {}
-module_2_upvr.__index = module_2_upvr
-local new_2_upvr = Vector3.new
-module_2_upvr.CameraShakeState = {
-    FadingIn = 0;
-    FadingOut = 1;
-    Sustained = 2;
-    Inactive = 3;
+local t = {}
+t.__index = t
+local v1 = Vector3.new
+local noise = math.noise
+t.CameraShakeState = {
+	FadingIn = 0,
+	FadingOut = 1,
+	Sustained = 2,
+	Inactive = 3
 }
-function module_2_upvr.new(arg1, arg2, arg3, arg4) -- Line 24
-    if arg3 == nil then
-        local var4 = 0
-    end
-    if arg4 == nil then
-        local var5 = 0
-    end
-    if type(arg1) ~= "number" then
-    else
-    end
-    assert(true, "Magnitude must be a number")
-    if type(arg2) ~= "number" then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    assert(true, "Roughness must be a number")
-    if type(var4) ~= "number" then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    assert(true, "FadeInTime must be a number")
-    if type(var5) ~= "number" then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    assert(true, "FadeOutTime must be a number")
-    local module = {}
-    module.Magnitude = arg1
-    module.Roughness = arg2
-    module.PositionInfluence = new_2_upvr()
-    module.RotationInfluence = new_2_upvr()
-    module.DeleteOnInactive = true
-    module.roughMod = 1
-    module.magnMod = 1
-    module.fadeOutDuration = var5
-    module.fadeInDuration = var4
-    if 0 >= var4 then
-        -- Decomp Logic Error: Konstant emitted a synthetic goto marker; surrounding branch was preserved.
-    end
-    module.sustain = true
-    if 0 < var4 then
-    else
-    end
-    module.currentFadeTime = 1
-    module.tick = Random.new():NextNumber(-100, 100)
-    module._camShakeInstance = true
-    return setmetatable(module, module_2_upvr)
+function t.new(p1, p2, p3, p4) --[[ Line: 24 | Upvalues: v1 (copy), t (copy) ]]
+	if p3 == nil then
+		p3 = 0
+	end
+	if p4 == nil then
+		p4 = 0
+	end
+	assert(type(p1) == "number", "Magnitude must be a number")
+	assert(type(p2) == "number", "Roughness must be a number")
+	assert(type(p3) == "number", "FadeInTime must be a number")
+	assert(type(p4) == "number", "FadeOutTime must be a number")
+	local t2 = {
+		Magnitude = p1,
+		Roughness = p2,
+		PositionInfluence = v1(),
+		RotationInfluence = v1(),
+		DeleteOnInactive = true,
+		roughMod = 1,
+		magnMod = 1,
+		fadeOutDuration = p4,
+		fadeInDuration = p3
+	}
+	t2.sustain = p3 > 0
+	t2.currentFadeTime = if p3 > 0 then 0 else 1
+	t2.tick = Random.new():NextNumber(-100, 100)
+	t2._camShakeInstance = true
+	return setmetatable(t2, t)
 end
-local noise_upvr = math.noise
-function module_2_upvr.UpdateShake(arg1, arg2) -- Line 56
-    local tick = arg1.tick
-    local var9
-    if 0 < arg1.fadeInDuration and arg1.sustain then
-        if var9 < 1 then
-            var9 += arg2 / arg1.fadeInDuration
-        elseif 0 < arg1.fadeOutDuration then
-            arg1.sustain = false
-        end
-    end
-    if not arg1.sustain then
-        var9 -= arg2 / arg1.fadeOutDuration
-    end
-    if arg1.sustain then
-        arg1.tick = tick + arg2 * arg1.Roughness * arg1.roughMod
-    else
-        arg1.tick = tick + arg2 * arg1.Roughness * arg1.roughMod * var9
-    end
-    arg1.currentFadeTime = var9
-    return new_2_upvr(noise_upvr(tick, 0) * 0.5, noise_upvr(0, tick) * 0.5, noise_upvr(tick, tick) * 0.5) * arg1.Magnitude * arg1.magnMod * var9
+function t.UpdateShake(p1, p2) --[[ Line: 56 | Upvalues: noise (copy), v1 (copy) ]]
+	local v12 = p1.tick
+	local currentFadeTime = p1.currentFadeTime
+	local v2 = v1(noise(v12, 0) * 0.5, noise(0, v12) * 0.5, noise(v12, v12) * 0.5)
+	if p1.fadeInDuration > 0 and p1.sustain then
+		if currentFadeTime < 1 then
+			currentFadeTime = currentFadeTime + p2 / p1.fadeInDuration
+		elseif p1.fadeOutDuration > 0 then
+			p1.sustain = false
+		end
+	end
+	if not p1.sustain then
+		currentFadeTime = currentFadeTime - p2 / p1.fadeOutDuration
+	end
+	if p1.sustain then
+		p1.tick = v12 + p2 * p1.Roughness * p1.roughMod
+	else
+		p1.tick = v12 + p2 * p1.Roughness * p1.roughMod * currentFadeTime
+	end
+	p1.currentFadeTime = currentFadeTime
+	return v2 * p1.Magnitude * p1.magnMod * currentFadeTime
 end
-function module_2_upvr.StartFadeOut(arg1, arg2) -- Line 85
-    if arg2 == 0 then
-        arg1.currentFadeTime = 0
-    end
-    arg1.fadeOutDuration = arg2
-    arg1.fadeInDuration = 0
-    arg1.sustain = false
+function t.StartFadeOut(p1, p2) --[[ Line: 85 ]]
+	if p2 == 0 then
+		p1.currentFadeTime = 0
+	end
+	p1.fadeOutDuration = p2
+	p1.fadeInDuration = 0
+	p1.sustain = false
 end
-function module_2_upvr.StartFadeIn(arg1, arg2) -- Line 94
-    if arg2 == 0 then
-        arg1.currentFadeTime = 1
-    end
-    local var10 = arg2
-    if not var10 then
-        var10 = arg1.fadeInDuration
-    end
-    arg1.fadeInDuration = var10
-    arg1.fadeOutDuration = 0
-    arg1.sustain = true
+function t.StartFadeIn(p1, p2) --[[ Line: 94 ]]
+	if p2 == 0 then
+		p1.currentFadeTime = 1
+	end
+	p1.fadeInDuration = p2 or p1.fadeInDuration
+	p1.fadeOutDuration = 0
+	p1.sustain = true
 end
-function module_2_upvr.GetScaleRoughness(arg1) -- Line 103
-    return arg1.roughMod
+function t.GetScaleRoughness(p1) --[[ Line: 103 ]]
+	return p1.roughMod
 end
-function module_2_upvr.SetScaleRoughness(arg1, arg2) -- Line 107
-    arg1.roughMod = arg2
+function t.SetScaleRoughness(p1, p2) --[[ Line: 107 ]]
+	p1.roughMod = p2
 end
-function module_2_upvr.GetScaleMagnitude(arg1) -- Line 111
-    return arg1.magnMod
+function t.GetScaleMagnitude(p1) --[[ Line: 111 ]]
+	return p1.magnMod
 end
-function module_2_upvr.SetScaleMagnitude(arg1, arg2) -- Line 115
-    arg1.magnMod = arg2
+function t.SetScaleMagnitude(p1, p2) --[[ Line: 115 ]]
+	p1.magnMod = p2
 end
-function module_2_upvr.GetNormalizedFadeTime(arg1) -- Line 119
-    return arg1.currentFadeTime
+function t.GetNormalizedFadeTime(p1) --[[ Line: 119 ]]
+	return p1.currentFadeTime
 end
-function module_2_upvr.IsShaking(arg1) -- Line 123
-    local var11 = true
-    if 0 >= arg1.currentFadeTime then
-        var11 = arg1.sustain
-    end
-    return var11
+function t.IsShaking(p1) --[[ Line: 123 ]]
+	return if p1.currentFadeTime > 0 then true else p1.sustain
 end
-function module_2_upvr.IsFadingOut(arg1) -- Line 127
-    local var12 = not arg1.sustain
-    if var12 then
-        if 0 >= arg1.currentFadeTime then
-            var12 = false
-        else
-            var12 = true
-        end
-    end
-    return var12
+function t.IsFadingOut(p1) --[[ Line: 127 ]]
+	return not p1.sustain and p1.currentFadeTime > 0
 end
-function module_2_upvr.IsFadingIn(arg1) -- Line 131
-    local var14 = false
-    if arg1.currentFadeTime < 1 then
-        var14 = arg1.sustain
-        if var14 then
-            if 0 >= arg1.fadeInDuration then
-                var14 = false
-            else
-                var14 = true
-            end
-        end
-    end
-    return var14
+function t.IsFadingIn(p1) --[[ Line: 131 ]]
+	return p1.currentFadeTime < 1 and (p1.sustain and p1.fadeInDuration > 0) or false
 end
-function module_2_upvr.GetState(arg1) -- Line 135
-    if arg1:IsFadingIn() then
-        return module_2_upvr.CameraShakeState.FadingIn
-    end
-    if arg1:IsFadingOut() then
-        return module_2_upvr.CameraShakeState.FadingOut
-    end
-    if arg1:IsShaking() then
-        return module_2_upvr.CameraShakeState.Sustained
-    end
-    return module_2_upvr.CameraShakeState.Inactive
+function t.GetState(p1) --[[ Line: 135 | Upvalues: t (copy) ]]
+	if p1:IsFadingIn() then
+		return t.CameraShakeState.FadingIn
+	elseif p1:IsFadingOut() then
+		return t.CameraShakeState.FadingOut
+	elseif p1:IsShaking() then
+		return t.CameraShakeState.Sustained
+	else
+		return t.CameraShakeState.Inactive
+	end
 end
-return module_2_upvr
+return t

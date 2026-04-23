@@ -1,34 +1,39 @@
 return {
-    computeHorizontalAngle = function(arg1, arg2, arg3) -- Line 2, Named "computeHorizontalAngle"
-        assert(arg3)
-        assert(arg2)
-        assert(arg2.Part1)
-        local Base = arg1:FindFirstChild("Base")
-        assert(Base)
-        local Arm = arg1:FindFirstChild("Arm")
-        assert(Arm)
-        local any_PointToObjectSpace_result1_2 = arg2.Part1.CFrame * arg2.C0:Inverse():PointToObjectSpace(arg3)
-        local any_PointToObjectSpace_result1_3 = Base.Root.CFrame:PointToObjectSpace(Arm.Tip.Position)
-        local squareroot = math.sqrt(any_PointToObjectSpace_result1_2.x * any_PointToObjectSpace_result1_2.x + any_PointToObjectSpace_result1_2.z * any_PointToObjectSpace_result1_2.z)
-        local var7
-        local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-            var7 = math.asin(any_PointToObjectSpace_result1_3.x / squareroot)
-            return var7
-        end
-        if any_PointToObjectSpace_result1_3.x >= squareroot or not decompInlinedCondition() then
-            var7 = math.asin(squareroot / any_PointToObjectSpace_result1_3.x)
-        end
-        return math.atan2(-any_PointToObjectSpace_result1_2.z, any_PointToObjectSpace_result1_2.x) + var7
-    end;
-    computeVerticalAngle = function(arg1, arg2, arg3) -- Line 17, Named "computeVerticalAngle"
-        assert(arg3)
-        assert(arg1:FindFirstChild("Arm"))
-        assert(arg2.Part1)
-        local any_PointToObjectSpace_result1 = arg2.Part1.CFrame * arg2.C0:Inverse():PointToObjectSpace(arg3)
-        return math.atan2(any_PointToObjectSpace_result1.y, -any_PointToObjectSpace_result1.z)
-    end;
-    updateModel = function(arg1, arg2, arg3, arg4) -- Line 26, Named "updateModel"
-        arg1.C1 = arg1.C0:Inverse() * CFrame.Angles(0, arg3 - (math.pi/2), 0) * arg1.C0
-        arg2.C1 = arg2.C0:Inverse() * CFrame.Angles(arg4, 0, 0) * arg2.C0
-    end;
+	computeHorizontalAngle = function(p1, p2, p3) --[[ Name: computeHorizontalAngle | Line: 2 ]]
+		assert(p3)
+		assert(p2)
+		assert(p2.Part1)
+		local Base = p1:FindFirstChild("Base")
+		assert(Base)
+		local Arm = p1:FindFirstChild("Arm")
+		assert(Arm)
+		local v1 = (p2.Part1.CFrame * p2.C0:Inverse()):PointToObjectSpace(p3)
+		local v2 = Base.Root.CFrame:PointToObjectSpace(Arm.Tip.Position)
+		local v4 = math.sqrt(v1.x * v1.x + v1.z * v1.z)
+		local v6 = math.atan2(-v1.z, v1.x)
+		local v7, v8
+		if v2.x < v4 then
+			v7 = math.asin(v2.x / v4)
+			if not v7 then
+				v8 = v4 / v2.x
+				v7 = math.asin(v8)
+			end
+		else
+			v8 = v4 / v2.x
+			v7 = math.asin(v8)
+		end
+		return v6 + v7
+	end,
+	computeVerticalAngle = function(p1, p2, p3) --[[ Name: computeVerticalAngle | Line: 17 ]]
+		assert(p3)
+		local Arm = p1:FindFirstChild("Arm")
+		assert(Arm)
+		assert(p2.Part1)
+		local v1 = (p2.Part1.CFrame * p2.C0:Inverse()):PointToObjectSpace(p3)
+		return math.atan2(v1.y, -v1.z)
+	end,
+	updateModel = function(p1, p2, p3, p4) --[[ Name: updateModel | Line: 26 ]]
+		p1.C1 = p1.C0:Inverse() * CFrame.Angles(0, p3 - 1.5707963267948966, 0) * p1.C0
+		p2.C1 = p2.C0:Inverse() * CFrame.Angles(p4, 0, 0) * p2.C0
+	end
 }

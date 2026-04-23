@@ -1,4 +1,4 @@
 return {
-    VehicleMake = nil;
-    HandBrake = false;
+	VehicleMake = nil,
+	HandBrake = false
 }

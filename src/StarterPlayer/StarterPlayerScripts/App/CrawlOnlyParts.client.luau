@@ -1,19 +1,21 @@
-local CollectionService_upvr = game:GetService("CollectionService")
-local CharacterUtil_upvr = require(game:GetService("ReplicatedStorage").Game.CharacterUtil)
-CollectionService_upvr:GetInstanceAddedSignal("CrawlPassOnly"):Connect(function(arg1) -- Line 7, Named "Added"
-    if arg1:IsA("BasePart") then
-        arg1.CanCollide = not CharacterUtil_upvr.IsCrawling
-    end
-end)
-for _, v in CollectionService_upvr:GetTagged("CrawlPassOnly") do
-    if v:IsA("BasePart") then
-        v.CanCollide = not CharacterUtil_upvr.IsCrawling
-    end
+local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CharacterUtil = require(ReplicatedStorage.Game.CharacterUtil)
+local function Added(p1) --[[ Line: 7 | Upvalues: CharacterUtil (copy) ]]
+	if p1:IsA("BasePart") then
+		p1.CanCollide = not CharacterUtil.IsCrawling
+	end
 end
-CharacterUtil_upvr.IsCrawlingChanged:Connect(function() -- Line 17
-    for _, v_2 in CollectionService_upvr:GetTagged("CrawlPassOnly") do
-        if v_2:IsA("BasePart") then
-            v_2.CanCollide = not CharacterUtil_upvr.IsCrawling
-        end
-    end
+CollectionService:GetInstanceAddedSignal("CrawlPassOnly"):Connect(Added)
+for v1, v2 in CollectionService:GetTagged("CrawlPassOnly") do
+	if v2:IsA("BasePart") then
+		v2.CanCollide = not CharacterUtil.IsCrawling
+	end
+end
+CharacterUtil.IsCrawlingChanged:Connect(function() --[[ Line: 17 | Upvalues: CollectionService (copy), CharacterUtil (copy) ]]
+	for v1, v2 in CollectionService:GetTagged("CrawlPassOnly") do
+		if v2:IsA("BasePart") then
+			v2.CanCollide = not CharacterUtil.IsCrawling
+		end
+	end
 end)

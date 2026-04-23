@@ -1,51 +1,50 @@
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local LocalizationService_upvr = game:GetService("LocalizationService")
-local var3_upvw
-if LocalPlayer_upvr then
-    task.spawn(function() -- Line 10
-        local pcall_result1, pcall_result2 = pcall(function() -- Line 11
-            var3_upvw = LocalizationService_upvr:GetTranslatorForPlayerAsync(LocalPlayer_upvr)
-        end)
-        if pcall_result1 then
-        else
-            warn(pcall_result2)
-            var3_upvw = nil
-        end
-    end)
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local LocalizationService = game:GetService("LocalizationService")
+local v1 = nil
+if LocalPlayer then
+	task.spawn(function() --[[ Line: 10 | Upvalues: v1 (ref), LocalizationService (copy), LocalPlayer (copy) ]]
+		local v12, v2 = pcall(function() --[[ Line: 11 | Upvalues: v1 (ref), LocalizationService (ref), LocalPlayer (ref) ]]
+			v1 = LocalizationService:GetTranslatorForPlayerAsync(LocalPlayer)
+		end)
+		if not v12 then
+			warn(v2)
+			v1 = nil
+		end
+	end)
 end
-local module = {}
-local any_GetTranslator_result1_upvr_2 = LocalizationService_upvr.GameLocalizationTable:GetTranslator(LocalizationService_upvr.RobloxLocaleId)
-local any_GetTranslator_result1_upvr = LocalizationService_upvr.GameLocalizationTable:GetTranslator("en-us")
-local function _formatByKey_upvr(arg1, ...) -- Line 25, Named "_formatByKey"
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local args_list_upvr = {...}
-    local var13_upvw
-    local var14_upvw
-    if not pcall(function() -- Line 28
-        var13_upvw = var3_upvw:FormatByKey(arg1, unpack(args_list_upvr))
-    end) then
-    end
-    if not pcall(function() -- Line 32
-        var14_upvw = any_GetTranslator_result1_upvr_2:FormatByKey(arg1, unpack(args_list_upvr))
-    end) then
-        local pcall_result1_2 = pcall(function() -- Line 37
-            var14_upvw = any_GetTranslator_result1_upvr:FormatByKey(arg1, unpack(args_list_upvr))
-        end)
-    end
-    if not pcall_result1_2 then
-        var14_upvw = arg1
-    end
-    return pcall_result1_2, var14_upvw
+local v2 = LocalizationService.GameLocalizationTable:GetTranslator(LocalizationService.RobloxLocaleId)
+local v3 = LocalizationService.GameLocalizationTable:GetTranslator("en-us")
+local t = {}
+local function _formatByKey(p1, ...) --[[ Line: 25 | Upvalues: v1 (ref), v2 (copy), v3 (copy) ]]
+	local t = { ... }
+	local v12 = nil
+	local v22 = pcall(function() --[[ Line: 28 | Upvalues: v12 (ref), v1 (ref), p1 (copy), t (copy) ]]
+		v12 = v1:FormatByKey(p1, unpack(t))
+	end)
+	if not v22 then
+		v22 = pcall(function() --[[ Line: 32 | Upvalues: v12 (ref), v2 (ref), p1 (copy), t (copy) ]]
+			v12 = v2:FormatByKey(p1, unpack(t))
+		end)
+	end
+	if not v22 then
+		v22 = pcall(function() --[[ Line: 37 | Upvalues: v12 (ref), v3 (ref), p1 (copy), t (copy) ]]
+			v12 = v3:FormatByKey(p1, unpack(t))
+		end)
+	end
+	if not v22 then
+		v12 = p1
+	end
+	return v22, v12
 end
-function module.FormatByKey(arg1, ...) -- Line 46
-    local _formatByKey_upvr_result1_2, _formatByKey_upvr_result2 = _formatByKey_upvr(...)
-    if not _formatByKey_upvr_result1_2 then
-        warn("No valid translation for: ".._formatByKey_upvr_result2)
-    end
-    return _formatByKey_upvr_result2
+function t.FormatByKey(p1, ...) --[[ Line: 46 | Upvalues: _formatByKey (copy) ]]
+	local v1, v2 = _formatByKey(...)
+	if not v1 then
+		warn("No valid translation for: " .. v2)
+	end
+	return v2
 end
-function module.AttemptFormatByKey(arg1, ...) -- Line 54
-    local _formatByKey_upvr_result1, _formatByKey_upvr_result2_2 = _formatByKey_upvr(...)
-    return _formatByKey_upvr_result1, _formatByKey_upvr_result2_2
+function t.AttemptFormatByKey(p1, ...) --[[ Line: 54 | Upvalues: _formatByKey (copy) ]]
+	local v1, v2 = _formatByKey(...)
+	return v1, v2
 end
-return module
+return t

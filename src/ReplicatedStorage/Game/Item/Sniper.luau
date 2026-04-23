@@ -1,110 +1,106 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Audio_upvr = require(ReplicatedStorage_upvr.Std.Audio)
-local ItemCamera_upvr = require(ReplicatedStorage_upvr.Game.ItemSystem.ItemCamera)
-local Gun_upvr = require(script.Parent.Gun)
-local module_upvr = {
-    __ClassName = "Sniper";
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Spring = require(ReplicatedStorage.Std.Spring)
+local ItemCamera = require(ReplicatedStorage.Game.ItemSystem.ItemCamera)
+local Gun = require(script.Parent.Gun)
+local t = {
+	__ClassName = "Sniper"
 }
-module_upvr.__index = module_upvr
-setmetatable(module_upvr, Gun_upvr)
-local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
-local Lighting_upvr = game:GetService("Lighting")
-local Spring_upvr = require(ReplicatedStorage_upvr.Std.Spring)
-function module_upvr.new(arg1, arg2, arg3) -- Line 32
-    local any_new_result1 = Gun_upvr.new(arg1, arg2, arg3)
-    setmetatable(any_new_result1, module_upvr)
-    any_new_result1:Setup(arg3)
-    if any_new_result1.Local then
-        local ScopeGui = ReplicatedStorage_upvr.Resource.ItemSystem.Gui.ScopeGui
-        assert(ScopeGui)
-        local clone = ScopeGui:Clone()
-        clone.ScreenInsets = Enum.ScreenInsets.None
-        clone.DisplayOrder = -1
-        clone.Enabled = false
-        clone.Parent = LocalPlayer_upvr.PlayerGui
-        any_new_result1.ScopeGui = clone
-        any_new_result1.Maid:GiveTask(clone)
-        local BlurEffect = Instance.new("BlurEffect")
-        BlurEffect.Size = 0
-        BlurEffect.Enabled = false
-        BlurEffect.Parent = Lighting_upvr
-        any_new_result1.Blur = BlurEffect
-        any_new_result1.Maid:GiveTask(BlurEffect)
-        any_new_result1.SpringBlur = Spring_upvr.new(0, 0, 0.8, 5)
-    end
-    return any_new_result1
+t.__index = t
+setmetatable(t, Gun)
+function t.new(p1, p2, p3) --[[ Line: 32 | Upvalues: Gun (copy), t (copy), ReplicatedStorage (copy), LocalPlayer (copy), Lighting (copy), Spring (copy) ]]
+	local v1 = Gun.new(p1, p2, p3)
+	setmetatable(v1, t)
+	v1:Setup(p3)
+	if v1.Local then
+		local ScopeGui = ReplicatedStorage.Resource.ItemSystem.Gui.ScopeGui
+		assert(ScopeGui)
+		local v3 = ScopeGui:Clone()
+		v3.ScreenInsets = Enum.ScreenInsets.None
+		v3.DisplayOrder = -1
+		v3.Enabled = false
+		v3.Parent = LocalPlayer.PlayerGui
+		v1.ScopeGui = v3
+		v1.Maid:GiveTask(v3)
+		local BlurEffect = Instance.new("BlurEffect")
+		BlurEffect.Size = 0
+		BlurEffect.Enabled = false
+		BlurEffect.Parent = Lighting
+		v1.Blur = BlurEffect
+		v1.Maid:GiveTask(BlurEffect)
+		v1.SpringBlur = Spring.new(0, 0, 0.8, 5)
+	end
+	return v1
 end
-function module_upvr.Heartbeat(arg1) -- Line 60
-    if arg1.Local then
-        local any_Update_result1 = arg1.SpringBlur:Update()
-        if 0.01 <= any_Update_result1 and arg1.IsScoping then
-            if arg1.Blur.Enabled == false then
-                arg1.Blur.Enabled = true
-            end
-            arg1.Blur.Size = any_Update_result1
-            return
-        end
-        if arg1.Blur.Enabled == true then
-            arg1.Blur.Enabled = false
-        end
-    end
+function t.Heartbeat(p1) --[[ Line: 60 ]]
+	if p1.Local then
+		local v1 = p1.SpringBlur:Update()
+		if v1 >= 0.01 and p1.IsScoping then
+			if p1.Blur.Enabled == false then
+				p1.Blur.Enabled = true
+			end
+			p1.Blur.Size = v1
+		elseif p1.Blur.Enabled == true then
+			p1.Blur.Enabled = false
+		end
+	end
 end
-function module_upvr.ShootSound(arg1, arg2) -- Line 75
-    if arg2 then
-    else
-        Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.shoot, {
-            Pitch = 1 + math.random() * 0.1 - 0.05;
-            Volume = 0.6;
-        })
-    end
+function t.ShootSound(p1, p2) --[[ Line: 75 | Upvalues: Audio (copy) ]]
+	if not p2 then
+		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.shoot, {
+			Pitch = 1 + math.random() * 0.1 - 0.05,
+			Volume = 0.6
+		})
+	end
 end
-function module_upvr.ScopeBegin(arg1) -- Line 82
-    if Gun_upvr.ScopeBegin(arg1) == false then
-        return false
-    end
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.scope)
-    if arg1.Local then
-        arg1._cameraSensitivity = ItemCamera_upvr.getSensitivity()
-        ItemCamera_upvr.setSensitivity(arg1._cameraSensitivity * 0.05)
-        arg1._CameraDistance = ItemCamera_upvr.GetCameraDistance()
-        ItemCamera_upvr.SetCameraDistance(0)
-        arg1.ScopeGui.Enabled = true
-        arg1.SpringBlur:Accelerate(500)
-    end
+function t.ScopeBegin(p1) --[[ Line: 82 | Upvalues: Gun (copy), Audio (copy), ItemCamera (copy) ]]
+	if Gun.ScopeBegin(p1) == false then
+		return false
+	end
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.scope)
+	if p1.Local then
+		p1._cameraSensitivity = ItemCamera.getSensitivity()
+		ItemCamera.setSensitivity(p1._cameraSensitivity * 0.05)
+		p1._CameraDistance = ItemCamera.GetCameraDistance()
+		ItemCamera.SetCameraDistance(0)
+		p1.ScopeGui.Enabled = true
+		p1.SpringBlur:Accelerate(500)
+	end
 end
-function module_upvr.ScopeEnd(arg1) -- Line 96
-    if Gun_upvr.ScopeEnd(arg1) == false then
-        return false
-    end
-    if arg1.Local then
-        if arg1._CameraDistance ~= nil then
-            ItemCamera_upvr.SetCameraDistance(arg1._CameraDistance)
-            arg1._CameraDistance = nil
-        end
-        if arg1._cameraSensitivity ~= nil then
-            ItemCamera_upvr.setSensitivity(arg1._cameraSensitivity)
-            arg1._cameraSensitivity = nil
-        end
-        arg1.ScopeGui.Enabled = false
-    end
+function t.ScopeEnd(p1) --[[ Line: 96 | Upvalues: Gun (copy), ItemCamera (copy) ]]
+	if Gun.ScopeEnd(p1) == false then
+		return false
+	end
+	if p1.Local then
+		if p1._CameraDistance ~= nil then
+			ItemCamera.SetCameraDistance(p1._CameraDistance)
+			p1._CameraDistance = nil
+		end
+		if p1._cameraSensitivity ~= nil then
+			ItemCamera.setSensitivity(p1._cameraSensitivity)
+			p1._cameraSensitivity = nil
+		end
+		p1.ScopeGui.Enabled = false
+	end
 end
-function module_upvr.ReloadDropAmmoVisual(arg1) -- Line 112
+function t.ReloadDropAmmoVisual(p1) --[[ Line: 112 ]] end
+function t.ReloadRefillAmmoVisual(p1) --[[ Line: 113 ]] end
+function t.ReloadDropAmmoSound(p1) --[[ Line: 114 | Upvalues: Audio (copy) ]]
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.mag_out, {
+		RollOffMaxDistance = 129
+	})
 end
-function module_upvr.ReloadRefillAmmoVisual(arg1) -- Line 113
+function t.ReloadRefillAmmoSound(p1) --[[ Line: 119 | Upvalues: Audio (copy) ]]
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.mag_in, {
+		RollOffMaxDistance = 129
+	})
+	wait(0.5)
+	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.cock, {
+		RollOffMaxDistance = 129
+	})
+	wait(0.2)
 end
-function module_upvr.ReloadDropAmmoSound(arg1) -- Line 114
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.mag_out, {
-        RollOffMaxDistance = 129;
-    })
-end
-function module_upvr.ReloadRefillAmmoSound(arg1) -- Line 119
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.mag_in, {
-        RollOffMaxDistance = 129;
-    })
-    wait(0.5)
-    Audio_upvr.ObjectLocal(arg1.Tip, arg1.Config.Sound.cock, {
-        RollOffMaxDistance = 129;
-    })
-    wait(0.2)
-end
-return module_upvr
+return t

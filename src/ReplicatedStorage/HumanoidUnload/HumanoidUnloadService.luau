@@ -1,6 +1,7 @@
-local Signal = require(game:GetService("ReplicatedStorage").Std.Signal)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Signal = require(ReplicatedStorage.Std.Signal)
 return {
-    onHumanoidAdded = Signal.new();
-    onHumanoidRemoving = Signal.new();
-    mapHooked = {};
+	onHumanoidAdded = Signal.new(),
+	onHumanoidRemoving = Signal.new(),
+	mapHooked = {}
 }

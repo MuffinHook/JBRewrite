@@ -1,190 +1,180 @@
-local ReplicatedStorage_upvr = game:GetService("ReplicatedStorage")
-local Maid_upvr = require(ReplicatedStorage_upvr.Std.Maid)
-local CartUtils_upvr = require(script.Parent.CartUtils)
-local module_upvr_2 = {}
-module_upvr_2.__index = module_upvr_2
-module_upvr_2.__ClassName = "Cart"
-local RxInstanceUtils_upvr = require(ReplicatedStorage_upvr.Std.RxInstanceUtils)
-local CartConsts_upvr = require(script.Parent.CartConsts)
-local HttpService_upvr = game:GetService("HttpService")
-local BinderUtils_upvr = require(ReplicatedStorage_upvr.Std.Binder.BinderUtils)
-local OwnedPartBinder_upvr = require(ReplicatedStorage_upvr.Game.OwnedPart.OwnedPartBinder)
-function module_upvr_2.new(arg1) -- Line 19
-    local module_upvr = {}
-    setmetatable(module_upvr, module_upvr_2)
-    RxInstanceUtils_upvr.yieldForProperty(arg1, "PrimaryPart")
-    module_upvr._maid = Maid_upvr.new()
-    module_upvr._obj = arg1
-    module_upvr._firstSegmentValue = arg1:WaitForChild(CartConsts_upvr.FIRST_SEGMENT_VALUE_NAME)
-    module_upvr._secondSegmentValue = arg1:WaitForChild(CartConsts_upvr.SECOND_SEGMENT_VALUE_NAME)
-    module_upvr._graphValue = arg1:WaitForChild(CartConsts_upvr.GRAPH_VALUE_NAME)
-    module_upvr._offsetValue = arg1:WaitForChild(CartConsts_upvr.OFFSET_VALUE_NAME)
-    module_upvr._updatedAtValue = arg1:WaitForChild(CartConsts_upvr.UPDATED_AT_VALUE_NAME)
-    module_upvr._seatOwnedPartValue = arg1:WaitForChild(CartConsts_upvr.SEAT_OWNED_PART_VALUE_NAME)
-    module_upvr._yOffset = 1
-    module_upvr._graph = nil
-    local Value_2 = module_upvr._graphValue.Value
-    if Value_2 then
-        module_upvr._graph = HttpService_upvr:JSONDecode(Value_2)
-    else
-        module_upvr._graph = nil
-    end
-    module_upvr._maid:GiveTask(module_upvr._graphValue.Changed:Connect(function() -- Line 38, Named "decodeGraphStr"
-        local Value = module_upvr._graphValue.Value
-        if Value then
-            module_upvr._graph = HttpService_upvr:JSONDecode(Value)
-        else
-            module_upvr._graph = nil
-        end
-    end))
-    module_upvr._maid:GiveTask(module_upvr._firstSegmentValue.Changed:Connect(function() -- Line 49
-        module_upvr:_onSegmentUpdate()
-    end))
-    module_upvr._maid:GiveTask(module_upvr._secondSegmentValue.Changed:Connect(function() -- Line 52
-        module_upvr:_onSegmentUpdate()
-    end))
-    module_upvr:_onSegmentUpdate()
-    module_upvr._maid._seatMaid = Maid_upvr.new()
-    local var15_upvw
-    local function onOwnedPart(arg1_2) -- Line 59
-        if var15_upvw then
-            var15_upvw:cancel()
-            var15_upvw = nil
-        end
-        module_upvr._ownedPartSeat = nil
-        if arg1_2 then
-            module_upvr._maid._onSeated = RxInstanceUtils_upvr.observeOneChildNamed(arg1_2, "SeatWeld", function(arg1_3, arg2) -- Line 69
-                local var17
-                if arg1_3 then
-                    local Part0 = arg1_3.Part0
-                    assert(Part0:IsA("BasePart"))
-                    local Parent = Part0.Parent
-                    local var20 = Parent
-                    if var20 then
-                        var20 = Parent:IsA("Model")
-                    end
-                    local function decompInlinedCondition() -- Decomp Logic Error: Konstant emitted an inline condition helper; kept as a local helper.
-                        var17 = Parent.ClassName
-                        return var17
-                    end
-                    if not Parent or not decompInlinedCondition() then
-                        var17 = "nil"
-                    end
-                    assert(var20, "SeatWeld.Part0.Parent was a: "..var17)
-                end
-                arg2:GiveTask(function() -- Line 80
-                    module_upvr._maid._seatMaid:DoCleaning()
-                    module_upvr:_onSeated(nil, module_upvr._maid._seatMaid)
-                end)
-                module_upvr._maid._seatMaid:DoCleaning()
-                module_upvr:_onSeated(Parent, module_upvr._maid._seatMaid)
-            end)
-            var15_upvw = BinderUtils_upvr.promiseBoundClass(OwnedPartBinder_upvr, arg1_2):andThen(function(arg1_4) -- Line 88
-                module_upvr._ownedPartSeat = arg1_4
-            end)
-        else
-            module_upvr._maid._onSeated = nil
-        end
-    end
-    onOwnedPart(module_upvr._seatOwnedPartValue.Value)
-    module_upvr._maid:GiveTask(module_upvr._seatOwnedPartValue.Changed:Connect(onOwnedPart))
-    return module_upvr
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Signal = require(ReplicatedStorage.Std.Signal)
+local CharacterUtil = require(ReplicatedStorage.Game.CharacterUtil)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Time = require(ReplicatedStorage.Module.Time)
+local BinderUtils = require(ReplicatedStorage.Std.Binder.BinderUtils)
+local CartConsts = require(script.Parent.CartConsts)
+local CartUtils = require(script.Parent.CartUtils)
+local GraphUtils = require(script.Parent.GraphUtils)
+local OwnedPartBinder = require(ReplicatedStorage.Game.OwnedPart.OwnedPartBinder)
+local t = {}
+t.__index = t
+t.__ClassName = "Cart"
+function t.new(p1) --[[ Line: 19 | Upvalues: t (copy), RxInstanceUtils (copy), Maid (copy), CartConsts (copy), HttpService (copy), BinderUtils (copy), OwnedPartBinder (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
+	t2._maid = Maid.new()
+	t2._obj = p1
+	t2._firstSegmentValue = p1:WaitForChild(CartConsts.FIRST_SEGMENT_VALUE_NAME)
+	t2._secondSegmentValue = p1:WaitForChild(CartConsts.SECOND_SEGMENT_VALUE_NAME)
+	t2._graphValue = p1:WaitForChild(CartConsts.GRAPH_VALUE_NAME)
+	t2._offsetValue = p1:WaitForChild(CartConsts.OFFSET_VALUE_NAME)
+	t2._updatedAtValue = p1:WaitForChild(CartConsts.UPDATED_AT_VALUE_NAME)
+	t2._seatOwnedPartValue = p1:WaitForChild(CartConsts.SEAT_OWNED_PART_VALUE_NAME)
+	t2._yOffset = 1
+	t2._graph = nil
+	local function decodeGraphStr() --[[ Line: 38 | Upvalues: t2 (copy), HttpService (ref) ]]
+		local _graphValue = t2._graphValue.Value
+		if _graphValue then
+			t2._graph = HttpService:JSONDecode(_graphValue)
+		else
+			t2._graph = nil
+		end
+	end
+	local _graphValue = t2._graphValue.Value
+	if _graphValue then
+		t2._graph = HttpService:JSONDecode(_graphValue)
+	else
+		t2._graph = nil
+	end
+	t2._maid:GiveTask(t2._graphValue.Changed:Connect(decodeGraphStr))
+	t2._maid:GiveTask(t2._firstSegmentValue.Changed:Connect(function() --[[ Line: 49 | Upvalues: t2 (copy) ]]
+		t2:_onSegmentUpdate()
+	end))
+	t2._maid:GiveTask(t2._secondSegmentValue.Changed:Connect(function() --[[ Line: 52 | Upvalues: t2 (copy) ]]
+		t2:_onSegmentUpdate()
+	end))
+	t2:_onSegmentUpdate()
+	t2._maid._seatMaid = Maid.new()
+	local v2 = nil
+	local function onOwnedPart(p1) --[[ Line: 59 | Upvalues: v2 (ref), t2 (copy), RxInstanceUtils (ref), BinderUtils (ref), OwnedPartBinder (ref) ]]
+		if v2 then
+			v2:cancel()
+			v2 = nil
+		end
+		t2._ownedPartSeat = nil
+		if p1 then
+			t2._maid._onSeated = RxInstanceUtils.observeOneChildNamed(p1, "SeatWeld", function(p1, p2) --[[ Line: 69 | Upvalues: t2 (ref) ]]
+				local v1
+				if p1 then
+					local Part0 = p1.Part0
+					assert(Part0:IsA("BasePart"))
+					v1 = Part0.Parent
+					assert(v1 and v1:IsA("Model"), "SeatWeld.Part0.Parent was a: " .. (v1 and v1.ClassName or "nil"))
+				else
+					v1 = nil
+				end
+				p2:GiveTask(function() --[[ Line: 80 | Upvalues: t2 (ref) ]]
+					t2._maid._seatMaid:DoCleaning()
+					t2:_onSeated(nil, t2._maid._seatMaid)
+				end)
+				t2._maid._seatMaid:DoCleaning()
+				t2:_onSeated(v1, t2._maid._seatMaid)
+			end)
+			v2 = BinderUtils.promiseBoundClass(OwnedPartBinder, p1):andThen(function(p1) --[[ Line: 88 | Upvalues: t2 (ref) ]]
+				t2._ownedPartSeat = p1
+			end)
+		else
+			t2._maid._onSeated = nil
+		end
+	end
+	onOwnedPart(t2._seatOwnedPartValue.Value)
+	t2._maid:GiveTask(t2._seatOwnedPartValue.Changed:Connect(onOwnedPart))
+	return t2
 end
-local Signal_upvr = require(ReplicatedStorage_upvr.Std.Signal)
-function module_upvr_2.GetOnSeatedSignal(arg1) -- Line 103
-    if not arg1._onSeatedSignal then
-        arg1._onSeatedSignal = Signal_upvr.new()
-        arg1._maid:GiveTask(arg1._onSeatedSignal)
-    end
-    return arg1._onSeatedSignal
+function t.GetOnSeatedSignal(p1) --[[ Line: 103 | Upvalues: Signal (copy) ]]
+	if not p1._onSeatedSignal then
+		p1._onSeatedSignal = Signal.new()
+		p1._maid:GiveTask(p1._onSeatedSignal)
+	end
+	return p1._onSeatedSignal
 end
-local CharacterUtil_upvr = require(ReplicatedStorage_upvr.Game.CharacterUtil)
-function module_upvr_2._onSeated(arg1, arg2, arg3) -- Line 110
-    if arg2 then
-        local Humanoid_upvr = arg2:FindFirstChild("Humanoid")
-        CharacterUtil_upvr.stopAnims(Humanoid_upvr)
-        Humanoid_upvr.Sit = true
-        local any_LoadAnimation_result1_upvr = Humanoid_upvr:FindFirstChildOfClass("Animator"):LoadAnimation(ReplicatedStorage_upvr.Resource.CartSitAnimation)
-        CharacterUtil_upvr.setHumanoidEnabled(Humanoid_upvr, false)
-        any_LoadAnimation_result1_upvr:AdjustSpeed(0)
-        any_LoadAnimation_result1_upvr:Play()
-        arg3:GiveTask(function() -- Line 126
-            Humanoid_upvr.Sit = false
-        end)
-        arg3:GiveTask(function() -- Line 129
-            any_LoadAnimation_result1_upvr:Stop()
-        end)
-        arg3:GiveTask(any_LoadAnimation_result1_upvr)
-        arg3:GiveTask(function() -- Line 133
-            CharacterUtil_upvr.setHumanoidEnabled(Humanoid_upvr, true)
-        end)
-    end
-    arg1._occupant = arg2
-    Humanoid_upvr = arg1._onSeatedSignal
-    if Humanoid_upvr then
-        Humanoid_upvr = arg1._onSeatedSignal
-        any_LoadAnimation_result1_upvr = arg3
-        Humanoid_upvr = Humanoid_upvr:Fire
-        Humanoid_upvr(arg2, any_LoadAnimation_result1_upvr)
-    end
+function t._onSeated(p1, p2, p3) --[[ Line: 110 | Upvalues: CharacterUtil (copy), ReplicatedStorage (copy) ]]
+	if p2 then
+		local Humanoid = p2:FindFirstChild("Humanoid")
+		CharacterUtil.stopAnims(Humanoid)
+		Humanoid.Sit = true
+		local v1 = Humanoid:FindFirstChildOfClass("Animator"):LoadAnimation(ReplicatedStorage.Resource.CartSitAnimation)
+		CharacterUtil.setHumanoidEnabled(Humanoid, false)
+		v1:AdjustSpeed(0)
+		v1:Play()
+		p3:GiveTask(function() --[[ Line: 126 | Upvalues: Humanoid (copy) ]]
+			Humanoid.Sit = false
+		end)
+		p3:GiveTask(function() --[[ Line: 129 | Upvalues: v1 (copy) ]]
+			v1:Stop()
+		end)
+		p3:GiveTask(v1)
+		p3:GiveTask(function() --[[ Line: 133 | Upvalues: CharacterUtil (ref), Humanoid (copy) ]]
+			CharacterUtil.setHumanoidEnabled(Humanoid, true)
+		end)
+	end
+	p1._occupant = p2
+	if p1._onSeatedSignal then
+		p1._onSeatedSignal:Fire(p2, p3)
+	end
 end
-function module_upvr_2.GetOccupant(arg1) -- Line 142
-    return arg1._occupant
+function t.GetOccupant(p1) --[[ Line: 142 ]]
+	return p1._occupant
 end
-function module_upvr_2.GetFirstSegment(arg1) -- Line 145
-    return arg1._firstSegmentValue.Value
+function t.GetFirstSegment(p1) --[[ Line: 145 ]]
+	return p1._firstSegmentValue.Value
 end
-function module_upvr_2.GetSecondSegment(arg1) -- Line 148
-    return arg1._secondSegmentValue.Value
+function t.GetSecondSegment(p1) --[[ Line: 148 ]]
+	return p1._secondSegmentValue.Value
 end
-local RunService_upvr = game:GetService("RunService")
-local Time_upvr = require(ReplicatedStorage_upvr.Module.Time)
-local GraphUtils_upvr = require(script.Parent.GraphUtils)
-function module_upvr_2._startUpdate(arg1) -- Line 151
-    arg1._maid._updateLoop = RunService_upvr.Heartbeat:Connect(function() -- Line 152
-        local var34 = GraphUtils_upvr.calculateDist(arg1._graph, Time_upvr.GetNowSync() - arg1:GetUpdatedAt()) + arg1:GetOffset()
-        local any_calculateSegment_result1, any_calculateSegment_result2 = CartUtils_upvr.calculateSegment(arg1._rail, var34 - 1.5)
-        local any_calculatePosition_result1_2 = CartUtils_upvr.calculatePosition(arg1._rail, any_calculateSegment_result1, any_calculateSegment_result2)
-        local any_calculateSegment_result1_2, any_calculateSegment_result2_2 = CartUtils_upvr.calculateSegment(arg1._rail, var34 + 1.5)
-        local any_calculatePosition_result1 = CartUtils_upvr.calculatePosition(arg1._rail, any_calculateSegment_result1_2, any_calculateSegment_result2_2)
-        arg1._obj.PrimaryPart.CFrame = CFrame.lookAt(Vector3.new(), any_calculatePosition_result1 - any_calculatePosition_result1_2) * CFrame.new(0, arg1._yOffset, 0) + (any_calculatePosition_result1_2 + any_calculatePosition_result1) * 0.5
-        if arg1._ownedPartSeat then
-            arg1._ownedPartSeat._obj.CFrame = arg1._obj:FindFirstChild("Seat").CFrame
-            arg1._ownedPartSeat._obj.AssemblyLinearVelocity = Vector3.new()
-        end
-    end)
+function t._startUpdate(p1) --[[ Line: 151 | Upvalues: RunService (copy), Time (copy), GraphUtils (copy), CartUtils (copy) ]]
+	p1._maid._updateLoop = RunService.Heartbeat:Connect(function() --[[ Line: 152 | Upvalues: Time (ref), p1 (copy), GraphUtils (ref), CartUtils (ref) ]]
+		local v1 = Time.GetNowSync() - p1:GetUpdatedAt()
+		local v2 = GraphUtils.calculateDist(p1._graph, v1) + p1:GetOffset()
+		local v3, v4 = CartUtils.calculateSegment(p1._rail, v2 - 1.5)
+		local v5 = CartUtils.calculatePosition(p1._rail, v3, v4)
+		local v6, v7 = CartUtils.calculateSegment(p1._rail, v2 + 1.5)
+		local v8 = CartUtils.calculatePosition(p1._rail, v6, v7)
+		p1._obj.PrimaryPart.CFrame = CFrame.lookAt(Vector3.new(), v8 - v5) * CFrame.new(0, p1._yOffset, 0) + (v5 + v8) * 0.5
+		if p1._ownedPartSeat then
+			p1._ownedPartSeat._obj.CFrame = p1._obj:FindFirstChild("Seat").CFrame
+			p1._ownedPartSeat._obj.AssemblyLinearVelocity = Vector3.new()
+		end
+	end)
 end
-function module_upvr_2._onSegmentUpdate(arg1) -- Line 180
-    local any_GetFirstSegment_result1 = arg1:GetFirstSegment()
-    if not any_GetFirstSegment_result1 then
-    else
-        local any_GetSecondSegment_result1 = arg1:GetSecondSegment()
-        if not any_GetSecondSegment_result1 then return end
-        arg1._rail = CartUtils_upvr.computeRail(any_GetFirstSegment_result1, any_GetSecondSegment_result1)
-        arg1:_startUpdate()
-        arg1._maid.railUpdateMaid = Maid_upvr.new()
-        for _, v in ipairs(arg1._rail.listSegment) do
-            arg1._maid.railUpdateMaid:GiveTask(v._front.Changed:Connect(function() -- Line 197
-                arg1:_onSegmentUpdate()
-            end))
-            arg1._maid.railUpdateMaid:GiveTask(v._back.Changed:Connect(function() -- Line 201
-                arg1:_onSegmentUpdate()
-            end))
-        end
-    end
+function t._onSegmentUpdate(p1) --[[ Line: 180 | Upvalues: CartUtils (copy), Maid (copy) ]]
+	local v1 = p1:GetFirstSegment()
+	if v1 then
+		local v2 = p1:GetSecondSegment()
+		if v2 then
+			p1._rail = CartUtils.computeRail(v1, v2)
+			p1:_startUpdate()
+			p1._maid.railUpdateMaid = Maid.new()
+			for i, v in ipairs(p1._rail.listSegment) do
+				p1._maid.railUpdateMaid:GiveTask(v._front.Changed:Connect(function() --[[ Line: 197 | Upvalues: p1 (copy) ]]
+					p1:_onSegmentUpdate()
+				end))
+				p1._maid.railUpdateMaid:GiveTask(v._back.Changed:Connect(function() --[[ Line: 201 | Upvalues: p1 (copy) ]]
+					p1:_onSegmentUpdate()
+				end))
+			end
+		end
+	end
 end
-function module_upvr_2.GetUpdatedAt(arg1) -- Line 207
-    return arg1._updatedAtValue.Value
+function t.GetUpdatedAt(p1) --[[ Line: 207 ]]
+	return p1._updatedAtValue.Value
 end
-function module_upvr_2.GetGraph(arg1) -- Line 210
-    return arg1._graphValue.Value
+function t.GetGraph(p1) --[[ Line: 210 ]]
+	return p1._graphValue.Value
 end
-function module_upvr_2.GetOffset(arg1) -- Line 213
-    return arg1._offsetValue.Value
+function t.GetOffset(p1) --[[ Line: 213 ]]
+	return p1._offsetValue.Value
 end
-function module_upvr_2.Destroy(arg1) -- Line 216
-    arg1._maid = nil
-    setmetatable(arg1, nil)
-    arg1._maid:Destroy()
+function t.Destroy(p1) --[[ Line: 216 ]]
+	local _maid = p1._maid
+	p1._maid = nil
+	setmetatable(p1, nil)
+	_maid:Destroy()
 end
-return module_upvr_2
+return t

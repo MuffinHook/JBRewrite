@@ -1,85 +1,85 @@
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local module_upvr = {}
-local LightningUtils_upvr = require(ReplicatedStorage.Game.LightningUtils)
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-local var5_upvw = 0
-local Lighting_upvr = game:GetService("Lighting")
-local RunService_upvr = game:GetService("RunService")
-local Anim_upvr = require(ReplicatedStorage.Module.Anim)
-function module_upvr.StrikePosition(arg1, arg2) -- Line 12
-    local tbl = {}
-    tbl.Origin = arg1
-    tbl.Target = arg2
-    tbl.Transparency = 0.6
-    local Part_upvr = Instance.new("Part")
-    Part_upvr.Anchored = true
-    Part_upvr.CanCollide = false
-    Part_upvr.Transparency = 1
-    Part_upvr.Position = arg2
-    Part_upvr.Parent = workspace
-    Audio_upvr.ObjectLocal(Part_upvr, 5042136770, {
-        Volume = 2;
-        EmitterSize = 60;
-        MaxPlaybackTime = 8;
-    })
-    Audio_upvr.ObjectLocal(Part_upvr, 457217618, {
-        EmitterSize = 60;
-        TimePosition = 1;
-        MaxPlaybackTime = 8;
-    })
-    delay(8, function() -- Line 30
-        Part_upvr:Destroy()
-    end)
-    local tick_result1 = tick()
-    if 1 < tick_result1 - var5_upvw then
-        var5_upvw = tick_result1
-        local Color3_fromRGB_result1_upvr_2 = Color3.fromRGB(164, 172, 186)
-        local Color3_fromRGB_result1_upvr = Color3.fromRGB(64, 76, 93)
-        Lighting_upvr.OutdoorAmbient = Color3_fromRGB_result1_upvr_2
-        local Clouds_upvr = workspace.Terrain.Clouds
-        Clouds_upvr.Density = 1
-        Clouds_upvr.Cover = 0.9
-        Clouds_upvr.Color = Color3_fromRGB_result1_upvr
-        task.delay(0.2, function() -- Line 46
-            local os_clock_result1_upvr = os.clock()
-            local var21_upvw
-            var21_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 50
-                local var22 = (os.clock() - os_clock_result1_upvr) / 0.5
-                if 1 <= var22 then
-                    var22 = 1
-                end
-                Lighting_upvr.OutdoorAmbient = Color3_fromRGB_result1_upvr_2:lerp(Lighting_upvr:GetAttribute("_OutdoorAmbient"), var22)
-                Clouds_upvr.Density = math.lerp(1, Lighting_upvr:GetAttribute("_CloudsDensity"), var22)
-                Clouds_upvr.Cover = math.lerp(0.9, Lighting_upvr:GetAttribute("_CloudsCover"), var22)
-                Clouds_upvr.Color = Color3_fromRGB_result1_upvr:lerp(Lighting_upvr:GetAttribute("_CloudsColor"), var22)
-                if var22 == 1 then
-                    var21_upvw:Disconnect()
-                end
-            end)
-        end)
-    end
-    Color3_fromRGB_result1_upvr_2 = task.delay
-    local any_strikePosition_result1_upvr = LightningUtils_upvr.strikePosition(tbl)
-    Color3_fromRGB_result1_upvr_2(1, function() -- Line 69
-        local any_new_result1_upvr = Anim_upvr.new(4)
-        local children_upvr = any_strikePosition_result1_upvr:GetChildren()
-        local any_Connect_result1_upvw = RunService_upvr.Heartbeat:Connect(function() -- Line 73
-            local any_Update_result1 = any_new_result1_upvr:Update()
-            for _, v in ipairs(children_upvr) do
-                v.Transparency = 0.6 * (1 - any_Update_result1) + 1 * any_Update_result1
-            end
-        end)
-        any_new_result1_upvr.OnCompleted:Connect(function() -- Line 79
-            any_Connect_result1_upvw:Disconnect()
-            any_Connect_result1_upvw = nil
-            any_new_result1_upvr:Destroy()
-            any_strikePosition_result1_upvr:Destroy()
-        end)
-    end)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local Anim = require(ReplicatedStorage.Module.Anim)
+local LightningUtils = require(ReplicatedStorage.Game.LightningUtils)
+local v1 = 0
+local t = {
+	StrikePosition = function(p1, p2) --[[ Name: StrikePosition | Line: 12 | Upvalues: LightningUtils (copy), Audio (copy), v1 (ref), Lighting (copy), RunService (copy), Anim (copy) ]]
+		local v12 = LightningUtils.strikePosition({
+			Origin = p1,
+			Target = p2,
+			Transparency = 0.6
+		})
+		local Part = Instance.new("Part")
+		Part.Anchored = true
+		Part.CanCollide = false
+		Part.Transparency = 1
+		Part.Position = p2
+		Part.Parent = workspace
+		Audio.ObjectLocal(Part, 5042136770, {
+			Volume = 2,
+			EmitterSize = 60,
+			MaxPlaybackTime = 8
+		})
+		Audio.ObjectLocal(Part, 457217618, {
+			EmitterSize = 60,
+			TimePosition = 1,
+			MaxPlaybackTime = 8
+		})
+		delay(8, function() --[[ Line: 30 | Upvalues: Part (copy) ]]
+			Part:Destroy()
+		end)
+		local v2 = tick()
+		if v2 - v1 > 1 then
+			v1 = v2
+			local v3 = Color3.fromRGB(164, 172, 186)
+			local v4 = Color3.fromRGB(64, 76, 93)
+			Lighting.OutdoorAmbient = v3
+			local Clouds = workspace.Terrain.Clouds
+			Clouds.Density = 1
+			Clouds.Cover = 0.9
+			Clouds.Color = v4
+			task.delay(0.2, function() --[[ Line: 46 | Upvalues: RunService (ref), Lighting (ref), v3 (copy), Clouds (copy), v4 (copy) ]]
+				local v1 = nil
+				local v2 = os.clock()
+				v1 = RunService.Heartbeat:Connect(function() --[[ Line: 50 | Upvalues: v2 (copy), Lighting (ref), v3 (ref), Clouds (ref), v4 (ref), v1 (ref) ]]
+					local v12 = (os.clock() - v2) / 0.5
+					if v12 >= 1 then
+						v12 = 1
+					end
+					Lighting.OutdoorAmbient = v3:lerp(Lighting:GetAttribute("_OutdoorAmbient"), v12)
+					Clouds.Density = math.lerp(1, Lighting:GetAttribute("_CloudsDensity"), v12)
+					Clouds.Cover = math.lerp(0.9, Lighting:GetAttribute("_CloudsCover"), v12)
+					Clouds.Color = v4:lerp(Lighting:GetAttribute("_CloudsColor"), v12)
+					if v12 == 1 then
+						v1:Disconnect()
+					end
+				end)
+			end)
+		end
+		task.delay(1, function() --[[ Line: 69 | Upvalues: v12 (copy), Anim (ref), RunService (ref) ]]
+			local v1 = v12:GetChildren()
+			local v2 = Anim.new(4)
+			local v3 = RunService.Heartbeat:Connect(function() --[[ Line: 73 | Upvalues: v2 (copy), v1 (copy) ]]
+				local v12 = v2:Update()
+				for i, v in ipairs(v1) do
+					v.Transparency = 0.6 * (1 - v12) + 1 * v12
+				end
+			end)
+			v2.OnCompleted:Connect(function() --[[ Line: 79 | Upvalues: v3 (ref), v2 (copy), v12 (ref) ]]
+				v3:Disconnect()
+				v3 = nil
+				v2:Destroy()
+				v12:Destroy()
+			end)
+		end)
+	end
+}
+function t.Init(p1) --[[ Line: 87 | Upvalues: t (copy) ]]
+	function p1.em.tqftmpkl(p1, p2) --[[ Line: 89 | Upvalues: t (ref) ]]
+		t.StrikePosition(p1, p2)
+	end
 end
-function module_upvr.Init(arg1) -- Line 87
-    arg1.em.h5dl90gc = function(arg1_2, arg2) -- Line 89, Named "h5dl90gc"
-        module_upvr.StrikePosition(arg1_2, arg2)
-    end
-end
-return module_upvr
+return t

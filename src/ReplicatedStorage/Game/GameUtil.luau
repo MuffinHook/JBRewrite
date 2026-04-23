@@ -1,16 +1,18 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Settings = require(ReplicatedStorage.Resource.Settings)
 local Signal = require(ReplicatedStorage.Std.Signal)
-local module = {
-    OnTeamChanged = Signal.new();
-    Team = require(ReplicatedStorage.Resource.Settings).EnumTeam.Prisoner;
-    Schedule = nil;
-    bounty = 0;
-    onBountyChanged = Signal.new();
-    removeDeathGui = nil;
-    removeDeathLighting = nil;
+local WindowGroup = require(ReplicatedStorage.Module.Window.WindowGroup)
+local t = {
+	OnTeamChanged = Signal.new(),
+	Team = Settings.EnumTeam.Prisoner,
+	Schedule = nil,
+	bounty = 0,
+	onBountyChanged = Signal.new(),
+	removeDeathGui = nil,
+	removeDeathLighting = nil
 }
-local any_new_result1_upvr = require(ReplicatedStorage.Module.Window.WindowGroup).new()
-function module.getCenterWindowGroup() -- Line 15
-    return any_new_result1_upvr
+local v1 = WindowGroup.new()
+function t.getCenterWindowGroup() --[[ Line: 15 | Upvalues: v1 (copy) ]]
+	return v1
 end
-return module
+return t

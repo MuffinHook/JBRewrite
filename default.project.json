@@ -14,20 +14,13 @@
     "ServerScriptService": {
       "$path": "src/ServerScriptService"
     },
-    "ServerStorage": {
-      "$path": "src/ServerStorage"
-    },
-    "StarterGui": {
+    "SoundService": {
       "$properties": {
-        "ResetPlayerGuiOnSpawn": false,
-        "VirtualCursorMode": "Enabled"
-      },
-      "$path": "src/StarterGui"
+        "RespectFilteringEnabled": true,
+        "VolumetricAudio": "Enabled"
+      }
     },
     "StarterPlayer": {
-      "StarterCharacterScripts": {
-        "$path": "src/StarterPlayer/StarterCharacterScripts"
-      },
       "StarterPlayerScripts": {
         "$path": "src/StarterPlayer/StarterPlayerScripts"
       },

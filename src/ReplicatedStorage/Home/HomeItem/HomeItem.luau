@@ -1,119 +1,101 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HomeItemConsts_upvr = require(script.Parent.HomeItemConsts)
-local module_2_upvr = {}
-module_2_upvr.__index = module_2_upvr
-module_2_upvr.__ClassName = "HomeItem"
-local RxInstanceUtils_upvr = require(ReplicatedStorage.Std.RxInstanceUtils)
-local Maid_upvr = require(ReplicatedStorage.Std.Maid)
-local Fabricate_upvr = script.Parent.Fabricate
-function module_2_upvr.new(arg1) -- Line 17
-    local module = {}
-    setmetatable(module, module_2_upvr)
-    RxInstanceUtils_upvr.yieldForProperty(arg1, "PrimaryPart")
-    module._maid = Maid_upvr.new()
-    module._obj = arg1
-    module._placeRemote = arg1:WaitForChild(HomeItemConsts_upvr.PLACE_REMOTE_NAME)
-    module._deleteRemote = arg1:WaitForChild(HomeItemConsts_upvr.DELETE_REMOTE_NAME)
-    module._ownerIdValue = arg1:WaitForChild(HomeItemConsts_upvr.OWNER_ID_VALUE_NAME)
-    module._upDotValue = arg1:WaitForChild(HomeItemConsts_upvr.UP_DOT_VALUE_NAME)
-    module._isPlacedValue = arg1:WaitForChild(HomeItemConsts_upvr.IS_PLACED_VALUE_NAME)
-    module._isGhostValue = arg1:WaitForChild(HomeItemConsts_upvr.IS_GHOST_VALUE_NAME)
-    module._damageRemote = nil
-    module._isBeingDragged = false
-    module._offsetCF = CFrame.new(0, -arg1.PrimaryPart.Size.Y * 0.5, 0):Inverse()
-    local SOME = Fabricate_upvr:FindFirstChild(module._obj.Name)
-    if SOME then
-        require(SOME).setup(module)
-    end
-    return module
+local Maid = require(ReplicatedStorage.Std.Maid)
+local Audio = require(ReplicatedStorage.Std.Audio)
+local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
+local HomeItemConsts = require(script.Parent.HomeItemConsts)
+local HomeItemUtils = require(script.Parent.HomeItemUtils)
+local HomeBinder = require(script.Parent.Parent.HomeBinder)
+local Fabricate = script.Parent.Fabricate
+local t = {}
+t.__index = t
+t.__ClassName = "HomeItem"
+function t.new(p1) --[[ Line: 17 | Upvalues: t (copy), RxInstanceUtils (copy), Maid (copy), HomeItemConsts (copy), Fabricate (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
+	t2._maid = Maid.new()
+	t2._obj = p1
+	t2._placeRemote = p1:WaitForChild(HomeItemConsts.PLACE_REMOTE_NAME)
+	t2._deleteRemote = p1:WaitForChild(HomeItemConsts.DELETE_REMOTE_NAME)
+	t2._ownerIdValue = p1:WaitForChild(HomeItemConsts.OWNER_ID_VALUE_NAME)
+	t2._upDotValue = p1:WaitForChild(HomeItemConsts.UP_DOT_VALUE_NAME)
+	t2._isPlacedValue = p1:WaitForChild(HomeItemConsts.IS_PLACED_VALUE_NAME)
+	t2._isGhostValue = p1:WaitForChild(HomeItemConsts.IS_GHOST_VALUE_NAME)
+	t2._damageRemote = nil
+	t2._isBeingDragged = false
+	t2._offsetCF = CFrame.new(0, -p1.PrimaryPart.Size.Y * 0.5, 0):Inverse()
+	local v2 = Fabricate:FindFirstChild(t2._obj.Name)
+	if v2 then
+		require(v2).setup(t2)
+	end
+	return t2
 end
-local HomeBinder_upvr = require(script.Parent.Parent.HomeBinder)
-function module_2_upvr.GetHome(arg1) -- Line 45
-    return HomeBinder_upvr:Get(arg1._obj.Parent)
+function t.GetHome(p1) --[[ Line: 45 | Upvalues: HomeBinder (copy) ]]
+	return HomeBinder:Get(p1._obj.Parent)
 end
-local Players_upvr = game:GetService("Players")
-function module_2_upvr.GetOwner(arg1) -- Line 48
-    return Players_upvr:GetPlayerByUserId(arg1._ownerIdValue.Value)
+function t.GetOwner(p1) --[[ Line: 48 | Upvalues: Players (copy) ]]
+	return Players:GetPlayerByUserId(p1._ownerIdValue.Value)
 end
-function module_2_upvr.GetObj(arg1) -- Line 53
-    return arg1._obj
+function t.GetObj(p1) --[[ Line: 53 ]]
+	return p1._obj
 end
-function module_2_upvr.TranslateCf(arg1, arg2) -- Line 56
-    return arg2 * arg1._offsetCF
+function t.TranslateCf(p1, p2) --[[ Line: 56 ]]
+	return p2 * p1._offsetCF
 end
-function module_2_upvr.UntranslateCf(arg1, arg2) -- Line 59
-    return arg2 * arg1._offsetCF:Inverse()
+function t.UntranslateCf(p1, p2) --[[ Line: 59 ]]
+	return p2 * p1._offsetCF:Inverse()
 end
-function module_2_upvr.SetCFrame(arg1, arg2) -- Line 62
-    arg1._obj:SetPrimaryPartCFrame(arg2)
+function t.SetCFrame(p1, p2) --[[ Line: 62 ]]
+	p1._obj:SetPrimaryPartCFrame(p2)
 end
-function module_2_upvr.SetServerCFrame(arg1, arg2) -- Line 65
-    arg1._placeRemote:FireServer(arg2)
+function t.SetServerCFrame(p1, p2) --[[ Line: 65 ]]
+	p1._placeRemote:FireServer(p2)
 end
-function module_2_upvr.CacheSurfaces(arg1) -- Line 68
-    local any_GetHome_result1 = arg1:GetHome()
-    local var12
-    if any_GetHome_result1 == nil then
-        var12 = false
-    else
-        var12 = true
-    end
-    assert(var12)
-    arg1._cacheSurfaces = any_GetHome_result1:GetSurfaces()
+function t.CacheSurfaces(p1) --[[ Line: 68 ]]
+	local v1 = p1:GetHome()
+	assert(v1 ~= nil)
+	p1._cacheSurfaces = v1:GetSurfaces()
 end
-function module_2_upvr.ClearCacheSurfaces(arg1) -- Line 73
-    arg1._cacheSurfaces = nil
+function t.ClearCacheSurfaces(p1) --[[ Line: 73 ]]
+	p1._cacheSurfaces = nil
 end
-local HomeItemUtils_upvr = require(script.Parent.HomeItemUtils)
-function module_2_upvr.IsWithinBoundsCached(arg1, arg2) -- Line 76
-    return HomeItemUtils_upvr.isWithinBounds(arg1._obj.PrimaryPart, arg2, arg1._cacheSurfaces)
+function t.IsWithinBoundsCached(p1, p2) --[[ Line: 76 | Upvalues: HomeItemUtils (copy) ]]
+	return HomeItemUtils.isWithinBounds(p1._obj.PrimaryPart, p2, p1._cacheSurfaces)
 end
-function module_2_upvr.IsValidUpDot(arg1, arg2) -- Line 79
-    local var14
-    if math.abs(arg2 - arg1._upDotValue.Value) >= 0.1 then
-        var14 = false
-    else
-        var14 = true
-    end
-    return var14
+function t.IsValidUpDot(p1, p2) --[[ Line: 79 ]]
+	return math.abs(p2 - p1._upDotValue.Value) < 0.1
 end
-function module_2_upvr.AttemptDelete(arg1) -- Line 82
-    arg1._deleteRemote:FireServer()
+function t.AttemptDelete(p1) --[[ Line: 82 ]]
+	p1._deleteRemote:FireServer()
 end
-local Audio_upvr = require(ReplicatedStorage.Std.Audio)
-function module_2_upvr.Damage(arg1) -- Line 85
-    if not arg1._damageRemote then
-        arg1._damageRemote = arg1._obj:FindFirstChild(HomeItemConsts_upvr.DAMAGE_REMOTE_NAME)
-    end
-    if arg1._damageRemote then
-        arg1._damageRemote:FireServer()
-        Audio_upvr.ObjectLocal(arg1._obj.PrimaryPart, 2837091387, {
-            Volume = 1;
-        })
-    end
+function t.Damage(p1) --[[ Line: 85 | Upvalues: HomeItemConsts (copy), Audio (copy) ]]
+	if not p1._damageRemote then
+		p1._damageRemote = p1._obj:FindFirstChild(HomeItemConsts.DAMAGE_REMOTE_NAME)
+	end
+	if p1._damageRemote then
+		p1._damageRemote:FireServer()
+		Audio.ObjectLocal(p1._obj.PrimaryPart, 2837091387, {
+			Volume = 1
+		})
+	end
 end
-function module_2_upvr.SetBeingDragged(arg1, arg2) -- Line 94
-    arg1._isBeingDragged = arg2
+function t.SetBeingDragged(p1, p2) --[[ Line: 94 ]]
+	p1._isBeingDragged = p2
 end
-function module_2_upvr.IsBeingDragged(arg1) -- Line 97
-    return arg1._isBeingDragged
+function t.IsBeingDragged(p1) --[[ Line: 97 ]]
+	return p1._isBeingDragged
 end
-function module_2_upvr.GetGhosted(arg1) -- Line 100
-    return arg1._isGhostValue.Value
+function t.GetGhosted(p1) --[[ Line: 100 ]]
+	return p1._isGhostValue.Value
 end
-function module_2_upvr.IsPlaced(arg1) -- Line 103
-    return arg1._isPlacedValue.Value
+function t.IsPlaced(p1) --[[ Line: 103 ]]
+	return p1._isPlacedValue.Value
 end
-function module_2_upvr.Destroy(arg1) -- Line 106
-    local _maid = arg1._maid
-    local var18
-    if _maid == nil then
-        var18 = false
-    else
-        var18 = true
-    end
-    assert(var18)
-    arg1._maid = nil
-    _maid:Destroy()
+function t.Destroy(p1) --[[ Line: 106 ]]
+	local _maid = p1._maid
+	assert(_maid ~= nil)
+	p1._maid = nil
+	_maid:Destroy()
 end
-return module_2_upvr
+return t

@@ -1,25 +1,18 @@
 return {
-    named = function(arg1) -- Line 15, Named "named"
-        local var2_upvr
-        if type(arg1) ~= "string" then
-            var2_upvr = false
-        else
-            var2_upvr = true
-        end
-        assert(var2_upvr, "Symbols must be created using a string name!")
-        var2_upvr = true
-        local newproxy_result1_2 = newproxy(var2_upvr)
-        var2_upvr = string.format("Symbol(%s)", arg1);
-        getmetatable(newproxy_result1_2).__tostring = function() -- Line 22
-            return var2_upvr
-        end
-        return newproxy_result1_2
-    end;
-    unnamed = function() -- Line 33, Named "unnamed"
-        local newproxy_result1 = newproxy(true)
-        getmetatable(newproxy_result1).__tostring = function() -- Line 36
-            return "Unnamed Symbol"
-        end
-        return newproxy_result1
-    end;
+	named = function(p1) --[[ Name: named | Line: 15 ]]
+		assert(type(p1) == "string", "Symbols must be created using a string name!")
+		local v2 = newproxy(true)
+		local v3 = ("Symbol(%s)"):format(p1)
+		getmetatable(v2).__tostring = function() --[[ Line: 22 | Upvalues: v3 (copy) ]]
+			return v3
+		end
+		return v2
+	end,
+	unnamed = function() --[[ Name: unnamed | Line: 33 ]]
+		local v1 = newproxy(true)
+		getmetatable(v1).__tostring = function() --[[ Line: 36 ]]
+			return "Unnamed Symbol"
+		end
+		return v1
+	end
 }

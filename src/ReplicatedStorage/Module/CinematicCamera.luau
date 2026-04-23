@@ -1,27 +1,29 @@
-local new_upvr = CFrame.new
-local zero_vector3_upvr = Vector3.new()
-local CurrentCamera_upvr = workspace.CurrentCamera
+local CurrentCamera = workspace.CurrentCamera
+local v1 = CFrame.new
+local v2 = Vector3.new
+v1()
+local v3 = v2()
 return {
-    MakeCinematicCamera = function() -- Line 7, Named "MakeCinematicCamera"
-        return {
-            StartPosition = nil;
-            Position = zero_vector3_upvr;
-            TargetPosition = nil;
-            LookVector = zero_vector3_upvr;
-            TargetFocus = nil;
-        }
-    end;
-    StepCinematicCamera = function(arg1, arg2, arg3, arg4) -- Line 16, Named "StepCinematicCamera"
-        if arg2.TargetPosition then
-            if arg2.StartPosition then
-                arg2.Position = arg2.StartPosition * (1 - arg4) + arg2.TargetPosition * arg4
-            else
-                arg2.Position += (arg2.TargetPosition - arg2.Position) * arg1 * arg4
-            end
-        end
-        if arg2.TargetFocus then
-            arg2.LookVector += ((arg2.TargetFocus - arg2.Position).unit - arg2.LookVector) * arg1 * arg3
-        end
-        CurrentCamera_upvr.CoordinateFrame = new_upvr(zero_vector3_upvr, arg2.LookVector) + arg2.Position
-    end;
+	MakeCinematicCamera = function() --[[ Name: MakeCinematicCamera | Line: 7 | Upvalues: v3 (copy) ]]
+		return {
+			StartPosition = nil,
+			Position = v3,
+			TargetPosition = nil,
+			LookVector = v3,
+			TargetFocus = nil
+		}
+	end,
+	StepCinematicCamera = function(p1, p2, p3, p4) --[[ Name: StepCinematicCamera | Line: 16 | Upvalues: CurrentCamera (copy), v1 (copy), v3 (copy) ]]
+		if p2.TargetPosition then
+			if p2.StartPosition then
+				p2.Position = p2.StartPosition * (1 - p4) + p2.TargetPosition * p4
+			else
+				p2.Position = p2.Position + (p2.TargetPosition - p2.Position) * p1 * p4
+			end
+		end
+		if p2.TargetFocus then
+			p2.LookVector = p2.LookVector + ((p2.TargetFocus - p2.Position).unit - p2.LookVector) * p1 * p3
+		end
+		CurrentCamera.CoordinateFrame = v1(v3, p2.LookVector) + p2.Position
+	end
 }

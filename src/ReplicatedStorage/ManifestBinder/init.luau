@@ -1,325 +1,304 @@
-local Signal_upvr = require(game:GetService("ReplicatedStorage").Std.Signal)
-local function isManifestResolved(arg1, arg2) -- Line 16, Named "isManifestResolved"
-    local var6 = 0
-    for _ in pairs(arg1) do
-        var6 += 1
-    end
-    assert(var6 <= arg2, var6)
-    return var6 == arg2
+local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Signal = require(ReplicatedStorage.Std.Signal)
+local promiseBoundClass = require(script.promiseBoundClass)
+local parsePath = require(script.parsePath)
+local function isManifestResolved(p1, p2) --[[ Line: 16 ]]
+	local count = 0
+	for k in pairs(p1) do
+		count = count + 1
+	end
+	assert(count <= p2, count)
+	return count == p2
 end
-local function unbindNodeDescend_upvr(arg1, arg2) -- Line 26, Named "unbindNodeDescend"
-    if arg1.instance == nil then
-    else
-        arg1.instance = nil
-        local connections = arg1.connections
-        if connections then
-            for _, v_7 in ipairs(connections) do
-                v_7:Disconnect()
-            end
-            table.clear(connections)
-        end
-        if arg2 and arg1.alias then
-            arg2[arg1.alias] = nil
-        end
-        local children = arg1.children
-        if children then
-            for _, v_8 in pairs(children) do
-                unbindNodeDescend_upvr(v_8, arg2)
-            end
-        end
-    end
+local function v1(p1, p2) --[[ Line: 26 | Upvalues: v1 (copy) ]]
+	if p1.instance ~= nil then
+		p1.instance = nil
+		local connections = p1.connections
+		if connections then
+			for i, v in ipairs(connections) do
+				v:Disconnect()
+			end
+			table.clear(connections)
+		end
+		if p2 and p1.alias then
+			p2[p1.alias] = nil
+		end
+		local children = p1.children
+		if children then
+			for k, v in pairs(children) do
+				v1(v, p2)
+			end
+		end
+	end
 end
-local module_upvr = {}
-module_upvr.__index = module_upvr
-function module_upvr.new(arg1, arg2, arg3) -- Line 56
-    local module_2_upvr = {}
-    setmetatable(module_2_upvr, module_upvr)
-    local var26 = arg1
-    if not var26 then
-        var26 = error("Bad argument 'tagName', expected string")
-    end
-    module_2_upvr._tagName = var26
-    var26 = arg2
-    local var27 = var26
-    if not var27 then
-        var27 = error("Bad argument `manifest`, expected table")
-    end
-    module_2_upvr._manifest = var27
-    var27 = arg3
-    local var28 = var27
-    if not var28 then
-        var28 = error("Bad argument `constructor`, expected table or function")
-    end
-    module_2_upvr._constructor = var28
-    module_2_upvr._connections = {}
-    module_2_upvr._rootInstToClass = {}
-    module_2_upvr._rootInstToRootNode = {}
-    module_2_upvr._rootInstToManifest = {}
-    module_2_upvr._pendingRootInstSet = {}
-    module_2_upvr._listeners = {}
-    local var32 = 1
-    for _ in pairs(arg2) do
-        var32 += 1
-    end
-    module_2_upvr._manifestSizeTarget = var32
-    task.delay(5, function() -- Line 77
-        if not module_2_upvr._loaded then
-            warn(string.format(("ManifestBinder %q is not loaded. Call :Start() on it!"), module_2_upvr._tagName))
-        end
-    end)
-    return module_2_upvr
+local t = {}
+t.__index = t
+function t.new(p1, p2, p3) --[[ Line: 56 | Upvalues: t (copy) ]]
+	local t2 = {}
+	setmetatable(t2, t)
+	t2._tagName = p1 or error("Bad argument \'tagName\', expected string")
+	t2._manifest = p2 or error("Bad argument `manifest`, expected table")
+	t2._constructor = p3 or error("Bad argument `constructor`, expected table or function")
+	t2._connections = {}
+	t2._rootInstToClass = {}
+	t2._rootInstToRootNode = {}
+	t2._rootInstToManifest = {}
+	t2._pendingRootInstSet = {}
+	t2._listeners = {}
+	local count = 1
+	for k in pairs(p2) do
+		count = count + 1
+	end
+	t2._manifestSizeTarget = count
+	task.delay(5, function() --[[ Line: 77 | Upvalues: t2 (copy) ]]
+		if not t2._loaded then
+			warn(("ManifestBinder %q is not loaded. Call :Start() on it!"):format(t2._tagName))
+		end
+	end)
+	return t2
 end
-local CollectionService_upvr = game:GetService("CollectionService")
-function module_upvr.Start(arg1) -- Line 85
-    if arg1._loaded then
-        warn("ManifestBinder already loaded.")
-    else
-        arg1._loaded = true
-        for _, v_9 in ipairs(CollectionService_upvr:GetTagged(arg1._tagName)) do
-            task.spawn(arg1._bindRoot, arg1, v_9)
-        end
-        table.insert(arg1._connections, CollectionService_upvr:GetInstanceAddedSignal(arg1._tagName):Connect(function(arg1_2) -- Line 98
-            arg1:_bindRoot(arg1_2)
-        end))
-        table.insert(arg1._connections, CollectionService_upvr:GetInstanceRemovedSignal(arg1._tagName):Connect(function(arg1_3) -- Line 104
-            arg1:_unbindRoot(arg1_3)
-        end))
-    end
+function t.Start(p1) --[[ Line: 85 | Upvalues: CollectionService (copy) ]]
+	if p1._loaded then
+		warn("ManifestBinder already loaded.")
+	else
+		p1._loaded = true
+		for i, v in ipairs(CollectionService:GetTagged(p1._tagName)) do
+			task.spawn(p1._bindRoot, p1, v)
+		end
+		table.insert(p1._connections, CollectionService:GetInstanceAddedSignal(p1._tagName):Connect(function(p12) --[[ Line: 98 | Upvalues: p1 (copy) ]]
+			p1:_bindRoot(p12)
+		end))
+		table.insert(p1._connections, CollectionService:GetInstanceRemovedSignal(p1._tagName):Connect(function(p12) --[[ Line: 104 | Upvalues: p1 (copy) ]]
+			p1:_unbindRoot(p12)
+		end))
+	end
 end
-function module_upvr._stopBoundFn(arg1, arg2) -- Line 109
-    local var44 = arg1._rootInstToClass[arg2]
-    if var44 then
-        if arg1._classRemovingSignal then
-            arg1._classRemovingSignal:Fire(var44, arg2)
-        end
-        local var45 = arg1._listeners[arg2]
-        if var45 then
-            for i_3, _ in pairs(var45) do
-                task.spawn(i_3, nil)
-            end
-        end
-        if var44.Destroy then
-            var44:Destroy()
-        else
-            warn(string.format(("[ManifestBinder._remove] - Class %q no longer has destroy, something destroyed it!"), tostring(arg1._tagName)))
-        end
-        arg1._rootInstToClass[arg2] = nil
-    end
+function t._stopBoundFn(p1, p2) --[[ Line: 109 ]]
+	local v1 = p1._rootInstToClass[p2]
+	if v1 then
+		if p1._classRemovingSignal then
+			p1._classRemovingSignal:Fire(v1, p2)
+		end
+		local v2 = p1._listeners[p2]
+		if v2 then
+			for k, v in pairs(v2) do
+				task.spawn(k, nil)
+			end
+		end
+		if v1.Destroy then
+			v1:Destroy()
+		else
+			local v3 = warn
+			v3(("[ManifestBinder._remove] - Class %q no longer has destroy, something destroyed it!"):format((tostring(p1._tagName))))
+		end
+		p1._rootInstToClass[p2] = nil
+	end
 end
-function module_upvr._startBoundFn(arg1, arg2, arg3) -- Line 135
-    arg1:_stopBoundFn(arg2)
-    if arg1._pendingRootInstSet[arg2] == true then
-        warn("[ManifestBinder._startBoundFn] - Re-entered add. Still loading, probably caused by error in constructor.")
-    else
-        arg1._pendingRootInstSet[arg2] = true
-        local var53 = nil
-        if typeof(arg1._constructor) == "function" then
-            var53 = arg1._constructor(arg2, arg3)
-        elseif arg1._constructor.new then
-            var53 = arg1._constructor.new(arg2, arg3)
-        else
-            error("Invalid constructor, expected table or function")
-        end
-        if arg1._pendingRootInstSet[arg2] ~= true then
-            local var54 = if type(arg1._constructor) == "table" then arg1._constructor.ClassName else arg1._constructor
-            warn(string.format(("[ManifestBinder._startBoundFn] - Failed to load instance %q of %q, removed while loading!"), arg2:GetFullName(), tostring(var54)))
-            return
-        end
-        arg1._pendingRootInstSet[arg2] = nil
-        if typeof(var53) ~= "table" or typeof(var53.Destroy) ~= "function" then
-            warn(string.format(("[ManifestBinder._startBoundFn] - Bad class constructed for tag %q"), arg1._tagName))
-            return
-        end
-        arg1._rootInstToClass[arg2] = var53
-        local var55 = arg1._listeners[arg2]
-        if var55 then
-            for i_12, _ in pairs(var55) do
-                task.spawn(i_12, var53)
-            end
-        end
-        if arg1._classAddedSignal then
-            arg1._classAddedSignal:Fire(var53, arg2)
-        end
-        -- Decomp Error: Konstant control-flow analysis failed in this block; surrounding logic was preserved for review.
-    end
+function t._startBoundFn(p1, p2, p3) --[[ Line: 135 ]]
+	p1:_stopBoundFn(p2)
+	if p1._pendingRootInstSet[p2] == true then
+		warn("[ManifestBinder._startBoundFn] - Re-entered add. Still loading, probably caused by error in constructor.")
+		return
+	end
+	p1._pendingRootInstSet[p2] = true
+	local v1 = nil
+	if typeof(p1._constructor) == "function" then
+		v1 = p1._constructor(p2, p3)
+	elseif p1._constructor.new then
+		v1 = p1._constructor.new(p2, p3)
+	else
+		error("Invalid constructor, expected table or function")
+	end
+	if p1._pendingRootInstSet[p2] == true then
+		p1._pendingRootInstSet[p2] = nil
+		if typeof(v1) == "table" then
+			if typeof(v1.Destroy) == "function" then
+				p1._rootInstToClass[p2] = v1
+				local v4 = p1._listeners[p2]
+				if v4 then
+					for k, v in pairs(v4) do
+						task.spawn(k, v1)
+					end
+				end
+				if p1._classAddedSignal then
+					p1._classAddedSignal:Fire(v1, p2)
+				end
+			else
+				warn(("[ManifestBinder._startBoundFn] - Bad class constructed for tag %q"):format(p1._tagName))
+			end
+		else
+			warn(("[ManifestBinder._startBoundFn] - Bad class constructed for tag %q"):format(p1._tagName))
+		end
+	else
+		warn(("[ManifestBinder._startBoundFn] - Failed to load instance %q of %q, removed while loading!"):format(p2:GetFullName(), (tostring(type(p1._constructor) == "table" and p1._constructor.ClassName or p1._constructor))))
+	end
 end
-local parsePath_upvr = require(script.parsePath)
-function module_upvr._bindRoot(arg1, arg2) -- Line 186
-    -- Decomp Logic Error: Konstant variable analysis failed; temporary assignments in this block were preserved for review.
-    local var76
-    if arg1._rootInstToManifest[arg2] ~= nil then
-        var76 = false
-    else
-        var76 = true
-    end
-    assert(var76)
-    local tbl_2_upvr = {}
-    var76 = arg1._rootInstToManifest
-    var76[arg2] = tbl_2_upvr
-    var76 = debug.profilebegin
-    var76("initializeBoundTree")
-    var76 = {}
-    var76.alias = "root"
-    var76.instance = arg2
-    if next(arg1._manifest) then
-        var76.children = {}
-        var76.connections = {}
-    end
-    arg1._rootInstToRootNode[arg2] = var76
-    for i_4, v_2 in pairs(arg1._manifest) do
-        local parsePath_upvr_result1 = parsePath_upvr(v_2)
-        local var82 = var76
-        for i_5, v_3 in ipairs(parsePath_upvr_result1) do
-            local var86 = i_5 == #parsePath_upvr_result1
-            local tbl = var82.children[v_3]
-            if not tbl then
-                tbl = {}
-                var82.children[v_3] = tbl
-            end
-            if var86 then
-                if tbl.alias ~= nil then
-                    error("Multiple aliases assigned to one instance")
-                end
-                tbl.alias = i_4
-            else
-                tbl.children = tbl.children or {}
-                tbl.connections = tbl.connections or {}
-            end
-            var82 = tbl
-        end
-    end
-    debug.profileend()
-    local function processNode_upvr(arg1_4) -- Line 232, Named "processNode"
-        local instance = assert(arg1_4.instance)
-        local children = arg1_4.children
-        local alias = arg1_4.alias
-        local isLeaf = not children
-        if alias then
-            tbl_2_upvr[alias] = instance
-        end
-        if not isLeaf then
-            local function processAddChild(child)
-                local childNode = children[child.Name]
-                if not childNode or childNode.instance ~= nil then
-                    return
-                end
-                childNode.instance = child
-                processNode_upvr(childNode)
-            end
-            local function processDeleteChild(child)
-                local childNode = children[child.Name]
-                if not childNode or childNode.instance ~= child then
-                    return
-                end
-                arg1:_stopBoundFn(arg2)
-                unbindNodeDescend_upvr(childNode, tbl_2_upvr)
-                assert(childNode.instance == nil)
-                local replacement = instance:FindFirstChild(child.Name)
-                if replacement then
-                    local replacementNode = children[replacement.Name]
-                    if replacementNode and replacementNode.instance == nil then
-                        replacementNode.instance = replacement
-                        processNode_upvr(replacementNode)
-                    end
-                end
-            end
-            for _, child in ipairs(instance:GetChildren()) do
-                local childNode = children[child.Name]
-                if childNode and childNode.instance == nil then
-                    childNode.instance = child
-                    processNode_upvr(childNode)
-                end
-            end
-            table.insert(arg1_4.connections, instance.ChildAdded:Connect(processAddChild))
-            table.insert(arg1_4.connections, instance.ChildRemoved:Connect(processDeleteChild))
-        end
-        if isLeaf and isManifestResolved(tbl_2_upvr, arg1._manifestSizeTarget) then
-            arg1:_startBoundFn(arg2, tbl_2_upvr)
-        end
-    end
-    debug.profilebegin("resolveBoundTree")
-    processNode_upvr(var76)
-    debug.profileend()
+function t._bindRoot(p1, p2) --[[ Line: 186 | Upvalues: parsePath (copy), v1 (copy) ]]
+	assert(p1._rootInstToManifest[p2] == nil)
+	local t = {}
+	p1._rootInstToManifest[p2] = t
+	debug.profilebegin("initializeBoundTree")
+	local t2 = {
+		alias = "root",
+		instance = p2
+	}
+	if next(p1._manifest) then
+		t2.children = {}
+		t2.connections = {}
+	end
+	p1._rootInstToRootNode[p2] = t2
+	for k, v in pairs(p1._manifest) do
+		local v2 = parsePath(v)
+		local v3 = t2
+		for i, v5 in ipairs(v2) do
+			local v4
+			v4 = i == #v2
+			local v52 = v3.children[v5] or {}
+			if v4 then
+				if v52.alias ~= nil then
+					error("Multiple aliases assigned to one instance")
+				end
+				v52.alias = k
+			else
+				v52.children = v52.children or {}
+				v52.connections = v52.connections or {}
+			end
+			v3.children[v5] = v52
+			v3 = v52
+		end
+	end
+	debug.profileend()
+	local function v8(p12) --[[ Line: 232 | Upvalues: t (copy), v8 (copy), p1 (copy), p2 (copy), v1 (ref) ]]
+		local v12 = assert(p12.instance)
+		local children = p12.children
+		local alias = p12.alias
+		local v2 = not children
+		if alias then
+			t[alias] = v12
+		end
+		if not v2 then
+			local function processAddChild(p1) --[[ Line: 244 | Upvalues: children (copy), v8 (ref) ]]
+				local v1 = children[p1.Name]
+				if v1 and v1.instance == nil then
+					v1.instance = p1
+					v8(v1)
+				end
+			end
+			local function processDeleteChild(p12) --[[ Line: 255 | Upvalues: children (copy), p1 (ref), p2 (ref), v1 (ref), t (ref), v12 (copy), v8 (ref) ]]
+				local v13 = p12.Name
+				local v2 = children[v13]
+				if v2 and v2.instance == p12 then
+					p1:_stopBoundFn(p2)
+					v1(v2, t)
+					assert(v2.instance == nil)
+					local v3 = v12:FindFirstChild(v13)
+					if v3 then
+						local v4 = children[v3.Name]
+						if v4 and v4.instance == nil then
+							v4.instance = v3
+							v8(v4)
+						end
+					end
+				end
+			end
+			for i, v in ipairs(v12:GetChildren()) do
+				local v3 = children[v.Name]
+				if v3 and v3.instance == nil then
+					v3.instance = v
+					v8(v3)
+				end
+			end
+			table.insert(p12.connections, v12.ChildAdded:Connect(processAddChild))
+			table.insert(p12.connections, v12.ChildRemoved:Connect(processDeleteChild))
+		end
+		if v2 then
+			local _manifestSizeTarget = p1._manifestSizeTarget
+			local count = 0
+			for k in pairs(t) do
+				count = count + 1
+			end
+			assert(count <= _manifestSizeTarget, count)
+			if count == _manifestSizeTarget then
+				p1:_startBoundFn(p2, t)
+			end
+		end
+	end
+	v8(t2)
 end
-function module_upvr._unbindRoot(arg1, arg2) -- Line 305
-    arg1:_stopBoundFn(arg2)
-    local var90 = arg1._rootInstToRootNode[arg2]
-    if var90 then
-        unbindNodeDescend_upvr(var90, assert(arg1._rootInstToManifest[arg2]))
-        arg1._rootInstToRootNode[arg2] = nil
-    end
-    arg1._rootInstToManifest[arg2] = nil
+function t._unbindRoot(p1, p2) --[[ Line: 305 | Upvalues: v1 (copy) ]]
+	p1:_stopBoundFn(p2)
+	local v12 = p1._rootInstToRootNode[p2]
+	if v12 then
+		v1(v12, (assert(p1._rootInstToManifest[p2])))
+		p1._rootInstToRootNode[p2] = nil
+	end
+	p1._rootInstToManifest[p2] = nil
 end
-function module_upvr.GetAllSet(arg1) -- Line 317
-    return arg1._rootInstToClass
+function t.GetAllSet(p1) --[[ Line: 317 ]]
+	return p1._rootInstToClass
 end
-function module_upvr.GetAll(arg1) -- Line 321
-    local module = {}
-    for _, v_4 in pairs(arg1._rootInstToClass) do
-        module[#module + 1] = v_4
-    end
-    return module
+function t.GetAll(p1) --[[ Line: 321 ]]
+	local t = {}
+	for k, v in pairs(p1._rootInstToClass) do
+		t[#t + 1] = v
+	end
+	return t
 end
-function module_upvr.GetTag(arg1) -- Line 328
-    return arg1._tagName
+function t.GetTag(p1) --[[ Line: 328 ]]
+	return p1._tagName
 end
-function module_upvr.Get(arg1, arg2) -- Line 331
-    return arg1._rootInstToClass[arg2]
+function t.Get(p1, p2) --[[ Line: 331 ]]
+	return p1._rootInstToClass[p2]
 end
-local promiseBoundClass_upvr = require(script.promiseBoundClass)
-function module_upvr.Promise(arg1, arg2) -- Line 334
-    return promiseBoundClass_upvr(arg1, arg2)
+function t.Promise(p1, p2) --[[ Line: 334 | Upvalues: promiseBoundClass (copy) ]]
+	return promiseBoundClass(p1, p2)
 end
-function module_upvr.ObserveInstance(arg1, arg2, arg3) -- Line 338
-    local var100 = arg1._listeners[arg2]
-    if not var100 then
-        var100 = {}
-    end
-    arg1._listeners[arg2] = var100
-    arg1._listeners[arg2][arg3] = true
-    return function() -- Line 342
-        if not arg1._listeners[arg2] then
-        else
-            arg1._listeners[arg2][arg3] = nil
-            if not next(arg1._listeners[arg2]) then
-                arg1._listeners[arg2] = nil
-            end
-        end
-    end
+function t.ObserveInstance(p1, p2, p3) --[[ Line: 338 ]]
+	p1._listeners[p2] = p1._listeners[p2] or {}
+	p1._listeners[p2][p3] = true
+	return function() --[[ Line: 342 | Upvalues: p1 (copy), p2 (copy), p3 (copy) ]]
+		if p1._listeners[p2] then
+			p1._listeners[p2][p3] = nil
+			if not next(p1._listeners[p2]) then
+				p1._listeners[p2] = nil
+			end
+		end
+	end
 end
-function module_upvr.GetClassAddedSignal(arg1) -- Line 353
-    if arg1._classAddedSignal then
-        return arg1._classAddedSignal
-    end
-    arg1._classAddedSignal = Signal_upvr.new()
-    table.insert(arg1._connections, arg1._classAddedSignal)
-    return arg1._classAddedSignal
+function t.GetClassAddedSignal(p1) --[[ Line: 353 | Upvalues: Signal (copy) ]]
+	if not p1._classAddedSignal then
+		p1._classAddedSignal = Signal.new()
+		table.insert(p1._connections, p1._classAddedSignal)
+	end
+	return p1._classAddedSignal
 end
-function module_upvr.GetClassRemovingSignal(arg1) -- Line 364
-    if arg1._classRemovingSignal then
-        return arg1._classRemovingSignal
-    end
-    arg1._classRemovingSignal = Signal_upvr.new()
-    table.insert(arg1._connections, arg1._classRemovingSignal)
-    return arg1._classRemovingSignal
+function t.GetClassRemovingSignal(p1) --[[ Line: 364 | Upvalues: Signal (copy) ]]
+	if not p1._classRemovingSignal then
+		p1._classRemovingSignal = Signal.new()
+		table.insert(p1._connections, p1._classRemovingSignal)
+	end
+	return p1._classRemovingSignal
 end
-function module_upvr.Destroy(arg1) -- Line 374
-    debug.profilebegin("ManifestBinder:Destroy")
-    for rootInst in pairs(arg1._rootInstToClass) do
-        arg1:_stopBoundFn(rootInst)
-        assert(arg1._rootInstToClass[rootInst] == nil, "Failed to remove")
-    end
-    table.clear(arg1._rootInstToClass)
-    for _, v_5 in ipairs(arg1._connections) do
-        v_5:Disconnect()
-    end
-    table.clear(arg1._connections)
-    for i_8, v_6 in pairs(arg1._rootInstToRootNode) do
-        unbindNodeDescend_upvr(v_6, assert(arg1._rootInstToManifest[i_8]))
-        local _
-    end
-    table.clear(arg1._rootInstToManifest)
-    table.clear(arg1._rootInstToRootNode)
-    debug.profileend()
+function t.Destroy(p1) --[[ Line: 374 | Upvalues: v1 (copy) ]]
+	debug.profilebegin("ManifestBinder:Destroy")
+	local v12 = next(p1._rootInstToClass)
+	while v12 ~= nil do
+		p1:_stopBoundFn(v12)
+		assert(p1._rootInstToClass[v12] == nil, "Failed to remove")
+		v12 = next(p1._rootInstToClass)
+	end
+	table.clear(p1._rootInstToClass)
+	for i, v in ipairs(p1._connections) do
+		v:Disconnect()
+	end
+	table.clear(p1._connections)
+	local _rootInstToManifest = p1._rootInstToManifest
+	for k, v in pairs(p1._rootInstToRootNode) do
+		v1(v, (assert(_rootInstToManifest[k])))
+	end
+	table.clear(p1._rootInstToManifest)
+	table.clear(p1._rootInstToRootNode)
+	debug.profileend()
 end
-return module_upvr
+return t
