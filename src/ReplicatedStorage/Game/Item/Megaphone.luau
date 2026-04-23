@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.ActionButton.ActionButtonService)
 local Basic = require(script.Parent.Basic)
@@ -34,30 +35,30 @@ local t = {
 		}
 	}
 }
-local function wireup(p1, p2) --[[ Line: 41 ]]
+local function wireup(source, target)
 	local Wire = Instance.new("Wire")
-	Wire.SourceInstance = p1
-	Wire.TargetInstance = p2
-	Wire.Parent = p2
+	Wire.SourceInstance = source
+	Wire.TargetInstance = target
+	Wire.Parent = target
 	return Wire
 end
-local function split(p1, p2) --[[ Line: 49 ]]
-	local SourceInstance = p1.SourceInstance
-	local TargetInstance = p1.TargetInstance
-	p1.TargetInstance = p2
-	local Wire = Instance.new("Wire")
-	Wire.SourceInstance = p2
-	Wire.TargetInstance = TargetInstance
-	Wire.Parent = TargetInstance
+local function split(wire, newTarget)
+	local SourceInstance = wire.SourceInstance
+	local TargetInstance = wire.TargetInstance
+	wire.TargetInstance = newTarget
+	local newWire = Instance.new("Wire")
+	newWire.SourceInstance = newTarget
+	newWire.TargetInstance = TargetInstance
+	newWire.Parent = TargetInstance
 end
-local t2 = {
+local Megaphone = {
 	__ClassName = "Megaphone"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.new(p1, p2, p3) --[[ Line: 60 | Upvalues: Basic (copy), t (copy), t2 (copy) ]]
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
+Megaphone.__index = Megaphone
+setmetatable(Megaphone, Basic)
+function Megaphone.new(self, itemInstance, motionConfig)
+	local newInstance = Basic.new(self, itemInstance, t, motionConfig)
+	setmetatable(newInstance, Megaphone)
 	local AudioEmitter = Instance.new("AudioEmitter")
 	local AudioPlayer = Instance.new("AudioPlayer")
 	local Wire = Instance.new("Wire")
@@ -69,8 +70,8 @@ function t2.new(p1, p2, p3) --[[ Line: 60 | Upvalues: Basic (copy), t (copy), t2
 	Wire.TargetInstance = AudioEmitter
 	Wire_2.Parent = AudioEmitter
 	Wire_2.TargetInstance = AudioEmitter
-	if p1:FindFirstChild("AudioDeviceInput") then
-		Wire_2.SourceInstance = p1.AudioDeviceInput
+	if self:FindFirstChild("AudioDeviceInput") then
+		Wire_2.SourceInstance = self.AudioDeviceInput
 	end
 	local AudioDistortion = Instance.new("AudioDistortion", Wire)
 	AudioDistortion.Level = 0.4
@@ -99,33 +100,33 @@ function t2.new(p1, p2, p3) --[[ Line: 60 | Upvalues: Basic (copy), t (copy), t2
 	Wire_5.SourceInstance = AudioFader
 	Wire_5.TargetInstance = TargetInstance_3
 	Wire_5.Parent = TargetInstance_3
-	AudioEmitter.Parent = v1.Model.Model.Body.EmmitAttachment
-	v1.Model.Model.TeamColor.BrickColor = p1.TeamColor
-	v1.AudioPlayer = AudioPlayer
-	v1.Maid:GiveTask(AudioEmitter)
-	if v1.Local then
+	AudioEmitter.Parent = newInstance.Model.Model.Body.EmmitAttachment
+	newInstance.Model.Model.TeamColor.BrickColor = self.TeamColor
+	newInstance.AudioPlayer = AudioPlayer
+	newInstance.Maid:GiveTask(AudioEmitter)
+	if newInstance.Local then
 		Wire_2.TargetInstance = nil
 	end
-	v1:DefaultDisableCamLock()
-	return v1
+	newInstance:DefaultDisableCamLock()
+	return newInstance
 end
-function t2.GetLeftArmPosition(p1) --[[ Line: 115 ]]
+function Megaphone.GetLeftArmPosition(self)
 	return nil
 end
-function t2.InputBegan(p1, p2, p3) --[[ Line: 118 | Upvalues: t (copy), Basic (copy) ]]
-	local v1 = if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false
-	if p1.AudioPlayer and v1 then
-		local v2 = "rbxassetid://" .. t.FunSounds[2].SoundId
-		if p1.AudioPlayer.Asset ~= v2 then
-			p1.AudioPlayer.Asset = v2
-			p1.AudioPlayer.TimePosition = 0
+function Megaphone.InputBegan(self, input, inputState)
+	local isClickInput = if input.UserInputType == Enum.UserInputType.MouseButton1 then true elseif input.UserInputType == Enum.UserInputType.Gamepad1 then input.KeyCode == Enum.KeyCode.ButtonR2 else false
+	if self.AudioPlayer and isClickInput then
+		local soundAsset = "rbxassetid://" .. t.FunSounds[2].SoundId
+		if self.AudioPlayer.Asset ~= soundAsset then
+			self.AudioPlayer.Asset = soundAsset
+			self.AudioPlayer.TimePosition = 0
 		end
-		p1.AudioPlayer:Play()
+		self.AudioPlayer:Play()
 	end
-	if p1.Local and v1 then
-		p1:BroadcastInputBegan(p2)
+	if self.Local and isClickInput then
+		self:BroadcastInputBegan(input)
 	end
-	Basic.InputBegan(p1, p2, p3)
+	Basic.InputBegan(self, input, inputState)
 end
-function t2.InputEnded(p1) --[[ Line: 137 ]] end
-return t2
+function Megaphone.InputEnded(self) end
+return Megaphone

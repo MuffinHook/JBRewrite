@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local v1 = Roact.PureComponent:extend("CenterMessage")
-function v1.init(p1) --[[ Line: 6 ]] end
+function v1.init(p1)end
 function v1.render(p1)
 	return createElement("Frame", {
 		BackgroundTransparency = 1,
@@ -30,5 +30,5 @@ function v1.render(p1)
 		})
 	})
 end
-function v1.willUnmount(p1) --[[ Line: 33 ]] end
+function v1.willUnmount(p1)end
 return v1

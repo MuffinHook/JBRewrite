@@ -42,7 +42,7 @@ v1.defaultProps = {
 	color = Color3.new(255/255, 255/255, 255/255),
 	zIndex = 1
 }
-function v1.init(p1) --[[ Line: 46 ]] end
+function v1.init(p1)end
 function v1.render(p1)
 	return createElement("Frame", {
 		BackgroundTransparency = 1,

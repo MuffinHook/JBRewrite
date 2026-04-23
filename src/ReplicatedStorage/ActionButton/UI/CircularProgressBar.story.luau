@@ -15,7 +15,7 @@ return function(p1)
 			progressBinding = p1.progress
 		})
 	end
-	function v1.willUnmount(p1) --[[ Line: 16 ]] end
+	function v1.willUnmount(p1)end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
 	return function()
 		Roact.unmount(v2)

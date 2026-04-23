@@ -77,7 +77,7 @@ return function(p1)
 			end
 		})
 	end
-	function v1.willUnmount(p1) --[[ Line: 82 ]] end
+	function v1.willUnmount(p1)end
 	local v4 = Roact.mount(Roact.createElement(v1), p1)
 	return function()
 		Roact.unmount(v4)
