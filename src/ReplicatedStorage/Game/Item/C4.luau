@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
 local AdminPermUtils = require(ReplicatedStorage.App.AdminPermUtils)
@@ -7,21 +8,21 @@ local C4Binder = require(ReplicatedStorage.Game.C4.C4Binder)
 local Audio = require(ReplicatedStorage.Std.Audio)
 require(ReplicatedStorage.Inventory.InventoryItemUtils)
 local Gun = require(script.Parent.Gun)
-local function getDetonatableC4(p1) --[[ Line: 13 | Upvalues: C4Binder (copy) ]]
+local function getDetonatableC4(p1)
 	for i, v in ipairs((C4Binder:GetAll())) do
 		if v:GetCreator() == p1 and (not v:IsListening() and (not v:GetDetonated() and v:GetStuck())) then
 			return v
 		end
 	end
 end
-local function getThrowableC4(p1) --[[ Line: 23 | Upvalues: C4Binder (copy) ]]
+local function getThrowableC4(p1)
 	for i, v in ipairs((C4Binder:GetAll())) do
 		if v:GetCreator() == p1 and not (v:IsListening() or (v:GetDetonated() or v:GetStuck())) then
 			return v
 		end
 	end
 end
-local function getNumActiveC4(p1) --[[ Line: 33 | Upvalues: C4Binder (copy) ]]
+local function getNumActiveC4(p1)
 	local count = 0
 	for i, v in ipairs((C4Binder:GetAll())) do
 		if v:GetCreator() == p1 and (v:IsListening() or v:GetStuck()) then
@@ -30,7 +31,7 @@ local function getNumActiveC4(p1) --[[ Line: 33 | Upvalues: C4Binder (copy) ]]
 	end
 	return count
 end
-local function randomVector() --[[ Line: 45 ]]
+local function randomVector()
 	local v1 = math.random() * 2 - 1
 	local v2 = math.random() * 2 - 1
 	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
@@ -41,10 +42,10 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.Init(p1) --[[ Line: 55 | Upvalues: v2 (ref) ]]
+function t.Init(p1)
 	v2 = p1.Event
 end
-function t.new(p1, p2, p3) --[[ Line: 58 | Upvalues: Gun (copy), t (copy), AdminPermUtils (copy), ActionButtonService (copy), getDetonatableC4 (copy) ]]
+function t.new(p1, p2, p3)
 	local v1 = Gun.new(p1, p2, p3)
 	setmetatable(v1, t)
 	v1.ApplySkin = false
@@ -54,7 +55,7 @@ function t.new(p1, p2, p3) --[[ Line: 58 | Upvalues: Gun (copy), t (copy), Admin
 			priority = 750,
 			image = "rbxassetid://4939740665",
 			keyCodes = { Enum.KeyCode.F },
-			onPressed = function() --[[ Name: onPressed | Line: 69 | Upvalues: getDetonatableC4 (ref), v1 (copy) ]]
+			onPressed = function()
 				local v12 = getDetonatableC4(v1.Player)
 				if v12 then
 					v12:Detonate({
@@ -66,17 +67,17 @@ function t.new(p1, p2, p3) --[[ Line: 58 | Upvalues: Gun (copy), t (copy), Admin
 	end
 	return v1
 end
-function t.SetupArmWelds(p1) --[[ Line: 82 ]] end
-function t.UpdateArmIK(p1) --[[ Line: 83 ]]
+function t.SetupArmWelds(p1) end
+function t.UpdateArmIK(p1)
 	local IK = p1.IK
 	IK.RightArm = p1.Model.Model.Hold.Position
 	IK.RightAngle = p1.Config.Motion.RightElbowAngle
 end
-function t.SetupTip(p1) --[[ Line: 89 ]]
+function t.SetupTip(p1)
 	p1.TipOffset = Vector3.new()
 end
-function t.BulletEmitterOnLocalHitPlayer(p1) --[[ Line: 92 ]] end
-function t.ShootBegin(p1, p2) --[[ Line: 93 | Upvalues: getDetonatableC4 (copy), Audio (copy), getNumActiveC4 (copy), getThrowableC4 (copy), SimulatedPhysicsProjectile (copy), v2 (ref) ]]
+function t.BulletEmitterOnLocalHitPlayer(p1) end
+function t.ShootBegin(p1, p2)
 	tick()
 	local v1, v22, v3, v4, v5, _, v6, v7, v8, v9
 	if not p1.Local then
@@ -109,7 +110,7 @@ function t.ShootBegin(p1, p2) --[[ Line: 93 | Upvalues: getDetonatableC4 (copy),
 			v8 = math.random() * 2 - 1
 			v9 = math.random() * 2 - 1
 			v1:SetRotVelocity(v6 + Vector3.new(v7, v8, v9).Unit * 5)
-			task.spawn(function() --[[ Line: 162 | Upvalues: v1 (ref) ]]
+			task.spawn(function()
 				v1:ListenForAttach()
 			end)
 			v2:FireServer("x" .. ("guynw"):sub(4, 4):reverse():reverse():reverse() .. "" .. "" .. ("wpwlw8gc4"):sub(5, 6):reverse():reverse():reverse() .. "" .. "" .. ("st5golsm"):sub(5, 7):reverse():reverse():reverse() .. "k")
@@ -135,7 +136,7 @@ function t.ShootBegin(p1, p2) --[[ Line: 93 | Upvalues: getDetonatableC4 (copy),
 				p1.SpringItemOffset:SetTarget(p1.Config.Motion.Raise.Springs.ItemOffset)
 				p1.SpringItemRotation:SetTarget(p1.Config.Motion.Raise.Springs.ItemRotation)
 				p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Raise.Springs.NeckRotation)
-				delay(0.2, function() --[[ Line: 114 | Upvalues: p1 (copy) ]]
+				delay(0.2, function()
 					p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
 					p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
 					p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
@@ -171,7 +172,7 @@ function t.ShootBegin(p1, p2) --[[ Line: 93 | Upvalues: getDetonatableC4 (copy),
 					v8 = math.random() * 2 - 1
 					v9 = math.random() * 2 - 1
 					v1:SetRotVelocity(v6 + Vector3.new(v7, v8, v9).Unit * 5)
-					task.spawn(function() --[[ Line: 162 | Upvalues: v1 (ref) ]]
+					task.spawn(function()
 						v1:ListenForAttach()
 					end)
 					v2:FireServer("x" .. ("guynw"):sub(4, 4):reverse():reverse():reverse() .. "" .. "" .. ("wpwlw8gc4"):sub(5, 6):reverse():reverse():reverse() .. "" .. "" .. ("st5golsm"):sub(5, 7):reverse():reverse():reverse() .. "k")
@@ -185,16 +186,16 @@ function t.ShootBegin(p1, p2) --[[ Line: 93 | Upvalues: getDetonatableC4 (copy),
 		end
 	end
 end
-function t.ShootEnd(p1, p2) --[[ Line: 175 ]]
+function t.ShootEnd(p1, p2)
 	if p1.Local then
 		p1:BroadcastInputEnded(p2)
 	end
 end
-function t.ShootSound(p1, p2) --[[ Line: 180 ]] end
-function t.ReloadDropAmmoSound(p1) --[[ Line: 185 ]] end
-function t.ReloadRefillAmmoSound(p1) --[[ Line: 186 ]] end
-function t.ReloadDropAmmoVisual(p1) --[[ Line: 187 ]] end
-function t.ReloadRefillAmmoVisual(p1) --[[ Line: 188 ]] end
+function t.ShootSound(p1, p2) end
+function t.ReloadDropAmmoSound(p1) end
+function t.ReloadRefillAmmoSound(p1) end
+function t.ReloadDropAmmoVisual(p1) end
+function t.ReloadRefillAmmoVisual(p1) end
 t.ScopeBegin = false
 t.ScopeEnd = false
 t.Reload = false

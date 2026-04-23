@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 local RunConsts = require(script.Parent.RunConsts)
 local RunUtils = require(script.Parent.RunUtils)
 local t = {
-	isBadimo = function(p1) --[[ Name: isBadimo | Line: 7 ]]
+	isBadimo = function(p1)
 		local UserId = p1.UserId
 		return if UserId == 2025110 or UserId == 2837719 then true else UserId == 606723718
 	end
 }
-function t.hasPerms(p1) --[[ Line: 12 | Upvalues: RunUtils (copy), t (copy), RunConsts (copy) ]]
+function t.hasPerms(p1)
 	if not p1 then
 		warn("Player missing from admin perm function.")
 	end

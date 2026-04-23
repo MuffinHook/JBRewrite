@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Binder = require(ReplicatedStorage.Std.Binder)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
@@ -7,7 +8,7 @@ local BountyBoardService = require(ReplicatedStorage.Bounty.BountyBoardService)
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1) --[[ Line: 12 | Upvalues: BaseObject (copy), t (copy), ReplicatedStorage (copy), BountyConsts (copy), BountyBoardService (copy) ]]
+function t.new(p1)
 	local v1 = BaseObject.new(p1)
 	setmetatable(v1, t)
 	local Board = p1:WaitForChild("Board")

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local v1 = table
 local v2 = ipairs
 local v3 = string
@@ -49,21 +50,21 @@ for v14, v15 in v4, {
 } do
 	v13[v15] = true
 end
-local v17 = v1.find or function(p1, p2) --[[ Line: 68 | Upvalues: v2 (copy) ]]
+local v17 = v1.find or function(p1, p2)
 	for v1, v22 in v2(p1) do
 		if v22 == p2 then
 			return v1
 		end
 	end
 end
-local v19 = v1.clone or function(p1) --[[ Line: 80 | Upvalues: v4 (copy) ]]
+local v19 = v1.clone or function(p1)
 	local t = {}
 	for v1, v2 in v4, p1 do
 		t[v1] = v2
 	end
 	return t
 end
-local function CheckType(p1, p2, ...) --[[ Line: 92 | Upvalues: v12 (copy), v17 (ref), format (copy), concat (copy) ]]
+local function CheckType(p1, p2, ...)
 	local t = { ... }
 	local v1 = v12(p1)
 	if not v17(t, v1) then
@@ -88,10 +89,10 @@ for i = 0, 255 do
 		t[v20] = "\\" .. i
 	end
 end
-local function SerializeString(p1) --[[ Line: 139 | Upvalues: gsub (copy), t (copy) ]]
+local function SerializeString(p1)
 	return "\"" .. gsub(p1, "[%z\\\"\1-\31\127-\255]", t) .. "\""
 end
-local function CommentBlock(p1) --[[ Line: 147 | Upvalues: gmatch (copy) ]]
+local function CommentBlock(p1)
 	local v1 = ""
 	for v2 in gmatch(p1, "%](=*)%]") do
 		if #v1 <= #v2 then
@@ -100,11 +101,11 @@ local function CommentBlock(p1) --[[ Line: 147 | Upvalues: gmatch (copy) ]]
 	end
 	return "--[" .. v1 .. "[" .. p1 .. "]" .. v1 .. "]"
 end
-local function IsService(p1) --[[ Line: 163 | Upvalues: v5 (copy), v6 (copy) ]]
+local function IsService(p1)
 	local v1, v2 = v5(v6.FindService, v6, p1.ClassName)
 	return v1 and v2 and true or false
 end
-local function v21(p1, p2) --[[ Line: 175 | Upvalues: v6 (copy), v5 (copy), SerializeString (ref), v13 (ref), match (copy), v7 (copy), v21 (ref) ]]
+local function v21(p1, p2)
 	local v1 = p2 or ""
 	local v2 = p1.Name
 	local ClassName = p1.ClassName
@@ -126,7 +127,7 @@ local function v21(p1, p2) --[[ Line: 175 | Upvalues: v6 (copy), v5 (copy), Seri
 		end
 	end
 end
-local function v22(p1, p2) --[[ Line: 236 | Upvalues: CheckType (copy), rep (copy), sub (copy), v4 (copy), v12 (copy), insert (copy), concat (copy), huge (copy), format (copy), v13 (ref), match (copy), SerializeString (ref), v19 (ref), v22 (copy), v9 (copy), v10 (copy), v21 (ref), gmatch (copy), v11 (copy), v5 (copy) ]]
+local function v22(p1, p2)
 	CheckType(p1, "inputTable", "table")
 	CheckType(p2, "options", "table", "nil")
 	if p2 then
@@ -169,20 +170,20 @@ local function v22(p1, p2) --[[ Line: 236 | Upvalues: CheckType (copy), rep (cop
 		local v14 = #v132 > 0 and sub(v132, 1, -IndentCount - 1) or ""
 		local v16 = 1
 		local t = {}
-		local function TypeCase(p1, p2) --[[ Line: 301 | Upvalues: t (copy) ]]
+		local function TypeCase(p1, p2)
 			return t[p1](p2, false)
 		end
-		local function Args(...) --[[ Line: 308 | Upvalues: v4 (ref), v12 (ref), t (copy), insert (ref), concat (ref), v102 (copy) ]]
+		local function Args(...)
 			local t2 = {}
 			for v1, v2 in v4, { ... } do
 				insert(t2, (t[v12(v2)](v2, false)))
 			end
 			return concat(t2, v102)
 		end
-		local function Params(p1, p2) --[[ Line: 319 | Upvalues: concat (ref), t (copy), v102 (copy) ]]
+		local function Params(p1, p2)
 			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ p1, (t.table(p2, false)) }, v102) .. ")"
 		end
-		function t.number(p1, p2) --[[ Line: 325 | Upvalues: v16 (ref), huge (ref), format (ref) ]]
+		function t.number(p1, p2)
 			if p2 and p1 == v16 then
 				v16 = v16 + 1
 				return nil, true
@@ -194,14 +195,14 @@ local function v22(p1, p2) --[[ Line: 236 | Upvalues: CheckType (copy), rep (cop
 				return format("%.14g", p1)
 			end
 		end
-		function t.string(p1, p2) --[[ Line: 346 | Upvalues: v13 (ref), match (ref), SerializeString (ref) ]]
+		function t.string(p1, p2)
 			if p2 and (not v13[p1] and match(p1, "^[A-Za-z_][A-Za-z0-9_]*$")) then
 				return p1, true
 			else
 				return SerializeString(p1)
 			end
 		end
-		function t.table(p12, p2) --[[ Line: 355 | Upvalues: v8 (copy), format (ref), p1 (copy), v19 (ref), v2 (ref), v3 (copy), IndentCount (copy), v7 (copy), v22 (ref) ]]
+		function t.table(p12, p2)
 			if v8[p12] then
 				return format("{--[[LuaEncode: Duplicate reference%s]]}", if p12 == p1 then " (of parent)" else "")
 			else
@@ -214,20 +215,20 @@ local function v22(p1, p2) --[[ Line: 236 | Upvalues: CheckType (copy), rep (cop
 				return v22(p12, v4)
 			end
 		end
-		function t.boolean(p1) --[[ Line: 387 | Upvalues: v9 (ref) ]]
+		function t.boolean(p1)
 			return v9(p1)
 		end
-		t["nil"] = function(p1) --[[ Line: 391 ]]
+		t["nil"] = function(p1)
 			return "nil"
 		end
-		t["function"] = function(p1) --[[ Line: 395 | Upvalues: FunctionsReturnRaw (copy) ]]
+		t["function"] = function(p1)
 			if FunctionsReturnRaw then
 				return p1()
 			else
 				return "function() --[[LuaEncode: `options.FunctionsReturnRaw` false; can\'t serialize functions]] return end"
 			end
 		end
-		function t.Axes(p1) --[[ Line: 409 | Upvalues: v4 (ref), insert (ref), concat (ref), v102 (copy) ]]
+		function t.Axes(p1)
 			local t = {}
 			for v1, v2 in v4, {
 				["Enum.Axis.X"] = p1.X,
@@ -240,17 +241,17 @@ local function v22(p1, p2) --[[ Line: 236 | Upvalues: CheckType (copy), rep (cop
 			end
 			return "Axes.new(" .. concat(t, v102) .. ")"
 		end
-		function t.BrickColor(p1) --[[ Line: 426 | Upvalues: v3 (copy), t (copy) ]]
+		function t.BrickColor(p1)
 			local v2 = v3
 			if v2 then
 				v2 = t.string(p1.Name, false)
 			end
 			return "BrickColor.new(" .. v2 or p1.Number .. ")"
 		end
-		function t.CFrame(p1) --[[ Line: 432 | Upvalues: Args (copy) ]]
+		function t.CFrame(p1)
 			return "CFrame.new(" .. Args(p1:components()) .. ")"
 		end
-		function t.CatalogSearchParams(p1) --[[ Line: 436 | Upvalues: concat (ref), t (copy), v102 (copy) ]]
+		function t.CatalogSearchParams(p1)
 			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ "CatalogSearchParams.new()", (t.table({
 					SearchKeyword = p1.SearchKeyword,
 					MinPrice = p1.MinPrice,
@@ -261,32 +262,32 @@ local function v22(p1, p2) --[[ Line: 236 | Upvalues: CheckType (copy), rep (cop
 					AssetTypes = p1.AssetTypes
 				}, false)) }, v102) .. ")"
 		end
-		function t.Color3(p1) --[[ Line: 448 | Upvalues: Args (copy) ]]
+		function t.Color3(p1)
 			return "Color3.new(" .. Args(p1.R, p1.G, p1.B)
 		end
-		function t.ColorSequence(p1) --[[ Line: 453 | Upvalues: t (copy) ]]
+		function t.ColorSequence(p1)
 			return "ColorSequence.new(" .. t.table(p1.Keypoints, false) .. ")"
 		end
-		function t.ColorSequenceKeypoint(p1) --[[ Line: 457 | Upvalues: Args (copy) ]]
+		function t.ColorSequenceKeypoint(p1)
 			return "ColorSequenceKeypoint.new(" .. Args(p1.Time, p1.Value) .. ")"
 		end
-		function t.DateTime(p1) --[[ Line: 462 ]]
+		function t.DateTime(p1)
 			return "DateTime.fromUnixTimestamp(" .. p1.UnixTimestamp .. ")"
 		end
-		function t.DockWidgetPluginGuiInfo(p1) --[[ Line: 469 | Upvalues: v9 (ref), Args (copy), match (ref), v10 (ref) ]]
+		function t.DockWidgetPluginGuiInfo(p1)
 			local v1 = v9(p1)
 			return "DockWidgetPluginGuiInfo.new(" .. Args(Enum.InitialDockState[match(v1, "InitialDockState:(%w+)")], match(v1, "InitialEnabled:(%w+)") == "1", match(v1, "InitialEnabledShouldOverrideRestore:(%w+)") == "1", v10(match(v1, "FloatingXSize:(%w+)")), v10(match(v1, "FloatingYSize:(%w+)")), v10(match(v1, "MinWidth:(%w+)")), (v10(match(v1, "MinHeight:(%w+)")))) .. ")"
 		end
-		function t.Enum(p1) --[[ Line: 491 | Upvalues: v9 (ref) ]]
+		function t.Enum(p1)
 			return "Enum." .. v9(p1)
 		end
-		function t.EnumItem(p1) --[[ Line: 496 | Upvalues: v9 (ref) ]]
+		function t.EnumItem(p1)
 			return v9(p1)
 		end
-		function t.Enums(p1) --[[ Line: 501 ]]
+		function t.Enums(p1)
 			return "Enum"
 		end
-		function t.Faces(p1) --[[ Line: 505 | Upvalues: v4 (ref), insert (ref), concat (ref), v102 (copy) ]]
+		function t.Faces(p1)
 			local t = {}
 			for v1, v2 in v4, {
 				["Enum.NormalId.Top"] = p1.Top,
@@ -302,13 +303,13 @@ local function v22(p1, p2) --[[ Line: 236 | Upvalues: CheckType (copy), rep (cop
 			end
 			return "Faces.new(" .. concat(t, v102) .. ")"
 		end
-		function t.FloatCurveKey(p1) --[[ Line: 525 | Upvalues: Args (copy) ]]
+		function t.FloatCurveKey(p1)
 			return "FloatCurveKey.new(" .. Args(p1.Time, p1.Value, p1.Interpolation) .. ")"
 		end
-		function t.Font(p1) --[[ Line: 529 | Upvalues: Args (copy) ]]
+		function t.Font(p1)
 			return "Font.new(" .. Args(p1.Family, p1.Weight, p1.Style) .. ")"
 		end
-		function t.Instance(p1) --[[ Line: 535 | Upvalues: v6 (copy), v21 (ref), v112 (copy), t (copy), gmatch (ref) ]]
+		function t.Instance(p1)
 			local v1, v2, v3, v4, v5
 			if v6 then
 				local v62 = v21(p1)
@@ -341,16 +342,16 @@ local function v22(p1, p2) --[[ Line: 236 | Upvalues: CheckType (copy), rep (cop
 				return v5 .. v112 .. "--[" .. v4 .. "[" .. v3 .. "]" .. v4 .. "]"
 			end
 		end
-		function t.NumberRange(p1) --[[ Line: 550 | Upvalues: Args (copy) ]]
+		function t.NumberRange(p1)
 			return "NumberRange.new(" .. Args(p1.Min, p1.Max) .. ")"
 		end
-		function t.NumberSequence(p1) --[[ Line: 554 | Upvalues: t (copy) ]]
+		function t.NumberSequence(p1)
 			return "NumberSequence.new(" .. t.table(p1.Keypoints, false) .. ")"
 		end
-		function t.NumberSequenceKeypoint(p1) --[[ Line: 558 | Upvalues: Args (copy) ]]
+		function t.NumberSequenceKeypoint(p1)
 			return "NumberSequenceKeypoint.new(" .. Args(p1.Time, p1.Value, p1.Envelope) .. ")"
 		end
-		function t.OverlapParams(p1) --[[ Line: 562 | Upvalues: concat (ref), t (copy), v102 (copy) ]]
+		function t.OverlapParams(p1)
 			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ "OverlapParams.new()", (t.table({
 					FilterDescendantsInstances = p1.FilterDescendantsInstances,
 					FilterType = p1.FilterType,
@@ -359,19 +360,19 @@ local function v22(p1, p2) --[[ Line: 236 | Upvalues: CheckType (copy), rep (cop
 					RespectCanCollide = p1.RespectCanCollide
 				}, false)) }, v102) .. ")"
 		end
-		function t.PathWaypoint(p1) --[[ Line: 572 | Upvalues: Args (copy) ]]
+		function t.PathWaypoint(p1)
 			return "PathWaypoint.new(" .. Args(p1.Position, p1.Action, p1.Label) .. ")"
 		end
-		function t.PhysicalProperties(p1) --[[ Line: 576 | Upvalues: Args (copy) ]]
+		function t.PhysicalProperties(p1)
 			return "PhysicalProperties.new(" .. Args(p1.Density, p1.Friction, p1.Elasticity, p1.FrictionWeight, p1.ElasticityWeight) .. ")"
 		end
-		function t.Random() --[[ Line: 582 ]]
+		function t.Random()
 			return "Random.new()"
 		end
-		function t.Ray(p1) --[[ Line: 586 | Upvalues: Args (copy) ]]
+		function t.Ray(p1)
 			return "Ray.new(" .. Args(p1.Origin, p1.Direction) .. ")"
 		end
-		function t.RaycastParams(p1) --[[ Line: 590 | Upvalues: concat (ref), t (copy), v102 (copy) ]]
+		function t.RaycastParams(p1)
 			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ "RaycastParams.new()", (t.table({
 					FilterDescendantsInstances = p1.FilterDescendantsInstances,
 					FilterType = p1.FilterType,
@@ -380,42 +381,42 @@ local function v22(p1, p2) --[[ Line: 236 | Upvalues: CheckType (copy), rep (cop
 					RespectCanCollide = p1.RespectCanCollide
 				}, false)) }, v102) .. ")"
 		end
-		function t.Rect(p1) --[[ Line: 600 | Upvalues: Args (copy) ]]
+		function t.Rect(p1)
 			return "Rect.new(" .. Args(p1.Min, p1.Max) .. ")"
 		end
-		function t.Region3(p1) --[[ Line: 607 | Upvalues: Args (copy) ]]
+		function t.Region3(p1)
 			local v1 = p1.CFrame
 			local Size = p1.Size
 			return "Region3.new(" .. Args(v1 * CFrame.new(-Size / 2), v1 * CFrame.new(Size / 2)) .. ")"
 		end
-		function t.Region3int16(p1) --[[ Line: 619 | Upvalues: Args (copy) ]]
+		function t.Region3int16(p1)
 			return "Region3int16.new(" .. Args(p1.Min, p1.Max) .. ")"
 		end
-		function t.TweenInfo(p1) --[[ Line: 623 | Upvalues: Args (copy) ]]
+		function t.TweenInfo(p1)
 			return "TweenInfo.new(" .. Args(p1.Time, p1.EasingStyle, p1.EasingDirection, p1.RepeatCount, p1.Reverses, p1.DelayTime) .. ")"
 		end
-		function t.RotationCurveKey(p1) --[[ Line: 637 | Upvalues: Args (copy) ]]
+		function t.RotationCurveKey(p1)
 			return "RotationCurveKey.new(" .. Args(p1.Time, p1.Value, p1.Interpolation) .. ")"
 		end
-		function t.UDim(p1) --[[ Line: 641 | Upvalues: Args (copy) ]]
+		function t.UDim(p1)
 			return "UDim.new(" .. Args(p1.Scale, p1.Offset) .. ")"
 		end
-		function t.UDim2(p1) --[[ Line: 645 | Upvalues: Args (copy) ]]
+		function t.UDim2(p1)
 			return "UDim2.new(" .. Args(p1.X.Scale, p1.X.Offset, p1.Y.Scale, p1.Y.Offset) .. ")"
 		end
-		function t.Vector2(p1) --[[ Line: 658 | Upvalues: Args (copy) ]]
+		function t.Vector2(p1)
 			return "Vector2.new(" .. Args(p1.X, p1.Y) .. ")"
 		end
-		function t.Vector2int16(p1) --[[ Line: 662 | Upvalues: Args (copy) ]]
+		function t.Vector2int16(p1)
 			return "Vector2int16.new(" .. Args(p1.X, p1.Y) .. ")"
 		end
-		function t.Vector3(p1) --[[ Line: 666 | Upvalues: Args (copy) ]]
+		function t.Vector3(p1)
 			return "Vector3.new(" .. Args(p1.X, p1.Y, p1.Z) .. ")"
 		end
-		function t.Vector3int16(p1) --[[ Line: 670 | Upvalues: Args (copy) ]]
+		function t.Vector3int16(p1)
 			return "Vector3int16.new(" .. Args(p1.X, p1.Y, p1.Z) .. ")"
 		end
-		function t.userdata(p1) --[[ Line: 675 | Upvalues: v11 (ref) ]]
+		function t.userdata(p1)
 			if v11(p1) then
 				return "newproxy(true)"
 			else

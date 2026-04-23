@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local SecondTexture = require(ReplicatedStorage.Game.Garage.Customize.SecondTexture)
 local getDefaultVehicleModel = require(ReplicatedStorage.Game.getDefaultVehicleModel)
 local Texture = require(script.Parent.Texture)
-local function GetInstance(p1) --[[ Line: 7 | Upvalues: VehicleUtils (copy), getDefaultVehicleModel (copy), SecondTexture (copy) ]]
+local function GetInstance(p1)
 	local v1 = VehicleUtils.GetLocalVehiclePacketForCustomize()
 	local v2 = getDefaultVehicleModel(v1.Make, v1.Type)
 	local t = {

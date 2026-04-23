@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
@@ -7,7 +8,7 @@ v1.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	imageScale = 1
 }
-function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), Roact (copy) ]]
+function v1.render(p1)
 	local t = {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = 1

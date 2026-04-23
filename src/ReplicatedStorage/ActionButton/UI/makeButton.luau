@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local CircularProgressBar = require(script.Parent.CircularProgressBar)
@@ -6,7 +7,7 @@ local InputUtils = require(script.Parent.InputUtils)
 local Roact = require(ReplicatedStorage.Roact)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local createElement = Roact.createElement
-return function(p1, p2, p3, p4, p5, p6) --[[ Line: 9 | Upvalues: ColorUtils (copy), createElement (copy), InputUtils (copy), ControllerImage (copy), UserInputService (copy), CircularProgressBar (copy), Roact (copy) ]]
+return function(p1, p2, p3, p4, p5, p6)
 	local v1 = ("%s_%d_%s"):format(p2, p3, "pressed")
 	local v2 = ("%s_%d_%s"):format(p2, p3, "onReleased")
 	local v3 = ("%s_%d_%s"):format(p2, p3, "onPressed")
@@ -100,7 +101,7 @@ return function(p1, p2, p3, p4, p5, p6) --[[ Line: 9 | Upvalues: ColorUtils (cop
 	}
 	t3.Active = v6 and not v6.noSink
 	t3.ImageColor3 = if p1[v1] and v10 then v10 else v8
-	t3[Roact.Event.InputBegan] = function(p12, p2) --[[ Line: 108 | Upvalues: v6 (copy), p1 (copy), v3 (copy), v2 (copy) ]]
+	t3[Roact.Event.InputBegan] = function(p12, p2)
 		if p2.UserInputType == Enum.UserInputType.Touch or p2.UserInputType == Enum.UserInputType.MouseButton1 then
 			local allowTouchSlide = v6.allowTouchSlide
 			if allowTouchSlide then
@@ -113,7 +114,7 @@ return function(p1, p2, p3, p4, p5, p6) --[[ Line: 9 | Upvalues: ColorUtils (cop
 				end
 				local v1 = p1[v2]
 				v6._enteredViaSlide = allowTouchSlide
-				v6._maid.waitForEnd = p2:GetPropertyChangedSignal("UserInputState"):Connect(function() --[[ Line: 125 | Upvalues: p2 (copy), v6 (ref), v1 (copy) ]]
+				v6._maid.waitForEnd = p2:GetPropertyChangedSignal("UserInputState"):Connect(function()
 					if p2.UserInputState == Enum.UserInputState.End then
 						v6._maid.waitForEnd = nil
 						if v1 then
@@ -124,7 +125,7 @@ return function(p1, p2, p3, p4, p5, p6) --[[ Line: 9 | Upvalues: ColorUtils (cop
 			end
 		end
 	end
-	t3[Roact.Event.MouseLeave] = function() --[[ Line: 139 | Upvalues: v6 (copy), p1 (copy), v2 (copy) ]]
+	t3[Roact.Event.MouseLeave] = function()
 		if v6 and v6._enteredViaSlide then
 			v6._maid.waitForEnd = nil
 			local v1 = p1[v2]

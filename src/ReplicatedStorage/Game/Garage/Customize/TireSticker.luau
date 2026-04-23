@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-return function(p1, p2) --[[ Line: 3 | Upvalues: ReplicatedStorage (copy) ]]
+return function(p1, p2)
 	local Type = p2.Type
 	local Model = p2.Model
-	local function UpdateWheel(p12) --[[ Line: 7 | Upvalues: p2 (copy), p1 (copy), ReplicatedStorage (ref) ]]
+	local function UpdateWheel(p12)
 		assert(p12 ~= nil, "WheelModel is nil")
 		if p12:FindFirstChild("Wheel") then
 			warn("Missing TireMesh, still using old Wheel format: " .. p2.Make)

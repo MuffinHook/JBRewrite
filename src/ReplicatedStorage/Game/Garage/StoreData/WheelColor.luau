@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local Color = require(script.Parent.Color)
 local WheelColor = require(ReplicatedStorage.Game.Garage.Customize.WheelColor)
 local getDefaultVehicleModel = require(ReplicatedStorage.Game.getDefaultVehicleModel)
-local function GetInstance(p1) --[[ Line: 7 | Upvalues: VehicleUtils (copy), getDefaultVehicleModel (copy), WheelColor (copy) ]]
+local function GetInstance(p1)
 	local v1 = VehicleUtils.GetLocalVehiclePacketForCustomize()
 	local v2 = getDefaultVehicleModel(v1.Make, v1.Type)
 	WheelColor(p1, {
@@ -13,7 +14,7 @@ local function GetInstance(p1) --[[ Line: 7 | Upvalues: VehicleUtils (copy), get
 	})
 	return v2
 end
-local function Update(p1, p2) --[[ Line: 15 ]]
+local function Update(p1, p2)
 	local v1 = os.clock() / 2
 	p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, p2.BoundingBox.Size.Magnitude * 0.7)
 end

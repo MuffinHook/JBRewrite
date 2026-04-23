@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
@@ -15,7 +16,7 @@ local v3 = Color3.fromRGB(255, 191, 5)
 local v4 = Color3.fromRGB(235, 88, 88)
 local v5 = Color3.fromHex("f1da10")
 t.onMessageIncoming = Signal.new()
-function t.init() --[[ Line: 22 | Upvalues: TextChatService (copy), Maid (copy), RunUtils (copy), GamepassSystem (copy), GamepassUtils (copy), v3 (copy), v2 (copy), v1 (copy), AdminPermUtils (copy), v4 (copy), Players (copy), v5 (copy), RichTextUtils (copy), t (copy) ]]
+function t.init()
 	local ChatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
 	if ChatWindowConfiguration then
 		ChatWindowConfiguration.TextStrokeTransparency = 0.7
@@ -24,11 +25,11 @@ function t.init() --[[ Line: 22 | Upvalues: TextChatService (copy), Maid (copy),
 	end
 	local v12 = Maid.new()
 	local t2 = {}
-	local function playerRemoving(p1) --[[ Line: 32 | Upvalues: v12 (copy), t2 (copy) ]]
+	local function playerRemoving(p1)
 		v12[p1] = nil
 		t2[p1] = nil
 	end
-	local function setPlayerChatData(p1) --[[ Line: 36 | Upvalues: RunUtils (ref), GamepassSystem (ref), GamepassUtils (ref), v3 (ref), v2 (ref), v1 (ref), AdminPermUtils (ref), v4 (ref), t2 (copy) ]]
+	local function setPlayerChatData(p1)
 		local t = {
 			Tags = {}
 		}
@@ -62,16 +63,16 @@ function t.init() --[[ Line: 22 | Upvalues: TextChatService (copy), Maid (copy),
 		end
 		t2[p1] = t
 	end
-	local function playerAdded(p1) --[[ Line: 73 | Upvalues: Maid (ref), v12 (copy), setPlayerChatData (copy), GamepassSystem (ref) ]]
+	local function playerAdded(p1)
 		local v1 = Maid.new()
 		v12[p1] = v1
 		setPlayerChatData(p1)
-		v1:GiveTask(GamepassSystem.OnAnyPlayerAnyOwned:Connect(function(p12, p2) --[[ Line: 77 | Upvalues: p1 (copy), setPlayerChatData (ref) ]]
+		v1:GiveTask(GamepassSystem.OnAnyPlayerAnyOwned:Connect(function(p12, p2)
 			if p12 == p1 then
 				setPlayerChatData(p1)
 			end
 		end))
-		v1:GiveTask(p1:GetAttributeChangedSignal("IsPartner"):Connect(function() --[[ Line: 83 | Upvalues: setPlayerChatData (ref), p1 (copy) ]]
+		v1:GiveTask(p1:GetAttributeChangedSignal("IsPartner"):Connect(function()
 			setPlayerChatData(p1)
 		end))
 	end
@@ -80,7 +81,7 @@ function t.init() --[[ Line: 22 | Upvalues: TextChatService (copy), Maid (copy),
 	end
 	Players.PlayerAdded:Connect(playerAdded)
 	Players.PlayerRemoving:Connect(playerRemoving)
-	function TextChatService.OnIncomingMessage(p1) --[[ Line: 92 | Upvalues: v5 (ref), RichTextUtils (ref), Players (ref), t2 (copy), t (ref) ]]
+	function TextChatService.OnIncomingMessage(p1)
 		local TextChatMessageProperties = Instance.new("TextChatMessageProperties")
 		local TextChannel = p1.TextChannel
 		local v1 = if TextChannel then string.find(TextChannel.Name, "RBXTeam") else nil
@@ -127,7 +128,7 @@ function t.init() --[[ Line: 22 | Upvalues: TextChatService (copy), Maid (copy),
 		t.onMessageIncoming:Fire(p1, TextChatMessageProperties)
 		return TextChatMessageProperties
 	end
-	function TextChatService.OnBubbleAdded(p1, p2) --[[ Line: 147 ]]
+	function TextChatService.OnBubbleAdded(p1, p2)
 		if p1.TextSource then
 			local BubbleChatMessageProperties = Instance.new("BubbleChatMessageProperties")
 			BubbleChatMessageProperties.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)

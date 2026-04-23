@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CircleActionUtils = require(script.Parent.CircleActionUtils)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
@@ -6,11 +7,11 @@ local UI = require(ReplicatedStorage.Module.UI)
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1) --[[ Line: 12 | Upvalues: BaseObject (copy), t (copy), CircleActionUtils (copy), UI (copy) ]]
+function t.new(p1)
 	local v1 = BaseObject.new(p1)
 	setmetatable(v1, t)
 	local OnPressedRemote = p1:WaitForChild("OnPressedRemote")
-	local function preUpdateFun(p12) --[[ Line: 18 | Upvalues: p1 (copy), CircleActionUtils (ref) ]]
+	local function preUpdateFun(p12)
 		p12.Enabled = not (p1:GetAttribute("CircleActionDisabled") == true)
 		p12.Duration = p1:GetAttribute("CircleActionDuration") or 0
 		p12.Timed = p12.Duration > 0.001
@@ -26,7 +27,7 @@ function t.new(p1) --[[ Line: 12 | Upvalues: BaseObject (copy), t (copy), Circle
 		Name = "[### MISSING ###]",
 		Timed = false,
 		Dist = 0,
-		Callback = function(p1, p2) --[[ Name: pressCallback | Line: 31 | Upvalues: OnPressedRemote (copy) ]]
+		Callback = function(p1, p2)
 			OnPressedRemote:FireServer(p2)
 			return true
 		end,

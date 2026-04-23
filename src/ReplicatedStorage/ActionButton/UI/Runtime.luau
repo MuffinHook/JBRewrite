@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
@@ -12,7 +13,7 @@ local InputUtils_2 = require(ReplicatedStorage.Std.InputUtils)
 local Radial = require(script.Parent.Radial)
 local Grid = require(script.Parent.Grid)
 local ActionButtonService = require(script.Parent.Parent.ActionButtonService)
-local function isToggle(p1) --[[ Line: 20 ]]
+local function isToggle(p1)
 	local _inputTypePressed = p1._inputTypePressed
 	if (_inputTypePressed == Enum.UserInputType.Touch or _inputTypePressed == Enum.UserInputType.MouseButton1) and p1.touchIsToggle then
 		return true
@@ -24,32 +25,32 @@ local v1 = Roact.PureComponent:extend("Runtime")
 v1.defaultProps = {
 	gridPosition = UDim2.new(1, -10, 1, -70)
 }
-function v1.init(p1) --[[ Line: 38 | Upvalues: Maid (copy), UserInputService (copy), ActionButtonService (copy) ]]
+function v1.init(p1)
 	p1._maid = Maid.new()
 	p1:_fetchInputType()
-	p1._maid:GiveTask(UserInputService.LastInputTypeChanged:Connect(function() --[[ Line: 41 | Upvalues: p1 (copy) ]]
+	p1._maid:GiveTask(UserInputService.LastInputTypeChanged:Connect(function()
 		p1:_fetchInputType()
 		p1:_fetchState()
-		task.delay(0, function() --[[ Line: 44 | Upvalues: p1 (ref) ]]
+		task.delay(0, function()
 			p1:_updateViewType()
 		end)
 	end))
 	p1:_fetchState()
-	p1._maid:GiveTask(ActionButtonService.triggerUpdate:Connect(function() --[[ Line: 49 | Upvalues: p1 (copy) ]]
+	p1._maid:GiveTask(ActionButtonService.triggerUpdate:Connect(function()
 		p1:_fetchState()
 	end))
-	p1._maid:GiveTask(workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function() --[[ Line: 52 | Upvalues: p1 (copy) ]]
+	p1._maid:GiveTask(workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
 		p1:_updateViewType()
 	end))
 	p1:_updateViewType()
 end
-function v1._updateViewType(p1) --[[ Line: 57 | Upvalues: InputUtils_2 (copy), Utils (copy) ]]
+function v1._updateViewType(p1)
 	p1:setState({
 		touchControls = InputUtils_2.isTouch(),
 		isSmallScreen = Utils.isSmallScreen()
 	})
 end
-function v1._fetchInputType(p1) --[[ Line: 65 | Upvalues: UserInputService (copy) ]]
+function v1._fetchInputType(p1)
 	local v1 = UserInputService:GetLastInputType()
 	if v1 == Enum.UserInputType.Gamepad1 or (v1 == Enum.UserInputType.Keyboard or v1 == Enum.UserInputType.Touch) then
 		p1:setState({
@@ -57,7 +58,7 @@ function v1._fetchInputType(p1) --[[ Line: 65 | Upvalues: UserInputService (copy
 		})
 	end
 end
-function v1._fetchStateButton(p1, p2, p3, p4, p5) --[[ Line: 77 | Upvalues: InputUtils (copy), Roact (copy), RunService (copy) ]]
+function v1._fetchStateButton(p1, p2, p3, p4, p5)
 	local v1 = ("%s_%d_%s"):format(p4, p5, "onReleased")
 	local v2 = ("%s_%d_%s"):format(p4, p5, "onPressed")
 	local v3 = ("%s_%d_%s"):format(p4, p5, "image")
@@ -69,7 +70,7 @@ function v1._fetchStateButton(p1, p2, p3, p4, p5) --[[ Line: 77 | Upvalues: Inpu
 		p3.progressBinding = v7
 		p3.updateProgressBinding = v8
 	end
-	local function releaseState(...) --[[ Line: 91 | Upvalues: p3 (copy), p1 (copy) ]]
+	local function releaseState(...)
 		local v1 = p3
 		local _inputTypePressed = v1._inputTypePressed
 		if not if _inputTypePressed == Enum.UserInputType.Touch or _inputTypePressed == Enum.UserInputType.MouseButton1 then if v1.touchIsToggle then true else _inputTypePressed == Enum.UserInputType.Gamepad1 and v1.gamepadIsToggle and true or false else _inputTypePressed == Enum.UserInputType.Gamepad1 and v1.gamepadIsToggle and true or false and p3._i then
@@ -87,7 +88,7 @@ function v1._fetchStateButton(p1, p2, p3, p4, p5) --[[ Line: 77 | Upvalues: Inpu
 	end
 	p2[v1] = releaseState
 	p3._releaseState = releaseState
-	local function pressState(...) --[[ Line: 114 | Upvalues: p3 (copy), p1 (copy), RunService (ref) ]]
+	local function pressState(...)
 		local v1 = ("%s_%d_%s"):format(p3._groupKey, p3._i, "pressed")
 		local v2 = true
 		local v3 = p3
@@ -110,20 +111,20 @@ function v1._fetchStateButton(p1, p2, p3, p4, p5) --[[ Line: 77 | Upvalues: Inpu
 					if v5 == false then
 					elseif p3.useEvery then
 						p3._lastUsed = os.clock()
-						p3._maid.progress = RunService.Heartbeat:Connect(function() --[[ Line: 146 | Upvalues: p3 (ref) ]]
+						p3._maid.progress = RunService.Heartbeat:Connect(function()
 							p3.updateProgressBinding((os.clock() - p3._lastUsed) / p3.useEvery)
 						end)
-						p3._maid.removeProgress = task.delay(p3.useEvery, function() --[[ Line: 150 | Upvalues: p3 (ref) ]]
+						p3._maid.removeProgress = task.delay(p3.useEvery, function()
 							p3._maid.progress = nil
 							p3.updateProgressBinding(0)
 						end)
 					end
 				elseif p3.useEvery then
 					p3._lastUsed = os.clock()
-					p3._maid.progress = RunService.Heartbeat:Connect(function() --[[ Line: 146 | Upvalues: p3 (ref) ]]
+					p3._maid.progress = RunService.Heartbeat:Connect(function()
 						p3.updateProgressBinding((os.clock() - p3._lastUsed) / p3.useEvery)
 					end)
-					p3._maid.removeProgress = task.delay(p3.useEvery, function() --[[ Line: 150 | Upvalues: p3 (ref) ]]
+					p3._maid.removeProgress = task.delay(p3.useEvery, function()
 						p3._maid.progress = nil
 						p3.updateProgressBinding(0)
 					end)
@@ -146,7 +147,7 @@ function v1._fetchStateButton(p1, p2, p3, p4, p5) --[[ Line: 77 | Upvalues: Inpu
 	p3._groupKey = p4
 	p3._i = p5
 end
-function v1._fetchState(p1) --[[ Line: 175 | Upvalues: ActionButtonService (copy), Maid (copy) ]]
+function v1._fetchState(p1)
 	for i, v in ipairs(ActionButtonService.active) do
 		v._groupKey = nil
 		v._i = nil
@@ -169,9 +170,9 @@ function v1._fetchState(p1) --[[ Line: 175 | Upvalues: ActionButtonService (copy
 	end
 	p1:setState(t)
 end
-function v1.didMount(p1) --[[ Line: 202 | Upvalues: UserInputService (copy), GuiService (copy), ActionButtonService (copy) ]]
+function v1.didMount(p1)
 	local v1 = 0
-	p1._maid:GiveTask(UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 204 | Upvalues: GuiService (ref), v1 (ref), ActionButtonService (ref) ]]
+	p1._maid:GiveTask(UserInputService.InputBegan:Connect(function(p1, p2)
 		local v12, v2, v3, v4, v5
 		if p2 then
 			if (p1.KeyCode == Enum.KeyCode.ButtonA or p1.KeyCode == Enum.KeyCode.ButtonR3) and ((p1.KeyCode ~= Enum.KeyCode.ButtonA or not (GuiService.SelectedObject or (GuiService.MenuIsOpen or os.clock() - v1 < 0.1))) and (p1.UserInputType == Enum.UserInputType.Keyboard or p1.UserInputType == Enum.UserInputType.Gamepad1)) then
@@ -188,7 +189,7 @@ function v1.didMount(p1) --[[ Line: 202 | Upvalues: UserInputService (copy), Gui
 					end
 				end
 				if #v2 ~= 0 then
-					table.sort(v2, function(p1_2, p2_2) --[[ Line: 236 ]]
+					table.sort(v2, function(p1_2, p2_2)
 						return (p1_2.priority or 1) > (p2_2.priority or 1)
 					end)
 					for i = 1, #v2 do
@@ -218,7 +219,7 @@ function v1.didMount(p1) --[[ Line: 202 | Upvalues: UserInputService (copy), Gui
 				end
 			end
 			if #v2 ~= 0 then
-				table.sort(v2, function(p1_2, p2_2) --[[ Line: 236 ]]
+				table.sort(v2, function(p1_2, p2_2)
 					return (p1_2.priority or 1) > (p2_2.priority or 1)
 				end)
 				for i = 1, #v2 do
@@ -235,7 +236,7 @@ function v1.didMount(p1) --[[ Line: 202 | Upvalues: UserInputService (copy), Gui
 			end
 		end
 	end))
-	p1._maid:GiveTask(UserInputService.InputEnded:Connect(function(p1) --[[ Line: 252 | Upvalues: ActionButtonService (ref) ]]
+	p1._maid:GiveTask(UserInputService.InputEnded:Connect(function(p1)
 		if p1.UserInputType == Enum.UserInputType.Keyboard or p1.UserInputType == Enum.UserInputType.Gamepad1 then
 			local KeyCode = p1.KeyCode
 			for i, v in ipairs(ActionButtonService.active) do
@@ -248,11 +249,11 @@ function v1.didMount(p1) --[[ Line: 202 | Upvalues: UserInputService (copy), Gui
 			end
 		end
 	end))
-	p1._maid:GiveTask(GuiService.MenuClosed:Connect(function() --[[ Line: 268 | Upvalues: v1 (ref) ]]
+	p1._maid:GiveTask(GuiService.MenuClosed:Connect(function()
 		v1 = os.clock()
 	end))
 end
-function v1._copyStateButton(p1, p2, p3, p4) --[[ Line: 272 ]]
+function v1._copyStateButton(p1, p2, p3, p4)
 	local v1 = ("%s_%d_%s"):format(p3, p4, "onReleased")
 	local v2 = ("%s_%d_%s"):format(p3, p4, "onPressed")
 	local v3 = ("%s_%d_%s"):format(p3, p4, "image")
@@ -266,7 +267,7 @@ function v1._copyStateButton(p1, p2, p3, p4) --[[ Line: 272 ]]
 	p2[v5] = p1.state[v5]
 	p2[v6] = p1.state[v6]
 end
-function v1.render(p1) --[[ Line: 286 | Upvalues: ActionButtonService (copy), createElement (copy), Radial (copy), Dictionary (copy), Grid (copy) ]]
+function v1.render(p1)
 	if ActionButtonService.enabled then
 		local t = {}
 		if p1.state.countInner then
@@ -312,7 +313,7 @@ function v1.render(p1) --[[ Line: 286 | Upvalues: ActionButtonService (copy), cr
 		return nil
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 340 ]]
+function v1.willUnmount(p1)
 	p1._maid:Destroy()
 end
 return v1

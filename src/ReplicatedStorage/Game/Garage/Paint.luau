@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Settings = require(ReplicatedStorage.Resource.Settings)
 local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
@@ -128,7 +129,7 @@ t[HyperChromeConsts.COLOR_SHIFT_NAME] = {
 	Reflectance = 0.1
 }
 return {
-	GetColor = function(p1) --[[ Name: GetColor | Line: 150 | Upvalues: t (copy), Settings (copy) ]]
+	GetColor = function(p1)
 		if t[p1] then
 			return t[p1].Color
 		elseif Settings.Colors[p1] then
@@ -137,7 +138,7 @@ return {
 			return nil
 		end
 	end,
-	Part = function(p1, p2, p3) --[[ Name: Part | Line: 158 | Upvalues: t (copy), Settings (copy) ]]
+	Part = function(p1, p2, p3)
 		assert(p1 ~= nil)
 		assert(p2 ~= nil)
 		assert(p3 ~= nil)

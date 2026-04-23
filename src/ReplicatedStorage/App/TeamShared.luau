@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Std.Promise)
@@ -5,9 +6,9 @@ local RunUtils = require(ReplicatedStorage.App.RunUtils)
 local PrivateServerUtils = require(ReplicatedStorage.PrivateServer.PrivateServerUtils)
 local Settings = require(ReplicatedStorage.Resource.Settings)
 local t = {
-	promiseIsTeamSwitchingEnabled = function() --[[ Name: promiseIsTeamSwitchingEnabled | Line: 9 | Upvalues: RunUtils (copy), Promise (copy), PrivateServerUtils (copy) ]]
+	promiseIsTeamSwitchingEnabled = function()
 		if RunUtils.isMainWorld() then
-			return PrivateServerUtils.promiseGetIsBattleServer():andThen(function(p1) --[[ Line: 13 ]]
+			return PrivateServerUtils.promiseGetIsBattleServer():andThen(function(p1)
 				return not p1
 			end)
 		else
@@ -15,11 +16,11 @@ local t = {
 		end
 	end
 }
-function t.isTeamSwitchingEnabled() --[[ Line: 18 | Upvalues: t (copy) ]]
+function t.isTeamSwitchingEnabled()
 	local v1, v2 = t.promiseIsTeamSwitchingEnabled():await()
 	return v1 and v2
 end
-function t.isTeamFull(p1) --[[ Line: 25 | Upvalues: Players (copy), ReplicatedStorage (copy), RunUtils (copy), Settings (copy) ]]
+function t.isTeamFull(p1)
 	local v1 = Players:GetPlayers()
 	local count = 0
 	local count_2 = 0

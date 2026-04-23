@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local makeButton = require(script.Parent.makeButton)
-local function calculateRadial(p1, p2) --[[ Line: 11 ]]
+local function calculateRadial(p1, p2)
 	local count = p1.count
 	local v2 = p1.centerAngle or -2.356194490192345
 	local v3 = p1.angleBetween or 0.59839860068377
@@ -37,11 +38,11 @@ v1.defaultProps = {
 	radiusInner = 0.58,
 	angleBetweenInner = 0.48
 }
-function v1._makeButton(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 66 | Upvalues: makeButton (copy) ]]
+function v1._makeButton(p1, p2, p3, p4, p5, p6, p7)
 	local v1 = UDim2.new(p7 * 2, 0, p7 * 2, 0)
 	return makeButton(p1.props, p2, p3, 100 - p3 + 500 * p4, v1, (UDim2.new(0.5 + p5, 0, 0.5 + p6, 0)))
 end
-function v1.render(p1) --[[ Line: 73 | Upvalues: calculateRadial (copy), createElement (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	local buttonRadiusOuter = p1.props.buttonRadiusOuter
 	local radiusOuter = p1.props.radiusOuter
 	local t = {

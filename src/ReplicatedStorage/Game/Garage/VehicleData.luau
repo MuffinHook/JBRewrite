@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local t = {
 	{
 		Type = "Chassis",
@@ -807,7 +808,7 @@ for v1, v2 in t do
 		v2.Lite = true
 	end
 end
-local function updateAutoRetire() --[[ Line: 875 | Upvalues: t (copy) ]]
+local function updateAutoRetire()
 	for v1, v2 in t do
 		if v2.AutoRetireAt and (not v2.Retired and v2.AutoRetireAt - workspace:GetServerTimeNow() <= 0) then
 			v2.Retired = true
@@ -815,7 +816,7 @@ local function updateAutoRetire() --[[ Line: 875 | Upvalues: t (copy) ]]
 	end
 end
 updateAutoRetire()
-task.spawn(function() --[[ Line: 883 | Upvalues: updateAutoRetire (copy) ]]
+task.spawn(function()
 	while true do
 		task.wait(60)
 		updateAutoRetire()

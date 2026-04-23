@@ -1,20 +1,21 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClanConsts = require(ReplicatedStorage.Clan.ClanConsts)
 local t = {
-	getFlagColorFromClanInfo = function(p1) --[[ Name: getFlagColorFromClanInfo | Line: 6 ]]
+	getFlagColorFromClanInfo = function(p1)
 		if p1.FlagColorStr == nil then
 			return nil
 		else
 			return Color3.fromHex(p1.FlagColorStr)
 		end
 	end,
-	setFlagColorInClanInfo = function(p1, p2) --[[ Name: setFlagColorInClanInfo | Line: 9 ]]
+	setFlagColorInClanInfo = function(p1, p2)
 		p1.FlagColorStr = p2:ToHex()
 	end,
-	getMemberInfoMapFromClanInfo = function(p1) --[[ Name: getMemberInfoMapFromClanInfo | Line: 12 ]]
+	getMemberInfoMapFromClanInfo = function(p1)
 		return p1.MemberInfoMap
 	end,
-	setMemberInfoInClanInfo = function(p1, p2, p3) --[[ Name: setMemberInfoInClanInfo | Line: 15 ]]
+	setMemberInfoInClanInfo = function(p1, p2, p3)
 		assert(typeof(p2) == "number", "playerUserId must be a number")
 		if p3 then
 			p1.MemberInfoMap[tostring(p2)] = p3
@@ -22,45 +23,45 @@ local t = {
 			p1.MemberInfoMap[tostring(p2)] = nil
 		end
 	end,
-	getClanNameFromClanInfo = function(p1) --[[ Name: getClanNameFromClanInfo | Line: 27 ]]
+	getClanNameFromClanInfo = function(p1)
 		return p1.Name
 	end,
-	getOwnerUserIdFromClanInfo = function(p1) --[[ Name: getOwnerUserIdFromClanInfo | Line: 30 ]]
+	getOwnerUserIdFromClanInfo = function(p1)
 		return tonumber(p1.OwnerUserId)
 	end,
-	setOwnerUserIdInClanInfo = function(p1, p2) --[[ Name: setOwnerUserIdInClanInfo | Line: 33 ]]
+	setOwnerUserIdInClanInfo = function(p1, p2)
 		assert(typeof(p2) == "number" or p2 == nil, "ownerUserId must be a number or nil")
 		p1.OwnerUserId = p2
 	end,
-	setAdminStatusInClanInfo = function(p1, p2, p3) --[[ Name: setAdminStatusInClanInfo | Line: 39 ]]
+	setAdminStatusInClanInfo = function(p1, p2, p3)
 		assert(typeof(p2) == "number", "playerUserId must be a number")
 		p1.AdminIdMap[tostring(p2)] = p3
 	end,
-	getAdminIdMapFromClanInfo = function(p1) --[[ Name: getAdminIdMapFromClanInfo | Line: 44 ]]
+	getAdminIdMapFromClanInfo = function(p1)
 		return p1.AdminIdMap
 	end,
-	getNameFromClanInfo = function(p1) --[[ Name: getNameFromClanInfo | Line: 47 ]]
+	getNameFromClanInfo = function(p1)
 		return p1.Name
 	end,
-	setNameInClanInfo = function(p1, p2) --[[ Name: setNameInClanInfo | Line: 50 ]]
+	setNameInClanInfo = function(p1, p2)
 		p1.Name = p2
 	end
 }
-function t.getIsPlayerAdminFromClanInfo(p1, p2) --[[ Line: 53 | Upvalues: t (copy) ]]
+function t.getIsPlayerAdminFromClanInfo(p1, p2)
 	assert(p1 ~= nil, "clanInfo must not be nil")
 	assert(typeof(p2) == "number", "playerUserId must be a number")
 	return t.getAdminIdMapFromClanInfo(p1)[tostring(p2)] == true
 end
-function t.getJoinRequestUserIdMapFromClanInfo(p1) --[[ Line: 58 ]]
+function t.getJoinRequestUserIdMapFromClanInfo(p1)
 	return p1.JoinRequestUserIdMap
 end
-function t._createMembersOnlineFolder() --[[ Line: 61 | Upvalues: ClanConsts (copy), ReplicatedStorage (copy) ]]
+function t._createMembersOnlineFolder()
 	local v1 = Instance.new("Folder")
 	v1.Name = ClanConsts.MEMBERS_ONLINE_OBJECT_NAME
 	v1.Parent = ReplicatedStorage
 	return v1
 end
-function t._createMembersOnlineChangedVal(p1, p2) --[[ Line: 67 ]]
+function t._createMembersOnlineChangedVal(p1, p2)
 	assert(typeof(p2) == "string", "clanId must be a string")
 	local v2 = Instance.new("NumberValue")
 	v2.Name = p2
@@ -68,10 +69,10 @@ function t._createMembersOnlineChangedVal(p1, p2) --[[ Line: 67 ]]
 	v2.Parent = p1
 	return v2
 end
-function t.getNumMembersOnlineChangedSignal(p1) --[[ Line: 76 | Upvalues: t (copy) ]]
+function t.getNumMembersOnlineChangedSignal(p1)
 	return t.getMembersOnlineChangedSignal(p1)
 end
-function t.getNumMembersOnline(p1) --[[ Line: 79 | Upvalues: t (copy) ]]
+function t.getNumMembersOnline(p1)
 	assert(typeof(p1) == "string", "clanId must be a string")
 	local v2 = t.getMembersOnline(p1)
 	if v2 then
@@ -84,7 +85,7 @@ function t.getNumMembersOnline(p1) --[[ Line: 79 | Upvalues: t (copy) ]]
 		return 0
 	end
 end
-function t.getMembersOnlineChangedSignal(p1) --[[ Line: 91 | Upvalues: ReplicatedStorage (copy), ClanConsts (copy) ]]
+function t.getMembersOnlineChangedSignal(p1)
 	assert(typeof(p1) == "string", "clanId must be a string")
 	local v2 = ReplicatedStorage:FindFirstChild(ClanConsts.MEMBERS_ONLINE_OBJECT_NAME)
 	if v2 then
@@ -94,7 +95,7 @@ function t.getMembersOnlineChangedSignal(p1) --[[ Line: 91 | Upvalues: Replicate
 		end
 	end
 end
-function t.getMembersOnline(p1) --[[ Line: 104 | Upvalues: ReplicatedStorage (copy), ClanConsts (copy) ]]
+function t.getMembersOnline(p1)
 	assert(typeof(p1) == "string", "clanId must be a string")
 	local v2 = ReplicatedStorage:FindFirstChild(ClanConsts.MEMBERS_ONLINE_OBJECT_NAME)
 	if v2 then
@@ -108,7 +109,7 @@ function t.getMembersOnline(p1) --[[ Line: 104 | Upvalues: ReplicatedStorage (co
 		end
 	end
 end
-function t.setMembersOnlineMap(p1, p2) --[[ Line: 121 | Upvalues: ReplicatedStorage (copy), ClanConsts (copy), t (copy) ]]
+function t.setMembersOnlineMap(p1, p2)
 	assert(typeof(p1) == "string", "clanId must be a string")
 	local v2 = ReplicatedStorage:FindFirstChild(ClanConsts.MEMBERS_ONLINE_OBJECT_NAME)
 	if not v2 then
@@ -140,27 +141,27 @@ function t.setMembersOnlineMap(p1, p2) --[[ Line: 121 | Upvalues: ReplicatedStor
 	end
 	v4.Value = v4.Value + 1
 end
-function t.getCurrentClanIdChangedSignal(p1) --[[ Line: 155 | Upvalues: ClanConsts (copy) ]]
+function t.getCurrentClanIdChangedSignal(p1)
 	return p1:GetAttributeChangedSignal(ClanConsts.CURRENT_CLAN_ID_ATTR_NAME)
 end
-function t.setCurrentClanId(p1, p2) --[[ Line: 158 | Upvalues: ClanConsts (copy) ]]
+function t.setCurrentClanId(p1, p2)
 	assert(typeof(p2) == "string" or p2 == nil, "clanId must be a string")
 	p1:SetAttribute(ClanConsts.CURRENT_CLAN_ID_ATTR_NAME, p2)
 end
-function t.getCurrentClanId(p1) --[[ Line: 163 | Upvalues: ClanConsts (copy) ]]
+function t.getCurrentClanId(p1)
 	return p1:GetAttribute(ClanConsts.CURRENT_CLAN_ID_ATTR_NAME)
 end
-function t.setIsPlayerAdminCached(p1, p2) --[[ Line: 166 | Upvalues: ClanConsts (copy) ]]
+function t.setIsPlayerAdminCached(p1, p2)
 	assert(typeof(p2) == "boolean" or p2 == nil, "value must be a boolean or nil")
 	p1:SetAttribute(ClanConsts.IS_PLAYER_CLAN_ADMIN_CACHED_ATTR_NAME, p2)
 end
-function t.getIsPlayerAdminCached(p1) --[[ Line: 171 | Upvalues: ClanConsts (copy) ]]
+function t.getIsPlayerAdminCached(p1)
 	return p1:GetAttribute(ClanConsts.IS_PLAYER_CLAN_ADMIN_CACHED_ATTR_NAME)
 end
-function t.getIsPlayerAdminCachedChangedSignal(p1) --[[ Line: 174 | Upvalues: ClanConsts (copy) ]]
+function t.getIsPlayerAdminCachedChangedSignal(p1)
 	return p1:GetAttributeChangedSignal(ClanConsts.IS_PLAYER_CLAN_ADMIN_CACHED_ATTR_NAME)
 end
-function t.getEmptyMemberInfo() --[[ Line: 177 ]]
+function t.getEmptyMemberInfo()
 	return {
 		JoinTime = workspace:GetServerTimeNow()
 	}

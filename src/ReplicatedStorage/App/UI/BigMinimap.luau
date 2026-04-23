@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
@@ -16,7 +17,7 @@ v1.defaultProps = {
 	visible = true,
 	mapScale = 1
 }
-function v1.init(p1) --[[ Line: 22 | Upvalues: Roact (copy), Maid (copy) ]]
+function v1.init(p1)
 	p1.horizontalRef = Roact.createRef()
 	p1.verticalRef = Roact.createRef()
 	p1.maid = Maid.new()
@@ -41,7 +42,7 @@ function v1.init(p1) --[[ Line: 22 | Upvalues: Roact (copy), Maid (copy) ]]
 	p1.x = 0
 	p1.y = 0
 end
-function v1.render(p1) --[[ Line: 42 | Upvalues: createElement (copy), Minimap (copy), Dictionary (copy), Roact (copy), GuiService (copy) ]]
+function v1.render(p1)
 	if p1.props.visible then
 		local v3 = Dictionary.merge(p1.props, {
 			containerSize = p1.containerSize,
@@ -94,7 +95,7 @@ function v1.render(p1) --[[ Line: 42 | Upvalues: createElement (copy), Minimap (
 			Text = "",
 			LayoutOrder = 1,
 			Selectable = true,
-			[Roact.Event.Activated] = function() --[[ Line: 98 | Upvalues: p1 (copy), GuiService (ref) ]]
+			[Roact.Event.Activated] = function()
 				if #p1.props.waypoints == 0 then
 					p1:setState({
 						crossHairEnabled = true
@@ -137,7 +138,7 @@ function v1.render(p1) --[[ Line: 42 | Upvalues: createElement (copy), Minimap (
 		return createElement(Minimap, v3, t)
 	end
 end
-function v1._setXY(p1, p2, p3) --[[ Line: 140 ]]
+function v1._setXY(p1, p2, p3)
 	local AbsoluteSize = p1.containerRef:getValue().AbsoluteSize
 	p1.x = math.clamp(p2, 0, AbsoluteSize.X)
 	p1.y = math.clamp(p3, 0, AbsoluteSize.Y)
@@ -148,12 +149,12 @@ function v1._setXY(p1, p2, p3) --[[ Line: 140 ]]
 		v2.Position = UDim2.new(0, p1.x, 0, 0)
 	end
 end
-function v1._hookVisible(p1, p2) --[[ Line: 154 | Upvalues: Maid (copy), GuiService (copy), RunService (copy), UserInputService (copy), MinimapUtils (copy) ]]
+function v1._hookVisible(p1, p2)
 	if p2 then
 		local v1 = Maid.new()
 		p1.maid.visibleMaid = v1
 		local v2 = GuiService:GetGuiInset()
-		v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 161 | Upvalues: p1 (copy), UserInputService (ref), v2 (copy) ]]
+		v1:GiveTask(RunService.Heartbeat:Connect(function()
 			local v1 = p1.containerRef:getValue()
 			if p1.state.inputType == Enum.UserInputType.Keyboard then
 				local v22 = UserInputService:GetMouseLocation() - v2
@@ -161,7 +162,7 @@ function v1._hookVisible(p1, p2) --[[ Line: 154 | Upvalues: Maid (copy), GuiServ
 				p1:_setXY(v22.X - AbsolutePosition.X, v22.Y - AbsolutePosition.Y)
 			end
 		end))
-		v1:GiveTask(UserInputService.InputBegan:Connect(function(p12) --[[ Line: 180 | Upvalues: p1 (copy), MinimapUtils (ref) ]]
+		v1:GiveTask(UserInputService.InputBegan:Connect(function(p12)
 			if p1.state.crossHairEnabled and (p12.UserInputType == Enum.UserInputType.MouseButton1 or (p12.UserInputType == Enum.UserInputType.Touch or p12.UserInputType == Enum.UserInputType.Gamepad1 and p12.KeyCode == Enum.KeyCode.ButtonA)) then
 				local v1 = p1.containerRef:getValue()
 				local AbsoluteSize = v1.AbsoluteSize
@@ -190,8 +191,8 @@ function v1._hookVisible(p1, p2) --[[ Line: 154 | Upvalues: Maid (copy), GuiServ
 		p1.maid.visibleMaid = nil
 	end
 end
-function v1.didMount(p1) --[[ Line: 236 | Upvalues: UserInputService (copy) ]]
-	local function updateInputType() --[[ Line: 237 | Upvalues: UserInputService (ref), p1 (copy) ]]
+function v1.didMount(p1)
+	local function updateInputType()
 		local v1 = UserInputService:GetLastInputType()
 		if (v1 == Enum.UserInputType.Gamepad1 or (v1 == Enum.UserInputType.Keyboard or v1 == Enum.UserInputType.Touch)) and p1.state.inputType ~= v1 then
 			p1:setState({
@@ -202,7 +203,7 @@ function v1.didMount(p1) --[[ Line: 236 | Upvalues: UserInputService (copy) ]]
 	updateInputType()
 	p1.maid:GiveTask(UserInputService.LastInputTypeChanged:Connect(updateInputType))
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 254 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p1.state.crossHairEnabled ~= p3.crossHairEnabled then
 		p1:_hookGamepad(p1.state.crossHairEnabled)
 	end
@@ -210,21 +211,21 @@ function v1.didUpdate(p1, p2, p3) --[[ Line: 254 ]]
 		p1:_hookVisible(p1.props.visible)
 	end
 end
-function v1._hookGamepad(p1, p2) --[[ Line: 262 | Upvalues: ContextActionService (copy), UserInputService (copy), RunService (copy) ]]
+function v1._hookGamepad(p1, p2)
 	if p2 then
-		ContextActionService:BindActionAtPriority("sinkThumb1", function() --[[ Line: 264 ]]
+		ContextActionService:BindActionAtPriority("sinkThumb1", function()
 			return Enum.ContextActionResult.Sink
 		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.Thumbstick1)
-		ContextActionService:BindActionAtPriority("sinkJump", function() --[[ Line: 267 ]]
+		ContextActionService:BindActionAtPriority("sinkJump", function()
 			return Enum.ContextActionResult.Sink
 		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.ButtonA)
 		local v1 = nil
-		p1.maid.selectionDragListen = UserInputService.InputChanged:Connect(function(p1) --[[ Line: 272 | Upvalues: v1 (ref) ]]
+		p1.maid.selectionDragListen = UserInputService.InputChanged:Connect(function(p1)
 			if p1.UserInputType == Enum.UserInputType.Gamepad1 and p1.KeyCode == Enum.KeyCode.Thumbstick1 then
 				v1 = p1
 			end
 		end)
-		p1.maid.dragHeartbeat = RunService.Heartbeat:Connect(function(p12) --[[ Line: 280 | Upvalues: v1 (ref), p1 (copy) ]]
+		p1.maid.dragHeartbeat = RunService.Heartbeat:Connect(function(p12)
 			if v1 then
 				local X = v1.Position.X
 				local Y = v1.Position.Y
@@ -240,20 +241,20 @@ function v1._hookGamepad(p1, p2) --[[ Line: 262 | Upvalues: ContextActionService
 		p1.maid.dragHeartbeat = nil
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 297 ]]
+function v1.willUnmount(p1)
 	p1:_hookGamepad(false)
 	p1.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 302 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		labels = p1.minimapLabels,
 		waypoints = p1.minimapWaypoints,
 		points = p1.minimapPoints,
 		circles = p1.minimapCircles
 	}
-end, function(p1) --[[ Line: 309 | Upvalues: MinimapService (copy) ]]
+end, function(p1)
 	return {
-		onSetWaypoint = function(p12) --[[ Name: onSetWaypoint | Line: 311 | Upvalues: MinimapService (ref), p1 (copy) ]]
+		onSetWaypoint = function(p12)
 			if p12 then
 				if MinimapService._addWaypointRemote then
 					MinimapService._addWaypointRemote:FireServer(p12.X, p12.Z)

@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SpecialTextureData = require(ReplicatedStorage.Game.Garage.SpecialTextureData)
 local TextureData = require(ReplicatedStorage.Game.Garage.TextureData)
-return function(p1, p2) --[[ Line: 5 | Upvalues: TextureData (copy), SpecialTextureData (copy) ]]
+return function(p1, p2)
 	local Make = p2.Make
 	local Model = p2.Model
 	local list = {}

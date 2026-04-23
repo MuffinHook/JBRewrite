@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local Basic = require(script.Parent.Basic)
-local t = {
+local defaultMotion = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -13,22 +14,22 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local t2 = {
+local MansionInvite = {
 	__ClassName = "MansionInvite"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.new(p1, p2, p3) --[[ Line: 23 | Upvalues: Basic (copy), t (copy), t2 (copy) ]]
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	v1:DefaultDisableCamLock()
-	return v1
+MansionInvite.__index = MansionInvite
+setmetatable(MansionInvite, Basic)
+function MansionInvite.new(self, itemInstance, motionConfig)
+	local newInstance = Basic.new(self, itemInstance, defaultMotion, motionConfig)
+	setmetatable(newInstance, MansionInvite)
+	newInstance:DefaultDisableCamLock()
+	return newInstance
 end
-function t2.GetLeftArmPosition(p1) --[[ Line: 31 ]]
+function MansionInvite.GetLeftArmPosition(self)
 	return nil
 end
-function t2.InputBegan(p1, ...) --[[ Line: 34 | Upvalues: Basic (copy) ]]
-	Basic.InputBegan(p1, ...)
+function MansionInvite.InputBegan(self, ...)
+	Basic.InputBegan(self, ...)
 end
-function t2.InputEnded(p1) --[[ Line: 37 ]] end
-return t2
+function MansionInvite.InputEnded(self) end
+return MansionInvite

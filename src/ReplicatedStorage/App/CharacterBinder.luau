@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local t = {}
 t.__index = t
-function t.new(p1, p2) --[[ Line: 8 | Upvalues: BaseObject (copy) ]]
+function t.new(p1, p2)
 	local v1 = BaseObject.new(p1)
 	v1.manifest = p2
 	return v1

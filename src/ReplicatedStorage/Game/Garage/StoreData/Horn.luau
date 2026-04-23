@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
-local function GetInstance(p1) --[[ Line: 134 | Upvalues: ReplicatedStorage (copy) ]]
+local function GetInstance(p1)
 	local v1 = ReplicatedStorage.Resource:FindFirstChild("GarageHornVisual"):Clone()
 	v1:PivotTo(CFrame.new(0, 0, 0))
 	return v1
 end
-local function Update(p1, p2) --[[ Line: 141 ]]
+local function Update(p1, p2)
 	local v1 = os.clock() / 2
 	p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.1 - 0.3, 0, 0) * CFrame.new(0, 0, p2.PrimaryPart.Size.Magnitude)
 end
@@ -143,7 +144,7 @@ return {
 	},
 	GetInstance = GetInstance,
 	Update = Update,
-	onItemSelected = function(p1) --[[ Name: onItemSelected | Line: 150 | Upvalues: v1 (ref), Players (copy), Audio (copy) ]]
+	onItemSelected = function(p1)
 		if v1 then
 			v1:Destroy()
 			v1 = nil

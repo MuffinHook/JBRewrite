@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 game:GetService("TextChatService")
 local StarterGui = game:GetService("StarterGui")
 local t = {}
 local v1 = true
 local v2 = true
-function t.setEnabled(p1) --[[ Line: 8 | Upvalues: v1 (ref), v2 (ref), StarterGui (copy) ]]
+function t.setEnabled(p1)
 	v1 = p1
 	if p1 == false then
 		v2 = StarterGui:GetCore("ChatActive")
@@ -12,12 +13,12 @@ function t.setEnabled(p1) --[[ Line: 8 | Upvalues: v1 (ref), v2 (ref), StarterGu
 		StarterGui:SetCore("ChatActive", v2)
 	end
 end
-function t.getEnabled() --[[ Line: 19 | Upvalues: v1 (ref) ]]
+function t.getEnabled()
 	return v1
 end
-function t.hide() --[[ Line: 22 | Upvalues: t (copy) ]]
+function t.hide()
 	t.setEnabled(false)
-	return function() --[[ Line: 24 | Upvalues: t (ref) ]]
+	return function()
 		t.setEnabled(true)
 	end
 end

@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local function makeGradient(p1, p2, p3) --[[ Line: 5 | Upvalues: createElement (copy) ]]
+local function makeGradient(p1, p2, p3)
 	local t = {
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(0.5, 1)
@@ -25,7 +26,7 @@ local function makeGradient(p1, p2, p3) --[[ Line: 5 | Upvalues: createElement (
 				NumberSequenceKeypoint.new(0.5, 1),
 				NumberSequenceKeypoint.new(1, 1)
 			}),
-			Rotation = p3:map(function(p1) --[[ Line: 28 | Upvalues: p2 (copy) ]]
+			Rotation = p3:map(function(p1)
 				return math.clamp(math.clamp(p1 * 360, 0, 360), if p2 then 180 else 0, if p2 then 360 else 180)
 			end)
 		})
@@ -42,7 +43,7 @@ v1.defaultProps = {
 	zIndex = 1
 }
 function v1.init(p1) --[[ Line: 46 ]] end
-function v1.render(p1) --[[ Line: 47 | Upvalues: createElement (copy), makeGradient (copy) ]]
+function v1.render(p1)
 	return createElement("Frame", {
 		BackgroundTransparency = 1,
 		Size = p1.props.size,

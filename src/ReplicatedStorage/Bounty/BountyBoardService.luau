@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
@@ -8,25 +9,25 @@ local t = {
 	onBountiesUpdated = require(ReplicatedStorage.Std.Signal).new()
 }
 local BountyData = ReplicatedStorage:FindFirstChild("BountyData")
-function t.init() --[[ Line: 18 | Upvalues: t (copy), BountyData (copy) ]]
+function t.init()
 	t.updateBounties()
 	BountyData:GetPropertyChangedSignal("Value"):Connect(t.updateBounties)
 end
-local function thumbnailBust(p1) --[[ Line: 23 ]]
+local function thumbnailBust(p1)
 	return ("rbxthumb://type=AvatarHeadShot&id=%d&w=420&h=420"):format(p1)
 end
-local function comma(p1) --[[ Line: 26 ]]
+local function comma(p1)
 	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
 	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
 end
-local function clearFrame(p1) --[[ Line: 30 ]]
+local function clearFrame(p1)
 	for v1, v2 in p1:GetChildren() do
 		if v2:IsA("Frame") then
 			v2:Destroy()
 		end
 	end
 end
-function t.updateGui(p1, p2) --[[ Line: 38 | Upvalues: Players (copy), clearFrame (copy), ReplicatedStorage (copy) ]]
+function t.updateGui(p1, p2)
 	local v1 = p1:IsDescendantOf(Players)
 	clearFrame(p1)
 	for i = 1, if v1 then 6 else 4 do
@@ -50,7 +51,7 @@ function t.updateGui(p1, p2) --[[ Line: 38 | Upvalues: Players (copy), clearFram
 		v3.Parent = p1
 	end
 end
-function t.getTopBounties(p1) --[[ Line: 70 | Upvalues: t (copy) ]]
+function t.getTopBounties(p1)
 	local t2 = {}
 	for v1, v2 in t.Bounties do
 		if p1 <= #t2 then
@@ -60,7 +61,7 @@ function t.getTopBounties(p1) --[[ Line: 70 | Upvalues: t (copy) ]]
 	end
 	return t2
 end
-function t.updateBounties() --[[ Line: 81 | Upvalues: t (copy), HttpService (copy), BountyData (copy), CollectionService (copy), BountyConsts (copy) ]]
+function t.updateBounties()
 	table.clear(t.Bounties)
 	t.Bounties = HttpService:JSONDecode(BountyData.Value)
 	t.onBountiesUpdated:Fire(t.Bounties)

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
 	Items = {
@@ -1210,7 +1211,7 @@ return {
 			Tags = { "Soccer" }
 		}
 	},
-	GetInstance = function(p1) --[[ Name: GetInstance | Line: 3 | Upvalues: ReplicatedStorage (copy) ]]
+	GetInstance = function(p1)
 		if p1.None then
 			local Part = Instance.new("Part")
 			Part.Transparency = 1
@@ -1231,7 +1232,7 @@ return {
 			return v2
 		end
 	end,
-	Update = function(p1, p2) --[[ Name: Update | Line: 25 ]]
+	Update = function(p1, p2)
 		local v1 = os.clock() / 2
 		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.5, 0, 0) * CFrame.new(0, 0, p2.Size.Magnitude * 0.707)
 	end

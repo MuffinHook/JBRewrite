@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Joint = require(ReplicatedStorage.Std.Joint)
 local SpoilerColor = require(script.Parent.SpoilerColor)
 require(script.Parent.InteriorDetailColor)
 local v1 = CFrame.new(0, 0, 0)
-return function(p1, p2, p3) --[[ Line: 9 | Upvalues: ReplicatedStorage (copy), Joint (copy), v1 (copy), RunService (copy), SpoilerColor (copy) ]]
+return function(p1, p2, p3)
 	local Model = p2.Model
 	local SpoilerPart = Model:FindFirstChild("SpoilerPart")
 	if p1 and not p1.None then
@@ -91,7 +92,7 @@ return function(p1, p2, p3) --[[ Line: 9 | Upvalues: ReplicatedStorage (copy), J
 			local v35 = Joint.Weld(SpoilerPart_2, Spoiler, v34:Inverse(), v1)
 			if p1.Name == "TurningKey" then
 				local v36 = nil
-				v36 = RunService.Heartbeat:Connect(function() --[[ Line: 116 | Upvalues: SpoilerPart_2 (ref), v36 (ref), v35 (copy) ]]
+				v36 = RunService.Heartbeat:Connect(function()
 					if not SpoilerPart_2:IsDescendantOf(workspace) then
 						v36:Disconnect()
 					end

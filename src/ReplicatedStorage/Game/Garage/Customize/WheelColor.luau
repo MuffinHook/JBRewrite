@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConsts)
 local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
-return function(p1, p2, p3) --[[ Line: 7 | Upvalues: ReplicatedStorage (copy), Paint (copy), CollectionService (copy), HyperChromeUtils (copy), HyperChromeConsts (copy) ]]
+return function(p1, p2, p3)
 	local Type = p2.Type
 	local Make = p2.Make
 	local Model = p2.Model
@@ -14,7 +15,7 @@ return function(p1, p2, p3) --[[ Line: 7 | Upvalues: ReplicatedStorage (copy), P
 		DefaultReflectance = v3.Reflectance,
 		DefaultMaterial = v3.Material
 	}
-	local function UpdateRim(p1) --[[ Line: 24 | Upvalues: Paint (ref), v1 (ref), t (copy), v2 (copy), Make (copy), CollectionService (ref), HyperChromeUtils (ref), HyperChromeConsts (ref) ]]
+	local function UpdateRim(p1)
 		Paint.Part(p1, v1, t)
 		if v2 == "Storm" or (v2 == "HatchVoids" or v2 == "INF1N1TY") then
 			for v12, v22 in p1:GetDescendants() do

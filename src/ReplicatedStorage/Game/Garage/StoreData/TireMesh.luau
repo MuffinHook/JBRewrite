@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
 	Items = {
@@ -178,12 +179,12 @@ return {
 			Price = 20000
 		}
 	},
-	GetInstance = function(p1) --[[ Name: GetInstance | Line: 2 | Upvalues: ReplicatedStorage (copy) ]]
+	GetInstance = function(p1)
 		local v1 = ReplicatedStorage.Resource.TireMesh:FindFirstChild(p1.Name):Clone()
 		v1.CFrame = CFrame.new(0, 0, 0)
 		return v1
 	end,
-	Update = function(p1, p2) --[[ Name: Update | Line: 10 ]]
+	Update = function(p1, p2)
 		local v1 = os.clock() / 2
 		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.5, 0, 0) * CFrame.new(0, 0, p2.Size.Magnitude * 0.707)
 	end

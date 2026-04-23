@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local CollectionService = game:GetService("CollectionService")
@@ -12,7 +13,7 @@ local createElement = Roact.createElement
 local CCTV = require(script.Parent.CCTV)
 local CameraBinder = require(script.Parent.Parent.CameraBinder)
 local v1 = Roact.PureComponent:extend("Viewer")
-function v1.init(p1) --[[ Line: 17 | Upvalues: Maid (copy), Roact (copy) ]]
+function v1.init(p1)
 	p1._maid = Maid.new()
 	p1:setState({
 		index = 1
@@ -22,9 +23,9 @@ function v1.init(p1) --[[ Line: 17 | Upvalues: Maid (copy), Roact (copy) ]]
 	p1.flash = v1
 	p1.updateFlash = v2
 end
-function v1._flash(p1) --[[ Line: 25 | Upvalues: RunService (copy) ]]
+function v1._flash(p1)
 	local v1 = os.clock()
-	p1._maid.flash = RunService.Heartbeat:Connect(function() --[[ Line: 28 | Upvalues: v1 (copy), p1 (copy) ]]
+	p1._maid.flash = RunService.Heartbeat:Connect(function()
 		local v12 = (os.clock() - v1) / 0.25
 		if v12 > 1 then
 			p1._maid.flash = nil
@@ -33,7 +34,7 @@ function v1._flash(p1) --[[ Line: 25 | Upvalues: RunService (copy) ]]
 		p1.updateFlash(1 - math.sin(math.pi * (v12 + 0.25) / 1.25))
 	end)
 end
-function v1._updateCameraParts(p1) --[[ Line: 39 | Upvalues: CollectionService (copy), Maid (copy) ]]
+function v1._updateCameraParts(p1)
 	local v1 = CollectionService:GetTagged(p1.props.cameraTag)
 	p1:setState({
 		cameraParts = v1
@@ -41,12 +42,12 @@ function v1._updateCameraParts(p1) --[[ Line: 39 | Upvalues: CollectionService (
 	local v2 = Maid.new()
 	p1._maid.cameraPartMaid = v2
 	for i, v in ipairs(v1) do
-		v2:GiveTask(v:GetAttributeChangedSignal("CCTVDisabled"):Connect(function() --[[ Line: 47 | Upvalues: p1 (copy) ]]
+		v2:GiveTask(v:GetAttributeChangedSignal("CCTVDisabled"):Connect(function()
 			p1:_updateCameraParts()
 		end))
 	end
 end
-function v1.render(p1) --[[ Line: 52 | Upvalues: createElement (copy), CCTV (copy), Roact (copy), CameraBinder (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	if p1.state.cameraParts and #p1.state.cameraParts ~= 0 then
 		local t = {}
 		local t2 = {}
@@ -125,7 +126,7 @@ function v1.render(p1) --[[ Line: 52 | Upvalues: createElement (copy), CCTV (cop
 					fieldOfView = p1.props.fieldOfView,
 					disabled = t3[p1.state.index],
 					flash = p1.flash,
-					onCharacterEnter = function(p12) --[[ Name: onCharacterEnter | Line: 133 | Upvalues: CameraBinder (ref), p1 (copy) ]]
+					onCharacterEnter = function(p12)
 						CameraBinder:Get(p1.state.cameraParts[p1.state.index]):Spot(p12)
 						p1:_flash()
 					end
@@ -197,7 +198,7 @@ function v1.render(p1) --[[ Line: 52 | Upvalues: createElement (copy), CCTV (cop
 					Size = UDim2.new(1, 0, 1, 0),
 					LayoutOrder = 100,
 					Text = "",
-					[Roact.Event.MouseButton1Down] = function() --[[ Line: 209 | Upvalues: p1 (copy), t (copy) ]]
+					[Roact.Event.MouseButton1Down] = function()
 						p1:setState({
 							index = (p1.state.index + 1 - 1) % #t + 1
 						})
@@ -224,7 +225,7 @@ function v1.render(p1) --[[ Line: 52 | Upvalues: createElement (copy), CCTV (cop
 					Size = UDim2.new(1, 0, 1, 0),
 					LayoutOrder = 101,
 					Text = "",
-					[Roact.Event.MouseButton1Down] = function() --[[ Line: 236 | Upvalues: p1 (copy), t (copy) ]]
+					[Roact.Event.MouseButton1Down] = function()
 						p1:setState({
 							index = (p1.state.index - 1 - 1) % #t + 1
 						})
@@ -248,12 +249,12 @@ function v1.render(p1) --[[ Line: 52 | Upvalues: createElement (copy), CCTV (cop
 		})
 	end
 end
-function v1.didMount(p1) --[[ Line: 260 | Upvalues: CollectionService (copy), Players (copy), Audio (copy), CharacterUtils (copy), Interval (copy) ]]
+function v1.didMount(p1)
 	p1.updateFlash(1)
-	p1._maid:GiveTask(CollectionService:GetInstanceAddedSignal(p1.props.cameraTag):Connect(function() --[[ Line: 263 | Upvalues: p1 (copy) ]]
+	p1._maid:GiveTask(CollectionService:GetInstanceAddedSignal(p1.props.cameraTag):Connect(function()
 		p1:_updateCameraParts()
 	end))
-	p1._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(p1.props.cameraTag):Connect(function() --[[ Line: 266 | Upvalues: p1 (copy) ]]
+	p1._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(p1.props.cameraTag):Connect(function()
 		p1:_updateCameraParts()
 	end))
 	if Players.LocalPlayer then
@@ -266,7 +267,7 @@ function v1.didMount(p1) --[[ Line: 260 | Upvalues: CollectionService (copy), Pl
 		local v2 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
 		if v2 then
 			local Position = v2.Position
-			p1._maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 279 | Upvalues: v2 (ref), CharacterUtils (ref), Players (ref), Position (copy), p1 (copy) ]]
+			p1._maid:GiveTask(Interval.every(1):Connect(function()
 				v2 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
 				if v2 then
 					if (v2.Position - Position).Magnitude > p1.props.expireDistance then
@@ -279,7 +280,7 @@ function v1.didMount(p1) --[[ Line: 260 | Upvalues: CollectionService (copy), Pl
 		end
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 293 ]]
+function v1.willUnmount(p1)
 	p1._maid:DoCleaning()
 end
 return v1

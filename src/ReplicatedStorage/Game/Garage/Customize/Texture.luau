@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SpecialTextureData = require(ReplicatedStorage.Game.Garage.SpecialTextureData)
 local TextureData = require(ReplicatedStorage.Game.Garage.TextureData)
 local GarageConsts = require(ReplicatedStorage.Garage.GarageConsts)
 local SecondTexture = require(script.Parent.SecondTexture)
 local SecondTexture_2 = require(script.Parent.Parent.Category.SecondTexture)
-return function(p1, p2, p3) --[[ Line: 8 | Upvalues: TextureData (copy), SpecialTextureData (copy), GarageConsts (copy), ReplicatedStorage (copy), SecondTexture_2 (copy), SecondTexture (copy) ]]
+return function(p1, p2, p3)
 	local Type = p2.Type
 	local Make = p2.Make
 	local Model = p2.Model

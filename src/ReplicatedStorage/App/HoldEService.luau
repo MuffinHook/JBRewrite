@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
@@ -7,7 +8,7 @@ local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local InventoryItemBinder = require(ReplicatedStorage.Inventory.InventoryItemBinder)
 require(ReplicatedStorage.Inventory.InventoryItemSystem)
 local t = {}
-function t.init() --[[ Line: 12 | Upvalues: t (copy), CircleAction (copy), ActionButtonService (copy), ItemSystem (copy), Players (copy), VehicleUtils (copy), InventoryItemBinder (copy) ]]
+function t.init()
 	t._button = {
 		primary = true,
 		priority = 1050,
@@ -15,20 +16,20 @@ function t.init() --[[ Line: 12 | Upvalues: t (copy), CircleAction (copy), Actio
 		saturateTo = 0,
 		image = "rbxassetid://10770151584",
 		keyCodes = { Enum.KeyCode.E, Enum.KeyCode.ButtonY },
-		onPressed = function() --[[ Name: onPressed | Line: 22 | Upvalues: CircleAction (ref) ]]
+		onPressed = function()
 			CircleAction.Press()
 		end,
-		onReleased = function() --[[ Name: onReleased | Line: 25 | Upvalues: CircleAction (ref) ]]
+		onReleased = function()
 			CircleAction.Release()
 		end
 	}
 	ActionButtonService.add(t._button)
-	CircleAction.onVisibilityChanged:Connect(function(p1) --[[ Line: 32 | Upvalues: t (ref) ]]
+	CircleAction.onVisibilityChanged:Connect(function(p1)
 		if p1 and t._button._pressed then
 			t._button.onPressed()
 		end
 	end)
-	local function updateVisibility(p1) --[[ Line: 39 | Upvalues: ItemSystem (ref), Players (ref), VehicleUtils (ref), t (ref), ActionButtonService (ref) ]]
+	local function updateVisibility(p1)
 		local v1 = ItemSystem.GetEquipped(Players.LocalPlayer)
 		local v2 = not VehicleUtils.GetLocalVehiclePacket()
 		local v3 = not v1
@@ -42,14 +43,14 @@ function t.init() --[[ Line: 12 | Upvalues: t (copy), CircleAction (copy), Actio
 		ActionButtonService.setButtonPriority(t._button, if v3 or v1 == nil then 1050 else 775)
 	end
 	updateVisibility(true)
-	local function handleItem(p1) --[[ Line: 61 | Upvalues: Players (ref), updateVisibility (copy) ]]
-		p1._maid:GiveTask(p1:GetEquippedSignal():Connect(function() --[[ Line: 62 | Upvalues: p1 (copy), Players (ref), updateVisibility (ref) ]]
+	local function handleItem(p1)
+		p1._maid:GiveTask(p1:GetEquippedSignal():Connect(function()
 			if p1:GetOwner() == Players.LocalPlayer then
 				updateVisibility()
 			end
 		end))
 		if p1:GetOwner() == Players.LocalPlayer then
-			p1._maid:GiveTask(function() --[[ Line: 69 | Upvalues: updateVisibility (ref) ]]
+			p1._maid:GiveTask(function()
 				updateVisibility()
 			end)
 		end
@@ -58,10 +59,10 @@ function t.init() --[[ Line: 12 | Upvalues: t (copy), CircleAction (copy), Actio
 		handleItem(v2)
 	end
 	InventoryItemBinder:GetClassAddedSignal():Connect(handleItem)
-	VehicleUtils.OnVehicleEntered:Connect(function(p1) --[[ Line: 78 | Upvalues: updateVisibility (copy) ]]
+	VehicleUtils.OnVehicleEntered:Connect(function(p1)
 		updateVisibility()
 	end)
-	VehicleUtils.OnVehicleExited:Connect(function(p1) --[[ Line: 81 | Upvalues: updateVisibility (copy) ]]
+	VehicleUtils.OnVehicleExited:Connect(function(p1)
 		updateVisibility()
 	end)
 end

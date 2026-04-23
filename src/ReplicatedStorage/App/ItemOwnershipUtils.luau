@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local store = require(ReplicatedStorage.App.store)
 local homeStore = require(ReplicatedStorage.Home.homeStore)
 return {
-	isVehicleOwned = function(p1) --[[ Name: isVehicleOwned | Line: 8 | Upvalues: store (copy) ]]
+	isVehicleOwned = function(p1)
 		if type(p1) == "string" then
 			local garageOwned = store:getState().garageOwned
 			if garageOwned and garageOwned.Vehicles then
@@ -14,7 +15,7 @@ return {
 			return false
 		end
 	end,
-	isVehicleCustomizationOwned = function(p1, p2) --[[ Name: isVehicleCustomizationOwned | Line: 20 | Upvalues: store (copy) ]]
+	isVehicleCustomizationOwned = function(p1, p2)
 		if type(p1) == "string" and type(p2) == "string" then
 			local garageOwned = store:getState().garageOwned
 			if garageOwned then
@@ -31,7 +32,7 @@ return {
 			return false
 		end
 	end,
-	isHomeItemOwned = function(p1) --[[ Name: isHomeItemOwned | Line: 36 | Upvalues: homeStore (copy) ]]
+	isHomeItemOwned = function(p1)
 		if type(p1) == "string" then
 			local v1 = homeStore:getState()
 			if v1 and v1.inventory then

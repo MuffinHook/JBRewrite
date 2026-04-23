@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
@@ -6,7 +7,7 @@ local v1 = Roact.PureComponent:extend("Bounty")
 v1.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0)
 }
-function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), Format (copy) ]]
+function v1.render(p1)
 	return createElement("Frame", {
 		BackgroundTransparency = 1,
 		Size = p1.props.size,

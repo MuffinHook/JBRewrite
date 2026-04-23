@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (copy), RoactRodux (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local store = require(ReplicatedStorage.App.store)
 	local BigMinimap = require(script.Parent.BigMinimap)
-	function v1.init(p1) --[[ Line: 9 | Upvalues: Roact (ref) ]]
+	function v1.init(p1)
 		local v1, v2 = Roact.createBinding(Vector3.new(2567, 0, 89))
 		p1.worldPosition = v1
 		p1.updateWorldPosition = v2
@@ -33,7 +34,7 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (co
 			markerColor = Color3.new(255/255, 0/255, 0/255)
 		}
 	}
-	function v1.render(p1) --[[ Line: 34 | Upvalues: Roact (ref), RoactRodux (ref), store (copy), BigMinimap (copy), t (copy) ]]
+	function v1.render(p1)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(BigMinimap, {
@@ -51,7 +52,7 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (co
 				labels = t,
 				size = UDim2.new(1, 0, 0.75, 0),
 				color = Color3.new(255/255, 0/255, 0/255),
-				onSetWaypoint = function(p12) --[[ Name: onSetWaypoint | Line: 56 | Upvalues: p1 (copy) ]]
+				onSetWaypoint = function(p12)
 					p1:setState({
 						waypoint = p12
 					})
@@ -60,7 +61,7 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (co
 	end
 	function v1.willUnmount(p1) --[[ Line: 64 ]] end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 67 | Upvalues: Roact (ref), v2 (copy) ]]
+	return function()
 		Roact.unmount(v2)
 	end
 end

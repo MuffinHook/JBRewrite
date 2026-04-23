@@ -1,17 +1,18 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local PaintUtils = require(ReplicatedStorage.Game.Garage.PaintUtils)
 local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConsts)
 local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
-local function getPaintConfig(p1) --[[ Line: 8 | Upvalues: PaintUtils (copy) ]]
+local function getPaintConfig(p1)
 	local v1 = PaintUtils.GetDefaultVehiclePart(p1)
 	return {
 		DefaultReflectance = v1.Reflectance,
 		DefaultMaterial = v1.Material
 	}
 end
-return function(p1, p2) --[[ Line: 16 | Upvalues: Paint (copy), PaintUtils (copy), CollectionService (copy), HyperChromeUtils (copy), HyperChromeConsts (copy) ]]
+return function(p1, p2)
 	local Model = p2.Model
 	local Type = p2.Type
 	local Make = p2.Make

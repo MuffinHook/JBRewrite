@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Resource.Settings)
@@ -5,7 +6,7 @@ local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConst
 local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local PaintUtils = require(ReplicatedStorage.Game.Garage.PaintUtils)
-return function(p1, p2) --[[ Line: 10 | Upvalues: PaintUtils (copy), Paint (copy), CollectionService (copy), HyperChromeUtils (copy), HyperChromeConsts (copy) ]]
+return function(p1, p2)
 	local Model = p2.Model
 	local Type = p2.Type
 	local Make = p2.Make

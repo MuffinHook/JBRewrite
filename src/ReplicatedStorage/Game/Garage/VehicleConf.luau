@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local t = {
 	require(ReplicatedStorage.Sale.SaleConsts).CATEGORY_NAME,
@@ -49,7 +50,7 @@ local t2 = {
 	HeadlightsColor = require(script.Parent.Category.HeadlightsColor)
 }
 return {
-	GetCategoriesByModel = function(p1) --[[ Name: GetCategoriesByModel | Line: 54 | Upvalues: t (copy), t2 (copy) ]]
+	GetCategoriesByModel = function(p1)
 		local t3 = {}
 		for v1, v2 in t do
 			local v3 = t2[v2]

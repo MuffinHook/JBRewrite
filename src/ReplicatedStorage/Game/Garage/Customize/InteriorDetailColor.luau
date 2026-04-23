@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local PaintUtils = require(ReplicatedStorage.Game.Garage.PaintUtils)
 local t = {}
-return function(p1, p2) --[[ Line: 7 | Upvalues: PaintUtils (copy), t (copy), Paint (copy) ]]
+return function(p1, p2)
 	local Model = p2.Model
 	local list = {}
 	for i, v in ipairs(Model:GetDescendants()) do

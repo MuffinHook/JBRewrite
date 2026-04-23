@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemCamera = require(ReplicatedStorage.Game.ItemSystem.ItemCamera)
@@ -32,20 +33,20 @@ local t2 = {
 }
 t2.__index = t2
 setmetatable(t2, Basic)
-function t2.Init(p1) --[[ Line: 43 | Upvalues: v3 (ref) ]]
+function t2.Init(p1)
 	v3 = p1.ScreenGui
 end
-function t2.new(p1, p2, p3) --[[ Line: 46 | Upvalues: Basic (copy), t (copy), t2 (copy) ]]
+function t2.new(p1, p2, p3)
 	local v1 = Basic.new(p1, p2, t, p3)
 	setmetatable(v1, t2)
 	if v1.Local then
-		v1.Maid:GiveTask(function() --[[ Line: 51 | Upvalues: v1 (copy) ]]
+		v1.Maid:GiveTask(function()
 			v1:Hide()
 		end)
 	end
 	return v1
 end
-function t2.Look(p1) --[[ Line: 58 | Upvalues: v3 (ref), ItemCamera (copy), v1 (ref), PartUtils (copy) ]]
+function t2.Look(p1)
 	if p1.Local then
 		local v12 = v3.AbsoluteSize.X + 40
 		local Y = v3.AbsoluteSize.Y
@@ -70,7 +71,7 @@ function t2.Look(p1) --[[ Line: 58 | Upvalues: v3 (ref), ItemCamera (copy), v1 (
 	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Eyes.Springs.NeckRotation)
 	p1.SpringWaistRotation:SetTarget(p1.Config.Motion.Eyes.Springs.WaistRotation)
 end
-function t2.Hide(p1) --[[ Line: 86 | Upvalues: v3 (ref), ItemCamera (copy), v1 (ref) ]]
+function t2.Hide(p1)
 	if p1.Local then
 		if v3.Binoculars.Visible then
 			v3.Binoculars.Visible = false
@@ -94,7 +95,7 @@ function t2.Hide(p1) --[[ Line: 86 | Upvalues: v3 (ref), ItemCamera (copy), v1 (
 	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
 	p1.SpringWaistRotation:SetTarget(p1.Config.Motion.Hip.Springs.WaistRotation)
 end
-function t2.InputBegan(p1, p2, p3) --[[ Line: 111 | Upvalues: Basic (copy) ]]
+function t2.InputBegan(p1, p2, p3)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		p1:Look()
 		if p1.Local then
@@ -103,7 +104,7 @@ function t2.InputBegan(p1, p2, p3) --[[ Line: 111 | Upvalues: Basic (copy) ]]
 	end
 	Basic.InputBegan(p1, p2, p3)
 end
-function t2.InputEnded(p1, p2) --[[ Line: 124 ]]
+function t2.InputEnded(p1, p2)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		p1:Hide()
 		if p1.Local then

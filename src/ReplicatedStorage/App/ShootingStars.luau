@@ -1,16 +1,17 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Interval = require(ReplicatedStorage.Std.Interval)
 local Tracer = require(ReplicatedStorage.Game.Tracer)
 local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
-local function computePosition(p1, p2) --[[ Line: 7 ]]
+local function computePosition(p1, p2)
 	return CFrame.fromAxisAngle(p1.axis, p2 + p1.angle0) * p1.origin
 end
 local t = {
 	list = {}
 }
-function t.init() --[[ Line: 13 | Upvalues: Interval (copy), GeomUtils (copy), t (copy), RunService (copy) ]]
-	Interval.every(10):Connect(function() --[[ Line: 14 | Upvalues: GeomUtils (ref), t (ref) ]]
+function t.init()
+	Interval.every(10):Connect(function()
 		local v1 = GeomUtils.randomPointOnCircle()
 		local v2 = Vector3.new(v1.x, 0, v1.y) * 5000
 		local v3 = v2:Cross(Vector3.new(0, 1, 0))
@@ -20,7 +21,7 @@ function t.init() --[[ Line: 13 | Upvalues: Interval (copy), GeomUtils (copy), t
 			task.wait()
 		end
 	end)
-	RunService.Heartbeat:Connect(function() --[[ Line: 28 | Upvalues: t (ref) ]]
+	RunService.Heartbeat:Connect(function()
 		local v1 = os.clock()
 		for i = #t.list, 1, -1 do
 			local v2 = t.list[i]
@@ -36,7 +37,7 @@ function t.init() --[[ Line: 13 | Upvalues: Interval (copy), GeomUtils (copy), t
 		end
 	end)
 end
-function t.create(p1, p2, p3) --[[ Line: 48 | Upvalues: Tracer (copy), t (copy) ]]
+function t.create(p1, p2, p3)
 	local v1 = Tracer.new()
 	v1:SetColor(Color3.new(255/255, 255/255, 255/255))
 	v1:SetThickness(1)

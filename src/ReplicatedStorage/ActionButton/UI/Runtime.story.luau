@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
 local Roact = require(ReplicatedStorage.Roact)
 local Maid = require(ReplicatedStorage.Std.Maid)
-return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), Maid (copy), ActionButtonService (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local Runtime = require(script.Parent.Runtime)
-	function v1.init(p1) --[[ Line: 10 | Upvalues: Maid (ref), ActionButtonService (ref) ]]
+	function v1.init(p1)
 		p1._maid = Maid.new()
 		p1._maid:GiveTask(ActionButtonService.add({
 			primary = true,
@@ -15,7 +16,7 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), Maid (copy), ActionBu
 			title = "drive",
 			image = "rbxassetid://7858765663",
 			keyCodes = { Enum.KeyCode.W, Enum.KeyCode.Up },
-			onPressed = function() --[[ Name: onPressed | Line: 20 ]]
+			onPressed = function()
 				print("asdf")
 				return true
 			end,
@@ -28,7 +29,7 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), Maid (copy), ActionBu
 			title = "brake",
 			image = "rbxassetid://7858764373",
 			keyCodes = { Enum.KeyCode.S, Enum.KeyCode.Down },
-			onPressed = function() --[[ Name: onPressed | Line: 33 ]]
+			onPressed = function()
 				print("asdf2")
 			end,
 			onReleased = function() --[[ Name: onReleased | Line: 36 ]] end
@@ -48,7 +49,7 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), Maid (copy), ActionBu
 			useEvery = 5,
 			keyCodes = { Enum.KeyCode.C, Enum.KeyCode.Z, Enum.KeyCode.ButtonL3 },
 			allowPassThrough = true,
-			onPressed = function() --[[ Name: onPressed | Line: 57 ]]
+			onPressed = function()
 				return true
 			end
 		}))
@@ -65,18 +66,18 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), Maid (copy), ActionBu
 			onPressed = function() --[[ Name: onPressed | Line: 75 ]] end
 		}))
 	end
-	function v1.render(p1) --[[ Line: 79 | Upvalues: Roact (ref), Runtime (copy) ]]
+	function v1.render(p1)
 		return Roact.createElement(Runtime, {
 			enabled = true,
 			color = Color3.new(255/255, 0/255, 0/255),
 			DEBUG_forceRadial = true
 		})
 	end
-	function v1.willUnmount(p1) --[[ Line: 86 ]]
+	function v1.willUnmount(p1)
 		p1._maid:Destroy()
 	end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 91 | Upvalues: Roact (ref), v2 (copy) ]]
+	return function()
 		Roact.unmount(v2)
 	end
 end

@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 return {
-	basic = function(p1, p2) --[[ Name: basic | Line: 7 | Upvalues: InputUtils (copy) ]]
+	basic = function(p1, p2)
 		if InputUtils.isGamepad() then
 			assert(p1)
 			assert(p2)

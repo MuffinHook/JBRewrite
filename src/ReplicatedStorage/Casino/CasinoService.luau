@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 return {
-	init = function() --[[ Name: init | Line: 2 ]]
+	init = function()
 		require(script.Parent.VaultDoorPuzzleBinder):Start()
 		require(script.Parent.CuttableGlassBinder):Start()
 		require(script.Parent.CasinoRobberyService).init()

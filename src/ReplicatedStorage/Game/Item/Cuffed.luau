@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local v1 = script.Parent
 local HapticEffect = require(ReplicatedStorage.App.HapticEffect)
@@ -21,7 +22,7 @@ local t2 = {
 }
 t2.__index = t2
 setmetatable(t2, Basic)
-function t2.new(p1, p2, p3) --[[ Line: 25 | Upvalues: Basic (copy), t (copy), t2 (copy), HapticEffect (copy) ]]
+function t2.new(p1, p2, p3)
 	local v1 = Basic.new(p1, p2, t, p3)
 	setmetatable(v1, t2)
 	v1.SpringItemOffset.Damp = 0.5
@@ -39,8 +40,8 @@ function t2.new(p1, p2, p3) --[[ Line: 25 | Upvalues: Basic (copy), t (copy), t2
 	end
 	return v1
 end
-function t2.InputBegan(p1, ...) --[[ Line: 48 | Upvalues: Basic (copy) ]]
+function t2.InputBegan(p1, ...)
 	Basic.InputBegan(p1, ...)
 end
-function t2.InputEnded(p1) --[[ Line: 51 ]] end
+function t2.InputEnded(p1) end
 return t2

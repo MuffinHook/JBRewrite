@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 if require(script.Parent.RunUtils).isTradeWorld() then
 	return {
 		spawn = Vector3.new(-200, 234, -280),

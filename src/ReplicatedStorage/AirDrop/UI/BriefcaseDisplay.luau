@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Roact = require(ReplicatedStorage.Roact)
@@ -6,13 +7,13 @@ local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local RewardSpinnerConsts = require(ReplicatedStorage.RewardSpinner.RewardSpinnerConsts)
 local v1 = Roact.PureComponent:extend("BriefcaseDisplay")
-function v1.init(p1) --[[ Line: 10 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	p1:setState({
 		probs = {}
 	})
 end
-function v1.render(p1) --[[ Line: 16 | Upvalues: RewardSpinnerConsts (copy), createElement (copy), ColorUtils (copy) ]]
+function v1.render(p1)
 	local v1 = p1.props.probs or p1.state.probs
 	local v2 = #RewardSpinnerConsts.RARITIES
 	local t = {}
@@ -56,9 +57,9 @@ function v1.render(p1) --[[ Line: 16 | Upvalues: RewardSpinnerConsts (copy), cre
 		BackgroundTransparency = 1
 	}, t)
 end
-function v1.didMount(p1) --[[ Line: 66 | Upvalues: RewardSpinnerConsts (copy), RxInstanceUtils (copy) ]]
+function v1.didMount(p1)
 	if p1.props.probsFolder then
-		local function f() --[[ Line: 68 | Upvalues: RewardSpinnerConsts (ref), p1 (copy) ]]
+		local function f()
 			local t = {}
 			for i = 1, #RewardSpinnerConsts.RARITIES do
 				local v1 = p1.props.probsFolder:FindFirstChild((tostring(i)))
@@ -70,13 +71,13 @@ function v1.didMount(p1) --[[ Line: 66 | Upvalues: RewardSpinnerConsts (copy), R
 				probs = t
 			})
 		end
-		p1.maid:GiveTask(RxInstanceUtils.observeChildren(p1.props.probsFolder, function(p1, p2) --[[ Line: 82 | Upvalues: f (copy) ]]
+		p1.maid:GiveTask(RxInstanceUtils.observeChildren(p1.props.probsFolder, function(p1, p2)
 			f()
 			p2:GiveTask(p1.Changed:Connect(f))
 		end))
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 89 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v1

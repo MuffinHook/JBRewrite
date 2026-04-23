@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
-return function(p1) --[[ Line: 4 | Upvalues: Roact (copy) ]]
+return function(p1)
 	local CCTV = require(script.Parent.CCTV)
 	local v1 = Roact.mount(Roact.createElement(CCTV, {
 		size = UDim2.new(0.5, 0, 0.5, 0),
@@ -10,7 +11,7 @@ return function(p1) --[[ Line: 4 | Upvalues: Roact (copy) ]]
 		cameraCFrame = workspace.CurrentCamera.CFrame,
 		fieldOfView = 70
 	}), p1)
-	return function() --[[ Line: 17 | Upvalues: Roact (ref), v1 (copy) ]]
+	return function()
 		Roact.unmount(v1)
 	end
 end

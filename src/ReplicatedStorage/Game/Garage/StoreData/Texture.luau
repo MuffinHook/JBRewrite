@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.App.RunUtils)
 local TextureData = require(ReplicatedStorage.Game.Garage.TextureData)
@@ -597,7 +598,7 @@ return {
 			Hidden = true
 		}
 	},
-	GetInstance = function(p1) --[[ Name: GetInstance | Line: 10 | Upvalues: VehicleUtils (copy), getDefaultVehicleModel (copy), Texture (copy) ]]
+	GetInstance = function(p1)
 		local v1 = VehicleUtils.GetLocalVehiclePacketForCustomize()
 		local v2 = getDefaultVehicleModel(v1.Make, v1.Type)
 		local t = {
@@ -612,11 +613,11 @@ return {
 		end
 		return v2
 	end,
-	Update = function(p1, p2) --[[ Name: Update | Line: 24 ]]
+	Update = function(p1, p2)
 		local v1 = os.clock() / 2
 		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, p2:GetExtentsSize().Magnitude * 0.6)
 	end,
-	IsValidForMake = function(p1) --[[ Name: IsValidForMake | Line: 32 | Upvalues: VehicleUtils (copy), TextureData (copy), SpecialTextureData (copy) ]]
+	IsValidForMake = function(p1)
 		local Make = VehicleUtils.GetLocalVehiclePacket().Make
 		if Make == "TinyToy" then
 			Make = "Camaro"

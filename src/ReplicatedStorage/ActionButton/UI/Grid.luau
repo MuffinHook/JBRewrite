@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local Roact = require(ReplicatedStorage.Roact)
@@ -7,7 +8,7 @@ local v1 = Roact.PureComponent:extend("Grid")
 v1.defaultProps = {
 	color = Color3.new(255/255, 0/255, 0/255)
 }
-function v1._makeButton(p1, p2, p3, p4) --[[ Line: 14 | Upvalues: createElement (copy), makeButton (copy) ]]
+function v1._makeButton(p1, p2, p3, p4)
 	local v1 = UDim2.new(0.9, 0, 0.9, 0)
 	local v2 = UDim2.new(0.5, 0, 0.5, 0)
 	return createElement("Frame", {
@@ -18,7 +19,7 @@ function v1._makeButton(p1, p2, p3, p4) --[[ Line: 14 | Upvalues: createElement 
 		Button = makeButton(p1.props, p2, p3, 1, v1, v2)
 	})
 end
-function v1.render(p1) --[[ Line: 27 | Upvalues: createElement (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	local t = {}
 	for i = 1, p1.props.countInner do
 		t[("%s_%d"):format("inner", i)] = p1:_makeButton("inner", i, i)

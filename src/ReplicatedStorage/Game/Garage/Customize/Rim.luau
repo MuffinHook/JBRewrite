@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Joint = require(ReplicatedStorage.Std.Joint)
 local WheelColor = require(script.Parent.WheelColor)
@@ -5,7 +6,7 @@ local v1 = CFrame.new
 local Angles = CFrame.Angles
 local v2 = v1()
 local _ = Vector3.new
-local function getRimAndCf(p1, p2, p3, p4) --[[ Line: 11 | Upvalues: ReplicatedStorage (copy), Joint (copy), v2 (copy) ]]
+local function getRimAndCf(p1, p2, p3, p4)
 	local PrimaryPart = p2.PrimaryPart
 	if not PrimaryPart then
 		print(p2:GetFullName())
@@ -99,7 +100,7 @@ end
 local t = {
 	Chassis = {}
 }
-local function setChassisRim(p1, p2, p3) --[[ Line: 133 | Upvalues: getRimAndCf (copy) ]]
+local function setChassisRim(p1, p2, p3)
 	if p1 then
 		local Rim = p1:FindFirstChild("Rim")
 		if Rim then
@@ -108,7 +109,7 @@ local function setChassisRim(p1, p2, p3) --[[ Line: 133 | Upvalues: getRimAndCf 
 		getRimAndCf(p2.Model, p1, p3).Parent = p1
 	end
 end
-local function SetRims(p1, p2) --[[ Line: 146 | Upvalues: getRimAndCf (copy) ]]
+local function SetRims(p1, p2)
 	for v1, v2 in p1.Model:GetDescendants() do
 		if v2:IsA("Model") and (v2.Name:sub(1, 5) == "Wheel" and v2.Name ~= "Wheels") and v2 then
 			local Rim = v2:FindFirstChild("Rim")
@@ -121,7 +122,7 @@ local function SetRims(p1, p2) --[[ Line: 146 | Upvalues: getRimAndCf (copy) ]]
 end
 t.Chassis.SetRims = SetRims
 t.Motorcycle = {}
-local function setMotorcycleRim(p1, p2, p3) --[[ Line: 155 | Upvalues: getRimAndCf (copy) ]]
+local function setMotorcycleRim(p1, p2, p3)
 	local RimLeft = p1:FindFirstChild("RimLeft")
 	if RimLeft then
 		RimLeft:Destroy()
@@ -137,7 +138,7 @@ local function setMotorcycleRim(p1, p2, p3) --[[ Line: 155 | Upvalues: getRimAnd
 	RimRight_2.Name = "RimRight"
 	RimRight_2.Parent = p1
 end
-local function SetRims_2(p1, p2) --[[ Line: 172 | Upvalues: setMotorcycleRim (copy) ]]
+local function SetRims_2(p1, p2)
 	local _ = p2.Name
 	for v1, v2 in p1.Model.WheelModels:GetChildren() do
 		if v2:IsA("Model") then
@@ -153,7 +154,7 @@ local t2 = {
 	FrontLeft = true,
 	FrontRight = true
 }
-local function SetRims_3(p1, p2) --[[ Line: 198 | Upvalues: t2 (copy), getRimAndCf (copy) ]]
+local function SetRims_3(p1, p2)
 	for v1, v2 in p1.Model.WheelModels:GetChildren() do
 		if t2[v2.Name] and v2 then
 			local Rim = v2:FindFirstChild("Rim")
@@ -165,7 +166,7 @@ local function SetRims_3(p1, p2) --[[ Line: 198 | Upvalues: t2 (copy), getRimAnd
 	end
 end
 t.DuneBuggy.SetRims = SetRims_3
-local function SetRimsRaw(p1, p2, p3, p4) --[[ Line: 208 | Upvalues: t (copy) ]]
+local function SetRimsRaw(p1, p2, p3, p4)
 	if t[p1] then
 		t[p1].SetRims({
 			Type = p1,
@@ -174,7 +175,7 @@ local function SetRimsRaw(p1, p2, p3, p4) --[[ Line: 208 | Upvalues: t (copy) ]]
 		}, p4)
 	end
 end
-return function(p1, p2, p3) --[[ Line: 215 | Upvalues: SetRimsRaw (ref), WheelColor (copy) ]]
+return function(p1, p2, p3)
 	local Type = p2.Type
 	local Make = p2.Make
 	local Model = p2.Model

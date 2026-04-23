@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-return function(p1, p2, p3, p4) --[[ Line: 3 | Upvalues: ReplicatedStorage (copy) ]]
+return function(p1, p2, p3, p4)
 	if not p1 then
 		warn("Drift Item not found, using default")
 		p1 = {

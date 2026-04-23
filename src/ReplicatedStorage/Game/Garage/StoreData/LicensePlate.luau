@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 game:GetService("ReplicatedStorage")
-function GetItemByName(p1) --[[ Line: 7 ]]
+function GetItemByName(p1)
 	return {
 		Name = p1
 	}

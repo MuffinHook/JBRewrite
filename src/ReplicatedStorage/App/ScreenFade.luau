@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
@@ -5,7 +6,7 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 require(ReplicatedStorage.Std.Signal)
 local t = {}
 t.__index = t
-local function _makeFadeGui() --[[ Line: 10 ]]
+local function _makeFadeGui()
 	local _Fade = Instance.new("ScreenGui")
 	_Fade.DisplayOrder = 100
 	_Fade.IgnoreGuiInset = true
@@ -24,7 +25,7 @@ local function _makeFadeGui() --[[ Line: 10 ]]
 	Frame.Parent = _Fade
 	return _Fade, Frame
 end
-function t.new() --[[ Line: 29 | Upvalues: t (copy), Maid (copy), _makeFadeGui (copy), Players (copy) ]]
+function t.new()
 	local t2 = {}
 	setmetatable(t2, t)
 	t2.maid = Maid.new()
@@ -34,7 +35,7 @@ function t.new() --[[ Line: 29 | Upvalues: t (copy), Maid (copy), _makeFadeGui (
 	t2.frame = v3
 	return t2
 end
-function t._FadeTo(p1, p2, p3) --[[ Line: 43 | Upvalues: TweenService (copy) ]]
+function t._FadeTo(p1, p2, p3)
 	if p1._tween then
 		p1._tween:Cancel()
 	end
@@ -43,16 +44,16 @@ function t._FadeTo(p1, p2, p3) --[[ Line: 43 | Upvalues: TweenService (copy) ]]
 	})
 	p1._tween:Play()
 end
-function t.FadeToLinear(p1, p2, p3) --[[ Line: 56 ]]
+function t.FadeToLinear(p1, p2, p3)
 	p1:_FadeTo(p2, TweenInfo.new(p3, 0))
 end
-function t.Set(p1, p2) --[[ Line: 60 ]]
+function t.Set(p1, p2)
 	if p1._tween then
 		p1._tween:Cancel()
 	end
 	p1.frame.BackgroundTransparency = p2
 end
-function t.Destroy(p1) --[[ Line: 67 ]]
+function t.Destroy(p1)
 	p1.maid:Destroy()
 	setmetatable(p1, nil)
 end

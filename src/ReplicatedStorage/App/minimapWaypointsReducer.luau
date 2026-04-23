@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	addWaypoint = function(p1, p2) --[[ Name: addWaypoint | Line: 7 ]]
+	addWaypoint = function(p1, p2)
 		assert(if p2.position == nil then p2.part ~= nil else true, "missing position or part")
 		assert(p2.priority ~= nil, "missing priority")
 		assert(p2.name ~= nil, "missing name")
@@ -28,7 +29,7 @@ return require(ReplicatedStorage.Rodux).createReducer({}, {
 		})
 		return v4
 	end,
-	removeWaypointByName = function(p1, p2) --[[ Name: removeWaypointByName | Line: 38 ]]
+	removeWaypointByName = function(p1, p2)
 		assert(p2.name ~= nil, "missing name")
 		local v2 = table.clone(p1)
 		for i = #v2, 1, -1 do
@@ -39,7 +40,7 @@ return require(ReplicatedStorage.Rodux).createReducer({}, {
 		end
 		return v2
 	end,
-	removeWaypointCurrent = function(p1) --[[ Name: removeWaypointCurrent | Line: 50 ]]
+	removeWaypointCurrent = function(p1)
 		local v1 = table.clone(p1)
 		if #v1 > 0 then
 			table.remove(v1, #v1)

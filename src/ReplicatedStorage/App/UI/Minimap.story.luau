@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	require(ReplicatedStorage.App.store)
 	local Minimap = require(script.Parent.Minimap)
-	function v1.init(p1) --[[ Line: 9 | Upvalues: Roact (ref) ]]
+	function v1.init(p1)
 		p1:setState({
 			waypoint = Vector3.new(0, 0, 0)
 		})
@@ -52,7 +53,7 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (co
 			transparency = 0.3
 		}
 	}
-	function v1.render(p1) --[[ Line: 54 | Upvalues: Roact (ref), Minimap (copy), t (copy), t2 (copy) ]]
+	function v1.render(p1)
 		return Roact.createElement(Minimap, {
 			mapImageId = 86921803889926,
 			mapWorldWidth = 9984,
@@ -69,7 +70,7 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (co
 			circles = t2,
 			waypoint = p1.state.waypoint,
 			color = Color3.new(255/255, 0/255, 0/255),
-			onSetWaypoint = function(p12) --[[ Name: onSetWaypoint | Line: 75 | Upvalues: p1 (copy) ]]
+			onSetWaypoint = function(p12)
 				p1:setState({
 					waypoint = p12
 				})
@@ -78,7 +79,7 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (co
 	end
 	function v1.willUnmount(p1) --[[ Line: 82 ]] end
 	local v4 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 85 | Upvalues: Roact (ref), v4 (copy) ]]
+	return function()
 		Roact.unmount(v4)
 	end
 end

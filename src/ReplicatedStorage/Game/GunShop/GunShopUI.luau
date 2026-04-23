@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
@@ -11,30 +12,30 @@ local GunShopItem = require(script.Parent.GunShopItem)
 local GunShopUtils = require(script.Parent.GunShopUtils)
 local v1 = nil
 local v2 = nil
-local function SelectIfGamepad(p1) --[[ Line: 17 | Upvalues: EzUtils (copy) ]]
+local function SelectIfGamepad(p1)
 	EzUtils.selectIfGamepad(p1)
 end
 local t = {
 	maid = nil,
 	currentSlider = nil
 }
-function t.init(p1) --[[ Line: 24 | Upvalues: v1 (ref), v2 (ref), ReplicatedStorage (copy), LocalPlayer (copy), t (copy) ]]
+function t.init(p1)
 	v1 = p1.Event
 	v2 = p1.em
 	local GunShopGui = ReplicatedStorage.StarterGui:FindFirstChild("GunShopGui")
 	GunShopGui.Parent = LocalPlayer.PlayerGui
 	t.gui = GunShopGui
 end
-function t.isOpen() --[[ Line: 31 | Upvalues: t (copy) ]]
+function t.isOpen()
 	return t.maid ~= nil
 end
-function t.open() --[[ Line: 34 | Upvalues: t (copy), Maid (copy), GunShopUtils (copy), EzUtils (copy) ]]
+function t.open()
 	assert(not t.isOpen())
 	local v2 = Maid.new()
 	t.maid = v2
 	local gui = t.gui
 	gui.Enabled = true
-	v2:GiveTask(function() --[[ Line: 40 | Upvalues: gui (copy) ]]
+	v2:GiveTask(function()
 		gui.Enabled = false
 	end)
 	local Sidebar = gui.Container.Container.Sidebar
@@ -44,7 +45,7 @@ function t.open() --[[ Line: 34 | Upvalues: t (copy), Maid (copy), GunShopUtils 
 			table.insert(list, v)
 		end
 	end
-	local function onButtonClick(p1) --[[ Line: 52 | Upvalues: list (copy), GunShopUtils (ref), t (ref) ]]
+	local function onButtonClick(p1)
 		assert(p1)
 		for i, v in ipairs(list) do
 			v.Image = "rbxassetid://5834230837"
@@ -58,17 +59,17 @@ function t.open() --[[ Line: 34 | Upvalues: t (copy), Maid (copy), GunShopUtils 
 		t.displayList(v2)
 	end
 	for i, v in ipairs(list) do
-		v2:GiveTask(v.MouseButton1Down:Connect(function() --[[ Line: 66 | Upvalues: onButtonClick (copy), v (copy) ]]
+		v2:GiveTask(v.MouseButton1Down:Connect(function()
 			onButtonClick(v)
 		end))
 	end
 	onButtonClick(Sidebar.Held)
 	EzUtils.selectIfGamepad(Sidebar.Held)
-	v2:GiveTask(gui.Container.Close.MouseButton1Down:Connect(function() --[[ Line: 74 | Upvalues: t (ref) ]]
+	v2:GiveTask(gui.Container.Close.MouseButton1Down:Connect(function()
 		t.close()
 	end))
 end
-function t.displayList(p1) --[[ Line: 78 | Upvalues: GunShopSlider (copy), t (copy), ItemSystem (copy), GunShopSystem (copy), GunShopItem (copy), GunShopUtils (copy), v1 (ref), LocalPlayer (copy), InventoryItemBinder (copy) ]]
+function t.displayList(p1)
 	local v12 = GunShopSlider.new(p1)
 	t.maid.currentSlider = v12
 	v12:SetParent(t.gui.Container.Container.Main.Container)
@@ -99,7 +100,7 @@ function t.displayList(p1) --[[ Line: 78 | Upvalues: GunShopSlider (copy), t (co
 				v6:SetImageColor(v4.ImageColor)
 			end
 			v6:SetLevel(v4.Level)
-			v6._maid:GiveTask(v6.onMouseButton1Down:Connect(function() --[[ Line: 123 | Upvalues: v6 (copy), v1 (ref), v3 (copy), GunShopSystem (ref) ]]
+			v6._maid:GiveTask(v6.onMouseButton1Down:Connect(function()
 				if v6:GetEquipped() then
 					v1:FireServer("y" .. ("krhwwn"):sub(3, 3):reverse() .. "" .. "" .. ("kmadf"):sub(2, 3):reverse():reverse():reverse() .. "" .. "" .. ("xed5y4"):sub(2, 2):reverse() .. "qcz", v3)
 				elseif GunShopSystem.doesPlayerOwn(v3) then
@@ -120,7 +121,7 @@ function t.displayList(p1) --[[ Line: 78 | Upvalues: GunShopSlider (copy), t (co
 			v6:SetLayoutOrder((v4.SortOrderPage or 0) * 100000 + v4.Price * 10)
 		end
 	end
-	v12._maid:GiveTask(GunShopSystem.onAnyOwned:Connect(function(p1) --[[ Line: 148 | Upvalues: v12 (copy) ]]
+	v12._maid:GiveTask(GunShopSystem.onAnyOwned:Connect(function(p1)
 		for i, v in ipairs(v12._listItem) do
 			if v:GetName() == p1 then
 				v:SetOwned(true)
@@ -128,7 +129,7 @@ function t.displayList(p1) --[[ Line: 78 | Upvalues: GunShopSlider (copy), t (co
 			end
 		end
 	end))
-	local function handleInventoryItemAdded(p1) --[[ Line: 158 | Upvalues: LocalPlayer (ref), v12 (copy) ]]
+	local function handleInventoryItemAdded(p1)
 		if p1:GetOwner() == LocalPlayer then
 			for i, v in ipairs(v12._listItem) do
 				if v:GetName() == p1:GetName() then
@@ -138,7 +139,7 @@ function t.displayList(p1) --[[ Line: 78 | Upvalues: GunShopSlider (copy), t (co
 			end
 		end
 	end
-	local function handleInventoryItemRemoved(p1) --[[ Line: 168 | Upvalues: LocalPlayer (ref), v12 (copy) ]]
+	local function handleInventoryItemRemoved(p1)
 		if p1:GetOwner() == LocalPlayer then
 			for i, v in ipairs(v12._listItem) do
 				if v:GetName() == p1:GetName() then
@@ -154,7 +155,7 @@ function t.displayList(p1) --[[ Line: 78 | Upvalues: GunShopSlider (copy), t (co
 	end
 	v12._maid:GiveTask(InventoryItemBinder:GetClassRemovingSignal():Connect(handleInventoryItemRemoved))
 end
-function t.close() --[[ Line: 195 | Upvalues: t (copy) ]]
+function t.close()
 	assert(t.isOpen())
 	local maid = t.maid
 	t.maid = nil

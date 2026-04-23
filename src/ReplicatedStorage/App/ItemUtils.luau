@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
 local SafesConsts = require(ReplicatedStorage.Safes.SafesConsts)
@@ -7,7 +8,7 @@ local Localization = require(ReplicatedStorage.Module.Localization)
 local OwnershipConsts = require(ReplicatedStorage.Ownership.OwnershipConsts)
 local SAFE_DATA = SafesConsts.SAFE_DATA
 local VehicleData = require(ReplicatedStorage.Game.Garage.VehicleData)
-local function getVehicleDataForMake(p1) --[[ Line: 12 | Upvalues: VehicleData (copy) ]]
+local function getVehicleDataForMake(p1)
 	for i, v in ipairs(VehicleData) do
 		if v.Make == p1 then
 			return v
@@ -15,7 +16,7 @@ local function getVehicleDataForMake(p1) --[[ Line: 12 | Upvalues: VehicleData (
 	end
 end
 local ItemSkinList = require(ReplicatedStorage.Game.ItemSkin.ItemSkinList)
-local function getItemSkinForName(p1) --[[ Line: 21 | Upvalues: ItemSkinList (copy) ]]
+local function getItemSkinForName(p1)
 	for i, v in ipairs(ItemSkinList) do
 		if v.Name == p1 then
 			return v
@@ -23,14 +24,14 @@ local function getItemSkinForName(p1) --[[ Line: 21 | Upvalues: ItemSkinList (co
 	end
 end
 local t = {
-	createVehicleItemTable = function(p1) --[[ Name: createVehicleItemTable | Line: 30 | Upvalues: PlayerDataConsts (copy) ]]
+	createVehicleItemTable = function(p1)
 		assert(typeof(p1) == "string", "Incorrect make type passed")
 		return {
 			ItemType = PlayerDataConsts.VEHICLE_ITEM_TYPE,
 			Make = p1
 		}
 	end,
-	createVehicleCustomizationItemTable = function(p1, p2) --[[ Name: createVehicleCustomizationItemTable | Line: 34 | Upvalues: OwnershipConsts (copy), PlayerDataConsts (copy) ]]
+	createVehicleCustomizationItemTable = function(p1, p2)
 		if typeof(p1) ~= "string" then
 			error("Incorrect categoryName type passed: " .. tostring(p1) .. ", " .. typeof(p1))
 		end
@@ -44,35 +45,35 @@ local t = {
 			ItemName = p2
 		}
 	end,
-	createHomeItemItemTable = function(p1) --[[ Name: createHomeItemItemTable | Line: 50 | Upvalues: PlayerDataConsts (copy) ]]
+	createHomeItemItemTable = function(p1)
 		assert(typeof(p1) == "string", "Incorrect itemName type passed")
 		return {
 			ItemType = PlayerDataConsts.HOME_ITEM_ITEM_TYPE,
 			ItemName = p1
 		}
 	end,
-	createItemSkinTable = function(p1) --[[ Name: createItemSkinTable | Line: 54 | Upvalues: PlayerDataConsts (copy) ]]
+	createItemSkinTable = function(p1)
 		assert(typeof(p1) == "string", "Incorrect skinName type passed")
 		return {
 			ItemType = PlayerDataConsts.ITEM_SKIN_ITEM_TYPE,
 			SkinName = p1
 		}
 	end,
-	createSafeTable = function(p1) --[[ Name: createSafeTable | Line: 58 | Upvalues: PlayerDataConsts (copy) ]]
+	createSafeTable = function(p1)
 		assert(typeof(p1) == "number", "Incorrect typeEnum type passed")
 		return {
 			ItemType = PlayerDataConsts.SAFE_ITEM_TYPE,
 			TypeEnum = p1
 		}
 	end,
-	createConsumableTable = function(p1) --[[ Name: createConsumableTable | Line: 62 | Upvalues: PlayerDataConsts (copy) ]]
+	createConsumableTable = function(p1)
 		assert(typeof(p1) == "string", "Incorrect itemName type passed")
 		return {
 			ItemType = PlayerDataConsts.CONSUMABLE_ITEM_TYPE,
 			ItemName = p1
 		}
 	end,
-	getStoreData = function(p1) --[[ Name: getStoreData | Line: 66 | Upvalues: PlayerDataConsts (copy), getVehicleDataForMake (copy), StoreData (copy), ReplicatedStorage (copy), getItemSkinForName (copy), SAFE_DATA (copy), ConsumablesData (copy) ]]
+	getStoreData = function(p1)
 		local ItemType = p1.ItemType
 		if ItemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then
 			return getVehicleDataForMake(p1.Make)
@@ -107,7 +108,7 @@ local t = {
 		end
 	end
 }
-function t.getItemTablesForItemType(p1) --[[ Line: 100 | Upvalues: PlayerDataConsts (copy), VehicleData (copy), t (copy), StoreData (copy), ReplicatedStorage (copy), ItemSkinList (copy), SafesConsts (copy), ConsumablesData (copy) ]]
+function t.getItemTablesForItemType(p1)
 	local ItemType = p1.ItemType
 	if ItemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then
 		local t2 = {}
@@ -154,12 +155,12 @@ function t.getItemTablesForItemType(p1) --[[ Line: 100 | Upvalues: PlayerDataCon
 	end
 	error("Could not find item type data for itemOwned, invalid itemType: " .. tostring(ItemType))
 end
-function t.isTradeable(p1) --[[ Line: 143 | Upvalues: t (copy) ]]
+function t.isTradeable(p1)
 	local v1 = t.getStoreData(p1)
 	assert(typeof(v1) == "table", "itemData is not a table")
 	return not v1.NoTrade
 end
-function t.validateItemTableFormat(p1) --[[ Line: 148 | Upvalues: PlayerDataConsts (copy), OwnershipConsts (copy), ConsumablesData (copy) ]]
+function t.validateItemTableFormat(p1)
 	if p1.ItemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then
 		assert(typeof(p1.Make) == "string", "Invalid make given for vehicle")
 	elseif p1.ItemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
@@ -183,7 +184,7 @@ function t.validateItemTableFormat(p1) --[[ Line: 148 | Upvalues: PlayerDataCons
 		error("Invalid ItemType: " .. p1.ItemType)
 	end
 end
-function t.getStrippedItemTable(p1) --[[ Line: 175 | Upvalues: PlayerDataConsts (copy), SafesConsts (copy) ]]
+function t.getStrippedItemTable(p1)
 	local ItemType = p1.ItemType
 	local t = {
 		itemType = ItemType,
@@ -206,7 +207,7 @@ function t.getStrippedItemTable(p1) --[[ Line: 175 | Upvalues: PlayerDataConsts 
 	end
 	return t
 end
-function t.getFullNameFromTable(p1) --[[ Line: 199 | Upvalues: t (copy) ]]
+function t.getFullNameFromTable(p1)
 	local t2 = {}
 	t.validateItemTableFormat(p1)
 	local v1 = t.getStrippedItemTable(p1)
@@ -217,7 +218,7 @@ function t.getFullNameFromTable(p1) --[[ Line: 199 | Upvalues: t (copy) ]]
 	table.insert(t2, v1.name)
 	return table.concat(t2, "."), v1
 end
-function t.getTranslatedTitleFromItemTable(p1) --[[ Line: 210 | Upvalues: t (copy), PlayerDataConsts (copy), SafesConsts (copy), Localization (copy) ]]
+function t.getTranslatedTitleFromItemTable(p1)
 	local v1, v2 = t.getFullNameFromTable(p1)
 	local ItemType = p1.ItemType
 	if ItemType == PlayerDataConsts.SAFE_ITEM_TYPE then

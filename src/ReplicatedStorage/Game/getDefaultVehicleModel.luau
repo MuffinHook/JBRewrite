@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PartUtils = require(ReplicatedStorage.Std.PartUtils)
 local Customize = require(ReplicatedStorage.Game.Garage.Customize)
-return function(p1, p2) --[[ Name: getDefaultVehicleModel | Line: 7 | Upvalues: ReplicatedStorage (copy), Customize (copy), PartUtils (copy) ]]
+return function(p1, p2)
 	assert(p1 ~= nil, "missing vehicle make")
 	assert(p2 ~= nil, "missing vehicle type")
 	if p1 == "MCL36FREE" then

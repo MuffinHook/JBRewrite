@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BountyBoardService = require(ReplicatedStorage.Bounty.BountyBoardService)
@@ -22,7 +23,7 @@ local t2 = {
 }
 t2.__index = t2
 setmetatable(t2, Basic)
-function t2.new(p1, p2, p3) --[[ Line: 27 | Upvalues: Basic (copy), t (copy), t2 (copy) ]]
+function t2.new(p1, p2, p3)
 	local v1 = Basic.new(p1, p2, t, p3)
 	setmetatable(v1, t2)
 	v1:DefaultDisableCamLock()
@@ -31,7 +32,7 @@ function t2.new(p1, p2, p3) --[[ Line: 27 | Upvalues: Basic (copy), t (copy), t2
 	end
 	return v1
 end
-function t2._showGui(p1) --[[ Line: 39 | Upvalues: Players (copy), BountyBoardService (copy) ]]
+function t2._showGui(p1)
 	local BountyBoard = Instance.new("ScreenGui")
 	BountyBoard.Name = "BountyBoard"
 	BountyBoard.Parent = Players.LocalPlayer:FindFirstChild("PlayerGui")
@@ -96,11 +97,11 @@ function t2._showGui(p1) --[[ Line: 39 | Upvalues: Players (copy), BountyBoardSe
 	BountyBoardService.updateGui(ContentFrame, v1)
 	p1.maid:GiveTask(BountyBoard)
 end
-function t2.GetLeftArmPosition(p1) --[[ Line: 121 ]]
+function t2.GetLeftArmPosition(p1)
 	return nil
 end
-function t2.InputBegan(p1, p2, p3) --[[ Line: 124 | Upvalues: Basic (copy) ]]
+function t2.InputBegan(p1, p2, p3)
 	Basic.InputBegan(p1, p2, p3)
 end
-function t2.InputEnded(p1) --[[ Line: 127 ]] end
+function t2.InputEnded(p1) end
 return t2

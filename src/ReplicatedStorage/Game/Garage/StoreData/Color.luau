@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
@@ -248,13 +249,13 @@ table.insert(t, 1, {
 	HiddenAll = true,
 	NoTrade = true
 })
-local function Update(p1, p2) --[[ Line: 261 ]]
+local function Update(p1, p2)
 	local v1 = os.clock() / 2
 	p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 end
 return {
 	Items = t,
-	GetInstance = function(p1) --[[ Name: GetInstance | Line: 268 | Upvalues: Paint (copy) ]]
+	GetInstance = function(p1)
 		local Part = Instance.new("Part")
 		Part.Shape = Enum.PartType.Ball
 		Part.Size = Vector3.new(4, 4, 4)

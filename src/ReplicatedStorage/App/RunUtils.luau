@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 game:GetService("MaterialService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -5,10 +6,10 @@ local RunConsts = require(ReplicatedStorage.App.RunConsts)
 require(ReplicatedStorage.PrivateServer.PrivateServerConsts)
 local t = {}
 local MAIN_WORLD_NAME = RunConsts.MAIN_WORLD_NAME
-function t.isStudio() --[[ Line: 14 | Upvalues: RunService (copy) ]]
+function t.isStudio()
 	return RunService:IsStudio() and true
 end
-local function getPlaceId() --[[ Line: 17 | Upvalues: RunService (copy), RunConsts (copy), MAIN_WORLD_NAME (copy) ]]
+local function getPlaceId()
 	if RunService:IsStudio() and game.PlaceId == 0 then
 		return RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[RunConsts.STUDIO_NAME][MAIN_WORLD_NAME].Default
 	else
@@ -16,14 +17,14 @@ local function getPlaceId() --[[ Line: 17 | Upvalues: RunService (copy), RunCons
 	end
 end
 t.isStudio()
-function t.getBuildCommit() --[[ Line: 31 ]]
+function t.getBuildCommit()
 	local v1 = "0ec1e2e"
 	if v1 == string.reverse("TIMMOC_DLIUB__") then
 		v1 = "UNKNOWN"
 	end
 	return v1
 end
-function t.isTradeWorld() --[[ Line: 39 | Upvalues: RunService (copy), MAIN_WORLD_NAME (copy), RunConsts (copy) ]]
+function t.isTradeWorld()
 	if RunService:IsStudio() then
 		return MAIN_WORLD_NAME == RunConsts.TRADE_WORLD_NAME
 	else
@@ -31,10 +32,10 @@ function t.isTradeWorld() --[[ Line: 39 | Upvalues: RunService (copy), MAIN_WORL
 		return isTRADE_WORLD_NAME
 	end
 end
-function t.isTradingEnabled() --[[ Line: 46 | Upvalues: t (copy) ]]
+function t.isTradingEnabled()
 	return t.isTradeWorld()
 end
-function t.isMainWorld() --[[ Line: 49 | Upvalues: RunService (copy), MAIN_WORLD_NAME (copy), RunConsts (copy) ]]
+function t.isMainWorld()
 	if RunService:IsStudio() then
 		return MAIN_WORLD_NAME == RunConsts.MAIN_WORLD_NAME
 	else
@@ -42,24 +43,24 @@ function t.isMainWorld() --[[ Line: 49 | Upvalues: RunService (copy), MAIN_WORLD
 		return isMAIN_WORLD_NAME
 	end
 end
-function t.getEnv() --[[ Line: 56 | Upvalues: RunConsts (copy), RunService (copy), MAIN_WORLD_NAME (copy) ]]
+function t.getEnv()
 	return RunConsts.PLACE_ID_TO_ENV_MAP[if RunService:IsStudio() and game.PlaceId == 0 then RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[RunConsts.STUDIO_NAME][MAIN_WORLD_NAME].Default else game.PlaceId]
 end
-function t.getWorld() --[[ Line: 59 | Upvalues: RunService (copy), MAIN_WORLD_NAME (copy), RunConsts (copy) ]]
+function t.getWorld()
 	if RunService:IsStudio() then
 		return MAIN_WORLD_NAME
 	else
 		return RunConsts.PLACE_ID_TO_WORLD_MAP[if RunService:IsStudio() and game.PlaceId == 0 then RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[RunConsts.STUDIO_NAME][MAIN_WORLD_NAME].Default else game.PlaceId]
 	end
 end
-function t.getPlaceType() --[[ Line: 65 | Upvalues: RunService (copy), RunConsts (copy), MAIN_WORLD_NAME (copy) ]]
+function t.getPlaceType()
 	if RunService:IsStudio() then
 		return "Default"
 	else
 		return RunConsts.PLACE_ID_TO_PLACE_TYPE_MAP[if RunService:IsStudio() and game.PlaceId == 0 then RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[RunConsts.STUDIO_NAME][MAIN_WORLD_NAME].Default else game.PlaceId]
 	end
 end
-function t.getPlaceIdFromEnvWorld(p1, p2, p3) --[[ Line: 71 | Upvalues: RunConsts (copy) ]]
+function t.getPlaceIdFromEnvWorld(p1, p2, p3)
 	local v1 = RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[p1]
 	assert(v1, "Invalid env given")
 	local v2 = p3 or "Default"
@@ -69,7 +70,7 @@ function t.getPlaceIdFromEnvWorld(p1, p2, p3) --[[ Line: 71 | Upvalues: RunConst
 	return v5
 end
 if RunService:IsServer() then
-	function t.isVIPServer() --[[ Line: 84 ]]
+	function t.isVIPServer()
 		return game.PrivateServerId ~= "" and game.PrivateServerOwnerId ~= 0
 	end
 end

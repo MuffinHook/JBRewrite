@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	addMinimapPoint = function(p1, p2) --[[ Name: addMinimapPoint | Line: 5 ]]
+	addMinimapPoint = function(p1, p2)
 		assert(p2.point.name ~= nil, "minimap point missing unique name")
 		local t = {}
 		for i, v in ipairs(p1) do
@@ -11,7 +12,7 @@ return require(ReplicatedStorage.Rodux).createReducer({}, {
 		table.insert(t, p2.point)
 		return t
 	end,
-	removeMinimapPoint = function(p1, p2) --[[ Name: removeMinimapPoint | Line: 18 ]]
+	removeMinimapPoint = function(p1, p2)
 		assert(p2.name ~= nil, "minimap point missing unique name")
 		local t = {}
 		for i, v in ipairs(p1) do

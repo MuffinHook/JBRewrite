@@ -1,14 +1,15 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local PaintUtils = require(ReplicatedStorage.Game.Garage.PaintUtils)
-local function getPaintConfig(p1) --[[ Line: 5 | Upvalues: PaintUtils (copy) ]]
+local function getPaintConfig(p1)
 	local v1 = PaintUtils.GetDefaultVehiclePart(p1)
 	return {
 		DefaultReflectance = v1.Reflectance,
 		DefaultMaterial = v1.Material
 	}
 end
-return function(p1, p2) --[[ Line: 13 | Upvalues: PaintUtils (copy), Paint (copy) ]]
+return function(p1, p2)
 	local Model = p2.Model
 	local Type = p2.Type
 	local Make = p2.Make

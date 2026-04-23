@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LevelSystem = require(ReplicatedStorage.Game.Level2.LevelSystem)
@@ -10,7 +11,7 @@ local GunShop = ReplicatedStorage.Resource.GunShop
 local t = {}
 t.__index = t
 t.__ClassName = "GunShopItem"
-function t.new() --[[ Line: 16 | Upvalues: t (copy), Maid (copy), GunShop (copy), LevelSystem (copy), LocalPlayer (copy) ]]
+function t.new()
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
@@ -28,55 +29,55 @@ function t.new() --[[ Line: 16 | Upvalues: t (copy), Maid (copy), GunShop (copy)
 	t2._equipped = false
 	t2._level = nil
 	t2._itemName = nil
-	t2._maid:GiveTask(LevelSystem.getOnLevelChangedSignal():Connect(function(p1) --[[ Line: 45 | Upvalues: LocalPlayer (ref), t2 (copy) ]]
+	t2._maid:GiveTask(LevelSystem.getOnLevelChangedSignal():Connect(function(p1)
 		if p1 == LocalPlayer then
 			t2:UpdateLevel()
 		end
 	end))
 	return t2
 end
-function t.GetName(p1) --[[ Line: 54 ]]
+function t.GetName(p1)
 	return p1._itemName
 end
-function t.SetName(p1, p2, p3) --[[ Line: 57 ]]
+function t.SetName(p1, p2, p3)
 	p1._itemName = p2
 	p1._itemFrame.Name = p2
 	p1._itemFrame.Top.Title.Text = p3:upper()
 end
-function t.SetImageId(p1, p2) --[[ Line: 62 ]]
+function t.SetImageId(p1, p2)
 	if typeof(p2) == "number" then
 		p2 = ("rbxassetid://%d"):format(p2)
 	end
 	p1._itemFrame.Top.Icon.Image = p2
 end
-function t.SetImageColor(p1, p2) --[[ Line: 68 ]]
+function t.SetImageColor(p1, p2)
 	p1._itemFrame.Top.Icon.ImageColor3 = p2
 end
-function t.SetPrice(p1, p2) --[[ Line: 71 ]]
+function t.SetPrice(p1, p2)
 	p1._price = p2
 	p1:Update()
 end
-function t.SetLevel(p1, p2) --[[ Line: 75 ]]
+function t.SetLevel(p1, p2)
 	p1._level = p2
 	p1:UpdateLevel()
 end
-function t.SetOwned(p1, p2) --[[ Line: 79 ]]
+function t.SetOwned(p1, p2)
 	if p1._owned ~= p2 then
 		p1._owned = p2
 		p1:Update()
 		p1:UpdateLevel()
 	end
 end
-function t.GetEquipped(p1) --[[ Line: 86 ]]
+function t.GetEquipped(p1)
 	return p1._equipped
 end
-function t.SetEquipped(p1, p2) --[[ Line: 89 ]]
+function t.SetEquipped(p1, p2)
 	if p1._equipped ~= p2 then
 		p1._equipped = p2
 		p1:Update()
 	end
 end
-function t.UpdateLevel(p1) --[[ Line: 95 | Upvalues: LevelUtils (copy), LocalPlayer (copy) ]]
+function t.UpdateLevel(p1)
 	local v1 = if p1._level == nil then false else not p1._owned
 	p1._itemFrame.Bottom.Level.Visible = v1
 	if v1 then
@@ -84,19 +85,19 @@ function t.UpdateLevel(p1) --[[ Line: 95 | Upvalues: LevelUtils (copy), LocalPla
 		p1._itemFrame.Bottom.Level.Lock.Visible = LevelUtils.yieldLevel(LocalPlayer) < p1._level
 	end
 end
-function t.AddRequiredGamepass(p1, p2) --[[ Line: 105 | Upvalues: GunShop (copy), GamepassUtils (copy), GamepassSystem (copy) ]]
+function t.AddRequiredGamepass(p1, p2)
 	assert(p2)
 	local v1 = GunShop.PresetRequiredIcon:Clone()
 	v1.Parent = p1._itemFrame.Bottom.RequiredContainer
-	p1._maid:GivePromise(GamepassSystem.promiseImageId(GamepassUtils.GetGamepassFromEnum(p2).PassId):andThen(function(p1) --[[ Line: 112 | Upvalues: v1 (copy) ]]
+	p1._maid:GivePromise(GamepassSystem.promiseImageId(GamepassUtils.GetGamepassFromEnum(p2).PassId):andThen(function(p1)
 		v1.Image = ("rbxassetid://%d"):format(p1)
 		v1.Visible = true
 	end):catch(warn))
-	p1._maid:GiveTask(v1.MouseButton1Down:Connect(function() --[[ Line: 118 | Upvalues: GamepassUtils (ref), p2 (copy) ]]
+	p1._maid:GiveTask(v1.MouseButton1Down:Connect(function()
 		GamepassUtils.PromptGamepass(p2)
 	end))
 end
-function t.Update(p1) --[[ Line: 122 | Upvalues: Format (copy) ]]
+function t.Update(p1)
 	if p1._equipped then
 		p1._itemFrame.Bottom.Action.Text = "UNEQUIP"
 		p1._itemFrame.Bottom.Action.TextColor3 = Color3.fromRGB(212, 39, 39)
@@ -117,16 +118,16 @@ function t.Update(p1) --[[ Line: 122 | Upvalues: Format (copy) ]]
 		p1._itemFrame.Image = "rbxassetid://5834236192"
 	end
 end
-function t.GetLayoutOrder(p1) --[[ Line: 144 ]]
+function t.GetLayoutOrder(p1)
 	return p1._itemFrame.LayoutOrder
 end
-function t.SetLayoutOrder(p1, p2) --[[ Line: 147 ]]
+function t.SetLayoutOrder(p1, p2)
 	p1._itemFrame.LayoutOrder = p2
 end
-function t.SetParent(p1, p2) --[[ Line: 150 ]]
+function t.SetParent(p1, p2)
 	p1._itemFrame.Parent = p2
 end
-function t.Destroy(p1) --[[ Line: 153 ]]
+function t.Destroy(p1)
 	p1._maid:Destroy()
 	p1._maid = nil
 end

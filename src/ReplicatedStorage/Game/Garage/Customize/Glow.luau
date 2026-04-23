@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
-local function GetLight(p1) --[[ Line: 4 ]]
+local function GetLight(p1)
 	local Step = p1:FindFirstChild("Step")
 	if Step then
 		return Step:FindFirstChild("Glow")
@@ -8,7 +9,7 @@ local function GetLight(p1) --[[ Line: 4 ]]
 		return nil
 	end
 end
-return function(p1, p2) --[[ Line: 11 | Upvalues: Paint (copy) ]]
+return function(p1, p2)
 	local Model = p2.Model
 	local Type = p2.Type
 	local Make = p2.Make

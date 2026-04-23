@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Joint = require(ReplicatedStorage.Std.Joint)
 local TireSticker = require(ReplicatedStorage.Game.Garage.Customize.TireSticker)
@@ -8,7 +9,7 @@ local t = {
 	BlackWidow = true,
 	Semi = true
 }
-return function(p1, p2, p3) --[[ Line: 14 | Upvalues: ReplicatedStorage (copy), Joint (copy), t (copy), StoreData (copy), TireSticker (copy), Rim (copy) ]]
+return function(p1, p2, p3)
 	local Model = p2.Model
 	if not p1 then
 		p1 = {
@@ -19,7 +20,7 @@ return function(p1, p2, p3) --[[ Line: 14 | Upvalues: ReplicatedStorage (copy), 
 	if not v1 then
 		error("Could not find tire mesh: " .. p1.Name)
 	end
-	local function updateWheelModel(p12) --[[ Line: 26 | Upvalues: v1 (copy), p1 (ref), Model (copy), Joint (ref), t (ref), p2 (copy) ]]
+	local function updateWheelModel(p12)
 		local TireMesh = p12:FindFirstChild("TireMesh")
 		if TireMesh then
 			TireMesh:Destroy()

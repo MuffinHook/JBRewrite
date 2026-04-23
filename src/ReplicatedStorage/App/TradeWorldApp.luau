@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local LevelUISystem = require(ReplicatedStorage.Game.Level2.LevelUISystem)
 return {
-	init = function() --[[ Name: init | Line: 8 | Upvalues: Audio (copy), Players (copy), LevelUISystem (copy) ]]
+	init = function()
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 9742813686, {
 			Looped = true,
 			Volume = 0.1

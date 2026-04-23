@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
-	getConfig = function(p1) --[[ Name: getConfig | Line: 5 | Upvalues: ReplicatedStorage (copy) ]]
+	getConfig = function(p1)
 		local v1 = ReplicatedStorage.Game.ItemConfig:FindFirstChild(p1)
 		if v1 == nil then
 			return nil

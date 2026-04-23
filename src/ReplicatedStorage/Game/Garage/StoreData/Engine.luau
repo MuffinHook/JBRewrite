@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
 	Items = {
@@ -27,7 +28,7 @@ return {
 			Price = 50000
 		}
 	},
-	GetInstance = function(p1) --[[ Name: GetInstance | Line: 29 | Upvalues: ReplicatedStorage (copy) ]]
+	GetInstance = function(p1)
 		local v1 = ReplicatedStorage.Resource.Engine:FindFirstChild(p1.Name)
 		if not v1 then
 			error("No Engine named: " .. p1.Name)
@@ -36,7 +37,7 @@ return {
 		v2.CFrame = CFrame.new(0, 0, 0)
 		return v2
 	end,
-	Update = function(p1, p2) --[[ Name: Update | Line: 42 ]]
+	Update = function(p1, p2)
 		local v1 = os.clock() / 2
 		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.1 - 0.3, 0, 0) * CFrame.new(0, 0, p2.Size.Magnitude)
 	end

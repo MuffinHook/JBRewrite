@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local t = {
 	Trailblazer = true,
 	R8 = true,
@@ -21,7 +22,7 @@ local t = {
 	OrionM42 = true,
 	Polaire = true
 }
-return function(p1) --[[ Line: 27 | Upvalues: t (copy) ]]
+return function(p1)
 	if t[p1.Make] then
 		return false
 	end

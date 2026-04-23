@@ -1,16 +1,17 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local _allAirDropData = require(ReplicatedStorage.AirDrop.Data._allAirDropData)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local RewardDataUtils = require(ReplicatedStorage.RewardData.RewardDataUtils)
 local t = {}
-local function lerp(p1, p2, p3) --[[ Line: 7 ]]
+local function lerp(p1, p2, p3)
 	return (p2 - p1) * p3 + p1
 end
-function t.getProportionOfMaxAirDropScalingDurationDone(p1, p2) --[[ Line: 10 | Upvalues: t (copy) ]]
+function t.getProportionOfMaxAirDropScalingDurationDone(p1, p2)
 	local DurationToGetMaxScaling = t.getAirDropTypeData(p1).DurationToGetMaxScaling
 	return math.min(p2, DurationToGetMaxScaling) / DurationToGetMaxScaling
 end
-function t.getCurrentGuardWaveData(p1, p2) --[[ Line: 16 | Upvalues: t (copy) ]]
+function t.getCurrentGuardWaveData(p1, p2)
 	local v1 = t.getAirDropTypeData(p1)
 	local v2 = t.getProportionOfMaxAirDropScalingDurationDone(p1, p2)
 	local t2 = {}
@@ -19,7 +20,7 @@ function t.getCurrentGuardWaveData(p1, p2) --[[ Line: 16 | Upvalues: t (copy) ]]
 	end
 	return t2
 end
-function t.getCurrentMoneyDropData(p1, p2) --[[ Line: 28 | Upvalues: t (copy) ]]
+function t.getCurrentMoneyDropData(p1, p2)
 	local v1 = t.getAirDropTypeData(p1)
 	local v2 = t.getProportionOfMaxAirDropScalingDurationDone(p1, p2)
 	local t2 = {}
@@ -28,10 +29,10 @@ function t.getCurrentMoneyDropData(p1, p2) --[[ Line: 28 | Upvalues: t (copy) ]]
 	end
 	return t2
 end
-function t.getAirDropTypeData(p1) --[[ Line: 39 | Upvalues: _allAirDropData (copy) ]]
+function t.getAirDropTypeData(p1)
 	return _allAirDropData[p1]
 end
-function t.getCurrentAirDropRarityProbabilities(p1, p2) --[[ Line: 42 | Upvalues: t (copy) ]]
+function t.getCurrentAirDropRarityProbabilities(p1, p2)
 	local v1 = t.getAirDropTypeData(p1)
 	local v2 = t.getProportionOfMaxAirDropScalingDurationDone(p1, p2)
 	local t2 = {}
@@ -42,7 +43,7 @@ function t.getCurrentAirDropRarityProbabilities(p1, p2) --[[ Line: 42 | Upvalues
 	end
 	return t2
 end
-function t.getCurrentDataForAirDrop(p1, p2) --[[ Line: 54 | Upvalues: t (copy), TableUtils (copy), RewardDataUtils (copy) ]]
+function t.getCurrentDataForAirDrop(p1, p2)
 	local v1 = t.getCurrentAirDropRarityProbabilities(p1, p2)
 	local v2 = TableUtils.deepCopy(t.getAirDropTypeData(p1))
 	v2.RarityProbabilities = v1

@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 return {
-	getHacker = function(p1) --[[ Name: getHacker | Line: 4 | Upvalues: Players (copy) ]]
+	getHacker = function(p1)
 		local v1 = p1:GetAttribute("VaultHackerId")
 		if v1 then
 			return Players:GetPlayerByUserId(v1)
@@ -8,25 +9,25 @@ return {
 			return nil
 		end
 	end,
-	setHacker = function(p1, p2) --[[ Name: setHacker | Line: 12 ]]
+	setHacker = function(p1, p2)
 		p1:SetAttribute("VaultHackerId", if p2 then p2.UserId else nil)
 	end,
-	getHackerChangedSignal = function(p1) --[[ Name: getHackerChangedSignal | Line: 19 ]]
+	getHackerChangedSignal = function(p1)
 		return p1:GetAttributeChangedSignal("VaultHackerId")
 	end,
-	getDirection = function(p1) --[[ Name: getDirection | Line: 22 ]]
+	getDirection = function(p1)
 		return p1:GetAttribute("VaultDirection")
 	end,
-	setDirection = function(p1, p2) --[[ Name: setDirection | Line: 25 ]]
+	setDirection = function(p1, p2)
 		p1:SetAttribute("VaultDirection", p2)
 	end,
-	getDirectionChangedSignal = function(p1) --[[ Name: getDirectionChangedSignal | Line: 28 ]]
+	getDirectionChangedSignal = function(p1)
 		return p1:GetAttributeChangedSignal("VaultDirection")
 	end,
-	getDisabled = function(p1) --[[ Name: getDisabled | Line: 31 ]]
+	getDisabled = function(p1)
 		return p1:GetAttribute("VaultDisabled")
 	end,
-	setDisabled = function(p1, p2) --[[ Name: setDisabled | Line: 34 ]]
+	setDisabled = function(p1, p2)
 		p1:SetAttribute("VaultDisabled", p2)
 	end
 }

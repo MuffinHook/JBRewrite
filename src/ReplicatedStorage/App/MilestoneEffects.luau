@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Notification = require(ReplicatedStorage.Game.Notification)
 local Format = require(ReplicatedStorage.Module.Format)
 local t = {}
 local v1 = nil
 local v2 = nil
-local function getMilestoneId(p1) --[[ Line: 9 ]]
+local function getMilestoneId(p1)
 	if p1 >= 1000000 then
 		return math.floor(p1 / 1000000)
 	elseif p1 >= 500000 then
@@ -15,10 +16,10 @@ local function getMilestoneId(p1) --[[ Line: 9 ]]
 		return 0
 	end
 end
-function t.init(p1) --[[ Line: 20 | Upvalues: v2 (ref) ]]
+function t.init(p1)
 	v2 = p1
 end
-local function playEffect(p1) --[[ Line: 24 | Upvalues: v2 (ref), Format (copy), Notification (copy) ]]
+local function playEffect(p1)
 	if v2 then
 		task.spawn(v2, 12)
 	end
@@ -27,7 +28,7 @@ local function playEffect(p1) --[[ Line: 24 | Upvalues: v2 (ref), Format (copy),
 		Style = "Gift"
 	})
 end
-function t.cashUpdate(p1) --[[ Line: 32 | Upvalues: v1 (ref), playEffect (copy) ]]
+function t.cashUpdate(p1)
 	if v1 == nil then
 		v1 = if p1 >= 1000000 then math.floor(p1 / 1000000) elseif p1 >= 500000 then 0.5 elseif p1 >= 100000 then 0.1 else 0
 	else

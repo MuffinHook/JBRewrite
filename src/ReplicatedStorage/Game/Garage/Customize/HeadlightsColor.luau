@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local PaintUtils = require(ReplicatedStorage.Game.Garage.PaintUtils)
@@ -5,7 +6,7 @@ local t = {
 	DefaultReflectance = 0,
 	DisableMaterial = true
 }
-return function(p1, p2) --[[ Line: 9 | Upvalues: Paint (copy), PaintUtils (copy), t (copy) ]]
+return function(p1, p2)
 	local Make = p2.Make
 	local Model = p2.Model
 	local v1 = if p1 == nil then "White" else p1.Name

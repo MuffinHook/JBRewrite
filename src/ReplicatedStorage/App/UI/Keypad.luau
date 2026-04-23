@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Grid = require(ReplicatedStorage.EzUi.Grid)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local function button(p1) --[[ Line: 6 | Upvalues: createElement (copy), Roact (copy) ]]
+local function button(p1)
 	local t = {
 		BorderSizePixel = 1,
 		BorderColor3 = Color3.new(0.3, 0.3, 0.3),
@@ -38,17 +39,17 @@ v1.defaultProps = {
 	position = UDim2.new(0.5, 0, 0.5, 0),
 	title = "Keypad"
 }
-function v1.init(p1) --[[ Line: 42 ]]
+function v1.init(p1)
 	p1:setState({
 		code = ""
 	})
 end
-function v1.render(p1) --[[ Line: 47 | Upvalues: createElement (copy), Roact (copy), Grid (copy), button (copy) ]]
+function v1.render(p1)
 	local t = {}
 	for i = 1, 9 do
 		table.insert(t, {
 			title = tostring(i),
-			onClicked = function() --[[ Name: onClicked | Line: 52 | Upvalues: p1 (copy), i (copy) ]]
+			onClicked = function()
 				if p1.props.onClicked then
 					p1.props.onClicked(i)
 				end
@@ -61,7 +62,7 @@ function v1.render(p1) --[[ Line: 47 | Upvalues: createElement (copy), Roact (co
 	table.insert(t, {
 		title = "Clear",
 		color = Color3.fromRGB(235, 60, 0),
-		onClicked = function() --[[ Name: onClicked | Line: 65 | Upvalues: p1 (copy) ]]
+		onClicked = function()
 			if p1.props.onClicked then
 				p1.props.onClicked(-2)
 			end
@@ -72,7 +73,7 @@ function v1.render(p1) --[[ Line: 47 | Upvalues: createElement (copy), Roact (co
 	})
 	table.insert(t, {
 		title = tostring(0),
-		onClicked = function() --[[ Name: onClicked | Line: 76 | Upvalues: p1 (copy) ]]
+		onClicked = function()
 			if p1.props.onClicked then
 				p1.props.onClicked(0)
 			end
@@ -84,7 +85,7 @@ function v1.render(p1) --[[ Line: 47 | Upvalues: createElement (copy), Roact (co
 	table.insert(t, {
 		title = "Enter",
 		color = Color3.fromRGB(25, 200, 53),
-		onClicked = function() --[[ Name: onClicked | Line: 88 | Upvalues: p1 (copy) ]]
+		onClicked = function()
 			local code = p1.state.code
 			if p1.props.onClicked then
 				p1.props.onClicked(-1)
@@ -189,7 +190,7 @@ function v1.render(p1) --[[ Line: 47 | Upvalues: createElement (copy), Roact (co
 		})
 	})
 end
-function v1.didMount(p1) --[[ Line: 195 ]]
+function v1.didMount(p1)
 	p1:setState({
 		code = ""
 	})

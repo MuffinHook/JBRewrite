@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AirDropConsts = require(ReplicatedStorage.AirDrop.AirDropConsts)
 local Players = game:GetService("Players")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
 return {
-	getPlayerIsInAmbulanceStretcher = function(p1) --[[ Name: getPlayerIsInAmbulanceStretcher | Line: 8 | Upvalues: AirDropConsts (copy) ]]
+	getPlayerIsInAmbulanceStretcher = function(p1)
 		assert(p1, "No player passed")
 		local v1 = p1:FindFirstChild(AirDropConsts.IN_AMBULANCE_STRETCHER_OBJ_NAME)
 		if v1 then
@@ -12,7 +13,7 @@ return {
 			return false
 		end
 	end,
-	setPlayerIsInAmbulanceStretcher = function(p1, p2) --[[ Name: setPlayerIsInAmbulanceStretcher | Line: 16 | Upvalues: AirDropConsts (copy) ]]
+	setPlayerIsInAmbulanceStretcher = function(p1, p2)
 		assert(p1, "No player passed")
 		assert(typeof(p2) == "boolean", "Incorrect value type passed")
 		local v2 = p1:FindFirstChild(AirDropConsts.IN_AMBULANCE_STRETCHER_OBJ_NAME)
@@ -25,7 +26,7 @@ return {
 		v2.Value = p2
 		return true
 	end,
-	getGuardHealthDebuffMultiplier = function() --[[ Name: getGuardHealthDebuffMultiplier | Line: 29 | Upvalues: RunUtils (copy), Players (copy) ]]
+	getGuardHealthDebuffMultiplier = function()
 		if RunUtils.isVIPServer() then
 			return 1
 		else

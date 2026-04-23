@@ -1,3 +1,4 @@
-return function(p1) --[[ Line: 1 ]]
+-- Reviewed by Claude
+return function(p1)
 	return p1.Model:FindFirstChild("Spoiler")
 end

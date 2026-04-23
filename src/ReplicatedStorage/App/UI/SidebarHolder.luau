@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -6,23 +7,23 @@ local createElement = Roact.createElement
 local BigButton = require(script.Parent.BigButton)
 local BigButtonService = require(ReplicatedStorage.App.BigButtonService)
 local v1 = Roact.PureComponent:extend("SidebarHolder")
-function v1.init(p1) --[[ Line: 12 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1:setState({
 		counter = 0
 	})
 	p1._maid = Maid.new()
 end
-function v1.didMount(p1) --[[ Line: 18 | Upvalues: BigButtonService (copy) ]]
-	p1._maid:GiveTask(BigButtonService.triggerUpdate:Connect(function() --[[ Line: 19 | Upvalues: p1 (copy) ]]
+function v1.didMount(p1)
+	p1._maid:GiveTask(BigButtonService.triggerUpdate:Connect(function()
 		p1:_fetchState()
 	end))
 end
-function v1._fetchState(p1) --[[ Line: 23 ]]
+function v1._fetchState(p1)
 	p1:setState({
 		counter = p1.state.counter + 1
 	})
 end
-function v1.render(p1) --[[ Line: 28 | Upvalues: createElement (copy), BigButton (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	local t = {}
 	for i, v in ipairs(p1.props.buttons) do
 		local v1 = createElement(BigButton, {
@@ -66,7 +67,7 @@ function v1.render(p1) --[[ Line: 28 | Upvalues: createElement (copy), BigButton
 		})
 	}, t))
 end
-function v1.willUnmount(p1) --[[ Line: 77 ]]
+function v1.willUnmount(p1)
 	p1._maid:DoCleaning()
 end
 return v1

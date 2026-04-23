@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -5,7 +6,7 @@ local ScrollingFrame = require(ReplicatedStorage.Module.ScrollingFrame)
 local CurrentCamera = workspace.CurrentCamera
 local t = {}
 t.__index = t
-function t.new(p1, p2, p3, p4) --[[ Line: 18 | Upvalues: t (copy), Maid (copy), Signal (copy), ScrollingFrame (copy) ]]
+function t.new(p1, p2, p3, p4)
 	local v2 = setmetatable({}, t)
 	v2.Alpha = 0
 	v2.Maid = Maid.new()
@@ -99,15 +100,15 @@ function t.new(p1, p2, p3, p4) --[[ Line: 18 | Upvalues: t (copy), Maid (copy), 
 		p2(v4, t3)
 		table.insert(t2, t3)
 		p4(Camera, v5)
-		local function OnMouseEnter() --[[ Line: 157 | Upvalues: v2 (copy), v4 (copy), t3 (copy) ]]
+		local function OnMouseEnter()
 			v2.OnMouseEnter:Fire(v4, t3)
 		end
 		v2.Maid:GiveTask(Frame_4.MouseEnter:Connect(OnMouseEnter))
-		local function OnMouseLeave() --[[ Line: 161 | Upvalues: v2 (copy), v4 (copy), t3 (copy) ]]
+		local function OnMouseLeave()
 			v2.OnMouseLeave:Fire(v4, t3)
 		end
 		v2.Maid:GiveTask(Frame_4.MouseLeave:Connect(OnMouseLeave))
-		local function OnMouseClick() --[[ Line: 166 | Upvalues: v2 (copy), v4 (copy), t3 (copy) ]]
+		local function OnMouseClick()
 			v2.OnMouseClick:Fire(v4, t3)
 		end
 		v2.Maid:GiveTask(v3:BindInput(Frame_4, {
@@ -117,17 +118,17 @@ function t.new(p1, p2, p3, p4) --[[ Line: 18 | Upvalues: t (copy), Maid (copy), 
 	v2.Viewports = t2
 	return v2
 end
-local function Ease_OutQuad(p1) --[[ Line: 175 ]]
+local function Ease_OutQuad(p1)
 	return -(p1 - 2) * p1
 end
-function t.GetContainerBottom(p1) --[[ Line: 178 ]]
+function t.GetContainerBottom(p1)
 	return p1._containerBottom
 end
-function t.SetParent(p1, p2) --[[ Line: 182 ]]
+function t.SetParent(p1, p2)
 	p1.Container.Parent = p2
 	p1.UIListLayout.Parent.Size = UDim2.new(0, p1.UIListLayout.AbsoluteContentSize.X, 1, 0)
 end
-function t.AddBackButton(p1) --[[ Line: 187 ]]
+function t.AddBackButton(p1)
 	local ImageButton = Instance.new("ImageButton")
 	ImageButton.BackgroundTransparency = 1
 	ImageButton.Image = "rbxassetid://4933143781"
@@ -136,7 +137,7 @@ function t.AddBackButton(p1) --[[ Line: 187 ]]
 	ImageButton.Parent = p1.Container
 	p1.OnMouseClickBack = ImageButton.MouseButton1Down
 end
-function t.Update(p1) --[[ Line: 197 ]]
+function t.Update(p1)
 	local v1 = tick()
 	local v2 = v1 - (p1.LastUpdate or v1)
 	p1.LastUpdate = v1
@@ -161,7 +162,7 @@ function t.Update(p1) --[[ Line: 197 ]]
 		end
 	end
 end
-function t.Destroy(p1) --[[ Line: 228 ]]
+function t.Destroy(p1)
 	local Viewports = p1.Viewports
 	for i = 1, #Viewports do
 		Viewports[i].Frame:Destroy()

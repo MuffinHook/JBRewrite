@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local MinimapService = require(script.Parent.MinimapService)
 local t = {}
-local function getRobberyMarkerForName(p1) --[[ Line: 7 | Upvalues: CollectionService (copy) ]]
+local function getRobberyMarkerForName(p1)
 	for v1, v2 in CollectionService:GetTagged("RobberyMarker") do
 		if v2.Name == p1 then
 			return v2
@@ -11,11 +12,11 @@ local function getRobberyMarkerForName(p1) --[[ Line: 7 | Upvalues: CollectionSe
 	end
 	return nil
 end
-function t.init() --[[ Line: 16 | Upvalues: ReplicatedStorage (copy), CollectionService (copy), MinimapService (copy), Dictionary (copy) ]]
-	task.spawn(function() --[[ Line: 17 | Upvalues: ReplicatedStorage (ref), CollectionService (ref), MinimapService (ref), Dictionary (ref) ]]
+function t.init()
+	task.spawn(function()
 		local SetRobberyWaypointRemote = ReplicatedStorage.App:WaitForChild("SetRobberyWaypointRemote")
 		local v1 = 0
-		SetRobberyWaypointRemote.OnClientEvent:Connect(function(p1) --[[ Line: 20 | Upvalues: v1 (ref), CollectionService (ref), MinimapService (ref), Dictionary (ref) ]]
+		SetRobberyWaypointRemote.OnClientEvent:Connect(function(p1)
 			local v12 = v1 + 1
 			v1 = v12
 			while true do

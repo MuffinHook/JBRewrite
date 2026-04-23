@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local CollectionService = game:GetService("CollectionService")
 local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConsts)
 local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
-return function(p1, p2, p3) --[[ Line: 7 | Upvalues: ReplicatedStorage (copy), Paint (copy), CollectionService (copy), HyperChromeUtils (copy), HyperChromeConsts (copy) ]]
+return function(p1, p2, p3)
 	local v1 = p3.Spoiler or "Classic"
 	local t = {
 		DefaultReflectance = 0,

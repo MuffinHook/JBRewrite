@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 game:GetService("Players")
 game:GetService("Chat")
 local RunService = game:GetService("RunService")
@@ -8,7 +9,7 @@ if RunService:IsServer() then
 else
 	v1 = nil
 end
-local function GetFilteredLicensePlate(p1, p2) --[[ Line: 12 | Upvalues: v1 (ref) ]]
+local function GetFilteredLicensePlate(p1, p2)
 	local v12 = p2:upper():gsub("[^%w%s]", ""):sub(1, 7)
 	if #v12 ~= 0 then
 		local v2 = v1.getFilteredDogName(p1, v12)
@@ -17,7 +18,7 @@ local function GetFilteredLicensePlate(p1, p2) --[[ Line: 12 | Upvalues: v1 (ref
 		end
 	end
 end
-return function(p1, p2) --[[ Line: 26 | Upvalues: RunService (copy), GetFilteredLicensePlate (copy) ]]
+return function(p1, p2)
 	if RunService:IsClient() then
 		warn("LICENSE PLATE CUSTOMIZE SHOULD NOT BE RUN LOCALLY!", debug.traceback())
 	else

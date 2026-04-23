@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaintUtils = require(ReplicatedStorage.Game.Garage.PaintUtils)
-local function setTransparency(p1, p2) --[[ Line: 4 | Upvalues: PaintUtils (copy) ]]
+local function setTransparency(p1, p2)
 	if p2 == nil then
 		p2 = PaintUtils.GetDefaultVehiclePart(p1).Transparency
 	end
 	p1.Transparency = p2
 end
-return function(p1, p2) --[[ Line: 12 | Upvalues: PaintUtils (copy) ]]
+return function(p1, p2)
 	local Model = p2.Model
 	local v1 = p1 and p1.Value
 	if Model:FindFirstChild("Model") then

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local CharacterUtil = require(ReplicatedStorage.Game.CharacterUtil)
@@ -25,18 +26,18 @@ local t2 = {
 }
 t2.__index = t2
 setmetatable(t2, Melee)
-function t2.Init(p1) --[[ Line: 31 | Upvalues: v2 (ref) ]]
+function t2.Init(p1)
 	v2 = p1.Event
 end
-function t2.new(p1, p2, p3) --[[ Line: 34 | Upvalues: Melee (copy), t (copy), t2 (copy) ]]
+function t2.new(p1, p2, p3)
 	local v1 = Melee.new(p1, p2, t, p3)
 	setmetatable(v1, t2)
 	return v1
 end
-function t2.SwingLunge(p1) --[[ Line: 40 | Upvalues: Audio (copy), CharacterUtil (copy), v2 (ref) ]]
+function t2.SwingLunge(p1)
 	p1.SpringWaistRotation:Accelerate(Vector3.new(4, -7, 0))
 	p1.SpringNeckRotation:Accelerate(Vector3.new(-2, 4, 0))
-	delay(0.05, function() --[[ Line: 43 | Upvalues: p1 (copy), Audio (ref), CharacterUtil (ref), v2 (ref) ]]
+	delay(0.05, function()
 		p1.SpringItemOffset:Accelerate(Vector3.new(0, 2, 5))
 		p1.SpringItemRotation:Accelerate(Vector3.new(-30, 0, 0))
 		p1.SpringWaistRotation:Accelerate(Vector3.new(-3, 7, 0))
@@ -51,7 +52,7 @@ function t2.SwingLunge(p1) --[[ Line: 40 | Upvalues: Audio (copy), CharacterUtil
 		end
 	end)
 end
-function t2.SwingSwoosh(p1) --[[ Line: 56 | Upvalues: Audio (copy), v2 (ref) ]]
+function t2.SwingSwoosh(p1)
 	Audio.ObjectLocal(p1.Center, p1.Config.Sound.sword_swoosh, {
 		Volume = 0.75
 	})

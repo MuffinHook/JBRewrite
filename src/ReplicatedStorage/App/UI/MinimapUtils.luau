@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local t = {
-	computeOffsetXY = function(p1, p2, p3, p4, p5, p6, p7, p8, p9) --[[ Name: computeOffsetXY | Line: 3 ]]
+	computeOffsetXY = function(p1, p2, p3, p4, p5, p6, p7, p8, p9)
 		if not p2 then
 			p2 = Vector2.new(512, 512)
 		end
@@ -25,14 +26,14 @@ local t = {
 		return v9 < 0 or (v10 < 0 or v7 < v9) or v8 < v10, v9, v10, v2
 	end
 }
-function t.computeWorldXY(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11) --[[ Line: 56 | Upvalues: t (copy) ]]
+function t.computeWorldXY(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 	local _, v1, v2, v3 = t.computeOffsetXY(p3, p4, p5, p6, p7, p8, p9, p10, p11)
 	return ((p1 + v1) / p9 / v3 - 0.5) * p5 + p7, ((p2 + v2) / p10 / v3 - 0.5) * p6 + p8
 end
-function t.worldToScale(p1, p2, p3, p4, p5, p6) --[[ Line: 84 ]]
+function t.worldToScale(p1, p2, p3, p4, p5, p6)
 	return UDim2.fromScale(0.5 + (p1 - p3) / p5, 0.5 + (p2 - p4) / p6)
 end
-function t.relativeWorldToScale(p1, p2, p3, p4) --[[ Line: 87 ]]
+function t.relativeWorldToScale(p1, p2, p3, p4)
 	return UDim2.fromScale(p1 / p3, p2 / p4)
 end
 return t

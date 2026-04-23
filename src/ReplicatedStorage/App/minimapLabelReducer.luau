@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Rodux = require(ReplicatedStorage.Rodux)
-local function addLabel(p1, p2) --[[ Line: 5 ]]
+local function addLabel(p1, p2)
 	assert(p2.title, "minimap label missing unique title")
 	table.insert(p1, {
 		title = p2.title,
@@ -14,7 +15,7 @@ local function addLabel(p1, p2) --[[ Line: 5 ]]
 	})
 end
 return Rodux.createReducer({}, {
-	addMinimapLabel = function(p1, p2) --[[ Name: addMinimapLabel | Line: 19 | Upvalues: addLabel (copy) ]]
+	addMinimapLabel = function(p1, p2)
 		assert(p2.title, "minimap label missing unique title")
 		local t = {}
 		for i, v in ipairs(p1) do
@@ -25,7 +26,7 @@ return Rodux.createReducer({}, {
 		addLabel(t, p2)
 		return t
 	end,
-	addMinimapLabels = function(p1, p2) --[[ Name: addMinimapLabels | Line: 30 | Upvalues: addLabel (copy) ]]
+	addMinimapLabels = function(p1, p2)
 		assert(p2.labels, "missing labels")
 		local v1 = table.clone(p1)
 		for i, v in ipairs(p2.labels) do
@@ -33,7 +34,7 @@ return Rodux.createReducer({}, {
 		end
 		return v1
 	end,
-	removeMinimapLabel = function(p1, p2) --[[ Name: removeMinimapLabel | Line: 38 ]]
+	removeMinimapLabel = function(p1, p2)
 		assert(p2.title, "minimap label missing unique title")
 		local t = {}
 		for i, v in ipairs(p1) do

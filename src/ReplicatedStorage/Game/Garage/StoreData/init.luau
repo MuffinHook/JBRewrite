@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local t = {}
 local t2 = {}
 for v1, v2 in script:GetChildren() do
 	t[v2.Name] = false
 end
-local function GetCategoryByName(p1) --[[ Line: 8 | Upvalues: t (copy), t2 (copy) ]]
+local function GetCategoryByName(p1)
 	assert(p1)
 	if not t[p1] then
 		local v1 = script:FindFirstChild(p1)
@@ -17,7 +18,7 @@ local function GetCategoryByName(p1) --[[ Line: 8 | Upvalues: t (copy), t2 (copy
 	end
 	return t2[p1]
 end
-local function GetItemByName(p1, p2) --[[ Line: 21 | Upvalues: GetCategoryByName (copy), RunService (copy) ]]
+local function GetItemByName(p1, p2)
 	assert(p1)
 	assert(p2)
 	local v1 = GetCategoryByName(p1)
@@ -41,7 +42,7 @@ end
 return {
 	GetCategoryByName = GetCategoryByName,
 	GetItemByName = GetItemByName,
-	GetMapFromSelection = function(p1) --[[ Name: GetMapFromSelection | Line: 50 | Upvalues: GetItemByName (copy) ]]
+	GetMapFromSelection = function(p1)
 		assert(p1)
 		local t = {}
 		for k, v in pairs(p1) do

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -8,12 +9,12 @@ local Interval = require(ReplicatedStorage.Std.Interval)
 local Roact = require(ReplicatedStorage.Roact)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local createElement = Roact.createElement
-local function wipeTags(p1) --[[ Line: 12 | Upvalues: CollectionService (copy) ]]
+local function wipeTags(p1)
 	for i, v in ipairs((CollectionService:GetTags(p1))) do
 		CollectionService:RemoveTag(p1, v)
 	end
 end
-local function wipeTagsRecursively(p1) --[[ Line: 18 | Upvalues: wipeTags (copy) ]]
+local function wipeTagsRecursively(p1)
 	wipeTags(p1)
 	for i, v in ipairs(p1:GetDescendants()) do
 		wipeTags(v)
@@ -21,7 +22,7 @@ local function wipeTagsRecursively(p1) --[[ Line: 18 | Upvalues: wipeTags (copy)
 end
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), wipeTags (copy) ]]
+function t.new(p1)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2.character = p1
@@ -30,10 +31,10 @@ function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), wipeTags (co
 	t2.lastOnScreenChanged = 0
 	local Model = Instance.new("Model")
 	local t3 = {}
-	local function shouldCopy(p1) --[[ Line: 41 ]]
+	local function shouldCopy(p1)
 		return (p1:IsA("BasePart") or (p1:IsA("Shirt") or (p1:IsA("Pants") or (p1:IsA("CharacterMesh") or (p1:IsA("WrapTarget") or (p1:IsA("Decal") or (p1:IsA("Accessory") or p1:IsA("Humanoid")))))))) and true or false
 	end
-	local function v2(p1, p2) --[[ Line: 56 | Upvalues: t3 (copy), wipeTags (ref), v2 (copy) ]]
+	local function v2(p1, p2)
 		local v1 = p1:Clone()
 		if v1 then
 			if p1:IsA("CharacterAppearance") then
@@ -58,7 +59,7 @@ function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), wipeTags (co
 			return v1
 		end
 	end
-	local function handleObj(p1) --[[ Line: 82 | Upvalues: shouldCopy (copy), v2 (copy), Model (copy) ]]
+	local function handleObj(p1)
 		if shouldCopy(p1) then
 			v2(p1, Model)
 		end
@@ -74,12 +75,12 @@ function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), wipeTags (co
 	t2._maid:GiveTask(Model)
 	return t2
 end
-function t.Update(p1) --[[ Line: 98 ]]
+function t.Update(p1)
 	for k, v in pairs(p1.cloneRef) do
 		k.CFrame = v.CFrame
 	end
 end
-function t.Destroy(p1) --[[ Line: 103 ]]
+function t.Destroy(p1)
 	p1._maid:Destroy()
 	setmetatable(p1, nil)
 end
@@ -87,13 +88,13 @@ local v1 = Roact.PureComponent:extend("CCTV")
 v1.defaultProps = {
 	active = true
 }
-function v1.init(p1) --[[ Line: 112 | Upvalues: Roact (copy), Maid (copy) ]]
+function v1.init(p1)
 	p1.cameraRef = Roact.createRef()
 	p1.viewportRef = Roact.createRef()
 	p1.fuzzRef = Roact.createRef()
 	p1._maid = Maid.new()
 end
-function v1.render(p1) --[[ Line: 118 | Upvalues: createElement (copy), Roact (copy) ]]
+function v1.render(p1)
 	local t = {
 		BorderSizePixel = 0
 	}
@@ -158,14 +159,14 @@ function v1.render(p1) --[[ Line: 118 | Upvalues: createElement (copy), Roact (c
 	t2.Flash = createElement("Frame", t3)
 	return createElement("Frame", t, t2)
 end
-function v1._clear(p1) --[[ Line: 181 ]]
+function v1._clear(p1)
 	for i, v in ipairs(p1.viewportRef:getValue():GetChildren()) do
 		if not (v:IsA("UICorner") or v:IsA("Camera")) then
 			v:Destroy()
 		end
 	end
 end
-function v1._redraw(p1) --[[ Line: 189 | Upvalues: Maid (copy), Players (copy), wipeTags (copy), ManifestBinder (copy), BaseObject (copy), t (copy), Interval (copy), RunService (copy) ]]
+function v1._redraw(p1)
 	p1:_clear()
 	local v1 = Maid.new()
 	p1._maid.canvasMaid = v1
@@ -195,17 +196,17 @@ function v1._redraw(p1) --[[ Line: 189 | Upvalues: Maid (copy), Players (copy), 
 	end
 	local v11 = ManifestBinder.new("Character", {
 		HumanoidRootPart = "HumanoidRootPart"
-	}, function(p1) --[[ Line: 222 | Upvalues: BaseObject (ref) ]]
+	}, function(p1)
 		return BaseObject.new(p1)
 	end)
 	v11:Start()
 	local t3 = {}
-	local function onCharacterAdded(p1) --[[ Line: 234 | Upvalues: t (ref), t3 (copy), v2 (copy) ]]
+	local function onCharacterAdded(p1)
 		local v1 = t.new(p1)
 		t3[p1] = v1
 		v1.characterClone.Parent = v2
 	end
-	local function onCharacterRemoving(p1) --[[ Line: 239 | Upvalues: t3 (copy) ]]
+	local function onCharacterRemoving(p1)
 		local v1 = t3[p1]
 		if v1 then
 			v1:Destroy()
@@ -218,13 +219,13 @@ function v1._redraw(p1) --[[ Line: 189 | Upvalues: Maid (copy), Players (copy), 
 		t3[obj] = v14
 		v14.characterClone.Parent = v2
 	end
-	v11:GetClassAddedSignal():Connect(function(p1) --[[ Line: 249 | Upvalues: t (ref), t3 (copy), v2 (copy) ]]
+	v11:GetClassAddedSignal():Connect(function(p1)
 		local obj = p1.obj
 		local v1 = t.new(obj)
 		t3[obj] = v1
 		v1.characterClone.Parent = v2
 	end)
-	v11:GetClassRemovingSignal():Connect(function(p1) --[[ Line: 252 | Upvalues: t3 (copy) ]]
+	v11:GetClassRemovingSignal():Connect(function(p1)
 		local obj = p1.obj
 		local v1 = t3[obj]
 		if v1 then
@@ -232,13 +233,13 @@ function v1._redraw(p1) --[[ Line: 189 | Upvalues: Maid (copy), Players (copy), 
 		end
 		t3[obj] = nil
 	end)
-	v1:GiveTask(function() --[[ Line: 255 | Upvalues: t3 (copy) ]]
+	v1:GiveTask(function()
 		for v1, v2 in t3 do
 			v2:Destroy()
 		end
 		table.clear(t3)
 	end)
-	v1:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 262 | Upvalues: t3 (copy), cameraCFrame (copy), p1 (copy) ]]
+	v1:GiveTask(Interval.every(0.1):Connect(function()
 		local v1 = os.clock()
 		for v3, v4 in t3 do
 			local v2
@@ -262,19 +263,19 @@ function v1._redraw(p1) --[[ Line: 189 | Upvalues: Maid (copy), Players (copy), 
 	end))
 	local v15 = p1.fuzzRef:getValue()
 	local v16 = math.random() * 512
-	v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 294 | Upvalues: v16 (copy), v15 (copy) ]]
+	v1:GiveTask(RunService.Heartbeat:Connect(function()
 		v15.Position = UDim2.new(0.5, 0, math.cos(os.clock() * 512 + v16) * 0.05 + 0.5, 0)
 	end))
 end
-function v1.didUpdate(p1, p2) --[[ Line: 299 ]]
+function v1.didUpdate(p1, p2)
 	if (p1.props.cameraCFrame.p - p2.cameraCFrame.p).Magnitude > 0.1 then
 		p1:_redraw()
 	end
 end
-function v1.didMount(p1) --[[ Line: 304 ]]
+function v1.didMount(p1)
 	p1:_redraw()
 end
-function v1.willUnmount(p1) --[[ Line: 307 ]]
+function v1.willUnmount(p1)
 	p1._maid:DoCleaning()
 end
 return v1

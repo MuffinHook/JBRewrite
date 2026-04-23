@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local Logic = require(ReplicatedStorage.Module.Logic)
@@ -8,17 +9,17 @@ local LocalPlayer = Players.LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
 local Localization = require(ReplicatedStorage.Module.Localization)
 local abs = math.abs
-local function comma(p1) --[[ Line: 14 ]]
+local function comma(p1)
 	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
 	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
 end
-local function FormatMoney(p1) --[[ Line: 18 | Upvalues: Localization (copy), abs (copy) ]]
+local function FormatMoney(p1)
 	local t = {}
 	local v4, v5, v6 = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
 	t[1] = v4 .. v5:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v6
 	return if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", t)
 end
-local function MakeSystem() --[[ Line: 24 ]]
+local function MakeSystem()
 	local t = {
 		Scale = 0.015625,
 		Nodes = {},
@@ -32,7 +33,7 @@ local function MakeSystem() --[[ Line: 24 ]]
 	return t
 end
 local t = {}
-local function DestroySystem(p1) --[[ Line: 38 | Upvalues: t (copy) ]]
+local function DestroySystem(p1)
 	for i = #t, 1, -1 do
 		if t[i] == p1 then
 			table.remove(t, i)
@@ -41,7 +42,7 @@ local function DestroySystem(p1) --[[ Line: 38 | Upvalues: t (copy) ]]
 	end
 	p1.Model:Destroy()
 end
-local function SetNodeColor(p1, p2) --[[ Line: 57 ]]
+local function SetNodeColor(p1, p2)
 	local Part = p1.Part
 	local r = p2.r
 	local g = p2.g
@@ -49,7 +50,7 @@ local function SetNodeColor(p1, p2) --[[ Line: 57 ]]
 	Part.Color = Color3.new(r, g, b)
 	Part.SelectionBox.Color3 = Color3.new(r + 0.2, g + 0.2, b + 0.2)
 end
-local function ConstructNode(p1, p2) --[[ Line: 64 ]]
+local function ConstructNode(p1, p2)
 	local Part = Instance.new("Part")
 	Part.Transparency = 0
 	Part.Material = Enum.Material.SmoothPlastic
@@ -69,16 +70,16 @@ local function ConstructNode(p1, p2) --[[ Line: 64 ]]
 	Part_2.Color = Color3.new(r, g, b)
 	Part_2.SelectionBox.Color3 = Color3.new(r + 0.2, g + 0.2, b + 0.2)
 end
-local function MakeNode(p1, p2) --[[ Line: 82 ]]
+local function MakeNode(p1, p2)
 	return {
 		c = p1,
 		s = p2
 	}
 end
-local function HorizontalDistance(p1, p2) --[[ Line: 89 ]]
+local function HorizontalDistance(p1, p2)
 	return ((p1 - p2) * Vector3.new(1, 0, 1)).Magnitude
 end
-local function CloseToAny(p1, p2) --[[ Line: 92 ]]
+local function CloseToAny(p1, p2)
 	for v1, v2 in next, p2 do
 		if ((v2.Position - p1.Position) * Vector3.new(1, 0, 1)).Magnitude < 100 then
 			return true
@@ -86,7 +87,7 @@ local function CloseToAny(p1, p2) --[[ Line: 92 ]]
 	end
 	return false
 end
-local function SimplifyCityParts(p1, p2) --[[ Line: 100 | Upvalues: Logic (copy), ConstructNode (copy) ]]
+local function SimplifyCityParts(p1, p2)
 	while #p2 > 0 do
 		local v1 = table.remove(p2, 1)
 		local t = { v1 }
@@ -116,7 +117,7 @@ local function SimplifyCityParts(p1, p2) --[[ Line: 100 | Upvalues: Logic (copy)
 		table.insert(p1.Nodes, t2)
 	end
 end
-local function SimplifyTrees(p1, p2) --[[ Line: 123 | Upvalues: Logic (copy), ConstructNode (copy) ]]
+local function SimplifyTrees(p1, p2)
 	local v1 = next
 	local v2, v3 = p2:GetChildren()
 	for v4, v5 in v1, v2, v3 do
@@ -205,7 +206,7 @@ local t2 = {
 		}
 	}
 }
-local function SimplifyExtra(p1) --[[ Line: 353 | Upvalues: t2 (copy), ConstructNode (copy) ]]
+local function SimplifyExtra(p1)
 	for v1, v2 in next, t2 do
 		for v3, v4 in next, v2.Loc do
 			local v6 = math.floor(math.random() * 30 / 255)
@@ -220,7 +221,7 @@ local function SimplifyExtra(p1) --[[ Line: 353 | Upvalues: t2 (copy), Construct
 		end
 	end
 end
-local function RenderSystem(p1) --[[ Line: 367 | Upvalues: Players (copy), ConstructNode (copy), ReplicatedStorage (copy), Localization (copy), abs (copy) ]]
+local function RenderSystem(p1)
 	local Scale = p1.Scale
 	local v1 = tick()
 	for v2, v3 in next, p1.Nodes do
@@ -314,8 +315,8 @@ local function RenderSystem(p1) --[[ Line: 367 | Upvalues: Players (copy), Const
 	end
 end
 return {
-	Init = function() --[[ Name: Init | Line: 459 | Upvalues: BountyBoardService (copy), t (copy), DestroySystem (copy), CollectionService (copy), CurrentCamera (copy), MakeSystem (copy), SimplifyCityParts (ref), SimplifyExtra (ref), RenderSystem (copy), RunService (copy) ]]
-		BountyBoardService.onBountiesUpdated:Connect(function(p1) --[[ Line: 460 | Upvalues: t (ref) ]]
+	Init = function()
+		BountyBoardService.onBountiesUpdated:Connect(function(p1)
 			for v1, v2 in next, t do
 				for v3, v4 in p1 do
 					local v5 = v2.PlayerNodes[v4.Name]
@@ -327,10 +328,10 @@ return {
 		end)
 		local t2 = {}
 		local t3 = {}
-		local function AddedFun(p1) --[[ Line: 473 | Upvalues: t2 (copy) ]]
+		local function AddedFun(p1)
 			table.insert(t2, p1)
 		end
-		local function RemovedFun(p1) --[[ Line: 476 | Upvalues: t2 (copy), t3 (copy), DestroySystem (ref) ]]
+		local function RemovedFun(p1)
 			for i = #t2, 1, -1 do
 				if t2[i] == p1 then
 					table.remove(t2, i)
@@ -350,7 +351,7 @@ return {
 		CollectionService:GetInstanceAddedSignal("MapHologram"):Connect(AddedFun)
 		CollectionService:GetInstanceRemovedSignal("MapHologram"):Connect(RemovedFun)
 		local v6 = tick()
-		local function Heartbeat() --[[ Line: 497 | Upvalues: v6 (ref), t2 (copy), t3 (copy), CurrentCamera (ref), MakeSystem (ref), SimplifyCityParts (ref), CollectionService (ref), SimplifyExtra (ref), t (ref), DestroySystem (ref), RenderSystem (ref) ]]
+		local function Heartbeat()
 			debug.profilebegin("Hologram")
 			local v1 = tick()
 			if v1 - v6 > 1 then
