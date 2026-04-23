@@ -41,70 +41,79 @@ local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local Interval = require(ReplicatedStorage.Std.Interval)
 local waitForChild = require(ReplicatedStorage.Std.waitForChild)
 local Item = require(script.Parent.Item)
-local v2 = CFrame.new()
-local function FromAxisAngle(p1) --[[ Line: 50 | Upvalues: v2 (copy) ]]
-	local x = p1.x
-	local y = p1.y
-	local z = p1.z
-	local v1 = (x * x + y * y + z * z) ^ 0.5
-	if v1 > 0.00001 then
-		local v22 = math.sin(v1 * 0.5) / v1
-		return CFrame.new(0, 0, 0, v22 * x, v22 * y, v22 * z, (math.cos(v1 * 0.5)))
+
+local identityCFrame = CFrame.new()
+
+local function FromAxisAngle(axisAngle)
+	local x = axisAngle.x
+	local y = axisAngle.y
+	local z = axisAngle.z
+	local magnitude = (x * x + y * y + z * z) ^ 0.5
+	if magnitude > 0.00001 then
+		local sinHalf = math.sin(magnitude * 0.5) / magnitude
+		return CFrame.new(0, 0, 0, sinHalf * x, sinHalf * y, sinHalf * z, (math.cos(magnitude * 0.5)))
 	else
-		return v2
+		return identityCFrame
 	end
 end
-local function RandomVector() --[[ Line: 60 ]]
-	local v1 = math.random() * 2 - 1
-	local v2 = math.random() * 2 - 1
-	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
+
+local function RandomVector()
+	local rx = math.random() * 2 - 1
+	local ry = math.random() * 2 - 1
+	return Vector3.new(rx, ry, math.random() * 2 - 1).Unit
 end
-local t = {
+
+local ImpactSoundIds = {
 	bullet_impact_bass = 2837091387,
 	bullet_impact_metal_light_01 = 2121004076,
 	bullet_impact_rock_03 = 2121004325,
 	bullet_impact_wood_light_04 = 2121004681
 }
-local t2 = {
-	[Enum.Material.Wood] = t.bullet_impact_wood_light_04,
-	[Enum.Material.Metal] = t.bullet_impact_metal_light_01,
-	[Enum.Material.DiamondPlate] = t.bullet_impact_metal_light_01,
-	[Enum.Material.Slate] = t.bullet_impact_rock_03
+
+local MaterialImpactSoundMap = {
+	[Enum.Material.Wood] = ImpactSoundIds.bullet_impact_wood_light_04,
+	[Enum.Material.Metal] = ImpactSoundIds.bullet_impact_metal_light_01,
+	[Enum.Material.DiamondPlate] = ImpactSoundIds.bullet_impact_metal_light_01,
+	[Enum.Material.Slate] = ImpactSoundIds.bullet_impact_rock_03
 }
-local v3 = nil
-local v4 = nil
-local v5 = 1
-local t3 = {
+
+local gunEvent = nil
+local mouseMovementRemote = nil
+local scopeSensitivity = 1
+
+local Gun = {
 	__ClassName = "Gun"
 }
-t3.__index = t3
-setmetatable(t3, Item)
-local v6 = false
-function t3.Init(p1) --[[ Line: 89 | Upvalues: v6 (ref), v3 (ref), waitForChild (copy), ReplicatedStorage (copy), v4 (ref), Players (copy), ItemSystem (copy), gameSettingType (copy), GameSettingsService (copy), v5 (ref) ]]
-	assert(not v6, "gun already Init")
-	v6 = true
-	v3 = p1.Event
-	waitForChild(ReplicatedStorage, "ItemSystemGunMouseMovement"):andThen(function(p1) --[[ Line: 96 | Upvalues: v4 (ref), Players (ref), ItemSystem (ref) ]]
-		v4 = p1
-		p1.OnClientEvent:Connect(function(p1) --[[ Line: 98 | Upvalues: Players (ref), ItemSystem (ref) ]]
-			for v1, v2 in p1 do
-				local v3 = Players:GetPlayerByUserId((tonumber(v1)))
-				if v3 then
-					local v4 = ItemSystem.GetEquipped(v3)
-					if v4 ~= nil and (v4.Local == false and v4.SetThirdMousePosition) then
-						v4:SetThirdMousePosition(v2)
+Gun.__index = Gun
+setmetatable(Gun, Item)
+
+local initialized = false
+
+function Gun.Init(eventBus)
+	assert(not initialized, "gun already Init")
+	initialized = true
+	gunEvent = eventBus.Event
+	waitForChild(ReplicatedStorage, "ItemSystemGunMouseMovement"):andThen(function(remote)
+		mouseMovementRemote = remote
+		remote.OnClientEvent:Connect(function(positionMap)
+			for userId, mousePos in positionMap do
+				local player = Players:GetPlayerByUserId((tonumber(userId)))
+				if player then
+					local equippedItem = ItemSystem.GetEquipped(player)
+					if equippedItem ~= nil and (equippedItem.Local == false and equippedItem.SetThirdMousePosition) then
+						equippedItem:SetThirdMousePosition(mousePos)
 					end
 				end
 			end
 		end)
 	end)
-	function p1.em.ssc92uk2(p1, p2, p3) --[[ Line: 113 | Upvalues: ItemSystem (ref) ]]
-		local v1 = ItemSystem.GetEquipped(p1)
-		if v1 ~= nil and v1.SetLeaning then
-			v1:SetLeaning(p2, p3)
+	function eventBus.em.ssc92uk2(player, isLeaning, isLeaningRight)
+		local equippedItem = ItemSystem.GetEquipped(player)
+		if equippedItem ~= nil and equippedItem.SetLeaning then
+			equippedItem:SetLeaning(isLeaning, isLeaningRight)
 		end
 	end
-	local t = {
+	local scopeSensSetting = {
 		name = "scopeSens",
 		title = "Scope Sensitivity",
 		type = gameSettingType.Slider,
@@ -113,637 +122,680 @@ function t3.Init(p1) --[[ Line: 89 | Upvalues: v6 (ref), v3 (ref), waitForChild 
 		min = 10,
 		max = 100,
 		step = 1,
-		textMap = function(p1) --[[ Name: textMap | Line: 131 ]]
-			return ("%d%%"):format(p1)
+		textMap = function(value)
+			return ("%d%%"):format(value)
 		end
 	}
-	GameSettingsService.add(t)
-	local function handleSetting(p1) --[[ Line: 136 | Upvalues: v5 (ref) ]]
-		v5 = p1 / 100
+	GameSettingsService.add(scopeSensSetting)
+	local function handleSetting(value)
+		scopeSensitivity = value / 100
 	end
-	v5 = t:getValue() / 100
-	t.onChanged:Connect(handleSetting)
+	scopeSensitivity = scopeSensSetting:getValue() / 100
+	scopeSensSetting.onChanged:Connect(handleSetting)
 end
-function t3.new(p1, p2, p3) --[[ Line: 142 | Upvalues: Item (copy), t3 (copy), InventoryItemUtils (copy), ReplicatedStorage (copy) ]]
-	local v1 = Item.new(p1, p3)
-	setmetatable(v1, t3)
-	v1.inventoryItemValue = p2
-	local v3 = InventoryItemUtils.getName(p2)
-	local v4 = ReplicatedStorage.Game.ItemConfig:FindFirstChild(v3)
-	if v4 == nil then
-		error(("No config file exists for item: %s"):format(v3))
+
+function Gun.new(itemValue, inventoryItemValue, config)
+	local self = Item.new(itemValue, config)
+	setmetatable(self, Gun)
+	self.inventoryItemValue = inventoryItemValue
+	local itemName = InventoryItemUtils.getName(inventoryItemValue)
+	local configModule = ReplicatedStorage.Game.ItemConfig:FindFirstChild(itemName)
+	if configModule == nil then
+		error(("No config file exists for item: %s"):format(itemName))
 	end
-	v1.Config = require(v4)
-	v1.LastReplicateMousePosition = tick()
-	v1.SimulateLocal = false
-	v1.MinimalFx = false
-	return v1
+	self.Config = require(configModule)
+	self.LastReplicateMousePosition = tick()
+	self.SimulateLocal = false
+	self.MinimalFx = false
+	return self
 end
-function t3.Setup(p1, p2) --[[ Line: 164 | Upvalues: VehicleUtils (copy), CollectionService (copy), DestructibleConsts (copy), R15IKv2 (copy), Spring (copy), ItemCamera (copy), ConstraintUtils (copy) ]]
-	p1:SetupModel()
-	p1.IgnoreList = { p1.Character, p1.Model, workspace.Items }
-	if p1.Local then
-		local v1 = VehicleUtils.GetLocalVehicleModel()
-		if v1 then
-			table.insert(p1.IgnoreList, v1)
+
+function Gun.Setup(self, previousSprings)
+	self:SetupModel()
+	self.IgnoreList = { self.Character, self.Model, workspace.Items }
+	if self.Local then
+		local localVehicleModel = VehicleUtils.GetLocalVehicleModel()
+		if localVehicleModel then
+			table.insert(self.IgnoreList, localVehicleModel)
 		end
-		for v2, v3 in CollectionService:GetTagged(DestructibleConsts.SPAWN_TAG_NAME) do
-			if v3:FindFirstChild(DestructibleConsts.INSTANCE_VALUE_NAME) and v3[DestructibleConsts.INSTANCE_VALUE_NAME].Value then
-				table.insert(p1.IgnoreList, v3[DestructibleConsts.INSTANCE_VALUE_NAME].Value)
+		for _, tagged in CollectionService:GetTagged(DestructibleConsts.SPAWN_TAG_NAME) do
+			if tagged:FindFirstChild(DestructibleConsts.INSTANCE_VALUE_NAME) and tagged[DestructibleConsts.INSTANCE_VALUE_NAME].Value then
+				table.insert(self.IgnoreList, tagged[DestructibleConsts.INSTANCE_VALUE_NAME].Value)
 			end
 		end
 	end
-	p1:SetupArmWelds()
-	p1:SetupTip()
-	p1:AttachModelToPlayer()
-	p1:SetupBulletEmitter()
-	p1:SetupSprings(p2)
-	p1.IK = R15IKv2.BuildPacketArms(p1.Character)
-	if p1.Local then
-		p1:SetupCrossHair()
+	self:SetupArmWelds()
+	self:SetupTip()
+	self:AttachModelToPlayer()
+	self:SetupBulletEmitter()
+	self:SetupSprings(previousSprings)
+	self.IK = R15IKv2.BuildPacketArms(self.Character)
+	if self.Local then
+		self:SetupCrossHair()
 	end
-	p1:SetupAmmoGui()
-	if p1.Local then
-		local v5 = Spring.new(Vector3.new(), Vector3.new(), 0.6, 75)
-		p1.SpringCamera = v5
-		ItemCamera.SetRecoilSpring(v5)
+	self:SetupAmmoGui()
+	if self.Local then
+		local recoilSpring = Spring.new(Vector3.new(), Vector3.new(), 0.6, 75)
+		self.SpringCamera = recoilSpring
+		ItemCamera.SetRecoilSpring(recoilSpring)
 	end
-	if not p1.Local then
-		p1.SpringThirdMousePosition = Spring.new(Vector3.new(), Vector3.new(), 0.9, 20)
+	if not self.Local then
+		self.SpringThirdMousePosition = Spring.new(Vector3.new(), Vector3.new(), 0.9, 20)
 	end
-	p1.JointNeckC0 = p1.JointNeck.C0
-	p1.JointWaistC0 = p1.JointWaist.C0
-	p1.IsShooting = false
-	p1.IsReloading = false
-	p1.IsEquipping = false
-	p1.IsScoping = false
-	p1.IsLeaning = false
-	p1.IsLeaningRight = false
-	p1.MousePosition = Vector3.new()
-	p1._lastUpdateViewDist = 0
-	p1:SetupShoot()
-	p1:Equip()
-	p1.Maid:GiveTask(function() --[[ Line: 223 | Upvalues: ConstraintUtils (ref), p1 (copy) ]]
-		ConstraintUtils.setJointC0(p1.JointNeck, p1.JointNeckC0)
-		ConstraintUtils.setJointC0(p1.JointWaist, p1.JointWaistC0)
+	self.JointNeckC0 = self.JointNeck.C0
+	self.JointWaistC0 = self.JointWaist.C0
+	self.IsShooting = false
+	self.IsReloading = false
+	self.IsEquipping = false
+	self.IsScoping = false
+	self.IsLeaning = false
+	self.IsLeaningRight = false
+	self.MousePosition = Vector3.new()
+	self._lastUpdateViewDist = 0
+	self:SetupShoot()
+	self:Equip()
+	self.Maid:GiveTask(function()
+		ConstraintUtils.setJointC0(self.JointNeck, self.JointNeckC0)
+		ConstraintUtils.setJointC0(self.JointWaist, self.JointWaistC0)
 	end)
-	p1.Maid:GiveTask(function() --[[ Line: 228 | Upvalues: p1 (copy) ]]
-		p1.Motor:Destroy()
-		p1.Motor = nil
-		p1.Model:Destroy()
-		p1.Model = nil
+	self.Maid:GiveTask(function()
+		self.Motor:Destroy()
+		self.Motor = nil
+		self.Model:Destroy()
+		self.Model = nil
 	end)
 end
-function t3.SetupShoot(p1) --[[ Line: 235 | Upvalues: RxInstanceUtils (copy), GunSystemConsts (copy) ]]
-	p1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1.inventoryItemValue, GunSystemConsts.SHOOT_REMOTE_NAME, function(p12, p2) --[[ Line: 240 | Upvalues: p1 (copy) ]]
-		p2:GiveTask(p12.OnClientEvent:Connect(function() --[[ Line: 241 | Upvalues: p1 (ref) ]]
-			p1:Shoot()
+
+function Gun.SetupShoot(self)
+	self.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(self.inventoryItemValue, GunSystemConsts.SHOOT_REMOTE_NAME, function(shootRemote, maid)
+		maid:GiveTask(shootRemote.OnClientEvent:Connect(function()
+			self:Shoot()
 		end))
 	end))
 end
-function t3.SetupCrossHair(p1) --[[ Line: 248 | Upvalues: CrossHair (copy) ]]
-	p1.CrossHair = CrossHair.Make()
-	p1.CrossHair.Gui.Parent = p1.Player.PlayerGui
-	p1.Maid:GiveTask(function() --[[ Line: 252 | Upvalues: p1 (copy) ]]
-		p1.CrossHair:Destroy()
-		p1.CrossHair = nil
+
+function Gun.SetupCrossHair(self)
+	self.CrossHair = CrossHair.Make()
+	self.CrossHair.Gui.Parent = self.Player.PlayerGui
+	self.Maid:GiveTask(function()
+		self.CrossHair:Destroy()
+		self.CrossHair = nil
 	end)
 end
-function t3.SetupAmmoGui(p1) --[[ Line: 257 | Upvalues: InventoryItemUtils (copy), AmmoGui (copy), GunShopUtils (copy), ItemDataUtils (copy), RunService (copy) ]]
-	if p1.Local then
-		local v1 = InventoryItemUtils.getName(p1.inventoryItemValue)
-		p1.AmmoGui = AmmoGui.new(GunShopUtils.getTranslatedTitleFromName(v1))
-		local v2 = InventoryItemUtils.getAttr(p1.inventoryItemValue, "AmmoCurrent")
-		if v2 then
-			InventoryItemUtils.setAttr(p1.inventoryItemValue, "AmmoCurrentLocal", v2)
+
+function Gun.SetupAmmoGui(self)
+	if self.Local then
+		local itemName = InventoryItemUtils.getName(self.inventoryItemValue)
+		self.AmmoGui = AmmoGui.new(GunShopUtils.getTranslatedTitleFromName(itemName))
+		local initialAmmo = InventoryItemUtils.getAttr(self.inventoryItemValue, "AmmoCurrent")
+		if initialAmmo then
+			InventoryItemUtils.setAttr(self.inventoryItemValue, "AmmoCurrentLocal", initialAmmo)
 		end
-		local v3 = 0
-		p1.Maid:GiveTask(p1.inventoryItemValue:GetAttributeChangedSignal("AmmoCurrent"):Connect(function() --[[ Line: 272 | Upvalues: InventoryItemUtils (ref), p1 (copy), v3 (ref) ]]
-			local v1 = InventoryItemUtils.getAttr(p1.inventoryItemValue, "AmmoCurrent")
-			if v3 < v1 then
-				InventoryItemUtils.setAttr(p1.inventoryItemValue, "AmmoCurrentLocal", v1)
+		local lastAmmoCurrent = 0
+		self.Maid:GiveTask(self.inventoryItemValue:GetAttributeChangedSignal("AmmoCurrent"):Connect(function()
+			local ammoCurrent = InventoryItemUtils.getAttr(self.inventoryItemValue, "AmmoCurrent")
+			if lastAmmoCurrent < ammoCurrent then
+				InventoryItemUtils.setAttr(self.inventoryItemValue, "AmmoCurrentLocal", ammoCurrent)
 			end
-			v3 = v1
+			lastAmmoCurrent = ammoCurrent
 		end))
-		local function updateAmmo() --[[ Line: 280 | Upvalues: InventoryItemUtils (ref), p1 (copy), ItemDataUtils (ref), v1 (copy) ]]
-			local v12 = InventoryItemUtils.getAttr(p1.inventoryItemValue, "AmmoCurrentLocal") or 0
-			local v2 = ItemDataUtils.getConfig(v1)
-			p1.AmmoGui:Update(v12, if v2 and v2.MagSize then v2.MagSize else nil)
+		local function updateAmmo()
+			local ammoCurrentLocal = InventoryItemUtils.getAttr(self.inventoryItemValue, "AmmoCurrentLocal") or 0
+			local itemConfig = ItemDataUtils.getConfig(itemName)
+			self.AmmoGui:Update(ammoCurrentLocal, if itemConfig and itemConfig.MagSize then itemConfig.MagSize else nil)
 		end
-		p1.Maid:GiveTask(p1.inventoryItemValue:GetAttributeChangedSignal("AmmoCurrentLocal"):Connect(updateAmmo))
-		p1.Maid:GiveTask(p1.inventoryItemValue:GetAttributeChangedSignal("AmmoLeft"):Connect(updateAmmo))
-		local v4 = InventoryItemUtils.getAttr(p1.inventoryItemValue, "AmmoCurrentLocal") or 0
-		local v5 = ItemDataUtils.getConfig(v1)
-		p1.AmmoGui:Update(v4, if v5 and v5.MagSize then v5.MagSize else nil)
-		local v7 = p1.Model and p1.Model:FindFirstChild("BoundingBox", true)
-		p1.Maid:GiveTask(RunService.Heartbeat:Connect(function(p12) --[[ Line: 295 | Upvalues: v7 (copy), p1 (copy) ]]
-			if v7 then
-				p1.AmmoGui:UpdatePosition(v7, p12)
+		self.Maid:GiveTask(self.inventoryItemValue:GetAttributeChangedSignal("AmmoCurrentLocal"):Connect(updateAmmo))
+		self.Maid:GiveTask(self.inventoryItemValue:GetAttributeChangedSignal("AmmoLeft"):Connect(updateAmmo))
+		local ammoCurrentLocal = InventoryItemUtils.getAttr(self.inventoryItemValue, "AmmoCurrentLocal") or 0
+		local itemConfig = ItemDataUtils.getConfig(itemName)
+		self.AmmoGui:Update(ammoCurrentLocal, if itemConfig and itemConfig.MagSize then itemConfig.MagSize else nil)
+		local boundingBox = self.Model and self.Model:FindFirstChild("BoundingBox", true)
+		self.Maid:GiveTask(RunService.Heartbeat:Connect(function(dt)
+			if boundingBox then
+				self.AmmoGui:UpdatePosition(boundingBox, dt)
 			end
 		end))
-		p1.Maid:GiveTask(function() --[[ Line: 301 | Upvalues: p1 (copy) ]]
-			p1.AmmoGui:Destroy()
-			p1.AmmoGui = nil
+		self.Maid:GiveTask(function()
+			self.AmmoGui:Destroy()
+			self.AmmoGui = nil
 		end)
 	end
 end
-function t3.SetupModel(p1, p2) --[[ Line: 307 | Upvalues: InventoryItemUtils (copy), ReplicatedStorage (copy), Joint (copy) ]]
-	if p2 == nil then
-		p2 = InventoryItemUtils.getName(p1.inventoryItemValue)
+
+function Gun.SetupModel(self, modelName)
+	if modelName == nil then
+		modelName = InventoryItemUtils.getName(self.inventoryItemValue)
 	end
-	local v2 = ReplicatedStorage.Resource.ItemSystem.Models:FindFirstChild(p2)
-	if v2 == nil then
-		error(("Could not find model for item `%s`"):format(p2))
+	local modelTemplate = ReplicatedStorage.Resource.ItemSystem.Models:FindFirstChild(modelName)
+	if modelTemplate == nil then
+		error(("Could not find model for item `%s`"):format(modelName))
 	end
-	local v3 = v2:Clone()
-	local v4 = v3
-	for v5, v6 in v3:GetDescendants() do
-		if v6:IsA("BasePart") then
-			v6.CanCollide = false
-			v6.CanQuery = false
-			v6.CanTouch = false
+	local modelClone = modelTemplate:Clone()
+	for _, desc in modelClone:GetDescendants() do
+		if desc:IsA("BasePart") then
+			desc.CanCollide = false
+			desc.CanQuery = false
+			desc.CanTouch = false
 		end
 	end
-	p1.Model = v4
-	local BoundingBox = v4.Skeleton.BoundingBox
-	p1.BoundingBox = BoundingBox
-	Joint.WeldAllTo(v4.Model, BoundingBox)
-	if p1.ApplySkin then
-		local function updateSkin() --[[ Line: 331 | Upvalues: p1 (copy) ]]
-			p1:ApplySkinLocal(p1.inventoryItemValue:GetAttribute("SkinName"))
+	self.Model = modelClone
+	local BoundingBox = modelClone.Skeleton.BoundingBox
+	self.BoundingBox = BoundingBox
+	Joint.WeldAllTo(modelClone.Model, BoundingBox)
+	if self.ApplySkin then
+		local function updateSkin()
+			self:ApplySkinLocal(self.inventoryItemValue:GetAttribute("SkinName"))
 		end
-		p1.Maid:GiveTask(p1.inventoryItemValue:GetAttributeChangedSignal("SkinName"):Connect(updateSkin))
-		p1:ApplySkinLocal(p1.inventoryItemValue:GetAttribute("SkinName"))
+		self.Maid:GiveTask(self.inventoryItemValue:GetAttributeChangedSignal("SkinName"):Connect(updateSkin))
+		self:ApplySkinLocal(self.inventoryItemValue:GetAttribute("SkinName"))
 	end
 end
-function t3.SetupTip(p1) --[[ Line: 338 | Upvalues: Joint (copy) ]]
-	local Tip = p1.Model.Skeleton.Tip
-	p1.Tip = Tip
-	p1.TipOffset = p1.BoundingBox.CFrame:PointToObjectSpace(Tip.Position)
-	Joint.Weld(p1.Model.Skeleton.Tip, p1.BoundingBox)
-	p1.Model.Skeleton.Tip.Anchored = false
+
+function Gun.SetupTip(self)
+	local Tip = self.Model.Skeleton.Tip
+	self.Tip = Tip
+	self.TipOffset = self.BoundingBox.CFrame:PointToObjectSpace(Tip.Position)
+	Joint.Weld(self.Model.Skeleton.Tip, self.BoundingBox)
+	self.Model.Skeleton.Tip.Anchored = false
 end
-function t3.SetupArmWelds(p1) --[[ Line: 347 | Upvalues: Joint (copy) ]]
-	Joint.Weld(p1.Model.Skeleton.LeftArm, p1.BoundingBox)
-	Joint.Weld(p1.Model.Skeleton.RightArm, p1.BoundingBox)
-	p1.Model.Skeleton.LeftArm.Anchored = false
-	p1.Model.Skeleton.RightArm.Anchored = false
+
+function Gun.SetupArmWelds(self)
+	Joint.Weld(self.Model.Skeleton.LeftArm, self.BoundingBox)
+	Joint.Weld(self.Model.Skeleton.RightArm, self.BoundingBox)
+	self.Model.Skeleton.LeftArm.Anchored = false
+	self.Model.Skeleton.RightArm.Anchored = false
 end
-function t3.ApplySkinLocal(p1, p2) --[[ Line: 353 | Upvalues: ItemSkinIds (copy) ]]
-	local v1
-	if p2 == nil or p2 == "None" then
-		v1 = ""
+
+function Gun.ApplySkinLocal(self, skinName)
+	local textureId
+	if skinName == nil or skinName == "None" then
+		textureId = ""
 	else
-		local v2 = ItemSkinIds[p2]
-		if v2 == nil then
-			error(("No skin by name of %s exists."):format(p2))
+		local skinEntry = ItemSkinIds[skinName]
+		if skinEntry == nil then
+			error(("No skin by name of %s exists."):format(skinName))
 		end
-		local v3 = v2[p1.__ClassName]
-		if v3 == nil then
-			error(("Skin %s has no image id for item: %s"):format(p2, p1.__ClassName))
+		local skinImageId = skinEntry[self.__ClassName]
+		if skinImageId == nil then
+			error(("Skin %s has no image id for item: %s"):format(skinName, self.__ClassName))
 		end
-		v1 = ("rbxassetid://%d"):format(v3)
+		textureId = ("rbxassetid://%d"):format(skinImageId)
 	end
-	for v5, v6 in p1.Model:GetDescendants() do
-		if v6:IsA("MeshPart") and v6:GetAttribute("ApplyGunTexture") == true then
-			v6.TextureID = v1
+	for _, desc in self.Model:GetDescendants() do
+		if desc:IsA("MeshPart") and desc:GetAttribute("ApplyGunTexture") == true then
+			desc.TextureID = textureId
 		end
 	end
 end
-function t3.ApplySkin(p1, p2) --[[ Line: 375 | Upvalues: v3 (ref) ]]
-	if p1.Local then
-		v3:FireServer("c" .. ("etdvf"):sub(4, 4):reverse() .. "ro44st", p1.inventoryItemValue, p2)
+
+function Gun.ApplySkin(self, skinName)
+	if self.Local then
+		gunEvent:FireServer("cvro44st", self.inventoryItemValue, skinName)
 	end
 end
-function t3.AttachModelToPlayer(p1) --[[ Line: 380 | Upvalues: Joint (copy) ]]
-	local UpperTorso = p1.UpperTorso
-	p1.BoundingBox.CFrame = UpperTorso.CFrame
-	local v1 = Joint.BlankMotor6D(p1.BoundingBox, UpperTorso)
-	p1.Model.Parent = workspace.Items
-	p1.Motor = v1
+
+function Gun.AttachModelToPlayer(self)
+	local UpperTorso = self.UpperTorso
+	self.BoundingBox.CFrame = UpperTorso.CFrame
+	local motor = Joint.BlankMotor6D(self.BoundingBox, UpperTorso)
+	self.Model.Parent = workspace.Items
+	self.Motor = motor
 end
-function t3.BulletEmitterOnLocalHitPlayer(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15) --[[ Line: 393 | Upvalues: Time (copy), GunSystemConsts (copy), Audio (copy), t (copy) ]]
-	local v1 = Time.GetNowSync()
-	p1.inventoryItemValue:FindFirstChild(GunSystemConsts.DAMAGE_REMOTE_NAME):FireServer(p2, p3, p4, p5, p6 - 0.6609848067581097 * v1, p7, p8, p9 + 0.3968011188544949 * v1, p10, p11, p12, p13, p14 + 0.6369049829533174 * v1, p15)
-	if p1.CrossHair then
-		p1.CrossHair:Flare()
+
+function Gun.BulletEmitterOnLocalHitPlayer(self, hitPart, encoded1, encoded2, encoded3, encoded4, encoded5, encoded6, encoded7, encoded8, encoded9, encoded10, encoded11, encoded12, hitInfo)
+	local now = Time.GetNowSync()
+	self.inventoryItemValue:FindFirstChild(GunSystemConsts.DAMAGE_REMOTE_NAME):FireServer(hitPart, encoded1, encoded2, encoded3, encoded4 - 0.6609848067581097 * now, encoded5, encoded6, encoded7 + 0.3968011188544949 * now, encoded8, encoded9, encoded10, encoded11, encoded12 + 0.6369049829533174 * now, hitInfo)
+	if self.CrossHair then
+		self.CrossHair:Flare()
 	end
-	if not p1.MinimalFx then
-		Audio.ObjectLocal(p1.Tip, t.bullet_impact_bass, {
+	if not self.MinimalFx then
+		Audio.ObjectLocal(self.Tip, ImpactSoundIds.bullet_impact_bass, {
 			TimePosition = 0,
 			Volume = 1,
 			Pitch = 1
 		})
 	end
 end
-function t3.BulletEmitterShieldDamage(p1, p2) --[[ Line: 435 | Upvalues: ReplicatedStorage (copy), ForcefieldConsts (copy) ]]
-	if p1.Local then
-		ReplicatedStorage.Forcefield:FindFirstChild(ForcefieldConsts.DAMAGE_REMOTE_NAME):FireServer(p2.Id, p1.__ClassName)
+
+function Gun.BulletEmitterShieldDamage(self, shield)
+	if self.Local then
+		ReplicatedStorage.Forcefield:FindFirstChild(ForcefieldConsts.DAMAGE_REMOTE_NAME):FireServer(shield.Id, self.__ClassName)
 	end
 end
-function t3.SetupBulletEmitter(p1) --[[ Line: 443 | Upvalues: BulletEmitter (copy), Joint (copy), Debris (copy), t2 (copy), Audio (copy), ReplicatedStorage (copy), v3 (ref), HomeItemBinder (copy), CameraBinder (copy), ExplodableBarrelBinder (copy), RunService (copy) ]]
-	p1.LastImpactSound = 0
-	p1.LastImpact = 0
-	p1.BulletEmitter = BulletEmitter.new(p1.Local)
-	p1.BulletEmitter.IgnoreList = assert(p1.IgnoreList)
-	p1.BulletEmitter.LifeSpan = 1
-	p1.BulletEmitter.GravityVector = (p1.Config.GravityMultiplier or 1) * Vector3.new(0, -workspace.Gravity / 10, 0)
-	local BulletEmitterOnLocalHitPlayer = p1.BulletEmitterOnLocalHitPlayer
-	p1.BulletEmitter.OnLocalHitPlayer:Connect(function(...) --[[ Line: 453 | Upvalues: BulletEmitterOnLocalHitPlayer (copy), p1 (copy) ]]
-		BulletEmitterOnLocalHitPlayer(p1, ...)
+
+function Gun.SetupBulletEmitter(self)
+	self.LastImpactSound = 0
+	self.LastImpact = 0
+	self.BulletEmitter = BulletEmitter.new(self.Local)
+	self.BulletEmitter.IgnoreList = assert(self.IgnoreList)
+	self.BulletEmitter.LifeSpan = 1
+	self.BulletEmitter.GravityVector = (self.Config.GravityMultiplier or 1) * Vector3.new(0, -workspace.Gravity / 10, 0)
+	local BulletEmitterOnLocalHitPlayer = self.BulletEmitterOnLocalHitPlayer
+	self.BulletEmitter.OnLocalHitPlayer:Connect(function(...)
+		BulletEmitterOnLocalHitPlayer(self, ...)
 	end)
-	local BulletEmitterShieldDamage = p1.BulletEmitterShieldDamage
-	p1.BulletEmitter.OnShieldDamage:Connect(function(...) --[[ Line: 458 | Upvalues: BulletEmitterShieldDamage (copy), p1 (copy) ]]
-		BulletEmitterShieldDamage(p1, ...)
+	local BulletEmitterShieldDamage = self.BulletEmitterShieldDamage
+	self.BulletEmitter.OnShieldDamage:Connect(function(...)
+		BulletEmitterShieldDamage(self, ...)
 	end)
-	p1.BulletEmitter.OnHitSurface:Connect(function(p12, p2, p3, p4) --[[ Line: 462 | Upvalues: p1 (copy), Joint (ref), Debris (ref), t2 (ref), Audio (ref), ReplicatedStorage (ref), v3 (ref), HomeItemBinder (ref), CameraBinder (ref), ExplodableBarrelBinder (ref) ]]
-		local v1 = tick()
-		if not p1.MinimalFx then
+	self.BulletEmitter.OnHitSurface:Connect(function(hitPart, hitPosition, hitNormal, hitMaterial)
+		local now = tick()
+		if not self.MinimalFx then
 			local Part = Instance.new("Part")
-			Part.Color = p12.Color
+			Part.Color = hitPart.Color
 			Part.Massless = true
 			Part.Size = Vector3.new(0.5, 0.5, 0.1)
 			Part.Anchored = false
 			Part.CanCollide = false
 			Part.Transparency = 1
-			Part.CFrame = CFrame.new(Vector3.new(), p3) * CFrame.Angles(0, 0, math.random() * math.pi * 2) + p2
+			Part.CFrame = CFrame.new(Vector3.new(), hitNormal) * CFrame.Angles(0, 0, math.random() * math.pi * 2) + hitPosition
 			local Decal = Instance.new("Decal")
 			Decal.Texture = "rbxassetid://2078626"
-			Decal.Color3 = p12.Color
+			Decal.Color3 = hitPart.Color
 			Decal.Face = Enum.NormalId.Front
 			Decal.Parent = Part
-			Joint.Weld(Part, p12)
+			Joint.Weld(Part, hitPart)
 			Part.Parent = workspace.Items
 			Debris:AddItem(Part, 2)
-			if p1.Local and v1 - p1.LastImpactSound > 0.03 then
-				local v2 = t2[p4]
-				if v2 ~= nil then
-					p1.LastImpactSound = v1
-					Audio.ObjectLocal(Part, v2, {
+			if self.Local and now - self.LastImpactSound > 0.03 then
+				local impactSoundId = MaterialImpactSoundMap[hitMaterial]
+				if impactSoundId ~= nil then
+					self.LastImpactSound = now
+					Audio.ObjectLocal(Part, impactSoundId, {
 						Volume = 0.4
 					})
 				end
 			end
-			local v32 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Debris:Clone()
-			v32.EmissionDirection = Enum.NormalId.Front
-			v32.Size = NumberSequence.new(0.1)
-			v32.SpreadAngle = Vector2.new(15, 15)
-			v32.Parent = Part
-			v32:Emit(3)
+			local debrisEmitter = ReplicatedStorage.Resource.ItemSystem.Projectiles.Debris:Clone()
+			debrisEmitter.EmissionDirection = Enum.NormalId.Front
+			debrisEmitter.Size = NumberSequence.new(0.1)
+			debrisEmitter.SpreadAngle = Vector2.new(15, 15)
+			debrisEmitter.Parent = Part
+			debrisEmitter:Emit(3)
 		end
-		if p1.Local and v1 - p1.LastImpact > 0.1 then
-			p1.LastImpact = v1
-			if p12:IsDescendantOf(workspace.Vehicles) then
-				v4 = p12
+		if self.Local and now - self.LastImpact > 0.1 then
+			self.LastImpact = now
+			if hitPart:IsDescendantOf(workspace.Vehicles) then
+				local current = hitPart
 				count = 0
 				repeat
-					v4 = v4.Parent
+					current = current.Parent
 					count = count + 1
-					if v4 ~= nil and v4:FindFirstChild("BoundingBox") then
+					if current ~= nil and current:FindFirstChild("BoundingBox") then
 						break
 					end
 				until count >= 5
-				local v5 = if v4 == nil then false else v4:FindFirstChild("BoundingBox")
-				if v5 then
-					v3:FireServer("u" .. ("m3wmc9"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("p2j4j4qac"):sub(5, 6):reverse() .. "" .. "" .. ("u5ej"):sub(2, 2):reverse():reverse():reverse() .. "uqm", v5.Parent, p1.__ClassName)
+				local vehicleBoundingBox = if current == nil then false else current:FindFirstChild("BoundingBox")
+				if vehicleBoundingBox then
+					gunEvent:FireServer("uw4j5uqm", vehicleBoundingBox.Parent, self.__ClassName)
 				end
 			end
-			if p12.Name == "ShootingRangePart" then
-				Audio.ObjectLocal(p12, 737592495, {
+			if hitPart.Name == "ShootingRangePart" then
+				Audio.ObjectLocal(hitPart, 737592495, {
 					Volume = 1,
 					Pitch = 2 + math.random() * 0.2,
 					EmitterSize = 15
 				})
-				Audio.ObjectLocal(p12, 690530166, {
+				Audio.ObjectLocal(hitPart, 690530166, {
 					MaxPlaybackTime = 0.8
 				})
 				return
 			end
-			if workspace:FindFirstChild("Museum") and p12:IsDescendantOf(workspace.Museum) then
-				v3:FireServer("s" .. ("wqs1pzrc"):sub(4, 4):reverse() .. "" .. "" .. ("x53bf"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("mixcgqt6fl"):sub(5, 6):reverse():reverse():reverse() .. "" .. "" .. ("l9ozxgem"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "g1", p12)
+			if workspace:FindFirstChild("Museum") and hitPart:IsDescendantOf(workspace.Museum) then
+				gunEvent:FireServer("s1bqgxg1", hitPart)
 				return
 			end
-			local v6 = p12
+			local current = hitPart
 			while true do
-				local v7 = HomeItemBinder:Get(v6)
-				if v7 then
-					v7:Damage()
+				local homeItem = HomeItemBinder:Get(current)
+				if homeItem then
+					homeItem:Damage()
 					return
 				end
-				local v8 = CameraBinder:Get(v6)
-				if v8 then
-					v8:Damage()
+				local camera = CameraBinder:Get(current)
+				if camera then
+					camera:Damage()
 					return
 				end
-				local v9 = ExplodableBarrelBinder:Get(v6)
-				if v9 then
-					v3:FireServer("s" .. ("xb1d1"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("sibs"):sub(3, 3):reverse() .. "" .. "" .. ("nmxgqe"):sub(3, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("taago"):sub(4, 4):reverse() .. "1", v9.obj, p1.__ClassName)
+				local explodableBarrel = ExplodableBarrelBinder:Get(current)
+				if explodableBarrel then
+					gunEvent:FireServer("s1bqgxg1", explodableBarrel.obj, self.__ClassName)
 					return
 				end
-				v6 = v6.Parent
-				local _ = v6 == workspace
+				current = current.Parent
+				local _ = current == workspace
 			end
 		end
 	end)
-	local v32 = RunService.Heartbeat:Connect(function() --[[ Line: 554 | Upvalues: p1 (copy) ]]
+	local heartbeatConnection = RunService.Heartbeat:Connect(function()
 		debug.profilebegin("Gun Bullet Emitter Update")
-		p1.BulletEmitter:Update()
+		self.BulletEmitter:Update()
 		debug.profileend()
 	end)
-	p1.Maid:GiveTask(function() --[[ Line: 560 | Upvalues: p1 (copy), v32 (ref) ]]
-		if #p1.BulletEmitter.Bullets > 0 then
-			p1.BulletEmitter.OnQueueEmptied:Connect(function() --[[ Line: 563 | Upvalues: v32 (ref), p1 (ref) ]]
-				v32:Disconnect()
-				v32 = nil
-				p1.BulletEmitter:Destroy()
+	self.Maid:GiveTask(function()
+		if #self.BulletEmitter.Bullets > 0 then
+			self.BulletEmitter.OnQueueEmptied:Connect(function()
+				heartbeatConnection:Disconnect()
+				heartbeatConnection = nil
+				self.BulletEmitter:Destroy()
 			end)
 		else
-			v32:Disconnect()
-			v32 = nil
-			p1.BulletEmitter:Destroy()
+			heartbeatConnection:Disconnect()
+			heartbeatConnection = nil
+			self.BulletEmitter:Destroy()
 		end
 	end)
 end
-function t3.SetupSprings(p1, p2) --[[ Line: 575 | Upvalues: Spring (copy) ]]
-	if p1.Local and (p2 and p2.SpringItemOffset) then
-		p1.SpringItemOffset = p2.SpringItemOffset
-		p1.SpringItemOffset.Damp = 0.7
-		p1.SpringItemOffset.Freq = 50
-		p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
+
+function Gun.SetupSprings(self, previousSprings)
+	if self.Local and (previousSprings and previousSprings.SpringItemOffset) then
+		self.SpringItemOffset = previousSprings.SpringItemOffset
+		self.SpringItemOffset.Damp = 0.7
+		self.SpringItemOffset.Freq = 50
+		self.SpringItemOffset:SetTarget(self.Config.Motion.Hip.Springs.ItemOffset)
 	else
-		p1.SpringItemOffset = Spring.new(p1.Config.Motion.Hip.Springs.ItemOffset, Vector3.new(), 0.7, 50)
+		self.SpringItemOffset = Spring.new(self.Config.Motion.Hip.Springs.ItemOffset, Vector3.new(), 0.7, 50)
 	end
-	if p1.Local and (p2 and p2.SpringItemRotation) then
-		p1.SpringItemRotation = p2.SpringItemRotation
-		p1.SpringItemRotation.Damp = 0.9
-		p1.SpringItemRotation.Freq = 25
-		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
+	if self.Local and (previousSprings and previousSprings.SpringItemRotation) then
+		self.SpringItemRotation = previousSprings.SpringItemRotation
+		self.SpringItemRotation.Damp = 0.9
+		self.SpringItemRotation.Freq = 25
+		self.SpringItemRotation:SetTarget(self.Config.Motion.Hip.Springs.ItemRotation)
 	else
-		p1.SpringItemRotation = Spring.new(p1.Config.Motion.Hip.Springs.ItemRotation, Vector3.new(), 0.9, 25)
+		self.SpringItemRotation = Spring.new(self.Config.Motion.Hip.Springs.ItemRotation, Vector3.new(), 0.9, 25)
 	end
-	if p1.Local and (p2 and p2.SpringNeckRotation) then
-		p1.SpringNeckRotation = p2.SpringNeckRotation
-		p1.SpringNeckRotation.Damp = 0.9
-		p1.SpringNeckRotation.Freq = 25
-		p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
+	if self.Local and (previousSprings and previousSprings.SpringNeckRotation) then
+		self.SpringNeckRotation = previousSprings.SpringNeckRotation
+		self.SpringNeckRotation.Damp = 0.9
+		self.SpringNeckRotation.Freq = 25
+		self.SpringNeckRotation:SetTarget(self.Config.Motion.Hip.Springs.NeckRotation)
 	else
-		p1.SpringNeckRotation = Spring.new(p1.Config.Motion.Hip.Springs.NeckRotation, Vector3.new(), 0.9, 25)
+		self.SpringNeckRotation = Spring.new(self.Config.Motion.Hip.Springs.NeckRotation, Vector3.new(), 0.9, 25)
 	end
 end
-function t3.UpdateItemSprings(p1) --[[ Line: 605 | Upvalues: FromAxisAngle (copy) ]]
-	local v1 = p1.SpringItemOffset:Update()
-	local v2, v3 = p1.SpringItemRotation:Update()
-	local v4 = FromAxisAngle(v2)
-	local v5 = FromAxisAngle(v3 * 0.01)
-	p1.ItemOffsetPosition = v1
-	p1.ItemRotationCFrame = v4
-	p1.ItemRotationVelocityCFrame = v5
+
+function Gun.UpdateItemSprings(self)
+	local offsetPosition = self.SpringItemOffset:Update()
+	local rotationPosition, rotationVelocity = self.SpringItemRotation:Update()
+	local rotationCFrame = FromAxisAngle(rotationPosition)
+	local rotationVelocityCFrame = FromAxisAngle(rotationVelocity * 0.01)
+	self.ItemOffsetPosition = offsetPosition
+	self.ItemRotationCFrame = rotationCFrame
+	self.ItemRotationVelocityCFrame = rotationVelocityCFrame
 end
-function t3.UpdateItemJoints(p1) --[[ Line: 616 ]] end
-function t3.ApplyItemJointsC1(p1) --[[ Line: 617 ]]
-	if p1.Motor then
-		p1.Motor.C1 = p1.ItemRotationCFrame * CFrame.new(p1.ItemOffsetPosition) * p1.JointWaist.C1
+
+function Gun.UpdateItemJoints(self) end
+
+function Gun.ApplyItemJointsC1(self)
+	if self.Motor then
+		self.Motor.C1 = self.ItemRotationCFrame * CFrame.new(self.ItemOffsetPosition) * self.JointWaist.C1
 	end
 end
-function t3.ApplyItemJointsTransform(p1) --[[ Line: 622 ]]
-	if p1.Motor then
-		p1.Motor.Transform = (p1.ItemRotationCFrame * CFrame.new(p1.ItemOffsetPosition) * p1.JointWaist.C1):Inverse()
+
+function Gun.ApplyItemJointsTransform(self)
+	if self.Motor then
+		self.Motor.Transform = (self.ItemRotationCFrame * CFrame.new(self.ItemOffsetPosition) * self.JointWaist.C1):Inverse()
 	end
 end
-function t3.UpdateBodySprings(p1) --[[ Line: 627 ]]
-	p1.NeckRotationPosition = p1.SpringNeckRotation:Update()
+
+function Gun.UpdateBodySprings(self)
+	self.NeckRotationPosition = self.SpringNeckRotation:Update()
 end
-function t3.UpdateMousePosition(p1) --[[ Line: 631 | Upvalues: v4 (ref) ]]
-	local v1 = tick()
-	local v2 = if p1.Local then p1:ProjectMouseLocationToWorld((p1:GetMouseLocation())) else p1.SpringThirdMousePosition:Update()
-	p1.MousePosition = v2
-	if p1.Local and (v4 and v1 - p1.LastReplicateMousePosition > 0.25) then
-		p1.LastReplicateMousePosition = v1
-		v4:FireServer(v2)
+
+function Gun.UpdateMousePosition(self)
+	local now = tick()
+	local mousePos = if self.Local then self:ProjectMouseLocationToWorld((self:GetMouseLocation())) else self.SpringThirdMousePosition:Update()
+	self.MousePosition = mousePos
+	if self.Local and (mouseMovementRemote and now - self.LastReplicateMousePosition > 0.25) then
+		self.LastReplicateMousePosition = now
+		mouseMovementRemote:FireServer(mousePos)
 	end
 end
-function t3.ComputeBodyJoints(p1) --[[ Line: 651 | Upvalues: GeomUtils (copy), FromAxisAngle (copy) ]]
-	local JointRoot = p1.JointRoot
-	local JointWaist = p1.JointWaist
-	p1.JointWaist.Transform = CFrame.new()
-	p1.JointNeck.Transform = CFrame.new()
-	local v1 = (p1.RootPart.CFrame * JointRoot.C0 * JointRoot.Transform * JointRoot.C1:Inverse() * p1.JointWaistC0 * JointWaist.Transform):PointToObjectSpace(p1.MousePosition)
-	local v2 = p1.ItemRotationCFrame:Inverse() * JointWaist.C1:Inverse() * p1.ItemRotationCFrame * CFrame.new(p1.ItemOffsetPosition + p1.TipOffset) * JointWaist.C1
-	local v3, v4 = GeomUtils.offsetLookAtTarget(v2.x, v2.y, v2.z, v1.x, v1.y, v1.z)
-	if v4 < -1.382300767579509 then
-		v4 = -1.382300767579509
+
+function Gun.ComputeBodyJoints(self)
+	local JointRoot = self.JointRoot
+	local JointWaist = self.JointWaist
+	self.JointWaist.Transform = CFrame.new()
+	self.JointNeck.Transform = CFrame.new()
+	local localMouseDir = (self.RootPart.CFrame * JointRoot.C0 * JointRoot.Transform * JointRoot.C1:Inverse() * self.JointWaistC0 * JointWaist.Transform):PointToObjectSpace(self.MousePosition)
+	local tipOffset = self.ItemRotationCFrame:Inverse() * JointWaist.C1:Inverse() * self.ItemRotationCFrame * CFrame.new(self.ItemOffsetPosition + self.TipOffset) * JointWaist.C1
+	local yawAngle, pitchAngle = GeomUtils.offsetLookAtTarget(tipOffset.x, tipOffset.y, tipOffset.z, localMouseDir.x, localMouseDir.y, localMouseDir.z)
+	if pitchAngle < -1.382300767579509 then
+		pitchAngle = -1.382300767579509
 	end
-	p1.JointWaistTransform = CFrame.Angles(0, v3, 0) * CFrame.Angles(v4, 0, 0) * p1.ItemRotationCFrame:inverse()
-	p1.JointNeckTransform = p1.ItemRotationCFrame * FromAxisAngle(p1.NeckRotationPosition) * p1.ItemRotationVelocityCFrame
+	self.JointWaistTransform = CFrame.Angles(0, yawAngle, 0) * CFrame.Angles(pitchAngle, 0, 0) * self.ItemRotationCFrame:inverse()
+	self.JointNeckTransform = self.ItemRotationCFrame * FromAxisAngle(self.NeckRotationPosition) * self.ItemRotationVelocityCFrame
 end
-function t3.ApplyBodyJointsC1(p1) --[[ Line: 684 | Upvalues: ConstraintUtils (copy) ]]
-	if p1.JointWaistTransform then
-		ConstraintUtils.setJointC0(p1.JointWaist, p1.JointWaistC0 * p1.JointWaistTransform)
-		ConstraintUtils.setJointC0(p1.JointNeck, p1.JointNeckC0 * p1.JointNeckTransform)
-	end
-end
-function t3.ApplyBodyJointsTransform(p1) --[[ Line: 690 ]]
-	if p1.JointWaistTransform then
-		p1.JointWaist.Transform = p1.JointWaistTransform
-		p1.JointNeck.Transform = p1.JointNeckTransform
+
+function Gun.ApplyBodyJointsC1(self)
+	if self.JointWaistTransform then
+		ConstraintUtils.setJointC0(self.JointWaist, self.JointWaistC0 * self.JointWaistTransform)
+		ConstraintUtils.setJointC0(self.JointNeck, self.JointNeckC0 * self.JointNeckTransform)
 	end
 end
-function t3.ClearBodyTransform(p1) --[[ Line: 696 ]]
-	p1.JointWaist.Transform = CFrame.new()
-	p1.JointNeck.Transform = CFrame.new()
+
+function Gun.ApplyBodyJointsTransform(self)
+	if self.JointWaistTransform then
+		self.JointWaist.Transform = self.JointWaistTransform
+		self.JointNeck.Transform = self.JointNeckTransform
+	end
 end
-function t3.UpdateArmIK(p1) --[[ Line: 703 ]]
-	local IK = p1.IK
-	local Model = p1.Model
+
+function Gun.ClearBodyTransform(self)
+	self.JointWaist.Transform = CFrame.new()
+	self.JointNeck.Transform = CFrame.new()
+end
+
+function Gun.UpdateArmIK(self)
+	local IK = self.IK
+	local Model = self.Model
 	IK.RightArm = Model.Skeleton.RightArm.Position
 	IK.LeftArm = Model.Skeleton.LeftArm.Position
-	IK.RightAngle = p1.Config.Motion.RightElbowAngle
-	IK.LeftAngle = p1.Config.Motion.LeftElbowAngle
+	IK.RightAngle = self.Config.Motion.RightElbowAngle
+	IK.LeftAngle = self.Config.Motion.LeftElbowAngle
 end
-function t3.ComputeArmJoints(p1) --[[ Line: 712 | Upvalues: R15IKv2 (copy) ]]
-	if p1.Model:IsDescendantOf(workspace) then
-		if p1.Character.PrimaryPart then
-			p1:UpdateArmIK()
-			R15IKv2.ComputeArms(p1.IK)
+
+function Gun.ComputeArmJoints(self)
+	if self.Model:IsDescendantOf(workspace) then
+		if self.Character.PrimaryPart then
+			self:UpdateArmIK()
+			R15IKv2.ComputeArms(self.IK)
 		end
 	end
 end
-function t3.ApplyArmJoints(p1) --[[ Line: 727 | Upvalues: R15IKv2 (copy) ]]
-	local IK = p1.IK
+
+function Gun.ApplyArmJoints(self)
+	local IK = self.IK
 	R15IKv2.ApplyArms(IK)
-	if p1.Config.Motion.RightWristRotation then
-		IK.RightWrist.Transform = p1.Config.Motion.RightWristRotation
+	if self.Config.Motion.RightWristRotation then
+		IK.RightWrist.Transform = self.Config.Motion.RightWristRotation
 	end
-	if p1.Config.Motion.LeftWristRotation then
-		IK.LeftWrist.Transform = p1.Config.Motion.LeftWristRotation
+	if self.Config.Motion.LeftWristRotation then
+		IK.LeftWrist.Transform = self.Config.Motion.LeftWristRotation
 	end
 end
-function t3.ReloadDropAmmoVisual(p1) --[[ Line: 738 | Upvalues: Debris (copy) ]]
-	local Ammo = p1.Model.Model:FindFirstChild("Ammo")
+
+function Gun.ReloadDropAmmoVisual(self)
+	local Ammo = self.Model.Model:FindFirstChild("Ammo")
 	if Ammo then
-		local v1 = Ammo:Clone()
-		v1:ClearAllChildren()
-		v1.CFrame = Ammo.CFrame
-		v1.CanCollide = true
-		v1.CollisionGroup = "NoCollide"
-		v1.Velocity = Vector3.new(0, -20, 0)
-		v1.Parent = workspace
-		Debris:AddItem(v1, 6)
+		local droppedAmmo = Ammo:Clone()
+		droppedAmmo:ClearAllChildren()
+		droppedAmmo.CFrame = Ammo.CFrame
+		droppedAmmo.CanCollide = true
+		droppedAmmo.CollisionGroup = "NoCollide"
+		droppedAmmo.Velocity = Vector3.new(0, -20, 0)
+		droppedAmmo.Parent = workspace
+		Debris:AddItem(droppedAmmo, 6)
 		Ammo.Transparency = 1
 	end
 end
-function t3.ReloadRefillAmmoVisual(p1) --[[ Line: 754 ]]
-	local Ammo = p1.Model.Model:FindFirstChild("Ammo")
+
+function Gun.ReloadRefillAmmoVisual(self)
+	local Ammo = self.Model.Model:FindFirstChild("Ammo")
 	if Ammo then
 		Ammo.Transparency = 0
 	end
 end
-function t3.ReloadDropAmmoSound(p1) --[[ Line: 762 ]]
+
+function Gun.ReloadDropAmmoSound(self)
 	error("TODO: Implement")
 end
-function t3.ReloadRefillAmmoSound(p1) --[[ Line: 765 ]]
+
+function Gun.ReloadRefillAmmoSound(self)
 	error("TODO: Implement")
 end
-function t3._reloadBroadcast(p1) --[[ Line: 769 | Upvalues: GunSystemConsts (copy) ]]
-	local v1 = p1.inventoryItemValue:FindFirstChild(GunSystemConsts.RELOAD_REMOTE_NAME)
-	if v1 then
-		v1:FireServer()
+
+function Gun._reloadBroadcast(self)
+	local reloadRemote = self.inventoryItemValue:FindFirstChild(GunSystemConsts.RELOAD_REMOTE_NAME)
+	if reloadRemote then
+		reloadRemote:FireServer()
 	end
 end
-function t3.ReloadLocal(p1, p2) --[[ Line: 775 ]]
-	p1:StartReloadProgressCircle()
+
+function Gun.ReloadLocal(self, reloadTime)
+	self:StartReloadProgressCircle()
 	return true
 end
-function t3.ReloadAnyone(p1) --[[ Line: 779 ]]
-	p1:ReloadDropAmmoVisual()
-	p1:ReloadDropAmmoSound()
-	task.delay(p1.Config.ReloadTime - (p1.Config.LocalReloadOffset or 0), function() --[[ Line: 785 | Upvalues: p1 (copy) ]]
-		if p1.Destroyed then
+
+function Gun.ReloadAnyone(self)
+	self:ReloadDropAmmoVisual()
+	self:ReloadDropAmmoSound()
+	task.delay(self.Config.ReloadTime - (self.Config.LocalReloadOffset or 0), function()
+		if self.Destroyed then
 			return false
 		else
-			p1:ReloadRefillAmmoVisual()
-			if p1.Destroyed then
+			self:ReloadRefillAmmoVisual()
+			if self.Destroyed then
 				return false
 			else
-				p1:ReloadRefillAmmoSound()
-				return not p1.Destroyed
+				self:ReloadRefillAmmoSound()
+				return not self.Destroyed
 			end
 		end
 	end)
 end
-function t3._checkReloadCondition(p1) --[[ Line: 802 ]]
-	if p1.IsReloading or p1.Local and p1.inventoryItemValue:GetAttribute("IsReloading") then
+
+function Gun._checkReloadCondition(self)
+	if self.IsReloading or self.Local and self.inventoryItemValue:GetAttribute("IsReloading") then
 		return false
 	else
-		return not (p1:GetAmmoLeft() <= 0)
+		return not (self:GetAmmoLeft() <= 0)
 	end
 end
-function t3.Reload(p1) --[[ Line: 816 ]]
-	if p1:_checkReloadCondition() then
-		p1.IsReloading = true
-		task.delay(p1.Config.ReloadTime, function() --[[ Line: 824 | Upvalues: p1 (copy) ]]
-			if p1.Destroyed then
+
+function Gun.Reload(self)
+	if self:_checkReloadCondition() then
+		self.IsReloading = true
+		task.delay(self.Config.ReloadTime, function()
+			if self.Destroyed then
 				return false
 			else
-				p1.IsReloading = false
+				self.IsReloading = false
 				return true
 			end
 		end)
-		if p1.Local or p1.SimulateLocal then
-			p1:_reloadBroadcast()
+		if self.Local or self.SimulateLocal then
+			self:_reloadBroadcast()
 		end
-		if p1.Local then
-			p1:ReloadLocal()
+		if self.Local then
+			self:ReloadLocal()
 		end
-		p1:ReloadAnyone()
+		self:ReloadAnyone()
 		return true
 	else
 		return false
 	end
 end
-function t3.GetAmmoLeft(p1) --[[ Line: 840 | Upvalues: InventoryItemUtils (copy) ]]
-	return InventoryItemUtils.getAttr(p1.inventoryItemValue, "AmmoLeft") or (1 / 0)
+
+function Gun.GetAmmoLeft(self)
+	return InventoryItemUtils.getAttr(self.inventoryItemValue, "AmmoLeft") or (1 / 0)
 end
-function t3.ShootCheckConditions(p1) --[[ Line: 844 | Upvalues: InventoryItemUtils (copy), RayCast (copy) ]]
-	local Tip = p1.Tip
-	if not (p1.IsReloading or (p1.IsEquipping or (p1.BlockFire or p1.inventoryItemValue:GetAttribute("IsReloading")))) then
-		if p1.Local then
-			if InventoryItemUtils.getAttr(p1.inventoryItemValue, "AmmoCurrentLocal") <= 0 then
-				p1:ShootSound(true)
-				if p1.IsReloading == false then
-					p1:InputBegan({
+
+function Gun.ShootCheckConditions(self)
+	local Tip = self.Tip
+	if not (self.IsReloading or (self.IsEquipping or (self.BlockFire or self.inventoryItemValue:GetAttribute("IsReloading")))) then
+		if self.Local then
+			if InventoryItemUtils.getAttr(self.inventoryItemValue, "AmmoCurrentLocal") <= 0 then
+				self:ShootSound(true)
+				if self.IsReloading == false then
+					self:InputBegan({
 						UserInputType = Enum.UserInputType.Keyboard,
 						KeyCode = Enum.KeyCode.R
 					})
 				end
 			elseif Tip then
-				local Position = p1.RootPart.Position
-				local v1 = Tip.Position - Position
-				local _, v2 = RayCast.RayIgnoreNonCollideWithIgnoreList(Position, v1.Unit, v1.Magnitude, p1.IgnoreList, nil, nil, p1._customCollideFunc)
-				if (v2 - Tip.Position).Magnitude > 0.1 then
+				local Position = self.RootPart.Position
+				local tipDelta = Tip.Position - Position
+				local _, hitPos = RayCast.RayIgnoreNonCollideWithIgnoreList(Position, tipDelta.Unit, tipDelta.Magnitude, self.IgnoreList, nil, nil, self._customCollideFunc)
+				if (hitPos - Tip.Position).Magnitude > 0.1 then
 					return false
 				else
-					return p1:CheckNextShotPossible() and true or false
+					return self:CheckNextShotPossible() and true or false
 				end
 			else
-				return p1:CheckNextShotPossible() and true or false
+				return self:CheckNextShotPossible() and true or false
 			end
 		else
-			return p1:CheckNextShotPossible() and true or false
+			return self:CheckNextShotPossible() and true or false
 		end
 	end
 	return false
 end
-function t3.CheckNextShotPossible(p1) --[[ Line: 894 | Upvalues: GunUtils (copy) ]]
-	local v1 = workspace:GetServerTimeNow()
-	local v2 = GunUtils.getNextShotPossible(p1.Player)
-	return not (v2 and v1 < v2)
+
+function Gun.CheckNextShotPossible(self)
+	local serverTime = workspace:GetServerTimeNow()
+	local nextShotTime = GunUtils.getNextShotPossible(self.Player)
+	return not (nextShotTime and serverTime < nextShotTime)
 end
-function t3.SetNextShotPossible(p1) --[[ Line: 904 | Upvalues: GunUtils (copy) ]]
-	local FireFreq = p1.Config.FireFreq
-	local Player = p1.Player
-	local v1 = workspace:GetServerTimeNow()
-	GunUtils.setLastShotTime(Player, v1)
+
+function Gun.SetNextShotPossible(self)
+	local FireFreq = self.Config.FireFreq
+	local Player = self.Player
+	local serverTime = workspace:GetServerTimeNow()
+	GunUtils.setLastShotTime(Player, serverTime)
 	if FireFreq then
-		GunUtils.setNextShotPossible(Player, v1 + 1 / FireFreq)
+		GunUtils.setNextShotPossible(Player, serverTime + 1 / FireFreq)
 		return true
 	else
 		warn("No FireFreq")
 		return false
 	end
 end
-function t3.ShootLocal(p1) --[[ Line: 917 | Upvalues: HapticEffect (copy) ]]
-	if p1.Local then
+
+function Gun.ShootLocal(self)
+	if self.Local then
 		HapticEffect.basic(0.2, 0.25)
-		local v1 = if p1.IsScoping then 0.3 else 1
-		p1.SpringCamera:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 0.15 * p1.Config.CamShakeMagnitude * v1)
-		p1.CrossHair.Spring:Accelerate(600 * if p1.IsScoping then 0.3 else 1)
+		local scopeMultiplier = if self.IsScoping then 0.3 else 1
+		self.SpringCamera:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 0.15 * self.Config.CamShakeMagnitude * scopeMultiplier)
+		self.CrossHair.Spring:Accelerate(600 * if self.IsScoping then 0.3 else 1)
 		return true
 	else
 		return false
 	end
 end
-function t3.ShootOther(p1) --[[ Line: 933 | Upvalues: GunUtils (copy) ]]
-	p1.SpringItemOffset:Accelerate(Vector3.new(0, 0, 50) + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 3)
-	p1.SpringItemRotation:Accelerate((Vector3.new(-1, 2, 0)).Unit * 12 + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 2)
-	local v8 = p1.Tip.CFrame
-	local TipDirection = p1.TipDirection
+
+function Gun.ShootOther(self)
+	self.SpringItemOffset:Accelerate(Vector3.new(0, 0, 50) + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 3)
+	self.SpringItemRotation:Accelerate((Vector3.new(-1, 2, 0)).Unit * 12 + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 2)
+	local tipCFrame = self.Tip.CFrame
+	local TipDirection = self.TipDirection
 	if TipDirection then
-		local function getLocalBulletDirection() --[[ Line: 947 | Upvalues: p1 (copy), GunUtils (ref), v8 (copy), TipDirection (copy) ]]
-			return GunUtils.getBulletDirection(v8, TipDirection, (p1.BulletSpread or 0) + (p1.Config.BulletSpread or 0))
+		local function getLocalBulletDirection()
+			return GunUtils.getBulletDirection(tipCFrame, TipDirection, (self.BulletSpread or 0) + (self.Config.BulletSpread or 0))
 		end
-		if p1.Config.BulletsPerShot then
-			for i = 1, p1.Config.BulletsPerShot do
-				p1.BulletEmitter:Emit(v8.Position, GunUtils.getBulletDirection(v8, TipDirection, (p1.BulletSpread or 0) + (p1.Config.BulletSpread or 0)), p1.Config.BulletSpeed)
+		if self.Config.BulletsPerShot then
+			for i = 1, self.Config.BulletsPerShot do
+				self.BulletEmitter:Emit(tipCFrame.Position, GunUtils.getBulletDirection(tipCFrame, TipDirection, (self.BulletSpread or 0) + (self.Config.BulletSpread or 0)), self.Config.BulletSpeed)
 			end
 		else
-			p1.BulletEmitter:Emit(v8.Position, GunUtils.getBulletDirection(v8, TipDirection, (p1.BulletSpread or 0) + (p1.Config.BulletSpread or 0)), p1.Config.BulletSpeed)
+			self.BulletEmitter:Emit(tipCFrame.Position, GunUtils.getBulletDirection(tipCFrame, TipDirection, (self.BulletSpread or 0) + (self.Config.BulletSpread or 0)), self.Config.BulletSpeed)
 		end
 		return true
 	end
 end
-function t3.ShootFx(p1) --[[ Line: 962 ]]
-	local Tip = p1.Tip
+
+function Gun.ShootFx(self)
+	local Tip = self.Tip
 	if Tip then
 		local _ = ({
 			Flintlock = 1,
@@ -751,7 +803,7 @@ function t3.ShootFx(p1) --[[ Line: 962 ]]
 			Revolver = 20,
 			Shotgun = 20,
 			Sniper = 3
-		})[p1.__ClassName]
+		})[self.__ClassName]
 		local ParticleEmitter = Tip:FindFirstChild("ParticleEmitter")
 		if ParticleEmitter then
 			ParticleEmitter:Emit(1)
@@ -763,154 +815,166 @@ function t3.ShootFx(p1) --[[ Line: 962 ]]
 		local PointLight = Tip:FindFirstChild("PointLight", true)
 		if PointLight then
 			PointLight.Enabled = true
-			task.delay(0.1, function() --[[ Line: 990 | Upvalues: PointLight (copy) ]]
+			task.delay(0.1, function()
 				PointLight.Enabled = false
 			end)
 		end
 	end
 end
-function t3.Shoot(p1) --[[ Line: 995 ]]
-	p1:ShootLocal()
-	p1:ShootOther()
-	p1:ShootSound(false)
-	p1:ShootFx()
+
+function Gun.Shoot(self)
+	self:ShootLocal()
+	self:ShootOther()
+	self:ShootSound(false)
+	self:ShootFx()
 	return true
 end
-function t3.ShootSound(p1, p2) --[[ Line: 1002 ]]
+
+function Gun.ShootSound(self, isEmpty)
 	error("TODO: Implement")
 end
-function t3._attemptShoot(p1) --[[ Line: 1005 ]]
-	if p1:ShootCheckConditions() then
-		if p1.PreFireFunc then
-			p1:PreFireFunc()
-			if p1.Destroyed or not p1:ShootCheckConditions() then
+
+function Gun._attemptShoot(self)
+	if self:ShootCheckConditions() then
+		if self.PreFireFunc then
+			self:PreFireFunc()
+			if self.Destroyed or not self:ShootCheckConditions() then
 				return false
 			else
-				p1:DecrementAmmo()
-				p1:SetNextShotPossible()
-				if p1.Local or p1.SimulateLocal then
-					p1:_shootBroadcast()
+				self:DecrementAmmo()
+				self:SetNextShotPossible()
+				if self.Local or self.SimulateLocal then
+					self:_shootBroadcast()
 				end
-				p1:Shoot()
+				self:Shoot()
 				return true
 			end
 		else
-			p1:DecrementAmmo()
-			p1:SetNextShotPossible()
-			if p1.Local or p1.SimulateLocal then
-				p1:_shootBroadcast()
+			self:DecrementAmmo()
+			self:SetNextShotPossible()
+			if self.Local or self.SimulateLocal then
+				self:_shootBroadcast()
 			end
-			p1:Shoot()
+			self:Shoot()
 			return true
 		end
 	else
 		return false
 	end
 end
-function t3._startReloading(p1) --[[ Line: 1026 ]]
-	if p1.IsReloading == false then
-		p1:InputBegan({
+
+function Gun._startReloading(self)
+	if self.IsReloading == false then
+		self:InputBegan({
 			UserInputType = Enum.UserInputType.Keyboard,
 			KeyCode = Enum.KeyCode.R
 		})
 	end
 end
-function t3.DecrementAmmo(p1) --[[ Line: 1031 | Upvalues: InventoryItemUtils (copy) ]]
-	if p1.Local or p1.SimulateLocal then
-		local v1 = InventoryItemUtils.getAttr(p1.inventoryItemValue, "AmmoCurrent") - 1
-		InventoryItemUtils.setAttr(p1.inventoryItemValue, "AmmoCurrentLocal", v1)
-		if v1 <= 0 then
-			p1:_startReloading()
+
+function Gun.DecrementAmmo(self)
+	if self.Local or self.SimulateLocal then
+		local newAmmo = InventoryItemUtils.getAttr(self.inventoryItemValue, "AmmoCurrent") - 1
+		InventoryItemUtils.setAttr(self.inventoryItemValue, "AmmoCurrentLocal", newAmmo)
+		if newAmmo <= 0 then
+			self:_startReloading()
 		end
 		return true
 	else
 		return false
 	end
 end
-function t3._shootBroadcast(p1) --[[ Line: 1044 | Upvalues: GunSystemConsts (copy) ]]
-	local v1 = p1.inventoryItemValue:FindFirstChild(GunSystemConsts.SHOOT_REMOTE_NAME)
-	if v1 then
-		v1:FireServer()
+
+function Gun._shootBroadcast(self)
+	local shootRemote = self.inventoryItemValue:FindFirstChild(GunSystemConsts.SHOOT_REMOTE_NAME)
+	if shootRemote then
+		shootRemote:FireServer()
 	end
 end
-function t3.UpdateCrossHair(p1) --[[ Line: 1050 ]]
-	if p1.CrossHair then
-		p1.CrossHair:Update(p1:GetMouseLocation())
+
+function Gun.UpdateCrossHair(self)
+	if self.CrossHair then
+		self.CrossHair:Update(self:GetMouseLocation())
 	end
 end
-function t3.RenderStepped(p1) --[[ Line: 1055 | Upvalues: MovementRollService (copy) ]]
-	if p1.Local then
-		p1:UpdateCrossHair()
+
+function Gun.RenderStepped(self)
+	if self.Local then
+		self:UpdateCrossHair()
 	end
 	debug.profilebegin("UpdateMousePosition")
-	p1:UpdateMousePosition()
+	self:UpdateMousePosition()
 	debug.profileend()
 	debug.profilebegin("UpdateItemSprings")
-	p1:UpdateItemSprings()
+	self:UpdateItemSprings()
 	debug.profileend()
 	debug.profilebegin("UpdateBodySprings")
-	p1:UpdateBodySprings()
+	self:UpdateBodySprings()
 	debug.profileend()
 	debug.profilebegin("ComputeBodyJoints")
-	p1:ComputeBodyJoints()
+	self:ComputeBodyJoints()
 	debug.profileend()
-	if p1.Local then
-		if not MovementRollService.isPlayerRolling(p1.Player) then
+	if self.Local then
+		if not MovementRollService.isPlayerRolling(self.Player) then
 			debug.profilebegin("ApplyBodyJoints")
-			p1:ApplyBodyJointsC1()
+			self:ApplyBodyJointsC1()
 			debug.profileend()
 		end
 		debug.profilebegin("ApplyItemJoints")
-		p1:ApplyItemJointsC1()
+		self:ApplyItemJointsC1()
 		debug.profileend()
 	end
-	p1:UpdateItemJoints()
+	self:UpdateItemJoints()
 	debug.profilebegin("ComputeArmJoints")
-	p1:ComputeArmJoints()
+	self:ComputeArmJoints()
 	debug.profileend()
-	local Tip = p1.Tip
+	local Tip = self.Tip
 	if Tip ~= nil then
-		p1.TipDirection = Tip.CFrame.LookVector
+		self.TipDirection = Tip.CFrame.LookVector
 	end
-	if (p1.Local or p1.SimulateLocal) and p1.IsShooting == true then
-		p1:_attemptShoot()
+	if (self.Local or self.SimulateLocal) and self.IsShooting == true then
+		self:_attemptShoot()
 	end
 end
-function t3.Stepped(p1) --[[ Line: 1106 ]]
-	p1:ClearBodyTransform()
-	if not p1.Local then
+
+function Gun.Stepped(self)
+	self:ClearBodyTransform()
+	if not self.Local then
 		debug.profilebegin("ApplyBodyJoints")
-		p1:ApplyBodyJointsTransform()
+		self:ApplyBodyJointsTransform()
 		debug.profileend()
 		debug.profilebegin("ApplyItemJoints")
-		p1:ApplyItemJointsTransform()
+		self:ApplyItemJointsTransform()
 		debug.profileend()
 	end
-	p1:ApplyArmJoints()
+	self:ApplyArmJoints()
 end
-function t3.ShootBegin(p1, p2) --[[ Line: 1121 | Upvalues: InputUtils (copy) ]]
-	if p1.Config.FireAuto or InputUtils.isTouch() and p1.Config.FireAutoMobile then
-		p1.IsShooting = true
+
+function Gun.ShootBegin(self, input)
+	if self.Config.FireAuto or InputUtils.isTouch() and self.Config.FireAutoMobile then
+		self.IsShooting = true
 	else
-		p1:_attemptShoot()
+		self:_attemptShoot()
 	end
 end
-function t3.ShootEnd(p1, p2) --[[ Line: 1128 ]]
-	if p1.IsShooting == true then
-		p1.IsShooting = false
+
+function Gun.ShootEnd(self, input)
+	if self.IsShooting == true then
+		self.IsShooting = false
 	end
 end
-function t3.LocalScopeChanged(p1) --[[ Line: 1134 | Upvalues: AimAssist (copy), Interval (copy) ]]
+
+function Gun.LocalScopeChanged(self)
 	if AimAssist.canAimAssist() then
-		local maid = p1.maid
-		local function finishedCallback() --[[ Line: 1137 | Upvalues: maid (copy) ]]
+		local maid = self.maid
+		local function finishedCallback()
 			maid.aimAssistMaid = nil
 		end
-		if p1.IsScoping then
-			maid.aimAssistMaid = AimAssist.aimAssist(p1, finishedCallback)
-			maid.aimAssistScan = Interval.every(0.25):Connect(function() --[[ Line: 1142 | Upvalues: maid (copy), AimAssist (ref), p1 (copy), finishedCallback (copy) ]]
+		if self.IsScoping then
+			maid.aimAssistMaid = AimAssist.aimAssist(self, finishedCallback)
+			maid.aimAssistScan = Interval.every(0.25):Connect(function()
 				if maid.aimAssistMaid == nil then
-					maid.aimAssistMaid = AimAssist.aimAssist(p1, finishedCallback)
+					maid.aimAssistMaid = AimAssist.aimAssist(self, finishedCallback)
 				end
 			end)
 			return
@@ -919,244 +983,257 @@ function t3.LocalScopeChanged(p1) --[[ Line: 1134 | Upvalues: AimAssist (copy), 
 		maid.aimAssistScan = nil
 	end
 end
-function t3.ScopeBegin(p1) --[[ Line: 1155 | Upvalues: VehicleUtils (copy), ItemCamera (copy), v5 (ref) ]]
-	if p1.IsLeaning or (VehicleUtils.GetLocalVehiclePacket() or p1.IsScoping) then
+
+function Gun.ScopeBegin(self)
+	if self.IsLeaning or (VehicleUtils.GetLocalVehiclePacket() or self.IsScoping) then
 		return false
 	else
-		p1.SpringItemOffset:SetTarget(p1.Config.Motion.Scope.Springs.ItemOffset)
-		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Scope.Springs.ItemRotation)
-		p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Scope.Springs.NeckRotation)
-		if p1.Local then
-			ItemCamera.Zoom(p1.Config.Motion.Scope.FOV or 50)
-			p1.CrossHair:ADS(true)
-			if math.abs(v5 - 1) > 0.001 then
-				ItemCamera.setSensitivity(v5)
+		self.SpringItemOffset:SetTarget(self.Config.Motion.Scope.Springs.ItemOffset)
+		self.SpringItemRotation:SetTarget(self.Config.Motion.Scope.Springs.ItemRotation)
+		self.SpringNeckRotation:SetTarget(self.Config.Motion.Scope.Springs.NeckRotation)
+		if self.Local then
+			ItemCamera.Zoom(self.Config.Motion.Scope.FOV or 50)
+			self.CrossHair:ADS(true)
+			if math.abs(scopeSensitivity - 1) > 0.001 then
+				ItemCamera.setSensitivity(scopeSensitivity)
 			end
 		end
-		p1.IsScoping = true
-		if p1.Local then
-			p1:LocalScopeChanged()
+		self.IsScoping = true
+		if self.Local then
+			self:LocalScopeChanged()
 		end
 		return true
 	end
 end
-function t3.ScopeEnd(p1) --[[ Line: 1183 | Upvalues: ItemCamera (copy) ]]
-	if p1.IsLeaning then
+
+function Gun.ScopeEnd(self)
+	if self.IsLeaning then
 		return false
-	elseif p1.IsScoping then
-		p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
-		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
-		p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
-		if p1.Local then
+	elseif self.IsScoping then
+		self.SpringItemOffset:SetTarget(self.Config.Motion.Hip.Springs.ItemOffset)
+		self.SpringItemRotation:SetTarget(self.Config.Motion.Hip.Springs.ItemRotation)
+		self.SpringNeckRotation:SetTarget(self.Config.Motion.Hip.Springs.NeckRotation)
+		if self.Local then
 			ItemCamera.Zoom(70)
-			p1.CrossHair:ADS(false)
+			self.CrossHair:ADS(false)
 			ItemCamera.setSensitivity(1)
 		end
-		p1.IsScoping = false
-		if p1.Local then
-			p1:LocalScopeChanged()
+		self.IsScoping = false
+		if self.Local then
+			self:LocalScopeChanged()
 		end
 		return true
 	else
 		return false
 	end
 end
-function t3.SetLeaning(p1, p2, p3) --[[ Line: 1204 | Upvalues: v3 (ref) ]]
-	p1.IsLeaning = p2
-	p1.IsLeaningRight = p3
-	if p1.IsLeaning then
-		if p1.IsLeaningRight == true then
-			p1.SpringItemOffset:SetTarget(Vector3.new(0.9, 1, -1.9))
-			p1.SpringItemRotation:SetTarget(Vector3.new(0.2, 0, 0.6))
-			p1.SpringNeckRotation:SetTarget(Vector3.new(0, 0, -0.5))
+
+function Gun.SetLeaning(self, isLeaning, isLeaningRight)
+	self.IsLeaning = isLeaning
+	self.IsLeaningRight = isLeaningRight
+	if self.IsLeaning then
+		if self.IsLeaningRight == true then
+			self.SpringItemOffset:SetTarget(Vector3.new(0.9, 1, -1.9))
+			self.SpringItemRotation:SetTarget(Vector3.new(0.2, 0, 0.6))
+			self.SpringNeckRotation:SetTarget(Vector3.new(0, 0, -0.5))
 		else
-			p1.SpringItemOffset:SetTarget(Vector3.new(-0.6, 1, -1.9))
-			p1.SpringItemRotation:SetTarget(Vector3.new(0.2, 0, -0.6))
-			p1.SpringNeckRotation:SetTarget(Vector3.new(0, 0, 0.5))
+			self.SpringItemOffset:SetTarget(Vector3.new(-0.6, 1, -1.9))
+			self.SpringItemRotation:SetTarget(Vector3.new(0.2, 0, -0.6))
+			self.SpringNeckRotation:SetTarget(Vector3.new(0, 0, 0.5))
 		end
 	else
-		p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
-		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
-		p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
+		self.SpringItemOffset:SetTarget(self.Config.Motion.Hip.Springs.ItemOffset)
+		self.SpringItemRotation:SetTarget(self.Config.Motion.Hip.Springs.ItemRotation)
+		self.SpringNeckRotation:SetTarget(self.Config.Motion.Hip.Springs.NeckRotation)
 	end
-	if p1.Local then
-		v3:FireServer("s" .. "" .. ("w29csl96d"):sub(2, 5):reverse():reverse():reverse():reverse():reverse() .. "uk2", p2, p3)
+	if self.Local then
+		gunEvent:FireServer("ssc92uk2", isLeaning, isLeaningRight)
 	end
 end
-function t3.InputBegan(p1, p2, p3) --[[ Line: 1226 | Upvalues: UI (copy), Item (copy), ItemCamera (copy) ]]
-	if p3 then
+
+function Gun.InputBegan(self, input, gameProcessed)
+	if gameProcessed then
 		return false
 	end
-	local v1 = if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false
-	local v2 = p2.UserInputType == Enum.UserInputType.MouseButton2
-	local v3 = if p2.UserInputType == Enum.UserInputType.Keyboard and p2.KeyCode == Enum.KeyCode.R then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonX else false
-	local v4 = if p2.UserInputType == Enum.UserInputType.Keyboard then p2.KeyCode == Enum.KeyCode.V else false
-	local v5 = if type(p2) == "table" then p2.FlagToggleSkins ~= nil else false
-	if v1 then
-		p1:ShootBegin(p2)
-	elseif v2 and p1.ScopeBegin then
-		p1:ScopeBegin()
-		if p1.Local then
-			p1:BroadcastInputBegan(p2)
+	local isShoot = if input.UserInputType == Enum.UserInputType.MouseButton1 then true elseif input.UserInputType == Enum.UserInputType.Gamepad1 then input.KeyCode == Enum.KeyCode.ButtonR2 else false
+	local isScope = input.UserInputType == Enum.UserInputType.MouseButton2
+	local isReload = if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.R then true elseif input.UserInputType == Enum.UserInputType.Gamepad1 then input.KeyCode == Enum.KeyCode.ButtonX else false
+	local isSkinToggleKey = if input.UserInputType == Enum.UserInputType.Keyboard then input.KeyCode == Enum.KeyCode.V else false
+	local isSkinToggleFlag = if type(input) == "table" then input.FlagToggleSkins ~= nil else false
+	if isShoot then
+		self:ShootBegin(input)
+	elseif isScope and self.ScopeBegin then
+		self:ScopeBegin()
+		if self.Local then
+			self:BroadcastInputBegan(input)
 		end
-	elseif v3 and p1.Reload then
-		task.spawn(p1.Reload, p1)
-		if p1.Local then
-			p1:BroadcastInputBegan(p2)
+	elseif isReload and self.Reload then
+		task.spawn(self.Reload, self)
+		if self.Local then
+			self:BroadcastInputBegan(input)
 		end
-	elseif v4 then
+	elseif isSkinToggleKey then
 		if UI.IsOpen == false then
-			Item.InputBegan(p1, p2, p3)
+			Item.InputBegan(self, input, gameProcessed)
 		end
-	elseif v5 and UI.IsOpen == false then
+	elseif isSkinToggleFlag and UI.IsOpen == false then
 		UI.Open()
-		p1.CrossHair:Disable()
+		self.CrossHair:Disable()
 		if ItemCamera.Locked == true then
 			ItemCamera.setLocked(false)
-			function p1.Maid.undoCameraLock() --[[ Line: 1263 | Upvalues: ItemCamera (ref) ]]
+			function self.Maid.undoCameraLock()
 				ItemCamera.setLocked(true)
 			end
 		end
-	elseif v5 then
+	elseif isSkinToggleFlag then
 		UI.Close()
-		p1.CrossHair:Enable()
-		p1.Maid.undoCameraLock = nil
+		self.CrossHair:Enable()
+		self.Maid.undoCameraLock = nil
 	end
 end
-function t3.InputEnded(p1, p2, p3) --[[ Line: 1274 ]]
-	if p3 then
+
+function Gun.InputEnded(self, input, gameProcessed)
+	if gameProcessed then
 		return false
 	end
-	local v1 = if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false
-	local v2 = p2.UserInputType == Enum.UserInputType.MouseButton2
-	if v1 then
-		p1:ShootEnd(p2)
-	elseif v2 and p1.ScopeEnd then
-		p1:ScopeEnd()
-		if p1.Local then
-			p1:BroadcastInputEnded(p2)
+	local isShoot = if input.UserInputType == Enum.UserInputType.MouseButton1 then true elseif input.UserInputType == Enum.UserInputType.Gamepad1 then input.KeyCode == Enum.KeyCode.ButtonR2 else false
+	local isScope = input.UserInputType == Enum.UserInputType.MouseButton2
+	if isShoot then
+		self:ShootEnd(input)
+	elseif isScope and self.ScopeEnd then
+		self:ScopeEnd()
+		if self.Local then
+			self:BroadcastInputEnded(input)
 		end
 	end
 end
-function t3.SetThirdMousePosition(p1, p2) --[[ Line: 1292 ]]
-	p1.SpringThirdMousePosition:SetTarget(p2)
+
+function Gun.SetThirdMousePosition(self, position)
+	self.SpringThirdMousePosition:SetTarget(position)
 end
-function t3._getUncachedViewDist(p1) --[[ Line: 1295 | Upvalues: CurrentCamera (copy) ]]
-	return (p1.RootPart.Position - CurrentCamera.CFrame.Position).Magnitude
+
+function Gun._getUncachedViewDist(self)
+	return (self.RootPart.Position - CurrentCamera.CFrame.Position).Magnitude
 end
-function t3._getViewDist(p1) --[[ Line: 1298 ]]
-	local v1 = os.clock()
-	if v1 - p1._lastUpdateViewDist > 0.1 then
-		p1._lastUpdateViewDist = v1
-		local v2 = p1:_getUncachedViewDist()
-		p1._viewDist = v2
-		return v2
+
+function Gun._getViewDist(self)
+	local now = os.clock()
+	if now - self._lastUpdateViewDist > 0.1 then
+		self._lastUpdateViewDist = now
+		local dist = self:_getUncachedViewDist()
+		self._viewDist = dist
+		return dist
 	else
-		return p1._viewDist
+		return self._viewDist
 	end
 end
-function t3._getUpdateRate(p1, p2) --[[ Line: 1309 ]]
-	if p1.Model:IsDescendantOf(workspace) then
-		local v1 = p2 or 512
-		local v2 = p1:_getViewDist()
-		if v2 < v1 then
+
+function Gun._getUpdateRate(self, maxDist)
+	if self.Model:IsDescendantOf(workspace) then
+		local threshold = maxDist or 512
+		local dist = self:_getViewDist()
+		if dist < threshold then
 			return 0
 		else
-			return (v2 - v1) / (1024 - v1)
+			return (dist - threshold) / (1024 - threshold)
 		end
 	else
 		return 1
 	end
 end
-function t3.Equip(p1) --[[ Line: 1322 | Upvalues: InventoryItemUtils (copy), GunUtils (copy), GunSystemConsts (copy), RunService (copy) ]]
-	p1:RenderStepped()
-	p1:Stepped()
-	local v2 = GunUtils.getEquipTime((InventoryItemUtils.getName(p1.inventoryItemValue))) or GunSystemConsts.GUN_EQUIP_TIME
-	if GunUtils.getShouldAddEquipTime(p1) and v2 > 0 then
-		if InventoryItemUtils.getAttr(p1.inventoryItemValue, "AmmoCurrent") <= 0 then
-			p1.maid:GiveTask(task.defer(function() --[[ Line: 1334 | Upvalues: p1 (copy) ]]
-				p1:_startReloading()
+
+function Gun.Equip(self)
+	self:RenderStepped()
+	self:Stepped()
+	local equipTime = GunUtils.getEquipTime((InventoryItemUtils.getName(self.inventoryItemValue))) or GunSystemConsts.GUN_EQUIP_TIME
+	if GunUtils.getShouldAddEquipTime(self) and equipTime > 0 then
+		if InventoryItemUtils.getAttr(self.inventoryItemValue, "AmmoCurrent") <= 0 then
+			self.maid:GiveTask(task.defer(function()
+				self:_startReloading()
 			end))
 		else
-			p1.IsEquipping = true
-			p1:StartReloadProgressCircle(v2)
-			p1.maid:GiveTask(task.delay(v2, function() --[[ Line: 1340 | Upvalues: p1 (copy) ]]
-				p1.IsEquipping = false
+			self.IsEquipping = true
+			self:StartReloadProgressCircle(equipTime)
+			self.maid:GiveTask(task.delay(equipTime, function()
+				self.IsEquipping = false
 			end))
 		end
 	end
-	p1.maid:GiveTask(function() --[[ Line: 1346 | Upvalues: p1 (copy), GunUtils (ref) ]]
-		local Player = p1.Player
+	self.maid:GiveTask(function()
+		local Player = self.Player
 		if Player and Player.SetAttribute then
 			GunUtils.setNextShotPossible(Player, nil)
 		end
 	end)
-	local v3 = 0
-	if p1.Local then
-		p1.Maid:GiveTask(RunService.RenderStepped:Connect(function() --[[ Line: 1357 | Upvalues: p1 (copy), v3 (ref) ]]
-			if not p1.Destroyed then
-				local v1 = os.clock()
-				if v1 - v3 > p1:_getUpdateRate() then
-					v3 = v1
+	local lastRenderTime = 0
+	if self.Local then
+		self.Maid:GiveTask(RunService.RenderStepped:Connect(function()
+			if not self.Destroyed then
+				local now = os.clock()
+				if now - lastRenderTime > self:_getUpdateRate() then
+					lastRenderTime = now
 					debug.profilebegin("Gun RenderStepped")
-					p1:RenderStepped()
+					self:RenderStepped()
 					debug.profileend()
 				end
 			end
 		end))
 	else
-		p1.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 1370 | Upvalues: p1 (copy), v3 (ref) ]]
-			if not p1.Destroyed then
-				local v1 = os.clock()
-				if v1 - v3 > p1:_getUpdateRate() then
-					v3 = v1
+		self.Maid:GiveTask(RunService.Heartbeat:Connect(function()
+			if not self.Destroyed then
+				local now = os.clock()
+				if now - lastRenderTime > self:_getUpdateRate() then
+					lastRenderTime = now
 					debug.profilebegin("Gun RenderStepped")
-					p1:RenderStepped()
+					self:RenderStepped()
 					debug.profileend()
 				end
 			end
 		end))
 	end
-	local v4 = 0
-	p1.Maid:GiveTask(RunService.Stepped:Connect(function() --[[ Line: 1385 | Upvalues: p1 (copy), v4 (ref) ]]
-		if not p1.Destroyed then
-			local v1 = os.clock()
-			local v2 = p1:_getUpdateRate()
-			if p1.Local or p1.SimulateLocal then
-				v2 = 0
+	local lastSteppedTime = 0
+	self.Maid:GiveTask(RunService.Stepped:Connect(function()
+		if not self.Destroyed then
+			local now = os.clock()
+			local updateRate = self:_getUpdateRate()
+			if self.Local or self.SimulateLocal then
+				updateRate = 0
 			end
-			if v2 < v1 - v4 then
-				v4 = v1
+			if updateRate < now - lastSteppedTime then
+				lastSteppedTime = now
 				debug.profilebegin("Gun Stepped")
-				p1:Stepped()
+				self:Stepped()
 				debug.profileend()
 			end
 		end
 	end))
-	if p1.Heartbeat then
-		p1.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 1403 | Upvalues: p1 (copy) ]]
-			if not p1.Destroyed then
+	if self.Heartbeat then
+		self.Maid:GiveTask(RunService.Heartbeat:Connect(function()
+			if not self.Destroyed then
 				debug.profilebegin("Gun Heartbeat")
-				p1:Heartbeat()
+				self:Heartbeat()
 				debug.profileend()
 			end
 		end))
 	end
 end
-function t3.Unequip(p1) --[[ Line: 1412 | Upvalues: CurrentCamera (copy), UI (copy) ]]
-	if p1.IsLeaning then
-		p1:SetLeaning(false)
+
+function Gun.Unequip(self)
+	if self.IsLeaning then
+		self:SetLeaning(false)
 	end
-	if p1.IsScoping then
-		p1:ScopeEnd()
+	if self.IsScoping then
+		self:ScopeEnd()
 		CurrentCamera.FieldOfView = 70
 	end
-	if p1.Local and UI.IsOpen == true then
+	if self.Local and UI.IsOpen == true then
 		UI.Close()
 	end
 end
-function t3.Destroy(p1) --[[ Line: 1428 | Upvalues: Item (copy) ]]
-	p1:Unequip()
-	Item.Destroy(p1)
+
+function Gun.Destroy(self)
+	self:Unequip()
+	Item.Destroy(self)
 end
-return t3
+
+return Gun

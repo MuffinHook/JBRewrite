@@ -11,163 +11,163 @@ local PersistentCrewBattleUtils = require(ReplicatedStorage.PersistentCrewBattle
 local TextButton = require(script.Parent.TextButton)
 local Member = require(script.Parent.Member)
 local Flag = require(script.Parent.Flag)
-local v1 = Roact.PureComponent:extend("Info")
-function v1.init(p1) --[[ Line: 18 | Upvalues: Roact (copy), Players (copy), Notification (copy) ]]
-	p1:setState({
+local InfoComponent = Roact.PureComponent:extend("Info")
+function InfoComponent.init(self)
+	self:setState({
 		searchText = "",
 		isRenamingClan = false
 	})
-	function p1.onClickLeave() --[[ Line: 23 | Upvalues: p1 (copy) ]]
-		p1.props.attemptLeave()
+	function self.onClickLeave()
+		self.props.attemptLeave()
 	end
-	function p1.playerSearchTextBoxTextChanged(p12) --[[ Line: 27 | Upvalues: p1 (copy) ]]
-		p1:setState({
-			searchText = p12.Text
+	function self.playerSearchTextBoxTextChanged(textBox)
+		self:setState({
+			searchText = textBox.Text
 		})
 	end
-	function p1.crewSearchTextBoxFocusLost(p12, p2) --[[ Line: 33 | Upvalues: p1 (copy) ]]
-		if p2 then
-			p1.onClickViewClan()
+	function self.crewSearchTextBoxFocusLost(textBox, enterPressed)
+		if enterPressed then
+			self.onClickViewClan()
 		end
 	end
-	p1.crewSearchTextBoxRef = Roact.createRef()
-	function p1.onClickViewClan() --[[ Line: 40 | Upvalues: p1 (copy), Players (ref) ]]
-		local v1 = p1.crewSearchTextBoxRef:getValue()
-		local Text = v1.Text
-		if Text == "" then
+	self.crewSearchTextBoxRef = Roact.createRef()
+	function self.onClickViewClan()
+		local textBox = self.crewSearchTextBoxRef:getValue()
+		local text = textBox.Text
+		if text == "" then
 			return
 		end
-		v1.Text = ""
-		local v2 = Players:GetUserIdFromNameAsync(Text)
-		if v2 then
-			p1.props.attemptViewUserIdClan(v2)
+		textBox.Text = ""
+		local userId = Players:GetUserIdFromNameAsync(text)
+		if userId then
+			self.props.attemptViewUserIdClan(userId)
 		end
 	end
-	p1.crewRenameTextBoxRef = Roact.createRef()
-	function p1.renameCrewTextFocusLost() --[[ Line: 55 | Upvalues: p1 (copy) ]]
-		local v1 = p1.crewRenameTextBoxRef:getValue()
-		if v1 then
-			local Text = v1.Text
-			if Text ~= "" then
-				v1.Text = ""
-				p1:setState({
+	self.crewRenameTextBoxRef = Roact.createRef()
+	function self.renameCrewTextFocusLost()
+		local textBox = self.crewRenameTextBoxRef:getValue()
+		if textBox then
+			local text = textBox.Text
+			if text ~= "" then
+				textBox.Text = ""
+				self:setState({
 					isEditingClanName = false
 				})
-				p1.props.onClickRenameCrew(Text)
+				self.props.onClickRenameCrew(text)
 			end
 		end
 	end
-	function p1.onClickBattle(p12) --[[ Line: 71 | Upvalues: p1 (copy), Notification (ref) ]]
-		assert(typeof(p12) == "number", "count must be a number")
-		return function() --[[ Line: 73 | Upvalues: p1 (ref), Notification (ref), p12 (copy) ]]
-			if p1.props.isReadiedUp then
+	function self.onClickBattle(count)
+		assert(typeof(count) == "number", "count must be a number")
+		return function()
+			if self.props.isReadiedUp then
 				Notification.new({
 					Text = "Cannot start unranked battle while in ranked matchamking!"
 				})
 			end
-			p1.props.attemptBattleClanId(p1.props.clanId, p12)
+			self.props.attemptBattleClanId(self.props.clanId, count)
 		end
 	end
-	p1:_buildMembers()
-	function p1.uncurryPropsIndex(p12, p2) --[[ Line: 86 | Upvalues: p1 (copy) ]]
-		return function(p13) --[[ Line: 87 | Upvalues: p12 (copy), p1 (ref), p2 (copy) ]]
-			return p12(p1.lastMembers[p2])
+	self:_buildMembers()
+	function self.uncurryPropsIndex(getter, memberIndex)
+		return function(item)
+			return getter(self.lastMembers[memberIndex])
 		end
 	end
 end
-v1.defaultProps = {
+InfoComponent.defaultProps = {
 	flagColor = Color3.new(255/255, 0/255, 0/255)
 }
-function v1._buildMembers(p1) --[[ Line: 95 ]]
-	local t = {}
-	local searchText = p1.state.searchText
-	local v1 = if p1.props.showRequests then p1.props.joinRequests else p1.props.members
-	if v1 then
-		for v3, v4 in v1 do
-			local v2
-			v2 = not (#searchText > 0) or string.find(string.lower(v4.displayName), string.lower(searchText))
-			if v2 then
-				if p1.props.membersOnlineMap then
-					v4.isOnline = p1.props.membersOnlineMap[tostring(v4.userId)]
+function InfoComponent._buildMembers(self)
+	local filteredMembers = {}
+	local searchText = self.state.searchText
+	local memberList = if self.props.showRequests then self.props.joinRequests else self.props.members
+	if memberList then
+		for _, memberData in memberList do
+			local matchesSearch
+			matchesSearch = not (#searchText > 0) or string.find(string.lower(memberData.displayName), string.lower(searchText))
+			if matchesSearch then
+				if self.props.membersOnlineMap then
+					memberData.isOnline = self.props.membersOnlineMap[tostring(memberData.userId)]
 				end
-				table.insert(t, v4)
+				table.insert(filteredMembers, memberData)
 			end
 		end
 	end
-	if not p1.props.showRequests then
-		table.sort(t, function(p1, p2) --[[ Line: 121 ]]
-			if p1.isOnline == p2.isOnline then
-				if p1.isAdmin == p2.isAdmin then
-					local v3 = p1.battlesWon / (p1.battlesPlayed - p1.battlesWon)
-					local v4 = p2.battlesPlayed / (p2.battlesPlayed - p2.battlesWon)
-					if v3 == v4 then
-						return p1.displayName < p2.displayName
+	if not self.props.showRequests then
+		table.sort(filteredMembers, function(memberA, memberB)
+			if memberA.isOnline == memberB.isOnline then
+				if memberA.isAdmin == memberB.isAdmin then
+					local ratioA = memberA.battlesWon / (memberA.battlesPlayed - memberA.battlesWon)
+					local ratioB = memberB.battlesPlayed / (memberB.battlesPlayed - memberB.battlesWon)
+					if ratioA == ratioB then
+						return memberA.displayName < memberB.displayName
 					else
-						return v4 < v3
+						return ratioB < ratioA
 					end
 				else
-					return p1.isAdmin
+					return memberA.isAdmin
 				end
 			else
-				return p1.isOnline
+				return memberA.isOnline
 			end
 		end)
 	end
-	p1.lastMembers = t
+	self.lastMembers = filteredMembers
 end
-function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedContainer (copy), TextButton (copy), Players (copy), Roact (copy), Flag (copy), PersistentCrewBattleUtils (copy), PersistentCrewBattleConsts (copy), paddedScrollingGrid (copy), Member (copy) ]]
-	local t = {}
-	p1:_buildMembers()
-	local isAdminOfCurrentClan = p1.props.isAdminOfCurrentClan
+function InfoComponent.render(self)
+	local rootChildren = {}
+	self:_buildMembers()
+	local isAdminOfCurrentClan = self.props.isAdminOfCurrentClan
 	if isAdminOfCurrentClan then
-		isAdminOfCurrentClan = p1.props.isPlayersClan
+		isAdminOfCurrentClan = self.props.isPlayersClan
 		if isAdminOfCurrentClan then
-			isAdminOfCurrentClan = if p1.props.playersClanId == nil then false else not p1.props.playerHasAcceptedInvite
+			isAdminOfCurrentClan = if self.props.playersClanId == nil then false else not self.props.playerHasAcceptedInvite
 		end
 	end
-	local isAdminOfCurrentClan_2 = p1.props.isAdminOfCurrentClan
+	local isAdminOfCurrentClan_2 = self.props.isAdminOfCurrentClan
 	if isAdminOfCurrentClan_2 then
-		isAdminOfCurrentClan_2 = not p1.props.isPlayersClan
+		isAdminOfCurrentClan_2 = not self.props.isPlayersClan
 		if isAdminOfCurrentClan_2 then
-			isAdminOfCurrentClan_2 = if p1.props.playersClanId == nil then false else not p1.props.playerHasAcceptedInvite
+			isAdminOfCurrentClan_2 = if self.props.playersClanId == nil then false else not self.props.playerHasAcceptedInvite
 		end
 	end
-	local t2 = { 1, 2, 3, 4, 5 }
-	local t3 = {}
-	for v4, v5 in t2 do
-		local v2, v3
-		local t4 = {
+	local battleSizes = { 1, 2, 3, 4, 5 }
+	local battleButtons = {}
+	for slotIndex, teamSize in battleSizes do
+		local paddingLeft, paddingRight
+		local containerProps = {
 			backgroundTransparency = 1,
-			size = UDim2.fromScale(1 / #t2, 1),
-			position = UDim2.fromScale((v4 - 1) / #t2, 0)
+			size = UDim2.fromScale(1 / #battleSizes, 1),
+			position = UDim2.fromScale((slotIndex - 1) / #battleSizes, 0)
 		}
-		v2 = if v4 > 1 then 0.5 else 0
-		t4.paddingLeft = v2
-		v3 = if v4 < #t2 then 0.5 else 0
-		t4.paddingRight = v3
-		t4.paddingTop = 0
-		t4.paddingBottom = 0
-		t3[v4] = createElement(PaddedContainer, t4, {
+		paddingLeft = if slotIndex > 1 then 0.5 else 0
+		containerProps.paddingLeft = paddingLeft
+		paddingRight = if slotIndex < #battleSizes then 0.5 else 0
+		containerProps.paddingRight = paddingRight
+		containerProps.paddingTop = 0
+		containerProps.paddingBottom = 0
+		battleButtons[slotIndex] = createElement(PaddedContainer, containerProps, {
 			Button = createElement(TextButton, {
 				size = UDim2.new(1, 0, 1, 0),
-				text = ("%dv%d"):format(v5, v5),
+				text = ("%dv%d"):format(teamSize, teamSize),
 				backgroundColor = Color3.fromRGB(88, 172, 246),
-				onClick = p1.onClickBattle(v5),
-				disabled = p1.props.networkMutexLocked
+				onClick = self.onClickBattle(teamSize),
+				disabled = self.props.networkMutexLocked
 			})
 		})
 	end
-	local v8 = 0.3055555555555556 * p1.props.aspectRatio / 1.5
-	local LocalPlayer = Players.LocalPlayer
-	if LocalPlayer then
-		LocalPlayer = if Players.LocalPlayer.UserId == p1.props.clanOwnerUserId then not p1.state.isEditingClanName else false
+	local flagHeightScale = 0.3055555555555556 * self.props.aspectRatio / 1.5
+	local localPlayer = Players.LocalPlayer
+	if localPlayer then
+		localPlayer = if Players.LocalPlayer.UserId == self.props.clanOwnerUserId then not self.state.isEditingClanName else false
 	end
-	local LocalPlayer_2 = Players.LocalPlayer
-	if LocalPlayer_2 then
-		LocalPlayer_2 = if Players.LocalPlayer.UserId == p1.props.clanOwnerUserId then p1.state.isEditingClanName else false
+	local localPlayer_2 = Players.LocalPlayer
+	if localPlayer_2 then
+		localPlayer_2 = if Players.LocalPlayer.UserId == self.props.clanOwnerUserId then self.state.isEditingClanName else false
 	end
-	local v9 = LocalPlayer or LocalPlayer_2
-	local t5 = {
+	local isOwner = localPlayer or localPlayer_2
+	local headerBarProps = {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
 		size = UDim2.new(1, 0, 0.09090909090909091, 0),
@@ -176,17 +176,17 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 		paddingTop = 0,
 		paddingBottom = 0.5
 	}
-	local t6 = {
+	local headerBarChildren = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
 		})
 	}
-	local t7 = {
+	local titleContainerProps = {
 		backgroundTransparency = 1,
 		size = UDim2.new(1, 0, 1, 0)
 	}
-	local t8 = {}
-	local t9 = {
+	local titleContainerChildren = {}
+	local renameBtnContainerProps = {
 		backgroundTransparency = 1,
 		size = UDim2.new(0.1, 0, 1, 0),
 		paddingRight = 0.5,
@@ -194,31 +194,31 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 		paddingBottom = 0,
 		paddingLeft = 0
 	}
-	local t10 = {}
-	t10.RenameButton = LocalPlayer and createElement(TextButton, {
+	local renameBtnContainerChildren = {}
+	renameBtnContainerChildren.RenameButton = localPlayer and createElement(TextButton, {
 		size = UDim2.new(1, 0, 1, 0),
 		text = "RENAME",
 		backgroundColor = Color3.fromRGB(88, 172, 246),
-		onClick = function() --[[ Name: onClick | Line: 230 | Upvalues: p1 (copy) ]]
-			p1:setState({
+		onClick = function()
+			self:setState({
 				isEditingClanName = true
 			})
 		end,
-		disabled = p1.props.networkMutexLocked
+		disabled = self.props.networkMutexLocked
 	})
-	t10.CancelButton = LocalPlayer_2 and createElement(TextButton, {
+	renameBtnContainerChildren.CancelButton = localPlayer_2 and createElement(TextButton, {
 		size = UDim2.new(1, 0, 1, 0),
 		text = "CANCEL",
 		backgroundColor = Color3.fromRGB(88, 172, 246),
-		onClick = function() --[[ Name: onClick | Line: 239 | Upvalues: p1 (copy) ]]
-			p1:setState({
+		onClick = function()
+			self:setState({
 				isEditingClanName = false
 			})
 		end,
-		disabled = p1.props.networkMutexLocked
+		disabled = self.props.networkMutexLocked
 	})
-	t8.ButtonContainer = createElement(PaddedContainer, t9, t10)
-	t8.RenameNameContainer = LocalPlayer_2 and createElement(PaddedContainer, {
+	titleContainerChildren.ButtonContainer = createElement(PaddedContainer, renameBtnContainerProps, renameBtnContainerChildren)
+	titleContainerChildren.RenameNameContainer = localPlayer_2 and createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.new(0.9, 0, 1, 0),
 		position = UDim2.new(0.1, 0, 0, 0),
@@ -238,37 +238,37 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 			Text = "",
 			Font = Enum.Font.Bangers,
 			TextScaled = true,
-			[Roact.Ref] = p1.crewRenameTextBoxRef,
-			[Roact.Event.FocusLost] = p1.renameCrewTextFocusLost
+			[Roact.Ref] = self.crewRenameTextBoxRef,
+			[Roact.Event.FocusLost] = self.renameCrewTextFocusLost
 		})
 	})
-	local v19 = not LocalPlayer_2
-	if v19 then
-		local t11 = {
+	local clanNameDisplay = not localPlayer_2
+	if clanNameDisplay then
+		local clanNameContainerProps = {
 			backgroundTransparency = 1
 		}
-		t11.size = if v9 then UDim2.fromScale(0.9, 1) else UDim2.fromScale(1, 1)
-		t11.position = if v9 then UDim2.fromScale(0.1, 0) else UDim2.fromScale(0, 0)
-		t11.paddingRight = 0
-		t11.paddingTop = 0
-		t11.paddingBottom = 0
-		t11.paddingLeft = if v9 then 0.5 else 0
-		v19 = createElement(PaddedContainer, t11, {
+		clanNameContainerProps.size = if isOwner then UDim2.fromScale(0.9, 1) else UDim2.fromScale(1, 1)
+		clanNameContainerProps.position = if isOwner then UDim2.fromScale(0.1, 0) else UDim2.fromScale(0, 0)
+		clanNameContainerProps.paddingRight = 0
+		clanNameContainerProps.paddingTop = 0
+		clanNameContainerProps.paddingBottom = 0
+		clanNameContainerProps.paddingLeft = if isOwner then 0.5 else 0
+		clanNameDisplay = createElement(PaddedContainer, clanNameContainerProps, {
 			ClanName = createElement("TextLabel", {
 				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(1, 1),
 				Font = Enum.Font.Bangers,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				Text = p1.props.clanName,
+				Text = self.props.clanName,
 				LineHeight = 1,
 				TextScaled = true,
 				TextColor3 = Color3.new(255/255, 255/255, 255/255)
 			})
 		})
 	end
-	t8.NameContainer = v19
-	t6.TitleContainer = createElement(PaddedContainer, t7, t8)
-	t6.PlayerRatingContainer = createElement(PaddedContainer, {
+	titleContainerChildren.NameContainer = clanNameDisplay
+	headerBarChildren.TitleContainer = createElement(PaddedContainer, titleContainerProps, titleContainerChildren)
+	headerBarChildren.PlayerRatingContainer = createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(0.3, 0.8),
 		position = UDim2.fromScale(0.7, 0.1),
@@ -290,7 +290,7 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 				Size = UDim2.fromScale(1, 1),
 				Font = Enum.Font.Bangers,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				Text = "Personal Rating: " .. (p1.props.playerDisplayRating or "N/A"),
+				Text = "Personal Rating: " .. (self.props.playerDisplayRating or "N/A"),
 				LineHeight = 1,
 				TextScaled = true,
 				TextColor3 = Color3.new(255/255, 255/255, 255/255)
@@ -304,12 +304,12 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 			CornerRadius = UDim.new(0, 4)
 		})
 	})
-	t.Header = createElement(PaddedContainer, t5, t6)
-	t.Flag = createElement(PaddedContainer, {
+	rootChildren.Header = createElement(PaddedContainer, headerBarProps, headerBarChildren)
+	rootChildren.Flag = createElement(PaddedContainer, {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
 		position = UDim2.new(0, 0, 0.09090909090909091, 0),
-		size = UDim2.new(0.25, 0, 0.8181818181818181 * v8, 0),
+		size = UDim2.new(0.25, 0, 0.8181818181818181 * flagHeightScale, 0),
 		paddingLeft = 0,
 		paddingRight = 0.5,
 		paddingTop = 0.5,
@@ -319,38 +319,38 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 			CornerRadius = UDim.new(0, 4)
 		}),
 		Flag = createElement(Flag, {
-			flagColor = p1.props.flagColor,
-			userId = p1.props.clanOwnerUserId
+			flagColor = self.props.flagColor,
+			userId = self.props.clanOwnerUserId
 		})
 	})
-	local v25 = PersistentCrewBattleUtils.calculateWLRatio(p1.props.battlesWon, p1.props.battlesPlayed)
-	local count = 0
-	if p1.props.membersOnlineMap then
-		for v26, v27 in p1.props.membersOnlineMap do
-			count = count + 1
+	local wlRatio = PersistentCrewBattleUtils.calculateWLRatio(self.props.battlesWon, self.props.battlesPlayed)
+	local onlineCount = 0
+	if self.props.membersOnlineMap then
+		for _, _ in self.props.membersOnlineMap do
+			onlineCount = onlineCount + 1
 		end
 	end
-	local v28 = if string.find(p1.props.clanDisplayRating, "?") == nil then false else p1.props.isPlayersClan
-	local v29 = if v28 then UDim2.new(1, 0, 0.1, 0) else UDim2.new(1, 0, 0.15, 0)
-	local v30 = if v28 then 0.02 else 0
-	local v31 = if p1.props.leaderboardRank then ("RANK: %d, RATING: %s"):format(p1.props.leaderboardRank, p1.props.clanDisplayRating) else ("RATING: %s"):format(p1.props.clanDisplayRating)
-	local t11 = {
+	local isProvisionalRating = if string.find(self.props.clanDisplayRating, "?") == nil then false else self.props.isPlayersClan
+	local ratingContainerSize = if isProvisionalRating then UDim2.new(1, 0, 0.1, 0) else UDim2.new(1, 0, 0.15, 0)
+	local provisionalVerticalOffset = if isProvisionalRating then 0.02 else 0
+	local ratingText = if self.props.leaderboardRank then ("RANK: %d, RATING: %s"):format(self.props.leaderboardRank, self.props.clanDisplayRating) else ("RATING: %s"):format(self.props.clanDisplayRating)
+	local statsContainerProps = {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
-		position = UDim2.new(0, 0, 0.8181818181818181 * v8 + 0.09090909090909091, 0),
-		size = UDim2.new(0.25, 0, 0.8181818181818181 * (1 - v8), 0),
+		position = UDim2.new(0, 0, 0.8181818181818181 * flagHeightScale + 0.09090909090909091, 0),
+		size = UDim2.new(0.25, 0, 0.8181818181818181 * (1 - flagHeightScale), 0),
 		paddingLeft = 0,
 		paddingRight = 0.5,
 		paddingTop = 0.5,
 		paddingBottom = 0.5
 	}
-	local t12 = {
+	local statsChildren = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
 		}),
 		Rating = createElement(PaddedContainer, {
 			backgroundTransparency = 1,
-			size = v29,
+			size = ratingContainerSize,
 			paddingTop = 0,
 			paddingBottom = 0
 		}, {
@@ -361,14 +361,14 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Font = Enum.Font.FredokaOne,
 				TextXAlignment = Enum.TextXAlignment.Center,
-				Text = v31,
+				Text = ratingText,
 				LineHeight = 1,
 				TextScaled = true,
 				TextColor3 = Color3.new(255/255, 255/255, 255/255)
 			})
 		})
 	}
-	t12.ProvisionalRatingExplanation = v28 and createElement(PaddedContainer, {
+	statsChildren.ProvisionalRatingExplanation = isProvisionalRating and createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.new(1, 0, 0.09, 0),
 		position = UDim2.new(0, 0, 0.08, 0),
@@ -388,15 +388,15 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 			TextColor3 = Color3.new(255/255, 255/255, 255/255)
 		})
 	})
-	local t13 = {
+	local onlineContainerProps = {
 		backgroundTransparency = 1,
 		size = UDim2.new(1, 0, 0.125, 0),
-		position = UDim2.new(0, 0, v30 + 0.15, 0),
+		position = UDim2.new(0, 0, provisionalVerticalOffset + 0.15, 0),
 		paddingTop = 0,
 		paddingBottom = 0
 	}
-	local t14 = {}
-	local t15 = {
+	local onlineContainerChildren = {}
+	local onlineLabelProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -404,16 +404,16 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 		Font = Enum.Font.FredokaOne,
 		TextXAlignment = Enum.TextXAlignment.Center
 	}
-	t15.Text = if count then ("%d online"):format(count) else "... online"
-	t15.LineHeight = 1
-	t15.TextScaled = true
-	t15.TextColor3 = Color3.new(0.7, 0.7, 0.7)
-	t14.Text = createElement("TextLabel", t15)
-	t12.Online = createElement(PaddedContainer, t13, t14)
-	t12.Won = createElement(PaddedContainer, {
+	onlineLabelProps.Text = if onlineCount then ("%d online"):format(onlineCount) else "... online"
+	onlineLabelProps.LineHeight = 1
+	onlineLabelProps.TextScaled = true
+	onlineLabelProps.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+	onlineContainerChildren.Text = createElement("TextLabel", onlineLabelProps)
+	statsChildren.Online = createElement(PaddedContainer, onlineContainerProps, onlineContainerChildren)
+	statsChildren.Won = createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.new(1, 0, 0.125, 0),
-		position = UDim2.new(0, 0, v30 + 0.275, 0),
+		position = UDim2.new(0, 0, provisionalVerticalOffset + 0.275, 0),
 		paddingTop = 0,
 		paddingBottom = 0
 	}, {
@@ -424,21 +424,21 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Font = Enum.Font.FredokaOne,
 			TextXAlignment = Enum.TextXAlignment.Center,
-			Text = ("%d battles"):format(p1.props.battlesPlayed or 0),
+			Text = ("%d battles"):format(self.props.battlesPlayed or 0),
 			LineHeight = 1,
 			TextScaled = true,
 			TextColor3 = Color3.new(0.7, 0.7, 0.7)
 		})
 	})
-	local t16 = {
+	local wlContainerProps = {
 		backgroundTransparency = 1,
 		size = UDim2.new(1, 0, 0.125, 0),
-		position = UDim2.new(0, 0, v30 + 0.4, 0),
+		position = UDim2.new(0, 0, provisionalVerticalOffset + 0.4, 0),
 		paddingTop = 0,
 		paddingBottom = 0
 	}
-	local t17 = {}
-	local t18 = {
+	local wlContainerChildren = {}
+	local wlLabelProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -446,13 +446,13 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 		Font = Enum.Font.FredokaOne,
 		TextXAlignment = Enum.TextXAlignment.Center
 	}
-	t18.Text = v25 and "W/L: " .. v25 or "W/L: ..."
-	t18.LineHeight = 1
-	t18.TextScaled = true
-	t18.TextColor3 = Color3.new(0.7, 0.7, 0.7)
-	t17.Text = createElement("TextLabel", t18)
-	t12.WLRatio = createElement(PaddedContainer, t16, t17)
-	t12.RankedBattleTitleContainer = isAdminOfCurrentClan and createElement(PaddedContainer, {
+	wlLabelProps.Text = wlRatio and "W/L: " .. wlRatio or "W/L: ..."
+	wlLabelProps.LineHeight = 1
+	wlLabelProps.TextScaled = true
+	wlLabelProps.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+	wlContainerChildren.Text = createElement("TextLabel", wlLabelProps)
+	statsChildren.WLRatio = createElement(PaddedContainer, wlContainerProps, wlContainerChildren)
+	statsChildren.RankedBattleTitleContainer = isAdminOfCurrentClan and createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.new(1, 0, 0.1, 0),
 		position = UDim2.new(0, 0, 0.6, 0),
@@ -470,31 +470,31 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 			TextColor3 = Color3.new(255/255, 255/255, 255/255)
 		})
 	})
-	local v48
+	local readyUpContainer
 	if isAdminOfCurrentClan then
-		local t19 = {
+		local readyUpContainerProps = {
 			backgroundTransparency = 1,
 			size = UDim2.new(1, 0, 0.15, 0),
 			position = UDim2.fromScale(0, 0.7),
 			paddingTop = 0
 		}
-		local t20 = {}
-		local t21 = {
+		local readyUpContainerChildren = {}
+		local readyUpButtonProps = {
 			size = UDim2.new(1, 0, 1, 0),
 			position = UDim2.new(1, 0, 0, 0),
 			anchorPoint = Vector2.new(1, 0)
 		}
-		t21.text = if p1.props.isReadiedUp then "LEAVE MATCHMAKING" else "ENTER MATCHMAKING"
-		t21.backgroundColor = Color3.fromRGB(88, 172, 246)
-		t21.onClick = p1.props.isReadiedUp and p1.props.onClickUnreadyUp or p1.props.onClickReadyUp
-		t21.disabled = p1.props.networkMutexLocked
-		t20.Button = createElement(TextButton, t21)
-		v48 = createElement(PaddedContainer, t19, t20)
+		readyUpButtonProps.text = if self.props.isReadiedUp then "LEAVE MATCHMAKING" else "ENTER MATCHMAKING"
+		readyUpButtonProps.backgroundColor = Color3.fromRGB(88, 172, 246)
+		readyUpButtonProps.onClick = self.props.isReadiedUp and self.props.onClickUnreadyUp or self.props.onClickReadyUp
+		readyUpButtonProps.disabled = self.props.networkMutexLocked
+		readyUpContainerChildren.Button = createElement(TextButton, readyUpButtonProps)
+		readyUpContainer = createElement(PaddedContainer, readyUpContainerProps, readyUpContainerChildren)
 	else
-		v48 = isAdminOfCurrentClan
+		readyUpContainer = isAdminOfCurrentClan
 	end
-	t12.ReadyUpContainer = v48
-	t12.Leave = p1.props.isPlayersClan and createElement(PaddedContainer, {
+	statsChildren.ReadyUpContainer = readyUpContainer
+	statsChildren.Leave = self.props.isPlayersClan and createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(1, 0.15),
 		position = UDim2.fromScale(0, 0.85),
@@ -504,29 +504,29 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 			size = UDim2.new(1, 0, 1, 0),
 			text = "LEAVE CREW",
 			backgroundColor = Color3.fromRGB(233, 76, 64),
-			onClick = p1.onClickLeave,
-			disabled = p1.props.networkMutexLocked
+			onClick = self.onClickLeave,
+			disabled = self.props.networkMutexLocked
 		})
 	})
-	t12.JoinContainer = if p1.props.playersClanId == nil then createElement(PaddedContainer, {
-	backgroundTransparency = 1,
-	size = UDim2.new(1, 0, 0.15, 0),
-	position = UDim2.fromScale(0, 0.85),
-	paddingTop = 0
-}, {
-	Button = createElement(TextButton, {
-		size = UDim2.new(1, 0, 1, 0),
-		position = UDim2.new(1, 0, 0, 0),
-		anchorPoint = Vector2.new(1, 0),
-		text = "REQUEST JOIN CREW",
-		backgroundColor = Color3.fromRGB(88, 172, 246),
-		onClick = function() --[[ Name: onClick | Line: 542 | Upvalues: p1 (copy) ]]
-			p1.props.attemptRequestJoinUserId(p1.props.clanOwnerUserId)
-		end,
-		disabled = p1.props.networkMutexLocked
-	})
-}) else false
-	t12.UnrankedBattleTitleContainer = isAdminOfCurrentClan_2 and createElement(PaddedContainer, {
+	statsChildren.JoinContainer = if self.props.playersClanId == nil then createElement(PaddedContainer, {
+		backgroundTransparency = 1,
+		size = UDim2.new(1, 0, 0.15, 0),
+		position = UDim2.fromScale(0, 0.85),
+		paddingTop = 0
+	}, {
+		Button = createElement(TextButton, {
+			size = UDim2.new(1, 0, 1, 0),
+			position = UDim2.new(1, 0, 0, 0),
+			anchorPoint = Vector2.new(1, 0),
+			text = "REQUEST JOIN CREW",
+			backgroundColor = Color3.fromRGB(88, 172, 246),
+			onClick = function()
+				self.props.attemptRequestJoinUserId(self.props.clanOwnerUserId)
+			end,
+			disabled = self.props.networkMutexLocked
+		})
+	}) else false
+	statsChildren.UnrankedBattleTitleContainer = isAdminOfCurrentClan_2 and createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.new(1, 0, 0.15, 0),
 		position = UDim2.new(0, 0, 0.7, 0),
@@ -544,15 +544,15 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 			TextColor3 = Color3.new(255/255, 255/255, 255/255)
 		})
 	})
-	t12.Battle = isAdminOfCurrentClan_2 and createElement(PaddedContainer, {
+	statsChildren.Battle = isAdminOfCurrentClan_2 and createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(1, 0.15),
 		position = UDim2.fromScale(0, 0.85),
 		paddingTop = 0
-	}, t3)
-	t.Body1Bottom = createElement(PaddedContainer, t11, t12)
-	local isAdminOfViewingClan = p1.props.isAdminOfViewingClan
-	local t19 = {
+	}, battleButtons)
+	rootChildren.Body1Bottom = createElement(PaddedContainer, statsContainerProps, statsChildren)
+	local isAdminOfViewingClan = self.props.isAdminOfViewingClan
+	local tabBarContainerProps = {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
 		position = UDim2.new(0.25, 0, 0.09090909090909091, 0),
@@ -562,28 +562,28 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 		paddingTop = 0.5,
 		paddingBottom = 0.5
 	}
-	local t20 = {
+	local tabBarChildren = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
 		})
 	}
-	local t21 = {
+	local membersTabProps = {
 		backgroundTransparency = 1
 	}
-	t21.size = if isAdminOfViewingClan then UDim2.fromScale(0.5, 1) else UDim2.fromScale(1, 1)
-	t21.paddingRight = if isAdminOfViewingClan then 0.5 else 1
-	t20.Left = createElement(PaddedContainer, t21, {
+	membersTabProps.size = if isAdminOfViewingClan then UDim2.fromScale(0.5, 1) else UDim2.fromScale(1, 1)
+	membersTabProps.paddingRight = if isAdminOfViewingClan then 0.5 else 1
+	tabBarChildren.Left = createElement(PaddedContainer, membersTabProps, {
 		Button = createElement(TextButton, {
 			size = UDim2.new(1, 0, 1, 0),
 			position = UDim2.new(1, 0, 0, 0),
 			anchorPoint = Vector2.new(1, 0),
-			text = ("MEMBERS (%d)"):format(#p1.props.members),
+			text = ("MEMBERS (%d)"):format(#self.props.members),
 			backgroundColor = Color3.fromRGB(88, 172, 246),
-			disabled = not p1.props.showRequests,
-			onClick = p1.props.onClickToggleRequests
+			disabled = not self.props.showRequests,
+			onClick = self.props.onClickToggleRequests
 		})
 	})
-	t20.Right = isAdminOfViewingClan and createElement(PaddedContainer, {
+	tabBarChildren.Right = isAdminOfViewingClan and createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		position = UDim2.new(0.5, 0, 0, 0),
 		size = UDim2.new(0.5, 0, 1, 0),
@@ -593,14 +593,14 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 			size = UDim2.new(1, 0, 1, 0),
 			position = UDim2.new(1, 0, 0, 0),
 			anchorPoint = Vector2.new(1, 0),
-			text = ("REQUESTS (%d)"):format(#p1.props.joinRequests),
+			text = ("REQUESTS (%d)"):format(#self.props.joinRequests),
 			backgroundColor = Color3.fromRGB(88, 172, 246),
-			disabled = p1.props.showRequests,
-			onClick = p1.props.onClickToggleRequests
+			disabled = self.props.showRequests,
+			onClick = self.props.onClickToggleRequests
 		})
 	})
-	t.Body2TopLeft = createElement(PaddedContainer, t19, t20)
-	t.Search = createElement(PaddedContainer, {
+	rootChildren.Body2TopLeft = createElement(PaddedContainer, tabBarContainerProps, tabBarChildren)
+	rootChildren.Search = createElement(PaddedContainer, {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
 		position = UDim2.new(0.625, 0, 0.09090909090909091, 0),
@@ -638,12 +638,12 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 					Text = "",
 					Font = Enum.Font.Bangers,
 					TextScaled = true,
-					[Roact.Change.Text] = p1.playerSearchTextBoxTextChanged
+					[Roact.Change.Text] = self.playerSearchTextBoxTextChanged
 				})
 			})
 		})
 	})
-	t.Body2Bottom = createElement(PaddedContainer, {
+	rootChildren.Body2Bottom = createElement(PaddedContainer, {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
 		position = UDim2.new(0.25, 0, 0.19090909090909092, 0),
@@ -661,20 +661,20 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 			rowsPerPage = 7.5,
 			colsPerRow = 1,
 			component = Member,
-			items = p1.lastMembers,
+			items = self.lastMembers,
 			itemDefaults = {
-				networkMutexLocked = p1.props.networkMutexLocked,
-				showRequests = p1.props.showRequests,
-				uncurryPropsIndex = p1.uncurryPropsIndex,
-				onClickAdmin = p1.props.onClickAdmin,
-				onClickUnAdmin = p1.props.onClickUnAdmin,
-				onClickKick = p1.props.onClickKick,
-				onClickJoinRequestAccept = p1.props.onClickJoinRequestAccept,
-				onClickJoinRequestDeny = p1.props.onClickJoinRequestDeny
+				networkMutexLocked = self.props.networkMutexLocked,
+				showRequests = self.props.showRequests,
+				uncurryPropsIndex = self.uncurryPropsIndex,
+				onClickAdmin = self.props.onClickAdmin,
+				onClickUnAdmin = self.props.onClickUnAdmin,
+				onClickKick = self.props.onClickKick,
+				onClickJoinRequestAccept = self.props.onClickJoinRequestAccept,
+				onClickJoinRequestDeny = self.props.onClickJoinRequestDeny
 			}
 		})
 	})
-	local t22 = {
+	local footerContainerProps = {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
 		position = UDim2.new(0, 0, 0.9090909090909091, 0),
@@ -684,7 +684,7 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 		paddingTop = 0.5,
 		paddingBottom = 0
 	}
-	local t23 = {
+	local footerChildren = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
 		}),
@@ -725,20 +725,20 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 							Text = "",
 							Font = Enum.Font.Bangers,
 							TextScaled = true,
-							[Roact.Ref] = p1.crewSearchTextBoxRef,
-							[Roact.Event.FocusLost] = p1.crewSearchTextBoxFocusLost,
-							[Roact.Change.Text] = p1.crewSearchTextBoxTextChanged
+							[Roact.Ref] = self.crewSearchTextBoxRef,
+							[Roact.Event.FocusLost] = self.crewSearchTextBoxFocusLost,
+							[Roact.Change.Text] = self.crewSearchTextBoxTextChanged
 						})
 					})
 				})
 			})
 		})
 	}
-	local t24 = {
+	local rightFrameProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1)
 	}
-	local t25 = {
+	local rightFrameChildren = {
 		UIListLayout = createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalAlignment = Enum.HorizontalAlignment.Right,
@@ -760,12 +760,12 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 					anchorPoint = Vector2.new(1, 0),
 					text = "CLOSE",
 					backgroundColor = Color3.fromRGB(233, 76, 64),
-					onClick = p1.props.onClickClose
+					onClick = self.props.onClickClose
 				})
 			})
 		})
 	}
-	t25.BackContainer = not p1.props.isPlayersClan and createElement("Frame", {
+	rightFrameChildren.BackContainer = not self.props.isPlayersClan and createElement("Frame", {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0.15, 0, 1, 0),
 		LayoutOrder = 1
@@ -781,18 +781,18 @@ function v1.render(p1) --[[ Line: 140 | Upvalues: createElement (copy), PaddedCo
 				anchorPoint = Vector2.new(1, 0),
 				text = "BACK",
 				backgroundColor = Color3.fromRGB(88, 172, 246),
-				onClick = p1.props.onClickViewMe,
-				disabled = p1.props.networkMutexLocked
+				onClick = self.props.onClickViewMe,
+				disabled = self.props.networkMutexLocked
 			})
 		})
 	})
-	t23.Right = createElement("Frame", t24, t25)
-	t.Footer = createElement(PaddedContainer, t22, t23)
+	footerChildren.Right = createElement("Frame", rightFrameProps, rightFrameChildren)
+	rootChildren.Footer = createElement(PaddedContainer, footerContainerProps, footerChildren)
 	return createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		backgroundColor = Color3.new(255/255, 255/255, 255/255),
-		aspectRatio = p1.props.aspectRatio,
-		verticalPaddingRatio = p1.props.verticalPaddingRatio
-	}, t)
+		aspectRatio = self.props.aspectRatio,
+		verticalPaddingRatio = self.props.verticalPaddingRatio
+	}, rootChildren)
 end
-return v1
+return InfoComponent

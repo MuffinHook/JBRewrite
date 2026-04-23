@@ -1,35 +1,35 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local RunService = game:GetService("RunService")
-return function(p1) --[[ Line: 5 | Upvalues: Maid (copy), RunService (copy) ]]
-	local v1 = Maid.new()
-	local AnimationsFolder = p1:FindFirstChild("AnimationsFolder")
+return function(character)
+	local maid = Maid.new()
+	local AnimationsFolder = character:FindFirstChild("AnimationsFolder")
 	if not AnimationsFolder then
 		AnimationsFolder = Instance.new("Folder")
 		AnimationsFolder.Name = "AnimationsFolder"
-		AnimationsFolder.Parent = p1
-		for v2, v3 in script.Parent:FindFirstChild("Res"):FindFirstChild("DefaultAnimations"):GetChildren() do
-			v3:Clone().Parent = AnimationsFolder
+		AnimationsFolder.Parent = character
+		for _, animClone in script.Parent:FindFirstChild("Res"):FindFirstChild("DefaultAnimations"):GetChildren() do
+			animClone:Clone().Parent = AnimationsFolder
 		end
 	end
-	local Humanoid = p1:FindFirstChild("Humanoid")
-	local v4 = "Standing"
+	local Humanoid = character:FindFirstChild("Humanoid")
+	local currentState = "Standing"
 	local ScaleDampeningPercent = Humanoid:FindFirstChild("ScaleDampeningPercent")
-	local v5 = 0
-	local v6 = 0
-	local t = {
+	local currentSpeed = 0
+	local lastBlendSpeed = 0
+	local lastBlendDirection = {
 		x = 0,
 		y = 0
 	}
-	local v7 = 0
-	local v8 = ""
-	local v9 = nil
-	local v10 = nil
-	local v11 = nil
-	local v12 = 1
-	local t2 = {}
-	local t3 = {}
-	local tbl = {
+	local lastBlendTime = 0
+	local currentAnimName = ""
+	local currentAnimObject = nil
+	local currentTrack = nil
+	local keyframeConnection = nil
+	local currentAnimSpeed = 1
+	local loadedAnimIds = {}
+	local animationSets = {}
+	local defaultAnimations = {
 		idle = {
 			{
 				id = "http://www.roblox.com/asset/?id=507766666",
@@ -177,10 +177,10 @@ return function(p1) --[[ Line: 5 | Upvalues: Maid (copy), RunService (copy) ]]
 			}
 		}
 	}
-	local t4 = {}
-	local t5 = {}
-	local v13 = t4
-	local t6 = {
+	local strafeAnimations = {}
+	local nonStrafeAnimations = {}
+	local activeLocomotionSet = strafeAnimations
+	local emoteLoops = {
 		wave = false,
 		point = false,
 		dance = true,
@@ -190,682 +190,682 @@ return function(p1) --[[ Line: 5 | Upvalues: Maid (copy), RunService (copy) ]]
 		cheer = false
 	}
 	math.randomseed(tick())
-	local function destroyWalkAnimations() --[[ Line: 122 | Upvalues: t4 (copy), t5 (copy), v6 (ref) ]]
-		for k, v in pairs(t4) do
+	local function destroyWalkAnimations()
+		for k, v in pairs(strafeAnimations) do
 			if v.track then
 				v.track:Stop()
 				v.track:Destroy()
 				v.track = nil
 			end
 		end
-		for k, v in pairs(t5) do
+		for k, v in pairs(nonStrafeAnimations) do
 			if v.track then
 				v.track:Stop()
 				v.track:Destroy()
 				v.track = nil
 			end
 		end
-		v6 = 0
+		lastBlendSpeed = 0
 	end
-	local v14 = nil
-	local v15 = nil
-	local v16 = nil
-	local v17 = nil
-	local v18 = nil
-	local function resetVelocityBounds(p1) --[[ Line: 144 | Upvalues: v16 (ref), v15 (ref), v18 (ref), v17 (ref) ]]
-		v16 = 0
-		v15 = 0
-		v18 = 0
-		v17 = 0
+	local maxLvX = nil
+	local minLvX = nil
+	local maxLvY = nil
+	local minLvY = nil
+	local function resetVelocityBounds(_)
+		maxLvX = 0
+		minLvX = 0
+		maxLvY = 0
+		minLvY = 0
 	end
-	local function updateVelocityBounds(p1) --[[ Line: 151 | Upvalues: v15 (ref), v17 (ref), v16 (ref), v18 (ref) ]]
-		if p1 then
-			if v15 < p1.x then
-				v15 = p1.x
+	local function updateVelocityBounds(vel)
+		if vel then
+			if maxLvX < vel.x then
+				maxLvX = vel.x
 			end
-			if v17 < p1.y then
-				v17 = p1.y
+			if maxLvY < vel.y then
+				maxLvY = vel.y
 			end
-			if p1.x < v16 then
-				v16 = p1.x
+			if vel.x < minLvX then
+				minLvX = vel.x
 			end
-			if p1.y < v18 then
-				v18 = p1.y
+			if vel.y < minLvY then
+				minLvY = vel.y
 			end
 		end
 	end
-	local function checkStrafingEnabled(p1) --[[ Line: 168 | Upvalues: v15 (ref), v16 (ref), v17 (ref), v18 (ref), v13 (ref), t4 (copy), t5 (copy) ]]
-		if v15 ~= 0 and (v16 ~= 0 and (v17 ~= 0 and v18 ~= 0)) and (t4.run and t4.walk) then
-			if v13 ~= t4 then
-				v13 = t4
+	local function checkStrafingEnabled(_)
+		if maxLvX ~= 0 and (minLvX ~= 0 and (maxLvY ~= 0 and minLvY ~= 0)) and (strafeAnimations.run and strafeAnimations.walk) then
+			if activeLocomotionSet ~= strafeAnimations then
+				activeLocomotionSet = strafeAnimations
 				warn("Strafing reenabled")
 			end
 			return
-		elseif v15 ~= 0 and (v16 ~= 0 and (v17 ~= 0 and v18 ~= 0)) and v13 == t4 then
+		elseif maxLvX ~= 0 and (minLvX ~= 0 and (maxLvY ~= 0 and minLvY ~= 0)) and activeLocomotionSet == strafeAnimations then
 			warn("Strafe blending disabled.  Run and walk must be strafing-friendly.")
 		end
-		v13 = t5
+		activeLocomotionSet = nonStrafeAnimations
 	end
-	local function setupWalkAnimations() --[[ Line: 187 | Upvalues: v16 (ref), v15 (ref), v18 (ref), v17 (ref), t4 (copy), checkStrafingEnabled (copy), v13 (ref), Humanoid (copy), t3 (copy) ]]
-		v16 = 0
-		v15 = 0
-		v18 = 0
-		v17 = 0
-		for k, v in pairs(t4) do
+	local function setupWalkAnimations()
+		maxLvX = 0
+		minLvX = 0
+		maxLvY = 0
+		minLvY = 0
+		for k, v in pairs(strafeAnimations) do
 			local lv = v.lv
 			if lv then
-				if v15 < lv.x then
-					v15 = lv.x
+				if maxLvX < lv.x then
+					maxLvX = lv.x
 				end
-				if v17 < lv.y then
-					v17 = lv.y
+				if maxLvY < lv.y then
+					maxLvY = lv.y
 				end
-				if lv.x < v16 then
-					v16 = lv.x
+				if lv.x < minLvX then
+					minLvX = lv.x
 				end
-				if lv.y < v18 then
-					v18 = lv.y
+				if lv.y < minLvY then
+					minLvY = lv.y
 				end
 			end
 		end
 		checkStrafingEnabled()
-		for k, v in pairs(v13) do
-			v.track = Humanoid:LoadAnimation(t3[k][1].anim)
+		for k, v in pairs(activeLocomotionSet) do
+			v.track = Humanoid:LoadAnimation(animationSets[k][1].anim)
 			v.track.Priority = Enum.AnimationPriority.Core
 		end
 	end
-	local function replaceLocomotionTrack(p1, p2) --[[ Line: 200 | Upvalues: v8 (ref), v13 (ref), destroyWalkAnimations (copy), t4 (copy), t5 (copy), setupWalkAnimations (copy), v7 (ref) ]]
-		local v1
-		if v8 == "walk" and v13[p1] then
+	local function replaceLocomotionTrack(animName, linearVelocity)
+		local wasWalking
+		if currentAnimName == "walk" and activeLocomotionSet[animName] then
 			destroyWalkAnimations()
-			v1 = true
+			wasWalking = true
 		else
-			v1 = false
+			wasWalking = false
 		end
-		if p2 then
-			t4[p1] = {
-				lv = p2,
-				speed = p2.Magnitude
+		if linearVelocity then
+			strafeAnimations[animName] = {
+				lv = linearVelocity,
+				speed = linearVelocity.Magnitude
 			}
 		else
-			t4[p1] = nil
+			strafeAnimations[animName] = nil
 		end
-		if (p1 == "run" or p1 == "walk") and p2 then
-			t5[p1] = t4[p1]
-		elseif p1 == "run" or p1 == "walk" then
-			local v2 = if p1 == "run" then 12.8 else 6.4
-			t5[p1] = {
-				lv = Vector2.new(0, v2),
-				speed = v2
+		if (animName == "run" or animName == "walk") and linearVelocity then
+			nonStrafeAnimations[animName] = strafeAnimations[animName]
+		elseif animName == "run" or animName == "walk" then
+			local defaultSpeed = if animName == "run" then 12.8 else 6.4
+			nonStrafeAnimations[animName] = {
+				lv = Vector2.new(0, defaultSpeed),
+				speed = defaultSpeed
 			}
-			t4[p1] = nil
+			strafeAnimations[animName] = nil
 		end
-		if v1 then
+		if wasWalking then
 			setupWalkAnimations()
-			v7 = 0
+			lastBlendTime = 0
 		end
 	end
-	local function v19(p1, p2) --[[ Line: 228 | Upvalues: t3 (copy), AnimationsFolder (ref), v19 (copy), replaceLocomotionTrack (copy), t2 (copy), Humanoid (copy) ]]
-		if t3[p1] ~= nil then
-			for k, v in pairs(t3[p1].connections) do
+	local function loadAnimationSet(animName, defaultSet)
+		if animationSets[animName] ~= nil then
+			for k, v in pairs(animationSets[animName].connections) do
 				v:disconnect()
 			end
 		end
-		t3[p1] = {}
-		t3[p1].count = 0
-		t3[p1].totalWeight = 0
-		t3[p1].connections = {}
-		local v1 = AnimationsFolder:FindFirstChild(p1)
-		if v1 ~= nil then
-			local function f2(p12) --[[ Line: 244 | Upvalues: v19 (ref), p1 (copy), p2 (copy) ]]
-				v19(p1, p2)
+		animationSets[animName] = {}
+		animationSets[animName].count = 0
+		animationSets[animName].totalWeight = 0
+		animationSets[animName].connections = {}
+		local animFolder = AnimationsFolder:FindFirstChild(animName)
+		if animFolder ~= nil then
+			local function onChildAdded(_)
+				loadAnimationSet(animName, defaultSet)
 			end
-			table.insert(t3[p1].connections, v1.ChildAdded:connect(f2))
-			local function f3(p12) --[[ Line: 250 | Upvalues: v19 (ref), p1 (copy), p2 (copy) ]]
-				v19(p1, p2)
+			table.insert(animationSets[animName].connections, animFolder.ChildAdded:connect(onChildAdded))
+			local function onChildRemoved(_)
+				loadAnimationSet(animName, defaultSet)
 			end
-			table.insert(t3[p1].connections, v1.ChildRemoved:connect(f3))
-			for k, v in pairs(v1:GetChildren()) do
-				local v4
+			table.insert(animationSets[animName].connections, animFolder.ChildRemoved:connect(onChildRemoved))
+			for k, v in pairs(animFolder:GetChildren()) do
+				local weight
 				if v:IsA("Animation") then
 					local Weight = v:FindFirstChild("Weight")
-					v4 = if Weight == nil then 1 else Weight.Value
-					t3[p1].count = t3[p1].count + 1
-					local count = t3[p1].count
-					t3[p1][count] = {}
-					t3[p1][count].anim = v
-					t3[p1][count].weight = v4
-					t3[p1].totalWeight = t3[p1].totalWeight + t3[p1][count].weight
-					local function f5(p12) --[[ Line: 272 | Upvalues: v19 (ref), p1 (copy), p2 (copy) ]]
-						v19(p1, p2)
+					weight = if Weight == nil then 1 else Weight.Value
+					animationSets[animName].count = animationSets[animName].count + 1
+					local count = animationSets[animName].count
+					animationSets[animName][count] = {}
+					animationSets[animName][count].anim = v
+					animationSets[animName][count].weight = weight
+					animationSets[animName].totalWeight = animationSets[animName].totalWeight + animationSets[animName][count].weight
+					local function onAnimChanged(_)
+						loadAnimationSet(animName, defaultSet)
 					end
-					table.insert(t3[p1].connections, v.Changed:connect(f5))
-					local function f6(p12) --[[ Line: 278 | Upvalues: v19 (ref), p1 (copy), p2 (copy) ]]
-						v19(p1, p2)
+					table.insert(animationSets[animName].connections, v.Changed:connect(onAnimChanged))
+					local function onAnimChildAdded(_)
+						loadAnimationSet(animName, defaultSet)
 					end
-					table.insert(t3[p1].connections, v.ChildAdded:connect(f6))
-					local function f7(p12) --[[ Line: 284 | Upvalues: v19 (ref), p1 (copy), p2 (copy) ]]
-						v19(p1, p2)
+					table.insert(animationSets[animName].connections, v.ChildAdded:connect(onAnimChildAdded))
+					local function onAnimChildRemoved(_)
+						loadAnimationSet(animName, defaultSet)
 					end
-					table.insert(t3[p1].connections, v.ChildRemoved:connect(f7))
-					replaceLocomotionTrack(p1, (v:GetAttribute("LinearVelocity")))
+					table.insert(animationSets[animName].connections, v.ChildRemoved:connect(onAnimChildRemoved))
+					replaceLocomotionTrack(animName, (v:GetAttribute("LinearVelocity")))
 				end
 			end
 		end
-		if t3[p1].count <= 0 then
-			for k, v in pairs(p2) do
-				t3[p1][k] = {}
-				t3[p1][k].anim = Instance.new("Animation")
-				t3[p1][k].anim.Name = p1
-				t3[p1][k].anim.AnimationId = v.id
-				t3[p1][k].weight = v.weight
-				t3[p1].count = t3[p1].count + 1
-				t3[p1].totalWeight = t3[p1].totalWeight + v.weight
+		if animationSets[animName].count <= 0 then
+			for k, v in pairs(defaultSet) do
+				animationSets[animName][k] = {}
+				animationSets[animName][k].anim = Instance.new("Animation")
+				animationSets[animName][k].anim.Name = animName
+				animationSets[animName][k].anim.AnimationId = v.id
+				animationSets[animName][k].weight = v.weight
+				animationSets[animName].count = animationSets[animName].count + 1
+				animationSets[animName].totalWeight = animationSets[animName].totalWeight + v.weight
 			end
 		end
-		for k, v in pairs(t3) do
+		for k, v in pairs(animationSets) do
 			for i = 1, v.count do
-				if t2[v[i].anim.AnimationId] == nil then
+				if loadedAnimIds[v[i].anim.AnimationId] == nil then
 					Humanoid:LoadAnimation(v[i].anim)
-					t2[v[i].anim.AnimationId] = true
+					loadedAnimIds[v[i].anim.AnimationId] = true
 				end
 			end
 		end
 	end
-	local function scriptChildModified(p1) --[[ Line: 319 | Upvalues: tbl (copy), v19 (copy) ]]
-		local v1 = tbl[p1.Name]
-		if v1 == nil then
-			if p1:isA("StringValue") then
-				tbl[p1.Name] = {}
-				v19(p1.Name, tbl[p1.Name])
+	local function scriptChildModified(child)
+		local defaultSet = defaultAnimations[child.Name]
+		if defaultSet == nil then
+			if child:isA("StringValue") then
+				defaultAnimations[child.Name] = {}
+				loadAnimationSet(child.Name, defaultAnimations[child.Name])
 			end
 		else
-			v19(p1.Name, v1)
+			loadAnimationSet(child.Name, defaultSet)
 		end
 	end
-	v1:GiveTask(AnimationsFolder.ChildAdded:connect(scriptChildModified))
-	v1:GiveTask(AnimationsFolder.ChildRemoved:connect(scriptChildModified))
-	v1:GiveTask(function() --[[ Line: 333 | Upvalues: t3 (copy) ]]
-		for v1, v2 in t3 do
-			for v3, v4 in v2.connections do
-				v4:Disconnect()
+	maid:GiveTask(AnimationsFolder.ChildAdded:connect(scriptChildModified))
+	maid:GiveTask(AnimationsFolder.ChildRemoved:connect(scriptChildModified))
+	maid:GiveTask(function()
+		for animName, animSet in animationSets do
+			for _, conn in animSet.connections do
+				conn:Disconnect()
 			end
 		end
 	end)
-	local v20 = if Humanoid then Humanoid:FindFirstChildOfClass("Animator") else nil
-	if not v20 and RunService:IsServer() then
-		v20 = Instance.new("Animator")
-		assert(v20).Parent = Humanoid
-	elseif not v20 then
-		v20 = Humanoid
+	local animator = if Humanoid then Humanoid:FindFirstChildOfClass("Animator") else nil
+	if not animator and RunService:IsServer() then
+		animator = Instance.new("Animator")
+		assert(animator).Parent = Humanoid
+	elseif not animator then
+		animator = Humanoid
 	end
-	if v20 then
-		for i, v in ipairs((v20:GetPlayingAnimationTracks())) do
+	if animator then
+		for i, v in ipairs((animator:GetPlayingAnimationTracks())) do
 			v:Stop(0)
 			v:Destroy()
 		end
 	end
-	for k, v in pairs(tbl) do
-		v19(k, v)
+	for k, v in pairs(defaultAnimations) do
+		loadAnimationSet(k, v)
 	end
-	for v22, v23 in AnimationsFolder:GetChildren() do
-		if v23:isA("StringValue") then
-			tbl[v23.Name] = {}
-			v19(v23.Name, tbl[v23.Name])
+	for _, child in AnimationsFolder:GetChildren() do
+		if child:isA("StringValue") then
+			defaultAnimations[child.Name] = {}
+			loadAnimationSet(child.Name, defaultAnimations[child.Name])
 		end
 	end
-	local v24 = "None"
-	local v25 = 0
-	local v26 = 0
-	local v27 = false
-	local function stopAllAnimations() --[[ Line: 388 | Upvalues: v8 (ref), t6 (copy), v27 (ref), v9 (ref), v11 (ref), v10 (ref), v13 (ref) ]]
-		local v1 = v8
-		if t6[v1] ~= nil and t6[v1] == false then
-			v1 = "idle"
+	local currentToolAnim = "None"
+	local toolAnimExpiry = 0
+	local jumpFallTimer = 0
+	local isEmoting = false
+	local function stopAllAnimations()
+		local prevAnimName = currentAnimName
+		if emoteLoops[prevAnimName] ~= nil and emoteLoops[prevAnimName] == false then
+			prevAnimName = "idle"
 		end
-		if v27 then
-			v1 = "idle"
-			v27 = false
+		if isEmoting then
+			prevAnimName = "idle"
+			isEmoting = false
 		end
-		v8 = ""
-		v9 = nil
-		if v11 ~= nil then
-			v11:disconnect()
+		currentAnimName = ""
+		currentAnimObject = nil
+		if keyframeConnection ~= nil then
+			keyframeConnection:disconnect()
 		end
-		if v10 ~= nil then
-			v10:Stop()
-			v10:Destroy()
-			v10 = nil
+		if currentTrack ~= nil then
+			currentTrack:Stop()
+			currentTrack:Destroy()
+			currentTrack = nil
 		end
-		for k, v in pairs(v13) do
+		for k, v in pairs(activeLocomotionSet) do
 			if v.track then
 				v.track:Stop()
 				v.track:Destroy()
 				v.track = nil
 			end
 		end
-		return v1
+		return prevAnimName
 	end
-	local function getHeightScale() --[[ Line: 424 | Upvalues: Humanoid (copy), ScaleDampeningPercent (ref) ]]
+	local function getHeightScale()
 		if Humanoid and Humanoid.AutomaticScalingEnabled then
-			local v1 = Humanoid.HipHeight / 2
+			local heightScale = Humanoid.HipHeight / 2
 			if ScaleDampeningPercent == nil then
 				ScaleDampeningPercent = Humanoid:FindFirstChild("ScaleDampeningPercent")
 			end
 			if ScaleDampeningPercent ~= nil then
-				v1 = 1 + (Humanoid.HipHeight - 2) * ScaleDampeningPercent.Value / 2
+				heightScale = 1 + (Humanoid.HipHeight - 2) * ScaleDampeningPercent.Value / 2
 			end
-			return v1
+			return heightScale
 		else
 			return 1
 		end
 	end
-	local function signedAngle(p1, p2) --[[ Line: 445 ]]
-		return -math.atan2(p1.x * p2.y - p1.y * p2.x, p1.x * p2.x + p1.y * p2.y)
+	local function signedAngle(a, b)
+		return -math.atan2(a.x * b.y - a.y * b.x, a.x * b.x + a.y * b.y)
 	end
-	local function get2DWeight(p1, p2, p3, p4, p5, p6) --[[ Line: 450 ]]
-		local v1 = 0.5 * (p5 + p6)
-		local t = {
-			x = (p4 - p5) / v1
+	local function get2DWeight(inputDir, refDir, otherDir, speed, refSpeed, otherSpeed)
+		local avgSpeed = 0.5 * (refSpeed + otherSpeed)
+		local inputDelta = {
+			x = (speed - refSpeed) / avgSpeed
 		}
-		t.y = 2 * -math.atan2(p2.x * p1.y - p2.y * p1.x, p2.x * p1.x + p2.y * p1.y)
-		local t2 = {
-			x = (p6 - p5) / v1
+		inputDelta.y = 2 * -math.atan2(refDir.x * inputDir.y - refDir.y * inputDir.x, refDir.x * inputDir.x + refDir.y * inputDir.y)
+		local otherDelta = {
+			x = (otherSpeed - refSpeed) / avgSpeed
 		}
-		t2.y = 2 * -math.atan2(p2.x * p3.y - p2.y * p3.x, p2.x * p3.x + p2.y * p3.y)
-		return math.clamp(1 - (t.x * t2.x + t.y * t2.y) / (0.0001 + (t2.x * t2.x + t2.y * t2.y)), 0, 1)
+		otherDelta.y = 2 * -math.atan2(refDir.x * otherDir.y - refDir.y * otherDir.x, refDir.x * otherDir.x + refDir.y * otherDir.y)
+		return math.clamp(1 - (inputDelta.x * otherDelta.x + inputDelta.y * otherDelta.y) / (0.0001 + (otherDelta.x * otherDelta.x + otherDelta.y * otherDelta.y)), 0, 1)
 	end
-	local function blend2D(p1, p2) --[[ Line: 461 | Upvalues: v13 (ref), get2DWeight (copy), Humanoid (copy), ScaleDampeningPercent (ref) ]]
-		local t = {}
+	local function blend2D(inputDir, speed)
+		local weights = {}
 		local sum = 0
-		for k, v in pairs(v13) do
-			if p1.x * v.lv.x < 0 or p1.y * v.lv.y < 0 then
-				t[k] = 0
+		for k, v in pairs(activeLocomotionSet) do
+			if inputDir.x * v.lv.x < 0 or inputDir.y * v.lv.y < 0 then
+				weights[k] = 0
 			else
-				t[k] = (1 / 0)
-				for k2, v2 in pairs(v13) do
-					if not (p1.x * v2.lv.x < 0 or p1.y * v2.lv.y < 0) then
-						t[k] = math.min(t[k], (get2DWeight(p1, v.lv, v2.lv, p2, v.speed, v2.speed)))
+				weights[k] = (1 / 0)
+				for k2, v2 in pairs(activeLocomotionSet) do
+					if not (inputDir.x * v2.lv.x < 0 or inputDir.y * v2.lv.y < 0) then
+						weights[k] = math.min(weights[k], (get2DWeight(inputDir, v.lv, v2.lv, speed, v.speed, v2.speed)))
 					end
 				end
-				sum = sum + t[k]
+				sum = sum + weights[k]
 			end
 		end
-		local sum_2 = 0
-		local sum_3 = 0
-		local sum_4 = 0
-		for k, v in pairs(v13) do
-			if t[k] / sum > 0.1 then
-				sum_2 = sum_2 + t[k]
-				sum_3 = sum_3 + t[k] * v.lv.x
-				sum_4 = sum_4 + t[k] * v.lv.y
+		local weightSum = 0
+		local weightedLvX = 0
+		local weightedLvY = 0
+		for k, v in pairs(activeLocomotionSet) do
+			if weights[k] / sum > 0.1 then
+				weightSum = weightSum + weights[k]
+				weightedLvX = weightedLvX + weights[k] * v.lv.x
+				weightedLvY = weightedLvY + weights[k] * v.lv.y
 			else
-				t[k] = 0
+				weights[k] = 0
 			end
 		end
-		local v3 = sum_3 * sum_3 + sum_4 * sum_4
-		local v4 = if v3 > 0.0001 then math.sqrt(p2 * p2 / v3) else 0
-		local v6
+		local weightSqSum = weightedLvX * weightedLvX + weightedLvY * weightedLvY
+		local speedScale = if weightSqSum > 0.0001 then math.sqrt(speed * speed / weightSqSum) else 0
+		local heightScale
 		if Humanoid and Humanoid.AutomaticScalingEnabled then
-			local v7 = Humanoid.HipHeight / 2
+			local hipScale = Humanoid.HipHeight / 2
 			if ScaleDampeningPercent == nil then
 				ScaleDampeningPercent = Humanoid:FindFirstChild("ScaleDampeningPercent")
 			end
 			if ScaleDampeningPercent ~= nil then
-				v7 = 1 + (Humanoid.HipHeight - 2) * ScaleDampeningPercent.Value / 2
+				hipScale = 1 + (Humanoid.HipHeight - 2) * ScaleDampeningPercent.Value / 2
 			end
-			v6 = v7
+			heightScale = hipScale
 		else
-			v6 = 1
+			heightScale = 1
 		end
-		local v8 = 0
-		local v9 = v4 / v6
-		for k, v in pairs(v13) do
+		local syncTimePos = 0
+		local adjustedSpeed = speedScale / heightScale
+		for k, v in pairs(activeLocomotionSet) do
 			if v.track.IsPlaying then
-				v8 = v.track.TimePosition
+				syncTimePos = v.track.TimePosition
 				break
 			end
 		end
-		for k, v in pairs(v13) do
-			if t[k] > 0 then
+		for k, v in pairs(activeLocomotionSet) do
+			if weights[k] > 0 then
 				if not v.track.IsPlaying then
 					v.track:Play(0.2)
-					v.track.TimePosition = v8
+					v.track.TimePosition = syncTimePos
 				end
-				v.track:AdjustWeight(math.max(0.0001, t[k] / sum_2), 0.2)
-				v.track:AdjustSpeed(v9)
+				v.track:AdjustWeight(math.max(0.0001, weights[k] / weightSum), 0.2)
+				v.track:AdjustSpeed(adjustedSpeed)
 			else
 				v.track:Stop(0.2)
 			end
 		end
 	end
-	local function getWalkDirection() --[[ Line: 527 | Upvalues: Humanoid (copy) ]]
+	local function getWalkDirection()
 		local WalkToPoint = Humanoid.WalkToPoint
 		local WalkToPart = Humanoid.WalkToPart
 		if Humanoid.MoveDirection == Vector3.new(0, 0, 0) and (WalkToPart or WalkToPoint ~= Vector3.new(0, 0, 0)) then
-			local v1 = if WalkToPart then WalkToPart.CFrame:PointToWorldSpace(WalkToPoint) else WalkToPoint
-			local v3
+			local targetPos = if WalkToPart then WalkToPart.CFrame:PointToWorldSpace(WalkToPoint) else WalkToPoint
+			local walkDir
 			if Humanoid.RootPart then
-				local v4 = v1 - Humanoid.RootPart.CFrame.Position
-				local v5 = Vector3.new(v4.x, 0, v4.z)
-				local Magnitude = v5.Magnitude
-				v3 = if Magnitude > 0.01 then v5 / Magnitude else v5
+				local diff = targetPos - Humanoid.RootPart.CFrame.Position
+				local flatDiff = Vector3.new(diff.x, 0, diff.z)
+				local flatMag = flatDiff.Magnitude
+				walkDir = if flatMag > 0.01 then flatDiff / flatMag else flatDiff
 			else
-				v3 = Vector3.new(0, 0, 0)
+				walkDir = Vector3.new(0, 0, 0)
 			end
-			return v3
+			return walkDir
 		else
 			return Humanoid.MoveDirection
 		end
 	end
-	local function updateVelocity(p1) --[[ Line: 554 | Upvalues: v13 (ref), t4 (copy), getWalkDirection (copy), Humanoid (copy), v4 (ref), v5 (ref), t (ref), v6 (ref), v7 (ref), blend2D (copy) ]]
-		if v13 == t4 then
-			local v1 = getWalkDirection()
+	local function updateVelocity(clockTime)
+		if activeLocomotionSet == strafeAnimations then
+			local walkDir = getWalkDirection()
 			if Humanoid.RootPart then
-				local v2 = Humanoid.RootPart.CFrame
-				if math.abs(v2.UpVector.Y) < 0.0001 or (v4 ~= "Running" or v5 < 0.001) then
-					for k, v in pairs(v13) do
+				local rootCFrame = Humanoid.RootPart.CFrame
+				if math.abs(rootCFrame.UpVector.Y) < 0.0001 or (currentState ~= "Running" or currentSpeed < 0.001) then
+					for k, v in pairs(activeLocomotionSet) do
 						if v.track then
 							v.track:AdjustWeight(0.0001, 0.2)
 						end
 					end
 				else
-					local LookVector = v2.LookVector
-					local v3 = Vector3.new(LookVector.X, 0, LookVector.Z)
-					local v42 = v3 / v3.Magnitude
-					local v52 = v1:Dot(v42)
-					if v52 <= 0 and v52 > -0.05 then
-						v52 = 0.0001
+					local LookVector = rootCFrame.LookVector
+					local lookFlat = Vector3.new(LookVector.X, 0, LookVector.Z)
+					local lookNorm = lookFlat / lookFlat.Magnitude
+					local forwardDot = walkDir:Dot(lookNorm)
+					if forwardDot <= 0 and forwardDot > -0.05 then
+						forwardDot = 0.0001
 					end
-					local v72 = Vector2.new(v42.X * v1.Z - v42.Z * v1.X, v52)
-					local v8 = Vector2.new(v72.x - t.x, v72.y - t.y)
-					if v8:Dot(v8) > 0.001 then
-						t = v72
-						v6 = v5
-						v7 = p1
-						blend2D(v72, v5)
+					local blendDir = Vector2.new(lookNorm.X * walkDir.Z - lookNorm.Z * walkDir.X, forwardDot)
+					local dirDelta = Vector2.new(blendDir.x - lastBlendDirection.x, blendDir.y - lastBlendDirection.y)
+					if dirDelta:Dot(dirDelta) > 0.001 then
+						lastBlendDirection = blendDir
+						lastBlendSpeed = currentSpeed
+						lastBlendTime = clockTime
+						blend2D(blendDir, currentSpeed)
 						return
 					end
-					if math.abs(v5 - v6) > 0.01 or p1 - v7 > 1 then
-						t = v72
-						v6 = v5
-						v7 = p1
-						blend2D(v72, v5)
+					if math.abs(currentSpeed - lastBlendSpeed) > 0.01 or clockTime - lastBlendTime > 1 then
+						lastBlendDirection = blendDir
+						lastBlendSpeed = currentSpeed
+						lastBlendTime = clockTime
+						blend2D(blendDir, currentSpeed)
 					end
 				end
 			end
 		else
-			if math.abs(v5 - v6) > 0.01 or p1 - v7 > 1 then
-				v6 = v5
-				v7 = p1
-				blend2D(Vector2.yAxis, v5)
+			if math.abs(currentSpeed - lastBlendSpeed) > 0.01 or clockTime - lastBlendTime > 1 then
+				lastBlendSpeed = currentSpeed
+				lastBlendTime = clockTime
+				blend2D(Vector2.yAxis, currentSpeed)
 			end
 		end
 	end
-	local function setAnimationSpeed(p1) --[[ Line: 604 | Upvalues: v8 (ref), v12 (ref), v10 (ref) ]]
-		if v8 ~= "walk" and p1 ~= v12 then
-			v12 = p1
-			v10:AdjustSpeed(p1)
+	local function setAnimationSpeed(speed)
+		if currentAnimName ~= "walk" and speed ~= currentAnimSpeed then
+			currentAnimSpeed = speed
+			currentTrack:AdjustSpeed(speed)
 		end
 	end
-	local function keyFrameReachedFunc(p1) --[[ Line: 613 | Upvalues: v8 (ref), t6 (copy), v27 (ref), v10 (ref), v12 (ref), v14 (ref), Humanoid (copy) ]]
-		if p1 == "End" then
-			local v1 = v8
-			if t6[v1] ~= nil and t6[v1] == false then
-				v1 = "idle"
+	local playAnimation = nil
+	local function keyFrameReachedFunc(keyframeName)
+		if keyframeName == "End" then
+			local animName = currentAnimName
+			if emoteLoops[animName] ~= nil and emoteLoops[animName] == false then
+				animName = "idle"
 			end
-			if v27 then
-				if v10.Looped then
+			if isEmoting then
+				if currentTrack.Looped then
 					return
 				end
-				v1 = "idle"
-				v27 = false
+				animName = "idle"
+				isEmoting = false
 			end
-			local v2 = v12
-			v14(v1, 0.15, Humanoid)
-			if v8 ~= "walk" and v2 ~= v12 then
-				v12 = v2
-				v10:AdjustSpeed(v2)
+			local savedSpeed = currentAnimSpeed
+			playAnimation(animName, 0.15, Humanoid)
+			if currentAnimName ~= "walk" and savedSpeed ~= currentAnimSpeed then
+				currentAnimSpeed = savedSpeed
+				currentTrack:AdjustSpeed(savedSpeed)
 			end
 		end
 	end
-	local function rollAnimation(p1) --[[ Line: 637 | Upvalues: t3 (copy) ]]
-		local sum = math.random(1, t3[p1].totalWeight)
-		local count = 1
-		while t3[p1][count].weight < sum do
-			sum = sum - t3[p1][count].weight
-			count = count + 1
+	local function rollAnimation(animName)
+		local roll = math.random(1, animationSets[animName].totalWeight)
+		local index = 1
+		while animationSets[animName][index].weight < roll do
+			roll = roll - animationSets[animName][index].weight
+			index = index + 1
 		end
-		return count
+		return index
 	end
-	local function switchToAnim(p1, p2, p3, p4) --[[ Line: 648 | Upvalues: v9 (ref), v10 (ref), v11 (ref), v12 (ref), v8 (ref), setupWalkAnimations (copy), destroyWalkAnimations (copy), keyFrameReachedFunc (copy) ]]
-		if p1 ~= v9 then
-			if v10 ~= nil then
-				v10:Stop(p3)
-				v10:Destroy()
+	local function switchToAnim(animObject, animName, fadeTime, animatorObj)
+		if animObject ~= currentAnimObject then
+			if currentTrack ~= nil then
+				currentTrack:Stop(fadeTime)
+				currentTrack:Destroy()
 			end
-			if v11 ~= nil then
-				v11:disconnect()
+			if keyframeConnection ~= nil then
+				keyframeConnection:disconnect()
 			end
-			v12 = 1
-			v8 = p2
-			v9 = p1
-			if p2 == "walk" then
+			currentAnimSpeed = 1
+			currentAnimName = animName
+			currentAnimObject = animObject
+			if animName == "walk" then
 				setupWalkAnimations()
 				return
 			end
 			destroyWalkAnimations()
-			v10 = p4:LoadAnimation(p1)
-			v10.Priority = Enum.AnimationPriority.Core
-			v10:Play(p3)
-			v11 = v10.KeyframeReached:connect(keyFrameReachedFunc)
+			currentTrack = animatorObj:LoadAnimation(animObject)
+			currentTrack.Priority = Enum.AnimationPriority.Core
+			currentTrack:Play(fadeTime)
+			keyframeConnection = currentTrack.KeyframeReached:connect(keyFrameReachedFunc)
 		end
 	end
-	local function playAnimation(p1, p2, p3) --[[ Line: 680 | Upvalues: rollAnimation (copy), t3 (copy), switchToAnim (copy), v27 (ref) ]]
-		switchToAnim(t3[p1][rollAnimation(p1)].anim, p1, p2, p3)
-		v27 = false
+	playAnimation = function(animName, fadeTime, animatorObj)
+		switchToAnim(animationSets[animName][rollAnimation(animName)].anim, animName, fadeTime, animatorObj)
+		isEmoting = false
 	end
-	local v28 = ""
-	local v29 = nil
-	local v30 = nil
-	local v31 = nil
-	local v32 = nil
-	local function toolKeyFrameReachedFunc(p1) --[[ Line: 698 | Upvalues: v32 (ref), v28 (ref), Humanoid (copy) ]]
-		if p1 == "End" then
-			v32(v28, 0, Humanoid)
+	local currentToolAnimName = ""
+	local currentToolTrack = nil
+	local currentToolAnimObject = nil
+	local toolKeyframeConnection = nil
+	local playToolAnimation = nil
+	local function toolKeyFrameReachedFunc(keyframeName)
+		if keyframeName == "End" then
+			playToolAnimation(currentToolAnimName, 0, Humanoid)
 		end
 	end
-	v32 = function(p1, p2, p3, p4) --[[ Name: playToolAnimation | Line: 704 | Upvalues: rollAnimation (copy), t3 (copy), v30 (ref), v29 (ref), v28 (ref), v31 (ref), toolKeyFrameReachedFunc (copy) ]]
-		local anim = t3[p1][rollAnimation(p1)].anim
-		if v30 ~= anim then
-			if v29 ~= nil then
-				v29:Stop()
-				v29:Destroy()
-				p2 = 0
+	playToolAnimation = function(animName, fadeTime, animatorObj, priority)
+		local anim = animationSets[animName][rollAnimation(animName)].anim
+		if currentToolAnimObject ~= anim then
+			if currentToolTrack ~= nil then
+				currentToolTrack:Stop()
+				currentToolTrack:Destroy()
+				fadeTime = 0
 			end
-			v29 = p3:LoadAnimation(anim)
-			if p4 then
-				v29.Priority = p4
+			currentToolTrack = animatorObj:LoadAnimation(anim)
+			if priority then
+				currentToolTrack.Priority = priority
 			end
-			v29:Play(p2)
-			v28 = p1
-			v30 = anim
-			v31 = v29.KeyframeReached:connect(toolKeyFrameReachedFunc)
+			currentToolTrack:Play(fadeTime)
+			currentToolAnimName = animName
+			currentToolAnimObject = anim
+			toolKeyframeConnection = currentToolTrack.KeyframeReached:connect(toolKeyFrameReachedFunc)
 		end
 	end
-	local function stopToolAnimations() --[[ Line: 730 | Upvalues: v28 (ref), v31 (ref), v30 (ref), v29 (ref) ]]
-		local v1 = v28
-		if v31 ~= nil then
-			v31:disconnect()
+	local function stopToolAnimations()
+		local prevToolAnimName = currentToolAnimName
+		if toolKeyframeConnection ~= nil then
+			toolKeyframeConnection:disconnect()
 		end
-		v28 = ""
-		v30 = nil
-		if v29 ~= nil then
-			v29:Stop()
-			v29:Destroy()
-			v29 = nil
+		currentToolAnimName = ""
+		currentToolAnimObject = nil
+		if currentToolTrack ~= nil then
+			currentToolTrack:Stop()
+			currentToolTrack:Destroy()
+			currentToolTrack = nil
 		end
-		return v1
+		return prevToolAnimName
 	end
-	local function onRunning(p1) --[[ Line: 752 | Upvalues: v27 (ref), Humanoid (copy), v5 (ref), playAnimation (ref), v4 (ref), updateVelocity (copy), t6 (copy), v8 (ref) ]]
-		v5 = p1
-		if (v27 and Humanoid.MoveDirection == Vector3.new(0, 0, 0) and Humanoid.WalkSpeed or 0.75) < p1 then
+	local function onRunning(speed)
+		currentSpeed = speed
+		if (isEmoting and Humanoid.MoveDirection == Vector3.new(0, 0, 0) and Humanoid.WalkSpeed or 0.75) < speed then
 			playAnimation("walk", 0.2, Humanoid)
-			if v4 ~= "Running" then
-				v4 = "Running"
+			if currentState ~= "Running" then
+				currentState = "Running"
 				updateVelocity(0)
 			end
-		elseif t6[v8] == nil and not v27 then
+		elseif emoteLoops[currentAnimName] == nil and not isEmoting then
 			playAnimation("idle", 0.2, Humanoid)
-			v4 = "Standing"
+			currentState = "Standing"
 		end
 	end
-	local function onDied() --[[ Line: 770 | Upvalues: v4 (ref) ]]
-		v4 = "Dead"
+	local function onDied()
+		currentState = "Dead"
 	end
-	local function onJumping() --[[ Line: 774 | Upvalues: playAnimation (ref), Humanoid (copy), v26 (ref), v4 (ref) ]]
+	local function onJumping()
 		playAnimation("jump", 0.1, Humanoid)
-		v26 = 0.31
-		v4 = "Jumping"
+		jumpFallTimer = 0.31
+		currentState = "Jumping"
 	end
-	local function onClimbing(p1) --[[ Line: 780 | Upvalues: playAnimation (ref), Humanoid (copy), v8 (ref), v12 (ref), v10 (ref), v4 (ref) ]]
+	local function onClimbing(speed)
 		playAnimation("climb", 0.1, Humanoid)
-		local v1 = p1 / 5
-		if v8 ~= "walk" and v1 ~= v12 then
-			v12 = v1
-			v10:AdjustSpeed(v1)
+		local climbSpeed = speed / 5
+		if currentAnimName ~= "walk" and climbSpeed ~= currentAnimSpeed then
+			currentAnimSpeed = climbSpeed
+			currentTrack:AdjustSpeed(climbSpeed)
 		end
-		v4 = "Climbing"
+		currentState = "Climbing"
 	end
-	local function onGettingUp() --[[ Line: 787 | Upvalues: v4 (ref) ]]
-		v4 = "GettingUp"
+	local function onGettingUp()
+		currentState = "GettingUp"
 	end
-	local function onFreeFall() --[[ Line: 791 | Upvalues: v26 (ref), playAnimation (ref), Humanoid (copy), v4 (ref) ]]
-		if v26 <= 0 then
+	local function onFreeFall()
+		if jumpFallTimer <= 0 then
 			playAnimation("fall", 0.2, Humanoid)
 		end
-		v4 = "FreeFall"
+		currentState = "FreeFall"
 	end
-	local function onFallingDown() --[[ Line: 798 | Upvalues: v4 (ref) ]]
-		v4 = "FallingDown"
+	local function onFallingDown()
+		currentState = "FallingDown"
 	end
-	local function onSeated() --[[ Line: 802 | Upvalues: v4 (ref) ]]
-		v4 = "Seated"
+	local function onSeated()
+		currentState = "Seated"
 	end
-	local function onPlatformStanding() --[[ Line: 806 | Upvalues: v4 (ref) ]]
-		v4 = "PlatformStanding"
+	local function onPlatformStanding()
+		currentState = "PlatformStanding"
 	end
-	local function onSwimming(p1) --[[ Line: 813 | Upvalues: playAnimation (ref), Humanoid (copy), v8 (ref), v12 (ref), v10 (ref), v4 (ref) ]]
-		if p1 > 1 then
+	local function onSwimming(speed)
+		if speed > 1 then
 			playAnimation("swim", 0.4, Humanoid)
-			local v1 = p1 / 10
-			if v8 ~= "walk" and v1 ~= v12 then
-				v12 = v1
-				v10:AdjustSpeed(v1)
+			local swimSpeed = speed / 10
+			if currentAnimName ~= "walk" and swimSpeed ~= currentAnimSpeed then
+				currentAnimSpeed = swimSpeed
+				currentTrack:AdjustSpeed(swimSpeed)
 			end
-			v4 = "Swimming"
+			currentState = "Swimming"
 		else
 			playAnimation("swimidle", 0.4, Humanoid)
-			v4 = "Standing"
+			currentState = "Standing"
 		end
 	end
-	local function animateTool() --[[ Line: 825 | Upvalues: v24 (ref), v32 (ref), Humanoid (copy) ]]
-		if v24 == "None" then
-			v32("toolnone", 0.1, Humanoid, Enum.AnimationPriority.Idle)
-		elseif v24 == "Slash" then
-			v32("toolslash", 0, Humanoid, Enum.AnimationPriority.Action)
-		elseif v24 == "Lunge" then
-			v32("toollunge", 0, Humanoid, Enum.AnimationPriority.Action)
+	local function animateTool()
+		if currentToolAnim == "None" then
+			playToolAnimation("toolnone", 0.1, Humanoid, Enum.AnimationPriority.Idle)
+		elseif currentToolAnim == "Slash" then
+			playToolAnimation("toolslash", 0, Humanoid, Enum.AnimationPriority.Action)
+		elseif currentToolAnim == "Lunge" then
+			playToolAnimation("toollunge", 0, Humanoid, Enum.AnimationPriority.Action)
 		end
 	end
-	local function getToolAnim(p1) --[[ Line: 842 ]]
-		for i, v in ipairs(p1:GetChildren()) do
+	local function getToolAnim(tool)
+		for i, v in ipairs(tool:GetChildren()) do
 			if v.Name == "toolanim" and v.className == "StringValue" then
 				return v
 			end
 		end
 		return nil
 	end
-	local v33 = 0
-	local function stepAnimate(p12) --[[ Line: 853 | Upvalues: v33 (ref), v26 (ref), v4 (ref), playAnimation (ref), Humanoid (copy), updateVelocity (copy), stopAllAnimations (copy), p1 (copy), getToolAnim (copy), v24 (ref), v25 (ref), animateTool (copy), v28 (ref), v31 (ref), v30 (ref), v29 (ref) ]]
-		local v1 = p12 - v33
-		v33 = p12
-		if v26 > 0 then
-			v26 = v26 - v1
+	local lastStepTime = 0
+	local function stepAnimate(clockTime)
+		local dt = clockTime - lastStepTime
+		lastStepTime = clockTime
+		if jumpFallTimer > 0 then
+			jumpFallTimer = jumpFallTimer - dt
 		end
-		if v4 == "FreeFall" and v26 <= 0 then
+		if currentState == "FreeFall" and jumpFallTimer <= 0 then
 			playAnimation("fall", 0.2, Humanoid)
-		elseif v4 == "Seated" then
+		elseif currentState == "Seated" then
 			playAnimation("sit", 0.5, Humanoid)
 			return
-		elseif v4 == "Running" then
+		elseif currentState == "Running" then
 			playAnimation("walk", 0.2, Humanoid)
-			updateVelocity(p12)
-		elseif v4 == "Dead" or (v4 == "GettingUp" or (v4 == "FallingDown" or (v4 == "Seated" or v4 == "PlatformStanding"))) then
+			updateVelocity(clockTime)
+		elseif currentState == "Dead" or (currentState == "GettingUp" or (currentState == "FallingDown" or (currentState == "Seated" or currentState == "PlatformStanding"))) then
 			stopAllAnimations()
 		end
-		local Tool = p1:FindFirstChildOfClass("Tool")
+		local Tool = character:FindFirstChildOfClass("Tool")
 		if Tool and Tool:FindFirstChild("Handle") then
-			local v2 = getToolAnim(Tool)
-			if v2 then
-				v24 = v2.Value
-				v2.Parent = nil
-				v25 = p12 + 0.3
+			local toolAnimValue = getToolAnim(Tool)
+			if toolAnimValue then
+				currentToolAnim = toolAnimValue.Value
+				toolAnimValue.Parent = nil
+				toolAnimExpiry = clockTime + 0.3
 			end
-			if v25 < p12 then
-				v25 = 0
-				v24 = "None"
+			if toolAnimExpiry < clockTime then
+				toolAnimExpiry = 0
+				currentToolAnim = "None"
 			end
 			animateTool()
 		else
-			if v31 ~= nil then
-				v31:disconnect()
+			if toolKeyframeConnection ~= nil then
+				toolKeyframeConnection:disconnect()
 			end
-			v28 = ""
-			v30 = nil
-			if v29 ~= nil then
-				v29:Stop()
-				v29:Destroy()
-				v29 = nil
+			currentToolAnimName = ""
+			currentToolAnimObject = nil
+			if currentToolTrack ~= nil then
+				currentToolTrack:Stop()
+				currentToolTrack:Destroy()
+				currentToolTrack = nil
 			end
-			v24 = "None"
-			v30 = nil
-			v25 = 0
+			currentToolAnim = "None"
+			currentToolAnimObject = nil
+			toolAnimExpiry = 0
 		end
 	end
-	v1:GiveTask(Humanoid.Died:connect(onDied))
-	v1:GiveTask(Humanoid.Running:connect(onRunning))
-	v1:GiveTask(Humanoid.Jumping:connect(onJumping))
-	v1:GiveTask(Humanoid.Climbing:connect(onClimbing))
-	v1:GiveTask(Humanoid.GettingUp:connect(onGettingUp))
-	v1:GiveTask(Humanoid.FreeFalling:connect(onFreeFall))
-	v1:GiveTask(Humanoid.FallingDown:connect(onFallingDown))
-	v1:GiveTask(Humanoid.Seated:connect(onSeated))
-	v1:GiveTask(Humanoid.PlatformStanding:connect(onPlatformStanding))
-	v1:GiveTask(Humanoid.Swimming:connect(onSwimming))
-	if p1.Parent ~= nil then
+	maid:GiveTask(Humanoid.Died:connect(onDied))
+	maid:GiveTask(Humanoid.Running:connect(onRunning))
+	maid:GiveTask(Humanoid.Jumping:connect(onJumping))
+	maid:GiveTask(Humanoid.Climbing:connect(onClimbing))
+	maid:GiveTask(Humanoid.GettingUp:connect(onGettingUp))
+	maid:GiveTask(Humanoid.FreeFalling:connect(onFreeFall))
+	maid:GiveTask(Humanoid.FallingDown:connect(onFallingDown))
+	maid:GiveTask(Humanoid.Seated:connect(onSeated))
+	maid:GiveTask(Humanoid.PlatformStanding:connect(onPlatformStanding))
+	maid:GiveTask(Humanoid.Swimming:connect(onSwimming))
+	if character.Parent ~= nil then
 		playAnimation("idle", 0.1, Humanoid)
 	end
-	v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 932 | Upvalues: p1 (copy), v1 (copy), stepAnimate (copy) ]]
-		if p1.Parent == nil then
-			v1:DoCleaning()
+	maid:GiveTask(RunService.Heartbeat:Connect(function()
+		if character.Parent == nil then
+			maid:DoCleaning()
 		else
 			stepAnimate(os.clock())
 		end
 	end))
-	v1:GiveTask(function() --[[ Line: 940 | Upvalues: v20 (ref) ]]
-		task.defer(function() --[[ Line: 941 | Upvalues: v20 (ref) ]]
-			if v20 then
-				for v1, v2 in v20:GetPlayingAnimationTracks() do
-					v2:Stop(0)
-					v2:Destroy()
+	maid:GiveTask(function()
+		task.defer(function()
+			if animator then
+				for _, track in animator:GetPlayingAnimationTracks() do
+					track:Stop(0)
+					track:Destroy()
 				end
 			end
 		end)
 	end)
 	return {
-		Destroy = function(p1) --[[ Name: Destroy | Line: 952 | Upvalues: v1 (copy) ]]
-			v1:DoCleaning()
+		Destroy = function(_)
+			maid:DoCleaning()
 		end
 	}
 end

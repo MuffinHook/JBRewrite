@@ -15,40 +15,41 @@ local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local CreatorValues = require(ReplicatedStorage.Trade.CreatorValues)
 local CategoryButtonComponent = require(script.Parent.CategoryButtonComponent)
 local PageButtonComponent = require(script.Parent.PageButtonComponent)
-local v1 = Roact.PureComponent:extend("SettingItem")
-function v1.init(p1) --[[ Line: 30 ]]
-	p1:setState({
-		value = p1.props.defaultValue
+
+local SettingItem = Roact.PureComponent:extend("SettingItem")
+function SettingItem.init(self)
+	self:setState({
+		value = self.props.defaultValue
 	})
 end
-function v1.render(p1) --[[ Line: 35 | Upvalues: createElement (copy), Checkbox (copy) ]]
+function SettingItem.render(self)
 	return createElement("Frame", {
 		BackgroundTransparency = 1,
-		Size = p1.props.size,
-		Position = p1.props.position
+		Size = self.props.size,
+		Position = self.props.position
 	}, {
 		Value = createElement(Checkbox, {
 			size = UDim2.new(1, 0, 1, 0),
-			value = p1.state.value,
-			onChecked = function(p12) --[[ Name: onChecked | Line: 44 | Upvalues: p1 (copy) ]]
-				p1:setState({
-					value = p12
+			value = self.state.value,
+			onChecked = function(newValue)
+				self:setState({
+					value = newValue
 				})
-				if p1.props.onChecked then
-					p1.props.onChecked(p12)
+				if self.props.onChecked then
+					self.props.onChecked(newValue)
 				end
 			end,
 			layoutOrder = 1,
-			checkColor = p1.props.color,
+			checkColor = self.props.color,
 			cornerRadius = UDim.new(0, 4),
-			disabled = p1.props.disabled
+			disabled = self.props.disabled
 		}),
 		Title = createElement("TextLabel", {
 			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1 - (1 / p1.props.aspectRatio + p1.props.paddingRatio / p1.props.aspectRatio), 0.8),
+			Size = UDim2.fromScale(1 - (1 / self.props.aspectRatio + self.props.paddingRatio / self.props.aspectRatio), 0.8),
 			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.fromScale(1 / p1.props.aspectRatio + p1.props.paddingRatio / p1.props.aspectRatio, 0.5),
-			Text = p1.props.title,
+			Position = UDim2.fromScale(1 / self.props.aspectRatio + self.props.paddingRatio / self.props.aspectRatio, 0.5),
+			Text = self.props.title,
 			Font = Enum.Font.LuckiestGuy,
 			LineHeight = 0.7,
 			TextXAlignment = Enum.TextXAlignment.Left,
@@ -58,9 +59,10 @@ function v1.render(p1) --[[ Line: 35 | Upvalues: createElement (copy), Checkbox 
 		})
 	})
 end
-local v2 = Roact.Component:extend("HomeApp")
-function v2.init(p1) --[[ Line: 80 | Upvalues: Roact (copy) ]]
-	p1.categories = {
+
+local HomeApp = Roact.Component:extend("HomeApp")
+function HomeApp.init(self)
+	self.categories = {
 		{
 			name = "floorFurniture",
 			title = "Floor Furniture",
@@ -119,23 +121,23 @@ function v2.init(p1) --[[ Line: 80 | Upvalues: Roact (copy) ]]
 			module = "WindowTint"
 		}
 	}
-	function p1.categoryOnClick(p12) --[[ Line: 142 | Upvalues: p1 (copy), Roact (ref) ]]
-		local v1 = p1.categories[p12]
-		if v1.name == "floorFurniture" or (v1.name == "wallFurniture" or (v1.name == "ceilingFurniture" or v1.name == "defense")) then
-			p1.props.setFurnitureCategory(v1)
-		elseif v1.module then
-			p1.props.setCategory(v1)
+	function self.categoryOnClick(index)
+		local category = self.categories[index]
+		if category.name == "floorFurniture" or (category.name == "wallFurniture" or (category.name == "ceilingFurniture" or category.name == "defense")) then
+			self.props.setFurnitureCategory(category)
+		elseif category.module then
+			self.props.setCategory(category)
 		end
-		p1:setState({
-			categoryName = v1.name,
+		self:setState({
+			categoryName = category.name,
 			selectedName = Roact.None
 		})
-		local v2 = p1.searchRef:getValue()
-		if v2 then
-			v2.Text = ""
+		local searchBox = self.searchRef:getValue()
+		if searchBox then
+			searchBox.Text = ""
 		end
 	end
-	p1.pages = {
+	self.pages = {
 		{
 			name = "inventory",
 			title = "INVENTORY",
@@ -157,24 +159,24 @@ function v2.init(p1) --[[ Line: 80 | Upvalues: Roact (copy) ]]
 			bgColor = Color3.fromRGB(255, 151, 24)
 		}
 	}
-	function p1.pageOnClick(p12) --[[ Line: 186 | Upvalues: p1 (copy), Roact (ref) ]]
-		p1:setState({
-			pageName = p1.pages[p12].name,
+	function self.pageOnClick(index)
+		self:setState({
+			pageName = self.pages[index].name,
 			selectedName = Roact.None
 		})
-		local v1 = p1.searchRef:getValue()
-		if v1 then
-			v1.Text = ""
+		local searchBox = self.searchRef:getValue()
+		if searchBox then
+			searchBox.Text = ""
 		end
 	end
-	local v1 = p1.categories[1]
-	p1:setState({
+	local firstCategory = self.categories[1]
+	self:setState({
 		pageName = "inventory",
-		categoryName = v1.name,
+		categoryName = firstCategory.name,
 		selectedName = Roact.None
 	})
-	p1.props.setFurnitureCategory(v1)
-	p1.settingItems = {
+	self.props.setFurnitureCategory(firstCategory)
+	self.settingItems = {
 		{
 			name = "entryAllowFriends",
 			title = "ENTRY: ALLOW FRIENDS"
@@ -203,158 +205,164 @@ function v2.init(p1) --[[ Line: 80 | Upvalues: Roact (copy) ]]
 			requires = "entryAllowEveryone"
 		}
 	}
-	p1.searchRef = Roact.createRef()
-	p1:setState({
+	self.searchRef = Roact.createRef()
+	self:setState({
 		search = ""
 	})
 end
-local v3 = false
-function v2.render(p1) --[[ Line: 252 | Upvalues: v3 (ref), Players (copy), createElement (copy), PaddedContainer (copy), PageButtonComponent (copy), ItemUtils (copy), CreatorValues (copy), paddedScrollingGrid (copy), CustomizeItem (copy), ButtonComponent (copy), v1 (copy), CategoryButtonComponent (copy), CashBar (copy), ColorUtils (copy), Roact (copy) ]]
-	if p1.props.visible then
-		if not v3 then
-			v3 = true
-			task.delay(0.05, function() --[[ Line: 263 | Upvalues: p1 (copy), v3 (ref) ]]
-				p1:setState({
+
+local searchConnection = false
+function HomeApp.render(self)
+	if self.props.visible then
+		if not searchConnection then
+			searchConnection = true
+			task.delay(0.05, function()
+				self:setState({
 					search = ""
 				})
-				local v1 = p1.searchRef:getValue()
-				if v1 then
-					v3 = v1:GetPropertyChangedSignal("Text"):Connect(function() --[[ Line: 269 | Upvalues: p1 (ref), v1 (copy) ]]
-						task.delay(0.02, function() --[[ Line: 270 | Upvalues: p1 (ref), v1 (ref) ]]
-							p1:setState({
-								search = v1.Text
+				local searchBox = self.searchRef:getValue()
+				if searchBox then
+					searchConnection = searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+						task.delay(0.02, function()
+							self:setState({
+								search = searchBox.Text
 							})
 						end)
 					end)
 				end
 			end)
 		end
-		local v12 = if p1.props.home == nil then false else p1.props.home:GetOwnerId() == Players.LocalPlayer.UserId
-		local t = {}
-		local v2 = nil
-		for v4, v5 in p1.pages do
-			local v32
-			local t2 = {}
-			v32 = v5.name == p1.state.pageName
-			t2.selected = v32
-			t[v4] = t2
-			if t[v4].selected then
-				v2 = v5
+
+		local isOwner = if self.props.home == nil then false else self.props.home:GetOwnerId() == Players.LocalPlayer.UserId
+
+		local pageStateMap = {}
+		local selectedPage = nil
+		for pageIndex, page in self.pages do
+			local pageState = {}
+			pageState.selected = page.name == self.state.pageName
+			pageStateMap[pageIndex] = pageState
+			if pageStateMap[pageIndex].selected then
+				selectedPage = page
 			end
 		end
-		assert(v2 ~= nil, "selectedPage must not be nil")
-		local t2 = {}
-		for v7, v8 in p1.pages do
-			t2[v8.name] = createElement(PaddedContainer, {
-				size = UDim2.fromScale(1, 1 / #p1.pages),
-				position = UDim2.fromScale(0, (v7 - 1) / #p1.pages),
+		assert(selectedPage ~= nil, "selectedPage must not be nil")
+
+		local pageButtonElements = {}
+		for pageIndex, page in self.pages do
+			pageButtonElements[page.name] = createElement(PaddedContainer, {
+				size = UDim2.fromScale(1, 1 / #self.pages),
+				position = UDim2.fromScale(0, (pageIndex - 1) / #self.pages),
 				paddingTop = 0.5,
 				paddingBottom = 0.5,
 				paddingLeft = 0.5,
 				paddingRight = 0.5,
 				component = PageButtonComponent,
 				props = {
-					title = v8.title,
-					selected = t[v7].selected,
-					backgroundColor = v8.bgColor,
-					onClick = function() --[[ Name: onClick | Line: 317 | Upvalues: p1 (copy), v7 (copy) ]]
-						p1.pageOnClick(v7)
+					title = page.title,
+					selected = pageStateMap[pageIndex].selected,
+					backgroundColor = page.bgColor,
+					onClick = function()
+						self.pageOnClick(pageIndex)
 					end
 				}
 			})
 		end
-		local t3 = {}
-		local v10 = nil
-		for v122, v13 in p1.categories do
-			local v11
-			local t4 = {}
-			v11 = v13.name == p1.state.categoryName
-			t4.selected = v11
-			t3[v122] = t4
-			if t3[v122].selected then
-				v10 = v13
+
+		local categoryStateMap = {}
+		local selectedCategory = nil
+		for categoryIndex, category in self.categories do
+			local categoryState = {}
+			categoryState.selected = category.name == self.state.categoryName
+			categoryStateMap[categoryIndex] = categoryState
+			if categoryStateMap[categoryIndex].selected then
+				selectedCategory = category
 			end
 		end
-		assert(v10 ~= nil, "selectedCategory must not be nil")
-		local t4 = {
-			selectedBgColor = v2.bgColor,
-			onClick = p1.categoryOnClick
+		assert(selectedCategory ~= nil, "selectedCategory must not be nil")
+
+		local categoryButtonDefaults = {
+			selectedBgColor = selectedPage.bgColor,
+			onClick = self.categoryOnClick
 		}
-		local v15 = nil
-		local v16 = nil
-		local v17 = (p1.state.search or ""):lower():gsub(" ", "")
-		local v18 = #v17 > 0
-		if p1.state.pageName == "inventory" or p1.state.pageName == "store" then
-			local t5 = {}
-			for v19, v20 in p1.props.items do
-				local v21 = (v20.title or ""):lower():gsub(" ", "")
-				local v22 = v18
-				if v22 then
-					v22 = string.find(v21, v17, 1, true) ~= nil
+
+		local gridContainer = nil
+		local categoryTitle = nil
+		local searchQuery = (self.state.search or ""):lower():gsub(" ", "")
+		local hasSearch = #searchQuery > 0
+
+		if self.state.pageName == "inventory" or self.state.pageName == "store" then
+			local filteredItems = {}
+			for _, item in self.props.items do
+				local itemTitle = (item.title or ""):lower():gsub(" ", "")
+				local matchesSearch = hasSearch
+				if matchesSearch then
+					matchesSearch = string.find(itemTitle, searchQuery, 1, true) ~= nil
 				end
-				if (not v18 or v22) and p1.state.pageName == "inventory" then
-					if p1.props.inventory[v20.module] and (p1.props.inventory[v20.module][v20.name] and not (p1.props.inventory[v20.module][v20.name] <= 0)) then
-						table.insert(t5, v20)
+				if (not hasSearch or matchesSearch) and self.state.pageName == "inventory" then
+					if self.props.inventory[item.module] and (self.props.inventory[item.module][item.name] and not (self.props.inventory[item.module][item.name] <= 0)) then
+						table.insert(filteredItems, item)
 					end
-				elseif (not v18 or v22) and (p1.state.pageName ~= "store" or v20.available and (v20.module == "HomeItem" or not (p1.props.inventory[v20.module] and p1.props.inventory[v20.module][v20.name]))) then
-					table.insert(t5, v20)
+				elseif (not hasSearch or matchesSearch) and (self.state.pageName ~= "store" or item.available and (item.module == "HomeItem" or not (self.props.inventory[item.module] and self.props.inventory[item.module][item.name]))) then
+					table.insert(filteredItems, item)
 				end
 			end
-			local t7 = {}
-			for v29, v30 in t5 do
-				local v23, v24, v25, v26, v27, v28
-				local v31 = nil
-				if v30.module == "HomeItem" then
-					v23 = if p1.props.inventory[v30.module] == nil then 0 else p1.props.inventory[v30.module][v30.name] or 0
-					local v322 = p1.props.quantityPlaced[v30.name] or 0
-					if p1.state.pageName == "inventory" then
-						v31 = ("%d/%d"):format(v23 - v322, v23)
-					elseif p1.state.pageName == "store" then
-						v24 = if v30.maxPlaced == nil then "\226\136\158" else tostring(v30.maxPlaced)
-						v31 = ("%d/%s"):format(v23, v24)
+
+			local itemMetadata = {}
+			local selectedItem = nil
+			for filteredIndex, item in filteredItems do
+				local countLabel = nil
+				if item.module == "HomeItem" then
+					local ownedCount = if self.props.inventory[item.module] == nil then 0 else self.props.inventory[item.module][item.name] or 0
+					local placedCount = self.props.quantityPlaced[item.name] or 0
+					if self.state.pageName == "inventory" then
+						countLabel = ("%d/%d"):format(ownedCount - placedCount, ownedCount)
+					elseif self.state.pageName == "store" then
+						local maxPlacedStr = if item.maxPlaced == nil then "\226\136\158" else tostring(item.maxPlaced)
+						countLabel = ("%d/%s"):format(ownedCount, maxPlacedStr)
 					end
 				end
-				local v37 = ItemUtils.getFullNameFromTable((ItemUtils.createHomeItemItemTable(v30.name)))
-				local t8 = {
-					onClick = function() --[[ Name: onClick | Line: 408 | Upvalues: p1 (copy), v30 (copy) ]]
-						p1:setState({
-							selectedName = v30.name
+
+				local fullItemName = ItemUtils.getFullNameFromTable((ItemUtils.createHomeItemItemTable(item.name)))
+				local meta = {
+					onClick = function()
+						self:setState({
+							selectedName = item.name
 						})
-						if p1.state.pageName == "inventory" then
-							p1.props.attemptPlaceItem(v30)
-						elseif p1.state.pageName == "store" then
-							p1.props.attemptPreviewItem(v30)
+						if self.state.pageName == "inventory" then
+							self.props.attemptPlaceItem(item)
+						elseif self.state.pageName == "store" then
+							self.props.attemptPreviewItem(item)
 						end
 					end
 				}
-				v25 = v30.name == p1.state.selectedName
-				t8.selected = v25
-				v26 = p1.props.equipped[v30.module] == v30.name
-				t8.equipped = v26
-				v27 = v31 and createElement("TextLabel", {
+
+				meta.selected = item.name == self.state.selectedName
+				meta.equipped = self.props.equipped[item.module] == item.name
+				meta.customComponent = countLabel and createElement("TextLabel", {
 					Size = UDim2.fromScale(1, 1),
 					BackgroundTransparency = 1,
-					Text = v31,
+					Text = countLabel,
 					TextColor3 = Color3.new(255/255, 255/255, 255/255),
 					Font = Enum.Font.FredokaOne,
 					TextScaled = true
 				})
-				t8.customComponent = v27
-				t8.creatorName = CreatorValues[v37] and CreatorValues[v37].CreatorName
-				if p1.state.pageName == "store" then
-					if v30.module ~= "HomeItem" then
-						v28 = if p1.props.inventory[v30.module] and p1.props.inventory[v30.module][v30.name] ~= nil then true else nil
-						t8.owned = v28
+				meta.creatorName = CreatorValues[fullItemName] and CreatorValues[fullItemName].CreatorName
+
+				if self.state.pageName == "store" then
+					if item.module ~= "HomeItem" then
+						meta.owned = if self.props.inventory[item.module] and self.props.inventory[item.module][item.name] ~= nil then true else nil
 					end
-				elseif p1.state.pageName == "inventory" then
-					t8.owned = true
+				elseif self.state.pageName == "inventory" then
+					meta.owned = true
 				end
-				t7[v29] = t8
-				if t7[v29].selected then
-					v16 = v30
+
+				itemMetadata[filteredIndex] = meta
+				if itemMetadata[filteredIndex].selected then
+					selectedItem = item
 				end
 			end
-			local t8 = {
+
+			local gridContainerProps = {
 				backgroundTransparency = 0,
 				backgroundColor = Color3.new(51/255, 51/255, 51/255),
 				size = UDim2.fromScale(1, 0.8350000000000001),
@@ -364,90 +372,95 @@ function v2.render(p1) --[[ Line: 252 | Upvalues: v3 (ref), Players (copy), crea
 				paddingLeft = 0,
 				paddingRight = 0
 			}
-			local t9 = {
+			local gridContainerChildren = {
 				Corner = createElement("UICorner", {
 					CornerRadius = UDim.new(0, 4)
 				})
 			}
-			t9.Scrolling = if #t5 > 0 then createElement(paddedScrollingGrid, {
-	exposePaddedContainerProps = true,
-	rowsPerPage = 2.5,
-	colsPerRow = 8,
-	component = CustomizeItem,
-	items = t5,
-	metadata = t7,
-	itemDefaults = {
-		canFavorite = false,
-		accentColor = v2.bgColor
-	}
-}) else false
-			local v42
-			if #t5 == 0 then
-				v42 = not v18
-				if v42 then
-					local t11 = {}
-					local t12 = {
+
+			gridContainerChildren.Scrolling = if #filteredItems > 0 then createElement(paddedScrollingGrid, {
+				exposePaddedContainerProps = true,
+				rowsPerPage = 2.5,
+				colsPerRow = 8,
+				component = CustomizeItem,
+				items = filteredItems,
+				metadata = itemMetadata,
+				itemDefaults = {
+					canFavorite = false,
+					accentColor = selectedPage.bgColor
+				}
+			}) else false
+
+			local helpElement
+			if #filteredItems == 0 then
+				helpElement = not hasSearch
+				if helpElement then
+					local helpChildren = {}
+					local emptyLabelProps = {
 						Size = UDim2.fromScale(1, 0.1),
 						BackgroundTransparency = 1
 					}
-					t12.Text = if p1.state.pageName == "inventory" then "You don\'t have any of these.. check out the store!" else "No more items to buy.. check your inventory!"
-					t12.TextColor3 = Color3.new(255/255, 255/255, 255/255)
-					t12.Font = Enum.Font.FredokaOne
-					t12.TextScaled = true
-					t11.Title = createElement("TextLabel", t12)
-					local t13 = {
+					emptyLabelProps.Text = if self.state.pageName == "inventory" then "You don\'t have any of these.. check out the store!" else "No more items to buy.. check your inventory!"
+					emptyLabelProps.TextColor3 = Color3.new(255/255, 255/255, 255/255)
+					emptyLabelProps.Font = Enum.Font.FredokaOne
+					emptyLabelProps.TextScaled = true
+					helpChildren.Title = createElement("TextLabel", emptyLabelProps)
+
+					local switchButtonProps = {
 						size = UDim2.fromScale(0.3, 0.2),
 						position = UDim2.fromScale(0.5, 0.5),
 						anchorPoint = Vector2.new(0.5, 0.5),
 						cornerRadius = UDim.new(0, 4),
 						backgroundColor = Color3.fromRGB(255, 155, 25)
 					}
-					t13.title = if p1.state.pageName == "inventory" then "Store" else "Inventory"
-					function t13.onClick() --[[ Line: 496 | Upvalues: p1 (copy) ]]
-						if p1.state.pageName == "inventory" then
-							p1:setState({
+					switchButtonProps.title = if self.state.pageName == "inventory" then "Store" else "Inventory"
+					function switchButtonProps.onClick()
+						if self.state.pageName == "inventory" then
+							self:setState({
 								pageName = "store"
 							})
 						else
-							p1:setState({
+							self:setState({
 								pageName = "inventory"
 							})
 						end
 					end
-					t11.Button = createElement(ButtonComponent, t13)
-					v42 = createElement(PaddedContainer, {
+					helpChildren.Button = createElement(ButtonComponent, switchButtonProps)
+					helpElement = createElement(PaddedContainer, {
 						backgroundTransparency = 1
-					}, t11)
+					}, helpChildren)
 				end
 			else
-				v42 = false
+				helpElement = false
 			end
-			t9.Help = v42
-			v15 = createElement(PaddedContainer, t8, t9)
-		elseif p1.state.pageName == "settings" then
-			local t6 = {}
-			for v51, v52 in p1.settingItems do
-				if not v52.requires or p1.props.savedSettings[v52.requires] then
-					table.insert(t6, v52)
+
+			gridContainerChildren.Help = helpElement
+			gridContainer = createElement(PaddedContainer, gridContainerProps, gridContainerChildren)
+			selectedItem = selectedItem
+		elseif self.state.pageName == "settings" then
+			local visibleSettings = {}
+			for _, settingItem in self.settingItems do
+				if not settingItem.requires or self.props.savedSettings[settingItem.requires] then
+					table.insert(visibleSettings, settingItem)
 				end
 			end
-			local t7 = {}
-			for v54, v55 in t6 do
-				local v53
-				local t8 = {
-					onChecked = function(p12) --[[ Name: onChecked | Line: 523 | Upvalues: p1 (copy), v55 (copy) ]]
-						p1.props.setSavedSetting(v55.name, p12)
-						if p1.props.onSettingChanged then
-							p1.props.onSettingChanged(v55.name, p12)
+
+			local settingMetadata = {}
+			for settingIndex, settingItem in visibleSettings do
+				local meta = {
+					onChecked = function(newValue)
+						self.props.setSavedSetting(settingItem.name, newValue)
+						if self.props.onSettingChanged then
+							self.props.onSettingChanged(settingItem.name, newValue)
 						end
 					end
 				}
-				v53 = p1.props.savedSettings[v55.name] == true
-				t8.defaultValue = v53
-				t8.disabled = not v12
-				t7[v54] = t8
+				meta.defaultValue = self.props.savedSettings[settingItem.name] == true
+				meta.disabled = not isOwner
+				settingMetadata[settingIndex] = meta
 			end
-			v15 = createElement(PaddedContainer, {
+
+			gridContainer = createElement(PaddedContainer, {
 				backgroundTransparency = 0,
 				backgroundColor = Color3.new(51/255, 51/255, 51/255),
 				size = UDim2.fromScale(1, 0.8350000000000001),
@@ -464,33 +477,34 @@ function v2.render(p1) --[[ Line: 252 | Upvalues: v3 (ref), Players (copy), crea
 					exposePaddedContainerProps = true,
 					rowsPerPage = 12,
 					colsPerRow = 1,
-					component = v1,
-					items = t6,
-					metadata = t7,
+					component = SettingItem,
+					items = visibleSettings,
+					metadata = settingMetadata,
 					itemDefaults = {
-						color = v2.bgColor
+						color = selectedPage.bgColor
 					}
 				})
 			})
 		else
-			local isPageName = p1.state.pageName == "edit"
+			local isPageName = self.state.pageName == "edit"
 		end
-		local t5 = {}
-		local t6 = {}
-		if p1.state.pageName == "store" and (v16 ~= nil and v16.available) then
-			table.insert(t6, {
+
+		local actionButtonElements = {}
+		local actionButtons = {}
+		if self.state.pageName == "store" and (selectedItem ~= nil and selectedItem.available) then
+			table.insert(actionButtons, {
 				name = "purchase",
 				title = "BUY"
 			})
 		end
-		table.insert(t6, {
+		table.insert(actionButtons, {
 			name = "exit",
 			title = "EXIT"
 		})
-		for v56, v57 in t6 do
-			t5[v57.name] = createElement(PaddedContainer, {
-				size = UDim2.fromScale(1 / #t6, 1),
-				position = UDim2.fromScale((v56 - 1) / #t6, 0),
+		for buttonIndex, actionButton in actionButtons do
+			actionButtonElements[actionButton.name] = createElement(PaddedContainer, {
+				size = UDim2.fromScale(1 / #actionButtons, 1),
+				position = UDim2.fromScale((buttonIndex - 1) / #actionButtons, 0),
 				paddingTop = 0.5,
 				paddingBottom = 0.5,
 				paddingLeft = 0.5,
@@ -498,26 +512,27 @@ function v2.render(p1) --[[ Line: 252 | Upvalues: v3 (ref), Players (copy), crea
 				component = ButtonComponent,
 				props = {
 					cornerRadius = UDim.new(0, 4),
-					title = v57.title,
-					backgroundColor = v2.bgColor,
-					onClick = function() --[[ Name: onClick | Line: 625 | Upvalues: v57 (copy), p1 (copy), v16 (ref) ]]
-						if v57.name == "place" then
-							p1.props.attemptPlaceItem(v16)
-						elseif v57.name == "purchase" then
-							p1.props.attemptPurchaseItem(v16)
-						elseif v57.name == "delete" then
-							p1.props.attemptDeleteItem()
-						elseif v57.name == "exit" then
-							p1.props.exit()
+					title = actionButton.title,
+					backgroundColor = selectedPage.bgColor,
+					onClick = function()
+						if actionButton.name == "place" then
+							self.props.attemptPlaceItem(selectedItem)
+						elseif actionButton.name == "purchase" then
+							self.props.attemptPurchaseItem(selectedItem)
+						elseif actionButton.name == "delete" then
+							self.props.attemptDeleteItem()
+						elseif actionButton.name == "exit" then
+							self.props.exit()
 						end
 					end
 				}
 			})
 		end
-		local v58 = nil
-		local v59 = nil
-		if p1.state.pageName == "store" or p1.state.pageName == "inventory" then
-			local v60 = createElement(PaddedContainer, {
+
+		local categoryListElement = nil
+		local categoryTitleText = nil
+		if self.state.pageName == "store" or self.state.pageName == "inventory" then
+			local categoryList = createElement(PaddedContainer, {
 				backgroundTransparency = 0,
 				backgroundColor = Color3.new(51/255, 51/255, 51/255),
 				size = UDim2.fromScale(1, 0.56),
@@ -535,30 +550,32 @@ function v2.render(p1) --[[ Line: 252 | Upvalues: v3 (ref), Players (copy), crea
 					rowsPerPage = 6.9,
 					colsPerRow = 1,
 					component = CategoryButtonComponent,
-					items = p1.categories,
-					itemDefaults = t4,
-					metadata = t3
+					items = self.categories,
+					itemDefaults = categoryButtonDefaults,
+					metadata = categoryStateMap
 				})
 			})
-			v59 = v10.title
-			v58 = v60
-		elseif p1.state.pageName == "settings" then
-			v59 = "Settings"
-		elseif p1.state.pageName == "edit" then
-			v59 = "Editing"
+			categoryTitleText = selectedCategory.title
+			categoryListElement = categoryList
+		elseif self.state.pageName == "settings" then
+			categoryTitleText = "Settings"
+		elseif self.state.pageName == "edit" then
+			categoryTitleText = "Editing"
 		end
-		local t7 = {}
-		t7.backgroundTransparency = if p1.state.pageName == "edit" then 1 else 0.8
-		t7.backgroundColor = Color3.new(0/255, 0/255, 0/255)
-		t7.aspectRatio = p1.props.aspectRatio
-		t7.verticalPaddingRatio = p1.props.verticalPaddingRatio
-		t7.paddingTop = 0
-		t7.paddingBottom = 0
-		t7.paddingLeft = 0
-		t7.paddingRight = 0
-		local t8 = {
+
+		local outerContainerProps = {}
+		outerContainerProps.backgroundTransparency = if self.state.pageName == "edit" then 1 else 0.8
+		outerContainerProps.backgroundColor = Color3.new(0/255, 0/255, 0/255)
+		outerContainerProps.aspectRatio = self.props.aspectRatio
+		outerContainerProps.verticalPaddingRatio = self.props.verticalPaddingRatio
+		outerContainerProps.paddingTop = 0
+		outerContainerProps.paddingBottom = 0
+		outerContainerProps.paddingLeft = 0
+		outerContainerProps.paddingRight = 0
+
+		local outerChildren = {
 			UIAspectRatioConstraint = createElement("UIAspectRatioConstraint", {
-				AspectRatio = p1.props.aspectRatio
+				AspectRatio = self.props.aspectRatio
 			}),
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, 4)
@@ -608,18 +625,19 @@ function v2.render(p1) --[[ Line: 252 | Upvalues: v3 (ref), Players (copy), crea
 						paddingRight = 0.5,
 						paddingTop = 0.5,
 						paddingBottom = 0.5
-					}, t2)
+					}, pageButtonElements)
 				}),
-				Categories = v58
+				Categories = categoryListElement
 			})
 		}
-		local t9 = {
+
+		local bodyProps = {
 			backgroundTransparency = 1,
 			size = UDim2.fromScale(0.85, 1),
 			position = UDim2.fromScale(0.15, 0),
 			paddingLeft = 0.5
 		}
-		local t10 = {
+		local bodyChildren = {
 			Cash = createElement(PaddedContainer, {
 				backgroundTransparency = 1,
 				size = UDim2.fromScale(1, 0.075),
@@ -630,14 +648,15 @@ function v2.render(p1) --[[ Line: 252 | Upvalues: v3 (ref), Players (copy), crea
 			}, {
 				Bar = createElement(CashBar, {
 					exposePaddedContainerProps = true,
-					cash = p1.props.cash,
-					promptCashPurchase = p1.props.promptCashPurchase
+					cash = self.props.cash,
+					promptCashPurchase = self.props.promptCashPurchase
 				})
 			})
 		}
-		local t11 = {
+
+		local categoryTitleBarProps = {
 			backgroundTransparency = 0,
-			backgroundColor = v2.bgColor,
+			backgroundColor = selectedPage.bgColor,
 			size = UDim2.fromScale(1, 0.09),
 			position = UDim2.fromScale(0, 0.075),
 			paddingTop = 0.5,
@@ -645,24 +664,24 @@ function v2.render(p1) --[[ Line: 252 | Upvalues: v3 (ref), Players (copy), crea
 			paddingRight = 0,
 			paddingBottom = 0.5
 		}
-		local t12 = {
+		local categoryTitleBarChildren = {
 			Corner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, 4)
 			})
 		}
-		local t14 = {
+		local categoryTitleInnerChildren = {
 			Title = createElement("TextLabel", {
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				Size = UDim2.fromScale(0.5, 0.8),
 				Position = UDim2.fromScale(0.005, 0.5),
 				AnchorPoint = Vector2.new(0, 0.5),
-				Text = v59,
+				Text = categoryTitleText,
 				Font = Enum.Font.LuckiestGuy,
 				LineHeight = 0.7,
 				TextScaled = true,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				TextColor3 = ColorUtils.saturateBy(v2.bgColor, -0.7),
+				TextColor3 = ColorUtils.saturateBy(selectedPage.bgColor, -0.7),
 				ZIndex = 4
 			}, {
 				UIStroke = createElement("UIStroke", {
@@ -671,7 +690,8 @@ function v2.render(p1) --[[ Line: 252 | Upvalues: v3 (ref), Players (copy), crea
 				})
 			})
 		}
-		local t15 = {
+
+		local searchBoxProps = {
 			BackgroundTransparency = 0,
 			BorderSizePixel = 0,
 			AnchorPoint = Vector2.new(1, 0.5),
@@ -686,33 +706,34 @@ function v2.render(p1) --[[ Line: 252 | Upvalues: v3 (ref), Players (copy), crea
 			TextColor3 = Color3.new(0/255, 0/255, 0/255),
 			PlaceholderColor3 = Color3.new(0.5, 0.5, 0.5),
 			ZIndex = 1,
-			[Roact.Ref] = p1.searchRef
+			[Roact.Ref] = self.searchRef
 		}
-		t15.Visible = if v59 == "Settings" then false else v59 ~= "Editing"
-		t14.SearchBox = createElement("TextBox", t15, {
+		searchBoxProps.Visible = if categoryTitleText == "Settings" then false else categoryTitleText ~= "Editing"
+		categoryTitleInnerChildren.SearchBox = createElement("TextBox", searchBoxProps, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, 4)
 			})
 		})
-		t12.Inner = createElement(PaddedContainer, {
+		categoryTitleBarChildren.Inner = createElement(PaddedContainer, {
 			backgroundTransparency = 1
-		}, t14)
-		t10.CategoryTitle = createElement(PaddedContainer, t11, t12)
-		t10.GridContainer = v15
-		t8.Body = createElement(PaddedContainer, t9, t10)
-		local v73
-		if #t6 > 0 then
-			local t16 = {
+		}, categoryTitleInnerChildren)
+		bodyChildren.CategoryTitle = createElement(PaddedContainer, categoryTitleBarProps, categoryTitleBarChildren)
+		bodyChildren.GridContainer = gridContainer
+		outerChildren.Body = createElement(PaddedContainer, bodyProps, bodyChildren)
+
+		local bottomBarElement
+		if #actionButtons > 0 then
+			local bottomBarProps = {
 				backgroundTransparency = 0.8,
 				backgroundColor = Color3.new(0/255, 0/255, 0/255),
 				size = UDim2.fromScale(0.25, 0.1)
 			}
-			t16.position = UDim2.fromScale(0.375, if p1.state.pageName == "edit" then 0.2 else 1)
-			t16.paddingTop = 1
-			t16.paddingBottom = 0
-			t16.paddingLeft = 0
-			t16.paddingRight = 0
-			v73 = createElement(PaddedContainer, t16, {
+			bottomBarProps.position = UDim2.fromScale(0.375, if self.state.pageName == "edit" then 0.2 else 1)
+			bottomBarProps.paddingTop = 1
+			bottomBarProps.paddingBottom = 0
+			bottomBarProps.paddingLeft = 0
+			bottomBarProps.paddingRight = 0
+			bottomBarElement = createElement(PaddedContainer, bottomBarProps, {
 				Corners = createElement("UICorner", {
 					CornerRadius = UDim.new(0, 4)
 				}),
@@ -722,51 +743,53 @@ function v2.render(p1) --[[ Line: 252 | Upvalues: v3 (ref), Players (copy), crea
 					paddingBottom = 0.5,
 					paddingLeft = 0.5,
 					paddingRight = 0.5
-				}, t5)
+				}, actionButtonElements)
 			})
 		else
-			v73 = false
+			bottomBarElement = false
 		end
-		t8.Bottom = v73
-		return createElement(PaddedContainer, t7, t8)
+
+		outerChildren.Bottom = bottomBarElement
+		return createElement(PaddedContainer, outerContainerProps, outerChildren)
 	end
-	if typeof(v3) == "RBXScriptConnection" then
-		v3:Disconnect()
+	if typeof(searchConnection) == "RBXScriptConnection" then
+		searchConnection:Disconnect()
 	end
-	v3 = false
+	searchConnection = false
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 844 ]]
+
+return RoactRodux.connect(function(state, props)
 	return {
-		home = p1.home,
-		cash = p1.cash,
-		items = p1.items,
-		visible = p1.visible,
-		inventory = p1.inventory,
-		equipped = p1.equipped,
-		quantityPlaced = p1.quantityPlaced,
-		savedSettings = p1.savedSettings
+		home = state.home,
+		cash = state.cash,
+		items = state.items,
+		visible = state.visible,
+		inventory = state.inventory,
+		equipped = state.equipped,
+		quantityPlaced = state.quantityPlaced,
+		savedSettings = state.savedSettings
 	}
-end, function(p1) --[[ Line: 855 ]]
+end, function(dispatch)
 	return {
-		setFurnitureCategory = function(p12) --[[ Name: setFurnitureCategory | Line: 857 | Upvalues: p1 (copy) ]]
-			p1({
+		setFurnitureCategory = function(category)
+			dispatch({
 				type = "setFurnitureCategory",
-				upDot = p12.upDot,
-				use = p12.use
+				upDot = category.upDot,
+				use = category.use
 			})
 		end,
-		setCategory = function(p12) --[[ Name: setCategory | Line: 864 | Upvalues: p1 (copy) ]]
-			p1({
+		setCategory = function(category)
+			dispatch({
 				type = "setCategory",
-				module = p12.module
+				module = category.module
 			})
 		end,
-		setSavedSetting = function(p12, p2) --[[ Name: setSavedSetting | Line: 870 | Upvalues: p1 (copy) ]]
-			p1({
+		setSavedSetting = function(key, value)
+			dispatch({
 				type = "setSavedSetting",
-				key = p12,
-				value = p2
+				key = key,
+				value = value
 			})
 		end
 	}
-end)(v2)
+end)(HomeApp)

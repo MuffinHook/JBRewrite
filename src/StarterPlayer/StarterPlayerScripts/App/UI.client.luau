@@ -69,20 +69,20 @@ require(ReplicatedStorage.Inventory.InventoryItemSystem)
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local TooltipRodux = require(ReplicatedStorage.Tooltip.UI.TooltipRodux)
 local OtherTradeServerListRodux = require(ReplicatedStorage.Trade.UI.OtherTradeServerListRodux)
-local v1 = RunUtils.getWorld()
-local v2 = Roact.Component:extend("App")
-local t = {}
-t.mapImageId = assert(MinimapConsts.MAP_IMAGE_ID[v1], "missing mapImageId")
-t.mapWorldWidth = assert(MinimapConsts.MAP_WORLD_WIDTH[v1], "missing mapWorldWidth")
-t.mapWorldHeight = assert(MinimapConsts.MAP_WORLD_HEIGHT[v1], "missing mapWorldHeight")
-t.mapWorldCenterX = assert(MinimapConsts.MAP_WORLD_CENTER_X[v1], "missing mapWorldCenterX")
-t.mapWorldCenterY = assert(MinimapConsts.MAP_WORLD_CENTER_Y[v1], "missing mapWorldCenterY")
-t.mapImageWidth = 512
-t.mapImageHeight = 512
-v2.defaultProps = t
-function v2.init(p1) --[[ Line: 94 | Upvalues: Maid (copy), Settings (copy), GameUtil (copy), Utils (copy), RxInstanceUtils (copy), Players (copy), Roact (copy), gameSettingType (copy), GameSettingsService (copy), VehicleUtils (copy), HotbarSystem (copy), AdminPermUtils (copy), UserInputService (copy), store (copy), RunService (copy), SpeedometerUtils (copy), TableUtils (copy), CCTVService (copy), SidebarUI (copy), GarageUtils (copy), ReplicatedStorage (copy), GarageConsts (copy), SaleConsts (copy), Notification (copy), Confirmation (copy), ItemUtils (copy), String (copy), PlayerUtils (copy), GarageConsts_2 (copy), GamepassUtils (copy), CashBuyUI (copy), MinimapService (copy), RunUtils (copy), SpawnSelectionService (copy) ]]
-	p1._maid = Maid.new()
-	p1:setState({
+local currentWorld = RunUtils.getWorld()
+local AppComponent = Roact.Component:extend("App")
+local defaultProps = {}
+defaultProps.mapImageId = assert(MinimapConsts.MAP_IMAGE_ID[currentWorld], "missing mapImageId")
+defaultProps.mapWorldWidth = assert(MinimapConsts.MAP_WORLD_WIDTH[currentWorld], "missing mapWorldWidth")
+defaultProps.mapWorldHeight = assert(MinimapConsts.MAP_WORLD_HEIGHT[currentWorld], "missing mapWorldHeight")
+defaultProps.mapWorldCenterX = assert(MinimapConsts.MAP_WORLD_CENTER_X[currentWorld], "missing mapWorldCenterX")
+defaultProps.mapWorldCenterY = assert(MinimapConsts.MAP_WORLD_CENTER_Y[currentWorld], "missing mapWorldCenterY")
+defaultProps.mapImageWidth = 512
+defaultProps.mapImageHeight = 512
+AppComponent.defaultProps = defaultProps
+function AppComponent.init(self)
+	self._maid = Maid.new()
+	self:setState({
 		controlsEnabled = true,
 		teamColor = Settings.TeamColor[GameUtil.Team],
 		isSmallScreen = Utils.isSmallScreen(),
@@ -97,84 +97,84 @@ function v2.init(p1) --[[ Line: 94 | Upvalues: Maid (copy), Settings (copy), Gam
 		devPanelVisible = false,
 		garageVisible = false
 	})
-	p1._maid:GiveTask(Utils.getViewportSizeChangedSignal():Connect(function() --[[ Line: 111 | Upvalues: p1 (copy), Utils (ref) ]]
-		p1:setState({
+	self._maid:GiveTask(Utils.getViewportSizeChangedSignal():Connect(function()
+		self:setState({
 			isSmallScreen = Utils.isSmallScreen()
 		})
 	end))
-	p1._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(Players.LocalPlayer, "ChoosingTeam", function(p12, p2) --[[ Line: 120 | Upvalues: p1 (copy) ]]
-		local function handler(p12) --[[ Line: 121 | Upvalues: p1 (ref) ]]
-			p1:setState({
-				controlsEnabled = not p12
+	self._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(Players.LocalPlayer, "ChoosingTeam", function(choosingTeamValue, taskMaid)
+		local function handler(newValue)
+			self:setState({
+				controlsEnabled = not newValue
 			})
 		end
-		p2:GiveTask(p12.Changed:Connect(handler))
-		p1:setState({
-			controlsEnabled = not p12.Value
+		taskMaid:GiveTask(choosingTeamValue.Changed:Connect(handler))
+		self:setState({
+			controlsEnabled = not choosingTeamValue.Value
 		})
 	end))
-	p1._maid:GiveTask(GameUtil.OnTeamChanged:Connect(function(p12) --[[ Line: 131 | Upvalues: p1 (copy), Settings (ref) ]]
-		p1:setState({
-			teamColor = Settings.TeamColor[p12]
+	self._maid:GiveTask(GameUtil.OnTeamChanged:Connect(function(newTeam)
+		self:setState({
+			teamColor = Settings.TeamColor[newTeam]
 		})
 	end))
-	local function updateBounty() --[[ Line: 137 | Upvalues: p1 (copy), GameUtil (ref) ]]
-		p1:setState({
+	local function updateBounty()
+		self:setState({
 			bounty = GameUtil.bounty
 		})
 	end
-	p1:setState({
+	self:setState({
 		bounty = GameUtil.bounty
 	})
-	p1._maid:GiveTask(GameUtil.onBountyChanged:Connect(updateBounty))
-	local v1, v2 = Roact.createBinding(123456)
-	p1._spdDistance = v1
-	p1._updateSpdDistance = v2
-	local v3, v4 = Roact.createBinding(878)
-	p1._spdSpeed = v3
-	p1._updateSpdSpeed = v4
-	local v5, v6 = Roact.createBinding(0)
-	p1._spdAccelRatio = v5
-	p1._updateSpdAccelRatio = v6
-	local t = {
+	self._maid:GiveTask(GameUtil.onBountyChanged:Connect(updateBounty))
+	local spdDistance, updateSpdDistance = Roact.createBinding(123456)
+	self._spdDistance = spdDistance
+	self._updateSpdDistance = updateSpdDistance
+	local spdSpeed, updateSpdSpeed = Roact.createBinding(878)
+	self._spdSpeed = spdSpeed
+	self._updateSpdSpeed = updateSpdSpeed
+	local spdAccelRatio, updateSpdAccelRatio = Roact.createBinding(0)
+	self._spdAccelRatio = spdAccelRatio
+	self._updateSpdAccelRatio = updateSpdAccelRatio
+	local hotbarWithSpeedometerSetting = {
 		name = "hotbarWithSpeedometer",
 		title = "Hotbar With Speedometer",
 		type = gameSettingType.Checkbox,
 		defaultValue = false,
 		order = 51
 	}
-	GameSettingsService.add(t)
-	local function handleSetting(p1) --[[ Line: 157 | Upvalues: VehicleUtils (ref), HotbarSystem (ref) ]]
+	GameSettingsService.add(hotbarWithSpeedometerSetting)
+	local function handleSetting(enabled)
 		if VehicleUtils.GetLocalVehiclePacket and VehicleUtils.GetLocalVehiclePacket() then
-			if p1 then
+			if enabled then
 				HotbarSystem.show()
 				return
 			end
 			HotbarSystem.hide()
 		end
 	end
-	local v7 = t:getValue()
+	local hotbarWithSpeedometerEnabled = hotbarWithSpeedometerSetting:getValue()
 	if VehicleUtils.GetLocalVehiclePacket and VehicleUtils.GetLocalVehiclePacket() then
-		if v7 then
+		if hotbarWithSpeedometerEnabled then
 			HotbarSystem.show()
 		else
 			HotbarSystem.hide()
 		end
 	end
-	t.onChanged:Connect(handleSetting)
+	hotbarWithSpeedometerSetting.onChanged:Connect(handleSetting)
 	if AdminPermUtils.hasPerms(Players.LocalPlayer) then
-		p1._maid:GiveTask(UserInputService.InputBegan:Connect(function(p12, p2) --[[ Line: 170 | Upvalues: UserInputService (ref), p1 (copy) ]]
-			if not p2 and (p12.KeyCode == Enum.KeyCode.G and (UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) and p1.state.inVehicle)) then
-				p1:setState({
-					speedometerEnabled = not p1.state.speedometerEnabled
+		self._maid:GiveTask(UserInputService.InputBegan:Connect(function(input, gameProcessed)
+			if not gameProcessed and (input.KeyCode == Enum.KeyCode.G and (UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) and self.state.inVehicle)) then
+				self:setState({
+					speedometerEnabled = not self.state.speedometerEnabled
 				})
 			end
 		end))
 	end
-	p1._maid:GiveTask(VehicleUtils.OnVehicleEntered:Connect(function(p12, p2) --[[ Line: 182 | Upvalues: p1 (copy), store (ref), t (copy), HotbarSystem (ref), VehicleUtils (ref), RunService (ref), SpeedometerUtils (ref), Players (ref), RxInstanceUtils (ref), TableUtils (ref) ]]
-		if not p2 then
-			if p1.state.garageVisible then
-				p12.LockMovement = true
+	self._maid:GiveTask(VehicleUtils.OnVehicleEntered:Connect(function(vehiclePacket, isPassenger)
+		if not isPassenger then
+			if self.state.garageVisible then
+				vehiclePacket.LockMovement = true
 			end
 			store:dispatch({
 				type = "setInVehicle",
@@ -182,310 +182,310 @@ function v2.init(p1) --[[ Line: 94 | Upvalues: Maid (copy), Settings (copy), Gam
 			})
 			store:dispatch({
 				type = "setLocalVehiclePacket",
-				packet = p12
+				packet = vehiclePacket
 			})
-			p1:setState({
+			self:setState({
 				inVehicle = true
 			})
-			p12.seatMaid:GiveTask(function() --[[ Line: 200 | Upvalues: store (ref), p1 (ref) ]]
+			vehiclePacket.seatMaid:GiveTask(function()
 				store:dispatch({
 					type = "setInVehicle",
 					inVehicle = false
 				})
-				p1:setState({
+				self:setState({
 					inVehicle = false,
 					garageVisible = false
 				})
 			end)
-			local BoundingBox = p12.Model:FindFirstChild("BoundingBox")
+			local BoundingBox = vehiclePacket.Model:FindFirstChild("BoundingBox")
 			if BoundingBox then
-				if not t:getValue() then
+				if not hotbarWithSpeedometerSetting:getValue() then
 					HotbarSystem.hide()
 				end
-				p12.seatMaid:GiveTask(function() --[[ Line: 216 | Upvalues: t (ref), HotbarSystem (ref) ]]
-					if not t:getValue() then
+				vehiclePacket.seatMaid:GiveTask(function()
+					if not hotbarWithSpeedometerSetting:getValue() then
 						HotbarSystem.show()
 					end
 				end)
-				local t2 = {
+				local vehicleState = {
 					speedometerEnabled = true,
 					hasLicensePlate = false
 				}
-				t2.missilesEnabled = (p12.Bombs or p12.Rockets) and true or false
-				t2.speedometerSmallUI = p12.Make == "Bionic"
-				p1:setState(t2)
-				p12.seatMaid:GiveTask(function() --[[ Line: 227 | Upvalues: p1 (ref) ]]
-					p1:setState({
+				vehicleState.missilesEnabled = (vehiclePacket.Bombs or vehiclePacket.Rockets) and true or false
+				vehicleState.speedometerSmallUI = vehiclePacket.Make == "Bionic"
+				self:setState(vehicleState)
+				vehiclePacket.seatMaid:GiveTask(function()
+					self:setState({
 						speedometerEnabled = false,
 						licensePromptEnabled = false
 					})
 				end)
-				p1._updateSpdDistance(0)
+				self._updateSpdDistance(0)
 				VehicleUtils.updateSpdBarRatio(0)
 				VehicleUtils._forceUpdateNitroBar = true
-				p12.seatMaid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 236 | Upvalues: BoundingBox (copy), SpeedometerUtils (ref), VehicleUtils (ref), p1 (ref), p12 (copy) ]]
-					local v2 = math.abs((BoundingBox.Velocity:Dot(BoundingBox.CFrame.LookVector)))
-					local v3 = SpeedometerUtils.sToH(SpeedometerUtils.studsToMi(v2))
-					VehicleUtils.LastMPHClient = v3
-					p1._updateSpdSpeed(v3)
-					if p12.rpmVisual and p12.rpmVisualMax then
-						p1._updateSpdAccelRatio(p12.rpmVisual / p12.rpmVisualMax)
+				vehiclePacket.seatMaid:GiveTask(RunService.Heartbeat:Connect(function()
+					local rawSpeed = math.abs((BoundingBox.Velocity:Dot(BoundingBox.CFrame.LookVector)))
+					local mph = SpeedometerUtils.sToH(SpeedometerUtils.studsToMi(rawSpeed))
+					VehicleUtils.LastMPHClient = mph
+					self._updateSpdSpeed(mph)
+					if vehiclePacket.rpmVisual and vehiclePacket.rpmVisualMax then
+						self._updateSpdAccelRatio(vehiclePacket.rpmVisual / vehiclePacket.rpmVisualMax)
 					else
-						p1._updateSpdAccelRatio(v2 / 100)
+						self._updateSpdAccelRatio(rawSpeed / 100)
 					end
 				end))
 				local PlayerGui = Players.LocalPlayer:FindFirstChild("PlayerGui")
 				if PlayerGui then
 					local MapMakeOdometer = PlayerGui:FindFirstChild("MapMakeOdometer")
-					p12.seatMaid:GiveTask(RxInstanceUtils.observeOneChildNamed(MapMakeOdometer, p12.Make, function(p12, p2) --[[ Line: 256 | Upvalues: p1 (ref), SpeedometerUtils (ref) ]]
-						p1._updateSpdDistance(SpeedometerUtils.studsToMi(p12.Value))
-						p2:GiveTask(p12.Changed:Connect(function(p12) --[[ Line: 258 | Upvalues: p1 (ref), SpeedometerUtils (ref) ]]
-							p1._updateSpdDistance(SpeedometerUtils.studsToMi(p12))
+					vehiclePacket.seatMaid:GiveTask(RxInstanceUtils.observeOneChildNamed(MapMakeOdometer, vehiclePacket.Make, function(odometerValue, taskMaid)
+						self._updateSpdDistance(SpeedometerUtils.studsToMi(odometerValue.Value))
+						taskMaid:GiveTask(odometerValue.Changed:Connect(function(newValue)
+							self._updateSpdDistance(SpeedometerUtils.studsToMi(newValue))
 						end))
 					end))
 				end
-				local function updateLocked() --[[ Line: 267 | Upvalues: p1 (ref), p12 (copy), VehicleUtils (ref) ]]
-					local t = {}
-					t.vehicleLocked = p12.Model:GetAttribute("Locked") == true
-					t.speedometerLockEnabled = VehicleUtils.canLocalLock()
-					p1:setState(t)
+				local function updateLocked()
+					local lockedState = {}
+					lockedState.vehicleLocked = vehiclePacket.Model:GetAttribute("Locked") == true
+					lockedState.speedometerLockEnabled = VehicleUtils.canLocalLock()
+					self:setState(lockedState)
 				end
-				local t3 = {}
-				t3.vehicleLocked = p12.Model:GetAttribute("Locked") == true
-				t3.speedometerLockEnabled = VehicleUtils.canLocalLock()
-				p1:setState(t3)
-				p12.seatMaid:GiveTask(p12.Model:GetAttributeChangedSignal("Locked"):Connect(updateLocked))
-				local function updatePassengers() --[[ Line: 277 | Upvalues: VehicleUtils (ref), p12 (copy), TableUtils (ref), Players (ref), p1 (ref) ]]
-					local v3 = TableUtils.map(TableUtils.filter(VehicleUtils.getSeats(p12.Model), function(p1) --[[ Line: 279 | Upvalues: Players (ref) ]]
-						return p1.Player ~= Players.LocalPlayer
-					end), function(p1) --[[ Line: 282 ]]
-						return p1.Player
+				local initialLockedState = {}
+				initialLockedState.vehicleLocked = vehiclePacket.Model:GetAttribute("Locked") == true
+				initialLockedState.speedometerLockEnabled = VehicleUtils.canLocalLock()
+				self:setState(initialLockedState)
+				vehiclePacket.seatMaid:GiveTask(vehiclePacket.Model:GetAttributeChangedSignal("Locked"):Connect(updateLocked))
+				local function updatePassengers()
+					local otherPassengers = TableUtils.map(TableUtils.filter(VehicleUtils.getSeats(vehiclePacket.Model), function(seat)
+						return seat.Player ~= Players.LocalPlayer
+					end), function(seat)
+						return seat.Player
 					end)
-					local t = {
-						passengers = v3
+					local passengerState = {
+						passengers = otherPassengers
 					}
-					t.speedometerEjectEnabled = if #v3 > 0 then VehicleUtils.canLocalEject() else false
-					p1:setState(t)
+					passengerState.speedometerEjectEnabled = if #otherPassengers > 0 then VehicleUtils.canLocalEject() else false
+					self:setState(passengerState)
 				end
 				updatePassengers()
-				for i, v in ipairs(p12.Model:GetChildren()) do
+				for i, v in ipairs(vehiclePacket.Model:GetChildren()) do
 					if v.Name == "Seat" or v.Name == "Passenger" then
 						local PlayerName = v:FindFirstChild("PlayerName")
-						p12.seatMaid:GiveTask(PlayerName.Changed:Connect(updatePassengers))
+						vehiclePacket.seatMaid:GiveTask(PlayerName.Changed:Connect(updatePassengers))
 					end
 				end
-				local Model = p12.Model:FindFirstChild("Model")
+				local Model = vehiclePacket.Model:FindFirstChild("Model")
 				if Model then
 					local plate = Model:FindFirstChild("plate")
 					if plate then
 						local SurfaceGui = plate:FindFirstChild("SurfaceGui")
 						if SurfaceGui then
 							local TextLabel = SurfaceGui.Frame.TextLabel
-							p1:setState({
+							self:setState({
 								hasLicensePlate = true,
 								licensePlateText = TextLabel.Text
 							})
-							p12.seatMaid:GiveTask(TextLabel:GetPropertyChangedSignal("Text"):Connect(function() --[[ Line: 311 | Upvalues: p1 (ref), TextLabel (copy) ]]
-								p1:setState({
+							vehiclePacket.seatMaid:GiveTask(TextLabel:GetPropertyChangedSignal("Text"):Connect(function()
+								self:setState({
 									licensePlateText = TextLabel.Text
 								})
 							end))
 						end
 					end
 				end
-				local function updateMissiles() --[[ Line: 321 | Upvalues: Players (ref), p12 (copy), p1 (ref) ]]
-					p1:setState({
+				local function updateMissiles()
+					self:setState({
 						missileCount = Players.LocalPlayer:GetAttribute("MissileCount") or 0,
-						missileMax = p12.Model:GetAttribute("MissileMax") or 0
+						missileMax = vehiclePacket.Model:GetAttribute("MissileMax") or 0
 					})
 				end
 				updateMissiles()
-				p12.seatMaid:GiveTask(Players.LocalPlayer:GetAttributeChangedSignal("MissileCount"):Connect(updateMissiles))
-				p12.seatMaid:GiveTask(p12.Model:GetAttributeChangedSignal("MissileMax"):Connect(updateMissiles))
+				vehiclePacket.seatMaid:GiveTask(Players.LocalPlayer:GetAttributeChangedSignal("MissileCount"):Connect(updateMissiles))
+				vehiclePacket.seatMaid:GiveTask(vehiclePacket.Model:GetAttributeChangedSignal("MissileMax"):Connect(updateMissiles))
 			end
 		end
 	end))
-	p1._maid:GiveTask(CCTVService.onRequestPrompt:Connect(function(p12, p2) --[[ Line: 338 | Upvalues: p1 (copy) ]]
-		if p12 == nil then
-			p12 = true
+	self._maid:GiveTask(CCTVService.onRequestPrompt:Connect(function(enabled, permanent)
+		if enabled == nil then
+			enabled = true
 		end
-		local t = {
-			cctvViewerEnabled = p12
+		local cctvState = {
+			cctvViewerEnabled = enabled
 		}
-		t.cctvViewerExpireDistance = if p2 then 9999 else 20
-		p1:setState(t)
+		cctvState.cctvViewerExpireDistance = if permanent then 9999 else 20
+		self:setState(cctvState)
 	end))
-	p1.consoleRef = Roact.createRef()
-	p1.settingsRef = Roact.createRef()
-	p1._maid:GiveTask(SidebarUI.onDevPanelToggle:Connect(function() --[[ Line: 350 | Upvalues: p1 (copy) ]]
-		p1:setState({
-			devPanelVisible = not p1.state.devPanelVisible,
-			devPanelCurrentPage = p1.settingsRef:getValue()
+	self.consoleRef = Roact.createRef()
+	self.settingsRef = Roact.createRef()
+	self._maid:GiveTask(SidebarUI.onDevPanelToggle:Connect(function()
+		self:setState({
+			devPanelVisible = not self.state.devPanelVisible,
+			devPanelCurrentPage = self.settingsRef:getValue()
 		})
 	end))
-	local function setGarageUIOpen(p12) --[[ Line: 356 | Upvalues: GarageUtils (ref), ReplicatedStorage (ref), GarageConsts (ref), store (ref), SaleConsts (ref), p1 (copy) ]]
-		local v1 = GarageUtils.inVehicle() and (GarageUtils.hasPremium() or GarageUtils.inPhysicalGarage())
-		if p12 then
-			if v1 then
-				local v2 = ReplicatedStorage:FindFirstChild(GarageConsts.LOAD_LAST_SELECTION_REMOTE_NAME)
-				if v2 then
-					v2:FireServer()
+	local function setGarageUIOpen(open)
+		local canCustomize = GarageUtils.inVehicle() and (GarageUtils.hasPremium() or GarageUtils.inPhysicalGarage())
+		if open then
+			if canCustomize then
+				local loadLastSelectionRemote = ReplicatedStorage:FindFirstChild(GarageConsts.LOAD_LAST_SELECTION_REMOTE_NAME)
+				if loadLastSelectionRemote then
+					loadLastSelectionRemote:FireServer()
 				end
 			end
-			local v3 = store:getState()
-			local t = {
+			local currentState = store:getState()
+			local pageAction = {
 				type = "setPage"
 			}
-			t.pageName = if v1 then "Customize" else "Spawn"
-			t.categoryName = SaleConsts.CATEGORY_NAME
-			t.sortId = v3.garageSort
-			t.garageOwned = v3.garageOwned
-			store:dispatch(t)
+			pageAction.pageName = if canCustomize then "Customize" else "Spawn"
+			pageAction.categoryName = SaleConsts.CATEGORY_NAME
+			pageAction.sortId = currentState.garageSort
+			pageAction.garageOwned = currentState.garageOwned
+			store:dispatch(pageAction)
 		end
-		p1:setState({
-			garageVisible = p12
+		self:setState({
+			garageVisible = open
 		})
 	end
-	local v8 = ReplicatedStorage:FindFirstChild(GarageConsts.INFORM_UI_IS_OPEN_REMOTE_NAME)
-	v8.OnClientEvent:Connect(setGarageUIOpen)
-	p1._maid:GiveTask(SidebarUI.onGarageToggle:Connect(function() --[[ Line: 382 | Upvalues: p1 (copy), VehicleUtils (ref), Notification (ref), v8 (copy), setGarageUIOpen (copy) ]]
-		if p1.state.garageVisible then
-			v8:FireServer(not p1.state.garageVisible)
-			setGarageUIOpen(not p1.state.garageVisible)
+	local informUIOpenRemote = ReplicatedStorage:FindFirstChild(GarageConsts.INFORM_UI_IS_OPEN_REMOTE_NAME)
+	informUIOpenRemote.OnClientEvent:Connect(setGarageUIOpen)
+	self._maid:GiveTask(SidebarUI.onGarageToggle:Connect(function()
+		if self.state.garageVisible then
+			informUIOpenRemote:FireServer(not self.state.garageVisible)
+			setGarageUIOpen(not self.state.garageVisible)
 			return
 		end
-		local v1 = VehicleUtils.GetLocalVehiclePacket()
-		if v1 and v1.Passenger then
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+		if vehiclePacket and vehiclePacket.Passenger then
 			Notification.new({
 				Title = "Garage",
 				Text = "Cannot customize as passenger."
 			})
-		elseif v1 and v1.Model:GetAttribute("DisableGarage") then
+		elseif vehiclePacket and vehiclePacket.Model:GetAttribute("DisableGarage") then
 			Notification.new({
 				Text = "Garage disabled on this vehicle."
 			})
 		else
-			v8:FireServer(not p1.state.garageVisible)
-			setGarageUIOpen(not p1.state.garageVisible)
+			informUIOpenRemote:FireServer(not self.state.garageVisible)
+			setGarageUIOpen(not self.state.garageVisible)
 		end
 	end))
-	function p1.onClickLeaveGarage() --[[ Line: 400 | Upvalues: v8 (copy), p1 (copy) ]]
-		v8:FireServer(false)
-		p1:setState({
+	function self.onClickLeaveGarage()
+		informUIOpenRemote:FireServer(false)
+		self:setState({
 			garageVisible = false
 		})
 	end
-	function p1.onClickSpawnVehicle(p12) --[[ Line: 406 | Upvalues: ReplicatedStorage (ref), GarageConsts (ref), p1 (copy) ]]
-		local v1 = ReplicatedStorage:FindFirstChild(GarageConsts.SPAWN_VEHICLE_REMOTE_NAME)
-		if v1 then
-			v1:FireServer(p12.vehicleType, p12.vehicleMake)
+	function self.onClickSpawnVehicle(params)
+		local spawnVehicleRemote = ReplicatedStorage:FindFirstChild(GarageConsts.SPAWN_VEHICLE_REMOTE_NAME)
+		if spawnVehicleRemote then
+			spawnVehicleRemote:FireServer(params.vehicleType, params.vehicleMake)
 		end
-		p1.onClickLeaveGarage()
+		self.onClickLeaveGarage()
 	end
-	function p1.onAttemptPurchaseVehicle(p12, p2) --[[ Line: 414 | Upvalues: Confirmation (ref), p1 (copy), ItemUtils (ref), String (ref), ReplicatedStorage (ref), GarageConsts (ref) ]]
-		if p12.limited then
-		elseif p2.locked then
-			local v1 = Confirmation.new("You need the Pro Garage gamepass to buy this here. Otherwise, find it in the world and buy it there. Want to buy Pro Garage?")
-			p1:setState({
+	function self.onAttemptPurchaseVehicle(vehicleInfo, categoryInfo)
+		if vehicleInfo.limited then
+		elseif categoryInfo.locked then
+			local confirmation = Confirmation.new("You need the Pro Garage gamepass to buy this here. Otherwise, find it in the world and buy it there. Want to buy Pro Garage?")
+			self:setState({
 				garageVisible = false
 			})
-			v1.Maid:GiveTask(function() --[[ Line: 427 | Upvalues: p1 (ref) ]]
-				p1:setState({
+			confirmation.Maid:GiveTask(function()
+				self:setState({
 					garageVisible = true
 				})
 			end)
-			v1.Maid:GiveTask(v1.OnYes:Connect(function() --[[ Line: 432 | Upvalues: p1 (ref) ]]
-				p1.onRequestPremiumUpgrade()
+			confirmation.Maid:GiveTask(confirmation.OnYes:Connect(function()
+				self.onRequestPremiumUpgrade()
 			end))
 		else
-			local vehicleMake = p12.vehicleMake
-			local v3 = ItemUtils.getTranslatedTitleFromItemTable((ItemUtils.createVehicleItemTable(vehicleMake)))
-			local v4 = Confirmation.new("Purchase the " .. v3 .. " for $" .. String.comma(p12.price) .. "?")
-			p1:setState({
+			local vehicleMake = vehicleInfo.vehicleMake
+			local vehicleTitle = ItemUtils.getTranslatedTitleFromItemTable((ItemUtils.createVehicleItemTable(vehicleMake)))
+			local confirmation = Confirmation.new("Purchase the " .. vehicleTitle .. " for $" .. String.comma(vehicleInfo.price) .. "?")
+			self:setState({
 				garageVisible = false
 			})
-			v4.Maid:GiveTask(function() --[[ Line: 446 | Upvalues: p1 (ref) ]]
-				p1:setState({
+			confirmation.Maid:GiveTask(function()
+				self:setState({
 					garageVisible = true
 				})
 			end)
-			v4.Maid:GiveTask(v4.OnYes:Connect(function() --[[ Line: 451 | Upvalues: ReplicatedStorage (ref), GarageConsts (ref), vehicleMake (copy) ]]
+			confirmation.Maid:GiveTask(confirmation.OnYes:Connect(function()
 				ReplicatedStorage:FindFirstChild(GarageConsts.PURCHASE_VEHICLE_REMOTE_NAME):FireServer(vehicleMake)
 			end))
 		end
 	end
-	function p1.getRemainingDebounce() --[[ Line: 455 | Upvalues: store (ref), PlayerUtils (ref), Players (ref), GarageConsts (ref), GarageConsts_2 (ref) ]]
-		local v1 = store:getState()
-		local v2 = workspace:GetServerTimeNow() - PlayerUtils.getLastVehicleSpawnedAt()
-		return if v1.garageInPhysical or Players.LocalPlayer:GetAttribute(GarageConsts.AERIAL_SPAWN_ATTR_NAME) then GarageConsts_2.SPAWN_DEBOUNCE_PHYSICAL elseif v1.garagePremium then GarageConsts_2.SPAWN_DEBOUNCE_PREMIUM else GarageConsts_2.SPAWN_DEBOUNCE_NON_PREMIUM - v2
+	function self.getRemainingDebounce()
+		local currentState = store:getState()
+		local timeSinceLastSpawn = workspace:GetServerTimeNow() - PlayerUtils.getLastVehicleSpawnedAt()
+		return if currentState.garageInPhysical or Players.LocalPlayer:GetAttribute(GarageConsts.AERIAL_SPAWN_ATTR_NAME) then GarageConsts_2.SPAWN_DEBOUNCE_PHYSICAL elseif currentState.garagePremium then GarageConsts_2.SPAWN_DEBOUNCE_PREMIUM else GarageConsts_2.SPAWN_DEBOUNCE_NON_PREMIUM - timeSinceLastSpawn
 	end
-	function p1.onDeleteSlot(p12) --[[ Line: 470 | Upvalues: Confirmation (ref), p1 (copy), store (ref) ]]
-		local v1 = Confirmation.new("Are you sure you want to delete this save slot?")
-		p1:setState({
+	function self.onDeleteSlot(slotName)
+		local confirmation = Confirmation.new("Are you sure you want to delete this save slot?")
+		self:setState({
 			garageVisible = false
 		})
-		v1.Maid:GiveTask(function() --[[ Line: 477 | Upvalues: p1 (ref) ]]
-			p1:setState({
+		confirmation.Maid:GiveTask(function()
+			self:setState({
 				garageVisible = true
 			})
 		end)
-		v1.Maid:GiveTask(v1.OnYes:Connect(function() --[[ Line: 482 | Upvalues: store (ref), p12 (copy) ]]
+		confirmation.Maid:GiveTask(confirmation.OnYes:Connect(function()
 			store:dispatch({
 				type = "deleteSaveSlot",
-				name = p12
+				name = slotName
 			})
 		end))
 	end
-	function p1.attemptEquipGarageItem(p1, p2) --[[ Line: 490 | Upvalues: ReplicatedStorage (ref), GarageConsts (ref) ]]
-		local v1 = ReplicatedStorage:FindFirstChild(GarageConsts.EQUIP_ITEM_REMOTE_NAME)
-		if v1 then
-			v1:FireServer(p1, p2)
+	function self.attemptEquipGarageItem(itemType, itemName)
+		local remote = ReplicatedStorage:FindFirstChild(GarageConsts.EQUIP_ITEM_REMOTE_NAME)
+		if remote then
+			remote:FireServer(itemType, itemName)
 		end
 	end
-	function p1.attemptFavoriteGarageItem(p1, p2, p3) --[[ Line: 496 | Upvalues: ReplicatedStorage (ref), GarageConsts (ref) ]]
-		local v1 = ReplicatedStorage:FindFirstChild(GarageConsts.UPDATE_FAVORITED_REMOTE_NAME)
-		if v1 then
-			v1:FireServer(p1, p2, p3)
+	function self.attemptFavoriteGarageItem(itemType, itemName, favorited)
+		local remote = ReplicatedStorage:FindFirstChild(GarageConsts.UPDATE_FAVORITED_REMOTE_NAME)
+		if remote then
+			remote:FireServer(itemType, itemName, favorited)
 		end
 	end
-	function p1.attemptBuyGarageItem(p1, p2) --[[ Line: 502 | Upvalues: ReplicatedStorage (ref), GarageConsts (ref) ]]
-		local v1 = ReplicatedStorage:FindFirstChild(GarageConsts.PURCHASE_ITEM_REMOTE_NAME)
-		if v1 then
-			v1:FireServer(p1, p2)
+	function self.attemptBuyGarageItem(itemType, itemName)
+		local remote = ReplicatedStorage:FindFirstChild(GarageConsts.PURCHASE_ITEM_REMOTE_NAME)
+		if remote then
+			remote:FireServer(itemType, itemName)
 		end
 	end
-	function p1.notify(p1) --[[ Line: 508 | Upvalues: Notification (ref) ]]
+	function self.notify(text)
 		Notification.new({
-			Text = p1
+			Text = text
 		})
 	end
-	function p1.onRequestPremiumUpgrade() --[[ Line: 511 | Upvalues: GamepassUtils (ref) ]]
+	function self.onRequestPremiumUpgrade()
 		GamepassUtils.PromptGamepass(GamepassUtils.EnumGamepass.PremiumGarage)
 	end
-	function p1.garagePromptCashPurchase() --[[ Line: 514 | Upvalues: p1 (copy), CashBuyUI (ref) ]]
-		p1.onClickLeaveGarage()
+	function self.garagePromptCashPurchase()
+		self.onClickLeaveGarage()
 		CashBuyUI.Open()
 	end
-	p1.minimapBaseProps = {
+	self.minimapBaseProps = {
 		mapImageColor3 = MinimapService.mapImageColor3,
-		mapImageId = p1.props.mapImageId,
-		mapWorldWidth = p1.props.mapWorldWidth,
-		mapWorldHeight = p1.props.mapWorldHeight,
-		mapWorldCenterX = p1.props.mapWorldCenterX,
-		mapWorldCenterY = p1.props.mapWorldCenterY,
-		mapImageWidth = p1.props.mapImageWidth,
-		mapImageHeight = p1.props.mapImageHeight,
+		mapImageId = self.props.mapImageId,
+		mapWorldWidth = self.props.mapWorldWidth,
+		mapWorldHeight = self.props.mapWorldHeight,
+		mapWorldCenterX = self.props.mapWorldCenterX,
+		mapWorldCenterY = self.props.mapWorldCenterY,
+		mapImageWidth = self.props.mapImageWidth,
+		mapImageHeight = self.props.mapImageHeight,
 		worldPosition = MinimapService.mapWorldPosition,
 		worldDirection = MinimapService.mapWorldDirection
 	}
-	function p1.minimapOnToggle() --[[ Line: 531 | Upvalues: p1 (copy) ]]
-		p1:setState({
-			minimapOpen = not p1.state.minimapOpen
+	function self.minimapOnToggle()
+		self:setState({
+			minimapOpen = not self.state.minimapOpen
 		})
 	end
-	function p1.megamapOnToggle() --[[ Line: 536 | Upvalues: p1 (copy) ]]
-		p1:setState({
-			megamapOpen = not p1.state.megamapOpen
+	function self.megamapOnToggle()
+		self:setState({
+			megamapOpen = not self.state.megamapOpen
 		})
 	end
 	if RunUtils.isMainWorld() then
@@ -523,58 +523,58 @@ function v2.init(p1) --[[ Line: 94 | Upvalues: Maid (copy), Settings (copy), Gam
 			}
 		})
 	end
-	p1._maid:GiveTask(UserInputService.InputBegan:Connect(function(p12, p2) --[[ Line: 578 | Upvalues: p1 (copy) ]]
-		if not p2 and p12.UserInputType == Enum.UserInputType.Keyboard then
-			if p12.KeyCode == Enum.KeyCode.M then
-				p1.megamapOnToggle()
+	self._maid:GiveTask(UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard then
+			if input.KeyCode == Enum.KeyCode.M then
+				self.megamapOnToggle()
 			end
-		elseif not p2 and (p12.UserInputType == Enum.UserInputType.Gamepad1 and p12.KeyCode == Enum.KeyCode.DPadRight) then
-			p1.megamapOnToggle()
+		elseif not gameProcessed and (input.UserInputType == Enum.UserInputType.Gamepad1 and input.KeyCode == Enum.KeyCode.DPadRight) then
+			self.megamapOnToggle()
 		end
 	end))
-	function p1.onSpawnSelectionSpawnPressed(p1) --[[ Line: 593 | Upvalues: SpawnSelectionService (ref), GameUtil (ref) ]]
-		SpawnSelectionService.attemptSelect(p1.name)
+	function self.onSpawnSelectionSpawnPressed(spawnInfo)
+		SpawnSelectionService.attemptSelect(spawnInfo.name)
 		GameUtil.removeDeathLighting()
 	end
-	function p1.onSpawnSelectionShowSpawns() --[[ Line: 597 | Upvalues: SpawnSelectionService (ref), GameUtil (ref) ]]
+	function self.onSpawnSelectionShowSpawns()
 		SpawnSelectionService.requestShowSpawns()
 		GameUtil.removeDeathGui()
 	end
-	local t2 = {
+	local showTooltipsSetting = {
 		name = "showTooltips",
 		title = "Show Tooltips",
 		type = gameSettingType.Checkbox,
 		defaultValue = true,
 		order = 52
 	}
-	GameSettingsService.add(t2)
-	local function handleTooltips(p1) --[[ Line: 610 | Upvalues: store (ref) ]]
+	GameSettingsService.add(showTooltipsSetting)
+	local function handleTooltips(value)
 		store:dispatch({
 			type = "setTooltipVisible",
-			value = p1
+			value = value
 		})
 	end
 	store:dispatch({
 		type = "setTooltipVisible",
-		value = t2:getValue()
+		value = showTooltipsSetting:getValue()
 	})
-	t2.onChanged:Connect(handleTooltips)
+	showTooltipsSetting.onChanged:Connect(handleTooltips)
 end
-function v2.render(p1) --[[ Line: 619 | Upvalues: createElement (copy), Runtime (copy), Bounty (copy), MinimapRodux (copy), Dictionary (copy), SidebarUI (copy), InputUtils (copy), SidebarHolder (copy), BigButtonService (copy), BigMinimap (copy), CenterMessage (copy), TrackService (copy), LikePromptRodux (copy), TooltipRodux (copy), Utils (copy), Speedometer (copy), VehicleUtils (copy), LicensePlate (copy), Viewer (copy), TabContainer (copy), Roact (copy), ReplicatedStorage (copy), Garage (copy), CasinoKeypad (copy), DamageIndicators (copy), Trade (copy), TradeInitiations (copy), TradeResult (copy), RewardSpinner (copy), Safes (copy), SpawnSelection (copy), SpawnSelectionConsts (copy), ChooseSpawn (copy), Settings (copy), OtherTradeServerListRodux (copy), RoactRodux (copy), store (copy) ]]
-	local t = {
+function AppComponent.render(self)
+	local children = {
 		Controls = createElement(Runtime, {
-			enabled = p1.state.controlsEnabled,
-			color = p1.state.teamColor
+			enabled = self.state.controlsEnabled,
+			color = self.state.teamColor
 		})
 	}
-	if p1.state.isSmallScreen then
-		local t2 = {
+	if self.state.isSmallScreen then
+		local frameProps = {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0.1, 0, 1, 0),
 			AnchorPoint = Vector2.new(1, 0),
 			Position = UDim2.new(1, 0, 0, 0)
 		}
-		local t3 = {
+		local innerChildren = {
 			Padding = createElement("UIPadding", {
 				PaddingTop = UDim.new(0, 61)
 			}),
@@ -586,37 +586,37 @@ function v2.render(p1) --[[ Line: 619 | Upvalues: createElement (copy), Runtime 
 				Padding = UDim.new(0, 8)
 			})
 		}
-		local t4 = {
-			amount = p1.state.bounty
+		local bountyProps = {
+			amount = self.state.bounty
 		}
-		t4.enabled = p1.state.bounty > 0
-		t4.displayOrder = 2
-		t3.Bounty = createElement(Bounty, t4)
-		local t5 = {
+		bountyProps.enabled = self.state.bounty > 0
+		bountyProps.displayOrder = 2
+		innerChildren.Bounty = createElement(Bounty, bountyProps)
+		local minimapProps = {
 			square = true,
 			mapScale = 6,
 			size = UDim2.new(0.9, 0, 0.9, 0),
 			anchorPoint = Vector2.new(0.5, 0.5),
-			isSmallScreen = p1.state.isSmallScreen,
-			color = p1.state.teamColor
+			isSmallScreen = self.state.isSmallScreen,
+			color = self.state.teamColor
 		}
-		t5.open = p1.state.minimapOpen and p1.state.controlsEnabled
-		t5.showToggleButton = p1.state.controlsEnabled
-		t5.time = SidebarUI.time
-		t5.displayOrder = 3
-		t5.onToggle = p1.minimapOnToggle
-		t5.onClick = p1.megamapOnToggle
-		t3.Minimap = createElement(MinimapRodux, Dictionary.merge(p1.minimapBaseProps, t5))
-		t.TopRight = createElement("Frame", t2, t3)
+		minimapProps.open = self.state.minimapOpen and self.state.controlsEnabled
+		minimapProps.showToggleButton = self.state.controlsEnabled
+		minimapProps.time = SidebarUI.time
+		minimapProps.displayOrder = 3
+		minimapProps.onToggle = self.minimapOnToggle
+		minimapProps.onClick = self.megamapOnToggle
+		innerChildren.Minimap = createElement(MinimapRodux, Dictionary.merge(self.minimapBaseProps, minimapProps))
+		children.TopRight = createElement("Frame", frameProps, innerChildren)
 	else
-		local v9 = InputUtils.isGamepad()
-		local t2 = {
+		local isGamepad = InputUtils.isGamepad()
+		local frameProps = {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0.4, 0)
 		}
-		t2.Position = UDim2.new(0, 0, if v9 then 0.74 else 0.6, 0)
-		t2.AnchorPoint = Vector2.new(0, 0.5)
-		local t3 = {
+		frameProps.Position = UDim2.new(0, 0, if isGamepad then 0.74 else 0.6, 0)
+		frameProps.AnchorPoint = Vector2.new(0, 0.5)
+		local innerChildren = {
 			ListLayout = createElement("UIListLayout", {
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				VerticalAlignment = Enum.VerticalAlignment.Bottom,
@@ -629,7 +629,7 @@ function v2.render(p1) --[[ Line: 619 | Upvalues: createElement (copy), Runtime 
 				DominantAxis = Enum.DominantAxis.Height
 			}),
 			Sidebar = createElement(SidebarHolder, {
-				color = p1.state.teamColor,
+				color = self.state.teamColor,
 				buttons = BigButtonService.active,
 				size = UDim2.new(1, 0, 1, 0),
 				anchorPoint = Vector2.new(0, 1),
@@ -637,135 +637,135 @@ function v2.render(p1) --[[ Line: 619 | Upvalues: createElement (copy), Runtime 
 				displayOrder = 1
 			})
 		}
-		local t4 = {
-			amount = p1.state.bounty
+		local bountyProps = {
+			amount = self.state.bounty
 		}
-		t4.enabled = p1.state.bounty > 0
-		t4.displayOrder = 2
-		t3.Bounty = createElement(Bounty, t4)
-		local t5 = {
+		bountyProps.enabled = self.state.bounty > 0
+		bountyProps.displayOrder = 2
+		innerChildren.Bounty = createElement(Bounty, bountyProps)
+		local minimapProps = {
 			square = true,
 			mapScale = 6,
 			size = UDim2.new(0.9, 0, 0.9, 0),
 			anchorPoint = Vector2.new(0.5, 0.5),
-			isSmallScreen = p1.state.isSmallScreen,
-			color = p1.state.teamColor
+			isSmallScreen = self.state.isSmallScreen,
+			color = self.state.teamColor
 		}
-		t5.open = p1.state.minimapOpen and p1.state.controlsEnabled
-		t5.showToggleButton = p1.state.controlsEnabled
-		t5.time = SidebarUI.time
-		t5.displayOrder = 3
-		t5.onToggle = p1.minimapOnToggle
-		t5.onClick = p1.megamapOnToggle
-		t3.Minimap = createElement(MinimapRodux, Dictionary.merge(p1.minimapBaseProps, t5))
-		t.Buttons = createElement("Frame", t2, t3)
+		minimapProps.open = self.state.minimapOpen and self.state.controlsEnabled
+		minimapProps.showToggleButton = self.state.controlsEnabled
+		minimapProps.time = SidebarUI.time
+		minimapProps.displayOrder = 3
+		minimapProps.onToggle = self.minimapOnToggle
+		minimapProps.onClick = self.megamapOnToggle
+		innerChildren.Minimap = createElement(MinimapRodux, Dictionary.merge(self.minimapBaseProps, minimapProps))
+		children.Buttons = createElement("Frame", frameProps, innerChildren)
 	end
-	t.Minimap = createElement(BigMinimap, Dictionary.merge(p1.minimapBaseProps, {
-		visible = p1.state.megamapOpen,
+	children.Minimap = createElement(BigMinimap, Dictionary.merge(self.minimapBaseProps, {
+		visible = self.state.megamapOpen,
 		open = true,
 		size = UDim2.new(0.7, 0, 0.7, 0),
 		position = UDim2.new(0.5, 0, 0.5, 0),
 		anchorPoint = Vector2.new(0.5, 0.5),
-		labels = p1.state.minimapLabels,
-		color = p1.state.teamColor,
+		labels = self.state.minimapLabels,
+		color = self.state.teamColor,
 		displayOrder = 1,
-		onToggle = p1.megamapOnToggle,
-		isSmallScreen = p1.state.isSmallScreen,
+		onToggle = self.megamapOnToggle,
+		isSmallScreen = self.state.isSmallScreen,
 		square = true
 	}))
-	t.TrackCountdown = createElement(CenterMessage, {
+	children.TrackCountdown = createElement(CenterMessage, {
 		text = TrackService.screenText
 	})
-	t.LikePrompt = createElement(LikePromptRodux, {
+	children.LikePrompt = createElement(LikePromptRodux, {
 		size = UDim2.fromScale(0.35, 0.5),
 		anchorPoint = Vector2.new(0.5, 1),
 		position = UDim2.fromScale(0.5, 0.8)
 	})
-	local t2 = {}
-	t2.size = UDim2.fromScale(0.6, if p1.state.isSmallScreen then 0.025 else 0.015)
-	t2.anchorPoint = Vector2.new(0.5, 1)
-	t2.position = if Utils.isSmallScreen() then UDim2.fromScale(0.5, 0.95) else UDim2.fromScale(0.5, 1)
-	t2.visible = not p1.state.inVehicle
-	t.Tooltip = createElement(TooltipRodux, t2)
-	if p1.state.speedometerEnabled then
-		local t3 = {
+	local tooltipProps = {}
+	tooltipProps.size = UDim2.fromScale(0.6, if self.state.isSmallScreen then 0.025 else 0.015)
+	tooltipProps.anchorPoint = Vector2.new(0.5, 1)
+	tooltipProps.position = if Utils.isSmallScreen() then UDim2.fromScale(0.5, 0.95) else UDim2.fromScale(0.5, 1)
+	tooltipProps.visible = not self.state.inVehicle
+	children.Tooltip = createElement(TooltipRodux, tooltipProps)
+	if self.state.speedometerEnabled then
+		local spdProps = {
 			enabled = true,
-			color = p1.state.teamColor,
-			distance = p1._spdDistance,
-			speed = p1._spdSpeed,
+			color = self.state.teamColor,
+			distance = self._spdDistance,
+			speed = self._spdSpeed,
 			barRatio = VehicleUtils.spdBarRatio,
-			accelRatio = p1._spdAccelRatio,
+			accelRatio = self._spdAccelRatio,
 			size = UDim2.new(0.25, 0, 0.5, 0)
 		}
-		t3.position = UDim2.new(0.5, 0, if p1.state.speedometerSmallUI then 0.93 else 0.95, 0)
-		t3.anchorPoint = Vector2.new(0.5, 1)
-		t3.locked = p1.state.vehicleLocked
-		t3.lockEnabled = p1.state.speedometerLockEnabled
-		t3.hasLicensePlate = p1.state.hasLicensePlate
-		t3.licensePlate = p1.state.licensePlateText
-		t3.ejectEnabled = p1.state.speedometerEjectEnabled
-		t3.missilesEnabled = p1.state.missilesEnabled
-		t3.missileCount = p1.state.missileCount
-		t3.missileMax = p1.state.missileMax
-		t3.passengers = p1.state.passengers
-		t3.smallUI = p1.state.speedometerSmallUI
-		function t3.onClickBar() --[[ Line: 769 | Upvalues: VehicleUtils (ref) ]]
+		spdProps.position = UDim2.new(0.5, 0, if self.state.speedometerSmallUI then 0.93 else 0.95, 0)
+		spdProps.anchorPoint = Vector2.new(0.5, 1)
+		spdProps.locked = self.state.vehicleLocked
+		spdProps.lockEnabled = self.state.speedometerLockEnabled
+		spdProps.hasLicensePlate = self.state.hasLicensePlate
+		spdProps.licensePlate = self.state.licensePlateText
+		spdProps.ejectEnabled = self.state.speedometerEjectEnabled
+		spdProps.missilesEnabled = self.state.missilesEnabled
+		spdProps.missileCount = self.state.missileCount
+		spdProps.missileMax = self.state.missileMax
+		spdProps.passengers = self.state.passengers
+		spdProps.smallUI = self.state.speedometerSmallUI
+		function spdProps.onClickBar()
 			VehicleUtils.NitroShopVisible(true, true)
 		end
-		function t3.onClickLock() --[[ Line: 772 | Upvalues: VehicleUtils (ref) ]]
+		function spdProps.onClickLock()
 			VehicleUtils.toggleLocalLocked()
 		end
-		function t3.onClickEjectName(p1) --[[ Line: 775 | Upvalues: VehicleUtils (ref) ]]
-			VehicleUtils.attemptPassengerEject(p1)
+		function spdProps.onClickEjectName(playerName)
+			VehicleUtils.attemptPassengerEject(playerName)
 		end
-		function t3.onClickPlate() --[[ Line: 778 | Upvalues: p1 (copy) ]]
-			p1:setState({
+		function spdProps.onClickPlate()
+			self:setState({
 				licensePromptEnabled = true
 			})
 		end
-		t3.onClickMissileBuy = VehicleUtils.promptMissileBuy
-		t.Speedometer = createElement(Speedometer, t3)
+		spdProps.onClickMissileBuy = VehicleUtils.promptMissileBuy
+		children.Speedometer = createElement(Speedometer, spdProps)
 	end
-	if p1.state.licensePromptEnabled then
-		t.LicensePlate = createElement(LicensePlate, {
-			text = p1.state.licensePlateText,
+	if self.state.licensePromptEnabled then
+		children.LicensePlate = createElement(LicensePlate, {
+			text = self.state.licensePlateText,
 			size = UDim2.new(0.2, 0, 0.5, 0),
 			position = UDim2.new(0.5, 0, 0.5, 0),
-			onClickClose = function() --[[ Name: onClickClose | Line: 791 | Upvalues: p1 (copy) ]]
-				p1:setState({
+			onClickClose = function()
+				self:setState({
 					licensePromptEnabled = false
 				})
 			end,
-			onClickApply = function(p12) --[[ Name: onClickApply | Line: 796 | Upvalues: p1 (copy) ]]
-				p1:setState({
+			onClickApply = function(newText)
+				self:setState({
 					licensePromptEnabled = false
 				})
-				if #p12 ~= 0 then
-					p1.attemptBuyGarageItem("LicensePlate", p12)
+				if #newText ~= 0 then
+					self.attemptBuyGarageItem("LicensePlate", newText)
 				end
 			end
 		})
 	end
-	if p1.state.cctvViewerEnabled then
-		t.CCTVViewer = createElement(Viewer, {
+	if self.state.cctvViewerEnabled then
+		children.CCTVViewer = createElement(Viewer, {
 			size = UDim2.new(0.5, 0, 0.5, 0),
 			position = UDim2.new(0.5, 0, 0.5, 0),
 			distance = 96,
 			aspectRatio = 1.7777777777777777,
-			expireDistance = p1.state.cctvViewerExpireDistance,
+			expireDistance = self.state.cctvViewerExpireDistance,
 			cameraTag = "CCTVCamera",
 			fieldOfView = 70,
-			onClickClose = function() --[[ Name: onClickClose | Line: 816 | Upvalues: p1 (copy) ]]
-				p1:setState({
+			onClickClose = function()
+				self:setState({
 					cctvViewerEnabled = false
 				})
 			end
 		})
 	end
-	t.DevPanel = createElement(TabContainer, {
-		color = p1.state.teamColor,
-		visible = p1.state.devPanelVisible,
-		isSmallScreen = p1.state.isSmallScreen,
+	children.DevPanel = createElement(TabContainer, {
+		color = self.state.teamColor,
+		visible = self.state.devPanelVisible,
+		isSmallScreen = self.state.isSmallScreen,
 		anchorPoint = Vector2.new(0.5, 0.5),
 		position = UDim2.new(0.5, 0, 0.5, 0),
 		size = UDim2.new(0.5, 0, 0.5, 0),
@@ -776,7 +776,7 @@ function v2.render(p1) --[[ Line: 619 | Upvalues: createElement (copy), Runtime 
 				layoutOrder = 1,
 				backgroundColor = Color3.fromRGB(17, 17, 17),
 				backgroundTransparency = 0.4,
-				[Roact.Ref] = p1.consoleRef
+				[Roact.Ref] = self.consoleRef
 			},
 			{
 				title = "SETTINGS",
@@ -784,89 +784,89 @@ function v2.render(p1) --[[ Line: 619 | Upvalues: createElement (copy), Runtime 
 				layoutOrder = 2,
 				backgroundColor = Color3.fromRGB(17, 17, 17),
 				backgroundTransparency = 0.4,
-				[Roact.Ref] = p1.settingsRef,
+				[Roact.Ref] = self.settingsRef,
 				[Roact.Children] = createElement(require(ReplicatedStorage.GameSettings.UI.GameSettings), {
 					size = UDim2.new(1, 0, 1, 0),
-					color = p1.state.teamColor
+					color = self.state.teamColor
 				})
 			}
 		},
-		currentPage = p1.state.devPanelCurrentPage,
-		updatePage = function(p12) --[[ Name: updatePage | Line: 854 | Upvalues: p1 (copy) ]]
-			p1:setState({
-				devPanelCurrentPage = p12
+		currentPage = self.state.devPanelCurrentPage,
+		updatePage = function(newPage)
+			self:setState({
+				devPanelCurrentPage = newPage
 			})
 		end
 	})
-	local t3 = {}
-	t3.size = if p1.state.isSmallScreen then UDim2.new(0.65, 0, 0.6, 0) else UDim2.new(0.65, 0, 0.7, 0) or UDim2.new(0.65, 0, 0.6, 0)
-	t3.anchorPoint = Vector2.new(0.5, 0.5)
-	t3.position = if p1.state.isSmallScreen then UDim2.new(0.5, 0, 0.35, 0) else UDim2.new(0.5, 0, 0.25, 0) or UDim2.new(0.5, 0, 0.35, 0)
-	t3.disabled = not p1.state.garageVisible
-	t3.onClickLeaveGarage = p1.onClickLeaveGarage
-	t3.onClickSpawnVehicle = p1.onClickSpawnVehicle
-	t3.onAttemptPurchaseVehicle = p1.onAttemptPurchaseVehicle
-	t3.getRemainingDebounce = p1.getRemainingDebounce
-	t3.attemptEquipItem = p1.attemptEquipGarageItem
-	t3.attemptBuyItem = p1.attemptBuyGarageItem
-	t3.attemptFavoriteItem = p1.attemptFavoriteGarageItem
-	t3.notify = p1.notify
-	t3.onRequestPremiumUpgrade = p1.onRequestPremiumUpgrade
-	t3.promptCashPurchase = p1.garagePromptCashPurchase
-	t3.colsPerRow = if p1.state.isSmallScreen then 6 else 7
-	t3.rowsPerPage = if p1.state.isSmallScreen then 2 else 2.5
-	t3.categoriesPerPage = if p1.state.isSmallScreen then 7 else 10
-	t3.onDeleteSlot = p1.onDeleteSlot
-	t.Garage = createElement(Garage, t3)
-	t.CasinoKeypad = createElement(CasinoKeypad)
-	t.DamageIndicators = createElement(DamageIndicators, {
+	local garageProps = {}
+	garageProps.size = if self.state.isSmallScreen then UDim2.new(0.65, 0, 0.6, 0) else UDim2.new(0.65, 0, 0.7, 0) or UDim2.new(0.65, 0, 0.6, 0)
+	garageProps.anchorPoint = Vector2.new(0.5, 0.5)
+	garageProps.position = if self.state.isSmallScreen then UDim2.new(0.5, 0, 0.35, 0) else UDim2.new(0.5, 0, 0.25, 0) or UDim2.new(0.5, 0, 0.35, 0)
+	garageProps.disabled = not self.state.garageVisible
+	garageProps.onClickLeaveGarage = self.onClickLeaveGarage
+	garageProps.onClickSpawnVehicle = self.onClickSpawnVehicle
+	garageProps.onAttemptPurchaseVehicle = self.onAttemptPurchaseVehicle
+	garageProps.getRemainingDebounce = self.getRemainingDebounce
+	garageProps.attemptEquipItem = self.attemptEquipGarageItem
+	garageProps.attemptBuyItem = self.attemptBuyGarageItem
+	garageProps.attemptFavoriteItem = self.attemptFavoriteGarageItem
+	garageProps.notify = self.notify
+	garageProps.onRequestPremiumUpgrade = self.onRequestPremiumUpgrade
+	garageProps.promptCashPurchase = self.garagePromptCashPurchase
+	garageProps.colsPerRow = if self.state.isSmallScreen then 6 else 7
+	garageProps.rowsPerPage = if self.state.isSmallScreen then 2 else 2.5
+	garageProps.categoriesPerPage = if self.state.isSmallScreen then 7 else 10
+	garageProps.onDeleteSlot = self.onDeleteSlot
+	children.Garage = createElement(Garage, garageProps)
+	children.CasinoKeypad = createElement(CasinoKeypad)
+	children.DamageIndicators = createElement(DamageIndicators, {
 		size = UDim2.new(0.5, 0, 0.5, 0)
 	})
-	local t4 = {}
-	t4.size = p1.state.isSmallScreen and UDim2.new(0.75, 0, 0.75, 0) or UDim2.new(0.6, 0, 0.6, 0)
-	t4.position = p1.state.isSmallScreen and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0.5, 0, 0.55, 0)
-	t.Trade = createElement(Trade, t4)
-	local t5 = {
+	local tradeProps = {}
+	tradeProps.size = self.state.isSmallScreen and UDim2.new(0.75, 0, 0.75, 0) or UDim2.new(0.6, 0, 0.6, 0)
+	tradeProps.position = self.state.isSmallScreen and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0.5, 0, 0.55, 0)
+	children.Trade = createElement(Trade, tradeProps)
+	local tradeInitiationsProps = {
 		size = UDim2.new(0.3333333333333333, 0, 0.3333333333333333, 0)
 	}
-	t5.position = if p1.state.isSmallScreen then UDim2.new(0.5, 0, 0.6666666666666666, 0) else UDim2.new(1, 0, 0.7, 0)
-	t5.anchorPoint = if p1.state.isSmallScreen then Vector2.new(0.5, 0.5) else Vector2.new(1, 0.5)
-	t.TradeInitiations = createElement(TradeInitiations, t5)
-	t.TradeResult = createElement(TradeResult, {
+	tradeInitiationsProps.position = if self.state.isSmallScreen then UDim2.new(0.5, 0, 0.6666666666666666, 0) else UDim2.new(1, 0, 0.7, 0)
+	tradeInitiationsProps.anchorPoint = if self.state.isSmallScreen then Vector2.new(0.5, 0.5) else Vector2.new(1, 0.5)
+	children.TradeInitiations = createElement(TradeInitiations, tradeInitiationsProps)
+	children.TradeResult = createElement(TradeResult, {
 		size = UDim2.new(0.25, 0, 0.25, 0),
 		position = UDim2.new(0.5, 0, 0.3333333333333333, 0),
 		anchorPoint = Vector2.new(0.5, 0.5)
 	})
-	t.RewardSpinner = createElement(RewardSpinner, {
+	children.RewardSpinner = createElement(RewardSpinner, {
 		size = UDim2.new(0.3333333333333333, 0, 0.25, 0),
 		position = UDim2.new(0.5, 0, 0.03125, 0),
 		anchorPoint = Vector2.new(0.5, 0)
 	})
-	t.Safes = createElement(Safes, {
+	children.Safes = createElement(Safes, {
 		size = UDim2.new(0.5, 0, 0.5, 0),
 		position = UDim2.new(0.5, 0, 0.5, 0),
 		anchorPoint = Vector2.new(0.5, 0.5)
 	})
-	t.SpawnSelection = createElement(SpawnSelection, Dictionary.merge(p1.minimapBaseProps, {
+	children.SpawnSelection = createElement(SpawnSelection, Dictionary.merge(self.minimapBaseProps, {
 		visible = true,
 		open = true,
 		size = UDim2.new(0.7, 0, 0.7, 0),
 		position = UDim2.new(0.5, 0, 0.5, 0),
 		anchorPoint = Vector2.new(0.5, 0.5),
-		color = p1.state.teamColor,
+		color = self.state.teamColor,
 		displayOrder = 1,
-		isSmallScreen = p1.state.isSmallScreen,
+		isSmallScreen = self.state.isSmallScreen,
 		square = true,
 		duration = SpawnSelectionConsts.MAX_WAIT_TIME,
-		onSpawnPressed = p1.onSpawnSelectionSpawnPressed
+		onSpawnPressed = self.onSpawnSelectionSpawnPressed
 	}))
-	t.ChooseSpawn = createElement(ChooseSpawn, {
+	children.ChooseSpawn = createElement(ChooseSpawn, {
 		duration = Settings.Time.Respawn,
 		size = UDim2.new(0.5, 0, 0.08, 0),
 		position = UDim2.new(0.5, 0, 0.7, 0),
-		onSelect = p1.onSpawnSelectionShowSpawns
+		onSelect = self.onSpawnSelectionShowSpawns
 	})
-	t.OtherTradeServerListRodux = createElement(OtherTradeServerListRodux, {
+	children.OtherTradeServerListRodux = createElement(OtherTradeServerListRodux, {
 		verticalPaddingRatio = 128,
 		aspectRatio = 2,
 		size = UDim2.fromScale(0.8, 0.7),
@@ -875,66 +875,66 @@ function v2.render(p1) --[[ Line: 619 | Upvalues: createElement (copy), Runtime 
 	})
 	return Roact.createElement(RoactRodux.StoreProvider, {
 		store = store
-	}, { Roact.createFragment(t) })
+	}, { Roact.createFragment(children) })
 end
-function v2.didMount(p1) --[[ Line: 953 | Upvalues: CmdrExtSystem (copy), Players (copy), UserInputService (copy), RxInstanceUtils (copy), ReplicatedStorage (copy) ]]
-	p1._maid:GivePromise(CmdrExtSystem.promiseCmdr():andThen(function(p12, p2) --[[ Line: 954 | Upvalues: p1 (copy), Players (ref), UserInputService (ref), RxInstanceUtils (ref), ReplicatedStorage (ref) ]]
-		p1.cmdr = p12
-		p1.cmdrFrame = p2
-		p2.Parent = p1.consoleRef.current
-		p12:SetEnabled(true)
-		p1._maid:GiveTask(function() --[[ Line: 960 | Upvalues: p12 (copy) ]]
-			p12:SetEnabled(false)
+function AppComponent.didMount(self)
+	self._maid:GivePromise(CmdrExtSystem.promiseCmdr():andThen(function(cmdr, cmdrFrame)
+		self.cmdr = cmdr
+		self.cmdrFrame = cmdrFrame
+		cmdrFrame.Parent = self.consoleRef.current
+		cmdr:SetEnabled(true)
+		self._maid:GiveTask(function()
+			cmdr:SetEnabled(false)
 		end)
-		p1._maid:GiveTask(function() --[[ Line: 963 | Upvalues: p2 (copy), Players (ref) ]]
-			p2.Parent = Players.LocalPlayer
+		self._maid:GiveTask(function()
+			cmdrFrame.Parent = Players.LocalPlayer
 		end)
-		if p1.state.devPanelVisible and p1.state.devPanelCurrentPage == p1.consoleRef:getValue() then
-			p12:Show()
+		if self.state.devPanelVisible and self.state.devPanelCurrentPage == self.consoleRef:getValue() then
+			cmdr:Show()
 		else
-			p12:Hide()
+			cmdr:Hide()
 		end
-		p1._maid:GiveTask(UserInputService.InputBegan:Connect(function(p12, p2) --[[ Line: 972 | Upvalues: p1 (ref) ]]
-			if p12.UserInputType == Enum.UserInputType.Keyboard and p12.KeyCode == Enum.KeyCode.Backquote and (not p2 or p1.state.devPanelVisible) then
-				p1:setState({
-					devPanelVisible = not p1.state.devPanelVisible,
-					devPanelCurrentPage = p1.consoleRef:getValue()
+		self._maid:GiveTask(UserInputService.InputBegan:Connect(function(input, gameProcessed)
+			if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Backquote and (not gameProcessed or self.state.devPanelVisible) then
+				self:setState({
+					devPanelVisible = not self.state.devPanelVisible,
+					devPanelCurrentPage = self.consoleRef:getValue()
 				})
 			end
 		end))
-		p1._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(ReplicatedStorage, "OpenCmdrMenu", function(p12) --[[ Line: 986 | Upvalues: p1 (ref) ]]
-			p12.OnClientEvent:Connect(function() --[[ Line: 987 | Upvalues: p1 (ref) ]]
-				p1:setState({
+		self._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(ReplicatedStorage, "OpenCmdrMenu", function(remote)
+			remote.OnClientEvent:Connect(function()
+				self:setState({
 					devPanelVisible = true,
-					devPanelCurrentPage = p1.consoleRef:getValue()
+					devPanelCurrentPage = self.consoleRef:getValue()
 				})
 			end)
 		end))
 	end))
 end
-function v2.didUpdate(p1, p2, p3) --[[ Line: 997 | Upvalues: VehicleUtils (copy), ActionButtonService (copy), ChatUtils (copy) ]]
-	if p1.state.devPanelVisible ~= p3.devPanelVisible or p1.state.devPanelCurrentPage ~= p3.devPanelCurrentPage then
-		if p1.state.devPanelVisible and p1.state.devPanelCurrentPage == p1.consoleRef:getValue() then
-			if p1.cmdr then
-				p1.cmdr:Show()
+function AppComponent.didUpdate(self, prevProps, prevState)
+	if self.state.devPanelVisible ~= prevState.devPanelVisible or self.state.devPanelCurrentPage ~= prevState.devPanelCurrentPage then
+		if self.state.devPanelVisible and self.state.devPanelCurrentPage == self.consoleRef:getValue() then
+			if self.cmdr then
+				self.cmdr:Show()
 			end
-		elseif p1.cmdr then
-			p1.cmdr:Hide()
-			if p1.cmdrFrame then
-				for v1, v2 in p1.cmdrFrame:GetChildren() do
-					if v2:IsA("TextBox") and v2:IsFocused() then
-						v2:ReleaseFocus()
+		elseif self.cmdr then
+			self.cmdr:Hide()
+			if self.cmdrFrame then
+				for i, child in self.cmdrFrame:GetChildren() do
+					if child:IsA("TextBox") and child:IsFocused() then
+						child:ReleaseFocus()
 					end
 				end
 			end
 		end
 	end
-	if p1.state.garageVisible ~= p3.garageVisible then
-		local v3 = VehicleUtils.GetLocalVehiclePacket()
-		if v3 then
-			v3.LockMovement = p1.state.garageVisible
+	if self.state.garageVisible ~= prevState.garageVisible then
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+		if vehiclePacket then
+			vehiclePacket.LockMovement = self.state.garageVisible
 		end
-		if p1.state.garageVisible then
+		if self.state.garageVisible then
 			ActionButtonService.hide()
 			ChatUtils.setEnabled(false)
 			return
@@ -943,19 +943,19 @@ function v2.didUpdate(p1, p2, p3) --[[ Line: 997 | Upvalues: VehicleUtils (copy)
 		ChatUtils.setEnabled(true)
 	end
 end
-function v2.willUnmount(p1) --[[ Line: 1034 ]]
-	p1._maid:DoCleaning()
+function AppComponent.willUnmount(self)
+	self._maid:DoCleaning()
 end
 Roact.mount(createElement("ScreenGui", {
 	ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	ResetOnSpawn = false,
 	IgnoreGuiInset = true,
 	DisplayOrder = 8
-}, { createElement(v2) }), Players.LocalPlayer.PlayerGui, "AppUI")
-RxInstanceUtils.observeOneChildNamed(Players.LocalPlayer.PlayerGui, "TouchGui", function(p1, p2) --[[ Line: 1050 | Upvalues: RxInstanceUtils (copy) ]]
-	p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "TouchControlFrame", function(p1, p2) --[[ Line: 1055 | Upvalues: RxInstanceUtils (ref) ]]
-		p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "JumpButton", function(p1) --[[ Line: 1057 ]]
-			task.defer(p1.Destroy, p1)
+}, { createElement(AppComponent) }), Players.LocalPlayer.PlayerGui, "AppUI")
+RxInstanceUtils.observeOneChildNamed(Players.LocalPlayer.PlayerGui, "TouchGui", function(touchGui, taskMaid)
+	taskMaid:GiveTask(RxInstanceUtils.observeOneChildNamed(touchGui, "TouchControlFrame", function(touchControlFrame, innerTaskMaid)
+		innerTaskMaid:GiveTask(RxInstanceUtils.observeOneChildNamed(touchControlFrame, "JumpButton", function(jumpButton)
+			task.defer(jumpButton.Destroy, jumpButton)
 		end))
 	end))
 end)

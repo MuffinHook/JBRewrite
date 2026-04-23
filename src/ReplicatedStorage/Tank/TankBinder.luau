@@ -24,48 +24,48 @@ local Missile = require(ReplicatedStorage.Game.Missile)
 local Time = require(ReplicatedStorage.Module.Time)
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
-local v1 = Enumer({ "Wheel", "Front", "Gear" })
-local t = {}
-t.__index = t
-function t.new(p1, p2) --[[ Line: 33 | Upvalues: t (copy), Maid (copy), Signal (copy) ]]
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.obj = p1
-	t2.manifest = p2
-	t2._maid = Maid.new()
-	t2._onGunnerSeatLeft = Signal.new()
-	t2._gunnerMaid = Maid.new()
-	t2._maid:GiveTask(t2._gunnerMaid)
-	t2._lastShoot = 0
-	t2.mobileInputObject = nil
-	t2._flagBrakelightsEnabled = false
-	t2:_handleIdleUpdate()
-	t2:_listenSeats("Seat")
-	t2:_listenSeats("Passenger")
-	t2:_listenNetwork()
-	return t2
+local WheelType = Enumer({ "Wheel", "Front", "Gear" })
+local TankBinder = {}
+TankBinder.__index = TankBinder
+function TankBinder.new(obj, manifest)
+	local self = {}
+	setmetatable(self, TankBinder)
+	self.obj = obj
+	self.manifest = manifest
+	self._maid = Maid.new()
+	self._onGunnerSeatLeft = Signal.new()
+	self._gunnerMaid = Maid.new()
+	self._maid:GiveTask(self._gunnerMaid)
+	self._lastShoot = 0
+	self.mobileInputObject = nil
+	self._flagBrakelightsEnabled = false
+	self:_handleIdleUpdate()
+	self:_listenSeats("Seat")
+	self:_listenSeats("Passenger")
+	self:_listenNetwork()
+	return self
 end
-function t._listenSeats(p1, p2) --[[ Line: 55 | Upvalues: RxInstanceUtils (copy) ]]
-	p1._maid:GiveTask(RxInstanceUtils.observeChildrenNamed(p1.obj, p2, function(p12, p2) --[[ Line: 56 | Upvalues: RxInstanceUtils (ref), p1 (copy) ]]
-		p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p12, "PlayerName", function(p13, p2) --[[ Line: 58 | Upvalues: p1 (ref), p12 (copy) ]]
-			p1:_handlePlayerNameChanged(p12, p13, p2)
-			p2:GiveTask(p13.Changed:Connect(function() --[[ Line: 60 | Upvalues: p1 (ref), p12 (ref), p13 (copy), p2 (copy) ]]
-				p1:_handlePlayerNameChanged(p12, p13, p2)
+function TankBinder._listenSeats(self, seatName)
+	self._maid:GiveTask(RxInstanceUtils.observeChildrenNamed(self.obj, seatName, function(seatInstance, seatMaid)
+		seatMaid:GiveTask(RxInstanceUtils.observeOneChildNamed(seatInstance, "PlayerName", function(playerNameValue, playerNameMaid)
+			self:_handlePlayerNameChanged(seatInstance, playerNameValue, playerNameMaid)
+			playerNameMaid:GiveTask(playerNameValue.Changed:Connect(function()
+				self:_handlePlayerNameChanged(seatInstance, playerNameValue, playerNameMaid)
 			end))
 		end))
 	end))
 end
-function t._handlePlayerNameChanged(p1, p2, p3, p4) --[[ Line: 67 | Upvalues: Players (copy), Maid (copy) ]]
-	local v1 = Players:FindFirstChild(p3.Value)
-	if v1 then
-		local v2 = Maid.new()
-		p4.seatMaid = v2
-		p1:_handleSeated(v1, v2, p2)
+function TankBinder._handlePlayerNameChanged(self, seatInstance, playerNameValue, playerNameMaid)
+	local player = Players:FindFirstChild(playerNameValue.Value)
+	if player then
+		local seatMaid = Maid.new()
+		playerNameMaid.seatMaid = seatMaid
+		self:_handleSeated(player, seatMaid, seatInstance)
 	else
-		p4.seatMaid = nil
+		playerNameMaid.seatMaid = nil
 	end
 end
-function t._getMouseLocation(p1) --[[ Line: 79 | Upvalues: InputUtils (copy), CurrentCamera (copy), UserInputService (copy) ]]
+function TankBinder._getMouseLocation(self)
 	if InputUtils.isTouch() then
 		local ViewportSize = CurrentCamera.ViewportSize
 		return Vector2.new(ViewportSize.X * 0.5, ViewportSize.Y * 0.5)
@@ -73,463 +73,463 @@ function t._getMouseLocation(p1) --[[ Line: 79 | Upvalues: InputUtils (copy), Cu
 		return UserInputService:GetMouseLocation()
 	end
 end
-function t._transformLocalMousePosition(p1, p2) --[[ Line: 90 ]]
-	return p2
+function TankBinder._transformLocalMousePosition(self, position)
+	return position
 end
-function t._getIgnoreList(p1) --[[ Line: 93 ]]
-	return { p1.obj }
+function TankBinder._getIgnoreList(self)
+	return { self.obj }
 end
-function t._projectMouseLocationToWorld(p1, p2) --[[ Line: 96 | Upvalues: CurrentCamera (copy), Raycast (copy) ]]
-	local v1 = CurrentCamera:ViewportPointToRay(p2.x, p2.y)
-	p1.raycastParams.FilterDescendantsInstances = p1:_getIgnoreList()
-	local v2 = Raycast.collidable(v1.Origin, v1.Direction, 999, p1.raycastParams)
-	return p1:_transformLocalMousePosition(v2 and v2.Position or v1.Origin + v1.Direction * 999), v1.Direction
+function TankBinder._projectMouseLocationToWorld(self, screenPos)
+	local ray = CurrentCamera:ViewportPointToRay(screenPos.x, screenPos.y)
+	self.raycastParams.FilterDescendantsInstances = self:_getIgnoreList()
+	local result = Raycast.collidable(ray.Origin, ray.Direction, 999, self.raycastParams)
+	return self:_transformLocalMousePosition(result and result.Position or ray.Origin + ray.Direction * 999), ray.Direction
 end
-function t._getMouseWorldPosition(p1) --[[ Line: 105 ]]
-	return p1:_projectMouseLocationToWorld(p1:_getMouseLocation())
+function TankBinder._getMouseWorldPosition(self)
+	return self:_projectMouseLocationToWorld(self:_getMouseLocation())
 end
-function t._flip(p1) --[[ Line: 108 ]]
-	local PrimaryPart = p1.obj.PrimaryPart
+function TankBinder._flip(self)
+	local PrimaryPart = self.obj.PrimaryPart
 	local LookVector = PrimaryPart.CFrame.LookVector
 	local Unit = LookVector:Cross(Vector3.new(0, 1, 0)).Unit
-	p1.obj:SetPrimaryPartCFrame(CFrame.fromMatrix(PrimaryPart.Position, Unit, Vector3.new(0, 1, 0), -LookVector))
+	self.obj:SetPrimaryPartCFrame(CFrame.fromMatrix(PrimaryPart.Position, Unit, Vector3.new(0, 1, 0), -LookVector))
 end
-function t._handleSeated(p1, p2, p3, p4) --[[ Line: 115 ]]
-	if p4.Name == "Seat" then
-		p1:_handleSeatedDriver(p2, p3)
+function TankBinder._handleSeated(self, player, seatMaid, seat)
+	if seat.Name == "Seat" then
+		self:_handleSeatedDriver(player, seatMaid)
 	end
-	p3:GiveTask(p1._onGunnerSeatLeft:Connect(function(p12) --[[ Line: 121 | Upvalues: p1 (copy), p2 (copy), p3 (copy) ]]
-		p1:_checkIfThisPlayerIsGunner(p2, p3)
+	seatMaid:GiveTask(self._onGunnerSeatLeft:Connect(function()
+		self:_checkIfThisPlayerIsGunner(player, seatMaid)
 	end))
-	p1:_checkIfThisPlayerIsGunner(p2, p3)
+	self:_checkIfThisPlayerIsGunner(player, seatMaid)
 end
-function t._checkIfThisPlayerIsGunner(p1, p2, p3) --[[ Line: 126 | Upvalues: TankUtils (copy) ]]
-	local v1 = TankUtils.getGunner(p1.obj)
-	if v1 == p2 and (v1 and v1 ~= p1._currentGunner) then
-		p1._currentGunner = v1
-		p1:_handleSeatedGunner(v1, p3)
+function TankBinder._checkIfThisPlayerIsGunner(self, player, seatMaid)
+	local gunner = TankUtils.getGunner(self.obj)
+	if gunner == player and (gunner and gunner ~= self._currentGunner) then
+		self._currentGunner = gunner
+		self:_handleSeatedGunner(gunner, seatMaid)
 	end
 end
-function t._handleSeatedGunner(p1, p2, p3) --[[ Line: 139 | Upvalues: Players (copy), Maid (copy), Audio (copy), AccelTween (copy), Spring (copy), RunService (copy), MilitaryTurretUtils (copy), VehicleUtils (copy), Raycast (copy), Time (copy), ActionButtonService (copy), UserInputService (copy) ]]
-	local v1 = p2 == Players.LocalPlayer
-	local v2 = Maid.new()
-	p1._maid.gunnerMaid = v2
-	p3:GiveTask(function() --[[ Line: 143 | Upvalues: p1 (copy), v2 (copy) ]]
-		if p1._maid.gunnerMaid == v2 then
-			p1._currentGunner = nil
-			p1._maid.gunnerMaid = nil
-			p1._onGunnerSeatLeft:Fire(nil)
+function TankBinder._handleSeatedGunner(self, gunner, seatMaid)
+	local isLocalPlayer = gunner == Players.LocalPlayer
+	local gunnerMaid = Maid.new()
+	self._maid.gunnerMaid = gunnerMaid
+	seatMaid:GiveTask(function()
+		if self._maid.gunnerMaid == gunnerMaid then
+			self._currentGunner = nil
+			self._maid.gunnerMaid = nil
+			self._onGunnerSeatLeft:Fire(nil)
 		end
 	end)
-	local v3 = Audio.ObjectLocal(p1.obj.PrimaryPart, 8206012878, {
+	local turretAudio = Audio.ObjectLocal(self.obj.PrimaryPart, 8206012878, {
 		Volume = 0,
 		Pitch = 1,
 		Looped = true
 	})
-	v2:GiveTask(function() --[[ Line: 153 | Upvalues: Audio (ref), v3 (copy) ]]
-		Audio.promiseFadeTo(v3, 0, 0.5):andThen(function() --[[ Line: 154 | Upvalues: v3 (ref) ]]
-			v3:Destroy()
+	gunnerMaid:GiveTask(function()
+		Audio.promiseFadeTo(turretAudio, 0, 0.5):andThen(function()
+			turretAudio:Destroy()
 		end)
 	end)
-	local v4 = RaycastParams.new()
-	v4.FilterType = Enum.RaycastFilterType.Blacklist
-	v4.FilterDescendantsInstances = p1:_getIgnoreList()
-	v4.IgnoreWater = true
-	p1.raycastParams = v4
-	local topMotor = p1.manifest.topMotor
-	local gunMotor = p1.manifest.gunMotor
-	if not p1._lastPitch then
-		p1._lastPitch = 0
+	local raycastParams = RaycastParams.new()
+	raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+	raycastParams.FilterDescendantsInstances = self:_getIgnoreList()
+	raycastParams.IgnoreWater = true
+	self.raycastParams = raycastParams
+	local topMotor = self.manifest.topMotor
+	local gunMotor = self.manifest.gunMotor
+	if not self._lastPitch then
+		self._lastPitch = 0
 	end
-	if not p1._lastYaw then
-		p1._lastYaw = 0
+	if not self._lastYaw then
+		self._lastYaw = 0
 	end
-	if not p1._pitchAccel then
-		p1._pitchAccel = AccelTween.new(20)
+	if not self._pitchAccel then
+		self._pitchAccel = AccelTween.new(20)
 	end
-	if not p1._yawAccel then
-		p1._yawAccel = AccelTween.new(15)
+	if not self._yawAccel then
+		self._yawAccel = AccelTween.new(15)
 	end
-	if not p1._kickSpring then
-		p1._kickSpring = Spring.new(0, 0, 0.5, 15)
+	if not self._kickSpring then
+		self._kickSpring = Spring.new(0, 0, 0.5, 15)
 	end
-	local v5 = os.clock()
-	local v6 = false
-	v2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 187 | Upvalues: v1 (copy), v6 (ref), topMotor (copy), p1 (copy), gunMotor (copy), MilitaryTurretUtils (ref), v5 (ref), v3 (copy) ]]
-		if v1 then
-			if v6 then
-				local v12 = topMotor.Part1.CFrame * topMotor.C0:Inverse()
-				local v2 = p1:_getMouseWorldPosition()
-				local v32 = v12:PointToObjectSpace(v2)
-				local v62 = math.atan2(-v32.x, -v32.z)
-				local v7 = (v12 * CFrame.Angles(0, v62, 0) * gunMotor.C0:Inverse()):PointToObjectSpace(v2)
-				local v9 = math.atan2(v7.y, -v7.z)
-				p1._lastYaw = p1._lastYaw + MilitaryTurretUtils.shortAngleDist(p1._lastYaw, v62)
-				p1._lastPitch = math.clamp(v9, -0.2617993877991494, 0.5235987755982988)
+	local lastReplicateTime = os.clock()
+	local isFiring = false
+	gunnerMaid:GiveTask(RunService.Heartbeat:Connect(function()
+		if isLocalPlayer then
+			if isFiring then
+				local topMotorWorldCFrame = topMotor.Part1.CFrame * topMotor.C0:Inverse()
+				local mouseWorldPos = self:_getMouseWorldPosition()
+				local localMousePos = topMotorWorldCFrame:PointToObjectSpace(mouseWorldPos)
+				local yawAngle = math.atan2(-localMousePos.x, -localMousePos.z)
+				local gunLocalPos = (topMotorWorldCFrame * CFrame.Angles(0, yawAngle, 0) * gunMotor.C0:Inverse()):PointToObjectSpace(mouseWorldPos)
+				local pitchAngle = math.atan2(gunLocalPos.y, -gunLocalPos.z)
+				self._lastYaw = self._lastYaw + MilitaryTurretUtils.shortAngleDist(self._lastYaw, yawAngle)
+				self._lastPitch = math.clamp(pitchAngle, -0.2617993877991494, 0.5235987755982988)
 			end
-			local v10 = os.clock()
-			if v10 - v5 > 0.06666666666666667 then
-				v5 = v10
-				p1.manifest.replicateRingRemote:FireServer(p1._lastYaw, p1._lastPitch)
+			local now = os.clock()
+			if now - lastReplicateTime > 0.06666666666666667 then
+				lastReplicateTime = now
+				self.manifest.replicateRingRemote:FireServer(self._lastYaw, self._lastPitch)
 			end
 		end
-		if p1._yawAccel.t ~= p1._lastYaw then
-			p1._yawAccel.t = p1._lastYaw
+		if self._yawAccel.t ~= self._lastYaw then
+			self._yawAccel.t = self._lastYaw
 		end
-		if p1._pitchAccel.t ~= p1._lastPitch then
-			p1._pitchAccel.t = p1._lastPitch
+		if self._pitchAccel.t ~= self._lastPitch then
+			self._pitchAccel.t = self._lastPitch
 		end
-		v3.Volume = (math.clamp(math.abs(p1._yawAccel.v) / 4, 0, 1) * 0.9 + 0.1) * 0.8
-		local v13 = p1._kickSpring:Update()
-		topMotor.C1 = topMotor.C0:Inverse() * CFrame.Angles(0, p1._yawAccel.p, 0) * topMotor.C0
-		gunMotor.C1 = gunMotor.C0:Inverse() * CFrame.Angles(p1._pitchAccel.p, 0, 0) * CFrame.new(0, 0, v13) * gunMotor.C0
+		turretAudio.Volume = (math.clamp(math.abs(self._yawAccel.v) / 4, 0, 1) * 0.9 + 0.1) * 0.8
+		local kickOffset = self._kickSpring:Update()
+		topMotor.C1 = topMotor.C0:Inverse() * CFrame.Angles(0, self._yawAccel.p, 0) * topMotor.C0
+		gunMotor.C1 = gunMotor.C0:Inverse() * CFrame.Angles(self._pitchAccel.p, 0, 0) * CFrame.new(0, 0, kickOffset) * gunMotor.C0
 	end))
-	if v1 then
-		local function shoot() --[[ Line: 231 | Upvalues: p1 (copy), Players (ref), VehicleUtils (ref), gunMotor (copy), Raycast (ref), Time (ref) ]]
-			if p1.obj:GetAttribute("TankDisabled") == true then
+	if isLocalPlayer then
+		local function shoot()
+			if self.obj:GetAttribute("TankDisabled") == true then
 				return
 			end
 			if Players.LocalPlayer:GetAttribute("MissileCount") <= 0 and not Players.LocalPlayer.Character:GetAttribute("TankRoyaleAlive") then
 				VehicleUtils.promptMissileBuy()
 				return false
 			end
-			local v2 = os.clock()
-			if not (v2 - p1._lastShoot < 1 / p1.obj:GetAttribute("MissileLaunchHz")) then
-				p1._lastShoot = v2
+			local now = os.clock()
+			if not (now - self._lastShoot < 1 / self.obj:GetAttribute("MissileLaunchHz")) then
+				self._lastShoot = now
 				local Part0 = gunMotor.Part0
-				local v3 = Part0.CFrame
-				local v4 = Raycast.collidable(v3.p, v3.LookVector, 999, p1.raycastParams)
-				local v5 = v4 and v4.Position or v3.p + v3.LookVector * 999
-				local v6 = v3 * CFrame.new(0, 0, -14)
-				local v7 = Time.GetNowSync()
-				p1:_launchMissile(v6, Part0.Velocity, v5, v7)
-				p1.manifest.shootRemote:FireServer(p1._yawAccel.p, p1._pitchAccel.p, v5, v7)
+				local gunCFrame = Part0.CFrame
+				local rayResult = Raycast.collidable(gunCFrame.p, gunCFrame.LookVector, 999, self.raycastParams)
+				local targetPos = rayResult and rayResult.Position or gunCFrame.p + gunCFrame.LookVector * 999
+				local launchCFrame = gunCFrame * CFrame.new(0, 0, -14)
+				local timestamp = Time.GetNowSync()
+				self:_launchMissile(launchCFrame, Part0.Velocity, targetPos, timestamp)
+				self.manifest.shootRemote:FireServer(self._yawAccel.p, self._pitchAccel.p, targetPos, timestamp)
 			end
 		end
-		v2:GiveTask(ActionButtonService.add({
+		gunnerMaid:GiveTask(ActionButtonService.add({
 			priority = 350,
 			image = "rbxassetid://4939740665",
 			keyCodes = { Enum.KeyCode.F, Enum.KeyCode.ButtonX },
-			onPressed = function() --[[ Name: onPressed | Line: 267 | Upvalues: shoot (copy) ]]
+			onPressed = function()
 				shoot()
 			end
 		}))
-		v2:GiveTask(UserInputService.InputBegan:Connect(function(p12, p2) --[[ Line: 272 | Upvalues: v6 (ref), p1 (copy) ]]
-			if not p2 and p12.UserInputType == Enum.UserInputType.MouseButton1 then
-				v6 = true
-			elseif not p2 and p12.UserInputType == Enum.UserInputType.Touch then
-				p1._mobileInputObject = p12
+		gunnerMaid:GiveTask(UserInputService.InputBegan:Connect(function(input, gameProcessed)
+			if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton1 then
+				isFiring = true
+			elseif not gameProcessed and input.UserInputType == Enum.UserInputType.Touch then
+				self._mobileInputObject = input
 			end
 		end))
-		v2:GiveTask(UserInputService.InputEnded:Connect(function(p12, p2) --[[ Line: 282 | Upvalues: v6 (ref), p1 (copy) ]]
-			if not p2 and p12.UserInputType == Enum.UserInputType.MouseButton1 then
-				v6 = false
-			elseif not p2 and p12.UserInputType == Enum.UserInputType.Touch then
-				local is_mobileInputObject = p1._mobileInputObject == p12
+		gunnerMaid:GiveTask(UserInputService.InputEnded:Connect(function(input, gameProcessed)
+			if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton1 then
+				isFiring = false
+			elseif not gameProcessed and input.UserInputType == Enum.UserInputType.Touch then
+				local is_mobileInputObject = self._mobileInputObject == input
 			end
 		end))
-		v2:GiveTask(ActionButtonService.add({
+		gunnerMaid:GiveTask(ActionButtonService.add({
 			priority = 975,
 			image = "rbxassetid://4939736720",
 			touchIsToggle = true,
 			keyCodes = { Enum.KeyCode.Q, Enum.KeyCode.ButtonL1 },
-			onPressed = function() --[[ Name: onPressed | Line: 299 | Upvalues: p1 (copy), v6 (ref) ]]
-				p1._mobileInputObject = nil
-				v6 = true
+			onPressed = function()
+				self._mobileInputObject = nil
+				isFiring = true
 			end,
-			onReleased = function() --[[ Name: onReleased | Line: 303 | Upvalues: v6 (ref) ]]
-				v6 = false
+			onReleased = function()
+				isFiring = false
 			end
 		}))
 	end
 end
-function t._updateTreads(p1, p2, p3) --[[ Line: 309 | Upvalues: v1 (copy) ]]
-	local count = 0
-	local sum = 0
-	local count_2 = 0
-	local t = {}
-	local t2 = {}
-	local t3 = {}
-	local sum_2 = 0
-	for i, v in ipairs(p2.Wheels) do
-		local v12, v2, v3 = v:Update(p3, 0)
-		v.wheelMotor.C1 = CFrame.new(0, v12, 0) * CFrame.Angles(v2, 0, 0)
-		t[v.PartNode] = v12
-		t2[v.PartNode] = v.treadType
-		t3[v.PartNode] = v.fakeTreadMotor
-		if v.fakeTreadMotor then
-			v.fakeTreadMotor.C1 = CFrame.new(0, v12, 0)
+function TankBinder._updateTreads(self, wheelWorld, dt)
+	local leftCount = 0
+	local leftSum = 0
+	local rightCount = 0
+	local suspensionOffsets = {}
+	local treadTypes = {}
+	local fakeTreadMotors = {}
+	local rightSum = 0
+	for i, wheel in ipairs(wheelWorld.Wheels) do
+		local suspOffset, spinAngle, treadSpeed = wheel:Update(dt, 0)
+		wheel.wheelMotor.C1 = CFrame.new(0, suspOffset, 0) * CFrame.Angles(spinAngle, 0, 0)
+		suspensionOffsets[wheel.PartNode] = suspOffset
+		treadTypes[wheel.PartNode] = wheel.treadType
+		fakeTreadMotors[wheel.PartNode] = wheel.fakeTreadMotor
+		if wheel.fakeTreadMotor then
+			wheel.fakeTreadMotor.C1 = CFrame.new(0, suspOffset, 0)
 		end
-		if v._isRight then
-			count = count + 1
-			sum_2 = sum_2 + v3
+		if wheel._isRight then
+			rightCount = rightCount + 1
+			rightSum = rightSum + treadSpeed
 		else
-			sum = sum + v3
-			count_2 = count_2 + 1
+			leftSum = leftSum + treadSpeed
+			leftCount = leftCount + 1
 		end
 	end
-	local v4 = sum / count_2
-	local v5 = sum_2 / count
-	for i, v in ipairs(p2.Wheels) do
-		local v6
-		local PartNode = v.PartNode
-		local treadToTarget = v.treadToTarget
-		local v7 = t[PartNode]
-		local v8 = t[treadToTarget]
-		local v9 = nil
-		local v10 = nil
-		if t2[PartNode] == v1.Wheel then
-			v9 = PartNode.CFrame * Vector3.new(0, v7 - v.RadiusVisual + 0.1, 0)
-		elseif t2[PartNode] == v1.Gear then
-			v9 = t3[PartNode].Part0.Bottom.WorldPosition
-		elseif t2[PartNode] == v1.Front then
-			v9 = t3[PartNode].Part0.Top.WorldPosition
+	local leftAvg = leftSum / leftCount
+	local rightAvg = rightSum / rightCount
+	for i, wheel in ipairs(wheelWorld.Wheels) do
+		local treadScrollAmount
+		local PartNode = wheel.PartNode
+		local treadToTarget = wheel.treadToTarget
+		local nodeOffset = suspensionOffsets[PartNode]
+		local targetOffset = suspensionOffsets[treadToTarget]
+		local nodeWorldPos = nil
+		local targetWorldPos = nil
+		if treadTypes[PartNode] == WheelType.Wheel then
+			nodeWorldPos = PartNode.CFrame * Vector3.new(0, nodeOffset - wheel.RadiusVisual + 0.1, 0)
+		elseif treadTypes[PartNode] == WheelType.Gear then
+			nodeWorldPos = fakeTreadMotors[PartNode].Part0.Bottom.WorldPosition
+		elseif treadTypes[PartNode] == WheelType.Front then
+			nodeWorldPos = fakeTreadMotors[PartNode].Part0.Top.WorldPosition
 		end
-		if t2[treadToTarget] == v1.Wheel then
-			v10 = treadToTarget.CFrame * Vector3.new(0, v8 - v.RadiusVisual + 0.1, 0)
-		elseif t2[treadToTarget] == v1.Gear then
-			v10 = t3[treadToTarget].Part0.Top.WorldPosition
-		elseif t2[treadToTarget] == v1.Front then
-			v10 = t3[treadToTarget].Part0.Bottom.WorldPosition
+		if treadTypes[treadToTarget] == WheelType.Wheel then
+			targetWorldPos = treadToTarget.CFrame * Vector3.new(0, targetOffset - wheel.RadiusVisual + 0.1, 0)
+		elseif treadTypes[treadToTarget] == WheelType.Gear then
+			targetWorldPos = fakeTreadMotors[treadToTarget].Part0.Top.WorldPosition
+		elseif treadTypes[treadToTarget] == WheelType.Front then
+			targetWorldPos = fakeTreadMotors[treadToTarget].Part0.Bottom.WorldPosition
 		end
-		local Magnitude = (v9 - v10).Magnitude
-		v.treadMotor.C1 = PartNode.CFrame:ToObjectSpace(CFrame.lookAt(v9, v10, p1.obj.PrimaryPart.CFrame.UpVector) * CFrame.new(0, 0, -Magnitude * 0.5))
-		local Part0 = v.treadMotor.Part0
-		Part0.Size = Vector3.new(Part0.Size.X, Part0.Size.Y, Magnitude)
-		v6 = if v._isRight and v5 then v5 else v4
-		local v16 = v.treadTex[1].OffsetStudsV - v6
-		for i2, v2 in ipairs(v.treadTex) do
-			v2.OffsetStudsV = v16
+		local segmentLength = (nodeWorldPos - targetWorldPos).Magnitude
+		wheel.treadMotor.C1 = PartNode.CFrame:ToObjectSpace(CFrame.lookAt(nodeWorldPos, targetWorldPos, self.obj.PrimaryPart.CFrame.UpVector) * CFrame.new(0, 0, -segmentLength * 0.5))
+		local treadPart = wheel.treadMotor.Part0
+		treadPart.Size = Vector3.new(treadPart.Size.X, treadPart.Size.Y, segmentLength)
+		treadScrollAmount = if wheel._isRight and rightAvg then rightAvg else leftAvg
+		local newOffset = wheel.treadTex[1].OffsetStudsV - treadScrollAmount
+		for i2, tex in ipairs(wheel.treadTex) do
+			tex.OffsetStudsV = newOffset
 		end
 	end
-	return v4, v5
+	return leftAvg, rightAvg
 end
-local function getUpdateRate(p1, p2, p3) --[[ Line: 391 ]]
-	if p1 < p2 then
+local function getUpdateRate(elapsed, minDist, maxDist)
+	if elapsed < minDist then
 		return 0
 	else
-		return (p1 - p2) / (p3 - p2)
+		return (elapsed - minDist) / (maxDist - minDist)
 	end
 end
-function t._handleIdleUpdate(p1) --[[ Line: 397 | Upvalues: Maid (copy), RunService (copy), CharacterUtils (copy), Players (copy) ]]
-	local v1 = Maid.new()
-	p1._maid.lqMaid = v1
-	local v2 = p1:_buildWheelWorld(v1, false)
-	local v3 = os.clock()
-	v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 402 | Upvalues: v3 (ref), CharacterUtils (ref), Players (ref), p1 (copy), v2 (copy) ]]
-		local v1 = os.clock()
-		local v22 = v1 - v3
-		local v32 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-		if v32 then
-			local Magnitude = (v32.Position - p1.obj.PrimaryPart.Position).Magnitude
-			if not (v22 < if Magnitude < 0 then 0 else (Magnitude - 0) / 256) then
-				v3 = v1
-				p1:_updateTreads(v2, v22)
+function TankBinder._handleIdleUpdate(self)
+	local idleMaid = Maid.new()
+	self._maid.lqMaid = idleMaid
+	local wheelWorld = self:_buildWheelWorld(idleMaid, false)
+	local lastUpdate = os.clock()
+	idleMaid:GiveTask(RunService.Heartbeat:Connect(function()
+		local now = os.clock()
+		local dt = now - lastUpdate
+		local rootPart = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+		if rootPart then
+			local Magnitude = (rootPart.Position - self.obj.PrimaryPart.Position).Magnitude
+			if not (dt < if Magnitude < 0 then 0 else (Magnitude - 0) / 256) then
+				lastUpdate = now
+				self:_updateTreads(wheelWorld, dt)
 			end
 		end
 	end))
 end
-function t._handleSeatedDriver(p1, p2, p3) --[[ Line: 418 | Upvalues: Players (copy), DrivingControls (copy), VehicleUtils (copy), AccelTween (copy), Audio (copy), RunService (copy), ActionButtonService (copy) ]]
-	p1._maid.lqMaid = nil
-	p3:GiveTask(function() --[[ Line: 420 | Upvalues: p1 (copy) ]]
-		p1:_handleIdleUpdate()
+function TankBinder._handleSeatedDriver(self, player, seatMaid)
+	self._maid.lqMaid = nil
+	seatMaid:GiveTask(function()
+		self:_handleIdleUpdate()
 	end)
-	local isLocalPlayer = p2 == Players.LocalPlayer
-	local v1
+	local isLocalPlayer = player == Players.LocalPlayer
+	local drivingControls
 	if isLocalPlayer then
-		v1 = DrivingControls.new()
-		p3:GiveTask(v1)
-		local obj = p1.obj
-		p3:GiveTask(function() --[[ Line: 431 | Upvalues: VehicleUtils (ref), obj (copy) ]]
+		drivingControls = DrivingControls.new()
+		seatMaid:GiveTask(drivingControls)
+		local obj = self.obj
+		seatMaid:GiveTask(function()
 			VehicleUtils.setBrakelightsEnabled(obj, false)
 		end)
 	else
-		v1 = nil
+		drivingControls = nil
 	end
-	local v2 = p1:_buildWheelWorld(p3, isLocalPlayer)
-	local v3 = v2:GetEffWheelCount()
-	local v4 = AccelTween.new(500)
-	local v5 = AccelTween.new(2000)
-	local v6 = Audio.ObjectLocal(p1.obj.PrimaryPart, 9058406725, {
+	local wheelWorld = self:_buildWheelWorld(seatMaid, isLocalPlayer)
+	local effWheelCount = wheelWorld:GetEffWheelCount()
+	local forwardBackwardAccel = AccelTween.new(500)
+	local leftRightAccel = AccelTween.new(2000)
+	local engineAudio = Audio.ObjectLocal(self.obj.PrimaryPart, 9058406725, {
 		Volume = 0,
 		Pitch = 1,
 		Looped = true
 	})
-	p3:GiveTask(function() --[[ Line: 446 | Upvalues: Audio (ref), v6 (copy) ]]
-		Audio.promiseFadeTo(v6, 0, 0.5):andThen(function() --[[ Line: 447 | Upvalues: v6 (ref) ]]
-			v6:Destroy()
+	seatMaid:GiveTask(function()
+		Audio.promiseFadeTo(engineAudio, 0, 0.5):andThen(function()
+			engineAudio:Destroy()
 		end)
 	end)
-	local v7 = Audio.ObjectLocal(p1.obj.PrimaryPart, 8206014264, {
+	local trackAudio = Audio.ObjectLocal(self.obj.PrimaryPart, 8206014264, {
 		Volume = 0,
 		Pitch = 1,
 		Looped = true
 	})
-	p3:GiveTask(function() --[[ Line: 453 | Upvalues: Audio (ref), v7 (copy) ]]
-		Audio.promiseFadeTo(v7, 0, 0.5):andThen(function() --[[ Line: 454 | Upvalues: v7 (ref) ]]
-			v7:Destroy()
+	seatMaid:GiveTask(function()
+		Audio.promiseFadeTo(trackAudio, 0, 0.5):andThen(function()
+			trackAudio:Destroy()
 		end)
 	end)
-	local v8 = 0
-	p3:GiveTask(RunService.Heartbeat:Connect(function(p12) --[[ Line: 461 | Upvalues: v1 (ref), VehicleUtils (ref), p1 (copy), v4 (copy), v5 (copy), v8 (ref), v2 (copy), v3 (copy) ]]
-		local v12 = 60
-		if v1 then
-			local v22 = VehicleUtils.GetLocalVehiclePacket()
-			local v32 = if p1.obj:GetAttribute("TankDisabled") == true then true else v22.LockMovement
-			local v42 = v1:GetForwardBackward()
-			if v32 then
-				v42 = 0
+	local engineSpeed = 0
+	seatMaid:GiveTask(RunService.Heartbeat:Connect(function(dt)
+		local maxSpeed = 60
+		if drivingControls then
+			local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+			local movementLocked = if self.obj:GetAttribute("TankDisabled") == true then true else vehiclePacket.LockMovement
+			local forwardInput = drivingControls:GetForwardBackward()
+			if movementLocked then
+				forwardInput = 0
 			end
-			if v4.t ~= v42 then
-				v4.t = v42
-				v4.v = 0
+			if forwardBackwardAccel.t ~= forwardInput then
+				forwardBackwardAccel.t = forwardInput
+				forwardBackwardAccel.v = 0
 			end
-			local v52 = v1:GetLeftRight()
-			if v32 then
-				v52 = 0
+			local turnInput = drivingControls:GetLeftRight()
+			if movementLocked then
+				turnInput = 0
 			end
-			if v5.t ~= v52 then
-				v5.t = v52
-				v5.v = 0
+			if leftRightAccel.t ~= turnInput then
+				leftRightAccel.t = turnInput
+				leftRightAccel.v = 0
 			end
-			if v4.p < 0 then
-				v12 = v12 * 0.5
+			if forwardBackwardAccel.p < 0 then
+				maxSpeed = maxSpeed * 0.5
 			end
-			v8 = if math.abs(v4.p) < 0.1 then v8 + math.sign(0 - v8) * 75 * p12 else v8 + math.sign(v12 - v8) * 30 * p12
-			v8 = math.max(v8, 0)
-			local v9 = v42 < 1e-6
-			if p1._flagBrakelightsEnabled ~= v9 then
-				p1._flagBrakelightsEnabled = v9
-				VehicleUtils.setBrakelightsEnabled(p1.obj, v9)
+			engineSpeed = if math.abs(forwardBackwardAccel.p) < 0.1 then engineSpeed + math.sign(0 - engineSpeed) * 75 * dt else engineSpeed + math.sign(maxSpeed - engineSpeed) * 30 * dt
+			engineSpeed = math.max(engineSpeed, 0)
+			local isBraking = forwardInput < 1e-6
+			if self._flagBrakelightsEnabled ~= isBraking then
+				self._flagBrakelightsEnabled = isBraking
+				VehicleUtils.setBrakelightsEnabled(self.obj, isBraking)
 			end
 		end
-		for i, v in ipairs(v2.Wheels) do
-			local v10
-			local _isRight = v._isRight
-			if v1 then
-				local p = v4.p
-				local p_2 = v5.p
-				local sum = Vector3.new()
-				if math.abs(p) >= 0.001 then
-					sum = sum + Vector3.new(0, 0, -v8 * p) / v3
+		for i, wheel in ipairs(wheelWorld.Wheels) do
+			local wheelForce
+			local isRight = wheel._isRight
+			if drivingControls then
+				local forwardP = forwardBackwardAccel.p
+				local turnP = leftRightAccel.p
+				local accelSum = Vector3.new()
+				if math.abs(forwardP) >= 0.001 then
+					accelSum = accelSum + Vector3.new(0, 0, -engineSpeed * forwardP) / effWheelCount
 				end
-				if math.abs(p_2) >= 0.001 then
-					v10 = if _isRight then 1 else -1
-					sum = sum + Vector3.new(0, 0, -10 * p_2 * v10) / v3
+				if math.abs(turnP) >= 0.001 then
+					wheelForce = if isRight then 1 else -1
+					accelSum = accelSum + Vector3.new(0, 0, -10 * turnP * wheelForce) / effWheelCount
 				end
-				v:SetExternalGroundAccel(sum)
+				wheel:SetExternalGroundAccel(accelSum)
 			end
 		end
 	end))
-	p3:GiveTask(RunService.Heartbeat:Connect(function(p12) --[[ Line: 525 | Upvalues: p1 (copy), v2 (copy), v7 (copy), v6 (copy) ]]
-		local v1, v22 = p1:_updateTreads(v2, p12)
-		v7.Volume = (math.clamp((math.abs(v1) + math.abs(v22)) * 0.5 / p12 / 10, 0, 1) * 0.9 + 0.1) * 0.8
-		local v62 = math.abs((p1.obj.PrimaryPart.Velocity:Dot(p1.obj.PrimaryPart.CFrame.LookVector)))
-		v6.Volume = (math.clamp(v62 / 90, 0, 1) * 0.6 + 0.4) * 1
-		v6.PlaybackSpeed = math.clamp(v62 / 100, 0, 1) * 0.4 + 0.8
+	seatMaid:GiveTask(RunService.Heartbeat:Connect(function(dt)
+		local leftAvg, rightAvg = self:_updateTreads(wheelWorld, dt)
+		trackAudio.Volume = (math.clamp((math.abs(leftAvg) + math.abs(rightAvg)) * 0.5 / dt / 10, 0, 1) * 0.9 + 0.1) * 0.8
+		local forwardSpeed = math.abs((self.obj.PrimaryPart.Velocity:Dot(self.obj.PrimaryPart.CFrame.LookVector)))
+		engineAudio.Volume = (math.clamp(forwardSpeed / 90, 0, 1) * 0.6 + 0.4) * 1
+		engineAudio.PlaybackSpeed = math.clamp(forwardSpeed / 100, 0, 1) * 0.4 + 0.8
 	end))
 	if isLocalPlayer then
-		local v9 = os.clock()
-		p3:GiveTask(ActionButtonService.add({
+		local lastFlipTime = os.clock()
+		seatMaid:GiveTask(ActionButtonService.add({
 			priority = 850,
 			image = "rbxassetid://4939737424",
 			keyCodes = { Enum.KeyCode.V, Enum.KeyCode.ButtonR1 },
-			onPressed = function() --[[ Name: onPressed | Line: 545 | Upvalues: v9 (ref), p1 (copy) ]]
-				local v1 = os.clock()
-				if not (v1 - v9 < 1) then
-					v9 = v1
-					p1:_flip()
+			onPressed = function()
+				local now = os.clock()
+				if not (now - lastFlipTime < 1) then
+					lastFlipTime = now
+					self:_flip()
 				end
 			end
 		}))
 	end
 end
-function t._listenNetwork(p1) --[[ Line: 556 ]]
-	p1._maid:GiveTask(p1.manifest.replicateRingRemote.OnClientEvent:Connect(function(p12, p2) --[[ Line: 557 | Upvalues: p1 (copy) ]]
-		p1._lastYaw = p12
-		p1._lastPitch = p2
+function TankBinder._listenNetwork(self)
+	self._maid:GiveTask(self.manifest.replicateRingRemote.OnClientEvent:Connect(function(yaw, pitch)
+		self._lastYaw = yaw
+		self._lastPitch = pitch
 	end))
-	p1._maid:GiveTask(p1.manifest.shootRemote.OnClientEvent:Connect(function(p12, p2, p3, p4) --[[ Line: 561 | Upvalues: p1 (copy) ]]
-		local topMotor = p1.manifest.topMotor
-		local gunMotor = p1.manifest.gunMotor
-		p1._lastYaw = p12
-		p1._lastPitch = p2
-		p1:_launchMissile(topMotor.Part1.CFrame * topMotor.C0:Inverse() * CFrame.Angles(0, p12, 0) * gunMotor.C0:Inverse() * CFrame.Angles(p2, 0, 0) * CFrame.new(0, 0, -14) * CFrame.new(0, 0, -14), gunMotor.Part0.Velocity, p3, p4)
+	self._maid:GiveTask(self.manifest.shootRemote.OnClientEvent:Connect(function(yaw, pitch, targetPos, timestamp)
+		local topMotor = self.manifest.topMotor
+		local gunMotor = self.manifest.gunMotor
+		self._lastYaw = yaw
+		self._lastPitch = pitch
+		self:_launchMissile(topMotor.Part1.CFrame * topMotor.C0:Inverse() * CFrame.Angles(0, yaw, 0) * gunMotor.C0:Inverse() * CFrame.Angles(pitch, 0, 0) * CFrame.new(0, 0, -14) * CFrame.new(0, 0, -14), gunMotor.Part0.Velocity, targetPos, timestamp)
 	end))
 end
-function t._launchMissile(p1, p2, p3, p4, p5) --[[ Line: 582 | Upvalues: Missile (copy), Audio (copy) ]]
-	Missile.LaunchMissile(p2, p3, p4, p5, "TankMissile", 0, p1:_getIgnoreList())
-	p1.obj.PrimaryPart:ApplyImpulseAtPosition(-p2.LookVector * p1.obj.PrimaryPart.AssemblyMass * 30, p2.p)
-	p1._kickSpring:Accelerate(80)
-	Audio.ObjectLocal(p1.obj.PrimaryPart, 8206015084, {
+function TankBinder._launchMissile(self, launchCFrame, velocity, targetPos, timestamp)
+	Missile.LaunchMissile(velocity, targetPos, timestamp, "TankMissile", 0, self:_getIgnoreList())
+	self.obj.PrimaryPart:ApplyImpulseAtPosition(-launchCFrame.LookVector * self.obj.PrimaryPart.AssemblyMass * 30, launchCFrame.p)
+	self._kickSpring:Accelerate(80)
+	Audio.ObjectLocal(self.obj.PrimaryPart, 8206015084, {
 		Volume = 0.6
 	})
-	local ParticlePart = p1.obj:FindFirstChild("Top"):FindFirstChild("Gun"):FindFirstChild("ParticlePart")
+	local ParticlePart = self.obj:FindFirstChild("Top"):FindFirstChild("Gun"):FindFirstChild("ParticlePart")
 	for i, v in ipairs(ParticlePart:GetChildren()) do
 		if v:IsA("ParticleEmitter") then
 			v:Emit(10)
 		end
 	end
 end
-function t._buildWheelWorld(p1, p2, p3) --[[ Line: 595 | Upvalues: WheelWorld (copy), Wheel (copy), v1 (copy) ]]
-	local v12 = WheelWorld.new()
-	v12:SetModel(p1.obj)
-	p2:GiveTask(v12)
-	for i, v in ipairs(p1.obj:FindFirstChild("Wheels"):GetChildren()) do
-		local v2
-		local v3 = p1.obj.PrimaryPart.CFrame:ToObjectSpace(v.CFrame)
-		v2 = v3.x > 0
-		local _ = v3.z < 0
-		local v4 = Wheel.new(v, not p3)
-		local Wheel_2 = v1.Wheel
-		if v.Name == "Front" then
-			Wheel_2 = v1.Front
-		elseif v.Name == "Gear" then
-			Wheel_2 = v1.Gear
+function TankBinder._buildWheelWorld(self, taskMaid, applyForces)
+	local wheelWorld = WheelWorld.new()
+	wheelWorld:SetModel(self.obj)
+	taskMaid:GiveTask(wheelWorld)
+	for i, wheelPart in ipairs(self.obj:FindFirstChild("Wheels"):GetChildren()) do
+		local isRight
+		local localCFrame = self.obj.PrimaryPart.CFrame:ToObjectSpace(wheelPart.CFrame)
+		isRight = localCFrame.x > 0
+		local _ = localCFrame.z < 0
+		local wheel = Wheel.new(wheelPart, not applyForces)
+		local wheelType = WheelType.Wheel
+		if wheelPart.Name == "Front" then
+			wheelType = WheelType.Front
+		elseif wheelPart.Name == "Gear" then
+			wheelType = WheelType.Gear
 		end
-		v4.treadType = Wheel_2
-		v4._isRight = v2
-		v4:SetSpringConstants(2, 6)
-		v4:SetHorizontalFriction(6)
-		v4:SetForwardFriction(2)
-		v4:SetForwardFriction2(0.01)
-		v4:SetVisualRadius(1.6384999999999998)
-		if Wheel_2 == v1.Wheel then
-			v4:SetSuspensionHeight(5.3)
+		wheel.treadType = wheelType
+		wheel._isRight = isRight
+		wheel:SetSpringConstants(2, 6)
+		wheel:SetHorizontalFriction(6)
+		wheel:SetForwardFriction(2)
+		wheel:SetForwardFriction2(0.01)
+		wheel:SetVisualRadius(1.6384999999999998)
+		if wheelType == WheelType.Wheel then
+			wheel:SetSuspensionHeight(5.3)
 		else
-			v4:SetSuspensionHeight(3.3)
+			wheel:SetSuspensionHeight(3.3)
 		end
-		v4:SetVersion(2)
-		if p3 then
-			v4:SetApplyForces(Wheel_2 == v1.Wheel)
+		wheel:SetVersion(2)
+		if applyForces then
+			wheel:SetApplyForces(wheelType == WheelType.Wheel)
 		end
-		v12:AddWheel(v4)
-		v4.wheelMotor = v:FindFirstChild("WheelMotor")
-		v4.fakeTreadMotor = v:FindFirstChild("FakeTreadMotor")
-		v4.treadMotor = v:FindFirstChild("TreadMotor")
-		v4.treadToTarget = v:FindFirstChild("_TrackToWheel").Value
-		v4.treadTex = { v4.treadMotor.Part0:FindFirstChild("TreadTex0"), v4.treadMotor.Part0:FindFirstChild("TreadTex1") }
-		if v4.fakeTreadMotor then
-			for i2, v5 in ipairs(v4.fakeTreadMotor.Part0.Parent:GetChildren()) do
-				if v5.Name == "Tread" then
-					for i3, v6 in ipairs(v5:GetChildren()) do
-						if v6:IsA("Texture") then
-							table.insert(v4.treadTex, v6)
+		wheelWorld:AddWheel(wheel)
+		wheel.wheelMotor = wheelPart:FindFirstChild("WheelMotor")
+		wheel.fakeTreadMotor = wheelPart:FindFirstChild("FakeTreadMotor")
+		wheel.treadMotor = wheelPart:FindFirstChild("TreadMotor")
+		wheel.treadToTarget = wheelPart:FindFirstChild("_TrackToWheel").Value
+		wheel.treadTex = { wheel.treadMotor.Part0:FindFirstChild("TreadTex0"), wheel.treadMotor.Part0:FindFirstChild("TreadTex1") }
+		if wheel.fakeTreadMotor then
+			for i2, sibling in ipairs(wheel.fakeTreadMotor.Part0.Parent:GetChildren()) do
+				if sibling.Name == "Tread" then
+					for i3, child in ipairs(sibling:GetChildren()) do
+						if child:IsA("Texture") then
+							table.insert(wheel.treadTex, child)
 						end
 					end
 				end
 			end
 		end
 	end
-	return v12
+	return wheelWorld
 end
-function t.Destroy(p1) --[[ Line: 654 ]]
-	p1._maid:Destroy()
-	setmetatable(p1, nil)
+function TankBinder.Destroy(self)
+	self._maid:Destroy()
+	setmetatable(self, nil)
 end
 return ManifestBinder.new("Tank", {
 	topMotor = "BoundingBox/TopMotor",
 	gunMotor = "BoundingBox/GunMotor",
 	shootRemote = "ShootRemote",
 	replicateRingRemote = "ReplicateRingRemote"
-}, t)
+}, TankBinder)
