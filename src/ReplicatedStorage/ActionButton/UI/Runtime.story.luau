@@ -20,7 +20,7 @@ return function(p1)
 				print("asdf")
 				return true
 			end,
-			onReleased = function() --[[ Name: onReleased | Line: 24 ]] end
+			onReleased = function()  end
 		}))
 		p1._maid:GiveTask(ActionButtonService.add({
 			primary = true,
@@ -32,7 +32,7 @@ return function(p1)
 			onPressed = function()
 				print("asdf2")
 			end,
-			onReleased = function() --[[ Name: onReleased | Line: 36 ]] end
+			onReleased = function()  end
 		}))
 		p1._maid:GiveTask(ActionButtonService.add({
 			priority = 900,
@@ -40,8 +40,8 @@ return function(p1)
 			keyCodes = { Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonB },
 			touchIsToggle = true,
 			gamepadIsToggle = true,
-			onPressed = function() --[[ Name: onPressed | Line: 45 ]] end,
-			onReleased = function() --[[ Name: onReleased | Line: 46 ]] end
+			onPressed = function()  end,
+			onReleased = function()  end
 		}))
 		p1._maid:GiveTask(ActionButtonService.add({
 			priority = 950,
@@ -57,13 +57,13 @@ return function(p1)
 			priority = 975,
 			image = "rbxassetid://4939740172",
 			keyCodes = { Enum.KeyCode.F, Enum.KeyCode.ButtonR2 },
-			onPressed = function() --[[ Name: onPressed | Line: 67 ]] end
+			onPressed = function()  end
 		}))
 		p1._maid:GiveTask(ActionButtonService.add({
 			priority = 650,
 			image = "rbxassetid://4970993126",
 			keyCodes = { Enum.KeyCode.R },
-			onPressed = function() --[[ Name: onPressed | Line: 75 ]] end
+			onPressed = function()  end
 		}))
 	end
 	function v1.render(p1)

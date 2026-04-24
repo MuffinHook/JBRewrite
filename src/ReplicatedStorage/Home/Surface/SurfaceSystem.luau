@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local SurfaceBinder = require(script.Parent.SurfaceBinder)
 return {
-	init = function() --[[ Name: init | Line: 4 | Upvalues: SurfaceBinder (copy) ]]
+	init = function()
 		SurfaceBinder:Start()
 	end
 }

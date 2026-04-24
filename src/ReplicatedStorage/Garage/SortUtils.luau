@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local EnumSort = require(script.Parent.EnumSort)
 local t = {
-	getSortFunc = function(p1) --[[ Name: getSortFunc | Line: 6 | Upvalues: EnumSort (copy) ]]
+	getSortFunc = function(p1)
 		if p1 == EnumSort.Alphabetical then
-			return function(p1, p2) --[[ Line: 8 ]]
+			return function(p1, p2)
 				local title = p1.title
 				local title_2 = p2.title
 				if p1.isNone then
@@ -15,7 +16,7 @@ local t = {
 			end
 		end
 		if p1 == EnumSort.Price then
-			return function(p1, p2) --[[ Line: 20 ]]
+			return function(p1, p2)
 				local v1 = p1.priceSortMetric or p1.price or 0
 				if p1.hidden then
 					v1 = 0
@@ -34,7 +35,7 @@ local t = {
 			end
 		end
 		if p1 == EnumSort.PriceLow then
-			return function(p1, p2) --[[ Line: 38 ]]
+			return function(p1, p2)
 				local v1 = p1.priceSortMetric or p1.price or 0
 				if p1.hidden then
 					v1 = 0
@@ -53,7 +54,7 @@ local t = {
 			end
 		end
 		if p1 == EnumSort.Newest then
-			return function(p1, p2) --[[ Line: 56 ]]
+			return function(p1, p2)
 				local v1 = p1.timeSortMetric or p1.primaryIndex
 				local v2 = p2.timeSortMetric or p2.primaryIndex
 				if p1.isNone then
@@ -66,7 +67,7 @@ local t = {
 			end
 		end
 		if p1 == EnumSort.Popular then
-			return function(p1, p2) --[[ Line: 68 ]]
+			return function(p1, p2)
 				local v1 = p1.salesIndex or p1.primaryIndex + 9999
 				local v2 = p2.salesIndex or p2.primaryIndex + 9999
 				if p1.isNone then
@@ -81,9 +82,9 @@ local t = {
 		error("invalid sort enum passed", p1)
 	end
 }
-function t.getTradeSortFunc(p1) --[[ Line: 83 | Upvalues: EnumSort (copy), t (copy) ]]
+function t.getTradeSortFunc(p1)
 	if p1 == EnumSort.Popular then
-		return function(p1, p2) --[[ Line: 85 ]]
+		return function(p1, p2)
 			local v1 = p1.tradePopularMetric or 0
 			local v2 = p2.tradePopularMetric or 0
 			if p1.isNone then

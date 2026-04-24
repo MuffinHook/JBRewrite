@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -11,20 +12,20 @@ v1.defaultProps = {
 	position = UDim2.new(0, 0, 0, 0),
 	aspectRatio = 6
 }
-function v1.init(p1) --[[ Line: 16 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1:setState({
 		remaining = 0,
 		createdAt = workspace:GetServerTimeNow()
 	})
-	function p1.onAccept() --[[ Line: 21 | Upvalues: p1 (copy) ]]
+	function p1.onAccept()
 		p1.props.onAccept(p1.props.index)
 	end
-	function p1.onDecline() --[[ Line: 24 | Upvalues: p1 (copy) ]]
+	function p1.onDecline()
 		p1.props.onDecline(p1.props.index)
 	end
 	p1.maid = Maid.new()
 end
-function v1.render(p1) --[[ Line: 29 | Upvalues: createElement (copy), TradeButton (copy), Roact (copy) ]]
+function v1.render(p1)
 	local aspectRatio = p1.props.aspectRatio
 	local v1 = p1.props.ranked and Color3.fromRGB(255, 215, 0) or Color3.new(255/255, 255/255, 255/255)
 	local v2 = if p1.props.ranked then ("Enter ranked %d player crew battle?"):format(p1.props.battleNumPlayersPerTeam) else ("Enter %d player crew battle against %s\'s %s (%s)?"):format(p1.props.battleNumPlayersPerTeam, p1.props.opposingClanOwnerName, p1.props.clanName, p1.props.clanDisplayRating or "N/A")
@@ -107,21 +108,21 @@ function v1.render(p1) --[[ Line: 29 | Upvalues: createElement (copy), TradeButt
 		AnchorPoint = p1.props.anchorPoint
 	}, t)
 end
-function v1._hookObj(p1) --[[ Line: 124 | Upvalues: PersistentCrewBattleConsts (copy) ]]
+function v1._hookObj(p1)
 	p1:setState({
 		createdAt = p1.props.obj:GetAttribute(PersistentCrewBattleConsts.INVITE_CREATED_AT_ATTR_NAME)
 	})
-	p1.maid.listenForInviteCreatedAtChanged = p1.props.obj:GetAttributeChangedSignal(PersistentCrewBattleConsts.INVITE_CREATED_AT_ATTR_NAME):Connect(function() --[[ Line: 130 | Upvalues: p1 (copy), PersistentCrewBattleConsts (ref) ]]
+	p1.maid.listenForInviteCreatedAtChanged = p1.props.obj:GetAttributeChangedSignal(PersistentCrewBattleConsts.INVITE_CREATED_AT_ATTR_NAME):Connect(function()
 		p1:setState({
 			createdAt = p1.props.obj:GetAttribute(PersistentCrewBattleConsts.INVITE_CREATED_AT_ATTR_NAME)
 		})
 	end)
 end
-function v1.didMount(p1) --[[ Line: 136 | Upvalues: PersistentCrewBattleConsts (copy), Interval (copy) ]]
+function v1.didMount(p1)
 	if p1.props.obj then
 		p1:_hookObj()
 	end
-	local function update() --[[ Line: 140 | Upvalues: p1 (copy), PersistentCrewBattleConsts (ref) ]]
+	local function update()
 		local t = {}
 		t.remaining = math.floor((math.max(0, PersistentCrewBattleConsts.INVITE_TIMEOUT_DURATION - (workspace:GetServerTimeNow() - p1.state.createdAt))))
 		p1:setState(t)
@@ -129,12 +130,12 @@ function v1.didMount(p1) --[[ Line: 136 | Upvalues: PersistentCrewBattleConsts (
 	update()
 	p1.maid:GiveTask(Interval.every(1):Connect(update))
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 151 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p1.props.obj ~= p2.obj and p1.props.obj then
 		p1:_hookObj()
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 158 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v1

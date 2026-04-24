@@ -1,5 +1,5 @@
 -- Reviewed by Claude
-local t = {
+local vehicleDataTable = {
 	{
 		Type = "Chassis",
 		Make = "Bluebird",
@@ -803,15 +803,15 @@ local t = {
 		NoTrade = true
 	}
 }
-for v1, v2 in t do
-	if v2.Price ~= nil and (v2.Price <= 100000 and (v2.Level ~= 10 and v2.Type ~= "Heli")) then
-		v2.Lite = true
+for index, vehicleData in vehicleDataTable do
+	if vehicleData.Price ~= nil and (vehicleData.Price <= 100000 and (vehicleData.Level ~= 10 and vehicleData.Type ~= "Heli")) then
+		vehicleData.Lite = true
 	end
 end
 local function updateAutoRetire()
-	for v1, v2 in t do
-		if v2.AutoRetireAt and (not v2.Retired and v2.AutoRetireAt - workspace:GetServerTimeNow() <= 0) then
-			v2.Retired = true
+	for index, vehicleData in vehicleDataTable do
+		if vehicleData.AutoRetireAt and (not vehicleData.Retired and vehicleData.AutoRetireAt - workspace:GetServerTimeNow() <= 0) then
+			vehicleData.Retired = true
 		end
 	end
 end
@@ -822,4 +822,4 @@ task.spawn(function()
 		updateAutoRetire()
 	end
 end)
-return t
+return vehicleDataTable

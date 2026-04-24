@@ -1,21 +1,22 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
 local Joint = require(ReplicatedStorage.Std.Joint)
 local Maid = require(ReplicatedStorage.Std.Maid)
-CharacterUtils.observeLocalCharacterAdded(function(p1, p2) --[[ Line: 8 | Upvalues: CharacterUtils (copy), Joint (copy), Maid (copy), RunService (copy) ]]
+CharacterUtils.observeLocalCharacterAdded(function(p1, p2)
 	local Humanoid = p1:FindFirstChild("Humanoid")
 	local PlayEmote = p1:WaitForChild("Animate"):WaitForChild("PlayEmote")
 	task.wait(1)
 	local v1 = nil
-	local function StopAnimation(p1) --[[ Line: 17 | Upvalues: p2 (copy), v1 (ref) ]]
+	local function StopAnimation(p1)
 		p2.emoteBallConnection = nil
 		if v1 then
 			v1:Stop(if p1 then 0 else nil)
 			v1 = nil
 		end
 	end
-	function PlayEmote.OnInvoke(p12) --[[ Line: 25 | Upvalues: p2 (copy), v1 (ref), Humanoid (copy), CharacterUtils (ref), p1 (copy), Joint (ref), Maid (ref), RunService (ref) ]]
+	function PlayEmote.OnInvoke(p12)
 		p2.emoteBallConnection = nil
 		if v1 then
 			v1:Stop(nil)
@@ -39,19 +40,19 @@ CharacterUtils.observeLocalCharacterAdded(function(p1, p2) --[[ Line: 8 | Upvalu
 				EmoteBall.Parent = p1
 				Joint.CustomWeld(EmoteBall, v12, CFrame.new(0, 0, 0), CFrame.new(0, 0, 0))
 				local v2 = Maid.new()
-				v2:GiveTask(function() --[[ Line: 51 | Upvalues: EmoteBall (copy) ]]
-					task.delay(0.25, function() --[[ Line: 52 | Upvalues: EmoteBall (ref) ]]
+				v2:GiveTask(function()
+					task.delay(0.25, function()
 						EmoteBall:Destroy()
 					end)
 				end)
-				v2:GiveTask(v1.Stopped:Connect(function() --[[ Line: 56 | Upvalues: p2 (ref), v1 (ref) ]]
+				v2:GiveTask(v1.Stopped:Connect(function()
 					p2.emoteBallConnection = nil
 					if v1 then
 						v1:Stop(nil)
 						v1 = nil
 					end
 				end))
-				v2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 59 | Upvalues: p1 (ref), v12 (copy), p2 (ref), v1 (ref) ]]
+				v2:GiveTask(RunService.Heartbeat:Connect(function()
 					if (p1.LowerTorso.Position - v12.Position).Magnitude > 3 then
 						p2.emoteBallConnection = nil
 						if v1 then
@@ -65,14 +66,14 @@ CharacterUtils.observeLocalCharacterAdded(function(p1, p2) --[[ Line: 8 | Upvalu
 			return true
 		end
 	end
-	p2:GiveTask(Humanoid.StateChanged:Connect(function(p1, p22) --[[ Line: 72 | Upvalues: p2 (copy), v1 (ref) ]]
+	p2:GiveTask(Humanoid.StateChanged:Connect(function(p1, p22)
 		p2.emoteBallConnection = nil
 		if v1 then
 			v1:Stop(nil)
 			v1 = nil
 		end
 	end))
-	p2:GiveTask(Humanoid.Running:Connect(function(p1) --[[ Line: 75 | Upvalues: p2 (copy), v1 (ref) ]]
+	p2:GiveTask(Humanoid.Running:Connect(function(p1)
 		p2.emoteBallConnection = nil
 		if v1 then
 			v1:Stop(nil)

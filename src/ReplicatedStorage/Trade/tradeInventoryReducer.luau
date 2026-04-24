@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Rodux = require(ReplicatedStorage.Rodux)
 local InventoryReducerUtils = require(ReplicatedStorage.Trade.InventoryReducerUtils)

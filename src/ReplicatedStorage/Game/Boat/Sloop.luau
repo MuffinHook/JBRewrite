@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Spring = require(ReplicatedStorage.Std.Spring)
@@ -15,7 +16,7 @@ local t2 = {
 }
 t2.__index = t2
 setmetatable(t2, Boat)
-function t2.new(p1) --[[ Line: 21 | Upvalues: Boat (copy), t (copy), t2 (copy), Audio (copy) ]]
+function t2.new(p1)
 	local v1 = Boat.new(t, p1)
 	setmetatable(v1, t2)
 	v1:Setup()
@@ -39,54 +40,54 @@ function t2.new(p1) --[[ Line: 21 | Upvalues: Boat (copy), t (copy), t2 (copy), 
 	v1.ParticleWake = v1.Model.Visual.WakeEmitter.Particle
 	return v1
 end
-function t2.Setup(p1) --[[ Line: 43 | Upvalues: Boat (copy), Spring (copy) ]]
+function t2.Setup(p1)
 	Boat.Setup(p1)
 	p1.SpringSlowHeading = Spring.new(0, 0, 0.25, 4)
 	p1.LastHeadingSign = 0
 end
-function t2.UpdateInput(p1) --[[ Line: 48 | Upvalues: Boat (copy) ]]
+function t2.UpdateInput(p1)
 	Boat.UpdateInput(p1)
 	p1.SpringSlowHeadingp = p1.SpringSlowHeading:SetTarget(p1.Heading)
 end
-function t2.UpdateThirdInput(p1) --[[ Line: 52 ]]
+function t2.UpdateThirdInput(p1)
 	p1.Heading = math.clamp(p1.PartBase.RotVelocity.Y * 2, -1, 1)
 	p1.Forward = math.clamp(-p1.PartBase.CFrame:VectorToObjectSpace(p1.PartBase.Velocity).Z / 60, -1, 1)
 	p1.SpringHeadingp = p1.SpringHeading:SetTarget(p1.Heading)
 	p1.SpringForwardp = p1.SpringForward:SetTarget(p1.Forward)
 	p1.SpringSlowHeadingp = p1.SpringSlowHeading:SetTarget(p1.Heading)
 end
-function t2.MountPlayer(p1, p2, p3) --[[ Line: 64 | Upvalues: Boat (copy), R15IKv2 (copy), ReplicatedStorage (copy), RunService (copy) ]]
+function t2.MountPlayer(p1, p2, p3)
 	Boat.MountPlayer(p1, p2, p3)
 	if p3.Driver then
 		p3.IKP = R15IKv2.BuildPacketArms(p3.Character)
 		if p3.Local then
 			local v1 = p3.Humanoid:LoadAnimation(ReplicatedStorage.Resource.IdleAnimation)
 			v1:Play()
-			p3.Maid:GiveTask(function() --[[ Line: 72 | Upvalues: v1 (copy) ]]
+			p3.Maid:GiveTask(function()
 				v1:Stop()
 				v1:Destroy()
 			end)
 		end
-		p3.Maid:GiveTask(RunService.Stepped:Connect(function() --[[ Line: 78 | Upvalues: p1 (copy), p3 (copy) ]]
+		p3.Maid:GiveTask(RunService.Stepped:Connect(function()
 			if p1.Model ~= nil then
 				p1:SteppedDriver(p3)
 			end
 		end))
 		p1.SoundCreak:Play()
 		p1.SoundWater:Play()
-		p3.Maid:GiveTask(function() --[[ Line: 86 | Upvalues: p1 (copy) ]]
+		p3.Maid:GiveTask(function()
 			p1.SoundCreak:Stop()
 		end)
-		p3.Maid:GiveTask(function() --[[ Line: 89 | Upvalues: p1 (copy) ]]
+		p3.Maid:GiveTask(function()
 			p1.SoundWater:Stop()
 		end)
-		p3.Maid:GiveTask(function() --[[ Line: 93 | Upvalues: p1 (copy) ]]
+		p3.Maid:GiveTask(function()
 			p1.ParticleWake.Enabled = false
 			p1.ParticleMist.Enabled = false
 		end)
 	end
 end
-function t2.SteppedDriver(p1, p2) --[[ Line: 99 | Upvalues: R15IKv2 (copy) ]]
+function t2.SteppedDriver(p1, p2)
 	local IKP = p2.IKP
 	local Part0 = p1.MotorSteeringWheel.Part0
 	local SpringHeadingp = p1.SpringHeadingp
@@ -96,7 +97,7 @@ function t2.SteppedDriver(p1, p2) --[[ Line: 99 | Upvalues: R15IKv2 (copy) ]]
 	IKP.LeftWrist.Transform = CFrame.Angles(0, -1.5707963267948966 * (1 - SpringHeadingp), 0)
 	R15IKv2.Arms(IKP)
 end
-function t2.HeartbeatDriver(p1, p2) --[[ Line: 111 | Upvalues: Boat (copy), Audio (copy) ]]
+function t2.HeartbeatDriver(p1, p2)
 	Boat.HeartbeatDriver(p1, p2)
 	local v1, v2, v3
 	if p2.Local then

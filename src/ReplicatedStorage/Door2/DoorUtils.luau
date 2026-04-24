@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local DoorConsts = require(script.Parent.DoorConsts)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -6,7 +7,7 @@ local waitForChild = require(ReplicatedStorage.Std.waitForChild)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local Players = game:GetService("Players")
 local t = {
-	setup = function(p1, p2) --[[ Name: setup | Line: 10 | Upvalues: DoorConsts (copy), RunService (copy), TableUtils (copy), Players (copy), Joint (copy) ]]
+	setup = function(p1, p2)
 		local PrimaryPart = p1.PrimaryPart
 		if not PrimaryPart then
 			error("Missing PrimaryPart for door: " .. p1:GetFullName())
@@ -22,10 +23,10 @@ local t = {
 		Model.Name = DoorConsts.INNER_MODEL_NAME
 		for i, v in ipairs(p1:GetChildren()) do
 			if not (v:IsA("BasePart") or v:IsA("Model")) then
-				task.delay(3, function() --[[ Line: 26 | Upvalues: RunService (ref), TableUtils (ref), Players (ref), v (copy) ]]
+				task.delay(3, function()
 					local v1 = false
 					if RunService:IsServer() then
-						local v2 = TableUtils.map(Players:GetPlayers(), function(p1) --[[ Line: 31 ]]
+						local v2 = TableUtils.map(Players:GetPlayers(), function(p1)
 							return p1.UserId
 						end)
 						if table.find(v2, 2025110) or table.find(v2, 25881764) then
@@ -52,54 +53,54 @@ local t = {
 		end
 		return Model
 	end,
-	getOpen = function(p1) --[[ Name: getOpen | Line: 67 | Upvalues: DoorConsts (copy) ]]
+	getOpen = function(p1)
 		return p1:GetAttribute(DoorConsts.OPEN_ATTR_NAME)
 	end,
-	setOpen = function(p1, p2) --[[ Name: setOpen | Line: 70 | Upvalues: DoorConsts (copy) ]]
+	setOpen = function(p1, p2)
 		assert(p2 ~= nil)
 		p1:SetAttribute(DoorConsts.OPEN_ATTR_NAME, p2)
 	end,
-	getPctOpen = function(p1) --[[ Name: getPctOpen | Line: 74 | Upvalues: DoorConsts (copy) ]]
+	getPctOpen = function(p1)
 		return p1:GetAttribute(DoorConsts.PCT_OPEN_ATTR_NAME)
 	end,
-	setPctOpen = function(p1, p2) --[[ Name: setPctOpen | Line: 77 | Upvalues: DoorConsts (copy) ]]
+	setPctOpen = function(p1, p2)
 		assert(p2 ~= nil, "missing pctOpen")
 		p1:SetAttribute(DoorConsts.PCT_OPEN_ATTR_NAME, p2)
 	end,
-	getDoorOpenChangedSignal = function(p1) --[[ Name: getDoorOpenChangedSignal | Line: 81 | Upvalues: DoorConsts (copy) ]]
+	getDoorOpenChangedSignal = function(p1)
 		return p1:GetAttributeChangedSignal(DoorConsts.OPEN_ATTR_NAME)
 	end,
-	getDoorPctOpenChangedSignal = function(p1) --[[ Name: getDoorPctOpenChangedSignal | Line: 84 | Upvalues: DoorConsts (copy) ]]
+	getDoorPctOpenChangedSignal = function(p1)
 		return p1:GetAttributeChangedSignal(DoorConsts.PCT_OPEN_ATTR_NAME)
 	end,
-	getDuration = function(p1) --[[ Name: getDuration | Line: 87 | Upvalues: DoorConsts (copy) ]]
+	getDuration = function(p1)
 		return p1:GetAttribute(DoorConsts.DURATION_ATTR_NAME)
 	end,
-	setDuration = function(p1, p2) --[[ Name: setDuration | Line: 90 | Upvalues: DoorConsts (copy) ]]
+	setDuration = function(p1, p2)
 		assert(p2 ~= nil)
 		p1:SetAttribute(DoorConsts.DURATION_ATTR_NAME, p2)
 	end,
-	getShouldSwing = function(p1) --[[ Name: getShouldSwing | Line: 94 | Upvalues: DoorConsts (copy) ]]
+	getShouldSwing = function(p1)
 		return p1:GetAttribute(DoorConsts.SHOULD_SWING_ATTR_NAME)
 	end,
-	setShouldSwing = function(p1, p2) --[[ Name: setShouldSwing | Line: 97 | Upvalues: DoorConsts (copy) ]]
+	setShouldSwing = function(p1, p2)
 		assert(p2 ~= nil)
 		p1:SetAttribute(DoorConsts.SHOULD_SWING_ATTR_NAME, p2)
 	end,
-	getMaxAngle = function(p1) --[[ Name: getMaxAngle | Line: 101 | Upvalues: DoorConsts (copy) ]]
+	getMaxAngle = function(p1)
 		return p1:GetAttribute(DoorConsts.MAX_ANGLE_ATTR_NAME)
 	end,
-	setMaxAngle = function(p1, p2) --[[ Name: setMaxAngle | Line: 104 | Upvalues: DoorConsts (copy) ]]
+	setMaxAngle = function(p1, p2)
 		assert(p2 ~= nil)
 		p1:SetAttribute(DoorConsts.MAX_ANGLE_ATTR_NAME, p2)
 	end,
-	getInnerModel = function(p1) --[[ Name: getInnerModel | Line: 108 | Upvalues: DoorConsts (copy) ]]
+	getInnerModel = function(p1)
 		return p1:FindFirstChild(DoorConsts.INNER_MODEL_NAME)
 	end,
-	promiseInnerModel = function(p1) --[[ Name: promiseInnerModel | Line: 111 | Upvalues: waitForChild (copy), DoorConsts (copy) ]]
+	promiseInnerModel = function(p1)
 		return waitForChild(p1, DoorConsts.INNER_MODEL_NAME, 10)
 	end,
-	setValueRaw = function(p1, p2, p3, p4, p5) --[[ Name: setValueRaw | Line: 114 ]]
+	setValueRaw = function(p1, p2, p3, p4, p5)
 		local v1 = if p4 then CFrame.Angles(0, p5, 0) else CFrame.new(p5, 0, 0)
 		if p3 then
 			p3.C1 = v1
@@ -108,24 +109,24 @@ local t = {
 		end
 	end
 }
-function t.setValue(p1, p2) --[[ Line: 127 | Upvalues: DoorConsts (copy), t (copy) ]]
+function t.setValue(p1, p2)
 	local PrimaryPart = p1.PrimaryPart
 	local v1 = p1:FindFirstChild(DoorConsts.INNER_MODEL_NAME)
 	local v2 = p1:GetAttribute(DoorConsts.SHOULD_SWING_ATTR_NAME)
 	t.setValueRaw(PrimaryPart, v1, PrimaryPart:FindFirstChild(DoorConsts.MOTOR_OBJ_NAME), v2, p2)
 end
-function t.setFreezeStateOnServer(p1, p2) --[[ Line: 135 | Upvalues: DoorConsts (copy) ]]
+function t.setFreezeStateOnServer(p1, p2)
 	p1:SetAttribute(DoorConsts.FREEZE_SERVER_STATE_ATTR_NAME, p2)
 end
-function t.setSnapStateOnServer(p1, p2) --[[ Line: 138 | Upvalues: DoorConsts (copy) ]]
+function t.setSnapStateOnServer(p1, p2)
 	p1:SetAttribute(DoorConsts.SNAP_SERVER_STATE_ATTR_NAME, p2)
 end
-function t.setEasingDirection(p1, p2) --[[ Line: 141 | Upvalues: DoorConsts (copy) ]]
+function t.setEasingDirection(p1, p2)
 	assert(p1 ~= nil)
 	assert(typeof(p2) == "EnumItem")
 	p1:SetAttribute(DoorConsts.EASING_DIRECTION_ATTR_NAME, p2.Name)
 end
-function t.setEasingStyle(p1, p2) --[[ Line: 146 | Upvalues: DoorConsts (copy) ]]
+function t.setEasingStyle(p1, p2)
 	assert(p1 ~= nil)
 	assert(typeof(p2) == "EnumItem")
 	p1:SetAttribute(DoorConsts.EASING_STYLE_ATTR_NAME, p2.Name)

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -16,22 +17,22 @@ local ContractUtils = require(script.Parent.ContractUtils)
 local t = {}
 t.__index = t
 t.__ClassName = "ContractUI"
-function t.new() --[[ Line: 22 | Upvalues: t (copy), Maid (copy) ]]
+function t.new()
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
 	return t2
 end
-function t.SetFrame(p1, p2) --[[ Line: 30 | Upvalues: Audio (copy), LocalPlayer (copy), ContractConsts (copy), Confirmation (copy), String (copy), ContractSystem (copy) ]]
+function t.SetFrame(p1, p2)
 	assert(p2 ~= nil)
 	assert(not p1._frame)
 	p1._frame = p2
 	p1._maid:GiveTask(p1._frame)
-	p1._maid:GiveTask(p1._frame.Background.Body.Bottom.Action.MouseButton1Down:Connect(function() --[[ Line: 36 | Upvalues: Audio (ref), LocalPlayer (ref), p1 (copy), ContractConsts (ref), Confirmation (ref), String (ref) ]]
+	p1._maid:GiveTask(p1._frame.Background.Body.Bottom.Action.MouseButton1Down:Connect(function()
 		Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
 		if p1._contract:GetStateId() == ContractConsts.enumState.ACTIVE then
 			local v1 = Confirmation.new(("Re-roll for a random contract for $%s?"):format(String.comma(ContractConsts.REROLL_PRICE)))
-			v1.Maid:GiveTask(v1.OnYes:Connect(function() --[[ Line: 43 | Upvalues: p1 (ref) ]]
+			v1.Maid:GiveTask(v1.OnYes:Connect(function()
 				p1._contract._contractActionRemote:FireServer()
 			end))
 			p1._contract._rerollConfirm = v1
@@ -39,7 +40,7 @@ function t.SetFrame(p1, p2) --[[ Line: 30 | Upvalues: Audio (copy), LocalPlayer 
 			p1._contract._contractActionRemote:FireServer()
 		end
 	end))
-	p1._maid:GiveTask(ContractSystem.getAnyContractActiveTransitionSignal():Connect(function() --[[ Line: 52 | Upvalues: p1 (copy) ]]
+	p1._maid:GiveTask(ContractSystem.getAnyContractActiveTransitionSignal():Connect(function()
 		if getmetatable(p1) == nil then
 			return
 		end
@@ -48,25 +49,25 @@ function t.SetFrame(p1, p2) --[[ Line: 30 | Upvalues: Audio (copy), LocalPlayer 
 		end
 	end))
 end
-function t.SetLayoutOrder(p1, p2) --[[ Line: 62 ]]
+function t.SetLayoutOrder(p1, p2)
 	assert(p2 ~= nil)
 	p1._frame.LayoutOrder = p2
 end
-function t.SetContract(p1, p2) --[[ Line: 66 | Upvalues: ContractUtils (copy), SeasonSystem (copy), LocalPlayer (copy) ]]
+function t.SetContract(p1, p2)
 	assert(not p1._contract)
 	p1._contract = p2
-	p1._maid:GiveTask(p1._contract:GetProgressValue():GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 69 | Upvalues: p1 (copy) ]]
+	p1._maid:GiveTask(p1._contract:GetProgressValue():GetPropertyChangedSignal("Value"):Connect(function()
 		p1:_updateProgress()
 	end))
 	p1:_updateProgress()
-	local function updateState() --[[ Line: 74 | Upvalues: p1 (copy) ]]
+	local function updateState()
 		p1:_updateState(p1._contract:GetStateId())
 	end
 	p1._maid:GiveTask(p1._contract:GetRequireSeasonPassValue():GetPropertyChangedSignal("Value"):Connect(updateState))
 	p1._maid:GiveTask(p1._contract:GetStateValue():GetPropertyChangedSignal("Value"):Connect(updateState))
 	p1._maid:GiveTask(ContractUtils.getNumTimesRerolledObject(p1._contract.obj).Changed:Connect(updateState))
 	p1:_updateState(p1._contract:GetStateId())
-	p1._maid:GiveTask(SeasonSystem.getSeasonPassOwnedSignal():Connect(function(p12) --[[ Line: 83 | Upvalues: LocalPlayer (ref), p1 (copy) ]]
+	p1._maid:GiveTask(SeasonSystem.getSeasonPassOwnedSignal():Connect(function(p12)
 		if p12 == LocalPlayer then
 			p1:_updateState(p1._contract:GetStateId())
 		end
@@ -76,16 +77,16 @@ function t.SetContract(p1, p2) --[[ Line: 66 | Upvalues: ContractUtils (copy), S
 	p1:_setRewardExp(p1._contract:GetRewardExp())
 	p1:_setMessage(p1._contract:GetMessage())
 end
-function t.SetTitle(p1, p2) --[[ Line: 96 ]]
+function t.SetTitle(p1, p2)
 	p1._frame.Background.Title.TextLabel.Text = p2
 end
-function t._setMessage(p1, p2) --[[ Line: 99 ]]
+function t._setMessage(p1, p2)
 	p1._frame.Background.Body.Top.ContractDesc.Text = p2
 end
-function t._setRewardExp(p1, p2) --[[ Line: 104 ]]
+function t._setRewardExp(p1, p2)
 	p1._frame.Background.Body.Bottom.Reward.Amount.Text = ("REWARD: %d XP"):format(p2)
 end
-function t._setTeamId(p1, p2) --[[ Line: 109 | Upvalues: Settings (copy) ]]
+function t._setTeamId(p1, p2)
 	local v1 = nil
 	if p2 == Settings.EnumTeam.Police then
 		v1 = 5955472455
@@ -96,7 +97,7 @@ function t._setTeamId(p1, p2) --[[ Line: 109 | Upvalues: Settings (copy) ]]
 	end
 	p1._frame.Background.Image = ("rbxassetid://%d"):format(v1)
 end
-function t._updateProgress(p1) --[[ Line: 120 | Upvalues: ContractConsts (copy) ]]
+function t._updateProgress(p1)
 	local v1 = if p1._contract:GetStateId() == ContractConsts.enumState.ACTIVE then p1._contract:GetProgress() else nil
 	local Bottom = p1._frame.Background.Body.Bottom
 	Bottom.Progress.Visible = v1 ~= nil
@@ -104,7 +105,7 @@ function t._updateProgress(p1) --[[ Line: 120 | Upvalues: ContractConsts (copy) 
 		Bottom.Progress.Text = ("PROGRESS: %d/%d"):format(p1._contract:GetProgress(), p1._contract:GetGoal())
 	end
 end
-function t._updateState(p1, p2) --[[ Line: 133 | Upvalues: GamepassSystem (copy), GamepassUtils (copy), ContractConsts (copy), ContractUtils (copy), SeasonSystem (copy), LocalPlayer (copy), ContractSystem (copy), SeasonUtils (copy), Interval (copy) ]]
+function t._updateState(p1, p2)
 	if getmetatable(p1) ~= nil then
 		local v1 = nil
 		local v2 = nil
@@ -141,7 +142,7 @@ function t._updateState(p1, p2) --[[ Line: 133 | Upvalues: GamepassSystem (copy)
 		local v9 = if p2 == ContractConsts.enumState.ABORTED or p2 == ContractConsts.enumState.FAILED then not v8 else false
 		Bottom.Retry.Visible = v9
 		if v9 then
-			local function updateRetryTimer() --[[ Line: 191 | Upvalues: ContractConsts (ref), p1 (copy), SeasonUtils (ref), Bottom (copy) ]]
+			local function updateRetryTimer()
 				Bottom.Retry.Text = ("RETRY AVAILABLE IN: %s"):format((SeasonUtils.formatRemaining((math.max(ContractConsts.COOLDOWN_DURATION - (DateTime.now().UnixTimestamp - p1._contract:GetLastStateUpdate()), 0)))))
 			end
 			p1._maid.stateUpdateLoop = Interval.every(1):Connect(updateRetryTimer)
@@ -168,7 +169,7 @@ function t._updateState(p1, p2) --[[ Line: 133 | Upvalues: GamepassSystem (copy)
 		p1:_updateProgress()
 	end
 end
-function t.Destroy(p1) --[[ Line: 218 ]]
+function t.Destroy(p1)
 	assert(p1._maid ~= nil)
 	p1._maid:Destroy()
 	p1._maid = nil

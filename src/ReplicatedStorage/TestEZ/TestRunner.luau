@@ -1,32 +1,33 @@
+-- Reviewed by Claude
 local TestEnum = require(script.Parent.TestEnum)
 local TestSession = require(script.Parent.TestSession)
 local LifecycleHooks = require(script.Parent.LifecycleHooks)
 local t = {
 	environment = {}
 }
-local function wrapExpectContextWithPublicApi(p1) --[[ Line: 19 ]]
+local function wrapExpectContextWithPublicApi(p1)
 	local t = {
-		extend = function(...) --[[ Name: extend | Line: 21 | Upvalues: p1 (copy) ]]
+		extend = function(...)
 			p1:extend(...)
 		end
 	}
 	return setmetatable(t, {
-		__call = function(p12, ...) --[[ Name: __call | Line: 25 | Upvalues: p1 (copy) ]]
+		__call = function(p12, ...)
 			return p1:startExpectationChain(...)
 		end
 	})
 end
-function t.runPlan(p1) --[[ Line: 35 | Upvalues: TestSession (copy), LifecycleHooks (copy), TestEnum (copy), t (copy) ]]
+function t.runPlan(p1)
 	local v1 = TestSession.new(p1)
 	local v2 = LifecycleHooks.new()
-	v1.hasFocusNodes = #p1:findNodes(function(p1) --[[ Line: 39 | Upvalues: TestEnum (ref) ]]
+	v1.hasFocusNodes = #p1:findNodes(function(p1)
 		return p1.modifier == TestEnum.NodeModifier.Focus
 	end) > 0
 	t.runPlanNode(v1, p1, v2)
 	return v1:finalize()
 end
-function t.runPlanNode(p1, p2, p3) --[[ Line: 54 | Upvalues: t (copy), wrapExpectContextWithPublicApi (copy), TestEnum (copy) ]]
-	local function runCallback(p12, p2) --[[ Line: 55 | Upvalues: t (ref), wrapExpectContextWithPublicApi (ref), p1 (copy) ]]
+function t.runPlanNode(p1, p2, p3)
+	local function runCallback(p12, p2)
 		_G.__TESTEZ_RUNNING_TEST__ = true
 		local v1 = getfenv(p12)
 		local v2 = true
@@ -35,7 +36,7 @@ function t.runPlanNode(p1, p2, p3) --[[ Line: 54 | Upvalues: t (copy), wrapExpec
 		for k, v in pairs(t.environment) do
 			v1[k] = v
 		end
-		function v1.fail(p1) --[[ Line: 71 | Upvalues: v2 (ref), v3 (ref), v4 (ref) ]]
+		function v1.fail(p1)
 			if p1 == nil then
 				p1 = "fail() was called."
 			end
@@ -44,9 +45,9 @@ function t.runPlanNode(p1, p2, p3) --[[ Line: 54 | Upvalues: t (copy), wrapExpec
 		end
 		v1.expect = wrapExpectContextWithPublicApi(p1:getExpectationContext())
 		local v5 = p1:getContext()
-		local v6, v7 = xpcall(function() --[[ Line: 85 | Upvalues: p12 (copy), v5 (copy) ]]
+		local v6, v7 = xpcall(function()
 			p12(v5)
-		end, function(p1) --[[ Line: 88 | Upvalues: v4 (ref) ]]
+		end, function(p1)
 			return v4 .. debug.traceback(tostring(p1), 2)
 		end)
 		if not v6 then
@@ -56,7 +57,7 @@ function t.runPlanNode(p1, p2, p3) --[[ Line: 54 | Upvalues: t (copy), wrapExpec
 		_G.__TESTEZ_RUNNING_TEST__ = nil
 		return v2, v3
 	end
-	local function runNode(p1) --[[ Line: 105 | Upvalues: p3 (copy), runCallback (copy) ]]
+	local function runNode(p1)
 		for i, v in ipairs(p3:getBeforeEachHooks()) do
 			local v1, v2 = runCallback(v, "beforeEach hook: ")
 			if not v1 then

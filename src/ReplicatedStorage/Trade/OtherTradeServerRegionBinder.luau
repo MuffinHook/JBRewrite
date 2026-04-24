@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -12,13 +13,13 @@ local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1) --[[ Line: 17 | Upvalues: BaseObject (copy), t (copy), RegionUtils (copy), ReplicatedStorage (copy), Interval (copy), Players (copy), store (copy) ]]
+function t.new(p1)
 	local v1 = BaseObject.new(p1)
 	setmetatable(v1, t)
 	local v3 = RegionUtils.getPrism(p1.CFrame, p1.Size)
 	p1.Parent = ReplicatedStorage
 	local v4 = false
-	v1.maid:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 24 | Upvalues: Players (ref), RegionUtils (ref), v3 (copy), v4 (ref), store (ref) ]]
+	v1.maid:GiveTask(Interval.every(0.1):Connect(function()
 		local Character = Players.LocalPlayer.Character
 		if Character then
 			local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")

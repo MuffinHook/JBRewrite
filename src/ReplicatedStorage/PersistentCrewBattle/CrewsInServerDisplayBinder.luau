@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local Binder = require(ReplicatedStorage.Std.Binder)
@@ -6,7 +7,7 @@ local PersistentCrewBattleConsts = require(script.Parent.PersistentCrewBattleCon
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1) --[[ Line: 11 | Upvalues: CrewsSurfaceGuiDisplay (copy), PersistentCrewBattleConsts (copy), t (copy) ]]
+function t.new(p1)
 	local v1 = CrewsSurfaceGuiDisplay.new(p1, PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.CrewsInServer)
 	setmetatable(v1, t)
 	return v1

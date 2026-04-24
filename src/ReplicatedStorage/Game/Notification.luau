@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ContentProvider = game:GetService("ContentProvider")
@@ -13,16 +14,16 @@ local v1 = 0
 local CurrentCamera = workspace.CurrentCamera
 local v2 = Vector2.new(1539, 804)
 local v3 = TweenInfo.new(0.3, Enum.EasingStyle.Linear)
-local function getBox(p1) --[[ Line: 26 ]]
+local function getBox(p1)
 	return math.min(p1.X, p1.Y)
 end
-local function getScreenRatio() --[[ Line: 29 | Upvalues: CurrentCamera (copy), v2 (copy) ]]
+local function getScreenRatio()
 	local ViewportSize = CurrentCamera.ViewportSize
 	local v1 = math.min(ViewportSize.X, ViewportSize.Y)
 	local v22 = v2
 	return v1 / math.min(v22.X, v22.Y)
 end
-local function ScaleNotification(p1) --[[ Line: 32 | Upvalues: CurrentCamera (copy), v2 (copy) ]]
+local function ScaleNotification(p1)
 	p1.Message.TextSize = math.floor(24 * (CurrentCamera.ViewportSize.Y / v2.Y))
 	local ViewportSize = CurrentCamera.ViewportSize
 	local v22 = math.min(ViewportSize.X, ViewportSize.Y)
@@ -31,7 +32,7 @@ local function ScaleNotification(p1) --[[ Line: 32 | Upvalues: CurrentCamera (co
 end
 local t = {}
 local t2 = {}
-local function ProcessQueue() --[[ Line: 39 | Upvalues: t (copy), t2 (copy) ]]
+local function ProcessQueue()
 	if #t > 0 then
 		local v1 = table.remove(t, 1)
 		table.insert(t2, v1)
@@ -59,14 +60,14 @@ local t3 = {
 }
 local t4 = {}
 t4.__index = t4
-function t4.Init(p1) --[[ Line: 69 | Upvalues: ReplicatedStorage (copy), LocalPlayer (copy), t4 (copy), CurrentCamera (copy), t2 (copy), v2 (copy) ]]
+function t4.Init(p1)
 	local em = p1.em
 	local NotificationGui = ReplicatedStorage.StarterGui:FindFirstChild("NotificationGui")
 	NotificationGui.Parent = LocalPlayer.PlayerGui
 	NotificationGui.DisplayOrder = 9
 	t4.Gui = NotificationGui
 	t4.Templates = NotificationGui:WaitForChild("Templates")
-	CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function() --[[ Line: 81 | Upvalues: t2 (ref), CurrentCamera (ref), v2 (ref) ]]
+	CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
 		for v1, v22 in t2 do
 			local Frame = v22.Frame
 			Frame.Message.TextSize = math.floor(24 * (CurrentCamera.ViewportSize.Y / v2.Y))
@@ -77,7 +78,7 @@ function t4.Init(p1) --[[ Line: 69 | Upvalues: ReplicatedStorage (copy), LocalPl
 		end
 	end)
 end
-local function GetTextLines(p1) --[[ Line: 88 | Upvalues: TextService (copy) ]]
+local function GetTextLines(p1)
 	local GetTextBoundsParams = Instance.new("GetTextBoundsParams")
 	GetTextBoundsParams.Text = p1
 	GetTextBoundsParams.Font = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Bold, Enum.FontStyle.Italic)
@@ -85,7 +86,7 @@ local function GetTextLines(p1) --[[ Line: 88 | Upvalues: TextService (copy) ]]
 	GetTextBoundsParams.Width = 312
 	return math.ceil(TextService:GetTextBoundsAsync(GetTextBoundsParams).Y / 24)
 end
-function t4.notifyBoss(p1, p2) --[[ Line: 98 | Upvalues: t4 (copy), RobberyConsts (copy), ContentProvider (copy), Audio (copy), TweenService (copy), v3 (copy) ]]
+function t4.notifyBoss(p1, p2)
 	local Gui = t4.Gui
 	local v1 = t4.Templates.BossAlert:Clone()
 	local v2 = p1[1] and RobberyConsts.PRETTY_NAME[p1[1]] or ""
@@ -129,7 +130,7 @@ function t4.notifyBoss(p1, p2) --[[ Line: 98 | Upvalues: t4 (copy), RobberyConst
 		end
 	end
 	v1.Visible = true
-	task.delay(3.5, function() --[[ Line: 138 | Upvalues: v1 (copy), TweenService (ref), v3 (ref) ]]
+	task.delay(3.5, function()
 		for v12, v2 in v1:GetDescendants() do
 			if v2:IsA("TextLabel") then
 				TweenService:Create(v2, v3, {
@@ -145,7 +146,7 @@ function t4.notifyBoss(p1, p2) --[[ Line: 98 | Upvalues: t4 (copy), RobberyConst
 		v1:Destroy()
 	end)
 end
-local function getNumOfNotificationsWith(p1) --[[ Line: 151 | Upvalues: t2 (copy), t (copy) ]]
+local function getNumOfNotificationsWith(p1)
 	local count = 0
 	for v1, v2 in t2 do
 		if v2.Text == p1 then
@@ -159,7 +160,7 @@ local function getNumOfNotificationsWith(p1) --[[ Line: 151 | Upvalues: t2 (copy
 	end
 	return count
 end
-function t4.new(p1) --[[ Line: 166 | Upvalues: t3 (copy), getNumOfNotificationsWith (copy), t4 (copy), Maid (copy), t (copy), t2 (copy) ]]
+function t4.new(p1)
 	assert(p1 ~= nil)
 	assert(p1.Text ~= nil)
 	if p1.Duration == nil then
@@ -190,7 +191,7 @@ function t4.new(p1) --[[ Line: 166 | Upvalues: t3 (copy), getNumOfNotificationsW
 		return t5
 	end
 end
-function t4.Hook(p1) --[[ Line: 214 | Upvalues: v1 (ref), t4 (copy), t3 (copy), GetTextLines (copy), CurrentCamera (copy), v2 (copy), TweenService (copy), TypeWrite (copy), Audio (copy) ]]
+function t4.Hook(p1)
 	v1 = v1 + 1
 	local Gui = t4.Gui
 	local v12 = t4.Templates.Notification:Clone()
@@ -222,7 +223,7 @@ function t4.Hook(p1) --[[ Line: 214 | Upvalues: v1 (ref), t4 (copy), t3 (copy), 
 	p1.Maid:GiveTask(Sound)
 	v12.Parent = Gui.Container
 	local v7 = 1
-	p1.Maid:GiveTask(TypeWrite(p1.Text, function(p12) --[[ Line: 246 | Upvalues: p1 (copy), v7 (ref), Gui (copy), Sound (copy), v12 (copy) ]]
+	p1.Maid:GiveTask(TypeWrite(p1.Text, function(p12)
 		if p1.Maid == nil then
 			return false
 		end
@@ -238,11 +239,11 @@ function t4.Hook(p1) --[[ Line: 214 | Upvalues: v1 (ref), t4 (copy), t3 (copy), 
 			TimePosition = v22.TimePosition or 0
 		})
 	end
-	task.delay(p1.Duration, function() --[[ Line: 261 | Upvalues: p1 (copy) ]]
+	task.delay(p1.Duration, function()
 		p1:Destroy()
 	end)
 end
-function t4.Destroy(p1) --[[ Line: 265 | Upvalues: t4 (copy), TweenService (copy), v3 (copy), t2 (copy), t (copy) ]]
+function t4.Destroy(p1)
 	if p1.Maid ~= nil then
 		local Gui = t4.Gui
 		TweenService:Create(p1.Frame, v3, {
@@ -254,7 +255,7 @@ function t4.Destroy(p1) --[[ Line: 265 | Upvalues: t4 (copy), TweenService (copy
 		TweenService:Create(p1.Frame.UIStroke, v3, {
 			Transparency = 1
 		}):Play()
-		task.delay(v3.Time, function() --[[ Line: 273 | Upvalues: p1 (copy), t2 (ref), t (ref) ]]
+		task.delay(v3.Time, function()
 			p1.Frame:Destroy()
 			local v1 = table.find(t2, p1)
 			if v1 then

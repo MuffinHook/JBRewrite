@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local HttpService = game:GetService("HttpService")
 local t = {}
-local function v1(p1) --[[ Line: 4 | Upvalues: v1 (copy) ]]
+local function v1(p1)
 	for v12, v2 in p1 do
 		if typeof(v12) == "string" then
 			if #v12 >= 1000 then
@@ -42,10 +43,10 @@ local function v1(p1) --[[ Line: 4 | Upvalues: v1 (copy) ]]
 	end
 	return true
 end
-function t.isTableSafe(p1, p2) --[[ Line: 49 | Upvalues: HttpService (copy), v1 (copy) ]]
+function t.isTableSafe(p1, p2)
 	if typeof(p1) == "table" then
 		local v12 = nil
-		local v2, v3 = pcall(function() --[[ Line: 54 | Upvalues: HttpService (ref), p1 (copy), v12 (ref) ]]
+		local v2, v3 = pcall(function()
 			v12 = #HttpService:JSONEncode(p1)
 		end)
 		if v2 then
@@ -62,7 +63,7 @@ function t.isTableSafe(p1, p2) --[[ Line: 49 | Upvalues: HttpService (copy), v1 
 		return false
 	end
 end
-function t.isStringSafe(p1) --[[ Line: 68 ]]
+function t.isStringSafe(p1)
 	if typeof(p1) == "string" then
 		if utf8.len(p1) == nil then
 			return false

@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 local BoxCar = require(script.Parent.BoxCar)
 return {
-	MakeCar = function(p1) --[[ Name: MakeCar | Line: 2 | Upvalues: BoxCar (copy) ]]
+	MakeCar = function(p1)
 		return BoxCar.MakeCar(p1)
 	end,
-	MoveCar = function(p1, p2, p3, p4) --[[ Name: MoveCar | Line: 5 | Upvalues: BoxCar (copy) ]]
+	MoveCar = function(p1, p2, p3, p4)
 		return BoxCar.MoveCar(p1, p2, p3, p4)
 	end,
-	DestroyCar = function(p1) --[[ Name: DestroyCar | Line: 8 | Upvalues: BoxCar (copy) ]]
+	DestroyCar = function(p1)
 		return BoxCar.DestroyCar(p1)
 	end
 }

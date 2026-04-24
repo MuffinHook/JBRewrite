@@ -1,4 +1,5 @@
-return function() --[[ Line: 1 ]]
+-- Reviewed by Claude
+return function()
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
 	local createSpy = require(script.Parent.Parent.createSpy)
@@ -6,11 +7,11 @@ return function() --[[ Line: 1 ]]
 	local Type = require(script.Parent.Parent.Type)
 	local Component = require(script.Parent.Parent.Component)
 	local v1 = createReconciler(NoopRenderer)
-	it("should be invoked when mounted", function() --[[ Line: 12 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy) ]]
+	it("should be invoked when mounted", function()
 		local v12 = Component:extend("MyComponent")
 		local v2 = createSpy()
 		v12.didMount = v2.value
-		function v12.render(p1) --[[ Line: 19 ]]
+		function v12.render(p1)
 			return nil
 		end
 		v1.mountVirtualNode(createElement(v12), nil, "Test")

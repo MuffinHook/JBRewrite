@@ -1,161 +1,161 @@
 -- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BriefcaseConsts = require(ReplicatedStorage.AirDrop.BriefcaseConsts)
-local function getQuatBtwn(p1, p2, p3)
-	local v1 = p1:Dot(p2)
-	local v2 = p1:Cross(p2)
-	if v1 < -0.99999 then
-		return CFrame.fromAxisAngle(p3, math.pi)
+local function getQuaternionBetween(upVector, targetVector, refVector)
+	local dotProduct = upVector:Dot(targetVector)
+	local crossProduct = upVector:Cross(targetVector)
+	if dotProduct < -0.99999 then
+		return CFrame.fromAxisAngle(refVector, math.pi)
 	else
-		return CFrame.new(0, 0, 0, v2.x, v2.y, v2.z, 1 + v1)
+		return CFrame.new(0, 0, 0, crossProduct.x, crossProduct.y, crossProduct.z, 1 + dotProduct)
 	end
 end
-local t = {
-	getOrigin = function(p1)
-		return p1:GetAttribute(BriefcaseConsts.ORIGIN_ATTR_NAME)
+local BriefcaseUtilsModule = {
+	getOrigin = function(briefcase)
+		return briefcase:GetAttribute(BriefcaseConsts.ORIGIN_ATTR_NAME)
 	end,
-	setOrigin = function(p1, p2)
-		p1:SetAttribute(BriefcaseConsts.ORIGIN_ATTR_NAME, p2)
+	setOrigin = function(briefcase, origin)
+		briefcase:SetAttribute(BriefcaseConsts.ORIGIN_ATTR_NAME, origin)
 	end,
-	getTarget = function(p1)
-		return p1:GetAttribute(BriefcaseConsts.TARGET_ATTR_NAME)
+	getTarget = function(briefcase)
+		return briefcase:GetAttribute(BriefcaseConsts.TARGET_ATTR_NAME)
 	end,
-	setTarget = function(p1, p2)
-		p1:SetAttribute(BriefcaseConsts.TARGET_ATTR_NAME, p2)
+	setTarget = function(briefcase, target)
+		briefcase:SetAttribute(BriefcaseConsts.TARGET_ATTR_NAME, target)
 	end,
-	getTargetNormal = function(p1)
-		return p1:GetAttribute(BriefcaseConsts.TARGET_NORMAL_ATTR_NAME)
+	getTargetNormal = function(briefcase)
+		return briefcase:GetAttribute(BriefcaseConsts.TARGET_NORMAL_ATTR_NAME)
 	end,
-	setTargetNormal = function(p1, p2)
-		p1:SetAttribute(BriefcaseConsts.TARGET_NORMAL_ATTR_NAME, p2)
+	setTargetNormal = function(briefcase, targetNormal)
+		briefcase:SetAttribute(BriefcaseConsts.TARGET_NORMAL_ATTR_NAME, targetNormal)
 	end,
-	getCollected = function(p1)
-		return p1:GetAttribute(BriefcaseConsts.COLLECTED_ATTR_NAME)
+	getCollected = function(briefcase)
+		return briefcase:GetAttribute(BriefcaseConsts.COLLECTED_ATTR_NAME)
 	end,
-	setCollected = function(p1, p2)
-		p1:SetAttribute(BriefcaseConsts.COLLECTED_ATTR_NAME, p2)
+	setCollected = function(briefcase, collected)
+		briefcase:SetAttribute(BriefcaseConsts.COLLECTED_ATTR_NAME, collected)
 	end,
-	getCollectedChangedSignal = function(p1)
-		return p1:GetAttributeChangedSignal(BriefcaseConsts.COLLECTED_ATTR_NAME)
+	getCollectedChangedSignal = function(briefcase)
+		return briefcase:GetAttributeChangedSignal(BriefcaseConsts.COLLECTED_ATTR_NAME)
 	end,
-	getBornAt = function(p1)
-		return p1:GetAttribute(BriefcaseConsts.BORN_AT_ATTR_NAME)
+	getBornAt = function(briefcase)
+		return briefcase:GetAttribute(BriefcaseConsts.BORN_AT_ATTR_NAME)
 	end,
-	setBornAt = function(p1, p2)
-		p1:SetAttribute(BriefcaseConsts.BORN_AT_ATTR_NAME, p2)
+	setBornAt = function(briefcase, bornAt)
+		briefcase:SetAttribute(BriefcaseConsts.BORN_AT_ATTR_NAME, bornAt)
 	end,
-	getSpeed = function(p1)
-		return p1:GetAttribute(BriefcaseConsts.SPEED_ATTR_NAME)
+	getSpeed = function(briefcase)
+		return briefcase:GetAttribute(BriefcaseConsts.SPEED_ATTR_NAME)
 	end,
-	setSpeed = function(p1, p2)
-		p1:SetAttribute(BriefcaseConsts.SPEED_ATTR_NAME, p2)
+	setSpeed = function(briefcase, speed)
+		briefcase:SetAttribute(BriefcaseConsts.SPEED_ATTR_NAME, speed)
 	end,
-	getLanded = function(p1)
-		return p1:GetAttribute(BriefcaseConsts.LANDED_ATTR_NAME)
+	getLanded = function(briefcase)
+		return briefcase:GetAttribute(BriefcaseConsts.LANDED_ATTR_NAME)
 	end,
-	setLanded = function(p1, p2)
-		p1:SetAttribute(BriefcaseConsts.LANDED_ATTR_NAME, p2)
+	setLanded = function(briefcase, landed)
+		briefcase:SetAttribute(BriefcaseConsts.LANDED_ATTR_NAME, landed)
 	end,
-	getLandedTime = function(p1)
-		return p1:GetAttribute(BriefcaseConsts.BRIEFCASE_LANDING_TIME_ATTRIBUTE_NAME)
+	getLandedTime = function(briefcase)
+		return briefcase:GetAttribute(BriefcaseConsts.BRIEFCASE_LANDING_TIME_ATTRIBUTE_NAME)
 	end,
-	setLandedTime = function(p1, p2)
-		p1:SetAttribute(BriefcaseConsts.BRIEFCASE_LANDING_TIME_ATTRIBUTE_NAME, p2)
+	setLandedTime = function(briefcase, landedTime)
+		briefcase:SetAttribute(BriefcaseConsts.BRIEFCASE_LANDING_TIME_ATTRIBUTE_NAME, landedTime)
 	end,
-	getRarityProbabilities = function(p1)
-		local v1 = p1:FindFirstChild(BriefcaseConsts.BRIEFCASE_RARITY_PROBABILITIES_FOLDER_NAME)
-		assert(v1, "No rarity folder found")
-		local t = {}
-		for v2, v3 in v1:GetChildren() do
-			t[v3.Name] = v3.Value
+	getRarityProbabilities = function(briefcase)
+		local rarityFolder = briefcase:FindFirstChild(BriefcaseConsts.BRIEFCASE_RARITY_PROBABILITIES_FOLDER_NAME)
+		assert(rarityFolder, "No rarity folder found")
+		local rarityProbs = {}
+		for index, rarityValue in rarityFolder:GetChildren() do
+			rarityProbs[rarityValue.Name] = rarityValue.Value
 		end
-		return t
+		return rarityProbs
 	end
 }
-function t.getTimeSinceBriefcaseLanded(p1)
-	local v1 = t.getLandedTime(p1)
-	assert(v1, "Briefcase hasn\'t landed yet but trying to collect reward")
-	return workspace:GetServerTimeNow() - v1
+function BriefcaseUtilsModule.getTimeSinceBriefcaseLanded(briefcase)
+	local landedTime = BriefcaseUtilsModule.getLandedTime(briefcase)
+	assert(landedTime, "Briefcase hasn't landed yet but trying to collect reward")
+	return workspace:GetServerTimeNow() - landedTime
 end
-function t.setBriefcaseActiveDurationStart(p1, p2)
-	p1:SetAttribute(BriefcaseConsts.BRIEFCASE_ACTIVE_DURATION_START, p2)
+function BriefcaseUtilsModule.setBriefcaseActiveDurationStart(briefcase, startTime)
+	briefcase:SetAttribute(BriefcaseConsts.BRIEFCASE_ACTIVE_DURATION_START, startTime)
 end
-function t.getBriefcaseActiveDurationStart(p1)
-	return p1:GetAttribute(BriefcaseConsts.BRIEFCASE_ACTIVE_DURATION_START)
+function BriefcaseUtilsModule.getBriefcaseActiveDurationStart(briefcase)
+	return briefcase:GetAttribute(BriefcaseConsts.BRIEFCASE_ACTIVE_DURATION_START)
 end
-function t.getBriefcaseActiveDuration(p1)
-	if t.getBriefcaseActiveDurationStart(p1) then
-		return workspace:GetServerTimeNow() - t.getBriefcaseActiveDurationStart(p1)
+function BriefcaseUtilsModule.getBriefcaseActiveDuration(briefcase)
+	if BriefcaseUtilsModule.getBriefcaseActiveDurationStart(briefcase) then
+		return workspace:GetServerTimeNow() - BriefcaseUtilsModule.getBriefcaseActiveDurationStart(briefcase)
 	else
 		return nil
 	end
 end
-function t.setRarityProbabilities(p1, p2)
-	if typeof(p2) ~= "table" then
-		print(p2)
+function BriefcaseUtilsModule.setRarityProbabilities(briefcase, rarityProbs)
+	if typeof(rarityProbs) ~= "table" then
+		print(rarityProbs)
 		error("Invalid rarityProbs given")
 	end
-	local v1 = p1:FindFirstChild(BriefcaseConsts.BRIEFCASE_RARITY_PROBABILITIES_FOLDER_NAME)
-	if not v1 then
-		local v2 = Instance.new("Folder")
-		v2.Name = BriefcaseConsts.BRIEFCASE_RARITY_PROBABILITIES_FOLDER_NAME
-		v2.Parent = p1
-		v1 = v2
+	local rarityFolder = briefcase:FindFirstChild(BriefcaseConsts.BRIEFCASE_RARITY_PROBABILITIES_FOLDER_NAME)
+	if not rarityFolder then
+		local newFolder = Instance.new("Folder")
+		newFolder.Name = BriefcaseConsts.BRIEFCASE_RARITY_PROBABILITIES_FOLDER_NAME
+		newFolder.Parent = briefcase
+		rarityFolder = newFolder
 	end
-	for v3, v4 in p2 do
-		local v5 = v1:FindFirstChild(v3)
-		if not v5 then
-			local v6 = Instance.new("NumberValue")
-			v6.Name = v3
-			v6.Parent = v1
-			v5 = v6
+	for rarityId, probability in rarityProbs do
+		local rarityValue = rarityFolder:FindFirstChild(rarityId)
+		if not rarityValue then
+			local newRarityValue = Instance.new("NumberValue")
+			newRarityValue.Name = rarityId
+			newRarityValue.Parent = rarityFolder
+			rarityValue = newRarityValue
 		end
-		v5.Value = v4
+		rarityValue.Value = probability
 	end
-	for v7, v8 in v1:GetChildren() do
-		if not p2[tonumber(v8.Name)] then
-			v8:Destroy()
+	for index, childValue in rarityFolder:GetChildren() do
+		if not rarityProbs[tonumber(childValue.Name)] then
+			childValue:Destroy()
 		end
 	end
 	return true
 end
-function t.getLandedChangedSignal(p1)
-	return p1:GetAttributeChangedSignal(BriefcaseConsts.LANDED_ATTR_NAME)
+function BriefcaseUtilsModule.getLandedChangedSignal(briefcase)
+	return briefcase:GetAttributeChangedSignal(BriefcaseConsts.LANDED_ATTR_NAME)
 end
-function t.getOpenDuration(p1)
-	return p1:GetAttribute(BriefcaseConsts.OPEN_DURATION_ATTRIBUTE_NAME)
+function BriefcaseUtilsModule.getOpenDuration(briefcase)
+	return briefcase:GetAttribute(BriefcaseConsts.OPEN_DURATION_ATTRIBUTE_NAME)
 end
-function t.setOpenDuration(p1, p2)
-	p1:SetAttribute(BriefcaseConsts.OPEN_DURATION_ATTRIBUTE_NAME, p2)
+function BriefcaseUtilsModule.setOpenDuration(briefcase, duration)
+	briefcase:SetAttribute(BriefcaseConsts.OPEN_DURATION_ATTRIBUTE_NAME, duration)
 	return true
 end
-function t.getPositionAt(p1, p2, p3, p4)
-	if p4 < p1 then
-		p1 = p4
+function BriefcaseUtilsModule.getPositionAt(elapsedTime, origin, target, totalDuration)
+	if totalDuration < elapsedTime then
+		elapsedTime = totalDuration
 	end
-	return p2 + (p3 - p2) * (p1 / p4)
+	return origin + (target - origin) * (elapsedTime / totalDuration)
 end
-function t.getCFrameAt(p1, p2, p3, p4, p5)
-	if p5 < p1 then
-		p1 = p5
+function BriefcaseUtilsModule.getCFrameAt(elapsedTime, origin, target, targetNormal, totalDuration)
+	if totalDuration < elapsedTime then
+		elapsedTime = totalDuration
 	end
-	local v2 = p1 % 6.283185307179586
-	local v3 = if p5 - 1 < p1 then (p1 - p5) / 1 + 1 else 0
-	local v4 = v3 * v3
-	return getQuatBtwn(Vector3.new(0, 1, 0), (Vector3.new(0, 1, 0)):lerp(p4, v4), Vector3.new(0, 0, 1)) * CFrame.Angles(math.cos(v2) * 0.2 * (1 - v4), v2, math.sin(v2) * 0.2 * (1 - v4)) + p2 + (p3 - p2) * (p1 / p5)
+	local rotationPhase = elapsedTime % 6.283185307179586
+	local landingProgress = if totalDuration - 1 < elapsedTime then (elapsedTime - totalDuration) / 1 + 1 else 0
+	local landingProgressSquared = landingProgress * landingProgress
+	return getQuaternionBetween(Vector3.new(0, 1, 0), (Vector3.new(0, 1, 0)):lerp(targetNormal, landingProgressSquared), Vector3.new(0, 0, 1)) * CFrame.Angles(math.cos(rotationPhase) * 0.2 * (1 - landingProgressSquared), rotationPhase, math.sin(rotationPhase) * 0.2 * (1 - landingProgressSquared)) + origin + (target - origin) * (elapsedTime / totalDuration)
 end
-function t.setLastEPress(p1, p2)
-	p1:SetAttribute(BriefcaseConsts.LAST_E_PRESS_ATTR_NAME, p2)
+function BriefcaseUtilsModule.setLastEPress(briefcase, pressTime)
+	briefcase:SetAttribute(BriefcaseConsts.LAST_E_PRESS_ATTR_NAME, pressTime)
 	return true
 end
-function t.getLastEPress(p1)
-	return p1:GetAttribute(BriefcaseConsts.LAST_E_PRESS_ATTR_NAME)
+function BriefcaseUtilsModule.getLastEPress(briefcase)
+	return briefcase:GetAttribute(BriefcaseConsts.LAST_E_PRESS_ATTR_NAME)
 end
-function t.setIsCurrentlyEPressed(p1, p2)
-	p1:SetAttribute(BriefcaseConsts.IS_CURRENTLY_E_PRESSED_ATTR_NAME, p2)
+function BriefcaseUtilsModule.setIsCurrentlyEPressed(briefcase, isPressed)
+	briefcase:SetAttribute(BriefcaseConsts.IS_CURRENTLY_E_PRESSED_ATTR_NAME, isPressed)
 	return true
 end
-function t.getIsCurrentlyEPressed(p1)
-	return p1:GetAttribute(BriefcaseConsts.IS_CURRENTLY_E_PRESSED_ATTR_NAME)
+function BriefcaseUtilsModule.getIsCurrentlyEPressed(briefcase)
+	return briefcase:GetAttribute(BriefcaseConsts.IS_CURRENTLY_E_PRESSED_ATTR_NAME)
 end
-return t
+return BriefcaseUtilsModule

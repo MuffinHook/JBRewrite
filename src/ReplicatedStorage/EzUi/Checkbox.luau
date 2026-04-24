@@ -1,45 +1,46 @@
-local v1 = script:FindFirstAncestor("EzUi")
+-- Reviewed by Claude
+local EzUiFolder = script:FindFirstAncestor("EzUi")
 local Dictionary = require(script.Parent.Dictionary)
-local Roact = require(v1.Parent.Roact)
+local Roact = require(EzUiFolder.Parent.Roact)
 local createElement = Roact.createElement
-local v2 = Roact.Component:extend("Checkbox")
-v2.defaultProps = {
+local CheckboxComponent = Roact.Component:extend("Checkbox")
+CheckboxComponent.defaultProps = {
 	size = UDim2.new(0.5, 0, 0.5, 0),
 	backgroundColor = Color3.new(204/255, 204/255, 204/255),
 	checkColor = Color3.new(0/255, 0/255, 0/255),
 	disabled = false
 }
-function v2.render(p1) --[[ Line: 16 | Upvalues: createElement (copy), Roact (copy), Dictionary (copy) ]]
-	local t = {
-		Size = p1.props.size,
-		Position = p1.props.position,
-		LayoutOrder = p1.props.layoutOrder
+function CheckboxComponent.render(self)
+	local frameProps = {
+		Size = self.props.size,
+		Position = self.props.position,
+		LayoutOrder = self.props.layoutOrder
 	}
-	t.BackgroundColor3 = p1.props.value and Color3.new(0/255, 0/255, 0/255) or Color3.new(0.1, 0.1, 0.1)
-	local t2 = {}
-	t2.Corner = p1.props.cornerRadius and createElement("UICorner", {
-		CornerRadius = p1.props.cornerRadius
+	frameProps.BackgroundColor3 = self.props.value and Color3.new(0/255, 0/255, 0/255) or Color3.new(0.1, 0.1, 0.1)
+	local frameChildren = {}
+	frameChildren.Corner = self.props.cornerRadius and createElement("UICorner", {
+		CornerRadius = self.props.cornerRadius
 	})
-	t2.AspectRatio = createElement("UIAspectRatioConstraint", {
+	frameChildren.AspectRatio = createElement("UIAspectRatioConstraint", {
 		AspectRatio = 1,
 		DominantAxis = Enum.DominantAxis.Height
 	})
-	local t3 = {
-		AutoButtonColor = not p1.props.disabled,
+	local checkboxButtonProps = {
+		AutoButtonColor = not self.props.disabled,
 		Size = UDim2.fromScale(0.92, 0.92),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
-		LayoutOrder = p1.props.layoutOrder,
-		BackgroundColor3 = p1.props.backgroundColor,
+		LayoutOrder = self.props.layoutOrder,
+		BackgroundColor3 = self.props.backgroundColor,
 		Selectable = true,
 		Text = ""
 	}
-	t3[Roact.Event.Activated] = if p1.props.disabled then nil else function() --[[ Line: 42 | Upvalues: p1 (copy) ]]
-	if p1.props.onChecked then
-		p1.props.onChecked(not p1.props.value)
+	checkboxButtonProps[Roact.Event.Activated] = if self.props.disabled then nil else function()
+	if self.props.onChecked then
+		self.props.onChecked(not self.props.value)
 	end
 end
-	local t4 = {
+	local checkboxButtonChildren = {
 		Check = createElement("ImageLabel", {
 			Size = UDim2.new(1, 0, 1, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
@@ -47,14 +48,14 @@ end
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Image = "rbxassetid://8724615287",
-			ImageColor3 = p1.props.checkColor,
-			Visible = p1.props.value
+			ImageColor3 = self.props.checkColor,
+			Visible = self.props.value
 		})
 	}
-	t4.Corner = p1.props.cornerRadius and createElement("UICorner", {
-		CornerRadius = p1.props.cornerRadius
+	checkboxButtonChildren.Corner = self.props.cornerRadius and createElement("UICorner", {
+		CornerRadius = self.props.cornerRadius
 	})
-	t2.Checkbox = createElement("TextButton", t3, Dictionary.merge(p1.props[Roact.Children], t4))
-	return createElement("Frame", t, t2)
+	frameChildren.Checkbox = createElement("TextButton", checkboxButtonProps, Dictionary.merge(self.props[Roact.Children], checkboxButtonChildren))
+	return createElement("Frame", frameProps, frameChildren)
 end
-return v2
+return CheckboxComponent

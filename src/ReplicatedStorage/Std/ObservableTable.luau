@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local table2Lua = require(ReplicatedStorage.Std.Debug.table2Lua)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-local function checkIfShouldDebugPrint(p1) --[[ Line: 8 ]]
+local function checkIfShouldDebugPrint(p1)
 	return false
 end
-local function checkIfShouldDebugPrintMultiple(p1) --[[ Line: 14 ]]
+local function checkIfShouldDebugPrintMultiple(p1)
 	for v1, v2 in p1 do
 		if not false then
 			return false
@@ -14,17 +15,17 @@ local function checkIfShouldDebugPrintMultiple(p1) --[[ Line: 14 ]]
 end
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 57 | Upvalues: t (copy) ]]
+function t.new(p1)
 	local v2 = setmetatable({}, t)
 	v2._rawTable = p1
 	v2._mapKeyToCallbacks = {}
 	v2._mapUpdateInProgress = {}
 	return v2
 end
-function t.GetRawTable(p1) --[[ Line: 64 ]]
+function t.GetRawTable(p1)
 	return p1._rawTable
 end
-function t.Get(p1, p2) --[[ Line: 67 | Upvalues: TableUtils (copy) ]]
+function t.Get(p1, p2)
 	assert(typeof(p2) == "string", "key must be string")
 	local v2 = p1._rawTable[p2]
 	if typeof(v2) == "table" then
@@ -32,11 +33,11 @@ function t.Get(p1, p2) --[[ Line: 67 | Upvalues: TableUtils (copy) ]]
 	end
 	return v2
 end
-local function errHandler(p1) --[[ Line: 75 ]]
+local function errHandler(p1)
 	print(p1)
 	warn("^^^ _mapKeyToCallbacks err ^^^")
 end
-function t._rawSet(p1, p2, p3) --[[ Line: 79 | Upvalues: TableUtils (copy), errHandler (copy) ]]
+function t._rawSet(p1, p2, p3)
 	assert(typeof(p2) == "string", "key must be string")
 	if typeof(p3) == "table" then
 		TableUtils.deepFreeze(p3)
@@ -45,7 +46,7 @@ function t._rawSet(p1, p2, p3) --[[ Line: 79 | Upvalues: TableUtils (copy), errH
 		p1._rawTable[p2] = p3
 		if p1._mapKeyToCallbacks[p2] then
 			for v2, v3 in p1._mapKeyToCallbacks[p2] do
-				local v4 = task.delay(0, function() --[[ Line: 91 | Upvalues: p2 (copy) ]]
+				local v4 = task.delay(0, function()
 					warn((("ObservableTable:Observe callback on %* took too long"):format(p2)))
 				end)
 				xpcall(v3, errHandler, p3)
@@ -54,7 +55,7 @@ function t._rawSet(p1, p2, p3) --[[ Line: 79 | Upvalues: TableUtils (copy), errH
 		end
 	end
 end
-function t._set(p1, p2, p3) --[[ Line: 101 ]]
+function t._set(p1, p2, p3)
 	assert(typeof(p2) == "string", "key must be string")
 	if p1:_getIsUpdateInProgress(p2) then
 		error("Cannot set, key update in progress: " .. p2)
@@ -63,7 +64,7 @@ function t._set(p1, p2, p3) --[[ Line: 101 ]]
 	p1:_rawSet(p2, p3)
 	p1:_setIsUpdateInProgress(p2, false)
 end
-function t._setIsUpdateInProgress(p1, p2, p3) --[[ Line: 115 ]]
+function t._setIsUpdateInProgress(p1, p2, p3)
 	assert(typeof(p2) == "string", "key must be string")
 	assert(typeof(p3) == "boolean", "isUpdating must be boolean")
 	if p3 == (p1._mapUpdateInProgress[p2] == true) then
@@ -71,13 +72,13 @@ function t._setIsUpdateInProgress(p1, p2, p3) --[[ Line: 115 ]]
 	end
 	p1._mapUpdateInProgress[p2] = if p3 then true else nil
 end
-function t._getIsUpdateInProgress(p1, p2) --[[ Line: 129 ]]
+function t._getIsUpdateInProgress(p1, p2)
 	assert(typeof(p2) == "string", "key must be string")
 	return p1._mapUpdateInProgress[p2] == true
 end
-function t.Update(p1, p2, p3) --[[ Line: 133 ]]
+function t.Update(p1, p2, p3)
 	assert(typeof(p2) == "string", "key must be string")
-	local v2 = p1:UpdateMultiple({ p2 }, function(p1) --[[ Line: 135 | Upvalues: p3 (copy) ]]
+	local v2 = p1:UpdateMultiple({ p2 }, function(p1)
 		return { (p3(p1[1])) }
 	end)
 	if v2 == nil then
@@ -86,7 +87,7 @@ function t.Update(p1, p2, p3) --[[ Line: 133 ]]
 		return v2[1]
 	end
 end
-function t.UpdateMultiple(p1, p2, p3) --[[ Line: 144 | Upvalues: TableUtils (copy), table2Lua (copy) ]]
+function t.UpdateMultiple(p1, p2, p3)
 	local v1 = true
 	for v2, v3 in p2 do
 		if not false then
@@ -106,12 +107,12 @@ function t.UpdateMultiple(p1, p2, p3) --[[ Line: 144 | Upvalues: TableUtils (cop
 		assert(not t[v8], "keys must be unique")
 		t[v8] = true
 	end
-	local function finishUpdate() --[[ Line: 155 | Upvalues: p2 (copy), p1 (copy) ]]
+	local function finishUpdate()
 		for v1, v2 in p2 do
 			p1:_setIsUpdateInProgress(v2, false)
 		end
 	end
-	local v10 = TableUtils.filter(p2, function(p12) --[[ Line: 165 | Upvalues: p1 (copy) ]]
+	local v10 = TableUtils.filter(p2, function(p12)
 		return p1:_getIsUpdateInProgress(p12)
 	end)
 	if #v10 > 0 then
@@ -128,7 +129,7 @@ function t.UpdateMultiple(p1, p2, p3) --[[ Line: 144 | Upvalues: TableUtils (cop
 		end
 		table.insert(t2, v15)
 	end
-	local v17 = task.delay(0, function() --[[ Line: 187 | Upvalues: table2Lua (ref), p2 (copy) ]]
+	local v17 = task.delay(0, function()
 		warn((("ObservableTable:Update callback on %* took too long: %*"):format(table2Lua(p2), (debug.traceback()))))
 	end)
 	local v18, v19 = pcall(p3, t2)
@@ -196,11 +197,11 @@ function t.UpdateMultiple(p1, p2, p3) --[[ Line: 144 | Upvalues: TableUtils (cop
 		return v19
 	end
 end
-function t.Remove(p1, p2) --[[ Line: 231 ]]
+function t.Remove(p1, p2)
 	assert(typeof(p2) == "string", "key must be string")
 	p1:_set(p2, nil)
 end
-function t.Connect(p1, p2, p3) --[[ Line: 235 ]]
+function t.Connect(p1, p2, p3)
 	assert(typeof(p2) == "string", "key must be string")
 	local v2 = p1._mapKeyToCallbacks[p2]
 	if not v2 then
@@ -208,7 +209,7 @@ function t.Connect(p1, p2, p3) --[[ Line: 235 ]]
 		p1._mapKeyToCallbacks[p2] = v2
 	end
 	table.insert(v2, p3)
-	return function() --[[ Line: 243 | Upvalues: v2 (ref), p1 (copy), p2 (copy), p3 (copy) ]]
+	return function()
 		v2 = p1._mapKeyToCallbacks[p2]
 		local v1 = table.find(v2, p3)
 		if v1 then
@@ -219,7 +220,7 @@ function t.Connect(p1, p2, p3) --[[ Line: 235 ]]
 		end
 	end
 end
-function t.Observe(p1, p2, p3) --[[ Line: 254 ]]
+function t.Observe(p1, p2, p3)
 	assert(typeof(p2) == "string", "key must be string")
 	p3(p1:Get(p2))
 	return p1:Connect(p2, p3)

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
@@ -13,20 +14,20 @@ local Time = require(ReplicatedStorage.Module.Time)
 local RadioConsts = require(script.RadioConsts)
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 21 | Upvalues: t (copy), Maid (copy), Radio (copy), RadioPlayer (copy), RadioConsts (copy), HomeItemSystem (copy), HomeSystem (copy), LocalPlayer (copy), RxInstanceUtils (copy), CircleAction (copy), CurrentCamera (copy), Time (copy), RunService (copy) ]]
+function t.new(p1)
 	local t2 = {}
 	setmetatable(t2, t)
 	local _obj = p1._obj
 	t2._obj = _obj
 	t2._maid = Maid.new()
 	local v2 = Maid.new()
-	local function action(p1, p2) --[[ Line: 30 | Upvalues: Radio (ref), v2 (copy), RadioPlayer (ref), _obj (copy), RadioConsts (ref) ]]
+	local function action(p1, p2)
 		if p2 then
 			Radio.Open()
-			v2.listenOnClose = Radio.Window:GetOnClosedSignal():Connect(function() --[[ Line: 33 | Upvalues: v2 (ref) ]]
+			v2.listenOnClose = Radio.Window:GetOnClosedSignal():Connect(function()
 				v2:Destroy()
 			end)
-			v2.listenOnSongStarted = RadioPlayer.OnSongStarted:Connect(function(p1) --[[ Line: 36 | Upvalues: _obj (ref), RadioConsts (ref) ]]
+			v2.listenOnSongStarted = RadioPlayer.OnSongStarted:Connect(function(p1)
 				_obj:FindFirstChild(RadioConsts.PLAY_REMOTE_NAME):FireServer(p1)
 			end)
 			p1.Enabled = false
@@ -35,7 +36,7 @@ function t.new(p1) --[[ Line: 21 | Upvalues: t (copy), Maid (copy), Radio (copy)
 			return false
 		end
 	end
-	local function preUpdateFun(p12) --[[ Line: 45 | Upvalues: Radio (ref), HomeItemSystem (ref), HomeSystem (ref), p1 (copy), LocalPlayer (ref) ]]
+	local function preUpdateFun(p12)
 		local v1 = not Radio.IsOpen() and not HomeItemSystem.isCustomizing()
 		local v2 = HomeSystem.queryCurrentStandingHome()
 		if not v2 then
@@ -51,7 +52,7 @@ function t.new(p1) --[[ Line: 21 | Upvalues: t (copy), Maid (copy), Radio (copy)
 		end
 		p12.Enabled = v1
 	end
-	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(_obj, "Radio", function(p1, p2) --[[ Line: 61 | Upvalues: action (copy), preUpdateFun (copy), CircleAction (ref) ]]
+	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(_obj, "Radio", function(p1, p2)
 		CircleAction.Add({
 			Part = p1,
 			Name = "Open Radio",
@@ -61,13 +62,13 @@ function t.new(p1) --[[ Line: 21 | Upvalues: t (copy), Maid (copy), Radio (copy)
 			PreUpdateFun = preUpdateFun,
 			PreUpdatePeriod = 0.1
 		}, p1)
-		p2:GiveTask(function() --[[ Line: 72 | Upvalues: CircleAction (ref), p1 (copy) ]]
+		p2:GiveTask(function()
 			CircleAction.Remove(p1)
 		end)
 	end))
 	local v3 = 0
 	local v4 = 0
-	local function updateCameraFov() --[[ Line: 81 | Upvalues: RadioPlayer (ref), v4 (ref), v3 (ref), CurrentCamera (ref) ]]
+	local function updateCameraFov()
 		if RadioPlayer.CurrentSound then
 			local PlaybackLoudness = RadioPlayer.CurrentSound.PlaybackLoudness
 			if PlaybackLoudness ~= PlaybackLoudness then
@@ -106,13 +107,13 @@ function t.new(p1) --[[ Line: 21 | Upvalues: t (copy), Maid (copy), Radio (copy)
 			CurrentCamera.FieldOfView = v2 * 10 + 70
 		end
 	end
-	local function playId(p1) --[[ Line: 123 | Upvalues: Time (ref), t2 (copy), RadioPlayer (ref), RunService (ref), updateCameraFov (copy) ]]
+	local function playId(p1)
 		local v1 = Time.GetNowSync() - t2:GetStartedAt()
 		RadioPlayer.PlayRandomSongAfter = false
 		RadioPlayer.PlayId(p1, v1, false)
 		t2._maid.updateFov = RunService.Heartbeat:Connect(updateCameraFov)
 	end
-	t2._maid:GiveTask(t2._obj:GetAttributeChangedSignal(RadioConsts.SONG_ID_ATTR_NAME):Connect(function() --[[ Line: 134 | Upvalues: HomeSystem (ref), p1 (copy), t2 (copy), Time (ref), RadioPlayer (ref), RunService (ref), updateCameraFov (copy) ]]
+	t2._maid:GiveTask(t2._obj:GetAttributeChangedSignal(RadioConsts.SONG_ID_ATTR_NAME):Connect(function()
 		if HomeSystem.queryCurrentStandingHome() == p1:GetHome() then
 			local v1 = t2:GetSongId()
 			if v1 then
@@ -126,7 +127,7 @@ function t.new(p1) --[[ Line: 21 | Upvalues: t (copy), Maid (copy), Radio (copy)
 			t2._maid.updateFov = nil
 		end
 	end))
-	t2._maid:GiveTask(HomeSystem.onEntered:Connect(function(p12) --[[ Line: 147 | Upvalues: p1 (copy), t2 (copy), Time (ref), RadioPlayer (ref), RunService (ref), updateCameraFov (copy) ]]
+	t2._maid:GiveTask(HomeSystem.onEntered:Connect(function(p12)
 		if p1:GetHome() == p12 then
 			local v1 = t2:GetSongId()
 			if v1 then
@@ -137,7 +138,7 @@ function t.new(p1) --[[ Line: 21 | Upvalues: t (copy), Maid (copy), Radio (copy)
 			end
 		end
 	end))
-	t2._maid:GiveTask(HomeSystem.onExited:Connect(function(p12) --[[ Line: 155 | Upvalues: p1 (copy), t2 (copy), RadioPlayer (ref) ]]
+	t2._maid:GiveTask(HomeSystem.onExited:Connect(function(p12)
 		if p1:GetHome() == p12 then
 			local v1 = t2:GetSongId()
 			if v1 and RadioPlayer.CurrentSoundId == v1 then
@@ -148,20 +149,20 @@ function t.new(p1) --[[ Line: 21 | Upvalues: t (copy), Maid (copy), Radio (copy)
 	end))
 	return t2
 end
-function t.GetSongId(p1) --[[ Line: 169 | Upvalues: RadioConsts (copy) ]]
+function t.GetSongId(p1)
 	return p1._obj:GetAttribute(RadioConsts.SONG_ID_ATTR_NAME)
 end
-function t.GetStartedAt(p1) --[[ Line: 172 | Upvalues: RadioConsts (copy) ]]
+function t.GetStartedAt(p1)
 	return p1._obj:GetAttribute(RadioConsts.STARTED_AT_ATTR_NAME)
 end
-function t.Destroy(p1) --[[ Line: 175 ]]
+function t.Destroy(p1)
 	local _maid = p1._maid
 	assert(_maid ~= nil)
 	p1._maid = nil
 	_maid:Destroy()
 end
 return {
-	setup = function(p1) --[[ Name: setup | Line: 183 | Upvalues: t (copy) ]]
+	setup = function(p1)
 		local v1 = t.new(p1)
 		p1._maid:GiveTask(v1)
 		p1._radio = v1

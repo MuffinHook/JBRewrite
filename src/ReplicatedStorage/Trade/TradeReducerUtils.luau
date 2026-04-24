@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TradePopularSortData = require(script.Parent.TradePopularSortData)
 local ItemUtils = require(ReplicatedStorage.App.ItemUtils)
@@ -9,7 +10,7 @@ local SAFE_DATA = require(ReplicatedStorage.Safes.SafesConsts).SAFE_DATA
 local PopularSort = require(ReplicatedStorage.Garage.PopularSort)
 local PlayerUtils = require(ReplicatedStorage.Std.PlayerUtils)
 local getViewportProps = require(ReplicatedStorage.App.getViewportProps)
-local function getVehicleDataForMake(p1) --[[ Line: 14 | Upvalues: VehicleData (copy) ]]
+local function getVehicleDataForMake(p1)
 	for i, v in ipairs(VehicleData) do
 		if v.Make == p1 then
 			return v
@@ -18,7 +19,7 @@ local function getVehicleDataForMake(p1) --[[ Line: 14 | Upvalues: VehicleData (
 end
 local ItemSkinList = require(ReplicatedStorage.Game.ItemSkin.ItemSkinList)
 local String = require(ReplicatedStorage.Std.String)
-local function getItemSkinForName(p1) --[[ Line: 24 | Upvalues: ItemSkinList (copy) ]]
+local function getItemSkinForName(p1)
 	for i, v in ipairs(ItemSkinList) do
 		if v.Name == p1 then
 			return v
@@ -26,7 +27,7 @@ local function getItemSkinForName(p1) --[[ Line: 24 | Upvalues: ItemSkinList (co
 	end
 end
 local t = {
-	buildItemProps = function(p1) --[[ Name: buildItemProps | Line: 37 | Upvalues: PopularSort (copy), TradePopularSortData (copy), ItemUtils (copy), getViewportProps (copy), PlayerDataConsts (copy), StoreData (copy), GarageTranslationUtils (copy), VehicleData (copy), ReplicatedStorage (copy), ItemSkinList (copy), String (copy), PlayerUtils (copy) ]]
+	buildItemProps = function(p1)
 		local v1 = nil
 		local v2 = PopularSort.getRaw()
 		local v3 = TradePopularSortData.getPopularTradeItemData() or {}
@@ -193,7 +194,7 @@ local t = {
 			}
 			table.insert(v1.info, t3)
 			if UserId then
-				PlayerUtils.promiseNameFromUserId(UserId):andThen(function(p1) --[[ Line: 222 | Upvalues: t3 (copy) ]]
+				PlayerUtils.promiseNameFromUserId(UserId):andThen(function(p1)
 					t3.value = p1
 				end):catch(warn)
 			end
@@ -206,7 +207,7 @@ local t = {
 		end
 		return v1
 	end,
-	getDefaults = function() --[[ Name: getDefaults | Line: 243 ]]
+	getDefaults = function()
 		return {
 			userId = nil,
 			displayName = nil,
@@ -216,7 +217,7 @@ local t = {
 		}
 	end
 }
-function t.update(p1, p2) --[[ Line: 252 | Upvalues: t (copy) ]]
+function t.update(p1, p2)
 	local v1 = if p2.reset == true then t.getDefaults() else table.clone(p1)
 	if p2.userId ~= nil then
 		v1.userId = p2.userId
@@ -242,7 +243,7 @@ function t.update(p1, p2) --[[ Line: 252 | Upvalues: t (copy) ]]
 	end
 	return v1
 end
-function t.addItem(p1, p2) --[[ Line: 283 ]]
+function t.addItem(p1, p2)
 	local item = p2.item
 	assert(item ~= nil, "missing item")
 	local v2 = false
@@ -260,7 +261,7 @@ function t.addItem(p1, p2) --[[ Line: 283 ]]
 		return v3
 	end
 end
-function t.removeItem(p1, p2) --[[ Line: 301 ]]
+function t.removeItem(p1, p2)
 	local item = p2.item
 	assert(item ~= nil, "missing item")
 	for i = #p1.offerItems, 1, -1 do
@@ -272,7 +273,7 @@ function t.removeItem(p1, p2) --[[ Line: 301 ]]
 	end
 	return p1
 end
-function t.removeItemByIndex(p1, p2) --[[ Line: 315 ]]
+function t.removeItemByIndex(p1, p2)
 	assert(p2.index ~= nil, "missing item id")
 	local v2 = table.clone(p1)
 	table.remove(v2.offerItems, p2.index)

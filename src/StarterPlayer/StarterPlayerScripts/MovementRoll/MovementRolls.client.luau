@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("UserInputService")
@@ -18,7 +19,7 @@ for v2, v3 in t do
 	t3[v2].AnimationId = v3.animationId
 end
 local t4 = {}
-local function characterAdded(p1) --[[ Line: 31 | Upvalues: t3 (copy), t (copy), t4 (copy) ]]
+local function characterAdded(p1)
 	local Animator = p1:WaitForChild("Humanoid"):WaitForChild("Animator")
 	for v1, v2 in t3 do
 		local v4 = Animator:LoadAnimation(v2)
@@ -27,7 +28,7 @@ local function characterAdded(p1) --[[ Line: 31 | Upvalues: t3 (copy), t (copy),
 		t4[v1] = v4
 	end
 end
-local function playerAdded(p1) --[[ Line: 42 | Upvalues: characterAdded (copy) ]]
+local function playerAdded(p1)
 	if p1.Character then
 		characterAdded(p1.Character)
 	end
@@ -38,7 +39,7 @@ if LocalPlayer.Character then
 	characterAdded(LocalPlayer.Character)
 end
 LocalPlayer.CharacterAdded:Connect(characterAdded)
-local function playRollSound(p1) --[[ Line: 50 | Upvalues: Audio (copy) ]]
+local function playRollSound(p1)
 	local PrimaryPart = p1.PrimaryPart
 	if PrimaryPart then
 		Audio.ObjectLocal(PrimaryPart, 13621046723, {
@@ -47,7 +48,7 @@ local function playRollSound(p1) --[[ Line: 50 | Upvalues: Audio (copy) ]]
 	end
 end
 local ReplicateMovementRollRemote = ReplicatedStorage:WaitForChild("ReplicateMovementRollRemote")
-MovementRollService.onRollBegan:Connect(function(p1, p2) --[[ Line: 62 | Upvalues: t4 (copy), ReplicateMovementRollRemote (copy), Audio (copy) ]]
+MovementRollService.onRollBegan:Connect(function(p1, p2)
 	t4.Roll:Play()
 	t4.Roll:AdjustSpeed(0.54 * t4.Roll.Length / p2)
 	ReplicateMovementRollRemote:FireServer()
@@ -58,7 +59,7 @@ MovementRollService.onRollBegan:Connect(function(p1, p2) --[[ Line: 62 | Upvalue
 		})
 	end
 end)
-ReplicateMovementRollRemote.OnClientEvent:Connect(function(p1) --[[ Line: 73 | Upvalues: Players (copy), Audio (copy) ]]
+ReplicateMovementRollRemote.OnClientEvent:Connect(function(p1)
 	if p1 ~= Players.LocalPlayer then
 		local Character = p1.Character
 		if Character then
@@ -78,13 +79,13 @@ local t5 = {
 	useEvery = 5,
 	image = "rbxassetid://13613171070",
 	keyCodes = { Enum.KeyCode.LeftControl, Enum.KeyCode.RightControl, Enum.KeyCode.ButtonL3 },
-	onPressed = function(p1) --[[ Name: onPressed | Line: 90 | Upvalues: MovementRollService (copy) ]]
+	onPressed = function(p1)
 		return MovementRollService.attemptRoll() and true or false
 	end,
-	onReleased = function() --[[ Name: onReleased | Line: 96 ]] end
+	onReleased = function()  end
 }
 ActionButtonService.add(t5)
-local function updateVisibility() --[[ Line: 100 | Upvalues: VehicleUtils (copy), ReplicatedStorage (copy), ActionButtonService (copy), t5 (ref) ]]
+local function updateVisibility()
 	local v1 = VehicleUtils.GetLocalVehiclePacket()
 	ActionButtonService.setButtonEnabled(t5, not v1 and ReplicatedStorage:GetAttribute("RollingEnabled") == true)
 end

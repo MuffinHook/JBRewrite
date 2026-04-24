@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Std.Audio)
@@ -7,7 +8,7 @@ local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 require(ReplicatedStorage.Inventory.InventoryItemUtils)
 local CurrentCamera = workspace.CurrentCamera
 local Gun = require(script.Parent.Gun)
-local function RandomVector() --[[ Line: 13 ]]
+local function RandomVector()
 	local v1 = math.random() * 2 - 1
 	local v2 = math.random() * 2 - 1
 	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
@@ -17,33 +18,33 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.new(p1, p2, p3) --[[ Line: 21 | Upvalues: Gun (copy), t (copy), RxInstanceUtils (copy) ]]
+function t.new(p1, p2, p3)
 	local v1 = Gun.new(p1, p2)
 	setmetatable(v1, t)
-	v1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p2, "TurretValue", function(p1, p2) --[[ Line: 27 | Upvalues: RxInstanceUtils (ref), v1 (copy) ]]
-		p2:GiveTask(RxInstanceUtils.observeProperty(p1, "Value", function(p1, p2) --[[ Line: 29 | Upvalues: v1 (ref), RxInstanceUtils (ref) ]]
+	v1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p2, "TurretValue", function(p1, p2)
+		p2:GiveTask(RxInstanceUtils.observeProperty(p1, "Value", function(p1, p2)
 			v1.Model = p1
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "BarrelMotor", function(p1) --[[ Line: 32 | Upvalues: v1 (ref) ]]
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "BarrelMotor", function(p1)
 				v1.BarrelMotor = p1
 			end))
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "VerticalMotor", function(p1) --[[ Line: 37 | Upvalues: v1 (ref) ]]
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "VerticalMotor", function(p1)
 				v1.VerticalMotor = p1
 			end))
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "HorizontalMotor", function(p1) --[[ Line: 42 | Upvalues: v1 (ref) ]]
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "HorizontalMotor", function(p1)
 				v1.HorizontalMotor = p1
 			end))
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Flare", function(p1, p2) --[[ Line: 47 | Upvalues: RxInstanceUtils (ref), v1 (ref) ]]
-				p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "ParticleEmitter", function(p1) --[[ Line: 49 | Upvalues: v1 (ref) ]]
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Flare", function(p1, p2)
+				p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "ParticleEmitter", function(p1)
 					v1.FlareEmitter = p1
 				end))
 			end))
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Tips", function(p1, p2) --[[ Line: 56 | Upvalues: RxInstanceUtils (ref), v1 (ref) ]]
-				p2:GiveTask(RxInstanceUtils.observeChildren(p1, function() --[[ Line: 57 | Upvalues: v1 (ref), p1 (copy) ]]
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Tips", function(p1, p2)
+				p2:GiveTask(RxInstanceUtils.observeChildren(p1, function()
 					v1.Tips = p1:GetChildren()
 				end))
 			end))
 			if v1.Local then
-				v1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "UpdateHeatRemote", function(p1) --[[ Line: 67 | Upvalues: v1 (ref) ]]
+				v1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "UpdateHeatRemote", function(p1)
 					v1._updateHeatRemote = p1
 				end))
 			end
@@ -53,7 +54,7 @@ function t.new(p1, p2, p3) --[[ Line: 21 | Upvalues: Gun (copy), t (copy), RxIns
 	v1:DefaultDisableCamLock()
 	return v1
 end
-function t.Setup(p1) --[[ Line: 83 | Upvalues: Spring (copy), R15IKv2 (copy), RunService (copy) ]]
+function t.Setup(p1)
 	p1.IgnoreList = { p1.Character, p1.Model, workspace.Items }
 	p1.LastShoot = 0
 	p1.LastPlayerImpact = 0
@@ -75,33 +76,33 @@ function t.Setup(p1) --[[ Line: 83 | Upvalues: Spring (copy), R15IKv2 (copy), Ru
 	p1:SetupShoot()
 	p1.IK = R15IKv2.BuildPacketArms(p1.Character)
 	p1:UpdateMousePosition()
-	p1.Maid:GiveTask(RunService.RenderStepped:Connect(function(p12) --[[ Line: 115 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(RunService.RenderStepped:Connect(function(p12)
 		p1:RenderStepped(p12)
 	end))
-	p1.Maid:GiveTask(RunService.Stepped:Connect(function() --[[ Line: 118 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(RunService.Stepped:Connect(function()
 		p1:Stepped()
 	end))
 end
 t.ApplySkin = false
 t.Reload = false
-function t.BulletEmitterOnLocalHitPlayer(p1, ...) --[[ Line: 127 | Upvalues: Gun (copy) ]]
+function t.BulletEmitterOnLocalHitPlayer(p1, ...)
 	local v1 = tick()
 	if v1 - p1.LastPlayerImpact > 0.1 then
 		p1.LastPlayerImpact = v1
 		Gun.BulletEmitterOnLocalHitPlayer(p1, ...)
 	end
 end
-function t.TransformLocalMousePosition(p1, p2) --[[ Line: 136 ]]
+function t.TransformLocalMousePosition(p1, p2)
 	return p1.SpringThirdMousePosition:SetTarget(p2)
 end
-function t.UpdateArmJoints(p1) --[[ Line: 139 | Upvalues: R15IKv2 (copy) ]]
+function t.UpdateArmJoints(p1)
 	local IK = p1.IK
 	local Model = p1.Model
 	IK.RightArm = Model.RightArm.Position
 	IK.LeftArm = Model.LeftArm.Position
 	R15IKv2.Arms(IK)
 end
-function t.UpdateCamera(p1) --[[ Line: 151 | Upvalues: CurrentCamera (copy) ]]
+function t.UpdateCamera(p1)
 	local v1 = os.clock()
 	local v2 = v1 - (p1._lastCameraUpdate or v1)
 	p1._lastCameraUpdate = v1
@@ -109,14 +110,14 @@ function t.UpdateCamera(p1) --[[ Line: 151 | Upvalues: CurrentCamera (copy) ]]
 	local v4 = CurrentCamera
 	v4.CFrame = v4.CFrame * (CFrame.Angles(0, v3.X * v2 * 60, 0) * CFrame.Angles(v3.Y * v2 * 60, 0, 0))
 end
-function t.RenderStepped(p1, p2) --[[ Line: 160 ]]
+function t.RenderStepped(p1, p2)
 	p1:UpdateMousePosition()
 	if p1.Local then
 		p1:UpdateCrossHair()
 		p1:UpdateCamera()
 	end
 end
-function t.Shoot(p1) --[[ Line: 170 | Upvalues: CurrentCamera (copy) ]]
+function t.Shoot(p1)
 	local v1 = p1.Tips[p1.TipIndex]
 	p1.Tip = v1
 	p1.BulletEmitter:Emit(v1.Position, v1.CFrame.lookVector, p1.Config.BulletSpeed)
@@ -127,10 +128,10 @@ function t.Shoot(p1) --[[ Line: 170 | Upvalues: CurrentCamera (copy) ]]
 		p1.SpringCamera:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * v3 * 0.15 * 15)
 	end
 end
-function t.ShootCheckConditions(p1) --[[ Line: 185 ]]
+function t.ShootCheckConditions(p1)
 	return true
 end
-function t.AnimateBarrel(p1, p2, p3) --[[ Line: 188 ]]
+function t.AnimateBarrel(p1, p2, p3)
 	if p1.Model then
 		local v1 = tick()
 		if p1.Sound then
@@ -170,7 +171,7 @@ function t.AnimateBarrel(p1, p2, p3) --[[ Line: 188 ]]
 		p1.Model:SetAttribute("Heat", sum)
 	end
 end
-function t.Stepped(p1) --[[ Line: 234 ]]
+function t.Stepped(p1)
 	if p1.Model and (p1.HorizontalMotor and p1.BarrelMotor) then
 		if p1.VerticalMotor then
 			local v1 = tick()
@@ -200,8 +201,8 @@ function t.Stepped(p1) --[[ Line: 234 ]]
 		end
 	end
 end
-function t.Heartbeat(p1) --[[ Line: 286 ]] end
-function t.InputBegan(p1, p2, p3) --[[ Line: 287 ]]
+function t.Heartbeat(p1)  end
+function t.InputBegan(p1, p2, p3)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		if p1.Model:GetAttribute("Heat") < p1.Config.MaxHeat then
 			p1.SpringSpin:SetTarget(1)
@@ -221,11 +222,11 @@ function t.InputBegan(p1, p2, p3) --[[ Line: 287 ]]
 		end
 	end
 end
-function t.InputEnded(p1, p2, p3) --[[ Line: 312 ]]
+function t.InputEnded(p1, p2, p3)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		p1.SpringSpin:SetTarget(0)
 		p1.MouseDown = false
-		delay(0.5, function() --[[ Line: 320 | Upvalues: p1 (copy) ]]
+		delay(0.5, function()
 			if p1.Sound and not p1.MouseDown then
 				p1.Sound:Destroy()
 				p1.Sound = nil
@@ -236,7 +237,7 @@ function t.InputEnded(p1, p2, p3) --[[ Line: 312 ]]
 		end
 	end
 end
-function t.Unequip(p1) --[[ Line: 331 ]]
+function t.Unequip(p1)
 	if p1.FlareEmitter then
 		p1.FlareEmitter.Enabled = false
 	end

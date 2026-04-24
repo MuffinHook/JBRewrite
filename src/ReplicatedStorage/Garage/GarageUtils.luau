@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -9,7 +10,7 @@ local GarageConsts = require(ReplicatedStorage.Game.Garage.GarageConsts)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local PrivateServerUtils = require(ReplicatedStorage.PrivateServer.PrivateServerUtils)
 local t = {
-	isPlayerInPhysicalGarage = function(p1) --[[ Name: isPlayerInPhysicalGarage | Line: 13 | Upvalues: CollectionService (copy), CharacterUtils (copy), RegionUtils (copy) ]]
+	isPlayerInPhysicalGarage = function(p1)
 		local v1 = false
 		local v2 = CollectionService:GetTagged("Garage")
 		local v3 = CharacterUtils.getRootPart(p1.Character)
@@ -25,22 +26,22 @@ local t = {
 		end
 	end
 }
-function t.inPhysicalGarage() --[[ Line: 33 | Upvalues: t (copy), Players (copy) ]]
+function t.inPhysicalGarage()
 	return t.isPlayerInPhysicalGarage(Players.LocalPlayer)
 end
-function t.inVehicle() --[[ Line: 36 | Upvalues: VehicleUtils (copy) ]]
+function t.inVehicle()
 	return VehicleUtils.GetLocalVehiclePacket() ~= nil
 end
-function t.hasPremium() --[[ Line: 40 | Upvalues: GamepassSystem (copy), GamepassUtils (copy), PrivateServerUtils (copy) ]]
+function t.hasPremium()
 	return GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.PremiumGarage) or PrivateServerUtils.getIsBattleServer()
 end
-function t.isVehicleCustomizationLimited(p1) --[[ Line: 44 ]]
+function t.isVehicleCustomizationLimited(p1)
 	return if p1.Hidden == true or (p1.HiddenAll == true or (p1.Level ~= nil or p1.Season ~= nil)) then true else not p1.Price
 end
-function t.isVehicleLimited(p1) --[[ Line: 51 ]]
+function t.isVehicleLimited(p1)
 	return if p1.Hidden == true or (p1.Retired == true or p1.Level ~= nil) then true else p1.Season ~= nil
 end
-function t.getIsSaveSlotValid(p1, p2) --[[ Line: 55 | Upvalues: GarageConsts (copy) ]]
+function t.getIsSaveSlotValid(p1, p2)
 	assert(typeof(p1) == "number", "saveSlotNum must be a number")
 	assert(typeof(p2) == "boolean", "isVIP must be a boolean")
 	if p1 == p1 then

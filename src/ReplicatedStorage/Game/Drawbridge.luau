@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
-local function Ease_InOutQuad(p1) --[[ Line: 5 ]]
+local function Ease_InOutQuad(p1)
 	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
 end
 local t = {}
 t.__index = t
-function t.new(p1, p2) --[[ Line: 11 | Upvalues: t (copy) ]]
+function t.new(p1, p2)
 	assert(p1 ~= nil)
 	assert(p2 ~= nil)
 	local t2 = {}
@@ -18,7 +19,7 @@ function t.new(p1, p2) --[[ Line: 11 | Upvalues: t (copy) ]]
 	t2.Angle = 0
 	return t2
 end
-function t.AnimateToAngle(p1, p2, p3) --[[ Line: 27 | Upvalues: RunService (copy) ]]
+function t.AnimateToAngle(p1, p2, p3)
 	assert(p2 ~= nil)
 	assert(p3 ~= nil)
 	if p1.Event ~= nil then
@@ -27,7 +28,7 @@ function t.AnimateToAngle(p1, p2, p3) --[[ Line: 27 | Upvalues: RunService (copy
 	end
 	local Angle = p1.Angle
 	local v3 = tick()
-	p1.Event = RunService.Heartbeat:Connect(function() --[[ Line: 37 | Upvalues: v3 (copy), p3 (copy), p1 (copy), Angle (copy), p2 (copy) ]]
+	p1.Event = RunService.Heartbeat:Connect(function()
 		local v1 = (tick() - v3) / p3
 		if v1 > 1 then
 			p1.Event:Disconnect()
@@ -50,7 +51,7 @@ function t.AnimateToAngle(p1, p2, p3) --[[ Line: 27 | Upvalues: RunService (copy
 	end)
 end
 local t2 = {
-	_initSpawned = function(p1) --[[ Name: _initSpawned | Line: 53 | Upvalues: RunUtils (copy), RunService (copy), t (copy) ]]
+	_initSpawned = function(p1)
 		p1.Model = workspace:WaitForChild("Drawbridge", 5)
 		if p1.Model == nil then
 			if RunUtils.isMainWorld() and not RunService:IsStudio() then
@@ -62,9 +63,9 @@ local t2 = {
 		p1.Door0 = t.new(p1.Model.Model.RoadA.Bridge, p1.Model.Model.RoadA.Hinge)
 	end
 }
-function t2.Init(p1) --[[ Line: 66 | Upvalues: t2 (copy) ]]
+function t2.Init(p1)
 	task.spawn(t2._initSpawned, t2)
-	function p1.em.fbs2dwjk(p1) --[[ Line: 71 | Upvalues: t2 (ref) ]]
+	function p1.em.fbs2dwjk(p1)
 		if p1 then
 			t2.Open()
 		else
@@ -72,10 +73,10 @@ function t2.Init(p1) --[[ Line: 66 | Upvalues: t2 (copy) ]]
 		end
 	end
 end
-function t2.Open() --[[ Line: 79 | Upvalues: t2 (copy) ]]
+function t2.Open()
 	t2.Door0:AnimateToAngle(0.9424777960769379, 10)
 end
-function t2.Close() --[[ Line: 83 | Upvalues: t2 (copy) ]]
+function t2.Close()
 	t2.Door0:AnimateToAngle(0, 10)
 end
 return t2

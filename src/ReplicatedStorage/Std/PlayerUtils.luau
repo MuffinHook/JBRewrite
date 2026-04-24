@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
@@ -5,32 +6,32 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local Promise = require(script.Parent.Promise)
 local t = {}
 local t2 = {}
-function t.promiseNameFromUserId(p1) --[[ Line: 11 | Upvalues: Promise (copy), t2 (copy), Players (copy) ]]
+function t.promiseNameFromUserId(p1)
 	if p1 < 0 then
 		return Promise.resolve("[USERNAME]")
 	elseif t2[p1] then
 		return Promise.resolve(t2[p1])
 	else
-		return Promise.new(function(p12) --[[ Line: 17 | Upvalues: Players (ref), p1 (copy), t2 (ref) ]]
+		return Promise.new(function(p12)
 			local v1 = Players:GetNameFromUserIdAsync(p1)
 			t2[p1] = v1
 			p12(v1)
 		end)
 	end
 end
-function t.promiseUserIdFromName(p1) --[[ Line: 23 | Upvalues: Promise (copy), Players (copy) ]]
-	return Promise.new(function(p12, p2, p3) --[[ Line: 24 | Upvalues: Players (ref), p1 (copy) ]]
+function t.promiseUserIdFromName(p1)
+	return Promise.new(function(p12, p2, p3)
 		local v1 = Players:GetUserIdFromNameAsync(p1)
 		if not p3() then
 			p12(v1)
 		end
 	end)
 end
-function t.promiseUserThumbnail(p1, p2, p3) --[[ Line: 32 | Upvalues: Promise (copy), Players (copy) ]]
+function t.promiseUserThumbnail(p1, p2, p3)
 	assert(p1 ~= nil)
 	assert(p2 ~= nil)
 	assert(p3 ~= nil)
-	return Promise.new(function(p12, p22, p32) --[[ Line: 36 | Upvalues: Players (ref), p1 (copy), p2 (copy), p3 (copy) ]]
+	return Promise.new(function(p12, p22, p32)
 		local v1, v2 = Players:GetUserThumbnailAsync(p1, p2, p3)
 		if v2 then
 			p12(v1)
@@ -39,11 +40,11 @@ function t.promiseUserThumbnail(p1, p2, p3) --[[ Line: 32 | Upvalues: Promise (c
 		end
 	end)
 end
-function t.getHeadShot(p1) --[[ Line: 47 ]]
+function t.getHeadShot(p1)
 	return ("rbxthumb://type=AvatarHeadShot&id=%*&w=180&h=180"):format(p1)
 end
 local v1 = Maid.new()
-function t.getPlayerMaid(p1) --[[ Line: 54 | Upvalues: Players (copy), v1 (copy), Maid (copy) ]]
+function t.getPlayerMaid(p1)
 	assert(p1.Parent == Players, "player must be a Player")
 	local v12 = v1[p1]
 	if not v12 then
@@ -54,25 +55,25 @@ function t.getPlayerMaid(p1) --[[ Line: 54 | Upvalues: Players (copy), v1 (copy)
 	v12:GiveTask(v2)
 	return v2
 end
-local function playerRemoving(p1) --[[ Line: 65 | Upvalues: v1 (copy) ]]
+local function playerRemoving(p1)
 	v1[p1] = nil
 end
 Players.PlayerRemoving:Connect(playerRemoving)
-function t.observePlayerAdded(p1) --[[ Line: 71 | Upvalues: Maid (copy), Players (copy) ]]
+function t.observePlayerAdded(p1)
 	local v1 = Maid.new()
 	local t = {}
-	local function onPlayerAdded(p12) --[[ Line: 74 | Upvalues: t (copy), Maid (ref), p1 (copy) ]]
+	local function onPlayerAdded(p12)
 		t[p12] = Maid.new()
 		p1(p12, t[p12])
 	end
-	local function onPlayerRemoving(p1) --[[ Line: 78 | Upvalues: t (copy) ]]
+	local function onPlayerRemoving(p1)
 		local v1 = t[p1]
 		if v1 then
 			t[p1] = nil
 			v1:DoCleaning()
 		end
 	end
-	v1:GiveTask(function() --[[ Line: 85 | Upvalues: t (copy) ]]
+	v1:GiveTask(function()
 		for k, v in pairs(t) do
 			local v1 = t[k]
 			if v1 then

@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Joint = require(ReplicatedStorage.Std.Joint)
 local Default = require(script.Parent.Default)
 local CollectionService = game:GetService("CollectionService")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
-local function MakeSound(p1, p2) --[[ Line: 9 ]]
+local function MakeSound(p1, p2)
 	local Sound = Instance.new("Sound")
 	Sound.SoundId = "rbxassetid://" .. tostring(p2)
 	Sound.Volume = 0.25
@@ -14,7 +15,7 @@ local function MakeSound(p1, p2) --[[ Line: 9 ]]
 	Sound.Parent = p1
 	return Sound
 end
-local function MakeCar(p1, p2) --[[ Line: 20 | Upvalues: CollectionService (copy), Joint (copy), RunUtils (copy), ReplicatedStorage (copy), LocalPlayer (copy), Default (copy) ]]
+local function MakeCar(p1, p2)
 	local Model = p1.Model
 	CollectionService:AddTag(Model.Model.TrainPassenger, "RobberyMarker")
 	local Base = p1.Base
@@ -83,7 +84,7 @@ local function MakeCar(p1, p2) --[[ Line: 20 | Upvalues: CollectionService (copy
 	p1.SoundBell = Sound
 	p1.SoundWhistle = Sound_2
 	local v10 = tick()
-	Model.Model.Front.Touched:connect(function(p1) --[[ Line: 66 | Upvalues: RunUtils (ref), v10 (ref), ReplicatedStorage (ref), LocalPlayer (ref), p2 (copy) ]]
+	Model.Model.Front.Touched:connect(function(p1)
 		if not RunUtils.isStudio() then
 			local v1 = tick()
 			if not (v1 - v10 < 0.1) then
@@ -114,7 +115,7 @@ local function MakeCar(p1, p2) --[[ Line: 20 | Upvalues: CollectionService (copy
 	p1.LastBellSpeed = 0
 	return Default.MakeCar(p1)
 end
-local function UpdateSound(p1, p2) --[[ Line: 105 | Upvalues: LocalPlayer (copy) ]]
+local function UpdateSound(p1, p2)
 	local Character = LocalPlayer.Character
 	if Character then
 		local Humanoid = Character:FindFirstChild("Humanoid")
@@ -169,7 +170,7 @@ local function UpdateSound(p1, p2) --[[ Line: 105 | Upvalues: LocalPlayer (copy)
 end
 return {
 	MakeCar = MakeCar,
-	MoveCar = function(p1, p2, p3, p4) --[[ Name: MoveCar | Line: 174 | Upvalues: UpdateSound (copy), Default (copy) ]]
+	MoveCar = function(p1, p2, p3, p4)
 		local v1 = p2.Speed * p3
 		local RightVector = p1.Base.CFrame.RightVector
 		for v2, v3 in next, p1.Wheels do
@@ -181,7 +182,7 @@ return {
 		UpdateSound(p1, p2)
 		return Default.MoveCar(p1, p2, p3, p4)
 	end,
-	DestroyCar = function(p1) --[[ Name: DestroyCar | Line: 196 | Upvalues: Default (copy) ]]
+	DestroyCar = function(p1)
 		p1.SoundPart:Destroy()
 		p1.SoundBell:Destroy()
 		p1.SoundWhistle:Destroy()

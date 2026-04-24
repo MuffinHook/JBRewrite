@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SpawnSelectionConsts = require(script.Parent.SpawnSelectionConsts)
@@ -14,33 +15,33 @@ local t = {
 	_updateRemote = nil,
 	_maid = Maid.new()
 }
-function t.init() --[[ Line: 20 | Upvalues: waitForChild (copy), ReplicatedStorage (copy), t (copy), store (copy) ]]
-	waitForChild(ReplicatedStorage, "SpawnSelectionUpdateSpawnData"):andThen(function(p1) --[[ Line: 21 | Upvalues: t (ref) ]]
+function t.init()
+	waitForChild(ReplicatedStorage, "SpawnSelectionUpdateSpawnData"):andThen(function(p1)
 		t._updateRemote = p1
 		p1.OnClientEvent:Connect(t._receiveSpawns)
 	end)
-	waitForChild(ReplicatedStorage, "SpawnSelectionOffer"):andThen(function(p1) --[[ Line: 25 | Upvalues: t (ref), store (ref) ]]
+	waitForChild(ReplicatedStorage, "SpawnSelectionOffer"):andThen(function(p1)
 		t._offerRemote = p1
-		p1.OnClientEvent:Connect(function() --[[ Line: 27 | Upvalues: store (ref) ]]
+		p1.OnClientEvent:Connect(function()
 			store:dispatch({
 				type = "setSpawnSelectionOfferVisible",
 				visible = true
 			})
 		end)
 	end)
-	store.changed:connect(function(p1, p2) --[[ Line: 35 | Upvalues: t (ref) ]]
+	store.changed:connect(function(p1, p2)
 		if p1.minimapSpawns ~= p2.minimapSpawns then
 			t._maid.receiveSpawnsMaid = nil
 		end
 	end)
 end
-function t.requestShowSpawns() --[[ Line: 41 | Upvalues: t (copy) ]]
+function t.requestShowSpawns()
 	t._updateRemote:FireServer()
 end
-function t.attemptSelect(p1) --[[ Line: 44 | Upvalues: ReplicatedStorage (copy) ]]
+function t.attemptSelect(p1)
 	ReplicatedStorage:FindFirstChild("SpawnSelectionSelect"):FireServer(p1)
 end
-function t._receiveSpawns(p1) --[[ Line: 50 | Upvalues: Maid (copy), t (copy), ClanUtils (copy), Players (copy), PrivateServerUtils (copy), Roact (copy), Interval (copy), CharacterUtil (copy), SpawnSelectionConsts (copy), Settings (copy), store (copy) ]]
+function t._receiveSpawns(p1)
 	local v1 = Maid.new()
 	t._maid.receiveSpawnsMaid = v1
 	local v2 = ClanUtils.getCurrentClanId(Players.LocalPlayer)
@@ -54,7 +55,7 @@ function t._receiveSpawns(p1) --[[ Line: 50 | Upvalues: Maid (copy), t (copy), C
 		if PrivateServerUtils.getIsBattleServer() then
 			local v5, v6 = Roact.createBinding(0)
 			t3.numEnemies = v5
-			v1:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 64 | Upvalues: Players (ref), ClanUtils (ref), v2 (copy), CharacterUtil (ref), t3 (copy), SpawnSelectionConsts (ref), v6 (copy) ]]
+			v1:GiveTask(Interval.every(0.1):Connect(function()
 				local count = 0
 				for v1, v22 in Players:GetPlayers() do
 					if ClanUtils.getCurrentClanId(v22) ~= v2 then

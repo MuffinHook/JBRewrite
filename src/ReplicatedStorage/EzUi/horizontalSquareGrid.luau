@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local v1 = script:FindFirstAncestor("EzUi")
 local Dictionary = require(v1.Dictionary)
 local Roact = require(v1.Parent.Roact)
 local createElement = Roact.createElement
-return function(p1) --[[ Name: horizontalSquareGrid | Line: 9 | Upvalues: createElement (copy), Dictionary (copy), Roact (copy) ]]
+return function(p1)
 	local t = {}
 	local v1 = p1.numItems or #p1.items
 	local aspectRatio = p1.aspectRatio

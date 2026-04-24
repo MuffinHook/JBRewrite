@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -12,17 +13,17 @@ Darts.Name = "Darts"
 Darts.Parent = workspace
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 20 | Upvalues: t (copy), Maid (copy), DartDispenserConsts (copy) ]]
+function t.new(p1)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
-	t2._maid:GiveTask(p1:WaitForChild(DartDispenserConsts.FIRE_REMOTE_NAME).OnClientEvent:Connect(function() --[[ Line: 27 | Upvalues: t2 (copy), p1 (copy) ]]
+	t2._maid:GiveTask(p1:WaitForChild(DartDispenserConsts.FIRE_REMOTE_NAME).OnClientEvent:Connect(function()
 		t2:_fire(p1)
 	end))
 	t2._damageRemote = p1:WaitForChild(DartDispenserConsts.DAMAGE_REMOTE_NAME)
 	return t2
 end
-function t._fire(p1, p2) --[[ Line: 34 | Upvalues: v1 (copy), ReplicatedStorage (copy), Darts (copy), Audio (copy), SimulatedPhysicsProjectile (copy), LocalPlayer (copy), Spring (copy), RunService (copy) ]]
+function t._fire(p1, p2)
 	local v12 = v1:NextInteger(1, 1000000000)
 	local v2 = ("update_%d"):format(v12)
 	local v3 = ("part_%d"):format(v12)
@@ -36,7 +37,7 @@ function t._fire(p1, p2) --[[ Line: 34 | Upvalues: v1 (copy), ReplicatedStorage 
 		RollOffMaxDistance = 128
 	})
 	local v8 = SimulatedPhysicsProjectile.new(v6)
-	function v8.CollidableFunc(p1) --[[ Line: 58 | Upvalues: LocalPlayer (ref) ]]
+	function v8.CollidableFunc(p1)
 		return if p1.Parent == LocalPlayer.Character then true else p1:IsA("Terrain")
 	end
 	v8.IgnoreList = { Darts }
@@ -49,7 +50,7 @@ function t._fire(p1, p2) --[[ Line: 34 | Upvalues: v1 (copy), ReplicatedStorage 
 	local v122 = nil
 	local v13 = Spring.new(0, 0, 0.3, 30)
 	local v14 = os.clock()
-	p1._maid[v2] = RunService.Heartbeat:Connect(function() --[[ Line: 71 | Upvalues: v10 (ref), v8 (copy), v9 (ref), PrimaryPart (copy), v122 (ref), LookVector (ref), v13 (copy), v11 (ref), Audio (ref), LocalPlayer (ref), p1 (copy), v7 (ref), v2 (copy), v3 (copy), v14 (copy) ]]
+	p1._maid[v2] = RunService.Heartbeat:Connect(function()
 		if v10 then
 			local v1, v22 = v13:Update()
 			if math.abs(v1) < 0.001 and math.abs(v22) < 0.001 then
@@ -87,7 +88,7 @@ function t._fire(p1, p2) --[[ Line: 34 | Upvalues: v1 (copy), ReplicatedStorage 
 		end
 	end)
 end
-function t.Destroy(p1) --[[ Line: 113 ]]
+function t.Destroy(p1)
 	local _maid = p1._maid
 	p1._maid = nil
 	_maid:Destroy()

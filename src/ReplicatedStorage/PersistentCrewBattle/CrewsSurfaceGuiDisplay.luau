@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PersistentCrewBattleConsts = require(script.Parent.PersistentCrewBattleConsts)
@@ -15,14 +16,14 @@ local t = {
 	ClassName = "CrewsSurfaceGuiDisplay"
 }
 t.__index = t
-function t.new(p1, p2) --[[ Line: 19 | Upvalues: PersistentCrewBattleConsts (copy), BaseObject (copy), t (copy), RxInstanceUtils (copy), ReplicatedStorage (copy), PersistentCrewConsts (copy), persistentCrewStore (copy), Roact (copy), Interval (copy), Players (copy), RoactRodux (copy), CrewLeaderboard (copy), createElement (copy), persistentCrewBattleStore (copy) ]]
+function t.new(p1, p2)
 	if not PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM:GetValueFromEnum(p2) then
 		error("Invalid displayType: " .. tostring(p2))
 	end
 	local v1 = BaseObject.new(p1)
 	setmetatable(v1, t)
 	RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
-	local function attemptViewClanId(p1) --[[ Line: 27 | Upvalues: ReplicatedStorage (ref), PersistentCrewConsts (ref), persistentCrewStore (ref) ]]
+	local function attemptViewClanId(p1)
 		ReplicatedStorage:FindFirstChild(PersistentCrewConsts.VIEW_CLAN_REMOTE_NAME):FireServer(p1)
 		persistentCrewStore:dispatch({
 			type = "setGroupVisible",
@@ -30,10 +31,10 @@ function t.new(p1, p2) --[[ Line: 19 | Upvalues: PersistentCrewBattleConsts (cop
 		})
 	end
 	local v3, v4 = Roact.createBinding(true)
-	v1.maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 37 | Upvalues: Players (ref), v3 (copy), v4 (copy), p1 (copy), PersistentCrewBattleConsts (ref) ]]
+	v1.maid:GiveTask(Interval.every(1):Connect(function()
 		local Character = Players.LocalPlayer.Character
 		local v1 = v3:getValue()
-		local function setCurrEnabled(p1) --[[ Line: 40 | Upvalues: v1 (copy), v4 (ref) ]]
+		local function setCurrEnabled(p1)
 			if p1 ~= v1 then
 				v4(p1)
 			end
@@ -66,7 +67,7 @@ function t.new(p1, p2) --[[ Line: 19 | Upvalues: PersistentCrewBattleConsts (cop
 			PixelsPerStud = if v1.obj.PrimaryPart.Size.Y < 30 then 80 else 20,
 			Enabled = v3
 		}, {
-			Display = createElement(RoactRodux.connect(function(p1, p22) --[[ Line: 65 | Upvalues: p2 (copy), PersistentCrewBattleConsts (ref) ]]
+			Display = createElement(RoactRodux.connect(function(p1, p22)
 				local v1 = nil
 				if p2 == PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.CrewsInServer then
 					v1 = p1.crewsInServerDisplayInfo
@@ -84,7 +85,7 @@ function t.new(p1, p2) --[[ Line: 19 | Upvalues: PersistentCrewBattleConsts (cop
 				attemptViewClanId = attemptViewClanId
 			})
 		})) }), Players.LocalPlayer.PlayerGui, "CrewsInServerGui")
-	v1.maid:GiveTask(function() --[[ Line: 104 | Upvalues: Roact (ref), v10 (copy) ]]
+	v1.maid:GiveTask(function()
 		Roact.unmount(v10)
 	end)
 	return v1

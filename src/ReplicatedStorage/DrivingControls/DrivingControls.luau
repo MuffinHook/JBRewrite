@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -15,24 +16,24 @@ local t = {
 	[Enum.KeyCode.Left] = 2,
 	[Enum.KeyCode.Right] = 4
 }
-local function GetMoveVector() --[[ Line: 26 ]]
+local function GetMoveVector()
 	return Vector3.new()
 end
 local ControlModule = Players.LocalPlayer:FindFirstChild("PlayerScripts"):FindFirstChild("PlayerModule"):FindFirstChild("ControlModule")
 if ControlModule then
 	local v1 = require(ControlModule)
-	GetMoveVector = function() --[[ Name: GetMoveVector | Line: 36 | Upvalues: v1 (ref) ]]
+	GetMoveVector = function()
 		return v1:GetMoveVector()
 	end
 end
 local t2 = {}
 t2.__index = t2
-function t2.new() --[[ Line: 45 | Upvalues: t2 (copy), Maid (copy), UserInputService (copy), t (copy), ActionButtonService (copy), RunService (copy) ]]
+function t2.new()
 	local t3 = {}
 	setmetatable(t3, t2)
 	t3._wasdqe = { 0, 0, 0, 0, 0, 0 }
 	t3._maid = Maid.new()
-	t3._maid:GiveTask(UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 52 | Upvalues: t (ref), t3 (copy) ]]
+	t3._maid:GiveTask(UserInputService.InputBegan:Connect(function(p1, p2)
 		if not p2 and p1.UserInputType == Enum.UserInputType.Keyboard then
 			local KeyCode = p1.KeyCode
 			if t[KeyCode] then
@@ -40,7 +41,7 @@ function t2.new() --[[ Line: 45 | Upvalues: t2 (copy), Maid (copy), UserInputSer
 			end
 		end
 	end))
-	t3._maid:GiveTask(UserInputService.InputEnded:Connect(function(p1, p2) --[[ Line: 63 | Upvalues: t (ref), t3 (copy) ]]
+	t3._maid:GiveTask(UserInputService.InputEnded:Connect(function(p1, p2)
 		if not p2 and p1.UserInputType == Enum.UserInputType.Keyboard then
 			local KeyCode = p1.KeyCode
 			if t[KeyCode] then
@@ -54,10 +55,10 @@ function t2.new() --[[ Line: 45 | Upvalues: t2 (copy), Maid (copy), UserInputSer
 		saturateTo = 0,
 		image = "rbxassetid://7858765663",
 		keyCodes = { Enum.KeyCode.W, Enum.KeyCode.Up },
-		onPressed = function() --[[ Name: onPressed | Line: 80 | Upvalues: t3 (copy) ]]
+		onPressed = function()
 			t3._wasdqe[1] = 1
 		end,
-		onReleased = function() --[[ Name: onReleased | Line: 83 | Upvalues: t3 (copy) ]]
+		onReleased = function()
 			t3._wasdqe[1] = 0
 		end
 	}))
@@ -67,14 +68,14 @@ function t2.new() --[[ Line: 45 | Upvalues: t2 (copy), Maid (copy), UserInputSer
 		saturateTo = 0,
 		image = "rbxassetid://7858764373",
 		keyCodes = { Enum.KeyCode.S, Enum.KeyCode.Down },
-		onPressed = function() --[[ Name: onPressed | Line: 93 | Upvalues: t3 (copy) ]]
+		onPressed = function()
 			t3._wasdqe[3] = 1
 		end,
-		onReleased = function() --[[ Name: onReleased | Line: 96 | Upvalues: t3 (copy) ]]
+		onReleased = function()
 			t3._wasdqe[3] = 0
 		end
 	}))
-	t3._maid:GiveTask(UserInputService.InputChanged:Connect(function(p1) --[[ Line: 100 | Upvalues: t3 (copy), t (ref), RunService (ref) ]]
+	t3._maid:GiveTask(UserInputService.InputChanged:Connect(function(p1)
 		if p1.UserInputType == Enum.UserInputType.Gamepad1 then
 			local KeyCode = p1.KeyCode
 			if KeyCode == Enum.KeyCode.Thumbstick1 then
@@ -88,14 +89,14 @@ function t2.new() --[[ Line: 45 | Upvalues: t2 (copy), Maid (copy), UserInputSer
 				local v5 = "throttleWaitForEnd" .. v4
 				local v6 = "throttleHeartbeat" .. v4
 				if not t3._maid[v5] then
-					t3._maid[v5] = p1:GetPropertyChangedSignal("UserInputState"):Connect(function() --[[ Line: 117 | Upvalues: p1 (copy), t3 (ref), v5 (copy), v6 (copy), t (ref), KeyCode (copy) ]]
+					t3._maid[v5] = p1:GetPropertyChangedSignal("UserInputState"):Connect(function()
 						if p1.UserInputState == Enum.UserInputState.End then
 							t3._maid[v5] = nil
 							t3._maid[v6] = nil
 							t3._wasdqe[t[KeyCode]] = 0
 						end
 					end)
-					local function update() --[[ Line: 125 | Upvalues: p1 (copy), t3 (ref), t (ref), KeyCode (copy) ]]
+					local function update()
 						local Z = p1.Position.Z
 						t3._wasdqe[t[KeyCode]] = Z > 0.05 and Z ^ 0.5 or 0
 					end
@@ -108,10 +109,10 @@ function t2.new() --[[ Line: 45 | Upvalues: t2 (copy), Maid (copy), UserInputSer
 	end))
 	return t3
 end
-function t2.GetForwardBackward(p1) --[[ Line: 140 ]]
+function t2.GetForwardBackward(p1)
 	return p1._wasdqe[1] - p1._wasdqe[3]
 end
-function t2.GetLeftRight(p1) --[[ Line: 143 | Upvalues: InputUtils (copy), GetMoveVector (ref) ]]
+function t2.GetLeftRight(p1)
 	local v1 = p1._wasdqe[2] - p1._wasdqe[4]
 	if InputUtils.isTouch() then
 		local X = GetMoveVector().X
@@ -119,10 +120,10 @@ function t2.GetLeftRight(p1) --[[ Line: 143 | Upvalues: InputUtils (copy), GetMo
 	end
 	return v1
 end
-function t2.GetUpDown(p1) --[[ Line: 152 ]]
+function t2.GetUpDown(p1)
 	return p1._wasdqe[6] - p1._wasdqe[5]
 end
-function t2.Destroy(p1) --[[ Line: 155 ]]
+function t2.Destroy(p1)
 	p1._maid:Destroy()
 	setmetatable(p1, nil)
 end

@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 local t = {
-	fromArray = function(p1) --[[ Name: fromArray | Line: 3 ]]
+	fromArray = function(p1)
 		local t = {}
 		for i, v in ipairs(p1) do
 			t[v] = true
 		end
 		return t
 	end,
-	subtract = function(p1, p2) --[[ Name: subtract | Line: 11 ]]
+	subtract = function(p1, p2)
 		if #p1 ~= 0 then
 			error("`first` has nonzero length, is it a set?")
 		end
@@ -21,7 +22,7 @@ local t = {
 		end
 		return t
 	end,
-	intersect = function(p1, p2) --[[ Name: intersect | Line: 26 ]]
+	intersect = function(p1, p2)
 		if #p1 ~= 0 then
 			error("`first` has nonzero length, is it a set?")
 		end
@@ -36,7 +37,7 @@ local t = {
 		end
 		return t
 	end,
-	union = function(p1, p2) --[[ Name: union | Line: 41 ]]
+	union = function(p1, p2)
 		if #p1 ~= 0 then
 			error("`first` has nonzero length, is it a set?")
 		end
@@ -53,7 +54,7 @@ local t = {
 		return t
 	end
 }
-function t.symmetricDiff(p1, p2) --[[ Line: 57 | Upvalues: t (copy) ]]
+function t.symmetricDiff(p1, p2)
 	if #p1 ~= 0 then
 		error("`first` has nonzero length, is it a set?")
 	end
@@ -62,7 +63,7 @@ function t.symmetricDiff(p1, p2) --[[ Line: 57 | Upvalues: t (copy) ]]
 	end
 	return t.union(t.subtract(p1, p2), t.subtract(p2, p1))
 end
-function t.toArray(p1) --[[ Line: 66 ]]
+function t.toArray(p1)
 	if #p1 ~= 0 then
 		error("`set` has nonzero length, is it a set?")
 	end

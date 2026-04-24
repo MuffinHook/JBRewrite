@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local v1 = script.Parent
 local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
@@ -22,7 +23,7 @@ local t2 = {
 }
 t2.__index = t2
 setmetatable(t2, Basic)
-function t2.new(p1, p2, p3) --[[ Line: 26 | Upvalues: TableUtils (copy), t (copy), InventoryItemUtils (copy), Basic (copy), t2 (copy) ]]
+function t2.new(p1, p2, p3)
 	local v1 = TableUtils.deepCopy(t)
 	local v2 = InventoryItemUtils.getAttr(p2, "ItemOffset")
 	if v2 then
@@ -34,11 +35,11 @@ function t2.new(p1, p2, p3) --[[ Line: 26 | Upvalues: TableUtils (copy), t (copy
 	v3:DefaultDisableCamLock()
 	return v3
 end
-function t2.GetLeftArmPosition(p1) --[[ Line: 41 ]]
+function t2.GetLeftArmPosition(p1)
 	return nil
 end
-function t2.InputBegan(p1, ...) --[[ Line: 44 | Upvalues: Basic (copy) ]]
+function t2.InputBegan(p1, ...)
 	Basic.InputBegan(p1, ...)
 end
-function t2.InputEnded(p1) --[[ Line: 47 ]] end
+function t2.InputEnded(p1)  end
 return t2

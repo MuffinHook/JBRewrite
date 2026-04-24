@@ -1,16 +1,17 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Raycast = require(ReplicatedStorage.Std.Raycast)
 local GuardNPCConsts = require(ReplicatedStorage.GuardNPC.GuardNPCConsts)
 local GuardNPCUtils = require(ReplicatedStorage.GuardNPC.GuardNPCUtils)
 local t = {}
-local function collidableFunc(p1) --[[ Line: 10 ]]
+local function collidableFunc(p1)
 	if p1.Transparency >= 0.999 then
 		return false
 	else
 		return p1.CanCollide
 	end
 end
-function t.canSeeTarget(p1, p2, p3) --[[ Line: 17 | Upvalues: GuardNPCUtils (copy), GuardNPCConsts (copy), Raycast (copy), collidableFunc (copy) ]]
+function t.canSeeTarget(p1, p2, p3)
 	if typeof(p2) == "Vector3" then
 		return false
 	else

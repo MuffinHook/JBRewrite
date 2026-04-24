@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local t = {}
 local exp = math.exp
 local cos = math.cos
 local sin = math.sin
-local function SpringUpdate(p1) --[[ Line: 7 | Upvalues: exp (copy), cos (copy), sin (copy) ]]
+local function SpringUpdate(p1)
 	local v1 = tick() - p1.t
 	local Freq = p1.Freq
 	local Damp = p1.Damp
@@ -34,7 +35,7 @@ local function SpringUpdate(p1) --[[ Line: 7 | Upvalues: exp (copy), cos (copy),
 		return Target + v16 * (v2 * v17 + v19 * v18), -v16 * ((v2 * v14 - v19 * v15) * v17 + (v2 * v15 + v19 * v14) * v18)
 	end
 end
-local function SpringSetTarget(p1, p2) --[[ Line: 52 | Upvalues: SpringUpdate (copy) ]]
+local function SpringSetTarget(p1, p2)
 	local v1, v2 = SpringUpdate(p1)
 	p1.p = v1
 	p1.v = v2
@@ -42,13 +43,13 @@ local function SpringSetTarget(p1, p2) --[[ Line: 52 | Upvalues: SpringUpdate (c
 	p1.t = tick()
 	return v1, v2
 end
-local function SpringAccelerate(p1, p2) --[[ Line: 59 | Upvalues: SpringUpdate (copy) ]]
+local function SpringAccelerate(p1, p2)
 	local v1, v2 = SpringUpdate(p1)
 	p1.t = tick()
 	p1.p = v1
 	p1.v = v2 + p2
 end
-function t.MakeSpring() --[[ Line: 70 | Upvalues: SpringUpdate (copy), SpringSetTarget (copy), SpringAccelerate (copy) ]]
+function t.MakeSpring()
 	return {
 		p = nil,
 		v = nil,
@@ -67,7 +68,7 @@ local v2 = v1()
 local cos_2 = math.cos
 local sin_2 = math.sin
 local pointToObjectSpace = v2.pointToObjectSpace
-local function FromAxisAngle(p1) --[[ Line: 92 | Upvalues: sin_2 (copy), v1 (copy), cos_2 (copy), v2 (copy) ]]
+local function FromAxisAngle(p1)
 	local x = p1.x
 	local y = p1.y
 	local z = p1.z
@@ -79,7 +80,7 @@ local function FromAxisAngle(p1) --[[ Line: 92 | Upvalues: sin_2 (copy), v1 (cop
 		return v2
 	end
 end
-local function SolveIK(p1, p2, p3, p4, p5) --[[ Line: 103 | Upvalues: pointToObjectSpace (copy), cos_2 (copy), sin_2 (copy), v1 (copy) ]]
+local function SolveIK(p1, p2, p3, p4, p5)
 	local v12 = pointToObjectSpace(p3, p4)
 	local x = v12.x
 	local y = v12.y
@@ -116,7 +117,7 @@ local min = math.min
 local max = math.max
 local components = CFrame.new().components
 local abs = math.abs
-local function SingleAABBRaw(p1, p2, p3, p4, p5) --[[ Line: 167 | Upvalues: components (copy), min (copy), max (copy) ]]
+local function SingleAABBRaw(p1, p2, p3, p4, p5)
 	local v1, v2, v3
 	if p3 then
 		v1 = p3.x
@@ -201,11 +202,11 @@ local function SingleAABBRaw(p1, p2, p3, p4, p5) --[[ Line: 167 | Upvalues: comp
 	local v72 = v7 * v46 + v8 * v47 + v9 * v48
 	return min(v49, v50, v51, v52, v53, v54, v55, v56), max(v49, v50, v51, v52, v53, v54, v55, v56), min(v57, v58, v59, v60, v61, v62, v63, v64), max(v57, v58, v59, v60, v61, v62, v63, v64), min(v65, v66, v67, v68, v69, v70, v71, v72), max(v65, v66, v67, v68, v69, v70, v71, v72)
 end
-local function SingleAABB(p1, p2) --[[ Line: 245 | Upvalues: SingleAABBRaw (copy) ]]
+local function SingleAABB(p1, p2)
 	local v1, v2, v3, v4, v5, v6 = SingleAABBRaw(p1, p2, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 1))
 	return CFrame.new(0.5 * (v1 + v2), 0.5 * (v3 + v4), 0.5 * (v5 + v6), 1, 0, 0, 0, 1, 0, 0, 0, 1), Vector3.new(v2 - v1, v4 - v3, v6 - v5)
 end
-local function MultiAABBRaw(p1, p2, p3, p4) --[[ Line: 265 | Upvalues: SingleAABBRaw (copy) ]]
+local function MultiAABBRaw(p1, p2, p3, p4)
 	local v1 = nil
 	local v2 = nil
 	local v3 = nil
@@ -235,19 +236,19 @@ local function MultiAABBRaw(p1, p2, p3, p4) --[[ Line: 265 | Upvalues: SingleAAB
 	end
 	return v5, v6, v1, v2, v3, v4
 end
-local function MultiAABB(p1) --[[ Line: 291 | Upvalues: MultiAABBRaw (copy) ]]
+local function MultiAABB(p1)
 	local v1, v2, v3, v4, v5, v6 = MultiAABBRaw(p1, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 1))
 	return CFrame.new(0.5 * (v1 + v2), 0.5 * (v3 + v4), 0.5 * (v5 + v6), 1, 0, 0, 0, 1, 0, 0, 0, 1), Vector3.new(v2 - v1, v4 - v3, v6 - v5)
 end
-local function IntersectAABB(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12) --[[ Line: 310 ]]
+local function IntersectAABB(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12)
 	return if p1 <= p8 and (p7 <= p2 and (p3 <= p10 and (p9 <= p4 and p5 <= p12))) then p11 <= p6 else false
 end
-local function IntersectPrism(p1, p2, p3, p4) --[[ Line: 313 | Upvalues: SingleAABBRaw (copy) ]]
+local function IntersectPrism(p1, p2, p3, p4)
 	local v1, v2, v3, v4, v5, v6 = SingleAABBRaw(p1, p2)
 	local v7, v8, v9, v10, v11, v12 = SingleAABBRaw(p3, p4)
 	return if v1 <= v8 and (v7 <= v2 and (v3 <= v10 and (v9 <= v4 and v5 <= v12))) then v11 <= v6 else false
 end
-local function IntersectMultiPrism(p1) --[[ Line: 318 | Upvalues: SingleAABBRaw (copy) ]]
+local function IntersectMultiPrism(p1)
 	for i = 1, #p1 do
 		local v1 = p1[i]
 		local v2, v3, v4, v5, v6, v7 = SingleAABBRaw(v1.CFrame, v1.Size, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 1))
@@ -263,16 +264,16 @@ local function IntersectMultiPrism(p1) --[[ Line: 318 | Upvalues: SingleAABBRaw 
 	end
 	return false
 end
-local function IntersectRectangleRaw(p1, p2, p3, p4, p5, p6, p7, p8) --[[ Line: 335 ]]
+local function IntersectRectangleRaw(p1, p2, p3, p4, p5, p6, p7, p8)
 	return if p1 <= p6 and (p5 <= p2 and p3 <= p8) then p7 <= p4 else false
 end
-local function ContainRectangleRaw(p1, p2, p3, p4, p5, p6, p7, p8) --[[ Line: 339 ]]
+local function ContainRectangleRaw(p1, p2, p3, p4, p5, p6, p7, p8)
 	return if p5 <= p1 and (p2 <= p6 and p7 <= p3) then p4 <= p8 else false
 end
-local function IsPointInRectangleRaw(p1, p2, p3, p4, p5, p6) --[[ Line: 342 ]]
+local function IsPointInRectangleRaw(p1, p2, p3, p4, p5, p6)
 	return if p3 <= p1 and (p1 <= p4 and p5 <= p2) then p2 <= p6 else false
 end
-local function IntersectRayPlane(p1, p2, p3, p4) --[[ Line: 350 | Upvalues: Dot (copy), abs (copy) ]]
+local function IntersectRayPlane(p1, p2, p3, p4)
 	local v1 = Dot(p2, p4)
 	if abs(v1) <= 1e-6 then
 		return false
@@ -285,7 +286,7 @@ local function IntersectRayPlane(p1, p2, p3, p4) --[[ Line: 350 | Upvalues: Dot 
 		end
 	end
 end
-local function IntersectSegSeg(p1, p2, p3, p4, p5, p6, p7, p8) --[[ Line: 365 | Upvalues: abs (copy) ]]
+local function IntersectSegSeg(p1, p2, p3, p4, p5, p6, p7, p8)
 	local v1 = (p8 - p6) * (p3 - p1) - (p7 - p5) * (p4 - p2)
 	local v2 = (p7 - p5) * (p2 - p6) - (p8 - p6) * (p1 - p5)
 	local v3 = (p3 - p1) * (p2 - p6) - (p4 - p2) * (p1 - p5)
@@ -312,7 +313,7 @@ t.IsPointInRectangleRaw = IsPointInRectangleRaw
 t.IntersectRayPlane = IntersectRayPlane
 local cos_3 = math.cos
 local tan = math.tan
-function t.DoesFixedConeIntersectSphere(p1, p2, p3, p4, p5, p6) --[[ Line: 399 | Upvalues: tan (copy), cos_3 (copy) ]]
+function t.DoesFixedConeIntersectSphere(p1, p2, p3, p4, p5, p6)
 	local v1 = p5 - p1
 	if p3 <= p2:Dot(v1) then
 		return false
@@ -326,7 +327,7 @@ local asin = math.asin
 local atan = math.atan
 local cos_4 = math.cos
 local sin_3 = math.sin
-function t.OffsetLookAtTarget(p1, p2, p3, p4, p5, p6) --[[ Line: 428 | Upvalues: atan (copy), asin (copy), cos_4 (copy), sin_3 (copy) ]]
+function t.OffsetLookAtTarget(p1, p2, p3, p4, p5, p6)
 	if p4 == 0 or (p5 == 0 or p6 == 0) then
 		return 0, 0
 	else
@@ -339,7 +340,7 @@ function t.OffsetLookAtTarget(p1, p2, p3, p4, p5, p6) --[[ Line: 428 | Upvalues:
 		return v4, v7 - (p2 * p2 < v6 and asin(p2 / v6 ^ 0.5) or asin(v6 ^ 0.5 / p2))
 	end
 end
-local function TraceBounceRay(p1, p2, p3, p4) --[[ Line: 445 ]]
+local function TraceBounceRay(p1, p2, p3, p4)
 	local count = 0
 	while true do
 		count = count + 1
@@ -355,7 +356,7 @@ local function TraceBounceRay(p1, p2, p3, p4) --[[ Line: 445 ]]
 		p1 = v3
 	end
 end
-function t.SinkRay(p1, p2, p3, p4) --[[ Line: 468 ]]
+function t.SinkRay(p1, p2, p3, p4)
 	local count = 0
 	while true do
 		count = count + 1

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
@@ -80,10 +81,10 @@ for v2, v3 in t do
 		LookVector = Vector3.new(0, 0, -1)
 	}
 end
-local function SelectIfGamepad(p1) --[[ Line: 63 | Upvalues: EzUtils (copy) ]]
+local function SelectIfGamepad(p1)
 	EzUtils.selectIfGamepad(p1)
 end
-local function Ease_InOutQuad(p1) --[[ Line: 67 ]]
+local function Ease_InOutQuad(p1)
 	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
 end
 local v4 = nil
@@ -93,15 +94,15 @@ local t3 = {
 	ColorCorrection = nil,
 	Maid = Maid.new()
 }
-function t3.Init(p1) --[[ Line: 79 | Upvalues: v4 (ref), v5 (ref), v6 (ref), Lighting (copy), t3 (copy), TeamShared (copy), v1 (copy), Settings (copy) ]]
+function t3.Init(p1)
 	v4 = p1.Event
 	v5 = p1.em
 	v6 = p1.OnJump
 	t3.ColorCorrection = Lighting:FindFirstChild("ColorCorrection")
-	function v5.rh1aeent() --[[ Line: 88 | Upvalues: t3 (ref) ]]
+	function v5.rh1aeent()
 		t3.Hide()
 	end
-	function v5.zijzuhxq(p1) --[[ Line: 93 | Upvalues: TeamShared (ref), t3 (ref) ]]
+	function v5.zijzuhxq(p1)
 		if TeamShared.isTeamSwitchingEnabled() then
 			t3.Show(p1)
 		end
@@ -110,7 +111,7 @@ function t3.Init(p1) --[[ Line: 79 | Upvalues: v4 (ref), v5 (ref), v6 (ref), Lig
 		v5.zijzuhxq(true)
 	end
 end
-function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), CinematicCamera (copy), RunUtils (copy), t2 (copy), t (copy), CurrentCamera (copy), RunService (copy), TeamShared (copy), Notification (copy), Localization (copy), v4 (ref), Roact (copy), EzUtils (copy), Teams (copy), VoiceChatService (copy), Players (copy), ReplicatedStorage (copy), TeamSelectConsts (copy), GamepassSystem (copy), GamepassUtils (copy), WorldTeleportConsts (copy), RunConsts (copy), createElement (copy), TeamSelect (copy), CharacterUtils (copy), InventoryItemSystem (copy), v6 (ref), v5 (ref), WorldMarkerSystem (copy) ]]
+function t3.Show(p1)
 	local Maid = t3.Maid
 	local ColorCorrection = t3.ColorCorrection
 	assert(ColorCorrection)
@@ -119,7 +120,7 @@ function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), Ci
 	local v3 = 0
 	local v42 = 0
 	local v52 = CinematicCamera.MakeCinematicCamera()
-	local function UpdateCamera() --[[ Line: 120 | Upvalues: v42 (ref), ColorCorrection (copy), RunUtils (ref), t2 (ref), t (ref), v3 (ref), v52 (copy) ]]
+	local function UpdateCamera()
 		v42 = v42 + 1
 		ColorCorrection.TintColor = Color3.new(255/255, 255/255, 255/255)
 		local v1 = if RunUtils.isStudio() then t2 else t
@@ -135,7 +136,7 @@ function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), Ci
 	end
 	local v62 = tick()
 	local v7 = p1 ~= nil
-	local function RenderStepped(p1) --[[ Line: 142 | Upvalues: v62 (ref), CurrentCamera (ref), v7 (ref), UpdateCamera (copy), v42 (ref), ColorCorrection (copy), CinematicCamera (ref), v52 (copy) ]]
+	local function RenderStepped(p1)
 		local v1 = tick()
 		local v2 = v1 - v62
 		if CurrentCamera.CameraType ~= Enum.CameraType.Scriptable then
@@ -182,7 +183,7 @@ function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), Ci
 	Maid:GiveTask(RunService.RenderStepped:Connect(RenderStepped))
 	UpdateCamera()
 	local v8 = false
-	local function play() --[[ Line: 172 | Upvalues: v8 (ref), TeamShared (ref), v1 (ref), Notification (ref), Localization (ref), v2 (copy), v4 (ref), Maid (copy) ]]
+	local function play()
 		if v8 then
 		elseif TeamShared.isTeamFull(v1) then
 			v1 = nil
@@ -193,14 +194,14 @@ function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), Ci
 			v8 = true
 			v2:FadeToLinear(0, 0.3)
 			v4:FireServer("c" .. "" .. ("bds94b"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("wfb5itc"):sub(3, 6):reverse():reverse():reverse():reverse():reverse() .. "x", v1)
-			Maid:GiveTask(task.delay(2, function() --[[ Line: 184 | Upvalues: v2 (ref), v8 (ref) ]]
+			Maid:GiveTask(task.delay(2, function()
 				v2:Set(1)
 				v8 = false
 			end))
 		end
 	end
 	local v9 = Roact.createRef()
-	local function getComponent() --[[ Line: 192 | Upvalues: EzUtils (ref), Teams (ref), RunUtils (ref), VoiceChatService (ref), Players (ref), Notification (ref), ReplicatedStorage (ref), TeamSelectConsts (ref), GamepassSystem (ref), GamepassUtils (ref), WorldTeleportConsts (ref), RunConsts (ref), createElement (ref), v7 (ref), TeamSelect (ref), v9 (copy), v1 (ref), play (copy) ]]
+	local function getComponent()
 		EzUtils.isSmallScreen()
 		local sum = 0
 		local sum_2 = 0
@@ -216,9 +217,9 @@ function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), Ci
 		local v5 = RunUtils.getPlaceType() == "Pro"
 		local t = {}
 		local t2 = {
-			onClicked = function() --[[ Name: onClicked | Line: 207 | Upvalues: v4 (copy), VoiceChatService (ref), Players (ref), Notification (ref), ReplicatedStorage (ref), TeamSelectConsts (ref) ]]
+			onClicked = function()
 				local v1 = if v4 then "VoiceChat" else "Default"
-				local v2, v3 = pcall(function() --[[ Line: 209 | Upvalues: VoiceChatService (ref), Players (ref) ]]
+				local v2, v3 = pcall(function()
 					return VoiceChatService:IsVoiceEnabledForUserIdAsync(Players.LocalPlayer.UserId)
 				end)
 				if v4 and not (v2 and v3) then
@@ -232,9 +233,9 @@ function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), Ci
 		}
 		t2.text = if v4 then "VOICECHAT SERVERS" else "MAIN SERVERS"
 		local t3 = {
-			onClicked = function() --[[ Name: onClicked | Line: 225 | Upvalues: v5 (copy), VoiceChatService (ref), Players (ref), Notification (ref), ReplicatedStorage (ref), TeamSelectConsts (ref) ]]
+			onClicked = function()
 				local v1 = if v5 then "VoiceChat" else "Pro"
-				local v2, v3 = pcall(function() --[[ Line: 227 | Upvalues: VoiceChatService (ref), Players (ref) ]]
+				local v2, v3 = pcall(function()
 					return VoiceChatService:IsVoiceEnabledForUserIdAsync(Players.LocalPlayer.UserId)
 				end)
 				if v5 and not (v2 and v3) then
@@ -260,7 +261,7 @@ function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), Ci
 		t[1] = t2
 		t[2] = t3
 		t[3] = {
-			onClicked = function() --[[ Name: onClicked | Line: 252 | Upvalues: GamepassSystem (ref), GamepassUtils (ref), ReplicatedStorage (ref), WorldTeleportConsts (ref), RunConsts (ref) ]]
+			onClicked = function()
 				if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then
 					ReplicatedStorage:FindFirstChild(WorldTeleportConsts.TELEPORT_TO_WORLD_FROM_TEAM_SWITCH_NAME):FireServer(RunConsts.TRADE_WORLD_NAME)
 				else
@@ -271,7 +272,7 @@ function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), Ci
 		}
 		if workspace:GetServerTimeNow() < TeamSelectConsts.OG_JB_END_TIME then
 			table.insert(t, 1, {
-				onClicked = function() --[[ Name: onClicked | Line: 267 | Upvalues: ReplicatedStorage (ref), TeamSelectConsts (ref) ]]
+				onClicked = function()
 					ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer("Hang")
 				end,
 				text = "OG JAILBREAK",
@@ -289,7 +290,7 @@ function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), Ci
 				numCriminals = sum,
 				criminalButtonRef = v9,
 				allowCriminal = if v8 == nil then false else v8,
-				onTeamSelected = function(p1) --[[ Name: onTeamSelected | Line: 293 | Upvalues: v1 (ref), play (ref) ]]
+				onTeamSelected = function(p1)
 					v1 = p1
 					play()
 				end,
@@ -301,36 +302,36 @@ function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), Ci
 	if v9:getValue() then
 		EzUtils.selectIfGamepad((v9:getValue()))
 	end
-	Maid:GiveTask(function() --[[ Line: 307 | Upvalues: Roact (ref), v10 (copy) ]]
+	Maid:GiveTask(function()
 		Roact.unmount(v10)
 	end)
-	local function update() --[[ Line: 311 | Upvalues: Roact (ref), v10 (copy), getComponent (copy) ]]
+	local function update()
 		Roact.update(v10, getComponent())
 	end
 	for v12, v13 in Teams:GetChildren() do
 		Maid:GiveTask(v13.PlayerAdded:Connect(update))
 		Maid:GiveTask(v13.PlayerRemoved:Connect(update))
 	end
-	Maid:GiveTask(function() --[[ Line: 320 | Upvalues: CurrentCamera (ref), CharacterUtils (ref), Players (ref), v2 (copy) ]]
+	Maid:GiveTask(function()
 		CurrentCamera.CameraType = Enum.CameraType.Custom
 		local v1 = CharacterUtils.getHumanoid(Players.LocalPlayer.Character)
 		if v1 then
 			CurrentCamera.CameraSubject = v1
 		end
 		v2:FadeToLinear(1, 0.3)
-		task.delay(0.3, function() --[[ Line: 327 | Upvalues: v2 (ref) ]]
+		task.delay(0.3, function()
 			v2:Destroy()
 		end)
 	end)
 	InventoryItemSystem.unequipAll()
 	v6()
 	v5.dmg39zpa(true)
-	Maid:GiveTask(function() --[[ Line: 336 | Upvalues: ColorCorrection (copy) ]]
+	Maid:GiveTask(function()
 		ColorCorrection.TintColor = Color3.new(255/255, 255/255, 255/255)
 	end)
 	if not p1 then
 		v2:FadeToLinear(0, 0.3)
-		Maid:GiveTask(task.delay(0.4, function() --[[ Line: 342 | Upvalues: v7 (ref), Roact (ref), v10 (copy), getComponent (copy), v2 (copy) ]]
+		Maid:GiveTask(task.delay(0.4, function()
 			v7 = true
 			Roact.update(v10, getComponent())
 			v2:FadeToLinear(1, 0.3)
@@ -339,12 +340,12 @@ function t3.Show(p1) --[[ Line: 106 | Upvalues: t3 (copy), ScreenFade (copy), Ci
 	local gui = WorldMarkerSystem.gui
 	if gui then
 		gui.Enabled = false
-		Maid:GiveTask(function() --[[ Line: 352 | Upvalues: gui (copy) ]]
+		Maid:GiveTask(function()
 			gui.Enabled = true
 		end)
 	end
 end
-function t3.Hide() --[[ Line: 360 | Upvalues: t3 (copy) ]]
+function t3.Hide()
 	t3.Maid:DoCleaning()
 end
 return t3

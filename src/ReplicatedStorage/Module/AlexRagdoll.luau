@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local t = {}
-local function RagdollSetup(p1) --[[ Line: 41 ]]
+local function RagdollSetup(p1)
 	local RagdollNeck = Instance.new("BallSocketConstraint")
 	RagdollNeck.Name = "RagdollNeck"
 	RagdollNeck.Attachment0 = p1.UpperTorso.NeckRigAttachment
@@ -104,7 +105,7 @@ local function RagdollSetup(p1) --[[ Line: 41 ]]
 	RagdollRightHip.Enabled = false
 	RagdollRightHip.Parent = p1
 end
-local function EnableHumanoid(p1, p2) --[[ Line: 160 ]]
+local function EnableHumanoid(p1, p2)
 	local v1 = next
 	local v2, v3 = Enum.HumanoidStateType:GetEnumItems()
 	for v4, v5 in v1, v2, v3 do
@@ -114,7 +115,7 @@ local function EnableHumanoid(p1, p2) --[[ Line: 160 ]]
 	end
 end
 return {
-	Ragdoll = function(p1) --[[ Name: Ragdoll | Line: 167 | Upvalues: EnableHumanoid (copy) ]]
+	Ragdoll = function(p1)
 		local Humanoid = p1:FindFirstChild("Humanoid")
 		if Humanoid and p1.PrimaryPart then
 			local UpperTorso = p1:FindFirstChild("UpperTorso")
@@ -125,7 +126,7 @@ return {
 			end
 		end
 	end,
-	Unragdoll = function(p1) --[[ Name: Unragdoll | Line: 185 | Upvalues: EnableHumanoid (copy) ]]
+	Unragdoll = function(p1)
 		local Humanoid = p1:FindFirstChild("Humanoid")
 		if Humanoid then
 			local RootPart = Humanoid.RootPart
@@ -141,7 +142,7 @@ return {
 			end
 		end
 	end,
-	RagdollServer = function(p1) --[[ Name: RagdollServer | Line: 212 | Upvalues: t (copy), RagdollSetup (copy) ]]
+	RagdollServer = function(p1)
 		local v1 = p1.Name
 		local Character = p1.Character
 		if not Character then
@@ -173,7 +174,7 @@ return {
 				t[v1] = v2
 			end
 			if not PrimaryPart.Anchored then
-				local v3, v4 = pcall(function() --[[ Line: 246 | Upvalues: PrimaryPart (copy), p1 (copy) ]]
+				local v3, v4 = pcall(function()
 					PrimaryPart:SetNetworkOwner(p1)
 				end)
 				if v3 == false then
@@ -209,7 +210,7 @@ return {
 			return true
 		end
 	end,
-	UnragdollServer = function(p1) --[[ Name: UnragdollServer | Line: 276 | Upvalues: t (copy) ]]
+	UnragdollServer = function(p1)
 		local v1 = p1.Name
 		local Character = p1.Character
 		if Character and Character:FindFirstChild("RagdollWaist") then
@@ -244,10 +245,10 @@ return {
 			return false
 		end
 	end,
-	PlayerRemoving = function(p1) --[[ Name: PlayerRemoving | Line: 318 | Upvalues: t (copy) ]]
+	PlayerRemoving = function(p1)
 		t[p1] = nil
 	end,
-	IsRagdoll = function(p1) --[[ Name: IsRagdoll | Line: 321 ]]
+	IsRagdoll = function(p1)
 		local Character = p1.Character
 		if Character then
 			local RagdollWaist = Character:FindFirstChild("RagdollWaist")

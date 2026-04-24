@@ -23,7 +23,7 @@ local function getItemSkinForName(p1)
 		end
 	end
 end
-local t = {
+local module = {
 	createVehicleItemTable = function(p1)
 		assert(typeof(p1) == "string", "Incorrect make type passed")
 		return {
@@ -83,13 +83,13 @@ local t = {
 			local ItemName = p1.ItemName
 			local v1 = ReplicatedStorage.Resource.HomeItem:FindFirstChild(ItemName)
 			if v1 then
-				local t = {}
+				local module = {}
 				for v2, v3 in v1:GetChildren() do
 					if v3:IsA("ValueBase") then
-						t[v3.Name] = v3.Value
+						module[v3.Name] = v3.Value
 					end
 				end
-				return t
+				return module
 			else
 				warn("Missing homeItemModel for: " .. ItemName)
 				return nil
@@ -108,12 +108,12 @@ local t = {
 		end
 	end
 }
-function t.getItemTablesForItemType(p1)
+function module.getItemTablesForItemType(p1)
 	local ItemType = p1.ItemType
 	if ItemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then
 		local t2 = {}
 		for v1, v2 in VehicleData do
-			table.insert(t2, t.createVehicleItemTable(v2.Make))
+			table.insert(t2, module.createVehicleItemTable(v2.Make))
 		end
 		return t2
 	end
@@ -121,46 +121,46 @@ function t.getItemTablesForItemType(p1)
 		local CategoryName = p1.CategoryName
 		local t2 = {}
 		for v3, v4 in StoreData.GetCategoryByName(CategoryName).Items do
-			table.insert(t2, t.createVehicleCustomizationItemTable(CategoryName, v4.Name))
+			table.insert(t2, module.createVehicleCustomizationItemTable(CategoryName, v4.Name))
 		end
 		return t2
 	end
 	if ItemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then
 		local t2 = {}
 		for v6, v7 in ReplicatedStorage.Resource.HomeItem:GetChildren() do
-			table.insert(t2, t.createHomeItemItemTable(v7.Name))
+			table.insert(t2, module.createHomeItemItemTable(v7.Name))
 		end
 		return t2
 	end
 	if ItemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then
 		local t2 = {}
 		for v9, v10 in ItemSkinList do
-			table.insert(t2, t.createItemSkinTable(v10.Name))
+			table.insert(t2, module.createItemSkinTable(v10.Name))
 		end
 		return t2
 	end
 	if ItemType == PlayerDataConsts.SAFE_ITEM_TYPE then
 		local t2 = {}
 		for v12 in SafesConsts.TYPE_ENUM:GetEnumItems() do
-			table.insert(t2, t.createSafeTable(v12))
+			table.insert(t2, module.createSafeTable(v12))
 		end
 		return t2
 	end
 	if ItemType == PlayerDataConsts.CONSUMABLE_ITEM_TYPE then
 		local t2 = {}
 		for v13 in ConsumablesData do
-			table.insert(t2, t.createConsumableTable(v13))
+			table.insert(t2, module.createConsumableTable(v13))
 		end
 		return t2
 	end
 	error("Could not find item type data for itemOwned, invalid itemType: " .. tostring(ItemType))
 end
-function t.isTradeable(p1)
-	local v1 = t.getStoreData(p1)
+function module.isTradeable(p1)
+	local v1 = module.getStoreData(p1)
 	assert(typeof(v1) == "table", "itemData is not a table")
 	return not v1.NoTrade
 end
-function t.validateItemTableFormat(p1)
+function module.validateItemTableFormat(p1)
 	if p1.ItemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then
 		assert(typeof(p1.Make) == "string", "Invalid make given for vehicle")
 	elseif p1.ItemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
@@ -184,33 +184,33 @@ function t.validateItemTableFormat(p1)
 		error("Invalid ItemType: " .. p1.ItemType)
 	end
 end
-function t.getStrippedItemTable(p1)
+function module.getStrippedItemTable(p1)
 	local ItemType = p1.ItemType
-	local t = {
+	local module = {
 		itemType = ItemType,
 		uid = p1.Id,
 		created = p1.CreationTime
 	}
 	if ItemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then
-		t.name = p1.Make
+		module.name = p1.Make
 	elseif ItemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
-		t.subItemType = p1.CategoryName
-		t.name = p1.ItemName
+		module.subItemType = p1.CategoryName
+		module.name = p1.ItemName
 	elseif ItemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then
-		t.name = p1.ItemName
+		module.name = p1.ItemName
 	elseif ItemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then
-		t.name = p1.SkinName
+		module.name = p1.SkinName
 	elseif ItemType == PlayerDataConsts.SAFE_ITEM_TYPE then
-		t.name = SafesConsts.TYPE_ENUM:GetValueFromEnum(p1.TypeEnum)
+		module.name = SafesConsts.TYPE_ENUM:GetValueFromEnum(p1.TypeEnum)
 	elseif ItemType == PlayerDataConsts.CONSUMABLE_ITEM_TYPE then
-		t.name = p1.ItemName
+		module.name = p1.ItemName
 	end
-	return t
+	return module
 end
-function t.getFullNameFromTable(p1)
+function module.getFullNameFromTable(p1)
 	local t2 = {}
-	t.validateItemTableFormat(p1)
-	local v1 = t.getStrippedItemTable(p1)
+	module.validateItemTableFormat(p1)
+	local v1 = module.getStrippedItemTable(p1)
 	table.insert(t2, v1.itemType)
 	if v1.subItemType then
 		table.insert(t2, v1.subItemType)
@@ -218,8 +218,8 @@ function t.getFullNameFromTable(p1)
 	table.insert(t2, v1.name)
 	return table.concat(t2, "."), v1
 end
-function t.getTranslatedTitleFromItemTable(p1)
-	local v1, v2 = t.getFullNameFromTable(p1)
+function module.getTranslatedTitleFromItemTable(p1)
+	local v1, v2 = module.getFullNameFromTable(p1)
 	local ItemType = p1.ItemType
 	if ItemType == PlayerDataConsts.SAFE_ITEM_TYPE then
 		return SafesConsts.SAFE_DATA[p1.TypeEnum].Title
@@ -229,4 +229,4 @@ function t.getTranslatedTitleFromItemTable(p1)
 		return Localization:FormatByKey(v1)
 	end
 end
-return t
+return module

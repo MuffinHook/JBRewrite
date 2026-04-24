@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -17,14 +18,14 @@ if EnvironmentConsts.SNOW then
 			v3.CanQuery = false
 		end
 	end
-	local function StartSnow() --[[ Line: 27 | Upvalues: DefaultSnow (copy), v1 (copy), ReplicatedStorage (copy), RunService (copy), LocalPlayer (copy), Raycast (copy) ]]
+	local function StartSnow()
 		DefaultSnow.Parent = workspace
-		v1:GiveTask(function() --[[ Line: 29 | Upvalues: DefaultSnow (ref), ReplicatedStorage (ref) ]]
+		v1:GiveTask(function()
 			DefaultSnow.Parent = ReplicatedStorage.Resource
 		end)
 		local v12 = Vector3.new(0, 0, 0)
 		local v2 = 0
-		v1:GiveTask(RunService.Heartbeat:Connect(function(p1) --[[ Line: 34 | Upvalues: v2 (ref), LocalPlayer (ref), v12 (ref), DefaultSnow (ref), Raycast (ref) ]]
+		v1:GiveTask(RunService.Heartbeat:Connect(function(p1)
 			debug.profilebegin("snow Update")
 			v2 = v2 + p1
 			if v2 > 0.2 then
@@ -54,7 +55,7 @@ if EnvironmentConsts.SNOW then
 			debug.profileend()
 		end))
 	end
-	local function UpdateSnowCheck() --[[ Line: 62 | Upvalues: EnvironmentUtils (copy), EnvironmentConsts (copy), v1 (copy), StartSnow (copy) ]]
+	local function UpdateSnowCheck()
 		if EnvironmentUtils.getPrecipitation() == EnvironmentConsts.PRECIPITATION_ENUM.Rain then
 			v1:Destroy()
 			return false
@@ -63,7 +64,7 @@ if EnvironmentConsts.SNOW then
 			return true
 		end
 	end
-	EnvironmentUtils.getPrecipitationChangedSignal():Connect(function() --[[ Line: 70 | Upvalues: EnvironmentUtils (copy), EnvironmentConsts (copy), v1 (copy), StartSnow (copy) ]]
+	EnvironmentUtils.getPrecipitationChangedSignal():Connect(function()
 		if EnvironmentUtils.getPrecipitation() == EnvironmentConsts.PRECIPITATION_ENUM.Rain then
 			v1:Destroy()
 		else

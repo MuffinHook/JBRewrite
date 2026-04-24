@@ -1,75 +1,76 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local FriendsConsts = require(ReplicatedStorage.Friends.FriendsConsts)
 local Interval = require(ReplicatedStorage.Std.Interval)
-local t = {
+local FriendsService = {
 	friendsUpdated = require(ReplicatedStorage.Std.Signal).new(),
 	_cachedLocal = {}
 }
-function t.init() --[[ Line: 12 | Upvalues: t (copy), Players (copy) ]]
-	t.monitorPlayer(Players.LocalPlayer)
+function FriendsService.init()
+	FriendsService.monitorPlayer(Players.LocalPlayer)
 end
-function t.monitorPlayer(p1) --[[ Line: 15 | Upvalues: Interval (copy), FriendsConsts (copy), t (copy), StarterGui (copy) ]]
-	Interval.every(FriendsConsts.FRIEND_UPDATE_INTERVAL):Connect(function() --[[ Line: 18 | Upvalues: t (ref), p1 (copy) ]]
-		t.updateFriends(p1)
+function FriendsService.monitorPlayer(player)
+	Interval.every(FriendsConsts.FRIEND_UPDATE_INTERVAL):Connect(function()
+		FriendsService.updateFriends(player)
 	end)
-	task.spawn(t.updateFriends, p1)
-	pcall(function() --[[ Line: 23 | Upvalues: StarterGui (ref), t (ref), p1 (copy) ]]
-		StarterGui:GetCore("PlayerFriendedEvent").Event:Connect(function(p12) --[[ Line: 24 | Upvalues: t (ref), p1 (ref) ]]
-			local v1 = t._cachedLocal[p1.UserId]
-			if v1 and not v1[p12.UserId] then
-				v1[p12.UserId] = true
-				t.friendsUpdated:Fire()
+	task.spawn(FriendsService.updateFriends, player)
+	pcall(function()
+		StarterGui:GetCore("PlayerFriendedEvent").Event:Connect(function(otherPlayer)
+			local playerFriendsCache = FriendsService._cachedLocal[player.UserId]
+			if playerFriendsCache and not playerFriendsCache[otherPlayer.UserId] then
+				playerFriendsCache[otherPlayer.UserId] = true
+				FriendsService.friendsUpdated:Fire()
 			end
 		end)
-		StarterGui:GetCore("PlayerUnfriendedEvent").Event:Connect(function(p12) --[[ Line: 31 | Upvalues: t (ref), p1 (ref) ]]
-			local v1 = t._cachedLocal[p1.UserId]
-			if v1 and v1[p12.UserId] then
-				v1[p12.UserId] = nil
-				t.friendsUpdated:Fire()
+		StarterGui:GetCore("PlayerUnfriendedEvent").Event:Connect(function(otherPlayer)
+			local playerFriendsCache = FriendsService._cachedLocal[player.UserId]
+			if playerFriendsCache and playerFriendsCache[otherPlayer.UserId] then
+				playerFriendsCache[otherPlayer.UserId] = nil
+				FriendsService.friendsUpdated:Fire()
 			end
 		end)
 	end)
 end
-function t.updateFriends(p1) --[[ Line: 40 | Upvalues: Players (copy), t (copy) ]]
-	if p1 == Players.LocalPlayer then
-		local v1, v2 = pcall(function() --[[ Line: 46 | Upvalues: Players (ref), p1 (copy) ]]
-			return Players:GetFriendsAsync(p1.UserId)
+function FriendsService.updateFriends(player)
+	if player == Players.LocalPlayer then
+		local isSuccess, friendsPageResult = pcall(function()
+			return Players:GetFriendsAsync(player.UserId)
 		end)
-		if v1 or t._cachedLocal[p1.UserId] ~= nil then
-			local t2 = {}
+		if isSuccess or FriendsService._cachedLocal[player.UserId] ~= nil then
+			local friendsTable = {}
 			while true do
-				for v3, v4 in v2:GetCurrentPage() do
-					t2[v4.Id] = true
+				for _index, friendInfo in friendsPageResult:GetCurrentPage() do
+					friendstable[friendInfo.Id] = true
 				end
-				if v2.IsFinished then
-					t._cachedLocal[p1.UserId] = t2
-					t.friendsUpdated:Fire()
-					return t._cachedLocal[p1.UserId]
+				if friendsPageResult.IsFinished then
+					FriendsService._cachedLocal[player.UserId] = friendsTable
+					FriendsService.friendsUpdated:Fire()
+					return FriendsService._cachedLocal[player.UserId]
 				end
-				v2:AdvanceToNextPageAsync()
+				friendspageResult:AdvanceToNextPageAsync()
 			end
 		else
-			t._cachedLocal[p1.UserId] = {}
-			return t._cachedLocal[p1.UserId]
+			FriendsService._cachedLocal[player.UserId] = {}
+			return FriendsService._cachedLocal[player.UserId]
 		end
 	else
 		error("Not meant to update friends for other players")
 	end
 end
-function t.getIsFriendsWith(p1, p2, p3) --[[ Line: 66 | Upvalues: t (copy) ]]
-	if p1 then
-		if not t._cachedLocal[p1.UserId] then
-			if p3 then
+function FriendsService.getIsFriendsWith(player, friendUserId, skipUpdate)
+	if player then
+		if not FriendsService._cachedLocal[player.UserId] then
+			if skipUpdate then
 				return false
 			end
-			t.updateFriends(p1)
+			FriendsService.updateFriends(player)
 		end
-		return t._cachedLocal[p1.UserId][p2] == true
+		return FriendsService._cachedLocal[player.UserId][friendUserId] == true
 	else
 		warn("No player")
 		return false
 	end
 end
-return t
+return FriendsService

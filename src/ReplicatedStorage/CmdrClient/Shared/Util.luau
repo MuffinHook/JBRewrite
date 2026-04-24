@@ -1,13 +1,14 @@
+-- Reviewed by Claude
 local TextService = game:GetService("TextService")
 local t = {
-	MakeDictionary = function(p1) --[[ Name: MakeDictionary | Line: 17 ]]
+	MakeDictionary = function(p1)
 		local t = {}
 		for i = 1, #p1 do
 			t[p1[i]] = true
 		end
 		return t
 	end,
-	DictionaryKeys = function(p1) --[[ Name: DictionaryKeys | Line: 30 ]]
+	DictionaryKeys = function(p1)
 		local t = {}
 		for k in pairs(p1) do
 			table.insert(t, k)
@@ -15,14 +16,14 @@ local t = {
 		return t
 	end
 }
-local function transformInstanceSet(p1) --[[ Line: 41 ]]
+local function transformInstanceSet(p1)
 	local t = {}
 	for i = 1, #p1 do
 		t[i] = p1[i].Name
 	end
 	return t, p1
 end
-function t.MakeFuzzyFinder(p1) --[[ Line: 59 ]]
+function t.MakeFuzzyFinder(p1)
 	local v1 = nil
 	local t = {}
 	if typeof(p1) == "Enum" then
@@ -70,7 +71,7 @@ function t.MakeFuzzyFinder(p1) --[[ Line: 59 ]]
 	else
 		error("[Cmdr] MakeFuzzyFinder only accepts a table, Enum, or Instance.")
 	end
-	return function(p1, p2, p3) --[[ Line: 88 | Upvalues: v1 (ref), t (ref) ]]
+	return function(p1, p2, p3)
 		local t2 = {}
 		for k, v in pairs(v1) do
 			local v12 = t and t[k] or v
@@ -94,7 +95,7 @@ function t.MakeFuzzyFinder(p1) --[[ Line: 59 ]]
 		end
 	end
 end
-function t.GetNames(p1) --[[ Line: 124 ]]
+function t.GetNames(p1)
 	local t = {}
 	for i = 1, #p1 do
 		local v1 = p1[i].Name
@@ -105,7 +106,7 @@ function t.GetNames(p1) --[[ Line: 124 ]]
 	end
 	return t
 end
-function t.SplitStringSimple(p1, p2) --[[ Line: 137 ]]
+function t.SplitStringSimple(p1, p2)
 	if p2 == nil then
 		p2 = "%s"
 	end
@@ -117,36 +118,36 @@ function t.SplitStringSimple(p1, p2) --[[ Line: 137 ]]
 	end
 	return t
 end
-local function charCode(p1) --[[ Line: 150 ]]
+local function charCode(p1)
 	return utf8.char((tonumber(p1, 16)))
 end
-function t.ParseEscapeSequences(p1) --[[ Line: 157 | Upvalues: charCode (copy) ]]
+function t.ParseEscapeSequences(p1)
 	return p1:gsub("\\(.)", {
 		t = "\t",
 		n = "\n"
 	}):gsub("\\u(%x%x%x%x)", charCode):gsub("\\x(%x%x)", charCode)
 end
-function t.EncodeEscapedOperator(p1, p2) --[[ Line: 169 ]]
-	return p1:gsub("(" .. ("%" .. p2:sub(1, 1)) .. "+)(" .. p2:gsub(".", "%%%1") .. ")", function(p1, p2) --[[ Line: 174 ]]
-		return (p1:sub(1, #p1 - 1) .. p2):gsub(".", function(p1) --[[ Line: 175 ]]
+function t.EncodeEscapedOperator(p1, p2)
+	return p1:gsub("(" .. ("%" .. p2:sub(1, 1)) .. "+)(" .. p2:gsub(".", "%%%1") .. ")", function(p1, p2)
+		return (p1:sub(1, #p1 - 1) .. p2):gsub(".", function(p1)
 			return "\\u" .. string.format("%04x", string.byte(p1), 16)
 		end)
 	end)
 end
 local t2 = { "&&", "||", ";" }
-function t.EncodeEscapedOperators(p1) --[[ Line: 185 | Upvalues: t2 (copy), t (copy) ]]
+function t.EncodeEscapedOperators(p1)
 	for i, v in ipairs(t2) do
 		p1 = t.EncodeEscapedOperator(p1, v)
 	end
 	return p1
 end
-local function encodeControlChars(p1) --[[ Line: 193 ]]
+local function encodeControlChars(p1)
 	return p1:gsub("\\\\", "___!CMDR_ESCAPE!___"):gsub("\\\"", "___!CMDR_QUOTE!___"):gsub("\\\'", "___!CMDR_SQUOTE!___"):gsub("\\\n", "___!CMDR_NL!___")
 end
-local function decodeControlChars(p1) --[[ Line: 202 ]]
+local function decodeControlChars(p1)
 	return p1:gsub("___!CMDR_ESCAPE!___", "\\"):gsub("___!CMDR_QUOTE!___", "\""):gsub("___!CMDR_NL!___", "\n")
 end
-function t.SplitString(p1, p2) --[[ Line: 209 | Upvalues: t (copy) ]]
+function t.SplitString(p1, p2)
 	local v1 = nil
 	local v2 = nil
 	local t2 = {}
@@ -180,7 +181,7 @@ function t.SplitString(p1, p2) --[[ Line: 209 | Upvalues: t (copy) ]]
 	end
 	return t2
 end
-function t.MashExcessArguments(p1, p2) --[[ Line: 242 ]]
+function t.MashExcessArguments(p1, p2)
 	local t = {}
 	for i = 1, #p1 do
 		if p2 < i then
@@ -191,7 +192,7 @@ function t.MashExcessArguments(p1, p2) --[[ Line: 242 ]]
 	end
 	return t
 end
-function t.TrimString(p1) --[[ Line: 257 ]]
+function t.TrimString(p1)
 	local _, v1 = string.find(p1, "^%s*")
 	if v1 == #p1 then
 		return ""
@@ -199,25 +200,25 @@ function t.TrimString(p1) --[[ Line: 257 ]]
 		return string.match(p1, ".*%S", v1 + 1)
 	end
 end
-function t.GetTextSize(p1, p2, p3) --[[ Line: 266 | Upvalues: TextService (copy) ]]
+function t.GetTextSize(p1, p2, p3)
 	return TextService:GetTextSize(p1, p2.TextSize, p2.Font, p3 or Vector2.new(p2.AbsoluteSize.X, 0))
 end
-function t.MakeEnumType(p1, p2) --[[ Line: 274 | Upvalues: t (copy) ]]
+function t.MakeEnumType(p1, p2)
 	local v1 = t.MakeFuzzyFinder(p2)
 	return {
-		Validate = function(p12) --[[ Name: Validate | Line: 277 | Upvalues: v1 (copy), p1 (copy) ]]
+		Validate = function(p12)
 			return v1(p12, true) ~= nil, ("Value %q is not a valid %s."):format(p12, p1)
 		end,
-		Autocomplete = function(p1) --[[ Name: Autocomplete | Line: 280 | Upvalues: v1 (copy), t (ref) ]]
+		Autocomplete = function(p1)
 			local v12 = v1(p1)
 			return if type(v12[1]) == "string" then v12 else t.GetNames(v12) or v12
 		end,
-		Parse = function(p1) --[[ Name: Parse | Line: 284 | Upvalues: v1 (copy) ]]
+		Parse = function(p1)
 			return v1(p1, true)
 		end
 	}
 end
-function t.ParsePrefixedUnionType(p1, p2) --[[ Line: 293 | Upvalues: t (copy) ]]
+function t.ParsePrefixedUnionType(p1, p2)
 	local v1 = t.SplitStringSimple(p1)
 	local t2 = {}
 	for i = 1, #v1, 2 do
@@ -226,7 +227,7 @@ function t.ParsePrefixedUnionType(p1, p2) --[[ Line: 293 | Upvalues: t (copy) ]]
 			type = v1[i]
 		}
 	end
-	table.sort(t2, function(p1, p2) --[[ Line: 305 ]]
+	table.sort(t2, function(p1, p2)
 		return #p1.prefix > #p2.prefix
 	end)
 	for j = 1, #t2 do
@@ -236,7 +237,7 @@ function t.ParsePrefixedUnionType(p1, p2) --[[ Line: 293 | Upvalues: t (copy) ]]
 		end
 	end
 end
-function t.MakeListableType(p1, p2) --[[ Line: 325 ]]
+function t.MakeListableType(p1, p2)
 	local t = {
 		Listable = true,
 		Transform = p1.Transform,
@@ -245,7 +246,7 @@ function t.MakeListableType(p1, p2) --[[ Line: 325 ]]
 		Autocomplete = p1.Autocomplete,
 		Default = p1.Default,
 		ArgumentOperatorAliases = p1.ArgumentOperatorAliases,
-		Parse = function(...) --[[ Name: Parse | Line: 334 | Upvalues: p1 (copy) ]]
+		Parse = function(...)
 			return { p1.Parse(...) }
 		end
 	}
@@ -256,13 +257,13 @@ function t.MakeListableType(p1, p2) --[[ Line: 325 ]]
 	end
 	return t
 end
-local function encodeCommandEscape(p1) --[[ Line: 348 ]]
+local function encodeCommandEscape(p1)
 	return p1:gsub("\\%$", "___!CMDR_DOLLAR!___")
 end
-local function decodeCommandEscape(p1) --[[ Line: 352 ]]
+local function decodeCommandEscape(p1)
 	return p1:gsub("___!CMDR_DOLLAR!___", "$")
 end
-function t.RunCommandString(p1, p2) --[[ Line: 361 | Upvalues: t (copy) ]]
+function t.RunCommandString(p1, p2)
 	local v2 = t.EncodeEscapedOperators((t.ParseEscapeSequences(p2))):split("&&")
 	local v3 = ""
 	for i, v in ipairs(v2) do
@@ -274,7 +275,7 @@ function t.RunCommandString(p1, p2) --[[ Line: 361 | Upvalues: t (copy) ]]
 		v3 = v9
 	end
 end
-function t.RunEmbeddedCommands(p1, p2) --[[ Line: 386 | Upvalues: t (copy) ]]
+function t.RunEmbeddedCommands(p1, p2)
 	local v1 = p2:gsub("\\%$", "___!CMDR_DOLLAR!___")
 	local t2, v2 = {}, v1
 	for v4 in v1:gmatch("$(%b{})") do
@@ -292,7 +293,7 @@ function t.RunEmbeddedCommands(p1, p2) --[[ Line: 386 | Upvalues: t (copy) ]]
 	end
 	return v2:gsub("$(%b{})", t2):gsub("___!CMDR_DOLLAR!___", "$")
 end
-function t.SubstituteArgs(p1, p2) --[[ Line: 417 ]]
+function t.SubstituteArgs(p1, p2)
 	local v1 = p1:gsub("\\%$", "___!CMDR_DOLLAR!___")
 	local v2
 	if type(p2) == "table" then
@@ -309,7 +310,7 @@ function t.SubstituteArgs(p1, p2) --[[ Line: 417 ]]
 	end
 	return v2:gsub("($%d+)%b{}", "%1"):gsub("$(%w+)", p2):gsub("___!CMDR_DOLLAR!___", "$")
 end
-function t.MakeAliasCommand(p1, p2) --[[ Line: 437 | Upvalues: t (copy) ]]
+function t.MakeAliasCommand(p1, p2)
 	local v1, v2 = unpack(p1:split("|"))
 	local v3 = t.EncodeEscapedOperators(p2)
 	local t2 = {}
@@ -346,28 +347,28 @@ function t.MakeAliasCommand(p1, p2) --[[ Line: 437 | Upvalues: t (copy) ]]
 		Description = ("<Alias> %*"):format(v2 or v3),
 		Group = "UserAlias",
 		Args = t3,
-		ClientRun = function(p1) --[[ Name: ClientRun | Line: 476 | Upvalues: t (ref), v3 (ref) ]]
+		ClientRun = function(p1)
 			return t.RunCommandString(p1.Dispatcher, t.SubstituteArgs(v3, p1.RawArguments))
 		end
 	}
 end
-function t.MakeSequenceType(p1) --[[ Line: 490 | Upvalues: t (copy) ]]
+function t.MakeSequenceType(p1)
 	local v2 = p1 or {}
 	assert(if v2.Parse == nil then v2.Constructor ~= nil else true, "[Cmdr] MakeSequenceType: Must provide one of: Constructor, Parse")
-	v2.TransformEach = v2.TransformEach or function(...) --[[ Line: 498 ]]
+	v2.TransformEach = v2.TransformEach or function(...)
 		return ...
 	end
-	v2.ValidateEach = v2.ValidateEach or function() --[[ Line: 502 ]]
+	v2.ValidateEach = v2.ValidateEach or function()
 		return true
 	end
 	local t2 = {
 		Prefixes = v2.Prefixes,
-		Transform = function(p1) --[[ Name: Transform | Line: 509 | Upvalues: t (ref), v2 (ref) ]]
-			return t.Map(t.SplitPrioritizedDelimeter(p1, { ",", "%s" }), function(p1) --[[ Line: 510 | Upvalues: v2 (ref) ]]
+		Transform = function(p1)
+			return t.Map(t.SplitPrioritizedDelimeter(p1, { ",", "%s" }), function(p1)
 				return v2.TransformEach(p1)
 			end)
 		end,
-		Validate = function(p1) --[[ Name: Validate | Line: 515 | Upvalues: v2 (ref) ]]
+		Validate = function(p1)
 			if v2.Length and #p1 > v2.Length then
 				return false, ("Maximum of %d values allowed in sequence"):format(v2.Length)
 			else
@@ -381,33 +382,33 @@ function t.MakeSequenceType(p1) --[[ Line: 490 | Upvalues: t (copy) ]]
 			end
 		end
 	}
-	t2.Parse = v2.Parse or function(p1) --[[ Line: 531 | Upvalues: v2 (ref) ]]
+	t2.Parse = v2.Parse or function(p1)
 		return v2.Constructor(unpack(p1))
 	end
 	return t2
 end
-function t.SplitPrioritizedDelimeter(p1, p2) --[[ Line: 540 | Upvalues: t (copy) ]]
+function t.SplitPrioritizedDelimeter(p1, p2)
 	for i, v in ipairs(p2) do
 		if p1:find(v) or i == #p2 then
 			return t.SplitStringSimple(p1, v)
 		end
 	end
 end
-function t.Map(p1, p2) --[[ Line: 552 ]]
+function t.Map(p1, p2)
 	local t = {}
 	for i, v in ipairs(p1) do
 		t[i] = p2(v, i)
 	end
 	return t
 end
-function t.Each(p1, ...) --[[ Line: 563 ]]
+function t.Each(p1, ...)
 	local t = {}
 	for i, v in ipairs({ ... }) do
 		t[i] = p1(v)
 	end
 	return unpack(t)
 end
-function t.EmulateTabstops(p1, p2) --[[ Line: 572 ]]
+function t.EmulateTabstops(p1, p2)
 	local v1 = #p1
 	local v2 = table.create(v1)
 	local sum = 0
@@ -428,17 +429,17 @@ function t.EmulateTabstops(p1, p2) --[[ Line: 572 ]]
 	end
 	return table.concat(v2)
 end
-function t.Mutex() --[[ Line: 594 ]]
+function t.Mutex()
 	local t = {}
 	local v1 = false
-	return function() --[[ Line: 598 | Upvalues: v1 (ref), t (copy) ]]
+	return function()
 		if v1 then
 			table.insert(t, coroutine.running())
 			coroutine.yield()
 		else
 			v1 = true
 		end
-		return function() --[[ Line: 606 | Upvalues: t (ref), v1 (ref) ]]
+		return function()
 			if #t > 0 then
 				coroutine.resume(table.remove(t, 1))
 			else

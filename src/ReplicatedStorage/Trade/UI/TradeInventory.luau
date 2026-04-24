@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
@@ -16,14 +17,14 @@ v1.defaultProps = {
 	sortEnabled = true,
 	displayName = ""
 }
-function v1.init(p1) --[[ Line: 22 ]]
+function v1.init(p1)
 	p1.itemDefaults = {
 		cornerPixel = p1.props.cornerPixel,
 		onClick = p1.props.onClickItem,
 		onCardFlipped = p1.props.onCardFlipped
 	}
 end
-function v1.render(p1) --[[ Line: 29 | Upvalues: EnumSort (copy), createElement (copy), Roact (copy), store (copy), ScrollingGrid (copy), TradeCategory (copy), TradeCard (copy), TradeButton (copy), TradeChat (copy) ]]
+function v1.render(p1)
 	local cornerPixel = p1.props.cornerPixel
 	local v1 = Color3.new(51/255, 51/255, 51/255)
 	local v2 = nil
@@ -42,7 +43,7 @@ function v1.render(p1) --[[ Line: 29 | Upvalues: EnumSort (copy), createElement 
 		local t2 = {
 			itemType = v.match.itemType,
 			title = v.categoryTitle,
-			onClick = function() --[[ Name: onClick | Line: 64 | Upvalues: p1 (copy), v (copy) ]]
+			onClick = function()
 				if p1.props.onClickCategory then
 					p1.props.onClickCategory(v)
 				end
@@ -58,7 +59,7 @@ function v1.render(p1) --[[ Line: 29 | Upvalues: EnumSort (copy), createElement 
 			local v4
 			local t3 = {
 				title = v6.DisplayName,
-				onClick = function() --[[ Name: onClick | Line: 78 | Upvalues: p1 (copy), v6 (copy) ]]
+				onClick = function()
 					if p1.props.onClickInventoryPlayer and v6 ~= p1.props.inventoryPlayers.selectedPlayer then
 						p1.props.onClickInventoryPlayer(v6)
 					end
@@ -134,7 +135,7 @@ function v1.render(p1) --[[ Line: 29 | Upvalues: EnumSort (copy), createElement 
 			PlaceholderText = "SEARCH ITEMS...",
 			Text = "",
 			[Roact.Ref] = p1.boxRef,
-			[Roact.Change.Text] = function(p1) --[[ Line: 154 | Upvalues: store (ref) ]]
+			[Roact.Change.Text] = function(p1)
 				local v1 = p1.Text:upper():gsub("[^%w%s]", "")
 				p1.Text = v1
 				store:dispatch({
@@ -188,7 +189,7 @@ function v1.render(p1) --[[ Line: 29 | Upvalues: EnumSort (copy), createElement 
 				BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0, 0, 0, 0),
-				[Roact.Event.Activated] = function() --[[ Line: 211 | Upvalues: p1 (copy) ]]
+				[Roact.Event.Activated] = function()
 					p1.props.onSelectSort(p1.props.sortId)
 				end
 			}, {

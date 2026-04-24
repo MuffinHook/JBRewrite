@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 return {
 	BlackIce = {
 		AK47 = 16629264201,

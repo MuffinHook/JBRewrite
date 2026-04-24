@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local RocketLauncherConsts = require(script.Parent.RocketLauncherConsts)
@@ -5,11 +6,11 @@ local t = {}
 local t2 = {
 	explosion_large_02 = 2205008239
 }
-function t.getMissileItemPoolObj(p1) --[[ Line: 8 | Upvalues: RocketLauncherConsts (copy) ]]
+function t.getMissileItemPoolObj(p1)
 	assert(typeof(p1) == "Instance")
 	return p1:FindFirstChild(RocketLauncherConsts.MISSILE_OBJ_POOL_NAME)
 end
-function t.explodeAt(p1) --[[ Line: 12 | Upvalues: ReplicatedStorage (copy), Audio (copy), t2 (copy) ]]
+function t.explodeAt(p1)
 	assert(p1)
 	local Part = Instance.new("Part")
 	Part.Size = Vector3.new(0.1, 0.1, 0.1)
@@ -30,12 +31,12 @@ function t.explodeAt(p1) --[[ Line: 12 | Upvalues: ReplicatedStorage (copy), Aud
 	local v4 = ReplicatedStorage.Resource.ItemSystem.Projectiles.LandingSmoke:Clone()
 	v4.Enabled = true
 	v4.Parent = Part
-	delay(10 - v4.Lifetime.Max, function() --[[ Line: 39 | Upvalues: v4 (copy) ]]
-		v4.Enabled = false
+	delay(10 - v4.Lifetime.Max, function()
+ v4.Enabled = false
 	end)
 	game.Debris:AddItem(Part, 10)
 	Audio.ObjectLocal(Part, t2.explosion_large_02, {
-		Volume = 1
+ Volume = 1
 	}).EmitterSize = 20
 end
 return t

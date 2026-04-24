@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local DataStoreService = game:GetService("DataStoreService")
 local RunService = game:GetService("RunService")
 local DataStoreQueue = require(script.DataStoreQueue)
@@ -28,9 +29,9 @@ t.DataToSave = { "Sessions", "Transactions", "ProgressionTries", "CurrentCustomD
 t.PlayerCache = {}
 t.EventsQueue = {}
 t.DataStoreQueue = DataStoreQueue
-function t.GetPlayerData(p1, p2) --[[ Line: 45 | Upvalues: DataStoreQueue (copy), RunService (copy), t (copy) ]]
+function t.GetPlayerData(p1, p2)
 	local UserId = p2.UserId
-	local v1, v2 = DataStoreQueue.AddRequest(UserId, function() --[[ Line: 47 | Upvalues: RunService (ref), t (ref), UserId (copy) ]]
+	local v1, v2 = DataStoreQueue.AddRequest(UserId, function()
 		return RunService:IsStudio() and ({} or (t.PlayerDS:GetAsync(UserId) or {})) or (t.PlayerDS:GetAsync(UserId) or {})
 	end, 7)
 	if not v1 then
@@ -38,7 +39,7 @@ function t.GetPlayerData(p1, p2) --[[ Line: 45 | Upvalues: DataStoreQueue (copy)
 	end
 	return v2
 end
-function t.GetPlayerDataFromCache(p1, p2) --[[ Line: 57 | Upvalues: t (copy) ]]
+function t.GetPlayerDataFromCache(p1, p2)
 	local v1 = t.PlayerCache[tonumber(p2)]
 	if v1 then
 		return v1
@@ -46,16 +47,16 @@ function t.GetPlayerDataFromCache(p1, p2) --[[ Line: 57 | Upvalues: t (copy) ]]
 		return t.PlayerCache[tostring(p2)]
 	end
 end
-function t.GetErrorDataStore(p1, p2) --[[ Line: 66 | Upvalues: RunService (copy), DataStoreService (copy) ]]
+function t.GetErrorDataStore(p1, p2)
 	local v1 = nil
-	if not pcall(function() --[[ Line: 68 | Upvalues: v1 (ref), RunService (ref), DataStoreService (ref), p2 (copy) ]]
+	if not pcall(function()
 		v1 = RunService:IsStudio() and {} or DataStoreService:GetDataStore("GA_ErrorDS_1.0.0", p2)
 	end) then
 		v1 = {}
 	end
 	return v1
 end
-function t.SavePlayerData(p1, p2) --[[ Line: 79 | Upvalues: t (copy), RunService (copy), DataStoreQueue (copy) ]]
+function t.SavePlayerData(p1, p2)
 	local v1 = t:GetPlayerDataFromCache(p2.UserId)
 	local t2 = {}
 	if v1 then
@@ -64,19 +65,19 @@ function t.SavePlayerData(p1, p2) --[[ Line: 79 | Upvalues: t (copy), RunService
 		end
 		local UserId = p2.UserId
 		if not RunService:IsStudio() then
-			DataStoreQueue.AddRequest(UserId, function() --[[ Line: 96 | Upvalues: t (ref), UserId (copy), t2 (copy) ]]
+			DataStoreQueue.AddRequest(UserId, function()
 				return t.PlayerDS:SetAsync(UserId, t2)
 			end, 7)
 		end
 	end
 end
-function t.IncrementErrorCount(p1, p2, p3, p4) --[[ Line: 102 | Upvalues: RunService (copy), DataStoreQueue (copy) ]]
+function t.IncrementErrorCount(p1, p2, p3, p4)
 	if p3 then
 		local v1
 		if RunService:IsStudio() then
 			v1 = 0
 		else
-			local v2, v3 = DataStoreQueue.AddRequest(p3, function() --[[ Line: 111 | Upvalues: p2 (copy), p3 (copy), p4 (copy) ]]
+			local v2, v3 = DataStoreQueue.AddRequest(p3, function()
 				return p2:IncrementAsync(p3, p4)
 			end, 7)
 			_ = v2

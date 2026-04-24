@@ -1,15 +1,16 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Std.Promise)
 local waitForChild = require(ReplicatedStorage.Std.waitForChild)
 local GunSystemConsts = require(ReplicatedStorage.Game.ItemSystem.GunSystemConsts)
 local t = {}
 local t2 = {}
-function t2.init() --[[ Line: 8 | Upvalues: waitForChild (copy), ReplicatedStorage (copy), t2 (copy) ]]
-	waitForChild(ReplicatedStorage, "DisplayDamageDraw"):andThen(function(p1) --[[ Line: 9 | Upvalues: t2 (ref) ]]
+function t2.init()
+	waitForChild(ReplicatedStorage, "DisplayDamageDraw"):andThen(function(p1)
 		p1.OnClientEvent:Connect(t2.draw)
 	end)
 end
-function t2.draw(p1, p2, p3, p4) --[[ Line: 13 | Upvalues: t (copy), ReplicatedStorage (copy), GunSystemConsts (copy), Promise (copy) ]]
+function t2.draw(p1, p2, p3, p4)
 	local v1 = p4 or {}
 	local isHeadshot = v1.isHeadshot
 	local isWallbang = v1.isWallbang
@@ -42,7 +43,7 @@ function t2.draw(p1, p2, p3, p4) --[[ Line: 13 | Upvalues: t (copy), ReplicatedS
 		t[p1] = v4
 		v5 = true
 	end
-	local function displayDPS() --[[ Line: 48 | Upvalues: v4 (ref), p3 (copy) ]]
+	local function displayDPS()
 		local v1 = v4
 		v1.realDamage = v1.realDamage + p3
 		local v2 = os.clock() - v4.firstDamageTime
@@ -72,7 +73,7 @@ function t2.draw(p1, p2, p3, p4) --[[ Line: 13 | Upvalues: t (copy), ReplicatedS
 		v4.promise:cancel()
 		v4.promise = nil
 	end
-	v4.promise = Promise.delay(1):andThen(function() --[[ Line: 82 | Upvalues: v4 (ref), t (ref), p1 (copy) ]]
+	v4.promise = Promise.delay(1):andThen(function()
 		v4.arrowsGui:Destroy()
 		v4.billboardGui:Destroy()
 		t[p1] = nil

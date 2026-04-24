@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local SafeComponent = require(script.Parent.SafeComponent)
 local RewardSpinnerConsts = require(ReplicatedStorage.RewardSpinner.RewardSpinnerConsts)
-return function(p1) --[[ Line: 8 | Upvalues: RewardSpinnerConsts (copy), createElement (copy), Roact (copy), SafeComponent (copy) ]]
+return function(p1)
 	local aspectRatio = p1.aspectRatio
 	local verticalPaddingRatio = p1.verticalPaddingRatio
 	local t = {}

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Raycast = require(ReplicatedStorage.Std.Raycast)
@@ -18,7 +19,7 @@ local MansionRobberyUtils = require(ReplicatedStorage.MansionRobbery.MansionRobb
 local NPCUtils = require(ReplicatedStorage.NPC.NPCUtils)
 local NPCConsts = require(ReplicatedStorage.NPC.NPCConsts)
 local Shake = require(ReplicatedStorage.Module.Shake)
-local function shakeCamAt(p1, p2) --[[ Line: 24 | Upvalues: Shake (copy) ]]
+local function shakeCamAt(p1, p2)
 	local CurrentCamera = workspace.CurrentCamera
 	local Last = Enum.RenderPriority.Last.Value
 	local v1 = Shake.new()
@@ -29,7 +30,7 @@ local function shakeCamAt(p1, p2) --[[ Line: 24 | Upvalues: Shake (copy) ]]
 	v1.PositionInfluence = Vector3.new(1, 1, 1)
 	v1.RotationInfluence = Vector3.new(1, 1, 1)
 	v1.Sustain = p2 and p2.Sustain or false
-	local function callback(p12, p2) --[[ Line: 37 | Upvalues: CurrentCamera (copy), p1 (copy), Shake (ref) ]]
+	local function callback(p12, p2)
 		local v1 = (CurrentCamera.CFrame.Position - p1).Magnitude / 100
 		local v2 = Shake.InverseSquare(p12, v1)
 		local v3 = Shake.InverseSquare(p2, v1)
@@ -38,18 +39,18 @@ local function shakeCamAt(p1, p2) --[[ Line: 24 | Upvalues: Shake (copy) ]]
 	end
 	v1:Start()
 	v1:BindToRenderStep(Shake.NextRenderName(), Last, callback)
-	return function() --[[ Line: 46 | Upvalues: v1 (copy) ]]
+	return function()
 		v1:StopSustain()
 	end
 end
 local t = {}
 t.__index = t
 setmetatable(t, NPC)
-function t.new(p1, p2) --[[ Line: 55 | Upvalues: NPC (copy), t (copy), NPCUtils (copy), NPCConsts (copy), Raycast (copy), CollectionService (copy), MansionRobberyConsts (copy), MansionRobberyUtils (copy), Players (copy), BossNPCUtils (copy), BossNPCConsts (copy), BossNPCShared (copy) ]]
+function t.new(p1, p2)
 	local v1 = NPC.new(p1, p2)
 	setmetatable(v1, t)
 	v1:_setupArmBoneData()
-	local function getTargetPosition() --[[ Line: 61 | Upvalues: NPCUtils (ref), p1 (copy), NPCConsts (ref), v1 (copy), Raycast (ref) ]]
+	local function getTargetPosition()
 		local v12 = Vector3.new(0, 0, 0)
 		if NPCUtils.getTargetType(p1) == NPCConsts.DEST_TYPE.OBJ then
 			local v2 = NPCUtils.getTarget(p1)
@@ -68,7 +69,7 @@ function t.new(p1, p2) --[[ Line: 55 | Upvalues: NPC (copy), t (copy), NPCUtils 
 		return v12
 	end
 	v1.maid.lastAttackMaidClient = nil
-	local function handleAttackState() --[[ Line: 82 | Upvalues: v1 (copy), CollectionService (ref), MansionRobberyConsts (ref), MansionRobberyUtils (ref), Players (ref), BossNPCUtils (ref), p1 (copy), BossNPCConsts (ref), getTargetPosition (copy) ]]
+	local function handleAttackState()
 		if v1.maid.lastAttackMaidClient then
 			v1.maid.lastAttackMaidClient = nil
 		end
@@ -96,7 +97,7 @@ function t.new(p1, p2) --[[ Line: 55 | Upvalues: NPC (copy), t (copy), NPCUtils 
 	BossNPCShared.setup(v1)
 	return v1
 end
-function t._setupArmBoneData(p1) --[[ Line: 114 ]]
+function t._setupArmBoneData(p1)
 	local t = {}
 	for v2, v3 in { "Shoulder.R.001", "Shoulder.R.002", "Shoulder.R.003", "Shoulder.R.004", "Arm.R.001", "Arm.R.002", "Arm.R.003", "Arm.R.004" } do
 		local v1
@@ -121,12 +122,12 @@ function t._setupArmBoneData(p1) --[[ Line: 114 ]]
 		CFrame.new(0.06, 2.17, -0.15) * CFrame.Angles(0.0011, 0.0002, 0.1974)
 	}
 end
-function t._resetArmBones(p1) --[[ Line: 171 ]]
+function t._resetArmBones(p1)
 	for v1, v2 in p1.allArmBoneData do
 		v2.bone.CFrame = v2.cf
 	end
 end
-function t._armGrabTarget(p1, p2, p3, p4) --[[ Line: 176 ]]
+function t._armGrabTarget(p1, p2, p3, p4)
 	local allArmBoneData = p1.allArmBoneData
 	local TransformedWorldCFrame = allArmBoneData[1].bone.TransformedWorldCFrame
 	local Position = TransformedWorldCFrame.Position
@@ -140,11 +141,11 @@ function t._armGrabTarget(p1, p2, p3, p4) --[[ Line: 176 ]]
 		TransformedWorldCFrame = TransformedWorldCFrame * (v4 * v1)
 	end
 end
-function t._armAnimateFromTo(p1, p2, p3, p4, p5, p6) --[[ Line: 194 | Upvalues: RunService (copy), TweenService (copy) ]]
+function t._armAnimateFromTo(p1, p2, p3, p4, p5, p6)
 	local v1 = os.clock()
 	local v2 = nil
 	local v3 = nil
-	v3 = RunService.Heartbeat:Connect(function() --[[ Line: 204 | Upvalues: v1 (copy), v2 (ref), p5 (copy), v3 (ref), TweenService (ref), p6 (copy), p3 (copy), p4 (copy), p1 (copy), p2 (copy) ]]
+	v3 = RunService.Heartbeat:Connect(function()
 		v2 = (os.clock() - v1) / p5
 		if v2 >= 1 then
 			v2 = 1
@@ -154,14 +155,14 @@ function t._armAnimateFromTo(p1, p2, p3, p4, p5, p6) --[[ Line: 194 | Upvalues: 
 		local v12 = TweenService:GetValue(v2, Enum.EasingStyle.Quart, p6)
 		p1:_armGrabTarget(p2(), p3 * (1 - v12) + p4 * v12, p1.armBoneLungeTransforms)
 	end)
-	return function() --[[ Line: 216 | Upvalues: v3 (ref), v2 (ref) ]]
+	return function()
 		if v3 then
 			v3:Disconnect()
 		end
 		return v2
 	end
 end
-function t.DisplayAttackIndicator(p1, p2) --[[ Line: 223 | Upvalues: Maid (copy), NPCUtils (copy), Players (copy), ReplicatedStorage (copy), RunService (copy) ]]
+function t.DisplayAttackIndicator(p1, p2)
 	local v1 = Maid.new()
 	p2.targetingMaid = v1
 	local v2 = NPCUtils.getTarget(p1.obj)
@@ -176,7 +177,7 @@ function t.DisplayAttackIndicator(p1, p2) --[[ Line: 223 | Upvalues: Maid (copy)
 			v4.Parent = workspace
 			v1:GiveTask(v4)
 			local v5 = os.clock()
-			v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 246 | Upvalues: v3 (copy), v1 (copy), v4 (ref), v5 (copy) ]]
+			v1:GiveTask(RunService.Heartbeat:Connect(function()
 				if v3 then
 					local Character = v3.Character
 					if Character then
@@ -198,7 +199,7 @@ function t.DisplayAttackIndicator(p1, p2) --[[ Line: 223 | Upvalues: Maid (copy)
 		end
 	end
 end
-function t.PlayArmGrab(p1, p2) --[[ Line: 271 | Upvalues: Maid (copy), NPCUtils (copy), Players (copy), mansionRobberyStore (copy), BossNPCConsts (copy), Audio (copy), Falling (copy), shakeCamAt (copy) ]]
+function t.PlayArmGrab(p1, p2)
 	local v1 = Maid.new()
 	local v2 = nil
 	local v3 = NPCUtils.getTarget(p1.obj)
@@ -217,7 +218,7 @@ function t.PlayArmGrab(p1, p2) --[[ Line: 271 | Upvalues: Maid (copy), NPCUtils 
 		type = "setDialogueText",
 		text = v2
 	})
-	task.delay(3, function() --[[ Line: 294 | Upvalues: mansionRobberyStore (ref) ]]
+	task.delay(3, function()
 		mansionRobberyStore:dispatch({
 			type = "setDialogueText",
 			text = ""
@@ -225,12 +226,12 @@ function t.PlayArmGrab(p1, p2) --[[ Line: 271 | Upvalues: Maid (copy), NPCUtils 
 	end)
 	local v6 = p1.humanoid:WaitForChild("Animator"):LoadAnimation(p1.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("LungeAnimation"))
 	v6:Play()
-	v1:GiveTask(function() --[[ Line: 306 | Upvalues: v6 (copy) ]]
+	v1:GiveTask(function()
 		v6:Stop()
 		v6:Destroy()
 	end)
 	v6:AdjustSpeed(0.2)
-	v1:GiveTask(task.delay(BossNPCConsts.EXTENDO_WHACK_WARM_UP_DURATION, function() --[[ Line: 312 | Upvalues: v6 (copy), v1 (copy), p1 (copy), p2 (copy), Audio (ref) ]]
+	v1:GiveTask(task.delay(BossNPCConsts.EXTENDO_WHACK_WARM_UP_DURATION, function()
 		v6:AdjustSpeed(1)
 		v1.killAnimateTo = p1:_armAnimateFromTo(p2, 0, 1, v6.Length - 0.25, Enum.EasingDirection.In)
 		Audio.ObjectLocal(p1.obj.PrimaryPart, 11793693522, {
@@ -239,7 +240,7 @@ function t.PlayArmGrab(p1, p2) --[[ Line: 271 | Upvalues: Maid (copy), NPCUtils 
 		})
 	end))
 	local v7 = false
-	v1:GiveTask(v6.Stopped:Connect(function() --[[ Line: 320 | Upvalues: v7 (ref), p2 (copy), Players (ref), Falling (ref), shakeCamAt (ref), Audio (ref), p1 (copy), BossNPCConsts (ref), v1 (copy) ]]
+	v1:GiveTask(v6.Stopped:Connect(function()
 		if not v7 then
 			v7 = true
 			local v12 = p2()
@@ -256,7 +257,7 @@ function t.PlayArmGrab(p1, p2) --[[ Line: 271 | Upvalues: Maid (copy), NPCUtils 
 				})
 			end
 			p1:_armAnimateFromTo(p2, 1, 0, 0.2, Enum.EasingDirection.Out)
-			task.delay(0.2, function() --[[ Line: 340 | Upvalues: v1 (ref), Audio (ref), p1 (ref) ]]
+			task.delay(0.2, function()
 				v1:DoCleaning()
 				Audio.ObjectLocal(p1.obj.PrimaryPart, 11793694003, {
 					Volume = 0.5,
@@ -265,18 +266,18 @@ function t.PlayArmGrab(p1, p2) --[[ Line: 271 | Upvalues: Maid (copy), NPCUtils 
 			end)
 		end
 	end))
-	v1:GiveTask(function() --[[ Line: 346 | Upvalues: p1 (copy) ]]
+	v1:GiveTask(function()
 		p1:_resetArmBones()
 	end)
 	return v1
 end
-function t.PlayLaserSweepVisual(p1, p2) --[[ Line: 351 | Upvalues: mansionRobberyStore (copy), Maid (copy), Audio (copy), BossNPCConsts (copy), RunService (copy), Raycast (copy), Players (copy) ]]
+function t.PlayLaserSweepVisual(p1, p2)
 	local t = { "CEO: Block this you filthy casual!", "CEO: I\'ll turn you to dust with this unstoppable weapon!", "CEO: You\'ll never defeat me with that puny arsenal, my laser will decimate you all!", "CEO: You\'ll never be able to dodge my laser\'s deadly beam!" }
 	mansionRobberyStore:dispatch({
 		type = "setDialogueText",
 		text = t[math.random(#t)]
 	})
-	task.delay(3, function() --[[ Line: 363 | Upvalues: mansionRobberyStore (ref) ]]
+	task.delay(3, function()
 		mansionRobberyStore:dispatch({
 			type = "setDialogueText",
 			text = ""
@@ -285,12 +286,12 @@ function t.PlayLaserSweepVisual(p1, p2) --[[ Line: 351 | Upvalues: mansionRobber
 	local v1 = Maid.new()
 	local v2 = p1.humanoid:WaitForChild("Animator"):LoadAnimation(p1.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("AimAnimation"))
 	v2:Play()
-	v1:GiveTask(function() --[[ Line: 376 | Upvalues: v2 (copy) ]]
+	v1:GiveTask(function()
 		v2:Stop()
 		v2:Destroy()
 	end)
 	local v3 = false
-	v1:GiveTask(v2.Stopped:Connect(function() --[[ Line: 381 | Upvalues: v3 (ref), v2 (copy) ]]
+	v1:GiveTask(v2.Stopped:Connect(function()
 		if not v3 then
 			v3 = true
 			v2:Play()
@@ -302,7 +303,7 @@ function t.PlayLaserSweepVisual(p1, p2) --[[ Line: 351 | Upvalues: mansionRobber
 		Volume = 0.3,
 		RollOffMinDistance = 64
 	})
-	v1:GiveTask(task.delay(BossNPCConsts.LASER_SWEEP_WARM_UP_DURATION, function() --[[ Line: 392 | Upvalues: v1 (copy), Audio (ref), p1 (copy), RunService (ref), p2 (copy), Raycast (ref), Players (ref), BossNPCConsts (ref) ]]
+	v1:GiveTask(task.delay(BossNPCConsts.LASER_SWEEP_WARM_UP_DURATION, function()
 		local Part = Instance.new("Part")
 		Part.CanCollide = false
 		Part.CanQuery = false
@@ -322,10 +323,10 @@ function t.PlayLaserSweepVisual(p1, p2) --[[ Line: 351 | Upvalues: mansionRobber
 		})))
 		local v12 = p1.obj.PrimaryPart.CFrame * Vector3.new(0, -10, -10)
 		local t = {}
-		v1:GiveTask(function() --[[ Line: 409 | Upvalues: t (copy) ]]
+		v1:GiveTask(function()
 			table.clear(t)
 		end)
-		v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 412 | Upvalues: p2 (ref), p1 (ref), v12 (ref), Raycast (ref), Part (copy), Players (ref), t (copy), BossNPCConsts (ref), Audio (ref) ]]
+		v1:GiveTask(RunService.Heartbeat:Connect(function()
 			local v1 = p2()
 			v12 = v12 + (v1 + (v1 - p1.obj.PrimaryPart.Position).Unit * 3 - v12) * 0.1
 			local Position = p1.allArmBoneData[#p1.allArmBoneData].bone.TransformedWorldCFrame.Position
@@ -348,55 +349,55 @@ function t.PlayLaserSweepVisual(p1, p2) --[[ Line: 351 | Upvalues: mansionRobber
 	end))
 	return v1
 end
-function t.PlayMansionLasers(p1) --[[ Line: 447 | Upvalues: Maid (copy), BossNPCConsts (copy), Audio (copy) ]]
+function t.PlayMansionLasers(p1)
 	local v1 = Maid.new()
 	local v2 = p1.humanoid:WaitForChild("Animator"):LoadAnimation(p1.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("WaveRightAnimation"))
-	v1:GiveTask(task.delay(BossNPCConsts.WALK_TO_DEST_DURATION, function() --[[ Line: 452 | Upvalues: Audio (ref), p1 (copy), v2 (copy), v1 (copy) ]]
+	v1:GiveTask(task.delay(BossNPCConsts.WALK_TO_DEST_DURATION, function()
 		Audio.ObjectLocal(p1.obj.PrimaryPart, 11793818720, {
 			Volume = 0.5
 		})
 		v2:Play()
-		v1:GiveTask(function() --[[ Line: 455 | Upvalues: v2 (ref) ]]
+		v1:GiveTask(function()
 			v2:Stop()
 			v2:Destroy()
 		end)
 	end))
 	return v1
 end
-function t.PlayMansionCameras(p1) --[[ Line: 463 | Upvalues: Maid (copy), BossNPCConsts (copy), Audio (copy) ]]
+function t.PlayMansionCameras(p1)
 	local v1 = Maid.new()
 	local v2 = p1.humanoid:WaitForChild("Animator"):LoadAnimation(p1.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("WaveLeftAnimation"))
-	v1:GiveTask(task.delay(BossNPCConsts.WALK_TO_DEST_DURATION, function() --[[ Line: 468 | Upvalues: Audio (ref), p1 (copy), v2 (copy), v1 (copy) ]]
+	v1:GiveTask(task.delay(BossNPCConsts.WALK_TO_DEST_DURATION, function()
 		Audio.ObjectLocal(p1.obj.PrimaryPart, 11793818720, {
 			Volume = 0.5
 		})
 		v2:Play()
-		v1:GiveTask(function() --[[ Line: 471 | Upvalues: v2 (ref) ]]
+		v1:GiveTask(function()
 			v2:Stop()
 			v2:Destroy()
 		end)
 	end))
 	return v1
 end
-function t.PlayCallInGuards(p1) --[[ Line: 478 | Upvalues: Maid (copy), Audio (copy) ]]
+function t.PlayCallInGuards(p1)
 	local v1 = Maid.new()
 	local v2 = p1.humanoid:WaitForChild("Animator"):LoadAnimation(p1.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("WaveLeftAnimation"))
 	v2:Play()
 	Audio.ObjectLocal(p1.obj.PrimaryPart, 11793818440, {
 		Volume = 0.5
 	})
-	v1:GiveTask(function() --[[ Line: 485 | Upvalues: v2 (copy) ]]
+	v1:GiveTask(function()
 		v2:Stop()
 		v2:Destroy()
 	end)
 	return v1
 end
-function t.PlayAuraBlast(p1) --[[ Line: 491 | Upvalues: mansionRobberyStore (copy), Maid (copy), Players (copy), shakeCamAt (copy), RunService (copy), BossNPCConsts (copy), Falling (copy) ]]
+function t.PlayAuraBlast(p1)
 	mansionRobberyStore:dispatch({
 		type = "setDialogueText",
 		text = "CEO: Alright this has been going on too long. Enough is ENOUGH!"
 	})
-	task.delay(4, function() --[[ Line: 497 | Upvalues: mansionRobberyStore (ref) ]]
+	task.delay(4, function()
 		mansionRobberyStore:dispatch({
 			type = "setDialogueText",
 			text = ""
@@ -418,7 +419,7 @@ function t.PlayAuraBlast(p1) --[[ Line: 491 | Upvalues: mansionRobberyStore (cop
 	v1:GiveTask(AuraPart)
 	local v2 = workspace:GetServerTimeNow()
 	local v3 = false
-	local function isPlayerInAura() --[[ Line: 524 | Upvalues: Players (ref), AuraPart (copy) ]]
+	local function isPlayerInAura()
 		local Character = Players.LocalPlayer.Character
 		if Character then
 			return (Character.PrimaryPart.Position - AuraPart.Position).Magnitude <= AuraPart.Size.X / 2
@@ -428,7 +429,7 @@ function t.PlayAuraBlast(p1) --[[ Line: 491 | Upvalues: mansionRobberyStore (cop
 		Sustain = true,
 		Amplitude = 0.1
 	})))
-	v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 536 | Upvalues: v2 (copy), BossNPCConsts (ref), v1 (copy), AuraPart (copy), v3 (ref), Players (ref), Falling (ref) ]]
+	v1:GiveTask(RunService.Heartbeat:Connect(function()
 		local v12 = (workspace:GetServerTimeNow() - v2) / BossNPCConsts.AURA_BLAST_DURATION
 		if v12 > 1 then
 			v1:Destroy()

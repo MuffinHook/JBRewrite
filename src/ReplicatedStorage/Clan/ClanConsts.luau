@@ -3,8 +3,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunConsts = require(ReplicatedStorage.App.RunConsts)
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-local v1 = if RunUtils.getEnv() == RunConsts.PROD_NAME then 259200 else 1
-local t = {
+local joinCooldownDuration = if RunUtils.getEnv() == RunConsts.PROD_NAME then 259200 else 1
+local clanColors = {
 	{
 		name = "Sky",
 		color = Color3.fromRGB(41, 171, 255),
@@ -46,15 +46,15 @@ local t = {
 		buildingColor = Color3.fromRGB(70, 70, 76)
 	}
 }
-local t2 = {}
-local t3 = {}
-for v2, v3 in t do
-	t2[v3.name] = v3
-	t3[v3.color:ToHex()] = v3.buildingColor
+local colorNameMap = {}
+local colorHexToBuildingColorMap = {}
+for _, clanColor in clanColors do
+	colorNameMap[clanColor.name] = clanColor
+	colorHexToBuildingColorMap[clanColor.color:ToHex()] = clanColor.buildingColor
 end
 return TableUtils.requireValidIndexAndFreeze({
 	CURR_CLAN_DATA_VERSION = 3,
-	CLAN_JOIN_COOLDOWN_DURATION = v1,
+	CLAN_JOIN_COOLDOWN_DURATION = joinCooldownDuration,
 	MAX_MEMBERS = 25,
 	MAX_CLAN_NAME_LENGTH = 24,
 	PLAYER_ONLINE_MEMORY_STORE_EXPIRATION_TIME = 300,
@@ -74,7 +74,7 @@ return TableUtils.requireValidIndexAndFreeze({
 	MEMBERS_ONLINE_OBJECT_NAME = "ClanPlayersOnline",
 	CURRENT_CLAN_ID_ATTR_NAME = "CurrentClanId",
 	IS_PLAYER_CLAN_ADMIN_CACHED_ATTR_NAME = "IsPlayerClanAdminCached",
-	CLAN_COLORS = t,
-	MAP_NAME_TO_CLAN_COLOR = t2,
-	MAP_CLAN_COLOR_HEX_TO_BUILDING_COLOR = t3
+	CLAN_COLORS = clanColors,
+	MAP_NAME_TO_CLAN_COLOR = colorNameMap,
+	MAP_CLAN_COLOR_HEX_TO_BUILDING_COLOR = colorHexToBuildingColorMap
 })

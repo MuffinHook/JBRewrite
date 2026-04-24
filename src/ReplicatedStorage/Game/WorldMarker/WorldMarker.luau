@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Anim = require(ReplicatedStorage.Module.Anim)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local CurrentCamera = workspace.CurrentCamera
-local function GetRootPart() --[[ Line: 13 | Upvalues: LocalPlayer (copy) ]]
+local function GetRootPart()
 	local Character = LocalPlayer.Character
 	if Character == nil then
 		return nil
@@ -24,7 +25,7 @@ local t = {
 }
 local t2 = {}
 t2.__index = t2
-function t2.new() --[[ Line: 31 | Upvalues: t2 (copy), Maid (copy), t (copy) ]]
+function t2.new()
 	local t3 = {}
 	setmetatable(t3, t2)
 	t3._maid = Maid.new()
@@ -61,22 +62,22 @@ function t2.new() --[[ Line: 31 | Upvalues: t2 (copy), Maid (copy), t (copy) ]]
 	t3:SetEnabled(true)
 	return t3
 end
-function t2.SetSizes(p1, p2) --[[ Line: 78 | Upvalues: t (copy) ]]
+function t2.SetSizes(p1, p2)
 	p2 = p2 or t
 	p1._sizes = p2
 end
-function t2.SetEnabled(p1, p2) --[[ Line: 85 ]]
+function t2.SetEnabled(p1, p2)
 	p1.Enabled = p2
 	p1.Frame.Visible = p2
 	if p1.Frame.Name == "ImportantLocationMarker" then
 		print("setting enabled", p2)
 	end
 end
-function t2.SetScreenGui(p1, p2) --[[ Line: 92 ]]
+function t2.SetScreenGui(p1, p2)
 	p1.ScreenGui = p2
 	p1.Frame.Parent = p1.ScreenGui
 end
-function t2.CreateFrameIcon(p1) --[[ Line: 97 ]]
+function t2.CreateFrameIcon(p1)
 	assert(p1.FrameIcon == nil)
 	local ImageLabel = Instance.new("ImageLabel")
 	ImageLabel.BorderSizePixel = 0
@@ -88,12 +89,12 @@ function t2.CreateFrameIcon(p1) --[[ Line: 97 ]]
 	ImageLabel.Parent = p1.FrameInner
 	p1.FrameIcon = ImageLabel
 end
-function t2.DestroyFrameIcon(p1) --[[ Line: 109 ]]
+function t2.DestroyFrameIcon(p1)
 	assert(p1.FrameIcon ~= nil)
 	p1.FrameIcon:Destroy()
 	p1.FrameIcon = nil
 end
-function t2.SetIcon(p1, p2, p3) --[[ Line: 114 ]]
+function t2.SetIcon(p1, p2, p3)
 	if p2 == nil then
 		if p1.FrameIcon ~= nil then
 			p1:DestroyFrameIcon()
@@ -109,13 +110,13 @@ function t2.SetIcon(p1, p2, p3) --[[ Line: 114 ]]
 		p1:SetRadius(p1.Radius)
 	end
 end
-function t2.SetPosition(p1, p2) --[[ Line: 132 ]]
+function t2.SetPosition(p1, p2)
 	p1.Position = p2
 end
-function t2.GetPosition(p1) --[[ Line: 135 ]]
+function t2.GetPosition(p1)
 	return p1.Position
 end
-function t2.SetRadius(p1, p2) --[[ Line: 138 ]]
+function t2.SetRadius(p1, p2)
 	p1.Radius = p2
 	p1.Frame.Size = UDim2.new(0, 2 * p2, 0, 2 * p2)
 	if p1.FrameIcon ~= nil then
@@ -128,7 +129,7 @@ function t2.SetRadius(p1, p2) --[[ Line: 138 ]]
 		end
 	end
 end
-function t2.AnimateRadius(p1, p2) --[[ Line: 154 | Upvalues: Anim (copy) ]]
+function t2.AnimateRadius(p1, p2)
 	if p1.AnimRadius ~= nil then
 		p1.AnimRadius:Destroy()
 		p1.AnimRadius = nil
@@ -136,21 +137,21 @@ function t2.AnimateRadius(p1, p2) --[[ Line: 154 | Upvalues: Anim (copy) ]]
 	p1.StartRadius = p1.Radius
 	p1.EndRadius = p2
 	local v1 = Anim.new(0.1)
-	v1.OnCompleted:Connect(function() --[[ Line: 163 | Upvalues: p1 (copy) ]]
+	v1.OnCompleted:Connect(function()
 		p1.AnimRadius:Destroy()
 		p1.AnimRadius = nil
 		p1:SetRadius(p1.EndRadius)
 	end)
 	p1.AnimRadius = v1
 end
-function t2.SetAdornee(p1, p2) --[[ Line: 171 ]]
+function t2.SetAdornee(p1, p2)
 	p1._adornee = p2
 	p1.Position = p1._adornee.Position
 end
-function t2.GetAdornee(p1) --[[ Line: 175 ]]
+function t2.GetAdornee(p1)
 	return p1._adornee
 end
-function t2.Update(p1) --[[ Line: 178 | Upvalues: CurrentCamera (copy), LocalPlayer (copy) ]]
+function t2.Update(p1)
 	if p1.Enabled then
 		local AbsoluteSize = p1.ScreenGui.AbsoluteSize
 		local X = AbsoluteSize.X
@@ -239,7 +240,7 @@ function t2.Update(p1) --[[ Line: 178 | Upvalues: CurrentCamera (copy), LocalPla
 		end
 	end
 end
-function t2.Destroy(p1) --[[ Line: 275 ]]
+function t2.Destroy(p1)
 	p1._maid:Destroy()
 	p1._maid = nil
 	p1.ScreenGui = nil

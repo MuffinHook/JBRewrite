@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local v1 = Random.new()
 local t = {
-	copyKeysSafe = function(p1, p2) --[[ Name: copyKeysSafe | Line: 5 ]]
+	copyKeysSafe = function(p1, p2)
 		for k, v in pairs(p2) do
 			if p1[k] ~= nil then
 				error(("Table `to` already has key `%s` = %s"):format(k, p1[k]), 2)
@@ -11,18 +12,18 @@ local t = {
 	end
 }
 local t2 = {
-	__index = function(p1, p2) --[[ Name: __index | Line: 15 ]]
+	__index = function(p1, p2)
 		error(("Table does not contain key `%s`"):format(p2), 2)
 	end
 }
-function t.requireValidIndex(p1) --[[ Line: 19 | Upvalues: t2 (copy) ]]
+function t.requireValidIndex(p1)
 	if typeof(p1) == "table" then
 		setmetatable(p1, t2)
 	end
 	return p1
 end
-function t.requireValidIndexAndFreeze(p1) --[[ Line: 25 | Upvalues: t2 (copy) ]]
-	local function v1(p1) --[[ Line: 26 | Upvalues: t2 (ref), v1 (copy) ]]
+function t.requireValidIndexAndFreeze(p1)
+	local function v1(p1)
 		assert(typeof(p1) == "table", "currTable is not a table")
 		local v2 = getmetatable(p1)
 		if not v2 or v2 == t2 then
@@ -39,7 +40,7 @@ function t.requireValidIndexAndFreeze(p1) --[[ Line: 25 | Upvalues: t2 (copy) ]]
 	end
 	return v1(p1)
 end
-function t.shuffleInPlace(p1) --[[ Line: 50 ]]
+function t.shuffleInPlace(p1)
 	for i = #p1, 2, -1 do
 		local v1 = math.random(i)
 		local v3 = p1[i]
@@ -47,7 +48,7 @@ function t.shuffleInPlace(p1) --[[ Line: 50 ]]
 		p1[v1] = v3
 	end
 end
-function t.filter(p1, p2) --[[ Line: 56 ]]
+function t.filter(p1, p2)
 	local t = {}
 	for i = 1, #p1 do
 		if p2(p1[i]) then
@@ -56,21 +57,21 @@ function t.filter(p1, p2) --[[ Line: 56 ]]
 	end
 	return t
 end
-function t.map(p1, p2) --[[ Line: 65 ]]
+function t.map(p1, p2)
 	local t = {}
 	for i = 1, #p1 do
 		table.insert(t, p2(p1[i]))
 	end
 	return t
 end
-function t.sum(p1) --[[ Line: 72 ]]
+function t.sum(p1)
 	local sum = 0
 	for i = 1, #p1 do
 		sum = sum + p1[i]
 	end
 	return sum
 end
-function t.weightedRandom(p1, p2) --[[ Line: 80 | Upvalues: t (copy), v1 (copy) ]]
+function t.weightedRandom(p1, p2)
 	local v12 = p2 or t.sum(p1)
 	assert(v12)
 	local sum = v12 * v1:NextNumber()
@@ -82,7 +83,7 @@ function t.weightedRandom(p1, p2) --[[ Line: 80 | Upvalues: t (copy), v1 (copy) 
 	end
 	error("Couldn\'t find value")
 end
-function t.hasDesiredValuesShallow(p1, p2) --[[ Line: 92 ]]
+function t.hasDesiredValuesShallow(p1, p2)
 	for k, v in pairs(p2) do
 		if p1[k] ~= v then
 			return false
@@ -90,10 +91,10 @@ function t.hasDesiredValuesShallow(p1, p2) --[[ Line: 92 ]]
 	end
 	return true
 end
-function t.deepCompareTables(p1, p2, p3, p4) --[[ Line: 110 | Upvalues: t (copy) ]]
+function t.deepCompareTables(p1, p2, p3, p4)
 	assert(typeof(p1) == "table", "t1 is not a table")
 	assert(typeof(p2) == "table", "t2 is not a table")
-	local function valueCompareLogic(p1, p2, p3, p4) --[[ Line: 114 | Upvalues: t (ref) ]]
+	local function valueCompareLogic(p1, p2, p3, p4)
 		local v1 = not p3
 		if typeof(p1) == typeof(p2) then
 			if typeof(p1) == "table" then
@@ -128,7 +129,7 @@ function t.deepCompareTables(p1, p2, p3, p4) --[[ Line: 110 | Upvalues: t (copy)
 	end
 	return false
 end
-function t.deepCheckSubset(p1, p2, p3) --[[ Line: 204 | Upvalues: t (copy) ]]
+function t.deepCheckSubset(p1, p2, p3)
 	assert(typeof(p1) == "table", "t1 is not a table")
 	assert(typeof(p2) == "table", "t2 is not a table")
 	local count = 0
@@ -155,7 +156,7 @@ function t.deepCheckSubset(p1, p2, p3) --[[ Line: 204 | Upvalues: t (copy) ]]
 		return true
 	end
 end
-function t.deepCopy(p1, p2) --[[ Line: 241 | Upvalues: t (copy) ]]
+function t.deepCopy(p1, p2)
 	local v1 = p2 or {}
 	assert(v1)
 	if type(p1) == "table" then
@@ -174,7 +175,7 @@ function t.deepCopy(p1, p2) --[[ Line: 241 | Upvalues: t (copy) ]]
 		return p1
 	end
 end
-local function f2(p1, p2) --[[ Line: 263 ]]
+local function f2(p1, p2)
 	return true
 end
 local t3 = {
@@ -183,7 +184,7 @@ local t3 = {
 	Instance = "ObjectValue"
 }
 local t4 = {
-	EnumItem = function(p1, p2) --[[ Line: 273 ]]
+	EnumItem = function(p1, p2)
 		local t = {
 			instanceType = "StringValue",
 			serializedValue = p2.Name
@@ -195,7 +196,7 @@ local t4 = {
 		t.attributes = t2
 		return t
 	end,
-	Vector2 = function(p1, p2) --[[ Line: 283 ]]
+	Vector2 = function(p1, p2)
 		local t = {
 			instanceType = "Vector3Value"
 		}
@@ -207,14 +208,14 @@ local t4 = {
 	end
 }
 local t5 = {
-	EnumItem = function(p1) --[[ Line: 295 ]]
+	EnumItem = function(p1)
 		return Enum[p1:GetAttribute("_EnumType")][p1.Value]
 	end,
-	Vector2 = function(p1) --[[ Line: 299 ]]
+	Vector2 = function(p1)
 		return Vector2.new(p1.Value.X, p1.Value.Y)
 	end
 }
-local function getSerializedTypeAndValue(p1, p2) --[[ Line: 304 | Upvalues: t4 (copy), t3 (copy) ]]
+local function getSerializedTypeAndValue(p1, p2)
 	local v1 = typeof(p2)
 	if typeof(p1) ~= "number" and typeof(p1) ~= "string" then
 		error("Cannot serialize non-string/number key")
@@ -234,20 +235,20 @@ local function getSerializedTypeAndValue(p1, p2) --[[ Line: 304 | Upvalues: t4 (
 		return v6, p2, t
 	end
 end
-local function deserializeValue(p1) --[[ Line: 327 | Upvalues: t5 (copy) ]]
+local function deserializeValue(p1)
 	local v1 = p1:GetAttribute("_ValueType")
 	return t5[v1] and t5[v1](p1) or p1.Value
 end
-function t.observeObjectValuesChanged(p1, p2) --[[ Line: 333 | Upvalues: t (copy) ]]
+function t.observeObjectValuesChanged(p1, p2)
 	assert(p1 and p1:IsA("Instance"), "Invalid rootFolder passed")
-	local function handleUpdate() --[[ Line: 335 | Upvalues: t (ref), p1 (copy), p2 (copy) ]]
+	local function handleUpdate()
 		p2(t.createTableFromObjectValues(p1), (p1:GetAttribute("_TableUtilsLastUpdated")))
 	end
 	local v2 = p1:GetAttributeChangedSignal("_TableUtilsLastUpdated"):Connect(handleUpdate)
 	p2(t.createTableFromObjectValues(p1), (p1:GetAttribute("_TableUtilsLastUpdated")))
 	return v2
 end
-function t.createObjectValuesFromTable(p1, p2, p3) --[[ Line: 346 | Upvalues: f2 (copy), getSerializedTypeAndValue (copy) ]]
+function t.createObjectValuesFromTable(p1, p2, p3)
 	assert(typeof(p1) == "table", "Incorrect originalTable type passed")
 	assert(typeof(p2) == "function" or p2 == nil, "Incorrect filterPredicate type passed")
 	assert(if p3 == nil then true else p3:IsA("Instance"), "Incorrect rootFolder type passed")
@@ -256,7 +257,7 @@ function t.createObjectValuesFromTable(p1, p2, p3) --[[ Line: 346 | Upvalues: f2
 	if not (v7 and v5) then
 		error("no folder")
 	end
-	local function v8(p1, p2) --[[ Line: 361 | Upvalues: v5 (ref), getSerializedTypeAndValue (ref), v8 (copy) ]]
+	local function v8(p1, p2)
 		local t = {}
 		for v1, v2 in p2:GetChildren() do
 			t[v2.Name] = v2
@@ -295,14 +296,14 @@ function t.createObjectValuesFromTable(p1, p2, p3) --[[ Line: 346 | Upvalues: f2
 		end
 	end
 	v8(p1, v7)
-	task.delay(0, function() --[[ Line: 412 | Upvalues: v7 (ref) ]]
+	task.delay(0, function()
 		v7:SetAttribute("_TableUtilsLastUpdated", workspace:GetServerTimeNow())
 	end)
 	return v7
 end
-function t.createTableFromObjectValues(p1) --[[ Line: 418 | Upvalues: t5 (copy) ]]
+function t.createTableFromObjectValues(p1)
 	assert(typeof(p1) == "Instance", "Invalid objectValues passed")
-	local function v2(p1) --[[ Line: 421 | Upvalues: v2 (copy), t5 (ref) ]]
+	local function v2(p1)
 		local t = {}
 		for v3, v4 in p1:GetChildren() do
 			local v1, v22
@@ -319,14 +320,14 @@ function t.createTableFromObjectValues(p1) --[[ Line: 418 | Upvalues: t5 (copy) 
 	end
 	return v2(p1)
 end
-function t.isValidSequentialArray(p1) --[[ Line: 437 ]]
+function t.isValidSequentialArray(p1)
 	for v2, v3 in p1 do
 		local _ = typeof(v2) == "number"
 		return false
 	end
 	return #p1 == 0
 end
-function t.insertDesc(p1, p2) --[[ Line: 450 ]]
+function t.insertDesc(p1, p2)
 	local v1 = #p1 + 1
 	for i = #p1, 1, -1 do
 		if p2 < p1[i] then
@@ -336,7 +337,7 @@ function t.insertDesc(p1, p2) --[[ Line: 450 ]]
 	end
 	return v1
 end
-function t.insertAsc(p1, p2) --[[ Line: 460 ]]
+function t.insertAsc(p1, p2)
 	local v1 = 0
 	for i = 1, #p1 do
 		if p2 < p1[i] then
@@ -346,16 +347,16 @@ function t.insertAsc(p1, p2) --[[ Line: 460 ]]
 	end
 	return v1 + 1
 end
-function t.concat(p1, p2) --[[ Line: 470 ]]
+function t.concat(p1, p2)
 	local v1 = table.create(#p1 + #p2)
 	table.move(p1, 1, #p1, 1, v1)
 	table.move(p2, 1, #p2, #p1 + 1, v1)
 	return v1
 end
-function t.concatInPlace(p1, p2) --[[ Line: 476 ]]
+function t.concatInPlace(p1, p2)
 	table.move(p2, 1, #p2, #p1 + 1, p1)
 end
-function t.mergeDeepInPlace(p1, p2) --[[ Line: 487 | Upvalues: t (copy) ]]
+function t.mergeDeepInPlace(p1, p2)
 	assert(type(p1) == "table", "The \'from\' parameter must be a table.")
 	assert(type(p2) == "table", "The \'to\' parameter must be a table.")
 	for v3, v4 in p1 do
@@ -366,7 +367,7 @@ function t.mergeDeepInPlace(p1, p2) --[[ Line: 487 | Upvalues: t (copy) ]]
 		end
 	end
 end
-function t.deepFreeze(p1) --[[ Line: 507 | Upvalues: t (copy) ]]
+function t.deepFreeze(p1)
 	if typeof(p1) == "table" then
 		if not table.isfrozen(p1) then
 			table.freeze(p1)

@@ -17,14 +17,14 @@ end
 return Rodux.createReducer({}, {
 	addMinimapLabel = function(p1, p2)
 		assert(p2.title, "minimap label missing unique title")
-		local t = {}
+		local localTable = {}
 		for i, v in ipairs(p1) do
 			if v.title ~= p2.title then
-				table.insert(t, v)
+				table.insert(localTable, v)
 			end
 		end
-		addLabel(t, p2)
-		return t
+		addLabel(localTable, p2)
+		return localTable
 	end,
 	addMinimapLabels = function(p1, p2)
 		assert(p2.labels, "missing labels")
@@ -36,12 +36,12 @@ return Rodux.createReducer({}, {
 	end,
 	removeMinimapLabel = function(p1, p2)
 		assert(p2.title, "minimap label missing unique title")
-		local t = {}
+		local localTable = {}
 		for i, v in ipairs(p1) do
 			if v.title ~= p2.title then
-				table.insert(t, v)
+				table.insert(localTable, v)
 			end
 		end
-		return t
+		return localTable
 	end
 })

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
@@ -6,7 +7,7 @@ local ViewportFrame = require(ReplicatedStorage.EzUi.ViewportFrame)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local ScrollingGrid = require(ReplicatedStorage.EzUi.ScrollingGrid)
-local function infoComponent(p1) --[[ Line: 11 | Upvalues: createElement (copy) ]]
+local function infoComponent(p1)
 	local v1 = p1.valueColor or Color3.new(255/255, 255/255, 255/255)
 	local t2 = {}
 	local t3 = {
@@ -50,34 +51,34 @@ v1.defaultProps = {
 	number = nil,
 	isOriginalOwner = false
 }
-function v1.init(p1) --[[ Line: 55 ]]
+function v1.init(p1)
 	p1:setState({
 		hover = false,
 		hoverInfo = false,
 		showInfo = false
 	})
-	function p1.setHoverTrue() --[[ Line: 61 | Upvalues: p1 (copy) ]]
+	function p1.setHoverTrue()
 		p1:setState({
 			hover = true
 		})
 	end
-	function p1.setHoverFalse() --[[ Line: 66 | Upvalues: p1 (copy) ]]
+	function p1.setHoverFalse()
 		p1:setState({
 			hover = false
 		})
 	end
-	function p1.setHoverInfoTrue() --[[ Line: 71 | Upvalues: p1 (copy) ]]
+	function p1.setHoverInfoTrue()
 		p1:setState({
 			hoverInfo = true
 		})
 	end
-	function p1.setHoverInfoFalse() --[[ Line: 76 | Upvalues: p1 (copy) ]]
+	function p1.setHoverInfoFalse()
 		p1:setState({
 			hoverInfo = false
 		})
 	end
 end
-function v1.render(p1) --[[ Line: 82 | Upvalues: PlayerDataConsts (copy), ColorUtils (copy), createElement (copy), Roact (copy), ScrollingGrid (copy), infoComponent (copy), ViewportFrame (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	local aspectRatio = p1.props.aspectRatio
 	local v3 = 10
 	local v4 = 8
@@ -172,7 +173,7 @@ function v1.render(p1) --[[ Line: 82 | Upvalues: PlayerDataConsts (copy), ColorU
 			[Roact.Event.MouseLeave] = p1.setHoverInfoFalse,
 			[Roact.Event.SelectionGained] = p1.setHoverInfoTrue,
 			[Roact.Event.SelectionLost] = p1.setHoverInfoFalse,
-			[Roact.Event.Activated] = function() --[[ Line: 202 | Upvalues: p1 (copy) ]]
+			[Roact.Event.Activated] = function()
 				p1:setState({
 					showInfo = false
 				})
@@ -328,7 +329,7 @@ function v1.render(p1) --[[ Line: 82 | Upvalues: PlayerDataConsts (copy), ColorU
 			[Roact.Event.MouseLeave] = p1.setHoverInfoFalse,
 			[Roact.Event.SelectionGained] = p1.setHoverInfoTrue,
 			[Roact.Event.SelectionLost] = p1.setHoverInfoFalse,
-			[Roact.Event.Activated] = function() --[[ Line: 375 | Upvalues: p1 (copy) ]]
+			[Roact.Event.Activated] = function()
 				p1:setState({
 					showInfo = true
 				})
@@ -443,7 +444,7 @@ function v1.render(p1) --[[ Line: 82 | Upvalues: PlayerDataConsts (copy), ColorU
 		[Roact.Event.MouseLeave] = p1.setHoverFalse,
 		[Roact.Event.SelectionGained] = p1.setHoverTrue,
 		[Roact.Event.SelectionLost] = p1.setHoverFalse,
-		[Roact.Event.Activated] = function() --[[ Line: 495 | Upvalues: p1 (copy) ]]
+		[Roact.Event.Activated] = function()
 			if p1.state.showInfo then
 				p1:setState({
 					showInfo = false

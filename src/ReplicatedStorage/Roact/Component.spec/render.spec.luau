@@ -1,4 +1,5 @@
-return function() --[[ Line: 1 ]]
+-- Reviewed by Claude
+return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
@@ -7,20 +8,20 @@ return function() --[[ Line: 1 ]]
 	local Type = require(script.Parent.Parent.Type)
 	local Component = require(script.Parent.Parent.Component)
 	local v1 = createReconciler(NoopRenderer)
-	it("should throw on mount if not overridden", function() --[[ Line: 13 | Upvalues: Component (copy), createElement (copy), v1 (copy) ]]
+	it("should throw on mount if not overridden", function()
 		local v12 = createElement((Component:extend("MyComponent")))
-		local v2, v3 = pcall(function() --[[ Line: 20 | Upvalues: v1 (ref), v12 (copy) ]]
+		local v2, v3 = pcall(function()
 			v1.mountVirtualNode(v12, nil, "Test")
 		end)
 		expect(v2).to.equal(false)
 		expect(v3:match("MyComponent")).to.be.ok()
 		expect(v3:match("render")).to.be.ok()
 	end)
-	it("should be invoked when a component is mounted", function() --[[ Line: 29 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy), assertDeepEqual (copy) ]]
+	it("should be invoked when a component is mounted", function()
 		local v12 = Component:extend("Foo")
 		local v2 = nil
 		local v3 = nil
-		local v4 = createSpy(function(p1) --[[ Line: 34 | Upvalues: v2 (ref), v3 (ref) ]]
+		local v4 = createSpy(function(p1)
 			v2 = p1.props
 			v3 = p1.state
 		end)
@@ -31,11 +32,11 @@ return function() --[[ Line: 1 ]]
 		assertDeepEqual(v2, {})
 		assertDeepEqual(v3, {})
 	end)
-	it("should be invoked when a component is updated via props", function() --[[ Line: 55 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy), assertDeepEqual (copy) ]]
+	it("should be invoked when a component is updated via props", function()
 		local v12 = Component:extend("Foo")
 		local v2 = nil
 		local v3 = nil
-		local v4 = createSpy(function(p1) --[[ Line: 60 | Upvalues: v2 (ref), v3 (ref) ]]
+		local v4 = createSpy(function(p1)
 			v2 = p1.props
 			v3 = p1.state
 		end)
@@ -61,17 +62,17 @@ return function() --[[ Line: 1 ]]
 		assertDeepEqual(v122, t2)
 		expect(v3).to.equal(v9)
 	end)
-	it("should be invoked when a component is updated via state", function() --[[ Line: 104 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy) ]]
+	it("should be invoked when a component is updated via state", function()
 		local v12 = Component:extend("Foo")
 		local v2 = nil
-		function v12.init(p1) --[[ Line: 108 | Upvalues: v2 (ref) ]]
-			v2 = function(...) --[[ Line: 109 | Upvalues: p1 (copy) ]]
+		function v12.init(p1)
+			v2 = function(...)
 				return p1:setState(...)
 			end
 		end
 		local v3 = nil
 		local v4 = nil
-		local v5 = createSpy(function(p1) --[[ Line: 116 | Upvalues: v3 (ref), v4 (ref) ]]
+		local v5 = createSpy(function(p1)
 			v3 = p1.props
 			v4 = p1.state
 		end)
@@ -85,7 +86,7 @@ return function() --[[ Line: 1 ]]
 		expect(v3).to.equal(v3)
 		expect(v4).never.to.equal(v4)
 	end)
-	itSKIP("Test defaultProps on initial render", function() --[[ Line: 147 ]] end)
-	itSKIP("Test defaultProps on prop update", function() --[[ Line: 148 ]] end)
-	itSKIP("Test defaultProps on state update", function() --[[ Line: 149 ]] end)
+	itSKIP("Test defaultProps on initial render", function()  end)
+	itSKIP("Test defaultProps on prop update", function()  end)
+	itSKIP("Test defaultProps on state update", function()  end)
 end

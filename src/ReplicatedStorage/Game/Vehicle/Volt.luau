@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CurrentCamera = workspace.CurrentCamera
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -18,17 +19,17 @@ local t = {
 	tire_respawn = 77257382359638
 }
 local t2 = { 0, 0, 0, 0, 0, 0 }
-local function GetMoveVector() --[[ Line: 24 ]]
+local function GetMoveVector()
 	return Vector3.new()
 end
 local ControlModule = LocalPlayer.PlayerScripts:WaitForChild("PlayerModule", 5).ControlModule
 if ControlModule then
 	local v3 = require(ControlModule)
-	GetMoveVector = function() --[[ Name: GetMoveVector | Line: 31 | Upvalues: v3 (ref) ]]
+	GetMoveVector = function()
 		return v3:GetMoveVector()
 	end
 end
-local function SetHumanoidEnabled(p1, p2) --[[ Line: 36 ]]
+local function SetHumanoidEnabled(p1, p2)
 	local v1 = next
 	local v2, v3 = Enum.HumanoidStateType:GetEnumItems()
 	for v4, v5 in v1, v2, v3 do
@@ -37,7 +38,7 @@ local function SetHumanoidEnabled(p1, p2) --[[ Line: 36 ]]
 		end
 	end
 end
-local function v4(p1) --[[ Line: 60 | Upvalues: v4 (copy) ]]
+local function v4(p1)
 	local sum = 0
 	for i, v in ipairs(p1:GetChildren()) do
 		if v:IsA("BasePart") then
@@ -56,7 +57,7 @@ local function v4(p1) --[[ Line: 60 | Upvalues: v4 (copy) ]]
 	return sum
 end
 local v5 = os.clock()
-local function VehicleEnter(p1) --[[ Line: 79 | Upvalues: t2 (ref), v5 (ref), LocalPlayer (copy), SetHumanoidEnabled (copy), v4 (copy), WheelWorld (copy), Wheel (copy) ]]
+local function VehicleEnter(p1)
 	t2 = { 0, 0, 0, 0, 0, 0 }
 	v5 = os.clock()
 	local Character = LocalPlayer.Character
@@ -86,14 +87,14 @@ local function VehicleEnter(p1) --[[ Line: 79 | Upvalues: t2 (ref), v5 (ref), Lo
 	v3:SetSuspensionHeight(6.5)
 	v1:AddWheel(v3)
 	p1.WheelWorld = v1
-	function p1.setForward(p1) --[[ Line: 122 | Upvalues: t2 (ref) ]]
+	function p1.setForward(p1)
 		t2[1] = if p1 then 1 else 0
 	end
-	function p1.setBackward(p1) --[[ Line: 125 | Upvalues: t2 (ref) ]]
+	function p1.setBackward(p1)
 		t2[3] = if p1 then 1 else 0
 	end
 end
-local function VehicleLeave(p1) --[[ Line: 129 | Upvalues: LocalPlayer (copy), SetHumanoidEnabled (copy), CurrentCamera (copy), t2 (ref) ]]
+local function VehicleLeave(p1)
 	local Character = LocalPlayer.Character
 	if Character and Character:FindFirstChild("Humanoid") then
 		SetHumanoidEnabled(Character, true)
@@ -107,7 +108,7 @@ local function VehicleLeave(p1) --[[ Line: 129 | Upvalues: LocalPlayer (copy), S
 end
 local v6 = Vector3.new()
 os.clock()
-local function Update(p1) --[[ Line: 153 | Upvalues: v5 (ref), t2 (ref), InputUtils (copy), LocalPlayer (copy), GetMoveVector (ref), C4Binder (copy), Time (copy), Audio (copy), t (copy), CurrentCamera (copy), RayCast (copy), v6 (copy) ]]
+local function Update(p1)
 	local v1 = os.clock()
 	local v2 = v1 - v5
 	v5 = v1
@@ -216,7 +217,7 @@ local t3 = {
 	[Enum.KeyCode.Left] = 2,
 	[Enum.KeyCode.Right] = 4
 }
-local function InputBegan(p1) --[[ Line: 328 | Upvalues: t3 (copy), t2 (ref) ]]
+local function InputBegan(p1)
 	if p1.UserInputType == Enum.UserInputType.Keyboard then
 		local KeyCode = p1.KeyCode
 		if t3[KeyCode] then
@@ -224,7 +225,7 @@ local function InputBegan(p1) --[[ Line: 328 | Upvalues: t3 (copy), t2 (ref) ]]
 		end
 	end
 end
-local function InputEnded(p1) --[[ Line: 336 | Upvalues: t3 (copy), t2 (ref) ]]
+local function InputEnded(p1)
 	if p1.UserInputType == Enum.UserInputType.Keyboard then
 		local KeyCode = p1.KeyCode
 		if t3[KeyCode] then
@@ -237,7 +238,7 @@ local function InputEnded(p1) --[[ Line: 336 | Upvalues: t3 (copy), t2 (ref) ]]
 		end
 	end
 end
-local function InputChanged(p1, p2) --[[ Line: 349 | Upvalues: t2 (ref), t3 (copy) ]]
+local function InputChanged(p1, p2)
 	if p1.UserInputType == Enum.UserInputType.Gamepad1 then
 		local KeyCode = p1.KeyCode
 		if KeyCode == Enum.KeyCode.Thumbstick1 then
@@ -253,7 +254,7 @@ local function InputChanged(p1, p2) --[[ Line: 349 | Upvalues: t2 (ref), t3 (cop
 	end
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 371 | Upvalues: v1 (ref), v2 (ref) ]]
+	Init = function(p1)
 		v1 = p1.Event
 		v2 = p1.em
 	end,

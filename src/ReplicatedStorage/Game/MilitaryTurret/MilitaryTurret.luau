@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -11,7 +12,7 @@ local RayCast = require(ReplicatedStorage.Module.RayCast)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local RunService = game:GetService("RunService")
 local Maid = require(ReplicatedStorage.Std.Maid)
-local function randomVector() --[[ Line: 15 ]]
+local function randomVector()
 	local v1 = math.random() * 2 - 1
 	local v2 = math.random() * 2 - 1
 	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
@@ -27,7 +28,7 @@ local MilitaryTurretConsts = require(script.Parent.MilitaryTurretConsts)
 local MilitaryTurretUtils = require(script.Parent.MilitaryTurretUtils)
 local t2 = {}
 t2.__index = t2
-function t2.new(p1) --[[ Line: 33 | Upvalues: RxInstanceUtils (copy), t2 (copy), Maid (copy), Signal (copy), Spring (copy), BulletEmitter (copy), Players (copy), LocalPlayer (copy), MilitaryTurretConsts (copy), Audio (copy), t (copy), RunService (copy), Joint (copy) ]]
+function t2.new(p1)
 	RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
 	local t3 = {}
 	setmetatable(t3, t2)
@@ -44,7 +45,7 @@ function t2.new(p1) --[[ Line: 33 | Upvalues: RxInstanceUtils (copy), t2 (copy),
 	v2.LifeSpan = 1
 	v2.IgnoreLocalPlayer = false
 	v2.GravityVector = Vector3.new(0, -2, 0)
-	t3._maid:GiveTask(v2.OnLocalHitPlayer:Connect(function(p1) --[[ Line: 56 | Upvalues: Players (ref), LocalPlayer (ref), t3 (copy), MilitaryTurretConsts (ref), Audio (ref), t (ref) ]]
+	t3._maid:GiveTask(v2.OnLocalHitPlayer:Connect(function(p1)
 		if Players:GetPlayerFromCharacter(p1.Parent) == LocalPlayer then
 			t3.onBulletHit:Fire(MilitaryTurretConsts.TURRET_DAMAGE)
 		end
@@ -66,7 +67,7 @@ function t2.new(p1) --[[ Line: 33 | Upvalues: RxInstanceUtils (copy), t2 (copy),
 	t3._lastFire = os.clock()
 	t3._lastPointAt = nil
 	t3._lastDetectedBeep = os.clock()
-	t3._maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 82 | Upvalues: t3 (copy), p1 (copy) ]]
+	t3._maid:GiveTask(RunService.Heartbeat:Connect(function()
 		t3:_update(p1)
 	end))
 	local MotorArm = p1:FindFirstChild("MotorArm")
@@ -87,7 +88,7 @@ function t2.new(p1) --[[ Line: 33 | Upvalues: RxInstanceUtils (copy), t2 (copy),
 	t3._motorBase = MotorBase
 	return t3
 end
-function t2._update(p1, p2) --[[ Line: 120 | Upvalues: PlayerUtils (copy), LocalPlayer (copy), MilitaryTurretUtils (copy), RayCast (copy), Audio (copy), t (copy), MilitaryTurretConsts (copy) ]]
+function t2._update(p1, p2)
 	local v1 = os.clock()
 	local v2 = PlayerUtils.getRootPart(LocalPlayer)
 	if v2 then
@@ -148,7 +149,7 @@ function t2._update(p1, p2) --[[ Line: 120 | Upvalues: PlayerUtils (copy), Local
 		end
 	end
 end
-function t2._updateRotation(p1, p2, p3) --[[ Line: 193 | Upvalues: MilitaryTurretUtils (copy) ]]
+function t2._updateRotation(p1, p2, p3)
 	local v1 = os.clock()
 	local v2 = v1 - p1._lastDt
 	p1._lastDt = v1
@@ -164,7 +165,7 @@ function t2._updateRotation(p1, p2, p3) --[[ Line: 193 | Upvalues: MilitaryTurre
 	p1._motorBase.C1 = CFrame.Angles(0, v16, 0)
 	p1._motorArm.C1 = CFrame.Angles(0, v16, 0) * CFrame.Angles(v15, 0, 0) * CFrame.new(0, 0, v3)
 end
-function t2._fire(p1, p2) --[[ Line: 224 | Upvalues: Audio (copy), t (copy) ]]
+function t2._fire(p1, p2)
 	local v1 = p2.Top.Tip.CFrame
 	p1._bulletEmitter:Emit(v1.p, v1.LookVector + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 0.008, 400)
 	p1._kickSpring:Accelerate(40)
@@ -172,7 +173,7 @@ function t2._fire(p1, p2) --[[ Line: 224 | Upvalues: Audio (copy), t (copy) ]]
 		Volume = 0.5
 	})
 end
-function t2.Destroy(p1) --[[ Line: 232 ]]
+function t2.Destroy(p1)
 	local _maid = p1._maid
 	p1._maid = nil
 	_maid:Destroy()

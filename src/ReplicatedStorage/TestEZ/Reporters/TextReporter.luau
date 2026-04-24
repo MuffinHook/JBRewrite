@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local TestService = game:GetService("TestService")
 local TestEnum = require(script.Parent.Parent.TestEnum)
 local v1 = (" "):rep(3)
@@ -7,10 +8,10 @@ local t = {
 	[TestEnum.TestStatus.Skipped] = "~"
 }
 local t2 = {}
-local function compareNodes(p1, p2) --[[ Line: 20 ]]
+local function compareNodes(p1, p2)
 	return p1.planNode.phrase:lower() < p2.planNode.phrase:lower()
 end
-local function v2(p1, p2, p3) --[[ Line: 24 | Upvalues: TestEnum (copy), t (copy), v1 (copy), compareNodes (copy), v2 (copy) ]]
+local function v2(p1, p2, p3)
 	local v12 = p2 or {}
 	local v22 = p3 or 0
 	if p1.status == TestEnum.TestStatus.Skipped then
@@ -25,7 +26,7 @@ local function v2(p1, p2, p3) --[[ Line: 24 | Upvalues: TestEnum (copy), t (copy
 		return v7
 	end
 end
-local function reportRoot(p1) --[[ Line: 59 | Upvalues: compareNodes (copy), v2 (copy) ]]
+local function reportRoot(p1)
 	table.sort(p1.children, compareNodes)
 	local t = {}
 	for i, v in ipairs(p1.children) do
@@ -33,10 +34,10 @@ local function reportRoot(p1) --[[ Line: 59 | Upvalues: compareNodes (copy), v2 
 	end
 	return t
 end
-local function report(p1) --[[ Line: 70 | Upvalues: reportRoot (copy) ]]
+local function report(p1)
 	return table.concat(reportRoot(p1), "\n")
 end
-function t2.report(p1) --[[ Line: 76 | Upvalues: reportRoot (copy), TestService (copy) ]]
+function t2.report(p1)
 	local t = {}
 	local v1 = reportRoot(p1)
 	t[1] = "Test results:"

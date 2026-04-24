@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -9,24 +10,24 @@ local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local v1 = 0
-UserInputService.InputBegan:Connect(function(p1) --[[ Line: 14 | Upvalues: v1 (ref) ]]
+UserInputService.InputBegan:Connect(function(p1)
 	if p1.UserInputType ~= Enum.UserInputType.Gamepad1 then
 		v1 = os.clock()
 	end
 end)
-UserInputService.InputChanged:Connect(function(p1) --[[ Line: 19 | Upvalues: v1 (ref) ]]
+UserInputService.InputChanged:Connect(function(p1)
 	if p1.UserInputType ~= Enum.UserInputType.Gamepad1 then
 		v1 = os.clock()
 	end
 end)
-local function canAimAssist() --[[ Line: 25 | Upvalues: Players (copy), InputUtils (copy), v1 (ref) ]]
+local function canAimAssist()
 	if Players.LocalPlayer:GetAttribute("AimbotEnabled") then
 		return true
 	else
 		return InputUtils.isGamepad() and os.clock() - v1 > 10 and true or false
 	end
 end
-local function hasLineOfSight(p1, p2) --[[ Line: 37 | Upvalues: Players (copy) ]]
+local function hasLineOfSight(p1, p2)
 	local Position = workspace.CurrentCamera.CFrame.Position
 	local v1 = RaycastParams.new()
 	v1.FilterType = Enum.RaycastFilterType.Exclude
@@ -41,17 +42,17 @@ local function hasLineOfSight(p1, p2) --[[ Line: 37 | Upvalues: Players (copy) ]
 	end
 end
 return {
-	aimAssist = function(p1, p2) --[[ Name: aimAssist | Line: 61 | Upvalues: Maid (copy), Players (copy), PlayerUtils (copy), hasLineOfSight (copy), CollectionService (copy), RunService (copy), InputUtils (copy), v1 (ref) ]]
+	aimAssist = function(p1, p2)
 		local v12 = Maid.new()
 		local CurrentCamera = workspace.CurrentCamera
 		local v2 = Players.LocalPlayer:GetAttribute("AimbotEnabled") == true
 		local v3 = Players.LocalPlayer.Character:GetPivot()
 		local Position = v3.Position
 		local LookVector = v3.LookVector
-		local function findBestCharacter() --[[ Line: 68 | Upvalues: Players (ref), PlayerUtils (ref), hasLineOfSight (ref), Position (copy), LookVector (copy), CollectionService (ref) ]]
+		local function findBestCharacter()
 			local t = {}
 			local t2 = {}
-			local function handleCharacter(p1) --[[ Line: 71 | Upvalues: t2 (copy), Players (ref), PlayerUtils (ref), hasLineOfSight (ref), t (copy), Position (ref), LookVector (ref) ]]
+			local function handleCharacter(p1)
 				if t2[p1] then
 					return
 				end
@@ -85,7 +86,7 @@ return {
 			for v1, v2 in CollectionService:GetTagged("Humanoid") do
 				handleCharacter(v2.Parent)
 			end
-			table.sort(t, function(p1, p2) --[[ Line: 117 ]]
+			table.sort(t, function(p1, p2)
 				return p1.dot > p2.dot
 			end)
 			for i = 1, #t do
@@ -99,7 +100,7 @@ return {
 		local v4 = findBestCharacter()
 		if v4 then
 			local part = v4.part
-			v12:GiveTask(RunService.RenderStepped:Connect(function(p12) --[[ Line: 133 | Upvalues: CurrentCamera (copy), part (copy), v4 (copy), p1 (copy), hasLineOfSight (ref), p2 (copy), Players (ref), v2 (copy), InputUtils (ref), v1 (ref) ]]
+			v12:GiveTask(RunService.RenderStepped:Connect(function(p12)
 				local v12 = CFrame.lookAt(CurrentCamera.CFrame.Position, part.CFrame * v4.offset)
 				local v22 = p1:GetMouseLocation()
 				local v3 = CurrentCamera:ViewportPointToRay(v22.X, v22.Y, 0)

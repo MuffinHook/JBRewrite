@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
+return function(p1, p2)
 	local v1 = false
 	local v2 = nil
 	local t = {}
-	local function EmptyMenuStack(p12) --[[ Line: 8 | Upvalues: t (copy), p1 (copy), v1 (ref), v2 (ref) ]]
+	local function EmptyMenuStack(p12)
 		for i = #t, p12 and p12 + 1 or 1, -1 do
 			local v3 = t[i]
 			v3.state.isOpened:set(false)
@@ -16,7 +17,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			v2 = nil
 		end
 	end
-	local function UpdateChildContainerTransform(p12) --[[ Line: 25 | Upvalues: p2 (copy), p1 (copy) ]]
+	local function UpdateChildContainerTransform(p12)
 		local isType = p12.parentWidget.type == "Menu"
 		local v1 = p12.Instance
 		local ChildContainer = p12.ChildContainer
@@ -45,7 +46,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			ChildContainer.AnchorPoint = zero
 		end
 	end
-	p2.registerEvent("InputBegan", function(p12) --[[ Line: 65 | Upvalues: p1 (copy), v1 (ref), v2 (ref), p2 (copy), t (copy), EmptyMenuStack (copy) ]]
+	p2.registerEvent("InputBegan", function(p12)
 		if p1._started and ((p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.MouseButton2) and (v1 ~= false and v2 ~= nil)) then
 			local v12 = p2.getMouseLocation()
 			local v22 = false
@@ -71,7 +72,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 		hasChildren = true,
 		Args = {},
 		Events = {},
-		Generate = function(p12) --[[ Name: Generate | Line: 107 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_MenuBar = Instance.new("Frame")
 			Iris_MenuBar.Name = "Iris_MenuBar"
 			Iris_MenuBar.AutomaticSize = Enum.AutomaticSize.Y
@@ -85,11 +86,11 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p2.applyFrameStyle(Iris_MenuBar, true, true)
 			return Iris_MenuBar
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 123 ]] end,
-		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 126 ]]
+		Update = function(p1) end,
+		ChildAdded = function(p1, p2)
 			return p1.Instance
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 129 ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	})
@@ -100,26 +101,26 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Text = 1
 		},
 		Events = {
-			clicked = p2.EVENTS.click(function(p1) --[[ Line: 142 ]]
+			clicked = p2.EVENTS.click(function(p1)
 				return p1.Instance
 			end),
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 145 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end),
 			opened = {
-				Init = function(p1) --[[ Line: 149 ]] end,
-				Get = function(p12) --[[ Line: 150 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastOpenedTick == p1._cycleTick
 				end
 			},
 			closed = {
-				Init = function(p1) --[[ Line: 155 ]] end,
-				Get = function(p12) --[[ Line: 156 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastClosedTick == p1._cycleTick
 				end
 			}
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 161 | Upvalues: p1 (copy), p2 (copy), t (copy), v1 (ref), v2 (ref), EmptyMenuStack (copy) ]]
+		Generate = function(p12)
 			p12.ButtonColors = {
 				Color = p1._config.HeaderColor,
 				Transparency = 1,
@@ -178,7 +179,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				v12 = Menu
 			end
 			p2.applyInteractionHighlights("Background", v12, v12, p12.ButtonColors)
-			p2.applyButtonClick(v12, function() --[[ Line: 229 | Upvalues: t (ref), p12 (copy), v1 (ref), v2 (ref) ]]
+			p2.applyButtonClick(v12, function()
 				local v12 = if #t <= 1 then not p12.state.isOpened.value else true
 				p12.state.isOpened:set(v12)
 				v1 = v12
@@ -191,7 +192,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 					table.remove(t)
 				end
 			end)
-			p2.applyMouseEnter(v12, function() --[[ Line: 245 | Upvalues: v1 (ref), v2 (ref), p12 (copy), t (ref), EmptyMenuStack (ref) ]]
+			p2.applyMouseEnter(v12, function()
 				if v1 and (v2 and v2 ~= p12) then
 					EmptyMenuStack((table.find(t, p12.parentWidget)))
 					p12.state.isOpened:set(true)
@@ -226,23 +227,23 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p12.ChildContainer = MenuContainer
 			return v12
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 297 ]]
+		Update = function(p1)
 			local v1 = p1.Instance;
 			(if p1.parentWidget.type == "Menu" then v1.TextLabel else v1).Text = p1.arguments.Text or "Menu"
 		end,
-		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 307 | Upvalues: UpdateChildContainerTransform (copy) ]]
+		ChildAdded = function(p1, p2)
 			UpdateChildContainerTransform(p1)
 			return p1.ChildContainer
 		end,
-		ChildDiscarded = function(p1, p2) --[[ Name: ChildDiscarded | Line: 311 | Upvalues: UpdateChildContainerTransform (copy) ]]
+		ChildDiscarded = function(p1, p2)
 			UpdateChildContainerTransform(p1)
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 314 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.isOpened == nil then
 				p12.state.isOpened = p1._widgetState(p12, "isOpened", false)
 			end
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 319 | Upvalues: p1 (copy), UpdateChildContainerTransform (copy) ]]
+		UpdateState = function(p12)
 			local ChildContainer = p12.ChildContainer
 			if p12.state.isOpened.value then
 				p12.lastOpenedTick = p1._cycleTick + 1
@@ -255,7 +256,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				ChildContainer.Visible = false
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 334 | Upvalues: v1 (ref), t (copy), EmptyMenuStack (copy), v2 (ref), p2 (copy) ]]
+		Discard = function(p1)
 			if v1 then
 				local parentWidget = p1.parentWidget
 				local v12 = table.find(t, parentWidget)
@@ -281,14 +282,14 @@ return function(p1, p2) --[[ Line: 3 ]]
 			ModifierKey = 3
 		},
 		Events = {
-			clicked = p2.EVENTS.click(function(p1) --[[ Line: 364 ]]
+			clicked = p2.EVENTS.click(function(p1)
 				return p1.Instance
 			end),
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 367 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 371 | Upvalues: p2 (copy), p1 (copy), EmptyMenuStack (copy), v1 (ref), v2 (ref), t (copy) ]]
+		Generate = function(p12)
 			local Iris_MenuItem = Instance.new("TextButton")
 			Iris_MenuItem.Name = "Iris_MenuItem"
 			Iris_MenuItem.AutomaticSize = Enum.AutomaticSize.Y
@@ -308,10 +309,10 @@ return function(p1, p2) --[[ Line: 3 ]]
 				ActiveColor = p1._config.HeaderHoveredColor,
 				ActiveTransparency = p1._config.HeaderHoveredTransparency
 			})
-			p2.applyButtonClick(Iris_MenuItem, function() --[[ Line: 394 | Upvalues: EmptyMenuStack (ref) ]]
+			p2.applyButtonClick(Iris_MenuItem, function()
 				EmptyMenuStack()
 			end)
-			p2.applyMouseEnter(Iris_MenuItem, function() --[[ Line: 398 | Upvalues: p12 (copy), v1 (ref), v2 (ref), t (ref), EmptyMenuStack (ref) ]]
+			p2.applyMouseEnter(Iris_MenuItem, function()
 				local parentWidget = p12.parentWidget
 				if v1 and (v2 and v2 ~= parentWidget) then
 					EmptyMenuStack((table.find(t, parentWidget)))
@@ -339,7 +340,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Shortcut.Parent = Iris_MenuItem
 			return Iris_MenuItem
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 436 ]]
+		Update = function(p1)
 			local v1 = p1.Instance
 			local Shortcut = v1.Shortcut
 			v1.TextLabel.Text = p1.arguments.Text
@@ -351,7 +352,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				Shortcut.Text = p1.arguments.KeyCode.Name
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 450 ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	})
@@ -365,22 +366,22 @@ return function(p1, p2) --[[ Line: 3 ]]
 		},
 		Events = {
 			checked = {
-				Init = function(p1) --[[ Line: 466 ]] end,
-				Get = function(p12) --[[ Line: 467 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastCheckedTick == p1._cycleTick
 				end
 			},
 			unchecked = {
-				Init = function(p1) --[[ Line: 472 ]] end,
-				Get = function(p12) --[[ Line: 473 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastUncheckedTick == p1._cycleTick
 				end
 			},
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 477 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 481 | Upvalues: p2 (copy), p1 (copy), EmptyMenuStack (copy), v1 (ref), v2 (ref), t (copy) ]]
+		Generate = function(p12)
 			local Iris_MenuToggle = Instance.new("TextButton")
 			Iris_MenuToggle.Name = "Iris_MenuToggle"
 			Iris_MenuToggle.AutomaticSize = Enum.AutomaticSize.Y
@@ -400,11 +401,11 @@ return function(p1, p2) --[[ Line: 3 ]]
 				ActiveColor = p1._config.HeaderHoveredColor,
 				ActiveTransparency = p1._config.HeaderHoveredTransparency
 			})
-			p2.applyButtonClick(Iris_MenuToggle, function() --[[ Line: 504 | Upvalues: p12 (copy), EmptyMenuStack (ref) ]]
+			p2.applyButtonClick(Iris_MenuToggle, function()
 				p12.state.isChecked:set(not p12.state.isChecked.value)
 				EmptyMenuStack()
 			end)
-			p2.applyMouseEnter(Iris_MenuToggle, function() --[[ Line: 509 | Upvalues: p12 (copy), v1 (ref), v2 (ref), t (ref), EmptyMenuStack (ref) ]]
+			p2.applyMouseEnter(Iris_MenuToggle, function()
 				local parentWidget = p12.parentWidget
 				if v1 and (v2 and v2 ~= parentWidget) then
 					EmptyMenuStack((table.find(t, parentWidget)))
@@ -444,12 +445,12 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Icon.Parent = Iris_MenuToggle
 			return Iris_MenuToggle
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 563 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.isChecked == nil then
 				p12.state.isChecked = p1._widgetState(p12, "isChecked", false)
 			end
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 568 ]]
+		Update = function(p1)
 			local v1 = p1.Instance
 			local Shortcut = v1.Shortcut
 			v1.TextLabel.Text = p1.arguments.Text
@@ -461,7 +462,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				Shortcut.Text = p1.arguments.KeyCode.Name
 			end
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 582 | Upvalues: p1 (copy) ]]
+		UpdateState = function(p12)
 			local Icon = p12.Instance.Icon
 			if p12.state.isChecked.value then
 				Icon.ImageTransparency = p1._config.TextTransparency
@@ -471,7 +472,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				p12.lastUncheckedTick = p1._cycleTick + 1
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 594 | Upvalues: p2 (copy) ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 			p2.discardState(p1)
 		end

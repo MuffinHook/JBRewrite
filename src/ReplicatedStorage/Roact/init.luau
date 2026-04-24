@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local GlobalConfig = require(script.GlobalConfig)
 local createReconciler = require(script.createReconciler)
 local createReconcilerCompat = require(script.createReconcilerCompat)

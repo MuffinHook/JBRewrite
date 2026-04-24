@@ -1,10 +1,11 @@
-local v1 = Vector3.new
-local v2 = CFrame.new
+-- Reviewed by Claude
+local createVector3 = Vector3.new
+local createCFrame = CFrame.new
 local Angles = CFrame.Angles
-local v3 = Vector3.new(0, 0, 0)
-local v4 = v2()
-local Cross = v3.Cross
-local Dot = v3.Dot
+local zeroVector3 = Vector3.new(0, 0, 0)
+local identityCFrame = createCFrame()
+local Cross = zeroVector3.Cross
+local Dot = zeroVector3.Dot
 local cos = math.cos
 local sin = math.sin
 local tan = math.tan
@@ -12,222 +13,221 @@ local acos = math.acos
 local asin = math.asin
 local atan2 = math.atan2
 local atan = math.atan
-local components = v4.components
-local inverse = v4.inverse
+local components = identityCFrame.components
+local inverse = identityCFrame.inverse
 local fromAxisAngle = CFrame.fromAxisAngle
 local abs = math.abs
 local floor = math.floor
 local random = math.random
-local pointToObjectSpace = v4.pointToObjectSpace
+local pointToObjectSpace = identityCFrame.pointToObjectSpace
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local String = require(ReplicatedStorage.Std.String)
 local t = {
-	ContinuousSpring1 = function(p1, p2, p3, p4, p5, p6) --[[ Name: ContinuousSpring1 | Line: 29 ]]
-		return p2 + p3 * p6 * p4, p3 + (p1 - p2 - p3) * p6 * p5
+	ContinuousSpring1 = function(target, position, velocity, stiffness, damping, deltaTime)
+		return position + velocity * deltaTime * stiffness, velocity + (target - position - velocity) * deltaTime * damping
 	end
 }
 t.ContinuousSpring3 = t.ContinuousSpring1
-function t.ContinuousSpring3F(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12) --[[ Line: 33 ]]
-	return p4 + p7 * p12 * p10, p6 + p9 * p12 * p10, p6 + p9 * p12 * p10, p7 + (p1 - p4 - p7) * p12 * p11, p8 + (p2 - p5 - p8) * p12 * p11, p9 + (p3 - p6 - p9) * p12 * p11
+function t.ContinuousSpring3F(targetX, targetY, targetZ, posX, posY, posZ, velX, velY, velZ, stiffness, damping, deltaTime)
+	return posX + velX * deltaTime * stiffness, posY + velY * deltaTime * stiffness, posZ + velZ * deltaTime * stiffness, velX + (targetX - posX - velX) * deltaTime * damping, velY + (targetY - posY - velY) * deltaTime * damping, velZ + (targetZ - posZ - velZ) * deltaTime * damping
 end
-function t.MakeSpring(p1, p2, p3) --[[ Line: 45 ]]
-	local v1 = if typeof(p1) == "Vector3" then Vector3.new(0, 0, 0) else 0
+function t.MakeSpring(target, stiffness, damping)
+	local initialVelocity = if typeof(target) == "Vector3" then Vector3.new(0, 0, 0) else 0
 	return {
-		t = p1,
-		p = p1 or v1,
-		v = v1,
-		s = p2 or 10,
-		d = p3 or 0.5,
+		t = target,
+		p = target or initialVelocity,
+		v = initialVelocity,
+		s = stiffness or 10,
+		d = damping or 0.5,
 		t0 = 0
 	}
 end
-function t.Spring(p1, p2) --[[ Line: 56 | Upvalues: cos (copy), sin (copy) ]]
-	local v1 = tick()
-	local t = p1.t
-	local p = p1.p
-	local v = p1.v
-	local s = p1.s
-	local d = p1.d
-	local v2 = v1 - p1.t0
-	if s == 0 then
-		return p, v
+function t.Spring(spring, currentTime)
+	local currentClock = tick()
+	local target = spring.t
+	local position = spring.p
+	local velocity = spring.v
+	local stiffness = spring.s
+	local damping = spring.d
+	local elapsedTime = currentClock - spring.t0
+	if stiffness == 0 then
+		return position, velocity
 	end
-	if d < 1 then
-		local v3 = (1 - d * d) ^ 0.5
-		local v4 = p - t
-		local v5 = (d * v4 + v / s) / v3
-		local v6 = 2.718281828459045 ^ (-d * s * v2)
-		local v7 = cos(v3 * s * v2)
-		local v8 = sin(v3 * s * v2)
-		return t + (v4 * v7 + v5 * v8) * v6, ((v4 * d - d * v5 - v) * v7 + (v4 * v3 + v5 * d) * v8) * -v6
+	if damping < 1 then
+		local dampingFactor = (1 - damping * damping) ^ 0.5
+		local positionDelta = position - target
+		local intermediateValue = (damping * positionDelta + velocity / stiffness) / dampingFactor
+		local exponentialDecay = 2.718281828459045 ^ (-damping * stiffness * elapsedTime)
+		local cosComponent = cos(dampingFactor * stiffness * elapsedTime)
+		local sinComponent = sin(dampingFactor * stiffness * elapsedTime)
+		return target + (positionDelta * cosComponent + intermediateValue * sinComponent) * exponentialDecay, ((positionDelta * damping - damping * intermediateValue - velocity) * cosComponent + (positionDelta * dampingFactor + intermediateValue * damping) * sinComponent) * -exponentialDecay
 	end
-	if not (d > 1) then
-		local v9 = p - t
-		local v10 = v9 + v / s
-		local v11 = 2.718281828459045 ^ (-s * v2)
-		return t + (v9 + v10 * s * v2) * v11, s * (v10 - v9 - v10 * s * v2) * v11
+	if not (damping > 1) then
+		local positionDelta = position - target
+		local intermediateValue = positionDelta + velocity / stiffness
+		local exponentialDecay = 2.718281828459045 ^ (-stiffness * elapsedTime)
+		return target + (positionDelta + intermediateValue * stiffness * elapsedTime) * exponentialDecay, stiffness * (intermediateValue - positionDelta - intermediateValue * stiffness * elapsedTime) * exponentialDecay
 	end
 	assert(false, "not implemented")
 end
-function t.SpringSetTarget(p1, p2) --[[ Line: 79 | Upvalues: t (copy) ]]
-	local v1 = tick()
-	local v2, v3 = t.Spring(p1, v1)
-	p1.p = v2
-	p1.v = v3
-	p1.t0 = v1
-	p1.t = p2
+function t.SpringSetTarget(spring, targetValue)
+	local currentClock = tick()
+	local newPosition, newVelocity = t.Spring(spring, currentClock)
+	spring.p = newPosition
+	spring.v = newVelocity
+	spring.t0 = currentClock
+	spring.t = targetValue
 end
-function t.SpringAccelerate(p1, p2) --[[ Line: 87 | Upvalues: t (copy) ]]
-	local v1 = tick()
-	local v2, v3 = t.Spring(p1, v1)
-	p1.p = v2
-	p1.v = v3 + p2
-	p1.t0 = v1
+function t.SpringAccelerate(spring, acceleration)
+	local currentClock = tick()
+	local newPosition, newVelocity = t.Spring(spring, currentClock)
+	spring.p = newPosition
+	spring.v = newVelocity + acceleration
+	spring.t0 = currentClock
 end
-local function MakeWorldSpring() --[[ Line: 95 ]]
+local function MakeWorldSpring()
 	return {
 		Part = nil,
 		Target = nil,
 		k = 200,
 		B = 15,
-		f3 = nil
+		forceVector = nil
 	}
 end
-local function WorldSpringUpdate(p1, p2) --[[ Line: 104 ]]
-	local Part = p1.Part
-	local Target = p1.Target
-	p1.f3 = if Target then p1.k * Target - p1.B * Part.CFrame:vectorToObjectSpace(Part.Velocity) else Vector3.new(0, 0, 0)
+local function WorldSpringUpdate(spring, deltaTime)
+	local Part = spring.Part
+	local Target = spring.Target
+	spring.forceVector = if Target then spring.k * Target - spring.B * Part.CFrame:vectorToObjectSpace(Part.Velocity) else Vector3.new(0, 0, 0)
 end
-local function WorldSpringSetTarget(p1, p2) --[[ Line: 116 ]]
-	p1.Target = p2 - p1.Part.Position
+local function WorldSpringSetTarget(spring, targetPosition)
+	spring.Target = targetPosition - spring.Part.Position
 end
 t.MakeWorldSpring = MakeWorldSpring
 t.WorldSpringUpdate = WorldSpringUpdate
 t.WorldSpringSetTarget = WorldSpringSetTarget
-function t.CrossMagSq(p1, p2) --[[ Line: 130 | Upvalues: Dot (copy) ]]
-	local v1 = Dot(p1, p2)
-	return Dot(p1, p1) * Dot(p2, p2) - v1 * v1
+function t.CrossMagSq(vec1, vec2)
+	local dotProduct = Dot(vec1, vec2)
+	return Dot(vec1, vec1) * Dot(vec2, vec2) - dotProduct * dotProduct
 end
-function t.CrossMagSqF(p1, p2, p3, p4, p5, p6) --[[ Line: 134 ]]
-	local v1 = p1 * p4 + p2 * p5 + p3 * p6
-	return (p1 * p1 + p2 * p2 + p3 * p3) * (p4 * p4 + p5 * p5 + p6 * p6) - v1 * v1
+function t.CrossMagSqF(x1, y1, z1, x2, y2, z2)
+	local dotProduct = x1 * x2 + y1 * y2 + z1 * z2
+	return (x1 * x1 + y1 * y1 + z1 * z1) * (x2 * x2 + y2 * y2 + z2 * z2) - dotProduct * dotProduct
 end
-function t.CFrameFromAxisAngle(p1) --[[ Line: 138 | Upvalues: Dot (copy), sin (copy), v2 (copy), cos (copy), v4 (copy) ]]
-	local v1 = Dot(p1, p1) ^ 0.5
-	if v1 > 1e-6 then
-		local v22 = sin(v1 * 0.5) / v1
-		return v2(0, 0, 0, v22 * p1.x, v22 * p1.y, v22 * p1.z, (cos(v1 * 0.5)))
+function t.CFrameFromAxisAngle(axisAngle)
+	local magnitude = Dot(axisAngle, axisAngle) ^ 0.5
+	if magnitude > 1e-6 then
+		local sinHalfMag = sin(magnitude * 0.5) / magnitude
+		return createCFrame(0, 0, 0, sinHalfMag * axisAngle.x, sinHalfMag * axisAngle.y, sinHalfMag * axisAngle.z, (cos(magnitude * 0.5)))
 	else
-		return v4
+		return identityCFrame
 	end
 end
-function t.CFrameFromAxisAngleF(p1, p2, p3) --[[ Line: 146 | Upvalues: sin (copy), v2 (copy), cos (copy), v4 (copy) ]]
-	local v1 = (p1 * p1 + p2 * p2 + p3 * p3) ^ 0.5
-	if v1 > 1e-6 then
-		local v22 = sin(v1 * 0.5) / v1
-		return v2(0, 0, 0, v22 * p1, v22 * p2, v22 * p3, (cos(v1 * 0.5)))
+function t.CFrameFromAxisAngleF(axisX, axisY, axisZ)
+	local magnitude = (axisX * axisX + axisY * axisY + axisZ * axisZ) ^ 0.5
+	if magnitude > 1e-6 then
+		local sinHalfMag = sin(magnitude * 0.5) / magnitude
+		return createCFrame(0, 0, 0, sinHalfMag * axisX, sinHalfMag * axisY, sinHalfMag * axisZ, (cos(magnitude * 0.5)))
 	else
-		return v4
+		return identityCFrame
 	end
 end
-function t.CFrameToAxisAngleF(p1, p2, p3, p4, p5, p6, p7, p8, p9) --[[ Line: 154 | Upvalues: acos (copy) ]]
-	local v1 = (p1 + p5 + p9 - 1) * 0.5
-	if v1 < -0.99999 then
-		local v2 = p1 + p2 + p3 + 1
-		local v3 = p4 + p5 + p6 + 1
-		local v4 = p7 + p8 + p9 + 1
-		local v5 = math.pi * (v2 * v2 + v3 * v3 + v4 * v4) ^ (-0.5)
-		return v5 * v2, v5 * v3, v5 * v4
-	elseif v1 < 0.99999 then
-		local v6 = p8 - p6
-		local v7 = p3 - p7
-		local v8 = p4 - p2
-		local v9 = acos(v1) * (v6 * v6 + v7 * v7 + v8 * v8) ^ (-0.5)
-		return v9 * v6, v9 * v7, v9 * v8
+function t.CFrameToAxisAngleF(m00, m01, m02, m10, m11, m12, m20, m21, m22)
+	local traceDiv2 = (m00 + m11 + m22 - 1) * 0.5
+	if traceDiv2 < -0.99999 then
+		local axisX = m00 + m01 + m02 + 1
+		local axisY = m10 + m11 + m12 + 1
+		local axisZ = m20 + m21 + m22 + 1
+		local normalizationFactor = math.pi * (axisX * axisX + axisY * axisY + axisZ * axisZ) ^ (-0.5)
+		return normalizationFactor * axisX, normalizationFactor * axisY, normalizationFactor * axisZ
+	elseif traceDiv2 < 0.99999 then
+		local crossX = m21 - m12
+		local crossY = m02 - m20
+		local crossZ = m10 - m01
+		local angleScaleFactor = acos(traceDiv2) * (crossX * crossX + crossY * crossY + crossZ * crossZ) ^ (-0.5)
+		return angleScaleFactor * crossX, angleScaleFactor * crossY, angleScaleFactor * crossZ
 	else
 		return 0, 0, 0
 	end
 end
-function t.CFrameToAxisAngle(p1) --[[ Line: 173 | Upvalues: components (copy), t (copy), v1 (copy) ]]
-	local _, _2, _3, v12, v2, v3, v4, v5, v6, v7, v8, v9 = components(p1)
-	return v1(t.CFrameToAxisAngleF(v12, v2, v3, v4, v5, v6, v7, v8, v9))
+function t.CFrameToAxisAngle(cframe)
+	local _, _2, _3, m00, m10, m20, m01, m11, m21, m02, m12, m22 = components(cframe)
+	return createVector3(t.CFrameToAxisAngleF(m00, m10, m20, m01, m11, m21, m02, m12, m22))
 end
-function t.UnitVectorToAnglesYXF(p1, p2, p3) --[[ Line: 178 | Upvalues: asin (copy), atan2 (copy) ]]
-	return asin(p2), atan2(-p1, -p3)
+function t.UnitVectorToAnglesYXF(x, y, z)
+	return asin(y), atan2(-x, -z)
 end
-function t.UnitVectorToAnglesYX(p1) --[[ Line: 181 | Upvalues: t (copy) ]]
-	return t.UnitVectorToAnglesYXF(p1.x, p1.y, p1.z)
+function t.UnitVectorToAnglesYX(vector)
+	return t.UnitVectorToAnglesYXF(vector.x, vector.y, vector.z)
 end
-function t.VectorToAnglesYXF(p1, p2, p3) --[[ Line: 184 | Upvalues: asin (copy), atan2 (copy) ]]
-	return asin(p2 / (p1 * p1 + p2 * p2 + p3 * p3) ^ 0.5), atan2(-p1, -p3)
+function t.VectorToAnglesYXF(x, y, z)
+	return asin(y / (x * x + y * y + z * z) ^ 0.5), atan2(-x, -z)
 end
-function t.VectorToAnglesYX(p1) --[[ Line: 187 | Upvalues: t (copy) ]]
-	return t.VectorToAnglesYXF(p1.x, p1.y, p1.z)
+function t.VectorToAnglesYX(vector)
+	return t.VectorToAnglesYXF(vector.x, vector.y, vector.z)
 end
-function t.VectorFromAnglesYX(p1, p2) --[[ Line: 190 | Upvalues: cos (copy), sin (copy), v1 (copy) ]]
-	local v12 = cos(p1)
-	return v1(-v12 * sin(p2), sin(p1), -v12 * cos(p2))
+function t.VectorFromAnglesYX(yaw, pitch)
+	local cosPitch = cos(yaw)
+	return createVector3(-cosPitch * sin(pitch), sin(yaw), -cosPitch * cos(pitch))
 end
-function t.Quaternion(p1, p2) --[[ Line: 202 | Upvalues: Dot (copy), Cross (copy), v2 (copy) ]]
-	local v1 = Dot(p1, p2)
-	local v22 = Cross(p1, p2)
-	local v3 = (2 * (1 + v1)) ^ 0.5
-	return v2(0, 0, 0, v22.x / v3, v22.y / v3, v22.z / v3, (1 + v1) / v3)
+function t.Quaternion(vec1, vec2)
+	local dotProduct = Dot(vec1, vec2)
+	local crossProduct = Cross(vec1, vec2)
+	local normalizationFactor = (2 * (1 + dotProduct)) ^ 0.5
+	return createCFrame(0, 0, 0, crossProduct.x / normalizationFactor, crossProduct.y / normalizationFactor, crossProduct.z / normalizationFactor, (1 + dotProduct) / normalizationFactor)
 end
-function t.QuaternionF(p1, p2, p3, p4, p5, p6) --[[ Line: 208 | Upvalues: v2 (copy) ]]
-	local v1 = 1 + p1 * p4 + p2 * p5 + p3 * p6
-	local v22 = (2 * v1) ^ 0.5
-	return v2(0, 0, 0, (p2 * p6 - p3 * p5) / v22, (p3 * p4 - p1 * p6) / v22, (p1 * p5 - p2 * p4) / v22, v1 / v22)
+function t.QuaternionF(x1, y1, z1, x2, y2, z2)
+	local dotProductPlus1 = 1 + x1 * x2 + y1 * y2 + z1 * z2
+	local normalizationFactor = (2 * dotProductPlus1) ^ 0.5
+	return createCFrame(0, 0, 0, (y1 * z2 - z1 * y2) / normalizationFactor, (z1 * x2 - x1 * z2) / normalizationFactor, (x1 * y2 - y1 * x2) / normalizationFactor, dotProductPlus1 / normalizationFactor)
 end
-function t.AxisAngleInterpolate(p1, p2, p3) --[[ Line: 216 | Upvalues: components (copy), inverse (copy), fromAxisAngle (copy), v1 (copy), acos (copy) ]]
-	local _, _2, _3, v12, v2, v3, v4, v5, v6, v7, v8, v9 = components(inverse(p1) * p2)
-	local v10 = (v12 + v5 + v9 - 1) * 0.5
-	return p1 * fromAxisAngle(v1(v8 - v6, v3 - v7, v4 - v2), acos(if v10 > 1 then 1 elseif v10 < -1 then -1 else v10) * p3) + (p2.p - p1.p) * p3
+function t.AxisAngleInterpolate(startCFrame, endCFrame, alpha)
+	local _, _2, _3, m00, m10, m20, m01, m11, m21, m02, m12, m22 = components(inverse(startCFrame) * endCFrame)
+	local traceDiv2 = (m00 + m11 + m22 - 1) * 0.5
+	return startCFrame * fromAxisAngle(createVector3(m12 - m21, m02 - m20, m10 - m01), acos(if traceDiv2 > 1 then 1 elseif traceDiv2 < -1 then -1 else traceDiv2) * alpha) + (endCFrame.p - startCFrame.p) * alpha
 end
-function t.IsPointInPolygonXZ(p1, p2) --[[ Line: 226 ]]
-	local X = p1.X
-	local Z = p1.Z
-	local v1 = #p2
-	local count = 0
-	local v2 = false
-	local v3 = v1 - 1
-	while not (v1 <= count) do
-		local v4, v5
-		local v6 = p2[count + 1]
-		local v7 = p2[v3 + 1]
-		local X_2 = v6.X
-		local Z_2 = v6.Z
-		local Z_3 = v7.Z
-		v4 = Z < Z_2
-		v5 = Z < Z_3
-		if v4 ~= v5 and X < (v7.X - X_2) * (Z - Z_2) / (Z_3 - Z_2) + X_2 then
-			v2 = not v2
+function t.IsPointInPolygonXZ(point, polygonPoints)
+	local X = point.X
+	local Z = point.Z
+	local pointCount = #polygonPoints
+	local index = 0
+	local isInside = false
+	local prevIndex = pointCount - 1
+	while not (pointCount <= index) do
+		local currentPoint = polygonPoints[index + 1]
+		local previousPoint = polygonPoints[prevIndex + 1]
+		local currentX = currentPoint.X
+		local currentZ = currentPoint.Z
+		local previousZ = previousPoint.Z
+		local isZBetween = Z < currentZ
+		local isZPrevBetween = Z < previousZ
+		if isZBetween ~= isZPrevBetween and X < (previousPoint.X - currentX) * (Z - currentZ) / (previousZ - currentZ) + currentX then
+			isInside = not isInside
 		end
-		count, v3 = count + 1, count
+		index, prevIndex = index + 1, index
 	end
-	return v2
+	return isInside
 end
-function t.IsPointInRectangleYZ(p1, p2, p3) --[[ Line: 244 ]]
-	local v1 = p2:pointToObjectSpace(p1) + p3 * 0.5
-	return if v1.y >= 0 and (v1.y < p3.y and v1.z >= 0) then v1.z < p3.z else false
+function t.IsPointInRectangleYZ(point, cframeRef, dimensions)
+	local localPoint = cframeRef:pointToObjectSpace(point) + dimensions * 0.5
+	return if localPoint.y >= 0 and (localPoint.y < dimensions.y and localPoint.z >= 0) then localPoint.z < dimensions.z else false
 end
-function t.IsPointInRectangleXY(p1, p2, p3) --[[ Line: 248 ]]
-	local v1 = p2:pointToObjectSpace(p1) + p3 * 0.5
-	return if v1.x >= 0 and (v1.x < p3.x and v1.y >= 0) then v1.y < p3.y else false
+function t.IsPointInRectangleXY(point, cframeRef, dimensions)
+	local localPoint = cframeRef:pointToObjectSpace(point) + dimensions * 0.5
+	return if localPoint.x >= 0 and (localPoint.x < dimensions.x and localPoint.y >= 0) then localPoint.y < dimensions.y else false
 end
-function t.IsPointInRectangleXZ(p1, p2, p3) --[[ Line: 252 ]]
-	local v1 = p2:pointToObjectSpace(p1) + p3 * 0.5
-	return if v1.x >= 0 and (v1.x < p3.x and v1.z >= 0) then v1.z < p3.z else false
+function t.IsPointInRectangleXZ(point, cframeRef, dimensions)
+	local localPoint = cframeRef:pointToObjectSpace(point) + dimensions * 0.5
+	return if localPoint.x >= 0 and (localPoint.x < dimensions.x and localPoint.z >= 0) then localPoint.z < dimensions.z else false
 end
-function t.IsPointInPrism(p1, p2, p3) --[[ Line: 256 ]]
-	local v1 = p2:pointToObjectSpace(p1) + p3 * 0.5
-	return if v1.x >= 0 and (v1.x < p3.x and (v1.y >= 0 and (v1.y < p3.y and v1.z >= 0))) then v1.z < p3.z else false
+function t.IsPointInPrism(point, cframeRef, dimensions)
+	local localPoint = cframeRef:pointToObjectSpace(point) + dimensions * 0.5
+	return if localPoint.x >= 0 and (localPoint.x < dimensions.x and (localPoint.y >= 0 and (localPoint.y < dimensions.y and localPoint.z >= 0))) then localPoint.z < dimensions.z else false
 end
-function t.IsPointInFixedCone(p1, p2, p3, p4) --[[ Line: 260 | Upvalues: Dot (copy), acos (copy) ]]
+function t.IsPointInFixedCone(p1, p2, p3, p4)
 	local v1 = p4 - p1.p
 	return if -p3 <= v1.z then acos((Dot(p1.lookVector, v1.unit))) <= p2 else false
 end
-function t.DoesFixedConeIntersectSphere(p1, p2, p3, p4, p5, p6) --[[ Line: 265 | Upvalues: tan (copy), cos (copy) ]]
+function t.DoesFixedConeIntersectSphere(p1, p2, p3, p4, p5, p6)
 	local v1 = p5 - p1
 	if p3 <= p2:Dot(v1) then
 		return false
@@ -237,16 +237,16 @@ function t.DoesFixedConeIntersectSphere(p1, p2, p3, p4, p5, p6) --[[ Line: 265 |
 		return ((v1:Dot(v1) - v2 * v2) ^ 0.5 - v3) * cos(p4) <= p6
 	end
 end
-function t.TopPoint(p1, p2) --[[ Line: 286 | Upvalues: v1 (copy) ]]
+function t.TopPoint(p1, p2)
 	return p1 * v1(0, p2.y * 0.5, 0)
 end
-function t.BottomPoint(p1, p2) --[[ Line: 289 | Upvalues: t (copy) ]]
+function t.BottomPoint(p1, p2)
 	return t.TopPoint(p1, -p2)
 end
-function t.Normal(p1) --[[ Line: 299 ]]
+function t.Normal(p1)
 	return p1.upVector
 end
-function t.IntersectRayPlane(p1, p2, p3, p4) --[[ Line: 303 | Upvalues: Dot (copy), abs (copy) ]]
+function t.IntersectRayPlane(p1, p2, p3, p4)
 	local v1 = Dot(p4, p2)
 	if not (abs(v1) < 1e-6) then
 		local v2 = Dot(p4, p3 - p1) / v1
@@ -255,27 +255,27 @@ function t.IntersectRayPlane(p1, p2, p3, p4) --[[ Line: 303 | Upvalues: Dot (cop
 		end
 	end
 end
-function t.IntersectRectanglesByCornersF(p1, p2, p3, p4, p5, p6, p7, p8) --[[ Line: 316 ]]
+function t.IntersectRectanglesByCornersF(p1, p2, p3, p4, p5, p6, p7, p8)
 	return not if p7 <= p1 or (p3 <= p5 or p8 <= p2) then true else p4 <= p6
 end
-function t.IntersectRectanglesF(p1, p2, p3, p4, p5, p6, p7, p8) --[[ Line: 319 | Upvalues: t (copy) ]]
+function t.IntersectRectanglesF(p1, p2, p3, p4, p5, p6, p7, p8)
 	local v1 = 0.5 * p5
 	local v2 = 0.5 * p6
 	local v3 = 0.5 * p7
 	local v4 = 0.5 * p8
 	return t.IntersectRectanglesByCornersF(p1 - v1, p2 - v2, p1 + v1, p2 + v2, p3 - v3, p4 - v4, p3 + v3, p4 + v4)
 end
-function t.IntersectRectanglesXZ(p1, p2, p3, p4) --[[ Line: 325 | Upvalues: t (copy) ]]
+function t.IntersectRectanglesXZ(p1, p2, p3, p4)
 	return t.IntersectRectanglesF(p1.x, p1.z, p2.x, p2.z, p3.x, p3.z, p4.x, p4.z)
 end
-function t.Round(p1, p2) --[[ Line: 328 | Upvalues: floor (copy) ]]
+function t.Round(p1, p2)
 	return floor(p1 / p2 + 0.5) * p2
 end
-function t.RoundVec(p1, p2) --[[ Line: 331 | Upvalues: floor (copy), v1 (copy) ]]
+function t.RoundVec(p1, p2)
 	return v1(floor(p1.x / p2 + 0.5) * p2, floor(p1.y / p2 + 0.5) * p2, floor(p1.z / p2 + 0.5) * p2)
 end
 t.Clamp = math.clamp
-function t.AABBXZF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12) --[[ Line: 336 ]]
+function t.AABBXZF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12)
 	local v1 = 0.5 * p10
 	local v2 = 0.5 * p12
 	local v3 = -p1 * v1 - p3 * v2
@@ -320,11 +320,11 @@ function t.AABBXZF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12) --[[ Line:
 	end
 	return v7 - v3, v8 - v4
 end
-function t.AABBXZ(p1, p2) --[[ Line: 375 | Upvalues: components (copy), t (copy) ]]
+function t.AABBXZ(p1, p2)
 	local _, _2, _3, v1, v2, v3, v4, v5, v6, v7, v8, v9 = components(p1)
 	return t.AABBXZF(v1, v2, v3, v4, v5, v6, v7, v8, v9, p2.x, p2.y, p2.z)
 end
-function t.IsPrismVisibleD(p1, p2, p3) --[[ Line: 380 | Upvalues: components (copy), acos (copy) ]]
+function t.IsPrismVisibleD(p1, p2, p3)
 	local lookVector = p2.lookVector
 	local x = p2.x
 	local y = p2.y
@@ -382,7 +382,7 @@ function t.IsPrismVisibleD(p1, p2, p3) --[[ Line: 380 | Upvalues: components (co
 		end
 	end
 end
-function t.IsPrismVisible(p1, p2, p3, p4) --[[ Line: 425 | Upvalues: v1 (copy) ]]
+function t.IsPrismVisible(p1, p2, p3, p4)
 	local v12 = 0.5 * p4
 	local x = v12.x
 	local y = v12.y
@@ -420,7 +420,7 @@ function t.IsPrismVisible(p1, p2, p3, p4) --[[ Line: 425 | Upvalues: v1 (copy) ]
 		return true
 	end
 end
-function t.IsPrismApproxVisible(p1, p2, p3, p4) --[[ Line: 469 | Upvalues: v1 (copy) ]]
+function t.IsPrismApproxVisible(p1, p2, p3, p4)
 	local v12 = 0.5 * p4 * 2
 	local x = v12.x
 	local y = v12.y
@@ -433,7 +433,7 @@ function t.IsPrismApproxVisible(p1, p2, p3, p4) --[[ Line: 469 | Upvalues: v1 (c
 		return v3 and true or false
 	end
 end
-local function IntersectRaySphereF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11) --[[ Line: 496 ]]
+local function IntersectRaySphereF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 	local v1 = p8 - p1
 	local v2 = p9 - p2
 	local v3 = p10 - p3
@@ -450,7 +450,7 @@ local function IntersectRaySphereF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 		end
 	end
 end
-local function IntersectRaySphere(p1, p2, p3, p4, p5) --[[ Line: 523 ]]
+local function IntersectRaySphere(p1, p2, p3, p4, p5)
 	local v1 = p4.x - p1.x
 	local v2 = p4.y - p1.y
 	local v3 = p4.z - p1.z
@@ -469,18 +469,18 @@ local function IntersectRaySphere(p1, p2, p3, p4, p5) --[[ Line: 523 ]]
 end
 t.IntersectRaySphereF = IntersectRaySphereF
 t.IntersectRaySphere = IntersectRaySphere
-function t.GUID() --[[ Line: 541 | Upvalues: random (copy) ]]
-	return ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(p1) --[[ Line: 543 | Upvalues: random (ref) ]]
+function t.GUID()
+	return ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(p1)
 		return ("%x"):format(p1 == "x" and random(0, 15) or random(8, 11))
 	end)
 end
-function t.ShortGUID() --[[ Line: 548 | Upvalues: random (copy) ]]
-	return ("xxx-yx"):gsub("[xy]", function(p1) --[[ Line: 550 | Upvalues: random (ref) ]]
+function t.ShortGUID()
+	return ("xxx-yx"):gsub("[xy]", function(p1)
 		return ("%x"):format(p1 == "x" and random(0, 15) or random(8, 11))
 	end)
 end
 t.Base85UUID = String.base85UUID
-function t.Uniform2D(p1) --[[ Line: 556 | Upvalues: random (copy), cos (copy), sin (copy), v1 (copy) ]]
+function t.Uniform2D(p1)
 	local v12 = random()
 	local v2 = random()
 	local v3
@@ -492,7 +492,7 @@ function t.Uniform2D(p1) --[[ Line: 556 | Upvalues: random (copy), cos (copy), s
 	return v1(v2 * p1 * cos(6.283185307179586 * v3 / v2), v2 * p1 * sin(6.283185307179586 * v3 / v2), 0)
 end
 local v5 = Random.new()
-function t.WeightedRandom(p1) --[[ Line: 566 | Upvalues: v5 (copy) ]]
+function t.WeightedRandom(p1)
 	for i = 1, 10 do
 		v5:NextNumber()
 	end
@@ -509,13 +509,13 @@ function t.WeightedRandom(p1) --[[ Line: 566 | Upvalues: v5 (copy) ]]
 	end
 	return false
 end
-function t.LookAt(p1, p2, p3) --[[ Line: 584 | Upvalues: Cross (copy), v2 (copy) ]]
+function t.LookAt(p1, p2, p3)
 	local unit = (p2 - p3).unit
 	local unit_2 = Cross(p1, unit).unit
 	local v1 = Cross(unit, unit_2)
 	return v2(p2.X, p2.Y, p2.Z, unit_2.x, v1.x, unit.x, unit_2.y, v1.y, unit.y, unit_2.z, v1.z, unit.z)
 end
-function t.BinaryFind(p1, p2, p3) --[[ Line: 590 | Upvalues: floor (copy) ]]
+function t.BinaryFind(p1, p2, p3)
 	local v1 = 1
 	local v2 = #p1
 	local v3 = p3 or "Sort"
@@ -533,7 +533,7 @@ function t.BinaryFind(p1, p2, p3) --[[ Line: 590 | Upvalues: floor (copy) ]]
 	end
 	return v1
 end
-function t.Shuffle(p1) --[[ Line: 606 ]]
+function t.Shuffle(p1)
 	for i = #p1, 2, -1 do
 		local v1 = math.random(i)
 		local v3 = p1[i]
@@ -541,13 +541,13 @@ function t.Shuffle(p1) --[[ Line: 606 ]]
 		p1[v1] = v3
 	end
 end
-function t.IsNaN(p1) --[[ Line: 612 ]]
+function t.IsNaN(p1)
 	return p1 ~= p1
 end
-function t.IsNaNv3(p1) --[[ Line: 615 ]]
+function t.IsNaNv3(p1)
 	return if p1.x == p1.x and p1.y == p1.y then p1.z ~= p1.z else true
 end
-function t.IsNaNcf(p1) --[[ Line: 619 ]]
+function t.IsNaNcf(p1)
 	local lookVector = p1.lookVector
 	local v1 = if lookVector.x == lookVector.x and lookVector.y == lookVector.y then lookVector.z ~= lookVector.z else true
 	if not v1 then
@@ -560,46 +560,46 @@ function t.IsNaNcf(p1) --[[ Line: 619 ]]
 	end
 	return v1
 end
-function t.Clampv3(p1, p2, p3) --[[ Line: 622 | Upvalues: v1 (copy) ]]
+function t.Clampv3(p1, p2, p3)
 	return v1(math.clamp(p1.x, p2, p3), math.clamp(p1.y, p2, p3), (math.clamp(p1.z, p2, p3)))
 end
-local function comma(p1) --[[ Line: 626 ]]
+local function comma(p1)
 	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
 	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
 end
-local function FormatMoney(p1) --[[ Line: 630 | Upvalues: abs (copy) ]]
+local function FormatMoney(p1)
 	local v3, v4, v5 = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
 	return ("%s$%s"):format(if p1 >= 0 then "" else "-", v3 .. v4:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v5)
 end
 t.comma = comma
 t.FormatMoney = FormatMoney
-function t.stohms(p1) --[[ Line: 639 ]]
+function t.stohms(p1)
 	local v1 = math.floor(p1 / 3600)
 	local v2 = p1 - v1 * 3600
 	local v3 = math.floor(v2 / 60)
 	return v1, v3, v2 - v3 * 60
 end
-function t.Now(p1) --[[ Line: 649 ]]
+function t.Now(p1)
 	return os.time() + ((p1 or -8) + 1) * 60 * 60
 end
-function t.NextMidnight(p1) --[[ Line: 657 | Upvalues: t (copy) ]]
+function t.NextMidnight(p1)
 	return math.ceil(t.Now(p1) / 86400) * 86400
 end
-function t.TimeUntilMidnight(p1) --[[ Line: 663 | Upvalues: t (copy) ]]
+function t.TimeUntilMidnight(p1)
 	local v1 = t.Now(p1)
 	return t.NextMidnight(p1) - v1
 end
 local max = math.max
-local function TimeAccumDiff(p1, p2) --[[ Line: 670 | Upvalues: max (copy) ]]
+local function TimeAccumDiff(p1, p2)
 	return max(0, p1 - (p2 and os.time() or tick()))
 end
-local function TimeAccumAdd(p1, p2, p3) --[[ Line: 674 | Upvalues: TimeAccumDiff (ref) ]]
+local function TimeAccumAdd(p1, p2, p3)
 	local v1 = p3 and os.time() or tick()
 	return v1 + TimeAccumDiff(p1) + p2
 end
 t.TimeAccumDiff = TimeAccumDiff
 t.TimeAccumAdd = TimeAccumAdd
-local function Ease_inOutQuad(p1, p2, p3, p4) --[[ Line: 683 ]]
+local function Ease_inOutQuad(p1, p2, p3, p4)
 	local v1 = p1 / p4 * 2
 	if v1 < 1 then
 		return p3 * 0.5 * v1 * v1 + p2
@@ -611,7 +611,7 @@ t.TweenType = {
 	Linear = 1,
 	InOutQuad = 2
 }
-function t.MakeTween() --[[ Line: 695 | Upvalues: t (copy) ]]
+function t.MakeTween()
 	return {
 		i = 0,
 		t0 = 0,
@@ -622,7 +622,7 @@ function t.MakeTween() --[[ Line: 695 | Upvalues: t (copy) ]]
 		Finished = nil
 	}
 end
-function t.UpdateTween(p1, p2) --[[ Line: 706 | Upvalues: t (copy) ]]
+function t.UpdateTween(p1, p2)
 	p1.i = p1.i + p2 * p1.s
 	if p1.Type == t.TweenType.Linear then
 		p1.v = p1.t0 * (1 - p1.i) + p1.t1 * p1.i
@@ -636,7 +636,7 @@ function t.UpdateTween(p1, p2) --[[ Line: 706 | Upvalues: t (copy) ]]
 		p1.Finished(p1)
 	end
 end
-function t.TweenFunSwap(p1) --[[ Line: 717 ]]
+function t.TweenFunSwap(p1)
 	local t1 = p1.t1
 	p1.t1 = p1.t0
 	p1.t0 = t1

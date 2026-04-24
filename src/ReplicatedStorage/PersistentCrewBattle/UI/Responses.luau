@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -7,7 +8,7 @@ local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local Flag = require(ReplicatedStorage.PersistentCrew.UI.Flag)
 local TextButton = require(ReplicatedStorage.PersistentCrew.UI.TextButton)
 local horizontalSquareGrid = require(ReplicatedStorage.PersistentCrew.UI.horizontalSquareGrid)
-local function avatarComponent(p1) --[[ Line: 12 | Upvalues: createElement (copy) ]]
+local function avatarComponent(p1)
 	if p1.RespondedAt then
 		local t = {
 			BorderSizePixel = 0,
@@ -75,13 +76,13 @@ v1.defaultProps = {
 	position = UDim2.new(0.5, 0, 0.5, 0),
 	numPlayersPerTeam = 5
 }
-function v1.init(p1) --[[ Line: 81 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	p1:setState({
 		dots = 0
 	})
 end
-function v1.render(p1) --[[ Line: 87 | Upvalues: createElement (copy), PaddedContainer (copy), Flag (copy), horizontalSquareGrid (copy), avatarComponent (copy), TextButton (copy) ]]
+function v1.render(p1)
 	local v1 = 0.385 / p1.props.aspectRatio * 1.5
 	local v2 = Color3.new(51/255, 51/255, 51/255)
 	local v3 = ("."):rep(p1.state.dots - 1) .. ("ASSEMBLING %dv%d BATTLE"):format(p1.props.numPlayersPerTeam, p1.props.numPlayersPerTeam) .. ("."):rep(p1.state.dots - 1)
@@ -296,14 +297,14 @@ function v1.render(p1) --[[ Line: 87 | Upvalues: createElement (copy), PaddedCon
 		})
 	})
 end
-function v1.didMount(p1) --[[ Line: 349 | Upvalues: Interval (copy) ]]
-	p1.maid:GiveTask(Interval.every(0.5):Connect(function() --[[ Line: 350 | Upvalues: p1 (copy) ]]
+function v1.didMount(p1)
+	p1.maid:GiveTask(Interval.every(0.5):Connect(function()
 		p1:setState({
 			dots = p1.state.dots % 4 + 1
 		})
 	end))
 end
-function v1.willUnmount(p1) --[[ Line: 356 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v1

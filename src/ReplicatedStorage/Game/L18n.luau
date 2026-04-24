@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local Localization = require(ReplicatedStorage.Module.Localization)
-return function(p1) --[[ Line: 6 | Upvalues: Localization (copy) ]]
+return function(p1)
 	local ScreenGui = p1.ScreenGui
 	local L18n = workspace:FindFirstChild("L18n")
 	if L18n then

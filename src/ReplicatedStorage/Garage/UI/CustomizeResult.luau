@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -9,7 +10,7 @@ local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local Customize = require(ReplicatedStorage.Game.Garage.Customize)
 local StoreData = require(ReplicatedStorage.Game.Garage.StoreData)
 local v1 = Roact.PureComponent:extend("CustomizeResult")
-function v1.init(p1) --[[ Line: 13 | Upvalues: Maid (copy), Roact (copy) ]]
+function v1.init(p1)
 	p1:setState({
 		hover = false
 	})
@@ -17,7 +18,7 @@ function v1.init(p1) --[[ Line: 13 | Upvalues: Maid (copy), Roact (copy) ]]
 	p1.cameraRef = Roact.createRef()
 	p1.viewportRef = Roact.createRef()
 end
-function v1.render(p1) --[[ Line: 21 | Upvalues: createElement (copy), Roact (copy) ]]
+function v1.render(p1)
 	return createElement("ViewportFrame", {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
@@ -34,7 +35,7 @@ function v1.render(p1) --[[ Line: 21 | Upvalues: createElement (copy), Roact (co
 		})
 	})
 end
-function v1._updateCustomize(p1) --[[ Line: 38 | Upvalues: StoreData (copy), Customize (copy) ]]
+function v1._updateCustomize(p1)
 	if p1.model then
 		local vehiclePacket = p1.props.vehiclePacket
 		local v1 = vehiclePacket.GarageSelection or {}
@@ -52,13 +53,13 @@ function v1._updateCustomize(p1) --[[ Line: 38 | Upvalues: StoreData (copy), Cus
 		}, v1)
 	end
 end
-function v1._removeModel(p1) --[[ Line: 57 ]]
+function v1._removeModel(p1)
 	if p1.model then
 		p1.model:Destroy()
 		p1.model = nil
 	end
 end
-function v1._updateModel(p1) --[[ Line: 63 | Upvalues: VehicleUtils (copy), PartUtils (copy) ]]
+function v1._updateModel(p1)
 	p1:_removeModel()
 	local vehiclePacket = p1.props.vehiclePacket
 	if vehiclePacket then
@@ -74,14 +75,14 @@ function v1._updateModel(p1) --[[ Line: 63 | Upvalues: VehicleUtils (copy), Part
 		end
 	end
 end
-function v1.didMount(p1) --[[ Line: 84 | Upvalues: RunService (copy) ]]
+function v1.didMount(p1)
 	p1:_updateModel()
-	p1.maid:GiveTask(function() --[[ Line: 86 | Upvalues: p1 (copy) ]]
+	p1.maid:GiveTask(function()
 		p1:_removeModel()
 	end)
 	p1:_updateCustomize()
 	local v1 = p1.cameraRef:getValue()
-	p1.maid.moveCamera = RunService.Heartbeat:Connect(function() --[[ Line: 91 | Upvalues: p1 (copy), v1 (copy) ]]
+	p1.maid.moveCamera = RunService.Heartbeat:Connect(function()
 		if p1.model then
 			local v12 = os.clock()
 			local v2 = p1.model:GetExtentsSize()
@@ -90,7 +91,7 @@ function v1.didMount(p1) --[[ Line: 84 | Upvalues: RunService (copy) ]]
 		end
 	end)
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 105 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p2.vehiclePacket ~= p1.props.vehiclePacket then
 		p1:_updateModel()
 		p1:_updateCustomize()
@@ -99,10 +100,10 @@ function v1.didUpdate(p1, p2, p3) --[[ Line: 105 ]]
 		p1:_updateCustomize()
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 114 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 117 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		receipt = p1.garageReceipt,
 		equipped = p1.garageEquipped,

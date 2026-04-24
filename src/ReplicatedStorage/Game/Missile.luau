@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local v1 = nil
 local RayCast = require(ReplicatedStorage.Module.RayCast)
 local v2 = nil
-local function CalculateConstants(p1, p2, p3, p4, p5) --[[ Line: 16 | Upvalues: RayCast (copy) ]]
+local function CalculateConstants(p1, p2, p3, p4, p5)
 	local v1 = p4 or 0.25
 	local v3 = p1 + p2 * v1 + Vector3.new(0, -98.10000000000001 * v1 * v1, 0)
 	local Unit = (p3 - v3).Unit
@@ -14,7 +15,7 @@ end
 local v3 = nil
 local t = {}
 t.__index = t
-function t.new(p1, p2, p3, p4, p5, p6) --[[ Line: 32 | Upvalues: t (copy), ReplicatedStorage (copy) ]]
+function t.new(p1, p2, p3, p4, p5, p6)
 	local v2 = setmetatable({}, t)
 	if not p4 then
 		p4 = "RocketPart"
@@ -36,7 +37,7 @@ function t.new(p1, p2, p3, p4, p5, p6) --[[ Line: 32 | Upvalues: t (copy), Repli
 	v2.IgnoreList = p6
 	return v2
 end
-function t.Animate(p1, p2) --[[ Line: 57 | Upvalues: v2 (ref), CalculateConstants (copy), v1 (ref), v3 (ref), RunService (copy) ]]
+function t.Animate(p1, p2)
 	local v22 = p2 or v2.GetNowSync()
 	local OriginVelocity = p1.OriginVelocity
 	local LookVector = (p1.Origin * p1.Rotation).LookVector
@@ -44,7 +45,7 @@ function t.Animate(p1, p2) --[[ Line: 57 | Upvalues: v2 (ref), CalculateConstant
 	local Unit = (p1.Target - v32).Unit
 	local v6 = OriginVelocity:Dot(Unit)
 	local v7 = v22 - 0.03333333333333333
-	local function Ignite() --[[ Line: 70 | Upvalues: p1 (copy), v1 (ref) ]]
+	local function Ignite()
 		p1.Part.Fire.Enabled = true
 		v1.ObjectLocal(p1.Part, 1386598740, {
 			TimePosition = 0.5,
@@ -56,7 +57,7 @@ function t.Animate(p1, p2) --[[ Line: 57 | Upvalues: v2 (ref), CalculateConstant
 			EmitterSize = 25
 		})
 	end
-	local function Heartbeat() --[[ Line: 76 | Upvalues: v2 (ref), v22 (ref), v7 (ref), v4 (copy), Ignite (copy), v5 (copy), p1 (copy), OriginVelocity (copy), LookVector (copy), Unit (copy), v3 (ref), v32 (copy), v6 (copy) ]]
+	local function Heartbeat()
 		local v1 = v2.GetNowSync()
 		local v23 = v1 - v22
 		local v33 = v1 - v7
@@ -76,8 +77,8 @@ function t.Animate(p1, p2) --[[ Line: 57 | Upvalues: v2 (ref), CalculateConstant
 	end
 	p1.Runtime = RunService.Heartbeat:Connect(Heartbeat)
 end
-function t.Explode(p1) --[[ Line: 100 ]]
-	delay(2, function() --[[ Line: 101 | Upvalues: p1 (copy) ]]
+function t.Explode(p1)
+	delay(2, function()
 		p1:Destroy()
 	end)
 	p1.Part.Transparency = 1
@@ -94,7 +95,7 @@ function t.Explode(p1) --[[ Line: 100 ]]
 	Sound.Volume = 0.8
 	Sound:Play()
 end
-function t.Destroy(p1) --[[ Line: 121 ]]
+function t.Destroy(p1)
 	p1.Part:Destroy()
 	p1.Part = nil
 	p1.Runtime:Disconnect()
@@ -102,10 +103,10 @@ function t.Destroy(p1) --[[ Line: 121 ]]
 end
 return {
 	CalculateConstants = CalculateConstants,
-	LaunchMissile = function(p1, p2, p3, p4, p5, p6, p7) --[[ Name: LaunchMissile | Line: 131 | Upvalues: t (copy) ]]
+	LaunchMissile = function(p1, p2, p3, p4, p5, p6, p7)
 		t.new(p1, p2, p3, p5, p6, p7):Animate(p4)
 	end,
-	Init = function() --[[ Name: Init | Line: 135 | Upvalues: v3 (ref), v1 (ref), ReplicatedStorage (copy), v2 (ref) ]]
+	Init = function()
 		v3 = Vector3.new()
 		v1 = require(ReplicatedStorage.Std.Audio)
 		v2 = require(ReplicatedStorage.Module.Time)

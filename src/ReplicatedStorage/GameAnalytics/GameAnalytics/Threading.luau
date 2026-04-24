@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local t = {
 	_canSafelyClose = true,
 	_endThread = false,
@@ -8,7 +9,7 @@ local t = {
 }
 local Logger = require(script.Parent.Logger)
 local RunService = game:GetService("RunService")
-local function getScheduledBlock() --[[ Line: 13 | Upvalues: t (copy) ]]
+local function getScheduledBlock()
 	if t._hasScheduledBlockRun or (t._scheduledBlock == nil or not (t._scheduledBlock.deadline <= tick())) then
 		return nil
 	else
@@ -16,8 +17,8 @@ local function getScheduledBlock() --[[ Line: 13 | Upvalues: t (copy) ]]
 		return t._scheduledBlock
 	end
 end
-local function run() --[[ Line: 24 | Upvalues: Logger (copy), t (copy), RunService (copy) ]]
-	task.spawn(function() --[[ Line: 26 | Upvalues: Logger (ref), t (ref) ]]
+local function run()
+	task.spawn(function()
 		Logger:d("Starting GA thread")
 		while not t._endThread do
 			local v1
@@ -48,7 +49,7 @@ local function run() --[[ Line: 24 | Upvalues: Logger (copy), t (copy), RunServi
 		end
 		Logger:d("GA thread stopped")
 	end)
-	game:BindToClose(function() --[[ Line: 59 | Upvalues: RunService (ref), t (ref) ]]
+	game:BindToClose(function()
 		if not RunService:IsStudio() then
 			task.wait(1)
 			if not t._canSafelyClose then
@@ -60,7 +61,7 @@ local function run() --[[ Line: 24 | Upvalues: Logger (copy), t (copy), RunServi
 		end
 	end)
 end
-function t.scheduleTimer(p1, p2, p3) --[[ Line: 80 | Upvalues: run (copy) ]]
+function t.scheduleTimer(p1, p2, p3)
 	if not p1._endThread then
 		if not p1._isRunning then
 			p1._isRunning = true
@@ -76,7 +77,7 @@ function t.scheduleTimer(p1, p2, p3) --[[ Line: 80 | Upvalues: run (copy) ]]
 		end
 	end
 end
-function t.performTaskOnGAThread(p1, p2) --[[ Line: 101 | Upvalues: run (copy) ]]
+function t.performTaskOnGAThread(p1, p2)
 	if not p1._endThread then
 		if not p1._isRunning then
 			p1._isRunning = true
@@ -87,7 +88,7 @@ function t.performTaskOnGAThread(p1, p2) --[[ Line: 101 | Upvalues: run (copy) ]
 		}
 	end
 end
-function t.stopThread(p1) --[[ Line: 118 ]]
+function t.stopThread(p1)
 	p1._endThread = true
 end
 return t

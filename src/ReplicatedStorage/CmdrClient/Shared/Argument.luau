@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local Util = require(script.Parent.Util)
-local function unescapeOperators(p1) --[[ Line: 3 ]]
+local function unescapeOperators(p1)
 	for i, v in ipairs({ "%.", "%?", "%*", "%*%*" }) do
 		p1 = p1:gsub("\\" .. v, v:gsub("%%", ""))
 	end
@@ -7,7 +8,7 @@ local function unescapeOperators(p1) --[[ Line: 3 ]]
 end
 local t = {}
 t.__index = t
-function t.new(p1, p2, p3) --[[ Line: 113 | Upvalues: Util (copy), t (copy) ]]
+function t.new(p1, p2, p3)
 	local t2 = {
 		Command = p1,
 		Type = nil,
@@ -37,7 +38,7 @@ function t.new(p1, p2, p3) --[[ Line: 113 | Upvalues: Util (copy), t (copy) ]]
 	t2:Transform()
 	return t2
 end
-function t.GetDefaultAutocomplete(p1) --[[ Line: 156 ]]
+function t.GetDefaultAutocomplete(p1)
 	if p1.Type.Autocomplete then
 		local v1, v2 = p1.Type.Autocomplete(p1:TransformSegment(""))
 		return v1, v2 or {}
@@ -45,7 +46,7 @@ function t.GetDefaultAutocomplete(p1) --[[ Line: 156 ]]
 		return {}
 	end
 end
-function t.Transform(p1) --[[ Line: 173 | Upvalues: unescapeOperators (copy), Util (copy) ]]
+function t.Transform(p1)
 	if #p1.TransformedValues == 0 then
 		local RawValue = p1.RawValue
 		if p1.Type.ArgumentOperatorAliases then
@@ -116,17 +117,17 @@ function t.Transform(p1) --[[ Line: 173 | Upvalues: unescapeOperators (copy), Ut
 		end
 	end
 end
-function t.TransformSegment(p1, p2) --[[ Line: 266 ]]
+function t.TransformSegment(p1, p2)
 	if p1.Type.Transform then
 		return p1.Type.Transform(p2, p1.Executor)
 	else
 		return p2
 	end
 end
-function t.GetTransformedValue(p1, p2) --[[ Line: 278 ]]
+function t.GetTransformedValue(p1, p2)
 	return unpack(p1.TransformedValues[p2])
 end
-function t.Validate(p1, p2) --[[ Line: 289 ]]
+function t.Validate(p1, p2)
 	if p1.RawValue ~= nil and (#p1.RawValue ~= 0 or p1.Required ~= false) then
 		if p1.Required and (p1.RawSegments[1] == nil or #p1.RawSegments[1] == 0) then
 			return false, "This argument is required."
@@ -149,21 +150,21 @@ function t.Validate(p1, p2) --[[ Line: 289 ]]
 	end
 	return true
 end
-function t.GetAutocomplete(p1) --[[ Line: 330 ]]
+function t.GetAutocomplete(p1)
 	if p1.Type.Autocomplete then
 		return p1.Type.Autocomplete(p1:GetTransformedValue(#p1.TransformedValues))
 	else
 		return {}
 	end
 end
-function t.ParseValue(p1, p2) --[[ Line: 343 ]]
+function t.ParseValue(p1, p2)
 	if p1.Type.Parse then
 		return p1.Type.Parse(p1:GetTransformedValue(p2))
 	else
 		return p1:GetTransformedValue(p2)
 	end
 end
-function t.GetValue(p1) --[[ Line: 356 ]]
+function t.GetValue(p1)
 	if #p1.RawValue == 0 and (not p1.Required and p1.Object.Default ~= nil) then
 		return p1.Object.Default
 	elseif p1.Type.Listable then

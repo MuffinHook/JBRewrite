@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
 local v2 = Roact.PureComponent:extend("TabPage")
-function v2.init(p1) --[[ Line: 8 ]] end
-function v2.render(p1) --[[ Line: 9 | Upvalues: createElement (copy), Roact (copy) ]]
+function v2.init(p1)  end
+function v2.render(p1)
 	return createElement("Frame", {
 		Size = UDim2.new(1, 0, 1, 0),
 		BorderSizePixel = 0,

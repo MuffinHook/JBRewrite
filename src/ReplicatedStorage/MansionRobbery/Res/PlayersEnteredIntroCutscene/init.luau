@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local TweenService = game:GetService("TweenService")
-local function warnf(p1, ...) --[[ Line: 45 ]]
+local function warnf(p1, ...)
 	warn(string.format(p1, ...))
 end
 local v1 = script.Curve:FindFirstChild("CurveData") and require(script.Curve.CurveData)
@@ -12,7 +13,7 @@ local v6
 if v1.AnimationKeyframes then
 	local t = {}
 	t[1] = unpack(v1.AnimationKeyframes)
-	table.sort(t, function(p1, p2) --[[ Line: 66 ]]
+	table.sort(t, function(p1, p2)
 		return p1.pos.X < p2.pos.X
 	end)
 	if #t == 0 or t[1].pos.X > 0 then
@@ -36,10 +37,10 @@ end
 local t = {}
 local t2 = {}
 local NumPoints = v1.Attributes.NumPoints
-function t2.GetCurveValueAt(p1, p2) --[[ Line: 86 | Upvalues: v3 (copy) ]]
+function t2.GetCurveValueAt(p1, p2)
 	return v3.Lerp(p1:_getAttribute("GraphMinSpeed") or 0, p1:_getAttribute("GraphMaxSpeed") or 1, (math.clamp(p1:_getCurveValueAt(p2), 0, 1)))
 end
-function t2.GetProgress(p1, p2, p3, p4) --[[ Line: 95 | Upvalues: t (copy) ]]
+function t2.GetProgress(p1, p2, p3, p4)
 	local v1, v2, v3 = p1:_getProgress(p2, p3)
 	local DeltaTime = p1.DeltaTime
 	if not DeltaTime then
@@ -47,7 +48,7 @@ function t2.GetProgress(p1, p2, p3, p4) --[[ Line: 95 | Upvalues: t (copy) ]]
 	end
 	return p1:_getTransformed(v1, v2, v3, t, DeltaTime)
 end
-function t2.GetProgressRaw(p1, p2, p3, p4) --[[ Line: 101 | Upvalues: t (copy) ]]
+function t2.GetProgressRaw(p1, p2, p3, p4)
 	local v1, v2, v3 = p1:_getProgress(p2, p3)
 	local DeltaTime = p1.DeltaTime
 	if not DeltaTime then
@@ -55,17 +56,17 @@ function t2.GetProgressRaw(p1, p2, p3, p4) --[[ Line: 101 | Upvalues: t (copy) ]
 	end
 	return p1:_getTransformedRaw(v1, v2, v3, t, DeltaTime)
 end
-function t2.CreateTween(p1, p2, p3, p4) --[[ Line: 107 | Upvalues: TweenService (copy) ]]
+function t2.CreateTween(p1, p2, p3, p4)
 	local v1 = Instance.new("NumberValue")
 	local v2 = TweenService:Create(v1, p2, {
 		Value = 1
 	})
-	v2:GetPropertyChangedSignal("PlaybackState"):connect(function() --[[ Line: 111 | Upvalues: v2 (copy), p1 (copy) ]]
+	v2:GetPropertyChangedSignal("PlaybackState"):connect(function()
 		if v2.PlaybackState == Enum.PlaybackState.Playing then
 			p1.LastTick = os.clock()
 		end
 	end)
-	v1:GetPropertyChangedSignal("Value"):connect(function() --[[ Line: 117 | Upvalues: p1 (copy), v1 (copy), p4 (copy), p3 (copy) ]]
+	v1:GetPropertyChangedSignal("Value"):connect(function()
 		local v12 = os.clock()
 		p1.DeltaTime = v12 - p1.LastTick
 		p1.LastTick = v12
@@ -73,7 +74,7 @@ function t2.CreateTween(p1, p2, p3, p4) --[[ Line: 107 | Upvalues: TweenService 
 	end)
 	return v2
 end
-function t2.Generate(p1) --[[ Line: 128 | Upvalues: v1 (copy), v2 (copy) ]]
+function t2.Generate(p1)
 	local ControlPoints = v1.ControlPoints
 	local v12
 	if v1.Attributes.PathClosed == true then
@@ -93,15 +94,15 @@ function t2.Generate(p1) --[[ Line: 128 | Upvalues: v1 (copy), v2 (copy) ]]
 	p1.Spline = v12
 	p1:_generatePointData()
 end
-function t2._getAttribute(p1, p2) --[[ Line: 159 | Upvalues: v1 (copy) ]]
+function t2._getAttribute(p1, p2)
 	return v1.Attributes[p2]
 end
-function t2._getCurveValueAt(p1, p2) --[[ Line: 162 | Upvalues: v6 (ref) ]]
+function t2._getCurveValueAt(p1, p2)
 	if v6 then
 		return v6:CalculateValueAt(p2)
 	end
 end
-function t2._getProgress(p1, p2, p3) --[[ Line: 168 | Upvalues: v4 (copy) ]]
+function t2._getProgress(p1, p2, p3)
 	local v1 = p1:_getAttribute("PathClosed")
 	local v2 = p1.Spline:CalculatePositionRelativeToLength(p2)
 	local v3 = p1.Spline:CalculateDerivativeRelativeToLength(p2)
@@ -111,7 +112,7 @@ function t2._getProgress(p1, p2, p3) --[[ Line: 168 | Upvalues: v4 (copy) ]]
 	end
 	return v2 + v42 * (p3 or 0), v3, v42
 end
-function t2._getUpVector(p1, p2, p3, p4) --[[ Line: 180 | Upvalues: NumPoints (copy) ]]
+function t2._getUpVector(p1, p2, p3, p4)
 	if p1.PointData then
 		local v3 = p1.PointData.points[math.floor(p2 * NumPoints)]
 		if v3 then
@@ -123,7 +124,7 @@ function t2._getUpVector(p1, p2, p3, p4) --[[ Line: 180 | Upvalues: NumPoints (c
 		return Vector3.new(0, 1, 0)
 	end
 end
-function t2._getTwistAt(p1, p2, p3, p4) --[[ Line: 192 | Upvalues: v3 (copy) ]]
+function t2._getTwistAt(p1, p2, p3, p4)
 	local v1 = nil
 	local v2 = nil
 	local v32 = nil
@@ -168,7 +169,7 @@ function t2._getTwistAt(p1, p2, p3, p4) --[[ Line: 192 | Upvalues: v3 (copy) ]]
 		return v2
 	end
 end
-function t2._twistUpvector(p1, p2, p3, p4, p5, p6) --[[ Line: 245 ]]
+function t2._twistUpvector(p1, p2, p3, p4, p5, p6)
 	if p1.PointData then
 		local v1 = p1:_getTwistAt(p3, p4, p6)
 		if v1 == 0 then
@@ -178,11 +179,11 @@ function t2._twistUpvector(p1, p2, p3, p4, p5, p6) --[[ Line: 245 ]]
 		end
 	end
 end
-function t2._getTransformed(p1, ...) --[[ Line: 259 | Upvalues: v5 (copy) ]]
+function t2._getTransformed(p1, ...)
 	local t = { ... }
 	local v1, v2, v3, _
 	if v5 then
-		local v4, v52 = pcall(function() --[[ Line: 262 | Upvalues: v5 (ref), t (copy) ]]
+		local v4, v52 = pcall(function()
 			return v5(unpack(t))
 		end)
 		if v4 then
@@ -196,11 +197,11 @@ function t2._getTransformed(p1, ...) --[[ Line: 259 | Upvalues: v5 (copy) ]]
 		return CFrame.lookAt(v1, v1 + v2, v3)
 	end
 end
-function t2._getTransformedRaw(p1, ...) --[[ Line: 272 | Upvalues: v5 (copy) ]]
+function t2._getTransformedRaw(p1, ...)
 	local t = { ... }
 	local v1, v2, v3, _
 	if v5 then
-		local v4, v52 = pcall(function() --[[ Line: 275 | Upvalues: v5 (ref), t (copy) ]]
+		local v4, v52 = pcall(function()
 			return v5(unpack(t))
 		end)
 		if v4 then
@@ -214,7 +215,7 @@ function t2._getTransformedRaw(p1, ...) --[[ Line: 272 | Upvalues: v5 (copy) ]]
 		return v1, v2, v3
 	end
 end
-function t2._generatePointData(p1) --[[ Line: 286 | Upvalues: NumPoints (copy) ]]
+function t2._generatePointData(p1)
 	local v1 = Vector3.new(0, 1, 0)
 	local t = {
 		points = {}

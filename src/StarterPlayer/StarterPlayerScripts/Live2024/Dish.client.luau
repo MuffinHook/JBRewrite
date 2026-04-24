@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
 local RunConsts = require(ReplicatedStorage.App.RunConsts)
 local isMAIN_WORLD_NAME = require(ReplicatedStorage.App.RunUtils).getWorld() == RunConsts.MAIN_WORLD_NAME
-local function _(p1, p2) --[[ Unused ]]
+local function _(p1, p2)
 	for i = 1, #p1 do
 		local v1 = p1[i]
 		if v1 == "1" then
@@ -20,13 +21,13 @@ local function _(p1, p2) --[[ Unused ]]
 		end
 	end
 end
-local function _() --[[ Unused | Upvalues: v1 (ref) ]]
+local function _()
 	v1:Destroy()
 end
-local function _() --[[ Unused | Upvalues: v2 (ref) ]]
+local function _()
 	v2:Destroy()
 end
-local function _(p1) --[[ Unused | Upvalues: v3 (ref), v4 (ref), v5 (ref), v6 (ref) ]]
+local function _(p1)
 	if p1 == "1" then
 		v3.Transparency = 0
 		v4.Transparency = 0.7
@@ -36,7 +37,7 @@ local function _(p1) --[[ Unused | Upvalues: v3 (ref), v4 (ref), v5 (ref), v6 (r
 			RollOffMaxDistance = 1536
 		})
 		task.wait(0.2)
-		v5.promiseFadeTo(v1, 0, 0.1):andThen(function() --[[ Line: 68 | Upvalues: v1 (copy) ]]
+		v5.promiseFadeTo(v1, 0, 0.1):andThen(function()
 			v1:Destroy()
 		end)
 		v3.Transparency = 1
@@ -50,20 +51,20 @@ local function _(p1) --[[ Unused | Upvalues: v3 (ref), v4 (ref), v5 (ref), v6 (r
 			RollOffMaxDistance = 1536
 		})
 		task.wait(0.6000000000000001)
-		v5.promiseFadeTo(v2, 0, 0.1):andThen(function() --[[ Line: 82 | Upvalues: v2 (copy) ]]
+		v5.promiseFadeTo(v2, 0, 0.1):andThen(function()
 			v2:Destroy()
 		end)
 		v3.Transparency = 1
 		v4.Transparency = 1
 	end
 end
-local function _(p1) --[[ Unused | Upvalues: v7 (ref), v8 (ref) ]]
+local function _(p1)
 	local Dish = workspace:WaitForChild("Live2024"):WaitForChild("Dish")
 	local Door = Dish:WaitForChild("Door")
 	local Laser = Dish:WaitForChild("Laser")
 	local Sphere = Dish:WaitForChild("Sphere")
 	local v1 = os.clock()
-	v7(p1, function(p1) --[[ Line: 58 | Upvalues: Laser (copy), Sphere (copy), v8 (ref), Door (copy) ]]
+	v7(p1, function(p1)
 		if p1 == "1" then
 			Laser.Transparency = 0
 			Sphere.Transparency = 0.7
@@ -73,7 +74,7 @@ local function _(p1) --[[ Unused | Upvalues: v7 (ref), v8 (ref) ]]
 				RollOffMaxDistance = 1536
 			})
 			task.wait(0.2)
-			v8.promiseFadeTo(v1, 0, 0.1):andThen(function() --[[ Line: 68 | Upvalues: v1 (copy) ]]
+			v8.promiseFadeTo(v1, 0, 0.1):andThen(function()
 				v1:Destroy()
 			end)
 			Laser.Transparency = 1
@@ -87,7 +88,7 @@ local function _(p1) --[[ Unused | Upvalues: v7 (ref), v8 (ref) ]]
 				RollOffMaxDistance = 1536
 			})
 			task.wait(0.6000000000000001)
-			v8.promiseFadeTo(v2, 0, 0.1):andThen(function() --[[ Line: 82 | Upvalues: v2 (copy) ]]
+			v8.promiseFadeTo(v2, 0, 0.1):andThen(function()
 				v2:Destroy()
 			end)
 			Laser.Transparency = 1

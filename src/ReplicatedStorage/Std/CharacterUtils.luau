@@ -1,23 +1,24 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Maid = require(script.Parent.Maid)
 local PlayerUtils = require(script.Parent.PlayerUtils)
 local t = {
-	getHumanoid = function(p1) --[[ Name: getHumanoid | Line: 7 ]]
+	getHumanoid = function(p1)
 		if p1 then
 			return p1:FindFirstChild("Humanoid")
 		else
 			return nil
 		end
 	end,
-	getRootPart = function(p1) --[[ Name: getRootPart | Line: 14 ]]
+	getRootPart = function(p1)
 		if p1 then
 			return p1.PrimaryPart
 		else
 			return nil
 		end
 	end,
-	setEnabled = function(p1, p2) --[[ Name: setEnabled | Line: 20 ]]
+	setEnabled = function(p1, p2)
 		if p1 then
 			local Humanoid = p1:FindFirstChild("Humanoid")
 			if Humanoid then
@@ -30,7 +31,7 @@ local t = {
 			end
 		end
 	end,
-	setMassless = function(p1, p2) --[[ Name: setMassless | Line: 39 ]]
+	setMassless = function(p1, p2)
 		for i, v in ipairs(p1:GetDescendants()) do
 			if v:IsA("BasePart") then
 				local oldMassless = v:FindFirstChild("oldMassless")
@@ -51,7 +52,7 @@ local t = {
 			end
 		end
 	end,
-	_setValue = function(p1, p2, p3) --[[ Name: _setValue | Line: 67 ]]
+	_setValue = function(p1, p2, p3)
 		local count = 0
 		repeat
 			count = count + 1
@@ -62,7 +63,7 @@ local t = {
 		v1.Parent = p1
 		p1[p2] = p3
 	end,
-	_popValue = function(p1, p2) --[[ Name: _popValue | Line: 80 ]]
+	_popValue = function(p1, p2)
 		local count = 0
 		repeat
 			count = count + 1
@@ -76,7 +77,7 @@ local t = {
 		end
 	end
 }
-function t.setInvisible(p1, p2) --[[ Line: 94 | Upvalues: t (copy) ]]
+function t.setInvisible(p1, p2)
 	if p1 then
 		for v1, v2 in p1:GetDescendants() do
 			if v2:IsA("BasePart") and (v2 ~= p1.PrimaryPart and (not p2 or p2(v2))) then
@@ -92,7 +93,7 @@ function t.setInvisible(p1, p2) --[[ Line: 94 | Upvalues: t (copy) ]]
 		end
 	end
 end
-function t.popInvisible(p1, p2) --[[ Line: 113 | Upvalues: t (copy) ]]
+function t.popInvisible(p1, p2)
 	if p1 then
 		for v1, v2 in p1:GetDescendants() do
 			if v2:IsA("BasePart") and (v2 ~= p1.PrimaryPart and (not p2 or p2(v2))) then
@@ -108,7 +109,7 @@ function t.popInvisible(p1, p2) --[[ Line: 113 | Upvalues: t (copy) ]]
 		end
 	end
 end
-function t.setScale(p1, p2) --[[ Line: 132 | Upvalues: t (copy) ]]
+function t.setScale(p1, p2)
 	local Humanoid = p1:FindFirstChild("Humanoid")
 	local HeadScale = Humanoid:FindFirstChild("HeadScale")
 	t._setValue(HeadScale, "Value", p2)
@@ -119,7 +120,7 @@ function t.setScale(p1, p2) --[[ Line: 132 | Upvalues: t (copy) ]]
 	local BodyHeightScale = Humanoid:FindFirstChild("BodyHeightScale")
 	t._setValue(BodyHeightScale, "Value", p2)
 end
-function t.popScale(p1) --[[ Line: 143 | Upvalues: t (copy) ]]
+function t.popScale(p1)
 	local Humanoid = p1:FindFirstChild("Humanoid")
 	local HeadScale = Humanoid:FindFirstChild("HeadScale")
 	t._popValue(HeadScale, "Value")
@@ -130,7 +131,7 @@ function t.popScale(p1) --[[ Line: 143 | Upvalues: t (copy) ]]
 	local BodyHeightScale = Humanoid:FindFirstChild("BodyHeightScale")
 	t._popValue(BodyHeightScale, "Value")
 end
-function t.getAncestorPartHumanoid(p1) --[[ Line: 154 ]]
+function t.getAncestorPartHumanoid(p1)
 	if p1 and p1.Parent then
 		assert(p1)
 		local v1 = p1.Parent
@@ -144,7 +145,7 @@ function t.getAncestorPartHumanoid(p1) --[[ Line: 154 ]]
 		end
 	end
 end
-function t.getRootAttachment(p1) --[[ Line: 170 ]]
+function t.getRootAttachment(p1)
 	assert(p1)
 	local RootAttachment = p1:FindFirstChild("RootAttachment")
 	if not RootAttachment then
@@ -156,14 +157,14 @@ function t.getRootAttachment(p1) --[[ Line: 170 ]]
 	RootAttachment.CFrame = CFrame.new()
 	return RootAttachment
 end
-local function _observeOnPlayerAdded(p1, p2, p3) --[[ Line: 182 | Upvalues: Maid (copy), Players (copy) ]]
-	local function onCharacterAdded(p1) --[[ Line: 187 | Upvalues: Maid (ref), p2 (copy), Players (ref), p3 (copy) ]]
+local function _observeOnPlayerAdded(p1, p2, p3)
+	local function onCharacterAdded(p1)
 		local v1 = Maid.new()
 		p2._characterMaid = v1
 		local Humanoid = p1:WaitForChild("Humanoid", 1)
 		assert(Humanoid)
 		if Players:GetPlayerFromCharacter(p1) then
-			v1:GiveTask(p1.Destroying:Connect(function() --[[ Line: 200 | Upvalues: v1 (copy) ]]
+			v1:GiveTask(p1.Destroying:Connect(function()
 				task.defer(v1.DoCleaning, v1)
 			end))
 			task.spawn(p3, p1, v1, p2)
@@ -172,20 +173,20 @@ local function _observeOnPlayerAdded(p1, p2, p3) --[[ Line: 182 | Upvalues: Maid
 	if p1.Character then
 		task.spawn(onCharacterAdded, p1.Character)
 	end
-	local function onCharacterRemoving(p1) --[[ Line: 209 | Upvalues: p2 (copy) ]]
+	local function onCharacterRemoving(p1)
 		p2._characterMaid = nil
 	end
 	p2:GiveTask(p1.CharacterAdded:Connect(onCharacterAdded))
 	p2:GiveTask(p1.CharacterRemoving:Connect(onCharacterRemoving))
 end
-function t.observeCharacterAdded(p1) --[[ Line: 215 | Upvalues: Maid (copy), PlayerUtils (copy), _observeOnPlayerAdded (copy) ]]
+function t.observeCharacterAdded(p1)
 	local v1 = Maid.new()
-	v1:GiveTask(PlayerUtils.observePlayerAdded(function(p12, p2) --[[ Line: 219 | Upvalues: _observeOnPlayerAdded (ref), p1 (copy) ]]
+	v1:GiveTask(PlayerUtils.observePlayerAdded(function(p12, p2)
 		_observeOnPlayerAdded(p12, p2, p1)
 	end))
 	return v1
 end
-function t.observeLocalCharacterAdded(p1) --[[ Line: 225 | Upvalues: RunService (copy), Maid (copy), _observeOnPlayerAdded (copy), Players (copy) ]]
+function t.observeLocalCharacterAdded(p1)
 	assert(RunService:IsClient(), "observeLocalCharacterAdded must be called on the client")
 	local v2 = Maid.new()
 	_observeOnPlayerAdded(Players.LocalPlayer, v2, p1)

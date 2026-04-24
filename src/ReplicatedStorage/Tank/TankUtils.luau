@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local t = {}
-function t.getGunner(p1) --[[ Line: 3 | Upvalues: Players (copy), t (copy) ]]
+function t.getGunner(p1)
 	local t2 = {}
 	for v1, v2 in p1:GetChildren() do
 		if v2.Name == "Seat" or v2.Name == "Passenger" then
@@ -20,7 +21,7 @@ function t.getGunner(p1) --[[ Line: 3 | Upvalues: Players (copy), t (copy) ]]
 			end
 		end
 	end
-	table.sort(t2, function(p1, p2) --[[ Line: 27 ]]
+	table.sort(t2, function(p1, p2)
 		return p1.priority > p2.priority
 	end)
 	if #t2 > 0 then
@@ -29,7 +30,7 @@ function t.getGunner(p1) --[[ Line: 3 | Upvalues: Players (copy), t (copy) ]]
 		return t.getDriver(p1)
 	end
 end
-function t.getDriver(p1) --[[ Line: 36 | Upvalues: Players (copy) ]]
+function t.getDriver(p1)
 	for v1, v2 in p1:GetChildren() do
 		if v2.Name == "Seat" then
 			local PlayerName = v2:FindFirstChild("PlayerName")

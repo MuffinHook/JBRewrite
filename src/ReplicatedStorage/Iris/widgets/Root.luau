@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
+return function(p1, p2)
 	local v1 = 0
 	p1.WidgetConstructor("Root", {
 		hasState = false,
 		hasChildren = true,
 		Args = {},
 		Events = {},
-		Generate = function(p12) --[[ Name: Generate | Line: 12 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_Root = Instance.new("Folder")
 			Iris_Root.Name = "Iris_Root"
 			local PseudoWindowScreenGui
@@ -85,16 +86,16 @@ return function(p1, p2) --[[ Line: 3 ]]
 			PseudoWindow.Parent = PseudoWindowScreenGui
 			return Iris_Root
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 100 | Upvalues: v1 (ref) ]]
+		Update = function(p1)
 			if v1 > 0 then
 				p1.Instance.PseudoWindowScreenGui.PseudoWindow.Visible = true
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 108 | Upvalues: v1 (ref) ]]
+		Discard = function(p1)
 			v1 = 0
 			p1.Instance:Destroy()
 		end,
-		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 112 | Upvalues: v1 (ref) ]]
+		ChildAdded = function(p1, p2)
 			local v12 = p1.Instance
 			if p2.type == "Window" then
 				return p1.Instance
@@ -109,7 +110,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				return PseudoWindow
 			end
 		end,
-		ChildDiscarded = function(p1, p2) --[[ Name: ChildDiscarded | Line: 131 | Upvalues: v1 (ref) ]]
+		ChildDiscarded = function(p1, p2)
 			if p2.type ~= "Window" and (p2.type ~= "Tooltip" and p2.type ~= "MenuBar") then
 				v1 = v1 - 1
 				if v1 == 0 then

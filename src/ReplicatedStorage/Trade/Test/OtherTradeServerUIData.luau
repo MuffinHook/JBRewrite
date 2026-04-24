@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 return {
 	otherTradeServerInfo = {
 		{

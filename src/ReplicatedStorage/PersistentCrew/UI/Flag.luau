@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
@@ -9,7 +10,7 @@ v1.defaultProps = {
 	position = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5)
 }
-function v1.render(p1) --[[ Line: 13 | Upvalues: createElement (copy) ]]
+function v1.render(p1)
 	return createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundColor3 = p1.props.flagColor,

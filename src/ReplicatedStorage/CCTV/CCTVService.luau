@@ -5,29 +5,29 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local Signal = require(ReplicatedStorage.Std.Signal)
 local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
 local CameraBinder = require(script.Parent.CameraBinder)
-local t = {
+local CCTVService = {
 	onRequestPrompt = Signal.new()
 }
-function t.init()
+function CCTVService.init()
 	CameraBinder:Start()
-	Binder.new("CCTVPrompt", function(p1)
-		local v1 = Maid.new()
+	Binder.new("CCTVPrompt", function(promptPart)
+		local promptMaid = Maid.new()
 		CircleAction.Add({
-			Part = p1,
+			Part = promptPart,
 			Name = "Open Security Cameras",
 			Timed = false,
 			Dist = 8,
-			Callback = function(p1, p2)
-				if p2 then
-					t.onRequestPrompt:Fire()
+			Callback = function(player, isCompleted)
+				if isCompleted then
+					CCTVService.onRequestPrompt:Fire()
 				end
 				return true
 			end
-		}, p1)
-		v1:GiveTask(function()
-			CircleAction.Remove(p1)
+		}, promptPart)
+		promptMaid:GiveTask(function()
+			CircleAction.Remove(promptPart)
 		end)
-		return v1
+		return promptMaid
 	end):Start()
 end
-return t
+return CCTVService

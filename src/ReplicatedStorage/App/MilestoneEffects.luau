@@ -2,7 +2,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Notification = require(ReplicatedStorage.Game.Notification)
 local Format = require(ReplicatedStorage.Module.Format)
-local t = {}
+local module = {}
 local v1 = nil
 local v2 = nil
 local function getMilestoneId(p1)
@@ -16,7 +16,7 @@ local function getMilestoneId(p1)
 		return 0
 	end
 end
-function t.init(p1)
+function module.init(p1)
 	v2 = p1
 end
 local function playEffect(p1)
@@ -28,7 +28,7 @@ local function playEffect(p1)
 		Style = "Gift"
 	})
 end
-function t.cashUpdate(p1)
+function module.cashUpdate(p1)
 	if v1 == nil then
 		v1 = if p1 >= 1000000 then math.floor(p1 / 1000000) elseif p1 >= 500000 then 0.5 elseif p1 >= 100000 then 0.1 else 0
 	else
@@ -39,4 +39,4 @@ function t.cashUpdate(p1)
 		end
 	end
 end
-return t
+return module

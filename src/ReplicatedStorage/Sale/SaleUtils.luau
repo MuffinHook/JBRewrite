@@ -1,16 +1,17 @@
+-- Reviewed by Claude
 local SaleConsts = require(script.Parent.SaleConsts)
 local t = {
-	getNumSalesPassed = function() --[[ Name: getNumSalesPassed | Line: 3 | Upvalues: SaleConsts (copy) ]]
+	getNumSalesPassed = function()
 		return math.floor((workspace:GetServerTimeNow() - SaleConsts.FIRST_SALE_START_TIMESTAMP) / SaleConsts.SALE_DURATION_SECONDS)
 	end
 }
-function t.getNextSaleTime() --[[ Line: 7 | Upvalues: t (copy), SaleConsts (copy) ]]
+function t.getNextSaleTime()
 	return SaleConsts.FIRST_SALE_START_TIMESTAMP + (t.getNumSalesPassed() + 1) * SaleConsts.SALE_DURATION_SECONDS
 end
-function t.getTimeToNextSale() --[[ Line: 13 | Upvalues: t (copy) ]]
+function t.getTimeToNextSale()
 	return t.getNextSaleTime() - workspace:GetServerTimeNow()
 end
-function t.formatRemaining(p1) --[[ Line: 18 ]]
+function t.formatRemaining(p1)
 	local v1 = math.max(0, p1)
 	local v2 = math.floor(v1 / 86400)
 	local v3 = math.floor(v1 % 86400 / 3600)

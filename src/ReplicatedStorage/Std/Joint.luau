@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local _ = Vector3.new
 local v1 = CFrame.new(0, 0, 0)
 local toObjectSpace = v1.toObjectSpace
-local function Custom(p1, p2, p3, p4, p5) --[[ Line: 10 ]]
+local function Custom(p1, p2, p3, p4, p5)
 	local v1 = Instance.new(p1)
 	v1.Part0 = p2
 	v1.Part1 = p3
@@ -10,7 +11,7 @@ local function Custom(p1, p2, p3, p4, p5) --[[ Line: 10 ]]
 	v1.Parent = p2
 	return v1
 end
-local function CustomWeld(p1, p2, p3, p4) --[[ Line: 19 ]]
+local function CustomWeld(p1, p2, p3, p4)
 	local Weld = Instance.new("Weld")
 	Weld.Part0 = p1
 	Weld.Part1 = p2
@@ -19,7 +20,7 @@ local function CustomWeld(p1, p2, p3, p4) --[[ Line: 19 ]]
 	Weld.Parent = p1
 	return Weld
 end
-local function CustomMotor(p1, p2, p3, p4) --[[ Line: 22 ]]
+local function CustomMotor(p1, p2, p3, p4)
 	local Motor = Instance.new("Motor")
 	Motor.Part0 = p1
 	Motor.Part1 = p2
@@ -28,7 +29,7 @@ local function CustomMotor(p1, p2, p3, p4) --[[ Line: 22 ]]
 	Motor.Parent = p1
 	return Motor
 end
-local function CustomMotor6D(p1, p2, p3, p4) --[[ Line: 25 ]]
+local function CustomMotor6D(p1, p2, p3, p4)
 	local Motor6D = Instance.new("Motor6D")
 	Motor6D.Part0 = p1
 	Motor6D.Part1 = p2
@@ -37,7 +38,7 @@ local function CustomMotor6D(p1, p2, p3, p4) --[[ Line: 25 ]]
 	Motor6D.Parent = p1
 	return Motor6D
 end
-local function BlankWeld(p1, p2) --[[ Line: 28 | Upvalues: v1 (copy) ]]
+local function BlankWeld(p1, p2)
 	local Weld = Instance.new("Weld")
 	Weld.Part0 = p1
 	Weld.Part1 = p2
@@ -46,7 +47,7 @@ local function BlankWeld(p1, p2) --[[ Line: 28 | Upvalues: v1 (copy) ]]
 	Weld.Parent = p1
 	return Weld
 end
-local function BlankMotor(p1, p2) --[[ Line: 31 | Upvalues: v1 (copy) ]]
+local function BlankMotor(p1, p2)
 	local Motor = Instance.new("Motor")
 	Motor.Part0 = p1
 	Motor.Part1 = p2
@@ -55,7 +56,7 @@ local function BlankMotor(p1, p2) --[[ Line: 31 | Upvalues: v1 (copy) ]]
 	Motor.Parent = p1
 	return Motor
 end
-local function BlankMotor6D(p1, p2) --[[ Line: 34 | Upvalues: v1 (copy) ]]
+local function BlankMotor6D(p1, p2)
 	local Motor6D = Instance.new("Motor6D")
 	Motor6D.Part0 = p1
 	Motor6D.Part1 = p2
@@ -64,7 +65,7 @@ local function BlankMotor6D(p1, p2) --[[ Line: 34 | Upvalues: v1 (copy) ]]
 	Motor6D.Parent = p1
 	return Motor6D
 end
-local function Weld(p1, p2) --[[ Line: 37 | Upvalues: toObjectSpace (copy), v1 (copy) ]]
+local function Weld(p1, p2)
 	local v12 = toObjectSpace(p1.CFrame, p2.CFrame)
 	local Weld = Instance.new("Weld")
 	Weld.Part0 = p1
@@ -74,7 +75,7 @@ local function Weld(p1, p2) --[[ Line: 37 | Upvalues: toObjectSpace (copy), v1 (
 	Weld.Parent = p1
 	return Weld
 end
-local function Motor(p1, p2) --[[ Line: 40 | Upvalues: toObjectSpace (copy), v1 (copy) ]]
+local function Motor(p1, p2)
 	local v12 = toObjectSpace(p1.CFrame, p2.CFrame)
 	local Motor = Instance.new("Motor")
 	Motor.Part0 = p1
@@ -84,7 +85,7 @@ local function Motor(p1, p2) --[[ Line: 40 | Upvalues: toObjectSpace (copy), v1 
 	Motor.Parent = p1
 	return Motor
 end
-local function Motor6D(p1, p2) --[[ Line: 43 | Upvalues: toObjectSpace (copy), v1 (copy) ]]
+local function Motor6D(p1, p2)
 	local v12 = toObjectSpace(p1.CFrame, p2.CFrame)
 	local Motor6D = Instance.new("Motor6D")
 	Motor6D.Part0 = p1
@@ -94,7 +95,7 @@ local function Motor6D(p1, p2) --[[ Line: 43 | Upvalues: toObjectSpace (copy), v
 	Motor6D.Parent = p1
 	return Motor6D
 end
-local function v2(p1, p2, p3) --[[ Line: 46 | Upvalues: v2 (copy), toObjectSpace (copy), v1 (copy) ]]
+local function v2(p1, p2, p3)
 	local v12 = next
 	local v22, v3 = p1:GetChildren()
 	local t = {}

@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClanMatchmakingConsts = require(ReplicatedStorage.ClanMatchmaking.ClanMatchmakingConsts)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 return {
-	setIsClanReadiedUp = function(p1, p2) --[[ Name: setIsClanReadiedUp | Line: 7 | Upvalues: ReplicatedStorage (copy), ClanMatchmakingConsts (copy) ]]
+	setIsClanReadiedUp = function(p1, p2)
 		assert(typeof(p1) == "string", "Invalid clanId passed")
 		local v2 = ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME)
 		local v3 = v2:FindFirstChild(p1)
@@ -16,7 +17,7 @@ return {
 			v3:Destroy()
 		end
 	end,
-	getIsClanReadiedUp = function(p1) --[[ Name: getIsClanReadiedUp | Line: 25 | Upvalues: ReplicatedStorage (copy), ClanMatchmakingConsts (copy) ]]
+	getIsClanReadiedUp = function(p1)
 		assert(typeof(p1) == "string", "Invalid clanId passed")
 		local v2 = ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME):FindFirstChild(p1)
 		if v2 then
@@ -25,7 +26,7 @@ return {
 			return false
 		end
 	end,
-	observeIsClanReadiedUp = function(p1, p2) --[[ Name: observeIsClanReadiedUp | Line: 34 | Upvalues: ReplicatedStorage (copy), ClanMatchmakingConsts (copy), RxInstanceUtils (copy) ]]
+	observeIsClanReadiedUp = function(p1, p2)
 		return RxInstanceUtils.observeChildrenNamed(ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME), p1, p2)
 	end
 }

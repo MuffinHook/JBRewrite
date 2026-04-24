@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local TestEnum = require(script.Parent.TestEnum)
 local t = {
 	[TestEnum.TestStatus.Success] = "+",
@@ -6,7 +7,7 @@ local t = {
 }
 local t2 = {}
 t2.__index = t2
-function t2.new(p1) --[[ Line: 25 | Upvalues: t2 (copy) ]]
+function t2.new(p1)
 	local t = {
 		successCount = 0,
 		failureCount = 0,
@@ -18,7 +19,7 @@ function t2.new(p1) --[[ Line: 25 | Upvalues: t2 (copy) ]]
 	setmetatable(t, t2)
 	return t
 end
-function t2.createNode(p1) --[[ Line: 43 ]]
+function t2.createNode(p1)
 	return {
 		planNode = p1,
 		children = {},
@@ -26,13 +27,13 @@ function t2.createNode(p1) --[[ Line: 43 ]]
 		status = nil
 	}
 end
-function t2.visitAllNodes(p1, p2, p3) --[[ Line: 57 ]]
+function t2.visitAllNodes(p1, p2, p3)
 	for i, v in ipairs((p3 or p1).children) do
 		p2(v)
 		p1:visitAllNodes(p2, v)
 	end
 end
-function t2.visualize(p1, p2, p3) --[[ Line: 70 | Upvalues: TestEnum (copy), t (copy) ]]
+function t2.visualize(p1, p2, p3)
 	local v1 = p3 or 0
 	local t2 = {}
 	for i, v in ipairs((p2 or p1).children) do

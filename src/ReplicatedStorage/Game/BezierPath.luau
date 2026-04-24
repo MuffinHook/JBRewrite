@@ -1,12 +1,13 @@
-local function CubicBezierCurve(p1, p2, p3, p4, p5) --[[ Line: 1 ]]
+-- Reviewed by Claude
+local function CubicBezierCurve(p1, p2, p3, p4, p5)
 	local v1 = 1 - p1
 	return v1 * v1 * v1 * p2 + 3 * v1 * v1 * p1 * p3 + 3 * v1 * p1 * p1 * p4 + p1 * p1 * p1 * p5
 end
-local function DCubicBezierCurve(p1, p2, p3, p4, p5) --[[ Line: 6 ]]
+local function DCubicBezierCurve(p1, p2, p3, p4, p5)
 	local v1 = 1 - p1
 	return 3 * v1 * v1 * (p3 - p2) + 6 * v1 * p1 * (p4 - p3) + 3 * p1 * p1 * (p5 - p4)
 end
-local function ApproximateVectorCubicBezierCurveLength(p1, p2, p3, p4, p5) --[[ Line: 10 ]]
+local function ApproximateVectorCubicBezierCurveLength(p1, p2, p3, p4, p5)
 	local sum = 0
 	for i = 1, p1 do
 		local v1 = (i - 1) / p1
@@ -17,7 +18,7 @@ local function ApproximateVectorCubicBezierCurveLength(p1, p2, p3, p4, p5) --[[ 
 end
 local t = {}
 t.__index = t
-function t.new() --[[ Line: 22 | Upvalues: t (copy) ]]
+function t.new()
 	local v2 = setmetatable({}, t)
 	v2.Points = nil
 	v2.NumPoints = nil
@@ -28,18 +29,18 @@ function t.new() --[[ Line: 22 | Upvalues: t (copy) ]]
 	v2.lengthCache = {}
 	return v2
 end
-function t.SetNodeOffset(p1, p2, p3) --[[ Line: 33 ]]
+function t.SetNodeOffset(p1, p2, p3)
 	assert(p2)
 	assert(p3)
 	p1.OffsetStart = p2
 	p1.OffsetEnd = p3
 end
-function t.SetPoints(p1, p2) --[[ Line: 39 ]]
+function t.SetPoints(p1, p2)
 	p1.Points = p2
 	p1.NumPoints = #p2
 	p1:_recomputeLengthCache()
 end
-function t._recomputeLengthCache(p1) --[[ Line: 45 | Upvalues: ApproximateVectorCubicBezierCurveLength (copy) ]]
+function t._recomputeLengthCache(p1)
 	for i = 1, p1.NumPoints do
 		local v1 = p1:GetPoint(i)
 		local v2 = p1:GetPoint(i + 1)
@@ -48,10 +49,10 @@ function t._recomputeLengthCache(p1) --[[ Line: 45 | Upvalues: ApproximateVector
 		p1.lengthCache[i] = ApproximateVectorCubicBezierCurveLength(10000, v1, v3, v2 - (p1:GetPoint(i + 2) - v1).Unit * Magnitude / 3, v2)
 	end
 end
-function t.GetPoint(p1, p2) --[[ Line: 55 ]]
+function t.GetPoint(p1, p2)
 	return p1.Points[(p2 - 1) % p1.NumPoints + 1]
 end
-function t.ApproximateLength(p1, p2) --[[ Line: 58 | Upvalues: ApproximateVectorCubicBezierCurveLength (copy) ]]
+function t.ApproximateLength(p1, p2)
 	local sum = 0
 	for i = p1.OffsetStart + 1, p1.NumPoints - p1.OffsetEnd do
 		local v1 = p1:GetPoint(i)
@@ -61,7 +62,7 @@ function t.ApproximateLength(p1, p2) --[[ Line: 58 | Upvalues: ApproximateVector
 	end
 	return sum
 end
-function t.Step(p1, p2) --[[ Line: 73 ]]
+function t.Step(p1, p2)
 	local t = p1.t
 	local v1 = t * (p1.NumPoints - p1.OffsetStart - p1.OffsetEnd) + p1.OffsetStart
 	local v2 = v1 % 1
@@ -95,7 +96,7 @@ function t.Step(p1, p2) --[[ Line: 73 ]]
 	end
 	return v12 * v12 * v12 * v4 + 3 * v12 * v12 * v2 * v5 + 3 * v12 * v2 * v2 * v6 + v2 * v2 * v2 * v7, v11
 end
-function t.GetWorldPositionAt(p1, p2) --[[ Line: 112 | Upvalues: ApproximateVectorCubicBezierCurveLength (copy) ]]
+function t.GetWorldPositionAt(p1, p2)
 	local count = 1 + p1.OffsetStart
 	while true do
 		local v1, v2
@@ -121,7 +122,7 @@ function t.GetWorldPositionAt(p1, p2) --[[ Line: 112 | Upvalues: ApproximateVect
 		p2 = p2 - v7
 	end
 end
-function t.Reset(p1) --[[ Line: 139 ]]
+function t.Reset(p1)
 	p1.t = 0
 	p1._p0 = nil
 	p1._c0 = nil

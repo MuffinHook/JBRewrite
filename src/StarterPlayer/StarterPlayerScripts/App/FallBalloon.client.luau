@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
 require(ReplicatedStorage.App.RunUtils)
-local function _(p1, p2) --[[ Unused ]]
+local function _(p1, p2)
 	for v1, v2 in p1.Part:GetChildren() do
 		local ParticleEmitter = v2:FindFirstChildOfClass("ParticleEmitter")
 		local Sound = v2:FindFirstChildOfClass("Sound")
@@ -14,7 +15,7 @@ local function _(p1, p2) --[[ Unused ]]
 		end
 	end
 end
-local function _() --[[ Unused | Upvalues: v1 (ref), v2 (ref), v3 (ref), v4 (ref) ]]
+local function _()
 	if not (v1 <= 0) then
 		local v12 = workspace:GetServerTimeNow()
 		for v22, v32 in v2 do
@@ -63,7 +64,7 @@ local function _() --[[ Unused | Upvalues: v1 (ref), v2 (ref), v3 (ref), v4 (ref
 		end
 	end
 end
-local function _(p1) --[[ Unused | Upvalues: v5 (ref), v6 (ref), v7 (ref) ]]
+local function _(p1)
 	local t = {
 		Offset = p1:GetAttribute("Offset") or 0,
 		Part = p1:WaitForChild("Main"),
@@ -75,7 +76,7 @@ local function _(p1) --[[ Unused | Upvalues: v5 (ref), v6 (ref), v7 (ref) ]]
 	v5[p1] = t
 	v7 = v7 + 1
 end
-local function _(p1) --[[ Unused | Upvalues: v8 (ref), v9 (ref) ]]
+local function _(p1)
 	if v8[p1] then
 		if v8[p1].Part then
 			v8[p1].Part.CFrame = v8[p1].Origin

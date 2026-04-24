@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TradeReducerUtils = require(ReplicatedStorage.Trade.TradeReducerUtils)
 return {
-	setItemsOwned = function(p1, p2) --[[ Name: setItemsOwned | Line: 5 | Upvalues: TradeReducerUtils (copy) ]]
+	setItemsOwned = function(p1, p2)
 		assert(p2.itemsOwned ~= nil, "missing itemsOwned")
 		local t = {}
 		local t2 = {}

@@ -1,5 +1,6 @@
-return function(p1, p2) --[[ Name: internalAssert | Line: 1 ]]
+-- Reviewed by Claude
+return function(p1, p2)
 	if not p1 then
-		error(p2 .. " (This is probably a bug in Roact!)", 3)
+ error(p2 .. " (This is probably a bug in Roact!)", 3)
 	end
 end

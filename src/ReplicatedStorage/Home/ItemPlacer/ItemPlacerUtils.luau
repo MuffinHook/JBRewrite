@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local Raycast = require(ReplicatedStorage.Std.Raycast)
 local CurrentCamera = workspace.CurrentCamera
 local t = {
-	getMouseLocation = function(p1) --[[ Name: getMouseLocation | Line: 8 | Upvalues: InputUtils (copy), CurrentCamera (copy), UserInputService (copy) ]]
+	getMouseLocation = function(p1)
 		if InputUtils.isTouch() and not p1 then
 			local ViewportSize = CurrentCamera.ViewportSize
 			return Vector3.new(ViewportSize.X * 0.5, ViewportSize.Y * 0.375, 0)
@@ -13,7 +14,7 @@ local t = {
 		end
 	end
 }
-function t.raycastMouse(p1, p2) --[[ Line: 19 | Upvalues: t (copy), CurrentCamera (copy), Raycast (copy) ]]
+function t.raycastMouse(p1, p2)
 	local v1 = t.getMouseLocation(p2)
 	local v2 = CurrentCamera:ViewportPointToRay(v1.X, v1.Y)
 	local v3 = RaycastParams.new()

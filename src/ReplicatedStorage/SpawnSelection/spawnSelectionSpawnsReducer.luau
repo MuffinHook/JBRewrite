@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	minimapSetSpawns = function(p1, p2) --[[ Name: minimapSetSpawns | Line: 5 ]]
+	minimapSetSpawns = function(p1, p2)
 		local t = {}
 		for v1, v2 in p2.spawns do
 			assert(v2.name, "missing name")

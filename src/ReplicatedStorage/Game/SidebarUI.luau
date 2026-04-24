@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
@@ -28,7 +29,7 @@ local t = {
 local v1, v2 = Roact.createBinding("4:00 PM")
 t.time = v1
 t.updateTime = v2
-function t.Init(p1) --[[ Line: 31 | Upvalues: ReplicatedStorage (copy), Roact (copy), BigButtonService (copy), t (copy), UserInputService (copy), TeamShared (copy), Players (copy), Confirmation (copy), Notification (copy), Audio (copy), store (copy), RunUtils (copy), GamepassSystem (copy), GamepassUtils (copy), WorldTeleportConsts (copy), RunConsts (copy), GuiService (copy), Utils (copy), Settings (copy), createElement (copy), TopbarHolder (copy) ]]
+function t.Init(p1)
 	local em = p1.em
 	local v1 = p1.Event
 	local CashBuyUI = require(ReplicatedStorage.Game.CashBuyUI)
@@ -38,32 +39,32 @@ function t.Init(p1) --[[ Line: 31 | Upvalues: ReplicatedStorage (copy), Roact (c
 		imageId = 8733342027,
 		displayOrder = 10,
 		ref = v2,
-		onClick = function() --[[ Name: onClick | Line: 43 | Upvalues: t (ref) ]]
+		onClick = function()
 			t.onGarageToggle:Fire()
 		end
 	})
-	UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 48 | Upvalues: t (ref) ]]
+	UserInputService.InputBegan:Connect(function(p1, p2)
 		if not p2 and p1.KeyCode == Enum.KeyCode.DPadUp then
 			t.onGarageToggle:Fire()
 		end
 	end)
 	local v3 = nil
-	TeamShared.promiseIsTeamSwitchingEnabled():andThen(function(p1) --[[ Line: 58 | Upvalues: BigButtonService (ref), Players (ref), v3 (ref), Confirmation (ref), v1 (copy) ]]
+	TeamShared.promiseIsTeamSwitchingEnabled():andThen(function(p1)
 		if p1 then
 			BigButtonService.add({
 				name = "TeamSwitch",
 				imageId = 4912231691,
 				displayOrder = 20,
-				onClick = function() --[[ Name: onClick | Line: 64 | Upvalues: Players (ref), v3 (ref), Confirmation (ref), v1 (ref) ]]
+				onClick = function()
 					local ChoosingTeam = Players.LocalPlayer:FindFirstChild("ChoosingTeam")
 					if ChoosingTeam and ChoosingTeam.Value then
 					elseif v3 == nil then
 						v3 = Confirmation.new("Are you sure you want to switch teams?")
-						v3.OnYes:Connect(function() --[[ Line: 78 | Upvalues: v3 (ref), v1 (ref) ]]
+						v3.OnYes:Connect(function()
 							v3 = nil
 							v1:FireServer("l" .. "" .. ("y29g6ufpx"):sub(4, 7):reverse() .. "" .. "" .. ("g1brs4r"):sub(5, 6):reverse() .. "2")
 						end)
-						v3.OnNo:Connect(function() --[[ Line: 82 | Upvalues: v3 (ref) ]]
+						v3.OnNo:Connect(function()
 							v3 = nil
 						end)
 					else
@@ -78,7 +79,7 @@ function t.Init(p1) --[[ Line: 31 | Upvalues: ReplicatedStorage (copy), Roact (c
 		name = "Cash",
 		imageId = 4912231216,
 		displayOrder = 30,
-		onClick = function() --[[ Name: onClick | Line: 95 | Upvalues: t (ref), CashBuyUI (copy), Notification (ref) ]]
+		onClick = function()
 			if t.ShopAlreadyLoading then
 			elseif CashBuyUI.IsOpen == false then
 				if not CashBuyUI.Loaded then
@@ -100,7 +101,7 @@ function t.Init(p1) --[[ Line: 31 | Upvalues: ReplicatedStorage (copy), Roact (c
 		imageId = 10313420284,
 		imageScale = 0.9,
 		displayOrder = 40,
-		onClick = function() --[[ Name: onClick | Line: 118 | Upvalues: Players (ref), Audio (ref), store (ref) ]]
+		onClick = function()
 			if Players.LocalPlayer.PlayerGui then
 				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 					Volume = 0.15
@@ -116,7 +117,7 @@ function t.Init(p1) --[[ Line: 31 | Upvalues: ReplicatedStorage (copy), Roact (c
 		name = "Settings",
 		imageId = 8733343021,
 		displayOrder = 50,
-		onClick = function() --[[ Name: onClick | Line: 133 | Upvalues: t (ref) ]]
+		onClick = function()
 			t.onDevPanelToggle:Fire()
 		end
 	}
@@ -126,7 +127,7 @@ function t.Init(p1) --[[ Line: 31 | Upvalues: ReplicatedStorage (copy), Roact (c
 			name = "Trade",
 			imageId = 9857392770,
 			displayOrder = 60,
-			onClick = function() --[[ Name: onClick | Line: 153 | Upvalues: Players (ref), Audio (ref), store (ref) ]]
+			onClick = function()
 				if Players.LocalPlayer.PlayerGui then
 					Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 						Volume = 0.15
@@ -140,13 +141,13 @@ function t.Init(p1) --[[ Line: 31 | Upvalues: ReplicatedStorage (copy), Roact (c
 		})
 	end
 	if RunUtils.isTradeWorld() then
-		local function doesHaveVIP() --[[ Line: 170 | Upvalues: GamepassSystem (ref), GamepassUtils (ref) ]]
+		local function doesHaveVIP()
 			return GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP)
 		end
 		local t2 = {
 			name = "GoHome",
 			displayOrder = 70,
-			onClick = function() --[[ Name: onClick | Line: 176 | Upvalues: Players (ref), Audio (ref), GamepassSystem (ref), GamepassUtils (ref), v3 (ref), Confirmation (ref), ReplicatedStorage (ref), WorldTeleportConsts (ref), RunConsts (ref) ]]
+			onClick = function()
 				if Players.LocalPlayer.PlayerGui then
 					Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 						Volume = 0.15
@@ -155,11 +156,11 @@ function t.Init(p1) --[[ Line: 31 | Upvalues: ReplicatedStorage (copy), Roact (c
 				if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then
 					if v3 == nil then
 						v3 = Confirmation.new("Are you sure you want to return to Jailbreak?")
-						v3.OnYes:Connect(function() --[[ Line: 186 | Upvalues: v3 (ref), ReplicatedStorage (ref), WorldTeleportConsts (ref), RunConsts (ref) ]]
+						v3.OnYes:Connect(function()
 							v3 = nil
 							ReplicatedStorage:FindFirstChild(WorldTeleportConsts.TELEPORT_TO_WORLD_FROM_TEAM_SWITCH_NAME):FireServer(RunConsts.MAIN_WORLD_NAME)
 						end)
-						v3.OnNo:Connect(function() --[[ Line: 193 | Upvalues: v3 (ref) ]]
+						v3.OnNo:Connect(function()
 							v3 = nil
 						end)
 					else
@@ -171,39 +172,39 @@ function t.Init(p1) --[[ Line: 31 | Upvalues: ReplicatedStorage (copy), Roact (c
 				end
 			end
 		}
-		local function updateProps() --[[ Line: 202 | Upvalues: t2 (copy), GamepassSystem (ref), GamepassUtils (ref) ]]
+		local function updateProps()
 			t2.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
 		end
 		t2.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
 		BigButtonService.add(t2)
-		GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.TradingVIP):Connect(function() --[[ Line: 207 | Upvalues: t2 (copy), GamepassSystem (ref), GamepassUtils (ref), BigButtonService (ref) ]]
+		GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.TradingVIP):Connect(function()
 			t2.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
 			BigButtonService.triggerUpdate:Fire()
 		end)
 	end
 	local GameUtil = require(ReplicatedStorage.Game.GameUtil)
-	function em.zyfagb6d(p1) --[[ Line: 214 | Upvalues: GameUtil (copy) ]]
+	function em.zyfagb6d(p1)
 		if not (p1 == "Criminal") then
 			GameUtil.bounty = 0
 			GameUtil.onBountyChanged:Fire(GameUtil.bounty)
 		end
 	end
-	function em.rglritaz(p1) --[[ Line: 221 | Upvalues: GameUtil (copy) ]]
+	function em.rglritaz(p1)
 		GameUtil.bounty = p1
 		GameUtil.onBountyChanged:Fire(GameUtil.bounty)
 	end
 	t.SetSafeCount(0)
-	store.changed:connect(function(p1, p2) --[[ Line: 228 | Upvalues: t (ref) ]]
+	store.changed:connect(function(p1, p2)
 		if p1.safesInventoryItems ~= p2.safesInventoryItems then
 			t.SetSafeCount(#p1.safesInventoryItems)
 		end
 	end)
-	UserInputService.InputBegan:Connect(function(p1) --[[ Line: 238 | Upvalues: GuiService (ref), Utils (ref), v2 (copy) ]]
+	UserInputService.InputBegan:Connect(function(p1)
 		if p1.UserInputType == Enum.UserInputType.Gamepad1 and (p1.KeyCode == Enum.KeyCode.ButtonSelect and GuiService.SelectedObject ~= nil) then
 			Utils.selectIfGamepad(v2:getValue())
 		end
 	end)
-	local function getComponent() --[[ Line: 289 | Upvalues: Settings (ref), GameUtil (copy), Utils (ref), createElement (ref), TopbarHolder (ref), BigButtonService (ref) ]]
+	local function getComponent()
 		local v2 = Utils.isSmallScreen()
 		local t = {
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
@@ -219,23 +220,23 @@ function t.Init(p1) --[[ Line: 31 | Upvalues: ReplicatedStorage (copy), Roact (c
 	end
 	local v5 = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "SidebarGui")
 	local v6 = nil
-	Utils.getViewportSizeChangedSignal():Connect(function() --[[ Line: 308 | Upvalues: v6 (ref), Roact (ref), v5 (copy), getComponent (copy) ]]
+	Utils.getViewportSizeChangedSignal():Connect(function()
 		if v6 then
 			task.cancel(v6)
 		end
-		v6 = task.delay(0.1, function() --[[ Line: 312 | Upvalues: Roact (ref), v5 (ref), getComponent (ref), v6 (ref) ]]
+		v6 = task.delay(0.1, function()
 			Roact.update(v5, getComponent())
 			v6 = nil
 		end)
 	end)
-	GameUtil.OnTeamChanged:Connect(function(p1) --[[ Line: 317 | Upvalues: Roact (ref), v5 (copy), getComponent (copy) ]]
+	GameUtil.OnTeamChanged:Connect(function(p1)
 		Roact.update(v5, getComponent())
 	end)
 end
-function t.SetTime(p1) --[[ Line: 321 | Upvalues: t (copy) ]]
+function t.SetTime(p1)
 	t.updateTime(p1)
 end
-function t.SetSafeCount(p1) --[[ Line: 324 | Upvalues: t (copy), BigButtonService (copy) ]]
+function t.SetSafeCount(p1)
 	if t.safesButton then
 		t.safesButton.count = p1
 		BigButtonService.triggerUpdate:Fire()

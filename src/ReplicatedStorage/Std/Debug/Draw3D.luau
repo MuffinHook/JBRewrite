@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local t = {
 	_parent = nil
 }
-function t.setParent(p1) --[[ Line: 6 | Upvalues: t (copy) ]]
+function t.setParent(p1)
 	t._parent = p1
 end
-function t.point(p1, p2, p3) --[[ Line: 9 | Upvalues: t (copy) ]]
+function t.point(p1, p2, p3)
 	local v2 = p3 or Instance.new("Part")
 	assert(v2)
 	v2.Anchored = true
@@ -17,7 +18,7 @@ function t.point(p1, p2, p3) --[[ Line: 9 | Upvalues: t (copy) ]]
 	v2.Parent = t._parent
 	return v2
 end
-function t.line(p1, p2, p3) --[[ Line: 27 | Upvalues: t (copy) ]]
+function t.line(p1, p2, p3)
 	local v1 = p3 or Instance.new("Part")
 	assert(v1)
 	local Magnitude = (p2 - p1).Magnitude

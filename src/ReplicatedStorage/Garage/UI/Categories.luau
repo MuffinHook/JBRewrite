@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
@@ -8,8 +9,8 @@ local v1 = Roact.PureComponent:extend("Categories")
 v1.defaultProps = {
 	categoriesPerPage = 10
 }
-function v1.init(p1) --[[ Line: 13 ]] end
-function v1.render(p1) --[[ Line: 14 | Upvalues: createElement (copy), CategoryItem (copy), Dictionary (copy) ]]
+function v1.init(p1)  end
+function v1.render(p1)
 	local mainRatio = p1.props.mainRatio
 	local paddingRatio = p1.props.paddingRatio
 	local cornerPixel = p1.props.cornerPixel
@@ -27,7 +28,7 @@ function v1.render(p1) --[[ Line: 14 | Upvalues: createElement (copy), CategoryI
 		}
 		v3 = p1.props.selectedCategory == v.name
 		t2.selected = v3
-		function t2.onSelect() --[[ Line: 39 | Upvalues: p1 (copy), v (copy) ]]
+		function t2.onSelect()
 			p1.props.setCategory(v.name, p1.props.sortId)
 		end
 		table.insert(t, (createElement(CategoryItem, t2)))
@@ -78,15 +79,15 @@ function v1.render(p1) --[[ Line: 14 | Upvalues: createElement (copy), CategoryI
 		}, t))
 	})
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 103 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		categories = p1.garageCategories,
 		selectedCategory = p1.garageCategory,
 		sortId = p1.garageSort
 	}
-end, function(p1) --[[ Line: 109 ]]
+end, function(p1)
 	return {
-		setCategory = function(p12, p2) --[[ Name: setCategory | Line: 111 | Upvalues: p1 (copy) ]]
+		setCategory = function(p12, p2)
 			p1({
 				type = "setCategory",
 				categoryName = p12,

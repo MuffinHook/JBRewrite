@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("TweenService")
@@ -6,23 +7,23 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 11 | Upvalues: t (copy), Maid (copy), RxInstanceUtils (copy), Interval (copy) ]]
+function t.new(p1)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
-	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "BoardGui", function(p1, p2) --[[ Line: 16 | Upvalues: Interval (ref) ]]
+	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "BoardGui", function(p1, p2)
 		local Container = p1:WaitForChild("Container")
 		local UIListLayout = Container:WaitForChild("UIListLayout")
-		local function resize() --[[ Line: 19 | Upvalues: Container (copy), UIListLayout (copy) ]]
+		local function resize()
 			Container.Size = UDim2.new(1, 0, 0, UIListLayout.AbsoluteContentSize.Y)
 		end
 		Container.Size = UDim2.new(1, 0, 0, UIListLayout.AbsoluteContentSize.Y)
 		p2:GiveTask(UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(resize))
-		local function scrollY(p1) --[[ Line: 25 | Upvalues: Container (copy) ]]
+		local function scrollY(p1)
 			Container.Position = UDim2.new(0, 0, 0, -p1)
 		end
 		local v1 = 0
-		Interval.every(5):Connect(function() --[[ Line: 29 | Upvalues: p1 (copy), Container (copy), v1 (ref) ]]
+		Interval.every(5):Connect(function()
 			local Y = p1.AbsoluteSize.Y
 			local Y_2 = Container.AbsoluteSize.Y
 			local v12 = Y_2 / (#Container:GetChildren() - 1)
@@ -33,7 +34,7 @@ function t.new(p1) --[[ Line: 11 | Upvalues: t (copy), Maid (copy), RxInstanceUt
 	end))
 	return t2
 end
-function t.Destroy(p1) --[[ Line: 45 ]]
+function t.Destroy(p1)
 	p1._maid:Destroy()
 	setmetatable(p1, nil)
 end

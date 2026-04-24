@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -20,7 +21,7 @@ v1.defaultProps = {
 	colsPerRow = 5.5,
 	primaryColor = Color3.fromRGB(215, 131, 255)
 }
-function v1.init(p1) --[[ Line: 31 | Upvalues: Maid (copy), Roact (copy), ReplicatedStorage (copy), RewardSpinnerConsts (copy), Players (copy), Audio (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	p1.openMaid = Maid.new()
 	local v2, v3 = Roact.createBinding((math.ceil(p1.props.colsPerRow * 0.5 + 0.5)))
@@ -29,22 +30,22 @@ function v1.init(p1) --[[ Line: 31 | Upvalues: Maid (copy), Roact (copy), Replic
 	local v4, v5 = Roact.createBinding(false)
 	p1.ticked = v4
 	p1.updateTicked = v5
-	function p1.onFinished() --[[ Line: 39 | Upvalues: ReplicatedStorage (ref), RewardSpinnerConsts (ref), p1 (copy) ]]
+	function p1.onFinished()
 		local v1 = ReplicatedStorage:FindFirstChild(RewardSpinnerConsts.COLLECT_REWARD_REMOTE_NAME)
 		if v1 then
 			v1:FireServer(p1.props.config.topic)
 		end
-		p1.openMaid:GiveTask(task.delay(1, function() --[[ Line: 45 | Upvalues: p1 (ref) ]]
+		p1.openMaid:GiveTask(task.delay(1, function()
 			p1.props.close()
 		end))
 	end
-	function p1.playTick() --[[ Line: 50 | Upvalues: Players (ref), Audio (ref) ]]
+	function p1.playTick()
 		if Players.LocalPlayer then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 156286438)
 		end
 	end
 end
-function v1.render(p1) --[[ Line: 56 | Upvalues: rewardCardComponent (copy), createElement (copy), GridUtils (copy), Grid (copy) ]]
+function v1.render(p1)
 	if p1.props.config then
 		local v1 = p1.props.config.primaryColor or p1.props.primaryColor
 		local aspectRatio = p1.props.aspectRatio
@@ -183,7 +184,7 @@ function v1.render(p1) --[[ Line: 56 | Upvalues: rewardCardComponent (copy), cre
 						BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
 						Size = UDim2.new(1, 0, 0.8782961460446247, 0),
 						AnchorPoint = Vector2.new(0, 0.5),
-						Position = p1.index:map(function(p1) --[[ Line: 253 | Upvalues: colsPerRow (copy), GridUtils (ref), t (copy), v10 (copy) ]]
+						Position = p1.index:map(function(p1)
 							return UDim2.new(-(p1 - colsPerRow * 0.5 - 0.5) * GridUtils.getScaleX(t) - (p1 - colsPerRow * 0.5 - 0.5) / v10, 0, 0.5, 0)
 						end)
 					}, {
@@ -265,7 +266,7 @@ function v1.render(p1) --[[ Line: 56 | Upvalues: rewardCardComponent (copy), cre
 		return createElement("Frame", t2, t3)
 	end
 end
-function v1._spin(p1) --[[ Line: 347 | Upvalues: RunService (copy) ]]
+function v1._spin(p1)
 	local v1 = 0
 	local duration = p1.props.config.duration
 	local v2 = os.clock()
@@ -277,7 +278,7 @@ function v1._spin(p1) --[[ Line: 347 | Upvalues: RunService (copy) ]]
 		warn("winIndex is > maxVisibleIndex, player will see empty space")
 	end
 	local v10 = winIndex + math.clamp(math.random() - 0.5, -0.48, 0.48)
-	p1.maid.spinHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 361 | Upvalues: v2 (copy), duration (copy), v3 (ref), p1 (copy), v5 (copy), v10 (ref), v1 (ref) ]]
+	p1.maid.spinHeartbeat = RunService.Heartbeat:Connect(function()
 		local v12 = (os.clock() - v2) / duration
 		if v12 >= 1 then
 			v12 = 1
@@ -303,12 +304,12 @@ function v1._spin(p1) --[[ Line: 347 | Upvalues: RunService (copy) ]]
 		p1.updateIndex(v22)
 	end)
 end
-function v1.didMount(p1) --[[ Line: 399 ]]
+function v1.didMount(p1)
 	if p1.props.config then
 		p1:_spin()
 	end
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 404 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p1.props.config ~= p2.config then
 		p1.openMaid:DoCleaning()
 		if p1.props.config then
@@ -316,16 +317,16 @@ function v1.didUpdate(p1, p2, p3) --[[ Line: 404 ]]
 		end
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 412 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 415 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		config = p1.rewardSpinnerConfig
 	}
-end, function(p1) --[[ Line: 419 ]]
+end, function(p1)
 	return {
-		close = function() --[[ Name: close | Line: 421 | Upvalues: p1 (copy) ]]
+		close = function()
 			p1({
 				type = "setRewardSpinnerConfig",
 				items = nil

@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local t = {
 	QR = true,
 	Queue = {},
 	Process = 0
 }
 local t2 = {}
-task.spawn(function() --[[ Line: 7 | Upvalues: t (copy), t2 (copy) ]]
+task.spawn(function()
 	while t.QR do
 		task.wait()
 		if #t.Queue > 0 then
@@ -19,7 +20,7 @@ task.spawn(function() --[[ Line: 7 | Upvalues: t (copy), t2 (copy) ]]
 			if v3 <= 0 then
 				v3 = 0
 			end
-			task.delay(v3, function() --[[ Line: 21 | Upvalues: t2 (ref), v1 (copy), t (ref) ]]
+			task.delay(v3, function()
 				while true do
 					t2[v1.Key] = DateTime.now().UnixTimestamp
 					local v12, v2, v3 = pcall(v1.Func)
@@ -47,7 +48,7 @@ task.spawn(function() --[[ Line: 7 | Upvalues: t (copy), t2 (copy) ]]
 		end
 	end
 end)
-function t.AddRequest(p1, p2, p3) --[[ Line: 40 | Upvalues: t (copy) ]]
+function t.AddRequest(p1, p2, p3)
 	local v1 = Instance.new("BindableEvent")
 	table.insert(t.Queue, {
 		Key = p1,
@@ -58,7 +59,7 @@ function t.AddRequest(p1, p2, p3) --[[ Line: 40 | Upvalues: t (copy) ]]
 	local v2, v3, v4 = v1.Event:Wait()
 	return v2, v3, v4
 end
-function t.RemoveKey(p1) --[[ Line: 54 | Upvalues: t2 (copy) ]]
+function t.RemoveKey(p1)
 	t2[p1] = nil
 end
 return t

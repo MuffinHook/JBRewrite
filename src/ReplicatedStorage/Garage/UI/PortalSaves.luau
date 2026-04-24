@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -6,7 +7,7 @@ local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local createElement = Roact.createElement
 local PortalBase = require(script.Parent.PortalBase)
 local v1 = Roact.PureComponent:extend("PortalSaves")
-function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), PortalBase (copy) ]]
+function v1.render(p1)
 	local t = {}
 	local t2 = {}
 	for i, v in ipairs(p1.props.receipt) do
@@ -22,11 +23,11 @@ function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), PortalBas
 		v1 = v4 ~= nil
 		t3.filled = v1
 		t3.getInstCompare = v4
-		v2 = v4 and function() --[[ Line: 24 | Upvalues: v3 (copy), v4 (copy) ]]
+		v2 = v4 and function()
 			return v3.getInstForSelection(v4)
 		end
 		t3.getInst = v2
-		function t3.onSelect() --[[ Line: 28 | Upvalues: v3 (copy), p1 (copy) ]]
+		function t3.onSelect()
 			if v3.available then
 				p1.props.onSelectItem(v3)
 			end
@@ -46,13 +47,13 @@ function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), PortalBas
 		onSelectSort = p1.props.onSelectSort
 	})
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 50 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		receipt = p1.garageReceipt
 	}
-end, function(p1) --[[ Line: 54 | Upvalues: Players (copy), Audio (copy) ]]
+end, function(p1)
 	return {
-		onSelectItem = function(p12) --[[ Name: onSelectItem | Line: 56 | Upvalues: Players (ref), Audio (ref), p1 (copy) ]]
+		onSelectItem = function(p12)
 			if Players.LocalPlayer.PlayerGui then
 				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 					Volume = 0.25

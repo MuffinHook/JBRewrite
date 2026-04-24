@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemUtils = require(ReplicatedStorage.App.ItemUtils)
@@ -317,8 +318,8 @@ function HomeApp.render(self)
 					if self.state.pageName == "inventory" then
 						countLabel = ("%d/%d"):format(ownedCount - placedCount, ownedCount)
 					elseif self.state.pageName == "store" then
-						local maxPlacedStr = if item.maxPlaced == nil then "\226\136\158" else tostring(item.maxPlaced)
-						countLabel = ("%d/%s"):format(ownedCount, maxPlacedStr)
+						local maxPlacedDisplay = if item.maxPlaced == nil then "∞" else tostring(item.maxPlaced)
+						countLabel = ("%d/%s"):format(ownedCount, maxPlacedDisplay)
 					end
 				end
 

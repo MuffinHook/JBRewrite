@@ -1,83 +1,83 @@
 -- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClanConsts = require(ReplicatedStorage.Clan.ClanConsts)
-local t = {
-	getFlagColorFromClanInfo = function(p1)
-		if p1.FlagColorStr == nil then
+local ClanUtils = {
+	getFlagColorFromClanInfo = function(clanInfo)
+		if clanInfo.FlagColorStr == nil then
 			return nil
 		else
-			return Color3.fromHex(p1.FlagColorStr)
+			return Color3.fromHex(clanInfo.FlagColorStr)
 		end
 	end,
-	setFlagColorInClanInfo = function(p1, p2)
-		p1.FlagColorStr = p2:ToHex()
+	setFlagColorInClanInfo = function(clanInfo, color)
+		clanInfo.FlagColorStr = color:ToHex()
 	end,
-	getMemberInfoMapFromClanInfo = function(p1)
-		return p1.MemberInfoMap
+	getMemberInfoMapFromClanInfo = function(clanInfo)
+		return clanInfo.MemberInfoMap
 	end,
-	setMemberInfoInClanInfo = function(p1, p2, p3)
-		assert(typeof(p2) == "number", "playerUserId must be a number")
-		if p3 then
-			p1.MemberInfoMap[tostring(p2)] = p3
+	setMemberInfoInClanInfo = function(clanInfo, playerUserId, memberInfo)
+		assert(typeof(playerUserId) == "number", "playerUserId must be a number")
+		if memberInfo then
+			clanInfo.MemberInfoMap[tostring(playerUserId)] = memberInfo
 		else
-			p1.MemberInfoMap[tostring(p2)] = nil
+			clanInfo.MemberInfoMap[tostring(playerUserId)] = nil
 		end
 	end,
-	getClanNameFromClanInfo = function(p1)
-		return p1.Name
+	getClanNameFromClanInfo = function(clanInfo)
+		return clanInfo.Name
 	end,
-	getOwnerUserIdFromClanInfo = function(p1)
-		return tonumber(p1.OwnerUserId)
+	getOwnerUserIdFromClanInfo = function(clanInfo)
+		return tonumber(clanInfo.OwnerUserId)
 	end,
-	setOwnerUserIdInClanInfo = function(p1, p2)
-		assert(typeof(p2) == "number" or p2 == nil, "ownerUserId must be a number or nil")
-		p1.OwnerUserId = p2
+	setOwnerUserIdInClanInfo = function(clanInfo, ownerUserId)
+		assert(typeof(ownerUserId) == "number" or ownerUserId == nil, "ownerUserId must be a number or nil")
+		clanInfo.OwnerUserId = ownerUserId
 	end,
-	setAdminStatusInClanInfo = function(p1, p2, p3)
-		assert(typeof(p2) == "number", "playerUserId must be a number")
-		p1.AdminIdMap[tostring(p2)] = p3
+	setAdminStatusInClanInfo = function(clanInfo, playerUserId, isAdmin)
+		assert(typeof(playerUserId) == "number", "playerUserId must be a number")
+		clanInfo.AdminIdMap[tostring(playerUserId)] = isAdmin
 	end,
-	getAdminIdMapFromClanInfo = function(p1)
-		return p1.AdminIdMap
+	getAdminIdMapFromClanInfo = function(clanInfo)
+		return clanInfo.AdminIdMap
 	end,
-	getNameFromClanInfo = function(p1)
-		return p1.Name
+	getNameFromClanInfo = function(clanInfo)
+		return clanInfo.Name
 	end,
-	setNameInClanInfo = function(p1, p2)
-		p1.Name = p2
+	setNameInClanInfo = function(clanInfo, newName)
+		clanInfo.Name = newName
 	end
 }
-function t.getIsPlayerAdminFromClanInfo(p1, p2)
-	assert(p1 ~= nil, "clanInfo must not be nil")
-	assert(typeof(p2) == "number", "playerUserId must be a number")
-	return t.getAdminIdMapFromClanInfo(p1)[tostring(p2)] == true
+function ClanUtils.getIsPlayerAdminFromClanInfo(clanInfo, playerUserId)
+	assert(clanInfo ~= nil, "clanInfo must not be nil")
+	assert(typeof(playerUserId) == "number", "playerUserId must be a number")
+	return ClanUtils.getAdminIdMapFromClanInfo(clanInfo)[tostring(playerUserId)] == true
 end
-function t.getJoinRequestUserIdMapFromClanInfo(p1)
-	return p1.JoinRequestUserIdMap
+function ClanUtils.getJoinRequestUserIdMapFromClanInfo(clanInfo)
+	return clanInfo.JoinRequestUserIdMap
 end
-function t._createMembersOnlineFolder()
-	local v1 = Instance.new("Folder")
-	v1.Name = ClanConsts.MEMBERS_ONLINE_OBJECT_NAME
-	v1.Parent = ReplicatedStorage
-	return v1
+function ClanUtils._createMembersOnlineFolder()
+	local membersOnlineFolder = Instance.new("Folder")
+	membersOnlineFolder.Name = ClanConsts.MEMBERS_ONLINE_OBJECT_NAME
+	membersOnlineFolder.Parent = ReplicatedStorage
+	return membersOnlineFolder
 end
-function t._createMembersOnlineChangedVal(p1, p2)
-	assert(typeof(p2) == "string", "clanId must be a string")
-	local v2 = Instance.new("NumberValue")
-	v2.Name = p2
-	v2.Value = 0
-	v2.Parent = p1
-	return v2
+function ClanUtils._createMembersOnlineChangedVal(parentFolder, clanId)
+	assert(typeof(clanId) == "string", "clanId must be a string")
+	local membersOnlineValue = Instance.new("NumberValue")
+	membersOnlineValue.Name = clanId
+	membersOnlineValue.Value = 0
+	membersOnlineValue.Parent = parentFolder
+	return membersOnlineValue
 end
-function t.getNumMembersOnlineChangedSignal(p1)
-	return t.getMembersOnlineChangedSignal(p1)
+function ClanUtils.getNumMembersOnlineChangedSignal(clanId)
+	return ClanUtils.getMembersOnlineChangedSignal(clanId)
 end
-function t.getNumMembersOnline(p1)
-	assert(typeof(p1) == "string", "clanId must be a string")
-	local v2 = t.getMembersOnline(p1)
-	if v2 then
+function ClanUtils.getNumMembersOnline(clanId)
+	assert(typeof(clanId) == "string", "clanId must be a string")
+	local membersOnline = ClanUtils.getMembersOnline(clanId)
+	if membersOnline then
 		local count = 0
-		for v3, v4 in v2 do
+		for _, _ in membersOnline do
 			count = count + 1
 		end
 		return count
@@ -85,85 +85,84 @@ function t.getNumMembersOnline(p1)
 		return 0
 	end
 end
-function t.getMembersOnlineChangedSignal(p1)
-	assert(typeof(p1) == "string", "clanId must be a string")
-	local v2 = ReplicatedStorage:FindFirstChild(ClanConsts.MEMBERS_ONLINE_OBJECT_NAME)
-	if v2 then
-		local v3 = v2:FindFirstChild(p1)
-		if v3 then
-			return v3.Changed
+function ClanUtils.getMembersOnlineChangedSignal(clanId)
+	assert(typeof(clanId) == "string", "clanId must be a string")
+	local membersOnlineFolder = ReplicatedStorage:FindFirstChild(ClanConsts.MEMBERS_ONLINE_OBJECT_NAME)
+	if membersOnlineFolder then
+		local clanMembersValue = membersOnlineFolder:FindFirstChild(clanId)
+		if clanMembersValue then
+			return clanMembersValue.Changed
 		end
 	end
 end
-function t.getMembersOnline(p1)
-	assert(typeof(p1) == "string", "clanId must be a string")
-	local v2 = ReplicatedStorage:FindFirstChild(ClanConsts.MEMBERS_ONLINE_OBJECT_NAME)
-	if v2 then
-		local v3 = v2:FindFirstChild(p1)
-		if v3 then
-			local t = {}
-			for v4, v5 in v3:GetChildren() do
-				t[v5.Name] = true
+function ClanUtils.getMembersOnline(clanId)
+	assert(typeof(clanId) == "string", "clanId must be a string")
+	local membersOnlineFolder = ReplicatedStorage:FindFirstChild(ClanConsts.MEMBERS_ONLINE_OBJECT_NAME)
+	if membersOnlineFolder then
+		local clanMembersValue = membersOnlineFolder:FindFirstChild(clanId)
+		if clanMembersValue then
+			local membersMap = {}
+			for _, memberValue in clanMembersValue:GetChildren() do
+				membersMap[memberValue.Name] = true
 			end
-			return t
+			return membersMap
 		end
 	end
 end
-function t.setMembersOnlineMap(p1, p2)
-	assert(typeof(p1) == "string", "clanId must be a string")
-	local v2 = ReplicatedStorage:FindFirstChild(ClanConsts.MEMBERS_ONLINE_OBJECT_NAME)
-	if not v2 then
-		v2 = t._createMembersOnlineFolder()
+function ClanUtils.setMembersOnlineMap(clanId, membersOnlineMap)
+	assert(typeof(clanId) == "string", "clanId must be a string")
+	local membersOnlineFolder = ReplicatedStorage:FindFirstChild(ClanConsts.MEMBERS_ONLINE_OBJECT_NAME)
+	if not membersOnlineFolder then
+		membersOnlineFolder = ClanUtils._createMembersOnlineFolder()
 	end
-	local v4 = v2:FindFirstChild(p1)
-	if not v4 then
-		v4 = t._createMembersOnlineChangedVal(v2, p1)
+	local clanMembersValue = membersOnlineFolder:FindFirstChild(clanId)
+	if not clanMembersValue then
+		clanMembersValue = ClanUtils._createMembersOnlineChangedVal(membersOnlineFolder, clanId)
 	end
-	local v7 = p2 or {}
-	for v9, v10 in v4:GetChildren() do
-		local v8
-		v8 = typeof(v10.Name) == "string"
-		assert(v8, "child.Name must be a string")
-		if not v7[v10.Name] then
-			v10:Destroy()
+	local newMembersMap = membersOnlineMap or {}
+	for _, memberValue in clanMembersValue:GetChildren() do
+		local memberName = typeof(memberValue.Name) == "string"
+		assert(memberName, "child.Name must be a string")
+		if not newMembersMap[memberValue.Name] then
+			memberValue:Destroy()
 		end
 	end
-	for v12, v13 in v7 do
-		assert(typeof(v12) == "string", "membersOnlineMap keys must be strings")
+	for memberUserId, _ in newMembersMap do
+		assert(typeof(memberUserId) == "string", "membersOnlineMap keys must be strings")
 	end
-	for v15, v16 in v7 do
-		if not v4:FindFirstChild(v15) then
-			local v17 = Instance.new("BoolValue")
-			v17.Name = v15
-			v17.Value = true
-			v17.Parent = v4
+	for memberUserId, _ in newMembersMap do
+		if not clanMembersValue:FindFirstChild(memberUserId) then
+			local memberBoolValue = Instance.new("BoolValue")
+			memberBoolValue.Name = memberUserId
+			memberBoolValue.Value = true
+			memberBoolValue.Parent = clanMembersValue
 		end
 	end
-	v4.Value = v4.Value + 1
+	clanMembersValue.Value = clanMembersValue.Value + 1
 end
-function t.getCurrentClanIdChangedSignal(p1)
-	return p1:GetAttributeChangedSignal(ClanConsts.CURRENT_CLAN_ID_ATTR_NAME)
+function ClanUtils.getCurrentClanIdChangedSignal(player)
+	return player:GetAttributeChangedSignal(ClanConsts.CURRENT_CLAN_ID_ATTR_NAME)
 end
-function t.setCurrentClanId(p1, p2)
-	assert(typeof(p2) == "string" or p2 == nil, "clanId must be a string")
-	p1:SetAttribute(ClanConsts.CURRENT_CLAN_ID_ATTR_NAME, p2)
+function ClanUtils.setCurrentClanId(player, clanId)
+	assert(typeof(clanId) == "string" or clanId == nil, "clanId must be a string")
+	player:SetAttribute(ClanConsts.CURRENT_CLAN_ID_ATTR_NAME, clanId)
 end
-function t.getCurrentClanId(p1)
-	return p1:GetAttribute(ClanConsts.CURRENT_CLAN_ID_ATTR_NAME)
+function ClanUtils.getCurrentClanId(player)
+	return player:GetAttribute(ClanConsts.CURRENT_CLAN_ID_ATTR_NAME)
 end
-function t.setIsPlayerAdminCached(p1, p2)
-	assert(typeof(p2) == "boolean" or p2 == nil, "value must be a boolean or nil")
-	p1:SetAttribute(ClanConsts.IS_PLAYER_CLAN_ADMIN_CACHED_ATTR_NAME, p2)
+function ClanUtils.setIsPlayerAdminCached(player, value)
+	assert(typeof(value) == "boolean" or value == nil, "value must be a boolean or nil")
+	player:SetAttribute(ClanConsts.IS_PLAYER_CLAN_ADMIN_CACHED_ATTR_NAME, value)
 end
-function t.getIsPlayerAdminCached(p1)
-	return p1:GetAttribute(ClanConsts.IS_PLAYER_CLAN_ADMIN_CACHED_ATTR_NAME)
+function ClanUtils.getIsPlayerAdminCached(player)
+	return player:GetAttribute(ClanConsts.IS_PLAYER_CLAN_ADMIN_CACHED_ATTR_NAME)
 end
-function t.getIsPlayerAdminCachedChangedSignal(p1)
-	return p1:GetAttributeChangedSignal(ClanConsts.IS_PLAYER_CLAN_ADMIN_CACHED_ATTR_NAME)
+function ClanUtils.getIsPlayerAdminCachedChangedSignal(player)
+	return player:GetAttributeChangedSignal(ClanConsts.IS_PLAYER_CLAN_ADMIN_CACHED_ATTR_NAME)
 end
-function t.getEmptyMemberInfo()
+function ClanUtils.getEmptyMemberInfo()
 	return {
 		JoinTime = workspace:GetServerTimeNow()
 	}
 end
-return t
+return ClanUtils

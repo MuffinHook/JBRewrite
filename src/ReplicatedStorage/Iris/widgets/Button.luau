@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
+return function(p1, p2)
 	local t = {
 		hasState = false,
 		hasChildren = false,
@@ -8,23 +9,23 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Size = 2
 		},
 		Events = {
-			clicked = p2.EVENTS.click(function(p1) --[[ Line: 12 ]]
+			clicked = p2.EVENTS.click(function(p1)
 				return p1.Instance
 			end),
-			rightClicked = p2.EVENTS.rightClick(function(p1) --[[ Line: 15 ]]
+			rightClicked = p2.EVENTS.rightClick(function(p1)
 				return p1.Instance
 			end),
-			doubleClicked = p2.EVENTS.doubleClick(function(p1) --[[ Line: 18 ]]
+			doubleClicked = p2.EVENTS.doubleClick(function(p1)
 				return p1.Instance
 			end),
-			ctrlClicked = p2.EVENTS.ctrlClick(function(p1) --[[ Line: 21 ]]
+			ctrlClicked = p2.EVENTS.ctrlClick(function(p1)
 				return p1.Instance
 			end),
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 24 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 28 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local TextButton = Instance.new("TextButton")
 			TextButton.AutomaticSize = Enum.AutomaticSize.XY
 			TextButton.Size = UDim2.fromOffset(0, 0)
@@ -44,25 +45,25 @@ return function(p1, p2) --[[ Line: 3 ]]
 			})
 			return TextButton
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 52 ]]
+		Update = function(p1)
 			local v1 = p1.Instance
 			v1.Text = p1.arguments.Text or "Button"
 			v1.Size = p1.arguments.Size or UDim2.fromOffset(0, 0)
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 57 ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	}
 	p2.abstractButton = t
 	p1.WidgetConstructor("Button", p2.extend(t, {
-		Generate = function(p1) --[[ Name: Generate | Line: 65 | Upvalues: t (copy) ]]
+		Generate = function(p1)
 			local Iris_Button = t.Generate(p1)
 			Iris_Button.Name = "Iris_Button"
 			return Iris_Button
 		end
 	}))
 	p1.WidgetConstructor("SmallButton", p2.extend(t, {
-		Generate = function(p1) --[[ Name: Generate | Line: 76 | Upvalues: t (copy) ]]
+		Generate = function(p1)
 			local Iris_SmallButton = t.Generate(p1)
 			Iris_SmallButton.Name = "Iris_SmallButton"
 			local UIPadding = Iris_SmallButton.UIPadding

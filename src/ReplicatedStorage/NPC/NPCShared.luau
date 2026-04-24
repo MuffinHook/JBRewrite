@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -15,9 +16,9 @@ local NPCConsts = require(ReplicatedStorage.NPC.NPCConsts)
 local NPCUtils = require(ReplicatedStorage.NPC.NPCUtils)
 local DestructibleConsts = require(ReplicatedStorage.Game.Destructible.DestructibleConsts)
 local t = {}
-function t.setup(p1) --[[ Line: 23 | Upvalues: Signal (copy), RxInstanceUtils (copy), NPCConsts (copy), Maid (copy), NPCUtils (copy), RunService (copy), GeomUtils (copy), t (copy), Interval (copy), Region (copy), RegionUtils (copy) ]]
+function t.setup(p1)
 	local obj = p1.obj
-	p1.maid:GiveTask(function() --[[ Line: 26 | Upvalues: p1 (copy) ]]
+	p1.maid:GiveTask(function()
 		if p1._path then
 			p1._path:Destroy()
 			p1._path = nil
@@ -29,24 +30,24 @@ function t.setup(p1) --[[ Line: 23 | Upvalues: Signal (copy), RxInstanceUtils (c
 	p1.maid.reachedConnection = nil
 	p1._lastJump = 0
 	p1.onWaypoint = Signal.new()
-	function p1.shouldMoveToNextWaypointFunc() --[[ Line: 41 ]]
+	function p1.shouldMoveToNextWaypointFunc()
 		return true
 	end
 	p1.lookAtConstraint = nil
-	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.LOOK_AT_CONSTRAINT_NAME, function(p12, p2) --[[ Line: 50 | Upvalues: p1 (copy) ]]
+	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.LOOK_AT_CONSTRAINT_NAME, function(p12, p2)
 		p1.lookAtConstraint = p12
-		p2:GiveTask(function() --[[ Line: 52 | Upvalues: p1 (ref) ]]
+		p2:GiveTask(function()
 			p1.lookAtConstraint = nil
 		end)
 	end))
-	local function updateTarget() --[[ Line: 59 | Upvalues: Maid (ref), p1 (copy), NPCUtils (ref), obj (copy), NPCConsts (ref), RunService (ref), GeomUtils (ref), t (ref), Interval (ref) ]]
+	local function updateTarget()
 		local v1 = Maid.new()
 		p1.maid.targetMaid = v1
 		if p1:IsLocallyOwned() and (not p1.customUpdateTarget or p1:customUpdateTarget(v1) ~= true) then
 			local v2 = NPCUtils.getTargetType(obj)
 			if v2 and v2 == NPCConsts.DEST_TYPE.OBJ then
 				if NPCUtils.getTarget(obj) then
-					v1:GiveTask(RunService.PostSimulation:Connect(function() --[[ Line: 81 | Upvalues: obj (ref), NPCUtils (ref), GeomUtils (ref), p1 (ref), t (ref) ]]
+					v1:GiveTask(RunService.PostSimulation:Connect(function()
 						if obj.PrimaryPart then
 							local v1 = NPCUtils.getTarget(obj)
 							local Position = v1.Position
@@ -81,18 +82,18 @@ function t.setup(p1) --[[ Line: 23 | Upvalues: Signal (copy), RxInstanceUtils (c
 			elseif v2 and v2 == NPCConsts.DEST_TYPE.POS then
 				local v3 = NPCUtils.getTarget(obj)
 				if v3 then
-					v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 141 | Upvalues: t (ref), p1 (ref), v3 (copy) ]]
+					v1:GiveTask(RunService.Heartbeat:Connect(function()
 						t.goTo(p1, v3)
 					end))
 				end
 			elseif v2 and v2 == NPCConsts.DEST_TYPE.IDLE then
 				local v4 = nil
-				v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 147 | Upvalues: v4 (ref), t (ref), p1 (ref) ]]
+				v1:GiveTask(RunService.Heartbeat:Connect(function()
 					if v4 then
 						t.goTo(p1, v4)
 					end
 				end))
-				v1:GiveTask(Interval.every(2):Connect(function() --[[ Line: 152 | Upvalues: NPCUtils (ref), obj (ref), GeomUtils (ref), v4 (ref) ]]
+				v1:GiveTask(Interval.every(2):Connect(function()
 					local v1 = NPCUtils.getTarget(obj)
 					if v1 then
 						local v2 = GeomUtils.randomPointOnCircle() * 16
@@ -109,12 +110,12 @@ function t.setup(p1) --[[ Line: 23 | Upvalues: Signal (copy), RxInstanceUtils (c
 	updateTarget()
 	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.DEST_POS_ATTR_NAME):Connect(updateTarget))
 	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.DEST_TYPE_ATTR_NAME):Connect(updateTarget))
-	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.DEST_OBJ_VALUE_NAME, function(p1, p2) --[[ Line: 173 | Upvalues: updateTarget (copy) ]]
+	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.DEST_OBJ_VALUE_NAME, function(p1, p2)
 		updateTarget()
 		p2:GiveTask(p1.Changed:Connect(updateTarget))
 	end))
 	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME):Connect(updateTarget))
-	local function updateLookAt() --[[ Line: 181 | Upvalues: Maid (ref), p1 (copy), NPCUtils (ref), obj (copy), NPCConsts (ref), RunService (ref), t (ref) ]]
+	local function updateLookAt()
 		local v1 = Maid.new()
 		p1.maid.lookAtMaid = v1
 		if p1:IsLocallyOwned() then
@@ -122,7 +123,7 @@ function t.setup(p1) --[[ Line: 23 | Upvalues: Signal (copy), RxInstanceUtils (c
 			if v2 and v2 == NPCConsts.DEST_TYPE.OBJ then
 				local v3 = NPCUtils.getLookAt(obj)
 				if v3 then
-					v1.runtime = RunService.Heartbeat:Connect(function() --[[ Line: 196 | Upvalues: t (ref), p1 (ref), v3 (copy) ]]
+					v1.runtime = RunService.Heartbeat:Connect(function()
 						t.lookAt(p1, v3.Position)
 					end)
 				else
@@ -131,14 +132,14 @@ function t.setup(p1) --[[ Line: 23 | Upvalues: Signal (copy), RxInstanceUtils (c
 			elseif v2 and v2 == NPCConsts.DEST_TYPE.POS then
 				local v4 = NPCUtils.getLookAt(obj)
 				if v4 then
-					v1.runtime = RunService.Heartbeat:Connect(function() --[[ Line: 204 | Upvalues: t (ref), p1 (ref), v4 (copy) ]]
+					v1.runtime = RunService.Heartbeat:Connect(function()
 						t.lookAt(p1, v4)
 					end)
 				else
 					return
 				end
 			end
-			v1:GiveTask(function() --[[ Line: 209 | Upvalues: p1 (ref) ]]
+			v1:GiveTask(function()
 				if p1.lookAtConstraint then
 					p1.lookAtConstraint.Enabled = false
 				end
@@ -148,16 +149,16 @@ function t.setup(p1) --[[ Line: 23 | Upvalues: Signal (copy), RxInstanceUtils (c
 	updateLookAt()
 	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.LOOK_AT_POS_ATTR_NAME):Connect(updateLookAt))
 	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.LOOK_AT_TYPE_ATTR_NAME):Connect(updateLookAt))
-	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.LOOK_AT_OBJ_VALUE_NAME, function(p1, p2) --[[ Line: 219 | Upvalues: updateLookAt (copy) ]]
+	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.LOOK_AT_OBJ_VALUE_NAME, function(p1, p2)
 		updateLookAt()
 		p2:GiveTask(p1.Changed:Connect(updateLookAt))
 	end))
 	p1.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME):Connect(updateLookAt))
-	p1.maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 226 | Upvalues: t (ref), p1 (copy) ]]
+	p1.maid:GiveTask(Interval.every(1):Connect(function()
 		t._createNewPath(p1)
 		t._updatePathfind(p1)
 	end))
-	p1.maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 233 | Upvalues: p1 (copy) ]]
+	p1.maid:GiveTask(Interval.every(1):Connect(function()
 		if p1:IsLocallyOwned() then
 			local t = {
 				[Enum.HumanoidStateType.Dead] = true,
@@ -182,44 +183,44 @@ function t.setup(p1) --[[ Line: 23 | Upvalues: Signal (copy), RxInstanceUtils (c
 	v1.FilterDescendantsInstances = {}
 	v1.IgnoreWater = true
 	p1.occlusionCastParams = v1
-	p1.maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 259 | Upvalues: v1 (copy), t (ref), p1 (copy) ]]
+	p1.maid:GiveTask(Interval.every(1):Connect(function()
 		v1.FilterDescendantsInstances = t._buildOcclusionBlacklist(p1)
 	end))
 	p1.allowedRegion = Region.new(RegionUtils.NilCondition)
 	p1.maid:GiveTask(p1.allowedRegion)
 	p1.hasAllowedRegion = false
-	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.ALLOWED_PRISMS_FOLDER_NAME, function(p12, p2) --[[ Line: 271 | Upvalues: RxInstanceUtils (ref), p1 (copy) ]]
-		p2:GiveTask(RxInstanceUtils.observeChildren(p12, function(p13, p2) --[[ Line: 275 | Upvalues: RxInstanceUtils (ref), p1 (ref), p12 (copy) ]]
+	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.ALLOWED_PRISMS_FOLDER_NAME, function(p12, p2)
+		p2:GiveTask(RxInstanceUtils.observeChildren(p12, function(p13, p2)
 			local t = {
 				c = CFrame.new(),
 				s = Vector3.new()
 			}
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p13, "c", function(p1) --[[ Line: 278 | Upvalues: t (copy) ]]
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p13, "c", function(p1)
 				t.c = p1.Value
 			end))
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p13, "s", function(p1) --[[ Line: 283 | Upvalues: t (copy) ]]
+			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p13, "s", function(p1)
 				t.s = p1.Value
 			end))
 			p2:GiveTask((p1.allowedRegion:AddPrism(t)))
-			local function f() --[[ Line: 289 | Upvalues: p1 (ref), p12 (ref) ]]
+			local function f()
 				p1.hasAllowedRegion = #p12:GetChildren() > 0
 			end
 			p1.hasAllowedRegion = #p12:GetChildren() > 0
 			p2:GiveTask(f)
 		end))
 	end))
-	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.HOME_POSITION_OBJ_NAME, function(p12, p2) --[[ Line: 306 | Upvalues: p1 (copy), NPCUtils (ref), obj (copy) ]]
-		local function update() --[[ Line: 307 | Upvalues: p1 (ref), NPCUtils (ref), obj (ref) ]]
+	p1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.HOME_POSITION_OBJ_NAME, function(p12, p2)
+		local function update()
 			p1.homePosition = NPCUtils.getHomePosition(obj)
 		end
 		p1.homePosition = NPCUtils.getHomePosition(obj)
 		p2:GiveTask(p12.Changed:Connect(update))
-		p2:GiveTask(function() --[[ Line: 312 | Upvalues: p1 (ref) ]]
+		p2:GiveTask(function()
 			p1.homePosition = nil
 		end)
 	end))
 end
-function t._buildOcclusionBlacklist(p1) --[[ Line: 319 | Upvalues: CollectionService (copy), Players (copy), DestructibleConsts (copy) ]]
+function t._buildOcclusionBlacklist(p1)
 	local t = { p1.obj }
 	local t2 = {}
 	for v1, v2 in CollectionService:GetTagged("Humanoid") do
@@ -241,7 +242,7 @@ function t._buildOcclusionBlacklist(p1) --[[ Line: 319 | Upvalues: CollectionSer
 	end
 	return t
 end
-function t._createNewPath(p1) --[[ Line: 343 | Upvalues: PathfindingService (copy) ]]
+function t._createNewPath(p1)
 	if p1._path then
 		p1._path:Destroy()
 		p1._path = nil
@@ -253,13 +254,13 @@ function t._createNewPath(p1) --[[ Line: 343 | Upvalues: PathfindingService (cop
 		Costs = p1.agentCosts
 	})
 end
-function t.pathfindTo(p1, p2) --[[ Line: 355 ]]
+function t.pathfindTo(p1, p2)
 	p1._pathfindTo = p2
 end
-function t._updatePathfind(p1) --[[ Line: 358 | Upvalues: NPCConsts (copy), t (copy) ]]
+function t._updatePathfind(p1)
 	local _pathfindTo = p1._pathfindTo
 	if _pathfindTo then
-		local v1, _ = pcall(function() --[[ Line: 361 | Upvalues: p1 (copy), _pathfindTo (copy) ]]
+		local v1, _ = pcall(function()
 			p1._path:ComputeAsync(p1.obj.PrimaryPart.Position + p1.obj.PrimaryPart.CFrame.UpVector * -4, _pathfindTo)
 		end)
 		if p1.Destroy == nil then
@@ -270,7 +271,7 @@ function t._updatePathfind(p1) --[[ Line: 358 | Upvalues: NPCConsts (copy), t (c
 		if v2 then
 			p1._waypoints = p1._path:GetWaypoints()
 			if not p1.maid.reachedConnection then
-				p1.maid.reachedConnection = p1.humanoid.MoveToFinished:Connect(function(p12) --[[ Line: 378 | Upvalues: p1 (copy), NPCConsts (ref), t (ref) ]]
+				p1.maid.reachedConnection = p1.humanoid.MoveToFinished:Connect(function(p12)
 					if p12 and (p1._waypoints and p1._nextWaypointIndex < #p1._waypoints) then
 						local v1 = p1
 						v1._nextWaypointIndex = v1._nextWaypointIndex + 1
@@ -310,7 +311,7 @@ function t._updatePathfind(p1) --[[ Line: 358 | Upvalues: NPCConsts (copy), t (c
 		p1.maid.reachedConnection = nil
 	end
 end
-function t.lookAt(p1, p2) --[[ Line: 426 ]]
+function t.lookAt(p1, p2)
 	if p1.lookAtConstraint ~= nil then
 		if p2 == nil then
 			if p1.lookAtConstraint.Enabled then
@@ -324,7 +325,7 @@ function t.lookAt(p1, p2) --[[ Line: 426 ]]
 		end
 	end
 end
-function t.goTo(p1, p2) --[[ Line: 441 | Upvalues: t (copy), NPCConsts (copy) ]]
+function t.goTo(p1, p2)
 	local humanoid = p1.humanoid
 	local v1 = os.clock()
 	if not p1._lastTargetOcclusionCheck then
@@ -348,7 +349,7 @@ function t.goTo(p1, p2) --[[ Line: 441 | Upvalues: t (copy), NPCConsts (copy) ]]
 		t.move(humanoid, Vector3.new(0, 0, 0))
 	end
 end
-function t.isNonOccluded(p1, p2, p3) --[[ Line: 468 | Upvalues: Raycast (copy) ]]
+function t.isNonOccluded(p1, p2, p3)
 	local Position = p1.Position
 	local v1 = p2 - Position
 	if v1.Magnitude < 0.1 then
@@ -362,13 +363,13 @@ function t.isNonOccluded(p1, p2, p3) --[[ Line: 468 | Upvalues: Raycast (copy) ]
 		end
 	end
 end
-function t.moveTo(p1, p2) --[[ Line: 481 ]]
+function t.moveTo(p1, p2)
 	p1:MoveTo(p2)
 end
-function t.moveTowards(p1, p2) --[[ Line: 484 | Upvalues: t (copy) ]]
+function t.moveTowards(p1, p2)
 	t.move(p1, (p2 - p1.RootPart.Position).Unit)
 end
-function t.zigZagTowards(p1, p2) --[[ Line: 488 | Upvalues: NPCConsts (copy), t (copy) ]]
+function t.zigZagTowards(p1, p2)
 	local v1 = p1.Parent:GetAttribute(NPCConsts.SIDE_STRAFE_MULT_ATTR_NAME)
 	local v2 = p1.Parent:GetAttribute(NPCConsts.FREQ_OFFSET_ATTR_NAME)
 	local v3 = p2 - p1.RootPart.Position
@@ -376,10 +377,10 @@ function t.zigZagTowards(p1, p2) --[[ Line: 488 | Upvalues: NPCConsts (copy), t 
 	local v6 = v3.Unit:Cross(Vector3.new(0, 1, 0))
 	t.move(p1, v3.Unit + v6 * (math.cos(os.clock() * 7 + v2) * v5) * 0.3 * v1)
 end
-function t.move(p1, p2) --[[ Line: 498 ]]
+function t.move(p1, p2)
 	p1:Move(p2)
 end
-function t.getDistTo(p1, p2) --[[ Line: 501 ]]
+function t.getDistTo(p1, p2)
 	return ((p2 - p1.Position) * Vector3.new(1, 0, 1)).Magnitude
 end
 return t

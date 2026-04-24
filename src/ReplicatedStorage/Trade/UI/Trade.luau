@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -14,7 +15,7 @@ local EnumSort = require(ReplicatedStorage.Garage.EnumSort)
 local TradeInventory = require(script.Parent.TradeInventory)
 local TradeOffering = require(script.Parent.TradeOffering)
 local store = require(ReplicatedStorage.App.store)
-local function playTick() --[[ Line: 19 | Upvalues: Players (copy), Audio (copy) ]]
+local function playTick()
 	if Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 			Volume = 0.15
@@ -27,7 +28,7 @@ v1.defaultProps = {
 	position = UDim2.new(0.5, 0, 0.5, 0),
 	anchorPoint = Vector2.new(0.5, 0.5)
 }
-local function resetInventoryUserEditedValues() --[[ Line: 31 | Upvalues: store (copy), Players (copy) ]]
+local function resetInventoryUserEditedValues()
 	store:dispatch({
 		type = "setTradeInventorySearchText",
 		value = ""
@@ -37,18 +38,18 @@ local function resetInventoryUserEditedValues() --[[ Line: 31 | Upvalues: store 
 		selectedPlayer = Players.LocalPlayer
 	})
 end
-function v1.init(p1) --[[ Line: 41 | Upvalues: Maid (copy), TradeUtils (copy), resetInventoryUserEditedValues (copy), Players (copy), Audio (copy), ReplicatedStorage (copy), TradeConsts (copy), store (copy) ]]
+function v1.init(p1)
 	p1.activeMaid = Maid.new()
 	p1.categories = TradeUtils.getCategories()
 	p1:setState({
 		inventoryItems = p1:_getFilteredInventoryItems(),
 		category = p1.categories[1]
 	})
-	function p1.onClickExitInventory() --[[ Line: 49 | Upvalues: resetInventoryUserEditedValues (ref), p1 (copy) ]]
+	function p1.onClickExitInventory()
 		resetInventoryUserEditedValues()
 		p1.props.setInventoryOpen(false)
 	end
-	function p1.promptInventory() --[[ Line: 53 | Upvalues: Players (ref), Audio (ref), p1 (copy) ]]
+	function p1.promptInventory()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 				Volume = 0.15
@@ -56,7 +57,7 @@ function v1.init(p1) --[[ Line: 41 | Upvalues: Maid (copy), TradeUtils (copy), r
 		end
 		p1.props.setInventoryOpen(true)
 	end
-	function p1.onClickInventoryItem(p12) --[[ Line: 57 | Upvalues: p1 (copy), Players (ref), Audio (ref) ]]
+	function p1.onClickInventoryItem(p12)
 		if p1.props.tradeActive and p1.props.inventoryPlayers.selectedPlayer == Players.LocalPlayer then
 			local v1 = p1.state.inventoryItems[p12]
 			local v2 = false
@@ -80,11 +81,11 @@ function v1.init(p1) --[[ Line: 41 | Upvalues: Maid (copy), TradeUtils (copy), r
 			end
 		end
 	end
-	function p1.removeTraderMeOfferItemByIndex(p12) --[[ Line: 81 | Upvalues: p1 (copy) ]]
+	function p1.removeTraderMeOfferItemByIndex(p12)
 		p1.props.removeTraderMeOfferItemByIndex(p12)
 		p1:_updateMyOffer(false)
 	end
-	function p1.onClickCategory(p12) --[[ Line: 85 | Upvalues: Players (ref), Audio (ref), p1 (copy) ]]
+	function p1.onClickCategory(p12)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 				Volume = 0.25
@@ -99,7 +100,7 @@ function v1.init(p1) --[[ Line: 41 | Upvalues: Maid (copy), TradeUtils (copy), r
 			})
 		end
 	end
-	function p1.onClickReady() --[[ Line: 95 | Upvalues: p1 (copy), Players (ref), Audio (ref) ]]
+	function p1.onClickReady()
 		p1.props.onClickReady()
 		p1:_updateMyOffer(true)
 		if Players.LocalPlayer.PlayerGui then
@@ -108,7 +109,7 @@ function v1.init(p1) --[[ Line: 41 | Upvalues: Maid (copy), TradeUtils (copy), r
 			})
 		end
 	end
-	function p1.onClickUnready() --[[ Line: 100 | Upvalues: p1 (copy), Players (ref), Audio (ref) ]]
+	function p1.onClickUnready()
 		p1.props.onClickUnready()
 		p1:_updateMyOffer(false)
 		if Players.LocalPlayer.PlayerGui then
@@ -117,7 +118,7 @@ function v1.init(p1) --[[ Line: 41 | Upvalues: Maid (copy), TradeUtils (copy), r
 			})
 		end
 	end
-	function p1.onClickAccept() --[[ Line: 105 | Upvalues: ReplicatedStorage (ref), TradeConsts (ref), Players (ref), Audio (ref) ]]
+	function p1.onClickAccept()
 		ReplicatedStorage:FindFirstChild(TradeConsts.ACCEPT_OFFERING_REMOTE_NAME):FireServer()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
@@ -125,7 +126,7 @@ function v1.init(p1) --[[ Line: 41 | Upvalues: Maid (copy), TradeUtils (copy), r
 			})
 		end
 	end
-	function p1.onClickDecline() --[[ Line: 111 | Upvalues: ReplicatedStorage (ref), TradeConsts (ref), Players (ref), Audio (ref) ]]
+	function p1.onClickDecline()
 		ReplicatedStorage:FindFirstChild(TradeConsts.DECLINE_OFFERING_REMOTE_NAME):FireServer()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
@@ -133,7 +134,7 @@ function v1.init(p1) --[[ Line: 41 | Upvalues: Maid (copy), TradeUtils (copy), r
 			})
 		end
 	end
-	function p1.onClickExit() --[[ Line: 117 | Upvalues: ReplicatedStorage (ref), TradeConsts (ref), Players (ref), Audio (ref) ]]
+	function p1.onClickExit()
 		ReplicatedStorage:FindFirstChild(TradeConsts.EXIT_OFFERING_REMOTE_NAME):FireServer()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
@@ -141,14 +142,14 @@ function v1.init(p1) --[[ Line: 41 | Upvalues: Maid (copy), TradeUtils (copy), r
 			})
 		end
 	end
-	function p1.onCardFlipped() --[[ Line: 123 | Upvalues: Players (ref), Audio (ref) ]]
+	function p1.onCardFlipped()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 9846199217, {
 				Volume = 0.15
 			})
 		end
 	end
-	function p1.onClickInventoryPlayer(p1) --[[ Line: 128 | Upvalues: store (ref), Players (ref), Audio (ref) ]]
+	function p1.onClickInventoryPlayer(p1)
 		store:dispatch({
 			type = "setInventoryPlayer",
 			selectedPlayer = p1
@@ -160,7 +161,7 @@ function v1.init(p1) --[[ Line: 41 | Upvalues: Maid (copy), TradeUtils (copy), r
 		end
 	end
 end
-function v1._updateMyOffer(p1, p2) --[[ Line: 136 | Upvalues: ReplicatedStorage (copy), TradeConsts (copy) ]]
+function v1._updateMyOffer(p1, p2)
 	if p2 == nil then
 		p2 = p1.props.traderMe.ready
 	end
@@ -170,12 +171,12 @@ function v1._updateMyOffer(p1, p2) --[[ Line: 136 | Upvalues: ReplicatedStorage 
 		v2:FireServer(p2, v1)
 	end
 end
-function v1._getMeOfferIds(p1) --[[ Line: 146 | Upvalues: TableUtils (copy) ]]
-	return TableUtils.map(p1.props.traderMe.offerItems, function(p1) --[[ Line: 147 ]]
+function v1._getMeOfferIds(p1)
+	return TableUtils.map(p1.props.traderMe.offerItems, function(p1)
 		return assert(p1.id, "missing id itemProp")
 	end)
 end
-function v1._getFilteredInventoryItems(p1) --[[ Line: 153 | Upvalues: TableUtils (copy), SortUtils (copy) ]]
+function v1._getFilteredInventoryItems(p1)
 	local tradeInventorySearchText = p1.props.tradeInventorySearchText
 	local t = {}
 	for i, v in ipairs(p1.props.tradeInventory) do
@@ -186,8 +187,8 @@ function v1._getFilteredInventoryItems(p1) --[[ Line: 153 | Upvalues: TableUtils
 	table.sort(t, SortUtils.getTradeSortFunc(p1.props.tradeSort))
 	return t
 end
-function v1._getFilteredInventoryPlayers(p1) --[[ Line: 171 | Upvalues: Players (copy) ]]
-	table.sort(p1.props.inventoryPlayers.allPlayers, function(p1, p2) --[[ Line: 172 | Upvalues: Players (ref) ]]
+function v1._getFilteredInventoryPlayers(p1)
+	table.sort(p1.props.inventoryPlayers.allPlayers, function(p1, p2)
 		if p1.UserId == Players.LocalPlayer.UserId then
 			return true
 		elseif p2.UserId == Players.LocalPlayer.UserId then
@@ -211,7 +212,7 @@ function v1._getFilteredInventoryPlayers(p1) --[[ Line: 171 | Upvalues: Players 
 		return p1.props.inventoryPlayers
 	end
 end
-function v1.render(p1) --[[ Line: 195 | Upvalues: createElement (copy), TradeInventory (copy), TradeOffering (copy) ]]
+function v1.render(p1)
 	local t = {}
 	for i, v in ipairs(p1.props.traderMe.offerItems) do
 		t[v.id] = true
@@ -274,7 +275,7 @@ function v1.render(p1) --[[ Line: 195 | Upvalues: createElement (copy), TradeInv
 		})
 	end
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 262 | Upvalues: ActionButtonService (copy), resetInventoryUserEditedValues (copy) ]]
+function v1.didUpdate(p1, p2, p3)
 	if p1.state.category ~= p3.category or (p1.props.tradeInventory ~= p2.tradeInventory or (p1.props.tradeInventorySearchText ~= p2.tradeInventorySearchText or p1.props.tradeSort ~= p2.tradeSort)) then
 		p1:setState({
 			inventoryItems = p1:_getFilteredInventoryItems()
@@ -297,7 +298,7 @@ function v1.didUpdate(p1, p2, p3) --[[ Line: 262 | Upvalues: ActionButtonService
 		resetInventoryUserEditedValues()
 	end
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 293 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		traderMe = p1.traderMe,
 		traderThem = p1.traderThem,
@@ -311,39 +312,39 @@ return RoactRodux.connect(function(p1, p2) --[[ Line: 293 ]]
 		inventoryPlayers = p1.inventoryPlayers,
 		tradeChatMessages = p1.tradeChatMessages
 	}
-end, function(p1) --[[ Line: 307 | Upvalues: Players (copy), Audio (copy), EnumSort (copy) ]]
+end, function(p1)
 	return {
-		onClickReady = function(p12) --[[ Name: onClickReady | Line: 309 | Upvalues: p1 (copy) ]]
+		onClickReady = function(p12)
 			p1({
 				type = "updateTraderMe",
 				ready = true
 			})
 		end,
-		onClickUnready = function() --[[ Name: onClickUnready | Line: 315 | Upvalues: p1 (copy) ]]
+		onClickUnready = function()
 			p1({
 				type = "updateTraderMe",
 				ready = false
 			})
 		end,
-		addTraderMeOfferItem = function(p12) --[[ Name: addTraderMeOfferItem | Line: 321 | Upvalues: p1 (copy) ]]
+		addTraderMeOfferItem = function(p12)
 			p1({
 				type = "addTraderMeOfferItem",
 				item = p12
 			})
 		end,
-		removeTraderMeOfferItem = function(p12) --[[ Name: removeTraderMeOfferItem | Line: 327 | Upvalues: p1 (copy) ]]
+		removeTraderMeOfferItem = function(p12)
 			p1({
 				type = "removeTraderMeOfferItem",
 				item = p12
 			})
 		end,
-		removeTraderMeOfferItemByIndex = function(p12) --[[ Name: removeTraderMeOfferItemByIndex | Line: 333 | Upvalues: p1 (copy) ]]
+		removeTraderMeOfferItemByIndex = function(p12)
 			p1({
 				type = "removeTraderMeOfferItemByIndex",
 				index = p12
 			})
 		end,
-		onSelectSort = function(p12) --[[ Name: onSelectSort | Line: 339 | Upvalues: Players (ref), Audio (ref), EnumSort (ref), p1 (copy) ]]
+		onSelectSort = function(p12)
 			if Players.LocalPlayer.PlayerGui then
 				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 					Volume = 0.15
@@ -362,13 +363,13 @@ end, function(p1) --[[ Line: 307 | Upvalues: Players (copy), Audio (copy), EnumS
 				sortId = v1
 			})
 		end,
-		setInventoryOpen = function(p12) --[[ Name: setInventoryOpen | Line: 355 | Upvalues: p1 (copy) ]]
+		setInventoryOpen = function(p12)
 			p1({
 				type = "setTradeInventoryOpen",
 				value = p12
 			})
 		end,
-		resetTradeInfo = function() --[[ Name: resetTradeInfo | Line: 361 | Upvalues: p1 (copy) ]]
+		resetTradeInfo = function()
 			p1({
 				type = "setTradeInfo",
 				info = nil

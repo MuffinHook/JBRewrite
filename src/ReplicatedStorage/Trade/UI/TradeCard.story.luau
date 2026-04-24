@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), createElement (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local TradeCard = require(script.Parent.TradeCard)
-	function v1.init(p1) --[[ Line: 8 ]] end
-	function v1.render(p1) --[[ Line: 9 | Upvalues: Roact (ref), createElement (ref), TradeCard (copy) ]]
+	function v1.init(p1)  end
+	function v1.render(p1)
 		return Roact.createElement("Frame", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0)
@@ -31,7 +32,7 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), createElement (copy) 
 						value = DateTime.now():FormatLocalTime("ll", "en-us")
 					}
 				},
-				onCardFlipped = function() --[[ Name: onCardFlipped | Line: 37 ]]
+				onCardFlipped = function()
 					print("flipped!")
 				end
 			}),
@@ -40,9 +41,9 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), createElement (copy) 
 			})
 		})
 	end
-	function v1.willUnmount(p1) --[[ Line: 46 ]] end
+	function v1.willUnmount(p1)  end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 49 | Upvalues: Roact (ref), v2 (copy) ]]
+	return function()
 		Roact.unmount(v2)
 	end
 end

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local StoreProvider = require(script.StoreProvider)
 local connect = require(script.connect)
 return {

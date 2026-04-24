@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Logic = require(ReplicatedStorage.Module.Logic)
-local function Update(p1, p2) --[[ Line: 6 | Upvalues: UserInputService (copy) ]]
+local function Update(p1, p2)
 	local v1 = p1.Spring:Update()
 	local CrossHair = p1.Gui.CrossHair
 	local v2 = p2 or UserInputService:GetMouseLocation()
@@ -14,7 +15,7 @@ local function Update(p1, p2) --[[ Line: 6 | Upvalues: UserInputService (copy) ]
 end
 local v1 = Color3.new(255/255, 0/255, 0/255)
 local v2 = Color3.new(255/255, 255/255, 255/255)
-local function FlareCrossHair(p1) --[[ Line: 22 | Upvalues: v1 (copy), v2 (copy) ]]
+local function FlareCrossHair(p1)
 	local v12 = p1.Int + 1
 	p1.Int = v12
 	local Gui = p1.Gui
@@ -30,7 +31,7 @@ local function FlareCrossHair(p1) --[[ Line: 22 | Upvalues: v1 (copy), v2 (copy)
 	VerticalBottom.BackgroundColor3 = v1
 	HorizontalLeft.BackgroundColor3 = v1
 	HorizontalRight.BackgroundColor3 = v1
-	delay(0.1, function() --[[ Line: 39 | Upvalues: p1 (copy), v12 (copy), VerticalTop (copy), v2 (ref), VerticalBottom (copy), HorizontalLeft (copy), HorizontalRight (copy) ]]
+	delay(0.1, function()
 		if p1.Int == v12 then
 			VerticalTop.BackgroundColor3 = v2
 			VerticalBottom.BackgroundColor3 = v2
@@ -39,25 +40,25 @@ local function FlareCrossHair(p1) --[[ Line: 22 | Upvalues: v1 (copy), v2 (copy)
 		end
 	end)
 end
-local function ADS(p1, p2) --[[ Line: 49 ]]
+local function ADS(p1, p2)
 	p1.Spring:SetTarget(if p2 then 2 else 5)
 end
-local function EnableCrossHair(p1) --[[ Line: 52 | Upvalues: UserInputService (copy) ]]
+local function EnableCrossHair(p1)
 	UserInputService.MouseIconEnabled = false
 	p1.Gui.Enabled = true
 end
-local function DisableCrossHair(p1) --[[ Line: 56 | Upvalues: UserInputService (copy) ]]
+local function DisableCrossHair(p1)
 	UserInputService.MouseIconEnabled = true
 	p1.Gui.Enabled = false
 end
-local function DestroyCrossHair(p1) --[[ Line: 60 | Upvalues: UserInputService (copy) ]]
+local function DestroyCrossHair(p1)
 	UserInputService.MouseIconEnabled = true
 	p1.Gui.Enabled = false
 	p1.Gui:Destroy()
 	p1.Gui = nil
 end
 return {
-	Make = function() --[[ Name: MakeCrossHair | Line: 66 | Upvalues: Logic (copy), ReplicatedStorage (copy), Update (copy), DestroyCrossHair (copy), ADS (copy), FlareCrossHair (copy), EnableCrossHair (copy), DisableCrossHair (copy), UserInputService (copy) ]]
+	Make = function()
 		local v1 = Logic.MakeSpring()
 		v1.p = 0
 		v1.v = 0

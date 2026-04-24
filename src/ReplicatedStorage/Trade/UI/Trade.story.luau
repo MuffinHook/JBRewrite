@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (copy), RoactRodux (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local store = require(ReplicatedStorage.App.store)
 	local Trade = require(script.Parent.Trade)
-	function v1.init(p1) --[[ Line: 9 | Upvalues: store (copy) ]]
+	function v1.init(p1)
 		store:dispatch({
 			type = "updateTraderMe",
 			userId = 2025110,
@@ -23,14 +24,14 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (co
 			value = true
 		})
 	end
-	function v1.render(p1) --[[ Line: 27 | Upvalues: Roact (ref), RoactRodux (ref), store (copy), Trade (copy) ]]
+	function v1.render(p1)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(Trade, {}) })
 	end
-	function v1.willUnmount(p1) --[[ Line: 34 ]] end
+	function v1.willUnmount(p1)  end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 37 | Upvalues: Roact (ref), v2 (copy) ]]
+	return function()
 		Roact.unmount(v2)
 	end
 end

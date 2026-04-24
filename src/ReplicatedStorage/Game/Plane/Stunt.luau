@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -10,7 +11,7 @@ local t = {
 	__ClassName = "Stunt"
 }
 t.__index = t
-function t.new(p1) --[[ Line: 16 | Upvalues: t (copy), BaseUserControlledPlane (copy) ]]
+function t.new(p1)
 	local v2 = setmetatable({}, t)
 	v2.Meta = p1
 	v2.Model = p1.Model
@@ -38,7 +39,7 @@ function t.new(p1) --[[ Line: 16 | Upvalues: t (copy), BaseUserControlledPlane (
 	v2.Plane.WheelsConf = p1.WheelsConf
 	return v2
 end
-local function MountLocalPlayer(p1, p2, p3) --[[ Line: 48 | Upvalues: RunService (copy) ]]
+local function MountLocalPlayer(p1, p2, p3)
 	local PlaneGui = p1.Plane.PlaneGui
 	local MotorAileronWingRight = p1.MotorAileronWingRight
 	local MotorAileronWingLeft = p1.MotorAileronWingLeft
@@ -48,7 +49,7 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 48 | Upvalues: RunService
 	local MotorPropeller = p1.MotorPropeller
 	local v1 = 0
 	local v2 = 0
-	local function HeartbeatAilerons(p12) --[[ Line: 60 | Upvalues: p1 (copy), MotorAileronWingRight (copy), MotorAileronWingLeft (copy), MotorAileronTailRight (copy), MotorAileronTailLeft (copy), MotorAileronTail (copy), v1 (ref), MotorPropeller (copy), v2 (ref) ]]
+	local function HeartbeatAilerons(p12)
 		local Joystickx = p1.Plane.Joystickx
 		local Joysticky = p1.Plane.Joysticky
 		local v12 = (Joystickx * Joystickx + Joysticky * Joysticky) ^ 0.5
@@ -70,24 +71,24 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 48 | Upvalues: RunService
 			p1.Meta.PropellerDisc.Transparency = v5
 		end
 	end
-	local function HeartbeatSounds(p12) --[[ Line: 94 | Upvalues: p1 (copy) ]]
+	local function HeartbeatSounds(p12)
 		local Throttle = p1.Plane.Throttle
 		p1.SoundPropeller.Volume = Throttle * Throttle
 	end
-	local function Heartbeat(p12) --[[ Line: 98 | Upvalues: HeartbeatAilerons (copy), p1 (copy) ]]
+	local function Heartbeat(p12)
 		HeartbeatAilerons(p12)
 		local Throttle = p1.Plane.Throttle
 		p1.SoundPropeller.Volume = Throttle * Throttle
 	end
 	p3.Maid:GiveTask(RunService.Heartbeat:Connect(Heartbeat))
-	p3.Maid:GiveTask(function() --[[ Line: 103 | Upvalues: p1 (copy) ]]
+	p3.Maid:GiveTask(function()
 		p1.Meta.PropellerDisc.Transparency = 1
 	end)
 end
-local function MountThirdPlayer(p1, p2, p3) --[[ Line: 108 | Upvalues: RunService (copy) ]]
+local function MountThirdPlayer(p1, p2, p3)
 	local MotorPropeller = p1.MotorPropeller
 	local v1 = 0
-	local function Heartbeat(p12) --[[ Line: 112 | Upvalues: v1 (ref), MotorPropeller (copy), p1 (copy) ]]
+	local function Heartbeat(p12)
 		v1 = v1 + 10 * p12
 		if v1 > 6.283185307179586 then
 			v1 = v1 - 6.283185307179586
@@ -98,7 +99,7 @@ local function MountThirdPlayer(p1, p2, p3) --[[ Line: 108 | Upvalues: RunServic
 	p3.Maid:GiveTask(RunService.Heartbeat:Connect(Heartbeat))
 	p1.Plane:SetParticlesEnabled(true)
 end
-function t.MountPlayer(p1, p2, p3) --[[ Line: 129 | Upvalues: Audio (copy), LocalPlayer (copy), MountLocalPlayer (copy), MountThirdPlayer (copy) ]]
+function t.MountPlayer(p1, p2, p3)
 	p1.Plane:MountPlayer(p2, p3)
 	local v1 = Audio.ObjectLocal(p1.Model.BoundingBox, 9058676938, {
 		Looped = true,
@@ -114,11 +115,11 @@ function t.MountPlayer(p1, p2, p3) --[[ Line: 129 | Upvalues: Audio (copy), Loca
 		MountThirdPlayer(p1, p2, p3)
 	end
 end
-local function UnmountLocalPlayer(p1, p2) --[[ Line: 144 ]] end
-local function UnmountThirdPlayer(p1, p2, p3) --[[ Line: 145 ]]
+local function UnmountLocalPlayer(p1, p2) end
+local function UnmountThirdPlayer(p1, p2, p3)
 	p1.Plane:SetParticlesEnabled(false)
 end
-function t.UnmountSeat(p1, p2) --[[ Line: 148 | Upvalues: LocalPlayer (copy) ]]
+function t.UnmountSeat(p1, p2)
 	assert(p2)
 	assert(p2.Occupied)
 	p1.SoundPropeller:Destroy()
@@ -129,7 +130,7 @@ function t.UnmountSeat(p1, p2) --[[ Line: 148 | Upvalues: LocalPlayer (copy) ]]
 	end
 	return p1.Plane:UnmountSeat(p2)
 end
-function t.Destroy(p1) --[[ Line: 161 ]]
+function t.Destroy(p1)
 	p1.Plane:Destroy()
 end
 return t

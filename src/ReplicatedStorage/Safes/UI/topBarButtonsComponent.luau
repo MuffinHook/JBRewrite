@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local String = require(ReplicatedStorage.Std.String)
 local createElement = Roact.createElement
-return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), createElement (copy), String (copy) ]]
+return function(p1)
 	local t = {}
 	t.PolicyCashAvailableBar = if p1.policyCashAvailable then createElement("Frame", {
 	Size = UDim2.new(0.2, 0, 1, 0),

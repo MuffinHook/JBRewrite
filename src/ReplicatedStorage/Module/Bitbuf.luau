@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local t = {}
-local function int_from_uint(p1, p2) --[[ Line: 10 ]]
+local function int_from_uint(p1, p2)
 	local v1 = 2 ^ p1
 	local v2 = p2 % v1
 	if v1 / 2 <= v2 then
@@ -8,22 +9,22 @@ local function int_from_uint(p1, p2) --[[ Line: 10 ]]
 		return v2
 	end
 end
-local function int_to_uint(p1, p2) --[[ Line: 19 ]]
+local function int_to_uint(p1, p2)
 	return p2 % 2 ^ p1
 end
-local function float32_to_uint(p1) --[[ Line: 23 ]]
+local function float32_to_uint(p1)
 	return string.unpack("<I4", string.pack("<f", p1))
 end
-local function float32_from_uint(p1) --[[ Line: 27 ]]
+local function float32_from_uint(p1)
 	return string.unpack("<f", string.pack("<I4", p1))
 end
-local function float64_to_uint(p1) --[[ Line: 31 ]]
+local function float64_to_uint(p1)
 	return string.unpack("<I8", string.pack("<d", p1))
 end
-local function float64_from_uint(p1) --[[ Line: 35 ]]
+local function float64_from_uint(p1)
 	return string.unpack("<d", string.pack("<I8", p1))
 end
-local function float_to_fixed(p1, p2, p3) --[[ Line: 39 ]]
+local function float_to_fixed(p1, p2, p3)
 	local v1 = 2 ^ (p1 + p2)
 	local v2 = math.floor(p3 * 2 ^ p2) % v1
 	if v1 / 2 <= v2 then
@@ -32,21 +33,21 @@ local function float_to_fixed(p1, p2, p3) --[[ Line: 39 ]]
 		return v2
 	end
 end
-local function float_from_fixed(p1, p2, p3) --[[ Line: 43 ]]
+local function float_from_fixed(p1, p2, p3)
 	local v1 = 2 ^ (p1 + p2)
 	local v2 = p3 % v1
 	return math.floor(if v1 / 2 <= v2 then v2 - v1 else v2) * 2 ^ (-p2)
 end
-local function float_to_ufixed(p1, p2, p3) --[[ Line: 47 ]]
+local function float_to_ufixed(p1, p2, p3)
 	return math.floor(p3 * 2 ^ p2) % 2 ^ (p1 + p2)
 end
-local function float_from_ufixed(p1, p2, p3) --[[ Line: 51 ]]
+local function float_from_ufixed(p1, p2, p3)
 	return math.floor(p3 % 2 ^ (p1 + p2)) * 2 ^ (-p2)
 end
 local t2 = {
 	__index = {}
 }
-function t.new(p1) --[[ Line: 72 | Upvalues: t2 (copy) ]]
+function t.new(p1)
 	assert(p1 == nil or type(p1) == "number", "number expected")
 	local v2 = p1 or 0
 	return setmetatable({
@@ -55,7 +56,7 @@ function t.new(p1) --[[ Line: 72 | Upvalues: t2 (copy) ]]
 		i = 0
 	}, t2)
 end
-function t.fromString(p1) --[[ Line: 87 | Upvalues: t2 (copy) ]]
+function t.fromString(p1)
 	assert(type(p1) == "string", "string expected")
 	local v2 = math.ceil(#p1 / 4)
 	local t = {
@@ -72,7 +73,7 @@ function t.fromString(p1) --[[ Line: 87 | Upvalues: t2 (copy) ]]
 	end
 	return setmetatable(t, t2)
 end
-local function String(p1) --[[ Line: 109 ]]
+local function String(p1)
 	local v2 = math.ceil(p1.len / 32)
 	local v3 = table.create(v2, "")
 	for i in ipairs(v3) do
@@ -91,7 +92,7 @@ local function String(p1) --[[ Line: 109 ]]
 	return table.concat(v3)
 end
 t2.__index.String = String
-local function writeUnit(p1, p2, p3) --[[ Line: 137 ]]
+local function writeUnit(p1, p2, p3)
 	assert(if p2 >= 0 then p2 <= 32 else false, "size must be in range [0,32]")
 	if p2 ~= 0 then
 		local v2 = bit32.rshift(p1.i, 5) + 1
@@ -115,7 +116,7 @@ local function writeUnit(p1, p2, p3) --[[ Line: 137 ]]
 	end
 end
 t2.__index.writeUnit = writeUnit
-local function readUnit(p1, p2) --[[ Line: 174 ]]
+local function readUnit(p1, p2)
 	assert(if p2 >= 0 then p2 <= 32 else false, "size must be in range [0,32]")
 	if p2 == 0 then
 		return 0
@@ -140,11 +141,11 @@ local function readUnit(p1, p2) --[[ Line: 174 ]]
 	end
 end
 t2.__index.readUnit = readUnit
-local function Len(p1) --[[ Line: 199 ]]
+local function Len(p1)
 	return p1.len
 end
 t2.__index.Len = Len
-local function SetLen(p1, p2) --[[ Line: 208 ]]
+local function SetLen(p1, p2)
 	if p2 < 0 then
 		p2 = 0
 	end
@@ -165,11 +166,11 @@ local function SetLen(p1, p2) --[[ Line: 208 ]]
 	end
 end
 t2.__index.SetLen = SetLen
-local function Index(p1) --[[ Line: 236 ]]
+local function Index(p1)
 	return p1.i
 end
 t2.__index.Index = Index
-local function SetIndex(p1, p2) --[[ Line: 244 ]]
+local function SetIndex(p1, p2)
 	if p2 < 0 then
 		p2 = 0
 	end
@@ -179,31 +180,31 @@ local function SetIndex(p1, p2) --[[ Line: 244 ]]
 	end
 end
 t2.__index.SetIndex = SetIndex
-local function Fits(p1, p2) --[[ Line: 258 ]]
+local function Fits(p1, p2)
 	assert(type(p2) == "number", "number expected")
 	return p2 <= p1.len - p1.i
 end
 t2.__index.Fits = Fits
-local function readPad(p1, p2) --[[ Line: 263 ]]
+local function readPad(p1, p2)
 	p1.i = p1.i + p2
 	if p1.i > p1.len then
 		p1.len = p1.i
 	end
 end
-local function writePad(p1, p2) --[[ Line: 270 ]]
+local function writePad(p1, p2)
 	for i = 1, math.floor(p2 / 32) do
 		p1:writeUnit(32, 0)
 	end
 	p1:writeUnit(p2 % 32, 0)
 end
-local function WritePad(p1, p2) --[[ Line: 281 | Upvalues: writePad (copy) ]]
+local function WritePad(p1, p2)
 	assert(type(p2) == "number", "number expected")
 	if not (p2 <= 0) then
 		writePad(p1, p2)
 	end
 end
 t2.__index.WritePad = WritePad
-local function ReadPad(p1, p2) --[[ Line: 293 ]]
+local function ReadPad(p1, p2)
 	assert(type(p2) == "number", "number expected")
 	if not (p2 <= 0) then
 		p1.i = p1.i + p2
@@ -213,14 +214,14 @@ local function ReadPad(p1, p2) --[[ Line: 293 ]]
 	end
 end
 t2.__index.ReadPad = ReadPad
-local function WriteAlign(p1, p2) --[[ Line: 306 | Upvalues: writePad (copy) ]]
+local function WriteAlign(p1, p2)
 	assert(type(p2) == "number", "number expected")
 	if not (p2 <= 1) and p1.i % p2 ~= 0 then
 		writePad(p1, (math.floor(math.ceil(p1.i / p2) * p2 - p1.i)))
 	end
 end
 t2.__index.WriteAlign = WriteAlign
-local function ReadAlign(p1, p2) --[[ Line: 319 ]]
+local function ReadAlign(p1, p2)
 	assert(type(p2) == "number", "number expected")
 	if not (p2 <= 1) and p1.i % p2 ~= 0 then
 		p1.i = p1.i + math.floor(math.ceil(p1.i / p2) * p2 - p1.i)
@@ -230,13 +231,13 @@ local function ReadAlign(p1, p2) --[[ Line: 319 ]]
 	end
 end
 t2.__index.ReadAlign = ReadAlign
-local function Reset(p1) --[[ Line: 331 ]]
+local function Reset(p1)
 	p1.i = 0
 	p1.len = 0
 	table.clear(p1.buf)
 end
 t2.__index.Reset = Reset
-local function fastWriteBytes(p1, p2) --[[ Line: 340 ]]
+local function fastWriteBytes(p1, p2)
 	if #p2 <= 4 then
 		p1:writeUnit(#p2 * 8, (string.unpack("<I" .. #p2, p2)))
 	else
@@ -259,7 +260,7 @@ local function fastWriteBytes(p1, p2) --[[ Line: 340 ]]
 		end
 	end
 end
-local function WriteBytes(p1, p2) --[[ Line: 373 | Upvalues: fastWriteBytes (copy) ]]
+local function WriteBytes(p1, p2)
 	assert(type(p2) == "string", "string expected")
 	if p2 ~= "" then
 		if p1.i % 8 == 0 then
@@ -272,7 +273,7 @@ local function WriteBytes(p1, p2) --[[ Line: 373 | Upvalues: fastWriteBytes (cop
 	end
 end
 t2.__index.WriteBytes = WriteBytes
-local function fastReadBytes(p1, p2) --[[ Line: 390 ]]
+local function fastReadBytes(p1, p2)
 	if p2 <= 4 then
 		return string.pack("<I" .. p2, p1:readUnit(p2 * 8))
 	else
@@ -305,7 +306,7 @@ local function fastReadBytes(p1, p2) --[[ Line: 390 ]]
 		return table.concat(v4)
 	end
 end
-local function ReadBytes(p1, p2) --[[ Line: 434 | Upvalues: fastReadBytes (copy) ]]
+local function ReadBytes(p1, p2)
 	assert(type(p2) == "number", "number expected")
 	if p2 == 0 then
 		return ""
@@ -320,7 +321,7 @@ local function ReadBytes(p1, p2) --[[ Line: 434 | Upvalues: fastReadBytes (copy)
 	end
 end
 t2.__index.ReadBytes = ReadBytes
-local function WriteUint(p1, p2, p3) --[[ Line: 453 ]]
+local function WriteUint(p1, p2, p3)
 	assert(type(p2) == "number", "number expected")
 	assert(type(p3) == "number", "number expected")
 	assert(if p2 >= 0 then p2 <= 53 else false, "size must be in range [0,53]")
@@ -334,7 +335,7 @@ local function WriteUint(p1, p2, p3) --[[ Line: 453 ]]
 	end
 end
 t2.__index.WriteUint = WriteUint
-local function ReadUint(p1, p2) --[[ Line: 472 ]]
+local function ReadUint(p1, p2)
 	assert(type(p2) == "number", "number expected")
 	assert(if p2 >= 0 then p2 <= 53 else false, "size must be in range [0,53]")
 	if p2 == 0 then
@@ -346,7 +347,7 @@ local function ReadUint(p1, p2) --[[ Line: 472 ]]
 	end
 end
 t2.__index.ReadUint = ReadUint
-local function WriteBool(p1, p2) --[[ Line: 486 ]]
+local function WriteBool(p1, p2)
 	if p2 then
 		p1:writeUnit(1, 1)
 	else
@@ -354,20 +355,20 @@ local function WriteBool(p1, p2) --[[ Line: 486 ]]
 	end
 end
 t2.__index.WriteBool = WriteBool
-local function ReadBool(p1) --[[ Line: 498 ]]
+local function ReadBool(p1)
 	return p1:readUnit(1) == 1
 end
 t2.__index.ReadBool = ReadBool
-local function WriteByte(p1, p2) --[[ Line: 505 ]]
+local function WriteByte(p1, p2)
 	assert(type(p2) == "number", "number expected")
 	p1:writeUnit(8, p2)
 end
 t2.__index.WriteByte = WriteByte
-local function ReadByte(p1) --[[ Line: 513 ]]
+local function ReadByte(p1)
 	return p1:readUnit(8)
 end
 t2.__index.ReadByte = ReadByte
-local function WriteInt(p1, p2, p3) --[[ Line: 521 ]]
+local function WriteInt(p1, p2, p3)
 	assert(type(p2) == "number", "number expected")
 	assert(type(p3) == "number", "number expected")
 	assert(if p2 >= 0 then p2 <= 53 else false, "size must be in range [0,53]")
@@ -383,7 +384,7 @@ local function WriteInt(p1, p2, p3) --[[ Line: 521 ]]
 	end
 end
 t2.__index.WriteInt = WriteInt
-local function ReadInt(p1, p2) --[[ Line: 541 ]]
+local function ReadInt(p1, p2)
 	assert(type(p2) == "number", "number expected")
 	assert(if p2 >= 0 then p2 <= 53 else false, "size must be in range [0,53]")
 	if p2 == 0 then
@@ -399,7 +400,7 @@ local function ReadInt(p1, p2) --[[ Line: 541 ]]
 	end
 end
 t2.__index.ReadInt = ReadInt
-local function WriteFloat(p1, p2, p3) --[[ Line: 563 ]]
+local function WriteFloat(p1, p2, p3)
 	assert(type(p2) == "number", "number expected")
 	assert(type(p3) == "number", "number expected")
 	assert(p2 == 32 or p2 == 64, "size must be 32 or 64")
@@ -410,7 +411,7 @@ local function WriteFloat(p1, p2, p3) --[[ Line: 563 ]]
 	end
 end
 t2.__index.WriteFloat = WriteFloat
-local function ReadFloat(p1, p2) --[[ Line: 581 ]]
+local function ReadFloat(p1, p2)
 	assert(type(p2) == "number", "number expected")
 	assert(p2 == 32 or p2 == 64, "size must be 32 or 64")
 	local v3 = p1:ReadBytes(p2 / 8)
@@ -421,7 +422,7 @@ local function ReadFloat(p1, p2) --[[ Line: 581 ]]
 	end
 end
 t2.__index.ReadFloat = ReadFloat
-local function WriteUfixed(p1, p2, p3, p4) --[[ Line: 598 ]]
+local function WriteUfixed(p1, p2, p3, p4)
 	assert(type(p2) == "number", "number expected")
 	assert(type(p3) == "number", "number expected")
 	assert(p2 >= 0, "integer size must be >= 0")
@@ -431,7 +432,7 @@ local function WriteUfixed(p1, p2, p3, p4) --[[ Line: 598 ]]
 	p1:WriteUint(p2 + p3, math.floor(p4 * 2 ^ p3) % 2 ^ (p2 + p3))
 end
 t2.__index.WriteUfixed = WriteUfixed
-local function ReadUfixed(p1, p2, p3) --[[ Line: 613 ]]
+local function ReadUfixed(p1, p2, p3)
 	assert(type(p2) == "number", "number expected")
 	assert(type(p3) == "number", "number expected")
 	assert(p2 >= 0, "integer size must be >= 0")
@@ -440,7 +441,7 @@ local function ReadUfixed(p1, p2, p3) --[[ Line: 613 ]]
 	return math.floor(p1:ReadUint(p2 + p3) % 2 ^ (p2 + p3)) * 2 ^ (-p3)
 end
 t2.__index.ReadUfixed = ReadUfixed
-local function WriteFixed(p1, p2, p3, p4) --[[ Line: 627 ]]
+local function WriteFixed(p1, p2, p3, p4)
 	assert(type(p2) == "number", "number expected")
 	assert(type(p3) == "number", "number expected")
 	assert(p2 >= 0, "integer size must be >= 0")
@@ -452,7 +453,7 @@ local function WriteFixed(p1, p2, p3, p4) --[[ Line: 627 ]]
 	p1:WriteInt(p2 + p3, if v8 / 2 <= v9 then v9 - v8 else v9)
 end
 t2.__index.WriteFixed = WriteFixed
-local function ReadFixed(p1, p2, p3) --[[ Line: 642 ]]
+local function ReadFixed(p1, p2, p3)
 	assert(type(p2) == "number", "number expected")
 	assert(type(p3) == "number", "number expected")
 	assert(p2 >= 0, "integer size must be >= 0")
@@ -463,7 +464,7 @@ local function ReadFixed(p1, p2, p3) --[[ Line: 642 ]]
 	return math.floor(if v6 / 2 <= v7 then v7 - v6 else v7) * 2 ^ (-p3)
 end
 t2.__index.ReadFixed = ReadFixed
-function t.isBuffer(p1) --[[ Line: 654 | Upvalues: t2 (copy) ]]
+function t.isBuffer(p1)
 	return getmetatable(p1) == t2
 end
 return t

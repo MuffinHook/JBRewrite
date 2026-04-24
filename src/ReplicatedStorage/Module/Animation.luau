@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 5 | Upvalues: t (copy), RunService (copy) ]]
+function t.new(p1)
 	local v2 = setmetatable({}, t)
 	assert(p1.Duration)
 	local Duration_2 = p1.Duration
@@ -9,7 +10,7 @@ function t.new(p1) --[[ Line: 5 | Upvalues: t (copy), RunService (copy) ]]
 	v2.OnComplete = p1.OnComplete
 	v2.OnCancel = p1.OnCancel
 	local v3 = tick()
-	v2.Event = RunService.Heartbeat:Connect(function(p1) --[[ Line: 16 | Upvalues: v3 (copy), Duration_2 (copy), v2 (copy) ]]
+	v2.Event = RunService.Heartbeat:Connect(function(p1)
 		local v1 = tick() - v3
 		local v22 = Duration_2 <= v1
 		if v22 then
@@ -32,7 +33,7 @@ function t.new(p1) --[[ Line: 5 | Upvalues: t (copy), RunService (copy) ]]
 	end)
 	return v2
 end
-function t.Destroy(p1) --[[ Line: 40 ]]
+function t.Destroy(p1)
 	if p1.Event then
 		p1.Event:Disconnect()
 		p1.Event = nil

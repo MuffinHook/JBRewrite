@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local t = {
-	calculateVelocityForDesiredDistance = function(p1, p2, p3) --[[ Name: calculateVelocityForDesiredDistance | Line: 11 ]]
+	calculateVelocityForDesiredDistance = function(p1, p2, p3)
 		assert(typeof(p1) == "number")
 		assert(typeof(p2) == "number")
 		assert(typeof(p3) == "number")
@@ -10,10 +11,10 @@ local t = {
 		end
 	end
 }
-function t.calculateVelocityForDesiredHeight(p1, p2) --[[ Line: 35 | Upvalues: t (copy) ]]
+function t.calculateVelocityForDesiredHeight(p1, p2)
 	return t.calculateVelocityForDesiredDistance(p1, p2, -workspace.Gravity)
 end
-function t.calculateTimeForDesiredHeight(p1) --[[ Line: 38 ]]
+function t.calculateTimeForDesiredHeight(p1)
 	return math.sqrt(p1 * 2 / workspace.Gravity)
 end
 return t

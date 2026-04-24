@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -9,9 +10,9 @@ local t = {
 	onEntered = Signal.new(),
 	onExited = Signal.new()
 }
-function t.init() --[[ Line: 14 | Upvalues: HomeBinder (copy), Interval (copy), t (copy) ]]
+function t.init()
 	HomeBinder:Start()
-	Interval.every(0.25):Connect(function() --[[ Line: 18 | Upvalues: t (ref) ]]
+	Interval.every(0.25):Connect(function()
 		local v1 = t.queryCurrentStandingHome()
 		if t._currentStandingHome ~= v1 then
 			local _currentStandingHome = t._currentStandingHome
@@ -24,7 +25,7 @@ function t.init() --[[ Line: 14 | Upvalues: HomeBinder (copy), Interval (copy), 
 		end
 	end)
 end
-function t.queryCurrentStandingHome() --[[ Line: 32 | Upvalues: PlayerUtils (copy), LocalPlayer (copy), HomeBinder (copy) ]]
+function t.queryCurrentStandingHome()
 	local v1 = PlayerUtils.getRootPart(LocalPlayer)
 	if v1 then
 		local Position = v1.Position

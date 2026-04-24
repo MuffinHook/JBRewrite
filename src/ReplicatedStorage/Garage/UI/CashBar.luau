@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local String = require(ReplicatedStorage.Std.String)
 local Roact = require(ReplicatedStorage.Roact)
@@ -6,7 +7,7 @@ local v1 = Roact.PureComponent:extend("CashBar")
 v1.defaultProps = {
 	cash = 0
 }
-function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), String (copy), Roact (copy) ]]
+function v1.render(p1)
 	local v1 = p1.props.mainRatio or p1.props.aspectRatio
 	return createElement("Frame", {
 		BackgroundTransparency = 1,

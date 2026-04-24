@@ -2,10 +2,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local EnumRarity = require(ReplicatedStorage.RewardSpinner.EnumRarity)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(target)
+	local StoryApp = Roact.Component:extend("App")
 	local BriefcaseDisplay = require(script.Parent.BriefcaseDisplay)
-	function v1.render(p1)
+	function StoryApp.render(self)
 		return Roact.createElement(BriefcaseDisplay, {
 			probs = {
 				[EnumRarity.Common] = 75,
@@ -16,9 +16,9 @@ return function(p1)
 			}
 		})
 	end
-	function v1.willUnmount(p1)end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function StoryApp.willUnmount(self)end
+	local storyHandle = Roact.mount(Roact.createElement(StoryApp), target)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(storyHandle)
 	end
 end

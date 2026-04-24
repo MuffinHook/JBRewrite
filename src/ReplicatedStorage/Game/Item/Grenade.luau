@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 require(ReplicatedStorage.Module.R15IKv2)
@@ -5,12 +6,12 @@ local Joint = require(ReplicatedStorage.Std.Joint)
 require(ReplicatedStorage.Inventory.InventoryItemUtils)
 local GunSystemConsts = require(ReplicatedStorage.Game.ItemSystem.GunSystemConsts)
 local Gun = require(script.Parent.Gun)
-local function RandomVector() --[[ Line: 11 ]]
+local function RandomVector()
 	local v1 = math.random() * 2 - 1
 	local v2 = math.random() * 2 - 1
 	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
 end
-local function CalculateProjectileVelocity(p1, p2, p3) --[[ Line: 17 ]]
+local function CalculateProjectileVelocity(p1, p2, p3)
 	local v1 = p2 - p1
 	local v2 = (v1.x * v1.x + v1.z * v1.z) ^ 0.5
 	local Gravity = workspace.Gravity
@@ -29,23 +30,23 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.new(p1, p2, p3) --[[ Line: 37 | Upvalues: Gun (copy), t (copy) ]]
+function t.new(p1, p2, p3)
 	local v1 = Gun.new(p1, p2, p3)
 	setmetatable(v1, t)
 	v1:Setup(p3)
 	v1.ShootProxy = 1
 	return v1
 end
-function t.SetupArmWelds(p1) --[[ Line: 49 ]] end
-function t.UpdateArmIK(p1) --[[ Line: 50 ]]
+function t.SetupArmWelds(p1)  end
+function t.UpdateArmIK(p1)
 	local IK = p1.IK
 	IK.RightArm = p1.Model.Model.Base.Position
 	IK.RightAngle = p1.Config.Motion.RightElbowAngle
 end
-function t.SetupTip(p1) --[[ Line: 56 ]]
+function t.SetupTip(p1)
 	p1.TipOffset = Vector3.new()
 end
-local function GrenadeExplode(p1, p2) --[[ Line: 59 | Upvalues: ReplicatedStorage (copy), Audio (copy), GunSystemConsts (copy) ]]
+local function GrenadeExplode(p1, p2)
 	local Position = p2.Skeleton.BoundingBox.Position
 	if p1.BulletEmitter.Bullets then
 		for i = 1, 30 do
@@ -72,7 +73,7 @@ local function GrenadeExplode(p1, p2) --[[ Line: 59 | Upvalues: ReplicatedStorag
 	local v7 = ReplicatedStorage.Resource.ItemSystem.Projectiles.LandingSmoke:Clone()
 	v7.Enabled = true
 	v7.Parent = Part
-	delay(5 - v7.Lifetime.Max, function() --[[ Line: 97 | Upvalues: v7 (copy) ]]
+	delay(5 - v7.Lifetime.Max, function()
 		v7.Enabled = false
 	end)
 	game.Debris:AddItem(Part, 5)
@@ -83,7 +84,7 @@ local function GrenadeExplode(p1, p2) --[[ Line: 59 | Upvalues: ReplicatedStorag
 		p1.inventoryItemValue:FindFirstChild(GunSystemConsts.DAMAGE_REMOTE_NAME):FireServer(Position)
 	end
 end
-function t.GrenadeThrow(p1, p2, p3) --[[ Line: 110 | Upvalues: ReplicatedStorage (copy), Joint (copy), CalculateProjectileVelocity (copy), GrenadeExplode (copy), GunSystemConsts (copy) ]]
+function t.GrenadeThrow(p1, p2, p3)
 	local v1 = assert(ReplicatedStorage.Resource.ItemSystem.Models.Grenade, ("Item model for %s does not exist."):format("Grenade")):Clone()
 	v1.Model.Handle:Destroy()
 	Joint.Weld(v1.Model.Base, v1.Skeleton.BoundingBox)
@@ -95,25 +96,25 @@ function t.GrenadeThrow(p1, p2, p3) --[[ Line: 110 | Upvalues: ReplicatedStorage
 	PrimaryPart.Velocity = CalculateProjectileVelocity(p1.Model.Skeleton.BoundingBox.Position, p2, 100)
 	v1:SetPrimaryPartCFrame(CFrame.new(Vector3.new(), PrimaryPart.Velocity) + p1.Model.Skeleton.BoundingBox.Position)
 	PrimaryPart.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.9, 0.5, 20, 1)
-	delay(0, function() --[[ Line: 131 | Upvalues: PrimaryPart (copy) ]]
+	delay(0, function()
 		PrimaryPart.CanCollide = true
 	end)
-	delay(p3, function() --[[ Line: 134 | Upvalues: GrenadeExplode (ref), p1 (copy), v1 (ref) ]]
+	delay(p3, function()
 		GrenadeExplode(p1, v1)
 		v1.Model.Base.CanCollide = true
 		local v12 = math.random() * 2 - 1
 		local v2 = math.random() * 2 - 1
 		v1.Model.Base.Velocity = Vector3.new(v12, v2, math.random() * 2 - 1).Unit * 50
 	end)
-	delay(p3 + 2, function() --[[ Line: 141 | Upvalues: v1 (ref) ]]
+	delay(p3 + 2, function()
 		v1:Destroy()
 	end)
 	if p1.Local then
 		p1.inventoryItemValue:FindFirstChild(GunSystemConsts.SHOOT_REMOTE_NAME):FireServer()
 	end
 end
-function t.BulletEmitterOnLocalHitPlayer(p1) --[[ Line: 150 ]] end
-function t.ShootBegin(p1, p2) --[[ Line: 151 ]]
+function t.BulletEmitterOnLocalHitPlayer(p1)  end
+function t.ShootBegin(p1, p2)
 	if not p1:ShootCheckConditions() then
 		return false
 	end
@@ -133,11 +134,11 @@ function t.ShootBegin(p1, p2) --[[ Line: 151 ]]
 	local v3 = math.random() * 2 - 1
 	local v4 = math.random() * 2 - 1
 	v2.Velocity = Vector3.new(v3, v4, math.random() * 2 - 1).Unit * 50
-	delay(5, function() --[[ Line: 173 | Upvalues: v2 (copy) ]]
+	delay(5, function()
 		v2:Destroy()
 	end)
 	p1.Model.Model.Handle.Transparency = 1
-	delay(p1.Config.FuseTime, function() --[[ Line: 179 | Upvalues: p1 (copy), v1 (copy), p2 (copy) ]]
+	delay(p1.Config.FuseTime, function()
 		if not p1.Destroyed then
 			if p1.ShootProxy ~= v1 then
 				return false
@@ -149,7 +150,7 @@ function t.ShootBegin(p1, p2) --[[ Line: 151 ]]
 		p1:BroadcastInputBegan(p2)
 	end
 end
-function t.ShootEnd(p1, p2) --[[ Line: 193 ]]
+function t.ShootEnd(p1, p2)
 	if not p1.GrenadeHeldAt then
 		return false
 	end
@@ -158,7 +159,7 @@ function t.ShootEnd(p1, p2) --[[ Line: 193 ]]
 	p1.SpringItemOffset:SetTarget(p1.Config.Motion.Launch.Springs.ItemOffset)
 	p1.SpringItemRotation:SetTarget(p1.Config.Motion.Launch.Springs.ItemRotation)
 	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Launch.Springs.NeckRotation)
-	delay(0.2, function() --[[ Line: 203 | Upvalues: p1 (copy) ]]
+	delay(0.2, function()
 		p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
 		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
 		p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
@@ -166,7 +167,7 @@ function t.ShootEnd(p1, p2) --[[ Line: 193 ]]
 	local Model = p1.Model
 	Model.Model.Base.Transparency = 1
 	Model.Model.Handle.Transparency = 1
-	delay(p1.Config.ReloadTime, function() --[[ Line: 213 | Upvalues: p1 (copy), Model (copy) ]]
+	delay(p1.Config.ReloadTime, function()
 		if p1.Destroyed then
 			return false
 		end
@@ -178,8 +179,8 @@ function t.ShootEnd(p1, p2) --[[ Line: 193 ]]
 		p1:BroadcastInputEnded(p2)
 	end
 end
-function t.ShootOther(p1) --[[ Line: 227 ]] end
-function t.ShootSound(p1, p2) --[[ Line: 228 | Upvalues: Audio (copy) ]]
+function t.ShootOther(p1)  end
+function t.ShootSound(p1, p2)
 	if p2 then
 		Audio.ObjectLocal(p1.Model.Skeleton.BoundingBox, p1.Config.Sound.gun_pistol_dry_fire_01, {
 			Volume = 0.6,

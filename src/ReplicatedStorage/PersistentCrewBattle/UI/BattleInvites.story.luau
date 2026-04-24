@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (copy), RoactRodux (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local BattleInvites = require(script.Parent.BattleInvites)
 	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
-	function v1.init(p1) --[[ Line: 9 | Upvalues: persistentCrewStore (copy) ]]
+	function v1.init(p1)
 		persistentCrewStore:dispatch({
 			type = "battleInvitesSet",
 			list = {
@@ -26,21 +27,21 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (co
 			}
 		})
 	end
-	function v1.render(p1) --[[ Line: 30 | Upvalues: Roact (ref), RoactRodux (ref), persistentCrewStore (copy), BattleInvites (copy) ]]
+	function v1.render(p1)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement(BattleInvites, {
-				onAccept = function(p1) --[[ Name: onAccept | Line: 35 ]]
+				onAccept = function(p1)
 					print("accept", p1)
 				end,
-				onDecline = function(p1) --[[ Name: onDecline | Line: 38 ]]
+				onDecline = function(p1)
 					print("decline", p1)
 				end
 			}) })
 	end
-	function v1.willUnmount(p1) --[[ Line: 44 ]] end
+	function v1.willUnmount(p1)  end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 47 | Upvalues: Roact (ref), v2 (copy) ]]
+	return function()
 		Roact.unmount(v2)
 	end
 end

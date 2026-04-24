@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Lighting = game:GetService("Lighting")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 game:GetService("UserInputService")
@@ -11,7 +12,7 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.new(p1, p2, p3) --[[ Line: 32 | Upvalues: Gun (copy), t (copy), ReplicatedStorage (copy), LocalPlayer (copy), Lighting (copy), Spring (copy) ]]
+function t.new(p1, p2, p3)
 	local v1 = Gun.new(p1, p2, p3)
 	setmetatable(v1, t)
 	v1:Setup(p3)
@@ -35,7 +36,7 @@ function t.new(p1, p2, p3) --[[ Line: 32 | Upvalues: Gun (copy), t (copy), Repli
 	end
 	return v1
 end
-function t.Heartbeat(p1) --[[ Line: 60 ]]
+function t.Heartbeat(p1)
 	if p1.Local then
 		local v1 = p1.SpringBlur:Update()
 		if v1 >= 0.01 and p1.IsScoping then
@@ -48,7 +49,7 @@ function t.Heartbeat(p1) --[[ Line: 60 ]]
 		end
 	end
 end
-function t.ShootSound(p1, p2) --[[ Line: 75 | Upvalues: Audio (copy) ]]
+function t.ShootSound(p1, p2)
 	if not p2 then
 		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.shoot, {
 			Pitch = 1 + math.random() * 0.1 - 0.05,
@@ -56,7 +57,7 @@ function t.ShootSound(p1, p2) --[[ Line: 75 | Upvalues: Audio (copy) ]]
 		})
 	end
 end
-function t.ScopeBegin(p1) --[[ Line: 82 | Upvalues: Gun (copy), Audio (copy), ItemCamera (copy) ]]
+function t.ScopeBegin(p1)
 	if Gun.ScopeBegin(p1) == false then
 		return false
 	end
@@ -70,7 +71,7 @@ function t.ScopeBegin(p1) --[[ Line: 82 | Upvalues: Gun (copy), Audio (copy), It
 		p1.SpringBlur:Accelerate(500)
 	end
 end
-function t.ScopeEnd(p1) --[[ Line: 96 | Upvalues: Gun (copy), ItemCamera (copy) ]]
+function t.ScopeEnd(p1)
 	if Gun.ScopeEnd(p1) == false then
 		return false
 	end
@@ -86,14 +87,14 @@ function t.ScopeEnd(p1) --[[ Line: 96 | Upvalues: Gun (copy), ItemCamera (copy) 
 		p1.ScopeGui.Enabled = false
 	end
 end
-function t.ReloadDropAmmoVisual(p1) --[[ Line: 112 ]] end
-function t.ReloadRefillAmmoVisual(p1) --[[ Line: 113 ]] end
-function t.ReloadDropAmmoSound(p1) --[[ Line: 114 | Upvalues: Audio (copy) ]]
+function t.ReloadDropAmmoVisual(p1)  end
+function t.ReloadRefillAmmoVisual(p1)  end
+function t.ReloadDropAmmoSound(p1)
 	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.mag_out, {
 		RollOffMaxDistance = 129
 	})
 end
-function t.ReloadRefillAmmoSound(p1) --[[ Line: 119 | Upvalues: Audio (copy) ]]
+function t.ReloadRefillAmmoSound(p1)
 	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.mag_in, {
 		RollOffMaxDistance = 129
 	})

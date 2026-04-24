@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local EnumRarity = require(ReplicatedStorage.RewardSpinner.EnumRarity)
-return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), ReplicatedStorage (copy), EnumRarity (copy), RoactRodux (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local RewardSpinner = require(script.Parent.RewardSpinner)
 	local store = require(ReplicatedStorage.App.store)
@@ -18,7 +19,7 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), ReplicatedStorage (co
 		t2.RarityId = EnumRarity.Epic
 		table.insert(t, t2)
 	end
-	function v1.init(p1) --[[ Line: 19 | Upvalues: store (copy), t (copy), v2 (ref) ]]
+	function v1.init(p1)
 		local t2 = {
 			type = "setRewardSpinnerConfig",
 			items = t,
@@ -28,11 +29,11 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), ReplicatedStorage (co
 		t2.extraText = "Spin num: " .. tostring(v2)
 		store:dispatch(t2)
 	end
-	function v1.render(p1) --[[ Line: 28 | Upvalues: Roact (ref), RoactRodux (ref), store (copy), RewardSpinner (copy), v2 (ref), t (copy) ]]
+	function v1.render(p1)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(RewardSpinner, {
-				onFinished = function() --[[ Name: onFinished | Line: 33 | Upvalues: v2 (ref), store (ref), t (ref) ]]
+				onFinished = function()
 					v2 = v2 + 1
 					local t2 = {
 						type = "setRewardSpinnerConfig",
@@ -45,9 +46,9 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), ReplicatedStorage (co
 				end
 			}) })
 	end
-	function v1.willUnmount(p1) --[[ Line: 46 ]] end
+	function v1.willUnmount(p1)  end
 	local v4 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 49 | Upvalues: Roact (ref), v4 (copy) ]]
+	return function()
 		Roact.unmount(v4)
 	end
 end

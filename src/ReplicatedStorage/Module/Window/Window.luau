@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -5,7 +6,7 @@ local t = {
 	__ClassName = "Window"
 }
 t.__index = t
-function t.new() --[[ Line: 8 | Upvalues: t (copy), Maid (copy) ]]
+function t.new()
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
@@ -13,21 +14,21 @@ function t.new() --[[ Line: 8 | Upvalues: t (copy), Maid (copy) ]]
 	t2._beforeOpenFun = nil
 	return t2
 end
-function t.GetOnOpenedSignal(p1) --[[ Line: 19 | Upvalues: Signal (copy) ]]
+function t.GetOnOpenedSignal(p1)
 	if not p1._onOpened then
 		p1._onOpened = Signal.new()
 		p1._maid:GiveTask(p1._onOpened)
 	end
 	return p1._onOpened
 end
-function t.GetOnClosedSignal(p1) --[[ Line: 26 | Upvalues: Signal (copy) ]]
+function t.GetOnClosedSignal(p1)
 	if not p1._onClosed then
 		p1._onClosed = Signal.new()
 		p1._maid:GiveTask(p1._onClosed)
 	end
 	return p1._onClosed
 end
-function t.Open(p1) --[[ Line: 33 ]]
+function t.Open(p1)
 	assert(not p1._isOpen)
 	p1._isOpen = true
 	if p1._beforeOpenFun then
@@ -37,17 +38,17 @@ function t.Open(p1) --[[ Line: 33 ]]
 		p1._onOpened:Fire()
 	end
 end
-function t.Close(p1) --[[ Line: 43 ]]
+function t.Close(p1)
 	assert(p1._isOpen)
 	p1._isOpen = false
 	if p1._onClosed then
 		p1._onClosed:Fire()
 	end
 end
-function t.IsOpen(p1) --[[ Line: 50 ]]
+function t.IsOpen(p1)
 	return p1._isOpen
 end
-function t.Destroy(p1) --[[ Line: 53 ]]
+function t.Destroy(p1)
 	assert(p1._maid)
 	if p1:IsOpen() then
 		p1:Close()

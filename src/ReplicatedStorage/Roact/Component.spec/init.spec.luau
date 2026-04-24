@@ -1,4 +1,5 @@
-return function() --[[ Line: 1 ]]
+-- Reviewed by Claude
+return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
@@ -7,11 +8,11 @@ return function() --[[ Line: 1 ]]
 	local Type = require(script.Parent.Parent.Type)
 	local Component = require(script.Parent.Parent.Component)
 	local v1 = createReconciler(NoopRenderer)
-	it("should be invoked with props when mounted", function() --[[ Line: 13 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy), assertDeepEqual (copy) ]]
+	it("should be invoked with props when mounted", function()
 		local v12 = Component:extend("MyComponent")
 		local v2 = createSpy()
 		v12.init = v2.value
-		function v12.render(p1) --[[ Line: 20 ]]
+		function v12.render(p1)
 			return nil
 		end
 		local t = {

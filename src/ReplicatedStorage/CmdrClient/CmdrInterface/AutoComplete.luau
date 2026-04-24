@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
-return function(p1) --[[ Line: 4 | Upvalues: LocalPlayer (copy) ]]
+return function(p1)
 	local t = {
 		Items = {},
 		ItemOptions = {},
@@ -13,17 +14,17 @@ return function(p1) --[[ Line: 4 | Upvalues: LocalPlayer (copy) ]]
 	local Description = Autocomplete:WaitForChild("Description")
 	local Entry = v1:WaitForChild("Entry")
 	TextButton.Parent = nil
-	local function SetText(p1, p2, p3, p4) --[[ Line: 22 | Upvalues: Util (copy) ]]
+	local function SetText(p1, p2, p3, p4)
 		p1.Visible = p3 ~= nil
 		p2.Text = p3 or ""
 		if p4 then
 			p2.Size = UDim2.new(0, Util.GetTextSize(p3 or "", p2, Vector2.new(1000, 1000), 1, 0).X, p1.Size.Y.Scale, p1.Size.Y.Offset)
 		end
 	end
-	local function UpdateContainerSize() --[[ Line: 36 | Upvalues: Autocomplete (copy), Title (copy) ]]
+	local function UpdateContainerSize()
 		Autocomplete.Size = UDim2.new(0, math.max(Title.Field.TextBounds.X + Title.Field.Type.TextBounds.X, Autocomplete.Size.X.Offset), 0, (math.min(Autocomplete.UIListLayout.AbsoluteContentSize.Y, Autocomplete.Parent.AbsoluteSize.Y - Autocomplete.AbsolutePosition.Y - 10)))
 	end
-	local function UpdateInfoDisplay(p1) --[[ Line: 46 | Upvalues: SetText (copy), Title (copy), Description (copy), Autocomplete (copy), UpdateContainerSize (copy) ]]
+	local function UpdateInfoDisplay(p1)
 		SetText(Title, Title.Field, p1.name, true)
 		local v1 = p1.type and ": " .. p1.type:sub(1, 1):upper() .. p1.type:sub(2)
 		Title.Field.Type.Visible = v1 ~= nil
@@ -44,7 +45,7 @@ return function(p1) --[[ Line: 4 | Upvalues: LocalPlayer (copy) ]]
 		Autocomplete.UIListLayout:ApplyLayout()
 		UpdateContainerSize()
 	end
-	function t.Show(p1, p2, p3) --[[ Line: 85 | Upvalues: TextButton (copy), Autocomplete (copy), Entry (copy), Util (copy), UpdateInfoDisplay (copy) ]]
+	function t.Show(p1, p2, p3)
 		local v2 = p3 or {}
 		for k, v in pairs(p1.Items) do
 			if v.gui then
@@ -95,20 +96,20 @@ return function(p1) --[[ Line: 4 | Upvalues: LocalPlayer (copy) ]]
 		Autocomplete.Visible = true
 		UpdateInfoDisplay(p1.Items[1] and p1.Items[1].options or v2)
 	end
-	function t.GetSelectedItem(p1) --[[ Line: 164 | Upvalues: Autocomplete (copy), t (copy) ]]
+	function t.GetSelectedItem(p1)
 		if Autocomplete.Visible == false then
 			return nil
 		else
 			return t.Items[t.SelectedItem]
 		end
 	end
-	function t.Hide(p1) --[[ Line: 173 | Upvalues: Autocomplete (copy) ]]
+	function t.Hide(p1)
 		Autocomplete.Visible = false
 	end
-	function t.IsVisible(p1) --[[ Line: 178 | Upvalues: Autocomplete (copy) ]]
+	function t.IsVisible(p1)
 		return Autocomplete.Visible
 	end
-	function t.Select(p1, p2) --[[ Line: 183 | Upvalues: Autocomplete (copy), Title (copy), Description (copy), TextButton (copy), UpdateInfoDisplay (copy) ]]
+	function t.Select(p1, p2)
 		if Autocomplete.Visible then
 			p1.SelectedItem = p1.SelectedItem + p2
 			if p1.SelectedItem > #p1.Items then

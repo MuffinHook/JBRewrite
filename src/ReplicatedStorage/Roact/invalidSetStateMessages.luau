@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ComponentLifecyclePhase = require(script.Parent.ComponentLifecyclePhase)
 return {
 	[ComponentLifecyclePhase.WillUpdate] = "setState cannot be used in the willUpdate lifecycle method.\nConsider using the didUpdate method instead, or using getDerivedStateFromProps.\n\nCheck the definition of willUpdate in the component %q.",

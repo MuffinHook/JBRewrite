@@ -1,14 +1,15 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local t = {
 	_color = nil,
 	_targetColor = Color3.new(255/255, 255/255, 255/255)
 }
-function t.init() --[[ Line: 6 | Upvalues: RunService (copy), t (copy) ]]
-	task.spawn(function() --[[ Line: 7 | Upvalues: RunService (ref), t (ref) ]]
+function t.init()
+	task.spawn(function()
 		local SkyLights = workspace:WaitForChild("SkyLights", 20)
 		if SkyLights then
 			local v1 = 0
-			RunService.Heartbeat:Connect(function() --[[ Line: 11 | Upvalues: v1 (ref), t (ref), SkyLights (copy) ]]
+			RunService.Heartbeat:Connect(function()
 				local v12 = tick()
 				if v12 - v1 > 5 then
 					v1 = v12

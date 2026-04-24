@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local Binder = require(ReplicatedStorage.Std.Binder)
@@ -5,12 +6,12 @@ local NetObjPoolItemBinder = require(ReplicatedStorage.NetObjPool.NetObjPoolItem
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1) --[[ Line: 11 | Upvalues: BaseObject (copy), t (copy) ]]
+function t.new(p1)
 	local v1 = BaseObject.new(p1)
 	setmetatable(v1, t)
 	return v1
 end
-function t.Get(p1) --[[ Line: 17 | Upvalues: NetObjPoolItemBinder (copy) ]]
+function t.Get(p1)
 	local v1 = nil
 	for v2, v3 in NetObjPoolItemBinder:GetAll() do
 		if v3:GetPoolObj() == p1.obj and v3:GetActive() == true then

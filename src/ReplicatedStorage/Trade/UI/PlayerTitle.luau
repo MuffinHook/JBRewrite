@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Spring = require(ReplicatedStorage.Std.Spring)
@@ -11,7 +12,7 @@ v1.defaultProps = {
 	aspectRatio = 1,
 	parentRatio = 1
 }
-function v1.init(p1) --[[ Line: 15 | Upvalues: Maid (copy), Spring (copy), Roact (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	p1.spinSpring = Spring.new(0, 0, 0.8, 15)
 	p1.scaleSpring = Spring.new(1, 0, 0.5, 40)
@@ -22,7 +23,7 @@ function v1.init(p1) --[[ Line: 15 | Upvalues: Maid (copy), Spring (copy), Roact
 	p1.scale = v3
 	p1.updateScale = v4
 end
-function v1.render(p1) --[[ Line: 22 | Upvalues: createElement (copy) ]]
+function v1.render(p1)
 	local aspectRatio = p1.props.aspectRatio
 	assert(p1.props.size.X.Offset == 0, "cannot support nonzero offset")
 	assert(p1.props.size.Y.Offset == 0, "cannot support nonzero offset")
@@ -39,7 +40,7 @@ function v1.render(p1) --[[ Line: 22 | Upvalues: createElement (copy) ]]
 		BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5 / aspectRatio, 0, 0.5, 0),
-		Size = p1.scale:map(function(p1) --[[ Line: 40 | Upvalues: aspectRatio (copy) ]]
+		Size = p1.scale:map(function(p1)
 			return UDim2.new(p1 / aspectRatio, 0, p1, 0)
 		end)
 	}
@@ -73,10 +74,10 @@ function v1.render(p1) --[[ Line: 22 | Upvalues: createElement (copy) ]]
 	t2.Title = createElement("Frame", t4, t5)
 	return createElement("Frame", t, t2)
 end
-function v1.PopIcon(p1) --[[ Line: 75 | Upvalues: RunService (copy) ]]
+function v1.PopIcon(p1)
 	p1.scaleSpring:Accelerate(15)
 	local Target = p1.scaleSpring.Target
-	p1.maid.scaleHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 78 | Upvalues: p1 (copy), Target (copy) ]]
+	p1.maid.scaleHeartbeat = RunService.Heartbeat:Connect(function()
 		local v1, v2 = p1.scaleSpring:Update()
 		if math.abs(Target - v1) < 0.001 and math.abs(v2) < 0.001 then
 			p1.maid.scaleHeartbeat = nil
@@ -85,10 +86,10 @@ function v1.PopIcon(p1) --[[ Line: 75 | Upvalues: RunService (copy) ]]
 		p1.updateScale(v1)
 	end)
 end
-function v1.SpinIcon(p1) --[[ Line: 87 | Upvalues: RunService (copy) ]]
+function v1.SpinIcon(p1)
 	p1.spinSpring:SetTarget(360)
 	p1.spinSpring.p = 0
-	p1.maid.spinHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 91 | Upvalues: p1 (copy) ]]
+	p1.maid.spinHeartbeat = RunService.Heartbeat:Connect(function()
 		local v1, v2 = p1.spinSpring:Update()
 		if math.abs(360 - v1) < 0.001 and math.abs(v2) < 0.001 then
 			p1.maid.spinHeartbeat = nil
@@ -97,7 +98,7 @@ function v1.SpinIcon(p1) --[[ Line: 87 | Upvalues: RunService (copy) ]]
 		p1.updateSpin(v1)
 	end)
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 100 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p1.props.ready ~= p2.ready and p1.props.ready then
 		p1:SpinIcon()
 		p1:PopIcon()

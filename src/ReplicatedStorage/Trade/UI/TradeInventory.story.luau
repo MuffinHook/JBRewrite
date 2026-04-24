@@ -1,13 +1,14 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local TradeReducerUtils = require(ReplicatedStorage.Trade.TradeReducerUtils)
 local TradeUtils = require(ReplicatedStorage.Trade.TradeUtils)
 game:GetService("Players")
 local EnumSort = require(ReplicatedStorage.Garage.EnumSort)
-return function(p1) --[[ Line: 9 | Upvalues: Roact (copy), TradeReducerUtils (copy), TradeUtils (copy), EnumSort (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local TradeInventory = require(script.Parent.TradeInventory)
-	function v1.init(p1) --[[ Line: 12 | Upvalues: TradeReducerUtils (ref), TradeUtils (ref), EnumSort (ref) ]]
+	function v1.init(p1)
 		local v1 = TradeReducerUtils.buildItemProps({
 			Id = "a4",
 			ItemType = "ItemSkin",
@@ -45,7 +46,7 @@ return function(p1) --[[ Line: 9 | Upvalues: Roact (copy), TradeReducerUtils (co
 			DisplayName = tostring(i)
 		})
 	end
-	function v1.render(p1) --[[ Line: 51 | Upvalues: Roact (ref), TradeInventory (copy), t (copy), EnumSort (ref) ]]
+	function v1.render(p1)
 		return Roact.createElement(TradeInventory, {
 			size = UDim2.new(0.75, 0, 0.75, 0),
 			position = UDim2.new(0.1, 0, 0, 0),
@@ -59,20 +60,20 @@ return function(p1) --[[ Line: 9 | Upvalues: Roact (copy), TradeReducerUtils (co
 					DisplayName = "badcc"
 				}
 			},
-			onCardFlipped = function() --[[ Name: onCardFlipped | Line: 65 ]]
+			onCardFlipped = function()
 				print("card flipped!")
 			end,
 			sortId = p1.state.sortId,
-			onSelectSort = function(p12) --[[ Name: onSelectSort | Line: 69 | Upvalues: EnumSort (ref), p1 (copy) ]]
+			onSelectSort = function(p12)
 				p1:setState({
 					sortId = if p12 == EnumSort.Newest then EnumSort.Alphabetical else EnumSort.Newest
 				})
 			end
 		})
 	end
-	function v1.willUnmount(p1) --[[ Line: 81 ]] end
+	function v1.willUnmount(p1)  end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 84 | Upvalues: Roact (ref), v2 (copy) ]]
+	return function()
 		Roact.unmount(v2)
 	end
 end

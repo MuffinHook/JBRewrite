@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
+return function(p1, p2)
 	local t = {
 		hasState = false,
 		hasChildren = false,
@@ -13,17 +14,17 @@ return function(p1, p2) --[[ Line: 3 ]]
 			SliceCenter = 7,
 			SliceScale = 8
 		},
-		Discard = function(p1) --[[ Name: Discard | Line: 17 ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	}
 	p1.WidgetConstructor("Image", p2.extend(t, {
 		Events = {
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 25 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 29 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_Image = Instance.new("ImageLabel")
 			Iris_Image.Name = "Iris_Image"
 			Iris_Image.BackgroundTransparency = 1
@@ -33,7 +34,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p2.applyFrameStyle(Iris_Image, true)
 			return Iris_Image
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 41 | Upvalues: p2 (copy) ]]
+		Update = function(p1)
 			local v1 = p1.Instance
 			v1.Image = p1.arguments.Image or p2.ICONS.UNKNOWN_TEXTURE
 			v1.Size = p1.arguments.Size
@@ -61,23 +62,23 @@ return function(p1, p2) --[[ Line: 3 ]]
 	}))
 	p1.WidgetConstructor("ImageButton", p2.extend(t, {
 		Events = {
-			clicked = p2.EVENTS.click(function(p1) --[[ Line: 75 ]]
+			clicked = p2.EVENTS.click(function(p1)
 				return p1.Instance
 			end),
-			rightClicked = p2.EVENTS.rightClick(function(p1) --[[ Line: 78 ]]
+			rightClicked = p2.EVENTS.rightClick(function(p1)
 				return p1.Instance
 			end),
-			doubleClicked = p2.EVENTS.doubleClick(function(p1) --[[ Line: 81 ]]
+			doubleClicked = p2.EVENTS.doubleClick(function(p1)
 				return p1.Instance
 			end),
-			ctrlClicked = p2.EVENTS.ctrlClick(function(p1) --[[ Line: 84 ]]
+			ctrlClicked = p2.EVENTS.ctrlClick(function(p1)
 				return p1.Instance
 			end),
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 87 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 91 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_ImageButton = Instance.new("ImageButton")
 			Iris_ImageButton.Name = "Iris_ImageButton"
 			Iris_ImageButton.AutomaticSize = Enum.AutomaticSize.XY
@@ -106,7 +107,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			})
 			return Iris_ImageButton
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 124 | Upvalues: p2 (copy) ]]
+		Update = function(p1)
 			local ImageLabel = p1.Instance.ImageLabel
 			ImageLabel.Image = p1.arguments.Image or p2.ICONS.UNKNOWN_TEXTURE
 			ImageLabel.Size = p1.arguments.Size

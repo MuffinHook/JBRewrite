@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
@@ -9,25 +10,25 @@ local t = {
 	Formatter = {},
 	CurrentTier = 1
 }
-local function Cash(p1, p2) --[[ Line: 13 | Upvalues: Format (copy) ]]
+local function Cash(p1, p2)
 	return ("%s / %s"):format(Format.Currency(p1), Format.Currency(p2))
 end
 t.Formatter.Cash = Cash
-local function CashNoMax(p1) --[[ Line: 16 | Upvalues: Format (copy) ]]
+local function CashNoMax(p1)
 	return ("%s Cash"):format(Format.Currency(p1))
 end
 t.Formatter.CashNoMax = CashNoMax
-local function Weight(p1, p2) --[[ Line: 19 ]]
+local function Weight(p1, p2)
 	return ("%d kg / %d kg"):format(p1, p2)
 end
 t.Formatter.Weight = Weight
 t.SelectedFormatter = t.Formatter.Cash
-function t.Init() --[[ Line: 23 | Upvalues: ReplicatedStorage (copy), LocalPlayer (copy), t (copy) ]]
+function t.Init()
 	local RobberyMoneyGui = ReplicatedStorage.StarterGui:FindFirstChild("RobberyMoneyGui")
 	RobberyMoneyGui.Parent = LocalPlayer.PlayerGui
 	t.Gui = RobberyMoneyGui.Frame
 end
-function t.GetMaxSizeForTier(p1) --[[ Line: 29 | Upvalues: t (copy) ]]
+function t.GetMaxSizeForTier(p1)
 	assert(p1 ~= nil)
 	assert(p1 >= 1)
 	return t.Gui.Container.Bottom.Progress.Tiers:FindFirstChild("Tier" .. p1).Position.X.Scale
@@ -35,7 +36,7 @@ end
 local v1 = nil
 local v2 = TweenInfo.new(1.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 local v3 = TweenInfo.new(2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-function t.Show() --[[ Line: 40 | Upvalues: t (copy), Maid (copy), v1 (ref), TweenService (copy), v2 (copy), v3 (copy) ]]
+function t.Show()
 	if t.Maid ~= nil then
 		return false
 	end
@@ -51,7 +52,7 @@ function t.Show() --[[ Line: 40 | Upvalues: t (copy), Maid (copy), v1 (ref), Twe
 		Position = UDim2.fromScale(0, 0)
 	})
 	v1:Play()
-	v12:GiveTask(function() --[[ Line: 55 | Upvalues: v1 (ref), TweenService (ref), Gui (copy), v3 (ref) ]]
+	v12:GiveTask(function()
 		if v1 then
 			v1:Cancel()
 		end
@@ -59,24 +60,24 @@ function t.Show() --[[ Line: 40 | Upvalues: t (copy), Maid (copy), v1 (ref), Twe
 			Position = UDim2.fromScale(1, 0)
 		})
 		v1:Play()
-		v1.Completed:Once(function(p1) --[[ Line: 61 | Upvalues: Gui (ref) ]]
+		v1.Completed:Once(function(p1)
 			if p1 == Enum.PlaybackState.Completed then
 				Gui.Visible = false
 			end
 		end)
 	end)
 	Gui.Container.Bottom.Progress.Slider.Value.Size = UDim2.new(0, 0, 1, 0)
-	v12:GiveTask(function() --[[ Line: 68 | Upvalues: Gui (copy) ]]
+	v12:GiveTask(function()
 		Gui.Container.Bottom.Progress.Slider.Value.Size = UDim2.new(0, 0, 1, 0)
 	end)
 end
-function t.getUpgradeButton() --[[ Line: 72 | Upvalues: t (copy) ]]
+function t.getUpgradeButton()
 	return t.Gui.Container.Top.Upgrade
 end
-function t.SetFormatter(p1) --[[ Line: 76 | Upvalues: t (copy) ]]
+function t.SetFormatter(p1)
 	t.SelectedFormatter = p1
 end
-function t.SetTime(p1) --[[ Line: 79 | Upvalues: t (copy) ]]
+function t.SetTime(p1)
 	local Gui = t.Gui
 	Gui.Container.Time.Visible = p1 ~= nil
 	if p1 ~= nil then
@@ -89,7 +90,7 @@ function t.SetTime(p1) --[[ Line: 79 | Upvalues: t (copy) ]]
 		Gui.Container.Time.Text = ("%d"):format((math.max(p1, 0)))
 	end
 end
-function t.SetTier(p1, p2) --[[ Line: 95 | Upvalues: t (copy) ]]
+function t.SetTier(p1, p2)
 	assert(p1 ~= nil)
 	assert(p1 >= 1)
 	assert(p2 ~= nil)
@@ -124,7 +125,7 @@ function t.SetTier(p1, p2) --[[ Line: 95 | Upvalues: t (copy) ]]
 end
 local v4 = nil
 local v5 = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-function t.SetMoney(p1, p2, p3) --[[ Line: 145 | Upvalues: t (copy), v4 (ref), TweenService (copy), v5 (copy) ]]
+function t.SetMoney(p1, p2, p3)
 	assert(p1)
 	assert(p2)
 	local Gui = t.Gui
@@ -156,7 +157,7 @@ function t.SetMoney(p1, p2, p3) --[[ Line: 145 | Upvalues: t (copy), v4 (ref), T
 		Gui.Container.Bottom.Progress.Tiers.Visible = true
 	end
 end
-function t.SetMessage(p1) --[[ Line: 182 | Upvalues: t (copy) ]]
+function t.SetMessage(p1)
 	local Gui = t.Gui
 	if p1 == nil then
 		Gui.Container.Message.Visible = false
@@ -165,7 +166,7 @@ function t.SetMessage(p1) --[[ Line: 182 | Upvalues: t (copy) ]]
 		Gui.Container.Message.Text = p1
 	end
 end
-local function setColor(p1, p2) --[[ Line: 192 ]]
+local function setColor(p1, p2)
 	if p1:IsA("Frame") then
 		p1.BackgroundColor3 = p2
 	elseif p1:IsA("TextLabel") or p1:IsA("TextButton") then
@@ -177,7 +178,7 @@ local function setColor(p1, p2) --[[ Line: 192 ]]
 		p1.Color = ColorSequence.new(p2)
 	end
 end
-local function changeColor(p1, p2) --[[ Line: 205 | Upvalues: ColorUtils (copy), setColor (copy) ]]
+local function changeColor(p1, p2)
 	local v1 = ColorUtils.saturateBy(ColorUtils.brightenBy(p2, -0.455), 0.093)
 	if p2 == Color3.fromRGB(194, 248, 117) then
 		v1 = ColorUtils.hueBy(v1, 0.102)
@@ -193,7 +194,7 @@ local function changeColor(p1, p2) --[[ Line: 205 | Upvalues: ColorUtils (copy),
 		setColor(v9, v3)
 	end
 end
-function t.SetRobbery(p1) --[[ Line: 222 | Upvalues: t (copy), RobberyConsts (copy), changeColor (copy) ]]
+function t.SetRobbery(p1)
 	local Container = t.Gui.Container
 	local v1 = RobberyConsts.DATA_ROBBERY[p1].frameData or {}
 	changeColor(Container, v1.color or Color3.fromRGB(194, 248, 117))
@@ -201,7 +202,7 @@ function t.SetRobbery(p1) --[[ Line: 222 | Upvalues: t (copy), RobberyConsts (co
 	Container.Bottom.Progress.Icon.Image = "rbxassetid://" .. (v1.cashImageId or 4912231216)
 	Container.Top.Alternative.Title.Text = v1.alternativeText or "COLLECTING..."
 end
-function t.Hide() --[[ Line: 237 | Upvalues: t (copy) ]]
+function t.Hide()
 	if t.Maid == nil then
 		return false
 	end

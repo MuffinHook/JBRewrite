@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GunUtils = require(ReplicatedStorage.Game.GunShop.GunUtils)
@@ -9,7 +10,7 @@ local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtil
 local ConstraintUtils = require(ReplicatedStorage.Std.ConstraintUtils)
 local Item = require(script.Parent.Item)
 local v2 = CFrame.new()
-local function FromAxisAngle(p1) --[[ Line: 15 | Upvalues: v2 (copy) ]]
+local function FromAxisAngle(p1)
 	local x = p1.x
 	local y = p1.y
 	local z = p1.z
@@ -26,14 +27,14 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Item)
-function t.new(p1, p2, p3, p4) --[[ Line: 32 | Upvalues: Item (copy), t (copy), ConstraintUtils (copy), R15IKv2 (copy) ]]
+function t.new(p1, p2, p3, p4)
 	local v1 = Item.new(p1, p4)
 	setmetatable(v1, t)
 	v1.Config = p3
 	v1.inventoryItemValue = p2
 	v1.JointNeckC0 = v1.JointNeck.C0
 	v1.JointWaistC0 = v1.JointWaist.C0
-	v1.Maid:GiveTask(function() --[[ Line: 41 | Upvalues: ConstraintUtils (ref), v1 (copy) ]]
+	v1.Maid:GiveTask(function()
 		ConstraintUtils.setJointC0(v1.JointNeck, v1.JointNeckC0)
 		ConstraintUtils.setJointC0(v1.JointWaist, v1.JointWaistC0)
 	end)
@@ -45,23 +46,23 @@ function t.new(p1, p2, p3, p4) --[[ Line: 32 | Upvalues: Item (copy), t (copy), 
 	v1:Equip()
 	return v1
 end
-function t.Equip(p1) --[[ Line: 56 | Upvalues: InventoryItemUtils (copy), GunUtils (copy), GunSystemConsts (copy), RunService (copy) ]]
+function t.Equip(p1)
 	local v2 = GunUtils.getEquipTime((InventoryItemUtils.getName(p1.inventoryItemValue))) or GunSystemConsts.GUN_EQUIP_TIME
 	if GunUtils.getShouldAddEquipTime(p1) and v2 > 0 then
 		p1.IsEquipping = true
 		p1:StartReloadProgressCircle(v2)
-		p1.maid:GiveTask(task.delay(v2, function() --[[ Line: 63 | Upvalues: p1 (copy) ]]
+		p1.maid:GiveTask(task.delay(v2, function()
 			p1.IsEquipping = false
 		end))
 	end
-	p1.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 68 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(RunService.Heartbeat:Connect(function()
 		p1:Heartbeat()
 	end))
-	p1.Maid:GiveTask(RunService.Stepped:Connect(function() --[[ Line: 71 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(RunService.Stepped:Connect(function()
 		p1:Stepped()
 	end))
 end
-function t.SetupSprings(p1, p2) --[[ Line: 75 | Upvalues: Spring (copy) ]]
+function t.SetupSprings(p1, p2)
 	if p1.Local and (p2 and p2.SpringItemOffset) then
 		p1.SpringItemOffset = p2.SpringItemOffset
 		p1.SpringItemOffset.Damp = 0.85
@@ -95,7 +96,7 @@ function t.SetupSprings(p1, p2) --[[ Line: 75 | Upvalues: Spring (copy) ]]
 		p1.SpringWaistRotation = Spring.new(p1.Config.Motion.Hip.Springs.WaistRotation, Vector3.new(), 0.85, 8)
 	end
 end
-function t.SetupModel(p1) --[[ Line: 115 | Upvalues: InventoryItemUtils (copy), ReplicatedStorage (copy), Joint (copy) ]]
+function t.SetupModel(p1)
 	local v1 = InventoryItemUtils.getName(p1.inventoryItemValue)
 	local v2 = ReplicatedStorage.Resource.ItemSystem.Models:FindFirstChild(v1)
 	if v2 == nil then
@@ -106,46 +107,46 @@ function t.SetupModel(p1) --[[ Line: 115 | Upvalues: InventoryItemUtils (copy), 
 	local Center = v3.Skeleton.Center
 	p1.Center = Center
 	Joint.WeldAllTo(v3, Center)
-	p1.Maid:GiveTask(function() --[[ Line: 128 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(function()
 		p1.Model:Destroy()
 		p1.Model = nil
 	end)
 end
-function t.AttachModelToPlayer(p1) --[[ Line: 133 | Upvalues: Joint (copy) ]]
+function t.AttachModelToPlayer(p1)
 	local UpperTorso = p1.UpperTorso
 	p1.Center.CFrame = UpperTorso.CFrame
 	local v1 = Joint.BlankMotor(p1.Center, UpperTorso)
 	p1.Model.Parent = workspace.Items
 	p1.Motor = v1
-	p1.Maid:GiveTask(function() --[[ Line: 140 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(function()
 		p1.Motor:Destroy()
 		p1.Motor = nil
 	end)
 end
-function t.SwingLunge(p1) --[[ Line: 145 ]]
+function t.SwingLunge(p1)
 	error("TODO: Implement")
 end
-function t.SwingSwoosh(p1) --[[ Line: 148 ]]
+function t.SwingSwoosh(p1)
 	error("TODO: Implement")
 end
-function t.Heartbeat(p1) --[[ Line: 151 | Upvalues: FromAxisAngle (copy), ConstraintUtils (copy) ]]
+function t.Heartbeat(p1)
 	local v1 = p1.SpringItemOffset:Update()
 	local v2 = FromAxisAngle((p1.SpringItemRotation:Update()))
 	p1.Motor.C1 = CFrame.new(v1) * v2 * CFrame.new(1.6, 1, -1.5) * p1.JointWaist.C1
 	ConstraintUtils.setJointC0(p1.JointWaist, p1.JointWaistC0 * FromAxisAngle((p1.SpringWaistRotation:Update())))
 	ConstraintUtils.setJointC0(p1.JointNeck, p1.JointNeckC0 * FromAxisAngle((p1.SpringNeckRotation:Update())))
 end
-function t.Stepped(p1) --[[ Line: 163 | Upvalues: R15IKv2 (copy) ]]
+function t.Stepped(p1)
 	local IK = p1.IK
 	IK.RightArm = p1.Center.CFrame * Vector3.new(0, 0, 0.2)
 	R15IKv2.Arms(IK)
 	IK.LeftWrist.Transform = CFrame.new()
 	IK.RightWrist.Transform = CFrame.Angles(0, -0.3, 0)
 end
-function t._getLastUse(p1) --[[ Line: 171 ]]
+function t._getLastUse(p1)
 	return p1.Model:GetAttribute("LastUse") or 0
 end
-function t.Swing(p1, p2) --[[ Line: 174 | Upvalues: GunUtils (copy) ]]
+function t.Swing(p1, p2)
 	if p1.IsEquipping then
 		return false
 	end
@@ -164,14 +165,14 @@ function t.Swing(p1, p2) --[[ Line: 174 | Upvalues: GunUtils (copy) ]]
 		p1:BroadcastInputBegan(p2)
 	end
 end
-function t.ShootBegin(p1, p2) --[[ Line: 193 ]]
+function t.ShootBegin(p1, p2)
 	p1:Swing(p2)
 end
-function t.InputBegan(p1, p2, p3) --[[ Line: 196 | Upvalues: Item (copy) ]]
+function t.InputBegan(p1, p2, p3)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		p1:ShootBegin(p2)
 	end
 	Item.InputBegan(p1, p2, p3)
 end
-function t.InputEnded(p1, p2, p3) --[[ Line: 206 ]] end
+function t.InputEnded(p1, p2, p3)  end
 return t

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -16,7 +17,7 @@ v1.defaultProps = {
 	bornAt = workspace:GetServerTimeNow(),
 	duration = 10
 }
-function v1.init(p1) --[[ Line: 22 | Upvalues: Maid (copy), Roact (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	if p1.props.containerSize then
 		local updateContainerSize = p1.props.updateContainerSize
@@ -36,7 +37,7 @@ function v1.init(p1) --[[ Line: 22 | Upvalues: Maid (copy), Roact (copy) ]]
 		remaining = 0
 	})
 end
-function v1.render(p1) --[[ Line: 38 | Upvalues: MinimapUtils (copy), Roact (copy), createElement (copy), Minimap (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	if #p1.props.spawns ~= 0 then
 		local t = {}
 		for v1, v2 in p1.props.spawns do
@@ -52,7 +53,7 @@ function v1.render(p1) --[[ Line: 38 | Upvalues: MinimapUtils (copy), Roact (cop
 				v9 = MinimapUtils.worldToScale(position_2.X, position_2.Z, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapWorldWidth, p1.props.mapWorldHeight)
 			else
 				if typeof(v7.position) == "table" and v7.position.map then
-					v9 = v7.position:map(function(p12) --[[ Line: 64 | Upvalues: MinimapUtils (ref), p1 (copy) ]]
+					v9 = v7.position:map(function(p12)
 						return MinimapUtils.worldToScale(p12.X, p12.Z, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapWorldWidth, p1.props.mapWorldHeight)
 					end)
 				end
@@ -66,14 +67,14 @@ function v1.render(p1) --[[ Line: 38 | Upvalues: MinimapUtils (copy), Roact (cop
 			t3.Position = v9
 			t3.ZIndex = 1
 			t3.Selectable = true
-			t3[Roact.Event.Activated] = function() --[[ Line: 84 | Upvalues: p1 (copy), v7 (copy) ]]
+			t3[Roact.Event.Activated] = function()
 				p1.props.onSpawnPressed(v7)
 				if not v7.locked then
 					p1.props.hide()
 				end
 			end
 			local v13 = "TextButton"
-			t3.Size = p1.containerSize:map(function(p1) --[[ Line: 97 ]]
+			t3.Size = p1.containerSize:map(function(p1)
 				return UDim2.new(0, p1.X * 0.06, 0, p1.X * 0.06)
 			end)
 			t3.Text = ""
@@ -113,7 +114,7 @@ function v1.render(p1) --[[ Line: 38 | Upvalues: MinimapUtils (copy), Roact (cop
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0, 0, 1, 0),
-				Text = v7.numEnemies:map(function(p1) --[[ Line: 124 ]]
+				Text = v7.numEnemies:map(function(p1)
 					return "Enemies: " .. tostring(p1)
 				end),
 				Font = Enum.Font.Bangers,
@@ -172,8 +173,8 @@ function v1.render(p1) --[[ Line: 38 | Upvalues: MinimapUtils (copy), Roact (cop
 		return createElement(Minimap, v22, t3)
 	end
 end
-function v1._startTimer(p1) --[[ Line: 183 | Upvalues: Interval (copy) ]]
-	local function update() --[[ Line: 184 | Upvalues: p1 (copy) ]]
+function v1._startTimer(p1)
+	local function update()
 		local v1 = workspace:GetServerTimeNow() - p1.props.bornAt
 		if p1.props.duration <= v1 then
 			p1.maid.countdown = nil
@@ -185,29 +186,29 @@ function v1._startTimer(p1) --[[ Line: 183 | Upvalues: Interval (copy) ]]
 	update()
 	p1.maid.countdown = Interval.every(1):Connect(update)
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 197 ]]
+function v1.didUpdate(p1, p2, p3)
 	if #p1.props.spawns ~= #p2.spawns then
 		p1:_startTimer()
 	end
 end
-function v1.didMount(p1) --[[ Line: 202 ]]
+function v1.didMount(p1)
 	if #p1.props.spawns > 0 then
 		p1:_startTimer()
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 207 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 210 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		spawns = p1.minimapSpawns,
 		bornAt = p1.spawnSelectionReceivedAt,
 		points = p1.minimapPoints,
 		circles = p1.minimapCircles
 	}
-end, function(p1) --[[ Line: 217 ]]
+end, function(p1)
 	return {
-		hide = function() --[[ Name: hide | Line: 219 | Upvalues: p1 (copy) ]]
+		hide = function()
 			p1({
 				type = "minimapSetSpawns",
 				spawns = {}

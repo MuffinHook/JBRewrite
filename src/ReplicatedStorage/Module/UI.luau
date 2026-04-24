@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
@@ -8,12 +9,12 @@ local Signal = require(ReplicatedStorage.Std.Signal)
 local Raycast = require(ReplicatedStorage.Std.Raycast)
 local Octree = require(ReplicatedStorage.Std.Octree)
 local t = {
-	MakeGroup = function() --[[ Name: MakeGroup | Line: 14 ]]
+	MakeGroup = function()
 		return {
 			Running = nil
 		}
 	end,
-	MakeSpec = function() --[[ Name: MakeSpec | Line: 19 ]]
+	MakeSpec = function()
 		return {
 			Duration = nil,
 			Start = nil,
@@ -22,60 +23,60 @@ local t = {
 			Update = nil
 		}
 	end,
-	Cancel = function(p1) --[[ Name: Cancel | Line: 28 ]]
-		local Running = p1.Running
+	Cancel = function(group)
+		local Running = group.Running
 		if Running then
 			Running:Cancel()
-			p1.Running = nil
+			group.Running = nil
 		end
 	end
 }
-function t.Push(p1, p2) --[[ Line: 35 | Upvalues: t (ref) ]]
-	t.Cancel(p1)
-	assert(p2.Duration)
-	assert(p2.Start)
-	assert(p2.End)
-	assert(p2.Update)
-	if not p2.Cancel then
-		p2.Cancel = p2.End
+function t.Push(group, spec)
+	t.Cancel(group)
+	assert(spec.Duration)
+	assert(spec.Start)
+	assert(spec.End)
+	assert(spec.Update)
+	if not spec.Cancel then
+		spec.Cancel = spec.End
 	end
-	p1.Running = p2
+	group.Running = spec
 end
-function t.Update(p1, p2) --[[ Line: 46 ]]
-	local Running = p1.Running
+function t.Update(group, deltaTime)
+	local Running = group.Running
 	if Running then
-		local v1 = os.clock()
+		local currentTime = os.clock()
 		if not Running.Started then
-			Running.Started = v1
+			Running.Started = currentTime
 			Running:Start()
 		end
-		local sum = v1 - Running.Started
+		local elapsedTime = currentTime - Running.Started
 		if Running.Elapsed then
-			sum = sum + Running.Elapsed
+			elapsedTime = elapsedTime + Running.Elapsed
 		end
-		local v2 = sum / Running.Duration
-		if v2 >= 1 then
-			v2 = 1
+		local progress = elapsedTime / Running.Duration
+		if progress >= 1 then
+			progress = 1
 		end
-		Running:Update(v2, p2)
-		if v2 >= 1 then
+		Running:Update(progress, deltaTime)
+		if progress >= 1 then
 			Running:End()
-			p1.Running = nil
+			group.Running = nil
 		end
 	end
 end
 local t2 = {
 	onVisibilityChanged = Signal.new()
 }
-local v1 = t.MakeGroup()
-local t3 = {}
-t2.Specs = t3
-local v2 = Vector3.new()
-local v3 = Octree.new(Vector3.new(0, 50, 0), 8192, 8, 8)
-t2.SpecOctree = v3
-local t4 = {}
-local v4 = 0
-function t2.Add(p1, p2) --[[ Line: 89 | Upvalues: t3 (copy), v2 (copy), v3 (copy), t2 (ref) ]]
+local animationGroup = t.MakeGroup()
+local specsList = {}
+t2.Specs = specsList
+local zeroVector = Vector3.new()
+local octreeStructure = Octree.new(Vector3.new(0, 50, 0), 8192, 8, 8)
+t2.SpecOctree = octreeStructure
+local nearbySpecsList = {}
+local lastOctreeUpdateTime = 0
+function t2.Add(p1, p2)
 	assert(p2, "No key found, second param to Add must be nil")
 	p1.Tag = p2
 	if not p1.Enabled then
@@ -90,11 +91,11 @@ function t2.Add(p1, p2) --[[ Line: 89 | Upvalues: t3 (copy), v2 (copy), v3 (copy
 		WorldPosition = p1.Attachment and p1.Attachment.WorldPosition or (p1.Part and p1.Part.Position or v2)
 	end
 	v3:Insert(p1, WorldPosition)
-	return function() --[[ Line: 104 | Upvalues: t2 (ref), p2 (copy) ]]
+	return function()
 		return t2.Remove(p2)
 	end
 end
-function t2.Remove(p1) --[[ Line: 108 | Upvalues: t3 (copy), t2 (ref), v3 (copy) ]]
+function t2.Remove(p1)
 	for i = #t3, 1, -1 do
 		local v1 = t3[i]
 		if v1.Tag == p1 then
@@ -111,12 +112,12 @@ function t2.Remove(p1) --[[ Line: 108 | Upvalues: t3 (copy), t2 (ref), v3 (copy)
 	end
 	return false
 end
-local v5 = 1
-local function GetCirclePct() --[[ Line: 126 | Upvalues: v5 (ref) ]]
-	return v5
+local circleProgress = 1
+local function GetCirclePct()
+	return circleProgress
 end
-local function SetCirclePct(p1) --[[ Line: 129 | Upvalues: v5 (ref), t2 (ref) ]]
-	v5 = p1
+local function SetCirclePct(percentage)
+	circleProgress = percentage
 	local Frame = t2.Frame
 	local Image = Frame.OuterFrame.Left.Image
 	local Image_2 = Frame.OuterFrame.Right.Image
@@ -128,20 +129,20 @@ local function SetCirclePct(p1) --[[ Line: 129 | Upvalues: v5 (ref), t2 (ref) ]]
 	Image_2.Visible = v2
 	Frame.OuterFrame.OuterFull.Visible = not v2
 end
-local function SetCircleColor(p1) --[[ Line: 144 | Upvalues: t2 (ref) ]]
+local function SetCircleColor(p1)
 	local Frame = t2.Frame
 	Frame.OuterFrame.Left.Image.ImageColor3 = p1
 	Frame.OuterFrame.Right.Image.ImageColor3 = p1
 	Frame.OuterFrame.OuterFull.ImageColor3 = p1
 end
-local function SetCircleRadius(p1) --[[ Line: 152 | Upvalues: t2 (ref) ]]
+local function SetCircleRadius(p1)
 	local Frame = t2.Frame
 	Frame.OuterFrame.Size = UDim2.new(1, 2 * p1, 1, 2 * p1)
 	Frame.OuterFrame.Position = UDim2.new(0, -p1, 0, -p1)
 end
 local sin = math.sin
-local function afSpin_Start() --[[ Line: 160 | Upvalues: v5 (ref), t2 (ref) ]]
-	v5 = 0
+local function afSpin_Start()
+	circleProgress = 0
 	local Frame = t2.Frame
 	local Image = Frame.OuterFrame.Left.Image
 	local Image_2 = Frame.OuterFrame.Right.Image
@@ -159,8 +160,8 @@ local function afSpin_Start() --[[ Line: 160 | Upvalues: v5 (ref), t2 (ref) ]]
 	Frame_3.OuterFrame.Right.Image.ImageColor3 = v1
 	Frame_3.OuterFrame.OuterFull.ImageColor3 = v1
 end
-local function afSpin_End() --[[ Line: 165 | Upvalues: v5 (ref), t2 (ref) ]]
-	v5 = 1
+local function afSpin_End()
+	circleProgress = 1
 	local Frame = t2.Frame
 	local Image = Frame.OuterFrame.Left.Image
 	local Image_2 = Frame.OuterFrame.Right.Image
@@ -178,27 +179,27 @@ local function afSpin_End() --[[ Line: 165 | Upvalues: v5 (ref), t2 (ref) ]]
 	Frame_3.OuterFrame.Right.Image.ImageColor3 = v1
 	Frame_3.OuterFrame.OuterFull.ImageColor3 = v1
 end
-local function afSpin_Update(p1, p2, p3) --[[ Line: 170 | Upvalues: sin (copy), SetCirclePct (copy), t2 (ref) ]]
-	local v1 = sin(p2) / 0.8414709848078965
-	SetCirclePct(v1)
-	local v2 = 214 - (1 - v1) * 64
-	local v3 = Color3.fromRGB(v2, v2, v2)
+local function afSpin_Update(spec, progress, deltaTime)
+	local sinValue = sin(progress) / 0.8414709848078965
+	SetCirclePct(sinValue)
+	local colorValue = 214 - (1 - sinValue) * 64
+	local colorRGB = Color3.fromRGB(colorValue, colorValue, colorValue)
 	local Frame = t2.Frame
-	Frame.OuterFrame.Left.Image.ImageColor3 = v3
-	Frame.OuterFrame.Right.Image.ImageColor3 = v3
-	Frame.OuterFrame.OuterFull.ImageColor3 = v3
-	local v4 = v1 * 4 + 4
+	Frame.OuterFrame.Left.Image.ImageColor3 = colorRGB
+	Frame.OuterFrame.Right.Image.ImageColor3 = colorRGB
+	Frame.OuterFrame.OuterFull.ImageColor3 = colorRGB
+	local radiusSize = sinValue * 4 + 4
 	local Frame_2 = t2.Frame
-	Frame_2.OuterFrame.Size = UDim2.new(1, 2 * v4, 1, 2 * v4)
-	Frame_2.OuterFrame.Position = UDim2.new(0, -v4, 0, -v4)
+	Frame_2.OuterFrame.Size = UDim2.new(1, 2 * radiusSize, 1, 2 * radiusSize)
+	Frame_2.OuterFrame.Position = UDim2.new(0, -radiusSize, 0, -radiusSize)
 end
-local v6 = 1
-local function Ease_outBack(p1, p2, p3, p4, p5) --[[ Line: 184 ]]
+local pulseProgress = 1
+local function Ease_outBack(p1, p2, p3, p4, p5)
 	p5 = p5 or 1.70158
 	local v1 = p1 / p4 - 1
 	return p3 * (v1 * v1 * ((p5 + 1) * v1 + p5) + 1) + p2
 end
-local function afPulse_Start() --[[ Line: 191 | Upvalues: t2 (ref) ]]
+local function afPulse_Start()
 	local v1 = Color3.fromRGB(214, 214, 214)
 	local Frame = t2.Frame
 	Frame.OuterFrame.Left.Image.ImageColor3 = v1
@@ -208,8 +209,8 @@ local function afPulse_Start() --[[ Line: 191 | Upvalues: t2 (ref) ]]
 	Frame_2.OuterFrame.Size = UDim2.new(1, 0, 1, 0)
 	Frame_2.OuterFrame.Position = UDim2.new(0, -0, 0, -0)
 end
-local function afPulse_End() --[[ Line: 196 | Upvalues: v5 (ref), t2 (ref), v6 (ref) ]]
-	v5 = 1
+local function afPulse_End()
+	circleProgress = 1
 	local Frame = t2.Frame
 	local Image = Frame.OuterFrame.Left.Image
 	local Image_2 = Frame.OuterFrame.Right.Image
@@ -218,7 +219,7 @@ local function afPulse_End() --[[ Line: 196 | Upvalues: v5 (ref), t2 (ref), v6 (
 	Image.Visible = false
 	Image_2.Visible = false
 	Frame.OuterFrame.OuterFull.Visible = true
-	v6 = 1
+	pulseProgress = 1
 	local v1 = Color3.fromRGB(214, 214, 214)
 	local Frame_2 = t2.Frame
 	Frame_2.OuterFrame.Left.Image.ImageColor3 = v1
@@ -228,69 +229,69 @@ local function afPulse_End() --[[ Line: 196 | Upvalues: v5 (ref), t2 (ref), v6 (
 	Frame_3.OuterFrame.Size = UDim2.new(1, 16, 1, 16)
 	Frame_3.OuterFrame.Position = UDim2.new(0, -8, 0, -8)
 end
-local function afPulse_Update(p1, p2, p3) --[[ Line: 203 | Upvalues: SetCirclePct (copy), v6 (ref), t2 (ref) ]]
-	SetCirclePct(v6 * (1 - p2) + p2)
-	local v2 = 6 or 1.70158
-	local v3 = p2 / 1 - 1
-	local v4 = 8 * (1 * (v3 * v3 * ((v2 + 1) * v3 + v2) + 1) + 0)
+local function afPulse_Update(spec, progress, deltaTime)
+	SetCirclePct(pulseProgress * (1 - progress) + progress)
+	local easeOutBackFactor = 6 or 1.70158
+	local normalizedProgress = progress / 1 - 1
+	local easedRadius = 8 * (1 * (normalizedProgress * normalizedProgress * ((easeOutBackFactor + 1) * normalizedProgress + easeOutBackFactor) + 1) + 0)
 	local Frame = t2.Frame
-	Frame.OuterFrame.Size = UDim2.new(1, 2 * v4, 1, 2 * v4)
-	Frame.OuterFrame.Position = UDim2.new(0, -v4, 0, -v4)
-	if p1.Red then
-		local v5 = 40 - 40 * p2
-		local v62 = 1 - p2
-		local v7 = Color3.fromRGB(214 * v62 + 214 * p2 + v5, 69 * v62 + 214 * p2 + v5, 69 * v62 + 214 * p2 + v5)
+	Frame.OuterFrame.Size = UDim2.new(1, 2 * easedRadius, 1, 2 * easedRadius)
+	Frame.OuterFrame.Position = UDim2.new(0, -easedRadius, 0, -easedRadius)
+	if spec.Red then
+		local redIntensity = 40 - 40 * progress
+		local inverseProgress = 1 - progress
+		local redColor = Color3.fromRGB(214 * inverseProgress + 214 * progress + redIntensity, 69 * inverseProgress + 214 * progress + redIntensity, 69 * inverseProgress + 214 * progress + redIntensity)
 		local Frame_2 = t2.Frame
-		Frame_2.OuterFrame.Left.Image.ImageColor3 = v7
-		Frame_2.OuterFrame.Right.Image.ImageColor3 = v7
-		Frame_2.OuterFrame.OuterFull.ImageColor3 = v7
+		Frame_2.OuterFrame.Left.Image.ImageColor3 = redColor
+		Frame_2.OuterFrame.Right.Image.ImageColor3 = redColor
+		Frame_2.OuterFrame.OuterFull.ImageColor3 = redColor
 	end
 end
-function t2.NotAllowed() --[[ Line: 216 | Upvalues: t (ref), afPulse_Start (ref), afPulse_End (ref), afPulse_Update (ref), v1 (copy) ]]
-	local v12 = t.MakeSpec()
-	v12.Duration = 0.3
-	v12.Start = afPulse_Start
-	v12.End = afPulse_End
-	v12.Update = afPulse_Update
-	v12.Red = true
-	t.Push(v1, v12)
+function t2.NotAllowed()
+	local notAllowedSpec = t.MakeSpec()
+	notAllowedSpec.Duration = 0.3
+	notAllowedSpec.Start = afPulse_Start
+	notAllowedSpec.End = afPulse_End
+	notAllowedSpec.Update = afPulse_Update
+	notAllowedSpec.Red = true
+	t.Push(animationGroup, notAllowedSpec)
 end
-local function Press() --[[ Line: 226 | Upvalues: t2 (ref), t (ref), afSpin_Start (ref), afSpin_End (ref), afSpin_Update (ref), v1 (copy), afPulse_Start (ref), afPulse_End (ref), afPulse_Update (ref) ]]
+local function Press()
 	local Spec = t2.Spec
 	if Spec then
 		Spec:Callback(false)
 		if Spec.Timed then
 			Spec.Pressed = true
 			Spec.PressedAt = os.clock()
-			local v12 = t.MakeSpec()
-			v12.Duration = Spec.Duration
-			v12.Start = afSpin_Start
-			v12.End = afSpin_End
-			v12.Update = afSpin_Update
+			local spinSpec = t.MakeSpec()
+			spinSpec.Duration = Spec.Duration
+			spinSpec.Start = afSpin_Start
+			spinSpec.End = afSpin_End
+			spinSpec.Update = afSpin_Update
 			if Spec.GetAccumulation then
-				v12.Elapsed = Spec.GetAccumulation()
+			spinSpec.Elapsed = Spec.GetAccumulation()
 			end
-			t.Push(v1, v12)
+			t.Push(animationGroup, spinSpec)
 			Spec.Animation = v12
 		elseif Spec:Callback(true) then
-			local v2 = t.MakeSpec()
-			v2.Duration = 0.3
-			v2.Start = afPulse_Start
-			v2.End = afPulse_End
-			v2.Update = afPulse_Update
-			t.Push(v1, v2)
+			local pulseSpec = t.MakeSpec()
+			pulseSpec.Duration = 0.3
+			pulseSpec.Start = afPulse_Start
+			pulseSpec.End = afPulse_End
+			pulseSpec.Update = afPulse_Update
+			t.Push(animationGroup, pulseSpec)
 		else
-			local v3 = t.MakeSpec()
-			v3.Duration = 0.3
-			v3.Start = afPulse_Start
-			v3.End = afPulse_End
-			v3.Update = afPulse_Update
-			v3.Red = true
-			t.Push(v1, v3)
+			local failSpec = t.MakeSpec()
+			failSpec.Duration = 0.3
+			failSpec.Start = afPulse_Start
+			failSpec.End = afPulse_End
+			failSpec.Update = afPulse_Update
+			failSpec.Red = true
+			t.Push(animationGroup, failSpec)
 		end
 	end
 end
-local function Release() --[[ Line: 261 | Upvalues: t2 (ref), v1 (copy), v6 (ref), v5 (ref), t (ref), afPulse_Start (ref), afPulse_End (ref), afPulse_Update (ref) ]]
+local function Release()
 	local Spec = t2.Spec
 	if Spec then
 		Spec.Pressed = false
@@ -316,7 +317,7 @@ local function Release() --[[ Line: 261 | Upvalues: t2 (ref), v1 (copy), v6 (ref
 end
 t2.Press = Press
 t2.Release = Release
-local function UpdateUI() --[[ Line: 289 | Upvalues: t3 (copy), t2 (ref), v3 (copy), LocalPlayer (copy), t4 (ref), v4 (ref), v2 (copy), Raycast (copy) ]]
+local function UpdateUI()
 	local v1 = 999
 	local v22 = 1
 	local v32 = nil
@@ -440,7 +441,7 @@ local function UpdateUI() --[[ Line: 289 | Upvalues: t3 (copy), t2 (ref), v3 (co
 		end
 	end
 end
-local function ProcessSpec() --[[ Line: 459 | Upvalues: t2 (ref), Release (copy), t (ref), afPulse_Start (ref), afPulse_End (ref), afPulse_Update (ref), v1 (copy) ]]
+local function ProcessSpec()
 	local Spec = t2.Spec
 	if Spec and Spec.Pressed then
 		local sum = os.clock() - Spec.PressedAt
@@ -483,7 +484,7 @@ local function ProcessSpec() --[[ Line: 459 | Upvalues: t2 (ref), Release (copy)
 		end
 	end
 end
-local function UpdatePlatform() --[[ Line: 504 | Upvalues: t2 (ref), UserInputService (copy), InputUtils (copy) ]]
+local function UpdatePlatform()
 	local Frame = t2.Frame
 	local v1 = UserInputService:GetLastInputType()
 	local v2
@@ -503,8 +504,8 @@ local function UpdatePlatform() --[[ Line: 504 | Upvalues: t2 (ref), UserInputSe
 	local Spec = t2.Spec
 	Frame.Hold.Visible = Spec and Spec.Timed
 end
-local v7 = nil
-function t2.UpdateLogic(p1) --[[ Line: 530 | Upvalues: UpdateUI (copy), t2 (ref), Release (copy), UpdatePlatform (copy), ProcessSpec (copy), v7 (ref) ]]
+local lastSpecState = nil
+function t2.UpdateLogic(deltaTime)
 	if not UpdateUI() and t2.Spec then
 		if t2.Spec.HideFun then
 			t2.Spec:HideFun()
@@ -513,12 +514,12 @@ function t2.UpdateLogic(p1) --[[ Line: 530 | Upvalues: UpdateUI (copy), t2 (ref)
 	end
 	UpdatePlatform()
 	ProcessSpec()
-	if t2.Spec ~= v7 then
+	if t2.Spec ~= lastSpecState then
 		t2.onVisibilityChanged:Fire(t2.Spec ~= nil)
 	end
-	v7 = t2.Spec
+	lastSpecState = t2.Spec
 end
-function t2.UpdateVisual(p1) --[[ Line: 551 | Upvalues: t2 (ref), t (ref), v1 (copy), v2 (copy), CurrentCamera (copy) ]]
+function t2.UpdateVisual(deltaTime)
 	local Spec = t2.Spec
 	local Frame = t2.Frame
 	if Spec then
@@ -533,21 +534,21 @@ function t2.UpdateVisual(p1) --[[ Line: 551 | Upvalues: t2 (ref), t (ref), v1 (c
 				WorldPosition = if Part == nil then v2 else Part.Position or v2
 			end
 		end
-		local v12, v22 = CurrentCamera:WorldToScreenPoint(WorldPosition)
-		Frame.Visible = v22
-		if v22 then
-			Spec.ScreenPosition = Vector3.new(v12.X, v12.Y, 0)
-			Frame.Position = UDim2.new(0, v12.X, 0, v12.Y) - UDim2.new(0, Frame.AbsoluteSize.X * 0.5, 0, Frame.AbsoluteSize.Y * 0.5)
+		local screenPos, isOnScreen = CurrentCamera:WorldToScreenPoint(WorldPosition)
+		Frame.Visible = isOnScreen
+		if isOnScreen then
+			Spec.ScreenPosition = Vector3.new(screenPos.X, screenPos.Y, 0)
+			Frame.Position = UDim2.new(0, screenPos.X, 0, screenPos.Y) - UDim2.new(0, Frame.AbsoluteSize.X * 0.5, 0, Frame.AbsoluteSize.Y * 0.5)
 			Frame.Help.Text = Spec.Name or ""
 			Frame.Help.Visible = Spec.Name and true or false
 		end
 	else
 		Frame.Visible = false
 	end
-	t.Update(v1, p1)
+	t.Update(animationGroup, deltaTime)
 end
 local v8 = false
-local function TouchStarted(p1) --[[ Line: 577 | Upvalues: t2 (ref), v8 (ref), Press (copy) ]]
+local function TouchStarted(p1)
 	local Spec = t2.Spec
 	if Spec then
 		local ScreenPosition = Spec.ScreenPosition
@@ -560,14 +561,14 @@ local function TouchStarted(p1) --[[ Line: 577 | Upvalues: t2 (ref), v8 (ref), P
 		end
 	end
 end
-local function TouchEnded(p1) --[[ Line: 594 | Upvalues: v8 (ref), Release (copy) ]]
+local function TouchEnded(p1)
 	if v8 then
 		v8 = false
 		Release()
 	end
 end
 local v9 = nil
-local function InputBegan(p1, p2) --[[ Line: 602 | Upvalues: t2 (ref), v8 (ref), Press (copy), v9 (ref) ]]
+local function InputBegan(p1, p2)
 	if not p2 and p1.UserInputType == Enum.UserInputType.MouseButton1 then
 		local Spec = t2.Spec
 		local v1
@@ -588,7 +589,7 @@ local function InputBegan(p1, p2) --[[ Line: 602 | Upvalues: t2 (ref), v8 (ref),
 		end
 	end
 end
-local function InputEnded(p1, p2) --[[ Line: 613 | Upvalues: v9 (ref), v8 (ref), Release (copy) ]]
+local function InputEnded(p1, p2)
 	if not p2 and (p1.UserInputType == Enum.UserInputType.MouseButton1 and v9 == Enum.UserInputType.MouseButton1 and v8) then
 		v8 = false
 		Release()

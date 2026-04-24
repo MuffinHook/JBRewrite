@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
 local RunConsts = require(ReplicatedStorage.App.RunConsts)
@@ -60,10 +61,10 @@ else
 		userIds = t2
 	}
 end
-function t3.isOp(p1) --[[ Line: 104 | Upvalues: ReplicatedStorage (copy) ]]
+function t3.isOp(p1)
 	return ReplicatedStorage:FindFirstChild("OpList"):FindFirstChild(p1.UserId) ~= nil
 end
-function t3.groupAllowed(p1, p2) --[[ Line: 108 | Upvalues: RunUtils (copy), t3 (copy), ReplicatedStorage (copy) ]]
+function t3.groupAllowed(p1, p2)
 	assert(p1 ~= nil, "player missing")
 	assert(p1.Parent == game:GetService("Players"), "player is not a Player")
 	assert(p2 ~= nil, "group missing")

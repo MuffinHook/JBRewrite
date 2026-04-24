@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 game:GetService("GuiService")
 local Players = game:GetService("Players")
 local CurrentCamera = workspace.CurrentCamera

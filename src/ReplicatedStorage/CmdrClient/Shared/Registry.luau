@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Util = require(script.Parent.Util)
 local t = {
@@ -37,13 +38,13 @@ local t = {
 	}
 }
 t.Stores = setmetatable({}, {
-	__index = function(p1, p2) --[[ Name: __index | Line: 170 ]]
+	__index = function(p1, p2)
 		p1[p2] = {}
 		return p1[p2]
 	end
 })
 t.AutoExecBuffer = {}
-function t.RegisterType(p1, p2, p3) --[[ Line: 184 ]]
+function t.RegisterType(p1, p2, p3)
 	if not p2 or typeof(p2) ~= "string" then
 		error("[Cmdr] Invalid type name provided: nil")
 	end
@@ -65,17 +66,17 @@ function t.RegisterType(p1, p2, p3) --[[ Line: 184 ]]
 		p1:RegisterTypePrefix(p2, p3.Prefixes)
 	end
 end
-function t.RegisterTypePrefix(p1, p2, p3) --[[ Line: 224 ]]
+function t.RegisterTypePrefix(p1, p2, p3)
 	if not p1.TypeAliases[p2] then
 		p1.TypeAliases[p2] = p2
 	end
 	p1.TypeAliases[p2] = ("%s %s"):format(p1.TypeAliases[p2], p3)
 end
-function t.RegisterTypeAlias(p1, p2, p3) --[[ Line: 240 ]]
+function t.RegisterTypeAlias(p1, p2, p3)
 	assert(p1.TypeAliases[p2] == nil, (("[Cmdr] Type alias %* already exists!"):format(p3)))
 	p1.TypeAliases[p2] = p3
 end
-function t.RegisterTypesIn(p1, p2) --[[ Line: 251 ]]
+function t.RegisterTypesIn(p1, p2)
 	for k, v in pairs(p2:GetChildren()) do
 		if v:IsA("ModuleScript") then
 			v.Parent = p1.Cmdr.ReplicatedRoot.Types
@@ -86,7 +87,7 @@ function t.RegisterTypesIn(p1, p2) --[[ Line: 251 ]]
 	end
 end
 t.RegisterHooksIn = t.RegisterTypesIn
-function t.RegisterCommandObject(p1, p2) --[[ Line: 283 | Upvalues: RunService (copy) ]]
+function t.RegisterCommandObject(p1, p2)
 	for k in pairs(p2) do
 		if p1.CommandMethods[k] == nil then
 			error((("[Cmdr] Unknown key/method in command \"%*\": %*"):format(p2.Name or "unknown command", k)))
@@ -122,7 +123,7 @@ function t.RegisterCommandObject(p1, p2) --[[ Line: 283 | Upvalues: RunService (
 		end
 	end
 end
-function t.RegisterCommand(p1, p2, p3, p4) --[[ Line: 336 | Upvalues: RunService (copy) ]]
+function t.RegisterCommand(p1, p2, p3, p4)
 	local v1 = require(p2)
 	assert(typeof(v1) == "table", (("[Cmdr] Invalid return value from command script \"%*\" (CommandDefinition expected, got %*)"):format(p2.Name, (typeof(v1)))))
 	if p3 then
@@ -134,7 +135,7 @@ function t.RegisterCommand(p1, p2, p3, p4) --[[ Line: 336 | Upvalues: RunService
 		p2.Parent = p1.Cmdr.ReplicatedRoot.Commands
 	end
 end
-function t.RegisterCommandsIn(p1, p2, p3) --[[ Line: 371 ]]
+function t.RegisterCommandsIn(p1, p2, p3)
 	local tbl = {}
 	local t = {}
 	for k, v in pairs(p2:GetChildren()) do
@@ -158,20 +159,20 @@ function t.RegisterCommandsIn(p1, p2, p3) --[[ Line: 371 ]]
 		end
 	end
 end
-function t.RegisterDefaultCommands(p1, p2) --[[ Line: 415 | Upvalues: RunService (copy), Util (copy) ]]
+function t.RegisterDefaultCommands(p1, p2)
 	assert(RunService:IsServer(), "[Cmdr] RegisterDefaultCommands cannot be called from the client.")
 	local v2 = if type(p2) == "table" then Util.MakeDictionary(p2) else nil
-	p1:RegisterCommandsIn(p1.Cmdr.DefaultCommandsFolder, if v2 == nil then p2 else function(p1) --[[ Line: 420 | Upvalues: v2 (copy) ]]
+	p1:RegisterCommandsIn(p1.Cmdr.DefaultCommandsFolder, if v2 == nil then p2 else function(p1)
 	return v2[p1.Group] or false
 end or p2)
 end
-function t.GetCommand(p1, p2) --[[ Line: 430 ]]
+function t.GetCommand(p1, p2)
 	return p1.Commands[(p2 or ""):lower()]
 end
-function t.GetCommands(p1) --[[ Line: 440 ]]
+function t.GetCommands(p1)
 	return p1.CommandsArray
 end
-function t.GetCommandNames(p1) --[[ Line: 448 ]]
+function t.GetCommandNames(p1)
 	local t = {}
 	for k, v in pairs(p1.CommandsArray) do
 		table.insert(t, v.Name)
@@ -179,20 +180,20 @@ function t.GetCommandNames(p1) --[[ Line: 448 ]]
 	return t
 end
 t.GetCommandsAsStrings = t.GetCommandNames
-function t.GetTypeNames(p1) --[[ Line: 469 ]]
+function t.GetTypeNames(p1)
 	local t = {}
 	for k in pairs(p1.Types) do
 		table.insert(t, k)
 	end
 	return t
 end
-function t.GetType(p1, p2) --[[ Line: 484 ]]
+function t.GetType(p1, p2)
 	return p1.Types[p2]
 end
-function t.GetTypeName(p1, p2) --[[ Line: 493 ]]
+function t.GetTypeName(p1, p2)
 	return p1.TypeAliases[p2] or p2
 end
-function t.RegisterHook(p1, p2, p3, p4) --[[ Line: 507 ]]
+function t.RegisterHook(p1, p2, p3, p4)
 	if not p1.Hooks[p2] then
 		error(("[Cmdr] Invalid hook name: %q"):format(p2), 2)
 	end
@@ -200,24 +201,24 @@ function t.RegisterHook(p1, p2, p3, p4) --[[ Line: 507 ]]
 		callback = p3,
 		priority = p4 or 0
 	})
-	table.sort(p1.Hooks[p2], function(p1, p2) --[[ Line: 513 ]]
+	table.sort(p1.Hooks[p2], function(p1, p2)
 		return p1.priority < p2.priority
 	end)
 end
 t.AddHook = t.RegisterHook
-function t.GetStore(p1, p2) --[[ Line: 534 ]]
+function t.GetStore(p1, p2)
 	return p1.Stores[p2]
 end
-function t.FlushAutoExecBufferDeferred(p1) --[[ Line: 543 | Upvalues: RunService (copy) ]]
+function t.FlushAutoExecBufferDeferred(p1)
 	if not p1.AutoExecFlushConnection then
-		p1.AutoExecFlushConnection = RunService.Heartbeat:Connect(function() --[[ Line: 548 | Upvalues: p1 (copy) ]]
+		p1.AutoExecFlushConnection = RunService.Heartbeat:Connect(function()
 			p1.AutoExecFlushConnection:Disconnect()
 			p1.AutoExecFlushConnection = nil
 			p1:FlushAutoExecBuffer()
 		end)
 	end
 end
-function t.FlushAutoExecBuffer(p1) --[[ Line: 560 ]]
+function t.FlushAutoExecBuffer(p1)
 	for i, v in ipairs(p1.AutoExecBuffer) do
 		for i2, v2 in ipairs(v) do
 			p1.Cmdr.Dispatcher:EvaluateAndRun(v2)
@@ -225,7 +226,7 @@ function t.FlushAutoExecBuffer(p1) --[[ Line: 560 ]]
 	end
 	p1.AutoExecBuffer = {}
 end
-return function(p1) --[[ Line: 570 | Upvalues: t (copy) ]]
+return function(p1)
 	t.Cmdr = p1
 	return t
 end

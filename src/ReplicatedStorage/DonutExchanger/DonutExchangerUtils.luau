@@ -1,13 +1,14 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
 local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
 local Settings = require(ReplicatedStorage.Resource.Settings)
 return {
-	canInteract = function(p1) --[[ Name: canInteract | Line: 7 | Upvalues: RunUtils (copy), PlayerUtils (copy), Settings (copy) ]]
+	canInteract = function(player)
 		if RunUtils.isStudio() then
 			return true
 		else
-			return PlayerUtils.getTeamId(p1) == Settings.EnumTeam.Prisoner
+			return PlayerUtils.getTeamId(player) == Settings.EnumTeam.Prisoner
 		end
 	end
 }

@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local Roact = require(ReplicatedStorage.Roact)
 require(ReplicatedStorage.Std.ColorUtils)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("ProgressBar")
-v1.defaultProps = {
+local ProgressBarComponent = Roact.PureComponent:extend("ProgressBar")
+ProgressBarComponent.defaultProps = {
 	aspectRatio = 19,
 	verticalPaddingRatio = 4.266666666666667,
 	text = "",
@@ -17,8 +18,8 @@ v1.defaultProps = {
 	unfilledColor = Color3.new(0/255, 0/255, 0/255),
 	filledColor = Color3.new(0.47451, 0.760784, 0.309804)
 }
-function v1.render(p1) --[[ Line: 22 | Upvalues: createElement (copy), PaddedContainer (copy), Roact (copy) ]]
-	local progress = p1.props.progress
+function ProgressBarComponent.render(props)
+	local progress = props.props.progress
 	if progress > 1 then
 		warn("Passed larger progress than max:", progress)
 		progress = 1
@@ -27,23 +28,23 @@ function v1.render(p1) --[[ Line: 22 | Upvalues: createElement (copy), PaddedCon
 		progress = 0
 	end
 	return createElement("Frame", {
-		Size = p1.props.size,
-		Position = p1.props.position,
+		Size = props.props.size,
+		Position = props.props.position,
 		BackgroundTransparency = 1
 	}, {
 		TotalCurrency = createElement(PaddedContainer, {
 			backgroundTransparency = 0,
-			backgroundColor = p1.props.unfilledColor,
-			aspectRatio = p1.props.aspectRatio,
-			verticalPaddingRatio = p1.props.verticalPaddingRatio,
+			backgroundColor = props.props.unfilledColor,
+			aspectRatio = props.props.aspectRatio,
+			verticalPaddingRatio = props.props.verticalPaddingRatio,
 			size = UDim2.fromScale(1, 1),
 			position = UDim2.fromScale(0, 0),
-			anchorPoint = p1.props.anchorPoint,
+			anchorPoint = props.props.anchorPoint,
 			paddingNone = true
 		}, {
 			Stroke = createElement("UIStroke", {
-				Thickness = p1.props.barStrokeThickness,
-				Color = p1.props.barStrokeColor
+				Thickness = props.props.barStrokeThickness,
+				Color = props.props.barStrokeColor
 			}),
 			Corner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
@@ -52,8 +53,8 @@ function v1.render(p1) --[[ Line: 22 | Upvalues: createElement (copy), PaddedCon
 				size = UDim2.fromScale(progress, 1),
 				position = UDim2.fromScale(0, 0),
 				paddingNone = true,
-				backgroundColor = p1.props.filledColor,
-				[Roact.Ref] = p1.props.currCurrencyRef
+				backgroundColor = props.props.filledColor,
+				[Roact.Ref] = props.props.currCurrencyRef
 			}, {
 				Corner = createElement("UICorner", {
 					CornerRadius = UDim.new(1, 0)
@@ -66,18 +67,18 @@ function v1.render(p1) --[[ Line: 22 | Upvalues: createElement (copy), PaddedCon
 				Position = UDim2.fromScale(0.5, 0.5),
 				Font = Enum.Font.GothamBlack,
 				TextXAlignment = Enum.TextXAlignment.Center,
-				Text = p1.props.text,
+				Text = props.props.text,
 				LineHeight = 1,
 				TextScaled = true,
 				TextColor3 = Color3.new(255/255, 255/255, 255/255),
 				ZIndex = 3
 			}, {
 				Stroke = createElement("UIStroke", {
-					Thickness = p1.props.textStrokeThickness,
+					Thickness = props.props.textStrokeThickness,
 					Color = Color3.new(0/255, 0/255, 0/255)
 				})
 			})
 		})
 	})
 end
-return v1
+return ProgressBarComponent

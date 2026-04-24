@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
@@ -40,7 +41,7 @@ local t2 = {
 	PSDPadRight = "rbxassetid://125339474802706",
 	PSDPadLeft = "rbxassetid://116409886750178"
 }
-local function getImageIdForKeyCode(p1) --[[ Line: 50 | Upvalues: UserInputService (copy), t2 (copy) ]]
+local function getImageIdForKeyCode(p1)
 	local v1 = UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross"
 	local v2 = UserInputService:GetStringForKeyCode(p1)
 	if v1 and v2:find("DPad") then
@@ -48,7 +49,7 @@ local function getImageIdForKeyCode(p1) --[[ Line: 50 | Upvalues: UserInputServi
 	end
 	return t2[v2] or UserInputService:GetImageForKeyCode(p1)
 end
-local function getImageInstance(p1, p2, p3) --[[ Line: 62 | Upvalues: UserInputService (copy) ]]
+local function getImageInstance(p1, p2, p3)
 	local v1 = Instance.new(p1)
 	v1.BackgroundTransparency = 1
 	v1.BorderSizePixel = 1
@@ -56,7 +57,7 @@ local function getImageInstance(p1, p2, p3) --[[ Line: 62 | Upvalues: UserInputS
 	v1.Size = UDim2.fromScale(1, 1)
 	return v1
 end
-function t.GetImageLabel(p1, p2, p3) --[[ Line: 71 | Upvalues: UserInputService (copy) ]]
+function t.GetImageLabel(p1, p2, p3)
 	local ImageLabel = Instance.new("ImageLabel")
 	ImageLabel.BackgroundTransparency = 1
 	ImageLabel.BorderSizePixel = 1
@@ -64,7 +65,7 @@ function t.GetImageLabel(p1, p2, p3) --[[ Line: 71 | Upvalues: UserInputService 
 	ImageLabel.Size = UDim2.fromScale(1, 1)
 	return ImageLabel
 end
-function t.GetImageButton(p1, p2, p3) --[[ Line: 75 | Upvalues: UserInputService (copy) ]]
+function t.GetImageButton(p1, p2, p3)
 	local ImageButton = Instance.new("ImageButton")
 	ImageButton.BackgroundTransparency = 1
 	ImageButton.BorderSizePixel = 1
@@ -72,7 +73,7 @@ function t.GetImageButton(p1, p2, p3) --[[ Line: 75 | Upvalues: UserInputService
 	ImageButton.Size = UDim2.fromScale(1, 1)
 	return ImageButton
 end
-local function getRoactImageInstance(p1, p2, p3, p4, p5) --[[ Line: 79 | Upvalues: getImageIdForKeyCode (copy), Roact (copy), Dictionary (copy) ]]
+local function getRoactImageInstance(p1, p2, p3, p4, p5)
 	local t = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
@@ -89,10 +90,10 @@ local function getRoactImageInstance(p1, p2, p3, p4, p5) --[[ Line: 79 | Upvalue
 	end
 	return Roact.createElement(p1, Dictionary.merge(t, p4), p5)
 end
-function t.GetRoactImageLabel(p1, p2, p3, p4, p5) --[[ Line: 97 | Upvalues: getRoactImageInstance (copy) ]]
+function t.GetRoactImageLabel(p1, p2, p3, p4, p5)
 	return getRoactImageInstance("ImageLabel", p2, p3, p4, p5)
 end
-function t.GetRoactImageButton(p1, p2, p3, p4, p5) --[[ Line: 101 | Upvalues: getRoactImageInstance (copy) ]]
+function t.GetRoactImageButton(p1, p2, p3, p4, p5)
 	return getRoactImageInstance("ImageButton", p2, p3, p4, p5)
 end
 t.getImageIdForKeyCode = getImageIdForKeyCode

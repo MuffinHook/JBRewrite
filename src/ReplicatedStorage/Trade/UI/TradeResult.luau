@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
@@ -8,8 +9,8 @@ v1.defaultProps = {
 	position = UDim2.new(0, 0, 0, 0),
 	anchorPoint = Vector2.new()
 }
-function v1.init(p1) --[[ Line: 12 ]] end
-function v1.render(p1) --[[ Line: 13 | Upvalues: createElement (copy) ]]
+function v1.init(p1)  end
+function v1.render(p1)
 	local tradeResult = p1.props.tradeResult
 	if tradeResult then
 		local t = {
@@ -70,8 +71,8 @@ function v1.render(p1) --[[ Line: 13 | Upvalues: createElement (copy) ]]
 		return createElement("Frame", t, t2)
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 74 ]] end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 75 ]]
+function v1.willUnmount(p1)  end
+return RoactRodux.connect(function(p1, p2)
 	return {
 		tradeResult = p1.tradeResult
 	}

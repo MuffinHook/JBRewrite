@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -12,7 +13,7 @@ local t = {
 }
 local t2 = {}
 t2.__index = t2
-function t2.new() --[[ Line: 17 | Upvalues: t2 (copy), Maid (copy), Signal (copy) ]]
+function t2.new()
 	local t = {}
 	setmetatable(t, t2)
 	t.Maid = Maid.new()
@@ -21,7 +22,7 @@ function t2.new() --[[ Line: 17 | Upvalues: t2 (copy), Maid (copy), Signal (copy
 	t:Setup()
 	return t
 end
-function t2.CreatePart(p1, p2, p3) --[[ Line: 28 | Upvalues: ReplicatedStorage (copy), Audio (copy), t (copy) ]]
+function t2.CreatePart(p1, p2, p3)
 	local v1 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Rocket:Clone()
 	v1.CFrame = CFrame.new(Vector3.new(), p3) + p2
 	v1.Parent = workspace
@@ -40,11 +41,11 @@ function t2.CreatePart(p1, p2, p3) --[[ Line: 28 | Upvalues: ReplicatedStorage (
 	v2.Parent = v1
 	return v1
 end
-function t2.AddSmoke(p1, p2) --[[ Line: 44 | Upvalues: ReplicatedStorage (copy) ]]
+function t2.AddSmoke(p1, p2)
 	ReplicatedStorage.Resource.ItemSystem.Projectiles.RocketFire:Clone().Parent = p2
 	ReplicatedStorage.Resource.ItemSystem.Projectiles.RocketSmoke:Clone().Parent = p2
 end
-function t2.Launch(p1, p2, p3, p4) --[[ Line: 50 ]]
+function t2.Launch(p1, p2, p3, p4)
 	assert(p2)
 	assert(p3)
 	assert(p4)
@@ -57,15 +58,15 @@ function t2.Launch(p1, p2, p3, p4) --[[ Line: 50 ]]
 	}
 	table.insert(p1.ListRocket, t)
 end
-function t2.Setup(p1) --[[ Line: 66 | Upvalues: RunService (copy) ]]
+function t2.Setup(p1)
 	p1.ListRocket = {}
 	p1.IgnoreList = {}
-	local v1 = RunService.Heartbeat:Connect(function() --[[ Line: 70 | Upvalues: p1 (copy) ]]
+	local v1 = RunService.Heartbeat:Connect(function()
 		p1:Update()
 	end)
-	p1.Maid:GiveTask(function() --[[ Line: 74 | Upvalues: p1 (copy), v1 (ref) ]]
+	p1.Maid:GiveTask(function()
 		if #p1.ListRocket > 0 then
-			p1.OnRocketQueueEmptied:Connect(function() --[[ Line: 77 | Upvalues: v1 (ref), p1 (ref) ]]
+			p1.OnRocketQueueEmptied:Connect(function()
 				v1:Disconnect()
 				v1 = nil
 				p1.OnRocketQueueEmptied:Destroy()
@@ -83,7 +84,7 @@ function t2.Setup(p1) --[[ Line: 66 | Upvalues: RunService (copy) ]]
 		end
 	end)
 end
-function t2.Update(p1) --[[ Line: 95 | Upvalues: RayCast (copy), Audio (copy) ]]
+function t2.Update(p1)
 	local v1 = tick()
 	local v2 = v1 - (p1.LastUpdate or v1)
 	p1.LastUpdate = v1
@@ -136,11 +137,11 @@ function t2.Update(p1) --[[ Line: 95 | Upvalues: RayCast (copy), Audio (copy) ]]
 		p1.OnRocketQueueEmptied:Fire()
 	end
 end
-function t2.ExplodeAt(p1, p2) --[[ Line: 147 | Upvalues: RocketLauncherUtils (copy) ]]
+function t2.ExplodeAt(p1, p2)
 	RocketLauncherUtils.explodeAt(p2)
 	p1.OnRocketExploded:Fire(p2)
 end
-function t2.Destroy(p1) --[[ Line: 151 ]]
+function t2.Destroy(p1)
 	p1.Maid:Destroy()
 	p1.Maid = nil
 end

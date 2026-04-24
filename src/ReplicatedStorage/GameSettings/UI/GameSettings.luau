@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
@@ -8,21 +9,21 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local GameSettingsService = require(script.Parent.Parent.GameSettingsService)
 local gameSettingType = require(script.Parent.Parent.gameSettingType)
 local v1 = Roact.PureComponent:extend("GameSettings")
-function v1.init(p1) --[[ Line: 13 | Upvalues: Maid (copy), GameSettingsService (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	p1:setState({
 		updateCounter = 0
 	})
-	p1.maid:GiveTask(GameSettingsService.onUpdate:Connect(function() --[[ Line: 18 | Upvalues: p1 (copy) ]]
+	p1.maid:GiveTask(GameSettingsService.onUpdate:Connect(function()
 		p1:_forceUpdate()
 	end))
 end
-function v1._forceUpdate(p1) --[[ Line: 22 ]]
+function v1._forceUpdate(p1)
 	p1:setState({
 		updateCounter = p1.state.updateCounter + 1
 	})
 end
-function v1.render(p1) --[[ Line: 27 | Upvalues: GameSettingsService (copy), gameSettingType (copy), createElement (copy), Checkbox (copy), Slider (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	local t = {}
 	for i, v in ipairs(GameSettingsService.getAll()) do
 		local v1 = nil
@@ -46,7 +47,7 @@ function v1.render(p1) --[[ Line: 27 | Upvalues: GameSettingsService (copy), gam
 				Value = createElement(Checkbox, {
 					size = UDim2.new(1, 0, 1, 0),
 					value = v._value,
-					onChecked = function(p12) --[[ Name: onChecked | Line: 52 | Upvalues: v (copy), p1 (copy) ]]
+					onChecked = function(p12)
 						v._value = p12
 						p1:_forceUpdate()
 						v.onChanged:Fire(p12)
@@ -94,7 +95,7 @@ function v1.render(p1) --[[ Line: 27 | Upvalues: GameSettingsService (copy), gam
 					max = v.max,
 					step = v.step,
 					value = v._value,
-					updateValue = function(p1) --[[ Name: updateValue | Line: 97 | Upvalues: v (copy) ]]
+					updateValue = function(p1)
 						v._updateValue(p1)
 						v.onChanged:Fire(p1)
 					end,
@@ -144,7 +145,7 @@ function v1.render(p1) --[[ Line: 27 | Upvalues: GameSettingsService (copy), gam
 		})
 	}, t))
 end
-function v1.willUnmount(p1) --[[ Line: 150 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v1

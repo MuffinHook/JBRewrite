@@ -4,12 +4,12 @@ local CircleActionUtils = require(script.Parent.CircleActionUtils)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local Binder = require(ReplicatedStorage.Std.Binder)
 local UI = require(ReplicatedStorage.Module.UI)
-local t = {}
-t.__index = t
-setmetatable(t, BaseObject)
-function t.new(p1)
+local localTable = {}
+localTable.__index = localTable
+setmetatable(localTable, BaseObject)
+function localTable.new(p1)
 	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
+	setmetatable(v1, localTable)
 	local OnPressedRemote = p1:WaitForChild("OnPressedRemote")
 	local function preUpdateFun(p12)
 		p12.Enabled = not (p1:GetAttribute("CircleActionDisabled") == true)
@@ -37,4 +37,4 @@ function t.new(p1)
 	}, p1))
 	return v1
 end
-return Binder.new("CircleAction", t)
+return Binder.new("CircleAction", localTable)

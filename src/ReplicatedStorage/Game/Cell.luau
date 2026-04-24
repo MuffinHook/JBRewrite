@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -14,15 +15,15 @@ local CircleAction = UI.CircleAction
 local v4 = 0
 local v5 = nil
 local t = {}
-local function ShowFun(p1) --[[ Line: 32 | Upvalues: t (copy) ]]
+local function ShowFun(p1)
 	local ValidRoot = p1.ValidRoot
 	ValidRoot:SetPrimaryPartCFrame(t[ValidRoot.Drawer].Opened)
 end
-local function HideFun(p1) --[[ Line: 38 | Upvalues: t (copy) ]]
+local function HideFun(p1)
 	local ValidRoot = p1.ValidRoot
 	ValidRoot:SetPrimaryPartCFrame(t[ValidRoot.Drawer].Closed)
 end
-local function Update(p1) --[[ Line: 44 | Upvalues: v4 (ref), InventoryItemSystem (copy), LocalPlayer (copy), v5 (ref), BinderUtils (copy), InventoryItemBinder (copy) ]]
+local function Update(p1)
 	local v1 = tick()
 	if not (v1 - v4 < 0.1) then
 		v4 = v1
@@ -55,7 +56,7 @@ local function Update(p1) --[[ Line: 44 | Upvalues: v4 (ref), InventoryItemSyste
 		p1.Duration = v42
 	end
 end
-local function Action(p1, p2) --[[ Line: 85 | Upvalues: InventoryItemSystem (copy), LocalPlayer (copy), v5 (ref), BinderUtils (copy), InventoryItemBinder (copy), v2 (ref) ]]
+local function Action(p1, p2)
 	if p2 then
 		local v1 = InventoryItemSystem.getEquippedFor(LocalPlayer)[1]
 		local ValidRoot = p1.ValidRoot
@@ -76,7 +77,7 @@ local function Action(p1, p2) --[[ Line: 85 | Upvalues: InventoryItemSystem (cop
 		return true
 	end
 end
-local function AddedFun(p1) --[[ Line: 105 | Upvalues: Action (copy), Update (copy), ShowFun (copy), HideFun (copy), CircleAction (copy), t (copy) ]]
+local function AddedFun(p1)
 	CircleAction.Add({
 		Part = p1.Parent.Handle,
 		WorldPosition = p1.Parent.Handle.Position,
@@ -95,23 +96,23 @@ local function AddedFun(p1) --[[ Line: 105 | Upvalues: Action (copy), Update (co
 		Opened = p1.CFrame * CFrame.new(0, 0, -1.5)
 	}
 end
-local function RemovedFun(p1) --[[ Line: 123 | Upvalues: t (copy), CircleAction (copy) ]]
+local function RemovedFun(p1)
 	t[p1] = nil
 	CircleAction.Remove(p1)
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 128 | Upvalues: v1 (ref), v2 (ref), v3 (ref), v5 (ref), Settings (copy), CollectionService (copy), AddedFun (copy), RemovedFun (copy) ]]
+	Init = function(p1)
 		v1 = p1.Inventory
 		local em = p1.em
 		v2 = p1.Event
 		v3 = em
 		local ScreenGui = p1.ScreenGui
-		function em.aa02dq4j(p1) --[[ Line: 133 | Upvalues: v5 (ref) ]]
+		function em.aa02dq4j(p1)
 			assert(p1)
 			v5 = p1
 		end
 		local v22 = 0
-		function em.fwrmzn28() --[[ Line: 139 | Upvalues: v22 (ref), Settings (ref), ScreenGui (copy) ]]
+		function em.fwrmzn28()
 			local v1 = v22 + 1
 			v22 = v1
 			local Cell = Settings.Time.Cell

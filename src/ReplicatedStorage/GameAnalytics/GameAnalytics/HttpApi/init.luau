@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Validation = require(script.Parent.Validation)
 local Version = require(script.Parent.Version)
@@ -29,7 +30,7 @@ local v1 = if RunService:IsStudio() then "https" else t.protocol
 local v4 = v1 .. "://" .. if RunService:IsStudio() then "sandbox-" else "" .. t.hostName .. "/" .. t.version
 local v5 = if RunService:IsStudio() then "https" else t.protocol
 local v8 = v5 .. "://" .. if RunService:IsStudio() then "sandbox-" else "" .. t.hostName .. "/remote_configs/" .. t.remoteConfigsVersion
-local function getInitAnnotations(p1, p2, p3) --[[ Line: 34 | Upvalues: Version (copy) ]]
+local function getInitAnnotations(p1, p2, p3)
 	return {
 		user_id = tostring(p3) .. p2.CustomUserId,
 		sdk_version = "roblox " .. Version.SdkVersion,
@@ -40,13 +41,13 @@ local function getInitAnnotations(p1, p2, p3) --[[ Line: 34 | Upvalues: Version 
 		random_salt = p2.Sessions
 	}
 end
-local function encode(p1, p2) --[[ Line: 48 | Upvalues: Logger (copy), HashLib (copy), RunService (copy) ]]
+local function encode(p1, p2)
 	if p2 then
 		return HashLib.base64_encode((HashLib.hmac(HashLib.sha256, if RunService:IsStudio() then "16813a12f718bc5c620f56944e1abc3ea13ccbac" else p2, p1, true)))
 	end
 	Logger:w("Error encoding, invalid SecretKey")
 end
-local function processRequestResponse(p1, p2) --[[ Line: 66 | Upvalues: Logger (copy), t (copy) ]]
+local function processRequestResponse(p1, p2)
 	local StatusCode = p1.StatusCode
 	local Body = p1.Body
 	if Body and #Body ~= 0 then
@@ -71,7 +72,7 @@ local function processRequestResponse(p1, p2) --[[ Line: 66 | Upvalues: Logger (
 		return t.EGAHTTPApiResponse.NoResponse
 	end
 end
-function t.initRequest(p1, p2, p3, p4, p5, p6) --[[ Line: 93 | Upvalues: v8 (copy), t (copy), RunService (copy), v4 (copy), Logger (copy), HttpService (copy), Version (copy), HashLib (copy), processRequestResponse (copy), Validation (copy) ]]
+function t.initRequest(p1, p2, p3, p4, p5, p6)
 	local v1 = v8 .. "/" .. t.initializeUrlPath .. "?game_key=" .. p2 .. "&interval_seconds=0&configs_hash=" .. (p5.ConfigsHash or "")
 	if RunService:IsStudio() then
 		v1 = v4 .. "/5c6bcb5402204249437fb5a7a80a4959/" .. p1.initializeUrlPath
@@ -96,7 +97,7 @@ function t.initRequest(p1, p2, p3, p4, p5, p6) --[[ Line: 93 | Upvalues: v8 (cop
 	end
 	Logger:d("init payload: " .. v2)
 	local v7 = nil
-	local v82, v9 = pcall(function() --[[ Line: 108 | Upvalues: v7 (ref), HttpService (ref), v1 (ref), v42 (copy), v2 (ref) ]]
+	local v82, v9 = pcall(function()
 		v7 = HttpService:RequestAsync({
 			Url = v1,
 			Method = "POST",
@@ -112,7 +113,7 @@ function t.initRequest(p1, p2, p3, p4, p5, p6) --[[ Line: 93 | Upvalues: v8 (cop
 		local v10 = processRequestResponse(v7, "Init")
 		if v10 == t.EGAHTTPApiResponse.Ok or (v10 == t.EGAHTTPApiResponse.Created or v10 == t.EGAHTTPApiResponse.BadRequest) then
 			local v11 = nil
-			if pcall(function() --[[ Line: 142 | Upvalues: v11 (ref), HttpService (ref), v7 (ref) ]]
+			if pcall(function()
 				v11 = HttpService:JSONDecode(v7.Body)
 			end) then
 				if v10 == t.EGAHTTPApiResponse.BadRequest then
@@ -156,7 +157,7 @@ function t.initRequest(p1, p2, p3, p4, p5, p6) --[[ Line: 93 | Upvalues: v8 (cop
 		}
 	end
 end
-function t.sendEventsInArray(p1, p2, p3, p4) --[[ Line: 180 | Upvalues: Logger (copy), v4 (copy), RunService (copy), HttpService (copy), HashLib (copy), t (copy), processRequestResponse (copy) ]]
+function t.sendEventsInArray(p1, p2, p3, p4)
 	if p4 and #p4 ~= 0 then
 		local v1 = v4 .. "/" .. p2 .. "/" .. p1.eventsUrlPath
 		if RunService:IsStudio() then
@@ -173,7 +174,7 @@ function t.sendEventsInArray(p1, p2, p3, p4) --[[ Line: 180 | Upvalues: Logger (
 			v42 = nil
 		end
 		local v7 = nil
-		local v8, v9 = pcall(function() --[[ Line: 200 | Upvalues: v7 (ref), HttpService (ref), v1 (ref), v42 (copy), v2 (ref) ]]
+		local v8, v9 = pcall(function()
 			v7 = HttpService:RequestAsync({
 				Url = v1,
 				Method = "POST",
@@ -189,7 +190,7 @@ function t.sendEventsInArray(p1, p2, p3, p4) --[[ Line: 180 | Upvalues: Logger (
 			local v10 = processRequestResponse(v7, "Events")
 			if v10 == t.EGAHTTPApiResponse.Ok or (v10 == t.EGAHTTPApiResponse.Created or v10 == t.EGAHTTPApiResponse.BadRequest) then
 				local v11 = nil
-				pcall(function() --[[ Line: 234 | Upvalues: v11 (ref), HttpService (ref), v7 (ref) ]]
+				pcall(function()
 					v11 = HttpService:JSONDecode(v7.Body)
 				end)
 				if v11 then

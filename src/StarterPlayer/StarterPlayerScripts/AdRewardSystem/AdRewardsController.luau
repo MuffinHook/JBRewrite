@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AdService = game:GetService("AdService")
 local Players = game:GetService("Players")
@@ -35,7 +36,7 @@ local v11 = false
 local v12 = nil
 local t = {}
 local v13 = nil
-local function getCurrentRegionTag() --[[ Line: 79 | Upvalues: v13 (ref) ]]
+local function getCurrentRegionTag()
 	if v13 and v13.GetCurrentRegionTag then
 		return v13:GetCurrentRegionTag()
 	else
@@ -48,7 +49,7 @@ local t2 = {
 	Enum.AdAvailabilityResult.PublisherIneligible,
 	Enum.AdAvailabilityResult.ExperienceIneligible
 }
-local function isIneligible(p1) --[[ Line: 93 | Upvalues: t2 (copy) ]]
+local function isIneligible(p1)
 	for i, v in ipairs(t2) do
 		if p1 == v then
 			return true
@@ -56,7 +57,7 @@ local function isIneligible(p1) --[[ Line: 93 | Upvalues: t2 (copy) ]]
 	end
 	return false
 end
-local function getCurrentRegionKey() --[[ Line: 106 | Upvalues: LocalPlayer (copy) ]]
+local function getCurrentRegionKey()
 	local Team = LocalPlayer.Team
 	if Team then
 		return Team.Name
@@ -64,11 +65,11 @@ local function getCurrentRegionKey() --[[ Line: 106 | Upvalues: LocalPlayer (cop
 		return nil
 	end
 end
-local function checkForAds() --[[ Line: 118 | Upvalues: v8 (ref), v6 (ref), AdService (copy), v7 (ref), t2 (copy) ]]
+local function checkForAds()
 	if v8 or v6 then
 		return
 	end
-	local v1, v2 = pcall(function() --[[ Line: 123 | Upvalues: AdService (ref) ]]
+	local v1, v2 = pcall(function()
 		return AdService:GetAdAvailabilityNowAsync(Enum.AdFormat.RewardedVideo)
 	end)
 	if v1 and v2 then
@@ -88,19 +89,19 @@ local function checkForAds() --[[ Line: 118 | Upvalues: v8 (ref), v6 (ref), AdSe
 		v8 = true
 	end
 end
-local function startGlobalSleep() --[[ Line: 141 | Upvalues: v9 (ref), v10 (ref), v6 (ref) ]]
+local function startGlobalSleep()
 	v9 = os.time() + 180
 	v10 = false
 	v6 = false
 end
 local t3 = {
-	TriggerPromptInteracted = function() --[[ Name: TriggerPromptInteracted | Line: 154 | Upvalues: v9 (ref), v10 (ref), v6 (ref) ]]
+	TriggerPromptInteracted = function()
 		v9 = os.time() + 180
 		v10 = false
 		v6 = false
 	end
 }
-local function PlayRewardedAd(p1) --[[ Line: 162 | Upvalues: v8 (ref), v6 (ref), ShowAd (copy) ]]
+local function PlayRewardedAd(p1)
 	if v8 then
 		return false
 	else
@@ -113,12 +114,12 @@ local function PlayRewardedAd(p1) --[[ Line: 162 | Upvalues: v8 (ref), v6 (ref),
 		return true
 	end
 end
-local function tweenGuiPosition(p1, p2, p3) --[[ Line: 181 | Upvalues: TweenService (copy) ]]
+local function tweenGuiPosition(p1, p2, p3)
 	TweenService:Create(p1, TweenInfo.new(p3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
 		Position = p2
 	}):Play()
 end
-local function setupClickToMoveFrame(p1) --[[ Line: 195 | Upvalues: tweenGuiPosition (copy), Telemetry (copy), v13 (ref), t3 (copy) ]]
+local function setupClickToMoveFrame(p1)
 	if p1:GetAttribute("__AdRewardsBound") then
 		return
 	end
@@ -132,7 +133,7 @@ local function setupClickToMoveFrame(p1) --[[ Line: 195 | Upvalues: tweenGuiPosi
 				local v4 = p1:GetAttribute("MoveTime")
 				if typeof(v3) == "UDim2" and (typeof(v4) == "number" and not (v4 <= 0)) then
 					local v5 = v2.Name
-					v1.MouseButton1Down:Connect(function() --[[ Line: 229 | Upvalues: tweenGuiPosition (ref), v2 (copy), v3 (copy), v4 (copy), Telemetry (ref), v5 (copy), v13 (ref), t3 (ref) ]]
+					v1.MouseButton1Down:Connect(function()
 						tweenGuiPosition(v2, v3, v4)
 						Telemetry.send("DeclineAd_" .. v5)
 						local v1 = if v13 and v13.GetCurrentRegionTag then v13:GetCurrentRegionTag() else nil
@@ -154,12 +155,12 @@ local function setupClickToMoveFrame(p1) --[[ Line: 195 | Upvalues: tweenGuiPosi
 		warn("[AdRewardsController] ClickToMoveFrame missing button or target frame:", p1:GetFullName())
 	end
 end
-local function handleAdRewardsUITaggedInstance(p1) --[[ Line: 243 | Upvalues: setupClickToMoveFrame (copy) ]]
+local function handleAdRewardsUITaggedInstance(p1)
 	if p1:IsA("ObjectValue") and p1.Name == "ClickToMoveFrame" then
 		setupClickToMoveFrame(p1)
 	end
 end
-local function initAdRewardsUI() --[[ Line: 253 | Upvalues: CollectionService (copy), setupClickToMoveFrame (copy), handleAdRewardsUITaggedInstance (copy) ]]
+local function initAdRewardsUI()
 	for i, v in ipairs(CollectionService:GetTagged("AdRewardsUI")) do
 		if v:IsA("ObjectValue") and v.Name == "ClickToMoveFrame" then
 			setupClickToMoveFrame(v)
@@ -167,8 +168,8 @@ local function initAdRewardsUI() --[[ Line: 253 | Upvalues: CollectionService (c
 	end
 	CollectionService:GetInstanceAddedSignal("AdRewardsUI"):Connect(handleAdRewardsUITaggedInstance)
 end
-local function InitRewardAdListener() --[[ Line: 265 | Upvalues: ShowAd (copy), v8 (ref), v6 (ref), v4 (ref) ]]
-	ShowAd.OnClientEvent:Connect(function(p1, p2, p3) --[[ Line: 266 | Upvalues: v8 (ref), v6 (ref), v4 (ref) ]]
+local function InitRewardAdListener()
+	ShowAd.OnClientEvent:Connect(function(p1, p2, p3)
 		if p3 == "generic_watch_to_claim" then
 			v8 = false
 			v6 = false
@@ -181,15 +182,15 @@ end
 local v14 = nil
 local v15 = nil
 local v16 = false
-local function formatTime(p1) --[[ Line: 288 ]]
+local function formatTime(p1)
 	local v1 = math.floor(p1)
 	return string.format("%d:%02d", math.floor(v1 / 60), v1 % 60)
 end
-local function initCashTimer() --[[ Line: 295 | Upvalues: v16 (ref), PlayerGui (copy), v14 (ref), v15 (ref), LocalPlayer (copy), v3 (ref), CashTimer (copy) ]]
+local function initCashTimer()
 	if not v16 then
 		v16 = true
 		local AppUI = PlayerGui:WaitForChild("AppUI")
-		local function getContainer() --[[ Line: 303 | Upvalues: AppUI (copy) ]]
+		local function getContainer()
 			if AppUI and AppUI.Parent then
 				local Buttons = AppUI:FindFirstChild("Buttons")
 				if Buttons and Buttons:IsA("GuiObject") then
@@ -206,7 +207,7 @@ local function initCashTimer() --[[ Line: 295 | Upvalues: v16 (ref), PlayerGui (
 				return nil
 			end
 		end
-		local function applyAppearanceForContainer(p1) --[[ Line: 321 | Upvalues: v14 (ref) ]]
+		local function applyAppearanceForContainer(p1)
 			if v14 and p1 then
 				local UIAspectRatioConstraint = v14:FindFirstChildOfClass("UIAspectRatioConstraint")
 				if not UIAspectRatioConstraint then
@@ -228,14 +229,14 @@ local function initCashTimer() --[[ Line: 295 | Upvalues: v16 (ref), PlayerGui (
 				end
 			end
 		end
-		local function bindTimer() --[[ Line: 348 | Upvalues: v15 (ref), v14 (ref), getContainer (copy), applyAppearanceForContainer (copy), LocalPlayer (ref) ]]
+		local function bindTimer()
 			if v15 then
 				v15:Disconnect()
 				v15 = nil
 			end
 			if v14 then
 				v14.Visible = false
-				local function updatetimer(p1) --[[ Line: 359 | Upvalues: v14 (ref), getContainer (ref), applyAppearanceForContainer (ref) ]]
+				local function updatetimer(p1)
 					if v14 and v14.Parent then
 						v14.Visible = p1 > 0
 						local v3 = math.floor(p1)
@@ -246,7 +247,7 @@ local function initCashTimer() --[[ Line: 295 | Upvalues: v16 (ref), PlayerGui (
 						end
 					end
 				end
-				v15 = LocalPlayer:GetAttributeChangedSignal("CashMultiplierTimer"):Connect(function() --[[ Line: 373 | Upvalues: LocalPlayer (ref), v14 (ref), getContainer (ref), applyAppearanceForContainer (ref) ]]
+				v15 = LocalPlayer:GetAttributeChangedSignal("CashMultiplierTimer"):Connect(function()
 					local v1 = LocalPlayer:GetAttribute("CashMultiplierTimer")
 					if v14 and v14.Parent then
 						v14.Visible = v1 > 0
@@ -280,7 +281,7 @@ local function initCashTimer() --[[ Line: 295 | Upvalues: v16 (ref), PlayerGui (
 				end
 			end
 		end
-		local function ensureTimer() --[[ Line: 385 | Upvalues: v3 (ref), getContainer (copy), v14 (ref), applyAppearanceForContainer (copy), CashTimer (ref), bindTimer (copy) ]]
+		local function ensureTimer()
 			if v3 and v3.Parent then
 				local v1 = getContainer()
 				if v1 and (v14 and (v14.Parent and v14.Parent ~= v1)) then
@@ -299,7 +300,7 @@ local function initCashTimer() --[[ Line: 295 | Upvalues: v16 (ref), PlayerGui (
 				end
 			end
 		end
-		task.spawn(function() --[[ Line: 416 | Upvalues: ensureTimer (copy) ]]
+		task.spawn(function()
 			while true do
 				ensureTimer()
 				task.wait(1)
@@ -307,8 +308,8 @@ local function initCashTimer() --[[ Line: 295 | Upvalues: v16 (ref), PlayerGui (
 		end)
 	end
 end
-local function connectCustomTelemetry() --[[ Line: 424 ]] end
-local function startRegionLoop() --[[ Line: 433 | Upvalues: v9 (ref), v13 (ref), v11 (ref), v12 (ref), t (copy), PromptCashBooster (copy), v10 (ref), checkForAds (copy), v7 (ref), v6 (ref), LocalPlayer (copy), v4 (ref) ]]
+local function connectCustomTelemetry()  end
+local function startRegionLoop()
 	while true do
 		local v1, v2
 		repeat
@@ -347,10 +348,10 @@ local function startRegionLoop() --[[ Line: 433 | Upvalues: v9 (ref), v13 (ref),
 		end
 	end
 end
-local function initNotifications() --[[ Line: 510 | Upvalues: AdRewardEvents (copy), Notification (copy) ]]
+local function initNotifications()
 	local Notification_2 = AdRewardEvents:FindFirstChild("Notification")
 	if Notification_2 then
-		Notification_2.OnClientEvent:Connect(function(p1) --[[ Line: 514 | Upvalues: Notification (ref) ]]
+		Notification_2.OnClientEvent:Connect(function(p1)
 			task.wait(2)
 			Notification.new({
 				Text = p1,
@@ -359,7 +360,7 @@ local function initNotifications() --[[ Line: 510 | Upvalues: AdRewardEvents (co
 		end)
 	end
 end
-local function boot() --[[ Line: 529 | Upvalues: AdRewardCashToast (copy), PlayerGui (copy), v3 (ref), AdRewardSystem (copy), v13 (ref), LocalPlayer (copy), v4 (ref), PlayRewardedAd (copy), v7 (ref), v6 (ref), v8 (ref), getCurrentRegionTag (copy), initAdRewardsUI (copy), initCashTimer (copy), AdRewardEvents (copy), Notification (copy), startRegionLoop (copy), ShowAd (copy) ]]
+local function boot()
 	task.wait(1)
 	local v1 = AdRewardCashToast:Clone()
 	v1.Parent = PlayerGui
@@ -372,11 +373,11 @@ local function boot() --[[ Line: 529 | Upvalues: AdRewardCashToast (copy), Playe
 	v13 = require(script.Parent:WaitForChild("PlayerRegionTracker")).new(LocalPlayer, RobloxAdServicesTeamRegions)
 	v13:Start()
 	if v4 then
-		local v2, v32 = pcall(function() --[[ Line: 550 | Upvalues: v4 (ref), PlayerGui (ref), PlayRewardedAd (ref), v7 (ref), v6 (ref), v8 (ref), getCurrentRegionTag (ref) ]]
+		local v2, v32 = pcall(function()
 			v4.Init({
 				PlayerGui = PlayerGui,
 				PlayAd = PlayRewardedAd,
-				GetAdState = function() --[[ Name: GetAdState | Line: 554 | Upvalues: v7 (ref), v6 (ref), v8 (ref) ]]
+				GetAdState = function()
 					return v7, v6, v8
 				end,
 				GetCurrentRegionTag = getCurrentRegionTag
@@ -392,7 +393,7 @@ local function boot() --[[ Line: 529 | Upvalues: AdRewardCashToast (copy), Playe
 	initCashTimer()
 	local Notification_2 = AdRewardEvents:FindFirstChild("Notification")
 	if Notification_2 then
-		Notification_2.OnClientEvent:Connect(function(p1) --[[ Line: 514 | Upvalues: Notification (ref) ]]
+		Notification_2.OnClientEvent:Connect(function(p1)
 			task.wait(2)
 			Notification.new({
 				Text = p1,
@@ -401,7 +402,7 @@ local function boot() --[[ Line: 529 | Upvalues: AdRewardCashToast (copy), Playe
 		end)
 	end
 	task.spawn(startRegionLoop)
-	ShowAd.OnClientEvent:Connect(function(p1, p2, p3) --[[ Line: 266 | Upvalues: v8 (ref), v6 (ref), v4 (ref) ]]
+	ShowAd.OnClientEvent:Connect(function(p1, p2, p3)
 		if p3 == "generic_watch_to_claim" then
 			v8 = false
 			v6 = false
@@ -411,11 +412,11 @@ local function boot() --[[ Line: 529 | Upvalues: AdRewardCashToast (copy), Playe
 		end
 	end)
 end
-function t3.Init(p1) --[[ Line: 577 | Upvalues: checkForAds (copy), v7 (ref), v4 (ref), ABCheck (copy), v5 (ref), boot (copy) ]]
+function t3.Init(p1)
 	checkForAds()
 	if v7 then
 		v4 = p1 or v4
-		local v2, v3 = pcall(function() --[[ Line: 587 | Upvalues: ABCheck (ref) ]]
+		local v2, v3 = pcall(function()
 			return ABCheck:InvokeServer()
 		end)
 		v5 = v2 and v3 == true and true or false

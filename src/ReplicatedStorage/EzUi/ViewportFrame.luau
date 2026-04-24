@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local v1 = script:FindFirstAncestor("EzUi")
 local Dictionary = require(v1.Dictionary)
@@ -10,7 +11,7 @@ v2.defaultProps = {
 	position = UDim2.new(0, 0, 0, 0),
 	fieldOfView = 70
 }
-function v2.init(p1) --[[ Line: 19 | Upvalues: Maid (copy), Roact (copy) ]]
+function v2.init(p1)
 	p1.maid = Maid.new()
 	if p1.props.cameraRef then
 		p1.cameraRef = p1.props.cameraRef
@@ -23,7 +24,7 @@ function v2.init(p1) --[[ Line: 19 | Upvalues: Maid (copy), Roact (copy) ]]
 		p1.viewportRef = Roact.createRef()
 	end
 end
-function v2.render(p1) --[[ Line: 32 | Upvalues: createElement (copy), Roact (copy), Dictionary (copy) ]]
+function v2.render(p1)
 	return createElement("ViewportFrame", {
 		BackgroundColor3 = p1.props.backgroundColor,
 		BackgroundTransparency = p1.props.backgroundTransparency,
@@ -43,40 +44,40 @@ function v2.render(p1) --[[ Line: 32 | Upvalues: createElement (copy), Roact (co
 		})
 	}, p1.props[Roact.Children]))
 end
-function v2._updateViewport(p1) --[[ Line: 56 ]]
+function v2._updateViewport(p1)
 	local v1 = p1.cameraRef:getValue()
 	local inst = p1.maid.inst
 	if inst and inst.Parent ~= nil then
 		p1.props.updateCamera(v1, inst)
 	end
 end
-function v2._reparent(p1) --[[ Line: 63 ]]
+function v2._reparent(p1)
 	local v1 = p1.viewportRef:getValue()
 	p1.maid.inst = nil
 	if p1.props.getInst then
-		local v2 = task.delay(math.random() * 0.1, function() --[[ Line: 70 | Upvalues: p1 (copy), v1 (copy) ]]
+		local v2 = task.delay(math.random() * 0.1, function()
 			local v12 = p1.props.getInst()
 			p1.maid.inst = v12
 			v12.Parent = v1
 		end)
-		function p1.maid.cancelDelayThread() --[[ Line: 75 | Upvalues: v2 (copy) ]]
+		function p1.maid.cancelDelayThread()
 			task.cancel(v2)
 		end
 	end
 	p1:_updateViewport()
 end
-function v2.didMount(p1) --[[ Line: 81 | Upvalues: RunService (copy) ]]
+function v2.didMount(p1)
 	p1:_reparent()
-	p1.maid.updateCamera = RunService.Heartbeat:Connect(function() --[[ Line: 83 | Upvalues: p1 (copy) ]]
+	p1.maid.updateCamera = RunService.Heartbeat:Connect(function()
 		p1:_updateViewport()
 	end)
 end
-function v2.didUpdate(p1, p2) --[[ Line: 87 ]]
+function v2.didUpdate(p1, p2)
 	if p1.props.getInstCompare and p1.props.getInstCompare ~= p2.getInstCompare or not p1.props.getInstCompare and p1.props.getInst ~= p2.getInst then
 		p1:_reparent()
 	end
 end
-function v2.willUnmount(p1) --[[ Line: 95 ]]
+function v2.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v2

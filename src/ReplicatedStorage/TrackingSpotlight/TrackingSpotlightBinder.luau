@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -10,7 +11,7 @@ local Spring = require(ReplicatedStorage.Std.Spring)
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1) --[[ Line: 15 | Upvalues: BaseObject (copy), t (copy), Spring (copy), Players (copy) ]]
+function t.new(p1)
 	local v1 = BaseObject.new(p1)
 	setmetatable(v1, t)
 	v1.motor = p1:WaitForChild("Pivot"):WaitForChild("TrackingSpotlightMotor")
@@ -20,7 +21,7 @@ function t.new(p1) --[[ Line: 15 | Upvalues: BaseObject (copy), t (copy), Spring
 	v1._lastYaw = 0
 	v1._pitchSpring = Spring.new(v1._lastPitch, 0, 0.6, 15)
 	v1._yawSpring = Spring.new(v1._lastYaw, 0, 0.6, 15)
-	local function updateTarget() --[[ Line: 33 | Upvalues: p1 (copy), Players (ref), v1 (copy) ]]
+	local function updateTarget()
 		local v12 = p1:GetAttribute("TrackingSpotlightTargetUserId")
 		local v2 = if v12 then Players:GetPlayerByUserId(v12) else nil
 		if v2 then
@@ -39,10 +40,10 @@ function t.new(p1) --[[ Line: 15 | Upvalues: BaseObject (copy), t (copy), Spring
 	end
 	return v1
 end
-function t.TrackPlayer(p1, p2) --[[ Line: 47 | Upvalues: Maid (copy), RunService (copy), CharacterUtils (copy), GeomUtils (copy) ]]
+function t.TrackPlayer(p1, p2)
 	local v1 = Maid.new()
 	p1.maid.trackingMaid = v1
-	v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 50 | Upvalues: p2 (copy), p1 (copy), CharacterUtils (ref), GeomUtils (ref) ]]
+	v1:GiveTask(RunService.Heartbeat:Connect(function()
 		if p2.Character then
 			if p2.Character.PrimaryPart then
 				local Position = p2.Character.PrimaryPart.Position
@@ -65,22 +66,22 @@ function t.TrackPlayer(p1, p2) --[[ Line: 47 | Upvalues: Maid (copy), RunService
 			p1:StopTracking()
 		end
 	end))
-	v1:GiveTask(function() --[[ Line: 81 | Upvalues: CharacterUtils (ref), p2 (copy) ]]
+	v1:GiveTask(function()
 		local v1 = CharacterUtils.getHumanoid(p2.Character)
 		if v1 then
 			v1:SetAttribute("IsInTrackingSpotlight", nil)
 		end
 	end)
-	v1:GiveTask(function() --[[ Line: 88 | Upvalues: p1 (copy) ]]
+	v1:GiveTask(function()
 		p1._lastPitch = 0
 		p1._lastYaw = 0
 		p1.motor.C1 = CFrame.new()
 	end)
 end
-function t.StopTracking(p1) --[[ Line: 96 ]]
+function t.StopTracking(p1)
 	p1.maid.trackingMaid = nil
 end
-function t.MoveTowardsTarget(p1, p2) --[[ Line: 99 | Upvalues: GeomUtils (copy) ]]
+function t.MoveTowardsTarget(p1, p2)
 	local v1 = os.clock()
 	local v2 = v1 - p1._lastDt
 	p1._lastDt = v1

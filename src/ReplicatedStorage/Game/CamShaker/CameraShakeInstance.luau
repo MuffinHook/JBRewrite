@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local t = {}
 t.__index = t
 local v1 = Vector3.new
@@ -8,7 +9,7 @@ t.CameraShakeState = {
 	Sustained = 2,
 	Inactive = 3
 }
-function t.new(p1, p2, p3, p4) --[[ Line: 24 | Upvalues: v1 (copy), t (copy) ]]
+function t.new(p1, p2, p3, p4)
 	if p3 == nil then
 		p3 = 0
 	end
@@ -36,7 +37,7 @@ function t.new(p1, p2, p3, p4) --[[ Line: 24 | Upvalues: v1 (copy), t (copy) ]]
 	t2._camShakeInstance = true
 	return setmetatable(t2, t)
 end
-function t.UpdateShake(p1, p2) --[[ Line: 56 | Upvalues: noise (copy), v1 (copy) ]]
+function t.UpdateShake(p1, p2)
 	local v12 = p1.tick
 	local currentFadeTime = p1.currentFadeTime
 	local v2 = v1(noise(v12, 0) * 0.5, noise(0, v12) * 0.5, noise(v12, v12) * 0.5)
@@ -58,7 +59,7 @@ function t.UpdateShake(p1, p2) --[[ Line: 56 | Upvalues: noise (copy), v1 (copy)
 	p1.currentFadeTime = currentFadeTime
 	return v2 * p1.Magnitude * p1.magnMod * currentFadeTime
 end
-function t.StartFadeOut(p1, p2) --[[ Line: 85 ]]
+function t.StartFadeOut(p1, p2)
 	if p2 == 0 then
 		p1.currentFadeTime = 0
 	end
@@ -66,7 +67,7 @@ function t.StartFadeOut(p1, p2) --[[ Line: 85 ]]
 	p1.fadeInDuration = 0
 	p1.sustain = false
 end
-function t.StartFadeIn(p1, p2) --[[ Line: 94 ]]
+function t.StartFadeIn(p1, p2)
 	if p2 == 0 then
 		p1.currentFadeTime = 1
 	end
@@ -74,31 +75,31 @@ function t.StartFadeIn(p1, p2) --[[ Line: 94 ]]
 	p1.fadeOutDuration = 0
 	p1.sustain = true
 end
-function t.GetScaleRoughness(p1) --[[ Line: 103 ]]
+function t.GetScaleRoughness(p1)
 	return p1.roughMod
 end
-function t.SetScaleRoughness(p1, p2) --[[ Line: 107 ]]
+function t.SetScaleRoughness(p1, p2)
 	p1.roughMod = p2
 end
-function t.GetScaleMagnitude(p1) --[[ Line: 111 ]]
+function t.GetScaleMagnitude(p1)
 	return p1.magnMod
 end
-function t.SetScaleMagnitude(p1, p2) --[[ Line: 115 ]]
+function t.SetScaleMagnitude(p1, p2)
 	p1.magnMod = p2
 end
-function t.GetNormalizedFadeTime(p1) --[[ Line: 119 ]]
+function t.GetNormalizedFadeTime(p1)
 	return p1.currentFadeTime
 end
-function t.IsShaking(p1) --[[ Line: 123 ]]
+function t.IsShaking(p1)
 	return if p1.currentFadeTime > 0 then true else p1.sustain
 end
-function t.IsFadingOut(p1) --[[ Line: 127 ]]
+function t.IsFadingOut(p1)
 	return not p1.sustain and p1.currentFadeTime > 0
 end
-function t.IsFadingIn(p1) --[[ Line: 131 ]]
+function t.IsFadingIn(p1)
 	return p1.currentFadeTime < 1 and (p1.sustain and p1.fadeInDuration > 0) or false
 end
-function t.GetState(p1) --[[ Line: 135 | Upvalues: t (copy) ]]
+function t.GetState(p1)
 	if p1:IsFadingIn() then
 		return t.CameraShakeState.FadingIn
 	elseif p1:IsFadingOut() then

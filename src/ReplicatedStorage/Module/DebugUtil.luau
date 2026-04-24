@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 return {
-	DrawPoint = function(p1, p2) --[[ Name: DrawPoint | Line: 3 ]]
+	DrawPoint = function(p1, p2)
 		local v1 = p2 or 0.5
 		local Part = Instance.new("Part")
 		Part.Anchored = true
@@ -8,7 +9,7 @@ return {
 		Part.Parent = workspace
 		return Part
 	end,
-	DrawLine = function(p1, p2) --[[ Name: DrawLine | Line: 16 ]]
+	DrawLine = function(p1, p2)
 		local Magnitude = (p2 - p1).Magnitude
 		local Part = Instance.new("Part")
 		Part.Anchored = true

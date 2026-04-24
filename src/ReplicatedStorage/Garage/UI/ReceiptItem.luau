@@ -1,14 +1,15 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local String = require(ReplicatedStorage.Std.String)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local v1 = Roact.PureComponent:extend("ReceiptItem")
-function v1.init(p1) --[[ Line: 7 ]]
+function v1.init(p1)
 	p1:setState({
 		hover = false
 	})
 end
-function v1.render(p1) --[[ Line: 12 | Upvalues: createElement (copy), Roact (copy), String (copy) ]]
+function v1.render(p1)
 	local mainRatio = p1.props.mainRatio
 	local cornerPixel = p1.props.cornerPixel
 	local paddingRatio = p1.props.paddingRatio
@@ -22,22 +23,22 @@ function v1.render(p1) --[[ Line: 12 | Upvalues: createElement (copy), Roact (co
 	t.Size = UDim2.new(1, 0, 1, 0)
 	t.LayoutOrder = p1.props.layoutOrder
 	t.Selectable = true
-	t[Roact.Event.MouseEnter] = function() --[[ Line: 30 | Upvalues: p1 (copy) ]]
+	t[Roact.Event.MouseEnter] = function()
 		p1:setState({
 			hover = true
 		})
 	end
-	t[Roact.Event.MouseLeave] = function() --[[ Line: 35 | Upvalues: p1 (copy) ]]
+	t[Roact.Event.MouseLeave] = function()
 		p1:setState({
 			hover = false
 		})
 	end
-	t[Roact.Event.SelectionGained] = function() --[[ Line: 40 | Upvalues: p1 (copy) ]]
+	t[Roact.Event.SelectionGained] = function()
 		p1:setState({
 			hover = true
 		})
 	end
-	t[Roact.Event.SelectionLost] = function() --[[ Line: 45 | Upvalues: p1 (copy) ]]
+	t[Roact.Event.SelectionLost] = function()
 		p1:setState({
 			hover = false
 		})

@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local t = {
-	findFirstAncestor = function(p1, p2) --[[ Name: findFirstAncestor | Line: 9 ]]
+	findFirstAncestor = function(p1, p2)
 		assert(type(p1) == "table", "Binder must be binder")
 		assert(typeof(p2) == "Instance", "Child parameter must be instance")
 		local v3 = p2.Parent
@@ -13,7 +14,7 @@ local t = {
 		end
 		return nil
 	end,
-	findFirstChild = function(p1, p2) --[[ Name: findFirstChild | Line: 24 ]]
+	findFirstChild = function(p1, p2)
 		assert(type(p1) == "table", "Binder must be binder")
 		assert(typeof(p2) == "Instance", "Parent parameter must be instance")
 		for k, v in pairs(p2:GetChildren()) do
@@ -24,7 +25,7 @@ local t = {
 		end
 		return nil
 	end,
-	getChildren = function(p1, p2) --[[ Name: getChildren | Line: 38 ]]
+	getChildren = function(p1, p2)
 		assert(type(p1) == "table", "Binder must be binder")
 		assert(typeof(p2) == "Instance", "Parent parameter must be instance")
 		local t = {}
@@ -36,7 +37,7 @@ local t = {
 		end
 		return t
 	end,
-	mapBinderListToTable = function(p1) --[[ Name: mapBinderListToTable | Line: 52 ]]
+	mapBinderListToTable = function(p1)
 		assert(type(p1) == "table", "bindersList must be a table of binders")
 		local t = {}
 		for k, v in pairs(p1) do
@@ -44,7 +45,7 @@ local t = {
 		end
 		return t
 	end,
-	getMappedFromList = function(p1, p2) --[[ Name: getMappedFromList | Line: 62 | Upvalues: CollectionService (copy) ]]
+	getMappedFromList = function(p1, p2)
 		local t = {}
 		for k, v in pairs(p2) do
 			for k2, v2 in pairs(CollectionService:GetTags(v)) do
@@ -60,12 +61,12 @@ local t = {
 		return t
 	end
 }
-function t.getChildrenOfBinders(p1, p2) --[[ Line: 80 | Upvalues: t (copy) ]]
+function t.getChildrenOfBinders(p1, p2)
 	assert(type(p1) == "table", "bindersList must be a table of binders")
 	assert(typeof(p2) == "Instance", "Parent parameter must be instance")
 	return t.getMappedFromList(t.mapBinderListToTable(p1), p2:GetChildren())
 end
-function t.getLinkedChildren(p1, p2, p3) --[[ Line: 88 ]]
+function t.getLinkedChildren(p1, p2, p3)
 	local t = {}
 	local t2 = {}
 	for k, v in pairs(p3:GetChildren()) do
@@ -81,7 +82,7 @@ function t.getLinkedChildren(p1, p2, p3) --[[ Line: 88 ]]
 	end
 	return t2
 end
-function t.getDescendants(p1, p2) --[[ Line: 107 ]]
+function t.getDescendants(p1, p2)
 	assert(type(p1) == "table", "Binder must be binder")
 	assert(typeof(p2) == "Instance", "Parent parameter must be instance")
 	local t = {}

@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
+return function(p1, p2)
 	p1.WidgetConstructor("Separator", {
 		hasState = false,
 		hasChildren = false,
 		Args = {},
 		Events = {},
-		Generate = function(p12) --[[ Name: Generate | Line: 10 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_Separator = Instance.new("Frame")
 			Iris_Separator.Name = "Iris_Separator"
 			if p12.parentWidget.type == "SameLine" then
@@ -19,8 +20,8 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p2.UIListLayout(Iris_Separator, Enum.FillDirection.Vertical, UDim.new(0, 0))
 			return Iris_Separator
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 27 ]] end,
-		Discard = function(p1) --[[ Name: Discard | Line: 28 ]]
+		Update = function(p1) end,
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	})
@@ -31,7 +32,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Width = 1
 		},
 		Events = {},
-		Generate = function(p12) --[[ Name: Generate | Line: 41 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_Indent = Instance.new("Frame")
 			Iris_Indent.Name = "Iris_Indent"
 			Iris_Indent.AutomaticSize = Enum.AutomaticSize.Y
@@ -42,13 +43,13 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p2.UIPadding(Iris_Indent, Vector2.zero)
 			return Iris_Indent
 		end,
-		Update = function(p12) --[[ Name: Update | Line: 54 | Upvalues: p1 (copy) ]]
+		Update = function(p12)
 			p12.Instance.UIPadding.PaddingLeft = UDim.new(0, p12.arguments.Width or p1._config.IndentSpacing)
 		end,
-		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 59 ]]
+		ChildAdded = function(p1, p2)
 			return p1.Instance
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 62 ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	})
@@ -61,7 +62,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			HorizontalAlignment = 3
 		},
 		Events = {},
-		Generate = function(p12) --[[ Name: Generate | Line: 77 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_SameLine = Instance.new("Frame")
 			Iris_SameLine.Name = "Iris_SameLine"
 			Iris_SameLine.AutomaticSize = Enum.AutomaticSize.Y
@@ -71,7 +72,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p2.UIListLayout(Iris_SameLine, Enum.FillDirection.Horizontal, UDim.new(0, 0))
 			return Iris_SameLine
 		end,
-		Update = function(p12) --[[ Name: Update | Line: 89 | Upvalues: p1 (copy) ]]
+		Update = function(p12)
 			local UIListLayout = p12.Instance.UIListLayout
 			UIListLayout.Padding = UDim.new(0, p12.arguments.Width or p1._config.ItemSpacing.X)
 			if p12.arguments.VerticalAlignment then
@@ -85,10 +86,10 @@ return function(p1, p2) --[[ Line: 3 ]]
 				UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 			end
 		end,
-		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 105 ]]
+		ChildAdded = function(p1, p2)
 			return p1.Instance
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 108 ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	})
@@ -97,7 +98,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 		hasChildren = true,
 		Args = {},
 		Events = {},
-		Generate = function(p12) --[[ Name: Generate | Line: 119 | Upvalues: p2 (copy), p1 (copy) ]]
+		Generate = function(p12)
 			local Iris_Group = Instance.new("Frame")
 			Iris_Group.Name = "Iris_Group"
 			Iris_Group.AutomaticSize = Enum.AutomaticSize.XY
@@ -108,11 +109,11 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p2.UIListLayout(Iris_Group, Enum.FillDirection.Vertical, UDim.new(0, p1._config.ItemSpacing.Y))
 			return Iris_Group
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 132 ]] end,
-		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 133 ]]
+		Update = function(p1) end,
+		ChildAdded = function(p1, p2)
 			return p1.Instance
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 136 ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	})

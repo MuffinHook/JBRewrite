@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Roact = require(ReplicatedStorage.Roact)
@@ -10,10 +11,10 @@ v1.defaultProps = {
 	aspectRatio = 1,
 	verticalPaddingRatio = 128
 }
-function v1.init(p1) --[[ Line: 15 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 end
-function v1.render(p1) --[[ Line: 18 | Upvalues: createElement (copy), PaddedContainer (copy) ]]
+function v1.render(p1)
 	local aspectRatio = p1.props.aspectRatio
 	local verticalPaddingRatio = p1.props.verticalPaddingRatio
 	local t = {

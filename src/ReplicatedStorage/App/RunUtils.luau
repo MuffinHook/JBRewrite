@@ -4,9 +4,9 @@ local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunConsts = require(ReplicatedStorage.App.RunConsts)
 require(ReplicatedStorage.PrivateServer.PrivateServerConsts)
-local t = {}
+local module = {}
 local MAIN_WORLD_NAME = RunConsts.MAIN_WORLD_NAME
-function t.isStudio()
+function module.isStudio()
 	return RunService:IsStudio() and true
 end
 local function getPlaceId()
@@ -16,15 +16,15 @@ local function getPlaceId()
 		return game.PlaceId
 	end
 end
-t.isStudio()
-function t.getBuildCommit()
+module.isStudio()
+function module.getBuildCommit()
 	local v1 = "0ec1e2e"
 	if v1 == string.reverse("TIMMOC_DLIUB__") then
 		v1 = "UNKNOWN"
 	end
 	return v1
 end
-function t.isTradeWorld()
+function module.isTradeWorld()
 	if RunService:IsStudio() then
 		return MAIN_WORLD_NAME == RunConsts.TRADE_WORLD_NAME
 	else
@@ -32,10 +32,10 @@ function t.isTradeWorld()
 		return isTRADE_WORLD_NAME
 	end
 end
-function t.isTradingEnabled()
-	return t.isTradeWorld()
+function module.isTradingEnabled()
+	return module.isTradeWorld()
 end
-function t.isMainWorld()
+function module.isMainWorld()
 	if RunService:IsStudio() then
 		return MAIN_WORLD_NAME == RunConsts.MAIN_WORLD_NAME
 	else
@@ -43,24 +43,24 @@ function t.isMainWorld()
 		return isMAIN_WORLD_NAME
 	end
 end
-function t.getEnv()
+function module.getEnv()
 	return RunConsts.PLACE_ID_TO_ENV_MAP[if RunService:IsStudio() and game.PlaceId == 0 then RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[RunConsts.STUDIO_NAME][MAIN_WORLD_NAME].Default else game.PlaceId]
 end
-function t.getWorld()
+function module.getWorld()
 	if RunService:IsStudio() then
 		return MAIN_WORLD_NAME
 	else
 		return RunConsts.PLACE_ID_TO_WORLD_MAP[if RunService:IsStudio() and game.PlaceId == 0 then RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[RunConsts.STUDIO_NAME][MAIN_WORLD_NAME].Default else game.PlaceId]
 	end
 end
-function t.getPlaceType()
+function module.getPlaceType()
 	if RunService:IsStudio() then
 		return "Default"
 	else
 		return RunConsts.PLACE_ID_TO_PLACE_TYPE_MAP[if RunService:IsStudio() and game.PlaceId == 0 then RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[RunConsts.STUDIO_NAME][MAIN_WORLD_NAME].Default else game.PlaceId]
 	end
 end
-function t.getPlaceIdFromEnvWorld(p1, p2, p3)
+function module.getPlaceIdFromEnvWorld(p1, p2, p3)
 	local v1 = RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[p1]
 	assert(v1, "Invalid env given")
 	local v2 = p3 or "Default"
@@ -70,8 +70,8 @@ function t.getPlaceIdFromEnvWorld(p1, p2, p3)
 	return v5
 end
 if RunService:IsServer() then
-	function t.isVIPServer()
+	function module.isVIPServer()
 		return game.PrivateServerId ~= "" and game.PrivateServerOwnerId ~= 0
 	end
 end
-return t
+return module

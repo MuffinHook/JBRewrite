@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
-return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), createElement (copy) ]]
+return function(p1)
 	local PaddedContainer = require(script.Parent.PaddedContainer)
 	local v1 = Roact.mount(createElement("Frame", {
 		BackgroundTransparency = 0.9,
@@ -47,7 +48,7 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), createElement (copy) 
 			})
 		})
 	}), p1)
-	return function() --[[ Line: 78 | Upvalues: Roact (ref), v1 (copy) ]]
+	return function()
 		Roact.unmount(v1)
 	end
 end

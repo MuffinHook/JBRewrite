@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.TargetingIndicator.TargetingIndicatorConsts)
 local InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSystem)
@@ -13,9 +14,9 @@ local Taser = require(ReplicatedStorage.Game.ItemConfig.Taser)
 local Handcuffs = require(ReplicatedStorage.Game.ItemConfig.Handcuffs)
 local t = {}
 return {
-	init = function() --[[ Name: init | Line: 19 | Upvalues: Players (copy), Settings (copy), InventoryItemSystem (copy), InventoryItemUtils (copy), t (copy), Taser (copy), Handcuffs (copy), Maid (copy), RunService (copy), Raycast (copy), TargetingIndicators (copy), TagUtils (copy) ]]
+	init = function()
 		local t2 = {}
-		local function getClosestPlayer(p1) --[[ Line: 22 | Upvalues: Players (ref), Settings (ref) ]]
+		local function getClosestPlayer(p1)
 			if p1 and (p1.Character and p1.Character.PrimaryPart) then
 				local Position = p1.Character.PrimaryPart.Position
 				local v1 = nil
@@ -44,7 +45,7 @@ return {
 				return nil, nil, nil, nil
 			end
 		end
-		InventoryItemSystem.onInventoryItemUnequipped:Connect(function(p1) --[[ Line: 59 | Upvalues: InventoryItemUtils (ref), t (ref) ]]
+		InventoryItemSystem.onInventoryItemUnequipped:Connect(function(p1)
 			local v1 = InventoryItemUtils.getOwner(p1.obj)
 			if v1 then
 				local v2 = t[v1.UserId]
@@ -56,7 +57,7 @@ return {
 				return false
 			end
 		end)
-		InventoryItemSystem.onInventoryItemEquipped:Connect(function(p1) --[[ Line: 72 | Upvalues: InventoryItemUtils (ref), Taser (ref), Handcuffs (ref), t (ref), Maid (ref), RunService (ref), getClosestPlayer (copy), t2 (copy), Raycast (ref), TargetingIndicators (ref), TagUtils (ref) ]]
+		InventoryItemSystem.onInventoryItemEquipped:Connect(function(p1)
 			local obj = p1.obj
 			local v1 = InventoryItemUtils.getName(obj)
 			local v2 = nil
@@ -76,7 +77,7 @@ return {
 				end
 				local v7 = Maid.new()
 				t[v5.UserId] = v7
-				v7:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 97 | Upvalues: getClosestPlayer (ref), v5 (copy), t2 (ref), v3 (ref), v4 (ref), v2 (ref), v7 (ref), v1 (copy), Raycast (ref), Maid (ref), TargetingIndicators (ref), RunService (ref), TagUtils (ref) ]]
+				v7:GiveTask(RunService.Heartbeat:Connect(function()
 					local v12, v22, v32, v42 = getClosestPlayer(v5)
 					local v52 = t2[v5.UserId] or {}
 					t2[v5.UserId] = v52
@@ -120,7 +121,7 @@ return {
 									ItemName = v1,
 									Maid = v122
 								}
-								v122:GiveTask(function() --[[ Line: 169 | Upvalues: t2 (ref), v5 (ref) ]]
+								v122:GiveTask(function()
 									t2[v5.UserId] = nil
 								end)
 								local v15 = v13:Clone()
@@ -134,7 +135,7 @@ return {
 								v122:GiveTask(v15)
 								v122:GiveTask(v16)
 								local v17 = os.clock()
-								v122:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 184 | Upvalues: v12 (copy), v5 (ref), v1 (ref), TagUtils (ref), v7 (ref), v15 (ref), v16 (ref), v17 (copy) ]]
+								v122:GiveTask(RunService.Heartbeat:Connect(function()
 									local Character = v12.Character
 									local Character_2 = v5.Character
 									if Character and Character_2 then

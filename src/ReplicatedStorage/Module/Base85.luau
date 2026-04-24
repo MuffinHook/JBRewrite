@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local t = {}
 local t2 = {
 	"0",
@@ -86,7 +87,7 @@ local t2 = {
 	"}",
 	"~"
 }
-function t.encode(p1) --[[ Line: 103 | Upvalues: t2 (copy) ]]
+function t.encode(p1)
 	local v1 = table.create(math.floor((#p1 + 3) / 4) * 5)
 	local sum = 1
 	local sum_2 = 1
@@ -200,7 +201,7 @@ local t3 = {
 	[133] = -1,
 	[160] = -1
 }
-function t.decode(p1) --[[ Line: 226 | Upvalues: t3 (copy) ]]
+function t.decode(p1)
 	local v1 = table.create((math.floor(#p1 * 4 / 5)))
 	local v2 = 0
 	local count = 0

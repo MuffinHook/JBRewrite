@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
+return function(p1, p2)
 	p1.WidgetConstructor("Selectable", {
 		hasState = true,
 		hasChildren = false,
@@ -10,40 +11,40 @@ return function(p1, p2) --[[ Line: 3 ]]
 		},
 		Events = {
 			selected = {
-				Init = function(p1) --[[ Line: 15 ]] end,
-				Get = function(p12) --[[ Line: 16 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastSelectedTick == p1._cycleTick
 				end
 			},
 			unselected = {
-				Init = function(p1) --[[ Line: 21 ]] end,
-				Get = function(p12) --[[ Line: 22 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastUnselectedTick == p1._cycleTick
 				end
 			},
 			active = {
-				Init = function(p1) --[[ Line: 27 ]] end,
-				Get = function(p1) --[[ Line: 28 ]]
+				Init = function(p1) end,
+				Get = function(p1)
 					return p1.state.index.value == p1.arguments.Index
 				end
 			},
-			clicked = p2.EVENTS.click(function(p1) --[[ Line: 32 ]]
+			clicked = p2.EVENTS.click(function(p1)
 				return p1.Instance.SelectableButton
 			end),
-			rightClicked = p2.EVENTS.rightClick(function(p1) --[[ Line: 36 ]]
+			rightClicked = p2.EVENTS.rightClick(function(p1)
 				return p1.Instance.SelectableButton
 			end),
-			doubleClicked = p2.EVENTS.doubleClick(function(p1) --[[ Line: 40 ]]
+			doubleClicked = p2.EVENTS.doubleClick(function(p1)
 				return p1.Instance.SelectableButton
 			end),
-			ctrlClicked = p2.EVENTS.ctrlClick(function(p1) --[[ Line: 44 ]]
+			ctrlClicked = p2.EVENTS.ctrlClick(function(p1)
 				return p1.Instance.SelectableButton
 			end),
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 48 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance.SelectableButton
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 53 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_Selectable = Instance.new("Frame")
 			Iris_Selectable.Name = "Iris_Selectable"
 			Iris_Selectable.Size = UDim2.new(p1._config.ItemWidth, UDim.new(0, p1._config.TextSize + 2 * p1._config.FramePadding.Y - p1._config.ItemSpacing.Y))
@@ -68,7 +69,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				ActiveTransparency = p1._config.HeaderActiveTransparency
 			}
 			p2.applyInteractionHighlights("Background", SelectableButton, SelectableButton, p12.ButtonColors)
-			p2.applyButtonClick(SelectableButton, function() --[[ Line: 82 | Upvalues: p12 (copy) ]]
+			p2.applyButtonClick(SelectableButton, function()
 				if p12.arguments.NoClick ~= true then
 					if type(p12.state.index.value) == "boolean" then
 						p12.state.index:set(not p12.state.index.value)
@@ -80,7 +81,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			SelectableButton.Parent = Iris_Selectable
 			return Iris_Selectable
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 96 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.index == nil then
 				if p12.arguments.Index ~= nil then
 					error("A shared state index is required for Iris.Selectables() with an Index argument.", 5)
@@ -88,10 +89,10 @@ return function(p1, p2) --[[ Line: 3 ]]
 				p12.state.index = p1._widgetState(p12, "index", false)
 			end
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 104 ]]
+		Update = function(p1)
 			p1.Instance.SelectableButton.Text = p1.arguments.Text or "Selectable"
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 109 | Upvalues: p1 (copy) ]]
+		UpdateState = function(p12)
 			local SelectableButton = p12.Instance.SelectableButton
 			if p12.state.index.value == p12.arguments.Index or p12.state.index.value == true then
 				p12.ButtonColors.Transparency = p1._config.HeaderTransparency
@@ -103,7 +104,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				p12.lastUnselectedTick = p1._cycleTick + 1
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 123 | Upvalues: p2 (copy) ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 			p2.discardState(p1)
 		end
@@ -112,7 +113,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 	local v2 = -1
 	local v3 = nil
 	local v4 = 0
-	local function UpdateChildContainerTransform(p12) --[[ Line: 134 | Upvalues: p2 (copy), p1 (copy), v4 (ref) ]]
+	local function UpdateChildContainerTransform(p12)
 		local PreviewContainer = p12.Instance.PreviewContainer
 		local ChildContainer = p12.ChildContainer
 		local v1 = PreviewContainer.AbsolutePosition - p2.GuiOffset
@@ -133,13 +134,13 @@ return function(p1, p2) --[[ Line: 3 ]]
 		ChildContainer.Position = UDim2.fromOffset(v1.X, v3)
 		ChildContainer.Size = UDim2.fromOffset(PreviewContainer.AbsoluteSize.X, (math.min(v2, v42)))
 	end
-	local function f5() --[[ Line: 169 | Upvalues: v1 (ref), v3 (ref), v4 (ref), UpdateChildContainerTransform (copy) ]]
+	local function f5()
 		if v1 and (v3 and v3.UIListLayout.AbsoluteContentSize.Y ~= v4) then
 			UpdateChildContainerTransform(v3)
 		end
 	end
 	table.insert(p1._postCycleCallbacks, f5)
-	local function UpdateComboState(p12) --[[ Line: 178 | Upvalues: p1 (copy), v1 (ref), v3 (ref), v2 (ref), p2 (copy) ]]
+	local function UpdateComboState(p12)
 		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 or (p12.UserInputType == Enum.UserInputType.MouseButton2 or (p12.UserInputType == Enum.UserInputType.Touch or p12.UserInputType == Enum.UserInputType.MouseWheel))) then
 			if v1 == false or not v3 or v2 == p1._cycleTick then
 				return
@@ -167,31 +168,31 @@ return function(p1, p2) --[[ Line: 3 ]]
 		},
 		Events = {
 			opened = {
-				Init = function(p1) --[[ Line: 226 ]] end,
-				Get = function(p12) --[[ Line: 227 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastOpenedTick == p1._cycleTick
 				end
 			},
 			closed = {
-				Init = function(p1) --[[ Line: 232 ]] end,
-				Get = function(p12) --[[ Line: 233 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastClosedTick == p1._cycleTick
 				end
 			},
 			changed = {
-				Init = function(p1) --[[ Line: 238 ]] end,
-				Get = function(p12) --[[ Line: 239 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastChangedTick == p1._cycleTick
 				end
 			},
-			clicked = p2.EVENTS.click(function(p1) --[[ Line: 243 ]]
+			clicked = p2.EVENTS.click(function(p1)
 				return p1.Instance.PreviewContainer
 			end),
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 247 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 251 | Upvalues: p1 (copy), p2 (copy), v1 (ref), v3 (ref) ]]
+		Generate = function(p12)
 			local v12 = p1._config.TextSize + 2 * p1._config.FramePadding.Y
 			local Iris_Combo = Instance.new("Frame")
 			Iris_Combo.Name = "Iris_Combo"
@@ -266,7 +267,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 					}
 				}
 			})
-			p2.applyButtonClick(PreviewContainer, function() --[[ Line: 345 | Upvalues: v1 (ref), v3 (ref), p12 (copy) ]]
+			p2.applyButtonClick(PreviewContainer, function()
 				if not v1 or v3 == p12 then
 					p12.state.isOpened:set(not p12.state.isOpened.value)
 				end
@@ -304,21 +305,21 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p12.UIListLayout = v4
 			return Iris_Combo
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 401 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.index == nil then
 				p12.state.index = p1._widgetState(p12, "index", "No Selection")
 			end
 			if p12.state.isOpened == nil then
 				p12.state.isOpened = p1._widgetState(p12, "isOpened", false)
 			end
-			p12.state.index:onChange(function() --[[ Line: 409 | Upvalues: p12 (copy), p1 (ref) ]]
+			p12.state.index:onChange(function()
 				p12.lastChangedTick = p1._cycleTick + 1
 				if p12.state.isOpened.value then
 					p12.state.isOpened:set(false)
 				end
 			end)
 		end,
-		Update = function(p12) --[[ Name: Update | Line: 416 | Upvalues: p1 (copy) ]]
+		Update = function(p12)
 			local v1 = p12.Instance
 			local PreviewContainer = v1.PreviewContainer
 			local PreviewLabel = PreviewContainer.PreviewLabel
@@ -341,7 +342,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				PreviewContainer.AutomaticSize = Enum.AutomaticSize.Y
 			end
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 444 | Upvalues: v1 (ref), v3 (ref), v2 (ref), p1 (copy), p2 (copy), UpdateChildContainerTransform (copy) ]]
+		UpdateState = function(p12)
 			local ChildContainer = p12.ChildContainer
 			local PreviewContainer = p12.Instance.PreviewContainer
 			local Dropdown = PreviewContainer.DropdownButton.Dropdown
@@ -365,11 +366,11 @@ return function(p1, p2) --[[ Line: 3 ]]
 			local value = p12.state.index.value
 			PreviewContainer.PreviewLabel.Text = if typeof(value) == "EnumItem" then value.Name else tostring(value)
 		end,
-		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 476 | Upvalues: UpdateChildContainerTransform (copy) ]]
+		ChildAdded = function(p1, p2)
 			UpdateChildContainerTransform(p1)
 			return p1.ChildContainer
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 480 | Upvalues: v3 (ref), v1 (ref), p2 (copy) ]]
+		Discard = function(p1)
 			if v3 and v3 == p1 then
 				v3 = nil
 				v1 = false

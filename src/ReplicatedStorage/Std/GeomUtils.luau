@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local t = {
-	doesLineIntersectLine = function(p1, p2, p3, p4, p5, p6, p7, p8) --[[ Name: doesLineIntersectLine | Line: 4 ]]
+	doesLineIntersectLine = function(p1, p2, p3, p4, p5, p6, p7, p8)
 		if p1 == p3 and p2 == p4 or p5 == p7 and p6 == p8 then
 			return false
 		else
@@ -13,7 +14,7 @@ local t = {
 			end
 		end
 	end,
-	fasterComputeAABB = function(p1) --[[ Name: fasterComputeAABB | Line: 40 ]]
+	fasterComputeAABB = function(p1)
 		local abs = math.abs
 		local v1 = (-1 / 0)
 		local v2 = (-1 / 0)
@@ -54,10 +55,10 @@ local t = {
 		return Vector3.new(v3, v4, v5), Vector3.new(v6, v1, v2)
 	end
 }
-function t.fasterComputeAABBPart(p1) --[[ Line: 84 | Upvalues: t (copy) ]]
+function t.fasterComputeAABBPart(p1)
 	return t.fasterComputeAABBCFSize(p1.CFrame, p1.Size)
 end
-function t.fasterComputeAABBCFSize(p1, p2) --[[ Line: 87 ]]
+function t.fasterComputeAABBCFSize(p1, p2)
 	local abs = math.abs
 	local v1 = (1 / 0)
 	local v2 = (1 / 0)
@@ -92,7 +93,7 @@ function t.fasterComputeAABBCFSize(p1, p2) --[[ Line: 87 ]]
 	end
 	return Vector3.new(v1, v2, v3), Vector3.new(v4, v5, v6)
 end
-function t.calcRayIntersectSphere(p1, p2, p3, p4) --[[ Line: 130 ]]
+function t.calcRayIntersectSphere(p1, p2, p3, p4)
 	local Unit = (p2 - p1).Unit
 	local v1 = p3 - p1
 	local v2 = v1:Dot(Unit)
@@ -117,7 +118,7 @@ function t.calcRayIntersectSphere(p1, p2, p3, p4) --[[ Line: 130 ]]
 		end
 	end
 end
-function t.intersectRayPlane(p1, p2, p3, p4) --[[ Line: 176 ]]
+function t.intersectRayPlane(p1, p2, p3, p4)
 	local v1 = p4:Dot(p2)
 	if not (math.abs(v1) < 1e-6) then
 		local v2 = p4:Dot(p3 - p1) / v1
@@ -126,7 +127,7 @@ function t.intersectRayPlane(p1, p2, p3, p4) --[[ Line: 176 ]]
 		end
 	end
 end
-function t.isPointInCylinder(p1, p2, p3, p4, p5) --[[ Line: 196 ]]
+function t.isPointInCylinder(p1, p2, p3, p4, p5)
 	local Unit = p3.Unit
 	local v1 = p1 - p2
 	local v2 = v1:Dot(Unit)
@@ -136,27 +137,27 @@ function t.isPointInCylinder(p1, p2, p3, p4, p5) --[[ Line: 196 ]]
 		return not (p5 < (v1 - Unit * v2).Magnitude)
 	end
 end
-function t.randomPointInCircle() --[[ Line: 233 ]]
+function t.randomPointInCircle()
 	local v2 = math.sqrt((math.random()))
 	local v3 = math.random() * 2 * math.pi
 	return Vector2.new(v2 * math.cos(v3), v2 * math.sin(v3))
 end
-function t.randomPointOnCircle() --[[ Line: 239 ]]
+function t.randomPointOnCircle()
 	local v1 = math.random() * 2 * math.pi
 	return Vector2.new(math.cos(v1), (math.sin(v1)))
 end
-function t.randomPointInRing(p1) --[[ Line: 245 ]]
+function t.randomPointInRing(p1)
 	local v2 = math.sqrt(math.random() * (1 - p1 ^ 2) + p1 ^ 2)
 	local v3 = math.random() * 2 * math.pi
 	return Vector2.new(v2 * math.cos(v3), v2 * math.sin(v3))
 end
-function t.randomPointOnSphere() --[[ Line: 251 ]]
+function t.randomPointOnSphere()
 	local v1 = math.random() * math.pi * 2
 	local v2 = math.random() * 2 - 1
 	local v3 = math.sqrt(1 - v2 ^ 2) * math.cos(v1)
 	return Vector3.new(v3, math.sqrt(1 - v2 ^ 2) * math.sin(v1), v2)
 end
-function t.randomPointInSphere() --[[ Line: 258 ]]
+function t.randomPointInSphere()
 	local v1 = math.random() * 2 * math.pi
 	local v3 = math.acos(2 * math.random() - 1)
 	local v4 = math.random() ^ 0.3333333333333333
@@ -165,19 +166,19 @@ function t.randomPointInSphere() --[[ Line: 258 ]]
 	local v7 = math.sin(v3)
 	return Vector3.new(v4 * v7 * v6, v4 * v7 * v5, v4 * math.cos(v3))
 end
-function t.shortAngleDist(p1, p2) --[[ Line: 277 ]]
+function t.shortAngleDist(p1, p2)
 	local v1 = math.sign(p2 - p1)
 	local v2 = v1 * (math.abs(p2 - p1) % 6.283185307179586)
 	return v1 * (math.abs(v2) * 2 % 6.283185307179586) - v2
 end
-function t.waveTriangle(p1, p2, p3) --[[ Line: 286 ]]
+function t.waveTriangle(p1, p2, p3)
 	local v1 = p2 or 1
 	assert(v1)
 	local v2 = p3 or 1
 	assert(v2)
 	return 4 * v1 / v2 * math.abs(p1 % v2 - v2 / 2) - v1
 end
-function t.closestPointInPart(p1, p2) --[[ Line: 294 ]]
+function t.closestPointInPart(p1, p2)
 	local v1 = p1.CFrame
 	local v2 = v1:PointToObjectSpace(p2)
 	local v3 = p1.Size.X * 0.5
@@ -185,18 +186,18 @@ function t.closestPointInPart(p1, p2) --[[ Line: 294 ]]
 	local v5 = p1.Size.Z * 0.5
 	return v1 * Vector3.new(math.clamp(v2.X, -v3, v3), math.clamp(v2.Y, -v4, v4), (math.clamp(v2.Z, -v5, v5)))
 end
-function t.closestPointOnPart(p1, p2) --[[ Line: 303 ]]
+function t.closestPointOnPart(p1, p2)
 	return p1:GetClosestPointOnSurface(p2)
 end
-function t.closestPointOnLine(p1, p2, p3) --[[ Line: 307 ]]
+function t.closestPointOnLine(p1, p2, p3)
 	local Unit = p2.Unit
 	local v2 = p1 + Unit * math.clamp(Unit:Dot(p3 - p1), 0, p2.Magnitude)
 	return v2, (p3 - v2).Magnitude
 end
-function t.getSunflowerSeedArrangementGenerator(p1, p2, p3) --[[ Line: 320 ]]
+function t.getSunflowerSeedArrangementGenerator(p1, p2, p3)
 	local v2 = math.floor(p2 * math.sqrt(p1) + 0.5)
 	local v3 = 0
-	return function() --[[ Line: 325 | Upvalues: v3 (ref), p1 (copy), p3 (copy), v2 (copy) ]]
+	return function()
 		if v3 < p1 then
 			v3 = v3 + 1
 			local v1 = p3
@@ -209,7 +210,7 @@ function t.getSunflowerSeedArrangementGenerator(p1, p2, p3) --[[ Line: 320 ]]
 		end
 	end
 end
-function t.getTrajectoryInterceptTime(p1, p2, p3, p4, p5) --[[ Line: 353 ]]
+function t.getTrajectoryInterceptTime(p1, p2, p3, p4, p5)
 	local X = p3.X
 	local Y = p3.Y
 	local Z = p3.Z
@@ -236,7 +237,7 @@ function t.getTrajectoryInterceptTime(p1, p2, p3, p4, p5) --[[ Line: 353 ]]
 		return v4 or v5
 	end
 end
-function t.offsetLookAtTarget(p1, p2, p3, p4, p5, p6) --[[ Line: 400 ]]
+function t.offsetLookAtTarget(p1, p2, p3, p4, p5, p6)
 	if p6 == 0 then
 		return 0, 0
 	else
@@ -249,10 +250,10 @@ function t.offsetLookAtTarget(p1, p2, p3, p4, p5, p6) --[[ Line: 400 ]]
 		return v4, v7 - (p2 * p2 < v6 and math.asin(p2 / v6 ^ 0.5) or math.asin(v6 ^ 0.5 / p2))
 	end
 end
-function t.generate2DPointClockwiseComparisonFunction(p1) --[[ Line: 418 ]]
+function t.generate2DPointClockwiseComparisonFunction(p1)
 	local v1 = p1 or Vector2.zero
 	assert(typeof(v1) == "Vector2", "optionalCenter must be a Vector2")
-	return function(p1, p2) --[[ Line: 421 | Upvalues: v1 (copy) ]]
+	return function(p1, p2)
 		local v12 = p1 - v1
 		local v2 = p2 - v1
 		if v12.X >= 0 and v2.X < 0 then
@@ -281,10 +282,10 @@ function t.generate2DPointClockwiseComparisonFunction(p1) --[[ Line: 418 ]]
 		end
 	end
 end
-function t.yieldNPointsOnSphere(p1) --[[ Line: 457 ]]
+function t.yieldNPointsOnSphere(p1)
 	local v1 = 2 / p1
 	local v2 = 1
-	return function() --[[ Line: 463 | Upvalues: v2 (ref), p1 (copy), v1 (copy) ]]
+	return function()
 		v2 = v2 + 1
 		if v2 <= p1 then
 			local v12 = v2 * v1 - 1 + v1 / 2
@@ -297,7 +298,7 @@ function t.yieldNPointsOnSphere(p1) --[[ Line: 457 ]]
 		end
 	end
 end
-function t.catmullRomSplinePoint(p1, p2, p3, p4, p5) --[[ Line: 483 ]]
+function t.catmullRomSplinePoint(p1, p2, p3, p4, p5)
 	local v1 = p5 * p5
 	local v2 = v1 * p5
 	local v3 = (-v2 + v1 * 2 - p5) * 0.5
@@ -306,7 +307,7 @@ function t.catmullRomSplinePoint(p1, p2, p3, p4, p5) --[[ Line: 483 ]]
 	local v6 = (v2 - v1) * 0.5
 	return Vector3.new(v3 * p1.X + v4 * p2.X + v5 * p3.X + v6 * p4.X, v3 * p1.Y + v4 * p2.Y + v5 * p3.Y + v6 * p4.Y, v3 * p1.Z + v4 * p2.Z + v5 * p3.Z + v6 * p4.Z)
 end
-function t.getNCatmullRomSplinePoints(p1, p2, p3, p4, p5) --[[ Line: 498 | Upvalues: t (copy) ]]
+function t.getNCatmullRomSplinePoints(p1, p2, p3, p4, p5)
 	local v1 = p5 or 100
 	assert(v1)
 	local t2 = {}
@@ -315,11 +316,11 @@ function t.getNCatmullRomSplinePoints(p1, p2, p3, p4, p5) --[[ Line: 498 | Upval
 	end
 	return t2
 end
-function t.yieldNCatmullRomSplinePoints(p1, p2, p3, p4, p5) --[[ Line: 516 | Upvalues: t (copy) ]]
+function t.yieldNCatmullRomSplinePoints(p1, p2, p3, p4, p5)
 	local v1 = p5 or 100
 	assert(v1)
 	local v3 = 1
-	return function() --[[ Line: 521 | Upvalues: v3 (ref), v1 (ref), t (ref), p1 (copy), p2 (copy), p3 (copy), p4 (copy) ]]
+	return function()
 		if v3 <= v1 then
 			local v2 = t.catmullRomSplinePoint(p1, p2, p3, p4, (v3 - 1) / (v1 - 1))
 			v3 = v3 + 1
@@ -327,7 +328,7 @@ function t.yieldNCatmullRomSplinePoints(p1, p2, p3, p4, p5) --[[ Line: 516 | Upv
 		end
 	end
 end
-function t.stepAlongPath(p1, p2, p3, p4) --[[ Line: 534 ]]
+function t.stepAlongPath(p1, p2, p3, p4)
 	while p4 > 0 do
 		local v2 = p2 + 1 <= #p1 and p2 + 1 or 1
 		local Magnitude = (p1[p2]:Lerp(p1[(p2 + 1 - 1) % #p1 + 1], p3) - p1[v2]).Magnitude
@@ -340,11 +341,11 @@ function t.stepAlongPath(p1, p2, p3, p4) --[[ Line: 534 ]]
 	end
 	return p2, p3
 end
-function t.getDepthForWidth(p1, p2, p3) --[[ Line: 558 ]]
+function t.getDepthForWidth(p1, p2, p3)
 	local ViewportSize = p3.ViewportSize
 	return 0.5 * ViewportSize.X * p1 / (p2 * (ViewportSize.X / ViewportSize.Y * math.tan(math.rad(p3.FieldOfView) / 2)))
 end
-function t.transformRange(p1, p2, p3, p4, p5) --[[ Line: 567 ]]
+function t.transformRange(p1, p2, p3, p4, p5)
 	return p4 + (p1 - p2) * (p5 - p4) / (p3 - p2)
 end
 return t

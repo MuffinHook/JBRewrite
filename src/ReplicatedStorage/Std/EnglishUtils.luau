@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 return {
-	getAOrAn = function(p1) --[[ Name: getAOrAn | Line: 5 ]]
+	getAOrAn = function(p1)
 		if ({
 			a = true,
 			e = true,

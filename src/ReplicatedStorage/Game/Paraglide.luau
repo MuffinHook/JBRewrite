@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -12,7 +13,7 @@ local v1 = nil
 local v2 = nil
 local v3 = Vector3.new
 local FindPartOnRayWithIgnoreList = workspace.FindPartOnRayWithIgnoreList
-local function fpor2(p1, p2, ...) --[[ Line: 18 | Upvalues: TableUtils (copy), CollectionService (copy), C4Consts (copy), v3 (copy), FindPartOnRayWithIgnoreList (copy) ]]
+local function fpor2(p1, p2, ...)
 	local magnitude = p2.magnitude
 	local unit = p2.unit
 	local v1 = 0
@@ -52,10 +53,10 @@ local v5 = nil
 local v6 = Signal.new()
 local v7 = Signal.new()
 local v8 = nil
-local function IsFlying() --[[ Line: 57 | Upvalues: v8 (ref) ]]
+local function IsFlying()
 	return v8 ~= nil
 end
-local function UpdateParachute() --[[ Line: 60 | Upvalues: v8 (ref), CurrentCamera (copy), fpor2 (ref), v4 (ref) ]]
+local function UpdateParachute()
 	local HumanoidRootPart = v8.HumanoidRootPart
 	local v1 = CurrentCamera.CFrame * CFrame.Angles(0.2, 0, 0)
 	local v2 = math.clamp(HumanoidRootPart.RotVelocity.y, -4, 4)
@@ -68,7 +69,7 @@ local function UpdateParachute() --[[ Line: 60 | Upvalues: v8 (ref), CurrentCame
 		v4()
 	end
 end
-local function RawParachute() --[[ Line: 77 | Upvalues: v8 (ref), LocalPlayer (copy), CurrentCamera (copy), Audio (copy), RunService (copy), UpdateParachute (copy) ]]
+local function RawParachute()
 	if v8 then
 		print("Already has parachute")
 		return false
@@ -114,7 +115,7 @@ local function RawParachute() --[[ Line: 77 | Upvalues: v8 (ref), LocalPlayer (c
 		end
 	end
 end
-local function RawParachuteStop() --[[ Line: 127 | Upvalues: v8 (ref), v6 (copy) ]]
+local function RawParachuteStop()
 	if v8 and v8.Type == "Parachute" then
 		v8.Gyro:Destroy()
 		v8.Velocity:Destroy()
@@ -127,13 +128,13 @@ local function RawParachuteStop() --[[ Line: 127 | Upvalues: v8 (ref), v6 (copy)
 		return false
 	end
 end
-local function Parachute() --[[ Line: 143 | Upvalues: RawParachute (copy), v1 (ref) ]]
+local function Parachute()
 	if not RawParachute() then
 		return false
 	end
 	v1:FireServer("g" .. ("t8x"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("nmkqmqyms"):sub(4, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ydl"):sub(2, 2):reverse() .. "sf")
 end
-v4 = function() --[[ Name: ParachuteStop | Line: 150 | Upvalues: v8 (ref), v6 (copy), v1 (ref) ]]
+v4 = function()
 	local v12
 	if v8 and v8.Type == "Parachute" then
 		v8.Gyro:Destroy()
@@ -151,7 +152,7 @@ v4 = function() --[[ Name: ParachuteStop | Line: 150 | Upvalues: v8 (ref), v6 (c
 	end
 	v1:FireServer("q" .. ("ieaznve"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("s9ls"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("b83yluf"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("ek53zzt1"):sub(5, 5):reverse():reverse():reverse() .. "uem")
 end
-local function UpdateGlider() --[[ Line: 157 | Upvalues: v8 (ref), CurrentCamera (copy), fpor2 (ref), v5 (ref) ]]
+local function UpdateGlider()
 	local HumanoidRootPart = v8.HumanoidRootPart
 	local v1 = CurrentCamera.CFrame * CFrame.Angles(0.2, 0, 0)
 	local v4 = math.abs((math.clamp(v1.lookVector:Dot(Vector3.new(0, 1, 0)), -1, -0.06)))
@@ -163,7 +164,7 @@ local function UpdateGlider() --[[ Line: 157 | Upvalues: v8 (ref), CurrentCamera
 		v5()
 	end
 end
-local function RawGlider() --[[ Line: 173 | Upvalues: v8 (ref), LocalPlayer (copy), CurrentCamera (copy), RunService (copy), UpdateGlider (copy) ]]
+local function RawGlider()
 	if v8 then
 		print("Already has glider")
 		return false
@@ -209,7 +210,7 @@ local function RawGlider() --[[ Line: 173 | Upvalues: v8 (ref), LocalPlayer (cop
 		end
 	end
 end
-local function RawGliderStop() --[[ Line: 223 | Upvalues: v8 (ref), v7 (copy) ]]
+local function RawGliderStop()
 	if v8 and v8.Type == "Glider" then
 		v8.Gyro:Destroy()
 		v8.Velocity:Destroy()
@@ -223,29 +224,29 @@ local function RawGliderStop() --[[ Line: 223 | Upvalues: v8 (ref), v7 (copy) ]]
 		return false
 	end
 end
-local function Glider() --[[ Line: 240 | Upvalues: RawGlider (copy), v1 (ref) ]]
+local function Glider()
 	if not RawGlider() then
 		return false
 	end
 	v1:FireServer("d" .. ("ashj6e2"):sub(5, 5):reverse() .. "" .. "" .. ("x8cuhlli"):sub(4, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("a1ruj9s"):sub(3, 3):reverse() .. "m4")
 end
-v5 = function() --[[ Name: GliderStop | Line: 247 | Upvalues: RawGliderStop (copy), v1 (ref) ]]
+v5 = function()
 	if not RawGliderStop() then
 		return false
 	end
 	v1:FireServer("m" .. ("awfcg8s"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "6ascx8")
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 254 | Upvalues: v1 (ref), v2 (ref), RawParachute (copy), v8 (ref), v6 (copy), RawGlider (copy), RawGliderStop (copy), v5 (ref) ]]
+	Init = function(p1)
 		local em = p1.em
 		v1 = p1.Event
 		v2 = em
-		function em.g8qmqdsf() --[[ Line: 256 | Upvalues: RawParachute (ref), v1 (ref) ]]
+		function em.g8qmqdsf()
 			if not RawParachute() then
 				v1:FireServer("qa93zuem")
 			end
 		end
-		function em.qa93zuem() --[[ Line: 262 | Upvalues: v8 (ref), v6 (ref) ]]
+		function em.qa93zuem()
 			if v8 then
 				if v8.Type == "Parachute" then
 					v8.Gyro:Destroy()
@@ -257,15 +258,15 @@ return {
 				end
 			end
 		end
-		function em.d6lhurm4() --[[ Line: 265 | Upvalues: RawGlider (ref), v1 (ref) ]]
+		function em.d6lhurm4()
 			if not RawGlider() then
 				v1:FireServer("m" .. "" .. ("nxcuyyr"):sub(3, 3):reverse() .. "" .. "" .. ("v3rfa6g"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "scx8")
 			end
 		end
-		function em.mc6ascx8() --[[ Line: 271 | Upvalues: RawGliderStop (ref) ]]
+		function em.mc6ascx8()
 			RawGliderStop()
 		end
-		require(script.Parent.DefaultActions).onJumpPressed:Connect(function() --[[ Line: 276 | Upvalues: v8 (ref), v5 (ref) ]]
+		require(script.Parent.DefaultActions).onJumpPressed:Connect(function()
 			if v8 and v8.Type == "Glider" then
 				v5()
 			end

@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local t = {}
 t.__index = t
 t.__ClassName = "RateLimiter"
-function t.new(p1, p2) --[[ Line: 12 | Upvalues: t (copy) ]]
+function t.new(p1, p2)
 	assert(p1 ~= nil, "missing budgetPerWindow limit")
 	local t2 = {}
 	setmetatable(t2, t)
@@ -11,12 +12,12 @@ function t.new(p1, p2) --[[ Line: 12 | Upvalues: t (copy) ]]
 	t2._data = {}
 	return t2
 end
-function t.CanUseBudget(p1, p2, p3) --[[ Line: 25 ]]
+function t.CanUseBudget(p1, p2, p3)
 	assert(p2 ~= nil, "missing key")
 	p1:Update()
 	return if p1._data[p2] then p1._data[p2].amount else 0 + (p3 or 1) <= p1._budgetPerWindow
 end
-function t.UseBudget(p1, p2, p3, p4) --[[ Line: 37 ]]
+function t.UseBudget(p1, p2, p3, p4)
 	local v1 = p3 or 1
 	assert(v1)
 	assert(p2 ~= nil, "missing key")
@@ -37,7 +38,7 @@ function t.UseBudget(p1, p2, p3, p4) --[[ Line: 37 ]]
 	end
 end
 t.Increment = t.UseBudget
-function t.Update(p1) --[[ Line: 60 ]]
+function t.Update(p1)
 	local v1 = os.clock()
 	for v2, v3 in p1._data do
 		if v1 - v3.lastUpdate >= p1._budgetWindowDuration then
@@ -49,7 +50,7 @@ function t.Update(p1) --[[ Line: 60 ]]
 		end
 	end
 end
-function t.Destroy(p1) --[[ Line: 74 ]]
+function t.Destroy(p1)
 	table.clear(p1._data)
 	setmetatable(p1, nil)
 end

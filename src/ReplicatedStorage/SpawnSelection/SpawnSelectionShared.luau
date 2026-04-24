@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
@@ -6,10 +7,10 @@ local SpawnSelectionConsts = require(ReplicatedStorage.SpawnSelection.SpawnSelec
 local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
 local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
 local t = {}
-local function encodeSpawnName(p1) --[[ Line: 10 ]]
+local function encodeSpawnName(p1)
 	return p1:gsub("[^%w]", "")
 end
-function t.getPlayerLastSpawnedAt(p1, p2) --[[ Line: 13 | Upvalues: SpawnSelectionConsts (copy) ]]
+function t.getPlayerLastSpawnedAt(p1, p2)
 	local v1 = p2.name:gsub("[^%w]", "")
 	local v2 = p1:FindFirstChild(SpawnSelectionConsts.SPAWN_TIME_HOLDER_OBJ_NAME)
 	if v2 then
@@ -18,7 +19,7 @@ function t.getPlayerLastSpawnedAt(p1, p2) --[[ Line: 13 | Upvalues: SpawnSelecti
 		return 0
 	end
 end
-function t.recordPlayerSpawnedAt(p1, p2) --[[ Line: 21 | Upvalues: SpawnSelectionConsts (copy) ]]
+function t.recordPlayerSpawnedAt(p1, p2)
 	local v1 = p2.name:gsub("[^%w]", "")
 	local v2 = p1:FindFirstChild(SpawnSelectionConsts.SPAWN_TIME_HOLDER_OBJ_NAME)
 	if not v2 then
@@ -30,7 +31,7 @@ function t.recordPlayerSpawnedAt(p1, p2) --[[ Line: 21 | Upvalues: SpawnSelectio
 	v2:SetAttribute(v1, (workspace:GetServerTimeNow()))
 	return true
 end
-function t.canPlayerSpawnAt(p1, p2) --[[ Line: 33 | Upvalues: PlayerUtils (copy), t (copy), GamepassSystem (copy), GamepassUtils (copy), SpawnSelectionConsts (copy) ]]
+function t.canPlayerSpawnAt(p1, p2)
 	if p2.exclusiveTeamId and not t.isTeamIdSame(PlayerUtils.getTeamId(p1), p2.exclusiveTeamId) then
 		return false
 	elseif p2.exclusiveBoss and not GamepassSystem.doesPlayerOwnCached(p1, GamepassUtils.EnumGamepass.BOSS) then
@@ -78,14 +79,14 @@ function t.canPlayerSpawnAt(p1, p2) --[[ Line: 33 | Upvalues: PlayerUtils (copy)
 		end
 	end
 end
-function t.isTeamIdSame(p1, p2) --[[ Line: 70 | Upvalues: Settings (copy) ]]
+function t.isTeamIdSame(p1, p2)
 	if p2 == Settings.EnumTeam.Police and p1 ~= Settings.EnumTeam.Police then
 		return false
 	else
 		return p2 ~= Settings.EnumTeam.Prisoner and p2 ~= Settings.EnumTeam.Criminal or (p1 == Settings.EnumTeam.Prisoner or p1 == Settings.EnumTeam.Criminal)
 	end
 end
-function t.getSpawnDataFromSpawnPart(p1) --[[ Line: 83 | Upvalues: SpawnSelectionConsts (copy), Settings (copy) ]]
+function t.getSpawnDataFromSpawnPart(p1)
 	local v1 = p1:GetAttribute(SpawnSelectionConsts.SPAWN_EXCLUSIVE_TEAM_NAME_ATTR_NAME)
 	local v2
 	if v1 then
@@ -108,14 +109,14 @@ function t.getSpawnDataFromSpawnPart(p1) --[[ Line: 83 | Upvalues: SpawnSelectio
 	t.useParachute = p1:GetAttribute(SpawnSelectionConsts.SPAWN_USE_PARACHUTE_ATTR_NAME) == true
 	return t
 end
-function t.getSpawnPartFromName(p1) --[[ Line: 103 | Upvalues: CollectionService (copy), SpawnSelectionConsts (copy) ]]
+function t.getSpawnPartFromName(p1)
 	for v1, v2 in CollectionService:GetTagged(SpawnSelectionConsts.SPAWN_TAG_NAME) do
 		if v2.Name == p1 then
 			return v2
 		end
 	end
 end
-function t.getAllSpawnData() --[[ Line: 111 | Upvalues: CollectionService (copy), SpawnSelectionConsts (copy), t (copy) ]]
+function t.getAllSpawnData()
 	local t2 = {}
 	for v1, v2 in CollectionService:GetTagged(SpawnSelectionConsts.SPAWN_TAG_NAME) do
 		table.insert(t2, t.getSpawnDataFromSpawnPart(v2))

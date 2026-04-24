@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -10,7 +11,7 @@ local Fabricate = script.Parent.Fabricate
 local t = {}
 t.__index = t
 t.__ClassName = "HomeItem"
-function t.new(p1) --[[ Line: 17 | Upvalues: t (copy), RxInstanceUtils (copy), Maid (copy), HomeItemConsts (copy), Fabricate (copy) ]]
+function t.new(p1)
 	local t2 = {}
 	setmetatable(t2, t)
 	RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
@@ -31,45 +32,45 @@ function t.new(p1) --[[ Line: 17 | Upvalues: t (copy), RxInstanceUtils (copy), M
 	end
 	return t2
 end
-function t.GetHome(p1) --[[ Line: 45 | Upvalues: HomeBinder (copy) ]]
+function t.GetHome(p1)
 	return HomeBinder:Get(p1._obj.Parent)
 end
-function t.GetOwner(p1) --[[ Line: 48 | Upvalues: Players (copy) ]]
+function t.GetOwner(p1)
 	return Players:GetPlayerByUserId(p1._ownerIdValue.Value)
 end
-function t.GetObj(p1) --[[ Line: 53 ]]
+function t.GetObj(p1)
 	return p1._obj
 end
-function t.TranslateCf(p1, p2) --[[ Line: 56 ]]
+function t.TranslateCf(p1, p2)
 	return p2 * p1._offsetCF
 end
-function t.UntranslateCf(p1, p2) --[[ Line: 59 ]]
+function t.UntranslateCf(p1, p2)
 	return p2 * p1._offsetCF:Inverse()
 end
-function t.SetCFrame(p1, p2) --[[ Line: 62 ]]
+function t.SetCFrame(p1, p2)
 	p1._obj:SetPrimaryPartCFrame(p2)
 end
-function t.SetServerCFrame(p1, p2) --[[ Line: 65 ]]
+function t.SetServerCFrame(p1, p2)
 	p1._placeRemote:FireServer(p2)
 end
-function t.CacheSurfaces(p1) --[[ Line: 68 ]]
+function t.CacheSurfaces(p1)
 	local v1 = p1:GetHome()
 	assert(v1 ~= nil)
 	p1._cacheSurfaces = v1:GetSurfaces()
 end
-function t.ClearCacheSurfaces(p1) --[[ Line: 73 ]]
+function t.ClearCacheSurfaces(p1)
 	p1._cacheSurfaces = nil
 end
-function t.IsWithinBoundsCached(p1, p2) --[[ Line: 76 | Upvalues: HomeItemUtils (copy) ]]
+function t.IsWithinBoundsCached(p1, p2)
 	return HomeItemUtils.isWithinBounds(p1._obj.PrimaryPart, p2, p1._cacheSurfaces)
 end
-function t.IsValidUpDot(p1, p2) --[[ Line: 79 ]]
+function t.IsValidUpDot(p1, p2)
 	return math.abs(p2 - p1._upDotValue.Value) < 0.1
 end
-function t.AttemptDelete(p1) --[[ Line: 82 ]]
+function t.AttemptDelete(p1)
 	p1._deleteRemote:FireServer()
 end
-function t.Damage(p1) --[[ Line: 85 | Upvalues: HomeItemConsts (copy), Audio (copy) ]]
+function t.Damage(p1)
 	if not p1._damageRemote then
 		p1._damageRemote = p1._obj:FindFirstChild(HomeItemConsts.DAMAGE_REMOTE_NAME)
 	end
@@ -80,19 +81,19 @@ function t.Damage(p1) --[[ Line: 85 | Upvalues: HomeItemConsts (copy), Audio (co
 		})
 	end
 end
-function t.SetBeingDragged(p1, p2) --[[ Line: 94 ]]
+function t.SetBeingDragged(p1, p2)
 	p1._isBeingDragged = p2
 end
-function t.IsBeingDragged(p1) --[[ Line: 97 ]]
+function t.IsBeingDragged(p1)
 	return p1._isBeingDragged
 end
-function t.GetGhosted(p1) --[[ Line: 100 ]]
+function t.GetGhosted(p1)
 	return p1._isGhostValue.Value
 end
-function t.IsPlaced(p1) --[[ Line: 103 ]]
+function t.IsPlaced(p1)
 	return p1._isPlacedValue.Value
 end
-function t.Destroy(p1) --[[ Line: 106 ]]
+function t.Destroy(p1)
 	local _maid = p1._maid
 	assert(_maid ~= nil)
 	p1._maid = nil

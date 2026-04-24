@@ -19,50 +19,50 @@ function t.init()
 	t.setupAlarm()
 end
 function t.setupCollect()
-	Binder.new(CasinoRobberyConsts.LOOT_TAG_NAME, function(p1)
-		local v1 = Maid.new()
-		local function action(p12, p2)
-			if p2 then
-				p1:FindFirstChild(CasinoRobberyConsts.LOOT_COLLECT_REMOTE_NAME):FireServer()
+	Binder.new(CasinoRobberyConsts.LOOT_TAG_NAME, function(lootObj)
+		local maid = Maid.new()
+		local function action(_, isActive)
+			if isActive then
+				lootObj:FindFirstChild(CasinoRobberyConsts.LOOT_COLLECT_REMOTE_NAME):FireServer()
 				return true
 			end
 		end
-		local v2 = nil
-		if p1:IsA("Model") then
-			RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
-			v2 = p1.PrimaryPart
-		elseif p1:IsA("BasePart") then
-			v2 = p1
+		local targetPart = nil
+		if lootObj:IsA("Model") then
+			RxInstanceUtils.yieldForProperty(lootObj, "PrimaryPart")
+			targetPart = lootObj.PrimaryPart
+		elseif lootObj:IsA("BasePart") then
+			targetPart = lootObj
 		else
 			error("Invalid ClassName for Casino Collect obj")
 		end
 		CircleAction.Add({
-			Part = v2,
+			Part = targetPart,
 			Name = "Collect",
 			NoRay = true,
 			Timed = true,
 			Duration = 0.5,
 			Dist = 8,
 			Callback = action
-		}, v2)
-		v1:GiveTask(function()
-			CircleAction.Remove(v2)
+		}, targetPart)
+		maid:GiveTask(function()
+			CircleAction.Remove(targetPart)
 		end)
-		return v1
+		return maid
 	end):Start()
 end
 function t.setupComputers()
-	Binder.new(CasinoRobberyConsts.COMPUTER_TAG_NAME, function(p1)
-		RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
-		local v1 = Maid.new()
-		local function action(p12, p2)
-			if p2 then
-				p1:FindFirstChild(CasinoRobberyConsts.COMPUTER_HACK_REMOTE_NAME):FireServer()
+	Binder.new(CasinoRobberyConsts.COMPUTER_TAG_NAME, function(computerObj)
+		RxInstanceUtils.yieldForProperty(computerObj, "PrimaryPart")
+		local maid = Maid.new()
+		local function action(_, isActive)
+			if isActive then
+				computerObj:FindFirstChild(CasinoRobberyConsts.COMPUTER_HACK_REMOTE_NAME):FireServer()
 				return true
 			end
 		end
-		local PrimaryPart = p1.PrimaryPart
-		local t = {
+		local PrimaryPart = computerObj.PrimaryPart
+		local actionConfig = {
 			Part = PrimaryPart,
 			Name = "Hack",
 			NoRay = true,
@@ -72,118 +72,118 @@ function t.setupComputers()
 			Callback = action
 		}
 		local function update()
-			t.Enabled = p1:GetAttribute("ComputerActive") == true
-			local v3, v4
-			if p1:GetAttribute("ShowDisableSecurityPrompt") == true then
-				v3 = "Disable Vault Security"
-				v4 = true
+			actionConfig.Enabled = computerObj:GetAttribute("ComputerActive") == true
+			local actionName, isTimed
+			if computerObj:GetAttribute("ShowDisableSecurityPrompt") == true then
+				actionName = "Disable Vault Security"
+				isTimed = true
 			else
-				v3 = "Hack"
-				v4 = false
+				actionName = "Hack"
+				isTimed = false
 			end
-			t.Name = v3
-			t.Timed = v4
+			actionConfig.Name = actionName
+			actionConfig.Timed = isTimed
 		end
-		t.Enabled = p1:GetAttribute("ComputerActive") == true
-		local v3, v4
-		if p1:GetAttribute("ShowDisableSecurityPrompt") == true then
-			v3 = "Disable Vault Security"
-			v4 = true
+		actionConfig.Enabled = computerObj:GetAttribute("ComputerActive") == true
+		local actionName, isTimed
+		if computerObj:GetAttribute("ShowDisableSecurityPrompt") == true then
+			actionName = "Disable Vault Security"
+			isTimed = true
 		else
-			v3 = "Hack"
-			v4 = false
+			actionName = "Hack"
+			isTimed = false
 		end
-		t.Name = v3
-		t.Timed = v4
-		v1:GiveTask(p1:GetAttributeChangedSignal("ComputerActive"):Connect(update))
-		v1:GiveTask(p1:GetAttributeChangedSignal("ShowDisableSecurityPrompt"):Connect(update))
-		CircleAction.Add(t, PrimaryPart)
-		v1:GiveTask(function()
+		actionConfig.Name = actionName
+		actionConfig.Timed = isTimed
+		maid:GiveTask(computerObj:GetAttributeChangedSignal("ComputerActive"):Connect(update))
+		maid:GiveTask(computerObj:GetAttributeChangedSignal("ShowDisableSecurityPrompt"):Connect(update))
+		CircleAction.Add(actionConfig, PrimaryPart)
+		maid:GiveTask(function()
 			CircleAction.Remove(PrimaryPart)
 		end)
-		return v1
+		return maid
 	end):Start()
 end
 function t.setupRobberyDoor()
-	Binder.new(CasinoRobberyConsts.KEYPAD_TAG_NAME, function(p1)
-		local v1 = Maid.new()
-		local function action(p12, p2)
+	Binder.new(CasinoRobberyConsts.KEYPAD_TAG_NAME, function(keypadPrompt)
+		local maid = Maid.new()
+		local function action(_, isActive)
 			if workspace:FindFirstChild(CasinoRobberyConsts.WORKSPACE_MODEL_NAME):GetAttribute(CasinoRobberyConsts.OPEN_ATTR_NAME) ~= true then
 				Notification.new({
 					Text = "Wait for the Crown Jewel to open..."
 				})
 				return false
 			end
-			if p2 then
+			if isActive then
 				store:dispatch({
 					type = "setCasinoKeypadVisible",
 					visible = true
 				})
 				store:dispatch({
 					type = "setCasinoKeypadCallback",
-					callback = function(p12)
-						p1:FindFirstChild(CasinoRobberyConsts.KEYPAD_SUBMIT_REMOTE_NAME):FireServer(p12)
+					callback = function(keyCode)
+						keypadPrompt:FindFirstChild(CasinoRobberyConsts.KEYPAD_SUBMIT_REMOTE_NAME):FireServer(keyCode)
 					end
 				})
 				return true
 			end
 		end
 		CircleAction.Add({
-			Part = p1,
-			ValidRoot = p1.Parent,
+			Part = keypadPrompt,
+			ValidRoot = keypadPrompt.Parent,
 			Name = "Open Keypad",
 			Dist = 8,
 			Callback = action
-		}, p1)
-		v1:GiveTask(function()
-			CircleAction.Remove(p1)
+		}, keypadPrompt)
+		maid:GiveTask(function()
+			CircleAction.Remove(keypadPrompt)
 		end)
-		return v1
+		return maid
 	end):Start()
 end
 function t.setupMusic()
-	local v1 = nil
-	local v2 = nil
+	local casinoMusic = nil
+	local fadePromise = nil
 	Players.LocalPlayer:GetAttributeChangedSignal(CasinoRobberyConsts.ROBBERY_MUSIC_PLAYING_ATTR_NAME):Connect(function()
-		local v12 = Players.LocalPlayer:GetAttribute(CasinoRobberyConsts.ROBBERY_MUSIC_PLAYING_ATTR_NAME)
-		if v2 then
-			v2:cancel()
-			v2 = nil
+		local shouldPlayMusic = Players.LocalPlayer:GetAttribute(CasinoRobberyConsts.ROBBERY_MUSIC_PLAYING_ATTR_NAME)
+		if fadePromise then
+			fadePromise:cancel()
+			fadePromise = nil
 		end
-		if v1 then
-			local v22 = v1
-			v1 = nil
-			Audio.promiseFadeTo(v22, 0, 3):finally(function()
-				v22:Destroy()
+		if casinoMusic then
+			local oldMusic = casinoMusic
+			casinoMusic = nil
+			Audio.promiseFadeTo(oldMusic, 0, 3):finally(function()
+				oldMusic:Destroy()
 			end)
 		end
-		if v12 then
-			v1 = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 1837987527, {
+		if shouldPlayMusic then
+			casinoMusic = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 1837987527, {
 				Looped = true,
 				Volume = 0
 			})
-			v1.Name = "CasinoMusic"
-			v1.SoundGroup = game:GetService("SoundService").RobberyMusic
-			v2 = Audio.promiseFadeTo(v1, 0.5, 3):finally(function()
-				v2 = nil
+			casinoMusic.Name = "CasinoMusic"
+			casinoMusic.SoundGroup = game:GetService("SoundService").RobberyMusic
+			fadePromise = Audio.promiseFadeTo(casinoMusic, 0.5, 3):finally(function()
+				fadePromise = nil
 			end)
 		end
 	end)
 end
 function t.setupAlarm()
-	Binder.new("CasinoTriggerAlarm", function(p1)
-		local v1 = Maid.new()
-		local v2 = 0
-		v1:GiveTask(p1.Touched:Connect(function(p1)
-			if p1:IsDescendantOf(Players.LocalPlayer.Character) then
-				local v1 = os.clock()
-				if not (v1 - v2 < 0.3) then
-					v2 = v1
+	Binder.new("CasinoTriggerAlarm", function(alarmTrigger)
+		local maid = Maid.new()
+		local lastTriggerTime = 0
+		maid:GiveTask(alarmTrigger.Touched:Connect(function(touchingPart)
+			if touchingPart:IsDescendantOf(Players.LocalPlayer.Character) then
+				local currentTime = os.clock()
+				if not (currentTime - lastTriggerTime < 0.3) then
+					lastTriggerTime = currentTime
 					ReplicatedStorage:FindFirstChild(CasinoRobberyConsts.TRIGGER_ALARM_REMOTE_NAME):FireServer()
 				end
 			end
 		end))
-		return v1
+		return maid
 	end):Start()
 end
 return t

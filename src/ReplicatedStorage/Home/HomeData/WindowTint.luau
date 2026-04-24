@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WindowTint = require(ReplicatedStorage.Game.Garage.StoreData.WindowTint)
 return {
-	getInstance = function(p1) --[[ Name: getInstance | Line: 5 ]]
+	getInstance = function(p1)
 		local Part = Instance.new("Part")
 		Part.Shape = Enum.PartType.Ball
 		Part.Size = Vector3.new(4, 4, 4)
@@ -12,14 +13,14 @@ return {
 		Part.CFrame = CFrame.new()
 		return Part
 	end,
-	updateCamera = function(p1, p2) --[[ Name: updateCamera | Line: 16 ]]
+	updateCamera = function(p1, p2)
 		local v1 = os.clock() / 2
 		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 	end,
-	getItems = function() --[[ Name: getItems | Line: 22 | Upvalues: WindowTint (copy) ]]
+	getItems = function()
 		return WindowTint.Items
 	end,
-	apply = function(p1, p2) --[[ Name: apply | Line: 25 ]]
+	apply = function(p1, p2)
 		local Windows = p2:FindFirstChild("Windows")
 		if Windows then
 			local count = 0

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -6,7 +7,7 @@ local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local createElement = Roact.createElement
 local PortalBase = require(script.Parent.PortalBase)
 local v1 = Roact.PureComponent:extend("PortalCustomize")
-function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), PortalBase (copy) ]]
+function v1.render(p1)
 	local category = p1.props.category
 	local v1 = nil
 	for i, v in ipairs(p1.props.categories) do
@@ -43,13 +44,13 @@ function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), PortalBas
 		t3.equipped = v4
 		t3.owned = v3
 		t3.faved = v2
-		function t3.onSelect() --[[ Line: 60 | Upvalues: p1 (copy), categoryName (copy), v5 (copy), v6 (ref), t3 (copy) ]]
+		function t3.onSelect()
 			if p1.props.attemptEquipItem then
 				p1.props.attemptEquipItem(categoryName, v5.name)
 			end
 			p1.props.onSelectItem(categoryName, v6, v5, t3)
 		end
-		function t3.onFavorite(p12) --[[ Line: 66 | Upvalues: p1 (copy), categoryName (copy), v5 (copy) ]]
+		function t3.onFavorite(p12)
 			if p1.props.attemptFavoriteItem then
 				p1.props.attemptFavoriteItem(categoryName, v5.name, p12)
 			end
@@ -74,16 +75,16 @@ function v1.render(p1) --[[ Line: 11 | Upvalues: createElement (copy), PortalBas
 		rowsPerPage = p1.props.rowsPerPage
 	})
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 92 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		category = p1.garageCategory,
 		categories = p1.garageCategories,
 		receipt = p1.garageReceipt,
 		favorited = p1.garageFavorited
 	}
-end, function(p1) --[[ Line: 100 | Upvalues: Players (copy), Audio (copy) ]]
+end, function(p1)
 	return {
-		onSelectItem = function(p12, p2, p3, p4) --[[ Name: onSelectItem | Line: 102 | Upvalues: Players (ref), Audio (ref), p1 (copy) ]]
+		onSelectItem = function(p12, p2, p3, p4)
 			if Players.LocalPlayer and Players.LocalPlayer.PlayerGui then
 				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 					Volume = 0.25
@@ -109,7 +110,7 @@ end, function(p1) --[[ Line: 100 | Upvalues: Players (copy), Audio (copy) ]]
 				})
 			end
 		end,
-		onFavoriteItem = function(p12, p2, p3) --[[ Name: onFavoriteItem | Line: 126 | Upvalues: p1 (copy) ]]
+		onFavoriteItem = function(p12, p2, p3)
 			p1({
 				type = "setCategoryItemFavorited",
 				category = p12,

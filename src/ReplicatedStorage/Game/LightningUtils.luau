@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
 return {
-	strikePosition = function(p1) --[[ Name: strikePosition | Line: 5 | Upvalues: GeomUtils (copy) ]]
+	strikePosition = function(p1)
 		local Origin = p1.Origin
 		local Target = p1.Target
 		local Model = Instance.new("Model")

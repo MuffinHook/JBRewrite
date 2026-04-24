@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 return {
 	colorDark = {
 		TextColor = Color3.fromRGB(255, 255, 255),

@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Glicko2Utils = require(ReplicatedStorage.Glicko2.Glicko2Utils)
-return function() --[[ Line: 9 | Upvalues: Glicko2Utils (copy) ]]
-	describe("checkSingleBattle", function() --[[ Line: 11 | Upvalues: Glicko2Utils (ref) ]]
-		it("single battle rating should be correct", function() --[[ Line: 12 | Upvalues: Glicko2Utils (ref) ]]
+return function()
+	describe("checkSingleBattle", function()
+		it("single battle rating should be correct", function()
 			local v1, v2, v3 = Glicko2Utils.calculateNewRatingData(1500, 350, 0.06, { 1500 }, { 350 }, { 1 })
 			local v4 = not (math.abs(v1 - 1662.31) > 0.01)
 			if math.abs(v2 - 290.319) > 0.01 then
@@ -17,8 +18,8 @@ return function() --[[ Line: 9 | Upvalues: Glicko2Utils (copy) ]]
 			expect(v4).to.equal(true)
 		end)
 	end)
-	describe("checkMultipleBattles", function() --[[ Line: 38 | Upvalues: Glicko2Utils (ref) ]]
-		it("single battle rating should be correct", function() --[[ Line: 39 | Upvalues: Glicko2Utils (ref) ]]
+	describe("checkMultipleBattles", function()
+		it("single battle rating should be correct", function()
 			local v1, v2, v3 = Glicko2Utils.calculateNewRatingData(1500, 200, 0.06, { 1400, 1550, 1700 }, { 30, 100, 300 }, { 1, 0, 0 })
 			local v4 = not (math.abs(v1 - 1464.06) > 0.01)
 			if math.abs(v2 - 151.52) > 0.01 then

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local CurrentCamera = workspace.CurrentCamera
 local Players = game:GetService("Players")
@@ -27,7 +28,7 @@ local t = {
 	OnVehicleExited = Signal.new(),
 	OnVehicleJumpExited = Signal.new(),
 	LastMPHClient = 0,
-	GetLocalVehiclePacket = function() --[[ Name: GetLocalVehiclePacket | Line: 33 | Upvalues: RunService (copy), ReplicatedStorage (copy) ]]
+	GetLocalVehiclePacket = function()
 		if RunService:IsStudio() and (RunService:IsServer() and RunService:IsClient()) then
 			return {
 				Type = "Chassis",
@@ -39,7 +40,7 @@ local t = {
 		end
 	end
 }
-function t.GetLocalVehiclePacketForCustomize() --[[ Line: 46 | Upvalues: t (copy), RunUtils (copy) ]]
+function t.GetLocalVehiclePacketForCustomize()
 	local v1 = t.GetLocalVehiclePacket()
 	if v1 and not RunUtils.isTradeWorld() then
 		return v1
@@ -50,7 +51,7 @@ function t.GetLocalVehiclePacketForCustomize() --[[ Line: 46 | Upvalues: t (copy
 		}
 	end
 end
-function t.Init(p1) --[[ Line: 56 | Upvalues: Players (copy), v2 (ref), t (copy), Roact (copy), Confirmation (copy) ]]
+function t.Init(p1)
 	v2 = require(Players.LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetCameras()
 	t.LastVehicleExit = 0
 	t.LastVehicleEject = 0
@@ -63,45 +64,45 @@ function t.Init(p1) --[[ Line: 56 | Upvalues: Players (copy), v2 (ref), t (copy)
 	t.nitroState = p1.nitroState
 	local em = p1.em
 	local v5 = p1.Event
-	function em.scrfqlpx(p1) --[[ Line: 70 | Upvalues: t (ref) ]]
+	function em.scrfqlpx(p1)
 		t.LastVehicleEject = p1
 	end
-	function t.canLocalLock() --[[ Line: 73 | Upvalues: t (ref) ]]
+	function t.canLocalLock()
 		local v1 = t.GetLocalVehiclePacket()
 		return v1 and (not v1.Passenger and (v1.Model and not v1.Model:GetAttribute("DisableLocking"))) and true or false
 	end
-	function t.toggleLocalLocked() --[[ Line: 85 | Upvalues: t (ref), v5 (copy) ]]
+	function t.toggleLocalLocked()
 		local v1 = t.GetLocalVehiclePacket()
 		v5:FireServer("r" .. "" .. ("fusvu"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("pjngo4g"):sub(2, 3):reverse():reverse():reverse() .. "" .. "" .. ("x4dvxg"):sub(4, 4):reverse():reverse():reverse() .. "omi", v1.Model:GetAttribute("Locked") ~= true)
 	end
-	function t.canLocalEject() --[[ Line: 89 | Upvalues: t (ref) ]]
+	function t.canLocalEject()
 		local v1 = t.GetLocalVehiclePacket()
 		return v1 and (not v1.Passenger and (v1.Model and not v1.Model:GetAttribute("DisableEjecting"))) and true or false
 	end
-	function t.attemptPassengerEject(p1) --[[ Line: 101 | Upvalues: v5 (copy) ]]
+	function t.attemptPassengerEject(p1)
 		v5:FireServer("t" .. ("uug3jewsj"):sub(2, 7):reverse():reverse():reverse():reverse():reverse() .. "t", p1)
 	end
-	function t.attemptBuyMissiles() --[[ Line: 104 | Upvalues: v5 (copy) ]]
+	function t.attemptBuyMissiles()
 		v5:FireServer("b" .. ("ji139irheem"):sub(4, 7):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ry5n2o"):sub(4, 5):reverse() .. "x")
 	end
 	local v6 = false
-	function t.promptMissileBuy() --[[ Line: 108 | Upvalues: v6 (ref), Confirmation (ref), t (ref) ]]
+	function t.promptMissileBuy()
 		if not v6 then
 			v6 = true
 			local v1 = Confirmation.new("Buy 10 Explosives for $5,000?")
-			v1.Maid:GiveTask(v1.OnYes:Connect(function() --[[ Line: 114 | Upvalues: t (ref) ]]
+			v1.Maid:GiveTask(v1.OnYes:Connect(function()
 				t.attemptBuyMissiles()
 			end))
-			v1.Maid:GiveTask(function() --[[ Line: 117 | Upvalues: v6 (ref) ]]
+			v1.Maid:GiveTask(function()
 				v6 = false
 			end)
 		end
 	end
-	function em.asxzm3xn(...) --[[ Line: 122 | Upvalues: t (ref) ]]
+	function em.asxzm3xn(...)
 		t.vehicleEffect(...)
 	end
 end
-function t.GetLocalVehicleModel() --[[ Line: 126 | Upvalues: t (copy) ]]
+function t.GetLocalVehicleModel()
 	local v1 = t.GetLocalVehiclePacket()
 	if v1 == nil then
 		return false
@@ -109,7 +110,7 @@ function t.GetLocalVehicleModel() --[[ Line: 126 | Upvalues: t (copy) ]]
 		return v1.Model
 	end
 end
-function t.CleanVehicleModel(p1) --[[ Line: 133 ]]
+function t.CleanVehicleModel(p1)
 	local v1 = p1:GetDescendants()
 	for i = 1, #v1 do
 		local v2 = v1[i]
@@ -118,7 +119,7 @@ function t.CleanVehicleModel(p1) --[[ Line: 133 ]]
 		end
 	end
 end
-function t.getHeadlights(p1) --[[ Line: 142 ]]
+function t.getHeadlights(p1)
 	local t = {}
 	for i, v in ipairs(p1.Model.Body:GetChildren()) do
 		if v.Name == "Headlight" then
@@ -127,7 +128,7 @@ function t.getHeadlights(p1) --[[ Line: 142 ]]
 	end
 	return t
 end
-function t.setHeadlightsEnabled(p1, p2) --[[ Line: 153 ]]
+function t.setHeadlightsEnabled(p1, p2)
 	local Model = p1:FindFirstChild("Model")
 	if Model then
 		local Body = Model:FindFirstChild("Body")
@@ -140,7 +141,7 @@ function t.setHeadlightsEnabled(p1, p2) --[[ Line: 153 ]]
 					end
 				end
 			end
-			local function scanModelForName(p1, p22) --[[ Line: 170 | Upvalues: p2 (copy) ]]
+			local function scanModelForName(p1, p22)
 				for i, v in ipairs(p1:GetDescendants()) do
 					if v.Name == p22 then
 						local v1 = p2 and Enum.Material.Neon or Enum.Material.Glass
@@ -164,7 +165,7 @@ function t.setHeadlightsEnabled(p1, p2) --[[ Line: 153 ]]
 		end
 	end
 end
-function t.setBrakelightsEnabled(p1, p2) --[[ Line: 194 ]]
+function t.setBrakelightsEnabled(p1, p2)
 	local Model = p1:FindFirstChild("Model")
 	if Model then
 		local Body = Model:FindFirstChild("Body")
@@ -198,28 +199,28 @@ function t.setBrakelightsEnabled(p1, p2) --[[ Line: 194 ]]
 		end
 	end
 end
-function t.getBrakelightsEnabled(p1) --[[ Line: 233 ]]
+function t.getBrakelightsEnabled(p1)
 	return p1:GetAttribute("BrakeLightEnabled") == true
 end
-function t.getTireHealth(p1) --[[ Line: 236 | Upvalues: VehicleConsts (copy) ]]
+function t.getTireHealth(p1)
 	return p1:GetAttribute(VehicleConsts.TIRE_HEALTH_ATTR_NAME)
 end
-function t.setTireHealth(p1, p2) --[[ Line: 239 | Upvalues: VehicleConsts (copy) ]]
+function t.setTireHealth(p1, p2)
 	p1:SetAttribute(VehicleConsts.TIRE_HEALTH_ATTR_NAME, p2)
 end
-function t.getTireHealthChangedSignal(p1) --[[ Line: 242 | Upvalues: VehicleConsts (copy) ]]
+function t.getTireHealthChangedSignal(p1)
 	return p1:GetAttributeChangedSignal(VehicleConsts.TIRE_HEALTH_ATTR_NAME)
 end
-function t.setTireMaxHealth(p1, p2) --[[ Line: 245 | Upvalues: VehicleConsts (copy) ]]
+function t.setTireMaxHealth(p1, p2)
 	p1:SetAttribute(VehicleConsts.TIRE_MAX_HEALTH_ATTR_NAME, p2)
 end
-function t.getTireMaxHealth(p1) --[[ Line: 248 | Upvalues: VehicleConsts (copy) ]]
+function t.getTireMaxHealth(p1)
 	return p1:GetAttribute(VehicleConsts.TIRE_MAX_HEALTH_ATTR_NAME)
 end
-function t.getTireMaxHealthChangedSignal(p1) --[[ Line: 251 | Upvalues: VehicleConsts (copy) ]]
+function t.getTireMaxHealthChangedSignal(p1)
 	return p1:GetAttributeChangedSignal(VehicleConsts.TIRE_MAX_HEALTH_ATTR_NAME)
 end
-function t.getVehicleCombatConfig(p1) --[[ Line: 254 | Upvalues: VehicleCombatData (copy), RunService (copy), v1 (ref) ]]
+function t.getVehicleCombatConfig(p1)
 	assert(type(p1) == "string", "Invalid make")
 	local v2 = VehicleCombatData[p1]
 	if not v2 then
@@ -230,7 +231,7 @@ function t.getVehicleCombatConfig(p1) --[[ Line: 254 | Upvalues: VehicleCombatDa
 	end
 	return v2
 end
-function t.getSeats(p1) --[[ Line: 265 | Upvalues: Players (copy) ]]
+function t.getSeats(p1)
 	local t = {}
 	for i, v in ipairs(p1:GetChildren()) do
 		if v.Name == "Seat" or v.Name == "Passenger" then
@@ -244,12 +245,12 @@ function t.getSeats(p1) --[[ Line: 265 | Upvalues: Players (copy) ]]
 			end
 		end
 	end
-	table.sort(t, function(p1, p2) --[[ Line: 279 ]]
+	table.sort(t, function(p1, p2)
 		return p1.Player.DisplayName < p2.Player.DisplayName
 	end)
 	return t
 end
-function t.prepareCameraSubject(p1, p2, p3) --[[ Line: 284 | Upvalues: v2 (ref), CurrentCamera (copy) ]]
+function t.prepareCameraSubject(p1, p2, p3)
 	local v1 = nil
 	if p1.Seat and not p1.Seat:FindFirstChild("NoCameraSubject") then
 		if p1.Passenger then
@@ -279,7 +280,7 @@ function t.prepareCameraSubject(p1, p2, p3) --[[ Line: 284 | Upvalues: v2 (ref),
 		return v1
 	end
 end
-function t.getParentModel(p1) --[[ Line: 312 | Upvalues: CollectionService (copy) ]]
+function t.getParentModel(p1)
 	while true do
 		p1 = p1.Parent
 		if not p1 then
@@ -290,11 +291,11 @@ function t.getParentModel(p1) --[[ Line: 312 | Upvalues: CollectionService (copy
 		end
 	end
 end
-function t.getVehicleMakeFromModel(p1) --[[ Line: 321 | Upvalues: CollectionService (copy) ]]
+function t.getVehicleMakeFromModel(p1)
 	assert(CollectionService:HasTag(p1, "Vehicle"), "Model is not a vehicle")
 	return p1.Name
 end
-function t.getVehicleDataForMake(p1) --[[ Line: 325 | Upvalues: VehicleData (copy) ]]
+function t.getVehicleDataForMake(p1)
 	for i, v in ipairs(VehicleData) do
 		if v.Make == p1 then
 			return v
@@ -302,10 +303,10 @@ function t.getVehicleDataForMake(p1) --[[ Line: 325 | Upvalues: VehicleData (cop
 	end
 	error("Invalid make: " .. p1)
 end
-function t.fixNetworkingCharacters() --[[ Line: 333 | Upvalues: ReplicatedStorage (copy), Players (copy), StarterPlayer (copy) ]]
+function t.fixNetworkingCharacters()
 	local Falling = require(ReplicatedStorage.Game.Falling)
 	local Paraglide = require(ReplicatedStorage.Game.Paraglide)
-	task.delay(2, function() --[[ Line: 336 | Upvalues: Players (ref), Falling (copy), Paraglide (copy), StarterPlayer (ref) ]]
+	task.delay(2, function()
 		local Character = Players.LocalPlayer.Character
 		if Character and (Falling.IsSkydiving() or (Paraglide.IsFlying() or Character.Humanoid:GetState() == Enum.HumanoidStateType.Freefall)) then
 			local v1 = Character.Humanoid.HipHeight + Character.HumanoidRootPart.Size.Y / 2
@@ -319,7 +320,7 @@ function t.fixNetworkingCharacters() --[[ Line: 333 | Upvalues: ReplicatedStorag
 			NetworkFixPart1.CFrame = Character.HumanoidRootPart.CFrame - Vector3.new(0, v1, 0)
 			NetworkFixPart1.Parent = workspace
 			Character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
-			task.delay(0.01, function() --[[ Line: 358 | Upvalues: NetworkFixPart1 (copy), Character (copy), Velocity (copy), Paraglide (ref), StarterPlayer (ref) ]]
+			task.delay(0.01, function()
 				NetworkFixPart1:Destroy()
 				Character.HumanoidRootPart.Velocity = Velocity
 				if Paraglide.IsFlying() then
@@ -332,7 +333,7 @@ function t.fixNetworkingCharacters() --[[ Line: 333 | Upvalues: ReplicatedStorag
 		end
 	end)
 end
-function t.vehicleEffect(p1, p2) --[[ Line: 375 | Upvalues: Audio (copy), Shockwave (copy), t (copy), CharacterUtil (copy) ]]
+function t.vehicleEffect(p1, p2)
 	if p1 == "Jump" and (p2 and p2.Parent) then
 		local JumpEffect = p2:FindFirstChild("JumpEffect", true)
 		local BlastEffect = p2:FindFirstChild("BlastEffect", true)
@@ -342,7 +343,7 @@ function t.vehicleEffect(p1, p2) --[[ Line: 375 | Upvalues: Audio (copy), Shockw
 		end
 		if JumpEffect then
 			JumpEffect.Enabled = true
-			task.delay(1, function() --[[ Line: 385 | Upvalues: JumpEffect (copy) ]]
+			task.delay(1, function()
 				JumpEffect.Enabled = false
 			end)
 		end
@@ -356,7 +357,7 @@ function t.vehicleEffect(p1, p2) --[[ Line: 375 | Upvalues: Audio (copy), Shockw
 			Duration = 12,
 			MaxRadius = 6400,
 			Power = 80
-		}).OnPastLocalPlayer:Connect(function() --[[ Line: 400 | Upvalues: t (ref), CharacterUtil (ref) ]]
+		}).OnPastLocalPlayer:Connect(function()
 			local v1 = t.GetLocalVehiclePacket()
 			if v1 ~= nil then
 				if v1.Make == "AdminNuke" and not v1.Passenger then

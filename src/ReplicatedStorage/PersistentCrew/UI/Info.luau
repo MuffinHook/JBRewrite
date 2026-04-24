@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
@@ -118,18 +119,18 @@ end
 function InfoComponent.render(self)
 	local rootChildren = {}
 	self:_buildMembers()
-	local isAdminOfCurrentClan = self.props.isAdminOfCurrentClan
-	if isAdminOfCurrentClan then
-		isAdminOfCurrentClan = self.props.isPlayersClan
-		if isAdminOfCurrentClan then
-			isAdminOfCurrentClan = if self.props.playersClanId == nil then false else not self.props.playerHasAcceptedInvite
+	local canEditCurrentClan = self.props.isAdminOfCurrentClan
+	if canEditCurrentClan then
+		canEditCurrentClan = self.props.isPlayersClan
+		if canEditCurrentClan then
+			canEditCurrentClan = if self.props.playersClanId == nil then false else not self.props.playerHasAcceptedInvite
 		end
 	end
-	local isAdminOfCurrentClan_2 = self.props.isAdminOfCurrentClan
-	if isAdminOfCurrentClan_2 then
-		isAdminOfCurrentClan_2 = not self.props.isPlayersClan
-		if isAdminOfCurrentClan_2 then
-			isAdminOfCurrentClan_2 = if self.props.playersClanId == nil then false else not self.props.playerHasAcceptedInvite
+	local canStartRankedBattle = self.props.isAdminOfCurrentClan
+	if canStartRankedBattle then
+		canStartRankedBattle = not self.props.isPlayersClan
+		if canStartRankedBattle then
+			canStartRankedBattle = if self.props.playersClanId == nil then false else not self.props.playerHasAcceptedInvite
 		end
 	end
 	local battleSizes = { 1, 2, 3, 4, 5 }
@@ -158,15 +159,15 @@ function InfoComponent.render(self)
 		})
 	end
 	local flagHeightScale = 0.3055555555555556 * self.props.aspectRatio / 1.5
-	local localPlayer = Players.LocalPlayer
-	if localPlayer then
-		localPlayer = if Players.LocalPlayer.UserId == self.props.clanOwnerUserId then not self.state.isEditingClanName else false
+	local isOwnerNotEditing = Players.LocalPlayer
+	if isOwnerNotEditing then
+		isOwnerNotEditing = if Players.LocalPlayer.UserId == self.props.clanOwnerUserId then not self.state.isEditingClanName else false
 	end
-	local localPlayer_2 = Players.LocalPlayer
-	if localPlayer_2 then
-		localPlayer_2 = if Players.LocalPlayer.UserId == self.props.clanOwnerUserId then self.state.isEditingClanName else false
+	local isOwnerEditing = Players.LocalPlayer
+	if isOwnerEditing then
+		isOwnerEditing = if Players.LocalPlayer.UserId == self.props.clanOwnerUserId then self.state.isEditingClanName else false
 	end
-	local isOwner = localPlayer or localPlayer_2
+	local isOwner = isOwnerNotEditing or isOwnerEditing
 	local headerBarProps = {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
@@ -195,7 +196,7 @@ function InfoComponent.render(self)
 		paddingLeft = 0
 	}
 	local renameBtnContainerChildren = {}
-	renameBtnContainerChildren.RenameButton = localPlayer and createElement(TextButton, {
+	renameBtnContainerChildren.RenameButton = isOwnerNotEditing and createElement(TextButton, {
 		size = UDim2.new(1, 0, 1, 0),
 		text = "RENAME",
 		backgroundColor = Color3.fromRGB(88, 172, 246),
@@ -206,7 +207,7 @@ function InfoComponent.render(self)
 		end,
 		disabled = self.props.networkMutexLocked
 	})
-	renameBtnContainerChildren.CancelButton = localPlayer_2 and createElement(TextButton, {
+	renameBtnContainerChildren.CancelButton = isOwnerEditing and createElement(TextButton, {
 		size = UDim2.new(1, 0, 1, 0),
 		text = "CANCEL",
 		backgroundColor = Color3.fromRGB(88, 172, 246),
@@ -218,7 +219,7 @@ function InfoComponent.render(self)
 		disabled = self.props.networkMutexLocked
 	})
 	titleContainerChildren.ButtonContainer = createElement(PaddedContainer, renameBtnContainerProps, renameBtnContainerChildren)
-	titleContainerChildren.RenameNameContainer = localPlayer_2 and createElement(PaddedContainer, {
+	titleContainerChildren.RenameNameContainer = isOwnerEditing and createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.new(0.9, 0, 1, 0),
 		position = UDim2.new(0.1, 0, 0, 0),
@@ -242,7 +243,7 @@ function InfoComponent.render(self)
 			[Roact.Event.FocusLost] = self.renameCrewTextFocusLost
 		})
 	})
-	local clanNameDisplay = not localPlayer_2
+	local clanNameDisplay = not isOwnerEditing
 	if clanNameDisplay then
 		local clanNameContainerProps = {
 			backgroundTransparency = 1
@@ -452,7 +453,7 @@ function InfoComponent.render(self)
 	wlLabelProps.TextColor3 = Color3.new(0.7, 0.7, 0.7)
 	wlContainerChildren.Text = createElement("TextLabel", wlLabelProps)
 	statsChildren.WLRatio = createElement(PaddedContainer, wlContainerProps, wlContainerChildren)
-	statsChildren.RankedBattleTitleContainer = isAdminOfCurrentClan and createElement(PaddedContainer, {
+	statsChildren.RankedBattleTitleContainer = canEditCurrentClan and createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.new(1, 0, 0.1, 0),
 		position = UDim2.new(0, 0, 0.6, 0),
@@ -471,7 +472,7 @@ function InfoComponent.render(self)
 		})
 	})
 	local readyUpContainer
-	if isAdminOfCurrentClan then
+	if canEditCurrentClan then
 		local readyUpContainerProps = {
 			backgroundTransparency = 1,
 			size = UDim2.new(1, 0, 0.15, 0),
@@ -526,7 +527,7 @@ function InfoComponent.render(self)
 			disabled = self.props.networkMutexLocked
 		})
 	}) else false
-	statsChildren.UnrankedBattleTitleContainer = isAdminOfCurrentClan_2 and createElement(PaddedContainer, {
+	statsChildren.UnrankedBattleTitleContainer = canStartRankedBattle and createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.new(1, 0, 0.15, 0),
 		position = UDim2.new(0, 0, 0.7, 0),
@@ -544,7 +545,7 @@ function InfoComponent.render(self)
 			TextColor3 = Color3.new(255/255, 255/255, 255/255)
 		})
 	})
-	statsChildren.Battle = isAdminOfCurrentClan_2 and createElement(PaddedContainer, {
+	statsChildren.Battle = canStartRankedBattle and createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(1, 0.15),
 		position = UDim2.fromScale(0, 0.85),

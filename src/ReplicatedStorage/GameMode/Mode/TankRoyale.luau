@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -20,15 +21,15 @@ local v1 = Color3.fromRGB(4, 141, 39)
 local v2 = Color3.fromRGB(255, 255, 255)
 local v3 = if RunUtils.isStudio() then 20 else 600
 return {
-	launch = function(p1, p2) --[[ Name: launch | Line: 30 | Upvalues: Binder (copy), Maid (copy), CircleAction (copy), BriefcaseUtils (copy), RunService (copy), Roact (copy), Audio (copy), Players (copy), v2 (copy), v1 (copy), ReplicatedStorage (copy), CharacterUtils (copy), MinimapService (copy), LevelUISystem (copy), CollectionService (copy), SpectateConsts (copy), v3 (ref), Interval (copy) ]]
-		local v12 = Binder.new("RoyaleBriefcase", function(p1) --[[ Line: 31 | Upvalues: Maid (ref), CircleAction (ref), BriefcaseUtils (ref), RunService (ref) ]]
+	launch = function(p1, p2)
+		local v12 = Binder.new("RoyaleBriefcase", function(p1)
 			local v1 = Maid.new()
 			v1:GiveTask(CircleAction.Add({
 				Name = "Open Briefcase",
 				Timed = true,
 				Duration = 0.5,
 				Dist = 16,
-				Callback = function(p12, p2) --[[ Name: action | Line: 33 | Upvalues: p1 (copy) ]]
+				Callback = function(p12, p2)
 					if p2 then
 						p1:FindFirstChild("ClaimRemote"):FireServer()
 					end
@@ -37,7 +38,7 @@ return {
 				Part = p1.PrimaryPart,
 				ValidRoot = p1
 			}, p1))
-			local function updatePosition() --[[ Line: 52 | Upvalues: p1 (copy), v1 (copy), BriefcaseUtils (ref) ]]
+			local function updatePosition()
 				local v12 = p1:GetAttribute("BriefcaseOrigin")
 				local v2 = p1:GetAttribute("BriefcaseTarget")
 				local v3 = p1:GetAttribute("BriefcaseLandNormal")
@@ -68,13 +69,13 @@ return {
 		local v8, v9 = Roact.createBinding(0)
 		local v10 = false
 		local v11 = os.clock()
-		local function processCharacterInStorm(p12) --[[ Line: 86 | Upvalues: v11 (copy), v10 (ref), Audio (ref), Players (ref), p1 (copy), RunService (ref), v2 (ref), v1 (ref), RoyaleColorCorrection (copy) ]]
+		local function processCharacterInStorm(p12)
 			if os.clock() - v11 < 5 then
 			elseif v10 ~= p12 then
 				v10 = p12
 				Audio.ObjectLocal(Players.LocalPlayer, 3217484827)
 				local v12 = os.clock()
-				p1.animateStormColor = RunService.Heartbeat:Connect(function() --[[ Line: 100 | Upvalues: v12 (copy), p1 (ref), p12 (copy), v2 (ref), v1 (ref), RoyaleColorCorrection (ref) ]]
+				p1.animateStormColor = RunService.Heartbeat:Connect(function()
 					local count = (os.clock() - v12) / 2
 					if count >= 1 then
 						p1.animateStormColor = nil
@@ -93,7 +94,7 @@ return {
 		Mesh.VertexColor = Vector3.new(v1.R, v1.G, v1.B)
 		v122.Parent = workspace
 		p1:GiveTask(v122)
-		p1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 122 | Upvalues: v22 (copy), p2 (copy), v32 (copy), v4 (copy), v5 (copy), v122 (copy), CharacterUtils (ref), Players (ref), processCharacterInStorm (copy) ]]
+		p1:GiveTask(RunService.Heartbeat:Connect(function()
 			local v1 = v22:getValue()
 			local v2 = p2:GetAttribute("StormWorldPosition")
 			if v2 then
@@ -114,12 +115,12 @@ return {
 				processCharacterInStorm(if sum < ((v52.Position - v1) * Vector3.new(1, 0, 1)).Magnitude then v52.Parent:GetAttribute("BattleRoyaleAlive") == true else false)
 			end
 		end))
-		local function updatePositionTarget() --[[ Line: 147 | Upvalues: v7 (copy), p2 (copy) ]]
+		local function updatePositionTarget()
 			v7(p2:GetAttribute("StormWorldPositionTarget") or Vector3.new(0, 0, 0))
 		end
 		p2:GetAttributeChangedSignal("StormWorldPositionTarget"):Connect(updatePositionTarget)
 		v7(p2:GetAttribute("StormWorldPositionTarget") or Vector3.new(0, 0, 0))
-		local function updateRadiusTarget() --[[ Line: 152 | Upvalues: v9 (copy), p2 (copy) ]]
+		local function updateRadiusTarget()
 			v9(p2:GetAttribute("StormWorldRadiusTarget") or 0)
 		end
 		p2:GetAttributeChangedSignal("StormWorldRadiusTarget"):Connect(updateRadiusTarget)
@@ -149,7 +150,7 @@ return {
 		v13.Stats.Players.TextLabel.TextColor3 = Color3.fromRGB(0, 255, 51)
 		v13.Stats.Time.TextLabel.TextColor3 = Color3.fromRGB(0, 255, 51)
 		v13.Stats.Visible = true
-		local function updatePlayersAlive() --[[ Line: 189 | Upvalues: v13 (copy), CollectionService (ref), SpectateConsts (ref) ]]
+		local function updatePlayersAlive()
 			v13.Stats.Players.TextLabel.Text = tostring(#CollectionService:GetTagged(SpectateConsts.SPECTATE_TAG_NAME))
 		end
 		v13.Stats.Players.TextLabel.Text = tostring(#CollectionService:GetTagged(SpectateConsts.SPECTATE_TAG_NAME))
@@ -157,7 +158,7 @@ return {
 		p1:GiveTask(CollectionService:GetInstanceRemovedSignal(SpectateConsts.SPECTATE_TAG_NAME):Connect(updatePlayersAlive))
 		local v15 = v3
 		local v16 = p2:GetAttribute("GameModeBornAt")
-		p1:GiveTask(Interval.every(1):Connect(function() --[[ Line: 198 | Upvalues: v16 (copy), v15 (copy), v13 (copy) ]]
+		p1:GiveTask(Interval.every(1):Connect(function()
 			local v1 = v15 - (workspace:GetServerTimeNow() - v16)
 			if v1 < 0 then
 				v1 = 0

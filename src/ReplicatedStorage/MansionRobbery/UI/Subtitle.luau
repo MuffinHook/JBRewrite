@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Roact = require(ReplicatedStorage.Roact)
@@ -8,11 +9,11 @@ v1.defaultProps = {
 	charPerSecond = 25,
 	fontFace = Font.fromName("Merriweather", Enum.FontWeight.Heavy, Enum.FontStyle.Normal)
 }
-function v1.init(p1) --[[ Line: 12 | Upvalues: Maid (copy), Roact (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	p1.labelRef = Roact.createRef()
 end
-function v1.render(p1) --[[ Line: 16 | Upvalues: createElement (copy), Roact (copy) ]]
+function v1.render(p1)
 	return createElement("Frame", {
 		Size = UDim2.new(1, 0, 1, 0),
 		BackgroundTransparency = 1
@@ -33,18 +34,18 @@ function v1.render(p1) --[[ Line: 16 | Upvalues: createElement (copy), Roact (co
 		})
 	})
 end
-function v1._write(p1) --[[ Line: 37 | Upvalues: TypeWriteLabel (copy) ]]
+function v1._write(p1)
 	p1.maid.typewrite = TypeWriteLabel(p1.props.text, p1.labelRef:getValue(), p1.props.charPerSecond, p1.props.maxVisibleGraphemeCallback)
 end
-function v1.didMount(p1) --[[ Line: 45 ]]
+function v1.didMount(p1)
 	p1:_write()
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 48 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p1.props.text ~= p2.text then
 		p1:_write()
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 53 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v1

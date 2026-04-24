@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local CollectionService = game:GetService("CollectionService")
 local v1 = nil
-local function GetById(p1) --[[ Line: 6 | Upvalues: v1 (ref) ]]
+local function GetById(p1)
 	for i = #v1, 1, -1 do
 		if v1[i].Id == p1 then
 			return i
@@ -19,7 +20,7 @@ local t = {
 }
 local v2 = nil
 local v3 = nil
-local function NetSyncReplicateSingle(p1) --[[ Line: 22 | Upvalues: v1 (ref), t (copy), CollectionService (copy) ]]
+local function NetSyncReplicateSingle(p1)
 	local v12 = p1
 	local Id = v12.Id
 	local v2 = false
@@ -46,7 +47,7 @@ local function NetSyncReplicateSingle(p1) --[[ Line: 22 | Upvalues: v1 (ref), t 
 		local v6 = ("NetSync_%d"):format(v12.Id)
 		if not v12.InstanceAddedSignal then
 			v12.InstanceAddedSignal = CollectionService:GetInstanceAddedSignal(v6)
-			local function InstanceAdded(p1) --[[ Line: 44 | Upvalues: v12 (ref), t (ref) ]]
+			local function InstanceAdded(p1)
 				v12.Inst = p1
 				t.InstAddedSignal:Fire(v12)
 			end
@@ -60,13 +61,13 @@ local function NetSyncReplicateSingle(p1) --[[ Line: 22 | Upvalues: v1 (ref), t 
 		end
 		if not v12.InstanceRemovedSignal then
 			v12.InstanceRemovedSignal = CollectionService:GetInstanceRemovedSignal(v6)
-			v12.InstanceRemovedSignal:Connect(function() --[[ Line: 55 | Upvalues: t (ref), v12 (ref) ]]
+			v12.InstanceRemovedSignal:Connect(function()
 				t.InstRemovedSignal:Fire(v12)
 			end)
 		end
 	end
 end
-local function NetSyncReplicateDestroy(p1) --[[ Line: 61 | Upvalues: v1 (ref), t (copy) ]]
+local function NetSyncReplicateDestroy(p1)
 	assert(v1)
 	local v2 = false
 	for i = #v1, 1, -1 do
@@ -78,13 +79,13 @@ local function NetSyncReplicateDestroy(p1) --[[ Line: 61 | Upvalues: v1 (ref), t
 	t.RemovedSignal:Fire((table.remove(v1, (assert(v2)))))
 	return false
 end
-local function NetSyncReplicateAll(p1) --[[ Line: 68 | Upvalues: NetSyncReplicateSingle (copy) ]]
+local function NetSyncReplicateAll(p1)
 	for i = 1, #p1 do
 		NetSyncReplicateSingle(p1[i])
 	end
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 73 | Upvalues: v1 (ref), v2 (ref), v3 (ref), NetSyncReplicateSingle (copy), NetSyncReplicateDestroy (copy), NetSyncReplicateAll (copy) ]]
+	Init = function(p1)
 		v1 = {}
 		local em = p1.em
 		v2 = p1.Event

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -5,17 +6,17 @@ local ContextMessageUI = require(ReplicatedStorage.Game.ContextMessage.ContextMe
 local t = {}
 t.__index = t
 t.__ClassName = "BaseTutorial"
-function t.new(p1, p2) --[[ Line: 9 | Upvalues: t (copy), Maid (copy), ContextMessageUI (copy) ]]
+function t.new(p1, p2)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
 	t2._remoteEvent = p1:WaitForChild("RemoteEvent")
 	t2.Messages = p2
-	t2._maid:GiveTask(t2._remoteEvent.OnClientEvent:Connect(function(...) --[[ Line: 18 | Upvalues: t2 (copy) ]]
+	t2._maid:GiveTask(t2._remoteEvent.OnClientEvent:Connect(function(...)
 		t2:_onClientEvent(...)
 	end))
 	t2._runningValue = p1:WaitForChild("Running")
-	t2._maid:GiveTask(t2._runningValue:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 24 | Upvalues: t2 (copy), ContextMessageUI (ref) ]]
+	t2._maid:GiveTask(t2._runningValue:GetPropertyChangedSignal("Value"):Connect(function()
 		if t2._runningValue.Value then
 			t2:SetEdge(t2._edgeValue.Value)
 		else
@@ -27,19 +28,19 @@ function t.new(p1, p2) --[[ Line: 9 | Upvalues: t (copy), Maid (copy), ContextMe
 	end))
 	t2._edgeValue = p1:WaitForChild("Edge")
 	t2:SetEdge(t2._edgeValue.Value)
-	t2._maid:GiveTask(t2._edgeValue:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 40 | Upvalues: t2 (copy) ]]
+	t2._maid:GiveTask(t2._edgeValue:GetPropertyChangedSignal("Value"):Connect(function()
 		t2:SetEdge(t2._edgeValue.Value)
 	end))
 	return t2
 end
-function t.SetEdge(p1, p2) --[[ Line: 48 | Upvalues: ContextMessageUI (copy), Interval (copy) ]]
+function t.SetEdge(p1, p2)
 	if p1:GetRunning() then
 		p1._maid.updatePosition = nil
 		local v1 = p1.Messages[p2]
 		if v1 ~= nil then
 			if not ContextMessageUI.isOpen() then
 				ContextMessageUI.open()
-				ContextMessageUI._maid:GiveTask(ContextMessageUI.onCloseClicked:Connect(function() --[[ Line: 58 | Upvalues: p1 (copy) ]]
+				ContextMessageUI._maid:GiveTask(ContextMessageUI.onCloseClicked:Connect(function()
 					p1._remoteEvent:FireServer()
 				end))
 			end
@@ -51,11 +52,11 @@ function t.SetEdge(p1, p2) --[[ Line: 48 | Upvalues: ContextMessageUI (copy), In
 				elseif v2 == "Instance" and v1.position:IsA("Vector3Value") then
 					local Position = v1.Position
 					ContextMessageUI.setWorldMarkerPosition(Position.Value)
-					p1._maid.updatePosition = Position.Changed:Connect(function() --[[ Line: 70 | Upvalues: ContextMessageUI (ref), Position (copy) ]]
+					p1._maid.updatePosition = Position.Changed:Connect(function()
 						ContextMessageUI.setWorldMarkerPosition(Position.Value)
 					end)
 				elseif v2 == "function" then
-					local function update() --[[ Line: 74 | Upvalues: v1 (copy), ContextMessageUI (ref) ]]
+					local function update()
 						ContextMessageUI.setWorldMarkerPosition((v1.position()))
 					end
 					p1._maid.updatePosition = Interval.every(5):Connect(update)
@@ -68,11 +69,11 @@ function t.SetEdge(p1, p2) --[[ Line: 48 | Upvalues: ContextMessageUI (copy), In
 		end
 	end
 end
-function t.GetRunning(p1) --[[ Line: 87 ]]
+function t.GetRunning(p1)
 	return p1._runningValue.Value
 end
-function t._onClientEvent(p1) --[[ Line: 90 ]] end
-function t.Destroy(p1) --[[ Line: 91 ]]
+function t._onClientEvent(p1)  end
+function t.Destroy(p1)
 	assert(p1._maid)
 	p1._maid:Destroy()
 	p1._maid = nil

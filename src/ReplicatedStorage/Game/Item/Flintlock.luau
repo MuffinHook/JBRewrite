@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Joint = require(ReplicatedStorage.Std.Joint)
@@ -6,7 +7,7 @@ local RayCast = require(ReplicatedStorage.Module.RayCast)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local Gun = require(script.Parent.Gun)
 local v2 = CFrame.new()
-local function FromAxisAngle(p1) --[[ Line: 12 | Upvalues: v2 (copy) ]]
+local function FromAxisAngle(p1)
 	local X = p1.X
 	local Y = p1.Y
 	local Z = p1.Z
@@ -23,13 +24,13 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.new(p1, p2, p3) --[[ Line: 27 | Upvalues: Gun (copy), t (copy) ]]
+function t.new(p1, p2, p3)
 	local v1 = Gun.new(p1, p2, p3)
 	setmetatable(v1, t)
 	v1:Setup(p3)
 	return v1
 end
-function t.SetupModel(p1) --[[ Line: 34 | Upvalues: Gun (copy), Joint (copy), Spring (copy) ]]
+function t.SetupModel(p1)
 	Gun.SetupModel(p1)
 	local Lever = p1.Model.Motion.Lever
 	local v1 = Joint.Motor(Lever, p1.BoundingBox)
@@ -40,13 +41,13 @@ function t.SetupModel(p1) --[[ Line: 34 | Upvalues: Gun (copy), Joint (copy), Sp
 	p1.SpringLever = v2
 	p1.SpringKnockback = v3
 end
-function t.UpdateItemSprings(p1) --[[ Line: 49 | Upvalues: Gun (copy) ]]
+function t.UpdateItemSprings(p1)
 	Gun.UpdateItemSprings(p1)
 	p1.LeverPosition = p1.SpringLever:Update()
 	p1.KnockbackPosition = p1.SpringKnockback:Update()
 end
 local v3 = os.clock()
-function t.UpdateItemJoints(p1) --[[ Line: 59 | Upvalues: Gun (copy), FromAxisAngle (copy), VehicleUtils (copy), v3 (ref) ]]
+function t.UpdateItemJoints(p1)
 	Gun.UpdateItemJoints(p1)
 	p1.MotorLever.C1 = FromAxisAngle(p1.LeverPosition)
 	if p1.KnockbackPosition > 0.1 and not (VehicleUtils.GetLocalVehiclePacket() or p1.Humanoid.Sit) then
@@ -54,16 +55,16 @@ function t.UpdateItemJoints(p1) --[[ Line: 59 | Upvalues: Gun (copy), FromAxisAn
 	end
 	v3 = os.clock()
 end
-function t.SetupArmWelds(p1) --[[ Line: 69 | Upvalues: Joint (copy) ]]
+function t.SetupArmWelds(p1)
 	Joint.Weld(p1.Model.Skeleton.RightArm, p1.BoundingBox)
 	p1.Model.Skeleton.RightArm.Anchored = false
 end
-function t.UpdateArmIK(p1) --[[ Line: 73 ]]
+function t.UpdateArmIK(p1)
 	local IK = p1.IK
 	IK.RightArm = p1.Model.Skeleton.RightArm.Position
 	IK.RightAngle = p1.Config.Motion.RightElbowAngle
 end
-function t.ShootSound(p1, p2) --[[ Line: 79 | Upvalues: Audio (copy), RayCast (copy) ]]
+function t.ShootSound(p1, p2)
 	if not p2 then
 		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.flintlock_shoot, {
 			Pitch = 0.7,
@@ -75,12 +76,12 @@ function t.ShootSound(p1, p2) --[[ Line: 79 | Upvalues: Audio (copy), RayCast (c
 		end
 	end
 end
-function t.ReloadDropAmmoSound(p1) --[[ Line: 91 | Upvalues: Audio (copy) ]]
+function t.ReloadDropAmmoSound(p1)
 	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.flintlock_reload_open, {
 		RollOffMaxDistance = 129
 	})
 end
-function t.ReloadRefillAmmoSound(p1) --[[ Line: 96 | Upvalues: Audio (copy) ]]
+function t.ReloadRefillAmmoSound(p1)
 	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.flintlock_reload_close, {
 		RollOffMaxDistance = 129
 	})

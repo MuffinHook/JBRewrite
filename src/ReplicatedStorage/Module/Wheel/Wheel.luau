@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RayCast = require(ReplicatedStorage.Module.RayCast)
 local v1 = Vector3.new
@@ -8,7 +9,7 @@ local abs = math.abs
 local Angles = CFrame.Angles
 local t = {}
 t.__index = t
-function t.new(p1, p2) --[[ Line: 18 | Upvalues: t (copy) ]]
+function t.new(p1, p2)
 	assert(p1, "missing PartNode")
 	local v2 = setmetatable({}, t)
 	if not p2 then
@@ -46,37 +47,37 @@ function t.new(p1, p2) --[[ Line: 18 | Upvalues: t (copy) ]]
 	v2._applyForces = not p2
 	return v2
 end
-function t.SetSuspensionHeight(p1, p2) --[[ Line: 64 ]]
+function t.SetSuspensionHeight(p1, p2)
 	assert(p2)
 	p1.HeightSuspension = p2
 end
-function t.SetVisualRadius(p1, p2) --[[ Line: 68 ]]
+function t.SetVisualRadius(p1, p2)
 	assert(p2)
 	p1.RadiusVisual = p2
 end
-function t.SetSpringConstants(p1, p2, p3) --[[ Line: 72 ]]
+function t.SetSpringConstants(p1, p2, p3)
 	p1.Springk = p2
 	p1.SpringB = p3
 end
-function t.SetHorizontalFriction(p1, p2) --[[ Line: 75 ]]
+function t.SetHorizontalFriction(p1, p2)
 	p1.BHFric0 = p2
 end
-function t.SetForwardFriction(p1, p2) --[[ Line: 78 ]]
+function t.SetForwardFriction(p1, p2)
 	p1.BFFric0 = p2
 end
-function t.SetForwardFriction2(p1, p2) --[[ Line: 81 ]]
+function t.SetForwardFriction2(p1, p2)
 	p1.BFFric1 = p2
 end
-function t.SetVersion(p1, p2) --[[ Line: 84 ]]
+function t.SetVersion(p1, p2)
 	p1._version = p2
 end
-function t.SetApplyForces(p1, p2) --[[ Line: 87 ]]
+function t.SetApplyForces(p1, p2)
 	p1._applyForces = p2
 end
-function t.SetExternalGroundAccel(p1, p2) --[[ Line: 90 ]]
+function t.SetExternalGroundAccel(p1, p2)
 	p1._extGroundAccel = p2
 end
-function t.Update(p1, p2, p3) --[[ Line: 93 | Upvalues: Angles (copy), RayCast (copy), Dot (copy), clamp (copy), abs (copy), v1 (copy) ]]
+function t.Update(p1, p2, p3)
 	local PartNode = p1.PartNode
 	local VectorForce = p1.VectorForce
 	local Torque = p1.Torque
@@ -152,7 +153,7 @@ function t.Update(p1, p2, p3) --[[ Line: 93 | Upvalues: Angles (copy), RayCast (
 	p1.dx = v6
 	return v24, v21, z * p2
 end
-function t.Clear(p1) --[[ Line: 205 | Upvalues: v2 (copy) ]]
+function t.Clear(p1)
 	if p1.VectorForce then
 		p1.VectorForce.Force = v2
 	end
@@ -160,7 +161,7 @@ function t.Clear(p1) --[[ Line: 205 | Upvalues: v2 (copy) ]]
 		p1.Torque.Torque = v2
 	end
 end
-function t.Destroy(p1) --[[ Line: 213 ]]
+function t.Destroy(p1)
 	if p1.VectorForce then
 		p1.VectorForce:Destroy()
 		p1.VectorForce = nil

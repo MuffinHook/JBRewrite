@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local Flag = require(ReplicatedStorage.PersistentCrew.UI.Flag)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
-local function colorCompAvg(p1) --[[ Line: 8 ]]
+local function colorCompAvg(p1)
 	if p1 then
 		return (p1.R + p1.G + p1.B) / 3
 	else
@@ -12,7 +13,7 @@ local function colorCompAvg(p1) --[[ Line: 8 ]]
 	end
 end
 local v1 = Roact.PureComponent:extend("ClanRating")
-function v1.render(p1) --[[ Line: 16 | Upvalues: ColorUtils (copy), createElement (copy), PaddedContainer (copy), Flag (copy), Roact (copy) ]]
+function v1.render(p1)
 	local aspectRatio = p1.props.aspectRatio
 	if typeof(p1.props.clanRating) ~= "string" then
 		local v1 = error
@@ -131,7 +132,7 @@ function v1.render(p1) --[[ Line: 16 | Upvalues: ColorUtils (copy), createElemen
 			LineHeight = 1,
 			TextScaled = true,
 			TextColor3 = Color3.new(255/255, 255/255, 255/255),
-			[Roact.Event.Activated] = function() --[[ Line: 148 | Upvalues: p1 (copy) ]]
+			[Roact.Event.Activated] = function()
 				p1.props.attemptViewClanId(p1.props.ownerUserId)
 			end
 		})

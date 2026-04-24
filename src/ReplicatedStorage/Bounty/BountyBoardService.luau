@@ -13,60 +13,60 @@ function t.init()
 	t.updateBounties()
 	BountyData:GetPropertyChangedSignal("Value"):Connect(t.updateBounties)
 end
-local function thumbnailBust(p1)
-	return ("rbxthumb://type=AvatarHeadShot&id=%d&w=420&h=420"):format(p1)
+local function thumbnailBust(userId)
+	return ("rbxthumb://type=AvatarHeadShot&id=%d&w=420&h=420"):format(userId)
 end
-local function comma(p1)
-	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
-	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
+local function comma(numberStr)
+	local prefix, middleDigits, suffix = string.match(numberStr, "^([^%d]*%d)(%d*)(.-)$")
+	return prefix .. middleDigits:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. suffix
 end
-local function clearFrame(p1)
-	for v1, v2 in p1:GetChildren() do
-		if v2:IsA("Frame") then
-			v2:Destroy()
+local function clearFrame(parentFrame)
+	for _, child in parentFrame:GetChildren() do
+		if child:IsA("Frame") then
+			child:Destroy()
 		end
 	end
 end
-function t.updateGui(p1, p2)
-	local v1 = p1:IsDescendantOf(Players)
-	clearFrame(p1)
-	for i = 1, if v1 then 6 else 4 do
-		local v3 = ReplicatedStorage.Bounty.Res.PlayerFrame:Clone()
-		v3.Visible = true
-		v3.LayoutOrder = i
-		if v1 then
-			v3.Size = UDim2.new(0.28, 0, 0.5, 0)
-			v3.BountyText.TextScaled = true
+function t.updateGui(boardFrame, bountiesData)
+	local isPlayerFrame = boardFrame:IsDescendantOf(Players)
+	clearFrame(boardFrame)
+	for i = 1, if isPlayerFrame then 6 else 4 do
+		local playerFrame = ReplicatedStorage.Bounty.Res.PlayerFrame:Clone()
+		playerFrame.Visible = true
+		playerFrame.LayoutOrder = i
+		if isPlayerFrame then
+			playerFrame.Size = UDim2.new(0.28, 0, 0.5, 0)
+			playerFrame.BountyText.TextScaled = true
 		end
-		local v4 = p2[i]
-		if v4 then
-			v3.NameText.Text = Players:GetPlayerByUserId(v4.UserId).DisplayName
-			local v6, v7, v8 = string.match(v4.Bounty, "^([^%d]*%d)(%d*)(.-)$")
-			v3.BountyText.Text = "$" .. v6 .. v7:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v8
-			v3.ImageLabel.Image = ("rbxthumb://type=AvatarHeadShot&id=%d&w=420&h=420"):format(v4.UserId)
+		local bountyData = bountiesData[i]
+		if bountyData then
+			playerFrame.NameText.Text = Players:GetPlayerByUserId(bountyData.UserId).DisplayName
+			local prefix, middleDigits, suffix = string.match(bountyData.Bounty, "^([^%d]*%d)(%d*)(.-)$")
+			playerFrame.BountyText.Text = "$" .. prefix .. middleDigits:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. suffix
+			playerFrame.ImageLabel.Image = ("rbxthumb://type=AvatarHeadShot&id=%d&w=420&h=420"):format(bountyData.UserId)
 		else
-			v3:ClearAllChildren()
-			v3.BackgroundTransparency = 1
+			playerFrame:ClearAllChildren()
+			playerFrame.BackgroundTransparency = 1
 		end
-		v3.Parent = p1
+		playerFrame.Parent = boardFrame
 	end
 end
-function t.getTopBounties(p1)
-	local t2 = {}
-	for v1, v2 in t.Bounties do
-		if p1 <= #t2 then
+function t.getTopBounties(maxCount)
+	local topBounties = {}
+	for _, bountyData in t.Bounties do
+		if maxCount <= #topBounties then
 			break
 		end
-		table.insert(t2, v2)
+		table.insert(topBounties, bountyData)
 	end
-	return t2
+	return topBounties
 end
 function t.updateBounties()
 	table.clear(t.Bounties)
 	t.Bounties = HttpService:JSONDecode(BountyData.Value)
 	t.onBountiesUpdated:Fire(t.Bounties)
-	for v1, v2 in CollectionService:GetTagged(BountyConsts.BOARD_LIST_TAG_NAME) do
-		t.updateGui(v2, (t.getTopBounties(4)))
+	for _, boardFrame in CollectionService:GetTagged(BountyConsts.BOARD_LIST_TAG_NAME) do
+		t.updateGui(boardFrame, (t.getTopBounties(4)))
 	end
 end
 return t

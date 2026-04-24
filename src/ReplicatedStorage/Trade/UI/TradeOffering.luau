@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
@@ -16,13 +17,13 @@ local v1 = Roact.PureComponent:extend("TradeOffering")
 v1.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0)
 }
-function v1.init(p1) --[[ Line: 21 | Upvalues: Maid (copy), Roact (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	local v1, v2 = Roact.createBinding(0)
 	p1.arrowSine = v1
 	p1.updateArrowSine = v2
 end
-function v1.render(p1) --[[ Line: 25 | Upvalues: ColorUtils (copy), TradeConsts (copy), Dictionary (copy), createElement (copy), PlayerTitle (copy), Grid (copy), TradeCard (copy), TradeButton (copy), TradeChat (copy) ]]
+function v1.render(p1)
 	local v1 = Color3.new(51/255, 51/255, 51/255)
 	if p1.props.traderMe.ready then
 		v1 = Color3.fromRGB(0, 153, 59)
@@ -42,7 +43,7 @@ function v1.render(p1) --[[ Line: 25 | Upvalues: ColorUtils (copy), TradeConsts 
 		local v7 = #p1.props.traderMe.offerItems
 		if i <= v7 then
 			table.insert(t, Dictionary.merge(p1.props.traderMe.offerItems[i], {
-				onClick = function() --[[ Name: onClick | Line: 69 | Upvalues: p1 (copy), i (copy) ]]
+				onClick = function()
 					p1.props.removeTraderMeOfferItem(i)
 				end
 			}))
@@ -96,7 +97,7 @@ function v1.render(p1) --[[ Line: 25 | Upvalues: ColorUtils (copy), TradeConsts 
 				ImageColor3 = v1,
 				Image = "rbxassetid://9529821938",
 				Size = UDim2.new(0.13986013986013987, 0, 0.07459207459207459, 0),
-				Position = p1.arrowSine:map(function(p1) --[[ Line: 128 ]]
+				Position = p1.arrowSine:map(function(p1)
 					return UDim2.new(0, 0, 0.4627039627039627 - 0.07459207459207459 * p1 - 0.005, 0)
 				end)
 			}),
@@ -105,7 +106,7 @@ function v1.render(p1) --[[ Line: 25 | Upvalues: ColorUtils (copy), TradeConsts 
 				ImageColor3 = v4,
 				Image = "rbxassetid://9529821938",
 				Size = UDim2.new(0.13986013986013987, 0, 0.07459207459207459, 0),
-				Position = p1.arrowSine:map(function(p1) --[[ Line: 137 ]]
+				Position = p1.arrowSine:map(function(p1)
 					return UDim2.new(0.8601398601398601, 0, 0.4627039627039627 + 0.07459207459207459 * p1 + 0.005, 0)
 				end),
 				Rotation = 180
@@ -259,10 +260,10 @@ function v1.render(p1) --[[ Line: 25 | Upvalues: ColorUtils (copy), TradeConsts 
 })
 	return createElement("Frame", t3, t4)
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 304 | Upvalues: Roact (copy), Interval (copy) ]]
+function v1.didUpdate(p1, p2, p3)
 	if p2.traderMe.ready ~= p1.props.traderMe.ready or p2.traderThem.ready ~= p1.props.traderThem.ready then
 		local v1 = os.clock()
-		local function update(p12) --[[ Line: 310 | Upvalues: v1 (copy), p1 (copy), Roact (ref) ]]
+		local function update(p12)
 			local v12 = p12 - (os.clock() - v1)
 			if v12 < 0 then
 				p1:setState({
@@ -277,14 +278,14 @@ function v1.didUpdate(p1, p2, p3) --[[ Line: 304 | Upvalues: Roact (copy), Inter
 		end
 		if p1.props.traderMe.ready and p1.props.traderThem.ready then
 			update(5)
-			p1.maid.countdown = Interval.every(1):Connect(function() --[[ Line: 328 | Upvalues: update (copy) ]]
+			p1.maid.countdown = Interval.every(1):Connect(function()
 				update(5)
 			end)
 			return
 		end
 		if p2.traderMe.ready and not p1.props.traderMe.ready then
 			update(1)
-			p1.maid.countdown = Interval.every(1):Connect(function() --[[ Line: 334 | Upvalues: update (copy) ]]
+			p1.maid.countdown = Interval.every(1):Connect(function()
 				update(1)
 			end)
 			return
@@ -295,12 +296,12 @@ function v1.didUpdate(p1, p2, p3) --[[ Line: 304 | Upvalues: Roact (copy), Inter
 		p1.maid.countdown = nil
 	end
 end
-function v1.didMount(p1) --[[ Line: 345 | Upvalues: RunService (copy) ]]
-	p1.maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 346 | Upvalues: p1 (copy) ]]
+function v1.didMount(p1)
+	p1.maid:GiveTask(RunService.Heartbeat:Connect(function()
 		p1.updateArrowSine(math.sin(os.clock() * 3) * 0.5 + 0.5)
 	end))
 end
-function v1.willUnmount(p1) --[[ Line: 351 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v1

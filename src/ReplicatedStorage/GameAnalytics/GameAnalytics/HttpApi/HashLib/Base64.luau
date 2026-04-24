@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local list = {}
 local t = {}
 for i = 65, 90 do
@@ -25,7 +26,7 @@ local t2 = {}
 local rshift = bit32.rshift
 local lshift = bit32.lshift
 local band = bit32.band
-function t2.Encode(p1) --[[ Line: 38 | Upvalues: rshift (copy), band (copy), lshift (copy), list (copy) ]]
+function t2.Encode(p1)
 	local v1 = 0
 	local t = {}
 	for i = 1, #p1, 3 do
@@ -54,7 +55,7 @@ function t2.Encode(p1) --[[ Line: 38 | Upvalues: rshift (copy), band (copy), lsh
 	end
 	return table.concat(t2)
 end
-function t2.Decode(p1) --[[ Line: 86 | Upvalues: t (copy), lshift (copy), rshift (copy), band (copy) ]]
+function t2.Decode(p1)
 	local count = 0
 	local t2 = {}
 	for i = 1, #p1, 4 do

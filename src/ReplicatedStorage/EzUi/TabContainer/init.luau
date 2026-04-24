@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local v1 = script:FindFirstAncestor("EzUi")
 local Roact = require(v1.Parent.Roact)
 local createElement = Roact.createElement
@@ -13,11 +14,11 @@ v2.defaultProps = {
 	size = UDim2.new(0.5, 0, 0.5, 0),
 	isSmallScreen = true
 }
-function v2.init(p1) --[[ Line: 18 | Upvalues: Roact (copy) ]]
+function v2.init(p1)
 	p1.pageLayoutRef = Roact.createRef()
 	p1.data = {}
 end
-function v2.render(p1) --[[ Line: 22 | Upvalues: Roact (copy), Maid (copy), AccelTween (copy), RunService (copy), createElement (copy), TabPage (copy), Tab (copy), ColorUtils (copy), Dictionary (copy) ]]
+function v2.render(p1)
 	local v1 = if p1.props.isSmallScreen then 1 else 4
 	local v2 = #p1.props.pages
 	local t = {}
@@ -42,7 +43,7 @@ function v2.render(p1) --[[ Line: 22 | Upvalues: Roact (copy), Maid (copy), Acce
 			v6.scaleXAccelTween.p = v5
 		end
 		v6.scaleXAccelTween.t = v5
-		v6.maid.scaleXUpdate = RunService.Heartbeat:Connect(function() --[[ Line: 42 | Upvalues: v6 (ref) ]]
+		v6.maid.scaleXUpdate = RunService.Heartbeat:Connect(function()
 			if v6.scaleXAccelTween.rtime == 0 then
 				v6.maid.scaleXUpdate = nil
 			end
@@ -63,7 +64,7 @@ function v2.render(p1) --[[ Line: 22 | Upvalues: Roact (copy), Maid (copy), Acce
 			paddingX = v9,
 			active = currentPage,
 			layoutOrder = v.layoutOrder,
-			onClick = function() --[[ Name: onClick | Line: 66 | Upvalues: v (copy), Roact (ref), p1 (copy) ]]
+			onClick = function()
 				local v1 = v[Roact.Ref]:getValue()
 				if p1.props.currentPage ~= v1 then
 					p1.props.updatePage(v1)
@@ -115,7 +116,7 @@ function v2.render(p1) --[[ Line: 22 | Upvalues: Roact (copy), Maid (copy), Acce
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				EasingStyle = Enum.EasingStyle.Quad,
 				TweenTime = 0.2,
-				[Roact.Change.CurrentPage] = function(p12) --[[ Line: 128 | Upvalues: p1 (copy) ]]
+				[Roact.Change.CurrentPage] = function(p12)
 					local CurrentPage = p12.CurrentPage
 					if p1.props.currentPage ~= CurrentPage then
 						p1.props.updatePage(CurrentPage)
@@ -126,12 +127,12 @@ function v2.render(p1) --[[ Line: 22 | Upvalues: Roact (copy), Maid (copy), Acce
 		}, t))
 	})
 end
-function v2.didUpdate(p1, p2, p3) --[[ Line: 140 ]]
+function v2.didUpdate(p1, p2, p3)
 	if p1.props.currentPage ~= p3.currentPage and p1.pageLayoutRef:getValue().CurrentPage ~= p1.props.currentPage then
 		p1.pageLayoutRef:getValue():JumpTo(p1.props.currentPage)
 	end
 end
-function v2.willUnmount(p1) --[[ Line: 147 ]]
+function v2.willUnmount(p1)
 	for k, v in pairs(p1.data) do
 		v.maid:DoCleaning()
 	end

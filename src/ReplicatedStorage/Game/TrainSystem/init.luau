@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Time = require(ReplicatedStorage.Module.Time)
@@ -24,7 +25,7 @@ local MoveTrain = TrainSystemUtils.MoveTrain
 local v4 = RaycastParams.new()
 v4.FilterType = Enum.RaycastFilterType.Include
 v4.IgnoreWater = true
-local function PopulateCar(p1, p2, p3) --[[ Line: 33 | Upvalues: v2 (ref), t (copy) ]]
+local function PopulateCar(p1, p2, p3)
 	local Base = p3.Base
 	local v1 = require(p2)
 	p1.Model = p3
@@ -42,7 +43,7 @@ local function PopulateCar(p1, p2, p3) --[[ Line: 33 | Upvalues: v2 (ref), t (co
 	p1.Loaded = true
 	return p1
 end
-local function RenderTrain(p1, p2) --[[ Line: 55 ]]
+local function RenderTrain(p1, p2)
 	local v1 = 0
 	for i = #p1.Cars, 1, -1 do
 		local v2 = p1.Cars[i]
@@ -53,7 +54,7 @@ local function RenderTrain(p1, p2) --[[ Line: 55 ]]
 	end
 end
 local t2 = {}
-local function GetSystemById(p1) --[[ Line: 66 | Upvalues: t2 (copy) ]]
+local function GetSystemById(p1)
 	for i = 1, #t2 do
 		if t2[i].Id == p1 then
 			return t2[i]
@@ -61,7 +62,7 @@ local function GetSystemById(p1) --[[ Line: 66 | Upvalues: t2 (copy) ]]
 	end
 	return false
 end
-local function GetCarById(p1, p2) --[[ Line: 74 ]]
+local function GetCarById(p1, p2)
 	for i = 1, #p1.Cars do
 		if p1.Cars[i].Id == p2 then
 			return p1.Cars[i]
@@ -70,7 +71,7 @@ local function GetCarById(p1, p2) --[[ Line: 74 ]]
 	return false
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 83 | Upvalues: v2 (ref), v3 (ref), v1 (ref), v4 (copy), ReplicatedStorage (copy), PopulateCar (copy), t2 (copy), Time (copy), CalculateDistanceAhead (copy), t (copy), CollectionService (copy), LocalPlayer (copy), JetPack (copy), MoveTrain (copy), RenderTrain (copy), VehicleUtils (copy), CurrentCamera (copy), RunService (copy) ]]
+	Init = function(p1)
 		local em = p1.em
 		v2 = p1.Event
 		v3 = em
@@ -81,7 +82,7 @@ return {
 		v4.FilterDescendantsInstances = { Trains }
 		local UnsafePositionReplication = ReplicatedStorage:FindFirstChild("UnsafePositionReplication")
 		local ChangePositionReplication = ReplicatedStorage:FindFirstChild("ChangePositionReplication")
-		local function PopulateTrain(p1) --[[ Line: 97 | Upvalues: ReplicatedStorage (ref), Trains (copy), PopulateCar (ref) ]]
+		local function PopulateTrain(p1)
 			for v1, v2 in next, p1.Cars do
 				v2.SystemId = p1.Id
 				local v3 = v2.Name
@@ -93,7 +94,7 @@ return {
 				task.wait()
 			end
 		end
-		function em.b9qhzm8t(p1) --[[ Line: 109 | Upvalues: t2 (ref), PopulateTrain (copy) ]]
+		function em.b9qhzm8t(p1)
 			local Id = p1.Id
 			local v1 = false
 			for i = 1, #t2 do
@@ -111,7 +112,7 @@ return {
 			return true
 		end
 		local v22 = 0
-		local function ReplicateTrain(p1) --[[ Line: 120 | Upvalues: t2 (ref), v22 (ref), v2 (ref), Time (ref), CalculateDistanceAhead (ref) ]]
+		local function ReplicateTrain(p1)
 			local SystemId = p1.SystemId
 			local v1 = false
 			for i = 1, #t2 do
@@ -146,12 +147,12 @@ return {
 				return false
 			end
 		end
-		function em.pvopv1ja(p1) --[[ Line: 165 | Upvalues: ReplicateTrain (copy) ]]
+		function em.pvopv1ja(p1)
 			for v1, v2 in next, p1 do
 				ReplicateTrain(v2)
 			end
 		end
-		function em.mwxdlqx0(p1) --[[ Line: 170 | Upvalues: t2 (ref), t (ref) ]]
+		function em.mwxdlqx0(p1)
 			for i = 1, #t2 do
 				local v1 = t2[i]
 				if v1.Id == p1 then
@@ -174,7 +175,7 @@ return {
 			end
 			return false
 		end
-		function em.ptiew0pw(p1, p2, p3) --[[ Line: 195 | Upvalues: t2 (ref) ]]
+		function em.ptiew0pw(p1, p2, p3)
 			local v1 = false
 			for i = 1, #t2 do
 				if t2[i].Id == p1 then
@@ -189,7 +190,7 @@ return {
 			assert(v2)
 			v2.BranchIndex = p3
 		end
-		function em.r0klh6da(p1) --[[ Line: 204 | Upvalues: t2 (ref) ]]
+		function em.r0klh6da(p1)
 			local v1 = false
 			for i = 1, #t2 do
 				if t2[i].Id == p1 then
@@ -216,19 +217,19 @@ return {
 		end
 		local t4 = {}
 		local t5 = {}
-		CollectionService:GetInstanceAddedSignal("ReplicateCharacterTrain"):Connect(function(p1) --[[ Line: 226 | Upvalues: t3 (copy), t5 (copy) ]]
+		CollectionService:GetInstanceAddedSignal("ReplicateCharacterTrain"):Connect(function(p1)
 			table.insert(t3, p1)
 			if t5[p1] then
 				task.cancel(t5[p1])
 				t5[p1] = nil
 			end
 		end)
-		CollectionService:GetInstanceRemovedSignal("ReplicateCharacterTrain"):Connect(function(p1) --[[ Line: 235 | Upvalues: t3 (copy), t5 (copy), t4 (copy) ]]
+		CollectionService:GetInstanceRemovedSignal("ReplicateCharacterTrain"):Connect(function(p1)
 			table.remove(t3, table.find(t3, p1))
 			if t5[p1] then
 				task.cancel(t5[p1])
 			end
-			t5[p1] = task.delay(2, function() --[[ Line: 245 | Upvalues: t4 (ref), p1 (copy), t5 (ref) ]]
+			t5[p1] = task.delay(2, function()
 				t4[p1] = nil
 				t5[p1] = nil
 			end)
@@ -237,7 +238,7 @@ return {
 		local v6 = nil
 		local v7 = os.clock()
 		local v8 = CFrame.new()
-		local function Stepped(p1) --[[ Line: 256 | Upvalues: t2 (ref), v5 (ref), t (ref), v6 (ref), LocalPlayer (ref), JetPack (ref), v4 (ref), MoveTrain (ref), RenderTrain (ref), VehicleUtils (ref), CurrentCamera (ref), UnsafePositionReplication (copy), v7 (ref), v8 (ref), t3 (copy), t4 (copy) ]]
+		local function Stepped(p1)
 			if #t2 <= 0 then
 				if v5 then
 					t.OnCarExited:Fire(v5)
@@ -358,7 +359,7 @@ return {
 			end
 		end
 		RunService.Heartbeat:Connect(Stepped)
-		t.OnCarEntered:Connect(function(p1) --[[ Line: 397 | Upvalues: LocalPlayer (ref), ChangePositionReplication (copy) ]]
+		t.OnCarEntered:Connect(function(p1)
 			if LocalPlayer.Character then
 				local v1 = nil
 				local v2 = p1.Base and p1.Base.CFrame
@@ -375,7 +376,7 @@ return {
 				end
 			end
 		end)
-		t.OnCarExited:Connect(function(p1, p2) --[[ Line: 415 | Upvalues: LocalPlayer (ref), ChangePositionReplication (copy) ]]
+		t.OnCarExited:Connect(function(p1, p2)
 			if LocalPlayer.Character then
 				for v1, v2 in LocalPlayer.Character:GetDescendants() do
 					if v2:IsA("BasePart") then

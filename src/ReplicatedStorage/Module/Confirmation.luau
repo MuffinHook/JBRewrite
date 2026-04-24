@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
@@ -8,7 +9,7 @@ local Signal = require(ReplicatedStorage.Std.Signal)
 local Localization = require(ReplicatedStorage.Module.Localization)
 local v1 = false
 local t = {}
-local function ProcessQueue() --[[ Line: 16 | Upvalues: t (copy), v1 (ref) ]]
+local function ProcessQueue()
 	if #t > 0 then
 		v1 = true
 		table.remove(t, 1):Hook()
@@ -16,38 +17,38 @@ local function ProcessQueue() --[[ Line: 16 | Upvalues: t (copy), v1 (ref) ]]
 		v1 = false
 	end
 end
-local function SelectIfGamepad(p1) --[[ Line: 26 | Upvalues: EzUtils (copy) ]]
+local function SelectIfGamepad(p1)
 	EzUtils.selectIfGamepad(p1)
 end
 local t2 = {}
 t2.__index = t2
-function t2.Init(p1) --[[ Line: 32 | Upvalues: ReplicatedStorage (copy), LocalPlayer (copy), t2 (copy), Localization (copy), GameUtil (copy), Settings (copy) ]]
+function t2.Init(p1)
 	local ConfirmationGui = ReplicatedStorage.StarterGui:FindFirstChild("ConfirmationGui")
 	ConfirmationGui.Parent = LocalPlayer.PlayerGui
 	t2.Gui = ConfirmationGui
 	ConfirmationGui.Confirmation.Background.ContainerButtons.ContainerYes.Button.Message.Text = Localization:FormatByKey("General.Yes")
 	ConfirmationGui.Confirmation.Background.ContainerButtons.ContainerNo.Button.Message.Text = Localization:FormatByKey("General.No")
-	function p1.em.p4rz6ffg(p1, p2) --[[ Line: 43 | Upvalues: t2 (ref) ]]
+	function p1.em.p4rz6ffg(p1, p2)
 		local v1 = t2.new(p1, p2)
-		v1.OnYes:Connect(function() --[[ Line: 46 | Upvalues: v1 (ref) ]]
+		v1.OnYes:Connect(function()
 			v1 = nil
 		end)
-		v1.OnNo:Connect(function() --[[ Line: 49 | Upvalues: v1 (ref) ]]
+		v1.OnNo:Connect(function()
 			v1 = nil
 		end)
 	end
-	GameUtil.OnTeamChanged:Connect(function(p1) --[[ Line: 54 | Upvalues: Settings (ref), t2 (ref) ]]
+	GameUtil.OnTeamChanged:Connect(function(p1)
 		t2.SetColor(Settings.TeamColor[p1])
 	end)
 	t2.SetColor(Settings.TeamColor[GameUtil.Team])
 end
-function t2.SetColor(p1) --[[ Line: 61 | Upvalues: t2 (copy) ]]
+function t2.SetColor(p1)
 	local Gui = t2.Gui
 	Gui.Confirmation.Background.ImageColor3 = p1
 	Gui.Confirmation.Background.ContainerButtons.ContainerYes.Button.ImageColor3 = p1
 	Gui.Confirmation.Background.ContainerButtons.ContainerNo.Button.ImageColor3 = p1
 end
-function t2.new(p1, p2) --[[ Line: 69 | Upvalues: t2 (copy), Maid (copy), Signal (copy), t (copy), v1 (ref) ]]
+function t2.new(p1, p2)
 	local t3 = {}
 	setmetatable(t3, t2)
 	t3.OptionSingleChoice = if p2 == nil then false else p2.SingleChoice
@@ -70,13 +71,13 @@ function t2.new(p1, p2) --[[ Line: 69 | Upvalues: t2 (copy), Maid (copy), Signal
 	end
 	return t3
 end
-function t2.Hook(p1) --[[ Line: 93 | Upvalues: t2 (copy), EzUtils (copy) ]]
+function t2.Hook(p1)
 	local Gui = t2.Gui
 	Gui.Enabled = true
 	Gui.Confirmation.Background.ContainerMessage.Message.Text = p1.Text
 	local Button = Gui.Confirmation.Background.ContainerButtons.ContainerYes.Button
 	EzUtils.selectIfGamepad(Button)
-	p1.Maid:GiveTask(Button.MouseButton1Down:Connect(function() --[[ Line: 100 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(Button.MouseButton1Down:Connect(function()
 		p1.OnYes:Fire()
 		p1:Destroy()
 	end))
@@ -84,13 +85,13 @@ function t2.Hook(p1) --[[ Line: 93 | Upvalues: t2 (copy), EzUtils (copy) ]]
 	ContainerNo.Visible = not p1.OptionSingleChoice
 	local Button_2 = ContainerNo.Button
 	if not p1.OptionSingleChoice then
-		p1.Maid:GiveTask(Button_2.MouseButton1Down:Connect(function() --[[ Line: 109 | Upvalues: p1 (copy) ]]
+		p1.Maid:GiveTask(Button_2.MouseButton1Down:Connect(function()
 			p1.OnNo:Fire()
 			p1:Destroy()
 		end))
 	end
 end
-function t2.Destroy(p1) --[[ Line: 115 | Upvalues: t2 (copy), t (copy), v1 (ref) ]]
+function t2.Destroy(p1)
 	if p1.Maid ~= nil then
 		t2.Gui.Enabled = false
 		p1.Maid:Destroy()

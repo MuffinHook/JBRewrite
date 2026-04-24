@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
 local v2 = Roact.Component:extend("TextBox")
@@ -8,7 +9,7 @@ v2.defaultProps = {
 	borderColor = Color3.new(0/255, 0/255, 0/255),
 	backgroundTransparency = 0
 }
-function v2.render(p1) --[[ Line: 16 | Upvalues: createElement (copy), Roact (copy) ]]
+function v2.render(p1)
 	return createElement("TextBox", {
 		BorderSizePixel = p1.props.borderSize,
 		BorderColor3 = p1.props.borderColor,

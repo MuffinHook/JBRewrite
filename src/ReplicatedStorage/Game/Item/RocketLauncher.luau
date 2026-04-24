@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -19,12 +20,12 @@ local SeekingMissileBinder = require(ReplicatedStorage.SeekingMissile.SeekingMis
 local Interval = require(ReplicatedStorage.Std.Interval)
 local Raycast = require(ReplicatedStorage.Std.Raycast)
 local Gun = require(script.Parent.Gun)
-local function RandomVector() --[[ Line: 25 ]]
+local function RandomVector()
 	local v1 = math.random() * 2 - 1
 	local v2 = math.random() * 2 - 1
 	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
 end
-local function attemptSetSightColor(p1, p2) --[[ Line: 28 ]]
+local function attemptSetSightColor(p1, p2)
 	local PlaneGui = p1.PlaneGui
 	local v1 = os.clock()
 	if not p1.lastSightsColorChange then
@@ -36,7 +37,7 @@ local function attemptSetSightColor(p1, p2) --[[ Line: 28 ]]
 		PlaneGui.Sights.ImageColor3 = p2
 	end
 end
-local function GetTargetPart(p1) --[[ Line: 43 | Upvalues: CollectionService (copy), JetConsts (copy), VehicleUtils (copy) ]]
+local function GetTargetPart(p1)
 	local Tip = p1.Model:FindFirstChild("Skeleton"):FindFirstChild("Tip")
 	local Position = Tip.Position
 	local LookVector = Tip.CFrame.LookVector
@@ -77,17 +78,17 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.new(p1, p2, p3) --[[ Line: 79 | Upvalues: Gun (copy), t (copy), RxInstanceUtils (copy), GunSystemConsts (copy), Interval (copy), GetTargetPart (copy), ReplicatedStorage (copy), Players (copy), RunService (copy), CurrentCamera (copy), RocketLauncherConsts (copy), Audio (copy) ]]
+function t.new(p1, p2, p3)
 	local v1 = Gun.new(p1, p2, p3)
 	setmetatable(v1, t)
 	v1:Setup(p3)
 	v1.maid = v1.Maid
-	v1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(v1.inventoryItemValue, GunSystemConsts.SHOOT_REMOTE_NAME, function(p1, p2) --[[ Line: 88 | Upvalues: v1 (copy) ]]
-		p2:GiveTask(p1.OnClientEvent:Connect(function(p1, p2, p3) --[[ Line: 90 | Upvalues: v1 (ref) ]]
+	v1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(v1.inventoryItemValue, GunSystemConsts.SHOOT_REMOTE_NAME, function(p1, p2)
+		p2:GiveTask(p1.OnClientEvent:Connect(function(p1, p2, p3)
 			v1:Shoot(p1, p2, p3)
 		end))
 	end))
-	v1.Maid:GiveTask(Interval.every(0.3333333333333333):Connect(function() --[[ Line: 97 | Upvalues: GetTargetPart (ref), v1 (copy) ]]
+	v1.Maid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
 		local v12 = GetTargetPart(v1)
 		if v12 ~= v1.targetPart then
 			v1.targetPart = v12
@@ -105,7 +106,7 @@ function t.new(p1, p2, p3) --[[ Line: 79 | Upvalues: Gun (copy), t (copy), RxIns
 		local v4 = true
 		local v5 = 0
 		local v6 = false
-		v1.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 116 | Upvalues: v1 (copy), CurrentCamera (ref), v3 (copy), RocketLauncherConsts (ref), v5 (ref), v4 (ref), Audio (ref), v6 (ref) ]]
+		v1.Maid:GiveTask(RunService.Heartbeat:Connect(function()
 			local v12 = os.clock()
 			local targetPart = v1.targetPart
 			local v2 = if targetPart then targetPart.Position else nil
@@ -166,14 +167,14 @@ function t.new(p1, p2, p3) --[[ Line: 79 | Upvalues: Gun (copy), t (copy), RxIns
 	end
 	return v1
 end
-function t.SetupShoot(p1) --[[ Line: 157 ]] end
-function t._shootBroadcast(p1) --[[ Line: 158 ]] end
-function t.SetupModel(p1) --[[ Line: 159 | Upvalues: Gun (copy), Joint (copy) ]]
+function t.SetupShoot(p1)  end
+function t._shootBroadcast(p1)  end
+function t.SetupModel(p1)
 	Gun.SetupModel(p1)
 	Joint.Weld(p1.Model.Skeleton.Rocket, p1.BoundingBox)
 	p1.Model.Skeleton.Rocket.Anchored = false
 end
-function t.ShootLocal(p1) --[[ Line: 165 | Upvalues: HapticEffect (copy), ItemCamera (copy) ]]
+function t.ShootLocal(p1)
 	if p1.Local then
 		HapticEffect.basic(0.5, 0.35)
 		p1.SpringCamera:Accelerate(Vector3.new(1, 0, 0) * math.clamp(20 / ItemCamera.GetCameraDistance(), 0.5, 1) * 10)
@@ -181,8 +182,8 @@ function t.ShootLocal(p1) --[[ Line: 165 | Upvalues: HapticEffect (copy), ItemCa
 	end
 	return true
 end
-function t.SetupBulletEmitter(p1) --[[ Line: 178 ]] end
-function t.LaunchRocket(p1, p2, p3, p4) --[[ Line: 179 | Upvalues: Players (copy), RocketLauncherConsts (copy), Raycast (copy), NetObjPoolBinder (copy), SeekingMissileBinder (copy), GunSystemConsts (copy) ]]
+function t.SetupBulletEmitter(p1)  end
+function t.LaunchRocket(p1, p2, p3, p4)
 	assert(p2, "missing origin")
 	assert(p3, "missing direction")
 	assert(p4, "missing speed")
@@ -212,7 +213,7 @@ function t.LaunchRocket(p1, p2, p3, p4) --[[ Line: 179 | Upvalues: Players (copy
 				v7:SetActive(false)
 				obj.CFrame = Tip.CFrame
 				obj.Velocity = Tip.Velocity
-				SeekingMissileBinder:Promise(obj):andThen(function(p12) --[[ Line: 224 | Upvalues: p1 (copy), v3 (ref), v2 (ref) ]]
+				SeekingMissileBinder:Promise(obj):andThen(function(p12)
 					table.insert(p12.ignoreList, p1.Model)
 					p12.raycastParams.FilterDescendantsInstances = p12.ignoreList
 					if v3 then
@@ -242,7 +243,7 @@ function t.LaunchRocket(p1, p2, p3, p4) --[[ Line: 179 | Upvalues: Players (copy
 		end
 	end
 end
-function t.Shoot(p1) --[[ Line: 239 | Upvalues: Audio (copy), InventoryItemUtils (copy) ]]
+function t.Shoot(p1)
 	if p1.IsEquipping then
 		return false
 	else
@@ -260,7 +261,7 @@ function t.Shoot(p1) --[[ Line: 239 | Upvalues: Audio (copy), InventoryItemUtils
 		return true
 	end
 end
-function t.ShootSound(p1, p2) --[[ Line: 255 | Upvalues: Audio (copy) ]]
+function t.ShootSound(p1, p2)
 	if p2 then
 		Audio.ObjectLocal(p1.Model.Skeleton.BoundingBox, p1.Config.Sound.gun_pistol_dry_fire_01, {
 			Volume = 0.6,
@@ -268,8 +269,8 @@ function t.ShootSound(p1, p2) --[[ Line: 255 | Upvalues: Audio (copy) ]]
 		})
 	end
 end
-function t.ReloadDropAmmoSound(p1) --[[ Line: 264 ]] end
-function t.ReloadRefillAmmoSound(p1) --[[ Line: 265 ]] end
-function t.ReloadDropAmmoVisual(p1) --[[ Line: 266 ]] end
-function t.ReloadRefillAmmoVisual(p1) --[[ Line: 267 ]] end
+function t.ReloadDropAmmoSound(p1)  end
+function t.ReloadRefillAmmoSound(p1)  end
+function t.ReloadDropAmmoVisual(p1)  end
+function t.ReloadRefillAmmoVisual(p1)  end
 return t

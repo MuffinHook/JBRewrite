@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local Roact = require(ReplicatedStorage.Roact)
@@ -8,7 +9,7 @@ v1.defaultProps = {
 	position = UDim2.fromScale(0.5, 0.5),
 	title = "N/A"
 }
-function v1.render(p1) --[[ Line: 12 | Upvalues: createElement (copy), PaddedContainer (copy), Roact (copy) ]]
+function v1.render(p1)
 	return createElement("Frame", {
 		BackgroundTransparency = 0.8,
 		BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),

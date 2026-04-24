@@ -1,6 +1,7 @@
-return function() --[[ Line: 1 ]]
+-- Reviewed by Claude
+return function()
 	local Config = require(script.Parent.Config)
-	it("should accept valid configuration", function() --[[ Line: 4 | Upvalues: Config (copy) ]]
+	it("should accept valid configuration", function()
 		local v1 = Config.new()
 		local v2 = v1.get()
 		expect(v2.elementTracing).to.equal(false)
@@ -9,9 +10,9 @@ return function() --[[ Line: 1 ]]
 		})
 		expect(v2.elementTracing).to.equal(true)
 	end)
-	it("should reject invalid configuration keys", function() --[[ Line: 17 | Upvalues: Config (copy) ]]
+	it("should reject invalid configuration keys", function()
 		local v1 = Config.new()
-		local v2, v3 = pcall(function() --[[ Line: 22 | Upvalues: v1 (copy) ]]
+		local v2, v3 = pcall(function()
 			v1.set({
 				garblegoop = true
 			})
@@ -19,9 +20,9 @@ return function() --[[ Line: 1 ]]
 		expect(v2).to.equal(false)
 		expect(v3:find("garblegoop")).to.be.ok()
 	end)
-	it("should reject invalid configuration values", function() --[[ Line: 34 | Upvalues: Config (copy) ]]
+	it("should reject invalid configuration values", function()
 		local v1 = Config.new()
-		local v2, v3 = pcall(function() --[[ Line: 40 | Upvalues: v1 (copy) ]]
+		local v2, v3 = pcall(function()
 			v1.set({
 				elementTracing = "Hello there!"
 			})

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -6,7 +7,7 @@ local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local BattleInvite = require(script.Parent.BattleInvite)
-local function playTick() --[[ Line: 11 | Upvalues: Players (copy), Audio (copy) ]]
+local function playTick()
 	if Players.LocalPlayer and Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 			Volume = 0.15
@@ -20,8 +21,8 @@ v1.defaultProps = {
 	aspectRatio = 1.25,
 	maximumItemsDisplayed = 4
 }
-function v1.init(p1) --[[ Line: 24 | Upvalues: Players (copy), Audio (copy) ]]
-	function p1.onAccept(p12) --[[ Line: 25 | Upvalues: p1 (copy), Players (ref), Audio (ref) ]]
+function v1.init(p1)
+	function p1.onAccept(p12)
 		local v1 = p1.props.battleInvites[p12]
 		p1.props.removeByIndex(p12)
 		if Players.LocalPlayer and Players.LocalPlayer.PlayerGui then
@@ -33,7 +34,7 @@ function v1.init(p1) --[[ Line: 24 | Upvalues: Players (copy), Audio (copy) ]]
 			p1.props.onAccept(v1)
 		end
 	end
-	function p1.onDecline(p12) --[[ Line: 33 | Upvalues: p1 (copy), Players (ref), Audio (ref) ]]
+	function p1.onDecline(p12)
 		local v1 = p1.props.battleInvites[p12]
 		p1.props.removeByIndex(p12)
 		if Players.LocalPlayer and Players.LocalPlayer.PlayerGui then
@@ -46,7 +47,7 @@ function v1.init(p1) --[[ Line: 24 | Upvalues: Players (copy), Audio (copy) ]]
 		end
 	end
 end
-function v1.render(p1) --[[ Line: 42 | Upvalues: createElement (copy), BattleInvite (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	local v1 = 1 / (1 / p1.props.maximumItemsDisplayed - 1 / (256 / p1.props.maximumItemsDisplayed)) * p1.props.aspectRatio
 	local v2 = p1.props.maximumItemsDisplayed * p1.props.aspectRatio
 	local v3 = #p1.props.battleInvites
@@ -72,13 +73,13 @@ function v1.render(p1) --[[ Line: 42 | Upvalues: createElement (copy), BattleInv
 		})
 	}, t))
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 86 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		battleInvites = p1.battleInvites
 	}
-end, function(p1) --[[ Line: 90 ]]
+end, function(p1)
 	return {
-		removeByIndex = function(p12) --[[ Name: removeByIndex | Line: 92 | Upvalues: p1 (copy) ]]
+		removeByIndex = function(p12)
 			p1({
 				type = "battleInvitesRemoveByIndex",
 				index = p12

@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 local TestEnum = require(script.Parent.TestEnum)
 local t = {}
 t.__index = t
-function t.new() --[[ Line: 6 | Upvalues: t (copy) ]]
+function t.new()
 	return setmetatable({
 		_stack = {}
 	}, t)
 end
-function t.getBeforeEachHooks(p1) --[[ Line: 16 | Upvalues: TestEnum (copy) ]]
+function t.getBeforeEachHooks(p1)
 	local BeforeEach = TestEnum.NodeType.BeforeEach
 	local t = {}
 	for i, v in ipairs(p1._stack) do
@@ -16,7 +17,7 @@ function t.getBeforeEachHooks(p1) --[[ Line: 16 | Upvalues: TestEnum (copy) ]]
 	end
 	return t
 end
-function t.getAfterEachHooks(p1) --[[ Line: 32 | Upvalues: TestEnum (copy) ]]
+function t.getAfterEachHooks(p1)
 	local AfterEach = TestEnum.NodeType.AfterEach
 	local t = {}
 	for i, v in ipairs(p1._stack) do
@@ -26,10 +27,10 @@ function t.getAfterEachHooks(p1) --[[ Line: 32 | Upvalues: TestEnum (copy) ]]
 	end
 	return t
 end
-function t.popHooks(p1) --[[ Line: 48 ]]
+function t.popHooks(p1)
 	table.remove(p1._stack, #p1._stack)
 end
-function t.pushHooksFrom(p1, p2) --[[ Line: 52 | Upvalues: TestEnum (copy) ]]
+function t.pushHooksFrom(p1, p2)
 	assert(p2 ~= nil)
 	table.insert(p1._stack, {
 		[TestEnum.NodeType.BeforeAll] = p1:_getHooksOfType(p2.children, TestEnum.NodeType.BeforeAll),
@@ -38,13 +39,13 @@ function t.pushHooksFrom(p1, p2) --[[ Line: 52 | Upvalues: TestEnum (copy) ]]
 		[TestEnum.NodeType.AfterEach] = p1:_getHooksOfType(p2.children, TestEnum.NodeType.AfterEach)
 	})
 end
-function t.getBeforeAllHooks(p1) --[[ Line: 66 | Upvalues: TestEnum (copy) ]]
+function t.getBeforeAllHooks(p1)
 	return p1._stack[#p1._stack][TestEnum.NodeType.BeforeAll]
 end
-function t.getAfterAllHooks(p1) --[[ Line: 73 | Upvalues: TestEnum (copy) ]]
+function t.getAfterAllHooks(p1)
 	return p1._stack[#p1._stack][TestEnum.NodeType.AfterAll]
 end
-function t._getHooksOfType(p1, p2, p3) --[[ Line: 77 ]]
+function t._getHooksOfType(p1, p2, p3)
 	local t = {}
 	for i, v in ipairs(p2) do
 		if v.type == p3 then

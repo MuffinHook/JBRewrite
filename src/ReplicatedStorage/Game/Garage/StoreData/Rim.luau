@@ -1154,25 +1154,25 @@ return {
 		}
 	},
 	GetInstance = function(p1)
-		local v1 = ReplicatedStorage.Resource.Rims:FindFirstChild(p1.Name)
-		if not v1 then
+		local rimTemplate = ReplicatedStorage.Resource.Rims:FindFirstChild(p1.Name)
+		if not rimTemplate then
 			error("No Rim named: " .. p1.Name)
 		end
-		local v2 = v1:Clone()
-		v2.Color = Color3.new(0.5, 0.5, 0.5)
-		v2.CFrame = CFrame.new(0, 0, 0)
-		v2.Size = v2.Size.Unit * 4
+		local rimClone = rimTemplate:Clone()
+		rimClone.Color = Color3.new(0.5, 0.5, 0.5)
+		rimClone.CFrame = CFrame.new(0, 0, 0)
+		rimClone.Size = rimClone.Size.Unit * 4
 		if p1.FlipY then
-			v2.CFrame = v2.CFrame * CFrame.Angles(0, math.pi, 0)
+			rimClone.CFrame = rimClone.CFrame * CFrame.Angles(0, math.pi, 0)
 		end
-		local v3 = v2
+		local rimInstance = rimClone
 		if p1.VisualFlipY then
-			v3.CFrame = v3.CFrame * CFrame.Angles(0, math.pi, 0)
+			rimInstance.CFrame = rimInstance.CFrame * CFrame.Angles(0, math.pi, 0)
 		end
-		return v3
+		return rimInstance
 	end,
 	Update = function(p1, p2)
-		local v1 = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.5, 0, 0) * CFrame.new(0, 0, 3)
+		local elapsedTime = os.clock() / 2
+		p1.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, 3)
 	end
 }

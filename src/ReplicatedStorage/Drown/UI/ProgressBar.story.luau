@@ -1,15 +1,16 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ProgressBar = require(script.Parent.ProgressBar)
 local Roact = require(ReplicatedStorage.Roact)
-return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ProgressBar (copy) ]]
-	local v1 = Roact.Component:extend("App")
-	function v1.init(p1) --[[ Line: 7 ]] end
-	function v1.render(p1) --[[ Line: 8 | Upvalues: Roact (ref), ProgressBar (ref) ]]
+return function(target)
+	local AppComponent = Roact.Component:extend("App")
+	function AppComponent.init(props)  end
+	function AppComponent.render(props)
 		return Roact.createElement(ProgressBar, {})
 	end
-	function v1.willUnmount(p1) --[[ Line: 11 ]] end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 14 | Upvalues: Roact (ref), v2 (copy) ]]
-		Roact.unmount(v2)
+	function AppComponent.willUnmount(props)  end
+	local mountedInstance = Roact.mount(Roact.createElement(AppComponent), target)
+	return function()
+		Roact.unmount(mountedInstance)
 	end
 end

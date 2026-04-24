@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 38 | Upvalues: t (copy) ]]
+function t.new(p1)
 	assert(p1)
 	local v2 = setmetatable({}, t)
 	v2.Data = p1
@@ -9,7 +10,7 @@ function t.new(p1) --[[ Line: 38 | Upvalues: t (copy) ]]
 	p1[1][1](0, 0)
 	return v2
 end
-function t.Update(p1, p2) --[[ Line: 48 ]]
+function t.Update(p1, p2)
 	local CumulativeSeqAge = p1.CumulativeSeqAge
 	local Data = p1.Data
 	local Seqi = p1.Seqi
@@ -45,7 +46,7 @@ function t.Update(p1, p2) --[[ Line: 48 ]]
 		return false
 	end
 end
-function t.GetTotalLifespan(p1) --[[ Line: 86 ]]
+function t.GetTotalLifespan(p1)
 	local sum = 0
 	for i = 1, #p1.Data do
 		sum = sum + p1.Data[i][2]

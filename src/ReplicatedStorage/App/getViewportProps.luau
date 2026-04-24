@@ -21,19 +21,19 @@ local function getVehicleDataForMake(p1)
 end
 return function(p1)
 	assert(p1.ItemType, "missing ItemType")
-	local t = {}
+	local localTable = {}
 	if p1.ItemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
 		local CategoryName = p1.CategoryName
 		local v1 = StoreData.GetCategoryByName(CategoryName)
 		local ItemName = p1.ItemName
 		local v2 = StoreData.GetItemByName(CategoryName, ItemName)
 		if v2 and typeof(v2) == "table" then
-			function t.getInst()
+			function localTable.getInst()
 				return v1.GetInstance(v2)
 			end
-			t.getInstCompare = "VehCust" .. CategoryName .. ItemName
-			t.updateCamera = v1.Update
-			return t
+			localTable.getInstCompare = "VehCust" .. CategoryName .. ItemName
+			localTable.updateCamera = v1.Update
+			return localTable
 		end
 		warn("Missing vehCust for: " .. CategoryName .. "/" .. ItemName)
 	else
@@ -46,37 +46,37 @@ return function(p1)
 					break
 				end
 			end
-			function t.getInst()
+			function localTable.getInst()
 				return getDefaultVehicleModel(Make, v3.Type)
 			end
-			t.getInstCompare = "Vehicle" .. Make
-			t.updateCamera = updateVehicleCamera
+			localTable.getInstCompare = "Vehicle" .. Make
+			localTable.updateCamera = updateVehicleCamera
 		elseif p1.ItemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then
 			local ItemName = p1.ItemName
-			function t.getInst()
+			function localTable.getInst()
 				return HomeItemUIUtils.getModel(ItemName)
 			end
-			t.updateCamera = HomeItemUIUtils.getUpdateCamera()
-			t.getInstCompare = "HomeItem" .. ItemName
+			localTable.updateCamera = HomeItemUIUtils.getUpdateCamera()
+			localTable.getInstCompare = "HomeItem" .. ItemName
 		elseif p1.ItemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then
 			local SkinName = p1.SkinName
-			function t.getInst()
+			function localTable.getInst()
 				return ItemSkinUIUtils.getModel(SkinName)
 			end
-			t.updateCamera = ItemSkinUIUtils.getUpdateCamera()
-			t.getInstCompare = "ItemSkin" .. SkinName
+			localTable.updateCamera = ItemSkinUIUtils.getUpdateCamera()
+			localTable.getInstCompare = "ItemSkin" .. SkinName
 		elseif p1.ItemType == PlayerDataConsts.SAFE_ITEM_TYPE then
 			local TypeEnum = p1.TypeEnum
-			t.image = "rbxassetid://" .. tostring(SAFE_DATA[TypeEnum].ImageId)
-			t.getInstCompare = "Safe" .. tostring(TypeEnum)
+			localTable.image = "rbxassetid://" .. tostring(SAFE_DATA[TypeEnum].ImageId)
+			localTable.getInstCompare = "Safe" .. tostring(TypeEnum)
 		elseif p1.ItemType == PlayerDataConsts.CONSUMABLE_ITEM_TYPE then
 			local ItemName = p1.ItemName
-			t.image = "rbxassetid://" .. tostring(ConsumablesData[ItemName].ImageId)
-			t.getInstCompare = "Consumable" .. ItemName
+			localTable.image = "rbxassetid://" .. tostring(ConsumablesData[ItemName].ImageId)
+			localTable.getInstCompare = "Consumable" .. ItemName
 		else
 			local v4 = error
 			v4("Invalid ItemType: " .. tostring(p1.ItemType))
 		end
-		return t
+		return localTable
 	end
 end

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
 local Roact = require(ReplicatedStorage.Roact)
@@ -7,14 +8,14 @@ local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local createElement = Roact.createElement
 local v1 = Roact.PureComponent:extend("TooltipContainer")
-function v1.init(p1) --[[ Line: 27 | Upvalues: EzUtils (copy), InputUtils (copy), Maid (copy) ]]
+function v1.init(p1)
 	p1:setState({
 		smallScreen = EzUtils.isSmallScreen(),
 		touchControls = InputUtils.isTouch()
 	})
 	p1.maid = Maid.new()
 end
-function v1.render(p1) --[[ Line: 34 | Upvalues: createElement (copy), Tooltip (copy) ]]
+function v1.render(p1)
 	local t = {
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1)
@@ -59,8 +60,8 @@ function v1.render(p1) --[[ Line: 34 | Upvalues: createElement (copy), Tooltip (
 	})
 	return createElement("Frame", t, t2)
 end
-function v1.didMount(p1) --[[ Line: 81 | Upvalues: EzUtils (copy), InputUtils (copy) ]]
-	p1.maid:GiveTask(EzUtils.getViewportSizeChangedSignal():Connect(function() --[[ Line: 82 | Upvalues: EzUtils (ref), InputUtils (ref), p1 (copy) ]]
+function v1.didMount(p1)
+	p1.maid:GiveTask(EzUtils.getViewportSizeChangedSignal():Connect(function()
 		local v1 = EzUtils.isSmallScreen()
 		local v2 = InputUtils.isTouch()
 		if v1 ~= p1.state.smallScreen or v2 ~= p1.state.touchControls then
@@ -71,7 +72,7 @@ function v1.didMount(p1) --[[ Line: 81 | Upvalues: EzUtils (copy), InputUtils (c
 		end
 	end))
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 94 ]]
+return RoactRodux.connect(function(p1, p2)
 	local t = {
 		text = p1.tooltipConfig.text
 	}

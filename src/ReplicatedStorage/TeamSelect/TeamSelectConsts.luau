@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Std.TableUtils).requireValidIndexAndFreeze({
 	TELEPORT_PLACE_TYPE_REMOTE_NAME = "TeleportPlaceTypeRemote",

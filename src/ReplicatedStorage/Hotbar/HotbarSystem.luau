@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local HotbarItemRes = require(script.Parent.HotbarItemRes)
 return {
-	init = function() --[[ Name: init | Line: 4 ]]
+	init = function()
 		require(script.Parent.HotbarItemSystem).init()
 	end,
-	setColor = function(p1) --[[ Name: setColor | Line: 7 | Upvalues: HotbarItemRes (copy) ]]
+	setColor = function(p1)
 		for i, v in ipairs(HotbarItemRes.gui.Container:GetChildren()) do
 			if v:IsA(HotbarItemRes.presetFrame.ClassName) then
 				v.ImageColor3 = p1
@@ -11,13 +12,13 @@ return {
 			end
 		end
 	end,
-	show = function() --[[ Name: show | Line: 16 | Upvalues: HotbarItemRes (copy) ]]
+	show = function()
 		local gui = HotbarItemRes.gui
 		if gui then
 			gui.Enabled = true
 		end
 	end,
-	hide = function() --[[ Name: hide | Line: 22 | Upvalues: HotbarItemRes (copy) ]]
+	hide = function()
 		local gui = HotbarItemRes.gui
 		if gui then
 			gui.Enabled = false

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Std.TableUtils).requireValidIndexAndFreeze({
 	VOXEL_INDESTRUCTIBLE_TAG_NAME = "VoxelIndestructible",

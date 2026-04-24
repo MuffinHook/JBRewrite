@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local Dictionary = require(ReplicatedStorage.Std.Dictionary)
@@ -14,7 +15,7 @@ v1.defaultProps = {
 	position = UDim2.fromScale(0.5, 0.5),
 	attacking = false
 }
-function v1.render(p1) --[[ Line: 19 | Upvalues: ColorUtils (copy), createElement (copy), BattleRobberyStatus (copy), Dictionary (copy), Roact (copy), Elapsed (copy), PersistentCrewBattleConsts (copy) ]]
+function v1.render(p1)
 	local v1 = ColorUtils.saturateBy(p1.props.backgroundColor, -0.9)
 	local count = 0
 	local t = {}

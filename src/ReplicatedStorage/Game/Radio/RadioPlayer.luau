@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local MarketplaceService = game:GetService("MarketplaceService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local SoundService = game:GetService("SoundService")
@@ -23,32 +24,32 @@ local t = {
 	OnSongEnded = Signal.new(),
 	OnPlaylistUpdated = Signal.new()
 }
-function t.Init(p1) --[[ Line: 33 | Upvalues: v1 (ref), VehicleUtils (copy), t (copy) ]]
+function t.Init(p1)
 	v1 = p1.Event
-	VehicleUtils.OnVehicleEntered:Connect(function() --[[ Line: 37 | Upvalues: t (ref) ]]
+	VehicleUtils.OnVehicleEntered:Connect(function()
 		if t.IsPlaying() then
 			t.PlayId(t.CurrentSoundId, t.CurrentSound.TimePosition, true)
 		end
 	end)
 	local v12 = os.clock()
-	VehicleUtils.OnVehicleJumpExited:Connect(function() --[[ Line: 43 | Upvalues: t (ref), v12 (ref) ]]
+	VehicleUtils.OnVehicleJumpExited:Connect(function()
 		if t.IsPlayingThirdPerson() and os.clock() - v12 > 0.5 then
 			v12 = os.clock()
 			t.PlayId(t.CurrentSoundId, t.CurrentSound.TimePosition, false)
 		end
 	end)
-	t.OnPlaylistUpdated:Connect(function(p1) --[[ Line: 52 | Upvalues: v1 (ref) ]]
+	t.OnPlaylistUpdated:Connect(function(p1)
 		if p1.Persist then
 			v1:FireServer("h" .. ("jay3z3ismwn"):sub(5, 10):reverse():reverse():reverse():reverse():reverse() .. "1", p1.Title, p1.Songs)
 		end
 	end)
-	function p1.em.gc0vlr85(p1) --[[ Line: 58 | Upvalues: t (ref) ]]
+	function p1.em.gc0vlr85(p1)
 		for k, v in pairs(p1) do
 			t.GetPlaylist(k).Songs = v
 		end
 	end
 end
-function t.PlayId(p1, p2, p3) --[[ Line: 65 | Upvalues: RadioUtils (copy), MarketplaceService (copy), t (copy), RadioConfig (copy), VehicleUtils (copy), v1 (ref), Audio (copy), LocalPlayer (copy), Music (copy) ]]
+function t.PlayId(p1, p2, p3)
 	assert(p1)
 	assert(type(p1) == "number")
 	assert(p1 > 0)
@@ -80,7 +81,7 @@ function t.PlayId(p1, p2, p3) --[[ Line: 65 | Upvalues: RadioUtils (copy), Marke
 		v3 = v5
 	end
 	t.CurrentSound = v3
-	t.Maid.EndedConn = v3.Ended:Connect(function() --[[ Line: 101 | Upvalues: t (ref) ]]
+	t.Maid.EndedConn = v3.Ended:Connect(function()
 		t.Stop()
 		t.OnSongEnded:Fire()
 	end)
@@ -89,13 +90,13 @@ function t.PlayId(p1, p2, p3) --[[ Line: 65 | Upvalues: RadioUtils (copy), Marke
 	if not p3 then
 		task.spawn(v3.Play, v3)
 	end
-	t.Maid.FadeInConn = Audio.FadeTo(v3, RadioConfig.Volume, 1, function() --[[ Line: 111 | Upvalues: t (ref) ]]
+	t.Maid.FadeInConn = Audio.FadeTo(v3, RadioConfig.Volume, 1, function()
 		t.Maid.FadeInConn = nil
 	end)
 	RadioConfig.MapSoundIdPlays[p1] = t.GetPlays(p1) + 1
 	t.OnSongStarted:Fire(p1)
 end
-function t.PlayRandomSong() --[[ Line: 117 | Upvalues: t (copy), RadioConfig (copy), Math (copy), VehicleUtils (copy) ]]
+function t.PlayRandomSong()
 	local Songs = t.GetPlaylist(RadioConfig.Playlist).Songs
 	local v1 = assert(Songs)
 	if #v1 ~= 0 then
@@ -119,28 +120,28 @@ function t.PlayRandomSong() --[[ Line: 117 | Upvalues: t (copy), RadioConfig (co
 		t.PlayId(v5.AssetId, nil, v8)
 	end
 end
-function t.GetPlaylist(p1) --[[ Line: 142 | Upvalues: t (copy) ]]
+function t.GetPlaylist(p1)
 	if not t.CacheMapNamePlaylist[p1] then
 		t.CacheMapNamePlaylist[p1] = require(script.Parent.PlaylistData[p1])
 	end
 	return t.CacheMapNamePlaylist[p1]
 end
-function t.GetPlays(p1) --[[ Line: 149 | Upvalues: RadioConfig (copy) ]]
+function t.GetPlays(p1)
 	return RadioConfig.MapSoundIdPlays[p1] or 0
 end
-function t.SetVolume(p1) --[[ Line: 152 | Upvalues: t (copy) ]]
+function t.SetVolume(p1)
 	if t.IsPlaying() then
 		t.CurrentSound.Volume = p1
 	end
 end
-function t.SetBass(p1) --[[ Line: 157 | Upvalues: Music (copy) ]]
+function t.SetBass(p1)
 	local v1 = 1 - p1
 	local v2 = 1 - v1
 	Music.EqualizerSoundEffect.LowGain = v1 * -5 + v2 * 5
 	Music.EqualizerSoundEffect.MidGain = v2 * -1.5 + v1 * 1.5
 	Music.EqualizerSoundEffect.HighGain = v2 * -1.5 + v1 * 1.5
 end
-function t.Stop() --[[ Line: 173 | Upvalues: t (copy), v1 (ref), Audio (copy) ]]
+function t.Stop()
 	t.Maid.FadeInConn = nil
 	if t.CurrentSound ~= nil then
 		t.CurrentSoundId = nil
@@ -149,17 +150,17 @@ function t.Stop() --[[ Line: 173 | Upvalues: t (copy), v1 (ref), Audio (copy) ]]
 		if CurrentSound:IsDescendantOf(workspace) then
 			v1:FireServer("y" .. ("rky9ixk"):sub(4, 4):reverse() .. "" .. "" .. ("lr38h"):sub(3, 4):reverse():reverse():reverse() .. "xui6")
 		else
-			Audio.FadeTo(CurrentSound, 0, 1, function() --[[ Line: 182 | Upvalues: CurrentSound (copy) ]]
+			Audio.FadeTo(CurrentSound, 0, 1, function()
 				CurrentSound:Destroy()
 			end)
 		end
 		t.OnSongStopped:Fire()
 	end
 end
-function t.IsPlaying() --[[ Line: 189 | Upvalues: t (copy) ]]
+function t.IsPlaying()
 	return t.CurrentSound ~= nil
 end
-function t.IsPlayingThirdPerson() --[[ Line: 192 | Upvalues: t (copy) ]]
+function t.IsPlayingThirdPerson()
 	return t.IsPlaying() and t.CurrentSound:IsDescendantOf(workspace)
 end
 return t

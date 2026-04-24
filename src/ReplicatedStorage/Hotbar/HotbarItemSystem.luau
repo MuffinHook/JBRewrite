@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -12,7 +13,7 @@ local HotbarItemUtils = require(script.Parent.HotbarItemUtils)
 local t = {
 	isDragging = false
 }
-function t.init() --[[ Line: 16 | Upvalues: t (copy), Players (copy), HotbarItemBinder (copy), TableUtils (copy), HotbarItemUtils (copy), HotbarItemConsts (copy), Maid (copy), RunService (copy), UserInputService (copy), InventoryItemBinder (copy), InventoryItemSystem (copy) ]]
+function t.init()
 	require(script.Parent.HotbarItemRes).init()
 	local t2 = {
 		Enum.KeyCode.One,
@@ -26,7 +27,7 @@ function t.init() --[[ Line: 16 | Upvalues: t (copy), Players (copy), HotbarItem
 		Enum.KeyCode.Nine,
 		Enum.KeyCode.Zero
 	}
-	local function updateDisplayOrder() --[[ Line: 32 | Upvalues: t (ref), Players (ref), t2 (copy) ]]
+	local function updateDisplayOrder()
 		if not t.isDragging then
 			local v1 = t.getSortedHotbarItemsFor(Players.LocalPlayer)
 			for i = 1, #v1 do
@@ -41,9 +42,9 @@ function t.init() --[[ Line: 16 | Upvalues: t (copy), Players (copy), HotbarItem
 			end
 		end
 	end
-	HotbarItemBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 50 | Upvalues: Players (ref), TableUtils (ref), t (ref), HotbarItemUtils (ref), updateDisplayOrder (copy), HotbarItemConsts (ref), Maid (ref), RunService (ref), UserInputService (ref) ]]
+	HotbarItemBinder:GetClassAddedSignal():Connect(function(p1)
 		if p1:GetOwner() == Players.LocalPlayer then
-			local function f2(p1) --[[ Line: 58 | Upvalues: HotbarItemUtils (ref) ]]
+			local function f2(p1)
 				local v1 = HotbarItemUtils.getDisplayOrder(p1.obj) or 0
 				if v1 > 50 then
 					v1 = 0
@@ -56,18 +57,18 @@ function t.init() --[[ Line: 16 | Upvalues: t (copy), Players (copy), HotbarItem
 			end
 			updateDisplayOrder()
 			p1._maid:GiveTask(p1.obj:GetAttributeChangedSignal(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME):Connect(updateDisplayOrder))
-			p1._maid:GiveTask(p1.onDragStarted:Connect(function() --[[ Line: 76 | Upvalues: t (ref), Maid (ref), p1 (copy), RunService (ref), UserInputService (ref), HotbarItemUtils (ref), updateDisplayOrder (ref) ]]
+			p1._maid:GiveTask(p1.onDragStarted:Connect(function()
 				assert(not t.isDragging, "somehow hotbar is already dragging")
 				t.isDragging = true
 				local v2 = Maid.new()
-				v2:GiveTask(function() --[[ Line: 80 | Upvalues: t (ref) ]]
+				v2:GiveTask(function()
 					t.isDragging = false
 				end)
 				p1._maid._dragMaid = v2
 				local v3 = t.getSortedHotbarItemsFor(p1:GetOwner())
 				local v4 = #v3
 				p1:SetSize(1.2)
-				v2:GiveTask(function() --[[ Line: 89 | Upvalues: p1 (ref) ]]
+				v2:GiveTask(function()
 					p1:SetSize(1)
 					p1:Spin()
 				end)
@@ -76,7 +77,7 @@ function t.init() --[[ Line: 16 | Upvalues: t (copy), Players (copy), HotbarItem
 				local X = p1._frame.Parent.UIListLayout.AbsoluteContentSize.X
 				local v7 = p1._frame.Parent.AbsolutePosition.X + p1._frame.Parent.AbsoluteSize.X * 0.5 - X * 0.5
 				local v8 = X / v4
-				v2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 103 | Upvalues: UserInputService (ref), v7 (copy), v6 (ref), v8 (copy), v4 (copy), v3 (copy), HotbarItemUtils (ref), v5 (copy) ]]
+				v2:GiveTask(RunService.Heartbeat:Connect(function()
 					v6 = math.floor((UserInputService:GetMouseLocation().X - v7) / v8) + 1
 					if v6 < 1 then
 						v6 = 1
@@ -87,14 +88,14 @@ function t.init() --[[ Line: 16 | Upvalues: t (copy), Players (copy), HotbarItem
 						HotbarItemUtils.setDisplayOrder(v.obj, HotbarItemUtils.calculateNewIndex(i, v5, v6))
 					end
 				end))
-				v2:GiveTask(UserInputService.InputEnded:Connect(function(p12) --[[ Line: 121 | Upvalues: p1 (ref), updateDisplayOrder (ref) ]]
+				v2:GiveTask(UserInputService.InputEnded:Connect(function(p12)
 					if p12.UserInputType == Enum.UserInputType.MouseButton1 or (p12.UserInputType == Enum.UserInputType.Touch or p12.UserInputType == Enum.UserInputType.Gamepad1) then
 						p1._maid._dragMaid = nil
 						updateDisplayOrder()
 					end
 				end))
 			end))
-			p1._maid:GiveTask(p1:GetInventoryItem():GetEquippedSignal():Connect(function() --[[ Line: 137 | Upvalues: p1 (copy) ]]
+			p1._maid:GiveTask(p1:GetInventoryItem():GetEquippedSignal():Connect(function()
 				local v1 = p1:GetInventoryItem()
 				p1:SetDropVisible(v1 and v1:GetEquipped() and true or false)
 			end))
@@ -103,13 +104,13 @@ function t.init() --[[ Line: 16 | Upvalues: t (copy), Players (copy), HotbarItem
 			end
 		end
 	end)
-	HotbarItemBinder:GetClassRemovingSignal():Connect(function(p1) --[[ Line: 153 | Upvalues: Players (ref), updateDisplayOrder (copy) ]]
+	HotbarItemBinder:GetClassRemovingSignal():Connect(function(p1)
 		if p1:GetOwner() == Players.LocalPlayer then
 			task.defer(updateDisplayOrder)
 		end
 	end)
 	HotbarItemBinder:Start()
-	UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 164 | Upvalues: t (ref), Players (ref), InventoryItemBinder (ref) ]]
+	UserInputService.InputBegan:Connect(function(p1, p2)
 		if not p2 and p1.UserInputType == Enum.UserInputType.Keyboard then
 			for i, v in ipairs((t.getHotbarItemsFor(Players.LocalPlayer))) do
 				if p1.KeyCode == v.keyCode then
@@ -120,7 +121,7 @@ function t.init() --[[ Line: 16 | Upvalues: t (copy), Players (copy), HotbarItem
 			end
 		end
 	end)
-	UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 181 | Upvalues: InventoryItemSystem (ref), Players (ref), t (ref) ]]
+	UserInputService.InputBegan:Connect(function(p1, p2)
 		if p2 then
 			return false
 		end
@@ -158,14 +159,14 @@ function t.init() --[[ Line: 16 | Upvalues: t (copy), Players (copy), HotbarItem
 		end
 	end)
 end
-function t.getHotbarItemsFor(p1) --[[ Line: 223 | Upvalues: TableUtils (copy), HotbarItemBinder (copy) ]]
-	return TableUtils.filter(HotbarItemBinder:GetAll(), function(p12) --[[ Line: 224 | Upvalues: p1 (copy) ]]
+function t.getHotbarItemsFor(p1)
+	return TableUtils.filter(HotbarItemBinder:GetAll(), function(p12)
 		return p12:GetOwner() == p1
 	end)
 end
-function t.getSortedHotbarItemsFor(p1) --[[ Line: 228 | Upvalues: t (copy), HotbarItemUtils (copy) ]]
+function t.getSortedHotbarItemsFor(p1)
 	local v1 = t.getHotbarItemsFor(p1)
-	table.sort(v1, function(p1, p2) --[[ Line: 230 | Upvalues: HotbarItemUtils (ref) ]]
+	table.sort(v1, function(p1, p2)
 		return (HotbarItemUtils.getDisplayOrder(p1.obj) or 0) < (HotbarItemUtils.getDisplayOrder(p2.obj) or 0)
 	end)
 	return v1

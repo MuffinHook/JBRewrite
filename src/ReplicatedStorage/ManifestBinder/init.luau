@@ -1,40 +1,41 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local promiseBoundClass = require(script.promiseBoundClass)
 local parsePath = require(script.parsePath)
-local function isManifestResolved(p1, p2) --[[ Line: 16 ]]
+local function isManifestResolved(manifest, targetSize)
 	local count = 0
-	for k in pairs(p1) do
+	for k in pairs(manifest) do
 		count = count + 1
 	end
-	assert(count <= p2, count)
-	return count == p2
+	assert(count <= targetSize, count)
+	return count == targetSize
 end
-local function v1(p1, p2) --[[ Line: 26 | Upvalues: v1 (copy) ]]
-	if p1.instance ~= nil then
-		p1.instance = nil
-		local connections = p1.connections
+local function cleanupNode(node, manifest)
+	if node.instance ~= nil then
+		node.instance = nil
+		local connections = node.connections
 		if connections then
 			for i, v in ipairs(connections) do
 				v:Disconnect()
 			end
 			table.clear(connections)
 		end
-		if p2 and p1.alias then
-			p2[p1.alias] = nil
+		if manifest and node.alias then
+			manifest[node.alias] = nil
 		end
-		local children = p1.children
+		local children = node.children
 		if children then
 			for k, v in pairs(children) do
-				v1(v, p2)
+				cleanupNode(v, manifest)
 			end
 		end
 	end
 end
 local t = {}
 t.__index = t
-function t.new(p1, p2, p3) --[[ Line: 56 | Upvalues: t (copy) ]]
+function t.new(p1, p2, p3)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._tagName = p1 or error("Bad argument \'tagName\', expected string")
@@ -51,14 +52,14 @@ function t.new(p1, p2, p3) --[[ Line: 56 | Upvalues: t (copy) ]]
 		count = count + 1
 	end
 	t2._manifestSizeTarget = count
-	task.delay(5, function() --[[ Line: 77 | Upvalues: t2 (copy) ]]
+	task.delay(5, function()
 		if not t2._loaded then
 			warn(("ManifestBinder %q is not loaded. Call :Start() on it!"):format(t2._tagName))
 		end
 	end)
 	return t2
 end
-function t.Start(p1) --[[ Line: 85 | Upvalues: CollectionService (copy) ]]
+function t.Start(p1)
 	if p1._loaded then
 		warn("ManifestBinder already loaded.")
 	else
@@ -66,15 +67,15 @@ function t.Start(p1) --[[ Line: 85 | Upvalues: CollectionService (copy) ]]
 		for i, v in ipairs(CollectionService:GetTagged(p1._tagName)) do
 			task.spawn(p1._bindRoot, p1, v)
 		end
-		table.insert(p1._connections, CollectionService:GetInstanceAddedSignal(p1._tagName):Connect(function(p12) --[[ Line: 98 | Upvalues: p1 (copy) ]]
+		table.insert(p1._connections, CollectionService:GetInstanceAddedSignal(p1._tagName):Connect(function(p12)
 			p1:_bindRoot(p12)
 		end))
-		table.insert(p1._connections, CollectionService:GetInstanceRemovedSignal(p1._tagName):Connect(function(p12) --[[ Line: 104 | Upvalues: p1 (copy) ]]
+		table.insert(p1._connections, CollectionService:GetInstanceRemovedSignal(p1._tagName):Connect(function(p12)
 			p1:_unbindRoot(p12)
 		end))
 	end
 end
-function t._stopBoundFn(p1, p2) --[[ Line: 109 ]]
+function t._stopBoundFn(p1, p2)
 	local v1 = p1._rootInstToClass[p2]
 	if v1 then
 		if p1._classRemovingSignal then
@@ -95,7 +96,7 @@ function t._stopBoundFn(p1, p2) --[[ Line: 109 ]]
 		p1._rootInstToClass[p2] = nil
 	end
 end
-function t._startBoundFn(p1, p2, p3) --[[ Line: 135 ]]
+function t._startBoundFn(p1, p2, p3)
 	p1:_stopBoundFn(p2)
 	if p1._pendingRootInstSet[p2] == true then
 		warn("[ManifestBinder._startBoundFn] - Re-entered add. Still loading, probably caused by error in constructor.")
@@ -134,7 +135,7 @@ function t._startBoundFn(p1, p2, p3) --[[ Line: 135 ]]
 		warn(("[ManifestBinder._startBoundFn] - Failed to load instance %q of %q, removed while loading!"):format(p2:GetFullName(), (tostring(type(p1._constructor) == "table" and p1._constructor.ClassName or p1._constructor))))
 	end
 end
-function t._bindRoot(p1, p2) --[[ Line: 186 | Upvalues: parsePath (copy), v1 (copy) ]]
+function t._bindRoot(p1, p2)
 	assert(p1._rootInstToManifest[p2] == nil)
 	local t = {}
 	p1._rootInstToManifest[p2] = t
@@ -169,7 +170,7 @@ function t._bindRoot(p1, p2) --[[ Line: 186 | Upvalues: parsePath (copy), v1 (co
 		end
 	end
 	debug.profileend()
-	local function v8(p12) --[[ Line: 232 | Upvalues: t (copy), v8 (copy), p1 (copy), p2 (copy), v1 (ref) ]]
+	local function v8(p12)
 		local v12 = assert(p12.instance)
 		local children = p12.children
 		local alias = p12.alias
@@ -178,14 +179,14 @@ function t._bindRoot(p1, p2) --[[ Line: 186 | Upvalues: parsePath (copy), v1 (co
 			t[alias] = v12
 		end
 		if not v2 then
-			local function processAddChild(p1) --[[ Line: 244 | Upvalues: children (copy), v8 (ref) ]]
+			local function processAddChild(p1)
 				local v1 = children[p1.Name]
 				if v1 and v1.instance == nil then
 					v1.instance = p1
 					v8(v1)
 				end
 			end
-			local function processDeleteChild(p12) --[[ Line: 255 | Upvalues: children (copy), p1 (ref), p2 (ref), v1 (ref), t (ref), v12 (copy), v8 (ref) ]]
+			local function processDeleteChild(p12)
 				local v13 = p12.Name
 				local v2 = children[v13]
 				if v2 and v2.instance == p12 then
@@ -226,7 +227,7 @@ function t._bindRoot(p1, p2) --[[ Line: 186 | Upvalues: parsePath (copy), v1 (co
 	end
 	v8(t2)
 end
-function t._unbindRoot(p1, p2) --[[ Line: 305 | Upvalues: v1 (copy) ]]
+function t._unbindRoot(p1, p2)
 	p1:_stopBoundFn(p2)
 	local v12 = p1._rootInstToRootNode[p2]
 	if v12 then
@@ -235,29 +236,29 @@ function t._unbindRoot(p1, p2) --[[ Line: 305 | Upvalues: v1 (copy) ]]
 	end
 	p1._rootInstToManifest[p2] = nil
 end
-function t.GetAllSet(p1) --[[ Line: 317 ]]
+function t.GetAllSet(p1)
 	return p1._rootInstToClass
 end
-function t.GetAll(p1) --[[ Line: 321 ]]
+function t.GetAll(p1)
 	local t = {}
 	for k, v in pairs(p1._rootInstToClass) do
 		t[#t + 1] = v
 	end
 	return t
 end
-function t.GetTag(p1) --[[ Line: 328 ]]
+function t.GetTag(p1)
 	return p1._tagName
 end
-function t.Get(p1, p2) --[[ Line: 331 ]]
+function t.Get(p1, p2)
 	return p1._rootInstToClass[p2]
 end
-function t.Promise(p1, p2) --[[ Line: 334 | Upvalues: promiseBoundClass (copy) ]]
+function t.Promise(p1, p2)
 	return promiseBoundClass(p1, p2)
 end
-function t.ObserveInstance(p1, p2, p3) --[[ Line: 338 ]]
+function t.ObserveInstance(p1, p2, p3)
 	p1._listeners[p2] = p1._listeners[p2] or {}
 	p1._listeners[p2][p3] = true
-	return function() --[[ Line: 342 | Upvalues: p1 (copy), p2 (copy), p3 (copy) ]]
+	return function()
 		if p1._listeners[p2] then
 			p1._listeners[p2][p3] = nil
 			if not next(p1._listeners[p2]) then
@@ -266,21 +267,21 @@ function t.ObserveInstance(p1, p2, p3) --[[ Line: 338 ]]
 		end
 	end
 end
-function t.GetClassAddedSignal(p1) --[[ Line: 353 | Upvalues: Signal (copy) ]]
+function t.GetClassAddedSignal(p1)
 	if not p1._classAddedSignal then
 		p1._classAddedSignal = Signal.new()
 		table.insert(p1._connections, p1._classAddedSignal)
 	end
 	return p1._classAddedSignal
 end
-function t.GetClassRemovingSignal(p1) --[[ Line: 364 | Upvalues: Signal (copy) ]]
+function t.GetClassRemovingSignal(p1)
 	if not p1._classRemovingSignal then
 		p1._classRemovingSignal = Signal.new()
 		table.insert(p1._connections, p1._classRemovingSignal)
 	end
 	return p1._classRemovingSignal
 end
-function t.Destroy(p1) --[[ Line: 374 | Upvalues: v1 (copy) ]]
+function t.Destroy(p1)
 	debug.profilebegin("ManifestBinder:Destroy")
 	local v12 = next(p1._rootInstToClass)
 	while v12 ~= nil do

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -10,7 +11,7 @@ local t = {
 	_maid = nil,
 	onCloseClicked = Signal.new()
 }
-function t.init() --[[ Line: 16 | Upvalues: ReplicatedStorage (copy), LocalPlayer (copy), t (copy), WorldMarkerGroup (copy), WorldMarker (copy), WorldMarkerSystem (copy) ]]
+function t.init()
 	local ContextMessageGui = ReplicatedStorage.StarterGui:FindFirstChild("ContextMessageGui")
 	ContextMessageGui.Parent = LocalPlayer.PlayerGui
 	t.gui = ContextMessageGui
@@ -25,44 +26,44 @@ function t.init() --[[ Line: 16 | Upvalues: ReplicatedStorage (copy), LocalPlaye
 	WorldMarkerSystem.addGroup(v1)
 	t._worldMarker = v2
 end
-function t.open() --[[ Line: 35 | Upvalues: t (copy), Maid (copy) ]]
+function t.open()
 	assert(t._maid == nil)
 	local v1 = Maid.new()
 	t._maid = v1
 	local gui = t.gui
 	gui.Enabled = true
-	v1:GiveTask(function() --[[ Line: 42 | Upvalues: gui (copy) ]]
+	v1:GiveTask(function()
 		gui.Enabled = false
 	end)
-	v1:GiveTask(function() --[[ Line: 45 | Upvalues: t (ref) ]]
+	v1:GiveTask(function()
 		t.setWorldMarkerEnabled(false)
 	end)
-	v1:GiveTask(gui.Container.Close.MouseButton1Down:Connect(function() --[[ Line: 49 | Upvalues: t (ref) ]]
+	v1:GiveTask(gui.Container.Close.MouseButton1Down:Connect(function()
 		t.onCloseClicked:Fire()
 		t.close()
 	end))
 end
-function t.close() --[[ Line: 54 | Upvalues: t (copy) ]]
+function t.close()
 	assert(t._maid ~= nil)
 	local _maid = t._maid
 	t._maid = nil
 	_maid:Destroy()
 end
-function t.setMessage(p1) --[[ Line: 61 | Upvalues: t (copy), Audio (copy) ]]
+function t.setMessage(p1)
 	local gui = t.gui
 	gui.Container.Container.Message.Text = p1
 	Audio.ObjectLocal(gui, 131184732929614)
 end
-function t.setWorldMarkerEnabled(p1) --[[ Line: 68 | Upvalues: t (copy) ]]
+function t.setWorldMarkerEnabled(p1)
 	t._worldMarkerGroup:SetEnabled(p1)
 end
-function t.setWorldMarkerPosition(p1) --[[ Line: 71 | Upvalues: t (copy) ]]
+function t.setWorldMarkerPosition(p1)
 	t._worldMarker:SetPosition(p1)
 end
-function t.setWorldMarkerSizes(p1) --[[ Line: 74 | Upvalues: t (copy) ]]
+function t.setWorldMarkerSizes(p1)
 	t._worldMarker:SetSizes(p1)
 end
-function t.isOpen() --[[ Line: 77 | Upvalues: t (copy) ]]
+function t.isOpen()
 	return t._maid ~= nil
 end
 return t

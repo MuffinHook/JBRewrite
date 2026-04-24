@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -194,7 +195,7 @@ function CargoPlane.new(bornAt)
 		RemoteEvent:FireServer("w" .. ("o3jonpri"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("oog1nt"):sub(3, 4):reverse() .. "" .. "" .. ("ohk"):sub(2, 2):reverse():reverse():reverse() .. "xm")
 	end)
 	self.Lever.OnFail:Connect(function()
-		em.mq92d5a8({
+		em.ShowNotification({
 			Title = "CargoPlane",
 			Text = "Keycard required. Search the crates..."
 		})
@@ -688,7 +689,7 @@ return {
 		Team = p1.Team
 		local ScreenGui = p1.ScreenGui
 		local rng = Random.new()
-		function eventManager.p2y3cg32(state)
+		function eventManager.OnCargoPlaneStateChanged(state)
 			if state then
 				if activePlane == nil then
 					activePlane = CargoPlane.new(state.BornAt)
@@ -721,7 +722,7 @@ return {
 				activePlane = nil
 			end
 		end
-		function eventManager.u246rrbe()
+		function eventManager.OnHatchOpenRequest()
 			if activePlane == nil then
 				error("No running plane to open hatch of.")
 			end

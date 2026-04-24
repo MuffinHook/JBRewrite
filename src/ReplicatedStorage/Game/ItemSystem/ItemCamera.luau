@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local PlayerModule = LocalPlayer.PlayerScripts.PlayerModule
 local CameraSensitivity = PlayerModule:FindFirstChild("CameraModule"):FindFirstChild("CameraSensitivity")
@@ -19,7 +20,7 @@ local v3 = 0
 local t = {
 	Locked = true
 }
-local function GetLocalAccessoryParts() --[[ Line: 33 | Upvalues: LocalPlayer (copy) ]]
+local function GetLocalAccessoryParts()
 	local t = {}
 	if LocalPlayer.Character then
 		for v1, v2 in LocalPlayer.Character:QueryDescendants("BasePart#Handle") do
@@ -30,12 +31,12 @@ local function GetLocalAccessoryParts() --[[ Line: 33 | Upvalues: LocalPlayer (c
 	end
 	return t
 end
-local function HideAccessories() --[[ Line: 47 | Upvalues: GetLocalAccessoryParts (copy) ]]
+local function HideAccessories()
 	for v1, v2 in GetLocalAccessoryParts() do
 		v2.LocalTransparencyModifier = 0.8
 	end
 end
-local function ShowAccessories() --[[ Line: 52 | Upvalues: LocalPlayer (copy), GetLocalAccessoryParts (copy) ]]
+local function ShowAccessories()
 	local v1 = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")
 	for v3, v4 in GetLocalAccessoryParts() do
 		local v2
@@ -45,7 +46,7 @@ local function ShowAccessories() --[[ Line: 52 | Upvalues: LocalPlayer (copy), G
 end
 local v4 = nil
 local v5 = nil
-local function InputChanged(p1) --[[ Line: 61 | Upvalues: v2 (ref), v3 (ref) ]]
+local function InputChanged(p1)
 	if p1.UserInputType == Enum.UserInputType.MouseMovement then
 		local Delta = p1.Delta
 		v2 = v2 - Delta.X * 0.005
@@ -53,7 +54,7 @@ local function InputChanged(p1) --[[ Line: 61 | Upvalues: v2 (ref), v3 (ref) ]]
 		v3 = math.clamp(v3, -1.4, 1.2)
 	end
 end
-function t.Init() --[[ Line: 78 | Upvalues: v4 (ref), Logic (copy), v5 (ref), UserInputService (copy), InputChanged (copy), gameSettingType (copy), GameSettingsService (copy), t (copy) ]]
+function t.Init()
 	v4 = Logic.MakeSpring()
 	v4.Target = 70
 	v4.v = 0
@@ -75,7 +76,7 @@ function t.Init() --[[ Line: 78 | Upvalues: v4 (ref), Logic (copy), v5 (ref), Us
 		order = 200
 	}
 	GameSettingsService.add(t2)
-	local function handleSetting(p1) --[[ Line: 102 | Upvalues: t (ref) ]]
+	local function handleSetting(p1)
 		t.setLocked(p1)
 	end
 	t.setLocked((t2:getValue()))
@@ -86,19 +87,19 @@ local v6 = nil
 local v7 = nil
 local v8 = false
 t.equipped = false
-function t.Adjust(p1) --[[ Line: 114 | Upvalues: v2 (ref), v3 (ref) ]]
+function t.Adjust(p1)
 	v2 = v2 + p1.Y
 	v3 = v3 + p1.X
 end
-function t.SetRecoilSpring(p1) --[[ Line: 120 | Upvalues: v6 (ref) ]]
+function t.SetRecoilSpring(p1)
 	assert(p1)
 	v6 = p1
 end
-function t.setLocked(p1) --[[ Line: 124 | Upvalues: t (copy) ]]
+function t.setLocked(p1)
 	t.Locked = p1
 	t.updateMouseLock()
 end
-function t.updateMouseLock() --[[ Line: 128 | Upvalues: PlayerUtils (copy), LocalPlayer (copy), v1 (copy), UserInputService (copy), t (copy), InputUtils (copy) ]]
+function t.updateMouseLock()
 	local v12 = PlayerUtils.getHumanoid(LocalPlayer)
 	local activeMouseLockController = v1.activeMouseLockController
 	if activeMouseLockController then
@@ -116,22 +117,22 @@ function t.updateMouseLock() --[[ Line: 128 | Upvalues: PlayerUtils (copy), Loca
 		v12.AutoRotate = v3
 	end
 end
-function t.getMouseLocked() --[[ Line: 155 | Upvalues: v1 (copy) ]]
+function t.getMouseLocked()
 	local activeMouseLockController = v1.activeMouseLockController
 	return activeMouseLockController and activeMouseLockController:GetIsMouseLocked()
 end
-function t.getSensitivity() --[[ Line: 159 | Upvalues: CameraSensitivity (copy) ]]
+function t.getSensitivity()
 	return CameraSensitivity.Value
 end
-function t.setSensitivity(p1) --[[ Line: 162 | Upvalues: t (copy), CameraSensitivity (copy) ]]
+function t.setSensitivity(p1)
 	local v1 = t.getSensitivity()
 	CameraSensitivity.Value = p1
-	return function() --[[ Line: 165 | Upvalues: CameraSensitivity (ref), v1 (copy) ]]
+	return function()
 		CameraSensitivity.Value = v1
 	end
 end
 local v9 = os.clock()
-function t.Update() --[[ Line: 170 | Upvalues: v9 (ref), t (copy), MovementRollService (copy), LocalPlayer (copy), PlayerUtils (copy), CurrentCamera (copy), v4 (ref), v6 (ref) ]]
+function t.Update()
 	local v1 = os.clock()
 	local v2 = v1 - v9
 	v9 = v1
@@ -148,10 +149,10 @@ function t.Update() --[[ Line: 170 | Upvalues: v9 (ref), t (copy), MovementRollS
 		CurrentCamera.CFrame = CurrentCamera.CFrame * CFrame.Angles(0, v5.Y * v2 * 60, 0) * CFrame.Angles(v5.X * v2 * 60, 0, 0)
 	end
 end
-function t.Zoom(p1) --[[ Line: 198 | Upvalues: v4 (ref) ]]
+function t.Zoom(p1)
 	v4:SetTarget(p1)
 end
-function t.GetCameraDistance() --[[ Line: 201 | Upvalues: v1 (copy) ]]
+function t.GetCameraDistance()
 	local activeCameraController = v1.activeCameraController
 	if activeCameraController then
 		return activeCameraController:GetCameraToSubjectDistance()
@@ -159,7 +160,7 @@ function t.GetCameraDistance() --[[ Line: 201 | Upvalues: v1 (copy) ]]
 		return 0
 	end
 end
-function t.SetCameraDistance(p1) --[[ Line: 208 | Upvalues: v1 (copy) ]]
+function t.SetCameraDistance(p1)
 	local activeCameraController = v1.activeCameraController
 	if activeCameraController then
 		return activeCameraController:SetCameraToSubjectDistance(p1)
@@ -167,7 +168,7 @@ function t.SetCameraDistance(p1) --[[ Line: 208 | Upvalues: v1 (copy) ]]
 		return 0
 	end
 end
-function t.OnItemEquipped(p1, p2) --[[ Line: 216 | Upvalues: t (copy), LocalPlayer (copy), v5 (ref), v8 (ref), v7 (ref), GetLocalAccessoryParts (copy), PlayerModule (copy) ]]
+function t.OnItemEquipped(p1, p2)
 	t.equipped = true
 	local Character = LocalPlayer.Character
 	assert(Character)
@@ -199,7 +200,7 @@ function t.OnItemEquipped(p1, p2) --[[ Line: 216 | Upvalues: t (copy), LocalPlay
 	t.Update()
 	PlayerModule:FindFirstChild("CameraModule"):FindFirstChild("DisableAutoRotate").Value = true
 end
-function t.OnItemUnequipped() --[[ Line: 242 | Upvalues: t (copy), v4 (ref), CurrentCamera (copy), LocalPlayer (copy), GetLocalAccessoryParts (copy), PlayerModule (copy) ]]
+function t.OnItemUnequipped()
 	t.equipped = false
 	v4.p = 70
 	v4.Target = v4.p

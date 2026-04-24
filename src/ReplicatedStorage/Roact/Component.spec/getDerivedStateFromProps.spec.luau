@@ -1,4 +1,5 @@
-return function() --[[ Line: 1 ]]
+-- Reviewed by Claude
+return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createSpy = require(script.Parent.Parent.createSpy)
 	local createElement = require(script.Parent.Parent.createElement)
@@ -7,11 +8,11 @@ return function() --[[ Line: 1 ]]
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
 	local Component = require(script.Parent.Parent.Component)
 	local v1 = createReconciler(NoopRenderer)
-	it("should be invoked on initial mount", function() --[[ Line: 13 | Upvalues: createSpy (copy), Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should be invoked on initial mount", function()
 		local v12 = createSpy()
 		local v2 = Component:extend("WithDerivedState")
 		v2.getDerivedStateFromProps = v12.value
-		function v2.render(p1) --[[ Line: 19 ]]
+		function v2.render(p1)
 			return nil
 		end
 		v1.mountVirtualNode(createElement(v2, {
@@ -24,11 +25,11 @@ return function() --[[ Line: 1 ]]
 		})
 		assertDeepEqual(v4.state, {})
 	end)
-	it("should be invoked when updated via props", function() --[[ Line: 39 | Upvalues: createSpy (copy), Component (copy), v1 (copy), createElement (copy), assertDeepEqual (copy) ]]
+	it("should be invoked when updated via props", function()
 		local v12 = createSpy()
 		local v2 = Component:extend("WithDerivedState")
 		v2.getDerivedStateFromProps = v12.value
-		function v2.render(p1) --[[ Line: 45 ]]
+		function v2.render(p1)
 			return nil
 		end
 		v1.updateVirtualNode(v1.mountVirtualNode(createElement(v2, {
@@ -43,16 +44,16 @@ return function() --[[ Line: 1 ]]
 		})
 		assertDeepEqual(v4.state, {})
 	end)
-	it("should be invoked when updated via state", function() --[[ Line: 75 | Upvalues: createSpy (copy), Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should be invoked when updated via state", function()
 		local v12 = createSpy()
 		local v2 = Component:extend("WithDerivedState")
 		v2.getDerivedStateFromProps = v12.value
-		function v2.init(p1) --[[ Line: 81 ]]
+		function v2.init(p1)
 			p1:setState({
 				someState = 1
 			})
 		end
-		function v2.render(p1) --[[ Line: 87 ]]
+		function v2.render(p1)
 			return nil
 		end
 		local v3 = createElement(v2)
@@ -66,16 +67,16 @@ return function() --[[ Line: 1 ]]
 			someState = 2
 		})
 	end)
-	it("should be invoked when updating via state in init (which skips reconciliation)", function() --[[ Line: 114 | Upvalues: createSpy (copy), Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should be invoked when updating via state in init (which skips reconciliation)", function()
 		local v12 = createSpy()
 		local v2 = Component:extend("WithDerivedState")
 		v2.getDerivedStateFromProps = v12.value
-		function v2.init(p1) --[[ Line: 120 ]]
+		function v2.init(p1)
 			p1:setState({
 				stateFromInit = 1
 			})
 		end
-		function v2.render(p1) --[[ Line: 126 ]]
+		function v2.render(p1)
 			return nil
 		end
 		v1.mountVirtualNode(createElement(v2, {
@@ -90,14 +91,14 @@ return function() --[[ Line: 1 ]]
 			stateFromInit = 1
 		})
 	end)
-	it("should receive defaultProps", function() --[[ Line: 154 | Upvalues: createSpy (copy), Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should receive defaultProps", function()
 		local v12 = createSpy()
 		local v2 = Component:extend("WithDerivedState")
 		v2.defaultProps = {
 			someDefaultProp = "foo"
 		}
 		v2.getDerivedStateFromProps = v12.value
-		function v2.render(p1) --[[ Line: 164 ]]
+		function v2.render(p1)
 			return nil
 		end
 		local v4 = v1.mountVirtualNode(createElement(v2, {
@@ -117,22 +118,22 @@ return function() --[[ Line: 1 ]]
 			someProp = 2
 		})
 	end)
-	it("should derive state for all setState updates, even when deferred", function() --[[ Line: 202 | Upvalues: Component (copy), createSpy (copy), createFragment (copy), createElement (copy), v1 (copy) ]]
+	it("should derive state for all setState updates, even when deferred", function()
 		local v12 = Component:extend("Child")
-		local v2 = createSpy(function() --[[ Line: 204 ]]
+		local v2 = createSpy(function()
 			return {}
 		end)
 		local v3 = createSpy()
-		function v12.render(p1) --[[ Line: 209 ]]
+		function v12.render(p1)
 			return nil
 		end
-		function v12.didMount(p1) --[[ Line: 213 ]]
+		function v12.didMount(p1)
 			p1.props.callback()
 		end
 		local v4 = Component:extend("Parent")
 		v4.getDerivedStateFromProps = v3.value
-		function v4.render(p1) --[[ Line: 221 | Upvalues: v2 (copy), createFragment (ref), createElement (ref), v12 (copy) ]]
-			local function f1() --[[ Line: 222 | Upvalues: p1 (copy), v2 (ref) ]]
+		function v4.render(p1)
+			local function f1()
 				p1:setState(v2.value)
 			end
 			return createFragment({
@@ -148,24 +149,24 @@ return function() --[[ Line: 1 ]]
 		expect(v2.callCount).to.equal(2)
 		expect(v3.callCount).to.equal(3)
 	end)
-	it("should have derived state after assigning to state in init", function() --[[ Line: 248 | Upvalues: createSpy (copy), Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should have derived state after assigning to state in init", function()
 		local v12 = nil
-		local v2 = createSpy(function() --[[ Line: 250 ]]
+		local v2 = createSpy(function()
 			return {
 				derived = true
 			}
 		end)
 		local v3 = Component:extend("WithDerivedState")
 		v3.getDerivedStateFromProps = v2.value
-		function v3.init(p1) --[[ Line: 259 | Upvalues: v12 (ref) ]]
+		function v3.init(p1)
 			p1.state = {
 				init = true
 			}
-			v12 = function() --[[ Line: 264 | Upvalues: p1 (copy) ]]
+			v12 = function()
 				return p1.state
 			end
 		end
-		function v3.render(p1) --[[ Line: 269 ]]
+		function v3.render(p1)
 			return nil
 		end
 		v1.mountVirtualNode(createElement(v3), nil, "WithDerivedState")

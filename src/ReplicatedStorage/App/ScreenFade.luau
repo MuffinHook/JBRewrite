@@ -4,8 +4,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local Maid = require(ReplicatedStorage.Std.Maid)
 require(ReplicatedStorage.Std.Signal)
-local t = {}
-t.__index = t
+local module = {}
+module.__index = module
 local function _makeFadeGui()
 	local _Fade = Instance.new("ScreenGui")
 	_Fade.DisplayOrder = 100
@@ -25,9 +25,9 @@ local function _makeFadeGui()
 	Frame.Parent = _Fade
 	return _Fade, Frame
 end
-function t.new()
+function module.new()
 	local t2 = {}
-	setmetatable(t2, t)
+	setmetatable(t2, module)
 	t2.maid = Maid.new()
 	local v2, v3 = _makeFadeGui()
 	t2.maid:GiveTask(v2)
@@ -35,7 +35,7 @@ function t.new()
 	t2.frame = v3
 	return t2
 end
-function t._FadeTo(p1, p2, p3)
+function module._FadeTo(p1, p2, p3)
 	if p1._tween then
 		p1._tween:Cancel()
 	end
@@ -44,17 +44,17 @@ function t._FadeTo(p1, p2, p3)
 	})
 	p1._tween:Play()
 end
-function t.FadeToLinear(p1, p2, p3)
+function module.FadeToLinear(p1, p2, p3)
 	p1:_FadeTo(p2, TweenInfo.new(p3, 0))
 end
-function t.Set(p1, p2)
+function module.Set(p1, p2)
 	if p1._tween then
 		p1._tween:Cancel()
 	end
 	p1.frame.BackgroundTransparency = p2
 end
-function t.Destroy(p1)
+function module.Destroy(p1)
 	p1.maid:Destroy()
 	setmetatable(p1, nil)
 end
-return t
+return module

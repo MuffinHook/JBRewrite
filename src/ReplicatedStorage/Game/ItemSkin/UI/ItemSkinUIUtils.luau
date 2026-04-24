@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemSkinIds = require(ReplicatedStorage.Game.ItemSkin.ItemSkinIds)
 return {
-	getUpdateCamera = function() --[[ Name: getUpdateCamera | Line: 6 ]]
+	getUpdateCamera = function()
 		local v1 = nil
 		local v2 = nil
-		return function(p1, p2) --[[ Line: 9 | Upvalues: v1 (ref), v2 (ref) ]]
+		return function(p1, p2)
 			if p2 then
 				if p2 ~= v1 then
 					local v12, v22 = p2:GetBoundingBox()
@@ -17,7 +18,7 @@ return {
 			end
 		end
 	end,
-	getModel = function(p1, p2) --[[ Name: getModel | Line: 26 | Upvalues: ReplicatedStorage (copy), ItemSkinIds (copy) ]]
+	getModel = function(p1, p2)
 		local v1 = p2 or "RocketLauncher"
 		assert(v1)
 		local v2 = ReplicatedStorage.Resource.ItemSystem.Models:FindFirstChild(v1):Clone()

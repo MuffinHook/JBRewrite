@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
@@ -10,7 +11,7 @@ v1.defaultProps = {
 	verticalPaddingRatio = 96,
 	aspectRatio = 1.7777777777777777
 }
-function v1.render(p1) --[[ Line: 15 | Upvalues: PersistentCrewBattleConsts (copy), createElement (copy), PaddedContainer (copy), paddedScrollingGrid (copy), ClanRating (copy) ]]
+function v1.render(p1)
 	assert(p1.props.displayType, "No display type set")
 	local t = {}
 	local v1 = nil

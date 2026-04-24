@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -11,38 +12,38 @@ local NPCConsts = require(ReplicatedStorage.NPC.NPCConsts)
 local NPCShared = require(ReplicatedStorage.NPC.NPCShared)
 local MansionRobberyUtils = require(ReplicatedStorage.MansionRobbery.MansionRobberyUtils)
 return {
-	setup = function(p1) --[[ Name: setup | Line: 15 | Upvalues: BossNPCUtils (copy), Maid (copy), BossNPCConsts (copy), NPCUtils (copy), Players (copy), MansionRobberyUtils (copy), GeomUtils (copy), RunService (copy), Audio (copy), NPCShared (copy), NPCConsts (copy) ]]
+	setup = function(p1)
 		local obj = p1.obj
 		local v1 = nil
-		local function handleMovement() --[[ Line: 19 | Upvalues: v1 (ref), BossNPCUtils (ref), obj (copy) ]]
+		local function handleMovement()
 			v1 = BossNPCUtils.getMovementState(obj)
 		end
 		v1 = BossNPCUtils.getMovementState(obj)
 		p1.maid:GiveTask(BossNPCUtils.getMovementStateChangedSignal(obj):Connect(handleMovement))
 		local v2 = nil
 		p1.maid.lastAttackMaidShared = nil
-		local function handleAttackState() --[[ Line: 27 | Upvalues: v2 (ref), BossNPCUtils (ref), obj (copy), p1 (copy), Maid (ref), BossNPCConsts (ref), NPCUtils (ref), Players (ref), MansionRobberyUtils (ref), GeomUtils (ref), RunService (ref), Audio (ref) ]]
+		local function handleAttackState()
 			v2 = BossNPCUtils.getAttackState(obj)
 			if p1:IsLocallyOwned() then
 				local v1 = Maid.new()
 				p1.maid.lastAttackMaidShared = v1
 				local v22 = true
-				v1:GiveTask(function() --[[ Line: 38 | Upvalues: v22 (ref) ]]
+				v1:GiveTask(function()
 					v22 = false
 				end)
 				if v2 == BossNPCConsts.ATTACK_STATE.ExtendoWhack then
 					NPCUtils.setLookAt(obj, NPCUtils.getTarget(obj))
-					v1:GiveTask(function() --[[ Line: 43 | Upvalues: NPCUtils (ref), obj (ref) ]]
+					v1:GiveTask(function()
 						NPCUtils.setLookAt(obj, nil)
 					end)
-					v1:GiveTask(task.delay(BossNPCConsts.EXTENDO_WHACK_DURATION, function() --[[ Line: 46 | Upvalues: v22 (ref), BossNPCUtils (ref), obj (ref), BossNPCConsts (ref) ]]
+					v1:GiveTask(task.delay(BossNPCConsts.EXTENDO_WHACK_DURATION, function()
 						if v22 then
 							task.defer(BossNPCUtils.setAttackState, obj, BossNPCConsts.ATTACK_STATE.None)
 						end
 					end))
 				elseif v2 == BossNPCConsts.ATTACK_STATE.LaserSweep then
 					NPCUtils.setLookAt(obj, NPCUtils.getTarget(obj))
-					v1:GiveTask(task.delay(BossNPCConsts.LASER_SWEEP_WARM_UP_DURATION, function() --[[ Line: 55 | Upvalues: Players (ref), p1 (ref), MansionRobberyUtils (ref), obj (ref), GeomUtils (ref), v22 (ref), NPCUtils (ref), BossNPCConsts (ref), BossNPCUtils (ref) ]]
+					v1:GiveTask(task.delay(BossNPCConsts.LASER_SWEEP_WARM_UP_DURATION, function()
 						local t = {}
 						for v1, v2 in Players:GetPlayers() do
 							if v2.Character and v2.Character.PrimaryPart and MansionRobberyUtils.getIsPlayerInRobbery(p1.obj.Parent, v2) then
@@ -50,9 +51,9 @@ return {
 							end
 						end
 						local v4 = obj.PrimaryPart.CFrame
-						local function resort() --[[ Line: 73 | Upvalues: GeomUtils (ref), t (copy), v4 (copy) ]]
+						local function resort()
 							local v1 = GeomUtils.generate2DPointClockwiseComparisonFunction()
-							table.sort(t, function(p1, p2) --[[ Line: 75 | Upvalues: v4 (ref), v1 (copy) ]]
+							table.sort(t, function(p1, p2)
 								local v12 = v4:PointToObjectSpace(p1.Position)
 								local v2 = v4:PointToObjectSpace(p2.Position)
 								return v1(Vector2.new(v12.X, -v12.Z), (Vector2.new(v2.X, -v2.Z)))
@@ -60,7 +61,7 @@ return {
 						end
 						while #t > 0 and v22 do
 							local v5 = GeomUtils.generate2DPointClockwiseComparisonFunction()
-							table.sort(t, function(p1, p2) --[[ Line: 75 | Upvalues: v4 (copy), v5 (copy) ]]
+							table.sort(t, function(p1, p2)
 								local v1 = v4:PointToObjectSpace(p1.Position)
 								local v2 = v4:PointToObjectSpace(p2.Position)
 								return v5(Vector2.new(v1.X, -v1.Z), (Vector2.new(v2.X, -v2.Z)))
@@ -73,14 +74,14 @@ return {
 							task.defer(BossNPCUtils.setAttackState, obj, BossNPCConsts.ATTACK_STATE.None)
 						end
 					end))
-					v1:GiveTask(function() --[[ Line: 103 | Upvalues: NPCUtils (ref), obj (ref) ]]
+					v1:GiveTask(function()
 						NPCUtils.setLookAt(obj, nil)
 					end)
 				elseif v2 == BossNPCConsts.ATTACK_STATE.AuraBlast then
 					local v3 = os.clock()
 					local Health = p1.humanoid.Health
 					local v4 = nil
-					v4 = RunService.Heartbeat:Connect(function() --[[ Line: 111 | Upvalues: v3 (copy), BossNPCConsts (ref), v4 (ref), BossNPCUtils (ref), obj (ref), p1 (ref), Health (copy) ]]
+					v4 = RunService.Heartbeat:Connect(function()
 						local v1 = (os.clock() - v3) / BossNPCConsts.AURA_BLAST_DURATION
 						if v1 >= 1 then
 							v4:Disconnect()
@@ -98,7 +99,7 @@ return {
 		end
 		handleAttackState()
 		p1.maid:GiveTask(BossNPCUtils.getAttackStateChangedSignal(obj):Connect(handleAttackState))
-		local function goToTargetPos(p12) --[[ Line: 131 | Upvalues: v2 (ref), BossNPCConsts (ref), NPCShared (ref), p1 (copy), v1 (ref), NPCUtils (ref), obj (copy) ]]
+		local function goToTargetPos(p12)
 			if v2 == BossNPCConsts.ATTACK_STATE.None or v2 == BossNPCConsts.ATTACK_STATE.LockedNone then
 				if v1 == BossNPCConsts.MOVEMENT_STATE.StrafeTarget then
 					local v12 = NPCUtils.getHomePosition(obj)
@@ -114,11 +115,11 @@ return {
 				NPCShared.move(p1.humanoid, Vector3.new(0, 0, 0))
 			end
 		end
-		function p1.customUpdateTarget(p1, p2) --[[ Line: 152 | Upvalues: NPCUtils (ref), obj (copy), NPCConsts (ref), RunService (ref), goToTargetPos (copy) ]]
+		function p1.customUpdateTarget(p1, p2)
 			if NPCUtils.getTargetType(obj) == NPCConsts.DEST_TYPE.OBJ then
 				local v1 = NPCUtils.getTarget(obj)
 				if v1 then
-					p2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 159 | Upvalues: goToTargetPos (ref), v1 (copy) ]]
+					p2:GiveTask(RunService.Heartbeat:Connect(function()
 						goToTargetPos(v1.Position)
 					end))
 					return true

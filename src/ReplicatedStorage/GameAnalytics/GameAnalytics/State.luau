@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Validation = require(script.Parent.Validation)
 local Logger = require(script.Parent.Logger)
 local HttpApi = require(script.Parent.HttpApi)
@@ -17,7 +18,7 @@ local t = {
 	ConfigsHash = ""
 }
 local v1 = nil
-local function getClientTsAdjusted(p1) --[[ Line: 23 | Upvalues: Store (copy), Validation (copy) ]]
+local function getClientTsAdjusted(p1)
 	local v1 = Store:GetPlayerDataFromCache(p1)
 	if v1 then
 		local v2 = os.time()
@@ -31,7 +32,7 @@ local function getClientTsAdjusted(p1) --[[ Line: 23 | Upvalues: Store (copy), V
 		return os.time()
 	end
 end
-local function populateConfigurations(p1) --[[ Line: 38 | Upvalues: Store (copy), Validation (copy), Logger (copy), v1 (ref) ]]
+local function populateConfigurations(p1)
 	local v12 = Store:GetPlayerDataFromCache(p1.UserId)
 	local SdkConfig = v12.SdkConfig
 	if SdkConfig.configs then
@@ -59,7 +60,7 @@ local function populateConfigurations(p1) --[[ Line: 38 | Upvalues: Store (copy)
 	v1 = v1 or game:GetService("ReplicatedStorage"):WaitForChild("GameAnalyticsRemoteConfigs")
 	v1:FireClient(p1, v12.Configurations)
 end
-function t.sessionIsStarted(p1, p2) --[[ Line: 67 | Upvalues: Store (copy) ]]
+function t.sessionIsStarted(p1, p2)
 	local v1 = Store:GetPlayerDataFromCache(p2)
 	if v1 then
 		return v1.SessionStart ~= 0
@@ -67,7 +68,7 @@ function t.sessionIsStarted(p1, p2) --[[ Line: 67 | Upvalues: Store (copy) ]]
 		return false
 	end
 end
-function t.isEnabled(p1, p2) --[[ Line: 76 | Upvalues: Store (copy) ]]
+function t.isEnabled(p1, p2)
 	local v1 = Store:GetPlayerDataFromCache(p2)
 	if v1 then
 		return v1.InitAuthorized and true or false
@@ -75,7 +76,7 @@ function t.isEnabled(p1, p2) --[[ Line: 76 | Upvalues: Store (copy) ]]
 		return false
 	end
 end
-function t.validateAndFixCurrentDimensions(p1, p2) --[[ Line: 87 | Upvalues: Store (copy), Validation (copy), Logger (copy) ]]
+function t.validateAndFixCurrentDimensions(p1, p2)
 	local v1 = Store:GetPlayerDataFromCache(p2)
 	if not Validation:validateDimension(p1._availableCustomDimensions01, v1.CurrentCustomDimension01) then
 		Logger:d("Invalid dimension01 found in variable. Setting to nil. Invalid dimension: " .. v1.CurrentCustomDimension01)
@@ -87,44 +88,44 @@ function t.validateAndFixCurrentDimensions(p1, p2) --[[ Line: 87 | Upvalues: Sto
 		Logger:d("Invalid dimension03 found in variable. Setting to nil. Invalid dimension: " .. v1.CurrentCustomDimension03)
 	end
 end
-function t.setAvailableCustomDimensions01(p1, p2) --[[ Line: 106 | Upvalues: Validation (copy), Logger (copy) ]]
+function t.setAvailableCustomDimensions01(p1, p2)
 	if Validation:validateCustomDimensions(p2) then
 		p1._availableCustomDimensions01 = p2
 		Logger:i("Set available custom01 dimension values: (" .. table.concat(p2, ", ") .. ")")
 	end
 end
-function t.setAvailableCustomDimensions02(p1, p2) --[[ Line: 115 | Upvalues: Validation (copy), Logger (copy) ]]
+function t.setAvailableCustomDimensions02(p1, p2)
 	if Validation:validateCustomDimensions(p2) then
 		p1._availableCustomDimensions02 = p2
 		Logger:i("Set available custom02 dimension values: (" .. table.concat(p2, ", ") .. ")")
 	end
 end
-function t.setAvailableCustomDimensions03(p1, p2) --[[ Line: 124 | Upvalues: Validation (copy), Logger (copy) ]]
+function t.setAvailableCustomDimensions03(p1, p2)
 	if Validation:validateCustomDimensions(p2) then
 		p1._availableCustomDimensions03 = p2
 		Logger:i("Set available custom03 dimension values: (" .. table.concat(p2, ", ") .. ")")
 	end
 end
-function t.setAvailableGamepasses(p1, p2) --[[ Line: 133 | Upvalues: Logger (copy) ]]
+function t.setAvailableGamepasses(p1, p2)
 	p1._availableGamepasses = p2
 	Logger:i("Set available game passes: (" .. table.concat(p2, ", ") .. ")")
 end
-function t.setEventSubmission(p1, p2) --[[ Line: 138 ]]
+function t.setEventSubmission(p1, p2)
 	p1._enableEventSubmission = p2
 end
-function t.isEventSubmissionEnabled(p1) --[[ Line: 142 ]]
+function t.isEventSubmissionEnabled(p1)
 	return p1._enableEventSubmission
 end
-function t.setCustomDimension01(p1, p2, p3) --[[ Line: 146 | Upvalues: Store (copy) ]]
+function t.setCustomDimension01(p1, p2, p3)
 	Store:GetPlayerDataFromCache(p2).CurrentCustomDimension01 = p3
 end
-function t.setCustomDimension02(p1, p2, p3) --[[ Line: 151 | Upvalues: Store (copy) ]]
+function t.setCustomDimension02(p1, p2, p3)
 	Store:GetPlayerDataFromCache(p2).CurrentCustomDimension02 = p3
 end
-function t.setCustomDimension03(p1, p2, p3) --[[ Line: 156 | Upvalues: Store (copy) ]]
+function t.setCustomDimension03(p1, p2, p3)
 	Store:GetPlayerDataFromCache(p2).CurrentCustomDimension03 = p3
 end
-function t.startNewSession(p1, p2, p3) --[[ Line: 161 | Upvalues: t (copy), Logger (copy), Store (copy), HttpApi (copy), Events (copy), populateConfigurations (copy), HttpService (copy), Validation (copy) ]]
+function t.startNewSession(p1, p2, p3)
 	if t:isEventSubmissionEnabled() and p3 == nil then
 		Logger:i("Starting a new session.")
 	end
@@ -192,7 +193,7 @@ function t.startNewSession(p1, p2, p3) --[[ Line: 161 | Upvalues: t (copy), Logg
 		Logger:w("Could not start session: SDK is disabled.")
 	end
 end
-function t.endSession(p1, p2) --[[ Line: 247 | Upvalues: t (copy), Logger (copy), Events (copy), Store (copy) ]]
+function t.endSession(p1, p2)
 	if t.Initialized and t:isEventSubmissionEnabled() then
 		Logger:i("Ending session.")
 		if t:isEnabled(p2) and t:sessionIsStarted(p2) then
@@ -201,13 +202,13 @@ function t.endSession(p1, p2) --[[ Line: 247 | Upvalues: t (copy), Logger (copy)
 		end
 	end
 end
-function t.getRemoteConfigsStringValue(p1, p2, p3, p4) --[[ Line: 257 | Upvalues: Store (copy) ]]
+function t.getRemoteConfigsStringValue(p1, p2, p3, p4)
 	return Store:GetPlayerDataFromCache(p2).Configurations[p3] or p4
 end
-function t.isRemoteConfigsReady(p1, p2) --[[ Line: 262 | Upvalues: Store (copy) ]]
+function t.isRemoteConfigsReady(p1, p2)
 	return Store:GetPlayerDataFromCache(p2).RemoteConfigsIsReady
 end
-function t.getRemoteConfigsContentAsString(p1, p2) --[[ Line: 267 | Upvalues: Store (copy), HttpService (copy) ]]
+function t.getRemoteConfigsContentAsString(p1, p2)
 	return HttpService:JSONEncode(Store:GetPlayerDataFromCache(p2).Configurations)
 end
 return t

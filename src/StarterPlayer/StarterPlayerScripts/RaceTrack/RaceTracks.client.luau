@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
@@ -9,9 +10,9 @@ local Audio = require(ReplicatedStorage.Std.Audio)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local Board = require(ReplicatedStorage.RaceTrack.UI.Board)
 local TrackService = require(ReplicatedStorage.RaceTrack.TrackService)
-RxInstanceUtils.waitForChild(ReplicatedStorage, "RaceTrackScreenText"):andThen(function(p1) --[[ Line: 14 | Upvalues: TrackService (copy), Audio (copy), Players (copy), Promise (copy) ]]
+RxInstanceUtils.waitForChild(ReplicatedStorage, "RaceTrackScreenText"):andThen(function(p1)
 	local v1 = nil
-	p1.OnClientEvent:Connect(function(p1) --[[ Line: 16 | Upvalues: TrackService (ref), Audio (ref), Players (ref), v1 (ref), Promise (ref) ]]
+	p1.OnClientEvent:Connect(function(p1)
 		TrackService.updateScreenText(p1)
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6874682609, {
 			Volume = 0.8
@@ -20,30 +21,30 @@ RxInstanceUtils.waitForChild(ReplicatedStorage, "RaceTrackScreenText"):andThen(f
 			v1:cancel()
 			v1 = nil
 		end
-		v1 = Promise.delay(3):andThen(function() --[[ Line: 24 | Upvalues: TrackService (ref) ]]
+		v1 = Promise.delay(3):andThen(function()
 			TrackService.updateScreenText("")
 		end)
 	end)
 end)
 local v1 = Roact.PureComponent:extend("Board")
-function v1.init(p1) --[[ Line: 31 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1._maid = Maid.new()
 end
-function v1._fetch(p1) --[[ Line: 34 ]]
+function v1._fetch(p1)
 	p1:setState({
 		numEntries = #p1.props.dataFolder:GetChildren()
 	})
 end
-function v1.didMount(p1) --[[ Line: 39 ]]
+function v1.didMount(p1)
 	p1:_fetch()
-	p1._maid:GiveTask(p1.props.dataFolder.ChildAdded:Connect(function() --[[ Line: 41 | Upvalues: p1 (copy) ]]
+	p1._maid:GiveTask(p1.props.dataFolder.ChildAdded:Connect(function()
 		p1:_fetch()
 	end))
-	p1._maid:GiveTask(p1.props.dataFolder.ChildRemoved:Connect(function() --[[ Line: 44 | Upvalues: p1 (copy) ]]
+	p1._maid:GiveTask(p1.props.dataFolder.ChildRemoved:Connect(function()
 		p1:_fetch()
 	end))
 end
-function v1.render(p1) --[[ Line: 48 | Upvalues: createElement (copy), Board (copy) ]]
+function v1.render(p1)
 	local t = {}
 	for i, v in ipairs(p1.props.dataFolder:GetChildren()) do
 		local v1
@@ -61,7 +62,7 @@ function v1.render(p1) --[[ Line: 48 | Upvalues: createElement (copy), Board (co
 		t2.message = ("%d:%02d.%03d"):format(v3, v4, v5)
 		table.insert(t, t2)
 	end
-	table.sort(t, function(p1, p2) --[[ Line: 64 ]]
+	table.sort(t, function(p1, p2)
 		return p1.time < p2.time
 	end)
 	return createElement("SurfaceGui", {
@@ -76,27 +77,27 @@ function v1.render(p1) --[[ Line: 48 | Upvalues: createElement (copy), Board (co
 		})
 	})
 end
-function v1.willUnmount(p1) --[[ Line: 79 ]]
+function v1.willUnmount(p1)
 	p1._maid:DoCleaning()
 end
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 86 | Upvalues: t (copy), Maid (copy), RxInstanceUtils (copy), Roact (copy), createElement (copy), v1 (copy), Players (copy) ]]
+function t.new(p1)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
-	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1.Parent.Parent, "Data", function(p12, p2) --[[ Line: 91 | Upvalues: Roact (ref), createElement (ref), v1 (ref), p1 (copy), Players (ref) ]]
+	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1.Parent.Parent, "Data", function(p12, p2)
 		local v12 = Roact.mount(createElement(v1, {
 			adornee = p1,
 			dataFolder = p12
 		}), Players.LocalPlayer.PlayerGui, "BoardGui")
-		p2:GiveTask(function() --[[ Line: 101 | Upvalues: Roact (ref), v12 (copy) ]]
+		p2:GiveTask(function()
 			Roact.unmount(v12)
 		end)
 	end))
 	return t2
 end
-function t.Destroy(p1) --[[ Line: 108 ]]
+function t.Destroy(p1)
 	p1._maid:Destroy()
 end
 Binder.new("RaceTrackBoard", t):Start()

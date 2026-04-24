@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
@@ -5,11 +6,11 @@ local LocalPlayer = Players.LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
 local t = {
 	ChatModule = nil,
-	IsSmallScreen = function() --[[ Name: IsSmallScreen | Line: 9 | Upvalues: CurrentCamera (copy) ]]
+	IsSmallScreen = function()
 		return math.min(CurrentCamera.ViewportSize.X, CurrentCamera.ViewportSize.y) <= 500
 	end
 }
-function t.GetChatModule() --[[ Line: 15 | Upvalues: t (copy), LocalPlayer (copy) ]]
+function t.GetChatModule()
 	if t.ChatModule then
 		return t.ChatModule
 	else
@@ -22,7 +23,7 @@ function t.GetChatModule() --[[ Line: 15 | Upvalues: t (copy), LocalPlayer (copy
 				return nil
 			else
 				local v1 = nil
-				local v2, v3 = pcall(function() --[[ Line: 28 | Upvalues: v1 (ref), ChatMain (copy) ]]
+				local v2, v3 = pcall(function()
 					v1 = require(ChatMain)
 				end)
 				if v2 then
@@ -36,14 +37,14 @@ function t.GetChatModule() --[[ Line: 15 | Upvalues: t (copy), LocalPlayer (copy
 		end
 	end
 end
-function t.GetChatVisible() --[[ Line: 38 | Upvalues: t (copy) ]]
+function t.GetChatVisible()
 	local v1 = t.GetChatModule()
 	if v1 == nil or v1.GetVisibility == nil then
 		warn("Could not set chat visibility. API changed?")
 		return false
 	else
 		local v2 = nil
-		local v3, v4 = pcall(function() --[[ Line: 43 | Upvalues: v2 (ref), v1 (copy) ]]
+		local v3, v4 = pcall(function()
 			v2 = v1:GetVisibility()
 		end)
 		if not v3 then
@@ -52,13 +53,13 @@ function t.GetChatVisible() --[[ Line: 38 | Upvalues: t (copy) ]]
 		return v2
 	end
 end
-function t.SetChatVisible(p1) --[[ Line: 55 | Upvalues: t (copy) ]]
+function t.SetChatVisible(p1)
 	local v1 = t.GetChatModule()
 	if v1 == nil or v1.SetVisible == nil then
 		warn("Could not set chat visibility. API changed?")
 		return false
 	else
-		local v2, v3 = pcall(function() --[[ Line: 59 | Upvalues: v1 (copy), p1 (copy) ]]
+		local v2, v3 = pcall(function()
 			v1:SetVisible(p1)
 		end)
 		if not v2 then
@@ -67,12 +68,12 @@ function t.SetChatVisible(p1) --[[ Line: 55 | Upvalues: t (copy) ]]
 		return true
 	end
 end
-function t.getJumpButtonPosition() --[[ Line: 71 | Upvalues: t (copy) ]]
+function t.getJumpButtonPosition()
 	local v1 = t.IsSmallScreen()
 	local v2 = if v1 then 70 else 120
 	return v1 and UDim2.new(1, -(v2 * 1.5 - 10), 1, -v2 - 20) or UDim2.new(1, -(v2 * 1.5 - 10), 1, -v2 * 1.75)
 end
-function t.selectIfGamepad(p1) --[[ Line: 79 | Upvalues: EzUtils (copy) ]]
+function t.selectIfGamepad(p1)
 	EzUtils.selectIfGamepad(p1)
 end
 return t

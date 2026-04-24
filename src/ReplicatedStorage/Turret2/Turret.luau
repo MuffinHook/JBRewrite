@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -11,7 +12,7 @@ local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
 local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
 local Raycast = require(ReplicatedStorage.Std.Raycast)
 local Signal = require(ReplicatedStorage.Std.Signal)
-local function ShortAngleDist(p1, p2) --[[ Line: 15 ]]
+local function ShortAngleDist(p1, p2)
 	local v1 = (p2 - p1) % 6.283185307179586
 	return 2 * v1 % 6.283185307179586 - v1
 end
@@ -20,13 +21,13 @@ local t = {
 }
 local t2 = {}
 t2.__index = t2
-function t2.new(p1) --[[ Line: 27 | Upvalues: t2 (copy), Maid (copy), RocketWorld (copy), ReplicatedStorage (copy), Signal (copy), Spring (copy) ]]
+function t2.new(p1)
 	assert(p1)
 	local t = {}
 	setmetatable(t, t2)
 	t.Maid = Maid.new()
 	t.RocketWorld = RocketWorld.new()
-	local function AddSmoke(p1, p2) --[[ Line: 35 | Upvalues: ReplicatedStorage (ref) ]]
+	local function AddSmoke(p1, p2)
 		ReplicatedStorage.Resource.Robbery.CargoShip.RocketSmoke:Clone().Parent = p2
 	end
 	t.RocketWorld.AddSmoke = AddSmoke
@@ -49,7 +50,7 @@ function t2.new(p1) --[[ Line: 27 | Upvalues: t2 (copy), Maid (copy), RocketWorl
 	t.SpringShoot = Spring.new(0, 0, 0.6, 10)
 	return t
 end
-function t2.SetupJoints(p1) --[[ Line: 65 ]]
+function t2.SetupJoints(p1)
 	p1.MotorBase = p1.Model.Base.Root:WaitForChild("MotorBase", 5)
 	assert(p1.MotorBase)
 	p1.MotorBaseC0 = p1.MotorBase.C0
@@ -58,7 +59,7 @@ function t2.SetupJoints(p1) --[[ Line: 65 ]]
 	p1.MotorBarrel = p1.Model.Arm.Barrel:WaitForChild("MotorBarrel", 5)
 	assert(p1.MotorBarrel)
 end
-function t2.PointAt(p1, p2) --[[ Line: 74 | Upvalues: TurretUtils (copy) ]]
+function t2.PointAt(p1, p2)
 	p1.Target = p2
 	if p2 then
 		p1.TargetHorizontalAngle = TurretUtils.computeHorizontalAngle(p1.Model, p1.MotorBase, p2)
@@ -68,7 +69,7 @@ function t2.PointAt(p1, p2) --[[ Line: 74 | Upvalues: TurretUtils (copy) ]]
 		p1.TargetVerticalAngle = 0
 	end
 end
-function t2.Update(p1) --[[ Line: 84 | Upvalues: TurretUtils (copy), TurretConsts (copy) ]]
+function t2.Update(p1)
 	local v1 = os.clock()
 	local v2 = v1 - p1.LastUpdate
 	p1.LastUpdate = v1
@@ -88,10 +89,10 @@ function t2.Update(p1) --[[ Line: 84 | Upvalues: TurretUtils (copy), TurretConst
 		p1:ShootRocket()
 	end
 end
-function t2.GetShootHz(p1) --[[ Line: 124 | Upvalues: TurretConsts (copy) ]]
+function t2.GetShootHz(p1)
 	return p1.Model:GetAttribute(TurretConsts.SHOOT_HZ_ATTR_NAME) or 0.6666666666666666
 end
-function t2.ShootRocket(p1) --[[ Line: 127 | Upvalues: Audio (copy), t (copy) ]]
+function t2.ShootRocket(p1)
 	p1.SpringShoot:Accelerate(100)
 	p1.SpringVerticalAngle:Accelerate(1)
 	p1.SpringHorizontalAngle:Accelerate(-1)
@@ -101,7 +102,7 @@ function t2.ShootRocket(p1) --[[ Line: 127 | Upvalues: Audio (copy), t (copy) ]]
 	})
 	p1.RocketWorld:Launch(Tip.Position, Tip.CFrame.LookVector, 400)
 end
-function t2.ShootLaser(p1) --[[ Line: 139 | Upvalues: Maid (copy), Raycast (copy), Audio (copy), CharacterUtils (copy), Players (copy), GeomUtils (copy), RunService (copy) ]]
+function t2.ShootLaser(p1)
 	p1.SpringShoot:Accelerate(50)
 	p1.SpringVerticalAngle:Accelerate(1)
 	p1.SpringHorizontalAngle:Accelerate(-1)
@@ -124,13 +125,13 @@ function t2.ShootLaser(p1) --[[ Line: 139 | Upvalues: Maid (copy), Raycast (copy
 	local v2 = 1 / p1:GetShootHz() * 0.5
 	local Tip = p1.Model.Arm.Tip
 	local Vehicles = workspace:FindFirstChild("Vehicles")
-	local function updateLaserToTarget(p12) --[[ Line: 164 | Upvalues: p1 (copy), Vehicles (copy), Tip (copy), Raycast (ref), Part (copy), Audio (ref), v2 (copy), CharacterUtils (ref), Players (ref), GeomUtils (ref) ]]
+	local function updateLaserToTarget(p12)
 		local v1 = RaycastParams.new()
 		v1.FilterType = Enum.RaycastFilterType.Exclude
 		v1.FilterDescendantsInstances = { p1.Model, Vehicles }
 		v1.IgnoreWater = true
 		local v22 = p12 - Tip.Position
-		local v3 = Raycast.collidable(Tip.Position, v22.Unit, v22.Magnitude, v1, function(p1) --[[ Line: 170 ]]
+		local v3 = Raycast.collidable(Tip.Position, v22.Unit, v22.Magnitude, v1, function(p1)
 			if p1:GetAttribute("InvisibleToBullets") == true then
 				return false
 			else
@@ -151,7 +152,7 @@ function t2.ShootLaser(p1) --[[ Line: 139 | Upvalues: Maid (copy), Raycast (copy
 				Volume = 0.6,
 				RollOffMaxDistance = 1280
 			})
-			p1.Maid:GiveTask(function() --[[ Line: 193 | Upvalues: p1 (ref) ]]
+			p1.Maid:GiveTask(function()
 				p1.shoot1Sound:Destroy()
 				p1.shoot1Sound = nil
 			end)
@@ -164,12 +165,12 @@ function t2.ShootLaser(p1) --[[ Line: 139 | Upvalues: Maid (copy), Raycast (copy
 				Volume = 0.5,
 				RollOffMaxDistance = 1280
 			})
-			p1.Maid:GiveTask(function() --[[ Line: 204 | Upvalues: p1 (ref) ]]
+			p1.Maid:GiveTask(function()
 				p1.laserLoop:Destroy()
 				p1.laserLoop = nil
 			end)
 		end
-		task.delay(v2, function() --[[ Line: 211 | Upvalues: p1 (ref) ]]
+		task.delay(v2, function()
 			p1.laserLoop:Stop()
 		end)
 		local v5 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
@@ -184,7 +185,7 @@ function t2.ShootLaser(p1) --[[ Line: 139 | Upvalues: Maid (copy), Raycast (copy
 	updateLaserToTarget(Tip.Position + Vector3.new(0.01, 0.01, 0.01))
 	Part.Parent = workspace
 	local v3 = os.clock()
-	v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 229 | Upvalues: p1 (copy), v3 (copy), v2 (copy), updateLaserToTarget (copy), Tip (copy) ]]
+	v1:GiveTask(RunService.Heartbeat:Connect(function()
 		if p1.Target then
 			local v1 = os.clock() - v3
 			if v2 <= v1 then
@@ -199,7 +200,7 @@ function t2.ShootLaser(p1) --[[ Line: 139 | Upvalues: Maid (copy), Raycast (copy
 		end
 	end))
 end
-function t2.Destroy(p1) --[[ Line: 246 ]]
+function t2.Destroy(p1)
 	p1.Maid:Destroy()
 	p1.Maid = nil
 end

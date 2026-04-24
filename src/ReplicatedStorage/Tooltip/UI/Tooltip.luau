@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -8,10 +9,10 @@ v1.defaultProps = {
 	anchorPoint = Vector2.new(0.5, 0),
 	position = UDim2.fromScale(0.5, 0)
 }
-function v1.init(p1) --[[ Line: 13 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 end
-function v1.render(p1) --[[ Line: 16 | Upvalues: createElement (copy) ]]
+function v1.render(p1)
 	if p1.props.visible then
 		return createElement("Frame", {
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
@@ -39,7 +40,7 @@ function v1.render(p1) --[[ Line: 16 | Upvalues: createElement (copy) ]]
 		})
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 45 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v1

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Module.R15IKv2)
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -6,14 +7,14 @@ local SmokeGrenadeBinder = require(ReplicatedStorage.Game.SmokeGrenade.SmokeGren
 local Notification = require(ReplicatedStorage.Game.Notification)
 require(ReplicatedStorage.Inventory.InventoryItemUtils)
 local Gun = require(script.Parent.Gun)
-local function getThrowableSmokeGrenade(p1) --[[ Line: 12 | Upvalues: SmokeGrenadeBinder (copy) ]]
+local function getThrowableSmokeGrenade(p1)
 	for i, v in ipairs((SmokeGrenadeBinder:GetAll())) do
 		if v:GetCreator() == p1 and not v:GetThrown() then
 			return v
 		end
 	end
 end
-local function getNumActiveSmokeGrenade(p1) --[[ Line: 22 | Upvalues: SmokeGrenadeBinder (copy) ]]
+local function getNumActiveSmokeGrenade(p1)
 	local count = 0
 	for i, v in ipairs((SmokeGrenadeBinder:GetAll())) do
 		if v:GetCreator() == p1 and v:GetThrown() then
@@ -22,7 +23,7 @@ local function getNumActiveSmokeGrenade(p1) --[[ Line: 22 | Upvalues: SmokeGrena
 	end
 	return count
 end
-local function randomVector() --[[ Line: 34 ]]
+local function randomVector()
 	local v1 = math.random() * 2 - 1
 	local v2 = math.random() * 2 - 1
 	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
@@ -33,27 +34,27 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.Init(p1) --[[ Line: 44 | Upvalues: v2 (ref) ]]
+function t.Init(p1)
 	v2 = p1.Event
 end
-function t.new(p1, p2, p3) --[[ Line: 47 | Upvalues: Gun (copy), t (copy) ]]
+function t.new(p1, p2, p3)
 	local v1 = Gun.new(p1, p2, p3)
 	setmetatable(v1, t)
 	v1:Setup(p3)
 	return v1
 end
 t.ApplySkin = false
-function t.SetupArmWelds(p1) --[[ Line: 55 ]] end
-function t.UpdateArmIK(p1) --[[ Line: 56 ]]
+function t.SetupArmWelds(p1)  end
+function t.UpdateArmIK(p1)
 	local IK = p1.IK
 	IK.RightArm = p1.Model.Model.Hold.Position
 	IK.RightAngle = p1.Config.Motion.RightElbowAngle
 end
-function t.SetupTip(p1) --[[ Line: 62 ]]
+function t.SetupTip(p1)
 	p1.TipOffset = Vector3.new()
 end
-function t.BulletEmitterOnLocalHitPlayer(p1) --[[ Line: 65 ]] end
-function t.ShootBegin(p1, p2) --[[ Line: 66 | Upvalues: getNumActiveSmokeGrenade (copy), Notification (copy), getThrowableSmokeGrenade (copy), SimulatedPhysicsProjectile (copy), v2 (ref) ]]
+function t.BulletEmitterOnLocalHitPlayer(p1)  end
+function t.ShootBegin(p1, p2)
 	tick()
 	local v1
 	if p1.Local then
@@ -83,12 +84,12 @@ function t.ShootBegin(p1, p2) --[[ Line: 66 | Upvalues: getNumActiveSmokeGrenade
 		local v5 = -0.25 * v4:Cross(Vector3.new(0, 1, 0))
 		v1:SetRotVelocity(v5 + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 5)
 		v1:SetThrown(true)
-		v1._maid:GiveTask(function() --[[ Line: 99 ]] end)
+		v1._maid:GiveTask(function()  end)
 		p1:SetNextShotPossible()
 		p1:DecrementAmmo()
 		v2:FireServer("i" .. ("v3p4ig"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("tpzkady"):sub(2, 3):reverse():reverse():reverse() .. "6p5r")
 		p1:ReloadDropAmmoVisual()
-		delay(0.1, function() --[[ Line: 109 | Upvalues: p1 (copy) ]]
+		delay(0.1, function()
 			if p1.Destroyed then
 				return false
 			end
@@ -99,12 +100,12 @@ function t.ShootBegin(p1, p2) --[[ Line: 66 | Upvalues: getNumActiveSmokeGrenade
 		p1:BroadcastInputBegan(p2)
 	end
 end
-function t.ShootEnd(p1, p2) --[[ Line: 121 ]]
+function t.ShootEnd(p1, p2)
 	if p1.Local then
 		p1:BroadcastInputEnded(p2)
 	end
 end
-function t.ShootSound(p1, p2) --[[ Line: 126 | Upvalues: Audio (copy) ]]
+function t.ShootSound(p1, p2)
 	if p2 then
 		Audio.ObjectLocal(p1.Model.Skeleton.BoundingBox, 2121005402)
 	end

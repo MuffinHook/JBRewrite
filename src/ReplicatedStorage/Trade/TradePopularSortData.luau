@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local t = {}
-function t.setPopularTradeItemData(p1) --[[ Line: 3 | Upvalues: t (copy) ]]
+function t.setPopularTradeItemData(p1)
 	t._popularTradeItemData = p1
 end
-function t.getPopularTradeItemData() --[[ Line: 6 | Upvalues: t (copy) ]]
+function t.getPopularTradeItemData()
 	return t._popularTradeItemData
 end
 return t

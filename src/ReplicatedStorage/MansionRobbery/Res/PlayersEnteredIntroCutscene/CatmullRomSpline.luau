@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local TweenService = game:GetService("TweenService")
 local t = {}
 local t2 = {}
-function t.new(p1, p2) --[[ Line: 22 | Upvalues: t2 (copy) ]]
+function t.new(p1, p2)
 	local t = {
 		Tension = p2 or 0.5,
 		Points = {},
@@ -18,20 +19,20 @@ function t.new(p1, p2) --[[ Line: 22 | Upvalues: t2 (copy) ]]
 	end
 	setmetatable(t, {
 		__index = t2,
-		__newindex = function(p1, p2, p3) --[[ Name: __newindex | Line: 43 ]]
+		__newindex = function(p1, p2, p3)
 			error("Cannot add new indices to CatmullRomSplineObject!")
 		end
 	})
 	return t
 end
-function t2.ChangeTension(p1, p2) --[[ Line: 56 | Upvalues: t2 (copy) ]]
+function t2.ChangeTension(p1, p2)
 	if type(p2) ~= "number" then
 		error("CatmullRomSpline:ChangeTension() expected a number as an input, got " .. tostring(p2) .. "!")
 	end
 	p1.Tension = p2
 	t2.UpdateLength(p1)
 end
-function t2.ChangeAllSplineTensions(p1, p2) --[[ Line: 69 | Upvalues: t2 (copy) ]]
+function t2.ChangeAllSplineTensions(p1, p2)
 	if type(p2) ~= "number" then
 		error("CatmullRomSpline:ChangeAllSplineTensions() expected a number as an input, got " .. tostring(p2) .. "!")
 	end
@@ -39,9 +40,9 @@ function t2.ChangeAllSplineTensions(p1, p2) --[[ Line: 69 | Upvalues: t2 (copy) 
 		v:ChangeTension(p2)
 	end
 end
-function t2.AddPoint(p1, p2, p3) --[[ Line: 85 | Upvalues: t2 (copy), t (copy) ]]
+function t2.AddPoint(p1, p2, p3)
 	local Points = p1.Points
-	local function checkIfPointsMatch(p12) --[[ Line: 88 | Upvalues: t2 (ref), p1 (copy) ]]
+	local function checkIfPointsMatch(p12)
 		for k, v in pairs((t2._getPoints(p1))) do
 			if typeof(v) ~= typeof(p12) then
 				return false
@@ -86,7 +87,7 @@ function t2.AddPoint(p1, p2, p3) --[[ Line: 85 | Upvalues: t2 (copy), t (copy) ]
 		t2.UpdateLength(p1)
 	end
 end
-function t2.RemovePoint(p1, p2) --[[ Line: 144 | Upvalues: t2 (copy) ]]
+function t2.RemovePoint(p1, p2)
 	for k, v in pairs((t2.GetSplines(p1))) do
 		local v2 = table.find(v.Points, p2)
 		if v2 then
@@ -94,18 +95,18 @@ function t2.RemovePoint(p1, p2) --[[ Line: 144 | Upvalues: t2 (copy) ]]
 		end
 	end
 end
-function t2._getPoints(p1) --[[ Line: 162 ]]
+function t2._getPoints(p1)
 	local t = {}
 	for i = 1, #p1.Points do
 		t[i] = typeof(p1.Points[i]) == "Instance" and p1.Points[i].Position or p1.Points[i]
 	end
 	return t
 end
-function t2.ConnectSpline(p1, p2) --[[ Line: 178 | Upvalues: t2 (copy) ]]
+function t2.ConnectSpline(p1, p2)
 	local Points = p2.Points
 	local v1 = t2.GetSplines(p1)
 	local Points_2 = v1[#v1].Points
-	local function checkIfPointsMatch(p12) --[[ Line: 186 | Upvalues: t2 (ref), p1 (copy) ]]
+	local function checkIfPointsMatch(p12)
 		for k, v in pairs((t2._getPoints(p1))) do
 			if typeof(v) ~= typeof(p12) then
 				return false
@@ -141,16 +142,16 @@ function t2.ConnectSpline(p1, p2) --[[ Line: 178 | Upvalues: t2 (copy) ]]
 		error("Cannot connect the spline because the splines do not share 3 common points!")
 	end
 end
-function t2.GetSplines(p1) --[[ Line: 209 ]]
+function t2.GetSplines(p1)
 	local t = { p1 }
 	for i = 1, #p1.ConnectedSplines do
 		table.insert(t, p1.ConnectedSplines[i])
 	end
 	return t
 end
-function t2.GetSplineAt(p1, p2) --[[ Line: 221 | Upvalues: t2 (copy) ]]
+function t2.GetSplineAt(p1, p2)
 	local v1 = t2.GetSplines(p1)
-	local function percentage(p1, p2, p3) --[[ Line: 226 ]]
+	local function percentage(p1, p2, p3)
 		local v1 = 1 / (p3 - p2)
 		return v1 * p1 - v1 * p3 + 1
 	end
@@ -173,7 +174,7 @@ function t2.GetSplineAt(p1, p2) --[[ Line: 221 | Upvalues: t2 (copy) ]]
 		end
 	end
 end
-function t2.UpdateLength(p1, p2) --[[ Line: 256 | Upvalues: t2 (copy) ]]
+function t2.UpdateLength(p1, p2)
 	local t = {}
 	local sum = 0
 	for k, v in pairs((t2.GetSplines(p1))) do
@@ -198,7 +199,7 @@ function t2.UpdateLength(p1, p2) --[[ Line: 256 | Upvalues: t2 (copy) ]]
 	p1.Length = sum
 	p1.LengthIndices = t3
 end
-function t2.CalculatePositionAt(p1, p2) --[[ Line: 295 | Upvalues: t2 (copy) ]]
+function t2.CalculatePositionAt(p1, p2)
 	if type(p2) ~= "number" then
 		error("The given t value in CatmullRomSpline:CalculatePositionAt() was not between 0 and 1, got " .. tostring(p2) .. "!")
 	end
@@ -210,7 +211,7 @@ function t2.CalculatePositionAt(p1, p2) --[[ Line: 295 | Upvalues: t2 (copy) ]]
 	local Tension = v1.Tension
 	return v3[2] + Tension * (v3[3] - v3[1]) * v2 + (3 * (v3[3] - v3[2]) - Tension * (v3[4] - v3[2]) - 2 * Tension * (v3[3] - v3[1])) * v2 ^ 2 + (-2 * (v3[3] - v3[2]) + Tension * (v3[4] - v3[2]) + Tension * (v3[3] - v3[1])) * v2 ^ 3
 end
-function t2.CalculatePositionRelativeToLength(p1, p2) --[[ Line: 324 | Upvalues: t2 (copy) ]]
+function t2.CalculatePositionRelativeToLength(p1, p2)
 	if type(p2) ~= "number" then
 		error("CatmullRomSpline:CalculatePositionRelativeToLength() only accepts a number, got " .. tostring(p2) .. "!")
 	end
@@ -246,7 +247,7 @@ function t2.CalculatePositionRelativeToLength(p1, p2) --[[ Line: 324 | Upvalues:
 		error("The CatmullRomSpline object has an invalid number of points (" .. tostring(#Points) .. "), expected 4 points!")
 	end
 end
-function t2.CalculateDerivativeAt(p1, p2) --[[ Line: 381 | Upvalues: t2 (copy) ]]
+function t2.CalculateDerivativeAt(p1, p2)
 	if type(p2) ~= "number" then
 		error("The given t value in CatmullRomSpline:CalculateDerivativeAt() was not between 0 and 1, got " .. tostring(p2) .. "!")
 	end
@@ -258,7 +259,7 @@ function t2.CalculateDerivativeAt(p1, p2) --[[ Line: 381 | Upvalues: t2 (copy) ]
 	local Tension = v1.Tension
 	return Tension * (v3[3] - v3[1]) + 2 * (3 * (v3[3] - v3[2]) - Tension * (v3[4] - v3[2]) - 2 * Tension * (v3[3] - v3[1])) * v2 + 3 * (-2 * (v3[3] - v3[2]) + Tension * (v3[4] - v3[2]) + Tension * (v3[3] - v3[1])) * v2 ^ 2
 end
-function t2.CalculateDerivativeRelativeToLength(p1, p2) --[[ Line: 409 | Upvalues: t2 (copy) ]]
+function t2.CalculateDerivativeRelativeToLength(p1, p2)
 	if type(p2) ~= "number" then
 		error("CatmullRomSpline:CalculateDerivativeRelativeToLength() only accepts a number, got " .. tostring(p2) .. "!")
 	end
@@ -289,7 +290,7 @@ function t2.CalculateDerivativeRelativeToLength(p1, p2) --[[ Line: 409 | Upvalue
 	end
 	error("The CatmullRomSpline object has an invalid number of points (" .. tostring(#Points) .. "), expected 4 points!")
 end
-function t2.CreateTween(p1, p2, p3, p4, p5) --[[ Line: 477 | Upvalues: TweenService (copy), t2 (copy) ]]
+function t2.CreateTween(p1, p2, p3, p4, p5)
 	if typeof(p2) ~= "Instance" then
 		error("CatmullRomSplineObject:CreateTween() expected an instance as the first input, got " .. tostring(p2) .. "!")
 	end
@@ -298,7 +299,7 @@ function t2.CreateTween(p1, p2, p3, p4, p5) --[[ Line: 477 | Upvalues: TweenServ
 	end
 	local v1 = true
 	for k, v in pairs(p4) do
-		local v2, v3 = pcall(function() --[[ Line: 491 | Upvalues: p2 (copy), v (copy) ]]
+		local v2, v3 = pcall(function()
 			return p2[v]
 		end)
 		if not v2 or v3 == nil then
@@ -313,9 +314,9 @@ function t2.CreateTween(p1, p2, p3, p4, p5) --[[ Line: 477 | Upvalues: TweenServ
 		Value = 1
 	})
 	local v6 = nil
-	v5.Changed:Connect(function(p12) --[[ Line: 506 | Upvalues: v5 (copy), v6 (ref), v4 (copy), p4 (copy), p5 (copy), t2 (ref), p1 (copy), p2 (copy) ]]
+	v5.Changed:Connect(function(p12)
 		if p12 == "PlaybackState" and v5.PlaybackState == Enum.PlaybackState.Playing then
-			v6 = v4.Changed:Connect(function(p12) --[[ Line: 510 | Upvalues: p4 (ref), p5 (ref), t2 (ref), p1 (ref), p2 (ref) ]]
+			v6 = v4.Changed:Connect(function(p12)
 				for k, v in pairs(p4) do
 					local v1 = p5 and t2.CalculatePositionRelativeToLength(p1, p12) or t2.CalculatePositionAt(p1, p12)
 					local v2 = p5 and t2.CalculateDerivativeRelativeToLength(p1, p12) or t2.CalculateDerivativeAt(p1, p12)

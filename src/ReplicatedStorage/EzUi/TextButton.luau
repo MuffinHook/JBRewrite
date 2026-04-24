@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
 local v2 = Roact.Component:extend("TextButton")
@@ -7,7 +8,7 @@ v2.defaultProps = {
 	borderSize = 0,
 	borderColor = Color3.new(0/255, 0/255, 0/255)
 }
-function v2.render(p1) --[[ Line: 15 | Upvalues: createElement (copy), Roact (copy) ]]
+function v2.render(p1)
 	return createElement("TextButton", {
 		AnchorPoint = p1.props.anchorPoint,
 		BorderSizePixel = p1.props.borderSize,

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -14,20 +15,20 @@ local topBarButtonsComponent = require(script.Parent.topBarButtonsComponent)
 local rewardCardComponent = require(ReplicatedStorage.RewardSpinner.UI.rewardCardComponent)
 local bodyTopBarComponent = require(script.Parent.bodyTopBarComponent)
 local v1 = Roact.PureComponent:extend("SafesShop")
-function v1.init(p1) --[[ Line: 20 | Upvalues: Maid (copy), Players (copy), PolicyService (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	p1:setState({
 		canPurchase = true
 	})
 	if Players.LocalPlayer then
 		local LocalPlayer = Players.LocalPlayer
-		PolicyService.promiseCachedPlayerPolicyInfo(LocalPlayer):andThen(function(p12) --[[ Line: 27 | Upvalues: LocalPlayer (copy), p1 (copy) ]]
+		PolicyService.promiseCachedPlayerPolicyInfo(LocalPlayer):andThen(function(p12)
 			if p12.ArePaidRandomItemsRestricted == true then
 				p1:setState({
 					canPurchase = true,
 					policyCashAvailable = LocalPlayer:GetAttribute("NoPaidCash") or 0
 				})
-				p1.maid:GiveTask(LocalPlayer:GetAttributeChangedSignal("NoPaidCash"):Connect(function() --[[ Line: 38 | Upvalues: LocalPlayer (ref), p1 (ref) ]]
+				p1.maid:GiveTask(LocalPlayer:GetAttributeChangedSignal("NoPaidCash"):Connect(function()
 					p1:setState({
 						policyCashAvailable = LocalPlayer:GetAttribute("NoPaidCash") or 0
 					})
@@ -36,7 +37,7 @@ function v1.init(p1) --[[ Line: 20 | Upvalues: Maid (copy), Players (copy), Poli
 		end)
 	end
 end
-function v1.render(p1) --[[ Line: 48 | Upvalues: createElement (copy), PaddedContainer (copy), topBarButtonsComponent (copy), paddedScrollingGrid (copy), SafeComponent (copy), bodyTopBarComponent (copy), rewardCardComponent (copy), safeInfoComponent (copy), Dictionary (copy), String (copy), Roact (copy) ]]
+function v1.render(p1)
 	local v1 = Color3.new(51/255, 51/255, 51/255)
 	local t = {
 		BackgroundTransparency = 0.8,
@@ -287,5 +288,5 @@ function v1.render(p1) --[[ Line: 48 | Upvalues: createElement (copy), PaddedCon
 	})
 	return createElement("Frame", t, t2)
 end
-function v1.didMount(p1) --[[ Line: 317 ]] end
+function v1.didMount(p1)  end
 return v1

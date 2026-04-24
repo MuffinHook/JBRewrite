@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("ServerStorage")
 local GarageItemUtils = require(script.Parent.GarageItemUtils)
@@ -17,18 +18,18 @@ local VehicleConf = require(ReplicatedStorage.Game.Garage.VehicleConf)
 local SaleConsts = require(ReplicatedStorage.Sale.SaleConsts)
 local SaleShared = require(ReplicatedStorage.Sale.SaleShared)
 local CreatorValues = require(ReplicatedStorage.Trade.CreatorValues)
-local function updateVehicleCamera(p1, p2) --[[ Line: 24 ]]
+local function updateVehicleCamera(p1, p2)
 	local v1 = os.clock() / 2
 	p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1 * 0.5) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, p2.BoundingBox.Size.Magnitude * 0.8)
 end
-local function cleanup(p1) --[[ Line: 31 ]]
+local function cleanup(p1)
 	if p1.inst then
 		p1.inst:Destroy()
 		p1.inst = nil
 	end
 	p1.updateCamera = nil
 end
-local function setPageSpawn(p1, p2) --[[ Line: 38 | Upvalues: PopularSort (copy), VehicleData (copy), RunUtils (copy), ItemUtils (copy), SaleShared (copy), SaleConsts (copy), GarageUtils (copy), getDefaultVehicleModel (copy), updateVehicleCamera (copy), CreatorValues (copy), SortUtils (copy) ]]
+local function setPageSpawn(p1, p2)
 	local t = {}
 	for i, v in ipairs(p1) do
 		if v.inst then
@@ -69,7 +70,7 @@ local function setPageSpawn(p1, p2) --[[ Line: 38 | Upvalues: PopularSort (copy)
 			t2.price = Price
 			t2.level = v4.Level
 			t2.season = v4.Season
-			function t2.getInst() --[[ Line: 81 | Upvalues: getDefaultVehicleModel (ref), v4 (copy) ]]
+			function t2.getInst()
 				return getDefaultVehicleModel(v4.Make, v4.Type)
 			end
 			t2.updateCamera = updateVehicleCamera
@@ -92,7 +93,7 @@ local function setPageSpawn(p1, p2) --[[ Line: 38 | Upvalues: PopularSort (copy)
 	end
 	return t
 end
-local function setCategory(p1, p2) --[[ Line: 101 | Upvalues: StoreData (copy), VehicleUtils (copy), PopularSort (copy), VehicleConf (copy), GarageItemUtils (copy), SaleShared (copy), SaleConsts (copy), ItemUtils (copy), GarageUtils (copy), CreatorValues (copy), SortUtils (copy) ]]
+local function setCategory(p1, p2)
 	assert(p2.categoryName ~= nil, "missing category Name")
 	for i, v in ipairs(p1) do
 		if v.inst then
@@ -155,12 +156,12 @@ local function setCategory(p1, p2) --[[ Line: 101 | Upvalues: StoreData (copy), 
 				topPct = v10.TopPct,
 				vip = v10.VIP,
 				categoryName = v11,
-				getInst = function() --[[ Name: getInst | Line: 169 | Upvalues: v6 (ref), v10 (copy) ]]
+				getInst = function()
 					return v6.GetInstance(v10)
 				end,
 				updateCamera = v6.Update
 			}
-			v8 = if v6.onItemSelected == nil then false else function() --[[ Line: 173 | Upvalues: v6 (ref), v10 (copy) ]]
+			v8 = if v6.onItemSelected == nil then false else function()
 	return v6.onItemSelected(v10)
 end
 			t2.onItemSelected = v8
@@ -175,7 +176,7 @@ end
 	end
 	return t
 end
-local function setPageSaves() --[[ Line: 188 | Upvalues: GarageConsts (copy), VehicleUtils (copy), getDefaultVehicleModel (copy), StoreData (copy), Customize (copy), updateVehicleCamera (copy) ]]
+local function setPageSaves()
 	local t = {}
 	for i = 1, GarageConsts.NUM_SAVE_SLOTS do
 		local v1
@@ -186,7 +187,7 @@ local function setPageSaves() --[[ Line: 188 | Upvalues: GarageConsts (copy), Ve
 		v1 = GarageConsts.NUM_FREE_SAVE_SLOTS < i
 		t2.vip = v1
 		t2.available = true
-		function t2.getInstForSelection(p1) --[[ Line: 197 | Upvalues: VehicleUtils (ref), getDefaultVehicleModel (ref), StoreData (ref), Customize (ref) ]]
+		function t2.getInstForSelection(p1)
 			local v1 = VehicleUtils.GetLocalVehiclePacket()
 			local v2 = getDefaultVehicleModel(v1.Make, v1.Type)
 			local v3 = StoreData.GetMapFromSelection(p1)
@@ -203,13 +204,13 @@ local function setPageSaves() --[[ Line: 188 | Upvalues: GarageConsts (copy), Ve
 	return t
 end
 return Rodux.createReducer({}, {
-	setCategory = function(p1, p2) --[[ Name: setCategory | Line: 213 | Upvalues: setCategory (copy) ]]
+	setCategory = function(p1, p2)
 		return setCategory(p1, p2)
 	end,
-	setSaveSlot = function() --[[ Name: setSaveSlot | Line: 216 | Upvalues: setPageSaves (copy) ]]
+	setSaveSlot = function()
 		return setPageSaves()
 	end,
-	setPage = function(p1, p2) --[[ Name: setPage | Line: 219 | Upvalues: setPageSpawn (copy), setCategory (copy), setPageSaves (copy) ]]
+	setPage = function(p1, p2)
 		local pageName = p2.pageName
 		if pageName == "Spawn" then
 			return setPageSpawn(p1, p2)
@@ -222,7 +223,7 @@ return Rodux.createReducer({}, {
 		end
 		error("Page not handled by itemsReducer")
 	end,
-	setSort = function(p1, p2) --[[ Name: setSort | Line: 230 | Upvalues: SortUtils (copy) ]]
+	setSort = function(p1, p2)
 		assert(p2.id ~= nil, "missing sort id")
 		local t = {}
 		for i = 1, #p1 do

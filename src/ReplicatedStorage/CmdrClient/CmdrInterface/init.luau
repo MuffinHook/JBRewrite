@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
-return function(p1) --[[ Line: 6 | Upvalues: LocalPlayer (copy) ]]
+return function(p1)
 	local Util = p1.Util
 	local Window = require(script:WaitForChild("Window"))
 	Window.Cmdr = p1
 	local v1 = require(script:WaitForChild("AutoComplete"))(p1)
 	Window.AutoComplete = v1
-	function Window.ProcessEntry(p12) --[[ Line: 16 | Upvalues: Util (copy), Window (copy), p1 (copy), LocalPlayer (ref) ]]
+	function Window.ProcessEntry(p12)
 		local v1 = Util.TrimString(p12)
 		if #v1 ~= 0 then
 			Window:AddLine(Window:GetLabel() .. " " .. v1, Color3.fromRGB(255, 223, 93))
@@ -14,7 +15,7 @@ return function(p1) --[[ Line: 6 | Upvalues: LocalPlayer (copy) ]]
 			}))
 		end
 	end
-	function Window.OnTextChanged(p12) --[[ Line: 31 | Upvalues: p1 (copy), LocalPlayer (ref), Util (copy), Window (copy), v1 (copy) ]]
+	function Window.OnTextChanged(p12)
 		local v12 = p1.Dispatcher:Evaluate(p12, LocalPlayer, true)
 		local v2 = Util.SplitString(p12)
 		local v3 = table.remove(v2, 1)

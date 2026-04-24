@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 game:GetService("Debris")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -22,7 +23,7 @@ local t = {
 	bullet_impact_body_thump_01 = 2121003873,
 	bullet_impact_bass = 2837091387
 }
-local function IntersectRaySphereF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11) --[[ Line: 33 ]]
+local function IntersectRaySphereF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 	local v1 = p7 * p7 * p4 * p4 + p7 * p7 * p5 * p5 + p7 * p7 * p6 * p6
 	local v2 = 2 * (p7 * p4 * (p1 - p8) + p7 * p5 * (p2 - p9) + p7 * p6 * (p3 - p10))
 	local v3 = v2 * v2 - 4 * v1 * (p8 * p8 + p9 * p9 + p10 * p10 + p1 * p1 + p2 * p2 + p3 * p3 - 2 * (p8 * p1 + p9 * p2 + p10 * p3) - p11 * p11)
@@ -39,7 +40,7 @@ local function IntersectRaySphereF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 		end
 	end
 end
-local function IntersectRaySphere(p1, p2, p3, p4, p5) --[[ Line: 52 | Upvalues: IntersectRaySphereF (copy) ]]
+local function IntersectRaySphere(p1, p2, p3, p4, p5)
 	return IntersectRaySphereF(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p3, p4.x, p4.y, p4.z, p5)
 end
 local Part = Instance.new("Part")
@@ -52,7 +53,7 @@ local v1 = Instance.new("Folder")
 v1.Parent = workspace
 local t2 = {}
 t2.__index = t2
-function t2.new(p1) --[[ Line: 79 | Upvalues: t2 (copy), Maid (copy), Signal (copy) ]]
+function t2.new(p1)
 	assert(p1 ~= nil)
 	local t = {}
 	setmetatable(t, t2)
@@ -83,7 +84,7 @@ function t2.new(p1) --[[ Line: 79 | Upvalues: t2 (copy), Maid (copy), Signal (co
 	t._customCollidableFunc = t:_buildCustomCollidableFunc()
 	return t
 end
-function t2.Emit(p1, p2, p3, p4) --[[ Line: 121 | Upvalues: Part (copy), v1 (copy) ]]
+function t2.Emit(p1, p2, p3, p4)
 	local LineHandleAdornment = Instance.new("LineHandleAdornment")
 	LineHandleAdornment.Adornee = Part
 	LineHandleAdornment.AdornCullingMode = Enum.AdornCullingMode.Automatic
@@ -111,7 +112,7 @@ function t2.Emit(p1, p2, p3, p4) --[[ Line: 121 | Upvalues: Part (copy), v1 (cop
 end
 local t3 = { t.bullet_flyby_01, t.bullet_flyby_04 }
 local t4 = {}
-local function getWhizPart() --[[ Line: 151 | Upvalues: t4 (copy) ]]
+local function getWhizPart()
 	local v1 = table.remove(t4)
 	if v1 then
 		return v1
@@ -124,7 +125,7 @@ local function getWhizPart() --[[ Line: 151 | Upvalues: t4 (copy) ]]
 		return Part
 	end
 end
-local function returnWhizPart(p1) --[[ Line: 163 | Upvalues: t4 (copy) ]]
+local function returnWhizPart(p1)
 	p1.Parent = nil
 	if #t4 < 8 then
 		t4[#t4 + 1] = p1
@@ -132,7 +133,7 @@ local function returnWhizPart(p1) --[[ Line: 163 | Upvalues: t4 (copy) ]]
 		p1:Destroy()
 	end
 end
-function t2.PlayWhiz(p1, p2, p3) --[[ Line: 171 | Upvalues: t4 (copy), Audio (copy), t3 (copy), returnWhizPart (copy) ]]
+function t2.PlayWhiz(p1, p2, p3)
 	local v1 = table.remove(t4)
 	local v2
 	if v1 then
@@ -154,7 +155,7 @@ function t2.PlayWhiz(p1, p2, p3) --[[ Line: 171 | Upvalues: t4 (copy), Audio (co
 	})
 	task.delay(3, returnWhizPart, v2)
 end
-function t2.CheckWhiz(p1, p2) --[[ Line: 185 | Upvalues: PlayerUtils (copy), LocalPlayer (copy) ]]
+function t2.CheckWhiz(p1, p2)
 	local v1 = tick()
 	local v2 = PlayerUtils.getRootPart(LocalPlayer)
 	if v2 ~= nil then
@@ -166,8 +167,8 @@ function t2.CheckWhiz(p1, p2) --[[ Line: 185 | Upvalues: PlayerUtils (copy), Loc
 		end
 	end
 end
-function t2._buildCustomCollidableFunc(p1) --[[ Line: 198 ]]
-	return function(p12) --[[ Line: 199 | Upvalues: p1 (copy) ]]
+function t2._buildCustomCollidableFunc(p1)
+	return function(p12)
 		if p12:GetAttribute("InvisibleToBullets") == true then
 			return false
 		else
@@ -186,7 +187,7 @@ local t5 = {
 	FaceFrontAttachment = true,
 	FaceCenterAttachment = true
 }
-function t2.Update(p1) --[[ Line: 223 | Upvalues: LocalPlayer (copy), CollectionService (copy), GuardNPCBinder (copy), ForcefieldService (copy), t2 (copy), Players (copy), IntersectRaySphereF (copy), ItemSystem (copy), InventoryItemUtils (copy), Math (copy), CombatUtils (copy), RayCast (copy), t5 (copy) ]]
+function t2.Update(p1)
 	debug.profilebegin("BulletEmitter Update")
 	local v1 = tick()
 	local v2 = v1 - (p1.LastUpdate or v1)
@@ -357,7 +358,7 @@ function t2.Update(p1) --[[ Line: 223 | Upvalues: LocalPlayer (copy), Collection
 	end
 	debug.profileend()
 end
-function t2.Destroy(p1) --[[ Line: 546 ]]
+function t2.Destroy(p1)
 	for i = #p1.Bullets, 1, -1 do
 		local v1 = p1.Bullets[i]
 		v1[4]:Destroy()

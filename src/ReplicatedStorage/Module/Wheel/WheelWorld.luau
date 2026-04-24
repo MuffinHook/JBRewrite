@@ -1,4 +1,5 @@
-local function v1(p1) --[[ Line: 7 | Upvalues: v1 (copy) ]]
+-- Reviewed by Claude
+local function v1(p1)
 	local v12 = next
 	local v2, v3 = p1:GetChildren()
 	local sum = 0
@@ -12,21 +13,21 @@ local function v1(p1) --[[ Line: 7 | Upvalues: v1 (copy) ]]
 end
 local t = {}
 t.__index = t
-function t.new() --[[ Line: 20 | Upvalues: t (copy) ]]
+function t.new()
 	local v2 = setmetatable({}, t)
 	v2.Model = nil
 	v2.Wheels = {}
 	return v2
 end
-function t.SetModel(p1, p2) --[[ Line: 26 ]]
+function t.SetModel(p1, p2)
 	p1.Model = p2
 end
-function t.AddWheel(p1, p2) --[[ Line: 29 ]]
+function t.AddWheel(p1, p2)
 	assert(p2)
 	table.insert(p1.Wheels, p2)
 	p1:Calculate()
 end
-function t.GetEffWheelCount(p1) --[[ Line: 34 ]]
+function t.GetEffWheelCount(p1)
 	local count = 0
 	for i, v in ipairs(p1.Wheels) do
 		if v._applyForces then
@@ -35,7 +36,7 @@ function t.GetEffWheelCount(p1) --[[ Line: 34 ]]
 	end
 	return count
 end
-function t.Calculate(p1) --[[ Line: 43 | Upvalues: v1 (copy) ]]
+function t.Calculate(p1)
 	local v12 = if p1.Model == nil then 0 else v1(p1.Model)
 	local v3 = v12 * (1 / p1:GetEffWheelCount())
 	for i = 1, #p1.Wheels do
@@ -44,7 +45,7 @@ function t.Calculate(p1) --[[ Line: 43 | Upvalues: v1 (copy) ]]
 	end
 	p1.Mass = v12
 end
-function t.Destroy(p1) --[[ Line: 58 ]]
+function t.Destroy(p1)
 	for i = 1, #p1.Wheels do
 		p1.Wheels[i]:Destroy()
 	end

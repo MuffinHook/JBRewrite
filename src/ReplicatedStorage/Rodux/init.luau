@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Store = require(script.Store)
 local createReducer = require(script.createReducer)
 local combineReducers = require(script.combineReducers)

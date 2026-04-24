@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Symbol = require(script.Parent.Symbol)
 local strict = require(script.Parent.strict)
 local Portal = require(script.Parent.Portal)
@@ -8,7 +9,7 @@ local t = {
 	Function = Symbol.named("Function"),
 	Stateful = Symbol.named("Stateful"),
 	Fragment = Symbol.named("Fragment"),
-	of = function(p1) --[[ Name: of | Line: 25 | Upvalues: v1 (copy) ]]
+	of = function(p1)
 		if typeof(p1) == "table" then
 			return p1[v1]
 		else
@@ -21,7 +22,7 @@ local t2 = {
 	["function"] = t.Function,
 	table = t.Stateful
 }
-function t.fromComponent(p1) --[[ Line: 39 | Upvalues: Portal (copy), v1 (copy), t2 (copy) ]]
+function t.fromComponent(p1)
 	if p1 == Portal then
 		return v1.Portal
 	else

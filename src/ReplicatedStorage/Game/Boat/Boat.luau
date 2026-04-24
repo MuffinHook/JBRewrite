@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
@@ -15,7 +16,7 @@ local Spring = require(ReplicatedStorage.Std.Spring)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local v1 = nil
 Vector3.new()
-local function v2(p1) --[[ Line: 21 | Upvalues: v2 (copy) ]]
+local function v2(p1)
 	local sum = 0
 	for i, v in ipairs(p1:GetChildren()) do
 		if v:IsA("BasePart") then
@@ -26,7 +27,7 @@ local function v2(p1) --[[ Line: 21 | Upvalues: v2 (copy) ]]
 	return sum
 end
 local v3 = CFrame.new()
-local function FromAxisAngle(p1) --[[ Line: 33 | Upvalues: v3 (copy) ]]
+local function FromAxisAngle(p1)
 	local x = p1.x
 	local y = p1.y
 	local z = p1.z
@@ -42,10 +43,10 @@ local t = {
 	__ClassName = "Boat"
 }
 t.__index = t
-function t.Init() --[[ Line: 47 | Upvalues: v1 (ref), LocalPlayer (copy) ]]
+function t.Init()
 	v1 = require(LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"))
 end
-function t.new(p1, p2) --[[ Line: 50 | Upvalues: t (copy), Maid (copy), Interval (copy) ]]
+function t.new(p1, p2)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2.Config = p1
@@ -61,7 +62,7 @@ function t.new(p1, p2) --[[ Line: 50 | Upvalues: t (copy), Maid (copy), Interval
 	t2.AlignOrientation = t2.PartBase.AlignOrientation
 	t2:SetupSeats()
 	local v2 = false
-	t2.maid:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 70 | Upvalues: t2 (copy), v2 (ref) ]]
+	t2.maid:GiveTask(Interval.every(0.1):Connect(function()
 		local v1 = t2:GetAreTiresPopped()
 		if v1 ~= v2 then
 			t2.Model:FindFirstChild("Visual"):FindFirstChild("Body"):FindFirstChild("Smoke").Enabled = v1
@@ -70,12 +71,12 @@ function t.new(p1, p2) --[[ Line: 50 | Upvalues: t (copy), Maid (copy), Interval
 	end))
 	return t2
 end
-function t.Setup(p1) --[[ Line: 81 | Upvalues: Spring (copy) ]]
+function t.Setup(p1)
 	p1.SpringForward = Spring.new(0, 0, 1, 10)
 	p1.SpringAccel = Spring.new(0, 0, 1, 5)
 	p1.SpringHeading = Spring.new(0, 0, 1, 20)
 end
-function t.SetupSeats(p1) --[[ Line: 86 ]]
+function t.SetupSeats(p1)
 	assert(p1.Seats == nil)
 	local t = {}
 	local t2 = {}
@@ -84,16 +85,16 @@ function t.SetupSeats(p1) --[[ Line: 86 ]]
 	t[1] = t2
 	p1.Seats = t
 end
-function t.MountLocalCamera(p1, p2) --[[ Line: 95 ]]
+function t.MountLocalCamera(p1, p2)
 	local Player = p2.Player
 	assert(Player)
 	local CameraMaxZoomDistance = Player.CameraMaxZoomDistance
-	p2.Maid:GiveTask(function() --[[ Line: 99 | Upvalues: Player (copy), CameraMaxZoomDistance (copy) ]]
+	p2.Maid:GiveTask(function()
 		Player.CameraMaxZoomDistance = CameraMaxZoomDistance
 	end)
 	Player.CameraMaxZoomDistance = 120
 end
-function t.MountPlayer(p1, p2, p3) --[[ Line: 105 | Upvalues: LocalPlayer (copy), ConstraintUtils (copy), CharacterUtil (copy), Spring (copy), RunService (copy) ]]
+function t.MountPlayer(p1, p2, p3)
 	assert(p2 ~= nil)
 	assert(p3 ~= nil)
 	p3.Local = p2 == LocalPlayer
@@ -103,13 +104,13 @@ function t.MountPlayer(p1, p2, p3) --[[ Line: 105 | Upvalues: LocalPlayer (copy)
 	p3.JointWaist = p3.Character.UpperTorso.Waist
 	p3.JointNeckC0 = p3.JointNeck.C0
 	p3.JointWaistC0 = p3.JointWaist.C0
-	p3.Maid:GiveTask(function() --[[ Line: 120 | Upvalues: ConstraintUtils (ref), p3 (copy) ]]
+	p3.Maid:GiveTask(function()
 		ConstraintUtils.setJointC0(p3.JointNeck, p3.JointNeckC0)
 		ConstraintUtils.setJointC0(p3.JointWaist, p3.JointWaistC0)
 	end)
 	CharacterUtil.setHumanoidEnabled(p3.Humanoid, false)
 	p3.Humanoid:ChangeState(Enum.HumanoidStateType.Seated)
-	p3.Maid:GiveTask(function() --[[ Line: 127 | Upvalues: CharacterUtil (ref), p3 (copy) ]]
+	p3.Maid:GiveTask(function()
 		CharacterUtil.setHumanoidEnabled(p3.Humanoid, true)
 		p3.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
 	end)
@@ -120,7 +121,7 @@ function t.MountPlayer(p1, p2, p3) --[[ Line: 105 | Upvalues: LocalPlayer (copy)
 			p1:MountLocalCamera(p3)
 			p1:SetupLocalDriverInputs(p3)
 		end
-		p3.Maid:GiveTask(function() --[[ Line: 140 | Upvalues: p1 (copy) ]]
+		p3.Maid:GiveTask(function()
 			p1.AlignOrientation.Enabled = false
 			if p1.ForceFront ~= nil then
 				p1.ForceFront.Force = Vector3.new()
@@ -128,19 +129,19 @@ function t.MountPlayer(p1, p2, p3) --[[ Line: 105 | Upvalues: LocalPlayer (copy)
 		end)
 		p3.SpringWaistRotation = Spring.new(Vector3.new(), Vector3.new(), 0.9, 20)
 		p3.SpringNeckRotation = Spring.new(Vector3.new(), Vector3.new(), 0.9, 20)
-		p3.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 153 | Upvalues: p1 (copy), p3 (copy) ]]
+		p3.Maid:GiveTask(RunService.Heartbeat:Connect(function()
 			if p1.Model ~= nil then
 				p1:HeartbeatDriver(p3)
 			end
 		end))
 	end
 end
-function t.UnmountSeat(p1, p2) --[[ Line: 160 ]]
+function t.UnmountSeat(p1, p2)
 	assert(p2 ~= nil)
 	assert(p2.Occupied == true)
 	p2.Local = nil
 end
-function t.UpdateCharacterJoints(p1, p2) --[[ Line: 165 | Upvalues: ConstraintUtils (copy), FromAxisAngle (copy) ]]
+function t.UpdateCharacterJoints(p1, p2)
 	ConstraintUtils.setJointC0(p2.JointWaist, p2.JointWaistC0 * FromAxisAngle((p2.SpringWaistRotation:Update())))
 	ConstraintUtils.setJointC0(p2.JointNeck, p2.JointNeckC0 * FromAxisAngle((p2.SpringNeckRotation:Update())))
 end
@@ -150,7 +151,7 @@ local t2 = {
 	[Enum.KeyCode.ButtonR2] = 1,
 	[Enum.KeyCode.ButtonL2] = 3
 }
-function t.UpdateInput(p1) --[[ Line: 180 | Upvalues: InputUtils (copy), v1 (ref) ]]
+function t.UpdateInput(p1)
 	local v12 = p1.WASD[1] - p1.WASD[3]
 	local v2 = p1.WASD[2] - p1.WASD[4]
 	if InputUtils.isTouch() then
@@ -164,10 +165,10 @@ function t.UpdateInput(p1) --[[ Line: 180 | Upvalues: InputUtils (copy), v1 (ref
 	p1.SpringHeadingp = p1.SpringHeading:SetTarget(v2)
 	p1.SpringAccelp = p1.SpringAccel:SetTarget(p1.Forward)
 end
-function t.UpdateThirdInput(p1) --[[ Line: 197 ]]
+function t.UpdateThirdInput(p1)
 	error("TODO: Implement")
 end
-function t.CalculateSway(p1) --[[ Line: 200 ]]
+function t.CalculateSway(p1)
 	local v1 = tick() - p1.BornAt
 	local v2 = -125925.51356 + p1.BornAt
 	local v3 = -51235.65816 + p1.BornAt
@@ -176,11 +177,11 @@ function t.CalculateSway(p1) --[[ Line: 200 ]]
 	p1.SwayX = v4 * (1 - v5)
 	p1.SwayY = (math.sin(v1 * 0.8 + v3) * 0.4 + math.noise(v1, v3) * 0.1) * (1 - v5)
 end
-function t.GetAreTiresPopped(p1) --[[ Line: 214 | Upvalues: BoatConsts (copy), VehicleUtils (copy) ]]
+function t.GetAreTiresPopped(p1)
 	local v1 = p1.Model:GetAttribute(BoatConsts.TIRES_POPPED_AT_ATTR_NAME) or 0
 	return v1 + VehicleUtils.getVehicleCombatConfig(p1.Model.Name).DisableDuration > workspace:GetServerTimeNow()
 end
-function t.UpdatePhysics(p1) --[[ Line: 221 ]]
+function t.UpdatePhysics(p1)
 	local v1 = p1:GetAreTiresPopped()
 	local BuoyancySensor = p1.BuoyancySensor
 	if not BuoyancySensor then
@@ -208,7 +209,7 @@ function t.UpdatePhysics(p1) --[[ Line: 221 ]]
 	local v25 = CFrame.new
 	p1.AlignOrientation.CFrame = v25(Vector3.new(0, 0, 0), Vector3.new(v2.LookVector.X, 0, v2.LookVector.Z).Unit) * CFrame.Angles(0, 0, (v13 + p1.SwayY) * math.pi * 0.03) * CFrame.Angles((v15 + p1.SwayX) * math.pi * 0.02, 0, 0) * CFrame.Angles(0, v24, 0) + v2.p
 end
-function t.HeartbeatDriver(p1, p2) --[[ Line: 288 ]]
+function t.HeartbeatDriver(p1, p2)
 	assert(p2 ~= nil)
 	if p1.Model ~= nil then
 		if p2.Local then
@@ -221,9 +222,9 @@ function t.HeartbeatDriver(p1, p2) --[[ Line: 288 ]]
 		p1:UpdateCharacterJoints(p2)
 	end
 end
-function t.SetupLocalDriverInputs(p1, p2) --[[ Line: 301 | Upvalues: t2 (copy), UserInputService (copy), ActionButtonService (copy) ]]
+function t.SetupLocalDriverInputs(p1, p2)
 	p1.WASD = { 0, 0, 0, 0 }
-	local function InputBegan(p12, p2) --[[ Line: 303 | Upvalues: t2 (ref), p1 (copy) ]]
+	local function InputBegan(p12, p2)
 		if p2 then
 			return true
 		end
@@ -232,7 +233,7 @@ function t.SetupLocalDriverInputs(p1, p2) --[[ Line: 301 | Upvalues: t2 (copy), 
 		end
 	end
 	p2.Maid:GiveTask(UserInputService.InputBegan:Connect(InputBegan))
-	local function InputEnded(p12, p2) --[[ Line: 314 | Upvalues: t2 (ref), p1 (copy) ]]
+	local function InputEnded(p12, p2)
 		if p2 then
 			return true
 		end
@@ -241,7 +242,7 @@ function t.SetupLocalDriverInputs(p1, p2) --[[ Line: 301 | Upvalues: t2 (copy), 
 		end
 	end
 	p2.Maid:GiveTask(UserInputService.InputEnded:Connect(InputEnded))
-	local function InputChanged(p12) --[[ Line: 325 | Upvalues: p1 (copy), t2 (ref) ]]
+	local function InputChanged(p12)
 		if p12.UserInputType == Enum.UserInputType.Gamepad1 then
 			local KeyCode = p12.KeyCode
 			if KeyCode == Enum.KeyCode.Thumbstick1 then
@@ -263,10 +264,10 @@ function t.SetupLocalDriverInputs(p1, p2) --[[ Line: 301 | Upvalues: t2 (copy), 
 		saturateTo = 0,
 		image = "rbxassetid://7858765663",
 		keyCodes = { Enum.KeyCode.W },
-		onPressed = function() --[[ Name: onPressed | Line: 350 | Upvalues: p1 (copy) ]]
+		onPressed = function()
 			p1.WASD[1] = 1
 		end,
-		onReleased = function() --[[ Name: onReleased | Line: 353 | Upvalues: p1 (copy) ]]
+		onReleased = function()
 			p1.WASD[1] = 0
 		end
 	}))
@@ -276,16 +277,16 @@ function t.SetupLocalDriverInputs(p1, p2) --[[ Line: 301 | Upvalues: t2 (copy), 
 		saturateTo = 0,
 		image = "rbxassetid://7858764373",
 		keyCodes = { Enum.KeyCode.S },
-		onPressed = function() --[[ Name: onPressed | Line: 363 | Upvalues: p1 (copy) ]]
+		onPressed = function()
 			p1.WASD[3] = 1
 		end,
-		onReleased = function() --[[ Name: onReleased | Line: 366 | Upvalues: p1 (copy) ]]
+		onReleased = function()
 			p1.WASD[3] = 0
 		end
 	}))
 	p1:UpdateInput()
 end
-function t.Destroy(p1) --[[ Line: 374 ]]
+function t.Destroy(p1)
 	p1.Maid:Destroy()
 end
 return t

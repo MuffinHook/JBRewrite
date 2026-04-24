@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 require(script.Parent.Types)
-return function(p1) --[[ Line: 3 ]]
+return function(p1)
 	local t = {
 		_version = " 2.5.0 ",
 		_started = false,
@@ -35,7 +36,7 @@ return function(p1) --[[ Line: 3 ]]
 	t._connections = {}
 	t._initFunctions = {}
 	t._fullErrorTracebacks = game:GetService("RunService"):IsStudio()
-	t._cycleCoroutine = coroutine.create(function() --[[ Line: 73 | Upvalues: t (copy) ]]
+	t._cycleCoroutine = coroutine.create(function()
 		while t._started do
 			for v1, v2 in t._connectedFunctions do
 				debug.profilebegin("Iris/Connection")
@@ -51,10 +52,10 @@ return function(p1) --[[ Line: 3 ]]
 	end)
 	local t2 = {}
 	t2.__index = t2
-	function t2.get(p1) --[[ Line: 131 ]]
+	function t2.get(p1)
 		return p1.value
 	end
-	function t2.set(p12, p2, p3) --[[ Line: 144 | Upvalues: p1 (copy), t (copy) ]]
+	function t2.set(p12, p2, p3)
 		if p2 ~= p12.value or p3 == true then
 			p12.value = p2
 			p12.lastChangeTick = p1.Internal._cycleTick
@@ -69,18 +70,18 @@ return function(p1) --[[ Line: 3 ]]
 		end
 		return p12.value
 	end
-	function t2.onChange(p1, p2) --[[ Line: 176 ]]
+	function t2.onChange(p1, p2)
 		local v1 = #p1.ConnectedFunctions + 1
 		p1.ConnectedFunctions[v1] = p2
-		return function() --[[ Line: 179 | Upvalues: p1 (copy), v1 (copy) ]]
+		return function()
 			p1.ConnectedFunctions[v1] = nil
 		end
 	end
-	function t2.changed(p1) --[[ Line: 191 | Upvalues: t (copy) ]]
+	function t2.changed(p1)
 		return p1.lastChangeTick + 1 == t._cycleTick
 	end
 	t.StateClass = t2
-	function t._cycle(p12) --[[ Line: 209 | Upvalues: p1 (copy), t (copy) ]]
+	function t._cycle(p12)
 		if not p1.Disabled then
 			t._rootWidget.lastCycleTick = t._cycleTick
 			if t._rootInstance == nil or t._rootInstance.Parent == nil then
@@ -96,7 +97,7 @@ return function(p1) --[[ Line: 3 ]]
 			})
 			t._lastVDOM = t._VDOM
 			t._VDOM = t._generateEmptyVDOM()
-			task.spawn(function() --[[ Line: 235 | Upvalues: t (ref) ]]
+			task.spawn(function()
 				for v1, v2 in t._postCycleCallbacks do
 					v2()
 				end
@@ -143,8 +144,8 @@ return function(p1) --[[ Line: 3 ]]
 			end
 		end
 	end
-	function t._NoOp() --[[ Line: 322 ]] end
-	function t.WidgetConstructor(p12, p2) --[[ Line: 336 | Upvalues: t (copy), p1 (copy) ]]
+	function t._NoOp() end
+	function t.WidgetConstructor(p12, p2)
 		local t2 = {
 			All = {
 				Required = { "Generate", "Discard", "Update", "Args", "Events", "hasChildren", "hasState" },
@@ -212,13 +213,13 @@ return function(p1) --[[ Line: 3 ]]
 		t3.ArgNames = t4
 		for v21, v22 in t3.Events do
 			if p1.Events[v21] == nil then
-				p1.Events[v21] = function() --[[ Line: 427 | Upvalues: t (ref), v21 (copy) ]]
+				p1.Events[v21] = function()
 					return t._EventCall(t._lastWidget, v21)
 				end
 			end
 		end
 	end
-	function t._Insert(p1, p2, p3) --[[ Line: 445 | Upvalues: t (copy) ]]
+	function t._Insert(p1, p2, p3)
 		local v1 = t._getID(3)
 		local v2 = t._widgets[p1]
 		if t._VDOM[v1] then
@@ -276,7 +277,7 @@ return function(p1) --[[ Line: 3 ]]
 			return v8
 		end
 	end
-	function t._GenNewWidget(p1, p2, p3, p4) --[[ Line: 546 | Upvalues: t (copy) ]]
+	function t._GenNewWidget(p1, p2, p3, p4)
 		local v2 = t._VDOM[t._IDStack[t._stackIndex]]
 		local v3 = t._widgets[p1]
 		local t2 = {}
@@ -321,14 +322,14 @@ return function(p1) --[[ Line: 3 ]]
 		else
 			v4 = t2
 		end
-		function v4.__index(p1, p2) --[[ Line: 612 | Upvalues: t (ref), t2 (copy) ]]
-			return function() --[[ Line: 613 | Upvalues: t (ref), t2 (ref), p2 (copy) ]]
+		function v4.__index(p1, p2)
+			return function()
 				return t._EventCall(t2, p2)
 			end
 		end
 		return t2
 	end
-	function t._ContinueWidget(p1, p2) --[[ Line: 631 | Upvalues: t (copy) ]]
+	function t._ContinueWidget(p1, p2)
 		local v2 = t._VDOM[p1]
 		if t._widgets[p2].hasChildren then
 			local v3 = t
@@ -338,7 +339,7 @@ return function(p1) --[[ Line: 3 ]]
 		t._lastWidget = v2
 		return v2
 	end
-	function t._DiscardWidget(p1) --[[ Line: 654 | Upvalues: t (copy) ]]
+	function t._DiscardWidget(p1)
 		local parentWidget = p1.parentWidget
 		if parentWidget then
 			t._widgets[parentWidget.type].ChildDiscarded(parentWidget, p1)
@@ -346,7 +347,7 @@ return function(p1) --[[ Line: 3 ]]
 		t._widgets[p1.type].Discard(p1)
 		p1.lastCycleTick = -1
 	end
-	function t._widgetState(p1, p2, p3) --[[ Line: 679 | Upvalues: t (copy) ]]
+	function t._widgetState(p1, p2, p3)
 		local v1 = p1.ID .. p2
 		if t._states[v1] then
 			t._states[v1].ConnectedWidgets[p1.ID] = p1
@@ -367,7 +368,7 @@ return function(p1) --[[ Line: 3 ]]
 			return t2
 		end
 	end
-	function t._EventCall(p1, p2) --[[ Line: 709 | Upvalues: t (copy) ]]
+	function t._EventCall(p1, p2)
 		local v1 = t._widgets[p1.type].Events[p2]
 		assert(v1 ~= nil, (("widget %* has no event of name %*"):format(p1.type, p2)))
 		if p1.trackedEvents[p2] == nil then
@@ -376,20 +377,20 @@ return function(p1) --[[ Line: 3 ]]
 		end
 		return v1.Get(p1)
 	end
-	function t._GetParentWidget() --[[ Line: 728 | Upvalues: t (copy) ]]
+	function t._GetParentWidget()
 		return t._VDOM[t._IDStack[t._stackIndex]]
 	end
-	function t._generateEmptyVDOM() --[[ Line: 742 | Upvalues: t (copy) ]]
+	function t._generateEmptyVDOM()
 		return {
 			R = t._rootWidget
 		}
 	end
-	function t._generateRootInstance() --[[ Line: 755 | Upvalues: t (copy) ]]
+	function t._generateRootInstance()
 		t._rootInstance = t._widgets.Root.Generate(t._widgets.Root)
 		t._rootInstance.Parent = t.parentInstance
 		t._rootWidget.Instance = t._rootInstance
 	end
-	function t._generateSelectionImageObject() --[[ Line: 769 | Upvalues: t (copy) ]]
+	function t._generateSelectionImageObject()
 		if t.SelectionImageObject then
 			t.SelectionImageObject:Destroy()
 		end
@@ -403,7 +404,7 @@ return function(p1) --[[ Line: 3 ]]
 		t._utility.UICorner(Frame, 2)
 		t.SelectionImageObject = Frame
 	end
-	function t._getID(p1) --[[ Line: 799 | Upvalues: t (copy) ]]
+	function t._getID(p1)
 		if t._nextWidgetId then
 			local _nextWidgetId = t._nextWidgetId
 			t._nextWidgetId = nil
@@ -436,7 +437,7 @@ return function(p1) --[[ Line: 3 ]]
 			end
 		end
 	end
-	function t._deepCompare(p1, p2) --[[ Line: 846 | Upvalues: t (copy) ]]
+	function t._deepCompare(p1, p2)
 		for v1, v2 in p1 do
 			local v3 = p2[v1]
 			if type(v2) == "table" then
@@ -452,7 +453,7 @@ return function(p1) --[[ Line: 3 ]]
 		end
 		return true
 	end
-	function t._deepCopy(p1) --[[ Line: 877 | Upvalues: t (copy) ]]
+	function t._deepCopy(p1)
 		local v1 = table.clone(p1)
 		for v2, v3 in p1 do
 			if type(v3) == "table" then

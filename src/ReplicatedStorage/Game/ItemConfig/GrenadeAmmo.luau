@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 return {
 	ImageId = 2189707847,
 	Price = 500,

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -8,7 +9,7 @@ local createElement = Roact.createElement
 local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
 local TradeInitiation = require(script.Parent.TradeInitiation)
 local TradeService = require(ReplicatedStorage.Trade.TradeService)
-local function playTick() --[[ Line: 13 | Upvalues: Players (copy), Audio (copy) ]]
+local function playTick()
 	if Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 			Volume = 0.15
@@ -22,8 +23,8 @@ v1.defaultProps = {
 	aspectRatio = 1.25,
 	maximumItemsDisplayed = 4
 }
-function v1.init(p1) --[[ Line: 26 | Upvalues: TradeService (copy), Players (copy), Audio (copy), ReplicatedStorage (copy), TradeConsts (copy) ]]
-	function p1.onAccept(p12) --[[ Line: 27 | Upvalues: p1 (copy), TradeService (ref), Players (ref), Audio (ref) ]]
+function v1.init(p1)
+	function p1.onAccept(p12)
 		TradeService.acceptInitiation(p1.props.tradeInitiations[p12].userId)
 		p1.props.removeByIndex(p12)
 		if Players.LocalPlayer.PlayerGui then
@@ -32,7 +33,7 @@ function v1.init(p1) --[[ Line: 26 | Upvalues: TradeService (copy), Players (cop
 			})
 		end
 	end
-	function p1.onDecline(p12) --[[ Line: 33 | Upvalues: p1 (copy), ReplicatedStorage (ref), TradeConsts (ref), Players (ref), Audio (ref) ]]
+	function p1.onDecline(p12)
 		ReplicatedStorage:FindFirstChild(TradeConsts.DECLINE_TRADE_INITIATION_REMOTE_NAME):FireServer(p1.props.tradeInitiations[p12].userId)
 		p1.props.removeByIndex(p12)
 		if Players.LocalPlayer.PlayerGui then
@@ -42,7 +43,7 @@ function v1.init(p1) --[[ Line: 26 | Upvalues: TradeService (copy), Players (cop
 		end
 	end
 end
-function v1.render(p1) --[[ Line: 41 | Upvalues: createElement (copy), TradeInitiation (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	local v1 = 1 / (1 / p1.props.maximumItemsDisplayed - 1 / (256 / p1.props.maximumItemsDisplayed)) * p1.props.aspectRatio
 	local v2 = p1.props.maximumItemsDisplayed * p1.props.aspectRatio
 	local v3 = #p1.props.tradeInitiations
@@ -73,13 +74,13 @@ function v1.render(p1) --[[ Line: 41 | Upvalues: createElement (copy), TradeInit
 		})
 	}, t))
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 86 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		tradeInitiations = p1.tradeInitiations
 	}
-end, function(p1) --[[ Line: 90 ]]
+end, function(p1)
 	return {
-		removeByIndex = function(p12) --[[ Name: removeByIndex | Line: 92 | Upvalues: p1 (copy) ]]
+		removeByIndex = function(p12)
 			p1({
 				type = "tradeInitiationsRemoveByIndex",
 				index = p12

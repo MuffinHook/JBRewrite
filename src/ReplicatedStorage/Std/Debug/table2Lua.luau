@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 local insert = table.insert
-return function(p1) --[[ Name: table2Lua | Line: 3 | Upvalues: insert (copy) ]]
+return function(p1)
 	if p1 == nil then
 		return "nil"
 	end
 	if typeof(p1) == "table" then
 		local t = {}
-		local function v1(p1, p2, p3) --[[ Line: 12 | Upvalues: t (copy), insert (ref), v1 (copy) ]]
+		local function v1(p1, p2, p3)
 			local v12 = ("\t"):rep(p2)
 			if p3 then
 				if typeof(p3) == "string" and (not p3:find("\"") and (not p3:find("\'") and p3:sub(1, 1):match("[%w_]"))) then
@@ -23,7 +24,7 @@ return function(p1) --[[ Name: table2Lua | Line: 3 | Upvalues: insert (copy) ]]
 					v = v3
 				})
 			end
-			table.sort(t2, function(p1, p2) --[[ Line: 27 ]]
+			table.sort(t2, function(p1, p2)
 				return p1.k < p2.k
 			end)
 			for v5, v6 in t2 do

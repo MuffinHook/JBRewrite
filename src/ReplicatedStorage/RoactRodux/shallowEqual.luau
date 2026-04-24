@@ -1,19 +1,20 @@
-return function(p1, p2) --[[ Name: shallowEqual | Line: 1 ]]
+-- Reviewed by Claude
+return function(p1, p2)
 	if p1 == nil then
-		return p2 == nil
+ return p2 == nil
 	end
 	if p2 == nil then
-		return p1 == nil
+ return p1 == nil
 	end
 	for k, v in pairs(p1) do
-		if v ~= p2[k] then
-			return false
-		end
+ if v ~= p2[k] then
+ return false
+ end
 	end
 	for k, v in pairs(p2) do
-		if v ~= p1[k] then
-			return false
-		end
+ if v ~= p1[k] then
+ return false
+ end
 	end
 	return true
 end

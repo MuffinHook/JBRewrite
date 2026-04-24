@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 require(script.Types)
 local t = {}
 local v1 = require(script.Internal)(t)
 t.Disabled = false
 t.Args = {}
 t.Events = {}
-function t.Init(p1, p2, p3) --[[ Line: 73 | Upvalues: v1 (copy), t (copy) ]]
+function t.Init(p1, p2, p3)
 	assert(v1._shutdown == false, "Iris.Init() cannot be called once shutdown.")
 	assert(if v1._started == false then true else p3 == true, "Iris.Init() can only be called once.")
 	if not v1._started then
@@ -21,13 +22,13 @@ function t.Init(p1, p2, p3) --[[ Line: 73 | Upvalues: v1 (copy), t (copy) ]]
 		for v3, v4 in v1._initFunctions do
 			v4()
 		end
-		task.spawn(function() --[[ Line: 100 | Upvalues: p2 (ref), v1 (ref) ]]
+		task.spawn(function()
 			if typeof(p2) == "function" then
 				while v1._started do
 					v1._cycle((p2()))
 				end
 			elseif p2 ~= nil and p2 ~= false then
-				v1._eventConnection = p2:Connect(function(...) --[[ Line: 107 | Upvalues: v1 (ref) ]]
+				v1._eventConnection = p2:Connect(function(...)
 					v1._cycle(...)
 				end)
 			end
@@ -35,7 +36,7 @@ function t.Init(p1, p2, p3) --[[ Line: 73 | Upvalues: v1 (copy), t (copy) ]]
 	end
 	return t
 end
-function t.Shutdown() --[[ Line: 122 | Upvalues: v1 (copy) ]]
+function t.Shutdown()
 	v1._started = false
 	v1._shutdown = true
 	if v1._eventConnection then
@@ -55,23 +56,23 @@ function t.Shutdown() --[[ Line: 122 | Upvalues: v1 (copy) ]]
 		v2:Disconnect()
 	end
 end
-function t.Connect(p1, p2) --[[ Line: 159 | Upvalues: v1 (copy) ]]
+function t.Connect(p1, p2)
 	if v1._started == false then
 		warn("Iris:Connect() was called before calling Iris.Init(); always initialise Iris first.")
 	end
 	local v12 = #v1._connectedFunctions + 1
 	v1._connectedFunctions[v12] = p2
-	return function() --[[ Line: 165 | Upvalues: v1 (ref), v12 (copy) ]]
+	return function()
 		v1._connectedFunctions[v12] = nil
 	end
 end
-function t.Append(p1) --[[ Line: 180 | Upvalues: v1 (copy) ]]
+function t.Append(p1)
 	local v12 = v1._GetParentWidget()
 	p1.Parent = v1._config.Parent or v1._widgets[v12.type].ChildAdded(v12, {
 		type = "userInstance"
 	})
 end
-function t.End() --[[ Line: 218 | Upvalues: v1 (copy) ]]
+function t.End()
 	if v1._stackIndex == 1 then
 		error("Too many calls to Iris.End().", 2)
 	end
@@ -79,16 +80,16 @@ function t.End() --[[ Line: 218 | Upvalues: v1 (copy) ]]
 	local v12 = v1
 	v12._stackIndex = v12._stackIndex - 1
 end
-function t.ForceRefresh() --[[ Line: 243 | Upvalues: v1 (copy) ]]
+function t.ForceRefresh()
 	v1._globalRefreshRequested = true
 end
-function t.UpdateGlobalConfig(p1) --[[ Line: 265 | Upvalues: v1 (copy), t (copy) ]]
+function t.UpdateGlobalConfig(p1)
 	for v12, v2 in p1 do
 		v1._rootConfig[v12] = v2
 	end
 	t.ForceRefresh()
 end
-function t.PushConfig(p1) --[[ Line: 290 | Upvalues: t (copy), v1 (copy) ]]
+function t.PushConfig(p1)
 	local v12 = t.State(-1)
 	if v12.value == -1 then
 		v12:set(p1)
@@ -104,7 +105,7 @@ function t.PushConfig(p1) --[[ Line: 290 | Upvalues: t (copy), v1 (copy) ]]
 		__index = v1._config
 	})
 end
-function t.PopConfig() --[[ Line: 318 | Upvalues: v1 (copy) ]]
+function t.PopConfig()
 	local v12 = v1
 	v12._refreshLevel = v12._refreshLevel - 1
 	if v1._refreshStack[v1._refreshLevel] == true then
@@ -119,20 +120,20 @@ t.UpdateGlobalConfig(t.TemplateConfig.colorDark)
 t.UpdateGlobalConfig(t.TemplateConfig.sizeDefault)
 t.UpdateGlobalConfig(t.TemplateConfig.utilityDefault)
 v1._globalRefreshRequested = false
-function t.PushId(p1) --[[ Line: 354 | Upvalues: v1 (copy) ]]
+function t.PushId(p1)
 	assert(typeof(p1) == "string", "The ID argument to Iris.PushId() to be a string.")
 	v1._newID = true
 	table.insert(v1._pushedIds, p1)
 end
-function t.PopId() --[[ Line: 367 | Upvalues: v1 (copy) ]]
+function t.PopId()
 	if #v1._pushedIds ~= 0 then
 		table.remove(v1._pushedIds)
 	end
 end
-function t.SetNextWidgetID(p1) --[[ Line: 397 | Upvalues: v1 (copy) ]]
+function t.SetNextWidgetID(p1)
 	v1._nextWidgetId = p1
 end
-function t.State(p1) --[[ Line: 439 | Upvalues: v1 (copy), t (copy) ]]
+function t.State(p1)
 	local v12 = v1._getID(2)
 	if v1._states[v12] then
 		return v1._states[v12]
@@ -149,7 +150,7 @@ function t.State(p1) --[[ Line: 439 | Upvalues: v1 (copy), t (copy) ]]
 		return t2
 	end
 end
-function t.WeakState(p1) --[[ Line: 465 | Upvalues: v1 (copy), t (copy) ]]
+function t.WeakState(p1)
 	local v12 = v1._getID(2)
 	if v1._states[v12] then
 		if next(v1._states[v12].ConnectedWidgets) == nil then
@@ -169,7 +170,7 @@ function t.WeakState(p1) --[[ Line: 465 | Upvalues: v1 (copy), t (copy) ]]
 	v1._states[v12] = t2
 	return t2
 end
-function t.VariableState(p1, p2) --[[ Line: 524 | Upvalues: v1 (copy), t (copy) ]]
+function t.VariableState(p1, p2)
 	local v12 = v1._getID(2)
 	local v2 = v1._states[v12]
 	if v2 then
@@ -191,7 +192,7 @@ function t.VariableState(p1, p2) --[[ Line: 524 | Upvalues: v1 (copy), t (copy) 
 		return t2
 	end
 end
-function t.TableState(p1, p2, p3) --[[ Line: 604 | Upvalues: v1 (copy), t (copy) ]]
+function t.TableState(p1, p2, p3)
 	local v12 = p1[p2]
 	local v2 = v1._getID(2)
 	local v3 = v1._states[v2]
@@ -210,7 +211,7 @@ function t.TableState(p1, p2, p3) --[[ Line: 604 | Upvalues: v1 (copy), t (copy)
 		}
 		setmetatable(t2, v1.StateClass)
 		v1._states[v2] = t2
-		t2:onChange(function() --[[ Line: 628 | Upvalues: p3 (copy), t2 (copy), p1 (copy), p2 (copy) ]]
+		t2:onChange(function()
 			if p3 == nil then
 				p1[p2] = t2.value
 			elseif p3(t2.value) then
@@ -220,7 +221,7 @@ function t.TableState(p1, p2, p3) --[[ Line: 604 | Upvalues: v1 (copy), t (copy)
 		return t2
 	end
 end
-function t.ComputedState(p1, p2) --[[ Line: 657 | Upvalues: v1 (copy), t (copy) ]]
+function t.ComputedState(p1, p2)
 	local v12 = v1._getID(2)
 	if v1._states[v12] then
 		return v1._states[v12]
@@ -234,7 +235,7 @@ function t.ComputedState(p1, p2) --[[ Line: 657 | Upvalues: v1 (copy), t (copy) 
 		}
 		setmetatable(t2, v1.StateClass)
 		v1._states[v12] = t2
-		p1:onChange(function(p1) --[[ Line: 673 | Upvalues: t2 (copy), p2 (copy) ]]
+		p1:onChange(function(p1)
 			t2:set(p2(p1))
 		end)
 		return t2

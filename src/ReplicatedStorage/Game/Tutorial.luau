@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local t = {
 	ClassName = "Tree"
 }
 t.__index = t
-function t.new() --[[ Line: 28 | Upvalues: t (copy) ]]
+function t.new()
 	local v2 = setmetatable({}, t)
 	v2.Root = true
 	v2.Depth = 1
@@ -10,14 +11,14 @@ function t.new() --[[ Line: 28 | Upvalues: t (copy) ]]
 	v2.Leaf = nil
 	return v2
 end
-function t.AddBranch(p1, p2) --[[ Line: 36 | Upvalues: t (copy) ]]
+function t.AddBranch(p1, p2)
 	assert(p2.ClassName == t.ClassName)
 	assert(p2.Root)
 	p2.Root = false
 	p2.Depth = p1.Depth + 1
 	table.insert(p1.Branches, p2)
 end
-function t.Complete(p1) --[[ Line: 43 ]]
+function t.Complete(p1)
 	p1.State = 4
 	for i = 1, #p1.Branches do
 		p1.Branches[i].State = 2
@@ -81,13 +82,13 @@ t2.GetCar:AddBranch(t2.GetCarDone)
 t2.GetCar:AddBranch(t2.BankRobbery)
 t2.BankRobbery:AddBranch(t2.BankRobberyDone)
 t2.GetCar:AddBranch(t2.CustomizeCar)
-local function CompleteTree(p1) --[[ Line: 120 ]]
+local function CompleteTree(p1)
 	p1.State = 4
 	for i = 1, #p1.Branches do
 		p1.Branches[i].State = 2
 	end
 end
-local function v1(p1) --[[ Line: 126 | Upvalues: v1 (copy) ]]
+local function v1(p1)
 	assert(p1.State == 4 or p1.State == 2)
 	if p1.State == 2 then
 		return p1
@@ -121,14 +122,14 @@ end
 local v2 = nil
 local t3 = {}
 local v3 = false
-local function ProcessMessage(p1) --[[ Line: 163 | Upvalues: v2 (ref) ]]
+local function ProcessMessage(p1)
 	v2.Message.Inner.Title.Text = p1.Title
 	v2.Message.Inner.Body.Text = p1.Body
 end
-local function ProcessQueue() --[[ Line: 167 | Upvalues: v3 (ref), v2 (ref), t3 (copy) ]]
+local function ProcessQueue()
 	v3 = true
 	if v2.Icon.Visible then
-		v2.Icon:TweenPosition(UDim2.new(1, 0, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function() --[[ Line: 176 | Upvalues: v2 (ref) ]]
+		v2.Icon:TweenPosition(UDim2.new(1, 0, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function()
 			v2.Icon.Visible = false
 		end)
 		wait(0.5)
@@ -143,7 +144,7 @@ local function ProcessQueue() --[[ Line: 167 | Upvalues: v3 (ref), v2 (ref), t3 
 		v2.Message.Inner.Body.Text = v1.Body
 		wait(v1.Duration)
 	end
-	v2.Message:TweenPosition(UDim2.new(1, 0, 1, -300), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function() --[[ Line: 203 | Upvalues: v2 (ref) ]]
+	v2.Message:TweenPosition(UDim2.new(1, 0, 1, -300), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function()
 		v2.Message.Visible = false
 	end)
 	wait(0.5)
@@ -151,14 +152,14 @@ local function ProcessQueue() --[[ Line: 167 | Upvalues: v3 (ref), v2 (ref), t3 
 	v2.Icon:TweenPosition(UDim2.new(1, -40, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
 	v3 = false
 end
-local function ShowMessage(p1) --[[ Line: 218 | Upvalues: t3 (copy), v3 (ref), ProcessQueue (copy) ]]
+local function ShowMessage(p1)
 	table.insert(t3, p1)
 	if not v3 then
 		v3 = true
 		spawn(ProcessQueue)
 	end
 end
-local function ShowNextMessage() --[[ Line: 225 | Upvalues: v1 (copy), t2 (copy), t3 (copy), v3 (ref), ProcessQueue (copy) ]]
+local function ShowNextMessage()
 	local Leaf = v1(t2.Welcome).Leaf
 	table.insert(t3, Leaf)
 	if not v3 then
@@ -166,7 +167,7 @@ local function ShowNextMessage() --[[ Line: 225 | Upvalues: v1 (copy), t2 (copy)
 		spawn(ProcessQueue)
 	end
 end
-local function Complete(p1) --[[ Line: 229 | Upvalues: v1 (copy), t2 (copy), t3 (copy), v3 (ref), ProcessQueue (copy) ]]
+local function Complete(p1)
 	p1:Complete()
 	local Leaf = v1(t2.Welcome).Leaf
 	table.insert(t3, Leaf)
@@ -176,7 +177,7 @@ local function Complete(p1) --[[ Line: 229 | Upvalues: v1 (copy), t2 (copy), t3 
 	end
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 236 | Upvalues: v2 (ref), t2 (copy), t3 (copy), v3 (ref), ProcessQueue (copy), v1 (copy), t (copy) ]]
+	Init = function(p1)
 		local _ = p1.Event
 		v2 = p1.GetScreenGui("Tutorial")
 		table.insert(t3, t2.Welcome.Leaf)
@@ -192,7 +193,7 @@ return {
 			spawn(ProcessQueue)
 		end
 		local v32 = tick()
-		local function IconInputBegan(p1) --[[ Line: 246 | Upvalues: v32 (ref), v1 (ref), t2 (ref), t3 (ref), v3 (ref), ProcessQueue (ref) ]]
+		local function IconInputBegan(p1)
 			if p1.UserInputType == Enum.UserInputType.MouseButton1 then
 				local v12 = tick()
 				if v12 - v32 < 0.5 then
@@ -207,7 +208,7 @@ return {
 				end
 			end
 		end
-		local function IconMouseEnter(p1) --[[ Line: 256 | Upvalues: v32 (ref), v1 (ref), t2 (ref), t3 (ref), v3 (ref), ProcessQueue (ref) ]]
+		local function IconMouseEnter(p1)
 			local v12 = tick()
 			if v12 - v32 < 0.5 then
 				return false
@@ -222,7 +223,7 @@ return {
 		end
 		v2.Icon.InputBegan:Connect(IconInputBegan)
 		v2.Icon.MouseEnter:Connect(IconMouseEnter)
-		function p1.em.nvyrkw5r(p1, p2) --[[ Line: 267 | Upvalues: t2 (ref), t (ref), v1 (ref), t3 (ref), v3 (ref), ProcessQueue (ref) ]]
+		function p1.em.nvyrkw5r(p1, p2)
 			for v12, v2 in next, p1 do
 				local v32 = t2[v12]
 				if v32 and v32.State ~= 4 then

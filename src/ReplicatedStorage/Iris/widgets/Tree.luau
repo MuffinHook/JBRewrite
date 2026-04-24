@@ -1,35 +1,36 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
+return function(p1, p2)
 	local t = {
 		hasState = true,
 		hasChildren = true,
 		Events = {
 			collapsed = {
-				Init = function(p1) --[[ Line: 9 ]] end,
-				Get = function(p12) --[[ Line: 10 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastCollapsedTick == p1._cycleTick
 				end
 			},
 			uncollapsed = {
-				Init = function(p1) --[[ Line: 15 ]] end,
-				Get = function(p12) --[[ Line: 16 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastUncollapsedTick == p1._cycleTick
 				end
 			},
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 20 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Discard = function(p1) --[[ Name: Discard | Line: 24 | Upvalues: p2 (copy) ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 			p2.discardState(p1)
 		end,
-		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 28 ]]
+		ChildAdded = function(p1, p2)
 			local ChildContainer = p1.ChildContainer
 			ChildContainer.Visible = p1.state.isUncollapsed.value
 			return ChildContainer
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 35 | Upvalues: p2 (copy), p1 (copy) ]]
+		UpdateState = function(p12)
 			local value = p12.state.isUncollapsed.value
 			local ChildContainer = p12.ChildContainer
 			p12.Instance.Header.Button.Arrow.Image = value and p2.ICONS.DOWN_POINTING_TRIANGLE or p2.ICONS.RIGHT_POINTING_TRIANGLE
@@ -40,7 +41,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			end
 			ChildContainer.Visible = value
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 52 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.isUncollapsed == nil then
 				p12.state.isUncollapsed = p1._widgetState(p12, "isUncollapsed", p12.arguments.DefaultOpen or false)
 			end
@@ -53,7 +54,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			NoIndent = 3,
 			DefaultOpen = 4
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 69 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_Tree = Instance.new("Frame")
 			Iris_Tree.Name = "Iris_Tree"
 			Iris_Tree.AutomaticSize = Enum.AutomaticSize.Y
@@ -114,13 +115,13 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p2.UIPadding(TextLabel, Vector2.zero).PaddingRight = UDim.new(0, 21)
 			p2.applyTextStyle(TextLabel)
 			TextLabel.Parent = Button
-			p2.applyButtonClick(Button, function() --[[ Line: 146 | Upvalues: p12 (copy) ]]
+			p2.applyButtonClick(Button, function()
 				p12.state.isUncollapsed:set(not p12.state.isUncollapsed.value)
 			end)
 			p12.ChildContainer = TreeContainer
 			return Iris_Tree
 		end,
-		Update = function(p12) --[[ Name: Update | Line: 153 | Upvalues: p1 (copy) ]]
+		Update = function(p12)
 			local Button = p12.Instance.Header.Button
 			local UIPadding = p12.ChildContainer.UIPadding
 			Button.TextLabel.Text = p12.arguments.Text or "Tree"
@@ -143,7 +144,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Text = 1,
 			DefaultOpen = 2
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 187 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_CollapsingHeader = Instance.new("Frame")
 			Iris_CollapsingHeader.Name = "Iris_CollapsingHeader"
 			Iris_CollapsingHeader.AutomaticSize = Enum.AutomaticSize.Y
@@ -210,13 +211,13 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p2.UIPadding(TextLabel, Vector2.zero).PaddingRight = UDim.new(0, 21)
 			p2.applyTextStyle(TextLabel)
 			TextLabel.Parent = Button
-			p2.applyButtonClick(Button, function() --[[ Line: 270 | Upvalues: p12 (copy) ]]
+			p2.applyButtonClick(Button, function()
 				p12.state.isUncollapsed:set(not p12.state.isUncollapsed.value)
 			end)
 			p12.ChildContainer = CollapsingHeaderContainer
 			return Iris_CollapsingHeader
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 277 ]]
+		Update = function(p1)
 			p1.Instance.Header.Button.TextLabel.Text = p1.arguments.Text or "Collapsing Header"
 		end
 	}))

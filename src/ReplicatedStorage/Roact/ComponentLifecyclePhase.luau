@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Symbol = require(script.Parent.Symbol)
 return require(script.Parent.strict)({
 	Init = Symbol.named("init"),

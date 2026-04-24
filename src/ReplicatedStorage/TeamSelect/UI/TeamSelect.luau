@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
 local Countdown = require(ReplicatedStorage.EzUi.Countdown)
@@ -27,11 +28,11 @@ v1.defaultProps = {
 	position = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5)
 }
-function v1.init(p1) --[[ Line: 32 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 end
-function v1.render(p1) --[[ Line: 36 | Upvalues: createElement (copy), Roact (copy), Countdown (copy), TeamSelectConsts (copy), AllUpdateText (copy), TeamSelectImageAssets (copy), PaddedContainer (copy), paddedScrollingGrid (copy), t (copy), Settings (copy), ColorUtils (copy), Localization (copy) ]]
-	local function buttonComponent(p1) --[[ Line: 41 | Upvalues: createElement (ref), Roact (ref), Countdown (ref), TeamSelectConsts (ref) ]]
+function v1.render(p1)
+	local function buttonComponent(p1)
 		local t = {
 			Size = p1.size,
 			Position = p1.position,
@@ -65,7 +66,7 @@ function v1.render(p1) --[[ Line: 36 | Upvalues: createElement (copy), Roact (co
 	paddingNone = true,
 	textXAlignment = Enum.TextXAlignment.Right,
 	fontFace = Font.fromEnum(Enum.Font.Bangers),
-	timeFormatFunc = function(p1) --[[ Name: timeFormatFunc | Line: 74 ]]
+	timeFormatFunc = function(p1)
 		local v2 = p1 % 86400
 		return ("%*D %*H %*M"):format(math.floor(p1 / 86400), math.floor(v2 / 3600), (math.floor(v2 % 3600 / 60)))
 	end
@@ -148,7 +149,7 @@ function v1.render(p1) --[[ Line: 36 | Upvalues: createElement (copy), Roact (co
 	local v16 = Color3.fromHex("6687ce")
 	local v17 = Color3.fromHex("de4833")
 	local v18 = Color3.fromRGB(253, 123, 49)
-	local function getText(p1, p2) --[[ Line: 193 | Upvalues: createElement (ref) ]]
+	local function getText(p1, p2)
 		return createElement("TextLabel", {
 			Size = UDim2.fromScale(1, 0.2),
 			Position = UDim2.fromScale(0, 0.9),
@@ -165,7 +166,7 @@ function v1.render(p1) --[[ Line: 36 | Upvalues: createElement (copy), Roact (co
 			})
 		})
 	end
-	local function getNumPlayers(p1, p2) --[[ Line: 210 | Upvalues: createElement (ref) ]]
+	local function getNumPlayers(p1, p2)
 		return createElement("TextLabel", {
 			Size = UDim2.fromScale(0.4, 0.09),
 			Position = UDim2.fromScale(0.5, 0.9),
@@ -354,13 +355,13 @@ function v1.render(p1) --[[ Line: 36 | Upvalues: createElement (copy), Roact (co
 							BackgroundTransparency = 0,
 							BackgroundColor3 = v19,
 							Image = t.Police,
-							[Roact.Event.Activated] = function() --[[ Line: 408 | Upvalues: p1 (copy), Settings (ref) ]]
+							[Roact.Event.Activated] = function()
 								p1.props.onTeamSelected(Settings.EnumTeam.Police)
 							end,
-							[Roact.Event.MouseEnter] = function() --[[ Line: 411 | Upvalues: v20 (copy), ColorUtils (ref), v16 (copy) ]]
+							[Roact.Event.MouseEnter] = function()
 								v20(ColorUtils.brightenBy(v16, -0.5))
 							end,
-							[Roact.Event.MouseLeave] = function() --[[ Line: 414 | Upvalues: v20 (copy), v16 (copy) ]]
+							[Roact.Event.MouseLeave] = function()
 								v20(v16)
 							end,
 							Selectable = true
@@ -378,7 +379,7 @@ function v1.render(p1) --[[ Line: 36 | Upvalues: createElement (copy), Roact (co
 							Text = getText(Localization:FormatByKey("Teams.TeamPolice"), v16),
 							NumPlayers = getNumPlayers(p1.props.numPolice, v16)
 						}),
-						NonPoliceTeam = (function() --[[ Line: 433 | Upvalues: p1 (copy), Settings (ref), Localization (ref), v17 (copy), v18 (copy), Roact (ref), createElement (ref), t (ref), ColorUtils (ref), getText (copy), getNumPlayers (copy) ]]
+						NonPoliceTeam = (function()
 							local isAllowCriminal = p1.props.allowCriminal == true
 							local v1, v2, v3
 							if isAllowCriminal then
@@ -400,13 +401,13 @@ function v1.render(p1) --[[ Line: 36 | Upvalues: createElement (copy), Roact (co
 							}
 							t2.Image = isAllowCriminal and t.Criminal or t.Prison
 							t2[Roact.Ref] = p1.props.criminalButtonRef
-							t2[Roact.Event.Activated] = function() --[[ Line: 460 | Upvalues: p1 (ref), v1 (ref) ]]
+							t2[Roact.Event.Activated] = function()
 								p1.props.onTeamSelected(v1)
 							end
-							t2[Roact.Event.MouseEnter] = function() --[[ Line: 463 | Upvalues: v7 (copy), ColorUtils (ref), v2 (ref) ]]
+							t2[Roact.Event.MouseEnter] = function()
 								v7(ColorUtils.brightenBy(v2, -0.5))
 							end
-							t2[Roact.Event.MouseLeave] = function() --[[ Line: 466 | Upvalues: v7 (copy), v2 (ref) ]]
+							t2[Roact.Event.MouseLeave] = function()
 								v7(v2)
 							end
 							t2.Selectable = true
@@ -431,7 +432,7 @@ function v1.render(p1) --[[ Line: 36 | Upvalues: createElement (copy), Roact (co
 		})
 	})
 end
-function v1.willUnmount(p1) --[[ Line: 491 ]]
+function v1.willUnmount(p1)
 	p1.maid:Destroy()
 end
 return v1

@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 6 ]]
+return function(p1, p2)
 	local t = {
-		Init = function(p1) --[[ Line: 8 ]] end,
-		Get = function(p12) --[[ Line: 9 | Upvalues: p1 (copy) ]]
+		Init = function(p1) end,
+		Get = function(p12)
 			return p12.lastNumberChangedTick == p1._cycleTick
 		end
 	}
-	local function getValueByIndex(p1, p2, p3) --[[ Line: 14 ]]
+	local function getValueByIndex(p1, p2, p3)
 		if typeof(p1) == "number" then
 			return p1
 		else
@@ -82,7 +83,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 			error((("Incorrect datatype or value: %* %* %*."):format(p1, typeof(p1), p2)))
 		end
 	end
-	local function updateValueByIndex(p1, p2, p3, p4) --[[ Line: 74 ]]
+	local function updateValueByIndex(p1, p2, p3, p4)
 		if typeof(p1) == "number" then
 			return p3
 		else
@@ -217,7 +218,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 		Color4 = { 0, 0, 0, 0 },
 		Rect = { 0, 0, 0, 0 }
 	}
-	local function generateAbstract(p12, p22, p3, p4) --[[ Line: 194 | Upvalues: t (copy), p2 (copy), p1 (copy), t6 (copy), getValueByIndex (copy), t5 (copy), t2 (copy), t3 (copy), t4 (copy) ]]
+	local function generateAbstract(p12, p22, p3, p4)
 		return {
 			hasState = true,
 			hasChildren = false,
@@ -230,11 +231,11 @@ return function(p1, p2) --[[ Line: 6 ]]
 			},
 			Events = {
 				numberChanged = t,
-				hovered = p2.EVENTS.hover(function(p1) --[[ Line: 207 ]]
+				hovered = p2.EVENTS.hover(function(p1)
 					return p1.Instance
 				end)
 			},
-			GenerateState = function(p12) --[[ Name: GenerateState | Line: 211 | Upvalues: p1 (ref), p4 (copy) ]]
+			GenerateState = function(p12)
 				if p12.state.number == nil then
 					p12.state.number = p1._widgetState(p12, "number", p4)
 				end
@@ -242,7 +243,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 					p12.state.editingText = p1._widgetState(p12, "editingText", 0)
 				end
 			end,
-			Update = function(p13) --[[ Name: Update | Line: 219 | Upvalues: p22 (copy), p3 (copy), t6 (ref), getValueByIndex (ref), t5 (ref), p12 (copy), p1 (ref), t2 (ref), t3 (ref), t4 (ref) ]]
+			Update = function(p13)
 				local v1 = p13.Instance
 				v1.TextLabel.Text = p13.arguments.Text or ("Input %*"):format(p22)
 				local v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19
@@ -341,7 +342,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 					end
 					local v25 = #p1._postCycleCallbacks + 1
 					local v26 = p1._cycleTick + 1
-					p1._postCycleCallbacks[v25] = function() --[[ Line: 283 | Upvalues: p1 (ref), v26 (copy), p13 (copy), p22 (ref), v25 (copy) ]]
+					p1._postCycleCallbacks[v25] = function()
 						if v26 <= p1._cycleTick then
 							if p13.lastCycleTick ~= -1 then
 								p13.state.number.lastChangeTick = p1._cycleTick
@@ -352,13 +353,13 @@ return function(p1, p2) --[[ Line: 6 ]]
 					end
 				end
 			end,
-			Discard = function(p1) --[[ Name: Discard | Line: 294 | Upvalues: p2 (ref) ]]
+			Discard = function(p1)
 				p1.Instance:Destroy()
 				p2.discardState(p1)
 			end
 		}
 	end
-	local function focusLost(p12, p2, p3, p4) --[[ Line: 301 | Upvalues: getValueByIndex (copy), updateValueByIndex (copy), p1 (copy) ]]
+	local function focusLost(p12, p2, p3, p4)
 		local v1 = tonumber(p2.Text:match("-?%d*%.?%d*"))
 		local number = p12.state.number
 		if p4 == "Color4" and p3 == 4 then
@@ -395,7 +396,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 		p12.state.editingText:set(0)
 		p2:ReleaseFocus(true)
 	end
-	local function generateButtons(p12, p22, p3) --[[ Line: 349 | Upvalues: p2 (copy), p1 (copy), getValueByIndex (copy) ]]
+	local function generateButtons(p12, p22, p3)
 		local SubButton = p2.abstractButton.Generate(p12)
 		SubButton.Name = "SubButton"
 		SubButton.Size = UDim2.fromOffset(p1._config.TextSize + 2 * p1._config.FramePadding.Y, p1._config.TextSize)
@@ -404,7 +405,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 		SubButton.ZIndex = 5
 		SubButton.LayoutOrder = 5
 		SubButton.Parent = p22
-		p2.applyButtonClick(SubButton, function() --[[ Line: 359 | Upvalues: p2 (ref), p12 (copy), getValueByIndex (ref), p1 (ref) ]]
+		p2.applyButtonClick(SubButton, function()
 			local v1 = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
 			local v4 = p12.state.number.value - (p12.arguments.Increment and getValueByIndex(p12.arguments.Increment, 1, p12.arguments) or 1) * if v1 then 100 else 1
 			if p12.arguments.Min ~= nil then
@@ -424,7 +425,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 		AddButton.ZIndex = 6
 		AddButton.LayoutOrder = 6
 		AddButton.Parent = p22
-		p2.applyButtonClick(AddButton, function() --[[ Line: 382 | Upvalues: p2 (ref), p12 (copy), getValueByIndex (ref), p1 (ref) ]]
+		p2.applyButtonClick(AddButton, function()
 			local v1 = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
 			local v4 = p12.state.number.value + (p12.arguments.Increment and getValueByIndex(p12.arguments.Increment, 1, p12.arguments) or 1) * if v1 then 100 else 1
 			if p12.arguments.Min ~= nil then
@@ -438,7 +439,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 		end)
 		return 2 * p1._config.ItemInnerSpacing.X + p3 * 2
 	end
-	local function generateField(p12, p22, p3, p4) --[[ Line: 399 | Upvalues: p1 (copy), p2 (copy), focusLost (copy) ]]
+	local function generateField(p12, p22, p3, p4)
 		local TextBox = Instance.new("TextBox")
 		TextBox.Name = "InputField" .. tostring(p22)
 		TextBox.AutomaticSize = Enum.AutomaticSize.Y
@@ -453,19 +454,19 @@ return function(p1, p2) --[[ Line: 6 ]]
 		p2.applyFrameStyle(TextBox)
 		p2.applyTextStyle(TextBox)
 		p2.UISizeConstraint(TextBox, Vector2.xAxis)
-		TextBox.FocusLost:Connect(function() --[[ Line: 416 | Upvalues: focusLost (ref), p12 (copy), TextBox (copy), p22 (copy), p4 (copy) ]]
+		TextBox.FocusLost:Connect(function()
 			focusLost(p12, TextBox, p22, p4)
 		end)
-		TextBox.Focused:Connect(function() --[[ Line: 420 | Upvalues: TextBox (copy), p12 (copy), p22 (copy) ]]
+		TextBox.Focused:Connect(function()
 			TextBox.CursorPosition = #TextBox.Text + 1
 			TextBox.SelectionStart = 1
 			p12.state.editingText:set(p22)
 		end)
 		return TextBox
 	end
-	local function generateInputScalar(p12, p22, p3) --[[ Line: 431 | Upvalues: generateAbstract (copy), p2 (copy), p1 (copy), generateButtons (copy), generateField (copy), getValueByIndex (copy) ]]
+	local function generateInputScalar(p12, p22, p3)
 		return p2.extend(generateAbstract("Input", p12, p22, p3), {
-			Generate = function(p13) --[[ Name: Generate | Line: 435 | Upvalues: p12 (copy), p1 (ref), p2 (ref), p22 (copy), generateButtons (ref), generateField (ref) ]]
+			Generate = function(p13)
 				local Frame = Instance.new("Frame")
 				Frame.Name = "Iris_Input" .. p12
 				Frame.AutomaticSize = Enum.AutomaticSize.Y
@@ -491,7 +492,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 				TextLabel.Parent = Frame
 				return Frame
 			end,
-			UpdateState = function(p1) --[[ Name: UpdateState | Line: 478 | Upvalues: p22 (copy), getValueByIndex (ref) ]]
+			UpdateState = function(p1)
 				local v1 = p1.Instance
 				for i = 1, p22 do
 					local v2 = v1:FindFirstChild("InputField" .. tostring(i))
@@ -509,7 +510,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 	local v3 = nil
 	local v4 = 0
 	local v5 = ""
-	local function updateActiveDrag() --[[ Line: 506 | Upvalues: p2 (copy), v1 (ref), v2 (ref), v3 (ref), v5 (ref), v4 (ref), getValueByIndex (copy), t2 (copy), updateValueByIndex (copy), p1 (copy) ]]
+	local function updateActiveDrag()
 		local X = p2.getMouseLocation().X
 		local v12 = X - v1
 		v1 = X
@@ -537,7 +538,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 			v3.lastNumberChangedTick = p1._cycleTick + 1
 		end
 	end
-	local function DragMouseDown(p12, p22, p3, p4, p5) --[[ Line: 546 | Upvalues: p2 (copy), p1 (copy), v2 (ref), v3 (ref), v4 (ref), v5 (ref), updateActiveDrag (copy) ]]
+	local function DragMouseDown(p12, p22, p3, p4, p5)
 		local v1 = p2.getTime()
 		local v32 = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
 		if v1 - p12.lastClickedTime < p1._config.MouseDoubleClickTime and (Vector2.new(p4, p5) - p12.lastClickedPosition).Magnitude < p1._config.MouseDoubleClickMaxDist or v32 then
@@ -552,19 +553,19 @@ return function(p1, p2) --[[ Line: 6 ]]
 			updateActiveDrag()
 		end
 	end
-	p2.registerEvent("InputChanged", function() --[[ Line: 564 | Upvalues: p1 (copy), updateActiveDrag (copy) ]]
+	p2.registerEvent("InputChanged", function()
 		if p1._started then
 			updateActiveDrag()
 		end
 	end)
-	p2.registerEvent("InputEnded", function(p12) --[[ Line: 571 | Upvalues: p1 (copy), v2 (ref), v3 (ref), v4 (ref) ]]
+	p2.registerEvent("InputEnded", function(p12)
 		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 and v2) then
 			v2 = false
 			v3 = nil
 			v4 = 0
 		end
 	end)
-	local function generateField_2(p12, p22, p3, p4) --[[ Line: 582 | Upvalues: p1 (copy), p2 (copy), focusLost (copy), DragMouseDown (copy) ]]
+	local function generateField_2(p12, p22, p3, p4)
 		local TextButton = Instance.new("TextButton")
 		TextButton.Name = "DragField" .. tostring(p22)
 		TextButton.AutomaticSize = Enum.AutomaticSize.Y
@@ -598,22 +599,22 @@ return function(p1, p2) --[[ Line: 6 ]]
 		p2.applyFrameStyle(InputField, true)
 		p2.applyTextStyle(InputField)
 		InputField.Parent = TextButton
-		InputField.FocusLost:Connect(function() --[[ Line: 623 | Upvalues: focusLost (ref), p12 (copy), InputField (copy), p22 (copy), p4 (copy) ]]
+		InputField.FocusLost:Connect(function()
 			focusLost(p12, InputField, p22, p4)
 		end)
-		InputField.Focused:Connect(function() --[[ Line: 627 | Upvalues: InputField (copy), p12 (copy), p22 (copy) ]]
+		InputField.Focused:Connect(function()
 			InputField.CursorPosition = #InputField.Text + 1
 			InputField.SelectionStart = 1
 			p12.state.editingText:set(p22)
 		end)
-		p2.applyButtonDown(TextButton, function(p1, p2) --[[ Line: 635 | Upvalues: DragMouseDown (ref), p12 (copy), p4 (copy), p22 (copy) ]]
+		p2.applyButtonDown(TextButton, function(p1, p2)
 			DragMouseDown(p12, p4, p22, p1, p2)
 		end)
 		return TextButton
 	end
-	local function generateDragScalar(p12, p22, p3) --[[ Line: 642 | Upvalues: generateAbstract (copy), p2 (copy), p1 (copy), generateField_2 (copy), getValueByIndex (copy) ]]
+	local function generateDragScalar(p12, p22, p3)
 		return p2.extend(generateAbstract("Drag", p12, p22, p3), {
-			Generate = function(p13) --[[ Name: Generate | Line: 646 | Upvalues: p12 (copy), p1 (ref), p2 (ref), p22 (copy), generateField_2 (ref) ]]
+			Generate = function(p13)
 				p13.lastClickedTime = -1
 				p13.lastClickedPosition = Vector2.zero
 				local Frame = Instance.new("Frame")
@@ -654,7 +655,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 				TextLabel.Parent = Frame
 				return Frame
 			end,
-			UpdateState = function(p13) --[[ Name: UpdateState | Line: 703 | Upvalues: p22 (copy), p12 (copy), getValueByIndex (ref), p1 (ref) ]]
+			UpdateState = function(p13)
 				local v1 = p13.Instance
 				for i = 1, p22 do
 					local number = p13.state.number
@@ -695,7 +696,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 			end
 		})
 	end
-	local function generateColorDragScalar(p12, ...) --[[ Line: 752 | Upvalues: generateDragScalar (ref), p2 (copy), t5 (copy), p1 (copy) ]]
+	local function generateColorDragScalar(p12, ...)
 		local t = { ... }
 		return p2.extend(generateDragScalar(p12, if p12 == "Color4" then 4 else 3, t[1]), {
 			Args = {
@@ -704,7 +705,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 				UseHSV = 3,
 				Format = 4
 			},
-			Update = function(p13) --[[ Name: Update | Line: 763 | Upvalues: p12 (copy), t5 (ref), p1 (ref) ]]
+			Update = function(p13)
 				local Text = p13.arguments.Text
 				if not Text then
 					Text = ("Drag %*"):format(p12)
@@ -751,7 +752,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 					p1._widgets[p13.type].UpdateState(p13)
 				end
 			end,
-			GenerateState = function(p13) --[[ Name: GenerateState | Line: 794 | Upvalues: p1 (ref), t (copy), p12 (copy) ]]
+			GenerateState = function(p13)
 				if p13.state.color == nil then
 					p13.state.color = p1._widgetState(p13, "color", t[1])
 				end
@@ -768,7 +769,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 	local v7 = nil
 	local v8 = 0
 	local v9 = ""
-	local function updateActiveSlider() --[[ Line: 822 | Upvalues: v6 (ref), v7 (ref), v8 (ref), getValueByIndex (copy), t2 (copy), v9 (ref), t3 (copy), t4 (copy), p2 (copy), updateValueByIndex (copy), p1 (copy) ]]
+	local function updateActiveSlider()
 		if v6 == false then
 		elseif v7 ~= nil then
 			local v2 = v7.Instance:FindFirstChild("SliderField" .. tostring(v8))
@@ -780,7 +781,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 			v7.lastNumberChangedTick = p1._cycleTick + 1
 		end
 	end
-	local function SliderMouseDown(p1, p22, p3) --[[ Line: 848 | Upvalues: p2 (copy), v6 (ref), v7 (ref), v8 (ref), v9 (ref), updateActiveSlider (copy) ]]
+	local function SliderMouseDown(p1, p22, p3)
 		if p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl) then
 			p1.state.editingText:set(p3)
 		else
@@ -791,12 +792,12 @@ return function(p1, p2) --[[ Line: 6 ]]
 			updateActiveSlider()
 		end
 	end
-	p2.registerEvent("InputChanged", function() --[[ Line: 861 | Upvalues: p1 (copy), updateActiveSlider (copy) ]]
+	p2.registerEvent("InputChanged", function()
 		if p1._started then
 			updateActiveSlider()
 		end
 	end)
-	p2.registerEvent("InputEnded", function(p12) --[[ Line: 868 | Upvalues: p1 (copy), v6 (ref), v7 (ref), v8 (ref), v9 (ref) ]]
+	p2.registerEvent("InputEnded", function(p12)
 		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 and v6) then
 			v6 = false
 			v7 = nil
@@ -804,7 +805,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 			v9 = ""
 		end
 	end)
-	local function generateField_3(p12, p22, p3, p4) --[[ Line: 880 | Upvalues: p1 (copy), p2 (copy), focusLost (copy), SliderMouseDown (copy) ]]
+	local function generateField_3(p12, p22, p3, p4)
 		local TextButton = Instance.new("TextButton")
 		TextButton.Name = "SliderField" .. tostring(p22)
 		TextButton.AutomaticSize = Enum.AutomaticSize.Y
@@ -847,15 +848,15 @@ return function(p1, p2) --[[ Line: 6 ]]
 		p2.applyFrameStyle(InputField, true)
 		p2.applyTextStyle(InputField)
 		InputField.Parent = TextButton
-		InputField.FocusLost:Connect(function() --[[ Line: 933 | Upvalues: focusLost (ref), p12 (copy), InputField (copy), p22 (copy), p4 (copy) ]]
+		InputField.FocusLost:Connect(function()
 			focusLost(p12, InputField, p22, p4)
 		end)
-		InputField.Focused:Connect(function() --[[ Line: 937 | Upvalues: InputField (copy), p12 (copy), p22 (copy) ]]
+		InputField.Focused:Connect(function()
 			InputField.CursorPosition = #InputField.Text + 1
 			InputField.SelectionStart = 1
 			p12.state.editingText:set(p22)
 		end)
-		p2.applyButtonDown(TextButton, function() --[[ Line: 945 | Upvalues: SliderMouseDown (ref), p12 (copy), p4 (copy), p22 (copy) ]]
+		p2.applyButtonDown(TextButton, function()
 			SliderMouseDown(p12, p4, p22)
 		end)
 		local GrabBar = Instance.new("Frame")
@@ -881,9 +882,9 @@ return function(p1, p2) --[[ Line: 6 ]]
 		GrabBar.Parent = TextButton
 		return TextButton
 	end
-	local function generateSliderScalar(p12, p22, p3) --[[ Line: 978 | Upvalues: generateAbstract (copy), p2 (copy), p1 (copy), generateField_3 (copy), getValueByIndex (copy), t2 (copy), t3 (copy), t4 (copy) ]]
+	local function generateSliderScalar(p12, p22, p3)
 		return p2.extend(generateAbstract("Slider", p12, p22, p3), {
-			Generate = function(p13) --[[ Name: Generate | Line: 982 | Upvalues: p12 (copy), p1 (ref), p2 (ref), p22 (copy), generateField_3 (ref) ]]
+			Generate = function(p13)
 				local Frame = Instance.new("Frame")
 				Frame.Name = "Iris_Slider" .. p12
 				Frame.AutomaticSize = Enum.AutomaticSize.Y
@@ -908,7 +909,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 				TextLabel.Parent = Frame
 				return Frame
 			end,
-			UpdateState = function(p1) --[[ Name: UpdateState | Line: 1016 | Upvalues: p22 (copy), getValueByIndex (ref), t2 (ref), p12 (copy), t3 (ref), t4 (ref) ]]
+			UpdateState = function(p1)
 				local v1 = p1.Instance
 				for i = 1, p22 do
 					local v2 = v1:FindFirstChild("SliderField" .. tostring(i))
@@ -943,7 +944,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 			end
 		})
 	end
-	local function generateEnumSliderScalar(p12, p22) --[[ Line: 1062 | Upvalues: generateSliderScalar (ref), p2 (copy), p1 (copy) ]]
+	local function generateEnumSliderScalar(p12, p22)
 		local v1 = generateSliderScalar("Enum", 1, p22.Value)
 		local t = { string }
 		for v2, v3 in p12:GetEnumItems() do
@@ -953,7 +954,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 			Args = {
 				Text = 1
 			},
-			Update = function(p1) --[[ Name: Update | Line: 1074 | Upvalues: p12 (copy) ]]
+			Update = function(p1)
 				local v1 = p1.Instance
 				v1.TextLabel.Text = p1.arguments.Text or "Input Enum"
 				p1.arguments.Increment = 1
@@ -962,7 +963,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 				local GrabBar = v1:FindFirstChild("SliderField1").GrabBar
 				GrabBar.Size = UDim2.fromScale(1 / math.floor(#p12:GetEnumItems()), 1)
 			end,
-			GenerateState = function(p12) --[[ Name: GenerateState | Line: 1090 | Upvalues: p1 (ref), p22 (copy) ]]
+			GenerateState = function(p12)
 				if p12.state.number == nil then
 					p12.state.number = p1._widgetState(p12, "number", p22.Value)
 				end
@@ -1008,18 +1009,18 @@ return function(p1, p2) --[[ Line: 6 ]]
 		},
 		Events = {
 			textChanged = {
-				Init = function(p1) --[[ Line: 1146 ]]
+				Init = function(p1)
 					p1.lastTextChangedTick = 0
 				end,
-				Get = function(p12) --[[ Line: 1149 | Upvalues: p1 (copy) ]]
+				Get = function(p12)
 					return p12.lastTextChangedTick == p1._cycleTick
 				end
 			},
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 1153 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 1157 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_InputText = Instance.new("Frame")
 			Iris_InputText.Name = "Iris_InputText"
 			Iris_InputText.AutomaticSize = Enum.AutomaticSize.Y
@@ -1042,7 +1043,7 @@ return function(p1, p2) --[[ Line: 6 ]]
 			p2.applyTextStyle(InputField)
 			p2.UISizeConstraint(InputField, Vector2.xAxis)
 			InputField.Parent = Iris_InputText
-			InputField.FocusLost:Connect(function() --[[ Line: 1185 | Upvalues: p12 (copy), InputField (copy), p1 (ref) ]]
+			InputField.FocusLost:Connect(function()
 				p12.state.text:set(InputField.Text)
 				p12.lastTextChangedTick = p1._cycleTick + 1
 			end)
@@ -1057,12 +1058,12 @@ return function(p1, p2) --[[ Line: 6 ]]
 			TextLabel.Parent = Iris_InputText
 			return Iris_InputText
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 1206 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.text == nil then
 				p12.state.text = p1._widgetState(p12, "text", "")
 			end
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 1211 ]]
+		Update = function(p1)
 			local v1 = p1.Instance
 			local InputField = v1.InputField
 			v1.TextLabel.Text = p1.arguments.Text or "Input Text"
@@ -1070,10 +1071,10 @@ return function(p1, p2) --[[ Line: 6 ]]
 			InputField.TextEditable = not p1.arguments.ReadOnly
 			InputField.MultiLine = p1.arguments.MultiLine or false
 		end,
-		UpdateState = function(p1) --[[ Name: UpdateState | Line: 1221 ]]
+		UpdateState = function(p1)
 			p1.Instance.InputField.Text = p1.state.text.value
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 1227 | Upvalues: p2 (copy) ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 			p2.discardState(p1)
 		end

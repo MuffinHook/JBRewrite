@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -33,7 +34,7 @@ local t = {
 	"MOLLY"
 }
 local t2 = {}
-function t2.init() --[[ Line: 40 | Upvalues: ReplicatedStorage (copy), LocalPlayer (copy), t2 (copy), Window (copy), GameUtil (copy) ]]
+function t2.init()
 	local AdoptionStandGui = ReplicatedStorage.StarterGui:FindFirstChild("AdoptionStandGui")
 	AdoptionStandGui.Parent = LocalPlayer.PlayerGui
 	t2.gui = AdoptionStandGui
@@ -43,23 +44,23 @@ function t2.init() --[[ Line: 40 | Upvalues: ReplicatedStorage (copy), LocalPlay
 	t2._window = v1
 	GameUtil.getCenterWindowGroup():Add(v1)
 end
-function t2.setTitle(p1) --[[ Line: 51 | Upvalues: t2 (copy) ]]
+function t2.setTitle(p1)
 	assert(p1 ~= nil)
 	t2.gui.Container.Right.Title.TextLabel.Text = p1
 end
-function t2.setImageId(p1) --[[ Line: 57 | Upvalues: t2 (copy) ]]
+function t2.setImageId(p1)
 	assert(p1 ~= nil)
 	t2.gui.Container.Left.Icon.ImageLabel.Image = ("rbxassetid://%d"):format(p1)
 end
-function t2.setPrice(p1) --[[ Line: 63 | Upvalues: t2 (copy), Format (copy) ]]
+function t2.setPrice(p1)
 	t2.gui.Container.Right.Price.TextLabel.Text = if p1 == nil then "FREE" else Format.Currency(p1) or "FREE"
 end
-function t2.setFirstAdopt(p1) --[[ Line: 68 | Upvalues: t2 (copy) ]]
+function t2.setFirstAdopt(p1)
 	assert(p1 ~= nil)
 	assert(type(p1) == "boolean")
 	t2.gui.Container.Right.Adopt.TextLabel.Text = if p1 then "ADOPT" else "RE-ADOPT"
 end
-function t2.setDescriptionTeam(p1) --[[ Line: 76 | Upvalues: Settings (copy), t2 (copy) ]]
+function t2.setDescriptionTeam(p1)
 	local v1 = nil
 	if p1 == Settings.EnumTeam.Criminal then
 		v1 = "criminal"
@@ -70,7 +71,7 @@ function t2.setDescriptionTeam(p1) --[[ Line: 76 | Upvalues: Settings (copy), t2
 	end
 	t2.gui.Container.Right.Description.TextLabel.Text = ("This breed does more damage when playing on the %s team!"):format(v1)
 end
-function t2.getName() --[[ Line: 89 | Upvalues: t2 (copy) ]]
+function t2.getName()
 	local TextBox = t2.gui.Container.Left.DogName.TextBox
 	local Text = TextBox.Text
 	if #Text == 0 then
@@ -84,20 +85,20 @@ function t2.getName() --[[ Line: 89 | Upvalues: t2 (copy) ]]
 	end
 	return Text
 end
-function t2.setName(p1) --[[ Line: 104 | Upvalues: t2 (copy) ]]
+function t2.setName(p1)
 	t2.gui.Container.Left.DogName.TextBox.Text = p1
 end
-function t2._open() --[[ Line: 109 | Upvalues: t2 (copy), Maid (copy), t (copy), Interval (copy) ]]
+function t2._open()
 	assert(t2._maid == nil)
 	local v1 = Maid.new()
 	t2._maid = v1
 	local gui = t2.gui
 	gui.Enabled = true
-	v1:GiveTask(function() --[[ Line: 116 | Upvalues: gui (copy) ]]
+	v1:GiveTask(function()
 		gui.Enabled = false
 	end)
 	local TextBox = gui.Container.Left.DogName.TextBox
-	v1:GiveTask(TextBox:GetPropertyChangedSignal("Text"):Connect(function() --[[ Line: 121 | Upvalues: TextBox (copy) ]]
+	v1:GiveTask(TextBox:GetPropertyChangedSignal("Text"):Connect(function()
 		local Text = TextBox.Text
 		if #Text > 10 then
 			Text = Text:sub(1, 10)
@@ -106,33 +107,33 @@ function t2._open() --[[ Line: 109 | Upvalues: t2 (copy), Maid (copy), t (copy),
 	end))
 	local v2 = t[math.random(1, #t)]
 	local v3 = 0
-	v1:GiveTask(Interval.every(0.5):Connect(function() --[[ Line: 130 | Upvalues: v3 (ref), TextBox (copy), v2 (copy) ]]
+	v1:GiveTask(Interval.every(0.5):Connect(function()
 		v3 = v3 % 3 + 1
 		TextBox.PlaceholderText = ("%s%s"):format(v2, ("."):rep(v3))
 	end))
-	v1:GiveTask(gui.Container.Close.MouseButton1Down:Connect(function() --[[ Line: 135 | Upvalues: t2 (ref) ]]
+	v1:GiveTask(gui.Container.Close.MouseButton1Down:Connect(function()
 		t2.close()
 	end))
 end
-function t2._close() --[[ Line: 139 | Upvalues: t2 (copy) ]]
+function t2._close()
 	assert(t2._maid ~= nil)
 	local _maid = t2._maid
 	t2._maid = nil
 	_maid:Destroy()
 end
-function t2.open() --[[ Line: 145 | Upvalues: t2 (copy) ]]
+function t2.open()
 	t2._window:Open()
 end
-function t2.close() --[[ Line: 148 | Upvalues: t2 (copy) ]]
+function t2.close()
 	t2._window:Close()
 end
-function t2.isOpen() --[[ Line: 151 | Upvalues: t2 (copy) ]]
+function t2.isOpen()
 	return t2._window:IsOpen()
 end
-function t2.getOnClosedSignal() --[[ Line: 154 | Upvalues: t2 (copy) ]]
+function t2.getOnClosedSignal()
 	return t2._window:GetOnClosedSignal()
 end
-function t2.getOnClickAdoptSignal() --[[ Line: 157 | Upvalues: t2 (copy) ]]
+function t2.getOnClickAdoptSignal()
 	return t2.gui.Container.Right.Adopt.MouseButton1Down
 end
 return t2

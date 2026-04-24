@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -12,20 +13,20 @@ v1.defaultProps = {
 	aspectRatio = 6,
 	displayName = "TWENTYMOREMINUTES"
 }
-function v1.init(p1) --[[ Line: 17 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1:setState({
 		remaining = 0,
 		createdAt = workspace:GetServerTimeNow()
 	})
-	function p1.onAccept() --[[ Line: 22 | Upvalues: p1 (copy) ]]
+	function p1.onAccept()
 		p1.props.onAccept(p1.props.index)
 	end
-	function p1.onDecline() --[[ Line: 25 | Upvalues: p1 (copy) ]]
+	function p1.onDecline()
 		p1.props.onDecline(p1.props.index)
 	end
 	p1.maid = Maid.new()
 end
-function v1.render(p1) --[[ Line: 30 | Upvalues: TradeConsts (copy), createElement (copy), TradeButton (copy), Roact (copy) ]]
+function v1.render(p1)
 	local aspectRatio = p1.props.aspectRatio
 	local isTradingVIP = p1.props.isTradingVIP
 	local v1 = isTradingVIP and TradeConsts.VIP_INITIATION_COLOR or Color3.new(255/255, 255/255, 255/255)
@@ -115,21 +116,21 @@ function v1.render(p1) --[[ Line: 30 | Upvalues: TradeConsts (copy), createEleme
 		AnchorPoint = p1.props.anchorPoint
 	}, t)
 end
-function v1._hookObj(p1) --[[ Line: 123 | Upvalues: TradeConsts (copy) ]]
+function v1._hookObj(p1)
 	p1:setState({
 		createdAt = p1.props.obj:GetAttribute(TradeConsts.INITIATION_CREATED_AT_ATTR_NAME)
 	})
-	p1.maid:GiveTask(p1.props.obj:GetAttributeChangedSignal(TradeConsts.INITIATION_CREATED_AT_ATTR_NAME):Connect(function() --[[ Line: 128 | Upvalues: p1 (copy), TradeConsts (ref) ]]
+	p1.maid:GiveTask(p1.props.obj:GetAttributeChangedSignal(TradeConsts.INITIATION_CREATED_AT_ATTR_NAME):Connect(function()
 		p1:setState({
 			createdAt = p1.props.obj:GetAttribute(TradeConsts.INITIATION_CREATED_AT_ATTR_NAME)
 		})
 	end))
 end
-function v1.didMount(p1) --[[ Line: 135 | Upvalues: TradeConsts (copy), Interval (copy) ]]
+function v1.didMount(p1)
 	if p1.props.obj then
 		p1:_hookObj()
 	end
-	local function update() --[[ Line: 139 | Upvalues: p1 (copy), TradeConsts (ref) ]]
+	local function update()
 		local t = {}
 		t.remaining = math.floor((math.max(0, (p1.props.isTradingVIP and TradeConsts.VIP_INITIATION_TIMEOUT or TradeConsts.INITIATION_TIMEOUT) - (workspace:GetServerTimeNow() - p1.state.createdAt))))
 		p1:setState(t)
@@ -137,12 +138,12 @@ function v1.didMount(p1) --[[ Line: 135 | Upvalues: TradeConsts (copy), Interval
 	update()
 	p1.maid:GiveTask(Interval.every(1):Connect(update))
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 151 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p1.props.obj ~= p2.obj and p1.props.obj then
 		p1:_hookObj()
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 158 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v1

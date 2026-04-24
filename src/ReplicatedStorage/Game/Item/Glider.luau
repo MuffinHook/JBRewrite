@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Basic = require(script.Parent.Basic)
 local t = {
 	Motion = {
@@ -19,25 +20,25 @@ local t2 = {
 }
 t2.__index = t2
 setmetatable(t2, Basic)
-function t2.Init(p1) --[[ Line: 25 | Upvalues: v2 (ref) ]]
+function t2.Init(p1)
 	v2 = p1.Event
 end
-function t2.new(p1, p2, p3) --[[ Line: 28 | Upvalues: Basic (copy), t (copy), t2 (copy) ]]
+function t2.new(p1, p2, p3)
 	local v1 = Basic.new(p1, p2, t, p3)
 	setmetatable(v1, t2)
 	return v1
 end
-function t2.GetLeftArmPosition(p1) --[[ Line: 34 ]]
+function t2.GetLeftArmPosition(p1)
 	return nil
 end
-function t2.ShootBegin(p1, p2) --[[ Line: 37 | Upvalues: v2 (ref) ]]
+function t2.ShootBegin(p1, p2)
 	v2:FireServer("k" .. ("ialwnl1sco"):sub(4, 7):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("r5gc0"):sub(2, 3):reverse():reverse():reverse() .. "x")
 end
-function t2.InputBegan(p1, p2, p3) --[[ Line: 40 | Upvalues: Basic (copy) ]]
+function t2.InputBegan(p1, p2, p3)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		p1:ShootBegin(p2)
 	end
 	Basic.InputBegan(p1, p2, p3)
 end
-function t2.InputEnded(p1) --[[ Line: 50 ]] end
+function t2.InputEnded(p1)  end
 return t2

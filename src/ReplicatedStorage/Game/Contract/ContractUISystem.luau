@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -19,11 +20,11 @@ local SeasonUtils = require(ReplicatedStorage.Game.Season.SeasonUtils)
 local SeasonSystem = require(ReplicatedStorage.Game.Season.SeasonSystem)
 local v1 = nil
 local v2 = nil
-local function SelectIfGamepad(p1) --[[ Line: 28 | Upvalues: EzUtils (copy) ]]
+local function SelectIfGamepad(p1)
 	EzUtils.selectIfGamepad(p1)
 end
 local t = {}
-function t.init() --[[ Line: 33 | Upvalues: v1 (ref), ReplicatedStorage (copy), v2 (ref), LocalPlayer (copy), t (copy), waitForChild (copy), ContractConsts (copy), Interval (copy), Window (copy), GameUtil (copy), Audio (copy), ContractUI (copy), Promise (copy), ContractBinder (copy) ]]
+function t.init()
 	v1 = require(ReplicatedStorage.Game.Season.SeasonUISystem)
 	v2 = require(script.Parent.ContractSystem)
 	local ContractsGui = ReplicatedStorage.StarterGui:FindFirstChild("ContractsGui")
@@ -34,7 +35,7 @@ function t.init() --[[ Line: 33 | Upvalues: v1 (ref), ReplicatedStorage (copy), 
 	t.popupGui = ContractPopupGui
 	t._contractPreset = ContractsGui.Background.Body.Main.Preset
 	t._contractPreset.Visible = false
-	waitForChild(LocalPlayer, ContractConsts.DEADLINE_VALUE_NAME):andThen(function(p1) --[[ Line: 48 | Upvalues: t (ref), Interval (ref) ]]
+	waitForChild(LocalPlayer, ContractConsts.DEADLINE_VALUE_NAME):andThen(function(p1)
 		t._deadlineValue = p1
 		Interval.every(1):Connect(t._updateDeadline)
 		t._updateDeadline()
@@ -45,8 +46,8 @@ function t.init() --[[ Line: 33 | Upvalues: v1 (ref), ReplicatedStorage (copy), 
 	v12:GetOnClosedSignal():Connect(t._close)
 	t._window = v12
 	GameUtil.getCenterWindowGroup():Add(v12)
-	local function hookContract(p1) --[[ Line: 62 | Upvalues: ContractConsts (ref), Audio (ref), LocalPlayer (ref), t (ref), ContractPopupGui (copy), ContractUI (ref), Promise (ref) ]]
-		p1._maid:GiveTask(p1:GetOnStateChangedSignal():Connect(function(p12, p2) --[[ Line: 63 | Upvalues: ContractConsts (ref), Audio (ref), LocalPlayer (ref), t (ref), ContractPopupGui (ref), ContractUI (ref), p1 (copy), Promise (ref) ]]
+	local function hookContract(p1)
+		p1._maid:GiveTask(p1:GetOnStateChangedSignal():Connect(function(p12, p2)
 			if p12 == ContractConsts.enumState.COMPLETED or (p12 == ContractConsts.enumState.FAILED or p12 == ContractConsts.enumState.ABORTED) then
 				local v1 = nil
 				if p12 == ContractConsts.enumState.COMPLETED then
@@ -67,10 +68,10 @@ function t.init() --[[ Line: 33 | Upvalues: v1 (ref), ReplicatedStorage (copy), 
 				v3:SetFrame(v2)
 				v3:SetContract(p1)
 				v3:SetTitle(v1)
-				Promise.delay(10):andThen(function() --[[ Line: 94 | Upvalues: v3 (ref) ]]
+				Promise.delay(10):andThen(function()
 					v3:Destroy()
 					v3 = nil
-				end):andThen(function() --[[ Line: 98 | Upvalues: v2 (ref) ]]
+				end):andThen(function()
 					v2:Destroy()
 					v2 = nil
 				end)
@@ -79,7 +80,7 @@ function t.init() --[[ Line: 33 | Upvalues: v1 (ref), ReplicatedStorage (copy), 
 	end
 	for i, v in ipairs(ContractBinder:GetAll()) do
 		if v:GetPlayer() == LocalPlayer then
-			v._maid:GiveTask(v:GetOnStateChangedSignal():Connect(function(p1, p2) --[[ Line: 63 | Upvalues: ContractConsts (ref), Audio (ref), LocalPlayer (ref), t (ref), ContractPopupGui (copy), ContractUI (ref), v (copy), Promise (ref) ]]
+			v._maid:GiveTask(v:GetOnStateChangedSignal():Connect(function(p1, p2)
 				if p1 == ContractConsts.enumState.COMPLETED or (p1 == ContractConsts.enumState.FAILED or p1 == ContractConsts.enumState.ABORTED) then
 					local v1 = nil
 					if p1 == ContractConsts.enumState.COMPLETED then
@@ -100,10 +101,10 @@ function t.init() --[[ Line: 33 | Upvalues: v1 (ref), ReplicatedStorage (copy), 
 					v3:SetFrame(v2)
 					v3:SetContract(v)
 					v3:SetTitle(v1)
-					Promise.delay(10):andThen(function() --[[ Line: 94 | Upvalues: v3 (ref) ]]
+					Promise.delay(10):andThen(function()
 						v3:Destroy()
 						v3 = nil
-					end):andThen(function() --[[ Line: 98 | Upvalues: v2 (ref) ]]
+					end):andThen(function()
 						v2:Destroy()
 						v2 = nil
 					end)
@@ -111,9 +112,9 @@ function t.init() --[[ Line: 33 | Upvalues: v1 (ref), ReplicatedStorage (copy), 
 			end))
 		end
 	end
-	ContractBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 110 | Upvalues: LocalPlayer (ref), ContractConsts (ref), Audio (ref), t (ref), ContractPopupGui (copy), ContractUI (ref), Promise (ref) ]]
+	ContractBinder:GetClassAddedSignal():Connect(function(p1)
 		if p1:GetPlayer() == LocalPlayer then
-			p1._maid:GiveTask(p1:GetOnStateChangedSignal():Connect(function(p12, p2) --[[ Line: 63 | Upvalues: ContractConsts (ref), Audio (ref), LocalPlayer (ref), t (ref), ContractPopupGui (ref), ContractUI (ref), p1 (copy), Promise (ref) ]]
+			p1._maid:GiveTask(p1:GetOnStateChangedSignal():Connect(function(p12, p2)
 				if p12 == ContractConsts.enumState.COMPLETED or (p12 == ContractConsts.enumState.FAILED or p12 == ContractConsts.enumState.ABORTED) then
 					local v1 = nil
 					if p12 == ContractConsts.enumState.COMPLETED then
@@ -134,10 +135,10 @@ function t.init() --[[ Line: 33 | Upvalues: v1 (ref), ReplicatedStorage (copy), 
 					v3:SetFrame(v2)
 					v3:SetContract(p1)
 					v3:SetTitle(v1)
-					Promise.delay(10):andThen(function() --[[ Line: 94 | Upvalues: v3 (ref) ]]
+					Promise.delay(10):andThen(function()
 						v3:Destroy()
 						v3 = nil
-					end):andThen(function() --[[ Line: 98 | Upvalues: v2 (ref) ]]
+					end):andThen(function()
 						v2:Destroy()
 						v2 = nil
 					end)
@@ -146,10 +147,10 @@ function t.init() --[[ Line: 33 | Upvalues: v1 (ref), ReplicatedStorage (copy), 
 		end
 	end)
 end
-function t._updateDeadline() --[[ Line: 116 | Upvalues: t (copy), SeasonUtils (copy) ]]
+function t._updateDeadline()
 	t.gui.Background.Timer.Time.Text = SeasonUtils.formatRemaining((math.max(0, t._deadlineValue.Value - DateTime.now().UnixTimestamp)))
 end
-function t.clearContracts() --[[ Line: 127 | Upvalues: t (copy) ]]
+function t.clearContracts()
 	local _contractPreset = t._contractPreset
 	for i, v in ipairs(t.gui:GetChildren()) do
 		if v.ClassName == _contractPreset.ClassName and v ~= _contractPreset then
@@ -163,7 +164,7 @@ function t.clearContracts() --[[ Line: 127 | Upvalues: t (copy) ]]
 		t._listContractUI = nil
 	end
 end
-function t.loadContracts(p1) --[[ Line: 142 | Upvalues: t (copy), v2 (ref), SeasonConsts (copy), ContractUI (copy) ]]
+function t.loadContracts(p1)
 	t._lastTeamIdLoaded = p1
 	local gui = t.gui
 	local _contractPreset = t._contractPreset
@@ -192,49 +193,49 @@ function t.loadContracts(p1) --[[ Line: 142 | Upvalues: t (copy), v2 (ref), Seas
 		end
 	end
 end
-function t.reloadContracts() --[[ Line: 182 | Upvalues: t (copy) ]]
+function t.reloadContracts()
 	t.clearContracts()
 	t.loadContracts(t._lastTeamIdLoaded)
 end
-function t._open() --[[ Line: 187 | Upvalues: t (copy), Maid (copy), GameUtil (copy), Settings (copy), ContractBinder (copy), LocalPlayer (copy), Promise (copy), Audio (copy), v1 (ref), SeasonConsts (copy), SeasonSystem (copy), MarketplaceService (copy), EzUtils (copy), SeasonUIUtils (copy) ]]
+function t._open()
 	assert(not t._maid)
 	local v2 = Maid.new()
 	t._maid = v2
 	local gui = t.gui
 	gui.Enabled = true
-	v2:GiveTask(function() --[[ Line: 194 | Upvalues: gui (copy) ]]
+	v2:GiveTask(function()
 		gui.Enabled = false
 	end)
 	local v3 = if GameUtil.Team == Settings.EnumTeam.Police then Settings.EnumTeam.Police else Settings.EnumTeam.Criminal
 	t.clearContracts()
 	t.loadContracts(v3)
-	v2:GiveTask(ContractBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 207 | Upvalues: LocalPlayer (ref), t (ref) ]]
+	v2:GiveTask(ContractBinder:GetClassAddedSignal():Connect(function(p1)
 		if p1:GetPlayer() == LocalPlayer then
 			t.reloadContracts()
 		end
 	end))
-	v2:GiveTask(ContractBinder:GetClassRemovingSignal():Connect(function(p1) --[[ Line: 212 | Upvalues: LocalPlayer (ref), Promise (ref), t (ref) ]]
+	v2:GiveTask(ContractBinder:GetClassRemovingSignal():Connect(function(p1)
 		if p1:GetPlayer() == LocalPlayer then
 			Promise.delay(0.1):andThenCall(t.reloadContracts)
 		end
 	end))
-	v2:GiveTask(gui.Background.Body.Side.Criminal.Button.MouseButton1Down:Connect(function() --[[ Line: 219 | Upvalues: t (ref), Settings (ref), Audio (ref), LocalPlayer (ref) ]]
+	v2:GiveTask(gui.Background.Body.Side.Criminal.Button.MouseButton1Down:Connect(function()
 		t.clearContracts()
 		t.loadContracts(Settings.EnumTeam.Criminal)
 		Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
 	end))
-	v2:GiveTask(gui.Background.Body.Side.Police.Button.MouseButton1Down:Connect(function() --[[ Line: 224 | Upvalues: t (ref), Settings (ref), Audio (ref), LocalPlayer (ref) ]]
+	v2:GiveTask(gui.Background.Body.Side.Police.Button.MouseButton1Down:Connect(function()
 		t.clearContracts()
 		t.loadContracts(Settings.EnumTeam.Police)
 		Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
 	end))
-	v2:GiveTask(gui.Background.Bottom.Container.RewardButton.MouseButton1Down:Connect(function() --[[ Line: 230 | Upvalues: t (ref), v1 (ref), Audio (ref), LocalPlayer (ref) ]]
+	v2:GiveTask(gui.Background.Bottom.Container.RewardButton.MouseButton1Down:Connect(function()
 		t.close()
 		v1.open()
 		Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
 	end))
 	gui.Background.Bottom.Container.SeasonPass.Title.Text = ("SEASON %d: %s"):format(SeasonConsts.SEASON_NUM, SeasonConsts.SEASON_TITLE)
-	v2:GiveTask(gui.Background.Bottom.Container.SeasonPass.MouseButton1Down:Connect(function() --[[ Line: 240 | Upvalues: Settings (ref), Audio (ref), LocalPlayer (ref), SeasonSystem (ref), MarketplaceService (ref) ]]
+	v2:GiveTask(gui.Background.Bottom.Container.SeasonPass.MouseButton1Down:Connect(function()
 		local v1 = Settings.getFirstProductByType("SeasonPass")
 		assert(v1 ~= nil)
 		Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
@@ -244,7 +245,7 @@ function t._open() --[[ Line: 187 | Upvalues: t (copy), Maid (copy), GameUtil (c
 	end))
 	EzUtils.selectIfGamepad(gui.Background.Bottom.Container.SeasonPass)
 	SeasonUIUtils.hookGiftContainer(gui.Background.GiftContainer, v2)
-	local function setOwnsSeasonPass() --[[ Line: 252 | Upvalues: gui (copy) ]]
+	local function setOwnsSeasonPass()
 		gui.Background.Bottom.Container.SeasonPass.Buy.Visible = false
 		gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
 		gui.Background.Bottom.Container.SeasonPass.Owned.Visible = true
@@ -254,7 +255,7 @@ function t._open() --[[ Line: 187 | Upvalues: t (copy), Maid (copy), GameUtil (c
 		gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
 		gui.Background.Bottom.Container.SeasonPass.Owned.Visible = true
 	else
-		v2:GiveTask(SeasonSystem.getSeasonPassOwnedSignal():Connect(function(p1) --[[ Line: 260 | Upvalues: LocalPlayer (ref), gui (copy) ]]
+		v2:GiveTask(SeasonSystem.getSeasonPassOwnedSignal():Connect(function(p1)
 			if p1 == LocalPlayer then
 				gui.Background.Bottom.Container.SeasonPass.Buy.Visible = false
 				gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
@@ -263,7 +264,7 @@ function t._open() --[[ Line: 187 | Upvalues: t (copy), Maid (copy), GameUtil (c
 		end))
 	end
 	v2:GiveTask(gui.Background.Close.MouseButton1Down:Connect(t.close))
-	local function updatePrice() --[[ Line: 271 | Upvalues: Settings (ref), gui (copy) ]]
+	local function updatePrice()
 		local v1 = Settings.getFirstProductByType("SeasonPass")
 		if v1 and v1.Robux then
 			gui.Background.Bottom.Container.SeasonPass.Price.Text = tostring(v1.Robux)
@@ -275,16 +276,16 @@ function t._open() --[[ Line: 187 | Upvalues: t (copy), Maid (copy), GameUtil (c
 	end
 	Settings.OnProductsFetched:Connect(updatePrice)
 end
-function t._close() --[[ Line: 282 | Upvalues: t (copy) ]]
+function t._close()
 	local _maid = t._maid
 	assert(_maid)
 	t._maid = nil
 	_maid:Destroy()
 end
-function t.open() --[[ Line: 288 | Upvalues: t (copy) ]]
+function t.open()
 	t._window:Open()
 end
-function t.close() --[[ Line: 291 | Upvalues: t (copy) ]]
+function t.close()
 	t._window:Close()
 end
 return t

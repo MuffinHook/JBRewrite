@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local t = {}
-function t.new(p1) --[[ Line: 40 | Upvalues: t (copy) ]]
+function t.new(p1)
 	return setmetatable({
 		_accel = p1 or 1,
 		_t0 = 0,
@@ -10,7 +11,7 @@ function t.new(p1) --[[ Line: 40 | Upvalues: t (copy) ]]
 		_a1 = 0
 	}, t)
 end
-function t.__index(p1, p2) --[[ Line: 54 | Upvalues: t (copy) ]]
+function t.__index(p1, p2)
 	if t[p2] then
 		return t[p2]
 	end
@@ -34,7 +35,7 @@ function t.__index(p1, p2) --[[ Line: 54 | Upvalues: t (copy) ]]
 	end
 	error(("Bad index %q"):format((tostring(p2))))
 end
-function t.__newindex(p1, p2, p3) --[[ Line: 75 ]]
+function t.__newindex(p1, p2, p3)
 	if p2 == "p" then
 		p1:_setstate(p3, nil, nil, nil)
 	elseif p2 == "v" then
@@ -49,7 +50,7 @@ function t.__newindex(p1, p2, p3) --[[ Line: 75 ]]
 		error(("Bad index %q"):format((tostring(p2))))
 	end
 end
-function t._getstate(p1, p2) --[[ Line: 91 ]]
+function t._getstate(p1, p2)
 	if p2 < (p1._t0 + p1._t1) / 2 then
 		local v1 = p2 - p1._t0
 		return p1._y0 + v1 * v1 / 2 * p1._a0, v1 * p1._a0
@@ -60,7 +61,7 @@ function t._getstate(p1, p2) --[[ Line: 91 ]]
 		return p1._y1, 0
 	end
 end
-function t._setstate(p1, p2, p3, p4, p5) --[[ Line: 103 ]]
+function t._setstate(p1, p2, p3, p4, p5)
 	local v1 = os.clock()
 	local v2, v3 = p1:_getstate(v1)
 	local v4 = p2 or v2

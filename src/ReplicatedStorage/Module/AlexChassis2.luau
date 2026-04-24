@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local Math = require(ReplicatedStorage.Module.Math)
@@ -31,12 +32,12 @@ local SoundIds = {
 	tire_pop = 4534995816,
 	tire_leak = 4534995685
 }
-local function rotateAxisAngle(axis, vec, angle)
-	local sinA = math.sin(angle)
-	local cosA = math.cos(angle)
-	local cross = axis:Cross(vec)
-	local dot = axis:Dot(vec)
-	return dot * axis + cosA * (axis - dot * vec) + sinA * cross
+local function rotateAxisAngle(axis, vector, angle)
+	local sinAngle = math.sin(angle)
+	local cosAngle = math.cos(angle)
+	local crossProduct = axis:Cross(vector)
+	local dotProduct = axis:Dot(vector)
+	return dotProduct * axis + cosAngle * (axis - dotProduct * vector) + sinAngle * crossProduct
 end
 local function GetMoveVector()
 	return Vector3.new()

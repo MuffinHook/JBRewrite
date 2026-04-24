@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WorldMarker = require(ReplicatedStorage.Game.WorldMarker.WorldMarker)
@@ -29,7 +30,7 @@ local t3 = {
 	_playerMarkerGroup = nil,
 	_setting = nil
 }
-function t3.init() --[[ Line: 35 | Upvalues: WorldMarkerGroup (copy), WorldMarkerSystem (copy), t3 (copy), RxInstanceUtils (copy), Players (copy), RunService (copy), gameSettingType (copy), GameSettingsService (copy) ]]
+function t3.init()
 	local v1 = WorldMarkerGroup.new()
 	WorldMarkerSystem.addGroup(v1)
 	t3._playerMarkerGroup = v1
@@ -48,11 +49,11 @@ function t3.init() --[[ Line: 35 | Upvalues: WorldMarkerGroup (copy), WorldMarke
 	t.onChanged:Connect(t3.updateEnabled)
 	Players.LocalPlayer:GetAttributeChangedSignal("DisablePlayerMarkers"):Connect(t3.updateEnabled)
 end
-function t3.updateEnabled() --[[ Line: 62 | Upvalues: t3 (copy), Players (copy) ]]
+function t3.updateEnabled()
 	local v1 = t3._setting:getValue()
 	t3._playerMarkerGroup:SetEnabled(v1 and Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") ~= true)
 end
-function t3._draw() --[[ Line: 71 | Upvalues: t3 (copy), HumanoidUnloadConsts (copy) ]]
+function t3._draw()
 	debug.profilebegin("PlayerMarker draw")
 	for k, v in pairs(t3._mapPlayerIdPlayerMarker) do
 		local _player = v._player
@@ -76,11 +77,11 @@ function t3._draw() --[[ Line: 71 | Upvalues: t3 (copy), HumanoidUnloadConsts (c
 	end
 	debug.profileend()
 end
-function t3._rxChildAdded(p1, p2) --[[ Line: 98 | Upvalues: Players (copy), RxInstanceUtils (copy), GameUtil (copy), Settings (copy), v1 (copy), FriendsService (copy), t2 (copy), t3 (copy) ]]
+function t3._rxChildAdded(p1, p2)
 	assert(p1:IsA("Player"))
 	if p1 ~= Players.LocalPlayer then
-		p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "TeamValue", function(p12, p2) --[[ Line: 104 | Upvalues: GameUtil (ref), Settings (ref), v1 (ref), FriendsService (ref), Players (ref), p1 (copy), t2 (ref), t3 (ref) ]]
-			local function update() --[[ Line: 105 | Upvalues: GameUtil (ref), Settings (ref), p12 (copy), v1 (ref), FriendsService (ref), Players (ref), p1 (ref), t2 (ref), t3 (ref) ]]
+		p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "TeamValue", function(p12, p2)
+			local function update()
 				local v12 = if GameUtil.Team == Settings.EnumTeam.Police then Settings.EnumTeam.Police else Settings.EnumTeam.Criminal
 				local v2 = if p12.Value == Settings.Team.Police then Settings.EnumTeam.Police else Settings.EnumTeam.Criminal
 				local v3 = if v2 == v12 then if v2 == Settings.EnumTeam.Police then v1.Police else v1.Criminal else nil
@@ -105,17 +106,17 @@ function t3._rxChildAdded(p1, p2) --[[ Line: 98 | Upvalues: Players (copy), RxIn
 			p2._listenMyFriendsChange = FriendsService.friendsUpdated:Connect(update)
 			p2:GiveTask(p1:GetAttributeChangedSignal("CCTVSpotted"):Connect(update))
 		end))
-		p2:GiveTask(function() --[[ Line: 149 | Upvalues: t3 (ref), p1 (copy) ]]
+		p2:GiveTask(function()
 			if t3._doesMarkerExist(p1) then
 				t3._destructMarker(p1)
 			end
 		end)
 	end
 end
-function t3._doesMarkerExist(p1) --[[ Line: 166 | Upvalues: t3 (copy) ]]
+function t3._doesMarkerExist(p1)
 	return t3._mapPlayerIdPlayerMarker[p1.UserId] ~= nil
 end
-function t3._constructMarker(p1) --[[ Line: 169 | Upvalues: Players (copy), t3 (copy), WorldMarker (copy), WorldMarkerSystem (copy), t (copy) ]]
+function t3._constructMarker(p1)
 	assert(p1 ~= nil)
 	assert(p1 ~= Players.LocalPlayer)
 	if t3._mapPlayerIdPlayerMarker[p1.UserId] then
@@ -131,10 +132,10 @@ function t3._constructMarker(p1) --[[ Line: 169 | Upvalues: Players (copy), t3 (
 		_player = p1
 	}
 end
-function t3._setColor(p1, p2) --[[ Line: 188 | Upvalues: t3 (copy) ]]
+function t3._setColor(p1, p2)
 	t3._mapPlayerIdPlayerMarker[p1.UserId]._worldMarker.FrameInner.ImageColor3 = p2
 end
-function t3._destructMarker(p1) --[[ Line: 193 | Upvalues: t3 (copy) ]]
+function t3._destructMarker(p1)
 	assert(p1 ~= nil)
 	local v2 = t3._mapPlayerIdPlayerMarker[p1.UserId]
 	if v2 then

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 return {
 	Volume = 0.6,
 	Bass = 0.5,

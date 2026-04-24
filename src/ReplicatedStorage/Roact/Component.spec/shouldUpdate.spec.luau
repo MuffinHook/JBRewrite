@@ -1,4 +1,5 @@
-return function() --[[ Line: 1 ]]
+-- Reviewed by Claude
+return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
@@ -7,17 +8,17 @@ return function() --[[ Line: 1 ]]
 	local Type = require(script.Parent.Parent.Type)
 	local Component = require(script.Parent.Parent.Component)
 	local v1 = createReconciler(NoopRenderer)
-	it("should be invoked when props update", function() --[[ Line: 13 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy), assertDeepEqual (copy) ]]
+	it("should be invoked when props update", function()
 		local v12 = Component:extend("MyComponent")
 		local v2 = nil
 		local v3 = nil
-		local v4 = createSpy(function(p1) --[[ Line: 18 | Upvalues: v2 (ref), v3 (ref) ]]
+		local v4 = createSpy(function(p1)
 			v2 = p1.props
 			v3 = p1.state
 			return true
 		end)
 		v12.shouldUpdate = v4.value
-		function v12.render(p1) --[[ Line: 27 ]]
+		function v12.render(p1)
 			return nil
 		end
 		local t = {
@@ -38,15 +39,15 @@ return function() --[[ Line: 1 ]]
 		expect(v8.newState).to.equal(v3)
 		assertDeepEqual(v3, {})
 	end)
-	it("should be invoked when state is updated", function() --[[ Line: 63 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy), assertDeepEqual (copy) ]]
+	it("should be invoked when state is updated", function()
 		local v12 = Component:extend("MyComponent")
 		local t = {
 			a = 1
 		}
 		local v2 = nil
 		local v3 = nil
-		function v12.init(p1) --[[ Line: 72 | Upvalues: v2 (ref), t (copy), v3 (ref) ]]
-			v2 = function(...) --[[ Line: 73 | Upvalues: p1 (copy) ]]
+		function v12.init(p1)
+			v2 = function(...)
 				return p1:setState(...)
 			end
 			p1:setState(t)
@@ -54,13 +55,13 @@ return function() --[[ Line: 1 ]]
 		end
 		local v4 = nil
 		local v5 = nil
-		local v6 = createSpy(function(p1) --[[ Line: 84 | Upvalues: v4 (ref), v5 (ref) ]]
+		local v6 = createSpy(function(p1)
 			v4 = p1.props
 			v5 = p1.state
 			return true
 		end)
 		v12.shouldUpdate = v6.value
-		function v12.render(p1) --[[ Line: 93 ]]
+		function v12.render(p1)
 			return nil
 		end
 		v1.mountVirtualNode(createElement(v12), nil, "Test")
@@ -79,9 +80,9 @@ return function() --[[ Line: 1 ]]
 		expect(v5).to.equal(v3)
 		assertDeepEqual(v8.newState, t2)
 	end)
-	it("should not abort an update when returning true", function() --[[ Line: 126 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy) ]]
+	it("should not abort an update when returning true", function()
 		local v12 = Component:extend("MyComponent")
-		function v12.shouldUpdate(p1) --[[ Line: 129 ]]
+		function v12.shouldUpdate(p1)
 			return true
 		end
 		local v2 = createSpy()
@@ -91,9 +92,9 @@ return function() --[[ Line: 1 ]]
 		v1.updateVirtualNode(v4, (createElement(v12)))
 		expect(v2.callCount).to.equal(2)
 	end)
-	it("should abort an update when retuning false", function() --[[ Line: 151 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy) ]]
+	it("should abort an update when retuning false", function()
 		local v12 = Component:extend("MyComponent")
-		function v12.shouldUpdate(p1) --[[ Line: 154 ]]
+		function v12.shouldUpdate(p1)
 			return false
 		end
 		local v2 = createSpy()

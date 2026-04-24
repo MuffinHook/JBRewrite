@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Base64 = require(script.Base64)
 local _ = ipairs
 local band = bit32.band
@@ -45,7 +46,7 @@ local t8 = {
 	21
 }
 local t9 = {}
-local function sha256_feed_64(p1, p2, p3, p4) --[[ Line: 151 | Upvalues: t9 (copy), t2 (copy), rrotate (copy), lrotate (copy), rshift (copy), bxor (copy), band (copy) ]]
+local function sha256_feed_64(p1, p2, p3, p4)
 	local v1 = t9
 	local v2 = t2
 	local v3 = p1[1]
@@ -91,7 +92,7 @@ local function sha256_feed_64(p1, p2, p3, p4) --[[ Line: 151 | Upvalues: t9 (cop
 	p1[7] = v9
 	p1[8] = v10
 end
-local function sha512_feed_128(p1, p2, p3, p4, p5) --[[ Line: 187 | Upvalues: t9 (copy), t (copy), t2 (copy), rshift (copy), lshift (copy), bxor (copy), band (copy) ]]
+local function sha512_feed_128(p1, p2, p3, p4, p5)
 	local v1 = t9
 	local v2 = t
 	local v3 = t2
@@ -182,7 +183,7 @@ local function sha512_feed_128(p1, p2, p3, p4, p5) --[[ Line: 187 | Upvalues: t9
 	p2[7] = v18
 	p2[8] = v19
 end
-local function md5_feed_64(p1, p2, p3, p4) --[[ Line: 278 | Upvalues: t9 (copy), t7 (copy), t8 (copy), band (copy), rrotate (copy), bxor (copy), bor (copy) ]]
+local function md5_feed_64(p1, p2, p3, p4)
 	local v1 = t9
 	local v2 = t7
 	local v3 = t8
@@ -231,7 +232,7 @@ local function md5_feed_64(p1, p2, p3, p4) --[[ Line: 278 | Upvalues: t9 (copy),
 	p1[3] = v6
 	p1[4] = v7
 end
-local function sha1_feed_64(p1, p2, p3, p4) --[[ Line: 339 | Upvalues: t9 (copy), bxor (copy), lrotate (copy), band (copy), rrotate (copy) ]]
+local function sha1_feed_64(p1, p2, p3, p4)
 	local v1 = t9
 	local v2 = p1[1]
 	local v3 = p1[2]
@@ -277,7 +278,7 @@ local function sha1_feed_64(p1, p2, p3, p4) --[[ Line: 339 | Upvalues: t9 (copy)
 	p1[4] = v5
 	p1[5] = v6
 end
-local function keccak_feed(p1, p2, p3, p4, p5, p6) --[[ Line: 401 | Upvalues: t5 (copy), t6 (copy), bxor (copy), band (copy) ]]
+local function keccak_feed(p1, p2, p3, p4, p5, p6)
 	local v1 = t5
 	local v2 = t6
 	local v3 = p6 / 8
@@ -565,7 +566,7 @@ local function keccak_feed(p1, p2, p3, p4, p5, p6) --[[ Line: 401 | Upvalues: t5
 		p2[25] = v61
 	end
 end
-local function mul(p1, p2, p3, p4) --[[ Line: 628 ]]
+local function mul(p1, p2, p3, p4)
 	local v2, sum, sum_2, v3 = 1, 0, 0, table.create(p4)
 	for i = 1, p4 do
 		for j = math.max(1, i + 1 - #p2), math.min(i, #p1) do

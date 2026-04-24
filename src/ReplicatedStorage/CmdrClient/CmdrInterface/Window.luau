@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local GuiService = game:GetService("GuiService")
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
@@ -16,16 +17,16 @@ local v1 = LocalPlayer:WaitForChild("CmdrFrameValue").Value
 local Line = v1:WaitForChild("Line")
 local Entry = v1:WaitForChild("Entry")
 Line.Parent = nil
-function t2.UpdateLabel(p1) --[[ Line: 29 | Upvalues: Entry (copy), LocalPlayer (copy) ]]
+function t2.UpdateLabel(p1)
 	Entry.TextLabel.Text = ("%*%*$"):format(LocalPlayer.Name, if p1.Cmdr.PlaceName and p1.Cmdr.PlaceName ~= "" then ("@%*"):format(p1.Cmdr.PlaceName) else "")
 end
-function t2.GetLabel(p1) --[[ Line: 35 | Upvalues: Entry (copy) ]]
+function t2.GetLabel(p1)
 	return Entry.TextLabel.Text
 end
-function t2.UpdateWindowHeight(p1) --[[ Line: 40 | Upvalues: v1 (copy) ]]
+function t2.UpdateWindowHeight(p1)
 	v1.CanvasPosition = Vector2.new(0, (math.max(v1.UIListLayout.AbsoluteContentSize.Y + 20 - v1.AbsoluteWindowSize.Y, 0)))
 end
-function t2.AddLine(p1, p2, p3) --[[ Line: 48 | Upvalues: t2 (copy), Line (copy), v1 (copy) ]]
+function t2.AddLine(p1, p2, p3)
 	local v12 = p3 or {}
 	local v2 = tostring(p2)
 	local v3 = if typeof(v12) == "Color3" then {
@@ -43,11 +44,11 @@ function t2.AddLine(p1, p2, p3) --[[ Line: 48 | Upvalues: t2 (copy), Line (copy)
 		v5.Parent = v1
 	end
 end
-function t2.IsVisible(p1) --[[ Line: 72 | Upvalues: v1 (copy) ]]
+function t2.IsVisible(p1)
 	return v1.Visible
 end
-local function SafeGetCore(p1) --[[ Line: 78 | Upvalues: StarterGui (copy) ]]
-	local v1, v2 = pcall(function() --[[ Line: 79 | Upvalues: StarterGui (ref), p1 (copy) ]]
+local function SafeGetCore(p1)
+	local v1, v2 = pcall(function()
 		return StarterGui:GetCore(p1)
 	end)
 	if v1 then
@@ -56,22 +57,22 @@ local function SafeGetCore(p1) --[[ Line: 78 | Upvalues: StarterGui (copy) ]]
 		return true
 	end
 end
-local function SafeSetCore(p1, p2) --[[ Line: 84 | Upvalues: StarterGui (copy) ]]
-	local _, _2 = pcall(function() --[[ Line: 85 | Upvalues: StarterGui (ref), p1 (copy), p2 (copy) ]]
+local function SafeSetCore(p1, p2)
+	local _, _2 = pcall(function()
 		return StarterGui:SetCore(p1, p2)
 	end)
 end
-function t2.SetVisible(p1, p2) --[[ Line: 90 | Upvalues: v1 (copy), StarterGui (copy), Entry (copy), UserInputService (copy) ]]
+function t2.SetVisible(p1, p2)
 	v1.Visible = p2
 	if p2 then
 		local v12 = "ChatActive"
-		local v2, v3 = pcall(function() --[[ Line: 79 | Upvalues: StarterGui (ref), v12 (copy) ]]
+		local v2, v3 = pcall(function()
 			return StarterGui:GetCore(v12)
 		end)
 		p1.PreviousChatActive = if v2 then v3 else true
 		local v5 = "ChatActive"
 		local v6 = false
-		local _, _2 = pcall(function() --[[ Line: 85 | Upvalues: StarterGui (ref), v5 (copy), v6 (copy) ]]
+		local _, _2 = pcall(function()
 			return StarterGui:SetCore(v5, v6)
 		end)
 		Entry.TextBox:CaptureFocus()
@@ -83,13 +84,13 @@ function t2.SetVisible(p1, p2) --[[ Line: 90 | Upvalues: v1 (copy), StarterGui (
 		end
 	else
 		local v7 = "ChatActive"
-		local v8, v9 = pcall(function() --[[ Line: 79 | Upvalues: StarterGui (ref), v7 (copy) ]]
+		local v8, v9 = pcall(function()
 			return StarterGui:GetCore(v7)
 		end)
 		if not if v8 then v9 else true then
 			local PreviousChatActive = p1.PreviousChatActive
 			local v11 = "ChatActive"
-			local _, _2 = pcall(function() --[[ Line: 85 | Upvalues: StarterGui (ref), v11 (copy), PreviousChatActive (copy) ]]
+			local _, _2 = pcall(function()
 				return StarterGui:SetCore(v11, PreviousChatActive)
 			end)
 		end
@@ -101,13 +102,13 @@ function t2.SetVisible(p1, p2) --[[ Line: 90 | Upvalues: v1 (copy), StarterGui (
 		end
 	end
 end
-function t2.Hide(p1) --[[ Line: 121 ]]
+function t2.Hide(p1)
 	return p1:SetVisible(false)
 end
-function t2.Show(p1) --[[ Line: 126 ]]
+function t2.Show(p1)
 	return p1:SetVisible(true)
 end
-function t2.SetEntryText(p1, p2) --[[ Line: 131 | Upvalues: Entry (copy), t2 (copy) ]]
+function t2.SetEntryText(p1, p2)
 	Entry.TextBox.Text = p2
 	if p1:IsVisible() then
 		Entry.TextBox:CaptureFocus()
@@ -115,18 +116,18 @@ function t2.SetEntryText(p1, p2) --[[ Line: 131 | Upvalues: Entry (copy), t2 (co
 		t2:UpdateWindowHeight()
 	end
 end
-function t2.GetEntryText(p1) --[[ Line: 142 | Upvalues: Entry (copy) ]]
+function t2.GetEntryText(p1)
 	return Entry.TextBox.Text:gsub("\t", "")
 end
-function t2.SetIsValidInput(p1, p2, p3) --[[ Line: 148 | Upvalues: Entry (copy) ]]
+function t2.SetIsValidInput(p1, p2, p3)
 	Entry.TextBox.TextColor3 = p2 and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 73, 73)
 	p1.Valid = p2
 	p1._errorText = p3
 end
-function t2.HideInvalidState(p1) --[[ Line: 154 | Upvalues: Entry (copy) ]]
+function t2.HideInvalidState(p1)
 	Entry.TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 end
-function t2.LoseFocus(p1, p2) --[[ Line: 159 | Upvalues: Entry (copy), v1 (copy), GuiService (copy), UserInputService (copy) ]]
+function t2.LoseFocus(p1, p2)
 	local Text = Entry.TextBox.Text
 	p1:ClearHistoryState()
 	if v1.Visible and not (GuiService.MenuIsOpen or UserInputService.TouchEnabled) then
@@ -142,7 +143,7 @@ function t2.LoseFocus(p1, p2) --[[ Line: 159 | Upvalues: Entry (copy), v1 (copy)
 		p1:AddLine(p1._errorText, Color3.fromRGB(255, 153, 153))
 	end
 end
-function t2.TraverseHistory(p1, p2) --[[ Line: 180 ]]
+function t2.TraverseHistory(p1, p2)
 	local v1 = p1.Cmdr.Dispatcher:GetHistory()
 	if p1.HistoryState == nil then
 		p1.HistoryState = {
@@ -153,10 +154,10 @@ function t2.TraverseHistory(p1, p2) --[[ Line: 180 ]]
 	p1.HistoryState.Position = math.clamp(p1.HistoryState.Position + p2, 1, #v1 + 1)
 	p1:SetEntryText(p1.HistoryState.Position == #v1 + 1 and p1.HistoryState.InitialText or v1[p1.HistoryState.Position])
 end
-function t2.ClearHistoryState(p1) --[[ Line: 198 ]]
+function t2.ClearHistoryState(p1)
 	p1.HistoryState = nil
 end
-function t2.SelectVertical(p1, p2) --[[ Line: 202 ]]
+function t2.SelectVertical(p1, p2)
 	if p1.AutoComplete:IsVisible() and not p1.HistoryState then
 		p1.AutoComplete:Select(p2)
 	else
@@ -165,7 +166,7 @@ function t2.SelectVertical(p1, p2) --[[ Line: 202 ]]
 end
 local v2 = 0
 local v3 = 0
-function t2.BeginInput(p1, p2, p3) --[[ Line: 213 | Upvalues: GuiService (copy), v2 (ref), v3 (ref), t (copy), v1 (copy) ]]
+function t2.BeginInput(p1, p2, p3)
 	if GuiService.MenuIsOpen then
 		p1:Hide()
 	end
@@ -252,13 +253,13 @@ function t2.BeginInput(p1, p2, p3) --[[ Line: 213 | Upvalues: GuiService (copy),
 		end
 	end
 end
-Entry.TextBox.FocusLost:Connect(function(p1) --[[ Line: 324 | Upvalues: t2 (copy) ]]
+Entry.TextBox.FocusLost:Connect(function(p1)
 	return t2:LoseFocus(p1)
 end)
-UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 328 | Upvalues: t2 (copy) ]]
+UserInputService.InputBegan:Connect(function(p1, p2)
 	return t2:BeginInput(p1, p2)
 end)
-Entry.TextBox:GetPropertyChangedSignal("Text"):Connect(function() --[[ Line: 332 | Upvalues: v1 (copy), Entry (copy), t2 (copy) ]]
+Entry.TextBox:GetPropertyChangedSignal("Text"):Connect(function()
 	v1.CanvasPosition = Vector2.new(0, v1.AbsoluteCanvasSize.Y)
 	if Entry.TextBox.Text:match("\t") then
 		Entry.TextBox.Text = Entry.TextBox.Text:gsub("\t", "")
@@ -266,7 +267,7 @@ Entry.TextBox:GetPropertyChangedSignal("Text"):Connect(function() --[[ Line: 332
 		return t2.OnTextChanged(Entry.TextBox.Text)
 	end
 end)
-v1.ChildAdded:Connect(function() --[[ Line: 344 | Upvalues: t2 (copy) ]]
+v1.ChildAdded:Connect(function()
 	task.defer(t2.UpdateWindowHeight)
 end)
 return t2

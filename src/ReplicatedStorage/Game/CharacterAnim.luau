@@ -1,16 +1,17 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local t = {}
-function t.init() --[[ Line: 5 | Upvalues: t (copy), Players (copy) ]]
+function t.init()
 	t._handlePlayer(Players.LocalPlayer)
 end
-function t._handlePlayer(p1) --[[ Line: 8 | Upvalues: t (copy) ]]
+function t._handlePlayer(p1)
 	if p1.Character then
 		t._handleCharacter(p1.Character)
 	end
 	p1.CharacterAdded:Connect(t._handleCharacter)
 end
-function t._handleCharacter(p1) --[[ Line: 14 | Upvalues: t (copy), ReplicatedStorage (copy) ]]
+function t._handleCharacter(p1)
 	local Animator = p1:WaitForChild("Humanoid"):WaitForChild("Animator")
 	local v1 = Animator:LoadAnimation(p1:WaitForChild("Animate"):WaitForChild("idle"):WaitForChild("Animation1"))
 	v1.Priority = Enum.AnimationPriority.Action
@@ -25,16 +26,16 @@ function t._handleCharacter(p1) --[[ Line: 14 | Upvalues: t (copy), ReplicatedSt
 	v3:AdjustSpeed(0)
 	t._carSitTrack = v3
 end
-function t.getIdleTrack() --[[ Line: 36 | Upvalues: t (copy) ]]
+function t.getIdleTrack()
 	return t._idleTrack
 end
-function t.getSkydiveTrack() --[[ Line: 39 | Upvalues: t (copy) ]]
+function t.getSkydiveTrack()
 	return t._skydiveTrack
 end
-function t.getRopeGrabTrack() --[[ Line: 42 | Upvalues: t (copy) ]]
+function t.getRopeGrabTrack()
 	return t._ropeGrabTrack
 end
-function t.getCarSitTrack() --[[ Line: 45 | Upvalues: t (copy) ]]
+function t.getCarSitTrack()
 	return t._carSitTrack
 end
 return t

@@ -1,4 +1,5 @@
-local function CalculateSegment(p1, p2) --[[ Line: 1 ]]
+-- Reviewed by Claude
+local function CalculateSegment(p1, p2)
 	local v1 = p1.SegmentsById[p1.SegmentId]
 	if not (p2 < v1.Length) then
 		repeat
@@ -13,7 +14,7 @@ local function CalculateSegment(p1, p2) --[[ Line: 1 ]]
 	end
 	return v1, p2
 end
-local function CalculateDistanceAhead(p1, p2, p3, p4, p5) --[[ Line: 21 ]]
+local function CalculateDistanceAhead(p1, p2, p3, p4, p5)
 	if p2 == p4 then
 		return p5 - p3
 	end
@@ -51,7 +52,7 @@ local function CalculateDistanceAhead(p1, p2, p3, p4, p5) --[[ Line: 21 ]]
 end
 return {
 	CalculateSegment = CalculateSegment,
-	CalculatePosition = function(p1, p2) --[[ Name: CalculatePosition | Line: 61 | Upvalues: CalculateSegment (copy) ]]
+	CalculatePosition = function(p1, p2)
 		local v1, v2 = CalculateSegment(p1, p2)
 		if v1 then
 			local CF = v1.CF
@@ -61,7 +62,7 @@ return {
 		end
 	end,
 	CalculateDistanceAhead = CalculateDistanceAhead,
-	MoveTrain = function(p1, p2) --[[ Name: MoveTrain | Line: 69 | Upvalues: CalculateSegment (copy) ]]
+	MoveTrain = function(p1, p2)
 		local v1, v2 = CalculateSegment(p1, p1.Offset + p2 * p1.Speed)
 		p1.SegmentId = v1.Id
 		p1.Offset = v2

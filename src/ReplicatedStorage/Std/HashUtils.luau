@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 return {
-	polynomialRollingHash = function(p1) --[[ Name: polynomialRollingHash | Line: 5 ]]
+	polynomialRollingHash = function(p1)
 		assert(typeof(p1) == "string", "str must be string")
 		local v2 = 0
 		for i = 1, #p1 do

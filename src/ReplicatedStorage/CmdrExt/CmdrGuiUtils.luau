@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 return {
-	frame = function(p1) --[[ Name: frame | Line: 2 ]]
+	frame = function(p1)
 		local Frame = Instance.new("ScrollingFrame")
 		Frame.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
 		Frame.BackgroundTransparency = 1
@@ -80,7 +81,7 @@ return {
 		TextLabel.Parent = Entry
 		return Frame
 	end,
-	autocomplete = function(p1) --[[ Name: autocomplete | Line: 91 ]]
+	autocomplete = function(p1)
 		local Autocomplete = Instance.new("ScrollingFrame")
 		Autocomplete.CanvasSize = UDim2.new()
 		Autocomplete.AutomaticCanvasSize = Enum.AutomaticSize.Y

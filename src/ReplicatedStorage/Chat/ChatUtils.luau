@@ -1,25 +1,25 @@
 -- Reviewed by Claude
 game:GetService("TextChatService")
 local StarterGui = game:GetService("StarterGui")
-local t = {}
-local v1 = true
-local v2 = true
-function t.setEnabled(p1)
-	v1 = p1
-	if p1 == false then
-		v2 = StarterGui:GetCore("ChatActive")
+local ChatUtils = {}
+local isEnabled = true
+local previousChatActive = true
+function ChatUtils.setEnabled(enabled)
+	isEnabled = enabled
+	if enabled == false then
+		previousChatActive = StarterGui:GetCore("ChatActive")
 		StarterGui:SetCore("ChatActive", false)
 	elseif not StarterGui:GetCore("ChatActive") then
-		StarterGui:SetCore("ChatActive", v2)
+		StarterGui:SetCore("ChatActive", previousChatActive)
 	end
 end
-function t.getEnabled()
-	return v1
+function ChatUtils.getEnabled()
+	return isEnabled
 end
-function t.hide()
-	t.setEnabled(false)
+function ChatUtils.hide()
+	ChatUtils.setEnabled(false)
 	return function()
-		t.setEnabled(true)
+		ChatUtils.setEnabled(true)
 	end
 end
-return t
+return ChatUtils

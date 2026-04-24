@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local v1 = CFrame.new
 local Angles = CFrame.Angles
@@ -19,7 +20,7 @@ local random = math.random
 local deg = math.deg
 local insert = table.insert
 local remove = table.remove
-local function RandomVector(p1) --[[ Line: 15 | Upvalues: random (copy), cos (copy), sin (copy), v2 (copy) ]]
+local function RandomVector(p1)
 	local v1 = random()
 	local v22 = random()
 	local v3
@@ -30,14 +31,14 @@ local function RandomVector(p1) --[[ Line: 15 | Upvalues: random (copy), cos (co
 	end
 	return v2(v22 * p1 * cos(6.283185307179586 * v3 / v22), v22 * p1 * sin(6.283185307179586 * v3 / v22), 0)
 end
-local function MakeState() --[[ Line: 27 ]]
+local function MakeState()
 	return {
 		Frame = nil,
 		Simulate = {},
 		Fireworks = {}
 	}
 end
-local function MakeParticle() --[[ Line: 34 ]]
+local function MakeParticle()
 	return {
 		Frame = nil,
 		p = Vector3.new(0, 0, 0),
@@ -48,7 +49,7 @@ local function MakeParticle() --[[ Line: 34 ]]
 		Fake = false
 	}
 end
-local function Single(p1, p2, p3, p4) --[[ Line: 45 | Upvalues: insert (copy) ]]
+local function Single(p1, p2, p3, p4)
 	local Frame = Instance.new("Frame")
 	Frame.Size = UDim2.new(0, 2, 0, 2)
 	Frame.BackgroundColor3 = Color3.new(255/255, 255/255, 255/255)
@@ -71,13 +72,13 @@ local function Single(p1, p2, p3, p4) --[[ Line: 45 | Upvalues: insert (copy) ]]
 	insert(p1.Simulate, t)
 	return t
 end
-local function Firework(p1, p2, p3, p4) --[[ Line: 58 | Upvalues: Single (ref), insert (copy) ]]
+local function Firework(p1, p2, p3, p4)
 	local v1 = Single(p1, p2, p3, p4)
 	v1.Frame.Visible = false
 	insert(p1.Fireworks, v1)
 	return v1
 end
-local function Explosion(p1, p2) --[[ Line: 64 | Upvalues: random (copy), Single (ref), cos (copy), sin (copy), v2 (copy) ]]
+local function Explosion(p1, p2)
 	local v1 = Color3.fromHSV(random(), 0.9, 0.9)
 	for i = 1, 30 do
 		local v22
@@ -108,7 +109,7 @@ local function Explosion(p1, p2) --[[ Line: 64 | Upvalues: random (copy), Single
 		v13.Frame.BackgroundColor3 = v8
 	end
 end
-local function Update(p1, p2) --[[ Line: 78 | Upvalues: atan2 (copy), deg (copy), remove (copy), tanh (copy), random (copy), Single (ref), cos (copy), sin (copy), v2 (copy) ]]
+local function Update(p1, p2)
 	local v1 = tick()
 	local Simulate = p1.Simulate
 	for i = #Simulate, 1, -1 do
@@ -193,7 +194,7 @@ local function Update(p1, p2) --[[ Line: 78 | Upvalues: atan2 (copy), deg (copy)
 		Single(p1, v11.p, v2(v27 * 60 * cos(6.283185307179586 * v10 / v27), v27 * 60 * sin(6.283185307179586 * v10 / v27), 0), Vector3.new(0, 400, 0)).ttl = 0.8
 	end
 end
-local function Clear(p1) --[[ Line: 144 ]]
+local function Clear(p1)
 	for v1, v2 in next, p1.Simulate do
 		v2.Frame:Destroy()
 	end
@@ -204,12 +205,12 @@ return {
 	Single = Single,
 	Firework = Firework,
 	Explosion = Explosion,
-	EasySimulate = function(p1, p2) --[[ Name: EasySimulate | Line: 150 | Upvalues: Update (ref), RunService (copy), Clear (ref) ]]
-		local function Heartbeat(p12) --[[ Line: 151 | Upvalues: Update (ref), p1 (copy) ]]
+	EasySimulate = function(p1, p2)
+		local function Heartbeat(p12)
 			Update(p1, p12)
 		end
 		local v1 = RunService.Heartbeat:Connect(Heartbeat)
-		local function Finish() --[[ Line: 155 | Upvalues: v1 (copy), Clear (ref), p1 (copy) ]]
+		local function Finish()
 			v1:Disconnect()
 			Clear(p1)
 		end

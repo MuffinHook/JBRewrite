@@ -1,13 +1,14 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NetSync = require(ReplicatedStorage.Module.NetSync)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local RunService = game:GetService("RunService")
 local t = {}
 t.__index = t
-function t.new(p1, p2) --[[ Line: 10 | Upvalues: t (copy), RunService (copy) ]]
+function t.new(p1, p2)
 	local v2 = setmetatable({}, t)
 	local v3 = tick()
-	local function Heartbeat(p1) --[[ Line: 13 | Upvalues: v3 (copy), v2 (copy), p2 (copy) ]]
+	local function Heartbeat(p1)
 		local v1 = tick() - v3
 		if v1 >= 1 then
 			v2.Event:Disconnect()
@@ -20,17 +21,17 @@ function t.new(p1, p2) --[[ Line: 10 | Upvalues: t (copy), RunService (copy) ]]
 	v2.Done = false
 	return v2
 end
-function t.Destroy(p1) --[[ Line: 27 ]]
+function t.Destroy(p1)
 	p1.Event:Disconnect()
 	p1.Event = nil
 	p1.Done = true
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 33 | Upvalues: t (copy), Audio (copy), NetSync (copy) ]]
+	Init = function(p1)
 		local _ = p1.Event
 		local em = p1.em
 		local v1 = nil
-		local function Update(p1) --[[ Line: 59 | Upvalues: v1 (ref), t (ref), Audio (ref) ]]
+		local function Update(p1)
 			if not p1.Tagged then
 				return false
 			end
@@ -48,7 +49,7 @@ return {
 			local v3 = Inst.Parent
 			v3.PrimaryPart = v3.Root
 			local Root = v3.Parent.Model.Root
-			v1 = t.new(0.5, function(p12, p2) --[[ Line: 81 | Upvalues: p1 (copy), v3 (copy), Root (copy) ]]
+			v1 = t.new(0.5, function(p12, p2)
 				p1.Rot = if p1.Flipped then -0.9424777960769379 else 0 * p12 + (p1.Rot or 0) * (1 - p12)
 				v3:SetPrimaryPartCFrame(Root.CFrame * CFrame.Angles(0, 0, p1.Rot))
 			end)

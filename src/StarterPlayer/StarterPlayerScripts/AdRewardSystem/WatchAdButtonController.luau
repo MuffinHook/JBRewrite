@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Notification = require(ReplicatedStorage.Game.Notification)
 local AdRewardsController = require(script.Parent:WaitForChild("AdRewardsController"))
 local Telemetry = require(script.Parent.Telemetry)
-local t = {}
+local watchAdButtonController = {}
 local AdRewardEvents = ReplicatedStorage:WaitForChild("AdRewardSystem"):WaitForChild("AdRewardEvents")
 local GrantReward = AdRewardEvents:WaitForChild("GrantReward")
 local GetAdPlacementStatus = AdRewardEvents:WaitForChild("GetAdPlacementStatus")
@@ -734,7 +735,7 @@ local function findclaimbuttons()
 		warn("WatchAdButtonController: PlayerGui nil in findclaimbuttons")
 	end
 end
-function t.Init(initParams)
+function watchAdButtonController.Init(initParams)
 	playerGui = initParams.PlayerGui
 	playAdCallback = initParams.PlayAd
 	getAdStateCallback = initParams.GetAdState
@@ -746,12 +747,12 @@ function t.Init(initParams)
 		warn("WatchAdButtonController: findclaimbuttons failed:", err)
 	end
 end
-function t.EvaluateAllPlacementButtons()
+function watchAdButtonController.EvaluateAllPlacementButtons()
 	for k, v in pairs(claimButtonConfigs) do
 		evaluatePlacementVisibility(k)
 	end
 end
-function t.OnAdCompleted(adShown, showAdResult)
+function watchAdButtonController.OnAdCompleted(adShown, showAdResult)
 	local context = pendingAdContext
 	pendingAdContext = nil
 	if context then
@@ -805,4 +806,4 @@ function t.OnAdCompleted(adShown, showAdResult)
 		end
 	end
 end
-return t
+return watchAdButtonController

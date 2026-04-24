@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.RoactRodux)
 require(ReplicatedStorage.EzUi.Dictionary)
@@ -7,13 +8,13 @@ local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local RoundButton = require(script.Parent.RoundButton)
 local v1 = Roact.PureComponent:extend("Lite")
-function v1.init(p1) --[[ Line: 12 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	p1:setState({
 		remaining = 0
 	})
 end
-function v1.render(p1) --[[ Line: 18 | Upvalues: createElement (copy), RoundButton (copy) ]]
+function v1.render(p1)
 	local mainRatio = p1.props.mainRatio
 	local paddingRatio = p1.props.paddingRatio
 	local cornerPixel = p1.props.cornerPixel
@@ -92,17 +93,17 @@ function v1.render(p1) --[[ Line: 18 | Upvalues: createElement (copy), RoundButt
 	})
 	return createElement("Frame", t, t2)
 end
-function v1.didMount(p1) --[[ Line: 117 | Upvalues: Interval (copy) ]]
+function v1.didMount(p1)
 	p1:setState({
 		remaining = p1.props.getRemainingDebounce()
 	})
-	p1.maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 121 | Upvalues: p1 (copy) ]]
+	p1.maid:GiveTask(Interval.every(1):Connect(function()
 		p1:setState({
 			remaining = p1.props.getRemainingDebounce()
 		})
 	end))
 end
-function v1.willUnmount(p1) --[[ Line: 127 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v1

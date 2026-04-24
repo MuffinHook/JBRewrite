@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -10,14 +11,14 @@ local ItemSkin = require(ReplicatedStorage.Game.ItemSkin.ItemSkin)
 require(ReplicatedStorage.Game.ItemSkin.ItemSkinIds)
 local ItemSkinList = require(ReplicatedStorage.Game.ItemSkin.ItemSkinList)
 local ItemSystem = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
-local function comma(p1) --[[ Line: 15 ]]
+local function comma(p1)
 	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
 	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
 end
-local function SelectIfGamepad(p1) --[[ Line: 20 | Upvalues: EzUtils (copy) ]]
+local function SelectIfGamepad(p1)
 	EzUtils.selectIfGamepad(p1)
 end
-local function v1(p1, p2) --[[ Line: 24 | Upvalues: v1 (copy) ]]
+local function v1(p1, p2)
 	local v12 = next
 	local v2, v3 = p1:GetChildren()
 	for v4, v5 in v12, v2, v3 do
@@ -27,7 +28,7 @@ local function v1(p1, p2) --[[ Line: 24 | Upvalues: v1 (copy) ]]
 		v1(v5, p2)
 	end
 end
-local function ItemFrameGen(p1, p2) --[[ Line: 32 ]]
+local function ItemFrameGen(p1, p2)
 	local Frame = p2.Frame
 	local TextLabel = Instance.new("TextLabel")
 	TextLabel.Size = UDim2.new(1, 0, 0, 20)
@@ -67,7 +68,7 @@ local function ItemFrameGen(p1, p2) --[[ Line: 32 ]]
 		p2.TextButtonBuy = TextButton
 	end
 end
-local function UpdateItemFrame(p1, p2) --[[ Line: 81 | Upvalues: ItemSkin (copy) ]]
+local function UpdateItemFrame(p1, p2)
 	local v1 = ItemSkin.DoesPlayerOwn(p1.Name)
 	p2.Owned = v1
 	if v1 then
@@ -78,14 +79,14 @@ local function UpdateItemFrame(p1, p2) --[[ Line: 81 | Upvalues: ItemSkin (copy)
 		TextLabelPrice.Font = Enum.Font.SourceSansBold
 	end
 end
-local function GetInstance(p1) --[[ Line: 96 | Upvalues: ItemSystem (copy), ItemSkinUIUtils (copy) ]]
+local function GetInstance(p1)
 	local v1 = ItemSystem.GetLocalEquipped()
 	if v1 == nil then
 		error("Player has no item equipped.")
 	end
 	return ItemSkinUIUtils.getModel(p1.Name, v1.__ClassName)
 end
-local function ViewportUpdate(p1, p2) --[[ Line: 105 ]]
+local function ViewportUpdate(p1, p2)
 	local v1 = tick()
 	p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1 * 0.5) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, p2.Skeleton.BoundingBox.Size.Magnitude * 0.8)
 end
@@ -94,9 +95,9 @@ local t = {
 	OnSkinBuyClick = Signal.new(),
 	OnClosed = Signal.new(),
 	IsOpen = false,
-	Init = function() --[[ Name: Init | Line: 117 ]] end
+	Init = function()  end
 }
-function t.Open() --[[ Line: 122 | Upvalues: t (copy), Maid (copy), LocalPlayer (copy), ItemSkinList (copy), ItemSkin (copy), ViewportSlider (copy), ItemFrameGen (copy), GetInstance (copy), ViewportUpdate (copy), EzUtils (copy), RunService (copy) ]]
+function t.Open()
 	if t.IsOpen == true then
 		error("Already open!")
 	end
@@ -124,7 +125,7 @@ function t.Open() --[[ Line: 122 | Upvalues: t (copy), Maid (copy), LocalPlayer 
 		end
 	end
 	local v2 = nil
-	local function ClearSelection() --[[ Line: 158 | Upvalues: v2 (ref) ]]
+	local function ClearSelection()
 		if v2 then
 			v2.TextButtonBuy.Visible = false
 			v2 = nil
@@ -137,7 +138,7 @@ function t.Open() --[[ Line: 122 | Upvalues: t (copy), Maid (copy), LocalPlayer 
 	for i = 1, #v3.ListItem do
 		local v4 = v3.ListItem[i]
 		local v5 = v3.Viewports[i]
-		local function OnClick() --[[ Line: 175 | Upvalues: v2 (ref), t (ref), v4 (copy) ]]
+		local function OnClick()
 			if v2 then
 				v2.TextButtonBuy.Visible = false
 				v2 = nil
@@ -155,12 +156,12 @@ function t.Open() --[[ Line: 122 | Upvalues: t (copy), Maid (copy), LocalPlayer 
 			TextLabelPrice.Font = Enum.Font.SourceSansBold
 		end
 		if i == 1 then
-			spawn(function() --[[ Line: 184 | Upvalues: v5 (copy), EzUtils (ref) ]]
+			spawn(function()
 				EzUtils.selectIfGamepad(v5.Frame)
 			end)
 		end
 	end
-	t.Maid:GiveTask(v3.OnMouseClick:Connect(function(p1, p2) --[[ Line: 190 | Upvalues: v2 (ref), t (ref), EzUtils (ref) ]]
+	t.Maid:GiveTask(v3.OnMouseClick:Connect(function(p1, p2)
 		if v2 then
 			v2.TextButtonBuy.Visible = false
 			v2 = nil
@@ -172,14 +173,14 @@ function t.Open() --[[ Line: 122 | Upvalues: t (copy), Maid (copy), LocalPlayer 
 		EzUtils.selectIfGamepad(p2.TextButtonBuy)
 		v2 = p2
 	end))
-	t.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 201 | Upvalues: t (ref) ]]
+	t.Maid:GiveTask(RunService.Heartbeat:Connect(function()
 		t.Heartbeat()
 	end))
 end
-function t.Heartbeat() --[[ Line: 205 | Upvalues: t (copy) ]]
+function t.Heartbeat()
 	t.mViewportSlider:Update()
 end
-function t.UpdateOwned() --[[ Line: 208 | Upvalues: t (copy), ItemSkin (copy) ]]
+function t.UpdateOwned()
 	local mViewportSlider = t.mViewportSlider
 	if mViewportSlider == nil then
 		return false
@@ -197,7 +198,7 @@ function t.UpdateOwned() --[[ Line: 208 | Upvalues: t (copy), ItemSkin (copy) ]]
 		end
 	end
 end
-function t.Close() --[[ Line: 219 | Upvalues: t (copy) ]]
+function t.Close()
 	if t.IsOpen ~= true then
 		error("Not open!")
 	end

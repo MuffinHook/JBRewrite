@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -7,7 +8,7 @@ local t = {
 	_list = {},
 	onAdded = Signal.new()
 }
-function t.add(p1) --[[ Line: 11 | Upvalues: Signal (copy), gameSettingType (copy), Roact (copy), t (copy) ]]
+function t.add(p1)
 	assert(p1.name, "missing name")
 	assert(p1.type, "missing gameSettingType")
 	assert(p1.defaultValue ~= nil, "missing defaultValue")
@@ -24,13 +25,13 @@ function t.add(p1) --[[ Line: 11 | Upvalues: Signal (copy), gameSettingType (cop
 		p1._value = v2
 		p1._updateValue = v3
 	end
-	function p1.getValue(p1) --[[ Line: 29 | Upvalues: t (ref) ]]
+	function p1.getValue(p1)
 		return t.getValue(p1)
 	end
 	table.insert(t._list, p1)
 	t.onUpdate:Fire()
 	t.onAdded:Fire(p1)
-	return function() --[[ Line: 35 | Upvalues: t (ref), p1 (copy) ]]
+	return function()
 		for i = #t._list, 1, -1 do
 			if t._list[i] == p1 then
 				table.remove(t._list, i)
@@ -41,21 +42,21 @@ function t.add(p1) --[[ Line: 11 | Upvalues: Signal (copy), gameSettingType (cop
 		return false
 	end
 end
-function t.getAll() --[[ Line: 46 | Upvalues: t (copy) ]]
+function t.getAll()
 	return t._list
 end
-function t.getSettingByName(p1) --[[ Line: 49 | Upvalues: t (copy) ]]
+function t.getSettingByName(p1)
 	for i, v in ipairs(t._list) do
 		if v.name == p1 then
 			return v
 		end
 	end
 end
-function t.getValueByName(p1) --[[ Line: 56 | Upvalues: t (copy) ]]
+function t.getValueByName(p1)
 	assert(p1, "missing name")
 	return t.getValue((t.getSettingByName(p1)))
 end
-function t.getValue(p1) --[[ Line: 61 | Upvalues: gameSettingType (copy) ]]
+function t.getValue(p1)
 	assert(p1, "missing setting")
 	if p1.type == gameSettingType.Checkbox then
 		return p1._value
@@ -64,11 +65,11 @@ function t.getValue(p1) --[[ Line: 61 | Upvalues: gameSettingType (copy) ]]
 		return p1._value:getValue()
 	end
 end
-function t.setValueByName(p1, p2) --[[ Line: 69 | Upvalues: t (copy) ]]
+function t.setValueByName(p1, p2)
 	assert(p1, "missing name")
 	t.setValue(t.getSettingByName(p1), p2)
 end
-function t.setValue(p1, p2) --[[ Line: 74 | Upvalues: gameSettingType (copy), t (copy) ]]
+function t.setValue(p1, p2)
 	assert(p1, "missing setting")
 	if p1.type == gameSettingType.Checkbox then
 		p1._value = p2

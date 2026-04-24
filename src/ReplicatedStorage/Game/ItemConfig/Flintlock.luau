@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Game.ItemSystem.GunSystemConsts)
 local Settings = require(ReplicatedStorage.Resource.Settings)
@@ -33,7 +34,7 @@ return {
 	FireAuto = false,
 	FireFreq = 4,
 	ReloadTime = 4,
-	DamageFun = function(p1) --[[ Name: DamageFun | Line: 40 ]]
+	DamageFun = function(p1)
 		if p1 <= 20 then
 			return 40
 		elseif p1 >= 100 then

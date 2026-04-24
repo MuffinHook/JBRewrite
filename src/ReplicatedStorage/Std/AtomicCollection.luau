@@ -1,4 +1,5 @@
-local function parsePath(p1) --[[ Line: 9 ]]
+-- Reviewed by Claude
+local function parsePath(p1)
 	local v1 = string.split(p1, "/")
 	for i = #v1, 1, -1 do
 		if v1[i] == "" then
@@ -7,7 +8,7 @@ local function parsePath(p1) --[[ Line: 9 ]]
 	end
 	return v1
 end
-local function isManifestResolved(p1, p2) --[[ Line: 19 ]]
+local function isManifestResolved(p1, p2)
 	local count = 0
 	for k in pairs(p1) do
 		count = count + 1
@@ -15,7 +16,7 @@ local function isManifestResolved(p1, p2) --[[ Line: 19 ]]
 	assert(count <= p2, count)
 	return count == p2
 end
-local function v1(p1, p2) --[[ Line: 29 | Upvalues: v1 (copy) ]]
+local function v1(p1, p2)
 	if p1.instance ~= nil then
 		p1.instance = nil
 		local connections = p1.connections
@@ -36,14 +37,14 @@ local function v1(p1, p2) --[[ Line: 29 | Upvalues: v1 (copy) ]]
 		end
 	end
 end
-return function(p1, p2, p3) --[[ Name: bindRoot | Line: 56 | Upvalues: parsePath (copy), v1 (copy) ]]
+return function(p1, p2, p3)
 	local count = 1
 	for k in pairs(p2) do
 		count = count + 1
 	end
 	local t = {}
 	local v12 = nil
-	local function stopBoundFn() --[[ Line: 65 | Upvalues: v12 (ref) ]]
+	local function stopBoundFn()
 		local v1 = v12
 		if v1 then
 			v12 = nil
@@ -62,7 +63,7 @@ return function(p1, p2, p3) --[[ Name: bindRoot | Line: 56 | Upvalues: parsePath
 			warn("Unknown dtor return value")
 		end
 	end
-	local function startBoundFn() --[[ Line: 81 | Upvalues: stopBoundFn (copy), p3 (copy), t (ref), v12 (ref) ]]
+	local function startBoundFn()
 		stopBoundFn()
 		local v1 = p3(t)
 		if v1 then
@@ -99,7 +100,7 @@ return function(p1, p2, p3) --[[ Name: bindRoot | Line: 56 | Upvalues: parsePath
 		end
 	end
 	debug.profileend()
-	local function v8(p1) --[[ Line: 128 | Upvalues: t (ref), v8 (copy), stopBoundFn (copy), v1 (ref), count (ref), p3 (copy), v12 (ref) ]]
+	local function v8(p1)
 		local v13 = assert(p1.instance)
 		local children = p1.children
 		local alias = p1.alias
@@ -108,14 +109,14 @@ return function(p1, p2, p3) --[[ Name: bindRoot | Line: 56 | Upvalues: parsePath
 			t[alias] = v13
 		end
 		if not v2 then
-			local function processAddChild(p1) --[[ Line: 140 | Upvalues: children (copy), v8 (ref) ]]
+			local function processAddChild(p1)
 				local v1 = children[p1.Name]
 				if v1 and v1.instance == nil then
 					v1.instance = p1
 					v8(v1)
 				end
 			end
-			local function processDeleteChild(p1) --[[ Line: 151 | Upvalues: children (copy), stopBoundFn (ref), v1 (ref), t (ref), v13 (copy), v8 (ref) ]]
+			local function processDeleteChild(p1)
 				local v12 = p1.Name
 				local v2 = children[v12]
 				if v2 and v2.instance == p1 then
@@ -161,7 +162,7 @@ return function(p1, p2, p3) --[[ Name: bindRoot | Line: 56 | Upvalues: parsePath
 	debug.profilebegin("resolveBoundTree")
 	v8(t2)
 	debug.profileend()
-	return function() --[[ Line: 201 | Upvalues: stopBoundFn (copy), t2 (ref), v1 (ref), t (ref) ]]
+	return function()
 		stopBoundFn()
 		if t2 then
 			v1(t2, t)

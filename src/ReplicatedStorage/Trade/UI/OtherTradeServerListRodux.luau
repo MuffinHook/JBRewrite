@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -7,11 +8,11 @@ local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
 local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
-return RoactRodux.connect(function(p1, p2) --[[ Line: 11 ]]
+return RoactRodux.connect(function(p1, p2)
 	return p1.otherTradeServerListConfig
-end, function(p1) --[[ Line: 13 | Upvalues: store (copy), GamepassSystem (copy), GamepassUtils (copy), MarketplaceService (copy), Players (copy), ReplicatedStorage (copy), TradeConsts (copy) ]]
+end, function(p1)
 	return {
-		onJoinOtherTradeServer = function(p1) --[[ Name: onJoinOtherTradeServer | Line: 15 | Upvalues: store (ref), GamepassSystem (ref), GamepassUtils (ref), MarketplaceService (ref), Players (ref), ReplicatedStorage (ref), TradeConsts (ref) ]]
+		onJoinOtherTradeServer = function(p1)
 			store:dispatch({
 				type = "setOtherTradeServerListVisible",
 				visible = false

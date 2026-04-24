@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local Roact = require(ReplicatedStorage.Roact)
@@ -10,13 +11,13 @@ v1.defaultProps = {
 	anchorPoint = Vector2.new(0.5, 0),
 	position = UDim2.fromScale(0.5, 0)
 }
-function v1.init(p1) --[[ Line: 14 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	p1:setState({
 		remaining = 0
 	})
 end
-function v1.render(p1) --[[ Line: 20 | Upvalues: createElement (copy), PaddedContainer (copy), Roact (copy) ]]
+function v1.render(p1)
 	if p1.props.visible then
 		local v1 = Color3.fromRGB(1, 255, 171)
 		local t = {
@@ -122,7 +123,7 @@ function v1.render(p1) --[[ Line: 20 | Upvalues: createElement (copy), PaddedCon
 		return createElement("Frame", t, t2)
 	end
 end
-function v1._update(p1) --[[ Line: 125 ]]
+function v1._update(p1)
 	if p1.props.visible then
 		local v1 = p1.props.countdownTil - workspace:GetServerTimeNow()
 		p1:setState({
@@ -133,13 +134,13 @@ function v1._update(p1) --[[ Line: 125 ]]
 		end
 	end
 end
-function v1.didMount(p1) --[[ Line: 140 | Upvalues: Interval (copy) ]]
+function v1.didMount(p1)
 	p1:_update()
-	p1.maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 142 | Upvalues: p1 (copy) ]]
+	p1.maid:GiveTask(Interval.every(1):Connect(function()
 		p1:_update()
 	end))
 end
-function v1.willUnmount(p1) --[[ Line: 146 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v1

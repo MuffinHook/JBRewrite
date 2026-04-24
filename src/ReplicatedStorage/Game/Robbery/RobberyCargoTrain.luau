@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
 game:GetService("CollectionService")
@@ -6,15 +7,15 @@ local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
 local TrainSystem = require(ReplicatedStorage.Game.TrainSystem)
 local v1 = nil
 local v2 = nil
-local function Ease_InOutQuad(p1) --[[ Line: 11 ]]
+local function Ease_InOutQuad(p1)
 	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
 end
-local function OpenRoofDoorRaw(p1) --[[ Line: 14 | Upvalues: RunService (copy) ]]
+local function OpenRoofDoorRaw(p1)
 	if not p1.RoofDoorOpen then
 		p1.RoofDoorOpen = true
 		local v1 = tick()
 		local v2 = nil
-		local function Heartbeat() --[[ Line: 22 | Upvalues: v1 (copy), v2 (ref), p1 (copy) ]]
+		local function Heartbeat()
 			local v12 = (tick() - v1) * 0.5
 			if v12 >= 1 then
 				v2:Disconnect()
@@ -38,12 +39,12 @@ local function OpenRoofDoorRaw(p1) --[[ Line: 14 | Upvalues: RunService (copy) ]
 		return true
 	end
 end
-local function OpenSideDoorRaw(p1) --[[ Line: 40 | Upvalues: RunService (copy) ]]
+local function OpenSideDoorRaw(p1)
 	if not p1.DoorOpen then
 		p1.DoorOpen = true
 		local v1 = tick()
 		local v2 = nil
-		local function Heartbeat() --[[ Line: 48 | Upvalues: v1 (copy), v2 (ref), p1 (copy) ]]
+		local function Heartbeat()
 			local v12 = (tick() - v1) * 0.5
 			if v12 >= 1 then
 				v2:Disconnect()
@@ -67,7 +68,7 @@ local function OpenSideDoorRaw(p1) --[[ Line: 40 | Upvalues: RunService (copy) ]
 		return true
 	end
 end
-local function OpenVaultDoorRaw(p1) --[[ Line: 64 | Upvalues: RunService (copy) ]]
+local function OpenVaultDoorRaw(p1)
 	if p1.VaultOpenC1 then
 		if not p1.VaultOpened and p1.RoofDoorOpen then
 			p1.VaultOpened = true
@@ -88,7 +89,7 @@ local function OpenVaultDoorRaw(p1) --[[ Line: 64 | Upvalues: RunService (copy) 
 			wait(0.1)
 			local v1 = tick()
 			local v2 = nil
-			local function Heartbeat() --[[ Line: 96 | Upvalues: v1 (copy), v2 (ref), p1 (copy) ]]
+			local function Heartbeat()
 				local v12 = (tick() - v1) * 0.5
 				if v12 >= 1 then
 					v2:Disconnect()
@@ -113,10 +114,10 @@ local function OpenVaultDoorRaw(p1) --[[ Line: 64 | Upvalues: RunService (copy) 
 		end
 	end
 end
-local function SetupBoxCar(p1) --[[ Line: 112 | Upvalues: RunService (copy), v1 (ref), CircleAction (copy), OpenVaultDoorRaw (copy) ]]
+local function SetupBoxCar(p1)
 	local t = {}
 	local Model = p1.Model
-	local function Action(p12, p2) --[[ Line: 116 | Upvalues: p1 (copy), RunService (ref), v1 (ref) ]]
+	local function Action(p12, p2)
 		if p2 then
 			local v12 = p1
 			local v2
@@ -126,7 +127,7 @@ local function SetupBoxCar(p1) --[[ Line: 112 | Upvalues: RunService (copy), v1 
 				v12.RoofDoorOpen = true
 				local v3 = tick()
 				local v4 = nil
-				local function Heartbeat() --[[ Line: 22 | Upvalues: v3 (copy), v4 (ref), v12 (copy) ]]
+				local function Heartbeat()
 					local v1 = (tick() - v3) * 0.5
 					if v1 >= 1 then
 						v4:Disconnect()
@@ -171,7 +172,7 @@ local function SetupBoxCar(p1) --[[ Line: 112 | Upvalues: RunService (copy), v1 
 	CircleAction.Add(t2, RoofDoorClosed)
 	p1.RoofDoorSpec = t2
 	table.insert(t, t2)
-	local function Action_2(p12, p2) --[[ Line: 142 | Upvalues: p1 (copy), RunService (ref), v1 (ref) ]]
+	local function Action_2(p12, p2)
 		if p2 then
 			local v12 = p1
 			local v2
@@ -181,7 +182,7 @@ local function SetupBoxCar(p1) --[[ Line: 112 | Upvalues: RunService (copy), v1 
 				v12.DoorOpen = true
 				local v3 = tick()
 				local v4 = nil
-				local function Heartbeat() --[[ Line: 48 | Upvalues: v3 (copy), v4 (ref), v12 (copy) ]]
+				local function Heartbeat()
 					local v1 = (tick() - v3) * 0.5
 					if v1 >= 1 then
 						v4:Disconnect()
@@ -226,7 +227,7 @@ local function SetupBoxCar(p1) --[[ Line: 112 | Upvalues: RunService (copy), v1 
 	CircleAction.Add(t3, LeftDoorClosed)
 	p1.SideDoorSpec = t3
 	table.insert(t, t3)
-	local function Action_3(p12, p2) --[[ Line: 168 | Upvalues: OpenVaultDoorRaw (ref), p1 (copy), v1 (ref) ]]
+	local function Action_3(p12, p2)
 		if p2 and OpenVaultDoorRaw(p1) then
 			v1:FireServer("udhdjqcd", p1.SystemId, p1.Id)
 		elseif p2 then
@@ -249,12 +250,12 @@ local function SetupBoxCar(p1) --[[ Line: 112 | Upvalues: RunService (copy), v1 
 	table.insert(t, t4)
 	p1.CircleActionSpecs = t
 end
-local function OnCarCreated(p1) --[[ Line: 194 | Upvalues: SetupBoxCar (copy) ]]
+local function OnCarCreated(p1)
 	if p1.Name:find("BoxCar") then
 		SetupBoxCar(p1)
 	end
 end
-local function OnCarDestroyed(p1) --[[ Line: 199 ]]
+local function OnCarDestroyed(p1)
 	if p1.Name:find("BoxCar") then
 		for v1, v2 in next, p1.CircleActionSpecs do
 			if not v2.Kill then
@@ -264,10 +265,10 @@ local function OnCarDestroyed(p1) --[[ Line: 199 ]]
 	end
 end
 local v3 = nil
-local function OnCarEntered(p1) --[[ Line: 209 | Upvalues: v3 (ref), RunService (copy), LocalPlayer (copy), v1 (ref) ]]
+local function OnCarEntered(p1)
 	if p1.Name:find("BoxCar") then
 		local v12 = 0
-		v3 = RunService.Heartbeat:Connect(function() --[[ Line: 213 | Upvalues: v12 (ref), p1 (copy), LocalPlayer (ref), v1 (ref) ]]
+		v3 = RunService.Heartbeat:Connect(function()
 			local v13 = tick()
 			if v13 - v12 > 1 then
 				v12 = v13
@@ -278,7 +279,7 @@ local function OnCarEntered(p1) --[[ Line: 209 | Upvalues: v3 (ref), RunService 
 		end)
 	end
 end
-local function OnCarExited(p1) --[[ Line: 230 | Upvalues: v3 (ref), v1 (ref) ]]
+local function OnCarExited(p1)
 	if p1.Name:find("BoxCar") then
 		if v3 then
 			v3:Disconnect()
@@ -288,7 +289,7 @@ local function OnCarExited(p1) --[[ Line: 230 | Upvalues: v3 (ref), v1 (ref) ]]
 	end
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 240 | Upvalues: v1 (ref), v2 (ref), TrainSystem (copy), OnCarCreated (copy), OnCarDestroyed (copy), OnCarEntered (copy), OnCarExited (copy), RunService (copy), OpenVaultDoorRaw (copy) ]]
+	Init = function(p1)
 		local em = p1.em
 		v1 = p1.Event
 		v2 = em
@@ -296,7 +297,7 @@ return {
 		TrainSystem.Signals.OnCarDestroyed:Connect(OnCarDestroyed)
 		TrainSystem.Signals.OnCarEntered:Connect(OnCarEntered)
 		TrainSystem.Signals.OnCarExited:Connect(OnCarExited)
-		function em.birq5v2d(p1, p2) --[[ Line: 248 | Upvalues: TrainSystem (ref), RunService (ref) ]]
+		function em.birq5v2d(p1, p2)
 			local v1 = TrainSystem.GetSystemById(p1)
 			local v2 = TrainSystem.GetCarById(v1, p2)
 			if v1 and v2 then
@@ -304,7 +305,7 @@ return {
 					v2.RoofDoorOpen = true
 					local v3 = tick()
 					local v4 = nil
-					local function Heartbeat() --[[ Line: 22 | Upvalues: v3 (copy), v4 (ref), v2 (copy) ]]
+					local function Heartbeat()
 						local v1 = (tick() - v3) * 0.5
 						if v1 >= 1 then
 							v4:Disconnect()
@@ -331,7 +332,7 @@ return {
 				return nil
 			end
 		end
-		function em.wvsrc40j(p1, p2) --[[ Line: 257 | Upvalues: TrainSystem (ref), RunService (ref) ]]
+		function em.wvsrc40j(p1, p2)
 			local v1 = TrainSystem.GetSystemById(p1)
 			local v2 = TrainSystem.GetCarById(v1, p2)
 			if v1 and v2 then
@@ -339,7 +340,7 @@ return {
 					v2.DoorOpen = true
 					local v3 = tick()
 					local v4 = nil
-					local function Heartbeat() --[[ Line: 48 | Upvalues: v3 (copy), v4 (ref), v2 (copy) ]]
+					local function Heartbeat()
 						local v1 = (tick() - v3) * 0.5
 						if v1 >= 1 then
 							v4:Disconnect()
@@ -366,7 +367,7 @@ return {
 				return nil
 			end
 		end
-		function em.udhdjqcd(p1, p2) --[[ Line: 266 | Upvalues: TrainSystem (ref), OpenVaultDoorRaw (ref) ]]
+		function em.udhdjqcd(p1, p2)
 			local v1 = TrainSystem.GetSystemById(p1)
 			local v2 = TrainSystem.GetCarById(v1, p2)
 			if v1 and v2 and OpenVaultDoorRaw(v2) then

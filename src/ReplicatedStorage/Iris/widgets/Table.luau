@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 32 ]]
+return function(p1, p2)
 	local t = {}
 	local t2 = {}
 	local v1 = false
@@ -8,7 +9,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 	local v4 = -1
 	local v5 = -1
 	local v6 = 0
-	local function CalculateMinColumnWidth(p12, p2) --[[ Line: 42 | Upvalues: p1 (copy) ]]
+	local function CalculateMinColumnWidth(p12, p2)
 		local v1 = 0
 		for v2, v3 in p12._cellInstances do
 			for v4, v5 in v3[p2]:GetChildren() do
@@ -19,7 +20,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 		end
 		p12._minWidths[p2] = v1 + 2 * p1._config.CellPadding.X
 	end
-	table.insert(p1._postCycleCallbacks, function() --[[ Line: 56 | Upvalues: t (copy), p1 (copy), t2 (copy), CalculateMinColumnWidth (copy) ]]
+	table.insert(p1._postCycleCallbacks, function()
 		for v1, v2 in t do
 			for v3, v4 in v2._rowCycles do
 				if v4 < p1._cycleTick - 1 then
@@ -54,7 +55,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 			end
 		end
 	end)
-	local function UpdateActiveColumn() --[[ Line: 98 | Upvalues: v1 (ref), v2 (ref), p1 (copy), v4 (ref), v3 (ref), v5 (ref), p2 (copy), v6 (ref) ]]
+	local function UpdateActiveColumn()
 		if v1 ~= false and v2 ~= nil then
 			local widths = v2.state.widths
 			local NumColumns = v2.arguments.NumColumns
@@ -90,7 +91,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 			widths:set(widths.value, true)
 		end
 	end
-	local function ColumnMouseDown(p1, p22) --[[ Line: 154 | Upvalues: v1 (ref), v2 (ref), v3 (ref), v4 (ref), v5 (ref), v6 (ref), p2 (copy) ]]
+	local function ColumnMouseDown(p1, p22)
 		v1 = true
 		v2 = p1
 		v3 = p22
@@ -98,12 +99,12 @@ return function(p1, p2) --[[ Line: 32 ]]
 		v5 = -1
 		v6 = p2.getMouseLocation().X
 	end
-	p2.registerEvent("InputChanged", function() --[[ Line: 163 | Upvalues: p1 (copy), UpdateActiveColumn (copy) ]]
+	p2.registerEvent("InputChanged", function()
 		if p1._started then
 			UpdateActiveColumn()
 		end
 	end)
-	p2.registerEvent("InputEnded", function(p12) --[[ Line: 170 | Upvalues: p1 (copy), v1 (ref), v2 (ref), v3 (ref), v4 (ref), v5 (ref), v6 (ref) ]]
+	p2.registerEvent("InputEnded", function(p12)
 		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 and v1) then
 			v1 = false
 			v2 = nil
@@ -113,7 +114,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 			v6 = 0
 		end
 	end)
-	local function GenerateCell(p12, p22, p3, p4) --[[ Line: 184 | Upvalues: p2 (copy), p1 (copy) ]]
+	local function GenerateCell(p12, p22, p3, p4)
 		local v1
 		if p4 then
 			local TextButton = Instance.new("TextButton")
@@ -145,7 +146,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 		p2.UISizeConstraint(v1, Vector2.new(2 * p1._config.CellPadding.X, 0))
 		return v1
 	end
-	local function GenerateColumnBorder(p12, p22, p3) --[[ Line: 219 | Upvalues: p1 (copy), p2 (copy), v1 (ref), v2 (ref), v3 (ref), v4 (ref), v5 (ref), v6 (ref) ]]
+	local function GenerateColumnBorder(p12, p22, p3)
 		local ImageButton = Instance.new("ImageButton")
 		ImageButton.Name = ("Border_%*"):format(p22)
 		ImageButton.Size = UDim2.new(0, 5, 1, 0)
@@ -181,7 +182,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 			ActiveColor = p1._config.ResizeGripActiveColor,
 			ActiveTransparency = p1._config.ResizeGripActiveTransparency
 		})
-		p2.applyButtonDown(ImageButton, function() --[[ Line: 263 | Upvalues: p12 (copy), p22 (copy), v1 (ref), v2 (ref), v3 (ref), v4 (ref), v5 (ref), v6 (ref), p2 (ref) ]]
+		p2.applyButtonDown(ImageButton, function()
 			if p12.arguments.Resizable then
 				v1 = true
 				v2 = p12
@@ -193,7 +194,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 		end)
 		return ImageButton
 	end
-	local function GenerateRow(p12, p22) --[[ Line: 273 | Upvalues: p1 (copy), p2 (copy), GenerateCell (copy) ]]
+	local function GenerateRow(p12, p22)
 		local Frame = Instance.new("Frame")
 		Frame.Name = ("Row_%*"):format(p22)
 		Frame.AutomaticSize = Enum.AutomaticSize.Y
@@ -228,7 +229,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 		p12._rowInstances[p22] = Frame
 		return Frame
 	end
-	local function GenerateRowBorder(p12, p2, p3) --[[ Line: 311 | Upvalues: p1 (copy) ]]
+	local function GenerateRowBorder(p12, p2, p3)
 		local Frame = Instance.new("Frame")
 		Frame.Name = ("Border_%*"):format(p2)
 		Frame.Size = UDim2.fromScale(1, 0)
@@ -260,7 +261,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 			LimitTableWidth = 9
 		},
 		Events = {},
-		Generate = function(p12) --[[ Name: Generate | Line: 348 | Upvalues: t (copy), t2 (copy), p2 (copy), p1 (copy) ]]
+		Generate = function(p12)
 			t[p12.ID] = p12
 			t2[p12] = {}
 			local Iris_Table = Instance.new("Frame")
@@ -297,7 +298,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 			p12._rowCycles = {}
 			local v1 = #p1._postCycleCallbacks + 1
 			local v2 = p1._cycleTick + 1
-			p1._postCycleCallbacks[v1] = function() --[[ Line: 394 | Upvalues: p1 (ref), v2 (copy), p12 (copy), v1 (copy) ]]
+			p1._postCycleCallbacks[v1] = function()
 				if v2 <= p1._cycleTick then
 					if p12.lastCycleTick ~= -1 then
 						p12.state.widths.lastChangeTick = p1._cycleTick
@@ -308,7 +309,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 			end
 			return Iris_Table
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 406 | Upvalues: p1 (copy), GenerateColumnBorder (copy), GenerateCell (copy) ]]
+		GenerateState = function(p12)
 			local NumColumns = p12.arguments.NumColumns
 			if p12.state.widths == nil then
 				p12.state.widths = p1._widgetState(p12, "widths", (table.create(NumColumns, 1 / NumColumns)))
@@ -337,7 +338,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 			p12._columnBorders[0] = v10
 			v10.Parent = v2
 		end,
-		Update = function(p12) --[[ Name: Update | Line: 440 | Upvalues: p1 (copy), t2 (copy) ]]
+		Update = function(p12)
 			local NumColumns = p12.arguments.NumColumns
 			assert(NumColumns >= 1, "Iris.Table must have at least one column.")
 			if p12._widths ~= nil and #p12._widths ~= NumColumns then
@@ -392,7 +393,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 				p1._widgets.Table.UpdateState(p12)
 			end
 		end,
-		UpdateState = function(p1) --[[ Name: UpdateState | Line: 512 ]]
+		UpdateState = function(p1)
 			local v1 = p1.Instance
 			local NumColumns = p1.arguments.NumColumns
 			local value = p1.state.widths.value
@@ -454,7 +455,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 			v1.RowContainer.UISizeConstraint.MaxSize = Vector2.new(Offset, (1 / 0))
 			p1._columnBorders[0].Position = UDim2.fromOffset(Offset - 3, 0)
 		end,
-		ChildAdded = function(p12, p2) --[[ Name: ChildAdded | Line: 587 | Upvalues: p1 (copy), t2 (copy), GenerateRow (copy), GenerateRowBorder (copy) ]]
+		ChildAdded = function(p12, p2)
 			local _rowIndex = p12._rowIndex
 			local _columnIndex = p12._columnIndex
 			p12._rowCycles[_rowIndex] = p1._cycleTick
@@ -478,7 +479,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 			end
 			return p12._cellInstances[_rowIndex][_columnIndex]
 		end,
-		ChildDiscarded = function(p1, p2) --[[ Name: ChildDiscarded | Line: 614 | Upvalues: t2 (copy) ]]
+		ChildDiscarded = function(p1, p2)
 			local v1 = p2.Instance.Parent
 			if v1 ~= nil then
 				local v3 = tonumber(v1.Name:sub(6))
@@ -487,7 +488,7 @@ return function(p1, p2) --[[ Line: 32 ]]
 				end
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 625 | Upvalues: t (copy), t2 (copy), p2 (copy) ]]
+		Discard = function(p1)
 			t[p1.ID] = nil
 			t2[p1] = nil
 			p1.Instance:Destroy()

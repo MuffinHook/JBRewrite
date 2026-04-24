@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local assign = require(script.Parent.assign)
 local ComponentLifecyclePhase = require(script.Parent.ComponentLifecyclePhase)
 local Type = require(script.Parent.Type)
@@ -7,7 +8,7 @@ local internalAssert = require(script.Parent.internalAssert)
 local v1 = require(script.Parent.GlobalConfig).get()
 local v2 = Symbol.named("InternalData")
 local t = {
-	__tostring = function(p1) --[[ Name: __tostring | Line: 29 ]]
+	__tostring = function(p1)
 		return p1.__componentName
 	end
 }
@@ -16,7 +17,7 @@ setmetatable(t2, t)
 t2[Type] = Type.StatefulComponentClass
 t2.__index = t2
 t2.__componentName = "Component"
-function t2.extend(p1, p2) --[[ Line: 45 | Upvalues: v1 (copy), Type (copy), t (copy) ]]
+function t2.extend(p1, p2)
 	if v1.typeChecks then
 		local isStatefulComponentClass = Type.of(p1) == Type.StatefulComponentClass
 		assert(isStatefulComponentClass, "Invalid `self` argument to `extend`.")
@@ -34,7 +35,7 @@ function t2.extend(p1, p2) --[[ Line: 45 | Upvalues: v1 (copy), Type (copy), t (
 	setmetatable(t2, t)
 	return t2
 end
-function t2.__getDerivedState(p1, p2, p3) --[[ Line: 71 | Upvalues: v1 (copy), internalAssert (copy), Type (copy), v2 (copy) ]]
+function t2.__getDerivedState(p1, p2, p3)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__getDerivedState`")
@@ -54,7 +55,7 @@ function t2.__getDerivedState(p1, p2, p3) --[[ Line: 71 | Upvalues: v1 (copy), i
 		end
 	end
 end
-function t2.setState(p1, p2) --[[ Line: 94 | Upvalues: v1 (copy), Type (copy), v2 (copy), ComponentLifecyclePhase (copy), invalidSetStateMessages (copy), assign (copy) ]]
+function t2.setState(p1, p2)
 	if v1.typeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		assert(isStatefulComponentInstance, "Invalid `self` argument to `extend`.")
@@ -107,13 +108,13 @@ function t2.setState(p1, p2) --[[ Line: 94 | Upvalues: v1 (copy), Type (copy), v
 		end
 	end
 end
-function t2.getElementTraceback(p1) --[[ Line: 178 | Upvalues: v2 (copy) ]]
+function t2.getElementTraceback(p1)
 	return p1[v2].virtualNode.currentElement.source
 end
-function t2.render(p1) --[[ Line: 189 | Upvalues: v2 (copy) ]]
+function t2.render(p1)
 	error(("The component %q is missing the `render` method.\n`render` must be defined when creating a Roact component!"):format((tostring(p1[v2].componentClass))), 0)
 end
-function t2.__getContext(p1, p2) --[[ Line: 201 | Upvalues: v1 (copy), internalAssert (copy), Type (copy), v2 (copy) ]]
+function t2.__getContext(p1, p2)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__getContext`")
@@ -121,7 +122,7 @@ function t2.__getContext(p1, p2) --[[ Line: 201 | Upvalues: v1 (copy), internalA
 	end
 	return p1[v2].virtualNode.context[p2]
 end
-function t2.__addContext(p1, p2, p3) --[[ Line: 217 | Upvalues: v1 (copy), internalAssert (copy), Type (copy), v2 (copy), assign (copy) ]]
+function t2.__addContext(p1, p2, p3)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__addContext`")
@@ -134,7 +135,7 @@ function t2.__addContext(p1, p2, p3) --[[ Line: 217 | Upvalues: v1 (copy), inter
 		[p2] = p3
 	})
 end
-function t2.__validateProps(p1, p2) --[[ Line: 244 | Upvalues: v1 (copy), v2 (copy) ]]
+function t2.__validateProps(p1, p2)
 	if v1.propValidation then
 		local validateProps = p1[v2].componentClass.validateProps
 		if validateProps ~= nil then
@@ -148,7 +149,7 @@ function t2.__validateProps(p1, p2) --[[ Line: 244 | Upvalues: v1 (copy), v2 (co
 		end
 	end
 end
-function t2.__mount(p1, p2, p3) --[[ Line: 283 | Upvalues: v1 (copy), internalAssert (copy), Type (copy), ComponentLifecyclePhase (copy), v2 (copy), assign (copy) ]]
+function t2.__mount(p1, p2, p3)
 	if v1.internalTypeChecks then
 		local isStatefulComponentClass = Type.of(p1) == Type.StatefulComponentClass
 		internalAssert(isStatefulComponentClass, "Invalid use of `__mount`")
@@ -195,7 +196,7 @@ function t2.__mount(p1, p2, p3) --[[ Line: 283 | Upvalues: v1 (copy), internalAs
 	end
 	t.lifecyclePhase = ComponentLifecyclePhase.Idle
 end
-function t2.__unmount(p1) --[[ Line: 357 | Upvalues: v1 (copy), internalAssert (copy), Type (copy), v2 (copy), ComponentLifecyclePhase (copy) ]]
+function t2.__unmount(p1)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__unmount`")
@@ -211,7 +212,7 @@ function t2.__unmount(p1) --[[ Line: 357 | Upvalues: v1 (copy), internalAssert (
 		reconciler.unmountVirtualNode(v)
 	end
 end
-function t2.__update(p1, p2, p3) --[[ Line: 382 | Upvalues: v1 (copy), internalAssert (copy), Type (copy), v2 (copy), assign (copy) ]]
+function t2.__update(p1, p2, p3)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__update`")
@@ -265,7 +266,7 @@ function t2.__update(p1, p2, p3) --[[ Line: 382 | Upvalues: v1 (copy), internalA
 		end
 	end
 end
-function t2.__resolveUpdate(p1, p2, p3) --[[ Line: 459 | Upvalues: v1 (copy), internalAssert (copy), Type (copy), v2 (copy), ComponentLifecyclePhase (copy) ]]
+function t2.__resolveUpdate(p1, p2, p3)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__resolveUpdate`")

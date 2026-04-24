@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
@@ -7,7 +8,7 @@ local PortalBase = require(script.Parent.PortalBase)
 local GarageConsts = require(script.Parent.Parent.GarageConsts)
 local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
 local v1 = Roact.PureComponent:extend("PortalSpawn")
-function v1.render(p1) --[[ Line: 12 | Upvalues: Players (copy), GarageConsts (copy), GamepassUtils (copy), createElement (copy), PortalBase (copy) ]]
+function v1.render(p1)
 	local t = {}
 	local t2 = {}
 	for i, v in ipairs(p1.props.receipt) do
@@ -70,14 +71,14 @@ function v1.render(p1) --[[ Line: 12 | Upvalues: Players (copy), GarageConsts (c
 		v2 = v4 or v1 and v3.available
 		t5.masked = not v2
 		t5.locked = not v5
-		function t5.onSelect() --[[ Line: 61 | Upvalues: t5 (copy), p1 (copy), v3 (copy) ]]
+		function t5.onSelect()
 			if t5.masked then
 				p1.props.onAttemptPurchaseVehicle(v3, t5)
 			else
 				p1.props.onClickSpawnVehicle(v3)
 			end
 		end
-		function t5.onFavorite(p12) --[[ Line: 68 | Upvalues: p1 (copy), v3 (copy) ]]
+		function t5.onFavorite(p12)
 			if p1.props.attemptFavoriteItem then
 				p1.props.attemptFavoriteItem("Vehicles", v3.name, p12)
 			end
@@ -103,7 +104,7 @@ function v1.render(p1) --[[ Line: 12 | Upvalues: Players (copy), GarageConsts (c
 		rowsPerPage = p1.props.rowsPerPage
 	})
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 96 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		receipt = p1.garageReceipt,
 		inPhysical = p1.garageInPhysical,
@@ -111,9 +112,9 @@ return RoactRodux.connect(function(p1, p2) --[[ Line: 96 ]]
 		gamepassOwned = p1.gamepassOwned,
 		premium = p1.garagePremium
 	}
-end, function(p1) --[[ Line: 105 ]]
+end, function(p1)
 	return {
-		onFavoriteItem = function(p12, p2, p3) --[[ Name: onFavoriteItem | Line: 107 | Upvalues: p1 (copy) ]]
+		onFavoriteItem = function(p12, p2, p3)
 			p1({
 				type = "setCategoryItemFavorited",
 				category = p12,

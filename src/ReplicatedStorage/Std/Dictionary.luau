@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local v1 = newproxy(true)
-getmetatable(v1).__tostring = function() --[[ Line: 7 ]]
+getmetatable(v1).__tostring = function()
 	return "None"
 end
 return {
 	None = v1,
-	merge = function(...) --[[ Name: merge | Line: 11 | Upvalues: v1 (copy) ]]
+	merge = function(...)
 		local t = {}
 		for i = 1, select("#", ...) do
 			local v12 = select(i, ...)

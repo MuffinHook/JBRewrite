@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local Roact = require(ReplicatedStorage.Roact)
@@ -12,7 +13,7 @@ v1.defaultProps = {
 	text = "",
 	cornerRadius = 4
 }
-function v1.render(p1) --[[ Line: 18 | Upvalues: Roact (copy), createElement (copy), ColorUtils (copy) ]]
+function v1.render(p1)
 	local v1 = p1.props[Roact.Children] or {}
 	if p1.props.aspectRatio then
 		v1.AspectRatio = createElement("UIAspectRatioConstraint", {

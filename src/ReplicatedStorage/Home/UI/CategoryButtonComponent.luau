@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local Roact = require(ReplicatedStorage.Roact)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local createElement = Roact.createElement
-return function(p1) --[[ Name: categoryButtonComponent | Line: 7 | Upvalues: ColorUtils (copy), createElement (copy), Roact (copy), PaddedContainer (copy) ]]
+return function(p1)
 	local v1 = if p1.selected then p1.selectedBgColor else Color3.new(0/255, 0/255, 0/255)
 	local v2 = if p1.selected then ColorUtils.brightenBy(v1, -0.8) else Color3.new(255/255, 255/255, 255/255)
 	return createElement("TextButton", {
@@ -14,7 +15,7 @@ return function(p1) --[[ Name: categoryButtonComponent | Line: 7 | Upvalues: Col
 		Position = p1.position,
 		Text = "",
 		Selectable = true,
-		[Roact.Event.Activated] = function() --[[ Line: 18 | Upvalues: p1 (copy) ]]
+		[Roact.Event.Activated] = function()
 			if p1.onClick then
 				p1.onClick(p1.index)
 			end

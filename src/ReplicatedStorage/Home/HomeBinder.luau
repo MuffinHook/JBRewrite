@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Binder = require(ReplicatedStorage.Std.Binder)
 local HomeConsts = require(script.Parent.HomeConsts)

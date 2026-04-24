@@ -14,7 +14,7 @@ local String = require(ReplicatedStorage.Std.String)
 return {
 	init = function()
 		local v1 = true
-		local t = {
+		local localTable = {
 			Gun = {
 				ImageId = 15632538723,
 				Color = Color3.fromRGB(141, 81, 255)
@@ -32,7 +32,7 @@ return {
 		function t2.new(p1)
 			local v12 = BaseObject.new(p1)
 			setmetatable(v12, t2)
-			local v3 = t[p1.Name]
+			local v3 = localTable[p1.Name]
 			if not v3 then
 				error(("Missing important location marker entry for: %s"):format(p1.Name))
 			end

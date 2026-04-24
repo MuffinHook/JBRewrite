@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local createElement = Roact.createElement
-return function(p1) --[[ Name: buttonComponent | Line: 6 | Upvalues: createElement (copy), Roact (copy), ColorUtils (copy) ]]
+return function(p1)
 	local cornerRadius = p1.cornerRadius
 	local t2 = {}
 	t2.Corner = cornerRadius and createElement("UICorner", {

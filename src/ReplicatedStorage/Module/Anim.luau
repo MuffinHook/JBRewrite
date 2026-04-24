@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 13 | Upvalues: t (copy), Maid (copy), Signal (copy) ]]
+function t.new(p1)
 	assert(p1)
 	assert(p1 > 0)
 	local t2 = {}
@@ -18,7 +19,7 @@ function t.new(p1) --[[ Line: 13 | Upvalues: t (copy), Maid (copy), Signal (copy
 	t2.IsCompleted = false
 	return t2
 end
-function t.Update(p1) --[[ Line: 33 ]]
+function t.Update(p1)
 	local v1 = (os.clock() - p1.BornAt) / p1.Duration
 	if v1 >= 1 and p1.IsCompleted == false then
 		p1.IsCompleted = true
@@ -26,7 +27,7 @@ function t.Update(p1) --[[ Line: 33 ]]
 	end
 	return math.clamp(v1, 0, 1)
 end
-function t.Destroy(p1) --[[ Line: 45 ]]
+function t.Destroy(p1)
 	if p1.Maid ~= nil then
 		local Maid = p1.Maid
 		p1.Maid = nil

@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
-return function(p1) --[[ Line: 7 | Upvalues: Roact (copy), ReplicatedStorage (copy), RoactRodux (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local PersistentCrewApp = require(script.Parent.PersistentCrewApp)
 	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
@@ -115,14 +116,14 @@ return function(p1) --[[ Line: 7 | Upvalues: Roact (copy), ReplicatedStorage (co
 			}
 		}
 	})
-	function v1.init(p1) --[[ Line: 157 | Upvalues: persistentCrewStore (copy) ]]
-		function p1.attemptLeave() --[[ Line: 162 | Upvalues: persistentCrewStore (ref) ]]
+	function v1.init(p1)
+		function p1.attemptLeave()
 			persistentCrewStore:dispatch({
 				type = "setViewingClanInfo",
 				value = nil
 			})
 		end
-		function p1.attemptCreate(p1) --[[ Line: 169 | Upvalues: persistentCrewStore (ref) ]]
+		function p1.attemptCreate(p1)
 			persistentCrewStore:dispatch({
 				type = "setViewingClanInfo",
 				value = {
@@ -197,23 +198,23 @@ return function(p1) --[[ Line: 7 | Upvalues: Roact (copy), ReplicatedStorage (co
 				}
 			})
 		end
-		function p1.attemptJoinUserId(p1) --[[ Line: 208 ]]
+		function p1.attemptJoinUserId(p1)
 			print("player wants to request to join", p1)
 		end
-		function p1.attemptBattleUserId(p1) --[[ Line: 211 ]]
+		function p1.attemptBattleUserId(p1)
 			print("player wants to battle", p1, "crew")
 		end
-		function p1.attemptKick(p1) --[[ Line: 214 ]]
+		function p1.attemptKick(p1)
 			print("player wants to kick", p1)
 		end
-		function p1.attemptAdmin(p1) --[[ Line: 217 ]]
+		function p1.attemptAdmin(p1)
 			print("player wants to admin", p1)
 		end
-		function p1.attemptUnAdmin(p1) --[[ Line: 220 ]]
+		function p1.attemptUnAdmin(p1)
 			print("player wants to UNadmin", p1)
 		end
 	end
-	function v1.render(p1) --[[ Line: 225 | Upvalues: Roact (ref), RoactRodux (ref), persistentCrewStore (copy), PersistentCrewApp (copy) ]]
+	function v1.render(p1)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement(PersistentCrewApp, {
@@ -225,13 +226,13 @@ return function(p1) --[[ Line: 7 | Upvalues: Roact (copy), ReplicatedStorage (co
 				attemptAdmin = p1.attemptAdmin,
 				attemptUnAdmin = p1.attemptUnAdmin,
 				numMembersOnline = 11,
-				attemptReportCrew = function(p1, p2, p3) --[[ Name: attemptReportCrew | Line: 242 ]]
+				attemptReportCrew = function(p1, p2, p3)
 					print("player wants to report", p1, p2, p3)
 				end
 			}) })
 	end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 250 | Upvalues: Roact (ref), v2 (copy) ]]
+	return function()
 		Roact.unmount(v2)
 	end
 end

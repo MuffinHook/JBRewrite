@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local DuffelBagBinder = require(script.Parent.DuffelBagBinder)
 return {
-	getBag = function(p1) --[[ Name: getBag | Line: 6 | Upvalues: Players (copy), DuffelBagBinder (copy) ]]
+	getBag = function(p1)
 		assert(p1)
 		assert(p1.Parent == Players)
 		for i, v in ipairs(DuffelBagBinder:GetAll()) do

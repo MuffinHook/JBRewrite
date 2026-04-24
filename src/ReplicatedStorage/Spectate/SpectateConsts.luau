@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Std.TableUtils).requireValidIndex({
 	SPECTATE_REMOTE_NAME = "Spectate",

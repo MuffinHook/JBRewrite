@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 return {
-	isStringNullOrEmpty = function(p1, p2) --[[ Name: isStringNullOrEmpty | Line: 3 ]]
+	isStringNullOrEmpty = function(p1, p2)
 		return not p2 or #p2 == 0
 	end,
-	stringArrayContainsString = function(p1, p2, p3) --[[ Name: stringArrayContainsString | Line: 7 ]]
+	stringArrayContainsString = function(p1, p2, p3)
 		if #p2 ~= 0 then
 			for i, v in ipairs(p2) do
 				if v == p3 then
@@ -12,7 +13,7 @@ return {
 		end
 		return false
 	end,
-	copyTable = function(p1, p2) --[[ Name: copyTable | Line: 21 ]]
+	copyTable = function(p1, p2)
 		local t = {}
 		for k, v in pairs(p2) do
 			if typeof(v) == "table" then

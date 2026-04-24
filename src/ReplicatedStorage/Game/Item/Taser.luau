@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -21,16 +22,16 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Basic)
-function t.Init(p1) --[[ Line: 29 | Upvalues: v2 (ref), ItemSystem (copy) ]]
+function t.Init(p1)
 	v2 = p1.Event
-	function p1.em.enmm5zqj(p1, p2) --[[ Line: 32 | Upvalues: ItemSystem (ref) ]]
+	function p1.em.enmm5zqj(p1, p2)
 		local v1 = ItemSystem.GetEquipped(p1)
 		if v1 ~= nil and v1.Draw then
 			v1:Draw(p2)
 		end
 	end
 end
-function t.new(p1, p2, p3) --[[ Line: 41 | Upvalues: Basic (copy), Taser (copy), t (copy), InventoryItemUtils (copy), GunUtils (copy), GunSystemConsts (copy) ]]
+function t.new(p1, p2, p3)
 	local v1 = Basic.new(p1, p2, Taser, p3)
 	setmetatable(v1, t)
 	v1.Tip = v1.Model.Skeleton.Tip
@@ -54,15 +55,15 @@ function t.new(p1, p2, p3) --[[ Line: 41 | Upvalues: Basic (copy), Taser (copy),
 		elseif v3 then
 			v1.IsEquipping = true
 			v1:StartReloadProgressCircle(GunSystemConsts.GUN_EQUIP_TIME)
-			v1.maid:GiveTask(task.delay(GunSystemConsts.GUN_EQUIP_TIME, function() --[[ Line: 71 | Upvalues: v1 (copy) ]]
+			v1.maid:GiveTask(task.delay(GunSystemConsts.GUN_EQUIP_TIME, function()
 				v1.IsEquipping = false
 			end))
 		end
 	end
 	return v1
 end
-function t._buildCustomCollidableFunc(p1) --[[ Line: 80 ]]
-	return function(p12) --[[ Line: 81 | Upvalues: p1 (copy) ]]
+function t._buildCustomCollidableFunc(p1)
+	return function(p12)
 		if not p12.CanCollide and p1._lastListCharacter then
 			for i, v in ipairs(p1._lastListCharacter) do
 				local _ = p12:IsDescendantOf(v)
@@ -71,27 +72,27 @@ function t._buildCustomCollidableFunc(p1) --[[ Line: 80 ]]
 		return true
 	end
 end
-function t.UpdateCrossHair(p1) --[[ Line: 94 ]]
+function t.UpdateCrossHair(p1)
 	p1.CrossHair:Update(p1:GetMouseLocation())
 end
-function t.SetupCrossHair(p1) --[[ Line: 97 | Upvalues: CrossHair (copy) ]]
+function t.SetupCrossHair(p1)
 	p1.CrossHair = CrossHair.Make()
 	p1.CrossHair.Gui.Parent = p1.Player.PlayerGui
-	p1.Maid:GiveTask(function() --[[ Line: 101 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(function()
 		p1.CrossHair:Destroy()
 		p1.CrossHair = nil
 	end)
 end
-function t.Heartbeat(p1) --[[ Line: 107 | Upvalues: Basic (copy) ]]
+function t.Heartbeat(p1)
 	Basic.Heartbeat(p1)
 	if p1.Local then
 		p1:UpdateCrossHair()
 	end
 end
-function t.GetLeftArmPosition(p1) --[[ Line: 113 ]]
+function t.GetLeftArmPosition(p1)
 	return nil
 end
-function t.Draw(p1, p2) --[[ Line: 116 | Upvalues: LightningUtils (copy), v2 (ref) ]]
+function t.Draw(p1, p2)
 	local v1 = os.clock()
 	if not (p1._lastDraw and v1 - p1._lastDraw < 1) then
 		p1._lastDraw = v1
@@ -110,7 +111,7 @@ function t.Draw(p1, p2) --[[ Line: 116 | Upvalues: LightningUtils (copy), v2 (re
 		end
 	end
 end
-function t.Tase(p1, p2) --[[ Line: 155 | Upvalues: InventoryItemUtils (copy), Players (copy), TagUtils (copy), Notification (copy), Audio (copy), LocalPlayer (copy), Raycast (copy), GeomUtils (copy), PlayerUtils (copy), v2 (ref), GunUtils (copy) ]]
+function t.Tase(p1, p2)
 	if not p1.IsEquipping then
 		local v1 = os.clock()
 		if not (v1 - InventoryItemUtils.getAttr(p1.inventoryItemValue, "NextUse") < 0) then
@@ -183,11 +184,11 @@ function t.Tase(p1, p2) --[[ Line: 155 | Upvalues: InventoryItemUtils (copy), Pl
 	end
 	return false
 end
-function t.InputBegan(p1, p2, p3) --[[ Line: 244 | Upvalues: Basic (copy) ]]
+function t.InputBegan(p1, p2, p3)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		p1:Tase(p2)
 	end
 	Basic.InputBegan(p1, p2, p3)
 end
-function t.InputEnded(p1) --[[ Line: 254 ]] end
+function t.InputEnded(p1)  end
 return t

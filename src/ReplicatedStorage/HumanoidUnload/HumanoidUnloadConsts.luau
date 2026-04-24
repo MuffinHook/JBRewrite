@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Std.TableUtils).requireValidIndexAndFreeze({
 	MAX_DIST_TO_LOAD = 768,

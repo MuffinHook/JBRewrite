@@ -1,15 +1,16 @@
+-- Reviewed by Claude
 game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Telemetry = require(script.Parent.Telemetry)
 local t = {}
 t.__index = t
 local PromptCashBooster = ReplicatedStorage:WaitForChild("AdRewardSystem"):WaitForChild("AdRewardEvents"):WaitForChild("PromptCashBooster")
-local function firePromptSignal(p1) --[[ Line: 25 | Upvalues: PromptCashBooster (copy) ]]
+local function firePromptSignal(p1)
 	if PromptCashBooster then
 		PromptCashBooster:Fire(p1)
 	end
 end
-function t.new(p1, p2) --[[ Line: 34 | Upvalues: t (copy) ]]
+function t.new(p1, p2)
 	local v2 = setmetatable({}, t)
 	v2.Player = p1
 	v2.RegionFolder = p2
@@ -20,26 +21,26 @@ function t.new(p1, p2) --[[ Line: 34 | Upvalues: t (copy) ]]
 	v2:_connectFolderChanges()
 	return v2
 end
-function t._initRegions(p1) --[[ Line: 50 ]]
+function t._initRegions(p1)
 	for i, v in ipairs(p1.RegionFolder:GetChildren()) do
 		if v:IsA("BasePart") then
 			p1:_addRegion(v)
 		end
 	end
 end
-function t._connectFolderChanges(p1) --[[ Line: 59 ]]
-	p1.RegionFolder.ChildAdded:Connect(function(p12) --[[ Line: 60 | Upvalues: p1 (copy) ]]
+function t._connectFolderChanges(p1)
+	p1.RegionFolder.ChildAdded:Connect(function(p12)
 		if p12:IsA("BasePart") then
 			p1:_addRegion(p12)
 		end
 	end)
-	p1.RegionFolder.ChildRemoved:Connect(function(p12) --[[ Line: 66 | Upvalues: p1 (copy) ]]
+	p1.RegionFolder.ChildRemoved:Connect(function(p12)
 		if p12:IsA("BasePart") then
 			p1.Regions[p12] = nil
 		end
 	end)
 end
-function t._addRegion(p1, p2) --[[ Line: 74 ]]
+function t._addRegion(p1, p2)
 	p1.Regions[p2] = {
 		Part = p2,
 		Team = p2:GetAttribute("Team"),
@@ -48,7 +49,7 @@ function t._addRegion(p1, p2) --[[ Line: 74 ]]
 		NextRecheckTime = 0
 	}
 end
-function t._getCharacter(p1) --[[ Line: 85 ]]
+function t._getCharacter(p1)
 	local Character = p1.Player.Character
 	if Character and Character.Parent then
 		local Humanoid = Character:FindFirstChildOfClass("Humanoid")
@@ -62,7 +63,7 @@ function t._getCharacter(p1) --[[ Line: 85 ]]
 		return nil, nil, nil
 	end
 end
-function t._forceLeaveAllRegions(p1) --[[ Line: 102 | Upvalues: Telemetry (copy), PromptCashBooster (copy) ]]
+function t._forceLeaveAllRegions(p1)
 	for k, v in pairs(p1.Regions) do
 		if v.IsPlayerInside then
 			v.IsPlayerInside = false
@@ -76,7 +77,7 @@ function t._forceLeaveAllRegions(p1) --[[ Line: 102 | Upvalues: Telemetry (copy)
 		end
 	end
 end
-function t._step(p1) --[[ Line: 120 | Upvalues: Telemetry (copy), PromptCashBooster (copy) ]]
+function t._step(p1)
 	local v1, v2, v3 = p1:_getCharacter()
 	if v1 and (v2 and not (v2.Health <= 0 or v2.Health < 100)) then
 		local v4 = os.time()
@@ -154,10 +155,10 @@ function t._step(p1) --[[ Line: 120 | Upvalues: Telemetry (copy), PromptCashBoos
 		p1:_forceLeaveAllRegions()
 	end
 end
-function t.Start(p1) --[[ Line: 247 ]]
+function t.Start(p1)
 	if not p1._running then
 		p1._running = true
-		p1._loopThread = task.spawn(function() --[[ Line: 255 | Upvalues: p1 (copy) ]]
+		p1._loopThread = task.spawn(function()
 			while p1._running do
 				p1:_step()
 				task.wait(2)
@@ -165,11 +166,11 @@ function t.Start(p1) --[[ Line: 247 ]]
 		end)
 	end
 end
-function t.Stop(p1) --[[ Line: 264 ]]
+function t.Stop(p1)
 	p1._running = false
 	p1._loopThread = nil
 end
-function t.IsInAnyTeamMatchedRegion(p1) --[[ Line: 270 ]]
+function t.IsInAnyTeamMatchedRegion(p1)
 	for k, v in pairs(p1.Regions) do
 		if v.IsPlayerInside then
 			return true
@@ -177,7 +178,7 @@ function t.IsInAnyTeamMatchedRegion(p1) --[[ Line: 270 ]]
 	end
 	return false
 end
-function t.GetCurrentRegionTag(p1) --[[ Line: 280 ]]
+function t.GetCurrentRegionTag(p1)
 	for k, v in pairs(p1.Regions) do
 		if v.IsPlayerInside then
 			local v1 = k:GetAttribute("RegionTag")

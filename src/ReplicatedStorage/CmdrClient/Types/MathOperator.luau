@@ -1,38 +1,39 @@
-return function(p1) --[[ Line: 1 ]]
+-- Reviewed by Claude
+return function(p1)
 	p1:RegisterType("mathOperator", p1.Cmdr.Util.MakeEnumType("Math Operator", {
 		{
 			Name = "+",
-			Perform = function(p1, p2) --[[ Name: Perform | Line: 7 ]]
+			Perform = function(p1, p2)
 				return p1 + p2
 			end
 		},
 		{
 			Name = "-",
-			Perform = function(p1, p2) --[[ Name: Perform | Line: 13 ]]
+			Perform = function(p1, p2)
 				return p1 - p2
 			end
 		},
 		{
 			Name = "*",
-			Perform = function(p1, p2) --[[ Name: Perform | Line: 19 ]]
+			Perform = function(p1, p2)
 				return p1 * p2
 			end
 		},
 		{
 			Name = "/",
-			Perform = function(p1, p2) --[[ Name: Perform | Line: 25 ]]
+			Perform = function(p1, p2)
 				return p1 / p2
 			end
 		},
 		{
 			Name = "**",
-			Perform = function(p1, p2) --[[ Name: Perform | Line: 31 ]]
+			Perform = function(p1, p2)
 				return p1 ^ p2
 			end
 		},
 		{
 			Name = "%",
-			Perform = function(p1, p2) --[[ Name: Perform | Line: 37 ]]
+			Perform = function(p1, p2)
 				return p1 % p2
 			end
 		}

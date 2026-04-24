@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Module.Table)
 local t = {
-	calculateDist = function(p1, p2) --[[ Name: calculateDist | Line: 5 ]]
+	calculateDist = function(p1, p2)
 		local count = 1
 		local v1 = 0
 		local sum = 0
@@ -18,7 +19,7 @@ local t = {
 			end
 		end
 	end,
-	calculateSpeed = function(p1, p2) --[[ Name: calculateSpeed | Line: 23 ]]
+	calculateSpeed = function(p1, p2)
 		local v1 = 0
 		for i = 1, #p1 do
 			local v2 = p1[i]
@@ -32,11 +33,11 @@ local t = {
 		end
 	end
 }
-function t.calculateTime(p1, p2) --[[ Line: 38 | Upvalues: t (copy) ]]
+function t.calculateTime(p1, p2)
 	assert(#p1 > 0)
 	if not (t.calculateDist(p1, p1[#p1].timeUntil) < p2) then
 		local v2 = 0
-		local function v3(p12, p22) --[[ Line: 46 | Upvalues: t (ref), p1 (copy), p2 (copy), v2 (ref), v3 (copy) ]]
+		local function v3(p12, p22)
 			local v1 = (p12 + p22) * 0.5
 			local v22 = t.calculateDist(p1, v1) - p2
 			if math.abs(v22) < 1e-6 then
@@ -56,12 +57,12 @@ function t.calculateTime(p1, p2) --[[ Line: 38 | Upvalues: t (copy) ]]
 		return v3(0, p1[#p1].timeUntil)
 	end
 end
-function t.constrainLastTimeToReachTarget(p1, p2) --[[ Line: 67 | Upvalues: t (copy) ]]
+function t.constrainLastTimeToReachTarget(p1, p2)
 	if #p1 > 1 and p2 < t.calculateDist(p1, p1[#p1 - 1].timeUntil) then
 		return nil
 	else
 		local v1 = 0
-		local function v2(p12, p22) --[[ Line: 76 | Upvalues: p1 (copy), t (ref), p2 (copy), v1 (ref), v2 (copy) ]]
+		local function v2(p12, p22)
 			local v12 = (p12 + p22) * 0.5
 			p1[#p1].timeUntil = v12
 			local v22 = t.calculateDist(p1, v12) - p2
@@ -82,7 +83,7 @@ function t.constrainLastTimeToReachTarget(p1, p2) --[[ Line: 67 | Upvalues: t (c
 		return v2(#p1 > 1 and p1[#p1 - 1].timeUntil or 0, 10000000000)
 	end
 end
-function t.cap(p1) --[[ Line: 98 ]]
+function t.cap(p1)
 	table.insert(p1, {
 		timeUntil = 10000000000,
 		speedStart = 0,

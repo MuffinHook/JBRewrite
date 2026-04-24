@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local store = require(ReplicatedStorage.App.store)
 local SaleShared = require(script.Parent.SaleShared)
 return {
-	init = function() --[[ Name: init | Line: 6 | Upvalues: SaleShared (copy), store (copy) ]]
-		SaleShared.onSaleRefresh:Connect(function() --[[ Line: 7 | Upvalues: store (ref) ]]
+	init = function()
+		SaleShared.onSaleRefresh:Connect(function()
 			local v1 = store:getState()
 			store:dispatch({
 				type = "setPage",

@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local Util = require(script.Parent.Parent.Shared.Util)
 local v1 = Util.MakeSequenceType({
 	Prefixes = "# hexColor3 ! brickColor3",
-	ValidateEach = function(p1, p2) --[[ Name: ValidateEach | Line: 5 ]]
+	ValidateEach = function(p1, p2)
 		if p1 == nil then
 			return false, ("Invalid or missing number at position %d in Color3 type."):format(p2)
 		elseif p1 < 0 or p1 > 255 then
@@ -16,25 +17,25 @@ local v1 = Util.MakeSequenceType({
 	Constructor = Color3.fromRGB,
 	Length = 3
 })
-local function parseHexDigit(p1) --[[ Line: 21 ]]
+local function parseHexDigit(p1)
 	if #p1 == 1 then
 		p1 = p1 .. p1
 	end
 	return tonumber(p1, 16)
 end
 local t = {
-	Transform = function(p1) --[[ Name: Transform | Line: 30 | Upvalues: Util (copy), parseHexDigit (copy) ]]
+	Transform = function(p1)
 		local v1, v2, v3 = p1:match("^#?(%x%x?)(%x%x?)(%x%x?)$")
 		return Util.Each(parseHexDigit, v1, v2, v3)
 	end,
-	Validate = function(p1, p2, p3) --[[ Name: Validate | Line: 35 ]]
+	Validate = function(p1, p2, p3)
 		return if p1 == nil or p2 == nil then false else p3 ~= nil, "Invalid hex color"
 	end,
-	Parse = function(...) --[[ Name: Parse | Line: 39 ]]
+	Parse = function(...)
 		return Color3.fromRGB(...)
 	end
 }
-return function(p1) --[[ Line: 44 | Upvalues: v1 (copy), Util (copy), t (copy) ]]
+return function(p1)
 	p1:RegisterType("color3", v1)
 	p1:RegisterType("color3s", Util.MakeListableType(v1, {
 		Prefixes = "# hexColor3s ! brickColor3s"

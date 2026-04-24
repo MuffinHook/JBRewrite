@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemSystem = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
@@ -16,20 +17,20 @@ local Players = game:GetService("Players")
 local t = {}
 t.__index = t
 setmetatable(t, NPC)
-function t.new(p1, p2) --[[ Line: 21 | Upvalues: NPC (copy), t (copy), Maid (copy), InventoryItemOwnerBinder (copy), ItemSystem (copy), Math (copy), MinimapService (copy), RunService (copy), Players (copy), GuardNPCConsts (copy) ]]
+function t.new(p1, p2)
 	local v1 = NPC.new(p1, p2)
 	setmetatable(v1, t)
 	local v3 = Maid.new()
 	v1._maid:GiveTask(v3)
-	local function observePlayerObj(p1) --[[ Line: 27 | Upvalues: v3 (copy), InventoryItemOwnerBinder (ref), ItemSystem (ref), v1 (copy) ]]
+	local function observePlayerObj(p1)
 		v3:DoCleaning()
 		if p1 then
-			v3:GivePromise(InventoryItemOwnerBinder:Promise(p1):andThen(function(p1) --[[ Line: 32 | Upvalues: ItemSystem (ref), v1 (ref), v3 (ref) ]]
+			v3:GivePromise(InventoryItemOwnerBinder:Promise(p1):andThen(function(p1)
 				local v12 = ItemSystem.GetEquipped(p1)
 				if v12 then
 					v1:_onItemEquipped(v12)
 				end
-				v3:GiveTask(ItemSystem.onItemEquipped:Connect(function(p12) --[[ Line: 37 | Upvalues: p1 (copy), v1 (ref) ]]
+				v3:GiveTask(ItemSystem.onItemEquipped:Connect(function(p12)
 					if p12.Player == p1 then
 						v1:_onItemEquipped(p12)
 					end
@@ -46,9 +47,9 @@ function t.new(p1, p2) --[[ Line: 21 | Upvalues: NPC (copy), t (copy), Maid (cop
 		size = UDim2.new(0, 12, 0, 12),
 		flash = true
 	}))
-	local function initializePlayerPushing() --[[ Line: 58 | Upvalues: v1 (copy), RunService (ref), Players (ref), GuardNPCConsts (ref) ]]
+	local function initializePlayerPushing()
 		local t = {}
-		v1._maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 60 | Upvalues: Players (ref), v1 (ref), t (copy), GuardNPCConsts (ref) ]]
+		v1._maid:GiveTask(RunService.Heartbeat:Connect(function()
 			local v12 = workspace:GetServerTimeNow()
 			local t2 = {}
 			for v3, v4 in Players:GetPlayers() do
@@ -70,7 +71,7 @@ function t.new(p1, p2) --[[ Line: 21 | Upvalues: NPC (copy), t (copy), Maid (cop
 	end
 	return v1
 end
-function t._onItemEquipped(p1, p2) --[[ Line: 96 | Upvalues: NPCConsts (copy), GeomUtils (copy), GuardNPCShared (copy), GuardNPCUtils (copy), RunService (copy) ]]
+function t._onItemEquipped(p1, p2)
 	local v1 = math.random() * 100
 	p2.SimulateLocal = true
 	p2.MinimalFx = true
@@ -85,7 +86,7 @@ function t._onItemEquipped(p1, p2) --[[ Line: 96 | Upvalues: NPCConsts (copy), G
 	local v5 = 0
 	local v6 = false
 	local v7 = os.clock()
-	local function update() --[[ Line: 118 | Upvalues: v1 (copy), p1 (copy), NPCConsts (ref), v2 (ref), GeomUtils (ref), v3 (ref), p2 (copy), v7 (ref), v6 (ref), GuardNPCShared (ref), GuardNPCUtils (ref), v4 (ref), v5 (ref) ]]
+	local function update()
 		local v12 = os.clock() + v1
 		if p1.obj.Humanoid and not (p1.obj.Humanoid.Health <= 0) then
 			if p1:GetTargetType() == NPCConsts.DEST_TYPE.IDLE then
@@ -119,7 +120,7 @@ function t._onItemEquipped(p1, p2) --[[ Line: 96 | Upvalues: NPCConsts (copy), G
 								p2:InputBegan({
 									UserInputType = Enum.UserInputType.MouseButton1
 								})
-								task.delay(math.min(0.5, 1 / v52 * v5), function() --[[ Line: 168 | Upvalues: p2 (ref) ]]
+								task.delay(math.min(0.5, 1 / v52 * v5), function()
 									if not p2.Destroyed then
 										p2:InputEnded({
 											UserInputType = Enum.UserInputType.MouseButton1
@@ -143,7 +144,7 @@ function t._onItemEquipped(p1, p2) --[[ Line: 96 | Upvalues: NPCConsts (copy), G
 		end
 		return false
 	end
-	p1._maid.itemHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 179 | Upvalues: update (copy) ]]
+	p1._maid.itemHeartbeat = RunService.Heartbeat:Connect(function()
 		debug.profilebegin("GuardNPC Heartbeat")
 		update()
 		debug.profileend()

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TrainSystem = require(ReplicatedStorage.Game.TrainSystem)
@@ -6,26 +7,26 @@ local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
 local v1 = nil
 local v2 = nil
 local v3 = nil
-local function comma(p1) --[[ Line: 12 ]]
+local function comma(p1)
 	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
 	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
 end
-local function FormatMoney(p1) --[[ Line: 16 ]]
+local function FormatMoney(p1)
 	local v3, v4, v5 = string.match(math.abs(p1), "^([^%d]*%d)(%d*)(.-)$")
 	return ("%s$%s"):format(if p1 >= 0 then "" else "-", v3 .. v4:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v5)
 end
-local function PlaySound(p1, p2) --[[ Line: 20 ]]
+local function PlaySound(p1, p2)
 	local Sound = Instance.new("Sound")
 	Sound.SoundId = ("rbxassetid://%d"):format(p2)
 	Sound.Volume = 0.75
 	Sound.RollOffMode = Enum.RollOffMode.InverseTapered
 	Sound.Parent = p1
 	Sound:Play()
-	delay(1, function() --[[ Line: 27 | Upvalues: Sound (copy) ]]
+	delay(1, function()
 		game.Debris:AddItem(Sound, Sound.TimeLength)
 	end)
 end
-local function OpenRoofDoorRaw(p1, p2) --[[ Line: 31 | Upvalues: PlaySound (copy), CircleAction (copy) ]]
+local function OpenRoofDoorRaw(p1, p2)
 	local v2 = assert(p1.Model.Model:FindFirstChild("Glass" .. tostring(p2)), "missing glassPart")
 	if not p1.GlassIndexOpen[p2] then
 		p1.GlassIndexOpen[p2] = true
@@ -36,7 +37,7 @@ local function OpenRoofDoorRaw(p1, p2) --[[ Line: 31 | Upvalues: PlaySound (copy
 		return true
 	end
 end
-local function OpenSideDoorRaw(p1, p2) --[[ Line: 43 | Upvalues: CircleAction (copy) ]]
+local function OpenSideDoorRaw(p1, p2)
 	local v2 = assert(p1.Model.Skeleton:FindFirstChild("Door" .. tostring(p2)), "missing doorModel")
 	if not p1.DoorIndexOpen[p2] then
 		p1.DoorIndexOpen[p2] = true
@@ -46,9 +47,9 @@ local function OpenSideDoorRaw(p1, p2) --[[ Line: 43 | Upvalues: CircleAction (c
 	end
 end
 local v4 = CFrame.new()
-local function SetupPassengerCar(p1) --[[ Line: 54 | Upvalues: v1 (ref), CircleAction (copy), ReplicatedStorage (copy), Joint (copy), v4 (copy), OpenRoofDoorRaw (copy) ]]
+local function SetupPassengerCar(p1)
 	local t = {}
-	local function GrabAction(p12, p2) --[[ Line: 56 | Upvalues: v1 (ref), p1 (copy) ]]
+	local function GrabAction(p12, p2)
 		if p2 then
 			p12.IsMine = true
 			v1:FireServer("no98ghkm", p1.SystemId, p1.Id, p12.SpawnName, p12.ItemName)
@@ -102,7 +103,7 @@ local function SetupPassengerCar(p1) --[[ Line: 54 | Upvalues: v1 (ref), CircleA
 		end
 	end
 	if p1.Name ~= "PassengerArmor" then
-		local function Action(p12, p2) --[[ Line: 118 | Upvalues: OpenRoofDoorRaw (ref), p1 (copy), v1 (ref) ]]
+		local function Action(p12, p2)
 			if p2 and OpenRoofDoorRaw(p1, p12.GlassIndex) then
 				v1:FireServer("i" .. ("dls1l"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "qzvb", p1.SystemId, p1.Id, p12.GlassIndex)
 			elseif p2 then
@@ -127,7 +128,7 @@ local function SetupPassengerCar(p1) --[[ Line: 54 | Upvalues: v1 (ref), CircleA
 			table.insert(t, t2)
 		end
 	end
-	local function SideDoorAction(p12, p2) --[[ Line: 147 | Upvalues: p1 (copy), CircleAction (ref), v1 (ref) ]]
+	local function SideDoorAction(p12, p2)
 		if p2 then
 			local v12 = p1
 			local DoorIndex = p12.DoorIndex
@@ -170,12 +171,12 @@ local function SetupPassengerCar(p1) --[[ Line: 54 | Upvalues: v1 (ref), CircleA
 	p1.GlassIndexOpen = {}
 	p1.DoorIndexOpen = {}
 end
-local function OnCarCreated(p1) --[[ Line: 180 | Upvalues: SetupPassengerCar (copy) ]]
+local function OnCarCreated(p1)
 	if p1.Name:sub(1, 9) == "Passenger" then
 		SetupPassengerCar(p1)
 	end
 end
-local function OnCarDestroyed(p1) --[[ Line: 186 ]]
+local function OnCarDestroyed(p1)
 	if p1.Name:sub(1, 9) == "Passenger" then
 		if p1.CircleActionSpecs then
 			for v1, v2 in next, p1.CircleActionSpecs do
@@ -190,14 +191,14 @@ local function OnCarDestroyed(p1) --[[ Line: 186 ]]
 	end
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 201 | Upvalues: v1 (ref), v2 (ref), v3 (ref), TrainSystem (copy), OnCarCreated (copy), OnCarDestroyed (copy), PlaySound (copy), LocalPlayer (copy), OpenRoofDoorRaw (copy) ]]
+	Init = function(p1)
 		local em = p1.em
 		v1 = p1.Event
 		v2 = em
 		v3 = p1.ScreenGui
 		TrainSystem.Signals.OnCarCreated:Connect(OnCarCreated)
 		TrainSystem.Signals.OnCarDestroyed:Connect(OnCarDestroyed)
-		function em.no98ghkm(p1, p2, p3) --[[ Line: 210 | Upvalues: TrainSystem (ref), PlaySound (ref), LocalPlayer (ref) ]]
+		function em.no98ghkm(p1, p2, p3)
 			local v1 = TrainSystem.GetSystemById(p1)
 			if v1 then
 				local v2 = TrainSystem.GetCarById(v1, p2)
@@ -222,7 +223,7 @@ return {
 				return nil
 			end
 		end
-		function em.i1slqzvb(p1, p2, p3) --[[ Line: 237 | Upvalues: TrainSystem (ref), OpenRoofDoorRaw (ref) ]]
+		function em.i1slqzvb(p1, p2, p3)
 			local v1 = TrainSystem.GetSystemById(p1)
 			if v1 then
 				local v2 = TrainSystem.GetCarById(v1, p2)

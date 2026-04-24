@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CurrentCamera = workspace.CurrentCamera
@@ -12,7 +13,7 @@ v1.Parent = workspace
 local v2 = RateLimiter.new(50)
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 21 | Upvalues: t (copy), Maid (copy) ]]
+function t.new(p1)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._obj = p1
@@ -21,20 +22,20 @@ function t.new(p1) --[[ Line: 21 | Upvalues: t (copy), Maid (copy) ]]
 	t2:_setup(p1, t2._maid)
 	return t2
 end
-function t.GetOnHitSignal(p1) --[[ Line: 32 | Upvalues: Signal (copy) ]]
+function t.GetOnHitSignal(p1)
 	if not p1._onHitSignal then
 		p1._onHitSignal = Signal.new()
 		p1._maid:GiveTask(p1._onHitSignal)
 	end
 	return p1._onHitSignal
 end
-function t.GetInst(p1) --[[ Line: 39 ]]
+function t.GetInst(p1)
 	return p1._instValue.Value
 end
-function t.GetPrefab(p1) --[[ Line: 42 | Upvalues: ReplicatedStorage (copy), DestructibleConsts (copy) ]]
+function t.GetPrefab(p1)
 	return ReplicatedStorage:FindFirstChild(DestructibleConsts.PREFAB_FOLDER_NAME):FindFirstChild(p1._objName)
 end
-function t._setup(p1, p2, p3) --[[ Line: 46 | Upvalues: DestructibleConsts (copy), RxInstanceUtils (copy) ]]
+function t._setup(p1, p2, p3)
 	local v1 = p2:FindFirstChild(DestructibleConsts.INSTANCE_VALUE_NAME)
 	if not v1 then
 		local v2 = Instance.new("ObjectValue")
@@ -45,20 +46,20 @@ function t._setup(p1, p2, p3) --[[ Line: 46 | Upvalues: DestructibleConsts (copy
 	end
 	p1._instValue = v1
 	p1._wasTouched = false
-	p3:GiveTask(RxInstanceUtils.observeOneChildNamed(p2, DestructibleConsts.BROADCAST_COLLIDE_REMOTE_NAME, function(p12, p2) --[[ Line: 61 | Upvalues: p1 (copy) ]]
+	p3:GiveTask(RxInstanceUtils.observeOneChildNamed(p2, DestructibleConsts.BROADCAST_COLLIDE_REMOTE_NAME, function(p12, p2)
 		p1._broadcastCollideRemote = p12
-		p2:GiveTask(p12.OnClientEvent:Connect(function(p12) --[[ Line: 63 | Upvalues: p1 (ref) ]]
+		p2:GiveTask(p12.OnClientEvent:Connect(function(p12)
 			if not p1._wasTouched then
 				p1:_handleHitPosition(p12)
 			end
 		end))
 	end))
-	p3:GiveTask(v1.Changed:Connect(function() --[[ Line: 73 | Upvalues: p1 (copy) ]]
+	p3:GiveTask(v1.Changed:Connect(function()
 		p1:_handleInst()
 	end))
 	p1:_handleInst()
 end
-function t._handleHitPosition(p1, p2) --[[ Line: 78 | Upvalues: ReplicatedStorage (copy), Debris (copy), Audio (copy), DestructibleConsts (copy) ]]
+function t._handleHitPosition(p1, p2)
 	local _instValue = p1._instValue
 	p1._wasTouched = true
 	local v1 = _instValue.Value
@@ -94,7 +95,7 @@ function t._handleHitPosition(p1, p2) --[[ Line: 78 | Upvalues: ReplicatedStorag
 		v1:Destroy()
 	end
 end
-function t._handleInst(p1) --[[ Line: 122 | Upvalues: v2 (copy), CurrentCamera (copy), DestructibleConsts (copy), Maid (copy), ReplicatedStorage (copy), v1 (copy) ]]
+function t._handleInst(p1)
 	debug.profilebegin("DestructibleSpawn.handleInst")
 	local _instValue = p1._instValue
 	local _obj = p1._obj
@@ -111,14 +112,14 @@ function t._handleInst(p1) --[[ Line: 122 | Upvalues: v2 (copy), CurrentCamera (
 			v2:UseBudget(1)
 			local v22 = Maid.new()
 			_maid._instMaid = v22
-			v22:GiveTask(function() --[[ Line: 138 | Upvalues: p1 (copy) ]]
+			v22:GiveTask(function()
 				p1._wasTouched = false
 			end)
 			local v3 = ReplicatedStorage:FindFirstChild(DestructibleConsts.PREFAB_FOLDER_NAME):FindFirstChild(_obj.Name):Clone()
 			v3:SetPrimaryPartCFrame(_obj.Value)
 			v3.Parent = v1
 			_instValue.Value = v3
-			v22:GiveTask(v3.PrimaryPart.Touched:Connect(function(p12) --[[ Line: 151 | Upvalues: v1 (ref), p1 (copy) ]]
+			v22:GiveTask(v3.PrimaryPart.Touched:Connect(function(p12)
 				if p12:IsDescendantOf(v1) then
 				elseif p12:IsDescendantOf(workspace:FindFirstChild("Vehicles")) then
 					if not p1._wasTouched then
@@ -129,7 +130,7 @@ function t._handleInst(p1) --[[ Line: 122 | Upvalues: v2 (copy), CurrentCamera (
 					end
 				end
 			end))
-			v22:GiveTask(v3.AncestryChanged:Connect(function(p1, p2) --[[ Line: 169 | Upvalues: _instValue (copy) ]]
+			v22:GiveTask(v3.AncestryChanged:Connect(function(p1, p2)
 				if not p2 then
 					_instValue.Value = nil
 				end
@@ -139,7 +140,7 @@ function t._handleInst(p1) --[[ Line: 122 | Upvalues: v2 (copy), CurrentCamera (
 	end
 end
 t.Update = t._handleInst
-function t.Destroy(p1) --[[ Line: 181 ]]
+function t.Destroy(p1)
 	local _maid = p1._maid
 	p1._maid = nil
 	_maid:Destroy()

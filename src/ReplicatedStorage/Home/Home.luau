@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -13,15 +14,15 @@ local HomeSaleUISystem = require(script.Parent.HomeUI.HomeSaleUISystem)
 local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
 require(ReplicatedStorage.Game.GameUtil)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
-local function isPointInPrism(p1, p2, p3) --[[ Line: 19 ]]
-	local v1 = p2:pointToObjectSpace(p1) + p3 * 0.5
-	return if v1.x >= 0 and (v1.x <= p3.x and (v1.y >= 0 and (v1.y <= p3.y and v1.z >= 0))) then v1.z <= p3.z else false
+local function isPointInPrism(point, cframe, size)
+	local localPoint = cframe:pointToObjectSpace(point) + size * 0.5
+	return if localPoint.x >= 0 and (localPoint.x <= size.x and (localPoint.y >= 0 and (localPoint.y <= size.y and localPoint.z >= 0))) then localPoint.z <= size.z else false
 end
 local t = {}
 t.__index = t
 t.__ClassName = "Home"
-function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), HomeConsts (copy), LocalPlayer (copy), HomeSaleUISystem (copy), Confirmation (copy), CircleAction (copy), RxInstanceUtils (copy) ]]
-	local t2 = {}
+function t.new(homeObj)
+	local self = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
 	t2._obj = p1
@@ -34,7 +35,7 @@ function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), HomeConsts (
 	t2._homeUnclaimRemote = p1:WaitForChild(HomeConsts.HOME_UNCLAIM_REMOTE_NAME)
 	t2._permissionsFolder = p1:WaitForChild(HomeConsts.PERMISSIONS_FOLDER_NAME)
 	t2._setSavedSettingRemote = p1:WaitForChild(HomeConsts.SET_SAVED_SETTING_REMOTE_NAME)
-	local function doIOwnThisHomeName() --[[ Line: 44 | Upvalues: LocalPlayer (ref), HomeConsts (ref), t2 (copy) ]]
+	local function doIOwnThisHomeName()
 		local v1 = LocalPlayer:FindFirstChild(HomeConsts.HOMES_OWNED_FOLDER_NAME)
 		if v1 then
 			return v1:FindFirstChild(t2._obj.Name) ~= nil
@@ -48,7 +49,7 @@ function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), HomeConsts (
 		NoRay = true,
 		Timed = false,
 		Dist = 16,
-		Callback = function(p1, p2) --[[ Name: action | Line: 56 | Upvalues: t2 (copy), LocalPlayer (ref), HomeConsts (ref), HomeSaleUISystem (ref), Confirmation (ref) ]]
+		Callback = function(p1, p2)
 			if p2 then
 				if t2:GetOwnerId() == nil then
 					local v1 = LocalPlayer:FindFirstChild(HomeConsts.HOMES_OWNED_FOLDER_NAME)
@@ -63,14 +64,14 @@ function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), HomeConsts (
 					else
 						HomeSaleUISystem.setPrice(t2._priceValue.Value)
 						HomeSaleUISystem.open()
-						t2._maid._onSaleYes = HomeSaleUISystem.getOnClickYesSignal():Connect(function() --[[ Line: 65 | Upvalues: HomeSaleUISystem (ref), t2 (ref) ]]
+						t2._maid._onSaleYes = HomeSaleUISystem.getOnClickYesSignal():Connect(function()
 							HomeSaleUISystem.close()
 							t2._homePurchaseRemote:FireServer()
 						end)
-						t2._maid._onSaleNo = HomeSaleUISystem.getOnClickNoSignal():Connect(function() --[[ Line: 69 | Upvalues: HomeSaleUISystem (ref) ]]
+						t2._maid._onSaleNo = HomeSaleUISystem.getOnClickNoSignal():Connect(function()
 							HomeSaleUISystem.close()
 						end)
-						t2._maid._onClosed = HomeSaleUISystem.getOnClosedSignal():Connect(function() --[[ Line: 72 | Upvalues: t2 (ref) ]]
+						t2._maid._onClosed = HomeSaleUISystem.getOnClosedSignal():Connect(function()
 							t2._maid._onClosed = nil
 							t2._maid._onSaleYes = nil
 							t2._maid._onSaleNo = nil
@@ -79,11 +80,11 @@ function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), HomeConsts (
 				elseif t2:GetOwnerId() == LocalPlayer.UserId then
 					local v4 = Confirmation.new("Unclaim home? You will still own it, but will have to claim the land again.")
 					t2._maid._confirm = v4
-					v4.Maid:GiveTask(v4.OnYes:Connect(function() --[[ Line: 82 | Upvalues: t2 (ref) ]]
+					v4.Maid:GiveTask(v4.OnYes:Connect(function()
 						t2._homeUnclaimRemote:FireServer()
 						t2._maid._confirm = nil
 					end))
-					v4.Maid:GiveTask(v4.OnNo:Connect(function() --[[ Line: 86 | Upvalues: t2 (ref) ]]
+					v4.Maid:GiveTask(v4.OnNo:Connect(function()
 						t2._maid._confirm = nil
 					end))
 				end
@@ -92,7 +93,7 @@ function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), HomeConsts (
 				return false
 			end
 		end,
-		PreUpdateFun = function(p1) --[[ Name: preUpdateFun | Line: 94 | Upvalues: HomeSaleUISystem (ref), t2 (copy), LocalPlayer (ref), HomeConsts (ref) ]]
+		PreUpdateFun = function(p1)
 			local v1 = false
 			local v2 = nil
 			if not HomeSaleUISystem.isOpen() then
@@ -116,15 +117,15 @@ function t.new(p1) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), HomeConsts (
 		end,
 		PreUpdatePeriod = 0.1
 	}, Sign)
-	t2._maid:GiveTask(function() --[[ Line: 125 | Upvalues: CircleAction (ref), Sign (copy) ]]
+	t2._maid:GiveTask(function()
 		CircleAction.Remove(Sign)
 	end)
-	t2._maid:GiveTask(RxInstanceUtils.observeChildrenNamed(t2._obj, "Door", function(p1, p2) --[[ Line: 129 | Upvalues: t2 (copy) ]]
+	t2._maid:GiveTask(RxInstanceUtils.observeChildrenNamed(t2._obj, "Door", function(p1, p2)
 		t2:_receiveDoorModel(p1)
 	end))
 	return t2
 end
-function t._receiveDoorModel(p1, p2) --[[ Line: 135 | Upvalues: DoorUtils (copy), PlayerUtils (copy), LocalPlayer (copy), Players (copy), HomeConsts (copy), CircleAction (copy) ]]
+function t._receiveDoorModel(p1, p2)
 	local Door = DoorUtils.getInnerModel(p2):FindFirstChild("Door")
 	assert(Door)
 	CircleAction.Add({
@@ -133,7 +134,7 @@ function t._receiveDoorModel(p1, p2) --[[ Line: 135 | Upvalues: DoorUtils (copy)
 		NoRay = true,
 		Timed = false,
 		Dist = 10,
-		Callback = function(p12, p22) --[[ Name: action | Line: 139 | Upvalues: p1 (copy), p2 (copy) ]]
+		Callback = function(p12, p22)
 			if p22 then
 				p1._doorInteractRemote:FireServer(p2, true)
 				return true
@@ -144,7 +145,7 @@ function t._receiveDoorModel(p1, p2) --[[ Line: 135 | Upvalues: DoorUtils (copy)
 				return false
 			end
 		end,
-		PreUpdateFun = function(p12) --[[ Name: preUpdateFun | Line: 150 | Upvalues: DoorUtils (ref), p2 (copy), PlayerUtils (ref), LocalPlayer (ref), p1 (copy), Players (ref), HomeConsts (ref) ]]
+		PreUpdateFun = function(p12)
 			local v1 = DoorUtils.getPctOpen(p2) ~= 0
 			local v2 = PlayerUtils.getRootPart(LocalPlayer)
 			if v2 then
@@ -172,25 +173,25 @@ function t._receiveDoorModel(p1, p2) --[[ Line: 135 | Upvalues: DoorUtils (copy)
 		end,
 		PreUpdatePeriod = 0.5
 	}, Door)
-	p1._maid:GiveTask(function() --[[ Line: 194 | Upvalues: CircleAction (ref), Door (copy) ]]
+	p1._maid:GiveTask(function()
 		CircleAction.Remove(Door)
 	end)
 end
-function t.GetObj(p1) --[[ Line: 198 ]]
+function t.GetObj(p1)
 	return p1._obj
 end
-function t.GetHomeItems(p1) --[[ Line: 201 | Upvalues: v1 (ref), BinderUtils (copy) ]]
+function t.GetHomeItems(p1)
 	v1 = v1 or require(script.Parent.HomeItem.HomeItemBinder)
 	return BinderUtils.getChildren(v1, p1._obj)
 end
-function t.AttemptCreateHomeItem(p1, p2) --[[ Line: 207 ]]
+function t.AttemptCreateHomeItem(p1, p2)
 	assert(p2 ~= nil)
 	p1._homeItemNewRemote:FireServer(p2)
 end
-function t.GetSurfaces(p1) --[[ Line: 211 | Upvalues: BinderUtils (copy), SurfaceBinder (copy) ]]
+function t.GetSurfaces(p1)
 	return BinderUtils.getDescendants(SurfaceBinder, p1._obj)
 end
-function t.IsPointInStandingPrism(p1, p2) --[[ Line: 214 ]]
+function t.IsPointInStandingPrism(p1, p2)
 	for i, v in ipairs((p1:GetSurfaces())) do
 		local v2
 		local v3, v4 = v:GetStandingPrism()
@@ -204,7 +205,7 @@ function t.IsPointInStandingPrism(p1, p2) --[[ Line: 214 ]]
 	end
 	return false
 end
-function t.GetArmedVault(p1) --[[ Line: 228 ]]
+function t.GetArmedVault(p1)
 	for i, v in ipairs((p1:GetHomeItems())) do
 		local _vault = v._vault
 		if _vault and _vault:GetIsVaultArmed() then
@@ -213,13 +214,13 @@ function t.GetArmedVault(p1) --[[ Line: 228 ]]
 	end
 	return nil
 end
-function t.ReplicateCustomizing(p1, p2) --[[ Line: 238 ]]
+function t.ReplicateCustomizing(p1, p2)
 	p1._updateCustomizingRemote:FireServer(p2)
 end
-function t.GetOwnerId(p1) --[[ Line: 241 | Upvalues: HomeConsts (copy) ]]
+function t.GetOwnerId(p1)
 	return p1._obj:GetAttribute(HomeConsts.OWNER_ID_ATTR_NAME)
 end
-function t._getPlayerPermObj(p1, p2) --[[ Line: 244 ]]
+function t._getPlayerPermObj(p1, p2)
 	local v1 = p1._permissionsFolder:FindFirstChild((tostring(p2.UserId)))
 	if v1 then
 		return v1
@@ -227,7 +228,7 @@ function t._getPlayerPermObj(p1, p2) --[[ Line: 244 ]]
 		return nil
 	end
 end
-function t.HasPermissionToEnter(p1, p2) --[[ Line: 252 | Upvalues: HomeConsts (copy) ]]
+function t.HasPermissionToEnter(p1, p2)
 	local v1 = p1:_getPlayerPermObj(p2)
 	if v1 then
 		return v1:GetAttribute(HomeConsts.PERMISSION_CAN_ENTER_ATTR_NAME) == true
@@ -235,7 +236,7 @@ function t.HasPermissionToEnter(p1, p2) --[[ Line: 252 | Upvalues: HomeConsts (c
 		return false
 	end
 end
-function t.HasPermissionToEdit(p1, p2) --[[ Line: 259 | Upvalues: HomeConsts (copy) ]]
+function t.HasPermissionToEdit(p1, p2)
 	local v1 = p1:_getPlayerPermObj(p2)
 	if v1 then
 		return v1:GetAttribute(HomeConsts.PERMISSION_CAN_EDIT_ATTR_NAME) == true
@@ -243,10 +244,10 @@ function t.HasPermissionToEdit(p1, p2) --[[ Line: 259 | Upvalues: HomeConsts (co
 		return false
 	end
 end
-function t.SetSavedSetting(p1, p2, p3) --[[ Line: 266 ]]
+function t.SetSavedSetting(p1, p2, p3)
 	p1._setSavedSettingRemote:FireServer(p2, p3)
 end
-function t.Destroy(p1) --[[ Line: 269 ]]
+function t.Destroy(p1)
 	local _maid = p1._maid
 	assert(_maid ~= nil)
 	p1._maid = nil

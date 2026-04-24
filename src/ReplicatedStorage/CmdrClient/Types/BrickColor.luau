@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Util = require(script.Parent.Parent.Shared.Util)
 local v1 = Util.MakeFuzzyFinder({
 	"White",
@@ -211,20 +212,20 @@ local v1 = Util.MakeFuzzyFinder({
 })
 local t = {
 	Prefixes = "% teamColor",
-	Transform = function(p1) --[[ Name: Transform | Line: 219 | Upvalues: v1 (copy) ]]
+	Transform = function(p1)
 		local t = {}
 		for k, v in pairs(v1(p1)) do
 			t[k] = BrickColor.new(v)
 		end
 		return t
 	end,
-	Validate = function(p1) --[[ Name: Validate | Line: 227 ]]
+	Validate = function(p1)
 		return #p1 > 0, "No valid brick colors with that name could be found."
 	end,
-	Autocomplete = function(p1) --[[ Name: Autocomplete | Line: 231 | Upvalues: Util (copy) ]]
+	Autocomplete = function(p1)
 		return Util.GetNames(p1)
 	end,
-	Parse = function(p1) --[[ Name: Parse | Line: 235 ]]
+	Parse = function(p1)
 		return p1[1]
 	end
 }
@@ -232,11 +233,11 @@ local t2 = {
 	Transform = t.Transform,
 	Validate = t.Validate,
 	Autocomplete = t.Autocomplete,
-	Parse = function(p1) --[[ Name: Parse | Line: 245 ]]
+	Parse = function(p1)
 		return p1[1].Color
 	end
 }
-return function(p1) --[[ Line: 250 | Upvalues: t (copy), Util (copy), t2 (copy) ]]
+return function(p1)
 	p1:RegisterType("brickColor", t)
 	p1:RegisterType("brickColors", Util.MakeListableType(t, {
 		Prefixes = "% teamColors"

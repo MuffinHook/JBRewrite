@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
@@ -6,7 +7,7 @@ local Roact = require(ReplicatedStorage.Roact)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local createElement = Roact.createElement
-local function comma(p1) --[[ Line: 10 ]]
+local function comma(p1)
 	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
 	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
 end
@@ -25,7 +26,7 @@ v1.defaultProps = {
 	position = UDim2.new(0, 0, 0, 0),
 	enabled = true
 }
-function v1.init(p1) --[[ Line: 30 | Upvalues: Roact (copy) ]]
+function v1.init(p1)
 	p1:setState({
 		ejectOpen = false
 	})
@@ -33,21 +34,21 @@ function v1.init(p1) --[[ Line: 30 | Upvalues: Roact (copy) ]]
 	p1.color_frameRef = Roact.createRef()
 	p1.color_frame2Ref = Roact.createRef()
 end
-function v1.didMount(p1) --[[ Line: 38 | Upvalues: Maid (copy), VehicleUtils (copy), HyperChromeConsts (copy), RunService (copy) ]]
+function v1.didMount(p1)
 	p1.maid = Maid.new()
 	local v1 = VehicleUtils.GetLocalVehicleModel()
 	assert(v1, "No local vehicle model")
-	p1.maid:GiveTask(VehicleUtils.getTireHealthChangedSignal(v1):Connect(function() --[[ Line: 42 | Upvalues: p1 (copy) ]]
+	p1.maid:GiveTask(VehicleUtils.getTireHealthChangedSignal(v1):Connect(function()
 		p1:setState({
 			_c = math.random()
 		})
 	end))
-	p1.maid:GiveTask(VehicleUtils.getTireMaxHealthChangedSignal(v1):Connect(function() --[[ Line: 48 | Upvalues: p1 (copy) ]]
+	p1.maid:GiveTask(VehicleUtils.getTireMaxHealthChangedSignal(v1):Connect(function()
 		p1:setState({
 			_c = math.random()
 		})
 	end))
-	local function setColor(p12) --[[ Line: 55 | Upvalues: p1 (copy) ]]
+	local function setColor(p12)
 		local v1 = p1.color_strokeRef:getValue()
 		local v2 = p1.color_frameRef:getValue()
 		local v3 = p1.color_frame2Ref:getValue()
@@ -61,9 +62,9 @@ function v1.didMount(p1) --[[ Line: 38 | Upvalues: Maid (copy), VehicleUtils (co
 			v3.BackgroundColor3 = p12
 		end
 	end
-	local function hyperChromeUpdated() --[[ Line: 69 | Upvalues: v1 (copy), HyperChromeConsts (ref), p1 (copy), RunService (ref) ]]
+	local function hyperChromeUpdated()
 		if v1:GetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME) == HyperChromeConsts.COLOR_SHIFT_NAME then
-			p1.maid.hyperShiftParticleRainbowHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 72 | Upvalues: HyperChromeConsts (ref), p1 (ref) ]]
+			p1.maid.hyperShiftParticleRainbowHeartbeat = RunService.Heartbeat:Connect(function()
 				local v2 = Color3.fromHSV(os.clock() % HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME / HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME, 1, 1)
 				local v3 = p1.color_strokeRef:getValue()
 				local v4 = p1.color_frameRef:getValue()
@@ -98,7 +99,7 @@ function v1.didMount(p1) --[[ Line: 38 | Upvalues: Maid (copy), VehicleUtils (co
 	task.spawn(hyperChromeUpdated)
 	p1.maid:GiveTask(v1:GetAttributeChangedSignal(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME):Connect(hyperChromeUpdated))
 end
-function v1.render(p1) --[[ Line: 89 | Upvalues: VehicleUtils (copy), RunService (copy), createElement (copy), Roact (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	if p1.props.enabled then
 		local smallUI = p1.props.smallUI
 		local v1 = VehicleUtils.GetLocalVehicleModel()
@@ -124,7 +125,7 @@ function v1.render(p1) --[[ Line: 89 | Upvalues: VehicleUtils (copy), RunService
 						AnchorPoint = Vector2.new(0, 0),
 						Text = "",
 						LayoutOrder = 10 - i,
-						[Roact.Event.MouseButton1Down] = function() --[[ Line: 121 | Upvalues: p1 (copy), v5 (copy) ]]
+						[Roact.Event.MouseButton1Down] = function()
 							p1:setState({
 								ejectOpen = false
 							})
@@ -156,7 +157,7 @@ function v1.render(p1) --[[ Line: 89 | Upvalues: VehicleUtils (copy), RunService
 					ImageTransparency = 0,
 					Image = "rbxassetid://8208058512",
 					Size = UDim2.new(1, 0, 1, 0),
-					ImageColor3 = p1.props.accelRatio:map(function(p1) --[[ Line: 156 | Upvalues: i (copy) ]]
+					ImageColor3 = p1.props.accelRatio:map(function(p1)
 						local v1 = Color3.new(255/255, 255/255, 255/255)
 						local v2 = i / 10
 						local v3 = (i + 1) / 10
@@ -210,7 +211,7 @@ function v1.render(p1) --[[ Line: 89 | Upvalues: VehicleUtils (copy), RunService
 			t8.Position = UDim2.new(0.5, 0, 0, 0)
 			t8.TextColor3 = Color3.new(255/255, 255/255, 255/255)
 			t8.TextScaled = true
-			t8.Text = p1.props.speed:map(function(p1) --[[ Line: 208 ]]
+			t8.Text = p1.props.speed:map(function(p1)
 				return ("%03d"):format(p1)
 			end)
 			t8.Font = Enum.Font.Bangers
@@ -234,7 +235,7 @@ function v1.render(p1) --[[ Line: 89 | Upvalues: VehicleUtils (copy), RunService
 				Position = UDim2.new(1, 0, 0.72, 0),
 				TextColor3 = Color3.new(255/255, 255/255, 255/255),
 				TextScaled = true,
-				Text = p1.props.distance:map(function(p1) --[[ Line: 232 ]]
+				Text = p1.props.distance:map(function(p1)
 					local v2, v3, v4 = string.match(math.floor(p1 + 0.5), "^([^%d]*%d)(%d*)(.-)$")
 					return ("%s mi"):format(v2 .. v3:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v4)
 				end),
@@ -297,7 +298,7 @@ function v1.render(p1) --[[ Line: 89 | Upvalues: VehicleUtils (copy), RunService
 				Size = UDim2.new(0.5, 0, 0.5, 0),
 				Position = UDim2.new(0.16, 0, 0.14, 0),
 				Visible = p1.props.ejectEnabled,
-				[Roact.Event.MouseButton1Down] = function() --[[ Line: 291 | Upvalues: p1 (copy) ]]
+				[Roact.Event.MouseButton1Down] = function()
 					local v1 = not p1.state.ejectOpen
 					p1:setState({
 						ejectOpen = v1
@@ -446,7 +447,7 @@ function v1.render(p1) --[[ Line: 89 | Upvalues: VehicleUtils (copy), RunService
 				}),
 				Inner = createElement("Frame", {
 					BackgroundTransparency = 1,
-					Size = p1.props.barRatio:map(function(p1) --[[ Line: 447 ]]
+					Size = p1.props.barRatio:map(function(p1)
 						return UDim2.new(p1, 0, 1, 0)
 					end),
 					ClipsDescendants = true
@@ -454,7 +455,7 @@ function v1.render(p1) --[[ Line: 89 | Upvalues: VehicleUtils (copy), RunService
 					Value = createElement("Frame", {
 						BackgroundTransparency = 0,
 						BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
-						Size = p1.props.barRatio:map(function(p1) --[[ Line: 455 ]]
+						Size = p1.props.barRatio:map(function(p1)
 							return UDim2.new(math.min(1 / p1, 2), 0, 1, 0)
 						end)
 					}, {
@@ -500,7 +501,7 @@ function v1.render(p1) --[[ Line: 89 | Upvalues: VehicleUtils (copy), RunService
 						Position = UDim2.new(0.5, 0, 0.6, 0),
 						TextColor3 = Color3.new(255/255, 255/255, 255/255),
 						TextScaled = true,
-						Text = p1.props.distance:map(function(p1) --[[ Line: 509 ]]
+						Text = p1.props.distance:map(function(p1)
 							local v2, v3, v4 = string.match(math.floor(p1 + 0.5), "^([^%d]*%d)(%d*)(.-)$")
 							return ("%s mi"):format(v2 .. v3:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v4)
 						end),
@@ -513,7 +514,7 @@ function v1.render(p1) --[[ Line: 89 | Upvalues: VehicleUtils (copy), RunService
 		end
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 520 ]]
+function v1.willUnmount(p1)
 	p1.maid:Destroy()
 end
 return v1

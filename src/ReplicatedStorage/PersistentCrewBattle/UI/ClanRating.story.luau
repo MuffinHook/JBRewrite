@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
-return function(p1) --[[ Line: 4 | Upvalues: Roact (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local ClanRating = require(script.Parent.ClanRating)
-	function v1.init(p1) --[[ Line: 7 ]] end
-	function v1.render(p1) --[[ Line: 8 | Upvalues: Roact (ref), ClanRating (copy) ]]
+	function v1.init(p1)  end
+	function v1.render(p1)
 		return Roact.createElement(ClanRating, {
 			aspectRatio = 20,
 			paddingRatio = 0.0078125,
@@ -14,9 +15,9 @@ return function(p1) --[[ Line: 4 | Upvalues: Roact (copy) ]]
 			size = UDim2.fromScale(0.8, 0.1)
 		})
 	end
-	function v1.willUnmount(p1) --[[ Line: 18 ]] end
+	function v1.willUnmount(p1)  end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 21 | Upvalues: Roact (ref), v2 (copy) ]]
+	return function()
 		Roact.unmount(v2)
 	end
 end

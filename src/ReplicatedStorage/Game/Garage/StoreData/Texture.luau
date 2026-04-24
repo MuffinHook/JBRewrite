@@ -598,30 +598,30 @@ return {
 			Hidden = true
 		}
 	},
-	GetInstance = function(p1)
-		local v1 = VehicleUtils.GetLocalVehiclePacketForCustomize()
-		local v2 = getDefaultVehicleModel(v1.Make, v1.Type)
-		local t = {
-			Model = v2,
-			Make = v1.Make,
-			Type = v1.Type
+	GetInstance = function(textureData)
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacketForCustomize()
+		local vehicleModel = getDefaultVehicleModel(vehiclePacket.Make, vehiclePacket.Type)
+		local context = {
+			Model = vehicleModel,
+			Make = vehiclePacket.Make,
+			Type = vehiclePacket.Type
 		}
-		if p1.None then
-			Texture(nil, t)
+		if textureData.None then
+			Texture(nil, context)
 		else
-			Texture(p1, t)
+			Texture(textureData, context)
 		end
-		return v2
+		return vehicleModel
 	end,
-	Update = function(p1, p2)
-		local v1 = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, p2:GetExtentsSize().Magnitude * 0.6)
+	Update = function(model, extents)
+		local elapsedTime = os.clock() / 2
+		model.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, extents:GetExtentsSize().Magnitude * 0.6)
 	end,
-	IsValidForMake = function(p1)
-		local Make = VehicleUtils.GetLocalVehiclePacket().Make
-		if Make == "TinyToy" then
-			Make = "Camaro"
+	IsValidForMake = function(textureData)
+		local vehicleMake = VehicleUtils.GetLocalVehiclePacket().Make
+		if vehicleMake == "TinyToy" then
+			vehicleMake = "Camaro"
 		end
-		return TextureData[p1.Name] and TextureData[p1.Name][Make] or (SpecialTextureData[p1.Name] or p1.Name == "None")
+		return TextureData[textureData.Name] and TextureData[textureData.Name][vehicleMake] or (SpecialTextureData[textureData.Name] or textureData.Name == "None")
 	end
 }

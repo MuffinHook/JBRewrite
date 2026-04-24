@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local store = require(ReplicatedStorage.App.store)
 local OtherTradeServerItem = require(script.Parent.OtherTradeServerItem)
@@ -11,12 +12,12 @@ v1.defaultProps = {
 	verticalPaddingRatio = 96,
 	aspectRatio = 1.7777777777777777
 }
-function v1.render(p1) --[[ Line: 15 | Upvalues: createElement (copy), PaddedContainer (copy), Roact (copy), store (copy), paddedScrollingGrid (copy), OtherTradeServerItem (copy) ]]
+function v1.render(p1)
 	if p1.props.visible then
 		local t = {}
 		if p1.props.otherTradeServerInfo then
 			local v1 = table.clone(p1.props.otherTradeServerInfo)
-			table.sort(v1, function(p1, p2) --[[ Line: 28 ]]
+			table.sort(v1, function(p1, p2)
 				return #p1.userIds < #p2.userIds
 			end)
 			t.Header = createElement(PaddedContainer, {
@@ -64,7 +65,7 @@ function v1.render(p1) --[[ Line: 15 | Upvalues: createElement (copy), PaddedCon
 						LineHeight = 1,
 						TextScaled = true,
 						TextColor3 = Color3.fromHex("ffffff"),
-						[Roact.Event.Activated] = function() --[[ Line: 78 | Upvalues: store (ref) ]]
+						[Roact.Event.Activated] = function()
 							store:dispatch({
 								type = "setOtherTradeServerListVisible",
 								value = false

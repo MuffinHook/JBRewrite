@@ -1,4 +1,5 @@
-return function(p1, p2) --[[ Line: 2 ]]
+-- Reviewed by Claude
+return function(p1, p2)
 	local v1 = string.len(p1)
 	local v2 = string.len(p2)
 	local t = {}

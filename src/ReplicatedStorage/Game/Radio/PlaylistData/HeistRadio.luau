@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 return {
 	Title = "HeistRadio",
 	Songs = {

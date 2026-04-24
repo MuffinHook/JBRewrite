@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local TestEnum = require(script.Parent.TestEnum)
 local TestResults = require(script.Parent.TestResults)
 local Context = require(script.Parent.Context)
 local ExpectationContext = require(script.Parent.ExpectationContext)
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 24 | Upvalues: TestResults (copy), t (copy) ]]
+function t.new(p1)
 	local t2 = {
 		results = TestResults.new(p1),
 		nodeStack = {},
@@ -15,12 +16,12 @@ function t.new(p1) --[[ Line: 24 | Upvalues: TestResults (copy), t (copy) ]]
 	setmetatable(t2, t)
 	return t2
 end
-function t.calculateTotals(p1) --[[ Line: 42 | Upvalues: TestEnum (copy) ]]
+function t.calculateTotals(p1)
 	local results = p1.results
 	results.successCount = 0
 	results.failureCount = 0
 	results.skippedCount = 0
-	results:visitAllNodes(function(p1) --[[ Line: 49 | Upvalues: TestEnum (ref), results (copy) ]]
+	results:visitAllNodes(function(p1)
 		local status = p1.status
 		if p1.planNode.type == TestEnum.NodeType.It then
 			if status == TestEnum.TestStatus.Success then
@@ -33,10 +34,10 @@ function t.calculateTotals(p1) --[[ Line: 42 | Upvalues: TestEnum (copy) ]]
 		end
 	end)
 end
-function t.gatherErrors(p1) --[[ Line: 69 ]]
+function t.gatherErrors(p1)
 	local results = p1.results
 	results.errors = {}
-	results:visitAllNodes(function(p1) --[[ Line: 74 | Upvalues: results (copy) ]]
+	results:visitAllNodes(function(p1)
 		if #p1.errors > 0 then
 			for i, v in ipairs(p1.errors) do
 				table.insert(results.errors, v)
@@ -44,7 +45,7 @@ function t.gatherErrors(p1) --[[ Line: 69 ]]
 		end
 	end)
 end
-function t.finalize(p1) --[[ Line: 86 ]]
+function t.finalize(p1)
 	if #p1.nodeStack ~= 0 then
 		error("Cannot finalize TestResults with nodes still on the stack!", 2)
 	end
@@ -52,28 +53,28 @@ function t.finalize(p1) --[[ Line: 86 ]]
 	p1:gatherErrors()
 	return p1.results
 end
-function t.pushNode(p1, p2) --[[ Line: 100 | Upvalues: TestResults (copy), Context (copy), ExpectationContext (copy) ]]
+function t.pushNode(p1, p2)
 	local v1 = TestResults.createNode(p2)
 	table.insert((p1.nodeStack[#p1.nodeStack] or p1.results).children, v1)
 	table.insert(p1.nodeStack, v1)
 	table.insert(p1.contextStack, (Context.new(p1.contextStack[#p1.contextStack])))
 	table.insert(p1.expectationContextStack, (ExpectationContext.new(p1.expectationContextStack[#p1.expectationContextStack])))
 end
-function t.popNode(p1) --[[ Line: 118 ]]
+function t.popNode(p1)
 	assert(#p1.nodeStack > 0, "Tried to pop from an empty node stack!")
 	table.remove(p1.nodeStack, #p1.nodeStack)
 	table.remove(p1.contextStack, #p1.contextStack)
 	table.remove(p1.expectationContextStack, #p1.expectationContextStack)
 end
-function t.getContext(p1) --[[ Line: 128 ]]
+function t.getContext(p1)
 	assert(#p1.contextStack > 0, "Tried to get context from an empty stack!")
 	return p1.contextStack[#p1.contextStack]
 end
-function t.getExpectationContext(p1) --[[ Line: 134 ]]
+function t.getExpectationContext(p1)
 	assert(#p1.expectationContextStack > 0, "Tried to get expectationContext from an empty stack!")
 	return p1.expectationContextStack[#p1.expectationContextStack]
 end
-function t.shouldSkip(p1) --[[ Line: 142 | Upvalues: TestEnum (copy) ]]
+function t.shouldSkip(p1)
 	if p1.hasFocusNodes then
 		for i = #p1.nodeStack, 1, -1 do
 			local v1 = p1.nodeStack[i]
@@ -93,21 +94,21 @@ function t.shouldSkip(p1) --[[ Line: 142 | Upvalues: TestEnum (copy) ]]
 	end
 	return false
 end
-function t.setSuccess(p1) --[[ Line: 176 | Upvalues: TestEnum (copy) ]]
+function t.setSuccess(p1)
 	assert(#p1.nodeStack > 0, "Attempting to set success status on empty stack")
 	p1.nodeStack[#p1.nodeStack].status = TestEnum.TestStatus.Success
 end
-function t.setSkipped(p1) --[[ Line: 184 | Upvalues: TestEnum (copy) ]]
+function t.setSkipped(p1)
 	assert(#p1.nodeStack > 0, "Attempting to set skipped status on empty stack")
 	p1.nodeStack[#p1.nodeStack].status = TestEnum.TestStatus.Skipped
 end
-function t.setError(p1, p2) --[[ Line: 193 | Upvalues: TestEnum (copy) ]]
+function t.setError(p1, p2)
 	assert(#p1.nodeStack > 0, "Attempting to set error status on empty stack")
 	local v2 = p1.nodeStack[#p1.nodeStack]
 	v2.status = TestEnum.TestStatus.Failure
 	table.insert(v2.errors, p2)
 end
-function t.addDummyError(p1, p2, p3) --[[ Line: 205 | Upvalues: TestEnum (copy) ]]
+function t.addDummyError(p1, p2, p3)
 	p1:pushNode({
 		type = TestEnum.NodeType.It,
 		phrase = p2
@@ -116,7 +117,7 @@ function t.addDummyError(p1, p2, p3) --[[ Line: 205 | Upvalues: TestEnum (copy) 
 	p1:popNode()
 	p1.nodeStack[#p1.nodeStack].status = TestEnum.TestStatus.Failure
 end
-function t.setStatusFromChildren(p1) --[[ Line: 217 | Upvalues: TestEnum (copy) ]]
+function t.setStatusFromChildren(p1)
 	assert(#p1.nodeStack > 0, "Attempting to set status from children on empty stack")
 	local v2 = p1.nodeStack[#p1.nodeStack]
 	local Success = TestEnum.TestStatus.Success

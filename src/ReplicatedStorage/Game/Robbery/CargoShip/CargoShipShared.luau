@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BezierPath = require(ReplicatedStorage.Game.BezierPath)
 return {
 	Speed = 50,
-	GetPath = function() --[[ Name: GetPath | Line: 6 | Upvalues: BezierPath (copy) ]]
+	GetPath = function()
 		local PathCargoShip = workspace:WaitForChild("PathCargoShip")
 		local t = {}
 		local v1 = nil

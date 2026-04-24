@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
@@ -11,12 +12,12 @@ v1.defaultProps = {
 	cornerPixel = 8,
 	selected = false
 }
-function v1.init(p1) --[[ Line: 15 ]]
+function v1.init(p1)
 	p1:setState({
 		hover = false
 	})
 end
-function v1.render(p1) --[[ Line: 20 | Upvalues: PlayerDataConsts (copy), ColorUtils (copy), createElement (copy), Roact (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	local v1 = if p1.props.itemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then Color3.fromRGB(122, 212, 255) elseif p1.props.itemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then Color3.fromRGB(255, 90, 82) elseif p1.props.itemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then Color3.fromRGB(255, 213, 122) elseif p1.props.itemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then Color3.fromRGB(167, 131, 255) elseif p1.props.itemType == PlayerDataConsts.SAFE_ITEM_TYPE then Color3.fromRGB(255, 126, 191) else Color3.new(204/255, 204/255, 204/255)
 	if not p1.props.selected and p1.state.hover then
 		v1 = ColorUtils.brightenBy(v1, -0.2)
@@ -30,22 +31,22 @@ function v1.render(p1) --[[ Line: 20 | Upvalues: PlayerDataConsts (copy), ColorU
 		Position = p1.props.position,
 		BackgroundColor3 = v1,
 		Text = "",
-		[Roact.Event.MouseEnter] = function() --[[ Line: 55 | Upvalues: p1 (copy) ]]
+		[Roact.Event.MouseEnter] = function()
 			p1:setState({
 				hover = true
 			})
 		end,
-		[Roact.Event.MouseLeave] = function() --[[ Line: 60 | Upvalues: p1 (copy) ]]
+		[Roact.Event.MouseLeave] = function()
 			p1:setState({
 				hover = false
 			})
 		end,
-		[Roact.Event.SelectionGained] = function() --[[ Line: 65 | Upvalues: p1 (copy) ]]
+		[Roact.Event.SelectionGained] = function()
 			p1:setState({
 				hover = true
 			})
 		end,
-		[Roact.Event.SelectionLost] = function() --[[ Line: 70 | Upvalues: p1 (copy) ]]
+		[Roact.Event.SelectionLost] = function()
 			p1:setState({
 				hover = false
 			})

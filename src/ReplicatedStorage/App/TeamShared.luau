@@ -5,7 +5,7 @@ local Promise = require(ReplicatedStorage.Std.Promise)
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
 local PrivateServerUtils = require(ReplicatedStorage.PrivateServer.PrivateServerUtils)
 local Settings = require(ReplicatedStorage.Resource.Settings)
-local t = {
+local module = {
 	promiseIsTeamSwitchingEnabled = function()
 		if RunUtils.isMainWorld() then
 			return PrivateServerUtils.promiseGetIsBattleServer():andThen(function(p1)
@@ -16,11 +16,11 @@ local t = {
 		end
 	end
 }
-function t.isTeamSwitchingEnabled()
-	local v1, v2 = t.promiseIsTeamSwitchingEnabled():await()
+function module.isTeamSwitchingEnabled()
+	local v1, v2 = module.promiseIsTeamSwitchingEnabled():await()
 	return v1 and v2
 end
-function t.isTeamFull(p1)
+function module.isTeamFull(p1)
 	local v1 = Players:GetPlayers()
 	local count = 0
 	local count_2 = 0
@@ -46,4 +46,4 @@ function t.isTeamFull(p1)
 		end
 	end
 end
-return t
+return module

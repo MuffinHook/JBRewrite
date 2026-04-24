@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local v1 = nil
 local v2 = false
-local function Check() --[[ Line: 6 | Upvalues: ReplicatedStorage (copy), v2 (ref), v1 (ref) ]]
+local function Check()
 	local April2020LiveEvent = ReplicatedStorage.Resource:FindFirstChild("April2020LiveEvent")
 	if April2020LiveEvent ~= nil then
 		v2 = true
@@ -12,7 +13,7 @@ local function Check() --[[ Line: 6 | Upvalues: ReplicatedStorage (copy), v2 (re
 		print("Loaded april 2020 live event")
 	end
 end
-local function Launch() --[[ Line: 18 | Upvalues: v2 (ref), Check (copy) ]]
+local function Launch()
 	while v2 == false do
 		local v1, v22 = pcall(Check)
 		if not v1 then
@@ -22,7 +23,7 @@ local function Launch() --[[ Line: 18 | Upvalues: v2 (ref), Check (copy) ]]
 	end
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 27 | Upvalues: v1 (ref), Launch (copy) ]]
+	Init = function(p1)
 		v1 = p1
 		spawn(Launch)
 	end

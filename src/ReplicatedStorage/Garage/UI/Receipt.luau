@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local String = require(ReplicatedStorage.Std.String)
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
@@ -9,8 +10,8 @@ local v1 = Roact.PureComponent:extend("Receipt")
 v1.defaultProps = {
 	showTotal = true
 }
-function v1.init(p1) --[[ Line: 14 ]] end
-function v1.render(p1) --[[ Line: 15 | Upvalues: createElement (copy), ReceiptItem (copy), Dictionary (copy), String (copy) ]]
+function v1.init(p1)  end
+function v1.render(p1)
 	local mainRatio = p1.props.mainRatio
 	local cornerPixel = p1.props.cornerPixel
 	local paddingRatio = p1.props.paddingRatio
@@ -33,7 +34,7 @@ function v1.render(p1) --[[ Line: 15 | Upvalues: createElement (copy), ReceiptIt
 				mainRatio = 1 / (1 / (v2 * 6) - 1 / v1 + 1 / v1 / 6),
 				paddingRatio = paddingRatio,
 				cornerPixel = cornerPixel,
-				onRequestRemove = function() --[[ Name: onRequestRemove | Line: 54 | Upvalues: p1 (copy), v4 (copy) ]]
+				onRequestRemove = function()
 					p1.props.onRequestRemove(v4)
 				end
 			}, v4))))
@@ -147,9 +148,9 @@ function v1.render(p1) --[[ Line: 15 | Upvalues: createElement (copy), ReceiptIt
 	t3.Bottom = createElement("Frame", t4, t5)
 	return createElement("Frame", t2, t3)
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 177 ]] end, function(p1) --[[ Line: 177 ]]
+return RoactRodux.connect(function(p1, p2)  end, function(p1)
 	return {
-		onRequestRemove = function(p12) --[[ Name: onRequestRemove | Line: 179 | Upvalues: p1 (copy) ]]
+		onRequestRemove = function(p12)
 			p1({
 				type = "removeReceiptItem",
 				name = p12.name,

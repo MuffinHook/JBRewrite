@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local t = {}
-function t.addAbsoluteProbsToRewardDataFromRarityProbs(p1, p2) --[[ Line: 5 | Upvalues: t (copy) ]]
+function t.addAbsoluteProbsToRewardDataFromRarityProbs(p1, p2)
 	t.validateRewardData(p1, p2)
 	local t2 = {}
 	for v1, v2 in p1 do
@@ -19,7 +20,7 @@ function t.addAbsoluteProbsToRewardDataFromRarityProbs(p1, p2) --[[ Line: 5 | Up
 		v6.AbsoluteProbability = t3[v6.RarityId]
 	end
 end
-function t.validateRewardData(p1, p2) --[[ Line: 28 ]]
+function t.validateRewardData(p1, p2)
 	local t = {}
 	for v1, v2 in p1 do
 		if not t[v2.RarityId] then

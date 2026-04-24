@@ -1,13 +1,14 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SolveIK = require(ReplicatedStorage.Module.Logic).SolveIK
 CFrame.new()
 local v1 = CFrame.new(-0.1, -0.2, -0.05)
 local v2 = CFrame.new(0.1, -0.2, -0.05)
 local v3 = CFrame.Angles(1.5707963267948966, 0, 0)
-local function isNanV3(p1) --[[ Line: 10 ]]
+local function isNanV3(p1)
 	return if p1.x == p1.x and p1.y == p1.y then p1.z ~= p1.z else true
 end
-local function isNanCf(p1) --[[ Line: 13 ]]
+local function isNanCf(p1)
 	local lookVector = p1.lookVector
 	local v1 = if lookVector.x == lookVector.x and lookVector.y == lookVector.y then lookVector.z ~= lookVector.z else true
 	if not v1 then
@@ -20,7 +21,7 @@ local function isNanCf(p1) --[[ Line: 13 ]]
 	end
 	return v1
 end
-local function ComputeRawArm(p1, p2, p3, p4, p5, p6) --[[ Line: 16 | Upvalues: SolveIK (copy), v3 (copy) ]]
+local function ComputeRawArm(p1, p2, p3, p4, p5, p6)
 	local Part0 = p1.Part0
 	local v1 = Part0.CFrame * p1.C0 * p1.C1:inverse()
 	local v2 = v1 * p2.C0 * p2.C1:inverse()
@@ -61,7 +62,7 @@ local function ComputeRawArm(p1, p2, p3, p4, p5, p6) --[[ Line: 16 | Upvalues: S
 		end
 	end
 end
-local function BuildPacketArms(p1) --[[ Line: 49 ]]
+local function BuildPacketArms(p1)
 	return {
 		RightShoulder = p1.RightUpperArm.RightShoulder,
 		RightElbow = p1.RightLowerArm.RightElbow,
@@ -71,7 +72,7 @@ local function BuildPacketArms(p1) --[[ Line: 49 ]]
 		LeftWrist = p1.LeftHand.LeftWrist
 	}
 end
-local function ComputeArms(p1) --[[ Line: 61 | Upvalues: ComputeRawArm (copy), v1 (copy), v2 (copy) ]]
+local function ComputeArms(p1)
 	local RightArm = p1.RightArm
 	if RightArm then
 		local v12, v22 = ComputeRawArm(p1.RightShoulder, p1.RightElbow, p1.RightWrist, RightArm, p1.RightAngle, v1)
@@ -99,7 +100,7 @@ local function ComputeArms(p1) --[[ Line: 61 | Upvalues: ComputeRawArm (copy), v
 		p1.LeftElbowTransform = nil
 	end
 end
-local function ApplyArms(p1) --[[ Line: 104 ]]
+local function ApplyArms(p1)
 	if p1.RightShoulderTransform then
 		p1.RightShoulder.Transform = p1.RightShoulderTransform
 		p1.RightElbow.Transform = p1.RightElbowTransform
@@ -111,7 +112,7 @@ local function ApplyArms(p1) --[[ Line: 104 ]]
 end
 return {
 	BuildPacketArms = BuildPacketArms,
-	Arms = function(p1) --[[ Name: ArmsFull | Line: 116 | Upvalues: ComputeArms (copy) ]]
+	Arms = function(p1)
 		ComputeArms(p1)
 		if p1.RightShoulderTransform then
 			p1.RightShoulder.Transform = p1.RightShoulderTransform

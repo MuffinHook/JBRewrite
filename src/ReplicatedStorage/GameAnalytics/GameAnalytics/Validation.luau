@@ -1,17 +1,18 @@
+-- Reviewed by Claude
 local t = {}
 local Logger = require(script.Parent.Logger)
 local Utilities = require(script.Parent.Utilities)
-function t.validateCustomDimensions(p1, p2) --[[ Line: 6 | Upvalues: t (copy) ]]
+function t.validateCustomDimensions(p1, p2)
 	return t:validateArrayOfStrings(20, 32, false, "custom dimensions", p2)
 end
-function t.validateDimension(p1, p2, p3) --[[ Line: 10 | Upvalues: Utilities (copy) ]]
+function t.validateDimension(p1, p2, p3)
 	if Utilities:isStringNullOrEmpty(p3) then
 		return true
 	else
 		return Utilities:stringArrayContainsString(p2, p3) and true or false
 	end
 end
-function t.validateResourceCurrencies(p1, p2) --[[ Line: 23 | Upvalues: t (copy), Logger (copy) ]]
+function t.validateResourceCurrencies(p1, p2)
 	if t:validateArrayOfStrings(20, 64, false, "resource currencies", p2) then
 		for k, v in pairs(p2) do
 			if not string.find(v, "^[A-Za-z]+$") then
@@ -24,7 +25,7 @@ function t.validateResourceCurrencies(p1, p2) --[[ Line: 23 | Upvalues: t (copy)
 		return false
 	end
 end
-function t.validateResourceItemTypes(p1, p2) --[[ Line: 39 | Upvalues: t (copy), Logger (copy) ]]
+function t.validateResourceItemTypes(p1, p2)
 	if t:validateArrayOfStrings(20, 32, false, "resource item types", p2) then
 		for k, v in pairs(p2) do
 			if not t:validateEventPartCharacters(v) then
@@ -37,10 +38,10 @@ function t.validateResourceItemTypes(p1, p2) --[[ Line: 39 | Upvalues: t (copy),
 		return false
 	end
 end
-function t.validateEventPartCharacters(p1, p2) --[[ Line: 55 ]]
+function t.validateEventPartCharacters(p1, p2)
 	return string.find(p2, "^[A-Za-z0-9%s%-_%.%(%)!%?]+$") and true or false
 end
-function t.validateArrayOfStrings(p1, p2, p3, p4, p5, p6) --[[ Line: 63 | Upvalues: Logger (copy) ]]
+function t.validateArrayOfStrings(p1, p2, p3, p4, p5, p6)
 	local v1 = p5 or "Array"
 	if p6 then
 		if p4 or #p6 ~= 0 then
@@ -71,20 +72,20 @@ function t.validateArrayOfStrings(p1, p2, p3, p4, p5, p6) --[[ Line: 63 | Upvalu
 		return false
 	end
 end
-function t.validateBuild(p1, p2) --[[ Line: 111 | Upvalues: t (copy) ]]
+function t.validateBuild(p1, p2)
 	return t:validateShortString(p2, false) and true or false
 end
-function t.validateShortString(p1, p2, p3) --[[ Line: 119 | Upvalues: Utilities (copy) ]]
+function t.validateShortString(p1, p2, p3)
 	if p3 and Utilities:isStringNullOrEmpty(p2) then
 		return true
 	else
 		return not (Utilities:isStringNullOrEmpty(p2) or #p2 > 32)
 	end
 end
-function t.validateKeys(p1, p2, p3) --[[ Line: 132 ]]
+function t.validateKeys(p1, p2, p3)
 	return string.find(p2, "^[A-Za-z0-9]+$") and (#p2 == 32 and (string.find(p3, "^[A-Za-z0-9]+$") and #p3 == 40)) and true or false
 end
-function t.validateAndCleanInitRequestResponse(p1, p2, p3) --[[ Line: 142 | Upvalues: Logger (copy) ]]
+function t.validateAndCleanInitRequestResponse(p1, p2, p3)
 	if p2 then
 		local t = {}
 		local v1 = p2.server_ts or -1
@@ -102,17 +103,17 @@ function t.validateAndCleanInitRequestResponse(p1, p2, p3) --[[ Line: 142 | Upva
 		return nil
 	end
 end
-function t.validateClientTs(p1, p2) --[[ Line: 166 ]]
+function t.validateClientTs(p1, p2)
 	return not (p2 < 1000000000 or p2 > 9999999999)
 end
-function t.validateCurrency(p1, p2) --[[ Line: 174 | Upvalues: Utilities (copy) ]]
+function t.validateCurrency(p1, p2)
 	if Utilities:isStringNullOrEmpty(p2) then
 		return false
 	else
 		return string.find(p2, "^[A-Z]+$") and #p2 == 3 and true or false
 	end
 end
-function t.validateEventPartLength(p1, p2, p3) --[[ Line: 186 | Upvalues: Utilities (copy) ]]
+function t.validateEventPartLength(p1, p2, p3)
 	if p3 and Utilities:isStringNullOrEmpty(p2) then
 		return true
 	elseif Utilities:isStringNullOrEmpty(p2) then
@@ -121,7 +122,7 @@ function t.validateEventPartLength(p1, p2, p3) --[[ Line: 186 | Upvalues: Utilit
 		return #p2 ~= 0 and not (#p2 > 64) and true or false
 	end
 end
-function t.validateBusinessEvent(p1, p2, p3, p4, p5, p6) --[[ Line: 201 | Upvalues: t (copy), Logger (copy) ]]
+function t.validateBusinessEvent(p1, p2, p3, p4, p5, p6)
 	if t:validateCurrency(p2) then
 		if p3 < 0 then
 			Logger:w("Validation fail - business event - amount: Cannot be less then 0. Failed amount: " .. p3)
@@ -157,7 +158,7 @@ function t.validateBusinessEvent(p1, p2, p3, p4, p5, p6) --[[ Line: 201 | Upvalu
 		return false
 	end
 end
-function t.validateResourceEvent(p1, p2, p3, p4, p5, p6, p7, p8, p9) --[[ Line: 245 | Upvalues: Logger (copy), Utilities (copy), t (copy) ]]
+function t.validateResourceEvent(p1, p2, p3, p4, p5, p6, p7, p8, p9)
 	if p3 == p2.Source or p3 == p2.Sink then
 		if Utilities:isStringNullOrEmpty(p4) then
 			Logger:w("Validation fail - resource event - currency: Cannot be (null)")
@@ -206,7 +207,7 @@ function t.validateResourceEvent(p1, p2, p3, p4, p5, p6, p7, p8, p9) --[[ Line: 
 		return false
 	end
 end
-function t.validateProgressionEvent(p1, p2, p3, p4, p5, p6) --[[ Line: 299 | Upvalues: Logger (copy), Utilities (copy), t (copy) ]]
+function t.validateProgressionEvent(p1, p2, p3, p4, p5, p6)
 	if p3 == p2.Start or (p3 == p2.Complete or p3 == p2.Fail) then
 		if Utilities:isStringNullOrEmpty(p6) or (not Utilities:isStringNullOrEmpty(p5) or Utilities:isStringNullOrEmpty(p4)) then
 			if Utilities:isStringNullOrEmpty(p5) or not Utilities:isStringNullOrEmpty(p4) then
@@ -273,7 +274,7 @@ function t.validateProgressionEvent(p1, p2, p3, p4, p5, p6) --[[ Line: 299 | Upv
 		return false
 	end
 end
-function t.validateEventIdLength(p1, p2) --[[ Line: 357 | Upvalues: Utilities (copy) ]]
+function t.validateEventIdLength(p1, p2)
 	if not Utilities:isStringNullOrEmpty(p2) then
 		local count = 0
 		for v1 in string.gmatch(p2, "([^:]+)") do
@@ -283,7 +284,7 @@ function t.validateEventIdLength(p1, p2) --[[ Line: 357 | Upvalues: Utilities (c
 	end
 	return false
 end
-function t.validateEventIdCharacters(p1, p2) --[[ Line: 373 | Upvalues: Utilities (copy) ]]
+function t.validateEventIdCharacters(p1, p2)
 	if not Utilities:isStringNullOrEmpty(p2) then
 		local count = 0
 		for v1 in string.gmatch(p2, "([^:]+)") do
@@ -294,7 +295,7 @@ function t.validateEventIdCharacters(p1, p2) --[[ Line: 373 | Upvalues: Utilitie
 	end
 	return false
 end
-function t.validateDesignEvent(p1, p2) --[[ Line: 389 | Upvalues: t (copy), Logger (copy) ]]
+function t.validateDesignEvent(p1, p2)
 	if t:validateEventIdLength(p2) then
 		if t:validateEventIdCharacters(p2) then
 			return true
@@ -307,14 +308,14 @@ function t.validateDesignEvent(p1, p2) --[[ Line: 389 | Upvalues: t (copy), Logg
 		return false
 	end
 end
-function t.validateLongString(p1, p2, p3) --[[ Line: 404 | Upvalues: Utilities (copy) ]]
+function t.validateLongString(p1, p2, p3)
 	if p3 and Utilities:isStringNullOrEmpty(p2) then
 		return true
 	else
 		return not (Utilities:isStringNullOrEmpty(p2) or #p2 > 8192)
 	end
 end
-function t.validateErrorEvent(p1, p2, p3, p4) --[[ Line: 417 | Upvalues: Logger (copy), t (copy) ]]
+function t.validateErrorEvent(p1, p2, p3, p4)
 	if p3 == p2.debug or (p3 == p2.info or (p3 == p2.warning or (p3 == p2.error or p3 == p2.critical))) then
 		if t:validateLongString(p4, true) then
 			return true

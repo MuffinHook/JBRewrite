@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -11,7 +12,7 @@ local AdoptionStandConsts = require(script.Parent.AdoptionStandConsts)
 local t = {}
 t.__index = t
 t.__ClassName = "AdoptionStand"
-function t.new(p1) --[[ Line: 18 | Upvalues: t (copy), Maid (copy), AdoptionStandConsts (copy), Interval (copy), PlayerUtils (copy), LocalPlayer (copy), AdoptionStandUI (copy), AdoptionSystem (copy), DogConsts (copy), CircleAction (copy) ]]
+function t.new(p1)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
@@ -21,20 +22,20 @@ function t.new(p1) --[[ Line: 18 | Upvalues: t (copy), Maid (copy), AdoptionStan
 		Part = p1,
 		Timed = false,
 		Dist = 8,
-		Callback = function(p12, p2) --[[ Name: action | Line: 26 | Upvalues: t2 (copy), Interval (ref), PlayerUtils (ref), LocalPlayer (ref), p1 (copy), AdoptionStandUI (ref), AdoptionSystem (ref), DogConsts (ref) ]]
+		Callback = function(p12, p2)
 			if p2 then
 				local v1 = t2:GetBreedId()
-				t2._maid.walkAwayLoop = Interval.every(1):Connect(function() --[[ Line: 29 | Upvalues: PlayerUtils (ref), LocalPlayer (ref), p1 (ref), AdoptionStandUI (ref) ]]
+				t2._maid.walkAwayLoop = Interval.every(1):Connect(function()
 					local v1 = PlayerUtils.getRootPart(LocalPlayer)
 					if v1 and ((v1.Position - p1.Position).Magnitude > 16 and AdoptionStandUI.isOpen()) then
 						AdoptionStandUI.close()
 					end
 				end)
-				t2._maid.onClickAdopt = AdoptionStandUI.getOnClickAdoptSignal():Connect(function() --[[ Line: 40 | Upvalues: AdoptionStandUI (ref), t2 (ref) ]]
+				t2._maid.onClickAdopt = AdoptionStandUI.getOnClickAdoptSignal():Connect(function()
 					t2._adoptRemote:FireServer((AdoptionStandUI.getName()))
 					AdoptionStandUI.close()
 				end)
-				t2._maid.onClosed = AdoptionStandUI.getOnClosedSignal():Connect(function() --[[ Line: 45 | Upvalues: t2 (ref) ]]
+				t2._maid.onClosed = AdoptionStandUI.getOnClosedSignal():Connect(function()
 					t2._maid.walkAwayLoop = nil
 					t2._maid.onClosed = nil
 					t2._maid.onClickAdopt = nil
@@ -51,26 +52,26 @@ function t.new(p1) --[[ Line: 18 | Upvalues: t (copy), Maid (copy), AdoptionStan
 				return true
 			end
 		end,
-		PreUpdateFun = function(p1) --[[ Name: preUpdateFun | Line: 65 | Upvalues: AdoptionStandUI (ref) ]]
+		PreUpdateFun = function(p1)
 			p1.Enabled = not AdoptionStandUI.isOpen()
 		end,
 		PreUpdatePeriod = 0.5
 	}
 	CircleAction.Add(t3, p1)
-	t2._maid:GiveTask(function() --[[ Line: 77 | Upvalues: CircleAction (ref), p1 (copy) ]]
+	t2._maid:GiveTask(function()
 		CircleAction.Remove(p1)
 	end)
-	local function updateSpec() --[[ Line: 81 | Upvalues: t2 (copy), t3 (copy), DogConsts (ref) ]]
+	local function updateSpec()
 		t3.Name = ("Adopt %s"):format(DogConsts.TITLE[t2:GetBreedId()])
 	end
 	t2._maid:GiveTask(t2._breedIdValue.Changed:Connect(updateSpec))
 	t3.Name = ("Adopt %s"):format(DogConsts.TITLE[t2:GetBreedId()])
 	return t2
 end
-function t.GetBreedId(p1) --[[ Line: 90 ]]
+function t.GetBreedId(p1)
 	return p1._breedIdValue.Value
 end
-function t.Destroy(p1) --[[ Line: 93 ]]
+function t.Destroy(p1)
 	local _maid = p1._maid
 	assert(_maid ~= nil)
 	p1._maid = nil

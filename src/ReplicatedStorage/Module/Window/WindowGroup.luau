@@ -1,13 +1,14 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local t = {}
 t.__index = t
-function t.new() --[[ Line: 6 | Upvalues: t (copy), Maid (copy) ]]
+function t.new()
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
 	t2._listWindow = {}
-	t2._maid:GiveTask(function() --[[ Line: 12 | Upvalues: t2 (copy) ]]
+	t2._maid:GiveTask(function()
 		for i, v in ipairs(t2._listWindow) do
 			v:Destroy()
 		end
@@ -15,7 +16,7 @@ function t.new() --[[ Line: 6 | Upvalues: t (copy), Maid (copy) ]]
 	end)
 	return t2
 end
-function t.Add(p1, p2) --[[ Line: 21 ]]
+function t.Add(p1, p2)
 	assert(p2.__ClassName == "Window")
 	for i, v in ipairs(p1._listWindow) do
 		if p2 == v then
@@ -23,7 +24,7 @@ function t.Add(p1, p2) --[[ Line: 21 ]]
 		end
 	end
 	table.insert(p1._listWindow, p2)
-	function p2._beforeOpenFun() --[[ Line: 31 | Upvalues: p1 (copy), p2 (copy) ]]
+	function p2._beforeOpenFun()
 		for i, v in ipairs(p1._listWindow) do
 			if v ~= p2 and v:IsOpen() then
 				v:Close()
@@ -31,7 +32,7 @@ function t.Add(p1, p2) --[[ Line: 21 ]]
 		end
 	end
 end
-function t.Destroy(p1) --[[ Line: 39 ]]
+function t.Destroy(p1)
 	assert(p1._maid)
 	local _maid_2 = p1._maid
 	p1._maid = nil

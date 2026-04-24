@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VehicleConf = require(ReplicatedStorage.Game.Garage.VehicleConf)
 local VehicleData = require(ReplicatedStorage.Game.Garage.VehicleData)
@@ -11,14 +12,14 @@ local t = {
 	onSaleRefresh = Signal.new()
 }
 local v1 = SaleUtils.getNextSaleTime()
-Interval.every(1):Connect(function() --[[ Line: 17 | Upvalues: SaleUtils (copy), v1 (ref), t (copy) ]]
+Interval.every(1):Connect(function()
 	local v12 = SaleUtils.getNextSaleTime()
 	if v1 + 0.01 < v12 then
 		v1 = v12
 		t.onSaleRefresh:Fire()
 	end
 end)
-local function canVehicleCustomizationGoOnSale(p1) --[[ Line: 26 | Upvalues: GarageUtils (copy) ]]
+local function canVehicleCustomizationGoOnSale(p1)
 	local v1 = not GarageUtils.isVehicleCustomizationLimited(p1)
 	if v1 then
 		v1 = not p1.None
@@ -31,7 +32,7 @@ local function canVehicleCustomizationGoOnSale(p1) --[[ Line: 26 | Upvalues: Gar
 	end
 	return v1
 end
-local function canVehicleGoOnSale(p1) --[[ Line: 32 | Upvalues: GarageUtils (copy) ]]
+local function canVehicleGoOnSale(p1)
 	local v1 = not GarageUtils.isVehicleLimited(p1)
 	if v1 then
 		v1 = not p1.None
@@ -44,19 +45,19 @@ local function canVehicleGoOnSale(p1) --[[ Line: 32 | Upvalues: GarageUtils (cop
 	end
 	return v1
 end
-local function applySeededSort(p1, p2) --[[ Line: 40 | Upvalues: SaleUtils (copy) ]]
-	table.sort(p1, function(p1, p22) --[[ Line: 42 | Upvalues: p2 (copy) ]]
+local function applySeededSort(p1, p2)
+	table.sort(p1, function(p1, p22)
 		return p1.Pointer[p2] < p22.Pointer[p2]
 	end)
 	local v2 = Random.new((SaleUtils.getNumSalesPassed()))
 	for v3, v4 in p1 do
 		v4.SortNumber = v2:NextNumber()
 	end
-	table.sort(p1, function(p1, p2) --[[ Line: 52 ]]
+	table.sort(p1, function(p1, p2)
 		return p1.SortNumber < p2.SortNumber
 	end)
 end
-local function _getOnSaleVehicleCustomizations() --[[ Line: 56 | Upvalues: VehicleConf (copy), SaleConsts (copy), OwnershipConsts (copy), ReplicatedStorage (copy), applySeededSort (copy), GarageUtils (copy) ]]
+local function _getOnSaleVehicleCustomizations()
 	local t = {}
 	local t2 = {}
 	for v1, v2 in VehicleConf.CATEGORIES do
@@ -105,7 +106,7 @@ local function _getOnSaleVehicleCustomizations() --[[ Line: 56 | Upvalues: Vehic
 	end
 	return t4, t5
 end
-local function _getOnSaleVehicles() --[[ Line: 113 | Upvalues: VehicleData (copy), applySeededSort (copy), GarageUtils (copy), SaleConsts (copy) ]]
+local function _getOnSaleVehicles()
 	local t = {}
 	for v1, v2 in VehicleData do
 		table.insert(t, {
@@ -137,22 +138,22 @@ local function _getOnSaleVehicles() --[[ Line: 113 | Upvalues: VehicleData (copy
 end
 t._cachedOnSaleVehicleCustomizations = nil
 t._cachedOnSaleVehicleCustomizationsMap = nil
-local function cacheOnSaleVehicleCustomizationsIfNeeded() --[[ Line: 139 | Upvalues: t (copy), _getOnSaleVehicleCustomizations (copy), SaleUtils (copy) ]]
+local function cacheOnSaleVehicleCustomizationsIfNeeded()
 	if t._cachedOnSaleVehicleCustomizations == nil then
 		local v3, v4 = _getOnSaleVehicleCustomizations()
 		t._cachedOnSaleVehicleCustomizations = v3
 		t._cachedOnSaleVehicleCustomizationsMap = v4
-		task.delay(math.min(60, SaleUtils.getTimeToNextSale() - 1), function() --[[ Line: 144 | Upvalues: t (ref) ]]
+		task.delay(math.min(60, SaleUtils.getTimeToNextSale() - 1), function()
 			t._cachedOnSaleVehicleCustomizations = nil
 			t._cachedOnSaleVehicleCustomizationsMap = nil
 		end)
 	end
 end
-function t.getOnSaleVehicleCustomizations() --[[ Line: 150 | Upvalues: cacheOnSaleVehicleCustomizationsIfNeeded (copy), t (copy) ]]
+function t.getOnSaleVehicleCustomizations()
 	cacheOnSaleVehicleCustomizationsIfNeeded()
 	return t._cachedOnSaleVehicleCustomizations
 end
-function t.isVehicleCustomizationOnSale(p1, p2) --[[ Line: 154 | Upvalues: cacheOnSaleVehicleCustomizationsIfNeeded (copy), t (copy) ]]
+function t.isVehicleCustomizationOnSale(p1, p2)
 	assert(p1 ~= nil, "categoryName must not be nil")
 	assert(p2 ~= nil, "itemName must not be nil")
 	cacheOnSaleVehicleCustomizationsIfNeeded()
@@ -160,22 +161,22 @@ function t.isVehicleCustomizationOnSale(p1, p2) --[[ Line: 154 | Upvalues: cache
 end
 t._cachedOnSaleVehicles = nil
 t._cachedOnSaleVehiclesMap = nil
-local function cacheOnSaleVehiclesIfNeeded() --[[ Line: 163 | Upvalues: t (copy), _getOnSaleVehicles (copy), SaleUtils (copy) ]]
+local function cacheOnSaleVehiclesIfNeeded()
 	if t._cachedOnSaleVehicles == nil then
 		local v3, v4 = _getOnSaleVehicles()
 		t._cachedOnSaleVehicles = v3
 		t._cachedOnSaleVehiclesMap = v4
-		task.delay(math.min(60, SaleUtils.getTimeToNextSale() - 1), function() --[[ Line: 167 | Upvalues: t (ref) ]]
+		task.delay(math.min(60, SaleUtils.getTimeToNextSale() - 1), function()
 			t._cachedOnSaleVehicles = nil
 			t._cachedOnSaleVehiclesMap = nil
 		end)
 	end
 end
-function t.getOnSaleVehicles() --[[ Line: 173 | Upvalues: cacheOnSaleVehiclesIfNeeded (copy), t (copy) ]]
+function t.getOnSaleVehicles()
 	cacheOnSaleVehiclesIfNeeded()
 	return t._cachedOnSaleVehicles
 end
-function t.isVehicleOnSale(p1) --[[ Line: 177 | Upvalues: cacheOnSaleVehiclesIfNeeded (copy), t (copy) ]]
+function t.isVehicleOnSale(p1)
 	assert(p1 ~= nil, "vehicleMake must not be nil")
 	cacheOnSaleVehiclesIfNeeded()
 	return t._cachedOnSaleVehiclesMap[p1] == true

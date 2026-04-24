@@ -1,25 +1,26 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local Roact = require(ReplicatedStorage.Roact)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local createElement = Roact.createElement
 local v1 = Roact.PureComponent:extend("PlacerButton")
-function v1.init(p1) --[[ Line: 8 ]]
+function v1.init(p1)
 	p1:setState({
 		hovered = false,
 		pressed = false
 	})
-	function p1.onMouseEnter() --[[ Line: 13 | Upvalues: p1 (copy) ]]
+	function p1.onMouseEnter()
 		p1:setState({
 			hovered = true
 		})
 	end
-	function p1.onMouseLeave() --[[ Line: 18 | Upvalues: p1 (copy) ]]
+	function p1.onMouseLeave()
 		p1:setState({
 			hovered = false
 		})
 	end
-	function p1.onMouseDown() --[[ Line: 23 | Upvalues: p1 (copy) ]]
+	function p1.onMouseDown()
 		p1:setState({
 			pressed = true
 		})
@@ -27,7 +28,7 @@ function v1.init(p1) --[[ Line: 8 ]]
 			p1.props.onMouseDown()
 		end
 	end
-	function p1.onMouseUp() --[[ Line: 31 | Upvalues: p1 (copy) ]]
+	function p1.onMouseUp()
 		p1:setState({
 			pressed = false
 		})
@@ -36,7 +37,7 @@ function v1.init(p1) --[[ Line: 8 ]]
 		end
 	end
 end
-function v1.render(p1) --[[ Line: 40 | Upvalues: ColorUtils (copy), createElement (copy), PaddedContainer (copy), Roact (copy) ]]
+function v1.render(p1)
 	local state = p1.state
 	local bgColor = p1.props.bgColor
 	if state.pressed then
@@ -119,7 +120,7 @@ function v1.render(p1) --[[ Line: 40 | Upvalues: ColorUtils (copy), createElemen
 		paddingRight = 0.5
 	}, t2)
 end
-local function buttons(p1) --[[ Line: 119 | Upvalues: createElement (copy), PaddedContainer (copy), v1 (copy) ]]
+local function buttons(p1)
 	local t2 = {
 		Left = createElement(v1, {
 			exposePaddedContainerProps = true,
@@ -170,8 +171,8 @@ local function buttons(p1) --[[ Line: 119 | Upvalues: createElement (copy), Padd
 	}, t2)
 end
 local v2 = Roact.PureComponent:extend("PlacerApp")
-function v2.init(p1) --[[ Line: 171 ]] end
-function v2.render(p1) --[[ Line: 172 | Upvalues: createElement (copy), PaddedContainer (copy), buttons (copy) ]]
+function v2.init(p1) end
+function v2.render(p1)
 	return createElement(PaddedContainer, {
 		backgroundTransparency = 0.8,
 		backgroundColor = Color3.new(0/255, 0/255, 0/255),

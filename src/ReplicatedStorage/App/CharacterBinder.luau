@@ -2,9 +2,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
-local t = {}
-t.__index = t
-function t.new(p1, p2)
+local localTable = {}
+localTable.__index = localTable
+function localTable.new(p1, p2)
 	local v1 = BaseObject.new(p1)
 	v1.manifest = p2
 	return v1
@@ -29,4 +29,4 @@ return ManifestBinder.new("Character", {
 	LeftElbow = "LeftLowerArm/LeftElbow",
 	LeftHand = "LeftHand",
 	LeftWrist = "LeftHand/LeftWrist"
-}, t)
+}, localTable)

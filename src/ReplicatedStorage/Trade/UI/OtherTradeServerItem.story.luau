@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local OtherTradeServerUIData = require(ReplicatedStorage.Trade.Test.OtherTradeServerUIData)
-return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), OtherTradeServerUIData (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local OtherTradeServerItem = require(script.Parent.OtherTradeServerItem)
-	function v1.init(p1) --[[ Line: 8 ]] end
-	function v1.render(p1) --[[ Line: 9 | Upvalues: OtherTradeServerUIData (ref), Roact (ref), OtherTradeServerItem (copy) ]]
+	function v1.init(p1)  end
+	function v1.render(p1)
 		local v1 = OtherTradeServerUIData.otherTradeServerInfo[1]
 		v1.size = UDim2.fromScale(0.8, 0.1)
 		v1.verticalPaddingRatio = 128
@@ -16,9 +17,9 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), OtherTradeServerUIDat
 			})
 		})
 	end
-	function v1.willUnmount(p1) --[[ Line: 20 ]] end
+	function v1.willUnmount(p1)  end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 23 | Upvalues: Roact (ref), v2 (copy) ]]
+	return function()
 		Roact.unmount(v2)
 	end
 end

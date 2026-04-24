@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
@@ -6,7 +7,7 @@ local topBarButtonsComponent = require(script.Parent.topBarButtonsComponent)
 local SafeComponent = require(script.Parent.SafeComponent)
 local paddedScrollingGrid = require(script.Parent.paddedScrollingGrid)
 local v1 = Roact.PureComponent:extend("SafesInventory")
-function v1.render(p1) --[[ Line: 12 | Upvalues: createElement (copy), PaddedContainer (copy), topBarButtonsComponent (copy), paddedScrollingGrid (copy), SafeComponent (copy) ]]
+function v1.render(p1)
 	local v1 = Color3.new(51/255, 51/255, 51/255)
 	return createElement("Frame", {
 		BackgroundTransparency = 0.8,

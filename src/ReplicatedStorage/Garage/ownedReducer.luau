@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	setCategoryItemOwned = function(p1, p2) --[[ Name: setCategoryItemOwned | Line: 5 ]]
+	setCategoryItemOwned = function(p1, p2)
 		assert(p2.category ~= nil, "missing category")
 		assert(p2.name ~= nil, "missing name")
 		local t = {}
@@ -13,7 +14,7 @@ return require(ReplicatedStorage.Rodux).createReducer({}, {
 		t[p2.category][p2.name] = true
 		return t
 	end,
-	setOwnedRaw = function(p1, p2) --[[ Name: setOwnedRaw | Line: 19 ]]
+	setOwnedRaw = function(p1, p2)
 		assert(p2.owned ~= nil, "missing owned table")
 		return p2.owned
 	end

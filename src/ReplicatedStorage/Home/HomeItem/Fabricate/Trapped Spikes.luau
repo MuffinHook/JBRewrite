@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 game:GetService("ReplicatedStorage")
 local TrappedTrapUtils = require(script.Parent.TrappedTrapUtils)
 local v1 = nil
 return {
-	init = function(p1) --[[ Name: init | Line: 6 | Upvalues: v1 (ref) ]]
+	init = function(p1)
 		v1 = p1.Event
 	end,
-	setup = function(p1) --[[ Name: setup | Line: 9 | Upvalues: TrappedTrapUtils (copy), v1 (ref) ]]
+	setup = function(p1)
 		TrappedTrapUtils.setup(p1, {
 			doorName = "FakeDoor",
 			spikesName = "Spikes",

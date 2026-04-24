@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -14,7 +15,7 @@ local PersistentCrewBattleUtils = require(ReplicatedStorage.PersistentCrewBattle
 local Elapsed = require(ReplicatedStorage.PersistentCrewBattle.UI.Elapsed)
 local BattleCrewInfo = require(ReplicatedStorage.PersistentCrewBattle.UI.BattleCrewInfo)
 local Welcome = require(ReplicatedStorage.PersistentCrewBattle.UI.Welcome)
-local function playClick() --[[ Line: 20 | Upvalues: Players (copy), Audio (copy) ]]
+local function playClick()
 	if Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 			Volume = 0.2
@@ -27,7 +28,7 @@ v1.defaultProps = {
 	position = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5)
 }
-function v1.init(p1) --[[ Line: 32 | Upvalues: Maid (copy), Utils (copy), Players (copy), Audio (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	p1:setState({
 		showRequests = false,
@@ -35,12 +36,12 @@ function v1.init(p1) --[[ Line: 32 | Upvalues: Maid (copy), Utils (copy), Player
 		countdownVisible = false,
 		isSmallScreen = Utils.isSmallScreen()
 	})
-	p1.maid:GiveTask(Utils.getViewportSizeChangedSignal():Connect(function() --[[ Line: 41 | Upvalues: p1 (copy), Utils (ref) ]]
+	p1.maid:GiveTask(Utils.getViewportSizeChangedSignal():Connect(function()
 		p1:setState({
 			isSmallScreen = Utils.isSmallScreen()
 		})
 	end))
-	function p1.onClickCloseWelcome() --[[ Line: 46 | Upvalues: p1 (copy), Players (ref), Audio (ref) ]]
+	function p1.onClickCloseWelcome()
 		p1:setState({
 			welcomeVisible = false
 		})
@@ -50,7 +51,7 @@ function v1.init(p1) --[[ Line: 32 | Upvalues: Maid (copy), Utils (copy), Player
 			})
 		end
 	end
-	function p1.onCountdownElapsed(p12) --[[ Line: 52 | Upvalues: p1 (copy) ]]
+	function p1.onCountdownElapsed(p12)
 		if p12 < 0 then
 			p1:setState({
 				countdownVisible = false
@@ -59,7 +60,7 @@ function v1.init(p1) --[[ Line: 32 | Upvalues: Maid (copy), Utils (copy), Player
 		end
 	end
 end
-function v1.render(p1) --[[ Line: 61 | Upvalues: createElement (copy), Welcome (copy), Players (copy), Elapsed (copy), ColorUtils (copy), BattleCrewInfo (copy), Roact (copy) ]]
+function v1.render(p1)
 	local t = {}
 	if p1.state.welcomeVisible then
 		t.Welcome = createElement(Welcome, {
@@ -229,9 +230,9 @@ function v1.render(p1) --[[ Line: 61 | Upvalues: createElement (copy), Welcome (
 	end
 	return Roact.createFragment(t)
 end
-function v1.didMount(p1) --[[ Line: 270 | Upvalues: PersistentCrewBattleUtils (copy) ]]
+function v1.didMount(p1)
 	p1:_updateWelcomeVisible()
-	local function updateCountdown() --[[ Line: 273 | Upvalues: PersistentCrewBattleUtils (ref), p1 (copy) ]]
+	local function updateCountdown()
 		local v1 = PersistentCrewBattleUtils.getRoundStartsAt()
 		if v1 and workspace:GetServerTimeNow() < v1 then
 			p1:setState({
@@ -243,22 +244,22 @@ function v1.didMount(p1) --[[ Line: 270 | Upvalues: PersistentCrewBattleUtils (c
 	p1.maid:GiveTask(PersistentCrewBattleUtils.getRoundStartsAtAttributeChangedSignal():Connect(updateCountdown))
 	updateCountdown()
 end
-function v1._updateWelcomeVisible(p1) --[[ Line: 285 ]]
+function v1._updateWelcomeVisible(p1)
 	if p1.props.isBattleServer then
 		p1:setState({
 			welcomeVisible = true
 		})
 	end
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 292 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p1.props.isBattleServer ~= p2.isBattleServer then
 		p1:_updateWelcomeVisible()
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 297 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 300 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		timeTook = p1.timeTook,
 		startedAt = p1.startedAt,
@@ -270,9 +271,9 @@ return RoactRodux.connect(function(p1, p2) --[[ Line: 300 ]]
 		battleResponseData = p1.battleResponseData,
 		penalty = p1.penalty
 	}
-end, function(p1) --[[ Line: 313 | Upvalues: Players (copy), Audio (copy) ]]
+end, function(p1)
 	return {
-		onClickClose = function() --[[ Name: onClickClose | Line: 315 | Upvalues: p1 (copy), Players (ref), Audio (ref) ]]
+		onClickClose = function()
 			p1({
 				type = "setGroupVisible",
 				value = false
@@ -283,7 +284,7 @@ end, function(p1) --[[ Line: 313 | Upvalues: Players (copy), Audio (copy) ]]
 				})
 			end
 		end,
-		onClickViewMe = function() --[[ Name: onClickViewMe | Line: 322 | Upvalues: p1 (copy) ]]
+		onClickViewMe = function()
 			p1({
 				type = "setMembers",
 				value = {}

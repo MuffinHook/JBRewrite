@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SeasonConsts = require(ReplicatedStorage.Game.Season.SeasonConsts)
 local t = {}
@@ -5,7 +6,7 @@ local t2 = {}
 t.Level = t2
 local t3 = {}
 t.Bonus = t3
-local function gatherStoreData(p1, p2) --[[ Line: 10 | Upvalues: SeasonConsts (copy), t2 (copy), t3 (copy) ]]
+local function gatherStoreData(p1, p2)
 	for v3, v4 in p2 do
 		local v1, v2
 		if v4.Season and v4.Season == SeasonConsts.SEASON_NUM then
@@ -35,7 +36,7 @@ local function gatherStoreData(p1, p2) --[[ Line: 10 | Upvalues: SeasonConsts (c
 		end
 	end
 end
-local function gatherModelData(p1, p2) --[[ Line: 37 | Upvalues: SeasonConsts (copy), t2 (copy), t3 (copy) ]]
+local function gatherModelData(p1, p2)
 	for v3, v4 in p2:GetChildren() do
 		local v1, v2
 		local Season = v4:FindFirstChild("Season")

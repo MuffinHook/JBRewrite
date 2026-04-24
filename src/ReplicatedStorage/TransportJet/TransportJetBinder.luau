@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local CurrentCamera = workspace.CurrentCamera
@@ -19,7 +20,7 @@ local v1 = Vector3.new()
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1) --[[ Line: 28 | Upvalues: BaseObject (copy), t (copy), ReplicatedStorage (copy), Audio (copy), CharacterUtils (copy), Players (copy), Confirmation (copy), TransportJetConsts (copy), Interval (copy), CircleAction (copy), RxInstanceUtils (copy) ]]
+function t.new(p1)
 	local v1 = BaseObject.new(p1)
 	setmetatable(v1, t)
 	local v3 = ReplicatedStorage.TransportJet.Res.TransportJet:Clone()
@@ -43,20 +44,20 @@ function t.new(p1) --[[ Line: 28 | Upvalues: BaseObject (copy), t (copy), Replic
 	})
 	v1.maid:GiveTask(v1.jetWindSound)
 	local v4 = false
-	local function action(p12, p2) --[[ Line: 52 | Upvalues: CharacterUtils (ref), Players (ref), v4 (ref), Confirmation (ref), TransportJetConsts (ref), p1 (copy), Interval (ref) ]]
+	local function action(p12, p2)
 		if p2 then
 			local v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
 			local Position = v1.Position
 			if not v4 then
 				v4 = true
 				local v2 = Confirmation.new(("Fly across the map for $%s?"):format(TransportJetConsts.LAUNCH_COST_CASH))
-				v2.Maid:GiveTask(v2.OnYes:Connect(function() --[[ Line: 62 | Upvalues: p1 (ref), TransportJetConsts (ref) ]]
+				v2.Maid:GiveTask(v2.OnYes:Connect(function()
 					p1:FindFirstChild(TransportJetConsts.REQUEST_LAUNCH_REMOTE_NAME):FireServer()
 				end))
-				v2.Maid:GiveTask(function() --[[ Line: 66 | Upvalues: v4 (ref) ]]
+				v2.Maid:GiveTask(function()
 					v4 = false
 				end)
-				v2.Maid:GiveTask(Interval.every(1):Connect(function() --[[ Line: 69 | Upvalues: Position (copy), v1 (copy), v2 (copy) ]]
+				v2.Maid:GiveTask(Interval.every(1):Connect(function()
 					if (Position - v1.Position).Magnitude > 16 then
 						v2:Destroy()
 					end
@@ -75,7 +76,7 @@ function t.new(p1) --[[ Line: 28 | Upvalues: BaseObject (copy), t (copy), Replic
 		Callback = action
 	}
 	v1.maid:GiveTask(CircleAction.Add(t2, RequestLaunch))
-	local function updateDoorOpen() --[[ Line: 90 | Upvalues: v1 (copy), t2 (copy) ]]
+	local function updateDoorOpen()
 		local v12 = v1:GetDoorOpen()
 		v1:SetDoorOpen(v12)
 		t2.Enabled = v12
@@ -84,7 +85,7 @@ function t.new(p1) --[[ Line: 28 | Upvalues: BaseObject (copy), t (copy), Replic
 	v1:SetDoorOpen(v5)
 	t2.Enabled = v5
 	v1.maid:GiveTask(p1:GetAttributeChangedSignal(TransportJetConsts.DOOR_OPEN_ATTR_NAME):Connect(updateDoorOpen))
-	v1.maid:GiveTask(Interval.every(0.5):Connect(function() --[[ Line: 98 | Upvalues: v1 (copy) ]]
+	v1.maid:GiveTask(Interval.every(0.5):Connect(function()
 		if v1:_isLocalStanding() then
 			v1.shouldMovePlayer = true
 		else
@@ -93,12 +94,12 @@ function t.new(p1) --[[ Line: 28 | Upvalues: BaseObject (copy), t (copy), Replic
 	end))
 	v1.lastCF = nil
 	v1.realRoll = 0
-	v1.maid:GiveTask(RxInstanceUtils.observeAttribute(p1, TransportJetConsts.LAUNCHED_AT_ATTR_NAME, function() --[[ Line: 109 | Upvalues: v1 (copy) ]]
+	v1.maid:GiveTask(RxInstanceUtils.observeAttribute(p1, TransportJetConsts.LAUNCHED_AT_ATTR_NAME, function()
 		v1:_update()
 	end))
-	v1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, TransportJetConsts.PATH_POINTS_OBJ_NAME, function(p1, p2) --[[ Line: 116 | Upvalues: v1 (copy) ]]
+	v1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, TransportJetConsts.PATH_POINTS_OBJ_NAME, function(p1, p2)
 		if p1 then
-			p2:GiveTask(p1.Changed:Connect(function() --[[ Line: 118 | Upvalues: v1 (ref) ]]
+			p2:GiveTask(p1.Changed:Connect(function()
 				v1:_update()
 			end))
 		end
@@ -106,7 +107,7 @@ function t.new(p1) --[[ Line: 28 | Upvalues: BaseObject (copy), t (copy), Replic
 	end))
 	return v1
 end
-function t._isLocalStanding(p1) --[[ Line: 129 | Upvalues: CharacterUtils (copy), Players (copy) ]]
+function t._isLocalStanding(p1)
 	local v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
 	local v2 = RaycastParams.new()
 	v2.FilterType = Enum.RaycastFilterType.Whitelist
@@ -117,7 +118,7 @@ function t._isLocalStanding(p1) --[[ Line: 129 | Upvalues: CharacterUtils (copy)
 		return false
 	end
 end
-function t._update(p1) --[[ Line: 140 | Upvalues: Maid (copy), TransportJetConsts (copy), BezierPath (copy), GraphUtils (copy), v1 (copy), CharacterUtils (copy), Players (copy), CurrentCamera (copy), DoorUtils (copy), Audio (copy), RunService (copy) ]]
+function t._update(p1)
 	local v12 = Maid.new()
 	p1.maid.runningMaid = v12
 	local v2 = p1.obj:GetAttribute(TransportJetConsts.LAUNCHED_AT_ATTR_NAME)
@@ -165,7 +166,7 @@ function t._update(p1) --[[ Line: 140 | Upvalues: Maid (copy), TransportJetConst
 			local timeUntil = t2[#t2 - 1].timeUntil
 			local v15 = nil
 			local v16 = os.clock()
-			local function setFlightElapsed(p12) --[[ Line: 187 | Upvalues: GraphUtils (ref), t2 (copy), v7 (copy), timeUntil (copy), v15 (ref), v16 (ref), p1 (copy), v1 (ref), CharacterUtils (ref), Players (ref), CurrentCamera (ref) ]]
+			local function setFlightElapsed(p12)
 				local v12 = os.clock()
 				local v2, v3 = v7:GetWorldPositionAt((GraphUtils.calculateDist(t2, p12)))
 				local v4 = timeUntil - p12
@@ -195,19 +196,19 @@ function t._update(p1) --[[ Line: 140 | Upvalues: Maid (copy), TransportJetConst
 			local v17 = DoorUtils.getDuration(Door)
 			local v18 = false
 			local v19 = true
-			v12:GiveTask((task.delay(v17 + timeUntil * 0.5, function() --[[ Line: 231 | Upvalues: Audio (ref), p1 (copy) ]]
+			v12:GiveTask((task.delay(v17 + timeUntil * 0.5, function()
 				Audio.ObjectLocal(p1.visualModel.PrimaryPart, 9553470967)
 			end)))
 			p1.jetEngineSound.Volume = 0
 			p1.jetEngineSound:Play()
 			p1.jetWindSound.Volume = 0
 			p1.jetWindSound:Play()
-			v12:GiveTask(function() --[[ Line: 240 | Upvalues: p1 (copy) ]]
+			v12:GiveTask(function()
 				p1.jetEngineSound:Stop()
 				p1.jetWindSound:Stop()
 			end)
 			local v20 = os.clock() + (v2 - workspace:GetServerTimeNow())
-			v12:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 246 | Upvalues: v20 (copy), v17 (copy), timeUntil (copy), v18 (ref), p1 (copy), DoorUtils (ref), v19 (ref), setFlightElapsed (copy) ]]
+			v12:GiveTask(RunService.Heartbeat:Connect(function()
 				local v1 = os.clock() - v20
 				local v3 = if v17 < v1 then v1 < v17 + timeUntil else false
 				if v3 ~= v18 then
@@ -231,10 +232,10 @@ function t._update(p1) --[[ Line: 140 | Upvalues: Maid (copy), TransportJetConst
 		end
 	end
 end
-function t._stopRunning(p1) --[[ Line: 286 ]]
+function t._stopRunning(p1)
 	p1.maid.runningMaid = nil
 end
-function t.StepRoll(p1, p2, p3) --[[ Line: 289 ]]
+function t.StepRoll(p1, p2, p3)
 	if p2 ~= p2 then
 		p2 = 0
 	end
@@ -243,12 +244,12 @@ function t.StepRoll(p1, p2, p3) --[[ Line: 289 ]]
 	p1.realRoll = v2
 	return v2
 end
-function t.SetDoorOpen(p1, p2) --[[ Line: 298 | Upvalues: DoorUtils (copy), Audio (copy) ]]
+function t.SetDoorOpen(p1, p2)
 	local Door = p1.visualModel:FindFirstChild("Door")
 	DoorUtils.setOpen(Door, p2)
 	Audio.ObjectLocal(Door.PrimaryPart, 4487204926)
 end
-function t.GetDoorOpen(p1) --[[ Line: 303 | Upvalues: TransportJetConsts (copy) ]]
+function t.GetDoorOpen(p1)
 	return p1.obj:GetAttribute(TransportJetConsts.DOOR_OPEN_ATTR_NAME) == true
 end
 return Binder.new(TransportJetConsts.TAG_NAME, t)

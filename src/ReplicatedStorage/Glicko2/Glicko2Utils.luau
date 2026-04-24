@@ -1,15 +1,16 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Glicko2Consts = require(ReplicatedStorage.Glicko2.Glicko2Consts)
 local MathUtils = require(ReplicatedStorage.Std.MathUtils)
 local t = {
-	g = function(p1) --[[ Name: g | Line: 11 ]]
+	g = function(p1)
 		return 1 / math.sqrt(1 + 3 * p1 ^ 2 / 9.869604401089358)
 	end
 }
-function t.E(p1, p2, p3) --[[ Line: 14 | Upvalues: t (copy) ]]
+function t.E(p1, p2, p3)
 	return 1 / (math.exp(-t.g(p3) * (p1 - p2)) + 1)
 end
-function t.v(p1, p2, p3) --[[ Line: 17 | Upvalues: t (copy) ]]
+function t.v(p1, p2, p3)
 	local sum = 0
 	for i = 1, #p2 do
 		local v2 = p3[i]
@@ -18,7 +19,7 @@ function t.v(p1, p2, p3) --[[ Line: 17 | Upvalues: t (copy) ]]
 	end
 	return 1 / sum
 end
-function t.delta(p1, p2, p3, p4, p5) --[[ Line: 29 | Upvalues: t (copy) ]]
+function t.delta(p1, p2, p3, p4, p5)
 	local sum = 0
 	for i = 1, #p3 do
 		local v2 = p4[i]
@@ -26,16 +27,16 @@ function t.delta(p1, p2, p3, p4, p5) --[[ Line: 29 | Upvalues: t (copy) ]]
 	end
 	return p1 * sum
 end
-function t.f(p1, p2, p3, p4, p5, p6) --[[ Line: 41 ]]
+function t.f(p1, p2, p3, p4, p5, p6)
 	return 0.5 * (math.exp(p1) * (p2 ^ 2 - p4 ^ 2 - p3 - math.exp(p1))) / (p4 ^ 2 + p3 + math.exp(p1)) ^ 2 - (p1 - math.log(p5 ^ 2)) / p6 ^ 2
 end
-function t.convertToGlicko2Rating(p1, p2) --[[ Line: 49 | Upvalues: Glicko2Consts (copy) ]]
+function t.convertToGlicko2Rating(p1, p2)
 	return (p1 - 1500) / Glicko2Consts.CONVERSION_FACTOR, p2 / Glicko2Consts.CONVERSION_FACTOR
 end
-function t.convertFromGlicko2Rating(p1, p2) --[[ Line: 54 | Upvalues: Glicko2Consts (copy) ]]
+function t.convertFromGlicko2Rating(p1, p2)
 	return Glicko2Consts.CONVERSION_FACTOR * p1 + 1500, Glicko2Consts.CONVERSION_FACTOR * p2
 end
-function t.calculateNewRatingData(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 62 | Upvalues: t (copy), Glicko2Consts (copy), MathUtils (copy) ]]
+function t.calculateNewRatingData(p1, p2, p3, p4, p5, p6, p7)
 	assert(typeof(p4) == "table", "Invalid ratingList")
 	assert(typeof(p5) == "table", "Invalid ratingDeviationList")
 	assert(typeof(p6) == "table", "Invalid scoreList")
@@ -59,7 +60,7 @@ function t.calculateNewRatingData(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 62 | Up
 		local v18 = p7 or Glicko2Consts.DEFAULT_TAU
 		local v19 = t.v(v9, t2, t3)
 		local v20 = t.delta(v19, v9, t2, t3, p6)
-		local function f21(p1) --[[ Line: 103 | Upvalues: t (ref), v20 (copy), v19 (copy), v10 (copy), p3 (copy), v18 (ref) ]]
+		local function f21(p1)
 			return t.f(p1, v20, v19, v10, p3, v18)
 		end
 		local v23 = math.exp(MathUtils.regulaFalsi(f21) / 2)

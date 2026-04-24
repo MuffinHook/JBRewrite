@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -14,7 +15,7 @@ local t = {
 	gui = nil,
 	hidden = false
 }
-function t.init() --[[ Line: 18 | Upvalues: ReplicatedStorage (copy), LocalPlayer (copy), t (copy), LevelSystem (copy), SeasonConsts (copy), SeasonSystem (copy) ]]
+function t.init()
 	local LevelGui2 = ReplicatedStorage.StarterGui:FindFirstChild("LevelGui2")
 	LevelGui2.Parent = LocalPlayer.PlayerGui
 	t.gui = LevelGui2
@@ -25,13 +26,13 @@ function t.init() --[[ Line: 18 | Upvalues: ReplicatedStorage (copy), LocalPlaye
 	LevelGui2.Background.Body.SeasonNum.Text = ("SEASON %d"):format(SeasonConsts.SEASON_NUM)
 	LevelGui2.Background.Body.InfoButton.MouseButton1Down:Connect(t.toggleInfo)
 	LevelGui2.Background.Body.MouseButton1Down:Connect(t.toggleInfo)
-	SeasonSystem.getSeasonPassOwnedSignal():Connect(function(p1) --[[ Line: 37 | Upvalues: LocalPlayer (ref), t (ref) ]]
+	SeasonSystem.getSeasonPassOwnedSignal():Connect(function(p1)
 		if p1 == LocalPlayer then
 			t.updateProgress(LocalPlayer)
 		end
 	end)
 end
-function t.toggleInfo() --[[ Line: 44 | Upvalues: Audio (copy), LocalPlayer (copy), SeasonConsts (copy), SeasonUISystem (copy), ContractUISystem (copy), SeasonUtils (copy) ]]
+function t.toggleInfo()
 	Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
 	local v1 = LocalPlayer:FindFirstChild(SeasonConsts.HAS_SEEN_REWARDS_VALUE_NAME)
 	if SeasonUISystem._window:IsOpen() then
@@ -46,7 +47,7 @@ function t.toggleInfo() --[[ Line: 44 | Upvalues: Audio (copy), LocalPlayer (cop
 		v2.open()
 	end
 end
-function t.updateProgress(p1) --[[ Line: 61 | Upvalues: LocalPlayer (copy), LevelUtils (copy), t (copy) ]]
+function t.updateProgress(p1)
 	if p1 == LocalPlayer then
 		local v1 = LevelUtils.getLevel(p1)
 		local v2 = LevelUtils.getExp(p1)
@@ -55,7 +56,7 @@ function t.updateProgress(p1) --[[ Line: 61 | Upvalues: LocalPlayer (copy), Leve
 		end
 	end
 end
-local function tweenFrameFromLastFracToFrac(p1, p2, p3) --[[ Line: 70 ]]
+local function tweenFrameFromLastFracToFrac(p1, p2, p3)
 	if p3 then
 		p1.Size = UDim2.fromScale(0, 1)
 		p1.Position = UDim2.fromScale(0, 0)
@@ -65,7 +66,7 @@ local function tweenFrameFromLastFracToFrac(p1, p2, p3) --[[ Line: 70 ]]
 	p1:TweenSize(UDim2.new(p2, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, v2, true)
 	return v2
 end
-function t.setProgress(p1, p2) --[[ Line: 82 | Upvalues: LevelUtils (copy), t (copy), LevelConsts (copy), SeasonSystem (copy), LocalPlayer (copy), SeasonUtils (copy), Players (copy) ]]
+function t.setProgress(p1, p2)
 	local v1 = LevelUtils.calculateExpNextLevel(p1)
 	local v2 = p2 / v1
 	local gui = t.gui
@@ -98,13 +99,13 @@ function t.setProgress(p1, p2) --[[ Line: 82 | Upvalues: LevelUtils (copy), t (c
 	gui.Background.Body.ProgressDaily:TweenSize(UDim2.new(math.min(1, (p2 + sum) / v1) - v2, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, v4, true)
 	gui.Background.Body.ProgressDaily:TweenPosition(UDim2.fromScale(v2, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, v4, true)
 end
-function t.hideTopbar() --[[ Line: 139 | Upvalues: t (copy) ]]
+function t.hideTopbar()
 	t.hidden = true
 	if t.gui then
 		t.gui.Enabled = not t.hidden
 	end
 end
-function t.showTopbar() --[[ Line: 145 | Upvalues: t (copy) ]]
+function t.showTopbar()
 	t.hidden = false
 	if t.gui then
 		t.gui.Enabled = not t.hidden

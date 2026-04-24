@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Avatar = require(script.Parent.Avatar)
 local Roact = require(ReplicatedStorage.Roact)
@@ -9,14 +10,14 @@ local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
 local Players = game:GetService("Players")
 local FriendsService = require(ReplicatedStorage.Friends.FriendsService)
 local v1 = Roact.PureComponent:extend("OtherTradeServerItem")
-function v1.render(p1) --[[ Line: 13 | Upvalues: TableUtils (copy), FriendsService (copy), Players (copy), createElement (copy), PaddedContainer (copy), TradeConsts (copy), Roact (copy), ScrollingGrid (copy), Avatar (copy) ]]
-	local v1 = TableUtils.map(p1.props.userIds, function(p1) --[[ Line: 21 | Upvalues: FriendsService (ref), Players (ref) ]]
+function v1.render(p1)
+	local v1 = TableUtils.map(p1.props.userIds, function(p1)
 		return {
 			userId = p1,
 			isFriend = FriendsService.getIsFriendsWith(Players.LocalPlayer, p1)
 		}
 	end)
-	table.sort(v1, function(p1, p2) --[[ Line: 24 ]]
+	table.sort(v1, function(p1, p2)
 		return p1.isFriend and not p2.isFriend
 	end)
 	local t2 = {
@@ -63,7 +64,7 @@ function v1.render(p1) --[[ Line: 13 | Upvalues: TableUtils (copy), FriendsServi
 	t7.LineHeight = 1
 	t7.TextSize = 26
 	t7.TextColor3 = Color3.new(255/255, 255/255, 255/255)
-	t7[Roact.Event.Activated] = function() --[[ Line: 76 | Upvalues: p1 (copy) ]]
+	t7[Roact.Event.Activated] = function()
 		p1.props.onJoinOtherTradeServer(p1.props.otherServerId)
 	end
 	t6.TextButton = createElement("TextButton", t7, {

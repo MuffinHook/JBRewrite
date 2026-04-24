@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local t = {
 	ProcessEventsInterval = 8,
 	GameKey = "",
@@ -17,7 +18,7 @@ local GAResourceFlowType = require(script.Parent.GAResourceFlowType)
 local GAProgressionStatus = require(script.Parent.GAProgressionStatus)
 local GAErrorSeverity = require(script.Parent.GAErrorSeverity)
 local HttpService = game:GetService("HttpService")
-local function addDimensionsToEvent(p1, p2) --[[ Line: 33 | Upvalues: Store (copy) ]]
+local function addDimensionsToEvent(p1, p2)
 	if p2 and p1 then
 		local v1 = Store:GetPlayerDataFromCache(p1)
 		if v1 and (v1.CurrentCustomDimension01 and #v1.CurrentCustomDimension01 > 0) then
@@ -31,7 +32,7 @@ local function addDimensionsToEvent(p1, p2) --[[ Line: 33 | Upvalues: Store (cop
 		end
 	end
 end
-local function getClientTsAdjusted(p1) --[[ Line: 54 | Upvalues: Store (copy), Validation (copy) ]]
+local function getClientTsAdjusted(p1)
 	if p1 then
 		local v1 = Store:GetPlayerDataFromCache(p1)
 		local v2 = os.time()
@@ -46,14 +47,14 @@ local function getClientTsAdjusted(p1) --[[ Line: 54 | Upvalues: Store (copy), V
 	end
 end
 local v1 = HttpService:GenerateGUID(false):lower()
-local function Length(p1) --[[ Line: 71 ]]
+local function Length(p1)
 	local count = 0
 	for k, v in pairs(p1) do
 		count = count + 1
 	end
 	return count
 end
-local function getEventAnnotations(p1) --[[ Line: 79 | Upvalues: Store (copy), v1 (copy), Validation (copy), Version (copy), Utilities (copy), t (copy) ]]
+local function getEventAnnotations(p1)
 	local v12, v2
 	if p1 then
 		v12, v2 = p1, Store:GetPlayerDataFromCache(p1)
@@ -113,7 +114,7 @@ local function getEventAnnotations(p1) --[[ Line: 79 | Upvalues: Store (copy), v
 	end
 	return t2
 end
-local function addEventToStore(p1, p2) --[[ Line: 146 | Upvalues: getEventAnnotations (copy), HttpService (copy), Logger (copy), Store (copy) ]]
+local function addEventToStore(p1, p2)
 	local v1 = getEventAnnotations(p1)
 	for k in pairs(p2) do
 		v1[k] = p2[k]
@@ -121,7 +122,7 @@ local function addEventToStore(p1, p2) --[[ Line: 146 | Upvalues: getEventAnnota
 	Logger:ii("Event added to queue: " .. HttpService:JSONEncode(v1))
 	Store.EventsQueue[#Store.EventsQueue + 1] = v1
 end
-local function dequeueMaxEvents() --[[ Line: 165 | Upvalues: Store (copy), Logger (copy) ]]
+local function dequeueMaxEvents()
 	if #Store.EventsQueue <= 500 then
 		local EventsQueue = Store.EventsQueue
 		Store.EventsQueue = {}
@@ -145,7 +146,7 @@ local function dequeueMaxEvents() --[[ Line: 165 | Upvalues: Store (copy), Logge
 		return v1
 	end
 end
-local function processEvents() --[[ Line: 198 | Upvalues: dequeueMaxEvents (copy), Logger (copy), HttpApi (copy), t (copy), Store (copy) ]]
+local function processEvents()
 	local v1 = dequeueMaxEvents()
 	if #v1 == 0 then
 		Logger:i("Event queue: No events to send")
@@ -175,13 +176,13 @@ local function processEvents() --[[ Line: 198 | Upvalues: dequeueMaxEvents (copy
 		Logger:w("Event queue: Failed to send events.")
 	end
 end
-function t.processEventQueue(p1) --[[ Line: 235 | Upvalues: processEvents (copy), Threading (copy), t (copy) ]]
+function t.processEventQueue(p1)
 	processEvents()
-	Threading:scheduleTimer(t.ProcessEventsInterval, function() --[[ Line: 237 | Upvalues: t (ref) ]]
+	Threading:scheduleTimer(t.ProcessEventsInterval, function()
 		t:processEventQueue()
 	end)
 end
-function t.setBuild(p1, p2) --[[ Line: 242 | Upvalues: Validation (copy), Logger (copy) ]]
+function t.setBuild(p1, p2)
 	if Validation:validateBuild(p2) then
 		p1.Build = p2
 		Logger:i("Set build version: " .. p2)
@@ -189,19 +190,19 @@ function t.setBuild(p1, p2) --[[ Line: 242 | Upvalues: Validation (copy), Logger
 		Logger:w("Validation fail - configure build: Cannot be null, empty or above 32 length. String: " .. p2)
 	end
 end
-function t.setAvailableResourceCurrencies(p1, p2) --[[ Line: 252 | Upvalues: Validation (copy), Logger (copy) ]]
+function t.setAvailableResourceCurrencies(p1, p2)
 	if Validation:validateResourceCurrencies(p2) then
 		p1._availableResourceCurrencies = p2
 		Logger:i("Set available resource currencies: (" .. table.concat(p2, ", ") .. ")")
 	end
 end
-function t.setAvailableResourceItemTypes(p1, p2) --[[ Line: 261 | Upvalues: Validation (copy), Logger (copy) ]]
+function t.setAvailableResourceItemTypes(p1, p2)
 	if Validation:validateResourceCurrencies(p2) then
 		p1._availableResourceItemTypes = p2
 		Logger:i("Set available resource item types: (" .. table.concat(p2, ", ") .. ")")
 	end
 end
-function t.addSessionStartEvent(p1, p2, p3) --[[ Line: 270 | Upvalues: Store (copy), addDimensionsToEvent (copy), addEventToStore (copy), Logger (copy), processEvents (copy) ]]
+function t.addSessionStartEvent(p1, p2, p3)
 	local v1 = Store:GetPlayerDataFromCache(p2)
 	if p3 then
 		v1.Sessions = p3.Sessions
@@ -216,7 +217,7 @@ function t.addSessionStartEvent(p1, p2, p3) --[[ Line: 270 | Upvalues: Store (co
 		processEvents()
 	end
 end
-function t.addSessionEndEvent(p1, p2) --[[ Line: 296 | Upvalues: Store (copy), Validation (copy), Logger (copy), addDimensionsToEvent (copy), addEventToStore (copy), processEvents (copy) ]]
+function t.addSessionEndEvent(p1, p2)
 	local v1 = Store:GetPlayerDataFromCache(p2)
 	local SessionStart = v1.SessionStart
 	local v2
@@ -243,7 +244,7 @@ function t.addSessionEndEvent(p1, p2) --[[ Line: 296 | Upvalues: Store (copy), V
 	Logger:i("Add SESSION END event.")
 	processEvents()
 end
-function t.addBusinessEvent(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 330 | Upvalues: Validation (copy), Store (copy), Utilities (copy), addDimensionsToEvent (copy), Logger (copy), addEventToStore (copy) ]]
+function t.addBusinessEvent(p1, p2, p3, p4, p5, p6, p7)
 	if Validation:validateBusinessEvent(p3, p4, p7, p5, p6) then
 		local t = {}
 		local v1 = Store:GetPlayerDataFromCache(p2)
@@ -261,7 +262,7 @@ function t.addBusinessEvent(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 330 | Upvalue
 		addEventToStore(p2, t)
 	end
 end
-function t.addResourceEvent(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 365 | Upvalues: Validation (copy), GAResourceFlowType (copy), addDimensionsToEvent (copy), Logger (copy), addEventToStore (copy) ]]
+function t.addResourceEvent(p1, p2, p3, p4, p5, p6, p7)
 	if Validation:validateResourceEvent(GAResourceFlowType, p3, p4, p5, p6, p7, p1._availableResourceCurrencies, p1._availableResourceItemTypes) then
 		if p3 == GAResourceFlowType.Sink then
 			p5 = -1 * p5
@@ -276,7 +277,7 @@ function t.addResourceEvent(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 365 | Upvalue
 		addEventToStore(p2, t)
 	end
 end
-function t.addProgressionEvent(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 395 | Upvalues: Validation (copy), GAProgressionStatus (copy), Utilities (copy), Store (copy), addDimensionsToEvent (copy), Logger (copy), addEventToStore (copy) ]]
+function t.addProgressionEvent(p1, p2, p3, p4, p5, p6, p7)
 	if Validation:validateProgressionEvent(GAProgressionStatus, p3, p4, p5, p6) then
 		local t = {}
 		local v1 = if Utilities:isStringNullOrEmpty(p5) then p4 elseif Utilities:isStringNullOrEmpty(p6) then p4 .. ":" .. p5 else p4 .. ":" .. p5 .. ":" .. p6
@@ -304,7 +305,7 @@ function t.addProgressionEvent(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 395 | Upva
 		addEventToStore(p2, t)
 	end
 end
-function t.addDesignEvent(p1, p2, p3, p4) --[[ Line: 471 | Upvalues: Validation (copy), addDimensionsToEvent (copy), Logger (copy), addEventToStore (copy) ]]
+function t.addDesignEvent(p1, p2, p3, p4)
 	if Validation:validateDesignEvent(p3) then
 		local t = {
 			category = "design",
@@ -318,7 +319,7 @@ function t.addDesignEvent(p1, p2, p3, p4) --[[ Line: 471 | Upvalues: Validation 
 		addEventToStore(p2, t)
 	end
 end
-function t.addErrorEvent(p1, p2, p3, p4) --[[ Line: 498 | Upvalues: Validation (copy), GAErrorSeverity (copy), addDimensionsToEvent (copy), Utilities (copy), Logger (copy), addEventToStore (copy) ]]
+function t.addErrorEvent(p1, p2, p3, p4)
 	if Validation:validateErrorEvent(GAErrorSeverity, p3, p4) then
 		local t = {}
 		local v1 = GAErrorSeverity[p3]
@@ -330,7 +331,7 @@ function t.addErrorEvent(p1, p2, p3, p4) --[[ Line: 498 | Upvalues: Validation (
 		addEventToStore(p2, t)
 	end
 end
-function t.addSdkErrorEvent(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 528 | Upvalues: Utilities (copy), Logger (copy), addEventToStore (copy) ]]
+function t.addSdkErrorEvent(p1, p2, p3, p4, p5, p6, p7)
 	local t = {
 		category = "sdk_error",
 		error_category = p3,

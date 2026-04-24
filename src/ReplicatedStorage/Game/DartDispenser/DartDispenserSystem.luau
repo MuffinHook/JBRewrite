@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local DartDispenserBinder = require(script.Parent.DartDispenserBinder)
 return {
-	init = function() --[[ Name: init | Line: 4 | Upvalues: DartDispenserBinder (copy) ]]
+	init = function()
 		DartDispenserBinder:Start()
 	end
 }

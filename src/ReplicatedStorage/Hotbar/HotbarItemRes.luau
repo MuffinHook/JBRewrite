@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Utils = require(ReplicatedStorage.EzUi.Utils)
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local t = {}
-function t.init() --[[ Line: 7 | Upvalues: Players (copy), t (copy), Utils (copy), InputUtils (copy) ]]
+function t.init()
 	local HotbarGui = script.Parent.Res.HotbarGui
 	HotbarGui.Parent = Players.LocalPlayer.PlayerGui
 	HotbarGui.DisplayOrder = 11
@@ -11,7 +12,7 @@ function t.init() --[[ Line: 7 | Upvalues: Players (copy), t (copy), Utils (copy
 	local v1 = HotbarGui.Container.Item:Clone()
 	HotbarGui.Container.Item:Destroy()
 	t.presetFrame = v1
-	local function updateSize() --[[ Line: 17 | Upvalues: Utils (ref), HotbarGui (copy), InputUtils (ref) ]]
+	local function updateSize()
 		if Utils.isSmallScreen() then
 			HotbarGui.Container.Size = UDim2.new(0.7, 0, 1, 0)
 			HotbarGui.UIPadding.PaddingBottom = UDim.new(0.06, 0)

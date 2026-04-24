@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Basic = require(script.Parent.Basic)
 local t = {
 	Motion = {
@@ -27,19 +28,19 @@ local t2 = {
 }
 t2.__index = t2
 setmetatable(t2, Basic)
-function t2.Init(p1) --[[ Line: 33 | Upvalues: v2 (ref) ]]
+function t2.Init(p1)
 	v2 = p1.Event
 end
-function t2.new(p1, p2, p3) --[[ Line: 36 | Upvalues: Basic (copy), t (copy), t2 (copy) ]]
+function t2.new(p1, p2, p3)
 	local v1 = Basic.new(p1, p2, t, p3)
 	setmetatable(v1, t2)
 	v1:DefaultDisableCamLock()
 	return v1
 end
-function t2.InputBegan(p1, p2, p3) --[[ Line: 44 | Upvalues: v2 (ref), Basic (copy) ]]
+function t2.InputBegan(p1, p2, p3)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Eat.Springs.ItemRotation)
-		delay(0.3, function() --[[ Line: 52 | Upvalues: p1 (copy), v2 (ref) ]]
+		delay(0.3, function()
 			p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
 			if p1.Local then
 				local v1 = tick()
@@ -57,5 +58,5 @@ function t2.InputBegan(p1, p2, p3) --[[ Line: 44 | Upvalues: v2 (ref), Basic (co
 	end
 	Basic.InputBegan(p1, p2, p3)
 end
-function t2.InputEnded(p1) --[[ Line: 70 ]] end
+function t2.InputEnded(p1)  end
 return t2

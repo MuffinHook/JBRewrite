@@ -1219,21 +1219,21 @@ return {
 			Part.CFrame = CFrame.new(0, 0, 0)
 			return Part
 		else
-			local v1 = ReplicatedStorage.Resource.Spoiler:FindFirstChild(p1.Name)
-			if not v1 then
+			local spoilerTemplate = ReplicatedStorage.Resource.Spoiler:FindFirstChild(p1.Name)
+			if not spoilerTemplate then
 				error("No Spoiler named: " .. p1.Name)
 			end
-			local v2 = v1:Clone()
-			v2.Color = Color3.new(0.5, 0.5, 0.5)
-			v2.CFrame = CFrame.new(0, 0, 0)
+			local spoilerClone = spoilerTemplate:Clone()
+			spoilerClone.Color = Color3.new(0.5, 0.5, 0.5)
+			spoilerClone.CFrame = CFrame.new(0, 0, 0)
 			if p1.ViewportFlipX then
-				v2.CFrame = v2.CFrame * CFrame.Angles(math.pi, 0, 0)
+				spoilerClone.CFrame = spoilerClone.CFrame * CFrame.Angles(math.pi, 0, 0)
 			end
-			return v2
+			return spoilerClone
 		end
 	end,
 	Update = function(p1, p2)
-		local v1 = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.5, 0, 0) * CFrame.new(0, 0, p2.Size.Magnitude * 0.707)
+		local elapsedTime = os.clock() / 2
+		p1.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, p2.Size.Magnitude * 0.707)
 	end
 }

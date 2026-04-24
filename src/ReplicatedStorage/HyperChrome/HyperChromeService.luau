@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConsts)
@@ -7,22 +8,22 @@ local RunService = game:GetService("RunService")
 local Binder = require(ReplicatedStorage.Std.Binder)
 local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
 return {
-	init = function() --[[ Name: init | Line: 16 | Upvalues: ManifestBinder (copy), Maid (copy), HyperChromeConsts (copy), ReplicatedStorage (copy), RunService (copy), HyperChromeUtils (copy), Binder (copy), CurrentCamera (copy) ]]
+	init = function()
 		local v1 = ManifestBinder.new("Vehicle", {
 			body = "Model/Body"
-		}, function(p1, p2) --[[ Line: 19 | Upvalues: Maid (ref), HyperChromeConsts (ref), ReplicatedStorage (ref), RunService (ref), HyperChromeUtils (ref) ]]
+		}, function(p1, p2)
 			local v1 = Maid.new()
-			local function clearMaxLevelAura() --[[ Line: 21 | Upvalues: v1 (copy) ]]
+			local function clearMaxLevelAura()
 				v1.maxLevelAuraAttachment = nil
 			end
-			local function clearNumberParticleEmitter() --[[ Line: 24 | Upvalues: v1 (copy) ]]
+			local function clearNumberParticleEmitter()
 				v1.numberParticleEmitter = nil
 			end
-			local function clearHyperShiftAuraParticle() --[[ Line: 27 | Upvalues: v1 (copy) ]]
+			local function clearHyperShiftAuraParticle()
 				v1.hyperShiftAuraParticle = nil
 				v1.hyperShiftParticleRainbowHeartbeat = nil
 			end
-			v1:GiveTask(p1:GetAttributeChangedSignal(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME):Connect(function() --[[ Line: 37 | Upvalues: v1 (copy), p1 (copy), HyperChromeConsts (ref), p2 (copy), ReplicatedStorage (ref), RunService (ref), HyperChromeUtils (ref) ]]
+			v1:GiveTask(p1:GetAttributeChangedSignal(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME):Connect(function()
 				v1.maxLevelAuraAttachment = nil
 				v1.numberParticleEmitter = nil
 				v1.hyperShiftAuraParticle = nil
@@ -35,7 +36,7 @@ return {
 						local v2 = ReplicatedStorage.Resource:FindFirstChild(HyperChromeConsts.HYPERSHIFT_PARTICLE_RESOURCE_NAME):Clone()
 						v2.Parent = Attachment
 						v1.hyperShiftAuraParticle = Attachment
-						v1.hyperShiftParticleRainbowHeartbeat = RunService.Heartbeat:Connect(function() --[[ Line: 54 | Upvalues: HyperChromeConsts (ref), v2 (copy), p1 (ref) ]]
+						v1.hyperShiftParticleRainbowHeartbeat = RunService.Heartbeat:Connect(function()
 							local v22 = ColorSequence.new(Color3.fromHSV(os.clock() % HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME / HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME, 1, 0.65))
 							v2.Color = v22
 							for v3, v4 in p1.Model:GetChildren() do
@@ -73,14 +74,14 @@ return {
 					end
 				end
 			end))
-			v1:GiveTask(p1.Destroying:Connect(function() --[[ Line: 109 | Upvalues: v1 (copy) ]]
+			v1:GiveTask(p1.Destroying:Connect(function()
 				task.defer(v1.Destroy, v1)
 			end))
 			return v1
 		end)
-		local v2 = Binder.new("VehicleColorPart", function(p1) --[[ Line: 115 | Upvalues: Maid (ref), HyperChromeConsts (ref), HyperChromeUtils (ref), RunService (ref), CurrentCamera (ref) ]]
+		local v2 = Binder.new("VehicleColorPart", function(p1)
 			local v1 = Maid.new()
-			local function updateHyperChrome() --[[ Line: 117 | Upvalues: p1 (copy), HyperChromeConsts (ref), HyperChromeUtils (ref), v1 (copy), RunService (ref), CurrentCamera (ref) ]]
+			local function updateHyperChrome()
 				local v12 = p1:GetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME)
 				if v12 == nil then
 					v1.angleShifter = nil
@@ -117,7 +118,7 @@ return {
 						end
 					end
 					local isCOLOR_SHIFT_NAME = v12 == HyperChromeConsts.COLOR_SHIFT_NAME
-					v1.angleShifter = RunService.Heartbeat:Connect(function() --[[ Line: 150 | Upvalues: CurrentCamera (ref), p1 (ref), t (copy), isCOLOR_SHIFT_NAME (copy), HyperChromeConsts (ref) ]]
+					v1.angleShifter = RunService.Heartbeat:Connect(function()
 						local v1 = CurrentCamera.CFrame
 						local LookVector = v1.LookVector
 						local Position = p1.Position

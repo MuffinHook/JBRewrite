@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local t = {}
 t.__index = t
 t.ClassName = "Octree"
 local t2 = {}
 t2.__index = t2
-local function Node_new(p1, p2, p3) --[[ Line: 24 | Upvalues: t2 (copy) ]]
+local function Node_new(p1, p2, p3)
 	return setmetatable({
 		center = p1,
 		halfSize = p2,
@@ -13,7 +14,7 @@ local function Node_new(p1, p2, p3) --[[ Line: 24 | Upvalues: t2 (copy) ]]
 		children = nil
 	}, t2)
 end
-local function Node_getOctant(p1, p2) --[[ Line: 35 ]]
+local function Node_getOctant(p1, p2)
 	local center = p1.center
 	return if p2.X >= center.X then 4 else 0 + if p2.Y >= center.Y then 2 else 0 + if p2.Z >= center.Z then 1 else 0 + 1
 end
@@ -27,7 +28,7 @@ local t3 = {
 	Vector3.new(1, 1, -1),
 	Vector3.new(1, 1, 1)
 }
-local function Node_subdivide(p1) --[[ Line: 54 | Upvalues: Node_new (copy), t3 (copy) ]]
+local function Node_subdivide(p1)
 	local v1 = p1.halfSize * 0.5
 	local center = p1.center
 	local v2 = table.create(8)
@@ -36,12 +37,12 @@ local function Node_subdivide(p1) --[[ Line: 54 | Upvalues: Node_new (copy), t3 
 	end
 	p1.children = v2
 end
-local function Node_containsPoint(p1, p2) --[[ Line: 64 ]]
+local function Node_containsPoint(p1, p2)
 	local center = p1.center
 	local halfSize = p1.halfSize
 	return if math.abs(p2.X - center.X) <= halfSize then if math.abs(p2.Y - center.Y) <= halfSize then math.abs(p2.Z - center.Z) <= halfSize else false else false
 end
-local function Node_intersectsSphere(p1, p2, p3) --[[ Line: 73 ]]
+local function Node_intersectsSphere(p1, p2, p3)
 	local center = p1.center
 	local halfSize = p1.halfSize
 	local v3 = math.max(0, math.abs(p2.X - center.X) - halfSize)
@@ -49,7 +50,7 @@ local function Node_intersectsSphere(p1, p2, p3) --[[ Line: 73 ]]
 	local v9 = math.max(0, math.abs(p2.Z - center.Z) - halfSize)
 	return v3 * v3 + v6 * v6 + v9 * v9 <= p3 * p3
 end
-function t.new(p1, p2, p3, p4) --[[ Line: 83 | Upvalues: t (copy), Node_new (copy) ]]
+function t.new(p1, p2, p3, p4)
 	local v2 = setmetatable({}, t)
 	v2._maxDepth = p3 or 7
 	v2._splitThreshold = p4 or 8
@@ -58,7 +59,7 @@ function t.new(p1, p2, p3, p4) --[[ Line: 83 | Upvalues: t (copy), Node_new (cop
 	v2._itemToPos = {}
 	return v2
 end
-function t.Insert(p1, p2, p3) --[[ Line: 93 ]]
+function t.Insert(p1, p2, p3)
 	if p1._itemToNode[p2] then
 		p1:Update(p2, p3)
 	else
@@ -66,7 +67,7 @@ function t.Insert(p1, p2, p3) --[[ Line: 93 ]]
 		p1:_insertIntoNode(p1._root, p2, p3)
 	end
 end
-function t._insertIntoNode(p1, p2, p3, p4) --[[ Line: 103 | Upvalues: Node_subdivide (copy) ]]
+function t._insertIntoNode(p1, p2, p3, p4)
 	if p2.children then
 		local center = p2.center
 		p1:_insertIntoNode(p2.children[if p4.X >= center.X then 4 else 0 + if p4.Y >= center.Y then 2 else 0 + if p4.Z >= center.Z then 1 else 0 + 1], p3, p4)
@@ -94,7 +95,7 @@ function t._insertIntoNode(p1, p2, p3, p4) --[[ Line: 103 | Upvalues: Node_subdi
 		end
 	end
 end
-function t.Remove(p1, p2) --[[ Line: 134 ]]
+function t.Remove(p1, p2)
 	local v1 = p1._itemToNode[p2]
 	if v1 then
 		v1.items[p2] = nil
@@ -103,7 +104,7 @@ function t.Remove(p1, p2) --[[ Line: 134 ]]
 		p1._itemToPos[p2] = nil
 	end
 end
-function t.Update(p1, p2, p3) --[[ Line: 145 ]]
+function t.Update(p1, p2, p3)
 	local v1 = p1._itemToNode[p2]
 	if v1 then
 		p1._itemToPos[p2] = p3
@@ -122,12 +123,12 @@ function t.Update(p1, p2, p3) --[[ Line: 145 ]]
 		return false
 	end
 end
-function t.QueryRadius(p1, p2, p3) --[[ Line: 166 ]]
+function t.QueryRadius(p1, p2, p3)
 	local t = {}
 	p1:_queryNode(p1._root, p2, p3, p3 * p3, t)
 	return t
 end
-function t._queryNode(p1, p2, p3, p4, p5, p6) --[[ Line: 173 | Upvalues: Node_intersectsSphere (copy) ]]
+function t._queryNode(p1, p2, p3, p4, p5, p6)
 	if Node_intersectsSphere(p2, p3, p4) then
 		if p2.children then
 			for i = 1, 8 do
@@ -146,7 +147,7 @@ function t._queryNode(p1, p2, p3, p4, p5, p6) --[[ Line: 173 | Upvalues: Node_in
 		end
 	end
 end
-function t.Destroy(p1) --[[ Line: 195 ]]
+function t.Destroy(p1)
 	p1._root = nil
 	p1._itemToNode = nil
 	p1._itemToPos = nil

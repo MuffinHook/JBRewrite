@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local String = require(ReplicatedStorage.Std.String)
 local RewardSpinnerConsts = require(ReplicatedStorage.RewardSpinner.RewardSpinnerConsts)
 local TradeReducerUtils = require(ReplicatedStorage.Trade.TradeReducerUtils)
-return function(p1) --[[ Line: 7 | Upvalues: RewardSpinnerConsts (copy), String (copy), TradeReducerUtils (copy) ]]
+return function(p1)
 	local t = {}
 	if p1.RarityId then
 		local v1 = RewardSpinnerConsts.RARITY_ID_TO_RARITY[p1.RarityId]

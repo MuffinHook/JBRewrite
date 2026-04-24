@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
-local function testComponent(p1) --[[ Line: 6 | Upvalues: createElement (copy) ]]
+local function testComponent(p1)
 	return createElement("TextLabel", {
 		BackgroundTransparency = 0.5,
 		BackgroundColor3 = p1.color,
@@ -9,7 +10,7 @@ local function testComponent(p1) --[[ Line: 6 | Upvalues: createElement (copy) ]
 		Text = p1.title
 	})
 end
-return function(p1) --[[ Line: 16 | Upvalues: Roact (copy), createElement (copy), testComponent (copy) ]]
+return function(p1)
 	local Grid = require(script.Parent.Grid)
 	local v1 = Roact.mount(createElement("Frame", {
 		BackgroundTransparency = 0.5,
@@ -36,7 +37,7 @@ return function(p1) --[[ Line: 16 | Upvalues: Roact (copy), createElement (copy)
 			}
 		}
 	})), p1)
-	return function() --[[ Line: 50 | Upvalues: Roact (ref), v1 (copy) ]]
+	return function()
 		Roact.unmount(v1)
 	end
 end

@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BezierPath = require(ReplicatedStorage.Game.BezierPath)
 local t = {}
 local t2 = {}
 local v1 = nil
 local v2 = false
-local function gather() --[[ Line: 10 | Upvalues: v2 (ref), t (copy), t2 (copy), v1 (ref) ]]
+local function gather()
 	if not v2 then
 		v2 = true
 		local NodesLanding = workspace:WaitForChild("NodesLanding")
@@ -31,7 +32,7 @@ local function gather() --[[ Line: 10 | Upvalues: v2 (ref), t (copy), t2 (copy),
 	end
 end
 return {
-	GetFlightData = function() --[[ Name: GetFlightData | Line: 38 | Upvalues: v2 (ref), gather (copy), t2 (copy), t (copy), BezierPath (copy), v1 (ref) ]]
+	GetFlightData = function()
 		if not v2 then
 			gather()
 		end

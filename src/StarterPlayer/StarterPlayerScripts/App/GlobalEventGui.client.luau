@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TypeWriteLabel = require(ReplicatedStorage.Game.TypeWriteLabel)
@@ -11,12 +12,12 @@ local DialogueContainer = GlobalEventGui:FindFirstChild("DialogueContainer")
 local Sound = Instance.new("Sound")
 Sound.SoundId = "rbxassetid://215658476"
 Sound.Parent = DialogueContainer
-local function ThumbnailBust(p1) --[[ Line: 21 ]]
+local function ThumbnailBust(p1)
 	return ("https://www.roblox.com/bust-thumbnail/image?width=420&height=420&format=png&userId=%d"):format(p1)
 end
 local v1 = false
 local t = {}
-local function ProcessQueue() --[[ Line: 27 | Upvalues: t (copy), v1 (ref), GlobalEventGui (copy) ]]
+local function ProcessQueue()
 	if #t > 0 then
 		v1 = true
 		local v12 = table.remove(t, 1)
@@ -27,13 +28,13 @@ local function ProcessQueue() --[[ Line: 27 | Upvalues: t (copy), v1 (ref), Glob
 		GlobalEventGui.Enabled = false
 	end
 end
-function Hook(p1) --[[ Line: 39 | Upvalues: Audio (copy), GlobalEventGui (copy), DialogueContainer (copy), TypeWriteLabel (copy), Bio (copy), Sound (copy), t (copy), v1 (ref) ]]
+function Hook(p1)
 	Audio.ObjectLocal(GlobalEventGui, 4838933194, {
 		Volume = 0.3,
 		TimePosition = 0.15
 	})
 	DialogueContainer.Icon.Icon.Image = ("https://www.roblox.com/bust-thumbnail/image?width=420&height=420&format=png&userId=%d"):format(p1.UserId)
-	TypeWriteLabel(p1.Text, Bio, 18, function(p1) --[[ Line: 43 | Upvalues: Sound (ref) ]]
+	TypeWriteLabel(p1.Text, Bio, 18, function(p1)
 		if p1 % 2 == 0 then
 			Sound:Play()
 		end
@@ -50,8 +51,8 @@ function Hook(p1) --[[ Line: 39 | Upvalues: Audio (copy), GlobalEventGui (copy),
 		GlobalEventGui.Enabled = false
 	end
 end
-RxInstanceUtils.observeOneChildNamed(ReplicatedStorage, "GlobalEventRemote", function(p1) --[[ Line: 53 | Upvalues: t (copy), v1 (ref), GlobalEventGui (copy) ]]
-	p1.OnClientEvent:Connect(function(p1, p2, p3) --[[ Line: 54 | Upvalues: t (ref), v1 (ref), GlobalEventGui (ref) ]]
+RxInstanceUtils.observeOneChildNamed(ReplicatedStorage, "GlobalEventRemote", function(p1)
+	p1.OnClientEvent:Connect(function(p1, p2, p3)
 		table.insert(t, {
 			UserId = p1,
 			Text = p2,

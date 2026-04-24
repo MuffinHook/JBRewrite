@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
@@ -19,7 +20,7 @@ local UI = require(ReplicatedStorage.Module.UI)
 local Joint = require(ReplicatedStorage.Std.Joint)
 local CircleAction = UI.CircleAction
 local v1 = nil
-local function v2(p1, p2) --[[ Line: 26 | Upvalues: v2 (copy) ]]
+local function v2(p1, p2)
 	for i, v in ipairs(p1:GetChildren()) do
 		local v1
 		if v:IsA("BasePart") then
@@ -30,10 +31,10 @@ local function v2(p1, p2) --[[ Line: 26 | Upvalues: v2 (copy) ]]
 	end
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 37 | Upvalues: v1 (ref), Audio (copy), LocalPlayer (copy), Silo (copy), CamShaker (copy), CurrentCamera (copy), Nuke (copy), RunService (copy), ReplicatedStorage (copy), Shockwave (copy), VehicleUtils (copy), CharacterUtil (copy), Falling (copy), MarketplaceService (copy), Confirmation (copy), Format (copy), CircleAction (copy), CollectionService (copy), v2 (copy), Joint (copy), TweenService (copy) ]]
+	Init = function(p1)
 		v1 = p1.Event
 		local em = p1.em
-		function em.qx3dpfz6(p1) --[[ Line: 41 | Upvalues: Audio (ref), LocalPlayer (ref), Silo (ref), CamShaker (ref), CurrentCamera (ref), Nuke (ref), RunService (ref), ReplicatedStorage (ref), Shockwave (ref), v1 (ref), VehicleUtils (ref), CharacterUtil (ref), Falling (ref) ]]
+		function em.qx3dpfz6(p1)
 			assert(p1 ~= nil)
 			assert(p1.Nuke ~= nil)
 			assert(p1.Shockwave ~= nil)
@@ -45,7 +46,7 @@ return {
 			Audio.FadeTo(v2, 0.5, 5)
 			local v3 = Silo.new(workspace:WaitForChild("Silo", 1))
 			local v5 = v3.Model.Tube.Position + Vector3.new(0, v3.Model.Tube.Size.Y * 0.5, 0)
-			local v7 = CamShaker.new(Enum.RenderPriority.Camera.Value + 1, function(p1) --[[ Line: 54 | Upvalues: CurrentCamera (ref) ]]
+			local v7 = CamShaker.new(Enum.RenderPriority.Camera.Value + 1, function(p1)
 				CurrentCamera.CFrame = CurrentCamera.CFrame * p1
 			end)
 			v7:Start()
@@ -53,7 +54,7 @@ return {
 			v3:Open()
 			local v9 = tick()
 			local v10 = nil
-			v10 = RunService.Heartbeat:Connect(function() --[[ Line: 65 | Upvalues: v9 (copy), v10 (ref), v8 (copy), v5 (copy) ]]
+			v10 = RunService.Heartbeat:Connect(function()
 				local v1 = (tick() - v9) / 5
 				if v1 > 1 then
 					v10:Disconnect()
@@ -61,7 +62,7 @@ return {
 				end
 				v8.Model:SetPrimaryPartCFrame(CFrame.new(v5) * CFrame.Angles(1.5707963267948966, 0, 0) * CFrame.new(0, 0, 48 * (1 - v1) + 12 * v1))
 			end)
-			v3.OnOpened:Connect(function() --[[ Line: 81 | Upvalues: p1 (copy), v8 (copy), Audio (ref), LocalPlayer (ref), v7 (copy), CamShaker (ref), v2 (copy), ReplicatedStorage (ref), RunService (ref), Shockwave (ref), v1 (ref), VehicleUtils (ref), CharacterUtil (ref), Falling (ref) ]]
+			v3.OnOpened:Connect(function()
 				p1.Nuke.Origin = v8.Model.PrimaryPart.CFrame.p
 				v8:Launch(p1.Nuke)
 				Audio.ObjectLocal(LocalPlayer, 2205008075)
@@ -71,9 +72,9 @@ return {
 				})
 				Audio.FadeTo(v12, 0.8, 0.5)
 				local v22 = v7:ShakeSustain(CamShaker.Presets.Vibration)
-				v8.OnImpact:Connect(function() --[[ Line: 90 | Upvalues: Audio (ref), v2 (ref), LocalPlayer (ref), v7 (ref), CamShaker (ref), v22 (copy), v12 (ref), ReplicatedStorage (ref), p1 (ref), RunService (ref), Shockwave (ref), v1 (ref), VehicleUtils (ref), CharacterUtil (ref), Falling (ref) ]]
+				v8.OnImpact:Connect(function()
 					Audio.FadeTo(v2, 0, 5)
-					delay(5, function() --[[ Line: 92 | Upvalues: v2 (ref) ]]
+					delay(5, function()
 						v2:Destroy()
 					end)
 					Audio.ObjectLocal(LocalPlayer, 2205008239, {
@@ -82,7 +83,7 @@ return {
 					v7:Shake(CamShaker.Presets.Explosion)
 					v22:StartFadeOut(1)
 					Audio.FadeTo(v12, 0, 0.5)
-					delay(0.5, function() --[[ Line: 100 | Upvalues: v12 (ref) ]]
+					delay(0.5, function()
 						v12:Destroy()
 						v12 = nil
 					end)
@@ -90,10 +91,10 @@ return {
 					v13.CFrame = CFrame.new(p1.Nuke.Target) + Vector3.new(0, 261.646, 0)
 					v13.Transparency = 1
 					v13.Parent = workspace
-					local function FadeInCloud() --[[ Line: 110 | Upvalues: RunService (ref), v13 (copy) ]]
+					local function FadeInCloud()
 						local v1 = tick()
 						local v2 = nil
-						v2 = RunService.Heartbeat:Connect(function() --[[ Line: 114 | Upvalues: v1 (copy), v2 (ref), v13 (ref) ]]
+						v2 = RunService.Heartbeat:Connect(function()
 							local v12 = (tick() - v1) / 5
 							if v12 > 1 then
 								v2:Disconnect()
@@ -102,10 +103,10 @@ return {
 							v13.Transparency = 1 * (1 - v12) + 0 * v12
 						end)
 					end
-					local function FadeOutCloud() --[[ Line: 125 | Upvalues: RunService (ref), v13 (copy) ]]
+					local function FadeOutCloud()
 						local v1 = tick()
 						local v2 = nil
-						v2 = RunService.Heartbeat:Connect(function() --[[ Line: 129 | Upvalues: v1 (copy), v2 (ref), v13 (ref) ]]
+						v2 = RunService.Heartbeat:Connect(function()
 							local v12 = (tick() - v1) / 2
 							if v12 > 1 then
 								v2:Disconnect()
@@ -116,7 +117,7 @@ return {
 					end
 					local v23 = tick()
 					local v3 = nil
-					v3 = RunService.Heartbeat:Connect(function() --[[ Line: 114 | Upvalues: v23 (copy), v3 (ref), v13 (copy) ]]
+					v3 = RunService.Heartbeat:Connect(function()
 						local v1 = (tick() - v23) / 5
 						if v1 > 1 then
 							v3:Disconnect()
@@ -125,7 +126,7 @@ return {
 						v13.Transparency = 1 * (1 - v1) + 0 * v1
 					end)
 					local v4 = Shockwave.new(p1.Nuke.Target, p1.Shockwave)
-					v4.OnPastLocalPlayer:Connect(function() --[[ Line: 144 | Upvalues: v1 (ref), VehicleUtils (ref), CharacterUtil (ref), Falling (ref) ]]
+					v4.OnPastLocalPlayer:Connect(function()
 						v1:FireServer("j" .. ("x669lyj"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("no8ta8ph1czx"):sub(5, 9):reverse():reverse():reverse() .. "m")
 						local v12 = VehicleUtils.GetLocalVehiclePacket()
 						if v12 ~= nil then
@@ -138,11 +139,11 @@ return {
 						end
 						Falling.StartRagdolling(5)
 					end)
-					v4.OnDestroyed:Connect(function() --[[ Line: 158 | Upvalues: v7 (ref), RunService (ref), v13 (copy) ]]
+					v4.OnDestroyed:Connect(function()
 						v7:Stop()
 						local v1 = tick()
 						local v2 = nil
-						v2 = RunService.Heartbeat:Connect(function() --[[ Line: 129 | Upvalues: v1 (copy), v2 (ref), v13 (ref) ]]
+						v2 = RunService.Heartbeat:Connect(function()
 							local v12 = (tick() - v1) / 2
 							if v12 > 1 then
 								v2:Disconnect()
@@ -154,35 +155,35 @@ return {
 				end)
 			end)
 		end
-		function em.mlmt6v4d() --[[ Line: 166 | Upvalues: MarketplaceService (ref), Confirmation (ref), Format (ref), LocalPlayer (ref) ]]
-			local v1, v2 = pcall(function() --[[ Line: 167 | Upvalues: MarketplaceService (ref) ]]
+		function em.mlmt6v4d()
+			local v1, v2 = pcall(function()
 				return MarketplaceService:GetProductInfo(980194938, Enum.InfoType.Product)
 			end)
 			local v3 = v1 and v2 and v2.PriceInRobux or 16000
 			local v4 = Confirmation.new("Do you want to buy Uranium to launch a Nuke?")
-			v4.OnYes:Connect(function() --[[ Line: 172 | Upvalues: v4 (ref), Confirmation (ref), Format (ref), v3 (copy), MarketplaceService (ref), LocalPlayer (ref) ]]
+			v4.OnYes:Connect(function()
 				v4 = nil
 				local v1 = Confirmation.new(string.format("Are you SURE? It costs %s Robux.", Format.Comma(v3)))
-				v1.OnYes:Connect(function() --[[ Line: 177 | Upvalues: MarketplaceService (ref), LocalPlayer (ref), v1 (ref) ]]
+				v1.OnYes:Connect(function()
 					MarketplaceService:PromptProductPurchase(LocalPlayer, 980194938)
 					v1 = nil
 				end)
-				v1.OnNo:Connect(function() --[[ Line: 182 | Upvalues: v1 (ref) ]]
+				v1.OnNo:Connect(function()
 					v1 = nil
 				end)
 			end)
-			v4.OnNo:Connect(function() --[[ Line: 186 | Upvalues: v4 (ref) ]]
+			v4.OnNo:Connect(function()
 				v4 = nil
 			end)
 		end
-		local function Action(p1, p2) --[[ Line: 191 | Upvalues: v1 (ref) ]]
+		local function Action(p1, p2)
 			if p2 then
 				v1:FireServer("z" .. "" .. ("aidmekvo"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("b6wv0"):sub(3, 3):reverse() .. "clj")
 				return true
 			end
 		end
 		local v12 = nil
-		local function AddedFun(p1) --[[ Line: 198 | Upvalues: v12 (ref), Action (copy), CircleAction (ref) ]]
+		local function AddedFun(p1)
 			v12 = p1
 			local Button = p1:WaitForChild("Button")
 			CircleAction.Add({
@@ -195,7 +196,7 @@ return {
 				Callback = Action
 			}, p1)
 		end
-		local function RemovedFun(p1) --[[ Line: 212 | Upvalues: v12 (ref), CircleAction (ref) ]]
+		local function RemovedFun(p1)
 			v12 = nil
 			CircleAction.Remove(p1)
 		end
@@ -204,7 +205,7 @@ return {
 		end
 		CollectionService:GetInstanceAddedSignal("NukeUranium"):Connect(AddedFun)
 		CollectionService:GetInstanceRemovedSignal("NukeUranium"):Connect(RemovedFun)
-		function em.lw1ioe8o(p1) --[[ Line: 222 | Upvalues: v12 (ref), v2 (ref) ]]
+		function em.lw1ioe8o(p1)
 			if v12 ~= nil then
 				local Visual = v12:FindFirstChild("Visual")
 				if Visual ~= nil then
@@ -212,8 +213,8 @@ return {
 				end
 			end
 		end
-		CollectionService:GetInstanceAddedSignal("C4Nuke"):Connect(function(p1) --[[ Line: 231 | Upvalues: CamShaker (ref), CurrentCamera (ref), Audio (ref), LocalPlayer (ref), ReplicatedStorage (ref), Joint (ref), TweenService (ref), Shockwave (ref) ]]
-			local v2 = CamShaker.new(Enum.RenderPriority.Camera.Value + 1, function(p1) --[[ Line: 238 | Upvalues: CurrentCamera (ref) ]]
+		CollectionService:GetInstanceAddedSignal("C4Nuke"):Connect(function(p1)
+			local v2 = CamShaker.new(Enum.RenderPriority.Camera.Value + 1, function(p1)
 				CurrentCamera.CFrame = CurrentCamera.CFrame * p1
 			end)
 			v2:Start()
@@ -244,7 +245,7 @@ return {
 			v4:StartFadeOut(1)
 			v2:Shake(CamShaker.Presets.Explosion)
 			Audio.FadeTo(v3, 0, 0.5)
-			task.delay(0.5, function() --[[ Line: 272 | Upvalues: v3 (ref) ]]
+			task.delay(0.5, function()
 				v3:Destroy()
 				v3 = nil
 			end)
@@ -254,7 +255,7 @@ return {
 				EndTransparency = 1,
 				StartTransparency = 0,
 				FxDisabled = true
-			}).OnDestroyed:Connect(function() --[[ Line: 284 | Upvalues: v2 (copy) ]]
+			}).OnDestroyed:Connect(function()
 				v2:Stop()
 			end)
 		end)

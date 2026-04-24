@@ -1,13 +1,14 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClanConsts = require(ReplicatedStorage.Clan.ClanConsts)
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), ReplicatedStorage (copy), ClanConsts (copy), RoactRodux (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local CrewLeaderboard = require(script.Parent.CrewLeaderboard)
 	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
 	local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
-	function v1.init(p1) --[[ Line: 11 | Upvalues: ClanConsts (ref) ]]
+	function v1.init(p1)
 		p1.aspectRatio = 1.5
 		p1.leaderboardInfo = {
 			{
@@ -208,7 +209,7 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), ReplicatedStorage (co
 			}
 		}
 	end
-	function v1.render(p1) --[[ Line: 213 | Upvalues: Roact (ref), RoactRodux (ref), persistentCrewStore (copy), CrewLeaderboard (copy), PersistentCrewBattleConsts (copy) ]]
+	function v1.render(p1)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement("Frame", {
@@ -218,7 +219,7 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), ReplicatedStorage (co
 					leaderboardInfo = p1.leaderboardInfo,
 					aspectRatio = p1.aspectRatio,
 					displayType = PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.CrewsInServer,
-					attemptViewClanId = function() --[[ Name: attemptViewClanId | Line: 224 ]]
+					attemptViewClanId = function()
 						print("attempting join")
 					end
 				}),
@@ -228,7 +229,7 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), ReplicatedStorage (co
 			}) })
 	end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 236 | Upvalues: Roact (ref), v2 (copy) ]]
+	return function()
 		Roact.unmount(v2)
 	end
 end

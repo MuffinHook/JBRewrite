@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local t = {}
 t.__index = t
 t.ClassName = "RoundedBackingBuilder"
-function t.new() --[[ Line: 8 | Upvalues: t (copy) ]]
+function t.new()
 	return setmetatable({}, t)
 end
-function t.CreateBacking(p1, p2) --[[ Line: 14 ]]
+function t.CreateBacking(p1, p2)
 	local Backing = Instance.new("ImageLabel")
 	Backing.Name = "Backing"
 	Backing.Size = UDim2.new(1, 0, 1, 0)
@@ -18,13 +19,13 @@ function t.CreateBacking(p1, p2) --[[ Line: 14 ]]
 	p2.BackgroundTransparency = 1
 	return Backing
 end
-function t.CreateTopBacking(p1, p2) --[[ Line: 32 ]]
+function t.CreateTopBacking(p1, p2)
 	local v1 = p1:CreateBacking(p2)
 	v1.ImageRectSize = Vector2.new(20, 16)
 	v1.SliceCenter = Rect.new(4, 4, 16, 16)
 	return v1
 end
-function t.CreateShadow(p1, p2) --[[ Line: 42 ]]
+function t.CreateShadow(p1, p2)
 	local Shadow = Instance.new("ImageLabel")
 	Shadow.Name = "Shadow"
 	Shadow.Size = UDim2.new(1, 6, 1, 6)
@@ -40,7 +41,7 @@ function t.CreateShadow(p1, p2) --[[ Line: 42 ]]
 	Shadow.Parent = p2.Parent
 	return Shadow
 end
-function t.Create(p1, p2) --[[ Line: 61 ]]
+function t.Create(p1, p2)
 	local v1 = p1:CreateBacking(p2)
 	p1:CreateShadow(v1)
 	return v1

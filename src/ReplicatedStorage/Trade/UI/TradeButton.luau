@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local Roact = require(ReplicatedStorage.Roact)
@@ -14,34 +15,34 @@ v1.defaultProps = {
 	cornerPixel = 4,
 	cornerScale = 0
 }
-function v1.init(p1) --[[ Line: 18 ]]
-	function p1.onActivated() --[[ Line: 19 | Upvalues: p1 (copy) ]]
+function v1.init(p1)
+	function p1.onActivated()
 		if not p1.props.disabled and p1.props.onClick then
 			p1.props.onClick()
 		end
 	end
-	function p1.onMouseEnter() --[[ Line: 26 | Upvalues: p1 (copy) ]]
+	function p1.onMouseEnter()
 		p1:setState({
 			hover = true
 		})
 	end
-	function p1.onMouseLeave() --[[ Line: 31 | Upvalues: p1 (copy) ]]
+	function p1.onMouseLeave()
 		p1:setState({
 			hover = false
 		})
 	end
-	function p1.onMouseDown() --[[ Line: 36 | Upvalues: p1 (copy) ]]
+	function p1.onMouseDown()
 		p1:setState({
 			pressed = true
 		})
 	end
-	function p1.onMouseUp() --[[ Line: 41 | Upvalues: p1 (copy) ]]
+	function p1.onMouseUp()
 		p1:setState({
 			pressed = false
 		})
 	end
 end
-function v1.render(p1) --[[ Line: 47 | Upvalues: ColorUtils (copy), createElement (copy), Roact (copy) ]]
+function v1.render(p1)
 	local backgroundColor = p1.props.backgroundColor
 	if p1.props.disabled then
 		backgroundColor = ColorUtils.brightenBy(p1.props.backgroundColor, -0.5)

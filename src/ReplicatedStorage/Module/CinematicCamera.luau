@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local v1 = CFrame.new
 local v2 = Vector3.new
 v1()
 local v3 = v2()
 return {
-	MakeCinematicCamera = function() --[[ Name: MakeCinematicCamera | Line: 7 | Upvalues: v3 (copy) ]]
+	MakeCinematicCamera = function()
 		return {
 			StartPosition = nil,
 			Position = v3,
@@ -13,7 +14,7 @@ return {
 			TargetFocus = nil
 		}
 	end,
-	StepCinematicCamera = function(p1, p2, p3, p4) --[[ Name: StepCinematicCamera | Line: 16 | Upvalues: CurrentCamera (copy), v1 (copy), v3 (copy) ]]
+	StepCinematicCamera = function(p1, p2, p3, p4)
 		if p2.TargetPosition then
 			if p2.StartPosition then
 				p2.Position = p2.StartPosition * (1 - p4) + p2.TargetPosition * p4

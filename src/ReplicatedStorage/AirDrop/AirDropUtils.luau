@@ -4,26 +4,26 @@ local AirDropConsts = require(ReplicatedStorage.AirDrop.AirDropConsts)
 local Players = game:GetService("Players")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
 return {
-	getPlayerIsInAmbulanceStretcher = function(p1)
-		assert(p1, "No player passed")
-		local v1 = p1:FindFirstChild(AirDropConsts.IN_AMBULANCE_STRETCHER_OBJ_NAME)
-		if v1 then
-			return v1.Value
+	getPlayerIsInAmbulanceStretcher = function(player)
+		assert(player, "No player passed")
+		local stretcherValue = player:FindFirstChild(AirDropConsts.IN_AMBULANCE_STRETCHER_OBJ_NAME)
+		if stretcherValue then
+			return stretcherValue.Value
 		else
 			return false
 		end
 	end,
-	setPlayerIsInAmbulanceStretcher = function(p1, p2)
-		assert(p1, "No player passed")
-		assert(typeof(p2) == "boolean", "Incorrect value type passed")
-		local v2 = p1:FindFirstChild(AirDropConsts.IN_AMBULANCE_STRETCHER_OBJ_NAME)
-		if not v2 then
-			local v3 = Instance.new("BoolValue")
-			v3.Name = AirDropConsts.IN_AMBULANCE_STRETCHER_OBJ_NAME
-			v3.Parent = p1
-			v2 = v3
+	setPlayerIsInAmbulanceStretcher = function(player, isInStretcher)
+		assert(player, "No player passed")
+		assert(typeof(isInStretcher) == "boolean", "Incorrect value type passed")
+		local stretcherValue = player:FindFirstChild(AirDropConsts.IN_AMBULANCE_STRETCHER_OBJ_NAME)
+		if not stretcherValue then
+			local newStretcherValue = Instance.new("BoolValue")
+			newStretcherValue.Name = AirDropConsts.IN_AMBULANCE_STRETCHER_OBJ_NAME
+			newStretcherValue.Parent = player
+			stretcherValue = newStretcherValue
 		end
-		v2.Value = p2
+		stretcherValue.Value = isInStretcher
 		return true
 	end,
 	getGuardHealthDebuffMultiplier = function()

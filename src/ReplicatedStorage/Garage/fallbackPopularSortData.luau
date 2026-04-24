@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 return {
 	BodyColor = {
 		Black = 1,

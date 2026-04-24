@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Util = require(script.Parent.Parent.Shared.Util)
 local tbl = {
 	Years = 31556926,
@@ -13,7 +14,7 @@ for k, v in pairs(tbl) do
 	table.insert(t, k)
 end
 local v1 = Util.MakeFuzzyFinder(t)
-local function stringToSecondDuration(p1) --[[ Line: 19 | Upvalues: v1 (copy), tbl (copy) ]]
+local function stringToSecondDuration(p1)
 	if p1 == nil or p1 == "" then
 		return nil
 	else
@@ -55,7 +56,7 @@ local function stringToSecondDuration(p1) --[[ Line: 19 | Upvalues: v1 (copy), t
 		end
 	end
 end
-local function mapUnits(p1, p2, p3, p4) --[[ Line: 60 ]]
+local function mapUnits(p1, p2, p3, p4)
 	local v1 = p4 or 1
 	local t = {}
 	for k, v in pairs(p1) do
@@ -68,13 +69,13 @@ local function mapUnits(p1, p2, p3, p4) --[[ Line: 60 ]]
 	return t
 end
 local t2 = {
-	Transform = function(p1) --[[ Name: Transform | Line: 74 | Upvalues: stringToSecondDuration (copy) ]]
+	Transform = function(p1)
 		return p1, stringToSecondDuration(p1)
 	end,
-	Validate = function(p1, p2) --[[ Name: Validate | Line: 78 ]]
+	Validate = function(p1, p2)
 		return p2 ~= nil
 	end,
-	Autocomplete = function(p1, p2, p3, p4, p5) --[[ Name: Autocomplete | Line: 82 | Upvalues: v1 (copy), mapUnits (copy) ]]
+	Autocomplete = function(p1, p2, p3, p4, p5)
 		local t = {}
 		if p4 or p5 then
 			local v12 = p4 == true and v1("", false, true) or p5
@@ -93,11 +94,11 @@ local t2 = {
 			return t
 		end
 	end,
-	Parse = function(p1, p2) --[[ Name: Parse | Line: 106 ]]
+	Parse = function(p1, p2)
 		return p2
 	end
 }
-return function(p1) --[[ Line: 111 | Upvalues: t2 (copy), Util (copy) ]]
+return function(p1)
 	p1:RegisterType("duration", t2)
 	p1:RegisterType("durations", Util.MakeListableType(t2))
 end

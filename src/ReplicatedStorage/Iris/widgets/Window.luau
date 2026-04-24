@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
-	local function relocateTooltips() --[[ Line: 4 | Upvalues: p1 (copy), p2 (copy) ]]
+return function(p1, p2)
+	local function relocateTooltips()
 		if p1._rootInstance ~= nil then
 			local PopupScreenGui = p1._rootInstance:FindFirstChild("PopupScreenGui")
 			local TooltipContainer = PopupScreenGui.TooltipContainer
@@ -8,7 +9,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			TooltipContainer.Position = UDim2.fromOffset(v2.X, v2.Y)
 		end
 	end
-	p2.registerEvent("InputChanged", function() --[[ Line: 15 | Upvalues: p1 (copy), relocateTooltips (copy) ]]
+	p2.registerEvent("InputChanged", function()
 		if p1._started then
 			relocateTooltips()
 		end
@@ -20,7 +21,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Text = 1
 		},
 		Events = {},
-		Generate = function(p12) --[[ Name: Generate | Line: 30 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			p12.parentWidget = p1._rootWidget
 			local Iris_Tooltip = Instance.new("Frame")
 			Iris_Tooltip.Name = "Iris_Tooltip"
@@ -43,14 +44,14 @@ return function(p1, p2) --[[ Line: 3 ]]
 			TooltipText.Parent = Iris_Tooltip
 			return Iris_Tooltip
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 58 | Upvalues: relocateTooltips (copy) ]]
+		Update = function(p1)
 			if p1.arguments.Text == nil then
 				error("Text argument is required for Iris.Tooltip().", 5)
 			end
 			p1.Instance.TooltipText.Text = p1.arguments.Text
 			relocateTooltips()
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 67 ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	})
@@ -68,7 +69,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 	local v10 = nil
 	local v11 = false
 	local t = {}
-	local function quickSwapWindows() --[[ Line: 91 | Upvalues: p1 (copy), t (copy) ]]
+	local function quickSwapWindows()
 		if p1._config.UseScreenGUIs == false then
 			return
 		end
@@ -90,19 +91,19 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p1.SetFocusedWindow(v2)
 		end
 	end
-	local function fitSizeToWindowBounds(p12, p22) --[[ Line: 122 | Upvalues: p1 (copy), p2 (copy) ]]
+	local function fitSizeToWindowBounds(p12, p22)
 		local v1 = Vector2.new(p12.state.position.value.X, p12.state.position.value.Y)
 		local v2 = (p1._config.TextSize + 2 * p1._config.FramePadding.Y) * 2
 		local v3 = p2.getScreenSizeForWindow(p12) - v1 - Vector2.new(p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.X, p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.Y)
 		return Vector2.new(math.clamp(p22.X, v2, (math.max(v3.X, v2))), (math.clamp(p22.Y, v2, (math.max(v3.Y, v2)))))
 	end
-	local function fitPositionToWindowBounds(p12, p22) --[[ Line: 132 | Upvalues: p2 (copy), p1 (copy) ]]
+	local function fitPositionToWindowBounds(p12, p22)
 		local v1 = p12.Instance
 		local v2 = p2.getScreenSizeForWindow(p12)
 		local v3 = Vector2.new(p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.X, p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.Y)
 		return Vector2.new(math.clamp(p22.X, v3.X, (math.max(v3.X, v2.X - v1.WindowButton.AbsoluteSize.X - v3.X))), (math.clamp(p22.Y, v3.Y, (math.max(v3.Y, v2.Y - v1.WindowButton.AbsoluteSize.Y - v3.Y)))))
 	end
-	function p1.SetFocusedWindow(p12) --[[ Line: 143 | Upvalues: v10 (ref), v11 (ref), t (copy), p1 (copy), v1 (ref), p2 (copy) ]]
+	function p1.SetFocusedWindow(p12)
 		if v10 ~= p12 then
 			if v11 and v10 ~= nil then
 				if t[v10.ID] then
@@ -148,7 +149,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			end
 		end
 	end
-	p2.registerEvent("InputBegan", function(p12) --[[ Line: 204 | Upvalues: p1 (copy), p2 (copy), t (copy), quickSwapWindows (copy), v7 (ref), v8 (ref), v11 (ref), v10 (ref), Top (ref), Left (ref), v6 (ref), v5 (ref) ]]
+	p2.registerEvent("InputBegan", function(p12)
 		if p1._started then
 			if p12.UserInputType == Enum.UserInputType.MouseButton1 then
 				local v1 = p2.getMouseLocation()
@@ -181,12 +182,12 @@ return function(p1, p2) --[[ Line: 3 ]]
 			end
 		end
 	end)
-	p2.registerEvent("TouchTapInWorld", function(p12, p2) --[[ Line: 250 | Upvalues: p1 (copy) ]]
+	p2.registerEvent("TouchTapInWorld", function(p12, p2)
 		if p1._started and not p2 then
 			p1.SetFocusedWindow(nil)
 		end
 	end)
-	p2.registerEvent("InputChanged", function(p12) --[[ Line: 259 | Upvalues: p1 (copy), v3 (ref), v2 (ref), p2 (copy), v4 (ref), fitPositionToWindowBounds (copy), v6 (ref), v5 (ref), v9 (ref), Left (ref), Top (ref), fitSizeToWindowBounds (copy) ]]
+	p2.registerEvent("InputChanged", function(p12)
 		if p1._started then
 			if v3 and v2 then
 				local v1
@@ -216,7 +217,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			v9 = p2.getMouseLocation()
 		end
 	end)
-	p2.registerEvent("InputEnded", function(p12, p2) --[[ Line: 313 | Upvalues: p1 (copy), v3 (ref), v2 (ref), v6 (ref), v5 (ref), quickSwapWindows (copy) ]]
+	p2.registerEvent("InputEnded", function(p12, p2)
 		if p1._started then
 			if (p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch) and (v3 and v2) then
 				local WindowButton = v2.Instance.WindowButton
@@ -249,34 +250,34 @@ return function(p1, p2) --[[ Line: 3 ]]
 		},
 		Events = {
 			closed = {
-				Init = function(p1) --[[ Line: 352 ]] end,
-				Get = function(p12) --[[ Line: 353 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastClosedTick == p1._cycleTick
 				end
 			},
 			opened = {
-				Init = function(p1) --[[ Line: 358 ]] end,
-				Get = function(p12) --[[ Line: 359 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastOpenedTick == p1._cycleTick
 				end
 			},
 			collapsed = {
-				Init = function(p1) --[[ Line: 364 ]] end,
-				Get = function(p12) --[[ Line: 365 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastCollapsedTick == p1._cycleTick
 				end
 			},
 			uncollapsed = {
-				Init = function(p1) --[[ Line: 370 ]] end,
-				Get = function(p12) --[[ Line: 371 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastUncollapsedTick == p1._cycleTick
 				end
 			},
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 375 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance.WindowButton
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 380 | Upvalues: p1 (copy), t (copy), p2 (copy), v2 (ref), v3 (ref), v4 (ref), v11 (ref), v10 (ref), v6 (ref), Top (ref), Left (ref), v5 (ref), v7 (ref), v8 (ref) ]]
+		Generate = function(p12)
 			p12.parentWidget = p1._rootWidget
 			p12.usesScreenGuis = p1._config.UseScreenGUIs
 			t[p12.ID] = p12
@@ -316,7 +317,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			WindowButton.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
 			p2.UIStroke(WindowButton, p1._config.WindowBorderSize, p1._config.BorderColor, p1._config.BorderTransparency)
 			WindowButton.Parent = Iris_Window
-			p2.applyInputBegan(WindowButton, function(p13) --[[ Line: 425 | Upvalues: p12 (copy), p1 (ref), v2 (ref), v3 (ref), v4 (ref), p2 (ref) ]]
+			p2.applyInputBegan(WindowButton, function(p13)
 				if p13.UserInputType ~= Enum.UserInputType.MouseMovement and p13.UserInputType ~= Enum.UserInputType.Keyboard then
 					if p12.state.isUncollapsed.value then
 						p1.SetFocusedWindow(p12)
@@ -361,10 +362,10 @@ return function(p1, p2) --[[ Line: 3 ]]
 			UIFlexItem.FlexMode = Enum.UIFlexMode.Fill
 			UIFlexItem.ItemLineAlignment = Enum.ItemLineAlignment.End
 			UIFlexItem.Parent = WindowContainer
-			WindowContainer:GetPropertyChangedSignal("CanvasPosition"):Connect(function() --[[ Line: 480 | Upvalues: p12 (copy), WindowContainer (copy) ]]
+			WindowContainer:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
 				p12.state.scrollDistance.value = WindowContainer.CanvasPosition.Y
 			end)
-			p2.applyInputBegan(WindowContainer, function(p13) --[[ Line: 485 | Upvalues: p12 (copy), p1 (ref) ]]
+			p2.applyInputBegan(WindowContainer, function(p13)
 				if p13.UserInputType ~= Enum.UserInputType.MouseMovement and p13.UserInputType ~= Enum.UserInputType.Keyboard and p12.state.isUncollapsed.value then
 					p1.SetFocusedWindow(p12)
 				end
@@ -386,7 +387,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			TitleBar.Parent = Frame
 			p2.UIPadding(TitleBar, Vector2.new(p1._config.FramePadding.X))
 			p2.UIListLayout(TitleBar, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
-			p2.applyInputBegan(TitleBar, function(p1) --[[ Line: 516 | Upvalues: p12 (copy), v2 (ref), v3 (ref), v4 (ref) ]]
+			p2.applyInputBegan(TitleBar, function(p1)
 				if p1.UserInputType == Enum.UserInputType.Touch and not p12.arguments.NoMove then
 					v2 = p12
 					v3 = true
@@ -407,7 +408,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			CollapseButton.Text = ""
 			p2.UICorner(CollapseButton)
 			CollapseButton.Parent = TitleBar
-			p2.applyButtonClick(CollapseButton, function() --[[ Line: 544 | Upvalues: p12 (copy) ]]
+			p2.applyButtonClick(CollapseButton, function()
 				p12.state.isUncollapsed:set(not p12.state.isUncollapsed.value)
 			end)
 			p2.applyInteractionHighlights("Background", CollapseButton, CollapseButton, {
@@ -441,7 +442,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			CloseButton.AutoButtonColor = false
 			CloseButton.LayoutOrder = 2
 			p2.UICorner(CloseButton)
-			p2.applyButtonClick(CloseButton, function() --[[ Line: 583 | Upvalues: p12 (copy) ]]
+			p2.applyButtonClick(CloseButton, function()
 				p12.state.isOpened:set(false)
 			end)
 			p2.applyInteractionHighlights("Background", CloseButton, CloseButton, {
@@ -502,7 +503,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				ActiveColor = p1._config.ResizeGripActiveColor,
 				ActiveTransparency = p1._config.ResizeGripActiveTransparency
 			})
-			p2.applyButtonDown(LeftResizeGrip, function() --[[ Line: 658 | Upvalues: v11 (ref), v10 (ref), p12 (copy), p1 (ref), v6 (ref), Top (ref), Left (ref), v5 (ref) ]]
+			p2.applyButtonDown(LeftResizeGrip, function()
 				if not v11 or v10 ~= p12 then
 					p1.SetFocusedWindow(p12)
 				end
@@ -533,7 +534,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				ActiveColor = p1._config.ResizeGripActiveColor,
 				ActiveTransparency = p1._config.ResizeGripActiveTransparency
 			})
-			p2.applyButtonDown(RightResizeGrip, function() --[[ Line: 694 | Upvalues: v11 (ref), v10 (ref), p12 (copy), p1 (ref), v6 (ref), Top (ref), Left (ref), v5 (ref) ]]
+			p2.applyButtonDown(RightResizeGrip, function()
 				if not v11 or v10 ~= p12 then
 					p1.SetFocusedWindow(p12)
 				end
@@ -648,27 +649,27 @@ return function(p1, p2) --[[ Line: 3 ]]
 			ResizeBorder.Selectable = false
 			ResizeBorder.ClipsDescendants = false
 			ResizeBorder.Parent = WindowButton
-			p2.applyMouseEnter(ResizeBorder, function() --[[ Line: 824 | Upvalues: v10 (ref), p12 (copy), v7 (ref) ]]
+			p2.applyMouseEnter(ResizeBorder, function()
 				if v10 == p12 then
 					v7 = true
 				end
 			end)
-			p2.applyMouseLeave(ResizeBorder, function() --[[ Line: 829 | Upvalues: v10 (ref), p12 (copy), v7 (ref) ]]
+			p2.applyMouseLeave(ResizeBorder, function()
 				if v10 == p12 then
 					v7 = false
 				end
 			end)
-			p2.applyInputBegan(ResizeBorder, function(p13) --[[ Line: 834 | Upvalues: p12 (copy), p1 (ref) ]]
+			p2.applyInputBegan(ResizeBorder, function(p13)
 				if p13.UserInputType ~= Enum.UserInputType.MouseMovement and p13.UserInputType ~= Enum.UserInputType.Keyboard and p12.state.isUncollapsed.value then
 					p1.SetFocusedWindow(p12)
 				end
 			end)
-			p2.applyMouseEnter(WindowButton, function() --[[ Line: 843 | Upvalues: v10 (ref), p12 (copy), v8 (ref) ]]
+			p2.applyMouseEnter(WindowButton, function()
 				if v10 == p12 then
 					v8 = true
 				end
 			end)
-			p2.applyMouseLeave(WindowButton, function() --[[ Line: 848 | Upvalues: v10 (ref), p12 (copy), v8 (ref) ]]
+			p2.applyMouseLeave(WindowButton, function()
 				if v10 == p12 then
 					v8 = false
 				end
@@ -676,7 +677,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p12.ChildContainer = WindowContainer
 			return Iris_Window
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 857 | Upvalues: p1 (copy), v11 (ref), v10 (ref), fitPositionToWindowBounds (copy), fitSizeToWindowBounds (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.size == nil then
 				p12.state.size = p1._widgetState(p12, "size", Vector2.new(400, 300))
 			end
@@ -695,7 +696,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				p12.state.scrollDistance = p1._widgetState(p12, "scrollDistance", 0)
 			end
 		end,
-		Update = function(p12) --[[ Name: Update | Line: 877 | Upvalues: p1 (copy) ]]
+		Update = function(p12)
 			local ChildContainer = p12.ChildContainer
 			local WindowButton = p12.Instance.WindowButton
 			local v2 = WindowButton.Content
@@ -755,7 +756,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			end
 			Title.Text = p12.arguments.Title or ""
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 944 | Upvalues: p1 (copy), p2 (copy) ]]
+		UpdateState = function(p12)
 			local value = p12.state.size.value
 			local value_2 = p12.state.position.value
 			local value_3 = p12.state.isUncollapsed.value
@@ -834,7 +835,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			if value_5 and value_5 ~= 0 then
 				local v3 = #p1._postCycleCallbacks + 1
 				local v4 = p1._cycleTick + 1
-				p1._postCycleCallbacks[v3] = function() --[[ Line: 1035 | Upvalues: p1 (ref), v4 (copy), p12 (copy), ChildContainer (copy), value_5 (copy), v3 (copy) ]]
+				p1._postCycleCallbacks[v3] = function()
 					if v4 <= p1._cycleTick then
 						if p12.lastCycleTick ~= -1 then
 							ChildContainer.CanvasPosition = Vector2.new(0, value_5)
@@ -844,7 +845,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				end
 			end
 		end,
-		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 1045 ]]
+		ChildAdded = function(p1, p2)
 			local v1 = p1.Instance.WindowButton.Content
 			if p2.type == "MenuBar" then
 				local ChildContainer = p1.ChildContainer
@@ -855,7 +856,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				return p1.ChildContainer
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 1057 | Upvalues: v10 (ref), v11 (ref), v2 (ref), v3 (ref), v5 (ref), v6 (ref), t (copy), p2 (copy) ]]
+		Discard = function(p1)
 			if v10 == p1 then
 				v10 = nil
 				v11 = false

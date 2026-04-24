@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Gun = require(script.Parent.Gun)
@@ -6,13 +7,13 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.new(p1, p2, p3) --[[ Line: 11 | Upvalues: Gun (copy), t (copy) ]]
+function t.new(p1, p2, p3)
 	local v1 = Gun.new(p1, p2, p3)
 	setmetatable(v1, t)
 	v1:Setup(p3)
 	return v1
 end
-function t.ShootSound(p1, p2) --[[ Line: 18 | Upvalues: Audio (copy) ]]
+function t.ShootSound(p1, p2)
 	if p2 then
 		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.dry_fire01, {
 			Volume = 0.4,
@@ -24,12 +25,12 @@ function t.ShootSound(p1, p2) --[[ Line: 18 | Upvalues: Audio (copy) ]]
 		})
 	end
 end
-function t.ReloadDropAmmoSound(p1) --[[ Line: 29 | Upvalues: Audio (copy) ]]
+function t.ReloadDropAmmoSound(p1)
 	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_semi_auto_rifle_magazine_unload_01, {
 		RollOffMaxDistance = 129
 	})
 end
-function t.ReloadRefillAmmoSound(p1) --[[ Line: 34 | Upvalues: Audio (copy) ]]
+function t.ReloadRefillAmmoSound(p1)
 	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_semi_auto_rifle_magazine_load_01, {
 		RollOffMaxDistance = 129
 	})

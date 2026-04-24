@@ -1,17 +1,18 @@
+-- Reviewed by Claude
 local ContractConsts = require(script.Parent.ContractConsts)
 local CollectionService = game:GetService("CollectionService")
 local t = {}
-local function validateObj(p1) --[[ Line: 5 | Upvalues: CollectionService (copy) ]]
+local function validateObj(p1)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, "Contract"))
 end
-function t.canReroll(p1, p2) --[[ Line: 9 | Upvalues: CollectionService (copy), t (copy) ]]
+function t.canReroll(p1, p2)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, "Contract"))
 	assert(typeof(p2) == "boolean", "Incorrect hasVIP passed")
 	return t.getNumTimesRerolled(p1) < if p2 then 2 else 1
 end
-function t.getNumTimesRerolled(p1) --[[ Line: 15 | Upvalues: CollectionService (copy), ContractConsts (copy) ]]
+function t.getNumTimesRerolled(p1)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, "Contract"))
 	local v3 = p1:FindFirstChild(ContractConsts.REROLLED_VALUE_NAME)
@@ -21,7 +22,7 @@ function t.getNumTimesRerolled(p1) --[[ Line: 15 | Upvalues: CollectionService (
 		return nil
 	end
 end
-function t.getNumTimesRerolledObject(p1) --[[ Line: 23 | Upvalues: CollectionService (copy), ContractConsts (copy) ]]
+function t.getNumTimesRerolledObject(p1)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, "Contract"))
 	local v3 = p1:FindFirstChild(ContractConsts.REROLLED_VALUE_NAME)
@@ -31,7 +32,7 @@ function t.getNumTimesRerolledObject(p1) --[[ Line: 23 | Upvalues: CollectionSer
 		return nil
 	end
 end
-function t.setNumTimesRerolled(p1, p2) --[[ Line: 31 | Upvalues: CollectionService (copy), ContractConsts (copy) ]]
+function t.setNumTimesRerolled(p1, p2)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, "Contract"))
 	local v3 = p1:FindFirstChild(ContractConsts.REROLLED_VALUE_NAME)
@@ -44,14 +45,14 @@ function t.setNumTimesRerolled(p1, p2) --[[ Line: 31 | Upvalues: CollectionServi
 	v3.Value = p2
 	return true
 end
-function t.getQuantizedBlock(p1, p2) --[[ Line: 43 ]]
+function t.getQuantizedBlock(p1, p2)
 	assert(typeof(p1) == "number", "Duration must be a number")
 	local v2 = p2 or 0
 	if v2 then
 		return math.ceil((workspace:GetServerTimeNow() - v2) / p1) * p1 + v2
 	end
 end
-function t.getNextDeadline() --[[ Line: 53 | Upvalues: t (copy), ContractConsts (copy) ]]
+function t.getNextDeadline()
 	local t2 = {
 		year = 2023,
 		month = 7,

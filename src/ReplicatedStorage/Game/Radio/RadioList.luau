@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -8,7 +9,7 @@ local RadioPlayer = require(script.Parent.RadioPlayer)
 local RadioUtils = require(script.Parent.RadioUtils)
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 13 | Upvalues: t (copy), Maid (copy), Signal (copy) ]]
+function t.new(p1)
 	assert(p1)
 	local t2 = {}
 	setmetatable(t2, t)
@@ -19,10 +20,10 @@ function t.new(p1) --[[ Line: 13 | Upvalues: t (copy), Maid (copy), Signal (copy
 	t2.ListItem = {}
 	return t2
 end
-function t.Populate(p1, p2) --[[ Line: 26 | Upvalues: Promise (copy), MarketplaceService (copy), VehicleUtils (copy), RadioPlayer (copy), RadioUtils (copy) ]]
+function t.Populate(p1, p2)
 	assert(p2)
 	local ScrollingFrame = p1.Gui.Container.Sidebar.ScrollingFrame
-	p1.Maid:GiveTask(ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() --[[ Line: 29 | Upvalues: ScrollingFrame (copy) ]]
+	p1.Maid:GiveTask(ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 		ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 	end))
 	for i, v in ipairs(p2.Songs) do
@@ -36,17 +37,17 @@ function t.Populate(p1, p2) --[[ Line: 26 | Upvalues: Promise (copy), Marketplac
 		v2.Title.Text = v3
 		if v.Name == nil then
 			local v4 = nil
-			v4 = Promise.resolve():andThen(function() --[[ Line: 40 | Upvalues: MarketplaceService (ref), v (copy) ]]
+			v4 = Promise.resolve():andThen(function()
 				return MarketplaceService:GetProductInfo(v.AssetId)
-			end):andThen(function(p1) --[[ Line: 43 | Upvalues: v (copy), v2 (copy) ]]
+			end):andThen(function(p1)
 				v.Name = tostring(p1.Name)
 				v2.Title.Text = v.Name
-			end):finally(function() --[[ Line: 47 | Upvalues: v4 (ref) ]]
+			end):finally(function()
 				if v4 then
 					v4:cancel()
 				end
 			end)
-			p1.Maid:GiveTask(function() --[[ Line: 52 | Upvalues: v4 (ref) ]]
+			p1.Maid:GiveTask(function()
 				if v4 then
 					v4:cancel()
 				end
@@ -55,7 +56,7 @@ function t.Populate(p1, p2) --[[ Line: 26 | Upvalues: Promise (copy), Marketplac
 		v2.Visible = true
 		v2.Parent = ScrollingFrame
 		v2.LayoutOrder = i
-		p1.Maid:GiveTask(v2.Play.MouseButton1Down:Connect(function() --[[ Line: 61 | Upvalues: VehicleUtils (ref), RadioPlayer (ref), v (copy) ]]
+		p1.Maid:GiveTask(v2.Play.MouseButton1Down:Connect(function()
 			local v1 = VehicleUtils.GetLocalVehiclePacket()
 			local v3 = RadioPlayer.IsPlayingThirdPerson()
 			if not v3 then
@@ -65,7 +66,7 @@ function t.Populate(p1, p2) --[[ Line: 26 | Upvalues: Promise (copy), Marketplac
 		end))
 		v2.Delete.Visible = p2.Editable
 		if p2.Editable then
-			p1.Maid:GiveTask(v2.Delete.MouseButton1Down:Connect(function() --[[ Line: 71 | Upvalues: p2 (copy), i (copy), p1 (copy), RadioPlayer (ref) ]]
+			p1.Maid:GiveTask(v2.Delete.MouseButton1Down:Connect(function()
 				table.remove(p2.Songs, i)
 				p1.OnRefreshRequested:Fire()
 				RadioPlayer.OnPlaylistUpdated:Fire(p2)
@@ -78,7 +79,7 @@ function t.Populate(p1, p2) --[[ Line: 26 | Upvalues: Promise (copy), Marketplac
 	end
 	if p2.Editable then
 		ScrollingFrame.NewSong.LayoutOrder = #p2.Songs + 1
-		p1.Maid:GiveTask(ScrollingFrame.NewSong.Add.MouseButton1Down:Connect(function() --[[ Line: 83 | Upvalues: RadioPlayer (ref), p2 (copy), RadioUtils (ref), p1 (copy) ]]
+		p1.Maid:GiveTask(ScrollingFrame.NewSong.Add.MouseButton1Down:Connect(function()
 			if RadioPlayer.CurrentSound == nil then
 				error("Attempted to add song when no song is playing!")
 			end
@@ -100,7 +101,7 @@ function t.Populate(p1, p2) --[[ Line: 26 | Upvalues: Promise (copy), Marketplac
 	end
 	ScrollingFrame.NewSong.Visible = p2.Editable
 end
-function t.Destroy(p1) --[[ Line: 105 ]]
+function t.Destroy(p1)
 	p1.Maid:Destroy()
 	p1.Maid = nil
 end

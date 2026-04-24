@@ -47,16 +47,16 @@ local v1 = TableUtils.requireValidIndexAndFreeze({
 		}
 	})
 })
-local t = {}
+local localTable = {}
 local t2 = {}
 local t3 = {}
 for v2, v3 in v1 do
 	for v4, v5 in v3 do
 		for v7, v8 in v5 do
 			local v6
-			v6 = t[v8] == nil
+			v6 = localTable[v8] == nil
 			assert(v6, "env was already populated for this placeId.. duplicate?")
-			t[v8] = v2
+			localTable[v8] = v2
 			t2[v8] = v4
 			t3[v8] = v7
 		end
@@ -64,7 +64,7 @@ for v2, v3 in v1 do
 end
 return TableUtils.requireValidIndexAndFreeze({
 	ENV_TO_WORLD_TO_PLACE_IDS_MAP = v1,
-	PLACE_ID_TO_ENV_MAP = TableUtils.requireValidIndexAndFreeze(t),
+	PLACE_ID_TO_ENV_MAP = TableUtils.requireValidIndexAndFreeze(localTable),
 	PLACE_ID_TO_WORLD_MAP = TableUtils.requireValidIndexAndFreeze(t2),
 	PLACE_ID_TO_PLACE_TYPE_MAP = TableUtils.requireValidIndexAndFreeze(t3),
 	MAIN_WORLD_NAME = "MAIN_WORLD",

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local CurrentCamera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
@@ -22,7 +23,7 @@ local WorldMarkerGroup = require(ReplicatedStorage.Game.WorldMarker.WorldMarkerG
 local WorldMarkerSystem = require(ReplicatedStorage.Game.WorldMarker.WorldMarkerSystem)
 local WorldMarker = require(ReplicatedStorage.Game.WorldMarker.WorldMarker)
 local MinimapService = require(ReplicatedStorage.App.MinimapService)
-Maid.new():GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 28 | Upvalues: CharacterUtils (copy), Players (copy), MinimapService (copy) ]]
+Maid.new():GiveTask(RunService.Heartbeat:Connect(function()
 	local v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
 	if v1 then
 		MinimapService.mapUpdateWorldPosition(v1.Position)
@@ -30,17 +31,17 @@ Maid.new():GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 28 | Upva
 	end
 end))
 require(ReplicatedStorage.HumanoidUnload.HumanoidUnloadService)
-local function getColorFromTeam(p1) --[[ Line: 38 | Upvalues: Settings (copy) ]]
+local function getColorFromTeam(p1)
 	if p1 == Settings.Team.Police then
 		return Settings.TeamColor[Settings.EnumTeam.Police]
 	else
 		return Settings.TeamColor[Settings.EnumTeam.Criminal]
 	end
 end
-CharacterUtils.observeLocalCharacterAdded(function(p1, p2) --[[ Line: 46 | Upvalues: HapticEffect (copy) ]]
+CharacterUtils.observeLocalCharacterAdded(function(p1, p2)
 	local Humanoid = p1:FindFirstChild("Humanoid")
 	local Health = Humanoid.Health
-	p2:GiveTask(Humanoid:GetPropertyChangedSignal("Health"):Connect(function() --[[ Line: 49 | Upvalues: Humanoid (copy), HapticEffect (ref), Health (ref) ]]
+	p2:GiveTask(Humanoid:GetPropertyChangedSignal("Health"):Connect(function()
 		if Humanoid.Health <= 0 then
 			HapticEffect.basic(1, 1)
 		elseif Humanoid.Health < Health then
@@ -49,7 +50,7 @@ CharacterUtils.observeLocalCharacterAdded(function(p1, p2) --[[ Line: 46 | Upval
 		Health = Humanoid.Health
 	end))
 end)
-CharacterUtils.observeCharacterAdded(function(p1, p2) --[[ Line: 59 | Upvalues: Players (copy), RxInstanceUtils (copy), Promise (copy), Roact (copy), Settings (copy), MinimapService (copy), Interval (copy), HumanoidUnloadConsts (copy) ]]
+CharacterUtils.observeCharacterAdded(function(p1, p2)
 	local Humanoid = p1:FindFirstChild("Humanoid")
 	assert(Humanoid)
 	local v1 = Players:GetPlayerFromCharacter(p1)
@@ -58,35 +59,35 @@ CharacterUtils.observeCharacterAdded(function(p1, p2) --[[ Line: 59 | Upvalues: 
 			name = v1.Name,
 			flash = false
 		}
-		p2:GivePromise(Promise.all({ RxInstanceUtils.waitForChild(v1, "TeamValue", 5), RxInstanceUtils.waitForChild(Players.LocalPlayer, "TeamValue", 5) }):andThen(function(p1) --[[ Line: 77 | Upvalues: t (copy), Roact (ref), Settings (ref), Players (ref), p2 (copy), MinimapService (ref) ]]
+		p2:GivePromise(Promise.all({ RxInstanceUtils.waitForChild(v1, "TeamValue", 5), RxInstanceUtils.waitForChild(Players.LocalPlayer, "TeamValue", 5) }):andThen(function(p1)
 			local v1 = p1[1]
 			local v2 = p1[2]
 			local v6, v7 = Roact.createBinding(if v1.Value == Settings.Team.Police then Settings.TeamColor[Settings.EnumTeam.Police] else Settings.TeamColor[Settings.EnumTeam.Criminal])
 			t.color = v6
 			t.updateColor = v7
-			local function updateFlash() --[[ Line: 83 | Upvalues: t (ref), v2 (copy), v1 (copy), Players (ref) ]]
+			local function updateFlash()
 				t.flash = if v2.Value == v1.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end
-			p2:GiveTask(v1.Changed:Connect(function(p1) --[[ Line: 87 | Upvalues: t (ref), Settings (ref), v2 (copy), v1 (copy), Players (ref) ]]
+			p2:GiveTask(v1.Changed:Connect(function(p1)
 				t.updateColor(if p1 == Settings.Team.Police then Settings.TeamColor[Settings.EnumTeam.Police] else Settings.TeamColor[Settings.EnumTeam.Criminal])
 				t.flash = if v2.Value == v1.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end))
-			p2:GiveTask(v2.Changed:Connect(function() --[[ Line: 91 | Upvalues: t (ref), v2 (copy), v1 (copy), Players (ref) ]]
+			p2:GiveTask(v2.Changed:Connect(function()
 				t.flash = if v2.Value == v1.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end))
-			p2:GiveTask(Players.LocalPlayer:GetAttributeChangedSignal("DisablePlayerMarkers"):Connect(function() --[[ Line: 94 | Upvalues: t (ref), v2 (copy), v1 (copy), Players (ref) ]]
+			p2:GiveTask(Players.LocalPlayer:GetAttributeChangedSignal("DisablePlayerMarkers"):Connect(function()
 				t.flash = if v2.Value == v1.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end))
 			t.flash = if v2.Value == v1.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			p2:GiveTask(MinimapService.add(t))
 		end))
-		p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "HumanoidRootPart", function(p1, p2) --[[ Line: 102 | Upvalues: t (copy) ]]
+		p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "HumanoidRootPart", function(p1, p2)
 			t.part = p1
-			p2:GiveTask(function() --[[ Line: 104 | Upvalues: t (ref) ]]
+			p2:GiveTask(function()
 				t.part = nil
 			end)
 		end))
-		p2:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 108 | Upvalues: Humanoid (copy), HumanoidUnloadConsts (ref), t (copy) ]]
+		p2:GiveTask(Interval.every(0.1):Connect(function()
 			local v1 = Humanoid:FindFirstChild(HumanoidUnloadConsts.SERVER_POSITION_OBJ_NAME)
 			if t._position and (not t.part and v1) then
 				t._updatePosition((t._position:getValue():Lerp(v1.Value, 0.3333333333333333)))
@@ -101,7 +102,7 @@ local t = {
 }
 t.premium = GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.PremiumGarage) or PrivateServerUtils.getIsBattleServer()
 store:dispatch(t)
-GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.PremiumGarage):Connect(function() --[[ Line: 130 | Upvalues: store (copy) ]]
+GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.PremiumGarage):Connect(function()
 	store:dispatch({
 		type = "setPremium",
 		premium = true
@@ -114,7 +115,7 @@ for v2, v3 in GamepassUtils.EnumGamepass:GetEnumItems() do
 		gamepassEnum = v4,
 		gamepassOwned = GamepassSystem.DoesPlayerOwn(v4)
 	})
-	GamepassSystem.GetGamepassOwnedSignal(v4):Connect(function() --[[ Line: 144 | Upvalues: store (copy), v4 (copy), GamepassSystem (copy) ]]
+	GamepassSystem.GetGamepassOwnedSignal(v4):Connect(function()
 		store:dispatch({
 			type = "setGamepassOwned",
 			gamepassEnum = v4,
@@ -125,7 +126,7 @@ end
 local v5 = Maid.new()
 local v6 = WorldMarkerGroup.new()
 WorldMarkerSystem.addGroup(v6)
-local function setWaypoint(p1) --[[ Line: 162 | Upvalues: v5 (copy), ReplicatedStorage (copy), Interval (copy), store (copy), RunService (copy), WorldMarker (copy), WorldMarkerSystem (copy), v6 (copy), CharacterUtils (copy), Players (copy), EzUtils (copy), createElement (copy), Roact (copy) ]]
+local function setWaypoint(p1)
 	v5:DoCleaning()
 	if p1 then
 		local position = p1.position
@@ -137,7 +138,7 @@ local function setWaypoint(p1) --[[ Line: 162 | Upvalues: v5 (copy), ReplicatedS
 		elseif part then
 			position = part.Position
 			v1:PivotTo(CFrame.new(position))
-			v5:GiveTask(Interval.every(0.5):Connect(function() --[[ Line: 176 | Upvalues: part (copy), position (ref), v1 (ref), store (ref), p1 (copy) ]]
+			v5:GiveTask(Interval.every(0.5):Connect(function()
 				if part and part:IsDescendantOf(workspace) then
 					position = part.Position
 					v1:PivotTo(CFrame.new(position))
@@ -150,7 +151,7 @@ local function setWaypoint(p1) --[[ Line: 162 | Upvalues: v5 (copy), ReplicatedS
 			end))
 		end
 		v1.Parent = workspace
-		v5:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 189 | Upvalues: v1 (ref) ]]
+		v5:GiveTask(RunService.Heartbeat:Connect(function()
 			v1.Arrow.CFrame = v1.ArrowRoot.CFrame * CFrame.Angles(0, os.clock() % 6.283185307179586, 0)
 		end))
 		v5:GiveTask(v1)
@@ -170,7 +171,7 @@ local function setWaypoint(p1) --[[ Line: 162 | Upvalues: v5 (copy), ReplicatedS
 		v3:SetIcon(5920742944)
 		v3.FrameInner.ImageColor3 = Color3.fromRGB(255, 108, 98)
 		v6:Add(v3)
-		v5:GiveTask(function() --[[ Line: 216 | Upvalues: v6 (ref), v3 (copy) ]]
+		v5:GiveTask(function()
 			v6:Remove(v3)
 			v3:Destroy()
 		end)
@@ -182,13 +183,13 @@ local function setWaypoint(p1) --[[ Line: 162 | Upvalues: v5 (copy), ReplicatedS
 			markerColor = v3.FrameInner.ImageColor3,
 			scale = 1.5
 		})
-		v3._maid:GiveTask(function() --[[ Line: 229 | Upvalues: store (ref), p1 (copy) ]]
+		v3._maid:GiveTask(function()
 			store:dispatch({
 				type = "removeMinimapLabel",
 				title = p1.name .. "_"
 			})
 		end)
-		local function update() --[[ Line: 237 | Upvalues: CharacterUtils (ref), Players (ref), v2 (ref), v1 (ref), minDist (copy), store (ref), p1 (copy) ]]
+		local function update()
 			local v12 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
 			if v12 then
 				v2.Attachment1 = v12:FindFirstChildOfClass("Attachment")
@@ -203,7 +204,7 @@ local function setWaypoint(p1) --[[ Line: 162 | Upvalues: v5 (copy), ReplicatedS
 		update()
 		v5:GiveTask(Interval.every(1):Connect(update))
 		if p1.message then
-			local function getComponent() --[[ Line: 255 | Upvalues: EzUtils (ref), createElement (ref), p1 (copy) ]]
+			local function getComponent()
 				local v1 = EzUtils.isSmallScreen()
 				local t = {
 					ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
@@ -239,13 +240,13 @@ local function setWaypoint(p1) --[[ Line: 162 | Upvalues: v5 (copy), ReplicatedS
 				return createElement("ScreenGui", t, t2)
 			end
 			local v4 = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "WaypointGui")
-			v5:GiveTask(function() --[[ Line: 334 | Upvalues: Roact (ref), v4 (copy) ]]
+			v5:GiveTask(function()
 				Roact.unmount(v4)
 			end)
 		end
 	end
 end
-store.changed:connect(function(p1, p2) --[[ Line: 340 | Upvalues: setWaypoint (copy), ChatUtils (copy) ]]
+store.changed:connect(function(p1, p2)
 	if p1.minimapWaypoints == p2.minimapWaypoints then
 		if p1.otherTradeServerListConfig ~= p2.otherTradeServerListConfig then
 			if p1.otherTradeServerListConfig.visible then

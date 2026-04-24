@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
@@ -15,7 +16,7 @@ local t = {
 	onRollEnded = Signal.new()
 }
 local v1 = RateLimiter.new(10, 10)
-function t.attemptRoll() --[[ Line: 25 | Upvalues: Players (copy), Falling (copy), CharacterUtil (copy), Raycast (copy), t (copy), v1 (copy), Maid (copy), UserGameSettings (copy), RunService (copy) ]]
+function t.attemptRoll()
 	local LocalPlayer = Players.LocalPlayer
 	local PrimaryPart = LocalPlayer.Character.PrimaryPart
 	local Humanoid = PrimaryPart.Parent:FindFirstChild("Humanoid")
@@ -49,46 +50,46 @@ function t.attemptRoll() --[[ Line: 25 | Upvalues: Players (copy), Falling (copy
 			ImpulseAlignOrientation.RigidityEnabled = true
 			ImpulseAlignOrientation.CFrame = ImpulseAttachment.WorldCFrame
 			ImpulseAlignOrientation.Parent = PrimaryPart
-			v2:GiveTask(function() --[[ Line: 95 | Upvalues: ImpulseAlignOrientation (copy) ]]
-				task.delay(0.1, function() --[[ Line: 97 | Upvalues: ImpulseAlignOrientation (ref) ]]
+			v2:GiveTask(function()
+				task.delay(0.1, function()
 					ImpulseAlignOrientation:Destroy()
 				end)
 			end)
 			v2:GiveTask(ImpulseAttachment)
 			Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-			v2:GiveTask(function() --[[ Line: 106 | Upvalues: Humanoid (copy) ]]
+			v2:GiveTask(function()
 				if Humanoid:GetState() == Enum.HumanoidStateType.Physics and Humanoid:GetStateEnabled(Enum.HumanoidStateType.Running) then
 					Humanoid:ChangeState(Enum.HumanoidStateType.Running)
 				end
 			end)
 			if UserGameSettings.RotationType == Enum.RotationType.CameraRelative then
 				UserGameSettings.RotationType = Enum.RotationType.MovementRelative
-				v2:GiveTask(function() --[[ Line: 119 | Upvalues: UserGameSettings (ref) ]]
+				v2:GiveTask(function()
 					UserGameSettings.RotationType = Enum.RotationType.CameraRelative
 				end)
 			end
-			v2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 124 | Upvalues: MoveDirection (ref), LinearVelocity (copy) ]]
+			v2:GiveTask(RunService.Heartbeat:Connect(function()
 				local v1 = (MoveDirection * Vector3.new(1, 0, 1)).Unit * 70
 				LinearVelocity.PlaneVelocity = Vector2.new(v1.X, v1.Z)
 			end))
 			t.onRollBegan:Fire(LocalPlayer, 0.3)
 			t.mapPlayerRolling[LocalPlayer] = true
-			v2:GiveTask(function() --[[ Line: 132 | Upvalues: t (ref), LocalPlayer (copy) ]]
+			v2:GiveTask(function()
 				t.mapPlayerRolling[LocalPlayer] = nil
 				t.onRollEnded:Fire(LocalPlayer)
 			end)
-			v2:GiveTask(task.delay(0.3, function() --[[ Line: 136 | Upvalues: v2 (copy) ]]
+			v2:GiveTask(task.delay(0.3, function()
 				task.defer(v2.Destroy, v2)
 			end))
 			t.mapLastRollTime[LocalPlayer] = os.clock()
-			task.delay(1, function() --[[ Line: 141 | Upvalues: t (ref), LocalPlayer (copy) ]]
+			task.delay(1, function()
 				t.mapLastRollTime[LocalPlayer] = nil
 			end)
 			return true
 		end
 	end
 end
-function t.isPlayerRolling(p1) --[[ Line: 146 | Upvalues: t (copy) ]]
+function t.isPlayerRolling(p1)
 	return t.mapPlayerRolling[p1] == true
 end
 return t

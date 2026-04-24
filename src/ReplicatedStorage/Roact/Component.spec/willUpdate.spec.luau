@@ -1,4 +1,5 @@
-return function() --[[ Line: 1 ]]
+-- Reviewed by Claude
+return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
@@ -7,11 +8,11 @@ return function() --[[ Line: 1 ]]
 	local Type = require(script.Parent.Parent.Type)
 	local Component = require(script.Parent.Parent.Component)
 	local v1 = createReconciler(NoopRenderer)
-	it("should be invoked when updated via updateVirtualNode", function() --[[ Line: 13 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy), assertDeepEqual (copy) ]]
+	it("should be invoked when updated via updateVirtualNode", function()
 		local v12 = Component:extend("MyComponent")
 		local v2 = createSpy()
 		v12.willUpdate = v2.value
-		function v12.render(p1) --[[ Line: 20 ]]
+		function v12.render(p1)
 			return nil
 		end
 		local v4 = v1.mountVirtualNode(createElement(v12, {
@@ -28,20 +29,20 @@ return function() --[[ Line: 1 ]]
 		assertDeepEqual(v6.newProps, t)
 		assertDeepEqual(v6.newState, {})
 	end)
-	it("it should be invoked when updated via setState", function() --[[ Line: 49 | Upvalues: Component (copy), createSpy (copy), createElement (copy), v1 (copy), Type (copy), assertDeepEqual (copy) ]]
+	it("it should be invoked when updated via setState", function()
 		local v12 = Component:extend("MyComponent")
 		local v2 = nil
 		local v3 = createSpy()
 		v12.willUpdate = v3.value
-		function v12.init(p1) --[[ Line: 57 | Upvalues: v2 (ref) ]]
-			v2 = function(p12) --[[ Line: 58 | Upvalues: p1 (copy) ]]
+		function v12.init(p1)
+			v2 = function(p12)
 				p1:setState(p12)
 			end
 			p1:setState({
 				foo = 1
 			})
 		end
-		function v12.render(p1) --[[ Line: 67 ]]
+		function v12.render(p1)
 			return nil
 		end
 		v1.mountVirtualNode(createElement(v12), nil, "Test")

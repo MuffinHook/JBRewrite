@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -7,7 +8,7 @@ local CinematicCamera = require(ReplicatedStorage.Module.CinematicCamera)
 require(ReplicatedStorage.Std.Signal)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local SpectateGui = ReplicatedStorage.Resource.SpectateGui
-local function GetHumanoid(p1) --[[ Line: 27 ]]
+local function GetHumanoid(p1)
 	assert(p1)
 	local Character = p1.Character
 	if Character then
@@ -21,7 +22,7 @@ local function GetHumanoid(p1) --[[ Line: 27 ]]
 		return nil
 	end
 end
-local function GetRootPart(p1) --[[ Line: 38 ]]
+local function GetRootPart(p1)
 	assert(p1)
 	assert(p1)
 	local Character = p1.Character
@@ -39,7 +40,7 @@ local function GetRootPart(p1) --[[ Line: 38 ]]
 		end
 	end
 end
-local function SetCenterText(p1) --[[ Line: 48 | Upvalues: SpectateGui (copy) ]]
+local function SetCenterText(p1)
 	SpectateGui.Spectate.Center.TextLabel.Text = p1
 end
 local v1 = CinematicCamera.MakeCinematicCamera()
@@ -51,7 +52,7 @@ local t = {
 	Maid = nil,
 	Signal = {}
 }
-local function GetIndexFromName() --[[ Line: 64 | Upvalues: t (copy) ]]
+local function GetIndexFromName()
 	if t.SpectatingName == nil then
 		return nil
 	end
@@ -64,7 +65,7 @@ local function GetIndexFromName() --[[ Line: 64 | Upvalues: t (copy) ]]
 		end
 	end
 end
-local function CycleRight() --[[ Line: 77 | Upvalues: t (copy), SpectateGui (copy) ]]
+local function CycleRight()
 	local v1
 	if t.SpectatingName ~= nil and t.NameList ~= nil then
 		for i = 1, #t.NameList do
@@ -83,7 +84,7 @@ local function CycleRight() --[[ Line: 77 | Upvalues: t (copy), SpectateGui (cop
 	end
 	SpectateGui.Spectate.Center.TextLabel.Text = t.SpectatingName
 end
-local function CycleLeft() --[[ Line: 88 | Upvalues: t (copy), SpectateGui (copy) ]]
+local function CycleLeft()
 	local v1
 	if t.SpectatingName ~= nil and t.NameList ~= nil then
 		for i = 1, #t.NameList do
@@ -102,7 +103,7 @@ local function CycleLeft() --[[ Line: 88 | Upvalues: t (copy), SpectateGui (copy
 	end
 	SpectateGui.Spectate.Center.TextLabel.Text = t.SpectatingName
 end
-local function ToggleView() --[[ Line: 99 | Upvalues: t (copy), SpectateGui (copy) ]]
+local function ToggleView()
 	if t.Viewing then
 		t.Viewing = false
 	elseif t.NameList and #t.NameList > 0 then
@@ -136,7 +137,7 @@ local function ToggleView() --[[ Line: 99 | Upvalues: t (copy), SpectateGui (cop
 	end
 	SpectateGui.Spectate.Center.TextLabel.Text = t.SpectatingName
 end
-local function Heartbeat(p1) --[[ Line: 129 | Upvalues: t (copy), CurrentCamera (copy), Players (copy), v1 (copy), CinematicCamera (copy), SpectateGui (copy), ToggleView (copy), LocalPlayer (copy) ]]
+local function Heartbeat(p1)
 	if t.Viewing then
 		if CurrentCamera.CameraType ~= Enum.CameraType.Scriptable then
 			CurrentCamera.CameraType = Enum.CameraType.Scriptable
@@ -190,7 +191,7 @@ local function Heartbeat(p1) --[[ Line: 129 | Upvalues: t (copy), CurrentCamera 
 		CurrentCamera.CameraSubject = v7
 	end
 end
-function t.Start() --[[ Line: 166 | Upvalues: t (copy), Maid (copy), SpectateGui (copy), LocalPlayer (copy), ToggleView (copy), CycleRight (copy), CycleLeft (copy), RunService (copy), Heartbeat (copy) ]]
+function t.Start()
 	assert(t.IsOpen == false)
 	t.IsOpen = true
 	t.Maid = Maid.new()
@@ -203,7 +204,7 @@ function t.Start() --[[ Line: 166 | Upvalues: t (copy), Maid (copy), SpectateGui
 	t.Maid:GiveTask(SpectateGui.Spectate.ButtonLeft.MouseButton1Down:Connect(CycleLeft))
 	t.Maid:GiveTask(RunService.Heartbeat:Connect(Heartbeat))
 end
-function t.Stop() --[[ Line: 182 | Upvalues: t (copy), SpectateGui (copy), CurrentCamera (copy), LocalPlayer (copy) ]]
+function t.Stop()
 	assert(t.IsOpen == true)
 	SpectateGui.Parent = script
 	t.Maid:Destroy()
@@ -222,7 +223,7 @@ function t.Stop() --[[ Line: 182 | Upvalues: t (copy), SpectateGui (copy), Curre
 	CurrentCamera.CameraSubject = v3
 	t.IsOpen = false
 end
-function t.Update(p1) --[[ Line: 191 | Upvalues: t (copy) ]]
+function t.Update(p1)
 	t.NameList = p1
 	local v1
 	if t.Viewing and t.SpectatingName then

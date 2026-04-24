@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Spring = require(ReplicatedStorage.Std.Spring)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local t = {}
 t.__index = t
-function t.new() --[[ Line: 10 | Upvalues: t (copy), Maid (copy), Spring (copy) ]]
+function t.new()
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
@@ -13,7 +14,7 @@ function t.new() --[[ Line: 10 | Upvalues: t (copy), Maid (copy), Spring (copy) 
 	t2:_createFx()
 	return t2
 end
-function t._createFx(p1) --[[ Line: 24 | Upvalues: LocalPlayer (copy) ]]
+function t._createFx(p1)
 	local BlurEffect = Instance.new("BlurEffect")
 	BlurEffect.Size = 0
 	BlurEffect.Enabled = false
@@ -36,10 +37,10 @@ function t._createFx(p1) --[[ Line: 24 | Upvalues: LocalPlayer (copy) ]]
 	Frame.Parent = ScreenGui
 	p1._colorFrame = Frame
 end
-function t.SetActive(p1, p2) --[[ Line: 50 ]]
+function t.SetActive(p1, p2)
 	p1._springActive:SetTarget(if p2 then 1 else 0)
 end
-function t.Update(p1) --[[ Line: 53 ]]
+function t.Update(p1)
 	local v1, _ = p1._springActive:Update()
 	local v2 = v1 >= 0.001
 	if v2 then
@@ -64,7 +65,7 @@ function t.Update(p1) --[[ Line: 53 ]]
 		p1._colorCorrection.Enabled = v6
 	end
 end
-function t.Destroy(p1) --[[ Line: 85 ]]
+function t.Destroy(p1)
 	local _maid = p1._maid
 	p1._maid = nil
 	_maid:Destroy()

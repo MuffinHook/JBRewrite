@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local t = {
 	EGAResourceFlowType = require(script.GAResourceFlowType),
 	EGAProgressionStatus = require(script.GAProgressionStatus),
@@ -24,7 +25,7 @@ local t4 = {}
 local t5 = {}
 local t6 = {}
 local t7 = {}
-local function addToInitializationQueue(p1, ...) --[[ Line: 36 | Upvalues: t6 (ref), Logger (copy) ]]
+local function addToInitializationQueue(p1, ...)
 	if t6 == nil then
 		Logger:w("Initialization queue already cleared.")
 	else
@@ -35,7 +36,7 @@ local function addToInitializationQueue(p1, ...) --[[ Line: 36 | Upvalues: t6 (r
 		Logger:i("Added event to initialization queue")
 	end
 end
-local function addToInitializationQueueByUserId(p1, p2, ...) --[[ Line: 50 | Upvalues: t (copy), t7 (copy), Logger (copy) ]]
+local function addToInitializationQueueByUserId(p1, p2, ...)
 	if t:isPlayerReady(p1) then
 		Logger:w("Player initialization queue already cleared.")
 	else
@@ -49,7 +50,7 @@ local function addToInitializationQueueByUserId(p1, p2, ...) --[[ Line: 50 | Upv
 		Logger:i("Added event to player initialization queue")
 	end
 end
-local function isSdkReady(p1) --[[ Line: 70 | Upvalues: State (copy), Logger (copy) ]]
+local function isSdkReady(p1)
 	local v1 = p1.playerId or nil
 	local v2 = p1.needsInitialized or true
 	local v3 = p1.shouldWarn or false
@@ -71,7 +72,7 @@ local function isSdkReady(p1) --[[ Line: 70 | Upvalues: State (copy), Logger (co
 	end
 	return false
 end
-function t.configureAvailableCustomDimensions01(p1, p2) --[[ Line: 106 | Upvalues: isSdkReady (copy), Logger (copy), State (copy) ]]
+function t.configureAvailableCustomDimensions01(p1, p2)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -81,7 +82,7 @@ function t.configureAvailableCustomDimensions01(p1, p2) --[[ Line: 106 | Upvalue
 		State:setAvailableCustomDimensions01(p2)
 	end
 end
-function t.configureAvailableCustomDimensions02(p1, p2) --[[ Line: 115 | Upvalues: isSdkReady (copy), Logger (copy), State (copy) ]]
+function t.configureAvailableCustomDimensions02(p1, p2)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -91,7 +92,7 @@ function t.configureAvailableCustomDimensions02(p1, p2) --[[ Line: 115 | Upvalue
 		State:setAvailableCustomDimensions02(p2)
 	end
 end
-function t.configureAvailableCustomDimensions03(p1, p2) --[[ Line: 124 | Upvalues: isSdkReady (copy), Logger (copy), State (copy) ]]
+function t.configureAvailableCustomDimensions03(p1, p2)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -101,7 +102,7 @@ function t.configureAvailableCustomDimensions03(p1, p2) --[[ Line: 124 | Upvalue
 		State:setAvailableCustomDimensions03(p2)
 	end
 end
-function t.configureAvailableResourceCurrencies(p1, p2) --[[ Line: 133 | Upvalues: isSdkReady (copy), Logger (copy), Events (copy) ]]
+function t.configureAvailableResourceCurrencies(p1, p2)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -111,7 +112,7 @@ function t.configureAvailableResourceCurrencies(p1, p2) --[[ Line: 133 | Upvalue
 		Events:setAvailableResourceCurrencies(p2)
 	end
 end
-function t.configureAvailableResourceItemTypes(p1, p2) --[[ Line: 142 | Upvalues: isSdkReady (copy), Logger (copy), Events (copy) ]]
+function t.configureAvailableResourceItemTypes(p1, p2)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -121,7 +122,7 @@ function t.configureAvailableResourceItemTypes(p1, p2) --[[ Line: 142 | Upvalues
 		Events:setAvailableResourceItemTypes(p2)
 	end
 end
-function t.configureBuild(p1, p2) --[[ Line: 151 | Upvalues: isSdkReady (copy), Logger (copy), Events (copy) ]]
+function t.configureBuild(p1, p2)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -131,7 +132,7 @@ function t.configureBuild(p1, p2) --[[ Line: 151 | Upvalues: isSdkReady (copy), 
 		Events:setBuild(p2)
 	end
 end
-function t.configureAvailableGamepasses(p1, p2) --[[ Line: 160 | Upvalues: isSdkReady (copy), Logger (copy), State (copy) ]]
+function t.configureAvailableGamepasses(p1, p2)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -141,8 +142,8 @@ function t.configureAvailableGamepasses(p1, p2) --[[ Line: 160 | Upvalues: isSdk
 		State:setAvailableGamepasses(p2)
 	end
 end
-function t.startNewSession(p1, p2, p3) --[[ Line: 169 | Upvalues: Threading (copy), State (copy), Logger (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 170 | Upvalues: State (ref), Logger (ref), p2 (copy), p3 (copy) ]]
+function t.startNewSession(p1, p2, p3)
+	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if State.Initialized then
 				State:startNewSession(p2, p3)
@@ -152,18 +153,18 @@ function t.startNewSession(p1, p2, p3) --[[ Line: 169 | Upvalues: Threading (cop
 		end
 	end)
 end
-function t.endSession(p1, p2) --[[ Line: 184 | Upvalues: Threading (copy), State (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 185 | Upvalues: State (ref), p2 (copy) ]]
+function t.endSession(p1, p2)
+	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			State:endSession(p2)
 		end
 	end)
 end
-function t.filterForBusinessEvent(p1, p2) --[[ Line: 193 ]]
+function t.filterForBusinessEvent(p1, p2)
 	return string.gsub(p2, "[^A-Za-z0-9%s%-_%.%(%)!%?]", "")
 end
-function t.addBusinessEvent(p1, p2, p3) --[[ Line: 197 | Upvalues: Threading (copy), State (copy), isSdkReady (copy), addToInitializationQueueByUserId (copy), t (copy), addToInitializationQueue (copy), Events (copy), Players (copy), Store (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 198 | Upvalues: State (ref), isSdkReady (ref), p2 (copy), addToInitializationQueueByUserId (ref), t (ref), p3 (copy), addToInitializationQueue (ref), Events (ref), Players (ref), Store (ref) ]]
+function t.addBusinessEvent(p1, p2, p3)
+	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
 				playerId = p2,
@@ -194,8 +195,8 @@ function t.addBusinessEvent(p1, p2, p3) --[[ Line: 197 | Upvalues: Threading (co
 		end
 	end)
 end
-function t.addResourceEvent(p1, p2, p3) --[[ Line: 234 | Upvalues: Threading (copy), State (copy), isSdkReady (copy), addToInitializationQueueByUserId (copy), t (copy), addToInitializationQueue (copy), Events (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 235 | Upvalues: State (ref), isSdkReady (ref), p2 (copy), addToInitializationQueueByUserId (ref), t (ref), p3 (copy), addToInitializationQueue (ref), Events (ref) ]]
+function t.addResourceEvent(p1, p2, p3)
+	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
 				playerId = p2,
@@ -212,8 +213,8 @@ function t.addResourceEvent(p1, p2, p3) --[[ Line: 234 | Upvalues: Threading (co
 		end
 	end)
 end
-function t.addProgressionEvent(p1, p2, p3) --[[ Line: 259 | Upvalues: Threading (copy), State (copy), isSdkReady (copy), addToInitializationQueueByUserId (copy), t (copy), addToInitializationQueue (copy), Events (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 260 | Upvalues: State (ref), isSdkReady (ref), p2 (copy), addToInitializationQueueByUserId (ref), t (ref), p3 (copy), addToInitializationQueue (ref), Events (ref) ]]
+function t.addProgressionEvent(p1, p2, p3)
+	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
 				playerId = p2,
@@ -230,8 +231,8 @@ function t.addProgressionEvent(p1, p2, p3) --[[ Line: 259 | Upvalues: Threading 
 		end
 	end)
 end
-function t.addDesignEvent(p1, p2, p3) --[[ Line: 284 | Upvalues: Threading (copy), State (copy), isSdkReady (copy), addToInitializationQueueByUserId (copy), t (copy), addToInitializationQueue (copy), Events (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 285 | Upvalues: State (ref), isSdkReady (ref), p2 (copy), addToInitializationQueueByUserId (ref), t (ref), p3 (copy), addToInitializationQueue (ref), Events (ref) ]]
+function t.addDesignEvent(p1, p2, p3)
+	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
 				playerId = p2,
@@ -248,8 +249,8 @@ function t.addDesignEvent(p1, p2, p3) --[[ Line: 284 | Upvalues: Threading (copy
 		end
 	end)
 end
-function t.addErrorEvent(p1, p2, p3) --[[ Line: 306 | Upvalues: Threading (copy), State (copy), isSdkReady (copy), addToInitializationQueueByUserId (copy), t (copy), addToInitializationQueue (copy), Events (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 307 | Upvalues: State (ref), isSdkReady (ref), p2 (copy), addToInitializationQueueByUserId (ref), t (ref), p3 (copy), addToInitializationQueue (ref), Events (ref) ]]
+function t.addErrorEvent(p1, p2, p3)
+	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
 				playerId = p2,
@@ -266,7 +267,7 @@ function t.addErrorEvent(p1, p2, p3) --[[ Line: 306 | Upvalues: Threading (copy)
 		end
 	end)
 end
-function t.setEnabledDebugLog(p1, p2) --[[ Line: 328 | Upvalues: RunService (copy), Logger (copy) ]]
+function t.setEnabledDebugLog(p1, p2)
 	if RunService:IsStudio() then
 		if p2 then
 			Logger:setDebugLog(p2)
@@ -279,7 +280,7 @@ function t.setEnabledDebugLog(p1, p2) --[[ Line: 328 | Upvalues: RunService (cop
 		Logger:i("setEnabledDebugLog can only be used in studio")
 	end
 end
-function t.setEnabledInfoLog(p1, p2) --[[ Line: 342 | Upvalues: Logger (copy) ]]
+function t.setEnabledInfoLog(p1, p2)
 	if p2 then
 		Logger:setInfoLog(p2)
 		Logger:i("Info logging enabled")
@@ -288,7 +289,7 @@ function t.setEnabledInfoLog(p1, p2) --[[ Line: 342 | Upvalues: Logger (copy) ]]
 		Logger:setInfoLog(p2)
 	end
 end
-function t.setEnabledVerboseLog(p1, p2) --[[ Line: 352 | Upvalues: Logger (copy) ]]
+function t.setEnabledVerboseLog(p1, p2)
 	if p2 then
 		Logger:setVerboseLog(p2)
 		Logger:ii("Verbose logging enabled")
@@ -297,8 +298,8 @@ function t.setEnabledVerboseLog(p1, p2) --[[ Line: 352 | Upvalues: Logger (copy)
 		Logger:setVerboseLog(p2)
 	end
 end
-function t.setEnabledEventSubmission(p1, p2) --[[ Line: 363 | Upvalues: Threading (copy), State (copy), Logger (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 364 | Upvalues: p2 (copy), State (ref), Logger (ref) ]]
+function t.setEnabledEventSubmission(p1, p2)
+	Threading:performTaskOnGAThread(function()
 		if p2 then
 			State:setEventSubmission(p2)
 			Logger:i("Event submission enabled")
@@ -308,8 +309,8 @@ function t.setEnabledEventSubmission(p1, p2) --[[ Line: 363 | Upvalues: Threadin
 		end
 	end)
 end
-function t.setCustomDimension01(p1, p2, p3) --[[ Line: 375 | Upvalues: Threading (copy), Validation (copy), State (copy), Logger (copy), isSdkReady (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 376 | Upvalues: Validation (ref), State (ref), p3 (copy), Logger (ref), isSdkReady (ref), p2 (copy) ]]
+function t.setCustomDimension01(p1, p2, p3)
+	Threading:performTaskOnGAThread(function()
 		if Validation:validateDimension(State._availableCustomDimensions01, p3) then
 			if isSdkReady({
 				playerId = p2,
@@ -324,8 +325,8 @@ function t.setCustomDimension01(p1, p2, p3) --[[ Line: 375 | Upvalues: Threading
 		end
 	end)
 end
-function t.setCustomDimension02(p1, p2, p3) --[[ Line: 390 | Upvalues: Threading (copy), Validation (copy), State (copy), Logger (copy), isSdkReady (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 391 | Upvalues: Validation (ref), State (ref), p3 (copy), Logger (ref), isSdkReady (ref), p2 (copy) ]]
+function t.setCustomDimension02(p1, p2, p3)
+	Threading:performTaskOnGAThread(function()
 		if Validation:validateDimension(State._availableCustomDimensions02, p3) then
 			if isSdkReady({
 				playerId = p2,
@@ -340,8 +341,8 @@ function t.setCustomDimension02(p1, p2, p3) --[[ Line: 390 | Upvalues: Threading
 		end
 	end)
 end
-function t.setCustomDimension03(p1, p2, p3) --[[ Line: 405 | Upvalues: Threading (copy), Validation (copy), State (copy), Logger (copy), isSdkReady (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 406 | Upvalues: Validation (ref), State (ref), p3 (copy), Logger (ref), isSdkReady (ref), p2 (copy) ]]
+function t.setCustomDimension03(p1, p2, p3)
+	Threading:performTaskOnGAThread(function()
 		if Validation:validateDimension(State._availableCustomDimensions03, p3) then
 			if isSdkReady({
 				playerId = p2,
@@ -356,22 +357,22 @@ function t.setCustomDimension03(p1, p2, p3) --[[ Line: 405 | Upvalues: Threading
 		end
 	end)
 end
-function t.setEnabledReportErrors(p1, p2) --[[ Line: 420 | Upvalues: Threading (copy), State (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 421 | Upvalues: State (ref), p2 (copy) ]]
+function t.setEnabledReportErrors(p1, p2)
+	Threading:performTaskOnGAThread(function()
 		State.ReportErrors = p2
 	end)
 end
-function t.setEnabledCustomUserId(p1, p2) --[[ Line: 426 | Upvalues: Threading (copy), State (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 427 | Upvalues: State (ref), p2 (copy) ]]
+function t.setEnabledCustomUserId(p1, p2)
+	Threading:performTaskOnGAThread(function()
 		State.UseCustomUserId = p2
 	end)
 end
-function t.setEnabledAutomaticSendBusinessEvents(p1, p2) --[[ Line: 432 | Upvalues: Threading (copy), State (copy) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 433 | Upvalues: State (ref), p2 (copy) ]]
+function t.setEnabledAutomaticSendBusinessEvents(p1, p2)
+	Threading:performTaskOnGAThread(function()
 		State.AutomaticSendBusinessEvents = p2
 	end)
 end
-function t.addGameAnalyticsTeleportData(p1, p2, p3) --[[ Line: 438 | Upvalues: Store (copy) ]]
+function t.addGameAnalyticsTeleportData(p1, p2, p3)
 	local t = {}
 	for i, v in ipairs(p2) do
 		local v1 = Store:GetPlayerDataFromCache(v)
@@ -385,71 +386,71 @@ function t.addGameAnalyticsTeleportData(p1, p2, p3) --[[ Line: 438 | Upvalues: S
 	p3.gameanalyticsData = t
 	return p3
 end
-function t.getRemoteConfigsValueAsString(p1, p2, p3) --[[ Line: 457 | Upvalues: State (copy) ]]
+function t.getRemoteConfigsValueAsString(p1, p2, p3)
 	return State:getRemoteConfigsStringValue(p2, p3.key or "", p3.defaultValue or nil)
 end
-function t.isRemoteConfigsReady(p1, p2) --[[ Line: 463 | Upvalues: State (copy) ]]
+function t.isRemoteConfigsReady(p1, p2)
 	return State:isRemoteConfigsReady(p2)
 end
-function t.getRemoteConfigsContentAsString(p1, p2) --[[ Line: 467 | Upvalues: State (copy) ]]
+function t.getRemoteConfigsContentAsString(p1, p2)
 	return State:getRemoteConfigsContentAsString(p2)
 end
-function t.PlayerJoined(p1, p2) --[[ Line: 471 | Upvalues: Store (copy), Postie (copy), Utilities (copy), LocalizationService (copy), Events (copy), State (copy), Logger (copy), t (copy), v1 (ref), ReplicatedStorage (copy), MarketplaceService (copy), t2 (copy), t7 (copy) ]]
-	local TeleportData = p2:GetJoinData().TeleportData
-	local v12 = Store:GetPlayerData(p2)
-	local v2
+function t.PlayerJoined(self, player)
+	local TeleportData = player:GetJoinData().TeleportData
+	local playerData = Store:GetPlayerData(player)
+	local teleportGameAnalyticsData
 	if TeleportData then
 		local gameanalyticsData = TeleportData.gameanalyticsData
 		if gameanalyticsData then
-			gameanalyticsData = TeleportData.gameanalyticsData[tostring(p2.UserId)]
+			gameanalyticsData = TeleportData.gameanalyticsData[tostring(player.UserId)]
 		end
-		v2 = gameanalyticsData
+		teleportGameAnalyticsData = gameanalyticsData
 	else
-		v2 = nil
+		teleportGameAnalyticsData = nil
 	end
-	local v3 = Store:GetPlayerDataFromCache(p2.UserId)
-	if v3 then
-		if v2 then
-			v3.SessionID = v2.SessionID
-			v3.SessionStart = v2.SessionStart
+	local cachedPlayerData = Store:GetPlayerDataFromCache(player.UserId)
+	if cachedPlayerData then
+		if teleportGameAnalyticsData then
+			cachedPlayerData.SessionID = teleportGameAnalyticsData.SessionID
+			cachedPlayerData.SessionStart = teleportGameAnalyticsData.SessionStart
 		end
-		v3.PlayerTeleporting = false
+		cachedPlayerData.PlayerTeleporting = false
 	else
-		local v4, v5 = Postie.invokeClient("getPlatform", p2, 5)
-		local v6 = if v4 then v5 else "unknown"
+		local platformSuccess, platform = Postie.invokeClient("getPlatform", player, 5)
+		local platformName = if platformSuccess then platform else "unknown"
 		for k, v in pairs(Store.BasePlayerData) do
-			if not v12[k] then
+			if not playerData[k] then
 				if typeof(v) == "table" then
-					v12[k] = Utilities:copyTable(v)
+					playerData[k] = Utilities:copyTable(v)
 				else
-					v12[k] = v
+					playerData[k] = v
 				end
 			end
 		end
-		local v7, v8 = pcall(function() --[[ Line: 512 | Upvalues: LocalizationService (ref), p2 (copy) ]]
-			return LocalizationService:GetCountryRegionForPlayerAsync(p2)
+		local countrySuccess, countryCode = pcall(function()
+			return LocalizationService:GetCountryRegionForPlayerAsync(player)
 		end)
-		if v7 then
-			v12.CountryCode = v8
+		if countrySuccess then
+			playerData.CountryCode = countryCode
 		end
-		Store.PlayerCache[p2.UserId] = v12
-		v12.Platform = if v6 == "Console" then "uwp_console" elseif v6 == "Mobile" then "uwp_mobile" else "uwp_desktop"
-		v12.OS = v12.Platform .. " 0.0.0"
-		if not v7 then
-			Events:addSdkErrorEvent(p2.UserId, "event_validation", "player_joined", "string_empty_or_null", "country_code", "")
+		Store.PlayerCache[player.UserId] = playerData
+		playerData.Platform = if platformName == "Console" then "uwp_console" elseif platformName == "Mobile" then "uwp_mobile" else "uwp_desktop"
+		playerData.OS = playerData.Platform .. " 0.0.0"
+		if not countrySuccess then
+			Events:addSdkErrorEvent(player.UserId, "event_validation", "player_joined", "string_empty_or_null", "country_code", "")
 		end
-		local v10 = ""
+		local customUserId = ""
 		if State.UseCustomUserId then
-			local v11, v122 = Postie.invokeClient("getCustomUserId", p2, 5)
-			if v11 then
-				v10 = v122
+			local customIdSuccess, customIdValue = Postie.invokeClient("getCustomUserId", player, 5)
+			if customIdSuccess then
+				customUserId = customIdValue
 			end
 		end
-		if not Utilities:isStringNullOrEmpty(v10) then
-			Logger:i("Using custom id: " .. v10)
-			v12.CustomUserId = v10
+		if not Utilities:isStringNullOrEmpty(customUserId) then
+			Logger:i("Using custom id: " .. customUserId)
+			playerData.CustomUserId = customUserId
 		end
-		t:startNewSession(p2, v2)
+		t:startNewSession(player, teleportGameAnalyticsData)
 		v1 = v1 or ReplicatedStorage:WaitForChild("OnPlayerReadyEvent")
 		v1:Fire(p2)
 		if State.AutomaticSendBusinessEvents then
@@ -502,7 +503,7 @@ function t.PlayerJoined(p1, p2) --[[ Line: 471 | Upvalues: Store (copy), Postie 
 		end
 	end
 end
-function t.PlayerRemoved(p1, p2) --[[ Line: 615 | Upvalues: Store (copy), t (copy) ]]
+function t.PlayerRemoved(p1, p2)
 	Store:SavePlayerData(p2)
 	local v1 = Store:GetPlayerDataFromCache(p2.UserId)
 	if v1 and v1.PlayerTeleporting then
@@ -512,13 +513,13 @@ function t.PlayerRemoved(p1, p2) --[[ Line: 615 | Upvalues: Store (copy), t (cop
 		t:endSession(p2.UserId)
 	end
 end
-function t.isPlayerReady(p1, p2) --[[ Line: 630 | Upvalues: Store (copy) ]]
+function t.isPlayerReady(p1, p2)
 	return Store:GetPlayerDataFromCache(p2) and true or false
 end
-function t.ProcessReceiptCallback(p1, p2) --[[ Line: 638 | Upvalues: t2 (copy), MarketplaceService (copy), t (copy) ]]
+function t.ProcessReceiptCallback(p1, p2)
 	local v1 = t2[p2.ProductId]
 	if not v1 then
-		pcall(function() --[[ Line: 645 | Upvalues: v1 (ref), MarketplaceService (ref), p2 (copy), t2 (ref) ]]
+		pcall(function()
 			v1 = MarketplaceService:GetProductInfo(p2.ProductId, Enum.InfoType.Product)
 			t2[p2.ProductId] = v1
 		end)
@@ -531,7 +532,7 @@ function t.ProcessReceiptCallback(p1, p2) --[[ Line: 638 | Upvalues: t2 (copy), 
 		})
 	end
 end
-function t.GamepassPurchased(p1, p2, p3, p4) --[[ Line: 661 | Upvalues: t2 (copy), MarketplaceService (copy), t (copy) ]]
+function t.GamepassPurchased(p1, p2, p3, p4)
 	local v1 = t2[p3]
 	if not v1 then
 		local v2 = MarketplaceService:GetProductInfo(p3, Enum.InfoType.GamePass)
@@ -555,14 +556,14 @@ function t.GamepassPurchased(p1, p2, p3, p4) --[[ Line: 661 | Upvalues: t2 (copy
 	})
 end
 local t8 = { "gameKey", "secretKey" }
-function t.initServer(p1, p2, p3) --[[ Line: 692 | Upvalues: t (copy) ]]
+function t.initServer(p1, p2, p3)
 	t:initialize({
 		gameKey = p2,
 		secretKey = p3
 	})
 end
-function t.initialize(p1, p2) --[[ Line: 699 | Upvalues: Threading (copy), t8 (copy), Logger (copy), t (copy), isSdkReady (copy), Validation (copy), Events (copy), State (copy), Players (copy), t6 (ref) ]]
-	Threading:performTaskOnGAThread(function() --[[ Line: 700 | Upvalues: t8 (ref), p2 (copy), Logger (ref), t (ref), isSdkReady (ref), Validation (ref), Events (ref), State (ref), Players (ref), t6 (ref) ]]
+function t.initialize(p1, p2)
+	Threading:performTaskOnGAThread(function()
 		for i, v in ipairs(t8) do
 			if p2[v] == nil then
 				Logger:e("Initialize \'" .. v .. "\' option missing")
@@ -621,10 +622,10 @@ function t.initialize(p1, p2) --[[ Line: 699 | Upvalues: Threading (copy), t8 (c
 			Events.GameKey = gameKey
 			Events.SecretKey = secretKey
 			State.Initialized = true
-			Players.PlayerAdded:Connect(function(p1) --[[ Line: 768 | Upvalues: t (ref) ]]
+			Players.PlayerAdded:Connect(function(p1)
 				t:PlayerJoined(p1)
 			end)
-			Players.PlayerRemoving:Connect(function(p1) --[[ Line: 773 | Upvalues: t (ref) ]]
+			Players.PlayerRemoving:Connect(function(p1)
 				t:PlayerRemoved(p1)
 			end)
 			for i, v in ipairs(Players:GetPlayers()) do
@@ -651,7 +652,7 @@ if not ReplicatedStorage:FindFirstChild("OnPlayerReadyEvent") then
 	OnPlayerReadyEvent.Name = "OnPlayerReadyEvent"
 	OnPlayerReadyEvent.Parent = ReplicatedStorage
 end
-task.spawn(function() --[[ Line: 808 | Upvalues: t3 (ref), Store (copy), t4 (ref), t5 (ref) ]]
+task.spawn(function()
 	t3 = Store:GetErrorDataStore((math.floor(os.time() / 3600)))
 	while task.wait(3600) do
 		t3 = Store:GetErrorDataStore((math.floor(os.time() / 3600)))
@@ -659,7 +660,7 @@ task.spawn(function() --[[ Line: 808 | Upvalues: t3 (ref), Store (copy), t4 (ref
 		t5 = {}
 	end
 end)
-task.spawn(function() --[[ Line: 820 | Upvalues: Store (copy), t5 (ref), t4 (ref), t3 (ref) ]]
+task.spawn(function()
 	while task.wait(Store.AutoSaveData) do
 		for k, v in pairs(t5) do
 			local v1 = t4[v]
@@ -668,7 +669,7 @@ task.spawn(function() --[[ Line: 820 | Upvalues: Store (copy), t5 (ref), t4 (ref
 		end
 	end
 end)
-local function ErrorHandler(p1, p2, p3, p4) --[[ Line: 831 | Upvalues: t4 (ref), t5 (ref), t (copy) ]]
+local function ErrorHandler(p1, p2, p3, p4)
 	local v4 = if p3 == nil then "(null)" else p3 .. ": message=" .. if p1 == nil then "(null)" else p1 .. ", trace=" .. if p2 == nil then "(null)" else p2
 	if #v4 > 8192 then
 		v4 = string.sub(v4, 1, 8192)
@@ -695,11 +696,11 @@ local function ErrorHandler(p1, p2, p3, p4) --[[ Line: 831 | Upvalues: t4 (ref),
 		t4[v8].currentCount = t4[v8].currentCount + 1
 	end
 end
-local function ErrorHandlerFromServer(p1, p2, p3) --[[ Line: 882 | Upvalues: State (copy), ErrorHandler (copy) ]]
+local function ErrorHandlerFromServer(p1, p2, p3)
 	if State.ReportErrors then
 		if p3 then
 			local v1 = nil
-			local v2, _ = pcall(function() --[[ Line: 893 | Upvalues: v1 (ref), p3 (copy) ]]
+			local v2, _ = pcall(function()
 				v1 = p3:GetFullName()
 			end)
 			if v2 then
@@ -708,7 +709,7 @@ local function ErrorHandlerFromServer(p1, p2, p3) --[[ Line: 882 | Upvalues: Sta
 		end
 	end
 end
-local function ErrorHandlerFromClient(p1, p2, p3, p4) --[[ Line: 903 | Upvalues: State (copy), ErrorHandler (copy) ]]
+local function ErrorHandlerFromClient(p1, p2, p3, p4)
 	if State.ReportErrors then
 		return ErrorHandler(p1, p2, p3, p4)
 	end
@@ -719,12 +720,12 @@ if not ReplicatedStorage:FindFirstChild("GameAnalyticsError") then
 	GameAnalyticsError.Name = "GameAnalyticsError"
 	GameAnalyticsError.Parent = ReplicatedStorage
 end
-ReplicatedStorage.GameAnalyticsError.OnServerEvent:Connect(function(p1, p2, p3, p4) --[[ Line: 921 | Upvalues: State (copy), ErrorHandler (copy) ]]
+ReplicatedStorage.GameAnalyticsError.OnServerEvent:Connect(function(p1, p2, p3, p4)
 	if State.ReportErrors then
 		ErrorHandler(p2, p3, p4, p1)
 	end
 end)
-MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(p1, p2, p3) --[[ Line: 927 | Upvalues: State (copy), t (copy) ]]
+MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(p1, p2, p3)
 	if State.AutomaticSendBusinessEvents and p3 then
 		t:GamepassPurchased(p1, p2)
 	end

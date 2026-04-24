@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Std.Promise)
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -9,7 +10,7 @@ local v2 = nil
 local v3 = false
 local v4 = Signal.new()
 local t = {}
-function t.init() --[[ Line: 15 | Upvalues: v1 (ref), CmdrGuiUtils (copy), Players (copy), t (copy) ]]
+function t.init()
 	v1 = CmdrGuiUtils.frame(Players.LocalPlayer)
 	local CmdrFrameValue = Instance.new("ObjectValue")
 	CmdrFrameValue.Name = "CmdrFrameValue"
@@ -22,7 +23,7 @@ function t.init() --[[ Line: 15 | Upvalues: v1 (ref), CmdrGuiUtils (copy), Playe
 	CmdrGuiUtils.autocomplete(ScreenGui)
 	task.spawn(t._load, ScreenGui)
 end
-function t._load(p1) --[[ Line: 32 | Upvalues: Players (copy), v2 (ref), ReplicatedStorage (copy), v4 (copy), v3 (ref), v1 (ref), CmdrPermission (copy) ]]
+function t._load(p1)
 	local CmdrAutocompleteGuiValue = Instance.new("ObjectValue")
 	CmdrAutocompleteGuiValue.Name = "CmdrAutocompleteGuiValue"
 	CmdrAutocompleteGuiValue.Value = p1
@@ -34,7 +35,7 @@ function t._load(p1) --[[ Line: 32 | Upvalues: Players (copy), v2 (ref), Replica
 	v4:Fire()
 	v3 = true
 	local TextBox = v1.Entry.TextBox
-	TextBox:GetPropertyChangedSignal("Text"):Connect(function() --[[ Line: 47 | Upvalues: TextBox (copy), v2 (ref), Players (ref), CmdrPermission (ref) ]]
+	TextBox:GetPropertyChangedSignal("Text"):Connect(function()
 		local v1 = TextBox.Text:gsub("^%s+", "")
 		local v22 = v2.Dispatcher:Evaluate(v1, Players.LocalPlayer, true)
 		if v22 and not v1:sub(#v22.Name + 1, #v22.Name + 1):match("%s") then
@@ -45,14 +46,14 @@ function t._load(p1) --[[ Line: 32 | Upvalues: Players (copy), v2 (ref), Replica
 		end
 	end)
 end
-function t.promiseCmdr() --[[ Line: 62 | Upvalues: v3 (ref), Promise (copy), v2 (ref), v1 (ref), v4 (copy) ]]
+function t.promiseCmdr()
 	if v3 then
 		return Promise.resolve(v2, v1)
 	else
-		return Promise.fromEvent(v4):andThen(function() --[[ Line: 66 | Upvalues: v2 (ref), v1 (ref) ]]
+		return Promise.fromEvent(v4):andThen(function()
 			return v2, v1
 		end)
 	end
 end
-function t.mount() --[[ Line: 71 ]] end
+function t.mount()  end
 return t

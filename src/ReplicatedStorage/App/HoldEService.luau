@@ -7,9 +7,9 @@ local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local InventoryItemBinder = require(ReplicatedStorage.Inventory.InventoryItemBinder)
 require(ReplicatedStorage.Inventory.InventoryItemSystem)
-local t = {}
-function t.init()
-	t._button = {
+local module = {}
+function module.init()
+	module._button = {
 		primary = true,
 		priority = 1050,
 		noSink = true,
@@ -23,10 +23,10 @@ function t.init()
 			CircleAction.Release()
 		end
 	}
-	ActionButtonService.add(t._button)
+	ActionButtonService.add(module._button)
 	CircleAction.onVisibilityChanged:Connect(function(p1)
-		if p1 and t._button._pressed then
-			t._button.onPressed()
+		if p1 and module._button._pressed then
+			module._button.onPressed()
 		end
 	end)
 	local function updateVisibility(p1)
@@ -36,11 +36,11 @@ function t.init()
 		if not v3 then
 			v3 = v1.ShootBegin == nil
 		end
-		if t._button.disabled == v2 or p1 then
-			ActionButtonService.setButtonEnabled(t._button, v2)
+		if module._button.disabled == v2 or p1 then
+			ActionButtonService.setButtonEnabled(module._button, v2)
 		end
-		ActionButtonService.setButtonPrimary(t._button, v3)
-		ActionButtonService.setButtonPriority(t._button, if v3 or v1 == nil then 1050 else 775)
+		ActionButtonService.setButtonPrimary(module._button, v3)
+		ActionButtonService.setButtonPriority(module._button, if v3 or v1 == nil then 1050 else 775)
 	end
 	updateVisibility(true)
 	local function handleItem(p1)
@@ -66,4 +66,4 @@ function t.init()
 		updateVisibility()
 	end)
 end
-return t
+return module

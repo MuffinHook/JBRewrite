@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
@@ -8,12 +9,12 @@ local PlaneUtils = require(ReplicatedStorage.Plane.PlaneUtils)
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1) --[[ Line: 14 | Upvalues: BaseObject (copy), t (copy), RxInstanceUtils (copy), PlaneConsts (copy), RunService (copy) ]]
+function t.new(p1)
 	local v1 = BaseObject.new(p1)
 	setmetatable(v1, t)
-	v1.maid:GiveTask(RxInstanceUtils.observeAttribute(p1, PlaneConsts.BORN_AT_ATTR_NAME, function(p1, p2) --[[ Line: 18 | Upvalues: RunService (ref), v1 (copy) ]]
+	v1.maid:GiveTask(RxInstanceUtils.observeAttribute(p1, PlaneConsts.BORN_AT_ATTR_NAME, function(p1, p2)
 		if p1 then
-			p2:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 22 | Upvalues: v1 (ref), p1 (copy) ]]
+			p2:GiveTask(RunService.Heartbeat:Connect(function()
 				v1:_update(p1)
 			end))
 		end
@@ -21,7 +22,7 @@ function t.new(p1) --[[ Line: 14 | Upvalues: BaseObject (copy), t (copy), RxInst
 	v1._lastPosition = Vector3.new()
 	return v1
 end
-function t._update(p1, p2) --[[ Line: 31 ]]
+function t._update(p1, p2)
 	local v1 = workspace:GetServerTimeNow() - p2
 	local v2 = p1:GetDuration()
 	local v3 = math.cos(v1)
@@ -38,44 +39,44 @@ function t._update(p1, p2) --[[ Line: 31 ]]
 		p1.obj.Wings.Transparency = v6
 	end
 end
-function t.SetOrigin(p1, p2) --[[ Line: 55 | Upvalues: PlaneUtils (copy) ]]
+function t.SetOrigin(p1, p2)
 	return PlaneUtils.setOrigin(p1.obj, p2)
 end
-function t.GetOrigin(p1) --[[ Line: 58 | Upvalues: PlaneUtils (copy) ]]
+function t.GetOrigin(p1)
 	return PlaneUtils.getOrigin(p1.obj)
 end
-function t.SetTarget(p1, p2) --[[ Line: 61 | Upvalues: PlaneUtils (copy) ]]
+function t.SetTarget(p1, p2)
 	return PlaneUtils.setTarget(p1.obj, p2)
 end
-function t.GetTarget(p1) --[[ Line: 64 | Upvalues: PlaneUtils (copy) ]]
+function t.GetTarget(p1)
 	return PlaneUtils.getTarget(p1.obj)
 end
-function t.SetSpeed(p1, p2) --[[ Line: 67 | Upvalues: PlaneUtils (copy) ]]
+function t.SetSpeed(p1, p2)
 	return PlaneUtils.setSpeed(p1.obj, p2)
 end
-function t.GetSpeed(p1) --[[ Line: 70 | Upvalues: PlaneUtils (copy) ]]
+function t.GetSpeed(p1)
 	return PlaneUtils.getSpeed(p1.obj)
 end
-function t.SetTypeEnum(p1, p2) --[[ Line: 73 | Upvalues: PlaneUtils (copy) ]]
+function t.SetTypeEnum(p1, p2)
 	return PlaneUtils.setTypeEnum(p1.obj, p2)
 end
-function t.GetTypeEnum(p1) --[[ Line: 76 | Upvalues: PlaneUtils (copy) ]]
+function t.GetTypeEnum(p1)
 	return PlaneUtils.getTypeEnum(p1.obj)
 end
-function t.SetBornAt(p1, p2) --[[ Line: 79 | Upvalues: PlaneUtils (copy) ]]
+function t.SetBornAt(p1, p2)
 	return PlaneUtils.setBornAt(p1.obj, p2)
 end
-function t.GetBornAt(p1) --[[ Line: 82 | Upvalues: PlaneUtils (copy) ]]
+function t.GetBornAt(p1)
 	return PlaneUtils.getBornAt(p1.obj)
 end
-function t.GetDuration(p1) --[[ Line: 85 ]]
+function t.GetDuration(p1)
 	local v1 = p1:GetOrigin()
 	local v2 = p1:GetTarget()
 	local v3 = p1:GetSpeed()
 	assert(v3 > 0, "speed must be > 0")
 	return (v2 - v1).Magnitude / v3
 end
-function t.GetPositionAt(p1, p2) --[[ Line: 94 | Upvalues: PlaneUtils (copy), PlaneConsts (copy) ]]
+function t.GetPositionAt(p1, p2)
 	local v1 = p1:GetOrigin()
 	if v1 then
 		local v2 = p1:GetTarget()

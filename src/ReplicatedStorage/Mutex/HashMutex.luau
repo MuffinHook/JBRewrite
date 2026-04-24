@@ -1,18 +1,19 @@
+-- Reviewed by Claude
 local t = {}
 t.__index = t
-function t.new() --[[ Line: 4 | Upvalues: t (copy) ]]
+function t.new()
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._data = {}
 	t2._observe = {}
 	return t2
 end
-function t.AcquireFor(p1, p2, p3) --[[ Line: 13 ]]
+function t.AcquireFor(p1, p2, p3)
 	if p1._data[p2] then
 		return false
 	else
 		p1._data[p2] = {
-			thread = task.delay(p3, function() --[[ Line: 18 | Upvalues: p1 (copy), p2 (copy) ]]
+			thread = task.delay(p3, function()
 				p1._data[p2] = nil
 				p1:_fireKeyChangedCallbacks(p2)
 			end)
@@ -21,7 +22,7 @@ function t.AcquireFor(p1, p2, p3) --[[ Line: 13 ]]
 		return true
 	end
 end
-function t.ReleaseFor(p1, p2) --[[ Line: 26 ]]
+function t.ReleaseFor(p1, p2)
 	local v1 = p1._data[p2]
 	if v1 then
 		task.cancel(v1.thread)
@@ -30,7 +31,7 @@ function t.ReleaseFor(p1, p2) --[[ Line: 26 ]]
 	end
 	return v1 ~= nil
 end
-function t._fireKeyChangedCallbacks(p1, p2) --[[ Line: 36 ]]
+function t._fireKeyChangedCallbacks(p1, p2)
 	local v1 = p1._data[p2] ~= nil
 	if p1._observe[p2] then
 		for v2, v3 in p1._observe[p2] do
@@ -38,12 +39,12 @@ function t._fireKeyChangedCallbacks(p1, p2) --[[ Line: 36 ]]
 		end
 	end
 end
-function t.AddKeyChangedCallback(p1, p2, p3) --[[ Line: 44 ]]
+function t.AddKeyChangedCallback(p1, p2, p3)
 	if not p1._observe[p2] then
 		p1._observe[p2] = {}
 	end
 	table.insert(p1._observe[p2], p3)
-	return function() --[[ Line: 49 | Upvalues: p1 (copy), p2 (copy), p3 (copy) ]]
+	return function()
 		if p1._observe[p2] then
 			local v1 = table.find(p1._observe[p2], p3)
 			if v1 then
@@ -60,11 +61,11 @@ function t.AddKeyChangedCallback(p1, p2, p3) --[[ Line: 44 ]]
 		end
 	end
 end
-function t.ObserveKey(p1, p2, p3) --[[ Line: 64 ]]
+function t.ObserveKey(p1, p2, p3)
 	p3(p1._data[p2] ~= nil)
 	return p1:AddKeyChangedCallback(p2, p3)
 end
-function t.Destroy(p1) --[[ Line: 69 ]]
+function t.Destroy(p1)
 	for v1 in p1._data do
 		p1:ReleaseFor(v1)
 	end

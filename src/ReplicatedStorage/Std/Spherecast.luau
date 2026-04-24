@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 return {
-	collidable = function(p1, p2, p3, p4, p5, p6) --[[ Name: collidable | Line: 5 ]]
+	collidable = function(p1, p2, p3, p4, p5, p6)
 		assert(p1, "missing position")
 		assert(p3.Magnitude - 1 <= 0.001, "direction is not unit length")
 		assert(p4 > 0, "length is not non zero")

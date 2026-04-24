@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local RobberyConsts = require(ReplicatedStorage.Robbery.RobberyConsts)
@@ -5,7 +6,7 @@ local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local v1 = Color3.fromRGB(127, 249, 82)
 local v2 = Roact.PureComponent:extend("BattleRobberyStatus")
-function v2.render(p1) --[[ Line: 10 | Upvalues: createElement (copy), ColorUtils (copy), v1 (copy), RobberyConsts (copy) ]]
+function v2.render(p1)
 	local rowIndex = p1.props.rowIndex
 	local t = {
 		BorderSizePixel = 0

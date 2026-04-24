@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Checkbox = require(ReplicatedStorage.EzUi.Checkbox)
@@ -14,7 +15,7 @@ local EnumSort = require(script.Parent.Parent.EnumSort)
 local GarageConsts = require(script.Parent.Parent.GarageConsts)
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
 local v1 = Roact.PureComponent:extend("PortalBase")
-function v1.init(p1) --[[ Line: 19 | Upvalues: Roact (copy), Maid (copy) ]]
+function v1.init(p1)
 	local v1, v2 = Roact.createBinding(p1.props.title)
 	p1.titleBinding = v1
 	p1.updateTitleBinding = v2
@@ -25,7 +26,7 @@ function v1.init(p1) --[[ Line: 19 | Upvalues: Roact (copy), Maid (copy) ]]
 		aerialEnabled = false
 	})
 end
-function v1.render(p1) --[[ Line: 28 | Upvalues: EnumSort (copy), RunUtils (copy), createElement (copy), SaleConsts (copy), Checkbox (copy), Roact (copy), ScrollingGrid (copy), CustomizeItem (copy) ]]
+function v1.render(p1)
 	local portalRatio = p1.props.portalRatio
 	local paddingRatio = p1.props.paddingRatio
 	local v1 = portalRatio * 10
@@ -50,7 +51,7 @@ function v1.render(p1) --[[ Line: 28 | Upvalues: EnumSort (copy), RunUtils (copy
 	local metadata = p1.props.metadata
 	local search = p1.state.search
 	local aerialEnabled = p1.state.aerialEnabled
-	local function shouldShow(p12, p2, p3) --[[ Line: 67 | Upvalues: p1 (copy), aerialEnabled (copy), RunUtils (ref) ]]
+	local function shouldShow(p12, p2, p3)
 		local v1 = (p3 or ""):lower():gsub(" ", "")
 		local v3 = #v1 > 0
 		local v4 = v3 and string.find((p12.title or ""):lower():gsub(" ", ""), v1, 1, true) ~= nil
@@ -204,22 +205,22 @@ function v1.render(p1) --[[ Line: 28 | Upvalues: EnumSort (copy), RunUtils (copy
 		t10.ImageColor3 = (p1.props.showFavorited or p1.state.favHover) and Color3.fromRGB(255, 251, 0) or Color3.new(0.7, 0.7, 0.7)
 		t10.Image = "rbxassetid://8552830996"
 		t10.ZIndex = 10
-		t10[Roact.Event.MouseEnter] = function() --[[ Line: 218 | Upvalues: p1 (copy) ]]
+		t10[Roact.Event.MouseEnter] = function()
 			p1:setState({
 				favHover = true
 			})
 		end
-		t10[Roact.Event.MouseLeave] = function() --[[ Line: 223 | Upvalues: p1 (copy) ]]
+		t10[Roact.Event.MouseLeave] = function()
 			p1:setState({
 				favHover = false
 			})
 		end
-		t10[Roact.Event.SelectionGained] = function() --[[ Line: 228 | Upvalues: p1 (copy) ]]
+		t10[Roact.Event.SelectionGained] = function()
 			p1:setState({
 				favHover = true
 			})
 		end
-		t10[Roact.Event.SelectionLost] = function() --[[ Line: 233 | Upvalues: p1 (copy) ]]
+		t10[Roact.Event.SelectionLost] = function()
 			p1:setState({
 				favHover = false
 			})
@@ -273,7 +274,7 @@ function v1.render(p1) --[[ Line: 28 | Upvalues: EnumSort (copy), RunUtils (copy
 				BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0, 0, 0, 0),
-				[Roact.Event.Activated] = function() --[[ Line: 286 | Upvalues: p1 (copy) ]]
+				[Roact.Event.Activated] = function()
 					p1.props.onSelectSort(p1.props.sortId)
 				end
 			}, {
@@ -366,21 +367,21 @@ function v1.render(p1) --[[ Line: 28 | Upvalues: EnumSort (copy), RunUtils (copy
 	})
 	return createElement("Frame", t3, t4)
 end
-function v1._updateTitle(p1) --[[ Line: 379 | Upvalues: SaleConsts (copy), SaleUtils (copy) ]]
+function v1._updateTitle(p1)
 	if p1.props.title == SaleConsts.CATEGORY_NAME then
 		p1.updateTitleBinding(SaleConsts.CATEGORY_NAME .. ": " .. SaleUtils.formatRemaining(SaleUtils.getTimeToNextSale()))
 	else
 		p1.updateTitleBinding(p1.props.title)
 	end
 end
-function v1.didMount(p1) --[[ Line: 388 | Upvalues: Interval (copy), Players (copy), GarageConsts (copy) ]]
-	p1.maid.updateTitle = Interval.every(1):Connect(function() --[[ Line: 389 | Upvalues: p1 (copy) ]]
+function v1.didMount(p1)
+	p1.maid.updateTitle = Interval.every(1):Connect(function()
 		p1:_updateTitle()
 	end)
 	local v1 = p1.searchRef:getValue()
 	if v1 then
-		p1.maid:GiveTask(v1:GetPropertyChangedSignal("Text"):Connect(function() --[[ Line: 394 | Upvalues: p1 (copy), v1 (copy) ]]
-			p1.maid.searchDelay = task.delay(0.1, function() --[[ Line: 395 | Upvalues: p1 (ref), v1 (ref) ]]
+		p1.maid:GiveTask(v1:GetPropertyChangedSignal("Text"):Connect(function()
+			p1.maid.searchDelay = task.delay(0.1, function()
 				p1:setState({
 					search = v1.Text
 				})
@@ -388,7 +389,7 @@ function v1.didMount(p1) --[[ Line: 388 | Upvalues: Interval (copy), Players (co
 		end))
 	end
 	if Players.LocalPlayer then
-		p1.maid:GiveTask(Players.LocalPlayer:GetAttributeChangedSignal(GarageConsts.AERIAL_SPAWN_ATTR_NAME):Connect(function() --[[ Line: 405 | Upvalues: p1 (copy), Players (ref), GarageConsts (ref) ]]
+		p1.maid:GiveTask(Players.LocalPlayer:GetAttributeChangedSignal(GarageConsts.AERIAL_SPAWN_ATTR_NAME):Connect(function()
 			local t = {}
 			t.aerialEnabled = Players.LocalPlayer:GetAttribute(GarageConsts.AERIAL_SPAWN_ATTR_NAME) == true
 			p1:setState(t)
@@ -400,16 +401,16 @@ function v1.didMount(p1) --[[ Line: 388 | Upvalues: Interval (copy), Players (co
 		end
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 418 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 422 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		sortId = p1.garageSort
 	}
-end, function(p1) --[[ Line: 430 | Upvalues: EnumSort (copy) ]]
+end, function(p1)
 	return {
-		onSelectSort = function(p12) --[[ Name: onSelectSort | Line: 432 | Upvalues: EnumSort (ref), p1 (copy) ]]
+		onSelectSort = function(p12)
 			local count = 0
 			for v1 in EnumSort:GetEnumItems() do
 				count = count + 1

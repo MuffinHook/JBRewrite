@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -10,19 +11,19 @@ local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1, p2) --[[ Line: 15 | Upvalues: BaseObject (copy), t (copy), RxInstanceUtils (copy), DoorUtils (copy), CharacterUtils (copy), Players (copy) ]]
+function t.new(p1, p2)
 	local v1 = BaseObject.new(p1)
 	setmetatable(v1, t)
 	v1._flashing = false
 	v1.buttonsModel = nil
-	v1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Buttons", function(p12, p22) --[[ Line: 22 | Upvalues: v1 (copy), RxInstanceUtils (ref), DoorUtils (ref), CharacterUtils (ref), Players (ref), p1 (copy), p2 (copy) ]]
+	v1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Buttons", function(p12, p22)
 		v1.buttonsModel = p12
-		p22:GiveTask(RxInstanceUtils.observeChildren(p12, function(p12, p22) --[[ Line: 24 | Upvalues: DoorUtils (ref), RxInstanceUtils (ref), CharacterUtils (ref), Players (ref), v1 (ref), p1 (ref), p2 (ref) ]]
-			p22:GivePromise(DoorUtils.promiseInnerModel(p12):andThen(function(p1) --[[ Line: 26 | Upvalues: RxInstanceUtils (ref) ]]
+		p22:GiveTask(RxInstanceUtils.observeChildren(p12, function(p12, p22)
+			p22:GivePromise(DoorUtils.promiseInnerModel(p12):andThen(function(p1)
 				return RxInstanceUtils.waitForChild(p1, "Touch")
-			end):andThen(function(p12) --[[ Line: 29 | Upvalues: p22 (copy), CharacterUtils (ref), Players (ref), v1 (ref), p1 (ref), p2 (ref) ]]
+			end):andThen(function(p12)
 				local v12 = os.clock()
-				p22:GiveTask(p12.Touched:Connect(function(p12) --[[ Line: 31 | Upvalues: CharacterUtils (ref), Players (ref), v12 (ref), v1 (ref), p1 (ref), p2 (ref) ]]
+				p22:GiveTask(p12.Touched:Connect(function(p12)
 					local v13 = CharacterUtils.getAncestorPartHumanoid(p12)
 					if v13 and (v13.Parent == Players.LocalPlayer.Character and v13:GetLimb(p12) ~= Enum.Limb.Unknown) then
 						local v2 = os.clock()
@@ -37,12 +38,12 @@ function t.new(p1, p2) --[[ Line: 15 | Upvalues: BaseObject (copy), t (copy), Rx
 			end))
 		end))
 	end))
-	v1.maid:GiveTask(p2.replicateRemote.OnClientEvent:Connect(function() --[[ Line: 60 | Upvalues: v1 (copy) ]]
+	v1.maid:GiveTask(p2.replicateRemote.OnClientEvent:Connect(function()
 		v1:_flicker()
 	end))
 	return v1
 end
-function t._setPartsVisible(p1, p2) --[[ Line: 66 ]]
+function t._setPartsVisible(p1, p2)
 	local Lasers = p1.obj:FindFirstChild("Lasers")
 	for v1, v2 in assert(Lasers, "no lasersModel exists"):GetChildren() do
 		if p2 then
@@ -54,7 +55,7 @@ function t._setPartsVisible(p1, p2) --[[ Line: 66 ]]
 		end
 	end
 end
-function t._setTouchPartsTriggered(p1) --[[ Line: 79 | Upvalues: DoorUtils (copy) ]]
+function t._setTouchPartsTriggered(p1)
 	local t = {}
 	local t2 = {}
 	for v1, v2 in p1.buttonsModel:GetChildren() do
@@ -64,7 +65,7 @@ function t._setTouchPartsTriggered(p1) --[[ Line: 79 | Upvalues: DoorUtils (copy
 		Touch.Transparency = 0
 		Touch.Color = Color3.new(0.9, 0, 0)
 	end
-	return function() --[[ Line: 90 | Upvalues: t (copy), t2 (copy) ]]
+	return function()
 		for v1, v2 in t do
 			v1.Transparency = v2
 		end
@@ -73,7 +74,7 @@ function t._setTouchPartsTriggered(p1) --[[ Line: 79 | Upvalues: DoorUtils (copy
 		end
 	end
 end
-function t._flicker(p1) --[[ Line: 99 | Upvalues: Audio (copy), RunService (copy) ]]
+function t._flicker(p1)
 	if not p1._flashing then
 		p1._flashing = true
 		Audio.ObjectLocal(p1.obj:FindFirstChild("SoundPart"), 11793588989, {

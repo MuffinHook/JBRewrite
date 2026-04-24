@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local GuiService = game:GetService("GuiService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -16,10 +17,10 @@ local t = {
 		Color3.fromRGB(1, 255, 31),
 		Color3.fromRGB(227, 255, 0)
 	},
-	Reset = function(p1) --[[ Name: Reset | Line: 22 ]]
+	Reset = function(p1)
 		p1.Index = 1
 	end,
-	NextColor = function(p1) --[[ Name: NextColor | Line: 25 | Upvalues: v1 (copy) ]]
+	NextColor = function(p1)
 		if p1.Index >= #p1.BaseColors then
 			return Color3.fromHSV(v1:NextNumber(), 1, 1)
 		else
@@ -29,7 +30,7 @@ local t = {
 		end
 	end
 }
-local function MakeTable(p1, p2) --[[ Line: 33 ]]
+local function MakeTable(p1, p2)
 	local t = {}
 	for i = 1, p2 do
 		t[i] = {}
@@ -41,10 +42,10 @@ local function MakeTable(p1, p2) --[[ Line: 33 ]]
 end
 local t2 = { 0, 1, 0, -1 }
 local t3 = { -1, 0, 1, 0 }
-local function IsInside(p1, p2, p3) --[[ Line: 44 ]]
+local function IsInside(p1, p2, p3)
 	return if p2 >= 1 and (p2 <= #p1[1] and p3 >= 1) then p3 <= #p1 else false
 end
-local function IsFilled(p1) --[[ Line: 76 ]]
+local function IsFilled(p1)
 	local v1 = #p1[1]
 	for i = 1, #p1 do
 		for j = 1, v1 do
@@ -55,7 +56,7 @@ local function IsFilled(p1) --[[ Line: 76 ]]
 	end
 	return true
 end
-local function IsNextTo(p1, p2, p3, p4) --[[ Line: 87 ]]
+local function IsNextTo(p1, p2, p3, p4)
 	return if p1 == p3 + 1 and p2 == p4 or (p1 == p3 - 1 and p2 == p4 or p1 == p3 and p2 == p4 + 1) then true elseif p1 == p3 then p2 == p4 - 1 else false
 end
 local FlowGui = ReplicatedStorage.Resource.FlowGui
@@ -63,7 +64,7 @@ local t4 = {
 	IsOpen = false,
 	Maid = nil,
 	OnFilled = nil,
-	SetGrid = function(p1, p2, p3) --[[ Name: SetGrid | Line: 101 | Upvalues: MakeTable (copy), t (copy) ]]
+	SetGrid = function(p1, p2, p3)
 		p1.FlowId = p2
 		p1.Grid = p3
 		local v1 = #p3
@@ -77,7 +78,7 @@ local t4 = {
 		t:Reset()
 		p1.Colors = {}
 	end,
-	ResetAlpha = function(p1, p2) --[[ Name: ResetAlpha | Line: 116 ]]
+	ResetAlpha = function(p1, p2)
 		assert(p2)
 		local v2 = #p1.Grid[1]
 		for i = 1, #p1.Grid do
@@ -88,7 +89,7 @@ local t4 = {
 			end
 		end
 	end,
-	Reset = function(p1) --[[ Name: Reset | Line: 127 ]]
+	Reset = function(p1)
 		if p1.Grid == nil then
 			return false
 		end
@@ -100,7 +101,7 @@ local t4 = {
 		end
 	end,
 	Colors = {},
-	Draw = function(p1) --[[ Name: Draw | Line: 139 | Upvalues: FlowGui (copy), t (copy) ]]
+	Draw = function(p1)
 		local v1 = #p1.Grid
 		local v2 = #p1.Grid[1]
 		for i = 1, v1 do
@@ -141,7 +142,7 @@ local t4 = {
 			end
 		end
 	end,
-	GetCoordFromMouse = function(p1, p2) --[[ Name: GetCoordFromMouse | Line: 179 | Upvalues: FlowGui (copy) ]]
+	GetCoordFromMouse = function(p1, p2)
 		local Inner = FlowGui.Board.Inner
 		local AbsolutePosition = Inner.AbsolutePosition
 		local AbsoluteSize = Inner.AbsoluteSize
@@ -152,7 +153,7 @@ local t4 = {
 		return v6, v8, p1.Grid[v8][v6]
 	end
 }
-function t4.Show(p1) --[[ Line: 204 | Upvalues: t4 (copy), FlowGui (copy), LocalPlayer (copy), Maid (copy), UserInputService (copy), ChatUtils (copy), t2 (copy), t3 (copy), GuiService (copy) ]]
+function t4.Show(p1)
 	if p1.IsOpen then
 		warn("Board was already.. attempting to remedy..")
 		t4:Reset()
@@ -165,7 +166,7 @@ function t4.Show(p1) --[[ Line: 204 | Upvalues: t4 (copy), FlowGui (copy), Local
 	if UserInputService.GamepadEnabled then
 		ChatUtils.setEnabled(false)
 	end
-	p1.Maid:GiveTask(function() --[[ Line: 217 | Upvalues: UserInputService (ref), ChatUtils (ref) ]]
+	p1.Maid:GiveTask(function()
 		if UserInputService.GamepadEnabled then
 			ChatUtils.setEnabled(true)
 		end
@@ -176,7 +177,7 @@ function t4.Show(p1) --[[ Line: 204 | Upvalues: t4 (copy), FlowGui (copy), Local
 	local v4 = nil
 	local v5 = nil
 	local v6 = false
-	local function TouchStart(p12) --[[ Line: 228 | Upvalues: p1 (copy), v3 (ref), v4 (ref), v5 (ref), v1 (ref), v2 (ref), v6 (ref) ]]
+	local function TouchStart(p12)
 		local v12, v22, v32 = p1:GetCoordFromMouse(p12)
 		local Grid = p1.Grid
 		if if v12 >= 1 and (v12 <= #Grid[1] and v22 >= 1) then v22 <= #Grid else false == false then
@@ -194,7 +195,7 @@ function t4.Show(p1) --[[ Line: 204 | Upvalues: t4 (copy), FlowGui (copy), Local
 		p1:Draw()
 		v6 = true
 	end
-	local function TouchStop(p12) --[[ Line: 242 | Upvalues: v6 (ref), v3 (ref), v1 (ref), v4 (ref), v2 (ref), p1 (copy), v5 (ref), t2 (ref), t3 (ref) ]]
+	local function TouchStop(p12)
 		if v6 == false then
 			return false
 		end
@@ -224,7 +225,7 @@ function t4.Show(p1) --[[ Line: 204 | Upvalues: t4 (copy), FlowGui (copy), Local
 		end
 		p1:Draw()
 	end
-	local function TouchMove(p12) --[[ Line: 278 | Upvalues: v6 (ref), p1 (copy), v3 (ref), v4 (ref), v5 (ref) ]]
+	local function TouchMove(p12)
 		if v6 then
 			local v1, v2, v32 = p1:GetCoordFromMouse(p12)
 			local v42 = v3
@@ -239,45 +240,45 @@ function t4.Show(p1) --[[ Line: 204 | Upvalues: t4 (copy), FlowGui (copy), Local
 			end
 		end
 	end
-	local function connectBoardInput() --[[ Line: 296 | Upvalues: p1 (copy), FlowGui (ref), TouchStart (copy), TouchStop (copy), TouchMove (copy) ]]
-		p1.Maid:GiveTask(FlowGui.Board.InputBegan:Connect(function(p1) --[[ Line: 297 | Upvalues: TouchStart (ref) ]]
+	local function connectBoardInput()
+		p1.Maid:GiveTask(FlowGui.Board.InputBegan:Connect(function(p1)
 			if p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Touch then
 				TouchStart(p1.Position)
 			end
 		end))
-		p1.Maid:GiveTask(FlowGui.Board.InputEnded:Connect(function(p1) --[[ Line: 302 | Upvalues: TouchStop (ref) ]]
+		p1.Maid:GiveTask(FlowGui.Board.InputEnded:Connect(function(p1)
 			if p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Touch then
 				TouchStop(p1.Position)
 			end
 		end))
-		p1.Maid:GiveTask(FlowGui.Board.InputChanged:Connect(function(p1) --[[ Line: 307 | Upvalues: TouchMove (ref) ]]
+		p1.Maid:GiveTask(FlowGui.Board.InputChanged:Connect(function(p1)
 			if p1.UserInputType == Enum.UserInputType.MouseMovement or p1.UserInputType == Enum.UserInputType.Touch then
 				TouchMove(p1.Position)
 			end
 		end))
 	end
-	task.defer(function() --[[ Line: 313 | Upvalues: p1 (copy), connectBoardInput (copy) ]]
+	task.defer(function()
 		if p1.IsOpen and p1.Maid then
 			connectBoardInput()
 		end
 	end)
-	p1.Maid:GiveTask(FlowGui.Board.Reset.MouseButton1Down:Connect(function() --[[ Line: 320 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(FlowGui.Board.Reset.MouseButton1Down:Connect(function()
 		p1:Reset()
 		p1:Draw()
 	end))
-	p1.Maid:GiveTask(FlowGui.Board.Cancel.MouseButton1Down:Connect(function() --[[ Line: 324 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(FlowGui.Board.Cancel.MouseButton1Down:Connect(function()
 		p1:Hide()
 	end))
 	t4:Draw()
 	if not GuiService.AutoSelectGuiEnabled and UserInputService:GetLastInputType() == Enum.UserInputType.Gamepad1 then
 		local Humanoid = LocalPlayer.Character:WaitForChild("Humanoid")
-		p1.Maid:GiveTask(Humanoid.Changed:connect(function() --[[ Line: 334 | Upvalues: Humanoid (copy) ]]
+		p1.Maid:GiveTask(Humanoid.Changed:connect(function()
 			Humanoid.Jump = false
 		end))
 		local v7 = 1
 		local v8 = 1
 		local v9 = nil
-		local function UpdateGamepadSelection() --[[ Line: 340 | Upvalues: p1 (copy), v7 (ref), v8 (ref), v9 (ref), FlowGui (ref), TouchMove (copy) ]]
+		local function UpdateGamepadSelection()
 			local v1 = #p1.Grid
 			local v2 = #p1.Grid[1]
 			if v7 < 1 then
@@ -301,7 +302,7 @@ function t4.Show(p1) --[[ Line: 204 | Upvalues: t4 (copy), FlowGui (copy), Local
 			v9 = v4
 			TouchMove(v4.AbsolutePosition + v4.AbsoluteSize * 0.5)
 		end
-		p1.Maid:GiveTask(UserInputService.InputBegan:Connect(function(p1) --[[ Line: 365 | Upvalues: v8 (ref), UpdateGamepadSelection (copy), v7 (ref), FlowGui (ref), TouchStart (copy) ]]
+		p1.Maid:GiveTask(UserInputService.InputBegan:Connect(function(p1)
 			if p1.UserInputType == Enum.UserInputType.Gamepad1 then
 				if p1.KeyCode == Enum.KeyCode.DPadUp then
 					v8 = v8 - 1
@@ -321,7 +322,7 @@ function t4.Show(p1) --[[ Line: 204 | Upvalues: t4 (copy), FlowGui (copy), Local
 				end
 			end
 		end))
-		p1.Maid:GiveTask(UserInputService.InputEnded:Connect(function(p1) --[[ Line: 386 | Upvalues: v7 (ref), v8 (ref), FlowGui (ref), TouchStop (copy) ]]
+		p1.Maid:GiveTask(UserInputService.InputEnded:Connect(function(p1)
 			if p1.UserInputType == Enum.UserInputType.Gamepad1 and p1.KeyCode == Enum.KeyCode.ButtonA then
 				local v2 = FlowGui.Board.Inner:FindFirstChild((("%d.%d"):format(v7, v8)))
 				TouchStop(v2.AbsolutePosition + v2.AbsoluteSize * 0.5)
@@ -330,7 +331,7 @@ function t4.Show(p1) --[[ Line: 204 | Upvalues: t4 (copy), FlowGui (copy), Local
 		UpdateGamepadSelection()
 	end
 end
-function t4.Hide(p1) --[[ Line: 399 | Upvalues: FlowGui (copy) ]]
+function t4.Hide(p1)
 	assert(p1.IsOpen == true)
 	FlowGui.Parent = script
 	FlowGui.Board.Inner:ClearAllChildren()
@@ -342,18 +343,18 @@ end
 local v2 = nil
 local v3 = nil
 return {
-	Init = function(p1) --[[ Name: Init | Line: 410 | Upvalues: v2 (ref), v3 (ref), t4 (copy) ]]
+	Init = function(p1)
 		local em = p1.em
 		v2 = p1.Event
 		v3 = em
-		function t4.OnConnection() --[[ Line: 413 | Upvalues: v2 (ref), t4 (ref) ]]
+		function t4.OnConnection()
 			v2:FireServer("v" .. "" .. ("eerm8f"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("nbaq1y"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("asjrl"):sub(2, 2):reverse() .. "" .. "" .. ("sw30enqm"):sub(5, 5):reverse():reverse():reverse() .. "4bd", t4.FlowId, t4.Grid)
 		end
-		function em.boy25zu9(p1, p2) --[[ Line: 416 | Upvalues: t4 (ref) ]]
+		function em.boy25zu9(p1, p2)
 			t4:SetGrid(p1, p2)
 			t4:Show()
 		end
-		function em.a5lmmwfi(p1) --[[ Line: 420 | Upvalues: t4 (ref) ]]
+		function em.a5lmmwfi(p1)
 			if t4.IsOpen and (p1 == nil or t4.FlowId == p1) then
 				t4:Reset()
 				t4:Hide()

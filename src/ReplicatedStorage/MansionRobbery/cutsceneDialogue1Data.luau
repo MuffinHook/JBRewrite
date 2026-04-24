@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local MansionRobberyConsts = require(script.Parent.MansionRobberyConsts)
 local t = {
 	{

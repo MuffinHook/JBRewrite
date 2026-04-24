@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
@@ -13,7 +14,7 @@ local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local v1 = Random.new()
 local v2 = RaycastParams.new()
 v2.RespectCanCollide = true
-local function customCollideFunc(p1) --[[ Line: 18 ]]
+local function customCollideFunc(p1)
 	if p1:GetAttribute("InvisibleToBullets") == true then
 		return false
 	else
@@ -24,7 +25,7 @@ local t = {
 	__ClassName = "Item"
 }
 t.__index = t
-function t.new(p1, p2) --[[ Line: 28 | Upvalues: RxInstanceUtils (copy), t (copy), Maid (copy), customCollideFunc (copy), LocalPlayer (copy), ItemCamera (copy), v1 (copy), RunService (copy) ]]
+function t.new(p1, p2)
 	assert(p1)
 	local Character = p1.Character
 	assert(Character)
@@ -57,34 +58,34 @@ function t.new(p1, p2) --[[ Line: 28 | Upvalues: RxInstanceUtils (copy), t (copy
 	t2._customCollideFunc = customCollideFunc
 	t2.Local = p1 == LocalPlayer
 	if t2.Local then
-		t2.Maid:GiveTask(task.defer(function() --[[ Line: 67 | Upvalues: ItemCamera (ref), p2 (copy), t2 (copy) ]]
+		t2.Maid:GiveTask(task.defer(function()
 			ItemCamera.OnItemEquipped(p2 ~= nil, t2.DoNotHide)
 		end))
-		t2.Maid:GiveTask(function() --[[ Line: 70 | Upvalues: ItemCamera (ref) ]]
+		t2.Maid:GiveTask(function()
 			ItemCamera.OnItemUnequipped()
 		end)
 	end
 	if t2.Local then
 		local v4 = "GunCamera" .. tostring((v1:NextInteger(1, 1000000000)))
-		RunService:BindToRenderStep(v4, Enum.RenderPriority.Camera.Value + 1, function() --[[ Line: 78 | Upvalues: t2 (copy) ]]
+		RunService:BindToRenderStep(v4, Enum.RenderPriority.Camera.Value + 1, function()
 			t2:UpdateCamera()
 		end)
-		t2.Maid:GiveTask(function() --[[ Line: 81 | Upvalues: RunService (ref), v4 (copy) ]]
+		t2.Maid:GiveTask(function()
 			RunService:UnbindFromRenderStep(v4)
 		end)
 	end
 	return t2
 end
-function t.TransformLocalMousePosition(p1, p2) --[[ Line: 88 ]]
+function t.TransformLocalMousePosition(p1, p2)
 	return p2
 end
-function t.ProjectMouseLocationToWorld(p1, p2) --[[ Line: 91 | Upvalues: CurrentCamera (copy), v2 (copy), Raycast (copy), customCollideFunc (copy) ]]
+function t.ProjectMouseLocationToWorld(p1, p2)
 	local v1 = CurrentCamera:ViewportPointToRay(p2.x, p2.y)
 	v2.FilterDescendantsInstances = p1.IgnoreList
 	local v22 = Raycast.collidable(v1.Origin, v1.Direction, 999, v2, customCollideFunc)
 	return p1:TransformLocalMousePosition(if v22 then v22.Position else v1.Origin + v1.Direction * 999)
 end
-function t.GetMouseLocation(p1) --[[ Line: 104 | Upvalues: InputUtils (copy), UserInputService (copy) ]]
+function t.GetMouseLocation(p1)
 	if InputUtils.isTouch() then
 		local ViewportSize = workspace.CurrentCamera.ViewportSize
 		return Vector3.new(ViewportSize.X * 0.5, ViewportSize.Y * 0.5, 0)
@@ -97,11 +98,11 @@ function t.GetMouseLocation(p1) --[[ Line: 104 | Upvalues: InputUtils (copy), Us
 end
 local t2 = {}
 t2.__index = t2
-function t2.new() --[[ Line: 125 | Upvalues: t2 (copy), Maid (copy) ]]
+function t2.new()
 	local t = {}
 	setmetatable(t, t2)
 	t.maid = Maid.new()
-	local function createProgressBarGradient(p1, p2) --[[ Line: 130 ]]
+	local function createProgressBarGradient(p1, p2)
 		local Frame = Instance.new("Frame")
 		Frame.Size = UDim2.fromScale(0.5, 1)
 		Frame.Position = UDim2.fromScale(if p2 then 0 else 0.5, 0)
@@ -142,19 +143,19 @@ function t2.new() --[[ Line: 125 | Upvalues: t2 (copy), Maid (copy) ]]
 	t.gradient2 = v3
 	return t
 end
-function t2.UpdatePosition(p1, p2) --[[ Line: 179 ]]
+function t2.UpdatePosition(p1, p2)
 	p1.progressBar.Position = UDim2.new(0, p2.X, 0, p2.Y)
 end
-function t2.UpdateProgress(p1, p2) --[[ Line: 182 ]]
+function t2.UpdateProgress(p1, p2)
 	local v1 = math.clamp(p2 * 360, 0, 360)
 	p1.gradient1.Rotation = math.clamp(v1, 180, 360)
 	p1.gradient2.Rotation = math.clamp(v1, 0, 180)
 end
-function t2.Destroy(p1) --[[ Line: 187 ]]
+function t2.Destroy(p1)
 	p1.maid:Destroy()
 	setmetatable(p1, nil)
 end
-function t.StartReloadProgressCircle(p1, p2, p3) --[[ Line: 191 | Upvalues: Players (copy), t2 (copy), Maid (copy), RunService (copy) ]]
+function t.StartReloadProgressCircle(p1, p2, p3)
 	local GunReload = Instance.new("ScreenGui")
 	GunReload.Name = "GunReload"
 	GunReload.Enabled = false
@@ -168,7 +169,7 @@ function t.StartReloadProgressCircle(p1, p2, p3) --[[ Line: 191 | Upvalues: Play
 	if not p2 then
 		p2 = p1.Config.ReloadTime
 	end
-	v2.progressBarUpdater = RunService.Heartbeat:Connect(function() --[[ Line: 207 | Upvalues: v4 (ref), p2 (ref), p1 (copy), v1 (copy) ]]
+	v2.progressBarUpdater = RunService.Heartbeat:Connect(function()
 		local v12 = (os.clock() - v4) / p2
 		if v12 >= 1 then
 			p1.Maid.guiMaid = nil
@@ -181,7 +182,7 @@ function t.StartReloadProgressCircle(p1, p2, p3) --[[ Line: 191 | Upvalues: Play
 	v1.progressBar.Parent = GunReload
 	GunReload.Enabled = true
 end
-function t.DefaultDisableCamLock(p1) --[[ Line: 223 | Upvalues: ItemCamera (copy) ]]
+function t.DefaultDisableCamLock(p1)
 	if p1.Local then
 		local Locked = ItemCamera.Locked
 		if ItemCamera.Locked == true then
@@ -189,32 +190,32 @@ function t.DefaultDisableCamLock(p1) --[[ Line: 223 | Upvalues: ItemCamera (copy
 			p1:UpdateCameraLocked()
 		end
 		if Locked then
-			p1.Maid:GiveTask(function() --[[ Line: 232 | Upvalues: ItemCamera (ref), Locked (copy) ]]
+			p1.Maid:GiveTask(function()
 				ItemCamera.Locked = Locked
 			end)
 		end
 	end
 end
-function t.UpdateCamera(p1) --[[ Line: 238 | Upvalues: ItemCamera (copy) ]]
+function t.UpdateCamera(p1)
 	ItemCamera.Update()
 end
-function t.UpdateCameraLocked(p1) --[[ Line: 241 | Upvalues: ItemCamera (copy) ]]
+function t.UpdateCameraLocked(p1)
 	if ItemCamera.Locked then
 		ItemCamera.OnItemEquipped(true, p1.DoNotHide)
 	else
 		ItemCamera.OnItemUnequipped()
 	end
 end
-function t.InputBegan(p1, p2, p3) --[[ Line: 249 | Upvalues: ItemCamera (copy), GameSettingsService (copy) ]]
+function t.InputBegan(p1, p2, p3)
 	if not p3 and if p2.UserInputType == Enum.UserInputType.Keyboard and p2.KeyCode == Enum.KeyCode.V then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonB else false then
 		ItemCamera.setLocked(not ItemCamera.Locked)
 		GameSettingsService.setValue(ItemCamera.UISetting, ItemCamera.Locked)
 	end
 end
-function t.InputEnded(p1, ...) --[[ Line: 261 ]]
+function t.InputEnded(p1, ...)
 	error("TODO: Implement")
 end
-function t.Destroy(p1) --[[ Line: 264 ]]
+function t.Destroy(p1)
 	p1.Maid:Destroy()
 	p1.Maid = nil
 	p1.Destroyed = true

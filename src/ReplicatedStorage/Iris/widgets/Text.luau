@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
+return function(p1, p2)
 	p1.WidgetConstructor("Text", {
 		hasState = false,
 		hasChildren = false,
@@ -10,11 +11,11 @@ return function(p1, p2) --[[ Line: 3 ]]
 			RichText = 4
 		},
 		Events = {
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 15 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p1) --[[ Name: Generate | Line: 19 | Upvalues: p2 (copy) ]]
+		Generate = function(p1)
 			local Iris_Text = Instance.new("TextLabel")
 			Iris_Text.Name = "Iris_Text"
 			Iris_Text.AutomaticSize = Enum.AutomaticSize.XY
@@ -25,7 +26,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p2.UIPadding(Iris_Text, Vector2.new(0, 2))
 			return Iris_Text
 		end,
-		Update = function(p12) --[[ Name: Update | Line: 32 | Upvalues: p1 (copy) ]]
+		Update = function(p12)
 			local v1 = p12.Instance
 			if p12.arguments.Text == nil then
 				error("Text argument is required for Iris.Text().", 5)
@@ -47,7 +48,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			end
 			v1.Text = p12.arguments.Text
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 55 ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	})
@@ -58,11 +59,11 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Text = 1
 		},
 		Events = {
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 68 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 72 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_SeparatorText = Instance.new("Frame")
 			Iris_SeparatorText.Name = "Iris_SeparatorText"
 			Iris_SeparatorText.AutomaticSize = Enum.AutomaticSize.Y
@@ -100,13 +101,13 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Right.Parent = Iris_SeparatorText
 			return Iris_SeparatorText
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 120 ]]
+		Update = function(p1)
 			if p1.arguments.Text == nil then
 				error("Text argument is required for Iris.SeparatorText().", 5)
 			end
 			p1.Instance.TextLabel.Text = p1.arguments.Text
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 128 ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	})

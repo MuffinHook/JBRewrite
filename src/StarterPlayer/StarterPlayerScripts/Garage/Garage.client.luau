@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GarageConsts = require(ReplicatedStorage.Garage.GarageConsts)
 local OwnershipConsts = require(ReplicatedStorage.Ownership.OwnershipConsts)
 local store = require(ReplicatedStorage.App.store)
-ReplicatedStorage:WaitForChild(GarageConsts.UPDATE_OWNED_REMOTE_NAME).OnClientEvent:Connect(function(p1) --[[ Line: 8 | Upvalues: OwnershipConsts (copy), store (copy) ]]
+ReplicatedStorage:WaitForChild(GarageConsts.UPDATE_OWNED_REMOTE_NAME).OnClientEvent:Connect(function(p1)
 	local t = {}
 	for k, v in pairs(p1) do
 		if k ~= "CustomizationSlots" then
@@ -25,25 +26,25 @@ ReplicatedStorage:WaitForChild(GarageConsts.UPDATE_OWNED_REMOTE_NAME).OnClientEv
 		saves = p1.CustomizationSlots
 	})
 end)
-ReplicatedStorage:WaitForChild(GarageConsts.UPDATE_EQUIPPED_REMOTE_NAME).OnClientEvent:Connect(function(p1) --[[ Line: 34 | Upvalues: store (copy) ]]
+ReplicatedStorage:WaitForChild(GarageConsts.UPDATE_EQUIPPED_REMOTE_NAME).OnClientEvent:Connect(function(p1)
 	store:dispatch({
 		type = "setEquippedRaw",
 		equipped = p1
 	})
 end)
-ReplicatedStorage:WaitForChild(GarageConsts.UPDATE_FAVORITED_REMOTE_NAME).OnClientEvent:Connect(function(p1) --[[ Line: 42 | Upvalues: store (copy) ]]
+ReplicatedStorage:WaitForChild(GarageConsts.UPDATE_FAVORITED_REMOTE_NAME).OnClientEvent:Connect(function(p1)
 	store:dispatch({
 		type = "setFavoritedRaw",
 		favorited = p1
 	})
 end)
-ReplicatedStorage:WaitForChild(GarageConsts.SET_IN_PHYSICAL_REMOTE_NAME).OnClientEvent:Connect(function(p1) --[[ Line: 50 | Upvalues: store (copy) ]]
+ReplicatedStorage:WaitForChild(GarageConsts.SET_IN_PHYSICAL_REMOTE_NAME).OnClientEvent:Connect(function(p1)
 	store:dispatch({
 		type = "setInPhysical",
 		inPhysical = p1
 	})
 end)
 local PopularSort = require(ReplicatedStorage.Garage.PopularSort)
-ReplicatedStorage:WaitForChild(GarageConsts.FILL_POPULAR_SORT_REMOTE_NAME).OnClientEvent:Connect(function(p1) --[[ Line: 59 | Upvalues: PopularSort (copy) ]]
+ReplicatedStorage:WaitForChild(GarageConsts.FILL_POPULAR_SORT_REMOTE_NAME).OnClientEvent:Connect(function(p1)
 	PopularSort.setRaw(p1)
 end)

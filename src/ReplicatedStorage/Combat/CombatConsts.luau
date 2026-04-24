@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Std.TableUtils).requireValidIndexAndFreeze({
 	DAMAGE_MULTIPLIER_ATTR_NAME = "DamageMultiplier",

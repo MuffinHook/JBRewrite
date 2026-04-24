@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local TracerRoot = Instance.new("Part")
@@ -13,20 +14,20 @@ TracerLines.Parent = workspace
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new() --[[ Line: 19 | Upvalues: BaseObject (copy), t (copy) ]]
+function t.new()
 	local v1 = BaseObject.new()
 	setmetatable(v1, t)
 	v1:_setup()
 	v1:SetColor(Color3.fromRGB(255, 235, 141))
 	return v1
 end
-function t.SetColor(p1, p2) --[[ Line: 28 ]]
+function t.SetColor(p1, p2)
 	p1.lineHandle.Color3 = p2
 end
-function t.SetThickness(p1, p2) --[[ Line: 31 ]]
+function t.SetThickness(p1, p2)
 	p1.lineHandle.Thickness = p2
 end
-function t._setup(p1) --[[ Line: 34 | Upvalues: TracerRoot (copy), TracerLines (copy) ]]
+function t._setup(p1)
 	local LineHandleAdornment = Instance.new("LineHandleAdornment")
 	LineHandleAdornment.Adornee = TracerRoot
 	LineHandleAdornment.Transparency = 0.1
@@ -38,7 +39,7 @@ function t._setup(p1) --[[ Line: 34 | Upvalues: TracerRoot (copy), TracerLines (
 	p1.maid:GiveTask(LineHandleAdornment)
 	p1.lineHandle = LineHandleAdornment
 end
-function t.Draw(p1, p2, p3) --[[ Line: 46 ]]
+function t.Draw(p1, p2, p3)
 	p1.lineHandle.Length = (p3 - p2).Magnitude
 	p1.lineHandle.CFrame = CFrame.lookAt(p2, p3)
 end

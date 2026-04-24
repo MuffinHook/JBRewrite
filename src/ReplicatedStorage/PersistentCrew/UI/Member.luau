@@ -1,19 +1,20 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local PersistentCrewBattleUtils = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleUtils)
 local v1 = Roact.PureComponent:extend("Member")
-function v1.init(p1) --[[ Line: 7 ]]
+function v1.init(p1)
 	p1:setState({
 		settingsOpen = false
 	})
-	function p1.toggleSettings() --[[ Line: 12 | Upvalues: p1 (copy) ]]
+	function p1.toggleSettings()
 		p1:setState({
 			settingsOpen = not p1.state.settingsOpen
 		})
 	end
 end
-function v1.render(p1) --[[ Line: 18 | Upvalues: createElement (copy), Roact (copy), PersistentCrewBattleUtils (copy) ]]
+function v1.render(p1)
 	local index = p1.props.index
 	local aspectRatio = p1.props.aspectRatio
 	local paddingRatio = p1.props.paddingRatio

@@ -1,14 +1,15 @@
+-- Reviewed by Claude
 local TestPlanner = require(script.Parent.TestPlanner)
 local TestRunner = require(script.Parent.TestRunner)
 local TextReporter = require(script.Parent.Reporters.TextReporter)
 local t = {}
-local function stripSpecSuffix(p1) --[[ Line: 11 ]]
+local function stripSpecSuffix(p1)
 	return p1:gsub("%.spec$", "")
 end
-local function isSpecScript(p1) --[[ Line: 14 ]]
+local function isSpecScript(p1)
 	return p1:IsA("ModuleScript") and p1.Name:match("%.spec$")
 end
-local function getPath(p1, p2) --[[ Line: 18 ]]
+local function getPath(p1, p2)
 	local v1 = p2 or game
 	local t = {}
 	local v2, v3
@@ -26,7 +27,7 @@ local function getPath(p1, p2) --[[ Line: 18 ]]
 	table.insert(t, (v3.Name:gsub("%.spec$", "")))
 	return t
 end
-local function toStringPath(p1) --[[ Line: 38 ]]
+local function toStringPath(p1)
 	local v1 = true
 	local v2 = ""
 	for i, v in ipairs(p1) do
@@ -39,7 +40,7 @@ local function toStringPath(p1) --[[ Line: 38 ]]
 	end
 	return v2
 end
-function t.getModulesImpl(p1, p2, p3, p4) --[[ Line: 52 | Upvalues: getPath (copy) ]]
+function t.getModulesImpl(p1, p2, p3, p4)
 	local v1 = p3 or {}
 	local v2 = p4 or p2
 	local v3 = v2:IsA("ModuleScript")
@@ -64,7 +65,7 @@ function t.getModulesImpl(p1, p2, p3, p4) --[[ Line: 52 | Upvalues: getPath (cop
 		})
 	end
 end
-function t.getModules(p1, p2) --[[ Line: 72 ]]
+function t.getModules(p1, p2)
 	local t = {}
 	p1:getModulesImpl(p2, t)
 	for i, v in ipairs(p2:GetDescendants()) do
@@ -72,7 +73,7 @@ function t.getModules(p1, p2) --[[ Line: 72 ]]
 	end
 	return t
 end
-function t.run(p1, p2, p3, p4) --[[ Line: 99 | Upvalues: TextReporter (copy), TestPlanner (copy), TestRunner (copy) ]]
+function t.run(p1, p2, p3, p4)
 	local v2 = p4 or {}
 	if type(p2) ~= "table" then
 		error(("Bad argument #1 to TestBootstrap:run. Expected table, got %s"):format((typeof(p2))), 2)

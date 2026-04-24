@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Trove = require(script.Trove)
 local v1 = Random.new()
 local v2 = 0
 local t = {}
 t.__index = t
-function t.new() --[[ Line: 179 | Upvalues: t (copy), RunService (copy), v1 (copy), Trove (copy) ]]
+function t.new()
 	local v2 = setmetatable({}, t)
 	v2.Amplitude = 1
 	v2.Frequency = 1
@@ -21,35 +22,35 @@ function t.new() --[[ Line: 179 | Upvalues: t (copy), RunService (copy), v1 (cop
 	v2._running = false
 	return v2
 end
-function t.InverseSquare(p1, p2) --[[ Line: 226 ]]
+function t.InverseSquare(p1, p2)
 	if p2 < 1 then
 		p2 = 1
 	end
 	return p1 * (1 / (p2 * p2))
 end
-function t.NextRenderName() --[[ Line: 242 | Upvalues: v2 (ref) ]]
+function t.NextRenderName()
 	v2 = v2 + 1
 	return ("__shake_%.4i__"):format(v2)
 end
-function t.Start(p1) --[[ Line: 255 ]]
+function t.Start(p1)
 	p1._startTime = p1.TimeFunction()
 	p1._running = true
-	p1._trove:Add(function() --[[ Line: 258 | Upvalues: p1 (copy) ]]
+	p1._trove:Add(function()
 		p1._running = false
 	end)
 end
-function t.Stop(p1) --[[ Line: 270 ]]
+function t.Stop(p1)
 	p1._trove:Clean()
 end
-function t.IsShaking(p1) --[[ Line: 278 ]]
+function t.IsShaking(p1)
 	return p1._running
 end
-function t.StopSustain(p1) --[[ Line: 287 ]]
+function t.StopSustain(p1)
 	local v1 = p1.TimeFunction()
 	p1.Sustain = false
 	p1.SustainTime = v1 - p1._startTime - p1.FadeInTime
 end
-function t.Update(p1) --[[ Line: 315 ]]
+function t.Update(p1)
 	local v1 = false
 	local v2 = p1.TimeFunction()
 	local v3 = v2 - p1._startTime
@@ -75,17 +76,17 @@ function t.Update(p1) --[[ Line: 315 ]]
 	end
 	return p1.PositionInfluence * v10, p1.RotationInfluence * v10, v1
 end
-function t.OnSignal(p1, p2, p3) --[[ Line: 373 ]]
-	return p1._trove:Connect(p2, function() --[[ Line: 374 | Upvalues: p3 (copy), p1 (copy) ]]
+function t.OnSignal(p1, p2, p3)
+	return p1._trove:Connect(p2, function()
 		p3(p1:Update())
 	end)
 end
-function t.BindToRenderStep(p1, p2, p3, p4) --[[ Line: 399 ]]
-	p1._trove:BindToRenderStep(p2, p3, function() --[[ Line: 400 | Upvalues: p4 (copy), p1 (copy) ]]
+function t.BindToRenderStep(p1, p2, p3, p4)
+	p1._trove:BindToRenderStep(p2, p3, function()
 		p4(p1:Update())
 	end)
 end
-function t.Clone(p1) --[[ Line: 434 | Upvalues: t (copy) ]]
+function t.Clone(p1)
 	local v1 = t.new()
 	for v2, v3 in {
 		"Amplitude",
@@ -102,7 +103,7 @@ function t.Clone(p1) --[[ Line: 434 | Upvalues: t (copy) ]]
 	end
 	return v1
 end
-function t.Destroy(p1) --[[ Line: 456 ]]
+function t.Destroy(p1)
 	p1:Stop()
 end
 return t

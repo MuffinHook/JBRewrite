@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.MansionRobbery.MansionRobberyBinder):Start()
 require(ReplicatedStorage.MansionRobbery.BossNPCBinder):Start()

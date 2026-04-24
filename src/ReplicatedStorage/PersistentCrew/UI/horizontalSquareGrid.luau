@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local Dictionary = require(ReplicatedStorage.Std.Dictionary)
 local createElement = Roact.createElement
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
-local function horizontalSquareGridItem(p1) --[[ Line: 7 | Upvalues: createElement (copy), PaddedContainer (copy) ]]
+local function horizontalSquareGridItem(p1)
 	local v1 = 1 / (1 / p1.aspectRatio + 1 / p1.verticalPaddingRatio / p1.aspectRatio)
 	return createElement(PaddedContainer, {
 		component = p1.component,
@@ -18,7 +19,7 @@ local function horizontalSquareGridItem(p1) --[[ Line: 7 | Upvalues: createEleme
 		paddingLeft = 0.5
 	})
 end
-return function(p1) --[[ Name: horizontalSquareGrid | Line: 23 | Upvalues: createElement (copy), horizontalSquareGridItem (copy), Dictionary (copy), PaddedContainer (copy) ]]
+return function(p1)
 	local t = {}
 	local v1 = p1.numItems or #p1.items
 	for i = 1, v1 do

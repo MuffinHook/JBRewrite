@@ -1,30 +1,31 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Std.Promise)
 local Maid = require(ReplicatedStorage.Std.Maid)
-return function(p1, p2) --[[ Line: 6 | Upvalues: Promise (copy), Maid (copy) ]]
-	local v1 = p1:Get(p2)
-	if v1 then
-		return Promise.resolve(v1)
+return function(binder, instance)
+	local boundClass = binder:Get(instance)
+	if boundClass then
+		return Promise.resolve(boundClass)
 	else
-		local v2 = Maid.new()
-		local v3 = Promise.defer(function(p12) --[[ Line: 12 | Upvalues: p1 (copy), p2 (copy), v2 (copy) ]]
-			local v1 = p1:Get(p2)
-			if v1 then
-				p12(v1)
+		local cleanupMaid = Maid.new()
+		local deferredPromise = Promise.defer(function(resolve)
+			local boundClass = binder:Get(instance)
+			if boundClass then
+				resolve(boundClass)
 			else
-				v2:GiveTask(p1:ObserveInstance(p2, function(p1) --[[ Line: 17 | Upvalues: p12 (copy) ]]
-					p12(p1)
+				cleanupMaid:GiveTask(binder:ObserveInstance(instance, function(boundClass)
+					resolve(boundClass)
 				end))
 			end
 		end)
-		v3:finally(function() --[[ Line: 22 | Upvalues: v2 (copy) ]]
-			v2:Destroy()
+		deferredPromise:finally(function()
+			cleanupMaid:Destroy()
 		end)
-		task.delay(5, function() --[[ Line: 25 | Upvalues: v3 (copy), Promise (ref), p2 (copy), p1 (copy) ]]
-			if v3:getStatus() == Promise.Status.Started then
-				warn(("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n"):format(p2:GetFullName(), p1:GetTag()))
+		task.delay(5, function()
+			if deferredPromise:getStatus() == Promise.Status.Started then
+				warn(("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n"):format(instance:GetFullName(), binder:GetTag()))
 			end
 		end)
-		return v3
+		return deferredPromise
 	end
 end

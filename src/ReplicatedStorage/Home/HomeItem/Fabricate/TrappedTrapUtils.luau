@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Region = require(ReplicatedStorage.Std.Region)
@@ -9,7 +10,7 @@ local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Interval = require(ReplicatedStorage.Std.Interval)
 return {
-	setup = function(p1, p2, p3) --[[ Name: setup | Line: 15 | Upvalues: BinderUtils (copy), DoorBinder (copy), Region (copy), RegionUtils (copy), DoorUtils (copy), Promise (copy), Audio (copy), Interval (copy), LocalPlayer (copy) ]]
+	setup = function(p1, p2, p3)
 		local v2 = p2.spikesName or "Spikes"
 		local v3 = p2.referenceName or "Shelving"
 		local offsetCf = p2.offsetCf
@@ -20,18 +21,18 @@ return {
 		local v5 = p2.doorCloseDelay or 1
 		local v6 = nil
 		local v7 = p1._obj:WaitForChild(p2.doorName or "FakeDoor")
-		v6 = BinderUtils.promiseBoundClass(DoorBinder, v7):tap(function(p12) --[[ Line: 32 | Upvalues: p1 (copy), v2 (copy), v3 (copy), spikeSizeMin (copy), spikeSizeMax (copy), offsetCf (copy) ]]
+		v6 = BinderUtils.promiseBoundClass(DoorBinder, v7):tap(function(p12)
 			local v1 = p1._obj:FindFirstChild(v2)
 			local v22 = p1._obj:FindFirstChild(v3)
-			p12:SetUpdateCallback(function(p1, p2) --[[ Line: 35 | Upvalues: spikeSizeMin (ref), spikeSizeMax (ref), v1 (copy), v22 (copy), offsetCf (ref) ]]
+			p12:SetUpdateCallback(function(p1, p2)
 				local v12 = spikeSizeMin * (1 - p2) + spikeSizeMax * p2
 				v1.Size = Vector3.new(v1.Size.X, v1.Size.Y, v12)
 				v1.CFrame = v22.CFrame * offsetCf * CFrame.new(0, 0, -v12 * 0.5)
 			end)
-		end):andThen(function() --[[ Line: 41 | Upvalues: v6 (ref) ]]
+		end):andThen(function()
 			v6 = nil
 		end)
-		p1._maid:GiveTask(function() --[[ Line: 44 | Upvalues: v6 (ref) ]]
+		p1._maid:GiveTask(function()
 			if v6 then
 				v6:cancel()
 				v6 = nil
@@ -40,7 +41,7 @@ return {
 		local v8 = Region.new(RegionUtils.ConditionPlayer)
 		local v9 = p1._obj:FindFirstChild(p2.regionName or "Region")
 		local t = {}
-		local function updatePrism() --[[ Line: 54 | Upvalues: t (copy), v9 (copy) ]]
+		local function updatePrism()
 			t.c = v9.CFrame
 			t.s = v9.Size
 		end
@@ -48,11 +49,11 @@ return {
 		t.s = v9.Size
 		v8:AddPrism(t)
 		p1._maid:GiveTask(v8)
-		p1._maid:GiveTask(v8.OnObjAdded:Connect(function() --[[ Line: 61 | Upvalues: DoorUtils (ref), v7 (copy), p3 (copy), damageAmount (copy), Promise (ref), v5 (copy), Audio (ref), audioId (copy) ]]
+		p1._maid:GiveTask(v8.OnObjAdded:Connect(function()
 			if not DoorUtils.getOpen(v7) then
 				p3:FireServer("xe6v1us6", damageAmount, "Spikes")
 				DoorUtils.setOpen(v7, true)
-				Promise.delay(v5):andThen(function() --[[ Line: 66 | Upvalues: DoorUtils (ref), v7 (ref) ]]
+				Promise.delay(v5):andThen(function()
 					DoorUtils.setOpen(v7, false)
 				end)
 				Audio.ObjectLocal(v7.PrimaryPart, audioId, {
@@ -61,7 +62,7 @@ return {
 				})
 			end
 		end))
-		p1._maid:GiveTask(Interval.every(0.2):Connect(function() --[[ Line: 72 | Upvalues: t (copy), v9 (copy), v8 (copy), LocalPlayer (ref) ]]
+		p1._maid:GiveTask(Interval.every(0.2):Connect(function()
 			t.c = v9.CFrame
 			t.s = v9.Size
 			v8:Update({ LocalPlayer })

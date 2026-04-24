@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -14,28 +15,28 @@ local PersistentCrewBattleUtils = require(ReplicatedStorage.PersistentCrewBattle
 local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
 local persistentCrewBattleStore = require(ReplicatedStorage.PersistentCrewBattle.persistentCrewBattleStore)
 require(ReplicatedStorage.Std.Debug.table2Lua)
-local function playHover() --[[ Line: 20 | Upvalues: Players (copy), Audio (copy) ]]
+local function playHover()
 	if Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617498616, {
 			Volume = 0.5
 		})
 	end
 end
-local function playLost() --[[ Line: 26 | Upvalues: Players (copy), Audio (copy) ]]
+local function playLost()
 	if Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617493597, {
 			Volume = 0.7
 		})
 	end
 end
-local function playWon() --[[ Line: 31 | Upvalues: Players (copy), Audio (copy) ]]
+local function playWon()
 	if Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617488605, {
 			Volume = 1
 		})
 	end
 end
-local function playDrums() --[[ Line: 36 | Upvalues: Players (copy), Audio (copy) ]]
+local function playDrums()
 	if Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617487453, {
 			Volume = 0.5
@@ -43,9 +44,9 @@ local function playDrums() --[[ Line: 36 | Upvalues: Players (copy), Audio (copy
 	end
 end
 local t = {}
-function t.init() --[[ Line: 43 | Upvalues: PrivateServerUtils (copy), t (copy) ]]
+function t.init()
 	local v1 = false
-	PrivateServerUtils.promiseGetIsBattleServer():timeout(10):andThen(function(p1) --[[ Line: 45 | Upvalues: v1 (ref), t (ref) ]]
+	PrivateServerUtils.promiseGetIsBattleServer():timeout(10):andThen(function(p1)
 		if p1 then
 			v1 = true
 			t.initBattleServer()
@@ -53,7 +54,7 @@ function t.init() --[[ Line: 43 | Upvalues: PrivateServerUtils (copy), t (copy) 
 	end)
 end
 local v1 = 0
-function t.initBattleServer() --[[ Line: 54 | Upvalues: LevelUISystem (copy), Roact (copy), createElement (copy), RoactRodux (copy), persistentCrewStore (copy), GameModeCrewApp (copy), v1 (ref), Players (copy), Audio (copy), waitForChild (copy), ReplicatedStorage (copy), PersistentCrewBattleConsts (copy), RxInstanceUtils (copy), PersistentCrewBattleUtils (copy) ]]
+function t.initBattleServer()
 	LevelUISystem.hideTopbar()
 	Roact.mount(createElement("ScreenGui", {
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
@@ -63,7 +64,7 @@ function t.initBattleServer() --[[ Line: 54 | Upvalues: LevelUISystem (copy), Ro
 	}, { Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { createElement(GameModeCrewApp, {
-				onCountdownFinished = function() --[[ Name: onCountdownFinished | Line: 70 | Upvalues: v1 (ref), Players (ref), Audio (ref) ]]
+				onCountdownFinished = function()
 					if v1 < 1 and Players.LocalPlayer.PlayerGui then
 						Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617487453, {
 							Volume = 0.5
@@ -76,9 +77,9 @@ function t.initBattleServer() --[[ Line: 54 | Upvalues: LevelUISystem (copy), Ro
 		type = "setIsBattleServer",
 		value = true
 	})
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ALL_CREW_BATTLE_DATA_OBJ_NAME):andThen(function(p1) --[[ Line: 88 | Upvalues: RxInstanceUtils (ref), PersistentCrewBattleUtils (ref), persistentCrewStore (ref), PersistentCrewBattleConsts (ref) ]]
-		RxInstanceUtils.observeChildren(p1, function(p1, p2) --[[ Line: 89 | Upvalues: PersistentCrewBattleUtils (ref), persistentCrewStore (ref), PersistentCrewBattleConsts (ref) ]]
-			local function handleChange() --[[ Line: 90 | Upvalues: PersistentCrewBattleUtils (ref), p1 (copy), persistentCrewStore (ref) ]]
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ALL_CREW_BATTLE_DATA_OBJ_NAME):andThen(function(p1)
+		RxInstanceUtils.observeChildren(p1, function(p1, p2)
+			local function handleChange()
 				local v1 = PersistentCrewBattleUtils.getCrewStartTime(p1)
 				local v2 = PersistentCrewBattleUtils.getCrewPenaltyDuration(p1)
 				if v1 and v2 then
@@ -101,7 +102,7 @@ function t.initBattleServer() --[[ Line: 54 | Upvalues: LevelUISystem (copy), Ro
 			p2:GiveTask(p1:GetAttributeChangedSignal(PersistentCrewBattleConsts.ROUND_START_ATTR_NAME):Connect(handleChange))
 			p2:GiveTask(p1:GetAttributeChangedSignal(PersistentCrewBattleConsts.ROUND_PENALTY_DURATION_ATTR_NAME):Connect(handleChange))
 			p2:GiveTask(p1:GetAttributeChangedSignal(PersistentCrewBattleConsts.ROUND_TIME_TOOK_ATTR_NAME):Connect(handleChange))
-			local function handleClanName() --[[ Line: 126 | Upvalues: p1 (copy), PersistentCrewBattleConsts (ref), persistentCrewStore (ref) ]]
+			local function handleClanName()
 				persistentCrewStore:dispatch({
 					type = "setClanName",
 					clanId = p1.Name,
@@ -115,7 +116,7 @@ function t.initBattleServer() --[[ Line: 54 | Upvalues: LevelUISystem (copy), Ro
 			})
 			p2:GiveTask(p1:GetAttributeChangedSignal(PersistentCrewBattleConsts.CLAN_NAME_ATTR_NAME):Connect(handleClanName))
 		end)
-		local function updateAttackingClanId() --[[ Line: 143 | Upvalues: PersistentCrewBattleUtils (ref), persistentCrewStore (ref) ]]
+		local function updateAttackingClanId()
 			persistentCrewStore:dispatch({
 				type = "setAttackingClanId",
 				value = PersistentCrewBattleUtils.getAttackingClanId()
@@ -127,8 +128,8 @@ function t.initBattleServer() --[[ Line: 54 | Upvalues: LevelUISystem (copy), Ro
 		})
 		PersistentCrewBattleUtils.getAttackingClanIdChangedSignal():Connect(updateAttackingClanId)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ROBBERIES_COMPLETED_REMOTE_NAME):andThen(function(p1) --[[ Line: 157 | Upvalues: persistentCrewStore (ref) ]]
-		local function receiveRobberiesCompleted(p1) --[[ Line: 158 | Upvalues: persistentCrewStore (ref) ]]
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ROBBERIES_COMPLETED_REMOTE_NAME):andThen(function(p1)
+		local function receiveRobberiesCompleted(p1)
 			persistentCrewStore:dispatch({
 				type = "setRobberiesCompleted",
 				value = p1
@@ -136,16 +137,16 @@ function t.initBattleServer() --[[ Line: 54 | Upvalues: LevelUISystem (copy), Ro
 		end
 		p1.OnClientEvent:Connect(receiveRobberiesCompleted)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ANNOUNCE_PENALTY_REMOTE_NAME):andThen(function(p1) --[[ Line: 169 | Upvalues: persistentCrewStore (ref) ]]
-		p1.OnClientEvent:Connect(function(p1, p2) --[[ Line: 170 | Upvalues: persistentCrewStore (ref) ]]
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ANNOUNCE_PENALTY_REMOTE_NAME):andThen(function(p1)
+		p1.OnClientEvent:Connect(function(p1, p2)
 			persistentCrewStore:dispatch({
 				type = "setPenaltyText",
 				value = ("%s +%ss"):format(p2, p1)
 			})
 		end)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ANNOUNCE_WIN_REMOTE_NAME):andThen(function(p1) --[[ Line: 180 | Upvalues: Players (ref), Audio (ref) ]]
-		p1.OnClientEvent:Connect(function(p1) --[[ Line: 181 | Upvalues: Players (ref), Audio (ref) ]]
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ANNOUNCE_WIN_REMOTE_NAME):andThen(function(p1)
+		p1.OnClientEvent:Connect(function(p1)
 			if p1 then
 				if Players.LocalPlayer.PlayerGui then
 					Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617488605, {
@@ -160,14 +161,14 @@ function t.initBattleServer() --[[ Line: 54 | Upvalues: LevelUISystem (copy), Ro
 		end)
 	end)
 	local v12 = nil
-	persistentCrewStore.changed:connect(function(p1, p2) --[[ Line: 192 | Upvalues: v12 (ref), persistentCrewStore (ref) ]]
+	persistentCrewStore.changed:connect(function(p1, p2)
 		if p1.penalty ~= p2.penalty then
 			if v12 then
 				task.cancel(v12)
 				v12 = nil
 			end
 			if p1.penalty then
-				v12 = task.delay(5, function() --[[ Line: 200 | Upvalues: persistentCrewStore (ref) ]]
+				v12 = task.delay(5, function()
 					persistentCrewStore:dispatch({
 						type = "setPenaltyText",
 						value = nil
@@ -177,13 +178,13 @@ function t.initBattleServer() --[[ Line: 54 | Upvalues: LevelUISystem (copy), Ro
 		end
 	end)
 end
-function t.initNonBattleServer() --[[ Line: 210 | Upvalues: persistentCrewStore (copy), waitForChild (copy), Players (copy), PersistentCrewBattleConsts (copy), Audio (copy), ReplicatedStorage (copy), persistentCrewBattleStore (copy) ]]
+function t.initNonBattleServer()
 	persistentCrewStore:dispatch({
 		type = "setIsBattleServer",
 		value = false
 	})
-	waitForChild(Players.LocalPlayer, PersistentCrewBattleConsts.INVITES_FOLDER_NAME):andThen(function(p1) --[[ Line: 215 | Upvalues: PersistentCrewBattleConsts (ref), Audio (ref), Players (ref), persistentCrewStore (ref) ]]
-		local function updateInitiations() --[[ Line: 216 | Upvalues: p1 (copy), PersistentCrewBattleConsts (ref), Audio (ref), Players (ref), persistentCrewStore (ref) ]]
+	waitForChild(Players.LocalPlayer, PersistentCrewBattleConsts.INVITES_FOLDER_NAME):andThen(function(p1)
+		local function updateInitiations()
 			local t = {}
 			for v1, v2 in p1:GetChildren() do
 				table.insert(t, {
@@ -207,25 +208,25 @@ function t.initNonBattleServer() --[[ Line: 210 | Upvalues: persistentCrewStore 
 		p1.ChildAdded:Connect(updateInitiations)
 		p1.ChildRemoved:Connect(updateInitiations)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.LEADERBOARD_INFO_REMOTE_NAME):andThen(function(p1) --[[ Line: 246 | Upvalues: persistentCrewBattleStore (ref) ]]
-		p1.OnClientEvent:Connect(function(p1) --[[ Line: 247 | Upvalues: persistentCrewBattleStore (ref) ]]
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.LEADERBOARD_INFO_REMOTE_NAME):andThen(function(p1)
+		p1.OnClientEvent:Connect(function(p1)
 			persistentCrewBattleStore:dispatch({
 				type = "setCrewLeaderboard",
 				value = p1
 			})
 		end)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.CREWS_IN_SERVER_DISPLAY_INFO_REMOTE_NAME):andThen(function(p1) --[[ Line: 256 | Upvalues: persistentCrewBattleStore (ref) ]]
-		p1.OnClientEvent:Connect(function(p1) --[[ Line: 257 | Upvalues: persistentCrewBattleStore (ref) ]]
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.CREWS_IN_SERVER_DISPLAY_INFO_REMOTE_NAME):andThen(function(p1)
+		p1.OnClientEvent:Connect(function(p1)
 			persistentCrewBattleStore:dispatch({
 				type = "setCrewsInServerDisplayInfo",
 				value = p1
 			})
 		end)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.UPDATE_BATTLE_RESPONSES_REMOTE_NAME):andThen(function(p1) --[[ Line: 267 | Upvalues: persistentCrewStore (ref), Players (ref), Audio (ref) ]]
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.UPDATE_BATTLE_RESPONSES_REMOTE_NAME):andThen(function(p1)
 		local v1 = 0
-		p1.OnClientEvent:Connect(function(p1, p2) --[[ Line: 270 | Upvalues: persistentCrewStore (ref), v1 (ref), Players (ref), Audio (ref) ]]
+		p1.OnClientEvent:Connect(function(p1, p2)
 			local battleResponseData = persistentCrewStore:getState().battleResponseData
 			if p2 ~= nil or (battleResponseData == nil or p1 == battleResponseData.BattleUniqueId) then
 				if p2 then

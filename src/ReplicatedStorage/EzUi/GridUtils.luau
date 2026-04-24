@@ -1,16 +1,17 @@
-local t = {
-	getRowRatio = function(p1) --[[ Name: getRowRatio | Line: 3 ]]
-		local v1 = p1.verticalPaddingRatio * p1.aspectRatio
-		return 1 / (1 / (p1.aspectRatio * p1.rowsPerPage) - 1 / v1 - 1 / (v1 * p1.rowsPerPage))
+-- Reviewed by Claude
+local GridUtils = {
+	getRowRatio = function(config)
+		local paddingScale = config.verticalPaddingRatio * config.aspectRatio
+		return 1 / (1 / (config.aspectRatio * config.rowsPerPage) - 1 / paddingScale - 1 / (paddingScale * config.rowsPerPage))
 	end
 }
-function t.getColRatio(p1, p2) --[[ Line: 7 | Upvalues: t (copy) ]]
-	local v1 = p1.verticalPaddingRatio * p1.aspectRatio
-	local v2 = p2 or t.getRowRatio(p1)
-	return v2 / p1.colsPerRow - v2 / v1 - v2 / v1 / p1.colsPerRow
+function GridUtils.getColRatio(config, rowRatio)
+	local paddingScale = config.verticalPaddingRatio * config.aspectRatio
+	local actualRowRatio = rowRatio or GridUtils.getRowRatio(config)
+	return actualRowRatio / config.colsPerRow - actualRowRatio / paddingScale - actualRowRatio / paddingScale / config.colsPerRow
 end
-function t.getScaleX(p1) --[[ Line: 12 ]]
-	local v1 = p1.verticalPaddingRatio * p1.aspectRatio
-	return 1 / p1.colsPerRow - 1 / v1 - 1 / v1 / p1.colsPerRow
+function GridUtils.getScaleX(config)
+	local paddingScale = config.verticalPaddingRatio * config.aspectRatio
+	return 1 / config.colsPerRow - 1 / paddingScale - 1 / paddingScale / config.colsPerRow
 end
-return t
+return GridUtils

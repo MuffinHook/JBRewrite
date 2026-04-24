@@ -1,13 +1,14 @@
+-- Reviewed by Claude
 local t = {}
 t.__index = t
-function t.new() --[[ Line: 3 | Upvalues: t (copy) ]]
+function t.new()
 	local t2 = {}
 	setmetatable(t2, t)
 	t2.MapNodeNode = {}
 	t2.ListNode = {}
 	return t2
 end
-function t.GetNeighbors(p1, p2) --[[ Line: 12 ]]
+function t.GetNeighbors(p1, p2)
 	assert(p1.MapNodeNode[p2] ~= nil)
 	local t = {}
 	for k in pairs(p1.MapNodeNode[p2]) do
@@ -15,7 +16,7 @@ function t.GetNeighbors(p1, p2) --[[ Line: 12 ]]
 	end
 	return t
 end
-function t.GetUndirectedNeighbors(p1, p2) --[[ Line: 20 ]]
+function t.GetUndirectedNeighbors(p1, p2)
 	assert(p1.MapNodeNode[p2] ~= nil)
 	local t = {}
 	for k in pairs(p1.MapNodeNode[p2]) do
@@ -28,13 +29,13 @@ function t.GetUndirectedNeighbors(p1, p2) --[[ Line: 20 ]]
 	end
 	return t
 end
-function t.AddNode(p1, p2) --[[ Line: 33 ]]
+function t.AddNode(p1, p2)
 	if p1.MapNodeNode[p2] == nil then
 		p1.MapNodeNode[p2] = {}
 		table.insert(p1.ListNode, p2)
 	end
 end
-function t.AddEdge(p1, p2, p3) --[[ Line: 40 ]]
+function t.AddEdge(p1, p2, p3)
 	if p1.MapNodeNode[p2] == nil then
 		p1:AddNode(p2)
 	end
@@ -46,10 +47,10 @@ function t.AddEdge(p1, p2, p3) --[[ Line: 40 ]]
 	end
 	p1.MapNodeNode[p2][p3] = true
 end
-function t.HasEdge(p1, p2, p3) --[[ Line: 52 ]]
+function t.HasEdge(p1, p2, p3)
 	return if p1.MapNodeNode[p2] == nil then false else p1.MapNodeNode[p2][p3] == true
 end
-function t.Inverse(p1) --[[ Line: 55 ]]
+function t.Inverse(p1)
 	local v1 = getmetatable(p1).new()
 	for i, v in ipairs(p1.ListNode) do
 		v1:AddNode(v)

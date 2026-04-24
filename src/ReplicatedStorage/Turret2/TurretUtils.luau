@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 return {
-	computeHorizontalAngle = function(p1, p2, p3) --[[ Name: computeHorizontalAngle | Line: 2 ]]
+	computeHorizontalAngle = function(p1, p2, p3)
 		assert(p3)
 		assert(p2)
 		assert(p2.Part1)
@@ -24,7 +25,7 @@ return {
 		end
 		return v6 + v7
 	end,
-	computeVerticalAngle = function(p1, p2, p3) --[[ Name: computeVerticalAngle | Line: 17 ]]
+	computeVerticalAngle = function(p1, p2, p3)
 		assert(p3)
 		local Arm = p1:FindFirstChild("Arm")
 		assert(Arm)
@@ -32,7 +33,7 @@ return {
 		local v1 = (p2.Part1.CFrame * p2.C0:Inverse()):PointToObjectSpace(p3)
 		return math.atan2(v1.y, -v1.z)
 	end,
-	updateModel = function(p1, p2, p3, p4) --[[ Name: updateModel | Line: 26 ]]
+	updateModel = function(p1, p2, p3, p4)
 		p1.C1 = p1.C0:Inverse() * CFrame.Angles(0, p3 - 1.5707963267948966, 0) * p1.C0
 		p2.C1 = p2.C0:Inverse() * CFrame.Angles(p4, 0, 0) * p2.C0
 	end

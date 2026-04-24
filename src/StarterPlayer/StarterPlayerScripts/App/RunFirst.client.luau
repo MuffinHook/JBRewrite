@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
@@ -49,14 +50,14 @@ if script.Parent == ReplicatedFirst then
 		ImageTransparency = 1,
 		Size = UDim2.fromScale(0.4, 0.4)
 	}):Play()
-	local function setTitle(p1) --[[ Line: 59 | Upvalues: UIAspectRatioConstraint (copy), ImageLabel (copy) ]]
+	local function setTitle(p1)
 		UIAspectRatioConstraint.AspectRatio = p1.aspectRatio
 		ImageLabel.Image = p1.image
 	end
 	local LocalPlayer = Players.LocalPlayer
 	local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 	local v1 = 0
-	local function handleTeleport(p1) --[[ Line: 69 | Upvalues: v1 (ref), TextLabel (copy), t (copy), UIAspectRatioConstraint (copy), ImageLabel (copy), ScreenGui (copy), PlayerGui (copy) ]]
+	local function handleTeleport(p1)
 		v1 = v1 + 1
 		local v12 = v1
 		local v2 = p1 == nil
@@ -77,7 +78,7 @@ if script.Parent == ReplicatedFirst then
 			if v3.migrationLoadingScreen then
 				TextLabel.Text = "Server Updating... Please wait!"
 			elseif v2 then
-				task.delay(7, function() --[[ Line: 86 | Upvalues: ScreenGui (ref), v12 (copy), v1 (ref), TextLabel (ref) ]]
+				task.delay(7, function()
 					if ScreenGui.Parent ~= nil and v12 == v1 then
 						TextLabel.Text = "Roblox is taking a while to load your data. Please wait."
 					end
@@ -92,7 +93,7 @@ if script.Parent == ReplicatedFirst then
 		ReplicatedFirst:RemoveDefaultLoadingScreen()
 		handleTeleport(v3)
 	else
-		task.delay(3, function() --[[ Line: 102 | Upvalues: v2 (ref), handleTeleport (copy) ]]
+		task.delay(3, function()
 			if not v2 then
 				handleTeleport()
 			end
@@ -105,16 +106,16 @@ if script.Parent == ReplicatedFirst then
 		LocalPlayer.CharacterAdded:Wait()
 	end
 	ScreenGui.Parent = nil
-	require(ReplicatedStorage.Std.Maid).new():GiveTask(ReplicatedStorage:WaitForChild(require(ReplicatedStorage.WorldTeleport.WorldTeleportConsts).TELEPORT_HAPPENING_REMOTE).onClientEvent:Connect(function(p1) --[[ Line: 125 | Upvalues: handleTeleport (copy), TeleportService (copy), ScreenGui (copy) ]]
+	require(ReplicatedStorage.Std.Maid).new():GiveTask(ReplicatedStorage:WaitForChild(require(ReplicatedStorage.WorldTeleport.WorldTeleportConsts).TELEPORT_HAPPENING_REMOTE).onClientEvent:Connect(function(p1)
 		handleTeleport(p1)
 		TeleportService:SetTeleportGui(ScreenGui)
 		if not (p1 and p1.migrationLoadingScreen) then
-			task.delay(10, function() --[[ Line: 133 | Upvalues: ScreenGui (ref) ]]
+			task.delay(10, function()
 				ScreenGui.Parent = nil
 			end)
 		end
 	end))
-	TeleportService.TeleportInitFailed:Connect(function(p1) --[[ Line: 139 | Upvalues: LocalPlayer (copy), ScreenGui (copy) ]]
+	TeleportService.TeleportInitFailed:Connect(function(p1)
 		if p1 == LocalPlayer then
 			ScreenGui.Parent = nil
 		end

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
 local CurrentCamera = workspace.CurrentCamera
@@ -8,10 +9,10 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local Spring = require(ReplicatedStorage.Std.Spring)
 local Math = require(ReplicatedStorage.Module.Math)
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
-local function ShortestAngle(p1, p2) --[[ Line: 19 ]]
+local function ShortestAngle(p1, p2)
 	return (p1 - p2 + math.pi) % 6.283185307179586 - math.pi + p2
 end
-local function LookAt(p1, p2) --[[ Line: 23 ]]
+local function LookAt(p1, p2)
 	local Unit = (p2 - p1).Unit
 	local v1 = Unit:Cross(Vector3.new(1, 0, 0))
 	return CFrame.fromMatrix(p1, v1, (v1:Cross(Unit)))
@@ -19,7 +20,7 @@ end
 local SpotlightConstants = require(script.Parent.SpotlightConstants)
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 35 | Upvalues: t (copy), Maid (copy), Spring (copy), LocalPlayer (copy) ]]
+function t.new(p1)
 	assert(p1)
 	local t2 = {}
 	setmetatable(t2, t)
@@ -47,30 +48,30 @@ function t.new(p1) --[[ Line: 35 | Upvalues: t (copy), Maid (copy), Spring (copy
 	t2.RemoteEvent = p1:WaitForChild("RemoteEvent")
 	local OnValue = p1:WaitForChild("OnValue")
 	t2.OnValue = OnValue
-	t2.Maid:GiveTask(OnValue:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 72 | Upvalues: t2 (copy), OnValue (copy) ]]
+	t2.Maid:GiveTask(OnValue:GetPropertyChangedSignal("Value"):Connect(function()
 		t2:SetEnabled(OnValue.Value)
 	end))
 	local AngleValue = p1:WaitForChild("AngleValue")
-	t2.Maid:GiveTask(AngleValue:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 76 | Upvalues: t2 (copy), AngleValue (copy) ]]
+	t2.Maid:GiveTask(AngleValue:GetPropertyChangedSignal("Value"):Connect(function()
 		t2:SetAngles(AngleValue.Value)
 	end))
 	local DistanceValue = p1:WaitForChild("DistanceValue")
-	t2.Maid:GiveTask(DistanceValue:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 80 | Upvalues: t2 (copy), DistanceValue (copy) ]]
+	t2.Maid:GiveTask(DistanceValue:GetPropertyChangedSignal("Value"):Connect(function()
 		t2:SetDistance(DistanceValue.Value)
 	end))
 	t2.PoliceValue = p1:WaitForChild("PoliceValue")
 	t2.IgnoreList = { workspace.Vehicles, LocalPlayer.Character }
 	return t2
 end
-function t.TransformLocalMousePosition(p1, p2) --[[ Line: 90 ]]
+function t.TransformLocalMousePosition(p1, p2)
 	return p2
 end
-function t.ProjectMouseLocationToWorld(p1, p2) --[[ Line: 93 | Upvalues: CurrentCamera (copy), RayCast (copy) ]]
+function t.ProjectMouseLocationToWorld(p1, p2)
 	local v1 = CurrentCamera:ViewportPointToRay(p2.x, p2.y)
 	local _, v2, v3 = RayCast.RayIgnoreNonCollideWithIgnoreList(v1.Origin, v1.Direction, 999, p1.IgnoreList)
 	return p1:TransformLocalMousePosition(v2), v3
 end
-function t.GetMouseLocation(p1) --[[ Line: 100 | Upvalues: InputUtils (copy), CurrentCamera (copy), UserInputService (copy) ]]
+function t.GetMouseLocation(p1)
 	if InputUtils.isTouch() then
 		local ViewportSize = CurrentCamera.ViewportSize
 		return Vector3.new(ViewportSize.X * 0.5, ViewportSize.Y * 0.875, 0)
@@ -78,9 +79,9 @@ function t.GetMouseLocation(p1) --[[ Line: 100 | Upvalues: InputUtils (copy), Cu
 		return UserInputService:GetMouseLocation()
 	end
 end
-function t.SetEnabled(p1, p2) --[[ Line: 111 | Upvalues: RunService (copy) ]]
+function t.SetEnabled(p1, p2)
 	if p2 then
-		p1.Maid.UpdateLoop = RunService.Heartbeat:Connect(function() --[[ Line: 113 | Upvalues: p1 (copy) ]]
+		p1.Maid.UpdateLoop = RunService.Heartbeat:Connect(function()
 			p1:Update()
 		end)
 	else
@@ -90,7 +91,7 @@ function t.SetEnabled(p1, p2) --[[ Line: 111 | Upvalues: RunService (copy) ]]
 	p1.PointLight.Enabled = p2
 	p1.Beam.Parent.Material = p2 and Enum.Material.Neon or Enum.Material.Plastic
 end
-function t.RequestToggle(p1) --[[ Line: 123 | Upvalues: SpotlightConstants (copy) ]]
+function t.RequestToggle(p1)
 	if p1.OnValue.Value then
 		p1.RemoteEvent:FireServer(SpotlightConstants.EVENT_DISABLE)
 		p1:UnhookLocal()
@@ -99,7 +100,7 @@ function t.RequestToggle(p1) --[[ Line: 123 | Upvalues: SpotlightConstants (copy
 		p1:HookLocal()
 	end
 end
-function t.HookLocal(p1) --[[ Line: 132 | Upvalues: Maid (copy), RunService (copy) ]]
+function t.HookLocal(p1)
 	assert(p1.Maid.LocalMaid == nil)
 	p1.Maid.LocalMaid = Maid.new()
 	local Part = Instance.new("Part")
@@ -117,29 +118,29 @@ function t.HookLocal(p1) --[[ Line: 132 | Upvalues: Maid (copy), RunService (cop
 	local v1, v2 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
 	p1.LastMouseWorldPosition = v1
 	p1.LastMouseWorldNormal = v2
-	p1.Maid.LocalMaid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 152 | Upvalues: p1 (copy) ]]
+	p1.Maid.LocalMaid:GiveTask(RunService.Heartbeat:Connect(function()
 		p1:UpdateMousePosition()
 	end))
-	p1.Maid.LocalMaid:GiveTask(function() --[[ Line: 155 | Upvalues: p1 (copy) ]]
+	p1.Maid.LocalMaid:GiveTask(function()
 		p1.Attachment.Position = Vector3.new()
 	end)
-	p1.Maid.LocalMaid:GiveTask(function() --[[ Line: 158 | Upvalues: p1 (copy) ]]
+	p1.Maid.LocalMaid:GiveTask(function()
 		p1.FakeCircle:Destroy()
 		p1.FakeCircle = nil
 	end)
 end
-function t.UnhookLocal(p1) --[[ Line: 163 ]]
+function t.UnhookLocal(p1)
 	if p1.Maid.LocalMaid ~= nil then
 		p1.Maid.LocalMaid = nil
 	end
 end
-function t.SetAngles(p1, p2) --[[ Line: 168 ]]
+function t.SetAngles(p1, p2)
 	p1.SpringAngles:SetTarget(p2)
 end
-function t.SetDistance(p1, p2) --[[ Line: 171 ]]
+function t.SetDistance(p1, p2)
 	p1.Distance = p2
 end
-function t.UpdateMousePosition(p1) --[[ Line: 175 | Upvalues: InputUtils (copy), UserInputService (copy), LookAt (copy), SpotlightConstants (copy) ]]
+function t.UpdateMousePosition(p1)
 	local v1, v2
 	if InputUtils.isTouch() then
 		local v3, v4 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
@@ -185,7 +186,7 @@ function t.UpdateMousePosition(p1) --[[ Line: 175 | Upvalues: InputUtils (copy),
 		p1.RemoteEvent:FireServer(SpotlightConstants.EVENT_UPDATE_ANGLE_DISTANCE, v14, Magnitude)
 	end
 end
-function t.Update(p1) --[[ Line: 231 | Upvalues: LocalPlayer (copy), Math (copy) ]]
+function t.Update(p1)
 	local v1 = p1.SpringAngles:Update()
 	local v2 = CFrame.fromEulerAnglesXYZ(v1.X, v1.Y, v1.Z)
 	local Distance = p1.Distance
@@ -207,7 +208,7 @@ function t.Update(p1) --[[ Line: 231 | Upvalues: LocalPlayer (copy), Math (copy)
 		end
 	end
 end
-function t.Destroy(p1) --[[ Line: 274 ]]
+function t.Destroy(p1)
 	p1.IsLocalInSpotlight = false
 	p1.Maid:Destroy()
 	p1.Maid = nil

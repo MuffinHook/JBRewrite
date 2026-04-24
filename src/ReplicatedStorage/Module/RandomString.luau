@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 return {
-	varSafe = function(p1) --[[ Name: varSafe | Line: 2 ]]
+	varSafe = function(p1)
 		local t = {}
 		for i = 1, p1 do
 			local v1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"

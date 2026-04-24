@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -21,13 +22,13 @@ v1.defaultProps = {
 	alwaysShowMinutes = true,
 	alwaysShowSeconds = true
 }
-function v1.init(p1) --[[ Line: 25 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1:setState({
 		elapsed = 0
 	})
 	p1.maid = Maid.new()
 end
-function v1.render(p1) --[[ Line: 31 | Upvalues: createElement (copy), Roact (copy) ]]
+function v1.render(p1)
 	local v1 = p1.props.elapsed or p1.state.elapsed
 	local v2 = math.floor(v1 % 86400 / 3600)
 	local v3 = math.floor(v1 % 3600 / 60)
@@ -70,8 +71,8 @@ function v1.render(p1) --[[ Line: 31 | Upvalues: createElement (copy), Roact (co
 	t2.Text = createElement("TextLabel", t3)
 	return createElement("Frame", t, t2)
 end
-function v1._startCounting(p1) --[[ Line: 69 | Upvalues: Interval (copy) ]]
-	local function update() --[[ Line: 70 | Upvalues: p1 (copy) ]]
+function v1._startCounting(p1)
+	local function update()
 		local v1 = workspace:GetServerTimeNow()
 		local v2
 		if p1.props.createdAtBinding then
@@ -93,19 +94,19 @@ function v1._startCounting(p1) --[[ Line: 69 | Upvalues: Interval (copy) ]]
 	update()
 	p1.maid.counting = Interval.every(0.5):Connect(update)
 end
-function v1.didMount(p1) --[[ Line: 92 ]]
+function v1.didMount(p1)
 	if not (p1.props.elapsed or p1.props.disabled) then
 		p1:_startCounting()
 	end
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 97 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p1.props.elapsed or p1.props.disabled then
 		p1.maid.counting = nil
 	elseif p1.maid.counting == nil then
 		p1:_startCounting()
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 106 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return v1

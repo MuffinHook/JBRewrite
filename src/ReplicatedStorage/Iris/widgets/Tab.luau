@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
-	local function openTab(p1, p2) --[[ Line: 4 ]]
+return function(p1, p2)
+	local function openTab(p1, p2)
 		if not (p1.state.index.value > 0) then
 			p1.state.index:set(p2)
 		end
 	end
-	local function closeTab(p1, p2) --[[ Line: 12 ]]
+	local function closeTab(p1, p2)
 		if p1.state.index.value == p2 then
 			for i = p2 - 1, 1, -1 do
 				if p1.Tabs[i].state.isOpened.value == true then
@@ -27,7 +28,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 		hasChildren = true,
 		Args = {},
 		Events = {},
-		Generate = function(p12) --[[ Name: Generate | Line: 43 | Upvalues: p2 (copy), p1 (copy) ]]
+		Generate = function(p12)
 			local Iris_TabBar = Instance.new("Frame")
 			Iris_TabBar.Name = "Iris_TabBar"
 			Iris_TabBar.AutomaticSize = Enum.AutomaticSize.Y
@@ -64,8 +65,8 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p12.Tabs = {}
 			return Iris_TabBar
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 90 ]] end,
-		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 91 ]]
+		Update = function(p1) end,
+		ChildAdded = function(p1, p2)
 			assert(p2.type == "Tab", "Only Iris.Tab can be parented to Iris.TabBar.")
 			p2.ChildContainer.Parent = p1.ChildContainer
 			p2.Index = #p1.Tabs + 1
@@ -73,7 +74,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			table.insert(p1.Tabs, p2)
 			return p1.Instance.Bar
 		end,
-		ChildDiscarded = function(p1, p2) --[[ Name: ChildDiscarded | Line: 101 | Upvalues: closeTab (copy) ]]
+		ChildDiscarded = function(p1, p2)
 			local Index = p2.Index
 			table.remove(p1.Tabs, Index)
 			for i = Index, #p1.Tabs do
@@ -81,13 +82,13 @@ return function(p1, p2) --[[ Line: 3 ]]
 			end
 			closeTab(p1, Index)
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 111 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.index == nil then
 				p12.state.index = p1._widgetState(p12, "index", 1)
 			end
 		end,
-		UpdateState = function(p1) --[[ Name: UpdateState | Line: 116 ]] end,
-		Discard = function(p1) --[[ Name: Discard | Line: 118 ]]
+		UpdateState = function(p1) end,
+		Discard = function(p1)
 			p1.Instance:Destroy()
 		end
 	})
@@ -99,44 +100,44 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Hideable = 2
 		},
 		Events = {
-			clicked = p2.EVENTS.click(function(p1) --[[ Line: 132 ]]
+			clicked = p2.EVENTS.click(function(p1)
 				return p1.Instance
 			end),
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 135 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end),
 			selected = {
-				Init = function(p1) --[[ Line: 139 ]] end,
-				Get = function(p12) --[[ Line: 140 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastSelectedTick == p1._cycleTick
 				end
 			},
 			unselected = {
-				Init = function(p1) --[[ Line: 145 ]] end,
-				Get = function(p12) --[[ Line: 146 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastUnselectedTick == p1._cycleTick
 				end
 			},
 			active = {
-				Init = function(p1) --[[ Line: 151 ]] end,
-				Get = function(p1) --[[ Line: 152 ]]
+				Init = function(p1) end,
+				Get = function(p1)
 					return p1.state.index.value == p1.Index
 				end
 			},
 			opened = {
-				Init = function(p1) --[[ Line: 157 ]] end,
-				Get = function(p12) --[[ Line: 158 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastOpenedTick == p1._cycleTick
 				end
 			},
 			closed = {
-				Init = function(p1) --[[ Line: 163 ]] end,
-				Get = function(p12) --[[ Line: 164 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastClosedTick == p1._cycleTick
 				end
 			}
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 169 | Upvalues: p1 (copy), p2 (copy), closeTab (copy) ]]
+		Generate = function(p12)
 			local Iris_Tab = Instance.new("TextButton")
 			Iris_Tab.Name = "Iris_Tab"
 			Iris_Tab.AutomaticSize = Enum.AutomaticSize.XY
@@ -157,7 +158,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p2.applyFrameStyle(Iris_Tab, true, true)
 			p2.UIListLayout(Iris_Tab, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
 			p2.applyInteractionHighlights("Background", Iris_Tab, Iris_Tab, p12.ButtonColors)
-			p2.applyButtonClick(Iris_Tab, function() --[[ Line: 192 | Upvalues: p12 (copy) ]]
+			p2.applyButtonClick(Iris_Tab, function()
 				p12.state.index:set(p12.Index)
 			end)
 			local TextLabel = Instance.new("TextLabel")
@@ -178,7 +179,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			CloseButton.AutoButtonColor = false
 			CloseButton.LayoutOrder = 1
 			p2.UICorner(CloseButton)
-			p2.applyButtonClick(CloseButton, function() --[[ Line: 219 | Upvalues: p12 (copy), closeTab (ref) ]]
+			p2.applyButtonClick(CloseButton, function()
 				p12.state.isOpened:set(false)
 				closeTab(p12.parentWidget, p12.Index)
 			end)
@@ -221,22 +222,22 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p12.ChildContainer = TabContainer
 			return Iris_Tab
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 270 ]]
+		Update = function(p1)
 			local v1 = p1.Instance
 			v1.TextLabel.Text = p1.arguments.Text
 			v1.CloseButton.Visible = p1.arguments.Hideable == true
 		end,
-		ChildAdded = function(p1, p2) --[[ Name: ChildAdded | Line: 278 ]]
+		ChildAdded = function(p1, p2)
 			return p1.ChildContainer
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 281 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			p12.state.index = p12.parentWidget.state.index
 			p12.state.index.ConnectedWidgets[p12.ID] = p12
 			if p12.state.isOpened == nil then
 				p12.state.isOpened = p1._widgetState(p12, "isOpened", true)
 			end
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 289 | Upvalues: p1 (copy), closeTab (copy) ]]
+		UpdateState = function(p12)
 			local v1 = p12.Instance
 			local ChildContainer = p12.ChildContainer
 			if p12.state.isOpened.lastChangeTick == p1._cycleTick then
@@ -272,7 +273,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				p12.lastUnselectedTick = p1._cycleTick + 1
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 323 | Upvalues: closeTab (copy), p2 (copy) ]]
+		Discard = function(p1)
 			if p1.state.isOpened.value == true then
 				closeTab(p1.parentWidget, p1.Index)
 			end

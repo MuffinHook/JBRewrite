@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local CurrentCamera = workspace.CurrentCamera

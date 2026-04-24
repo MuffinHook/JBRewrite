@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
 local Players = game:GetService("Players")
@@ -7,7 +8,7 @@ local v1 = false
 local t = {
 	Cmdr = nil,
 	Registry = nil,
-	Evaluate = function(p1, p2, p3, p4, p5) --[[ Name: Evaluate | Line: 45 | Upvalues: RunService (copy), Players (copy), Util (copy), Command (copy) ]]
+	Evaluate = function(p1, p2, p3, p4, p5)
 		if RunService:IsClient() == true and p3 ~= Players.LocalPlayer then
 			error("[Cmdr] Can\'t evaluate a command that isn\'t sent by the local player.")
 		end
@@ -34,21 +35,21 @@ local t = {
 			return false, ("%q is not a valid command name. Use the help command to see all available commands."):format((tostring(v2)))
 		end
 	end,
-	EvaluateAndRun = function(p1, p2, p3, p4) --[[ Name: EvaluateAndRun | Line: 94 | Upvalues: Players (copy), RunService (copy) ]]
+	EvaluateAndRun = function(p1, p2, p3, p4)
 		local v2 = p4 or {}
 		if RunService:IsClient() and v2.IsHuman then
 			p1:PushHistory(p2)
 		end
 		local v4, v5 = p1:Evaluate(p2, p3 or Players.LocalPlayer, nil, v2.Data)
 		if v4 then
-			local v6, v7 = xpcall(function() --[[ Line: 115 | Upvalues: v4 (copy) ]]
+			local v6, v7 = xpcall(function()
 				local v1, v2 = v4:Validate(true)
 				if v1 then
 					return v4:Run() or "Command executed."
 				else
 					return v2
 				end
-			end, function(p1) --[[ Line: 123 ]]
+			end, function(p1)
 				return debug.traceback((tostring(p1)))
 			end)
 			if not v6 then
@@ -59,7 +60,7 @@ local t = {
 			return v5
 		end
 	end,
-	Send = function(p1, p2, p3) --[[ Name: Send | Line: 144 | Upvalues: RunService (copy) ]]
+	Send = function(p1, p2, p3)
 		if RunService:IsClient() == false then
 			error("[Cmdr] Dispatcher:Send can only be called from the client.")
 		end
@@ -67,7 +68,7 @@ local t = {
 			Data = p3
 		})
 	end,
-	Run = function(p1, ...) --[[ Name: Run | Line: 164 | Upvalues: Players (copy) ]]
+	Run = function(p1, ...)
 		if not Players.LocalPlayer then
 			error("[Cmdr] Dispatcher:Run can only be called from the client.")
 		end
@@ -86,7 +87,7 @@ local t = {
 		end
 		return v3:Run()
 	end,
-	RunGuards = function(p1, p2, ...) --[[ Name: RunGuards | Line: 200 ]]
+	RunGuards = function(p1, p2, ...)
 		local Guards = p2.Object.Guards
 		if Guards ~= nil then
 			local v1 = typeof(Guards)
@@ -103,7 +104,7 @@ local t = {
 			end
 		end
 	end,
-	RunHooks = function(p1, p2, p3, ...) --[[ Name: RunHooks | Line: 236 | Upvalues: RunService (copy), v1 (ref) ]]
+	RunHooks = function(p1, p2, p3, ...)
 		if not p1.Registry.Hooks[p2] then
 			error(("[Cmdr] Invalid hook name: %q"):format(p2), 2)
 		end
@@ -124,7 +125,7 @@ local t = {
 			end
 		end
 	end,
-	PushHistory = function(p1, p2) --[[ Name: PushHistory | Line: 278 | Upvalues: RunService (copy), Util (copy), TeleportService (copy) ]]
+	PushHistory = function(p1, p2)
 		assert(RunService:IsClient(), "[Cmdr] PushHistory may only be used from the client.")
 		local v2 = p1:GetHistory()
 		if Util.TrimString(p2) ~= "" and p2 ~= v2[#v2] then
@@ -132,12 +133,12 @@ local t = {
 			TeleportService:SetTeleportSetting("CmdrCommandHistory", v2)
 		end
 	end,
-	GetHistory = function(p1) --[[ Name: GetHistory | Line: 299 | Upvalues: RunService (copy), TeleportService (copy) ]]
+	GetHistory = function(p1)
 		assert(RunService:IsClient(), "[Cmdr] GetHistory may only be used from the client.")
 		return TeleportService:GetTeleportSetting("CmdrCommandHistory") or {}
 	end
 }
-return function(p1) --[[ Line: 305 | Upvalues: t (copy) ]]
+return function(p1)
 	t.Cmdr = p1
 	t.Registry = p1.Registry
 	return t

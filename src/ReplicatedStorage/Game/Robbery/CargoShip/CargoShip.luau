@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -11,7 +12,7 @@ local Audio = require(ReplicatedStorage.Std.Audio)
 local Turret = require(ReplicatedStorage.Turret2.Turret)
 local CargoShipShared = require(script.Parent.CargoShipShared)
 local v2 = Vector3.new()
-local function GetHumanoid(p1) --[[ Line: 18 ]]
+local function GetHumanoid(p1)
 	local Character = p1.Character
 	if Character == nil then
 		return nil
@@ -19,7 +20,7 @@ local function GetHumanoid(p1) --[[ Line: 18 ]]
 		return Character:FindFirstChild("Humanoid")
 	end
 end
-local function GetRootPart(p1) --[[ Line: 26 ]]
+local function GetRootPart(p1)
 	local Character = p1.Character
 	local v1 = if Character == nil then nil else Character:FindFirstChild("Humanoid")
 	if v1 == nil then
@@ -30,7 +31,7 @@ local function GetRootPart(p1) --[[ Line: 26 ]]
 end
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 37 | Upvalues: t (copy), RxInstanceUtils (copy), Maid (copy), Turret (copy), CargoShipShared (copy), RunService (copy), Time (copy), v2 (copy), Players (copy), Audio (copy) ]]
+function t.new(p1)
 	assert(p1 ~= nil)
 	local t2 = {}
 	setmetatable(t2, t)
@@ -42,11 +43,11 @@ function t.new(p1) --[[ Line: 37 | Upvalues: t (copy), RxInstanceUtils (copy), M
 	t2._cargoShipIdObj = p1:WaitForChild("CargoShipId")
 	local CargoShipBornAt = p1:WaitForChild("CargoShipBornAt")
 	t2.BornAt = CargoShipBornAt.Value
-	t2.Maid:GiveTask(CargoShipBornAt.Changed:Connect(function() --[[ Line: 57 | Upvalues: t2 (copy), CargoShipBornAt (copy) ]]
+	t2.Maid:GiveTask(CargoShipBornAt.Changed:Connect(function()
 		t2.BornAt = CargoShipBornAt.Value
 	end))
 	local v3 = t2.Path.ApproxLength / CargoShipShared.Speed
-	t2.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 64 | Upvalues: Time (ref), t2 (copy), v3 (copy), v2 (ref) ]]
+	t2.Maid:GiveTask(RunService.Heartbeat:Connect(function()
 		local v1 = Time.GetNowSync()
 		local v22 = (v1 - t2.BornAt) / v3
 		if v22 > 1 then
@@ -59,13 +60,13 @@ function t.new(p1) --[[ Line: 37 | Upvalues: t (copy), RxInstanceUtils (copy), M
 		t2:SetPrimaryPartCFrame(CFrame.new(v2, v5) * v6 + v4)
 	end))
 	local v4 = nil
-	local function ChooseNextHorn() --[[ Line: 85 | Upvalues: v4 (ref) ]]
+	local function ChooseNextHorn()
 		assert(true)
 		v4 = tick() + 60 * (1 + math.random() * 1)
 	end
 	assert(true)
 	v4 = tick() + 60 * (1 + math.random() * 1)
-	t2.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 91 | Upvalues: t2 (copy), Players (ref), v4 (ref) ]]
+	t2.Maid:GiveTask(RunService.Heartbeat:Connect(function()
 		if t2.Model:IsDescendantOf(workspace) == false then
 			t2:Destroy()
 		else
@@ -101,10 +102,10 @@ function t.new(p1) --[[ Line: 37 | Upvalues: t (copy), RxInstanceUtils (copy), M
 	t2:ListenForFirstPickup()
 	return t2
 end
-function t.GetId(p1) --[[ Line: 127 ]]
+function t.GetId(p1)
 	return p1._cargoShipIdObj.Value
 end
-function t.FireHorn(p1) --[[ Line: 130 | Upvalues: Audio (copy) ]]
+function t.FireHorn(p1)
 	Audio.ObjectLocal(p1.Model.PrimaryPart, 5128574531, {
 		MaxDistance = 4000,
 		EmitterSize = 256,
@@ -112,9 +113,9 @@ function t.FireHorn(p1) --[[ Line: 130 | Upvalues: Audio (copy) ]]
 		RollOffMode = Enum.RollOffMode.Linear
 	})
 end
-function t.ListenForFirstPickup(p1) --[[ Line: 137 | Upvalues: Audio (copy) ]]
+function t.ListenForFirstPickup(p1)
 	local v1 = nil
-	v1 = p1.Model.ChildAdded:Connect(function(p12) --[[ Line: 139 | Upvalues: v1 (ref), Audio (ref), p1 (copy) ]]
+	v1 = p1.Model.ChildAdded:Connect(function(p12)
 		if p12.Name == "HasFirstRobbed" then
 			v1:Disconnect()
 			Audio.ObjectLocal(p1.Model.PrimaryPart, 5136785479, {
@@ -126,12 +127,12 @@ function t.ListenForFirstPickup(p1) --[[ Line: 137 | Upvalues: Audio (copy) ]]
 		end
 	end)
 end
-function t.SetTurretSeek(p1, p2) --[[ Line: 150 ]]
+function t.SetTurretSeek(p1, p2)
 	for i, v in ipairs(p1.ListTurret) do
 		v.TargetUserId = p2[v.Model.Name]
 	end
 end
-function t.SetPrimaryPartCFrame(p1, p2) --[[ Line: 156 | Upvalues: LocalPlayer (copy), RayCast (copy), CurrentCamera (copy) ]]
+function t.SetPrimaryPartCFrame(p1, p2)
 	local v1 = false
 	local Character = LocalPlayer.Character
 	local v2 = if Character == nil then nil else Character:FindFirstChild("Humanoid")
@@ -152,7 +153,7 @@ function t.SetPrimaryPartCFrame(p1, p2) --[[ Line: 156 | Upvalues: LocalPlayer (
 		CurrentCamera.CFrame = CurrentCamera.CFrame * v8 * (v7 - v7.p) * v8:Inverse()
 	end
 end
-function t.Destroy(p1) --[[ Line: 182 ]]
+function t.Destroy(p1)
 	p1.Maid:Destroy()
 	p1.Maid = nil
 end

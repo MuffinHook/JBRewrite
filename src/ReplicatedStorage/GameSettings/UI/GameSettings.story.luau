@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Roact = require(ReplicatedStorage.Roact)
 local GameSettingsService = require(ReplicatedStorage.GameSettings.GameSettingsService)
 local gameSettingType = require(ReplicatedStorage.GameSettings.gameSettingType)
-return function(p1) --[[ Line: 8 | Upvalues: Maid (copy), GameSettingsService (copy), gameSettingType (copy), Roact (copy) ]]
+return function(p1)
 	local v1 = Maid.new()
 	v1:GiveTask(GameSettingsService.add({
 		name = "playerMarkers",
@@ -17,7 +18,7 @@ return function(p1) --[[ Line: 8 | Upvalues: Maid (copy), GameSettingsService (c
 		position = UDim2.new(0.5, 0, 0.5, 0),
 		anchorPoint = Vector2.new(0.5, 0.5)
 	}), p1)
-	return function() --[[ Line: 25 | Upvalues: v1 (copy), Roact (ref), v2 (copy) ]]
+	return function()
 		v1:DoCleaning()
 		Roact.unmount(v2)
 	end

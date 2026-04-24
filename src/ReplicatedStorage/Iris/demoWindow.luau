@@ -1,49 +1,50 @@
+-- Reviewed by Claude
 require(script.Parent.Types)
-return function(p1) --[[ Line: 3 ]]
-	local v1 = p1.State(true)
-	local v2 = p1.State(false)
-	local v3 = p1.State(false)
-	local v4 = p1.State(false)
-	local v5 = p1.State(false)
-	local v6 = p1.State(false)
-	local v7 = p1.State(false)
-	local v8 = p1.State(false)
-	local v9 = p1.State(Color3.fromRGB(115, 140, 152))
-	local v10 = p1.State(0)
-	table.insert(p1.Internal._initFunctions, function() --[[ Line: 15 | Upvalues: v9 (copy), v10 (copy), p1 (copy), v8 (copy) ]]
+return function(irisContext)
+	local showBackgroundState = irisContext.State(true)
+	local showWindowState = irisContext.State(false)
+	local showTreeState = irisContext.State(false)
+	local showButtonState = irisContext.State(false)
+	local showInputState = irisContext.State(false)
+	local showDragState = irisContext.State(false)
+	local showComboState = irisContext.State(false)
+	local showBackgroundFrameState = irisContext.State(false)
+	local backgroundColorState = irisContext.State(Color3.fromRGB(115, 140, 152))
+	local backgroundTransparencyState = irisContext.State(0)
+	table.insert(irisContext.Internal._initFunctions, function()
 		local Background = Instance.new("Frame")
 		Background.Name = "Background"
 		Background.Size = UDim2.fromScale(1, 1)
-		Background.BackgroundColor3 = v9.value
-		Background.BackgroundTransparency = v10.value
+		Background.BackgroundColor3 = backgroundColorState.value
+		Background.BackgroundTransparency = backgroundTransparencyState.value
 		local Iris_Background
-		if p1._config.UseScreenGUIs then
+		if irisContext._config.UseScreenGUIs then
 			Iris_Background = Instance.new("ScreenGui")
 			Iris_Background.Name = "Iris_Background"
 			Iris_Background.IgnoreGuiInset = true
-			Iris_Background.DisplayOrder = p1._config.DisplayOrderOffset - 1
+			Iris_Background.DisplayOrder = irisContext._config.DisplayOrderOffset - 1
 			Iris_Background.ScreenInsets = Enum.ScreenInsets.None
 			Iris_Background.Enabled = true
 			Background.Parent = Iris_Background
 		else
-			Background.ZIndex = p1._config.DisplayOrderOffset - 1
+			Background.ZIndex = irisContext._config.DisplayOrderOffset - 1
 			Iris_Background = Background
 		end
-		v9:onChange(function(p1) --[[ Line: 37 | Upvalues: Background (copy) ]]
-			Background.BackgroundColor3 = p1
+		backgroundColorState:onChange(function(newColor)
+			Background.BackgroundColor3 = newColor
 		end)
-		v10:onChange(function(p1) --[[ Line: 40 | Upvalues: Background (copy) ]]
-			Background.BackgroundTransparency = p1
+		backgroundTransparencyState:onChange(function(newTransparency)
+			Background.BackgroundTransparency = newTransparency
 		end)
-		v8:onChange(function(p12) --[[ Line: 44 | Upvalues: Iris_Background (ref), p1 (ref) ]]
-			if p12 then
-				Iris_Background.Parent = p1.Internal.parentInstance
+		showBackgroundFrameState:onChange(function(shouldShow)
+			if shouldShow then
+				Iris_Background.Parent = irisContext.Internal.parentInstance
 			else
 				Iris_Background.Parent = nil
 			end
 		end)
 	end)
-	local function helpMarker(p12) --[[ Line: 53 | Upvalues: p1 (copy) ]]
+	local function helpMarker(p12)
 		p1.PushConfig({
 			TextColor = p1._config.TextDisabledColor
 		})
@@ -57,14 +58,14 @@ return function(p1) --[[ Line: 3 ]]
 		end
 		p1.PopConfig()
 	end
-	local function textAndHelpMarker(p12, p2) --[[ Line: 65 | Upvalues: p1 (copy), helpMarker (copy) ]]
+	local function textAndHelpMarker(p12, p2)
 		p1.SameLine()
 		p1.Text({ p12 })
 		helpMarker(p2)
 		p1.End()
 	end
 	local t = {
-		Basic = function() --[[ Name: Basic | Line: 76 | Upvalues: p1 (copy) ]]
+		Basic = function()
 			p1.Tree({ "Basic" })
 			p1.SeparatorText({ "Basic" })
 			local v1 = p1.State(1)
@@ -96,7 +97,7 @@ return function(p1) --[[ Line: 3 ]]
 			p1.SliderNum({})
 			p1.End()
 		end,
-		Image = function() --[[ Name: Image | Line: 112 | Upvalues: p1 (copy) ]]
+		Image = function()
 			p1.Tree({ "Image" })
 			p1.SeparatorText({ "Image Controls" })
 			local v1 = p1.State("rbxasset://textures/ui/common/robux.png")
@@ -104,7 +105,7 @@ return function(p1) --[[ Line: 3 ]]
 			local v3 = p1.State(Rect.new(0, 0, 0, 0))
 			local v4 = p1.State(Enum.ScaleType.Stretch)
 			local v5 = p1.State(false)
-			local v6 = p1.ComputedState(v5, function(p1) --[[ Line: 122 ]]
+			local v6 = p1.ComputedState(v5, function(p1)
 				return p1 and Enum.ResamplerMode.Pixelated or Enum.ResamplerMode.Default
 			end)
 			local v7 = p1.State(p1._config.ImageColor)
@@ -234,7 +235,7 @@ return function(p1) --[[ Line: 3 ]]
 			p1.End()
 			p1.End()
 		end,
-		Selectable = function() --[[ Name: Selectable | Line: 203 | Upvalues: p1 (copy) ]]
+		Selectable = function()
 			p1.Tree({ "Selectable" })
 			local v1 = p1.State(2)
 			p1.Selectable({ "Selectable #1", 1 }, {
@@ -257,7 +258,7 @@ return function(p1) --[[ Line: 3 ]]
 			p1.Selectable({ "Independent Selectable" })
 			p1.End()
 		end,
-		Combo = function() --[[ Name: Combo | Line: 223 | Upvalues: p1 (copy) ]]
+		Combo = function()
 			p1.Tree({ "Combo" })
 			p1.PushConfig({
 				ContentWidth = UDim.new(1, -200)
@@ -327,7 +328,7 @@ return function(p1) --[[ Line: 3 ]]
 			p1.PopConfig()
 			p1.End()
 		end,
-		Tree = function() --[[ Name: Tree | Line: 286 | Upvalues: p1 (copy), helpMarker (copy) ]]
+		Tree = function()
 			p1.Tree({ "Trees" })
 			p1.Tree({ "Tree using SpanAvailWidth", true })
 			helpMarker("SpanAvailWidth determines if the Tree is selectable from its entire with, or only the text area")
@@ -344,7 +345,7 @@ return function(p1) --[[ Line: 3 ]]
 			})
 			p1.End()
 		end,
-		CollapsingHeader = function() --[[ Name: CollapsingHeader | Line: 312 | Upvalues: p1 (copy) ]]
+		CollapsingHeader = function()
 			p1.Tree({ "Collapsing Headers" })
 			p1.CollapsingHeader({ "A header" })
 			p1.Text({ "This is under the first header!" })
@@ -359,7 +360,7 @@ return function(p1) --[[ Line: 3 ]]
 			p1.End()
 			p1.End()
 		end,
-		Group = function() --[[ Name: Group | Line: 333 | Upvalues: p1 (copy) ]]
+		Group = function()
 			p1.Tree({ "Groups" })
 			p1.SameLine()
 			p1.Group()
@@ -375,7 +376,7 @@ return function(p1) --[[ Line: 3 ]]
 			p1.End()
 			p1.End()
 		end,
-		Tab = function() --[[ Name: Tab | Line: 360 | Upvalues: p1 (copy) ]]
+		Tab = function()
 			p1.Tree({ "Tabs" })
 			p1.Tree({ "Simple" })
 			p1.TabBar()
@@ -431,7 +432,7 @@ return function(p1) --[[ Line: 3 ]]
 			p1.End()
 			p1.End()
 		end,
-		Indent = function() --[[ Name: Indent | Line: 435 | Upvalues: p1 (copy) ]]
+		Indent = function()
 			p1.Tree({ "Indents" })
 			p1.Text({ "Not Indented" })
 			p1.Indent()
@@ -445,7 +446,7 @@ return function(p1) --[[ Line: 3 ]]
 			p1.End()
 			p1.End()
 		end,
-		Input = function() --[[ Name: Input | Line: 457 | Upvalues: p1 (copy), helpMarker (copy) ]]
+		Input = function()
 			p1.Tree({ "Input" })
 			local v1 = p1.State(false)
 			local v2 = p1.State(false)
@@ -541,12 +542,12 @@ return function(p1) --[[ Line: 3 ]]
 			p1.PopConfig()
 			p1.End()
 		end,
-		InputText = function() --[[ Name: InputText | Line: 540 | Upvalues: p1 (copy) ]]
+		InputText = function()
 			p1.Tree({ "Input Text" })
 			p1.Text({ "The text is: " .. p1.InputText({ "Input Text Test", "Input Text here" }).text.value })
 			p1.End()
 		end,
-		MultiInput = function() --[[ Name: MultiInput | Line: 549 | Upvalues: p1 (copy) ]]
+		MultiInput = function()
 			p1.Tree({ "Multi-Component Input" })
 			local v1 = p1.State(Vector2.new())
 			local v2 = p1.State((Vector3.new()))
@@ -611,7 +612,7 @@ return function(p1) --[[ Line: 3 ]]
 			})
 			p1.End()
 		end,
-		Tooltip = function() --[[ Name: Tooltip | Line: 591 | Upvalues: p1 (copy) ]]
+		Tooltip = function()
 			p1.PushConfig({
 				ContentWidth = UDim.new(0, 250)
 			})
@@ -632,7 +633,7 @@ return function(p1) --[[ Line: 3 ]]
 			p1.End()
 			p1.PopConfig()
 		end,
-		Plotting = function() --[[ Name: Plotting | Line: 611 | Upvalues: p1 (copy) ]]
+		Plotting = function()
 			p1.Tree({ "Plotting" })
 			p1.SeparatorText({ "Progress" })
 			local v1 = os.clock() * 15
@@ -738,13 +739,13 @@ return function(p1) --[[ Line: 3 ]]
 		"Tooltip",
 		"Plotting"
 	}
-	local function v11() --[[ Line: 679 | Upvalues: p1 (copy), v11 (copy) ]]
+	local function v11()
 		if p1.Tree({ "Recursive Tree" }).state.isUncollapsed.value then
 			v11()
 		end
 		p1.End()
 	end
-	local function v12(p12) --[[ Line: 689 | Upvalues: p1 (copy), v12 (copy) ]]
+	local function v12(p12)
 		p1.Window({ "Recursive Window" }, {
 			size = p1.State(Vector2.new(175, 100)),
 			isOpened = p12
@@ -755,7 +756,7 @@ return function(p1) --[[ Line: 3 ]]
 			v12(v1.isChecked)
 		end
 	end
-	local function runtimeInfo() --[[ Line: 703 | Upvalues: p1 (copy), v3 (copy), helpMarker (copy) ]]
+	local function runtimeInfo()
 		local v1 = p1.Window({ "Runtime Info" }, {
 			isOpened = v3
 		})
@@ -774,7 +775,7 @@ return function(p1) --[[ Line: 3 ]]
 		})
 		if p1.Button({ "Disable" }).clicked() then
 			p1.Disabled = true
-			task.delay(v2:get(), function() --[[ Line: 718 | Upvalues: p1 (ref) ]]
+			task.delay(v2:get(), function()
 				p1.Disabled = false
 			end)
 		end
@@ -870,7 +871,7 @@ return function(p1) --[[ Line: 3 ]]
 		p1.End()
 		p1.End()
 	end
-	local function debugPanel() --[[ Line: 827 | Upvalues: p1 (copy), v7 (copy) ]]
+	local function debugPanel()
 		p1.Window({ "Debug Panel" }, {
 			isOpened = v7
 		})
@@ -886,7 +887,7 @@ return function(p1) --[[ Line: 3 ]]
 		p1.End()
 		p1.End()
 	end
-	local function v13() --[[ Line: 848 | Upvalues: p1 (copy), v13 (copy) ]]
+	local function v13()
 		if p1.Menu({ "Recursive" }).state.isOpened.value then
 			p1.MenuItem({ "New", Enum.KeyCode.N, Enum.ModifierKey.Ctrl })
 			p1.MenuItem({ "Open", Enum.KeyCode.O, Enum.ModifierKey.Ctrl })
@@ -906,7 +907,7 @@ return function(p1) --[[ Line: 3 ]]
 		end
 		p1.End()
 	end
-	local function mainMenuBar() --[[ Line: 869 | Upvalues: p1 (copy), v13 (copy), v1 (copy), v2 (copy), v5 (copy), v6 (copy), v3 (copy), v4 (copy), v7 (copy) ]]
+	local function mainMenuBar()
 		p1.MenuBar()
 		p1.Menu({ "File" })
 		p1.MenuItem({ "New", Enum.KeyCode.N, Enum.ModifierKey.Ctrl })
@@ -941,12 +942,12 @@ return function(p1) --[[ Line: 3 ]]
 		p1.End()
 		p1.End()
 	end
-	local function mainMenuBarExample() --[[ Line: 903 | Upvalues: mainMenuBar (copy) ]]
+	local function mainMenuBarExample()
 		mainMenuBar()
 	end
-	local function f14() --[[ Line: 918 | Upvalues: p1 (copy), helpMarker (copy), v4 (copy) ]]
+	local function f14()
 		local list = {
-			{ "Sizing", function() --[[ Line: 922 | Upvalues: p1 (ref), helpMarker (ref) ]]
+			{ "Sizing", function()
 					local v1 = p1.State({})
 					p1.SameLine()
 					if p1.Button({ "Update" }).clicked() then
@@ -955,7 +956,7 @@ return function(p1) --[[ Line: 3 ]]
 					end
 					helpMarker("Update the global config with these changes.")
 					p1.End()
-					local function SliderInput(p12, p2) --[[ Line: 936 | Upvalues: p1 (ref), v1 (copy) ]]
+					local function SliderInput(p12, p2)
 						local v12 = p1[p12](p2, {
 							number = p1.WeakState(p1._config[p2[1]])
 						})
@@ -963,7 +964,7 @@ return function(p1) --[[ Line: 3 ]]
 							v1.value[p2[1]] = v12.number:get()
 						end
 					end
-					local function BooleanInput(p12) --[[ Line: 943 | Upvalues: p1 (ref), v1 (copy) ]]
+					local function BooleanInput(p12)
 						local v12 = p1.Checkbox(p12, {
 							isChecked = p1.WeakState(p1._config[p12[1]])
 						})
@@ -1060,7 +1061,7 @@ return function(p1) --[[ Line: 3 ]]
 					SliderInput("SliderNum", { "MouseDoubleClickTime", 0.1, 0, 5 })
 					SliderInput("SliderNum", { "MouseDoubleClickMaxDist", 0.1, 0, 20 })
 				end },
-			{ "Colors", function() --[[ Line: 993 | Upvalues: p1 (ref), helpMarker (ref) ]]
+			{ "Colors", function()
 					local v1 = p1.State({})
 					p1.SameLine()
 					if p1.Button({ "Update" }).clicked() then
@@ -1114,7 +1115,7 @@ return function(p1) --[[ Line: 3 ]]
 						end
 					end
 				end },
-			{ "Fonts", function() --[[ Line: 1056 | Upvalues: p1 (ref), helpMarker (ref) ]]
+			{ "Fonts", function()
 					local v1 = p1.State({})
 					p1.SameLine()
 					if p1.Button({ "Update" }).clicked() then
@@ -1211,7 +1212,7 @@ return function(p1) --[[ Line: 3 ]]
 		p1.Separator()
 		p1.End()
 	end
-	local function widgetEventInteractivity() --[[ Line: 1170 | Upvalues: p1 (copy) ]]
+	local function widgetEventInteractivity()
 		p1.CollapsingHeader({ "Widget Event Interactivity" })
 		local v1 = p1.State(0)
 		if p1.Button({ "Click to increase Number" }).clicked() then
@@ -1271,7 +1272,7 @@ return function(p1) --[[ Line: 3 ]]
 		p1.End()
 		p1.End()
 	end
-	local function widgetStateInteractivity() --[[ Line: 1241 | Upvalues: p1 (copy) ]]
+	local function widgetStateInteractivity()
 		p1.CollapsingHeader({ "Widget State Interactivity" })
 		p1.Text({ (("isChecked: %*\n"):format(p1.Checkbox({ "Widget-Generated State" }).state.isChecked.value)) })
 		p1.Text({ (("isChecked: %*\n"):format(p1.Checkbox({ "User-Generated State" }, {
@@ -1289,7 +1290,7 @@ return function(p1) --[[ Line: 3 ]]
 		end
 		p1.Text({ (("isChecked: %*\n"):format(v6.value)) })
 		local v7 = p1.State(true)
-		local v8 = p1.ComputedState(v7, function(p1) --[[ Line: 1264 ]]
+		local v8 = p1.ComputedState(v7, function(p1)
 			return not p1
 		end)
 		p1.Checkbox({ "ComputedState (dynamic coupling)" }, {
@@ -1301,7 +1302,7 @@ return function(p1) --[[ Line: 3 ]]
 		p1.Text({ (("isChecked: %*\n"):format(v8.value)) })
 		p1.End()
 	end
-	local function dynamicStyle() --[[ Line: 1274 | Upvalues: p1 (copy), helpMarker (copy) ]]
+	local function dynamicStyle()
 		p1.CollapsingHeader({ "Dynamic Styles" })
 		local v1 = p1.State(0)
 		p1.SameLine()
@@ -1320,7 +1321,7 @@ return function(p1) --[[ Line: 3 ]]
 		p1.PopConfig()
 		p1.End()
 	end
-	local function tablesDemo() --[[ Line: 1295 | Upvalues: p1 (copy), helpMarker (copy) ]]
+	local function tablesDemo()
 		local v1 = p1.State(false)
 		p1.CollapsingHeader({ "Tables & Columns" }, {
 			isUncollapsed = v1
@@ -1628,7 +1629,7 @@ return function(p1) --[[ Line: 3 ]]
 					v23,
 					v24
 				}, {
-					number = p1.TableState(v21.value, i, function(p1) --[[ Line: 1548 | Upvalues: v21 (copy), i (copy) ]]
+					number = p1.TableState(v21.value, i, function(p1)
 						v21.value[i] = p1
 						v21:set(v21.value, true)
 						return false
@@ -1679,7 +1680,7 @@ return function(p1) --[[ Line: 3 ]]
 		end
 		p1.End()
 	end
-	local function layoutDemo() --[[ Line: 1600 | Upvalues: p1 (copy), helpMarker (copy) ]]
+	local function layoutDemo()
 		p1.CollapsingHeader({ "Widget Layout" })
 		p1.Tree({ "Widget Alignment" })
 		p1.Text({ "Iris.SameLine has optional argument supporting horizontal and vertical alignments." })
@@ -1853,7 +1854,7 @@ return function(p1) --[[ Line: 3 ]]
 		p1.End()
 		p1.End()
 	end
-	local function windowlessDemo() --[[ Line: 1801 | Upvalues: p1 (copy), helpMarker (copy) ]]
+	local function windowlessDemo()
 		p1.PushConfig({
 			ItemWidth = UDim.new(0, 150)
 		})
@@ -1867,7 +1868,7 @@ return function(p1) --[[ Line: 3 ]]
 		p1.End()
 		p1.PopConfig()
 	end
-	return function() --[[ Line: 1821 | Upvalues: p1 (copy), v1 (copy), mainMenuBar (copy), widgetEventInteractivity (copy), widgetStateInteractivity (copy), v11 (copy), dynamicStyle (copy), t2 (copy), t (copy), tablesDemo (copy), layoutDemo (copy), v8 (copy), v9 (copy), v10 (copy), v2 (copy), v12 (copy), v3 (copy), runtimeInfo (copy), v7 (copy), debugPanel (copy), v4 (copy), f14 (ref), v5 (copy), windowlessDemo (copy), v6 (copy) ]]
+	return function()
 		local v13 = p1.State(false)
 		local v22 = p1.State(false)
 		local v32 = p1.State(false)

@@ -1,17 +1,18 @@
+-- Reviewed by Claude
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
 local v2 = Roact.Component:extend("Plot")
-function v2.init(p1) --[[ Line: 8 ]]
+function v2.init(p1)
 	p1:setState({
 		aspectRatio = 1
 	})
 end
-function v2.CalculateAspectRatio(p1, p2) --[[ Line: 13 ]]
+function v2.CalculateAspectRatio(p1, p2)
 	p1:setState({
 		aspectRatio = p2.AbsoluteSize.Y / p2.AbsoluteSize.X
 	})
 end
-function v2.render(p1) --[[ Line: 18 | Upvalues: createElement (copy), Roact (copy) ]]
+function v2.render(p1)
 	local window = p1.props.window
 	local v1 = window[1]
 	local v2 = window[2]
@@ -73,7 +74,7 @@ function v2.render(p1) --[[ Line: 18 | Upvalues: createElement (copy), Roact (co
 		Size = p1.props.size,
 		Position = p1.props.position,
 		ZIndex = p1.props.zIndex,
-		[Roact.Change.AbsoluteSize] = function(p12) --[[ Line: 96 | Upvalues: p1 (copy) ]]
+		[Roact.Change.AbsoluteSize] = function(p12)
 			p1:CalculateAspectRatio(p12)
 		end
 	}, t)

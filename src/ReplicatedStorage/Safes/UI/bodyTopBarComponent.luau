@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local createElement = require(ReplicatedStorage.Roact).createElement
-return function(p1) --[[ Line: 5 | Upvalues: createElement (copy) ]]
+return function(p1)
 	return createElement("Frame", {
 		Size = UDim2.new(1, 0, 0.1, 0),
 		BackgroundTransparency = 1,

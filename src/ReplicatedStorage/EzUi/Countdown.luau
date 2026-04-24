@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local Roact = require(ReplicatedStorage.Roact)
@@ -14,7 +15,7 @@ v1.defaultProps = {
 	position = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5),
 	textColor = Color3.new(255/255, 255/255, 255/255),
-	timeFormatFunc = function(p1) --[[ Name: timeFormatFunc | Line: 19 ]]
+	timeFormatFunc = function(p1)
 		return p1
 	end,
 	fontFace = Font.fromEnum(Enum.Font.GothamBold),
@@ -24,17 +25,17 @@ v1.defaultProps = {
 	strokeThickness = 0,
 	strokeColor = Color3.new(0/255, 0/255, 0/255)
 }
-function v1.init(p1) --[[ Line: 30 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 end
-function v1.didMount(p1) --[[ Line: 33 | Upvalues: Interval (copy) ]]
-	p1.maid:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 34 | Upvalues: p1 (copy) ]]
+function v1.didMount(p1)
+	p1.maid:GiveTask(Interval.every(0.1):Connect(function()
 		p1:setState({
 			_c = math.random()
 		})
 	end))
 end
-function v1.render(p1) --[[ Line: 40 | Upvalues: createElement (copy), PaddedContainer (copy) ]]
+function v1.render(p1)
 	local v1 = p1.props.endTime - workspace:GetServerTimeNow()
 	if v1 < 0 then
 		v1 = 0
@@ -74,7 +75,7 @@ function v1.render(p1) --[[ Line: 40 | Upvalues: createElement (copy), PaddedCon
 		zIndex = p1.props.zIndex
 	}, t2)
 end
-function v1.willUnmount(p1) --[[ Line: 81 ]]
+function v1.willUnmount(p1)
 	p1.maid:Destroy()
 end
 return v1

@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	setCategoryItemFavorited = function(p1, p2) --[[ Name: setCategoryItemFavorited | Line: 5 ]]
+	setCategoryItemFavorited = function(p1, p2)
 		assert(p2.category ~= nil, "missing category")
 		assert(p2.name ~= nil, "missing name")
 		assert(p2.favorited ~= nil, "missing favorited")
@@ -14,7 +15,7 @@ return require(ReplicatedStorage.Rodux).createReducer({}, {
 		t[p2.category][p2.name] = p2.favorited
 		return t
 	end,
-	setFavoritedRaw = function(p1, p2) --[[ Name: setFavoritedRaw | Line: 20 ]]
+	setFavoritedRaw = function(p1, p2)
 		assert(p2.favorited ~= nil, "missing favorited table")
 		return p2.favorited
 	end

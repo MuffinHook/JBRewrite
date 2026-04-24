@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), ReplicatedStorage (copy), Maid (copy), RoactRodux (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local store = require(ReplicatedStorage.App.store)
 	store:dispatch({
@@ -40,34 +41,34 @@ return function(p1) --[[ Line: 6 | Upvalues: Roact (copy), ReplicatedStorage (co
 			categoryTitle = "categoryTitle" .. tostring(i)
 		})
 	end
-	function v1.init(p1) --[[ Line: 49 | Upvalues: Maid (ref) ]]
+	function v1.init(p1)
 		p1.maid = Maid.new()
 	end
 	local v2 = os.clock()
-	function v1.render(p1) --[[ Line: 53 | Upvalues: Roact (ref), RoactRodux (ref), store (copy), v2 (copy) ]]
+	function v1.render(p1)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(require(script.Parent.Garage), {
 				disabled = false,
-				attemptBuyItem = function(p1, p2) --[[ Name: attemptBuyItem | Line: 59 | Upvalues: store (ref) ]]
+				attemptBuyItem = function(p1, p2)
 					store:dispatch({
 						type = "setCategoryItemOwned",
 						category = p1,
 						name = p2
 					})
 				end,
-				getRemainingDebounce = function() --[[ Name: getRemainingDebounce | Line: 66 | Upvalues: v2 (ref) ]]
+				getRemainingDebounce = function()
 					return 10 - (os.clock() - v2)
 				end,
 				colsPerRow = 7,
 				rowsPerPage = 2.5
 			}) })
 	end
-	function v1.willUnmount(p1) --[[ Line: 74 ]]
+	function v1.willUnmount(p1)
 		p1.maid:Destroy()
 	end
 	local v3 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 79 | Upvalues: Roact (ref), v3 (copy) ]]
+	return function()
 		Roact.unmount(v3)
 	end
 end

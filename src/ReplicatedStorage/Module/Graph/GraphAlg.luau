@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 local t = {
-	dfs = function(p1, p2, p3, p4) --[[ Name: dfs | Line: 2 ]]
+	dfs = function(p1, p2, p3, p4)
 		assert(p1 ~= nil, "missing Graph G")
 		assert(p2 ~= nil, "missing start vertex v")
 		assert(typeof(p3) == "nil" or typeof(p3) == "function", "invalid condition")
 		local v5 = p4 or p1.GetNeighbors
 		local t = {}
-		local function v6(p12) --[[ Line: 10 | Upvalues: t (copy), v5 (ref), p1 (copy), p3 (copy), v6 (copy) ]]
+		local function v6(p12)
 			t[p12] = true
 			for i, v in ipairs(v5(p1, p12)) do
 				if not t[v] and (p3 == nil or p3(v)) then
@@ -16,7 +17,7 @@ local t = {
 		v6(p2)
 		return t
 	end,
-	bfsSearch = function(p1, p2, p3) --[[ Name: bfsSearch | Line: 23 ]]
+	bfsSearch = function(p1, p2, p3)
 		local t = {}
 		table.insert(t, p2)
 		local t2 = {
@@ -36,7 +37,7 @@ local t = {
 		end
 	end
 }
-function t.weaklyConnectedComponents(p1) --[[ Line: 41 | Upvalues: t (copy) ]]
+function t.weaklyConnectedComponents(p1)
 	assert(p1 ~= nil, "missing Graph G")
 	local t2 = {}
 	local t3 = {}

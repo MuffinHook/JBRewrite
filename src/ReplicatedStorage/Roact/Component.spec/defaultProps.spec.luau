@@ -1,4 +1,5 @@
-return function() --[[ Line: 1 ]]
+-- Reviewed by Claude
+return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
@@ -6,7 +7,7 @@ return function() --[[ Line: 1 ]]
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
 	local Component = require(script.Parent.Parent.Component)
 	local v1 = createReconciler(NoopRenderer)
-	it("should fill in when mounting before init", function() --[[ Line: 12 | Upvalues: Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should fill in when mounting before init", function()
 		local t = {
 			a = 3,
 			b = 2
@@ -14,10 +15,10 @@ return function() --[[ Line: 1 ]]
 		local v12 = Component:extend("Foo")
 		v12.defaultProps = t
 		local v2 = nil
-		function v12.init(p1) --[[ Line: 23 | Upvalues: v2 (ref) ]]
+		function v12.init(p1)
 			v2 = p1.props
 		end
-		function v12.render(p1) --[[ Line: 27 ]] end
+		function v12.render(p1)  end
 		local t2 = {
 			b = 4,
 			c = 6
@@ -29,7 +30,7 @@ return function() --[[ Line: 1 ]]
 			c = t2.c
 		})
 	end)
-	it("should fill in when updating via props", function() --[[ Line: 49 | Upvalues: Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should fill in when updating via props", function()
 		local t = {
 			a = 3,
 			b = 2
@@ -37,7 +38,7 @@ return function() --[[ Line: 1 ]]
 		local v12 = Component:extend("Foo")
 		v12.defaultProps = t
 		local v2 = nil
-		function v12.render(p1) --[[ Line: 60 | Upvalues: v2 (ref) ]]
+		function v12.render(p1)
 			v2 = p1.props
 		end
 		local v4 = v1.mountVirtualNode(createElement(v12, {
@@ -54,7 +55,7 @@ return function() --[[ Line: 1 ]]
 			c = t2.c
 		})
 	end)
-	it("should respect None to override a default prop with nil", function() --[[ Line: 91 | Upvalues: Component (copy), None (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should respect None to override a default prop with nil", function()
 		local t = {
 			a = 3,
 			b = 2
@@ -62,7 +63,7 @@ return function() --[[ Line: 1 ]]
 		local v12 = Component:extend("Foo")
 		v12.defaultProps = t
 		local v2 = nil
-		function v12.render(p1) --[[ Line: 102 | Upvalues: v2 (ref) ]]
+		function v12.render(p1)
 			v2 = p1.props
 		end
 		local t2 = {

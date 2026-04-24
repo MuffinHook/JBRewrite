@@ -1,25 +1,26 @@
+-- Reviewed by Claude
 local t = {}
 local t2 = {}
 local random = math.random
-local function GUID() --[[ Line: 8 | Upvalues: random (copy) ]]
-	return ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(p1) --[[ Line: 10 | Upvalues: random (ref) ]]
+local function GUID()
+	return ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(p1)
 		return ("%x"):format(p1 == "x" and random(0, 15) or random(8, 11))
 	end)
 end
-local function MakeListener() --[[ Line: 15 | Upvalues: random (copy) ]]
+local function MakeListener()
 	return {
-		g = ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(p1) --[[ Line: 10 | Upvalues: random (ref) ]]
+		g = ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(p1)
 			return ("%x"):format(p1 == "x" and random(0, 15) or random(8, 11))
 		end),
 		Callback = nil,
 		SignalName = nil
 	}
 end
-function t.Broadcast(p1, ...) --[[ Line: 22 | Upvalues: t2 (copy) ]]
+function t.Broadcast(p1, ...)
 	local t = { ... }
 	for v1, v2 in next, t2 do
 		if v2.SignalName == p1 then
-			local v3, v4 = pcall(function() --[[ Line: 26 | Upvalues: v2 (copy), t (copy) ]]
+			local v3, v4 = pcall(function()
 				v2:Callback(unpack(t))
 			end)
 			if not v3 then
@@ -28,9 +29,9 @@ function t.Broadcast(p1, ...) --[[ Line: 22 | Upvalues: t2 (copy) ]]
 		end
 	end
 end
-function t.Listen(p1, p2) --[[ Line: 35 | Upvalues: random (copy), t2 (copy) ]]
+function t.Listen(p1, p2)
 	local t = {
-		g = ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(p1) --[[ Line: 10 | Upvalues: random (ref) ]]
+		g = ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(p1)
 			return ("%x"):format(p1 == "x" and random(0, 15) or random(8, 11))
 		end),
 		Callback = nil,
@@ -41,7 +42,7 @@ function t.Listen(p1, p2) --[[ Line: 35 | Upvalues: random (copy), t2 (copy) ]]
 	table.insert(t2, t)
 	return t
 end
-function t.Close(p1) --[[ Line: 42 | Upvalues: t2 (copy) ]]
+function t.Close(p1)
 	local g = p1.g
 	for v1, v2 in next, t2 do
 		if v2.g == g then
@@ -50,7 +51,7 @@ function t.Close(p1) --[[ Line: 42 | Upvalues: t2 (copy) ]]
 	end
 	return false
 end
-function t.Closeg(p1) --[[ Line: 51 | Upvalues: t2 (copy) ]]
+function t.Closeg(p1)
 	for v1, v2 in next, t2 do
 		if v2.g == p1 then
 			return table.remove(t2, v1)
@@ -58,7 +59,7 @@ function t.Closeg(p1) --[[ Line: 51 | Upvalues: t2 (copy) ]]
 	end
 	return false
 end
-function t.Closef(p1) --[[ Line: 59 | Upvalues: t2 (copy) ]]
+function t.Closef(p1)
 	for v1, v2 in next, t2 do
 		if v2.Callback == p1 then
 			return table.remove(t2, v1)

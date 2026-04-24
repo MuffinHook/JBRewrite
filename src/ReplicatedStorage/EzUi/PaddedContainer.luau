@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local v1 = script:FindFirstAncestor("EzUi")
 local Dictionary = require(v1.Dictionary)
 local Roact = require(v1.Parent.Roact)
@@ -15,7 +16,7 @@ v2.defaultProps = {
 	zIndex = nil
 }
 local v3 = math.random()
-function v2.render(p1) --[[ Line: 21 | Upvalues: v3 (ref), Roact (copy), v2 (copy), createElement (copy), Dictionary (copy) ]]
+function v2.render(p1)
 	local backgroundColor = p1.props.backgroundColor
 	if not backgroundColor and p1.props.backgroundTransparency < 1 then
 		v3 = v3 + 0.07725424859373685
@@ -43,7 +44,7 @@ function v2.render(p1) --[[ Line: 21 | Upvalues: v3 (ref), Roact (copy), v2 (cop
 		warn("PaddedContainer: innerScaleY < 0: " .. tostring(v4))
 	end
 	local v5 = v32 / v4
-	local function v6(p1, p2, p3) --[[ Line: 54 | Upvalues: Roact (ref), v2 (ref), v5 (copy), v4 (copy), v6 (copy) ]]
+	local function v6(p1, p2, p3)
 		local v1 = p1.props[Roact.Children]
 		if v1 then
 			if p1.props.Size and typeof(p1.props.Size) == "UDim2" then

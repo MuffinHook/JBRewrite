@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -6,7 +7,7 @@ local v1 = nil
 local v2 = nil
 local t = {}
 t.__index = t
-function t.new(p1, p2) --[[ Line: 10 | Upvalues: t (copy), ReplicatedStorage (copy), v1 (ref) ]]
+function t.new(p1, p2)
 	local v2 = setmetatable({}, t)
 	v2.p0 = p1
 	v2.v0 = p2
@@ -20,10 +21,10 @@ function t.new(p1, p2) --[[ Line: 10 | Upvalues: t (copy), ReplicatedStorage (co
 end
 local v3 = Vector3.new()
 local v4 = CFrame.Angles(0, math.pi, 0)
-function t.Animate(p1, p2) --[[ Line: 29 | Upvalues: v2 (ref), v3 (copy), v4 (copy), RayCast (copy), RunService (copy) ]]
+function t.Animate(p1, p2)
 	local v22 = p2 or v2.GetNowSync()
 	local v32 = v22
-	local function Heartbeat() --[[ Line: 37 | Upvalues: v2 (ref), v22 (ref), v32 (ref), p1 (copy), v3 (ref), v4 (ref), RayCast (ref) ]]
+	local function Heartbeat()
 		local v1 = v2.GetNowSync()
 		local v23 = v1 - v22
 		local v33 = v1 - v32
@@ -46,9 +47,9 @@ function t.Animate(p1, p2) --[[ Line: 29 | Upvalues: v2 (ref), v3 (copy), v4 (co
 	p1.Runtime = RunService.Heartbeat:Connect(Heartbeat)
 end
 local v5 = nil
-function t.Explode(p1, p2) --[[ Line: 68 | Upvalues: Players (copy), v5 (ref) ]]
+function t.Explode(p1, p2)
 	p1.Exploded = true
-	delay(2, function() --[[ Line: 70 | Upvalues: p1 (copy) ]]
+	delay(2, function()
 		p1:Destroy()
 	end)
 	if p1.Runtime then
@@ -88,23 +89,23 @@ function t.Explode(p1, p2) --[[ Line: 68 | Upvalues: Players (copy), v5 (ref) ]]
 		end
 	end
 end
-function t.SetOwner(p1, p2) --[[ Line: 115 ]]
+function t.SetOwner(p1, p2)
 	p1._owner = p2
 end
-function t.Destroy(p1) --[[ Line: 118 ]]
+function t.Destroy(p1)
 	if p1.Runtime then
 		p1.Runtime:Disconnect()
 		p1.Runtime = nil
 	end
 	p1.Model:Destroy()
 end
-local function DropBomb(p1, p2, p3, p4) --[[ Line: 126 | Upvalues: t (copy) ]]
+local function DropBomb(p1, p2, p3, p4)
 	local v1 = t.new(p1, p2)
 	v1:SetOwner(p4)
 	v1:Animate(p3)
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 131 | Upvalues: v5 (ref), v2 (ref), ReplicatedStorage (copy), v1 (ref) ]]
+	Init = function(p1)
 		v5 = p1.Event
 		v2 = require(ReplicatedStorage.Module.Time)
 		v1 = require(ReplicatedStorage.Std.Joint)

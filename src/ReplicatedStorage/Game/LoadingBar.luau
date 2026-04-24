@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local t = {}
 t.__index = t
-function t.new() --[[ Line: 8 | Upvalues: t (copy), Maid (copy), ReplicatedStorage (copy), LocalPlayer (copy) ]]
+function t.new()
 	local t2 = {}
 	setmetatable(t2, t)
 	t2.Maid = Maid.new()
@@ -14,13 +15,13 @@ function t.new() --[[ Line: 8 | Upvalues: t (copy), Maid (copy), ReplicatedStora
 	t2:SetValue(0)
 	return t2
 end
-function t.SetValue(p1, p2) --[[ Line: 22 ]]
+function t.SetValue(p1, p2)
 	p1.Gui.Background.Value.Size = UDim2.new(p2, 0, 1, 0)
 end
-function t.SetPosition(p1, p2) --[[ Line: 25 ]]
+function t.SetPosition(p1, p2)
 	p1.Gui.Background.Position = p2
 end
-function t.Destroy(p1) --[[ Line: 28 ]]
+function t.Destroy(p1)
 	p1.Maid:Destroy()
 	p1.Maid = nil
 end

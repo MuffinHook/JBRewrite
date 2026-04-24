@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -9,12 +10,12 @@ local RayCast = require(ReplicatedStorage.Module.RayCast)
 local Interval = require(ReplicatedStorage.Std.Interval)
 local RunService = game:GetService("RunService")
 require(ReplicatedStorage.Clan.ClanUtils)
-local function randomVector() --[[ Line: 14 ]]
+local function randomVector()
 	local v1 = math.random() * 2 - 1
 	local v2 = math.random() * 2 - 1
 	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
 end
-local function offsetLookAtTarget(p1, p2, p3, p4, p5, p6) --[[ Line: 22 ]]
+local function offsetLookAtTarget(p1, p2, p3, p4, p5, p6)
 	if p4 == 0 or (p5 == 0 or p6 == 0) then
 		return 0, 0
 	else
@@ -27,11 +28,11 @@ local function offsetLookAtTarget(p1, p2, p3, p4, p5, p6) --[[ Line: 22 ]]
 		return v4, v7 - (p2 * p2 < v6 and math.asin(p2 / v6 ^ 0.5) or math.asin(v6 ^ 0.5 / p2))
 	end
 end
-local function shortAngleDist(p1, p2) --[[ Line: 36 ]]
+local function shortAngleDist(p1, p2)
 	local v1 = (p2 - p1) % 6.283185307179586
 	return 2 * v1 % 6.283185307179586 - v1
 end
-local function getNearestPlayer(p1, p2) --[[ Line: 41 | Upvalues: Players (copy), PlayerUtils (copy) ]]
+local function getNearestPlayer(p1, p2)
 	local v1 = p2 or (1 / 0)
 	local v2 = nil
 	for i, v in ipairs(Players:GetPlayers()) do
@@ -46,7 +47,7 @@ local function getNearestPlayer(p1, p2) --[[ Line: 41 | Upvalues: Players (copy)
 	end
 	return v2
 end
-local function getNearestOpp(p1, p2, p3) --[[ Line: 56 | Upvalues: Players (copy), PlayerUtils (copy) ]]
+local function getNearestOpp(p1, p2, p3)
 	local v1 = p3 or (1 / 0)
 	local v2 = nil
 	for v3, v4 in Players:GetPlayers() do
@@ -75,10 +76,10 @@ local t = {
 }
 local v1 = nil
 return {
-	init = function(p1) --[[ Name: init | Line: 89 | Upvalues: v1 (ref) ]]
+	init = function(p1)
 		v1 = p1.Event
 	end,
-	setup = function(p1) --[[ Name: setup | Line: 92 | Upvalues: Spring (copy), BulletEmitter (copy), Players (copy), LocalPlayer (copy), v1 (ref), Audio (copy), t (copy), offsetLookAtTarget (copy), RunService (copy), PlayerUtils (copy), getNearestOpp (copy), getNearestPlayer (copy), RayCast (copy), Interval (copy) ]]
+	setup = function(p1)
 		local _obj = p1._obj
 		local v12 = 0
 		local v2 = 0
@@ -91,7 +92,7 @@ return {
 		v6.IgnoreLocalPlayer = false
 		v6.ShieldBlockPct = 0.5
 		v6.GravityVector = Vector3.new(0, -49.05, 0)
-		p1._maid:GiveTask(v6.OnLocalHitPlayer:Connect(function(p12) --[[ Line: 110 | Upvalues: Players (ref), LocalPlayer (ref), p1 (copy), v1 (ref), Audio (ref), t (ref) ]]
+		p1._maid:GiveTask(v6.OnLocalHitPlayer:Connect(function(p12)
 			local v12 = Players:GetPlayerFromCharacter(p12.Parent)
 			if v12 then
 				if v12 == LocalPlayer then
@@ -106,7 +107,7 @@ return {
 			end
 		end))
 		local v7 = os.clock()
-		local function updateRotation(p1) --[[ Line: 132 | Upvalues: v7 (ref), _obj (copy), offsetLookAtTarget (ref), v12 (ref), v2 (ref), v3 (copy), v4 (copy), v5 (copy) ]]
+		local function updateRotation(p1)
 			local v1 = os.clock()
 			local v22 = v1 - v7
 			v7 = v1
@@ -122,7 +123,7 @@ return {
 			_obj.Top:SetPrimaryPartCFrame(v32 * CFrame.Angles(0, v9, 0) * CFrame.Angles(v8, 0, 0) * CFrame.new(0, 0, v10))
 		end
 		p1._maid:GiveTask(v6)
-		local function fire() --[[ Line: 159 | Upvalues: _obj (copy), v6 (copy), v5 (copy), Audio (ref), t (ref) ]]
+		local function fire()
 			local v1 = _obj.Top.Tip.CFrame
 			v6:Emit(v1.p, v1.LookVector + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 0.01, 300)
 			v5:Accelerate(40)
@@ -139,7 +140,7 @@ return {
 		local v10 = os.clock()
 		local v11 = nil
 		local v122 = os.clock()
-		p1._maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 179 | Upvalues: PlayerUtils (ref), LocalPlayer (ref), p1 (copy), v6 (copy), getNearestOpp (ref), getNearestPlayer (ref), _obj (copy), RayCast (ref), v11 (ref), v8 (copy), v122 (ref), Audio (ref), t (ref), v10 (ref), updateRotation (copy), v9 (ref), fire (copy) ]]
+		p1._maid:GiveTask(RunService.Heartbeat:Connect(function()
 			local v1 = os.clock()
 			local v2 = PlayerUtils.getRootPart(LocalPlayer)
 			if v2 then
@@ -210,7 +211,7 @@ return {
 			end
 		end))
 		local v13 = false
-		p1._maid:GiveTask(Interval.every(0.5):Connect(function() --[[ Line: 264 | Upvalues: v13 (ref), _obj (copy) ]]
+		p1._maid:GiveTask(Interval.every(0.5):Connect(function()
 			v13 = not v13
 			_obj.Top.Light.Color = v13 and Color3.new(0/255, 255/255, 0/255) or Color3.new(255/255, 0/255, 0/255)
 		end))

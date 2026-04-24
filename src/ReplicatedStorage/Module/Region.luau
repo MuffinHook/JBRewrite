@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -9,13 +10,13 @@ local Angles = CFrame.Angles
 local pointToObjectSpace = v2().pointToObjectSpace
 local insert = table.insert
 local remove = table.remove
-local function MakePrism() --[[ Line: 21 ]]
+local function MakePrism()
 	return {
 		c = nil,
 		s = nil
 	}
 end
-local function MakePrismA(p1, p2) --[[ Line: 27 ]]
+local function MakePrismA(p1, p2)
 	return {
 		c = nil,
 		s = nil,
@@ -23,7 +24,7 @@ local function MakePrismA(p1, p2) --[[ Line: 27 ]]
 		s = p2
 	}
 end
-local function MakeRegion() --[[ Line: 34 | Upvalues: Signal (copy) ]]
+local function MakeRegion()
 	return {
 		Prisms = {},
 		Names = {},
@@ -35,12 +36,12 @@ local function MakeRegion() --[[ Line: 34 | Upvalues: Signal (copy) ]]
 		IsInRegion = nil
 	}
 end
-local function CastPoint(p1, p2) --[[ Line: 47 | Upvalues: pointToObjectSpace (copy) ]]
+local function CastPoint(p1, p2)
 	local s = p1.s
 	local v1 = pointToObjectSpace(p1.c, p2) + s * 0.5
 	return if v1.x >= 0 and (v1.x < s.x and (v1.y >= 0 and (v1.y < s.y and v1.z >= 0))) then v1.z < s.z else false
 end
-local function RegionCastPoint(p1, p2) --[[ Line: 52 | Upvalues: CastPoint (copy) ]]
+local function RegionCastPoint(p1, p2)
 	local Prisms = p1.Prisms
 	for i = 1, #Prisms do
 		if CastPoint(Prisms[i], p2) then
@@ -50,7 +51,7 @@ local function RegionCastPoint(p1, p2) --[[ Line: 52 | Upvalues: CastPoint (copy
 	return false
 end
 local Players = game:GetService("Players")
-local function IsInRegionPlayerName(p1, p2) --[[ Line: 63 | Upvalues: Players (copy), v1 (ref), CastPoint (copy) ]]
+local function IsInRegionPlayerName(p1, p2)
 	local v12 = Players:FindFirstChild(p2)
 	if v12 then
 		local Character = v12.Character
@@ -84,7 +85,7 @@ return {
 	MakePrism = MakePrism,
 	MakePrismA = MakePrismA,
 	MakeRegion = MakeRegion,
-	Update = function(p1, p2) --[[ Name: Update | Line: 84 ]]
+	Update = function(p1, p2)
 		local IsInRegion = p1.IsInRegion
 		local NamesFastIndex = p1.NamesFastIndex
 		local Names = p1.Names
@@ -97,7 +98,7 @@ return {
 				table.insert(Names, v1)
 				NamesFastIndex[v1] = true
 				if p1.NameAdded then
-					local v4, v5 = pcall(function() --[[ Line: 97 | Upvalues: p1 (copy), v1 (copy) ]]
+					local v4, v5 = pcall(function()
 						p1.NameAdded(p1, v1)
 					end)
 					if not v4 then
@@ -108,7 +109,7 @@ return {
 				end
 			elseif not v2 and v3 then
 				if p1.NameRemoving then
-					local v6, v7 = pcall(function() --[[ Line: 109 | Upvalues: p1 (copy), v1 (copy) ]]
+					local v6, v7 = pcall(function()
 						p1.NameRemoving(p1, v1)
 					end)
 					if not v6 then
@@ -132,7 +133,7 @@ return {
 			local v8 = p1.Names[k]
 			if not (t[v8] or IsInRegion(p1, v8)) then
 				if p1.NameRemoving then
-					local v9, v10 = pcall(function() --[[ Line: 140 | Upvalues: p1 (copy), v8 (copy) ]]
+					local v9, v10 = pcall(function()
 						p1.NameRemoving(p1, v8)
 					end)
 					if not v9 then

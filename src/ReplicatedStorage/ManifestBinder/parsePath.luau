@@ -1,9 +1,10 @@
-return function(p1) --[[ Name: parsePath | Line: 1 ]]
-	local v1 = string.split(p1, "/")
-	for i = #v1, 1, -1 do
-		if v1[i] == "" then
-			table.remove(v1, i)
+-- Reviewed by Claude
+return function(path)
+	local pathSegments = string.split(path, "/")
+	for i = #pathSegments, 1, -1 do
+		if pathSegments[i] == "" then
+			table.remove(pathSegments, i)
 		end
 	end
-	return v1
+	return pathSegments
 end

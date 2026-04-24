@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Rodux = require(ReplicatedStorage.Rodux)
 local getItemPropsFromRewardData = require(ReplicatedStorage.RewardSpinner.getItemPropsFromRewardData)
 return Rodux.createReducer(nil, {
-	setRewardSpinnerConfig = function(p1, p2) --[[ Name: setRewardSpinnerConfig | Line: 7 | Upvalues: getItemPropsFromRewardData (copy) ]]
+	setRewardSpinnerConfig = function(p1, p2)
 		if p2.items then
 			local t = {}
 			for v1, v2 in p2.items do

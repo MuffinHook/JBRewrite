@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
@@ -9,20 +10,20 @@ v1.defaultProps = {
 	position = UDim2.fromScale(0.5, 0.5),
 	size = UDim2.fromScale(0.9, 0.9)
 }
-function v1.init(p1) --[[ Line: 13 | Upvalues: Roact (copy), PersistentCrewBattleConsts (copy) ]]
+function v1.init(p1)
 	p1.explainBoxRef = Roact.createRef()
 	p1.reportButtons = PersistentCrewBattleConsts.CLAN_REPORT_OPTIONS
 	p1:setState({
 		selectedButton = Roact.None
 	})
-	function p1.close() --[[ Line: 19 | Upvalues: p1 (copy), Roact (ref) ]]
+	function p1.close()
 		p1.explainBoxRef:getValue().Text = ""
 		p1:setState({
 			selectedButton = Roact.None
 		})
 		p1.props.onClose()
 	end
-	function p1.attemptSubmit() --[[ Line: 27 | Upvalues: p1 (copy) ]]
+	function p1.attemptSubmit()
 		if p1.state.selectedButton ~= nil then
 			local Text = p1.explainBoxRef:getValue().Text
 			p1.props.onSubmit(p1.state.selectedButton.name, Text)
@@ -30,9 +31,9 @@ function v1.init(p1) --[[ Line: 13 | Upvalues: Roact (copy), PersistentCrewBattl
 		end
 	end
 end
-function v1.render(p1) --[[ Line: 37 | Upvalues: createElement (copy), PaddedContainer (copy), Roact (copy) ]]
+function v1.render(p1)
 	local v1 = Color3.new(51/255, 51/255, 51/255)
-	local function button(p1) --[[ Line: 47 | Upvalues: createElement (ref), PaddedContainer (ref), Roact (ref) ]]
+	local function button(p1)
 		return createElement(PaddedContainer, {
 			size = p1.size,
 			position = p1.position,
@@ -98,7 +99,7 @@ function v1.render(p1) --[[ Line: 37 | Upvalues: createElement (copy), PaddedCon
 		}
 		v3 = if v2 then Color3.fromRGB(251, 121, 121) else Color3.fromRGB(88, 172, 246)
 		t2.bgColor = v3
-		function t2.onClicked() --[[ Line: 115 | Upvalues: p1 (copy), v5 (copy) ]]
+		function t2.onClicked()
 			p1:setState({
 				selectedButton = v5
 			})

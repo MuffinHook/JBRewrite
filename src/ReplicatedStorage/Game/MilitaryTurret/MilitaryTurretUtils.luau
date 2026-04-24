@@ -1,13 +1,14 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
 local Settings = require(ReplicatedStorage.Resource.Settings)
 return {
-	shortAngleDist = function(p1, p2) --[[ Name: shortAngleDist | Line: 7 ]]
+	shortAngleDist = function(p1, p2)
 		local v1 = (p2 - p1) % 6.283185307179586
 		return 2 * v1 % 6.283185307179586 - v1
 	end,
-	getNearestNonPolice = function(p1, p2) --[[ Name: getNearestNonPolice | Line: 12 | Upvalues: Players (copy), PlayerUtils (copy), Settings (copy) ]]
+	getNearestNonPolice = function(p1, p2)
 		local v1 = p2 or (1 / 0)
 		local v2 = nil
 		for i, v in ipairs(Players:GetPlayers()) do

@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Joint = require(ReplicatedStorage.Std.Joint)
 local Default = require(script.Parent.Default)
 return {
-	MakeCar = function(p1, p2) --[[ Name: MakeCar | Line: 6 | Upvalues: CollectionService (copy), Joint (copy), Default (copy) ]]
+	MakeCar = function(p1, p2)
 		local Model = p1.Model
 		CollectionService:AddTag(Model.Model.TrainCargo, "RobberyMarker")
 		local Skeleton = Model:FindFirstChild("Skeleton")
@@ -34,11 +35,11 @@ return {
 		p1.VaultOpenC1 = CFrame.Angles(0, -1.5707963267948966, 0)
 		return Default.MakeCar(p1)
 	end,
-	MoveCar = function(p1, p2, p3, p4) --[[ Name: MoveCar | Line: 66 | Upvalues: Default (copy) ]]
+	MoveCar = function(p1, p2, p3, p4)
 		local Speed = p2.Speed
 		return Default.MoveCar(p1, p2, p3, p4)
 	end,
-	DestroyCar = function(p1) --[[ Name: DestroyCar | Line: 70 | Upvalues: Default (copy) ]]
+	DestroyCar = function(p1)
 		return Default.DestroyCar(p1)
 	end
 }

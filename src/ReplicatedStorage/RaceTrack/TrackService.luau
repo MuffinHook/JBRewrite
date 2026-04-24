@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local t = {}
-local v1, v2 = require(ReplicatedStorage.Roact).createBinding("")
-t.screenText = v1
-t.updateScreenText = v2
-return t
+local TrackService = {}
+local screenTextValue, updateScreenText = require(ReplicatedStorage.Roact).createBinding("")
+TrackService.screenText = screenTextValue
+TrackService.updateScreenText = updateScreenText
+return TrackService

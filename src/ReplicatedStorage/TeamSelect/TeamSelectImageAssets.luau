@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 return {
 	BadimoLogo = "rbxassetid://17010675878",
 	Criminal = "rbxassetid://17209484346",

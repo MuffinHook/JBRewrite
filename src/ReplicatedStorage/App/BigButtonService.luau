@@ -1,15 +1,15 @@
 -- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local t = {
+local module = {
 	triggerUpdate = require(ReplicatedStorage.Std.Signal).new(),
 	active = {}
 }
-function t.add(p1)
-	table.insert(t.active, p1)
-	t.triggerUpdate:Fire()
+function module.add(p1)
+	table.insert(module.active, p1)
+	module.triggerUpdate:Fire()
 	return function()
-		table.remove(t.active, (table.find(t.active, p1)))
-		t.triggerUpdate:Fire()
+		table.remove(module.active, (table.find(module.active, p1)))
+		module.triggerUpdate:Fire()
 	end
 end
-return t
+return module

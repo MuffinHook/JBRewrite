@@ -3,7 +3,7 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local MinimapService = require(script.Parent.MinimapService)
-local t = {}
+local module = {}
 local function getRobberyMarkerForName(p1)
 	for v1, v2 in CollectionService:GetTagged("RobberyMarker") do
 		if v2.Name == p1 then
@@ -12,7 +12,7 @@ local function getRobberyMarkerForName(p1)
 	end
 	return nil
 end
-function t.init()
+function module.init()
 	task.spawn(function()
 		local SetRobberyWaypointRemote = ReplicatedStorage.App:WaitForChild("SetRobberyWaypointRemote")
 		local v1 = 0
@@ -45,4 +45,4 @@ function t.init()
 		end)
 	end)
 end
-return t
+return module

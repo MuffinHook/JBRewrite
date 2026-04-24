@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("BoardEntry")
-function v1.render(p1) --[[ Line: 6 | Upvalues: createElement (copy) ]]
+local BoardEntryComponent = Roact.PureComponent:extend("BoardEntry")
+function BoardEntryComponent.render(self)
 	return createElement("Frame", {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, 0),
-		LayoutOrder = p1.props.rank
+		LayoutOrder = self.props.rank
 	}, {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = 8
@@ -40,7 +41,7 @@ function v1.render(p1) --[[ Line: 6 | Upvalues: createElement (copy) ]]
 					Size = UDim2.new(0.8, 0, 0.8, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Position = UDim2.new(0.5, 0, 0.65, 0),
-					Text = ("#%d"):format(p1.props.rank),
+					Text = ("#%d"):format(self.props.rank),
 					TextColor3 = Color3.new(255/255, 255/255, 255/255),
 					Font = Enum.Font.LuckiestGuy,
 					TextScaled = true
@@ -62,7 +63,7 @@ function v1.render(p1) --[[ Line: 6 | Upvalues: createElement (copy) ]]
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Position = UDim2.new(0.5, 0, 0.5, 0),
 					Size = UDim2.new(0.8, 0, 0.8, 0),
-					Image = ("rbxthumb://type=AvatarHeadShot&w=150&h=150&id=%d"):format(p1.props.userId)
+					Image = ("rbxthumb://type=AvatarHeadShot&w=150&h=150&id=%d"):format(self.props.userId)
 				})
 			}),
 			Stats = createElement("Frame", {
@@ -77,7 +78,7 @@ function v1.render(p1) --[[ Line: 6 | Upvalues: createElement (copy) ]]
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 0.5, 0),
 					Position = UDim2.new(0, 0, 0.1, 0),
-					Text = p1.props.name,
+					Text = self.props.name,
 					TextColor3 = Color3.new(0.15, 0.15, 0.15),
 					Font = Enum.Font.LuckiestGuy,
 					TextScaled = true
@@ -86,7 +87,7 @@ function v1.render(p1) --[[ Line: 6 | Upvalues: createElement (copy) ]]
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 0.4, 0),
 					Position = UDim2.new(0, 0, 0.6, 0),
-					Text = p1.props.message,
+					Text = self.props.message,
 					TextColor3 = Color3.new(255/255, 255/255, 255/255),
 					Font = Enum.Font.LuckiestGuy,
 					TextScaled = true
@@ -95,4 +96,4 @@ function v1.render(p1) --[[ Line: 6 | Upvalues: createElement (copy) ]]
 		})
 	})
 end
-return v1
+return BoardEntryComponent

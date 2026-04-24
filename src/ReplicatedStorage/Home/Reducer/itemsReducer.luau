@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HomeItemUIUtils = require(ReplicatedStorage.Home.HomeItem.HomeItemUIUtils)
 local Rodux = require(ReplicatedStorage.Rodux)
-local function defaultSort(p1) --[[ Line: 6 ]]
-	table.sort(p1, function(p1, p2) --[[ Line: 8 ]]
+local function defaultSort(p1)
+	table.sort(p1, function(p1, p2)
 		if p1.limited == p2.limited then
 			if p1.season == p2.season then
 				return p1.name < p2.name
@@ -15,7 +16,7 @@ local function defaultSort(p1) --[[ Line: 6 ]]
 	end)
 end
 return Rodux.createReducer({}, {
-	setFurnitureCategory = function(p1, p2) --[[ Name: setFurnitureCategory | Line: 20 | Upvalues: ReplicatedStorage (copy), HomeItemUIUtils (copy) ]]
+	setFurnitureCategory = function(p1, p2)
 		local t = {}
 		for v9, v10 in ReplicatedStorage.Resource.HomeItem:GetChildren() do
 			local v1, v2, v3, v4, v5, v6, v7, v8
@@ -48,7 +49,7 @@ return Rodux.createReducer({}, {
 				v8 = if v2 == nil and v3 == nil then not v1 else true
 				v12.limited = v8
 				v12.maxPlaced = v7
-				function v12.getInst() --[[ Line: 57 | Upvalues: HomeItemUIUtils (ref), v11 (copy) ]]
+				function v12.getInst()
 					return HomeItemUIUtils.getModel(v11)
 				end
 				v12.updateCamera = HomeItemUIUtils.getUpdateCamera()
@@ -57,7 +58,7 @@ return Rodux.createReducer({}, {
 				table.insert(t, v12)
 			end
 		end
-		table.sort(t, function(p1, p2) --[[ Line: 8 ]]
+		table.sort(t, function(p1, p2)
 			if p1.limited == p2.limited then
 				if p1.season == p2.season then
 					return p1.name < p2.name
@@ -70,7 +71,7 @@ return Rodux.createReducer({}, {
 		end)
 		return t
 	end,
-	setCategory = function(p1, p2) --[[ Name: setCategory | Line: 69 | Upvalues: ReplicatedStorage (copy) ]]
+	setCategory = function(p1, p2)
 		assert(p2.module ~= nil, "setCategory requires a module name")
 		local v1 = ReplicatedStorage.Home.HomeData:FindFirstChild(p2.module)
 		assert(v1, "setCategory requires a valid module name")
@@ -87,7 +88,7 @@ return Rodux.createReducer({}, {
 					level = v5.Level,
 					season = v5.Season,
 					topPct = v5.TopPct,
-					getInst = function() --[[ Name: getInst | Line: 95 | Upvalues: v2 (copy), v5 (copy) ]]
+					getInst = function()
 						return v2.getInstance(v5)
 					end,
 					updateCamera = v2.updateCamera,
@@ -99,7 +100,7 @@ return Rodux.createReducer({}, {
 				table.insert(t, t2)
 			end
 		end
-		table.sort(t, function(p1, p2) --[[ Line: 8 ]]
+		table.sort(t, function(p1, p2)
 			if p1.limited == p2.limited then
 				if p1.season == p2.season then
 					return p1.name < p2.name

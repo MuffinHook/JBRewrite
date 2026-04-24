@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("StarterPlayer")
@@ -751,8 +752,8 @@ return function(initPacket)
 		Missile.LaunchMissile(missileCFrame, missileVelocity, aimTarget, fireTime)
 		Missiles.i = Missiles.i % #Missiles.Parts + 1
 	end
-	function em.exva0l4q(missileCFrame, missileVelocity, aimTarget, fireTime, p5, p6, p7)
-		Missile.LaunchMissile(missileCFrame, missileVelocity, aimTarget, fireTime, p5, p6, p7)
+	function em.exva0l4q(missileCFrame, missileVelocity, aimTarget, fireTime, extraParam1, extraParam2, extraParam3)
+		Missile.LaunchMissile(missileCFrame, missileVelocity, aimTarget, fireTime, extraParam1, extraParam2, extraParam3)
 	end
 	local function AttemptDropBomb()
 		if RunUtils.isTradeWorld() then

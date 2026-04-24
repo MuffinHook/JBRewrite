@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Module.Time)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
@@ -5,13 +6,13 @@ local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 local v1 = nil
 local t = {}
-local function FromPart(p1) --[[ Line: 10 ]]
+local function FromPart(p1)
 	return {
 		Part = p1
 	}
 end
 local v2 = nil
-local function Check() --[[ Line: 17 | Upvalues: VehicleUtils (copy), v2 (ref), t (copy), v1 (ref) ]]
+local function Check()
 	local v12 = VehicleUtils.GetLocalVehiclePacket()
 	if v12 == nil then
 		if v2 then
@@ -38,7 +39,7 @@ local function Check() --[[ Line: 17 | Upvalues: VehicleUtils (copy), v2 (ref), 
 	end
 end
 local v3 = 0
-local function Stepped() --[[ Line: 51 | Upvalues: v3 (ref), Check (copy) ]]
+local function Stepped()
 	local v1 = tick()
 	if v1 - v3 > 0.1 then
 		v3 = v1
@@ -46,15 +47,15 @@ local function Stepped() --[[ Line: 51 | Upvalues: v3 (ref), Check (copy) ]]
 	end
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 58 | Upvalues: v1 (ref), RunService (copy), Stepped (copy), t (copy), CollectionService (copy) ]]
+	Init = function(p1)
 		v1 = p1.Event
 		RunService.Heartbeat:Connect(Stepped)
-		local function AddedFun(p1) --[[ Line: 62 | Upvalues: t (ref) ]]
+		local function AddedFun(p1)
 			table.insert(t, {
 				Part = p1
 			})
 		end
-		local function RemovedFun(p1) --[[ Line: 66 | Upvalues: t (ref) ]]
+		local function RemovedFun(p1)
 			for i = #t, 1, -1 do
 				if t[i].Part == p1 then
 					table.remove(t, i)

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
@@ -5,7 +6,7 @@ local RunService = game:GetService("RunService")
 local CurrentCamera = workspace.CurrentCamera
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 11 | Upvalues: t (copy), RxInstanceUtils (copy), Maid (copy), RunService (copy) ]]
+function t.new(p1)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2.Model = p1
@@ -15,12 +16,12 @@ function t.new(p1) --[[ Line: 11 | Upvalues: t (copy), RxInstanceUtils (copy), M
 	assert(t2.Spinner.PrimaryPart, "spinner is missing PrimaryPart")
 	t2.Spinner.PrimaryPart.CFrame = CFrame.new(t2.Spinner.PrimaryPart.Position)
 	t2.Maid = Maid.new()
-	t2.Maid:GiveTask(RunService.Heartbeat:Connect(function(p1) --[[ Line: 25 | Upvalues: t2 (copy) ]]
+	t2.Maid:GiveTask(RunService.Heartbeat:Connect(function(p1)
 		t2:Heartbeat(p1)
 	end))
 	return t2
 end
-function t.Heartbeat(p1, p2) --[[ Line: 31 | Upvalues: CurrentCamera (copy) ]]
+function t.Heartbeat(p1, p2)
 	local Magnitude = (CurrentCamera.CFrame.Position - p1.Spinner.PrimaryPart.Position).Magnitude
 	if not (Magnitude * Magnitude > 250000) then
 		debug.profilebegin("PowerPlant Core")
@@ -31,7 +32,7 @@ function t.Heartbeat(p1, p2) --[[ Line: 31 | Upvalues: CurrentCamera (copy) ]]
 		debug.profileend()
 	end
 end
-function t.Destroy(p1) --[[ Line: 44 ]]
+function t.Destroy(p1)
 	p1.Maid:Destroy()
 	p1.Maid = nil
 end

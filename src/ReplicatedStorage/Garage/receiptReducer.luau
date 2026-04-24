@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	addReceiptItem = function(p1, p2) --[[ Name: addReceiptItem | Line: 5 ]]
+	addReceiptItem = function(p1, p2)
 		assert(p2.name ~= nil, "missing receipt item Name")
 		assert(p2.title ~= nil, "missing receipt item Title")
 		assert(p2.category ~= nil, "missing receipt item Category")
@@ -21,7 +22,7 @@ return require(ReplicatedStorage.Rodux).createReducer({}, {
 		table.insert(t, t2)
 		return t
 	end,
-	removeReceiptItem = function(p1, p2) --[[ Name: removeReceiptItem | Line: 26 ]]
+	removeReceiptItem = function(p1, p2)
 		assert(p2.name ~= nil, "missing receipt item Name")
 		assert(p2.category ~= nil, "missing receipt item Category")
 		local t = {}
@@ -33,7 +34,7 @@ return require(ReplicatedStorage.Rodux).createReducer({}, {
 		end
 		return t
 	end,
-	removeReceiptCategory = function(p1, p2) --[[ Name: removeReceiptCategory | Line: 38 ]]
+	removeReceiptCategory = function(p1, p2)
 		assert(p2.category ~= nil, "missing receipt item Category")
 		local t = {}
 		for i = 1, #p1 do
@@ -44,10 +45,10 @@ return require(ReplicatedStorage.Rodux).createReducer({}, {
 		end
 		return t
 	end,
-	clearReceipt = function() --[[ Name: clearReceipt | Line: 49 ]]
+	clearReceipt = function()
 		return {}
 	end,
-	setPage = function() --[[ Name: setPage | Line: 53 ]]
+	setPage = function()
 		return {}
 	end
 })

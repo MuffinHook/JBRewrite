@@ -3,53 +3,53 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local _allAirDropData = require(ReplicatedStorage.AirDrop.Data._allAirDropData)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local RewardDataUtils = require(ReplicatedStorage.RewardData.RewardDataUtils)
-local t = {}
-local function lerp(p1, p2, p3)
-	return (p2 - p1) * p3 + p1
+local AirDropDataUtilsModule = {}
+local function linearInterpolate(startValue, endValue, progress)
+	return (endValue - startValue) * progress + startValue
 end
-function t.getProportionOfMaxAirDropScalingDurationDone(p1, p2)
-	local DurationToGetMaxScaling = t.getAirDropTypeData(p1).DurationToGetMaxScaling
-	return math.min(p2, DurationToGetMaxScaling) / DurationToGetMaxScaling
+function AirDropDataUtilsModule.getProportionOfMaxAirDropScalingDurationDone(airDropTypeId, elapsedTime)
+	local DurationToGetMaxScaling = AirDropDataUtilsModule.getAirDropTypeData(airDropTypeId).DurationToGetMaxScaling
+	return math.min(elapsedTime, DurationToGetMaxScaling) / DurationToGetMaxScaling
 end
-function t.getCurrentGuardWaveData(p1, p2)
-	local v1 = t.getAirDropTypeData(p1)
-	local v2 = t.getProportionOfMaxAirDropScalingDurationDone(p1, p2)
-	local t2 = {}
-	for v3, v4 in v1.BeginningData.GuardData do
-		t2[v3] = (v1.EndingData.GuardData[v3] - v4) * v2 + v4
+function AirDropDataUtilsModule.getCurrentGuardWaveData(airDropTypeId, elapsedTime)
+	local airDropTypeData = AirDropDataUtilsModule.getAirDropTypeData(airDropTypeId)
+	local scalingProgress = AirDropDataUtilsModule.getProportionOfMaxAirDropScalingDurationDone(airDropTypeId, elapsedTime)
+	local currentGuardData = {}
+	for key, beginningValue in airDropTypeData.BeginningData.GuardData do
+		currentGuardData[key] = (airDropTypeData.EndingData.GuardData[key] - beginningValue) * scalingProgress + beginningValue
 	end
-	return t2
+	return currentGuardData
 end
-function t.getCurrentMoneyDropData(p1, p2)
-	local v1 = t.getAirDropTypeData(p1)
-	local v2 = t.getProportionOfMaxAirDropScalingDurationDone(p1, p2)
-	local t2 = {}
-	for v3, v4 in v1.BeginningData.MoneyDropData do
-		t2[v3] = (v1.EndingData.MoneyDropData[v3] - v4) * v2 + v4
+function AirDropDataUtilsModule.getCurrentMoneyDropData(airDropTypeId, elapsedTime)
+	local airDropTypeData = AirDropDataUtilsModule.getAirDropTypeData(airDropTypeId)
+	local scalingProgress = AirDropDataUtilsModule.getProportionOfMaxAirDropScalingDurationDone(airDropTypeId, elapsedTime)
+	local currentMoneyData = {}
+	for key, beginningValue in airDropTypeData.BeginningData.MoneyDropData do
+		currentMoneyData[key] = (airDropTypeData.EndingData.MoneyDropData[key] - beginningValue) * scalingProgress + beginningValue
 	end
-	return t2
+	return currentMoneyData
 end
-function t.getAirDropTypeData(p1)
-	return _allAirDropData[p1]
+function AirDropDataUtilsModule.getAirDropTypeData(airDropTypeId)
+	return _allAirDropData[airDropTypeId]
 end
-function t.getCurrentAirDropRarityProbabilities(p1, p2)
-	local v1 = t.getAirDropTypeData(p1)
-	local v2 = t.getProportionOfMaxAirDropScalingDurationDone(p1, p2)
-	local t2 = {}
-	for v3, v4 in v1.BeginningData.RarityProbs do
-		local v5 = v1.EndingData.RarityProbs[v3]
-		assert(v5, "No ending probability")
-		t2[v3] = (v5 - v4) * v2 + v4
+function AirDropDataUtilsModule.getCurrentAirDropRarityProbabilities(airDropTypeId, elapsedTime)
+	local airDropTypeData = AirDropDataUtilsModule.getAirDropTypeData(airDropTypeId)
+	local scalingProgress = AirDropDataUtilsModule.getProportionOfMaxAirDropScalingDurationDone(airDropTypeId, elapsedTime)
+	local currentRarityProbs = {}
+	for rarityId, beginningProb in airDropTypeData.BeginningData.RarityProbs do
+		local endingProb = airDropTypeData.EndingData.RarityProbs[rarityId]
+		assert(endingProb, "No ending probability")
+		currentRarityProbs[rarityId] = (endingProb - beginningProb) * scalingProgress + beginningProb
 	end
-	return t2
+	return currentRarityProbs
 end
-function t.getCurrentDataForAirDrop(p1, p2)
-	local v1 = t.getCurrentAirDropRarityProbabilities(p1, p2)
-	local v2 = TableUtils.deepCopy(t.getAirDropTypeData(p1))
-	v2.RarityProbabilities = v1
-	RewardDataUtils.addAbsoluteProbsToRewardDataFromRarityProbs(v2.RewardData, v2.RarityProbabilities)
-	v2.GuardData = t.getCurrentGuardWaveData(p1, p2)
-	v2.MoneyDropData = t.getCurrentMoneyDropData(p1, p2)
-	return v2
+function AirDropDataUtilsModule.getCurrentDataForAirDrop(airDropTypeId, elapsedTime)
+	local currentRarityProbs = AirDropDataUtilsModule.getCurrentAirDropRarityProbabilities(airDropTypeId, elapsedTime)
+	local currentAirDropData = TableUtils.deepCopy(AirDropDataUtilsModule.getAirDropTypeData(airDropTypeId))
+	currentAirDropData.RarityProbabilities = currentRarityProbs
+	RewardDataUtils.addAbsoluteProbsToRewardDataFromRarityProbs(currentAirDropData.RewardData, currentAirDropData.RarityProbabilities)
+	currentAirDropData.GuardData = AirDropDataUtilsModule.getCurrentGuardWaveData(airDropTypeId, elapsedTime)
+	currentAirDropData.MoneyDropData = AirDropDataUtilsModule.getCurrentMoneyDropData(airDropTypeId, elapsedTime)
+	return currentAirDropData
 end
-return t
+return AirDropDataUtilsModule

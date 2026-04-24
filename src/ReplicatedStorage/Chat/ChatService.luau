@@ -9,131 +9,131 @@ local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local RichTextUtils = require(ReplicatedStorage.Std.RichTextUtils)
 local Signal = require(ReplicatedStorage.Std.Signal)
-local t = {}
-local v1 = Color3.fromRGB(110, 197, 59)
-local v2 = Color3.fromRGB(255, 192, 203)
-local v3 = Color3.fromRGB(255, 191, 5)
-local v4 = Color3.fromRGB(235, 88, 88)
-local v5 = Color3.fromHex("f1da10")
-t.onMessageIncoming = Signal.new()
-function t.init()
+local ChatService = {}
+local partnerColor = Color3.fromRGB(110, 197, 59)
+local tradingVIPColor = Color3.fromRGB(255, 192, 203)
+local vipColor = Color3.fromRGB(255, 191, 5)
+local badimoColor = Color3.fromRGB(235, 88, 88)
+local systemMessageColor = Color3.fromHex("f1da10")
+ChatService.onMessageIncoming = Signal.new()
+function ChatService.init()
 	local ChatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
 	if ChatWindowConfiguration then
 		ChatWindowConfiguration.TextStrokeTransparency = 0.7
 	else
 		warn("ChatWindowConfiguration not found")
 	end
-	local v12 = Maid.new()
-	local t2 = {}
-	local function playerRemoving(p1)
-		v12[p1] = nil
-		t2[p1] = nil
+	local playerMaids = Maid.new()
+	local playerChatDataMap = {}
+	local function playerRemoving(player)
+		playerMaids[player] = nil
+		playerChatDataMap[player] = nil
 	end
-	local function setPlayerChatData(p1)
-		local t = {
+	local function setPlayerChatData(player)
+		local chatData = {
 			Tags = {}
 		}
-		if RunUtils.isMainWorld() and GamepassSystem.doesPlayerOwnCached(p1, GamepassUtils.EnumGamepass.VIP) then
-			t.ChatColor = v3
-			table.insert(t.Tags, {
+		if RunUtils.isMainWorld() and GamepassSystem.doesPlayerOwnCached(player, GamepassUtils.EnumGamepass.VIP) then
+			chatData.ChatColor = vipColor
+			table.insert(chatData.Tags, {
 				TagText = "[VIP] ",
-				TagColor = v3
+				TagColor = vipColor
 			})
 		end
-		if RunUtils.isTradeWorld() and GamepassSystem.doesPlayerOwnCached(p1, GamepassUtils.EnumGamepass.TradingVIP) then
-			t.ChatColor = v2
-			table.insert(t.Tags, {
+		if RunUtils.isTradeWorld() and GamepassSystem.doesPlayerOwnCached(player, GamepassUtils.EnumGamepass.TradingVIP) then
+			chatData.ChatColor = tradingVIPColor
+			table.insert(chatData.Tags, {
 				TagText = "[TradingVIP] ",
-				TagColor = v2
+				TagColor = tradingVIPColor
 			})
 		end
-		if p1:GetAttribute("IsPartner") then
-			table.insert(t.Tags, {
+		if player:GetAttribute("IsPartner") then
+			table.insert(chatData.Tags, {
 				TagText = "[Star] ",
-				TagColor = v1
+				TagColor = partnerColor
 			})
 		end
-		if AdminPermUtils.isBadimo(p1) then
-			t.ChatColor = v4
-			table.clear(t.Tags)
-			table.insert(t.Tags, {
+		if AdminPermUtils.isBadimo(player) then
+			chatData.ChatColor = badimoColor
+			table.clear(chatData.Tags)
+			table.insert(chatData.Tags, {
 				TagText = "[Badimo] ",
-				TagColor = v4
+				TagColor = badimoColor
 			})
 		end
-		t2[p1] = t
+		playerChatDataMap[player] = chatData
 	end
-	local function playerAdded(p1)
-		local v1 = Maid.new()
-		v12[p1] = v1
-		setPlayerChatData(p1)
-		v1:GiveTask(GamepassSystem.OnAnyPlayerAnyOwned:Connect(function(p12, p2)
-			if p12 == p1 then
-				setPlayerChatData(p1)
+	local function playerAdded(player)
+		local playerMaid = Maid.new()
+		playerMaids[player] = playerMaid
+		setPlayerChatData(player)
+		playerMaid:GiveTask(GamepassSystem.OnAnyPlayerAnyOwned:Connect(function(ownerPlayer, gamepass)
+			if ownerPlayer == player then
+				setPlayerChatData(player)
 			end
 		end))
-		v1:GiveTask(p1:GetAttributeChangedSignal("IsPartner"):Connect(function()
-			setPlayerChatData(p1)
+		playerMaid:GiveTask(player:GetAttributeChangedSignal("IsPartner"):Connect(function()
+			setPlayerChatData(player)
 		end))
 	end
-	for v22, v32 in Players:GetPlayers() do
-		playerAdded(v32)
+	for _, player in Players:GetPlayers() do
+		playerAdded(player)
 	end
 	Players.PlayerAdded:Connect(playerAdded)
 	Players.PlayerRemoving:Connect(playerRemoving)
-	function TextChatService.OnIncomingMessage(p1)
+	function TextChatService.OnIncomingMessage(message)
 		local TextChatMessageProperties = Instance.new("TextChatMessageProperties")
-		local TextChannel = p1.TextChannel
-		local v1 = if TextChannel then string.find(TextChannel.Name, "RBXTeam") else nil
-		if p1.TextSource == nil and p1.Metadata == "BadimoSystemMessage" then
-			local v3 = v5
-			if RichTextUtils.doesTextHaveColor(p1.Text) then
-				v3 = RichTextUtils.extractColorFromText(p1.Text)
+		local TextChannel = message.TextChannel
+		local isTeamChannel = if TextChannel then string.find(TextChannel.Name, "RBXTeam") else nil
+		if message.TextSource == nil and message.Metadata == "BadimoSystemMessage" then
+			local messageColor = systemMessageColor
+			if RichTextUtils.doesTextHaveColor(message.Text) then
+				messageColor = RichTextUtils.extractColorFromText(message.Text)
 			else
-				TextChatMessageProperties.Text = RichTextUtils.addColorToText(p1.Text, v5)
+				TextChatMessageProperties.Text = RichTextUtils.addColorToText(message.Text, systemMessageColor)
 			end
-			TextChatMessageProperties.PrefixText = RichTextUtils.addColorToText("[System]", v3) .. p1.PrefixText
-		elseif v1 then
-			TextChatMessageProperties.Text = RichTextUtils.addColorToText(p1.Text, BrickColor.new((string.sub(TextChannel.Name, v1 + 7))).Color)
-		elseif p1.TextSource then
-			local UserId = p1.TextSource.UserId
-			local v7 = Players:GetPlayerByUserId(UserId)
-			if v7 then
-				if v7:GetAttribute("ChatLoaded") == true or v7 == Players.LocalPlayer then
-					local v8 = t2[v7]
-					if v8 then
-						local PrefixText = p1.PrefixText
-						for v9, v10 in v8.Tags do
-							local v11 = v10.TagColor or Color3.new(255/255, 255/255, 255/255)
-							local v12 = v10.TagText or ""
-							if #v12 > 0 then
-								PrefixText = RichTextUtils.addColorToText(v12, v11) .. PrefixText
+			TextChatMessageProperties.PrefixText = RichTextUtils.addColorToText("[System]", messageColor) .. message.PrefixText
+		elseif isTeamChannel then
+			TextChatMessageProperties.Text = RichTextUtils.addColorToText(message.Text, BrickColor.new((string.sub(TextChannel.Name, isTeamChannel + 7))).Color)
+		elseif message.TextSource then
+			local UserId = message.TextSource.UserId
+			local sourcePlayer = Players:GetPlayerByUserId(UserId)
+			if sourcePlayer then
+				if sourcePlayer:GetAttribute("ChatLoaded") == true or sourcePlayer == Players.LocalPlayer then
+					local sourcePlayerChatData = playerChatDataMap[sourcePlayer]
+					if sourcePlayerChatData then
+						local PrefixText = message.PrefixText
+						for _, tag in sourcePlayerChatData.Tags do
+							local tagColor = tag.TagColor or Color3.new(255/255, 255/255, 255/255)
+							local tagText = tag.TagText or ""
+							if #tagText > 0 then
+								PrefixText = RichTextUtils.addColorToText(tagText, tagColor) .. PrefixText
 							end
 						end
 						TextChatMessageProperties.PrefixText = PrefixText
-						local Text = p1.Text
-						local v13 = v8.ChatColor or Color3.new(255/255, 255/255, 255/255)
-						TextChatMessageProperties.Text = if UserId == 1 then RichTextUtils.addColorToText(Text, Color3.fromHSV(math.random(), 1, 1)) else RichTextUtils.addColorToText(Text, v13)
+						local Text = message.Text
+						local chatColor = sourcePlayerChatData.ChatColor or Color3.new(255/255, 255/255, 255/255)
+						TextChatMessageProperties.Text = if UserId == 1 then RichTextUtils.addColorToText(Text, Color3.fromHSV(math.random(), 1, 1)) else RichTextUtils.addColorToText(Text, chatColor)
 					else
 						return
 					end
 				else
-					p1.Status = Enum.TextChatMessageStatus.InvalidTextChannelPermissions
+					message.Status = Enum.TextChatMessageStatus.InvalidTextChannelPermissions
 					return nil
 				end
 			else
 				return
 			end
 		end
-		t.onMessageIncoming:Fire(p1, TextChatMessageProperties)
+		ChatService.onMessageIncoming:Fire(message, TextChatMessageProperties)
 		return TextChatMessageProperties
 	end
-	function TextChatService.OnBubbleAdded(p1, p2)
-		if p1.TextSource then
+	function TextChatService.OnBubbleAdded(message, bubbleInstance)
+		if message.TextSource then
 			local BubbleChatMessageProperties = Instance.new("BubbleChatMessageProperties")
 			BubbleChatMessageProperties.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 			return BubbleChatMessageProperties
 		end
 	end
 end
-return t
+return ChatService

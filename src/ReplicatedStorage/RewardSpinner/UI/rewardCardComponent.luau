@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local createElement = require(ReplicatedStorage.Roact).createElement
 local ViewportFrame = require(ReplicatedStorage.EzUi.ViewportFrame)
-return function(p1) --[[ Line: 12 | Upvalues: createElement (copy), ViewportFrame (copy) ]]
+return function(p1)
 	local aspectRatio = p1.aspectRatio
 	local v2 = p1.backGlowEnabled or false
 	local bubbleColor = p1.bubbleColor

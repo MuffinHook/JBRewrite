@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local t = {
-	getInstance = function(p1) --[[ Name: getInstance | Line: 3 ]]
+	getInstance = function(p1)
 		local Part = Instance.new("Part")
 		Part.Shape = Enum.PartType.Ball
 		Part.Size = Vector3.new(4, 4, 4)
@@ -20,7 +21,7 @@ local t = {
 		Part.CFrame = CFrame.new()
 		return Part
 	end,
-	updateCamera = function(p1, p2) --[[ Name: updateCamera | Line: 24 ]]
+	updateCamera = function(p1, p2)
 		local v1 = os.clock() / 2
 		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 	end
@@ -65,10 +66,10 @@ local t2 = {
 		Price = 30000
 	}
 }
-function t.getItems() --[[ Line: 70 | Upvalues: t2 (copy) ]]
+function t.getItems()
 	return t2
 end
-function t.apply(p1, p2) --[[ Line: 73 ]]
+function t.apply(p1, p2)
 	local FlooringMaterial = p2:FindFirstChild("FlooringMaterial")
 	if FlooringMaterial then
 		local count = 0

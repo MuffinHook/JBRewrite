@@ -1,16 +1,17 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Std.Promise)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local RunService = game:GetService("RunService")
 local ContentProvider = game:GetService("ContentProvider")
-local function Preload(p1) --[[ Line: 11 | Upvalues: ContentProvider (copy) ]]
+local function Preload(p1)
 	local t = {}
 	for v1, v2 in next, p1 do
 		local Sound = Instance.new("Sound")
 		Sound.SoundId = "rbxassetid://" .. v2
 		table.insert(t, Sound)
 	end
-	spawn(function() --[[ Line: 23 | Upvalues: ContentProvider (ref), t (copy) ]]
+	spawn(function()
 		ContentProvider:PreloadAsync(t)
 		for v1, v2 in next, t do
 			v2:Destroy()
@@ -18,14 +19,14 @@ local function Preload(p1) --[[ Line: 11 | Upvalues: ContentProvider (copy) ]]
 	end)
 	return true
 end
-local function PreloadHash(p1) --[[ Line: 31 | Upvalues: Preload (copy) ]]
+local function PreloadHash(p1)
 	local t = {}
 	for v1, v2 in next, p1 do
 		table.insert(t, v2)
 	end
 	return Preload(t)
 end
-local function ObjectLocal(p1, p2, p3) --[[ Line: 56 ]]
+local function ObjectLocal(p1, p2, p3)
 	assert(p1, "SourceObject cannot be nil")
 	assert(typeof(p1) == "Instance", "SourceObject must be an Instance")
 	if p1:IsDescendantOf(workspace) and not (p1:IsA("BasePart") or p1:IsA("Attachment")) then
@@ -96,7 +97,7 @@ local function ObjectLocal(p1, p2, p3) --[[ Line: 56 ]]
 	if not v3 then
 		Sound:Play()
 		if not Sound.Looped then
-			task.spawn(function() --[[ Line: 142 | Upvalues: v2 (ref), Sound (copy) ]]
+			task.spawn(function()
 				local v1 = v2
 				if v1 == nil then
 					if not Sound.IsLoaded then
@@ -110,7 +111,7 @@ local function ObjectLocal(p1, p2, p3) --[[ Line: 56 ]]
 	end
 	return Sound
 end
-local function WorldPositionLocal(p1, p2, p3) --[[ Line: 156 | Upvalues: ObjectLocal (copy) ]]
+local function WorldPositionLocal(p1, p2, p3)
 	local SoundPart = Instance.new("Part")
 	SoundPart.Anchored = true
 	SoundPart.CanCollide = false
@@ -121,8 +122,8 @@ local function WorldPositionLocal(p1, p2, p3) --[[ Line: 156 | Upvalues: ObjectL
 	SoundPart.Parent = workspace
 	return ObjectLocal(SoundPart, p2, p3)
 end
-local function FadeOut(p1, p2) --[[ Line: 167 ]]
-	spawn(function() --[[ Line: 168 | Upvalues: p1 (copy), p2 (copy) ]]
+local function FadeOut(p1, p2)
+	spawn(function()
 		local Volume = p1.Volume
 		for i = 1, 0, -0.03 / p2 do
 			p1.Volume = Volume * i
@@ -131,7 +132,7 @@ local function FadeOut(p1, p2) --[[ Line: 167 ]]
 		p1.Volume = 0
 	end)
 end
-local function Ease_InOutQuad(p1) --[[ Line: 179 ]]
+local function Ease_InOutQuad(p1)
 	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
 end
 return {
@@ -140,14 +141,14 @@ return {
 	Preload = Preload,
 	PreloadHash = PreloadHash,
 	FadeOut = FadeOut,
-	FadeTo = function(p1, p2, p3, p4) --[[ Name: FadeTo | Line: 182 | Upvalues: RunService (copy) ]]
+	FadeTo = function(p1, p2, p3, p4)
 		assert(p1)
 		assert(p2)
 		assert(p3)
 		local Volume = p1.Volume
 		local v1 = tick()
 		local v2 = nil
-		v2 = RunService.Heartbeat:Connect(function() --[[ Line: 189 | Upvalues: p1 (copy), v2 (ref), v1 (copy), p3 (copy), Volume (copy), p2 (copy), p4 (copy) ]]
+		v2 = RunService.Heartbeat:Connect(function()
 			if p1.Parent == nil then
 				v2:Disconnect()
 			else
@@ -175,19 +176,19 @@ return {
 		end)
 		return v2
 	end,
-	promiseFadeTo = function(p1, p2, p3) --[[ Name: promiseFadeTo | Line: 210 | Upvalues: Promise (copy), Maid (copy), RunService (copy) ]]
+	promiseFadeTo = function(p1, p2, p3)
 		assert(p1)
 		assert(p2)
 		assert(p3)
 		local v1 = os.clock()
-		return Promise.new(function(p12, p22, p32) --[[ Line: 215 | Upvalues: Maid (ref), p1 (copy), RunService (ref), v1 (copy), p3 (copy), p2 (copy) ]]
+		return Promise.new(function(p12, p22, p32)
 			local v12 = Maid.new()
-			if not p32(function() --[[ Line: 217 | Upvalues: v12 (ref) ]]
+			if not p32(function()
 				v12:Destroy()
 				v12 = nil
 			end) then
 				local Volume = p1.Volume
-				v12:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 224 | Upvalues: v1 (ref), p3 (ref), p1 (ref), v12 (ref), p22 (copy), Volume (copy), p2 (ref), p12 (copy) ]]
+				v12:GiveTask(RunService.Heartbeat:Connect(function()
 					local v13 = (os.clock() - v1) / p3
 					if v13 >= 1 then
 						v13 = 1

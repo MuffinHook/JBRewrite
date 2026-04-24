@@ -1,49 +1,50 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SeasonConsts = require(ReplicatedStorage.Game.Season.SeasonConsts)
 local LevelConsts = require(script.Parent.LevelConsts)
 local t = {
-	getLevelValue = function(p1) --[[ Name: getLevelValue | Line: 7 | Upvalues: LevelConsts (copy) ]]
+	getLevelValue = function(p1)
 		assert(p1 ~= nil)
 		return p1:FindFirstChild(LevelConsts.LEVEL_VALUE_NAME)
 	end,
-	yieldLevelValue = function(p1) --[[ Name: yieldLevelValue | Line: 11 | Upvalues: LevelConsts (copy) ]]
+	yieldLevelValue = function(p1)
 		assert(p1 ~= nil)
 		return p1:WaitForChild(LevelConsts.LEVEL_VALUE_NAME)
 	end
 }
-function t.yieldLevel(p1) --[[ Line: 15 | Upvalues: t (copy) ]]
+function t.yieldLevel(p1)
 	assert(p1 ~= nil)
 	return t.yieldLevelValue(p1).Value
 end
-function t.getLevel(p1) --[[ Line: 19 | Upvalues: t (copy) ]]
+function t.getLevel(p1)
 	local v1 = t.getLevelValue(p1)
 	if v1 then
 		return v1.Value
 	end
 end
-function t.getExpValue(p1) --[[ Line: 25 | Upvalues: LevelConsts (copy) ]]
+function t.getExpValue(p1)
 	assert(p1 ~= nil)
 	return p1:FindFirstChild(LevelConsts.EXP_VALUE_NAME)
 end
-function t.yieldExpValue(p1) --[[ Line: 29 | Upvalues: LevelConsts (copy) ]]
+function t.yieldExpValue(p1)
 	assert(p1 ~= nil)
 	return p1:WaitForChild(LevelConsts.EXP_VALUE_NAME)
 end
-function t.yieldExp(p1) --[[ Line: 33 | Upvalues: t (copy) ]]
+function t.yieldExp(p1)
 	assert(p1 ~= nil)
 	return t.yieldExpValue(p1).Value
 end
-function t.getExp(p1) --[[ Line: 37 | Upvalues: t (copy) ]]
+function t.getExp(p1)
 	local v1 = t.getExpValue(p1)
 	if v1 then
 		return v1.Value
 	end
 end
-function t.yieldTotalExp(p1) --[[ Line: 43 | Upvalues: t (copy) ]]
+function t.yieldTotalExp(p1)
 	local v1 = t.yieldLevel(p1)
 	return t.calculateExpOfLevel(v1) + t.yieldExp(p1)
 end
-local function getTotalExpAtLevel(p1, p2, p3, p4) --[[ Line: 49 ]]
+local function getTotalExpAtLevel(p1, p2, p3, p4)
 	local v1 = if p4 == 1 then p2 / p3 else p2 * (1 - p4) / (1 - p4 ^ p3)
 	local v2 = if p4 == 1 then v1 * p1 else v1 * (1 - p4 ^ p1) / (1 - p4)
 	local count = math.floor(v2)
@@ -54,10 +55,10 @@ local function getTotalExpAtLevel(p1, p2, p3, p4) --[[ Line: 49 ]]
 end
 local v1 = LevelConsts.EFFICIENCY * (LevelConsts.AVG_EXP_PER_CONTRACT * LevelConsts.CONTRACTS_PER_DAY * LevelConsts.TOTAL_DAYS + LevelConsts.MAX_DAILY_EXP * LevelConsts.TOTAL_DAYS)
 local CURVE_K = LevelConsts.CURVE_K
-function t.calculateExpNextLevel(p1) --[[ Line: 83 | Upvalues: t (copy) ]]
+function t.calculateExpNextLevel(p1)
 	return t.calculateExpOfLevel(p1 + 1) - t.calculateExpOfLevel(p1)
 end
-function t.calculateExpOfLevel(p1) --[[ Line: 86 | Upvalues: v1 (copy), SeasonConsts (copy), CURVE_K (copy) ]]
+function t.calculateExpOfLevel(p1)
 	if p1 <= 0 then
 		return 0
 	else
@@ -74,7 +75,7 @@ function t.calculateExpOfLevel(p1) --[[ Line: 86 | Upvalues: v1 (copy), SeasonCo
 		return count
 	end
 end
-function t.calculateLevelFromExp(p1) --[[ Line: 92 | Upvalues: t (copy) ]]
+function t.calculateLevelFromExp(p1)
 	local count = 1
 	local v1 = 0
 	while true do

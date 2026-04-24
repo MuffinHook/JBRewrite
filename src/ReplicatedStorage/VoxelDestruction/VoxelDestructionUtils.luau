@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Terrain = workspace:FindFirstChild("Terrain")
 local CollectionService = game:GetService("CollectionService")
 game:GetService("Debris")
@@ -8,7 +9,7 @@ local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local Pool = require(ReplicatedStorage.Std.Debug.Pool)
 local VoxelDestructionConsts = require(ReplicatedStorage.VoxelDestruction.VoxelDestructionConsts)
-local v1 = Pool.new(function() --[[ Line: 13 ]]
+local v1 = Pool.new(function()
 	local Part = Instance.new("Part")
 	Part.Anchored = true
 	local SmoothNoOutlines = Enum.SurfaceType.SmoothNoOutlines
@@ -16,16 +17,16 @@ local v1 = Pool.new(function() --[[ Line: 13 ]]
 	Part.TopSurface = SmoothNoOutlines
 	Part.BottomSurface = SmoothNoOutlines_2
 	return Part
-end, function(p1) --[[ Line: 18 ]]
+end, function(p1)
 	p1:Destroy()
 end)
 v1:Populate(5000)
-local function vec3Func(p1, p2) --[[ Line: 23 ]]
+local function vec3Func(p1, p2)
 	local v1 = p1(p2.X)
 	local v2 = p1(p2.Y)
 	return Vector3.new(v1, v2, p1(p2.Z))
 end
-local function slice(p1, p2, p3) --[[ Line: 27 ]]
+local function slice(p1, p2, p3)
 	local Size = p1.Size
 	local v1 = p1.CFrame
 	local v2 = v1 - v1.Position
@@ -48,7 +49,7 @@ local function slice(p1, p2, p3) --[[ Line: 27 ]]
 		return nil, nil
 	end
 end
-local function cut(p1, p2, p3) --[[ Line: 63 | Upvalues: slice (copy) ]]
+local function cut(p1, p2, p3)
 	local v1 = p3[1].CFrame
 	local t = {}
 	local v2 = p2 / 2
@@ -91,11 +92,11 @@ local function cut(p1, p2, p3) --[[ Line: 63 | Upvalues: slice (copy) ]]
 	end
 	return t2
 end
-local function voxelizeToXYZ(p1, p2, p3) --[[ Line: 124 ]]
+local function voxelizeToXYZ(p1, p2, p3)
 	local ceil = math.ceil
 	local v1 = p2 / p3
 	local v5 = Vector3.new(ceil(v1.X), ceil(v1.Y), (ceil(v1.Z)))
-	local function f() --[[ Line: 126 | Upvalues: v5 (copy) ]]
+	local function f()
 		for i = 1, v5.X do
 			for j = 1, v5.Y do
 				for k = 1, v5.Z do
@@ -106,12 +107,12 @@ local function voxelizeToXYZ(p1, p2, p3) --[[ Line: 124 ]]
 	end
 	return coroutine.wrap(f)
 end
-local function voxelizeToRelativeVoxelV3(p1, p2, p3) --[[ Line: 137 ]]
+local function voxelizeToRelativeVoxelV3(p1, p2, p3)
 	local ceil = math.ceil
 	local v1 = p2 / p3
 	local v5 = Vector3.new(ceil(v1.X), ceil(v1.Y), (ceil(v1.Z)))
 	local v6 = -(p3 + v5 * p3) / 2
-	local function f() --[[ Line: 140 | Upvalues: v5 (copy), p3 (copy), v6 (copy) ]]
+	local function f()
 		for i = 1, v5.X do
 			for j = 1, v5.Y do
 				for k = 1, v5.Z do
@@ -122,15 +123,15 @@ local function voxelizeToRelativeVoxelV3(p1, p2, p3) --[[ Line: 137 ]]
 	end
 	return coroutine.wrap(f)
 end
-local function vec3Hash(p1) --[[ Line: 153 ]]
+local function vec3Hash(p1)
 	return (p1.X * 73856093 + p1.Y * 19351301 + p1.Z * 83492791) % 100000000
 end
-local function xyzHash(p1, p2, p3) --[[ Line: 157 ]]
+local function xyzHash(p1, p2, p3)
 	return (p1 * 73856093 + p2 * 19351301 + p3 * 83492791) % 100000000
 end
-local function greedyMesh(p1, p2, p3, p4) --[[ Line: 162 ]]
+local function greedyMesh(p1, p2, p3, p4)
 	local t = {}
-	local function isXFilled(p1, p2, p3, p42) --[[ Line: 169 | Upvalues: t (copy), p4 (copy) ]]
+	local function isXFilled(p1, p2, p3, p42)
 		for i = p1, p2 do
 			local v1 = (i * 73856093 + p3 * 19351301 + p42 * 83492791) % 100000000
 			if t[v1] or not p4(v1, i, p3, p42) then
@@ -139,7 +140,7 @@ local function greedyMesh(p1, p2, p3, p4) --[[ Line: 162 ]]
 		end
 		return true
 	end
-	local function isXZFilled(p1, p2, p3, p42, p5) --[[ Line: 178 | Upvalues: t (copy), p4 (copy) ]]
+	local function isXZFilled(p1, p2, p3, p42, p5)
 		for i = p42, p5 do
 			for j = p1, p2 do
 				local v1 = (j * 73856093 + p3 * 19351301 + i * 83492791) % 100000000
@@ -150,7 +151,7 @@ local function greedyMesh(p1, p2, p3, p4) --[[ Line: 162 ]]
 		end
 		return true
 	end
-	local function getChunkSize(p12, p22, p32) --[[ Line: 190 | Upvalues: p1 (copy), p2 (copy), p3 (copy), t (copy), p4 (copy), isXFilled (copy), isXZFilled (copy) ]]
+	local function getChunkSize(p12, p22, p32)
 		local v1 = p2
 		local v2 = p3
 		local count = 0
@@ -192,7 +193,7 @@ local function greedyMesh(p1, p2, p3, p4) --[[ Line: 162 ]]
 		end
 		return count, count_2, count_3
 	end
-	local function f() --[[ Line: 238 | Upvalues: p1 (copy), p2 (copy), p3 (copy), t (copy), p4 (copy), getChunkSize (copy) ]]
+	local function f()
 		for i = 1, p1 do
 			for j = 1, p2 do
 				for k = 1, p3 do
@@ -210,7 +211,7 @@ end
 local VoxelDestructionDebris = Instance.new("Model")
 VoxelDestructionDebris.Name = "VoxelDestructionDebris"
 VoxelDestructionDebris.Parent = workspace
-local function tossDebris(p1, p2, p3, p4) --[[ Line: 263 | Upvalues: v1 (copy), VoxelDestructionDebris (copy), GeomUtils (copy) ]]
+local function tossDebris(p1, p2, p3, p4)
 	local v12 = v1:Get()
 	v12.CastShadow = false
 	v12.Size = Vector3.new(math.min(p3.X, p4.Size.X), math.min(p3.Y, p4.Size.Y), (math.min(p3.Z, p4.Size.Z)))
@@ -226,24 +227,24 @@ local function tossDebris(p1, p2, p3, p4) --[[ Line: 263 | Upvalues: v1 (copy), 
 	v12.Parent = VoxelDestructionDebris
 	v12.AssemblyLinearVelocity = ((p2 - p1).Unit * 0.5 + GeomUtils.randomPointInSphere() * 0.5 + Vector3.new(0, 1, 0)) * 100
 	v12.AssemblyAngularVelocity = GeomUtils.randomPointInSphere() * 100
-	task.delay(math.random(), function() --[[ Line: 287 | Upvalues: v12 (copy), v1 (ref) ]]
+	task.delay(math.random(), function()
 		v12.Parent = nil
 		v1:Free(v12)
 	end)
 end
-local function decompose(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 293 | Upvalues: tossDebris (copy), greedyMesh (copy) ]]
+local function decompose(p1, p2, p3, p4, p5, p6, p7)
 	local t = {}
 	local v1 = 0
 	local round = math.round
 	local v2 = p2 / p3
 	local v6 = Vector3.new(round(v2.X), round(v2.Y), (round(v2.Z)))
 	local v7 = -(p3 + v6 * p3) / 2
-	local function hasVoxelAt(p12, p2, p32) --[[ Line: 307 | Upvalues: p3 (copy), v7 (copy), p1 (copy), p4 (copy), p5 (copy) ]]
+	local function hasVoxelAt(p12, p2, p32)
 		local v1 = Vector3.new(p12, p2, p32) * p3 + v7
 		return (p1 * v1 - p4).Magnitude > p5 + math.noise(v1.X * 10 + 3845.013130122367, v1.Y * 10 + 10782.895910767973, v1.Z * 10 + 6047.444858337303) * 0.5
 	end
 	local v8 = 0.2 * (p3.Magnitude * 0.5773502691896257)
-	local function cachedHasVoxelAt(p12, p2, p32, p42) --[[ Line: 324 | Upvalues: t (copy), hasVoxelAt (copy), p7 (copy), v8 (copy), p3 (copy), v7 (copy), p1 (copy), tossDebris (ref), p4 (copy), p6 (copy), v1 (ref) ]]
+	local function cachedHasVoxelAt(p12, p2, p32, p42)
 		if t[p12] then
 			return t[p12]
 		else
@@ -251,7 +252,7 @@ local function decompose(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 293 | Upvalues: 
 			t[p12] = v12
 			if p7 and (not v12 and math.random() < v8) then
 				local v2 = p1 * (Vector3.new(p2, p32, p42) * p3 + v7)
-				task.delay(math.random() * 0.2, function() --[[ Line: 334 | Upvalues: tossDebris (ref), p4 (ref), v2 (copy), p3 (ref), p6 (ref) ]]
+				task.delay(math.random() * 0.2, function()
 					tossDebris(p4, v2, p3, p6)
 				end)
 			end
@@ -291,7 +292,7 @@ local function decompose(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 293 | Upvalues: 
 	end
 	return Model
 end
-local function getBoundingBoxParts(p1, p2) --[[ Line: 380 ]]
+local function getBoundingBoxParts(p1, p2)
 	local CollisionDetectionDummyPart = Instance.new("Part")
 	CollisionDetectionDummyPart.Name = "CollisionDetectionDummyPart"
 	CollisionDetectionDummyPart.Size = p2
@@ -299,13 +300,13 @@ local function getBoundingBoxParts(p1, p2) --[[ Line: 380 ]]
 	CollisionDetectionDummyPart.Anchored = false
 	CollisionDetectionDummyPart.CanCollide = true
 	CollisionDetectionDummyPart.Parent = workspace
-	local v1 = CollisionDetectionDummyPart.Touched:Connect(function() --[[ Line: 389 ]] end)
+	local v1 = CollisionDetectionDummyPart.Touched:Connect(function()  end)
 	local v2 = CollisionDetectionDummyPart:GetTouchingParts()
 	v1:Disconnect()
 	CollisionDetectionDummyPart:Destroy()
 	return v2
 end
-local function alignToVoxelGrid(p1, p2, p3, p4) --[[ Line: 398 ]]
+local function alignToVoxelGrid(p1, p2, p3, p4)
 	local round = math.round
 	local v1 = (p1 * (-p2 / 2 + p3 / 2) + p4) / p3
 	local v5 = Vector3.new(round(v1.X), round(v1.Y), (round(v1.Z))) * p3 - p4 - p3 / 2
@@ -314,7 +315,7 @@ local function alignToVoxelGrid(p1, p2, p3, p4) --[[ Line: 398 ]]
 	local v10 = Vector3.new(round_2(v6.X), round_2(v6.Y), (round_2(v6.Z))) * p3 - p4 + p3 / 2
 	return CFrame.new((v5 + v10) / 2), v10 - v5
 end
-local function getVoxelSize(p1, p2) --[[ Line: 420 | Upvalues: VoxelDestructionConsts (copy) ]]
+local function getVoxelSize(p1, p2)
 	local v1 = p2:GetAttribute(VoxelDestructionConsts.VOXEL_SIZE_ATTR_NAME)
 	if v1 then
 		return v1
@@ -324,7 +325,7 @@ local function getVoxelSize(p1, p2) --[[ Line: 420 | Upvalues: VoxelDestructionC
 		return Vector3.new(1, 1, 1)
 	end
 end
-local function isWaterAroundPosition(p1, p2) --[[ Line: 432 | Upvalues: Terrain (copy) ]]
+local function isWaterAroundPosition(p1, p2)
 	local v1 = Terrain:ReadVoxels(Region3.new(p1 - Vector3.new(1, 1, 1) * p2 * 4, p1 + Vector3.new(1, 1, 1) * p2 * 4), 4)
 	local Size = v1.Size
 	for i = 1, Size.X do
@@ -339,7 +340,7 @@ local function isWaterAroundPosition(p1, p2) --[[ Line: 432 | Upvalues: Terrain 
 	return false
 end
 local t = {
-	subtractSphere = function(p1) --[[ Name: subtractSphere | Line: 454 | Upvalues: isWaterAroundPosition (copy), Terrain (copy), CollectionService (copy), VoxelDestructionConsts (copy), tossDebris (copy), alignToVoxelGrid (copy), cut (copy), TableUtils (copy), decompose (copy) ]]
+	subtractSphere = function(p1)
 		if not p1.fx then
 			p1.fx = false
 		end
@@ -399,9 +400,9 @@ local t = {
 				end
 			end
 		end
-		return function() --[[ Line: 564 | Upvalues: t (copy), t2 (copy) ]]
+		return function()
 			for v1, v2 in t do
-				pcall(function() --[[ Line: 571 | Upvalues: v2 (copy) ]]
+				pcall(function()
 					v2[1].Parent = v2[2]
 				end)
 			end
@@ -413,7 +414,7 @@ local t = {
 }
 local t2 = {}
 local v2 = nil
-function t.addToRestoreVoxelDestructionQueue(p1) --[[ Line: 583 | Upvalues: v2 (ref), t2 (copy), Players (copy), RunService (copy) ]]
+function t.addToRestoreVoxelDestructionQueue(p1)
 	if v2 then
 		task.cancel(v2)
 		v2 = nil
@@ -423,7 +424,7 @@ function t.addToRestoreVoxelDestructionQueue(p1) --[[ Line: 583 | Upvalues: v2 (
 	if RunService:IsStudio() then
 		v22 = math.max(v22, 0.15)
 	end
-	v2 = task.delay(2 * v22 + 0.1, function() --[[ Line: 597 | Upvalues: t2 (ref) ]]
+	v2 = task.delay(2 * v22 + 0.1, function()
 		for i = #t2, 1, -1 do
 			t2[i]()
 		end

@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
-	Init = function() --[[ Name: Init | Line: 9 | Upvalues: ReplicatedStorage (copy), RunService (copy) ]]
+	Init = function()
 		local BoatScenery = ReplicatedStorage.Resource.BoatScenery
 		BoatScenery.Parent = workspace
 		local t = {}
@@ -20,7 +21,7 @@ return {
 				Radius = 6489.6 + (math.random() * 2 - 1) * 50
 			})
 		end
-		RunService.Heartbeat:Connect(function(p1) --[[ Line: 30 | Upvalues: t (copy) ]]
+		RunService.Heartbeat:Connect(function(p1)
 			for i, v in ipairs(t) do
 				v.Angle = v.Angle + v.Speed * p1 / v.Radius
 				local v2 = CFrame.Angles(0, v.Angle, 0) * CFrame.new(v.Radius, 0, 0) + Vector3.new(169, 0, -1550)

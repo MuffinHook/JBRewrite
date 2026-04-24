@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -19,7 +20,7 @@ local BattleCrewInfo = require(ReplicatedStorage.PersistentCrewBattle.UI.BattleC
 local ReportCrew = require(ReplicatedStorage.PersistentCrewBattle.UI.ReportCrew)
 local Welcome = require(ReplicatedStorage.PersistentCrewBattle.UI.Welcome)
 local Responses = require(ReplicatedStorage.PersistentCrewBattle.UI.Responses)
-local function playClick() --[[ Line: 26 | Upvalues: Players (copy), Audio (copy) ]]
+local function playClick()
 	if Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 			Volume = 0.2
@@ -32,24 +33,24 @@ v1.defaultProps = {
 	position = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5)
 }
-function v1.init(p1) --[[ Line: 38 | Upvalues: Maid (copy), Utils (copy), Players (copy), Audio (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
-	function p1.onClickAdmin(p12) --[[ Line: 41 | Upvalues: p1 (copy) ]]
+	function p1.onClickAdmin(p12)
 		p1.props.attemptAdmin(p12.userId)
 	end
-	function p1.onClickRenameCrew(p12) --[[ Line: 44 | Upvalues: p1 (copy) ]]
+	function p1.onClickRenameCrew(p12)
 		p1.props.attemptRenameCrew(p12)
 	end
-	function p1.onClickUnAdmin(p12) --[[ Line: 47 | Upvalues: p1 (copy) ]]
+	function p1.onClickUnAdmin(p12)
 		p1.props.attemptUnAdmin(p12.userId)
 	end
-	function p1.onClickKick(p12) --[[ Line: 50 | Upvalues: p1 (copy) ]]
+	function p1.onClickKick(p12)
 		p1.props.attemptKick(p12.userId)
 	end
-	function p1.onClickJoinRequestAccept(p12) --[[ Line: 53 | Upvalues: p1 (copy) ]]
+	function p1.onClickJoinRequestAccept(p12)
 		p1.props.onClickJoinRequestAccept(p12.userId)
 	end
-	function p1.onClickJoinRequestDeny(p12) --[[ Line: 56 | Upvalues: p1 (copy) ]]
+	function p1.onClickJoinRequestDeny(p12)
 		p1.props.onClickJoinRequestDeny(p12.userId)
 	end
 	p1:setState({
@@ -58,12 +59,12 @@ function v1.init(p1) --[[ Line: 38 | Upvalues: Maid (copy), Utils (copy), Player
 		countdownVisible = false,
 		isSmallScreen = Utils.isSmallScreen()
 	})
-	p1.maid:GiveTask(Utils.getViewportSizeChangedSignal():Connect(function() --[[ Line: 65 | Upvalues: p1 (copy), Utils (ref) ]]
+	p1.maid:GiveTask(Utils.getViewportSizeChangedSignal():Connect(function()
 		p1:setState({
 			isSmallScreen = Utils.isSmallScreen()
 		})
 	end))
-	function p1.onClickToggleRequests() --[[ Line: 70 | Upvalues: p1 (copy), Players (ref), Audio (ref) ]]
+	function p1.onClickToggleRequests()
 		p1:setState({
 			showRequests = not p1.state.showRequests
 		})
@@ -73,7 +74,7 @@ function v1.init(p1) --[[ Line: 38 | Upvalues: Maid (copy), Utils (copy), Player
 			})
 		end
 	end
-	function p1.onClickCloseWelcome() --[[ Line: 76 | Upvalues: p1 (copy), Players (ref), Audio (ref) ]]
+	function p1.onClickCloseWelcome()
 		p1:setState({
 			welcomeVisible = false
 		})
@@ -83,7 +84,7 @@ function v1.init(p1) --[[ Line: 38 | Upvalues: Maid (copy), Utils (copy), Player
 			})
 		end
 	end
-	function p1.onClickViewMe() --[[ Line: 82 | Upvalues: p1 (copy), Players (ref), Audio (ref) ]]
+	function p1.onClickViewMe()
 		p1.props.attemptViewUserIdClan(Players.LocalPlayer.UserId)
 		p1.props.onClickViewMe()
 		if Players.LocalPlayer.PlayerGui then
@@ -92,7 +93,7 @@ function v1.init(p1) --[[ Line: 38 | Upvalues: Maid (copy), Utils (copy), Player
 			})
 		end
 	end
-	function p1.onCountdownElapsed(p12) --[[ Line: 87 | Upvalues: p1 (copy) ]]
+	function p1.onCountdownElapsed(p12)
 		if p12 < 0 then
 			p1:setState({
 				countdownVisible = false
@@ -100,16 +101,16 @@ function v1.init(p1) --[[ Line: 38 | Upvalues: Maid (copy), Utils (copy), Player
 			p1.props.onCountdownFinished()
 		end
 	end
-	function p1.onReportDialogClose() --[[ Line: 96 | Upvalues: p1 (copy) ]]
+	function p1.onReportDialogClose()
 		p1:setState({
 			reportDialogVisible = false
 		})
 	end
-	function p1.onReportDialogSubmit(p12, p2) --[[ Line: 101 | Upvalues: p1 (copy) ]]
+	function p1.onReportDialogSubmit(p12, p2)
 		p1.props.attemptReportCrew(p12, p2)
 	end
 end
-function v1.render(p1) --[[ Line: 105 | Upvalues: Glicko2Consts (copy), Players (copy), createElement (copy), Info (copy), JoinOrCreate (copy), Dictionary (copy), Welcome (copy), BattleInvites (copy), Elapsed (copy), ColorUtils (copy), BattleCrewInfo (copy), Roact (copy), ReportCrew (copy), Responses (copy) ]]
+function v1.render(p1)
 	local currentClanInfo = p1.props.currentClanInfo
 	local v1 = p1.props.viewingClanInfo or currentClanInfo
 	local t = {}
@@ -370,7 +371,7 @@ function v1.render(p1) --[[ Line: 105 | Upvalues: Glicko2Consts (copy), Players 
 					BackgroundColor3 = Color3.fromRGB(251, 121, 121),
 					Size = UDim2.fromScale(1, 1),
 					Image = "rbxassetid://14280463776",
-					[Roact.Event.Activated] = function() --[[ Line: 388 | Upvalues: p1 (copy) ]]
+					[Roact.Event.Activated] = function()
 						p1:setState({
 							reportDialogVisible = not p1.state.reportDialogVisible
 						})
@@ -433,9 +434,9 @@ function v1.render(p1) --[[ Line: 105 | Upvalues: Glicko2Consts (copy), Players 
 	end
 	return Roact.createFragment(t)
 end
-function v1.didMount(p1) --[[ Line: 479 | Upvalues: PersistentCrewBattleUtils (copy) ]]
+function v1.didMount(p1)
 	p1:_updateWelcomeVisible()
-	local function updateCountdown() --[[ Line: 482 | Upvalues: PersistentCrewBattleUtils (ref), p1 (copy) ]]
+	local function updateCountdown()
 		local v1 = PersistentCrewBattleUtils.getRoundStartsAt()
 		if v1 and workspace:GetServerTimeNow() < v1 then
 			p1:setState({
@@ -447,22 +448,22 @@ function v1.didMount(p1) --[[ Line: 479 | Upvalues: PersistentCrewBattleUtils (c
 	p1.maid:GiveTask(PersistentCrewBattleUtils.getRoundStartsAtAttributeChangedSignal():Connect(updateCountdown))
 	updateCountdown()
 end
-function v1._updateWelcomeVisible(p1) --[[ Line: 494 ]]
+function v1._updateWelcomeVisible(p1)
 	if p1.props.isBattleServer then
 		p1:setState({
 			welcomeVisible = true
 		})
 	end
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 501 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p1.props.isBattleServer ~= p2.isBattleServer then
 		p1:_updateWelcomeVisible()
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 506 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 509 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		viewingClanInfo = p1.viewingClanInfo,
 		currentClanInfo = p1.currentClanInfo,
@@ -481,9 +482,9 @@ return RoactRodux.connect(function(p1, p2) --[[ Line: 509 ]]
 		battleResponseData = p1.battleResponseData,
 		penalty = p1.penalty
 	}
-end, function(p1) --[[ Line: 529 | Upvalues: Players (copy), Audio (copy) ]]
+end, function(p1)
 	return {
-		onClickClose = function() --[[ Name: onClickClose | Line: 531 | Upvalues: p1 (copy), Players (ref), Audio (ref) ]]
+		onClickClose = function()
 			p1({
 				type = "setGroupVisible",
 				value = false
@@ -494,7 +495,7 @@ end, function(p1) --[[ Line: 529 | Upvalues: Players (copy), Audio (copy) ]]
 				})
 			end
 		end,
-		onClickViewMe = function() --[[ Name: onClickViewMe | Line: 538 | Upvalues: p1 (copy) ]]
+		onClickViewMe = function()
 			p1({
 				type = "setMembers",
 				value = {}

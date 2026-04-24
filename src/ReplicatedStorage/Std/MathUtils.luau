@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local t = {
-	regulaFalsiWithEndpoints = function(p1, p2, p3, p4, p5) --[[ Name: regulaFalsiWithEndpoints | Line: 5 ]]
+	regulaFalsiWithEndpoints = function(p1, p2, p3, p4, p5)
 		local v1 = p4 or 1e-15
 		local v3 = nil
 		local v4 = 0
@@ -42,7 +43,7 @@ local t = {
 		return v3
 	end
 }
-function t.regulaFalsi(p1, p2, p3) --[[ Line: 48 | Upvalues: t (copy) ]]
+function t.regulaFalsi(p1, p2, p3)
 	local v1 = 0
 	local v2 = 1
 	for i = 1, 20 do

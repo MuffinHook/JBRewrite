@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Joint = require(ReplicatedStorage.Std.Joint)
 local TrainSystemUtils = require(script.Parent.TrainSystemUtils)
-local function v1(p1, p2, p3) --[[ Line: 8 | Upvalues: v1 (copy) ]]
+local function v1(p1, p2, p3)
 	local v12 = next
 	local v2, v3 = p1:GetChildren()
 	for v4, v5 in v12, v2, v3 do
@@ -16,7 +17,7 @@ local function v1(p1, p2, p3) --[[ Line: 8 | Upvalues: v1 (copy) ]]
 	return true
 end
 return {
-	MakeCar = function(p1) --[[ Name: MakeCar | Line: 19 | Upvalues: Joint (copy), TweenService (copy), RunService (copy) ]]
+	MakeCar = function(p1)
 		local Model = p1.Model
 		local Base = p1.Base
 		local Length = p1.Length
@@ -39,16 +40,16 @@ return {
 		local Skeleton = Model:FindFirstChild("Skeleton")
 		if Skeleton then
 			p1.DoorOpenFuncs = {}
-			local function setupDoor(p12) --[[ Line: 48 | Upvalues: Skeleton (copy), Joint (ref), Base (copy), p1 (copy), TweenService (ref), RunService (ref) ]]
+			local function setupDoor(p12)
 				local v1 = Skeleton:FindFirstChild("Door" .. tostring(p12))
 				if v1 then
 					Joint.WeldAllTo(v1, v1.PrimaryPart)
 					local v2 = Joint.Motor(v1.PrimaryPart, Base)
 					v1.PrimaryPart.Anchored = false
-					p1.DoorOpenFuncs[p12] = function() --[[ Line: 56 | Upvalues: TweenService (ref), v2 (copy), v1 (copy), RunService (ref) ]]
+					p1.DoorOpenFuncs[p12] = function()
 						local v12 = tick()
 						local v22 = nil
-						local function Heartbeat() --[[ Line: 60 | Upvalues: v12 (copy), v22 (ref), TweenService (ref), v2 (ref), v1 (ref) ]]
+						local function Heartbeat()
 							local v13 = (tick() - v12) / 1
 							if v13 >= 1 then
 								v22:Disconnect()
@@ -64,7 +65,7 @@ return {
 			setupDoor(2)
 		end
 	end,
-	MoveCar = function(p1, p2, p3, p4) --[[ Name: MoveCar | Line: 78 | Upvalues: TrainSystemUtils (copy) ]]
+	MoveCar = function(p1, p2, p3, p4)
 		local Speed = p2.Speed
 		local v1, v2 = TrainSystemUtils.CalculatePosition(p2, p2.Offset + p4 + p1.BogeyOffsetBack)
 		local v3, v4 = TrainSystemUtils.CalculatePosition(p2, p2.Offset + p4 + p1.Length - p1.BogeyOffsetFront)
@@ -79,7 +80,7 @@ return {
 		p1.BogeyMotorFront.C0 = p1.BogeyMotorFront.C0:lerp(v6, 0.1)
 		p1.BogeyMotorBack.C0 = p1.BogeyMotorBack.C0:lerp(v7, 0.1)
 	end,
-	DestroyCar = function(p1) --[[ Name: DestroyCar | Line: 100 ]]
+	DestroyCar = function(p1)
 		p1.Model:Destroy()
 		return true
 	end

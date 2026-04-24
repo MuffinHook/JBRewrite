@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.Std.Dictionary)
 local PlayerUtils = require(ReplicatedStorage.Std.PlayerUtils)
@@ -9,7 +10,7 @@ local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local ClanConsts = require(ReplicatedStorage.Clan.ClanConsts)
 local TextButton = require(script.Parent.TextButton)
 local horizontalSquareGrid = require(ReplicatedStorage.PersistentCrew.UI.horizontalSquareGrid)
-local function colorComponent(p1) --[[ Line: 15 | Upvalues: createElement (copy), Roact (copy), ColorUtils (copy) ]]
+local function colorComponent(p1)
 	local isName = p1.selectedColorName == p1.name
 	local t = {
 		BorderSizePixel = 0,
@@ -17,7 +18,7 @@ local function colorComponent(p1) --[[ Line: 15 | Upvalues: createElement (copy)
 		Size = p1.size,
 		Position = p1.position,
 		Text = "",
-		[Roact.Event.Activated] = function() --[[ Line: 23 | Upvalues: p1 (copy) ]]
+		[Roact.Event.Activated] = function()
 			p1.setSelectedColorName(p1.name)
 		end
 	}
@@ -45,36 +46,36 @@ local function colorComponent(p1) --[[ Line: 15 | Upvalues: createElement (copy)
 	return createElement("TextButton", t, t2)
 end
 local v1 = Roact.PureComponent:extend("JoinOrCreate")
-function v1.init(p1) --[[ Line: 50 | Upvalues: Roact (copy), PlayerUtils (copy), ClanConsts (copy) ]]
+function v1.init(p1)
 	p1.playerTextBoxRef = Roact.createRef()
-	function p1.onClickView() --[[ Line: 53 | Upvalues: p1 (copy), PlayerUtils (ref) ]]
+	function p1.onClickView()
 		local v1 = p1.playerTextBoxRef:getValue()
 		local Text = v1.Text
 		v1.Text = ""
-		PlayerUtils.promiseUserIdFromName(Text):andThen(function(p12) --[[ Line: 57 | Upvalues: p1 (ref) ]]
+		PlayerUtils.promiseUserIdFromName(Text):andThen(function(p12)
 			p1.props.attemptViewUserIdClan(p12)
 		end)
 	end
-	function p1.playerTextBoxFocusLost(p12, p2) --[[ Line: 61 | Upvalues: p1 (copy) ]]
+	function p1.playerTextBoxFocusLost(p12, p2)
 		if p2 then
 			p1.onClickView()
 		end
 	end
 	local v1 = nil
-	function p1.playerTextBoxTextChanged(p12) --[[ Line: 67 | Upvalues: v1 (ref), PlayerUtils (ref), p1 (copy), Roact (ref) ]]
+	function p1.playerTextBoxTextChanged(p12)
 		if v1 then
 			task.cancel(v1)
 			v1 = nil
 		end
 		local v12 = nil
-		v12 = task.delay(0.5, function() --[[ Line: 73 | Upvalues: p12 (copy), PlayerUtils (ref), v1 (ref), v12 (ref), p1 (ref), Roact (ref) ]]
-			PlayerUtils.promiseUserIdFromName(p12.Text):andThen(function(p12) --[[ Line: 76 | Upvalues: v1 (ref), v12 (ref), p1 (ref) ]]
+		v12 = task.delay(0.5, function()
+			PlayerUtils.promiseUserIdFromName(p12.Text):andThen(function(p12)
 				if v1 == v12 then
 					p1:setState({
 						avatarUserId = p12
 					})
 				end
-			end):catch(function() --[[ Line: 84 | Upvalues: v1 (ref), v12 (ref), p1 (ref), Roact (ref) ]]
+			end):catch(function()
 				if v1 == v12 then
 					p1:setState({
 						avatarUserId = Roact.None
@@ -85,18 +86,18 @@ function v1.init(p1) --[[ Line: 50 | Upvalues: Roact (copy), PlayerUtils (copy),
 		v1 = v12
 	end
 	p1.crewNameRef = Roact.createRef()
-	function p1.onClickCreate() --[[ Line: 98 | Upvalues: p1 (copy) ]]
+	function p1.onClickCreate()
 		local v1 = p1.crewNameRef:getValue()
 		local Text = v1.Text
 		v1.Text = ""
 		p1.props.attemptCreate(Text, p1.state.selectedColorName)
 	end
-	function p1.crewNameTextBoxFocusLost(p12, p2) --[[ Line: 104 | Upvalues: p1 (copy) ]]
+	function p1.crewNameTextBoxFocusLost(p12, p2)
 		if p2 then
 			p1.onClickCreate()
 		end
 	end
-	function p1.setSelectedColorName(p12) --[[ Line: 109 | Upvalues: p1 (copy) ]]
+	function p1.setSelectedColorName(p12)
 		p1:setState({
 			selectedColorName = p12
 		})
@@ -105,7 +106,7 @@ function v1.init(p1) --[[ Line: 50 | Upvalues: Roact (copy), PlayerUtils (copy),
 		selectedColorName = ClanConsts.CLAN_COLORS[math.random(1, #ClanConsts.CLAN_COLORS)].name
 	})
 end
-function v1.render(p1) --[[ Line: 119 | Upvalues: ClanConsts (copy), createElement (copy), PaddedContainer (copy), Roact (copy), TextButton (copy), horizontalSquareGrid (copy), colorComponent (copy), String (copy), Dictionary (copy) ]]
+function v1.render(p1)
 	local t = {}
 	for v1, v2 in ClanConsts.CLAN_COLORS do
 		table.insert(t, v2)

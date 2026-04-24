@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
+return function(p1, p2)
 	p1.WidgetConstructor("RadioButton", {
 		hasState = true,
 		hasChildren = false,
@@ -9,28 +10,28 @@ return function(p1, p2) --[[ Line: 3 ]]
 		},
 		Events = {
 			selected = {
-				Init = function(p1) --[[ Line: 14 ]] end,
-				Get = function(p12) --[[ Line: 15 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastSelectedTick == p1._cycleTick
 				end
 			},
 			unselected = {
-				Init = function(p1) --[[ Line: 20 ]] end,
-				Get = function(p12) --[[ Line: 21 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastUnselectedTick == p1._cycleTick
 				end
 			},
 			active = {
-				Init = function(p1) --[[ Line: 26 ]] end,
-				Get = function(p1) --[[ Line: 27 ]]
+				Init = function(p1) end,
+				Get = function(p1)
 					return p1.state.index.value == p1.arguments.Index
 				end
 			},
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 31 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 35 | Upvalues: p2 (copy), p1 (copy) ]]
+		Generate = function(p12)
 			local Iris_RadioButton = Instance.new("TextButton")
 			Iris_RadioButton.Name = "Iris_RadioButton"
 			Iris_RadioButton.AutomaticSize = Enum.AutomaticSize.XY
@@ -64,7 +65,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				ActiveColor = p1._config.FrameBgActiveColor,
 				ActiveTransparency = p1._config.FrameBgActiveTransparency
 			})
-			p2.applyButtonClick(Iris_RadioButton, function() --[[ Line: 76 | Upvalues: p12 (copy) ]]
+			p2.applyButtonClick(Iris_RadioButton, function()
 				p12.state.index:set(p12.arguments.Index)
 			end)
 			local TextLabel = Instance.new("TextLabel")
@@ -77,23 +78,23 @@ return function(p1, p2) --[[ Line: 3 ]]
 			TextLabel.Parent = Iris_RadioButton
 			return Iris_RadioButton
 		end,
-		Update = function(p12) --[[ Name: Update | Line: 92 | Upvalues: p1 (copy) ]]
+		Update = function(p12)
 			p12.Instance.TextLabel.Text = p12.arguments.Text or "Radio Button"
 			if p12.state then
 				p12.state.index.lastChangeTick = p1._cycleTick
 				p1._widgets[p12.type].UpdateState(p12)
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 102 | Upvalues: p2 (copy) ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 			p2.discardState(p1)
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 106 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.index == nil then
 				p12.state.index = p1._widgetState(p12, "index", p12.arguments.Index)
 			end
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 111 | Upvalues: p1 (copy) ]]
+		UpdateState = function(p12)
 			local Circle = p12.Instance.Button.Circle
 			if p12.state.index.value == p12.arguments.Index then
 				Circle.BackgroundTransparency = p1._config.CheckMarkTransparency

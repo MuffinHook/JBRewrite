@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 game:GetService("CollectionService")
 game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -11,16 +12,16 @@ local LocalPlayer = Players.LocalPlayer
 local t = {}
 local t2 = {}
 local t3 = {}
-local function RegisterModule(p1) --[[ Line: 19 | Upvalues: t3 (copy) ]]
+local function RegisterModule(p1)
 	assert(p1.__ClassName ~= nil)
 	t3[p1.__ClassName] = p1
 end
-local function Isv2(p1) --[[ Line: 23 ]]
+local function Isv2(p1)
 	return p1.Meta ~= nil
 end
-local function Init(p1) --[[ Line: 26 | Upvalues: t2 (copy), t3 (copy), Maid (copy), Players (copy), t (copy), Binder (copy), StreamingHelperUtils (copy), TableUtils (copy), RxInstanceUtils (copy), LocalPlayer (copy) ]]
+local function Init(p1)
 	local _ = p1.Event
-	local function v1(p1, p2) --[[ Line: 31 | Upvalues: v1 (copy) ]]
+	local function v1(p1, p2)
 		for v12, v2 in next, p1 do
 			if type(v2) == "table" then
 				v1(v2, p2)
@@ -29,7 +30,7 @@ local function Init(p1) --[[ Line: 26 | Upvalues: t2 (copy), t3 (copy), Maid (co
 			end
 		end
 	end
-	local function ProcessPacket(p1) --[[ Line: 41 | Upvalues: t2 (ref), t3 (ref), Maid (ref), Players (ref), t (ref), v1 (copy) ]]
+	local function ProcessPacket(p1)
 		assert(p1)
 		local Id = p1.Id
 		assert(Id)
@@ -52,7 +53,7 @@ local function Init(p1) --[[ Line: 26 | Upvalues: t2 (copy), t3 (copy), Maid (co
 				local PlayerName = v3.Part:WaitForChild("PlayerName")
 				v3.Occupied = false
 				v3.Maid = Maid.new()
-				local function update() --[[ Line: 70 | Upvalues: v3 (copy), Players (ref), PlayerName (copy), p1 (ref) ]]
+				local function update()
 					local Occupied = v3.Occupied
 					local v1 = Players:FindFirstChild(PlayerName.Value)
 					local v2 = v1 ~= nil
@@ -85,7 +86,7 @@ local function Init(p1) --[[ Line: 26 | Upvalues: t2 (copy), t3 (copy), Maid (co
 			end
 		end
 	end
-	local function removeIdFromList(p1) --[[ Line: 113 | Upvalues: t (ref), t2 (ref) ]]
+	local function removeIdFromList(p1)
 		for i = #t, 1, -1 do
 			local v1, v2
 			local v3 = t[i]
@@ -108,31 +109,31 @@ local function Init(p1) --[[ Line: 26 | Upvalues: t2 (copy), t3 (copy), Maid (co
 			end
 		end
 	end
-	Binder.new("VehicleSystemPacket", function(p1) --[[ Line: 140 | Upvalues: Maid (ref), StreamingHelperUtils (ref), TableUtils (ref), ProcessPacket (copy), removeIdFromList (copy), RxInstanceUtils (ref) ]]
+	Binder.new("VehicleSystemPacket", function(p1)
 		task.wait()
 		local v1 = Maid.new()
 		StreamingHelperUtils.yieldForAllValuesPopulated(p1)
 		local v2 = TableUtils.createTableFromObjectValues(p1)
 		local v3 = if v2.Meta ~= nil then v2.Meta.Id else v2.Id
-		local function create() --[[ Line: 154 | Upvalues: ProcessPacket (ref), v2 (copy) ]]
+		local function create()
 			ProcessPacket(v2)
 		end
-		local function destroy() --[[ Line: 157 | Upvalues: removeIdFromList (ref), v3 (ref) ]]
+		local function destroy()
 			removeIdFromList(v3)
 		end
-		v1:GiveTask(RxInstanceUtils.observeOneChildNamed(v2.Model, "BoundingBox", function(p1, p2) --[[ Line: 161 | Upvalues: ProcessPacket (ref), v2 (copy), destroy (copy) ]]
+		v1:GiveTask(RxInstanceUtils.observeOneChildNamed(v2.Model, "BoundingBox", function(p1, p2)
 			ProcessPacket(v2)
 			p2:GiveTask(destroy)
 		end))
 		return v1
 	end):Start()
-	function p1.em.ih5093c4(p1) --[[ Line: 169 | Upvalues: t2 (ref), LocalPlayer (ref) ]]
+	function p1.em.ih5093c4(p1)
 		local v1 = t2[p1]
 		assert(v1)
 		v1:FollowPlayer(LocalPlayer)
 	end
 end
-local function GetVehiclePacket(p1) --[[ Line: 208 | Upvalues: t (copy) ]]
+local function GetVehiclePacket(p1)
 	for i = 1, #t do
 		local v1 = t[i]
 		for j = 1, #v1.Seats do
@@ -148,7 +149,7 @@ return {
 	Init = Init,
 	RegisterModule = RegisterModule,
 	GetVehiclePacket = GetVehiclePacket,
-	WaitForVehiclePacket = function(p1) --[[ Name: WaitForVehiclePacket | Line: 220 | Upvalues: GetVehiclePacket (copy) ]]
+	WaitForVehiclePacket = function(p1)
 		local v1 = os.clock()
 		while os.clock() - v1 < 5 do
 			local v2, v3 = GetVehiclePacket(p1)
@@ -159,7 +160,7 @@ return {
 		end
 		return nil
 	end,
-	GetPlayerSeat = function(p1, p2) --[[ Name: GetPlayerSeat | Line: 231 ]]
+	GetPlayerSeat = function(p1, p2)
 		assert(p1 ~= nil)
 		assert(p2 ~= nil)
 		for i = 1, #p1.Seats do

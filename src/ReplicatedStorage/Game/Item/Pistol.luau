@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Joint = require(ReplicatedStorage.Std.Joint)
@@ -10,14 +11,14 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.new(p1, p2, p3) --[[ Line: 15 | Upvalues: Gun (copy), t (copy) ]]
+function t.new(p1, p2, p3)
 	local v1 = Gun.new(p1, p2, p3)
 	setmetatable(v1, t)
 	v1._hasSWAT = false
 	v1:Setup(p3)
 	return v1
 end
-function t.SetupModel(p1) --[[ Line: 23 | Upvalues: GamepassSystem (copy), GamepassUtils (copy), Gun (copy), Joint (copy), Spring (copy) ]]
+function t.SetupModel(p1)
 	if p1.Player and (p1.Player.DisplayName and GamepassSystem.doesPlayerOwnCached(p1.Player, GamepassUtils.EnumGamepass.SWAT)) then
 		p1._hasSWAT = true
 		Gun.SetupModel(p1, "PistolSWAT")
@@ -31,15 +32,15 @@ function t.SetupModel(p1) --[[ Line: 23 | Upvalues: GamepassSystem (copy), Gamep
 	p1.MotorSlide = v1
 	p1.SpringSlide = v2
 end
-function t.UpdateItemSprings(p1) --[[ Line: 45 | Upvalues: Gun (copy) ]]
+function t.UpdateItemSprings(p1)
 	Gun.UpdateItemSprings(p1)
 	p1.SlidePosition = p1.SpringSlide:Update()
 end
-function t.UpdateItemJoints(p1) --[[ Line: 50 | Upvalues: Gun (copy) ]]
+function t.UpdateItemJoints(p1)
 	Gun.UpdateItemJoints(p1)
 	p1.MotorSlide.C1 = CFrame.new(p1.SlidePosition)
 end
-function t.ShootSound(p1, p2) --[[ Line: 54 | Upvalues: Audio (copy) ]]
+function t.ShootSound(p1, p2)
 	if not p2 then
 		if p1._hasSWAT then
 			Audio.ObjectLocal(p1.Tip, p1.Config.Sound.pistol_shot_silenced, {
@@ -50,7 +51,7 @@ function t.ShootSound(p1, p2) --[[ Line: 54 | Upvalues: Audio (copy) ]]
 				Pitch = 1
 			})
 		end
-		delay(0.1, function() --[[ Line: 61 | Upvalues: Audio (ref), p1 (copy) ]]
+		delay(0.1, function()
 			Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_pistol_slide_fast_01, {
 				Volume = 0.3,
 				Pitch = 1 + math.random() * 0.1 - 0.05
@@ -59,12 +60,12 @@ function t.ShootSound(p1, p2) --[[ Line: 54 | Upvalues: Audio (copy) ]]
 		p1.SpringSlide:Accelerate(Vector3.new(0, 0, 30))
 	end
 end
-function t.ReloadDropAmmoSound(p1) --[[ Line: 71 | Upvalues: Audio (copy) ]]
+function t.ReloadDropAmmoSound(p1)
 	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_pistol_remove_mag_01, {
 		RollOffMaxDistance = 129
 	})
 end
-function t.ReloadRefillAmmoSound(p1) --[[ Line: 76 | Upvalues: Audio (copy) ]]
+function t.ReloadRefillAmmoSound(p1)
 	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.gun_pistol_insert_mag_01, {
 		RollOffMaxDistance = 129
 	})

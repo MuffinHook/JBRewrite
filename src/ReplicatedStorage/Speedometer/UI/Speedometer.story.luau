@@ -1,14 +1,15 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local Maid = require(ReplicatedStorage.Std.Maid)
-return function(p1) --[[ Line: 6 | Upvalues: Maid (copy), Roact (copy), RunService (copy) ]]
+return function(p1)
 	local v1 = Maid.new()
 	local v2, v3 = Roact.createBinding(123456)
 	local v4, v5 = Roact.createBinding(878)
 	local v6, v7 = Roact.createBinding(0.3)
 	local v8, v9 = Roact.createBinding(0.5)
-	v1:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 13 | Upvalues: v5 (copy), v9 (copy), v7 (copy), v3 (copy) ]]
+	v1:GiveTask(RunService.Heartbeat:Connect(function()
 		local v2 = math.sin(os.clock() * 2) * 0.5 + 0.5
 		v5(v2 * 500)
 		v9(v2)
@@ -36,7 +37,7 @@ return function(p1) --[[ Line: 6 | Upvalues: Maid (copy), Roact (copy), RunServi
 			}
 		}
 	}), p1)
-	return function() --[[ Line: 39 | Upvalues: Roact (ref), v10 (copy), v1 (copy) ]]
+	return function()
 		Roact.unmount(v10)
 		v1:DoCleaning()
 	end

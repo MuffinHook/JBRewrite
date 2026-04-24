@@ -1,11 +1,12 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (copy), RoactRodux (copy) ]]
+return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local Info = require(script.Parent.Info)
 	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
-	function v1.init(p1) --[[ Line: 9 ]]
+	function v1.init(p1)
 		p1.members = {
 			{
 				id = 2025110,
@@ -19,25 +20,25 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (co
 				battlesWon = 1
 			}
 		}
-		function p1.attemptBattleClanId(p1) --[[ Line: 23 ]]
+		function p1.attemptBattleClanId(p1)
 			print("player wants to clan", p1)
 		end
-		function p1.attemptViewUserIdClan(p1) --[[ Line: 26 ]]
+		function p1.attemptViewUserIdClan(p1)
 			print("player wants to view clan of user", p1)
 		end
-		function p1.onClickAdmin(p1) --[[ Line: 29 ]]
+		function p1.onClickAdmin(p1)
 			print("wants to admin", p1)
 		end
-		function p1.onClickUnAdmin(p1) --[[ Line: 32 ]]
+		function p1.onClickUnAdmin(p1)
 			print("wants to UNadmin", p1)
 		end
-		function p1.onClickKick(p1) --[[ Line: 35 ]]
+		function p1.onClickKick(p1)
 			print("wants to kick", p1)
 		end
-		function p1.onClickToggleRequests(p1) --[[ Line: 38 ]]
+		function p1.onClickToggleRequests(p1)
 			print("toggle requests")
 		end
-		function p1.onClickRenameCrew(p1) --[[ Line: 41 ]]
+		function p1.onClickRenameCrew(p1)
 			print("wants to rename", p1)
 		end
 		p1.isReadiedUp = false
@@ -59,7 +60,7 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (co
 			}
 		}
 	end
-	function v1.render(p1) --[[ Line: 54 | Upvalues: Roact (ref), RoactRodux (ref), persistentCrewStore (copy), Info (copy) ]]
+	function v1.render(p1)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement(Info, {
@@ -90,7 +91,7 @@ return function(p1) --[[ Line: 5 | Upvalues: Roact (copy), ReplicatedStorage (co
 			}) })
 	end
 	local v2 = Roact.mount(Roact.createElement(v1), p1)
-	return function() --[[ Line: 89 | Upvalues: Roact (ref), v2 (copy) ]]
+	return function()
 		Roact.unmount(v2)
 	end
 end

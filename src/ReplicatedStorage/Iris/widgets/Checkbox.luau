@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
+return function(p1, p2)
 	p1.WidgetConstructor("Checkbox", {
 		hasState = true,
 		hasChildren = false,
@@ -8,22 +9,22 @@ return function(p1, p2) --[[ Line: 3 ]]
 		},
 		Events = {
 			checked = {
-				Init = function(p1) --[[ Line: 13 ]] end,
-				Get = function(p12) --[[ Line: 14 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastCheckedTick == p1._cycleTick
 				end
 			},
 			unchecked = {
-				Init = function(p1) --[[ Line: 19 ]] end,
-				Get = function(p12) --[[ Line: 20 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastUncheckedTick == p1._cycleTick
 				end
 			},
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 24 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 28 | Upvalues: p2 (copy), p1 (copy) ]]
+		Generate = function(p12)
 			local Iris_Checkbox = Instance.new("TextButton")
 			Iris_Checkbox.Name = "Iris_Checkbox"
 			Iris_Checkbox.AutomaticSize = Enum.AutomaticSize.XY
@@ -59,7 +60,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Checkmark.ImageTransparency = 1
 			Checkmark.ScaleType = Enum.ScaleType.Fit
 			Checkmark.Parent = Box
-			p2.applyButtonClick(Iris_Checkbox, function() --[[ Line: 73 | Upvalues: p12 (copy) ]]
+			p2.applyButtonClick(Iris_Checkbox, function()
 				p12.state.isChecked:set(not p12.state.isChecked.value)
 			end)
 			local TextLabel = Instance.new("TextLabel")
@@ -72,15 +73,15 @@ return function(p1, p2) --[[ Line: 3 ]]
 			TextLabel.Parent = Iris_Checkbox
 			return Iris_Checkbox
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 89 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.isChecked == nil then
 				p12.state.isChecked = p1._widgetState(p12, "checked", false)
 			end
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 94 ]]
+		Update = function(p1)
 			p1.Instance.TextLabel.Text = p1.arguments.Text or "Checkbox"
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 98 | Upvalues: p1 (copy) ]]
+		UpdateState = function(p12)
 			local Checkmark = p12.Instance.Box.Checkmark
 			if p12.state.isChecked.value then
 				Checkmark.ImageTransparency = p1._config.CheckMarkTransparency
@@ -90,7 +91,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				p12.lastUncheckedTick = p1._cycleTick + 1
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 110 | Upvalues: p2 (copy) ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 			p2.discardState(p1)
 		end

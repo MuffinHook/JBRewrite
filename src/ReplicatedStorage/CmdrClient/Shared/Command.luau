@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local Argument = require(script.Parent.Argument)
 local v1 = RunService:IsServer()
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 22 | Upvalues: t (copy) ]]
+function t.new(p1)
 	local t2 = {
 		Dispatcher = p1.Dispatcher,
 		Cmdr = p1.Dispatcher.Cmdr,
@@ -27,7 +28,7 @@ function t.new(p1) --[[ Line: 22 | Upvalues: t (copy) ]]
 	setmetatable(t2, t)
 	return t2
 end
-function t.Parse(p1, p2) --[[ Line: 51 | Upvalues: Argument (copy) ]]
+function t.Parse(p1, p2)
 	local v1 = false
 	for i, v in ipairs(p1.ArgumentDefinitions) do
 		local v2
@@ -53,7 +54,7 @@ function t.Parse(p1, p2) --[[ Line: 51 | Upvalues: Argument (copy) ]]
 	end
 	return true
 end
-function t.Validate(p1, p2) --[[ Line: 83 ]]
+function t.Validate(p1, p2)
 	p1._Validated = true
 	local v1 = ""
 	local v2 = true
@@ -65,14 +66,14 @@ function t.Validate(p1, p2) --[[ Line: 83 ]]
 	end
 	return v2, v1:sub(3)
 end
-function t.GetLastArgument(p1) --[[ Line: 102 ]]
+function t.GetLastArgument(p1)
 	for i = #p1.Arguments, 1, -1 do
 		if p1.Arguments[i].RawValue then
 			return p1.Arguments[i]
 		end
 	end
 end
-function t.GatherArgumentValues(p1) --[[ Line: 111 ]]
+function t.GatherArgumentValues(p1)
 	local t = {}
 	for i = 1, #p1.ArgumentDefinitions do
 		local v1 = p1.Arguments[i]
@@ -86,7 +87,7 @@ function t.GatherArgumentValues(p1) --[[ Line: 111 ]]
 	end
 	return t, #p1.ArgumentDefinitions
 end
-function t.Run(p1) --[[ Line: 128 | Upvalues: v1 (copy) ]]
+function t.Run(p1)
 	if p1._Validated == nil then
 		error("[Cmdr] Must validate a command before running.")
 	end
@@ -130,16 +131,16 @@ function t.Run(p1) --[[ Line: 128 | Upvalues: v1 (copy) ]]
 		end
 	end
 end
-function t.GetArgument(p1, p2) --[[ Line: 181 ]]
+function t.GetArgument(p1, p2)
 	return p1.Arguments[p2]
 end
-function t.GetData(p1) --[[ Line: 189 | Upvalues: v1 (copy) ]]
+function t.GetData(p1)
 	if not p1.Data and (p1.Object.Data and not v1) then
 		p1.Data = p1.Object.Data(p1)
 	end
 	return p1.Data
 end
-function t.SendEvent(p1, p2, p3, ...) --[[ Line: 202 | Upvalues: v1 (copy), Players (copy) ]]
+function t.SendEvent(p1, p2, p3, ...)
 	assert(if typeof(p2) == "Instance" then p2:IsA("Player") else false, "[Cmdr] Argument #1 must be a Player")
 	assert(type(p3) == "string", "[Cmdr] Argument #2 must be a string")
 	if v1 then
@@ -149,19 +150,19 @@ function t.SendEvent(p1, p2, p3, ...) --[[ Line: 202 | Upvalues: v1 (copy), Play
 		p1.Dispatcher.Cmdr.Events[p3](...)
 	end
 end
-function t.BroadcastEvent(p1, ...) --[[ Line: 218 | Upvalues: v1 (copy) ]]
+function t.BroadcastEvent(p1, ...)
 	if not v1 then
 		error("[Cmdr] Can\'t broadcast event messages from the client.", 2)
 	end
 	p1.Dispatcher.Cmdr.RemoteEvent:FireAllClients(...)
 end
-function t.Reply(p1, ...) --[[ Line: 227 ]]
+function t.Reply(p1, ...)
 	return p1:SendEvent(p1.Executor, "AddLine", ...)
 end
-function t.GetStore(p1, ...) --[[ Line: 232 ]]
+function t.GetStore(p1, ...)
 	return p1.Dispatcher.Cmdr.Registry:GetStore(...)
 end
-function t.HasImplementation(p1) --[[ Line: 237 | Upvalues: RunService (copy) ]]
+function t.HasImplementation(p1)
 	if RunService:IsClient() and p1.Object.ClientRun or p1.Object.Run then
 		return true
 	else

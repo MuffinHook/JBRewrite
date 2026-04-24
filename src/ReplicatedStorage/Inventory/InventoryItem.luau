@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -8,41 +9,41 @@ local InventoryItemUtils = require(script.Parent.InventoryItemUtils)
 local InventoryItemOwnerBinder = require(script.Parent.InventoryItemOwnerBinder)
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 14 | Upvalues: t (copy), Maid (copy), Signal (copy), InventoryItemUtils (copy), RxInstanceUtils (copy), InventoryItemConsts (copy) ]]
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.obj = p1
-	t2._maid = Maid.new()
-	t2.onAttemptSelect = Signal.new()
-	t2._maid:GiveTask(t2.onAttemptSelect)
-	t2.onAttemptDrop = Signal.new()
-	t2._maid:GiveTask(t2.onAttemptDrop)
-	t2._maid:GiveTask(function() --[[ Line: 25 | Upvalues: InventoryItemUtils (ref), t2 (copy) ]]
-		InventoryItemUtils.setEquipped(t2.obj, false)
+function t.new(itemObj)
+	local instance = {}
+	setmetatable(instance, t)
+	instance.obj = itemObj
+	instance._maid = Maid.new()
+	instance.onAttemptSelect = Signal.new()
+	instance._maid:GiveTask(instance.onAttemptSelect)
+	instance.onAttemptDrop = Signal.new()
+	instance._maid:GiveTask(instance.onAttemptDrop)
+	instance._maid:GiveTask(function()
+		InventoryItemUtils.setEquipped(instance.obj, false)
 	end)
-	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, InventoryItemConsts.EQUIP_REMOTE_NAME, function(p1, p2) --[[ Line: 34 | Upvalues: t2 (copy) ]]
-		p2:GiveTask(p1.OnClientEvent:Connect(function() --[[ Line: 35 | Upvalues: t2 (ref) ]]
-			t2:AttemptSelect()
+	instance._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(itemObj, InventoryItemConsts.EQUIP_REMOTE_NAME, function(remote, maid)
+		maid:GiveTask(remote.OnClientEvent:Connect(function()
+			instance:AttemptSelect()
 		end))
 	end))
-	local function update() --[[ Line: 42 | Upvalues: p1 (copy), InventoryItemConsts (ref) ]]
-		local v1 = p1:GetAttribute(InventoryItemConsts.EQUIPPED_ATTR_NAME) or 0
-		if (p1:GetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME) or 0) < v1 then
-			p1:SetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME, v1)
+	local function update()
+		local serverEquipped = itemObj:GetAttribute(InventoryItemConsts.EQUIPPED_ATTR_NAME) or 0
+		if (itemObj:GetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME) or 0) < serverEquipped then
+			itemObj:SetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME, serverEquipped)
 		end
 	end
-	t2._maid:GiveTask(p1:GetAttributeChangedSignal(InventoryItemConsts.EQUIPPED_ATTR_NAME):Connect(update))
-	local v2 = p1:GetAttribute(InventoryItemConsts.EQUIPPED_ATTR_NAME) or 0
-	if (p1:GetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME) or 0) < v2 then
-		p1:SetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME, v2)
+	instance._maid:GiveTask(itemObj:GetAttributeChangedSignal(InventoryItemConsts.EQUIPPED_ATTR_NAME):Connect(update))
+	local serverEquipped = itemObj:GetAttribute(InventoryItemConsts.EQUIPPED_ATTR_NAME) or 0
+	if (itemObj:GetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME) or 0) < serverEquipped then
+		itemObj:SetAttribute(InventoryItemConsts.EQUIPPED_LOCAL_ATTR_NAME, serverEquipped)
 	end
-	t2._overriddenOwner = nil
-	return t2
+	instance._overriddenOwner = nil
+	return instance
 end
-function t.GetName(p1) --[[ Line: 56 | Upvalues: InventoryItemUtils (copy) ]]
+function t.GetName(p1)
 	return InventoryItemUtils.getName(p1.obj)
 end
-function t.GetOwner(p1) --[[ Line: 59 | Upvalues: InventoryItemOwnerBinder (copy) ]]
+function t.GetOwner(p1)
 	local v1 = p1.obj.Parent.Parent
 	if v1 then
 		local v2 = InventoryItemOwnerBinder:Get(v1)
@@ -54,7 +55,7 @@ function t.GetOwner(p1) --[[ Line: 59 | Upvalues: InventoryItemOwnerBinder (copy
 		end
 	end
 end
-function t.PromiseOwner(p1) --[[ Line: 74 | Upvalues: Promise (copy), InventoryItemOwnerBinder (copy) ]]
+function t.PromiseOwner(p1)
 	local v1 = p1.obj.Parent.Parent
 	if v1 then
 		if v1.Parent == game:GetService("Players") then
@@ -64,33 +65,33 @@ function t.PromiseOwner(p1) --[[ Line: 74 | Upvalues: Promise (copy), InventoryI
 		end
 	end
 end
-function t.GetAttr(p1, ...) --[[ Line: 84 | Upvalues: InventoryItemUtils (copy) ]]
+function t.GetAttr(p1, ...)
 	return InventoryItemUtils.getAttr(p1.obj, ...)
 end
-function t.SetAttr(p1, ...) --[[ Line: 87 | Upvalues: InventoryItemUtils (copy) ]]
+function t.SetAttr(p1, ...)
 	InventoryItemUtils.setAttr(p1.obj, ...)
 end
-function t.GetEquipped(p1, ...) --[[ Line: 90 | Upvalues: InventoryItemUtils (copy) ]]
+function t.GetEquipped(p1, ...)
 	return InventoryItemUtils.getEquipped(p1.obj, ...)
 end
-function t.SetEquipped(p1, ...) --[[ Line: 93 | Upvalues: InventoryItemUtils (copy) ]]
+function t.SetEquipped(p1, ...)
 	InventoryItemUtils.setEquipped(p1.obj, ...)
 end
-function t.GetEquippedSignal(p1) --[[ Line: 96 | Upvalues: InventoryItemUtils (copy) ]]
+function t.GetEquippedSignal(p1)
 	return InventoryItemUtils.getEquippedSignal(p1.obj)
 end
-function t.AttemptSetEquipped(p1, p2) --[[ Line: 99 | Upvalues: InventoryItemUtils (copy), InventoryItemConsts (copy) ]]
+function t.AttemptSetEquipped(p1, p2)
 	assert(p2 ~= nil, "missing value")
 	InventoryItemUtils.setEquipped(p1.obj, p2)
 	p1.obj:FindFirstChild(InventoryItemConsts.EQUIP_REMOTE_NAME):FireServer(p2)
 end
-function t.AttemptSelect(p1) --[[ Line: 105 ]]
+function t.AttemptSelect(p1)
 	p1.onAttemptSelect:Fire()
 end
-function t.AttemptDrop(p1) --[[ Line: 108 ]]
+function t.AttemptDrop(p1)
 	p1.onAttemptDrop:Fire()
 end
-function t.Destroy(p1) --[[ Line: 111 ]]
+function t.Destroy(p1)
 	p1._maid:Destroy()
 	setmetatable(p1, nil)
 end

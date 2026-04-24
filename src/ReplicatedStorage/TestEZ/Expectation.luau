@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local t = {}
 local t2 = {
 	to = true,
@@ -10,15 +11,15 @@ local t2 = {
 local t3 = {
 	never = true
 }
-local function assertLevel(p1, p2, p3) --[[ Line: 42 ]]
+local function assertLevel(p1, p2, p3)
 	local v1 = p2 or "Assertion failed!"
 	local v2 = p3 or 1
 	if not p1 then
 		error(v1, v2 + 1)
 	end
 end
-local function bindSelf(p1, p2) --[[ Line: 54 ]]
-	return function(p12, ...) --[[ Line: 55 | Upvalues: p1 (copy), p2 (copy) ]]
+local function bindSelf(p1, p2)
+	return function(p12, ...)
 		if p12 == p1 then
 			return p2(p1, ...)
 		else
@@ -26,14 +27,14 @@ local function bindSelf(p1, p2) --[[ Line: 54 ]]
 		end
 	end
 end
-local function formatMessage(p1, p2, p3) --[[ Line: 64 ]]
+local function formatMessage(p1, p2, p3)
 	if p1 then
 		return p2
 	else
 		return p3
 	end
 end
-function t.new(p1) --[[ Line: 75 | Upvalues: t (copy) ]]
+function t.new(p1)
 	local t2 = {
 		value = p1,
 		successCondition = true,
@@ -43,7 +44,7 @@ function t.new(p1) --[[ Line: 75 | Upvalues: t (copy) ]]
 	}
 	setmetatable(t2, t)
 	local a = t2.a
-	function t2.a(p1, ...) --[[ Line: 55 | Upvalues: t2 (copy), a (copy) ]]
+	function t2.a(p1, ...)
 		if p1 == t2 then
 			return a(t2, ...)
 		else
@@ -52,7 +53,7 @@ function t.new(p1) --[[ Line: 75 | Upvalues: t (copy) ]]
 	end
 	t2.an = t2.a
 	local ok = t2.ok
-	function t2.ok(p1, ...) --[[ Line: 55 | Upvalues: t2 (copy), ok (copy) ]]
+	function t2.ok(p1, ...)
 		if p1 == t2 then
 			return ok(t2, ...)
 		else
@@ -60,7 +61,7 @@ function t.new(p1) --[[ Line: 75 | Upvalues: t (copy) ]]
 		end
 	end
 	local equal = t2.equal
-	function t2.equal(p1, ...) --[[ Line: 55 | Upvalues: t2 (copy), equal (copy) ]]
+	function t2.equal(p1, ...)
 		if p1 == t2 then
 			return equal(t2, ...)
 		else
@@ -68,7 +69,7 @@ function t.new(p1) --[[ Line: 75 | Upvalues: t (copy) ]]
 		end
 	end
 	local throw = t2.throw
-	function t2.throw(p1, ...) --[[ Line: 55 | Upvalues: t2 (copy), throw (copy) ]]
+	function t2.throw(p1, ...)
 		if p1 == t2 then
 			return throw(t2, ...)
 		else
@@ -76,7 +77,7 @@ function t.new(p1) --[[ Line: 75 | Upvalues: t (copy) ]]
 		end
 	end
 	local near = t2.near
-	function t2.near(p1, ...) --[[ Line: 55 | Upvalues: t2 (copy), near (copy) ]]
+	function t2.near(p1, ...)
 		if p1 == t2 then
 			return near(t2, ...)
 		else
@@ -85,13 +86,13 @@ function t.new(p1) --[[ Line: 75 | Upvalues: t (copy) ]]
 	end
 	return t2
 end
-function t.checkMatcherNameCollisions(p1) --[[ Line: 96 | Upvalues: t2 (copy), t3 (copy), t (copy) ]]
+function t.checkMatcherNameCollisions(p1)
 	return not (t2[p1] or (t3[p1] or t[p1]))
 end
-function t.extend(p1, p2) --[[ Line: 104 ]]
+function t.extend(p1, p2)
 	p1.matchers = p2 or {}
 	for k, v in pairs(p1.matchers) do
-		local function f2(p12, ...) --[[ Line: 108 | Upvalues: v (copy), p1 (copy) ]]
+		local function f2(p12, ...)
 			local v1 = v(p1.value, ...)
 			local v2 = v1.message or "Assertion failed!"
 			local v3 = 3 or 1
@@ -101,7 +102,7 @@ function t.extend(p1, p2) --[[ Line: 104 ]]
 			p1:_resetModifiers()
 			return p1
 		end
-		p1._boundMatchers[k] = function(p12, ...) --[[ Line: 55 | Upvalues: p1 (copy), f2 (copy) ]]
+		p1._boundMatchers[k] = function(p12, ...)
 			if p12 == p1 then
 				return f2(p1, ...)
 			else
@@ -111,7 +112,7 @@ function t.extend(p1, p2) --[[ Line: 104 ]]
 	end
 	return p1
 end
-function t.__index(p1, p2) --[[ Line: 121 | Upvalues: t2 (copy), t3 (copy), t (copy) ]]
+function t.__index(p1, p2)
 	if t2[p2] then
 		return p1
 	elseif t3[p2] then
@@ -124,10 +125,10 @@ function t.__index(p1, p2) --[[ Line: 121 | Upvalues: t2 (copy), t3 (copy), t (c
 		return t[p2]
 	end
 end
-function t._resetModifiers(p1) --[[ Line: 154 ]]
+function t._resetModifiers(p1)
 	p1.successCondition = true
 end
-function t.a(p1, p2) --[[ Line: 163 ]]
+function t.a(p1, p2)
 	local v2 = type(p1.value) == p2 == p1.successCondition
 	local v4 = ("Expected value of type %q, got value %q of type %s"):format(p2, tostring(p1.value), (type(p1.value)))
 	local v8 = if p1.successCondition then v4 else ("Expected value not of type %q, got value %q of type %s"):format(p2, tostring(p1.value), (type(p1.value))) or "Assertion failed!"
@@ -139,7 +140,7 @@ function t.a(p1, p2) --[[ Line: 163 ]]
 	return p1
 end
 t.an = t.a
-function t.ok(p1) --[[ Line: 191 ]]
+function t.ok(p1)
 	local v1 = ("Expected value %q to be non-nil"):format((tostring(p1.value)))
 	local v4 = if p1.successCondition then v1 else ("Expected value %q to be nil"):format((tostring(p1.value))) or "Assertion failed!"
 	local v5 = 3 or 1
@@ -149,7 +150,7 @@ function t.ok(p1) --[[ Line: 191 ]]
 	p1:_resetModifiers()
 	return p1
 end
-function t.equal(p1, p2) --[[ Line: 212 ]]
+function t.equal(p1, p2)
 	local v5 = ("Expected value %q (%s), got %q (%s) instead"):format(tostring(p2), type(p2), tostring(p1.value), (type(p1.value)))
 	local v8 = if p1.successCondition then v5 else ("Expected anything but value %q (%s)"):format(tostring(p2), (type(p2))) or "Assertion failed!"
 	local v9 = 3 or 1
@@ -159,7 +160,7 @@ function t.equal(p1, p2) --[[ Line: 212 ]]
 	p1:_resetModifiers()
 	return p1
 end
-function t.near(p1, p2, p3) --[[ Line: 238 ]]
+function t.near(p1, p2, p3)
 	assert(type(p1.value) == "number", "Expectation value must be a number to use \'near\'")
 	assert(type(p2) == "number", "otherValue must be a number")
 	assert(type(p3) == "number" or p3 == nil, "limit must be a number or nil")
@@ -174,7 +175,7 @@ function t.near(p1, p2, p3) --[[ Line: 238 ]]
 	p1:_resetModifiers()
 	return p1
 end
-function t.throw(p1, p2) --[[ Line: 271 ]]
+function t.throw(p1, p2)
 	local v1, v2 = pcall(p1.value)
 	local v3 = v1 ~= p1.successCondition
 	if p2 and not v1 then

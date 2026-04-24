@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Settings = require(ReplicatedStorage.Resource.Settings)
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -12,7 +13,7 @@ local t = {
 	removeDeathLighting = nil
 }
 local v1 = WindowGroup.new()
-function t.getCenterWindowGroup() --[[ Line: 15 | Upvalues: v1 (copy) ]]
+function t.getCenterWindowGroup()
 	return v1
 end
 return t

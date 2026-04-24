@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
@@ -50,7 +51,7 @@ local t = {
 		Safe = true
 	}
 }
-local function toUnix(p1) --[[ Line: 70 ]]
+local function toUnix(p1)
 	return DateTime.fromUniversalTime(p1.year, p1.month, p1.day, p1.hour - -4).UnixTimestamp
 end
 local t2 = {

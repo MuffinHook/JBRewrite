@@ -1,75 +1,76 @@
+-- Reviewed by Claude
 local Util = require(script.Parent.Parent.Shared.Util)
 local t = {
-	Validate = function(p1) --[[ Name: Validate | Line: 4 ]]
+	Validate = function(p1)
 		return p1 ~= nil
 	end,
-	Parse = function(p1) --[[ Name: Parse | Line: 8 ]]
+	Parse = function(p1)
 		return tostring(p1)
 	end
 }
 local t2 = {
-	Transform = function(p1) --[[ Name: Transform | Line: 14 ]]
+	Transform = function(p1)
 		return tonumber(p1)
 	end,
-	Validate = function(p1) --[[ Name: Validate | Line: 18 ]]
+	Validate = function(p1)
 		return p1 ~= nil
 	end,
-	Parse = function(p1) --[[ Name: Parse | Line: 22 ]]
+	Parse = function(p1)
 		return p1
 	end
 }
 local t3 = {
-	Transform = function(p1) --[[ Name: Transform | Line: 28 ]]
+	Transform = function(p1)
 		return tonumber(p1)
 	end,
-	Validate = function(p1) --[[ Name: Validate | Line: 32 ]]
+	Validate = function(p1)
 		return if p1 == nil then false else p1 == math.floor(p1), "Only whole numbers are valid."
 	end,
-	Parse = function(p1) --[[ Name: Parse | Line: 36 ]]
+	Parse = function(p1)
 		return p1
 	end
 }
 local t4 = {
-	Transform = function(p1) --[[ Name: Transform | Line: 42 ]]
+	Transform = function(p1)
 		return tonumber(p1)
 	end,
-	Validate = function(p1) --[[ Name: Validate | Line: 46 ]]
+	Validate = function(p1)
 		return if p1 == nil or p1 ~= math.floor(p1) then false else p1 > 0, "Only positive whole numbers are valid."
 	end,
-	Parse = function(p1) --[[ Name: Parse | Line: 50 ]]
+	Parse = function(p1)
 		return p1
 	end
 }
 local t5 = {
-	Transform = function(p1) --[[ Name: Transform | Line: 56 ]]
+	Transform = function(p1)
 		return tonumber(p1)
 	end,
-	Validate = function(p1) --[[ Name: Validate | Line: 60 ]]
+	Validate = function(p1)
 		return if p1 == nil or p1 ~= math.floor(p1) then false else p1 >= 0, "Only non-negative whole numbers are valid."
 	end,
-	Parse = function(p1) --[[ Name: Parse | Line: 64 ]]
+	Parse = function(p1)
 		return p1
 	end
 }
 local t6 = {
-	Transform = function(p1) --[[ Name: Transform | Line: 70 ]]
+	Transform = function(p1)
 		return tonumber(p1)
 	end,
-	Validate = function(p1) --[[ Name: Validate | Line: 74 ]]
+	Validate = function(p1)
 		return if p1 == nil or (p1 ~= math.floor(p1) or not (p1 >= 0)) then false else p1 <= 255, "Only bytes are valid."
 	end,
-	Parse = function(p1) --[[ Name: Parse | Line: 78 ]]
+	Parse = function(p1)
 		return p1
 	end
 }
 local t7 = {
-	Transform = function(p1) --[[ Name: Transform | Line: 84 ]]
+	Transform = function(p1)
 		return tonumber(p1)
 	end,
-	Validate = function(p1) --[[ Name: Validate | Line: 88 ]]
+	Validate = function(p1)
 		return if p1 == nil or (p1 ~= math.floor(p1) or not (p1 >= 0)) then false else p1 <= 9, "Only digits are valid."
 	end,
-	Parse = function(p1) --[[ Name: Parse | Line: 92 ]]
+	Parse = function(p1)
 		return p1
 	end
 }
@@ -96,13 +97,13 @@ local v2 = Util.MakeDictionary({
 	"-"
 })
 local t8 = {
-	Transform = function(p1) --[[ Name: Transform | Line: 103 ]]
+	Transform = function(p1)
 		return p1:lower()
 	end,
-	Validate = function(p1) --[[ Name: Validate | Line: 107 | Upvalues: v1 (copy), v2 (copy) ]]
+	Validate = function(p1)
 		return if v1[p1] == nil then v2[p1] ~= nil else true, "Please use true/yes/on or false/no/off."
 	end,
-	Parse = function(p1) --[[ Name: Parse | Line: 111 | Upvalues: v1 (copy), v2 (copy) ]]
+	Parse = function(p1)
 		if v1[p1] then
 			return true
 		elseif v2[p1] then
@@ -112,7 +113,7 @@ local t8 = {
 		end
 	end
 }
-return function(p1) --[[ Line: 123 | Upvalues: t (copy), t2 (copy), t3 (copy), t4 (copy), t5 (copy), t6 (copy), t7 (copy), t8 (ref), Util (copy) ]]
+return function(p1)
 	p1:RegisterType("string", t)
 	p1:RegisterType("number", t2)
 	p1:RegisterType("integer", t3)

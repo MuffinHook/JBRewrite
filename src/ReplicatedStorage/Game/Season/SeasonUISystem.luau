@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local MarketplaceService = game:GetService("MarketplaceService")
@@ -22,11 +23,11 @@ local SeasonConsts = require(script.Parent.SeasonConsts)
 local SeasonUtils = require(script.Parent.SeasonUtils)
 local v1 = nil
 local v2 = nil
-local function SelectIfGamepad(p1) --[[ Line: 28 | Upvalues: EzUtils (copy) ]]
+local function SelectIfGamepad(p1)
 	EzUtils.selectIfGamepad(p1)
 end
 local t = {}
-function t.init() --[[ Line: 33 | Upvalues: v1 (ref), v2 (ref), ReplicatedStorage (copy), LocalPlayer (copy), t (copy), SeasonConsts (copy), Window (copy), GameUtil (copy), waitForChild (copy) ]]
+function t.init()
 	v1 = require(script.Parent.SeasonSystem)
 	v2 = require(ReplicatedStorage.Game.Contract.ContractUISystem)
 	local SeasonGui = ReplicatedStorage.StarterGui:FindFirstChild("SeasonGui")
@@ -41,12 +42,12 @@ function t.init() --[[ Line: 33 | Upvalues: v1 (ref), v2 (ref), ReplicatedStorag
 	v12:GetOnClosedSignal():Connect(t._close)
 	t._window = v12
 	GameUtil.getCenterWindowGroup():Add(v12)
-	waitForChild(ReplicatedStorage, SeasonConsts.PRIZE_PURCHASE_REMOTE_NAME, 30):andThen(function(p1) --[[ Line: 54 | Upvalues: v1 (ref) ]]
+	waitForChild(ReplicatedStorage, SeasonConsts.PRIZE_PURCHASE_REMOTE_NAME, 30):andThen(function(p1)
 		v1._prizePurchaseRemote = p1
 	end):catch(warn)
 	SeasonGui.Background.BonusAwards.Visible = SeasonConsts.SEASON_BONUS_ENABLED
 end
-function t._updateSeasonUi(p1) --[[ Line: 61 | Upvalues: t (copy), SeasonConsts (copy) ]]
+function t._updateSeasonUi(p1)
 	t._seasonState = p1
 	local gui = t.gui
 	if p1 == 0 then
@@ -65,7 +66,7 @@ function t._updateSeasonUi(p1) --[[ Line: 61 | Upvalues: t (copy), SeasonConsts 
 		error(("Invalid season state: %d"):format(p1))
 	end
 end
-function t._updateDeadline() --[[ Line: 80 | Upvalues: t (copy), SeasonUtils (copy), SeasonConsts (copy), ContractUtils (copy), LevelConsts (copy) ]]
+function t._updateDeadline()
 	local gui = t.gui
 	local v1 = SeasonUtils.getRemainingTime()
 	local v3 = SeasonUtils.isBuyEnabled()
@@ -88,7 +89,7 @@ function t._updateDeadline() --[[ Line: 80 | Upvalues: t (copy), SeasonUtils (co
 	local v8 = ContractUtils.getQuantizedBlock(LevelConsts.DAILY_EXP_DURATION, LevelConsts.DAILY_EXP_DURATION_OFFSET)
 	gui.Background.DailyExpRefreshHelp.Text = ("Daily XP reloads in <font color=\"rgb(255, 207, 0)\">%s</font>!"):format(SeasonUtils.formatRemaining(v8 - workspace:GetServerTimeNow()))
 end
-function t._open() --[[ Line: 125 | Upvalues: t (copy), Maid (copy), Utils (copy), Interval (copy), LocalPlayer (copy), LevelSystem (copy), v1 (ref), SeasonUtils (copy), Audio (copy), v2 (ref), EzUtils (copy), SeasonConsts (copy), RunUtils (copy), Notification (copy), Settings (copy), MarketplaceService (copy), SeasonUIUtils (copy) ]]
+function t._open()
 	assert(t._maid == nil)
 	local v12 = Maid.new()
 	t._maid = v12
@@ -99,7 +100,7 @@ function t._open() --[[ Line: 125 | Upvalues: t (copy), Maid (copy), Utils (copy
 		gui.Background.BonusAwards.Position = UDim2.new(1.01, 0, 0, 2)
 	end
 	gui.Enabled = true
-	v12:GiveTask(function() --[[ Line: 140 | Upvalues: gui (copy) ]]
+	v12:GiveTask(function()
 		gui.Enabled = false
 	end)
 	v12:GiveTask(Interval.every(1):Connect(t._updateDeadline))
@@ -107,12 +108,12 @@ function t._open() --[[ Line: 125 | Upvalues: t (copy), Maid (copy), Utils (copy
 	t.updateProgress(LocalPlayer)
 	v12:GiveTask(LevelSystem.getOnLevelChangedSignal():Connect(t.updateProgress))
 	v12:GiveTask(LevelSystem.getOnExpChangedSignal():Connect(t.updateProgress))
-	v12:GiveTask(v1.getSeasonPassOwnedSignal():Connect(function(p1) --[[ Line: 150 | Upvalues: LocalPlayer (ref), t (ref) ]]
+	v12:GiveTask(v1.getSeasonPassOwnedSignal():Connect(function(p1)
 		if p1 == LocalPlayer then
 			t.updateProgress(LocalPlayer)
 		end
 	end))
-	v12:GiveTask(gui.Background.Bottom.Container.ReviewButton.MouseButton1Down:Connect(function() --[[ Line: 157 | Upvalues: SeasonUtils (ref), Audio (ref), LocalPlayer (ref), t (ref), v2 (ref) ]]
+	v12:GiveTask(gui.Background.Bottom.Container.ReviewButton.MouseButton1Down:Connect(function()
 		if not (SeasonUtils.getRemainingTime() < 0) then
 			Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
 			t.close()
@@ -121,7 +122,7 @@ function t._open() --[[ Line: 125 | Upvalues: t (copy), Maid (copy), Utils (copy
 	end))
 	EzUtils.selectIfGamepad(gui.Background.Bottom.Container.ReviewButton)
 	gui.Background.Bottom.Container.SeasonPass.Title.Text = ("SEASON %d: %s"):format(SeasonConsts.SEASON_NUM, SeasonConsts.SEASON_TITLE)
-	v12:GiveTask(gui.Background.Bottom.Container.SeasonPass.MouseButton1Down:Connect(function() --[[ Line: 172 | Upvalues: RunUtils (ref), SeasonUtils (ref), Notification (ref), Audio (ref), LocalPlayer (ref), Settings (ref), v1 (ref), MarketplaceService (ref) ]]
+	v12:GiveTask(gui.Background.Bottom.Container.SeasonPass.MouseButton1Down:Connect(function()
 		if RunUtils.isStudio() or not (SeasonUtils.getRemainingTime() <= 0) then
 			Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
 			local v12 = Settings.getFirstProductByType("SeasonPass")
@@ -136,7 +137,7 @@ function t._open() --[[ Line: 125 | Upvalues: t (copy), Maid (copy), Utils (copy
 		end
 	end))
 	SeasonUIUtils.hookGiftContainer(gui.Background.GiftContainer, v12)
-	local function setOwnsSeasonPass() --[[ Line: 187 | Upvalues: gui (copy) ]]
+	local function setOwnsSeasonPass()
 		gui.Background.Bottom.Container.SeasonPass.Buy.Visible = false
 		gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
 		gui.Background.Bottom.Container.SeasonPass.Owned.Visible = true
@@ -146,7 +147,7 @@ function t._open() --[[ Line: 125 | Upvalues: t (copy), Maid (copy), Utils (copy
 		gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
 		gui.Background.Bottom.Container.SeasonPass.Owned.Visible = true
 	else
-		v12:GiveTask(v1.getSeasonPassOwnedSignal():Connect(function(p1) --[[ Line: 195 | Upvalues: LocalPlayer (ref), gui (copy) ]]
+		v12:GiveTask(v1.getSeasonPassOwnedSignal():Connect(function(p1)
 			if p1 == LocalPlayer then
 				gui.Background.Bottom.Container.SeasonPass.Buy.Visible = false
 				gui.Background.Bottom.Container.SeasonPass.Price.Visible = false
@@ -155,7 +156,7 @@ function t._open() --[[ Line: 125 | Upvalues: t (copy), Maid (copy), Utils (copy
 		end))
 	end
 	v12:GiveTask(gui.Background.Close.MouseButton1Down:Connect(t.close))
-	local function updatePrice() --[[ Line: 206 | Upvalues: Settings (ref), gui (copy) ]]
+	local function updatePrice()
 		local v1 = Settings.getFirstProductByType("SeasonPass")
 		if v1 and v1.Robux then
 			gui.Background.Bottom.Container.SeasonPass.Price.Text = tostring(v1.Robux)
@@ -186,25 +187,25 @@ function t._open() --[[ Line: 125 | Upvalues: t (copy), Maid (copy), Utils (copy
 		gui.Background.BonusAwards.Desc.Text = ("Players in the top %d%% win this prize when the season ends."):format(v4 * 100)
 	end
 end
-function t._close() --[[ Line: 248 | Upvalues: t (copy) ]]
+function t._close()
 	assert(t._maid ~= nil)
 	local _maid = t._maid
 	t._maid = nil
 	_maid:Destroy()
 end
-function t.open() --[[ Line: 254 | Upvalues: t (copy) ]]
+function t.open()
 	t._window:Open()
 end
-function t.close() --[[ Line: 257 | Upvalues: t (copy) ]]
+function t.close()
 	t._window:Close()
 end
-function t.updateProgress(p1) --[[ Line: 260 | Upvalues: LocalPlayer (copy), LevelUtils (copy), t (copy) ]]
+function t.updateProgress(p1)
 	if p1 == LocalPlayer then
 		local v1 = LevelUtils.yieldLevel(p1)
 		t.setProgress(v1, (LevelUtils.yieldExp(p1)))
 	end
 end
-local function setProgressFrameScale(p1, p2, p3) --[[ Line: 267 | Upvalues: SeasonConsts (copy) ]]
+local function setProgressFrameScale(p1, p2, p3)
 	local v1 = p1.Parent
 	if v1 ~= nil then
 		local Scale = v1.Size.X.Scale
@@ -219,7 +220,7 @@ local function setProgressFrameScale(p1, p2, p3) --[[ Line: 267 | Upvalues: Seas
 		p1.Visible = true
 	end
 end
-function t.setProgress(p1, p2) --[[ Line: 284 | Upvalues: LevelConsts (copy), v1 (ref), LocalPlayer (copy), SeasonUtils (copy), Players (copy), SeasonConsts (copy), t (copy), LevelUtils (copy), setProgressFrameScale (copy) ]]
+function t.setProgress(p1, p2)
 	local MAX_DAILY_EXP = LevelConsts.MAX_DAILY_EXP
 	if v1.doesPlayerOwnSeasonPass(LocalPlayer) then
 		MAX_DAILY_EXP = LevelConsts.MAX_DAILY_EXP_SEASON_PASS

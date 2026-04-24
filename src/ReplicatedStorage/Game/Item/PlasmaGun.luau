@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GunUtils = require(ReplicatedStorage.Game.GunShop.GunUtils)
@@ -8,10 +9,10 @@ local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
 local Raycast = require(ReplicatedStorage.Std.Raycast)
 local Gun = require(script.Parent.Gun)
 local v2 = Random.new()
-local function RandomBilateral() --[[ Line: 15 | Upvalues: v2 (copy) ]]
+local function RandomBilateral()
 	return v2:NextNumber() * 2 - 1
 end
-local function RandomVector() --[[ Line: 18 | Upvalues: GeomUtils (copy) ]]
+local function RandomVector()
 	return GeomUtils.randomPointOnSphere()
 end
 local t = {
@@ -19,13 +20,13 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.new(p1, p2, p3) --[[ Line: 26 | Upvalues: Gun (copy), t (copy) ]]
+function t.new(p1, p2, p3)
 	local v1 = Gun.new(p1, p2, p3)
 	setmetatable(v1, t)
 	v1.ListZap = {}
 	return v1
 end
-function t.UpdateZap(p1, p2) --[[ Line: 33 | Upvalues: GeomUtils (copy) ]]
+function t.UpdateZap(p1, p2)
 	local Origin = p2.Origin
 	local Target = p2.Target
 	local OffsetRadius = p2.OffsetRadius
@@ -84,19 +85,19 @@ function t.UpdateZap(p1, p2) --[[ Line: 33 | Upvalues: GeomUtils (copy) ]]
 	p2.LastPositionIndex = v7
 	return v6 >= 1
 end
-function t.DestroyZap(p1, p2) --[[ Line: 106 ]]
+function t.DestroyZap(p1, p2)
 	for i, v in ipairs(p2.Parts) do
 		v:Destroy()
 	end
 	p2.Parts = nil
 end
-function t.DestroyZaps(p1) --[[ Line: 112 ]]
+function t.DestroyZaps(p1)
 	for i = #p1.ListZap, 1, -1 do
 		table.remove(p1.ListZap, i)
 		p1:DestroyZap(p1.ListZap[i])
 	end
 end
-function t.UpdateZaps(p1) --[[ Line: 119 ]]
+function t.UpdateZaps(p1)
 	for i = #p1.ListZap, 1, -1 do
 		local v1 = p1.ListZap[i]
 		if p1:UpdateZap(v1) then
@@ -105,10 +106,10 @@ function t.UpdateZaps(p1) --[[ Line: 119 ]]
 		end
 	end
 end
-function t.Heartbeat(p1) --[[ Line: 129 ]]
+function t.Heartbeat(p1)
 	p1:UpdateZaps()
 end
-function t.Zap(p1, p2, p3, p4, p5, p6) --[[ Line: 132 ]]
+function t.Zap(p1, p2, p3, p4, p5, p6)
 	local t = {
 		Width = p4,
 		OffsetRadius = p5,
@@ -123,14 +124,14 @@ function t.Zap(p1, p2, p3, p4, p5, p6) --[[ Line: 132 ]]
 	t.BornAt = tick()
 	table.insert(p1.ListZap, t)
 end
-function t.ShootOther(p1) --[[ Line: 147 | Upvalues: GeomUtils (copy), CharacterUtils (copy), GunUtils (copy), Raycast (copy), GunSystemConsts (copy), Audio (copy) ]]
+function t.ShootOther(p1)
 	local Tip = p1.Tip
 	p1.SpringItemOffset:Accelerate(Vector3.new(0, 0, 30) + GeomUtils.randomPointOnSphere() * 3)
 	p1.SpringItemRotation:Accelerate((Vector3.new(-1, 2, 0)).Unit * 12 + GeomUtils.randomPointOnSphere() * 2)
 	local v1 = RaycastParams.new()
 	v1.FilterDescendantsInstances = p1.IgnoreList
 	v1.FilterType = Enum.RaycastFilterType.Exclude
-	local function collidableFunc(p1) --[[ Line: 157 | Upvalues: CharacterUtils (ref) ]]
+	local function collidableFunc(p1)
 		if p1:GetAttribute("InvisibleToBullets") == true then
 			return false
 		elseif CharacterUtils.getAncestorPartHumanoid(p1) then
@@ -177,20 +178,20 @@ function t.ShootOther(p1) --[[ Line: 147 | Upvalues: GeomUtils (copy), Character
 	p1:Zap(Tip.Position, Tip.CFrame * Vector3.new(0, 0, -4) + GeomUtils.randomPointOnSphere() * 3, 0.06, 0.2, 1)
 	p1:Zap(Tip.Position, Tip.CFrame * Vector3.new(0, 0, -4) + GeomUtils.randomPointOnSphere() * 3, 0.06, 0.2, 1)
 end
-function t.ShootSound(p1, p2) --[[ Line: 216 | Upvalues: Audio (copy) ]]
+function t.ShootSound(p1, p2)
 	if not p2 then
 		Audio.ObjectLocal(p1.Tip, 4752401149)
 	end
 end
-function t.ReloadDropAmmoVisual(p1) --[[ Line: 221 ]] end
-function t.ReloadRefillAmmoVisual(p1) --[[ Line: 222 ]] end
-function t.ReloadDropAmmoSound(p1) --[[ Line: 223 | Upvalues: Audio (copy) ]]
+function t.ReloadDropAmmoVisual(p1)  end
+function t.ReloadRefillAmmoVisual(p1)  end
+function t.ReloadDropAmmoSound(p1)
 	Audio.ObjectLocal(p1.Tip, 16652902841, {
 		Volume = 1
 	})
 end
-function t.ReloadRefillAmmoSound(p1) --[[ Line: 226 ]] end
-function t.Unequip(p1) --[[ Line: 227 | Upvalues: Gun (copy) ]]
+function t.ReloadRefillAmmoSound(p1)  end
+function t.Unequip(p1)
 	Gun.Unequip(p1)
 	p1:DestroyZaps()
 end

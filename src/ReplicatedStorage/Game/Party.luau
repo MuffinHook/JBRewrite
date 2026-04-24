@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local SoundService = game:GetService("SoundService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CollectionService = game:GetService("CollectionService")
@@ -11,12 +12,12 @@ local v2 = nil
 local v3 = Maid.new()
 local v4 = nil
 local v5 = false
-local function PartyStart() --[[ Line: 19 | Upvalues: v5 (ref), v4 (ref), SoundService (copy), v2 (ref), v3 (copy), RunService (copy), LocalPlayer (copy), v1 (ref), Animation (copy) ]]
+local function PartyStart()
 	assert(not v5)
 	v5 = true
 	local v22 = tick()
 	local v32 = tick()
-	local function Heartbeat(p1) --[[ Line: 25 | Upvalues: v4 (ref), SoundService (ref), v22 (ref), v32 (ref), v2 (ref) ]]
+	local function Heartbeat(p1)
 		local v1 = tick()
 		local v23 = CFrame.Angles(0, 0.3 * p1, 0)
 		local Disco = v4:FindFirstChild("Disco")
@@ -70,7 +71,7 @@ local function PartyStart() --[[ Line: 19 | Upvalues: v5 (ref), v4 (ref), SoundS
 		end
 	end
 end
-local function PartyEnd() --[[ Line: 77 | Upvalues: v5 (ref), v3 (copy), v1 (ref) ]]
+local function PartyEnd()
 	assert(v5)
 	v5 = false
 	v3:Destroy()
@@ -78,11 +79,11 @@ local function PartyEnd() --[[ Line: 77 | Upvalues: v5 (ref), v3 (copy), v1 (ref
 	v1:Destroy()
 	v1 = nil
 end
-local function AddedFun(p1) --[[ Line: 86 | Upvalues: v4 (ref), PartyStart (copy) ]]
+local function AddedFun(p1)
 	v4 = p1
 	PartyStart()
 end
-local function RemovedFun(p1) --[[ Line: 90 | Upvalues: v5 (ref), v3 (copy), v1 (ref), v4 (ref) ]]
+local function RemovedFun(p1)
 	assert(v5)
 	v5 = false
 	v3:Destroy()
@@ -92,7 +93,7 @@ local function RemovedFun(p1) --[[ Line: 90 | Upvalues: v5 (ref), v3 (copy), v1 
 	v4 = nil
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 96 | Upvalues: v2 (ref), CollectionService (copy), v4 (ref), PartyStart (copy), AddedFun (copy), RemovedFun (copy) ]]
+	Init = function(p1)
 		v2 = p1.Fireworks
 		local v1 = next
 		local v22, v3 = CollectionService:GetTagged("PartyThemeModel")

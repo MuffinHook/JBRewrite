@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -14,7 +15,7 @@ local OwnedPartBinder = require(ReplicatedStorage.Game.OwnedPart.OwnedPartBinder
 local t = {}
 t.__index = t
 t.__ClassName = "Cart"
-function t.new(p1) --[[ Line: 19 | Upvalues: t (copy), RxInstanceUtils (copy), Maid (copy), CartConsts (copy), HttpService (copy), BinderUtils (copy), OwnedPartBinder (copy) ]]
+function t.new(p1)
 	local t2 = {}
 	setmetatable(t2, t)
 	RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
@@ -28,7 +29,7 @@ function t.new(p1) --[[ Line: 19 | Upvalues: t (copy), RxInstanceUtils (copy), M
 	t2._seatOwnedPartValue = p1:WaitForChild(CartConsts.SEAT_OWNED_PART_VALUE_NAME)
 	t2._yOffset = 1
 	t2._graph = nil
-	local function decodeGraphStr() --[[ Line: 38 | Upvalues: t2 (copy), HttpService (ref) ]]
+	local function decodeGraphStr()
 		local _graphValue = t2._graphValue.Value
 		if _graphValue then
 			t2._graph = HttpService:JSONDecode(_graphValue)
@@ -43,23 +44,23 @@ function t.new(p1) --[[ Line: 19 | Upvalues: t (copy), RxInstanceUtils (copy), M
 		t2._graph = nil
 	end
 	t2._maid:GiveTask(t2._graphValue.Changed:Connect(decodeGraphStr))
-	t2._maid:GiveTask(t2._firstSegmentValue.Changed:Connect(function() --[[ Line: 49 | Upvalues: t2 (copy) ]]
+	t2._maid:GiveTask(t2._firstSegmentValue.Changed:Connect(function()
 		t2:_onSegmentUpdate()
 	end))
-	t2._maid:GiveTask(t2._secondSegmentValue.Changed:Connect(function() --[[ Line: 52 | Upvalues: t2 (copy) ]]
+	t2._maid:GiveTask(t2._secondSegmentValue.Changed:Connect(function()
 		t2:_onSegmentUpdate()
 	end))
 	t2:_onSegmentUpdate()
 	t2._maid._seatMaid = Maid.new()
 	local v2 = nil
-	local function onOwnedPart(p1) --[[ Line: 59 | Upvalues: v2 (ref), t2 (copy), RxInstanceUtils (ref), BinderUtils (ref), OwnedPartBinder (ref) ]]
+	local function onOwnedPart(p1)
 		if v2 then
 			v2:cancel()
 			v2 = nil
 		end
 		t2._ownedPartSeat = nil
 		if p1 then
-			t2._maid._onSeated = RxInstanceUtils.observeOneChildNamed(p1, "SeatWeld", function(p1, p2) --[[ Line: 69 | Upvalues: t2 (ref) ]]
+			t2._maid._onSeated = RxInstanceUtils.observeOneChildNamed(p1, "SeatWeld", function(p1, p2)
 				local v1
 				if p1 then
 					local Part0 = p1.Part0
@@ -69,14 +70,14 @@ function t.new(p1) --[[ Line: 19 | Upvalues: t (copy), RxInstanceUtils (copy), M
 				else
 					v1 = nil
 				end
-				p2:GiveTask(function() --[[ Line: 80 | Upvalues: t2 (ref) ]]
+				p2:GiveTask(function()
 					t2._maid._seatMaid:DoCleaning()
 					t2:_onSeated(nil, t2._maid._seatMaid)
 				end)
 				t2._maid._seatMaid:DoCleaning()
 				t2:_onSeated(v1, t2._maid._seatMaid)
 			end)
-			v2 = BinderUtils.promiseBoundClass(OwnedPartBinder, p1):andThen(function(p1) --[[ Line: 88 | Upvalues: t2 (ref) ]]
+			v2 = BinderUtils.promiseBoundClass(OwnedPartBinder, p1):andThen(function(p1)
 				t2._ownedPartSeat = p1
 			end)
 		else
@@ -87,14 +88,14 @@ function t.new(p1) --[[ Line: 19 | Upvalues: t (copy), RxInstanceUtils (copy), M
 	t2._maid:GiveTask(t2._seatOwnedPartValue.Changed:Connect(onOwnedPart))
 	return t2
 end
-function t.GetOnSeatedSignal(p1) --[[ Line: 103 | Upvalues: Signal (copy) ]]
+function t.GetOnSeatedSignal(p1)
 	if not p1._onSeatedSignal then
 		p1._onSeatedSignal = Signal.new()
 		p1._maid:GiveTask(p1._onSeatedSignal)
 	end
 	return p1._onSeatedSignal
 end
-function t._onSeated(p1, p2, p3) --[[ Line: 110 | Upvalues: CharacterUtil (copy), ReplicatedStorage (copy) ]]
+function t._onSeated(p1, p2, p3)
 	if p2 then
 		local Humanoid = p2:FindFirstChild("Humanoid")
 		CharacterUtil.stopAnims(Humanoid)
@@ -103,14 +104,14 @@ function t._onSeated(p1, p2, p3) --[[ Line: 110 | Upvalues: CharacterUtil (copy)
 		CharacterUtil.setHumanoidEnabled(Humanoid, false)
 		v1:AdjustSpeed(0)
 		v1:Play()
-		p3:GiveTask(function() --[[ Line: 126 | Upvalues: Humanoid (copy) ]]
+		p3:GiveTask(function()
 			Humanoid.Sit = false
 		end)
-		p3:GiveTask(function() --[[ Line: 129 | Upvalues: v1 (copy) ]]
+		p3:GiveTask(function()
 			v1:Stop()
 		end)
 		p3:GiveTask(v1)
-		p3:GiveTask(function() --[[ Line: 133 | Upvalues: CharacterUtil (ref), Humanoid (copy) ]]
+		p3:GiveTask(function()
 			CharacterUtil.setHumanoidEnabled(Humanoid, true)
 		end)
 	end
@@ -119,17 +120,17 @@ function t._onSeated(p1, p2, p3) --[[ Line: 110 | Upvalues: CharacterUtil (copy)
 		p1._onSeatedSignal:Fire(p2, p3)
 	end
 end
-function t.GetOccupant(p1) --[[ Line: 142 ]]
+function t.GetOccupant(p1)
 	return p1._occupant
 end
-function t.GetFirstSegment(p1) --[[ Line: 145 ]]
+function t.GetFirstSegment(p1)
 	return p1._firstSegmentValue.Value
 end
-function t.GetSecondSegment(p1) --[[ Line: 148 ]]
+function t.GetSecondSegment(p1)
 	return p1._secondSegmentValue.Value
 end
-function t._startUpdate(p1) --[[ Line: 151 | Upvalues: RunService (copy), Time (copy), GraphUtils (copy), CartUtils (copy) ]]
-	p1._maid._updateLoop = RunService.Heartbeat:Connect(function() --[[ Line: 152 | Upvalues: Time (ref), p1 (copy), GraphUtils (ref), CartUtils (ref) ]]
+function t._startUpdate(p1)
+	p1._maid._updateLoop = RunService.Heartbeat:Connect(function()
 		local v1 = Time.GetNowSync() - p1:GetUpdatedAt()
 		local v2 = GraphUtils.calculateDist(p1._graph, v1) + p1:GetOffset()
 		local v3, v4 = CartUtils.calculateSegment(p1._rail, v2 - 1.5)
@@ -143,7 +144,7 @@ function t._startUpdate(p1) --[[ Line: 151 | Upvalues: RunService (copy), Time (
 		end
 	end)
 end
-function t._onSegmentUpdate(p1) --[[ Line: 180 | Upvalues: CartUtils (copy), Maid (copy) ]]
+function t._onSegmentUpdate(p1)
 	local v1 = p1:GetFirstSegment()
 	if v1 then
 		local v2 = p1:GetSecondSegment()
@@ -152,26 +153,26 @@ function t._onSegmentUpdate(p1) --[[ Line: 180 | Upvalues: CartUtils (copy), Mai
 			p1:_startUpdate()
 			p1._maid.railUpdateMaid = Maid.new()
 			for i, v in ipairs(p1._rail.listSegment) do
-				p1._maid.railUpdateMaid:GiveTask(v._front.Changed:Connect(function() --[[ Line: 197 | Upvalues: p1 (copy) ]]
+				p1._maid.railUpdateMaid:GiveTask(v._front.Changed:Connect(function()
 					p1:_onSegmentUpdate()
 				end))
-				p1._maid.railUpdateMaid:GiveTask(v._back.Changed:Connect(function() --[[ Line: 201 | Upvalues: p1 (copy) ]]
+				p1._maid.railUpdateMaid:GiveTask(v._back.Changed:Connect(function()
 					p1:_onSegmentUpdate()
 				end))
 			end
 		end
 	end
 end
-function t.GetUpdatedAt(p1) --[[ Line: 207 ]]
+function t.GetUpdatedAt(p1)
 	return p1._updatedAtValue.Value
 end
-function t.GetGraph(p1) --[[ Line: 210 ]]
+function t.GetGraph(p1)
 	return p1._graphValue.Value
 end
-function t.GetOffset(p1) --[[ Line: 213 ]]
+function t.GetOffset(p1)
 	return p1._offsetValue.Value
 end
-function t.Destroy(p1) --[[ Line: 216 ]]
+function t.Destroy(p1)
 	local _maid = p1._maid
 	p1._maid = nil
 	setmetatable(p1, nil)

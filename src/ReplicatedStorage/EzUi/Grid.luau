@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local v1 = script:FindFirstAncestor("EzUi")
 local Dictionary = require(v1.Dictionary)
 local Roact = require(v1.Parent.Roact)
@@ -12,8 +13,8 @@ v2.defaultProps = {
 	infHorizontal = false,
 	reverseY = false
 }
-function v2.init(p1) --[[ Line: 18 ]] end
-function v2.render(p1) --[[ Line: 19 | Upvalues: GridUtils (copy), Dictionary (copy), createElement (copy), Roact (copy) ]]
+function v2.init(p1)  end
+function v2.render(p1)
 	local aspectRatio = p1.props.aspectRatio
 	if p1.props.paddingRatio then
 		assert(aspectRatio, "aspectRatio is required when using paddingRatio.")

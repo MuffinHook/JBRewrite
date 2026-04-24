@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -21,14 +22,14 @@ local waitForChild = require(ReplicatedStorage.Std.waitForChild)
 local Confirmation = require(ReplicatedStorage.Module.Confirmation)
 require(ReplicatedStorage.Std.Debug.table2Lua)
 local String = require(ReplicatedStorage.Std.String)
-local function playDrums() --[[ Line: 26 | Upvalues: Players (copy), Audio (copy) ]]
+local function playDrums()
 	if Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617487453, {
 			Volume = 0.5
 		})
 	end
 end
-local function playClick() --[[ Line: 31 | Upvalues: Players (copy), Audio (copy) ]]
+local function playClick()
 	if Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 			Volume = 0.2
@@ -38,16 +39,16 @@ end
 local t = {
 	maid = Maid.new()
 }
-function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanConsts (copy), Confirmation (copy), ReplicatedStorage (copy), Players (copy), Audio (copy), PersistentCrewBattleConsts (copy), PersistentCrewConsts (copy), PlayerUtils (copy), String (copy), ClanMatchmakingConsts (copy), Roact (copy), createElement (copy), RoactRodux (copy), PersistentCrewApp (copy), t (copy), RxInstanceUtils (copy), Promise (copy), Maid (copy), PersistentCrewUtils (copy), waitForChild (copy), ClanUtils (copy), ClanMatchmakingUtils (copy) ]]
-	local function optimisticallyLockNetworkMutex() --[[ Line: 40 | Upvalues: persistentCrewStore (ref) ]]
+function t.init()
+	local function optimisticallyLockNetworkMutex()
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
 		})
 	end
-	local function attemptLeave() --[[ Line: 46 | Upvalues: ClanConsts (ref), Confirmation (ref), persistentCrewStore (ref), ReplicatedStorage (ref), Players (ref), Audio (ref) ]]
+	local function attemptLeave()
 		local v2 = Confirmation.new("Are you sure you want to leave? If you joined for less than " .. ("%d days"):format(ClanConsts.CLAN_JOIN_COOLDOWN_DURATION / 86400) .. ", you\'ll have to wait to join another crew.")
-		v2.Maid:GiveTask(v2.OnYes:Connect(function() --[[ Line: 54 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), ClanConsts (ref) ]]
+		v2.Maid:GiveTask(v2.OnYes:Connect(function()
 			persistentCrewStore:dispatch({
 				type = "setNetworkMutexLocked",
 				value = true
@@ -60,7 +61,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function attemptCreate(p1, p2) --[[ Line: 60 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), ClanConsts (ref), Players (ref), Audio (ref) ]]
+	local function attemptCreate(p1, p2)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
@@ -72,7 +73,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function attemptRequestJoinUserId(p1) --[[ Line: 65 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), ClanConsts (ref), Players (ref), Audio (ref) ]]
+	local function attemptRequestJoinUserId(p1)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
@@ -84,7 +85,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function attemptBattleClanId(p1, p2) --[[ Line: 70 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), PersistentCrewBattleConsts (ref), Players (ref), Audio (ref) ]]
+	local function attemptBattleClanId(p1, p2)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
@@ -96,7 +97,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function attemptViewUserIdClan(p1) --[[ Line: 76 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), PersistentCrewConsts (ref), Players (ref), Audio (ref) ]]
+	local function attemptViewUserIdClan(p1)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
@@ -108,7 +109,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function onAcceptBattleInvite(p1) --[[ Line: 81 | Upvalues: ReplicatedStorage (ref), PersistentCrewBattleConsts (ref), Players (ref), Audio (ref) ]]
+	local function onAcceptBattleInvite(p1)
 		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.RESPONSE_REMOTE_NAME):FireServer(p1.obj.Name, true)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
@@ -116,7 +117,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function onDeclineBattleInvite(p1) --[[ Line: 86 | Upvalues: ReplicatedStorage (ref), PersistentCrewBattleConsts (ref), Players (ref), Audio (ref) ]]
+	local function onDeclineBattleInvite(p1)
 		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.RESPONSE_REMOTE_NAME):FireServer(p1.obj.Name, false)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
@@ -124,7 +125,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function onUnAcceptBattleInvite() --[[ Line: 92 | Upvalues: ReplicatedStorage (ref), PersistentCrewBattleConsts (ref), Players (ref), Audio (ref) ]]
+	local function onUnAcceptBattleInvite()
 		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.UNACCEPT_BATTLE_INVITE_REMOTE_NAME):FireServer()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
@@ -132,11 +133,11 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function attemptKick(p1) --[[ Line: 97 | Upvalues: PlayerUtils (ref), Confirmation (ref), persistentCrewStore (ref), ReplicatedStorage (ref), ClanConsts (ref), Players (ref), Audio (ref) ]]
+	local function attemptKick(p1)
 		local v1, v2 = PlayerUtils.promiseNameFromUserId(p1):await()
 		if v1 then
 			local v3 = Confirmation.new("Are you sure you want to kick " .. v2 .. "?")
-			v3.Maid:GiveTask(v3.OnYes:Connect(function() --[[ Line: 103 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), ClanConsts (ref), p1 (copy) ]]
+			v3.Maid:GiveTask(v3.OnYes:Connect(function()
 				persistentCrewStore:dispatch({
 					type = "setNetworkMutexLocked",
 					value = true
@@ -150,7 +151,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			end
 		end
 	end
-	local function attemptAdmin(p1) --[[ Line: 109 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), ClanConsts (ref), Players (ref), Audio (ref) ]]
+	local function attemptAdmin(p1)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
@@ -162,9 +163,9 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function attemptRenameCrew(p1) --[[ Line: 114 | Upvalues: Confirmation (ref), String (ref), ClanConsts (ref), persistentCrewStore (ref), ReplicatedStorage (ref), Players (ref), Audio (ref) ]]
+	local function attemptRenameCrew(p1)
 		local v2 = Confirmation.new("Are you sure you want to rename your crew? This will cost " .. "$" .. String.comma((tostring(ClanConsts.CLAN_RENAME_COST))))
-		v2.Maid:GiveTask(v2.OnYes:Connect(function() --[[ Line: 120 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), ClanConsts (ref), p1 (copy) ]]
+		v2.Maid:GiveTask(v2.OnYes:Connect(function()
 			persistentCrewStore:dispatch({
 				type = "setNetworkMutexLocked",
 				value = true
@@ -177,7 +178,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function attemptUnAdmin(p1) --[[ Line: 126 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), ClanConsts (ref), Players (ref), Audio (ref) ]]
+	local function attemptUnAdmin(p1)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
@@ -189,7 +190,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function onClickJoinRequestAccept(p1) --[[ Line: 131 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), ClanConsts (ref), Players (ref), Audio (ref) ]]
+	local function onClickJoinRequestAccept(p1)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
@@ -201,7 +202,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function onClickJoinRequestDeny(p1) --[[ Line: 136 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), ClanConsts (ref), Players (ref), Audio (ref) ]]
+	local function onClickJoinRequestDeny(p1)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
@@ -213,7 +214,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function onClickReadyUp() --[[ Line: 141 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), ClanMatchmakingConsts (ref), Players (ref), Audio (ref) ]]
+	local function onClickReadyUp()
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
@@ -225,7 +226,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function onClickUnreadyUp() --[[ Line: 146 | Upvalues: persistentCrewStore (ref), ReplicatedStorage (ref), ClanMatchmakingConsts (ref), Players (ref), Audio (ref) ]]
+	local function onClickUnreadyUp()
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
@@ -237,12 +238,12 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 	end
-	local function attemptReportCrew(p1, p2) --[[ Line: 151 | Upvalues: ReplicatedStorage (ref), PersistentCrewBattleConsts (ref) ]]
+	local function attemptReportCrew(p1, p2)
 		assert(typeof(p1) == "string", "invalid report option")
 		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.REPORT_CLAN_REMOTE_NAME):FireServer(p1, p2)
 	end
 	local v1 = 0
-	local function onCountdownFinished() --[[ Line: 157 | Upvalues: v1 (ref), Players (ref), Audio (ref) ]]
+	local function onCountdownFinished()
 		if v1 < 1 and Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617487453, {
 				Volume = 0.5
@@ -278,24 +279,24 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 				optimisticallyLockNetworkMutex = optimisticallyLockNetworkMutex,
 				attemptReportCrew = attemptReportCrew
 			}) }) }), Players.LocalPlayer.PlayerGui, "PersistentCrewUI")
-	t.maid:GiveTask(function() --[[ Line: 203 | Upvalues: Roact (ref), v2 (copy) ]]
+	t.maid:GiveTask(function()
 		Roact.unmount(v2)
 	end)
-	RxInstanceUtils.observeAttribute(Players.LocalPlayer, ClanConsts.NETWORK_MUTEX_LOCKED_ATTR_NAME, function(p1) --[[ Line: 210 | Upvalues: persistentCrewStore (ref) ]]
+	RxInstanceUtils.observeAttribute(Players.LocalPlayer, ClanConsts.NETWORK_MUTEX_LOCKED_ATTR_NAME, function(p1)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = p1
 		})
 	end)
 	local v3 = nil
-	persistentCrewStore.changed:connect(function(p1, p2) --[[ Line: 218 | Upvalues: v3 (ref), Players (ref), ClanConsts (ref), persistentCrewStore (ref), ReplicatedStorage (ref), PersistentCrewConsts (ref) ]]
+	persistentCrewStore.changed:connect(function(p1, p2)
 		if p1.networkMutexLocked ~= p2.networkMutexLocked then
 			if v3 then
 				task.cancel(v3)
 				v3 = nil
 			end
 			if p1.networkMutexLocked then
-				v3 = task.delay(0.75, function() --[[ Line: 228 | Upvalues: Players (ref), ClanConsts (ref), persistentCrewStore (ref) ]]
+				v3 = task.delay(0.75, function()
 					if not Players.LocalPlayer:GetAttribute(ClanConsts.NETWORK_MUTEX_LOCKED_ATTR_NAME) then
 						persistentCrewStore:dispatch({
 							type = "setNetworkMutexLocked",
@@ -309,8 +310,8 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			ReplicatedStorage:FindFirstChild(PersistentCrewConsts.INFORM_UI_IS_OPEN_REMOTE_NAME):FireServer(p1.groupVisible)
 		end
 	end)
-	RxInstanceUtils.waitForChild(ReplicatedStorage, PersistentCrewConsts.UPDATE_PERSISTENT_CREW_REMOTE_NAME):andThen(function(p1) --[[ Line: 249 | Upvalues: persistentCrewStore (ref), Players (ref), PlayerUtils (ref), Promise (ref) ]]
-		p1.OnClientEvent:Connect(function(p1) --[[ Line: 250 | Upvalues: persistentCrewStore (ref), Players (ref), PlayerUtils (ref), Promise (ref) ]]
+	RxInstanceUtils.waitForChild(ReplicatedStorage, PersistentCrewConsts.UPDATE_PERSISTENT_CREW_REMOTE_NAME):andThen(function(p1)
+		p1.OnClientEvent:Connect(function(p1)
 			if p1 then
 				persistentCrewStore:dispatch({
 					type = "setViewingClanInfo",
@@ -332,7 +333,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 					local v6 = v5.BattlesWon or 0
 					local v7 = v5.BattlesPlayed or 0
 					local v8 = tonumber(v3)
-					table.insert(t, PlayerUtils.promiseNameFromUserId(v8):andThen(function(p1) --[[ Line: 282 | Upvalues: t2 (copy), v8 (copy), AdminIdMap (copy), v3 (copy), v1 (copy), v7 (copy), v6 (copy) ]]
+					table.insert(t, PlayerUtils.promiseNameFromUserId(v8):andThen(function(p1)
 						local t = {
 							id = v8,
 							userId = v8,
@@ -351,7 +352,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 						table.insert(t2, t)
 					end))
 				end
-				Promise.all(t):andThen(function() --[[ Line: 297 | Upvalues: persistentCrewStore (ref), t2 (copy) ]]
+				Promise.all(t):andThen(function()
 					persistentCrewStore:dispatch({
 						type = "setMembers",
 						value = t2
@@ -362,7 +363,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 					local t4 = {}
 					for v10 in p1.JoinRequests do
 						local v11 = tonumber(v10)
-						table.insert(t4, PlayerUtils.promiseNameFromUserId(v11):andThen(function(p1) --[[ Line: 313 | Upvalues: t3 (copy), v11 (copy), v1 (copy) ]]
+						table.insert(t4, PlayerUtils.promiseNameFromUserId(v11):andThen(function(p1)
 							table.insert(t3, {
 								id = v11,
 								userId = v11,
@@ -370,7 +371,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 								showRequestAccept = v1,
 								showRequestDeny = v1
 							})
-						end):catch(function(p1) --[[ Line: 322 | Upvalues: t3 (copy), v11 (copy), v1 (copy) ]]
+						end):catch(function(p1)
 							table.insert(t3, {
 								id = v11,
 								userId = v11,
@@ -380,7 +381,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 							})
 						end))
 					end
-					Promise.allSettled(t4):andThen(function() --[[ Line: 334 | Upvalues: persistentCrewStore (ref), t3 (copy) ]]
+					Promise.allSettled(t4):andThen(function()
 						persistentCrewStore:dispatch({
 							type = "setJoinRequests",
 							value = t3
@@ -395,14 +396,14 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			end
 		end)
 	end)
-	local function invalidateOnline() --[[ Line: 349 | Upvalues: persistentCrewStore (ref) ]]
+	local function invalidateOnline()
 		persistentCrewStore:dispatch({
 			type = "setMembersOnlineMap",
 			value = nil
 		})
 	end
 	local v4 = Maid.new()
-	local function updateViewingInfo() --[[ Line: 356 | Upvalues: v4 (copy), persistentCrewStore (ref), PersistentCrewUtils (ref), Players (ref), waitForChild (ref), ReplicatedStorage (ref), ClanConsts (ref), ClanUtils (ref) ]]
+	local function updateViewingInfo()
 		v4:DoCleaning()
 		persistentCrewStore:dispatch({
 			type = "setMembersOnlineMap",
@@ -416,10 +417,10 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 			})
 		end
 		if v1 then
-			v4:GivePromise(waitForChild(ReplicatedStorage, ClanConsts.MEMBERS_ONLINE_OBJECT_NAME, 5):andThen(function(p1) --[[ Line: 371 | Upvalues: waitForChild (ref), v1 (copy) ]]
+			v4:GivePromise(waitForChild(ReplicatedStorage, ClanConsts.MEMBERS_ONLINE_OBJECT_NAME, 5):andThen(function(p1)
 				return waitForChild(p1, v1, 5)
-			end):andThen(function() --[[ Line: 374 | Upvalues: persistentCrewStore (ref), ClanUtils (ref), v1 (copy), v4 (ref) ]]
-				local function updateOnline() --[[ Line: 377 | Upvalues: persistentCrewStore (ref), ClanUtils (ref), v1 (ref) ]]
+			end):andThen(function()
+				local function updateOnline()
 					persistentCrewStore:dispatch({
 						type = "setMembersOnlineMap",
 						value = ClanUtils.getMembersOnline(v1)
@@ -436,7 +437,7 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 	PersistentCrewUtils.getPlayerViewingClanIdChangedSignal(Players.LocalPlayer):Connect(updateViewingInfo)
 	updateViewingInfo()
 	local v5 = Maid.new()
-	local function updateCurrentInfo() --[[ Line: 394 | Upvalues: ClanUtils (ref), Players (ref), persistentCrewStore (ref), ClanMatchmakingUtils (ref), v5 (copy) ]]
+	local function updateCurrentInfo()
 		local v1 = ClanUtils.getCurrentClanId(Players.LocalPlayer)
 		if not v1 then
 			persistentCrewStore:dispatch({
@@ -446,13 +447,13 @@ function t.init() --[[ Line: 39 | Upvalues: persistentCrewStore (copy), ClanCons
 		end
 		local v2
 		if v1 then
-			local function dispatchReadyUpChanges() --[[ Line: 404 | Upvalues: ClanMatchmakingUtils (ref), v1 (copy), persistentCrewStore (ref) ]]
+			local function dispatchReadyUpChanges()
 				persistentCrewStore:dispatch({
 					type = "setIsReadiedUp",
 					value = ClanMatchmakingUtils.getIsClanReadiedUp(v1)
 				})
 			end
-			local function callbackWrapper(p1, p2) --[[ Line: 411 | Upvalues: ClanMatchmakingUtils (ref), v1 (copy), persistentCrewStore (ref), dispatchReadyUpChanges (copy) ]]
+			local function callbackWrapper(p1, p2)
 				persistentCrewStore:dispatch({
 					type = "setIsReadiedUp",
 					value = ClanMatchmakingUtils.getIsClanReadiedUp(v1)

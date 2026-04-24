@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2) --[[ Line: 3 ]]
+return function(p1, p2)
 	p1.WidgetConstructor("ProgressBar", {
 		hasState = true,
 		hasChildren = false,
@@ -8,17 +9,17 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Format = 2
 		},
 		Events = {
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 13 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end),
 			changed = {
-				Init = function(p1) --[[ Line: 17 ]] end,
-				Get = function(p12) --[[ Line: 18 | Upvalues: p1 (copy) ]]
+				Init = function(p1) end,
+				Get = function(p12)
 					return p12.lastChangedTick == p1._cycleTick
 				end
 			}
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 23 | Upvalues: p1 (copy), p2 (copy) ]]
+		Generate = function(p12)
 			local Iris_ProgressBar = Instance.new("Frame")
 			Iris_ProgressBar.Name = "Iris_ProgressBar"
 			Iris_ProgressBar.AutomaticSize = Enum.AutomaticSize.Y
@@ -69,12 +70,12 @@ return function(p1, p2) --[[ Line: 3 ]]
 			TextLabel.Parent = Iris_ProgressBar
 			return Iris_ProgressBar
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 88 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.progress == nil then
 				p12.state.progress = p1._widgetState(p12, "Progress", 0)
 			end
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 93 ]]
+		Update = function(p1)
 			local v1 = p1.Instance
 			local Bar = v1.Bar.Value
 			if p1.arguments.Format ~= nil and typeof(p1.arguments.Format) == "string" then
@@ -82,7 +83,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			end
 			v1.TextLabel.Text = p1.arguments.Text or "Progress Bar"
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 105 | Upvalues: p1 (copy) ]]
+		UpdateState = function(p12)
 			local Bar = p12.Instance.Bar
 			local Progress = Bar.Progress
 			local v1 = Bar.Value
@@ -106,12 +107,12 @@ return function(p1, p2) --[[ Line: 3 ]]
 			end
 			p12.lastChangedTick = p1._cycleTick + 1
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 130 | Upvalues: p2 (copy) ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 			p2.discardState(p1)
 		end
 	})
-	local function createLine(p12, p2) --[[ Line: 136 | Upvalues: p1 (copy) ]]
+	local function createLine(p12, p2)
 		local Frame = Instance.new("Frame")
 		Frame.Name = tostring(p2)
 		Frame.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -121,7 +122,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 		Frame.Parent = p12
 		return Frame
 	end
-	local function clearLine(p12) --[[ Line: 149 | Upvalues: p1 (copy) ]]
+	local function clearLine(p12)
 		if p12.HoveredLine then
 			p12.HoveredLine.BackgroundColor3 = p1._config.PlotLinesColor
 			p12.HoveredLine.BackgroundTransparency = p1._config.PlotLinesTransparency
@@ -129,7 +130,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p12.state.hovered:set(nil)
 		end
 	end
-	local function updateLine(p12, p22) --[[ Line: 158 | Upvalues: p2 (copy), p1 (copy) ]]
+	local function updateLine(p12, p22)
 		local Plot = p12.Instance.Background.Plot
 		local v4 = math.ceil((p2.getMouseLocation().X - (Plot.AbsolutePosition - p2.GuiOffset).X) / Plot.AbsoluteSize.X * #p12.Lines)
 		local v5 = p12.Lines[v4]
@@ -168,11 +169,11 @@ return function(p1, p2) --[[ Line: 3 ]]
 			TextOverlay = 5
 		},
 		Events = {
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 206 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 210 | Upvalues: p1 (copy), p2 (copy), updateLine (copy) ]]
+		Generate = function(p12)
 			local Iris_PlotLines = Instance.new("Frame")
 			Iris_PlotLines.Name = "Iris_PlotLines"
 			Iris_PlotLines.Size = UDim2.new(p1._config.ItemWidth, UDim.new())
@@ -192,7 +193,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			Plot.BackgroundTransparency = 1
 			Plot.BorderSizePixel = 0
 			Plot.ClipsDescendants = true
-			Plot:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() --[[ Line: 235 | Upvalues: p12 (copy), p1 (ref) ]]
+			Plot:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 				p12.state.values.lastChangeTick = p1._cycleTick
 				p1._widgets.PlotLines.UpdateState(p12)
 			end)
@@ -224,10 +225,10 @@ return function(p1, p2) --[[ Line: 3 ]]
 			local v1 = p1._rootInstance and p1._rootInstance:FindFirstChild("PopupScreenGui")
 			Iris_Tooltip.Parent = v1 and v1:FindFirstChild("TooltipContainer")
 			p12.Tooltip = Iris_Tooltip
-			p2.applyMouseMoved(Plot, function() --[[ Line: 275 | Upvalues: updateLine (ref), p12 (copy) ]]
+			p2.applyMouseMoved(Plot, function()
 				updateLine(p12)
 			end)
-			p2.applyMouseLeave(Plot, function() --[[ Line: 279 | Upvalues: p12 (copy), p1 (ref) ]]
+			p2.applyMouseLeave(Plot, function()
 				local v1 = p12
 				if v1.HoveredLine then
 					v1.HoveredLine.BackgroundColor3 = p1._config.PlotLinesColor
@@ -251,7 +252,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			TextLabel.Parent = Iris_PlotLines
 			return Iris_PlotLines
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 303 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.values == nil then
 				p12.state.values = p1._widgetState(p12, "values", { 0, 1 })
 			end
@@ -259,13 +260,13 @@ return function(p1, p2) --[[ Line: 3 ]]
 				p12.state.hovered = p1._widgetState(p12, "hovered", nil)
 			end
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 311 ]]
+		Update = function(p1)
 			local v1 = p1.Instance
 			v1.TextLabel.Text = p1.arguments.Text or "Plot Lines"
 			v1.Background.Plot.OverlayText.Text = p1.arguments.TextOverlay or ""
 			v1.Size = UDim2.new(1, 0, 0, p1.arguments.Height or 0)
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 322 | Upvalues: p1 (copy), updateLine (copy) ]]
+		UpdateState = function(p12)
 			if p12.state.hovered.lastChangeTick == p1._cycleTick then
 				if p12.state.hovered.value then
 					p12.Tooltip.Visible = true
@@ -320,13 +321,13 @@ return function(p1, p2) --[[ Line: 3 ]]
 				end
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 385 | Upvalues: p2 (copy) ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 			p1.Tooltip:Destroy()
 			p2.discardState(p1)
 		end
 	})
-	local function createBlock(p12, p2) --[[ Line: 392 | Upvalues: p1 (copy) ]]
+	local function createBlock(p12, p2)
 		local Frame = Instance.new("Frame")
 		Frame.Name = tostring(p2)
 		Frame.BackgroundColor3 = p1._config.PlotHistogramColor
@@ -335,7 +336,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 		Frame.Parent = p12
 		return Frame
 	end
-	local function clearBlock(p12) --[[ Line: 404 | Upvalues: p1 (copy) ]]
+	local function clearBlock(p12)
 		if p12.HoveredBlock then
 			p12.HoveredBlock.BackgroundColor3 = p1._config.PlotHistogramColor
 			p12.HoveredBlock.BackgroundTransparency = p1._config.PlotHistogramTransparency
@@ -343,7 +344,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			p12.state.hovered:set(nil)
 		end
 	end
-	local function updateBlock(p12, p22) --[[ Line: 413 | Upvalues: p2 (copy), p1 (copy) ]]
+	local function updateBlock(p12, p22)
 		local Plot = p12.Instance.Background.Plot
 		local v4 = math.ceil((p2.getMouseLocation().X - (Plot.AbsolutePosition - p2.GuiOffset).X) / Plot.AbsoluteSize.X * #p12.Blocks)
 		local v5 = p12.Blocks[v4]
@@ -380,11 +381,11 @@ return function(p1, p2) --[[ Line: 3 ]]
 			BaseLine = 6
 		},
 		Events = {
-			hovered = p2.EVENTS.hover(function(p1) --[[ Line: 457 ]]
+			hovered = p2.EVENTS.hover(function(p1)
 				return p1.Instance
 			end)
 		},
-		Generate = function(p12) --[[ Name: Generate | Line: 461 | Upvalues: p1 (copy), p2 (copy), updateBlock (copy) ]]
+		Generate = function(p12)
 			local Iris_PlotHistogram = Instance.new("Frame")
 			Iris_PlotHistogram.Name = "Iris_PlotHistogram"
 			Iris_PlotHistogram.Size = UDim2.new(p1._config.ItemWidth, UDim.new())
@@ -433,10 +434,10 @@ return function(p1, p2) --[[ Line: 3 ]]
 			local v1 = p1._rootInstance and p1._rootInstance:FindFirstChild("PopupScreenGui")
 			Iris_Tooltip.Parent = v1 and v1:FindFirstChild("TooltipContainer")
 			p12.Tooltip = Iris_Tooltip
-			p2.applyMouseMoved(Plot, function() --[[ Line: 524 | Upvalues: updateBlock (ref), p12 (copy) ]]
+			p2.applyMouseMoved(Plot, function()
 				updateBlock(p12)
 			end)
-			p2.applyMouseLeave(Plot, function() --[[ Line: 528 | Upvalues: p12 (copy), p1 (ref) ]]
+			p2.applyMouseLeave(Plot, function()
 				local v1 = p12
 				if v1.HoveredBlock then
 					v1.HoveredBlock.BackgroundColor3 = p1._config.PlotHistogramColor
@@ -460,7 +461,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 			TextLabel.Parent = Iris_PlotHistogram
 			return Iris_PlotHistogram
 		end,
-		GenerateState = function(p12) --[[ Name: GenerateState | Line: 552 | Upvalues: p1 (copy) ]]
+		GenerateState = function(p12)
 			if p12.state.values == nil then
 				p12.state.values = p1._widgetState(p12, "values", { 1 })
 			end
@@ -468,13 +469,13 @@ return function(p1, p2) --[[ Line: 3 ]]
 				p12.state.hovered = p1._widgetState(p12, "hovered", nil)
 			end
 		end,
-		Update = function(p1) --[[ Name: Update | Line: 560 ]]
+		Update = function(p1)
 			local v1 = p1.Instance
 			v1.TextLabel.Text = p1.arguments.Text or "Plot Histogram"
 			v1.Background.Plot.OverlayText.Text = p1.arguments.TextOverlay or ""
 			v1.Size = UDim2.new(1, 0, 0, p1.arguments.Height or 0)
 		end,
-		UpdateState = function(p12) --[[ Name: UpdateState | Line: 571 | Upvalues: p1 (copy), updateBlock (copy) ]]
+		UpdateState = function(p12)
 			if p12.state.hovered.lastChangeTick == p1._cycleTick then
 				if p12.state.hovered.value then
 					p12.Tooltip.Visible = true
@@ -531,7 +532,7 @@ return function(p1, p2) --[[ Line: 3 ]]
 				end
 			end
 		end,
-		Discard = function(p1) --[[ Name: Discard | Line: 633 | Upvalues: p2 (copy) ]]
+		Discard = function(p1)
 			p1.Instance:Destroy()
 			p1.Tooltip:Destroy()
 			p2.discardState(p1)

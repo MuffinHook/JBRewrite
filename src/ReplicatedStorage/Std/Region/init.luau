@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local RegionUtils = require(script.RegionUtils)
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 8 | Upvalues: t (copy), Signal (copy) ]]
+function t.new(p1)
 	assert(p1)
 	local v2 = setmetatable({}, t)
 	v2.Prisms = {}
@@ -14,17 +15,17 @@ function t.new(p1) --[[ Line: 8 | Upvalues: t (copy), Signal (copy) ]]
 	v2.OnObjRemoved = Signal.new()
 	return v2
 end
-function t.AddPrism(p1, p2) --[[ Line: 20 ]]
+function t.AddPrism(p1, p2)
 	assert(p2)
 	table.insert(p1.Prisms, p2)
-	return function() --[[ Line: 24 | Upvalues: p1 (copy), p2 (copy) ]]
+	return function()
 		return table.remove(p1.Prisms, (table.find(p1.Prisms, p2)))
 	end
 end
-function t.AddPart(p1, p2) --[[ Line: 29 | Upvalues: RegionUtils (copy) ]]
+function t.AddPart(p1, p2)
 	return p1:AddPrism(RegionUtils.getPrism(p2.CFrame, p2.Size))
 end
-function t.CastPoint(p1, p2) --[[ Line: 32 | Upvalues: RegionUtils (copy) ]]
+function t.CastPoint(p1, p2)
 	local Prisms = p1.Prisms
 	for i = 1, #Prisms do
 		if RegionUtils.CastPoint(Prisms[i], p2) then
@@ -33,16 +34,16 @@ function t.CastPoint(p1, p2) --[[ Line: 32 | Upvalues: RegionUtils (copy) ]]
 	end
 	return false
 end
-function t.GetObjCount(p1) --[[ Line: 42 ]]
+function t.GetObjCount(p1)
 	return #p1.ListObj
 end
-function t.HasObj(p1, p2) --[[ Line: 45 ]]
+function t.HasObj(p1, p2)
 	return p1.MapObj[p2] == true
 end
-function t.GetObjList(p1) --[[ Line: 48 ]]
+function t.GetObjList(p1)
 	return p1.ListObj
 end
-function t.Update(p1, p2) --[[ Line: 51 ]]
+function t.Update(p1, p2)
 	local ListObj = p1.ListObj
 	local MapObj = p1.MapObj
 	local Condition = p1.Condition
@@ -74,7 +75,7 @@ function t.Update(p1, p2) --[[ Line: 51 ]]
 		end
 	end
 end
-function t.Destroy(p1) --[[ Line: 90 ]]
+function t.Destroy(p1)
 	local ListObj = p1.ListObj
 	for i = 1, #ListObj do
 		p1.OnObjRemoved:Fire(ListObj[i])

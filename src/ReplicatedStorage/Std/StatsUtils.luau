@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local ServerStorage = game:GetService("ServerStorage")
 local confidenceToZMap = require(ServerStorage.Trade.confidenceToZMap)
 local t = {}
-local function isNaN(p1) --[[ Line: 10 ]]
+local function isNaN(p1)
 	return p1 ~= p1
 end
-function t.getZSstarFromConfidence(p1) --[[ Line: 14 | Upvalues: confidenceToZMap (copy) ]]
+function t.getZSstarFromConfidence(p1)
 	if confidenceToZMap[p1] then
 		return confidenceToZMap[p1]
 	else
@@ -21,7 +22,7 @@ function t.getZSstarFromConfidence(p1) --[[ Line: 14 | Upvalues: confidenceToZMa
 		return v2
 	end
 end
-function t.getMeanStdDevFromConfidenceInterval(p1, p2, p3) --[[ Line: 31 | Upvalues: t (copy) ]]
+function t.getMeanStdDevFromConfidenceInterval(p1, p2, p3)
 	assert(p1 <= p2, "Invalid bounds given")
 	if p1 == p2 then
 		return p1, 0
@@ -35,14 +36,14 @@ function t.getMeanStdDevFromConfidenceInterval(p1, p2, p3) --[[ Line: 31 | Upval
 		return v3, v5
 	end
 end
-function t.factorial(p1) --[[ Line: 44 ]]
+function t.factorial(p1)
 	local v1 = 1
 	for i = 2, p1 do
 		v1 = v1 * i
 	end
 	return v1
 end
-function t.normalCDFTaylorApprox(p1, p2, p3) --[[ Line: 54 | Upvalues: t (copy) ]]
+function t.normalCDFTaylorApprox(p1, p2, p3)
 	assert(p2 > 0, "Invalid stdDev")
 	local v2 = (p3 - p1) / p2
 	if v2 > 5 then
@@ -74,13 +75,13 @@ function t.normalCDFTaylorApprox(p1, p2, p3) --[[ Line: 54 | Upvalues: t (copy) 
 	assert(if v9 >= 0 then v9 <= 1 else false, "Invalid normalCDF result, check normalCDFTaylorApprox function " .. v9)
 	return v9
 end
-function t.sampleNormalDistribution(p1, p2) --[[ Line: 82 ]]
+function t.sampleNormalDistribution(p1, p2)
 	local v1 = math.random()
 	local v2 = math.random()
 	local v3 = math.log(v1) * -2
 	return p1 + p2 * (math.sqrt(v3) * math.cos(6.283185307179586 * v2))
 end
-function t.sampleExponentialDistribution(p1) --[[ Line: 90 ]]
+function t.sampleExponentialDistribution(p1)
 	assert(p1 >= 0, "Invalid mean given")
 	return -1 / (1 / p1) * math.log((math.random()))
 end

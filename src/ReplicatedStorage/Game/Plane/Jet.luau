@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local CollectionService = game:GetService("CollectionService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
@@ -21,7 +22,7 @@ local JetConsts = require(ReplicatedStorage.Game.Plane.JetConsts)
 local v1 = nil
 local v2 = nil
 local v3 = Random.new()
-local function RandomVector(p1) --[[ Line: 27 | Upvalues: v3 (copy) ]]
+local function RandomVector(p1)
 	local v1 = p1 * (v3:NextNumber() * 2 - 1)
 	local v2 = p1 * (v3:NextNumber() * 2 - 1)
 	return Vector3.new(v1, v2, p1 * (v3:NextNumber() * 2 - 1))
@@ -30,11 +31,11 @@ local t = {
 	__ClassName = "Jet"
 }
 t.__index = t
-function t.Init(p1) --[[ Line: 38 | Upvalues: v1 (ref), v2 (ref) ]]
+function t.Init(p1)
 	v1 = p1.Event
 	v2 = p1.em
 end
-function t.new(p1) --[[ Line: 41 | Upvalues: t (copy), BaseUserControlledPlane (copy), Audio (copy) ]]
+function t.new(p1)
 	local v2 = setmetatable({}, t)
 	v2.Meta = p1
 	v2.Model = p1.Model
@@ -47,7 +48,7 @@ function t.new(p1) --[[ Line: 41 | Upvalues: t (copy), BaseUserControlledPlane (
 	v2.Maid = v2.Plane.Maid
 	v2:SetupSeats()
 	v2.Seats = v2.Plane.Seats
-	local function OnTakeoff() --[[ Line: 57 | Upvalues: Audio (ref), v2 (copy) ]]
+	local function OnTakeoff()
 		Audio.ObjectLocal(v2.Plane.PlaneGui, 3378079535)
 	end
 	v2.Plane.OnTakeoff = OnTakeoff
@@ -62,20 +63,20 @@ function t.new(p1) --[[ Line: 41 | Upvalues: t (copy), BaseUserControlledPlane (
 	v2.MissilesConf.Count = 0
 	return v2
 end
-function t.SetupSeats(p1) --[[ Line: 74 ]]
+function t.SetupSeats(p1)
 	local t = {}
 	t.Part = assert(p1.Model.Passenger)
 	t.Occupied = false
 	table.insert(p1.Plane.Seats, t)
 end
-local function ClampUnitVectorCone(p1, p2, p3) --[[ Line: 80 ]]
+local function ClampUnitVectorCone(p1, p2, p3)
 	local v1 = p1:VectorToObjectSpace(p2)
 	local v2 = math.acos(v1.Z)
 	local v3 = math.atan2(v1.Y, v1.X)
 	local v4 = math.clamp(v2, math.pi - p3, math.pi + p3)
 	return p1:VectorToWorldSpace((Vector3.new(math.sin(v4) * math.cos(v3), math.sin(v4) * math.sin(v3), (math.cos(v4)))))
 end
-local function CanLaunchMissile(p1, p2) --[[ Line: 91 ]]
+local function CanLaunchMissile(p1, p2)
 	local v1 = os.clock()
 	local MissilesConf = p1.MissilesConf
 	if v1 - MissilesConf.LastFire < 2 then
@@ -84,7 +85,7 @@ local function CanLaunchMissile(p1, p2) --[[ Line: 91 ]]
 		return not (MissilesConf.Count <= 0)
 	end
 end
-local function GetTargetPart(p1) --[[ Line: 105 | Upvalues: CollectionService (copy), JetConsts (copy) ]]
+local function GetTargetPart(p1)
 	local Model = p1.Model
 	local Position = Model.PrimaryPart.Position
 	local LookVector = Model.PrimaryPart.CFrame.LookVector
@@ -104,7 +105,7 @@ local function GetTargetPart(p1) --[[ Line: 105 | Upvalues: CollectionService (c
 	end
 	return v2
 end
-local function attemptSetSightColor(p1, p2) --[[ Line: 128 ]]
+local function attemptSetSightColor(p1, p2)
 	local PlaneGui = p1.Plane.PlaneGui
 	local v1 = os.clock()
 	if not p1.lastSightsColorChange then
@@ -116,7 +117,7 @@ local function attemptSetSightColor(p1, p2) --[[ Line: 128 ]]
 		PlaneGui.Sights.ImageColor3 = p2
 	end
 end
-local function AttemptLaunchLocalMissile(p1, p2) --[[ Line: 143 | Upvalues: LocalPlayer (copy), JetConsts (copy), Raycast (copy), PartUtils (copy), NetObjPoolBinder (copy), SeekingMissileBinder (copy), v3 (copy), v1 (ref) ]]
+local function AttemptLaunchLocalMissile(p1, p2)
 	local v12 = os.clock()
 	local MissilesConf = p1.MissilesConf
 	if not (v12 - MissilesConf.LastFire < 2 or MissilesConf.Count <= 0) then
@@ -144,7 +145,7 @@ local function AttemptLaunchLocalMissile(p1, p2) --[[ Line: 143 | Upvalues: Loca
 		obj.Anchored = false
 		obj.CFrame = v4.CFrame
 		obj.Velocity = v4.Velocity
-		SeekingMissileBinder:Promise(obj):andThen(function(p12) --[[ Line: 183 | Upvalues: p1 (copy), v6 (ref), v5 (ref) ]]
+		SeekingMissileBinder:Promise(obj):andThen(function(p12)
 			table.insert(p12.ignoreList, p1.Model)
 			if v6 then
 				p12:SetTargetPart(v6)
@@ -167,9 +168,9 @@ local function AttemptLaunchLocalMissile(p1, p2) --[[ Line: 143 | Upvalues: Loca
 		v1:FireServer("u" .. ("f6xqsmh"):sub(4, 5):reverse() .. "lew42", obj)
 	end
 end
-local function MountLocalPlayer(p1, p2, p3) --[[ Line: 198 | Upvalues: RunService (copy), Interval (copy), GetTargetPart (copy), CurrentCamera (copy), JetConsts (copy), Audio (copy), Confirmation (copy), String (copy), v1 (ref), ActionButtonService (copy), RunUtils (copy), AttemptLaunchLocalMissile (copy), UserInputService (copy) ]]
+local function MountLocalPlayer(p1, p2, p3)
 	if p3.Driver then
-		local function HeartbeatAilerons(p12) --[[ Line: 202 | Upvalues: p1 (copy) ]]
+		local function HeartbeatAilerons(p12)
 			local Joystickx = p1.Plane.Joystickx
 			local Joysticky = p1.Plane.Joysticky
 			local InputYaw = p1.Plane.InputYaw
@@ -181,13 +182,13 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 198 | Upvalues: RunServic
 			p1.MotorAileronTailRight.C0 = CFrame.new(0, 0, 1.5) * CFrame.Angles(0, -0.5 * v2 + 0.3 * InputYaw, 0)
 			p1.MotorAileronTailLeft.C0 = CFrame.new(0, 0, 1.5) * CFrame.Angles(0, -0.5 * v2 + 0.3 * InputYaw, 0)
 		end
-		local function Heartbeat(p1) --[[ Line: 221 | Upvalues: HeartbeatAilerons (copy) ]]
+		local function Heartbeat(p1)
 			HeartbeatAilerons(p1)
 		end
 		p3.Maid:GiveTask(RunService.Heartbeat:Connect(Heartbeat))
 		local PlaneGui = p1.Plane.PlaneGui
 		PlaneGui.Sights.Size = UDim2.new(0.08, 0, 0.08, 0)
-		p3.Maid:GiveTask(Interval.every(0.3333333333333333):Connect(function() --[[ Line: 230 | Upvalues: p1 (copy), GetTargetPart (ref) ]]
+		p3.Maid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
 			local v1 = if p1.Plane.IsFlying then GetTargetPart(p1) else nil
 			if v1 ~= p1.targetPart then
 				p1.targetPart = v1
@@ -199,7 +200,7 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 198 | Upvalues: RunServic
 		local v12 = true
 		local v2 = 0
 		local v3 = false
-		p3.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 246 | Upvalues: p1 (copy), CurrentCamera (ref), PlaneGui (copy), JetConsts (ref), v2 (ref), v12 (ref), Audio (ref), v3 (ref) ]]
+		p3.Maid:GiveTask(RunService.Heartbeat:Connect(function()
 			local v1 = os.clock()
 			local targetPart = p1.targetPart
 			local v22 = if targetPart then targetPart.Position else nil
@@ -258,17 +259,17 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 198 | Upvalues: RunServic
 			PlaneGui.Sights.Visible = v22 ~= nil
 		end))
 		local v4 = false
-		local function OpenMissileBuy() --[[ Line: 285 | Upvalues: p1 (copy), JetConsts (ref), v4 (ref), Confirmation (ref), String (ref), v1 (ref) ]]
+		local function OpenMissileBuy()
 			local v2 = math.max(0, JetConsts.MISSILE_COUNT_MAX - p1.MissilesConf.Count)
 			if v2 == 0 then
 			elseif not v4 then
 				v4 = true
 				p1.Plane:SetControlsEnabled(false)
 				local v42 = Confirmation.new(("Buy %d heat seeking missiles for $%s?"):format(v2, String.comma(v2 * JetConsts.MISSILE_COST_PER)))
-				v42.Maid:GiveTask(v42.OnYes:Connect(function() --[[ Line: 300 | Upvalues: v1 (ref) ]]
+				v42.Maid:GiveTask(v42.OnYes:Connect(function()
 					v1:FireServer("q" .. ("iufp3y3phw"):sub(5, 8):reverse():reverse():reverse() .. "" .. "" .. ("cdctv"):sub(4, 4):reverse() .. "h9")
 				end))
-				v42.Maid:GiveTask(function() --[[ Line: 303 | Upvalues: v4 (ref), p1 (ref) ]]
+				v42.Maid:GiveTask(function()
 					v4 = false
 					p1.Plane:SetControlsEnabled(true)
 				end)
@@ -279,11 +280,11 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 198 | Upvalues: RunServic
 			priority = 500,
 			image = "rbxassetid://4939737424",
 			keyCodes = { Enum.KeyCode.G },
-			onPressed = function() --[[ Name: onPressed | Line: 315 | Upvalues: OpenMissileBuy (copy) ]]
+			onPressed = function()
 				OpenMissileBuy()
 			end
 		}))
-		local function attemptLaunchLocalMissile() --[[ Line: 320 | Upvalues: RunUtils (ref), p1 (copy), OpenMissileBuy (copy), AttemptLaunchLocalMissile (ref), p3 (copy) ]]
+		local function attemptLaunchLocalMissile()
 			if RunUtils.isTradeWorld() then
 				return false
 			end
@@ -293,7 +294,7 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 198 | Upvalues: RunServic
 			end
 			AttemptLaunchLocalMissile(p1, p3)
 		end
-		local function InputBegan(p12, p2) --[[ Line: 331 | Upvalues: RunUtils (ref), p1 (copy), OpenMissileBuy (copy), AttemptLaunchLocalMissile (ref), p3 (copy) ]]
+		local function InputBegan(p12, p2)
 			if p2 then
 				return false
 			end
@@ -311,7 +312,7 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 198 | Upvalues: RunServic
 			noSink = true,
 			image = "rbxassetid://4939736393",
 			keyCodes = { Enum.KeyCode.F, Enum.KeyCode.ButtonX },
-			onPressed = function() --[[ Name: onPressed | Line: 346 | Upvalues: RunUtils (ref), p1 (copy), OpenMissileBuy (copy), AttemptLaunchLocalMissile (ref), p3 (copy) ]]
+			onPressed = function()
 				if RunUtils.isTradeWorld() then
 				elseif p1.MissilesConf.Count <= 0 then
 					OpenMissileBuy()
@@ -322,7 +323,7 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 198 | Upvalues: RunServic
 		}))
 	end
 end
-local function MountThirdPlayer(p1, p2, p3) --[[ Line: 351 | Upvalues: Audio (copy), RunService (copy) ]]
+local function MountThirdPlayer(p1, p2, p3)
 	local v1 = Audio.ObjectLocal(p1.Model.PrimaryPart, 9553468279, {
 		Looped = true,
 		Volume = 0,
@@ -331,7 +332,7 @@ local function MountThirdPlayer(p1, p2, p3) --[[ Line: 351 | Upvalues: Audio (co
 		RollOffMaxDistance = 896
 	})
 	p3.Maid:GiveTask(v1)
-	p3.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 359 | Upvalues: p1 (copy), v1 (copy) ]]
+	p3.Maid:GiveTask(RunService.Heartbeat:Connect(function()
 		local v12 = p1.Model.PrimaryPart.Velocity:Dot(p1.Model.PrimaryPart.CFrame.LookVector)
 		local v2 = math.clamp(v12 / 300, 0, 1)
 		local v3 = math.clamp(v12 / 300, 0, 1)
@@ -339,7 +340,7 @@ local function MountThirdPlayer(p1, p2, p3) --[[ Line: 351 | Upvalues: Audio (co
 		v1.PlaybackSpeed = v3 * 0.35 + 0.65
 	end))
 end
-function t.MountPlayer(p1, p2, p3) --[[ Line: 367 | Upvalues: LocalPlayer (copy), MountLocalPlayer (copy), MountThirdPlayer (copy) ]]
+function t.MountPlayer(p1, p2, p3)
 	p1.Plane:MountPlayer(p2, p3)
 	if p2 == LocalPlayer then
 		MountLocalPlayer(p1, p2, p3)
@@ -347,13 +348,13 @@ function t.MountPlayer(p1, p2, p3) --[[ Line: 367 | Upvalues: LocalPlayer (copy)
 		MountThirdPlayer(p1, p2, p3)
 	end
 end
-local function UnmountLocalPlayer(p1, p2) --[[ Line: 376 ]]
+local function UnmountLocalPlayer(p1, p2)
 	local PlaneGui = p1.Plane.PlaneGui
 	if p2.Driver then
 		PlaneGui.Missiles.Visible = false
 	end
 end
-function t.UnmountSeat(p1, p2) --[[ Line: 382 | Upvalues: LocalPlayer (copy) ]]
+function t.UnmountSeat(p1, p2)
 	if p2.Player == LocalPlayer then
 		local PlaneGui = p1.Plane.PlaneGui
 		if p2.Driver then
@@ -362,12 +363,12 @@ function t.UnmountSeat(p1, p2) --[[ Line: 382 | Upvalues: LocalPlayer (copy) ]]
 	end
 	return p1.Plane:UnmountSeat(p2)
 end
-function t.UpdateMissileUI(p1, p2, p3) --[[ Line: 388 ]]
+function t.UpdateMissileUI(p1, p2, p3)
 	assert(p2)
 	p1.MissilesConf.Count = p2
 	p1.Plane.PlaneGui:FindFirstChild("Missiles").Body.Current.Count.Text = ("%d/%d"):format(p2, p3)
 end
-function t.Destroy(p1) --[[ Line: 395 ]]
+function t.Destroy(p1)
 	p1.Plane:Destroy()
 end
 return t

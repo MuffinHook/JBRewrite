@@ -1,4 +1,5 @@
-return function() --[[ Line: 1 ]]
+-- Reviewed by Claude
+return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
@@ -6,28 +7,28 @@ return function() --[[ Line: 1 ]]
 	local oneChild = require(script.Parent.Parent.oneChild)
 	local Component = require(script.Parent.Parent.Component)
 	local v1 = createReconciler(NoopRenderer)
-	it("should be provided as an internal api on Component", function() --[[ Line: 12 | Upvalues: Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should be provided as an internal api on Component", function()
 		local v12 = Component:extend("Provider")
-		function v12.init(p1) --[[ Line: 15 ]]
+		function v12.init(p1)
 			p1:__addContext("foo", "bar")
 		end
-		function v12.render(p1) --[[ Line: 19 ]] end
+		function v12.render(p1)  end
 		assertDeepEqual(v1.mountVirtualNode(createElement(v12), nil, "Provider").context, {
 			foo = "bar"
 		})
 	end)
-	it("should be inherited from parent stateful nodes", function() --[[ Line: 33 | Upvalues: Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should be inherited from parent stateful nodes", function()
 		local v12 = Component:extend("Consumer")
 		local v2 = nil
-		function v12.init(p1) --[[ Line: 37 | Upvalues: v2 (ref) ]]
+		function v12.init(p1)
 			v2 = {
 				hello = p1:__getContext("hello"),
 				value = p1:__getContext("value")
 			}
 		end
-		function v12.render(p1) --[[ Line: 44 ]] end
+		function v12.render(p1)  end
 		local v3 = Component:extend("Parent")
-		function v3.render(p1) --[[ Line: 48 | Upvalues: createElement (ref), v12 (copy) ]]
+		function v3.render(p1)
 			return createElement(v12)
 		end
 		local t = {
@@ -40,21 +41,21 @@ return function() --[[ Line: 1 ]]
 		assertDeepEqual(v5.context, t)
 		assertDeepEqual(v2, t)
 	end)
-	it("should be inherited from parent function nodes", function() --[[ Line: 67 | Upvalues: Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should be inherited from parent function nodes", function()
 		local v12 = Component:extend("Consumer")
 		local v2 = nil
-		function v12.init(p1) --[[ Line: 71 | Upvalues: v2 (ref) ]]
+		function v12.init(p1)
 			v2 = {
 				hello = p1:__getContext("hello"),
 				value = p1:__getContext("value")
 			}
 		end
-		function v12.render(p1) --[[ Line: 78 ]] end
+		function v12.render(p1)  end
 		local t = {
 			hello = "world",
 			value = 6
 		}
-		local v4 = v1.mountVirtualNode(createElement(function() --[[ Name: Parent | Line: 80 | Upvalues: createElement (ref), v12 (copy) ]]
+		local v4 = v1.mountVirtualNode(createElement(function()
 			return createElement(v12)
 		end), nil, "Parent", t)
 		expect(v2).never.to.equal(t)
@@ -62,13 +63,13 @@ return function() --[[ Line: 1 ]]
 		assertDeepEqual(v4.context, t)
 		assertDeepEqual(v2, t)
 	end)
-	it("should not copy the context table if it doesn\'t need to", function() --[[ Line: 99 | Upvalues: Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy), oneChild (copy) ]]
+	it("should not copy the context table if it doesn\'t need to", function()
 		local v12 = Component:extend("Parent")
-		function v12.init(p1) --[[ Line: 102 ]]
+		function v12.init(p1)
 			p1:__addContext("parent", "I\'m here!")
 		end
-		function v12.render(p1) --[[ Line: 106 | Upvalues: createElement (ref) ]]
-			return createElement(function() --[[ Line: 108 ]] end)
+		function v12.render(p1)
+			return createElement(function()  end)
 		end
 		local v3 = v1.mountVirtualNode(createElement(v12), nil, "Parent")
 		assertDeepEqual(v3.context, {
@@ -77,17 +78,17 @@ return function() --[[ Line: 1 ]]
 		local v4 = oneChild(v3.children)
 		expect(v3.context).to.equal(v4.context)
 	end)
-	it("should not allow context to move up the tree", function() --[[ Line: 128 | Upvalues: Component (copy), createElement (copy), v1 (copy), oneChild (copy), assertDeepEqual (copy) ]]
+	it("should not allow context to move up the tree", function()
 		local v12 = Component:extend("ChildProvider")
-		function v12.init(p1) --[[ Line: 131 ]]
+		function v12.init(p1)
 			p1:__addContext("child", "I\'m here too!")
 		end
-		function v12.render(p1) --[[ Line: 135 ]] end
+		function v12.render(p1)  end
 		local v2 = Component:extend("ParentProvider")
-		function v2.init(p1) --[[ Line: 139 ]]
+		function v2.init(p1)
 			p1:__addContext("parent", "I\'m here!")
 		end
-		function v2.render(p1) --[[ Line: 143 | Upvalues: createElement (ref), v12 (copy) ]]
+		function v2.render(p1)
 			return createElement(v12)
 		end
 		local v4 = v1.mountVirtualNode(createElement(v2), nil, "Parent")
@@ -100,21 +101,21 @@ return function() --[[ Line: 1 ]]
 			child = "I\'m here too!"
 		})
 	end)
-	it("should contain values put into the tree by parent nodes", function() --[[ Line: 168 | Upvalues: Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should contain values put into the tree by parent nodes", function()
 		local v12 = Component:extend("Consumer")
 		local v2 = nil
-		function v12.init(p1) --[[ Line: 172 | Upvalues: v2 (ref) ]]
+		function v12.init(p1)
 			v2 = {
 				dont = p1:__getContext("dont"),
 				frob = p1:__getContext("frob")
 			}
 		end
-		function v12.render(p1) --[[ Line: 179 ]] end
+		function v12.render(p1)  end
 		local v3 = Component:extend("Provider")
-		function v3.init(p1) --[[ Line: 183 ]]
+		function v3.init(p1)
 			p1:__addContext("frob", "ulator")
 		end
-		function v3.render(p1) --[[ Line: 187 | Upvalues: createElement (ref), v12 (copy) ]]
+		function v3.render(p1)
 			return createElement(v12)
 		end
 		local t = {
@@ -134,9 +135,9 @@ return function() --[[ Line: 1 ]]
 		assertDeepEqual(v5.context, t2)
 		assertDeepEqual(v2, t2)
 	end)
-	it("should transfer context to children that are replaced", function() --[[ Line: 218 | Upvalues: Component (copy), createElement (copy), v1 (copy), assertDeepEqual (copy) ]]
+	it("should transfer context to children that are replaced", function()
 		local v12 = Component:extend("ConsumerA")
-		local function captureAllContext(p1) --[[ Line: 221 ]]
+		local function captureAllContext(p1)
 			return {
 				A = p1:__getContext("A"),
 				B = p1:__getContext("B"),
@@ -144,23 +145,23 @@ return function() --[[ Line: 1 ]]
 			}
 		end
 		local v2 = nil
-		function v12.init(p1) --[[ Line: 230 | Upvalues: v2 (ref), captureAllContext (copy) ]]
+		function v12.init(p1)
 			p1:__addContext("A", "hello")
 			v2 = captureAllContext(p1)
 		end
-		function v12.render(p1) --[[ Line: 236 ]] end
+		function v12.render(p1)  end
 		local v3 = Component:extend("ConsumerB")
 		local v4 = nil
-		function v3.init(p1) --[[ Line: 241 | Upvalues: v4 (ref), captureAllContext (copy) ]]
+		function v3.init(p1)
 			p1:__addContext("B", "hello")
 			v4 = captureAllContext(p1)
 		end
-		function v3.render(p1) --[[ Line: 247 ]] end
+		function v3.render(p1)  end
 		local v5 = Component:extend("Provider")
-		function v5.init(p1) --[[ Line: 251 ]]
+		function v5.init(p1)
 			p1:__addContext("frob", "ulator")
 		end
-		function v5.render(p1) --[[ Line: 255 | Upvalues: createElement (ref), v3 (copy), v12 (copy) ]]
+		function v5.render(p1)
 			if p1.props.useConsumerB then
 				return createElement(v3)
 			else

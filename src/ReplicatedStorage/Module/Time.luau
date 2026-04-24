@@ -1,7 +1,8 @@
-local function GetNowSync() --[[ Line: 1 ]]
+-- Reviewed by Claude
+local function GetNowSync()
 	return workspace:GetServerTimeNow()
 end
 return {
-	Init = function() --[[ Name: Init | Line: 4 ]] end,
+	Init = function()  end,
 	GetNowSync = GetNowSync
 }

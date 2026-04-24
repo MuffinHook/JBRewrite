@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UI = require(ReplicatedStorage.Module.UI)
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -5,17 +6,17 @@ local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
-local function PlaySound(p1, p2) --[[ Line: 23 ]]
+local function PlaySound(p1, p2)
 	local Sound = Instance.new("Sound")
 	Sound.SoundId = ("rbxassetid://%d"):format(p2)
 	Sound.Volume = 0.75
 	Sound.Parent = p1
 	Sound:Play()
-	delay(1, function() --[[ Line: 29 | Upvalues: Sound (copy) ]]
+	delay(1, function()
 		game.Debris:AddItem(Sound, Sound.TimeLength)
 	end)
 end
-return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (copy), Maid (copy), RunService (copy), GeomUtils (copy), UI (copy), CollectionService (copy) ]]
+return function(p1)
 	local v1 = p1.Event
 	local em = p1.em
 	local ScreenGui = p1.ScreenGui
@@ -25,7 +26,7 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 	Sound.SoundGroup = game:GetService("SoundService").RobberyMusic
 	Sound.Parent = LocalPlayer.PlayerGui
 	local v2 = 0
-	local function FadeInSound() --[[ Line: 46 | Upvalues: v2 (ref), Sound (copy) ]]
+	local function FadeInSound()
 		local v1 = v2 + 1
 		v2 = v1
 		Sound:Play()
@@ -37,7 +38,7 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 			wait()
 		end
 	end
-	local function FadeOutSound() --[[ Line: 60 | Upvalues: v2 (ref), Sound (copy) ]]
+	local function FadeOutSound()
 		local v1 = v2 + 1
 		v2 = v1
 		for i = 1, 0, -0.015 do
@@ -50,28 +51,28 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 		Sound:Stop()
 	end
 	local v3 = false
-	local function EnterRobbery() --[[ Line: 76 | Upvalues: v3 (ref), PlaySound (ref), LocalPlayer (ref), FadeInSound (copy) ]]
+	local function EnterRobbery()
 		if v3 then
 			return error("Already in robbery")
 		end
 		v3 = true
 		PlaySound(LocalPlayer, 1837831244)
-		delay(1, function() --[[ Line: 82 | Upvalues: PlaySound (ref), LocalPlayer (ref) ]]
+		delay(1, function()
 			PlaySound(LocalPlayer, 1843025542)
 		end)
 		spawn(FadeInSound)
 	end
-	local function ExitRobbery() --[[ Line: 87 | Upvalues: v3 (ref), FadeOutSound (copy) ]]
+	local function ExitRobbery()
 		if not v3 then
 			return error("Player not in robbery")
 		end
 		v3 = false
 		spawn(FadeOutSound)
 	end
-	function em.dhqg05sg() --[[ Line: 95 | Upvalues: EnterRobbery (copy) ]]
+	function em.dhqg05sg()
 		EnterRobbery()
 	end
-	function em.exsgze3l() --[[ Line: 98 | Upvalues: v3 (ref), FadeOutSound (copy) ]]
+	function em.exsgze3l()
 		if v3 then
 			v3 = false
 			spawn(FadeOutSound)
@@ -79,13 +80,13 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 			error("Player not in robbery")
 		end
 	end
-	local function Ease_InOutQuad(p1) --[[ Line: 102 ]]
+	local function Ease_InOutQuad(p1)
 		return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
 	end
 	local t = {}
 	local v4 = Maid.new()
 	local v5 = nil
-	function em.aad1ukee(p1) --[[ Line: 108 | Upvalues: v5 (ref), v4 (copy) ]]
+	function em.aad1ukee(p1)
 		if not v5 then
 			return false
 		end
@@ -97,7 +98,7 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 			v2.Part.Color = Color3.fromRGB(153, 153, 153)
 		end
 	end
-	function em.impi1r3j(p1) --[[ Line: 120 | Upvalues: v5 (ref), em (copy), v4 (copy), LocalPlayer (ref), v1 (copy), RunService (ref), t (ref), GeomUtils (ref) ]]
+	function em.impi1r3j(p1)
 		if v5 then
 			em.aad1ukee()
 		end
@@ -106,7 +107,7 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 		end
 		local v3 = tick()
 		for i, v in ipairs(p1) do
-			v4:GiveTask(v.Part.Touched:Connect(function(p1) --[[ Line: 130 | Upvalues: LocalPlayer (ref), v3 (ref), v (copy), v1 (ref) ]]
+			v4:GiveTask(v.Part.Touched:Connect(function(p1)
 				if p1:IsDescendantOf(LocalPlayer.Character) then
 					local v12 = tick()
 					if not (v12 - v3 < 0.2) and v12 - v.LastDamage >= 0.5 then
@@ -117,10 +118,10 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 				end
 			end))
 		end
-		local function getPeriod(p1) --[[ Line: 146 ]]
+		local function getPeriod(p1)
 			return 0.5 * p1.Duration * p1._speed
 		end
-		v5 = RunService.Heartbeat:Connect(function() --[[ Line: 149 | Upvalues: p1 (copy), t (ref), GeomUtils (ref) ]]
+		v5 = RunService.Heartbeat:Connect(function()
 			for v3, v4 in next, p1 do
 				local v1, v2
 				if not v4._speed then
@@ -144,21 +145,21 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 			end
 		end)
 	end
-	function em.ckvvbfd2(p1) --[[ Line: 184 | Upvalues: t (ref) ]]
+	function em.ckvvbfd2(p1)
 		t = p1
 	end
 	local CircleAction = UI.CircleAction
-	local function Action(p1, p2) --[[ Line: 190 | Upvalues: PlaySound (ref), LocalPlayer (ref), v1 (copy) ]]
+	local function Action(p1, p2)
 		if p2 then
 			PlaySound(LocalPlayer, 1843025542)
 			v1:FireServer("r" .. "" .. ("p9cm02a8gq"):sub(5, 6):reverse() .. "" .. "" .. ("q5fhmdj"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("vum2"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("pw8wcyud"):sub(5, 6):reverse() .. "w", p1.Part)
 			return true
 		end
 	end
-	local function PreUpdateFun(p1) --[[ Line: 197 ]]
+	local function PreUpdateFun(p1)
 		p1.Enabled = p1.Part.Parent.Arm.Transparency < 0.5
 	end
-	local function AddedFun(p1) --[[ Line: 200 | Upvalues: Action (copy), PreUpdateFun (copy), CircleAction (copy) ]]
+	local function AddedFun(p1)
 		CircleAction.Add({
 			Part = p1,
 			ValidRoot = p1.Parent,
@@ -171,7 +172,7 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 			PreUpdatePeriod = 0.1
 		}, p1)
 	end
-	local function RemovedFun(p1) --[[ Line: 214 | Upvalues: CircleAction (copy) ]]
+	local function RemovedFun(p1)
 		CircleAction.Remove(p1)
 	end
 	local v6 = next
@@ -191,7 +192,7 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 	end
 	CollectionService:GetInstanceAddedSignal("Museum_DynamiteNode"):Connect(AddedFun)
 	CollectionService:GetInstanceRemovedSignal("Museum_DynamiteNode"):Connect(RemovedFun)
-	local function Action_2(p1, p2) --[[ Line: 225 | Upvalues: PlaySound (ref), LocalPlayer (ref), v1 (copy) ]]
+	local function Action_2(p1, p2)
 		if p2 then
 			PlaySound(LocalPlayer, 1988477690)
 			PlaySound(LocalPlayer, 8473658289)
@@ -199,10 +200,10 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 			return true
 		end
 	end
-	local function PreUpdateFun_2(p1) --[[ Line: 234 ]]
+	local function PreUpdateFun_2(p1)
 		p1.Enabled = (p1.HidePart or p1.Part).Transparency < 0.999
 	end
-	local function AddedFun_2(p1) --[[ Line: 242 | Upvalues: Action_2 (copy), PreUpdateFun_2 (copy), CircleAction (copy) ]]
+	local function AddedFun_2(p1)
 		local v1 = nil
 		local v2 = nil
 		local v3 = 2
@@ -236,7 +237,7 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 			ValidRoot = v2
 		}, p1)
 	end
-	local function RemovedFun_2(p1) --[[ Line: 277 | Upvalues: CircleAction (copy) ]]
+	local function RemovedFun_2(p1)
 		local _ = p1.Name
 		CircleAction.Remove(p1)
 	end
@@ -247,17 +248,17 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 	end
 	CollectionService:GetInstanceAddedSignal("Museum_Item"):Connect(AddedFun_2)
 	CollectionService:GetInstanceRemovedSignal("Museum_Item"):Connect(RemovedFun_2)
-	local function Action_3(p1, p2) --[[ Line: 290 | Upvalues: PlaySound (ref), LocalPlayer (ref), v1 (copy) ]]
+	local function Action_3(p1, p2)
 		if p2 then
 			PlaySound(LocalPlayer, 1837831244)
 			v1:FireServer("z" .. ("wabix"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("uzby1rmb"):sub(5, 7):reverse() .. "v", p1.Part)
 			return true
 		end
 	end
-	local function PreUpdateFun_3(p1) --[[ Line: 299 ]]
+	local function PreUpdateFun_3(p1)
 		p1.Enabled = p1.Part.Reflectance < 0.15
 	end
-	local function AddedFun_3(p1) --[[ Line: 304 | Upvalues: Action_3 (copy), PreUpdateFun_3 (copy), CircleAction (copy) ]]
+	local function AddedFun_3(p1)
 		CircleAction.Add({
 			Part = p1,
 			Name = "Pull Lever",
@@ -269,7 +270,7 @@ return function(p1) --[[ Line: 34 | Upvalues: LocalPlayer (copy), PlaySound (cop
 			PreUpdatePeriod = 0.5
 		}, p1)
 	end
-	local function RemovedFun_3(p1) --[[ Line: 317 | Upvalues: CircleAction (copy) ]]
+	local function RemovedFun_3(p1)
 		CircleAction.Remove(p1)
 	end
 	local v16 = next

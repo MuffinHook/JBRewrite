@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local Roact = require(ReplicatedStorage.Roact)
@@ -7,7 +8,7 @@ v1.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	disabled = false
 }
-function v1.render(p1) --[[ Line: 12 | Upvalues: createElement (copy), ColorUtils (copy), Roact (copy) ]]
+function v1.render(p1)
 	local aspectRatio = p1.props.aspectRatio
 	local t = {
 		AutoButtonColor = not p1.props.disabled,

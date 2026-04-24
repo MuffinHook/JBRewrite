@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local t = {
@@ -49,14 +50,14 @@ local t = {
 	}
 }
 local sum = 0
-for v2, v3 in t.POSSIBLE_REWARDS do
-	local v1
-	v1 = v3.Probability > 0
-	assert(v1, "Reward probabilities must be positive!")
-	if v3.RewardName and not ReplicatedStorage.Game.Item:FindFirstChild(v3.RewardName) then
-		error("Reward is not a valid item: " .. v3.RewardName)
+for rewardIndex, rewardData in t.POSSIBLE_REWARDS do
+	local isProbabilityValid
+	isProbabilityValid = rewardData.Probability > 0
+	assert(isProbabilityValid, "Reward probabilities must be positive!")
+	if rewardData.RewardName and not ReplicatedStorage.Game.Item:FindFirstChild(rewardData.RewardName) then
+		error("Reward is not a valid item: " .. rewardData.RewardName)
 	end
-	sum = sum + v3.Probability
+	sum = sum + rewardData.Probability
 end
 assert(math.abs(sum - 1) < 0.001, "Reward probabilities must sum to 1!")
 return TableUtils.requireValidIndexAndFreeze(t)

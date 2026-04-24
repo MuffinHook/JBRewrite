@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -17,15 +18,15 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
 local String = require(ReplicatedStorage.Std.String)
 local Item = require(script.Parent.Item)
-local function RandomVector() --[[ Line: 24 ]]
+local function RandomVector()
 	local v1 = math.random() * 2 - 1
 	local v2 = math.random() * 2 - 1
 	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
 end
-local function Ease_OutBack(p1) --[[ Line: 27 ]]
+local function Ease_OutBack(p1)
 	return 1 + (p1 - 1) * (p1 - 1) * (-1 + p1 + 1.70158 * p1)
 end
-local function Ease_InOutQuad(p1) --[[ Line: 31 ]]
+local function Ease_InOutQuad(p1)
 	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
 end
 local v2 = nil
@@ -33,7 +34,7 @@ local ForcefieldLauncher = require(ReplicatedStorage.Game.ItemConfig.ForcefieldL
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 45 | Upvalues: t (copy), Maid (copy), ReplicatedStorage (copy), ForcefieldConsts (copy) ]]
+function t.new(p1)
 	local v2 = setmetatable({}, t)
 	v2.maid = Maid.new()
 	local v3 = ReplicatedStorage.Resource.ForcefieldMesh:Clone()
@@ -53,7 +54,7 @@ function t.new(p1) --[[ Line: 45 | Upvalues: t (copy), Maid (copy), ReplicatedSt
 	v2.Local = p1
 	return v2
 end
-function t.AttemptLaunch(p1, p2, p3) --[[ Line: 65 | Upvalues: SimulatedPhysicsProjectile (copy), ForcefieldService (copy), RunService (copy), String (copy), v2 (ref) ]]
+function t.AttemptLaunch(p1, p2, p3)
 	local v1 = SimulatedPhysicsProjectile.new(p2)
 	v1:HitTargetWithSpeed(p3, 75, false)
 	p1.PartShell.Parent = workspace
@@ -61,7 +62,7 @@ function t.AttemptLaunch(p1, p2, p3) --[[ Line: 65 | Upvalues: SimulatedPhysicsP
 	if ForcefieldService.getIsPositionAllowed(v22) then
 		local v4 = os.clock()
 		local v5 = nil
-		v5 = RunService.Heartbeat:Connect(function() --[[ Line: 77 | Upvalues: v4 (copy), v1 (copy), p1 (copy), v3 (copy), v5 (ref), String (ref), v2 (ref) ]]
+		v5 = RunService.Heartbeat:Connect(function()
 			local v22 = math.min((os.clock() - v4) * 5, 1)
 			local v32, v42 = v1:Update()
 			p1.PartShell.Size = Vector3.new(v22, v22, v22)
@@ -80,7 +81,7 @@ function t.AttemptLaunch(p1, p2, p3) --[[ Line: 65 | Upvalues: SimulatedPhysicsP
 		return false
 	end
 end
-function t.SetSize(p1, p2) --[[ Line: 96 ]]
+function t.SetSize(p1, p2)
 	local v1 = 1 + (p2 - 1) * (p2 - 1) * (-1 + p2 + 1.70158 * p2)
 	local Radius = p1.Radius
 	local v2 = Vector3.new(v1 * Radius * 2, v1 * Radius * 2, v1 * Radius * 2)
@@ -92,13 +93,13 @@ function t.SetSize(p1, p2) --[[ Line: 96 ]]
 	p1.MeshPartForcefield.Size = v2
 	p1.MeshPartForcefield.CFrame = v8
 end
-function t.Grow(p1, p2, p3, p4) --[[ Line: 107 | Upvalues: RunService (copy), ForcefieldService (copy), ReplicatedStorage (copy), ForcefieldConsts (copy), Players (copy), DisplayDamage (copy), ForcefieldLauncher (copy), TweenService (copy), Audio (copy) ]]
+function t.Grow(p1, p2, p3, p4)
 	p1.Position = p2
 	p1.PartShell.Parent = workspace
 	p1.MeshPartForcefield.Parent = workspace
 	local v1 = os.clock()
 	local v2 = nil
-	v2 = RunService.Heartbeat:Connect(function(p12) --[[ Line: 114 | Upvalues: v1 (copy), p1 (copy), v2 (ref) ]]
+	v2 = RunService.Heartbeat:Connect(function(p12)
 		local v12 = (os.clock() - v1) * 2
 		p1:SetSize(v12)
 		if v12 > 1 then
@@ -110,7 +111,7 @@ function t.Grow(p1, p2, p3, p4) --[[ Line: 107 | Upvalues: RunService (copy), Fo
 		p1.ForcefieldId = p3
 		local v3 = ReplicatedStorage.Forcefield:FindFirstChild(ForcefieldConsts.HEALTH_UPDATE_REMOTE_NAME)
 		local STARTING_HEALTH = ForcefieldConsts.STARTING_HEALTH
-		p1.maid:GiveTask(v3.OnClientEvent:Connect(function(p12, p2, p32) --[[ Line: 135 | Upvalues: p3 (copy), Players (ref), p1 (copy), DisplayDamage (ref), STARTING_HEALTH (ref), p4 (copy), ForcefieldLauncher (ref), ForcefieldConsts (ref), TweenService (ref) ]]
+		p1.maid:GiveTask(v3.OnClientEvent:Connect(function(p12, p2, p32)
 			if p2 == p3 then
 				if Players.LocalPlayer == p12 or p1.Local then
 					DisplayDamage.draw(p2, p1.PartShell, STARTING_HEALTH - p32, {
@@ -125,7 +126,7 @@ function t.Grow(p1, p2, p3, p4) --[[ Line: 107 | Upvalues: RunService (copy), Fo
 						p1:Shrink()
 						return
 					end
-					p1.maid.shrinkTask = task.delay(ForcefieldLauncher.MinShieldDuration - (v2 - p4), function() --[[ Line: 156 | Upvalues: p1 (ref) ]]
+					p1.maid.shrinkTask = task.delay(ForcefieldLauncher.MinShieldDuration - (v2 - p4), function()
 						p1:Shrink()
 					end)
 					p32 = 0
@@ -137,12 +138,12 @@ function t.Grow(p1, p2, p3, p4) --[[ Line: 107 | Upvalues: RunService (copy), Fo
 				p1.maid.transparencyHitFlicker = v6
 				p1.PartShell.Transparency = v4
 				v6:Play()
-				p1.maid.afterTween = task.delay(0.1, function() --[[ Line: 172 | Upvalues: p1 (ref), v4 (copy) ]]
+				p1.maid.afterTween = task.delay(0.1, function()
 					p1.PartShell.Transparency = v4
 				end)
 			end
 		end))
-		p1.maid:GiveTask(task.delay(ForcefieldLauncher.MaxShieldDuration, function() --[[ Line: 178 | Upvalues: p1 (copy) ]]
+		p1.maid:GiveTask(task.delay(ForcefieldLauncher.MaxShieldDuration, function()
 			p1:Shrink()
 		end))
 		Audio.ObjectLocal(p1.PartShell, 4058366615)
@@ -155,11 +156,11 @@ function t.Grow(p1, p2, p3, p4) --[[ Line: 107 | Upvalues: RunService (copy), Fo
 		p1:Destroy()
 	end
 end
-function t.Shrink(p1) --[[ Line: 184 | Upvalues: RunService (copy), ForcefieldService (copy) ]]
+function t.Shrink(p1)
 	if not p1.isShrinking then
 		p1.isShrinking = true
 		local v1 = os.clock()
-		p1.maid:GiveTask(RunService.Heartbeat:Connect(function(p12) --[[ Line: 190 | Upvalues: v1 (copy), p1 (copy) ]]
+		p1.maid:GiveTask(RunService.Heartbeat:Connect(function(p12)
 			local v12 = (os.clock() - v1) * 2
 			p1:SetSize(1 - v12)
 			if v12 > 1 then
@@ -170,7 +171,7 @@ function t.Shrink(p1) --[[ Line: 184 | Upvalues: RunService (copy), ForcefieldSe
 		p1.ForcefieldId = nil
 	end
 end
-function t.Destroy(p1) --[[ Line: 201 ]]
+function t.Destroy(p1)
 	p1.PartShell:Destroy()
 	p1.PartShell = nil
 	p1.MeshPartForcefield:Destroy()
@@ -182,15 +183,15 @@ local t2 = {
 }
 t2.__index = t2
 setmetatable(t2, Item)
-function t2.Init(p1) --[[ Line: 215 | Upvalues: v2 (ref), t (copy) ]]
+function t2.Init(p1)
 	v2 = p1.Event
-	function p1.em.oy0cfqfm(p1, p2, p3, p4) --[[ Line: 218 | Upvalues: t (ref) ]]
+	function p1.em.oy0cfqfm(p1, p2, p3, p4)
 		assert(p1)
 		assert(p2)
 		t.new():Grow(p2, p3, p4)
 	end
 end
-function t2.new(p1, p2, p3) --[[ Line: 225 | Upvalues: Item (copy), t2 (copy), ForcefieldLauncher (copy), InventoryItemUtils (copy), Spring (copy), R15IKv2 (copy), RunService (copy), Interval (copy), Audio (copy) ]]
+function t2.new(p1, p2, p3)
 	local v1 = Item.new(p1, p3)
 	setmetatable(v1, t2)
 	v1.Config = ForcefieldLauncher
@@ -204,10 +205,10 @@ function t2.new(p1, p2, p3) --[[ Line: 225 | Upvalues: Item (copy), t2 (copy), F
 	v1.IK = R15IKv2.BuildPacketArms(v1.Character)
 	v1:SetupModel()
 	v1:AttachModelToPlayer()
-	v1.Maid:GiveTask(RunService.Stepped:Connect(function() --[[ Line: 246 | Upvalues: v1 (copy) ]]
+	v1.Maid:GiveTask(RunService.Stepped:Connect(function()
 		v1:Stepped()
 	end))
-	v1.Maid:GiveTask(RunService.RenderStepped:Connect(function() --[[ Line: 249 | Upvalues: v1 (copy) ]]
+	v1.Maid:GiveTask(RunService.RenderStepped:Connect(function()
 		v1:RenderStepped()
 	end))
 	if v1.Local then
@@ -217,7 +218,7 @@ function t2.new(p1, p2, p3) --[[ Line: 225 | Upvalues: Item (copy), t2 (copy), F
 			v1:StartReloadProgressCircle(v1.Config.Reload + v1.Config.MaxShieldDuration, os.clock() - (v1.Config.Reload + v1.Config.MaxShieldDuration - (v3 - v4)))
 		end
 		local v5 = v4 < v3
-		v1.Maid:GiveTask(Interval.every(0.5):Connect(function() --[[ Line: 267 | Upvalues: InventoryItemUtils (ref), v1 (copy), v5 (ref), Audio (ref) ]]
+		v1.Maid:GiveTask(Interval.every(0.5):Connect(function()
 			local v12 = (InventoryItemUtils.getAttr(v1.inventoryItemValue, "NextShootPossible") or 0) > os.clock()
 			if v12 ~= v5 then
 				v5 = v12
@@ -229,7 +230,7 @@ function t2.new(p1, p2, p3) --[[ Line: 225 | Upvalues: Item (copy), t2 (copy), F
 	end
 	return v1
 end
-function t2.SetupModel(p1) --[[ Line: 282 | Upvalues: InventoryItemUtils (copy), ReplicatedStorage (copy), Joint (copy) ]]
+function t2.SetupModel(p1)
 	local v1 = InventoryItemUtils.getName(p1.inventoryItemValue)
 	local v2 = ReplicatedStorage.Resource.ItemSystem.Models:FindFirstChild(v1)
 	if v2 == nil then
@@ -240,36 +241,36 @@ function t2.SetupModel(p1) --[[ Line: 282 | Upvalues: InventoryItemUtils (copy),
 	local Center = v3.Skeleton.Center
 	p1.Center = Center
 	Joint.WeldAllTo(v3, Center)
-	p1.Maid:GiveTask(function() --[[ Line: 296 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(function()
 		p1.Model:Destroy()
 		p1.Model = nil
 	end)
 end
-function t2.AttachModelToPlayer(p1) --[[ Line: 301 | Upvalues: Joint (copy) ]]
+function t2.AttachModelToPlayer(p1)
 	local UpperTorso = p1.UpperTorso
 	p1.Center.CFrame = UpperTorso.CFrame
 	local v1 = Joint.BlankMotor(p1.Center, UpperTorso)
 	p1.Model.Parent = workspace.Items
 	p1.Motor = v1
 	p1.Motor.C1 = CFrame.new(1.2, 0, -1.5)
-	p1.Maid:GiveTask(function() --[[ Line: 310 | Upvalues: p1 (copy) ]]
+	p1.Maid:GiveTask(function()
 		p1.Motor:Destroy()
 		p1.Motor = nil
 	end)
 end
-function t2.RenderStepped(p1) --[[ Line: 315 | Upvalues: CurrentCamera (copy) ]]
+function t2.RenderStepped(p1)
 	if p1.Local then
 		CurrentCamera.CFrame = CFrame.new(CurrentCamera.CFrame.p, CurrentCamera.CFrame * Vector3.new(0, 0, -2) + p1.SpringCamera:Update())
 	end
 end
-function t2.Stepped(p1) --[[ Line: 322 | Upvalues: R15IKv2 (copy) ]]
+function t2.Stepped(p1)
 	local IK = p1.IK
 	IK.RightArm = p1.Center.CFrame * Vector3.new(0, 0, 0.2)
 	R15IKv2.Arms(IK)
 	IK.LeftWrist.Transform = CFrame.new()
 	IK.RightWrist.Transform = CFrame.new()
 end
-function t2.GetMouseLocation(p1) --[[ Line: 330 | Upvalues: InputUtils (copy), CurrentCamera (copy), UserInputService (copy) ]]
+function t2.GetMouseLocation(p1)
 	if InputUtils.isTouch() then
 		local ViewportSize = CurrentCamera.ViewportSize
 		return Vector3.new(ViewportSize.X * 0.5, ViewportSize.Y * (p1.Config.MobileMouseHeightScalar or 0.5), 0)
@@ -277,7 +278,7 @@ function t2.GetMouseLocation(p1) --[[ Line: 330 | Upvalues: InputUtils (copy), C
 		return UserInputService:GetMouseLocation()
 	end
 end
-function t2.ShootBegin(p1) --[[ Line: 341 | Upvalues: CurrentCamera (copy), InventoryItemUtils (copy), Audio (copy), t (copy) ]]
+function t2.ShootBegin(p1)
 	local v1 = p1:GetMouseLocation()
 	local v2 = CurrentCamera:ViewportPointToRay(v1.x, v1.y)
 	local _, v3 = workspace:FindPartOnRayWithIgnoreList(Ray.new(v2.Origin, v2.Direction * 200), { p1.Character, p1.Model })
@@ -299,11 +300,11 @@ function t2.ShootBegin(p1) --[[ Line: 341 | Upvalues: CurrentCamera (copy), Inve
 		InventoryItemUtils.setAttr(p1.inventoryItemValue, "NextShootPossible", sum)
 	end
 end
-function t2.InputBegan(p1, p2, p3) --[[ Line: 375 | Upvalues: Item (copy) ]]
+function t2.InputBegan(p1, p2, p3)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		p1:ShootBegin()
 	end
 	Item.InputBegan(p1, p2, p3)
 end
-function t2.InputEnded(p1) --[[ Line: 385 ]] end
+function t2.InputEnded(p1)  end
 return t2

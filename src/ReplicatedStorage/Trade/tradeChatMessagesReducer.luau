@@ -1,6 +1,7 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	addTradeChatMessage = function(p1, p2) --[[ Name: addTradeChatMessage | Line: 5 ]]
+	addTradeChatMessage = function(p1, p2)
 		assert(p2.displayName, "No display name")
 		assert(p2.text, "No text")
 		assert(typeof(p2.me) == "boolean", "No me value passed")
@@ -13,7 +14,7 @@ return require(ReplicatedStorage.Rodux).createReducer({}, {
 		})
 		return v2
 	end,
-	clearTradeChatMessages = function(p1, p2) --[[ Name: clearTradeChatMessages | Line: 19 ]]
+	clearTradeChatMessages = function(p1, p2)
 		return {}
 	end
 })

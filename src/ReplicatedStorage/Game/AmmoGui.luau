@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Game.GameUtil)
@@ -5,14 +6,14 @@ require(ReplicatedStorage.Resource.Settings)
 local CurrentCamera = workspace.CurrentCamera
 local t = {}
 t.__index = t
-function t.Init(p1) --[[ Line: 10 | Upvalues: t (copy) ]]
+function t.Init(p1)
 	local v1 = p1.GetScreenGui("AmmoGui")
 	t.Gui = v1
 	t.Frame = v1:WaitForChild("Frame")
 	t.Frame2 = v1:WaitForChild("Frame2")
 end
-function t.SetColor(p1) --[[ Line: 18 ]] end
-function t.new(p1) --[[ Line: 19 | Upvalues: t (copy) ]]
+function t.SetColor(p1)  end
+function t.new(p1)
 	local t2 = {}
 	setmetatable(t2, t)
 	t.Gui.Enabled = true
@@ -20,7 +21,7 @@ function t.new(p1) --[[ Line: 19 | Upvalues: t (copy) ]]
 	t.Frame2.ItemName.Text = ("// %s"):format(p1)
 	return t2
 end
-function t.Update(p1, p2, p3) --[[ Line: 29 | Upvalues: t (copy) ]]
+function t.Update(p1, p2, p3)
 	if p3 ~= nil then
 		p1.MaxAmmo = p3
 	end
@@ -42,7 +43,7 @@ function t.Update(p1, p2, p3) --[[ Line: 29 | Upvalues: t (copy) ]]
 		Frame2.MagSize.TextColor3 = Color3.new(255/255, 255/255, 255/255)
 	end
 end
-function t.UpdatePosition(p1, p2, p3) --[[ Line: 54 | Upvalues: t (copy), CurrentCamera (copy) ]]
+function t.UpdatePosition(p1, p2, p3)
 	local Frame = t.Frame
 	local v1, v2 = CurrentCamera:WorldToScreenPoint(p2.Position)
 	if v1 then
@@ -56,7 +57,7 @@ function t.UpdatePosition(p1, p2, p3) --[[ Line: 54 | Upvalues: t (copy), Curren
 	Frame.Visible = v2 and not ((CurrentCamera.CFrame.Position - CurrentCamera.Focus.Position).Magnitude < 4)
 	t.Frame2.Visible = not Frame.Visible
 end
-function t.Destroy(p1) --[[ Line: 70 | Upvalues: t (copy) ]]
+function t.Destroy(p1)
 	t.Gui.Enabled = false
 	t.Frame.Visible = false
 	t.Frame2.Visible = false

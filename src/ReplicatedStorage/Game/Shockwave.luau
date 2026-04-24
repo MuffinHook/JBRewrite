@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
@@ -6,7 +7,7 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Spring = require(ReplicatedStorage.Std.Spring)
 local Signal = require(ReplicatedStorage.Std.Signal)
-local function GetRootPart() --[[ Line: 11 | Upvalues: LocalPlayer (copy) ]]
+local function GetRootPart()
 	local Character = LocalPlayer.Character
 	if Character == nil then
 		return nil
@@ -21,7 +22,7 @@ local function GetRootPart() --[[ Line: 11 | Upvalues: LocalPlayer (copy) ]]
 end
 local t = {}
 t.__index = t
-function t.new(p1, p2) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), Signal (copy), Spring (copy), RunService (copy) ]]
+function t.new(p1, p2)
 	assert(p1 ~= nil)
 	assert(p2 ~= nil)
 	local t2 = {}
@@ -47,12 +48,12 @@ function t.new(p1, p2) --[[ Line: 27 | Upvalues: t (copy), Maid (copy), Signal (
 	t2:CreateFx()
 	t2:CreatePart()
 	t2.BornAt = tick()
-	t2.Maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 58 | Upvalues: t2 (copy) ]]
+	t2.Maid:GiveTask(RunService.Heartbeat:Connect(function()
 		t2:Update()
 	end))
 	return t2
 end
-function t.Update(p1) --[[ Line: 64 | Upvalues: LocalPlayer (copy), Audio (copy) ]]
+function t.Update(p1)
 	local v1 = (tick() - p1.BornAt) / p1.Duration
 	if v1 >= 1 then
 		v1 = 1
@@ -115,7 +116,7 @@ function t.Update(p1) --[[ Line: 64 | Upvalues: LocalPlayer (copy), Audio (copy)
 		p1:Destroy()
 	end
 end
-function t.CreateFx(p1) --[[ Line: 141 | Upvalues: LocalPlayer (copy) ]]
+function t.CreateFx(p1)
 	local BlurEffect = Instance.new("BlurEffect")
 	BlurEffect.Size = 0
 	BlurEffect.Enabled = false
@@ -138,7 +139,7 @@ function t.CreateFx(p1) --[[ Line: 141 | Upvalues: LocalPlayer (copy) ]]
 	Frame.Parent = ScreenGui
 	p1.OrangeFrame = Frame
 end
-function t.CreatePart(p1) --[[ Line: 168 ]]
+function t.CreatePart(p1)
 	local Part = Instance.new("Part")
 	Part.Color = p1.Color
 	Part.Size = Vector3.new(1, 1, 1)
@@ -155,7 +156,7 @@ function t.CreatePart(p1) --[[ Line: 168 ]]
 	p1.Mesh = SpecialMesh
 	p1.Part = Part
 end
-function t.Destroy(p1) --[[ Line: 190 ]]
+function t.Destroy(p1)
 	p1.OnDestroyed:Fire()
 	p1.Maid:Destroy()
 	p1.Maid = nil

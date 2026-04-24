@@ -1,8 +1,9 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RayCast = require(ReplicatedStorage.Module.RayCast)
 local t = {}
 t.__index = t
-function t.new(p1) --[[ Line: 21 | Upvalues: t (copy) ]]
+function t.new(p1)
 	local v2 = setmetatable({}, t)
 	v2.Origin = p1
 	v2.Target = nil
@@ -16,7 +17,7 @@ function t.new(p1) --[[ Line: 21 | Upvalues: t (copy) ]]
 	v2.IgnoreList = {}
 	return v2
 end
-function t.CalculateVelocityToHitTargetWithSpeed(p1, p2, p3, p4, p5) --[[ Line: 35 ]]
+function t.CalculateVelocityToHitTargetWithSpeed(p1, p2, p3, p4, p5)
 	local v1 = p2 - p1
 	local v2 = (v1.x * v1.x + v1.z * v1.z) ^ 0.5
 	local v3 = p3 * p3 * p3 * p3 - p4 * (p4 * v2 * v2 + 2 * v1.y * p3 * p3)
@@ -33,18 +34,18 @@ function t.CalculateVelocityToHitTargetWithSpeed(p1, p2, p3, p4, p5) --[[ Line: 
 	local v11 = p3 * math.sin(v4)
 	return Vector3.new(v10, v11, p3 * v1.z / v2 * math.cos(v4)), v2 / (p3 * math.cos(v4))
 end
-function t.HitTargetWithSpeed(p1, p2, p3, p4) --[[ Line: 68 | Upvalues: t (copy) ]]
+function t.HitTargetWithSpeed(p1, p2, p3, p4)
 	p1.Target = p2
 	local v1, v2 = t.CalculateVelocityToHitTargetWithSpeed(p1.Origin, p2, p3, p1.Gravity, p4)
 	p1.Velocity = v1
 	p1.Duration = v2
 	return true
 end
-function t.CalculateElapsedPosition(p1, p2) --[[ Line: 80 ]]
+function t.CalculateElapsedPosition(p1, p2)
 	assert(p2 ~= nil)
 	return p1.Origin + p1.Velocity * p2 + 0.5 * p1._GravityVector * p2 * p2
 end
-function t.Step(p1, p2, p3) --[[ Line: 85 | Upvalues: RayCast (copy) ]]
+function t.Step(p1, p2, p3)
 	assert(p2)
 	assert(p1.Velocity)
 	local v2 = p1:CalculateElapsedPosition(p2 - p1.Birthdate)
@@ -56,12 +57,12 @@ function t.Step(p1, p2, p3) --[[ Line: 85 | Upvalues: RayCast (copy) ]]
 		return v2, false
 	end
 end
-function t.Update(p1) --[[ Line: 106 ]]
+function t.Update(p1)
 	local v1, v2 = p1:Step(p1:_GetNow(), p1._PrevUpdatePosition)
 	p1._PrevUpdatePosition = v1
 	return v1, v2
 end
-function t.CalculateNextInstantCollision(p1, p2) --[[ Line: 114 ]]
+function t.CalculateNextInstantCollision(p1, p2)
 	local v1, v2 = p1:Update()
 	if v2 then
 		return v1, 0
@@ -82,7 +83,7 @@ function t.CalculateNextInstantCollision(p1, p2) --[[ Line: 114 ]]
 		return v4, sum - v3
 	end
 end
-function t.GetElapsed(p1) --[[ Line: 131 ]]
+function t.GetElapsed(p1)
 	return p1:_GetNow() - p1.Birthdate
 end
 return t

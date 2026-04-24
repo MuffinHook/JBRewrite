@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
@@ -5,7 +6,7 @@ local RunService = game:GetService("RunService")
 local SeekingMissileUtils = require(ReplicatedStorage.SeekingMissile.SeekingMissileUtils)
 require(ReplicatedStorage.Std.Raycast)
 local t = {
-	_init = function(p1) --[[ Name: _init | Line: 14 | Upvalues: SeekingMissileUtils (copy), Signal (copy) ]]
+	_init = function(p1)
 		p1._throttle = 1
 		p1.forwardDrag = SeekingMissileUtils.getForwardDrag(p1.obj)
 		p1.lateralDrag = SeekingMissileUtils.getLateralDrag(p1.obj)
@@ -22,7 +23,7 @@ local t = {
 		p1.onApplyingThrustChanged = Signal.new()
 		p1.maid:GiveTask(p1.onApplyingThrustChanged)
 	end,
-	_getTargetPosition = function(p1) --[[ Name: _getTargetPosition | Line: 36 | Upvalues: SeekingMissileUtils (copy) ]]
+	_getTargetPosition = function(p1)
 		local v1 = SeekingMissileUtils.getTargetPos(p1.obj)
 		local targetPartObj = p1.targetPartObj.Value
 		if targetPartObj then
@@ -31,7 +32,7 @@ local t = {
 		return v1
 	end
 }
-function t._run(p1) --[[ Line: 46 | Upvalues: RunService (copy), t (copy), GeomUtils (copy), SeekingMissileUtils (copy) ]]
+function t._run(p1)
 	p1.lastDistance = (1 / 0)
 	p1.lastDistanceImprovement = 0
 	local v1 = false
@@ -40,7 +41,7 @@ function t._run(p1) --[[ Line: 46 | Upvalues: RunService (copy), t (copy), GeomU
 	local v4 = os.clock()
 	local v5 = 0
 	local Position = p1.obj.Position
-	p1.runMaid:GiveTask(RunService.Heartbeat:Connect(function(p12) --[[ Line: 57 | Upvalues: p1 (copy), t (ref), v5 (ref), GeomUtils (ref), v4 (copy), SeekingMissileUtils (ref), Position (ref), v1 (ref), v2 (ref), v3 (ref) ]]
+	p1.runMaid:GiveTask(RunService.Heartbeat:Connect(function(p12)
 		local v12 = os.clock()
 		local obj = p1.obj
 		local AssemblyMass = obj.AssemblyMass
@@ -137,12 +138,12 @@ function t._run(p1) --[[ Line: 46 | Upvalues: RunService (copy), t (copy), GeomU
 		Position = Position_2
 	end))
 	p1.alignOrientation.MaxTorque = 10000000000000
-	p1.runMaid:GiveTask(function() --[[ Line: 214 | Upvalues: p1 (copy) ]]
+	p1.runMaid:GiveTask(function()
 		p1.vectorForce.Force = Vector3.new()
 		p1.alignOrientation.MaxTorque = 0
 	end)
 end
-function t._explode(p1) --[[ Line: 219 ]]
+function t._explode(p1)
 	if not p1._didExplode then
 		p1._didExplode = true
 		local targetPartObj = p1.targetPartObj.Value
@@ -150,9 +151,9 @@ function t._explode(p1) --[[ Line: 219 ]]
 		task.defer(p1.runMaid.DoCleaning, p1.runMaid)
 	end
 end
-function t._detectHit(p1) --[[ Line: 232 | Upvalues: t (copy) ]]
+function t._detectHit(p1)
 	if not p1._didExplode then
-		p1.runMaid:GiveTask(p1.obj.Touched:Connect(function(p12) --[[ Line: 236 | Upvalues: p1 (copy), t (ref) ]]
+		p1.runMaid:GiveTask(p1.obj.Touched:Connect(function(p12)
 			if not (p12.Transparency > 0.5) then
 				for v1, v2 in p1.ignoreList do
 					if p12:IsDescendantOf(v2) then
@@ -164,7 +165,7 @@ function t._detectHit(p1) --[[ Line: 232 | Upvalues: t (copy) ]]
 		end))
 	end
 end
-function t._enableSeeking(p1) --[[ Line: 251 ]]
+function t._enableSeeking(p1)
 	p1._seeking = true
 end
 return t

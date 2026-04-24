@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
 local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
@@ -5,7 +6,7 @@ local Rodux = require(ReplicatedStorage.Rodux)
 local GarageConsts = require(ReplicatedStorage.Garage.GarageConsts)
 local GarageUtils = require(ReplicatedStorage.Garage.GarageUtils)
 return Rodux.createReducer({}, {
-	setSaveSlot = function(p1, p2) --[[ Name: setSaveSlot | Line: 10 | Upvalues: GamepassSystem (copy), GamepassUtils (copy), GarageUtils (copy), ReplicatedStorage (copy), GarageConsts (copy) ]]
+	setSaveSlot = function(p1, p2)
 		assert(p2.name, "missing slot name")
 		assert(p2.equipped, "missing slot equipped")
 		local t = {}
@@ -23,7 +24,7 @@ return Rodux.createReducer({}, {
 		end
 		return t
 	end,
-	deleteSaveSlot = function(p1, p2) --[[ Name: deleteSaveSlot | Line: 30 | Upvalues: ReplicatedStorage (copy), GarageConsts (copy) ]]
+	deleteSaveSlot = function(p1, p2)
 		assert(p2.name, "missing slot name")
 		local t = {}
 		for k, v in pairs(p1) do
@@ -36,7 +37,7 @@ return Rodux.createReducer({}, {
 		end
 		return t
 	end,
-	loadSaveSlot = function(p1, p2) --[[ Name: loadSaveSlot | Line: 43 | Upvalues: ReplicatedStorage (copy), GarageConsts (copy) ]]
+	loadSaveSlot = function(p1, p2)
 		assert(p2.name, "missing slot name")
 		local v1 = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_LOAD_REMOTE_NAME)
 		if v1 then
@@ -44,7 +45,7 @@ return Rodux.createReducer({}, {
 		end
 		return p1
 	end,
-	setSavesRaw = function(p1, p2) --[[ Name: setSavesRaw | Line: 51 ]]
+	setSavesRaw = function(p1, p2)
 		assert(p2.saves ~= nil, "missing saves table")
 		return p2.saves
 	end

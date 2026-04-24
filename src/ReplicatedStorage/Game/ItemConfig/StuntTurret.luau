@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 return {
 	Sound = {},
 	ColorNormal = Color3.fromRGB(96, 117, 127),

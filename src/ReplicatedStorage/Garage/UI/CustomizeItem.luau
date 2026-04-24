@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local String = require(ReplicatedStorage.Std.String)
@@ -13,7 +14,7 @@ v1.defaultProps = {
 	cashHeight = 0.08,
 	accentColor = Color3.fromRGB(98, 222, 253)
 }
-function v1.init(p1) --[[ Line: 19 | Upvalues: Roact (copy), Maid (copy) ]]
+function v1.init(p1)
 	p1:setState({
 		hover = false,
 		favHover = false
@@ -23,7 +24,7 @@ function v1.init(p1) --[[ Line: 19 | Upvalues: Roact (copy), Maid (copy) ]]
 	p1.maid = Maid.new()
 	p1.mountCount = 0
 end
-function v1.render(p1) --[[ Line: 29 | Upvalues: String (copy), createElement (copy), Roact (copy), ColorUtils (copy) ]]
+function v1.render(p1)
 	local aspectRatio = p1.props.aspectRatio
 	local cornerPixel = p1.props.cornerPixel
 	local paddingRatio = p1.props.paddingRatio
@@ -41,22 +42,22 @@ function v1.render(p1) --[[ Line: 29 | Upvalues: String (copy), createElement (c
 	t.Text = ""
 	t.BackgroundColor3 = p1.props.equipped and Color3.new(255/255, 255/255, 255/255) or (p1.props.selected and Color3.new(0.05, 0.05, 0.05) or Color3.new(0.1, 0.1, 0.1))
 	t.LayoutOrder = p1.props.layoutOrder
-	t[Roact.Event.MouseEnter] = function() --[[ Line: 59 | Upvalues: p1 (copy) ]]
+	t[Roact.Event.MouseEnter] = function()
 		p1:setState({
 			hover = true
 		})
 	end
-	t[Roact.Event.MouseLeave] = function() --[[ Line: 64 | Upvalues: p1 (copy) ]]
+	t[Roact.Event.MouseLeave] = function()
 		p1:setState({
 			hover = false
 		})
 	end
-	t[Roact.Event.SelectionGained] = function() --[[ Line: 69 | Upvalues: p1 (copy) ]]
+	t[Roact.Event.SelectionGained] = function()
 		p1:setState({
 			hover = true
 		})
 	end
-	t[Roact.Event.SelectionLost] = function() --[[ Line: 74 | Upvalues: p1 (copy) ]]
+	t[Roact.Event.SelectionLost] = function()
 		p1:setState({
 			hover = false
 		})
@@ -222,27 +223,27 @@ function v1.render(p1) --[[ Line: 29 | Upvalues: String (copy), createElement (c
 		t7.BackgroundColor3 = p1.state.creatorHover and Color3.new(0.5, 0.5, 0.5) or Color3.new(0.7, 0.7, 0.7)
 		t7.Text = ""
 		t7.ZIndex = 10
-		t7[Roact.Event.MouseEnter] = function() --[[ Line: 244 | Upvalues: p1 (copy) ]]
+		t7[Roact.Event.MouseEnter] = function()
 			p1:setState({
 				creatorHover = true
 			})
 		end
-		t7[Roact.Event.MouseLeave] = function() --[[ Line: 249 | Upvalues: p1 (copy) ]]
+		t7[Roact.Event.MouseLeave] = function()
 			p1:setState({
 				creatorHover = false
 			})
 		end
-		t7[Roact.Event.SelectionGained] = function() --[[ Line: 254 | Upvalues: p1 (copy) ]]
+		t7[Roact.Event.SelectionGained] = function()
 			p1:setState({
 				creatorHover = true
 			})
 		end
-		t7[Roact.Event.SelectionLost] = function() --[[ Line: 259 | Upvalues: p1 (copy) ]]
+		t7[Roact.Event.SelectionLost] = function()
 			p1:setState({
 				creatorHover = false
 			})
 		end
-		t7[Roact.Event.Activated] = function() --[[ Line: 264 | Upvalues: p1 (copy) ]]
+		t7[Roact.Event.Activated] = function()
 			p1:setState({
 				creatorVisible = not p1.state.creatorVisible
 			})
@@ -275,27 +276,27 @@ function v1.render(p1) --[[ Line: 29 | Upvalues: String (copy), createElement (c
 		t7.ImageColor3 = (p1.props.faved or p1.state.favHover) and Color3.fromRGB(255, 251, 0) or Color3.new(0.7, 0.7, 0.7)
 		t7.Image = "rbxassetid://8552830996"
 		t7.ZIndex = 10
-		t7[Roact.Event.MouseEnter] = function() --[[ Line: 293 | Upvalues: p1 (copy) ]]
+		t7[Roact.Event.MouseEnter] = function()
 			p1:setState({
 				favHover = true
 			})
 		end
-		t7[Roact.Event.MouseLeave] = function() --[[ Line: 298 | Upvalues: p1 (copy) ]]
+		t7[Roact.Event.MouseLeave] = function()
 			p1:setState({
 				favHover = false
 			})
 		end
-		t7[Roact.Event.SelectionGained] = function() --[[ Line: 303 | Upvalues: p1 (copy) ]]
+		t7[Roact.Event.SelectionGained] = function()
 			p1:setState({
 				favHover = true
 			})
 		end
-		t7[Roact.Event.SelectionLost] = function() --[[ Line: 308 | Upvalues: p1 (copy) ]]
+		t7[Roact.Event.SelectionLost] = function()
 			p1:setState({
 				favHover = false
 			})
 		end
-		t7[Roact.Event.Activated] = function() --[[ Line: 313 | Upvalues: p1 (copy) ]]
+		t7[Roact.Event.Activated] = function()
 			if p1.props.onFavorite then
 				p1.props.onFavorite(not p1.props.faved)
 			end
@@ -378,19 +379,19 @@ function v1.render(p1) --[[ Line: 29 | Upvalues: String (copy), createElement (c
 	t2.Tags = createElement("Frame", t7, t8)
 	return createElement("TextButton", t, t2)
 end
-function v1._updateViewport(p1) --[[ Line: 408 ]]
+function v1._updateViewport(p1)
 	local v1 = p1.cameraRef:getValue()
 	local inst = p1.maid.inst
 	if inst and inst.Parent ~= nil then
 		p1.props.updateCamera(v1, inst)
 	end
 end
-function v1._reparent(p1) --[[ Line: 415 ]]
+function v1._reparent(p1)
 	local v1 = p1.viewportRef:getValue()
 	p1.maid.inst = nil
 	if p1.props.getInst then
 		local mountCount = p1.mountCount
-		task.delay(math.random() * 0.3, function() --[[ Line: 423 | Upvalues: p1 (copy), mountCount (copy), v1 (copy) ]]
+		task.delay(math.random() * 0.3, function()
 			if p1.mounted and p1.mountCount == mountCount then
 				local v12 = p1.props.getInst()
 				p1.maid.inst = v12
@@ -400,20 +401,20 @@ function v1._reparent(p1) --[[ Line: 415 ]]
 	end
 	p1:_updateViewport()
 end
-function v1.didMount(p1) --[[ Line: 434 | Upvalues: RunService (copy) ]]
+function v1.didMount(p1)
 	p1.mounted = true
 	p1.mountCount = p1.mountCount + 1
 	p1:_reparent()
-	p1.maid.updateCamera = RunService.Heartbeat:Connect(function() --[[ Line: 438 | Upvalues: p1 (copy) ]]
+	p1.maid.updateCamera = RunService.Heartbeat:Connect(function()
 		p1:_updateViewport()
 	end)
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 442 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p1.props.getInstCompare and p1.props.getInstCompare ~= p2.getInstCompare or not p1.props.getInstCompare and p1.props.getInst ~= p2.getInst then
 		p1:_reparent()
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 452 ]]
+function v1.willUnmount(p1)
 	p1.mounted = false
 	p1.maid:DoCleaning()
 end

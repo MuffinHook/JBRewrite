@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
 local RayCast = require(ReplicatedStorage.Module.RayCast)
@@ -31,10 +32,10 @@ local t2 = {
 }
 t2.__index = t2
 setmetatable(t2, Basic)
-function t2.Init(p1) --[[ Line: 39 | Upvalues: v2 (ref) ]]
+function t2.Init(p1)
 	v2 = p1.Event
 end
-function t2.new(p1, p2, p3) --[[ Line: 42 | Upvalues: Basic (copy), t (copy), t2 (copy) ]]
+function t2.new(p1, p2, p3)
 	local v1 = Basic.new(p1, p2, t, p3)
 	setmetatable(v1, t2)
 	v1.IgnoreList = { v1.Character, workspace.Items }
@@ -43,19 +44,19 @@ function t2.new(p1, p2, p3) --[[ Line: 42 | Upvalues: Basic (copy), t (copy), t2
 	v1:DefaultDisableCamLock()
 	return v1
 end
-function t2.SetupGui(p1) --[[ Line: 54 | Upvalues: ActionButtonService (copy), v2 (ref) ]]
+function t2.SetupGui(p1)
 	if p1.Local then
 		p1.Maid:GiveTask(ActionButtonService.add({
 			priority = 750,
 			image = "rbxassetid://4939737424",
 			keyCodes = { Enum.KeyCode.R, Enum.KeyCode.ButtonX },
-			onPressed = function() --[[ Name: onPressed | Line: 60 | Upvalues: v2 (ref) ]]
+			onPressed = function()
 				v2:FireServer("t" .. ("lv5jbmg2"):sub(3, 5):reverse():reverse():reverse() .. "" .. "" .. ("ec4oma"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ffgy"):sub(2, 3):reverse():reverse():reverse() .. "w")
 			end
 		}))
 	end
 end
-function t2.SetupBeam(p1) --[[ Line: 66 ]]
+function t2.SetupBeam(p1)
 	local Attachment = Instance.new("Attachment")
 	Attachment.Orientation = Vector3.new(90, 0, 0)
 	Attachment.Position = Vector3.new(0, 0, 0)
@@ -77,7 +78,7 @@ function t2.SetupBeam(p1) --[[ Line: 66 ]]
 	p1.EndPosition = nil
 	p1.TempPart = nil
 end
-function t2.PlaceBeam(p1, p2) --[[ Line: 91 | Upvalues: v2 (ref) ]]
+function t2.PlaceBeam(p1, p2)
 	if p1.StartPosition == nil then
 		if p1.TempPart ~= nil then
 			p1.TempPart:Destroy()
@@ -114,13 +115,13 @@ function t2.PlaceBeam(p1, p2) --[[ Line: 91 | Upvalues: v2 (ref) ]]
 		p1.EndPosition = nil
 	end
 end
-function t2.GetRightArmPosition(p1) --[[ Line: 132 ]]
+function t2.GetRightArmPosition(p1)
 	return p1.Center.CFrame * Vector3.new(0.4, 0, 0)
 end
-function t2.GetLeftArmPosition(p1) --[[ Line: 135 ]]
+function t2.GetLeftArmPosition(p1)
 	return p1.Center.CFrame * Vector3.new(-0.4, 0, 0)
 end
-function t2.Click(p1) --[[ Line: 138 | Upvalues: RayCast (copy) ]]
+function t2.Click(p1)
 	local v1, v2 = RayCast.RayIgnoreNonCollideWithIgnoreList(p1.Center.Position, Vector3.new(0, -1, 0), 10, p1.IgnoreList)
 	if p1.Local and v1 == nil then
 		return false
@@ -128,7 +129,7 @@ function t2.Click(p1) --[[ Line: 138 | Upvalues: RayCast (copy) ]]
 	p1.SpringItemOffset:SetTarget(p1.Config.Motion.Place.Springs.ItemOffset)
 	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Place.Springs.NeckRotation)
 	p1.SpringWaistRotation:SetTarget(p1.Config.Motion.Place.Springs.WaistRotation)
-	task.delay(0.3, function() --[[ Line: 151 | Upvalues: p1 (copy), v2 (copy) ]]
+	task.delay(0.3, function()
 		if not p1.Destroyed then
 			p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
 			p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
@@ -137,13 +138,13 @@ function t2.Click(p1) --[[ Line: 138 | Upvalues: RayCast (copy) ]]
 		end
 	end)
 end
-function t2.ShootBegin(p1, p2) --[[ Line: 163 ]]
+function t2.ShootBegin(p1, p2)
 	p1:Click()
 	if p1.Local then
 		p1:BroadcastInputBegan(p2)
 	end
 end
-function t2.InputBegan(p1, p2, p3) --[[ Line: 169 | Upvalues: Basic (copy) ]]
+function t2.InputBegan(p1, p2, p3)
 	if p3 then
 		return false
 	end
@@ -152,10 +153,10 @@ function t2.InputBegan(p1, p2, p3) --[[ Line: 169 | Upvalues: Basic (copy) ]]
 	end
 	Basic.InputBegan(p1, p2, p3)
 end
-function t2.InputEnded(p1) --[[ Line: 182 ]] end
+function t2.InputEnded(p1)  end
 local v3 = ColorSequence.new(Color3.new(255/255, 0/255, 0/255))
 local v4 = ColorSequence.new(Color3.new(255/255, 255/255, 255/255))
-function t2.Stepped(p1) --[[ Line: 186 | Upvalues: Basic (copy), RayCast (copy), v3 (copy), v4 (copy) ]]
+function t2.Stepped(p1)
 	Basic.Stepped(p1)
 	if p1.StartPosition ~= nil then
 		local _, v1 = RayCast.RayIgnoreNonCollideWithIgnoreList(p1.Center.Position, Vector3.new(0, -1, 0), 10, p1.IgnoreList)
@@ -174,7 +175,7 @@ function t2.Stepped(p1) --[[ Line: 186 | Upvalues: Basic (copy), RayCast (copy),
 		end
 	end
 end
-function t2.Unequip(p1) --[[ Line: 206 ]]
+function t2.Unequip(p1)
 	if p1.TempPart then
 		p1.TempPart:Destroy()
 		p1.TempPart = nil
@@ -184,7 +185,7 @@ function t2.Unequip(p1) --[[ Line: 206 ]]
 	p1.StartPosition = nil
 	p1.EndPosition = nil
 end
-function t2.Destroy(p1) --[[ Line: 216 | Upvalues: Basic (copy) ]]
+function t2.Destroy(p1)
 	p1:Unequip()
 	Basic.Destroy(p1)
 end

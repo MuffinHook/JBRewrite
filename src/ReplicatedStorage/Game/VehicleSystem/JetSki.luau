@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -14,17 +15,17 @@ local Interval = require(ReplicatedStorage.Std.Interval)
 require(ReplicatedStorage.Std.Raycast)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local LocalPlayer = Players.LocalPlayer
-local function GetMoveVector() --[[ Line: 21 ]]
+local function GetMoveVector()
 	return Vector3.new()
 end
 local ControlModule = LocalPlayer.PlayerScripts:WaitForChild("PlayerModule", 5).ControlModule
 if ControlModule then
 	local v1 = require(ControlModule)
-	GetMoveVector = function() --[[ Name: GetMoveVector | Line: 28 | Upvalues: v1 (ref) ]]
+	GetMoveVector = function()
 		return v1:GetMoveVector()
 	end
 end
-local function SetHumanoidEnabled(p1, p2) --[[ Line: 34 ]]
+local function SetHumanoidEnabled(p1, p2)
 	local v1 = next
 	local v2, v3 = Enum.HumanoidStateType:GetEnumItems()
 	for v4, v5 in v1, v2, v3 do
@@ -33,7 +34,7 @@ local function SetHumanoidEnabled(p1, p2) --[[ Line: 34 ]]
 		end
 	end
 end
-local function MakeSound(p1) --[[ Line: 45 ]]
+local function MakeSound(p1)
 	local Sound = Instance.new("Sound")
 	Sound.Volume = 0
 	Sound.SoundId = "rbxassetid://" .. p1
@@ -46,7 +47,7 @@ local t = {
 	__ClassName = "JetSki"
 }
 t.__index = t
-function t.FromPacket(p1) --[[ Line: 59 | Upvalues: t (copy), Maid (copy), Interval (copy) ]]
+function t.FromPacket(p1)
 	setmetatable(p1, t)
 	assert(p1.Id)
 	assert(p1.Model)
@@ -60,7 +61,7 @@ function t.FromPacket(p1) --[[ Line: 59 | Upvalues: t (copy), Maid (copy), Inter
 	p1.Maid = Maid.new()
 	p1.maid = p1.Maid
 	local v2 = false
-	p1.maid:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 76 | Upvalues: p1 (copy), v2 (ref) ]]
+	p1.maid:GiveTask(Interval.every(0.1):Connect(function()
 		local v1 = p1:GetAreTiresPopped()
 		if v1 ~= v2 then
 			p1.Model:FindFirstChild("Model"):FindFirstChild("Body"):FindFirstChild("Smoke").Enabled = v1
@@ -69,10 +70,10 @@ function t.FromPacket(p1) --[[ Line: 59 | Upvalues: t (copy), Maid (copy), Inter
 	end))
 	return p1
 end
-function t.GetAreTiresPopped(p1) --[[ Line: 87 | Upvalues: BoatConsts (copy), VehicleUtils (copy) ]]
+function t.GetAreTiresPopped(p1)
 	return (p1.Model:GetAttribute(BoatConsts.TIRES_POPPED_AT_ATTR_NAME) or 0) + VehicleUtils.getVehicleCombatConfig("JetSki").DisableDuration > workspace:GetServerTimeNow()
 end
-function t.GetSeatFromPlayer(p1, p2) --[[ Line: 93 ]]
+function t.GetSeatFromPlayer(p1, p2)
 	assert(p2)
 	for i = 1, #p1.Seats do
 		local v1 = p1.Seats[i]
@@ -82,7 +83,7 @@ function t.GetSeatFromPlayer(p1, p2) --[[ Line: 93 ]]
 	end
 	return false
 end
-local function UpdateArms(p1, p2) --[[ Line: 105 | Upvalues: ConstraintUtils (copy), R15IKv2 (copy) ]]
+local function UpdateArms(p1, p2)
 	local IKP = p2.IKP
 	if p1.Model:IsDescendantOf(workspace) then
 		local Steering = p1.Model.Model.Steering
@@ -93,7 +94,7 @@ local function UpdateArms(p1, p2) --[[ Line: 105 | Upvalues: ConstraintUtils (co
 		R15IKv2.Arms(IKP)
 	end
 end
-local function UpdateForces(p1, p2, p3) --[[ Line: 116 ]]
+local function UpdateForces(p1, p2, p3)
 	local v1 = p1:GetAreTiresPopped()
 	local VectorForce = p1.VectorForce
 	local BodyGyro = p1.BodyGyro
@@ -136,7 +137,7 @@ local function UpdateForces(p1, p2, p3) --[[ Line: 116 ]]
 	EnginePart.RotVelocity = v2:VectorToWorldSpace(v11)
 	return v11
 end
-local function MountLocalPlayer(p1, p2, p3) --[[ Line: 164 | Upvalues: SetHumanoidEnabled (copy), Spring (copy), UpdateArms (copy), RunService (copy), InputUtils (copy), GetMoveVector (ref), UpdateForces (copy), ConstraintUtils (copy), UserInputService (copy), ActionButtonService (copy) ]]
+local function MountLocalPlayer(p1, p2, p3)
 	assert(p2)
 	assert(p3)
 	local Character = p2.Character
@@ -152,7 +153,7 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 164 | Upvalues: SetHumano
 	local Waist = Character.UpperTorso.Waist
 	local v4 = CFrame.new(Waist.C1.p)
 	local Maid = p3.Maid
-	local function Stepped() --[[ Line: 184 | Upvalues: UpdateArms (ref), p1 (copy), p3 (copy) ]]
+	local function Stepped()
 		UpdateArms(p1, p3)
 	end
 	Maid:GiveTask(RunService.Stepped:Connect(Stepped))
@@ -163,7 +164,7 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 164 | Upvalues: SetHumano
 		[Enum.KeyCode.ButtonR2] = 1,
 		[Enum.KeyCode.ButtonL2] = 3
 	}
-	local function Heartbeat() --[[ Line: 198 | Upvalues: t (copy), InputUtils (ref), GetMoveVector (ref), UpdateForces (ref), p1 (copy), v1 (copy), v2 (copy), v4 (copy), v3 (copy), ConstraintUtils (ref), Waist (copy), Neck (copy), p3 (copy) ]]
+	local function Heartbeat()
 		local v12 = t[1] - t[3]
 		local v22 = t[2] - t[4]
 		if InputUtils.isTouch() then
@@ -188,7 +189,7 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 164 | Upvalues: SetHumano
 		end
 	end
 	Maid:GiveTask(RunService.Heartbeat:Connect(Heartbeat))
-	local function InputBegan(p1, p2) --[[ Line: 237 | Upvalues: t2 (copy), t (copy) ]]
+	local function InputBegan(p1, p2)
 		if p2 then
 			return true
 		end
@@ -197,7 +198,7 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 164 | Upvalues: SetHumano
 		end
 	end
 	Maid:GiveTask(UserInputService.InputBegan:Connect(InputBegan))
-	local function InputEnded(p1, p2) --[[ Line: 248 | Upvalues: t2 (copy), t (copy) ]]
+	local function InputEnded(p1, p2)
 		if p2 then
 			return true
 		end
@@ -206,7 +207,7 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 164 | Upvalues: SetHumano
 		end
 	end
 	Maid:GiveTask(UserInputService.InputEnded:Connect(InputEnded))
-	local function InputChanged(p1) --[[ Line: 259 | Upvalues: t (copy), t2 (copy) ]]
+	local function InputChanged(p1)
 		if p1.UserInputType == Enum.UserInputType.Gamepad1 then
 			local KeyCode = p1.KeyCode
 			if KeyCode == Enum.KeyCode.Thumbstick1 then
@@ -228,10 +229,10 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 164 | Upvalues: SetHumano
 		saturateTo = 0,
 		image = "rbxassetid://7858765663",
 		keyCodes = { Enum.KeyCode.W },
-		onPressed = function() --[[ Name: onPressed | Line: 284 | Upvalues: t (copy) ]]
+		onPressed = function()
 			t[1] = 1
 		end,
-		onReleased = function() --[[ Name: onReleased | Line: 287 | Upvalues: t (copy) ]]
+		onReleased = function()
 			t[1] = 0
 		end
 	}))
@@ -241,21 +242,21 @@ local function MountLocalPlayer(p1, p2, p3) --[[ Line: 164 | Upvalues: SetHumano
 		saturateTo = 0,
 		image = "rbxassetid://7858764373",
 		keyCodes = { Enum.KeyCode.S },
-		onPressed = function() --[[ Name: onPressed | Line: 297 | Upvalues: t (copy) ]]
+		onPressed = function()
 			t[3] = 1
 		end,
-		onReleased = function() --[[ Name: onReleased | Line: 300 | Upvalues: t (copy) ]]
+		onReleased = function()
 			t[3] = 0
 		end
 	}))
 	p1.NeckC1 = v3
 	p1.WaistC1 = v4
 end
-local function MountThirdPlayer(p1, p2, p3) --[[ Line: 308 | Upvalues: UpdateArms (copy), RunService (copy) ]]
+local function MountThirdPlayer(p1, p2, p3)
 	assert(p2)
 	assert(p3)
 	local EnginePart = p1.EnginePart
-	local function Stepped() --[[ Line: 314 | Upvalues: UpdateArms (ref), p1 (copy), p3 (copy), EnginePart (copy) ]]
+	local function Stepped()
 		UpdateArms(p1, p3)
 		local v1 = EnginePart.CFrame:VectorToObjectSpace(EnginePart.RotVelocity)
 		local SteeringMotor = p3.SteeringMotor
@@ -270,7 +271,7 @@ local function MountThirdPlayer(p1, p2, p3) --[[ Line: 308 | Upvalues: UpdateArm
 	end
 	p3.Maid:GiveTask(RunService.Stepped:Connect(Stepped))
 end
-function t.MountPlayer(p1, p2, p3) --[[ Line: 339 | Upvalues: R15IKv2 (copy), LocalPlayer (copy), MountLocalPlayer (copy), UpdateArms (copy), RunService (copy) ]]
+function t.MountPlayer(p1, p2, p3)
 	assert(p2)
 	assert(p3)
 	if p3.Driver then
@@ -305,7 +306,7 @@ function t.MountPlayer(p1, p2, p3) --[[ Line: 339 | Upvalues: R15IKv2 (copy), Lo
 		assert(p2)
 		assert(p3)
 		local EnginePart = p1.EnginePart
-		local function Stepped() --[[ Line: 314 | Upvalues: UpdateArms (ref), p1 (copy), p3 (copy), EnginePart (copy) ]]
+		local function Stepped()
 			UpdateArms(p1, p3)
 			local v1 = EnginePart.CFrame:VectorToObjectSpace(EnginePart.RotVelocity)
 			local SteeringMotor = p3.SteeringMotor
@@ -321,7 +322,7 @@ function t.MountPlayer(p1, p2, p3) --[[ Line: 339 | Upvalues: R15IKv2 (copy), Lo
 		p3.Maid:GiveTask(RunService.Stepped:Connect(Stepped))
 	end
 end
-local function UnmountLocalPlayer(p1, p2, p3) --[[ Line: 369 | Upvalues: SetHumanoidEnabled (copy), ConstraintUtils (copy) ]]
+local function UnmountLocalPlayer(p1, p2, p3)
 	assert(p2)
 	assert(p3)
 	local Character = p2.Character
@@ -367,7 +368,7 @@ local function UnmountLocalPlayer(p1, p2, p3) --[[ Line: 369 | Upvalues: SetHuma
 		Skeleton.WakeEmitter.Particle.Enabled = false
 	end
 end
-function t.UnmountPlayer(p1, p2, p3) --[[ Line: 429 | Upvalues: LocalPlayer (copy), UnmountLocalPlayer (copy) ]]
+function t.UnmountPlayer(p1, p2, p3)
 	assert(p2)
 	if p3 == nil then
 		p3 = p1:GetSeatFromPlayer(p2)
@@ -388,12 +389,12 @@ function t.UnmountPlayer(p1, p2, p3) --[[ Line: 429 | Upvalues: LocalPlayer (cop
 		UnmountLocalPlayer(p1, p2, p3)
 	end
 end
-function t.UnmountSeat(p1, p2) --[[ Line: 451 ]]
+function t.UnmountSeat(p1, p2)
 	assert(p2)
 	assert(p2.Occupied == true)
 	return p1:UnmountPlayer(p2.Player, p2)
 end
-function t.Destroy(p1) --[[ Line: 477 ]]
+function t.Destroy(p1)
 	for i = 1, #p1.Seats do
 		local v1 = p1.Seats[i]
 		if v1.Occupied then

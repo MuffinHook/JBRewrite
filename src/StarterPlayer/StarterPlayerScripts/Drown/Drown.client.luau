@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DrownUtils = require(ReplicatedStorage.Drown.DrownUtils)
@@ -8,7 +9,7 @@ local Interval = require(ReplicatedStorage.Std.Interval)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local PlayerUtils = require(ReplicatedStorage.Std.PlayerUtils)
 local createElement = Roact.createElement
-local function getComponent() --[[ Line: 12 | Upvalues: DrownUtils (copy), Players (copy), createElement (copy), ProgressBar (copy) ]]
+local function getComponent()
 	local v1 = DrownUtils.getDrownPercent(Players.LocalPlayer) or 0
 	local Character = Players.LocalPlayer.Character
 	if Character then
@@ -42,18 +43,18 @@ local function getComponent() --[[ Line: 12 | Upvalues: DrownUtils (copy), Playe
 	end
 end
 local v1 = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "DrownGui")
-local function updateUI() --[[ Line: 47 | Upvalues: Roact (copy), v1 (copy), getComponent (copy) ]]
+local function updateUI()
 	Roact.update(v1, getComponent())
 end
 DrownUtils.getDrownPercentChangedSignal(Players.LocalPlayer):Connect(updateUI)
 Players.LocalPlayer.CharacterAdded:Connect(updateUI)
 Roact.update(v1, getComponent())
-local function playerAdded(p1) --[[ Line: 54 | Upvalues: PlayerUtils (copy), DrownUtils (copy), Maid (copy), ReplicatedStorage (copy), Interval (copy) ]]
+local function playerAdded(p1)
 	local v1 = PlayerUtils.getPlayerMaid(p1)
-	local function cleanUp() --[[ Line: 56 | Upvalues: v1 (copy) ]]
+	local function cleanUp()
 		v1.drowningParticlesMaid = nil
 	end
-	local function updateBubbles() --[[ Line: 59 | Upvalues: DrownUtils (ref), p1 (copy), v1 (copy), Maid (ref), ReplicatedStorage (ref) ]]
+	local function updateBubbles()
 		if DrownUtils.getIsPlayerDrowning(p1) then
 			local Character = p1.Character
 			if Character then

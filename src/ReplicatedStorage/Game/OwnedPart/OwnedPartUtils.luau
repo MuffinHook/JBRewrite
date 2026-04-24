@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 local t = {
-	getAll = function(p1, p2) --[[ Name: getAll | Line: 2 ]]
+	getAll = function(p1, p2)
 		assert(p1 ~= nil)
 		assert(p2 ~= nil)
 		local t = {}
@@ -10,7 +11,7 @@ local t = {
 		end
 		return t
 	end,
-	getPool = function(p1, p2) --[[ Name: getPool | Line: 13 ]]
+	getPool = function(p1, p2)
 		assert(p1 ~= nil)
 		assert(p2 ~= nil)
 		local t = {}
@@ -22,7 +23,7 @@ local t = {
 		return t
 	end
 }
-function t.cleanPool(p1, p2) --[[ Line: 24 | Upvalues: t (copy) ]]
+function t.cleanPool(p1, p2)
 	local v1 = t.getPool(p1, p2)
 	print(("removing %d items from pool %s"):format(#v1, p2.Name))
 	for i, v in ipairs(v1) do

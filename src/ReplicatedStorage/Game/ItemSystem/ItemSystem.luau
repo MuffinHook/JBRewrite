@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -30,10 +31,10 @@ local t4 = {
 	OnLocalItemUnequipped = Signal.new(),
 	onItemEquipped = Signal.new()
 }
-function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryItemSystem (copy), t2 (copy), LocalPlayer (copy), CharacterUtil (copy), Falling (copy), JetPack (copy), PlayerUtils (copy), VehicleUtils (copy), InventoryItemUtils (copy), Audio (copy), CharacterBinder (copy), InventoryItemOwnerBinder (copy), t3 (copy), Interval (copy), DefaultActions (copy), ActionButtonService (copy), CharacterUtils (copy), Players (copy), CollectionService (copy), RegionUtils (copy), InventoryItemBinder (copy) ]]
+function t4.Init(p1)
 	v1 = p1.Event
 	local em = p1.em
-	function em.ogsbqczn(p1, p2, p3) --[[ Line: 39 | Upvalues: t4 (ref) ]]
+	function em.ogsbqczn(p1, p2, p3)
 		local v1 = t4.GetEquipped(p1)
 		if v1 ~= nil then
 			v1:InputBegan({
@@ -42,7 +43,7 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 			}, false)
 		end
 	end
-	function em.p2ylc2nx(p1, p2, p3) --[[ Line: 48 | Upvalues: t4 (ref) ]]
+	function em.p2ylc2nx(p1, p2, p3)
 		local v1 = t4.GetEquipped(p1)
 		if v1 ~= nil then
 			v1:InputEnded({
@@ -51,10 +52,10 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 			}, false)
 		end
 	end
-	InventoryItemSystem.addEquipCondition(function() --[[ Line: 61 | Upvalues: t2 (ref), LocalPlayer (ref) ]]
+	InventoryItemSystem.addEquipCondition(function()
 		return not t2[LocalPlayer]
 	end)
-	InventoryItemSystem.addEquipCondition(function() --[[ Line: 64 | Upvalues: CharacterUtil (ref), Falling (ref), JetPack (ref), PlayerUtils (ref), LocalPlayer (ref) ]]
+	InventoryItemSystem.addEquipCondition(function()
 		if CharacterUtil.IsCrawling or (Falling.IsRagdolling() or JetPack.IsFlying()) then
 			return false
 		else
@@ -66,7 +67,7 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 			end
 		end
 	end)
-	InventoryItemSystem.addEquipCondition(function() --[[ Line: 85 | Upvalues: VehicleUtils (ref) ]]
+	InventoryItemSystem.addEquipCondition(function()
 		local v1 = VehicleUtils.GetLocalVehiclePacket()
 		local v2 = tick()
 		if v1 then
@@ -86,7 +87,7 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 			return true
 		end
 	end)
-	local function handleEquipped(p1) --[[ Line: 107 | Upvalues: t2 (ref), t4 (ref), VehicleUtils (ref), InventoryItemUtils (ref), Audio (ref) ]]
+	local function handleEquipped(p1)
 		if t2[p1:GetOwner()] then
 			t4._unequip(p1:GetOwner())
 			warn("An item was already equipped, choosing newer server state.")
@@ -104,7 +105,7 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 		if v1.Model then
 			local Character = p1:GetOwner().Character
 			local v4 = v1.Model.Parent
-			local function updateParent() --[[ Line: 139 | Upvalues: v1 (copy), Character (copy), v4 (copy) ]]
+			local function updateParent()
 				if v1.Model then
 					if Character.Parent then
 						v1.Model.Parent = v4
@@ -128,9 +129,9 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 			})
 		end
 	end
-	local function updateCharacter(p1) --[[ Line: 159 | Upvalues: InventoryItemSystem (ref), handleEquipped (copy) ]]
+	local function updateCharacter(p1)
 		local obj = p1.obj
-		p1.maid:GiveTask(InventoryItemSystem.onInventoryItemEquipped:Connect(function(p1) --[[ Line: 163 | Upvalues: obj (copy), handleEquipped (ref) ]]
+		p1.maid:GiveTask(InventoryItemSystem.onInventoryItemEquipped:Connect(function(p1)
 			if p1:GetOwner().Character == obj then
 				handleEquipped(p1)
 			end
@@ -145,22 +146,22 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 		updateCharacter(v2)
 	end
 	CharacterBinder:GetClassAddedSignal():Connect(updateCharacter)
-	InventoryItemSystem.onInventoryItemEquipped:Connect(function(p1) --[[ Line: 182 | Upvalues: InventoryItemOwnerBinder (ref), handleEquipped (copy) ]]
+	InventoryItemSystem.onInventoryItemEquipped:Connect(function(p1)
 		local v1 = p1:GetOwner()
 		if typeof(v1) == "table" and getmetatable(v1) == InventoryItemOwnerBinder:GetConstructor() then
 			if v1.Character then
 				handleEquipped(p1)
 			end
-			p1._maid:GiveTask(v1._onCharacterChanged:Connect(function() --[[ Line: 188 | Upvalues: v1 (copy), handleEquipped (ref), p1 (copy) ]]
+			p1._maid:GiveTask(v1._onCharacterChanged:Connect(function()
 				if v1.Character then
 					handleEquipped(p1)
 				end
 			end))
 		end
 	end)
-	local function handleUnequippedRaw(p1, p2) --[[ Line: 196 | Upvalues: t3 (ref), t4 (ref) ]]
+	local function handleUnequippedRaw(p1, p2)
 		t3[p1] = p2
-		task.delay(1, function() --[[ Line: 204 | Upvalues: t3 (ref), p1 (copy), p2 (copy) ]]
+		task.delay(1, function()
 			if t3[p1] == p2 then
 				t3[p1] = nil
 			end
@@ -170,7 +171,7 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 		end
 		t4._unequip(p1)
 	end
-	local function clearUnknownOwners() --[[ Line: 217 | Upvalues: t2 (ref), handleUnequippedRaw (copy) ]]
+	local function clearUnknownOwners()
 		for v2, v3 in t2 do
 			local v1
 			local Character = v2.Character
@@ -181,7 +182,7 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 		end
 	end
 	Interval.every(1):Connect(clearUnknownOwners)
-	local function handleUnequipped(p1) --[[ Line: 232 | Upvalues: InventoryItemUtils (ref), t4 (ref), handleUnequippedRaw (copy), clearUnknownOwners (copy) ]]
+	local function handleUnequipped(p1)
 		local v1 = InventoryItemUtils.getName(p1.obj)
 		local v2 = p1:GetOwner()
 		if v2 then
@@ -196,7 +197,7 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 	InventoryItemSystem.onInventoryItemUnequipped:Connect(handleUnequipped)
 	local priority = DefaultActions.crawlButton.priority
 	local priority_2 = DefaultActions.sprintButton.priority
-	t4.OnLocalItemEquipped:Connect(function(p1) --[[ Line: 248 | Upvalues: ActionButtonService (ref), CharacterUtils (ref), Players (ref), CollectionService (ref), RegionUtils (ref), Interval (ref), DefaultActions (ref), priority (copy), priority_2 (copy), VehicleUtils (ref) ]]
+	t4.OnLocalItemEquipped:Connect(function(p1)
 		local Maid = p1.Maid
 		if p1.ShootBegin then
 			local v1 = p1.ShootActionButtonConfig or {}
@@ -207,12 +208,12 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 			t.noSink = true
 			t.keyCodes = v1.keyCodes
 			t.image = "rbxassetid://4939736393"
-			function t.onPressed() --[[ Line: 261 | Upvalues: p1 (copy) ]]
+			function t.onPressed()
 				p1:InputBegan({
 					UserInputType = Enum.UserInputType.MouseButton1
 				})
 			end
-			function t.onReleased() --[[ Line: 264 | Upvalues: p1 (copy) ]]
+			function t.onReleased()
 				if p1.InputEnded then
 					p1:InputEnded({
 						UserInputType = Enum.UserInputType.MouseButton1
@@ -226,7 +227,7 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 				priority = 750,
 				image = "rbxassetid://4939737424",
 				keyCodes = { Enum.KeyCode.R },
-				onPressed = function() --[[ Name: onPressed | Line: 277 | Upvalues: p1 (copy) ]]
+				onPressed = function()
 					p1:InputBegan({
 						UserInputType = Enum.UserInputType.Keyboard,
 						KeyCode = Enum.KeyCode.R
@@ -245,12 +246,12 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 				touchIsToggle = true,
 				keyCodes = { Enum.KeyCode.Q, Enum.KeyCode.ButtonL2 },
 				noSink = true,
-				onPressed = function() --[[ Name: onPressed | Line: 290 | Upvalues: p1 (copy) ]]
+				onPressed = function()
 					p1:InputBegan({
 						UserInputType = Enum.UserInputType.MouseButton2
 					})
 				end,
-				onReleased = function() --[[ Name: onReleased | Line: 293 | Upvalues: p1 (copy) ]]
+				onReleased = function()
 					if p1.InputEnded then
 						p1:InputEnded({
 							UserInputType = Enum.UserInputType.MouseButton2
@@ -261,7 +262,7 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 		end
 		if p1.ApplySkin and typeof(p1.ApplySkin) == "function" then
 			local v5 = false
-			local function checkFlagToggleSkins() --[[ Line: 303 | Upvalues: CharacterUtils (ref), Players (ref), CollectionService (ref), RegionUtils (ref), v5 (ref), p1 (copy) ]]
+			local function checkFlagToggleSkins()
 				local v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
 				if v1 then
 					local v2 = false
@@ -279,7 +280,7 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 					end
 				end
 			end
-			Maid:GiveTask(Interval.every(0.1):Connect(function() --[[ Line: 321 | Upvalues: checkFlagToggleSkins (copy) ]]
+			Maid:GiveTask(Interval.every(0.1):Connect(function()
 				checkFlagToggleSkins()
 			end))
 			checkFlagToggleSkins()
@@ -287,7 +288,7 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 		if not ScopeBegin then
 			ActionButtonService.setButtonPriority(DefaultActions.crawlButton, 900)
 			ActionButtonService.setButtonPriority(DefaultActions.sprintButton, 950)
-			Maid:GiveTask(function() --[[ Line: 331 | Upvalues: ActionButtonService (ref), DefaultActions (ref), priority (ref), priority_2 (ref) ]]
+			Maid:GiveTask(function()
 				ActionButtonService.setButtonPriority(DefaultActions.crawlButton, priority)
 				ActionButtonService.setButtonPriority(DefaultActions.sprintButton, priority_2)
 			end)
@@ -295,34 +296,34 @@ function t4.Init(p1) --[[ Line: 35 | Upvalues: v1 (ref), t4 (copy), InventoryIte
 		local v6 = VehicleUtils.GetLocalVehiclePacket()
 		if v6 == nil or v6.Passenger then
 			ActionButtonService.setButtonEnabled(DefaultActions.radioButton, false)
-			Maid:GiveTask(function() --[[ Line: 342 | Upvalues: ActionButtonService (ref), DefaultActions (ref) ]]
+			Maid:GiveTask(function()
 				ActionButtonService.setButtonEnabled(DefaultActions.radioButton, true)
 			end)
 		end
 	end)
-	InventoryItemBinder:GetClassAddedSignal():Connect(function(p1) --[[ Line: 348 | Upvalues: Players (ref), v1 (ref) ]]
-		p1._maid:GiveTask(p1.onAttemptDrop:Connect(function() --[[ Line: 349 | Upvalues: p1 (copy), Players (ref), v1 (ref) ]]
+	InventoryItemBinder:GetClassAddedSignal():Connect(function(p1)
+		p1._maid:GiveTask(p1.onAttemptDrop:Connect(function()
 			if p1:GetOwner() == Players.LocalPlayer then
 				v1:FireServer("x" .. ("cutr"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("sdartlwu"):sub(4, 5):reverse():reverse():reverse() .. "1qyd")
 			end
 		end))
 	end)
 end
-function t4.Register(p1) --[[ Line: 357 | Upvalues: t (copy) ]]
+function t4.Register(p1)
 	assert(p1.__ClassName)
 	assert(t[p1.__ClassName] == nil)
 	t[p1.__ClassName] = p1
 end
-function t4.GetConfig(p1) --[[ Line: 362 | Upvalues: ItemDataUtils (copy) ]]
+function t4.GetConfig(p1)
 	return ItemDataUtils.getConfig(p1)
 end
-function t4.GetEquipped(p1) --[[ Line: 365 | Upvalues: t2 (copy) ]]
+function t4.GetEquipped(p1)
 	return t2[p1]
 end
-function t4.GetLocalEquipped() --[[ Line: 369 | Upvalues: t4 (copy), LocalPlayer (copy) ]]
+function t4.GetLocalEquipped()
 	return t4.GetEquipped(LocalPlayer)
 end
-function t4._equip(p1, p2) --[[ Line: 372 | Upvalues: InventoryItemUtils (copy), t (copy), t3 (copy), UserInputService (copy), v1 (ref), t2 (copy), t4 (copy) ]]
+function t4._equip(p1, p2)
 	assert(p1, "missing player")
 	assert(p2, "missing inventoryItemValue")
 	local v12 = InventoryItemUtils.getName(p2)
@@ -332,14 +333,14 @@ function t4._equip(p1, p2) --[[ Line: 372 | Upvalues: InventoryItemUtils (copy),
 	end
 	local v6 = v5.new(p1, p2, t3[p1])
 	if v6.Local then
-		v6.Maid:GiveTask(UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 385 | Upvalues: v6 (copy) ]]
+		v6.Maid:GiveTask(UserInputService.InputBegan:Connect(function(p1, p2)
 			v6:InputBegan(p1, p2)
 		end))
-		v6.Maid:GiveTask(UserInputService.InputEnded:Connect(function(...) --[[ Line: 388 | Upvalues: v6 (copy) ]]
+		v6.Maid:GiveTask(UserInputService.InputEnded:Connect(function(...)
 			v6:InputEnded(...)
 		end))
 		if v6.ShootBegin == nil then
-			v6.Maid:GiveTask(UserInputService.TouchStarted:connect(function(p1, p2) --[[ Line: 399 | Upvalues: v6 (copy) ]]
+			v6.Maid:GiveTask(UserInputService.TouchStarted:connect(function(p1, p2)
 				if p2 then
 					return false
 				end
@@ -348,7 +349,7 @@ function t4._equip(p1, p2) --[[ Line: 372 | Upvalues: InventoryItemUtils (copy),
 					Position = p1.Position
 				})
 			end))
-			v6.Maid:GiveTask(UserInputService.TouchEnded:connect(function(p1, p2) --[[ Line: 405 | Upvalues: v6 (copy) ]]
+			v6.Maid:GiveTask(UserInputService.TouchEnded:connect(function(p1, p2)
 				if p2 then
 					return false
 				end
@@ -358,11 +359,11 @@ function t4._equip(p1, p2) --[[ Line: 372 | Upvalues: InventoryItemUtils (copy),
 				})
 			end))
 		end
-		function v6.BroadcastInputBegan(p1, p2) --[[ Line: 414 | Upvalues: v1 (ref) ]]
+		function v6.BroadcastInputBegan(p1, p2)
 			assert(p2 ~= nil)
 			v1:FireServer("ogsbqczn", p2.UserInputType, p2.KeyCode)
 		end
-		function v6.BroadcastInputEnded(p1, p2) --[[ Line: 418 | Upvalues: v1 (ref) ]]
+		function v6.BroadcastInputEnded(p1, p2)
 			assert(p2 ~= nil)
 			v1:FireServer("p" .. ("t2dblf"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("lclyh"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("pn2l"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "x", p2.UserInputType, p2.KeyCode)
 		end
@@ -384,7 +385,7 @@ function t4._equip(p1, p2) --[[ Line: 372 | Upvalues: InventoryItemUtils (copy),
 	t4.onItemEquipped:Fire(v6)
 	return v6
 end
-function t4._unequip(p1) --[[ Line: 445 | Upvalues: t2 (copy), t4 (copy) ]]
+function t4._unequip(p1)
 	assert(p1, "missing player")
 	local v1 = t2[p1]
 	if v1 then

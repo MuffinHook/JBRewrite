@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -13,17 +14,17 @@ v1.defaultProps = {
 	position = UDim2.new(0.5, 0, 0.5, 0),
 	size = UDim2.new(0.25, 0, 0.25, 0)
 }
-function v1.init(p1) --[[ Line: 17 | Upvalues: Maid (copy) ]]
+function v1.init(p1)
 	p1.maid = Maid.new()
 	p1:setState({
 		remaining = p1.props.duration
 	})
-	function p1.onSelect() --[[ Line: 22 | Upvalues: p1 (copy) ]]
+	function p1.onSelect()
 		p1.props.onSelect()
 		p1.props.hide()
 	end
 end
-function v1.render(p1) --[[ Line: 27 | Upvalues: createElement (copy), Roact (copy) ]]
+function v1.render(p1)
 	if p1.props.visible then
 		local t = {
 			BorderSizePixel = 0,
@@ -121,13 +122,13 @@ function v1.render(p1) --[[ Line: 27 | Upvalues: createElement (copy), Roact (co
 		return createElement("Frame", t, t2)
 	end
 end
-function v1.didUpdate(p1, p2, p3) --[[ Line: 121 ]]
+function v1.didUpdate(p1, p2, p3)
 	if p2.duration ~= p1.props.duration or p2.bornAt ~= p1.props.bornAt then
 		p1:_startTimer()
 	end
 end
-function v1._startTimer(p1) --[[ Line: 126 | Upvalues: Interval (copy) ]]
-	local function update() --[[ Line: 127 | Upvalues: p1 (copy) ]]
+function v1._startTimer(p1)
+	local function update()
 		local v1 = workspace:GetServerTimeNow() - p1.props.bornAt
 		local v2
 		if p1.props.duration <= v1 then
@@ -146,22 +147,22 @@ function v1._startTimer(p1) --[[ Line: 126 | Upvalues: Interval (copy) ]]
 	update()
 	p1.maid.countdown = Interval.every(1):Connect(update)
 end
-function v1.didMount(p1) --[[ Line: 145 ]]
+function v1.didMount(p1)
 	if p1.props.visible then
 		p1:_startTimer()
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 150 ]]
+function v1.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2) --[[ Line: 154 ]]
+return RoactRodux.connect(function(p1, p2)
 	return {
 		bornAt = p1.lastDiedAt,
 		visible = p1.spawnSelectionOfferVisible
 	}
-end, function(p1) --[[ Line: 159 ]]
+end, function(p1)
 	return {
-		hide = function() --[[ Name: hide | Line: 161 | Upvalues: p1 (copy) ]]
+		hide = function()
 			p1({
 				type = "setSpawnSelectionOfferVisible",
 				visible = false

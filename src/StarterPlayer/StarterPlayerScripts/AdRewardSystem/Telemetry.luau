@@ -1,10 +1,11 @@
+-- Reviewed by Claude
 local t = {}
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local v1 = false
 local v2 = nil
 local v3 = nil
 local v4 = nil
-task.spawn(function() --[[ Line: 14 | Upvalues: v2 (ref), ReplicatedStorage (copy), v3 (ref), v4 (ref), v1 (ref) ]]
+task.spawn(function()
 	v2 = ReplicatedStorage:FindFirstChild("AdRewardSystem")
 	if v2 then
 		v3 = v2:FindFirstChild("AdRewardEvents")
@@ -19,7 +20,7 @@ task.spawn(function() --[[ Line: 14 | Upvalues: v2 (ref), ReplicatedStorage (cop
 		warn("Custom telemetry failed: No Service")
 	end
 end)
-function t.send(p1, p2, p3) --[[ Line: 34 | Upvalues: v1 (ref), v4 (ref) ]]
+function t.send(p1, p2, p3)
 	if v1 then
 		local t = {
 			eventName = p1,

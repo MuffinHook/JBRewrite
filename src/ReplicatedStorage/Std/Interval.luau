@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Signal = require(script.Parent.Signal)
 local t = {}
 t.__index = t
 local v1 = nil
-local function _getCallerName(p1) --[[ Line: 10 ]]
+local function _getCallerName(p1)
 	local count = 0
 	for v2 in p1:gmatch("[^\n]+") do
 		local v1
@@ -21,7 +22,7 @@ local function _getCallerName(p1) --[[ Line: 10 ]]
 	end
 	return "Unknown"
 end
-local function _insert(p1) --[[ Line: 29 | Upvalues: v1 (ref) ]]
+local function _insert(p1)
 	if v1 == nil then
 		v1 = p1
 	elseif v1.endTime < p1.endTime then
@@ -42,7 +43,7 @@ local function _insert(p1) --[[ Line: 29 | Upvalues: v1 (ref) ]]
 		v1 = p1
 	end
 end
-RunService.Heartbeat:Connect(function() --[[ Line: 62 | Upvalues: v1 (ref), _insert (ref) ]]
+RunService.Heartbeat:Connect(function()
 	local v12 = os.clock()
 	while v1 ~= nil and v1.endTime <= v12 do
 		local v2 = v1
@@ -59,7 +60,7 @@ RunService.Heartbeat:Connect(function() --[[ Line: 62 | Upvalues: v1 (ref), _ins
 		debug.profileend()
 	end
 end)
-function t.every(p1) --[[ Line: 84 | Upvalues: t (copy), Signal (copy), _getCallerName (copy), _insert (ref) ]]
+function t.every(p1)
 	assert(type(p1) == "number", "Bad argument #1 to Interval.every, must be a number.")
 	assert(p1 == p1, "Bad argument #1 to Interval.every, must not be NaN.")
 	assert(p1 < (1 / 0), "Bad argument #1 to Interval.every, must not be infinity.")
@@ -80,7 +81,7 @@ function t.every(p1) --[[ Line: 84 | Upvalues: t (copy), Signal (copy), _getCall
 	t2._node = t3
 	return t2
 end
-local function _remove(p1) --[[ Line: 115 | Upvalues: v1 (ref) ]]
+local function _remove(p1)
 	local v12 = p1.next
 	if v1 == p1 then
 		if v12 ~= nil then
@@ -95,11 +96,11 @@ local function _remove(p1) --[[ Line: 115 | Upvalues: v1 (ref) ]]
 		end
 	end
 end
-function t.Connect(p1, p2) --[[ Line: 135 ]]
+function t.Connect(p1, p2)
 	p1._signal:Connect(p2)
 	return p1
 end
-function t.Destroy(p1) --[[ Line: 140 | Upvalues: v1 (ref) ]]
+function t.Destroy(p1)
 	local _node = p1._node
 	local v12 = _node.next
 	if v1 == _node then

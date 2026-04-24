@@ -1,7 +1,8 @@
+-- Reviewed by Claude
 local v1 = Ray.new
 local FindPartOnRay = workspace.FindPartOnRay
 local FindPartOnRayWithIgnoreList = workspace.FindPartOnRayWithIgnoreList
-local function RayIgnoreNonCollideSpecial(p1, p2, p3, p4, p5, p6, p7, p8) --[[ Line: 5 | Upvalues: v1 (copy), FindPartOnRayWithIgnoreList (copy), FindPartOnRay (copy) ]]
+local function RayIgnoreNonCollideSpecial(p1, p2, p3, p4, p5, p6, p7, p8)
 	if p6 then
 		assert(not p8)
 	end
@@ -38,11 +39,11 @@ local function RayIgnoreNonCollideSpecial(p1, p2, p3, p4, p5, p6, p7, p8) --[[ L
 	end
 	return v7, v3, v4, v5
 end
-local function RayIgnoreNonCollideWithIgnoreList(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 62 | Upvalues: RayIgnoreNonCollideSpecial (copy) ]]
+local function RayIgnoreNonCollideWithIgnoreList(p1, p2, p3, p4, p5, p6, p7)
 	return RayIgnoreNonCollideSpecial(p1, p2, p3, true, p4, p5, p6, p7)
 end
 return {
-	RayIgnoreNonCollide = function(p1, p2, p3, p4, p5, p6, p7) --[[ Name: RayIgnoreNonCollide | Line: 82 | Upvalues: RayIgnoreNonCollideSpecial (copy) ]]
+	RayIgnoreNonCollide = function(p1, p2, p3, p4, p5, p6, p7)
 		return RayIgnoreNonCollideSpecial(p1, p2, p3, false, p4, p5, p6, p7)
 	end,
 	RayIgnoreNonCollideWithIgnoreList = RayIgnoreNonCollideWithIgnoreList

@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TradePopularSortData = require(script.Parent.TradePopularSortData)
@@ -12,7 +13,7 @@ local gameSettingType = require(ReplicatedStorage.GameSettings.gameSettingType)
 local store = require(ReplicatedStorage.App.store)
 local ChatService = require(ReplicatedStorage.Chat.ChatService)
 require(ReplicatedStorage.Std.Debug.table2Lua)
-local function playReadyDing() --[[ Line: 16 | Upvalues: Players (copy), Audio (copy) ]]
+local function playReadyDing()
 	if Players.LocalPlayer.PlayerGui then
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 9856727426, {
 			Volume = 0.2
@@ -23,10 +24,10 @@ local t = {
 	_tradingWithUserId = nil
 }
 local v1 = nil
-function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (copy), t (copy), waitForChild (copy), ReplicatedStorage (copy), TradeConsts (copy), gameSettingType (copy), GameSettingsService (copy), ChatService (copy), Players (copy), EnumSort (copy), RxInstanceUtils (copy), Audio (copy), TradePopularSortData (copy) ]]
+function t.init(p1)
 	v1 = p1.em
 	if RunUtils.isTradingEnabled() then
-		store.changed:connect(function(p1, p2) --[[ Line: 33 | Upvalues: t (ref), store (ref) ]]
+		store.changed:connect(function(p1, p2)
 			t._tradingWithUserId = p1.traderThem.userId
 			if p1.traderThem.userId ~= p2.traderThem.userId then
 				store:dispatch({
@@ -49,7 +50,7 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 				end
 			end
 		end)
-		waitForChild(ReplicatedStorage, TradeConsts.ARE_TRADE_REQUESTS_ENABLED_REMOTE_NAME):andThen(function(p1) --[[ Line: 62 | Upvalues: gameSettingType (ref), GameSettingsService (ref) ]]
+		waitForChild(ReplicatedStorage, TradeConsts.ARE_TRADE_REQUESTS_ENABLED_REMOTE_NAME):andThen(function(p1)
 			local t = {
 				name = "areTradeRequestsEnabled",
 				title = "Allow Trade Requests",
@@ -58,13 +59,13 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 				order = 41
 			}
 			GameSettingsService.add(t)
-			local function handleTradeRequestsEnabled(p12) --[[ Line: 71 | Upvalues: p1 (copy) ]]
+			local function handleTradeRequestsEnabled(p12)
 				p1:FireServer(p12)
 			end
 			p1:FireServer((t:getValue()))
 			t.onChanged:Connect(handleTradeRequestsEnabled)
 		end)
-		ChatService.onMessageIncoming:Connect(function(p1, p2) --[[ Line: 80 | Upvalues: Players (ref), t (ref), store (ref) ]]
+		ChatService.onMessageIncoming:Connect(function(p1, p2)
 			if p1.Status == Enum.TextChatMessageStatus.Success and p1.TextSource then
 				local Text = p2.Text
 				local UserId = p1.TextSource.UserId
@@ -85,8 +86,8 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 				end
 			end
 		end)
-		waitForChild(ReplicatedStorage, TradeConsts.UPDATE_OWNED_REMOTE_NAME):andThen(function(p1) --[[ Line: 115 | Upvalues: store (ref), EnumSort (ref) ]]
-			p1.OnClientEvent:Connect(function(p1) --[[ Line: 116 | Upvalues: store (ref), EnumSort (ref) ]]
+		waitForChild(ReplicatedStorage, TradeConsts.UPDATE_OWNED_REMOTE_NAME):andThen(function(p1)
+			p1.OnClientEvent:Connect(function(p1)
 				store:dispatch({
 					type = "tradeInventorySetItemsOwned",
 					itemsOwned = p1,
@@ -94,8 +95,8 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 				})
 			end)
 		end)
-		waitForChild(ReplicatedStorage, TradeConsts.UPDATE_OFFERING_REMOTE_NAME):andThen(function(p1) --[[ Line: 126 | Upvalues: store (ref) ]]
-			p1.OnClientEvent:Connect(function(p1, p2) --[[ Line: 127 | Upvalues: store (ref) ]]
+		waitForChild(ReplicatedStorage, TradeConsts.UPDATE_OFFERING_REMOTE_NAME):andThen(function(p1)
+			p1.OnClientEvent:Connect(function(p1, p2)
 				if p1 then
 					store:dispatch({
 						type = "updateTraderMe",
@@ -109,8 +110,8 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 				end
 			end)
 		end)
-		waitForChild(Players.LocalPlayer, TradeConsts.ACTIVE_TRADE_OBJ_NAME):andThen(function(p1) --[[ Line: 142 | Upvalues: RxInstanceUtils (ref), TradeConsts (ref), store (ref), Players (ref), Audio (ref) ]]
-			RxInstanceUtils.observeAttribute(p1, TradeConsts.IS_READY_ATTR_NAME, function(p1) --[[ Line: 143 | Upvalues: store (ref), Players (ref), Audio (ref) ]]
+		waitForChild(Players.LocalPlayer, TradeConsts.ACTIVE_TRADE_OBJ_NAME):andThen(function(p1)
+			RxInstanceUtils.observeAttribute(p1, TradeConsts.IS_READY_ATTR_NAME, function(p1)
 				store:dispatch({
 					type = "updateTraderMe",
 					ready = p1
@@ -121,7 +122,7 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 					})
 				end
 			end)
-			RxInstanceUtils.observeAttribute(p1, TradeConsts.IS_ACCEPTED_ATTR_NAME, function(p1) --[[ Line: 152 | Upvalues: store (ref), Players (ref), Audio (ref) ]]
+			RxInstanceUtils.observeAttribute(p1, TradeConsts.IS_ACCEPTED_ATTR_NAME, function(p1)
 				store:dispatch({
 					type = "updateTraderMe",
 					accepted = p1
@@ -132,7 +133,7 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 					})
 				end
 			end)
-			p1.Changed:Connect(function(p1) --[[ Line: 161 | Upvalues: store (ref), Players (ref) ]]
+			p1.Changed:Connect(function(p1)
 				if p1 then
 					store:dispatch({
 						type = "updateTraderMe",
@@ -150,13 +151,13 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 					value = p1
 				})
 			end)
-			RxInstanceUtils.observeAttribute(p1, TradeConsts.WITH_USER_ID_ATTR_NAME, function(p1, p2) --[[ Line: 182 | Upvalues: Players (ref), TradeConsts (ref), RxInstanceUtils (ref), store (ref), Audio (ref) ]]
+			RxInstanceUtils.observeAttribute(p1, TradeConsts.WITH_USER_ID_ATTR_NAME, function(p1, p2)
 				if p1 then
 					local v1 = Players:GetPlayerByUserId(p1)
 					if v1 then
 						local v2 = v1:FindFirstChild(TradeConsts.ACTIVE_TRADE_OBJ_NAME)
 						if v2 then
-							p2:GiveTask(RxInstanceUtils.observeAttribute(v2, TradeConsts.IS_READY_ATTR_NAME, function(p1) --[[ Line: 192 | Upvalues: store (ref), Players (ref), Audio (ref) ]]
+							p2:GiveTask(RxInstanceUtils.observeAttribute(v2, TradeConsts.IS_READY_ATTR_NAME, function(p1)
 								store:dispatch({
 									type = "updateTraderThem",
 									ready = p1
@@ -167,7 +168,7 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 									})
 								end
 							end))
-							p2:GiveTask(RxInstanceUtils.observeAttribute(v2, TradeConsts.IS_ACCEPTED_ATTR_NAME, function(p1) --[[ Line: 207 | Upvalues: store (ref), Players (ref), Audio (ref) ]]
+							p2:GiveTask(RxInstanceUtils.observeAttribute(v2, TradeConsts.IS_ACCEPTED_ATTR_NAME, function(p1)
 								store:dispatch({
 									type = "updateTraderThem",
 									accepted = p1
@@ -186,7 +187,7 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 						})
 					end
 				end
-				p2:GiveTask(function() --[[ Line: 226 | Upvalues: store (ref) ]]
+				p2:GiveTask(function()
 					store:dispatch({
 						type = "updateTraderThem",
 						reset = true
@@ -194,8 +195,8 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 				end)
 			end)
 		end)
-		waitForChild(Players.LocalPlayer, TradeConsts.INITIATIONS_FOLDER_NAME):andThen(function(p1) --[[ Line: 236 | Upvalues: Players (ref), TradeConsts (ref), Audio (ref), store (ref) ]]
-			local function updateInitiations() --[[ Line: 237 | Upvalues: p1 (copy), Players (ref), TradeConsts (ref), Audio (ref), store (ref) ]]
+		waitForChild(Players.LocalPlayer, TradeConsts.INITIATIONS_FOLDER_NAME):andThen(function(p1)
+			local function updateInitiations()
 				local t = {}
 				for i, v in ipairs(p1:GetChildren()) do
 					local v2 = tonumber(v.Name)
@@ -225,8 +226,8 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 			p1.ChildAdded:Connect(updateInitiations)
 			p1.ChildRemoved:Connect(updateInitiations)
 		end)
-		waitForChild(ReplicatedStorage, TradeConsts.OFFERING_RESULT_REMOTE_NAME):andThen(function(p1) --[[ Line: 267 | Upvalues: Players (ref), Audio (ref), v1 (ref), store (ref) ]]
-			p1.OnClientEvent:Connect(function(p1) --[[ Line: 268 | Upvalues: Players (ref), Audio (ref), v1 (ref), store (ref) ]]
+		waitForChild(ReplicatedStorage, TradeConsts.OFFERING_RESULT_REMOTE_NAME):andThen(function(p1)
+			p1.OnClientEvent:Connect(function(p1)
 				local v12 = false
 				local v2, v3
 				if p1.accepted then
@@ -266,7 +267,7 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 						body = v3
 					}
 				})
-				task.delay(6, function() --[[ Line: 309 | Upvalues: store (ref) ]]
+				task.delay(6, function()
 					store:dispatch({
 						type = "setTradeResult",
 						value = nil
@@ -274,28 +275,28 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 				end)
 			end)
 		end)
-		waitForChild(ReplicatedStorage, TradeConsts.UPDATE_OFFERING_INFO_REMOTE_NAME):andThen(function(p1) --[[ Line: 319 | Upvalues: store (ref) ]]
-			p1.OnClientEvent:Connect(function(p1) --[[ Line: 320 | Upvalues: store (ref) ]]
+		waitForChild(ReplicatedStorage, TradeConsts.UPDATE_OFFERING_INFO_REMOTE_NAME):andThen(function(p1)
+			p1.OnClientEvent:Connect(function(p1)
 				store:dispatch({
 					type = "setTradeInfo",
 					info = p1
 				})
 			end)
 		end)
-		waitForChild(ReplicatedStorage, TradeConsts.POPULAR_TRADE_ITEM_DATA_REMOTE_NAME):andThen(function(p1) --[[ Line: 329 | Upvalues: TradePopularSortData (ref) ]]
-			p1.OnClientEvent:Connect(function(p1) --[[ Line: 330 | Upvalues: TradePopularSortData (ref) ]]
+		waitForChild(ReplicatedStorage, TradeConsts.POPULAR_TRADE_ITEM_DATA_REMOTE_NAME):andThen(function(p1)
+			p1.OnClientEvent:Connect(function(p1)
 				TradePopularSortData.setPopularTradeItemData(p1)
 			end)
 		end)
-		waitForChild(ReplicatedStorage, TradeConsts.OTHER_TRADE_SERVER_DATA_REMOTE_NAME):andThen(function(p1) --[[ Line: 337 | Upvalues: store (ref) ]]
-			p1.OnClientEvent:Connect(function(p1) --[[ Line: 338 | Upvalues: store (ref) ]]
+		waitForChild(ReplicatedStorage, TradeConsts.OTHER_TRADE_SERVER_DATA_REMOTE_NAME):andThen(function(p1)
+			p1.OnClientEvent:Connect(function(p1)
 				store:dispatch({
 					type = "setOtherTradeServerInfo",
 					value = p1
 				})
 			end)
 		end)
-		local function updatePlayers() --[[ Line: 348 | Upvalues: store (ref), Players (ref) ]]
+		local function updatePlayers()
 			store:dispatch({
 				type = "setInventoryPlayers",
 				allPlayers = Players:GetPlayers()
@@ -309,17 +310,17 @@ function t.init(p1) --[[ Line: 26 | Upvalues: v1 (ref), RunUtils (copy), store (
 		Players.ChildRemoved:Connect(updatePlayers)
 	end
 end
-function t.checkAlreadyInitiated(p1, p2) --[[ Line: 359 | Upvalues: TradeConsts (copy) ]]
+function t.checkAlreadyInitiated(p1, p2)
 	local v1 = p2:FindFirstChild(TradeConsts.INITIATIONS_FOLDER_NAME)
 	return v1:FindFirstChild((tostring(p1.UserId))) and true or false
 end
-function t.acceptInitiation(p1) --[[ Line: 367 | Upvalues: ReplicatedStorage (copy), TradeConsts (copy) ]]
+function t.acceptInitiation(p1)
 	ReplicatedStorage:FindFirstChild(TradeConsts.ACCEPT_TRADE_INITIATION_REMOTE_NAME):FireServer(p1)
 end
-function t.sendInitiation(p1) --[[ Line: 371 | Upvalues: ReplicatedStorage (copy), TradeConsts (copy) ]]
+function t.sendInitiation(p1)
 	ReplicatedStorage:WaitForChild(TradeConsts.SEND_TRADE_INITIATION_REMOTE_NAME):FireServer(p1)
 end
-function t.getTradingWithUserId() --[[ Line: 375 | Upvalues: t (copy) ]]
+function t.getTradingWithUserId()
 	return t._tradingWithUserId
 end
 return t

@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local GarageTranslationUtils = require(ReplicatedStorage.Garage.GarageTranslationUtils)
 local Rodux = require(ReplicatedStorage.Rodux)
 local VehicleConf = require(ReplicatedStorage.Game.Garage.VehicleConf)
 return Rodux.createReducer({}, {
-	setLocalVehiclePacket = function(p1, p2) --[[ Name: setLocalVehiclePacket | Line: 9 | Upvalues: VehicleConf (copy), TableUtils (copy), GarageTranslationUtils (copy) ]]
+	setLocalVehiclePacket = function(p1, p2)
 		assert(p2.packet ~= nil, "missing Packet")
-		return TableUtils.map(VehicleConf.GetCategoriesByModel(p2.packet), function(p1) --[[ Line: 12 | Upvalues: GarageTranslationUtils (ref) ]]
+		return TableUtils.map(VehicleConf.GetCategoriesByModel(p2.packet), function(p1)
 			return {
 				name = p1,
 				title = GarageTranslationUtils.getCategoryTitle(p1)

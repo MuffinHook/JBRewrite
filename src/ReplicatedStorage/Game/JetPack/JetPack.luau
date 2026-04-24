@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerModule = nil
@@ -585,26 +586,26 @@ return {
 		end)
 		local em = initData.em
 		Event = initData.Event
-		function em.effrclru(player, fuelData)
+		function em.OnEquipJetPack(player, fuelData)
 			assert(player)
 			JetPack.Equip(player, fuelData)
 		end
-		function em.ab3zo4do(player)
+		function em.OnUnequipJetPack(player)
 			assert(player)
 			JetPack.Unequip(player)
 		end
-		function em.d0r024ne(player)
+		function em.OnStartThrust(player)
 			assert(player)
 			JetPack.StartThrust(player)
 		end
-		function em.m1jxlp0h(player)
+		function em.OnStopThrust(player)
 			assert(player)
 			JetPack.StopThrust(player)
 		end
 		local hasJetPack = false
 		local jumpPressedConn = nil
 		local jumpReleasedConn = nil
-		function em.injzgvkb()
+		function em.OnInitializeJetPack()
 			assert(hasJetPack == false)
 			jumpPressedConn = DefaultActions.onJumpPressed:Connect(jumpPressed)
 			jumpReleasedConn = DefaultActions.onJumpReleased:Connect(jumpReleased)
@@ -612,7 +613,7 @@ return {
 			JetPack.LocalFuel = JetPack.LocalMaxFuel
 			JetPack.UpdateFuel()
 		end
-		function em.ijrarcvd()
+		function em.OnRemoveJetPack()
 			assert(hasJetPack == true)
 			jumpPressedConn:Disconnect()
 			jumpPressedConn = nil
@@ -633,7 +634,7 @@ return {
 				JetPack.UpdateFuel()
 			end
 		end
-		function em.tco34g38(damage)
+		function em.OnTakeDamage(damage)
 			JetPack.LocalFuel = math.max(JetPack.LocalFuel - damage / 10, 0)
 			JetPack.UpdateFuel()
 		end

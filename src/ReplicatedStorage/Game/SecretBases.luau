@@ -1,12 +1,13 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
 require(ReplicatedStorage.Std.Promise)
 game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
-local function EphThread(p1, p2) --[[ Line: 7 | Upvalues: RunService (copy) ]]
+local function EphThread(p1, p2)
 	local v1 = tick()
 	local v2 = nil
-	v2 = RunService.Heartbeat:Connect(function() --[[ Line: 10 | Upvalues: p1 (copy), v1 (copy), p2 (copy), v2 (ref) ]]
+	v2 = RunService.Heartbeat:Connect(function()
 		local v12 = tick()
 		if p1 then
 			local v22 = (v12 - v1) / p1
@@ -29,7 +30,7 @@ local function EphThread(p1, p2) --[[ Line: 7 | Upvalues: RunService (copy) ]]
 	end)
 end
 local t = {}
-local function AnimateDoor(p1, p2, p3) --[[ Line: 34 | Upvalues: t (copy), RunService (copy) ]]
+local function AnimateDoor(p1, p2, p3)
 	if t[p1] then
 		return false
 	end
@@ -45,13 +46,13 @@ local function AnimateDoor(p1, p2, p3) --[[ Line: 34 | Upvalues: t (copy), RunSe
 	v2.CanCollide = false
 	v3.CanCollide = false
 	local v8 = p3 * 0.5
-	local function f9(p1) --[[ Line: 47 | Upvalues: v2 (copy), v4 (copy), v6 (copy), v3 (copy), v5 (copy), v7 (copy) ]]
+	local function f9(p1)
 		v2.CFrame = v4:lerp(v6, p1)
 		v3.CFrame = v5:lerp(v7, p1)
 	end
 	local v10 = tick()
 	local v11 = nil
-	v11 = RunService.Heartbeat:Connect(function() --[[ Line: 10 | Upvalues: v8 (copy), v10 (copy), f9 (copy), v11 (ref) ]]
+	v11 = RunService.Heartbeat:Connect(function()
 		local v1 = tick()
 		if v8 then
 			local v2 = (v1 - v10) / v8
@@ -72,15 +73,15 @@ local function AnimateDoor(p1, p2, p3) --[[ Line: 34 | Upvalues: t (copy), RunSe
 			v11:Disconnect()
 		end
 	end)
-	delay(p3 * 0.5 + 1, function() --[[ Line: 51 | Upvalues: p3 (copy), v2 (copy), v6 (copy), v4 (copy), v3 (copy), v7 (copy), v5 (copy), RunService (ref) ]]
+	delay(p3 * 0.5 + 1, function()
 		local v1 = p3 * 0.5
-		local function f2(p1) --[[ Line: 52 | Upvalues: v2 (ref), v6 (ref), v4 (ref), v3 (ref), v7 (ref), v5 (ref) ]]
+		local function f2(p1)
 			v2.CFrame = v6:lerp(v4, p1)
 			v3.CFrame = v7:lerp(v5, p1)
 		end
 		local v32 = tick()
 		local v42 = nil
-		v42 = RunService.Heartbeat:Connect(function() --[[ Line: 10 | Upvalues: v1 (copy), v32 (copy), f2 (copy), v42 (ref) ]]
+		v42 = RunService.Heartbeat:Connect(function()
 			local v12 = tick()
 			if v1 then
 				local v2 = (v12 - v32) / v1
@@ -102,36 +103,36 @@ local function AnimateDoor(p1, p2, p3) --[[ Line: 34 | Upvalues: t (copy), RunSe
 			end
 		end)
 	end)
-	delay(p3 + 1.1, function() --[[ Line: 57 | Upvalues: v2 (copy), v3 (copy), t (ref), p1 (copy) ]]
+	delay(p3 + 1.1, function()
 		v2.CanCollide = true
 		v3.CanCollide = true
 		t[p1] = nil
 	end)
 end
 return {
-	Init = function(p1) --[[ Name: Init | Line: 64 | Upvalues: AnimateDoor (copy), DoorUtils (copy), RunService (copy) ]]
+	Init = function(p1)
 		local _ = p1.Event
 		local em = p1.em
-		function em.ukfy8gb8(p1, p2, p3) --[[ Line: 67 | Upvalues: AnimateDoor (ref) ]]
+		function em.ukfy8gb8(p1, p2, p3)
 			AnimateDoor(p1, p2, p3)
 		end
-		function em.hfdr6rmx(p1, p2) --[[ Line: 70 | Upvalues: DoorUtils (ref) ]]
+		function em.hfdr6rmx(p1, p2)
 			DoorUtils.setOpen(p1, p2)
 		end
 		local v1 = false
-		function em.bsjrqs6c(p1, p2) --[[ Line: 75 | Upvalues: v1 (ref), RunService (ref) ]]
+		function em.bsjrqs6c(p1, p2)
 			if v1 then
 				return false
 			end
 			v1 = true
-			delay(0, function() --[[ Line: 80 | Upvalues: p1 (copy), p2 (copy), RunService (ref) ]]
-				local function f1(p12) --[[ Line: 81 | Upvalues: p1 (ref), p2 (ref) ]]
+			delay(0, function()
+				local function f1(p12)
 					p1:SetPrimaryPartCFrame(p2 + Vector3.new(0, 20, 0) * p12)
 				end
 				local v2 = tick()
 				local v3 = nil
 				local v4 = 2
-				v3 = RunService.Heartbeat:Connect(function() --[[ Line: 10 | Upvalues: v4 (copy), v2 (copy), f1 (copy), v3 (ref) ]]
+				v3 = RunService.Heartbeat:Connect(function()
 					local v1 = tick()
 					if v4 then
 						local v22 = (v1 - v2) / v4
@@ -153,14 +154,14 @@ return {
 					end
 				end)
 			end)
-			delay(4, function() --[[ Line: 85 | Upvalues: p1 (copy), p2 (copy), RunService (ref) ]]
-				local function f1(p12) --[[ Line: 86 | Upvalues: p1 (ref), p2 (ref) ]]
+			delay(4, function()
+				local function f1(p12)
 					p1:SetPrimaryPartCFrame(p2 + Vector3.new(0, 20, 0) * (1 - p12))
 				end
 				local v2 = tick()
 				local v3 = nil
 				local v4 = 2
-				v3 = RunService.Heartbeat:Connect(function() --[[ Line: 10 | Upvalues: v4 (copy), v2 (copy), f1 (copy), v3 (ref) ]]
+				v3 = RunService.Heartbeat:Connect(function()
 					local v1 = tick()
 					if v4 then
 						local v22 = (v1 - v2) / v4

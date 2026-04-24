@@ -1,9 +1,10 @@
+-- Reviewed by Claude
 local exp = math.exp
 local cos = math.cos
 local sin = math.sin
 local t = {}
 t.__index = t
-function t.new(p1, p2, p3, p4) --[[ Line: 8 | Upvalues: t (copy) ]]
+function t.new(p1, p2, p3, p4)
 	assert(p1)
 	assert(p2)
 	assert(p3)
@@ -17,7 +18,7 @@ function t.new(p1, p2, p3, p4) --[[ Line: 8 | Upvalues: t (copy) ]]
 	v2.t = tick()
 	return v2
 end
-function t.Update(p1) --[[ Line: 22 | Upvalues: exp (copy), cos (copy), sin (copy) ]]
+function t.Update(p1)
 	local v1 = tick() - p1.t
 	local Freq = p1.Freq
 	local Damp = p1.Damp
@@ -49,7 +50,7 @@ function t.Update(p1) --[[ Line: 22 | Upvalues: exp (copy), cos (copy), sin (cop
 		return Target + v16 * (v2 * v17 + v19 * v18), -v16 * ((v2 * v14 - v19 * v15) * v17 + (v2 * v15 + v19 * v14) * v18)
 	end
 end
-function t.SetTarget(p1, p2) --[[ Line: 67 ]]
+function t.SetTarget(p1, p2)
 	local v1, v2 = p1:Update()
 	p1.p = v1
 	p1.v = v2
@@ -57,19 +58,19 @@ function t.SetTarget(p1, p2) --[[ Line: 67 ]]
 	p1.t = tick()
 	return v1, v2
 end
-function t.Accelerate(p1, p2) --[[ Line: 74 ]]
+function t.Accelerate(p1, p2)
 	local v1, v2 = p1:Update()
 	p1.t = tick()
 	p1.p = v1
 	p1.v = v2 + p2
 end
-function t.ForceTarget(p1, p2) --[[ Line: 79 ]]
+function t.ForceTarget(p1, p2)
 	p1.p = p2
 	p1.v = p2 * 0
 	p1.Target = p1.p
 	p1.t = tick()
 end
-function t.SetConsts(p1, p2, p3) --[[ Line: 84 ]]
+function t.SetConsts(p1, p2, p3)
 	local v1, v2 = p1:Update()
 	p1.p = v1
 	p1.v = v2

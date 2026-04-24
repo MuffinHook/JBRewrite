@@ -1,28 +1,29 @@
+-- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
-return function(p1) --[[ Line: 4 | Upvalues: Roact (copy) ]]
+return function(target)
 	local DamageIndicatorService = require(script.Parent.Parent.DamageIndicatorService)
-	local v1 = DamageIndicatorService.add({
+	local removeIndicator1 = DamageIndicatorService.add({
 		worldPosition = Vector3.new(0, 0, 0),
 		lifetime = 30
 	})
-	local v2 = DamageIndicatorService.add({
+	local removeIndicator2 = DamageIndicatorService.add({
 		worldPosition = Vector3.new(100, 0, 100),
 		color = Color3.new(255/255, 255/255, 0/255),
 		strength = 0.1,
 		lifetime = 30
 	})
 	local DamageIndicators = require(script.Parent.DamageIndicators)
-	local v3 = Roact.mount(Roact.createElement(DamageIndicators, {
+	local mountedComponent = Roact.mount(Roact.createElement(DamageIndicators, {
 		size = UDim2.new(0.95, 0, 0.95, 0)
-	}), p1)
-	return function() --[[ Line: 23 | Upvalues: v1 (copy), v2 (copy), Roact (ref), v3 (copy) ]]
-		if v1 then
-			v1()
+	}), target)
+	return function()
+		if removeIndicator1 then
+			removeIndicator1()
 		end
-		if v2 then
-			v2()
+		if removeIndicator2 then
+			removeIndicator2()
 		end
-		Roact.unmount(v3)
+		Roact.unmount(mountedComponent)
 	end
 end

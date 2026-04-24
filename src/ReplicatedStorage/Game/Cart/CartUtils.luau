@@ -1,5 +1,6 @@
+-- Reviewed by Claude
 return {
-	computeRail = function(p1, p2) --[[ Name: computeRail | Line: 5 ]]
+	computeRail = function(p1, p2)
 		local t = {
 			[p1] = true,
 			[p2] = true
@@ -40,7 +41,7 @@ return {
 			p2, p1 = v2, p2
 		end
 	end,
-	calculateSegment = function(p1, p2) --[[ Name: calculateSegment | Line: 75 ]]
+	calculateSegment = function(p1, p2)
 		local v1 = p2 % p1.totalLength
 		for i = 1, #p1.listSegment do
 			local v2 = v1 - p1.lengthCache[i]
@@ -50,7 +51,7 @@ return {
 			v1 = v2
 		end
 	end,
-	calculatePosition = function(p1, p2, p3) --[[ Name: calculatePosition | Line: 85 ]]
+	calculatePosition = function(p1, p2, p3)
 		local v1 = p1.listSegment[p2]
 		return v1.Position + p1.directionCache[p2] * (-v1.Size.Z * 0.5 + p3)
 	end
