@@ -1,3 +1,4 @@
+-- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("UserInputService")
@@ -6,7 +7,7 @@ local TweenService = game:GetService("TweenService")
 local UI = require(ReplicatedStorage.Module.UI)
 local RunService = game:GetService("RunService")
 game:GetService("Lighting")
-local v1 = require(ReplicatedStorage.App.RunUtils).isStudio()
+local isStudio = require(ReplicatedStorage.App.RunUtils).isStudio()
 local CurrentCamera = workspace.CurrentCamera
 local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
 local R15IKv2 = require(ReplicatedStorage.Module.R15IKv2)
@@ -35,48 +36,48 @@ local SpeedometerUtils = require(ReplicatedStorage.Speedometer.SpeedometerUtils)
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 require(ReplicatedStorage.Std.PartUtils)
 local Vehicles = workspace:WaitForChild("Vehicles")
-local function GetMoveVector() --[[ Line: 43 ]]
+local function GetMoveVector()
 	return Vector3.new()
 end
 local ControlModule = LocalPlayer.PlayerScripts:WaitForChild("PlayerModule", 5).ControlModule
 if ControlModule then
-	local v2 = require(ControlModule)
-	GetMoveVector = function() --[[ Name: GetMoveVector | Line: 50 | Upvalues: v2 (ref) ]]
-		return v2:GetMoveVector()
+	local controlModuleInstance = require(ControlModule)
+	GetMoveVector = function()
+		return controlModuleInstance:GetMoveVector()
 	end
 end
-local v3 = CFrame.new
-local v4 = Vector3.new
+local CFrameNew = CFrame.new
+local Vector3New = Vector3.new
 local Angles = CFrame.Angles
-local v5 = v3(0, 0, 0)
-local v6 = Ray.new
+local zeroOriginCFrame = CFrameNew(0, 0, 0)
+local RayNew = Ray.new
 local FindPartOnRayWithIgnoreList = workspace.FindPartOnRayWithIgnoreList
 local min = math.min
 local max = math.max
 local abs = math.abs
 local tanh = math.tanh
 local exp = math.exp
-local v7 = RaycastParams.new()
-v7.RespectCanCollide = true
-v7.FilterType = Enum.RaycastFilterType.Exclude
-v7.FilterDescendantsInstances = { Vehicles }
-local v8 = RaycastParams.new()
-v8.RespectCanCollide = true
-v8.FilterType = Enum.RaycastFilterType.Exclude
-v8.FilterDescendantsInstances = { Vehicles }
-local v9 = nil
-local v10 = nil
-local t = {
+local raycastParamsMobile = RaycastParams.new()
+raycastParamsMobile.RespectCanCollide = true
+raycastParamsMobile.FilterType = Enum.RaycastFilterType.Exclude
+raycastParamsMobile.FilterDescendantsInstances = { Vehicles }
+local raycastParamsDefault = RaycastParams.new()
+raycastParamsDefault.RespectCanCollide = true
+raycastParamsDefault.FilterType = Enum.RaycastFilterType.Exclude
+raycastParamsDefault.FilterDescendantsInstances = { Vehicles }
+local remoteEventServer = nil
+local vehicleModel = nil
+local soundEffectLibrary = {
 	Echo = SoundService.Chassis.EchoSoundEffect,
 	Equalizer = SoundService.Chassis.EqualizerSoundEffect,
 	Reverb = SoundService.Chassis.ReverbSoundEffect
 }
-local t2 = {
+local soundEffectProperties = {
 	Echo = { "Delay", "DryLevel", "Feedback", "WetLevel" },
 	Equalizer = { "HighGain", "LowGain", "MidGain" },
 	Reverb = { "DecayTime", "Density", "Diffusion", "DryLevel", "WetLevel" }
 }
-local t3 = {
+local environmentSoundProfiles = {
 	Tunnel = {
 		Echo = {
 			Delay = 0.35,
@@ -138,21 +139,21 @@ local t3 = {
 		}
 	}
 }
-local v11 = 0
-local function f(p1, p2, p3) --[[ Line: 150 ]]
+local engineSoundCounter = 0
+local function f(p1, p2, p3)
 	return math.exp(-(p1 - p2) ^ 2 / (2 * p3 * p3))
 end
-local function setVolume(p1, p2) --[[ Line: 153 ]]
+local function setVolume(p1, p2)
 	if math.abs(p1.Volume - p2) > 0.001 then
 		p1.Volume = p2
 	end
 end
-local function setPlaybackSpeed(p1, p2) --[[ Line: 158 ]]
+local function setPlaybackSpeed(p1, p2)
 	if math.abs(p1.PlaybackSpeed - p2) > 0.001 then
 		p1.PlaybackSpeed = p2
 	end
 end
-local function SetRPM3(p1, p2, p3, p4) --[[ Line: 163 | Upvalues: EnumMake (copy) ]]
+local function SetRPM3(p1, p2, p3, p4)
 	local v1 = 0.2
 	local v2 = 1
 	local v3, v4, v5, v6, v7
@@ -317,7 +318,7 @@ local function SetRPM3(p1, p2, p3, p4) --[[ Line: 163 | Upvalues: EnumMake (copy
 		end
 	end
 end
-local function SetRPM1(p1, p2, p3, p4) --[[ Line: 408 | Upvalues: EnumMake (copy) ]]
+local function SetRPM1(p1, p2, p3, p4)
 	local v1 = nil
 	local v3 = p2 / if p4 == EnumMake.Volt or p4 == EnumMake.Volt4x4 then 10000 elseif p4 == EnumMake.Roadster then 12000 else 6000
 	local v4 = 1
@@ -347,7 +348,7 @@ local function SetRPM1(p1, p2, p3, p4) --[[ Line: 408 | Upvalues: EnumMake (copy
 		Idle_2.Volume = v1
 	end
 end
-local function SetRPMNew(p1, p2, p3, p4, p5, p6) --[[ Line: 439 | Upvalues: EnumMake (copy) ]]
+local function SetRPMNew(p1, p2, p3, p4, p5, p6)
 	local v1 = p5 / 6
 	local v2 = p2 / 6300
 	local v3 = 5 * v2
@@ -399,7 +400,7 @@ local function SetRPMNew(p1, p2, p3, p4, p5, p6) --[[ Line: 439 | Upvalues: Enum
 		OnHigh_2.PlaybackSpeed = v14
 	end
 end
-local function SetRPM(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 492 | Upvalues: SetRPM1 (copy), SetRPMNew (copy), SetRPM3 (copy) ]]
+local function SetRPM(p1, p2, p3, p4, p5, p6, p7)
 	if p1 == "Electric" or (p1 == "BrickKar" or p1 == "AdminNuke") then
 		SetRPM1(p3, p4, p5, p2)
 	elseif p7 then
@@ -408,7 +409,7 @@ local function SetRPM(p1, p2, p3, p4, p5, p6, p7) --[[ Line: 492 | Upvalues: Set
 		SetRPM3(p3, p4, p5, p2)
 	end
 end
-local function UpdateGearsAndRPM(p1, p2, p3, p4, p5) --[[ Line: 503 | Upvalues: SetRPM (ref) ]]
+local function UpdateGearsAndRPM(p1, p2, p3, p4, p5)
 	local Gear = p1.Gear
 	local LastGear = p1.LastGear
 	local t3 = p1.t3
@@ -475,7 +476,7 @@ local function UpdateGearsAndRPM(p1, p2, p3, p4, p5) --[[ Line: 503 | Upvalues: 
 	end
 	return Gear, v2
 end
-local function updateFOV(p1) --[[ Line: 578 | Upvalues: CurrentCamera (copy) ]]
+local function updateFOV(p1)
 	local v1 = (p1.LastFakeGear or 1) ^ 0.5 * (p1.Model.Engine.AssemblyLinearVelocity.Magnitude / 120)
 	if v1 ~= v1 then
 		v1 = 0
@@ -495,13 +496,13 @@ local function updateFOV(p1) --[[ Line: 578 | Upvalues: CurrentCamera (copy) ]]
 	local FieldOfView = CurrentCamera.FieldOfView
 	CurrentCamera.FieldOfView = FieldOfView + (v3 * 30 + 70 - FieldOfView) * 0.7
 end
-local t4 = {}
-local t5 = { 0, 0, 0, 0, 0, 0 }
-local v12 = false
-local v13 = false
-local v14 = false
-local v15 = false
-local function GetMass(p1) --[[ Line: 600 ]]
+local chassisInputTable = {}
+local inputMovementState = { 0, 0, 0, 0, 0, 0 }
+local handbrakeEnabled = false
+local sirenEnabled = false
+local headlightsEnabled = false
+local policeMode = false
+local function GetMass(p1)
 	local sum = 0
 	for i, v in ipairs(p1:GetDescendants()) do
 		if v:IsA("BasePart") then
@@ -510,23 +511,23 @@ local function GetMass(p1) --[[ Line: 600 ]]
 	end
 	return sum
 end
-function t4.setForward(p1) --[[ Line: 609 | Upvalues: t5 (ref) ]]
-	t5[1] = if p1 then 1 else 0
+function chassisInputTable.setForward(p1)
+	inputMovementState[1] = if p1 then 1 else 0
 end
-function t4.setBackward(p1) --[[ Line: 612 | Upvalues: t5 (ref) ]]
-	t5[3] = if p1 then 1 else 0
+function chassisInputTable.setBackward(p1)
+	inputMovementState[3] = if p1 then 1 else 0
 end
-function t4.onGearShift(p1, p2, p3) --[[ Line: 615 | Upvalues: EnumMake (copy), Audio (copy) ]]
+function chassisInputTable.onGearShift(p1, p2, p3)
 	if p1.EnumMakeId == EnumMake.Venom or p1.EnumMakeId == EnumMake.Polaire then
 		Audio.ObjectLocal(p1.Model.PrimaryPart, 18128231812, {
 			Volume = 0.5,
 			Pitch = 1
 		})
-		for v1, v2 in p1.Model.Model.Metal:GetChildren() do
-			if v2:IsA("Attachment") then
-				local v3 = v2:FindFirstChildWhichIsA("ParticleEmitter")
-				if v3 then
-					v3:Emit(3)
+		for modelIndex, metalPart in p1.Model.Model.Metal:GetChildren() do
+			if metalPart:IsA("Attachment") then
+				local particleEmitter = metalPart:FindFirstChildWhichIsA("ParticleEmitter")
+				if particleEmitter then
+					particleEmitter:Emit(3)
 				end
 			end
 		end
@@ -536,55 +537,55 @@ function t4.onGearShift(p1, p2, p3) --[[ Line: 615 | Upvalues: EnumMake (copy), 
 		GearShiftRemote:FireServer(p2, p3)
 	end
 end
-function t4.toggleSirens() --[[ Line: 649 | Upvalues: v15 (ref), v9 (ref) ]]
-	v15 = not v15
-	v9:FireServer("s" .. ("fgis"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("lcj23s"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("alabh"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("anygmt"):sub(5, 5):reverse() .. "d", "PoliceLights", v15)
+function chassisInputTable.toggleSirens()
+	policeMode = not policeMode
+	remoteEventServer:FireServer("s" .. ("fgis"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("lcj23s"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("alabh"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("anygmt"):sub(5, 5):reverse() .. "d", "PoliceLights", policeMode)
 end
-function t4.toggleHeadlights() --[[ Line: 653 | Upvalues: v9 (ref) ]]
-	v9:FireServer("s" .. ("eeygz2ah"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("l9co90"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("l235bk"):sub(5, 5):reverse() .. "" .. "" .. ("o00laueo"):sub(4, 5):reverse():reverse():reverse() .. "md", "Lights")
+function chassisInputTable.toggleHeadlights()
+	remoteEventServer:FireServer("s" .. ("eeygz2ah"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("l9co90"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("l235bk"):sub(5, 5):reverse() .. "" .. "" .. ("o00laueo"):sub(4, 5):reverse():reverse():reverse() .. "md", "Lights")
 end
-function t4.setHandbrakeEnabled(p1) --[[ Line: 656 | Upvalues: v12 (ref), ChassisShared (copy) ]]
-	v12 = p1
+function chassisInputTable.setHandbrakeEnabled(p1)
+	handbrakeEnabled = p1
 	ChassisShared.HandBrake = p1
 end
-function t4.DriveToPosition(p1, p2, p3) --[[ Line: 668 ]]
-	local v1 = p3 or {}
-	p1.DriveToPosition = p2
-	p1.DriveToPositionArrivalRadius = v1.arrivalRadius or 4
-	p1.DriveToPositionOnReached = v1.onReached
+function chassisInputTable.DriveToPosition(p1, p2, p3)
+local driveOptions = p3 or {}
+p1.DriveToPosition = p2
+p1.DriveToPositionArrivalRadius = driveOptions.arrivalRadius or 4
+p1.DriveToPositionOnReached = driveOptions.onReached
 end
-function t4.StopDriveToPosition(p1) --[[ Line: 676 ]]
-	p1.DriveToPosition = nil
-	p1.DriveToPositionOnReached = nil
+function chassisInputTable.StopDriveToPosition(p1)
+p1.DriveToPosition = nil
+p1.DriveToPositionOnReached = nil
 end
-function t4.runAction(p1) --[[ Line: 680 | Upvalues: VehicleUtils (copy), v9 (ref), t4 (copy), SpeedometerUtils (copy), ChassisShared (copy) ]]
+function chassisInputTable.runAction(p1)
 	if p1 then
-		local v1 = VehicleUtils.GetLocalVehiclePacket()
-		if v1.Make == "Firetruck" then
-			v9:FireServer("sgcbalmd", "FiretruckWater", true)
-		elseif v1.Make == "TheAgent" then
-			t4.AttemptFireMissile(v1)
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+		if vehiclePacket.Make == "Firetruck" then
+			remoteEventServer:FireServer("sgcbalmd", "FiretruckWater", true)
+		elseif vehiclePacket.Make == "TheAgent" then
+			chassisInputTable.AttemptFireMissile(vehiclePacket)
 		elseif p1 == "Jump" then
-			if not v1.AreTiresPopped then
-				local Engine = v1.Model.Engine
-				local v4 = SpeedometerUtils.sToH(SpeedometerUtils.studsToMi((math.abs((Engine.Velocity:Dot(Engine.CFrame.LookVector))))))
-				local v7 = v1.jumpMaxAmount or 75
-				Engine:ApplyImpulse(Vector3.new(0, v7 - (v7 - (v1.jumpBaseAmount or 40)) * math.clamp(v4 / (v1.jumpMaxMph or 500), 0, 1), 0) * Engine.AssemblyMass)
-				VehicleUtils.vehicleEffect("Jump", v1.Model)
-				v9:FireServer("s" .. ("ifqfbcgt4bu"):sub(5, 7):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("y1hlaqa"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("zy4jmdk"):sub(5, 5):reverse() .. "d", "Jump")
-				v1._lastJumpAt = os.clock()
+			if not vehiclePacket.AreTiresPopped then
+				local Engine = vehiclePacket.Model.Engine
+				local currentSpeed = SpeedometerUtils.sToH(SpeedometerUtils.studsToMi((math.abs((Engine.Velocity:Dot(Engine.CFrame.LookVector))))))
+				local maxJumpForce = vehiclePacket.jumpMaxAmount or 75
+				Engine:ApplyImpulse(Vector3.new(0, maxJumpForce - (maxJumpForce - (vehiclePacket.jumpBaseAmount or 40)) * math.clamp(currentSpeed / (vehiclePacket.jumpMaxMph or 500), 0, 1), 0) * Engine.AssemblyMass)
+				VehicleUtils.vehicleEffect("Jump", vehiclePacket.Model)
+				remoteEventServer:FireServer("s" .. ("ifqfbcgt4bu"):sub(5, 7):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("y1hlaqa"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("zy4jmdk"):sub(5, 5):reverse() .. "d", "Jump")
+				vehiclePacket._lastJumpAt = os.clock()
 				return true
 			end
 		else
-			v9:FireServer("s" .. ("xvgpr"):sub(3, 3):reverse() .. "" .. "" .. ("r15labcwt"):sub(4, 7):reverse():reverse():reverse() .. "" .. "" .. ("chfmmejj"):sub(4, 4):reverse():reverse():reverse() .. "d", "Action")
+			remoteEventServer:FireServer("s" .. ("xvgpr"):sub(3, 3):reverse() .. "" .. "" .. ("r15labcwt"):sub(4, 7):reverse():reverse():reverse() .. "" .. "" .. ("chfmmejj"):sub(4, 4):reverse():reverse():reverse() .. "d", "Action")
 		end
 	elseif ChassisShared.VehicleMake == "Firetruck" then
-		v9:FireServer("s" .. "" .. ("vwabcgiu91"):sub(3, 6):reverse():reverse():reverse() .. "lmd", "FiretruckWater", false)
+		remoteEventServer:FireServer("s" .. "" .. ("vwabcgiu91"):sub(3, 6):reverse():reverse():reverse() .. "lmd", "FiretruckWater", false)
 	end
 end
-local function getTransparencyPredicateForHumanoid(p1) --[[ Line: 720 ]]
+local function getTransparencyPredicateForHumanoid(p1)
 	assert(p1, "missing humanoid")
-	return function(p12) --[[ Line: 723 | Upvalues: p1 (copy) ]]
+	return function(p12)
 		if p12.Parent == p1.Parent then
 			local v1 = p1:GetLimb(p12)
 			if v1 == Enum.Limb.LeftArm or v1 == Enum.Limb.RightArm then
@@ -597,7 +598,7 @@ local function getTransparencyPredicateForHumanoid(p1) --[[ Line: 720 ]]
 		end
 	end
 end
-function t4.toggleInsideCamera(p1) --[[ Line: 733 | Upvalues: VehicleUtils (copy), t4 (copy), LocalPlayer (copy), CharacterUtils (copy) ]]
+function t4.toggleInsideCamera(p1)
 	local v1 = p1 or VehicleUtils.GetLocalVehiclePacket()
 	if v1 and not v1.Passenger then
 		local IsCameraLocked = v1.IsCameraLocked
@@ -610,7 +611,7 @@ function t4.toggleInsideCamera(p1) --[[ Line: 733 | Upvalues: VehicleUtils (copy
 		if Character then
 			local Humanoid = Character:FindFirstChild("Humanoid")
 			assert(Humanoid, "missing humanoid")
-			local function f2(p1) --[[ Line: 723 | Upvalues: Humanoid (copy) ]]
+			local function f2(p1)
 				if p1.Parent == Humanoid.Parent then
 					local v1 = Humanoid:GetLimb(p1)
 					if v1 == Enum.Limb.LeftArm or v1 == Enum.Limb.RightArm then
@@ -630,10 +631,10 @@ function t4.toggleInsideCamera(p1) --[[ Line: 733 | Upvalues: VehicleUtils (copy
 		end
 	end
 end
-function t4.init(p1) --[[ Line: 754 | Upvalues: v10 (ref) ]]
+function t4.init(p1)
 	v10 = p1.ScreenGui
 end
-function t4.SetGravity(p1, p2) --[[ Line: 757 ]]
+function t4.SetGravity(p1, p2)
 	local v1 = p1.Model:FindFirstChild("Engine").AssemblyMass * 9.81 * 20
 	local v2 = 1 - p2 / 196.20000000000002
 	if v1 ~= v1 then
@@ -644,12 +645,12 @@ function t4.SetGravity(p1, p2) --[[ Line: 757 ]]
 	end
 	p1.gravityOffset = v1 * v2
 end
-function t4.VehicleEnter(p1) --[[ Line: 773 | Upvalues: LocalPlayer (copy), RunService (copy), updateFOV (copy), EnumMake (copy), CharacterAnim (copy), ChassisShared (copy), t5 (ref), v12 (ref), v13 (ref), v14 (ref), v15 (ref), t4 (copy), v4 (copy), R15IKv2 (copy), Spring (copy), Audio (copy), v7 (copy) ]]
+function t4.VehicleEnter(p1)
 	local Passenger = p1.Passenger
 	local Character = LocalPlayer.Character
 	local Humanoid = Character.Humanoid
 	local seatMaid = p1.seatMaid
-	seatMaid:GiveTask(function() --[[ Line: 779 | Upvalues: Character (copy) ]]
+	seatMaid:GiveTask(function()
 		if Character then
 			local Head = Character:FindFirstChild("Head")
 			if Head then
@@ -660,7 +661,7 @@ function t4.VehicleEnter(p1) --[[ Line: 773 | Upvalues: LocalPlayer (copy), RunS
 			end
 		end
 	end)
-	seatMaid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 792 | Upvalues: updateFOV (ref), p1 (copy) ]]
+	seatMaid:GiveTask(RunService.Heartbeat:Connect(function()
 		updateFOV(p1)
 	end))
 	p1.EnumMakeId = EnumMake[p1.Make]
@@ -668,13 +669,13 @@ function t4.VehicleEnter(p1) --[[ Line: 773 | Upvalues: LocalPlayer (copy), RunS
 	if p1.EnumMakeId == EnumMake.ATV or p1.EnumMakeId == EnumMake.Volt then
 		p1.NoLook = true
 	elseif p1.Seat:FindFirstChild("Turret") then
-		task.delay(0.1, function() --[[ Line: 803 | Upvalues: Humanoid (copy), CharacterAnim (ref), seatMaid (copy) ]]
+		task.delay(0.1, function()
 			for i, v in ipairs(Humanoid:GetPlayingAnimationTracks()) do
 				v:Stop()
 			end
 			local v1 = CharacterAnim.getIdleTrack()
 			v1:Play()
-			seatMaid:GiveTask(function() --[[ Line: 809 | Upvalues: v1 (copy) ]]
+			seatMaid:GiveTask(function()
 				v1:Stop()
 			end)
 		end)
@@ -683,7 +684,7 @@ function t4.VehicleEnter(p1) --[[ Line: 773 | Upvalues: LocalPlayer (copy), RunS
 	if v1 then
 		local v2 = CharacterAnim.getCarSitTrack()
 		v2:Play()
-		seatMaid:GiveTask(function() --[[ Line: 817 | Upvalues: v2 (copy) ]]
+		seatMaid:GiveTask(function()
 			v2:Stop()
 		end)
 	end
@@ -835,7 +836,7 @@ function t4.VehicleEnter(p1) --[[ Line: 773 | Upvalues: LocalPlayer (copy), RunS
 				Looped = true,
 				RollOffMaxDistance = 352
 			})
-			seatMaid:GiveTask(function() --[[ Line: 984 | Upvalues: p1 (copy) ]]
+			seatMaid:GiveTask(function()
 				if p1.BluebirdSupercharger then
 					p1.BluebirdSupercharger:Destroy()
 				end
@@ -866,7 +867,7 @@ function t4.VehicleEnter(p1) --[[ Line: 773 | Upvalues: LocalPlayer (copy), RunS
 			})
 			p1.turboIntakeSound = v18
 			p1.turboBlowOff = v19
-			seatMaid:GiveTask(function() --[[ Line: 1015 | Upvalues: v18 (copy), v19 (copy) ]]
+			seatMaid:GiveTask(function()
 				v18:Destroy()
 				v19:Destroy()
 			end)
@@ -883,7 +884,7 @@ function t4.VehicleEnter(p1) --[[ Line: 773 | Upvalues: LocalPlayer (copy), RunS
 		v7.IgnoreWater = if p1.EnumMakeId == EnumMake.Delorean then false else p1.EnumMakeId ~= EnumMake.Blackbeard
 	end
 end
-function t4.VehicleLeave(p1) --[[ Line: 1079 | Upvalues: CurrentCamera (copy), t3 (copy), t2 (copy), t (copy), t4 (copy), VehicleUtils (copy), DoorUtils (copy) ]]
+function t4.VehicleLeave(p1)
 	CurrentCamera.FieldOfView = 70
 	if p1.Sounds then
 		local Outside = t3.Outside
@@ -950,7 +951,7 @@ end
 local v16 = Color3.fromRGB(204, 142, 105)
 local v17 = Color3.fromRGB(68, 54, 43)
 local t6 = {}
-local function getThrusterLightsState(p1) --[[ Line: 1152 | Upvalues: t6 (copy) ]]
+local function getThrusterLightsState(p1)
 	local v1 = t6[p1]
 	if not v1 then
 		local t = {
@@ -972,7 +973,7 @@ local function getThrusterLightsState(p1) --[[ Line: 1152 | Upvalues: t6 (copy) 
 	end
 	return v1
 end
-local function setThrusterLightsEnabled(p1, p2) --[[ Line: 1174 | Upvalues: getThrusterLightsState (copy), TweenService (copy), v16 (copy), v17 (copy) ]]
+local function setThrusterLightsEnabled(p1, p2)
 	local v1 = getThrusterLightsState(p1)
 	local part = v1.part
 	if part then
@@ -991,7 +992,7 @@ local function setThrusterLightsEnabled(p1, p2) --[[ Line: 1174 | Upvalues: getT
 	end
 end
 local t7 = {}
-function t4.UpdateThrusterFlames(p1, p2, p3, p4, p5) --[[ Line: 1201 | Upvalues: t7 (copy), t5 (ref), getThrusterLightsState (copy), setThrusterLightsEnabled (copy), t6 (copy) ]]
+function t4.UpdateThrusterFlames(p1, p2, p3, p4, p5)
 	local v1 = p5 or {}
 	local v2 = t7[p1]
 	if not v2 then
@@ -1075,7 +1076,7 @@ function t4.UpdateThrusterFlames(p1, p2, p3, p4, p5) --[[ Line: 1201 | Upvalues:
 		t7[p1] = nil
 		v16.hotUntil = 0
 		setThrusterLightsEnabled(p1, false)
-		task.delay(0.25, function() --[[ Line: 1282 | Upvalues: t6 (ref), p1 (copy), v16 (copy) ]]
+		task.delay(0.25, function()
 			if t6[p1] == v16 and not v16.isOn then
 				t6[p1] = nil
 			end
@@ -1092,7 +1093,7 @@ function t4.UpdateThrusterFlames(p1, p2, p3, p4, p5) --[[ Line: 1201 | Upvalues:
 	end
 	return count
 end
-function t4.UpdateWheelLowQuality(p1, p2, p3, p4) --[[ Line: 1303 | Upvalues: v8 (copy), min (copy), v3 (copy), Angles (copy) ]]
+function t4.UpdateWheelLowQuality(p1, p2, p3, p4)
 	local Engine = p3.Engine
 	local Part = p3.Part
 	local v2 = Part.CFrame
@@ -1117,16 +1118,16 @@ function t4.UpdateWheelLowQuality(p1, p2, p3, p4) --[[ Line: 1303 | Upvalues: v8
 		BridgeMotor.C1 = v17 * CFrame.lookAt(Vector3.new(0, 0, 0), (Vector3.new(v32.X, v12 - v16, 0)))
 	end
 end
-function t4.UpdateSoundLowQuality(p1, p2, p3) --[[ Line: 1345 | Upvalues: EnumMake (copy), UpdateGearsAndRPM (copy) ]]
+function t4.UpdateSoundLowQuality(p1, p2, p3)
 	if p1.EnumMakeId == nil then
 		p1.EnumMakeId = EnumMake[p1.Make]
 	end
 	UpdateGearsAndRPM(p1, p2, math.abs(p3.Z), -math.sign(p3.Z), 1 / 60)
 end
-local function IsNaN(p1) --[[ Line: 1351 ]]
+local function IsNaN(p1)
 	return p1 ~= p1
 end
-local function UpdateThruster(p1, p2, p3, p4) --[[ Line: 1355 | Upvalues: v7 (copy), min (copy), v3 (copy), Angles (copy), v12 (ref), abs (copy), v5 (copy), PhysicsLagService (copy), v4 (copy) ]]
+local function UpdateThruster(p1, p2, p3, p4)
 	local Part = p2.Part
 	local Engine = p2.Engine
 	local v2 = Part.CFrame
@@ -1223,7 +1224,7 @@ local function UpdateThruster(p1, p2, p3, p4) --[[ Line: 1355 | Upvalues: v7 (co
 		BridgeMotor.C1 = v422 * CFrame.lookAt(Vector3.new(0, 0, 0), (Vector3.new(v32.X, v25 - v41, 0)))
 	end
 end
-local function fpor2Autopilot(p1, p2, p3) --[[ Line: 1489 | Upvalues: v6 (copy), FindPartOnRayWithIgnoreList (copy) ]]
+local function fpor2Autopilot(p1, p2, p3)
 	local magnitude = p2.magnitude
 	local unit = p2.unit
 	local count, v1, v2, v3 = 0, p1, 0, { p3 }
@@ -1324,7 +1325,7 @@ local t9 = {
 	[EnumMake.TheCamper] = 300,
 	[EnumMake.AdminNuke] = 900
 }
-function t4.UpdateEngine(p1, p2, p3) --[[ Line: 1588 | Upvalues: t5 (ref), InputUtils (copy), GetMoveVector (ref), abs (copy), v12 (ref), v4 (copy), fpor2Autopilot (copy), Time (copy), EnumMake (copy), HapticEffect (copy), t4 (copy), tanh (copy), EnvironmentUtils (copy), EnvironmentConsts (copy), UpdateGearsAndRPM (copy), v7 (copy), Audio (copy), t9 (copy), t8 (copy), max (copy), VehicleUtils (copy), v9 (ref), v1 (copy), Settings (copy), Region (copy), v11 (ref), t2 (copy), t (copy), t3 (copy), DoorUtils (copy) ]]
+function t4.UpdateEngine(p1, p2, p3)
 	local Model = p1.Model
 	local CanDrive = p2.CanDrive
 	local Engine = p2.Engine
@@ -1950,7 +1951,7 @@ function t4.UpdateEngine(p1, p2, p3) --[[ Line: 1588 | Upvalues: t5 (ref), Input
 	end
 	p1.Lift.Force = v4(0, gravityOffset, 0)
 end
-function t4.Update(p1, p2) --[[ Line: 2434 | Upvalues: t5 (ref), t4 (copy) ]]
+function t4.Update(p1, p2)
 	p1._didAnyWheelDrift = false
 	local v1 = t5[1] - t5[3] > 0
 	if not v1 and (p1.isAccelHeld ~= v1 and p1.Model.PrimaryPart.AssemblyLinearVelocity.Magnitude > 50) then
@@ -1970,7 +1971,7 @@ function t4.Update(p1, p2) --[[ Line: 2434 | Upvalues: t5 (ref), t4 (copy) ]]
 		p1.Model:FindFirstChild("RelayDriftingRemote"):FireServer(p1._didAnyWheelDrift)
 	end
 end
-function t4.UpdateStepped(p1) --[[ Line: 2464 | Upvalues: Angles (copy), v4 (copy), R15IKv2 (copy) ]]
+function t4.UpdateStepped(p1)
 	local Model = p1.Model
 	if p1.IK then
 		local v1 = 0.6 * p1.RotY
@@ -1994,23 +1995,23 @@ function t4.UpdateStepped(p1) --[[ Line: 2464 | Upvalues: Angles (copy), v4 (cop
 		R15IKv2.Arms(IK)
 	end
 end
-function t4.UpdateForces(p1, p2, p3) --[[ Line: 2495 | Upvalues: UpdateThruster (copy) ]]
+function t4.UpdateForces(p1, p2, p3)
 	for v1, v2 in p1.Wheels do
 		UpdateThruster(p1, v2, p2, p3)
 	end
 end
-function t4.Halt(p1) --[[ Line: 2501 ]]
+function t4.Halt(p1)
 	for v1, v2 in p1.EngineThrusters do
 		v2.Drive.Force = Vector3.new(0, 0, 0)
 		v2.Friction.Force = Vector3.new(0, 0, 0)
 	end
 	p1.Rotate.MaxTorque = Vector3.new(0, 0, 0)
 end
-function t4.SpinOut(p1, p2) --[[ Line: 2508 ]]
+function t4.SpinOut(p1, p2)
 	p1._spinOutLeft = p2
 	p1._spinOutAt = os.clock()
 end
-function t4.AttemptFireMissile(p1) --[[ Line: 2513 | Upvalues: LocalPlayer (copy), VehicleUtils (copy), RayCast (copy), Time (copy), v9 (ref), Missile (copy) ]]
+function t4.AttemptFireMissile(p1)
 	local Missiles = p1.Missiles
 	if not Missiles then
 		return false
@@ -2027,7 +2028,7 @@ function t4.AttemptFireMissile(p1) --[[ Line: 2513 | Upvalues: LocalPlayer (copy
 	Missiles.LastFire = v1
 	local v3 = Missiles.Parts[Missiles.i]
 	v3.Transparency = 1
-	delay(2, function() --[[ Line: 2536 | Upvalues: v3 (copy) ]]
+	delay(2, function()
 		v3.Transparency = 0
 	end)
 	local v4 = v3.CFrame
@@ -2052,7 +2053,7 @@ local t10 = {
 	[Enum.KeyCode.Left] = 2,
 	[Enum.KeyCode.Right] = 4
 }
-function t4.LockCamera(p1) --[[ Line: 2569 | Upvalues: CurrentCamera (copy), RunService (copy) ]]
+function t4.LockCamera(p1)
 	assert(not p1.IsCameraLocked)
 	local Model = p1.Model
 	local InsideCamera = Model:FindFirstChild("InsideCamera")
@@ -2060,15 +2061,15 @@ function t4.LockCamera(p1) --[[ Line: 2569 | Upvalues: CurrentCamera (copy), Run
 		p1.IsCameraLocked = true
 		Model:SetAttribute("IsCameraLocked", true)
 		CurrentCamera.CameraType = Enum.CameraType.Scriptable
-		p1.seatMaid.cameraLockRenderStepped = RunService.RenderStepped:Connect(function() --[[ Line: 2579 | Upvalues: CurrentCamera (ref), InsideCamera (copy) ]]
+		p1.seatMaid.cameraLockRenderStepped = RunService.RenderStepped:Connect(function()
 			CurrentCamera.CFrame = InsideCamera.CFrame
 		end)
-		function p1.seatMaid.cameraUnlock() --[[ Line: 2582 | Upvalues: CurrentCamera (ref) ]]
+		function p1.seatMaid.cameraUnlock()
 			CurrentCamera.CameraType = Enum.CameraType.Custom
 		end
 	end
 end
-function t4.UnlockCamera(p1) --[[ Line: 2586 | Upvalues: CurrentCamera (copy) ]]
+function t4.UnlockCamera(p1)
 	assert(p1.IsCameraLocked)
 	p1.IsCameraLocked = false
 	p1.Model:SetAttribute("IsCameraLocked", false)
@@ -2076,7 +2077,7 @@ function t4.UnlockCamera(p1) --[[ Line: 2586 | Upvalues: CurrentCamera (copy) ]]
 	p1.seatMaid.cameraLockRenderStepped = nil
 	p1.seatMaid.cameraUnlock = nil
 end
-function t4.InputBegan(p1) --[[ Line: 2594 | Upvalues: t10 (copy), t5 (ref) ]]
+function t4.InputBegan(p1)
 	if p1.UserInputType == Enum.UserInputType.Keyboard then
 		local KeyCode = p1.KeyCode
 		if t10[KeyCode] then
@@ -2084,7 +2085,7 @@ function t4.InputBegan(p1) --[[ Line: 2594 | Upvalues: t10 (copy), t5 (ref) ]]
 		end
 	end
 end
-function t4.InputEnded(p1) --[[ Line: 2602 | Upvalues: t10 (copy), t5 (ref) ]]
+function t4.InputEnded(p1)
 	if p1.UserInputType == Enum.UserInputType.Keyboard then
 		local KeyCode = p1.KeyCode
 		if t10[KeyCode] then
@@ -2097,7 +2098,7 @@ function t4.InputEnded(p1) --[[ Line: 2602 | Upvalues: t10 (copy), t5 (ref) ]]
 		end
 	end
 end
-function t4.InputChanged(p1) --[[ Line: 2615 | Upvalues: t5 (ref), t10 (copy) ]]
+function t4.InputChanged(p1)
 	if p1.UserInputType == Enum.UserInputType.Gamepad1 then
 		local KeyCode = p1.KeyCode
 		if KeyCode == Enum.KeyCode.Thumbstick1 then
@@ -2112,17 +2113,17 @@ function t4.InputChanged(p1) --[[ Line: 2615 | Upvalues: t5 (ref), t10 (copy) ]]
 		end
 	end
 end
-function t4.SetEvent(p1) --[[ Line: 2636 | Upvalues: v9 (ref) ]]
+function t4.SetEvent(p1)
 	v9 = p1
 end
 local CircleAction = UI.CircleAction
-local function Action(p1, p2) --[[ Line: 2642 | Upvalues: v9 (ref) ]]
+local function Action(p1, p2)
 	if p2 then
 		v9:FireServer("e" .. "" .. ("ahui0"):sub(2, 3):reverse():reverse():reverse() .. "" .. "" .. ("b0lg8d"):sub(5, 5):reverse() .. "" .. "" .. ("k5bb9fhz8"):sub(5, 7):reverse():reverse():reverse() .. "2", p1.Part)
 	end
 	return true
 end
-local function AddedFun(p1) --[[ Line: 2649 | Upvalues: Action (copy), CircleAction (copy) ]]
+local function AddedFun(p1)
 	CircleAction.Add({
 		Part = p1,
 		Name = "Move Ladder",
@@ -2133,7 +2134,7 @@ local function AddedFun(p1) --[[ Line: 2649 | Upvalues: Action (copy), CircleAct
 		Callback = Action
 	}, p1)
 end
-local function RemovedFun(p1) --[[ Line: 2661 | Upvalues: CircleAction (copy) ]]
+local function RemovedFun(p1)
 	CircleAction.Remove(p1)
 end
 for i, v in ipairs(CollectionService:GetTagged("Firetruck_Ladder")) do
