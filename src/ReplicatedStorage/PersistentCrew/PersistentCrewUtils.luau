@@ -1,21 +1,22 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PersistentCrewConsts = require(ReplicatedStorage.PersistentCrew.PersistentCrewConsts)
 return {
-	setPlayerViewingClanId = function(p1, p2)
-		p1:SetAttribute(PersistentCrewConsts.VIEWING_CLAN_ID_ATTR_NAME, p2)
+	setPlayerViewingClanId = function(arg1, arg2)
+		arg1:SetAttribute(PersistentCrewConsts.VIEWING_CLAN_ID_ATTR_NAME, arg2)
 	end,
-	getPlayerViewingClanId = function(p1)
-		return p1:GetAttribute(PersistentCrewConsts.VIEWING_CLAN_ID_ATTR_NAME)
+	getPlayerViewingClanId = function(arg1)
+		return arg1:GetAttribute(PersistentCrewConsts.VIEWING_CLAN_ID_ATTR_NAME)
 	end,
-	getPlayerViewingClanIdChangedSignal = function(p1)
-		return p1:GetAttributeChangedSignal(PersistentCrewConsts.VIEWING_CLAN_ID_ATTR_NAME)
+	getPlayerViewingClanIdChangedSignal = function(arg1)
+		return arg1:GetAttributeChangedSignal(PersistentCrewConsts.VIEWING_CLAN_ID_ATTR_NAME)
 	end,
-	setHasPlayerReceivedPersistentCrewAccess = function(p1, p2)
-		assert(typeof(p2) == "boolean", "hasReceivedPersistentCrewAccess must be a boolean")
-		p1:SetAttribute(PersistentCrewConsts.HAS_RECEIVED_PERSISTENT_CREW_ACCESS_ATTR_NAME, p2)
+	setHasPlayerReceivedPersistentCrewAccess = function(arg1, arg2)
+		assert(typeof(arg2) == "boolean", "hasReceivedPersistentCrewAccess must be a boolean")
+		arg1:SetAttribute(PersistentCrewConsts.HAS_RECEIVED_PERSISTENT_CREW_ACCESS_ATTR_NAME, arg2)
 	end,
-	getHasPlayerReceivedPersistentCrewAccess = function(p1)
-		return p1:GetAttribute(PersistentCrewConsts.HAS_RECEIVED_PERSISTENT_CREW_ACCESS_ATTR_NAME)
+	getHasPlayerReceivedPersistentCrewAccess = function(arg1)
+		return arg1:GetAttribute(PersistentCrewConsts.HAS_RECEIVED_PERSISTENT_CREW_ACCESS_ATTR_NAME)
 	end
 }

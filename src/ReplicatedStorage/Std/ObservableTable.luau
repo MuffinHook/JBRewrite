@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local table2Lua = require(ReplicatedStorage.Std.Debug.table2Lua)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)

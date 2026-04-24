@@ -1,7 +1,8 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer(false, {
-	setNetworkMutexLocked = function(p1, p2)
-		return p2.value
+	setNetworkMutexLocked = function(arg1, self)
+		return self.value
 	end
 })

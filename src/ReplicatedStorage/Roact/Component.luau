@@ -1,328 +1,329 @@
 -- Reviewed by Claude
+-- variables reassigned
 local assign = require(script.Parent.assign)
 local ComponentLifecyclePhase = require(script.Parent.ComponentLifecyclePhase)
 local Type = require(script.Parent.Type)
 local Symbol = require(script.Parent.Symbol)
 local invalidSetStateMessages = require(script.Parent.invalidSetStateMessages)
 local internalAssert = require(script.Parent.internalAssert)
-local v1 = require(script.Parent.GlobalConfig).get()
+local config = require(script.Parent.GlobalConfig).get()
 local typeSymbol = Symbol.named("InternalData")
 local t = {
-	__tostring = function(p1)
-		return p1.__componentName
+	__tostring = function(self)
+		return self.__componentName
 	end
 }
-local tbl = {}
-setmetatable(tbl, t)
-tbl[Type] = Type.StatefulComponentClass
-tbl.__index = tbl
-tbl.__componentName = "Component"
-function tbl.extend(p1, p2)
-	if v1.typeChecks then
-		local isStatefulComponentClass = Type.of(p1) == Type.StatefulComponentClass
+local tableObj = {}
+setmetatable(tableObj, t)
+tableObj[Type] = Type.StatefulComponentClass
+tableObj.__index = tableObj
+tableObj.__componentName = "Component"
+function tableObj.extend(self, callback)
+	if config.typeChecks then
+		local isStatefulComponentClass = Type.of(self) == Type.StatefulComponentClass
 		assert(isStatefulComponentClass, "Invalid `self` argument to `extend`.")
-		assert(typeof(p2) == "string", "Component class name must be a string")
+		assert(typeof(callback) == "string", "Component class name must be a string")
 	end
-	local tbl = {}
-	for k, v in pairs(p1) do
+	local tableObj = {}
+	for k, v in pairs(self) do
 		if k ~= "extend" then
-			tbl[k] = v
+			tableObj[k] = v
 		end
 	end
-	tbl[Type] = Type.StatefulComponentClass
-	tbl.__index = tbl
-	tbl.__componentName = p2
-	setmetatable(tbl, t)
-	return tbl
+	tableObj[Type] = Type.StatefulComponentClass
+	tableObj.__index = tableObj
+	tableObj.__componentName = callback
+	setmetatable(tableObj, t)
+	return tableObj
 end
-function tbl.__getDerivedState(p1, p2, p3)
-	if v1.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
+function tableObj.__getDerivedState(self, callback, p3)
+	if config.internalTypeChecks then
+		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__getDerivedState`")
 	end
-	local componentClass = p1[typeSymbol].componentClass
+	local componentClass = self[typeSymbol].componentClass
 	if componentClass.getDerivedStateFromProps == nil then
 		return nil
 	else
-		local v22 = componentClass.getDerivedStateFromProps(p2, p3)
-		if v22 == nil then
+		local derivedState = componentClass.getDerivedStateFromProps(callback, p3)
+		if derivedState == nil then
 			return nil
 		else
-			if v1.typeChecks then
-				assert(typeof(v22) == "table", "getDerivedStateFromProps must return a table!")
+			if config.typeChecks then
+				assert(typeof(derivedState) == "table", "getDerivedStateFromProps must return a table!")
 			end
-			return v22
+			return derivedState
 		end
 	end
 end
-function tbl.setState(p1, p2)
-	if v1.typeChecks then
-		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
+function tableObj.setState(self, callback)
+	if config.typeChecks then
+		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
 		assert(isStatefulComponentInstance, "Invalid `self` argument to `extend`.")
 	end
-	local v12 = p1[typeSymbol]
-	local lifecyclePhase = v12.lifecyclePhase
+	local internalData = self[typeSymbol]
+	local lifecyclePhase = internalData.lifecyclePhase
 	if lifecyclePhase == ComponentLifecyclePhase.ShouldUpdate or (lifecyclePhase == ComponentLifecyclePhase.WillUpdate or lifecyclePhase == ComponentLifecyclePhase.Render) then
-		error(invalidSetStateMessages[v12.lifecyclePhase]:format((tostring(v12.componentClass))), 2)
+		error(invalidSetStateMessages[internalData.lifecyclePhase]:format((tostring(internalData.componentClass))), 2)
 	end
-	local v22, v3, v7
+	local derivedState, newState, mergedState
 	if lifecyclePhase == ComponentLifecyclePhase.WillUnmount then
 		return
 	end
-	v22 = v12.pendingState
-	if typeof(p2) == "function" then
-		local v4, v5
-		v4 = v22 or p1.state
-		v5 = p2(v4, p1.props)
-		if v5 == nil then
+	derivedState = internalData.pendingState
+	if typeof(callback) == "function" then
+		local currentState, nextState
+		currentState = derivedState or self.state
+		nextState = callback(currentState, self.props)
+		if nextState == nil then
 			return
 		end
-		v3 = v5
-	elseif typeof(p2) == "table" then
-		v3 = p2
+		newState = nextState
+	elseif typeof(callback) == "table" then
+		newState = callback
 	else
 		error("Invalid argument to setState, expected function or table", 2)
 	end
-	if v22 == nil then
-		local v6
-		v6 = assign({}, p1.state, v3)
-		v7 = v6
+	if derivedState == nil then
+		local tempState
+		tempState = assign({}, self.state, newState)
+		mergedState = tempState
 	else
-		local v8
-		v8 = assign(v22, v3)
-		v7 = v8
+		local updatedState
+		updatedState = assign(derivedState, newState)
+		mergedState = updatedState
 	end
 	if lifecyclePhase == ComponentLifecyclePhase.Init then
-		p1.state = assign(v7, (p1:__getDerivedState(p1.props, v7)))
+		self.state = assign(mergedState, (self:__getDerivedState(self.props, mergedState)))
 	else
-		local v9, v10, v11
+		local finalState, var10, var11
 		if lifecyclePhase == ComponentLifecyclePhase.DidMount or (lifecyclePhase == ComponentLifecyclePhase.DidUpdate or lifecyclePhase == ComponentLifecyclePhase.ReconcileChildren) then
-			v12.pendingState = assign(v7, (p1:__getDerivedState(p1.props, v7)))
+			internalData.pendingState = assign(mergedState, (self:__getDerivedState(self.props, mergedState)))
 		elseif lifecyclePhase == ComponentLifecyclePhase.Idle then
-			p1:__update(nil, v7)
+			self:__update(nil, mergedState)
 		else
-			v9 = invalidSetStateMessages.default
-			v10 = v12.componentClass
-			v11 = v9:format((tostring(v10)))
-			error(v11, 2)
+			finalState = invalidSetStateMessages.default
+			var10 = internalData.componentClass
+			var11 = finalState:format((tostring(var10)))
+			error(var11, 2)
 		end
 	end
 end
-function tbl.getElementTraceback(p1)
-	return p1[typeSymbol].virtualNode.currentElement.source
+function tableObj.getElementTraceback(self)
+	return self[typeSymbol].virtualNode.currentElement.source
 end
-function tbl.render(p1)
-	error(("The component %q is missing the `render` method.\n`render` must be defined when creating a Roact component!"):format((tostring(p1[typeSymbol].componentClass))), 0)
+function tableObj.render(self)
+	error(("The component %q is missing the `render` method.\n`render` must be defined when creating a Roact component!"):format((tostring(self[typeSymbol].componentClass))), 0)
 end
-function tbl.__getContext(p1, p2)
-	if v1.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
+function tableObj.__getContext(self, callback)
+	if config.internalTypeChecks then
+		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__getContext`")
-		internalAssert(p2 ~= nil, "Context key cannot be nil")
+		internalAssert(callback ~= nil, "Context key cannot be nil")
 	end
-	return p1[typeSymbol].virtualNode.context[p2]
+	return self[typeSymbol].virtualNode.context[callback]
 end
-function tbl.__addContext(p1, p2, p3)
-	if v1.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
+function tableObj.__addContext(self, callback, p3)
+	if config.internalTypeChecks then
+		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__addContext`")
 	end
-	local virtualNode = p1[typeSymbol].virtualNode
+	local virtualNode = self[typeSymbol].virtualNode
 	if virtualNode.originalContext == nil then
 		virtualNode.originalContext = virtualNode.context
 	end
 	virtualNode.context = assign({}, virtualNode.context, {
-		[p2] = p3
+		[callback] = p3
 	})
 end
-function tbl.__validateProps(p1, p2)
-	if v1.propValidation then
-		local validateProps = p1[typeSymbol].componentClass.validateProps
+function tableObj.__validateProps(self, callback)
+	if config.propValidation then
+		local validateProps = self[typeSymbol].componentClass.validateProps
 		if validateProps ~= nil then
 			if typeof(validateProps) ~= "function" then
-				error(("validateProps must be a function, but it is a %s.\nCheck the definition of the component %q."):format(typeof(validateProps), p1.__componentName))
+				error(("validateProps must be a function, but it is a %s.\nCheck the definition of the component %q."):format(typeof(validateProps), self.__componentName))
 			end
-			local v12, v22 = validateProps(p2)
-			if not v12 then
-				error(("Property validation failed in %s: %s\n\n%s"):format(p1.__componentName, tostring(v22 or "<Validator function did not supply a message>"), p1:getElementTraceback() or "<enable element tracebacks>"), 0)
+			local internalData, derivedState = validateProps(callback)
+			if not internalData then
+				error(("Property validation failed in %s: %s\n\n%s"):format(self.__componentName, tostring(derivedState or "<Validator function did not supply a message>"), self:getElementTraceback() or "<enable element tracebacks>"), 0)
 			end
 		end
 	end
 end
-function tbl.__mount(p1, p2, p3)
-	if v1.internalTypeChecks then
-		local isStatefulComponentClass = Type.of(p1) == Type.StatefulComponentClass
+function tableObj.__mount(self, callback, p3)
+	if config.internalTypeChecks then
+		local isStatefulComponentClass = Type.of(self) == Type.StatefulComponentClass
 		internalAssert(isStatefulComponentClass, "Invalid use of `__mount`")
 		internalAssert(Type.of(p3) == Type.VirtualNode, "Expected arg #2 to be of type VirtualNode")
 	end
 	local currentElement = p3.currentElement
 	local hostParent = p3.hostParent
 	local t = {
-		reconciler = p2,
+		reconciler = callback,
 		virtualNode = p3,
-		componentClass = p1,
+		componentClass = self,
 		lifecyclePhase = ComponentLifecyclePhase.Init,
 		pendingState = nil
 	}
-	local tbl = {
+	local tableObj = {
 		[Type] = Type.StatefulComponentInstance,
 		[typeSymbol] = t
 	}
-	setmetatable(tbl, p1)
-	p3.instance = tbl
+	setmetatable(tableObj, self)
+	p3.instance = tableObj
 	local props = currentElement.props
-	if p1.defaultProps ~= nil then
-		props = assign({}, p1.defaultProps, props)
+	if self.defaultProps ~= nil then
+		props = assign({}, self.defaultProps, props)
 	end
-	tbl:__validateProps(props)
-	tbl.props = props
-	tbl._context = assign({}, p3.legacyContext)
-	tbl.state = assign({}, tbl:__getDerivedState(tbl.props, {}))
-	if tbl.init ~= nil then
-		tbl:init(tbl.props)
-		assign(tbl.state, tbl:__getDerivedState(tbl.props, tbl.state))
+	tableObj:__validateProps(props)
+	tableObj.props = props
+	tableObj._context = assign({}, p3.legacyContext)
+	tableObj.state = assign({}, tableObj:__getDerivedState(tableObj.props, {}))
+	if tableObj.init ~= nil then
+		tableObj:init(tableObj.props)
+		assign(tableObj.state, tableObj:__getDerivedState(tableObj.props, tableObj.state))
 	end
-	p3.legacyContext = tbl._context
+	p3.legacyContext = tableObj._context
 	t.lifecyclePhase = ComponentLifecyclePhase.Render
-	local v5 = tbl:render()
+	local nextState = tableObj:render()
 	t.lifecyclePhase = ComponentLifecyclePhase.ReconcileChildren
-	p2.updateVirtualNodeWithRenderResult(p3, hostParent, v5)
-	if tbl.didMount ~= nil then
+	callback.updateVirtualNodeWithRenderResult(p3, hostParent, nextState)
+	if tableObj.didMount ~= nil then
 		t.lifecyclePhase = ComponentLifecyclePhase.DidMount
-		tbl:didMount()
+		tableObj:didMount()
 	end
 	if t.pendingState ~= nil then
-		tbl:__update(nil, nil)
+		tableObj:__update(nil, nil)
 	end
 	t.lifecyclePhase = ComponentLifecyclePhase.Idle
 end
-function tbl.__unmount(p1)
-	if v1.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
+function tableObj.__unmount(self)
+	if config.internalTypeChecks then
+		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__unmount`")
 	end
-	local v22 = p1[typeSymbol]
-	local virtualNode = v22.virtualNode
-	local reconciler = v22.reconciler
-	if p1.willUnmount ~= nil then
-		v22.lifecyclePhase = ComponentLifecyclePhase.WillUnmount
-		p1:willUnmount()
+	local derivedState = self[typeSymbol]
+	local virtualNode = derivedState.virtualNode
+	local reconciler = derivedState.reconciler
+	if self.willUnmount ~= nil then
+		derivedState.lifecyclePhase = ComponentLifecyclePhase.WillUnmount
+		self:willUnmount()
 	end
 	for k, v in pairs(virtualNode.children) do
 		reconciler.unmountVirtualNode(v)
 	end
 end
-function tbl.__update(p1, p2, p3)
-	if v1.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
+function tableObj.__update(self, callback, p3)
+	if config.internalTypeChecks then
+		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__update`")
-		internalAssert(Type.of(p2) == Type.Element or p2 == nil, "Expected arg #1 to be of type Element or nil")
+		internalAssert(Type.of(callback) == Type.Element or callback == nil, "Expected arg #1 to be of type Element or nil")
 		internalAssert(typeof(p3) == "table" or p3 == nil, "Expected arg #2 to be of type table or nil")
 	end
-	local v6 = p1[typeSymbol]
-	local componentClass = v6.componentClass
-	local props = p1.props
-	if p2 ~= nil then
-		props = p2.props
+	local tempState = self[typeSymbol]
+	local componentClass = tempState.componentClass
+	local props = self.props
+	if callback ~= nil then
+		props = callback.props
 		if componentClass.defaultProps ~= nil then
 			props = assign({}, componentClass.defaultProps, props)
 		end
-		p1:__validateProps(props)
+		self:__validateProps(props)
 	end
 	local count = 0
 	while true do
-		local v8, v9, v10
-		if v6.pendingState == nil then
-			v8 = nil
+		local updatedState, finalState, var10
+		if tempState.pendingState == nil then
+			updatedState = nil
 		else
-			v8 = v6.pendingState
-			v6.pendingState = nil
+			updatedState = tempState.pendingState
+			tempState.pendingState = nil
 		end
-		if p3 == nil and props == p1.props then
-			v9 = v8
+		if p3 == nil and props == self.props then
+			finalState = updatedState
 		else
-			if v8 == nil then
-				v10 = p3 or p1.state
-				v9 = v10
+			if updatedState == nil then
+				var10 = p3 or self.state
+				finalState = var10
 			else
-				v9 = assign(v8, p3)
+				finalState = assign(updatedState, p3)
 			end
-			local v12 = p1:__getDerivedState(props, v9)
-			if v12 ~= nil then
-				v9 = assign({}, v9, v12)
+			local internalData = self:__getDerivedState(props, finalState)
+			if internalData ~= nil then
+				finalState = assign({}, finalState, internalData)
 			end
 			p3 = nil
 		end
-		if not p1:__resolveUpdate(props, v9) then
+		if not self:__resolveUpdate(props, finalState) then
 			return false
 		end
 		count = count + 1
 		if count > 100 then
 			local v14 = error
-			v14(("The component %q has reached the setState update recursion limit.\nWhen using `setState` in `didUpdate`, make sure that it won\'t repeat infinitely!"):format((tostring(v6.componentClass))), 3)
+			v14(("The component %q has reached the setState update recursion limit.\nWhen using `setState` in `didUpdate`, make sure that it won\'t repeat infinitely!"):format((tostring(tempState.componentClass))), 3)
 		end
-		if v6.pendingState == nil then
+		if tempState.pendingState == nil then
 			return true
 		end
 	end
 end
-function tbl.__resolveUpdate(p1, p2, p3)
-	if v1.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
+function tableObj.__resolveUpdate(self, callback, p3)
+	if config.internalTypeChecks then
+		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__resolveUpdate`")
 	end
-	local v22 = p1[typeSymbol]
-	local virtualNode = v22.virtualNode
-	local reconciler = v22.reconciler
-	local props = p1.props
-	local state = p1.state
-	if p2 == nil then
-		p2 = props
+	local derivedState = self[typeSymbol]
+	local virtualNode = derivedState.virtualNode
+	local reconciler = derivedState.reconciler
+	local props = self.props
+	local state = self.state
+	if callback == nil then
+		callback = props
 	end
 	if p3 == nil then
 		p3 = state
 	end
-	local v3
-	if p1.shouldUpdate == nil then
-		if p1.willUpdate ~= nil then
-			v22.lifecyclePhase = ComponentLifecyclePhase.WillUpdate
-			p1:willUpdate(p2, p3)
+	local newState
+	if self.shouldUpdate == nil then
+		if self.willUpdate ~= nil then
+			derivedState.lifecyclePhase = ComponentLifecyclePhase.WillUpdate
+			self:willUpdate(callback, p3)
 		end
-		v22.lifecyclePhase = ComponentLifecyclePhase.Render
-		p1.props = p2
-		p1.state = p3
-		v3 = virtualNode.instance:render()
-		v22.lifecyclePhase = ComponentLifecyclePhase.ReconcileChildren
-		reconciler.updateVirtualNodeWithRenderResult(virtualNode, virtualNode.hostParent, v3)
-		if p1.didUpdate ~= nil then
-			v22.lifecyclePhase = ComponentLifecyclePhase.DidUpdate
-			p1:didUpdate(props, state)
+		derivedState.lifecyclePhase = ComponentLifecyclePhase.Render
+		self.props = callback
+		self.state = p3
+		newState = virtualNode.instance:render()
+		derivedState.lifecyclePhase = ComponentLifecyclePhase.ReconcileChildren
+		reconciler.updateVirtualNodeWithRenderResult(virtualNode, virtualNode.hostParent, newState)
+		if self.didUpdate ~= nil then
+			derivedState.lifecyclePhase = ComponentLifecyclePhase.DidUpdate
+			self:didUpdate(props, state)
 		end
-		v22.lifecyclePhase = ComponentLifecyclePhase.Idle
+		derivedState.lifecyclePhase = ComponentLifecyclePhase.Idle
 		return true
 	else
-		v22.lifecyclePhase = ComponentLifecyclePhase.ShouldUpdate
-		if p1:shouldUpdate(p2, p3) then
-			if p1.willUpdate ~= nil then
-				v22.lifecyclePhase = ComponentLifecyclePhase.WillUpdate
-				p1:willUpdate(p2, p3)
+		derivedState.lifecyclePhase = ComponentLifecyclePhase.ShouldUpdate
+		if self:shouldUpdate(callback, p3) then
+			if self.willUpdate ~= nil then
+				derivedState.lifecyclePhase = ComponentLifecyclePhase.WillUpdate
+				self:willUpdate(callback, p3)
 			end
-			v22.lifecyclePhase = ComponentLifecyclePhase.Render
-			p1.props = p2
-			p1.state = p3
-			v3 = virtualNode.instance:render()
-			v22.lifecyclePhase = ComponentLifecyclePhase.ReconcileChildren
-			reconciler.updateVirtualNodeWithRenderResult(virtualNode, virtualNode.hostParent, v3)
-			if p1.didUpdate ~= nil then
-				v22.lifecyclePhase = ComponentLifecyclePhase.DidUpdate
-				p1:didUpdate(props, state)
+			derivedState.lifecyclePhase = ComponentLifecyclePhase.Render
+			self.props = callback
+			self.state = p3
+			newState = virtualNode.instance:render()
+			derivedState.lifecyclePhase = ComponentLifecyclePhase.ReconcileChildren
+			reconciler.updateVirtualNodeWithRenderResult(virtualNode, virtualNode.hostParent, newState)
+			if self.didUpdate ~= nil then
+				derivedState.lifecyclePhase = ComponentLifecyclePhase.DidUpdate
+				self:didUpdate(props, state)
 			end
-			v22.lifecyclePhase = ComponentLifecyclePhase.Idle
+			derivedState.lifecyclePhase = ComponentLifecyclePhase.Idle
 			return true
 		else
-			v22.lifecyclePhase = ComponentLifecyclePhase.Idle
+			derivedState.lifecyclePhase = ComponentLifecyclePhase.Idle
 			return false
 		end
 	end
 end
-return tbl
+return tableObj

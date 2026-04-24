@@ -1,79 +1,80 @@
 -- Reviewed by Claude
+-- variables reassigned
 local createSignal = require(script.Parent.createSignal)
 local Symbol = require(script.Parent.Symbol)
 local Type = require(script.Parent.Type)
-local v1 = require(script.Parent.GlobalConfig).get()
+local config = require(script.Parent.GlobalConfig).get()
 local typeSymbol = Symbol.named("BindingImpl")
-local tbl = {}
+local tableObj = {}
 local tbl3 = {
 	__index = {
-		getValue = function(p1)
-			return tbl.getValue(p1)
+		getValue = function(self)
+			return tableObj.getValue(self)
 		end,
-		map = function(p1, p2)
-			return tbl.map(p1, p2)
+		map = function(self, callback)
+			return tableObj.map(self, callback)
 		end
 	},
-	__tostring = function(p1)
-		return string.format("RoactBinding(%s)", (tostring(p1:getValue())))
+	__tostring = function(self)
+		return string.format("RoactBinding(%s)", (tostring(self:getValue())))
 	end
 }
-function tbl.update(p1, p2)
-	return p1[typeSymbol].update(p2)
+function tableObj.update(self, callback)
+	return self[typeSymbol].update(callback)
 end
-function tbl.subscribe(p1, p2)
-	return p1[typeSymbol].subscribe(p2)
+function tableObj.subscribe(self, callback)
+	return self[typeSymbol].subscribe(callback)
 end
-function tbl.getValue(p1)
-	return p1[typeSymbol].getValue()
+function tableObj.getValue(self)
+	return self[typeSymbol].getValue()
 end
-function tbl.create(p1)
-	local tbl = {
-		value = p1,
+function tableObj.create(self)
+	local tableObj = {
+		value = self,
 		changeSignal = createSignal()
 	}
-	function tbl.subscribe(p1)
-		return tbl.changeSignal:subscribe(p1)
+	function tableObj.subscribe(self)
+		return tableObj.changeSignal:subscribe(self)
 	end
-	function tbl.update(p1)
-		tbl.value = p1
-		tbl.changeSignal:fire(p1)
+	function tableObj.update(self)
+		tableObj.value = self
+		tableObj.changeSignal:fire(self)
 	end
-	function tbl.getValue()
-		return tbl.value
+	function tableObj.getValue()
+		return tableObj.value
 	end
 	return setmetatable({
 		[Type] = Type.Binding,
-		[typeSymbol] = tbl
-	}, tbl3), tbl.update
+		[typeSymbol] = tableObj
+	}, tbl3), tableObj.update
 end
-function tbl.map(p1, p2)
-	if v1.typeChecks then
-		local isBinding = Type.of(p1) == Type.Binding
+function tableObj.map(self, callback)
+	if config.typeChecks then
+		local isBinding = Type.of(self) == Type.Binding
 		assert(isBinding, "Expected arg #1 to be a binding")
-		assert(typeof(p2) == "function", "Expected arg #1 to be a function")
+		assert(typeof(callback) == "function", "Expected arg #1 to be a function")
 	end
 	return setmetatable({
 		[Type] = Type.Binding,
 		[typeSymbol] = {
-			subscribe = function(p12)
-				return tbl.subscribe(p1, function(p1)
-					p12(p2(p1))
+			subscribe = function(param12)
+				return tableObj.subscribe(self, function(self)
+					param12(callback(self))
 				end)
 			end,
-			update = function(p1)
+			update = function(self)
 				error("Bindings created by Binding:map(fn) cannot be updated directly", 2)
 			end,
 			getValue = function()
-				return p2(p1:getValue())
+				return callback(self:getValue())
 			end
 		}
 	}, tbl3)
 end
-function tbl.join(p1)
-	if v1.typeChecks then
-		assert(typeof(p1) == "table", "Expected arg #1 to be of type table")
-		for k, v in pairs(p1) do
+function tableObj.join(self)
+	if config.typeChecks then
+		assert(typeof(self) == "table", "Expected arg #1 to be of type table")
+		for k, v in pairs(self) do
 			if Type.of(v) ~= Type.Binding then
 				error(("Expected arg #1 to contain only bindings, but key %q had a non-binding value"):format((tostring(k))), 2)
 			end
@@ -81,17 +82,17 @@ function tbl.join(p1)
 	end
 	local tbl2 = {}
 	local function getValue()
-		local tbl = {}
-		for k, v in pairs(p1) do
-			tbl[k] = v:getValue()
+		local tableObj = {}
+		for k, v in pairs(self) do
+			tableObj[k] = v:getValue()
 		end
-		return tbl
+		return tableObj
 	end
-	function tbl2.subscribe(p12)
+	function tbl2.subscribe(param12)
 		local tbl3 = {}
-		for k, v in pairs(p1) do
-			tbl3[k] = tbl.subscribe(v, function(p1)
-				p12((getValue()))
+		for k, v in pairs(self) do
+			tbl3[k] = tableObj.subscribe(v, function(self)
+				param12((getValue()))
 			end)
 		end
 		return function()
@@ -103,7 +104,7 @@ function tbl.join(p1)
 			end
 		end
 	end
-	function tbl2.update(p1)
+	function tbl2.update(self)
 		error("Bindings created by joinBindings(...) cannot be updated directly", 2)
 	end
 	function tbl2.getValue()
@@ -114,4 +115,4 @@ function tbl.join(p1)
 		[typeSymbol] = tbl2
 	}, tbl3)
 end
-return tbl
+return tableObj

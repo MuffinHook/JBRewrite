@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {
 	clamp01 = function(p1, p2, p3)
 		return math.clamp(p1, 0, 1), math.clamp(p2, 0, 1), math.clamp(p3, 0, 1)

@@ -1,11 +1,11 @@
 -- Reviewed by Claude
 return {
-	named = function(p1)
- assert(type(p1) == "string", "Symbols must be created using a string name!")
+	named = function(self)
+ assert(type(self) == "string", "Symbols must be created using a string name!")
  local metaProxy = newproxy(true)
- local v3 = ("Symbol(%s)"):format(p1)
+ local newState = ("Symbol(%s)"):format(self)
  getmetatable(metaProxy).__tostring = function()
- return v3
+ return newState
  end
  return metaProxy
 	end

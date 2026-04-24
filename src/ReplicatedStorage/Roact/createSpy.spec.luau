@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local createSpy = require(script.Parent.createSpy)
 	describe("createSpy", function()
@@ -62,9 +63,9 @@ return function()
  it("should capture all values in a table", function()
  local fn = createSpy(function() end)
  fn.value(1, 2)
- local v2 = fn:captureValues("a", "b")
- expect(v2.a).to.equal(1)
- expect(v2.b).to.equal(2)
+ local var2 = fn:captureValues("a", "b")
+ expect(var2.a).to.equal(1)
+ expect(var2.b).to.equal(2)
  end)
 	end)
 end

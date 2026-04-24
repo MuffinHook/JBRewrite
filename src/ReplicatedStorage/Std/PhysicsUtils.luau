@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {
 	calculateVelocityForDesiredDistance = function(p1, p2, p3)
 		assert(typeof(p1) == "number")

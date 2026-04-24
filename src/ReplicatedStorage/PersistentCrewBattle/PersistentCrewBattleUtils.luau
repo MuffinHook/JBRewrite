@@ -1,66 +1,67 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
 local t = {
 	getBattleServerInitTime = function()
 		return ReplicatedStorage:GetAttribute(PersistentCrewBattleConsts.BATTLE_SERVER_INIT_TIME_ATTR_NAME)
 	end,
-	setBattleServerInitTime = function(p1)
-		return ReplicatedStorage:SetAttribute(PersistentCrewBattleConsts.BATTLE_SERVER_INIT_TIME_ATTR_NAME, p1)
+	setBattleServerInitTime = function(self)
+		return ReplicatedStorage:SetAttribute(PersistentCrewBattleConsts.BATTLE_SERVER_INIT_TIME_ATTR_NAME, self)
 	end,
 	getRoundStartsAt = function()
 		return ReplicatedStorage:GetAttribute(PersistentCrewBattleConsts.ROUND_STARTS_AT_ATTR_NAME)
 	end,
-	setRoundStartsAt = function(p1)
-		ReplicatedStorage:SetAttribute(PersistentCrewBattleConsts.ROUND_STARTS_AT_ATTR_NAME, p1)
+	setRoundStartsAt = function(self)
+		ReplicatedStorage:SetAttribute(PersistentCrewBattleConsts.ROUND_STARTS_AT_ATTR_NAME, self)
 	end,
 	getRoundStartsAtAttributeChangedSignal = function()
 		return ReplicatedStorage:GetAttributeChangedSignal(PersistentCrewBattleConsts.ROUND_STARTS_AT_ATTR_NAME)
 	end,
-	getCrewStartTime = function(p1)
-		return p1:GetAttribute(PersistentCrewBattleConsts.ROUND_START_ATTR_NAME)
+	getCrewStartTime = function(self)
+		return self:GetAttribute(PersistentCrewBattleConsts.ROUND_START_ATTR_NAME)
 	end,
-	setCrewStartTime = function(p1, p2)
-		p1:SetAttribute(PersistentCrewBattleConsts.ROUND_START_ATTR_NAME, p2)
+	setCrewStartTime = function(self, arg2)
+		self:SetAttribute(PersistentCrewBattleConsts.ROUND_START_ATTR_NAME, arg2)
 	end,
-	getCrewPenaltyDuration = function(p1)
-		return p1:GetAttribute(PersistentCrewBattleConsts.ROUND_PENALTY_DURATION_ATTR_NAME)
+	getCrewPenaltyDuration = function(self)
+		return self:GetAttribute(PersistentCrewBattleConsts.ROUND_PENALTY_DURATION_ATTR_NAME)
 	end,
-	setCrewPenaltyDuration = function(p1, p2)
-		p1:SetAttribute(PersistentCrewBattleConsts.ROUND_PENALTY_DURATION_ATTR_NAME, p2)
+	setCrewPenaltyDuration = function(self, arg2)
+		self:SetAttribute(PersistentCrewBattleConsts.ROUND_PENALTY_DURATION_ATTR_NAME, arg2)
 	end
 }
-function t.getCrewDurationElapsed(p1)
-	local v1 = t.getCrewStartTime(p1)
-	return workspace:GetServerTimeNow() - v1
+function t.getCrewDurationElapsed(self)
+	local local1 = t.getCrewStartTime(self)
+	return workspace:GetServerTimeNow() - local1
 end
-function t.getCrewEffectiveDurationElapsed(p1)
-	local v1 = t.getCrewPenaltyDuration(p1)
-	return t.getCrewDurationElapsed(p1) + v1
+function t.getCrewEffectiveDurationElapsed(self)
+	local local1 = t.getCrewPenaltyDuration(self)
+	return t.getCrewDurationElapsed(self) + local1
 end
-function t.getCrewTimeTook(p1)
-	return p1:GetAttribute(PersistentCrewBattleConsts.ROUND_TIME_TOOK_ATTR_NAME)
+function t.getCrewTimeTook(self)
+	return self:GetAttribute(PersistentCrewBattleConsts.ROUND_TIME_TOOK_ATTR_NAME)
 end
-function t.setCrewRoundTimeTook(p1, p2)
-	p1:SetAttribute(PersistentCrewBattleConsts.ROUND_TIME_TOOK_ATTR_NAME, p2)
+function t.setCrewRoundTimeTook(self, arg2)
+	self:SetAttribute(PersistentCrewBattleConsts.ROUND_TIME_TOOK_ATTR_NAME, arg2)
 end
-function t.getCrewRoundRobberiesDone(p1)
-	return p1:GetAttribute(PersistentCrewBattleConsts.ROUND_ROBBERIES_DONE_ATTR_NAME)
+function t.getCrewRoundRobberiesDone(self)
+	return self:GetAttribute(PersistentCrewBattleConsts.ROUND_ROBBERIES_DONE_ATTR_NAME)
 end
-function t.setCrewRoundRobberiesDone(p1, p2)
-	p1:SetAttribute(PersistentCrewBattleConsts.ROUND_ROBBERIES_DONE_ATTR_NAME, p2)
+function t.setCrewRoundRobberiesDone(self, arg2)
+	self:SetAttribute(PersistentCrewBattleConsts.ROUND_ROBBERIES_DONE_ATTR_NAME, arg2)
 end
 function t.getAttackingCrewStartTime()
 	return t.getCrewStartTime(t.getAttackingCrewObj())
 end
-function t.setAttackingCrewStartTime(p1)
-	t.setCrewStartTime(t.getAttackingCrewObj(), p1)
+function t.setAttackingCrewStartTime(self)
+	t.setCrewStartTime(t.getAttackingCrewObj(), self)
 end
 function t.getAttackingCrewPenaltyDuration()
 	return t.getCrewPenaltyDuration(t.getAttackingCrewObj())
 end
-function t.setAttackingCrewPenaltyDuration(p1)
-	t.setCrewPenaltyDuration(t.getAttackingCrewObj(), p1)
+function t.setAttackingCrewPenaltyDuration(self)
+	t.setCrewPenaltyDuration(t.getAttackingCrewObj(), self)
 end
 function t.getAttackingCrewEffectiveDurationElapsed()
 	return t.getCrewEffectiveDurationElapsed(t.getAttackingCrewObj())
@@ -74,72 +75,72 @@ end
 function t.getAttackingClanIdChangedSignal()
 	return t.getAllCrewBattleDataObj():GetAttributeChangedSignal(PersistentCrewBattleConsts.ATTACKING_CLAN_ID)
 end
-function t.setAttackingClanId(p1)
-	t.getAllCrewBattleDataObj():SetAttribute(PersistentCrewBattleConsts.ATTACKING_CLAN_ID, p1)
+function t.setAttackingClanId(self)
+	t.getAllCrewBattleDataObj():SetAttribute(PersistentCrewBattleConsts.ATTACKING_CLAN_ID, self)
 end
-function t.getCrewObjFromClanId(p1)
-	assert(p1 ~= nil, "clanId cannot be nil")
-	return t.getAllCrewBattleDataObj():FindFirstChild(p1)
+function t.getCrewObjFromClanId(self)
+	assert(self ~= nil, "clanId cannot be nil")
+	return t.getAllCrewBattleDataObj():FindFirstChild(self)
 end
 function t.getAttackingCrewObj()
 	return t.getCrewObjFromClanId(t.getAttackingClanId())
 end
-function t.getClanBattleInfoFromClanData(p1, p2)
-	if p1 then
-		local v1 = nil
-		if p2 then
-			return p1.AllTimeClanBattleInfo
+function t.getClanBattleInfoFromClanData(self, arg2)
+	if self then
+		local local1 = nil
+		if arg2 then
+			return self.AllTimeClanBattleInfo
 		else
-			if p1.SeasonClanBattleInfo then
-				v1 = p1.SeasonClanBattleInfo[tostring(PersistentCrewBattleConsts.CURR_CREW_BATTLE_SEASON)]
+			if self.SeasonClanBattleInfo then
+				local1 = self.SeasonClanBattleInfo[tostring(PersistentCrewBattleConsts.CURR_CREW_BATTLE_SEASON)]
 			end
-			return v1
+			return local1
 		end
 	else
 		return nil
 	end
 end
-function t.validateClanRatingData(p1)
-	local v1, v2 = pcall(function()
-		if p1 then
-			assert(if typeof(p1.Rating) == "number" then p1.Rating > 0 else false, "Invalid Rating")
-			assert(if typeof(p1.RatingDeviation) == "number" then p1.RatingDeviation > 0 else false, "Invalid RatingDeviation")
-			assert(if typeof(p1.Sigma) == "number" then p1.Sigma > 0 else false, "Invalid Sigma")
-			assert(if typeof(p1.LastBattle) == "number" then p1.LastBattle > 0 else false, "Invalid LastBattle")
+function t.validateClanRatingData(self)
+	local local1, local2 = pcall(function()
+		if self then
+			assert(if typeof(self.Rating) == "number" then self.Rating > 0 else false, "Invalid Rating")
+			assert(if typeof(self.RatingDeviation) == "number" then self.RatingDeviation > 0 else false, "Invalid RatingDeviation")
+			assert(if typeof(self.Sigma) == "number" then self.Sigma > 0 else false, "Invalid Sigma")
+			assert(if typeof(self.LastBattle) == "number" then self.LastBattle > 0 else false, "Invalid LastBattle")
 		end
 	end)
-	if not v1 then
-		warn(v2)
+	if not local1 then
+		warn(local2)
 	end
-	return v1
+	return local1
 end
 function t.getDefaultRatingData()
-	local t2 = {
+	local table2 = {
 		Rating = PersistentCrewBattleConsts.DEFAULT_RATING,
 		RatingDeviation = PersistentCrewBattleConsts.DEFAULT_RATING_DEVIATION,
 		Sigma = PersistentCrewBattleConsts.DEFAULT_SIGMA_GRINDSET,
 		LastBattle = workspace:GetServerTimeNow()
 	}
-	t.validateClanRatingData(t2)
-	return t2
+	t.validateClanRatingData(table2)
+	return table2
 end
-function t.getDisplayRatingFromClanBattleInfo(p1)
-	local v1 = p1 and p1.RatingData
-	if not v1 then
-		v1 = t.getDefaultRatingData()
+function t.getDisplayRatingFromClanBattleInfo(self)
+	local local1 = self and self.RatingData
+	if not local1 then
+		local1 = t.getDefaultRatingData()
 	end
-	local v4 = tostring((math.floor(v1.Rating)))
-	if not p1 or (not p1.BattlesPlayed or p1.BattlesPlayed < PersistentCrewBattleConsts.NUM_PROVISIONAL_RATING_BATTLES) then
-		v4 = v4 .. "?"
+	local local4 = tostring((math.floor(local1.Rating)))
+	if not self or (not self.BattlesPlayed or self.BattlesPlayed < PersistentCrewBattleConsts.NUM_PROVISIONAL_RATING_BATTLES) then
+		local4 = local4 .. "?"
 	end
-	return v4
+	return local4
 end
-function t.calculateWLRatio(p1, p2)
-	if p1 and p2 and p2 > 0 then
-		if p2 - p1 == 0 then
+function t.calculateWLRatio(self, arg2)
+	if self and arg2 and arg2 > 0 then
+		if arg2 - self == 0 then
 			return "\226\136\158"
 		else
-			return string.format("%.2f", p1 / (p2 - p1))
+			return string.format("%.2f", self / (arg2 - self))
 		end
 	else
 		return nil

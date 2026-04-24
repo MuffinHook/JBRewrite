@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DuffelBagBinder = require(ReplicatedStorage.Game.DuffelBag.DuffelBagBinder)
@@ -13,14 +14,14 @@ DuffelBagBinder:GetClassAddedSignal():Connect(function(p1)
 		v1:DoCleaning()
 		local v12 = p1:GetRobbery()
 		if p1:GetOwner() == Players.LocalPlayer and v12 == RobberyConsts.ENUM_ROBBERY.OIL_RIG then
-			local v2 = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 1837697591, {
+			local localPlayer = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 1837697591, {
 				Looped = true,
 				Volume = 0.4,
 				Group = game:GetService("SoundService").RobberyMusic
 			})
 			v1:GiveTask(function()
-				Audio.promiseFadeTo(v2, 0, 0.5):andThen(function()
-					v2:Destroy()
+				Audio.promiseFadeTo(localPlayer, 0, 0.5):andThen(function()
+					localPlayer:Destroy()
 				end)
 			end)
 		end

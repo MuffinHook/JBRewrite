@@ -1,20 +1,21 @@
 -- Reviewed by Claude
-local tbl = {
+-- variables reassigned
+local tableObj = {
 	internalTypeChecks = false,
 	typeChecks = false,
 	elementTracing = false,
 	propValidation = false
 }
-local tbl = {}
-for k in pairs(tbl) do
-	table.insert(tbl, k)
+local tableObj = {}
+for k in pairs(tableObj) do
+	table.insert(tableObj, k)
 end
 local tbl2 = {}
 function tbl2.new()
 	local tbl3 = {}
 	tbl3._currentConfig = setmetatable({}, {
-		__index = function(p1, p2)
-			error(("Invalid global configuration key %q. Valid configuration keys are: %s"):format(tostring(p2), table.concat(tbl, ", ")), 3)
+		__index = function(self, callback)
+			error(("Invalid global configuration key %q. Valid configuration keys are: %s"):format(tostring(callback), table.concat(tableObj, ", ")), 3)
 		end
 	})
 	function tbl3.set(...)
@@ -26,31 +27,31 @@ function tbl2.new()
 	function tbl3.scoped(...)
 		return tbl2.scoped(tbl3, ...)
 	end
-	tbl3.set(tbl)
+	tbl3.set(tableObj)
 	return tbl3
 end
-function tbl2.set(p1, p2)
-	for k, v in pairs(p2) do
-		if tbl[k] == nil then
-			error(("Invalid global configuration key %q (type %s). Valid configuration keys are: %s"):format(tostring(k), typeof(k), table.concat(tbl, ", ")), 3)
+function tbl2.set(self, callback)
+	for k, v in pairs(callback) do
+		if tableObj[k] == nil then
+			error(("Invalid global configuration key %q (type %s). Valid configuration keys are: %s"):format(tostring(k), typeof(k), table.concat(tableObj, ", ")), 3)
 		end
 		if typeof(v) ~= "boolean" then
 			error(("Invalid value %q (type %s) for global configuration key %q. Valid values are: true, false"):format(tostring(v), typeof(v), (tostring(k))), 3)
 		end
-		p1._currentConfig[k] = v
+		self._currentConfig[k] = v
 	end
 end
-function tbl2.get(p1)
-	return p1._currentConfig
+function tbl2.get(self)
+	return self._currentConfig
 end
-function tbl2.scoped(p1, p2, p3)
-	local tbl = {}
-	for k, v in pairs(p1._currentConfig) do
-		tbl[k] = v
+function tbl2.scoped(self, callback, self)
+	local tableObj = {}
+	for k, v in pairs(self._currentConfig) do
+		tableObj[k] = v
 	end
-	p1.set(p2)
-	local v1, v2 = pcall(p3)
-	p1.set(tbl)
-	assert(v1, v2)
+	self.set(callback)
+	local var1, var2 = pcall(self)
+	self.set(tableObj)
+	assert(var1, var2)
 end
 return tbl2

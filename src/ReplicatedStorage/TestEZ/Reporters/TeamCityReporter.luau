@@ -1,72 +1,73 @@
 -- Reviewed by Claude
+-- variables reassigned
 local TestService = game:GetService("TestService")
 local TestEnum = require(script.Parent.Parent.TestEnum)
-local t = {}
-local function teamCityEscape(p1)
-	return string.gsub(string.gsub(string.gsub(p1, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")
+local reporterModule = {}
+local function teamCityEscape(text)
+	return string.gsub(string.gsub(string.gsub(text, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")
 end
-local function teamCityEnterSuite(p1)
-	return string.format("##teamcity[testSuiteStarted name=\'%s\']", (string.gsub(string.gsub(string.gsub(p1, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")))
+local function teamCityEnterSuite(name)
+	return string.format("##teamcity[testSuiteStarted name=\'%s\']", (string.gsub(string.gsub(string.gsub(name, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")))
 end
-local function teamCityLeaveSuite(p1)
-	return string.format("##teamcity[testSuiteFinished name=\'%s\']", (string.gsub(string.gsub(string.gsub(p1, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")))
+local function teamCityLeaveSuite(name)
+	return string.format("##teamcity[testSuiteFinished name=\'%s\']", (string.gsub(string.gsub(string.gsub(name, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")))
 end
-local function teamCityEnterCase(p1)
-	return string.format("##teamcity[testStarted name=\'%s\']", (string.gsub(string.gsub(string.gsub(p1, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")))
+local function teamCityEnterCase(name)
+	return string.format("##teamcity[testStarted name=\'%s\']", (string.gsub(string.gsub(string.gsub(name, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")))
 end
-local function teamCityLeaveCase(p1)
-	return string.format("##teamcity[testFinished name=\'%s\']", (string.gsub(string.gsub(string.gsub(p1, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")))
+local function teamCityLeaveCase(name)
+	return string.format("##teamcity[testFinished name=\'%s\']", (string.gsub(string.gsub(string.gsub(name, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")))
 end
-local function teamCityFailCase(p1, p2)
-	return string.format("##teamcity[testFailed name=\'%s\' message=\'%s\']", string.gsub(string.gsub(string.gsub(p1, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n"), (string.gsub(string.gsub(string.gsub(p2, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")))
+local function teamCityFailCase(name, message)
+	return string.format("##teamcity[testFailed name=\'%s\' message=\'%s\']", string.gsub(string.gsub(string.gsub(name, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n"), (string.gsub(string.gsub(string.gsub(message, "([]|\'[])", "|%1"), "\r", "|r"), "\n", "|n")))
 end
-local function v1(p1, p2, p3)
-	local v12 = p2 or {}
-	local v2 = p3 or 0
-	if p1.status == TestEnum.TestStatus.Skipped then
-		return v12
-	elseif p1.planNode.type == TestEnum.NodeType.Describe then
-		table.insert(v12, teamCityEnterSuite(p1.planNode.phrase))
-		local v4 = v12
-		for i, v in ipairs(p1.children) do
-			v1(v, v4, v2 + 1)
+local function processNode(resultNode, outputList, depth)
+	local currentList = outputList or {}
+	local currentDepth = depth or 0
+	if resultNode.status == TestEnum.TestStatus.Skipped then
+		return currentList
+	elseif resultNode.planNode.type == TestEnum.NodeType.Describe then
+		table.insert(currentList, teamCityEnterSuite(resultNode.planNode.phrase))
+		local nodeOutputList = currentList
+		for i, child in ipairs(resultNode.children) do
+			processNode(child, nodeOutputList, currentDepth + 1)
 		end
-		table.insert(v4, teamCityLeaveSuite(p1.planNode.phrase))
+		table.insert(nodeOutputList, teamCityLeaveSuite(resultNode.planNode.phrase))
 	else
-		table.insert(v12, teamCityEnterCase(p1.planNode.phrase))
-		if p1.status == TestEnum.TestStatus.Failure then
-			table.insert(v12, teamCityFailCase(p1.planNode.phrase, table.concat(p1.errors, "\n")))
+		table.insert(currentList, teamCityEnterCase(resultNode.planNode.phrase))
+		if resultNode.status == TestEnum.TestStatus.Failure then
+			table.insert(currentList, teamCityFailCase(resultNode.planNode.phrase, table.concat(resultNode.errors, "\n")))
 		end
-		table.insert(v12, teamCityLeaveCase(p1.planNode.phrase))
+		table.insert(currentList, teamCityLeaveCase(resultNode.planNode.phrase))
 	end
 end
-local function reportRoot(p1)
-	local t = {}
-	for i, v in ipairs(p1.children) do
-		v1(v, t, 0)
+local function reportRoot(results)
+	local outputList = {}
+	for i, child in ipairs(results.children) do
+		processNode(child, outputList, 0)
 	end
-	return t
+	return outputList
 end
-local function report(p1)
-	return table.concat(reportRoot(p1), "\n")
+local function report(results)
+	return table.concat(reportRoot(results), "\n")
 end
-function t.report(p1)
-	local t = {}
-	local v1 = reportRoot(p1)
-	t[1] = "Test results:"
-	t[2] = table.concat(v1, "\n")
-	t[3] = ("%d passed, %d failed, %d skipped"):format(p1.successCount, p1.failureCount, p1.skippedCount)
-	print(table.concat(t, "\n"))
-	if p1.failureCount > 0 then
-		print(("%d test nodes reported failures."):format(p1.failureCount))
+function reporterModule.report(results)
+	local outputLines = {}
+	local nodeOutputList = reportRoot(results)
+	outputLines[1] = "Test results:"
+	outputLines[2] = table.concat(nodeOutputList, "\n")
+	outputLines[3] = ("%d passed, %d failed, %d skipped"):format(results.successCount, results.failureCount, results.skippedCount)
+	print(table.concat(outputLines, "\n"))
+	if results.failureCount > 0 then
+		print(("%d test nodes reported failures."):format(results.failureCount))
 	end
-	if #p1.errors > 0 then
+	if #results.errors > 0 then
 		print("Errors reported by tests:")
 		print("")
-		for i, v in ipairs(p1.errors) do
-			TestService:Error(v)
+		for i, errorMsg in ipairs(results.errors) do
+			TestService:Error(errorMsg)
 			print("")
 		end
 	end
 end
-return t
+return reporterModule

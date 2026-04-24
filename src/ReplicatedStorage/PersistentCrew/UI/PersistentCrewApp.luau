@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -27,46 +28,46 @@ local function playClick()
 		})
 	end
 end
-local v1 = Roact.PureComponent:extend("PersistentCrewApp")
-v1.defaultProps = {
+local local1 = Roact.PureComponent:extend("PersistentCrewApp")
+local1.defaultProps = {
 	size = UDim2.fromScale(0.9, 0.9),
 	position = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5)
 }
-function v1.init(p1)
-	p1.maid = Maid.new()
-	function p1.onClickAdmin(p12)
-		p1.props.attemptAdmin(p12.userId)
+function local1.init(self)
+	self.maid = Maid.new()
+	function self.onClickAdmin(self)
+		self.props.attemptAdmin(self.userId)
 	end
-	function p1.onClickRenameCrew(p12)
-		p1.props.attemptRenameCrew(p12)
+	function self.onClickRenameCrew(self)
+		self.props.attemptRenameCrew(self)
 	end
-	function p1.onClickUnAdmin(p12)
-		p1.props.attemptUnAdmin(p12.userId)
+	function self.onClickUnAdmin(self)
+		self.props.attemptUnAdmin(self.userId)
 	end
-	function p1.onClickKick(p12)
-		p1.props.attemptKick(p12.userId)
+	function self.onClickKick(self)
+		self.props.attemptKick(self.userId)
 	end
-	function p1.onClickJoinRequestAccept(p12)
-		p1.props.onClickJoinRequestAccept(p12.userId)
+	function self.onClickJoinRequestAccept(self)
+		self.props.onClickJoinRequestAccept(self.userId)
 	end
-	function p1.onClickJoinRequestDeny(p12)
-		p1.props.onClickJoinRequestDeny(p12.userId)
+	function self.onClickJoinRequestDeny(self)
+		self.props.onClickJoinRequestDeny(self.userId)
 	end
-	p1:setState({
+	self:setState({
 		showRequests = false,
 		countdownTil = 0,
 		countdownVisible = false,
 		isSmallScreen = Utils.isSmallScreen()
 	})
-	p1.maid:GiveTask(Utils.getViewportSizeChangedSignal():Connect(function()
-		p1:setState({
+	self.maid:GiveTask(Utils.getViewportSizeChangedSignal():Connect(function()
+		self:setState({
 			isSmallScreen = Utils.isSmallScreen()
 		})
 	end))
-	function p1.onClickToggleRequests()
-		p1:setState({
-			showRequests = not p1.state.showRequests
+	function self.onClickToggleRequests()
+		self:setState({
+			showRequests = not self.state.showRequests
 		})
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
@@ -74,8 +75,8 @@ function v1.init(p1)
 			})
 		end
 	end
-	function p1.onClickCloseWelcome()
-		p1:setState({
+	function self.onClickCloseWelcome()
+		self:setState({
 			welcomeVisible = false
 		})
 		if Players.LocalPlayer.PlayerGui then
@@ -84,119 +85,119 @@ function v1.init(p1)
 			})
 		end
 	end
-	function p1.onClickViewMe()
-		p1.props.attemptViewUserIdClan(Players.LocalPlayer.UserId)
-		p1.props.onClickViewMe()
+	function self.onClickViewMe()
+		self.props.attemptViewUserIdClan(Players.LocalPlayer.UserId)
+		self.props.onClickViewMe()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 				Volume = 0.2
 			})
 		end
 	end
-	function p1.onCountdownElapsed(p12)
-		if p12 < 0 then
-			p1:setState({
+	function self.onCountdownElapsed(self)
+		if self < 0 then
+			self:setState({
 				countdownVisible = false
 			})
-			p1.props.onCountdownFinished()
+			self.props.onCountdownFinished()
 		end
 	end
-	function p1.onReportDialogClose()
-		p1:setState({
+	function self.onReportDialogClose()
+		self:setState({
 			reportDialogVisible = false
 		})
 	end
-	function p1.onReportDialogSubmit(p12, p2)
-		p1.props.attemptReportCrew(p12, p2)
+	function self.onReportDialogSubmit(self, self)
+		self.props.attemptReportCrew(self, self)
 	end
 end
-function v1.render(p1)
-	local currentClanInfo = p1.props.currentClanInfo
-	local v1 = p1.props.viewingClanInfo or currentClanInfo
+function local1.render(self)
+	local currentClanInfo = self.props.currentClanInfo
+	local local1 = self.props.viewingClanInfo or currentClanInfo
 	local t = {}
-	if p1.props.groupVisible then
-		local t2 = {}
-		local v2, v3
-		if v1 then
-			local v7 = if Players.LocalPlayer then Players.LocalPlayer.UserId else -1
-			local v8 = UDim2.fromScale(1, 0.5)
-			local v11 = UDim2.fromScale(0.5, 0.5 - if p1.props.battleResponseData == nil then 0 else 0.1)
-			local t3 = {
+	if self.props.groupVisible then
+		local table2 = {}
+		local local2, local3
+		if local1 then
+			local localPlayer = if Players.LocalPlayer then Players.LocalPlayer.UserId else -1
+			local local8 = UDim2.fromScale(1, 0.5)
+			local local11 = UDim2.fromScale(0.5, 0.5 - if self.props.battleResponseData == nil then 0 else 0.1)
+			local table3 = {
 				aspectRatio = 1.7777777777777777,
 				verticalPaddingRatio = 128,
-				clanId = v1.ClanId,
-				playersClanId = v1.PlayersClanId
+				clanId = local1.ClanId,
+				playersClanId = local1.PlayersClanId
 			}
-			local v14
-			if v1.PlayersClanId == v1.ClanId then
-				v14 = true
-				v2 = v8
+			local local14
+			if local1.PlayersClanId == local1.ClanId then
+				local14 = true
+				local2 = local8
 			else
-				v14 = false
-				v2 = v8
+				local14 = false
+				local2 = local8
 			end
-			t3.isPlayersClan = v14
-			t3.leaderboardRank = v1.LeaderboardRank
-			local v15
-			if v1.AdminIdMap[tostring(v7)] == true then
-				v15 = true
-				v3 = v11
+			table3.isPlayersClan = local14
+			table3.leaderboardRank = local1.LeaderboardRank
+			local local15
+			if local1.AdminIdMap[tostring(localPlayer)] == true then
+				local15 = true
+				local3 = local11
 			else
-				v15 = false
-				v3 = v11
+				local15 = false
+				local3 = local11
 			end
-			t3.isAdminOfViewingClan = v15
-			t3.isAdminOfCurrentClan = currentClanInfo and currentClanInfo.AdminIdMap[tostring(v7)] == true
-			t3.battlesPlayed = v1.BattlesPlayed or 0
-			t3.battlesWon = v1.BattlesWon or 0
-			t3.attemptLeave = p1.props.attemptLeave
-			t3.clanOwnerUserId = v1.OwnerUserId
-			t3.clanName = v1.ClanName
-			t3.clanDisplayRating = v1.DisplayRating or Glicko2Consts.DEFAULT_MU
-			t3.flagColor = v1.FlagColor
-			t3.membersOnlineMap = p1.props.membersOnlineMap
-			t3.showRequests = p1.state.showRequests
-			t3.members = p1.props.members
-			t3.joinRequests = p1.props.joinRequests
-			t3.isReadiedUp = p1.props.isReadiedUp
-			t3.playerHasAcceptedInvite = p1.props.battleResponseData ~= nil
-			t3.playerDisplayRating = v1.PlayerDisplayRating
-			t3.attemptBattleClanId = p1.props.attemptBattleClanId
-			t3.attemptViewUserIdClan = p1.props.attemptViewUserIdClan
-			t3.onClickAdmin = p1.onClickAdmin
-			t3.onClickRenameCrew = p1.onClickRenameCrew
-			t3.onClickUnAdmin = p1.onClickUnAdmin
-			t3.onClickKick = p1.onClickKick
-			t3.onClickJoinRequestAccept = p1.onClickJoinRequestAccept
-			t3.onClickJoinRequestDeny = p1.onClickJoinRequestDeny
-			t3.onClickToggleRequests = p1.onClickToggleRequests
-			t3.attemptRequestJoinUserId = p1.props.attemptRequestJoinUserId
-			t3.onClickReadyUp = p1.props.onClickReadyUp
-			t3.onClickUnreadyUp = p1.props.onClickUnreadyUp
-			t3.networkMutexLocked = p1.props.networkMutexLocked
-			t3.onClickViewMe = p1.onClickViewMe
-			t3.onClickClose = p1.props.onClickClose
-			t2.Crew = createElement(Info, t3)
+			table3.isAdminOfViewingClan = local15
+			table3.isAdminOfCurrentClan = currentClanInfo and currentClanInfo.AdminIdMap[tostring(localPlayer)] == true
+			table3.battlesPlayed = local1.BattlesPlayed or 0
+			table3.battlesWon = local1.BattlesWon or 0
+			table3.attemptLeave = self.props.attemptLeave
+			table3.clanOwnerUserId = local1.OwnerUserId
+			table3.clanName = local1.ClanName
+			table3.clanDisplayRating = local1.DisplayRating or Glicko2Consts.DEFAULT_MU
+			table3.flagColor = local1.FlagColor
+			table3.membersOnlineMap = self.props.membersOnlineMap
+			table3.showRequests = self.state.showRequests
+			table3.members = self.props.members
+			table3.joinRequests = self.props.joinRequests
+			table3.isReadiedUp = self.props.isReadiedUp
+			table3.playerHasAcceptedInvite = self.props.battleResponseData ~= nil
+			table3.playerDisplayRating = local1.PlayerDisplayRating
+			table3.attemptBattleClanId = self.props.attemptBattleClanId
+			table3.attemptViewUserIdClan = self.props.attemptViewUserIdClan
+			table3.onClickAdmin = self.onClickAdmin
+			table3.onClickRenameCrew = self.onClickRenameCrew
+			table3.onClickUnAdmin = self.onClickUnAdmin
+			table3.onClickKick = self.onClickKick
+			table3.onClickJoinRequestAccept = self.onClickJoinRequestAccept
+			table3.onClickJoinRequestDeny = self.onClickJoinRequestDeny
+			table3.onClickToggleRequests = self.onClickToggleRequests
+			table3.attemptRequestJoinUserId = self.props.attemptRequestJoinUserId
+			table3.onClickReadyUp = self.props.onClickReadyUp
+			table3.onClickUnreadyUp = self.props.onClickUnreadyUp
+			table3.networkMutexLocked = self.props.networkMutexLocked
+			table3.onClickViewMe = self.onClickViewMe
+			table3.onClickClose = self.props.onClickClose
+			table2.Crew = createElement(Info, table3)
 		else
-			local v18 = UDim2.fromScale(1, 0.35)
-			local v19 = UDim2.fromScale(0.5, 0.5)
-			t2.JoinOrCreate = createElement(JoinOrCreate, {
+			local local18 = UDim2.fromScale(1, 0.35)
+			local local19 = UDim2.fromScale(0.5, 0.5)
+			table2.JoinOrCreate = createElement(JoinOrCreate, {
 				aspectRatio = 1.7777777777777777,
 				verticalPaddingRatio = 128,
-				attemptCreate = p1.props.attemptCreate,
-				attemptViewUserIdClan = p1.props.attemptViewUserIdClan,
-				networkMutexLocked = p1.props.networkMutexLocked,
-				onClickClose = p1.props.onClickClose
+				attemptCreate = self.props.attemptCreate,
+				attemptViewUserIdClan = self.props.attemptViewUserIdClan,
+				networkMutexLocked = self.props.networkMutexLocked,
+				onClickClose = self.props.onClickClose
 			})
-			v2 = v18
-			v3 = v19
+			local2 = local18
+			local3 = local19
 		end
 		t.Group = createElement("Frame", {
 			BackgroundTransparency = 0.8,
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
-			Size = v2,
-			Position = v3,
-			AnchorPoint = p1.props.anchorPoint
+			Size = local2,
+			Position = local3,
+			AnchorPoint = self.props.anchorPoint
 		}, Dictionary.merge({
 			AspectRatio = createElement("UIAspectRatioConstraint", {
 				AspectRatio = 1.7777777777777777
@@ -204,56 +205,56 @@ function v1.render(p1)
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, 8)
 			})
-		}, t2))
+		}, table2))
 	end
-	if p1.state.welcomeVisible then
+	if self.state.welcomeVisible then
 		t.Welcome = createElement(Welcome, {
-			onClickClose = p1.onClickCloseWelcome
+			onClickClose = self.onClickCloseWelcome
 		})
 	end
-	local t2 = {
+	local table2 = {
 		size = UDim2.new(0.3333333333333333, 0, 0.3333333333333333, 0)
 	}
-	t2.position = p1.state.isSmallScreen and UDim2.new(0.5, 0, 0.6666666666666666, 0) or UDim2.new(1, 0, 0.5, 0)
-	t2.anchorPoint = p1.state.isSmallScreen and Vector2.new(0.5, 0.5) or Vector2.new(1, 0.5)
-	t2.onAccept = p1.props.onAcceptBattleInvite
-	t2.onDecline = p1.props.onDeclineBattleInvite
-	t.BattleInvites = createElement(BattleInvites, t2)
-	local v24 = v1 and v1.ClanId
-	local t3 = {}
-	for v25 in p1.props.clanName do
-		table.insert(t3, v25)
+	table2.position = self.state.isSmallScreen and UDim2.new(0.5, 0, 0.6666666666666666, 0) or UDim2.new(1, 0, 0.5, 0)
+	table2.anchorPoint = self.state.isSmallScreen and Vector2.new(0.5, 0.5) or Vector2.new(1, 0.5)
+	table2.onAccept = self.props.onAcceptBattleInvite
+	table2.onDecline = self.props.onDeclineBattleInvite
+	t.BattleInvites = createElement(BattleInvites, table2)
+	local local24 = local1 and local1.ClanId
+	local table3 = {}
+	for local25 in self.props.clanName do
+		table.insert(table3, local25)
 	end
-	local v26 = if t3[1] == v24 then t3[2] else t3[1]
-	local attackingClanId = p1.props.attackingClanId
-	local v27 = Color3.fromRGB(121, 251, 177)
-	local v28 = Color3.fromRGB(255, 49, 49)
-	local penalty = p1.props.penalty
-	local v29 = penalty ~= nil
-	if p1.props.isBattleServer then
-		local t4 = {
+	local local26 = if table3[1] == local24 then table3[2] else table3[1]
+	local attackingClanId = self.props.attackingClanId
+	local identityColor = Color3.fromRGB(121, 251, 177)
+	local identityColor = Color3.fromRGB(255, 49, 49)
+	local penalty = self.props.penalty
+	local local29 = penalty ~= nil
+	if self.props.isBattleServer then
+		local table4 = {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0)
 		}
-		local t5 = {}
-		local t6 = {
+		local table5 = {}
+		local table6 = {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, -48, 1, -48),
 			Position = UDim2.fromOffset(24, 24)
 		}
-		local t7 = {}
-		local t8 = {
+		local table7 = {}
+		local table8 = {
 			Thickness = 2
 		}
-		t8.Color = if v29 then v28 else v27
-		t8.Transparency = 0.75
-		t7.UIStroke = createElement("UIStroke", t8)
-		t7.UICorner = createElement("UICorner", {
+		table8.Color = if local29 then identityColor else identityColor
+		table8.Transparency = 0.75
+		table7.UIStroke = createElement("UIStroke", table8)
+		table7.UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 32)
 		})
-		t5.BorderOuter = createElement("Frame", t6, t7)
-		t5.BorderInner = createElement("Frame", {
+		table5.BorderOuter = createElement("Frame", table6, table7)
+		table5.BorderInner = createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, -84, 1, -84),
@@ -261,15 +262,15 @@ function v1.render(p1)
 		}, {
 			UIStroke = createElement("UIStroke", {
 				Thickness = 2,
-				Color = v27,
+				Color = identityColor,
 				Transparency = 0.5
 			}),
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, 32)
 			})
 		})
-		t.Container = createElement("Frame", t4, t5)
-		t.Penalty = v29 and createElement("Frame", {
+		t.Container = createElement("Frame", table4, table5)
+		t.Penalty = local29 and createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0.5, 0, 0, 16),
@@ -279,7 +280,7 @@ function v1.render(p1)
 		}, {
 			Timer = createElement("Frame", {
 				BorderSizePixel = 0,
-				BackgroundColor3 = v28,
+				BackgroundColor3 = identityColor,
 				Size = UDim2.fromScale(0.1, 1),
 				AnchorPoint = Vector2.new(0.5, 0),
 				Position = UDim2.fromScale(0.5, 0)
@@ -300,7 +301,7 @@ function v1.render(p1)
 				})
 			})
 		})
-		local t9 = {
+		local table9 = {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0.5, 0, 0, 24),
@@ -308,60 +309,60 @@ function v1.render(p1)
 			Position = UDim2.new(0.5, 0, 0, 41),
 			ZIndex = 3
 		}
-		local t10 = {}
-		local t11 = {
+		local table10 = {}
+		local table11 = {
 			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
 			Size = UDim2.fromScale(0.125, 1.5),
 			AnchorPoint = Vector2.new(0.5, 0.25),
 			Position = UDim2.fromScale(0.5, 0.5)
 		}
-		local t12 = {
+		local table12 = {
 			UIStroke = createElement("UIStroke", {
 				Thickness = 2,
-				Color = v27,
+				Color = identityColor,
 				Transparency = 0.5
 			}),
 			UICorners = createElement("UICorner", {
 				CornerRadius = UDim.new(0.25, 0)
 			})
 		}
-		local t13 = {
+		local table13 = {
 			font = Enum.Font.FredokaOne,
 			position = UDim2.fromScale(0.5, 0.5),
-			textColor = ColorUtils.saturateBy(v27, 0.8),
-			createdAt = p1.props.startedAt[attackingClanId],
-			elapsed = p1.props.timeTook[attackingClanId]
+			textColor = ColorUtils.saturateBy(identityColor, 0.8),
+			createdAt = self.props.startedAt[attackingClanId],
+			elapsed = self.props.timeTook[attackingClanId]
 		}
-		t13.disabled = p1.props.startedAt[attackingClanId] == nil
-		t12.ElapsedContainer = createElement(Elapsed, t13)
-		t10.Timer = createElement("Frame", t11, t12)
-		local t14 = {
-			clanName = p1.props.clanName[v24],
-			backgroundColor = v27,
+		table13.disabled = self.props.startedAt[attackingClanId] == nil
+		table12.ElapsedContainer = createElement(Elapsed, table13)
+		table10.Timer = createElement("Frame", table11, table12)
+		local table14 = {
+			clanName = self.props.clanName[local24],
+			backgroundColor = identityColor,
 			size = UDim2.fromScale(0.4, 1),
 			position = UDim2.fromScale(0, 0.5),
 			anchorPoint = Vector2.new(0, 0.5),
-			createdAt = p1.props.startedAt[v24]
+			createdAt = self.props.startedAt[local24]
 		}
-		t14.elapsed = if p1.props.startedAt[v24] == nil then 0 else p1.props.timeTook[v24]
-		t14.disabled = p1.props.startedAt[v24] == nil
-		t14.attacking = v24 == attackingClanId
-		t14.robberiesCompleted = p1.props.robberiesCompleted
-		t10.CrewOurs = createElement(BattleCrewInfo, t14)
-		local t15 = {
-			clanName = p1.props.clanName[v26],
-			backgroundColor = v27,
+		table14.elapsed = if self.props.startedAt[local24] == nil then 0 else self.props.timeTook[local24]
+		table14.disabled = self.props.startedAt[local24] == nil
+		table14.attacking = local24 == attackingClanId
+		table14.robberiesCompleted = self.props.robberiesCompleted
+		table10.CrewOurs = createElement(BattleCrewInfo, table14)
+		local table15 = {
+			clanName = self.props.clanName[local26],
+			backgroundColor = identityColor,
 			size = UDim2.fromScale(0.4, 1),
 			position = UDim2.fromScale(1, 0.5),
 			anchorPoint = Vector2.new(1, 0.5),
-			createdAt = p1.props.startedAt[v26]
+			createdAt = self.props.startedAt[local26]
 		}
-		t15.elapsed = if p1.props.startedAt[v26] == nil then 0 else p1.props.timeTook[v26]
-		t15.disabled = p1.props.startedAt[v26] == nil
-		t15.attacking = v26 == attackingClanId
-		t15.robberiesCompleted = p1.props.robberiesCompleted
-		t10.CrewTheirs = createElement(BattleCrewInfo, t15, {
+		table15.elapsed = if self.props.startedAt[local26] == nil then 0 else self.props.timeTook[local26]
+		table15.disabled = self.props.startedAt[local26] == nil
+		table15.attacking = local26 == attackingClanId
+		table15.robberiesCompleted = self.props.robberiesCompleted
+		table10.CrewTheirs = createElement(BattleCrewInfo, table15, {
 			Report = createElement("Frame", {
 				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(1, 1),
@@ -372,8 +373,8 @@ function v1.render(p1)
 					Size = UDim2.fromScale(1, 1),
 					Image = "rbxassetid://14280463776",
 					[Roact.Event.Activated] = function()
-						p1:setState({
-							reportDialogVisible = not p1.state.reportDialogVisible
+						self:setState({
+							reportDialogVisible = not self.state.reportDialogVisible
 						})
 					end
 				}, {
@@ -386,12 +387,12 @@ function v1.render(p1)
 				})
 			})
 		})
-		t.TopBar = createElement("Frame", t9, t10)
-		if p1.state.countdownVisible then
+		t.TopBar = createElement("Frame", table9, table10)
+		if self.state.countdownVisible then
 			t.Countdown = createElement(Elapsed, {
-				createdAt = p1.state.countdownTil,
+				createdAt = self.state.countdownTil,
 				countDown = true,
-				onElapsed = p1.onCountdownElapsed,
+				onElapsed = self.onCountdownElapsed,
 				textColor = Color3.new(51/255, 51/255, 51/255),
 				alwaysShowMinutes = false
 			}, {
@@ -401,18 +402,18 @@ function v1.render(p1)
 				})
 			})
 		end
-		if p1.state.reportDialogVisible then
+		if self.state.reportDialogVisible then
 			t.ReportDialog = createElement(ReportCrew, {
 				size = UDim2.fromScale(1, 0.45),
-				onClose = p1.onReportDialogClose,
-				onSubmit = p1.onReportDialogSubmit
+				onClose = self.onReportDialogClose,
+				onSubmit = self.onReportDialogSubmit
 			})
 		end
 	end
-	if p1.props.battleResponseData then
-		local battleResponseData = p1.props.battleResponseData
+	if self.props.battleResponseData then
+		local battleResponseData = self.props.battleResponseData
 		local TheirClanInfo = battleResponseData.TheirClanInfo
-		local t4 = {
+		local table4 = {
 			anchorPoint = Vector2.new(0.5, 1),
 			position = UDim2.fromScale(0.5, 0.875),
 			size = UDim2.fromScale(1, 0.2),
@@ -425,67 +426,67 @@ function v1.render(p1)
 			clanColorOurs = Color3.fromHex(battleResponseData.OurClanInfo.FlagColorStr),
 			clanMembersOurs = battleResponseData.OurClanAccepted
 		}
-		t4.clanNameTheirs = if TheirClanInfo then TheirClanInfo.ClanName else nil
-		t4.clanOwnerTheirs = if TheirClanInfo then TheirClanInfo.OwnerUserId else nil
-		t4.clanColorTheirs = if TheirClanInfo then Color3.fromHex(TheirClanInfo.FlagColorStr) else nil
-		t4.clanMembersTheirs = battleResponseData.TheirClanAccepted
-		t4.onUnAcceptBattleInvite = p1.props.onUnAcceptBattleInvite
-		t.Responses = createElement(Responses, t4)
+		table4.clanNameTheirs = if TheirClanInfo then TheirClanInfo.ClanName else nil
+		table4.clanOwnerTheirs = if TheirClanInfo then TheirClanInfo.OwnerUserId else nil
+		table4.clanColorTheirs = if TheirClanInfo then Color3.fromHex(TheirClanInfo.FlagColorStr) else nil
+		table4.clanMembersTheirs = battleResponseData.TheirClanAccepted
+		table4.onUnAcceptBattleInvite = self.props.onUnAcceptBattleInvite
+		t.Responses = createElement(Responses, table4)
 	end
 	return Roact.createFragment(t)
 end
-function v1.didMount(p1)
-	p1:_updateWelcomeVisible()
+function local1.didMount(self)
+	self:_updateWelcomeVisible()
 	local function updateCountdown()
-		local v1 = PersistentCrewBattleUtils.getRoundStartsAt()
-		if v1 and workspace:GetServerTimeNow() < v1 then
-			p1:setState({
+		local local1 = PersistentCrewBattleUtils.getRoundStartsAt()
+		if local1 and workspace:GetServerTimeNow() < local1 then
+			self:setState({
 				countdownVisible = true,
-				countdownTil = v1
+				countdownTil = local1
 			})
 		end
 	end
-	p1.maid:GiveTask(PersistentCrewBattleUtils.getRoundStartsAtAttributeChangedSignal():Connect(updateCountdown))
+	self.maid:GiveTask(PersistentCrewBattleUtils.getRoundStartsAtAttributeChangedSignal():Connect(updateCountdown))
 	updateCountdown()
 end
-function v1._updateWelcomeVisible(p1)
-	if p1.props.isBattleServer then
-		p1:setState({
+function local1._updateWelcomeVisible(self)
+	if self.props.isBattleServer then
+		self:setState({
 			welcomeVisible = true
 		})
 	end
 end
-function v1.didUpdate(p1, p2, p3)
-	if p1.props.isBattleServer ~= p2.isBattleServer then
-		p1:_updateWelcomeVisible()
+function local1.didUpdate(self, self, param3)
+	if self.props.isBattleServer ~= self.isBattleServer then
+		self:_updateWelcomeVisible()
 	end
 end
-function v1.willUnmount(p1)
-	p1.maid:DoCleaning()
+function local1.willUnmount(self)
+	self.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(self, self)
 	return {
-		viewingClanInfo = p1.viewingClanInfo,
-		currentClanInfo = p1.currentClanInfo,
-		membersOnlineMap = p1.membersOnlineMap,
-		members = p1.members,
-		joinRequests = p1.joinRequests,
-		isReadiedUp = p1.isReadiedUp,
-		groupVisible = p1.groupVisible,
-		timeTook = p1.timeTook,
-		startedAt = p1.startedAt,
-		isBattleServer = p1.isBattleServer,
-		clanName = p1.clanName,
-		networkMutexLocked = p1.networkMutexLocked,
-		robberiesCompleted = p1.robberiesCompleted,
-		attackingClanId = p1.attackingClanId,
-		battleResponseData = p1.battleResponseData,
-		penalty = p1.penalty
+		viewingClanInfo = self.viewingClanInfo,
+		currentClanInfo = self.currentClanInfo,
+		membersOnlineMap = self.membersOnlineMap,
+		members = self.members,
+		joinRequests = self.joinRequests,
+		isReadiedUp = self.isReadiedUp,
+		groupVisible = self.groupVisible,
+		timeTook = self.timeTook,
+		startedAt = self.startedAt,
+		isBattleServer = self.isBattleServer,
+		clanName = self.clanName,
+		networkMutexLocked = self.networkMutexLocked,
+		robberiesCompleted = self.robberiesCompleted,
+		attackingClanId = self.attackingClanId,
+		battleResponseData = self.battleResponseData,
+		penalty = self.penalty
 	}
-end, function(p1)
+end, function(self)
 	return {
 		onClickClose = function()
-			p1({
+			self({
 				type = "setGroupVisible",
 				value = false
 			})
@@ -496,14 +497,14 @@ end, function(p1)
 			end
 		end,
 		onClickViewMe = function()
-			p1({
+			self({
 				type = "setMembers",
 				value = {}
 			})
-			p1({
+			self({
 				type = "setViewingClanInfo",
 				value = nil
 			})
 		end
 	}
-end)(v1)
+end)(local1)

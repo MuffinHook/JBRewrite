@@ -1,12 +1,13 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local TextButton = require(ReplicatedStorage.PersistentCrew.UI.TextButton)
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
-local v1 = Roact.PureComponent:extend("Welcome")
-function v1.render(p1)
+local local1 = Roact.PureComponent:extend("Welcome")
+function local1.render(self)
 	return createElement("Frame", {
 		BackgroundTransparency = 0.8,
 		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
@@ -143,7 +144,7 @@ function v1.render(p1)
 							anchorPoint = Vector2.new(1, 0),
 							text = "READY",
 							backgroundColor = Color3.fromRGB(88, 172, 246),
-							onClick = p1.props.onClickClose
+							onClick = self.props.onClickClose
 						})
 					})
 				})
@@ -151,4 +152,4 @@ function v1.render(p1)
 		})
 	})
 end
-return v1
+return local1

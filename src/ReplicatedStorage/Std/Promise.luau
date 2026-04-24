@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local weakKeyMetatable = {
 	__mode = "k"
 }

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createSpy = require(script.Parent.Parent.createSpy)
@@ -7,171 +8,171 @@ return function()
 	local createReconciler = require(script.Parent.Parent.createReconciler)
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
 	local Component = require(script.Parent.Parent.Component)
-	local v1 = createReconciler(NoopRenderer)
+	local state1 = createReconciler(NoopRenderer)
 	it("should be invoked on initial mount", function()
-		local v12 = createSpy()
+		local internalData = createSpy()
 		local fn = Component:extend("WithDerivedState")
-		fn.getDerivedStateFromProps = v12.value
-		function fn.render(p1)
+		fn.getDerivedStateFromProps = internalData.value
+		function fn.render(self)
 			return nil
 		end
-		v1.mountVirtualNode(createElement(fn, {
+		state1.mountVirtualNode(createElement(fn, {
 			someProp = 1
 		}), nil, "WithDerivedState")
-		expect(v12.callCount).to.equal(1)
-		local v4 = v12:captureValues("props", "state")
-		assertDeepEqual(v4.props, {
+		expect(internalData.callCount).to.equal(1)
+		local currentState = internalData:captureValues("props", "state")
+		assertDeepEqual(currentState.props, {
 			someProp = 1
 		})
-		assertDeepEqual(v4.state, {})
+		assertDeepEqual(currentState.state, {})
 	end)
 	it("should be invoked when updated via props", function()
-		local v12 = createSpy()
+		local internalData = createSpy()
 		local fn = Component:extend("WithDerivedState")
-		fn.getDerivedStateFromProps = v12.value
-		function fn.render(p1)
+		fn.getDerivedStateFromProps = internalData.value
+		function fn.render(self)
 			return nil
 		end
-		v1.updateVirtualNode(v1.mountVirtualNode(createElement(fn, {
+		state1.updateVirtualNode(state1.mountVirtualNode(createElement(fn, {
 			someProp = 1
 		}), nil, "WithDerivedState"), createElement(fn, {
 			someProp = 2
 		}))
-		expect(v12.callCount).to.equal(2)
-		local v4 = v12:captureValues("props", "state")
-		assertDeepEqual(v4.props, {
+		expect(internalData.callCount).to.equal(2)
+		local currentState = internalData:captureValues("props", "state")
+		assertDeepEqual(currentState.props, {
 			someProp = 2
 		})
-		assertDeepEqual(v4.state, {})
+		assertDeepEqual(currentState.state, {})
 	end)
 	it("should be invoked when updated via state", function()
-		local v12 = createSpy()
+		local internalData = createSpy()
 		local fn = Component:extend("WithDerivedState")
-		fn.getDerivedStateFromProps = v12.value
-		function fn.init(p1)
-			p1:setState({
+		fn.getDerivedStateFromProps = internalData.value
+		function fn.init(self)
+			self:setState({
 				someState = 1
 			})
 		end
-		function fn.render(p1)
+		function fn.render(self)
 			return nil
 		end
-		local v3 = createElement(fn)
-		v1.updateVirtualNode(v1.mountVirtualNode(v3, nil, "WithDerivedState"), v3, {
+		local newState = createElement(fn)
+		state1.updateVirtualNode(state1.mountVirtualNode(newState, nil, "WithDerivedState"), newState, {
 			someState = 2
 		})
-		expect(v12.callCount).to.equal(4)
-		local v5 = v12:captureValues("props", "state")
-		assertDeepEqual(v5.props, {})
-		assertDeepEqual(v5.state, {
+		expect(internalData.callCount).to.equal(4)
+		local nextState = internalData:captureValues("props", "state")
+		assertDeepEqual(nextState.props, {})
+		assertDeepEqual(nextState.state, {
 			someState = 2
 		})
 	end)
 	it("should be invoked when updating via state in init (which skips reconciliation)", function()
-		local v12 = createSpy()
+		local internalData = createSpy()
 		local fn = Component:extend("WithDerivedState")
-		fn.getDerivedStateFromProps = v12.value
-		function fn.init(p1)
-			p1:setState({
+		fn.getDerivedStateFromProps = internalData.value
+		function fn.init(self)
+			self:setState({
 				stateFromInit = 1
 			})
 		end
-		function fn.render(p1)
+		function fn.render(self)
 			return nil
 		end
-		v1.mountVirtualNode(createElement(fn, {
+		state1.mountVirtualNode(createElement(fn, {
 			someProp = 1
 		}), nil, "WithDerivedState")
-		expect(v12.callCount).to.equal(3)
-		local v4 = v12:captureValues("props", "state")
-		assertDeepEqual(v4.props, {
+		expect(internalData.callCount).to.equal(3)
+		local currentState = internalData:captureValues("props", "state")
+		assertDeepEqual(currentState.props, {
 			someProp = 1
 		})
-		assertDeepEqual(v4.state, {
+		assertDeepEqual(currentState.state, {
 			stateFromInit = 1
 		})
 	end)
 	it("should receive defaultProps", function()
-		local v12 = createSpy()
+		local internalData = createSpy()
 		local fn = Component:extend("WithDerivedState")
 		fn.defaultProps = {
 			someDefaultProp = "foo"
 		}
-		fn.getDerivedStateFromProps = v12.value
-		function fn.render(p1)
+		fn.getDerivedStateFromProps = internalData.value
+		function fn.render(self)
 			return nil
 		end
-		local v4 = v1.mountVirtualNode(createElement(fn, {
+		local currentState = state1.mountVirtualNode(createElement(fn, {
 			someProp = 1
 		}), nil, "WithDerivedState")
-		expect(v12.callCount).to.equal(1)
-		assertDeepEqual(v12:captureValues("props", "state").props, {
+		expect(internalData.callCount).to.equal(1)
+		assertDeepEqual(internalData:captureValues("props", "state").props, {
 			someDefaultProp = "foo",
 			someProp = 1
 		})
-		v1.updateVirtualNode(v4, (createElement(fn, {
+		state1.updateVirtualNode(currentState, (createElement(fn, {
 			someProp = 2
 		})))
-		expect(v12.callCount).to.equal(2)
-		assertDeepEqual(v12:captureValues("props", "state").props, {
+		expect(internalData.callCount).to.equal(2)
+		assertDeepEqual(internalData:captureValues("props", "state").props, {
 			someDefaultProp = "foo",
 			someProp = 2
 		})
 	end)
 	it("should derive state for all setState updates, even when deferred", function()
-		local v12 = Component:extend("Child")
+		local internalData = Component:extend("Child")
 		local fn = createSpy(function()
 			return {}
 		end)
-		local v3 = createSpy()
-		function v12.render(p1)
+		local newState = createSpy()
+		function internalData.render(self)
 			return nil
 		end
-		function v12.didMount(p1)
-			p1.props.callback()
+		function internalData.didMount(self)
+			self.props.callback()
 		end
-		local v4 = Component:extend("Parent")
-		v4.getDerivedStateFromProps = v3.value
-		function v4.render(p1)
+		local currentState = Component:extend("Parent")
+		currentState.getDerivedStateFromProps = newState.value
+		function currentState.render(self)
 			local function f1()
-				p1:setState(fn.value)
+				self:setState(fn.value)
 			end
 			return createFragment({
-				ChildA = createElement(v12, {
+				ChildA = createElement(internalData, {
 					callback = f1
 				}),
-				ChildB = createElement(v12, {
+				ChildB = createElement(internalData, {
 					callback = f1
 				})
 			})
 		end
-		v1.mountVirtualNode(createElement(v4), nil, "Test")
+		state1.mountVirtualNode(createElement(currentState), nil, "Test")
 		expect(fn.callCount).to.equal(2)
-		expect(v3.callCount).to.equal(3)
+		expect(newState.callCount).to.equal(3)
 	end)
 	it("should have derived state after assigning to state in init", function()
-		local v12 = nil
+		local internalData = nil
 		local fn = createSpy(function()
 			return {
 				derived = true
 			}
 		end)
-		local v3 = Component:extend("WithDerivedState")
-		v3.getDerivedStateFromProps = fn.value
-		function v3.init(p1)
-			p1.state = {
+		local newState = Component:extend("WithDerivedState")
+		newState.getDerivedStateFromProps = fn.value
+		function newState.init(self)
+			self.state = {
 				init = true
 			}
-			v12 = function()
-				return p1.state
+			internalData = function()
+				return self.state
 			end
 		end
-		function v3.render(p1)
+		function newState.render(self)
 			return nil
 		end
-		v1.mountVirtualNode(createElement(v3), nil, "WithDerivedState")
+		state1.mountVirtualNode(createElement(newState), nil, "WithDerivedState")
 		expect(fn.callCount).to.equal(2)
-		assertDeepEqual(v12(), {
+		assertDeepEqual(internalData(), {
 			init = true,
 			derived = true
 		})

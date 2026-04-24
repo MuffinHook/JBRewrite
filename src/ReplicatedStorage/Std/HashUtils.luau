@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return {
 	polynomialRollingHash = function(p1)
 		assert(typeof(p1) == "string", "str must be string")

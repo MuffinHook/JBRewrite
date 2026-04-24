@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local Dictionary = require(ReplicatedStorage.Std.Dictionary)
@@ -7,30 +8,30 @@ local createElement = Roact.createElement
 local Elapsed = require(script.Parent.Elapsed)
 local BattleRobberyStatus = require(script.Parent.BattleRobberyStatus)
 local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
-local v1 = Roact.PureComponent:extend("BattleCrewInfo")
-v1.defaultProps = {
+local local1 = Roact.PureComponent:extend("BattleCrewInfo")
+local1.defaultProps = {
 	backgroundColor = Color3.new(0/255, 0/255, 0/255),
 	size = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5),
 	position = UDim2.fromScale(0.5, 0.5),
 	attacking = false
 }
-function v1.render(p1)
-	local v1 = ColorUtils.saturateBy(p1.props.backgroundColor, -0.9)
+function local1.render(self)
+	local local1 = ColorUtils.saturateBy(self.props.backgroundColor, -0.9)
 	local count = 0
 	local t = {}
-	for v2, v3 in p1.props.robberiesCompleted do
-		if v3.robberyCompleted then
+	for local2, local3 in self.props.robberiesCompleted do
+		if local3.robberyCompleted then
 			count = count + 1
 		end
-		t["Robbery_" .. tostring(v3.robberyType)] = createElement(BattleRobberyStatus, {
-			rowIndex = v2,
-			robberyType = v3.robberyType,
-			robberyCompleted = v3.robberyCompleted,
-			backgroundColor = v1
+		t["Robbery_" .. tostring(local3.robberyType)] = createElement(BattleRobberyStatus, {
+			rowIndex = local2,
+			robberyType = local3.robberyType,
+			robberyCompleted = local3.robberyCompleted,
+			backgroundColor = local1
 		})
 	end
-	local t3 = {
+	local table3 = {
 		UICorners = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
 		}),
@@ -44,16 +45,16 @@ function v1.render(p1)
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Font = Enum.Font.Bangers,
-				Text = p1.props.clanName,
+				Text = self.props.clanName,
 				LineHeight = 1,
 				TextScaled = true,
-				TextColor3 = ColorUtils.brightenBy(p1.props.backgroundColor, -0.5)
+				TextColor3 = ColorUtils.brightenBy(self.props.backgroundColor, -0.5)
 			})
 		})
 	}
-	t3.TakenContainer = p1.props.attacking and createElement("Frame", {
+	table3.TakenContainer = self.props.attacking and createElement("Frame", {
 		BorderSizePixel = 0,
-		BackgroundColor3 = p1.props.backgroundColor,
+		BackgroundColor3 = self.props.backgroundColor,
 		Size = UDim2.new(0.5, -2, 0.8, 0),
 		AnchorPoint = Vector2.new(0, 0),
 		Position = UDim2.new(0, 0, 1, 4)
@@ -63,16 +64,16 @@ function v1.render(p1)
 		}),
 		ElapsedContainer = createElement(Elapsed, {
 			font = Enum.Font.FredokaOne,
-			textColor = ColorUtils.brightenBy(p1.props.backgroundColor, -0.5),
-			createdAt = p1.props.createdAt,
-			elapsed = p1.props.elapsed,
-			disabled = p1.props.disabled,
+			textColor = ColorUtils.brightenBy(self.props.backgroundColor, -0.5),
+			createdAt = self.props.createdAt,
+			elapsed = self.props.elapsed,
+			disabled = self.props.disabled,
 			prefix = "Time Taken: "
 		})
 	})
-	t3.RobberyList = p1.props.attacking and createElement("Frame", {
+	table3.RobberyList = self.props.attacking and createElement("Frame", {
 		BorderSizePixel = 0,
-		BackgroundColor3 = p1.props.backgroundColor,
+		BackgroundColor3 = self.props.backgroundColor,
 		Size = UDim2.new(0.5, -2, 0.8, 0),
 		AnchorPoint = Vector2.new(0, 0),
 		Position = UDim2.new(0.5, 2, 1, 4)
@@ -93,13 +94,13 @@ function v1.render(p1)
 				Text = ("Checklist (%d/%d)"):format(count, PersistentCrewBattleConsts.NUM_ROBBERIES_TO_FINISH_ROUND),
 				LineHeight = 1,
 				TextScaled = true,
-				TextColor3 = ColorUtils.brightenBy(p1.props.backgroundColor, -0.5)
+				TextColor3 = ColorUtils.brightenBy(self.props.backgroundColor, -0.5)
 			})
 		})
 	}, t))
-	t3.BeatContainer = not p1.props.attacking and createElement("Frame", {
+	table3.BeatContainer = not self.props.attacking and createElement("Frame", {
 		BorderSizePixel = 0,
-		BackgroundColor3 = p1.props.backgroundColor,
+		BackgroundColor3 = self.props.backgroundColor,
 		Size = UDim2.new(0.5, -2, 0.8, 0),
 		AnchorPoint = Vector2.new(0, 0),
 		Position = UDim2.new(0, 0, 1, 4)
@@ -109,16 +110,16 @@ function v1.render(p1)
 		}),
 		ElapsedContainer = createElement(Elapsed, {
 			font = Enum.Font.FredokaOne,
-			textColor = ColorUtils.brightenBy(p1.props.backgroundColor, -0.5),
-			createdAt = p1.props.createdAt,
-			elapsed = p1.props.elapsed,
-			disabled = p1.props.disabled,
+			textColor = ColorUtils.brightenBy(self.props.backgroundColor, -0.5),
+			createdAt = self.props.createdAt,
+			elapsed = self.props.elapsed,
+			disabled = self.props.disabled,
 			prefix = "Time Taken: "
 		})
 	})
-	t3.Help = not p1.props.attacking and createElement("Frame", {
+	table3.Help = not self.props.attacking and createElement("Frame", {
 		BorderSizePixel = 0,
-		BackgroundColor3 = p1.props.backgroundColor,
+		BackgroundColor3 = self.props.backgroundColor,
 		Size = UDim2.new(0.5, -2, 0.8, 0),
 		AnchorPoint = Vector2.new(0, 0),
 		Position = UDim2.new(0.5, 2, 1, 4)
@@ -139,16 +140,16 @@ function v1.render(p1)
 				Text = "Beat their time!",
 				LineHeight = 1,
 				TextScaled = true,
-				TextColor3 = ColorUtils.brightenBy(p1.props.backgroundColor, -0.5)
+				TextColor3 = ColorUtils.brightenBy(self.props.backgroundColor, -0.5)
 			})
 		})
 	})
 	return createElement("Frame", {
 		BorderSizePixel = 0,
-		BackgroundColor3 = p1.props.backgroundColor,
-		Size = p1.props.size,
-		AnchorPoint = p1.props.anchorPoint,
-		Position = p1.props.position
-	}, Dictionary.merge(p1.props[Roact.Children], t3))
+		BackgroundColor3 = self.props.backgroundColor,
+		Size = self.props.size,
+		AnchorPoint = self.props.anchorPoint,
+		Position = self.props.position
+	}, Dictionary.merge(self.props[Roact.Children], table3))
 end
-return v1
+return local1

@@ -1,7 +1,8 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer(nil, {
-	setIsBattleServer = function(p1, p2)
-		return p2.value
+	setIsBattleServer = function(arg1, self)
+		return self.value
 	end
 })

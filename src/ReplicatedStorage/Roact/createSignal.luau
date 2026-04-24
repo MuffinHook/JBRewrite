@@ -1,34 +1,35 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
-	local tbl = {}
+	local tableObj = {}
 	local tbl2 = {}
-	local v1 = false
+	local var1 = false
 	return {
- subscribe = function(p1, p2)
- assert(typeof(p2) == "function", "Can only subscribe to signals with a function.")
- local t3 = {
- callback = p2,
+ subscribe = function(self, callback)
+ assert(typeof(callback) == "function", "Can only subscribe to signals with a function.")
+ local metadata = {
+ callback = callback,
  disconnected = false
  }
- if v1 and not tbl[p2] then
- tbl2[p2] = t3
+ if var1 and not tableObj[callback] then
+ tbl2[callback] = metadata
  end
- tbl[p2] = t3
+ tableObj[callback] = metadata
  return function()
- assert(not t3.disconnected, "Listeners can only be disconnected once.")
- t3.disconnected = true
- tbl[p2] = nil
- tbl2[p2] = nil
+ assert(not metadata.disconnected, "Listeners can only be disconnected once.")
+ metadata.disconnected = true
+ tableObj[callback] = nil
+ tbl2[callback] = nil
  end
  end,
- fire = function(p1, ...)
- v1 = true
- for k, v in pairs(tbl) do
+ fire = function(self, ...)
+ var1 = true
+ for k, v in pairs(tableObj) do
  if not (v.disconnected or tbl2[k]) then
  k(...)
  end
  end
- v1 = false
+ var1 = false
  for k, v in pairs(tbl2) do
  tbl2[k] = nil
  end

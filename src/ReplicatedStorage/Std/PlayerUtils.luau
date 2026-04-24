@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")

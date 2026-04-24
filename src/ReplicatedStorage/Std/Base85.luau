@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {}
 local t2 = {
 	"0",

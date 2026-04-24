@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
@@ -45,24 +46,24 @@ function v1.didMount(p1)
 	end))
 end
 function v1.render(p1)
-	local t = {}
+	local configTable = {}
 	for i, v in ipairs(p1.props.dataFolder:GetChildren()) do
 		local v1
 		local v2 = v:GetAttribute("Time")
 		v1 = typeof(v2) == "number"
 		assert(v1, "time was not a number")
-		local v3 = math.floor(v2 % 3600000 / 60000)
-		local v4 = math.floor(v2 % 60000 / 1000)
-		local v5 = math.floor(v2 % 1000)
-		local t2 = {
+		local mathFunc = math.floor(v2 % 3600000 / 60000)
+		local mathFunc = math.floor(v2 % 60000 / 1000)
+		local mathFunc = math.floor(v2 % 1000)
+		local configTable = {
 			name = v.Value
 		}
-		t2.userId = tonumber(v.Name)
-		t2.time = v2
-		t2.message = ("%d:%02d.%03d"):format(v3, v4, v5)
-		table.insert(t, t2)
+		configTable.userId = tonumber(v.Name)
+		configTable.time = v2
+		configTable.message = ("%d:%02d.%03d"):format(mathFunc, mathFunc, mathFunc)
+		table.insert(configTable, configTable)
 	end
-	table.sort(t, function(p1, p2)
+	table.sort(configTable, function(p1, p2)
 		return p1.time < p2.time
 	end)
 	return createElement("SurfaceGui", {
@@ -73,20 +74,20 @@ function v1.render(p1)
 		Adornee = p1.props.adornee
 	}, {
 		Board = createElement(Board, {
-			entries = t
+			entries = configTable
 		})
 	})
 end
 function v1.willUnmount(p1)
 	p1._maid:DoCleaning()
 end
-local t = {}
-t.__index = t
-function t.new(p1)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._maid = Maid.new()
-	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1.Parent.Parent, "Data", function(p12, p2)
+local configTable = {}
+configTable.__index = configTable
+function configTable.new(p1)
+	local configTable = {}
+	setmetatable(configTable, configTable)
+	configTable._maid = Maid.new()
+	configTable._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1.Parent.Parent, "Data", function(p12, p2)
 		local v12 = Roact.mount(createElement(v1, {
 			adornee = p1,
 			dataFolder = p12
@@ -95,9 +96,9 @@ function t.new(p1)
 			Roact.unmount(v12)
 		end)
 	end))
-	return t2
+	return configTable
 end
-function t.Destroy(p1)
+function configTable.Destroy(p1)
 	p1._maid:Destroy()
 end
-Binder.new("RaceTrackBoard", t):Start()
+Binder.new("RaceTrackBoard", configTable):Start()

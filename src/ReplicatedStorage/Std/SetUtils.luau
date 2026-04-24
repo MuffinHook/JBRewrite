@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {
 	fromArray = function(p1)
 		local t = {}

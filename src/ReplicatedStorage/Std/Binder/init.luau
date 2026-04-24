@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 local Maid = require(script.Parent.Maid)

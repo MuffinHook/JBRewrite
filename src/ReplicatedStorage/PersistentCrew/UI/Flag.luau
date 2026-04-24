@@ -1,22 +1,23 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("Flag")
-v1.defaultProps = {
+local local1 = Roact.PureComponent:extend("Flag")
+local1.defaultProps = {
 	flagColor = Color3.new(255/255, 255/255, 255/255),
 	userId = 1,
 	size = UDim2.fromScale(1, 1),
 	position = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5)
 }
-function v1.render(p1)
+function local1.render(self)
 	return createElement("Frame", {
 		BorderSizePixel = 0,
-		BackgroundColor3 = p1.props.flagColor,
-		Size = p1.props.size,
-		AnchorPoint = p1.props.anchorPoint,
-		Position = p1.props.position
+		BackgroundColor3 = self.props.flagColor,
+		Size = self.props.size,
+		AnchorPoint = self.props.anchorPoint,
+		Position = self.props.position
 	}, {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
@@ -25,7 +26,7 @@ function v1.render(p1)
 			BackgroundTransparency = 1,
 			Image = "rbxassetid://12385250525",
 			Size = UDim2.fromScale(1, 1),
-			ImageColor3 = p1.props.flagColor
+			ImageColor3 = self.props.flagColor
 		}, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, 4)
@@ -33,7 +34,7 @@ function v1.render(p1)
 		}),
 		Avatar = createElement("ImageLabel", {
 			BackgroundTransparency = 1,
-			Image = "rbxthumb://type=AvatarHeadShot&w=150&h=150&id=" .. (p1.props.userId or 1),
+			Image = "rbxthumb://type=AvatarHeadShot&w=150&h=150&id=" .. (self.props.userId or 1),
 			Size = UDim2.fromScale(1, 0.9),
 			Position = UDim2.fromScale(0, 0),
 			AnchorPoint = Vector2.new(0, 0),
@@ -50,4 +51,4 @@ function v1.render(p1)
 		})
 	})
 end
-return v1
+return local1

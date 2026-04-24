@@ -1,23 +1,24 @@
 -- Reviewed by Claude
+-- variables reassigned
 local TestEnum = require(script.Parent.TestEnum)
 local TestSession = require(script.Parent.TestSession)
 local LifecycleHooks = require(script.Parent.LifecycleHooks)
-local t = {
+local testRunnerModule = {
 	environment = {}
 }
-local function wrapExpectContextWithPublicApi(p1)
-	local t = {
+local function wrapExpectContextWithPublicApi(expectationContext)
+	local wrappedContext = {
 		extend = function(...)
-			p1:extend(...)
+			expectationContext:extend(...)
 		end
 	}
-	return setmetatable(t, {
-		__call = function(p12, ...)
-			return p1:startExpectationChain(...)
+	return setmetatable(wrappedContext, {
+		__call = function(self, ...)
+			return expectationContext:startExpectationChain(...)
 		end
 	})
 end
-function t.runPlan(p1)
+function testRunnerModule.runPlan(plan)
 	local v1 = TestSession.new(p1)
 	local v2 = LifecycleHooks.new()
 	v1.hasFocusNodes = #p1:findNodes(function(p1)

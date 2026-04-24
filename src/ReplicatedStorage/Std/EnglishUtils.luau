@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return {
 	getAOrAn = function(p1)
 		if ({

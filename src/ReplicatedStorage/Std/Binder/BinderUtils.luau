@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local CollectionService = game:GetService("CollectionService")
 local t = {
 	findFirstAncestor = function(p1, p2)

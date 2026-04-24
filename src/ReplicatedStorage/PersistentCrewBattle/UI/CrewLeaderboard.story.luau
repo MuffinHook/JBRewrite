@@ -1,16 +1,17 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClanConsts = require(ReplicatedStorage.Clan.ClanConsts)
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(self)
+	local local1 = Roact.Component:extend("App")
 	local CrewLeaderboard = require(script.Parent.CrewLeaderboard)
 	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
 	local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
-	function v1.init(p1)
-		p1.aspectRatio = 1.5
-		p1.leaderboardInfo = {
+	function local1.init(self)
+		self.aspectRatio = 1.5
+		self.leaderboardInfo = {
 			{
 				ownerUserId = 2837719,
 				clanName = "Good Gang",
@@ -209,27 +210,27 @@ return function(p1)
 			}
 		}
 	end
-	function v1.render(p1)
+	function local1.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement("Frame", {
 				Size = UDim2.fromScale(1, 1)
 			}, {
 				x = Roact.createElement(CrewLeaderboard, {
-					leaderboardInfo = p1.leaderboardInfo,
-					aspectRatio = p1.aspectRatio,
+					leaderboardInfo = self.leaderboardInfo,
+					aspectRatio = self.aspectRatio,
 					displayType = PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.CrewsInServer,
 					attemptViewClanId = function()
 						print("attempting join")
 					end
 				}),
 				Aspect = Roact.createElement("UIAspectRatioConstraint", {
-					AspectRatio = p1.aspectRatio
+					AspectRatio = self.aspectRatio
 				})
 			}) })
 	end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	local local2 = Roact.mount(Roact.createElement(local1), self)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(local2)
 	end
 end

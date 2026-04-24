@@ -1,57 +1,58 @@
 -- Reviewed by Claude
+-- variables reassigned
 local TestEnum = require(script.Parent.TestEnum)
-local t = {}
-t.__index = t
-function t.new()
+local lifecycleHooksClass = {}
+lifecycleHooksClass.__index = lifecycleHooksClass
+function lifecycleHooksClass.new()
 	return setmetatable({
 		_stack = {}
-	}, t)
+	}, lifecycleHooksClass)
 end
-function t.getBeforeEachHooks(p1)
+function lifecycleHooksClass.getBeforeEachHooks(self)
 	local BeforeEach = TestEnum.NodeType.BeforeEach
-	local t = {}
-	for i, v in ipairs(p1._stack) do
-		for i2, v2 in ipairs(v[BeforeEach]) do
-			table.insert(t, v2)
+	local hooks = {}
+	for i, hookLevel in ipairs(self._stack) do
+		for i2, hook in ipairs(hookLevel[BeforeEach]) do
+			table.insert(hooks, hook)
 		end
 	end
-	return t
+	return hooks
 end
-function t.getAfterEachHooks(p1)
+function lifecycleHooksClass.getAfterEachHooks(self)
 	local AfterEach = TestEnum.NodeType.AfterEach
-	local t = {}
-	for i, v in ipairs(p1._stack) do
-		for i2, v2 in ipairs(v[AfterEach]) do
-			table.insert(t, 1, v2)
+	local hooks = {}
+	for i, hookLevel in ipairs(self._stack) do
+		for i2, hook in ipairs(hookLevel[AfterEach]) do
+			table.insert(hooks, 1, hook)
 		end
 	end
-	return t
+	return hooks
 end
-function t.popHooks(p1)
-	table.remove(p1._stack, #p1._stack)
+function lifecycleHooksClass.popHooks(self)
+	table.remove(self._stack, #self._stack)
 end
-function t.pushHooksFrom(p1, p2)
-	assert(p2 ~= nil)
-	table.insert(p1._stack, {
-		[TestEnum.NodeType.BeforeAll] = p1:_getHooksOfType(p2.children, TestEnum.NodeType.BeforeAll),
-		[TestEnum.NodeType.AfterAll] = p1:_getHooksOfType(p2.children, TestEnum.NodeType.AfterAll),
-		[TestEnum.NodeType.BeforeEach] = p1:_getHooksOfType(p2.children, TestEnum.NodeType.BeforeEach),
-		[TestEnum.NodeType.AfterEach] = p1:_getHooksOfType(p2.children, TestEnum.NodeType.AfterEach)
+function lifecycleHooksClass.pushHooksFrom(self, node)
+	assert(node ~= nil)
+	table.insert(self._stack, {
+		[TestEnum.NodeType.BeforeAll] = self:_getHooksOfType(node.children, TestEnum.NodeType.BeforeAll),
+		[TestEnum.NodeType.AfterAll] = self:_getHooksOfType(node.children, TestEnum.NodeType.AfterAll),
+		[TestEnum.NodeType.BeforeEach] = self:_getHooksOfType(node.children, TestEnum.NodeType.BeforeEach),
+		[TestEnum.NodeType.AfterEach] = self:_getHooksOfType(node.children, TestEnum.NodeType.AfterEach)
 	})
 end
-function t.getBeforeAllHooks(p1)
-	return p1._stack[#p1._stack][TestEnum.NodeType.BeforeAll]
+function lifecycleHooksClass.getBeforeAllHooks(self)
+	return self._stack[#self._stack][TestEnum.NodeType.BeforeAll]
 end
-function t.getAfterAllHooks(p1)
-	return p1._stack[#p1._stack][TestEnum.NodeType.AfterAll]
+function lifecycleHooksClass.getAfterAllHooks(self)
+	return self._stack[#self._stack][TestEnum.NodeType.AfterAll]
 end
-function t._getHooksOfType(p1, p2, p3)
-	local t = {}
-	for i, v in ipairs(p2) do
-		if v.type == p3 then
-			table.insert(t, v.callback)
+function lifecycleHooksClass._getHooksOfType(self, children, nodeType)
+	local hooks = {}
+	for i, child in ipairs(children) do
+		if child.type == nodeType then
+			table.insert(hooks, child.callback)
 		end
 	end
-	return t
+	return hooks
 end
-return t
+return lifecycleHooksClass

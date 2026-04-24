@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local v1 = if RunService:IsServer() and (ServerStorage:FindFirstChild("Game") and ServerStorage.Game:FindFirstChild("ServerPlayerUtils")) then require(ServerStorage.Game.ServerPlayerUtils) else nil

@@ -1,12 +1,13 @@
 -- Reviewed by Claude
-return function(p1, p2)
-	local v1 = p2 or tostring(p1)
-	return setmetatable(p1, {
- __index = function(p1, p2)
- error(("%q (%s) is not a valid member of %s"):format(tostring(p2), typeof(p2), v1), 2)
+-- variables reassigned
+return function(self, callback)
+	local varType = callback or tostring(self)
+	return setmetatable(self, {
+ __index = function(self, callback)
+ error(("%q (%s) is not a valid member of %s"):format(tostring(callback), typeof(callback), varType), 2)
  end,
- __newindex = function(p1, p2, p3)
- error(("%q (%s) is not a valid member of %s"):format(tostring(p2), typeof(p2), v1), 2)
+ __newindex = function(self, callback, self)
+ error(("%q (%s) is not a valid member of %s"):format(tostring(callback), typeof(callback), varType), 2)
  end
 	})
 end

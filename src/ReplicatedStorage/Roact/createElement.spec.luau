@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local Component = require(script.Parent.Component)
 	local ElementKind = require(script.Parent.ElementKind)
@@ -41,24 +42,24 @@ return function()
 	end)
 	it("should accept props and children", function()
  local fn = createElement("IntValue")
- local v2 = createElement("StringValue", {
+ local var2 = createElement("StringValue", {
  Value = "Foo"
  }, {
  Child = fn
  })
- expect(v2).to.be.ok()
- expect(v2.props.Value).to.equal("Foo")
- expect(v2.props[Children]).to.be.ok()
- expect(v2.props[Children].Child).to.equal(fn)
+ expect(var2).to.be.ok()
+ expect(var2.props.Value).to.equal("Foo")
+ expect(var2.props[Children]).to.be.ok()
+ expect(var2.props[Children].Child).to.equal(fn)
 	end)
 	it("should accept children with without props", function()
  local fn = createElement("IntValue")
- local v2 = createElement("StringValue", nil, {
+ local var2 = createElement("StringValue", nil, {
  Child = fn
  })
- expect(v2).to.be.ok()
- expect(v2.props[Children]).to.be.ok()
- expect(v2.props[Children].Child).to.equal(fn)
+ expect(var2).to.be.ok()
+ expect(var2.props[Children]).to.be.ok()
+ expect(var2.props[Children].Child).to.equal(fn)
 	end)
 	it("should warn once if children is specified in two different ways", function()
  local fn = Logging.capture(function()

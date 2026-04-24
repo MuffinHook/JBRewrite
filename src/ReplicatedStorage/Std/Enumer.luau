@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {}
 function t.__index(p1, p2)
 	if t[p2] then

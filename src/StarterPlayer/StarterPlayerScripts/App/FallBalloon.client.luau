@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
@@ -48,13 +49,13 @@ local function _()
 					v4(v32, false)
 					v32.Phase = "Air"
 				end
-				local v6 = math.noise(v12 * v3.SwaySpeed * v3.SwayAmount)
-				local v7 = math.noise(v12 * v3.SwaySpeed * 0.8 * v3.SwayAmount * 0.5)
-				local v9 = math.sin(v12 * v3.SwaySpeed)
-				local v10 = v9 * math.rad(v3.SwayTilt)
-				local v122 = math.cos(v12 * v3.SwaySpeed * 0.8)
-				local v13 = v122 * math.rad(v3.SwayTilt)
-				v32.Part.CFrame = v32.Pivot * CFrame.Angles(v10, 0, v13) * CFrame.new(v6, 0, v7) * v32.Pivot:ToObjectSpace(v32.Up)
+				local mathFunc = math.noise(v12 * v3.SwaySpeed * v3.SwayAmount)
+				local mathFunc = math.noise(v12 * v3.SwaySpeed * 0.8 * v3.SwayAmount * 0.5)
+				local mathFunc = math.sin(v12 * v3.SwaySpeed)
+				local mathFunc = mathFunc * math.rad(v3.SwayTilt)
+				local mathFunc = math.cos(v12 * v3.SwaySpeed * 0.8)
+				local mathFunc = mathFunc * math.rad(v3.SwayTilt)
+				v32.Part.CFrame = v32.Pivot * CFrame.Angles(mathFunc, 0, mathFunc) * CFrame.new(mathFunc, 0, mathFunc) * v32.Pivot:ToObjectSpace(v32.Up)
 			else
 				if v32.Phase ~= "Down" then
 					v32.Phase = "Down"
@@ -65,16 +66,16 @@ local function _()
 	end
 end
 local function _(p1)
-	local t = {
+	local configTable = {
 		Offset = p1:GetAttribute("Offset") or 0,
 		Part = p1:WaitForChild("Main"),
 		Origin = p1.Main.CFrame
 	}
-	t.Up = p1.Main.CFrame + Vector3.new(0, v6.UpDist, 0)
-	t.Pivot = p1.Main.CFrame + Vector3.new(0, v6.UpDist + v6.UpPivot, 0)
-	t.Phase = "Resting"
-	v5[p1] = t
-	v7 = v7 + 1
+	configTable.Up = p1.Main.CFrame + Vector3.new(0, mathFunc.UpDist, 0)
+	configTable.Pivot = p1.Main.CFrame + Vector3.new(0, mathFunc.UpDist + mathFunc.UpPivot, 0)
+	configTable.Phase = "Resting"
+	v5[p1] = configTable
+	mathFunc = mathFunc + 1
 end
 local function _(p1)
 	if v8[p1] then
@@ -82,6 +83,6 @@ local function _(p1)
 			v8[p1].Part.CFrame = v8[p1].Origin
 		end
 		v8[p1] = nil
-		v9 = v9 - 1
+		mathFunc = mathFunc - 1
 	end
 end

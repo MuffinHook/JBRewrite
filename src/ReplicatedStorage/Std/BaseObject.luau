@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Maid = require(script.Parent.Maid)
 local t = {
 	ClassName = "BaseObject"

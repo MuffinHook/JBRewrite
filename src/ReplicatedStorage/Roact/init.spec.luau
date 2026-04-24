@@ -1,8 +1,9 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
-	local v1 = require(script.Parent)
+	local config = require(script.Parent)
 	it("should load with all public APIs", function()
- local tbl = {
+ local tableObj = {
  createElement = "function",
  createFragment = "function",
  createRef = "function",
@@ -28,17 +29,17 @@ return function()
  None = true,
  UNSTABLE = true
  }
- expect(v1).to.be.ok()
- for k, v in pairs(tbl) do
- local v12, v2
- v12 = if typeof(v) == "string" then typeof(v1[k]) == v else v1[k] ~= nil
- if not v12 then
+ expect(config).to.be.ok()
+ for k, v in pairs(tableObj) do
+ local internalData, v2
+ internalData = if typeof(v) == "string" then typeof(config[k]) == v else config[k] ~= nil
+ if not internalData then
  v2 = if typeof(v) == "boolean" then "present" else "of type " .. tostring(v)
- error((("Expected public API member %q to be %s, but instead it was of type %s"):format(tostring(k), v2, (typeof(v1[k])))))
+ error((("Expected public API member %q to be %s, but instead it was of type %s"):format(tostring(k), v2, (typeof(config[k])))))
  end
  end
- for k in pairs(v1) do
- if tbl[k] == nil then
+ for k in pairs(config) do
+ if tableObj[k] == nil then
  error((("Found unknown public API key %q!"):format((tostring(k)))))
  end
  end

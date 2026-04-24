@@ -1,38 +1,39 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Expectation = require(script.Parent.Expectation)
 local checkMatcherNameCollisions = Expectation.checkMatcherNameCollisions
-local function copy(p1)
-	local t = {}
-	for k, v in pairs(p1) do
-		t[k] = v
+local function copy(table)
+	local newTable = {}
+	for k, v in pairs(table) do
+		newTable[k] = v
 	end
-	return t
+	return newTable
 end
-local t = {}
-t.__index = t
-function t.new(p1)
-	local t2 = {}
-	local v1
-	if p1 then
-		local t3 = {}
-		for k, v in pairs(p1._extensions) do
-			t3[k] = v
+local expectationContextClass = {}
+expectationContextClass.__index = expectationContextClass
+function expectationContextClass.new(parentContext)
+	local context = {}
+	local extensions
+	if parentContext then
+		local copiedExtensions = {}
+		for k, v in pairs(parentContext._extensions) do
+			copiedExtensions[k] = v
 		end
-		v1 = t3 or {}
+		extensions = copiedExtensions or {}
 	else
-		v1 = {}
+		extensions = {}
 	end
-	t2._extensions = v1
-	return setmetatable(t2, t)
+	context._extensions = extensions
+	return setmetatable(context, expectationContextClass)
 end
-function t.startExpectationChain(p1, ...)
-	return Expectation.new(...):extend(p1._extensions)
+function expectationContextClass.startExpectationChain(self, ...)
+	return Expectation.new(...):extend(self._extensions)
 end
-function t.extend(p1, p2)
-	for k, v in pairs(p2) do
-		assert(p1._extensions[k] == nil, string.format("Cannot reassign %q in expect.extend", k))
+function expectationContextClass.extend(self, matchers)
+	for k, v in pairs(matchers) do
+		assert(self._extensions[k] == nil, string.format("Cannot reassign %q in expect.extend", k))
 		assert(checkMatcherNameCollisions(k), string.format("Cannot overwrite matcher %q; it already exists", k))
-		p1._extensions[k] = v
+		self._extensions[k] = v
 	end
 end
-return t
+return expectationContextClass

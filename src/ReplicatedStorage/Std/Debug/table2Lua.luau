@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local insert = table.insert
 return function(p1)
 	if p1 == nil then

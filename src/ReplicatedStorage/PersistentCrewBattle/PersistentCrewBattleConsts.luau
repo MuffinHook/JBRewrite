@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
@@ -8,11 +9,11 @@ local RunConsts = require(ReplicatedStorage.App.RunConsts)
 require(ReplicatedStorage.Clan.ClanConsts)
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
 local Enumer = require(ReplicatedStorage.Std.Enumer)
-local v1 = 60
+local constant = 60
 if RunUtils.getEnv() == RunConsts.QA_NAME then
-	v1 = 10
+	constant = 10
 elseif RunUtils.getEnv() == RunConsts.DEV_NAME or RunUtils.getEnv() == RunConsts.STUDIO_NAME then
-	v1 = 1
+	constant = 1
 end
 local t = {
 	CURR_CREW_BATTLE_SEASON = 20,
@@ -45,7 +46,7 @@ t.TELEPORT_MESSAGE_TYPE = "Teleport"
 t.BATTLE_REJECTED_MESSAGE_TYPE = "BattleRejected"
 t.NUM_PROVISIONAL_RATING_BATTLES = if RunUtils.getEnv() == RunConsts.PROD_NAME then 10 else 1
 t.UNACCEPT_BATTLE_INVITE_REMOTE_NAME = "UnacceptBattleInviteRemote"
-t.BATTLE_INVITE_COOLDOWN_TIME = v1
+t.BATTLE_INVITE_COOLDOWN_TIME = constant
 t.NUM_ROBBERIES_AVAILABLE = 5
 t.NUM_ROBBERIES_TO_FINISH_ROUND = 3
 t.CREW_BATTLE_END_REASON_ENUM = Enumer({ "BattleComplete", "WinByDefault" })

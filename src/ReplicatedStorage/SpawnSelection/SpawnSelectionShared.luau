@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
@@ -7,71 +8,71 @@ local SpawnSelectionConsts = require(ReplicatedStorage.SpawnSelection.SpawnSelec
 local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
 local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
 local t = {}
-local function encodeSpawnName(p1)
-	return p1:gsub("[^%w]", "")
+local function encodeSpawnName(spawnName)
+	return spawnName:gsub("[^%w]", "")
 end
-function t.getPlayerLastSpawnedAt(p1, p2)
-	local v1 = p2.name:gsub("[^%w]", "")
-	local v2 = p1:FindFirstChild(SpawnSelectionConsts.SPAWN_TIME_HOLDER_OBJ_NAME)
-	if v2 then
-		return v2:GetAttribute(v1) or 0
+function t.getPlayerLastSpawnedAt(player, spawnData)
+	local encodedName = spawnData.name:gsub("[^%w]", "")
+	local spawnTimeHolder = player:FindFirstChild(SpawnSelectionConsts.SPAWN_TIME_HOLDER_OBJ_NAME)
+	if spawnTimeHolder then
+		return spawnTimeHolder:GetAttribute(encodedName) or 0
 	else
 		return 0
 	end
 end
-function t.recordPlayerSpawnedAt(p1, p2)
-	local v1 = p2.name:gsub("[^%w]", "")
-	local v2 = p1:FindFirstChild(SpawnSelectionConsts.SPAWN_TIME_HOLDER_OBJ_NAME)
-	if not v2 then
-		local v3 = Instance.new("BoolValue")
-		v3.Name = SpawnSelectionConsts.SPAWN_TIME_HOLDER_OBJ_NAME
-		v3.Parent = p1
-		v2 = v3
+function t.recordPlayerSpawnedAt(player, spawnData)
+	local encodedName = spawnData.name:gsub("[^%w]", "")
+	local spawnTimeHolder = player:FindFirstChild(SpawnSelectionConsts.SPAWN_TIME_HOLDER_OBJ_NAME)
+	if not spawnTimeHolder then
+		local newHolder = Instance.new("BoolValue")
+		newHolder.Name = SpawnSelectionConsts.SPAWN_TIME_HOLDER_OBJ_NAME
+		newHolder.Parent = player
+		spawnTimeHolder = newHolder
 	end
-	v2:SetAttribute(v1, (workspace:GetServerTimeNow()))
+	spawnTimeHolder:SetAttribute(encodedName, (workspace:GetServerTimeNow()))
 	return true
 end
-function t.canPlayerSpawnAt(p1, p2)
-	if p2.exclusiveTeamId and not t.isTeamIdSame(PlayerUtils.getTeamId(p1), p2.exclusiveTeamId) then
+function t.canPlayerSpawnAt(player, spawnData)
+	if spawnData.exclusiveTeamId and not t.isTeamIdSame(PlayerUtils.getTeamId(player), spawnData.exclusiveTeamId) then
 		return false
-	elseif p2.exclusiveBoss and not GamepassSystem.doesPlayerOwnCached(p1, GamepassUtils.EnumGamepass.BOSS) then
+	elseif spawnData.exclusiveBoss and not GamepassSystem.doesPlayerOwnCached(player, GamepassUtils.EnumGamepass.BOSS) then
 		return false, {
 			gamepassRequired = GamepassUtils.EnumGamepass.BOSS
 		}
-	elseif p2.exclusiveSWAT and not GamepassSystem.doesPlayerOwnCached(p1, GamepassUtils.EnumGamepass.SWAT) then
+	elseif spawnData.exclusiveSWAT and not GamepassSystem.doesPlayerOwnCached(player, GamepassUtils.EnumGamepass.SWAT) then
 		return false, {
 			gamepassRequired = GamepassUtils.EnumGamepass.SWAT
 		}
-	elseif p2.exclusiveVIP and not GamepassSystem.doesPlayerOwnCached(p1, GamepassUtils.EnumGamepass.VIP) then
+	elseif spawnData.exclusiveVIP and not GamepassSystem.doesPlayerOwnCached(player, GamepassUtils.EnumGamepass.VIP) then
 		return false, {
 			gamepassRequired = GamepassUtils.EnumGamepass.VIP
 		}
 	else
-		local v2 = p1:GetAttribute("LastDeathPosition")
-		local v3, v4
-		if v2 and typeof(v2) == "Vector3" then
-			local Magnitude = ((v2 - p2.position) * Vector3.new(1, 0, 1)).Magnitude
+		local lastDeathPos = player:GetAttribute("LastDeathPosition")
+		local nowTime, timeDiff
+		if lastDeathPos and typeof(lastDeathPos) == "Vector3" then
+			local Magnitude = ((lastDeathPos - spawnData.position) * Vector3.new(1, 0, 1)).Magnitude
 			if Magnitude < 900 then
 				return false, {
 					distance = Magnitude
 				}
 			else
-				v3 = workspace:GetServerTimeNow()
-				v4 = SpawnSelectionConsts.SPAWN_COOLDOWN_TIME - (v3 - t.getPlayerLastSpawnedAt(p1, p2))
-				if v4 > 0 then
+				nowTime = workspace:GetServerTimeNow()
+				timeDiff = SpawnSelectionConsts.SPAWN_COOLDOWN_TIME - (nowTime - t.getPlayerLastSpawnedAt(player, spawnData))
+				if timeDiff > 0 then
 					return false, {
-						timeLeft = v4
+						timeLeft = timeDiff
 					}
 				else
 					return true
 				end
 			end
 		else
-			v3 = workspace:GetServerTimeNow()
-			v4 = SpawnSelectionConsts.SPAWN_COOLDOWN_TIME - (v3 - t.getPlayerLastSpawnedAt(p1, p2))
-			if v4 > 0 then
+			nowTime = workspace:GetServerTimeNow()
+			timeDiff = SpawnSelectionConsts.SPAWN_COOLDOWN_TIME - (nowTime - t.getPlayerLastSpawnedAt(player, spawnData))
+			if timeDiff > 0 then
 				return false, {
-					timeLeft = v4
+					timeLeft = timeDiff
 				}
 			else
 				return true
@@ -79,48 +80,48 @@ function t.canPlayerSpawnAt(p1, p2)
 		end
 	end
 end
-function t.isTeamIdSame(p1, p2)
-	if p2 == Settings.EnumTeam.Police and p1 ~= Settings.EnumTeam.Police then
+function t.isTeamIdSame(playerTeamId, spawnTeamId)
+	if spawnTeamId == Settings.EnumTeam.Police and playerTeamId ~= Settings.EnumTeam.Police then
 		return false
 	else
-		return p2 ~= Settings.EnumTeam.Prisoner and p2 ~= Settings.EnumTeam.Criminal or (p1 == Settings.EnumTeam.Prisoner or p1 == Settings.EnumTeam.Criminal)
+		return spawnTeamId ~= Settings.EnumTeam.Prisoner and spawnTeamId ~= Settings.EnumTeam.Criminal or (playerTeamId == Settings.EnumTeam.Prisoner or playerTeamId == Settings.EnumTeam.Criminal)
 	end
 end
-function t.getSpawnDataFromSpawnPart(p1)
-	local v1 = p1:GetAttribute(SpawnSelectionConsts.SPAWN_EXCLUSIVE_TEAM_NAME_ATTR_NAME)
-	local v2
-	if v1 then
-		if v1 then
-			v2 = Settings.EnumTeam[v1]
+function t.getSpawnDataFromSpawnPart(spawnPart)
+	local teamNameAttr = spawnPart:GetAttribute(SpawnSelectionConsts.SPAWN_EXCLUSIVE_TEAM_NAME_ATTR_NAME)
+	local exclusiveTeamId
+	if teamNameAttr then
+		if teamNameAttr then
+			exclusiveTeamId = Settings.EnumTeam[teamNameAttr]
 		else
-			error(("Blank attribute SPAWN_EXCLUSIVE_TEAM_NAME_ATTR_NAME for %s"):format(p1:GetFullName()))
+			error(("Blank attribute SPAWN_EXCLUSIVE_TEAM_NAME_ATTR_NAME for %s"):format(spawnPart:GetFullName()))
 		end
 	else
-		v2 = nil
+		exclusiveTeamId = nil
 	end
-	local t = {
-		name = p1.Name,
-		position = p1.Position,
-		exclusiveTeamId = v2
+	local spawnDataTable = {
+		name = spawnPart.Name,
+		position = spawnPart.Position,
+		exclusiveTeamId = exclusiveTeamId
 	}
-	t.exclusiveBoss = p1:GetAttribute(SpawnSelectionConsts.SPAWN_EXCLUSIVE_BOSS_ATTR_NAME) == true
-	t.exclusiveSWAT = p1:GetAttribute(SpawnSelectionConsts.SPAWN_EXCLUSIVE_SWAT_ATTR_NAME) == true
-	t.exclusiveVIP = p1:GetAttribute(SpawnSelectionConsts.SPAWN_EXCLUSIVE_VIP_ATTR_NAME) == true
-	t.useParachute = p1:GetAttribute(SpawnSelectionConsts.SPAWN_USE_PARACHUTE_ATTR_NAME) == true
-	return t
+	spawnDataTable.exclusiveBoss = spawnPart:GetAttribute(SpawnSelectionConsts.SPAWN_EXCLUSIVE_BOSS_ATTR_NAME) == true
+	spawnDataTable.exclusiveSWAT = spawnPart:GetAttribute(SpawnSelectionConsts.SPAWN_EXCLUSIVE_SWAT_ATTR_NAME) == true
+	spawnDataTable.exclusiveVIP = spawnPart:GetAttribute(SpawnSelectionConsts.SPAWN_EXCLUSIVE_VIP_ATTR_NAME) == true
+	spawnDataTable.useParachute = spawnPart:GetAttribute(SpawnSelectionConsts.SPAWN_USE_PARACHUTE_ATTR_NAME) == true
+	return spawnDataTable
 end
-function t.getSpawnPartFromName(p1)
-	for v1, v2 in CollectionService:GetTagged(SpawnSelectionConsts.SPAWN_TAG_NAME) do
-		if v2.Name == p1 then
-			return v2
+function t.getSpawnPartFromName(spawnName)
+	for index, spawnPart in CollectionService:GetTagged(SpawnSelectionConsts.SPAWN_TAG_NAME) do
+		if spawnPart.Name == spawnName then
+			return spawnPart
 		end
 	end
 end
 function t.getAllSpawnData()
-	local t2 = {}
-	for v1, v2 in CollectionService:GetTagged(SpawnSelectionConsts.SPAWN_TAG_NAME) do
-		table.insert(t2, t.getSpawnDataFromSpawnPart(v2))
+	local allSpawnsData = {}
+	for index, spawnPart in CollectionService:GetTagged(SpawnSelectionConsts.SPAWN_TAG_NAME) do
+		table.insert(allSpawnsData, t.getSpawnDataFromSpawnPart(spawnPart))
 	end
-	return t2
+	return allSpawnsData
 end
 return t

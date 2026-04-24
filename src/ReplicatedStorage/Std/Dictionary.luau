@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local v1 = newproxy(true)
 getmetatable(v1).__tostring = function()
 	return "None"

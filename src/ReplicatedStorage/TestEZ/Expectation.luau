@@ -1,6 +1,7 @@
 -- Reviewed by Claude
-local t = {}
-local t2 = {
+-- variables reassigned
+local expectationClass = {}
+local modifierKeywords = {
 	to = true,
 	be = true,
 	been = true,
@@ -8,205 +9,205 @@ local t2 = {
 	was = true,
 	at = true
 }
-local t3 = {
+local negationKeywords = {
 	never = true
 }
-local function assertLevel(p1, p2, p3)
-	local v1 = p2 or "Assertion failed!"
-	local v2 = p3 or 1
-	if not p1 then
-		error(v1, v2 + 1)
+local function assertLevel(condition, message, level)
+	local errorMessage = message or "Assertion failed!"
+	local errorLevel = level or 1
+	if not condition then
+		error(errorMessage, errorLevel + 1)
 	end
 end
-local function bindSelf(p1, p2)
-	return function(p12, ...)
-		if p12 == p1 then
-			return p2(p1, ...)
+local function bindSelf(expectedSelf, method)
+	return function(actualSelf, ...)
+		if actualSelf == expectedSelf then
+			return method(expectedSelf, ...)
 		else
-			return p2(p1, p12, ...)
+			return method(expectedSelf, actualSelf, ...)
 		end
 	end
 end
-local function formatMessage(p1, p2, p3)
-	if p1 then
-		return p2
+local function formatMessage(shouldPass, passMessage, failMessage)
+	if shouldPass then
+		return passMessage
 	else
-		return p3
+		return failMessage
 	end
 end
-function t.new(p1)
-	local t2 = {
-		value = p1,
+function expectationClass.new(value)
+	local expectation = {
+		value = value,
 		successCondition = true,
 		condition = false,
 		matchers = {},
 		_boundMatchers = {}
 	}
-	setmetatable(t2, t)
-	local a = t2.a
-	function t2.a(p1, ...)
-		if p1 == t2 then
-			return a(t2, ...)
+	setmetatable(expectation, expectationClass)
+	local aMethod = expectation.a
+	function expectation.a(self, ...)
+		if self == expectation then
+			return aMethod(expectation, ...)
 		else
-			return a(t2, p1, ...)
+			return aMethod(expectation, self, ...)
 		end
 	end
-	t2.an = t2.a
-	local ok = t2.ok
-	function t2.ok(p1, ...)
-		if p1 == t2 then
-			return ok(t2, ...)
+	expectation.an = expectation.a
+	local okMethod = expectation.ok
+	function expectation.ok(self, ...)
+		if self == expectation then
+			return okMethod(expectation, ...)
 		else
-			return ok(t2, p1, ...)
+			return okMethod(expectation, self, ...)
 		end
 	end
-	local equal = t2.equal
-	function t2.equal(p1, ...)
-		if p1 == t2 then
-			return equal(t2, ...)
+	local equalMethod = expectation.equal
+	function expectation.equal(self, ...)
+		if self == expectation then
+			return equalMethod(expectation, ...)
 		else
-			return equal(t2, p1, ...)
+			return equalMethod(expectation, self, ...)
 		end
 	end
-	local throw = t2.throw
-	function t2.throw(p1, ...)
-		if p1 == t2 then
-			return throw(t2, ...)
+	local throwMethod = expectation.throw
+	function expectation.throw(self, ...)
+		if self == expectation then
+			return throwMethod(expectation, ...)
 		else
-			return throw(t2, p1, ...)
+			return throwMethod(expectation, self, ...)
 		end
 	end
-	local near = t2.near
-	function t2.near(p1, ...)
-		if p1 == t2 then
-			return near(t2, ...)
+	local nearMethod = expectation.near
+	function expectation.near(self, ...)
+		if self == expectation then
+			return nearMethod(expectation, ...)
 		else
-			return near(t2, p1, ...)
+			return nearMethod(expectation, self, ...)
 		end
 	end
-	return t2
+	return expectation
 end
-function t.checkMatcherNameCollisions(p1)
-	return not (t2[p1] or (t3[p1] or t[p1]))
+function expectationClass.checkMatcherNameCollisions(key)
+	return not (modifierKeywords[key] or (negationKeywords[key] or expectationClass[key]))
 end
-function t.extend(p1, p2)
-	p1.matchers = p2 or {}
-	for k, v in pairs(p1.matchers) do
-		local function f2(p12, ...)
-			local v1 = v(p1.value, ...)
-			local v2 = v1.message or "Assertion failed!"
-			local v3 = 3 or 1
-			if v1.pass ~= p1.successCondition then
-				error(v2, v3 + 1)
+function expectationClass.extend(expectation, matchers)
+	expectation.matchers = matchers or {}
+	for k, matcher in pairs(expectation.matchers) do
+		local function boundMatcherFunction(self, ...)
+			local matchResult = matcher(expectation.value, ...)
+			local errorMessage = matchResult.message or "Assertion failed!"
+			local errorLevel = 3 or 1
+			if matchResult.pass ~= expectation.successCondition then
+				error(errorMessage, errorLevel + 1)
 			end
-			p1:_resetModifiers()
-			return p1
+			expectation:_resetModifiers()
+			return expectation
 		end
-		p1._boundMatchers[k] = function(p12, ...)
-			if p12 == p1 then
-				return f2(p1, ...)
+		expectation._boundMatchers[k] = function(self, ...)
+			if self == expectation then
+				return boundMatcherFunction(expectation, ...)
 			else
-				return f2(p1, p12, ...)
+				return boundMatcherFunction(expectation, self, ...)
 			end
 		end
 	end
-	return p1
+	return expectation
 end
-function t.__index(p1, p2)
-	if t2[p2] then
-		return p1
-	elseif t3[p2] then
-		local v1 = t.new(p1.value):extend(p1.matchers)
-		v1.successCondition = not p1.successCondition
-		return v1
-	elseif p1._boundMatchers[p2] then
-		return p1._boundMatchers[p2]
+function expectationClass.__index(self, key)
+	if modifierKeywords[key] then
+		return self
+	elseif negationKeywords[key] then
+		local negatedExpectation = expectationClass.new(self.value):extend(self.matchers)
+		negatedExpectation.successCondition = not self.successCondition
+		return negatedExpectation
+	elseif self._boundMatchers[key] then
+		return self._boundMatchers[key]
 	else
-		return t[p2]
+		return expectationClass[key]
 	end
 end
-function t._resetModifiers(p1)
-	p1.successCondition = true
+function expectationClass._resetModifiers(self)
+	self.successCondition = true
 end
-function t.a(p1, p2)
-	local v2 = type(p1.value) == p2 == p1.successCondition
-	local v4 = ("Expected value of type %q, got value %q of type %s"):format(p2, tostring(p1.value), (type(p1.value)))
-	local v8 = if p1.successCondition then v4 else ("Expected value not of type %q, got value %q of type %s"):format(p2, tostring(p1.value), (type(p1.value))) or "Assertion failed!"
-	local v9 = 3 or 1
-	if not v2 then
-		error(v8, v9 + 1)
+function expectationClass.a(self, typeStr)
+	local typeMatches = type(self.value) == typeStr == self.successCondition
+	local wrongTypeMessage = ("Expected value of type %q, got value %q of type %s"):format(typeStr, tostring(self.value), (type(self.value)))
+	local finalMessage = if self.successCondition then wrongTypeMessage else ("Expected value not of type %q, got value %q of type %s"):format(typeStr, tostring(self.value), (type(self.value))) or "Assertion failed!"
+	local errorLevel = 3 or 1
+	if not typeMatches then
+		error(finalMessage, errorLevel + 1)
 	end
-	p1:_resetModifiers()
-	return p1
+	self:_resetModifiers()
+	return self
 end
-t.an = t.a
-function t.ok(p1)
-	local v1 = ("Expected value %q to be non-nil"):format((tostring(p1.value)))
-	local v4 = if p1.successCondition then v1 else ("Expected value %q to be nil"):format((tostring(p1.value))) or "Assertion failed!"
-	local v5 = 3 or 1
-	if p1.value ~= nil ~= p1.successCondition then
-		error(v4, v5 + 1)
+expectationClass.an = expectationClass.a
+function expectationClass.ok(self)
+	local notNilMessage = ("Expected value %q to be non-nil"):format((tostring(self.value)))
+	local finalMessage = if self.successCondition then notNilMessage else ("Expected value %q to be nil"):format((tostring(self.value))) or "Assertion failed!"
+	local errorLevel = 3 or 1
+	if self.value ~= nil ~= self.successCondition then
+		error(finalMessage, errorLevel + 1)
 	end
-	p1:_resetModifiers()
-	return p1
+	self:_resetModifiers()
+	return self
 end
-function t.equal(p1, p2)
-	local v5 = ("Expected value %q (%s), got %q (%s) instead"):format(tostring(p2), type(p2), tostring(p1.value), (type(p1.value)))
-	local v8 = if p1.successCondition then v5 else ("Expected anything but value %q (%s)"):format(tostring(p2), (type(p2))) or "Assertion failed!"
-	local v9 = 3 or 1
-	if p1.value == p2 ~= p1.successCondition then
-		error(v8, v9 + 1)
+function expectationClass.equal(self, otherValue)
+	local notEqualMessage = ("Expected value %q (%s), got %q (%s) instead"):format(tostring(otherValue), type(otherValue), tostring(self.value), (type(self.value)))
+	local finalMessage = if self.successCondition then notEqualMessage else ("Expected anything but value %q (%s)"):format(tostring(otherValue), (type(otherValue))) or "Assertion failed!"
+	local errorLevel = 3 or 1
+	if self.value == otherValue ~= self.successCondition then
+		error(finalMessage, errorLevel + 1)
 	end
-	p1:_resetModifiers()
-	return p1
+	self:_resetModifiers()
+	return self
 end
-function t.near(p1, p2, p3)
-	assert(type(p1.value) == "number", "Expectation value must be a number to use \'near\'")
-	assert(type(p2) == "number", "otherValue must be a number")
-	assert(type(p3) == "number" or p3 == nil, "limit must be a number or nil")
-	local v4 = p3 or 1e-7
-	local v7 = math.abs(p1.value - p2) <= v4 == p1.successCondition
-	local v8 = ("Expected value to be near %f (within %f) but got %f instead"):format(p2, v4, p1.value)
-	local v11 = if p1.successCondition then v8 else ("Expected value to not be near %f (within %f) but got %f instead"):format(p2, v4, p1.value) or "Assertion failed!"
-	local v12 = 3 or 1
-	if not v7 then
-		error(v11, v12 + 1)
+function expectationClass.near(self, otherValue, limit)
+	assert(type(self.value) == "number", "Expectation value must be a number to use \'near\'")
+	assert(type(otherValue) == "number", "otherValue must be a number")
+	assert(type(limit) == "number" or limit == nil, "limit must be a number or nil")
+	local tolerance = limit or 1e-7
+	local isNear = math.abs(self.value - otherValue) <= tolerance == self.successCondition
+	local notNearMessage = ("Expected value to be near %f (within %f) but got %f instead"):format(otherValue, tolerance, self.value)
+	local finalMessage = if self.successCondition then notNearMessage else ("Expected value to not be near %f (within %f) but got %f instead"):format(otherValue, tolerance, self.value) or "Assertion failed!"
+	local errorLevel = 3 or 1
+	if not isNear then
+		error(finalMessage, errorLevel + 1)
 	end
-	p1:_resetModifiers()
-	return p1
+	self:_resetModifiers()
+	return self
 end
-function t.throw(p1, p2)
-	local v1, v2 = pcall(p1.value)
-	local v3 = v1 ~= p1.successCondition
-	if p2 and not v1 then
-		v3 = if p1.successCondition then v2:find(p2, 1, true) ~= nil else v2:find(p2, 1, true) == nil
+function expectationClass.throw(self, expectedError)
+	local didThrow, errorMessage = pcall(self.value)
+	local throwMatches = didThrow ~= self.successCondition
+	if expectedError and not didThrow then
+		throwMatches = if self.successCondition then errorMessage:find(expectedError, 1, true) ~= nil else errorMessage:find(expectedError, 1, true) == nil
 	end
-	local v4
-	if p2 then
-		local v6, v7
-		if v2 then
-			v6 = ("threw: %s"):format(v2)
-			if v6 then
-				v7 = p2
+	local finalMessage
+	if expectedError then
+		local actualError, expectedStr
+		if errorMessage then
+			actualError = ("threw: %s"):format(errorMessage)
+			if actualError then
+				expectedStr = expectedError
 			else
-				v7 = p2
-				v6 = "did not throw."
+				expectedStr = expectedError
+				actualError = "did not throw."
 			end
 		else
-			v7 = p2
-			v6 = "did not throw."
+			expectedStr = expectedError
+			actualError = "did not throw."
 		end
-		local v8 = ("Expected function to throw an error containing %q, but it %s"):format(v7, v6)
-		v4 = if p1.successCondition then v8 else ("Expected function to never throw an error containing %q, but it threw: %s"):format(p2, (tostring(v2)))
+		local throwContainsMessage = ("Expected function to throw an error containing %q, but it %s"):format(expectedStr, actualError)
+		finalMessage = if self.successCondition then throwContainsMessage else ("Expected function to never throw an error containing %q, but it threw: %s"):format(expectedError, (tostring(errorMessage)))
 	else
-		v4 = if p1.successCondition then "Expected function to throw an error, but it did not throw." else ("Expected function to succeed, but it threw an error: %s"):format((tostring(v2)))
+		finalMessage = if self.successCondition then "Expected function to throw an error, but it did not throw." else ("Expected function to succeed, but it threw an error: %s"):format((tostring(errorMessage)))
 	end
-	local v11 = v4 or "Assertion failed!"
-	local v12 = 3 or 1
-	if not v3 then
-		error(v11, v12 + 1)
+	local displayMessage = finalMessage or "Assertion failed!"
+	local errorLevel = 3 or 1
+	if not throwMatches then
+		error(displayMessage, errorLevel + 1)
 	end
-	p1:_resetModifiers()
-	return p1
+	self:_resetModifiers()
+	return self
 end
-return t
+return expectationClass

@@ -1,48 +1,49 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {}
-local function int_from_uint(p1, p2)
-	local v1 = 2 ^ p1
-	local v2 = p2 % v1
-	if v1 / 2 <= v2 then
-		return v2 - v1
+local function int_from_uint(bitCount, unsignedValue)
+	local range = 2 ^ bitCount
+	local result = unsignedValue % range
+	if range / 2 <= result then
+		return result - range
 	else
-		return v2
+		return result
 	end
 end
-local function int_to_uint(p1, p2)
-	return p2 % 2 ^ p1
+local function int_to_uint(bitCount, signedValue)
+	return signedValue % 2 ^ bitCount
 end
-local function float32_to_uint(p1)
-	return string.unpack("<I4", string.pack("<f", p1))
+local function float32_to_uint(floatValue)
+	return string.unpack("<I4", string.pack("<f", floatValue))
 end
-local function float32_from_uint(p1)
-	return string.unpack("<f", string.pack("<I4", p1))
+local function float32_from_uint(uintValue)
+	return string.unpack("<f", string.pack("<I4", uintValue))
 end
-local function float64_to_uint(p1)
-	return string.unpack("<I8", string.pack("<d", p1))
+local function float64_to_uint(doubleValue)
+	return string.unpack("<I8", string.pack("<d", doubleValue))
 end
-local function float64_from_uint(p1)
-	return string.unpack("<d", string.pack("<I8", p1))
+local function float64_from_uint(uintValue)
+	return string.unpack("<d", string.pack("<I8", uintValue))
 end
-local function float_to_fixed(p1, p2, p3)
-	local v1 = 2 ^ (p1 + p2)
-	local v2 = math.floor(p3 * 2 ^ p2) % v1
-	if v1 / 2 <= v2 then
-		return v2 - v1
+local function float_to_fixed(intBits, fracBits, floatValue)
+	local range = 2 ^ (intBits + fracBits)
+	local fixedValue = math.floor(floatValue * 2 ^ fracBits) % range
+	if range / 2 <= fixedValue then
+		return fixedValue - range
 	else
-		return v2
+		return fixedValue
 	end
 end
-local function float_from_fixed(p1, p2, p3)
-	local v1 = 2 ^ (p1 + p2)
-	local v2 = p3 % v1
-	return math.floor(if v1 / 2 <= v2 then v2 - v1 else v2) * 2 ^ (-p2)
+local function float_from_fixed(intBits, fracBits, fixedValue)
+	local range = 2 ^ (intBits + fracBits)
+	local result = fixedValue % range
+	return math.floor(if range / 2 <= result then result - range else result) * 2 ^ (-fracBits)
 end
-local function float_to_ufixed(p1, p2, p3)
-	return math.floor(p3 * 2 ^ p2) % 2 ^ (p1 + p2)
+local function float_to_ufixed(intBits, fracBits, floatValue)
+	return math.floor(floatValue * 2 ^ fracBits) % 2 ^ (intBits + fracBits)
 end
-local function float_from_ufixed(p1, p2, p3)
-	return math.floor(p3 % 2 ^ (p1 + p2)) * 2 ^ (-p2)
+local function float_from_ufixed(intBits, fracBits, fixedValue)
+	return math.floor(fixedValue % 2 ^ (intBits + fracBits)) * 2 ^ (-fracBits)
 end
 local t2 = {
 	__index = {}

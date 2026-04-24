@@ -1,17 +1,18 @@
 -- Reviewed by Claude
+-- variables reassigned
 game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Telemetry = require(script.Parent.Telemetry)
-local t = {}
-t.__index = t
+local configTable = {}
+configTable.__index = configTable
 local PromptCashBooster = ReplicatedStorage:WaitForChild("AdRewardSystem"):WaitForChild("AdRewardEvents"):WaitForChild("PromptCashBooster")
 local function firePromptSignal(p1)
 	if PromptCashBooster then
 		PromptCashBooster:Fire(p1)
 	end
 end
-function t.new(p1, p2)
-	local v2 = setmetatable({}, t)
+function configTable.new(p1, p2)
+	local v2 = setmetatable({}, configTable)
 	v2.Player = p1
 	v2.RegionFolder = p2
 	v2.Regions = {}
@@ -21,14 +22,14 @@ function t.new(p1, p2)
 	v2:_connectFolderChanges()
 	return v2
 end
-function t._initRegions(p1)
+function configTable._initRegions(p1)
 	for i, v in ipairs(p1.RegionFolder:GetChildren()) do
 		if v:IsA("BasePart") then
 			p1:_addRegion(v)
 		end
 	end
 end
-function t._connectFolderChanges(p1)
+function configTable._connectFolderChanges(p1)
 	p1.RegionFolder.ChildAdded:Connect(function(p12)
 		if p12:IsA("BasePart") then
 			p1:_addRegion(p12)
@@ -40,7 +41,7 @@ function t._connectFolderChanges(p1)
 		end
 	end)
 end
-function t._addRegion(p1, p2)
+function configTable._addRegion(p1, p2)
 	p1.Regions[p2] = {
 		Part = p2,
 		Team = p2:GetAttribute("Team"),
@@ -49,7 +50,7 @@ function t._addRegion(p1, p2)
 		NextRecheckTime = 0
 	}
 end
-function t._getCharacter(p1)
+function configTable._getCharacter(p1)
 	local Character = p1.Player.Character
 	if Character and Character.Parent then
 		local Humanoid = Character:FindFirstChildOfClass("Humanoid")
@@ -63,7 +64,7 @@ function t._getCharacter(p1)
 		return nil, nil, nil
 	end
 end
-function t._forceLeaveAllRegions(p1)
+function configTable._forceLeaveAllRegions(p1)
 	for k, v in pairs(p1.Regions) do
 		if v.IsPlayerInside then
 			v.IsPlayerInside = false
@@ -77,7 +78,7 @@ function t._forceLeaveAllRegions(p1)
 		end
 	end
 end
-function t._step(p1)
+function configTable._step(p1)
 	local v1, v2, v3 = p1:_getCharacter()
 	if v1 and (v2 and not (v2.Health <= 0 or v2.Health < 100)) then
 		local v4 = os.time()
@@ -101,28 +102,28 @@ function t._step(p1)
 					else
 						v.IsValid = true
 						local v7 = k.Size * 0.5
-						local v8 = k.CFrame:PointToObjectSpace(Position)
-						v5 = if math.abs(v8.X) <= v7.X then if math.abs(v8.Y) <= v7.Y then math.abs(v8.Z) <= v7.Z else false else false
+						local cframe = k.CFrame:PointToObjectSpace(Position)
+						v5 = if math.abs(cframe.X) <= v7.X then if math.abs(cframe.Y) <= v7.Y then math.abs(cframe.Z) <= v7.Z else false else false
 						if v5 then
 							if not v.IsPlayerInside then
 								local Team_2 = v.Team
-								local v9 = false
+								local isEnabled = false
 								if Team ~= nil then
 									local _ = Team.Name or tostring(Team)
 								end
 								if typeof(Team_2) == "Instance" and Team_2:IsA("Team") then
 									local _ = Team_2.Name
 									if Team and Team == Team_2 then
-										v9 = true
+										isEnabled = true
 									end
 								elseif typeof(Team_2) == "string" then
 									if Team and Team.Name == Team_2 then
-										v9 = true
+										isEnabled = true
 									end
 								elseif Team_2 ~= nil then
 									tostring(Team_2)
 								end
-								if v9 then
+								if isEnabled then
 									v.IsPlayerInside = true
 									local v10 = k:GetAttribute("RegionTag")
 									if v10 then
@@ -155,7 +156,7 @@ function t._step(p1)
 		p1:_forceLeaveAllRegions()
 	end
 end
-function t.Start(p1)
+function configTable.Start(p1)
 	if not p1._running then
 		p1._running = true
 		p1._loopThread = task.spawn(function()
@@ -166,11 +167,11 @@ function t.Start(p1)
 		end)
 	end
 end
-function t.Stop(p1)
+function configTable.Stop(p1)
 	p1._running = false
 	p1._loopThread = nil
 end
-function t.IsInAnyTeamMatchedRegion(p1)
+function configTable.IsInAnyTeamMatchedRegion(p1)
 	for k, v in pairs(p1.Regions) do
 		if v.IsPlayerInside then
 			return true
@@ -178,7 +179,7 @@ function t.IsInAnyTeamMatchedRegion(p1)
 	end
 	return false
 end
-function t.GetCurrentRegionTag(p1)
+function configTable.GetCurrentRegionTag(p1)
 	for k, v in pairs(p1.Regions) do
 		if v.IsPlayerInside then
 			local v1 = k:GetAttribute("RegionTag")
@@ -189,4 +190,4 @@ function t.GetCurrentRegionTag(p1)
 	end
 	return nil
 end
-return t
+return configTable

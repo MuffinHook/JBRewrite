@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
@@ -8,55 +9,55 @@ return function()
 	local Component = require(script.Parent.Parent.Component)
 	local v1 = createReconciler(NoopRenderer)
 	it("should be provided as an internal api on Component", function()
-		local v12 = Component:extend("Provider")
-		function v12.init(p1)
-			p1:__addContext("foo", "bar")
+		local internalData = Component:extend("Provider")
+		function internalData.init(self)
+			self:__addContext("foo", "bar")
 		end
-		function v12.render(p1)  end
-		assertDeepEqual(v1.mountVirtualNode(createElement(v12), nil, "Provider").context, {
+		function internalData.render(self)  end
+		assertDeepEqual(v1.mountVirtualNode(createElement(internalData), nil, "Provider").context, {
 			foo = "bar"
 		})
 	end)
 	it("should be inherited from parent stateful nodes", function()
-		local v12 = Component:extend("Consumer")
+		local internalData = Component:extend("Consumer")
 		local v2 = nil
-		function v12.init(p1)
+		function internalData.init(self)
 			v2 = {
-				hello = p1:__getContext("hello"),
-				value = p1:__getContext("value")
+				hello = self:__getContext("hello"),
+				value = self:__getContext("value")
 			}
 		end
-		function v12.render(p1)  end
-		local v3 = Component:extend("Parent")
-		function v3.render(p1)
-			return createElement(v12)
+		function internalData.render(self)  end
+		local newState = Component:extend("Parent")
+		function newState.render(self)
+			return createElement(internalData)
 		end
 		local t = {
 			hello = "world",
 			value = 6
 		}
-		local v5 = v1.mountVirtualNode(createElement(v3), nil, "Parent", t)
+		local nextState = v1.mountVirtualNode(createElement(newState), nil, "Parent", t)
 		expect(v2).never.to.equal(t)
-		expect(v2).never.to.equal(v5.context)
-		assertDeepEqual(v5.context, t)
+		expect(v2).never.to.equal(nextState.context)
+		assertDeepEqual(nextState.context, t)
 		assertDeepEqual(v2, t)
 	end)
 	it("should be inherited from parent function nodes", function()
-		local v12 = Component:extend("Consumer")
+		local internalData = Component:extend("Consumer")
 		local v2 = nil
-		function v12.init(p1)
+		function internalData.init(self)
 			v2 = {
-				hello = p1:__getContext("hello"),
-				value = p1:__getContext("value")
+				hello = self:__getContext("hello"),
+				value = self:__getContext("value")
 			}
 		end
-		function v12.render(p1)  end
+		function internalData.render(self)  end
 		local t = {
 			hello = "world",
 			value = 6
 		}
 		local fn = v1.mountVirtualNode(createElement(function()
-			return createElement(v12)
+			return createElement(internalData)
 		end), nil, "Parent", t)
 		expect(v2).never.to.equal(t)
 		expect(v2).never.to.equal(fn.context)
@@ -64,116 +65,116 @@ return function()
 		assertDeepEqual(v2, t)
 	end)
 	it("should not copy the context table if it doesn\'t need to", function()
-		local v12 = Component:extend("Parent")
-		function v12.init(p1)
-			p1:__addContext("parent", "I\'m here!")
+		local internalData = Component:extend("Parent")
+		function internalData.init(self)
+			self:__addContext("parent", "I\'m here!")
 		end
-		function v12.render(p1)
+		function internalData.render(self)
 			return createElement(function()  end)
 		end
-		local v3 = v1.mountVirtualNode(createElement(v12), nil, "Parent")
-		assertDeepEqual(v3.context, {
+		local newState = v1.mountVirtualNode(createElement(internalData), nil, "Parent")
+		assertDeepEqual(newState.context, {
 			parent = "I\'m here!"
 		})
-		local fn = oneChild(v3.children)
-		expect(v3.context).to.equal(fn.context)
+		local fn = oneChild(newState.children)
+		expect(newState.context).to.equal(fn.context)
 	end)
 	it("should not allow context to move up the tree", function()
-		local v12 = Component:extend("ChildProvider")
-		function v12.init(p1)
-			p1:__addContext("child", "I\'m here too!")
+		local internalData = Component:extend("ChildProvider")
+		function internalData.init(self)
+			self:__addContext("child", "I\'m here too!")
 		end
-		function v12.render(p1)  end
+		function internalData.render(self)  end
 		local v2 = Component:extend("ParentProvider")
-		function v2.init(p1)
-			p1:__addContext("parent", "I\'m here!")
+		function v2.init(self)
+			self:__addContext("parent", "I\'m here!")
 		end
-		function v2.render(p1)
-			return createElement(v12)
+		function v2.render(self)
+			return createElement(internalData)
 		end
 		local fn = v1.mountVirtualNode(createElement(v2), nil, "Parent")
-		local v5 = oneChild(fn.children)
+		local nextState = oneChild(fn.children)
 		assertDeepEqual(fn.context, {
 			parent = "I\'m here!"
 		})
-		assertDeepEqual(v5.context, {
+		assertDeepEqual(nextState.context, {
 			parent = "I\'m here!",
 			child = "I\'m here too!"
 		})
 	end)
 	it("should contain values put into the tree by parent nodes", function()
-		local v12 = Component:extend("Consumer")
+		local internalData = Component:extend("Consumer")
 		local v2 = nil
-		function v12.init(p1)
+		function internalData.init(self)
 			v2 = {
-				dont = p1:__getContext("dont"),
-				frob = p1:__getContext("frob")
+				dont = self:__getContext("dont"),
+				frob = self:__getContext("frob")
 			}
 		end
-		function v12.render(p1)  end
-		local v3 = Component:extend("Provider")
-		function v3.init(p1)
-			p1:__addContext("frob", "ulator")
+		function internalData.render(self)  end
+		local newState = Component:extend("Provider")
+		function newState.init(self)
+			self:__addContext("frob", "ulator")
 		end
-		function v3.render(p1)
-			return createElement(v12)
+		function newState.render(self)
+			return createElement(internalData)
 		end
 		local t = {
 			dont = "try it"
 		}
-		local v5 = v1.mountVirtualNode(createElement(v3), nil, "Consumer", t)
-		local t2 = {
+		local nextState = v1.mountVirtualNode(createElement(newState), nil, "Consumer", t)
+		local tbl2 = {
 			dont = "try it",
 			frob = "ulator"
 		}
-		expect(v5.context).never.to.equal(t)
+		expect(nextState.context).never.to.equal(t)
 		expect(v2).never.to.equal(t)
-		expect(v2).never.to.equal(v5.context)
+		expect(v2).never.to.equal(nextState.context)
 		assertDeepEqual(t, {
 			dont = "try it"
 		})
-		assertDeepEqual(v5.context, t2)
-		assertDeepEqual(v2, t2)
+		assertDeepEqual(nextState.context, tbl2)
+		assertDeepEqual(v2, tbl2)
 	end)
 	it("should transfer context to children that are replaced", function()
-		local v12 = Component:extend("ConsumerA")
-		local function captureAllContext(p1)
+		local internalData = Component:extend("ConsumerA")
+		local function captureAllContext(self)
 			return {
-				A = p1:__getContext("A"),
-				B = p1:__getContext("B"),
-				frob = p1:__getContext("frob")
+				A = self:__getContext("A"),
+				B = self:__getContext("B"),
+				frob = self:__getContext("frob")
 			}
 		end
 		local v2 = nil
-		function v12.init(p1)
-			p1:__addContext("A", "hello")
-			v2 = captureAllContext(p1)
+		function internalData.init(self)
+			self:__addContext("A", "hello")
+			v2 = captureAllContext(self)
 		end
-		function v12.render(p1)  end
-		local v3 = Component:extend("ConsumerB")
+		function internalData.render(self)  end
+		local newState = Component:extend("ConsumerB")
 		local fn = nil
-		function v3.init(p1)
-			p1:__addContext("B", "hello")
-			fn = captureAllContext(p1)
+		function newState.init(self)
+			self:__addContext("B", "hello")
+			fn = captureAllContext(self)
 		end
-		function v3.render(p1)  end
-		local v5 = Component:extend("Provider")
-		function v5.init(p1)
-			p1:__addContext("frob", "ulator")
+		function newState.render(self)  end
+		local nextState = Component:extend("Provider")
+		function nextState.init(self)
+			self:__addContext("frob", "ulator")
 		end
-		function v5.render(p1)
-			if p1.props.useConsumerB then
-				return createElement(v3)
+		function nextState.render(self)
+			if self.props.useConsumerB then
+				return createElement(newState)
 			else
-				return createElement(v12)
+				return createElement(internalData)
 			end
 		end
-		local v7 = v1.mountVirtualNode(createElement(v5), nil, "Consumer")
+		local mergedState = v1.mountVirtualNode(createElement(nextState), nil, "Consumer")
 		assertDeepEqual(v2, {
 			frob = "ulator",
 			A = "hello"
 		})
-		v1.updateVirtualNode(v7, (createElement(v5, {
+		v1.updateVirtualNode(mergedState, (createElement(nextState, {
 			useConsumerB = true
 		})))
 		assertDeepEqual(fn, {

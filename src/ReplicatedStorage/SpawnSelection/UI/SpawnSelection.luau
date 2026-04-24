@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -9,113 +10,113 @@ local createElement = Roact.createElement
 local MinimapUtils = require(ReplicatedStorage.App.UI.MinimapUtils)
 local Minimap = require(ReplicatedStorage.App.UI.Minimap)
 require(ReplicatedStorage.Std.Debug.table2Lua)
-local v1 = Roact.PureComponent:extend("SpawnSelection")
-v1.defaultProps = {
+local SpawnSelectionComponent = Roact.PureComponent:extend("SpawnSelection")
+SpawnSelectionComponent.defaultProps = {
 	visible = true,
 	mapScale = 1,
 	showToggleButton = false,
 	bornAt = workspace:GetServerTimeNow(),
 	duration = 10
 }
-function v1.init(p1)
-	p1.maid = Maid.new()
-	if p1.props.containerSize then
-		local updateContainerSize = p1.props.updateContainerSize
-		p1.containerSize = p1.props.containerSize
-		p1.updateContainerSize = updateContainerSize
+function SpawnSelectionComponent.init(self)
+	self.maid = Maid.new()
+	if self.props.containerSize then
+		local updateContainerSize = self.props.updateContainerSize
+		self.containerSize = self.props.containerSize
+		self.updateContainerSize = updateContainerSize
 	else
-		local v1, v2 = Roact.createBinding(Vector2.new(512, 512))
-		p1.containerSize = v1
-		p1.updateContainerSize = v2
+		local containerSizeBinding, updateContainerSize = Roact.createBinding(Vector2.new(512, 512))
+		self.containerSize = containerSizeBinding
+		self.updateContainerSize = updateContainerSize
 	end
-	if p1.props.containerRef then
-		p1.containerRef = p1.props.containerRef
+	if self.props.containerRef then
+		self.containerRef = self.props.containerRef
 	else
-		p1.containerRef = Roact.createRef()
+		self.containerRef = Roact.createRef()
 	end
-	p1:setState({
+	self:setState({
 		remaining = 0
 	})
 end
-function v1.render(p1)
-	if #p1.props.spawns ~= 0 then
-		local t = {}
-		for v1, v2 in p1.props.spawns do
-			table.insert(t, v2)
+function SpawnSelectionComponent.render(self)
+	if #self.props.spawns ~= 0 then
+		local spawnsList = {}
+		for index, spawn in self.props.spawns do
+			table.insert(spawnsList, spawn)
 		end
-		local t2 = {}
-		for v6, v7 in t do
-			local v3, v4, v5
-			local v8 = ("button_%s"):format(v7.title)
-			local v9 = nil
-			if typeof(v7.position) == "Vector3" then
-				local position_2 = v7.position
-				v9 = MinimapUtils.worldToScale(position_2.X, position_2.Z, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapWorldWidth, p1.props.mapWorldHeight)
+		local pointsChildren = {}
+		for spawnIndex, spawnData in spawnsList do
+			local iconAsset, lockAsset, lockElement
+			local buttonId = ("button_%s"):format(spawnData.title)
+			local spawnScaledPos = nil
+			if typeof(spawnData.position) == "Vector3" then
+				local position_2 = spawnData.position
+				spawnScaledPos = MinimapUtils.worldToScale(position_2.X, position_2.Z, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapWorldWidth, self.props.mapWorldHeight)
 			else
-				if typeof(v7.position) == "table" and v7.position.map then
-					v9 = v7.position:map(function(p12)
-						return MinimapUtils.worldToScale(p12.X, p12.Z, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapWorldWidth, p1.props.mapWorldHeight)
+				if typeof(spawnData.position) == "table" and spawnData.position.map then
+					spawnScaledPos = spawnData.position:map(function(mapPos)
+						return MinimapUtils.worldToScale(mapPos.X, mapPos.Z, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapWorldWidth, self.props.mapWorldHeight)
 					end)
 				end
 			end
-			local t3 = {
+			local buttonProps = {
 				BackgroundTransparency = 0,
 				BorderSizePixel = 0
 			}
-			t3.BackgroundColor3 = v7.backgroundColor or Color3.new(0.1, 0.1, 0.1)
-			t3.AnchorPoint = Vector2.new(0.5, 0.5)
-			t3.Position = v9
-			t3.ZIndex = 1
-			t3.Selectable = true
-			t3[Roact.Event.Activated] = function()
-				p1.props.onSpawnPressed(v7)
-				if not v7.locked then
-					p1.props.hide()
+			buttonProps.BackgroundColor3 = spawnData.backgroundColor or Color3.new(0.1, 0.1, 0.1)
+			buttonProps.AnchorPoint = Vector2.new(0.5, 0.5)
+			buttonProps.Position = spawnScaledPos
+			buttonProps.ZIndex = 1
+			buttonProps.Selectable = true
+			buttonProps[Roact.Event.Activated] = function()
+				self.props.onSpawnPressed(spawnData)
+				if not spawnData.locked then
+					self.props.hide()
 				end
 			end
-			local v13 = "TextButton"
-			t3.Size = p1.containerSize:map(function(p1)
-				return UDim2.new(0, p1.X * 0.06, 0, p1.X * 0.06)
+			local buttonClassName = "TextButton"
+			buttonProps.Size = self.containerSize:map(function(containerSize)
+				return UDim2.new(0, containerSize.X * 0.06, 0, containerSize.X * 0.06)
 			end)
-			t3.Text = ""
-			local t4 = {
+			buttonProps.Text = ""
+			local buttonChildren = {
 				UICorner = createElement("UICorner", {
 					CornerRadius = UDim.new(0.25, 0)
 				})
 			}
-			local v14 = not v7.locked
-			if v14 then
-				local t5 = {
+			local isUnlocked = not spawnData.locked
+			if isUnlocked then
+				local iconProps = {
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, 0)
 				}
-				v3 = if v7.useParachute then "rbxassetid://11414556860" else "rbxassetid://11414555810"
-				t5.Image = v3
-				t5.ImageColor3 = Color3.new(0.1, 0.1, 0.1)
-				v14 = createElement("ImageLabel", t5)
+				iconAsset = if spawnData.useParachute then "rbxassetid://11414556860" else "rbxassetid://11414555810"
+				iconProps.Image = iconAsset
+				iconProps.ImageColor3 = Color3.new(0.1, 0.1, 0.1)
+				isUnlocked = createElement("ImageLabel", iconProps)
 			end
-			t4.Icon = v14
-			if v7.locked == true then
-				local t5 = {
+			buttonChildren.Icon = isUnlocked
+			if spawnData.locked == true then
+				local lockProps = {
 					BorderSizePixel = 0,
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, 0)
 				}
-				v4 = if v7.locked then "rbxassetid://8715708455" else "rbxassetid://8715708824"
-				t5.Image = v4
-				t5.ImageColor3 = Color3.new(0.1, 0.1, 0.1)
-				t5.ZIndex = 3
-				v5 = createElement("ImageLabel", t5)
+				lockAsset = if spawnData.locked then "rbxassetid://8715708455" else "rbxassetid://8715708824"
+				lockProps.Image = lockAsset
+				lockProps.ImageColor3 = Color3.new(0.1, 0.1, 0.1)
+				lockProps.ZIndex = 3
+				lockElement = createElement("ImageLabel", lockProps)
 			else
-				v5 = false
+				lockElement = false
 			end
-			t4.Lock = v5
-			t4.NumPlayers = v7.numEnemies and createElement("TextLabel", {
+			buttonChildren.Lock = lockElement
+			buttonChildren.NumPlayers = spawnData.numEnemies and createElement("TextLabel", {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0, 0, 1, 0),
-				Text = v7.numEnemies:map(function(p1)
-					return "Enemies: " .. tostring(p1)
+				Text = spawnData.numEnemies:map(function(enemyCount)
+					return "Enemies: " .. tostring(enemyCount)
 				end),
 				Font = Enum.Font.Bangers,
 				TextSize = 14,
@@ -124,53 +125,53 @@ function v1.render(p1)
 				TextStrokeColor3 = Color3.new(0/255, 0/255, 0/255),
 				ZIndex = 2
 			})
-			assert(v13, "missing classname for button")
-			t2[v8] = createElement(v13, t3, t4)
+			assert(buttonClassName, "missing classname for button")
+			pointsChildren[buttonId] = createElement(buttonClassName, buttonProps, buttonChildren)
 		end
-		local v22 = Dictionary.merge(p1.props, {
-			containerSize = p1.containerSize,
-			updateContainerSize = p1.updateContainerSize,
-			containerRef = p1.containerRef,
-			mapImageColor3 = p1.mapImageColor3,
-			pointsChildren = t2,
-			onButtonPress = p1.props.onButtonPress
+		local minimapProps = Dictionary.merge(self.props, {
+			containerSize = self.containerSize,
+			updateContainerSize = self.updateContainerSize,
+			containerRef = self.containerRef,
+			mapImageColor3 = self.mapImageColor3,
+			pointsChildren = pointsChildren,
+			onButtonPress = self.props.onButtonPress
 		})
-		local t3 = {}
-		local t4 = {
+		local minimapChildren = {}
+		local timerFrameProps = {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0.05, 0),
 			Position = UDim2.new(0, 0, 1, 4)
 		}
-		local t5 = {}
-		local t6 = {
-			BackgroundColor3 = p1.props.color,
+		local timerFrameChildren = {}
+		local waypointProps = {
+			BackgroundColor3 = self.props.color,
 			Size = UDim2.new(1, 0, 1, 0),
 			LayoutOrder = 1
 		}
-		local t7 = {}
-		local t8 = {
+		local waypointChildren = {}
+		local timerTextProps = {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(0.9, 0, 0.7, 0),
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5)
 		}
-		t8.Text = "Auto respawn in " .. tostring(p1.state.remaining) .. "..."
-		t8.Font = Enum.Font.LuckiestGuy
-		t8.LineHeight = 0.7
-		t8.TextScaled = true
-		t8.TextXAlignment = Enum.TextXAlignment.Center
-		t8.TextYAlignment = Enum.TextYAlignment.Center
-		t8.TextColor3 = Color3.fromRGB(255, 255, 255)
-		t8.ZIndex = 10
-		t7.Title = createElement("TextLabel", t8)
-		t7.UICorner = createElement("UICorner", {
+		timerTextProps.Text = "Auto respawn in " .. tostring(self.state.remaining) .. "..."
+		timerTextProps.Font = Enum.Font.LuckiestGuy
+		timerTextProps.LineHeight = 0.7
+		timerTextProps.TextScaled = true
+		timerTextProps.TextXAlignment = Enum.TextXAlignment.Center
+		timerTextProps.TextYAlignment = Enum.TextYAlignment.Center
+		timerTextProps.TextColor3 = Color3.fromRGB(255, 255, 255)
+		timerTextProps.ZIndex = 10
+		waypointChildren.Title = createElement("TextLabel", timerTextProps)
+		waypointChildren.UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
 		})
-		t5.Waypoint = createElement("Frame", t6, t7)
-		t3.Buttons = createElement("Frame", t4, t5)
-		return createElement(Minimap, v22, t3)
+		timerFrameChildren.Waypoint = createElement("Frame", waypointProps, waypointChildren)
+		minimapChildren.Buttons = createElement("Frame", timerFrameProps, timerFrameChildren)
+		return createElement(Minimap, minimapProps, minimapChildren)
 	end
 end
 function v1._startTimer(p1)

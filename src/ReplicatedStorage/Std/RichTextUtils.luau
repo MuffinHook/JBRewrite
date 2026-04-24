@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return {
 	addColorToText = function(p1, p2)
 		assert(typeof(p1) == "string", "text must be a string")

@@ -1,18 +1,19 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local ElementKind = require(script.Parent.ElementKind)
 	local Type = require(script.Parent.Type)
 	local createFragment = require(script.Parent.createFragment)
 	it("should create new primitive elements", function()
- local v1 = createFragment({})
- expect(v1).to.be.ok()
- expect(Type.of(v1)).to.equal(Type.Element)
- expect(ElementKind.of(v1)).to.equal(ElementKind.Fragment)
+ local varType = createFragment({})
+ expect(varType).to.be.ok()
+ expect(Type.of(varType)).to.equal(Type.Element)
+ expect(ElementKind.of(varType)).to.equal(ElementKind.Fragment)
 	end)
 	it("should accept children", function()
- local v1 = createFragment({})
+ local varType = createFragment({})
  expect(createFragment({
- key = v1
- }).elements.key).to.equal(v1)
+ key = varType
+ }).elements.key).to.equal(varType)
 	end)
 end

@@ -1,89 +1,90 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Symbol = require(script.Parent.Symbol)
 local createFragment = require(script.Parent.createFragment)
 local createSignal = require(script.Parent.createSignal)
 local Children = require(script.Parent.PropMarkers.Children)
 local Component = require(script.Parent.Component)
-local function createContextEntry(p1)
+local function createContextEntry(self)
 	return {
- value = p1,
+ value = self,
  onUpdate = createSignal()
 	}
 end
-local function createProvider(p1)
+local function createProvider(self)
 	local v1 = Component:extend("Provider")
-	function v1.init(p12, p2)
- p12.contextEntry = {
- value = p2.value,
+	function v1.init(param12, callback)
+ param12.contextEntry = {
+ value = callback.value,
  onUpdate = createSignal()
  }
- p12:__addContext(p1.key, p12.contextEntry)
+ param12:__addContext(self.key, param12.contextEntry)
 	end
-	function v1.willUpdate(p1, p2)
- if p2.value ~= p1.props.value then
- p1.contextEntry.value = p2.value
+	function v1.willUpdate(self, callback)
+ if callback.value ~= self.props.value then
+ self.contextEntry.value = callback.value
  end
 	end
-	function v1.didUpdate(p1, p2)
- if p2.value ~= p1.props.value then
- p1.contextEntry.onUpdate:fire(p1.props.value)
+	function v1.didUpdate(self, callback)
+ if callback.value ~= self.props.value then
+ self.contextEntry.onUpdate:fire(self.props.value)
  end
 	end
-	function v1.render(p1)
- return createFragment(p1.props[Children])
+	function v1.render(self)
+ return createFragment(self.props[Children])
 	end
 	return v1
 end
-local function createConsumer(p1)
+local function createConsumer(self)
 	local v1 = Component:extend("Consumer")
-	function v1.validateProps(p1)
- if type(p1.render) == "function" then
+	function v1.validateProps(self)
+ if type(self.render) == "function" then
  return true
  else
  return false, "Consumer expects a `render` function"
  end
 	end
-	function v1.init(p12, p2)
- p12.contextEntry = p12:__getContext(p1.key)
+	function v1.init(param12, callback)
+ param12.contextEntry = param12:__getContext(self.key)
 	end
-	function v1.render(p12)
- return p12.props.render(if p12.contextEntry == nil then p1.defaultValue else p12.contextEntry.value)
+	function v1.render(param12)
+ return param12.props.render(if param12.contextEntry == nil then self.defaultValue else param12.contextEntry.value)
 	end
-	function v1.didUpdate(p1)
- if p1.contextEntry ~= nil then
- p1.lastValue = p1.contextEntry.value
+	function v1.didUpdate(self)
+ if self.contextEntry ~= nil then
+ self.lastValue = self.contextEntry.value
  end
 	end
-	function v1.didMount(p1)
- if p1.contextEntry ~= nil then
- p1.disconnect = p1.contextEntry.onUpdate:subscribe(function(p12)
- if p12 ~= p1.lastValue then
- p1:setState({})
+	function v1.didMount(self)
+ if self.contextEntry ~= nil then
+ self.disconnect = self.contextEntry.onUpdate:subscribe(function(param12)
+ if param12 ~= self.lastValue then
+ self:setState({})
  end
  end)
  end
 	end
-	function v1.willUnmount(p1)
- if p1.disconnect ~= nil then
- p1.disconnect()
- p1.disconnect = nil
+	function v1.willUnmount(self)
+ if self.disconnect ~= nil then
+ self.disconnect()
+ self.disconnect = nil
  end
 	end
 	return v1
 end
-local tbl = {}
-tbl.__index = tbl
-function tbl.new(p1)
+local tableObj = {}
+tableObj.__index = tableObj
+function tableObj.new(self)
 	return setmetatable({
- defaultValue = p1,
+ defaultValue = self,
  key = Symbol.named("ContextKey")
-	}, tbl)
+	}, tableObj)
 end
-function tbl.__tostring(p1)
+function tableObj.__tostring(self)
 	return "RoactContext"
 end
-return function(p1)
-	local v1 = tbl.new(p1)
+return function(self)
+	local v1 = tableObj.new(self)
 	return {
  Provider = createProvider(v1),
  Consumer = createConsumer(v1)

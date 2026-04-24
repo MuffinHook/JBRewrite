@@ -1,20 +1,21 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Type = require(script.Parent.Parent.Type)
-local tbl = {}
-local t2 = {
-	__tostring = function(p1)
- return ("RoactHostChangeEvent(%s)"):format(p1.name)
+local tableObj = {}
+local tbl2 = {
+	__tostring = function(self)
+ return ("RoactHostChangeEvent(%s)"):format(self.name)
 	end
 }
-setmetatable(tbl, {
-	__index = function(p1, p2)
- local t3 = {
+setmetatable(tableObj, {
+	__index = function(self, callback)
+ local metadata = {
  [Type] = Type.HostChangeEvent,
- name = p2
+ name = callback
  }
- setmetatable(t3, t2)
- tbl[p2] = t3
- return t3
+ setmetatable(metadata, tbl2)
+ tableObj[callback] = metadata
+ return metadata
 	end
 })
-return tbl
+return tableObj

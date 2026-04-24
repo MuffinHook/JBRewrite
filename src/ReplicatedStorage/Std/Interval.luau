@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local Signal = require(script.Parent.Signal)
 local t = {}

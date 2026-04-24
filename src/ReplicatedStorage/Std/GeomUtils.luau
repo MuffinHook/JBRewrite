@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {
 	doesLineIntersectLine = function(p1, p2, p3, p4, p5, p6, p7, p8)
 		if p1 == p3 and p2 == p4 or p5 == p7 and p6 == p8 then

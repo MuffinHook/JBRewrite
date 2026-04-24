@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("ServerStorage")
 local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
@@ -7,10 +8,10 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local Promise = require(ReplicatedStorage.Std.Promise)
 Binder.new("ShootingRangeTarget", function(p1)
 	local v1 = Maid.new()
-	local v2 = true
+	local isEnabled = true
 	local v3 = nil
 	v1:GiveTask(function()
-		v2 = false
+		isEnabled = false
 		if v3 then
 			v3:cancel()
 		end
@@ -21,7 +22,7 @@ Binder.new("ShootingRangeTarget", function(p1)
 		if ShootingRangePart then
 			ShootingRangePart.CanCollide = true
 		end
-		while v2 do
+		while isEnabled do
 			v3 = Promise.resolve():andThenCall(DoorUtils.setOpen, p1, not DoorUtils.getOpen(p1)):andThenCall(Promise.delay, DoorUtils.getDuration(p1) or 1)
 			v3:await()
 		end

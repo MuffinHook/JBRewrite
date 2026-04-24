@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
@@ -9,52 +10,52 @@ return function()
 	local Component = require(script.Parent.Parent.Component)
 	local v1 = createReconciler(NoopRenderer)
 	it("should be invoked when updated via updateVirtualNode", function()
-		local v12 = Component:extend("MyComponent")
+		local internalData = Component:extend("MyComponent")
 		local v2 = createSpy()
-		v12.willUpdate = v2.value
-		function v12.render(p1)
+		internalData.willUpdate = v2.value
+		function internalData.render(self)
 			return nil
 		end
-		local v4 = v1.mountVirtualNode(createElement(v12, {
+		local currentState = v1.mountVirtualNode(createElement(internalData, {
 			a = 5
 		}), nil, "Test")
 		local t = {
 			a = 6,
 			b = 2
 		}
-		v1.updateVirtualNode(v4, (createElement(v12, t)))
+		v1.updateVirtualNode(currentState, (createElement(internalData, t)))
 		expect(v2.callCount).to.equal(1)
-		local v6 = v2:captureValues("self", "newProps", "newState")
-		expect(Type.of(v6.self)).to.equal(Type.StatefulComponentInstance)
-		assertDeepEqual(v6.newProps, t)
-		assertDeepEqual(v6.newState, {})
+		local tempState = v2:captureValues("self", "newProps", "newState")
+		expect(Type.of(tempState.self)).to.equal(Type.StatefulComponentInstance)
+		assertDeepEqual(tempState.newProps, t)
+		assertDeepEqual(tempState.newState, {})
 	end)
 	it("it should be invoked when updated via setState", function()
-		local v12 = Component:extend("MyComponent")
+		local internalData = Component:extend("MyComponent")
 		local v2 = nil
-		local v3 = createSpy()
-		v12.willUpdate = v3.value
-		function v12.init(p1)
-			v2 = function(p12)
-				p1:setState(p12)
+		local newState = createSpy()
+		internalData.willUpdate = newState.value
+		function internalData.init(self)
+			v2 = function(param12)
+				self:setState(param12)
 			end
-			p1:setState({
+			self:setState({
 				foo = 1
 			})
 		end
-		function v12.render(p1)
+		function internalData.render(self)
 			return nil
 		end
-		v1.mountVirtualNode(createElement(v12), nil, "Test")
-		expect(v3.callCount).to.equal(0)
+		v1.mountVirtualNode(createElement(internalData), nil, "Test")
+		expect(newState.callCount).to.equal(0)
 		v2({
 			foo = 2
 		})
-		expect(v3.callCount).to.equal(1)
-		local v5 = v3:captureValues("self", "newProps", "newState")
-		expect(Type.of(v5.self)).to.equal(Type.StatefulComponentInstance)
-		assertDeepEqual(v5.newProps, {})
-		assertDeepEqual(v5.newState, {
+		expect(newState.callCount).to.equal(1)
+		local nextState = newState:captureValues("self", "newProps", "newState")
+		expect(Type.of(nextState.self)).to.equal(Type.StatefulComponentInstance)
+		assertDeepEqual(nextState.newProps, {})
+		assertDeepEqual(nextState.newState, {
 			foo = 2
 		})
 	end)

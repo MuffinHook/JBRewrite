@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Binding = require(script.Parent.Binding)
 local Children = require(script.Parent.PropMarkers.Children)
 local ElementKind = require(script.Parent.ElementKind)
@@ -7,196 +8,196 @@ local getDefaultInstanceProperty = require(script.Parent.getDefaultInstancePrope
 local Ref = require(script.Parent.PropMarkers.Ref)
 local Type = require(script.Parent.Type)
 local internalAssert = require(script.Parent.internalAssert)
-local v1 = require(script.Parent.GlobalConfig).get()
+local config = require(script.Parent.GlobalConfig).get()
 local function identity(...)
 	return ...
 end
-local function applyRef(p1, p2)
-	if p1 == nil then
-	elseif typeof(p1) == "function" then
- p1(p2)
-	elseif Type.of(p1) == Type.Binding then
- Binding.update(p1, p2)
+local function applyRef(self, callback)
+	if self == nil then
+	elseif typeof(self) == "function" then
+ self(callback)
+	elseif Type.of(self) == Type.Binding then
+ Binding.update(self, callback)
 	else
- error(("Invalid ref: Expected type Binding but got %s"):format((typeof(p1))))
+ error(("Invalid ref: Expected type Binding but got %s"):format((typeof(self))))
 	end
 end
-local function setRobloxInstanceProperty(p1, p2, p3)
+local function setRobloxInstanceProperty(self, callback, p3)
 	if p3 == nil then
- local _, v1 = getDefaultInstanceProperty(p1.ClassName, p2)
- p3 = v1
+ local _, config = getDefaultInstanceProperty(self.ClassName, callback)
+ p3 = config
 	end
-	p1[p2] = p3
+	self[callback] = p3
 end
-local function removeBinding(p1, p2)
-	p1.bindings[p2]()
-	p1.bindings[p2] = nil
+local function removeBinding(self, callback)
+	self.bindings[callback]()
+	self.bindings[callback] = nil
 end
-local function attachBinding(p1, p2, p3)
-	local function updateBoundProperty(p12)
- local v1, v2 = xpcall(function()
- local hostObject = p1.hostObject
- local v1 = p2
- local v2 = p12
+local function attachBinding(self, callback, p3)
+	local function updateBoundProperty(param12)
+ local config, v2 = xpcall(function()
+ local hostObject = self.hostObject
+ local config = callback
+ local v2 = param12
  if v2 == nil then
- local _, v3 = getDefaultInstanceProperty(hostObject.ClassName, v1)
- v2 = v3
+ local _, newState = getDefaultInstanceProperty(hostObject.ClassName, config)
+ v2 = newState
  end
- hostObject[v1] = v2
+ hostObject[config] = v2
  end, identity)
- if not v1 then
- local source = p1.currentElement.source
+ if not config then
+ local source = self.currentElement.source
  if source == nil then
  source = "<enable element tracebacks>"
  end
  error(("Error updating props:\n\t%s\nIn element:\n%s\n"):format(v2, source), 0)
  end
 	end
-	if p1.bindings == nil then
- p1.bindings = {}
+	if self.bindings == nil then
+ self.bindings = {}
 	end
-	p1.bindings[p2] = Binding.subscribe(p3, updateBoundProperty)
+	self.bindings[callback] = Binding.subscribe(p3, updateBoundProperty)
 	updateBoundProperty(p3:getValue())
 end
-local function detachAllBindings(p1)
-	if p1.bindings ~= nil then
- for k, v in pairs(p1.bindings) do
+local function detachAllBindings(self)
+	if self.bindings ~= nil then
+ for k, v in pairs(self.bindings) do
  v()
  end
- p1.bindings = nil
+ self.bindings = nil
 	end
 end
-local function applyProp(p1, p2, p3, p4)
-	if p3 == p4 or (p2 == Ref or p2 == Children) then
+local function applyProp(self, callback, p3, p4)
+	if p3 == p4 or (callback == Ref or callback == Children) then
  return
 	end
-	local v1 = Type.of(p2)
-	if v1 == Type.HostEvent or v1 == Type.HostChangeEvent then
- if p1.eventManager == nil then
- p1.eventManager = SingleEventManager.new(p1.hostObject)
+	local config = Type.of(callback)
+	if config == Type.HostEvent or config == Type.HostChangeEvent then
+ if self.eventManager == nil then
+ self.eventManager = SingleEventManager.new(self.hostObject)
  end
- local name = p2.name
- if v1 == Type.HostChangeEvent then
- p1.eventManager:connectPropertyChange(name, p3)
+ local name = callback.name
+ if config == Type.HostChangeEvent then
+ self.eventManager:connectPropertyChange(name, p3)
  else
- p1.eventManager:connectEvent(name, p3)
+ self.eventManager:connectEvent(name, p3)
  end
 	else
  local isBinding = Type.of(p3) == Type.Binding
  if Type.of(p4) == Type.Binding then
- p1.bindings[p2]()
- p1.bindings[p2] = nil
+ self.bindings[callback]()
+ self.bindings[callback] = nil
  end
  if isBinding then
- attachBinding(p1, p2, p3)
+ attachBinding(self, callback, p3)
  else
- local hostObject = p1.hostObject
- local v3
+ local hostObject = self.hostObject
+ local newState
  if p3 == nil then
- local _, v4 = getDefaultInstanceProperty(hostObject.ClassName, p2)
- v3 = v4
+ local _, currentState = getDefaultInstanceProperty(hostObject.ClassName, callback)
+ newState = currentState
  else
- v3 = p3
+ newState = p3
  end
- hostObject[p2] = v3
+ hostObject[callback] = newState
  end
 	end
 end
-local function applyProps(p1, p2)
-	for k, v in pairs(p2) do
- applyProp(p1, k, v, nil)
+local function applyProps(self, callback)
+	for k, v in pairs(callback) do
+ applyProp(self, k, v, nil)
 	end
 end
-local function updateProps(p1, p2, p3)
+local function updateProps(self, callback, p3)
 	for k, v in pairs(p3) do
- applyProp(p1, k, v, p2[k])
+ applyProp(self, k, v, callback[k])
 	end
-	for k, v in pairs(p2) do
+	for k, v in pairs(callback) do
  if p3[k] == nil then
- applyProp(p1, k, nil, v)
+ applyProp(self, k, nil, v)
  end
 	end
 end
 return {
-	isHostObject = function(p1)
- return typeof(p1) == "Instance"
+	isHostObject = function(self)
+ return typeof(self) == "Instance"
 	end,
-	mountHostNode = function(p1, p2)
- local currentElement = p2.currentElement
- local hostParent = p2.hostParent
- local hostKey = p2.hostKey
- if v1.internalTypeChecks then
+	mountHostNode = function(self, callback)
+ local currentElement = callback.currentElement
+ local hostParent = callback.hostParent
+ local hostKey = callback.hostKey
+ if config.internalTypeChecks then
  local isHost = ElementKind.of(currentElement) == ElementKind.Host
  internalAssert(isHost, "Element at given node is not a host Element")
  end
- if v1.typeChecks then
+ if config.typeChecks then
  assert(currentElement.props.Name == nil, "Name can not be specified as a prop to a host component in Roact.")
  assert(currentElement.props.Parent == nil, "Parent can not be specified as a prop to a host component in Roact.")
  end
- local v3 = Instance.new(currentElement.component)
- p2.hostObject = v3
- local v4, v5 = xpcall(function()
- applyProps(p2, currentElement.props)
+ local newState = Instance.new(currentElement.component)
+ callback.hostObject = newState
+ local currentState, nextState = xpcall(function()
+ applyProps(callback, currentElement.props)
  end, identity)
- if not v4 then
+ if not currentState then
  local source = currentElement.source
  if source == nil then
  source = "<enable element tracebacks>"
  end
- error(("Error applying props:\n\t%s\nIn element:\n%s\n"):format(v5, source), 0)
+ error(("Error applying props:\n\t%s\nIn element:\n%s\n"):format(nextState, source), 0)
  end
- v3.Name = tostring(hostKey)
- local v7 = currentElement.props[Children]
- if v7 ~= nil then
- p1.updateVirtualNodeWithChildren(p2, p2.hostObject, v7)
+ newState.Name = tostring(hostKey)
+ local mergedState = currentElement.props[Children]
+ if mergedState ~= nil then
+ self.updateVirtualNodeWithChildren(callback, callback.hostObject, mergedState)
  end
- v3.Parent = hostParent
- p2.hostObject = v3
- applyRef(currentElement.props[Ref], v3)
- if p2.eventManager ~= nil then
- p2.eventManager:resume()
+ newState.Parent = hostParent
+ callback.hostObject = newState
+ applyRef(currentElement.props[Ref], newState)
+ if callback.eventManager ~= nil then
+ callback.eventManager:resume()
  end
 	end,
-	unmountHostNode = function(p1, p2)
- applyRef(p2.currentElement.props[Ref], nil)
- for k, v in pairs(p2.children) do
- p1.unmountVirtualNode(v)
+	unmountHostNode = function(self, callback)
+ applyRef(callback.currentElement.props[Ref], nil)
+ for k, v in pairs(callback.children) do
+ self.unmountVirtualNode(v)
  end
- if p2.bindings ~= nil then
- for k, v in pairs(p2.bindings) do
+ if callback.bindings ~= nil then
+ for k, v in pairs(callback.bindings) do
  v()
  end
- p2.bindings = nil
+ callback.bindings = nil
  end
- p2.hostObject:Destroy()
+ callback.hostObject:Destroy()
 	end,
-	updateHostNode = function(p1, p2, p3)
- local props = p2.currentElement.props
+	updateHostNode = function(self, callback, p3)
+ local props = callback.currentElement.props
  local props_2 = p3.props
- if p2.eventManager ~= nil then
- p2.eventManager:suspend()
+ if callback.eventManager ~= nil then
+ callback.eventManager:suspend()
  end
  if props[Ref] ~= props_2[Ref] then
  applyRef(props[Ref], nil)
- applyRef(props_2[Ref], p2.hostObject)
+ applyRef(props_2[Ref], callback.hostObject)
  end
- local v1, v2 = xpcall(function()
- updateProps(p2, props, props_2)
+ local config, v2 = xpcall(function()
+ updateProps(callback, props, props_2)
  end, identity)
- if not v1 then
+ if not config then
  local source = p3.source
  if source == nil then
  source = "<enable element tracebacks>"
  end
  error(("Error updating props:\n\t%s\nIn element:\n%s\n"):format(v2, source), 0)
  end
- local v4 = p3.props[Children]
- if v4 ~= nil or props[Children] ~= nil then
- p1.updateVirtualNodeWithChildren(p2, p2.hostObject, v4)
+ local currentState = p3.props[Children]
+ if currentState ~= nil or props[Children] ~= nil then
+ self.updateVirtualNodeWithChildren(callback, callback.hostObject, currentState)
  end
- if p2.eventManager ~= nil then
- p2.eventManager:resume()
+ if callback.eventManager ~= nil then
+ callback.eventManager:resume()
  end
- return p2
+ return callback
 	end
 }

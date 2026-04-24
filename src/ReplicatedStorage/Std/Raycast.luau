@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return {
 	collidable = function(p1, p2, p3, p4, p5)
 		assert(p1, "missing position")

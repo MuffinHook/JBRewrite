@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TradePopularSortData = require(script.Parent.TradePopularSortData)
 local ItemUtils = require(ReplicatedStorage.App.ItemUtils)
@@ -10,202 +11,202 @@ local SAFE_DATA = require(ReplicatedStorage.Safes.SafesConsts).SAFE_DATA
 local PopularSort = require(ReplicatedStorage.Garage.PopularSort)
 local PlayerUtils = require(ReplicatedStorage.Std.PlayerUtils)
 local getViewportProps = require(ReplicatedStorage.App.getViewportProps)
-local function getVehicleDataForMake(p1)
-	for i, v in ipairs(VehicleData) do
-		if v.Make == p1 then
-			return v
+local function getVehicleDataForMake(make)
+	for i, vehicleData in ipairs(VehicleData) do
+		if vehicleData.Make == make then
+			return vehicleData
 		end
 	end
 end
 local ItemSkinList = require(ReplicatedStorage.Game.ItemSkin.ItemSkinList)
 local String = require(ReplicatedStorage.Std.String)
-local function getItemSkinForName(p1)
-	for i, v in ipairs(ItemSkinList) do
-		if v.Name == p1 then
-			return v
+local function getItemSkinForName(skinName)
+	for i, skinData in ipairs(ItemSkinList) do
+		if skinData.Name == skinName then
+			return skinData
 		end
 	end
 end
-local t = {
-	buildItemProps = function(p1)
-		local v1 = nil
-		local v2 = PopularSort.getRaw()
-		local v3 = TradePopularSortData.getPopularTradeItemData() or {}
-		local v4 = ItemUtils.getFullNameFromTable(p1)
-		local v5 = getViewportProps(p1)
-		if p1.ItemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
-			local CategoryName = p1.CategoryName
-			local ItemName = p1.ItemName
-			local v6 = StoreData.GetItemByName(CategoryName, ItemName)
-			if v6 and typeof(v6) == "table" then
-				if v6.NoTrade then
+local tradeReducerUtils = {
+	buildItemProps = function(item)
+		local itemProps = nil
+		local popularSortData = PopularSort.getRaw()
+		local tradePopularData = TradePopularSortData.getPopularTradeItemData() or {}
+		local itemFullName = ItemUtils.getFullNameFromTable(item)
+		local viewportProps = getViewportProps(item)
+		if item.ItemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
+			local CategoryName = item.CategoryName
+			local ItemName = item.ItemName
+			local itemStoreData = StoreData.GetItemByName(CategoryName, ItemName)
+			if itemStoreData and typeof(itemStoreData) == "table" then
+				if itemStoreData.NoTrade then
 					return
 				end
-				local v7 = ItemUtils.getTranslatedTitleFromItemTable(p1)
-				v1 = {
-					salesIndex = v2[CategoryName] and v2[CategoryName][ItemName],
+				local translatedTitle = ItemUtils.getTranslatedTitleFromItemTable(item)
+				itemProps = {
+					salesIndex = popularSortData[CategoryName] and popularSortData[CategoryName][ItemName],
 					categoryName = CategoryName,
 					categoryTitle = GarageTranslationUtils.getCategoryTitle(CategoryName),
-					title = v7,
-					price = v6.Price,
-					level = v6.Level,
-					season = v6.Season,
-					topPct = v6.TopPct,
-					vip = v6.VIP,
-					getInst = v5.getInst,
-					getInstCompare = v5.getInstCompare,
-					updateCamera = v5.updateCamera
+					title = translatedTitle,
+					price = itemStoreData.Price,
+					level = itemStoreData.Level,
+					season = itemStoreData.Season,
+					topPct = itemStoreData.TopPct,
+					vip = itemStoreData.VIP,
+					getInst = viewportProps.getInst,
+					getInstCompare = viewportProps.getInstCompare,
+					updateCamera = viewportProps.updateCamera
 				}
 			else
 				warn("Missing vehCust for: " .. CategoryName .. "/" .. ItemName)
 				return
 			end
-		elseif p1.ItemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then
-			local Make = p1.Make
-			local v10 = nil
-			for i, v in ipairs(VehicleData) do
-				if v.Make == Make then
-					v10 = v
+		elseif item.ItemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then
+			local Make = item.Make
+			local vehicleData = nil
+			for i, vehicle in ipairs(VehicleData) do
+				if vehicle.Make == Make then
+					vehicleData = vehicle
 					break
 				end
 			end
-			if v10 then
-				if v10.NoTrade then
+			if vehicleData then
+				if vehicleData.NoTrade then
 					return
 				end
-				v1 = {
-					salesIndex = v2.Vehicles[Make],
+				itemProps = {
+					salesIndex = popularSortData.Vehicles[Make],
 					categoryTitle = "Vehicle",
-					title = ItemUtils.getTranslatedTitleFromItemTable(p1),
-					season = v10.Season,
-					level = v10.Level,
-					vip = v10.VIP,
-					topPct = v10.TopPct,
-					getInst = v5.getInst,
-					getInstCompare = v5.getInstCompare,
-					updateCamera = v5.updateCamera
+					title = ItemUtils.getTranslatedTitleFromItemTable(item),
+					season = vehicleData.Season,
+					level = vehicleData.Level,
+					vip = vehicleData.VIP,
+					topPct = vehicleData.TopPct,
+					getInst = viewportProps.getInst,
+					getInstCompare = viewportProps.getInstCompare,
+					updateCamera = viewportProps.updateCamera
 				}
 			else
 				warn("Missing vehicleConf for: " .. Make)
 				return
 			end
-		elseif p1.ItemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then
-			local ItemName = p1.ItemName
-			local v11 = ReplicatedStorage.Resource.HomeItem:FindFirstChild(ItemName)
-			if v11 then
-				if v11:FindFirstChild("NoTrade") then
+		elseif item.ItemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then
+			local ItemName = item.ItemName
+			local homeItemResource = ReplicatedStorage.Resource.HomeItem:FindFirstChild(ItemName)
+			if homeItemResource then
+				if homeItemResource:FindFirstChild("NoTrade") then
 					return
 				end
-				local Level = v11:FindFirstChild("Level")
-				local Season = v11:FindFirstChild("Season")
-				local TopPct = v11:FindFirstChild("TopPct")
-				local t = {
-					title = ItemUtils.getTranslatedTitleFromItemTable(p1),
+				local Level = homeItemResource:FindFirstChild("Level")
+				local Season = homeItemResource:FindFirstChild("Season")
+				local TopPct = homeItemResource:FindFirstChild("TopPct")
+				local homeItemProps = {
+					title = ItemUtils.getTranslatedTitleFromItemTable(item),
 					categoryTitle = "Furniture"
 				}
-				t.level = if Level == nil then nil else Level.Value or nil
-				t.season = if Season == nil then nil else Season.Value or nil
-				t.topPct = if TopPct == nil then nil else TopPct.Value or nil
-				t.getInst = v5.getInst
-				t.getInstCompare = v5.getInstCompare
-				t.updateCamera = v5.updateCamera
-				v1 = t
+				homeItemProps.level = if Level == nil then nil else Level.Value or nil
+				homeItemProps.season = if Season == nil then nil else Season.Value or nil
+				homeItemProps.topPct = if TopPct == nil then nil else TopPct.Value or nil
+				homeItemProps.getInst = viewportProps.getInst
+				homeItemProps.getInstCompare = viewportProps.getInstCompare
+				homeItemProps.updateCamera = viewportProps.updateCamera
+				itemProps = homeItemProps
 			else
 				warn("Missing homeItemModel for: " .. ItemName)
 				return
 			end
-		elseif p1.ItemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then
-			local SkinName = p1.SkinName
-			local v15 = nil
-			for i, v in ipairs(ItemSkinList) do
-				if v.Name == SkinName then
-					v15 = v
+		elseif item.ItemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then
+			local SkinName = item.SkinName
+			local skinData = nil
+			for i, skin in ipairs(ItemSkinList) do
+				if skin.Name == SkinName then
+					skinData = skin
 					break
 				end
 			end
-			if v15 then
-				if v15.NoTrade then
+			if skinData then
+				if skinData.NoTrade then
 					return
 				end
-				v1 = {
-					title = ItemUtils.getTranslatedTitleFromItemTable(p1),
+				itemProps = {
+					title = ItemUtils.getTranslatedTitleFromItemTable(item),
 					categoryTitle = "Item Skin",
-					season = v15.Season,
-					level = v15.Level,
-					vip = v15.VIP,
-					topPct = v15.TopPct,
-					getInst = v5.getInst,
-					getInstCompare = v5.getInstCompare,
-					updateCamera = v5.updateCamera
+					season = skinData.Season,
+					level = skinData.Level,
+					vip = skinData.VIP,
+					topPct = skinData.TopPct,
+					getInst = viewportProps.getInst,
+					getInstCompare = viewportProps.getInstCompare,
+					updateCamera = viewportProps.updateCamera
 				}
 			else
 				return
 			end
-		elseif p1.ItemType == PlayerDataConsts.SAFE_ITEM_TYPE then
-			v1 = {
-				title = ItemUtils.getTranslatedTitleFromItemTable(p1),
+		elseif item.ItemType == PlayerDataConsts.SAFE_ITEM_TYPE then
+			itemProps = {
+				title = ItemUtils.getTranslatedTitleFromItemTable(item),
 				categoryTitle = "Safe",
-				image = v5.image,
-				getInstCompare = v5.getInstCompare
+				image = viewportProps.image,
+				getInstCompare = viewportProps.getInstCompare
 			}
-		elseif p1.ItemType == PlayerDataConsts.CONSUMABLE_ITEM_TYPE then
-			v1 = {
-				title = ItemUtils.getTranslatedTitleFromItemTable(p1),
+		elseif item.ItemType == PlayerDataConsts.CONSUMABLE_ITEM_TYPE then
+			itemProps = {
+				title = ItemUtils.getTranslatedTitleFromItemTable(item),
 				categoryTitle = "Consumable",
-				image = v5.image,
-				getInstCompare = v5.getInstCompare
+				image = viewportProps.image,
+				getInstCompare = viewportProps.getInstCompare
 			}
 		else
-			error("Unsupported ItemType", p1.ItemType)
+			error("Unsupported ItemType", item.ItemType)
 		end
-		if p1.Id then
-			v1.id = p1.Id
+		if item.Id then
+			itemProps.id = item.Id
 		end
-		v1.itemType = assert(p1.ItemType, "missing ItemType")
-		v1.info = {}
-		local v16 = false
-		if p1.History then
-			local UserId = p1.History[1].UserId
-			local UserId_2 = p1.History[#p1.History].UserId
-			if UserId and UserId_2 then
-				v16 = UserId == UserId_2
+		itemProps.itemType = assert(item.ItemType, "missing ItemType")
+		itemProps.info = {}
+		local isOriginalOwner = false
+		if item.History then
+			local firstUserId = item.History[1].UserId
+			local lastUserId = item.History[#item.History].UserId
+			if firstUserId and lastUserId then
+				isOriginalOwner = firstUserId == lastUserId
 			end
 		end
-		v1.isOriginalOwner = v16
-		local v17 = v3[v4]
-		v1.uniqueCirculation = if v17 then v17.UniqueCirculation else 0
-		v1.timesTraded = if v17 then v17.TimesTraded else 0
-		if v1.uniqueCirculation > 0 then
-			v1.tradePopularMetric = v1.timesTraded / v1.uniqueCirculation
+		itemProps.isOriginalOwner = isOriginalOwner
+		local popularItemData = tradePopularData[itemFullName]
+		itemProps.uniqueCirculation = if popularItemData then popularItemData.UniqueCirculation else 0
+		itemProps.timesTraded = if popularItemData then popularItemData.TimesTraded else 0
+		if itemProps.uniqueCirculation > 0 then
+			itemProps.tradePopularMetric = itemProps.timesTraded / itemProps.uniqueCirculation
 		end
-		table.insert(v1.info, {
+		table.insert(itemProps.info, {
 			title = "Monthly Traded",
-			value = String.comma(v1.timesTraded)
+			value = String.comma(itemProps.timesTraded)
 		})
-		table.insert(v1.info, {
+		table.insert(itemProps.info, {
 			title = "Monthly Unique",
-			value = String.comma(v1.uniqueCirculation)
+			value = String.comma(itemProps.uniqueCirculation)
 		})
-		if p1.History then
-			local UserId = p1.History[1].UserId
-			local t3 = {
+		if item.History then
+			local firstOwnerId = item.History[1].UserId
+			local ownerInfoEntry = {
 				title = "Original Owner",
-				value = tostring(UserId)
+				value = tostring(firstOwnerId)
 			}
-			table.insert(v1.info, t3)
-			if UserId then
-				PlayerUtils.promiseNameFromUserId(UserId):andThen(function(p1)
-					t3.value = p1
+			table.insert(itemProps.info, ownerInfoEntry)
+			if firstOwnerId then
+				PlayerUtils.promiseNameFromUserId(firstOwnerId):andThen(function(ownerName)
+					ownerInfoEntry.value = ownerName
 				end):catch(warn)
 			end
 		end
-		if p1.CreationTime then
-			table.insert(v1.info, {
+		if item.CreationTime then
+			table.insert(itemProps.info, {
 				title = "Created At",
-				value = DateTime.fromUnixTimestamp(p1.CreationTime):FormatLocalTime("ll", "en-us")
+				value = DateTime.fromUnixTimestamp(item.CreationTime):FormatLocalTime("ll", "en-us")
 			})
 		end
-		return v1
+		return itemProps
 	end,
 	getDefaults = function()
 		return {
@@ -217,66 +218,66 @@ local t = {
 		}
 	end
 }
-function t.update(p1, p2)
-	local v1 = if p2.reset == true then t.getDefaults() else table.clone(p1)
-	if p2.userId ~= nil then
-		v1.userId = p2.userId
+function tradeReducerUtils.update(currentTrader, updateAction)
+	local updatedTrader = if updateAction.reset == true then tradeReducerUtils.getDefaults() else table.clone(currentTrader)
+	if updateAction.userId ~= nil then
+		updatedTrader.userId = updateAction.userId
 	end
-	if p2.displayName ~= nil then
-		v1.displayName = p2.displayName
+	if updateAction.displayName ~= nil then
+		updatedTrader.displayName = updateAction.displayName
 	end
-	if p2.ready ~= nil then
-		v1.ready = p2.ready
+	if updateAction.ready ~= nil then
+		updatedTrader.ready = updateAction.ready
 	end
-	if p2.accepted ~= nil then
-		v1.accepted = p2.accepted
+	if updateAction.accepted ~= nil then
+		updatedTrader.accepted = updateAction.accepted
 	end
-	if p2.itemsOwnedOffering ~= nil then
-		local t2 = {}
-		for i, v in ipairs(p2.itemsOwnedOffering) do
-			local v4 = t.buildItemProps(v)
-			if v4 then
-				table.insert(t2, v4)
+	if updateAction.itemsOwnedOffering ~= nil then
+		local processedItems = {}
+		for i, itemData in ipairs(updateAction.itemsOwnedOffering) do
+			local builtItemProps = tradeReducerUtils.buildItemProps(itemData)
+			if builtItemProps then
+				table.insert(processedItems, builtItemProps)
 			end
 		end
-		v1.offerItems = t2
+		updatedTrader.offerItems = processedItems
 	end
-	return v1
+	return updatedTrader
 end
-function t.addItem(p1, p2)
-	local item = p2.item
+function tradeReducerUtils.addItem(currentTrader, action)
+	local item = action.item
 	assert(item ~= nil, "missing item")
-	local v2 = false
-	for i, v in ipairs(p1.offerItems) do
-		if v.id == item.id then
-			v2 = true
+	local itemExists = false
+	for i, existingItem in ipairs(currentTrader.offerItems) do
+		if existingItem.id == item.id then
+			itemExists = true
 			break
 		end
 	end
-	if v2 then
-		return p1
+	if itemExists then
+		return currentTrader
 	else
-		local v3 = table.clone(p1)
-		table.insert(v3.offerItems, item)
-		return v3
+		local updatedTrader = table.clone(currentTrader)
+		table.insert(updatedTrader.offerItems, item)
+		return updatedTrader
 	end
 end
-function t.removeItem(p1, p2)
-	local item = p2.item
+function tradeReducerUtils.removeItem(currentTrader, action)
+	local item = action.item
 	assert(item ~= nil, "missing item")
-	for i = #p1.offerItems, 1, -1 do
-		if p1.offerItems[i].id == item.id then
-			local v2 = table.clone(p1)
-			table.remove(v2.offerItems, i)
-			return v2
+	for i = #currentTrader.offerItems, 1, -1 do
+		if currentTrader.offerItems[i].id == item.id then
+			local updatedTrader = table.clone(currentTrader)
+			table.remove(updatedTrader.offerItems, i)
+			return updatedTrader
 		end
 	end
-	return p1
+	return currentTrader
 end
-function t.removeItemByIndex(p1, p2)
-	assert(p2.index ~= nil, "missing item id")
-	local v2 = table.clone(p1)
-	table.remove(v2.offerItems, p2.index)
-	return v2
+function tradeReducerUtils.removeItemByIndex(currentTrader, action)
+	assert(action.index ~= nil, "missing item id")
+	local updatedTrader = table.clone(currentTrader)
+	table.remove(updatedTrader.offerItems, action.index)
+	return updatedTrader
 end
-return t
+return tradeReducerUtils

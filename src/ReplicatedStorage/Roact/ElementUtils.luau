@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Type = require(script.Parent.Type)
 local Symbol = require(script.Parent.Symbol)
 local function noop()
@@ -7,39 +8,39 @@ end
 local t = {
 	UseParentKey = Symbol.named("UseParentKey")
 }
-function t.iterateElements(p1)
-	if Type.of(p1) == Type.Element then
+function t.iterateElements(self)
+	if Type.of(self) == Type.Element then
  local v1 = false
- return function(p12, p2)
+ return function(param12, callback)
  if v1 then
  return nil
  else
  v1 = true
- return t.UseParentKey, p1
+ return t.UseParentKey, self
  end
  end
 	end
-	local v2 = typeof(p1)
-	if p1 == nil or v2 == "boolean" then
+	local v2 = typeof(self)
+	if self == nil or v2 == "boolean" then
  return noop
 	end
 	if v2 == "table" then
- return pairs(p1)
+ return pairs(self)
 	end
 	error("Invalid elements")
 end
-function t.getElementByKey(p1, p2)
-	if p1 == nil or typeof(p1) == "boolean" then
+function t.getElementByKey(self, callback)
+	if self == nil or typeof(self) == "boolean" then
  return nil
-	elseif Type.of(p1) == Type.Element then
- if p2 == t.UseParentKey then
- return p1
+	elseif Type.of(self) == Type.Element then
+ if callback == t.UseParentKey then
+ return self
  else
  return nil
  end
 	else
- if typeof(p1) == "table" then
- return p1[p2]
+ if typeof(self) == "table" then
+ return self[callback]
  end
  error("Invalid elements")
 	end

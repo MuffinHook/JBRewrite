@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SpawnSelectionConsts = require(script.Parent.SpawnSelectionConsts)
@@ -16,21 +17,21 @@ local t = {
 	_maid = Maid.new()
 }
 function t.init()
-	waitForChild(ReplicatedStorage, "SpawnSelectionUpdateSpawnData"):andThen(function(p1)
-		t._updateRemote = p1
-		p1.OnClientEvent:Connect(t._receiveSpawns)
+	waitForChild(ReplicatedStorage, "SpawnSelectionUpdateSpawnData"):andThen(function(updateRemote)
+		t._updateRemote = updateRemote
+		updateRemote.OnClientEvent:Connect(t._receiveSpawns)
 	end)
-	waitForChild(ReplicatedStorage, "SpawnSelectionOffer"):andThen(function(p1)
-		t._offerRemote = p1
-		p1.OnClientEvent:Connect(function()
+	waitForChild(ReplicatedStorage, "SpawnSelectionOffer"):andThen(function(offerRemote)
+		t._offerRemote = offerRemote
+		offerRemote.OnClientEvent:Connect(function()
 			store:dispatch({
 				type = "setSpawnSelectionOfferVisible",
 				visible = true
 			})
 		end)
 	end)
-	store.changed:connect(function(p1, p2)
-		if p1.minimapSpawns ~= p2.minimapSpawns then
+	store.changed:connect(function(newState, oldState)
+		if newState.minimapSpawns ~= oldState.minimapSpawns then
 			t._maid.receiveSpawnsMaid = nil
 		end
 	end)
@@ -41,46 +42,46 @@ end
 function t.attemptSelect(p1)
 	ReplicatedStorage:FindFirstChild("SpawnSelectionSelect"):FireServer(p1)
 end
-function t._receiveSpawns(p1)
-	local v1 = Maid.new()
-	t._maid.receiveSpawnsMaid = v1
-	local v2 = ClanUtils.getCurrentClanId(Players.LocalPlayer)
-	local t2 = {}
-	for v3, v4 in p1 do
-		local t3 = {}
-		t3.name = assert(v4.name, "missing spawnData.name")
-		t3.useParachute = v4.useParachute
-		t3.locked = v4.locked
-		t3.position = assert(v4.position, "missing spawnData.position")
+function t._receiveSpawns(spawns)
+	local maid = Maid.new()
+	t._maid.receiveSpawnsMaid = maid
+	local clanId = ClanUtils.getCurrentClanId(Players.LocalPlayer)
+	local spawnsData = {}
+	for index, spawnData in spawns do
+		local spawnInfo = {}
+		spawnInfo.name = assert(spawnData.name, "missing spawnData.name")
+		spawnInfo.useParachute = spawnData.useParachute
+		spawnInfo.locked = spawnData.locked
+		spawnInfo.position = assert(spawnData.position, "missing spawnData.position")
 		if PrivateServerUtils.getIsBattleServer() then
-			local v5, v6 = Roact.createBinding(0)
-			t3.numEnemies = v5
-			v1:GiveTask(Interval.every(0.1):Connect(function()
+			local enemyCount, setEnemyCount = Roact.createBinding(0)
+			spawnInfo.numEnemies = enemyCount
+			maid:GiveTask(Interval.every(0.1):Connect(function()
 				local count = 0
-				for v1, v22 in Players:GetPlayers() do
-					if ClanUtils.getCurrentClanId(v22) ~= v2 then
-						local Character = v22.Character
+				for index2, player in Players:GetPlayers() do
+					if ClanUtils.getCurrentClanId(player) ~= clanId then
+						local Character = player.Character
 						if Character then
-							local v3 = CharacterUtil.getPositionFromCharacter(Character)
-							if v3 and not ((v3 - t3.position).Magnitude > SpawnSelectionConsts.ENEMY_CHECK_RADIUS) then
+							local characterPos = CharacterUtil.getPositionFromCharacter(Character)
+							if characterPos and not ((characterPos - spawnInfo.position).Magnitude > SpawnSelectionConsts.ENEMY_CHECK_RADIUS) then
 								count = count + 1
 							end
 						end
 					end
 				end
-				v6(count)
+				setEnemyCount(count)
 			end))
 		end
-		if v4.exclusiveTeamId then
-			t3.backgroundColor = Settings.TeamColor[v4.exclusiveTeamId]
+		if spawnData.exclusiveTeamId then
+			spawnInfo.backgroundColor = Settings.TeamColor[spawnData.exclusiveTeamId]
 		else
-			t3.backgroundColor = Color3.new(255/255, 255/255, 255/255)
+			spawnInfo.backgroundColor = Color3.new(255/255, 255/255, 255/255)
 		end
-		table.insert(t2, t3)
+		table.insert(spawnsData, spawnInfo)
 	end
 	store:dispatch({
 		type = "minimapSetSpawns",
-		spawns = t2
+		spawns = spawnsData
 	})
 	store:dispatch({
 		type = "setSpawnSelectionReceivedAt",

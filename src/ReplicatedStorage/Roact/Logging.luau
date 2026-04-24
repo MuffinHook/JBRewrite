@@ -1,86 +1,87 @@
 -- Reviewed by Claude
+-- variables reassigned
 local count = true
-local tbl = {}
+local tableObj = {}
 local tbl2 = {}
-local function indent(p1, p2)
-	local count = ("\tbl"):rep(p2)
-	return count .. p1:gsub("\n", "\n" .. count)
+local function indent(self, callback)
+	local count = ("\tableObj"):rep(callback)
+	return count .. self:gsub("\n", "\n" .. count)
 end
-local function indentLines(p1, p2)
-	local tbl = {}
-	for i, v in ipairs(p1) do
- local count = ("\tbl"):rep(p2)
- table.insert(tbl, count .. v:gsub("\n", "\n" .. count))
+local function indentLines(self, callback)
+	local tableObj = {}
+	for i, v in ipairs(self) do
+ local count = ("\tableObj"):rep(callback)
+ table.insert(tableObj, count .. v:gsub("\n", "\n" .. count))
 	end
-	return table.concat(tbl, "\n")
+	return table.concat(tableObj, "\n")
 end
-local t3 = {
-	__tostring = function(p1)
- local tbl = { "LogInfo {" }
- local count = #p1.errors
- local count2 = #p1.warnings
- local count3 = #p1.infos
+local metadata = {
+	__tostring = function(self)
+ local tableObj = { "LogInfo {" }
+ local count = #self.errors
+ local count2 = #self.warnings
+ local count3 = #self.infos
  if count + count2 + count3 == 0 then
- table.insert(tbl, "\tbl(no messages)")
+ table.insert(tableObj, "\tableObj(no messages)")
  end
  if count > 0 then
- table.insert(tbl, ("\tErrors (%d) {"):format(count))
- table.insert(tbl, indentLines(p1.errors, 2))
- table.insert(tbl, "\tbl}")
+ table.insert(tableObj, ("\tErrors (%d) {"):format(count))
+ table.insert(tableObj, indentLines(self.errors, 2))
+ table.insert(tableObj, "\tableObj}")
  end
  if count2 > 0 then
- table.insert(tbl, ("\tWarnings (%d) {"):format(count2))
- table.insert(tbl, indentLines(p1.warnings, 2))
- table.insert(tbl, "\tbl}")
+ table.insert(tableObj, ("\tWarnings (%d) {"):format(count2))
+ table.insert(tableObj, indentLines(self.warnings, 2))
+ table.insert(tableObj, "\tableObj}")
  end
  if count3 > 0 then
- table.insert(tbl, ("\tInfos (%d) {"):format(count3))
- table.insert(tbl, indentLines(p1.infos, 2))
- table.insert(tbl, "\tbl}")
+ table.insert(tableObj, ("\tInfos (%d) {"):format(count3))
+ table.insert(tableObj, indentLines(self.infos, 2))
+ table.insert(tableObj, "\tableObj}")
  end
- table.insert(tbl, "}")
- return table.concat(tbl, "\n")
+ table.insert(tableObj, "}")
+ return table.concat(tableObj, "\n")
 	end
 }
 local function createLogInfo()
-	local tbl = {
+	local tableObj = {
  errors = {},
  warnings = {},
  infos = {}
 	}
-	setmetatable(tbl, t3)
-	return tbl
+	setmetatable(tableObj, metadata)
+	return tableObj
 end
-local t4 = {
-	capture = function(p1)
- local v12 = createLogInfo()
+local tbl4 = {
+	capture = function(self)
+ local internalData = createLogInfo()
  local count2 = count
  count = false
- tbl[v12] = true
- local count3, v4 = pcall(p1)
- tbl[v12] = nil
+ tableObj[internalData] = true
+ local count3, currentState = pcall(self)
+ tableObj[internalData] = nil
  count = count2
- assert(count3, v4)
- return v12
+ assert(count3, currentState)
+ return internalData
 	end,
-	warn = function(p1, ...)
- local v12 = p1:format(...)
- for k in pairs(tbl) do
- table.insert(k.warnings, v12)
+	warn = function(self, ...)
+ local internalData = self:format(...)
+ for k in pairs(tableObj) do
+ table.insert(k.warnings, internalData)
  end
  local count2 = debug.traceback("", 2):sub(2)
- local count3 = ("\tbl"):rep(1)
- local v4 = ("%s\n%s"):format(v12, count3 .. count2:gsub("\n", "\n" .. count3))
+ local count3 = ("\tableObj"):rep(1)
+ local currentState = ("%s\n%s"):format(internalData, count3 .. count2:gsub("\n", "\n" .. count3))
  if count then
- warn(v4)
+ warn(currentState)
  end
 	end
 }
-function t4.warnOnce(p1, ...)
+function tbl4.warnOnce(self, ...)
 	local count = debug.traceback()
 	if not tbl2[count] then
  tbl2[count] = true
- t4.warn(p1, ...)
+ tbl4.warn(self, ...)
 	end
 end
-return t4
+return tbl4

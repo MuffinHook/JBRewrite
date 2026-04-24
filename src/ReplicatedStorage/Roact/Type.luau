@@ -2,28 +2,28 @@
 local Symbol = require(script.Parent.Symbol)
 local strict = require(script.Parent.strict)
 local metaProxy = newproxy(true)
-local tbl = {}
-local function addType(p1)
-	tbl[p1] = Symbol.named("Roact" .. p1)
+local tableObj = {}
+local function addType(self)
+	tableObj[self] = Symbol.named("Roact" .. self)
 end
-tbl.Binding = Symbol.named("RoactBinding")
-tbl.Element = Symbol.named("RoactElement")
-tbl.HostChangeEvent = Symbol.named("RoactHostChangeEvent")
-tbl.HostEvent = Symbol.named("RoactHostEvent")
-tbl.StatefulComponentClass = Symbol.named("RoactStatefulComponentClass")
-tbl.StatefulComponentInstance = Symbol.named("RoactStatefulComponentInstance")
-tbl.VirtualNode = Symbol.named("RoactVirtualNode")
-tbl.VirtualTree = Symbol.named("RoactVirtualTree")
-function tbl.of(p1)
-	if typeof(p1) == "table" then
- return p1[metaProxy]
+tableObj.Binding = Symbol.named("RoactBinding")
+tableObj.Element = Symbol.named("RoactElement")
+tableObj.HostChangeEvent = Symbol.named("RoactHostChangeEvent")
+tableObj.HostEvent = Symbol.named("RoactHostEvent")
+tableObj.StatefulComponentClass = Symbol.named("RoactStatefulComponentClass")
+tableObj.StatefulComponentInstance = Symbol.named("RoactStatefulComponentInstance")
+tableObj.VirtualNode = Symbol.named("RoactVirtualNode")
+tableObj.VirtualTree = Symbol.named("RoactVirtualTree")
+function tableObj.of(self)
+	if typeof(self) == "table" then
+ return self[metaProxy]
 	else
  return nil
 	end
 end
-getmetatable(metaProxy).__index = tbl
+getmetatable(metaProxy).__index = tableObj
 getmetatable(metaProxy).__tostring = function()
 	return "RoactType"
 end
-strict(tbl, "Type")
+strict(tableObj, "Type")
 return metaProxy

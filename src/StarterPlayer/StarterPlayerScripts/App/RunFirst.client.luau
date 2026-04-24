@@ -1,11 +1,12 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local TweenService = game:GetService("TweenService")
 if script.Parent == ReplicatedFirst then
-	local t = {
+	local configTable = {
 		Trade = {
 			image = "rbxassetid://9839090323",
 			aspectRatio = 2
@@ -60,24 +61,24 @@ if script.Parent == ReplicatedFirst then
 	local function handleTeleport(p1)
 		v1 = v1 + 1
 		local v12 = v1
-		local v2 = p1 == nil
+		local isEnabled = p1 == nil
 		local v3 = p1 or {}
 		TextLabel.Text = ""
 		if v3.tradeLoadingScreen or v3.worldName == "TRADE_WORLD" then
-			local Trade = t.Trade
+			local Trade = configTable.Trade
 			UIAspectRatioConstraint.AspectRatio = Trade.aspectRatio
 			ImageLabel.Image = Trade.image
 		elseif v3.battleLoadingScreen then
-			local Battle = t.Battle
+			local Battle = configTable.Battle
 			UIAspectRatioConstraint.AspectRatio = Battle.aspectRatio
 			ImageLabel.Image = Battle.image
 		else
-			local Jailbreak = t.Jailbreak
+			local Jailbreak = configTable.Jailbreak
 			UIAspectRatioConstraint.AspectRatio = Jailbreak.aspectRatio
 			ImageLabel.Image = Jailbreak.image
 			if v3.migrationLoadingScreen then
 				TextLabel.Text = "Server Updating... Please wait!"
-			elseif v2 then
+			elseif isEnabled then
 				task.delay(7, function()
 					if ScreenGui.Parent ~= nil and v12 == v1 then
 						TextLabel.Text = "Roblox is taking a while to load your data. Please wait."
@@ -87,14 +88,14 @@ if script.Parent == ReplicatedFirst then
 		end
 		ScreenGui.Parent = PlayerGui
 	end
-	local v2 = false
+	local isEnabled = false
 	local v3 = TeleportService:GetLocalPlayerTeleportData()
 	if v3 then
 		ReplicatedFirst:RemoveDefaultLoadingScreen()
 		handleTeleport(v3)
 	else
 		task.delay(3, function()
-			if not v2 then
+			if not isEnabled then
 				handleTeleport()
 			end
 		end)

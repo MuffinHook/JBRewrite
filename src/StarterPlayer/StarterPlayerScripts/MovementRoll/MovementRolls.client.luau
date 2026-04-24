@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("UserInputService")
@@ -8,24 +9,24 @@ local RunConsts = require(ReplicatedStorage.App.RunConsts)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local MovementRollService = require(ReplicatedStorage.MovementRoll.MovementRollService)
 local Audio = require(ReplicatedStorage.Std.Audio)
-local t = {}
-local t2 = {}
-t2.animationId = if RunUtils.getEnv() == RunConsts.QA_NAME then "rbxassetid://13556910021" else "rbxassetid://12753913583"
-t2.looped = false
-t.Roll = t2
-local t3 = {}
-for v2, v3 in t do
-	t3[v2] = Instance.new("Animation")
-	t3[v2].AnimationId = v3.animationId
+local configTable = {}
+local configTable = {}
+configTable.animationId = if RunUtils.getEnv() == RunConsts.QA_NAME then "rbxassetid://13556910021" else "rbxassetid://12753913583"
+configTable.looped = false
+configTable.Roll = configTable
+local configTable = {}
+for v2, v3 in configTable do
+	configTable[v2] = Instance.new("Animation")
+	configTable[v2].AnimationId = v3.animationId
 end
-local t4 = {}
+local configTable = {}
 local function characterAdded(p1)
 	local Animator = p1:WaitForChild("Humanoid"):WaitForChild("Animator")
-	for v1, v2 in t3 do
+	for v1, v2 in configTable do
 		local v4 = Animator:LoadAnimation(v2)
 		v4.Priority = Enum.AnimationPriority.Action
-		v4.Looped = t[v1].looped
-		t4[v1] = v4
+		v4.Looped = configTable[v1].looped
+		configTable[v1] = v4
 	end
 end
 local function playerAdded(p1)
@@ -49,8 +50,8 @@ local function playRollSound(p1)
 end
 local ReplicateMovementRollRemote = ReplicatedStorage:WaitForChild("ReplicateMovementRollRemote")
 MovementRollService.onRollBegan:Connect(function(p1, p2)
-	t4.Roll:Play()
-	t4.Roll:AdjustSpeed(0.54 * t4.Roll.Length / p2)
+	configTable.Roll:Play()
+	configTable.Roll:AdjustSpeed(0.54 * configTable.Roll.Length / p2)
 	ReplicateMovementRollRemote:FireServer()
 	local PrimaryPart = p1.Character.PrimaryPart
 	if PrimaryPart then
@@ -72,7 +73,7 @@ ReplicateMovementRollRemote.OnClientEvent:Connect(function(p1)
 		end
 	end
 end)
-local t5 = {
+local configTable = {
 	disabled = true,
 	primary = false,
 	priority = 600,
@@ -84,13 +85,13 @@ local t5 = {
 	end,
 	onReleased = function()  end
 }
-ActionButtonService.add(t5)
+ActionButtonService.add(configTable)
 local function updateVisibility()
 	local v1 = VehicleUtils.GetLocalVehiclePacket()
-	ActionButtonService.setButtonEnabled(t5, not v1 and ReplicatedStorage:GetAttribute("RollingEnabled") == true)
+	ActionButtonService.setButtonEnabled(configTable, not v1 and ReplicatedStorage:GetAttribute("RollingEnabled") == true)
 end
 VehicleUtils.OnVehicleEntered:Connect(updateVisibility)
 VehicleUtils.OnVehicleExited:Connect(updateVisibility)
 ReplicatedStorage:GetAttributeChangedSignal("RollingEnabled"):Connect(updateVisibility)
 local v4 = VehicleUtils.GetLocalVehiclePacket()
-ActionButtonService.setButtonEnabled(t5, not v4 and ReplicatedStorage:GetAttribute("RollingEnabled") == true)
+ActionButtonService.setButtonEnabled(configTable, not v4 and ReplicatedStorage:GetAttribute("RollingEnabled") == true)

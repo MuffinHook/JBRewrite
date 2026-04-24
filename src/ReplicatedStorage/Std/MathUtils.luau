@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {
 	regulaFalsiWithEndpoints = function(p1, p2, p3, p4, p5)
 		local v1 = p4 or 1e-15

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {
 	comma = function(p1)
 		local v1, v2, v3 = string.match(tostring(p1), "^([^%d]*%d)(%d*)(.-)$")

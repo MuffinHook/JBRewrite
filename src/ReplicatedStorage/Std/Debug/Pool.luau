@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {}
 t.__index = t
 function t.new(p1, p2)

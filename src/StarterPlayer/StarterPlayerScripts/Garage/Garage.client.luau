@@ -1,25 +1,26 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GarageConsts = require(ReplicatedStorage.Garage.GarageConsts)
 local OwnershipConsts = require(ReplicatedStorage.Ownership.OwnershipConsts)
 local store = require(ReplicatedStorage.App.store)
 ReplicatedStorage:WaitForChild(GarageConsts.UPDATE_OWNED_REMOTE_NAME).OnClientEvent:Connect(function(p1)
-	local t = {}
+	local configTable = {}
 	for k, v in pairs(p1) do
 		if k ~= "CustomizationSlots" then
-			t[k] = v
+			configTable[k] = v
 		end
 	end
 	for k in pairs(OwnershipConsts.COLOR_CATEGORY_TYPES) do
-		t[k] = t.Color
+		configTable[k] = configTable.Color
 	end
-	t.Color = nil
+	configTable.Color = nil
 	for k in pairs(OwnershipConsts.TEXTURE_CATEGORY_TYPES) do
-		t[k] = t.Texture
+		configTable[k] = configTable.Texture
 	end
 	store:dispatch({
 		type = "setOwnedRaw",
-		owned = t
+		owned = configTable
 	})
 	store:dispatch({
 		type = "setSavesRaw",

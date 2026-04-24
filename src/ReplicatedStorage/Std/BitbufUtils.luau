@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return {
 	writeString = function(p1, p2, p3)
 		assert(#p3 <= 2 ^ p2, "String too long for length to be written in uint size")

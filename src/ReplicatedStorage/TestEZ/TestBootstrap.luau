@@ -1,105 +1,106 @@
 -- Reviewed by Claude
+-- variables reassigned
 local TestPlanner = require(script.Parent.TestPlanner)
 local TestRunner = require(script.Parent.TestRunner)
 local TextReporter = require(script.Parent.Reporters.TextReporter)
-local t = {}
-local function stripSpecSuffix(p1)
-	return p1:gsub("%.spec$", "")
+local bootstrapModule = {}
+local function stripSpecSuffix(name)
+	return name:gsub("%.spec$", "")
 end
-local function isSpecScript(p1)
-	return p1:IsA("ModuleScript") and p1.Name:match("%.spec$")
+local function isSpecScript(instance)
+	return instance:IsA("ModuleScript") and instance.Name:match("%.spec$")
 end
-local function getPath(p1, p2)
-	local v1 = p2 or game
-	local t = {}
-	local v2, v3
-	if p1.Name == "init.spec" then
-		v2 = p1.Parent
-		v3 = v1
+local function getPath(script, rootContainer)
+	local containerRoot = rootContainer or game
+	local pathParts = {}
+	local currentNode, stopNode
+	if script.Name == "init.spec" then
+		currentNode = script.Parent
+		stopNode = containerRoot
 	else
-		v2 = p1
-		v3 = v1
+		currentNode = script
+		stopNode = containerRoot
 	end
-	while v2 ~= nil and v2 ~= v3 do
-		table.insert(t, (v2.Name:gsub("%.spec$", "")))
-		v2 = v2.Parent
+	while currentNode ~= nil and currentNode ~= stopNode do
+		table.insert(pathParts, (currentNode.Name:gsub("%.spec$", "")))
+		currentNode = currentNode.Parent
 	end
-	table.insert(t, (v3.Name:gsub("%.spec$", "")))
-	return t
+	table.insert(pathParts, (stopNode.Name:gsub("%.spec$", "")))
+	return pathParts
 end
-local function toStringPath(p1)
-	local v1 = true
-	local v2 = ""
-	for i, v in ipairs(p1) do
-		if v1 then
-			v1 = false
-			v2 = v
+local function toStringPath(pathParts)
+	local isFirst = true
+	local pathString = ""
+	for i, part in ipairs(pathParts) do
+		if isFirst then
+			isFirst = false
+			pathString = part
 		else
-			v2 = v .. " " .. v2
+			pathString = part .. " " .. pathString
 		end
 	end
-	return v2
+	return pathString
 end
-function t.getModulesImpl(p1, p2, p3, p4)
-	local v1 = p3 or {}
-	local v2 = p4 or p2
-	local v3 = v2:IsA("ModuleScript")
-	if v3 and v2.Name:match("%.spec$") then
-		local v6 = require(v2)
-		local v7 = getPath(v2, p2)
-		v8 = true
-		v9 = ""
-		v10 = v1
-		for i, v in ipairs(v7) do
-			if v8 then
-				v8 = false
-				v9 = v
+function bootstrapModule.getModulesImpl(self, rootFolder, moduleList, scriptChild)
+	local results = moduleList or {}
+	local currentScript = scriptChild or rootFolder
+	local isModuleScript = currentScript:IsA("ModuleScript")
+	if isModuleScript and currentScript.Name:match("%.spec$") then
+		local moduleFunc = require(currentScript)
+		local pathParts = getPath(currentScript, rootFolder)
+		local isFirstPart = true
+		local sortPath = ""
+		local outputList = results
+		for i, part in ipairs(pathParts) do
+			if isFirstPart then
+				isFirstPart = false
+				sortPath = part
 			else
-				v9 = v .. " " .. v9
+				sortPath = part .. " " .. sortPath
 			end
 		end
-		table.insert(v10, {
-			method = v6,
-			path = v7,
-			pathStringForSorting = v9:lower()
+		table.insert(outputList, {
+			method = moduleFunc,
+			path = pathParts,
+			pathStringForSorting = sortPath:lower()
 		})
 	end
 end
-function t.getModules(p1, p2)
-	local t = {}
-	p1:getModulesImpl(p2, t)
-	for i, v in ipairs(p2:GetDescendants()) do
-		p1:getModulesImpl(p2, t, v)
+function bootstrapModule.getModules(self, rootFolder)
+	local modules = {}
+	self:getModulesImpl(rootFolder, modules)
+	for i, descendant in ipairs(rootFolder:GetDescendants()) do
+		self:getModulesImpl(rootFolder, modules, descendant)
 	end
-	return t
+	return modules
 end
-function t.run(p1, p2, p3, p4)
-	local v2 = p4 or {}
-	if type(p2) ~= "table" then
-		error(("Bad argument #1 to TestBootstrap:run. Expected table, got %s"):format((typeof(p2))), 2)
+function bootstrapModule.run(self, testFolders, reporter, options)
+	local runOptions = options or {}
+	if type(testFolders) ~= "table" then
+		error(("Bad argument #1 to TestBootstrap:run. Expected table, got %s"):format((typeof(testFolders))), 2)
 	end
-	local v5 = tick()
-	local t, v6 = {}, p3 or TextReporter
-	for i, v in ipairs(p2) do
-		for i2, v8 in ipairs((p1:getModules(v))) do
-			table.insert(t, v8)
+	local startLocateTime = tick()
+	local allModules, reporterModule = {}, reporter or TextReporter
+	for i, folder in ipairs(testFolders) do
+		for i2, module in ipairs((self:getModules(folder))) do
+			table.insert(allModules, module)
 		end
 	end
-	local v8 = tick()
-	local v9 = TestPlanner.createPlan(t, v2.testNamePattern, v2.extraEnvironment or {})
-	local v10 = tick()
-	local v11 = TestRunner.runPlan(v9)
-	local v12 = tick()
-	v6.report(v11)
-	local v13 = tick()
-	if v2.showTimingInfo then
+	local endLocateTime = tick()
+	local testPlan = TestPlanner.createPlan(allModules, runOptions.testNamePattern, runOptions.extraEnvironment or {})
+	local endPlanTime = tick()
+	local testResults = TestRunner.runPlan(testPlan)
+	local endRunTime = tick()
+	reporterModule.report(testResults)
+	local endReportTime = tick()
+	if runOptions.showTimingInfo then
 		print(table.concat({
-			("Took %f seconds to locate test modules"):format(v8 - v5),
-			("Took %f seconds to create test plan"):format(v10 - v8),
-			("Took %f seconds to run tests"):format(v12 - v10),
-			("Took %f seconds to report tests"):format(v13 - v12)
+			("Took %f seconds to locate test modules"):format(endLocateTime - startLocateTime),
+			("Took %f seconds to create test plan"):format(endPlanTime - endLocateTime),
+			("Took %f seconds to run tests"):format(endRunTime - endPlanTime),
+			("Took %f seconds to report tests"):format(endReportTime - endRunTime)
 		}, "\n"))
 	end
-	return v11
+	return testResults
 end
-return t
+return bootstrapModule

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -50,24 +51,24 @@ local function flingPlayer(p1, p2)
 end
 Binder.new("MilitaryForcefield", function(p1)
 	local v1 = Maid.new()
-	local v2 = p1.Position - Vector3.new(0, 1, 0) * p1.Position.Y
+	local vector = p1.Position - Vector3.new(0, 1, 0) * p1.Position.Y
 	local v3 = p1.Size.X / 2
 	local Size = p1.Size
 	local Position = p1.Position
-	local t = {
-		Position = v2,
+	local configTable = {
+		Position = vector,
 		Radius = v3,
 		Part = p1
 	}
-	BulletEmitter._militaryForcefield = t
+	BulletEmitter._militaryForcefield = configTable
 	v1:GiveTask(function()
-		if BulletEmitter._militaryForcefield == t then
+		if BulletEmitter._militaryForcefield == configTable then
 			BulletEmitter._militaryForcefield = nil
 		end
 	end)
-	local t2 = {}
+	local configTable = {}
 	local function toggleFlash(p1)
-		for v2, v3 in t2 do
+		for vector, v3 in configTable do
 			local v1
 			v1 = if p1 then 0 else 1
 			v3.Transparency = v1
@@ -83,7 +84,7 @@ Binder.new("MilitaryForcefield", function(p1)
 		Decal.Color3 = Color3.fromRGB(475, 280, 510)
 		Decal.Transparency = 1
 		Decal.Parent = p1
-		table.insert(t2, Decal)
+		table.insert(configTable, Decal)
 		v1:GiveTask(Decal)
 	end
 	v1:GiveTask(Audio.ObjectLocal(p1, 17183453324, {
@@ -93,38 +94,38 @@ Binder.new("MilitaryForcefield", function(p1)
 		return p1:GetAttribute("Disabled") == true
 	end
 	local v9 = nil
-	local v10 = false
-	local v11 = InventoryItemSystem.playerHasItem(LocalPlayer, "Key") == true
-	local v12 = true
+	local isEnabled = false
+	local isEnabled = InventoryItemSystem.playerHasItem(LocalPlayer, "Key") == true
+	local isEnabled = true
 	local function updatePermsToEnter()
-		v10 = v11 or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-		p1.CanCollide = not v10 and v12
-		if not (v10 or v12) and (p1:GetAttribute("Disabled") ~= true and v9) then
+		isEnabled = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+		p1.CanCollide = not isEnabled and isEnabled
+		if not (isEnabled or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
 			v9()
 		end
 	end
-	local v14 = v11 or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-	p1.CanCollide = not v14 and v12
-	if not (v14 or v12) and (p1:GetAttribute("Disabled") ~= true and v9) then
+	local v14 = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+	p1.CanCollide = not v14 and isEnabled
+	if not (v14 or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
 		v9()
 	end
 	v1:GiveTask(GameUtil.OnTeamChanged:Connect(updatePermsToEnter))
 	v1:GiveTask(InventoryItemBinder:GetClassAddedSignal():Connect(function(p12)
 		if p12:GetOwner() == LocalPlayer and p12:GetName() == "Key" then
-			v11 = true
-			v14 = v11 or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-			p1.CanCollide = not v14 and v12
-			if not (v14 or v12) and (p1:GetAttribute("Disabled") ~= true and v9) then
+			isEnabled = true
+			v14 = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+			p1.CanCollide = not v14 and isEnabled
+			if not (v14 or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
 				v9()
 			end
 		end
 	end))
 	v1:GiveTask(InventoryItemBinder:GetClassRemovingSignal():Connect(function(p12)
 		if p12:GetOwner() == LocalPlayer and p12:GetName() == "Key" then
-			v11 = false
-			v14 = v11 or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-			p1.CanCollide = not v14 and v12
-			if not (v14 or v12) and (p1:GetAttribute("Disabled") ~= true and v9) then
+			isEnabled = false
+			v14 = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+			p1.CanCollide = not v14 and isEnabled
+			if not (v14 or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
 				v9()
 			end
 		end
@@ -141,7 +142,7 @@ Binder.new("MilitaryForcefield", function(p1)
 		return SoundAttachment
 	end
 	local v16 = nil
-	local v17 = false
+	local isEnabled = false
 	local SoundAttachment = p1:FindFirstChild("SoundAttachment")
 	if not SoundAttachment then
 		SoundAttachment = Instance.new("Attachment")
@@ -167,23 +168,23 @@ Binder.new("MilitaryForcefield", function(p1)
 		end
 		v16 = Audio.promiseFadeTo(v18, p1, p2)
 	end
-	local v19 = false
+	local isEnabled = false
 	v1:GiveTask(CharacterUtils.observeLocalCharacterAdded(function(p1, p2)
 		if v16 then
 			v16:cancel()
 		end
 		v18.Volume = 0.2
-		v19 = true
+		isEnabled = true
 	end))
 	local v20 = TweenInfo.new(0.6, Enum.EasingStyle.Bounce, Enum.EasingDirection.In)
 	local v21 = TweenInfo.new(0.8, Enum.EasingStyle.Bounce, Enum.EasingDirection.In)
 	local v22 = TweenInfo.new(1, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 	local function disableForcefield()
-		if v12 then
-			v12 = false
-			v14 = v11 or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-			p1.CanCollide = not v14 and v12
-			if not (v14 or v12) and (p1:GetAttribute("Disabled") ~= true and v9) then
+		if isEnabled then
+			isEnabled = false
+			v14 = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+			p1.CanCollide = not v14 and isEnabled
+			if not (v14 or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
 				v9()
 			end
 			local SoundAttachment = p1:FindFirstChild("SoundAttachment")
@@ -212,13 +213,13 @@ Binder.new("MilitaryForcefield", function(p1)
 		end
 	end
 	v9 = function()
-		if v12 then
+		if isEnabled then
 			return
 		end
-		v12 = true
-		v14 = v11 or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-		p1.CanCollide = not v14 and v12
-		if not (v14 or v12) and (p1:GetAttribute("Disabled") ~= true and v9) then
+		isEnabled = true
+		v14 = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+		p1.CanCollide = not v14 and isEnabled
+		if not (v14 or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
 			v9()
 		end
 		local SoundAttachment = p1:FindFirstChild("SoundAttachment")
@@ -238,8 +239,8 @@ Binder.new("MilitaryForcefield", function(p1)
 			Transparency = -5
 		}):Play()
 		task.delay(0.5, function()
-			for v1, v2 in p1.Parent:QueryDescendants("Beam") do
-				v2.Enabled = true
+			for v1, vector in p1.Parent:QueryDescendants("Beam") do
+				vector.Enabled = true
 			end
 		end)
 		p1.Size = Size * 0.7
@@ -249,7 +250,7 @@ Binder.new("MilitaryForcefield", function(p1)
 			Size = Size,
 			Position = Position
 		}):Play()
-		if v17 then
+		if isEnabled then
 			if v16 then
 				v16:cancel()
 			end
@@ -262,10 +263,10 @@ Binder.new("MilitaryForcefield", function(p1)
 		end
 	end
 	local function updateServerState()
-		if p1:GetAttribute("Disabled") == true and v12 then
+		if p1:GetAttribute("Disabled") == true and isEnabled then
 			disableForcefield()
 		else
-			if not (p1:GetAttribute("Disabled") == true or v12) then
+			if not (p1:GetAttribute("Disabled") == true or isEnabled) then
 				v9()
 			end
 		end
@@ -279,7 +280,7 @@ Binder.new("MilitaryForcefield", function(p1)
 		v24.Enabled = true
 	end
 	local v25 = 0
-	local v26 = false
+	local isEnabled = false
 	v1:GiveTask(RunService.Heartbeat:Connect(function()
 		local v13 = os.clock()
 		if not (v13 < v25) then
@@ -287,45 +288,45 @@ Binder.new("MilitaryForcefield", function(p1)
 			local v22 = Character and Character.PrimaryPart
 			if v22 then
 				local Position = v22.Position
-				local Magnitude = (v2 - Position).Magnitude
+				local Magnitude = (vector - Position).Magnitude
 				local v32 = if 400 + v3 < Magnitude then 1 else 0.05
 				v25 = v13 + v32
 				local v42 = Magnitude < 1800 + v3
-				if v42 and not v26 then
-					v26 = true
+				if v42 and not isEnabled then
+					isEnabled = true
 					v1._distFade = Maid.new()
 					for v52, v62 in p1.Parent:QueryDescendants("Beam, BasePart#Forcefield") do
 						v1._distFade:GiveTask(Fade.linear(v62, "LocalTransparencyModifier", 0, 3))
 					end
-				elseif not v42 and v26 then
-					v26 = false
+				elseif not v42 and isEnabled then
+					isEnabled = false
 					v1._distFade = Maid.new()
 					for v7, v8 in p1.Parent:QueryDescendants("Beam, BasePart#Forcefield") do
 						v1._distFade:GiveTask(Fade.linear(v8, "LocalTransparencyModifier", 1, 3))
 					end
 				end
 				if v32 == 0.05 then
-					local v92 = if v4 < Magnitude and (Magnitude < v5 and Position.Y >= v2.Y) then v14 else false
-					if v92 then
+					local isEnabled = if v4 < Magnitude and (Magnitude < v5 and Position.Y >= vector.Y) then v14 else false
+					if isEnabled then
 						v6 = os.clock()
 					end
-					if v92 and v12 then
+					if isEnabled and isEnabled then
 						disableForcefield()
-					elseif not (v92 or v12) then
-						local v10 = p1:GetAttribute("Disabled") == true
-						if not v10 and os.clock() - v6 > 3 then
+					elseif not (isEnabled or isEnabled) then
+						local isEnabled = p1:GetAttribute("Disabled") == true
+						if not isEnabled and os.clock() - v6 > 3 then
 							v9()
 						end
 					end
-					if if v3 - 4 < Magnitude and Magnitude < v3 + 6 then Position.Y >= v2.Y else false and (not v14 and v12) then
-						flingPlayer(v2, toggleFlash)
+					if if v3 - 4 < Magnitude and Magnitude < v3 + 6 then Position.Y >= vector.Y else false and (not v14 and isEnabled) then
+						flingPlayer(vector, toggleFlash)
 					end
 					local v122 = Magnitude < v3
-					t.Ignore = v122
-					if v122 ~= v17 or v19 then
-						v19 = false
-						v17 = v122
-						if v12 then
+					configTable.Ignore = v122
+					if v122 ~= isEnabled or isEnabled then
+						isEnabled = false
+						isEnabled = v122
+						if isEnabled then
 							if v122 then
 								if v16 then
 									v16:cancel()

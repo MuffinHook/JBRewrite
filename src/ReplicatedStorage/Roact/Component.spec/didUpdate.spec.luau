@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
@@ -7,53 +8,53 @@ return function()
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
 	local Type = require(script.Parent.Parent.Type)
 	local Component = require(script.Parent.Parent.Component)
-	local v1 = createReconciler(NoopRenderer)
+	local state1 = createReconciler(NoopRenderer)
 	it("should be invoked when updated via updateVirtualNode", function()
-		local v12 = Component:extend("MyComponent")
-		local v2 = createSpy()
-		v12.didUpdate = v2.value
-		function v12.render(p1)
+		local internalData = Component:extend("MyComponent")
+		local state2 = createSpy()
+		internalData.didUpdate = state2.value
+		function internalData.render(self)
 			return nil
 		end
-		local t = {
+		local tbl = {
 			a = 5
 		}
-		local v4 = v1.mountVirtualNode(createElement(v12, t), nil, "Test")
-		expect(v2.callCount).to.equal(0)
-		v1.updateVirtualNode(v4, (createElement(v12, {
+		local currentState = state1.mountVirtualNode(createElement(internalData, tbl), nil, "Test")
+		expect(state2.callCount).to.equal(0)
+		state1.updateVirtualNode(currentState, (createElement(internalData, {
 			a = 6,
 			b = 2
 		})))
-		expect(v2.callCount).to.equal(1)
-		local v6 = v2:captureValues("self", "oldProps", "oldState")
-		expect(Type.of(v6.self)).to.equal(Type.StatefulComponentInstance)
-		assertDeepEqual(v6.oldProps, t)
-		assertDeepEqual(v6.oldState, {})
+		expect(state2.callCount).to.equal(1)
+		local tempState = state2:captureValues("self", "oldProps", "oldState")
+		expect(Type.of(tempState.self)).to.equal(Type.StatefulComponentInstance)
+		assertDeepEqual(tempState.oldProps, tbl)
+		assertDeepEqual(tempState.oldState, {})
 	end)
 	it("should be invoked when updated via setState", function()
-		local v12 = Component:extend("MyComponent")
-		local v2 = createSpy()
-		v12.didUpdate = v2.value
-		local t = {
+		local internalData = Component:extend("MyComponent")
+		local state2 = createSpy()
+		internalData.didUpdate = state2.value
+		local tbl = {
 			a = 4
 		}
-		local v3 = nil
-		function v12.init(p1)
-			v3 = function(...)
-				return p1:setState(...)
+		local newState = nil
+		function internalData.init(self)
+			newState = function(...)
+				return self:setState(...)
 			end
-			p1:setState(t)
+			self:setState(tbl)
 		end
-		function v12.render(p1)  end
-		v1.mountVirtualNode(createElement(v12), nil, "Test")
-		expect(v2.callCount).to.equal(0)
-		v3({
+		function internalData.render(self)  end
+		state1.mountVirtualNode(createElement(internalData), nil, "Test")
+		expect(state2.callCount).to.equal(0)
+		newState({
 			a = 5
 		})
-		expect(v2.callCount).to.equal(1)
-		local v5 = v2:captureValues("self", "oldProps", "oldState")
-		expect(Type.of(v5.self)).to.equal(Type.StatefulComponentInstance)
-		assertDeepEqual(v5.oldProps, {})
-		assertDeepEqual(v5.oldState, t)
+		expect(state2.callCount).to.equal(1)
+		local nextState = state2:captureValues("self", "oldProps", "oldState")
+		expect(Type.of(nextState.self)).to.equal(Type.StatefulComponentInstance)
+		assertDeepEqual(nextState.oldProps, {})
+		assertDeepEqual(nextState.oldState, tbl)
 	end)
 end

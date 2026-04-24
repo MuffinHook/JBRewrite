@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local RegionUtils = require(script.RegionUtils)

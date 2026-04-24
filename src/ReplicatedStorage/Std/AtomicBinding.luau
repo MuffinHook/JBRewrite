@@ -1,23 +1,24 @@
 -- Reviewed by Claude
+-- variables reassigned
 local CollectionService = game:GetService("CollectionService")
-local function parsePath(p1)
-	local v1 = string.split(p1, "/")
-	for i = #v1, 1, -1 do
-		if v1[i] == "" then
-			table.remove(v1, i)
+local function parsePath(path)
+	local parts = string.split(path, "/")
+	for i = #parts, 1, -1 do
+		if parts[i] == "" then
+			table.remove(parts, i)
 		end
 	end
-	return v1
+	return parts
 end
-local function isManifestResolved(p1, p2)
+local function isManifestResolved(manifest, expectedCount)
 	local count = 0
-	for k in pairs(p1) do
+	for k in pairs(manifest) do
 		count = count + 1
 	end
-	assert(count <= p2, count)
-	return count == p2
+	assert(count <= expectedCount, count)
+	return count == expectedCount
 end
-local function v1(p1, p2)
+local function cleanupNode(node, manifest)
 	if p1.instance ~= nil then
 		p1.instance = nil
 		local connections = p1.connections

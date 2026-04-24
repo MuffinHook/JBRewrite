@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {
 	isDST = function()
 		local month = os.date("*t").month

@@ -1,6 +1,6 @@
 -- Reviewed by Claude
-return function(p1, p2)
-	if not p1 then
- error(p2 .. " (This is probably a bug in Roact!)", 3)
+return function(self, callback)
+	if not self then
+ error(callback .. " (This is probably a bug in Roact!)", 3)
 	end
 end

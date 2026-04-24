@@ -1,44 +1,45 @@
 -- Reviewed by Claude
-local v1 = require(script.Parent.Symbol).named("Nil")
-local tbl = {}
-return function(p1, p2)
-	local v12 = tbl[p1]
-	local v2, v3, v4
-	if v12 then
- local v5 = v12[p2]
- if v5 == v1 then
+-- variables reassigned
+local module1 = require(script.Parent.Symbol).named("Nil")
+local tableObj = {}
+return function(self, callback)
+	local internalData = tableObj[self]
+	local state2, newState, currentState
+	if internalData then
+ local nextState = internalData[callback]
+ if nextState == module1 then
  return true, nil
- elseif v5 == nil then
- v2 = Instance.new(p1)
- v3, v4 = pcall(function()
- return v2[p2]
+ elseif nextState == nil then
+ state2 = Instance.new(self)
+ newState, currentState = pcall(function()
+ return state2[callback]
  end)
- v2:Destroy()
- if v3 then
- if v4 == nil then
- v12[p2] = v1
- return v3, v4
+ state2:Destroy()
+ if newState then
+ if currentState == nil then
+ internalData[callback] = module1
+ return newState, currentState
  end
- v12[p2] = v4
+ internalData[callback] = currentState
  end
- return v3, v4
+ return newState, currentState
  else
- return true, v5
+ return true, nextState
  end
 	end
-	v12 = {}
-	tbl[p1] = v12
-	v2 = Instance.new(p1)
-	v3, v4 = pcall(function()
- return v2[p2]
+	internalData = {}
+	tableObj[self] = internalData
+	state2 = Instance.new(self)
+	newState, currentState = pcall(function()
+ return state2[callback]
 	end)
-	v2:Destroy()
-	if v3 then
- if v4 == nil then
- v12[p2] = v1
- return v3, v4
+	state2:Destroy()
+	if newState then
+ if currentState == nil then
+ internalData[callback] = module1
+ return newState, currentState
  end
- v12[p2] = v4
+ internalData[callback] = currentState
 	end
-	return v3, v4
+	return newState, currentState
 end

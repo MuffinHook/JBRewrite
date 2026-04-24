@@ -1,5 +1,6 @@
 -- Reviewed by Claude
-local t = {}
+-- variables reassigned
+local moduleTable = {}
 function t.new(p1)
 	return setmetatable({
 		_accel = p1 or 1,

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -11,11 +12,11 @@ local LocalPlayer = Players.LocalPlayer
 if EnvironmentConsts.SNOW then
 	local DefaultSnow = ReplicatedStorage.Resource.DefaultSnow
 	local v1 = Maid.new()
-	for v2, v3 in DefaultSnow:GetChildren() do
-		if v3:IsA("BasePart") then
-			v3.CanCollide = false
-			v3.CanTouch = false
-			v3.CanQuery = false
+	for v2, vector in DefaultSnow:GetChildren() do
+		if vector:IsA("BasePart") then
+			vector.CanCollide = false
+			vector.CanTouch = false
+			vector.CanQuery = false
 		end
 	end
 	local function StartSnow()
@@ -23,7 +24,7 @@ if EnvironmentConsts.SNOW then
 		v1:GiveTask(function()
 			DefaultSnow.Parent = ReplicatedStorage.Resource
 		end)
-		local v12 = Vector3.new(0, 0, 0)
+		local vector = Vector3.new(0, 0, 0)
 		local v2 = 0
 		v1:GiveTask(RunService.Heartbeat:Connect(function(p1)
 			debug.profilebegin("snow Update")
@@ -33,7 +34,7 @@ if EnvironmentConsts.SNOW then
 			end
 			local v1 = LocalPlayer.Character and LocalPlayer.Character.PrimaryPart
 			if v1 then
-				v12 = v1.Position + v1.Velocity * Vector3.new(1, 0, 1)
+				vector = v1.Position + v1.Velocity * Vector3.new(1, 0, 1)
 			end
 			if v2 == 0 then
 				local v22 = RaycastParams.new()
@@ -43,14 +44,14 @@ if EnvironmentConsts.SNOW then
 					DefaultSnow,
 					workspace:FindFirstChild("Clouds")
 				}
-				local v3 = Raycast.collidable(v12, Vector3.new(0, 1, 0), 100, v22) ~= nil
-				if DefaultSnow.RainFall.Rain.Enabled == true and v3 then
+				local vector = Raycast.collidable(vector, Vector3.new(0, 1, 0), 100, v22) ~= nil
+				if DefaultSnow.RainFall.Rain.Enabled == true and vector then
 					DefaultSnow.RainFall.Rain:Clear()
 				end
-				DefaultSnow.RainFall.Rain.Enabled = not v3
+				DefaultSnow.RainFall.Rain.Enabled = not vector
 			end
 			if DefaultSnow.RainFall.Rain.Enabled then
-				DefaultSnow.RainFall.Position = v12 + Vector3.new(0, 37, 0)
+				DefaultSnow.RainFall.Position = vector + Vector3.new(0, 37, 0)
 			end
 			debug.profileend()
 		end))

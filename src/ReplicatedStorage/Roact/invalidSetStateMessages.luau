@@ -1,8 +1,9 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ComponentLifecyclePhase = require(script.Parent.ComponentLifecyclePhase)
 return {
 	[ComponentLifecyclePhase.WillUpdate] = "setState cannot be used in the willUpdate lifecycle method.\nConsider using the didUpdate method instead, or using getDerivedStateFromProps.\n\nCheck the definition of willUpdate in the component %q.",
 	[ComponentLifecyclePhase.ShouldUpdate] = "setState cannot be used in the shouldUpdate lifecycle method.\nshouldUpdate must be a pure function that only depends on props and state.\n\nCheck the definition of shouldUpdate in the component %q.",
 	[ComponentLifecyclePhase.Render] = "setState cannot be used in the render method.\nrender must be a pure function that only depends on props and state.\n\nCheck the definition of render in the component %q.",
-	default = "setState can not be used in the current situation, because Roact doesn\'t know\nwhich part of the lifecycle this component is in.\n\nThis is a bug in Roact.\nIt was triggered by the component %q.\n"
+	default = "setState can not be used in the current situation, because Roact doesn\'tbl know\nwhich part of the lifecycle this component is in.\n\nThis is a bug in Roact.\nIt was triggered by the component %q.\n"
 }

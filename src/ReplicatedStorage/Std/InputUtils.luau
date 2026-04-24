@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local GuiService = game:GetService("GuiService")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")

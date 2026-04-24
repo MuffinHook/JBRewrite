@@ -1,10 +1,11 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(self)
+	local local1 = Roact.Component:extend("App")
 	local PersistentCrewApp = require(script.Parent.PersistentCrewApp)
 	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
 	persistentCrewStore:dispatch({
@@ -116,14 +117,14 @@ return function(p1)
 			}
 		}
 	})
-	function v1.init(p1)
-		function p1.attemptLeave()
+	function local1.init(self)
+		function self.attemptLeave()
 			persistentCrewStore:dispatch({
 				type = "setViewingClanInfo",
 				value = nil
 			})
 		end
-		function p1.attemptCreate(p1)
+		function self.attemptCreate(self)
 			persistentCrewStore:dispatch({
 				type = "setViewingClanInfo",
 				value = {
@@ -198,41 +199,41 @@ return function(p1)
 				}
 			})
 		end
-		function p1.attemptJoinUserId(p1)
-			print("player wants to request to join", p1)
+		function self.attemptJoinUserId(self)
+			print("player wants to request to join", self)
 		end
-		function p1.attemptBattleUserId(p1)
-			print("player wants to battle", p1, "crew")
+		function self.attemptBattleUserId(self)
+			print("player wants to battle", self, "crew")
 		end
-		function p1.attemptKick(p1)
-			print("player wants to kick", p1)
+		function self.attemptKick(self)
+			print("player wants to kick", self)
 		end
-		function p1.attemptAdmin(p1)
-			print("player wants to admin", p1)
+		function self.attemptAdmin(self)
+			print("player wants to admin", self)
 		end
-		function p1.attemptUnAdmin(p1)
-			print("player wants to UNadmin", p1)
+		function self.attemptUnAdmin(self)
+			print("player wants to UNadmin", self)
 		end
 	end
-	function v1.render(p1)
+	function local1.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement(PersistentCrewApp, {
-				attemptLeave = p1.attemptLeave,
-				attemptCreate = p1.attemptCreate,
-				attemptJoinUserId = p1.attemptJoinUserId,
-				attemptBattleUserId = p1.attemptBattleUserId,
-				attemptKick = p1.attemptKick,
-				attemptAdmin = p1.attemptAdmin,
-				attemptUnAdmin = p1.attemptUnAdmin,
+				attemptLeave = self.attemptLeave,
+				attemptCreate = self.attemptCreate,
+				attemptJoinUserId = self.attemptJoinUserId,
+				attemptBattleUserId = self.attemptBattleUserId,
+				attemptKick = self.attemptKick,
+				attemptAdmin = self.attemptAdmin,
+				attemptUnAdmin = self.attemptUnAdmin,
 				numMembersOnline = 11,
-				attemptReportCrew = function(p1, p2, p3)
-					print("player wants to report", p1, p2, p3)
+				attemptReportCrew = function(self, arg2, arg3)
+					print("player wants to report", self, arg2, arg3)
 				end
 			}) })
 	end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	local local2 = Roact.mount(Roact.createElement(local1), self)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(local2)
 	end
 end

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local v1 = nil
 local function acquireRunnerThreadAndCallEventHandler(p1, ...)
 	local v12 = v1

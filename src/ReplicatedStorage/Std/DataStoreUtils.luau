@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local HttpService = game:GetService("HttpService")
 local t = {}
 local function v1(p1)

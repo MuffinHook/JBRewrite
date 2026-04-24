@@ -1,17 +1,18 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local assertDeepEqual = require(script.Parent.assertDeepEqual)
 	it("should fail with a message when args are not equal", function()
  local v1, v2 = pcall(assertDeepEqual, 1, 2)
  expect(v1).to.equal(false)
  expect(v2:find("first ~= second")).to.be.ok()
- local v3, v4 = pcall(assertDeepEqual, {
+ local newState, currentState = pcall(assertDeepEqual, {
  foo = 1
  }, {
  foo = 2
  })
- expect(v3).to.equal(false)
- expect(v4:find("first%[foo%] ~= second%[foo%]")).to.be.ok()
+ expect(newState).to.equal(false)
+ expect(currentState:find("first%[foo%] ~= second%[foo%]")).to.be.ok()
 	end)
 	it("should compare non-table values using standard \'==\' equality", function()
  assertDeepEqual(1, 1)
@@ -60,20 +61,20 @@ return function()
  foo = "bar",
  hello = "world"
  }
- local t2 = {
+ local tbl2 = {
  foo = "bar",
  hello = "world"
  }
- assertDeepEqual(t, t2)
- assertDeepEqual(t2, t)
- local t3 = {
+ assertDeepEqual(t, tbl2)
+ assertDeepEqual(tbl2, t)
+ local metadata = {
  foo = "bar"
  }
  expect(function()
- assertDeepEqual(t, t3)
+ assertDeepEqual(t, metadata)
  end).to.throw()
  expect(function()
- assertDeepEqual(t3, t)
+ assertDeepEqual(metadata, t)
  end).to.throw()
 	end)
 end

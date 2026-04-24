@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local ElementUtils = require(script.Parent.ElementUtils)
 	local createElement = require(script.Parent.createElement)
@@ -6,29 +7,29 @@ return function()
 	local Type = require(script.Parent.Type)
 	describe("iterateElements", function()
  it("should iterate once for a single child", function()
- local v1 = createElement("TextLabel")
- local v2 = ElementUtils.iterateElements(v1)
- local v3, v4 = v2()
- expect(v3).to.equal(ElementUtils.UseParentKey)
- expect(v4).to.equal(v1)
- expect((v2())).to.equal(nil)
+ local state1 = createElement("TextLabel")
+ local state2 = ElementUtils.iterateElements(state1)
+ local newState, currentState = state2()
+ expect(newState).to.equal(ElementUtils.UseParentKey)
+ expect(currentState).to.equal(state1)
+ expect((state2())).to.equal(nil)
  end)
  it("should iterate over tables", function()
- local t = {
+ local tbl = {
  a = createElement("TextLabel"),
  b = createElement("TextLabel")
  }
- local tbl = {}
+ local tableObj = {}
  local count = 0
- for v1, v2 in ElementUtils.iterateElements(t) do
- expect((typeof(v1))).to.equal("string")
- expect(Type.of(v2)).to.equal(Type.Element)
- tbl[v2] = v1
+ for state1, state2 in ElementUtils.iterateElements(tbl) do
+ expect((typeof(state1))).to.equal("string")
+ expect(Type.of(state2)).to.equal(Type.Element)
+ tableObj[state2] = state1
  count = count + 1
  end
  expect(count).to.equal(2)
- expect(tbl[t.a]).to.equal("a")
- expect(tbl[t.b]).to.equal("b")
+ expect(tableObj[tbl.a]).to.equal("a")
+ expect(tableObj[tbl.b]).to.equal("b")
  end)
  it("should return a zero-element iterator for booleans", function()
  expect(ElementUtils.iterateElements(false)()).to.equal(nil)
@@ -50,21 +51,21 @@ return function()
  expect(ElementUtils.getElementByKey(nil, "test")).to.equal(nil)
  end)
  describe("single elements", function()
- local v1 = createElement("TextLabel")
+ local state1 = createElement("TextLabel")
  it("should return the element if the key is UseParentKey", function()
- expect(ElementUtils.getElementByKey(v1, ElementUtils.UseParentKey)).to.equal(v1)
+ expect(ElementUtils.getElementByKey(state1, ElementUtils.UseParentKey)).to.equal(state1)
  end)
  it("should return nil if the key is not UseParentKey", function()
- expect(ElementUtils.getElementByKey(v1, "test")).to.equal(nil)
+ expect(ElementUtils.getElementByKey(state1, "test")).to.equal(nil)
  end)
  end)
  it("should return the corresponding element from a table", function()
- local t = {
+ local tbl = {
  a = createElement("TextLabel"),
  b = createElement("TextLabel")
  }
- expect(ElementUtils.getElementByKey(t, "a")).to.equal(t.a)
- expect(ElementUtils.getElementByKey(t, "b")).to.equal(t.b)
+ expect(ElementUtils.getElementByKey(tbl, "a")).to.equal(tbl.a)
+ expect(ElementUtils.getElementByKey(tbl, "b")).to.equal(tbl.b)
  end)
  it("should return nil if the key does not exist", function()
  expect(ElementUtils.getElementByKey(createFragment({}), "a")).to.equal(nil)

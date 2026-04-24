@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
@@ -6,31 +7,31 @@ local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
 local paddedScrollingGrid = require(ReplicatedStorage.Safes.UI.paddedScrollingGrid)
 local ClanRating = require(ReplicatedStorage.PersistentCrewBattle.UI.ClanRating)
-local v1 = Roact.PureComponent:extend("CrewLeaderboard")
-v1.defaultProps = {
+local local1 = Roact.PureComponent:extend("CrewLeaderboard")
+local1.defaultProps = {
 	verticalPaddingRatio = 96,
 	aspectRatio = 1.7777777777777777
 }
-function v1.render(p1)
-	assert(p1.props.displayType, "No display type set")
+function local1.render(self)
+	assert(self.props.displayType, "No display type set")
 	local t = {}
-	local v1 = nil
-	local v2 = nil
-	if p1.props.displayType == PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.Leaderboard then
-		v1 = "CREW BATTLES LEADERBOARD"
-		v2 = 7.5
-	elseif p1.props.displayType == PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.CrewsInServer then
-		assert(p1.props.attemptViewClanId, "No attemptViewClanId function set")
-		local v3 = true
-		v1 = "CREWS IN SERVER"
-		v2 = 7.5
-		for v4, v5 in p1.props.leaderboardInfo do
-			v5.attemptViewClanId = p1.props.attemptViewClanId
-			v5.showCrewView = v3
+	local local1 = nil
+	local constant = nil
+	if self.props.displayType == PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.Leaderboard then
+		local1 = "CREW BATTLES LEADERBOARD"
+		constant = 7.5
+	elseif self.props.displayType == PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.CrewsInServer then
+		assert(self.props.attemptViewClanId, "No attemptViewClanId function set")
+		local local3 = true
+		local1 = "CREWS IN SERVER"
+		constant = 7.5
+		for local4, local5 in self.props.leaderboardInfo do
+			local5.attemptViewClanId = self.props.attemptViewClanId
+			local5.showCrewView = local3
 		end
 	else
-		local v6 = error
-		v6("Invalid display type: " .. tostring(p1.props.displayType))
+		local local6 = error
+		local6("Invalid display type: " .. tostring(self.props.displayType))
 	end
 	t.Header = createElement(PaddedContainer, {
 		backgroundColor = Color3.fromRGB(57, 58, 65),
@@ -55,7 +56,7 @@ function v1.render(p1)
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Font = Enum.Font.FredokaOne,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				Text = v1,
+				Text = local1,
 				LineHeight = 1,
 				TextScaled = true,
 				TextColor3 = Color3.fromRGB(255, 169, 0)
@@ -77,17 +78,17 @@ function v1.render(p1)
 		}),
 		Scrolling = createElement(paddedScrollingGrid, {
 			exposePaddedContainerProps = true,
-			rowsPerPage = v2,
+			rowsPerPage = constant,
 			colsPerRow = 1,
 			component = ClanRating,
-			items = p1.props.leaderboardInfo
+			items = self.props.leaderboardInfo
 		})
 	})
 	return createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		backgroundColor = Color3.new(255/255, 255/255, 255/255),
-		aspectRatio = p1.props.aspectRatio,
-		verticalPaddingRatio = p1.props.verticalPaddingRatio
+		aspectRatio = self.props.aspectRatio,
+		verticalPaddingRatio = self.props.verticalPaddingRatio
 	}, t)
 end
-return v1
+return local1

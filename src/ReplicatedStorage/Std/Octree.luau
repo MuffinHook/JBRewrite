@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {}
 t.__index = t
 t.ClassName = "Octree"

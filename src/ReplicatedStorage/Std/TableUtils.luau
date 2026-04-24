@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local v1 = Random.new()
 local t = {
 	copyKeysSafe = function(p1, p2)

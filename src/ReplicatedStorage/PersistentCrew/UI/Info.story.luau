@@ -1,13 +1,14 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(self)
+	local local1 = Roact.Component:extend("App")
 	local Info = require(script.Parent.Info)
 	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
-	function v1.init(p1)
-		p1.members = {
+	function local1.init(self)
+		self.members = {
 			{
 				id = 2025110,
 				userId = 2025110,
@@ -20,29 +21,29 @@ return function(p1)
 				battlesWon = 1
 			}
 		}
-		function p1.attemptBattleClanId(p1)
-			print("player wants to clan", p1)
+		function self.attemptBattleClanId(self)
+			print("player wants to clan", self)
 		end
-		function p1.attemptViewUserIdClan(p1)
-			print("player wants to view clan of user", p1)
+		function self.attemptViewUserIdClan(self)
+			print("player wants to view clan of user", self)
 		end
-		function p1.onClickAdmin(p1)
-			print("wants to admin", p1)
+		function self.onClickAdmin(self)
+			print("wants to admin", self)
 		end
-		function p1.onClickUnAdmin(p1)
-			print("wants to UNadmin", p1)
+		function self.onClickUnAdmin(self)
+			print("wants to UNadmin", self)
 		end
-		function p1.onClickKick(p1)
-			print("wants to kick", p1)
+		function self.onClickKick(self)
+			print("wants to kick", self)
 		end
-		function p1.onClickToggleRequests(p1)
+		function self.onClickToggleRequests(self)
 			print("toggle requests")
 		end
-		function p1.onClickRenameCrew(p1)
-			print("wants to rename", p1)
+		function self.onClickRenameCrew(self)
+			print("wants to rename", self)
 		end
-		p1.isReadiedUp = false
-		p1.joinRequests = {
+		self.isReadiedUp = false
+		self.joinRequests = {
 			{
 				displayName = "badcc",
 				showRequestAccept = true,
@@ -60,13 +61,13 @@ return function(p1)
 			}
 		}
 	end
-	function v1.render(p1)
+	function local1.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement(Info, {
 				aspectRatio = 1.7777777777777777,
 				verticalPaddingRatio = 128,
-				attemptLeave = p1.props.attemptLeave,
+				attemptLeave = self.props.attemptLeave,
 				playersClanId = nil,
 				isPlayersClan = false,
 				isAdminOfViewingClan = true,
@@ -77,21 +78,21 @@ return function(p1)
 				battlesPlayed = 425,
 				battlesWLRatio = 2.13,
 				numMembersOnline = 10,
-				members = p1.members,
-				joinRequests = p1.joinRequests,
-				isReadiedUp = p1.isReadiedUp,
-				attemptBattleUserId = p1.attemptBattleUserId,
-				attemptViewUserIdClan = p1.attemptViewUserIdClan,
-				onClickAdmin = p1.onClickAdmin,
-				onClickUnAdmin = p1.onClickUnAdmin,
-				onClickKick = p1.onClickKick,
-				onClickToggleRequests = p1.onClickToggleRequests,
-				onClickRenameCrew = p1.onClickRenameCrew,
+				members = self.members,
+				joinRequests = self.joinRequests,
+				isReadiedUp = self.isReadiedUp,
+				attemptBattleUserId = self.attemptBattleUserId,
+				attemptViewUserIdClan = self.attemptViewUserIdClan,
+				onClickAdmin = self.onClickAdmin,
+				onClickUnAdmin = self.onClickUnAdmin,
+				onClickKick = self.onClickKick,
+				onClickToggleRequests = self.onClickToggleRequests,
+				onClickRenameCrew = self.onClickRenameCrew,
 				playerDisplayRating = "1600"
 			}) })
 	end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	local local2 = Roact.mount(Roact.createElement(local1), self)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(local2)
 	end
 end

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
 	local assertDeepEqual = require(script.Parent.assertDeepEqual)
@@ -153,7 +154,7 @@ return function()
  expect(ChildB.Value).to.equal(false)
  local ChildC = updateHostNodeTest.ChildC
  expect(ChildC.ClassName).to.equal("StringValue")
- expect(ChildC.Value).to.equal(v22)
+ expect(ChildC.Value).to.equal(derivedState)
  expect(updateHostNodeTest.ChildE.ClassName).to.equal("Folder")
  end)
  it("should update Bindings", function()
@@ -217,7 +218,7 @@ return function()
  newRefSpy:assertCalledWith(createdFrame)
  RobloxRenderer.unmountHostNode(reconciler, virtualNode)
  end)
- it("should not call function refs again if they didn\'t change", function()
+ it("should not call function refs again if they didn\'tbl change", function()
  local parentFolder = Instance.new("Folder")
  local refSpy = createSpy()
  local virtualNode = reconciler.createVirtualNode(createElement("Frame", {
@@ -665,228 +666,228 @@ return function()
  coroutine.resume(stateChangeCoroutine)
  expect(#ScreenGui:GetChildren()).to.equal(1)
  expect(#ScreenGui:GetChildren()[1]:GetChildren()).to.equal(1)
- v2.unmountVirtualNode(v5)
+ state2.unmountVirtualNode(nextState)
  end)
  it("should not allow re-entrancy in updateChildren even with callbacks", function()
- local v1 = Component:extend("LowestComponent")
- function v1.render(p1)
+ local result1 = Component:extend("LowestComponent")
+ function result1.render(self)
  return createElement("Frame")
  end
- function v1.didMount(p1)
- p1.props.onDidMountCallback()
+ function result1.didMount(self)
+ self.props.onDidMountCallback()
  end
- local v22 = Component:extend("ChildComponent")
- function v22.init(p1)
- p1:setState({
+ local derivedState = Component:extend("ChildComponent")
+ function derivedState.init(self)
+ self:setState({
  firstTime = true
  })
  end
- local v3 = nil
- function v22.render(p1)
- if p1.state.firstTime then
+ local newState = nil
+ function derivedState.render(self)
+ if self.state.firstTime then
  return createElement("Frame")
  else
- return createElement(v1, {
- onDidMountCallback = p1.props.onDidMountCallback
+ return createElement(result1, {
+ onDidMountCallback = self.props.onDidMountCallback
  })
  end
  end
- function v22.didMount(p1)
- v3 = coroutine.create(function()
- p1:setState({
+ function derivedState.didMount(self)
+ newState = coroutine.create(function()
+ self:setState({
  firstTime = false
  })
  end)
  end
- local v4 = Component:extend("ParentComponent")
- local v5 = 0
- function v4.init(p1)
- p1:setState({
+ local currentState = Component:extend("ParentComponent")
+ local nextState = 0
+ function currentState.init(self)
+ self:setState({
  count = 1
  })
- function p1.onDidMountCallback()
- v5 = v5 + 1
- if p1.state.count < 5 then
- p1:setState({
- count = p1.state.count + 1
+ function self.onDidMountCallback()
+ nextState = nextState + 1
+ if self.state.count < 5 then
+ self:setState({
+ count = self.state.count + 1
  })
  end
  end
  end
- function v4.render(p1)
+ function currentState.render(self)
  return createElement("Frame", {}, {
- ChildComponent = createElement(v22, {
- count = p1.state.count,
- onDidMountCallback = p1.onDidMountCallback
+ ChildComponent = createElement(derivedState, {
+ count = self.state.count,
+ onDidMountCallback = self.onDidMountCallback
  })
  })
  end
  local ScreenGui = Instance.new("ScreenGui")
- ScreenGui.Parent = v12
- local v7 = v2.mountVirtualNode(createElement(v4), ScreenGui, "Some Key")
- coroutine.resume(v3)
+ ScreenGui.Parent = internalData
+ local mergedState = state2.mountVirtualNode(createElement(currentState), ScreenGui, "Some Key")
+ coroutine.resume(newState)
  expect(#ScreenGui:GetChildren()).to.equal(1)
  expect(#ScreenGui:GetChildren()[1]:GetChildren()).to.equal(1)
- expect(v5 <= 2).to.equal(true)
- v2.unmountVirtualNode(v7)
+ expect(nextState <= 2).to.equal(true)
+ state2.unmountVirtualNode(mergedState)
  end)
  it("should never call unmount twice in the case of update children re-rentrancy", function()
- local tbl = {}
- local function addUnmount(p1)
- tbl[p1] = tbl[p1] + 1
+ local tableObj = {}
+ local function addUnmount(self)
+ tableObj[self] = tableObj[self] + 1
  end
- local function addInit(p1)
- tbl[p1] = 0
+ local function addInit(self)
+ tableObj[self] = 0
  end
- local v1 = Component:extend("LowestComponent")
- function v1.init(p1)
- tbl[tostring(p1)] = 0
+ local result1 = Component:extend("LowestComponent")
+ function result1.init(self)
+ tableObj[tostring(self)] = 0
  end
- function v1.render(p1)
+ function result1.render(self)
  return createElement("Frame")
  end
- function v1.didMount(p1)
- p1.props.onDidMountCallback()
+ function result1.didMount(self)
+ self.props.onDidMountCallback()
  end
- function v1.willUnmount(p1)
- local v1 = tostring(p1)
- tbl[v1] = tbl[v1] + 1
+ function result1.willUnmount(self)
+ local result1 = tostring(self)
+ tableObj[result1] = tableObj[result1] + 1
  end
- local v22 = Component:extend("FirstComponent")
- function v22.init(p1)
- tbl[tostring(p1)] = 0
+ local derivedState = Component:extend("FirstComponent")
+ function derivedState.init(self)
+ tableObj[tostring(self)] = 0
  end
- function v22.render(p1)
+ function derivedState.render(self)
  return createElement("TextLabel")
  end
- function v22.willUnmount(p1)
- local v1 = tostring(p1)
- tbl[v1] = tbl[v1] + 1
+ function derivedState.willUnmount(self)
+ local result1 = tostring(self)
+ tableObj[result1] = tableObj[result1] + 1
  end
- local v3 = Component:extend("ChildComponent")
- function v3.init(p1)
- tbl[tostring(p1)] = 0
- p1:setState({
+ local newState = Component:extend("ChildComponent")
+ function newState.init(self)
+ tableObj[tostring(self)] = 0
+ self:setState({
  firstTime = true
  })
  end
- local v4 = nil
- function v3.render(p1)
- if p1.state.firstTime then
- return createElement(v22)
+ local currentState = nil
+ function newState.render(self)
+ if self.state.firstTime then
+ return createElement(derivedState)
  else
- return createElement(v1, {
- onDidMountCallback = p1.props.onDidMountCallback
+ return createElement(result1, {
+ onDidMountCallback = self.props.onDidMountCallback
  })
  end
  end
- function v3.didMount(p1)
- v4 = coroutine.create(function()
- p1:setState({
+ function newState.didMount(self)
+ currentState = coroutine.create(function()
+ self:setState({
  firstTime = false
  })
  end)
  end
- function v3.willUnmount(p1)
- local v1 = tostring(p1)
- tbl[v1] = tbl[v1] + 1
+ function newState.willUnmount(self)
+ local result1 = tostring(self)
+ tableObj[result1] = tableObj[result1] + 1
  end
- local v5 = Component:extend("ParentComponent")
- local v6 = 0
- function v5.init(p1)
- p1:setState({
+ local nextState = Component:extend("ParentComponent")
+ local tempState = 0
+ function nextState.init(self)
+ self:setState({
  count = 1
  })
- function p1.onDidMountCallback()
- v6 = v6 + 1
- if p1.state.count < 5 then
- p1:setState({
- count = p1.state.count + 1
+ function self.onDidMountCallback()
+ tempState = tempState + 1
+ if self.state.count < 5 then
+ self:setState({
+ count = self.state.count + 1
  })
  end
  end
  end
- function v5.render(p1)
+ function nextState.render(self)
  return createElement("Frame", {}, {
- ChildComponent = createElement(v3, {
- count = p1.state.count,
- onDidMountCallback = p1.onDidMountCallback
+ ChildComponent = createElement(newState, {
+ count = self.state.count,
+ onDidMountCallback = self.onDidMountCallback
  })
  })
  end
  local ScreenGui = Instance.new("ScreenGui")
- ScreenGui.Parent = v12
- local v8 = v2.mountVirtualNode(createElement(v5), ScreenGui, "Some Key")
- coroutine.resume(v4)
+ ScreenGui.Parent = internalData
+ local updatedState = state2.mountVirtualNode(createElement(nextState), ScreenGui, "Some Key")
+ coroutine.resume(currentState)
  expect(#ScreenGui:GetChildren()).to.equal(1)
  expect(#ScreenGui:GetChildren()[1]:GetChildren()).to.equal(1)
- expect(v6 <= 2).to.equal(true)
- v2.unmountVirtualNode(v8)
- for k, v in pairs(tbl) do
+ expect(tempState <= 2).to.equal(true)
+ state2.unmountVirtualNode(updatedState)
+ for k, v in pairs(tableObj) do
  expect(v).to.equal(1)
  end
  end)
  it("should never unmount a node unnecesarily in the case of re-rentry", function()
- local v1 = Component:extend("LowestComponent")
- function v1.render(p1)
+ local result1 = Component:extend("LowestComponent")
+ function result1.render(self)
  return createElement("Frame")
  end
- function v1.didUpdate(p1, p2, p3)
- if p2.firstTime and not p1.props.firstTime then
- p1.props.onChangedCallback()
+ function result1.didUpdate(self, callback, self)
+ if callback.firstTime and not self.props.firstTime then
+ self.props.onChangedCallback()
  end
  end
- local v22 = Component:extend("ChildComponent")
- function v22.init(p1)
- p1:setState({
+ local derivedState = Component:extend("ChildComponent")
+ function derivedState.init(self)
+ self:setState({
  firstTime = true
  })
  end
- local v3 = nil
- function v22.render(p1)
- return createElement(v1, {
- firstTime = p1.state.firstTime,
- onChangedCallback = p1.props.onChangedCallback
+ local newState = nil
+ function derivedState.render(self)
+ return createElement(result1, {
+ firstTime = self.state.firstTime,
+ onChangedCallback = self.props.onChangedCallback
  })
  end
- function v22.didMount(p1)
- v3 = coroutine.create(function()
- p1:setState({
+ function derivedState.didMount(self)
+ newState = coroutine.create(function()
+ self:setState({
  firstTime = false
  })
  end)
  end
- local v4 = Component:extend("ParentComponent")
- local v5 = 0
- function v4.init(p1)
- p1:setState({
+ local currentState = Component:extend("ParentComponent")
+ local nextState = 0
+ function currentState.init(self)
+ self:setState({
  count = 1
  })
- function p1.onChangedCallback()
- v5 = v5 + 1
- if p1.state.count < 5 then
- p1:setState({
- count = p1.state.count + 1
+ function self.onChangedCallback()
+ nextState = nextState + 1
+ if self.state.count < 5 then
+ self:setState({
+ count = self.state.count + 1
  })
  end
  end
  end
- function v4.render(p1)
+ function currentState.render(self)
  return createElement("Frame", {}, {
- ChildComponent = createElement(v22, {
- count = p1.state.count,
- onChangedCallback = p1.onChangedCallback
+ ChildComponent = createElement(derivedState, {
+ count = self.state.count,
+ onChangedCallback = self.onChangedCallback
  })
  })
  end
  local ScreenGui = Instance.new("ScreenGui")
- ScreenGui.Parent = v12
- local v7 = v2.mountVirtualNode(createElement(v4), ScreenGui, "Some Key")
- coroutine.resume(v3)
+ ScreenGui.Parent = internalData
+ local mergedState = state2.mountVirtualNode(createElement(currentState), ScreenGui, "Some Key")
+ coroutine.resume(newState)
  expect(#ScreenGui:GetChildren()).to.equal(1)
  expect(#ScreenGui:GetChildren()[1]:GetChildren()).to.equal(1)
- expect(v5).to.equal(1)
- v2.unmountVirtualNode(v7)
+ expect(nextState).to.equal(1)
+ state2.unmountVirtualNode(mergedState)
  end)
 	end)
 end

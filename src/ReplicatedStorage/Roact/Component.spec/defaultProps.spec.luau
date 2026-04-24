@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
@@ -12,22 +13,22 @@ return function()
 			a = 3,
 			b = 2
 		}
-		local v12 = Component:extend("Foo")
-		v12.defaultProps = t
+		local internalData = Component:extend("Foo")
+		internalData.defaultProps = t
 		local v2 = nil
-		function v12.init(p1)
-			v2 = p1.props
+		function internalData.init(self)
+			v2 = self.props
 		end
-		function v12.render(p1)  end
-		local t2 = {
+		function internalData.render(self)  end
+		local tbl2 = {
 			b = 4,
 			c = 6
 		}
-		v1.mountVirtualNode(createElement(v12, t2), nil, "Some Foo")
+		v1.mountVirtualNode(createElement(internalData, tbl2), nil, "Some Foo")
 		assertDeepEqual(v2, {
 			a = t.a,
-			b = t2.b,
-			c = t2.c
+			b = tbl2.b,
+			c = tbl2.c
 		})
 	end)
 	it("should fill in when updating via props", function()
@@ -35,24 +36,24 @@ return function()
 			a = 3,
 			b = 2
 		}
-		local v12 = Component:extend("Foo")
-		v12.defaultProps = t
+		local internalData = Component:extend("Foo")
+		internalData.defaultProps = t
 		local v2 = nil
-		function v12.render(p1)
-			v2 = p1.props
+		function internalData.render(self)
+			v2 = self.props
 		end
-		local v4 = v1.mountVirtualNode(createElement(v12, {
+		local currentState = v1.mountVirtualNode(createElement(internalData, {
 			b = 4,
 			c = 6
 		}), nil, "Some Foo")
-		local t2 = {
+		local tbl2 = {
 			c = 5
 		}
-		v1.updateVirtualNode(v4, (createElement(v12, t2)))
+		v1.updateVirtualNode(currentState, (createElement(internalData, tbl2)))
 		assertDeepEqual(v2, {
 			a = t.a,
 			b = t.b,
-			c = t2.c
+			c = tbl2.c
 		})
 	end)
 	it("should respect None to override a default prop with nil", function()
@@ -60,21 +61,21 @@ return function()
 			a = 3,
 			b = 2
 		}
-		local v12 = Component:extend("Foo")
-		v12.defaultProps = t
+		local internalData = Component:extend("Foo")
+		internalData.defaultProps = t
 		local v2 = nil
-		function v12.render(p1)
-			v2 = p1.props
+		function internalData.render(self)
+			v2 = self.props
 		end
-		local t2 = {
+		local tbl2 = {
 			b = None,
 			c = 4
 		}
-		v1.mountVirtualNode(createElement(v12, t2), nil, "Some Foo")
+		v1.mountVirtualNode(createElement(internalData, tbl2), nil, "Some Foo")
 		assertDeepEqual(v2, {
 			a = t.a,
 			b = nil,
-			c = t2.c
+			c = tbl2.c
 		})
 	end)
 end

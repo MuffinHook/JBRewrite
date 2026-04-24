@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local function parsePath(p1)
 	local v1 = string.split(p1, "/")
 	for i = #v1, 1, -1 do

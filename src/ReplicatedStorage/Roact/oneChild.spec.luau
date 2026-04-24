@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local createElement = require(script.Parent.createElement)
 	local oneChild = require(script.Parent.oneChild)
@@ -6,18 +7,18 @@ return function()
  expect(oneChild({})).to.equal(nil)
 	end)
 	it("should get exactly one child", function()
- local v1 = createElement("Frame")
+ local var1 = createElement("Frame")
  expect(oneChild({
- foo = v1
- })).to.equal(v1)
+ foo = var1
+ })).to.equal(var1)
 	end)
 	it("should error with more than one child", function()
- local t = {
+ local tbl = {
  a = createElement("Frame"),
  b = createElement("Frame")
  }
  expect(function()
- oneChild(t)
+ oneChild(tbl)
  end).to.throw()
 	end)
 	it("should handle being passed nil", function()

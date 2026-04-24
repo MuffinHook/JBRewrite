@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ServerStorage = game:GetService("ServerStorage")
 local confidenceToZMap = require(ServerStorage.Trade.confidenceToZMap)
 local t = {}

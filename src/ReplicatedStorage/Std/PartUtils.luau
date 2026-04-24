@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {}
 function t.setAnchored(p1, p2)
 	return t.setProperty(p1, "Anchored", p2)

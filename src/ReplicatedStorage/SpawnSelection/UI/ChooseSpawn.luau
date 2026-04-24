@@ -1,12 +1,13 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("ChooseSpawn")
-v1.defaultProps = {
+local ChooseSpawnComponent = Roact.PureComponent:extend("ChooseSpawn")
+ChooseSpawnComponent.defaultProps = {
 	visible = false,
 	mapScale = 1,
 	bornAt = workspace:GetServerTimeNow(),
@@ -14,44 +15,44 @@ v1.defaultProps = {
 	position = UDim2.new(0.5, 0, 0.5, 0),
 	size = UDim2.new(0.25, 0, 0.25, 0)
 }
-function v1.init(p1)
-	p1.maid = Maid.new()
-	p1:setState({
-		remaining = p1.props.duration
+function ChooseSpawnComponent.init(self)
+	self.maid = Maid.new()
+	self:setState({
+		remaining = self.props.duration
 	})
-	function p1.onSelect()
-		p1.props.onSelect()
-		p1.props.hide()
+	function self.onSelect()
+		self.props.onSelect()
+		self.props.hide()
 	end
 end
-function v1.render(p1)
-	if p1.props.visible then
-		local t = {
+function ChooseSpawnComponent.render(self)
+	if self.props.visible then
+		local frameProps = {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
-			Size = p1.props.size,
-			Position = p1.props.position,
+			Size = self.props.size,
+			Position = self.props.position,
 			AnchorPoint = Vector2.new(0.5, 0.5)
 		}
-		local t2 = {
+		local childrenProps = {
 			AspectRatio = createElement("UIAspectRatioConstraint", {
 				AspectRatio = 6
 			})
 		}
-		local t3 = {
+		local leftFrameProps = {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0.16666666666666666, 0, 1, 0)
 		}
-		local t4 = {}
-		local t5 = {
+		local leftChildrenProps = {}
+		local timerInnerProps = {
 			Size = UDim2.new(0.9, 0, 0.9, 0),
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundTransparency = 0,
 			BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 		}
-		local t6 = {
+		local timerInnerChildrenProps = {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
 			}),
@@ -61,21 +62,21 @@ function v1.render(p1)
 				ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			})
 		}
-		local t7 = {
+		local timerTextProps = {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0.9, 0, 0.9, 0),
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5)
 		}
-		t7.Text = tostring(p1.state.remaining)
-		t7.Font = Enum.Font.Bangers
-		t7.LineHeight = 1
-		t7.TextScaled = true
-		t7.TextColor3 = Color3.new(255/255, 255/255, 255/255)
-		t6.Text = createElement("TextLabel", t7)
-		t4.Inner = createElement("Frame", t5, t6)
-		t2.Left = createElement("Frame", t3, t4)
-		t2.Right = createElement("Frame", {
+		timerTextProps.Text = tostring(self.state.remaining)
+		timerTextProps.Font = Enum.Font.Bangers
+		timerTextProps.LineHeight = 1
+		timerTextProps.TextScaled = true
+		timerTextProps.TextColor3 = Color3.new(255/255, 255/255, 255/255)
+		timerInnerChildrenProps.Text = createElement("TextLabel", timerTextProps)
+		leftChildrenProps.Inner = createElement("Frame", timerInnerProps, timerInnerChildrenProps)
+		childrenProps.Left = createElement("Frame", leftFrameProps, leftChildrenProps)
+		childrenProps.Right = createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Position = UDim2.new(0.16666666666666666, 0, 0, 0),
@@ -89,7 +90,7 @@ function v1.render(p1)
 				BackgroundTransparency = 0,
 				BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
 				Selectable = true,
-				[Roact.Event.Activated] = p1.onSelect
+				[Roact.Event.Activated] = self.onSelect
 			}, {
 				UICorner = createElement("UICorner", {
 					CornerRadius = UDim.new(0.25, 0)
@@ -119,54 +120,54 @@ function v1.render(p1)
 				})
 			})
 		})
-		return createElement("Frame", t, t2)
+		return createElement("Frame", frameProps, childrenProps)
 	end
 end
-function v1.didUpdate(p1, p2, p3)
-	if p2.duration ~= p1.props.duration or p2.bornAt ~= p1.props.bornAt then
-		p1:_startTimer()
+function ChooseSpawnComponent.didUpdate(self, prevProps, prevState)
+	if prevProps.duration ~= self.props.duration or prevProps.bornAt ~= self.props.bornAt then
+		self:_startTimer()
 	end
 end
-function v1._startTimer(p1)
+function ChooseSpawnComponent._startTimer(self)
 	local function update()
-		local v1 = workspace:GetServerTimeNow() - p1.props.bornAt
-		local v2
-		if p1.props.duration <= v1 then
-			p1.maid.countdown = nil
-			v2 = true
+		local elapsedTime = workspace:GetServerTimeNow() - self.props.bornAt
+		local shouldHide
+		if self.props.duration <= elapsedTime then
+			self.maid.countdown = nil
+			shouldHide = true
 		else
-			v2 = false
+			shouldHide = false
 		end
-		local t = {}
-		t.remaining = math.max(0, (math.ceil(p1.props.duration - v1)))
-		p1:setState(t)
-		if v2 then
-			p1.props.hide()
+		local stateUpdate = {}
+		stateUpdate.remaining = math.max(0, (math.ceil(self.props.duration - elapsedTime)))
+		self:setState(stateUpdate)
+		if shouldHide then
+			self.props.hide()
 		end
 	end
 	update()
-	p1.maid.countdown = Interval.every(1):Connect(update)
+	self.maid.countdown = Interval.every(1):Connect(update)
 end
-function v1.didMount(p1)
-	if p1.props.visible then
-		p1:_startTimer()
+function ChooseSpawnComponent.didMount(self)
+	if self.props.visible then
+		self:_startTimer()
 	end
 end
-function v1.willUnmount(p1)
-	p1.maid:DoCleaning()
+function ChooseSpawnComponent.willUnmount(self)
+	self.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(state, dispatch)
 	return {
-		bornAt = p1.lastDiedAt,
-		visible = p1.spawnSelectionOfferVisible
+		bornAt = state.lastDiedAt,
+		visible = state.spawnSelectionOfferVisible
 	}
-end, function(p1)
+end, function(dispatch)
 	return {
 		hide = function()
-			p1({
+			dispatch({
 				type = "setSpawnSelectionOfferVisible",
 				visible = false
 			})
 		end
 	}
-end)(v1)
+end)(ChooseSpawnComponent)

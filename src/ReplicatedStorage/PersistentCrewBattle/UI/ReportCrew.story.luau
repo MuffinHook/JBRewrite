@@ -1,24 +1,25 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(arg1)
+	local local1 = Roact.Component:extend("App")
 	local ReportCrew = require(script.Parent.ReportCrew)
-	function v1.init(p1)  end
-	function v1.render(p1)
+	function local1.init(arg1)  end
+	function local1.render(arg1)
 		return Roact.createElement(ReportCrew, {
-			onSubmit = function(p1, p2)
-				print(p1)
-				print(p2)
+			onSubmit = function(arg1, arg2)
+				print(arg1)
+				print(arg2)
 			end,
 			onClose = function()
 				print("wants to close")
 			end
 		})
 	end
-	function v1.willUnmount(p1)  end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function local1.willUnmount(arg1)  end
+	local local2 = Roact.mount(Roact.createElement(local1), arg1)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(local2)
 	end
 end

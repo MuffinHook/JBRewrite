@@ -1,8 +1,9 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer(0, {
-	setSpawnSelectionReceivedAt = function(p1, p2)
-		assert(p2.receivedAt, "missing receivedAt")
-		return p2.receivedAt
+	setSpawnSelectionReceivedAt = function(state, action)
+		assert(action.receivedAt, "missing receivedAt")
+		return action.receivedAt
 	end
 })

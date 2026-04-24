@@ -1,12 +1,13 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(storyParent)
+	local AppComponent = Roact.Component:extend("App")
 	local store = require(ReplicatedStorage.App.store)
 	local ChooseSpawn = require(script.Parent.ChooseSpawn)
-	function v1.init(p1)  end
+	function AppComponent.init(self)  end
 	store:dispatch({
 		type = "setSpawnSelectionOfferVisible",
 		visible = true
@@ -15,14 +16,14 @@ return function(p1)
 		type = "setLastDiedAt",
 		lastDiedAt = workspace:GetServerTimeNow()
 	})
-	function v1.render(p1)
+	function AppComponent.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(ChooseSpawn, {}) })
 	end
-	function v1.willUnmount(p1)  end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(self)  end
+	local mountedComponent = Roact.mount(Roact.createElement(AppComponent), storyParent)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedComponent)
 	end
 end

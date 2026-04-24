@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local exp = math.exp
 local cos = math.cos
 local sin = math.sin

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Interval = require(script.Parent.Parent.Interval)
 local function getErr(p1)
 	local v1 = 0

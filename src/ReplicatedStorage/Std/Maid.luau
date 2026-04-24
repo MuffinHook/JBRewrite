@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {
 	ClassName = "Maid"
 }
@@ -7,54 +8,54 @@ function t.new()
 		_tasks = {}
 	}, t)
 end
-local function validateTask(p1)
-	if typeof(p1) == "RBXScriptSignal" then
+local function validateTask(task)
+	if typeof(task) == "RBXScriptSignal" then
 		error("Task cannot be a RBXScriptSignal, did you mean RBXScriptConnection?", 2)
 	end
-	if type(p1) == "table" and not p1.Destroy then
+	if type(task) == "table" and not task.Destroy then
 		error("[Maid.GiveTask] - Gave table task without .Destroy\n\n", 2)
 	end
 end
-function t._doTask(p1, p2)
-	if typeof(p2) == "function" then
-		p2()
-	elseif typeof(p2) == "RBXScriptConnection" then
-		p2:Disconnect()
-	elseif typeof(p2) == "thread" then
-		task.cancel(p2)
-	elseif p2.Destroy then
-		p2:Destroy()
+function t._doTask(self, task)
+	if typeof(task) == "function" then
+		task()
+	elseif typeof(task) == "RBXScriptConnection" then
+		task:Disconnect()
+	elseif typeof(task) == "thread" then
+		task.cancel(task)
+	elseif task.Destroy then
+		task:Destroy()
 	else
-		warn("[Maid.DoCleaning] - Unable to clean task of type", (typeof(p2)))
+		warn("[Maid.DoCleaning] - Unable to clean task of type", (typeof(task)))
 	end
 end
 function t.isMaid(p1)
 	return if type(p1) == "table" then p1.ClassName == "Maid" else false
 end
-function t.__index(p1, p2)
-	if t[p2] then
-		return t[p2]
+function t.__index(self, key)
+	if t[key] then
+		return t[key]
 	else
-		return p1._tasks[p2]
+		return self._tasks[key]
 	end
 end
-function t.__newindex(p1, p2, p3)
-	if t[p2] ~= nil then
-		error(("\'%s\' is reserved"):format((tostring(p2))), 2)
+function t.__newindex(self, key, newTask)
+	if t[key] ~= nil then
+		error(("\'%s\' is reserved"):format((tostring(key))), 2)
 	end
-	local _tasks = p1._tasks
-	local v1 = _tasks[p2]
-	if p3 then
-		if typeof(p3) == "RBXScriptSignal" then
+	local tasks = self._tasks
+	local oldTask = tasks[key]
+	if newTask then
+		if typeof(newTask) == "RBXScriptSignal" then
 			error("Task cannot be a RBXScriptSignal, did you mean RBXScriptConnection?", 2)
 		end
-		if type(p3) == "table" and not p3.Destroy then
+		if type(newTask) == "table" and not newTask.Destroy then
 			error("[Maid.GiveTask] - Gave table task without .Destroy\n\n", 2)
 		end
 	end
-	_tasks[p2] = p3
-	if v1 then
-		p1:_doTask(v1)
+	tasks[key] = newTask
+	if oldTask then
+		self:_doTask(oldTask)
 	end
 end
 function t.GiveTask(p1, p2)

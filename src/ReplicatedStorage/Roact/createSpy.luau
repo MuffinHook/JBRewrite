@@ -1,52 +1,53 @@
 -- Reviewed by Claude
+-- variables reassigned
 local assertDeepEqual = require(script.Parent.assertDeepEqual)
-return function(p1)
-	local t = {
+return function(self)
+	local tbl = {
  callCount = 0,
  values = {},
  valuesLength = 0
 	}
-	function t.value(...)
- t.callCount = t.callCount + 1
- t.values = { ... }
- t.valuesLength = select("#", ...)
- if p1 == nil then
+	function tbl.value(...)
+ tbl.callCount = tbl.callCount + 1
+ tbl.values = { ... }
+ tbl.valuesLength = select("#", ...)
+ if self == nil then
  return nil
  else
- return p1(...)
+ return self(...)
  end
 	end
-	function t.assertCalledWith(p1, ...)
+	function tbl.assertCalledWith(self, ...)
  local vararg = select("#", ...)
- if t.valuesLength ~= vararg then
- error(("Expected %d arguments, but was called with %d arguments"):format(t.valuesLength, vararg), 2)
+ if tbl.valuesLength ~= vararg then
+ error(("Expected %d arguments, but was called with %d arguments"):format(tbl.valuesLength, vararg), 2)
  end
  for i = 1, vararg do
- assert(select(i, ...) == t.values[i], "value differs")
+ assert(select(i, ...) == tbl.values[i], "value differs")
  end
 	end
-	function t.assertCalledWithDeepEqual(p1, ...)
+	function tbl.assertCalledWithDeepEqual(self, ...)
  local vararg = select("#", ...)
- if t.valuesLength ~= vararg then
- error(("Expected %d arguments, but was called with %d arguments"):format(t.valuesLength, vararg), 2)
+ if tbl.valuesLength ~= vararg then
+ error(("Expected %d arguments, but was called with %d arguments"):format(tbl.valuesLength, vararg), 2)
  end
  for i = 1, vararg do
- assertDeepEqual(t.values[i], (select(i, ...)))
+ assertDeepEqual(tbl.values[i], (select(i, ...)))
  end
 	end
-	function t.captureValues(p1, ...)
+	function tbl.captureValues(self, ...)
  local vararg = select("#", ...)
- local tbl = {}
- assert(t.valuesLength == vararg, "length of expected values differs from stored values")
+ local tableObj = {}
+ assert(tbl.valuesLength == vararg, "length of expected values differs from stored values")
  for i = 1, vararg do
- tbl[select(i, ...)] = t.values[i]
+ tableObj[select(i, ...)] = tbl.values[i]
  end
- return tbl
+ return tableObj
 	end
-	setmetatable(t, {
- __index = function(p1, p2)
- error(("%q is not a valid member of spy"):format(p2))
+	setmetatable(tbl, {
+ __index = function(self, callback)
+ error(("%q is not a valid member of spy"):format(callback))
  end
 	})
-	return t
+	return tbl
 end

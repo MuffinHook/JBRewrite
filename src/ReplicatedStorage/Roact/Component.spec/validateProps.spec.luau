@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
@@ -11,15 +12,15 @@ return function()
 		GlobalConfig.scoped({
 			propValidation = true
 		}, function()
-			local v12 = Component:extend("MyComponent")
+			local internalData = Component:extend("MyComponent")
 			local fn = createSpy(function()
 				return true
 			end)
-			v12.validateProps = fn.value
-			function v12.render(p1)
+			internalData.validateProps = fn.value
+			function internalData.render(self)
 				return nil
 			end
-			v1.mountVirtualNode(createElement(v12), nil, "Test")
+			v1.mountVirtualNode(createElement(internalData), nil, "Test")
 			expect(fn.callCount).to.equal(1)
 		end)
 	end)
@@ -27,22 +28,22 @@ return function()
 		GlobalConfig.scoped({
 			propValidation = true
 		}, function()
-			local v12 = Component:extend("MyComponent")
+			local internalData = Component:extend("MyComponent")
 			local fn = createSpy(function()
 				return true
 			end)
-			v12.validateProps = fn.value
-			function v12.render(p1)
+			internalData.validateProps = fn.value
+			function internalData.render(self)
 				return nil
 			end
-			local v4 = v1.mountVirtualNode(createElement(v12, {
+			local currentState = v1.mountVirtualNode(createElement(internalData, {
 				a = 1
 			}), nil, "Test")
 			expect(fn.callCount).to.equal(1)
 			fn:assertCalledWithDeepEqual({
 				a = 1
 			})
-			v1.updateVirtualNode(v4, (createElement(v12, {
+			v1.updateVirtualNode(currentState, (createElement(internalData, {
 				a = 2
 			})))
 			expect(fn.callCount).to.equal(2)
@@ -55,21 +56,21 @@ return function()
 		GlobalConfig.scoped({
 			propValidation = true
 		}, function()
-			local v12 = Component:extend("MyComponent")
+			local internalData = Component:extend("MyComponent")
 			local fn = nil
 			local fn2 = createSpy(function()
 				return true
 			end)
-			v12.validateProps = fn2.value
-			function v12.init(p1)
-				fn = function(p12)
-					p1:setState(p12)
+			internalData.validateProps = fn2.value
+			function internalData.init(self)
+				fn = function(param12)
+					self:setState(param12)
 				end
 			end
-			function v12.render(p1)
+			function internalData.render(self)
 				return nil
 			end
-			v1.mountVirtualNode(createElement(v12, {
+			v1.mountVirtualNode(createElement(internalData, {
 				a = 1
 			}), nil, "Test")
 			expect(fn2.callCount).to.equal(1)
@@ -86,12 +87,12 @@ return function()
 		GlobalConfig.scoped({
 			propValidation = true
 		}, function()
-			local v12 = Component:extend("MyComponent")
-			v12.validateProps = 1
-			function v12.render(p1)
+			local internalData = Component:extend("MyComponent")
+			internalData.validateProps = 1
+			function internalData.render(self)
 				return nil
 			end
-			local fn = createElement(v12)
+			local fn = createElement(internalData)
 			expect(function()
 				v1.mountVirtualNode(fn, nil, "Test")
 			end).to.throw()
@@ -101,14 +102,14 @@ return function()
 		GlobalConfig.scoped({
 			propValidation = true
 		}, function()
-			local v12 = Component:extend("MyComponent")
-			function v12.validateProps()
+			local internalData = Component:extend("MyComponent")
+			function internalData.validateProps()
 				return false
 			end
-			function v12.render(p1)
+			function internalData.render(self)
 				return nil
 			end
-			local fn = createElement(v12)
+			local fn = createElement(internalData)
 			expect(function()
 				v1.mountVirtualNode(fn, nil, "Test")
 			end).to.throw()
@@ -118,37 +119,37 @@ return function()
 		GlobalConfig.scoped({
 			propValidation = true
 		}, function()
-			local v12 = Component:extend("MyComponent")
-			function v12.validateProps()
+			local internalData = Component:extend("MyComponent")
+			function internalData.validateProps()
 				return false
 			end
-			function v12.render(p1)
+			function internalData.render(self)
 				return nil
 			end
-			local fn = createElement(v12)
-			local fn2, v4 = pcall(function()
+			local fn = createElement(internalData)
+			local fn2, currentState = pcall(function()
 				v1.mountVirtualNode(fn, nil, "Test")
 			end)
 			expect(fn2).to.equal(false)
-			expect((v4:find("MyComponent"))).to.be.ok()
+			expect((currentState:find("MyComponent"))).to.be.ok()
 		end)
 	end)
 	it("should be invoked after defaultProps are applied", function()
 		GlobalConfig.scoped({
 			propValidation = true
 		}, function()
-			local v12 = Component:extend("MyComponent")
+			local internalData = Component:extend("MyComponent")
 			local fn = createSpy(function()
 				return true
 			end)
-			v12.validateProps = fn.value
-			function v12.render(p1)
+			internalData.validateProps = fn.value
+			function internalData.render(self)
 				return nil
 			end
-			v12.defaultProps = {
+			internalData.defaultProps = {
 				b = 2
 			}
-			local v4 = v1.mountVirtualNode(createElement(v12, {
+			local currentState = v1.mountVirtualNode(createElement(internalData, {
 				a = 1
 			}), nil, "Test")
 			expect(fn.callCount).to.equal(1)
@@ -156,7 +157,7 @@ return function()
 				a = 1,
 				b = 2
 			})
-			v1.updateVirtualNode(v4, (createElement(v12, {
+			v1.updateVirtualNode(currentState, (createElement(internalData, {
 				a = 2
 			})))
 			expect(fn.callCount).to.equal(2)
@@ -170,19 +171,19 @@ return function()
 		GlobalConfig.scoped({
 			propValidation = false
 		}, function()
-			local v12 = Component:extend("MyComponent")
+			local internalData = Component:extend("MyComponent")
 			local fn = createSpy(function()
 				return true
 			end)
-			v12.validateProps = fn.value
-			function v12.render(p1)
+			internalData.validateProps = fn.value
+			function internalData.render(self)
 				return nil
 			end
-			local v4 = v1.mountVirtualNode(createElement(v12, {
+			local currentState = v1.mountVirtualNode(createElement(internalData, {
 				a = 1
 			}), nil, "Test")
 			expect(fn.callCount).to.equal(0)
-			v1.updateVirtualNode(v4, (createElement(v12, {
+			v1.updateVirtualNode(currentState, (createElement(internalData, {
 				a = 2
 			})))
 			expect(fn.callCount).to.equal(0)

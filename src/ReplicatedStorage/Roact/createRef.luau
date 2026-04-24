@@ -1,25 +1,26 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Binding = require(script.Parent.Binding)
 return function()
-	local v1, _ = Binding.create(nil)
-	local tbl = {}
-	setmetatable(tbl, {
- __index = function(p1, p2)
- if p2 == "current" then
- return v1:getValue()
+	local result1, _ = Binding.create(nil)
+	local tableObj = {}
+	setmetatable(tableObj, {
+ __index = function(self, callback)
+ if callback == "current" then
+ return result1:getValue()
  else
- return v1[p2]
+ return result1[callback]
  end
  end,
- __newindex = function(p1, p2, p3)
- if p2 == "current" then
+ __newindex = function(self, callback, self)
+ if callback == "current" then
  error("Cannot assign to the \'current\' property of refs", 2)
  end
- v1[p2] = p3
+ result1[callback] = self
  end,
- __tostring = function(p1)
- return ("RoactRef(%s)"):format((tostring(v1:getValue())))
+ __tostring = function(self)
+ return ("RoactRef(%s)"):format((tostring(result1:getValue())))
  end
 	})
-	return tbl
+	return tableObj
 end

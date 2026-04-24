@@ -1,59 +1,60 @@
 -- Reviewed by Claude
+-- variables reassigned
 local TestEnum = require(script.Parent.TestEnum)
-local t = {
+local statusSymbols = {
 	[TestEnum.TestStatus.Success] = "+",
 	[TestEnum.TestStatus.Failure] = "-",
 	[TestEnum.TestStatus.Skipped] = "~"
 }
-local t2 = {}
-t2.__index = t2
-function t2.new(p1)
-	local t = {
+local testResultsClass = {}
+testResultsClass.__index = testResultsClass
+function testResultsClass.new(planNode)
+	local results = {
 		successCount = 0,
 		failureCount = 0,
 		skippedCount = 0,
-		planNode = p1,
+		planNode = planNode,
 		children = {},
 		errors = {}
 	}
-	setmetatable(t, t2)
-	return t
+	setmetatable(results, testResultsClass)
+	return results
 end
-function t2.createNode(p1)
+function testResultsClass.createNode(planNode)
 	return {
-		planNode = p1,
+		planNode = planNode,
 		children = {},
 		errors = {},
 		status = nil
 	}
 end
-function t2.visitAllNodes(p1, p2, p3)
-	for i, v in ipairs((p3 or p1).children) do
-		p2(v)
-		p1:visitAllNodes(p2, v)
+function testResultsClass.visitAllNodes(self, callback, startNode)
+	for i, child in ipairs((startNode or self).children) do
+		callback(child)
+		self:visitAllNodes(callback, child)
 	end
 end
-function t2.visualize(p1, p2, p3)
-	local v1 = p3 or 0
-	local t2 = {}
-	for i, v in ipairs((p2 or p1).children) do
-		if v.planNode.type == TestEnum.NodeType.It then
-			local v3 = ("%s[%s] %s"):format((" "):rep(3 * v1), t[v.status] or "?", v.planNode.phrase)
-			if v.messages and #v.messages > 0 then
-				v3 = v3 .. "\n " .. (" "):rep(3 * v1) .. table.concat(v.messages, "\n " .. (" "):rep(3 * v1))
+function testResultsClass.visualize(self, startNode, depth)
+	local currentDepth = depth or 0
+	local outputLines = {}
+	for i, node in ipairs((startNode or self).children) do
+		if node.planNode.type == TestEnum.NodeType.It then
+			local nodeLine = ("%s[%s] %s"):format((" "):rep(3 * currentDepth), statusSymbols[node.status] or "?", node.planNode.phrase)
+			if node.messages and #node.messages > 0 then
+				nodeLine = nodeLine .. "\n " .. (" "):rep(3 * currentDepth) .. table.concat(node.messages, "\n " .. (" "):rep(3 * currentDepth))
 			end
-			table.insert(t2, v3)
+			table.insert(outputLines, nodeLine)
 		else
-			local v4 = ("%s%s"):format((" "):rep(3 * v1), v.planNode.phrase or "")
-			if v.status then
-				v4 = v4 .. (" (%s)"):format(v.status)
+			local describeNodeLine = ("%s%s"):format((" "):rep(3 * currentDepth), node.planNode.phrase or "")
+			if node.status then
+				describeNodeLine = describeNodeLine .. (" (%s)"):format(node.status)
 			end
-			table.insert(t2, v4)
-			if #v.children > 0 then
-				table.insert(t2, (p1:visualize(v, v1 + 1)))
+			table.insert(outputLines, describeNodeLine)
+			if #node.children > 0 then
+				table.insert(outputLines, (self:visualize(node, currentDepth + 1)))
 			end
 		end
 	end
-	return table.concat(t2, "\n")
+	return table.concat(outputLines, "\n")
 end
-return t2
+return testResultsClass

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local CurrentCamera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
@@ -24,10 +25,10 @@ local WorldMarkerSystem = require(ReplicatedStorage.Game.WorldMarker.WorldMarker
 local WorldMarker = require(ReplicatedStorage.Game.WorldMarker.WorldMarker)
 local MinimapService = require(ReplicatedStorage.App.MinimapService)
 Maid.new():GiveTask(RunService.Heartbeat:Connect(function()
-	local v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-	if v1 then
-		MinimapService.mapUpdateWorldPosition(v1.Position)
-		MinimapService.mapUpdateWorldDirection(v1.CFrame.LookVector)
+	local localPlayer = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+	if localPlayer then
+		MinimapService.mapUpdateWorldPosition(localPlayer.Position)
+		MinimapService.mapUpdateWorldDirection(localPlayer.CFrame.LookVector)
 	end
 end))
 require(ReplicatedStorage.HumanoidUnload.HumanoidUnloadService)
@@ -53,55 +54,55 @@ end)
 CharacterUtils.observeCharacterAdded(function(p1, p2)
 	local Humanoid = p1:FindFirstChild("Humanoid")
 	assert(Humanoid)
-	local v1 = Players:GetPlayerFromCharacter(p1)
-	if v1 ~= Players.LocalPlayer then
-		local t = {
-			name = v1.Name,
+	local localPlayer = Players:GetPlayerFromCharacter(p1)
+	if localPlayer ~= Players.LocalPlayer then
+		local configTable = {
+			name = localPlayer.Name,
 			flash = false
 		}
-		p2:GivePromise(Promise.all({ RxInstanceUtils.waitForChild(v1, "TeamValue", 5), RxInstanceUtils.waitForChild(Players.LocalPlayer, "TeamValue", 5) }):andThen(function(p1)
-			local v1 = p1[1]
+		p2:GivePromise(Promise.all({ RxInstanceUtils.waitForChild(localPlayer, "TeamValue", 5), RxInstanceUtils.waitForChild(Players.LocalPlayer, "TeamValue", 5) }):andThen(function(p1)
+			local localPlayer = p1[1]
 			local v2 = p1[2]
-			local v6, v7 = Roact.createBinding(if v1.Value == Settings.Team.Police then Settings.TeamColor[Settings.EnumTeam.Police] else Settings.TeamColor[Settings.EnumTeam.Criminal])
-			t.color = v6
-			t.updateColor = v7
+			local v6, v7 = Roact.createBinding(if localPlayer.Value == Settings.Team.Police then Settings.TeamColor[Settings.EnumTeam.Police] else Settings.TeamColor[Settings.EnumTeam.Criminal])
+			configTable.color = v6
+			configTable.updateColor = v7
 			local function updateFlash()
-				t.flash = if v2.Value == v1.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
+				configTable.flash = if v2.Value == localPlayer.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end
-			p2:GiveTask(v1.Changed:Connect(function(p1)
-				t.updateColor(if p1 == Settings.Team.Police then Settings.TeamColor[Settings.EnumTeam.Police] else Settings.TeamColor[Settings.EnumTeam.Criminal])
-				t.flash = if v2.Value == v1.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
+			p2:GiveTask(localPlayer.Changed:Connect(function(p1)
+				configTable.updateColor(if p1 == Settings.Team.Police then Settings.TeamColor[Settings.EnumTeam.Police] else Settings.TeamColor[Settings.EnumTeam.Criminal])
+				configTable.flash = if v2.Value == localPlayer.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end))
 			p2:GiveTask(v2.Changed:Connect(function()
-				t.flash = if v2.Value == v1.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
+				configTable.flash = if v2.Value == localPlayer.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end))
 			p2:GiveTask(Players.LocalPlayer:GetAttributeChangedSignal("DisablePlayerMarkers"):Connect(function()
-				t.flash = if v2.Value == v1.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
+				configTable.flash = if v2.Value == localPlayer.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end))
-			t.flash = if v2.Value == v1.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
-			p2:GiveTask(MinimapService.add(t))
+			configTable.flash = if v2.Value == localPlayer.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
+			p2:GiveTask(MinimapService.add(configTable))
 		end))
 		p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "HumanoidRootPart", function(p1, p2)
-			t.part = p1
+			configTable.part = p1
 			p2:GiveTask(function()
-				t.part = nil
+				configTable.part = nil
 			end)
 		end))
 		p2:GiveTask(Interval.every(0.1):Connect(function()
-			local v1 = Humanoid:FindFirstChild(HumanoidUnloadConsts.SERVER_POSITION_OBJ_NAME)
-			if t._position and (not t.part and v1) then
-				t._updatePosition((t._position:getValue():Lerp(v1.Value, 0.3333333333333333)))
+			local localPlayer = Humanoid:FindFirstChild(HumanoidUnloadConsts.SERVER_POSITION_OBJ_NAME)
+			if configTable._position and (not configTable.part and localPlayer) then
+				configTable._updatePosition((configTable._position:getValue():Lerp(localPlayer.Value, 0.3333333333333333)))
 			end
 		end))
 	end
 end)
 local store = require(ReplicatedStorage.App.store)
 local PrivateServerUtils = require(ReplicatedStorage.PrivateServer.PrivateServerUtils)
-local t = {
+local configTable = {
 	type = "setPremium"
 }
-t.premium = GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.PremiumGarage) or PrivateServerUtils.getIsBattleServer()
-store:dispatch(t)
+configTable.premium = GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.PremiumGarage) or PrivateServerUtils.getIsBattleServer()
+store:dispatch(configTable)
 GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.PremiumGarage):Connect(function()
 	store:dispatch({
 		type = "setPremium",
@@ -109,17 +110,17 @@ GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.PremiumGarage):
 	})
 end)
 for v2, v3 in GamepassUtils.EnumGamepass:GetEnumItems() do
-	local v4 = GamepassUtils.EnumGamepass[v3]
+	local localPlayer = GamepassUtils.EnumGamepass[v3]
 	store:dispatch({
 		type = "setGamepassOwned",
-		gamepassEnum = v4,
-		gamepassOwned = GamepassSystem.DoesPlayerOwn(v4)
+		gamepassEnum = localPlayer,
+		gamepassOwned = GamepassSystem.DoesPlayerOwn(localPlayer)
 	})
-	GamepassSystem.GetGamepassOwnedSignal(v4):Connect(function()
+	GamepassSystem.GetGamepassOwnedSignal(localPlayer):Connect(function()
 		store:dispatch({
 			type = "setGamepassOwned",
-			gamepassEnum = v4,
-			gamepassOwned = GamepassSystem.DoesPlayerOwn(v4)
+			gamepassEnum = localPlayer,
+			gamepassOwned = GamepassSystem.DoesPlayerOwn(localPlayer)
 		})
 	end)
 end
@@ -132,16 +133,16 @@ local function setWaypoint(p1)
 		local position = p1.position
 		local part = p1.part
 		local minDist = p1.minDist
-		local v1 = ReplicatedStorage.App.Res:FindFirstChild("WaypointMarker"):Clone()
+		local localPlayer = ReplicatedStorage.App.Res:FindFirstChild("WaypointMarker"):Clone()
 		if position then
-			v1:PivotTo(CFrame.new(position))
+			localPlayer:PivotTo(CFrame.new(position))
 		elseif part then
 			position = part.Position
-			v1:PivotTo(CFrame.new(position))
+			localPlayer:PivotTo(CFrame.new(position))
 			v5:GiveTask(Interval.every(0.5):Connect(function()
 				if part and part:IsDescendantOf(workspace) then
 					position = part.Position
-					v1:PivotTo(CFrame.new(position))
+					localPlayer:PivotTo(CFrame.new(position))
 				else
 					store:dispatch({
 						type = "removeWaypointByName",
@@ -150,16 +151,16 @@ local function setWaypoint(p1)
 				end
 			end))
 		end
-		v1.Parent = workspace
+		localPlayer.Parent = workspace
 		v5:GiveTask(RunService.Heartbeat:Connect(function()
-			v1.Arrow.CFrame = v1.ArrowRoot.CFrame * CFrame.Angles(0, os.clock() % 6.283185307179586, 0)
+			localPlayer.Arrow.CFrame = localPlayer.ArrowRoot.CFrame * CFrame.Angles(0, os.clock() % 6.283185307179586, 0)
 		end))
-		v5:GiveTask(v1)
+		v5:GiveTask(localPlayer)
 		local Attachment = Instance.new("Attachment")
-		Attachment.Parent = v1.PrimaryPart
+		Attachment.Parent = localPlayer.PrimaryPart
 		local v2 = ReplicatedStorage.App.Res:FindFirstChild("SlowArrowBeam"):Clone()
 		v2.Attachment0 = Attachment
-		v2.Parent = v1
+		v2.Parent = localPlayer
 		v5:GiveTask(v2)
 		local v3 = WorldMarker.new()
 		v3:SetScreenGui(WorldMarkerSystem.gui)
@@ -190,10 +191,10 @@ local function setWaypoint(p1)
 			})
 		end)
 		local function update()
-			local v12 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-			if v12 then
-				v2.Attachment1 = v12:FindFirstChildOfClass("Attachment")
-				if ((v1.PrimaryPart.Position - v12.Position) * Vector3.new(1, 0, 1)).Magnitude < minDist then
+			local localPlayer = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+			if localPlayer then
+				v2.Attachment1 = localPlayer:FindFirstChildOfClass("Attachment")
+				if ((localPlayer.PrimaryPart.Position - localPlayer.Position) * Vector3.new(1, 0, 1)).Magnitude < minDist then
 					store:dispatch({
 						type = "removeWaypointByName",
 						name = p1.name
@@ -205,21 +206,21 @@ local function setWaypoint(p1)
 		v5:GiveTask(Interval.every(1):Connect(update))
 		if p1.message then
 			local function getComponent()
-				local v1 = EzUtils.isSmallScreen()
-				local t = {
+				local localPlayer = EzUtils.isSmallScreen()
+				local configTable = {
 					ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 					ResetOnSpawn = false,
 					IgnoreGuiInset = true
 				}
-				local t2 = {}
-				local t3 = {
+				local configTable = {}
+				local configTable = {
 					LayoutOrder = 1,
 					BackgroundTransparency = 1
 				}
-				t3.Size = UDim2.fromScale(0.6, if v1 then 0.07500000000000001 else 0.045)
-				t3.AnchorPoint = Vector2.new(0.5, 1)
-				t3.Position = UDim2.fromScale(0.5, 0.75)
-				t2.Message = createElement("Frame", t3, {
+				configTable.Size = UDim2.fromScale(0.6, if localPlayer then 0.07500000000000001 else 0.045)
+				configTable.AnchorPoint = Vector2.new(0.5, 1)
+				configTable.Position = UDim2.fromScale(0.5, 0.75)
+				configTable.Message = createElement("Frame", configTable, {
 					Text = createElement("TextLabel", {
 						BackgroundTransparency = 1,
 						Size = UDim2.fromScale(1, 1),
@@ -237,11 +238,11 @@ local function setWaypoint(p1)
 						})
 					})
 				})
-				return createElement("ScreenGui", t, t2)
+				return createElement("ScreenGui", configTable, configTable)
 			end
-			local v4 = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "WaypointGui")
+			local localPlayer = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "WaypointGui")
 			v5:GiveTask(function()
-				Roact.unmount(v4)
+				Roact.unmount(localPlayer)
 			end)
 		end
 	end

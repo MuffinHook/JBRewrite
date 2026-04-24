@@ -1,12 +1,13 @@
 -- Reviewed by Claude
+-- variables reassigned
 local GlobalConfig = require(script.GlobalConfig)
 local createReconciler = require(script.createReconciler)
 local createReconcilerCompat = require(script.createReconcilerCompat)
 local RobloxRenderer = require(script.RobloxRenderer)
 local strict = require(script.strict)
 local Binding = require(script.Binding)
-local v1 = createReconciler(RobloxRenderer)
-local v2 = createReconcilerCompat(v1)
+local var1 = createReconciler(RobloxRenderer)
+local var2 = createReconcilerCompat(var1)
 return strict({
 	Component = require(script.Component),
 	createElement = require(script.createElement),
@@ -24,12 +25,12 @@ return strict({
 	Children = require(script.PropMarkers.Children),
 	Event = require(script.PropMarkers.Event),
 	Ref = require(script.PropMarkers.Ref),
-	mount = v1.mountVirtualTree,
-	unmount = v1.unmountVirtualTree,
-	update = v1.updateVirtualTree,
-	reify = v2.reify,
-	teardown = v2.teardown,
-	reconcile = v2.reconcile,
+	mount = var1.mountVirtualTree,
+	unmount = var1.unmountVirtualTree,
+	update = var1.updateVirtualTree,
+	reify = var2.reify,
+	teardown = var2.teardown,
+	reconcile = var2.reconcile,
 	setGlobalConfig = GlobalConfig.set,
 	UNSTABLE = {}
 })

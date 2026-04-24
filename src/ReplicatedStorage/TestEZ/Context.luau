@@ -1,18 +1,19 @@
 -- Reviewed by Claude
+-- variables reassigned
 return {
-	new = function(p1)
-		local t = {}
-		local t2 = {}
-		t.__index = t2
-		if p1 then
-			for k, v in pairs(getmetatable(p1).__index) do
-				t2[k] = v
+	new = function(parentContext)
+		local contextMeta = {}
+		local contextData = {}
+		contextMeta.__index = contextData
+		if parentContext then
+			for k, v in pairs(getmetatable(parentContext).__index) do
+				contextData[k] = v
 			end
 		end
-		function t.__newindex(p1, p2, p3)
-			assert(t2[p2] == nil, string.format("Cannot reassign %s in context", (tostring(p2))))
-			t2[p2] = p3
+		function contextMeta.__newindex(self, key, value)
+			assert(contextData[key] == nil, string.format("Cannot reassign %s in context", (tostring(key))))
+			contextData[key] = value
 		end
-		return setmetatable({}, t)
+		return setmetatable({}, contextMeta)
 	end
 }

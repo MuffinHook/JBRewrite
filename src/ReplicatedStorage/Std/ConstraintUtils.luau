@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {
 	customWeld = function(p1, p2, p3, p4)
 		local Weld = Instance.new("Weld")

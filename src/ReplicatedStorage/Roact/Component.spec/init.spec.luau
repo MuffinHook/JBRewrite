@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
@@ -7,23 +8,23 @@ return function()
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
 	local Type = require(script.Parent.Parent.Type)
 	local Component = require(script.Parent.Parent.Component)
-	local v1 = createReconciler(NoopRenderer)
+	local key = createReconciler(NoopRenderer)
 	it("should be invoked with props when mounted", function()
-		local v12 = Component:extend("MyComponent")
-		local v2 = createSpy()
-		v12.init = v2.value
-		function v12.render(p1)
+		local internalData = Component:extend("MyComponent")
+		local state2 = createSpy()
+		internalData.init = state2.value
+		function internalData.render(self)
 			return nil
 		end
-		local t = {
+		local tbl = {
 			a = 5
 		}
-		v1.mountVirtualNode(createElement(v12, t), nil, "Some Component Key")
-		expect(v2.callCount).to.equal(1)
-		local v4 = v2:captureValues("self", "props")
-		expect(Type.of(v4.self)).to.equal(Type.StatefulComponentInstance)
-		local v5 = expect
-		v5((typeof(v4.props))).to.equal("table")
-		assertDeepEqual(v4.props, t)
+		key.mountVirtualNode(createElement(internalData, tbl), nil, "Some Component Key")
+		expect(state2.callCount).to.equal(1)
+		local currentState = state2:captureValues("self", "props")
+		expect(Type.of(currentState.self)).to.equal(Type.StatefulComponentInstance)
+		local nextState = expect
+		nextState((typeof(currentState.props))).to.equal("table")
+		assertDeepEqual(currentState.props, tbl)
 	end)
 end

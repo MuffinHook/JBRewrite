@@ -1,12 +1,13 @@
 -- Reviewed by Claude
-return function(p1)
-	if p1 then
- local v1, v2 = next(p1)
- if v2 then
- if next(p1, v1) then
+-- variables reassigned
+return function(self)
+	if self then
+ local result1, result2 = next(self)
+ if result2 then
+ if next(self, result1) then
  error("Expected at most child, had more than one child.", 2)
  end
- return v2
+ return result2
  else
  return nil
  end

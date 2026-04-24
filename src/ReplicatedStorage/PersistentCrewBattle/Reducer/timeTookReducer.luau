@@ -1,10 +1,11 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	setTimeTook = function(p1, p2)
-		assert(p2.clanId ~= nil, "missing clanId")
-		local v2 = table.clone(p1)
-		v2[p2.clanId] = p2.value
-		return v2
+	setTimeTook = function(arg1, self)
+		assert(self.clanId ~= nil, "missing clanId")
+		local local2 = table.clone(arg1)
+		local2[self.clanId] = self.value
+		return local2
 	end
 })
