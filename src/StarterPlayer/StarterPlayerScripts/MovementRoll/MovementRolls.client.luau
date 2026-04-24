@@ -23,10 +23,10 @@ local configTable = {}
 local function characterAdded(p1)
 	local Animator = p1:WaitForChild("Humanoid"):WaitForChild("Animator")
 	for v1, v2 in configTable do
-		local v4 = Animator:LoadAnimation(v2)
-		v4.Priority = Enum.AnimationPriority.Action
-		v4.Looped = configTable[v1].looped
-		configTable[v1] = v4
+		local var4 = Animator:LoadAnimation(v2)
+		var4.Priority = Enum.AnimationPriority.Action
+		var4.Looped = configTable[v1].looped
+		configTable[v1] = var4
 	end
 end
 local function playerAdded(p1)
@@ -93,5 +93,5 @@ end
 VehicleUtils.OnVehicleEntered:Connect(updateVisibility)
 VehicleUtils.OnVehicleExited:Connect(updateVisibility)
 ReplicatedStorage:GetAttributeChangedSignal("RollingEnabled"):Connect(updateVisibility)
-local v4 = VehicleUtils.GetLocalVehiclePacket()
-ActionButtonService.setButtonEnabled(configTable, not v4 and ReplicatedStorage:GetAttribute("RollingEnabled") == true)
+local var4 = VehicleUtils.GetLocalVehiclePacket()
+ActionButtonService.setButtonEnabled(configTable, not var4 and ReplicatedStorage:GetAttribute("RollingEnabled") == true)

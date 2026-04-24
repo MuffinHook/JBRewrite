@@ -10,7 +10,7 @@ local Interval = require(ReplicatedStorage.Std.Interval)
 local Signal = require(ReplicatedStorage.Std.Signal)
 local CurrentCamera = workspace.CurrentCamera
 local createElement = Roact.createElement
-local v1 = ReplicatedStorage:WaitForChild(SpectateConsts.SPECTATE_OTHER_REMOTE_NAME)
+local localPlayer = ReplicatedStorage:WaitForChild(SpectateConsts.SPECTATE_OTHER_REMOTE_NAME)
 local t = {
 	_tree = nil,
 	guiMaid = Maid.new(),
@@ -25,11 +25,11 @@ function t.trackCharacter(p1)
 		CurrentCamera.CameraSubject = nil
 	end
 	t.onCharacterSpectated:Fire(p1)
-	v1:FireServer(Players:GetPlayerFromCharacter(p1))
+	localPlayer:FireServer(Players:GetPlayerFromCharacter(p1))
 end
 local function getAllCharacters()
 	local t = {}
-	for v1, v2 in CollectionService:GetTagged(SpectateConsts.SPECTATE_TAG_NAME) do
+	for localPlayer, v2 in CollectionService:GetTagged(SpectateConsts.SPECTATE_TAG_NAME) do
 		table.insert(t, v2)
 	end
 	local Character = Players.LocalPlayer.Character
@@ -42,9 +42,9 @@ local function getAllCharacters()
 	return t
 end
 function t.findNewTarget()
-	local v1 = getAllCharacters()
-	assert(#v1 > 0, "No characters to spectate")
-	t.trackCharacter(v1[math.random(1, #v1)])
+	local localPlayer = getAllCharacters()
+	assert(#localPlayer > 0, "No characters to spectate")
+	t.trackCharacter(localPlayer[math.random(1, #localPlayer)])
 end
 function t.spectate(p1)
 	t.active = true
@@ -94,7 +94,7 @@ function t.unspectate()
 		local Humanoid = Character:FindFirstChild("Humanoid")
 		if Humanoid then
 			CurrentCamera.CameraSubject = Humanoid
-			v1:FireServer()
+			localPlayer:FireServer()
 		end
 	end
 end
@@ -110,36 +110,36 @@ end
 function t.showGui()
 	t.guiMaid:DoCleaning()
 	local function getNextCharacter(p1)
-		local v1 = getAllCharacters()
-		return v1[(table.find(v1, CurrentCamera.CameraSubject.Parent) + p1 - 1) % #v1 + 1]
+		local localPlayer = getAllCharacters()
+		return localPlayer[(table.find(localPlayer, CurrentCamera.CameraSubject.Parent) + p1 - 1) % #localPlayer + 1]
 	end
 	local t2 = {
 		size = UDim2.fromScale(1, 0.075),
 		position = UDim2.fromScale(0.5, 0.75),
 		onClickNext = function()
-			local v1 = getAllCharacters()
-			t.spectate(v1[(table.find(v1, CurrentCamera.CameraSubject.Parent) + 1 - 1) % #v1 + 1])
+			local localPlayer = getAllCharacters()
+			t.spectate(localPlayer[(table.find(localPlayer, CurrentCamera.CameraSubject.Parent) + 1 - 1) % #localPlayer + 1])
 		end,
 		onClickPrev = function()
-			local v1 = getAllCharacters()
-			t.spectate(v1[(table.find(v1, CurrentCamera.CameraSubject.Parent) + -1 - 1) % #v1 + 1])
+			local localPlayer = getAllCharacters()
+			t.spectate(localPlayer[(table.find(localPlayer, CurrentCamera.CameraSubject.Parent) + -1 - 1) % #localPlayer + 1])
 		end,
 		title = "N/A"
 	}
-	local v1 = Roact.mount(getComponent(t2), Players.LocalPlayer:FindFirstChild("PlayerGui"), "Spectate")
+	local localPlayer = Roact.mount(getComponent(t2), Players.LocalPlayer:FindFirstChild("PlayerGui"), "Spectate")
 	t.guiMaid:GiveTask(function()
-		Roact.unmount(v1)
+		Roact.unmount(localPlayer)
 	end)
 	local function updateCameraSubject()
 		local CameraSubject = CurrentCamera.CameraSubject
 		if CameraSubject ~= nil and CameraSubject:IsA("Humanoid") then
-			local v12 = Players:GetPlayerFromCharacter(CameraSubject.Parent)
-			if v12 then
-				t2.title = v12.DisplayName
+			local localPlayer = Players:GetPlayerFromCharacter(CameraSubject.Parent)
+			if localPlayer then
+				t2.title = localPlayer.DisplayName
 			else
 				t2.title = CameraSubject.Parent.Name
 			end
-			Roact.update(v1, getComponent(t2))
+			Roact.update(localPlayer, getComponent(t2))
 		end
 	end
 	t.guiMaid:GiveTask(CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(updateCameraSubject))

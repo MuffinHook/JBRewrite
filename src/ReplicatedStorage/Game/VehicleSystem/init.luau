@@ -21,12 +21,12 @@ local function Isv2(p1)
 end
 local function Init(p1)
 	local _ = p1.Event
-	local function v1(p1, p2)
-		for v12, v2 in next, p1 do
-			if type(v2) == "table" then
-				v1(v2, p2)
+	local function localPlayer(p1, p2)
+		for var12, table2 in next, p1 do
+			if type(table2) == "table" then
+				localPlayer(table2, p2)
 			else
-				p2[v12] = v2
+				p2[var12] = table2
 			end
 		end
 	end
@@ -35,42 +35,42 @@ local function Init(p1)
 		local Id = p1.Id
 		assert(Id)
 		if t2[Id] == nil then
-			local v12 = t3[p1.ClassName]
-			if v12 == nil then
+			local var12 = t3[p1.ClassName]
+			if var12 == nil then
 				error("No vehicle module has been registered for class name: " .. p1.ClassName)
 			end
-			if v12.FromPacket then
-				v12.FromPacket(p1)
+			if var12.FromPacket then
+				var12.FromPacket(p1)
 			else
-				p1 = v12.new(p1)
+				p1 = var12.new(p1)
 			end
 			if p1.Maid == nil then
 				warn("No maid for vehicle packet", p1)
 			end
 			assert(p1.Seats, "Vehicle needs seats")
 			local Maid_2 = p1.Maid
-			for v2, v3 in p1.Seats do
-				local PlayerName = v3.Part:WaitForChild("PlayerName")
-				v3.Occupied = false
-				v3.Maid = Maid.new()
+			for table2, var3 in p1.Seats do
+				local PlayerName = var3.Part:WaitForChild("PlayerName")
+				var3.Occupied = false
+				var3.Maid = Maid.new()
 				local function update()
-					local Occupied = v3.Occupied
-					local v1 = Players:FindFirstChild(PlayerName.Value)
-					local v2 = v1 ~= nil
-					if v2 then
-						v3.Player = v1
-						v3.Occupied = v2
-						v3.Maid:DoCleaning()
+					local Occupied = var3.Occupied
+					local localPlayer = Players:FindFirstChild(PlayerName.Value)
+					local table2 = localPlayer ~= nil
+					if table2 then
+						var3.Player = localPlayer
+						var3.Occupied = table2
+						var3.Maid:DoCleaning()
 					end
-					if v2 ~= Occupied and v2 then
-						p1:MountPlayer(v3.Player, v3)
-					elseif v2 ~= Occupied then
-						p1:UnmountSeat(v3)
+					if table2 ~= Occupied and table2 then
+						p1:MountPlayer(var3.Player, var3)
+					elseif table2 ~= Occupied then
+						p1:UnmountSeat(var3)
 					end
-					if not v2 then
-						v3.Player = v1
-						v3.Occupied = v2
-						v3.Maid:DoCleaning()
+					if not table2 then
+						var3.Player = localPlayer
+						var3.Occupied = table2
+						var3.Maid:DoCleaning()
 					end
 				end
 				update()
@@ -80,66 +80,66 @@ local function Init(p1)
 			t2[Id] = p1
 		else
 			if t2[Id].Meta ~= nil then
-				v1(p1, t2[Id].Meta)
+				localPlayer(p1, t2[Id].Meta)
 			else
-				v1(p1, t2[Id])
+				localPlayer(p1, t2[Id])
 			end
 		end
 	end
 	local function removeIdFromList(p1)
 		for i = #t, 1, -1 do
-			local v1, v2
-			local v3 = t[i]
-			v1 = v3.Meta ~= nil
-			v2 = if v1 then v3.Meta.Id else v3.Id
-			assert(v2)
-			if v2 == p1 then
-				t2[v2] = nil
+			local localPlayer, table2
+			local var3 = t[i]
+			localPlayer = var3.Meta ~= nil
+			table2 = if localPlayer then var3.Meta.Id else var3.Id
+			assert(table2)
+			if table2 == p1 then
+				t2[table2] = nil
 				table.remove(t, i)
-				if v3.Seats then
-					for j = 1, #v3.Seats do
-						local v4 = v3.Seats[j]
-						if v4.Occupied then
-							v3:UnmountSeat(v4)
-							v4.Maid:DoCleaning()
+				if var3.Seats then
+					for j = 1, #var3.Seats do
+						local var4 = var3.Seats[j]
+						if var4.Occupied then
+							var3:UnmountSeat(var4)
+							var4.Maid:DoCleaning()
 						end
 					end
 				end
-				v3:Destroy()
+				var3:Destroy()
 			end
 		end
 	end
 	Binder.new("VehicleSystemPacket", function(p1)
 		task.wait()
-		local v1 = Maid.new()
+		local localPlayer = Maid.new()
 		StreamingHelperUtils.yieldForAllValuesPopulated(p1)
-		local v2 = TableUtils.createTableFromObjectValues(p1)
-		local v3 = if v2.Meta ~= nil then v2.Meta.Id else v2.Id
+		local table2 = TableUtils.createTableFromObjectValues(p1)
+		local var3 = if table2.Meta ~= nil then table2.Meta.Id else table2.Id
 		local function create()
-			ProcessPacket(v2)
+			ProcessPacket(table2)
 		end
 		local function destroy()
-			removeIdFromList(v3)
+			removeIdFromList(var3)
 		end
-		v1:GiveTask(RxInstanceUtils.observeOneChildNamed(v2.Model, "BoundingBox", function(p1, p2)
-			ProcessPacket(v2)
+		localPlayer:GiveTask(RxInstanceUtils.observeOneChildNamed(table2.Model, "BoundingBox", function(p1, p2)
+			ProcessPacket(table2)
 			p2:GiveTask(destroy)
 		end))
-		return v1
+		return localPlayer
 	end):Start()
 	function p1.em.ih5093c4(p1)
-		local v1 = t2[p1]
-		assert(v1)
-		v1:FollowPlayer(LocalPlayer)
+		local localPlayer = t2[p1]
+		assert(localPlayer)
+		localPlayer:FollowPlayer(LocalPlayer)
 	end
 end
 local function GetVehiclePacket(p1)
 	for i = 1, #t do
-		local v1 = t[i]
-		for j = 1, #v1.Seats do
-			local v2 = v1.Seats[j]
-			if v2.Occupied and v2.Player == p1 then
-				return v1, v2
+		local localPlayer = t[i]
+		for j = 1, #localPlayer.Seats do
+			local table2 = localPlayer.Seats[j]
+			if table2.Occupied and table2.Player == p1 then
+				return localPlayer, table2
 			end
 		end
 	end
@@ -150,11 +150,11 @@ return {
 	RegisterModule = RegisterModule,
 	GetVehiclePacket = GetVehiclePacket,
 	WaitForVehiclePacket = function(p1)
-		local v1 = os.clock()
-		while os.clock() - v1 < 5 do
-			local v2, v3 = GetVehiclePacket(p1)
-			if v2 ~= nil then
-				return v2, v3
+		local localPlayer = os.clock()
+		while os.clock() - localPlayer < 5 do
+			local table2, var3 = GetVehiclePacket(p1)
+			if table2 ~= nil then
+				return table2, var3
 			end
 			task.wait()
 		end
@@ -164,9 +164,9 @@ return {
 		assert(p1 ~= nil)
 		assert(p2 ~= nil)
 		for i = 1, #p1.Seats do
-			local v3 = p1.Seats[i]
-			if v3.Occupied and v3.Player == p2 then
-				return v3
+			local var3 = p1.Seats[i]
+			if var3.Occupied and var3.Player == p2 then
+				return var3
 			end
 		end
 		return nil

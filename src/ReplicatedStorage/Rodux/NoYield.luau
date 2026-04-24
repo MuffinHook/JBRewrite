@@ -1,14 +1,15 @@
 -- Reviewed by Claude
-local function resultHandler(p1, p2, ...)
-	if not p2 then
- error(debug.traceback(p1, (...)), 2)
+-- variables reassigned
+local function resultHandler(coroutineThread, resumeSuccess, ...)
+	if not resumeSuccess then
+ error(debug.traceback(coroutineThread, (...)), 2)
 	end
-	if coroutine.status(p1) ~= "dead" then
- error(debug.traceback(p1, "Attempted to yield inside changed event!"), 2)
+	if coroutine.status(coroutineThread) ~= "dead" then
+ error(debug.traceback(coroutineThread, "Attempted to yield inside changed event!"), 2)
 	end
 	return ...
 end
-return function(p1, ...)
-	local v1 = coroutine.create(p1)
-	return resultHandler(v1, coroutine.resume(v1, ...))
+return function(functionToRun, ...)
+	local coroutineThread = coroutine.create(functionToRun)
+	return resultHandler(coroutineThread, coroutine.resume(coroutineThread, ...))
 end

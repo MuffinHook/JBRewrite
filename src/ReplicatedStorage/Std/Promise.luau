@@ -92,44 +92,44 @@ end
 local function packResult(p1, ...)
 	return p1, select("#", ...), { ... }
 end
-local function makeErrorHandler(p1)
-	assert(p1 ~= nil, "traceback is nil")
-	return function(p12)
-		if type(p12) == "table" then
-			return p12
+local function makeErrorHandler(traceback)
+	assert(traceback ~= nil, "traceback is nil")
+	return function(err)
+		if type(err) == "table" then
+			return err
 		else
-			return t2.new({
-				error = p12,
-				kind = t2.Kind.ExecutionError,
-				trace = debug.traceback(tostring(p12), 2),
-				context = "Promise created at:\n\n" .. p1
+			return PromiseError.new({
+				error = err,
+				kind = PromiseError.Kind.ExecutionError,
+				trace = debug.traceback(tostring(err), 2),
+				context = "Promise created at:\n\n" .. traceback
 			})
 		end
 	end
 end
-local function runExecutor(p1, p2, ...)
-	local v2 = xpcall
-	assert(p1 ~= nil, "traceback is nil")
-	return packResult(v2(p2, function(p12)
-		if type(p12) == "table" then
-			return p12
+local function runExecutor(traceback, fn, ...)
+	local xpcallFunc = xpcall
+	assert(traceback ~= nil, "traceback is nil")
+	return packResult(xpcallFunc(fn, function(err)
+		if type(err) == "table" then
+			return err
 		else
-			return t2.new({
-				error = p12,
-				kind = t2.Kind.ExecutionError,
-				trace = debug.traceback(tostring(p12), 2),
-				context = "Promise created at:\n\n" .. p1
+			return PromiseError.new({
+				error = err,
+				kind = PromiseError.Kind.ExecutionError,
+				trace = debug.traceback(tostring(err), 2),
+				context = "Promise created at:\n\n" .. traceback
 			})
 		end
 	end, ...))
 end
-local function createAdvancer(p1, p2, p3, p4)
+local function createAdvancer(traceback, fn, onResolve, onReject)
 	return function(...)
-		local v1, v2, v3 = runExecutor(p1, p2, ...)
-		if v1 then
-			p3(unpack(v3, 1, v2))
+		local success, count, values = runExecutor(traceback, fn, ...)
+		if success then
+			onResolve(unpack(values, 1, count))
 		else
-			p4(v3[1])
+			onReject(values[1])
 		end
 	end
 end
@@ -145,13 +145,13 @@ local Promise = {
 	prototype = {}
 }
 Promise.__index = Promise.prototype
-function Promise._new(p1, p2, p3)
-	if p3 ~= nil and not Promise.is(p3) then
+function Promise._new(traceback, executor, parentPromise)
+	if parentPromise ~= nil and not Promise.is(parentPromise) then
 		error("Argument #2 to Promise.new must be a promise or nil", 2)
 	end
-	local t2 = {
+	local promise = {
 		_thread = nil,
-		_source = p1,
+		_source = traceback,
 		_status = Promise.Status.Started,
 		_values = nil,
 		_valuesLength = -1,
@@ -160,142 +160,142 @@ function Promise._new(p1, p2, p3)
 		_queuedReject = {},
 		_queuedFinally = {},
 		_cancellationHook = nil,
-		_parent = p3
+		_parent = parentPromise
 	}
-	t2._consumers = setmetatable({}, weakKeyMetatable)
-	if p3 and p3._status == Promise.Status.Started then
-		p3._consumers[t2] = true
+	promise._consumers = setmetatable({}, weakKeyMetatable)
+	if parentPromise and parentPromise._status == Promise.Status.Started then
+		parentPromise._consumers[promise] = true
 	end
-	setmetatable(t2, Promise)
+	setmetatable(promise, Promise)
 	local function resolve(...)
-		t2:_resolve(...)
+		promise:_resolve(...)
 	end
 	local function reject(...)
-		t2:_reject(...)
+		promise:_reject(...)
 	end
-	local function onCancel(p1)
-		if p1 and t2._status == Promise.Status.Cancelled then
-			p1()
-		elseif p1 then
-			t2._cancellationHook = p1
+	local function onCancel(hook)
+		if hook and promise._status == Promise.Status.Cancelled then
+			hook()
+		elseif hook then
+			promise._cancellationHook = hook
 		end
-		return t2._status == Promise.Status.Cancelled
+		return promise._status == Promise.Status.Cancelled
 	end
-	t2._thread = coroutine.create(function()
-		local v1, _, v2 = runExecutor(t2._source, p2, resolve, reject, onCancel)
-		if not v1 then
-			reject(v2[1])
+	promise._thread = coroutine.create(function()
+		local success, _, values = runExecutor(promise._source, executor, resolve, reject, onCancel)
+		if not success then
+			reject(values[1])
 		end
 	end)
-	task.spawn(t2._thread)
-	return t2
+	task.spawn(promise._thread)
+	return promise
 end
-function Promise.new(p1)
-	return t3._new(debug.traceback(nil, 2), p1)
+function Promise.new(executor)
+	return Promise._new(debug.traceback(nil, 2), executor)
 end
 function Promise.__tostring(p1)
 	return string.format("Promise(%s)", p1._status)
 end
-function Promise.defer(p1)
-	local v1 = debug.traceback(nil, 2)
-	return t3._new(v1, function(p12, p2, p3)
-		local v12 = nil
-		v12 = t3._timeEvent:Connect(function()
-			v12:Disconnect()
-			local v13, _, v2 = runExecutor(v1, p1, p12, p2, p3)
-			if not v13 then
-				p2(v2[1])
+function Promise.defer(fn)
+	local traceback = debug.traceback(nil, 2)
+	return Promise._new(traceback, function(resolve, reject, onCancel)
+		local connection = nil
+		connection = Promise._timeEvent:Connect(function()
+			connection:Disconnect()
+			local success, _, values = runExecutor(traceback, fn, resolve, reject, onCancel)
+			if not success then
+				reject(values[1])
 			end
 		end)
 	end)
 end
 Promise.async = Promise.defer
 function Promise.resolve(...)
-	local v1, v2 = pack(...)
-	return t3._new(debug.traceback(nil, 2), function(p1)
-		p1(unpack(v2, 1, v1))
+	local count, values = pack(...)
+	return Promise._new(debug.traceback(nil, 2), function(resolve)
+		resolve(unpack(values, 1, count))
 	end)
 end
 function Promise.reject(...)
-	local v1, v2 = pack(...)
-	return t3._new(debug.traceback(nil, 2), function(p1, p2)
-		p2(unpack(v2, 1, v1))
+	local count, values = pack(...)
+	return Promise._new(debug.traceback(nil, 2), function(resolve, reject)
+		reject(unpack(values, 1, count))
 	end)
 end
-function Promise._try(p1, p2, ...)
-	local v1, v2 = pack(...)
-	return t3._new(p1, function(p1)
-		p1(p2(unpack(v2, 1, v1)))
+function Promise._try(traceback, fn, ...)
+	local count, values = pack(...)
+	return Promise._new(traceback, function(resolve)
+		resolve(fn(unpack(values, 1, count)))
 	end)
 end
-function Promise.try(p1, ...)
-	return t3._try(debug.traceback(nil, 2), p1, ...)
+function Promise.try(fn, ...)
+	return Promise._try(debug.traceback(nil, 2), fn, ...)
 end
-function Promise._all(p1, p2, p3)
-	if type(p2) ~= "table" then
+function Promise._all(traceback, promises, requiredCount)
+	if type(promises) ~= "table" then
 		error(string.format("Please pass a list of promises to %s", "Promise.all"), 3)
 	end
-	for k, v in pairs(p2) do
-		if not t3.is(v) then
+	for k, v in pairs(promises) do
+		if not Promise.is(v) then
 			error(string.format("Non-promise value passed into %s at index %s", "Promise.all", (tostring(k))), 3)
 		end
 	end
-	if #p2 == 0 or p3 == 0 then
-		return t3.resolve({})
+	if #promises == 0 or requiredCount == 0 then
+		return Promise.resolve({})
 	else
-		return t3._new(p1, function(p1, p22, p32)
-			local t = {}
-			local list = {}
-			local v1 = 0
-			local v2 = 0
-			local v3 = false
-			local function cancel()
-				for i, v in ipairs(list) do
+		return Promise._new(traceback, function(resolve, reject, onCancel)
+			local results = {}
+			local allPromises = {}
+			local resolvedCount = 0
+			local rejectedCount = 0
+			local finished = false
+			local function cancelAll()
+				for i, v in ipairs(allPromises) do
 					v:cancel()
 				end
 			end
-			local function resolveOne(p12, ...)
-				if not v3 then
-					v1 = v1 + 1
-					if p3 == nil then
-						t[p12] = ...
+			local function resolveOne(index, ...)
+				if not finished then
+					resolvedCount = resolvedCount + 1
+					if requiredCount == nil then
+						results[index] = ...
 					else
-						t[v1] = ...
+						results[resolvedCount] = ...
 					end
-					if (p3 or #p2) <= v1 then
-						v3 = true
-						p1(t)
-						for i, v in ipairs(list) do
+					if (requiredCount or #promises) <= resolvedCount then
+						finished = true
+						resolve(results)
+						for i, v in ipairs(allPromises) do
 							v:cancel()
 						end
 					end
 				end
 			end
-			p32(cancel)
-			for i, v in ipairs(p2) do
-				list[i] = v:andThen(function(...)
+			onCancel(cancelAll)
+			for i, v in ipairs(promises) do
+				allPromises[i] = v:andThen(function(...)
 					resolveOne(i, ...)
 				end, function(...)
-					v2 = v2 + 1
-					if p3 == nil or #p2 - v2 < p3 then
-						for i, v in ipairs(list) do
+					rejectedCount = rejectedCount + 1
+					if requiredCount == nil or #promises - rejectedCount < requiredCount then
+						for i, v in ipairs(allPromises) do
 							v:cancel()
 						end
-						v3 = true
-						p22(...)
+						finished = true
+						reject(...)
 					end
 				end)
 			end
-			if v3 then
-				for i, v in ipairs(list) do
+			if finished then
+				for i, v in ipairs(allPromises) do
 					v:cancel()
 				end
 			end
 		end)
 	end
 end
-function Promise.all(p1)
-	return t3._all(debug.traceback(nil, 2), p1)
+function Promise.all(promises)
+	return Promise._all(debug.traceback(nil, 2), promises)
 end
 function Promise.fold(p1, p2, p3)
 	assert(type(p1) == "table", "Bad argument #1 to Promise.fold: must be a table")
@@ -501,18 +501,18 @@ function Promise.each(p1, p2)
 		p12(t)
 	end)
 end
-function t3.is(p1)
-	if type(p1) == "table" then
-		local v1 = getmetatable(p1)
-		if v1 == t3 then
+function Promise.is(value)
+	if type(value) == "table" then
+		local mt = getmetatable(value)
+		if mt == Promise then
 			return true
-		elseif v1 == nil then
-			local andThen = p1.andThen
+		elseif mt == nil then
+			local andThen = value.andThen
 			if type(andThen) == "function" then
 				return true
 			elseif type(andThen) == "table" then
-				local v2 = getmetatable(andThen)
-				if v2 and type((rawget(v2, "__call"))) == "function" then
+				local mtAndThen = getmetatable(andThen)
+				if mtAndThen and type((rawget(mtAndThen, "__call"))) == "function" then
 					return true
 				else
 					return false
@@ -520,18 +520,18 @@ function t3.is(p1)
 			else
 				return false
 			end
-		elseif type(v1) == "table" and type((rawget(v1, "__index"))) == "table" then
-			local v6 = rawget(rawget(v1, "__index"), "andThen")
-			local v7
-			if type(v6) == "function" then
-				v7 = true
-			elseif type(v6) == "table" then
-				local v8 = getmetatable(v6)
-				v7 = if v8 then type((rawget(v8, "__call"))) == "function" else false
+		elseif type(mt) == "table" and type((rawget(mt, "__index"))) == "table" then
+			local indexAndThen = rawget(rawget(mt, "__index"), "andThen")
+			local isCallable
+			if type(indexAndThen) == "function" then
+				isCallable = true
+			elseif type(indexAndThen) == "table" then
+				local mtIndexAndThen = getmetatable(indexAndThen)
+				isCallable = if mtIndexAndThen then type((rawget(mtIndexAndThen, "__call"))) == "function" else false
 			else
-				v7 = false
+				isCallable = false
 			end
-			if v7 then
+			if isCallable then
 				return true
 			else
 				return false
@@ -543,563 +543,563 @@ function t3.is(p1)
 		return false
 	end
 end
-function t3.promisify(p1)
+function Promise.promisify(fn)
 	return function(...)
-		return t3._try(debug.traceback(nil, 2), p1, ...)
+		return Promise._try(debug.traceback(nil, 2), fn, ...)
 	end
 end
-local v1 = nil
-local v2 = nil
-function t3.delay(p1)
-	assert(type(p1) == "number", "Bad argument #1 to Promise.delay, must be a number.")
-	if not (p1 >= 1 / 60) or p1 == (1 / 0) then
-		p1 = 1 / 60
+local delayListHead = nil
+local delayConnection = nil
+function Promise.delay(seconds)
+	assert(type(seconds) == "number", "Bad argument #1 to Promise.delay, must be a number.")
+	if not (seconds >= 1 / 60) or seconds == (1 / 0) then
+		seconds = 1 / 60
 	end
-	return t3._new(debug.traceback(nil, 2), function(p12, p2, p3)
-		local v12 = t3._getTime()
-		local v22 = v12 + p1
-		local t = {
-			resolve = p12,
-			startTime = v12,
-			endTime = v22
+	return Promise._new(debug.traceback(nil, 2), function(resolve, reject, onCancel)
+		local startTime = Promise._getTime()
+		local endTime = startTime + seconds
+		local delayNode = {
+			resolve = resolve,
+			startTime = startTime,
+			endTime = endTime
 		}
-		if v2 == nil then
-			v1 = t
-			v2 = t3._timeEvent:Connect(function()
-				while v1 ~= nil and v1.endTime < t3._getTime() do
-					local v22 = v1
-					v1 = v22.next
-					if v1 == nil then
-						v2:Disconnect()
-						v2 = nil
+		if delayConnection == nil then
+			delayListHead = delayNode
+			delayConnection = Promise._timeEvent:Connect(function()
+				while delayListHead ~= nil and delayListHead.endTime < Promise._getTime() do
+					local currentNode = delayListHead
+					delayListHead = currentNode.next
+					if delayListHead == nil then
+						delayConnection:Disconnect()
+						delayConnection = nil
 					else
-						v1.previous = nil
+						delayListHead.previous = nil
 					end
-					v22.resolve(t3._getTime() - v22.startTime)
+					currentNode.resolve(Promise._getTime() - currentNode.startTime)
 				end
 			end)
-		elseif v1.endTime < v22 then
-			local v3 = v1
-			local v4 = v3.next
-			while v4 ~= nil and v4.endTime < v22 do
-				v4, v3 = v4.next, v4
+		elseif delayListHead.endTime < endTime then
+			local currentNode = delayListHead
+			local nextNode = currentNode.next
+			while nextNode ~= nil and nextNode.endTime < endTime do
+				nextNode, currentNode = nextNode.next, nextNode
 			end
-			v3.next = t
-			t.previous = v3
-			if v4 ~= nil then
-				t.next = v4
-				v4.previous = t
+			currentNode.next = delayNode
+			delayNode.previous = currentNode
+			if nextNode ~= nil then
+				delayNode.next = nextNode
+				nextNode.previous = delayNode
 			end
 		else
-			t.next = v1
-			v1.previous = t
-			v1 = t
+			delayNode.next = delayListHead
+			delayListHead.previous = delayNode
+			delayListHead = delayNode
 		end
-		p3(function()
-			local v12 = t.next
-			if v1 == t then
-				if v12 == nil then
-					v2:Disconnect()
-					v2 = nil
+		onCancel(function()
+			local nextNode = delayNode.next
+			if delayListHead == delayNode then
+				if nextNode == nil then
+					delayConnection:Disconnect()
+					delayConnection = nil
 				else
-					v12.previous = nil
+					nextNode.previous = nil
 				end
-				v1 = v12
+				delayListHead = nextNode
 			else
-				local previous = t.previous
-				previous.next = v12
-				if v12 ~= nil then
-					v12.previous = previous
+				local prevNode = delayNode.previous
+				prevNode.next = nextNode
+				if nextNode ~= nil then
+					nextNode.previous = prevNode
 				end
 			end
 		end)
 	end)
 end
-local function timeout(p1, p2, p3)
-	local v1 = debug.traceback(nil, 2)
-	return t3.race({ t3.delay(p2):andThen(function()
-			return t3.reject(p3 == nil and t2.new({
-				kind = t2.Kind.TimedOut,
+local function timeout(self, seconds, timeoutError)
+	local traceback = debug.traceback(nil, 2)
+	return Promise.race({ Promise.delay(seconds):andThen(function()
+			return Promise.reject(timeoutError == nil and PromiseError.new({
+				kind = PromiseError.Kind.TimedOut,
 				error = "Timed out",
-				context = string.format("Timeout of %d seconds exceeded.\n:timeout() called at:\n\n%s", p2, v1)
-			}) or p3)
-		end), p1 })
+				context = string.format("Timeout of %d seconds exceeded.\n:timeout() called at:\n\n%s", seconds, traceback)
+			}) or timeoutError)
+		end), self })
 end
-t3.prototype.timeout = timeout
-local function getStatus(p1)
-	return p1._status
+Promise.prototype.timeout = timeout
+local function getStatus(self)
+	return self._status
 end
-t3.prototype.getStatus = getStatus
-local function _andThen(p1, p2, p3, p4)
-	p1._unhandledRejection = false
-	if p1._status == Promise.Status.Cancelled then
-		local v1 = t3.new(function()  end)
-		v1:cancel()
-		return v1
+Promise.prototype.getStatus = getStatus
+local function _andThen(self, traceback, onResolve, onReject)
+	self._unhandledRejection = false
+	if self._status == Promise.Status.Cancelled then
+		local cancelled = Promise.new(function()  end)
+		cancelled:cancel()
+		return cancelled
 	else
-		return t3._new(p2, function(p12, p22, p32)
-			local v1
-			if p3 then
-				local v2 = p2
-				local v3 = p3
-				v1 = function(...)
-					local v1, v22, v32 = runExecutor(v2, v3, ...)
-					if v1 then
-						p12(unpack(v32, 1, v22))
+		return Promise._new(traceback, function(resolve, reject, onCancel)
+			local resolveHandler
+			if onResolve then
+				local tracebackRef = traceback
+				local onResolveRef = onResolve
+				resolveHandler = function(...)
+					local success, count, values = runExecutor(tracebackRef, onResolveRef, ...)
+					if success then
+						resolve(unpack(values, 1, count))
 					else
-						p22(v32[1])
+						reject(values[1])
 					end
 				end
 			else
-				v1 = p12
+				resolveHandler = resolve
 			end
-			local v4
-			if p4 then
-				local v5 = p2
-				local v6 = p4
-				v4 = function(...)
-					local v1, v2, v3 = runExecutor(v5, v6, ...)
-					if v1 then
-						p12(unpack(v3, 1, v2))
+			local rejectHandler
+			if onReject then
+				local tracebackRef = traceback
+				local onRejectRef = onReject
+				rejectHandler = function(...)
+					local success, count, values = runExecutor(tracebackRef, onRejectRef, ...)
+					if success then
+						resolve(unpack(values, 1, count))
 					else
-						p22(v3[1])
+						reject(values[1])
 					end
 				end
 			else
-				v4 = p22
+				rejectHandler = reject
 			end
-			if p1._status == Promise.Status.Started then
-				table.insert(p1._queuedResolve, v1)
-				table.insert(p1._queuedReject, v4)
-				p32(function()
-					if p1._status == Promise.Status.Started then
-						table.remove(p1._queuedResolve, table.find(p1._queuedResolve, v1))
-						table.remove(p1._queuedReject, table.find(p1._queuedReject, v4))
+			if self._status == Promise.Status.Started then
+				table.insert(self._queuedResolve, resolveHandler)
+				table.insert(self._queuedReject, rejectHandler)
+				onCancel(function()
+					if self._status == Promise.Status.Started then
+						table.remove(self._queuedResolve, table.find(self._queuedResolve, resolveHandler))
+						table.remove(self._queuedReject, table.find(self._queuedReject, rejectHandler))
 					end
 				end)
-			elseif p1._status == Promise.Status.Resolved then
-				v1(unpack(p1._values, 1, p1._valuesLength))
-			elseif p1._status == Promise.Status.Rejected then
-				v4(unpack(p1._values, 1, p1._valuesLength))
+			elseif self._status == Promise.Status.Resolved then
+				resolveHandler(unpack(self._values, 1, self._valuesLength))
+			elseif self._status == Promise.Status.Rejected then
+				rejectHandler(unpack(self._values, 1, self._valuesLength))
 			end
-		end, p1)
+		end, self)
 	end
 end
-t3.prototype._andThen = _andThen
-local function andThen(p1, p2, p3)
-	local v1
-	if p2 == nil or type(p2) == "function" then
-		v1 = true
-	elseif type(p2) == "table" then
-		local v2 = getmetatable(p2)
-		v1 = if v2 then type((rawget(v2, "__call"))) == "function" else false
+Promise.prototype._andThen = _andThen
+local function andThen(self, onResolve, onReject)
+	local resolveValid
+	if onResolve == nil or type(onResolve) == "function" then
+		resolveValid = true
+	elseif type(onResolve) == "table" then
+		local mtResolve = getmetatable(onResolve)
+		resolveValid = if mtResolve then type((rawget(mtResolve, "__call"))) == "function" else false
 	else
-		v1 = false
+		resolveValid = false
 	end
-	assert(v1, string.format("Please pass a handler function to %s!", "Promise:andThen"))
-	local v4
-	if p3 == nil or type(p3) == "function" then
-		v4 = true
-	elseif type(p3) == "table" then
-		local v5 = getmetatable(p3)
-		v4 = if v5 then type((rawget(v5, "__call"))) == "function" else false
+	assert(resolveValid, string.format("Please pass a handler function to %s!", "Promise:andThen"))
+	local rejectValid
+	if onReject == nil or type(onReject) == "function" then
+		rejectValid = true
+	elseif type(onReject) == "table" then
+		local mtReject = getmetatable(onReject)
+		rejectValid = if mtReject then type((rawget(mtReject, "__call"))) == "function" else false
 	else
-		v4 = false
+		rejectValid = false
 	end
-	assert(v4, string.format("Please pass a handler function to %s!", "Promise:andThen"))
-	return p1:_andThen(debug.traceback(nil, 2), p2, p3)
+	assert(rejectValid, string.format("Please pass a handler function to %s!", "Promise:andThen"))
+	return self:_andThen(debug.traceback(nil, 2), onResolve, onReject)
 end
-t3.prototype.andThen = andThen
-local function catch(p1, p2)
-	local v1
-	if p2 == nil or type(p2) == "function" then
-		v1 = true
-	elseif type(p2) == "table" then
-		local v2 = getmetatable(p2)
-		v1 = if v2 then type((rawget(v2, "__call"))) == "function" else false
+Promise.prototype.andThen = andThen
+local function catch(self, onReject)
+	local valid
+	if onReject == nil or type(onReject) == "function" then
+		valid = true
+	elseif type(onReject) == "table" then
+		local mt = getmetatable(onReject)
+		valid = if mt then type((rawget(mt, "__call"))) == "function" else false
 	else
-		v1 = false
+		valid = false
 	end
-	assert(v1, string.format("Please pass a handler function to %s!", "Promise:catch"))
-	return p1:_andThen(debug.traceback(nil, 2), nil, p2)
+	assert(valid, string.format("Please pass a handler function to %s!", "Promise:catch"))
+	return self:_andThen(debug.traceback(nil, 2), nil, onReject)
 end
-t3.prototype.catch = catch
-local function tap(p1, p2)
-	local v1
-	if type(p2) == "function" then
-		v1 = true
-	elseif type(p2) == "table" then
-		local v2 = getmetatable(p2)
-		v1 = if v2 then type((rawget(v2, "__call"))) == "function" else false
+Promise.prototype.catch = catch
+local function tap(self, fn)
+	local valid
+	if type(fn) == "function" then
+		valid = true
+	elseif type(fn) == "table" then
+		local mt = getmetatable(fn)
+		valid = if mt then type((rawget(mt, "__call"))) == "function" else false
 	else
-		v1 = false
+		valid = false
 	end
-	assert(v1, string.format("Please pass a handler function to %s!", "Promise:tap"))
-	return p1:_andThen(debug.traceback(nil, 2), function(...)
-		local v1 = p2(...)
-		if t3.is(v1) then
-			local v2, v3 = pack(...)
-			return v1:andThen(function()
-				return unpack(v3, 1, v2)
+	assert(valid, string.format("Please pass a handler function to %s!", "Promise:tap"))
+	return self:_andThen(debug.traceback(nil, 2), function(...)
+		local result = fn(...)
+		if Promise.is(result) then
+			local count, values = pack(...)
+			return result:andThen(function()
+				return unpack(values, 1, count)
 			end)
 		else
 			return ...
 		end
 	end)
 end
-t3.prototype.tap = tap
-local function andThenCall(p1, p2, ...)
-	local v1
-	if type(p2) == "function" then
-		v1 = true
-	elseif type(p2) == "table" then
-		local v2 = getmetatable(p2)
-		v1 = if v2 then type((rawget(v2, "__call"))) == "function" else false
+Promise.prototype.tap = tap
+local function andThenCall(self, fn, ...)
+	local valid
+	if type(fn) == "function" then
+		valid = true
+	elseif type(fn) == "table" then
+		local mt = getmetatable(fn)
+		valid = if mt then type((rawget(mt, "__call"))) == "function" else false
 	else
-		v1 = false
+		valid = false
 	end
-	assert(v1, string.format("Please pass a handler function to %s!", "Promise:andThenCall"))
-	local v4, v5 = pack(...)
-	return p1:_andThen(debug.traceback(nil, 2), function()
-		return p2(unpack(v5, 1, v4))
+	assert(valid, string.format("Please pass a handler function to %s!", "Promise:andThenCall"))
+	local argCount, args = pack(...)
+	return self:_andThen(debug.traceback(nil, 2), function()
+		return fn(unpack(args, 1, argCount))
 	end)
 end
-t3.prototype.andThenCall = andThenCall
-local function andThenReturn(p1, ...)
-	local v1, v2 = pack(...)
-	return p1:_andThen(debug.traceback(nil, 2), function()
-		return unpack(v2, 1, v1)
+Promise.prototype.andThenCall = andThenCall
+local function andThenReturn(self, ...)
+	local count, values = pack(...)
+	return self:_andThen(debug.traceback(nil, 2), function()
+		return unpack(values, 1, count)
 	end)
 end
-t3.prototype.andThenReturn = andThenReturn
-local function cancel(p1)
-	if p1._status == Promise.Status.Started then
-		p1._status = Promise.Status.Cancelled
-		if p1._cancellationHook then
-			p1._cancellationHook()
+Promise.prototype.andThenReturn = andThenReturn
+local function cancel(self)
+	if self._status == Promise.Status.Started then
+		self._status = Promise.Status.Cancelled
+		if self._cancellationHook then
+			self._cancellationHook()
 		end
-		coroutine.close(p1._thread)
-		if p1._parent then
-			p1._parent:_consumerCancelled(p1)
+		coroutine.close(self._thread)
+		if self._parent then
+			self._parent:_consumerCancelled(self)
 		end
-		for k in pairs(p1._consumers) do
+		for k in pairs(self._consumers) do
 			k:cancel()
 		end
-		p1:_finalize()
+		self:_finalize()
 	end
 end
-t3.prototype.cancel = cancel
-local function _consumerCancelled(p1, p2)
-	if p1._status == Promise.Status.Started then
-		p1._consumers[p2] = nil
-		if next(p1._consumers) == nil then
-			p1:cancel()
+Promise.prototype.cancel = cancel
+local function _consumerCancelled(self, consumer)
+	if self._status == Promise.Status.Started then
+		self._consumers[consumer] = nil
+		if next(self._consumers) == nil then
+			self:cancel()
 		end
 	end
 end
-t3.prototype._consumerCancelled = _consumerCancelled
-local function _finally(p1, p2, p3)
-	p1._unhandledRejection = false
-	return t3._new(p2, function(p12, p2, p32)
-		local v1 = nil
-		p32(function()
-			p1:_consumerCancelled(p1)
-			if v1 then
-				v1:cancel()
+Promise.prototype._consumerCancelled = _consumerCancelled
+local function _finally(self, traceback, onFinally)
+	self._unhandledRejection = false
+	return Promise._new(traceback, function(resolve, reject, onCancel)
+		local chainedPromise = nil
+		onCancel(function()
+			self:_consumerCancelled(self)
+			if chainedPromise then
+				chainedPromise:cancel()
 			end
 		end)
-		local v2 = if p3 then function(...)
-	local v12 = p3(...)
-	if t3.is(v12) then
-		v1 = v12
-		v12:finally(function(p13)
-			if p13 ~= Promise.Status.Rejected then
-				p12(p1)
+		local finallyHandler = if onFinally then function(status)
+			local result = onFinally(...)
+			if Promise.is(result) then
+				chainedPromise = result
+				result:finally(function(finalStatus)
+					if finalStatus ~= Promise.Status.Rejected then
+						resolve(self)
+					end
+				end):catch(function(...)
+					reject(...)
+				end)
+			else
+				resolve(self)
 			end
-		end):catch(function(...)
-			p2(...)
-		end)
-	else
-		p12(p1)
-	end
-end else p12
-		if p1._status == Promise.Status.Started then
-			table.insert(p1._queuedFinally, v2)
+		end else resolve
+		if self._status == Promise.Status.Started then
+			table.insert(self._queuedFinally, finallyHandler)
 		else
-			v2(p1._status)
+			finallyHandler(self._status)
 		end
 	end)
 end
-t3.prototype._finally = _finally
-local function finally(p1, p2)
-	local v1
-	if p2 == nil or type(p2) == "function" then
-		v1 = true
-	elseif type(p2) == "table" then
-		local v2 = getmetatable(p2)
-		v1 = if v2 then type((rawget(v2, "__call"))) == "function" else false
+Promise.prototype._finally = _finally
+local function finally(self, onFinally)
+	local valid
+	if onFinally == nil or type(onFinally) == "function" then
+		valid = true
+	elseif type(onFinally) == "table" then
+		local mt = getmetatable(onFinally)
+		valid = if mt then type((rawget(mt, "__call"))) == "function" else false
 	else
-		v1 = false
+		valid = false
 	end
-	assert(v1, string.format("Please pass a handler function to %s!", "Promise:finally"))
-	return p1:_finally(debug.traceback(nil, 2), p2)
+	assert(valid, string.format("Please pass a handler function to %s!", "Promise:finally"))
+	return self:_finally(debug.traceback(nil, 2), onFinally)
 end
-t3.prototype.finally = finally
-local function finallyCall(p1, p2, ...)
-	local v1
-	if type(p2) == "function" then
-		v1 = true
-	elseif type(p2) == "table" then
-		local v2 = getmetatable(p2)
-		v1 = if v2 then type((rawget(v2, "__call"))) == "function" else false
+Promise.prototype.finally = finally
+local function finallyCall(self, fn, ...)
+	local valid
+	if type(fn) == "function" then
+		valid = true
+	elseif type(fn) == "table" then
+		local mt = getmetatable(fn)
+		valid = if mt then type((rawget(mt, "__call"))) == "function" else false
 	else
-		v1 = false
+		valid = false
 	end
-	assert(v1, string.format("Please pass a handler function to %s!", "Promise:finallyCall"))
-	local v4, v5 = pack(...)
-	return p1:_finally(debug.traceback(nil, 2), function()
-		return p2(unpack(v5, 1, v4))
+	assert(valid, string.format("Please pass a handler function to %s!", "Promise:finallyCall"))
+	local argCount, args = pack(...)
+	return self:_finally(debug.traceback(nil, 2), function()
+		return fn(unpack(args, 1, argCount))
 	end)
 end
-t3.prototype.finallyCall = finallyCall
-local function finallyReturn(p1, ...)
-	local v1, v2 = pack(...)
-	return p1:_finally(debug.traceback(nil, 2), function()
-		return unpack(v2, 1, v1)
+Promise.prototype.finallyCall = finallyCall
+local function finallyReturn(self, ...)
+	local count, values = pack(...)
+	return self:_finally(debug.traceback(nil, 2), function()
+		return unpack(values, 1, count)
 	end)
 end
-t3.prototype.finallyReturn = finallyReturn
-local function awaitStatus(p1)
-	p1._unhandledRejection = false
-	if p1._status == Promise.Status.Started then
-		local v1 = coroutine.running()
-		p1:finally(function()
-			task.spawn(v1)
+Promise.prototype.finallyReturn = finallyReturn
+local function awaitStatus(self)
+	self._unhandledRejection = false
+	if self._status == Promise.Status.Started then
+		local runningThread = coroutine.running()
+		self:finally(function()
+			task.spawn(runningThread)
 		end):catch(function()  end)
 		coroutine.yield()
 	end
-	if p1._status == Promise.Status.Resolved or p1._status == Promise.Status.Rejected then
-		return p1._status, unpack(p1._values, 1, p1._valuesLength)
+	if self._status == Promise.Status.Resolved or self._status == Promise.Status.Rejected then
+		return self._status, unpack(self._values, 1, self._valuesLength)
 	else
-		return p1._status
+		return self._status
 	end
 end
-t3.prototype.awaitStatus = awaitStatus
-local function awaitHelper(p1, ...)
-	return p1 == Promise.Status.Resolved, ...
+Promise.prototype.awaitStatus = awaitStatus
+local function awaitHelper(status, ...)
+	return status == Promise.Status.Resolved, ...
 end
-local function await(p1)
-	return awaitHelper(p1:awaitStatus())
+local function await(self)
+	return awaitHelper(self:awaitStatus())
 end
-t3.prototype.await = await
-local function expectHelper(p1, ...)
-	if p1 ~= Promise.Status.Resolved then
+Promise.prototype.await = await
+local function expectHelper(status, ...)
+	if status ~= Promise.Status.Resolved then
 		error(if ... == nil then "Expected Promise rejected with no value." else ..., 3)
 	end
 	return ...
 end
-local function expect(p1)
-	return expectHelper(p1:awaitStatus())
+local function expect(self)
+	return expectHelper(self:awaitStatus())
 end
-t3.prototype.expect = expect
-t3.prototype.awaitValue = t3.prototype.expect
-local function _unwrap(p1)
-	if p1._status == Promise.Status.Started then
+Promise.prototype.expect = expect
+Promise.prototype.awaitValue = Promise.prototype.expect
+local function _unwrap(self)
+	if self._status == Promise.Status.Started then
 		error("Promise has not resolved or rejected.", 2)
 	end
-	return p1._status == Promise.Status.Resolved, unpack(p1._values, 1, p1._valuesLength)
+	return self._status == Promise.Status.Resolved, unpack(self._values, 1, self._valuesLength)
 end
-t3.prototype._unwrap = _unwrap
-local function _resolve(p1, ...)
-	if p1._status == Promise.Status.Started then
-		if t3.is((...)) then
+Promise.prototype._unwrap = _unwrap
+local function _resolve(self, ...)
+	if self._status == Promise.Status.Started then
+		if Promise.is((...)) then
 			if select("#", ...) > 1 then
-				warn((string.format("When returning a Promise from andThen, extra arguments are discarded! See:\n\n%s", p1._source)))
+				warn((string.format("When returning a Promise from andThen, extra arguments are discarded! See:\n\n%s", self._source)))
 			end
-			local v2 = ...
-			local v3 = v2:andThen(function(...)
-				p1:_resolve(...)
+			local chainedPromise = ...
+			local chainedConnection = chainedPromise:andThen(function(...)
+				self:_resolve(...)
 			end, function(...)
-				local v1 = v2._values[1]
-				if v2._error then
-					v1 = t2.new({
-						error = v2._error,
-						kind = t2.Kind.ExecutionError,
+				local chainedError = chainedPromise._values[1]
+				if chainedPromise._error then
+					chainedError = PromiseError.new({
+						error = chainedPromise._error,
+						kind = PromiseError.Kind.ExecutionError,
 						context = "[No stack trace available as this Promise originated from an older version of the Promise library (< v2)]"
 					})
 				end
-				if t2.isKind(v1, t2.Kind.ExecutionError) then
-					return p1:_reject(v1:extend({
+				if PromiseError.isKind(chainedError, PromiseError.Kind.ExecutionError) then
+					return self:_reject(chainedError:extend({
 						error = "This Promise was chained to a Promise that errored.",
 						trace = "",
-						context = string.format("The Promise at:\n\n%s\n...Rejected because it was chained to the following Promise, which encountered an error:\n", p1._source)
+						context = string.format("The Promise at:\n\n%s\n...Rejected because it was chained to the following Promise, which encountered an error:\n", self._source)
 					}))
 				end
-				p1:_reject(...)
+				self:_reject(...)
 			end)
-			if v3._status == Promise.Status.Cancelled then
-				p1:cancel()
-			elseif v3._status == Promise.Status.Started then
-				p1._parent = v3
-				v3._consumers[p1] = true
+			if chainedConnection._status == Promise.Status.Cancelled then
+				self:cancel()
+			elseif chainedConnection._status == Promise.Status.Started then
+				self._parent = chainedConnection
+				chainedConnection._consumers[self] = true
 			end
 		else
-			p1._status = Promise.Status.Resolved
-			local v4, v5 = pack(...)
-			p1._valuesLength = v4
-			p1._values = v5
-			for i, v in ipairs(p1._queuedResolve) do
+			self._status = Promise.Status.Resolved
+			local count, values = pack(...)
+			self._valuesLength = count
+			self._values = values
+			for i, v in ipairs(self._queuedResolve) do
 				coroutine.wrap(v)(...)
 			end
-			p1:_finalize()
+			self:_finalize()
 		end
-	elseif t3.is((...)) then
-		(...):_consumerCancelled(p1)
+	elseif Promise.is((...)) then
+		(...):_consumerCancelled(self)
 	end
 end
-t3.prototype._resolve = _resolve
-local function _reject(p1, ...)
-	if p1._status == Promise.Status.Started then
-		p1._status = Promise.Status.Rejected
-		local v1, v2 = pack(...)
-		p1._valuesLength = v1
-		p1._values = v2
-		if next(p1._queuedReject) == nil then
-			local v4 = tostring((...))
+Promise.prototype._resolve = _resolve
+local function _reject(self, ...)
+	if self._status == Promise.Status.Started then
+		self._status = Promise.Status.Rejected
+		local count, values = pack(...)
+		self._valuesLength = count
+		self._values = values
+		if next(self._queuedReject) == nil then
+			local errorStr = tostring((...))
 			coroutine.wrap(function()
-				t3._timeEvent:Wait()
-				if p1._unhandledRejection then
-					local v1 = string.format("Unhandled Promise rejection:\n\n%s\n\n%s", v4, p1._source)
-					for i, v in ipairs(t3._unhandledRejectionCallbacks) do
-						task.spawn(v, p1, unpack(p1._values, 1, p1._valuesLength))
+				Promise._timeEvent:Wait()
+				if self._unhandledRejection then
+					local message = string.format("Unhandled Promise rejection:\n\n%s\n\n%s", errorStr, self._source)
+					for i, v in ipairs(Promise._unhandledRejectionCallbacks) do
+						task.spawn(v, self, unpack(self._values, 1, self._valuesLength))
 					end
-					if not t3.TEST then
-						warn(v1)
+					if not Promise.TEST then
+						warn(message)
 					end
 				end
 			end)()
 		else
-			for i, v in ipairs(p1._queuedReject) do
+			for i, v in ipairs(self._queuedReject) do
 				coroutine.wrap(v)(...)
 			end
 		end
-		p1:_finalize()
+		self:_finalize()
 	end
 end
-t3.prototype._reject = _reject
-local function _finalize(p1)
-	for i, v in ipairs(p1._queuedFinally) do
-		coroutine.wrap(v)(p1._status)
+Promise.prototype._reject = _reject
+local function _finalize(self)
+	for i, v in ipairs(self._queuedFinally) do
+		coroutine.wrap(v)(self._status)
 	end
-	p1._queuedFinally = nil
-	p1._queuedReject = nil
-	p1._queuedResolve = nil
-	if not t3.TEST then
-		p1._parent = nil
-		p1._consumers = nil
+	self._queuedFinally = nil
+	self._queuedReject = nil
+	self._queuedResolve = nil
+	if not Promise.TEST then
+		self._parent = nil
+		self._consumers = nil
 	end
-	task.defer(coroutine.close, p1._thread)
+	task.defer(coroutine.close, self._thread)
 end
-t3.prototype._finalize = _finalize
-local function now(p1, p2)
-	local v1 = debug.traceback(nil, 2)
-	if p1._status == Promise.Status.Resolved then
-		return p1:_andThen(v1, function(...)
+Promise.prototype._finalize = _finalize
+local function now(self, error)
+	local traceback = debug.traceback(nil, 2)
+	if self._status == Promise.Status.Resolved then
+		return self:_andThen(traceback, function(...)
 			return ...
 		end)
 	else
-		return t3.reject(p2 == nil and t2.new({
-			kind = t2.Kind.NotResolvedInTime,
+		return Promise.reject(error == nil and PromiseError.new({
+			kind = PromiseError.Kind.NotResolvedInTime,
 			error = "This Promise was not resolved in time for :now()",
-			context = ":now() was called at:\n\n" .. v1
-		}) or p2)
+			context = ":now() was called at:\n\n" .. traceback
+		}) or error)
 	end
 end
-t3.prototype.now = now
-function t3.retry(p1, p2, ...)
-	local v1
-	if type(p1) == "function" then
-		v1 = true
-	elseif type(p1) == "table" then
-		local v2 = getmetatable(p1)
-		v1 = if v2 then type((rawget(v2, "__call"))) == "function" else false
+Promise.prototype.now = now
+function Promise.retry(fn, timesRemaining, ...)
+	local fnValid
+	if type(fn) == "function" then
+		fnValid = true
+	elseif type(fn) == "table" then
+		local mt = getmetatable(fn)
+		fnValid = if mt then type((rawget(mt, "__call"))) == "function" else false
 	else
-		v1 = false
+		fnValid = false
 	end
-	assert(v1, "Parameter #1 to Promise.retry must be a function")
-	assert(type(p2) == "number", "Parameter #2 to Promise.retry must be a number")
-	local t = { ... }
-	local v5 = select("#", ...)
-	return t3.resolve(p1(...)):catch(function(...)
-		if p2 > 0 then
-			return t3.retry(p1, p2 - 1, unpack(t, 1, v5))
+	assert(fnValid, "Parameter #1 to Promise.retry must be a function")
+	assert(type(timesRemaining) == "number", "Parameter #2 to Promise.retry must be a number")
+	local args = { ... }
+	local argCount = select("#", ...)
+	return Promise.resolve(fn(...)):catch(function(...)
+		if timesRemaining > 0 then
+			return Promise.retry(fn, timesRemaining - 1, unpack(args, 1, argCount))
 		else
-			return t3.reject(...)
+			return Promise.reject(...)
 		end
 	end)
 end
-function t3.retryWithDelay(p1, p2, p3, ...)
-	local v1
-	if type(p1) == "function" then
-		v1 = true
-	elseif type(p1) == "table" then
-		local v2 = getmetatable(p1)
-		v1 = if v2 then type((rawget(v2, "__call"))) == "function" else false
+function Promise.retryWithDelay(fn, timesRemaining, delaySeconds, ...)
+	local fnValid
+	if type(fn) == "function" then
+		fnValid = true
+	elseif type(fn) == "table" then
+		local mt = getmetatable(fn)
+		fnValid = if mt then type((rawget(mt, "__call"))) == "function" else false
 	else
-		v1 = false
+		fnValid = false
 	end
-	assert(v1, "Parameter #1 to Promise.retry must be a function")
-	assert(type(p2) == "number", "Parameter #2 (times) to Promise.retry must be a number")
-	assert(type(p3) == "number", "Parameter #3 (seconds) to Promise.retry must be a number")
-	local t = { ... }
-	local v6 = select("#", ...)
-	return t3.resolve(p1(...)):catch(function(...)
-		if p2 > 0 then
-			t3.delay(p3):await()
-			return t3.retryWithDelay(p1, p2 - 1, p3, unpack(t, 1, v6))
+	assert(fnValid, "Parameter #1 to Promise.retry must be a function")
+	assert(type(timesRemaining) == "number", "Parameter #2 (times) to Promise.retry must be a number")
+	assert(type(delaySeconds) == "number", "Parameter #3 (seconds) to Promise.retry must be a number")
+	local args = { ... }
+	local argCount = select("#", ...)
+	return Promise.resolve(fn(...)):catch(function(...)
+		if timesRemaining > 0 then
+			Promise.delay(delaySeconds):await()
+			return Promise.retryWithDelay(fn, timesRemaining - 1, delaySeconds, unpack(args, 1, argCount))
 		else
-			return t3.reject(...)
+			return Promise.reject(...)
 		end
 	end)
 end
-function t3.fromEvent(p1, p2)
-	local v2 = p2 or function()
+function Promise.fromEvent(signal, predicate)
+	local predicateFn = predicate or function()
 		return true
 	end
-	return t3._new(debug.traceback(nil, 2), function(p12, p2, p3)
-		local v1 = nil
-		local v22 = false
+	return Promise._new(debug.traceback(nil, 2), function(resolve, reject, onCancel)
+		local connection = nil
+		local disconnected = false
 		local function disconnect()
-			v1:Disconnect()
-			v1 = nil
+			connection:Disconnect()
+			connection = nil
 		end
-		v1 = p1:Connect(function(...)
-			local v12 = v2(...)
-			if v12 == true then
-				p12(...)
-				if v1 then
-					v1:Disconnect()
-					v1 = nil
+		connection = signal:Connect(function(...)
+			local predicateResult = predicateFn(...)
+			if predicateResult == true then
+				resolve(...)
+				if connection then
+					connection:Disconnect()
+					connection = nil
 				else
-					v22 = true
+					disconnected = true
 				end
-			elseif type(v12) ~= "boolean" then
+			elseif type(predicateResult) ~= "boolean" then
 				error("Promise.fromEvent predicate should always return a boolean")
 			end
 		end)
-		if v22 and v1 then
+		if disconnected and connection then
 			return disconnect()
 		end
-		p3(disconnect)
+		onCancel(disconnect)
 	end)
 end
-function t3.onUnhandledRejection(p1)
-	table.insert(t3._unhandledRejectionCallbacks, p1)
+function Promise.onUnhandledRejection(callback)
+	table.insert(Promise._unhandledRejectionCallbacks, callback)
 	return function()
-		local v1 = table.find(t3._unhandledRejectionCallbacks, p1)
-		if v1 then
-			table.remove(t3._unhandledRejectionCallbacks, v1)
+		local index = table.find(Promise._unhandledRejectionCallbacks, callback)
+		if index then
+			table.remove(Promise._unhandledRejectionCallbacks, index)
 		end
 	end
 end
-return t3
+return Promise

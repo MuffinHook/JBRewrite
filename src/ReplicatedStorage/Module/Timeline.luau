@@ -3,12 +3,12 @@ local t = {}
 t.__index = t
 function t.new(p1)
 	assert(p1)
-	local v2 = setmetatable({}, t)
-	v2.Data = p1
-	v2.Seqi = 1
-	v2.CumulativeSeqAge = 0
+	local table2 = setmetatable({}, t)
+	table2.Data = p1
+	table2.Seqi = 1
+	table2.CumulativeSeqAge = 0
 	p1[1][1](0, 0)
-	return v2
+	return table2
 end
 function t.Update(p1, p2)
 	local CumulativeSeqAge = p1.CumulativeSeqAge
@@ -31,17 +31,17 @@ function t.Update(p1, p2)
 		CumulativeSeqAge = CumulativeSeqAge + v1[2]
 	end
 	local Seqi_2 = p1.Seqi
-	local v3 = Data[Seqi_2]
-	local v4 = v3[2]
-	local v5 = CumulativeSeqAge - v4
-	if v5 + v4 <= p2 then
-		v3[1](1, v4)
+	local var3 = Data[Seqi_2]
+	local var4 = var3[2]
+	local var5 = CumulativeSeqAge - var4
+	if var5 + var4 <= p2 then
+		var3[1](1, var4)
 		p1.Seqi = Seqi_2 + 1
 		return true
 	else
-		local v6 = (p2 - v5) / v4
-		if v6 ~= 0 and v6 ~= 1 then
-			v3[1](v6, p2 - v5)
+		local var6 = (p2 - var5) / var4
+		if var6 ~= 0 and var6 ~= 1 then
+			var3[1](var6, p2 - var5)
 		end
 		return false
 	end

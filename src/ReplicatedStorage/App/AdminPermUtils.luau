@@ -1,17 +1,18 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunConsts = require(script.Parent.RunConsts)
 local RunUtils = require(script.Parent.RunUtils)
 local module = {
-	isBadimo = function(p1)
-		local UserId = p1.UserId
-		return if UserId == 2025110 or UserId == 2837719 then true else UserId == 606723718
+	isBadimo = function(player)
+		local playerId = player.UserId
+		return if playerId == 2025110 or playerId == 2837719 then true else playerId == 606723718
 	end
 }
-function module.hasPerms(p1)
-	if not p1 then
+function module.hasPerms(player)
+	if not player then
 		warn("Player missing from admin perm function.")
 	end
-	if RunUtils.isStudio() or p1 and module.isBadimo(p1) then
+	if RunUtils.isStudio() or player and module.isBadimo(player) then
 		return true
 	else
 		return RunUtils.getEnv() == RunConsts.QA_NAME

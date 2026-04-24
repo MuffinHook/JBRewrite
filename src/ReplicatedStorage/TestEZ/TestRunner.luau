@@ -19,88 +19,88 @@ local function wrapExpectContextWithPublicApi(expectationContext)
 	})
 end
 function testRunnerModule.runPlan(plan)
-	local v1 = TestSession.new(p1)
-	local v2 = LifecycleHooks.new()
-	v1.hasFocusNodes = #p1:findNodes(function(p1)
+	local instance = TestSession.new(p1)
+	local instance2 = LifecycleHooks.new()
+	instance.hasFocusNodes = #p1:findNodes(function(p1)
 		return p1.modifier == TestEnum.NodeModifier.Focus
 	end) > 0
-	t.runPlanNode(v1, p1, v2)
-	return v1:finalize()
+	t.runPlanNode(instance, p1, instance2)
+	return instance:finalize()
 end
 function t.runPlanNode(p1, p2, p3)
 	local function runCallback(p12, p2)
 		_G.__TESTEZ_RUNNING_TEST__ = true
-		local v1 = getfenv(p12)
-		local v2 = true
-		local v3 = nil
-		local v4 = p2 or ""
+		local instance = getfenv(p12)
+		local instance2 = true
+		local var3 = nil
+		local var4 = p2 or ""
 		for k, v in pairs(t.environment) do
-			v1[k] = v
+			instance[k] = v
 		end
-		function v1.fail(p1)
+		function instance.fail(p1)
 			if p1 == nil then
 				p1 = "fail() was called."
 			end
-			v2 = false
-			v3 = v4 .. debug.traceback(tostring(p1), 2)
+			instance2 = false
+			var3 = var4 .. debug.traceback(tostring(p1), 2)
 		end
-		v1.expect = wrapExpectContextWithPublicApi(p1:getExpectationContext())
-		local v5 = p1:getContext()
+		instance.expect = wrapExpectContextWithPublicApi(p1:getExpectationContext())
+		local var5 = p1:getContext()
 		local v6, v7 = xpcall(function()
-			p12(v5)
+			p12(var5)
 		end, function(p1)
-			return v4 .. debug.traceback(tostring(p1), 2)
+			return var4 .. debug.traceback(tostring(p1), 2)
 		end)
 		if not v6 then
-			v2 = false
-			v3 = v7
+			instance2 = false
+			var3 = v7
 		end
 		_G.__TESTEZ_RUNNING_TEST__ = nil
-		return v2, v3
+		return instance2, var3
 	end
 	local function runNode(p1)
 		for i, v in ipairs(p3:getBeforeEachHooks()) do
-			local v1, v2 = runCallback(v, "beforeEach hook: ")
-			if not v1 then
-				return false, v2
+			local instance, instance2 = runCallback(v, "beforeEach hook: ")
+			if not instance then
+				return false, instance2
 			end
 		end
-		local v3, v4 = runCallback(p1.callback)
+		local var3, var4 = runCallback(p1.callback)
 		for i, v in ipairs(p3:getAfterEachHooks()) do
-			local v5, v6 = runCallback(v, "afterEach hook: ")
-			if not v5 and v3 then
+			local var5, v6 = runCallback(v, "afterEach hook: ")
+			if not var5 and var3 then
 				return false, v6
-			elseif not v5 then
-				return false, v4 .. "\nWhile cleaning up the failed test another error was found:\n" .. v6
+			elseif not var5 then
+				return false, var4 .. "\nWhile cleaning up the failed test another error was found:\n" .. v6
 			end
 		end
-		if v3 then
+		if var3 then
 			return true, nil
 		else
-			return false, v4
+			return false, var4
 		end
 	end
 	p3:pushHooksFrom(p2)
-	local v1 = false
+	local instance = false
 	for i, v in ipairs(p3:getBeforeAllHooks()) do
-		local v2, v3 = runCallback(v, "beforeAll hook: ")
-		if not v2 then
-			p1:addDummyError("beforeAll", v3)
-			v1 = true
+		local instance2, var3 = runCallback(v, "beforeAll hook: ")
+		if not instance2 then
+			p1:addDummyError("beforeAll", var3)
+			instance = true
 		end
 	end
-	if not v1 then
+	if not instance then
 		for i, v in ipairs(p2.children) do
 			if v.type == TestEnum.NodeType.It then
 				p1:pushNode(v)
 				if p1:shouldSkip() then
 					p1:setSkipped()
 				else
-					local v4, v5 = runNode(v)
-					if v4 then
+					local var4, var5 = runNode(v)
+					if var4 then
 						p1:setSuccess()
 					else
-						p1:setError(v5)
+						p1:setError(var5)
 					end
 				end
 				p1:popNode()

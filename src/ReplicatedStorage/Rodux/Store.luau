@@ -1,126 +1,127 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local Signal = require(script.Parent.Signal)
 local NoYield = require(script.Parent.NoYield)
-local t = {
-	reportReducerError = function(p1, p2, p3)
- error(string.format("Received error: %s\n\n%s", p3.message, p3.thrownValue))
+local errorReporterDefaults = {
+	reportReducerError = function(state, action, errorInfo)
+ error(string.format("Received error: %s\n\n%s", errorInfo.message, errorInfo.thrownValue))
 	end,
-	reportUpdateError = function(p1, p2, p3, p4)
- error(string.format("Received error: %s\n\n%s", p4.message, p4.thrownValue))
+	reportUpdateError = function(oldState, newState, actionLog, errorInfo)
+ error(string.format("Received error: %s\n\n%s", errorInfo.message, errorInfo.thrownValue))
 	end
 }
-local function tracebackReporter(p1)
-	return debug.traceback((tostring(p1)))
+local function tracebackReporter(error)
+	return debug.traceback((tostring(error)))
 end
-local t2 = {
+local StoreMetatable = {
 	_flushEvent = RunService.Heartbeat
 }
-t2.__index = t2
-function t2.new(p1, p2, p3, p4)
-	assert(typeof(p1) == "function", "Bad argument #1 to Store.new, expected function.")
-	assert(p3 == nil or typeof(p3) == "table", "Bad argument #3 to Store.new, expected nil or table.")
-	if p3 ~= nil then
- for i = 1, #p3 do
- assert(typeof(p3[i]) == "function", ("Expected the middleware (\'%s\') at index %d to be a function."):format(tostring(p3[i]), i))
+StoreMetatable.__index = StoreMetatable
+function StoreMetatable.new(reducer, initialState, middlewares, errorReporter)
+	assert(typeof(reducer) == "function", "Bad argument #1 to Store.new, expected function.")
+	assert(middlewares == nil or typeof(middlewares) == "table", "Bad argument #3 to Store.new, expected nil or table.")
+	if middlewares ~= nil then
+ for i = 1, #middlewares do
+ assert(typeof(middlewares[i]) == "function", ("Expected the middleware ('%s') at index %d to be a function."):format(tostring(middlewares[i]), i))
  end
 	end
-	local tbl = {}
-	tbl._errorReporter = p4 or t
-	tbl._isDispatching = false
-	tbl._reducer = p1
-	local t4 = {
- type = "@@INIT"
+	local storeInstance = {}
+	storeInstance._errorReporter = errorReporter or errorReporterDefaults
+	storeInstance._isDispatching = false
+	storeInstance._reducer = reducer
+	local initAction = {
+  type = "@@INIT"
 	}
-	tbl._actionLog = { t4 }
-	local v8, v9 = xpcall(function()
- tbl._state = p1(p2, t4)
+	storeInstance._actionLog = { initAction }
+	local success, initializedState = xpcall(function()
+  storeInstance._state = reducer(initialState, initAction)
 	end, tracebackReporter)
-	if not v8 then
- tbl._errorReporter.reportReducerError(p2, t4, {
- message = "Caught error in reducer with init",
- thrownValue = v9
- })
- tbl._state = p2
+	if not success then
+  storeInstance._errorReporter.reportReducerError(initialState, initAction, {
+  message = "Caught error in reducer with init",
+  thrownValue = initializedState
+  })
+  storeInstance._state = initialState
 	end
-	tbl._lastState = tbl._state
-	tbl._mutatedSinceFlush = false
-	tbl._connections = {}
-	tbl.changed = Signal.new(tbl)
-	setmetatable(tbl, t2)
-	table.insert(tbl._connections, (tbl._flushEvent:Connect(function()
- tbl:flush()
+	storeInstance._lastState = storeInstance._state
+	storeInstance._mutatedSinceFlush = false
+	storeInstance._connections = {}
+	storeInstance.changed = Signal.new(storeInstance)
+	setmetatable(storeInstance, StoreMetatable)
+	table.insert(storeInstance._connections, (storeInstance._flushEvent:Connect(function()
+  storeInstance:flush()
 	end)))
-	if p3 then
- local dispatch = tbl.dispatch
- local function f12(...)
- return dispatch(tbl, ...)
- end
- for j = #p3, 1, -1 do
- f12 = p3[j](f12, tbl)
- end
- function tbl.dispatch(p1, ...)
- return f12(...)
- end
+	if middlewares then
+  local dispatch = storeInstance.dispatch
+  local function createWrappedDispatch(...)
+  return dispatch(storeInstance, ...)
+  end
+  for j = #middlewares, 1, -1 do
+  createWrappedDispatch = middlewares[j](createWrappedDispatch, storeInstance)
+  end
+  function storeInstance.dispatch(self, ...)
+  return createWrappedDispatch(...)
+  end
 	end
-	return tbl
+	return storeInstance
 end
-function t2.getState(p1)
-	if p1._isDispatching then
- local v1 = error
- v1(("You may not call store:getState() while the reducer is executing. The reducer (%s) has already received the state as an argument. Pass it down from the top reducer instead of reading it from the store."):format((tostring(p1._reducer))))
+function StoreMetatable.getState(self)
+	if self._isDispatching then
+  local errorFunc = error
+  errorFunc(("You may not call store:getState() while the reducer is executing. The reducer (%s) has already received the state as an argument. Pass it down from the top reducer instead of reading it from the store."):format((tostring(self._reducer))))
 	end
-	return p1._state
+	return self._state
 end
-function t2.dispatch(p1, p2)
-	if typeof(p2) ~= "table" then
- error(("Actions must be tables. Use custom middleware for %q actions."):format((typeof(p2))), 2)
+function StoreMetatable.dispatch(self, action)
+	if typeof(action) ~= "table" then
+  error(("Actions must be tables. Use custom middleware for %q actions."):format((typeof(action))), 2)
 	end
-	if p2.type == nil then
- error("Actions may not have an undefined \'type\' property. " .. "Have you misspelled a constant? \n" .. tostring(p2), 2)
+	if action.type == nil then
+  error("Actions may not have an undefined 'type' property. " .. "Have you misspelled a constant? \n" .. tostring(action), 2)
 	end
-	if p1._isDispatching then
- error("Reducers may not dispatch actions.")
+	if self._isDispatching then
+  error("Reducers may not dispatch actions.")
 	end
-	local v1, v2 = pcall(function()
- p1._isDispatching = true
- p1._state = p1._reducer(p1._state, p2)
- p1._mutatedSinceFlush = true
+	local dispatchSuccess, dispatchError = pcall(function()
+  self._isDispatching = true
+  self._state = self._reducer(self._state, action)
+  self._mutatedSinceFlush = true
 	end)
-	p1._isDispatching = false
-	if not v1 then
- p1._errorReporter.reportReducerError(p1._state, p2, {
- message = "Caught error in reducer",
- thrownValue = v2
- })
+	self._isDispatching = false
+	if not dispatchSuccess then
+  self._errorReporter.reportReducerError(self._state, action, {
+  message = "Caught error in reducer",
+  thrownValue = dispatchError
+  })
 	end
-	if #p1._actionLog == 3 then
- table.remove(p1._actionLog, 1)
+	if #self._actionLog == 3 then
+  table.remove(self._actionLog, 1)
 	end
-	table.insert(p1._actionLog, p2)
+	table.insert(self._actionLog, action)
 end
-function t2.destruct(p1)
-	for i, v in ipairs(p1._connections) do
- v:Disconnect()
+function StoreMetatable.destruct(self)
+	for i, v in ipairs(self._connections) do
+  v:Disconnect()
 	end
-	p1._connections = nil
+	self._connections = nil
 end
-function t2.flush(p1)
-	if p1._mutatedSinceFlush then
- p1._mutatedSinceFlush = false
- local _state = p1._state
- local v1, v2 = xpcall(function()
- NoYield(function()
- p1.changed:fire(_state, p1._lastState)
- end)
- end, tracebackReporter)
- if not v1 then
- p1._errorReporter.reportUpdateError(p1._lastState, _state, p1._actionLog, {
- message = "Caught error flushing store updates",
- thrownValue = v2
- })
- end
- p1._lastState = _state
+function StoreMetatable.flush(self)
+	if self._mutatedSinceFlush then
+  self._mutatedSinceFlush = false
+  local currentState = self._state
+  local flushSuccess, flushError = xpcall(function()
+  NoYield(function()
+  self.changed:fire(currentState, self._lastState)
+  end)
+  end, tracebackReporter)
+  if not flushSuccess then
+  self._errorReporter.reportUpdateError(self._lastState, currentState, self._actionLog, {
+  message = "Caught error flushing store updates",
+  thrownValue = flushError
+  })
+  end
+  self._lastState = currentState
 	end
 end
-return t2
+return StoreMetatable

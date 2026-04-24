@@ -9,33 +9,33 @@ local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
 local DoorConsts = require(ReplicatedStorage.Door2.DoorConsts)
 local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
 local VaultDoorPuzzleUtils = require(ReplicatedStorage.Casino.VaultDoorPuzzleUtils)
-local t = {}
-t.__index = t
-setmetatable(t, BaseObject)
-function t.new(p1, p2)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
-	RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
-	v1.manifest = p2
-	v1._pos = 0
-	local function action(p1, p22)
-		if p22 and v1:GetHacker() then
-			p2.updateDirectionRemote:FireServer()
-		elseif p22 then
-			p2.requestHackRemote:FireServer()
+local VaultDoorPuzzle = {}
+VaultDoorPuzzle.__index = VaultDoorPuzzle
+setmetatable(VaultDoorPuzzle, BaseObject)
+function VaultDoorPuzzle.new(puzzleObj, manifest)
+	local puzzleInstance = BaseObject.new(puzzleObj)
+	setmetatable(puzzleInstance, VaultDoorPuzzle)
+	RxInstanceUtils.yieldForProperty(puzzleObj, "PrimaryPart")
+	puzzleInstance.manifest = manifest
+	puzzleInstance._pos = 0
+	local function action(actionConfig, isActive)
+		if isActive and puzzleInstance:GetHacker() then
+			manifest.updateDirectionRemote:FireServer()
+		elseif isActive then
+			manifest.requestHackRemote:FireServer()
 		end
 		return true
 	end
-	local function preUpdateFun(p1)
-		local v12 = v1:GetHacker()
-		local v2 = not v1:GetDisabled()
-		if v2 then
-			v2 = if v12 == nil then true else v12 == Players.LocalPlayer
+	local function preUpdateFun(actionConfig)
+		local currentHacker = puzzleInstance:GetHacker()
+		local isNotDisabled = not puzzleInstance:GetDisabled()
+		if isNotDisabled then
+			isNotDisabled = if currentHacker == nil then true else currentHacker == Players.LocalPlayer
 		end
-		p1.Enabled = v2
+		actionConfig.Enabled = isNotDisabled
 	end
-	local t2 = {
-		Part = v1.obj.PrimaryPart,
+	local actionSpec = {
+		Part = puzzleInstance.obj.PrimaryPart,
 		Name = "",
 		Timed = false,
 		Dist = 8,
@@ -44,63 +44,62 @@ function t.new(p1, p2)
 		PreUpdateFun = preUpdateFun,
 		PreUpdatePeriod = 0.1
 	}
-	v1.spec = t2
-	v1.maid:GiveTask(CircleAction.Add(t2, v1.obj.PrimaryPart))
-	v1.maid:GiveTask(v1:GetHackerChangedSignal():Connect(function()
-		local v12 = v1:GetHacker()
-		if v12 then
-			local v2 = Maid.new()
-			v1.maid.hackMaid = v2
-			v1:_hookHacker(v2, v12)
+	puzzleInstance.spec = actionSpec
+	puzzleInstance.maid:GiveTask(CircleAction.Add(actionSpec, puzzleInstance.obj.PrimaryPart))
+	puzzleInstance.maid:GiveTask(puzzleInstance:GetHackerChangedSignal():Connect(function()
+		local currentHacker = puzzleInstance:GetHacker()
+		if currentHacker then
+			local hackerMaid = Maid.new()
+			puzzleInstance.maid.hackMaid = hackerMaid
+			puzzleInstance:_hookHacker(hackerMaid, currentHacker)
 		else
-			v1.maid.hackMaid = nil
-			v1:_hookHacker()
+			puzzleInstance.maid.hackMaid = nil
+			puzzleInstance:_hookHacker()
 		end
 	end))
-	v1:_hookHacker()
-	return v1
+	puzzleInstance:_hookHacker()
+	return puzzleInstance
 end
-function t._hookHacker(p1, p2, p3)
-	if p2 == nil then
-		p1.spec.Name = "Crack"
+function VaultDoorPuzzle._hookHacker(self, hackerMaid, hackerPlayer)
+	if hackerMaid == nil then
+		self.spec.Name = "Crack"
 	else
-		local v1 = 0
-		local v2 = p1:GetDirection()
-		p2:GiveTask(p1:GetDirectionChangedSignal():Connect(function()
-			v2 = p1:GetDirection()
+		local rotationForce = 0
+		local directionInput = self:GetDirection()
+		hackerMaid:GiveTask(self:GetDirectionChangedSignal():Connect(function()
+			directionInput = self:GetDirection()
 		end))
-		p2:GiveTask(RunService.Heartbeat:Connect(function(p12)
-			v1 = v1 + 5 * v2 * p12
-			v1 = v1 * 0.95
-			local v12 = p1
-			v12._pos = v12._pos + v1 * p12
-			p1.manifest.innerModel:SetPrimaryPartCFrame(p1.obj.PrimaryPart.CFrame * CFrame.Angles(0, 0, p1._pos))
+		hackerMaid:GiveTask(RunService.Heartbeat:Connect(function(deltaTime)
+			rotationForce = rotationForce + 5 * directionInput * deltaTime
+			rotationForce = rotationForce * 0.95
+			self._pos = self._pos + rotationForce * deltaTime
+			self.manifest.innerModel:SetPrimaryPartCFrame(self.obj.PrimaryPart.CFrame * CFrame.Angles(0, 0, self._pos))
 		end))
-		if p3 == Players.LocalPlayer then
-			p1.spec.Name = "Change Direction"
+		if hackerPlayer == Players.LocalPlayer then
+			self.spec.Name = "Change Direction"
 		end
 	end
 end
-function t.GetHackerChangedSignal(p1)
-	return VaultDoorPuzzleUtils.getHackerChangedSignal(p1.obj)
+function VaultDoorPuzzle.GetHackerChangedSignal(self)
+	return VaultDoorPuzzleUtils.getHackerChangedSignal(self.obj)
 end
-function t.GetHacker(p1)
-	return VaultDoorPuzzleUtils.getHacker(p1.obj)
+function VaultDoorPuzzle.GetHacker(self)
+	return VaultDoorPuzzleUtils.getHacker(self.obj)
 end
-function t.SetDirection(p1, p2)
-	return VaultDoorPuzzleUtils.setDirection(p1.obj, p2)
+function VaultDoorPuzzle.SetDirection(self, direction)
+	return VaultDoorPuzzleUtils.setDirection(self.obj, direction)
 end
-function t.GetDirection(p1)
-	return VaultDoorPuzzleUtils.getDirection(p1.obj)
+function VaultDoorPuzzle.GetDirection(self)
+	return VaultDoorPuzzleUtils.getDirection(self.obj)
 end
-function t.GetDirectionChangedSignal(p1)
-	return VaultDoorPuzzleUtils.getDirectionChangedSignal(p1.obj)
+function VaultDoorPuzzle.GetDirectionChangedSignal(self)
+	return VaultDoorPuzzleUtils.getDirectionChangedSignal(self.obj)
 end
-function t.GetDisabled(p1)
-	return VaultDoorPuzzleUtils.getDisabled(p1.obj)
+function VaultDoorPuzzle.GetDisabled(self)
+	return VaultDoorPuzzleUtils.getDisabled(self.obj)
 end
 return ManifestBinder.new("VaultDoorPuzzle", {
 	innerModel = DoorConsts.INNER_MODEL_NAME,
 	requestHackRemote = "RequestHack",
 	updateDirectionRemote = "UpdateDirection"
-}, t)
+}, VaultDoorPuzzle)

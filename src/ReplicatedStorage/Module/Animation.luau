@@ -3,35 +3,35 @@ local RunService = game:GetService("RunService")
 local t = {}
 t.__index = t
 function t.new(p1)
-	local v2 = setmetatable({}, t)
+	local table2 = setmetatable({}, t)
 	assert(p1.Duration)
 	local Duration_2 = p1.Duration
-	v2.OnUpdate = p1.OnUpdate
-	v2.OnComplete = p1.OnComplete
-	v2.OnCancel = p1.OnCancel
-	local v3 = tick()
-	v2.Event = RunService.Heartbeat:Connect(function(p1)
-		local v1 = tick() - v3
-		local v22 = Duration_2 <= v1
-		if v22 then
-			v1 = Duration_2
+	table2.OnUpdate = p1.OnUpdate
+	table2.OnComplete = p1.OnComplete
+	table2.OnCancel = p1.OnCancel
+	local var3 = tick()
+	table2.Event = RunService.Heartbeat:Connect(function(p1)
+		local delta = tick() - var3
+		local var22 = Duration_2 <= delta
+		if var22 then
+			delta = Duration_2
 		end
-		if v2.OnUpdate then
-			local v32 = v1 / Duration_2
-			if v32 ~= v32 then
-				v32 = 1
+		if table2.OnUpdate then
+			local var32 = delta / Duration_2
+			if var32 ~= var32 then
+				var32 = 1
 			end
-			v2.OnUpdate(p1, v1, v32)
+			table2.OnUpdate(p1, delta, var32)
 		end
-		if v22 then
-			v2.Event:Disconnect()
-			v2.Event = nil
-			if v2.OnComplete then
-				v2.OnComplete()
+		if var22 then
+			table2.Event:Disconnect()
+			table2.Event = nil
+			if table2.OnComplete then
+				table2.OnComplete()
 			end
 		end
 	end)
-	return v2
+	return table2
 end
 function t.Destroy(p1)
 	if p1.Event then

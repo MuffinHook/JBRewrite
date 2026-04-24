@@ -14,112 +14,112 @@ local Time = require(ReplicatedStorage.Module.Time)
 local RadioConsts = require(script.RadioConsts)
 local t = {}
 t.__index = t
-function t.new(p1)
+function t.new(self)
 	local t2 = {}
 	setmetatable(t2, t)
-	local _obj = p1._obj
+	local _obj = self._obj
 	t2._obj = _obj
 	t2._maid = Maid.new()
-	local v2 = Maid.new()
-	local function action(p1, p2)
+	local instance2 = Maid.new()
+	local function action(self, p2)
 		if p2 then
 			Radio.Open()
-			v2.listenOnClose = Radio.Window:GetOnClosedSignal():Connect(function()
-				v2:Destroy()
+			instance2.listenOnClose = Radio.Window:GetOnClosedSignal():Connect(function()
+				instance2:Destroy()
 			end)
-			v2.listenOnSongStarted = RadioPlayer.OnSongStarted:Connect(function(p1)
-				_obj:FindFirstChild(RadioConsts.PLAY_REMOTE_NAME):FireServer(p1)
+			instance2.listenOnSongStarted = RadioPlayer.OnSongStarted:Connect(function(self)
+				_obj:FindFirstChild(RadioConsts.PLAY_REMOTE_NAME):FireServer(self)
 			end)
-			p1.Enabled = false
+			self.Enabled = false
 			return true
 		else
 			return false
 		end
 	end
 	local function preUpdateFun(p12)
-		local v1 = not Radio.IsOpen() and not HomeItemSystem.isCustomizing()
-		local v2 = HomeSystem.queryCurrentStandingHome()
-		if not v2 then
-			v1 = false
+		local instance = not Radio.IsOpen() and not HomeItemSystem.isCustomizing()
+		local instance2 = HomeSystem.queryCurrentStandingHome()
+		if not instance2 then
+			instance = false
 		end
-		local v3 = p1:GetHome()
-		if v3 == v2 then
-			if not v3:HasPermissionToEdit(LocalPlayer) then
-				v1 = false
+		local var3 = self:GetHome()
+		if var3 == instance2 then
+			if not var3:HasPermissionToEdit(LocalPlayer) then
+				instance = false
 			end
 		else
-			v1 = false
+			instance = false
 		end
-		p12.Enabled = v1
+		p12.Enabled = instance
 	end
-	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(_obj, "Radio", function(p1, p2)
+	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(_obj, "Radio", function(self, p2)
 		CircleAction.Add({
-			Part = p1,
+			Part = self,
 			Name = "Open Radio",
 			Timed = false,
 			Dist = 10,
 			Callback = action,
 			PreUpdateFun = preUpdateFun,
 			PreUpdatePeriod = 0.1
-		}, p1)
+		}, self)
 		p2:GiveTask(function()
-			CircleAction.Remove(p1)
+			CircleAction.Remove(self)
 		end)
 	end))
-	local v3 = 0
-	local v4 = 0
+	local var3 = 0
+	local var4 = 0
 	local function updateCameraFov()
 		if RadioPlayer.CurrentSound then
 			local PlaybackLoudness = RadioPlayer.CurrentSound.PlaybackLoudness
 			if PlaybackLoudness ~= PlaybackLoudness then
 				PlaybackLoudness = 0
 			end
-			if v4 ~= v4 then
-				v4 = 0
+			if var4 ~= var4 then
+				var4 = 0
 			end
-			if v3 ~= v3 then
-				v3 = 0
+			if var3 ~= var3 then
+				var3 = 0
 			end
-			if v4 > 999 then
-				v4 = 0
+			if var4 > 999 then
+				var4 = 0
 			end
-			if v3 > 999 then
-				v3 = 0
+			if var3 > 999 then
+				var3 = 0
 			end
-			if v4 < -999 then
-				v4 = 0
+			if var4 < -999 then
+				var4 = 0
 			end
-			if v3 < -999 then
-				v3 = 0
+			if var3 < -999 then
+				var3 = 0
 			end
-			v3 = v3 * 0.86 + PlaybackLoudness * 0.14
-			v4 = v4 * 0.97 + math.tanh((PlaybackLoudness - v3) / 150) * 0.030000000000000027
-			local v2 = v4
-			if v2 < -1 then
-				v2 = -1
+			var3 = var3 * 0.86 + PlaybackLoudness * 0.14
+			var4 = var4 * 0.97 + math.tanh((PlaybackLoudness - var3) / 150) * 0.030000000000000027
+			local instance2 = var4
+			if instance2 < -1 then
+				instance2 = -1
 			end
-			if v2 > 1 then
-				v2 = 1
+			if instance2 > 1 then
+				instance2 = 1
 			end
-			if v2 ~= v2 then
-				v2 = 0
+			if instance2 ~= instance2 then
+				instance2 = 0
 			end
-			CurrentCamera.FieldOfView = v2 * 10 + 70
+			CurrentCamera.FieldOfView = instance2 * 10 + 70
 		end
 	end
-	local function playId(p1)
-		local v1 = Time.GetNowSync() - t2:GetStartedAt()
+	local function playId(self)
+		local instance = Time.GetNowSync() - t2:GetStartedAt()
 		RadioPlayer.PlayRandomSongAfter = false
-		RadioPlayer.PlayId(p1, v1, false)
+		RadioPlayer.PlayId(self, instance, false)
 		t2._maid.updateFov = RunService.Heartbeat:Connect(updateCameraFov)
 	end
 	t2._maid:GiveTask(t2._obj:GetAttributeChangedSignal(RadioConsts.SONG_ID_ATTR_NAME):Connect(function()
-		if HomeSystem.queryCurrentStandingHome() == p1:GetHome() then
-			local v1 = t2:GetSongId()
-			if v1 then
-				local v2 = Time.GetNowSync() - t2:GetStartedAt()
+		if HomeSystem.queryCurrentStandingHome() == self:GetHome() then
+			local instance = t2:GetSongId()
+			if instance then
+				local instance2 = Time.GetNowSync() - t2:GetStartedAt()
 				RadioPlayer.PlayRandomSongAfter = false
-				RadioPlayer.PlayId(v1, v2, false)
+				RadioPlayer.PlayId(instance, instance2, false)
 				t2._maid.updateFov = RunService.Heartbeat:Connect(updateCameraFov)
 				return
 			end
@@ -128,20 +128,20 @@ function t.new(p1)
 		end
 	end))
 	t2._maid:GiveTask(HomeSystem.onEntered:Connect(function(p12)
-		if p1:GetHome() == p12 then
-			local v1 = t2:GetSongId()
-			if v1 then
-				local v2 = Time.GetNowSync() - t2:GetStartedAt()
+		if self:GetHome() == p12 then
+			local instance = t2:GetSongId()
+			if instance then
+				local instance2 = Time.GetNowSync() - t2:GetStartedAt()
 				RadioPlayer.PlayRandomSongAfter = false
-				RadioPlayer.PlayId(v1, v2, false)
+				RadioPlayer.PlayId(instance, instance2, false)
 				t2._maid.updateFov = RunService.Heartbeat:Connect(updateCameraFov)
 			end
 		end
 	end))
 	t2._maid:GiveTask(HomeSystem.onExited:Connect(function(p12)
-		if p1:GetHome() == p12 then
-			local v1 = t2:GetSongId()
-			if v1 and RadioPlayer.CurrentSoundId == v1 then
+		if self:GetHome() == p12 then
+			local instance = t2:GetSongId()
+			if instance and RadioPlayer.CurrentSoundId == instance then
 				RadioPlayer.Stop()
 				t2._maid.updateFov = nil
 			end
@@ -149,22 +149,22 @@ function t.new(p1)
 	end))
 	return t2
 end
-function t.GetSongId(p1)
-	return p1._obj:GetAttribute(RadioConsts.SONG_ID_ATTR_NAME)
+function t.GetSongId(self)
+	return self._obj:GetAttribute(RadioConsts.SONG_ID_ATTR_NAME)
 end
-function t.GetStartedAt(p1)
-	return p1._obj:GetAttribute(RadioConsts.STARTED_AT_ATTR_NAME)
+function t.GetStartedAt(self)
+	return self._obj:GetAttribute(RadioConsts.STARTED_AT_ATTR_NAME)
 end
-function t.Destroy(p1)
-	local _maid = p1._maid
+function t.Destroy(self)
+	local _maid = self._maid
 	assert(_maid ~= nil)
-	p1._maid = nil
+	self._maid = nil
 	_maid:Destroy()
 end
 return {
-	setup = function(p1)
-		local v1 = t.new(p1)
-		p1._maid:GiveTask(v1)
-		p1._radio = v1
+	setup = function(self)
+		local instance = t.new(self)
+		self._maid:GiveTask(instance)
+		self._radio = instance
 	end
 }

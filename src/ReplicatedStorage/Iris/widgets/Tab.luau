@@ -169,10 +169,10 @@ return function(p1, p2)
 			p2.applyTextStyle(TextLabel)
 			p2.UIPadding(TextLabel, Vector2.new(0, p1._config.FramePadding.Y))
 			TextLabel.Parent = Iris_Tab
-			local v1 = p1._config.TextSize + (p1._config.FramePadding.Y - 1) * 2
+			local instance = p1._config.TextSize + (p1._config.FramePadding.Y - 1) * 2
 			local CloseButton = Instance.new("TextButton")
 			CloseButton.Name = "CloseButton"
-			CloseButton.Size = UDim2.fromOffset(v1, v1)
+			CloseButton.Size = UDim2.fromOffset(instance, instance)
 			CloseButton.BackgroundTransparency = 1
 			CloseButton.BorderSizePixel = 0
 			CloseButton.Text = ""
@@ -196,7 +196,7 @@ return function(p1, p2)
 			Icon.Name = "Icon"
 			Icon.AnchorPoint = Vector2.new(0.5, 0.5)
 			Icon.Position = UDim2.fromScale(0.5, 0.5)
-			Icon.Size = UDim2.fromOffset(math.floor(0.7 * v1), (math.floor(0.7 * v1)))
+			Icon.Size = UDim2.fromOffset(math.floor(0.7 * instance), (math.floor(0.7 * instance)))
 			Icon.BackgroundTransparency = 1
 			Icon.BorderSizePixel = 0
 			Icon.Image = p2.ICONS.MULTIPLICATION_SIGN
@@ -223,9 +223,9 @@ return function(p1, p2)
 			return Iris_Tab
 		end,
 		Update = function(p1)
-			local v1 = p1.Instance
-			v1.TextLabel.Text = p1.arguments.Text
-			v1.CloseButton.Visible = p1.arguments.Hideable == true
+			local instance = p1.Instance
+			instance.TextLabel.Text = p1.arguments.Text
+			instance.CloseButton.Visible = p1.arguments.Hideable == true
 		end,
 		ChildAdded = function(p1, p2)
 			return p1.ChildContainer
@@ -238,7 +238,7 @@ return function(p1, p2)
 			end
 		end,
 		UpdateState = function(p12)
-			local v1 = p12.Instance
+			local instance = p12.Instance
 			local ChildContainer = p12.ChildContainer
 			if p12.state.isOpened.lastChangeTick == p1._cycleTick then
 				if p12.state.isOpened.value == true then
@@ -248,27 +248,27 @@ return function(p1, p2)
 					if not (parentWidget.state.index.value > 0) then
 						parentWidget.state.index:set(Index)
 					end
-					v1.Visible = true
+					instance.Visible = true
 				else
 					p12.lastClosedTick = p1._cycleTick + 1
 					closeTab(p12.parentWidget, p12.Index)
-					v1.Visible = false
+					instance.Visible = false
 				end
 			end
 			if p12.state.index.lastChangeTick == p1._cycleTick then
 				if p12.state.index.value == p12.Index then
 					p12.ButtonColors.Color = p1._config.TabActiveColor
 					p12.ButtonColors.Transparency = p1._config.TabActiveTransparency
-					v1.BackgroundColor3 = p1._config.TabActiveColor
-					v1.BackgroundTransparency = p1._config.TabActiveTransparency
+					instance.BackgroundColor3 = p1._config.TabActiveColor
+					instance.BackgroundTransparency = p1._config.TabActiveTransparency
 					ChildContainer.Visible = true
 					p12.lastSelectedTick = p1._cycleTick + 1
 					return
 				end
 				p12.ButtonColors.Color = p1._config.TabColor
 				p12.ButtonColors.Transparency = p1._config.TabTransparency
-				v1.BackgroundColor3 = p1._config.TabColor
-				v1.BackgroundTransparency = p1._config.TabTransparency
+				instance.BackgroundColor3 = p1._config.TabColor
+				instance.BackgroundTransparency = p1._config.TabTransparency
 				ChildContainer.Visible = false
 				p12.lastUnselectedTick = p1._cycleTick + 1
 			end

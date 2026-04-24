@@ -25,14 +25,14 @@ function tbl.explodeAt(p1)
 	local v2 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Debris:Clone()
 	v2.Parent = Part
 	v2:Emit(50)
-	local v3 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Smoke:Clone()
-	v3.Parent = Part
-	v3:Emit(3)
-	local v4 = ReplicatedStorage.Resource.ItemSystem.Projectiles.LandingSmoke:Clone()
-	v4.Enabled = true
-	v4.Parent = Part
-	delay(10 - v4.Lifetime.Max, function()
- v4.Enabled = false
+	local var3 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Smoke:Clone()
+	var3.Parent = Part
+	var3:Emit(3)
+	local var4 = ReplicatedStorage.Resource.ItemSystem.Projectiles.LandingSmoke:Clone()
+	var4.Enabled = true
+	var4.Parent = Part
+	delay(10 - var4.Lifetime.Max, function()
+ var4.Enabled = false
 	end)
 	game.Debris:AddItem(Part, 10)
 	Audio.ObjectLocal(Part, t2.explosion_large_02, {

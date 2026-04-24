@@ -9,129 +9,129 @@ local Interval = require(ReplicatedStorage.Std.Interval)
 local Roact = require(ReplicatedStorage.Roact)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local createElement = Roact.createElement
-local function wipeTags(p1)
-	for i, v in ipairs((CollectionService:GetTags(p1))) do
-		CollectionService:RemoveTag(p1, v)
+local function wipeTags(instance)
+	for i, v in ipairs((CollectionService:GetTags(instance))) do
+		CollectionService:RemoveTag(instance, v)
 	end
 end
-local function wipeTagsRecursively(p1)
-	wipeTags(p1)
-	for i, v in ipairs(p1:GetDescendants()) do
+local function wipeTagsRecursively(instance)
+	wipeTags(instance)
+	for i, v in ipairs(instance:GetDescendants()) do
 		wipeTags(v)
 	end
 end
-local t = {}
-t.__index = t
-function t.new(p1)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.character = p1
-	t2._maid = Maid.new()
-	t2.onScreen = false
-	t2.lastOnScreenChanged = 0
-	local Model = Instance.new("Model")
-	local t3 = {}
-	local function shouldCopy(p1)
-		return (p1:IsA("BasePart") or (p1:IsA("Shirt") or (p1:IsA("Pants") or (p1:IsA("CharacterMesh") or (p1:IsA("WrapTarget") or (p1:IsA("Decal") or (p1:IsA("Accessory") or p1:IsA("Humanoid")))))))) and true or false
+local CharacterCloneManager = {}
+CharacterCloneManager.__index = CharacterCloneManager
+function CharacterCloneManager.new(character)
+	local self = {}
+	setmetatable(self, CharacterCloneManager)
+	self.character = character
+	self._maid = Maid.new()
+	self.onScreen = false
+	self.lastOnScreenChanged = 0
+	local cloneModel = Instance.new("Model")
+	local partMappings = {}
+	local function shouldCopy(instance)
+		return (instance:IsA("BasePart") or (instance:IsA("Shirt") or (instance:IsA("Pants") or (instance:IsA("CharacterMesh") or (instance:IsA("WrapTarget") or (instance:IsA("Decal") or (instance:IsA("Accessory") or instance:IsA("Humanoid")))))))) and true or false
 	end
-	local function v2(p1, p2)
-		local v1 = p1:Clone()
-		if v1 then
-			if p1:IsA("CharacterAppearance") then
-				local v22 = p2:FindFirstChild(v1.Name)
-				if v22 then
-					t3[v22] = nil
-					v22:Destroy()
+	local function cloneChild(sourceInstance, parentClone)
+		local clonedPart = sourceInstance:Clone()
+		if clonedPart then
+			if sourceInstance:IsA("CharacterAppearance") then
+				local existingClone = parentClone:FindFirstChild(clonedPart.Name)
+				if existingClone then
+					partMappings[existingClone] = nil
+					existingClone:Destroy()
 				end
 			end
-			v1:ClearAllChildren()
-			v1.Parent = p2
-			wipeTags(v1)
-			if v1:IsA("BasePart") then
-				v1.Anchored = true
-				t3[v1] = p1
-			elseif v1:IsA("Humanoid") then
-				v1.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+			clonedPart:ClearAllChildren()
+			clonedPart.Parent = parentClone
+			wipeTags(clonedPart)
+			if clonedPart:IsA("BasePart") then
+				clonedPart.Anchored = true
+				partMappings[clonedPart] = sourceInstance
+			elseif clonedPart:IsA("Humanoid") then
+				clonedPart.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 			end
-			for i, v in ipairs(p1:GetChildren()) do
-				v2(v, v1)
+			for i, v in ipairs(sourceInstance:GetChildren()) do
+				cloneChild(v, clonedPart)
 			end
-			return v1
+			return clonedPart
 		end
 	end
-	local function handleObj(p1)
-		if shouldCopy(p1) then
-			v2(p1, Model)
+	local function handleObj(instance)
+		if shouldCopy(instance) then
+			cloneChild(instance, cloneModel)
 		end
 	end
-	for i, v in ipairs(p1:GetChildren()) do
+	for i, v in ipairs(character:GetChildren()) do
 		if shouldCopy(v) then
-			v2(v, Model)
+			cloneChild(v, cloneModel)
 		end
 	end
-	t2._maid:GiveTask(p1.ChildAdded:Connect(handleObj))
-	t2.characterClone = Model
-	t2.cloneRef = t3
-	t2._maid:GiveTask(Model)
-	return t2
+	self._maid:GiveTask(character.ChildAdded:Connect(handleObj))
+	self.characterClone = cloneModel
+	self.cloneRef = partMappings
+	self._maid:GiveTask(cloneModel)
+	return self
 end
-function t.Update(p1)
-	for k, v in pairs(p1.cloneRef) do
+function CharacterCloneManager.Update(self)
+	for k, v in pairs(self.cloneRef) do
 		k.CFrame = v.CFrame
 	end
 end
-function t.Destroy(p1)
-	p1._maid:Destroy()
-	setmetatable(p1, nil)
+function CharacterCloneManager.Destroy(self)
+	self._maid:Destroy()
+	setmetatable(self, nil)
 end
-local v1 = Roact.PureComponent:extend("CCTV")
-v1.defaultProps = {
+local CCTVComponent = Roact.PureComponent:extend("CCTV")
+CCTVComponent.defaultProps = {
 	active = true
 }
-function v1.init(p1)
-	p1.cameraRef = Roact.createRef()
-	p1.viewportRef = Roact.createRef()
-	p1.fuzzRef = Roact.createRef()
-	p1._maid = Maid.new()
+function CCTVComponent.init(self)
+	self.cameraRef = Roact.createRef()
+	self.viewportRef = Roact.createRef()
+	self.fuzzRef = Roact.createRef()
+	self._maid = Maid.new()
 end
-function v1.render(p1)
-	local t = {
+function CCTVComponent.render(self)
+	local frameProps = {
 		BorderSizePixel = 0
 	}
-	t.BackgroundTransparency = if p1.props.disabled then 0 else 1
-	t.BackgroundColor3 = Color3.new(102/255, 0/255, 0/255)
-	t.Size = p1.props.size
-	t.Position = p1.props.position
-	t.LayoutOrder = p1.props.layoutOrder
-	t.AnchorPoint = Vector2.new(0.5, 0.5)
-	t.ClipsDescendants = true
-	local t2 = {
+	frameProps.BackgroundTransparency = if self.props.disabled then 0 else 1
+	frameProps.BackgroundColor3 = Color3.new(102/255, 0/255, 0/255)
+	frameProps.Size = self.props.size
+	frameProps.Position = self.props.position
+	frameProps.LayoutOrder = self.props.layoutOrder
+	frameProps.AnchorPoint = Vector2.new(0.5, 0.5)
+	frameProps.ClipsDescendants = true
+	local childrenProps = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0.015625, 0)
 		}),
 		UIStroke = createElement("UIStroke", {
 			Color = Color3.new(255/255, 0/255, 0/255),
 			Thickness = 2,
-			Enabled = p1.props.active
+			Enabled = self.props.active
 		}),
 		AspectRatio = createElement("UIAspectRatioConstraint", {
-			AspectRatio = p1.props.aspectRatio
+			AspectRatio = self.props.aspectRatio
 		}),
 		ViewportFrame = createElement("ViewportFrame", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0),
-			CurrentCamera = p1.cameraRef,
+			CurrentCamera = self.cameraRef,
 			ZIndex = 1,
-			Visible = not p1.props.disabled,
-			[Roact.Ref] = p1.viewportRef
+			Visible = not self.props.disabled,
+			[Roact.Ref] = self.viewportRef
 		}, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0.015625, 0)
 			}),
 			Camera = createElement("Camera", {
-				FieldOfView = p1.props.fieldOfView,
-				CFrame = p1.props.cameraCFrame,
-				[Roact.Ref] = p1.cameraRef
+				FieldOfView = self.props.fieldOfView,
+				CFrame = self.props.cameraCFrame,
+				[Roact.Ref] = self.cameraRef
 			})
 		}),
 		Fuzz = createElement("ImageLabel", {
@@ -142,140 +142,140 @@ function v1.render(p1)
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			ZIndex = 10,
-			[Roact.Ref] = p1.fuzzRef
+			[Roact.Ref] = self.fuzzRef
 		}, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0.015625, 0)
 			})
 		})
 	}
-	local t3 = {
-		BackgroundTransparency = p1.props.flash,
+	local flashProps = {
+		BackgroundTransparency = self.props.flash,
 		BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
 		Size = UDim2.new(1, 1, 1),
 		ZIndex = 20
 	}
-	t3.Visible = p1.props.flash ~= nil
-	t2.Flash = createElement("Frame", t3)
-	return createElement("Frame", t, t2)
+	flashProps.Visible = self.props.flash ~= nil
+	childrenProps.Flash = createElement("Frame", flashProps)
+	return createElement("Frame", frameProps, childrenProps)
 end
-function v1._clear(p1)
-	for i, v in ipairs(p1.viewportRef:getValue():GetChildren()) do
+function CCTVComponent._clear(self)
+	for i, v in ipairs(self.viewportRef:getValue():GetChildren()) do
 		if not (v:IsA("UICorner") or v:IsA("Camera")) then
 			v:Destroy()
 		end
 	end
 end
-function v1._redraw(p1)
-	p1:_clear()
-	local v1 = Maid.new()
-	p1._maid.canvasMaid = v1
-	local v2 = p1.viewportRef:getValue()
-	local distance = p1.props.distance
-	local cameraCFrame = p1.props.cameraCFrame
-	local v5 = 2 * distance * math.tan((math.rad(p1.props.fieldOfView / 2)))
-	local v7 = Vector3.new(v5 * p1.props.aspectRatio, v5, distance)
-	local t2 = { workspace:FindFirstChild("Items") }
+function CCTVComponent._redraw(self)
+	self:_clear()
+	local canvasMaid = Maid.new()
+	self._maid.canvasMaid = canvasMaid
+	local viewportFrame = self.viewportRef:getValue()
+	local distance = self.props.distance
+	local cameraCFrame = self.props.cameraCFrame
+	local viewportHeight = 2 * distance * math.tan((math.rad(self.props.fieldOfView / 2)))
+	local renderBounds = Vector3.new(viewportHeight * self.props.aspectRatio, viewportHeight, distance)
+	local filterList = { workspace:FindFirstChild("Items") }
 	for i, v in ipairs(Players:GetPlayers()) do
 		if v.Character then
-			table.insert(t2, v.Character)
+			table.insert(filterList, v.Character)
 		end
 	end
-	local v8 = OverlapParams.new()
-	v8.FilterType = Enum.RaycastFilterType.Blacklist
-	v8.FilterDescendantsInstances = t2
-	for i, v in ipairs((workspace:GetPartBoundsInBox(cameraCFrame * CFrame.new(0, 0, -v7.z * 0.5), v7, v8))) do
-		local v10 = v:Clone()
-		if v10 then
-			wipeTags(v10)
-			for i2, v11 in ipairs(v10:GetDescendants()) do
-				wipeTags(v11)
+	local overlapParams = OverlapParams.new()
+	overlapParams.FilterType = Enum.RaycastFilterType.Blacklist
+	overlapParams.FilterDescendantsInstances = filterList
+	for i, v in ipairs((workspace:GetPartBoundsInBox(cameraCFrame * CFrame.new(0, 0, -renderBounds.z * 0.5), renderBounds, overlapParams))) do
+		local clonedPart = v:Clone()
+		if clonedPart then
+			wipeTags(clonedPart)
+			for i2, descendant in ipairs(clonedPart:GetDescendants()) do
+				wipeTags(descendant)
 			end
-			v10.Parent = v2
+			clonedPart.Parent = viewportFrame
 		end
 	end
-	local v11 = ManifestBinder.new("Character", {
+	local characterBinder = ManifestBinder.new("Character", {
 		HumanoidRootPart = "HumanoidRootPart"
-	}, function(p1)
-		return BaseObject.new(p1)
+	}, function(characterObj)
+		return BaseObject.new(characterObj)
 	end)
-	v11:Start()
-	local t3 = {}
-	local function onCharacterAdded(p1)
-		local v1 = t.new(p1)
-		t3[p1] = v1
-		v1.characterClone.Parent = v2
+	characterBinder:Start()
+	local characterCloneMap = {}
+	local function onCharacterAdded(characterObj)
+		local cloneManager = CharacterCloneManager.new(characterObj)
+		characterCloneMap[characterObj] = cloneManager
+		cloneManager.characterClone.Parent = viewportFrame
 	end
-	local function onCharacterRemoving(p1)
-		local v1 = t3[p1]
-		if v1 then
-			v1:Destroy()
+	local function onCharacterRemoving(characterObj)
+		local cloneManager = characterCloneMap[characterObj]
+		if cloneManager then
+			cloneManager:Destroy()
 		end
-		t3[p1] = nil
+		characterCloneMap[characterObj] = nil
 	end
-	for v12, v13 in v11:GetAll() do
-		local obj = v13.obj
-		local v14 = t.new(obj)
-		t3[obj] = v14
-		v14.characterClone.Parent = v2
+	for key, boundInstance in characterBinder:GetAll() do
+		local obj = boundInstance.obj
+		local cloneManager = CharacterCloneManager.new(obj)
+		characterCloneMap[obj] = cloneManager
+		cloneManager.characterClone.Parent = viewportFrame
 	end
-	v11:GetClassAddedSignal():Connect(function(p1)
-		local obj = p1.obj
-		local v1 = t.new(obj)
-		t3[obj] = v1
-		v1.characterClone.Parent = v2
+	characterBinder:GetClassAddedSignal():Connect(function(boundInstance)
+		local obj = boundInstance.obj
+		local cloneManager = CharacterCloneManager.new(obj)
+		characterCloneMap[obj] = cloneManager
+		cloneManager.characterClone.Parent = viewportFrame
 	end)
-	v11:GetClassRemovingSignal():Connect(function(p1)
-		local obj = p1.obj
-		local v1 = t3[obj]
-		if v1 then
-			v1:Destroy()
+	characterBinder:GetClassRemovingSignal():Connect(function(boundInstance)
+		local obj = boundInstance.obj
+		local cloneManager = characterCloneMap[obj]
+		if cloneManager then
+			cloneManager:Destroy()
 		end
-		t3[obj] = nil
+		characterCloneMap[obj] = nil
 	end)
-	v1:GiveTask(function()
-		for v1, v2 in t3 do
-			v2:Destroy()
+	canvasMaid:GiveTask(function()
+		for characterKey, cloneManager in characterCloneMap do
+			cloneManager:Destroy()
 		end
-		table.clear(t3)
+		table.clear(characterCloneMap)
 	end)
-	v1:GiveTask(Interval.every(0.1):Connect(function()
-		local v1 = os.clock()
-		for v3, v4 in t3 do
-			local v2
-			local PrimaryPart = v4.character.PrimaryPart
-			if PrimaryPart then
-				local v5 = PrimaryPart.Position - cameraCFrame.p
-				local v6 = v5.Unit:Dot(cameraCFrame.LookVector)
-				v2 = if v5.Magnitude < p1.props.distance then math.cos((math.rad(p1.props.aspectRatio * p1.props.fieldOfView / 2))) < v6 else false
-				if v2 ~= v4.onScreen then
-					v4.onScreen = v2
-					v4.lastOnScreenChanged = v1
-					if v2 and p1.props.onCharacterEnter then
-						p1.props.onCharacterEnter(v4.character)
+	canvasMaid:GiveTask(Interval.every(0.1):Connect(function()
+		local currentTime = os.clock()
+		for characterKey, cloneManager in characterCloneMap do
+			local isVisible
+			local primaryPart = cloneManager.character.PrimaryPart
+			if primaryPart then
+				local viewVector = primaryPart.Position - cameraCFrame.p
+				local dotProduct = viewVector.Unit:Dot(cameraCFrame.LookVector)
+				isVisible = if viewVector.Magnitude < self.props.distance then math.cos((math.rad(self.props.aspectRatio * self.props.fieldOfView / 2))) < dotProduct else false
+				if isVisible ~= cloneManager.onScreen then
+					cloneManager.onScreen = isVisible
+					cloneManager.lastOnScreenChanged = currentTime
+					if isVisible and self.props.onCharacterEnter then
+						self.props.onCharacterEnter(cloneManager.character)
 					end
 				end
 			end
-			if v4.onScreen or v1 - v4.lastOnScreenChanged < 1 then
-				v4:Update()
+			if cloneManager.onScreen or currentTime - cloneManager.lastOnScreenChanged < 1 then
+				cloneManager:Update()
 			end
 		end
 	end))
-	local v15 = p1.fuzzRef:getValue()
-	local v16 = math.random() * 512
-	v1:GiveTask(RunService.Heartbeat:Connect(function()
-		v15.Position = UDim2.new(0.5, 0, math.cos(os.clock() * 512 + v16) * 0.05 + 0.5, 0)
+	local fuzzLabel = self.fuzzRef:getValue()
+	local fuzzOffset = math.random() * 512
+	canvasMaid:GiveTask(RunService.Heartbeat:Connect(function()
+		fuzzLabel.Position = UDim2.new(0.5, 0, math.cos(os.clock() * 512 + fuzzOffset) * 0.05 + 0.5, 0)
 	end))
 end
-function v1.didUpdate(p1, p2)
-	if (p1.props.cameraCFrame.p - p2.cameraCFrame.p).Magnitude > 0.1 then
-		p1:_redraw()
+function CCTVComponent.didUpdate(self, previousProps)
+	if (self.props.cameraCFrame.p - previousProps.cameraCFrame.p).Magnitude > 0.1 then
+		self:_redraw()
 	end
 end
-function v1.didMount(p1)
-	p1:_redraw()
+function CCTVComponent.didMount(self)
+	self:_redraw()
 end
-function v1.willUnmount(p1)
-	p1._maid:DoCleaning()
+function CCTVComponent.willUnmount(self)
+	self._maid:DoCleaning()
 end
-return v1
+return CCTVComponent

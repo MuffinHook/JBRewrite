@@ -7,9 +7,9 @@ local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
 function t.new(p1)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
-	return v1
+	local instance = BaseObject.new(p1)
+	setmetatable(instance, t)
+	return instance
 end
 function t.Get(p1)
 	local result = nil

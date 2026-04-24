@@ -17,14 +17,14 @@ local Interval = require(ReplicatedStorage.Std.Interval)
 local LevelUISystem = require(ReplicatedStorage.Game.Level2.LevelUISystem)
 local SpectateConsts = require(ReplicatedStorage.Spectate.SpectateConsts)
 local CircleAction = UI.CircleAction
-local v1 = Color3.fromRGB(4, 141, 39)
-local v2 = Color3.fromRGB(255, 255, 255)
-local v3 = if RunUtils.isStudio() then 20 else 600
+local color = Color3.fromRGB(4, 141, 39)
+local color2 = Color3.fromRGB(255, 255, 255)
+local var3 = if RunUtils.isStudio() then 20 else 600
 return {
 	launch = function(p1, p2)
-		local v12 = Binder.new("RoyaleBriefcase", function(p1)
-			local v1 = Maid.new()
-			v1:GiveTask(CircleAction.Add({
+		local instance12 = Binder.new("RoyaleBriefcase", function(p1)
+			local color = Maid.new()
+			color:GiveTask(CircleAction.Add({
 				Name = "Open Briefcase",
 				Timed = true,
 				Duration = 0.5,
@@ -39,24 +39,24 @@ return {
 				ValidRoot = p1
 			}, p1))
 			local function updatePosition()
-				local v12 = p1:GetAttribute("BriefcaseOrigin")
-				local v2 = p1:GetAttribute("BriefcaseTarget")
-				local v3 = p1:GetAttribute("BriefcaseLandNormal")
-				local v4 = p1:GetAttribute("BriefcaseDuration")
-				local v5 = p1:GetAttribute("BriefcaseBornAt")
-				local v6 = workspace:GetServerTimeNow() - v5
-				if v4 <= v6 then
-					v1.updatePosition = nil
-					v6 = v4
+				local instance12 = p1:GetAttribute("BriefcaseOrigin")
+				local color2 = p1:GetAttribute("BriefcaseTarget")
+				local var3 = p1:GetAttribute("BriefcaseLandNormal")
+				local var4 = p1:GetAttribute("BriefcaseDuration")
+				local var5 = p1:GetAttribute("BriefcaseBornAt")
+				local var6 = workspace:GetServerTimeNow() - var5
+				if var4 <= var6 then
+					color.updatePosition = nil
+					var6 = var4
 				end
-				p1:PivotTo(BriefcaseUtils.getCFrameAt(v6, v12, v2, v3, v4))
+				p1:PivotTo(BriefcaseUtils.getCFrameAt(var6, instance12, color2, var3, var4))
 			end
 			updatePosition()
-			v1.updatePosition = RunService.Heartbeat:Connect(updatePosition)
-			return v1
+			color.updatePosition = RunService.Heartbeat:Connect(updatePosition)
+			return color
 		end)
-		p1:GiveTask(v12)
-		v12:Start()
+		p1:GiveTask(instance12)
+		instance12:Start()
 		local RoyaleColorCorrection = Instance.new("ColorCorrectionEffect")
 		RoyaleColorCorrection.Name = "RoyaleColorCorrection"
 		RoyaleColorCorrection.Enabled = true
@@ -64,55 +64,55 @@ return {
 		RoyaleColorCorrection.Parent = game:GetService("Lighting")
 		p1:GiveTask(RoyaleColorCorrection)
 		local v22, v32 = Roact.createBinding(Vector3.new(0, 0, 0))
-		local v4, v5 = Roact.createBinding(0)
-		local v6, v7 = Roact.createBinding(Vector3.new(0, 0, 0))
+		local var4, var5 = Roact.createBinding(0)
+		local var6, v7 = Roact.createBinding(Vector3.new(0, 0, 0))
 		local v8, v9 = Roact.createBinding(0)
-		local v10 = false
-		local v11 = os.clock()
+		local var10 = false
+		local var11 = os.clock()
 		local function processCharacterInStorm(p12)
-			if os.clock() - v11 < 5 then
-			elseif v10 ~= p12 then
-				v10 = p12
+			if os.clock() - var11 < 5 then
+			elseif var10 ~= p12 then
+				var10 = p12
 				Audio.ObjectLocal(Players.LocalPlayer, 3217484827)
-				local v12 = os.clock()
+				local instance12 = os.clock()
 				p1.animateStormColor = RunService.Heartbeat:Connect(function()
-					local count = (os.clock() - v12) / 2
+					local count = (os.clock() - instance12) / 2
 					if count >= 1 then
 						p1.animateStormColor = nil
 					end
 					if not p12 then
 						count = 1 - count
 					end
-					RoyaleColorCorrection.TintColor = v2:Lerp(v1, count)
+					RoyaleColorCorrection.TintColor = color2:Lerp(color, count)
 				end)
 			end
 		end
-		local v122 = ReplicatedStorage.GameMode.Res:FindFirstChild("StormRing"):Clone()
-		v122.Transparency = 0
-		v122.Color = Color3.fromRGB(4, 141, 39)
-		local Mesh = v122:FindFirstChild("Mesh")
-		Mesh.VertexColor = Vector3.new(v1.R, v1.G, v1.B)
-		v122.Parent = workspace
-		p1:GiveTask(v122)
+		local var122 = ReplicatedStorage.GameMode.Res:FindFirstChild("StormRing"):Clone()
+		var122.Transparency = 0
+		var122.Color = Color3.fromRGB(4, 141, 39)
+		local Mesh = var122:FindFirstChild("Mesh")
+		Mesh.VertexColor = Vector3.new(color.R, color.G, color.B)
+		var122.Parent = workspace
+		p1:GiveTask(var122)
 		p1:GiveTask(RunService.Heartbeat:Connect(function()
-			local v1 = v22:getValue()
-			local v2 = p2:GetAttribute("StormWorldPosition")
-			if v2 then
-				local v3 = v1:Lerp(v2, 0.1)
-				v32(v3)
-				v1 = v3
+			local color = v22:getValue()
+			local color2 = p2:GetAttribute("StormWorldPosition")
+			if color2 then
+				local var3 = color:Lerp(color2, 0.1)
+				v32(var3)
+				color = var3
 			end
-			local sum = v4:getValue()
-			local v42 = p2:GetAttribute("StormWorldRadius")
-			if v42 then
-				sum = sum + (v42 - sum) * 0.1
-				v5(sum)
+			local sum = var4:getValue()
+			local var42 = p2:GetAttribute("StormWorldRadius")
+			if var42 then
+				sum = sum + (var42 - sum) * 0.1
+				var5(sum)
 			end
-			v122:FindFirstChild("Mesh").Scale = Vector3.new(2 * sum * 0.023809523809523808, 30, 2 * sum * 0.023809523809523808)
-			v122.CFrame = CFrame.new(v1.X, 500, v1.Z)
-			local v52 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-			if v52 then
-				processCharacterInStorm(if sum < ((v52.Position - v1) * Vector3.new(1, 0, 1)).Magnitude then v52.Parent:GetAttribute("BattleRoyaleAlive") == true else false)
+			var122:FindFirstChild("Mesh").Scale = Vector3.new(2 * sum * 0.023809523809523808, 30, 2 * sum * 0.023809523809523808)
+			var122.CFrame = CFrame.new(color.X, 500, color.Z)
+			local localPlayer = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+			if localPlayer then
+				processCharacterInStorm(if sum < ((localPlayer.Position - color) * Vector3.new(1, 0, 1)).Magnitude then localPlayer.Parent:GetAttribute("BattleRoyaleAlive") == true else false)
 			end
 		end))
 		local function updatePositionTarget()
@@ -128,43 +128,43 @@ return {
 		p1:GiveTask(MinimapService.addCircle({
 			name = "battleRoyale",
 			worldPositionBinding = v22,
-			worldRadiusBinding = v4,
-			color = v1,
+			worldRadiusBinding = var4,
+			color = color,
 			transparency = 0.8
 		}))
 		p1:GiveTask(MinimapService.addCircle({
 			name = "battleRoyaleTarget",
-			worldPositionBinding = v6,
+			worldPositionBinding = var6,
 			worldRadiusBinding = v8,
-			color = v1,
+			color = color,
 			transparency = 0.5
 		}))
 		LevelUISystem.hideTopbar()
 		p1:GiveTask(LevelUISystem.showTopbar)
-		local v13 = ReplicatedStorage.GameMode.Res:FindFirstChild("BRGui"):Clone()
-		p1:GiveTask(v13)
-		v13.Parent = Players.LocalPlayer.PlayerGui
-		v13.Enabled = true
-		v13.Stats.Players.ImageColor3 = Color3.fromRGB(78, 189, 72)
-		v13.Stats.Time.ImageColor3 = Color3.fromRGB(78, 189, 72)
-		v13.Stats.Players.TextLabel.TextColor3 = Color3.fromRGB(0, 255, 51)
-		v13.Stats.Time.TextLabel.TextColor3 = Color3.fromRGB(0, 255, 51)
-		v13.Stats.Visible = true
+		local var13 = ReplicatedStorage.GameMode.Res:FindFirstChild("BRGui"):Clone()
+		p1:GiveTask(var13)
+		var13.Parent = Players.LocalPlayer.PlayerGui
+		var13.Enabled = true
+		var13.Stats.Players.ImageColor3 = Color3.fromRGB(78, 189, 72)
+		var13.Stats.Time.ImageColor3 = Color3.fromRGB(78, 189, 72)
+		var13.Stats.Players.TextLabel.TextColor3 = Color3.fromRGB(0, 255, 51)
+		var13.Stats.Time.TextLabel.TextColor3 = Color3.fromRGB(0, 255, 51)
+		var13.Stats.Visible = true
 		local function updatePlayersAlive()
-			v13.Stats.Players.TextLabel.Text = tostring(#CollectionService:GetTagged(SpectateConsts.SPECTATE_TAG_NAME))
+			var13.Stats.Players.TextLabel.Text = tostring(#CollectionService:GetTagged(SpectateConsts.SPECTATE_TAG_NAME))
 		end
-		v13.Stats.Players.TextLabel.Text = tostring(#CollectionService:GetTagged(SpectateConsts.SPECTATE_TAG_NAME))
+		var13.Stats.Players.TextLabel.Text = tostring(#CollectionService:GetTagged(SpectateConsts.SPECTATE_TAG_NAME))
 		p1:GiveTask(CollectionService:GetInstanceAddedSignal(SpectateConsts.SPECTATE_TAG_NAME):Connect(updatePlayersAlive))
 		p1:GiveTask(CollectionService:GetInstanceRemovedSignal(SpectateConsts.SPECTATE_TAG_NAME):Connect(updatePlayersAlive))
-		local v15 = v3
-		local v16 = p2:GetAttribute("GameModeBornAt")
+		local var15 = var3
+		local var16 = p2:GetAttribute("GameModeBornAt")
 		p1:GiveTask(Interval.every(1):Connect(function()
-			local v1 = v15 - (workspace:GetServerTimeNow() - v16)
-			if v1 < 0 then
-				v1 = 0
+			local color = var15 - (workspace:GetServerTimeNow() - var16)
+			if color < 0 then
+				color = 0
 			end
-			local v2 = math.floor(v1 / 60)
-			v13.Stats.Time.TextLabel.Text = ("%02d:%02d"):format(v2, (math.floor(v1 % 60)))
+			local color2 = math.floor(color / 60)
+			var13.Stats.Time.TextLabel.Text = ("%02d:%02d"):format(color2, (math.floor(color % 60)))
 		end))
 	end
 }

@@ -46,9 +46,9 @@ return function(p1, p2)
 			return TextButton
 		end,
 		Update = function(p1)
-			local v1 = p1.Instance
-			v1.Text = p1.arguments.Text or "Button"
-			v1.Size = p1.arguments.Size or UDim2.fromOffset(0, 0)
+			local instance = p1.Instance
+			instance.Text = p1.arguments.Text or "Button"
+			instance.Size = p1.arguments.Size or UDim2.fromOffset(0, 0)
 		end,
 		Discard = function(p1)
 			p1.Instance:Destroy()

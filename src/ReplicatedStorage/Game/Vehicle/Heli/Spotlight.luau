@@ -14,8 +14,8 @@ local function ShortestAngle(p1, p2)
 end
 local function LookAt(p1, p2)
 	local Unit = (p2 - p1).Unit
-	local v1 = Unit:Cross(Vector3.new(1, 0, 0))
-	return CFrame.fromMatrix(p1, v1, (v1:Cross(Unit)))
+	local vector = Unit:Cross(Vector3.new(1, 0, 0))
+	return CFrame.fromMatrix(p1, vector, (vector:Cross(Unit)))
 end
 local SpotlightConstants = require(script.Parent.SpotlightConstants)
 local t = {}
@@ -67,9 +67,9 @@ function t.TransformLocalMousePosition(p1, p2)
 	return p2
 end
 function t.ProjectMouseLocationToWorld(p1, p2)
-	local v1 = CurrentCamera:ViewportPointToRay(p2.x, p2.y)
-	local _, v2, v3 = RayCast.RayIgnoreNonCollideWithIgnoreList(v1.Origin, v1.Direction, 999, p1.IgnoreList)
-	return p1:TransformLocalMousePosition(v2), v3
+	local vector = CurrentCamera:ViewportPointToRay(p2.x, p2.y)
+	local _, cframe2, cframe3 = RayCast.RayIgnoreNonCollideWithIgnoreList(vector.Origin, vector.Direction, 999, p1.IgnoreList)
+	return p1:TransformLocalMousePosition(cframe2), cframe3
 end
 function t.GetMouseLocation(p1)
 	if InputUtils.isTouch() then
@@ -115,9 +115,9 @@ function t.HookLocal(p1)
 	Decal.Transparency = 0.5
 	Decal.Parent = Part
 	p1.FakeCircle = Part
-	local v1, v2 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
-	p1.LastMouseWorldPosition = v1
-	p1.LastMouseWorldNormal = v2
+	local vector, cframe2 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
+	p1.LastMouseWorldPosition = vector
+	p1.LastMouseWorldNormal = cframe2
 	p1.Maid.LocalMaid:GiveTask(RunService.Heartbeat:Connect(function()
 		p1:UpdateMousePosition()
 	end))
@@ -141,58 +141,58 @@ function t.SetDistance(p1, p2)
 	p1.Distance = p2
 end
 function t.UpdateMousePosition(p1)
-	local v1, v2
+	local vector, cframe2
 	if InputUtils.isTouch() then
-		local v3, v4 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
-		v1 = v3
-		v2 = v4
+		local cframe3, v4 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
+		vector = cframe3
+		cframe2 = v4
 	elseif InputUtils.isGamepad() then
 		local v5, v6 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
-		v1 = v5
-		v2 = v6
+		vector = v5
+		cframe2 = v6
 	elseif UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) or not p1.LastMouseWorldPosition then
 		local v7, v8 = p1:ProjectMouseLocationToWorld((p1:GetMouseLocation()))
 		p1.LastMouseWorldPosition = v7
 		p1.LastMouseWorldNormal = v8
-		v1 = v7
-		v2 = v8
+		vector = v7
+		cframe2 = v8
 	else
-		v1 = p1.LastMouseWorldPosition
-		v2 = p1.LastMouseWorldNormal
+		vector = p1.LastMouseWorldPosition
+		cframe2 = p1.LastMouseWorldNormal
 	end
-	local v9 = v1 - p1.Beam.Attachment0.WorldPosition
-	local Magnitude = v9.Magnitude
+	local var9 = vector - p1.Beam.Attachment0.WorldPosition
+	local Magnitude = var9.Magnitude
 	if Magnitude > 160 then
 		Magnitude = 160
 		if p1.FakeCircle.Parent ~= nil then
 			p1.FakeCircle.Parent = nil
 		end
-		v1 = p1.Beam.Attachment0.WorldPosition + p1.SpotlightMotor.Part1.CFrame.LookVector * 160
+		vector = p1.Beam.Attachment0.WorldPosition + p1.SpotlightMotor.Part1.CFrame.LookVector * 160
 	else
-		local v10 = v9.Unit * Magnitude + p1.Beam.Attachment0.WorldPosition
-		p1.FakeCircle.CFrame = CFrame.new(v10, v10 + v2)
+		local var10 = var9.Unit * Magnitude + p1.Beam.Attachment0.WorldPosition
+		p1.FakeCircle.CFrame = CFrame.new(var10, var10 + cframe2)
 		if p1.FakeCircle.Parent ~= workspace then
 			p1.FakeCircle.Parent = workspace
 		end
 	end
 	p1:SetDistance(Magnitude)
-	local v11, v12, v13 = p1.SpotlightMotor.Part1.CFrame:ToObjectSpace(LookAt(p1.SpotlightMotor.Part1.Position, v1)):ToEulerAnglesXYZ()
+	local v11, v12, v13 = p1.SpotlightMotor.Part1.CFrame:ToObjectSpace(LookAt(p1.SpotlightMotor.Part1.Position, vector)):ToEulerAnglesXYZ()
 	local x = p1.SpringAngles:Update().x
-	local v14 = Vector3.new((v11 - x + math.pi) % 6.283185307179586 - math.pi + x, v12, v13)
-	p1:SetAngles(v14)
-	local v15 = tick()
-	if v15 - p1.LastUpdateAngleDistance > 0.125 then
-		p1.LastUpdateAngleDistance = v15
-		p1.RemoteEvent:FireServer(SpotlightConstants.EVENT_UPDATE_ANGLE_DISTANCE, v14, Magnitude)
+	local vector14 = Vector3.new((v11 - x + math.pi) % 6.283185307179586 - math.pi + x, v12, v13)
+	p1:SetAngles(vector14)
+	local var15 = tick()
+	if var15 - p1.LastUpdateAngleDistance > 0.125 then
+		p1.LastUpdateAngleDistance = var15
+		p1.RemoteEvent:FireServer(SpotlightConstants.EVENT_UPDATE_ANGLE_DISTANCE, vector14, Magnitude)
 	end
 end
 function t.Update(p1)
-	local v1 = p1.SpringAngles:Update()
-	local v2 = CFrame.fromEulerAnglesXYZ(v1.X, v1.Y, v1.Z)
+	local vector = p1.SpringAngles:Update()
+	local cframe2 = CFrame.fromEulerAnglesXYZ(vector.X, vector.Y, vector.Z)
 	local Distance = p1.Distance
-	p1.SpotlightMotor.C1 = v2
-	local v3 = p1.SpotlightMotor.Part0.CFrame
-	p1.Attachment.WorldPosition = v3.p + v3.LookVector * (Distance + 4)
+	p1.SpotlightMotor.C1 = cframe2
+	local cframe3 = p1.SpotlightMotor.Part0.CFrame
+	p1.Attachment.WorldPosition = cframe3.p + cframe3.LookVector * (Distance + 4)
 	p1.Beam.TextureLength = Distance + 4
 	p1.Beam.Width1 = Distance * 2 / 3
 	if p1.Maid.LocalMaid == nil and p1.PoliceValue.Value then
@@ -202,7 +202,7 @@ function t.Update(p1)
 			if Humanoid ~= nil then
 				local RootPart = Humanoid.RootPart
 				if RootPart ~= nil then
-					p1.IsLocalInSpotlight = Math.DoesFixedConeIntersectSphere(v3.p, v3.LookVector, Distance + 4, 0.23561944901923448, RootPart.Position, 3)
+					p1.IsLocalInSpotlight = Math.DoesFixedConeIntersectSphere(cframe3.p, cframe3.LookVector, Distance + 4, 0.23561944901923448, RootPart.Position, 3)
 				end
 			end
 		end

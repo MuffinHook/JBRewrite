@@ -7,9 +7,9 @@ return {
 		if t[p1] then
 			return t[p1]
 		else
-			local v1 = HashMutex.new()
-			t[p1] = v1
-			return v1
+			local instance = HashMutex.new()
+			t[p1] = instance
+			return instance
 		end
 	end
 }

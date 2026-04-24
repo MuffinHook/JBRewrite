@@ -40,11 +40,11 @@ function t.new(itemObj)
 	instance._overriddenOwner = nil
 	return instance
 end
-function t.GetName(p1)
-	return InventoryItemUtils.getName(p1.obj)
+function t.GetName(self)
+	return InventoryItemUtils.getName(self.obj)
 end
-function t.GetOwner(p1)
-	local v1 = p1.obj.Parent.Parent
+function t.GetOwner(self)
+	local v1 = self.obj.Parent.Parent
 	if v1 then
 		local v2 = InventoryItemOwnerBinder:Get(v1)
 		if v2 then
@@ -55,8 +55,8 @@ function t.GetOwner(p1)
 		end
 	end
 end
-function t.PromiseOwner(p1)
-	local v1 = p1.obj.Parent.Parent
+function t.PromiseOwner(self)
+	local v1 = self.obj.Parent.Parent
 	if v1 then
 		if v1.Parent == game:GetService("Players") then
 			return Promise.resolve(v1)
@@ -65,34 +65,34 @@ function t.PromiseOwner(p1)
 		end
 	end
 end
-function t.GetAttr(p1, ...)
-	return InventoryItemUtils.getAttr(p1.obj, ...)
+function t.GetAttr(self, ...)
+	return InventoryItemUtils.getAttr(self.obj, ...)
 end
-function t.SetAttr(p1, ...)
-	InventoryItemUtils.setAttr(p1.obj, ...)
+function t.SetAttr(self, ...)
+	InventoryItemUtils.setAttr(self.obj, ...)
 end
-function t.GetEquipped(p1, ...)
-	return InventoryItemUtils.getEquipped(p1.obj, ...)
+function t.GetEquipped(self, ...)
+	return InventoryItemUtils.getEquipped(self.obj, ...)
 end
-function t.SetEquipped(p1, ...)
-	InventoryItemUtils.setEquipped(p1.obj, ...)
+function t.SetEquipped(self, ...)
+	InventoryItemUtils.setEquipped(self.obj, ...)
 end
-function t.GetEquippedSignal(p1)
-	return InventoryItemUtils.getEquippedSignal(p1.obj)
+function t.GetEquippedSignal(self)
+	return InventoryItemUtils.getEquippedSignal(self.obj)
 end
-function t.AttemptSetEquipped(p1, p2)
+function t.AttemptSetEquipped(self, p2)
 	assert(p2 ~= nil, "missing value")
-	InventoryItemUtils.setEquipped(p1.obj, p2)
-	p1.obj:FindFirstChild(InventoryItemConsts.EQUIP_REMOTE_NAME):FireServer(p2)
+	InventoryItemUtils.setEquipped(self.obj, p2)
+	self.obj:FindFirstChild(InventoryItemConsts.EQUIP_REMOTE_NAME):FireServer(p2)
 end
-function t.AttemptSelect(p1)
-	p1.onAttemptSelect:Fire()
+function t.AttemptSelect(self)
+	self.onAttemptSelect:Fire()
 end
-function t.AttemptDrop(p1)
-	p1.onAttemptDrop:Fire()
+function t.AttemptDrop(self)
+	self.onAttemptDrop:Fire()
 end
-function t.Destroy(p1)
-	p1._maid:Destroy()
-	setmetatable(p1, nil)
+function t.Destroy(self)
+	self._maid:Destroy()
+	setmetatable(self, nil)
 end
 return t

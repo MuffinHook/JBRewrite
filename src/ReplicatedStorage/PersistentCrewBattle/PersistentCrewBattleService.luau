@@ -46,15 +46,15 @@ local function playDrums()
 end
 local t = {}
 function t.init()
-	local counter = false
-	PrivateServerUtils.promiseGetIsBattleServer():timeout(10):andThen(function(self)
-		if self then
-			counter = true
+	local isBattleServer = false
+	PrivateServerUtils.promiseGetIsBattleServer():timeout(10):andThen(function(battleServerResult)
+		if battleServerResult then
+			isBattleServer = true
 			t.initBattleServer()
 		end
 	end)
 end
-local counter = 0
+local countdownTimesPlayed = 0
 function t.initBattleServer()
 	LevelUISystem.hideTopbar()
 	Roact.mount(createElement("ScreenGui", {
@@ -66,56 +66,56 @@ function t.initBattleServer()
 			store = persistentCrewStore
 		}, { createElement(GameModeCrewApp, {
 				onCountdownFinished = function()
-					if counter < 1 and Players.LocalPlayer.PlayerGui then
+					if countdownTimesPlayed < 1 and Players.LocalPlayer.PlayerGui then
 						Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617487453, {
 							Volume = 0.5
 						})
 					end
-					counter = counter + 1
+					countdownTimesPlayed = countdownTimesPlayed + 1
 				end
 			}) }) }), Players.LocalPlayer.PlayerGui, "PersistentCrewUI")
 	persistentCrewStore:dispatch({
 		type = "setIsBattleServer",
 		value = true
 	})
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ALL_CREW_BATTLE_DATA_OBJ_NAME):andThen(function(self)
-		RxInstanceUtils.observeChildren(self, function(self, self)
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ALL_CREW_BATTLE_DATA_OBJ_NAME):andThen(function(allCrewBattleData)
+		RxInstanceUtils.observeChildren(allCrewBattleData, function(maid, crewBattleObj)
 			local function handleChange()
-				local counter = PersistentCrewBattleUtils.getCrewStartTime(self)
-				local local2 = PersistentCrewBattleUtils.getCrewPenaltyDuration(self)
-				if counter and local2 then
+				local crewStartTime = PersistentCrewBattleUtils.getCrewStartTime(crewBattleObj)
+				local penaltyDuration = PersistentCrewBattleUtils.getCrewPenaltyDuration(crewBattleObj)
+				if crewStartTime and penaltyDuration then
 					persistentCrewStore:dispatch({
 						type = "setStartedAt",
-						clanId = self.Name,
-						value = counter - local2
+						clanId = crewBattleObj.Name,
+						value = crewStartTime - penaltyDuration
 					})
 				end
-				local local3 = PersistentCrewBattleUtils.getCrewTimeTook(self)
-				if local3 then
+				local timeTook = PersistentCrewBattleUtils.getCrewTimeTook(crewBattleObj)
+				if timeTook then
 					persistentCrewStore:dispatch({
 						type = "setTimeTook",
-						clanId = self.Name,
-						value = local3
+						clanId = crewBattleObj.Name,
+						value = timeTook
 					})
 				end
 			end
 			handleChange()
-			self:GiveTask(self:GetAttributeChangedSignal(PersistentCrewBattleConsts.ROUND_START_ATTR_NAME):Connect(handleChange))
-			self:GiveTask(self:GetAttributeChangedSignal(PersistentCrewBattleConsts.ROUND_PENALTY_DURATION_ATTR_NAME):Connect(handleChange))
-			self:GiveTask(self:GetAttributeChangedSignal(PersistentCrewBattleConsts.ROUND_TIME_TOOK_ATTR_NAME):Connect(handleChange))
+			maid:GiveTask(maid:GetAttributeChangedSignal(PersistentCrewBattleConsts.ROUND_START_ATTR_NAME):Connect(handleChange))
+			maid:GiveTask(maid:GetAttributeChangedSignal(PersistentCrewBattleConsts.ROUND_PENALTY_DURATION_ATTR_NAME):Connect(handleChange))
+			maid:GiveTask(maid:GetAttributeChangedSignal(PersistentCrewBattleConsts.ROUND_TIME_TOOK_ATTR_NAME):Connect(handleChange))
 			local function handleClanName()
 				persistentCrewStore:dispatch({
 					type = "setClanName",
-					clanId = self.Name,
-					value = self:GetAttribute(PersistentCrewBattleConsts.CLAN_NAME_ATTR_NAME)
+					clanId = crewBattleObj.Name,
+					value = crewBattleObj:GetAttribute(PersistentCrewBattleConsts.CLAN_NAME_ATTR_NAME)
 				})
 			end
 			persistentCrewStore:dispatch({
 				type = "setClanName",
-				clanId = self.Name,
-				value = self:GetAttribute(PersistentCrewBattleConsts.CLAN_NAME_ATTR_NAME)
+				clanId = crewBattleObj.Name,
+				value = crewBattleObj:GetAttribute(PersistentCrewBattleConsts.CLAN_NAME_ATTR_NAME)
 			})
-			self:GiveTask(self:GetAttributeChangedSignal(PersistentCrewBattleConsts.CLAN_NAME_ATTR_NAME):Connect(handleClanName))
+			maid:GiveTask(maid:GetAttributeChangedSignal(PersistentCrewBattleConsts.CLAN_NAME_ATTR_NAME):Connect(handleClanName))
 		end)
 		local function updateAttackingClanId()
 			persistentCrewStore:dispatch({
@@ -129,26 +129,26 @@ function t.initBattleServer()
 		})
 		PersistentCrewBattleUtils.getAttackingClanIdChangedSignal():Connect(updateAttackingClanId)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ROBBERIES_COMPLETED_REMOTE_NAME):andThen(function(self)
-		local function receiveRobberiesCompleted(self)
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ROBBERIES_COMPLETED_REMOTE_NAME):andThen(function(robberiesCompletedRemote)
+		local function receiveRobberiesCompleted(robberiesData)
 			persistentCrewStore:dispatch({
 				type = "setRobberiesCompleted",
-				value = self
+				value = robberiesData
 			})
 		end
-		self.OnClientEvent:Connect(receiveRobberiesCompleted)
+		robberiesCompletedRemote.OnClientEvent:Connect(receiveRobberiesCompleted)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ANNOUNCE_PENALTY_REMOTE_NAME):andThen(function(self)
-		self.OnClientEvent:Connect(function(self, self)
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ANNOUNCE_PENALTY_REMOTE_NAME):andThen(function(announcePenaltyRemote)
+		announcePenaltyRemote.OnClientEvent:Connect(function(penaltyType, penaltyDurationSecs)
 			persistentCrewStore:dispatch({
 				type = "setPenaltyText",
-				value = ("%s +%ss"):format(self, self)
+				value = ("%s +%ss"):format(penaltyType, penaltyDurationSecs)
 			})
 		end)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ANNOUNCE_WIN_REMOTE_NAME):andThen(function(self)
-		self.OnClientEvent:Connect(function(self)
-			if self then
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.ANNOUNCE_WIN_REMOTE_NAME):andThen(function(announceWinRemote)
+		announceWinRemote.OnClientEvent:Connect(function(didWin)
+			if didWin then
 				if Players.LocalPlayer.PlayerGui then
 					Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617488605, {
 						Volume = 1
@@ -161,15 +161,15 @@ function t.initBattleServer()
 			end
 		end)
 	end)
-	local local12 = nil
-	persistentCrewStore.changed:connect(function(self, self)
-		if self.penalty ~= self.penalty then
-			if local12 then
-				task.cancel(local12)
-				local12 = nil
+	local penaltyTimeoutTask = nil
+	persistentCrewStore.changed:connect(function(newState, oldState)
+		if newState.penalty ~= oldState.penalty then
+			if penaltyTimeoutTask then
+				task.cancel(penaltyTimeoutTask)
+				penaltyTimeoutTask = nil
 			end
-			if self.penalty then
-				local12 = task.delay(5, function()
+			if newState.penalty then
+				penaltyTimeoutTask = task.delay(5, function()
 					persistentCrewStore:dispatch({
 						type = "setPenaltyText",
 						value = nil
@@ -184,17 +184,17 @@ function t.initNonBattleServer()
 		type = "setIsBattleServer",
 		value = false
 	})
-	waitForChild(Players.LocalPlayer, PersistentCrewBattleConsts.INVITES_FOLDER_NAME):andThen(function(self)
+	waitForChild(Players.LocalPlayer, PersistentCrewBattleConsts.INVITES_FOLDER_NAME):andThen(function(invitesFolder)
 		local function updateInitiations()
-			local t = {}
-			for counter, local2 in self:GetChildren() do
-				table.insert(t, {
-					clanName = local2:GetAttribute(PersistentCrewBattleConsts.INVITE_OPPOSING_CLAN_NAME_ATTR_NAME),
-					battleNumPlayersPerTeam = local2:GetAttribute(PersistentCrewBattleConsts.INVITE_NUM_PLAYERS_PER_TEAM_ATTR_NAME),
-					clanRating = local2:GetAttribute(PersistentCrewBattleConsts.INVITE_CLAN_DISPLAY_RATING_ATTR_NAME),
-					ranked = local2:GetAttribute(PersistentCrewBattleConsts.INVITE_RANKED_ATTR_NAME),
-					opposingClanOwnerName = local2:GetAttribute(PersistentCrewBattleConsts.INVITE_OPPOSING_CLAN_OWNER_NAME_ATTR_NAME),
-					obj = local2
+			local invitesList = {}
+			for _, inviteObj in invitesFolder:GetChildren() do
+				table.insert(invitesList, {
+					clanName = inviteObj:GetAttribute(PersistentCrewBattleConsts.INVITE_OPPOSING_CLAN_NAME_ATTR_NAME),
+					battleNumPlayersPerTeam = inviteObj:GetAttribute(PersistentCrewBattleConsts.INVITE_NUM_PLAYERS_PER_TEAM_ATTR_NAME),
+					clanRating = inviteObj:GetAttribute(PersistentCrewBattleConsts.INVITE_CLAN_DISPLAY_RATING_ATTR_NAME),
+					ranked = inviteObj:GetAttribute(PersistentCrewBattleConsts.INVITE_RANKED_ATTR_NAME),
+					opposingClanOwnerName = inviteObj:GetAttribute(PersistentCrewBattleConsts.INVITE_OPPOSING_CLAN_OWNER_NAME_ATTR_NAME),
+					obj = inviteObj
 				})
 				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 9781039157, {
 					Volume = 0.2
@@ -202,46 +202,46 @@ function t.initNonBattleServer()
 			end
 			persistentCrewStore:dispatch({
 				type = "battleInvitesSet",
-				list = t
+				list = invitesList
 			})
 		end
 		updateInitiations()
-		self.ChildAdded:Connect(updateInitiations)
-		self.ChildRemoved:Connect(updateInitiations)
+		invitesFolder.ChildAdded:Connect(updateInitiations)
+		invitesFolder.ChildRemoved:Connect(updateInitiations)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.LEADERBOARD_INFO_REMOTE_NAME):andThen(function(self)
-		self.OnClientEvent:Connect(function(self)
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.LEADERBOARD_INFO_REMOTE_NAME):andThen(function(leaderboardInfoRemote)
+		leaderboardInfoRemote.OnClientEvent:Connect(function(leaderboardData)
 			persistentCrewBattleStore:dispatch({
 				type = "setCrewLeaderboard",
-				value = self
+				value = leaderboardData
 			})
 		end)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.CREWS_IN_SERVER_DISPLAY_INFO_REMOTE_NAME):andThen(function(self)
-		self.OnClientEvent:Connect(function(self)
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.CREWS_IN_SERVER_DISPLAY_INFO_REMOTE_NAME):andThen(function(crewsInServerRemote)
+		crewsInServerRemote.OnClientEvent:Connect(function(crewsDisplayData)
 			persistentCrewBattleStore:dispatch({
 				type = "setCrewsInServerDisplayInfo",
-				value = self
+				value = crewsDisplayData
 			})
 		end)
 	end)
-	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.UPDATE_BATTLE_RESPONSES_REMOTE_NAME):andThen(function(self)
-		local counter = 0
-		self.OnClientEvent:Connect(function(self, self)
-			local battleResponseData = persistentCrewStore:getState().battleResponseData
-			if self ~= nil or (battleResponseData == nil or self == battleResponseData.BattleUniqueId) then
-				if self then
-					local local3 = if self.OurClanAccepted then #self.OurClanAccepted else 0 + if self.TheirClanAccepted then #self.TheirClanAccepted else 0
-					if counter < local3 and Players.LocalPlayer.PlayerGui then
+	waitForChild(ReplicatedStorage, PersistentCrewBattleConsts.UPDATE_BATTLE_RESPONSES_REMOTE_NAME):andThen(function(battleResponsesRemote)
+		local acceptedCountPrevious = 0
+		battleResponsesRemote.OnClientEvent:Connect(function(battleResponseData, otherData)
+			local currentBattleResponseData = persistentCrewStore:getState().battleResponseData
+			if battleResponseData ~= nil or (currentBattleResponseData == nil or battleResponseData == currentBattleResponseData.BattleUniqueId) then
+				if battleResponseData then
+					local acceptedCountCurrent = if battleResponseData.OurClanAccepted then #battleResponseData.OurClanAccepted else 0 + if battleResponseData.TheirClanAccepted then #battleResponseData.TheirClanAccepted else 0
+					if acceptedCountPrevious < acceptedCountCurrent and Players.LocalPlayer.PlayerGui then
 						Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617498616, {
 							Volume = 0.5
 						})
 					end
-					counter = local3
+					acceptedCountPrevious = acceptedCountCurrent
 				end
 				persistentCrewStore:dispatch({
 					type = "setBattleResponseData",
-					value = self
+					value = battleResponseData
 				})
 			end
 		end)

@@ -10,13 +10,13 @@ return Rodux.createReducer({}, {
 			local v1
 			assert(v3.Id, "missing Id")
 			local TypeEnum = v3.TypeEnum
-			local v4 = SAFE_DATA[TypeEnum]
-			v1 = v4 ~= nil
+			local var4 = SAFE_DATA[TypeEnum]
+			v1 = var4 ~= nil
 			assert(v1, "missing safeTierData")
 			table.insert(t, {
 				name = ("%s_%s"):format(TypeEnum, v2),
 				typeEnum = TypeEnum,
-				imageId = v4.ImageId,
+				imageId = var4.ImageId,
 				itemOwnedId = v3.Id
 			})
 		end

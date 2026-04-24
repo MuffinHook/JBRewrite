@@ -1,13 +1,14 @@
 -- Reviewed by Claude
+-- variables reassigned
 local prettyPrint = require(script.Parent.prettyPrint)
-local t = {
+local loggerMiddleware = {
 	outputFunction = print
 }
-function t.middleware(p1, p2)
-	return function(p12)
- local v1 = p1(p12)
- t.outputFunction(("Action dispatched: %s\nState changed to: %s"):format(prettyPrint(p12), prettyPrint(p2:getState())))
- return v1
+function loggerMiddleware.middleware(nextDispatch, store)
+	return function(action)
+ local result = nextDispatch(action)
+ loggerMiddleware.outputFunction(("Action dispatched: %s\nState changed to: %s"):format(prettyPrint(action), prettyPrint(store:getState())))
+ return result
 	end
 end
-return t
+return loggerMiddleware

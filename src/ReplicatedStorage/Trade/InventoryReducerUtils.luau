@@ -3,12 +3,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TradeReducerUtils = require(ReplicatedStorage.Trade.TradeReducerUtils)
 return {
-	setItemsOwned = function(p1, p2)
-		assert(p2.itemsOwned ~= nil, "missing itemsOwned")
+	setItemsOwned = function(state, action)
+		assert(action.itemsOwned ~= nil, "missing itemsOwned")
 		local itemCountMap = {}
 		local processedItems = {}
-		for i = 1, #p2.itemsOwned do
-			local itemProps = TradeReducerUtils.buildItemProps(p2.itemsOwned[i])
+		for i = 1, #action.itemsOwned do
+			local itemProps = TradeReducerUtils.buildItemProps(action.itemsOwned[i])
 			if itemProps then
 				itemProps.timeSortMetric = -i
 				itemProps.primaryIndex = i

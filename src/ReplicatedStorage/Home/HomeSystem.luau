@@ -13,12 +13,12 @@ local t = {
 function t.init()
 	HomeBinder:Start()
 	Interval.every(0.25):Connect(function()
-		local v1 = t.queryCurrentStandingHome()
-		if t._currentStandingHome ~= v1 then
+		local localPlayer = t.queryCurrentStandingHome()
+		if t._currentStandingHome ~= localPlayer then
 			local _currentStandingHome = t._currentStandingHome
-			t._currentStandingHome = v1
-			if v1 then
-				t.onEntered:Fire(v1)
+			t._currentStandingHome = localPlayer
+			if localPlayer then
+				t.onEntered:Fire(localPlayer)
 				return
 			end
 			t.onExited:Fire(_currentStandingHome)
@@ -26,9 +26,9 @@ function t.init()
 	end)
 end
 function t.queryCurrentStandingHome()
-	local v1 = PlayerUtils.getRootPart(LocalPlayer)
-	if v1 then
-		local Position = v1.Position
+	local localPlayer = PlayerUtils.getRootPart(LocalPlayer)
+	if localPlayer then
+		local Position = localPlayer.Position
 		for i, v in ipairs(HomeBinder:GetAll()) do
 			if v:IsPointInStandingPrism(Position) then
 				return v

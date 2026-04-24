@@ -73,9 +73,9 @@ end
 function v1._computeShopItems(p1)
 	local t = {}
 	for v1, v2 in SAFE_DATA[p1.props.safesSelectedTypeEnum].RewardData do
- local v3 = getItemPropsFromRewardData(v2)
- v3.owned = p1:_isRewardOwned(v2)
- table.insert(t, v3)
+ local var3 = getItemPropsFromRewardData(v2)
+ var3.owned = p1:_isRewardOwned(v2)
+ table.insert(t, var3)
 	end
 	table.sort(t, function(p1, p2)
  if p1.rarityIndex == p2.rarityIndex then
@@ -117,19 +117,19 @@ function v1.render(p1)
  t[typeEnum] = t2
  end
  for v1, v2 in p1.props.safesInventoryItems do
- local v3 = t[v2.typeEnum]
- v3.count = v3.count + 1
+ local var3 = t[v2.typeEnum]
+ var3.count = var3.count + 1
  end
  if p1.props.inventoryOpen then
- local v4 = TableUtils.filter(p1.props.safesInventoryItems, function(p12)
+ local table4 = TableUtils.filter(p1.props.safesInventoryItems, function(p12)
  return p12.typeEnum == p1.props.safesSelectedTypeEnum
  end)
  local t2 = {}
- for j = 1, #v4 do
- local v5 = v4[j]
+ for j = 1, #table4 do
+ local var5 = table4[j]
  table.insert(t2, {
  onSelect = function()
- p1.onSafeOpen(v5.itemOwnedId)
+ p1.onSafeOpen(var5.itemOwnedId)
  end
  })
  end
@@ -139,7 +139,7 @@ function v1.render(p1)
  anchorPoint = p1.props.anchorPoint,
  sidebarItems = p1.state.shopSidebarItems,
  sidebarItemMetadata = t,
- items = v4,
+ items = table4,
  itemMetadata = t2,
  onSelectBuySafes = p1.onSelectBuySafes,
  onSelectExit = p1.onSelectExit

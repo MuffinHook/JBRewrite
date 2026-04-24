@@ -14,47 +14,47 @@ function t.new()
 	t2._beforeOpenFun = nil
 	return t2
 end
-function t.GetOnOpenedSignal(p1)
-	if not p1._onOpened then
-		p1._onOpened = Signal.new()
-		p1._maid:GiveTask(p1._onOpened)
+function t.GetOnOpenedSignal(self)
+	if not self._onOpened then
+		self._onOpened = Signal.new()
+		self._maid:GiveTask(self._onOpened)
 	end
-	return p1._onOpened
+	return self._onOpened
 end
-function t.GetOnClosedSignal(p1)
-	if not p1._onClosed then
-		p1._onClosed = Signal.new()
-		p1._maid:GiveTask(p1._onClosed)
+function t.GetOnClosedSignal(self)
+	if not self._onClosed then
+		self._onClosed = Signal.new()
+		self._maid:GiveTask(self._onClosed)
 	end
-	return p1._onClosed
+	return self._onClosed
 end
-function t.Open(p1)
-	assert(not p1._isOpen)
-	p1._isOpen = true
-	if p1._beforeOpenFun then
-		p1:_beforeOpenFun()
+function t.Open(self)
+	assert(not self._isOpen)
+	self._isOpen = true
+	if self._beforeOpenFun then
+		self:_beforeOpenFun()
 	end
-	if p1._onOpened then
-		p1._onOpened:Fire()
-	end
-end
-function t.Close(p1)
-	assert(p1._isOpen)
-	p1._isOpen = false
-	if p1._onClosed then
-		p1._onClosed:Fire()
+	if self._onOpened then
+		self._onOpened:Fire()
 	end
 end
-function t.IsOpen(p1)
-	return p1._isOpen
-end
-function t.Destroy(p1)
-	assert(p1._maid)
-	if p1:IsOpen() then
-		p1:Close()
+function t.Close(self)
+	assert(self._isOpen)
+	self._isOpen = false
+	if self._onClosed then
+		self._onClosed:Fire()
 	end
-	local _maid_2 = p1._maid
-	p1._maid = nil
+end
+function t.IsOpen(self)
+	return self._isOpen
+end
+function t.Destroy(self)
+	assert(self._maid)
+	if self:IsOpen() then
+		self:Close()
+	end
+	local _maid_2 = self._maid
+	self._maid = nil
 	_maid_2:Destroy()
 end
 return t

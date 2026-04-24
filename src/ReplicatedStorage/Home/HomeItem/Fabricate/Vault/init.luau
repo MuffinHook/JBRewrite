@@ -16,10 +16,10 @@ local LocalPlayer = Players.LocalPlayer
 local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
 local t = {}
 t.__index = t
-function t.new(p1)
+function t.new(self)
 	local t2 = {}
 	setmetatable(t2, t)
-	t2._homeItem = p1
+	t2._homeItem = self
 	t2._obj = t2._homeItem._obj
 	t2.obj = t2._obj
 	t2._maid = Maid.new()
@@ -38,68 +38,68 @@ function t.new(p1)
 	t2:_findDoor()
 	return t2
 end
-function t._setArmJ(p1, p2)
-	for i, v in ipairs(DoorUtils.getInnerModel(p1._doorModel):GetChildren()) do
+function t._setArmJ(self, p2)
+	for i, v in ipairs(DoorUtils.getInnerModel(self._doorModel):GetChildren()) do
 		if v.Name == "Arm" then
-			local v2 = v.CFrame
+			local cframe2 = v.CFrame
 			v.Size = Vector3.new(p2 * 7.6 + (1 - p2) * 4, 0.5, 0.5)
-			v.CFrame = v2
+			v.CFrame = cframe2
 		end
 	end
 end
-function t._onDeadlineChanged(p1)
-	local v1 = Time.GetNowSync()
-	if v1 < p1:GetDeadline() then
-		p1._maid._deadlineLoop = Interval.every(1):Connect(function()
-			v1 = Time.GetNowSync()
-			local v12 = p1:GetDeadline() - v1
-			if v12 < 0 then
-				v12 = 0
+function t._onDeadlineChanged(self)
+	local instance = Time.GetNowSync()
+	if instance < self:GetDeadline() then
+		self._maid._deadlineLoop = Interval.every(1):Connect(function()
+			instance = Time.GetNowSync()
+			local var12 = self:GetDeadline() - instance
+			if var12 < 0 then
+				var12 = 0
 			end
-			p1:_updateDeadlineUi(v12)
-			if v12 == 0 then
-				p1._maid._deadlineLoop = nil
+			self:_updateDeadlineUi(var12)
+			if var12 == 0 then
+				self._maid._deadlineLoop = nil
 			end
 		end)
 	else
-		p1:_updateDeadlineUi(0)
+		self:_updateDeadlineUi(0)
 	end
 end
-function t._findDoor(p1)
-	local Door = p1._obj:WaitForChild("Door")
-	p1._doorModel = Door
+function t._findDoor(self)
+	local Door = self._obj:WaitForChild("Door")
+	self._doorModel = Door
 	BinderUtils.promiseBoundClass(DoorBinder, Door):andThen(function(p12)
-		p1:_receiveDoor(p12)
+		self:_receiveDoor(p12)
 	end):catch(warn)
 end
-function t._receiveDoor(p1, p2)
+function t._receiveDoor(self, p2)
 	local function preUpdateFun(p12)
-		local v1 = DoorUtils.getOpen(p1._doorModel)
-		local v2 = p1:IsCounting()
-		local v3 = p1._homeItem:GetHome()
+		local instance = DoorUtils.getOpen(self._doorModel)
+		local cframe2 = self:IsCounting()
+		local var3 = self._homeItem:GetHome()
 		local v4
-		if v3 and (v3:HasPermissionToEnter(LocalPlayer) and not v2) then
+		if var3 and (var3:HasPermissionToEnter(LocalPlayer) and not cframe2) then
 			p12.Name = "Arm"
 			v4 = true
 		else
 			v4 = false
 		end
-		if p1._homeItem:IsBeingDragged() then
+		if self._homeItem:IsBeingDragged() then
 			v4 = false
 		end
-		if not v1 then
+		if not instance then
 			v4 = false
 		end
 		p12.Enabled = v4
 	end
 	local function action(p12, p2)
 		if p2 then
-			p1._vaultInteractRemote:FireServer()
+			self._vaultInteractRemote:FireServer()
 			return true
 		end
 	end
-	local Body = DoorUtils.getInnerModel(p1.obj.Door).Body
-	p1.maid:GiveTask(function()  end)
+	local Body = DoorUtils.getInnerModel(self.obj.Door).Body
+	self.maid:GiveTask(function()  end)
 	CircleAction.Add({
 		Part = Body,
 		Name = "",
@@ -110,47 +110,47 @@ function t._receiveDoor(p1, p2)
 		Callback = action,
 		PreUpdateFun = preUpdateFun
 	}, Body)
-	p1._maid:GiveTask(function()
+	self._maid:GiveTask(function()
 		CircleAction.Remove(Body)
 	end)
 end
-function t.GetIsVaultArmed(p1)
-	return not DoorUtils.getOpen(p1.obj.Door)
+function t.GetIsVaultArmed(self)
+	return not DoorUtils.getOpen(self.obj.Door)
 end
-function t.GetArmingTeamId(p1)
-	return VaultUtils.getArmingTeamId(p1.obj)
+function t.GetArmingTeamId(self)
+	return VaultUtils.getArmingTeamId(self.obj)
 end
-function t._updateDeadlineUi(p1, p2)
-	local v1 = math.floor(p2 / 60)
-	DoorUtils.getInnerModel(p1._obj.Door).Timer.SurfaceGui.TextLabel.Text = ("%02d:%02d"):format(v1, p2 % 60)
+function t._updateDeadlineUi(self, p2)
+	local instance = math.floor(p2 / 60)
+	DoorUtils.getInnerModel(self._obj.Door).Timer.SurfaceGui.TextLabel.Text = ("%02d:%02d"):format(instance, p2 % 60)
 end
-function t._onAmountChanged(p1)
-	local SurfaceGui = DoorUtils.getInnerModel(p1._obj.Door).Cash.SurfaceGui
-	if p1._amountValue.Value > 0 then
+function t._onAmountChanged(self)
+	local SurfaceGui = DoorUtils.getInnerModel(self._obj.Door).Cash.SurfaceGui
+	if self._amountValue.Value > 0 then
 		SurfaceGui.TextLabel.BackgroundColor3 = Color3.fromRGB(115, 250, 121)
 		SurfaceGui.TextLabel.BackgroundTransparency = 0
 		SurfaceGui.TextLabel.TextColor3 = Color3.new(0/255, 0/255, 0/255)
 	else
 		SurfaceGui.TextLabel.BackgroundTransparency = 1
 	end
-	SurfaceGui.TextLabel.Text = ("%s"):format(Format.Currency(p1._amountValue.Value))
+	SurfaceGui.TextLabel.Text = ("%s"):format(Format.Currency(self._amountValue.Value))
 end
-function t.GetDeadline(p1)
-	return p1._deadlineValue.Value
+function t.GetDeadline(self)
+	return self._deadlineValue.Value
 end
-function t.IsCounting(p1)
-	return p1:GetDeadline() > Time.GetNowSync()
+function t.IsCounting(self)
+	return self:GetDeadline() > Time.GetNowSync()
 end
-function t.Destroy(p1)
-	local _maid = p1._maid
+function t.Destroy(self)
+	local _maid = self._maid
 	assert(_maid ~= nil)
-	p1._maid = nil
+	self._maid = nil
 	_maid:Destroy()
 end
 return {
-	setup = function(p1)
-		local v1 = t.new(p1)
-		p1._maid:GiveTask(v1)
-		p1._vault = v1
+	setup = function(self)
+		local instance = t.new(self)
+		self._maid:GiveTask(instance)
+		self._vault = instance
 	end
 }

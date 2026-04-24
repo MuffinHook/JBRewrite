@@ -16,131 +16,131 @@ local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
 local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local TransportJetConsts = require(ReplicatedStorage.TransportJet.TransportJetConsts)
-local v1 = Vector3.new()
+local vector = Vector3.new()
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
-	local v3 = ReplicatedStorage.TransportJet.Res.TransportJet:Clone()
-	v3.Parent = workspace
-	v1.visualModel = v3
-	v1.maid:GiveTask(v3)
-	v1.jetEngineSound = Audio.ObjectLocal(v1.visualModel.PrimaryPart, 9553468279, {
+function t.new(self)
+	local vector = BaseObject.new(self)
+	setmetatable(vector, t)
+	local var3 = ReplicatedStorage.TransportJet.Res.TransportJet:Clone()
+	var3.Parent = workspace
+	vector.visualModel = var3
+	vector.maid:GiveTask(var3)
+	vector.jetEngineSound = Audio.ObjectLocal(vector.visualModel.PrimaryPart, 9553468279, {
 		Looped = true,
 		RollOffMinDistance = 32,
 		RollOffMaxDistance = 512,
 		Volume = 0,
 		DoNotPlay = true
 	})
-	v1.maid:GiveTask(v1.jetEngineSound)
-	v1.jetWindSound = Audio.ObjectLocal(v1.visualModel.PrimaryPart, 9553467792, {
+	vector.maid:GiveTask(vector.jetEngineSound)
+	vector.jetWindSound = Audio.ObjectLocal(vector.visualModel.PrimaryPart, 9553467792, {
 		Looped = true,
 		RollOffMinDistance = 64,
 		RollOffMaxDistance = 512,
 		Volume = 0,
 		DoNotPlay = true
 	})
-	v1.maid:GiveTask(v1.jetWindSound)
-	local v4 = false
+	vector.maid:GiveTask(vector.jetWindSound)
+	local var4 = false
 	local function action(p12, p2)
 		if p2 then
-			local v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-			local Position = v1.Position
-			if not v4 then
-				v4 = true
-				local v2 = Confirmation.new(("Fly across the map for $%s?"):format(TransportJetConsts.LAUNCH_COST_CASH))
-				v2.Maid:GiveTask(v2.OnYes:Connect(function()
-					p1:FindFirstChild(TransportJetConsts.REQUEST_LAUNCH_REMOTE_NAME):FireServer()
+			local vector = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+			local Position = vector.Position
+			if not var4 then
+				var4 = true
+				local instance2 = Confirmation.new(("Fly across the map for $%s?"):format(TransportJetConsts.LAUNCH_COST_CASH))
+				instance2.Maid:GiveTask(instance2.OnYes:Connect(function()
+					self:FindFirstChild(TransportJetConsts.REQUEST_LAUNCH_REMOTE_NAME):FireServer()
 				end))
-				v2.Maid:GiveTask(function()
-					v4 = false
+				instance2.Maid:GiveTask(function()
+					var4 = false
 				end)
-				v2.Maid:GiveTask(Interval.every(1):Connect(function()
-					if (Position - v1.Position).Magnitude > 16 then
-						v2:Destroy()
+				instance2.Maid:GiveTask(Interval.every(1):Connect(function()
+					if (Position - vector.Position).Magnitude > 16 then
+						instance2:Destroy()
 					end
 				end))
 				return true
 			end
 		end
 	end
-	local RequestLaunch = v3:FindFirstChild("RequestLaunch")
+	local RequestLaunch = var3:FindFirstChild("RequestLaunch")
 	local t2 = {
 		Part = RequestLaunch,
-		ValidRoot = v3,
+		ValidRoot = var3,
 		Name = "Launch",
 		Timed = false,
 		Dist = 7,
 		Callback = action
 	}
-	v1.maid:GiveTask(CircleAction.Add(t2, RequestLaunch))
+	vector.maid:GiveTask(CircleAction.Add(t2, RequestLaunch))
 	local function updateDoorOpen()
-		local v12 = v1:GetDoorOpen()
-		v1:SetDoorOpen(v12)
-		t2.Enabled = v12
+		local var12 = vector:GetDoorOpen()
+		vector:SetDoorOpen(var12)
+		t2.Enabled = var12
 	end
-	local v5 = v1:GetDoorOpen()
-	v1:SetDoorOpen(v5)
-	t2.Enabled = v5
-	v1.maid:GiveTask(p1:GetAttributeChangedSignal(TransportJetConsts.DOOR_OPEN_ATTR_NAME):Connect(updateDoorOpen))
-	v1.maid:GiveTask(Interval.every(0.5):Connect(function()
-		if v1:_isLocalStanding() then
-			v1.shouldMovePlayer = true
+	local var5 = vector:GetDoorOpen()
+	vector:SetDoorOpen(var5)
+	t2.Enabled = var5
+	vector.maid:GiveTask(self:GetAttributeChangedSignal(TransportJetConsts.DOOR_OPEN_ATTR_NAME):Connect(updateDoorOpen))
+	vector.maid:GiveTask(Interval.every(0.5):Connect(function()
+		if vector:_isLocalStanding() then
+			vector.shouldMovePlayer = true
 		else
-			v1.shouldMovePlayer = false
+			vector.shouldMovePlayer = false
 		end
 	end))
-	v1.lastCF = nil
-	v1.realRoll = 0
-	v1.maid:GiveTask(RxInstanceUtils.observeAttribute(p1, TransportJetConsts.LAUNCHED_AT_ATTR_NAME, function()
-		v1:_update()
+	vector.lastCF = nil
+	vector.realRoll = 0
+	vector.maid:GiveTask(RxInstanceUtils.observeAttribute(self, TransportJetConsts.LAUNCHED_AT_ATTR_NAME, function()
+		vector:_update()
 	end))
-	v1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, TransportJetConsts.PATH_POINTS_OBJ_NAME, function(p1, p2)
-		if p1 then
-			p2:GiveTask(p1.Changed:Connect(function()
-				v1:_update()
+	vector.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(self, TransportJetConsts.PATH_POINTS_OBJ_NAME, function(self, p2)
+		if self then
+			p2:GiveTask(self.Changed:Connect(function()
+				vector:_update()
 			end))
 		end
-		v1:_update()
+		vector:_update()
 	end))
-	return v1
+	return vector
 end
-function t._isLocalStanding(p1)
-	local v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-	local v2 = RaycastParams.new()
-	v2.FilterType = Enum.RaycastFilterType.Whitelist
-	v2.FilterDescendantsInstances = p1.visualModel:FindFirstChild("TransportFloors"):GetChildren()
-	if v1 then
-		return workspace:Raycast(v1.Position, Vector3.new(0, -20, 0), v2) ~= nil
+function t._isLocalStanding(self)
+	local vector = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+	local instance2 = RaycastParams.new()
+	instance2.FilterType = Enum.RaycastFilterType.Whitelist
+	instance2.FilterDescendantsInstances = self.visualModel:FindFirstChild("TransportFloors"):GetChildren()
+	if vector then
+		return workspace:Raycast(vector.Position, Vector3.new(0, -20, 0), instance2) ~= nil
 	else
 		return false
 	end
 end
-function t._update(p1)
-	local v12 = Maid.new()
-	p1.maid.runningMaid = v12
-	local v2 = p1.obj:GetAttribute(TransportJetConsts.LAUNCHED_AT_ATTR_NAME)
-	local v3 = p1.obj:FindFirstChild(TransportJetConsts.PATH_POINTS_OBJ_NAME)
-	if v3 then
-		local v4 = v3.Value
-		if v4 then
-			local v5 = v4:GetAttribute(TransportJetConsts.NODE_OFFSET_START_ATTR_NAME) or 0
-			local v6 = v4:GetAttribute(TransportJetConsts.NODE_OFFSET_END_ATTR_NAME) or 0
-			local v7 = BezierPath.new()
+function t._update(self)
+	local var12 = Maid.new()
+	self.maid.runningMaid = var12
+	local instance2 = self.obj:GetAttribute(TransportJetConsts.LAUNCHED_AT_ATTR_NAME)
+	local var3 = self.obj:FindFirstChild(TransportJetConsts.PATH_POINTS_OBJ_NAME)
+	if var3 then
+		local var4 = var3.Value
+		if var4 then
+			local var5 = var4:GetAttribute(TransportJetConsts.NODE_OFFSET_START_ATTR_NAME) or 0
+			local var6 = var4:GetAttribute(TransportJetConsts.NODE_OFFSET_END_ATTR_NAME) or 0
+			local instance7 = BezierPath.new()
 			local t = {}
-			for i = 1, #v4:GetChildren() do
+			for i = 1, #var4:GetChildren() do
 				local v8
-				local v9 = v4:FindFirstChild(i)
-				v8 = v9 ~= nil
+				local var9 = var4:FindFirstChild(i)
+				v8 = var9 ~= nil
 				assert(v8, "missing point")
-				table.insert(t, v9.Position)
+				table.insert(t, var9.Position)
 			end
 			assert(#t > 0, "no points for transport jet")
-			v7:SetPoints(t)
-			v7:SetNodeOffset(v5, v6 + 1)
-			local v11 = v7:ApproximateLength(10000)
+			instance7:SetPoints(t)
+			instance7:SetNodeOffset(var5, var6 + 1)
+			local var11 = instance7:ApproximateLength(10000)
 			local t2 = {}
 			local RUNWAY_LENGTH = TransportJetConsts.RUNWAY_LENGTH
 			local TOP_SPEED = TransportJetConsts.TOP_SPEED
@@ -155,101 +155,101 @@ function t._update(p1)
 				speedStart = TOP_SPEED,
 				speedEnd = TOP_SPEED
 			})
-			assert(GraphUtils.constrainLastTimeToReachTarget(t2, v11 - RUNWAY_LENGTH), "cannot constrain last time to reach target")
+			assert(GraphUtils.constrainLastTimeToReachTarget(t2, var11 - RUNWAY_LENGTH), "cannot constrain last time to reach target")
 			table.insert(t2, {
 				timeUntil = 10000000000,
 				speedStart = TOP_SPEED,
 				speedEnd = 0
 			})
-			assert(GraphUtils.constrainLastTimeToReachTarget(t2, v11), "cannot constrain last time to reach target")
+			assert(GraphUtils.constrainLastTimeToReachTarget(t2, var11), "cannot constrain last time to reach target")
 			GraphUtils.cap(t2)
 			local timeUntil = t2[#t2 - 1].timeUntil
-			local v15 = nil
-			local v16 = os.clock()
+			local var15 = nil
+			local var16 = os.clock()
 			local function setFlightElapsed(p12)
-				local v12 = os.clock()
-				local v2, v3 = v7:GetWorldPositionAt((GraphUtils.calculateDist(t2, p12)))
-				local v4 = timeUntil - p12
-				if v15 then
-					local v5 = (v2 - v15).Magnitude / (v12 - v16)
-					p1.jetEngineSound.Volume = math.clamp(v5 / 100, 0, 1) * 0.8
-					p1.jetEngineSound.PlaybackSpeed = math.clamp(v5 / 100, 0, 1) * 0.2 + 0.8
-					p1.jetWindSound.Volume = math.clamp(v5 / 25, 0, 1) * 1
+				local var12 = os.clock()
+				local instance2, var3 = instance7:GetWorldPositionAt((GraphUtils.calculateDist(t2, p12)))
+				local var4 = timeUntil - p12
+				if var15 then
+					local var5 = (instance2 - var15).Magnitude / (var12 - var16)
+					self.jetEngineSound.Volume = math.clamp(var5 / 100, 0, 1) * 0.8
+					self.jetEngineSound.PlaybackSpeed = math.clamp(var5 / 100, 0, 1) * 0.2 + 0.8
+					self.jetWindSound.Volume = math.clamp(var5 / 25, 0, 1) * 1
 				end
-				v16 = v12
-				v15 = v2
-				local v11 = p1:StepRoll(if v4 < 1 then 0 else math.acos((p1.visualModel.PrimaryPart.CFrame.LookVector:Dot(v3.Unit))) * 10, if v4 < 1 then 0.03 else 0.01)
-				local v122 = CFrame.lookAt(v1, v3) * CFrame.Angles(0, 0, v11) + v2
-				if p1.shouldMovePlayer then
-					local v13 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-					if v13 and p1.lastCF then
-						local v14 = v122 * p1.lastCF:Inverse()
-						v13.CFrame = v14 * v13.CFrame
-						local v152 = CurrentCamera.CFrame:ToObjectSpace(CurrentCamera.Focus)
-						CurrentCamera.CFrame = CurrentCamera.CFrame * v152 * (v14 - v14.p) * v152:Inverse()
+				var16 = var12
+				var15 = instance2
+				local var11 = self:StepRoll(if var4 < 1 then 0 else math.acos((self.visualModel.PrimaryPart.CFrame.LookVector:Dot(var3.Unit))) * 10, if var4 < 1 then 0.03 else 0.01)
+				local cframe122 = CFrame.lookAt(vector, var3) * CFrame.Angles(0, 0, var11) + instance2
+				if self.shouldMovePlayer then
+					local localPlayer = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+					if localPlayer and self.lastCF then
+						local var14 = cframe122 * self.lastCF:Inverse()
+						localPlayer.CFrame = var14 * localPlayer.CFrame
+						local cframe152 = CurrentCamera.CFrame:ToObjectSpace(CurrentCamera.Focus)
+						CurrentCamera.CFrame = CurrentCamera.CFrame * cframe152 * (var14 - var14.p) * cframe152:Inverse()
 					end
 				end
-				p1.lastCF = v122
-				p1.visualModel:PivotTo(v122)
+				self.lastCF = cframe122
+				self.visualModel:PivotTo(cframe122)
 			end
-			local Door = p1.visualModel:FindFirstChild("Door")
-			local v17 = DoorUtils.getDuration(Door)
-			local v18 = false
-			local v19 = true
-			v12:GiveTask((task.delay(v17 + timeUntil * 0.5, function()
-				Audio.ObjectLocal(p1.visualModel.PrimaryPart, 9553470967)
+			local Door = self.visualModel:FindFirstChild("Door")
+			local var17 = DoorUtils.getDuration(Door)
+			local var18 = false
+			local var19 = true
+			var12:GiveTask((task.delay(var17 + timeUntil * 0.5, function()
+				Audio.ObjectLocal(self.visualModel.PrimaryPart, 9553470967)
 			end)))
-			p1.jetEngineSound.Volume = 0
-			p1.jetEngineSound:Play()
-			p1.jetWindSound.Volume = 0
-			p1.jetWindSound:Play()
-			v12:GiveTask(function()
-				p1.jetEngineSound:Stop()
-				p1.jetWindSound:Stop()
+			self.jetEngineSound.Volume = 0
+			self.jetEngineSound:Play()
+			self.jetWindSound.Volume = 0
+			self.jetWindSound:Play()
+			var12:GiveTask(function()
+				self.jetEngineSound:Stop()
+				self.jetWindSound:Stop()
 			end)
-			local v20 = os.clock() + (v2 - workspace:GetServerTimeNow())
-			v12:GiveTask(RunService.Heartbeat:Connect(function()
-				local v1 = os.clock() - v20
-				local v3 = if v17 < v1 then v1 < v17 + timeUntil else false
-				if v3 ~= v18 then
-					v18 = v3
-					for i, v in ipairs(p1.visualModel:FindFirstChild("Turbines"):GetChildren()) do
-						v:SetAttribute("SpinnerEnabled", v3)
-						DoorUtils.getInnerModel(v):FindFirstChild("Turbine"):FindFirstChildWhichIsA("Attachment"):FindFirstChildWhichIsA("ParticleEmitter").Enabled = v3
+			local var20 = os.clock() + (instance2 - workspace:GetServerTimeNow())
+			var12:GiveTask(RunService.Heartbeat:Connect(function()
+				local vector = os.clock() - var20
+				local var3 = if var17 < vector then vector < var17 + timeUntil else false
+				if var3 ~= var18 then
+					var18 = var3
+					for i, v in ipairs(self.visualModel:FindFirstChild("Turbines"):GetChildren()) do
+						v:SetAttribute("SpinnerEnabled", var3)
+						DoorUtils.getInnerModel(v):FindFirstChild("Turbine"):FindFirstChildWhichIsA("Attachment"):FindFirstChildWhichIsA("ParticleEmitter").Enabled = var3
 					end
 				end
-				local v4 = if v17 + 2 < v1 then v1 < v17 + timeUntil - 2 else false
-				if v4 ~= v19 then
-					v19 = v4
-					DoorUtils.setOpen(p1.visualModel:FindFirstChild("FrontLandingGear"), v4)
-					DoorUtils.setOpen(p1.visualModel:FindFirstChild("RearLandingGear"), v4)
+				local var4 = if var17 + 2 < vector then vector < var17 + timeUntil - 2 else false
+				if var4 ~= var19 then
+					var19 = var4
+					DoorUtils.setOpen(self.visualModel:FindFirstChild("FrontLandingGear"), var4)
+					DoorUtils.setOpen(self.visualModel:FindFirstChild("RearLandingGear"), var4)
 				end
-				setFlightElapsed(if v1 < v17 then 0 elseif v17 + timeUntil < v1 then timeUntil else v1 - v17)
-				if v17 * 2 + timeUntil < v1 then
-					p1:_stopRunning()
+				setFlightElapsed(if vector < var17 then 0 elseif var17 + timeUntil < vector then timeUntil else vector - var17)
+				if var17 * 2 + timeUntil < vector then
+					self:_stopRunning()
 				end
 			end))
 		end
 	end
 end
-function t._stopRunning(p1)
-	p1.maid.runningMaid = nil
+function t._stopRunning(self)
+	self.maid.runningMaid = nil
 end
-function t.StepRoll(p1, p2, p3)
+function t.StepRoll(self, p2, p3)
 	if p2 ~= p2 then
 		p2 = 0
 	end
-	local v1 = p1.realRoll or 0
-	local v2 = v1 + (p2 - v1) * p3
-	p1.realRoll = v2
-	return v2
+	local vector = self.realRoll or 0
+	local instance2 = vector + (p2 - vector) * p3
+	self.realRoll = instance2
+	return instance2
 end
-function t.SetDoorOpen(p1, p2)
-	local Door = p1.visualModel:FindFirstChild("Door")
+function t.SetDoorOpen(self, p2)
+	local Door = self.visualModel:FindFirstChild("Door")
 	DoorUtils.setOpen(Door, p2)
 	Audio.ObjectLocal(Door.PrimaryPart, 4487204926)
 end
-function t.GetDoorOpen(p1)
-	return p1.obj:GetAttribute(TransportJetConsts.DOOR_OPEN_ATTR_NAME) == true
+function t.GetDoorOpen(self)
+	return self.obj:GetAttribute(TransportJetConsts.DOOR_OPEN_ATTR_NAME) == true
 end
 return Binder.new(TransportJetConsts.TAG_NAME, t)

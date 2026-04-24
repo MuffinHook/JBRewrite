@@ -52,18 +52,18 @@ function t.init()
 		HomeApp = createElement(HomeApp, {
 			aspectRatio = 3,
 			verticalPaddingRatio = 128,
-			attemptPlaceItem = function(p1)
-				if p1.module == "HomeItem" then
-					t.onAttemptPlaceItem:Fire(p1)
+			attemptPlaceItem = function(self)
+				if self.module == "HomeItem" then
+					t.onAttemptPlaceItem:Fire(self)
 				else
-					t.attemptEquip(p1.module, p1.name)
+					t.attemptEquip(self.module, self.name)
 				end
 			end,
-			attemptPreviewItem = function(p1)
-				t.attemptPreview(p1.module, p1.name)
+			attemptPreviewItem = function(self)
+				t.attemptPreview(self.module, self.name)
 			end,
-			attemptPurchaseItem = function(p1)
-				t.attemptPurchase(p1.module, p1.name)
+			attemptPurchaseItem = function(self)
+				t.attemptPurchase(self.module, self.name)
 			end,
 			attemptDeleteItem = function()
 				t.onAttemptDeleteItem:Fire()
@@ -75,8 +75,8 @@ function t.init()
 				})
 				CashBuyUI.Open()
 			end,
-			onSettingChanged = function(p1, p2)
-				HomeSystem.queryCurrentStandingHome():SetSavedSetting(p1, p2)
+			onSettingChanged = function(self, p2)
+				HomeSystem.queryCurrentStandingHome():SetSavedSetting(self, p2)
 			end,
 			exit = function()
 				homeStore:dispatch({
@@ -94,9 +94,9 @@ function t.init()
 	t3[1] = Roact.createElement(RoactRodux.StoreProvider, {
 		store = homeStore
 	}, t5)
-	local v6 = Roact.mount(createElement("ScreenGui", t2, t3), Players.LocalPlayer.PlayerGui, "HomeItemGui")
+	local localPlayer = Roact.mount(createElement("ScreenGui", t2, t3), Players.LocalPlayer.PlayerGui, "HomeItemGui")
 	t._maid:GiveTask(function()
-		Roact.unmount(v6)
+		Roact.unmount(localPlayer)
 	end)
 	local t7 = {
 		name = "Home",
@@ -126,16 +126,16 @@ function t.init()
 		end
 	}
 	BigButtonService.add(t7)
-	local function updateButtonVisibility(p1)
+	local function updateButtonVisibility(self)
 		local v1 = HomeSystem.queryCurrentStandingHome()
-		local v3 = (v1 and v1:HasPermissionToEdit(Players.LocalPlayer)) == true
+		local localPlayer = (v1 and v1:HasPermissionToEdit(Players.LocalPlayer)) == true
 		local enabled = t7.enabled
-		if v3 ~= enabled then
-			t7.enabled = v3
+		if localPlayer ~= enabled then
+			t7.enabled = localPlayer
 			BigButtonService.triggerUpdate:Fire()
-			if enabled and not v3 then
-				p1:ReplicateCustomizing(false)
-				t.onCustomizeEnded:Fire(p1)
+			if enabled and not localPlayer then
+				self:ReplicateCustomizing(false)
+				t.onCustomizeEnded:Fire(self)
 				homeStore:dispatch({
 					type = "setVisible",
 					value = false
@@ -143,22 +143,22 @@ function t.init()
 			end
 		end
 	end
-	local v7 = Maid.new()
-	HomeSystem.onEntered:Connect(function(p1)
-		v7:DoCleaning()
-		updateButtonVisibility(p1)
-		v7:GiveTask(Interval.every(1):Connect(function()
-			updateButtonVisibility(p1)
+	local instance7 = Maid.new()
+	HomeSystem.onEntered:Connect(function(self)
+		instance7:DoCleaning()
+		updateButtonVisibility(self)
+		instance7:GiveTask(Interval.every(1):Connect(function()
+			updateButtonVisibility(self)
 		end))
 	end)
-	HomeSystem.onExited:Connect(function(p1)
-		v7:DoCleaning()
-		updateButtonVisibility(p1)
+	HomeSystem.onExited:Connect(function(self)
+		instance7:DoCleaning()
+		updateButtonVisibility(self)
 	end)
-	HomeSystem.onEntered:Connect(function(p1)
+	HomeSystem.onEntered:Connect(function(self)
 		homeStore:dispatch({
 			type = "setHome",
-			value = p1
+			value = self
 		})
 	end)
 	HomeSystem.onExited:Connect(function()
@@ -167,39 +167,39 @@ function t.init()
 			value = nil
 		})
 	end)
-	t.onCustomizeEnded:Connect(function(p1)
-		t.resetHomeCustomizationToEquipped(p1)
+	t.onCustomizeEnded:Connect(function(self)
+		t.resetHomeCustomizationToEquipped(self)
 	end)
-	HomeSystem.onEntered:Connect(function(p1)
-		RxInstanceUtils.observeChildren(p1._obj:FindFirstChild(HomeConsts.SETTINGS_FOLDER_NAME), function(p1, p2)
+	HomeSystem.onEntered:Connect(function(self)
+		RxInstanceUtils.observeChildren(self._obj:FindFirstChild(HomeConsts.SETTINGS_FOLDER_NAME), function(self, p2)
 			local function update()
 				homeStore:dispatch({
 					type = "setSavedSetting",
-					key = p1.Name,
-					value = p1.Value
+					key = self.Name,
+					value = self.Value
 				})
 			end
 			homeStore:dispatch({
 				type = "setSavedSetting",
-				key = p1.Name,
-				value = p1.Value
+				key = self.Name,
+				value = self.Value
 			})
-			p2:GiveTask(p1:GetPropertyChangedSignal("Value"):Connect(update))
+			p2:GiveTask(self:GetPropertyChangedSignal("Value"):Connect(update))
 		end)
 	end)
-	waitForChild(ReplicatedStorage, HomeItemConsts.UPDATE_INVENTORY_REMOTE_NAME):andThen(function(p1)
-		p1.OnClientEvent:Connect(function(p1)
+	waitForChild(ReplicatedStorage, HomeItemConsts.UPDATE_INVENTORY_REMOTE_NAME):andThen(function(self)
+		self.OnClientEvent:Connect(function(self)
 			homeStore:dispatch({
 				type = "setInventory",
-				value = p1
+				value = self
 			})
 		end)
 	end):catch(warn)
-	waitForChild(ReplicatedStorage, HomeItemConsts.UPDATE_EQUIPPED_REMOTE_NAME):andThen(function(p1)
-		p1.OnClientEvent:Connect(function(p1)
+	waitForChild(ReplicatedStorage, HomeItemConsts.UPDATE_EQUIPPED_REMOTE_NAME):andThen(function(self)
+		self.OnClientEvent:Connect(function(self)
 			homeStore:dispatch({
 				type = "setEquipped",
-				value = p1
+				value = self
 			})
 		end)
 	end):catch(warn)
@@ -213,78 +213,78 @@ function t.init()
 		type = "setQuantityPlaced",
 		value = t.getQuantityPlaced(Players.LocalPlayer)
 	})
-	HomeItemBinder:GetClassAddedSignal():Connect(function(p1)
+	HomeItemBinder:GetClassAddedSignal():Connect(function(self)
 		homeStore:dispatch({
 			type = "setQuantityPlaced",
 			value = t.getQuantityPlaced(Players.LocalPlayer)
 		})
-		p1._maid:GiveTask(updateQuantityPlaced)
+		self._maid:GiveTask(updateQuantityPlaced)
 	end)
 end
-function t.getQuantityPlaced(p1)
-	assert(p1 ~= nil)
+function t.getQuantityPlaced(self)
+	assert(self ~= nil)
 	local t = {}
 	for i, v in ipairs(HomeItemBinder:GetAll()) do
-		if v:GetOwner() == p1 then
+		if v:GetOwner() == self then
 			local v2 = v._obj.Name
 			t[v2] = (t[v2] or 0) + 1
 		end
 	end
 	return t
 end
-function t.attemptPurchase(p1, p2)
-	ReplicatedStorage:FindFirstChild(HomeItemConsts.PURCHASE_HOME_ITEM_REMOTE_NAME):FireServer(p1, p2)
+function t.attemptPurchase(self, p2)
+	ReplicatedStorage:FindFirstChild(HomeItemConsts.PURCHASE_HOME_ITEM_REMOTE_NAME):FireServer(self, p2)
 end
-local function getItem(p1, p2)
-	for v1, v2 in p1 do
+local function getItem(self, p2)
+	for v1, v2 in self do
 		if v2.Name == p2 then
 			return v2
 		end
 	end
 	return nil
 end
-function t.attemptEquip(p1, p2)
-	ReplicatedStorage:FindFirstChild(HomeItemConsts.EQUIP_HOME_ITEM_REMOTE_NAME):FireServer(p1, p2)
+function t.attemptEquip(self, p2)
+	ReplicatedStorage:FindFirstChild(HomeItemConsts.EQUIP_HOME_ITEM_REMOTE_NAME):FireServer(self, p2)
 end
-function t.attemptPreview(p1, p2)
+function t.attemptPreview(self, p2)
 	assert(p2, "itemName is nil")
-	assert(p1, "moduleName is nil for itemName: " .. tostring(p2))
-	local v2 = ReplicatedStorage.Home.HomeData:FindFirstChild(p1)
+	assert(self, "moduleName is nil for itemName: " .. tostring(p2))
+	local v2 = ReplicatedStorage.Home.HomeData:FindFirstChild(self)
 	if v2 then
 		assert(v2, "Module path does not exist")
-		local v3 = require(v2)
-		assert(v3.getItems ~= nil, "Module does not have a getItems function")
-		assert(v3.apply ~= nil, "Module does not have an apply function")
-		local v5 = nil
-		for v6, v7 in v3.getItems() do
-			if v7.Name == p2 then
-				v5 = v7
+		local localPlayer = require(v2)
+		assert(localPlayer.getItems ~= nil, "Module does not have a getItems function")
+		assert(localPlayer.apply ~= nil, "Module does not have an apply function")
+		local var5 = nil
+		for localPlayer, instance7 in localPlayer.getItems() do
+			if instance7.Name == p2 then
+				var5 = instance7
 				break
 			end
 		end
-		assert(v5 ~= nil, "Item does not exist")
-		v3.apply(v5, HomeSystem.queryCurrentStandingHome():GetObj())
+		assert(var5 ~= nil, "Item does not exist")
+		localPlayer.apply(var5, HomeSystem.queryCurrentStandingHome():GetObj())
 	end
 end
-function t.resetHomeCustomizationToEquipped(p1)
+function t.resetHomeCustomizationToEquipped(self)
 	local equipped = homeStore:getState().equipped
-	for v3, v4 in ReplicatedStorage.Home.HomeData:GetChildren() do
+	for localPlayer, v4 in ReplicatedStorage.Home.HomeData:GetChildren() do
 		local v1, v2
 		assert(v4, "Module path does not exist")
-		local v5 = require(v4)
-		local v6 = equipped[v4.Name]
-		v1 = v5.getItems ~= nil
+		local var5 = require(v4)
+		local localPlayer = equipped[v4.Name]
+		v1 = var5.getItems ~= nil
 		assert(v1, "Module does not have a getItems function")
-		v2 = v5.apply ~= nil
+		v2 = var5.apply ~= nil
 		assert(v2, "Module does not have an apply function")
-		local v7 = nil
-		for v8, v9 in v5.getItems() do
-			if v9.Name == v6 then
-				v7 = v9
+		local instance7 = nil
+		for v8, v9 in var5.getItems() do
+			if v9.Name == localPlayer then
+				instance7 = v9
 				break
 			end
 		end
-		v5.apply(v7, p1:GetObj())
+		var5.apply(instance7, self:GetObj())
 	end
 end
 function t.isCustomizing()

@@ -11,61 +11,61 @@ local Interval = require(ReplicatedStorage.Std.Interval)
 local RunService = game:GetService("RunService")
 require(ReplicatedStorage.Clan.ClanUtils)
 local function randomVector()
-	local v1 = math.random() * 2 - 1
-	local v2 = math.random() * 2 - 1
-	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
+	local cframe = math.random() * 2 - 1
+	local localPlayer = math.random() * 2 - 1
+	return Vector3.new(cframe, localPlayer, math.random() * 2 - 1).Unit
 end
-local function offsetLookAtTarget(p1, p2, p3, p4, p5, p6)
+local function offsetLookAtTarget(self, p2, p3, p4, p5, p6)
 	if p4 == 0 or (p5 == 0 or p6 == 0) then
 		return 0, 0
 	else
-		local v1 = p4 * p4 + p6 * p6
-		local v2 = p6 < 0 and math.atan(p4 / p6) or math.pi - math.atan(-p4 / p6)
-		local v4 = v2 + (p1 * p1 < v1 and math.asin(p1 / v1 ^ 0.5) or math.asin(v1 ^ 0.5 / p1))
-		local v5 = p6 * math.cos(v4) + p4 * math.sin(v4)
-		local v6 = p5 * p5 + v5 * v5
-		local v7 = v5 < 0 and math.atan(-p5 / v5) or math.atan(p5 / v5)
-		return v4, v7 - (p2 * p2 < v6 and math.asin(p2 / v6 ^ 0.5) or math.asin(v6 ^ 0.5 / p2))
+		local cframe = p4 * p4 + p6 * p6
+		local localPlayer = p6 < 0 and math.atan(p4 / p6) or math.pi - math.atan(-p4 / p6)
+		local var4 = localPlayer + (self * self < cframe and math.asin(self / cframe ^ 0.5) or math.asin(cframe ^ 0.5 / self))
+		local var5 = p6 * math.cos(var4) + p4 * math.sin(var4)
+		local var6 = p5 * p5 + var5 * var5
+		local var7 = var5 < 0 and math.atan(-p5 / var5) or math.atan(p5 / var5)
+		return var4, var7 - (p2 * p2 < var6 and math.asin(p2 / var6 ^ 0.5) or math.asin(var6 ^ 0.5 / p2))
 	end
 end
-local function shortAngleDist(p1, p2)
-	local v1 = (p2 - p1) % 6.283185307179586
-	return 2 * v1 % 6.283185307179586 - v1
+local function shortAngleDist(self, p2)
+	local cframe = (p2 - self) % 6.283185307179586
+	return 2 * cframe % 6.283185307179586 - cframe
 end
-local function getNearestPlayer(p1, p2)
-	local v1 = p2 or (1 / 0)
-	local v2 = nil
+local function getNearestPlayer(self, p2)
+	local cframe = p2 or (1 / 0)
+	local localPlayer = nil
 	for i, v in ipairs(Players:GetPlayers()) do
-		local v3 = PlayerUtils.getRootPart(v)
-		if v3 then
-			local Magnitude = (v3.Position - p1).Magnitude
-			if Magnitude < v1 then
-				v1 = Magnitude
-				v2 = v
+		local var3 = PlayerUtils.getRootPart(v)
+		if var3 then
+			local Magnitude = (var3.Position - self).Magnitude
+			if Magnitude < cframe then
+				cframe = Magnitude
+				localPlayer = v
 			end
 		end
 	end
-	return v2
+	return localPlayer
 end
-local function getNearestOpp(p1, p2, p3)
-	local v1 = p3 or (1 / 0)
-	local v2 = nil
-	for v3, v4 in Players:GetPlayers() do
-		if not p1:HasPermissionToEnter(v4) then
-			local v5 = PlayerUtils.getHumanoid(v4)
-			if v5 and v5.Health > 0 then
-				local RootPart = v5.RootPart
+local function getNearestOpp(self, p2, p3)
+	local cframe = p3 or (1 / 0)
+	local localPlayer = nil
+	for var3, var4 in Players:GetPlayers() do
+		if not self:HasPermissionToEnter(var4) then
+			local var5 = PlayerUtils.getHumanoid(var4)
+			if var5 and var5.Health > 0 then
+				local RootPart = var5.RootPart
 				if RootPart then
 					local Magnitude = (RootPart.Position - p2).Magnitude
-					if Magnitude < v1 then
-						v1 = Magnitude
-						v2 = v4
+					if Magnitude < cframe then
+						cframe = Magnitude
+						localPlayer = var4
 					end
 				end
 			end
 		end
 	end
-	return v2
+	return localPlayer
 end
 local t = {
 	bullet_impact_bass = 2837091387,
@@ -74,31 +74,31 @@ local t = {
 	detected = 6602024939,
 	motor = 6602024532
 }
-local v1 = nil
+local cframe = nil
 return {
-	init = function(p1)
-		v1 = p1.Event
+	init = function(self)
+		cframe = self.Event
 	end,
-	setup = function(p1)
-		local _obj = p1._obj
-		local v12 = 0
-		local v2 = 0
-		local v3 = Spring.new(v12, 0, 0.6, 15)
-		local v4 = Spring.new(v2, 0, 0.6, 15)
-		local v5 = Spring.new(0, 0, 0.7, 70)
-		local v6 = BulletEmitter.new(true)
-		v6.IgnoreList = assert({})
-		v6.LifeSpan = 1
-		v6.IgnoreLocalPlayer = false
-		v6.ShieldBlockPct = 0.5
-		v6.GravityVector = Vector3.new(0, -49.05, 0)
-		p1._maid:GiveTask(v6.OnLocalHitPlayer:Connect(function(p12)
-			local v12 = Players:GetPlayerFromCharacter(p12.Parent)
-			if v12 then
-				if v12 == LocalPlayer then
-					local v2 = p1:GetHome()
-					if not (v2 and v2:HasPermissionToEnter(v12)) then
-						v1:FireServer("xe6v1us6", 3, "Shot")
+	setup = function(self)
+		local _obj = self._obj
+		local var12 = 0
+		local localPlayer = 0
+		local var3 = Spring.new(var12, 0, 0.6, 15)
+		local var4 = Spring.new(localPlayer, 0, 0.6, 15)
+		local var5 = Spring.new(0, 0, 0.7, 70)
+		local var6 = BulletEmitter.new(true)
+		var6.IgnoreList = assert({})
+		var6.LifeSpan = 1
+		var6.IgnoreLocalPlayer = false
+		var6.ShieldBlockPct = 0.5
+		var6.GravityVector = Vector3.new(0, -49.05, 0)
+		self._maid:GiveTask(var6.OnLocalHitPlayer:Connect(function(p12)
+			local var12 = Players:GetPlayerFromCharacter(p12.Parent)
+			if var12 then
+				if var12 == LocalPlayer then
+					local localPlayer = self:GetHome()
+					if not (localPlayer and localPlayer:HasPermissionToEnter(var12)) then
+						cframe:FireServer("xe6v1us6", 3, "Shot")
 					end
 				end
 				Audio.ObjectLocal(p12.RootPart, t.bullet_impact_bass, {
@@ -106,114 +106,114 @@ return {
 				})
 			end
 		end))
-		local v7 = os.clock()
-		local function updateRotation(p1)
-			local v1 = os.clock()
-			local v22 = v1 - v7
-			v7 = v1
-			local v32 = _obj.Pivot.CFrame
-			local v42 = v32:PointToObjectSpace(p1)
-			local v52, v6 = offsetLookAtTarget(0.3935546875, 1.7648589611053467, nil, v42.x, v42.y, v42.z)
-			v12 = v6
-			local v72 = (v52 - v2) % 6.283185307179586
-			v2 = v2 + math.clamp(2 * v72 % 6.283185307179586 - v72, -2.5132741228718345 * v22, 2.5132741228718345 * v22)
-			local v8 = v3:SetTarget(v6)
-			local v9 = v4:SetTarget(v2)
-			local v10 = v5:Update()
-			_obj.Top:SetPrimaryPartCFrame(v32 * CFrame.Angles(0, v9, 0) * CFrame.Angles(v8, 0, 0) * CFrame.new(0, 0, v10))
+		local var7 = os.clock()
+		local function updateRotation(self)
+			local cframe = os.clock()
+			local var22 = cframe - var7
+			var7 = cframe
+			local cframe32 = _obj.Pivot.CFrame
+			local var42 = cframe32:PointToObjectSpace(self)
+			local v52, var6 = offsetLookAtTarget(0.3935546875, 1.7648589611053467, nil, var42.x, var42.y, var42.z)
+			var12 = var6
+			local var72 = (v52 - localPlayer) % 6.283185307179586
+			localPlayer = localPlayer + math.clamp(2 * var72 % 6.283185307179586 - var72, -2.5132741228718345 * var22, 2.5132741228718345 * var22)
+			local var8 = var3:SetTarget(var6)
+			local var9 = var4:SetTarget(localPlayer)
+			local var10 = var5:Update()
+			_obj.Top:SetPrimaryPartCFrame(cframe32 * CFrame.Angles(0, var9, 0) * CFrame.Angles(var8, 0, 0) * CFrame.new(0, 0, var10))
 		end
-		p1._maid:GiveTask(v6)
+		self._maid:GiveTask(var6)
 		local function fire()
-			local v1 = _obj.Top.Tip.CFrame
-			v6:Emit(v1.p, v1.LookVector + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 0.01, 300)
-			v5:Accelerate(40)
+			local cframe = _obj.Top.Tip.CFrame
+			var6:Emit(cframe.p, cframe.LookVector + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 0.01, 300)
+			var5:Accelerate(40)
 			Audio.ObjectLocal(_obj.Top.Tip, t.shoot, {
 				Volume = 0.5
 			})
 		end
-		local v8 = Audio.ObjectLocal(_obj.Pivot, t.motor, {
+		local var8 = Audio.ObjectLocal(_obj.Pivot, t.motor, {
 			Looped = true,
 			DoNotPlay = true,
 			Volume = 0.3
 		})
-		local v9 = 20
-		local v10 = os.clock()
-		local v11 = nil
-		local v122 = os.clock()
-		p1._maid:GiveTask(RunService.Heartbeat:Connect(function()
-			local v1 = os.clock()
-			local v2 = PlayerUtils.getRootPart(LocalPlayer)
-			if v2 then
-				if not ((v2.Position - p1._obj.PrimaryPart.Position).Magnitude > 128) then
-					v6:Update()
-					local v3 = nil
-					local v4 = nil
-					local v5 = p1:GetHome()
-					local v62 = v5:GetOwnerId()
-					if not (p1:GetGhosted() or p1:IsBeingDragged()) then
-						if v62 then
-							local v7 = getNearestOpp(v5, p1._obj.PrimaryPart.Position, 64)
-							if v7 then
-								local v82 = PlayerUtils.getRootPart(v7)
-								v4 = v82.Parent
-								v3 = v82.Position
+		local var9 = 20
+		local var10 = os.clock()
+		local var11 = nil
+		local var122 = os.clock()
+		self._maid:GiveTask(RunService.Heartbeat:Connect(function()
+			local cframe = os.clock()
+			local localPlayer = PlayerUtils.getRootPart(LocalPlayer)
+			if localPlayer then
+				if not ((localPlayer.Position - self._obj.PrimaryPart.Position).Magnitude > 128) then
+					var6:Update()
+					local var3 = nil
+					local var4 = nil
+					local var5 = self:GetHome()
+					local var62 = var5:GetOwnerId()
+					if not (self:GetGhosted() or self:IsBeingDragged()) then
+						if var62 then
+							local var7 = getNearestOpp(var5, self._obj.PrimaryPart.Position, 64)
+							if var7 then
+								local var82 = PlayerUtils.getRootPart(var7)
+								var4 = var82.Parent
+								var3 = var82.Position
 							end
 						else
-							local v92 = getNearestPlayer(p1._obj.PrimaryPart.Position, 64)
-							if v92 then
-								local v102 = PlayerUtils.getRootPart(v92)
-								v4 = v102.Parent
-								v3 = v102.Position
+							local var92 = getNearestPlayer(self._obj.PrimaryPart.Position, 64)
+							if var92 then
+								local var102 = PlayerUtils.getRootPart(var92)
+								var4 = var102.Parent
+								var3 = var102.Position
 							end
 						end
 					end
-					if v3 then
+					if var3 then
 						local Position = _obj.Top.Tip.Position
-						local v112 = v3 - Position
-						local v12, v13 = RayCast.RayIgnoreNonCollide(Position, v112.Unit, v112.Magnitude, _obj)
-						if (v13 - v3).Magnitude > 1 and (not v4 or v12 and not v12:IsDescendantOf(v4)) then
-							v3 = nil
+						local var112 = var3 - Position
+						local var12, var13 = RayCast.RayIgnoreNonCollide(Position, var112.Unit, var112.Magnitude, _obj)
+						if (var13 - var3).Magnitude > 1 and (not var4 or var12 and not var12:IsDescendantOf(var4)) then
+							var3 = nil
 						end
 					end
-					if v3 then
-						if not v11 then
-							if not v8.IsPlaying then
-								v8:Play()
+					if var3 then
+						if not var11 then
+							if not var8.IsPlaying then
+								var8:Play()
 							end
-							if v1 - v122 > 2 then
-								v122 = v1
+							if cframe - var122 > 2 then
+								var122 = cframe
 								Audio.ObjectLocal(_obj.Pivot, t.detected, {
 									Volume = 1
 								})
-								v10 = v1 + 0.5
+								var10 = cframe + 0.5
 							end
 						end
-						updateRotation(v3)
-						if v1 - v10 > 0.1 then
-							v10 = v1
-							if v9 > 0 then
-								v9 = v9 - 1
+						updateRotation(var3)
+						if cframe - var10 > 0.1 then
+							var10 = cframe
+							if var9 > 0 then
+								var9 = var9 - 1
 								fire()
 							else
-								v10 = v1 + 3
-								v9 = 20
+								var10 = cframe + 3
+								var9 = 20
 								Audio.ObjectLocal(_obj.Pivot, t.reload, {
 									Volume = 1
 								})
 							end
 						end
 					end
-					if not v3 and (v11 and v8.IsPlaying) then
-						v8:Stop()
+					if not var3 and (var11 and var8.IsPlaying) then
+						var8:Stop()
 					end
-					v11 = v3
+					var11 = var3
 				end
 			end
 		end))
-		local v13 = false
-		p1._maid:GiveTask(Interval.every(0.5):Connect(function()
-			v13 = not v13
-			_obj.Top.Light.Color = v13 and Color3.new(0/255, 255/255, 0/255) or Color3.new(255/255, 0/255, 0/255)
+		local var13 = false
+		self._maid:GiveTask(Interval.every(0.5):Connect(function()
+			var13 = not var13
+			_obj.Top.Light.Color = var13 and Color3.new(0/255, 255/255, 0/255) or Color3.new(255/255, 0/255, 0/255)
 		end))
 	end
 }

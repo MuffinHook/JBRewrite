@@ -108,9 +108,9 @@ end
 local function EnableHumanoid(p1, p2)
 	local v1 = next
 	local v2, v3 = Enum.HumanoidStateType:GetEnumItems()
-	for v4, v5 in v1, v2, v3 do
-		if v5 ~= Enum.HumanoidStateType.None and v5 ~= Enum.HumanoidStateType.Dead then
-			p1:SetStateEnabled(v5, p2)
+	for v4, var5 in v1, v2, v3 do
+		if var5 ~= Enum.HumanoidStateType.None and var5 ~= Enum.HumanoidStateType.Dead then
+			p1:SetStateEnabled(var5, p2)
 		end
 	end
 end
@@ -131,9 +131,9 @@ return {
 		if Humanoid then
 			local RootPart = Humanoid.RootPart
 			if not Humanoid.Sit then
-				local v1, v2, v3, v4, _, v5, v6, v7, v8, v9, _2, v10 = RootPart.CFrame:GetComponents()
-				local v11 = if v7 >= 0 then CFrame.new(v1, v2, v3, v4, 0, v5, v6, 1, v8, v9, 0, v10) else CFrame.new(v1, v2, v3, v4, 0, -v5, v6, 1, -v8, v9, 0, -v10)
-				RootPart.CFrame = v11 * CFrame.new(0, Humanoid.HipHeight, 0)
+				local v1, v2, v3, v4, _, var5, v6, v7, v8, v9, _2, var10 = RootPart.CFrame:GetComponents()
+				local cframe11 = if v7 >= 0 then CFrame.new(v1, v2, v3, v4, 0, var5, v6, 1, v8, v9, 0, var10) else CFrame.new(v1, v2, v3, v4, 0, -var5, v6, 1, -v8, v9, 0, -var10)
+				RootPart.CFrame = cframe11 * CFrame.new(0, Humanoid.HipHeight, 0)
 			end
 			EnableHumanoid(Humanoid, true)
 			if not p1:GetAttribute("InVehicle") then
@@ -181,13 +181,13 @@ return {
 					print(v4)
 				end
 			end
-			local v5 = next
+			local var5 = next
 			local v6, v7 = Character:GetChildren()
-			for v8, v9 in v5, v6, v7 do
+			for v8, v9 in var5, v6, v7 do
 				if v9:IsA("BasePart") then
-					local v10 = next
-					local v11, v12 = v9:GetChildren()
-					for v13, v14 in v10, v11, v12 do
+					local var10 = next
+					local cframe11, v12 = v9:GetChildren()
+					for v13, v14 in var10, cframe11, v12 do
 						if v14:IsA("Motor") and v14.Name ~= "Root" then
 							v2[v14] = v14.Part1
 							v14.Part1 = nil
@@ -200,9 +200,9 @@ return {
 			if not Character:FindFirstChild("RagdollWaist") then
 				RagdollSetup(Character)
 			end
-			local v15 = next
+			local var15 = next
 			local v16, v17 = Character:GetChildren()
-			for v18, v19 in v15, v16, v17 do
+			for v18, v19 in var15, v16, v17 do
 				if v19:IsA("Constraint") and v19.Name:sub(1, 7) == "Ragdoll" then
 					v19.Enabled = true
 				end
@@ -227,9 +227,9 @@ return {
 						v3.Part1 = v4
 					end
 					t[v1] = nil
-					local v5 = next
+					local var5 = next
 					local v6, v7 = Character:GetChildren()
-					for v8, v9 in v5, v6, v7 do
+					for v8, v9 in var5, v6, v7 do
 						if v9:IsA("Constraint") and v9.Name:sub(1, 7) == "Ragdoll" then
 							v9:Destroy()
 						end

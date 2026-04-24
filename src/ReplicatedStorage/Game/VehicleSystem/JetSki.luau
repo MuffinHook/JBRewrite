@@ -20,17 +20,17 @@ local function GetMoveVector()
 end
 local ControlModule = LocalPlayer.PlayerScripts:WaitForChild("PlayerModule", 5).ControlModule
 if ControlModule then
-	local v1 = require(ControlModule)
+	local module = require(ControlModule)
 	GetMoveVector = function()
-		return v1:GetMoveVector()
+		return module:GetMoveVector()
 	end
 end
 local function SetHumanoidEnabled(p1, p2)
-	local v1 = next
-	local v2, v3 = Enum.HumanoidStateType:GetEnumItems()
-	for v4, v5 in v1, v2, v3 do
-		if v5 ~= Enum.HumanoidStateType.Dead and (v5 ~= Enum.HumanoidStateType.None and v5 ~= Enum.HumanoidStateType.Jumping) then
-			p1:SetStateEnabled(v5, p2)
+	local module = next
+	local cframe2, cframe3 = Enum.HumanoidStateType:GetEnumItems()
+	for cframe4, var5 in module, cframe2, cframe3 do
+		if var5 ~= Enum.HumanoidStateType.Dead and (var5 ~= Enum.HumanoidStateType.None and var5 ~= Enum.HumanoidStateType.Jumping) then
+			p1:SetStateEnabled(var5, p2)
 		end
 	end
 end
@@ -60,13 +60,13 @@ function t.FromPacket(p1)
 	p1.BoundingBox = BoundingBox
 	p1.Maid = Maid.new()
 	p1.maid = p1.Maid
-	local v2 = false
+	local cframe2 = false
 	p1.maid:GiveTask(Interval.every(0.1):Connect(function()
-		local v1 = p1:GetAreTiresPopped()
-		if v1 ~= v2 then
-			p1.Model:FindFirstChild("Model"):FindFirstChild("Body"):FindFirstChild("Smoke").Enabled = v1
+		local module = p1:GetAreTiresPopped()
+		if module ~= cframe2 then
+			p1.Model:FindFirstChild("Model"):FindFirstChild("Body"):FindFirstChild("Smoke").Enabled = module
 		end
-		v2 = v1
+		cframe2 = module
 	end))
 	return p1
 end
@@ -76,9 +76,9 @@ end
 function t.GetSeatFromPlayer(p1, p2)
 	assert(p2)
 	for i = 1, #p1.Seats do
-		local v1 = p1.Seats[i]
-		if v1.Occupied and v1.Player == p2 then
-			return v1
+		local module = p1.Seats[i]
+		if module.Occupied and module.Player == p2 then
+			return module
 		end
 	end
 	return false
@@ -95,12 +95,12 @@ local function UpdateArms(p1, p2)
 	end
 end
 local function UpdateForces(p1, p2, p3)
-	local v1 = p1:GetAreTiresPopped()
+	local module = p1:GetAreTiresPopped()
 	local VectorForce = p1.VectorForce
 	local BodyGyro = p1.BodyGyro
 	local EnginePart = p1.EnginePart
 	local BoundingBox = p1.BoundingBox
-	local v2 = EnginePart.CFrame
+	local cframe2 = EnginePart.CFrame
 	local WorldPosition = VectorForce.Attachment0.WorldPosition
 	local BuoyancySensor = p1.BuoyancySensor
 	if not BuoyancySensor then
@@ -118,24 +118,24 @@ local function UpdateForces(p1, p2, p3)
 		Skeleton.MistEmitter.Particle.Enabled = TouchingSurface and Magnitude > 50
 		Skeleton.WakeEmitter.Particle.Enabled = TouchingSurface and Magnitude > 100
 	end
-	local v6 = 0
+	local var6 = 0
 	if p2 > 0 then
-		v6 = -6000 * p2
+		var6 = -6000 * p2
 	elseif p2 < 0 then
-		v6 = -1000 * p2
+		var6 = -1000 * p2
 	end
 	if TouchingSurface == false then
-		v6 = v6 * 0.3
+		var6 = var6 * 0.3
 	end
-	if v1 then
-		v6 = v6 * 0.05
+	if module then
+		var6 = var6 * 0.05
 	end
-	VectorForce.Force = Vector3.new(0, 0, v6)
-	BodyGyro.CFrame = CFrame.new(Vector3.new(), v2.LookVector) * CFrame.Angles(0, 0, p3 * math.pi * 0.2) + v2.p
-	local v7 = v2:VectorToObjectSpace(EnginePart.RotVelocity)
-	local v11 = Vector3.new(v7.X * if TouchingSurface then 1 else 0.8, v7.Y * 0.9 + p3 * 0.3, v7.Z)
-	EnginePart.RotVelocity = v2:VectorToWorldSpace(v11)
-	return v11
+	VectorForce.Force = Vector3.new(0, 0, var6)
+	BodyGyro.CFrame = CFrame.new(Vector3.new(), cframe2.LookVector) * CFrame.Angles(0, 0, p3 * math.pi * 0.2) + cframe2.p
+	local var7 = cframe2:VectorToObjectSpace(EnginePart.RotVelocity)
+	local vector11 = Vector3.new(var7.X * if TouchingSurface then 1 else 0.8, var7.Y * 0.9 + p3 * 0.3, var7.Z)
+	EnginePart.RotVelocity = cframe2:VectorToWorldSpace(vector11)
+	return vector11
 end
 local function MountLocalPlayer(p1, p2, p3)
 	assert(p2)
@@ -146,12 +146,12 @@ local function MountLocalPlayer(p1, p2, p3)
 	assert(Humanoid)
 	SetHumanoidEnabled(Humanoid, false)
 	Humanoid:ChangeState(Enum.HumanoidStateType.PlatformStanding)
-	local v1 = Spring.new(0, 0, 0.9, 30)
-	local v2 = Spring.new(0, 0, 0.6, 10)
+	local module = Spring.new(0, 0, 0.9, 30)
+	local cframe2 = Spring.new(0, 0, 0.6, 10)
 	local Neck = Character.Head.Neck
-	local v3 = CFrame.new(Neck.C1.p)
+	local cframe3 = CFrame.new(Neck.C1.p)
 	local Waist = Character.UpperTorso.Waist
-	local v4 = CFrame.new(Waist.C1.p)
+	local cframe4 = CFrame.new(Waist.C1.p)
 	local Maid = p3.Maid
 	local function Stepped()
 		UpdateArms(p1, p3)
@@ -165,21 +165,21 @@ local function MountLocalPlayer(p1, p2, p3)
 		[Enum.KeyCode.ButtonL2] = 3
 	}
 	local function Heartbeat()
-		local v12 = t[1] - t[3]
-		local v22 = t[2] - t[4]
+		local var12 = t[1] - t[3]
+		local var22 = t[2] - t[4]
 		if InputUtils.isTouch() then
 			local X = GetMoveVector().X
-			local v32 = math.clamp(X, -1, 1)
-			v22 = -v32 * math.abs(v32)
+			local var32 = math.clamp(X, -1, 1)
+			var22 = -var32 * math.abs(var32)
 		end
-		local v42 = v1:SetTarget(UpdateForces(p1, v12, v22).Y * 0.3)
-		local v5 = v2:SetTarget(v12)
-		local v6 = v4 * CFrame.Angles(-v5 * 0.15 + math.abs(v42) * 0.2, -v42 * 0.5, 0)
-		local v7 = v3 * CFrame.Angles(-0.6283185307179586 + v5 * 0.3 - math.abs(v42) * 0.3, 0, 0) * CFrame.Angles(0, -v42 * 0.1, 0)
-		ConstraintUtils.setJointC1(Waist, v6)
-		ConstraintUtils.setJointC1(Neck, v7)
+		local var42 = module:SetTarget(UpdateForces(p1, var12, var22).Y * 0.3)
+		local var5 = cframe2:SetTarget(var12)
+		local var6 = cframe4 * CFrame.Angles(-var5 * 0.15 + math.abs(var42) * 0.2, -var42 * 0.5, 0)
+		local var7 = cframe3 * CFrame.Angles(-0.6283185307179586 + var5 * 0.3 - math.abs(var42) * 0.3, 0, 0) * CFrame.Angles(0, -var42 * 0.1, 0)
+		ConstraintUtils.setJointC1(Waist, var6)
+		ConstraintUtils.setJointC1(Neck, var7)
 		local SteeringMotor = p3.SteeringMotor
-		SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -0.39999999999999997) * CFrame.Angles(0, v42 * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
+		SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -0.39999999999999997) * CFrame.Angles(0, var42 * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
 		if p3.Driver then
 			local LowSound = p1.LowSound
 			local Magnitude = p1.EnginePart.Velocity.Magnitude
@@ -249,8 +249,8 @@ local function MountLocalPlayer(p1, p2, p3)
 			t[3] = 0
 		end
 	}))
-	p1.NeckC1 = v3
-	p1.WaistC1 = v4
+	p1.NeckC1 = cframe3
+	p1.WaistC1 = cframe4
 end
 local function MountThirdPlayer(p1, p2, p3)
 	assert(p2)
@@ -258,9 +258,9 @@ local function MountThirdPlayer(p1, p2, p3)
 	local EnginePart = p1.EnginePart
 	local function Stepped()
 		UpdateArms(p1, p3)
-		local v1 = EnginePart.CFrame:VectorToObjectSpace(EnginePart.RotVelocity)
+		local module = EnginePart.CFrame:VectorToObjectSpace(EnginePart.RotVelocity)
 		local SteeringMotor = p3.SteeringMotor
-		SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -0.39999999999999997) * CFrame.Angles(0, v1.Y * 0.3 * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
+		SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -0.39999999999999997) * CFrame.Angles(0, module.Y * 0.3 * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
 		if p3.Driver then
 			local LowSound = p1.LowSound
 			local Magnitude = p1.EnginePart.Velocity.Magnitude
@@ -277,10 +277,10 @@ function t.MountPlayer(p1, p2, p3)
 	if p3.Driver then
 		local Character = p2.Character
 		assert(Character)
-		local v1 = R15IKv2.BuildPacketArms(Character)
-		p3.IKP = v1
-		p3.RightWristC1 = v1.RightWrist.C1
-		p3.LeftWristC1 = v1.LeftWrist.C1
+		local module = R15IKv2.BuildPacketArms(Character)
+		p3.IKP = module
+		p3.RightWristC1 = module.RightWrist.C1
+		p3.LeftWristC1 = module.LeftWrist.C1
 		local Sound = Instance.new("Sound")
 		Sound.Volume = 0
 		Sound.SoundId = "rbxassetid://" .. 657590761
@@ -308,9 +308,9 @@ function t.MountPlayer(p1, p2, p3)
 		local EnginePart = p1.EnginePart
 		local function Stepped()
 			UpdateArms(p1, p3)
-			local v1 = EnginePart.CFrame:VectorToObjectSpace(EnginePart.RotVelocity)
+			local module = EnginePart.CFrame:VectorToObjectSpace(EnginePart.RotVelocity)
 			local SteeringMotor = p3.SteeringMotor
-			SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -0.39999999999999997) * CFrame.Angles(0, v1.Y * 0.3 * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
+			SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -0.39999999999999997) * CFrame.Angles(0, module.Y * 0.3 * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
 			if p3.Driver then
 				local LowSound = p1.LowSound
 				local Magnitude = p1.EnginePart.Velocity.Magnitude
@@ -356,9 +356,9 @@ local function UnmountLocalPlayer(p1, p2, p3)
 	end
 	p1.WaistC1 = nil
 	p1.NeckC1 = nil
-	local v1 = p1.EnginePart.CFrame
+	local module = p1.EnginePart.CFrame
 	p1.VectorForce.Force = Vector3.new(0, 0, 0)
-	p1.BodyGyro.CFrame = CFrame.new(Vector3.new(), v1.LookVector) + v1.p
+	p1.BodyGyro.CFrame = CFrame.new(Vector3.new(), module.LookVector) + module.p
 	local SteeringMotor = p3.SteeringMotor
 	SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -0.39999999999999997) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
 	if p1.Model:IsDescendantOf(workspace) then
@@ -396,9 +396,9 @@ function t.UnmountSeat(p1, p2)
 end
 function t.Destroy(p1)
 	for i = 1, #p1.Seats do
-		local v1 = p1.Seats[i]
-		if v1.Occupied then
-			p1:UnmountSeat(v1)
+		local module = p1.Seats[i]
+		if module.Occupied then
+			p1:UnmountSeat(module)
 		end
 	end
 	p1.Maid:Destroy()

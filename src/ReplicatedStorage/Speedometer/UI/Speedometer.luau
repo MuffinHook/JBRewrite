@@ -8,11 +8,11 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local createElement = Roact.createElement
 local function comma(p1)
-	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
-	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
+	local color, color2, var3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
+	return color .. color2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. var3
 end
-local v1 = Roact.PureComponent:extend("Speedometer")
-v1.defaultProps = {
+local color = Roact.PureComponent:extend("Speedometer")
+color.defaultProps = {
 	metric = "MPH",
 	hasLicensePlate = true,
 	licensePlate = "JAILBRK!",
@@ -26,7 +26,7 @@ v1.defaultProps = {
 	position = UDim2.new(0, 0, 0, 0),
 	enabled = true
 }
-function v1.init(p1)
+function color.init(p1)
 	p1:setState({
 		ejectOpen = false
 	})
@@ -34,90 +34,90 @@ function v1.init(p1)
 	p1.color_frameRef = Roact.createRef()
 	p1.color_frame2Ref = Roact.createRef()
 end
-function v1.didMount(p1)
+function color.didMount(p1)
 	p1.maid = Maid.new()
-	local v1 = VehicleUtils.GetLocalVehicleModel()
-	assert(v1, "No local vehicle model")
-	p1.maid:GiveTask(VehicleUtils.getTireHealthChangedSignal(v1):Connect(function()
+	local color = VehicleUtils.GetLocalVehicleModel()
+	assert(color, "No local vehicle model")
+	p1.maid:GiveTask(VehicleUtils.getTireHealthChangedSignal(color):Connect(function()
 		p1:setState({
 			_c = math.random()
 		})
 	end))
-	p1.maid:GiveTask(VehicleUtils.getTireMaxHealthChangedSignal(v1):Connect(function()
+	p1.maid:GiveTask(VehicleUtils.getTireMaxHealthChangedSignal(color):Connect(function()
 		p1:setState({
 			_c = math.random()
 		})
 	end))
 	local function setColor(p12)
-		local v1 = p1.color_strokeRef:getValue()
-		local v2 = p1.color_frameRef:getValue()
-		local v3 = p1.color_frame2Ref:getValue()
-		if v1 then
-			v1.Color = p12
+		local color = p1.color_strokeRef:getValue()
+		local color2 = p1.color_frameRef:getValue()
+		local var3 = p1.color_frame2Ref:getValue()
+		if color then
+			color.Color = p12
 		end
-		if v2 then
-			v2.BackgroundColor3 = p12
+		if color2 then
+			color2.BackgroundColor3 = p12
 		end
-		if v3 then
-			v3.BackgroundColor3 = p12
+		if var3 then
+			var3.BackgroundColor3 = p12
 		end
 	end
 	local function hyperChromeUpdated()
-		if v1:GetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME) == HyperChromeConsts.COLOR_SHIFT_NAME then
+		if color:GetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME) == HyperChromeConsts.COLOR_SHIFT_NAME then
 			p1.maid.hyperShiftParticleRainbowHeartbeat = RunService.Heartbeat:Connect(function()
-				local v2 = Color3.fromHSV(os.clock() % HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME / HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME, 1, 1)
-				local v3 = p1.color_strokeRef:getValue()
-				local v4 = p1.color_frameRef:getValue()
-				local v5 = p1.color_frame2Ref:getValue()
-				if v3 then
-					v3.Color = v2
+				local color2 = Color3.fromHSV(os.clock() % HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME / HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME, 1, 1)
+				local var3 = p1.color_strokeRef:getValue()
+				local var4 = p1.color_frameRef:getValue()
+				local var5 = p1.color_frame2Ref:getValue()
+				if var3 then
+					var3.Color = color2
 				end
-				if v4 then
-					v4.BackgroundColor3 = v2
+				if var4 then
+					var4.BackgroundColor3 = color2
 				end
-				if v5 then
-					v5.BackgroundColor3 = v2
+				if var5 then
+					var5.BackgroundColor3 = color2
 				end
 			end)
 		else
 			p1.maid.hyperShiftParticleRainbowHeartbeat = nil
 			local color = p1.props.color
-			local v12 = p1.color_strokeRef:getValue()
-			local v2 = p1.color_frameRef:getValue()
-			local v3 = p1.color_frame2Ref:getValue()
-			if v12 then
-				v12.Color = color
+			local var12 = p1.color_strokeRef:getValue()
+			local color2 = p1.color_frameRef:getValue()
+			local var3 = p1.color_frame2Ref:getValue()
+			if var12 then
+				var12.Color = color
 			end
-			if v2 then
-				v2.BackgroundColor3 = color
+			if color2 then
+				color2.BackgroundColor3 = color
 			end
-			if v3 then
-				v3.BackgroundColor3 = color
+			if var3 then
+				var3.BackgroundColor3 = color
 			end
 		end
 	end
 	task.spawn(hyperChromeUpdated)
-	p1.maid:GiveTask(v1:GetAttributeChangedSignal(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME):Connect(hyperChromeUpdated))
+	p1.maid:GiveTask(color:GetAttributeChangedSignal(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME):Connect(hyperChromeUpdated))
 end
-function v1.render(p1)
+function color.render(p1)
 	if p1.props.enabled then
 		local smallUI = p1.props.smallUI
-		local v1 = VehicleUtils.GetLocalVehicleModel()
-		if v1 then
-			local v2 = VehicleUtils.getTireHealth(v1)
-			local v3 = VehicleUtils.getTireMaxHealth(v1)
+		local color = VehicleUtils.GetLocalVehicleModel()
+		if color then
+			local color2 = VehicleUtils.getTireHealth(color)
+			local var3 = VehicleUtils.getTireMaxHealth(color)
 			if RunService:IsRunning() then
-				assert(v2 and v3, "No health or maxHealth")
+				assert(color2 and var3, "No health or maxHealth")
 			else
-				v2 = 75
-				v3 = 150
+				color2 = 75
+				var3 = 150
 			end
-			local v4 = v2 / v3
+			local var4 = color2 / var3
 			local t = {}
 			if p1.state.ejectOpen and p1.props.passengers then
 				for i, v in ipairs(p1.props.passengers) do
-					local v5 = v.Name
-					t[v5] = createElement("TextButton", {
+					local var5 = v.Name
+					t[var5] = createElement("TextButton", {
 						BackgroundTransparency = 0,
 						BorderSizePixel = 0,
 						BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
@@ -130,7 +130,7 @@ function v1.render(p1)
 								ejectOpen = false
 							})
 							if p1.props.onClickEjectName then
-								p1.props.onClickEjectName(v5)
+								p1.props.onClickEjectName(var5)
 							end
 						end
 					}, {
@@ -139,7 +139,7 @@ function v1.render(p1)
 						}),
 						Title = createElement("TextLabel", {
 							BackgroundTransparency = 1,
-							Text = v5,
+							Text = var5,
 							Font = Enum.Font.LuckiestGuy,
 							TextColor3 = Color3.new(51/255, 51/255, 51/255),
 							TextScaled = true,
@@ -158,16 +158,16 @@ function v1.render(p1)
 					Image = "rbxassetid://8208058512",
 					Size = UDim2.new(1, 0, 1, 0),
 					ImageColor3 = p1.props.accelRatio:map(function(p1)
-						local v1 = Color3.new(255/255, 255/255, 255/255)
-						local v2 = i / 10
-						local v3 = (i + 1) / 10
-						if p1 < v2 then
+						local color = Color3.new(255/255, 255/255, 255/255)
+						local color2 = i / 10
+						local var3 = (i + 1) / 10
+						if p1 < color2 then
 							return Color3.new(0/255, 0/255, 0/255)
 						else
-							if p1 < v3 then
-								v1 = Color3.new(0/255, 0/255, 0/255):lerp(v1, ((p1 - v2) / (v3 - v2)) ^ 2)
+							if p1 < var3 then
+								color = Color3.new(0/255, 0/255, 0/255):lerp(color, ((p1 - color2) / (var3 - color2)) ^ 2)
 							end
-							return v1
+							return color
 						end
 					end),
 					LayoutOrder = i
@@ -236,8 +236,8 @@ function v1.render(p1)
 				TextColor3 = Color3.new(255/255, 255/255, 255/255),
 				TextScaled = true,
 				Text = p1.props.distance:map(function(p1)
-					local v2, v3, v4 = string.match(math.floor(p1 + 0.5), "^([^%d]*%d)(%d*)(.-)$")
-					return ("%s mi"):format(v2 .. v3:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v4)
+					local color2, var3, var4 = string.match(math.floor(p1 + 0.5), "^([^%d]*%d)(%d*)(.-)$")
+					return ("%s mi"):format(color2 .. var3:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. var4)
 				end),
 				Font = Enum.Font.LuckiestGuy,
 				TextYAlignment = Enum.TextYAlignment.Bottom
@@ -299,12 +299,12 @@ function v1.render(p1)
 				Position = UDim2.new(0.16, 0, 0.14, 0),
 				Visible = p1.props.ejectEnabled,
 				[Roact.Event.MouseButton1Down] = function()
-					local v1 = not p1.state.ejectOpen
+					local color = not p1.state.ejectOpen
 					p1:setState({
-						ejectOpen = v1
+						ejectOpen = color
 					})
 					if p1.props.onClickEject then
-						p1.props.onClickEject(v1)
+						p1.props.onClickEject(color)
 					end
 				end
 			}, {
@@ -414,13 +414,13 @@ function v1.render(p1)
 				}),
 				Inner = createElement("Frame", {
 					BackgroundTransparency = 1,
-					Size = UDim2.new(v4, 0, 1, 0),
+					Size = UDim2.new(var4, 0, 1, 0),
 					ClipsDescendants = true
 				}, {
 					Value = createElement("Frame", {
 						BackgroundTransparency = 0,
 						BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
-						Size = UDim2.new(math.min(1 / v4, 2), 0, 1, 0)
+						Size = UDim2.new(math.min(1 / var4, 2), 0, 1, 0)
 					}, {
 						UICorner = createElement("UICorner", {
 							CornerRadius = UDim.new(1, 0)
@@ -502,8 +502,8 @@ function v1.render(p1)
 						TextColor3 = Color3.new(255/255, 255/255, 255/255),
 						TextScaled = true,
 						Text = p1.props.distance:map(function(p1)
-							local v2, v3, v4 = string.match(math.floor(p1 + 0.5), "^([^%d]*%d)(%d*)(.-)$")
-							return ("%s mi"):format(v2 .. v3:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v4)
+							local color2, var3, var4 = string.match(math.floor(p1 + 0.5), "^([^%d]*%d)(%d*)(.-)$")
+							return ("%s mi"):format(color2 .. var3:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. var4)
 						end),
 						Font = Enum.Font.LuckiestGuy
 					})
@@ -514,7 +514,7 @@ function v1.render(p1)
 		end
 	end
 end
-function v1.willUnmount(p1)
+function color.willUnmount(p1)
 	p1.maid:Destroy()
 end
-return v1
+return color

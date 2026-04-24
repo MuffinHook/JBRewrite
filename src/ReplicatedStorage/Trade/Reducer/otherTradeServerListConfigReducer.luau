@@ -1,14 +1,15 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	setOtherTradeServerInfo = function(p1, p2)
-		local v1 = table.clone(p1)
-		v1.otherTradeServerInfo = p2.value
-		return v1
+	setOtherTradeServerInfo = function(state, action)
+		local updatedState = table.clone(state)
+		updatedState.otherTradeServerInfo = action.value
+		return updatedState
 	end,
-	setOtherTradeServerListVisible = function(p1, p2)
-		local v1 = table.clone(p1)
-		v1.visible = p2.value
-		return v1
+	setOtherTradeServerListVisible = function(state, action)
+		local updatedState = table.clone(state)
+		updatedState.visible = action.value
+		return updatedState
 	end
 })

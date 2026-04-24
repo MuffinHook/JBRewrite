@@ -17,11 +17,11 @@ local t = {
 function t.raycastMouse(p1, p2)
 	local v1 = t.getMouseLocation(p2)
 	local v2 = CurrentCamera:ViewportPointToRay(v1.X, v1.Y)
-	local v3 = RaycastParams.new()
-	v3.FilterDescendantsInstances = p1
-	local v4 = Raycast.collidable(v2.Origin, v2.Direction, 999, v3)
-	if v4 then
-		return v4
+	local instance3 = RaycastParams.new()
+	instance3.FilterDescendantsInstances = p1
+	local var4 = Raycast.collidable(v2.Origin, v2.Direction, 999, instance3)
+	if var4 then
+		return var4
 	else
 		return nil
 	end

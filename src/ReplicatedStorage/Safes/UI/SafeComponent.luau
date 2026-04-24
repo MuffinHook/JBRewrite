@@ -7,27 +7,27 @@ local AccelTween = require(ReplicatedStorage.Std.AccelTween)
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("SafeComponent")
-v1.defaultProps = {
+local color = Roact.PureComponent:extend("SafeComponent")
+color.defaultProps = {
 	static = false,
 	selected = false,
 	count = nil
 }
-function v1.init(p1)
+function color.init(p1)
 	p1:setState({
  hover = false
 	})
 	p1.maid = Maid.new()
-	local v1, v2 = Roact.createBinding(1)
-	p1.iconScale = v1
+	local color, v2 = Roact.createBinding(1)
+	p1.iconScale = color
 	p1.updateIconScale = v2
 	p1.iconScaleAccelTween = AccelTween.new(1000)
 	p1.iconScaleAccelTween.p = p1.iconScale:getValue()
 end
-function v1.render(p1)
-	local v1 = Color3.new(0.3, 0.3, 0.3)
+function color.render(p1)
+	local color = Color3.new(0.3, 0.3, 0.3)
 	if not p1.props.static and (p1.state.hover or p1.props.selected) then
- v1 = ColorUtils.brightenBy(v1, 0.5)
+ color = ColorUtils.brightenBy(color, 0.5)
 	end
 	local t = {
  AutoButtonColor = false,
@@ -61,7 +61,7 @@ function v1.render(p1)
 	}
 	local t2 = {
  Bubble = createElement("Frame", {
- BackgroundColor3 = v1,
+ BackgroundColor3 = color,
  Size = UDim2.new(1 / p1.props.aspectRatio, 0, 1, 0),
  AnchorPoint = Vector2.new(0.5, 0.5),
  Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -121,7 +121,7 @@ function v1.render(p1)
 	t2.Icon = createElement("ImageLabel", t3, t4)
 	return createElement("TextButton", t, Dictionary.merge(p1.props[Roact.Children], t2))
 end
-function v1._launchIconScaleUpdater(p1)
+function color._launchIconScaleUpdater(p1)
 	if p1.props.static then
  p1.updateIconScale(p1.iconScaleAccelTween.t)
 	else
@@ -133,23 +133,23 @@ function v1._launchIconScaleUpdater(p1)
  end)
 	end
 end
-function v1._recalculateIconScale(p1)
-	local v1 = if p1.state.hover or p1.props.selected then 1.2 else 1
-	if p1.iconScaleAccelTween.t ~= v1 then
- p1.iconScaleAccelTween.t = v1
+function color._recalculateIconScale(p1)
+	local color = if p1.state.hover or p1.props.selected then 1.2 else 1
+	if p1.iconScaleAccelTween.t ~= color then
+ p1.iconScaleAccelTween.t = color
  p1.updateIconScale(p1.iconScaleAccelTween.p)
  p1:_launchIconScaleUpdater()
 	end
 end
-function v1.didMount(p1)
+function color.didMount(p1)
 	p1:_recalculateIconScale()
 end
-function v1.didUpdate(p1, p2, p3)
+function color.didUpdate(p1, p2, p3)
 	if p1.state.hover ~= p3.hover or p1.props.selected ~= p2.selected then
  p1:_recalculateIconScale()
 	end
 end
-function v1.willUnmount(p1)
+function color.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
-return v1
+return color

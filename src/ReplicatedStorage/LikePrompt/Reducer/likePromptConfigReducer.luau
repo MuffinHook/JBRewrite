@@ -5,9 +5,9 @@ return require(ReplicatedStorage.Rodux).createReducer({
 	countdownTil = 0
 }, {
 	setLikePromptConfig = function(p1, p2)
-		local v1 = table.clone(p1)
-		v1.visible = p2.visible
-		v1.countdownTil = p2.countdownTil
-		return v1
+		local tbl = table.clone(p1)
+		tbl.visible = p2.visible
+		tbl.countdownTil = p2.countdownTil
+		return tbl
 	end
 })

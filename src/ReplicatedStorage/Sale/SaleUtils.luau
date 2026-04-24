@@ -14,17 +14,17 @@ end
 function t.formatRemaining(p1)
 	local v1 = math.max(0, p1)
 	local v2 = math.floor(v1 / 86400)
-	local v3 = math.floor(v1 % 86400 / 3600)
-	local v4 = math.floor(v1 % 3600 / 60)
-	local v5 = math.floor(v1 % 60)
+	local var3 = math.floor(v1 % 86400 / 3600)
+	local var4 = math.floor(v1 % 3600 / 60)
+	local var5 = math.floor(v1 % 60)
 	if v2 > 0 then
-		return ("%dd %dh %dm %ds"):format(v2, v3, v4, v5)
-	elseif v3 > 0 then
-		return ("%dh %dm %ds"):format(v3, v4, v5)
-	elseif v4 > 0 then
-		return ("%dm %ds"):format(v4, v5)
+		return ("%dd %dh %dm %ds"):format(v2, var3, var4, var5)
+	elseif var3 > 0 then
+		return ("%dh %dm %ds"):format(var3, var4, var5)
+	elseif var4 > 0 then
+		return ("%dm %ds"):format(var4, var5)
 	else
-		return ("%ds"):format(v5)
+		return ("%ds"):format(var5)
 	end
 end
 return t

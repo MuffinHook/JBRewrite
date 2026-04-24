@@ -7,14 +7,14 @@ local Settings = require(ReplicatedStorage.Resource.Settings)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Localization = require(ReplicatedStorage.Module.Localization)
-local v1 = false
+local instance = false
 local t = {}
 local function ProcessQueue()
 	if #t > 0 then
-		v1 = true
+		instance = true
 		table.remove(t, 1):Hook()
 	else
-		v1 = false
+		instance = false
 	end
 end
 local function SelectIfGamepad(p1)
@@ -29,12 +29,12 @@ function t2.Init(p1)
 	ConfirmationGui.Confirmation.Background.ContainerButtons.ContainerYes.Button.Message.Text = Localization:FormatByKey("General.Yes")
 	ConfirmationGui.Confirmation.Background.ContainerButtons.ContainerNo.Button.Message.Text = Localization:FormatByKey("General.No")
 	function p1.em.p4rz6ffg(p1, p2)
-		local v1 = t2.new(p1, p2)
-		v1.OnYes:Connect(function()
-			v1 = nil
+		local instance = t2.new(p1, p2)
+		instance.OnYes:Connect(function()
+			instance = nil
 		end)
-		v1.OnNo:Connect(function()
-			v1 = nil
+		instance.OnNo:Connect(function()
+			instance = nil
 		end)
 	end
 	GameUtil.OnTeamChanged:Connect(function(p1)
@@ -61,13 +61,13 @@ function t2.new(p1, p2)
 	end
 	t3.Text = p1
 	table.insert(t, t3)
-	if v1 == false then
+	if instance == false then
 		if #t > 0 then
-			v1 = true
+			instance = true
 			table.remove(t, 1):Hook()
 			return t3
 		end
-		v1 = false
+		instance = false
 	end
 	return t3
 end
@@ -97,11 +97,11 @@ function t2.Destroy(p1)
 		p1.Maid:Destroy()
 		p1.Maid = nil
 		if #t > 0 then
-			v1 = true
+			instance = true
 			table.remove(t, 1):Hook()
 			return
 		end
-		v1 = false
+		instance = false
 	end
 end
 return t2

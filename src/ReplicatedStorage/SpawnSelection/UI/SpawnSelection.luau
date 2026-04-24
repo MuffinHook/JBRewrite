@@ -174,30 +174,30 @@ function SpawnSelectionComponent.render(self)
 		return createElement(Minimap, minimapProps, minimapChildren)
 	end
 end
-function v1._startTimer(p1)
+function delta._startTimer(p1)
 	local function update()
-		local v1 = workspace:GetServerTimeNow() - p1.props.bornAt
-		if p1.props.duration <= v1 then
+		local delta = workspace:GetServerTimeNow() - p1.props.bornAt
+		if p1.props.duration <= delta then
 			p1.maid.countdown = nil
 		end
 		local t = {}
-		t.remaining = math.max(0, (math.ceil(p1.props.duration - v1)))
+		t.remaining = math.max(0, (math.ceil(p1.props.duration - delta)))
 		p1:setState(t)
 	end
 	update()
 	p1.maid.countdown = Interval.every(1):Connect(update)
 end
-function v1.didUpdate(p1, p2, p3)
+function delta.didUpdate(p1, p2, p3)
 	if #p1.props.spawns ~= #p2.spawns then
 		p1:_startTimer()
 	end
 end
-function v1.didMount(p1)
+function delta.didMount(p1)
 	if #p1.props.spawns > 0 then
 		p1:_startTimer()
 	end
 end
-function v1.willUnmount(p1)
+function delta.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
 return RoactRodux.connect(function(p1, p2)
@@ -216,4 +216,4 @@ end, function(p1)
 			})
 		end
 	}
-end)(v1)
+end)(delta)

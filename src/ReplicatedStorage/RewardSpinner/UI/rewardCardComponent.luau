@@ -6,7 +6,7 @@ return function(p1)
 	local aspectRatio = p1.aspectRatio
 	local v2 = p1.backGlowEnabled or false
 	local bubbleColor = p1.bubbleColor
-	local v4 = if p1.getInst == nil then createElement("Frame", {
+	local var4 = if p1.getInst == nil then createElement("Frame", {
 	BackgroundColor3 = bubbleColor,
 	Size = UDim2.new(0.8, 0, 0.8 * aspectRatio, 0),
 	Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -77,7 +77,7 @@ return function(p1)
 			ImageColor3 = bubbleColor,
 			Visible = p1.frontGlowEnabled or false
 		}),
-		Circle = v4
+		Circle = var4
 	}
 	t4.Owned = p1.owned and createElement("ImageLabel", {
 		BackgroundTransparency = 1,

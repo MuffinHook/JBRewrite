@@ -13,9 +13,9 @@ local t = {
 }
 local v1 = SaleUtils.getNextSaleTime()
 Interval.every(1):Connect(function()
-	local v12 = SaleUtils.getNextSaleTime()
-	if v1 + 0.01 < v12 then
-		v1 = v12
+	local var12 = SaleUtils.getNextSaleTime()
+	if v1 + 0.01 < var12 then
+		v1 = var12
 		t.onSaleRefresh:Fire()
 	end
 end)
@@ -49,9 +49,9 @@ local function applySeededSort(p1, p2)
 	table.sort(p1, function(p1, p22)
 		return p1.Pointer[p2] < p22.Pointer[p2]
 	end)
-	local v2 = Random.new((SaleUtils.getNumSalesPassed()))
+	local instance2 = Random.new((SaleUtils.getNumSalesPassed()))
 	for v3, v4 in p1 do
-		v4.SortNumber = v2:NextNumber()
+		v4.SortNumber = instance2:NextNumber()
 	end
 	table.sort(p1, function(p1, p2)
 		return p1.SortNumber < p2.SortNumber
@@ -60,19 +60,19 @@ end
 local function _getOnSaleVehicleCustomizations()
 	local t = {}
 	local t2 = {}
-	for v1, v2 in VehicleConf.CATEGORIES do
-		if v2 ~= SaleConsts.CATEGORY_NAME and not (OwnershipConsts.COLOR_CATEGORY_TYPES[v2] or OwnershipConsts.TEXTURE_CATEGORY_TYPES[v2]) then
-			for v3, v4 in require(ReplicatedStorage.Game.Garage.StoreData:FindFirstChild(v2)).Items do
+	for v1, instance2 in VehicleConf.CATEGORIES do
+		if instance2 ~= SaleConsts.CATEGORY_NAME and not (OwnershipConsts.COLOR_CATEGORY_TYPES[instance2] or OwnershipConsts.TEXTURE_CATEGORY_TYPES[instance2]) then
+			for v3, v4 in require(ReplicatedStorage.Game.Garage.StoreData:FindFirstChild(instance2)).Items do
 				table.insert(t, {
-					CategoryName = v2,
+					CategoryName = instance2,
 					Pointer = v4
 				})
 			end
-			t2[v2] = true
+			t2[instance2] = true
 		end
 	end
 	local count = 0
-	for v5, v6 in t2 do
+	for var5, v6 in t2 do
 		count = count + 1
 	end
 	applySeededSort(t, "Name")
@@ -82,18 +82,18 @@ local function _getOnSaleVehicleCustomizations()
 	for v7, v8 in t do
 		local CategoryName = v8.CategoryName
 		local Pointer = v8.Pointer
-		local v9 = not GarageUtils.isVehicleCustomizationLimited(Pointer)
-		if v9 then
-			v9 = not Pointer.None
-			if v9 then
-				v9 = if Pointer.Price and Pointer.Price < 1000000 then Pointer.Price > 0 else false
-				v9 = v9 and not Pointer.NoGarageUI
+		local var9 = not GarageUtils.isVehicleCustomizationLimited(Pointer)
+		if var9 then
+			var9 = not Pointer.None
+			if var9 then
+				var9 = if Pointer.Price and Pointer.Price < 1000000 then Pointer.Price > 0 else false
+				var9 = var9 and not Pointer.NoGarageUI
 			end
 		end
-		if v9 and not t3[CategoryName] then
-			local v10 = table.clone(v8.Pointer)
-			v10.CategoryName = CategoryName
-			table.insert(t4, v10)
+		if var9 and not t3[CategoryName] then
+			local table10 = table.clone(v8.Pointer)
+			table10.CategoryName = CategoryName
+			table.insert(t4, table10)
 			if not t5[CategoryName] then
 				t5[CategoryName] = {}
 			end
@@ -108,9 +108,9 @@ local function _getOnSaleVehicleCustomizations()
 end
 local function _getOnSaleVehicles()
 	local t = {}
-	for v1, v2 in VehicleData do
+	for v1, instance2 in VehicleData do
 		table.insert(t, {
-			Pointer = v2
+			Pointer = instance2
 		})
 	end
 	applySeededSort(t, "Make")
@@ -118,15 +118,15 @@ local function _getOnSaleVehicles()
 	local t3 = {}
 	for v3, v4 in t do
 		local Pointer = v4.Pointer
-		local v5 = not GarageUtils.isVehicleLimited(Pointer)
-		if v5 then
-			v5 = not Pointer.None
-			if v5 then
-				v5 = if Pointer.Price and Pointer.Price < 1000000 then Pointer.Price > 0 else false
-				v5 = v5 and (not Pointer.NoGarageUI and (not Pointer.NoMainWorldGarageSpawn and not Pointer.ExcludeFromSale))
+		local var5 = not GarageUtils.isVehicleLimited(Pointer)
+		if var5 then
+			var5 = not Pointer.None
+			if var5 then
+				var5 = if Pointer.Price and Pointer.Price < 1000000 then Pointer.Price > 0 else false
+				var5 = var5 and (not Pointer.NoGarageUI and (not Pointer.NoMainWorldGarageSpawn and not Pointer.ExcludeFromSale))
 			end
 		end
-		if v5 then
+		if var5 then
 			table.insert(t2, v4.Pointer)
 			t3[v4.Pointer.Make] = true
 		end

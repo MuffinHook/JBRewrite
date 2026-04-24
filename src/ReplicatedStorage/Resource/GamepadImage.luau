@@ -11,9 +11,9 @@ local function getImageInstance(p1, p2, p3)
 	if type(p2) == "userdata" then
 		p2 = string.sub(tostring(p2), 14)
 	end
-	local v3 = tbl.XboxOne[p3]
-	if v3 then
-		return v3:GetSprite(p1, p2)
+	local var3 = tbl.XboxOne[p3]
+	if var3 then
+		return var3:GetSprite(p1, p2)
 	end
 	warn("Could not find style: " .. p3)
 end

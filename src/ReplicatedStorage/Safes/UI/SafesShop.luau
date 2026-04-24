@@ -14,8 +14,8 @@ local paddedScrollingGrid = require(script.Parent.paddedScrollingGrid)
 local topBarButtonsComponent = require(script.Parent.topBarButtonsComponent)
 local rewardCardComponent = require(ReplicatedStorage.RewardSpinner.UI.rewardCardComponent)
 local bodyTopBarComponent = require(script.Parent.bodyTopBarComponent)
-local v1 = Roact.PureComponent:extend("SafesShop")
-function v1.init(p1)
+local color = Roact.PureComponent:extend("SafesShop")
+function color.init(p1)
 	p1.maid = Maid.new()
 	p1:setState({
 		canPurchase = true
@@ -37,8 +37,8 @@ function v1.init(p1)
 		end)
 	end
 end
-function v1.render(p1)
-	local v1 = Color3.new(51/255, 51/255, 51/255)
+function color.render(p1)
+	local color = Color3.new(51/255, 51/255, 51/255)
 	local t = {
 		BackgroundTransparency = 0.8,
 		BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
@@ -73,7 +73,7 @@ function v1.render(p1)
 	})
 }) else nil
 	local t5 = {
-		backgroundColor = v1,
+		backgroundColor = color,
 		paddingTop = 0,
 		paddingLeft = 0,
 		paddingRight = 0,
@@ -120,7 +120,7 @@ function v1.render(p1)
 	}, t8)
 	t4.TopBar = createElement(PaddedContainer, t5, t6)
 	t4.Left = createElement(PaddedContainer, {
-		backgroundColor = v1,
+		backgroundColor = color,
 		paddingTop = 0.5,
 		paddingLeft = 0,
 		paddingRight = 0.5,
@@ -142,7 +142,7 @@ function v1.render(p1)
 		})
 	})
 	t4.Body = createElement(PaddedContainer, {
-		backgroundColor = v1,
+		backgroundColor = color,
 		paddingTop = 0.5,
 		paddingLeft = 0.5,
 		paddingRight = 0.5,
@@ -172,7 +172,7 @@ function v1.render(p1)
 		})
 	})
 	t4.Right = createElement(PaddedContainer, {
-		backgroundColor = v1,
+		backgroundColor = color,
 		paddingTop = 0.5,
 		paddingLeft = 0.5,
 		paddingRight = 0,
@@ -190,7 +190,7 @@ function v1.render(p1)
 			}, p1.props.selectedSafeTierData)) })
 	})
 	local t10 = {
-		backgroundColor = v1,
+		backgroundColor = color,
 		paddingTop = 0.5,
 		paddingLeft = 0.5,
 		paddingRight = 0,
@@ -288,5 +288,5 @@ function v1.render(p1)
 	})
 	return createElement("Frame", t, t2)
 end
-function v1.didMount(p1)  end
-return v1
+function color.didMount(p1)  end
+return color

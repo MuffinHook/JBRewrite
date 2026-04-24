@@ -24,22 +24,22 @@ function t.getInstance(p1)
 	return Part
 end
 function t.updateCamera(p1, p2)
-	local v1 = os.clock() / 2
-	p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+	local tbl = os.clock() / 2
+	p1.CFrame = CFrame.Angles(0, tbl % 6.283185307179586, 0) * CFrame.Angles(math.sin(tbl) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 end
-local v1 = table.clone(Color.Items)
-table.insert(v1, 1, {
+local tbl = table.clone(Color.Items)
+table.insert(tbl, 1, {
 	Name = "Default",
 	None = true
 })
 function t.getItems()
-	return v1
+	return tbl
 end
 function t.apply(p1, p2)
 	local WallColor = p2:FindFirstChild("WallColor")
 	if WallColor then
 		local count = 0
-		for v1, v2 in WallColor:GetChildren() do
+		for tbl, v2 in WallColor:GetChildren() do
 			if v2:IsA("BasePart") then
 				count = count + 1
 				if p1 and not p1.None then

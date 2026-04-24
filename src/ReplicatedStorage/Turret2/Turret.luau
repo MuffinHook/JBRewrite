@@ -13,8 +13,8 @@ local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
 local Raycast = require(ReplicatedStorage.Std.Raycast)
 local Signal = require(ReplicatedStorage.Std.Signal)
 local function ShortAngleDist(p1, p2)
-	local v1 = (p2 - p1) % 6.283185307179586
-	return 2 * v1 % 6.283185307179586 - v1
+	local instance = (p2 - p1) % 6.283185307179586
+	return 2 * instance % 6.283185307179586 - instance
 end
 local t = {
 	weapon_cannon_shot_04 = 2205008075
@@ -70,18 +70,18 @@ function t2.PointAt(p1, p2)
 	end
 end
 function t2.Update(p1)
-	local v1 = os.clock()
-	local v2 = v1 - p1.LastUpdate
-	p1.LastUpdate = v1
-	local v3 = (p1.TargetHorizontalAngle - p1.HorizontalAngle) % 6.283185307179586
-	p1.HorizontalAngle = p1.HorizontalAngle + math.clamp(2 * v3 % 6.283185307179586 - v3, -p1.MaxDHorizontalAngle * v2, p1.MaxDHorizontalAngle * v2)
-	local v6 = p1.SpringHorizontalAngle:SetTarget(p1.HorizontalAngle)
+	local instance = os.clock()
+	local v2 = instance - p1.LastUpdate
+	p1.LastUpdate = instance
+	local var3 = (p1.TargetHorizontalAngle - p1.HorizontalAngle) % 6.283185307179586
+	p1.HorizontalAngle = p1.HorizontalAngle + math.clamp(2 * var3 % 6.283185307179586 - var3, -p1.MaxDHorizontalAngle * v2, p1.MaxDHorizontalAngle * v2)
+	local var6 = p1.SpringHorizontalAngle:SetTarget(p1.HorizontalAngle)
 	p1.VerticalAngle = math.clamp(p1.VerticalAngle + math.clamp(p1.TargetVerticalAngle - p1.VerticalAngle, -p1.MaxDVerticalAngle * v2, p1.MaxDVerticalAngle * v2), -0.9424777960769379, 1.5707963267948966)
-	TurretUtils.updateModel(p1.MotorBase, p1.MotorArm, v6, (p1.SpringVerticalAngle:SetTarget(p1.VerticalAngle)))
-	local v12 = p1.SpringShoot:Update()
-	p1.MotorBarrel.C1 = p1.MotorBarrel.C0:Inverse() * CFrame.new(0, 0, v12) * p1.MotorBarrel.C0
-	if p1.Target and 1 / p1:GetShootHz() < v1 - p1.LastShoot then
-		p1.LastShoot = v1
+	TurretUtils.updateModel(p1.MotorBase, p1.MotorArm, var6, (p1.SpringVerticalAngle:SetTarget(p1.VerticalAngle)))
+	local var12 = p1.SpringShoot:Update()
+	p1.MotorBarrel.C1 = p1.MotorBarrel.C0:Inverse() * CFrame.new(0, 0, var12) * p1.MotorBarrel.C0
+	if p1.Target and 1 / p1:GetShootHz() < instance - p1.LastShoot then
+		p1.LastShoot = instance
 		if p1.Model:GetAttribute(TurretConsts.USE_LASER_ATTR_NAME) == true then
 			p1:ShootLaser()
 			return
@@ -106,7 +106,7 @@ function t2.ShootLaser(p1)
 	p1.SpringShoot:Accelerate(50)
 	p1.SpringVerticalAngle:Accelerate(1)
 	p1.SpringHorizontalAngle:Accelerate(-1)
-	local v1 = Maid.new()
+	local instance = Maid.new()
 	local Part = Instance.new("Part")
 	Part.Anchored = true
 	Part.CanCollide = false
@@ -120,31 +120,31 @@ function t2.ShootLaser(p1)
 	local Smooth_2 = Enum.SurfaceType.Smooth
 	Part.TopSurface = Smooth
 	Part.BottomSurface = Smooth_2
-	v1:GiveTask(Part)
-	p1.Maid.laserMaid = v1
+	instance:GiveTask(Part)
+	p1.Maid.laserMaid = instance
 	local v2 = 1 / p1:GetShootHz() * 0.5
 	local Tip = p1.Model.Arm.Tip
 	local Vehicles = workspace:FindFirstChild("Vehicles")
 	local function updateLaserToTarget(p12)
-		local v1 = RaycastParams.new()
-		v1.FilterType = Enum.RaycastFilterType.Exclude
-		v1.FilterDescendantsInstances = { p1.Model, Vehicles }
-		v1.IgnoreWater = true
-		local v22 = p12 - Tip.Position
-		local v3 = Raycast.collidable(Tip.Position, v22.Unit, v22.Magnitude, v1, function(p1)
+		local instance = RaycastParams.new()
+		instance.FilterType = Enum.RaycastFilterType.Exclude
+		instance.FilterDescendantsInstances = { p1.Model, Vehicles }
+		instance.IgnoreWater = true
+		local var22 = p12 - Tip.Position
+		local var3 = Raycast.collidable(Tip.Position, var22.Unit, var22.Magnitude, instance, function(p1)
 			if p1:GetAttribute("InvisibleToBullets") == true then
 				return false
 			else
 				return p1.CanCollide and true or false
 			end
 		end)
-		if v3 then
-			v22 = v3.Position - Tip.Position
+		if var3 then
+			var22 = var3.Position - Tip.Position
 		end
-		local Magnitude = v22.Magnitude
+		local Magnitude = var22.Magnitude
 		Part.Size = Vector3.new(0.5, 0.5, Magnitude)
-		local v4 = os.clock()
-		Part.CFrame = CFrame.new(Vector3.new(0, 0, 0), v22.Unit) * CFrame.new(0, 0, -Magnitude / 2) * CFrame.Angles(0, 0, v4 * 20 % 6.283185307179586) + Tip.Position
+		local var4 = os.clock()
+		Part.CFrame = CFrame.new(Vector3.new(0, 0, 0), var22.Unit) * CFrame.new(0, 0, -Magnitude / 2) * CFrame.Angles(0, 0, var4 * 20 % 6.283185307179586) + Tip.Position
 		if p1.shoot1Sound then
 			p1.shoot1Sound:Play()
 		else
@@ -173,10 +173,10 @@ function t2.ShootLaser(p1)
 		task.delay(v2, function()
 			p1.laserLoop:Stop()
 		end)
-		local v5 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-		if v5 then
-			local _, v6 = GeomUtils.closestPointOnLine(p1.Model.Arm.Tip.Position, v22, v5.Position)
-			if v6 < 8 and os.clock() - p1.LastHit >= 1 / p1:GetShootHz() then
+		local localPlayer = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+		if localPlayer then
+			local _, var6 = GeomUtils.closestPointOnLine(p1.Model.Arm.Tip.Position, var22, localPlayer.Position)
+			if var6 < 8 and os.clock() - p1.LastHit >= 1 / p1:GetShootHz() then
 				p1.LastHit = os.clock()
 				p1.onLocalPlayerHit:Fire(Players.LocalPlayer)
 			end
@@ -184,15 +184,15 @@ function t2.ShootLaser(p1)
 	end
 	updateLaserToTarget(Tip.Position + Vector3.new(0.01, 0.01, 0.01))
 	Part.Parent = workspace
-	local v3 = os.clock()
-	v1:GiveTask(RunService.Heartbeat:Connect(function()
+	local var3 = os.clock()
+	instance:GiveTask(RunService.Heartbeat:Connect(function()
 		if p1.Target then
-			local v1 = os.clock() - v3
-			if v2 <= v1 then
-				v1 = v2
+			local instance = os.clock() - var3
+			if v2 <= instance then
+				instance = v2
 			end
-			updateLaserToTarget(Tip.Position:Lerp(p1.Target, (math.clamp(v1 / v2 * 5, 0, 1))))
-			if v1 == v2 then
+			updateLaserToTarget(Tip.Position:Lerp(p1.Target, (math.clamp(instance / v2 * 5, 0, 1))))
+			if instance == v2 then
 				p1.Maid.laserMaid = nil
 			end
 		else

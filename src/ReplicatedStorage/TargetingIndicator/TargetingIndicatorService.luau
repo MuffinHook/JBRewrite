@@ -21,26 +21,26 @@ return {
 				local Position = p1.Character.PrimaryPart.Position
 				local v1 = nil
 				local v2 = nil
-				local v3 = nil
-				local v4 = nil
-				for v5, v6 in Players:GetChildren() do
-					if v6 ~= p1 then
-						local Character = v6.Character
-						if Character and (Character.PrimaryPart ~= nil and (v6.TeamValue.Value == Settings.Team.Prisoner and not Character:GetAttribute("HasHandcuffs"))) then
-							local v7 = Character.PrimaryPart.Position - Position
-							local Magnitude = v7.Magnitude
-							local Magnitude_2 = Vector3.new(v7.X, 0, v7.Z).Magnitude
-							local Y = v7.Y
+				local var3 = nil
+				local var4 = nil
+				for var5, var6 in Players:GetChildren() do
+					if var6 ~= p1 then
+						local Character = var6.Character
+						if Character and (Character.PrimaryPart ~= nil and (var6.TeamValue.Value == Settings.Team.Prisoner and not Character:GetAttribute("HasHandcuffs"))) then
+							local var7 = Character.PrimaryPart.Position - Position
+							local Magnitude = var7.Magnitude
+							local Magnitude_2 = Vector3.new(var7.X, 0, var7.Z).Magnitude
+							local Y = var7.Y
 							if not v1 or Magnitude < v1 then
 								v1 = Magnitude
-								v2 = v6
-								v3 = Magnitude_2
-								v4 = Y
+								v2 = var6
+								var3 = Magnitude_2
+								var4 = Y
 							end
 						end
 					end
 				end
-				return v2, v1, v3, v4
+				return v2, v1, var3, var4
 			else
 				return nil, nil, nil, nil
 			end
@@ -61,140 +61,140 @@ return {
 			local obj = p1.obj
 			local v1 = InventoryItemUtils.getName(obj)
 			local v2 = nil
-			local v3 = nil
-			local v4 = nil
+			local var3 = nil
+			local var4 = nil
 			if v1 == "Taser" then
 				v2 = Taser.Range
 			elseif v1 == "Handcuffs" then
-				v3 = Handcuffs.ArrestDistance
-				v4 = Handcuffs.ArrestDistance * 2
+				var3 = Handcuffs.ArrestDistance
+				var4 = Handcuffs.ArrestDistance * 2
 			end
-			local v5 = InventoryItemUtils.getOwner(obj)
-			if v5 then
-				local v6 = t[v5.UserId]
-				if v6 then
-					v6:Destroy()
+			local var5 = InventoryItemUtils.getOwner(obj)
+			if var5 then
+				local var6 = t[var5.UserId]
+				if var6 then
+					var6:Destroy()
 				end
-				local v7 = Maid.new()
-				t[v5.UserId] = v7
-				v7:GiveTask(RunService.Heartbeat:Connect(function()
-					local v12, v22, v32, v42 = getClosestPlayer(v5)
-					local v52 = t2[v5.UserId] or {}
-					t2[v5.UserId] = v52
-					local Player = v52.Player
-					local ItemName = v52.ItemName
-					local Maid_2 = v52.Maid
-					local v8 = if v2 == nil then if v3 == nil or v32 == nil then false else v32 <= v3 and if v4 == nil or v42 == nil then false else v42 <= v4 elseif v22 == nil then false else v22 <= v2
-					if v12 and v8 then
-						local Position = v5.Character.PrimaryPart.Position
-						local v9 = v12.Character.PrimaryPart.Position - Position
-						local Magnitude = v9.Magnitude
+				local var7 = Maid.new()
+				t[var5.UserId] = var7
+				var7:GiveTask(RunService.Heartbeat:Connect(function()
+					local v12, v22, v32, v42 = getClosestPlayer(var5)
+					local table52 = t2[var5.UserId] or {}
+					t2[var5.UserId] = table52
+					local Player = table52.Player
+					local ItemName = table52.ItemName
+					local Maid_2 = table52.Maid
+					local var8 = if v2 == nil then if var3 == nil or v32 == nil then false else v32 <= var3 and if var4 == nil or v42 == nil then false else v42 <= var4 elseif v22 == nil then false else v22 <= v2
+					if v12 and var8 then
+						local Position = var5.Character.PrimaryPart.Position
+						local var9 = v12.Character.PrimaryPart.Position - Position
+						local Magnitude = var9.Magnitude
 						if Magnitude == 0 then
-							v7.targetingMaid = nil
+							var7.targetingMaid = nil
 							return
 						end
-						local Unit = v9.Unit
-						if v1 == "Taser" and v5.Character.PrimaryPart.CFrame.LookVector:Dot(Unit) < 0.9 then
-							v7.targetingMaid = nil
+						local Unit = var9.Unit
+						if v1 == "Taser" and var5.Character.PrimaryPart.CFrame.LookVector:Dot(Unit) < 0.9 then
+							var7.targetingMaid = nil
 							return
 						end
-						local v10 = RaycastParams.new()
-						v10.FilterDescendantsInstances = { v5.Character }
-						local v11 = Raycast.collidable(Position, Unit, Magnitude, v10)
-						if v11 and v11.Instance:IsDescendantOf(v12.Character) then
-							if v12 and (v8 and (Player ~= v12 or ItemName ~= v1)) then
-								local v122 = Maid.new()
-								v7.targetingMaid = v122
-								local v13 = nil
-								local v14 = nil
+						local instance10 = RaycastParams.new()
+						instance10.FilterDescendantsInstances = { var5.Character }
+						local var11 = Raycast.collidable(Position, Unit, Magnitude, instance10)
+						if var11 and var11.Instance:IsDescendantOf(v12.Character) then
+							if v12 and (var8 and (Player ~= v12 or ItemName ~= v1)) then
+								local instance122 = Maid.new()
+								var7.targetingMaid = instance122
+								local var13 = nil
+								local var14 = nil
 								if v1 == "Taser" then
-									v13 = TargetingIndicators:FindFirstChild("TaserBeam")
-									v14 = TargetingIndicators:FindFirstChild("TaserFlash")
+									var13 = TargetingIndicators:FindFirstChild("TaserBeam")
+									var14 = TargetingIndicators:FindFirstChild("TaserFlash")
 								elseif v1 == "Handcuffs" then
-									v13 = TargetingIndicators:FindFirstChild("HandcuffsBeam")
-									v14 = TargetingIndicators:FindFirstChild("HandcuffsFlash")
+									var13 = TargetingIndicators:FindFirstChild("HandcuffsBeam")
+									var14 = TargetingIndicators:FindFirstChild("HandcuffsFlash")
 								else
 									error("Unknown item")
 								end
-								t2[v5.UserId] = {
+								t2[var5.UserId] = {
 									Player = v12,
 									ItemName = v1,
-									Maid = v122
+									Maid = instance122
 								}
-								v122:GiveTask(function()
-									t2[v5.UserId] = nil
+								instance122:GiveTask(function()
+									t2[var5.UserId] = nil
 								end)
-								local v15 = v13:Clone()
-								v15:FindFirstChild("Targeter").CanCollide = false
-								v15:FindFirstChild("Targeter").CanQuery = false
-								local v16 = v14:Clone()
-								v16.CanCollide = false
-								v16.CanQuery = false
-								v15.Parent = workspace
-								v16.Parent = workspace
-								v122:GiveTask(v15)
-								v122:GiveTask(v16)
-								local v17 = os.clock()
-								v122:GiveTask(RunService.Heartbeat:Connect(function()
+								local var15 = var13:Clone()
+								var15:FindFirstChild("Targeter").CanCollide = false
+								var15:FindFirstChild("Targeter").CanQuery = false
+								local var16 = var14:Clone()
+								var16.CanCollide = false
+								var16.CanQuery = false
+								var15.Parent = workspace
+								var16.Parent = workspace
+								instance122:GiveTask(var15)
+								instance122:GiveTask(var16)
+								local var17 = os.clock()
+								instance122:GiveTask(RunService.Heartbeat:Connect(function()
 									local Character = v12.Character
-									local Character_2 = v5.Character
+									local Character_2 = var5.Character
 									if Character and Character_2 then
-										local v13, v2, v3, v4, v52, v6, v72, v8, v9, v10, v11, v122
+										local var13, v2, var3, var4, table52, var6, v72, var8, var9, instance10, var11, instance122
 										if v1 == "Taser" then
 											if TagUtils.isPointInTag(Character_2.PrimaryPart.Position, "NoTase") then
-												v7.targetingMaid = nil
+												var7.targetingMaid = nil
 												return
 											end
-											v13 = Character:FindFirstChild("UpperTorso")
+											var13 = Character:FindFirstChild("UpperTorso")
 											v2 = Character_2:FindFirstChild("UpperTorso")
-											if v13 and v2 then
-												v3 = Character.PrimaryPart.Position
-												v4 = Character.Humanoid.HipHeight + Character.PrimaryPart.Size.Y / 2
-												v52 = v3 - Vector3.new(0, v4, 0)
-												v6 = v15:FindFirstChild("Targeter")
-												v72 = v6:FindFirstChild("Attachment")
-												v8 = v6:FindFirstChild("AttachmentEnd")
+											if var13 and v2 then
+												var3 = Character.PrimaryPart.Position
+												var4 = Character.Humanoid.HipHeight + Character.PrimaryPart.Size.Y / 2
+												table52 = var3 - Vector3.new(0, var4, 0)
+												var6 = var15:FindFirstChild("Targeter")
+												v72 = var6:FindFirstChild("Attachment")
+												var8 = var6:FindFirstChild("AttachmentEnd")
 												v72.WorldPosition = v2.Position
-												v8.WorldPosition = v13.Position
-												v9 = 6.283185307179586 * (os.clock() % 2) / 2
-												v16.CFrame = CFrame.new(v52) * CFrame.Angles(0, v9, 0)
-												v10 = os.clock() - v17
-												v11 = 1 - (math.cos(v10) + 1) / 2
-												v122 = math.min(0.9, v11)
-												v16.Decal.Transparency = v122
+												var8.WorldPosition = var13.Position
+												var9 = 6.283185307179586 * (os.clock() % 2) / 2
+												var16.CFrame = CFrame.new(table52) * CFrame.Angles(0, var9, 0)
+												instance10 = os.clock() - var17
+												var11 = 1 - (math.cos(instance10) + 1) / 2
+												instance122 = math.min(0.9, var11)
+												var16.Decal.Transparency = instance122
 											end
 										else
 											if v1 == "Handcuffs" and TagUtils.isPointInTag(Character_2.PrimaryPart.Position, "NoArrest") then
-												v7.targetingMaid = nil
+												var7.targetingMaid = nil
 												return
 											end
-											v13 = Character:FindFirstChild("UpperTorso")
+											var13 = Character:FindFirstChild("UpperTorso")
 											v2 = Character_2:FindFirstChild("UpperTorso")
-											if v13 and v2 then
-												v3 = Character.PrimaryPart.Position
-												v4 = Character.Humanoid.HipHeight + Character.PrimaryPart.Size.Y / 2
-												v52 = v3 - Vector3.new(0, v4, 0)
-												v6 = v15:FindFirstChild("Targeter")
-												v72 = v6:FindFirstChild("Attachment")
-												v8 = v6:FindFirstChild("AttachmentEnd")
+											if var13 and v2 then
+												var3 = Character.PrimaryPart.Position
+												var4 = Character.Humanoid.HipHeight + Character.PrimaryPart.Size.Y / 2
+												table52 = var3 - Vector3.new(0, var4, 0)
+												var6 = var15:FindFirstChild("Targeter")
+												v72 = var6:FindFirstChild("Attachment")
+												var8 = var6:FindFirstChild("AttachmentEnd")
 												v72.WorldPosition = v2.Position
-												v8.WorldPosition = v13.Position
-												v9 = 6.283185307179586 * (os.clock() % 2) / 2
-												v16.CFrame = CFrame.new(v52) * CFrame.Angles(0, v9, 0)
-												v10 = os.clock() - v17
-												v11 = 1 - (math.cos(v10) + 1) / 2
-												v122 = math.min(0.9, v11)
-												v16.Decal.Transparency = v122
+												var8.WorldPosition = var13.Position
+												var9 = 6.283185307179586 * (os.clock() % 2) / 2
+												var16.CFrame = CFrame.new(table52) * CFrame.Angles(0, var9, 0)
+												instance10 = os.clock() - var17
+												var11 = 1 - (math.cos(instance10) + 1) / 2
+												instance122 = math.min(0.9, var11)
+												var16.Decal.Transparency = instance122
 											end
 										end
 									end
 								end))
 							end
 						else
-							v7.targetingMaid = nil
+							var7.targetingMaid = nil
 						end
 					else
-						v7.targetingMaid = nil
+						var7.targetingMaid = nil
 					end
 				end))
 			end

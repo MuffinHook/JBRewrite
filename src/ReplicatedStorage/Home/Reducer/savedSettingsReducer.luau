@@ -5,9 +5,9 @@ return require(ReplicatedStorage.Rodux).createReducer({}, {
 		if p1[p2.key] == p2.value then
 			return p1
 		else
-			local v1 = table.clone(p1)
-			v1[p2.key] = p2.value
-			return v1
+			local tbl = table.clone(p1)
+			tbl[p2.key] = p2.value
+			return tbl
 		end
 	end
 })

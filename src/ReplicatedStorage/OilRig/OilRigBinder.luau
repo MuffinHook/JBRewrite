@@ -17,85 +17,85 @@ local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1, p2)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
+function t.new(self, p2)
+	local instance = BaseObject.new(self)
+	setmetatable(instance, t)
 	local function handleProgressionState()
-		v1.maid.progressionMaid = Maid.new()
-		if OilRigUtils.getIsPlayerInRobbery(v1.obj, Players.LocalPlayer) then
-			OilRigUtils.getProgressionState(v1.obj)
+		instance.maid.progressionMaid = Maid.new()
+		if OilRigUtils.getIsPlayerInRobbery(instance.obj, Players.LocalPlayer) then
+			OilRigUtils.getProgressionState(instance.obj)
 		end
 	end
-	v1.maid:GiveTask(OilRigUtils.getProgressionStateChangedSignal(v1.obj):Connect(handleProgressionState))
+	instance.maid:GiveTask(OilRigUtils.getProgressionStateChangedSignal(instance.obj):Connect(handleProgressionState))
 	local function handleStatus()
-		local v12 = RobberyUtils.getStatus(v1.obj)
-		v1.maid.currRobberyMaid = Maid.new()
-		if OilRigUtils.getIsPlayerInRobbery(v1.obj, Players.LocalPlayer) then
-			local isSTARTED = v12 == RobberyConsts.ENUM_STATUS.STARTED
+		local var12 = RobberyUtils.getStatus(instance.obj)
+		instance.maid.currRobberyMaid = Maid.new()
+		if OilRigUtils.getIsPlayerInRobbery(instance.obj, Players.LocalPlayer) then
+			local isSTARTED = var12 == RobberyConsts.ENUM_STATUS.STARTED
 		end
 	end
-	v1.maid:GiveTask(RobberyUtils.getStatusChangedSignal(v1.obj):Connect(handleStatus))
-	v1.maid.localPlayerRobberyMaid = Maid.new()
+	instance.maid:GiveTask(RobberyUtils.getStatusChangedSignal(instance.obj):Connect(handleStatus))
+	instance.maid.localPlayerRobberyMaid = Maid.new()
 	local function handleLocalPlayerInRobbery()
-		v1.maid.progressionMaid = Maid.new()
-		if OilRigUtils.getIsPlayerInRobbery(v1.obj, Players.LocalPlayer) then
-			OilRigUtils.getProgressionState(v1.obj)
+		instance.maid.progressionMaid = Maid.new()
+		if OilRigUtils.getIsPlayerInRobbery(instance.obj, Players.LocalPlayer) then
+			OilRigUtils.getProgressionState(instance.obj)
 		end
-		local v2 = RobberyUtils.getStatus(v1.obj)
-		v1.maid.currRobberyMaid = Maid.new()
-		if OilRigUtils.getIsPlayerInRobbery(v1.obj, Players.LocalPlayer) then
+		local v2 = RobberyUtils.getStatus(instance.obj)
+		instance.maid.currRobberyMaid = Maid.new()
+		if OilRigUtils.getIsPlayerInRobbery(instance.obj, Players.LocalPlayer) then
 			local isSTARTED = v2 == RobberyConsts.ENUM_STATUS.STARTED
 		end
-		v1.maid.localPlayerRobberyMaid:DoCleaning()
+		instance.maid.localPlayerRobberyMaid:DoCleaning()
 	end
-	v1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(v1.obj, OilRigConsts.PLAYERS_IN_ROBBERY_FOLDER_NAME, function(p1, p2)
-		p2:GiveTask(RxInstanceUtils.observeChildren(p1, function(p1, p2)
-			if p1.Name == tostring(Players.LocalPlayer.UserId) then
-				v1.maid.progressionMaid = Maid.new()
-				if OilRigUtils.getIsPlayerInRobbery(v1.obj, Players.LocalPlayer) then
-					OilRigUtils.getProgressionState(v1.obj)
+	instance.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(instance.obj, OilRigConsts.PLAYERS_IN_ROBBERY_FOLDER_NAME, function(self, p2)
+		p2:GiveTask(RxInstanceUtils.observeChildren(self, function(self, p2)
+			if self.Name == tostring(Players.LocalPlayer.UserId) then
+				instance.maid.progressionMaid = Maid.new()
+				if OilRigUtils.getIsPlayerInRobbery(instance.obj, Players.LocalPlayer) then
+					OilRigUtils.getProgressionState(instance.obj)
 				end
-				local v3 = RobberyUtils.getStatus(v1.obj)
-				v1.maid.currRobberyMaid = Maid.new()
-				if OilRigUtils.getIsPlayerInRobbery(v1.obj, Players.LocalPlayer) then
-					local isSTARTED = v3 == RobberyConsts.ENUM_STATUS.STARTED
+				local var3 = RobberyUtils.getStatus(instance.obj)
+				instance.maid.currRobberyMaid = Maid.new()
+				if OilRigUtils.getIsPlayerInRobbery(instance.obj, Players.LocalPlayer) then
+					local isSTARTED = var3 == RobberyConsts.ENUM_STATUS.STARTED
 				end
-				v1.maid.localPlayerRobberyMaid:DoCleaning()
-				p2:GiveTask(p1.Changed:Connect(handleLocalPlayerInRobbery))
+				instance.maid.localPlayerRobberyMaid:DoCleaning()
+				p2:GiveTask(self.Changed:Connect(handleLocalPlayerInRobbery))
 			end
 		end))
 	end))
-	local UpdateOilTankRemote = v1.obj:WaitForChild("UpdateOilTankRemote")
-	v1.maid:GiveTask(UpdateOilTankRemote.OnClientEvent:Connect(function(p1, p2)
-		local v1 = p1:GetAttribute("OriginalCFrame")
-		local v2 = p1:GetAttribute("OriginalSize")
-		local Oil = p1:FindFirstChild("Oil")
+	local UpdateOilTankRemote = instance.obj:WaitForChild("UpdateOilTankRemote")
+	instance.maid:GiveTask(UpdateOilTankRemote.OnClientEvent:Connect(function(self, p2)
+		local instance = self:GetAttribute("OriginalCFrame")
+		local v2 = self:GetAttribute("OriginalSize")
+		local Oil = self:FindFirstChild("Oil")
 		assert(Oil and Oil:IsA("BasePart"))
-		local v4 = 1 - p2
-		Oil.Size = Vector3.new(1, v4, 1) * v2
-		Oil.CFrame = v1 * CFrame.new(0, -v2.Y / 2 * (1 - v4), 0)
-		if v4 <= 0.001 then
+		local var4 = 1 - p2
+		Oil.Size = Vector3.new(1, var4, 1) * v2
+		Oil.CFrame = instance * CFrame.new(0, -v2.Y / 2 * (1 - var4), 0)
+		if var4 <= 0.001 then
 			Oil.Transparency = 1
 		else
 			Oil.Transparency = 0
 		end
 	end))
-	v1:_listenEverywhere()
-	return v1
+	instance:_listenEverywhere()
+	return instance
 end
-function t._listenEverywhere(p1)
+function t._listenEverywhere(self)
 	local function handleProgressionState()
-		if OilRigUtils.getProgressionState(p1.obj) == OilRigConsts.PROGRESSION_STATE.BlowUp then
-			p1:_launchBlowUp()
+		if OilRigUtils.getProgressionState(self.obj) == OilRigConsts.PROGRESSION_STATE.BlowUp then
+			self:_launchBlowUp()
 		end
 	end
-	p1.maid:GiveTask(OilRigUtils.getProgressionStateChangedSignal(p1.obj):Connect(handleProgressionState))
+	self.maid:GiveTask(OilRigUtils.getProgressionStateChangedSignal(self.obj):Connect(handleProgressionState))
 end
-function t.IsPlayerInRobbery(p1, p2)
-	return OilRigUtils.getIsPlayerInRobbery(p1.obj, p2)
+function t.IsPlayerInRobbery(self, p2)
+	return OilRigUtils.getIsPlayerInRobbery(self.obj, p2)
 end
-function t._launchBlowUp(p1)
-	local Explosion = p1.obj:FindFirstChild("OpenCloseSignal"):FindFirstChild("Explosion")
+function t._launchBlowUp(self)
+	local Explosion = self.obj:FindFirstChild("OpenCloseSignal"):FindFirstChild("Explosion")
 	assert(Explosion)
 	Shockwave.new(Explosion.Position, {
 		Duration = 4,
@@ -103,7 +103,7 @@ function t._launchBlowUp(p1)
 		StartTransparency = 0.2,
 		EndTransparency = 1
 	}).OnPastLocalPlayer:Connect(function()
-		local ShockwaveRemote = p1.obj:FindFirstChild("ShockwaveRemote")
+		local ShockwaveRemote = self.obj:FindFirstChild("ShockwaveRemote")
 		if ShockwaveRemote then
 			ShockwaveRemote:FireServer()
 		end

@@ -17,12 +17,12 @@ local Interval = require(ReplicatedStorage.Std.Interval)
 local LevelUISystem = require(ReplicatedStorage.Game.Level2.LevelUISystem)
 local SpectateConsts = require(ReplicatedStorage.Spectate.SpectateConsts)
 local CircleAction = UI.CircleAction
-local v1 = Color3.fromRGB(192, 122, 255)
-local v2 = Color3.fromRGB(255, 255, 255)
-local v3 = if RunUtils.isStudio() then 20 else 600
+local stormColor = Color3.fromRGB(192, 122, 255)
+local whiteColor = Color3.fromRGB(255, 255, 255)
+local gameDuration = if RunUtils.isStudio() then 20 else 600
 return {
-	launch = function(p1, p2)
-		local v12 = Binder.new("RoyaleBriefcase", function(p1)
+	launch = function(maid, gameModeInstance)
+		local briefcaseBinder = Binder.new("RoyaleBriefcase", function(briefcaseModel)
 			local v1 = Maid.new()
 			v1:GiveTask(CircleAction.Add({
 				Name = "Open Briefcase",

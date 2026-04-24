@@ -4,12 +4,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local Maid = require(ReplicatedStorage.Std.Maid)
 return function(p1)
-	local v1 = Maid.new()
+	local instance = Maid.new()
 	local v2, v3 = Roact.createBinding(123456)
 	local v4, v5 = Roact.createBinding(878)
 	local v6, v7 = Roact.createBinding(0.3)
 	local v8, v9 = Roact.createBinding(0.5)
-	v1:GiveTask(RunService.Heartbeat:Connect(function()
+	instance:GiveTask(RunService.Heartbeat:Connect(function()
 		local v2 = math.sin(os.clock() * 2) * 0.5 + 0.5
 		v5(v2 * 500)
 		v9(v2)
@@ -17,7 +17,7 @@ return function(p1)
 		v3((math.cos(os.clock() * 0.1) * 0.5 + 0.5) * 1000000)
 	end))
 	local Speedometer = require(script.Parent.Speedometer)
-	local v10 = Roact.mount(Roact.createElement(Speedometer, {
+	local var10 = Roact.mount(Roact.createElement(Speedometer, {
 		distance = v2,
 		speed = v4,
 		barRatio = v6,
@@ -38,7 +38,7 @@ return function(p1)
 		}
 	}), p1)
 	return function()
-		Roact.unmount(v10)
-		v1:DoCleaning()
+		Roact.unmount(var10)
+		instance:DoCleaning()
 	end
 end

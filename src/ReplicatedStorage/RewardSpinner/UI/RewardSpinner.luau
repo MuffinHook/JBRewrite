@@ -24,12 +24,12 @@ v1.defaultProps = {
 function v1.init(p1)
 	p1.maid = Maid.new()
 	p1.openMaid = Maid.new()
-	local v2, v3 = Roact.createBinding((math.ceil(p1.props.colsPerRow * 0.5 + 0.5)))
+	local v2, var3 = Roact.createBinding((math.ceil(p1.props.colsPerRow * 0.5 + 0.5)))
 	p1.index = v2
-	p1.updateIndex = v3
-	local v4, v5 = Roact.createBinding(false)
-	p1.ticked = v4
-	p1.updateTicked = v5
+	p1.updateIndex = var3
+	local var4, var5 = Roact.createBinding(false)
+	p1.ticked = var4
+	p1.updateTicked = var5
 	function p1.onFinished()
 		local v1 = ReplicatedStorage:FindFirstChild(RewardSpinnerConsts.COLLECT_REWARD_REMOTE_NAME)
 		if v1 then
@@ -50,20 +50,20 @@ function v1.render(p1)
 		local v1 = p1.props.config.primaryColor or p1.props.primaryColor
 		local aspectRatio = p1.props.aspectRatio
 		local v2 = 1 - 0.03125 / aspectRatio
-		local v3 = v2 / 0.1515625 * aspectRatio
-		local v4 = 1 - 1 / v3 - 0.10309278350515465 / v3
-		local v5 = v4 / 1 * v3
-		local v6 = 1 - 0.03125 / aspectRatio
-		local v7 = v6 / 0.8015625 * aspectRatio
-		local count = 1 - 0.038986354775828465 / v7
-		local v9 = 1.138568129330254 * (count / 0.9610136452241715 * v7)
+		local var3 = v2 / 0.1515625 * aspectRatio
+		local var4 = 1 - 1 / var3 - 0.10309278350515465 / var3
+		local var5 = var4 / 1 * var3
+		local var6 = 1 - 0.03125 / aspectRatio
+		local var7 = var6 / 0.8015625 * aspectRatio
+		local count = 1 - 0.038986354775828465 / var7
+		local var9 = 1.138568129330254 * (count / 0.9610136452241715 * var7)
 		local colsPerRow = p1.props.colsPerRow
-		local v10 = 64 * v9 * 0.8015625 * 0.9610136452241715 * 0.8782961460446247
+		local var10 = 64 * var9 * 0.8015625 * 0.9610136452241715 * 0.8782961460446247
 		local t = {
-			aspectRatio = v9,
+			aspectRatio = var9,
 			items = p1.props.config.items,
 			component = rewardCardComponent,
-			verticalPaddingRatio = v10 / v9,
+			verticalPaddingRatio = var10 / var9,
 			rowsPerPage = 1,
 			colsPerRow = colsPerRow,
 			infHorizontal = true
@@ -94,7 +94,7 @@ function v1.render(p1)
 		local t6 = {
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 			BorderSizePixel = 0,
-			Size = UDim2.new(1 / v3, 0, 1, 0)
+			Size = UDim2.new(1 / var3, 0, 1, 0)
 		}
 		local t7 = {
 			UICorner = createElement("UICorner", {
@@ -123,8 +123,8 @@ function v1.render(p1)
 		tbl.Title = createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
-			Size = UDim2.new(v4, 0, 1, 0),
-			Position = UDim2.new(1 / v3 + 0.10309278350515465 / v3, 0, 0, 0)
+			Size = UDim2.new(var4, 0, 1, 0),
+			Position = UDim2.new(1 / var3 + 0.10309278350515465 / var3, 0, 0, 0)
 		}, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, p1.props.cornerPixel)
@@ -133,8 +133,8 @@ function v1.render(p1)
 				BorderSizePixel = 0,
 				BackgroundTransparency = 1,
 				BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
-				Size = UDim2.new(0.5 - 0.10309278350515465 / v5, 0, 1, 0),
-				Position = UDim2.new(0.10309278350515465 / v5, 0, 0, 0)
+				Size = UDim2.new(0.5 - 0.10309278350515465 / var5, 0, 1, 0),
+				Position = UDim2.new(0.10309278350515465 / var5, 0, 0, 0)
 			}, {
 				Text = createElement("TextLabel", {
 					BackgroundTransparency = 1,
@@ -156,7 +156,7 @@ function v1.render(p1)
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 			BackgroundTransparency = 0,
 			Position = UDim2.new(0.015625 / aspectRatio, 0, 0.1828125, 0),
-			Size = UDim2.new(v6, 0, 0.8015625, 0)
+			Size = UDim2.new(var6, 0, 0.8015625, 0)
 		}, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, p1.props.cornerPixel)
@@ -164,7 +164,7 @@ function v1.render(p1)
 			InnerBody = createElement("Frame", {
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				Position = UDim2.new(0.019493177387914232 / v7, 0, 0.019493177387914232, 0),
+				Position = UDim2.new(0.019493177387914232 / var7, 0, 0.019493177387914232, 0),
 				Size = UDim2.new(count, 0, 0.9610136452241715, 0),
 				ZIndex = 0
 			}, {
@@ -185,7 +185,7 @@ function v1.render(p1)
 						Size = UDim2.new(1, 0, 0.8782961460446247, 0),
 						AnchorPoint = Vector2.new(0, 0.5),
 						Position = p1.index:map(function(p1)
-							return UDim2.new(-(p1 - colsPerRow * 0.5 - 0.5) * GridUtils.getScaleX(t) - (p1 - colsPerRow * 0.5 - 0.5) / v10, 0, 0.5, 0)
+							return UDim2.new(-(p1 - colsPerRow * 0.5 - 0.5) * GridUtils.getScaleX(t) - (p1 - colsPerRow * 0.5 - 0.5) / var10, 0, 0.5, 0)
 						end)
 					}, {
 						Grid = createElement(Grid, t)
@@ -194,7 +194,7 @@ function v1.render(p1)
 			}),
 			ArrowTop = createElement("Frame", {
 				BackgroundTransparency = 1,
-				Size = UDim2.new(0.125 / v7, 0, 0.0625, 0),
+				Size = UDim2.new(0.125 / var7, 0, 0.0625, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.new(0.5, 0, 0.019493177387914232, 0),
 				ZIndex = 3
@@ -210,7 +210,7 @@ function v1.render(p1)
 			}),
 			ArrowBottom = createElement("Frame", {
 				BackgroundTransparency = 1,
-				Size = UDim2.new(0.125 / v7, 0, 0.0625, 0),
+				Size = UDim2.new(0.125 / var7, 0, 0.0625, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.new(0.5, 0, 0.9805068226120858, 0),
 				ZIndex = 3
@@ -270,20 +270,20 @@ function v1._spin(p1)
 	local v1 = 0
 	local duration = p1.props.config.duration
 	local v2 = os.clock()
-	local v3 = false
-	local v5 = math.ceil(p1.props.colsPerRow * 0.5 + 0.5)
+	local var3 = false
+	local var5 = math.ceil(p1.props.colsPerRow * 0.5 + 0.5)
 	local count = #p1.props.config.items - math.floor(p1.props.colsPerRow * 0.5 + 0.5)
 	local winIndex = p1.props.config.winIndex
 	if count < winIndex then
 		warn("winIndex is > maxVisibleIndex, player will see empty space")
 	end
-	local v10 = winIndex + math.clamp(math.random() - 0.5, -0.48, 0.48)
+	local var10 = winIndex + math.clamp(math.random() - 0.5, -0.48, 0.48)
 	p1.maid.spinHeartbeat = RunService.Heartbeat:Connect(function()
-		local v12 = (os.clock() - v2) / duration
-		if v12 >= 1 then
-			v12 = 1
-			if not v3 then
-				v3 = true
+		local var12 = (os.clock() - v2) / duration
+		if var12 >= 1 then
+			var12 = 1
+			if not var3 then
+				var3 = true
 				p1.onFinished()
 				if p1.props.onFinished then
 					p1.props.onFinished()
@@ -291,17 +291,17 @@ function v1._spin(p1)
 				p1.maid.spinHeartbeat = nil
 			end
 		else
-			v3 = false
+			var3 = false
 		end
-		local v22 = v5 + (v10 - v5) * (1 - math.pow(1 - v12, 2))
-		local v32 = v22 % 1
-		local v4 = v1 % 1
-		local v52 = v22 - v1 > 0
-		if v52 and (v32 > 0.5 and v4 < 0.5) or not v52 and (v32 < 0.5 and v4 > 0.5) then
+		local var22 = var5 + (var10 - var5) * (1 - math.pow(1 - var12, 2))
+		local var32 = var22 % 1
+		local var4 = v1 % 1
+		local var52 = var22 - v1 > 0
+		if var52 and (var32 > 0.5 and var4 < 0.5) or not var52 and (var32 < 0.5 and var4 > 0.5) then
 			p1.playTick()
 		end
-		v1 = v22
-		p1.updateIndex(v22)
+		v1 = var22
+		p1.updateIndex(var22)
 	end)
 end
 function v1.didMount(p1)

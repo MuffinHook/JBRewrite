@@ -5,21 +5,21 @@ local Roact = require(ReplicatedStorage.Roact)
 local Interval = require(ReplicatedStorage.Std.Interval)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("LikePrompt")
-v1.defaultProps = {
+local color = Roact.PureComponent:extend("LikePrompt")
+color.defaultProps = {
 	size = UDim2.fromScale(0.75, 0.05),
 	anchorPoint = Vector2.new(0.5, 0),
 	position = UDim2.fromScale(0.5, 0)
 }
-function v1.init(p1)
+function color.init(p1)
 	p1.maid = Maid.new()
 	p1:setState({
 		remaining = 0
 	})
 end
-function v1.render(p1)
+function color.render(p1)
 	if p1.props.visible then
-		local v1 = Color3.fromRGB(1, 255, 171)
+		local color = Color3.fromRGB(1, 255, 171)
 		local t = {
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 			BackgroundTransparency = 0,
@@ -68,7 +68,7 @@ function v1.render(p1)
 					BackgroundTransparency = 0,
 					Size = UDim2.fromScale(1, 1),
 					Text = "",
-					BackgroundColor3 = v1,
+					BackgroundColor3 = color,
 					Selectable = true,
 					[Roact.Event.Activated] = p1.props.onClickDone
 				}, {
@@ -123,24 +123,24 @@ function v1.render(p1)
 		return createElement("Frame", t, t2)
 	end
 end
-function v1._update(p1)
+function color._update(p1)
 	if p1.props.visible then
-		local v1 = p1.props.countdownTil - workspace:GetServerTimeNow()
+		local color = p1.props.countdownTil - workspace:GetServerTimeNow()
 		p1:setState({
-			remaining = v1
+			remaining = color
 		})
-		if p1.state.remaining > 0 and (v1 <= 0 and p1.props.onExpired) then
+		if p1.state.remaining > 0 and (color <= 0 and p1.props.onExpired) then
 			p1.props.onExpired()
 		end
 	end
 end
-function v1.didMount(p1)
+function color.didMount(p1)
 	p1:_update()
 	p1.maid:GiveTask(Interval.every(1):Connect(function()
 		p1:_update()
 	end))
 end
-function v1.willUnmount(p1)
+function color.willUnmount(p1)
 	p1.maid:DoCleaning()
 end
-return v1
+return color

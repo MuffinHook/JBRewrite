@@ -11,15 +11,15 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local PlayerUtils = require(ReplicatedStorage.Std.PlayerUtils)
 local createElement = Roact.createElement
 local function getComponent()
-	local localPlayer = DrownUtils.getDrownPercent(Players.LocalPlayer) or 0
+	local drownPercent = DrownUtils.getDrownPercent(Players.LocalPlayer) or 0
 	local Character = Players.LocalPlayer.Character
 	if Character then
 		local Head = Character:WaitForChild("Head")
-		local v2 = if localPlayer > 0 then createElement(ProgressBar, {
+		local progressBarElement = if drownPercent > 0 then createElement(ProgressBar, {
 	aspectRatio = 0.5,
 	size = UDim2.fromScale(1, 1),
 	position = UDim2.fromScale(0, 0),
-	progress = 1 - localPlayer,
+	progress = 1 - drownPercent,
 	text = "",
 	filledColor = Color3.fromHex("5fcbfa"),
 	unfilledColor = Color3.new(0/255, 0/255, 0/255),
@@ -34,7 +34,7 @@ local function getComponent()
 			ExtentsOffset = Vector3.new(0, 3, 0),
 			AlwaysOnTop = true
 		}, {
-			ProgressBar = v2
+			ProgressBar = progressBarElement
 		})
 	else
 		return createElement("Frame", {
@@ -43,45 +43,45 @@ local function getComponent()
 		})
 	end
 end
-local localPlayer = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "DrownGui")
+local guiInstance = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "DrownGui")
 local function updateUI()
-	Roact.update(localPlayer, getComponent())
+	Roact.update(guiInstance, getComponent())
 end
 DrownUtils.getDrownPercentChangedSignal(Players.LocalPlayer):Connect(updateUI)
 Players.LocalPlayer.CharacterAdded:Connect(updateUI)
-Roact.update(localPlayer, getComponent())
-local function playerAdded(p1)
-	local localPlayer = PlayerUtils.getPlayerMaid(p1)
+Roact.update(guiInstance, getComponent())
+local function playerAdded(player)
+	local playerMaid = PlayerUtils.getPlayerMaid(player)
 	local function cleanUp()
-		localPlayer.drowningParticlesMaid = nil
+		playerMaid.drowningParticlesMaid = nil
 	end
 	local function updateBubbles()
-		if DrownUtils.getIsPlayerDrowning(p1) then
-			local Character = p1.Character
+		if DrownUtils.getIsPlayerDrowning(player) then
+			local Character = player.Character
 			if Character then
 				local Head = Character:FindFirstChild("Head")
 				if Head then
-					if not localPlayer.drowningParticlesMaid then
-						localPlayer.drowningParticlesMaid = Maid.new()
-						local v12 = ReplicatedStorage.Drown.Res.AirBubbles:Clone()
-						v12.Rate = 100
-						localPlayer.drowningParticlesMaid:GiveTask(v12)
-						v12.Parent = Head
+					if not playerMaid.drowningParticlesMaid then
+						playerMaid.drowningParticlesMaid = Maid.new()
+						local airBubbles = ReplicatedStorage.Drown.Res.AirBubbles:Clone()
+						airBubbles.Rate = 100
+						playerMaid.drowningParticlesMaid:GiveTask(airBubbles)
+						airBubbles.Parent = Head
 					end
 				else
-					localPlayer.drowningParticlesMaid = nil
+					playerMaid.drowningParticlesMaid = nil
 				end
 			else
-				localPlayer.drowningParticlesMaid = nil
+				playerMaid.drowningParticlesMaid = nil
 			end
 		else
-			localPlayer.drowningParticlesMaid = nil
+			playerMaid.drowningParticlesMaid = nil
 		end
 	end
-	localPlayer:GiveTask(DrownUtils.getDrownPercentChangedSignal(p1):Connect(updateBubbles))
-	localPlayer:GiveTask(Interval.every(1):Connect(updateBubbles))
+	playerMaid:GiveTask(DrownUtils.getDrownPercentChangedSignal(player):Connect(updateBubbles))
+	playerMaid:GiveTask(Interval.every(1):Connect(updateBubbles))
 end
-for v2, v3 in Players:GetPlayers() do
-	playerAdded(v3)
+for _, player in Players:GetPlayers() do
+	playerAdded(player)
 end
 Players.PlayerAdded:Connect(playerAdded)

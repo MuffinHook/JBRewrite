@@ -1,15 +1,16 @@
 -- Reviewed by Claude
-return function(p1, p2)
-	assert(type(p1) == "string", "Bad argument #1: Expected a string name for the action creator")
-	assert(type(p2) == "function", "Bad argument #2: Expected a function that creates action objects")
+-- variables reassigned
+return function(actionName, actionCreatorFn)
+	assert(type(actionName) == "string", "Bad argument #1: Expected a string name for the action creator")
+	assert(type(actionCreatorFn) == "function", "Bad argument #2: Expected a function that creates action objects")
 	return setmetatable({
- name = p1
+ name = actionName
 	}, {
- __call = function(p12, ...)
- local v1 = p2(...)
- assert(type(v1) == "table", "Invalid action: An action creator must return a table")
- v1.type = p1
- return v1
+ __call = function(self, ...)
+ local actionObject = actionCreatorFn(...)
+ assert(type(actionObject) == "table", "Invalid action: An action creator must return a table")
+ actionObject.type = actionName
+ return actionObject
  end
 	})
 end

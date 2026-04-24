@@ -11,19 +11,19 @@ function t.init()
 	local HomeSaleGui = ReplicatedStorage.StarterGui:FindFirstChild("HomeSaleGui")
 	HomeSaleGui.Parent = LocalPlayer.PlayerGui
 	t.gui = HomeSaleGui
-	local v1 = Window.new()
-	v1:GetOnOpenedSignal():Connect(t._open)
-	v1:GetOnClosedSignal():Connect(t._close)
-	t._window = v1
-	GameUtil.getCenterWindowGroup():Add(v1)
+	local instance = Window.new()
+	instance:GetOnOpenedSignal():Connect(t._open)
+	instance:GetOnClosedSignal():Connect(t._close)
+	t._window = instance
+	GameUtil.getCenterWindowGroup():Add(instance)
 end
 function t._open()
 	assert(t._maid == nil)
-	local v1 = Maid.new()
-	t._maid = v1
+	local instance = Maid.new()
+	t._maid = instance
 	local gui = t.gui
 	gui.Enabled = true
-	v1:GiveTask(function()
+	instance:GiveTask(function()
 		gui.Enabled = false
 	end)
 	UIUtil.selectIfGamepad(gui.Container.ButtonContainer.YesContainer.Button)

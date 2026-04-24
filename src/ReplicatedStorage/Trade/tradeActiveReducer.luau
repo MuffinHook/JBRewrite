@@ -1,8 +1,9 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer(false, {
-	setTradeActive = function(p1, p2)
-		assert(p2.value ~= nil, "missing value")
-		return p2.value
+	setTradeActive = function(state, action)
+		assert(action.value ~= nil, "missing value")
+		return action.value
 	end
 })

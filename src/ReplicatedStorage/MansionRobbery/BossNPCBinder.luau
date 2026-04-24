@@ -19,99 +19,99 @@ local MansionRobberyUtils = require(ReplicatedStorage.MansionRobbery.MansionRobb
 local NPCUtils = require(ReplicatedStorage.NPC.NPCUtils)
 local NPCConsts = require(ReplicatedStorage.NPC.NPCConsts)
 local Shake = require(ReplicatedStorage.Module.Shake)
-local function shakeCamAt(p1, p2)
+local function shakeCamAt(self, p2)
 	local CurrentCamera = workspace.CurrentCamera
 	local Last = Enum.RenderPriority.Last.Value
-	local v1 = Shake.new()
-	v1.FadeInTime = 0
-	v1.FadeOutTime = 0.125
-	v1.Frequency = 0.1
-	v1.Amplitude = p2 and p2.Amplitude or 1
-	v1.PositionInfluence = Vector3.new(1, 1, 1)
-	v1.RotationInfluence = Vector3.new(1, 1, 1)
-	v1.Sustain = p2 and p2.Sustain or false
+	local instance = Shake.new()
+	instance.FadeInTime = 0
+	instance.FadeOutTime = 0.125
+	instance.Frequency = 0.1
+	instance.Amplitude = p2 and p2.Amplitude or 1
+	instance.PositionInfluence = Vector3.new(1, 1, 1)
+	instance.RotationInfluence = Vector3.new(1, 1, 1)
+	instance.Sustain = p2 and p2.Sustain or false
 	local function callback(p12, p2)
-		local v1 = (CurrentCamera.CFrame.Position - p1).Magnitude / 100
-		local v2 = Shake.InverseSquare(p12, v1)
-		local v3 = Shake.InverseSquare(p2, v1)
-		local v4 = CurrentCamera
-		v4.CFrame = v4.CFrame * (CFrame.new(v2) * CFrame.Angles(v3.X, v3.Y, v3.Z))
+		local instance = (CurrentCamera.CFrame.Position - self).Magnitude / 100
+		local vector2 = Shake.InverseSquare(p12, instance)
+		local var3 = Shake.InverseSquare(p2, instance)
+		local var4 = CurrentCamera
+		var4.CFrame = var4.CFrame * (CFrame.new(vector2) * CFrame.Angles(var3.X, var3.Y, var3.Z))
 	end
-	v1:Start()
-	v1:BindToRenderStep(Shake.NextRenderName(), Last, callback)
+	instance:Start()
+	instance:BindToRenderStep(Shake.NextRenderName(), Last, callback)
 	return function()
-		v1:StopSustain()
+		instance:StopSustain()
 	end
 end
 local t = {}
 t.__index = t
 setmetatable(t, NPC)
-function t.new(p1, p2)
-	local v1 = NPC.new(p1, p2)
-	setmetatable(v1, t)
-	v1:_setupArmBoneData()
+function t.new(self, p2)
+	local instance = NPC.new(self, p2)
+	setmetatable(instance, t)
+	instance:_setupArmBoneData()
 	local function getTargetPosition()
-		local v12 = Vector3.new(0, 0, 0)
-		if NPCUtils.getTargetType(p1) == NPCConsts.DEST_TYPE.OBJ then
-			local v2 = NPCUtils.getTarget(p1)
-			if v2 then
-				v12 = v2.Position
+		local vector12 = Vector3.new(0, 0, 0)
+		if NPCUtils.getTargetType(self) == NPCConsts.DEST_TYPE.OBJ then
+			local vector2 = NPCUtils.getTarget(self)
+			if vector2 then
+				vector12 = vector2.Position
 			end
 		end
-		local Position = v1.obj:GetPivot().Position
-		local v3 = v12 - Position
-		local v4 = RaycastParams.new()
-		v4.FilterDescendantsInstances = { v1.obj }
-		local v5 = Raycast.collidable(Position, v3.Unit, v3.Magnitude, v4)
-		if v5 then
-			v12 = v5.Position
+		local Position = instance.obj:GetPivot().Position
+		local var3 = vector12 - Position
+		local var4 = RaycastParams.new()
+		var4.FilterDescendantsInstances = { instance.obj }
+		local var5 = Raycast.collidable(Position, var3.Unit, var3.Magnitude, var4)
+		if var5 then
+			vector12 = var5.Position
 		end
-		return v12
+		return vector12
 	end
-	v1.maid.lastAttackMaidClient = nil
+	instance.maid.lastAttackMaidClient = nil
 	local function handleAttackState()
-		if v1.maid.lastAttackMaidClient then
-			v1.maid.lastAttackMaidClient = nil
+		if instance.maid.lastAttackMaidClient then
+			instance.maid.lastAttackMaidClient = nil
 		end
-		local v12 = v1.obj.Parent
-		assert(CollectionService:HasTag(v12, MansionRobberyConsts.TAG_NAME), "Invalid mansionModel")
-		if MansionRobberyUtils.getIsPlayerInRobbery(v12, Players.LocalPlayer) then
-			local v3 = BossNPCUtils.getAttackState(p1)
-			if v3 == BossNPCConsts.ATTACK_STATE.ExtendoWhack then
-				v1.maid.lastAttackMaidClient = v1:PlayArmGrab(getTargetPosition)
-			elseif v3 == BossNPCConsts.ATTACK_STATE.LaserSweep then
-				v1.maid.lastAttackMaidClient = v1:PlayLaserSweepVisual(getTargetPosition)
-			elseif v3 == BossNPCConsts.ATTACK_STATE.AuraBlast then
-				v1:PlayAuraBlast()
-			elseif v3 == BossNPCConsts.ATTACK_STATE.MansionLasers then
-				v1.maid.lastAttackMaidClient = v1:PlayMansionLasers()
-			elseif v3 == BossNPCConsts.ATTACK_STATE.MansionCameras then
-				v1.maid.lastAttackMaidClient = v1:PlayMansionCameras()
-			elseif v3 == BossNPCConsts.ATTACK_STATE.CallInGuards then
-				v1.maid.lastAttackMaidClient = v1:PlayCallInGuards()
+		local vector12 = instance.obj.Parent
+		assert(CollectionService:HasTag(vector12, MansionRobberyConsts.TAG_NAME), "Invalid mansionModel")
+		if MansionRobberyUtils.getIsPlayerInRobbery(vector12, Players.LocalPlayer) then
+			local var3 = BossNPCUtils.getAttackState(self)
+			if var3 == BossNPCConsts.ATTACK_STATE.ExtendoWhack then
+				instance.maid.lastAttackMaidClient = instance:PlayArmGrab(getTargetPosition)
+			elseif var3 == BossNPCConsts.ATTACK_STATE.LaserSweep then
+				instance.maid.lastAttackMaidClient = instance:PlayLaserSweepVisual(getTargetPosition)
+			elseif var3 == BossNPCConsts.ATTACK_STATE.AuraBlast then
+				instance:PlayAuraBlast()
+			elseif var3 == BossNPCConsts.ATTACK_STATE.MansionLasers then
+				instance.maid.lastAttackMaidClient = instance:PlayMansionLasers()
+			elseif var3 == BossNPCConsts.ATTACK_STATE.MansionCameras then
+				instance.maid.lastAttackMaidClient = instance:PlayMansionCameras()
+			elseif var3 == BossNPCConsts.ATTACK_STATE.CallInGuards then
+				instance.maid.lastAttackMaidClient = instance:PlayCallInGuards()
 			end
 		end
 	end
 	handleAttackState()
-	v1.maid:GiveTask(BossNPCUtils.getAttackStateChangedSignal(p1):Connect(handleAttackState))
-	BossNPCShared.setup(v1)
-	return v1
+	instance.maid:GiveTask(BossNPCUtils.getAttackStateChangedSignal(self):Connect(handleAttackState))
+	BossNPCShared.setup(instance)
+	return instance
 end
-function t._setupArmBoneData(p1)
+function t._setupArmBoneData(self)
 	local t = {}
-	for v2, v3 in { "Shoulder.R.001", "Shoulder.R.002", "Shoulder.R.003", "Shoulder.R.004", "Arm.R.001", "Arm.R.002", "Arm.R.003", "Arm.R.004" } do
-		local v1
-		local v4 = p1.obj.PrimaryPart:FindFirstChild(v3, true)
-		v1 = v4 ~= nil
-		assert(v1, "missing arm bone")
-		assert(v4:IsA("Bone"), "bone is not a bone")
+	for vector2, var3 in { "Shoulder.R.001", "Shoulder.R.002", "Shoulder.R.003", "Shoulder.R.004", "Arm.R.001", "Arm.R.002", "Arm.R.003", "Arm.R.004" } do
+		local instance
+		local var4 = self.obj.PrimaryPart:FindFirstChild(var3, true)
+		instance = var4 ~= nil
+		assert(instance, "missing arm bone")
+		assert(var4:IsA("Bone"), "bone is not a bone")
 		table.insert(t, {
-			bone = v4,
-			cf = v4.CFrame
+			bone = var4,
+			cf = var4.CFrame
 		})
 	end
-	p1.allArmBoneData = t
-	p1.armBoneLungeTransforms = {
+	self.allArmBoneData = t
+	self.armBoneLungeTransforms = {
 		CFrame.new(),
 		CFrame.new(-0.53, 0.86, -0.07) * CFrame.Angles(0, -0.0002, 0.4672),
 		CFrame.new(-0.57, 1.69, -0.13) * CFrame.Angles(0.0011, 0.0001, 0.1352),
@@ -122,101 +122,101 @@ function t._setupArmBoneData(p1)
 		CFrame.new(0.06, 2.17, -0.15) * CFrame.Angles(0.0011, 0.0002, 0.1974)
 	}
 end
-function t._resetArmBones(p1)
-	for v1, v2 in p1.allArmBoneData do
-		v2.bone.CFrame = v2.cf
+function t._resetArmBones(self)
+	for instance, vector2 in self.allArmBoneData do
+		vector2.bone.CFrame = vector2.cf
 	end
 end
-function t._armGrabTarget(p1, p2, p3, p4)
-	local allArmBoneData = p1.allArmBoneData
+function t._armGrabTarget(self, p2, p3, p4)
+	local allArmBoneData = self.allArmBoneData
 	local TransformedWorldCFrame = allArmBoneData[1].bone.TransformedWorldCFrame
 	local Position = TransformedWorldCFrame.Position
 	for i = 2, #allArmBoneData do
-		local v1
-		local v2 = allArmBoneData[i]
-		local v3 = TransformedWorldCFrame:PointToObjectSpace(Position:Lerp(p2, (i - 1) / (#allArmBoneData - 1)))
-		v1 = if p4 then p4[i] else v2.bone.Transform
-		local v4 = v2.cf * v1:Inverse() + v3
-		v2.bone.CFrame = v2.cf:Lerp(v4, p3)
-		TransformedWorldCFrame = TransformedWorldCFrame * (v4 * v1)
+		local instance
+		local vector2 = allArmBoneData[i]
+		local var3 = TransformedWorldCFrame:PointToObjectSpace(Position:Lerp(p2, (i - 1) / (#allArmBoneData - 1)))
+		instance = if p4 then p4[i] else vector2.bone.Transform
+		local var4 = vector2.cf * instance:Inverse() + var3
+		vector2.bone.CFrame = vector2.cf:Lerp(var4, p3)
+		TransformedWorldCFrame = TransformedWorldCFrame * (var4 * instance)
 	end
 end
-function t._armAnimateFromTo(p1, p2, p3, p4, p5, p6)
-	local v1 = os.clock()
-	local v2 = nil
-	local v3 = nil
-	v3 = RunService.Heartbeat:Connect(function()
-		v2 = (os.clock() - v1) / p5
-		if v2 >= 1 then
-			v2 = 1
-			v3:Disconnect()
-			v3 = nil
+function t._armAnimateFromTo(self, p2, p3, p4, p5, p6)
+	local instance = os.clock()
+	local vector2 = nil
+	local var3 = nil
+	var3 = RunService.Heartbeat:Connect(function()
+		vector2 = (os.clock() - instance) / p5
+		if vector2 >= 1 then
+			vector2 = 1
+			var3:Disconnect()
+			var3 = nil
 		end
-		local v12 = TweenService:GetValue(v2, Enum.EasingStyle.Quart, p6)
-		p1:_armGrabTarget(p2(), p3 * (1 - v12) + p4 * v12, p1.armBoneLungeTransforms)
+		local vector12 = TweenService:GetValue(vector2, Enum.EasingStyle.Quart, p6)
+		self:_armGrabTarget(p2(), p3 * (1 - vector12) + p4 * vector12, self.armBoneLungeTransforms)
 	end)
 	return function()
-		if v3 then
-			v3:Disconnect()
+		if var3 then
+			var3:Disconnect()
 		end
-		return v2
+		return vector2
 	end
 end
-function t.DisplayAttackIndicator(p1, p2)
-	local v1 = Maid.new()
-	p2.targetingMaid = v1
-	local v2 = NPCUtils.getTarget(p1.obj)
-	if v2 then
-		local v3 = Players:GetPlayerFromCharacter(v2.parent)
-		if v3 then
-			local v4 = ReplicatedStorage.Resource:FindFirstChild("BossAttackIndicator"):Clone()
-			v4.Anchored = true
-			v4.CanCollide = false
-			v4.CanTouch = false
-			v4.CanQuery = false
-			v4.Parent = workspace
-			v1:GiveTask(v4)
-			local v5 = os.clock()
-			v1:GiveTask(RunService.Heartbeat:Connect(function()
-				if v3 then
-					local Character = v3.Character
+function t.DisplayAttackIndicator(self, p2)
+	local instance = Maid.new()
+	p2.targetingMaid = instance
+	local vector2 = NPCUtils.getTarget(self.obj)
+	if vector2 then
+		local var3 = Players:GetPlayerFromCharacter(vector2.parent)
+		if var3 then
+			local var4 = ReplicatedStorage.Resource:FindFirstChild("BossAttackIndicator"):Clone()
+			var4.Anchored = true
+			var4.CanCollide = false
+			var4.CanTouch = false
+			var4.CanQuery = false
+			var4.Parent = workspace
+			instance:GiveTask(var4)
+			local var5 = os.clock()
+			instance:GiveTask(RunService.Heartbeat:Connect(function()
+				if var3 then
+					local Character = var3.Character
 					if Character then
 						if Character:FindFirstChild("UpperTorso") then
-							local v2 = Character.PrimaryPart.Position - Vector3.new(0, Character.Humanoid.HipHeight + Character.PrimaryPart.Size.Y / 2, 0)
-							local v32 = 6.283185307179586 * (os.clock() % 2) / 2
-							v4.CFrame = CFrame.new(v2) * CFrame.Angles(0, v32, 0)
-							v4.Decal.Transparency = math.min(0.9, 1 - (math.cos((os.clock() - v5) * 6) + 1) * 2 / 3)
+							local vector2 = Character.PrimaryPart.Position - Vector3.new(0, Character.Humanoid.HipHeight + Character.PrimaryPart.Size.Y / 2, 0)
+							local var32 = 6.283185307179586 * (os.clock() % 2) / 2
+							var4.CFrame = CFrame.new(vector2) * CFrame.Angles(0, var32, 0)
+							var4.Decal.Transparency = math.min(0.9, 1 - (math.cos((os.clock() - var5) * 6) + 1) * 2 / 3)
 						else
-							v1:Destroy()
+							instance:Destroy()
 						end
 					else
-						v1:Destroy()
+						instance:Destroy()
 					end
 				else
-					v1:Destroy()
+					instance:Destroy()
 				end
 			end))
 		end
 	end
 end
-function t.PlayArmGrab(p1, p2)
-	local v1 = Maid.new()
-	local v2 = nil
-	local v3 = NPCUtils.getTarget(p1.obj)
-	if v3 then
-		local v4 = Players:GetPlayerFromCharacter(v3.Parent)
-		if v4 then
-			p1:DisplayAttackIndicator(v1)
+function t.PlayArmGrab(self, p2)
+	local instance = Maid.new()
+	local vector2 = nil
+	local var3 = NPCUtils.getTarget(self.obj)
+	if var3 then
+		local var4 = Players:GetPlayerFromCharacter(var3.Parent)
+		if var4 then
+			self:DisplayAttackIndicator(instance)
 			local t = { "CEO: %s, you\'re mine!", "CEO: %s, you\'re going nowhere!", "CEO: Not so fast %s!" }
-			v2 = t[math.random(#t)]:format(v4.DisplayName)
+			vector2 = t[math.random(#t)]:format(var4.DisplayName)
 		end
 	end
-	if not v2 then
-		v2 = "CEO: You\'re mine!"
+	if not vector2 then
+		vector2 = "CEO: You\'re mine!"
 	end
 	mansionRobberyStore:dispatch({
 		type = "setDialogueText",
-		text = v2
+		text = vector2
 	})
 	task.delay(3, function()
 		mansionRobberyStore:dispatch({
@@ -224,54 +224,54 @@ function t.PlayArmGrab(p1, p2)
 			text = ""
 		})
 	end)
-	local v6 = p1.humanoid:WaitForChild("Animator"):LoadAnimation(p1.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("LungeAnimation"))
-	v6:Play()
-	v1:GiveTask(function()
-		v6:Stop()
-		v6:Destroy()
+	local var6 = self.humanoid:WaitForChild("Animator"):LoadAnimation(self.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("LungeAnimation"))
+	var6:Play()
+	instance:GiveTask(function()
+		var6:Stop()
+		var6:Destroy()
 	end)
-	v6:AdjustSpeed(0.2)
-	v1:GiveTask(task.delay(BossNPCConsts.EXTENDO_WHACK_WARM_UP_DURATION, function()
-		v6:AdjustSpeed(1)
-		v1.killAnimateTo = p1:_armAnimateFromTo(p2, 0, 1, v6.Length - 0.25, Enum.EasingDirection.In)
-		Audio.ObjectLocal(p1.obj.PrimaryPart, 11793693522, {
+	var6:AdjustSpeed(0.2)
+	instance:GiveTask(task.delay(BossNPCConsts.EXTENDO_WHACK_WARM_UP_DURATION, function()
+		var6:AdjustSpeed(1)
+		instance.killAnimateTo = self:_armAnimateFromTo(p2, 0, 1, var6.Length - 0.25, Enum.EasingDirection.In)
+		Audio.ObjectLocal(self.obj.PrimaryPart, 11793693522, {
 			Volume = 1,
 			RollOffMinDistance = 64
 		})
 	end))
-	local v7 = false
-	v1:GiveTask(v6.Stopped:Connect(function()
-		if not v7 then
-			v7 = true
-			local v12 = p2()
-			if (Players.LocalPlayer.Character.PrimaryPart.Position - v12).Magnitude <= 3 then
+	local var7 = false
+	instance:GiveTask(var6.Stopped:Connect(function()
+		if not var7 then
+			var7 = true
+			local vector12 = p2()
+			if (Players.LocalPlayer.Character.PrimaryPart.Position - vector12).Magnitude <= 3 then
 				Falling.StartRagdolling(2)
-				shakeCamAt(v12)
+				shakeCamAt(vector12)
 				Audio.ObjectLocal(Players.LocalPlayer.Character.PrimaryPart, 11793755625, {
 					Volume = 1
 				})
-				p1.obj:FindFirstChild(BossNPCConsts.DAMAGE_SELF_REMOTE_NAME):FireServer(40)
+				self.obj:FindFirstChild(BossNPCConsts.DAMAGE_SELF_REMOTE_NAME):FireServer(40)
 			else
-				Audio.ObjectLocal(p1.obj.PrimaryPart, 11793693028, {
+				Audio.ObjectLocal(self.obj.PrimaryPart, 11793693028, {
 					Volume = 0.3
 				})
 			end
-			p1:_armAnimateFromTo(p2, 1, 0, 0.2, Enum.EasingDirection.Out)
+			self:_armAnimateFromTo(p2, 1, 0, 0.2, Enum.EasingDirection.Out)
 			task.delay(0.2, function()
-				v1:DoCleaning()
-				Audio.ObjectLocal(p1.obj.PrimaryPart, 11793694003, {
+				instance:DoCleaning()
+				Audio.ObjectLocal(self.obj.PrimaryPart, 11793694003, {
 					Volume = 0.5,
 					RollOffMinDistance = 64
 				})
 			end)
 		end
 	end))
-	v1:GiveTask(function()
-		p1:_resetArmBones()
+	instance:GiveTask(function()
+		self:_resetArmBones()
 	end)
-	return v1
+	return instance
 end
-function t.PlayLaserSweepVisual(p1, p2)
+function t.PlayLaserSweepVisual(self, p2)
 	local t = { "CEO: Block this you filthy casual!", "CEO: I\'ll turn you to dust with this unstoppable weapon!", "CEO: You\'ll never defeat me with that puny arsenal, my laser will decimate you all!", "CEO: You\'ll never be able to dodge my laser\'s deadly beam!" }
 	mansionRobberyStore:dispatch({
 		type = "setDialogueText",
@@ -283,27 +283,27 @@ function t.PlayLaserSweepVisual(p1, p2)
 			text = ""
 		})
 	end)
-	local v1 = Maid.new()
-	local v2 = p1.humanoid:WaitForChild("Animator"):LoadAnimation(p1.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("AimAnimation"))
-	v2:Play()
-	v1:GiveTask(function()
-		v2:Stop()
-		v2:Destroy()
+	local instance = Maid.new()
+	local vector2 = self.humanoid:WaitForChild("Animator"):LoadAnimation(self.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("AimAnimation"))
+	vector2:Play()
+	instance:GiveTask(function()
+		vector2:Stop()
+		vector2:Destroy()
 	end)
-	local v3 = false
-	v1:GiveTask(v2.Stopped:Connect(function()
-		if not v3 then
-			v3 = true
-			v2:Play()
-			v2:AdjustSpeed(0)
-			v2.TimePosition = v2.Length - 0.001
+	local var3 = false
+	instance:GiveTask(vector2.Stopped:Connect(function()
+		if not var3 then
+			var3 = true
+			vector2:Play()
+			vector2:AdjustSpeed(0)
+			vector2.TimePosition = vector2.Length - 0.001
 		end
 	end))
-	Audio.ObjectLocal(p1.obj.PrimaryPart, 11831682028, {
+	Audio.ObjectLocal(self.obj.PrimaryPart, 11831682028, {
 		Volume = 0.3,
 		RollOffMinDistance = 64
 	})
-	v1:GiveTask(task.delay(BossNPCConsts.LASER_SWEEP_WARM_UP_DURATION, function()
+	instance:GiveTask(task.delay(BossNPCConsts.LASER_SWEEP_WARM_UP_DURATION, function()
 		local Part = Instance.new("Part")
 		Part.CanCollide = false
 		Part.CanQuery = false
@@ -313,33 +313,33 @@ function t.PlayLaserSweepVisual(p1, p2)
 		Part.Color = Color3.new(1, 0.1, 0.1)
 		Part.Size = Vector3.new(0.2, 0.2, 1)
 		Part.Parent = workspace
-		v1:GiveTask(Part)
+		instance:GiveTask(Part)
 		Audio.ObjectLocal(Part, 11793588989, {
 			Volume = 1
 		})
-		v1:GiveTask((Audio.ObjectLocal(Part, 11793547887, {
+		instance:GiveTask((Audio.ObjectLocal(Part, 11793547887, {
 			Looped = true,
 			Volume = 0.5
 		})))
-		local v12 = p1.obj.PrimaryPart.CFrame * Vector3.new(0, -10, -10)
+		local vector12 = self.obj.PrimaryPart.CFrame * Vector3.new(0, -10, -10)
 		local t = {}
-		v1:GiveTask(function()
+		instance:GiveTask(function()
 			table.clear(t)
 		end)
-		v1:GiveTask(RunService.Heartbeat:Connect(function()
-			local v1 = p2()
-			v12 = v12 + (v1 + (v1 - p1.obj.PrimaryPart.Position).Unit * 3 - v12) * 0.1
-			local Position = p1.allArmBoneData[#p1.allArmBoneData].bone.TransformedWorldCFrame.Position
-			local v2 = v12 - Position
-			local v3 = RaycastParams.new()
-			v3.FilterDescendantsInstances = { p1.obj }
-			local v4 = Raycast.collidable(Position, v2.Unit, v2.Magnitude, v3)
-			local v5 = if v4 then v4.Position else Position + v2
-			local Magnitude = (v5 - Position).Magnitude
+		instance:GiveTask(RunService.Heartbeat:Connect(function()
+			local instance = p2()
+			vector12 = vector12 + (instance + (instance - self.obj.PrimaryPart.Position).Unit * 3 - vector12) * 0.1
+			local Position = self.allArmBoneData[#self.allArmBoneData].bone.TransformedWorldCFrame.Position
+			local vector2 = vector12 - Position
+			local var3 = RaycastParams.new()
+			var3.FilterDescendantsInstances = { self.obj }
+			local var4 = Raycast.collidable(Position, vector2.Unit, vector2.Magnitude, var3)
+			local var5 = if var4 then var4.Position else Position + vector2
+			local Magnitude = (var5 - Position).Magnitude
 			Part.Size = Vector3.new(0.2, 0.2, Magnitude)
-			Part.CFrame = CFrame.lookAt(Vector3.new(), v5 - Position) * CFrame.new(0, 0, -Magnitude * 0.5) + Position
-			if (Players.LocalPlayer.Character.PrimaryPart.Position - v5).Magnitude <= 3 and not t[Players.LocalPlayer] then
-				p1.obj:FindFirstChild(BossNPCConsts.DAMAGE_SELF_REMOTE_NAME):FireServer(40)
+			Part.CFrame = CFrame.lookAt(Vector3.new(), var5 - Position) * CFrame.new(0, 0, -Magnitude * 0.5) + Position
+			if (Players.LocalPlayer.Character.PrimaryPart.Position - var5).Magnitude <= 3 and not t[Players.LocalPlayer] then
+				self.obj:FindFirstChild(BossNPCConsts.DAMAGE_SELF_REMOTE_NAME):FireServer(40)
 				Audio.ObjectLocal(Players.LocalPlayer.Character.PrimaryPart, 11793588652, {
 					Volume = 1
 				})
@@ -347,52 +347,52 @@ function t.PlayLaserSweepVisual(p1, p2)
 			end
 		end))
 	end))
-	return v1
+	return instance
 end
-function t.PlayMansionLasers(p1)
-	local v1 = Maid.new()
-	local v2 = p1.humanoid:WaitForChild("Animator"):LoadAnimation(p1.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("WaveRightAnimation"))
-	v1:GiveTask(task.delay(BossNPCConsts.WALK_TO_DEST_DURATION, function()
-		Audio.ObjectLocal(p1.obj.PrimaryPart, 11793818720, {
+function t.PlayMansionLasers(self)
+	local instance = Maid.new()
+	local vector2 = self.humanoid:WaitForChild("Animator"):LoadAnimation(self.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("WaveRightAnimation"))
+	instance:GiveTask(task.delay(BossNPCConsts.WALK_TO_DEST_DURATION, function()
+		Audio.ObjectLocal(self.obj.PrimaryPart, 11793818720, {
 			Volume = 0.5
 		})
-		v2:Play()
-		v1:GiveTask(function()
-			v2:Stop()
-			v2:Destroy()
+		vector2:Play()
+		instance:GiveTask(function()
+			vector2:Stop()
+			vector2:Destroy()
 		end)
 	end))
-	return v1
+	return instance
 end
-function t.PlayMansionCameras(p1)
-	local v1 = Maid.new()
-	local v2 = p1.humanoid:WaitForChild("Animator"):LoadAnimation(p1.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("WaveLeftAnimation"))
-	v1:GiveTask(task.delay(BossNPCConsts.WALK_TO_DEST_DURATION, function()
-		Audio.ObjectLocal(p1.obj.PrimaryPart, 11793818720, {
+function t.PlayMansionCameras(self)
+	local instance = Maid.new()
+	local vector2 = self.humanoid:WaitForChild("Animator"):LoadAnimation(self.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("WaveLeftAnimation"))
+	instance:GiveTask(task.delay(BossNPCConsts.WALK_TO_DEST_DURATION, function()
+		Audio.ObjectLocal(self.obj.PrimaryPart, 11793818720, {
 			Volume = 0.5
 		})
-		v2:Play()
-		v1:GiveTask(function()
-			v2:Stop()
-			v2:Destroy()
+		vector2:Play()
+		instance:GiveTask(function()
+			vector2:Stop()
+			vector2:Destroy()
 		end)
 	end))
-	return v1
+	return instance
 end
-function t.PlayCallInGuards(p1)
-	local v1 = Maid.new()
-	local v2 = p1.humanoid:WaitForChild("Animator"):LoadAnimation(p1.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("WaveLeftAnimation"))
-	v2:Play()
-	Audio.ObjectLocal(p1.obj.PrimaryPart, 11793818440, {
+function t.PlayCallInGuards(self)
+	local instance = Maid.new()
+	local vector2 = self.humanoid:WaitForChild("Animator"):LoadAnimation(self.obj:WaitForChild("ActionAnimationsFolder"):WaitForChild("WaveLeftAnimation"))
+	vector2:Play()
+	Audio.ObjectLocal(self.obj.PrimaryPart, 11793818440, {
 		Volume = 0.5
 	})
-	v1:GiveTask(function()
-		v2:Stop()
-		v2:Destroy()
+	instance:GiveTask(function()
+		vector2:Stop()
+		vector2:Destroy()
 	end)
-	return v1
+	return instance
 end
-function t.PlayAuraBlast(p1)
+function t.PlayAuraBlast(self)
 	mansionRobberyStore:dispatch({
 		type = "setDialogueText",
 		text = "CEO: Alright this has been going on too long. Enough is ENOUGH!"
@@ -403,11 +403,11 @@ function t.PlayAuraBlast(p1)
 			text = ""
 		})
 	end)
-	local v1 = Maid.new()
-	p1.maid.auraMaid = v1
+	local instance = Maid.new()
+	self.maid.auraMaid = instance
 	local AuraPart = Instance.new("Part")
 	AuraPart.Shape = Enum.PartType.Ball
-	AuraPart.Position = p1.obj.PrimaryPart.Position
+	AuraPart.Position = self.obj.PrimaryPart.Position
 	AuraPart.Name = "AuraPart"
 	AuraPart.Color = Color3.fromRGB(85, 0, 170)
 	AuraPart.Material = Enum.Material.Neon
@@ -415,37 +415,37 @@ function t.PlayAuraBlast(p1)
 	AuraPart.CanCollide = false
 	AuraPart.Anchored = true
 	AuraPart.Size = Vector3.new(0, 0, 0)
-	AuraPart.Parent = p1.obj
-	v1:GiveTask(AuraPart)
-	local v2 = workspace:GetServerTimeNow()
-	local v3 = false
+	AuraPart.Parent = self.obj
+	instance:GiveTask(AuraPart)
+	local vector2 = workspace:GetServerTimeNow()
+	local var3 = false
 	local function isPlayerInAura()
 		local Character = Players.LocalPlayer.Character
 		if Character then
 			return (Character.PrimaryPart.Position - AuraPart.Position).Magnitude <= AuraPart.Size.X / 2
 		end
 	end
-	v1:GiveTask((shakeCamAt(p1.obj.PrimaryPart.Position, {
+	instance:GiveTask((shakeCamAt(self.obj.PrimaryPart.Position, {
 		Sustain = true,
 		Amplitude = 0.1
 	})))
-	v1:GiveTask(RunService.Heartbeat:Connect(function()
-		local v12 = (workspace:GetServerTimeNow() - v2) / BossNPCConsts.AURA_BLAST_DURATION
-		if v12 > 1 then
-			v1:Destroy()
+	instance:GiveTask(RunService.Heartbeat:Connect(function()
+		local vector12 = (workspace:GetServerTimeNow() - vector2) / BossNPCConsts.AURA_BLAST_DURATION
+		if vector12 > 1 then
+			instance:Destroy()
 		else
-			local v22 = v12 * BossNPCConsts.AURA_BLAST_MAX_SIZE
-			AuraPart.Size = Vector3.new(v22, v22, v22)
-			if not v3 then
+			local var22 = vector12 * BossNPCConsts.AURA_BLAST_MAX_SIZE
+			AuraPart.Size = Vector3.new(var22, var22, var22)
+			if not var3 then
 				local Character = Players.LocalPlayer.Character
 				if if Character then (Character.PrimaryPart.Position - AuraPart.Position).Magnitude <= AuraPart.Size.X / 2 else nil then
 					Falling.StartRagdolling(2)
-					v3 = true
+					var3 = true
 				end
 			end
 		end
 	end))
-	return v1
+	return instance
 end
 return ManifestBinder.new(BossNPCConsts.TAG_NAME, {
 	humanoid = "Humanoid"

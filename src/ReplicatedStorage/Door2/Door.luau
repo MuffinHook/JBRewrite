@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -34,7 +35,7 @@ function Door.new(door, config)
 					if percentOpen == nil then
 						percentOpen = if door:GetAttribute(DoorConsts.OPEN_ATTR_NAME) then 1 else 0
 					end
-					self._lastJ = percentOpen
+					self._lastValue = percentOpen
 					self:_updateEndJ(door, percentOpen, true)
 				end
 			end))

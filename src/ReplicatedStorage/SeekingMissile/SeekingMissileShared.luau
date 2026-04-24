@@ -37,54 +37,54 @@ function t._run(p1)
 	p1.lastDistanceImprovement = 0
 	local v1 = false
 	local v2 = false
-	local v3 = false
-	local v4 = os.clock()
-	local v5 = 0
+	local var3 = false
+	local var4 = os.clock()
+	local var5 = 0
 	local Position = p1.obj.Position
 	p1.runMaid:GiveTask(RunService.Heartbeat:Connect(function(p12)
-		local v12 = os.clock()
+		local var12 = os.clock()
 		local obj = p1.obj
 		local AssemblyMass = obj.AssemblyMass
-		local v22 = t._getTargetPosition(p1)
-		assert(v22 ~= nil, "missing targetPosition")
-		local v42 = p1._lastTargetPosition or v22
-		p1._lastTargetPosition = v22
-		local v52 = obj.CFrame:VectorToObjectSpace(obj.AssemblyLinearVelocity)
-		local v6 = Vector3.new(0, 0, v52.Z)
-		local v7 = v52 - v6
-		local v8 = math.abs(v52.Z)
-		local Magnitude = v52.Magnitude
-		local v9 = v22 - v42
-		local Magnitude_2 = (v22 - obj.Position).Magnitude
-		v5 = (v5 * 24 + v9.Magnitude / p12) / 25
+		local var22 = t._getTargetPosition(p1)
+		assert(var22 ~= nil, "missing targetPosition")
+		local var42 = p1._lastTargetPosition or var22
+		p1._lastTargetPosition = var22
+		local cframe52 = obj.CFrame:VectorToObjectSpace(obj.AssemblyLinearVelocity)
+		local vector6 = Vector3.new(0, 0, cframe52.Z)
+		local var7 = cframe52 - vector6
+		local var8 = math.abs(cframe52.Z)
+		local Magnitude = cframe52.Magnitude
+		local var9 = var22 - var42
+		local Magnitude_2 = (var22 - obj.Position).Magnitude
+		var5 = (var5 * 24 + var9.Magnitude / p12) / 25
 		local _throttle = p1._throttle
-		local v11 = 1
+		local var11 = 1
 		local Position_2 = obj.Position
 		local v122
-		if v9.Magnitude > 0.1 then
-			local v13 = v5
-			local Unit = v9.Unit
+		if var9.Magnitude > 0.1 then
+			local var13 = var5
+			local Unit = var9.Unit
 			if Magnitude_2 < 500 then
-				v11 = if math.max(400, v5 * 5 / 3) < Magnitude then _throttle * 0.95 else _throttle * 1.05
+				var11 = if math.max(400, var5 * 5 / 3) < Magnitude then _throttle * 0.95 else _throttle * 1.05
 			end
-			local v15 = GeomUtils.getTrajectoryInterceptTime(Position_2, v8, v22, v13, Unit) or 0
-			v122 = if v15 > 0 then v22 + Unit * v13 * v15 else v22
+			local var15 = GeomUtils.getTrajectoryInterceptTime(Position_2, var8, var22, var13, Unit) or 0
+			v122 = if var15 > 0 then var22 + Unit * var13 * var15 else var22
 		else
-			v122 = v22
+			v122 = var22
 		end
-		local v16 = math.clamp(_throttle + (v11 - _throttle) * 0.9, 0, 1)
-		p1._throttle = v16
+		local var16 = math.clamp(_throttle + (var11 - _throttle) * 0.9, 0, 1)
+		p1._throttle = var16
 		if p1._seeking then
 			p1.alignOrientation.CFrame = CFrame.lookAt(obj.Position, v122)
 		else
 			p1.alignOrientation.CFrame = obj.CFrame
 		end
 		local v17, v18
-		if v12 - v4 > SeekingMissileUtils.getDropDuration(obj) then
-			v17 = v16
+		if var12 - var4 > SeekingMissileUtils.getDropDuration(obj) then
+			v17 = var16
 			v18 = true
 		else
-			v17 = v16
+			v17 = var16
 			v18 = false
 		end
 		if v18 ~= p1.flagApplyingThrust then
@@ -93,46 +93,46 @@ function t._run(p1)
 		end
 		local v19
 		if v18 then
-			local v20 = -p1.lateralDrag * v7
+			local var20 = -p1.lateralDrag * var7
 			if not p1._currentLateralForce then
-				p1._currentLateralForce = v20
+				p1._currentLateralForce = var20
 			end
-			p1._currentLateralForce = p1._currentLateralForce:Lerp(v20, if p12 <= 0.02 then 1 elseif p12 <= 0.05 then 0.3 else 0.1)
-			local v23 = -p1.forwardDrag * v6 * math.abs(v6.Magnitude)
-			v19 = Vector3.new(0, 0, -1) * AssemblyMass * 9.81 * 20 * SeekingMissileUtils.getAccel(obj) * v17 + v23 + p1._currentLateralForce
+			p1._currentLateralForce = p1._currentLateralForce:Lerp(var20, if p12 <= 0.02 then 1 elseif p12 <= 0.05 then 0.3 else 0.1)
+			local var23 = -p1.forwardDrag * vector6 * math.abs(vector6.Magnitude)
+			v19 = Vector3.new(0, 0, -1) * AssemblyMass * 9.81 * 20 * SeekingMissileUtils.getAccel(obj) * v17 + var23 + p1._currentLateralForce
 		else
 			v19 = Vector3.new(0, 0, 0)
 		end
 		p1.vectorForce.Force = v19
-		local Magnitude_3 = (v22 - obj.Position).Magnitude
-		local v24 = SeekingMissileUtils.getLifeSpan(obj)
+		local Magnitude_3 = (var22 - obj.Position).Magnitude
+		local var24 = SeekingMissileUtils.getLifeSpan(obj)
 		if p1._seeking then
 			if Magnitude_3 < p1.lastDistance - 0.1 then
-				p1.lastDistanceImprovement = v12
+				p1.lastDistanceImprovement = var12
 			end
-			if v12 - p1.lastDistanceImprovement > SeekingMissileUtils.getNoImprovementExplodeDuration(obj) then
+			if var12 - p1.lastDistanceImprovement > SeekingMissileUtils.getNoImprovementExplodeDuration(obj) then
 				t._explode(p1)
 			end
 			p1.lastDistance = Magnitude_3
-			local v27 = math.min(1, (v12 - v4) / v24)
-			local v28 = v27 * 12 + (1 - v27) * 3
-			if Magnitude_3 <= v28 then
+			local var27 = math.min(1, (var12 - var4) / var24)
+			local var28 = var27 * 12 + (1 - var27) * 3
+			if Magnitude_3 <= var28 then
 				t._explode(p1)
 			end
-			if GeomUtils.calcRayIntersectSphere(Position, Position_2, v22, v28) then
+			if GeomUtils.calcRayIntersectSphere(Position, Position_2, var22, var28) then
 				t._explode(p1)
 			end
 		end
-		if not v1 and v24 <= v12 - v4 then
+		if not v1 and var24 <= var12 - var4 then
 			v1 = true
 			t._explode(p1)
 		end
-		if not v2 and v12 - v4 > SeekingMissileUtils.getConnectHitAfterDuration(obj) then
+		if not v2 and var12 - var4 > SeekingMissileUtils.getConnectHitAfterDuration(obj) then
 			v2 = true
 			t._detectHit(p1)
 		end
-		if not v3 and v12 - v4 > SeekingMissileUtils.getSeekAfterDuration(obj) then
-			v3 = true
+		if not var3 and var12 - var4 > SeekingMissileUtils.getSeekAfterDuration(obj) then
+			var3 = true
 			t._enableSeeking(p1)
 		end
 		Position = Position_2

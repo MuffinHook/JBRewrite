@@ -12,67 +12,67 @@ local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local CCTV = require(script.Parent.CCTV)
 local CameraBinder = require(script.Parent.Parent.CameraBinder)
-local v1 = Roact.PureComponent:extend("Viewer")
-function v1.init(p1)
-	p1._maid = Maid.new()
-	p1:setState({
+local ViewerComponent = Roact.PureComponent:extend("Viewer")
+function ViewerComponent.init(self)
+	self._maid = Maid.new()
+	self:setState({
 		index = 1
 	})
-	p1:_updateCameraParts()
-	local v1, v2 = Roact.createBinding(1)
-	p1.flash = v1
-	p1.updateFlash = v2
+	self:_updateCameraParts()
+	local flashBinding, updateFlashBinding = Roact.createBinding(1)
+	self.flash = flashBinding
+	self.updateFlash = updateFlashBinding
 end
-function v1._flash(p1)
-	local v1 = os.clock()
-	p1._maid.flash = RunService.Heartbeat:Connect(function()
-		local v12 = (os.clock() - v1) / 0.25
-		if v12 > 1 then
-			p1._maid.flash = nil
-			v12 = 1
+function ViewerComponent._flash(self)
+	local startTime = os.clock()
+	self._maid.flash = RunService.Heartbeat:Connect(function()
+		local elapsedFraction = (os.clock() - startTime) / 0.25
+		if elapsedFraction > 1 then
+			self._maid.flash = nil
+			elapsedFraction = 1
 		end
-		p1.updateFlash(1 - math.sin(math.pi * (v12 + 0.25) / 1.25))
+		self.updateFlash(1 - math.sin(math.pi * (elapsedFraction + 0.25) / 1.25))
 	end)
 end
-function v1._updateCameraParts(p1)
-	local v1 = CollectionService:GetTagged(p1.props.cameraTag)
-	p1:setState({
-		cameraParts = v1
+function ViewerComponent._updateCameraParts(self)
+	local cameraPartsList = CollectionService:GetTagged(self.props.cameraTag)
+	self:setState({
+		cameraParts = cameraPartsList
 	})
-	local v2 = Maid.new()
-	p1._maid.cameraPartMaid = v2
-	for i, v in ipairs(v1) do
-		v2:GiveTask(v:GetAttributeChangedSignal("CCTVDisabled"):Connect(function()
-			p1:_updateCameraParts()
+	local cameraPartMaid = Maid.new()
+	self._maid.cameraPartMaid = cameraPartMaid
+	for i, v in ipairs(cameraPartsList) do
+		cameraPartMaid:GiveTask(v:GetAttributeChangedSignal("CCTVDisabled"):Connect(function()
+			self:_updateCameraParts()
 		end))
 	end
 end
-function v1.render(p1)
-	if p1.state.cameraParts and #p1.state.cameraParts ~= 0 then
-		local t = {}
-		local t2 = {}
-		local t3 = {}
-		for i = 1, #p1.state.cameraParts do
-			local v1
-			local v2 = p1.state.cameraParts[i]
-			t[i] = v2.CFrame * CFrame.new(0, 0, -v2.Size.Z * 0.5)
-			t2[i] = v2:GetAttribute("CCTVName")
-			v1 = v2:GetAttribute("CCTVDisabled") == true
-			t3[i] = v1
+function ViewerComponent.render(self)
+	if self.state.cameraParts and #self.state.cameraParts ~= 0 then
+		local cameraCFrameList = {}
+		local cameraNameList = {}
+		local isDisabledList = {}
+		for i = 1, #self.state.cameraParts do
+			local cameraIsDisabled
+			local cameraPart = self.state.cameraParts[i]
+			cameraCFrameList[i] = cameraPart.CFrame * CFrame.new(0, 0, -cameraPart.Size.Z * 0.5)
+			cameraNameList[i] = cameraPart:GetAttribute("CCTVName")
+			cameraIsDisabled = cameraPart:GetAttribute("CCTVDisabled") == true
+			isDisabledList[i] = cameraIsDisabled
 		end
-		local t4 = {}
+		local previewCameraElements = {}
 		for j = 1, 3 do
-			local v3 = (p1.state.index + j - 1) % #t + 1
-			t4[v3] = createElement(CCTV, {
+			local cameraIndex = (self.state.index + j - 1) % #cameraCFrameList + 1
+			previewCameraElements[cameraIndex] = createElement(CCTV, {
 				active = false,
 				size = UDim2.new(1, 0, 1, 0),
 				position = UDim2.new(0.5, 0, 0.5, 0),
-				distance = p1.props.distance,
-				aspectRatio = p1.props.aspectRatio,
-				cameraCFrame = t[v3],
-				fieldOfView = p1.props.fieldOfView,
+				distance = self.props.distance,
+				aspectRatio = self.props.aspectRatio,
+				cameraCFrame = cameraCFrameList[cameraIndex],
+				fieldOfView = self.props.fieldOfView,
 				layoutOrder = j,
-				disabled = t3[v3]
+				disabled = isDisabledList[cameraIndex]
 			})
 		end
 		return createElement("Frame", {
@@ -245,42 +245,42 @@ function v1.render(p1)
 						Font = Enum.Font.LuckiestGuy
 					})
 				})
-			}, t4))
+			}, previewCameraElements))
 		})
 	end
 end
-function v1.didMount(p1)
-	p1.updateFlash(1)
-	p1._maid:GiveTask(CollectionService:GetInstanceAddedSignal(p1.props.cameraTag):Connect(function()
-		p1:_updateCameraParts()
+function ViewerComponent.didMount(self)
+	self.updateFlash(1)
+	self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(self.props.cameraTag):Connect(function()
+		self:_updateCameraParts()
 	end))
-	p1._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(p1.props.cameraTag):Connect(function()
-		p1:_updateCameraParts()
+	self._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(self.props.cameraTag):Connect(function()
+		self:_updateCameraParts()
 	end))
 	if Players.LocalPlayer then
-		p1._maid:GiveTask((Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 9058379519, {
+		self._maid:GiveTask((Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 9058379519, {
 			Volume = 0.6,
 			Looped = true
 		})))
 	end
-	if p1.props.expireDistance then
-		local v2 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-		if v2 then
-			local Position = v2.Position
-			p1._maid:GiveTask(Interval.every(1):Connect(function()
-				v2 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-				if v2 then
-					if (v2.Position - Position).Magnitude > p1.props.expireDistance then
-						p1.props.onClickClose()
+	if self.props.expireDistance then
+		local rootPart = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+		if rootPart then
+			local initialPosition = rootPart.Position
+			self._maid:GiveTask(Interval.every(1):Connect(function()
+				rootPart = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+				if rootPart then
+					if (rootPart.Position - initialPosition).Magnitude > self.props.expireDistance then
+						self.props.onClickClose()
 					end
 				else
-					p1.props.onClickClose()
+					self.props.onClickClose()
 				end
 			end))
 		end
 	end
 end
-function v1.willUnmount(p1)
-	p1._maid:DoCleaning()
+function ViewerComponent.willUnmount(self)
+	self._maid:DoCleaning()
 end
-return v1
+return ViewerComponent

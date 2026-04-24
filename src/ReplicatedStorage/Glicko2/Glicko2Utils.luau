@@ -2,76 +2,76 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Glicko2Consts = require(ReplicatedStorage.Glicko2.Glicko2Consts)
 local MathUtils = require(ReplicatedStorage.Std.MathUtils)
-local t = {
-	g = function(p1)
-		return 1 / math.sqrt(1 + 3 * p1 ^ 2 / 9.869604401089358)
+local Glicko2Utils = {
+	g = function(ratingDeviation)
+		return 1 / math.sqrt(1 + 3 * ratingDeviation ^ 2 / 9.869604401089358)
 	end
 }
-function t.E(p1, p2, p3)
-	return 1 / (math.exp(-t.g(p3) * (p1 - p2)) + 1)
+function Glicko2Utils.E(playerRating, opponentRating, opponentDeviation)
+	return 1 / (math.exp(-Glicko2Utils.g(opponentDeviation) * (playerRating - opponentRating)) + 1)
 end
-function t.v(p1, p2, p3)
+function Glicko2Utils.v(playerRating, opponentRatings, opponentDeviations)
 	local sum = 0
-	for i = 1, #p2 do
-		local v2 = p3[i]
-		local v3 = t.E(p1, p2[i], v2)
-		sum = sum + t.g(v2) ^ 2 * v3 * (1 - v3)
+	for i = 1, #opponentRatings do
+		local opponentDeviation = opponentDeviations[i]
+		local expectedScore = Glicko2Utils.E(playerRating, opponentRatings[i], opponentDeviation)
+		sum = sum + Glicko2Utils.g(opponentDeviation) ^ 2 * expectedScore * (1 - expectedScore)
 	end
 	return 1 / sum
 end
-function t.delta(p1, p2, p3, p4, p5)
+function Glicko2Utils.delta(varianceInverse, playerRating, opponentRatings, opponentDeviations, scores)
 	local sum = 0
-	for i = 1, #p3 do
-		local v2 = p4[i]
-		sum = sum + t.g(v2) * (p5[i] - t.E(p2, p3[i], v2))
+	for i = 1, #opponentRatings do
+		local opponentDeviation = opponentDeviations[i]
+		sum = sum + Glicko2Utils.g(opponentDeviation) * (scores[i] - Glicko2Utils.E(playerRating, opponentRatings[i], opponentDeviation))
 	end
-	return p1 * sum
+	return varianceInverse * sum
 end
-function t.f(p1, p2, p3, p4, p5, p6)
-	return 0.5 * (math.exp(p1) * (p2 ^ 2 - p4 ^ 2 - p3 - math.exp(p1))) / (p4 ^ 2 + p3 + math.exp(p1)) ^ 2 - (p1 - math.log(p5 ^ 2)) / p6 ^ 2
+function Glicko2Utils.f(x, delta, variance, ratingDeviation, sigma, tau)
+	return 0.5 * (math.exp(x) * (delta ^ 2 - variance ^ 2 - x - math.exp(x))) / (variance ^ 2 + x + math.exp(x)) ^ 2 - (x - math.log(sigma ^ 2)) / tau ^ 2
 end
-function t.convertToGlicko2Rating(p1, p2)
-	return (p1 - 1500) / Glicko2Consts.CONVERSION_FACTOR, p2 / Glicko2Consts.CONVERSION_FACTOR
+function Glicko2Utils.convertToGlicko2Rating(rating, ratingDeviation)
+	return (rating - 1500) / Glicko2Consts.CONVERSION_FACTOR, ratingDeviation / Glicko2Consts.CONVERSION_FACTOR
 end
-function t.convertFromGlicko2Rating(p1, p2)
-	return Glicko2Consts.CONVERSION_FACTOR * p1 + 1500, Glicko2Consts.CONVERSION_FACTOR * p2
+function Glicko2Utils.convertFromGlicko2Rating(glicko2Rating, glicko2Deviation)
+	return Glicko2Consts.CONVERSION_FACTOR * glicko2Rating + 1500, Glicko2Consts.CONVERSION_FACTOR * glicko2Deviation
 end
-function t.calculateNewRatingData(p1, p2, p3, p4, p5, p6, p7)
-	assert(typeof(p4) == "table", "Invalid ratingList")
-	assert(typeof(p5) == "table", "Invalid ratingDeviationList")
-	assert(typeof(p6) == "table", "Invalid scoreList")
-	assert(#p4 == #p5, "Lengths of lists must be the same")
-	assert(#p4 == #p6, "Lengths of lists must be the same")
-	assert(if typeof(p1) == "number" then p1 > 0 else false, "Invalid rating")
-	assert(if typeof(p2) == "number" then p2 > 0 else false, "Invalid ratingDeviation")
-	assert(if typeof(p3) == "number" then p3 > 0 else false, "Invalid sigma")
-	local v9, v10 = t.convertToGlicko2Rating(p1, p2)
-	if #p4 == 0 then
-		local _, v12 = t.convertFromGlicko2Rating(v9, (math.sqrt(v10 ^ 2 + p3 ^ 2)))
-		return p1, v12, p3
+function Glicko2Utils.calculateNewRatingData(rating, ratingDeviation, sigma, opponentRatings, opponentDeviations, scores, tau)
+	assert(typeof(opponentRatings) == "table", "Invalid ratingList")
+	assert(typeof(opponentDeviations) == "table", "Invalid ratingDeviationList")
+	assert(typeof(scores) == "table", "Invalid scoreList")
+	assert(#opponentRatings == #opponentDeviations, "Lengths of lists must be the same")
+	assert(#opponentRatings == #scores, "Lengths of lists must be the same")
+	assert(if typeof(rating) == "number" then rating > 0 else false, "Invalid rating")
+	assert(if typeof(ratingDeviation) == "number" then ratingDeviation > 0 else false, "Invalid ratingDeviation")
+	assert(if typeof(sigma) == "number" then sigma > 0 else false, "Invalid sigma")
+	local glicko2Rating, glicko2Deviation = Glicko2Utils.convertToGlicko2Rating(rating, ratingDeviation)
+	if #opponentRatings == 0 then
+		local _, newDeviation = Glicko2Utils.convertFromGlicko2Rating(glicko2Rating, (math.sqrt(glicko2Deviation ^ 2 + sigma ^ 2)))
+		return rating, newDeviation, sigma
 	else
-		local t2 = {}
-		local t3 = {}
-		for i = 1, #p4 do
-			local v15, v16 = t.convertToGlicko2Rating(p4[i], p5[i])
-			table.insert(t2, v15)
-			table.insert(t3, v16)
+		local glicko2OpponentRatings = {}
+		local glicko2OpponentDeviations = {}
+		for i = 1, #opponentRatings do
+			local glicko2OpponentRating, glicko2OpponentDeviation = Glicko2Utils.convertToGlicko2Rating(opponentRatings[i], opponentDeviations[i])
+			table.insert(glicko2OpponentRatings, glicko2OpponentRating)
+			table.insert(glicko2OpponentDeviations, glicko2OpponentDeviation)
 		end
-		local v18 = p7 or Glicko2Consts.DEFAULT_TAU
-		local v19 = t.v(v9, t2, t3)
-		local v20 = t.delta(v19, v9, t2, t3, p6)
-		local function f21(p1)
-			return t.f(p1, v20, v19, v10, p3, v18)
+		local effectiveTau = tau or Glicko2Consts.DEFAULT_TAU
+		local variance = Glicko2Utils.v(glicko2Rating, glicko2OpponentRatings, glicko2OpponentDeviations)
+		local delta = Glicko2Utils.delta(variance, glicko2Rating, glicko2OpponentRatings, glicko2OpponentDeviations, scores)
+		local function iterateX(x)
+			return Glicko2Utils.f(x, delta, variance, glicko2Deviation, sigma, effectiveTau)
 		end
-		local v23 = math.exp(MathUtils.regulaFalsi(f21) / 2)
-		local v24 = 1 / math.sqrt(1 / (v10 ^ 2 + v23 ^ 2) + 1 / v19)
+		local a = math.exp(MathUtils.regulaFalsi(iterateX) / 2)
+		local newDeviation = 1 / math.sqrt(1 / (glicko2Deviation ^ 2 + a ^ 2) + 1 / variance)
 		local sum = 0
-		for j = 1, #t2 do
-			local v26 = t3[j]
-			sum = sum + t.g(v26) * (p6[j] - t.E(v9, t2[j], v26))
+		for j = 1, #glicko2OpponentRatings do
+			local opponentDeviation = glicko2OpponentDeviations[j]
+			sum = sum + Glicko2Utils.g(opponentDeviation) * (scores[j] - Glicko2Utils.E(glicko2Rating, glicko2OpponentRatings[j], opponentDeviation))
 		end
-		local v28, v29 = t.convertFromGlicko2Rating(v9 + v24 ^ 2 * sum, v24)
-		return v28, v29, v23
+		local newRating, newSigma = Glicko2Utils.convertFromGlicko2Rating(glicko2Rating + newDeviation ^ 2 * sum, newDeviation)
+		return newRating, newSigma, a
 	end
 end
-return t
+return Glicko2Utils

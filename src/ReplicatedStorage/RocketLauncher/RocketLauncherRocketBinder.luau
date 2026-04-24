@@ -11,14 +11,14 @@ local tbl = {}
 tbl.__index = tbl
 setmetatable(tbl, BaseObject)
 function tbl.new(p1)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, tbl)
-	assert(CollectionService:HasTag(v1.obj, SeekingMissileConsts.TAG_NAME), "Must be seeking missile")
-	SeekingMissileBinder:Promise(v1.obj):andThen(function(p1)
+	local instance = BaseObject.new(p1)
+	setmetatable(instance, tbl)
+	assert(CollectionService:HasTag(instance.obj, SeekingMissileConsts.TAG_NAME), "Must be seeking missile")
+	SeekingMissileBinder:Promise(instance.obj):andThen(function(p1)
  p1.onExploded:Connect(function(p1)
  RocketLauncherUtils.explodeAt(p1)
  end)
 	end)
-	return v1
+	return instance
 end
 return Binder.new(RocketLauncherConsts.ROCKET_TAG_NAME, tbl)

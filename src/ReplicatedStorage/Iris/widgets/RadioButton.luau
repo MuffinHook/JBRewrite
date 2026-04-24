@@ -41,15 +41,15 @@ return function(p1, p2)
 			Iris_RadioButton.Text = ""
 			Iris_RadioButton.AutoButtonColor = false
 			p2.UIListLayout(Iris_RadioButton, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
-			local v1 = p1._config.TextSize + 2 * (p1._config.FramePadding.Y - 1)
+			local delta = p1._config.TextSize + 2 * (p1._config.FramePadding.Y - 1)
 			local Button = Instance.new("Frame")
 			Button.Name = "Button"
-			Button.Size = UDim2.fromOffset(v1, v1)
+			Button.Size = UDim2.fromOffset(delta, delta)
 			Button.BackgroundColor3 = p1._config.FrameBgColor
 			Button.BackgroundTransparency = p1._config.FrameBgTransparency
 			Button.Parent = Iris_RadioButton
 			p2.UICorner(Button)
-			p2.UIPadding(Button, Vector2.new(math.max(1, (math.floor(v1 / 5))), (math.max(1, (math.floor(v1 / 5))))))
+			p2.UIPadding(Button, Vector2.new(math.max(1, (math.floor(delta / 5))), (math.max(1, (math.floor(delta / 5))))))
 			local Circle = Instance.new("Frame")
 			Circle.Name = "Circle"
 			Circle.Size = UDim2.fromScale(1, 1)

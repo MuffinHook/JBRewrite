@@ -1,14 +1,15 @@
 -- Reviewed by Claude
-return function(p1, p2)
-	return function(p12, p22)
- if p12 == nil then
- p12 = p1
+-- variables reassigned
+return function(initialState, actionsTable)
+	return function(state, action)
+ if state == nil then
+ state = initialState
  end
- local v1 = p2[p22.type]
- if v1 then
- return v1(p12, p22)
+ local actionHandler = actionsTable[action.type]
+ if actionHandler then
+ return actionHandler(state, action)
  else
- return p12
+ return state
  end
 	end
 end

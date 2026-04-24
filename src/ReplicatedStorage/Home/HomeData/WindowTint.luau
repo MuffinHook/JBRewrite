@@ -14,8 +14,8 @@ return {
 		return Part
 	end,
 	updateCamera = function(p1, p2)
-		local v1 = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+		local progress = os.clock() / 2
+		p1.CFrame = CFrame.Angles(0, progress % 6.283185307179586, 0) * CFrame.Angles(math.sin(progress) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 	end,
 	getItems = function()
 		return WindowTint.Items
@@ -24,7 +24,7 @@ return {
 		local Windows = p2:FindFirstChild("Windows")
 		if Windows then
 			local count = 0
-			for v1, v2 in Windows:GetChildren() do
+			for progress, v2 in Windows:GetChildren() do
 				if v2:IsA("BasePart") then
 					count = count + 1
 					if p1 and not p1.None then

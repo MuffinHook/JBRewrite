@@ -5,12 +5,12 @@ local Roact = require(ReplicatedStorage.Roact)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local createElement = Roact.createElement
 return function(p1)
-	local v1 = if p1.selected then p1.selectedBgColor else Color3.new(0/255, 0/255, 0/255)
-	local v2 = if p1.selected then ColorUtils.brightenBy(v1, -0.8) else Color3.new(255/255, 255/255, 255/255)
+	local color = if p1.selected then p1.selectedBgColor else Color3.new(0/255, 0/255, 0/255)
+	local color2 = if p1.selected then ColorUtils.brightenBy(color, -0.8) else Color3.new(255/255, 255/255, 255/255)
 	return createElement("TextButton", {
 		BackgroundTransparency = 0,
 		BorderSizePixel = 0,
-		BackgroundColor3 = v1,
+		BackgroundColor3 = color,
 		Size = p1.size,
 		Position = p1.position,
 		Text = "",
@@ -50,7 +50,7 @@ return function(p1)
 					TextScaled = true,
 					TextXAlignment = Enum.TextXAlignment.Right,
 					TextYAlignment = Enum.TextYAlignment.Center,
-					TextColor3 = v2
+					TextColor3 = color2
 				})
 			})
 		})

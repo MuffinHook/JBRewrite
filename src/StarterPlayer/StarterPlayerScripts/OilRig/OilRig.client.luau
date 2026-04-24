@@ -8,18 +8,18 @@ local RobberyConsts = require(ReplicatedStorage.Robbery.RobberyConsts)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Maid = require(ReplicatedStorage.Std.Maid)
 OilRigBinder:Start()
-DuffelBagBinder:GetClassAddedSignal():Connect(function(p1)
-	local v1 = Maid.new()
+DuffelBagBinder:GetClassAddedSignal():Connect(function(self)
+	local instance = Maid.new()
 	local function handleRobbery()
-		v1:DoCleaning()
-		local v12 = p1:GetRobbery()
-		if p1:GetOwner() == Players.LocalPlayer and v12 == RobberyConsts.ENUM_ROBBERY.OIL_RIG then
+		instance:DoCleaning()
+		local var12 = self:GetRobbery()
+		if self:GetOwner() == Players.LocalPlayer and var12 == RobberyConsts.ENUM_ROBBERY.OIL_RIG then
 			local localPlayer = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 1837697591, {
 				Looped = true,
 				Volume = 0.4,
 				Group = game:GetService("SoundService").RobberyMusic
 			})
-			v1:GiveTask(function()
+			instance:GiveTask(function()
 				Audio.promiseFadeTo(localPlayer, 0, 0.5):andThen(function()
 					localPlayer:Destroy()
 				end)
@@ -27,6 +27,6 @@ DuffelBagBinder:GetClassAddedSignal():Connect(function(p1)
 		end
 	end
 	handleRobbery()
-	p1._maid:GiveTask(p1:GetRobberyChangedSignal():Connect(handleRobbery))
-	p1._maid:GiveTask(v1)
+	self._maid:GiveTask(self:GetRobberyChangedSignal():Connect(handleRobbery))
+	self._maid:GiveTask(instance)
 end)

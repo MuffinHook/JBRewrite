@@ -65,20 +65,20 @@ end
 function t.getIsPlayerInRobbery(p1, p2)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	local v3 = p1:FindFirstChild(OilRigConsts.PLAYERS_IN_ROBBERY_FOLDER_NAME):FindFirstChild(p2.UserId)
-	return v3 and v3.Value == true
+	local var3 = p1:FindFirstChild(OilRigConsts.PLAYERS_IN_ROBBERY_FOLDER_NAME):FindFirstChild(p2.UserId)
+	return var3 and var3.Value == true
 end
 function t.getTNTModel(p1)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	local v3 = ReplicatedStorage.OilRig.Res.TNT:Clone()
-	CollectionService:AddTag(v3, OilRigConsts.TNT_MODEL_TAG_NAME)
-	return v3
+	local var3 = ReplicatedStorage.OilRig.Res.TNT:Clone()
+	CollectionService:AddTag(var3, OilRigConsts.TNT_MODEL_TAG_NAME)
+	return var3
 end
 function t.updateTNTTimers(p1, p2)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	for v3, v4 in TableUtils.filter(CollectionService:GetTagged(OilRigConsts.TNT_MODEL_TAG_NAME), function(p12)
+	for var3, v4 in TableUtils.filter(CollectionService:GetTagged(OilRigConsts.TNT_MODEL_TAG_NAME), function(p12)
 		return p12:IsDescendantOf(p1)
 	end) do
 		local TextLabel = v4:FindFirstChild("Timer"):FindFirstChild("SurfaceGui"):FindFirstChild("TextLabel")

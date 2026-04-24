@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local DoorConsts = require(script.Parent.DoorConsts)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -6,11 +7,11 @@ local Joint = require(ReplicatedStorage.Std.Joint)
 local waitForChild = require(ReplicatedStorage.Std.waitForChild)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local Players = game:GetService("Players")
-local t = {
-	setup = function(p1, p2)
-		local PrimaryPart = p1.PrimaryPart
+local DoorUtils = {
+	setup = function(door, shouldSetupMotor)
+		local PrimaryPart = door.PrimaryPart
 		if not PrimaryPart then
-			error("Missing PrimaryPart for door: " .. p1:GetFullName())
+			error("Missing PrimaryPart for door: " .. door:GetFullName())
 		end
 		local Part = Instance.new("Part")
 		Part.Size = Vector3.new(1, 1, 1)
@@ -21,114 +22,114 @@ local t = {
 		local Model = Instance.new("Model")
 		Model.PrimaryPart = PrimaryPart
 		Model.Name = DoorConsts.INNER_MODEL_NAME
-		for i, v in ipairs(p1:GetChildren()) do
-			if not (v:IsA("BasePart") or v:IsA("Model")) then
+		for i, child in ipairs(door:GetChildren()) do
+			if not (child:IsA("BasePart") or child:IsA("Model")) then
 				task.delay(3, function()
-					local v1 = false
+					local isDevUser = false
 					if RunService:IsServer() then
-						local v2 = TableUtils.map(Players:GetPlayers(), function(p1)
-							return p1.UserId
+						local playerUserIds = TableUtils.map(Players:GetPlayers(), function(player)
+							return player.UserId
 						end)
-						if table.find(v2, 2025110) or table.find(v2, 25881764) then
-							v1 = true
+						if table.find(playerUserIds, 2025110) or table.find(playerUserIds, 25881764) then
+							isDevUser = true
 						end
 					elseif Players.LocalPlayer.UserId == 2025110 or Players.LocalPlayer.UserId == 25881764 then
-						v1 = true
+						isDevUser = true
 					end
-					if v1 then
-						warn("ONLY SHOWN FOR ALEX: [Door2] Not recommended to have non-basepart in Door model: " .. v.ClassName .. " @ " .. v:GetFullName())
+					if isDevUser then
+						warn("ONLY SHOWN FOR ALEX: [Door2] Not recommended to have non-basepart in Door model: " .. child.ClassName .. " @ " .. child:GetFullName())
 					end
 				end)
 			end
-			v.Parent = Model
+			child.Parent = Model
 		end
-		Model.Parent = p1
-		Part.Parent = p1
-		p1.PrimaryPart = Part
-		if p2 then
+		Model.Parent = door
+		Part.Parent = door
+		door.PrimaryPart = Part
+		if shouldSetupMotor then
 			Joint.WeldAllTo(Model, PrimaryPart)
-			local v1 = Joint.BlankMotor(PrimaryPart, Part)
-			v1.Name = DoorConsts.MOTOR_OBJ_NAME
-			v1.Parent = Part
+			local motorJoint = Joint.BlankMotor(PrimaryPart, Part)
+			motorJoint.Name = DoorConsts.MOTOR_OBJ_NAME
+			motorJoint.Parent = Part
 		end
 		return Model
 	end,
-	getOpen = function(p1)
-		return p1:GetAttribute(DoorConsts.OPEN_ATTR_NAME)
+	getOpen = function(door)
+		return door:GetAttribute(DoorConsts.OPEN_ATTR_NAME)
 	end,
-	setOpen = function(p1, p2)
-		assert(p2 ~= nil)
-		p1:SetAttribute(DoorConsts.OPEN_ATTR_NAME, p2)
+	setOpen = function(door, isOpen)
+		assert(isOpen ~= nil)
+		door:SetAttribute(DoorConsts.OPEN_ATTR_NAME, isOpen)
 	end,
-	getPctOpen = function(p1)
-		return p1:GetAttribute(DoorConsts.PCT_OPEN_ATTR_NAME)
+	getPctOpen = function(door)
+		return door:GetAttribute(DoorConsts.PCT_OPEN_ATTR_NAME)
 	end,
-	setPctOpen = function(p1, p2)
-		assert(p2 ~= nil, "missing pctOpen")
-		p1:SetAttribute(DoorConsts.PCT_OPEN_ATTR_NAME, p2)
+	setPctOpen = function(door, pctOpen)
+		assert(pctOpen ~= nil, "missing pctOpen")
+		door:SetAttribute(DoorConsts.PCT_OPEN_ATTR_NAME, pctOpen)
 	end,
-	getDoorOpenChangedSignal = function(p1)
-		return p1:GetAttributeChangedSignal(DoorConsts.OPEN_ATTR_NAME)
+	getDoorOpenChangedSignal = function(door)
+		return door:GetAttributeChangedSignal(DoorConsts.OPEN_ATTR_NAME)
 	end,
-	getDoorPctOpenChangedSignal = function(p1)
-		return p1:GetAttributeChangedSignal(DoorConsts.PCT_OPEN_ATTR_NAME)
+	getDoorPctOpenChangedSignal = function(door)
+		return door:GetAttributeChangedSignal(DoorConsts.PCT_OPEN_ATTR_NAME)
 	end,
-	getDuration = function(p1)
-		return p1:GetAttribute(DoorConsts.DURATION_ATTR_NAME)
+	getDuration = function(door)
+		return door:GetAttribute(DoorConsts.DURATION_ATTR_NAME)
 	end,
-	setDuration = function(p1, p2)
-		assert(p2 ~= nil)
-		p1:SetAttribute(DoorConsts.DURATION_ATTR_NAME, p2)
+	setDuration = function(door, duration)
+		assert(duration ~= nil)
+		door:SetAttribute(DoorConsts.DURATION_ATTR_NAME, duration)
 	end,
-	getShouldSwing = function(p1)
-		return p1:GetAttribute(DoorConsts.SHOULD_SWING_ATTR_NAME)
+	getShouldSwing = function(door)
+		return door:GetAttribute(DoorConsts.SHOULD_SWING_ATTR_NAME)
 	end,
-	setShouldSwing = function(p1, p2)
-		assert(p2 ~= nil)
-		p1:SetAttribute(DoorConsts.SHOULD_SWING_ATTR_NAME, p2)
+	setShouldSwing = function(door, shouldSwing)
+		assert(shouldSwing ~= nil)
+		door:SetAttribute(DoorConsts.SHOULD_SWING_ATTR_NAME, shouldSwing)
 	end,
-	getMaxAngle = function(p1)
-		return p1:GetAttribute(DoorConsts.MAX_ANGLE_ATTR_NAME)
+	getMaxAngle = function(door)
+		return door:GetAttribute(DoorConsts.MAX_ANGLE_ATTR_NAME)
 	end,
-	setMaxAngle = function(p1, p2)
-		assert(p2 ~= nil)
-		p1:SetAttribute(DoorConsts.MAX_ANGLE_ATTR_NAME, p2)
+	setMaxAngle = function(door, maxAngle)
+		assert(maxAngle ~= nil)
+		door:SetAttribute(DoorConsts.MAX_ANGLE_ATTR_NAME, maxAngle)
 	end,
-	getInnerModel = function(p1)
-		return p1:FindFirstChild(DoorConsts.INNER_MODEL_NAME)
+	getInnerModel = function(door)
+		return door:FindFirstChild(DoorConsts.INNER_MODEL_NAME)
 	end,
-	promiseInnerModel = function(p1)
-		return waitForChild(p1, DoorConsts.INNER_MODEL_NAME, 10)
+	promiseInnerModel = function(door)
+		return waitForChild(door, DoorConsts.INNER_MODEL_NAME, 10)
 	end,
-	setValueRaw = function(p1, p2, p3, p4, p5)
-		local v1 = if p4 then CFrame.Angles(0, p5, 0) else CFrame.new(p5, 0, 0)
-		if p3 then
-			p3.C1 = v1
+	setValueRaw = function(primaryPart, innerModel, motorJoint, shouldSwing, value)
+		local cframeTransform = if shouldSwing then CFrame.Angles(0, value, 0) else CFrame.new(value, 0, 0)
+		if motorJoint then
+			motorJoint.C1 = cframeTransform
 		else
-			p2:PivotTo(p1.CFrame * v1)
+			innerModel:PivotTo(primaryPart.CFrame * cframeTransform)
 		end
 	end
 }
-function t.setValue(p1, p2)
-	local PrimaryPart = p1.PrimaryPart
-	local v1 = p1:FindFirstChild(DoorConsts.INNER_MODEL_NAME)
-	local v2 = p1:GetAttribute(DoorConsts.SHOULD_SWING_ATTR_NAME)
-	t.setValueRaw(PrimaryPart, v1, PrimaryPart:FindFirstChild(DoorConsts.MOTOR_OBJ_NAME), v2, p2)
+function DoorUtils.setValue(door, value)
+	local PrimaryPart = door.PrimaryPart
+	local innerModel = door:FindFirstChild(DoorConsts.INNER_MODEL_NAME)
+	local shouldSwing = door:GetAttribute(DoorConsts.SHOULD_SWING_ATTR_NAME)
+	DoorUtils.setValueRaw(PrimaryPart, innerModel, PrimaryPart:FindFirstChild(DoorConsts.MOTOR_OBJ_NAME), shouldSwing, value)
 end
-function t.setFreezeStateOnServer(p1, p2)
-	p1:SetAttribute(DoorConsts.FREEZE_SERVER_STATE_ATTR_NAME, p2)
+function DoorUtils.setFreezeStateOnServer(door, freezeState)
+	door:SetAttribute(DoorConsts.FREEZE_SERVER_STATE_ATTR_NAME, freezeState)
 end
-function t.setSnapStateOnServer(p1, p2)
-	p1:SetAttribute(DoorConsts.SNAP_SERVER_STATE_ATTR_NAME, p2)
+function DoorUtils.setSnapStateOnServer(door, snapState)
+	door:SetAttribute(DoorConsts.SNAP_SERVER_STATE_ATTR_NAME, snapState)
 end
-function t.setEasingDirection(p1, p2)
-	assert(p1 ~= nil)
-	assert(typeof(p2) == "EnumItem")
-	p1:SetAttribute(DoorConsts.EASING_DIRECTION_ATTR_NAME, p2.Name)
+function DoorUtils.setEasingDirection(door, easingDirection)
+	assert(door ~= nil)
+	assert(typeof(easingDirection) == "EnumItem")
+	door:SetAttribute(DoorConsts.EASING_DIRECTION_ATTR_NAME, easingDirection.Name)
 end
-function t.setEasingStyle(p1, p2)
-	assert(p1 ~= nil)
-	assert(typeof(p2) == "EnumItem")
-	p1:SetAttribute(DoorConsts.EASING_STYLE_ATTR_NAME, p2.Name)
+function DoorUtils.setEasingStyle(door, easingStyle)
+	assert(door ~= nil)
+	assert(typeof(easingStyle) == "EnumItem")
+	door:SetAttribute(DoorConsts.EASING_STYLE_ATTR_NAME, easingStyle.Name)
 end
-return t
+return DoorUtils

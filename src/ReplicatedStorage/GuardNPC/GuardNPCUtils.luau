@@ -50,11 +50,11 @@ function t.setDefenseTarget(p1, p2)
 		t.setDefenseTargetType(p1, NPCConsts.DEST_TYPE.OBJ)
 		local v1 = p1:FindFirstChild(GuardNPCConsts.DEFENSE_OBJ_VALUE_NAME)
 		if not v1 then
-			local v2 = Instance.new("ObjectValue")
-			v2.Name = GuardNPCConsts.DEFENSE_OBJ_VALUE_NAME
-			v2.Value = nil
-			v2.Parent = p1
-			v1 = v2
+			local instance2 = Instance.new("ObjectValue")
+			instance2.Name = GuardNPCConsts.DEFENSE_OBJ_VALUE_NAME
+			instance2.Value = nil
+			instance2.Parent = p1
+			v1 = instance2
 		end
 		v1.Value = p2
 	else
@@ -107,9 +107,9 @@ end
 function t.clearDamager(p1, p2)
 	local v1 = p1:FindFirstChild(GuardNPCConsts.DAMAGERS_FOLDER_NAME)
 	if v1 then
-		local v2 = v1:FindFirstChild((tostring(p2)))
-		if v2 then
-			v2:Destroy()
+		local instance2 = v1:FindFirstChild((tostring(p2)))
+		if instance2 then
+			instance2:Destroy()
 			return true
 		else
 			return false
@@ -121,28 +121,28 @@ end
 function t.addDamager(p1, p2, p3)
 	local v1 = p1:FindFirstChild(GuardNPCConsts.DAMAGERS_FOLDER_NAME)
 	if not v1 then
-		local v2 = Instance.new("Folder")
-		v2.Name = GuardNPCConsts.DAMAGERS_FOLDER_NAME
-		v2.Parent = p1
-		v1 = v2
+		local instance2 = Instance.new("Folder")
+		instance2.Name = GuardNPCConsts.DAMAGERS_FOLDER_NAME
+		instance2.Parent = p1
+		v1 = instance2
 	end
-	local v3 = v1:FindFirstChild((tostring(p2)))
-	if not v3 then
-		local v4 = Instance.new("NumberValue")
-		v4.Name = p2
-		v4.Parent = v1
-		v4.Value = 0
-		v3 = v4
+	local var3 = v1:FindFirstChild((tostring(p2)))
+	if not var3 then
+		local instance4 = Instance.new("NumberValue")
+		instance4.Name = p2
+		instance4.Parent = v1
+		instance4.Value = 0
+		var3 = instance4
 	end
-	v3.Value = v3.Value + p3
+	var3.Value = var3.Value + p3
 	return true
 end
 function t.getDamagers(p1)
 	local v1 = p1:FindFirstChild(GuardNPCConsts.DAMAGERS_FOLDER_NAME)
 	if v1 then
 		local t = {}
-		for v2, v3 in v1:GetChildren() do
-			t[tonumber(v3.Name)] = v3.Value
+		for instance2, var3 in v1:GetChildren() do
+			t[tonumber(var3.Name)] = var3.Value
 		end
 		return t
 	else

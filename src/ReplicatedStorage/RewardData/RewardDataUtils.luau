@@ -50,10 +50,10 @@ function tbl.validateRewardData(p1, p2)
 		error("Invalid total rarity probabilities: " .. sum)
 	end
 	for v6, v7 in p1 do
-		local v8 = tbl2[v7.RarityId]
+		local var8 = tbl2[v7.RarityId]
 		local RarityId = v7.RarityId
-		if v8 then
-			if v8 == 0 then
+		if var8 then
+			if var8 == 0 then
 				warn("Rarity has 0 probability but a reward with given rarity exists: " .. RarityId)
 			end
 		else

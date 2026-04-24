@@ -121,16 +121,16 @@ function t.setStatusFromChildren(p1)
 	assert(#p1.nodeStack > 0, "Attempting to set status from children on empty stack")
 	local v2 = p1.nodeStack[#p1.nodeStack]
 	local Success = TestEnum.TestStatus.Success
-	local v3 = true
+	local var3 = true
 	for i, v in ipairs(v2.children) do
 		if v.status ~= TestEnum.TestStatus.Skipped then
-			v3 = false
+			var3 = false
 			if v.status == TestEnum.TestStatus.Failure then
 				Success = TestEnum.TestStatus.Failure
 			end
 		end
 	end
-	if v3 then
+	if var3 then
 		Success = TestEnum.TestStatus.Skipped
 	end
 	v2.status = Success

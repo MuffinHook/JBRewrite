@@ -27,26 +27,26 @@ return function(p1, p2)
 			return Iris_Text
 		end,
 		Update = function(p12)
-			local v1 = p12.Instance
+			local instance = p12.Instance
 			if p12.arguments.Text == nil then
 				error("Text argument is required for Iris.Text().", 5)
 			end
 			if p12.arguments.Wrapped == nil then
-				v1.TextWrapped = p1._config.TextWrapped
+				instance.TextWrapped = p1._config.TextWrapped
 			else
-				v1.TextWrapped = p12.arguments.Wrapped
+				instance.TextWrapped = p12.arguments.Wrapped
 			end
 			if p12.arguments.Color then
-				v1.TextColor3 = p12.arguments.Color
+				instance.TextColor3 = p12.arguments.Color
 			else
-				v1.TextColor3 = p1._config.TextColor
+				instance.TextColor3 = p1._config.TextColor
 			end
 			if p12.arguments.RichText == nil then
-				v1.RichText = p1._config.RichText
+				instance.RichText = p1._config.RichText
 			else
-				v1.RichText = p12.arguments.RichText
+				instance.RichText = p12.arguments.RichText
 			end
-			v1.Text = p12.arguments.Text
+			instance.Text = p12.arguments.Text
 		end,
 		Discard = function(p1)
 			p1.Instance:Destroy()

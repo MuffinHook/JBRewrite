@@ -2,24 +2,24 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-local t = {
+local GameModeUtils = {
 	getGameModeNames = function()
-		local v1 = TableUtils.map(ReplicatedStorage.GameMode.Mode:GetChildren(), function(p1)
-			return p1.Name
+		local modeNames = TableUtils.map(ReplicatedStorage.GameMode.Mode:GetChildren(), function(modeModule)
+			return modeModule.Name
 		end)
-		table.insert(v1, "CrewBattle")
-		return v1
+		table.insert(modeNames, "CrewBattle")
+		return modeNames
 	end,
 	getGameModesRunning = function()
 		return CollectionService:GetTagged("GameMode")
 	end
 }
-function t.isThisGameModeRunning(p1)
-	for v1, v2 in t.getGameModesRunning() do
-		if v2.Name == p1 then
+function GameModeUtils.isThisGameModeRunning(gameModeName)
+	for _, runningGameMode in GameModeUtils.getGameModesRunning() do
+		if runningGameMode.Name == gameModeName then
 			return true
 		end
 	end
 	return false
 end
-return t
+return GameModeUtils

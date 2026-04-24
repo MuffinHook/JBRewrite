@@ -3,81 +3,81 @@
 local exp = math.exp
 local cos = math.cos
 local sin = math.sin
-local t = {}
-t.__index = t
-function t.new(p1, p2, p3, p4)
-	assert(p1)
-	assert(p2)
-	assert(p3)
-	assert(p4)
-	local v2 = setmetatable({}, t)
-	v2.p = p1
-	v2.v = p2
-	v2.Target = v2.p
-	v2.Freq = p4
-	v2.Damp = p3
-	v2.t = tick()
-	return v2
+local Spring = {}
+Spring.__index = Spring
+function Spring.new(initialPosition, initialVelocity, dampingRatio, frequency)
+	assert(initialPosition)
+	assert(initialVelocity)
+	assert(dampingRatio)
+	assert(frequency)
+	local spring = setmetatable({}, Spring)
+	spring.p = initialPosition
+	spring.v = initialVelocity
+	spring.Target = spring.p
+	spring.Freq = frequency
+	spring.Damp = dampingRatio
+	spring.t = tick()
+	return spring
 end
-function t.Update(p1)
-	local v1 = tick() - p1.t
-	local Freq = p1.Freq
-	local Damp = p1.Damp
-	local v = p1.v
-	local Target = p1.Target
-	local v2 = p1.p - Target
+function Spring.Update(self)
+	local elapsedTime = tick() - self.t
+	local Freq = self.Freq
+	local Damp = self.Damp
+	local v = self.v
+	local Target = self.Target
+	local positionDelta = self.p - Target
 	if Damp > 1 then
-		local v3 = -Freq * Damp
-		local v4 = Freq * (Damp * Damp - 1) ^ 0.5
-		local v5 = v3 - v4
-		local v6 = v3 + v4
-		local v7 = exp(v5 * v1)
-		local v8 = exp(v6 * v1)
-		local v9 = (v - v2 * v6) / (-2 * v4)
-		local v10 = v2 - v9
-		return Target + v9 * v7 + v10 * v8, v9 * v5 * v7 + v10 * v6 * v8
+		local lambda1 = -Freq * Damp
+		local lambda2 = Freq * (Damp * Damp - 1) ^ 0.5
+		local root1 = lambda1 - lambda2
+		local root2 = lambda1 + lambda2
+		local exp1 = exp(root1 * elapsedTime)
+		local exp2 = exp(root2 * elapsedTime)
+		local c1 = (v - positionDelta * root2) / (-2 * lambda2)
+		local c2 = positionDelta - c1
+		return Target + c1 * exp1 + c2 * exp2, c1 * root1 * exp1 + c2 * root2 * exp2
 	elseif Damp == 1 then
-		local v11 = exp(-Freq * v1)
-		local v12 = v + Freq * v2
-		local v13 = (v12 * v1 + v2) * v11
-		return Target + v13, v12 * v11 - v13 * Freq
+		local expDecay = exp(-Freq * elapsedTime)
+		local velocityTerm = v + Freq * positionDelta
+		local positionTerm = (velocityTerm * elapsedTime + positionDelta) * expDecay
+		return Target + positionTerm, velocityTerm * expDecay - positionTerm * Freq
 	else
-		local v14 = Freq * Damp
-		local v15 = Freq * (1 - Damp * Damp) ^ 0.5
-		local v16 = exp(-v14 * v1)
-		local v17 = cos(v15 * v1)
-		local v18 = sin(v15 * v1)
-		local v19 = (v + v14 * v2) / v15
-		return Target + v16 * (v2 * v17 + v19 * v18), -v16 * ((v2 * v14 - v19 * v15) * v17 + (v2 * v15 + v19 * v14) * v18)
+		local dampingCoeff = Freq * Damp
+		local oscillationFreq = Freq * (1 - Damp * Damp) ^ 0.5
+		local expDecay = exp(-dampingCoeff * elapsedTime)
+		local cosComponent = cos(oscillationFreq * elapsedTime)
+		local sinComponent = sin(oscillationFreq * elapsedTime)
+		local amplitudeTerm = (v + dampingCoeff * positionDelta) / oscillationFreq
+		return Target + expDecay * (positionDelta * cosComponent + amplitudeTerm * sinComponent), -expDecay * ((positionDelta * dampingCoeff - amplitudeTerm * oscillationFreq) * cosComponent + (positionDelta * oscillationFreq + amplitudeTerm * dampingCoeff) * sinComponent)
 	end
 end
-function t.SetTarget(p1, p2)
-	local v1, v2 = p1:Update()
-	p1.p = v1
-	p1.v = v2
-	p1.Target = p2
-	p1.t = tick()
-	return v1, v2
+function Spring.SetTarget(self, newTarget)
+	local position, velocity = self:Update()
+	self.p = position
+	self.v = velocity
+	self.Target = newTarget
+	self.t = tick()
+	return position, velocity
 end
-function t.Accelerate(p1, p2)
-	local v1, v2 = p1:Update()
-	p1.t = tick()
-	p1.p = v1
-	p1.v = v2 + p2
+function Spring.Accelerate(self, acceleration)
+	local position, velocity = self:Update()
+	self.t = tick()
+	self.p = position
+	self.v = velocity + acceleration
 end
-function t.ForceTarget(p1, p2)
-	p1.p = p2
-	p1.v = p2 * 0
-	p1.Target = p1.p
-	p1.t = tick()
+function Spring.ForceTarget(self, newTarget)
+	self.p = newTarget
+	self.v = newTarget * 0
+	self.Target = self.p
+	self.t = tick()
 end
-function t.SetConsts(p1, p2, p3)
-	local v1, v2 = p1:Update()
-	p1.p = v1
-	p1.v = v2
-	p1.Damp = p2
-	p1.Freq = p3
-	p1.t = tick()
-	return v1, v2
+function Spring.SetConsts(self, newDamping, newFrequency)
+	local position, velocity = self:Update()
+	self.p = position
+	self.v = velocity
+	self.Damp = newDamping
+	self.Freq = newFrequency
+	self.t = tick()
+	return position, velocity
 end
-return t
+return Spring

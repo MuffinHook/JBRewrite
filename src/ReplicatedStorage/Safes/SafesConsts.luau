@@ -467,16 +467,16 @@ for v2, v3 in t.SAFE_DATA do
  error("Invalid total rarity probabilities: " .. sum .. ", safeName: " .. v3.Title)
 	end
 	for v9, v10 in v3.RewardData do
- local v11 = t3[v10.RarityId]
+ local var11 = t3[v10.RarityId]
  local RarityId = v10.RarityId
- if v11 then
- if v11 == 0 then
+ if var11 then
+ if var11 == 0 then
  warn("Rarity has 0 probability but a reward with given rarity exists: " .. RarityId)
  end
  else
  error("No probability for rarity: " .. RarityId)
  end
- v10.AbsoluteProbability = v11
+ v10.AbsoluteProbability = var11
 	end
 end
 for v12, v13 in v1:GetEnumItems() do

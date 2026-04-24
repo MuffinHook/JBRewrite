@@ -9,7 +9,7 @@ local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
 local Confirmation = require(ReplicatedStorage.Module.Confirmation)
 local SurfaceBinder = require(script.Parent.Surface.SurfaceBinder)
 local HomeConsts = require(script.Parent.HomeConsts)
-local v1 = nil
+local localPlayer = nil
 local HomeSaleUISystem = require(script.Parent.HomeUI.HomeSaleUISystem)
 local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
 require(ReplicatedStorage.Game.GameUtil)
@@ -25,20 +25,20 @@ function t.new(homeObj)
 	local self = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
-	t2._obj = p1
-	t2._priceValue = p1:WaitForChild(HomeConsts.PRICE_VALUE_NAME)
-	t2._homeItemNewRemote = p1:WaitForChild(HomeConsts.HOME_ITEM_NEW_REMOTE_NAME)
-	t2._homePurchaseRemote = p1:WaitForChild(HomeConsts.HOME_PURCHASE_REMOTE_NAME)
-	t2._doorInteractRemote = p1:WaitForChild(HomeConsts.DOOR_INTERACT_REMOTE_NAME)
-	t2._updateCustomizingRemote = p1:WaitForChild(HomeConsts.UPDATE_CUSTOMIZING_REMOTE_NAME)
-	t2._homeClaimRemote = p1:WaitForChild(HomeConsts.HOME_CLAIM_REMOTE_NAME)
-	t2._homeUnclaimRemote = p1:WaitForChild(HomeConsts.HOME_UNCLAIM_REMOTE_NAME)
-	t2._permissionsFolder = p1:WaitForChild(HomeConsts.PERMISSIONS_FOLDER_NAME)
-	t2._setSavedSettingRemote = p1:WaitForChild(HomeConsts.SET_SAVED_SETTING_REMOTE_NAME)
+	t2._obj = self
+	t2._priceValue = self:WaitForChild(HomeConsts.PRICE_VALUE_NAME)
+	t2._homeItemNewRemote = self:WaitForChild(HomeConsts.HOME_ITEM_NEW_REMOTE_NAME)
+	t2._homePurchaseRemote = self:WaitForChild(HomeConsts.HOME_PURCHASE_REMOTE_NAME)
+	t2._doorInteractRemote = self:WaitForChild(HomeConsts.DOOR_INTERACT_REMOTE_NAME)
+	t2._updateCustomizingRemote = self:WaitForChild(HomeConsts.UPDATE_CUSTOMIZING_REMOTE_NAME)
+	t2._homeClaimRemote = self:WaitForChild(HomeConsts.HOME_CLAIM_REMOTE_NAME)
+	t2._homeUnclaimRemote = self:WaitForChild(HomeConsts.HOME_UNCLAIM_REMOTE_NAME)
+	t2._permissionsFolder = self:WaitForChild(HomeConsts.PERMISSIONS_FOLDER_NAME)
+	t2._setSavedSettingRemote = self:WaitForChild(HomeConsts.SET_SAVED_SETTING_REMOTE_NAME)
 	local function doIOwnThisHomeName()
-		local v1 = LocalPlayer:FindFirstChild(HomeConsts.HOMES_OWNED_FOLDER_NAME)
-		if v1 then
-			return v1:FindFirstChild(t2._obj.Name) ~= nil
+		local localPlayer = LocalPlayer:FindFirstChild(HomeConsts.HOMES_OWNED_FOLDER_NAME)
+		if localPlayer then
+			return localPlayer:FindFirstChild(t2._obj.Name) ~= nil
 		end
 		error("Player does not have a homes owned folder")
 	end
@@ -49,17 +49,17 @@ function t.new(homeObj)
 		NoRay = true,
 		Timed = false,
 		Dist = 16,
-		Callback = function(p1, p2)
+		Callback = function(self, p2)
 			if p2 then
 				if t2:GetOwnerId() == nil then
-					local v1 = LocalPlayer:FindFirstChild(HomeConsts.HOMES_OWNED_FOLDER_NAME)
-					local v2
-					if v1 then
-						v2 = v1:FindFirstChild(t2._obj.Name) ~= nil
+					local localPlayer = LocalPlayer:FindFirstChild(HomeConsts.HOMES_OWNED_FOLDER_NAME)
+					local localPlayer
+					if localPlayer then
+						localPlayer = localPlayer:FindFirstChild(t2._obj.Name) ~= nil
 					else
 						error("Player does not have a homes owned folder")
 					end
-					if v2 then
+					if localPlayer then
 						t2._homeClaimRemote:FireServer()
 					else
 						HomeSaleUISystem.setPrice(t2._priceValue.Value)
@@ -78,13 +78,13 @@ function t.new(homeObj)
 						end)
 					end
 				elseif t2:GetOwnerId() == LocalPlayer.UserId then
-					local v4 = Confirmation.new("Unclaim home? You will still own it, but will have to claim the land again.")
-					t2._maid._confirm = v4
-					v4.Maid:GiveTask(v4.OnYes:Connect(function()
+					local instance4 = Confirmation.new("Unclaim home? You will still own it, but will have to claim the land again.")
+					t2._maid._confirm = instance4
+					instance4.Maid:GiveTask(instance4.OnYes:Connect(function()
 						t2._homeUnclaimRemote:FireServer()
 						t2._maid._confirm = nil
 					end))
-					v4.Maid:GiveTask(v4.OnNo:Connect(function()
+					instance4.Maid:GiveTask(instance4.OnNo:Connect(function()
 						t2._maid._confirm = nil
 					end))
 				end
@@ -93,39 +93,39 @@ function t.new(homeObj)
 				return false
 			end
 		end,
-		PreUpdateFun = function(p1)
-			local v1 = false
-			local v2 = nil
+		PreUpdateFun = function(self)
+			local localPlayer = false
+			local localPlayer = nil
 			if not HomeSaleUISystem.isOpen() then
 				if t2:GetOwnerId() == nil then
-					v1 = true
-					local v3 = LocalPlayer:FindFirstChild(HomeConsts.HOMES_OWNED_FOLDER_NAME)
-					local v4
-					if v3 then
-						v4 = v3:FindFirstChild(t2._obj.Name) ~= nil
+					localPlayer = true
+					local localPlayer = LocalPlayer:FindFirstChild(HomeConsts.HOMES_OWNED_FOLDER_NAME)
+					local instance4
+					if localPlayer then
+						instance4 = localPlayer:FindFirstChild(t2._obj.Name) ~= nil
 					else
 						error("Player does not have a homes owned folder")
 					end
-					v2 = if v4 then "Claim" else "Buy"
+					localPlayer = if instance4 then "Claim" else "Buy"
 				elseif t2:GetOwnerId() == LocalPlayer.UserId then
-					v1 = true
-					v2 = "Unclaim"
+					localPlayer = true
+					localPlayer = "Unclaim"
 				end
 			end
-			p1.Enabled = v1
-			p1.Name = v2
+			self.Enabled = localPlayer
+			self.Name = localPlayer
 		end,
 		PreUpdatePeriod = 0.1
 	}, Sign)
 	t2._maid:GiveTask(function()
 		CircleAction.Remove(Sign)
 	end)
-	t2._maid:GiveTask(RxInstanceUtils.observeChildrenNamed(t2._obj, "Door", function(p1, p2)
-		t2:_receiveDoorModel(p1)
+	t2._maid:GiveTask(RxInstanceUtils.observeChildrenNamed(t2._obj, "Door", function(self, p2)
+		t2:_receiveDoorModel(self)
 	end))
 	return t2
 end
-function t._receiveDoorModel(p1, p2)
+function t._receiveDoorModel(self, p2)
 	local Door = DoorUtils.getInnerModel(p2):FindFirstChild("Door")
 	assert(Door)
 	CircleAction.Add({
@@ -136,77 +136,77 @@ function t._receiveDoorModel(p1, p2)
 		Dist = 10,
 		Callback = function(p12, p22)
 			if p22 then
-				p1._doorInteractRemote:FireServer(p2, true)
+				self._doorInteractRemote:FireServer(p2, true)
 				return true
 			else
 				if p12.Timed then
-					p1._doorInteractRemote:FireServer(p2, false)
+					self._doorInteractRemote:FireServer(p2, false)
 				end
 				return false
 			end
 		end,
 		PreUpdateFun = function(p12)
-			local v1 = DoorUtils.getPctOpen(p2) ~= 0
-			local v2 = PlayerUtils.getRootPart(LocalPlayer)
-			if v2 then
-				local v3 = p1:IsPointInStandingPrism(v2.Position)
-				local v4
-				if p1:HasPermissionToEnter(LocalPlayer) or v3 then
-					v4 = true
+			local localPlayer = DoorUtils.getPctOpen(p2) ~= 0
+			local localPlayer = PlayerUtils.getRootPart(LocalPlayer)
+			if localPlayer then
+				local localPlayer = self:IsPointInStandingPrism(localPlayer.Position)
+				local instance4
+				if self:HasPermissionToEnter(LocalPlayer) or localPlayer then
+					instance4 = true
 					p12.Timed = false
-					p12.Name = if v1 then "Close" else "Open"
+					p12.Name = if localPlayer then "Close" else "Open"
 				else
-					local v6 = p1:GetOwnerId()
-					local v7 = v6 and Players:GetPlayerByUserId(v6)
-					local v8 = v7 and PlayerUtils.getTeamId(v7)
-					if v6 == nil or v8 == PlayerUtils.getTeamId(LocalPlayer) then
-						v4 = false
+					local var6 = self:GetOwnerId()
+					local localPlayer = var6 and Players:GetPlayerByUserId(var6)
+					local var8 = localPlayer and PlayerUtils.getTeamId(localPlayer)
+					if var6 == nil or var8 == PlayerUtils.getTeamId(LocalPlayer) then
+						instance4 = false
 					else
 						p12.Timed = true
 						p12.Duration = HomeConsts.POLICE_BUST_DOOR_DURATION
 						p12.Name = "Break In"
-						v4 = true
+						instance4 = true
 					end
 				end
-				p12.Enabled = v4
+				p12.Enabled = instance4
 			end
 		end,
 		PreUpdatePeriod = 0.5
 	}, Door)
-	p1._maid:GiveTask(function()
+	self._maid:GiveTask(function()
 		CircleAction.Remove(Door)
 	end)
 end
-function t.GetObj(p1)
-	return p1._obj
+function t.GetObj(self)
+	return self._obj
 end
-function t.GetHomeItems(p1)
-	v1 = v1 or require(script.Parent.HomeItem.HomeItemBinder)
-	return BinderUtils.getChildren(v1, p1._obj)
+function t.GetHomeItems(self)
+	localPlayer = localPlayer or require(script.Parent.HomeItem.HomeItemBinder)
+	return BinderUtils.getChildren(localPlayer, self._obj)
 end
-function t.AttemptCreateHomeItem(p1, p2)
+function t.AttemptCreateHomeItem(self, p2)
 	assert(p2 ~= nil)
-	p1._homeItemNewRemote:FireServer(p2)
+	self._homeItemNewRemote:FireServer(p2)
 end
-function t.GetSurfaces(p1)
-	return BinderUtils.getDescendants(SurfaceBinder, p1._obj)
+function t.GetSurfaces(self)
+	return BinderUtils.getDescendants(SurfaceBinder, self._obj)
 end
-function t.IsPointInStandingPrism(p1, p2)
-	for i, v in ipairs((p1:GetSurfaces())) do
-		local v2
-		local v3, v4 = v:GetStandingPrism()
-		if not (v3.UpVector:Dot(Vector3.new(0, 1, 0)) < -0.5) then
-			local v5 = v3:pointToObjectSpace(p2) + v4 * 0.5
-			v2 = if v5.x >= 0 and (v5.x <= v4.x and (v5.y >= 0 and (v5.y <= v4.y and v5.z >= 0))) then v5.z <= v4.z else false
-			if v2 then
+function t.IsPointInStandingPrism(self, p2)
+	for i, v in ipairs((self:GetSurfaces())) do
+		local localPlayer
+		local localPlayer, instance4 = v:GetStandingPrism()
+		if not (localPlayer.UpVector:Dot(Vector3.new(0, 1, 0)) < -0.5) then
+			local var5 = localPlayer:pointToObjectSpace(p2) + instance4 * 0.5
+			localPlayer = if var5.x >= 0 and (var5.x <= instance4.x and (var5.y >= 0 and (var5.y <= instance4.y and var5.z >= 0))) then var5.z <= instance4.z else false
+			if localPlayer then
 				return true
 			end
 		end
 	end
 	return false
 end
-function t.GetArmedVault(p1)
-	for i, v in ipairs((p1:GetHomeItems())) do
+function t.GetArmedVault(self)
+	for i, v in ipairs((self:GetHomeItems())) do
 		local _vault = v._vault
 		if _vault and _vault:GetIsVaultArmed() then
 			return _vault
@@ -214,43 +214,43 @@ function t.GetArmedVault(p1)
 	end
 	return nil
 end
-function t.ReplicateCustomizing(p1, p2)
-	p1._updateCustomizingRemote:FireServer(p2)
+function t.ReplicateCustomizing(self, p2)
+	self._updateCustomizingRemote:FireServer(p2)
 end
-function t.GetOwnerId(p1)
-	return p1._obj:GetAttribute(HomeConsts.OWNER_ID_ATTR_NAME)
+function t.GetOwnerId(self)
+	return self._obj:GetAttribute(HomeConsts.OWNER_ID_ATTR_NAME)
 end
-function t._getPlayerPermObj(p1, p2)
-	local v1 = p1._permissionsFolder:FindFirstChild((tostring(p2.UserId)))
-	if v1 then
-		return v1
+function t._getPlayerPermObj(self, p2)
+	local localPlayer = self._permissionsFolder:FindFirstChild((tostring(p2.UserId)))
+	if localPlayer then
+		return localPlayer
 	else
 		return nil
 	end
 end
-function t.HasPermissionToEnter(p1, p2)
-	local v1 = p1:_getPlayerPermObj(p2)
-	if v1 then
-		return v1:GetAttribute(HomeConsts.PERMISSION_CAN_ENTER_ATTR_NAME) == true
+function t.HasPermissionToEnter(self, p2)
+	local localPlayer = self:_getPlayerPermObj(p2)
+	if localPlayer then
+		return localPlayer:GetAttribute(HomeConsts.PERMISSION_CAN_ENTER_ATTR_NAME) == true
 	else
 		return false
 	end
 end
-function t.HasPermissionToEdit(p1, p2)
-	local v1 = p1:_getPlayerPermObj(p2)
-	if v1 then
-		return v1:GetAttribute(HomeConsts.PERMISSION_CAN_EDIT_ATTR_NAME) == true
+function t.HasPermissionToEdit(self, p2)
+	local localPlayer = self:_getPlayerPermObj(p2)
+	if localPlayer then
+		return localPlayer:GetAttribute(HomeConsts.PERMISSION_CAN_EDIT_ATTR_NAME) == true
 	else
 		return false
 	end
 end
-function t.SetSavedSetting(p1, p2, p3)
-	p1._setSavedSettingRemote:FireServer(p2, p3)
+function t.SetSavedSetting(self, p2, p3)
+	self._setSavedSettingRemote:FireServer(p2, p3)
 end
-function t.Destroy(p1)
-	local _maid = p1._maid
+function t.Destroy(self)
+	local _maid = self._maid
 	assert(_maid ~= nil)
-	p1._maid = nil
+	self._maid = nil
 	_maid:Destroy()
 end
 return t

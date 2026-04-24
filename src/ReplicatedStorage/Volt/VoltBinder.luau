@@ -8,16 +8,16 @@ local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
 function t.new(p1)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
-	local Engine = v1.obj.Engine
-	v1.maid:GiveTask(RunService.Heartbeat:Connect(function()
-		local v1 = Engine:FindFirstChild(VoltConsts.ENGINE_SOUND_NAME)
+	local instance = BaseObject.new(p1)
+	setmetatable(instance, t)
+	local Engine = instance.obj.Engine
+	instance.maid:GiveTask(RunService.Heartbeat:Connect(function()
+		local instance = Engine:FindFirstChild(VoltConsts.ENGINE_SOUND_NAME)
 		local Magnitude = Engine.Velocity.Magnitude
-		if v1 then
-			v1.PlaybackSpeed = (math.abs(Magnitude) + 5) / 150
+		if instance then
+			instance.PlaybackSpeed = (math.abs(Magnitude) + 5) / 150
 		end
 	end))
-	return v1
+	return instance
 end
 return Binder.new(VoltConsts.TAG_NAME, t)

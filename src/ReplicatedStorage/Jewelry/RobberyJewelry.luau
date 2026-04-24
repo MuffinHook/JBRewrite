@@ -94,28 +94,28 @@ return {
 					end)
 				end
 				local CurrentCamera = workspace.CurrentCamera
-				local v3 = CurrentCamera.CFrame
-				local v4 = CamShaker.new(Enum.RenderPriority.Camera.Value + 2, function(p1)
-					v3 = CurrentCamera.CFrame
+				local cframe3 = CurrentCamera.CFrame
+				local instance4 = CamShaker.new(Enum.RenderPriority.Camera.Value + 2, function(p1)
+					cframe3 = CurrentCamera.CFrame
 					CurrentCamera.CFrame = CurrentCamera.CFrame * p1
 				end)
-				local v5 = RunService.Heartbeat:Connect(function()
-					CurrentCamera.CFrame = v3
+				local func5 = RunService.Heartbeat:Connect(function()
+					CurrentCamera.CFrame = cframe3
 				end)
-				v4:Start()
-				v4:Shake(CamShaker.Presets.Explosion)
+				instance4:Start()
+				instance4:Shake(CamShaker.Presets.Explosion)
 				Promise.delay(2):andThenCall(function()
-					v4:Stop()
-					v5:Disconnect()
+					instance4:Stop()
+					func5:Disconnect()
 				end)
 			end
 		end
 		function em.eckwjayf()
 			spawn(FadeOutSound)
 		end
-		local v22 = next
-		local v3, v4 = CollectionService:GetTagged("RobberyJewelryJewel")
-		for v5, v6 in v22, v3, v4 do
+		local var22 = next
+		local cframe3, instance4 = CollectionService:GetTagged("RobberyJewelryJewel")
+		for func5, v6 in var22, cframe3, instance4 do
 			if v6:GetAttribute("LaserButton") then
 				AddedLaserButton(v6)
 			else

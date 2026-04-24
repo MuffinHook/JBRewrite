@@ -19,11 +19,11 @@ return Rodux.createReducer({}, {
 	setFurnitureCategory = function(p1, p2)
 		local t = {}
 		for v9, v10 in ReplicatedStorage.Resource.HomeItem:GetChildren() do
-			local v1, v2, v3, v4, v5, v6, v7, v8
+			local v1, module2, v3, v4, v5, v6, v7, v8
 			local Price = v10:FindFirstChild("Price")
 			v1 = if Price then Price.Value else nil
 			local Level = v10:FindFirstChild("Level")
-			v2 = if Level then Level.Value else nil
+			module2 = if Level then Level.Value else nil
 			local Season = v10:FindFirstChild("Season")
 			v3 = if Season then Season.Value else nil
 			local TopPct = v10:FindFirstChild("TopPct")
@@ -42,11 +42,11 @@ return Rodux.createReducer({}, {
 					name = v11,
 					title = v11,
 					price = v1,
-					level = v2,
+					level = module2,
 					season = v3,
 					topPct = v4
 				}
-				v8 = if v2 == nil and v3 == nil then not v1 else true
+				v8 = if module2 == nil and v3 == nil then not v1 else true
 				v12.limited = v8
 				v12.maxPlaced = v7
 				function v12.getInst()
@@ -75,9 +75,9 @@ return Rodux.createReducer({}, {
 		assert(p2.module ~= nil, "setCategory requires a module name")
 		local v1 = ReplicatedStorage.Home.HomeData:FindFirstChild(p2.module)
 		assert(v1, "setCategory requires a valid module name")
-		local v2 = require(v1)
+		local module2 = require(v1)
 		local t = {}
-		for v4, v5 in v2.getItems() do
+		for v4, v5 in module2.getItems() do
 			local v3
 			if not (v5.HiddenAll or (v5.Hidden or v5.VIP)) then
 				local t2 = {
@@ -89,9 +89,9 @@ return Rodux.createReducer({}, {
 					season = v5.Season,
 					topPct = v5.TopPct,
 					getInst = function()
-						return v2.getInstance(v5)
+						return module2.getInstance(v5)
 					end,
-					updateCamera = v2.updateCamera,
+					updateCamera = module2.updateCamera,
 					getInstCompare = p2.module .. v5.Name
 				}
 				v3 = if t2.level == nil and t2.season == nil then not t2.price and not v5.None else not v5.None

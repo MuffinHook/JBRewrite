@@ -14,16 +14,16 @@ return {
 		InventoryItemSystem.init()
 	end,
 	getFor = function(p1)
-		local v1 = p1:FindFirstChild(InventoryConsts.CURRENT_INVENTORY_VALUE_NAME)
-		if v1 and v1.Value then
-			return InventoryBinder:Get(v1.Value)
+		local instance = p1:FindFirstChild(InventoryConsts.CURRENT_INVENTORY_VALUE_NAME)
+		if instance and instance.Value then
+			return InventoryBinder:Get(instance.Value)
 		end
 	end,
 	promiseFor = function(p1)
 		return waitForChild(p1, InventoryConsts.CURRENT_INVENTORY_VALUE_NAME):andThen(function(p1)
-			local v1 = Maid.new()
-			local v2 = Promise.new(function(p12, p2)
-				v1:GiveTask(RxInstanceUtils.observeProperty(p1, "Value", function(p1)
+			local instance = Maid.new()
+			local instance2 = Promise.new(function(p12, p2)
+				instance:GiveTask(RxInstanceUtils.observeProperty(p1, "Value", function(p1)
 					if p1 then
 						p12(BinderUtils.promiseBoundClass(InventoryBinder, p1))
 					else
@@ -31,10 +31,10 @@ return {
 					end
 				end))
 			end)
-			v2:finally(function()
-				v1:Destroy()
+			instance2:finally(function()
+				instance:Destroy()
 			end)
-			return v2
+			return instance2
 		end)
 	end
 }

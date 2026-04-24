@@ -4,11 +4,11 @@ local t = {
 		assert(p1 ~= nil, "missing Graph G")
 		assert(p2 ~= nil, "missing start vertex v")
 		assert(typeof(p3) == "nil" or typeof(p3) == "function", "invalid condition")
-		local v5 = p4 or p1.GetNeighbors
+		local var5 = p4 or p1.GetNeighbors
 		local t = {}
 		local function v6(p12)
 			t[p12] = true
-			for i, v in ipairs(v5(p1, p12)) do
+			for i, v in ipairs(var5(p1, p12)) do
 				if not t[v] and (p3 == nil or p3(v)) then
 					v6(v)
 				end
@@ -24,11 +24,11 @@ local t = {
 			[p2] = true
 		}
 		while #t > 0 do
-			local v1 = table.remove(t)
-			if p3(v1) then
-				return v1
+			local tbl = table.remove(t)
+			if p3(tbl) then
+				return tbl
 			end
-			for i, v in ipairs(p1:GetNeighbors(v1)) do
+			for i, v in ipairs(p1:GetNeighbors(tbl)) do
 				if not t2[v] then
 					t2[v] = true
 					table.insert(t, v)
@@ -45,17 +45,17 @@ function t.weaklyConnectedComponents(p1)
 		if not t2[v] then
 			t2[v] = true
 			local v2 = t.dfs(p1, v, nil, p1.GetUndirectedNeighbors)
-			local v3 = getmetatable(p1).new()
+			local instance3 = getmetatable(p1).new()
 			for k in pairs(v2) do
 				t2[k] = true
-				v3:AddNode(k)
+				instance3:AddNode(k)
 				for k2 in pairs(p1.MapNodeNode[k]) do
 					if v2[k2] then
-						v3:AddEdge(k, k2)
+						instance3:AddEdge(k, k2)
 					end
 				end
 			end
-			table.insert(t3, v3)
+			table.insert(t3, instance3)
 		end
 	end
 	return t3

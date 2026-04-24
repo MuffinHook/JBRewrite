@@ -38,13 +38,13 @@ return function(p1)
 	t._fullErrorTracebacks = game:GetService("RunService"):IsStudio()
 	t._cycleCoroutine = coroutine.create(function()
 		while t._started do
-			for v1, v2 in t._connectedFunctions do
+			for signal, v2 in t._connectedFunctions do
 				debug.profilebegin("Iris/Connection")
-				local v3, v4 = pcall(v2)
+				local var3, var4 = pcall(v2)
 				debug.profileend()
-				if not v3 then
+				if not var3 then
 					t._stackIndex = 1
-					coroutine.yield(false, v4)
+					coroutine.yield(false, var4)
 				end
 			end
 			coroutine.yield(true)
@@ -59,22 +59,22 @@ return function(p1)
 		if p2 ~= p12.value or p3 == true then
 			p12.value = p2
 			p12.lastChangeTick = p1.Internal._cycleTick
-			for v1, v2 in p12.ConnectedWidgets do
+			for signal, v2 in p12.ConnectedWidgets do
 				if v2.lastCycleTick ~= -1 then
 					t._widgets[v2.type].UpdateState(v2)
 				end
 			end
-			for v3, v4 in p12.ConnectedFunctions do
-				v4(p2)
+			for var3, var4 in p12.ConnectedFunctions do
+				var4(p2)
 			end
 		end
 		return p12.value
 	end
 	function t2.onChange(p1, p2)
-		local v1 = #p1.ConnectedFunctions + 1
-		p1.ConnectedFunctions[v1] = p2
+		local signal = #p1.ConnectedFunctions + 1
+		p1.ConnectedFunctions[signal] = p2
 		return function()
-			p1.ConnectedFunctions[v1] = nil
+			p1.ConnectedFunctions[signal] = nil
 		end
 	end
 	function t2.changed(p1)
@@ -87,7 +87,7 @@ return function(p1)
 			if t._rootInstance == nil or t._rootInstance.Parent == nil then
 				p1.ForceRefresh()
 			end
-			for v1, v2 in t._lastVDOM do
+			for signal, v2 in t._lastVDOM do
 				if v2.lastCycleTick ~= t._cycleTick and v2.lastCycleTick ~= -1 then
 					t._DiscardWidget(v2)
 				end
@@ -98,38 +98,38 @@ return function(p1)
 			t._lastVDOM = t._VDOM
 			t._VDOM = t._generateEmptyVDOM()
 			task.spawn(function()
-				for v1, v2 in t._postCycleCallbacks do
+				for signal, v2 in t._postCycleCallbacks do
 					v2()
 				end
 			end)
 			if t._globalRefreshRequested then
 				t._generateSelectionImageObject()
 				t._globalRefreshRequested = false
-				for v3, v4 in t._lastVDOM do
-					t._DiscardWidget(v4)
+				for var3, var4 in t._lastVDOM do
+					t._DiscardWidget(var4)
 				end
 				t._generateRootInstance()
 				t._lastVDOM = t._generateEmptyVDOM()
 			end
-			local v5 = t
-			v5._cycleTick = v5._cycleTick + 1
+			local var5 = t
+			var5._cycleTick = var5._cycleTick + 1
 			t._deltaTime = p12
 			table.clear(t._usedIDs)
 			if (t.parentInstance:IsA("GuiBase2d") or t.parentInstance:IsA("BasePlayerGui")) == false then
 				error("The Iris parent instance will not display any GUIs.")
 			end
 			if t._fullErrorTracebacks then
-				for v7, v8 in t._connectedFunctions do
-					v8()
+				for var7, var8 in t._connectedFunctions do
+					var8()
 				end
 			else
-				local v9 = coroutine.status(t._cycleCoroutine)
-				if v9 == "suspended" then
+				local var9 = coroutine.status(t._cycleCoroutine)
+				if var9 == "suspended" then
 					local _, v10, v11 = coroutine.resume(t._cycleCoroutine)
 					if v10 == false then
 						error(v11, 0)
 					end
-				elseif v9 == "running" then
+				elseif var9 == "running" then
 					error("Iris cycleCoroutine took to long to yield. Connected functions should not yield.")
 				else
 					error("unrecoverable state")
@@ -161,13 +161,13 @@ return function(p1)
 			}
 		}
 		local t3 = {}
-		for v2, v3 in t2.All.Required do
-			local v1
-			v1 = p2[v3] ~= nil
-			assert(v1, (("field %* is missing from widget %*, it is required for all widgets"):format(v3, p12)))
-			t3[v3] = p2[v3]
+		for v2, var3 in t2.All.Required do
+			local signal
+			signal = p2[var3] ~= nil
+			assert(signal, (("field %* is missing from widget %*, it is required for all widgets"):format(var3, p12)))
+			t3[var3] = p2[var3]
 		end
-		for v5, v6 in t2.All.Optional do
+		for var5, v6 in t2.All.Optional do
 			if p2[v6] == nil then
 				t3[v6] = t._NoOp
 			else
@@ -175,11 +175,11 @@ return function(p1)
 			end
 		end
 		if p2.hasState then
-			for v8, v9 in t2.IfState.Required do
-				local v7
-				v7 = p2[v9] ~= nil
-				assert(v7, (("field %* is missing from widget %*, it is required for all widgets with state"):format(v9, p12)))
-				t3[v9] = p2[v9]
+			for var8, var9 in t2.IfState.Required do
+				local var7
+				var7 = p2[var9] ~= nil
+				assert(var7, (("field %* is missing from widget %*, it is required for all widgets with state"):format(var9, p12)))
+				t3[var9] = p2[var9]
 			end
 			for v11, v12 in t2.IfState.Optional do
 				if p2[v12] == nil then
@@ -220,66 +220,66 @@ return function(p1)
 		end
 	end
 	function t._Insert(p1, p2, p3)
-		local v1 = t._getID(3)
+		local signal = t._getID(3)
 		local v2 = t._widgets[p1]
-		if t._VDOM[v1] then
-			return t._ContinueWidget(v1, p1)
+		if t._VDOM[signal] then
+			return t._ContinueWidget(signal, p1)
 		else
 			local t2 = {}
 			if p2 ~= nil then
 				if type(p2) ~= "table" then
 					p2 = { p2 }
 				end
-				for v3, v4 in p2 do
-					assert(v3 > 0, (("Widget Arguments must be a positive number, not %* of type %* for %*."):format(v3, typeof(v3), v4)))
-					t2[v2.ArgNames[v3]] = v4
+				for var3, var4 in p2 do
+					assert(var3 > 0, (("Widget Arguments must be a positive number, not %* of type %* for %*."):format(var3, typeof(var3), var4)))
+					t2[v2.ArgNames[var3]] = var4
 				end
 			end
 			table.freeze(t2)
-			local v7 = t._lastVDOM[v1]
-			if v7 and (p1 == v7.type and t._refreshCounter > 0) then
-				t._DiscardWidget(v7)
-				v7 = nil
+			local var7 = t._lastVDOM[signal]
+			if var7 and (p1 == var7.type and t._refreshCounter > 0) then
+				t._DiscardWidget(var7)
+				var7 = nil
 			end
-			local v8 = if v7 == nil then t._GenNewWidget(p1, t2, p3, v1) else v7
-			local parentWidget = v8.parentWidget
-			if v8.type ~= "Window" and v8.type ~= "Tooltip" then
-				if v8.ZIndex ~= parentWidget.ZOffset then
+			local var8 = if var7 == nil then t._GenNewWidget(p1, t2, p3, signal) else var7
+			local parentWidget = var8.parentWidget
+			if var8.type ~= "Window" and var8.type ~= "Tooltip" then
+				if var8.ZIndex ~= parentWidget.ZOffset then
 					parentWidget.ZUpdate = true
 				end
 				if parentWidget.ZUpdate then
-					v8.ZIndex = parentWidget.ZOffset
-					if v8.Instance then
-						v8.Instance.ZIndex = v8.ZIndex
-						v8.Instance.LayoutOrder = v8.ZIndex
+					var8.ZIndex = parentWidget.ZOffset
+					if var8.Instance then
+						var8.Instance.ZIndex = var8.ZIndex
+						var8.Instance.LayoutOrder = var8.ZIndex
 					end
 				end
 			end
 			if parentWidget.type == "Table" then
 				parentWidget._rowCycles[parentWidget._rowIndex] = t._cycleTick
 			end
-			if t._deepCompare(v8.providedArguments, t2) == false then
-				v8.arguments = t._deepCopy(t2)
-				v8.providedArguments = t2
-				v2.Update(v8)
+			if t._deepCompare(var8.providedArguments, t2) == false then
+				var8.arguments = t._deepCopy(t2)
+				var8.providedArguments = t2
+				v2.Update(var8)
 			end
-			v8.lastCycleTick = t._cycleTick
+			var8.lastCycleTick = t._cycleTick
 			parentWidget.ZOffset = parentWidget.ZOffset + 1
 			if v2.hasChildren then
-				v8.ZOffset = 0
-				v8.ZUpdate = false
-				local v9 = t
-				v9._stackIndex = v9._stackIndex + 1
-				t._IDStack[t._stackIndex] = v8.ID
+				var8.ZOffset = 0
+				var8.ZUpdate = false
+				local var9 = t
+				var9._stackIndex = var9._stackIndex + 1
+				t._IDStack[t._stackIndex] = var8.ID
 			end
-			t._VDOM[v1] = v8
-			t._lastWidget = v8
-			return v8
+			t._VDOM[signal] = var8
+			t._lastWidget = var8
+			return var8
 		end
 	end
 	function t._GenNewWidget(p1, p2, p3, p4)
 		local v2 = t._VDOM[t._IDStack[t._stackIndex]]
-		local v3 = t._widgets[p1]
+		local var3 = t._widgets[p1]
 		local t2 = {}
 		setmetatable(t2, t2)
 		t2.ID = p4
@@ -287,7 +287,7 @@ return function(p1)
 		t2.parentWidget = v2
 		t2.trackedEvents = {}
 		t2.ZIndex = v2.ZOffset
-		t2.Instance = v3.Generate(t2)
+		t2.Instance = var3.Generate(t2)
 		local parentWidget = t2.parentWidget
 		if t._config.Parent then
 			t2.Instance.Parent = t._config.Parent
@@ -296,33 +296,33 @@ return function(p1)
 		end
 		t2.providedArguments = p2
 		t2.arguments = t._deepCopy(p2)
-		v3.Update(t2)
-		local v4
-		if v3.hasState then
+		var3.Update(t2)
+		local var4
+		if var3.hasState then
 			if p3 then
-				for v5, v6 in p3 do
+				for var5, v6 in p3 do
 					if type(v6) ~= "table" or getmetatable(v6) ~= t.StateClass then
-						p3[v5] = t._widgetState(t2, v5, v6)
+						p3[var5] = t._widgetState(t2, var5, v6)
 					end
-					p3[v5].lastChangeTick = t._cycleTick
+					p3[var5].lastChangeTick = t._cycleTick
 				end
 				t2.state = p3
-				for v7, v8 in p3 do
-					v8.ConnectedWidgets[t2.ID] = t2
+				for var7, var8 in p3 do
+					var8.ConnectedWidgets[t2.ID] = t2
 				end
 			else
 				t2.state = {}
 			end
-			v3.GenerateState(t2)
-			v3.UpdateState(t2)
+			var3.GenerateState(t2)
+			var3.UpdateState(t2)
 			t2.stateMT = {}
 			setmetatable(t2.state, t2.stateMT)
 			t2.__index = t2.state
-			v4 = t2.stateMT
+			var4 = t2.stateMT
 		else
-			v4 = t2
+			var4 = t2
 		end
-		function v4.__index(p1, p2)
+		function var4.__index(p1, p2)
 			return function()
 				return t._EventCall(t2, p2)
 			end
@@ -332,8 +332,8 @@ return function(p1)
 	function t._ContinueWidget(p1, p2)
 		local v2 = t._VDOM[p1]
 		if t._widgets[p2].hasChildren then
-			local v3 = t
-			v3._stackIndex = v3._stackIndex + 1
+			local var3 = t
+			var3._stackIndex = var3._stackIndex + 1
 			t._IDStack[t._stackIndex] = v2.ID
 		end
 		t._lastWidget = v2
@@ -348,14 +348,14 @@ return function(p1)
 		p1.lastCycleTick = -1
 	end
 	function t._widgetState(p1, p2, p3)
-		local v1 = p1.ID .. p2
-		if t._states[v1] then
-			t._states[v1].ConnectedWidgets[p1.ID] = p1
-			t._states[v1].lastChangeTick = t._cycleTick
-			return t._states[v1]
+		local signal = p1.ID .. p2
+		if t._states[signal] then
+			t._states[signal].ConnectedWidgets[p1.ID] = p1
+			t._states[signal].lastChangeTick = t._cycleTick
+			return t._states[signal]
 		else
 			local t2 = {
-				ID = v1,
+				ID = signal,
 				value = p3,
 				lastChangeTick = t._cycleTick,
 				ConnectedWidgets = {
@@ -364,18 +364,18 @@ return function(p1)
 				ConnectedFunctions = {}
 			}
 			setmetatable(t2, t.StateClass)
-			t._states[v1] = t2
+			t._states[signal] = t2
 			return t2
 		end
 	end
 	function t._EventCall(p1, p2)
-		local v1 = t._widgets[p1.type].Events[p2]
-		assert(v1 ~= nil, (("widget %* has no event of name %*"):format(p1.type, p2)))
+		local signal = t._widgets[p1.type].Events[p2]
+		assert(signal ~= nil, (("widget %* has no event of name %*"):format(p1.type, p2)))
 		if p1.trackedEvents[p2] == nil then
-			v1.Init(p1)
+			signal.Init(p1)
 			p1.trackedEvents[p2] = true
 		end
-		return v1.Get(p1)
+		return signal.Get(p1)
 	end
 	function t._GetParentWidget()
 		return t._VDOM[t._IDStack[t._stackIndex]]
@@ -411,56 +411,56 @@ return function(p1)
 			return _nextWidgetId
 		else
 			local count = 1 + (p1 or 1)
-			local v1 = debug.info(count, "l")
+			local signal = debug.info(count, "l")
 			local v2 = ""
-			while v1 ~= -1 and v1 ~= nil do
+			while signal ~= -1 and signal ~= nil do
 				count = count + 1
-				v1, v2 = debug.info(count, "l"), v2 .. "+" .. v1
+				signal, v2 = debug.info(count, "l"), v2 .. "+" .. signal
 			end
-			local v4 = t._usedIDs[v2]
-			local v5
-			if v4 then
+			local var4 = t._usedIDs[v2]
+			local var5
+			if var4 then
 				local _usedIDs = t._usedIDs
 				_usedIDs[v2] = _usedIDs[v2] + 1
-				v5 = v4 + 1
+				var5 = var4 + 1
 			else
 				t._usedIDs[v2] = 1
-				v5 = 1
+				var5 = 1
 			end
 			if #t._pushedIds == 0 then
-				return v2 .. ":" .. v5
+				return v2 .. ":" .. var5
 			elseif t._newID then
 				t._newID = false
 				return v2 .. "::" .. table.concat(t._pushedIds, "\\")
 			else
-				return v2 .. ":" .. v5 .. ":" .. table.concat(t._pushedIds, "\\")
+				return v2 .. ":" .. var5 .. ":" .. table.concat(t._pushedIds, "\\")
 			end
 		end
 	end
 	function t._deepCompare(p1, p2)
-		for v1, v2 in p1 do
-			local v3 = p2[v1]
+		for signal, v2 in p1 do
+			local var3 = p2[signal]
 			if type(v2) == "table" then
-				if not v3 or type(v3) ~= "table" then
+				if not var3 or type(var3) ~= "table" then
 					return false
 				end
-				if t._deepCompare(v2, v3) == false then
+				if t._deepCompare(v2, var3) == false then
 					return false
 				end
-			elseif type(v2) ~= type(v3) or v2 ~= v3 then
+			elseif type(v2) ~= type(var3) or v2 ~= var3 then
 				return false
 			end
 		end
 		return true
 	end
 	function t._deepCopy(p1)
-		local v1 = table.clone(p1)
-		for v2, v3 in p1 do
-			if type(v3) == "table" then
-				v1[v2] = t._deepCopy(v3)
+		local signal = table.clone(p1)
+		for v2, var3 in p1 do
+			if type(var3) == "table" then
+				signal[v2] = t._deepCopy(var3)
 			end
 		end
-		return v1
+		return signal
 	end
 	t._lastVDOM = t._generateEmptyVDOM()
 	t._VDOM = t._generateEmptyVDOM()

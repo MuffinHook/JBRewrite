@@ -142,13 +142,13 @@ local function Heartbeat(p1)
 		if CurrentCamera.CameraType ~= Enum.CameraType.Scriptable then
 			CurrentCamera.CameraType = Enum.CameraType.Scriptable
 		end
-		local v12 = false
+		local var12 = false
 		if t.SpectatingName then
-			local v2 = Players:FindFirstChild(t.SpectatingName)
-			if v2 then
-				assert(v2)
-				assert(v2)
-				local Character = v2.Character
+			local localPlayer = Players:FindFirstChild(t.SpectatingName)
+			if localPlayer then
+				assert(localPlayer)
+				assert(localPlayer)
+				local Character = localPlayer.Character
 				local v3
 				if Character then
 					local Humanoid = Character:FindFirstChild("Humanoid")
@@ -156,16 +156,16 @@ local function Heartbeat(p1)
 				else
 					v3 = nil
 				end
-				local v4 = v3 and v3.RootPart or nil
-				if v4 then
-					v1.TargetFocus = v4.Position
-					v1.TargetPosition = v4.Position + v4.CFrame.LookVector * -10 + Vector3.new(0, 5, 0)
+				local var4 = v3 and v3.RootPart or nil
+				if var4 then
+					v1.TargetFocus = var4.Position
+					v1.TargetPosition = var4.Position + var4.CFrame.LookVector * -10 + Vector3.new(0, 5, 0)
 					CinematicCamera.StepCinematicCamera(p1, v1, 3, 2)
-					v12 = true
+					var12 = true
 				end
 			end
 		end
-		if v12 == false then
+		if var12 == false then
 			if t.NameList and #t.NameList > 0 then
 				print("Choosing new player")
 				t.SpectatingName = t.NameList[math.random(1, #t.NameList)]
@@ -178,9 +178,9 @@ local function Heartbeat(p1)
 		end
 	elseif CurrentCamera.CameraType ~= Enum.CameraType.Custom then
 		CurrentCamera.CameraType = Enum.CameraType.Custom
-		local v6 = LocalPlayer
-		assert(v6)
-		local Character = v6.Character
+		local localPlayer = LocalPlayer
+		assert(localPlayer)
+		local Character = localPlayer.Character
 		local v7
 		if Character then
 			local Humanoid = Character:FindFirstChild("Humanoid")
@@ -210,9 +210,9 @@ function t.Stop()
 	t.Maid:Destroy()
 	t.Maid = nil
 	CurrentCamera.CameraType = Enum.CameraType.Custom
-	local v2 = LocalPlayer
-	assert(v2)
-	local Character = v2.Character
+	local localPlayer = LocalPlayer
+	assert(localPlayer)
+	local Character = localPlayer.Character
 	local v3
 	if Character then
 		local Humanoid = Character:FindFirstChild("Humanoid")

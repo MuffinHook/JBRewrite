@@ -1,21 +1,21 @@
 -- Reviewed by Claude
 local v1 = newproxy()
-local v2 = newproxy()
+local table2 = newproxy()
 local RunService = game:GetService("RunService")
 local function GetObjectCleanupFunction(p1, p2)
-	local v12 = typeof(p1)
-	if v12 == "function" then
+	local var12 = typeof(p1)
+	if var12 == "function" then
 		return v1
-	elseif v12 == "thread" then
-		return v2
+	elseif var12 == "thread" then
+		return table2
 	elseif p2 then
 		return p2
-	elseif v12 == "Instance" then
+	elseif var12 == "Instance" then
 		return "Destroy"
-	elseif v12 == "RBXScriptConnection" then
+	elseif var12 == "RBXScriptConnection" then
 		return "Disconnect"
 	else
-		if v12 == "table" then
+		if var12 == "table" then
 			if typeof(p1.Destroy) == "function" then
 				return "Destroy"
 			end
@@ -23,15 +23,15 @@ local function GetObjectCleanupFunction(p1, p2)
 				return "Disconnect"
 			end
 		end
-		error("Failed to get cleanup function for object " .. v12 .. ": " .. tostring(p1))
+		error("Failed to get cleanup function for object " .. var12 .. ": " .. tostring(p1))
 	end
 end
 local t = {}
 t.__index = t
 function t.new()
-	local v2 = setmetatable({}, t)
-	v2._objects = {}
-	return v2
+	local table2 = setmetatable({}, t)
+	table2._objects = {}
+	return table2
 end
 function t.Extend(p1)
 	return p1:Construct(t)
@@ -41,10 +41,10 @@ function t.Clone(p1, p2)
 end
 function t.Construct(p1, p2, ...)
 	local v1 = nil
-	local v2 = type(p2)
-	if v2 == "table" then
+	local table2 = type(p2)
+	if table2 == "table" then
 		v1 = p2.new(...)
-	elseif v2 == "function" then
+	elseif table2 == "function" then
 		v1 = p2(...)
 	end
 	return p1:Add(v1)
@@ -85,7 +85,7 @@ end
 function t._cleanupObject(p1, p2, p3)
 	if p3 == v1 then
 		p2()
-	elseif p3 == v2 then
+	elseif p3 == table2 then
 		coroutine.close(p2)
 	else
 		p2[p3](p2)

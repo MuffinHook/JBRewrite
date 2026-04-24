@@ -12,12 +12,12 @@ local function newEnvironment(p1, p2)
 		end
 	end
 	local function addChild(p12, p2, p3, p4)
-		local v1 = p1:addChild(p12, p3, p4)
-		v1.callback = p2
+		local instance = p1:addChild(p12, p3, p4)
+		instance.callback = p2
 		if p3 == TestEnum.NodeType.Describe then
-			v1:expand()
+			instance:expand()
 		end
-		return v1
+		return instance
 	end
 	function t.describeFOCUS(p1, p2)
 		addChild(p1, p2, TestEnum.NodeType.Describe, TestEnum.NodeModifier.Focus)
@@ -40,7 +40,7 @@ local function newEnvironment(p1, p2)
 	function t.it(p1, p2, p3)
 		addChild(p1, p2, TestEnum.NodeType.It, TestEnum.NodeModifier.None)
 	end
-	local v1 = 0
+	local instance = 0
 	for k, v in pairs({
 		[TestEnum.NodeType.BeforeAll] = "beforeAll",
 		[TestEnum.NodeType.AfterAll] = "afterAll",
@@ -48,8 +48,8 @@ local function newEnvironment(p1, p2)
 		[TestEnum.NodeType.AfterEach] = "afterEach"
 	}) do
 		t[v] = function(p1)
-			addChild(v .. "_" .. tostring(v1), p1, k, TestEnum.NodeModifier.None)
-			v1 = v1 + 1
+			addChild(v .. "_" .. tostring(instance), p1, k, TestEnum.NodeModifier.None)
+			instance = instance + 1
 		end
 	end
 	function t.FIXME(p12)
@@ -115,16 +115,16 @@ function t.addChild(p1, p2, p3, p4)
 			end
 		end
 	end
-	local v2 = t.new(p1.plan, p2, p3, (getModifier(p1:getFullName() .. " " .. p2, p1.plan.testNamePattern, p4)))
-	v2.parent = p1
-	table.insert(p1.children, v2)
-	return v2
+	local instance2 = t.new(p1.plan, p2, p3, (getModifier(p1:getFullName() .. " " .. p2, p1.plan.testNamePattern, p4)))
+	instance2.parent = p1
+	table.insert(p1.children, instance2)
+	return instance2
 end
 function t.getFullName(p1)
 	if p1.parent then
-		local v1 = p1.parent:getFullName()
-		if v1 then
-			return v1 .. " " .. p1.phrase
+		local instance = p1.parent:getFullName()
+		if instance then
+			return instance .. " " .. p1.phrase
 		else
 			return p1.phrase
 		end
@@ -133,15 +133,15 @@ function t.getFullName(p1)
 	end
 end
 function t.expand(p1)
-	local v1 = getfenv(p1.callback)
-	local v2 = setmetatable({}, {
-		__index = v1
+	local instance = getfenv(p1.callback)
+	local instance2 = setmetatable({}, {
+		__index = instance
 	})
 	for k, v in pairs(p1.environment) do
-		v2[k] = v
+		instance2[k] = v
 	end
-	v2.script = v1.script
-	setfenv(p1.callback, v2)
+	instance2.script = instance.script
+	setfenv(p1.callback, instance2)
 	local v3, v4 = xpcall(p1.callback, function(p1)
 		return debug.traceback(tostring(p1), 2)
 	end)
@@ -159,33 +159,33 @@ function t2.new(p1, p2)
 	}, t2)
 end
 function t2.addChild(p1, p2, p3, p4)
-	local v2 = t.new(p1, p2, p3, (getModifier(p2, p1.testNamePattern, p4)))
-	table.insert(p1.children, v2)
-	return v2
+	local instance2 = t.new(p1, p2, p3, (getModifier(p2, p1.testNamePattern, p4)))
+	table.insert(p1.children, instance2)
+	return instance2
 end
 function t2.addRoot(p1, p2, p3)
-	local v1 = p1
+	local instance = p1
 	for i = #p2, 1, -1 do
-		local v2 = nil
-		for i2, v in ipairs(v1.children) do
+		local instance2 = nil
+		for i2, v in ipairs(instance.children) do
 			if v.phrase == p2[i] then
-				v2 = v
+				instance2 = v
 				break
 			end
 		end
-		if v2 == nil then
-			v2 = v1:addChild(p2[i], TestEnum.NodeType.Describe)
+		if instance2 == nil then
+			instance2 = instance:addChild(p2[i], TestEnum.NodeType.Describe)
 		end
-		v1 = v2
+		instance = instance2
 	end
-	v1.callback = p3
-	v1:expand()
+	instance.callback = p3
+	instance:expand()
 end
 function t2.visitAllNodes(p1, p2, p3, p4)
-	local v1 = p4 or 0
+	local instance = p4 or 0
 	for i, v in ipairs((p3 or p1).children) do
-		p2(v, v1)
-		p1:visitAllNodes(p2, v, v1 + 1)
+		p2(v, instance)
+		p1:visitAllNodes(p2, v, instance + 1)
 	end
 end
 function t2.visualize(p1)

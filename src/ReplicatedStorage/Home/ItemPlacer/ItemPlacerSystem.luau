@@ -21,32 +21,32 @@ local homeStore = require(ReplicatedStorage.Home.homeStore)
 local Roact = require(ReplicatedStorage.Roact)
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local createElement = Roact.createElement
-local function getClosestVecDual(p1, p2)
-	local v1 = p1[1]
-	local v2 = (-1 / 0)
-	for v4, v5 in p1 do
-		local v3
-		local v6 = v5:Dot(p2)
-		local v7 = math.abs(v6)
-		if v2 < v7 then
-			v3 = if v6 > 0 then 1 else -1
-			v2 = v7
-			v1 = v5 * v3
+local function getClosestVecDual(self, p2)
+	local instance = self[1]
+	local instance2 = (-1 / 0)
+	for var4, var5 in self do
+		local instance3
+		local var6 = var5:Dot(p2)
+		local var7 = math.abs(var6)
+		if instance2 < var7 then
+			instance3 = if var6 > 0 then 1 else -1
+			instance2 = var7
+			instance = var5 * instance3
 		end
 	end
-	return v1
+	return instance
 end
-local function rotBtwnUnit(p1, p2)
-	local v1 = p1:Cross(p2)
-	local v2 = p1:Dot(p2)
-	if v2 < -0.999 then
+local function rotBtwnUnit(self, p2)
+	local instance = self:Cross(p2)
+	local instance2 = self:Dot(p2)
+	if instance2 < -0.999 then
 		return CFrame.Angles(math.pi, 0, 0)
 	else
-		return CFrame.new(0, 0, 0, v1.x, v1.y, v1.z, v2 + 1)
+		return CFrame.new(0, 0, 0, instance.x, instance.y, instance.z, instance2 + 1)
 	end
 end
-local function roundN(p1, p2)
-	return math.floor(p1 / p2 + 0.5) * p2
+local function roundN(self, p2)
+	return math.floor(self / p2 + 0.5) * p2
 end
 local t = {
 	_maid = nil,
@@ -57,18 +57,18 @@ local t = {
 	onDragEnded = Signal.new()
 }
 function t.init()
-	local v1 = Maid.new()
-	t._maid = v1
+	local instance = Maid.new()
+	t._maid = instance
 	local t2 = {}
 	HomeItemSystem.onCustomizeStarted:Connect(function()
-		local function inputBegan(p1, p2)
-			local v1 = if p1.UserInputType == Enum.UserInputType.Gamepad1 then p1.KeyCode == Enum.KeyCode.ButtonA else false
-			if (not p2 or v1) and ((p1.UserInputType == Enum.UserInputType.MouseButton1 or (p1.UserInputType == Enum.UserInputType.Touch or v1)) and (not t.isDragging() and (not (t.getTimeSinceLastDragEnd() < 0.1) and HomeSystem.queryCurrentStandingHome()))) then
-				local v2 = ItemPlacerUtils.raycastMouse(t2, true)
-				if v2 then
-					local v3 = v2.Instance
+		local function inputBegan(self, p2)
+			local instance = if self.UserInputType == Enum.UserInputType.Gamepad1 then self.KeyCode == Enum.KeyCode.ButtonA else false
+			if (not p2 or instance) and ((self.UserInputType == Enum.UserInputType.MouseButton1 or (self.UserInputType == Enum.UserInputType.Touch or instance)) and (not t.isDragging() and (not (t.getTimeSinceLastDragEnd() < 0.1) and HomeSystem.queryCurrentStandingHome()))) then
+				local instance2 = ItemPlacerUtils.raycastMouse(t2, true)
+				if instance2 then
+					local instance3 = instance2.Instance
 					for i, v in ipairs(HomeItemBinder:GetAll()) do
-						if v3:IsDescendantOf(v:GetObj()) then
+						if instance3:IsDescendantOf(v:GetObj()) then
 							t.startDrag(v)
 							return
 						end
@@ -76,98 +76,98 @@ function t.init()
 				end
 			end
 		end
-		v1._listenForCustomizeTouch = UserInputService.TouchTap:Connect(inputBegan)
-		v1._listenForCustomizeClick = UserInputService.InputBegan:Connect(inputBegan)
+		instance._listenForCustomizeTouch = UserInputService.TouchTap:Connect(inputBegan)
+		instance._listenForCustomizeClick = UserInputService.InputBegan:Connect(inputBegan)
 	end)
 	HomeItemSystem.onCustomizeEnded:Connect(function()
-		v1._listenForCustomizeClick = nil
-		v1._listenForCustomizeTouch = nil
+		instance._listenForCustomizeClick = nil
+		instance._listenForCustomizeTouch = nil
 		if t.isDragging() then
 			t.stopDrag()
 		end
 	end)
 	HomeSystem.onExited:Connect(function()
-		v1._listenForCustomizeClick = nil
-		v1._listenForCustomizeTouch = nil
+		instance._listenForCustomizeClick = nil
+		instance._listenForCustomizeTouch = nil
 		if t.isDragging() then
 			t.stopDrag()
 		end
 	end)
-	HomeItemSystem.onAttemptPlaceItem:Connect(function(p1)
-		t.createAndDrag(p1.name)
+	HomeItemSystem.onAttemptPlaceItem:Connect(function(self)
+		t.createAndDrag(self.name)
 	end)
 	HomeItemSystem.onAttemptDeleteItem:Connect(function()
 		t.attemptDeleteCurrentHomeItem()
 	end)
 end
-function t.getTargetPosition(p1)
-	local v1 = ItemPlacerUtils.raycastMouse(p1)
-	if v1 then
-		local v2 = v1.Instance
-		local v3 = v2.CFrame:PointToObjectSpace(v1.Position)
-		return v2.CFrame:PointToWorldSpace((Vector3.new(math.floor(v3.x / 0.1 + 0.5) * 0.1, v3.y, math.floor(v3.z / 0.1 + 0.5) * 0.1))), v1.Normal, v2.CFrame
+function t.getTargetPosition(self)
+	local instance = ItemPlacerUtils.raycastMouse(self)
+	if instance then
+		local instance2 = instance.Instance
+		local instance3 = instance2.CFrame:PointToObjectSpace(instance.Position)
+		return instance2.CFrame:PointToWorldSpace((Vector3.new(math.floor(instance3.x / 0.1 + 0.5) * 0.1, instance3.y, math.floor(instance3.z / 0.1 + 0.5) * 0.1))), instance.Normal, instance2.CFrame
 	end
 end
-function t.startDrag(p1)
+function t.startDrag(self)
 	t._lastDragStart = os.clock()
-	local PrimaryPart = p1:GetObj().PrimaryPart
-	local v1 = p1:UntranslateCf(PrimaryPart.CFrame)
-	local v2 = Maid.new()
-	t._maid.placeMaid = v2
-	t._currentHomeItem = p1
-	v2:GiveTask(function()
+	local PrimaryPart = self:GetObj().PrimaryPart
+	local instance = self:UntranslateCf(PrimaryPart.CFrame)
+	local instance2 = Maid.new()
+	t._maid.placeMaid = instance2
+	t._currentHomeItem = self
+	instance2:GiveTask(function()
 		t._currentHomeItem = nil
 	end)
-	p1:SetBeingDragged(true)
-	v2:GiveTask(function()
-		p1:SetBeingDragged(false)
+	self:SetBeingDragged(true)
+	instance2:GiveTask(function()
+		self:SetBeingDragged(false)
 	end)
 	homeStore:dispatch({
 		type = "setVisible",
 		value = false
 	})
-	v2:GiveTask(function()
+	instance2:GiveTask(function()
 		homeStore:dispatch({
 			type = "setVisible",
 			value = true
 		})
 	end)
-	local v3 = false
-	v2:GiveTask(function()
-		if not v3 then
-			if p1._obj then
-				p1._obj:SetPrimaryPartCFrame(p1:TranslateCf(v1))
+	local instance3 = false
+	instance2:GiveTask(function()
+		if not instance3 then
+			if self._obj then
+				self._obj:SetPrimaryPartCFrame(self:TranslateCf(instance))
 			end
-			if not p1:IsPlaced() then
-				p1:AttemptDelete()
+			if not self:IsPlaced() then
+				self:AttemptDelete()
 			end
 		end
 	end)
-	p1:CacheSurfaces()
-	v2:GiveTask(function()
-		p1:ClearCacheSurfaces()
+	self:CacheSurfaces()
+	instance2:GiveTask(function()
+		self:ClearCacheSurfaces()
 	end)
 	local t2 = {}
-	for i, v in ipairs(p1:GetObj():GetDescendants()) do
+	for i, v in ipairs(self:GetObj():GetDescendants()) do
 		if v:IsA("BasePart") and v.CanCollide then
 			table.insert(t2, v)
 			v.CanCollide = false
 		end
 	end
-	v2:GiveTask(function()
+	instance2:GiveTask(function()
 		for i, v in ipairs(t2) do
 			v.CanCollide = true
 		end
 	end)
 	local Humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-	v2:GiveTask(Humanoid.Changed:connect(function()
+	instance2:GiveTask(Humanoid.Changed:connect(function()
 		Humanoid.Jump = false
 	end))
 	if Humanoid.SeatPart then
 		Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 	end
 	Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-	v2:GiveTask(function()
+	instance2:GiveTask(function()
 		Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
 	end)
 	local Part = Instance.new("Part")
@@ -179,54 +179,54 @@ function t.startDrag(p1)
 	Part.Size = PrimaryPart.Size + Vector3.new(0.1, 0.1, 0.1)
 	Part.CFrame = PrimaryPart.CFrame
 	Part.Transparency = 1
-	Part.Parent = p1:GetObj()
-	v2:GiveTask(Part)
-	local t3 = { p1:GetObj(), LocalPlayer.Character }
-	local v4 = v1
-	local v5 = v4 - v4.p
-	local _, v6, v7 = t.getTargetPosition(t3)
-	local UpVector = v5.UpVector
-	if v6:Dot(UpVector) < 0.99 then
-		v5 = rotBtwnUnit(UpVector, v6) * v5
-		UpVector = v6
+	Part.Parent = self:GetObj()
+	instance2:GiveTask(Part)
+	local t3 = { self:GetObj(), LocalPlayer.Character }
+	local var4 = instance
+	local var5 = var4 - var4.p
+	local _, var6, var7 = t.getTargetPosition(t3)
+	local UpVector = var5.UpVector
+	if var6:Dot(UpVector) < 0.99 then
+		var5 = rotBtwnUnit(UpVector, var6) * var5
+		UpVector = var6
 	end
-	local v8 = t._alignMat(v6, v7, v5)
-	local _2, v9, _3 = (v8:Inverse() * v1):ToOrientation()
-	local p = v1.p
-	local v10 = Spring.new(p, Vector3.new(), 0.8, 50)
-	local v11 = Spring.new(p, Vector3.new(), 0.7, 30)
-	local v12 = Spring.new(v8.RightVector, Vector3.new(), 0.8, 50)
-	local v13 = Spring.new(v8.UpVector, Vector3.new(), 0.8, 50)
-	local v14 = Spring.new(v9, 0, 0.8, 30)
-	local v15 = 0
-	local function doRotate(p1, p2, p3)
-		local v1 = os.clock()
-		local v2 = v1 - p3
-		local v3 = if v2 > 0.1 then math.min(12, v2 / 0.1 + 1) else 1
-		if not (v1 - v15 < 0.1) then
-			v15 = v1
-			if p1 then
-				v9 = v9 + 0.08726646259971647 * v3
+	local var8 = t._alignMat(var6, var7, var5)
+	local _2, v9, _3 = (var8:Inverse() * instance):ToOrientation()
+	local p = instance.p
+	local vector10 = Spring.new(p, Vector3.new(), 0.8, 50)
+	local vector11 = Spring.new(p, Vector3.new(), 0.7, 30)
+	local vector12 = Spring.new(var8.RightVector, Vector3.new(), 0.8, 50)
+	local vector13 = Spring.new(var8.UpVector, Vector3.new(), 0.8, 50)
+	local instance14 = Spring.new(v9, 0, 0.8, 30)
+	local var15 = 0
+	local function doRotate(self, p2, p3)
+		local instance = os.clock()
+		local instance2 = instance - p3
+		local instance3 = if instance2 > 0.1 then math.min(12, instance2 / 0.1 + 1) else 1
+		if not (instance - var15 < 0.1) then
+			var15 = instance
+			if self then
+				v9 = v9 + 0.08726646259971647 * instance3
 			elseif p2 then
-				v9 = v9 - 0.08726646259971647 * v3
+				v9 = v9 - 0.08726646259971647 * instance3
 			end
 			v9 = math.floor(v9 / 0.08726646259971647 + 0.5) * 0.08726646259971647
-			v14:SetTarget(v9)
+			instance14:SetTarget(v9)
 		end
 	end
 	local function attemptPlaceCurrentHomeItem()
-		t._maid.listenForFeedback = p1._placeRemote.OnClientEvent:Connect(function(p12)
+		t._maid.listenForFeedback = self._placeRemote.OnClientEvent:Connect(function(p12)
 			t._maid.listenForFeedback = nil
-			if not p12 and p1._obj then
-				p1._obj:SetPrimaryPartCFrame(p1:TranslateCf(v1))
+			if not p12 and self._obj then
+				self._obj:SetPrimaryPartCFrame(self:TranslateCf(instance))
 			end
 		end)
-		local v12, v2, v32 = t.getTargetPosition(t3)
-		p1:SetServerCFrame((p1:TranslateCf(t._alignMat(v2, v32, v5) * CFrame.Angles(0, v9, 0) + v12)))
-		v3 = true
+		local vector12, instance2, v32 = t.getTargetPosition(t3)
+		self:SetServerCFrame((self:TranslateCf(t._alignMat(instance2, v32, var5) * CFrame.Angles(0, v9, 0) + vector12)))
+		instance3 = true
 		t.stopDrag()
 	end
-	local v16 = Roact.mount(createElement("ScreenGui", {
+	local var16 = Roact.mount(createElement("ScreenGui", {
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		ResetOnSpawn = false,
 		IgnoreGuiInset = true,
@@ -251,104 +251,104 @@ function t.startDrag(p1)
 					attemptPlaceCurrentHomeItem()
 				end,
 				onDownRight = function()
-					local v1 = os.clock()
-					v2.rotateHeartbeat = RunService.Heartbeat:Connect(function()
-						local v2 = os.clock()
-						local v3 = v2 - v1
-						local v4 = if v3 > 0.1 then math.min(12, v3 / 0.1 + 1) else 1
-						if not (v2 - v15 < 0.1) then
-							v15 = v2
-							v9 = v9 - 0.08726646259971647 * v4
+					local instance = os.clock()
+					instance2.rotateHeartbeat = RunService.Heartbeat:Connect(function()
+						local instance2 = os.clock()
+						local instance3 = instance2 - instance
+						local var4 = if instance3 > 0.1 then math.min(12, instance3 / 0.1 + 1) else 1
+						if not (instance2 - var15 < 0.1) then
+							var15 = instance2
+							v9 = v9 - 0.08726646259971647 * var4
 							v9 = math.floor(v9 / 0.08726646259971647 + 0.5) * 0.08726646259971647
-							v14:SetTarget(v9)
+							instance14:SetTarget(v9)
 						end
 					end)
 				end,
 				onUpRight = function()
-					v2.rotateHeartbeat = nil
+					instance2.rotateHeartbeat = nil
 				end,
 				onDownLeft = function()
-					local v1 = os.clock()
-					v2.rotateHeartbeat = RunService.Heartbeat:Connect(function()
-						local v2 = os.clock()
-						local v3 = v2 - v1
-						local v4 = if v3 > 0.1 then math.min(12, v3 / 0.1 + 1) else 1
-						if not (v2 - v15 < 0.1) then
-							v15 = v2
-							v9 = v9 + 0.08726646259971647 * v4
+					local instance = os.clock()
+					instance2.rotateHeartbeat = RunService.Heartbeat:Connect(function()
+						local instance2 = os.clock()
+						local instance3 = instance2 - instance
+						local var4 = if instance3 > 0.1 then math.min(12, instance3 / 0.1 + 1) else 1
+						if not (instance2 - var15 < 0.1) then
+							var15 = instance2
+							v9 = v9 + 0.08726646259971647 * var4
 							v9 = math.floor(v9 / 0.08726646259971647 + 0.5) * 0.08726646259971647
-							v14:SetTarget(v9)
+							instance14:SetTarget(v9)
 						end
 					end)
 				end,
 				onUpLeft = function()
-					v2.rotateHeartbeat = nil
+					instance2.rotateHeartbeat = nil
 				end,
 				showPlace = InputUtils.isTouch()
 			})
 		})
 	}), Players.LocalPlayer.PlayerGui, "ItemPlacerGui")
-	v2:GiveTask(function()
-		Roact.unmount(v16)
+	instance2:GiveTask(function()
+		Roact.unmount(var16)
 	end)
-	v2:GiveTask(UserInputService.InputEnded:Connect(function(p1, p2)
-		if not p2 and p1.UserInputType == Enum.UserInputType.MouseButton1 then
-			v2.rotateHeartbeat = nil
+	instance2:GiveTask(UserInputService.InputEnded:Connect(function(self, p2)
+		if not p2 and self.UserInputType == Enum.UserInputType.MouseButton1 then
+			instance2.rotateHeartbeat = nil
 		end
 	end))
-	v2:GiveTask(UserInputService.InputBegan:Connect(function(p1, p2)
-		if not p2 and (p1.UserInputType == Enum.UserInputType.Keyboard or p1.UserInputType == Enum.UserInputType.Gamepad1) then
-			local v1 = p1.KeyCode == Enum.KeyCode.Q or p1.KeyCode == Enum.KeyCode.ButtonL2
-			local v22 = p1.KeyCode == Enum.KeyCode.E or p1.KeyCode == Enum.KeyCode.ButtonR2
-			if v22 or v1 then
-				local v3 = os.clock()
-				v2.waitForEnd = p1:GetPropertyChangedSignal("UserInputState"):Connect(function()
-					if p1.UserInputState == Enum.UserInputState.End then
-						v2.waitForEnd = nil
-						v2.rotateHeartbeat = nil
+	instance2:GiveTask(UserInputService.InputBegan:Connect(function(self, p2)
+		if not p2 and (self.UserInputType == Enum.UserInputType.Keyboard or self.UserInputType == Enum.UserInputType.Gamepad1) then
+			local instance = self.KeyCode == Enum.KeyCode.Q or self.KeyCode == Enum.KeyCode.ButtonL2
+			local var22 = self.KeyCode == Enum.KeyCode.E or self.KeyCode == Enum.KeyCode.ButtonR2
+			if var22 or instance then
+				local instance3 = os.clock()
+				instance2.waitForEnd = self:GetPropertyChangedSignal("UserInputState"):Connect(function()
+					if self.UserInputState == Enum.UserInputState.End then
+						instance2.waitForEnd = nil
+						instance2.rotateHeartbeat = nil
 					end
 				end)
-				v2.rotateHeartbeat = RunService.Heartbeat:Connect(function()
-					doRotate(v1, v22, v3)
+				instance2.rotateHeartbeat = RunService.Heartbeat:Connect(function()
+					doRotate(instance, var22, instance3)
 				end)
 			end
 		end
 	end))
-	v2:GiveTask(RunService.Heartbeat:Connect(function()
-		local v1, v2, v3 = t.getTargetPosition(t3)
-		if v1 then
-			local v4, _ = v10:SetTarget(v1)
-			local _2, v52 = v11:SetTarget(v1)
-			local v6 = v14:Update()
-			if v2:Dot(UpVector) < 0.99 then
-				v5 = rotBtwnUnit(UpVector, v2) * v5
-				UpVector = v2
+	instance2:GiveTask(RunService.Heartbeat:Connect(function()
+		local instance, instance2, instance3 = t.getTargetPosition(t3)
+		if instance then
+			local var4, _ = vector10:SetTarget(instance)
+			local _2, v52 = vector11:SetTarget(instance)
+			local var6 = instance14:Update()
+			if instance2:Dot(UpVector) < 0.99 then
+				var5 = rotBtwnUnit(UpVector, instance2) * var5
+				UpVector = instance2
 			end
-			local v7 = t._alignMat(v2, v3, v5)
-			local v8 = CFrame.fromMatrix(Vector3.new(0, 0, 0), v12:SetTarget(v7.RightVector).Unit, v13:SetTarget(v7.UpVector).Unit)
-			local v92 = p1:TranslateCf(v7 * CFrame.Angles(0, v9, 0) + v1)
-			local v102 = p1:IsValidUpDot((v92.UpVector:Dot(Vector3.new(0, 1, 0))))
-			Part.Transparency = if p1:IsWithinBoundsCached(v92) and v102 then 1 else 0.5
-			p1:SetCFrame((p1:TranslateCf(v8 * CFrame.Angles(-v52.z * 0.0015, 0, v52.x * 0.0015) * CFrame.Angles(0, v6, 0) + v4)))
+			local var7 = t._alignMat(instance2, instance3, var5)
+			local var8 = CFrame.fromMatrix(Vector3.new(0, 0, 0), vector12:SetTarget(var7.RightVector).Unit, vector13:SetTarget(var7.UpVector).Unit)
+			local cframe92 = self:TranslateCf(var7 * CFrame.Angles(0, v9, 0) + instance)
+			local vector102 = self:IsValidUpDot((cframe92.UpVector:Dot(Vector3.new(0, 1, 0))))
+			Part.Transparency = if self:IsWithinBoundsCached(cframe92) and vector102 then 1 else 0.5
+			self:SetCFrame((self:TranslateCf(var8 * CFrame.Angles(-v52.z * 0.0015, 0, v52.x * 0.0015) * CFrame.Angles(0, var6, 0) + var4)))
 		end
 	end))
-	local function inputBegan(p1, p2)
-		local v1 = if p1.UserInputType == Enum.UserInputType.Gamepad1 then p1.KeyCode == Enum.KeyCode.ButtonA else false
-		if (not p2 or v1) and (p1.UserInputType == Enum.UserInputType.MouseButton1 or v1) then
+	local function inputBegan(self, p2)
+		local instance = if self.UserInputType == Enum.UserInputType.Gamepad1 then self.KeyCode == Enum.KeyCode.ButtonA else false
+		if (not p2 or instance) and (self.UserInputType == Enum.UserInputType.MouseButton1 or instance) then
 			attemptPlaceCurrentHomeItem()
 		end
 	end
-	v2:GiveTask(UserInputService.InputBegan:Connect(inputBegan))
+	instance2:GiveTask(UserInputService.InputBegan:Connect(inputBegan))
 	t.onDragStarted:Fire()
 end
-function t._alignMat(p1, p2, p3)
+function t._alignMat(self, p2, p3)
 	local t = { p2.LookVector, p2.RightVector, p2.UpVector }
-	local v1 = getClosestVecDual(t, p1)
-	if table.find(t, v1) then
-		table.remove(t, table.find(t, v1))
+	local instance = getClosestVecDual(t, self)
+	if table.find(t, instance) then
+		table.remove(t, table.find(t, instance))
 	end
-	if table.find(t, -v1) then
-		table.remove(t, table.find(t, -v1))
+	if table.find(t, -instance) then
+		table.remove(t, table.find(t, -instance))
 	end
 	return p3 * rotBtwnUnit(Vector3.new(1, 0, 0), p3:VectorToObjectSpace((getClosestVecDual(t, p3:VectorToWorldSpace(Vector3.new(1, 0, 0))))))
 end
@@ -373,7 +373,7 @@ end
 function t.getTimeSinceLastDragEnd()
 	return os.clock() - t._lastDragEnd
 end
-function t.createAndDrag(p1)
+function t.createAndDrag(self)
 	homeStore:dispatch({
 		type = "setVisible",
 		value = false
@@ -384,14 +384,14 @@ function t.createAndDrag(p1)
 			value = true
 		})
 	end
-	local v1 = HomeSystem.queryCurrentStandingHome()
-	assert(v1 ~= nil)
-	HomeItemSystem._maid._listenNewItem = v1._homeItemNewRemote.OnClientEvent:Connect(function(p1)
+	local instance = HomeSystem.queryCurrentStandingHome()
+	assert(instance ~= nil)
+	HomeItemSystem._maid._listenNewItem = instance._homeItemNewRemote.OnClientEvent:Connect(function(self)
 		HomeItemSystem._maid._listenNewItem = nil
-		if p1.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.SUCCESS then
-			StreamingHelperUtils.yieldForObjValuePopulated(p1.modelPtr)
-			BinderUtils.promiseBoundClass(HomeItemBinder, p1.modelPtr.Value):andThen(function(p1)
-				t.startDrag(p1)
+		if self.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.SUCCESS then
+			StreamingHelperUtils.yieldForObjValuePopulated(self.modelPtr)
+			BinderUtils.promiseBoundClass(HomeItemBinder, self.modelPtr.Value):andThen(function(self)
+				t.startDrag(self)
 				t._maid.placeMaid:GiveTask(function()
 					homeStore:dispatch({
 						type = "setVisible",
@@ -399,7 +399,7 @@ function t.createAndDrag(p1)
 					})
 				end)
 			end):catch(warn)
-		elseif p1.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.TOO_MANY then
+		elseif self.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.TOO_MANY then
 			Notification.new({
 				Text = "Too many items placed... try deleting some."
 			})
@@ -407,7 +407,7 @@ function t.createAndDrag(p1)
 				type = "setVisible",
 				value = true
 			})
-		elseif p1.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.ALL_OWNED_PLACED then
+		elseif self.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.ALL_OWNED_PLACED then
 			Notification.new({
 				Text = "You placed all of these that you own..."
 			})
@@ -415,7 +415,7 @@ function t.createAndDrag(p1)
 				type = "setVisible",
 				value = true
 			})
-		elseif p1.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.MAX_PLACED then
+		elseif self.id == HomeConsts.ENUM_HOME_ITEM_NEW_RESULT.MAX_PLACED then
 			Notification.new({
 				Text = "You reached the placement limit for this item..."
 			})
@@ -424,9 +424,9 @@ function t.createAndDrag(p1)
 				value = true
 			})
 		else
-			error(("Unhandled result id: %d"):format(p1.id))
+			error(("Unhandled result id: %d"):format(self.id))
 		end
 	end)
-	v1:AttemptCreateHomeItem(p1)
+	instance:AttemptCreateHomeItem(self)
 end
 return t

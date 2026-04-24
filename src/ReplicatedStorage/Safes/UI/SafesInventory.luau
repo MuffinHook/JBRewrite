@@ -6,9 +6,9 @@ local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local topBarButtonsComponent = require(script.Parent.topBarButtonsComponent)
 local SafeComponent = require(script.Parent.SafeComponent)
 local paddedScrollingGrid = require(script.Parent.paddedScrollingGrid)
-local v1 = Roact.PureComponent:extend("SafesInventory")
-function v1.render(p1)
-	local v1 = Color3.new(51/255, 51/255, 51/255)
+local color = Roact.PureComponent:extend("SafesInventory")
+function color.render(p1)
+	local color = Color3.new(51/255, 51/255, 51/255)
 	return createElement("Frame", {
 		BackgroundTransparency = 0.8,
 		BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
@@ -22,7 +22,7 @@ function v1.render(p1)
 			verticalPaddingRatio = 128
 		}, {
 			TopBar = createElement(PaddedContainer, {
-				backgroundColor = v1,
+				backgroundColor = color,
 				paddingTop = 0,
 				paddingLeft = 0,
 				paddingRight = 0,
@@ -64,7 +64,7 @@ function v1.render(p1)
 				})
 			}),
 			Left = createElement(PaddedContainer, {
-				backgroundColor = v1,
+				backgroundColor = color,
 				paddingTop = 0.5,
 				paddingLeft = 0,
 				paddingRight = 0.5,
@@ -86,7 +86,7 @@ function v1.render(p1)
 				})
 			}),
 			Body = createElement(PaddedContainer, {
-				backgroundColor = v1,
+				backgroundColor = color,
 				paddingTop = 0.5,
 				paddingLeft = 0.5,
 				paddingRight = 0.5,
@@ -116,4 +116,4 @@ function v1.render(p1)
 		})
 	})
 end
-return v1
+return color

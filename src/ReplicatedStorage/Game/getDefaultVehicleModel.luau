@@ -8,23 +8,23 @@ return function(p1, p2)
 	if p1 == "MCL36FREE" then
 		p1 = "MCL36"
 	end
-	local v3 = ReplicatedStorage.Resource.Vehicles:FindFirstChild(p1) or ReplicatedStorage.Resource.Plane:FindFirstChild(p1) or ReplicatedStorage.Resource.Boat:FindFirstChild(p1)
-	if v3 then
-		local v4 = v3:Clone()
-		local v5 = v4
-		for v7, v8 in v4:GetDescendants() do
+	local var3 = ReplicatedStorage.Resource.Vehicles:FindFirstChild(p1) or ReplicatedStorage.Resource.Plane:FindFirstChild(p1) or ReplicatedStorage.Resource.Boat:FindFirstChild(p1)
+	if var3 then
+		local var4 = var3:Clone()
+		local var5 = var4
+		for v7, v8 in var4:GetDescendants() do
 			local v6
 			if v8:IsA("Model") and (v8.Name:sub(1, 5) == "Wheel" and (v8.Name ~= "Wheels" and v8.Name ~= "WheelModels")) then
-				local v9 = v8:FindFirstChild("Wheel") or v8:FindFirstChild("WheelRoot")
-				if not v9 then
+				local var9 = v8:FindFirstChild("Wheel") or v8:FindFirstChild("WheelRoot")
+				if not var9 then
 					print("could not find wheelRoot in", v8:GetFullName())
 				end
-				v6 = v9 ~= nil
+				v6 = var9 ~= nil
 				assert(v6, "could not find wheelRoot")
-				v8.PrimaryPart = v9
+				v8.PrimaryPart = var9
 			end
 		end
-		local WheelModels = v5:FindFirstChild("WheelModels")
+		local WheelModels = var5:FindFirstChild("WheelModels")
 		if WheelModels then
 			for v11, v12 in WheelModels:GetChildren() do
 				local v10
@@ -39,19 +39,19 @@ return function(p1, p2)
 				end
 			end
 		end
-		v5.PrimaryPart = v5.BoundingBox
-		v5:SetPrimaryPartCFrame(CFrame.new())
-		if v5:FindFirstChild("Spoiler") then
-			v5.Spoiler.Transparency = 1
+		var5.PrimaryPart = var5.BoundingBox
+		var5:SetPrimaryPartCFrame(CFrame.new())
+		if var5:FindFirstChild("Spoiler") then
+			var5.Spoiler.Transparency = 1
 		end
-		if v5:FindFirstChild("PoliceLights") then
-			v5.PoliceLights.Transparency = 1
+		if var5:FindFirstChild("PoliceLights") then
+			var5.PoliceLights.Transparency = 1
 		end
 		if p2 ~= "Chassis3" then
 			local t = {
 				Make = p1,
 				Type = p2,
-				Model = v5
+				Model = var5
 			}
 			Customize.Apply({
 				Name = "Classic"
@@ -84,9 +84,9 @@ return function(p1, p2)
 			Customize.Apply({
 				Name = "Black"
 			}, "WheelColor", t)
-			PartUtils.setAnchored(v5, true)
+			PartUtils.setAnchored(var5, true)
 		end
-		return v5
+		return var5
 	end
 	error("Could not find vehicle model: " .. p1)
 end

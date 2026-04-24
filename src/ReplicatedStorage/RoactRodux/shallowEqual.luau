@@ -1,18 +1,19 @@
 -- Reviewed by Claude
-return function(p1, p2)
-	if p1 == nil then
- return p2 == nil
+-- variables reassigned
+return function(tableA, tableB)
+	if tableA == nil then
+ return tableB == nil
 	end
-	if p2 == nil then
- return p1 == nil
+	if tableB == nil then
+ return tableA == nil
 	end
-	for k, v in pairs(p1) do
- if v ~= p2[k] then
+	for k, v in pairs(tableA) do
+ if v ~= tableB[k] then
  return false
  end
 	end
-	for k, v in pairs(p2) do
- if v ~= p1[k] then
+	for k, v in pairs(tableB) do
+ if v ~= tableA[k] then
  return false
  end
 	end

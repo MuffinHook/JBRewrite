@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
 local OwnershipConsts = require(ReplicatedStorage.Ownership.OwnershipConsts)
@@ -6,15 +7,15 @@ local Players = game:GetService("Players")
 local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
 local TradeTranslationUtils = require(script.Parent.TradeTranslationUtils)
 return {
-	setPlayerTradeRequestsEnabled = function(p1, p2)
-		assert(p1.Parent == Players, "Incorrect player passed")
-		assert(typeof(p2) == "boolean", "Incorrect value passed")
-		p1:SetAttribute(TradeConsts.ARE_TRADE_REQUESTS_ENABLED_ATTR_NAME, p2)
+	setPlayerTradeRequestsEnabled = function(player, enabled)
+		assert(player.Parent == Players, "Incorrect player passed")
+		assert(typeof(enabled) == "boolean", "Incorrect value passed")
+		player:SetAttribute(TradeConsts.ARE_TRADE_REQUESTS_ENABLED_ATTR_NAME, enabled)
 		return true
 	end,
-	getPlayerTradeRequestsEnabled = function(p1)
-		assert(p1.Parent == Players, "Incorrect player passed")
-		return p1:GetAttribute(TradeConsts.ARE_TRADE_REQUESTS_ENABLED_ATTR_NAME)
+	getPlayerTradeRequestsEnabled = function(player)
+		assert(player.Parent == Players, "Incorrect player passed")
+		return player:GetAttribute(TradeConsts.ARE_TRADE_REQUESTS_ENABLED_ATTR_NAME)
 	end,
 	getCategories = function()
 		local t = {}

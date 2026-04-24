@@ -2,10 +2,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local CollectionService = game:GetService("CollectionService")
-local v1 = nil
+local data = nil
 local function GetById(p1)
-	for i = #v1, 1, -1 do
-		if v1[i].Id == p1 then
+	for i = #data, 1, -1 do
+		if data[i].Id == p1 then
 			return i
 		end
 	end
@@ -19,64 +19,64 @@ local t = {
 	UpdatedSignal = Signal.new()
 }
 local v2 = nil
-local v3 = nil
+local var3 = nil
 local function NetSyncReplicateSingle(p1)
-	local v12 = p1
-	local Id = v12.Id
+	local var12 = p1
+	local Id = var12.Id
 	local v2 = false
-	for i = #v1, 1, -1 do
-		if v1[i].Id == Id then
+	for i = #data, 1, -1 do
+		if data[i].Id == Id then
 			v2 = i
 			break
 		end
 	end
 	if v2 then
-		v12 = v1[v2]
-		for v3, v4 in next, p1 do
-			if v3 ~= "Id" and (v3 ~= "Inst" and v3 ~= "Tagged") then
-				v12[v3] = v4
+		var12 = data[v2]
+		for var3, v4 in next, p1 do
+			if var3 ~= "Id" and (var3 ~= "Inst" and var3 ~= "Tagged") then
+				var12[var3] = v4
 			end
 		end
-		t.UpdatedSignal:Fire(v12)
+		t.UpdatedSignal:Fire(var12)
 	else
-		v12.Inst = nil
-		table.insert(v1, v12)
-		t.AddedSignal:Fire(v12)
+		var12.Inst = nil
+		table.insert(data, var12)
+		t.AddedSignal:Fire(var12)
 	end
-	if v12.Tagged then
-		local v6 = ("NetSync_%d"):format(v12.Id)
-		if not v12.InstanceAddedSignal then
-			v12.InstanceAddedSignal = CollectionService:GetInstanceAddedSignal(v6)
+	if var12.Tagged then
+		local var6 = ("NetSync_%d"):format(var12.Id)
+		if not var12.InstanceAddedSignal then
+			var12.InstanceAddedSignal = CollectionService:GetInstanceAddedSignal(var6)
 			local function InstanceAdded(p1)
-				v12.Inst = p1
-				t.InstAddedSignal:Fire(v12)
+				var12.Inst = p1
+				t.InstAddedSignal:Fire(var12)
 			end
-			v12.InstanceAddedSignal:Connect(InstanceAdded)
-			local v7 = next
-			local v8, v9 = CollectionService:GetTagged(v6)
-			for v10, v11 in v7, v8, v9 do
-				v12.Inst = v11
-				t.InstAddedSignal:Fire(v12)
+			var12.InstanceAddedSignal:Connect(InstanceAdded)
+			local var7 = next
+			local v8, v9 = CollectionService:GetTagged(var6)
+			for v10, v11 in var7, v8, v9 do
+				var12.Inst = v11
+				t.InstAddedSignal:Fire(var12)
 			end
 		end
-		if not v12.InstanceRemovedSignal then
-			v12.InstanceRemovedSignal = CollectionService:GetInstanceRemovedSignal(v6)
-			v12.InstanceRemovedSignal:Connect(function()
-				t.InstRemovedSignal:Fire(v12)
+		if not var12.InstanceRemovedSignal then
+			var12.InstanceRemovedSignal = CollectionService:GetInstanceRemovedSignal(var6)
+			var12.InstanceRemovedSignal:Connect(function()
+				t.InstRemovedSignal:Fire(var12)
 			end)
 		end
 	end
 end
 local function NetSyncReplicateDestroy(p1)
-	assert(v1)
+	assert(data)
 	local v2 = false
-	for i = #v1, 1, -1 do
-		if v1[i].Id == p1 then
+	for i = #data, 1, -1 do
+		if data[i].Id == p1 then
 			v2 = i
 			break
 		end
 	end
-	t.RemovedSignal:Fire((table.remove(v1, (assert(v2)))))
+	t.RemovedSignal:Fire((table.remove(data, (assert(v2)))))
 	return false
 end
 local function NetSyncReplicateAll(p1)
@@ -86,10 +86,10 @@ local function NetSyncReplicateAll(p1)
 end
 return {
 	Init = function(p1)
-		v1 = {}
+		data = {}
 		local em = p1.em
 		v2 = p1.Event
-		v3 = em
+		var3 = em
 		em.ybfjndtk = NetSyncReplicateSingle
 		em.icqxr6a0 = NetSyncReplicateDestroy
 		em.u8darxdf = NetSyncReplicateAll

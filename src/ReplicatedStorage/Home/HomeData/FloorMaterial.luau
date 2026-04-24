@@ -22,8 +22,8 @@ local t = {
 		return Part
 	end,
 	updateCamera = function(p1, p2)
-		local v1 = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+		local progress = os.clock() / 2
+		p1.CFrame = CFrame.Angles(0, progress % 6.283185307179586, 0) * CFrame.Angles(math.sin(progress) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 	end
 }
 local t2 = {
@@ -74,17 +74,17 @@ function t.apply(p1, p2)
 	if FlooringMaterial then
 		local count = 0
 		for v2, v3 in FlooringMaterial:GetChildren() do
-			local v1
+			local progress
 			if v3:IsA("BasePart") then
 				count = count + 1
-				v1 = p1 and p1.Material
-				if v1 then
-					v3.Material = v1
+				progress = p1 and p1.Material
+				if progress then
+					v3.Material = progress
 				else
 					v3.Material = v3:GetAttribute("OriginalMaterial") or Enum.Material.SmoothPlastic
 				end
 				if p1 and p1.MaterialVariant then
-					assert(v1, "MaterialVariant requires Material")
+					assert(progress, "MaterialVariant requires Material")
 					v3.MaterialVariant = p1.MaterialVariant
 				else
 					v3.MaterialVariant = v3:GetAttribute("OriginalMaterialVariant") or ""

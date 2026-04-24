@@ -47,8 +47,8 @@ return function(p1)
 			}) })
 	end
 	function v1.willUnmount(p1)  end
-	local v4 = Roact.mount(Roact.createElement(v1), p1)
+	local var4 = Roact.mount(Roact.createElement(v1), p1)
 	return function()
-		Roact.unmount(v4)
+		Roact.unmount(var4)
 	end
 end

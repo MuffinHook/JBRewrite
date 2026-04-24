@@ -68,8 +68,8 @@ function t.isPlayerInElevator(p1, p2)
 	if p2 then
 		local Character = p2.Character
 		if Character then
-			local v3 = CharacterUtils.getRootPart(Character)
-			return RegionUtils.isPointInPart(t.getEntranceElevatorModel(p1).PrimaryPart, v3.Position)
+			local var3 = CharacterUtils.getRootPart(Character)
+			return RegionUtils.isPointInPart(t.getEntranceElevatorModel(p1).PrimaryPart, var3.Position)
 		else
 			return false
 		end
@@ -84,9 +84,9 @@ end
 function t.getShields(p1)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, MansionRobberyConsts.TAG_NAME), "Obj does not have mansion robbery tag")
-	local v3 = t.getShieldsFolder(p1)
-	if v3 then
-		return v3:GetChildren()
+	local var3 = t.getShieldsFolder(p1)
+	if var3 then
+		return var3:GetChildren()
 	else
 		warn("No shield models folder")
 		return {}
@@ -116,14 +116,14 @@ end
 function t.getRandomExitTeleportationCFrame(p1)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, MansionRobberyConsts.TAG_NAME), "Obj does not have mansion robbery tag")
-	local v3 = t.getExitTeleportationPoints(p1)
-	return v3[math.random(#v3)].CFrame * CFrame.new(0, 5, 0)
+	local var3 = t.getExitTeleportationPoints(p1)
+	return var3[math.random(#var3)].CFrame * CFrame.new(0, 5, 0)
 end
 function t.getIsPlayerInRobbery(p1, p2)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, MansionRobberyConsts.TAG_NAME), "Obj does not have mansion robbery tag")
-	local v3 = p1:FindFirstChild(MansionRobberyConsts.IN_ROBBERY_FOLDER_NAME):FindFirstChild(p2.UserId)
-	return v3 and v3.Value == true
+	local var3 = p1:FindFirstChild(MansionRobberyConsts.IN_ROBBERY_FOLDER_NAME):FindFirstChild(p2.UserId)
+	return var3 and var3.Value == true
 end
 function t.setLastClosedTime(p1)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
@@ -144,8 +144,8 @@ end
 function t.getRandomBossRoomPlayerSpawn(p1)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")
 	assert(CollectionService:HasTag(p1, MansionRobberyConsts.TAG_NAME), "Obj does not have mansion robbery tag")
-	local v3 = t.getBossRoomPlayerSpawns(p1)
-	return v3[math.random(#v3)]
+	local var3 = t.getBossRoomPlayerSpawns(p1)
+	return var3[math.random(#var3)]
 end
 function t.getPlayersInRobbery(p1)
 	assert(typeof(p1) == "Instance", "Invalid obj passed")

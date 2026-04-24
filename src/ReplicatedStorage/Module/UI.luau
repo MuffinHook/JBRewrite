@@ -90,22 +90,22 @@ function t2.Add(p1, p2)
 	if not WorldPosition then
 		WorldPosition = p1.Attachment and p1.Attachment.WorldPosition or (p1.Part and p1.Part.Position or v2)
 	end
-	v3:Insert(p1, WorldPosition)
+	var3:Insert(p1, WorldPosition)
 	return function()
 		return t2.Remove(p2)
 	end
 end
 function t2.Remove(p1)
 	for i = #t3, 1, -1 do
-		local v1 = t3[i]
-		if v1.Tag == p1 then
-			if t2.Spec == v1 then
-				if v1.HideFun then
-					v1:HideFun()
+		local color = t3[i]
+		if color.Tag == p1 then
+			if t2.Spec == color then
+				if color.HideFun then
+					color:HideFun()
 				end
 				t2.Spec = nil
 			end
-			v3:Remove(v1)
+			var3:Remove(color)
 			table.remove(t3, i)
 			return true
 		end
@@ -121,9 +121,9 @@ local function SetCirclePct(percentage)
 	local Frame = t2.Frame
 	local Image = Frame.OuterFrame.Left.Image
 	local Image_2 = Frame.OuterFrame.Right.Image
-	local v1 = math.clamp(p1 * 360, 0, 360)
-	Image.UIGradient.Rotation = math.clamp(v1, 180, 360)
-	Image_2.UIGradient.Rotation = math.clamp(v1, 0, 180)
+	local color = math.clamp(p1 * 360, 0, 360)
+	Image.UIGradient.Rotation = math.clamp(color, 180, 360)
+	Image_2.UIGradient.Rotation = math.clamp(color, 0, 180)
 	local v2 = p1 < 0.999
 	Image.Visible = v2
 	Image_2.Visible = v2
@@ -154,11 +154,11 @@ local function afSpin_Start()
 	local Frame_2 = t2.Frame
 	Frame_2.OuterFrame.Size = UDim2.new(1, 8, 1, 8)
 	Frame_2.OuterFrame.Position = UDim2.new(0, -4, 0, -4)
-	local v1 = Color3.fromRGB(214, 214, 214)
+	local color = Color3.fromRGB(214, 214, 214)
 	local Frame_3 = t2.Frame
-	Frame_3.OuterFrame.Left.Image.ImageColor3 = v1
-	Frame_3.OuterFrame.Right.Image.ImageColor3 = v1
-	Frame_3.OuterFrame.OuterFull.ImageColor3 = v1
+	Frame_3.OuterFrame.Left.Image.ImageColor3 = color
+	Frame_3.OuterFrame.Right.Image.ImageColor3 = color
+	Frame_3.OuterFrame.OuterFull.ImageColor3 = color
 end
 local function afSpin_End()
 	circleProgress = 1
@@ -173,11 +173,11 @@ local function afSpin_End()
 	local Frame_2 = t2.Frame
 	Frame_2.OuterFrame.Size = UDim2.new(1, 16, 1, 16)
 	Frame_2.OuterFrame.Position = UDim2.new(0, -8, 0, -8)
-	local v1 = Color3.fromRGB(214, 214, 214)
+	local color = Color3.fromRGB(214, 214, 214)
 	local Frame_3 = t2.Frame
-	Frame_3.OuterFrame.Left.Image.ImageColor3 = v1
-	Frame_3.OuterFrame.Right.Image.ImageColor3 = v1
-	Frame_3.OuterFrame.OuterFull.ImageColor3 = v1
+	Frame_3.OuterFrame.Left.Image.ImageColor3 = color
+	Frame_3.OuterFrame.Right.Image.ImageColor3 = color
+	Frame_3.OuterFrame.OuterFull.ImageColor3 = color
 end
 local function afSpin_Update(spec, progress, deltaTime)
 	local sinValue = sin(progress) / 0.8414709848078965
@@ -196,15 +196,15 @@ end
 local pulseProgress = 1
 local function Ease_outBack(p1, p2, p3, p4, p5)
 	p5 = p5 or 1.70158
-	local v1 = p1 / p4 - 1
-	return p3 * (v1 * v1 * ((p5 + 1) * v1 + p5) + 1) + p2
+	local color = p1 / p4 - 1
+	return p3 * (color * color * ((p5 + 1) * color + p5) + 1) + p2
 end
 local function afPulse_Start()
-	local v1 = Color3.fromRGB(214, 214, 214)
+	local color = Color3.fromRGB(214, 214, 214)
 	local Frame = t2.Frame
-	Frame.OuterFrame.Left.Image.ImageColor3 = v1
-	Frame.OuterFrame.Right.Image.ImageColor3 = v1
-	Frame.OuterFrame.OuterFull.ImageColor3 = v1
+	Frame.OuterFrame.Left.Image.ImageColor3 = color
+	Frame.OuterFrame.Right.Image.ImageColor3 = color
+	Frame.OuterFrame.OuterFull.ImageColor3 = color
 	local Frame_2 = t2.Frame
 	Frame_2.OuterFrame.Size = UDim2.new(1, 0, 1, 0)
 	Frame_2.OuterFrame.Position = UDim2.new(0, -0, 0, -0)
@@ -220,11 +220,11 @@ local function afPulse_End()
 	Image_2.Visible = false
 	Frame.OuterFrame.OuterFull.Visible = true
 	pulseProgress = 1
-	local v1 = Color3.fromRGB(214, 214, 214)
+	local color = Color3.fromRGB(214, 214, 214)
 	local Frame_2 = t2.Frame
-	Frame_2.OuterFrame.Left.Image.ImageColor3 = v1
-	Frame_2.OuterFrame.Right.Image.ImageColor3 = v1
-	Frame_2.OuterFrame.OuterFull.ImageColor3 = v1
+	Frame_2.OuterFrame.Left.Image.ImageColor3 = color
+	Frame_2.OuterFrame.Right.Image.ImageColor3 = color
+	Frame_2.OuterFrame.OuterFull.ImageColor3 = color
 	local Frame_3 = t2.Frame
 	Frame_3.OuterFrame.Size = UDim2.new(1, 16, 1, 16)
 	Frame_3.OuterFrame.Position = UDim2.new(0, -8, 0, -8)
@@ -272,7 +272,7 @@ local function Press()
 			spinSpec.Elapsed = Spec.GetAccumulation()
 			end
 			t.Push(animationGroup, spinSpec)
-			Spec.Animation = v12
+			Spec.Animation = var12
 		elseif Spec:Callback(true) then
 			local pulseSpec = t.MakeSpec()
 			pulseSpec.Duration = 0.3
@@ -296,16 +296,16 @@ local function Release()
 	if Spec then
 		Spec.Pressed = false
 		Spec.PressedAt = nil
-		if v1.Running ~= nil and v1.Running == Spec.Animation then
-			v6 = v5
-			t.Cancel(v1)
-			local v12 = t.MakeSpec()
-			v12.Duration = 0.3
-			v12.Start = afPulse_Start
-			v12.End = afPulse_End
-			v12.Update = afPulse_Update
-			v12.Red = true
-			t.Push(v1, v12)
+		if color.Running ~= nil and color.Running == Spec.Animation then
+			var6 = var5
+			t.Cancel(color)
+			local var12 = t.MakeSpec()
+			var12.Duration = 0.3
+			var12.Start = afPulse_Start
+			var12.End = afPulse_End
+			var12.Update = afPulse_Update
+			var12.Red = true
+			t.Push(color, var12)
 		end
 		Spec.Animation = nil
 		Spec.ScreenPosition = nil
@@ -318,22 +318,22 @@ end
 t2.Press = Press
 t2.Release = Release
 local function UpdateUI()
-	local v1 = 999
-	local v22 = 1
-	local v32 = nil
+	local color = 999
+	local var22 = 1
+	local var32 = nil
 	for i = #t3, 1, -1 do
-		local v42 = t3[i]
-		if not v42.Kill and (v42.Part and not v42.Part:IsDescendantOf(workspace)) then
-			v42.Kill = true
+		local var42 = t3[i]
+		if not var42.Kill and (var42.Part and not var42.Part:IsDescendantOf(workspace)) then
+			var42.Kill = true
 		end
-		if v42.Kill then
-			if t2.Spec == v42 then
-				if v42.HideFun then
-					v42:HideFun()
+		if var42.Kill then
+			if t2.Spec == var42 then
+				if var42.HideFun then
+					var42:HideFun()
 				end
 				t2.Spec = nil
 			end
-			v3:Remove(v42)
+			var3:Remove(var42)
 			table.remove(t3, i)
 		end
 	end
@@ -342,98 +342,98 @@ local function UpdateUI()
 		local PrimaryPart = Character.PrimaryPart
 		if PrimaryPart then
 			local Position = PrimaryPart.Position
-			local v5 = os.clock()
+			local var5 = os.clock()
 			for i, v in ipairs(t4) do
 				if not (v.Kill or v.WorldPosition) then
-					local v6 = v.Attachment and v.Attachment.WorldPosition or v.Part and v.Part.Position
-					if v6 then
-						v3:Update(v, v6)
+					local var6 = v.Attachment and v.Attachment.WorldPosition or v.Part and v.Part.Position
+					if var6 then
+						var3:Update(v, var6)
 					end
 				end
 			end
-			if v5 - v4 >= 0.25 then
-				v4 = v5
+			if var5 - var4 >= 0.25 then
+				var4 = var5
 				for j = 1, #t3 do
-					local v8 = t3[j]
-					if not v8.Kill then
-						if v8.PreUpdateFun and (not v8.Part and (not v8.Attachment and not v8.WorldPosition)) then
-							v8:PreUpdateFun()
+					local var8 = t3[j]
+					if not var8.Kill then
+						if var8.PreUpdateFun and (not var8.Part and (not var8.Attachment and not var8.WorldPosition)) then
+							var8:PreUpdateFun()
 						end
-						local v10 = v8.WorldPosition or (v8.Attachment and v8.Attachment.WorldPosition or v8.Part and v8.Part.Position)
-						if v10 then
-							v3:Update(v8, v10)
+						local var10 = var8.WorldPosition or (var8.Attachment and var8.Attachment.WorldPosition or var8.Part and var8.Part.Position)
+						if var10 then
+							var3:Update(var8, var10)
 						end
 					end
 				end
 			end
-			local v11 = v3:QueryRadius(Position, 256)
-			t4 = v11
+			local var11 = var3:QueryRadius(Position, 256)
+			t4 = var11
 			local t = { Character }
-			for i, v in ipairs(v11) do
-				local v12, v13, v14, v15
+			for i, v in ipairs(var11) do
+				local var12, v13, v14, v15
 				local Part = v.Part
 				local Attachment = v.Attachment
-				local v16 = v.WorldPosition or (Attachment == nil and (Part == nil and v2 or Part.Position) or Attachment.WorldPosition)
-				local v17 = v16 - Position
-				local v18 = Vector3.new(v17.X, 0, v17.Z)
-				local v19 = Vector3.new(0, v17.Y, 0)
-				local Magnitude = v17.Magnitude
-				local Magnitude_2 = v18.Magnitude
-				local Magnitude_3 = v19.Magnitude
+				local var16 = v.WorldPosition or (Attachment == nil and (Part == nil and v2 or Part.Position) or Attachment.WorldPosition)
+				local var17 = var16 - Position
+				local vector18 = Vector3.new(var17.X, 0, var17.Z)
+				local vector19 = Vector3.new(0, var17.Y, 0)
+				local Magnitude = var17.Magnitude
+				local Magnitude_2 = vector18.Magnitude
+				local Magnitude_3 = vector19.Magnitude
 				local Dist = v.Dist
 				local HorizontalDist = v.HorizontalDist
 				local VerticalDist = v.VerticalDist
 				local IgnoreOverride = v.IgnoreOverride
-				if v.PreUpdateFun and (not Part or Magnitude <= Dist) and (not v.LastPreUpdate or (v.PreUpdatePeriod or 0.2) <= v5 - v.LastPreUpdate) then
-					v.LastPreUpdate = v5
+				if v.PreUpdateFun and (not Part or Magnitude <= Dist) and (not v.LastPreUpdate or (v.PreUpdatePeriod or 0.2) <= var5 - v.LastPreUpdate) then
+					v.LastPreUpdate = var5
 					v:PreUpdateFun()
 				end
 				if v.Enabled and (not t2.Spec or (v == t2.Spec or not t2.Spec.Pressed)) then
-					v12 = if HorizontalDist == nil then false else Magnitude_2 <= HorizontalDist
+					var12 = if HorizontalDist == nil then false else Magnitude_2 <= HorizontalDist
 					v13 = if VerticalDist == nil then false else Magnitude_3 <= VerticalDist
-					v14 = if Dist == nil then v12 and v13 else Magnitude <= Dist
+					v14 = if Dist == nil then var12 and v13 else Magnitude <= Dist
 					if v14 then
-						local v21 = false
+						local var21 = false
 						if v.NoRay then
-							v21 = true
+							var21 = true
 						else
-							local v222 = RaycastParams.new()
-							v222.FilterDescendantsInstances = IgnoreOverride or t
-							local v23 = Raycast.collidable(Position, v17.Unit, Magnitude, v222)
-							local v24 = nil
-							if v23 then
-								v24 = v23.Instance
-								v15 = v23.Position
+							local instance222 = RaycastParams.new()
+							instance222.FilterDescendantsInstances = IgnoreOverride or t
+							local var23 = Raycast.collidable(Position, var17.Unit, Magnitude, instance222)
+							local var24 = nil
+							if var23 then
+								var24 = var23.Instance
+								v15 = var23.Position
 							else
-								v15 = Position + v17.Unit * Magnitude
+								v15 = Position + var17.Unit * Magnitude
 							end
-							if (v15 - v16).Magnitude <= 1 or v24 and (v24 == v.Part or v.ValidRoot and v24:IsDescendantOf(v.ValidRoot)) then
-								v21 = true
+							if (v15 - var16).Magnitude <= 1 or var24 and (var24 == v.Part or v.ValidRoot and var24:IsDescendantOf(v.ValidRoot)) then
+								var21 = true
 							end
 						end
-						if v21 then
+						if var21 then
 							local Priority = v.Priority
-							if Magnitude <= v1 or v22 < Priority then
-								v1 = Magnitude
-								v22 = Priority
-								v32 = v
+							if Magnitude <= color or var22 < Priority then
+								color = Magnitude
+								var22 = Priority
+								var32 = v
 							end
 						end
 					end
 				end
 			end
 			local Spec = t2.Spec
-			if not Spec or (v32 == Spec or not Spec.Pressed) then
-				if Spec and (Spec.HideFun and v32 ~= Spec) then
+			if not Spec or (var32 == Spec or not Spec.Pressed) then
+				if Spec and (Spec.HideFun and var32 ~= Spec) then
 					Spec:HideFun()
 				end
-				t2.Spec = v32
-				if v32 then
-					if v32.ShowFun and v32 ~= Spec then
-						v32:ShowFun()
+				t2.Spec = var32
+				if var32 then
+					if var32.ShowFun and var32 ~= Spec then
+						var32:ShowFun()
 					end
-					if v32.Update then
-						v32:Update()
+					if var32.Update then
+						var32:Update()
 					end
 					return true
 				end
@@ -448,17 +448,17 @@ local function ProcessSpec()
 		if Spec.GetAccumulation then
 			sum = sum + Spec.GetAccumulation()
 		end
-		local v12 = sum / Spec.Duration
-		if v12 >= 1 then
-			v12 = 1
+		local var12 = sum / Spec.Duration
+		if var12 >= 1 then
+			var12 = 1
 		end
 		if Spec.WhilePressedUpdate then
-			Spec.WhilePressedUpdate(v12)
+			Spec.WhilePressedUpdate(var12)
 		end
 		if Spec.ForceRelease then
 			Spec.ForceRelease = false
 			Release()
-		elseif v12 == 1 then
+		elseif var12 == 1 then
 			Spec.Pressed = false
 			Spec.PressedAt = nil
 			local v2 = Spec:Callback(true)
@@ -466,33 +466,33 @@ local function ProcessSpec()
 				Spec:ReleaseCallback(true)
 			end
 			if v2 then
-				local v3 = t.MakeSpec()
-				v3.Duration = 0.5
-				v3.Start = afPulse_Start
-				v3.End = afPulse_End
-				v3.Update = afPulse_Update
-				t.Push(v1, v3)
+				local var3 = t.MakeSpec()
+				var3.Duration = 0.5
+				var3.Start = afPulse_Start
+				var3.End = afPulse_End
+				var3.Update = afPulse_Update
+				t.Push(color, var3)
 				return
 			end
-			local v4 = t.MakeSpec()
-			v4.Duration = 0.3
-			v4.Start = afPulse_Start
-			v4.End = afPulse_End
-			v4.Update = afPulse_Update
-			v4.Red = true
-			t.Push(v1, v4)
+			local var4 = t.MakeSpec()
+			var4.Duration = 0.3
+			var4.Start = afPulse_Start
+			var4.End = afPulse_End
+			var4.Update = afPulse_Update
+			var4.Red = true
+			t.Push(color, var4)
 		end
 	end
 end
 local function UpdatePlatform()
 	local Frame = t2.Frame
-	local v1 = UserInputService:GetLastInputType()
+	local color = UserInputService:GetLastInputType()
 	local v2
 	if InputUtils.isTouch() then
 		v2 = nil
-	elseif v1 == Enum.UserInputType.Gamepad1 then
-		local v3 = UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonY)
-		v2 = if v3 == "ButtonTriangle" then "\226\150\179" elseif v3 == "ButtonY" then "Y" else v3
+	elseif color == Enum.UserInputType.Gamepad1 then
+		local var3 = UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonY)
+		v2 = if var3 == "ButtonTriangle" then "\226\150\179" elseif var3 == "ButtonY" then "Y" else var3
 	else
 		v2 = "E"
 	end
@@ -547,13 +547,13 @@ function t2.UpdateVisual(deltaTime)
 	end
 	t.Update(animationGroup, deltaTime)
 end
-local v8 = false
+local var8 = false
 local function TouchStarted(p1)
 	local Spec = t2.Spec
 	if Spec then
 		local ScreenPosition = Spec.ScreenPosition
 		if ScreenPosition and (p1.Position - ScreenPosition).Magnitude < t2.Frame.AbsoluteSize.X * 0.5 then
-			v8 = true
+			var8 = true
 			Press()
 			return true
 		else
@@ -562,36 +562,36 @@ local function TouchStarted(p1)
 	end
 end
 local function TouchEnded(p1)
-	if v8 then
-		v8 = false
+	if var8 then
+		var8 = false
 		Release()
 	end
 end
-local v9 = nil
+local var9 = nil
 local function InputBegan(p1, p2)
 	if not p2 and p1.UserInputType == Enum.UserInputType.MouseButton1 then
 		local Spec = t2.Spec
-		local v1
+		local color
 		if Spec then
 			local ScreenPosition = Spec.ScreenPosition
 			if ScreenPosition and (p1.Position - ScreenPosition).Magnitude < t2.Frame.AbsoluteSize.X * 0.5 then
-				v8 = true
+				var8 = true
 				Press()
-				v1 = true
+				color = true
 			else
-				v1 = false
+				color = false
 			end
 		else
-			v1 = nil
+			color = nil
 		end
-		if v1 then
-			v9 = Enum.UserInputType.MouseButton1
+		if color then
+			var9 = Enum.UserInputType.MouseButton1
 		end
 	end
 end
 local function InputEnded(p1, p2)
-	if not p2 and (p1.UserInputType == Enum.UserInputType.MouseButton1 and v9 == Enum.UserInputType.MouseButton1 and v8) then
-		v8 = false
+	if not p2 and (p1.UserInputType == Enum.UserInputType.MouseButton1 and var9 == Enum.UserInputType.MouseButton1 and var8) then
+		var8 = false
 		Release()
 	end
 end

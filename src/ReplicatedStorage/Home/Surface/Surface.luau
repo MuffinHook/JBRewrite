@@ -5,23 +5,23 @@ local SurfaceUtils = require(script.Parent.SurfaceUtils)
 local t = {}
 t.__index = t
 t.__ClassName = "Surface"
-function t.new(p1)
+function t.new(self)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
-	t2._obj = p1
+	t2._obj = self
 	return t2
 end
-function t.GetPlacementPrism(p1)
-	return SurfaceUtils.getPlacementPrism(p1._obj.CFrame, p1._obj.Size)
+function t.GetPlacementPrism(self)
+	return SurfaceUtils.getPlacementPrism(self._obj.CFrame, self._obj.Size)
 end
-function t.GetStandingPrism(p1)
-	return SurfaceUtils.getStandingPrism(p1._obj.CFrame, p1._obj.Size)
+function t.GetStandingPrism(self)
+	return SurfaceUtils.getStandingPrism(self._obj.CFrame, self._obj.Size)
 end
-function t.Destroy(p1)
-	local _maid = p1._maid
+function t.Destroy(self)
+	local _maid = self._maid
 	assert(_maid ~= nil)
-	p1._maid = nil
+	self._maid = nil
 	_maid:Destroy()
 end
 return t

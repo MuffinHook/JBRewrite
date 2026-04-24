@@ -35,28 +35,28 @@ return function(p1, p2)
 			return Iris_Image
 		end,
 		Update = function(p1)
-			local v1 = p1.Instance
-			v1.Image = p1.arguments.Image or p2.ICONS.UNKNOWN_TEXTURE
-			v1.Size = p1.arguments.Size
+			local instance = p1.Instance
+			instance.Image = p1.arguments.Image or p2.ICONS.UNKNOWN_TEXTURE
+			instance.Size = p1.arguments.Size
 			if p1.arguments.ScaleType then
-				v1.ScaleType = p1.arguments.ScaleType
+				instance.ScaleType = p1.arguments.ScaleType
 				if p1.arguments.ScaleType == Enum.ScaleType.Tile and p1.arguments.TileSize then
-					v1.TileSize = p1.arguments.TileSize
+					instance.TileSize = p1.arguments.TileSize
 				elseif p1.arguments.ScaleType == Enum.ScaleType.Slice then
 					if p1.arguments.SliceCenter then
-						v1.SliceCenter = p1.arguments.SliceCenter
+						instance.SliceCenter = p1.arguments.SliceCenter
 					end
 					if p1.arguments.SliceScale then
-						v1.SliceScale = p1.arguments.SliceScale
+						instance.SliceScale = p1.arguments.SliceScale
 					end
 				end
 			end
 			if p1.arguments.Rect then
-				v1.ImageRectOffset = p1.arguments.Rect.Min
-				v1.ImageRectSize = Vector2.new(p1.arguments.Rect.Width, p1.arguments.Rect.Height)
+				instance.ImageRectOffset = p1.arguments.Rect.Min
+				instance.ImageRectSize = Vector2.new(p1.arguments.Rect.Width, p1.arguments.Rect.Height)
 			end
 			if p1.arguments.ResampleMode then
-				v1.ResampleMode = p1.arguments.ResampleMode
+				instance.ResampleMode = p1.arguments.ResampleMode
 			end
 		end
 	}))

@@ -3,21 +3,21 @@
 local RunService = game:GetService("RunService")
 local Maid = require(script.Parent.Maid)
 return {
-	linear = function(p1, p2, p3, p4)
-		local v1 = Maid.new()
-		local v2 = os.clock()
-		local v3 = p1[p2]
-		v1:GiveTask(RunService.Heartbeat:Connect(function()
-			local v12 = (os.clock() - v2) / p4
-			if v12 >= 1 then
-				v12 = 1
+	linear = function(obj, property, targetValue, duration)
+		local cleanup = Maid.new()
+		local startTime = os.clock()
+		local startValue = obj[property]
+		cleanup:GiveTask(RunService.Heartbeat:Connect(function()
+			local progress = (os.clock() - startTime) / duration
+			if progress >= 1 then
+				progress = 1
 			end
-			p1[p2] = v3 * (1 - v12) + p3 * v12
-			if v12 == 1 then
-				p1[p2] = p3
-				v1:DoCleaning()
+			obj[property] = startValue * (1 - progress) + targetValue * progress
+			if progress == 1 then
+				obj[property] = targetValue
+				cleanup:DoCleaning()
 			end
 		end))
-		return v1
+		return cleanup
 	end
 }

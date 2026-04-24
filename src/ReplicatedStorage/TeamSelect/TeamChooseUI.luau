@@ -7,7 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Teams = game:GetService("Teams")
 local VoiceChatService = game:GetService("VoiceChatService")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
-local v1 = RunUtils.isStudio()
+local localPlayer = RunUtils.isStudio()
 local Localization = require(ReplicatedStorage.Module.Localization)
 local CinematicCamera = require(ReplicatedStorage.Module.CinematicCamera)
 require(ReplicatedStorage.Game.GameUtil)
@@ -75,8 +75,8 @@ local t = {
 	}
 }
 local t2 = {}
-for v2, v3 in t do
-	t2[v2] = {
+for instance2, var3 in t do
+	t2[instance2] = {
 		p = Vector3.new(0, 0, 0),
 		LookVector = Vector3.new(0, 0, -1)
 	}
@@ -87,164 +87,164 @@ end
 local function Ease_InOutQuad(p1)
 	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
 end
-local v4 = nil
-local v5 = nil
-local v6 = nil
+local var4 = nil
+local var5 = nil
+local var6 = nil
 local t3 = {
 	ColorCorrection = nil,
 	Maid = Maid.new()
 }
 function t3.Init(p1)
-	v4 = p1.Event
-	v5 = p1.em
-	v6 = p1.OnJump
+	var4 = p1.Event
+	var5 = p1.em
+	var6 = p1.OnJump
 	t3.ColorCorrection = Lighting:FindFirstChild("ColorCorrection")
-	function v5.rh1aeent()
+	function var5.rh1aeent()
 		t3.Hide()
 	end
-	function v5.zijzuhxq(p1)
+	function var5.zijzuhxq(p1)
 		if TeamShared.isTeamSwitchingEnabled() then
 			t3.Show(p1)
 		end
 	end
-	if not v1 or Settings.Test.ChooseTeamInitially then
-		v5.zijzuhxq(true)
+	if not localPlayer or Settings.Test.ChooseTeamInitially then
+		var5.zijzuhxq(true)
 	end
 end
 function t3.Show(p1)
 	local Maid = t3.Maid
 	local ColorCorrection = t3.ColorCorrection
 	assert(ColorCorrection)
-	local v1 = nil
-	local v2 = ScreenFade.new()
-	local v3 = 0
-	local v42 = 0
-	local v52 = CinematicCamera.MakeCinematicCamera()
+	local localPlayer = nil
+	local instance2 = ScreenFade.new()
+	local var3 = 0
+	local var42 = 0
+	local var52 = CinematicCamera.MakeCinematicCamera()
 	local function UpdateCamera()
-		v42 = v42 + 1
+		var42 = var42 + 1
 		ColorCorrection.TintColor = Color3.new(255/255, 255/255, 255/255)
-		local v1 = if RunUtils.isStudio() then t2 else t
-		v3 = v3 % 3 + 1
-		local v2 = v1["City" .. v3 .. "_Start"]
-		local v32 = v1["City" .. v3 .. "_Stop"]
-		local v4 = CFrame.new(Vector3.new(), v2.LookVector) + v2.p
-		local v5 = CFrame.new(Vector3.new(), v32.LookVector) + v32.p
-		v52.StartPosition = v4.p
-		v52.TargetPosition = v5.p
-		v52.LookVector = v4.LookVector
-		v52.TargetLookVector = nil
+		local localPlayer = if RunUtils.isStudio() then t2 else t
+		var3 = var3 % 3 + 1
+		local instance2 = localPlayer["City" .. var3 .. "_Start"]
+		local var32 = localPlayer["City" .. var3 .. "_Stop"]
+		local var4 = CFrame.new(Vector3.new(), instance2.LookVector) + instance2.p
+		local var5 = CFrame.new(Vector3.new(), var32.LookVector) + var32.p
+		var52.StartPosition = var4.p
+		var52.TargetPosition = var5.p
+		var52.LookVector = var4.LookVector
+		var52.TargetLookVector = nil
 	end
-	local v62 = tick()
-	local v7 = p1 ~= nil
+	local var62 = tick()
+	local var7 = p1 ~= nil
 	local function RenderStepped(p1)
-		local v1 = tick()
-		local v2 = v1 - v62
+		local localPlayer = tick()
+		local instance2 = localPlayer - var62
 		if CurrentCamera.CameraType ~= Enum.CameraType.Scriptable then
 			CurrentCamera.CameraType = Enum.CameraType.Scriptable
 		end
-		if v7 then
-			if v2 >= 24 then
+		if var7 then
+			if instance2 >= 24 then
 				UpdateCamera()
-				v62 = v1
+				var62 = localPlayer
 			end
-			local v3 = v2 / 24
-			if v3 <= 0.1 and v42 ~= 1 then
-				local v4 = v3 / 0.1
-				local v5, v6
-				if v4 < 0.5 then
-					v5 = 2 * v4 * v4
-					if not v5 then
-						v6 = v4
-						v5 = -1 - 2 * (v4 - 2) * v4
+			local var3 = instance2 / 24
+			if var3 <= 0.1 and var42 ~= 1 then
+				local var4 = var3 / 0.1
+				local var5, var6
+				if var4 < 0.5 then
+					var5 = 2 * var4 * var4
+					if not var5 then
+						var6 = var4
+						var5 = -1 - 2 * (var4 - 2) * var4
 					end
 				else
-					v6 = v4
-					v5 = -1 - 2 * (v4 - 2) * v4
+					var6 = var4
+					var5 = -1 - 2 * (var4 - 2) * var4
 				end
-				ColorCorrection.TintColor = Color3.new(v5, v5, v5)
-			elseif v3 >= 0.9 then
-				local v72 = 1 - (v3 - 0.9) / 0.1
-				local v8, v9
-				if v72 < 0.5 then
-					v8 = 2 * v72 * v72
-					if not v8 then
-						v9 = v72
-						v8 = -1 - 2 * (v72 - 2) * v72
+				ColorCorrection.TintColor = Color3.new(var5, var5, var5)
+			elseif var3 >= 0.9 then
+				local var72 = 1 - (var3 - 0.9) / 0.1
+				local var8, var9
+				if var72 < 0.5 then
+					var8 = 2 * var72 * var72
+					if not var8 then
+						var9 = var72
+						var8 = -1 - 2 * (var72 - 2) * var72
 					end
 				else
-					v9 = v72
-					v8 = -1 - 2 * (v72 - 2) * v72
+					var9 = var72
+					var8 = -1 - 2 * (var72 - 2) * var72
 				end
-				ColorCorrection.TintColor = Color3.new(v8, v8, v8)
+				ColorCorrection.TintColor = Color3.new(var8, var8, var8)
 			end
-			CinematicCamera.StepCinematicCamera(p1, v52, 0.1, v3)
+			CinematicCamera.StepCinematicCamera(p1, var52, 0.1, var3)
 		end
 	end
 	Maid:GiveTask(RunService.RenderStepped:Connect(RenderStepped))
 	UpdateCamera()
-	local v8 = false
+	local var8 = false
 	local function play()
-		if v8 then
-		elseif TeamShared.isTeamFull(v1) then
-			v1 = nil
+		if var8 then
+		elseif TeamShared.isTeamFull(localPlayer) then
+			localPlayer = nil
 			Notification.new({
 				Text = Localization:FormatByKey("Teams.TeamFull")
 			})
 		else
-			v8 = true
-			v2:FadeToLinear(0, 0.3)
-			v4:FireServer("c" .. "" .. ("bds94b"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("wfb5itc"):sub(3, 6):reverse():reverse():reverse():reverse():reverse() .. "x", v1)
+			var8 = true
+			instance2:FadeToLinear(0, 0.3)
+			var4:FireServer("c" .. "" .. ("bds94b"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("wfb5itc"):sub(3, 6):reverse():reverse():reverse():reverse():reverse() .. "x", localPlayer)
 			Maid:GiveTask(task.delay(2, function()
-				v2:Set(1)
-				v8 = false
+				instance2:Set(1)
+				var8 = false
 			end))
 		end
 	end
-	local v9 = Roact.createRef()
+	local var9 = Roact.createRef()
 	local function getComponent()
 		EzUtils.isSmallScreen()
 		local sum = 0
 		local sum_2 = 0
-		for v2, v3 in Teams:GetChildren() do
-			if v3.Name == "Police" then
-				sum_2 = sum_2 + #v3:GetPlayers()
+		for instance2, var3 in Teams:GetChildren() do
+			if var3.Name == "Police" then
+				sum_2 = sum_2 + #var3:GetPlayers()
 			else
-				sum = sum + #v3:GetPlayers()
+				sum = sum + #var3:GetPlayers()
 			end
 		end
-		local v4 = RunUtils.getPlaceType() == "Default"
+		local var4 = RunUtils.getPlaceType() == "Default"
 		local _ = RunUtils.getPlaceType() == "VoiceChat"
-		local v5 = RunUtils.getPlaceType() == "Pro"
+		local var5 = RunUtils.getPlaceType() == "Pro"
 		local t = {}
 		local t2 = {
 			onClicked = function()
-				local v1 = if v4 then "VoiceChat" else "Default"
-				local v2, v3 = pcall(function()
+				local localPlayer = if var4 then "VoiceChat" else "Default"
+				local instance2, var3 = pcall(function()
 					return VoiceChatService:IsVoiceEnabledForUserIdAsync(Players.LocalPlayer.UserId)
 				end)
-				if v4 and not (v2 and v3) then
+				if var4 and not (instance2 and var3) then
 					Notification.new({
 						Text = "Enable voice chat to join voice chat servers!"
 					})
 				else
-					ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(v1)
+					ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(localPlayer)
 				end
 			end
 		}
-		t2.text = if v4 then "VOICECHAT SERVERS" else "MAIN SERVERS"
+		t2.text = if var4 then "VOICECHAT SERVERS" else "MAIN SERVERS"
 		local t3 = {
 			onClicked = function()
-				local v1 = if v5 then "VoiceChat" else "Pro"
-				local v2, v3 = pcall(function()
+				local localPlayer = if var5 then "VoiceChat" else "Pro"
+				local instance2, var3 = pcall(function()
 					return VoiceChatService:IsVoiceEnabledForUserIdAsync(Players.LocalPlayer.UserId)
 				end)
-				if v5 and not (v2 and v3) then
+				if var5 and not (instance2 and var3) then
 					Notification.new({
 						Text = "Enable voice chat to join voice chat servers!"
 					})
-				elseif v5 or not (Players.LocalPlayer.AccountAge < 60) then
-					if v5 or Players.LocalPlayer:GetAttribute("ProServerAccess") then
-						ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(v1)
+				elseif var5 or not (Players.LocalPlayer.AccountAge < 60) then
+					if var5 or Players.LocalPlayer:GetAttribute("ProServerAccess") then
+						ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(localPlayer)
 					else
 						Notification.new({
 							Text = "You need $5 million to enter High Roller servers!"
@@ -257,7 +257,7 @@ function t3.Show(p1)
 				end
 			end
 		}
-		t3.text = if v5 then "VOICECHAT SERVERS" else "HIGH ROLLER SERVERS"
+		t3.text = if var5 then "VOICECHAT SERVERS" else "HIGH ROLLER SERVERS"
 		t[1] = t2
 		t[2] = t3
 		t[3] = {
@@ -279,34 +279,34 @@ function t3.Show(p1)
 				textColor = Color3.fromHex("e88839")
 			})
 		end
-		local v8 = Players.LocalPlayer:GetAttribute("AllowCriminalSpawn")
+		local var8 = Players.LocalPlayer:GetAttribute("AllowCriminalSpawn")
 		return createElement("ScreenGui", {
 			IgnoreGuiInset = true,
-			Enabled = v7
+			Enabled = var7
 		}, {
 			TeamSelect = createElement(TeamSelect, {
 				size = UDim2.fromScale(1, 1),
 				numPolice = sum_2,
 				numCriminals = sum,
-				criminalButtonRef = v9,
-				allowCriminal = if v8 == nil then false else v8,
+				criminalButtonRef = var9,
+				allowCriminal = if var8 == nil then false else var8,
 				onTeamSelected = function(p1)
-					v1 = p1
+					localPlayer = p1
 					play()
 				end,
 				serverButtons = t
 			})
 		})
 	end
-	local v10 = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "TeamSelectGui")
-	if v9:getValue() then
-		EzUtils.selectIfGamepad((v9:getValue()))
+	local localPlayer = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "TeamSelectGui")
+	if var9:getValue() then
+		EzUtils.selectIfGamepad((var9:getValue()))
 	end
 	Maid:GiveTask(function()
-		Roact.unmount(v10)
+		Roact.unmount(localPlayer)
 	end)
 	local function update()
-		Roact.update(v10, getComponent())
+		Roact.update(localPlayer, getComponent())
 	end
 	for v12, v13 in Teams:GetChildren() do
 		Maid:GiveTask(v13.PlayerAdded:Connect(update))
@@ -314,27 +314,27 @@ function t3.Show(p1)
 	end
 	Maid:GiveTask(function()
 		CurrentCamera.CameraType = Enum.CameraType.Custom
-		local v1 = CharacterUtils.getHumanoid(Players.LocalPlayer.Character)
-		if v1 then
-			CurrentCamera.CameraSubject = v1
+		local localPlayer = CharacterUtils.getHumanoid(Players.LocalPlayer.Character)
+		if localPlayer then
+			CurrentCamera.CameraSubject = localPlayer
 		end
-		v2:FadeToLinear(1, 0.3)
+		instance2:FadeToLinear(1, 0.3)
 		task.delay(0.3, function()
-			v2:Destroy()
+			instance2:Destroy()
 		end)
 	end)
 	InventoryItemSystem.unequipAll()
-	v6()
-	v5.dmg39zpa(true)
+	var6()
+	var5.dmg39zpa(true)
 	Maid:GiveTask(function()
 		ColorCorrection.TintColor = Color3.new(255/255, 255/255, 255/255)
 	end)
 	if not p1 then
-		v2:FadeToLinear(0, 0.3)
+		instance2:FadeToLinear(0, 0.3)
 		Maid:GiveTask(task.delay(0.4, function()
-			v7 = true
-			Roact.update(v10, getComponent())
-			v2:FadeToLinear(1, 0.3)
+			var7 = true
+			Roact.update(localPlayer, getComponent())
+			instance2:FadeToLinear(1, 0.3)
 		end))
 	end
 	local gui = WorldMarkerSystem.gui

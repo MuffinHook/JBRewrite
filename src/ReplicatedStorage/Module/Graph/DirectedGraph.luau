@@ -51,15 +51,15 @@ function t.HasEdge(p1, p2, p3)
 	return if p1.MapNodeNode[p2] == nil then false else p1.MapNodeNode[p2][p3] == true
 end
 function t.Inverse(p1)
-	local v1 = getmetatable(p1).new()
+	local instance = getmetatable(p1).new()
 	for i, v in ipairs(p1.ListNode) do
-		v1:AddNode(v)
+		instance:AddNode(v)
 	end
 	for k, v in pairs(p1.MapNodeNode) do
 		for k2 in pairs(v) do
-			v1:AddEdge(k2, k)
+			instance:AddEdge(k2, k)
 		end
 	end
-	return v1
+	return instance
 end
 return t

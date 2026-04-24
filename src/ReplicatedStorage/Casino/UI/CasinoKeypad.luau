@@ -8,65 +8,65 @@ local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local createElement = Roact.createElement
 local Keypad = require(ReplicatedStorage.App.UI.Keypad)
-local v1 = Roact.PureComponent:extend("CasinoKeypad")
-v1.defaultProps = {
+local CasinoKeypadComponent = Roact.PureComponent:extend("CasinoKeypad")
+CasinoKeypadComponent.defaultProps = {
 	expireDistance = 16
 }
-function v1.init(p1)
-	p1.maid = Maid.new()
+function CasinoKeypadComponent.init(self)
+	self.maid = Maid.new()
 end
-function v1.render(p1)
-	if p1.props.keypadVisible then
+function CasinoKeypadComponent.render(self)
+	if self.props.keypadVisible then
 		return createElement(Keypad, {
 			title = "Search around the room...",
 			size = UDim2.new(0.5, 0, 0.5, 0),
 			onSubmit = function(...)
-				p1.props.keypadCallback(...)
-				p1.props.onClickClose()
+				self.props.keypadCallback(...)
+				self.props.onClickClose()
 			end,
-			onClickClose = p1.props.onClickClose
+			onClickClose = self.props.onClickClose
 		})
 	end
 end
-function v1.didUpdate(p1, p2)
-	if p1.props.keypadVisible ~= p2.keypadVisible then
-		if p1.props.keypadVisible then
-			if p1.props.expireDistance then
-				local v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-				if v1 then
-					local Position = v1.Position
-					p1.maid.expireDistCheck = Interval.every(1):Connect(function()
-						v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-						if v1 then
-							if (v1.Position - Position).Magnitude > p1.props.expireDistance then
-								p1.props.onClickClose()
+function CasinoKeypadComponent.didUpdate(self, previousProps)
+	if self.props.keypadVisible ~= previousProps.keypadVisible then
+		if self.props.keypadVisible then
+			if self.props.expireDistance then
+				local rootPart = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+				if rootPart then
+					local initialPosition = rootPart.Position
+					self.maid.expireDistCheck = Interval.every(1):Connect(function()
+						rootPart = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+						if rootPart then
+							if (rootPart.Position - initialPosition).Magnitude > self.props.expireDistance then
+								self.props.onClickClose()
 							end
 						else
-							p1.props.onClickClose()
+							self.props.onClickClose()
 						end
 					end)
 				end
 			end
 		else
-			p1.maid.expireDistCheck = nil
+			self.maid.expireDistCheck = nil
 		end
 	end
 end
-function v1.willUnmount(p1)
-	p1.maid:DoCleaning()
+function CasinoKeypadComponent.willUnmount(self)
+	self.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(state, dispatch)
 	return {
-		keypadVisible = p1.casinoKeypadVisible,
-		keypadCallback = p1.casinoKeypadCallback
+		keypadVisible = state.casinoKeypadVisible,
+		keypadCallback = state.casinoKeypadCallback
 	}
-end, function(p1)
+end, function(dispatch)
 	return {
 		onClickClose = function()
-			p1({
+			dispatch({
 				type = "setCasinoKeypadVisible",
 				visible = false
 			})
 		end
 	}
-end)(v1)
+end)(CasinoKeypadComponent)

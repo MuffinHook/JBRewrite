@@ -1,12 +1,12 @@
 -- Reviewed by Claude
 -- variables reassigned
-local t = {
+local Maid = {
 	ClassName = "Maid"
 }
-function t.new()
+function Maid.new()
 	return setmetatable({
 		_tasks = {}
-	}, t)
+	}, Maid)
 end
 local function validateTask(task)
 	if typeof(task) == "RBXScriptSignal" then
@@ -16,7 +16,7 @@ local function validateTask(task)
 		error("[Maid.GiveTask] - Gave table task without .Destroy\n\n", 2)
 	end
 end
-function t._doTask(self, task)
+function Maid._doTask(self, task)
 	if typeof(task) == "function" then
 		task()
 	elseif typeof(task) == "RBXScriptConnection" then
@@ -29,18 +29,18 @@ function t._doTask(self, task)
 		warn("[Maid.DoCleaning] - Unable to clean task of type", (typeof(task)))
 	end
 end
-function t.isMaid(p1)
-	return if type(p1) == "table" then p1.ClassName == "Maid" else false
+function Maid.isMaid(value)
+	return if type(value) == "table" then value.ClassName == "Maid" else false
 end
-function t.__index(self, key)
-	if t[key] then
-		return t[key]
+function Maid.__index(self, key)
+	if Maid[key] then
+		return Maid[key]
 	else
 		return self._tasks[key]
 	end
 end
-function t.__newindex(self, key, newTask)
-	if t[key] ~= nil then
+function Maid.__newindex(self, key, newTask)
+	if Maid[key] ~= nil then
 		error(("\'%s\' is reserved"):format((tostring(key))), 2)
 	end
 	local tasks = self._tasks
@@ -58,47 +58,47 @@ function t.__newindex(self, key, newTask)
 		self:_doTask(oldTask)
 	end
 end
-function t.GiveTask(p1, p2)
-	if not p2 then
+function Maid.GiveTask(self, task)
+	if not task then
 		error("Task cannot be false or nil", 2)
 	end
-	if typeof(p2) == "RBXScriptSignal" then
+	if typeof(task) == "RBXScriptSignal" then
 		error("Task cannot be a RBXScriptSignal, did you mean RBXScriptConnection?", 2)
 	end
-	if type(p2) == "table" and not p2.Destroy then
+	if type(task) == "table" and not task.Destroy then
 		error("[Maid.GiveTask] - Gave table task without .Destroy\n\n", 2)
 	end
-	local v1 = #p1._tasks + 1
-	p1[v1] = p2
-	return v1
+	local nextIndex = #self._tasks + 1
+	self[nextIndex] = task
+	return nextIndex
 end
-function t.GivePromise(p1, p2)
-	local v1 = getmetatable(p2)
-	if p2:getStatus() == v1.Status.Started then
-		local v2 = p1:GiveTask(function()
-			p2:cancel()
+function Maid.GivePromise(self, promise)
+	local promiseMetatable = getmetatable(promise)
+	if promise:getStatus() == promiseMetatable.Status.Started then
+		local taskIndex = self:GiveTask(function()
+			promise:cancel()
 		end)
-		p2:finally(function()
-			p1[v2] = nil
+		promise:finally(function()
+			self[taskIndex] = nil
 		end)
 	end
-	return p2
+	return promise
 end
-function t.DoCleaning(p1)
-	local _tasks = p1._tasks
+function Maid.DoCleaning(self)
+	local _tasks = self._tasks
 	for k, v in pairs(_tasks) do
 		if typeof(v) == "RBXScriptConnection" or typeof(v) == "thread" then
 			_tasks[k] = nil
-			p1:_doTask(v)
+			self:_doTask(v)
 		end
 	end
-	local v1, v2 = next(_tasks)
-	while v2 ~= nil do
-		_tasks[v1] = nil
-		p1:_doTask(v2)
-		local v3, v4 = next(_tasks)
-		v2, v1 = v4, v3
+	local key, value = next(_tasks)
+	while value ~= nil do
+		_tasks[key] = nil
+		self:_doTask(value)
+		local nextKey, nextValue = next(_tasks)
+		value, key = nextValue, nextKey
 	end
 end
-t.Destroy = t.DoCleaning
-return t
+Maid.Destroy = Maid.DoCleaning
+return Maid

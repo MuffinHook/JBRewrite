@@ -26,26 +26,26 @@ return {
 					GamepassUtils.PromptGamepass(GamepassUtils.EnumGamepass.Walmart)
 				end)
 				Binder.new("WalmartPurchaseRegion", function(p1)
-					local v1 = Maid.new()
-					local v2 = Maid.new()
-					local v3 = Region.new(RegionUtils.ConditionPlayer)
-					v3:AddPart(p1)
-					v1:GiveTask(v3)
-					v1:GiveTask(v3.OnObjAdded:Connect(function(p1)
-						v2:DoCleaning()
+					local instance = Maid.new()
+					local instance2 = Maid.new()
+					local instance3 = Region.new(RegionUtils.ConditionPlayer)
+					instance3:AddPart(p1)
+					instance:GiveTask(instance3)
+					instance:GiveTask(instance3.OnObjAdded:Connect(function(p1)
+						instance2:DoCleaning()
 						if not GamepassSystem.doesPlayerOwnCached(Players.LocalPlayer, GamepassUtils.EnumGamepass.Walmart) then
 							WalmartGui.Enabled = true
-							v2:GiveTask(task.delay(2, function()  end))
+							instance2:GiveTask(task.delay(2, function()  end))
 						end
 					end))
-					v1:GiveTask(v3.OnObjRemoved:Connect(function(p1)
-						v2:DoCleaning()
+					instance:GiveTask(instance3.OnObjRemoved:Connect(function(p1)
+						instance2:DoCleaning()
 						WalmartGui.Enabled = false
 					end))
-					v1:GiveTask(Interval.every(0.3333333333333333):Connect(function()
-						v3:Update({ Players.LocalPlayer })
+					instance:GiveTask(Interval.every(0.3333333333333333):Connect(function()
+						instance3:Update({ Players.LocalPlayer })
 					end))
-					return v1
+					return instance
 				end):Start()
 				GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.Walmart):Connect(function()
 					WalmartGui.Enabled = false

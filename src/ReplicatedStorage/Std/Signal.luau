@@ -1,107 +1,107 @@
 -- Reviewed by Claude
 -- variables reassigned
-local v1 = nil
-local function acquireRunnerThreadAndCallEventHandler(p1, ...)
-	local v12 = v1
-	v1 = nil
-	p1(...)
-	v1 = v12
+local freeRunnerThread = nil
+local function acquireRunnerThreadAndCallEventHandler(handler, ...)
+	local savedThread = freeRunnerThread
+	freeRunnerThread = nil
+	handler(...)
+	freeRunnerThread = savedThread
 end
 local function runEventHandlerInFreeThread()
 	while true do
 		acquireRunnerThreadAndCallEventHandler(coroutine.yield())
 	end
 end
-local t = {}
-t.__index = t
-function t.new(p1, p2)
+local Connection = {}
+Connection.__index = Connection
+function Connection.new(signal, handler)
 	return setmetatable({
 		_connected = true,
-		_signal = p1,
-		_fn = p2,
+		_signal = signal,
+		_fn = handler,
 		_next = false
-	}, t)
+	}, Connection)
 end
-function t.Disconnect(p1)
-	p1._connected = false
-	if p1._signal._handlerListHead == p1 then
-		p1._signal._handlerListHead = p1._next
+function Connection.Disconnect(self)
+	self._connected = false
+	if self._signal._handlerListHead == self then
+		self._signal._handlerListHead = self._next
 	else
-		local _handlerListHead = p1._signal._handlerListHead
-		while _handlerListHead and _handlerListHead._next ~= p1 do
-			_handlerListHead = _handlerListHead._next
+		local currentHandler = self._signal._handlerListHead
+		while currentHandler and currentHandler._next ~= self do
+			currentHandler = currentHandler._next
 		end
-		if _handlerListHead then
-			_handlerListHead._next = p1._next
+		if currentHandler then
+			currentHandler._next = self._next
 		end
 	end
 end
-t.Destroy = t.Disconnect
-setmetatable(t, {
-	__index = function(p1, p2)
-		error(("Attempt to get Connection::%s (not a valid member)"):format((tostring(p2))), 2)
+Connection.Destroy = Connection.Disconnect
+setmetatable(Connection, {
+	__index = function(self, key)
+		error(("Attempt to get Connection::%s (not a valid member)"):format((tostring(key))), 2)
 	end,
-	__newindex = function(p1, p2, p3)
-		error(("Attempt to set Connection::%s (not a valid member)"):format((tostring(p2))), 2)
+	__newindex = function(self, key, value)
+		error(("Attempt to set Connection::%s (not a valid member)"):format((tostring(key))), 2)
 	end
 })
-local t3 = {}
-t3.__index = t3
-function t3.new()
+local Signal = {}
+Signal.__index = Signal
+function Signal.new()
 	return setmetatable({
 		_handlerListHead = false
-	}, t3)
+	}, Signal)
 end
-function t3.Connect(p1, p2)
-	local v1 = t.new(p1, p2)
-	if p1._handlerListHead then
-		v1._next = p1._handlerListHead
+function Signal.Connect(self, handler)
+	local connection = Connection.new(self, handler)
+	if self._handlerListHead then
+		connection._next = self._handlerListHead
 	end
-	p1._handlerListHead = v1
-	return v1
+	self._handlerListHead = connection
+	return connection
 end
-function t3.DisconnectAll(p1)
-	p1._handlerListHead = false
+function Signal.DisconnectAll(self)
+	self._handlerListHead = false
 end
-function t3.Fire(p1, ...)
-	local _handlerListHead = p1._handlerListHead
-	while _handlerListHead do
-		if _handlerListHead._connected then
-			if not v1 then
-				v1 = coroutine.create(runEventHandlerInFreeThread)
-				coroutine.resume(v1)
+function Signal.Fire(self, ...)
+	local currentHandler = self._handlerListHead
+	while currentHandler do
+		if currentHandler._connected then
+			if not freeRunnerThread then
+				freeRunnerThread = coroutine.create(runEventHandlerInFreeThread)
+				coroutine.resume(freeRunnerThread)
 			end
-			task.spawn(v1, _handlerListHead._fn, ...)
+			task.spawn(freeRunnerThread, currentHandler._fn, ...)
 		end
-		_handlerListHead = _handlerListHead._next
+		currentHandler = currentHandler._next
 	end
 end
-function t3.Wait(p1)
-	local v1 = coroutine.running()
-	local v2 = nil
-	v2 = p1:Connect(function(...)
-		v2:Disconnect()
-		task.spawn(v1, ...)
+function Signal.Wait(self)
+	local runningThread = coroutine.running()
+	local connection = nil
+	connection = self:Connect(function(...)
+		connection:Disconnect()
+		task.spawn(runningThread, ...)
 	end)
 	return coroutine.yield()
 end
-function t3.Once(p1, p2)
-	local v1 = nil
-	v1 = p1:Connect(function(...)
-		if v1._connected then
-			v1:Disconnect()
+function Signal.Once(self, handler)
+	local connection = nil
+	connection = self:Connect(function(...)
+		if connection._connected then
+			connection:Disconnect()
 		end
-		p2(...)
+		handler(...)
 	end)
-	return v1
+	return connection
 end
-t3.Destroy = t3.DisconnectAll
-setmetatable(t3, {
-	__index = function(p1, p2)
-		error(("Attempt to get Signal::%s (not a valid member)"):format((tostring(p2))), 2)
+Signal.Destroy = Signal.DisconnectAll
+setmetatable(Signal, {
+	__index = function(self, key)
+		error(("Attempt to get Signal::%s (not a valid member)"):format((tostring(key))), 2)
 	end,
-	__newindex = function(p1, p2, p3)
-		error(("Attempt to set Signal::%s (not a valid member)"):format((tostring(p2))), 2)
+	__newindex = function(self, key, value)
+		error(("Attempt to set Signal::%s (not a valid member)"):format((tostring(key))), 2)
 	end
 })
-return t3
+return Signal

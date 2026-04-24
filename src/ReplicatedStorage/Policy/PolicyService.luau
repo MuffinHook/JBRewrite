@@ -8,10 +8,10 @@ local t = {
 }
 function t.setCachedPlayerPolicyInfo(p1, p2)
 	t._data[p1.UserId] = p2
-	local v1 = t._observing[p1.UserId]
-	if v1 then
+	local tbl = t._observing[p1.UserId]
+	if tbl then
 		t._observing[p1.UserId] = nil
-		for v2, v3 in v1 do
+		for v2, v3 in tbl do
 			v3(p2)
 		end
 	end
@@ -20,9 +20,9 @@ function t.getCachedPlayerPolicyInfo(p1)
 	return t._data[p1.UserId]
 end
 function t.promiseCachedPlayerPolicyInfo(p1)
-	local v1 = t.getCachedPlayerPolicyInfo(p1)
-	if v1 then
-		return Promise.resolve(v1)
+	local tbl = t.getCachedPlayerPolicyInfo(p1)
+	if tbl then
+		return Promise.resolve(tbl)
 	else
 		return Promise.new(function(p12, p2, p3)
 			local UserId = p1.UserId
@@ -31,9 +31,9 @@ function t.promiseCachedPlayerPolicyInfo(p1)
 			end
 			if not p3(function()
 				if t._observing[UserId] then
-					local v1 = table.find(t._observing[UserId], p12)
-					if v1 then
-						table.remove(t._observing[UserId], v1)
+					local tbl = table.find(t._observing[UserId], p12)
+					if tbl then
+						table.remove(t._observing[UserId], tbl)
 					end
 				end
 			end) then

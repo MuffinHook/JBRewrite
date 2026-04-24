@@ -1,35 +1,35 @@
 -- Reviewed by Claude
 -- variables reassigned
-local t = {
-	comma = function(p1)
-		local v1, v2, v3 = string.match(tostring(p1), "^([^%d]*%d)(%d*)(.-)$")
-		return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
+local StringUtils = {
+	comma = function(number)
+		local before, middle, after = string.match(tostring(number), "^([^%d]*%d)(%d*)(.-)$")
+		return before .. middle:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. after
 	end,
-	getSortableStringFromNumber = function(p1, p2)
-		assert(p1 ~= nil)
-		assert(p2 ~= nil)
-		assert(p2 >= 0)
-		return ("%0." .. tostring(p2) .. "d"):format(p1)
+	getSortableStringFromNumber = function(number, precision)
+		assert(number ~= nil)
+		assert(precision ~= nil)
+		assert(precision >= 0)
+		return ("%0." .. tostring(precision) .. "d"):format(number)
 	end,
-	base85UUID = function(p1)
-		local t = {}
-		for i = 1, p1 do
-			local v1 = math.random(1, 85)
-			table.insert(t, (string.sub("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#", v1, v1)))
+	base85UUID = function(length)
+		local chars = {}
+		for i = 1, length do
+			local randomIndex = math.random(1, 85)
+			table.insert(chars, (string.sub("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#", randomIndex, randomIndex)))
 		end
-		return table.concat(t)
+		return table.concat(chars)
 	end,
-	getSuffixForNumber = function(p1)
-		local v1 = p1 % 100
-		if v1 == 11 or (v1 == 12 or v1 == 13) then
+	getSuffixForNumber = function(number)
+		local twoDigits = number % 100
+		if twoDigits == 11 or (twoDigits == 12 or twoDigits == 13) then
 			return "th"
 		else
-			local v2 = p1 % 10
-			if v2 == 1 then
+			local lastDigit = number % 10
+			if lastDigit == 1 then
 				return "st"
-			elseif v2 == 2 then
+			elseif lastDigit == 2 then
 				return "nd"
-			elseif v2 == 3 then
+			elseif lastDigit == 3 then
 				return "rd"
 			else
 				return "th"
@@ -37,24 +37,24 @@ local t = {
 		end
 	end
 }
-local function formatCount(p1)
-	if p1 % 1 <= 0.001 then
-		return tostring((math.floor(p1)))
+local function formatCount(number)
+	if number % 1 <= 0.001 then
+		return tostring((math.floor(number)))
 	else
-		return ("%.1f"):format(p1)
+		return ("%.1f"):format(number)
 	end
 end
-function t.getShortHand(p1)
-	local t = { "", "K", "M", "B", "T", "Q" }
-	local count = 1
-	while p1 >= 1000 and count < #t do
-		p1 = p1 / 1000
-		count = count + 1
+function StringUtils.getShortHand(number)
+	local suffixes = { "", "K", "M", "B", "T", "Q" }
+	local suffixIndex = 1
+	while number >= 1000 and suffixIndex < #suffixes do
+		number = number / 1000
+		suffixIndex = suffixIndex + 1
 	end
-	if count > 1 then
-		return if p1 % 1 <= 0.001 then tostring((math.floor(p1))) else ("%.1f"):format(p1) .. t[count]
+	if suffixIndex > 1 then
+		return if number % 1 <= 0.001 then tostring((math.floor(number))) else ("%.1f"):format(number) .. suffixes[suffixIndex]
 	else
-		return tostring(p1)
+		return tostring(number)
 	end
 end
-return t
+return StringUtils

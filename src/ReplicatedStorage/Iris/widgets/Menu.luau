@@ -1,30 +1,30 @@
 -- Reviewed by Claude
 require(script.Parent.Parent.Types)
 return function(p1, p2)
-	local v1 = false
+	local instance = false
 	local v2 = nil
 	local t = {}
 	local function EmptyMenuStack(p12)
 		for i = #t, p12 and p12 + 1 or 1, -1 do
-			local v3 = t[i]
-			v3.state.isOpened:set(false)
-			v3.Instance.BackgroundColor3 = p1._config.HeaderColor
-			v3.Instance.BackgroundTransparency = 1
+			local var3 = t[i]
+			var3.state.isOpened:set(false)
+			var3.Instance.BackgroundColor3 = p1._config.HeaderColor
+			var3.Instance.BackgroundTransparency = 1
 			table.remove(t, i)
 		end
 		if #t == 0 then
-			v1 = false
+			instance = false
 			v2 = nil
 		end
 	end
 	local function UpdateChildContainerTransform(p12)
 		local isType = p12.parentWidget.type == "Menu"
-		local v1 = p12.Instance
+		local instance = p12.Instance
 		local ChildContainer = p12.ChildContainer
-		ChildContainer.Size = UDim2.fromOffset(v1.AbsoluteSize.X, 0)
+		ChildContainer.Size = UDim2.fromOffset(instance.AbsoluteSize.X, 0)
 		if ChildContainer.Parent ~= nil then
-			local v2 = v1.AbsolutePosition - p2.GuiOffset
-			local AbsoluteSize = v1.AbsoluteSize
+			local v2 = instance.AbsolutePosition - p2.GuiOffset
+			local AbsoluteSize = instance.AbsoluteSize
 			local AbsoluteSize_2 = ChildContainer.AbsoluteSize
 			local PopupBorderSize = p1._config.PopupBorderSize
 			local AbsoluteSize_3 = ChildContainer.Parent.AbsoluteSize
@@ -35,34 +35,34 @@ return function(p1, p2)
 			elseif isType then
 				X = v2.X + AbsoluteSize.X
 			end
-			local v3
+			local var3
 			if v2.Y + AbsoluteSize_2.Y > AbsoluteSize_3.Y then
 				zero = zero + Vector2.yAxis
-				v3 = v2.Y - PopupBorderSize + (isType and AbsoluteSize.Y or 0)
+				var3 = v2.Y - PopupBorderSize + (isType and AbsoluteSize.Y or 0)
 			else
-				v3 = v2.Y + PopupBorderSize + if isType then 0 else AbsoluteSize.Y
+				var3 = v2.Y + PopupBorderSize + if isType then 0 else AbsoluteSize.Y
 			end
-			ChildContainer.Position = UDim2.fromOffset(X, v3)
+			ChildContainer.Position = UDim2.fromOffset(X, var3)
 			ChildContainer.AnchorPoint = zero
 		end
 	end
 	p2.registerEvent("InputBegan", function(p12)
-		if p1._started and ((p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.MouseButton2) and (v1 ~= false and v2 ~= nil)) then
-			local v12 = p2.getMouseLocation()
-			local v22 = false
-			for v3, v4 in t do
-				for v5, v6 in { v4.ChildContainer, v4.Instance } do
-					local v7 = v6.AbsolutePosition - p2.GuiOffset
-					if p2.isPosInsideRect(v12, v7, v7 + v6.AbsoluteSize) then
-						v22 = true
+		if p1._started and ((p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.MouseButton2) and (instance ~= false and v2 ~= nil)) then
+			local var12 = p2.getMouseLocation()
+			local var22 = false
+			for var3, var4 in t do
+				for v5, v6 in { var4.ChildContainer, var4.Instance } do
+					local var7 = v6.AbsolutePosition - p2.GuiOffset
+					if p2.isPosInsideRect(var12, var7, var7 + v6.AbsoluteSize) then
+						var22 = true
 						break
 					end
 				end
-				if v22 then
+				if var22 then
 					break
 				end
 			end
-			if not v22 then
+			if not var22 then
 				EmptyMenuStack()
 			end
 		end
@@ -129,7 +129,7 @@ return function(p1, p2)
 				ActiveColor = p1._config.HeaderHoveredColor,
 				ActiveTransparency = p1._config.HeaderHoveredTransparency
 			}
-			local v12
+			local var12
 			if p12.parentWidget.type == "Menu" then
 				local Menu = Instance.new("TextButton")
 				Menu.Name = "Menu"
@@ -140,8 +140,8 @@ return function(p1, p2)
 				Menu.BorderSizePixel = 0
 				Menu.Text = ""
 				Menu.AutoButtonColor = false
-				local v22 = p2.UIPadding(Menu, p1._config.FramePadding)
-				v22.PaddingTop = v22.PaddingTop - UDim.new(0, 1)
+				local var22 = p2.UIPadding(Menu, p1._config.FramePadding)
+				var22.PaddingTop = var22.PaddingTop - UDim.new(0, 1)
 				p2.UIListLayout(Menu, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
 				local TextLabel = Instance.new("TextLabel")
 				TextLabel.Name = "TextLabel"
@@ -150,11 +150,11 @@ return function(p1, p2)
 				TextLabel.BorderSizePixel = 0
 				p2.applyTextStyle(TextLabel)
 				TextLabel.Parent = Menu
-				local v3 = p1._config.TextSize + 2 * p1._config.FramePadding.Y
-				local v4 = v3 - math.round(0.2 * v3) * 2
+				local var3 = p1._config.TextSize + 2 * p1._config.FramePadding.Y
+				local var4 = var3 - math.round(0.2 * var3) * 2
 				local Icon = Instance.new("ImageLabel")
 				Icon.Name = "Icon"
-				Icon.Size = UDim2.fromOffset(v4, v4)
+				Icon.Size = UDim2.fromOffset(var4, var4)
 				Icon.BackgroundTransparency = 1
 				Icon.BorderSizePixel = 0
 				Icon.ImageColor3 = p1._config.TextColor
@@ -162,7 +162,7 @@ return function(p1, p2)
 				Icon.Image = p2.ICONS.RIGHT_POINTING_TRIANGLE
 				Icon.LayoutOrder = 1
 				Icon.Parent = Menu
-				v12 = Menu
+				var12 = Menu
 			else
 				local Menu = Instance.new("TextButton")
 				Menu.Name = "Menu"
@@ -176,28 +176,28 @@ return function(p1, p2)
 				Menu.ClipsDescendants = true
 				p2.applyTextStyle(Menu)
 				p2.UIPadding(Menu, Vector2.new(p1._config.ItemSpacing.X, p1._config.FramePadding.Y))
-				v12 = Menu
+				var12 = Menu
 			end
-			p2.applyInteractionHighlights("Background", v12, v12, p12.ButtonColors)
-			p2.applyButtonClick(v12, function()
-				local v12 = if #t <= 1 then not p12.state.isOpened.value else true
-				p12.state.isOpened:set(v12)
-				v1 = v12
-				v2 = v12 and p12 or nil
+			p2.applyInteractionHighlights("Background", var12, var12, p12.ButtonColors)
+			p2.applyButtonClick(var12, function()
+				local var12 = if #t <= 1 then not p12.state.isOpened.value else true
+				p12.state.isOpened:set(var12)
+				instance = var12
+				v2 = var12 and p12 or nil
 				if #t <= 1 then
-					if v12 then
+					if var12 then
 						table.insert(t, p12)
 						return
 					end
 					table.remove(t)
 				end
 			end)
-			p2.applyMouseEnter(v12, function()
-				if v1 and (v2 and v2 ~= p12) then
+			p2.applyMouseEnter(var12, function()
+				if instance and (v2 and v2 ~= p12) then
 					EmptyMenuStack((table.find(t, p12.parentWidget)))
 					p12.state.isOpened:set(true)
 					v2 = p12
-					v1 = true
+					instance = true
 					table.insert(t, p12)
 				end
 			end)
@@ -225,11 +225,11 @@ return function(p1, p2)
 			p2.UIListLayout(MenuContainer, Enum.FillDirection.Vertical, UDim.new(0, 1)).VerticalAlignment = Enum.VerticalAlignment.Top
 			MenuContainer.Parent = p1._rootInstance and p1._rootInstance:FindFirstChild("PopupScreenGui")
 			p12.ChildContainer = MenuContainer
-			return v12
+			return var12
 		end,
 		Update = function(p1)
-			local v1 = p1.Instance;
-			(if p1.parentWidget.type == "Menu" then v1.TextLabel else v1).Text = p1.arguments.Text or "Menu"
+			local instance = p1.Instance;
+			(if p1.parentWidget.type == "Menu" then instance.TextLabel else instance).Text = p1.arguments.Text or "Menu"
 		end,
 		ChildAdded = function(p1, p2)
 			UpdateChildContainerTransform(p1)
@@ -257,14 +257,14 @@ return function(p1, p2)
 			end
 		end,
 		Discard = function(p1)
-			if v1 then
+			if instance then
 				local parentWidget = p1.parentWidget
-				local v12 = table.find(t, parentWidget)
-				if v12 then
-					EmptyMenuStack(v12)
+				local var12 = table.find(t, parentWidget)
+				if var12 then
+					EmptyMenuStack(var12)
 					if #t ~= 0 then
 						v2 = parentWidget
-						v1 = true
+						instance = true
 					end
 				end
 			end
@@ -298,8 +298,8 @@ return function(p1, p2)
 			Iris_MenuItem.BorderSizePixel = 0
 			Iris_MenuItem.Text = ""
 			Iris_MenuItem.AutoButtonColor = false
-			local v12 = p2.UIPadding(Iris_MenuItem, p1._config.FramePadding)
-			v12.PaddingTop = v12.PaddingTop - UDim.new(0, 1)
+			local var12 = p2.UIPadding(Iris_MenuItem, p1._config.FramePadding)
+			var12.PaddingTop = var12.PaddingTop - UDim.new(0, 1)
 			p2.UIListLayout(Iris_MenuItem, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X))
 			p2.applyInteractionHighlights("Background", Iris_MenuItem, Iris_MenuItem, {
 				Color = p1._config.HeaderColor,
@@ -314,10 +314,10 @@ return function(p1, p2)
 			end)
 			p2.applyMouseEnter(Iris_MenuItem, function()
 				local parentWidget = p12.parentWidget
-				if v1 and (v2 and v2 ~= parentWidget) then
+				if instance and (v2 and v2 ~= parentWidget) then
 					EmptyMenuStack((table.find(t, parentWidget)))
 					v2 = parentWidget
-					v1 = true
+					instance = true
 				end
 			end)
 			local TextLabel = Instance.new("TextLabel")
@@ -341,9 +341,9 @@ return function(p1, p2)
 			return Iris_MenuItem
 		end,
 		Update = function(p1)
-			local v1 = p1.Instance
-			local Shortcut = v1.Shortcut
-			v1.TextLabel.Text = p1.arguments.Text
+			local instance = p1.Instance
+			local Shortcut = instance.Shortcut
+			instance.TextLabel.Text = p1.arguments.Text
 			if p1.arguments.KeyCode then
 				if p1.arguments.ModifierKey then
 					Shortcut.Text = p1.arguments.ModifierKey.Name .. " + " .. p1.arguments.KeyCode.Name
@@ -390,8 +390,8 @@ return function(p1, p2)
 			Iris_MenuToggle.BorderSizePixel = 0
 			Iris_MenuToggle.Text = ""
 			Iris_MenuToggle.AutoButtonColor = false
-			local v12 = p2.UIPadding(Iris_MenuToggle, p1._config.FramePadding)
-			v12.PaddingTop = v12.PaddingTop - UDim.new(0, 1)
+			local var12 = p2.UIPadding(Iris_MenuToggle, p1._config.FramePadding)
+			var12.PaddingTop = var12.PaddingTop - UDim.new(0, 1)
 			p2.UIListLayout(Iris_MenuToggle, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
 			p2.applyInteractionHighlights("Background", Iris_MenuToggle, Iris_MenuToggle, {
 				Color = p1._config.HeaderColor,
@@ -407,10 +407,10 @@ return function(p1, p2)
 			end)
 			p2.applyMouseEnter(Iris_MenuToggle, function()
 				local parentWidget = p12.parentWidget
-				if v1 and (v2 and v2 ~= parentWidget) then
+				if instance and (v2 and v2 ~= parentWidget) then
 					EmptyMenuStack((table.find(t, parentWidget)))
 					v2 = parentWidget
-					v1 = true
+					instance = true
 				end
 			end)
 			local TextLabel = Instance.new("TextLabel")
@@ -431,11 +431,11 @@ return function(p1, p2)
 			Shortcut.TextColor3 = p1._config.TextDisabledColor
 			Shortcut.TextTransparency = p1._config.TextDisabledTransparency
 			Shortcut.Parent = Iris_MenuToggle
-			local v22 = p1._config.TextSize + 2 * p1._config.FramePadding.Y
-			local v3 = v22 - math.round(0.2 * v22) * 2
+			local var22 = p1._config.TextSize + 2 * p1._config.FramePadding.Y
+			local var3 = var22 - math.round(0.2 * var22) * 2
 			local Icon = Instance.new("ImageLabel")
 			Icon.Name = "Icon"
-			Icon.Size = UDim2.fromOffset(v3, v3)
+			Icon.Size = UDim2.fromOffset(var3, var3)
 			Icon.BackgroundTransparency = 1
 			Icon.BorderSizePixel = 0
 			Icon.ImageColor3 = p1._config.TextColor
@@ -451,9 +451,9 @@ return function(p1, p2)
 			end
 		end,
 		Update = function(p1)
-			local v1 = p1.Instance
-			local Shortcut = v1.Shortcut
-			v1.TextLabel.Text = p1.arguments.Text
+			local instance = p1.Instance
+			local Shortcut = instance.Shortcut
+			instance.TextLabel.Text = p1.arguments.Text
 			if p1.arguments.KeyCode then
 				if p1.arguments.ModifierKey then
 					Shortcut.Text = p1.arguments.ModifierKey.Name .. " + " .. p1.arguments.KeyCode.Name

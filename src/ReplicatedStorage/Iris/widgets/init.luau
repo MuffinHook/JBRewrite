@@ -28,14 +28,14 @@ return function(p1)
 	end
 	t.GuiOffset = if p1._config.IgnoreGuiInset then -t.GuiService:GetGuiInset() else Vector2.zero
 	t.MouseOffset = if p1._config.IgnoreGuiInset then Vector2.zero else t.GuiService:GetGuiInset()
-	local v5 = nil
-	v5 = t.GuiService:GetPropertyChangedSignal("TopbarInset"):Once(function()
+	local var5 = nil
+	var5 = t.GuiService:GetPropertyChangedSignal("TopbarInset"):Once(function()
 		t.MouseOffset = if p1._config.IgnoreGuiInset then Vector2.zero else t.GuiService:GetGuiInset()
 		t.GuiOffset = if p1._config.IgnoreGuiInset then -t.GuiService:GetGuiInset() else Vector2.zero
-		v5:Disconnect()
+		var5:Disconnect()
 	end)
 	task.delay(5, function()
-		v5:Disconnect()
+		var5:Disconnect()
 	end)
 	function t.getMouseLocation()
 		return t.UserInputService:GetMouseLocation() - t.MouseOffset
@@ -44,27 +44,27 @@ return function(p1)
 		return if p1.X >= p2.X and (p1.X <= p3.X and p1.Y >= p2.Y) then p1.Y <= p3.Y else false
 	end
 	function t.findBestWindowPosForPopup(p1, p2, p3, p4)
-		local v1 = if p1.X + p2.X + 20 > p4.X then if p1.Y + p2.Y + 20 > p4.Y then p1 + Vector2.new(0, -(20 + p2.Y)) else p1 + Vector2.new(0, 20) else p1 + Vector2.new(20)
-		return Vector2.new(math.max(math.min(v1.X + p2.X, p4.X) - p2.X, p3.X), (math.max(math.min(v1.Y + p2.Y, p4.Y) - p2.Y, p3.Y)))
+		local instance = if p1.X + p2.X + 20 > p4.X then if p1.Y + p2.Y + 20 > p4.Y then p1 + Vector2.new(0, -(20 + p2.Y)) else p1 + Vector2.new(0, 20) else p1 + Vector2.new(20)
+		return Vector2.new(math.max(math.min(instance.X + p2.X, p4.X) - p2.X, p3.X), (math.max(math.min(instance.Y + p2.Y, p4.Y) - p2.Y, p3.Y)))
 	end
 	function t.getScreenSizeForWindow(p1)
 		if p1.Instance:IsA("GuiBase2d") then
 			return p1.Instance.AbsoluteSize
 		else
-			local v1 = p1.Instance.Parent
-			if v1:IsA("GuiBase2d") or v1.Parent:IsA("GuiBase2d") then
-				return v1.AbsoluteSize
+			local instance = p1.Instance.Parent
+			if instance:IsA("GuiBase2d") or instance.Parent:IsA("GuiBase2d") then
+				return instance.AbsoluteSize
 			else
 				return workspace.CurrentCamera.ViewportSize
 			end
 		end
 	end
 	function t.extend(p1, p2)
-		local v1 = table.clone(p1)
+		local instance = table.clone(p1)
 		for v2, v3 in p2 do
-			v1[v2] = v3
+			instance[v2] = v3
 		end
-		return v1
+		return instance
 	end
 	function t.UIPadding(p1, p2)
 		local UIPadding = Instance.new("UIPadding")
@@ -118,16 +118,16 @@ return function(p1)
 		p12.AutoLocalize = false
 	end
 	function t.applyInteractionHighlights(p12, p2, p3, p4)
-		local v1 = false
+		local instance = false
 		t.applyMouseEnter(p2, function()
 			p3[p12 .. "Color3"] = p4.HoveredColor
 			p3[p12 .. "Transparency"] = p4.HoveredTransparency
-			v1 = false
+			instance = false
 		end)
 		t.applyMouseLeave(p2, function()
 			p3[p12 .. "Color3"] = p4.Color
 			p3[p12 .. "Transparency"] = p4.Transparency
-			v1 = true
+			instance = true
 		end)
 		t.applyInputBegan(p2, function(p1)
 			if p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Gamepad1 then
@@ -136,7 +136,7 @@ return function(p1)
 			end
 		end)
 		t.applyInputEnded(p2, function(p1)
-			if (p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Gamepad1) and not v1 then
+			if (p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Gamepad1) and not instance then
 				if p1.UserInputType == Enum.UserInputType.MouseButton1 then
 					p3[p12 .. "Color3"] = p4.HoveredColor
 					p3[p12 .. "Transparency"] = p4.HoveredTransparency
@@ -150,31 +150,31 @@ return function(p1)
 		p2.SelectionImageObject = p1.SelectionImageObject
 	end
 	function t.applyInteractionHighlightsWithMultiHighlightee(p12, p2, p3)
-		local v1 = false
+		local instance = false
 		t.applyMouseEnter(p2, function()
 			for v12, v2 in p3 do
 				v2[1][p12 .. "Color3"] = v2[2].HoveredColor
 				v2[1][p12 .. "Transparency"] = v2[2].HoveredTransparency
-				v1 = false
+				instance = false
 			end
 		end)
 		t.applyMouseLeave(p2, function()
 			for v12, v2 in p3 do
 				v2[1][p12 .. "Color3"] = v2[2].Color
 				v2[1][p12 .. "Transparency"] = v2[2].Transparency
-				v1 = true
+				instance = true
 			end
 		end)
 		t.applyInputBegan(p2, function(p1)
 			if p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Gamepad1 then
-				for v1, v2 in p3 do
+				for instance, v2 in p3 do
 					v2[1][p12 .. "Color3"] = v2[2].ActiveColor
 					v2[1][p12 .. "Transparency"] = v2[2].ActiveTransparency
 				end
 			end
 		end)
 		t.applyInputEnded(p2, function(p1)
-			if (p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Gamepad1) and not v1 then
+			if (p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Gamepad1) and not instance then
 				for v12, v2 in p3 do
 					if p1.UserInputType == Enum.UserInputType.MouseButton1 then
 						v2[1][p12 .. "Color3"] = v2[2].HoveredColor
@@ -210,26 +210,26 @@ return function(p1)
 	end
 	function t.applyButtonDown(p1, p2)
 		p1.MouseButton1Down:Connect(function(p1, p22)
-			local v1 = Vector2.new(p1, p22) - t.MouseOffset
-			p2(v1.X, v1.Y)
+			local instance = Vector2.new(p1, p22) - t.MouseOffset
+			p2(instance.X, instance.Y)
 		end)
 	end
 	function t.applyMouseEnter(p1, p2)
 		p1.MouseEnter:Connect(function(p1, p22)
-			local v1 = Vector2.new(p1, p22) - t.MouseOffset
-			p2(v1.X, v1.Y)
+			local instance = Vector2.new(p1, p22) - t.MouseOffset
+			p2(instance.X, instance.Y)
 		end)
 	end
 	function t.applyMouseMoved(p1, p2)
 		p1.MouseMoved:Connect(function(p1, p22)
-			local v1 = Vector2.new(p1, p22) - t.MouseOffset
-			p2(v1.X, v1.Y)
+			local instance = Vector2.new(p1, p22) - t.MouseOffset
+			p2(instance.X, instance.Y)
 		end)
 	end
 	function t.applyMouseLeave(p1, p2)
 		p1.MouseLeave:Connect(function(p1, p22)
-			local v1 = Vector2.new(p1, p22) - t.MouseOffset
-			p2(v1.X, v1.Y)
+			local instance = Vector2.new(p1, p22) - t.MouseOffset
+			p2(instance.X, instance.Y)
 		end)
 	end
 	function t.applyInputBegan(p1, p2)
@@ -243,7 +243,7 @@ return function(p1)
 		end)
 	end
 	function t.discardState(p1)
-		for v1, v2 in p1.state do
+		for instance, v2 in p1.state do
 			v2.ConnectedWidgets[p1.ID] = nil
 		end
 	end
@@ -257,11 +257,11 @@ return function(p1)
 		hover = function(p1)
 			return {
 				Init = function(p12)
-					local v1 = p1(p12)
-					t.applyMouseEnter(v1, function()
+					local instance = p1(p12)
+					t.applyMouseEnter(instance, function()
 						p12.isHoveredEvent = true
 					end)
-					t.applyMouseLeave(v1, function()
+					t.applyMouseLeave(instance, function()
 						p12.isHoveredEvent = false
 					end)
 					p12.isHoveredEvent = false
@@ -274,9 +274,9 @@ return function(p1)
 		click = function(p12)
 			return {
 				Init = function(p13)
-					local v1 = p12(p13)
+					local instance = p12(p13)
 					p13.lastClickedTick = -1
-					t.applyButtonClick(v1, function()
+					t.applyButtonClick(instance, function()
 						p13.lastClickedTick = p1._cycleTick + 1
 					end)
 				end,
@@ -288,9 +288,9 @@ return function(p1)
 		rightClick = function(p12)
 			return {
 				Init = function(p13)
-					local v1 = p12(p13)
+					local instance = p12(p13)
 					p13.lastRightClickedTick = -1
-					v1.MouseButton2Click:Connect(function()
+					instance.MouseButton2Click:Connect(function()
 						p13.lastRightClickedTick = p1._cycleTick + 1
 					end)
 				end,
@@ -302,16 +302,16 @@ return function(p1)
 		doubleClick = function(p12)
 			return {
 				Init = function(p13)
-					local v1 = p12(p13)
+					local instance = p12(p13)
 					p13.lastClickedTime = -1
 					p13.lastClickedPosition = Vector2.zero
 					p13.lastDoubleClickedTick = -1
-					t.applyButtonDown(v1, function(p12, p2)
-						local v1 = t.getTime()
-						if v1 - p13.lastClickedTime < p1._config.MouseDoubleClickTime and (Vector2.new(p12, p2) - p13.lastClickedPosition).Magnitude < p1._config.MouseDoubleClickMaxDist then
+					t.applyButtonDown(instance, function(p12, p2)
+						local instance = t.getTime()
+						if instance - p13.lastClickedTime < p1._config.MouseDoubleClickTime and (Vector2.new(p12, p2) - p13.lastClickedPosition).Magnitude < p1._config.MouseDoubleClickMaxDist then
 							p13.lastDoubleClickedTick = p1._cycleTick + 1
 						else
-							p13.lastClickedTime = v1
+							p13.lastClickedTime = instance
 							p13.lastClickedPosition = Vector2.new(p12, p2)
 						end
 					end)
@@ -324,9 +324,9 @@ return function(p1)
 		ctrlClick = function(p12)
 			return {
 				Init = function(p13)
-					local v1 = p12(p13)
+					local instance = p12(p13)
 					p13.lastCtrlClickedTick = -1
-					t.applyButtonClick(v1, function()
+					t.applyButtonClick(instance, function()
 						if t.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or t.UserInputService:IsKeyDown(Enum.KeyCode.RightControl) then
 							p13.lastCtrlClickedTick = p1._cycleTick + 1
 						end

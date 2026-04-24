@@ -16,26 +16,26 @@ function t.new()
 	end)
 	return t2
 end
-function t.Add(p1, p2)
+function t.Add(self, p2)
 	assert(p2.__ClassName == "Window")
-	for i, v in ipairs(p1._listWindow) do
+	for i, v in ipairs(self._listWindow) do
 		if p2 == v then
 			error("Window already exists in group.")
 		end
 	end
-	table.insert(p1._listWindow, p2)
+	table.insert(self._listWindow, p2)
 	function p2._beforeOpenFun()
-		for i, v in ipairs(p1._listWindow) do
+		for i, v in ipairs(self._listWindow) do
 			if v ~= p2 and v:IsOpen() then
 				v:Close()
 			end
 		end
 	end
 end
-function t.Destroy(p1)
-	assert(p1._maid)
-	local _maid_2 = p1._maid
-	p1._maid = nil
+function t.Destroy(self)
+	assert(self._maid)
+	local _maid_2 = self._maid
+	self._maid = nil
 	_maid_2:Destroy()
 end
 return t

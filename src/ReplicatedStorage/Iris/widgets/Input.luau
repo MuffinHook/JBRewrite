@@ -53,15 +53,15 @@ return function(p1, p2)
 				end
 				return
 			elseif typeof(p1) == "Color3" then
-				local v1 = if p3.UseHSV then { p1:ToHSV() } else { p1.R, p1.G, p1.B }
+				local instance = if p3.UseHSV then { p1:ToHSV() } else { p1.R, p1.G, p1.B }
 				if p2 == 1 then
-					return v1[1]
+					return instance[1]
 				end
 				if p2 == 2 then
-					return v1[2]
+					return instance[2]
 				end
 				if p2 == 3 then
-					return v1[3]
+					return instance[3]
 				end
 				return
 			elseif typeof(p1) == "Rect" then
@@ -144,15 +144,15 @@ return function(p1, p2)
 				return
 			elseif typeof(p1) == "Color3" then
 				if p4.UseHSV then
-					local v1, v2, v3 = p1:ToHSV()
+					local instance, instance2, var3 = p1:ToHSV()
 					if p2 == 1 then
-						return Color3.fromHSV(p3, v2, v3)
+						return Color3.fromHSV(p3, instance2, var3)
 					end
 					if p2 == 2 then
-						return Color3.fromHSV(v1, p3, v3)
+						return Color3.fromHSV(instance, p3, var3)
 					end
 					if p2 == 3 then
-						return Color3.fromHSV(v1, v2, p3)
+						return Color3.fromHSV(instance, instance2, p3)
 					end
 				end
 				if p2 == 1 then
@@ -244,111 +244,111 @@ return function(p1, p2)
 				end
 			end,
 			Update = function(p13)
-				local v1 = p13.Instance
-				v1.TextLabel.Text = p13.arguments.Text or ("Input %*"):format(p22)
-				local v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19
+				local instance = p13.Instance
+				instance.TextLabel.Text = p13.arguments.Text or ("Input %*"):format(p22)
+				local var3, var4, var5, var6, var7, var8, var9, var10, v11, var12, v13, v14, v15, v16, v17, v18, v19
 				if p13.arguments.Format then
 					if typeof(p13.arguments.Format) == "table" then
 						if not p13.arguments.Format then
-							v3 = {}
+							var3 = {}
 							for i = 1, p3 do
-								v4 = t6[p22][i]
+								var4 = t6[p22][i]
 								if p13.arguments.Increment then
-									v5 = getValueByIndex(p13.arguments.Increment, i, p13.arguments)
-									v6 = if v5 == 0 then 1 else v5
-									v7 = -math.log10(v6)
-									v8 = math.ceil(v7)
-									v9 = math.max(v4, v8, v4)
-									v4 = v9
+									var5 = getValueByIndex(p13.arguments.Increment, i, p13.arguments)
+									var6 = if var5 == 0 then 1 else var5
+									var7 = -math.log10(var6)
+									var8 = math.ceil(var7)
+									var9 = math.max(var4, var8, var4)
+									var4 = var9
 								end
 								if p13.arguments.Max then
-									v10 = getValueByIndex(p13.arguments.Max, i, p13.arguments)
-									v11 = if v10 == 0 then 1 else v10
-									v12 = -math.log10(v11)
-									v13 = math.ceil(v12)
-									v14 = math.max(v4, v13, v4)
-									v4 = v14
+									var10 = getValueByIndex(p13.arguments.Max, i, p13.arguments)
+									v11 = if var10 == 0 then 1 else var10
+									var12 = -math.log10(v11)
+									v13 = math.ceil(var12)
+									v14 = math.max(var4, v13, var4)
+									var4 = v14
 								end
 								if p13.arguments.Min then
 									v15 = getValueByIndex(p13.arguments.Min, i, p13.arguments)
 									v16 = if v15 == 0 then 1 else v15
 									v17 = -math.log10(v16)
 									v18 = math.ceil(v17)
-									v19 = math.max(v4, v18, v4)
-									v4 = v19
+									v19 = math.max(var4, v18, var4)
+									var4 = v19
 								end
-								if v4 > 0 then
-									v3[i] = ("%%.%*f"):format(v4)
+								if var4 > 0 then
+									var3[i] = ("%%.%*f"):format(var4)
 								else
-									v3[i] = "%d"
+									var3[i] = "%d"
 								end
 							end
-							p13.arguments.Format = v3
+							p13.arguments.Format = var3
 							p13.arguments.Prefix = t5[p22]
 						end
 					else
 						p13.arguments.Format = { p13.arguments.Format }
 					end
 				elseif not p13.arguments.Format then
-					v3 = {}
+					var3 = {}
 					for i = 1, p3 do
-						v4 = t6[p22][i]
+						var4 = t6[p22][i]
 						if p13.arguments.Increment then
-							v5 = getValueByIndex(p13.arguments.Increment, i, p13.arguments)
-							v6 = if v5 == 0 then 1 else v5
-							v7 = -math.log10(v6)
-							v8 = math.ceil(v7)
-							v9 = math.max(v4, v8, v4)
-							v4 = v9
+							var5 = getValueByIndex(p13.arguments.Increment, i, p13.arguments)
+							var6 = if var5 == 0 then 1 else var5
+							var7 = -math.log10(var6)
+							var8 = math.ceil(var7)
+							var9 = math.max(var4, var8, var4)
+							var4 = var9
 						end
 						if p13.arguments.Max then
-							v10 = getValueByIndex(p13.arguments.Max, i, p13.arguments)
-							v11 = if v10 == 0 then 1 else v10
-							v12 = -math.log10(v11)
-							v13 = math.ceil(v12)
-							v14 = math.max(v4, v13, v4)
-							v4 = v14
+							var10 = getValueByIndex(p13.arguments.Max, i, p13.arguments)
+							v11 = if var10 == 0 then 1 else var10
+							var12 = -math.log10(v11)
+							v13 = math.ceil(var12)
+							v14 = math.max(var4, v13, var4)
+							var4 = v14
 						end
 						if p13.arguments.Min then
 							v15 = getValueByIndex(p13.arguments.Min, i, p13.arguments)
 							v16 = if v15 == 0 then 1 else v15
 							v17 = -math.log10(v16)
 							v18 = math.ceil(v17)
-							v19 = math.max(v4, v18, v4)
-							v4 = v19
+							v19 = math.max(var4, v18, var4)
+							var4 = v19
 						end
-						if v4 > 0 then
-							v3[i] = ("%%.%*f"):format(v4)
+						if var4 > 0 then
+							var3[i] = ("%%.%*f"):format(var4)
 						else
-							v3[i] = "%d"
+							var3[i] = "%d"
 						end
 					end
-					p13.arguments.Format = v3
+					p13.arguments.Format = var3
 					p13.arguments.Prefix = t5[p22]
 				end
 				if p12 == "Input" and p22 == "Num" then
-					v1.SubButton.Visible = not p13.arguments.NoButtons
-					v1.AddButton.Visible = not p13.arguments.NoButtons
-					v1.InputField1.Size = UDim2.new(UDim.new(p1._config.ContentWidth.Scale, p1._config.ContentWidth.Offset - if p13.arguments.NoButtons then 0 else 2 * p1._config.ItemInnerSpacing.X + 2 * (p1._config.TextSize + 2 * p1._config.FramePadding.Y)), p1._config.ContentHeight)
+					instance.SubButton.Visible = not p13.arguments.NoButtons
+					instance.AddButton.Visible = not p13.arguments.NoButtons
+					instance.InputField1.Size = UDim2.new(UDim.new(p1._config.ContentWidth.Scale, p1._config.ContentWidth.Offset - if p13.arguments.NoButtons then 0 else 2 * p1._config.ItemInnerSpacing.X + 2 * (p1._config.TextSize + 2 * p1._config.FramePadding.Y)), p1._config.ContentHeight)
 				end
 				if p12 == "Slider" then
 					for j = 1, p3 do
-						local v21, v22, v23
-						local GrabBar = v1:FindFirstChild("SliderField" .. tostring(j)).GrabBar
+						local v21, var22, v23
+						local GrabBar = instance:FindFirstChild("SliderField" .. tostring(j)).GrabBar
 						v21 = p13.arguments.Increment and getValueByIndex(p13.arguments.Increment, j, p13.arguments) or t2[p22][j]
-						v22 = p13.arguments.Min and getValueByIndex(p13.arguments.Min, j, p13.arguments) or t3[p22][j]
+						var22 = p13.arguments.Min and getValueByIndex(p13.arguments.Min, j, p13.arguments) or t3[p22][j]
 						v23 = p13.arguments.Max and getValueByIndex(p13.arguments.Max, j, p13.arguments) or t4[p22][j]
-						GrabBar.Size = UDim2.fromScale(1 / math.floor((1 + v23 - v22) / v21), 1)
+						GrabBar.Size = UDim2.fromScale(1 / math.floor((1 + v23 - var22) / v21), 1)
 					end
-					local v25 = #p1._postCycleCallbacks + 1
-					local v26 = p1._cycleTick + 1
-					p1._postCycleCallbacks[v25] = function()
-						if v26 <= p1._cycleTick then
+					local var25 = #p1._postCycleCallbacks + 1
+					local var26 = p1._cycleTick + 1
+					p1._postCycleCallbacks[var25] = function()
+						if var26 <= p1._cycleTick then
 							if p13.lastCycleTick ~= -1 then
 								p13.state.number.lastChangeTick = p1._cycleTick
 								p1._widgets[("Slider%*"):format(p22)].UpdateState(p13)
 							end
-							p1._postCycleCallbacks[v25] = nil
+							p1._postCycleCallbacks[var25] = nil
 						end
 					end
 				end
@@ -360,39 +360,39 @@ return function(p1, p2)
 		}
 	end
 	local function focusLost(p12, p2, p3, p4)
-		local v1 = tonumber(p2.Text:match("-?%d*%.?%d*"))
+		local instance = tonumber(p2.Text:match("-?%d*%.?%d*"))
 		local number = p12.state.number
 		if p4 == "Color4" and p3 == 4 then
 			number = p12.state.transparency
 		elseif p4 == "Color3" or p4 == "Color4" then
 			number = p12.state.color
 		end
-		if v1 ~= nil then
+		if instance ~= nil then
 			if p4 == "Color3" or p4 == "Color4" and not p12.arguments.UseFloats then
-				v1 = v1 / 255
+				instance = instance / 255
 			end
 			if p12.arguments.Min ~= nil then
-				v1 = math.max(v1, getValueByIndex(p12.arguments.Min, p3, p12.arguments))
+				instance = math.max(instance, getValueByIndex(p12.arguments.Min, p3, p12.arguments))
 			end
 			if p12.arguments.Max ~= nil then
-				v1 = math.min(v1, getValueByIndex(p12.arguments.Max, p3, p12.arguments))
+				instance = math.min(instance, getValueByIndex(p12.arguments.Max, p3, p12.arguments))
 			end
 			if p12.arguments.Increment then
-				local v6 = v1 / getValueByIndex(p12.arguments.Increment, p3, p12.arguments)
-				v1 = math.round(v6) * getValueByIndex(p12.arguments.Increment, p3, p12.arguments)
+				local var6 = instance / getValueByIndex(p12.arguments.Increment, p3, p12.arguments)
+				instance = math.round(var6) * getValueByIndex(p12.arguments.Increment, p3, p12.arguments)
 			end
-			number:set(updateValueByIndex(number.value, p3, v1, p12.arguments))
+			number:set(updateValueByIndex(number.value, p3, instance, p12.arguments))
 			p12.lastNumberChangedTick = p1._cycleTick + 1
 		end
-		local v7 = getValueByIndex(number.value, p3, p12.arguments)
+		local var7 = getValueByIndex(number.value, p3, p12.arguments)
 		if p4 == "Color3" or p4 == "Color4" and not p12.arguments.UseFloats then
-			v7 = math.round(v7 * 255)
+			var7 = math.round(var7 * 255)
 		end
-		local v9 = p12.arguments.Format[p3] or p12.arguments.Format[1]
+		local var9 = p12.arguments.Format[p3] or p12.arguments.Format[1]
 		if p12.arguments.Prefix then
-			v9 = p12.arguments.Prefix[p3] .. v9
+			var9 = p12.arguments.Prefix[p3] .. var9
 		end
-		p2.Text = string.format(v9, v7)
+		p2.Text = string.format(var9, var7)
 		p12.state.editingText:set(0)
 		p2:ReleaseFocus(true)
 	end
@@ -406,15 +406,15 @@ return function(p1, p2)
 		SubButton.LayoutOrder = 5
 		SubButton.Parent = p22
 		p2.applyButtonClick(SubButton, function()
-			local v1 = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
-			local v4 = p12.state.number.value - (p12.arguments.Increment and getValueByIndex(p12.arguments.Increment, 1, p12.arguments) or 1) * if v1 then 100 else 1
+			local instance = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+			local var4 = p12.state.number.value - (p12.arguments.Increment and getValueByIndex(p12.arguments.Increment, 1, p12.arguments) or 1) * if instance then 100 else 1
 			if p12.arguments.Min ~= nil then
-				v4 = math.max(v4, getValueByIndex(p12.arguments.Min, 1, p12.arguments))
+				var4 = math.max(var4, getValueByIndex(p12.arguments.Min, 1, p12.arguments))
 			end
 			if p12.arguments.Max ~= nil then
-				v4 = math.min(v4, getValueByIndex(p12.arguments.Max, 1, p12.arguments))
+				var4 = math.min(var4, getValueByIndex(p12.arguments.Max, 1, p12.arguments))
 			end
-			p12.state.number:set(v4)
+			p12.state.number:set(var4)
 			p12.lastNumberChangedTick = p1._cycleTick + 1
 		end)
 		local AddButton = p2.abstractButton.Generate(p12)
@@ -426,15 +426,15 @@ return function(p1, p2)
 		AddButton.LayoutOrder = 6
 		AddButton.Parent = p22
 		p2.applyButtonClick(AddButton, function()
-			local v1 = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
-			local v4 = p12.state.number.value + (p12.arguments.Increment and getValueByIndex(p12.arguments.Increment, 1, p12.arguments) or 1) * if v1 then 100 else 1
+			local instance = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+			local var4 = p12.state.number.value + (p12.arguments.Increment and getValueByIndex(p12.arguments.Increment, 1, p12.arguments) or 1) * if instance then 100 else 1
 			if p12.arguments.Min ~= nil then
-				v4 = math.max(v4, getValueByIndex(p12.arguments.Min, 1, p12.arguments))
+				var4 = math.max(var4, getValueByIndex(p12.arguments.Min, 1, p12.arguments))
 			end
 			if p12.arguments.Max ~= nil then
-				v4 = math.min(v4, getValueByIndex(p12.arguments.Max, 1, p12.arguments))
+				var4 = math.min(var4, getValueByIndex(p12.arguments.Max, 1, p12.arguments))
 			end
-			p12.state.number:set(v4)
+			p12.state.number:set(var4)
 			p12.lastNumberChangedTick = p1._cycleTick + 1
 		end)
 		return 2 * p1._config.ItemInnerSpacing.X + p3 * 2
@@ -474,13 +474,13 @@ return function(p1, p2)
 				Frame.BackgroundTransparency = 1
 				Frame.BorderSizePixel = 0
 				p2.UIListLayout(Frame, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
-				local v2 = if p22 == 1 then generateButtons(p13, Frame, p1._config.TextSize + 2 * p1._config.FramePadding.Y) else 0
-				local v4 = UDim.new(p1._config.ContentWidth.Scale / p22, (p1._config.ContentWidth.Offset - p1._config.ItemInnerSpacing.X * (p22 - 1) - v2) / p22)
-				local v6 = p1._config.ContentWidth - UDim.new(v4.Scale * (p22 - 1), v4.Offset * (p22 - 1) + p1._config.ItemInnerSpacing.X * (p22 - 1) + v2)
+				local instance2 = if p22 == 1 then generateButtons(p13, Frame, p1._config.TextSize + 2 * p1._config.FramePadding.Y) else 0
+				local var4 = UDim.new(p1._config.ContentWidth.Scale / p22, (p1._config.ContentWidth.Offset - p1._config.ItemInnerSpacing.X * (p22 - 1) - instance2) / p22)
+				local var6 = p1._config.ContentWidth - UDim.new(var4.Scale * (p22 - 1), var4.Offset * (p22 - 1) + p1._config.ItemInnerSpacing.X * (p22 - 1) + instance2)
 				for i = 1, p22 do
-					local v7
-					v7 = if i == p22 then v6 else v4
-					generateField(p13, i, v7, p12).Parent = Frame
+					local var7
+					var7 = if i == p22 then var6 else var4
+					generateField(p13, i, var7, p12).Parent = Frame
 				end
 				local TextLabel = Instance.new("TextLabel")
 				TextLabel.Name = "TextLabel"
@@ -493,63 +493,63 @@ return function(p1, p2)
 				return Frame
 			end,
 			UpdateState = function(p1)
-				local v1 = p1.Instance
+				local instance = p1.Instance
 				for i = 1, p22 do
-					local v2 = v1:FindFirstChild("InputField" .. tostring(i))
-					local v3 = p1.arguments.Format[i] or p1.arguments.Format[1]
+					local instance2 = instance:FindFirstChild("InputField" .. tostring(i))
+					local var3 = p1.arguments.Format[i] or p1.arguments.Format[1]
 					if p1.arguments.Prefix then
-						v3 = p1.arguments.Prefix[i] .. v3
+						var3 = p1.arguments.Prefix[i] .. var3
 					end
-					v2.Text = string.format(v3, getValueByIndex(p1.state.number.value, i, p1.arguments))
+					instance2.Text = string.format(var3, getValueByIndex(p1.state.number.value, i, p1.arguments))
 				end
 			end
 		})
 	end
-	local v1 = 0
-	local v2 = false
-	local v3 = nil
-	local v4 = 0
-	local v5 = ""
+	local instance = 0
+	local instance2 = false
+	local var3 = nil
+	local var4 = 0
+	local var5 = ""
 	local function updateActiveDrag()
 		local X = p2.getMouseLocation().X
-		local v12 = X - v1
-		v1 = X
-		if v2 == false then
-		elseif v3 ~= nil then
-			local number = v3.state.number
-			if v5 == "Color3" or v5 == "Color4" then
-				local v22 = v3
-				number = v22.state.color
-				if v4 == 4 then
-					number = v22.state.transparency
+		local var12 = X - instance
+		instance = X
+		if instance2 == false then
+		elseif var3 ~= nil then
+			local number = var3.state.number
+			if var5 == "Color3" or var5 == "Color4" then
+				local var22 = var3
+				number = var22.state.color
+				if var4 == 4 then
+					number = var22.state.transparency
 				end
 			end
-			local v32 = v3.arguments.Increment and getValueByIndex(v3.arguments.Increment, v4, v3.arguments) or t2[v5][v4]
-			local v52 = v32 * if p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightShift) then 10 else 1
-			local v7 = v52 * if p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightAlt) then 0.1 else 1
-			local v9 = getValueByIndex(number.value, v4, v3.arguments) + v12 * (v7 * if v5 == "Color3" or v5 == "Color4" then 5 else 1)
-			if v3.arguments.Min ~= nil then
-				v9 = math.max(v9, getValueByIndex(v3.arguments.Min, v4, v3.arguments))
+			local var32 = var3.arguments.Increment and getValueByIndex(var3.arguments.Increment, var4, var3.arguments) or t2[var5][var4]
+			local var52 = var32 * if p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightShift) then 10 else 1
+			local var7 = var52 * if p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightAlt) then 0.1 else 1
+			local var9 = getValueByIndex(number.value, var4, var3.arguments) + var12 * (var7 * if var5 == "Color3" or var5 == "Color4" then 5 else 1)
+			if var3.arguments.Min ~= nil then
+				var9 = math.max(var9, getValueByIndex(var3.arguments.Min, var4, var3.arguments))
 			end
-			if v3.arguments.Max ~= nil then
-				v9 = math.min(v9, getValueByIndex(v3.arguments.Max, v4, v3.arguments))
+			if var3.arguments.Max ~= nil then
+				var9 = math.min(var9, getValueByIndex(var3.arguments.Max, var4, var3.arguments))
 			end
-			number:set(updateValueByIndex(number.value, v4, v9, v3.arguments))
-			v3.lastNumberChangedTick = p1._cycleTick + 1
+			number:set(updateValueByIndex(number.value, var4, var9, var3.arguments))
+			var3.lastNumberChangedTick = p1._cycleTick + 1
 		end
 	end
 	local function DragMouseDown(p12, p22, p3, p4, p5)
-		local v1 = p2.getTime()
-		local v32 = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
-		if v1 - p12.lastClickedTime < p1._config.MouseDoubleClickTime and (Vector2.new(p4, p5) - p12.lastClickedPosition).Magnitude < p1._config.MouseDoubleClickMaxDist or v32 then
+		local instance = p2.getTime()
+		local var32 = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+		if instance - p12.lastClickedTime < p1._config.MouseDoubleClickTime and (Vector2.new(p4, p5) - p12.lastClickedPosition).Magnitude < p1._config.MouseDoubleClickMaxDist or var32 then
 			p12.state.editingText:set(p3)
 		else
-			p12.lastClickedTime = v1
+			p12.lastClickedTime = instance
 			p12.lastClickedPosition = Vector2.new(p4, p5)
-			v2 = true
-			v3 = p12
-			v4 = p3
-			v5 = p22
+			instance2 = true
+			var3 = p12
+			var4 = p3
+			var5 = p22
 			updateActiveDrag()
 		end
 	end
@@ -559,10 +559,10 @@ return function(p1, p2)
 		end
 	end)
 	p2.registerEvent("InputEnded", function(p12)
-		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 and v2) then
-			v2 = false
-			v3 = nil
-			v4 = 0
+		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 and instance2) then
+			instance2 = false
+			var3 = nil
+			var4 = 0
 		end
 	end)
 	local function generateField_2(p12, p22, p3, p4)
@@ -625,12 +625,12 @@ return function(p1, p2)
 				Frame.BorderSizePixel = 0
 				p2.UIListLayout(Frame, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
 				local sum = 0
-				local v1 = p1._config.TextSize + 2 * p1._config.FramePadding.Y
+				local instance = p1._config.TextSize + 2 * p1._config.FramePadding.Y
 				if p12 == "Color3" or p12 == "Color4" then
-					sum = sum + (p1._config.ItemInnerSpacing.X + v1)
+					sum = sum + (p1._config.ItemInnerSpacing.X + instance)
 					local ColorBox = Instance.new("ImageLabel")
 					ColorBox.Name = "ColorBox"
-					ColorBox.Size = UDim2.fromOffset(v1, v1)
+					ColorBox.Size = UDim2.fromOffset(instance, instance)
 					ColorBox.BorderSizePixel = 0
 					ColorBox.Image = p2.ICONS.ALPHA_BACKGROUND_TEXTURE
 					ColorBox.ImageTransparency = 1
@@ -638,12 +638,12 @@ return function(p1, p2)
 					p2.applyFrameStyle(ColorBox, true)
 					ColorBox.Parent = Frame
 				end
-				local v2 = UDim.new(p1._config.ContentWidth.Scale / p22, (p1._config.ContentWidth.Offset - p1._config.ItemInnerSpacing.X * (p22 - 1) - sum) / p22)
-				local v4 = p1._config.ContentWidth - UDim.new(v2.Scale * (p22 - 1), v2.Offset * (p22 - 1) + p1._config.ItemInnerSpacing.X * (p22 - 1) + sum)
+				local instance2 = UDim.new(p1._config.ContentWidth.Scale / p22, (p1._config.ContentWidth.Offset - p1._config.ItemInnerSpacing.X * (p22 - 1) - sum) / p22)
+				local var4 = p1._config.ContentWidth - UDim.new(instance2.Scale * (p22 - 1), instance2.Offset * (p22 - 1) + p1._config.ItemInnerSpacing.X * (p22 - 1) + sum)
 				for i = 1, p22 do
-					local v5
-					v5 = if i == p22 then UDim2.new(v4, p1._config.ContentHeight) else UDim2.new(v2, p1._config.ContentHeight)
-					generateField_2(p13, i, v5, p12).Parent = Frame
+					local var5
+					var5 = if i == p22 then UDim2.new(var4, p1._config.ContentHeight) else UDim2.new(instance2, p1._config.ContentHeight)
+					generateField_2(p13, i, var5, p12).Parent = Frame
 				end
 				local TextLabel = Instance.new("TextLabel")
 				TextLabel.Name = "TextLabel"
@@ -656,7 +656,7 @@ return function(p1, p2)
 				return Frame
 			end,
 			UpdateState = function(p13)
-				local v1 = p13.Instance
+				local instance = p13.Instance
 				for i = 1, p22 do
 					local number = p13.state.number
 					if p12 == "Color3" or p12 == "Color4" then
@@ -665,29 +665,29 @@ return function(p1, p2)
 							number = p13.state.transparency
 						end
 					end
-					local v2 = v1:FindFirstChild("DragField" .. tostring(i))
-					local InputField = v2.InputField
-					local v3 = getValueByIndex(number.value, i, p13.arguments)
+					local instance2 = instance:FindFirstChild("DragField" .. tostring(i))
+					local InputField = instance2.InputField
+					local var3 = getValueByIndex(number.value, i, p13.arguments)
 					if (p12 == "Color3" or p12 == "Color4") and not p13.arguments.UseFloats then
-						v3 = math.round(v3 * 255)
+						var3 = math.round(var3 * 255)
 					end
-					local v5 = p13.arguments.Format[i] or p13.arguments.Format[1]
+					local var5 = p13.arguments.Format[i] or p13.arguments.Format[1]
 					if p13.arguments.Prefix then
-						v5 = p13.arguments.Prefix[i] .. v5
+						var5 = p13.arguments.Prefix[i] .. var5
 					end
-					v2.Text = string.format(v5, v3)
-					InputField.Text = tostring(v3)
+					instance2.Text = string.format(var5, var3)
+					InputField.Text = tostring(var3)
 					if p13.state.editingText.value == i then
 						InputField.Visible = true
 						InputField:CaptureFocus()
-						v2.TextTransparency = 1
+						instance2.TextTransparency = 1
 					else
 						InputField.Visible = false
-						v2.TextTransparency = p1._config.TextTransparency
+						instance2.TextTransparency = p1._config.TextTransparency
 					end
 				end
 				if p12 == "Color3" or p12 == "Color4" then
-					local ColorBox = v1.ColorBox
+					local ColorBox = instance.ColorBox
 					ColorBox.BackgroundColor3 = p13.state.color.value
 					if p12 == "Color4" then
 						ColorBox.ImageTransparency = 1 - p13.state.transparency.value
@@ -711,7 +711,7 @@ return function(p1, p2)
 					Text = ("Drag %*"):format(p12)
 				end
 				p13.Instance.TextLabel.Text = Text
-				local v2, v3, v4, v5
+				local instance2, var3, var4, var5
 				if p13.arguments.Format then
 					if typeof(p13.arguments.Format) == "table" then
 						if not p13.arguments.Format then
@@ -720,11 +720,11 @@ return function(p1, p2)
 							else
 								p13.arguments.Format = { "%d" }
 							end
-							v2 = p13.arguments
-							v3 = t5
-							v4 = p12
-							v5 = if p13.arguments.UseHSV then "_HSV" else "_RGB"
-							v2.Prefix = t5[p12 .. v5]
+							instance2 = p13.arguments
+							var3 = t5
+							var4 = p12
+							var5 = if p13.arguments.UseHSV then "_HSV" else "_RGB"
+							instance2.Prefix = t5[p12 .. var5]
 						end
 					else
 						p13.arguments.Format = { p13.arguments.Format }
@@ -735,11 +735,11 @@ return function(p1, p2)
 					else
 						p13.arguments.Format = { "%d" }
 					end
-					v2 = p13.arguments
-					v3 = t5
-					v4 = p12
-					v5 = if p13.arguments.UseHSV then "_HSV" else "_RGB"
-					v2.Prefix = t5[p12 .. v5]
+					instance2 = p13.arguments
+					var3 = t5
+					var4 = p12
+					var5 = if p13.arguments.UseHSV then "_HSV" else "_RGB"
+					instance2.Prefix = t5[p12 .. var5]
 				end
 				p13.arguments.Min = { 0, 0, 0, 0 }
 				p13.arguments.Max = { 1, 1, 1, 1 }
@@ -765,30 +765,30 @@ return function(p1, p2)
 			end
 		})
 	end
-	local v6 = false
-	local v7 = nil
-	local v8 = 0
-	local v9 = ""
+	local var6 = false
+	local var7 = nil
+	local var8 = 0
+	local var9 = ""
 	local function updateActiveSlider()
-		if v6 == false then
-		elseif v7 ~= nil then
-			local v2 = v7.Instance:FindFirstChild("SliderField" .. tostring(v8))
-			local v3 = v7.arguments.Increment and getValueByIndex(v7.arguments.Increment, v8, v7.arguments) or t2[v9][v8]
-			local v4 = v7.arguments.Min and getValueByIndex(v7.arguments.Min, v8, v7.arguments) or t3[v9][v8]
-			local v5 = v7.arguments.Max and getValueByIndex(v7.arguments.Max, v8, v7.arguments) or t4[v9][v8]
-			local X = v2.GrabBar.AbsoluteSize.X
-			v7.state.number:set(updateValueByIndex(v7.state.number.value, v8, math.clamp(math.round((p2.getMouseLocation().X - (v2.AbsolutePosition.X - p2.GuiOffset.X + X / 2)) / (v2.AbsoluteSize.X - X) * math.floor((v5 - v4) / v3)) * v3 + v4, v4, v5), v7.arguments))
-			v7.lastNumberChangedTick = p1._cycleTick + 1
+		if var6 == false then
+		elseif var7 ~= nil then
+			local instance2 = var7.Instance:FindFirstChild("SliderField" .. tostring(var8))
+			local var3 = var7.arguments.Increment and getValueByIndex(var7.arguments.Increment, var8, var7.arguments) or t2[var9][var8]
+			local var4 = var7.arguments.Min and getValueByIndex(var7.arguments.Min, var8, var7.arguments) or t3[var9][var8]
+			local var5 = var7.arguments.Max and getValueByIndex(var7.arguments.Max, var8, var7.arguments) or t4[var9][var8]
+			local X = instance2.GrabBar.AbsoluteSize.X
+			var7.state.number:set(updateValueByIndex(var7.state.number.value, var8, math.clamp(math.round((p2.getMouseLocation().X - (instance2.AbsolutePosition.X - p2.GuiOffset.X + X / 2)) / (instance2.AbsoluteSize.X - X) * math.floor((var5 - var4) / var3)) * var3 + var4, var4, var5), var7.arguments))
+			var7.lastNumberChangedTick = p1._cycleTick + 1
 		end
 	end
 	local function SliderMouseDown(p1, p22, p3)
 		if p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl) then
 			p1.state.editingText:set(p3)
 		else
-			v6 = true
-			v7 = p1
-			v8 = p3
-			v9 = p22
+			var6 = true
+			var7 = p1
+			var8 = p3
+			var9 = p22
 			updateActiveSlider()
 		end
 	end
@@ -798,11 +798,11 @@ return function(p1, p2)
 		end
 	end)
 	p2.registerEvent("InputEnded", function(p12)
-		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 and v6) then
-			v6 = false
-			v7 = nil
-			v8 = 0
-			v9 = ""
+		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 and var6) then
+			var6 = false
+			var7 = nil
+			var8 = 0
+			var9 = ""
 		end
 	end)
 	local function generateField_3(p12, p22, p3, p4)
@@ -892,12 +892,12 @@ return function(p1, p2)
 				Frame.BackgroundTransparency = 1
 				Frame.BorderSizePixel = 0
 				p2.UIListLayout(Frame, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
-				local v1 = UDim.new(p1._config.ContentWidth.Scale / p22, (p1._config.ContentWidth.Offset - p1._config.ItemInnerSpacing.X * (p22 - 1)) / p22)
-				local v3 = p1._config.ContentWidth - UDim.new(v1.Scale * (p22 - 1), v1.Offset * (p22 - 1) + p1._config.ItemInnerSpacing.X * (p22 - 1))
+				local instance = UDim.new(p1._config.ContentWidth.Scale / p22, (p1._config.ContentWidth.Offset - p1._config.ItemInnerSpacing.X * (p22 - 1)) / p22)
+				local var3 = p1._config.ContentWidth - UDim.new(instance.Scale * (p22 - 1), instance.Offset * (p22 - 1) + p1._config.ItemInnerSpacing.X * (p22 - 1))
 				for i = 1, p22 do
-					local v4
-					v4 = if i == p22 then UDim2.new(v3, p1._config.ContentHeight) else UDim2.new(v1, p1._config.ContentHeight)
-					generateField_3(p13, i, v4, p12).Parent = Frame
+					local var4
+					var4 = if i == p22 then UDim2.new(var3, p1._config.ContentHeight) else UDim2.new(instance, p1._config.ContentHeight)
+					generateField_3(p13, i, var4, p12).Parent = Frame
 				end
 				local TextLabel = Instance.new("TextLabel")
 				TextLabel.Name = "TextLabel"
@@ -910,26 +910,26 @@ return function(p1, p2)
 				return Frame
 			end,
 			UpdateState = function(p1)
-				local v1 = p1.Instance
+				local instance = p1.Instance
 				for i = 1, p22 do
-					local v2 = v1:FindFirstChild("SliderField" .. tostring(i))
-					local InputField = v2.InputField
-					local OverlayText = v2.OverlayText
-					local GrabBar = v2.GrabBar
-					local v3 = getValueByIndex(p1.state.number.value, i, p1.arguments)
-					local v4 = p1.arguments.Format[i] or p1.arguments.Format[1]
+					local instance2 = instance:FindFirstChild("SliderField" .. tostring(i))
+					local InputField = instance2.InputField
+					local OverlayText = instance2.OverlayText
+					local GrabBar = instance2.GrabBar
+					local var3 = getValueByIndex(p1.state.number.value, i, p1.arguments)
+					local var4 = p1.arguments.Format[i] or p1.arguments.Format[1]
 					if p1.arguments.Prefix then
-						v4 = p1.arguments.Prefix[i] .. v4
+						var4 = p1.arguments.Prefix[i] .. var4
 					end
-					OverlayText.Text = string.format(v4, v3)
-					InputField.Text = tostring(v3)
-					local v5 = p1.arguments.Increment and getValueByIndex(p1.arguments.Increment, i, p1.arguments) or t2[p12][i]
-					local v6 = p1.arguments.Min and getValueByIndex(p1.arguments.Min, i, p1.arguments) or t3[p12][i]
-					local v7 = p1.arguments.Max and getValueByIndex(p1.arguments.Max, i, p1.arguments) or t4[p12][i]
-					local X = v2.AbsoluteSize.X
-					local v8 = X - GrabBar.AbsoluteSize.X
-					local v9 = math.floor((v7 - v6) / v5)
-					GrabBar.Position = UDim2.fromScale(v8 / X * math.clamp(math.floor((v3 - v6) / (v7 - v6) * v9) / v9, 0, 1) + (1 - v8 / X) / 2, 0.5)
+					OverlayText.Text = string.format(var4, var3)
+					InputField.Text = tostring(var3)
+					local var5 = p1.arguments.Increment and getValueByIndex(p1.arguments.Increment, i, p1.arguments) or t2[p12][i]
+					local var6 = p1.arguments.Min and getValueByIndex(p1.arguments.Min, i, p1.arguments) or t3[p12][i]
+					local var7 = p1.arguments.Max and getValueByIndex(p1.arguments.Max, i, p1.arguments) or t4[p12][i]
+					local X = instance2.AbsoluteSize.X
+					local var8 = X - GrabBar.AbsoluteSize.X
+					local var9 = math.floor((var7 - var6) / var5)
+					GrabBar.Position = UDim2.fromScale(var8 / X * math.clamp(math.floor((var3 - var6) / (var7 - var6) * var9) / var9, 0, 1) + (1 - var8 / X) / 2, 0.5)
 					if p1.state.editingText.value == i then
 						InputField.Visible = true
 						OverlayText.Visible = false
@@ -945,22 +945,22 @@ return function(p1, p2)
 		})
 	end
 	local function generateEnumSliderScalar(p12, p22)
-		local v1 = generateSliderScalar("Enum", 1, p22.Value)
+		local instance = generateSliderScalar("Enum", 1, p22.Value)
 		local t = { string }
-		for v2, v3 in p12:GetEnumItems() do
-			t[v3.Value] = v3.Name
+		for instance2, var3 in p12:GetEnumItems() do
+			t[var3.Value] = var3.Name
 		end
-		return p2.extend(v1, {
+		return p2.extend(instance, {
 			Args = {
 				Text = 1
 			},
 			Update = function(p1)
-				local v1 = p1.Instance
-				v1.TextLabel.Text = p1.arguments.Text or "Input Enum"
+				local instance = p1.Instance
+				instance.TextLabel.Text = p1.arguments.Text or "Input Enum"
 				p1.arguments.Increment = 1
 				p1.arguments.Min = 0
 				p1.arguments.Max = #p12:GetEnumItems() - 1
-				local GrabBar = v1:FindFirstChild("SliderField1").GrabBar
+				local GrabBar = instance:FindFirstChild("SliderField1").GrabBar
 				GrabBar.Size = UDim2.fromScale(1 / math.floor(#p12:GetEnumItems()), 1)
 			end,
 			GenerateState = function(p12)
@@ -976,9 +976,9 @@ return function(p1, p2)
 			end
 		})
 	end
-	local v10 = generateInputScalar("Num", 1, 0)
-	v10.Args.NoButtons = 6
-	p1.WidgetConstructor("InputNum", v10)
+	local var10 = generateInputScalar("Num", 1, 0)
+	var10.Args.NoButtons = 6
+	p1.WidgetConstructor("InputNum", var10)
 	p1.WidgetConstructor("InputVector2", generateInputScalar("Vector2", 2, Vector2.zero))
 	p1.WidgetConstructor("InputVector3", generateInputScalar("Vector3", 3, Vector3.new(0, 0, 0)))
 	p1.WidgetConstructor("InputUDim", generateInputScalar("UDim", 2, UDim.new()))
@@ -1064,9 +1064,9 @@ return function(p1, p2)
 			end
 		end,
 		Update = function(p1)
-			local v1 = p1.Instance
-			local InputField = v1.InputField
-			v1.TextLabel.Text = p1.arguments.Text or "Input Text"
+			local instance = p1.Instance
+			local InputField = instance.InputField
+			instance.TextLabel.Text = p1.arguments.Text or "Input Text"
 			InputField.PlaceholderText = p1.arguments.TextHint or ""
 			InputField.TextEditable = not p1.arguments.ReadOnly
 			InputField.MultiLine = p1.arguments.MultiLine or false

@@ -1,13 +1,14 @@
 -- Reviewed by Claude
-return function(p1)
-	return function(p12, p2)
- if p12 == nil then
- p12 = {}
+-- variables reassigned
+return function(reducersMap)
+	return function(state, action)
+ if state == nil then
+ state = {}
  end
- local tbl = {}
- for k, v in pairs(p1) do
- tbl[k] = v(p12[k], p2)
+ local newState = {}
+ for key, reducer in pairs(reducersMap) do
+ newState[key] = reducer(state[key], action)
  end
- return tbl
+ return newState
 	end
 end

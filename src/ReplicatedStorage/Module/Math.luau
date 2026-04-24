@@ -224,21 +224,21 @@ function t.IsPointInPrism(point, cframeRef, dimensions)
 	return if localPoint.x >= 0 and (localPoint.x < dimensions.x and (localPoint.y >= 0 and (localPoint.y < dimensions.y and localPoint.z >= 0))) then localPoint.z < dimensions.z else false
 end
 function t.IsPointInFixedCone(p1, p2, p3, p4)
-	local v1 = p4 - p1.p
-	return if -p3 <= v1.z then acos((Dot(p1.lookVector, v1.unit))) <= p2 else false
+	local delta = p4 - p1.p
+	return if -p3 <= delta.z then acos((Dot(p1.lookVector, delta.unit))) <= p2 else false
 end
 function t.DoesFixedConeIntersectSphere(p1, p2, p3, p4, p5, p6)
-	local v1 = p5 - p1
-	if p3 <= p2:Dot(v1) then
+	local delta = p5 - p1
+	if p3 <= p2:Dot(delta) then
 		return false
 	else
-		local v2 = v1:Dot(p2)
-		local v3 = v2 * tan(p4)
-		return ((v1:Dot(v1) - v2 * v2) ^ 0.5 - v3) * cos(p4) <= p6
+		local v2 = delta:Dot(p2)
+		local var3 = v2 * tan(p4)
+		return ((delta:Dot(delta) - v2 * v2) ^ 0.5 - var3) * cos(p4) <= p6
 	end
 end
 function t.TopPoint(p1, p2)
-	return p1 * v1(0, p2.y * 0.5, 0)
+	return p1 * delta(0, p2.y * 0.5, 0)
 end
 function t.BottomPoint(p1, p2)
 	return t.TopPoint(p1, -p2)
@@ -247,9 +247,9 @@ function t.Normal(p1)
 	return p1.upVector
 end
 function t.IntersectRayPlane(p1, p2, p3, p4)
-	local v1 = Dot(p4, p2)
-	if not (abs(v1) < 1e-6) then
-		local v2 = Dot(p4, p3 - p1) / v1
+	local delta = Dot(p4, p2)
+	if not (abs(delta) < 1e-6) then
+		local v2 = Dot(p4, p3 - p1) / delta
 		if not (v2 < 0) then
 			return p1 + p2 * v2
 		end
@@ -259,11 +259,11 @@ function t.IntersectRectanglesByCornersF(p1, p2, p3, p4, p5, p6, p7, p8)
 	return not if p7 <= p1 or (p3 <= p5 or p8 <= p2) then true else p4 <= p6
 end
 function t.IntersectRectanglesF(p1, p2, p3, p4, p5, p6, p7, p8)
-	local v1 = 0.5 * p5
+	local delta = 0.5 * p5
 	local v2 = 0.5 * p6
-	local v3 = 0.5 * p7
-	local v4 = 0.5 * p8
-	return t.IntersectRectanglesByCornersF(p1 - v1, p2 - v2, p1 + v1, p2 + v2, p3 - v3, p4 - v4, p3 + v3, p4 + v4)
+	local var3 = 0.5 * p7
+	local var4 = 0.5 * p8
+	return t.IntersectRectanglesByCornersF(p1 - delta, p2 - v2, p1 + delta, p2 + v2, p3 - var3, p4 - var4, p3 + var3, p4 + var4)
 end
 function t.IntersectRectanglesXZ(p1, p2, p3, p4)
 	return t.IntersectRectanglesF(p1.x, p1.z, p2.x, p2.z, p3.x, p3.z, p4.x, p4.z)
@@ -272,57 +272,57 @@ function t.Round(p1, p2)
 	return floor(p1 / p2 + 0.5) * p2
 end
 function t.RoundVec(p1, p2)
-	return v1(floor(p1.x / p2 + 0.5) * p2, floor(p1.y / p2 + 0.5) * p2, floor(p1.z / p2 + 0.5) * p2)
+	return delta(floor(p1.x / p2 + 0.5) * p2, floor(p1.y / p2 + 0.5) * p2, floor(p1.z / p2 + 0.5) * p2)
 end
 t.Clamp = math.clamp
 function t.AABBXZF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12)
-	local v1 = 0.5 * p10
+	local delta = 0.5 * p10
 	local v2 = 0.5 * p12
-	local v3 = -p1 * v1 - p3 * v2
-	local v4 = -p7 * v1 - p9 * v2
-	local v5 = -p1 * v1 + p3 * v2
-	local v6 = -p7 * v1 + p9 * v2
+	local var3 = -p1 * delta - p3 * v2
+	local var4 = -p7 * delta - p9 * v2
+	local var5 = -p1 * delta + p3 * v2
+	local var6 = -p7 * delta + p9 * v2
 	local v7
-	if v5 < v3 then
-		v3, v7 = v5, v3
+	if var5 < var3 then
+		var3, v7 = var5, var3
 	else
-		v7 = if v3 <= v5 then v5 else v3
+		v7 = if var3 <= var5 then var5 else var3
 	end
 	local v8
-	if v6 < v4 then
-		v4, v8 = v6, v4
+	if var6 < var4 then
+		var4, v8 = var6, var4
 	else
-		v8 = if v4 <= v6 then v6 else v4
+		v8 = if var4 <= var6 then var6 else var4
 	end
-	local v9 = p1 * v1 - p3 * v2
-	local v10 = p7 * v1 - p9 * v2
-	if v9 < v3 then
-		v3 = v9
-	elseif v7 <= v9 then
-		v7 = v9
+	local var9 = p1 * delta - p3 * v2
+	local var10 = p7 * delta - p9 * v2
+	if var9 < var3 then
+		var3 = var9
+	elseif v7 <= var9 then
+		v7 = var9
 	end
-	if v10 < v4 then
-		v4 = v10
-	elseif v8 <= v10 then
-		v8 = v10
+	if var10 < var4 then
+		var4 = var10
+	elseif v8 <= var10 then
+		v8 = var10
 	end
-	local v11 = p1 * v1 + p3 * v2
-	local v12 = p7 * v1 + p9 * v2
-	if v11 < v3 then
-		v3 = v11
-	elseif v7 <= v11 then
-		v7 = v11
+	local var11 = p1 * delta + p3 * v2
+	local var12 = p7 * delta + p9 * v2
+	if var11 < var3 then
+		var3 = var11
+	elseif v7 <= var11 then
+		v7 = var11
 	end
-	if v12 < v4 then
-		v4 = v12
-	elseif v8 <= v12 then
-		v8 = v12
+	if var12 < var4 then
+		var4 = var12
+	elseif v8 <= var12 then
+		v8 = var12
 	end
-	return v7 - v3, v8 - v4
+	return v7 - var3, v8 - var4
 end
 function t.AABBXZ(p1, p2)
-	local _, _2, _3, v1, v2, v3, v4, v5, v6, v7, v8, v9 = components(p1)
-	return t.AABBXZF(v1, v2, v3, v4, v5, v6, v7, v8, v9, p2.x, p2.y, p2.z)
+	local _, _2, _3, delta, v2, var3, var4, var5, var6, v7, v8, var9 = components(p1)
+	return t.AABBXZF(delta, v2, var3, var4, var5, var6, v7, v8, var9, p2.x, p2.y, p2.z)
 end
 function t.IsPrismVisibleD(p1, p2, p3)
 	local lookVector = p2.lookVector
@@ -332,138 +332,138 @@ function t.IsPrismVisibleD(p1, p2, p3)
 	local x_2 = lookVector.x
 	local y_2 = lookVector.y
 	local z_2 = lookVector.z
-	local v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12 = components(p3.CFrame)
-	local v13 = p3.Size * 0.5
-	local x_3 = v13.x
-	local y_3 = v13.y
-	local z_3 = v13.z
-	local v14 = x_3 * v4
-	local v15 = y_3 * v5
-	local v16 = z_3 * v6
-	local v17 = x_3 * v7
-	local v18 = y_3 * v8
-	local v19 = z_3 * v9
-	local v20 = x_3 * v10
-	local v21 = y_3 * v11
-	local v22 = z_3 * v12
-	local v23 = v1 + v14 + v15 + v16
-	local v24 = v2 + v17 + v18 + v19
-	local v25 = v3 + v20 + v21 + v22
-	local v26 = v1 - v14 - v15 - v16
-	local v27 = v2 - v17 - v18 - v19
-	local v28 = v3 - v20 - v21 - v22
-	local v29 = v23 - x
-	local v30 = v24 - y
-	local v31 = v25 - z
-	local v32 = (v29 * v29 + v30 * v30 + v31 * v31) ^ (-0.5)
-	if acos(x_2 * (v29 * v32) + y_2 * (v30 * v32) + z_2 * (v31 * v32)) < p1 then
+	local delta, v2, var3, var4, var5, var6, v7, v8, var9, var10, var11, var12 = components(p3.CFrame)
+	local var13 = p3.Size * 0.5
+	local x_3 = var13.x
+	local y_3 = var13.y
+	local z_3 = var13.z
+	local var14 = x_3 * var4
+	local var15 = y_3 * var5
+	local var16 = z_3 * var6
+	local var17 = x_3 * v7
+	local var18 = y_3 * v8
+	local var19 = z_3 * var9
+	local var20 = x_3 * var10
+	local var21 = y_3 * var11
+	local var22 = z_3 * var12
+	local var23 = delta + var14 + var15 + var16
+	local var24 = v2 + var17 + var18 + var19
+	local var25 = var3 + var20 + var21 + var22
+	local var26 = delta - var14 - var15 - var16
+	local var27 = v2 - var17 - var18 - var19
+	local var28 = var3 - var20 - var21 - var22
+	local var29 = var23 - x
+	local var30 = var24 - y
+	local var31 = var25 - z
+	local var32 = (var29 * var29 + var30 * var30 + var31 * var31) ^ (-0.5)
+	if acos(x_2 * (var29 * var32) + y_2 * (var30 * var32) + z_2 * (var31 * var32)) < p1 then
 		return true
 	else
-		local v33 = v26 - x
-		local v34 = v27 - y
-		local v35 = v28 - z
-		local v36 = (v33 * v33 + v34 * v34 + v35 * v35) ^ (-0.5)
-		if acos(x_2 * (v33 * v36) + y_2 * (v34 * v36) + z_2 * (v35 * v36)) < p1 then
+		local var33 = var26 - x
+		local var34 = var27 - y
+		local var35 = var28 - z
+		local var36 = (var33 * var33 + var34 * var34 + var35 * var35) ^ (-0.5)
+		if acos(x_2 * (var33 * var36) + y_2 * (var34 * var36) + z_2 * (var35 * var36)) < p1 then
 			return true
 		else
-			local v37 = v26 - x
-			local v38 = v24 - y
-			local v39 = v25 - z
-			local v40 = (v37 * v37 + v38 * v38 + v39 * v39) ^ (-0.5)
-			if acos(x_2 * (v37 * v40) + y_2 * (v38 * v40) + z_2 * (v39 * v40)) < p1 then
+			local var37 = var26 - x
+			local var38 = var24 - y
+			local var39 = var25 - z
+			local var40 = (var37 * var37 + var38 * var38 + var39 * var39) ^ (-0.5)
+			if acos(x_2 * (var37 * var40) + y_2 * (var38 * var40) + z_2 * (var39 * var40)) < p1 then
 				return true
 			else
-				local v41 = v23 - x
-				local v42 = v27 - y
-				local v43 = v28 - z
-				local v44 = (v41 * v41 + v42 * v42 + v43 * v43) ^ (-0.5)
-				return acos(x_2 * (v41 * v44) + y_2 * (v42 * v44) + z_2 * (v43 * v44)) < p1
+				local var41 = var23 - x
+				local var42 = var27 - y
+				local var43 = var28 - z
+				local var44 = (var41 * var41 + var42 * var42 + var43 * var43) ^ (-0.5)
+				return acos(x_2 * (var41 * var44) + y_2 * (var42 * var44) + z_2 * (var43 * var44)) < p1
 			end
 		end
 	end
 end
 function t.IsPrismVisible(p1, p2, p3, p4)
-	local v12 = 0.5 * p4
-	local x = v12.x
-	local y = v12.y
-	local z = v12.z
-	local _, v2 = p1(p2, p3 * v1(x, y, z))
+	local var12 = 0.5 * p4
+	local x = var12.x
+	local y = var12.y
+	local z = var12.z
+	local _, v2 = p1(p2, p3 * delta(x, y, z))
 	if v2 then
 		return true
 	end
-	local _2, v3 = p1(p2, p3 * v1(-x, -y, -z))
-	if v3 then
+	local _2, var3 = p1(p2, p3 * delta(-x, -y, -z))
+	if var3 then
 		return true
 	end
-	local _3, v4 = p1(p2, p3 * v1(x, y, -z))
-	if v4 then
+	local _3, var4 = p1(p2, p3 * delta(x, y, -z))
+	if var4 then
 		return true
 	end
-	local _4, v5 = p1(p2, p3 * v1(-x, y, z))
-	if v5 then
+	local _4, var5 = p1(p2, p3 * delta(-x, y, z))
+	if var5 then
 		return true
 	end
-	local _5, v6 = p1(p2, p3 * v1(-x, y, -z))
-	if v6 then
+	local _5, var6 = p1(p2, p3 * delta(-x, y, -z))
+	if var6 then
 		return true
 	end
-	local _6, v7 = p1(p2, p3 * v1(x, -y, z))
+	local _6, v7 = p1(p2, p3 * delta(x, -y, z))
 	if v7 then
 		return true
 	end
-	local _7, v8 = p1(p2, p3 * v1(x, -y, -z))
+	local _7, v8 = p1(p2, p3 * delta(x, -y, -z))
 	if v8 then
 		return true
 	end
-	local _8, v9 = p1(p2, p3 * v1(-x, -y, z))
-	if v9 then
+	local _8, var9 = p1(p2, p3 * delta(-x, -y, z))
+	if var9 then
 		return true
 	end
 end
 function t.IsPrismApproxVisible(p1, p2, p3, p4)
-	local v12 = 0.5 * p4 * 2
-	local x = v12.x
-	local y = v12.y
-	local z = v12.z
-	local _, v2 = p1(p2, p3 * v1(x, y, z))
+	local var12 = 0.5 * p4 * 2
+	local x = var12.x
+	local y = var12.y
+	local z = var12.z
+	local _, v2 = p1(p2, p3 * delta(x, y, z))
 	if v2 then
 		return true
 	else
-		local _2, v3 = p1(p2, p3 * v1(-x, -y, -z))
-		return v3 and true or false
+		local _2, var3 = p1(p2, p3 * delta(-x, -y, -z))
+		return var3 and true or false
 	end
 end
 local function IntersectRaySphereF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
-	local v1 = p8 - p1
+	local delta = p8 - p1
 	local v2 = p9 - p2
-	local v3 = p10 - p3
-	local v4 = v1 * p4 + v2 * p5 + v3 * p6
-	if v4 < 0 then
+	local var3 = p10 - p3
+	local var4 = delta * p4 + v2 * p5 + var3 * p6
+	if var4 < 0 then
 		return false
 	else
-		local v5 = v1 * v1 + v2 * v2 + v3 * v3 - v4 * v4
-		local v6 = p11 * p11
-		if v6 < v5 then
+		local var5 = delta * delta + v2 * v2 + var3 * var3 - var4 * var4
+		local var6 = p11 * p11
+		if var6 < var5 then
 			return false
 		else
-			return not (p7 < v4 - (v6 - v5) ^ 0.5)
+			return not (p7 < var4 - (var6 - var5) ^ 0.5)
 		end
 	end
 end
 local function IntersectRaySphere(p1, p2, p3, p4, p5)
-	local v1 = p4.x - p1.x
+	local delta = p4.x - p1.x
 	local v2 = p4.y - p1.y
-	local v3 = p4.z - p1.z
-	local v4 = v1 * p2.x + v2 * p2.y + v3 * p2.z
-	if v4 < 0 then
+	local var3 = p4.z - p1.z
+	local var4 = delta * p2.x + v2 * p2.y + var3 * p2.z
+	if var4 < 0 then
 		return false
 	else
-		local v5 = v1 * v1 + v2 * v2 + v3 * v3 - v4 * v4
-		local v6 = p5 * p5
-		if v6 < v5 then
+		local var5 = delta * delta + v2 * v2 + var3 * var3 - var4 * var4
+		local var6 = p5 * p5
+		if var6 < var5 then
 			return false
 		else
-			return not (p3 < v4 - (v6 - v5) ^ 0.5)
+			return not (p3 < var4 - (var6 - var5) ^ 0.5)
 		end
 	end
 end
@@ -481,26 +481,26 @@ function t.ShortGUID()
 end
 t.Base85UUID = String.base85UUID
 function t.Uniform2D(p1)
-	local v12 = random()
+	local var12 = random()
 	local v2 = random()
-	local v3
-	if v2 < v12 then
-		v2, v3 = v12, v2
+	local var3
+	if v2 < var12 then
+		v2, var3 = var12, v2
 	else
-		v3 = v12
+		var3 = var12
 	end
-	return v1(v2 * p1 * cos(6.283185307179586 * v3 / v2), v2 * p1 * sin(6.283185307179586 * v3 / v2), 0)
+	return delta(v2 * p1 * cos(6.283185307179586 * var3 / v2), v2 * p1 * sin(6.283185307179586 * var3 / v2), 0)
 end
-local v5 = Random.new()
+local var5 = Random.new()
 function t.WeightedRandom(p1)
 	for i = 1, 10 do
-		v5:NextNumber()
+		var5:NextNumber()
 	end
 	local sum = 0
 	for j = 1, #p1 do
 		sum = sum + p1[j]
 	end
-	local sum_2 = v5:NextNumber() * sum
+	local sum_2 = var5:NextNumber() * sum
 	for k = 1, #p1 do
 		if sum_2 < p1[k] then
 			return k
@@ -512,33 +512,33 @@ end
 function t.LookAt(p1, p2, p3)
 	local unit = (p2 - p3).unit
 	local unit_2 = Cross(p1, unit).unit
-	local v1 = Cross(unit, unit_2)
-	return v2(p2.X, p2.Y, p2.Z, unit_2.x, v1.x, unit.x, unit_2.y, v1.y, unit.y, unit_2.z, v1.z, unit.z)
+	local delta = Cross(unit, unit_2)
+	return v2(p2.X, p2.Y, p2.Z, unit_2.x, delta.x, unit.x, unit_2.y, delta.y, unit.y, unit_2.z, delta.z, unit.z)
 end
 function t.BinaryFind(p1, p2, p3)
-	local v1 = 1
+	local delta = 1
 	local v2 = #p1
-	local v3 = p3 or "Sort"
-	while v1 <= v2 do
-		local v4 = floor((v1 + v2) * 0.5)
-		local v5 = p1[v4][v3]
-		if v5 < p2 then
-			v1 = v4 + 1
+	local var3 = p3 or "Sort"
+	while delta <= v2 do
+		local var4 = floor((delta + v2) * 0.5)
+		local var5 = p1[var4][var3]
+		if var5 < p2 then
+			delta = var4 + 1
 		else
-			if not (p2 < v5) then
-				return v4
+			if not (p2 < var5) then
+				return var4
 			end
-			v2 = v4 - 1
+			v2 = var4 - 1
 		end
 	end
-	return v1
+	return delta
 end
 function t.Shuffle(p1)
 	for i = #p1, 2, -1 do
-		local v1 = math.random(i)
-		local v3 = p1[i]
-		p1[i] = p1[v1]
-		p1[v1] = v3
+		local delta = math.random(i)
+		local var3 = p1[i]
+		p1[i] = p1[delta]
+		p1[delta] = var3
 	end
 end
 function t.IsNaN(p1)
@@ -549,35 +549,35 @@ function t.IsNaNv3(p1)
 end
 function t.IsNaNcf(p1)
 	local lookVector = p1.lookVector
-	local v1 = if lookVector.x == lookVector.x and lookVector.y == lookVector.y then lookVector.z ~= lookVector.z else true
-	if not v1 then
+	local delta = if lookVector.x == lookVector.x and lookVector.y == lookVector.y then lookVector.z ~= lookVector.z else true
+	if not delta then
 		local rightVector = p1.rightVector
-		v1 = if rightVector.x == rightVector.x and rightVector.y == rightVector.y then rightVector.z ~= rightVector.z else true
-		if not v1 then
+		delta = if rightVector.x == rightVector.x and rightVector.y == rightVector.y then rightVector.z ~= rightVector.z else true
+		if not delta then
 			local upVector = p1.upVector
-			v1 = if upVector.x == upVector.x and upVector.y == upVector.y then upVector.z ~= upVector.z else true
+			delta = if upVector.x == upVector.x and upVector.y == upVector.y then upVector.z ~= upVector.z else true
 		end
 	end
-	return v1
+	return delta
 end
 function t.Clampv3(p1, p2, p3)
-	return v1(math.clamp(p1.x, p2, p3), math.clamp(p1.y, p2, p3), (math.clamp(p1.z, p2, p3)))
+	return delta(math.clamp(p1.x, p2, p3), math.clamp(p1.y, p2, p3), (math.clamp(p1.z, p2, p3)))
 end
 local function comma(p1)
-	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
-	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
+	local delta, v2, var3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
+	return delta .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. var3
 end
 local function FormatMoney(p1)
-	local v3, v4, v5 = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
-	return ("%s$%s"):format(if p1 >= 0 then "" else "-", v3 .. v4:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v5)
+	local var3, var4, var5 = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
+	return ("%s$%s"):format(if p1 >= 0 then "" else "-", var3 .. var4:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. var5)
 end
 t.comma = comma
 t.FormatMoney = FormatMoney
 function t.stohms(p1)
-	local v1 = math.floor(p1 / 3600)
-	local v2 = p1 - v1 * 3600
-	local v3 = math.floor(v2 / 60)
-	return v1, v3, v2 - v3 * 60
+	local delta = math.floor(p1 / 3600)
+	local v2 = p1 - delta * 3600
+	local var3 = math.floor(v2 / 60)
+	return delta, var3, v2 - var3 * 60
 end
 function t.Now(p1)
 	return os.time() + ((p1 or -8) + 1) * 60 * 60
@@ -586,25 +586,25 @@ function t.NextMidnight(p1)
 	return math.ceil(t.Now(p1) / 86400) * 86400
 end
 function t.TimeUntilMidnight(p1)
-	local v1 = t.Now(p1)
-	return t.NextMidnight(p1) - v1
+	local delta = t.Now(p1)
+	return t.NextMidnight(p1) - delta
 end
 local max = math.max
 local function TimeAccumDiff(p1, p2)
 	return max(0, p1 - (p2 and os.time() or tick()))
 end
 local function TimeAccumAdd(p1, p2, p3)
-	local v1 = p3 and os.time() or tick()
-	return v1 + TimeAccumDiff(p1) + p2
+	local delta = p3 and os.time() or tick()
+	return delta + TimeAccumDiff(p1) + p2
 end
 t.TimeAccumDiff = TimeAccumDiff
 t.TimeAccumAdd = TimeAccumAdd
 local function Ease_inOutQuad(p1, p2, p3, p4)
-	local v1 = p1 / p4 * 2
-	if v1 < 1 then
-		return p3 * 0.5 * v1 * v1 + p2
+	local delta = p1 / p4 * 2
+	if delta < 1 then
+		return p3 * 0.5 * delta * delta + p2
 	else
-		return -p3 * 0.5 * ((v1 - 1) * (v1 - 3) - 1) + p2
+		return -p3 * 0.5 * ((delta - 1) * (delta - 3) - 1) + p2
 	end
 end
 t.TweenType = {
@@ -628,9 +628,9 @@ function t.UpdateTween(p1, p2)
 		p1.v = p1.t0 * (1 - p1.i) + p1.t1 * p1.i
 	elseif p1.Type == t.TweenType.InOutQuad then
 		local t0 = p1.t0
-		local v1 = p1.t1 - p1.t0
+		local delta = p1.t1 - p1.t0
 		local v2 = p1.i / 1 * 2
-		p1.v = if v2 < 1 then v1 * 0.5 * v2 * v2 + t0 else -v1 * 0.5 * ((v2 - 1) * (v2 - 3) - 1) + t0
+		p1.v = if v2 < 1 then delta * 0.5 * v2 * v2 + t0 else -delta * 0.5 * ((v2 - 1) * (v2 - 3) - 1) + t0
 	end
 	if p1.i >= 1 and p1.Finished then
 		p1.Finished(p1)

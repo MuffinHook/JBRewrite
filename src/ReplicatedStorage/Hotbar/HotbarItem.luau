@@ -12,10 +12,10 @@ local InventoryItemBinder = require(ReplicatedStorage.Inventory.InventoryItemBin
 local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
 local t = {}
 t.__index = t
-function t.new(p1)
+function t.new(self)
 	local t2 = {}
 	setmetatable(t2, t)
-	t2.obj = p1
+	t2.obj = self
 	t2._maid = Maid.new()
 	if t2:GetOwner() == Players.LocalPlayer then
 		t2:_setupLocal()
@@ -23,115 +23,115 @@ function t.new(p1)
 	t2.lastDroppedAt = 0
 	return t2
 end
-function t.GetOwner(p1)
-	local v1 = p1.obj.Parent.Parent
+function t.GetOwner(self)
+	local v1 = self.obj.Parent.Parent
 	local isParent = v1.Parent == game:GetService("Players")
 	assert(isParent, "this hotbarItem is not a valid descendant of a player")
 	return v1
 end
-function t.SetKeyCode(p1, p2)
-	p1.keyCode = p2
+function t.SetKeyCode(self, p2)
+	self.keyCode = p2
 end
-function t.SetBindText(p1, p2)
-	p1._frame.Index.Visible = p2 ~= nil
+function t.SetBindText(self, p2)
+	self._frame.Index.Visible = p2 ~= nil
 	if p2 then
-		p1._frame.Index.Text = p2
+		self._frame.Index.Text = p2
 	end
 end
-function t.SetDropVisible(p1, p2)
+function t.SetDropVisible(self, p2)
 	assert(typeof(p2) == "boolean", "value must be a boolean")
-	p1._frame.Drop.Visible = p2
+	self._frame.Drop.Visible = p2
 end
-function t._setupLocal(p1)
+function t._setupLocal(self)
 	local v1 = HotbarItemRes.presetFrame:Clone()
 	v1.Parent = HotbarItemRes.gui.Container
-	p1._frame = v1
-	p1._maid:GiveTask(p1._frame)
-	p1:_setupDisplayOrder()
-	p1:_setupImageSrc()
-	p1:_setupDragging()
-	p1.onDragStarted = Signal.new()
-	p1._maid:GiveTask(p1.onDragStarted)
-	p1.sizeSpring = Spring.new(1, 0, 0.5, 50)
-	p1.spinSpring = Spring.new(0, 0, 0.8, 20)
+	self._frame = v1
+	self._maid:GiveTask(self._frame)
+	self:_setupDisplayOrder()
+	self:_setupImageSrc()
+	self:_setupDragging()
+	self.onDragStarted = Signal.new()
+	self._maid:GiveTask(self.onDragStarted)
+	self.sizeSpring = Spring.new(1, 0, 0.5, 50)
+	self.spinSpring = Spring.new(0, 0, 0.8, 20)
 	local function handleEquipped()
-		p1._frame.ImageTransparency = if InventoryItemUtils.getEquipped(p1.obj) then 0.5 else 0
+		self._frame.ImageTransparency = if InventoryItemUtils.getEquipped(self.obj) then 0.5 else 0
 	end
-	p1._maid:GiveTask(InventoryItemUtils.getEquippedSignal(p1.obj):Connect(handleEquipped))
-	p1._frame.ImageTransparency = if InventoryItemUtils.getEquipped(p1.obj) then 0.5 else 0
-	p1._maid:GiveTask(v1.Drop.MouseButton1Down:Connect(function()
-		p1:GetInventoryItem():AttemptDrop()
-		p1.lastDroppedAt = os.clock()
+	self._maid:GiveTask(InventoryItemUtils.getEquippedSignal(self.obj):Connect(handleEquipped))
+	self._frame.ImageTransparency = if InventoryItemUtils.getEquipped(self.obj) then 0.5 else 0
+	self._maid:GiveTask(v1.Drop.MouseButton1Down:Connect(function()
+		self:GetInventoryItem():AttemptDrop()
+		self.lastDroppedAt = os.clock()
 	end))
 end
-function t._setupDisplayOrder(p1)
+function t._setupDisplayOrder(self)
 	local function update()
-		p1._frame.LayoutOrder = HotbarItemUtils.getDisplayOrder(p1.obj) or 0
+		self._frame.LayoutOrder = HotbarItemUtils.getDisplayOrder(self.obj) or 0
 	end
-	p1._frame.LayoutOrder = HotbarItemUtils.getDisplayOrder(p1.obj) or 0
-	p1._maid:GiveTask(p1.obj:GetAttributeChangedSignal(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME):Connect(update))
+	self._frame.LayoutOrder = HotbarItemUtils.getDisplayOrder(self.obj) or 0
+	self._maid:GiveTask(self.obj:GetAttributeChangedSignal(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME):Connect(update))
 end
-function t._setupImageSrc(p1)
+function t._setupImageSrc(self)
 	local function update()
-		p1._frame.Icon.Image = HotbarItemUtils.getImageSrc(p1.obj) or ""
+		self._frame.Icon.Image = HotbarItemUtils.getImageSrc(self.obj) or ""
 	end
-	p1._frame.Icon.Image = HotbarItemUtils.getImageSrc(p1.obj) or ""
-	p1._maid:GiveTask(p1.obj:GetAttributeChangedSignal(HotbarItemConsts.IMAGE_SRC_ATTR_NAME):Connect(update))
+	self._frame.Icon.Image = HotbarItemUtils.getImageSrc(self.obj) or ""
+	self._maid:GiveTask(self.obj:GetAttributeChangedSignal(HotbarItemConsts.IMAGE_SRC_ATTR_NAME):Connect(update))
 end
-function t._setupDragging(p1)
-	p1._maid:GiveTask(p1._frame.MouseButton1Down:Connect(function()
-		p1:_onPressStarted()
+function t._setupDragging(self)
+	self._maid:GiveTask(self._frame.MouseButton1Down:Connect(function()
+		self:_onPressStarted()
 	end))
-	p1._maid:GiveTask(p1._frame.MouseButton1Up:Connect(function()
-		p1:_onPressEnded()
+	self._maid:GiveTask(self._frame.MouseButton1Up:Connect(function()
+		self:_onPressEnded()
 	end))
 end
-function t._onPressStarted(p1)
-	local v1 = (p1._pressCounter or 0) + 1
-	p1._pressCounter = v1
-	p1._pressCounterAtStart = p1._pressCounter
+function t._onPressStarted(self)
+	local v1 = (self._pressCounter or 0) + 1
+	self._pressCounter = v1
+	self._pressCounterAtStart = self._pressCounter
 	task.delay(HotbarItemConsts.MIN_DRAG_DURATION, function()
-		if p1._pressCounter == v1 then
-			p1._pressCounter = p1._pressCounter + 1
-			p1.onDragStarted:Fire()
+		if self._pressCounter == v1 then
+			self._pressCounter = self._pressCounter + 1
+			self.onDragStarted:Fire()
 		end
 	end)
 end
-function t._onPressEnded(p1)
-	if os.clock() - p1.lastDroppedAt < 0.1 then
-	elseif p1._pressCounter == p1._pressCounterAtStart then
-		p1._pressCounter = (p1._pressCounter or 0) + 1
-		p1:GetInventoryItem():AttemptSelect()
+function t._onPressEnded(self)
+	if os.clock() - self.lastDroppedAt < 0.1 then
+	elseif self._pressCounter == self._pressCounterAtStart then
+		self._pressCounter = (self._pressCounter or 0) + 1
+		self:GetInventoryItem():AttemptSelect()
 	end
 end
-function t.GetInventoryItem(p1)
-	return InventoryItemBinder:Get(p1.obj)
+function t.GetInventoryItem(self)
+	return InventoryItemBinder:Get(self.obj)
 end
-function t.SetSize(p1, p2)
-	p1.sizeSpring:SetTarget(p2)
-	p1._maid.springHeartbeat = RunService.Heartbeat:Connect(function()
-		local v1, v2 = p1.sizeSpring:Update()
+function t.SetSize(self, p2)
+	self.sizeSpring:SetTarget(p2)
+	self._maid.springHeartbeat = RunService.Heartbeat:Connect(function()
+		local v1, v2 = self.sizeSpring:Update()
 		if math.abs(p2 - v1) < 0.001 and math.abs(v2) < 0.001 then
-			p1._maid.springHeartbeat = nil
+			self._maid.springHeartbeat = nil
 			v1 = p2
 		end
-		p1._frame.Size = UDim2.new(v1, 0, v1, 0)
+		self._frame.Size = UDim2.new(v1, 0, v1, 0)
 	end)
 end
-function t.Spin(p1)
-	p1.spinSpring:SetTarget(360)
-	p1.spinSpring.p = 0
-	p1._maid.spinHeartbeat = RunService.Heartbeat:Connect(function()
-		local v1, v2 = p1.spinSpring:Update()
+function t.Spin(self)
+	self.spinSpring:SetTarget(360)
+	self.spinSpring.p = 0
+	self._maid.spinHeartbeat = RunService.Heartbeat:Connect(function()
+		local v1, v2 = self.spinSpring:Update()
 		if math.abs(360 - v1) < 0.001 and math.abs(v2) < 0.001 then
-			p1._maid.spinHeartbeat = nil
+			self._maid.spinHeartbeat = nil
 			v1 = 0
 		end
-		p1._frame.Icon.Rotation = v1
+		self._frame.Icon.Rotation = v1
 	end)
 end
-function t.Destroy(p1)
-	p1._maid:Destroy()
-	setmetatable(p1, nil)
+function t.Destroy(self)
+	self._maid:Destroy()
+	setmetatable(self, nil)
 end
 return t

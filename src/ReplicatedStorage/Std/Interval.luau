@@ -2,122 +2,122 @@
 -- variables reassigned
 local RunService = game:GetService("RunService")
 local Signal = require(script.Parent.Signal)
-local t = {}
-t.__index = t
-local v1 = nil
-local function _getCallerName(p1)
-	local count = 0
-	for v2 in p1:gmatch("[^\n]+") do
-		local v1
-		count = count + 1
-		if count == 2 then
-			local v3 = v2:match("%.?([%w_]+):%d+")
-			local v4 = v2:match("function (%w+)")
-			if v3 and v4 then
-				return v3 .. "." .. v4
+local Interval = {}
+Interval.__index = Interval
+local intervalListHead = nil
+local function _getCallerName(traceback)
+	local lineCount = 0
+	for line in traceback:gmatch("[^\n]+") do
+		local funcName
+		lineCount = lineCount + 1
+		if lineCount == 2 then
+			local fileName = line:match("%.?([%w_]+):%d+")
+			local functionName = line:match("function (%w+)")
+			if fileName and functionName then
+				return fileName .. "." .. functionName
 			else
-				v1 = v4 or (v3 or "Unknown")
-				return v1
+				funcName = functionName or (fileName or "Unknown")
+				return funcName
 			end
 		end
 	end
 	return "Unknown"
 end
-local function _insert(p1)
-	if v1 == nil then
-		v1 = p1
-	elseif v1.endTime < p1.endTime then
-		local v12 = v1
-		local v2 = v12.next
-		while v2 ~= nil and v2.endTime < p1.endTime do
-			v2, v12 = v2.next, v2
+local function _insertNode(node)
+	if intervalListHead == nil then
+		intervalListHead = node
+	elseif intervalListHead.endTime < node.endTime then
+		local current = intervalListHead
+		local next = current.next
+		while next ~= nil and next.endTime < node.endTime do
+			next, current = next.next, next
 		end
-		v12.next = p1
-		p1.previous = v12
-		if v2 ~= nil then
-			p1.next = v2
-			v2.previous = p1
+		current.next = node
+		node.previous = current
+		if next ~= nil then
+			node.next = next
+			next.previous = node
 		end
 	else
-		p1.next = v1
-		v1.previous = p1
-		v1 = p1
+		node.next = intervalListHead
+		intervalListHead.previous = node
+		intervalListHead = node
 	end
 end
 RunService.Heartbeat:Connect(function()
-	local v12 = os.clock()
-	while v1 ~= nil and v1.endTime <= v12 do
-		local v2 = v1
-		v1 = v2.next
-		if v1 then
-			v1.previous = nil
+	local currentTime = os.clock()
+	while intervalListHead ~= nil and intervalListHead.endTime <= currentTime do
+		local node = intervalListHead
+		intervalListHead = node.next
+		if intervalListHead then
+			intervalListHead.previous = nil
 		end
-		local v3 = v2.endTime - v2.duration
-		v2.endTime = v2.endTime + v2.duration
-		v2.next = nil
-		_insert(v2)
-		debug.profilebegin("Interval::" .. v2.name)
-		v2.signal:Fire(v12 - v3)
+		local startTime = node.endTime - node.duration
+		node.endTime = node.endTime + node.duration
+		node.next = nil
+		_insertNode(node)
+		debug.profilebegin("Interval::" .. node.name)
+		node.signal:Fire(currentTime - startTime)
 		debug.profileend()
 	end
 end)
-function t.every(p1)
-	assert(type(p1) == "number", "Bad argument #1 to Interval.every, must be a number.")
-	assert(p1 == p1, "Bad argument #1 to Interval.every, must not be NaN.")
-	assert(p1 < (1 / 0), "Bad argument #1 to Interval.every, must not be infinity.")
-	if not (p1 >= 1 / 60) then
+function Interval.every(duration)
+	assert(type(duration) == "number", "Bad argument #1 to Interval.every, must be a number.")
+	assert(duration == duration, "Bad argument #1 to Interval.every, must not be NaN.")
+	assert(duration < (1 / 0), "Bad argument #1 to Interval.every, must not be infinity.")
+	if not (duration >= 1 / 60) then
 		warn("Interval.every: duration is less than 1/60, changing to 1/60")
-		p1 = 1 / 60
+		duration = 1 / 60
 	end
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._signal = Signal.new()
-	local t3 = {
+	local interval = {}
+	setmetatable(interval, Interval)
+	interval._signal = Signal.new()
+	local node = {
 		name = _getCallerName((debug.traceback())),
-		signal = t2._signal,
-		endTime = os.clock() + p1,
-		duration = p1
+		signal = interval._signal,
+		endTime = os.clock() + duration,
+		duration = duration
 	}
-	_insert(t3)
-	t2._node = t3
-	return t2
+	_insertNode(node)
+	interval._node = node
+	return interval
 end
-local function _remove(p1)
-	local v12 = p1.next
-	if v1 == p1 then
-		if v12 ~= nil then
-			v12.previous = nil
+local function _removeNode(node)
+	local nextNode = node.next
+	if intervalListHead == node then
+		if nextNode ~= nil then
+			nextNode.previous = nil
 		end
-		v1 = v12
+		intervalListHead = nextNode
 	else
-		local previous = p1.previous
-		previous.next = v12
-		if v12 ~= nil then
-			v12.previous = previous
+		local prevNode = node.previous
+		prevNode.next = nextNode
+		if nextNode ~= nil then
+			nextNode.previous = prevNode
 		end
 	end
 end
-function t.Connect(p1, p2)
-	p1._signal:Connect(p2)
-	return p1
+function Interval.Connect(self, callback)
+	self._signal:Connect(callback)
+	return self
 end
-function t.Destroy(p1)
-	local _node = p1._node
-	local v12 = _node.next
-	if v1 == _node then
-		if v12 ~= nil then
-			v12.previous = nil
+function Interval.Destroy(self)
+	local node = self._node
+	local nextNode = node.next
+	if intervalListHead == node then
+		if nextNode ~= nil then
+			nextNode.previous = nil
 		end
-		v1 = v12
+		intervalListHead = nextNode
 	else
-		local previous = _node.previous
-		previous.next = v12
-		if v12 ~= nil then
-			v12.previous = previous
+		local prevNode = node.previous
+		prevNode.next = nextNode
+		if nextNode ~= nil then
+			nextNode.previous = prevNode
 		end
 	end
-	p1._signal:Destroy()
-	p1._signal = nil
+	self._signal:Destroy()
+	self._signal = nil
 end
-t.Disconnect = t.Destroy
-return t
+Interval.Disconnect = Interval.Destroy
+return Interval

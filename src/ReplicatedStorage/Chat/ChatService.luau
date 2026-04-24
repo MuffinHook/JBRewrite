@@ -30,38 +30,38 @@ function ChatService.init()
 		playerChatDataMap[player] = nil
 	end
 	local function setPlayerChatData(player)
-		local chatData = {
+		local playerChatData = {
 			Tags = {}
 		}
 		if RunUtils.isMainWorld() and GamepassSystem.doesPlayerOwnCached(player, GamepassUtils.EnumGamepass.VIP) then
-			chatData.ChatColor = vipColor
-			table.insert(chatData.Tags, {
+			playerChatData.ChatColor = vipColor
+			table.insert(playerChatData.Tags, {
 				TagText = "[VIP] ",
 				TagColor = vipColor
 			})
 		end
 		if RunUtils.isTradeWorld() and GamepassSystem.doesPlayerOwnCached(player, GamepassUtils.EnumGamepass.TradingVIP) then
-			chatData.ChatColor = tradingVIPColor
-			table.insert(chatData.Tags, {
+			playerChatData.ChatColor = tradingVIPColor
+			table.insert(playerChatData.Tags, {
 				TagText = "[TradingVIP] ",
 				TagColor = tradingVIPColor
 			})
 		end
 		if player:GetAttribute("IsPartner") then
-			table.insert(chatData.Tags, {
+			table.insert(playerChatData.Tags, {
 				TagText = "[Star] ",
 				TagColor = partnerColor
 			})
 		end
 		if AdminPermUtils.isBadimo(player) then
-			chatData.ChatColor = badimoColor
-			table.clear(chatData.Tags)
-			table.insert(chatData.Tags, {
+			playerChatData.ChatColor = badimoColor
+			table.clear(playerChatData.Tags)
+			table.insert(playerChatData.Tags, {
 				TagText = "[Badimo] ",
 				TagColor = badimoColor
 			})
 		end
-		playerChatDataMap[player] = chatData
+		playerChatDataMap[player] = playerChatData
 	end
 	local function playerAdded(player)
 		local playerMaid = Maid.new()

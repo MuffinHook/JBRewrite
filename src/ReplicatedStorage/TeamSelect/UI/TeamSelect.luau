@@ -76,7 +76,7 @@ function v1.render(p1)
 	local v1 = AllUpdateText:split("\n")
 	local v2 = nil
 	local t2 = {}
-	local v3 = false
+	local var3 = false
 	local t3 = {}
 	local t4 = {}
 	for v4, v5 in v1 do
@@ -86,12 +86,12 @@ function v1.render(p1)
 				table.insert(t2, v2 .. "\n")
 			end
 			v2 = ""
-			v3 = false
-		elseif v3 then
+			var3 = false
+		elseif var3 then
 			v2 = v2 .. "\n" .. v5
 		else
 			table.insert(t3, v5)
-			v3 = true
+			var3 = true
 		end
 	end
 	assert(#t2 == #t3)
@@ -146,9 +146,9 @@ function v1.render(p1)
 		FillDirection = Enum.FillDirection.Vertical,
 		Padding = UDim.new(0, 0)
 	})
-	local v16 = Color3.fromHex("6687ce")
-	local v17 = Color3.fromHex("de4833")
-	local v18 = Color3.fromRGB(253, 123, 49)
+	local color16 = Color3.fromHex("6687ce")
+	local color17 = Color3.fromHex("de4833")
+	local color18 = Color3.fromRGB(253, 123, 49)
 	local function getText(p1, p2)
 		return createElement("TextLabel", {
 			Size = UDim2.fromScale(1, 0.2),
@@ -183,8 +183,8 @@ function v1.render(p1)
 			})
 		})
 	end
-	local v19, v20 = Roact.createBinding(v16)
-	local _, _2 = Roact.createBinding(v17)
+	local v19, v20 = Roact.createBinding(color16)
+	local _, _2 = Roact.createBinding(color17)
 	return createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
 		Position = UDim2.fromScale(0.5, 0.5),
@@ -359,10 +359,10 @@ function v1.render(p1)
 								p1.props.onTeamSelected(Settings.EnumTeam.Police)
 							end,
 							[Roact.Event.MouseEnter] = function()
-								v20(ColorUtils.brightenBy(v16, -0.5))
+								v20(ColorUtils.brightenBy(color16, -0.5))
 							end,
 							[Roact.Event.MouseLeave] = function()
-								v20(v16)
+								v20(color16)
 							end,
 							Selectable = true
 						}, {
@@ -376,20 +376,20 @@ function v1.render(p1)
 								Thickness = 3,
 								Color = v19
 							}),
-							Text = getText(Localization:FormatByKey("Teams.TeamPolice"), v16),
-							NumPlayers = getNumPlayers(p1.props.numPolice, v16)
+							Text = getText(Localization:FormatByKey("Teams.TeamPolice"), color16),
+							NumPlayers = getNumPlayers(p1.props.numPolice, color16)
 						}),
 						NonPoliceTeam = (function()
 							local isAllowCriminal = p1.props.allowCriminal == true
-							local v1, v2, v3
+							local v1, v2, var3
 							if isAllowCriminal then
 								v1 = Settings.EnumTeam.Criminal
-								v2 = v17
-								v3 = Localization:FormatByKey("Teams.TeamCriminal")
+								v2 = color17
+								var3 = Localization:FormatByKey("Teams.TeamCriminal")
 							else
 								v1 = Settings.EnumTeam.Prisoner
-								v2 = v18
-								v3 = Localization:FormatByKey("Teams.TeamPrisoner")
+								v2 = color18
+								var3 = Localization:FormatByKey("Teams.TeamPrisoner")
 							end
 							local v6, v7 = Roact.createBinding(v2)
 							local t2 = {
@@ -422,7 +422,7 @@ function v1.render(p1)
 									Thickness = 3,
 									Color = v6
 								}),
-								Text = getText(v3, v2),
+								Text = getText(var3, v2),
 								NumPlayers = getNumPlayers(p1.props.numCriminals, v2)
 							})
 						end)()

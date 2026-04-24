@@ -32,48 +32,48 @@ local mansionRobberyStore = require(ReplicatedStorage.MansionRobbery.mansionRobb
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1, p2)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
+function t.new(self, p2)
+	local instance = BaseObject.new(self)
+	setmetatable(instance, t)
 	local function handleProgressionState()
-		local v12 = Maid.new()
-		v1.maid.progressionMaid = v12
-		if MansionRobberyUtils.getIsPlayerInRobbery(v1.obj, Players.LocalPlayer) then
-			local v2 = MansionRobberyUtils.getProgressionState(v1.obj)
-			if v2 == MansionRobberyConsts.PROGRESSION_STATE.WaitForEnter then
-				v1:_launchWaitForEnter(v12)
-			elseif v2 == MansionRobberyConsts.PROGRESSION_STATE.PlayersEnteredIntroCutscene then
-				v1:_launchIntroCutscene(v12)
-				v1:_launchMusic2(v12)
-			elseif v2 == MansionRobberyConsts.PROGRESSION_STATE.RunAwayEndCutscene then
-				v1:_launchRunAwayEndCutscene(v12)
-				v1.maid.currRobberyMaid.music2 = nil
+		local instance12 = Maid.new()
+		instance.maid.progressionMaid = instance12
+		if MansionRobberyUtils.getIsPlayerInRobbery(instance.obj, Players.LocalPlayer) then
+			local instance2 = MansionRobberyUtils.getProgressionState(instance.obj)
+			if instance2 == MansionRobberyConsts.PROGRESSION_STATE.WaitForEnter then
+				instance:_launchWaitForEnter(instance12)
+			elseif instance2 == MansionRobberyConsts.PROGRESSION_STATE.PlayersEnteredIntroCutscene then
+				instance:_launchIntroCutscene(instance12)
+				instance:_launchMusic2(instance12)
+			elseif instance2 == MansionRobberyConsts.PROGRESSION_STATE.RunAwayEndCutscene then
+				instance:_launchRunAwayEndCutscene(instance12)
+				instance.maid.currRobberyMaid.music2 = nil
 			end
 		end
 	end
 	handleProgressionState()
-	v1.maid:GiveTask(MansionRobberyUtils.getProgressionStateChangedSignal(v1.obj):Connect(handleProgressionState))
+	instance.maid:GiveTask(MansionRobberyUtils.getProgressionStateChangedSignal(instance.obj):Connect(handleProgressionState))
 	local function handleStatus()
-		local v12 = RobberyUtils.getStatus(v1.obj)
-		local v2 = Maid.new()
-		v1.maid.currRobberyMaid = v2
-		if MansionRobberyUtils.getIsPlayerInRobbery(v1.obj, Players.LocalPlayer) and v12 == RobberyConsts.ENUM_STATUS.STARTED then
-			v1:_hookBossCameras(v2)
-			v1:_launchStarted(v2)
+		local instance12 = RobberyUtils.getStatus(instance.obj)
+		local instance2 = Maid.new()
+		instance.maid.currRobberyMaid = instance2
+		if MansionRobberyUtils.getIsPlayerInRobbery(instance.obj, Players.LocalPlayer) and instance12 == RobberyConsts.ENUM_STATUS.STARTED then
+			instance:_hookBossCameras(instance2)
+			instance:_launchStarted(instance2)
 		end
 	end
 	handleStatus()
-	v1.maid:GiveTask(RobberyUtils.getStatusChangedSignal(v1.obj):Connect(handleStatus))
-	local v3, v4 = Roact.createBinding(0)
-	v1.pctClosed = v3
-	v1.updatePctClosed = v4
-	v1.maid.localPlayerRobberyMaid = Maid.new()
+	instance.maid:GiveTask(RobberyUtils.getStatusChangedSignal(instance.obj):Connect(handleStatus))
+	local var3, var4 = Roact.createBinding(0)
+	instance.pctClosed = var3
+	instance.updatePctClosed = var4
+	instance.maid.localPlayerRobberyMaid = Maid.new()
 	local function handleLocalPlayerInRobbery()
 		handleProgressionState()
 		handleStatus()
-		v1.maid.localPlayerRobberyMaid:DoCleaning()
-		if MansionRobberyUtils.getIsPlayerInRobbery(v1.obj, Players.LocalPlayer) then
-			local v12 = Roact.mount(createElement("ScreenGui", {
+		instance.maid.localPlayerRobberyMaid:DoCleaning()
+		if MansionRobberyUtils.getIsPlayerInRobbery(instance.obj, Players.LocalPlayer) then
+			local instance12 = Roact.mount(createElement("ScreenGui", {
 				ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 				ResetOnSpawn = false,
 				IgnoreGuiInset = true,
@@ -83,22 +83,22 @@ function t.new(p1, p2)
 					store = mansionRobberyStore
 				}, { createElement(MansionRobberyApp, {
 						charPerSecond = MansionRobberyConsts.CHAR_PER_SECOND,
-						pctClosed = v1.pctClosed
+						pctClosed = instance.pctClosed
 					}) }) }), Players.LocalPlayer.PlayerGui, "MansionRobberyUI")
-			v1.maid.localPlayerRobberyMaid:GiveTask(function()
-				Roact.unmount(v12)
+			instance.maid.localPlayerRobberyMaid:GiveTask(function()
+				Roact.unmount(instance12)
 			end)
 		end
 	end
-	v1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(v1.obj, MansionRobberyConsts.IN_ROBBERY_FOLDER_NAME, function(p1, p2)
-		p2:GiveTask(RxInstanceUtils.observeChildren(p1, function(p1, p2)
-			if p1.Name == tostring(Players.LocalPlayer.UserId) then
+	instance.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(instance.obj, MansionRobberyConsts.IN_ROBBERY_FOLDER_NAME, function(self, p2)
+		p2:GiveTask(RxInstanceUtils.observeChildren(self, function(self, p2)
+			if self.Name == tostring(Players.LocalPlayer.UserId) then
 				handleLocalPlayerInRobbery()
-				p2:GiveTask(p1.Changed:Connect(handleLocalPlayerInRobbery))
+				p2:GiveTask(self.Changed:Connect(handleLocalPlayerInRobbery))
 			end
 		end))
 	end))
-	v1.mapCurveData = {
+	instance.mapCurveData = {
 		introCutscene1 = {
 			curve = PlayersEnteredIntroCutscene,
 			relativeCF = CFrame.new(154.824, 524.029, -172.294)
@@ -106,11 +106,11 @@ function t.new(p1, p2)
 	}
 	local attemptExitElevatorRemote = p2.attemptExitElevatorRemote
 	local function shouldExitConfirmationBeOpen()
-		return MansionRobberyUtils.isPlayerInElevator(v1.obj, Players.LocalPlayer) and not MansionRobberyUtils.getIsElevatorMoving(v1.obj) and RobberyUtils.getStatus(v1.obj) == RobberyConsts.ENUM_STATUS.OPENED
+		return MansionRobberyUtils.isPlayerInElevator(instance.obj, Players.LocalPlayer) and not MansionRobberyUtils.getIsElevatorMoving(instance.obj) and RobberyUtils.getStatus(instance.obj) == RobberyConsts.ENUM_STATUS.OPENED
 	end
-	v1.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(v1.obj, MansionRobberyConsts.EXIT_ELEVATOR_PART_NAME, function(p1, p2)
+	instance.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(instance.obj, MansionRobberyConsts.EXIT_ELEVATOR_PART_NAME, function(self, p2)
 		local t = {
-			Part = p1,
+			Part = self,
 			Name = "Exit Elevator",
 			Dist = 25,
 			Callback = function()
@@ -119,40 +119,40 @@ function t.new(p1, p2)
 		}
 		p2:GiveTask(CircleAction.Add(t, t))
 	end))
-	v1.maid:GiveTask(RxInstanceUtils.observeAttribute(Players.LocalPlayer, "MansionInvites", function(p1)
-		if v1.obj:FindFirstChild("InviteCount") then
-			v1.obj.InviteCount.SurfaceGui.TextLabel.Text = tostring(p1)
+	instance.maid:GiveTask(RxInstanceUtils.observeAttribute(Players.LocalPlayer, "MansionInvites", function(self)
+		if instance.obj:FindFirstChild("InviteCount") then
+			instance.obj.InviteCount.SurfaceGui.TextLabel.Text = tostring(self)
 		end
 	end))
-	return v1
+	return instance
 end
-function t._launchStarted(p1, p2)
+function t._launchStarted(self, p2)
 	p2:GiveTask(Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 11794013749, {
 		Looped = true,
 		Volume = 1
 	}))
-	local v1 = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 11793724573, {
+	local instance = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 11793724573, {
 		Looped = true,
 		Volume = 0.5,
 		Group = game:GetService("SoundService").RobberyMusic
 	})
 	function p2.music1()
-		Audio.promiseFadeTo(v1, 0, 3):andThen(function()
-			v1:Destroy()
+		Audio.promiseFadeTo(instance, 0, 3):andThen(function()
+			instance:Destroy()
 		end)
 	end
 end
-function t._launchMusic2(p1)
-	local currRobberyMaid = p1.maid.currRobberyMaid
+function t._launchMusic2(self)
+	local currRobberyMaid = self.maid.currRobberyMaid
 	currRobberyMaid.music1 = nil
-	local v1 = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 11793723268, {
+	local instance = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 11793723268, {
 		Looped = true,
 		Volume = 0.5,
 		Group = game:GetService("SoundService").RobberyMusic
 	})
 	function currRobberyMaid.music2()
-		Audio.promiseFadeTo(v1, 0, 3):andThen(function()
-			v1:Destroy()
+		Audio.promiseFadeTo(instance, 0, 3):andThen(function()
+			instance:Destroy()
 		end)
 	end
 end
@@ -161,118 +161,118 @@ local t2 = {
 	conePart = "Cone",
 	floorCircle = "FloorCircle"
 }
-function t._hookBossCameras(p1)
-	local v1 = ManifestBinder.new("BossRoomCamera", t2, function(p1, p2)
-		local v1 = Maid.new()
+function t._hookBossCameras(self)
+	local instance = ManifestBinder.new("BossRoomCamera", t2, function(self, p2)
+		local instance = Maid.new()
 		p2.conePart.Transparency = 0.95
-		v1:GiveTask(function()
+		instance:GiveTask(function()
 			p2.conePart.Transparency = 1
 		end)
 		p2.floorCircle.Transparency = 0.95
-		v1:GiveTask(function()
+		instance:GiveTask(function()
 			p2.floorCircle.Transparency = 1
 		end)
 		local IsInFloorCircle = Instance.new("BoolValue")
 		IsInFloorCircle.Name = "IsInFloorCircle"
 		IsInFloorCircle.Parent = nil
-		v1:GiveTask(IsInFloorCircle)
+		instance:GiveTask(IsInFloorCircle)
 		local doorModel = p2.doorModel
-		v1:GivePromise(DoorBinder:Promise(doorModel):andThen(function(p1)
+		instance:GivePromise(DoorBinder:Promise(doorModel):andThen(function(self)
 			local function updateCone()
-				local v1 = DoorUtils.getInnerModel(doorModel)
-				local LookVector = v1.PrimaryPart.CFrame.LookVector
-				local Position = v1.PrimaryPart.Position
-				local v2 = GeomUtils.intersectRayPlane(Position, LookVector, Position + Vector3.new(0, -40, 0), Vector3.new(0, 1, 0))
-				if v2 then
-					local v3 = Position + LookVector * 3
-					local v4 = v2 + LookVector * 6
-					local Magnitude = (v4 - v3).Magnitude
+				local instance = DoorUtils.getInnerModel(doorModel)
+				local LookVector = instance.PrimaryPart.CFrame.LookVector
+				local Position = instance.PrimaryPart.Position
+				local instance2 = GeomUtils.intersectRayPlane(Position, LookVector, Position + Vector3.new(0, -40, 0), Vector3.new(0, 1, 0))
+				if instance2 then
+					local var3 = Position + LookVector * 3
+					local var4 = instance2 + LookVector * 6
+					local Magnitude = (var4 - var3).Magnitude
 					p2.conePart.Size = Vector3.new(15, Magnitude, 15)
-					p2.conePart.CFrame = CFrame.lookAt(v3, v4, (Vector3.new(1, 1, 1)).Unit) * CFrame.new(0, 0, -Magnitude / 2) * CFrame.Angles(1.5707963267948966, 0, 0)
-					p2.floorCircle.CFrame = CFrame.new(v2)
+					p2.conePart.CFrame = CFrame.lookAt(var3, var4, (Vector3.new(1, 1, 1)).Unit) * CFrame.new(0, 0, -Magnitude / 2) * CFrame.Angles(1.5707963267948966, 0, 0)
+					p2.floorCircle.CFrame = CFrame.new(instance2)
 				end
 			end
 			updateCone()
-			v1:GiveTask(p1:SetUpdateCallback(updateCone))
+			instance:GiveTask(self:SetUpdateCallback(updateCone))
 		end))
-		v1:GiveTask(Interval.every(0.25):Connect(function()
-			local v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-			local v2
-			if v1 and (v1.Position - p2.floorCircle.Position).Magnitude <= p2.floorCircle.Size.X * 0.5 then
-				IsInFloorCircle.Parent = v1.Parent
-				v2 = true
+		instance:GiveTask(Interval.every(0.25):Connect(function()
+			local instance = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+			local instance2
+			if instance and (instance.Position - p2.floorCircle.Position).Magnitude <= p2.floorCircle.Size.X * 0.5 then
+				IsInFloorCircle.Parent = instance.Parent
+				instance2 = true
 			else
-				v2 = false
+				instance2 = false
 			end
-			if not v2 then
+			if not instance2 then
 				IsInFloorCircle.Parent = nil
 			end
 		end))
-		return v1
+		return instance
 	end)
-	v1:Start()
-	p1.maid.currRobberyMaid:GiveTask(v1)
+	instance:Start()
+	self.maid.currRobberyMaid:GiveTask(instance)
 end
-function t.IsPlayerInRobbery(p1, p2)
-	return MansionRobberyUtils.getIsPlayerInRobbery(p1.obj, p2)
+function t.IsPlayerInRobbery(self, p2)
+	return MansionRobberyUtils.getIsPlayerInRobbery(self.obj, p2)
 end
-function t._promisePlayCurve(p1, p2, p3, p4)
+function t._promisePlayCurve(self, p2, p3, p4)
 	local curve = p2.curve
 	if not curve.PointData then
 		curve:Generate()
 	end
-	local v1 = nil
-	local v2 = nil
-	local v3 = nil
-	local v4 = Maid.new()
+	local instance = nil
+	local instance2 = nil
+	local var3 = nil
+	local var4 = Maid.new()
 	return Promise.new(function(p12, p22, p32)
-		local v12 = false
-		local v22 = os.clock()
+		local instance12 = false
+		local var22 = os.clock()
 		if not p32(function()
-			v4:DoCleaning()
+			var4:DoCleaning()
 		end) then
-			v4:GiveTask(RunService.PreRender:Connect(function(p13)
-				local v13 = (os.clock() - v22) / (p4 - 0.1)
-				if v13 >= 1 then
-					if not v12 then
-						v12 = true
-						v4:GiveTask(task.delay(0.1, function()
-							task.defer(v4.DoCleaning, v4)
+			var4:GiveTask(RunService.PreRender:Connect(function(p13)
+				local var13 = (os.clock() - var22) / (p4 - 0.1)
+				if var13 >= 1 then
+					if not instance12 then
+						instance12 = true
+						var4:GiveTask(task.delay(0.1, function()
+							task.defer(var4.DoCleaning, var4)
 							p12()
 						end))
 					end
-					v13 = 1
+					var13 = 1
 				end
-				local v23, v32, v42 = curve:GetProgressRaw(curve:GetCurveValueAt(v13), p3, p13)
-				if not v1 then
-					v1 = v23
+				local v23, v32, v42 = curve:GetProgressRaw(curve:GetCurveValueAt(var13), p3, p13)
+				if not instance then
+					instance = v23
 				end
-				if not v2 then
-					v2 = v32
+				if not instance2 then
+					instance2 = v32
 				end
-				if not v3 then
-					v3 = v42
+				if not var3 then
+					var3 = v42
 				end
-				v1 = v1 + (v23 - v1) * 0.1
-				v2 = v2 + (v32 - v2) * 0.1
-				v3 = v3 + (v42 - v3) * 0.1
-				CurrentCamera.CFrame = p2.relativeCF:Inverse() * p1.obj:FindFirstChild("CameraRelative").CFrame * CFrame.lookAt(Vector3.new(0, 0, 0), v2, v3) + v1
+				instance = instance + (v23 - instance) * 0.1
+				instance2 = instance2 + (v32 - instance2) * 0.1
+				var3 = var3 + (v42 - var3) * 0.1
+				CurrentCamera.CFrame = p2.relativeCF:Inverse() * self.obj:FindFirstChild("CameraRelative").CFrame * CFrame.lookAt(Vector3.new(0, 0, 0), instance2, var3) + instance
 			end))
 		end
 	end)
 end
-function t._launchWaitForEnter(p1, p2)
+function t._launchWaitForEnter(self, p2)
 	p2:GiveTask(task.delay(3, function()
-		local v2 = TableUtils.filter(Players:GetPlayers(), function(p12)
-			return MansionRobberyUtils.getIsPlayerInRobbery(p1.obj, p12)
+		local instance2 = TableUtils.filter(Players:GetPlayers(), function(p12)
+			return MansionRobberyUtils.getIsPlayerInRobbery(self.obj, p12)
 		end)
-		local DisplayName = v2[math.random(1, #v2)].DisplayName
-		local v5 = ("%s: \"Okay %s.. let\'s find his office.\""):format(DisplayName, if #v2 > 1 then "team" else "")
+		local DisplayName = instance2[math.random(1, #instance2)].DisplayName
+		local var5 = ("%s: \"Okay %s.. let\'s find his office.\""):format(DisplayName, if #instance2 > 1 then "team" else "")
 		mansionRobberyStore:dispatch({
 			type = "setDialogueText",
-			text = v5
+			text = var5
 		})
-		p2:GivePromise(Promise.delay(5 + utf8.len(v5) / MansionRobberyConsts.CHAR_PER_SECOND):finally(function()
+		p2:GivePromise(Promise.delay(5 + utf8.len(var5) / MansionRobberyConsts.CHAR_PER_SECOND):finally(function()
 			mansionRobberyStore:dispatch({
 				type = "setDialogueText",
 				text = ""
@@ -281,14 +281,14 @@ function t._launchWaitForEnter(p1, p2)
 	end))
 end
 local cutsceneDialogue1Data = require(ReplicatedStorage.MansionRobbery.cutsceneDialogue1Data)
-function t._launchIntroCutscene(p1, p2)
+function t._launchIntroCutscene(self, p2)
 	CurrentCamera.CameraType = Enum.CameraType.Scriptable
 	p2:GiveTask(function()
 		CurrentCamera.CameraType = Enum.CameraType.Custom
 	end)
-	p1.updatePctClosed(0.4)
+	self.updatePctClosed(0.4)
 	p2:GiveTask(function()
-		p1.updatePctClosed(0)
+		self.updatePctClosed(0)
 	end)
 	p2:GiveTask(function()
 		mansionRobberyStore:dispatch({
@@ -296,21 +296,21 @@ function t._launchIntroCutscene(p1, p2)
 			text = ""
 		})
 	end)
-	local v1 = Dialogue.new()
-	v1:LoadData(cutsceneDialogue1Data)
-	v1:Connect("IntroCurve", function(p12)
-		p2:GivePromise(p1:_promisePlayCurve(p1.mapCurveData.introCutscene1, 4, p12.Duration))
+	local instance = Dialogue.new()
+	instance:LoadData(cutsceneDialogue1Data)
+	instance:Connect("IntroCurve", function(p12)
+		p2:GivePromise(self:_promisePlayCurve(self.mapCurveData.introCutscene1, 4, p12.Duration))
 	end)
-	local v2 = nil
-	p2:GiveTask(v1)
-	p2:GiveTask(v1.OnMessage:Connect(function(p12)
+	local instance2 = nil
+	p2:GiveTask(instance)
+	p2:GiveTask(instance.OnMessage:Connect(function(p12)
 		if p12.IsPlayer then
-			local v22 = TableUtils.filter(Players:GetPlayers(), function(p12)
-				return MansionRobberyUtils.getIsPlayerInRobbery(p1.obj, p12)
+			local var22 = TableUtils.filter(Players:GetPlayers(), function(p12)
+				return MansionRobberyUtils.getIsPlayerInRobbery(self.obj, p12)
 			end)
 			mansionRobberyStore:dispatch({
 				type = "setDialogueText",
-				text = ("%s: %s"):format(v22[math.random(1, #v22)].DisplayName, p12.Text)
+				text = ("%s: %s"):format(var22[math.random(1, #var22)].DisplayName, p12.Text)
 			})
 		else
 			mansionRobberyStore:dispatch({
@@ -319,32 +319,32 @@ function t._launchIntroCutscene(p1, p2)
 			})
 		end
 		if p12.GRAB_CAMERA then
-			v2 = CurrentCamera.CFrame
+			instance2 = CurrentCamera.CFrame
 		end
 		if p12.IsPlayer then
-			CurrentCamera.CFrame = p1.obj:FindFirstChild("CameraRelative").CFrame * CFrame.new(2.75805664, 5.60137939, 62.3071289, 0.960502386, 0.0158457458, -0.277820319, 0, 0.998377442, 0.056943398, 0.278271854, -0.0546942689, 0.958943903)
-		elseif p12.IsBoss and v2 then
-			CurrentCamera.CFrame = v2
+			CurrentCamera.CFrame = self.obj:FindFirstChild("CameraRelative").CFrame * CFrame.new(2.75805664, 5.60137939, 62.3071289, 0.960502386, 0.0158457458, -0.277820319, 0, 0.998377442, 0.056943398, 0.278271854, -0.0546942689, 0.958943903)
+		elseif p12.IsBoss and instance2 then
+			CurrentCamera.CFrame = instance2
 		end
 	end))
 	local function updateBornAt()
-		v1:SetBornAt(p1.obj:GetAttribute(MansionRobberyConsts.LAST_PROGRESSION_BORN_AT_ATTR_NAME))
+		instance:SetBornAt(self.obj:GetAttribute(MansionRobberyConsts.LAST_PROGRESSION_BORN_AT_ATTR_NAME))
 	end
-	v1:SetBornAt(p1.obj:GetAttribute(MansionRobberyConsts.LAST_PROGRESSION_BORN_AT_ATTR_NAME))
-	p2:GiveTask(p1.obj:GetAttributeChangedSignal(MansionRobberyConsts.LAST_PROGRESSION_BORN_AT_ATTR_NAME):Connect(updateBornAt))
-	v1:VerifyAllConnected()
-	v1:Run()
+	instance:SetBornAt(self.obj:GetAttribute(MansionRobberyConsts.LAST_PROGRESSION_BORN_AT_ATTR_NAME))
+	p2:GiveTask(self.obj:GetAttributeChangedSignal(MansionRobberyConsts.LAST_PROGRESSION_BORN_AT_ATTR_NAME):Connect(updateBornAt))
+	instance:VerifyAllConnected()
+	instance:Run()
 end
-function t._launchRunAwayEndCutscene(p1, p2)
+function t._launchRunAwayEndCutscene(self, p2)
 	local t = { "CEO: This is not the end for me!", "CEO: I\'ll be back with a vengeance!", "CEO: I may be beaten, but I am not defeated!", "CEO: You won\'t take me today!", "CEO: Where I\'m going, you\'ll never touch me!" }
 	local t2 = { "We did it...?", "That was intense, but we did it!", "I\'m so glad that\'s over, but we can\'t rest. We will discover his whereabouts.", "Good riddance." }
 	CurrentCamera.CameraType = Enum.CameraType.Scriptable
 	p2:GiveTask(function()
 		CurrentCamera.CameraType = Enum.CameraType.Custom
 	end)
-	p1.updatePctClosed(0.4)
+	self.updatePctClosed(0.4)
 	p2:GiveTask(function()
-		p1.updatePctClosed(0)
+		self.updatePctClosed(0)
 	end)
 	p2:GiveTask(function()
 		mansionRobberyStore:dispatch({
@@ -352,30 +352,30 @@ function t._launchRunAwayEndCutscene(p1, p2)
 			text = ""
 		})
 	end)
-	CurrentCamera.CFrame = p1.obj:FindFirstChild("CameraRelative").CFrame * CFrame.new(29.6342773, 11.0867615, 111.834961, -0.751779616, -0.105196744, 0.650969386, 7.45058149e-9, 0.987192988, 0.159530535, -0.65941453, 0.11993181, -0.742151499)
-	local v2 = TableUtils.filter(Players:GetPlayers(), function(p12)
-		return MansionRobberyUtils.getIsPlayerInRobbery(p1.obj, p12)
+	CurrentCamera.CFrame = self.obj:FindFirstChild("CameraRelative").CFrame * CFrame.new(29.6342773, 11.0867615, 111.834961, -0.751779616, -0.105196744, 0.650969386, 7.45058149e-9, 0.987192988, 0.159530535, -0.65941453, 0.11993181, -0.742151499)
+	local instance2 = TableUtils.filter(Players:GetPlayers(), function(p12)
+		return MansionRobberyUtils.getIsPlayerInRobbery(self.obj, p12)
 	end)
-	local v3 = v2[math.random(1, #v2)]
-	local v4 = ("%s: %s"):format(v3.DisplayName, t2[math.random(1, #t2)])
-	local v5 = t[math.random(1, #t)]
-	local v6 = ("%s: %s"):format(v3.DisplayName, "Let\'s follow him!")
+	local var3 = instance2[math.random(1, #instance2)]
+	local var4 = ("%s: %s"):format(var3.DisplayName, t2[math.random(1, #t2)])
+	local var5 = t[math.random(1, #t)]
+	local var6 = ("%s: %s"):format(var3.DisplayName, "Let\'s follow him!")
 	mansionRobberyStore:dispatch({
 		type = "setDialogueText",
-		text = v4
+		text = var4
 	})
-	p2:GivePromise(Promise.delay(2 + utf8.len(v4) / MansionRobberyConsts.CHAR_PER_SECOND):andThen(function()
+	p2:GivePromise(Promise.delay(2 + utf8.len(var4) / MansionRobberyConsts.CHAR_PER_SECOND):andThen(function()
 		mansionRobberyStore:dispatch({
 			type = "setDialogueText",
-			text = v5
+			text = var5
 		})
-		return Promise.delay(2 + utf8.len(v5) / MansionRobberyConsts.CHAR_PER_SECOND)
+		return Promise.delay(2 + utf8.len(var5) / MansionRobberyConsts.CHAR_PER_SECOND)
 	end):andThen(function()
 		mansionRobberyStore:dispatch({
 			type = "setDialogueText",
-			text = v6
+			text = var6
 		})
-		return Promise.delay(2 + utf8.len(v6) / MansionRobberyConsts.CHAR_PER_SECOND)
+		return Promise.delay(2 + utf8.len(var6) / MansionRobberyConsts.CHAR_PER_SECOND)
 	end):andThen(function()
 		task.defer(p2.DoCleaning, p2)
 	end))

@@ -17,78 +17,78 @@ local t = {
 	ClassName = "CrewsSurfaceGuiDisplay"
 }
 t.__index = t
-function t.new(self, arg2)
-	if not PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM:GetValueFromEnum(arg2) then
-		error("Invalid displayType: " .. tostring(arg2))
+function t.new(crewObject, displayType)
+	if not PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM:GetValueFromEnum(displayType) then
+		error("Invalid displayType: " .. tostring(displayType))
 	end
-	local local1 = BaseObject.new(self)
-	setmetatable(local1, t)
-	RxInstanceUtils.yieldForProperty(self, "PrimaryPart")
-	local function attemptViewClanId(self)
-		ReplicatedStorage:FindFirstChild(PersistentCrewConsts.VIEW_CLAN_REMOTE_NAME):FireServer(self)
+	local displayInstance = BaseObject.new(crewObject)
+	setmetatable(displayInstance, t)
+	RxInstanceUtils.yieldForProperty(crewObject, "PrimaryPart")
+	local function attemptViewClanId(clanId)
+		ReplicatedStorage:FindFirstChild(PersistentCrewConsts.VIEW_CLAN_REMOTE_NAME):FireServer(clanId)
 		persistentCrewStore:dispatch({
 			type = "setGroupVisible",
 			value = true
 		})
 	end
-	local local3, local4 = Roact.createBinding(true)
-	local1.maid:GiveTask(Interval.every(1):Connect(function()
+	local enabledBinding, setEnabledBinding = Roact.createBinding(true)
+	displayInstance.maid:GiveTask(Interval.every(1):Connect(function()
 		local Character = Players.LocalPlayer.Character
-		local local1 = local3:getValue()
-		local function setCurrEnabled(self)
-			if self ~= local1 then
-				local4(self)
+		local isCurrentlyEnabled = enabledBinding:getValue()
+		local function setCurrEnabled(newEnabledState)
+			if newEnabledState ~= isCurrentlyEnabled then
+				setEnabledBinding(newEnabledState)
 			end
 		end
 		if Character then
 			local PrimaryPart = Character.PrimaryPart
 			if PrimaryPart then
-				if (PrimaryPart.Position - self.PrimaryPart.Position).Magnitude >= PersistentCrewBattleConsts.UNRENDER_LEADERBOARD_DISPLAY_DISTANCE then
-					if local1 ~= false then
-						local4(false)
+				if (PrimaryPart.Position - crewObject.PrimaryPart.Position).Magnitude >= PersistentCrewBattleConsts.UNRENDER_LEADERBOARD_DISPLAY_DISTANCE then
+					if isCurrentlyEnabled ~= false then
+						setEnabledBinding(false)
 					end
-				elseif local1 ~= true then
-					local4(true)
+				elseif isCurrentlyEnabled ~= true then
+					setEnabledBinding(true)
 				end
-			elseif local1 ~= false then
-				local4(false)
+			elseif isCurrentlyEnabled ~= false then
+				setEnabledBinding(false)
 			end
-		elseif local1 ~= false then
-			local4(false)
+		elseif isCurrentlyEnabled ~= false then
+			setEnabledBinding(false)
 		end
 	end))
-	local local10 = Roact.mount(Roact.createElement(RoactRodux.StoreProvider, {
+	local mountedGui = Roact.mount(Roact.createElement(RoactRodux.StoreProvider, {
 		store = persistentCrewBattleStore
 	}, { (createElement("SurfaceGui", {
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 			ResetOnSpawn = false,
-			Adornee = local1.obj.PrimaryPart,
+			Adornee = displayInstance.obj.PrimaryPart,
 			Face = Enum.NormalId.Front,
 			SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud,
-			PixelsPerStud = if local1.obj.PrimaryPart.Size.Y < 30 then 80 else 20,
-			Enabled = local3
+			PixelsPerStud = if displayInstance.obj.PrimaryPart.Size.Y < 30 then 80 else 20,
+			Enabled = enabledBinding
 		}, {
-			Display = createElement(RoactRodux.connect(function(self, arg22)
-				local local1 = nil
-				if arg2 == PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.CrewsInServer then
-					local1 = self.crewsInServerDisplayInfo
-				elseif arg2 == PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.Leaderboard then
-					local1 = self.leaderboardInfo
+			Display = createElement(RoactRodux.connect(function(storeState, storeProps)
+				local selectedDisplayInfo = nil
+				if displayType == PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.CrewsInServer then
+					selectedDisplayInfo = storeState.crewsInServerDisplayInfo
+				elseif displayType == PersistentCrewBattleConsts.LEADERBOARD_DISPLAY_TYPE_ENUM.Leaderboard then
+					selectedDisplayInfo = storeState.leaderboardInfo
 				else
-					error("Invalid displayType: " .. tostring(arg2))
+					error("Invalid displayType: " .. tostring(displayType))
 				end
 				return {
-					leaderboardInfo = local1
+					leaderboardInfo = selectedDisplayInfo
 				}
 			end)(CrewLeaderboard), {
-				displayType = arg2,
-				aspectRatio = local1.obj.PrimaryPart.Size.X / local1.obj.PrimaryPart.Size.Y,
+				displayType = displayType,
+				aspectRatio = displayInstance.obj.PrimaryPart.Size.X / displayInstance.obj.PrimaryPart.Size.Y,
 				attemptViewClanId = attemptViewClanId
 			})
 		})) }), Players.LocalPlayer.PlayerGui, "CrewsInServerGui")
-	local1.maid:GiveTask(function()
-		Roact.unmount(local10)
+	displayInstance.maid:GiveTask(function()
+		Roact.unmount(mountedGui)
 	end)
-	return local1
+	return displayInstance
 end
 return t

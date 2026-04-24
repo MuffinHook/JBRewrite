@@ -26,28 +26,28 @@ return function(p1)
 	end
 	if p1.Type == "Cash" then
 		tbl.typeTitle = "Cash"
-		local v4 = if p1.Amount > 0 then "+" else ""
-		tbl.title = v4 .. "$" .. String.comma(p1.Amount)
+		local var4 = if p1.Amount > 0 then "+" else ""
+		tbl.title = var4 .. "$" .. String.comma(p1.Amount)
 	elseif p1.Type == "Nitro" then
 		tbl.typeTitle = "Nitro"
-		local v5 = if p1.Amount > 0 then "+" else ""
-		tbl.title = v5 .. String.comma(p1.Amount)
+		local var5 = if p1.Amount > 0 then "+" else ""
+		tbl.title = var5 .. String.comma(p1.Amount)
 	elseif p1.Type == "HyperChrome" then
 		tbl.typeTitle = "Color"
 		tbl.title = "HyperChrome!"
 		tbl.subTitle = "Level " .. tostring(p1.Level)
 	elseif p1.Type == "UniqueItem" then
-		local v6 = TradeReducerUtils.buildItemProps(p1)
-		if not v6 then
+		local var6 = TradeReducerUtils.buildItemProps(p1)
+		if not var6 then
 			print(p1)
 			error("No item props found for rewardData ^")
 		end
-		tbl.title = v6.title
-		tbl.typeTitle = v6.categoryTitle
-		tbl.getInst = v6.getInst
-		tbl.getInstCompare = v6.getInstCompare
-		tbl.updateCamera = v6.updateCamera
-		tbl.image = v6.image
+		tbl.title = var6.title
+		tbl.typeTitle = var6.categoryTitle
+		tbl.getInst = var6.getInst
+		tbl.getInstCompare = var6.getInstCompare
+		tbl.updateCamera = var6.updateCamera
+		tbl.image = var6.image
 	end
 	return tbl
 end

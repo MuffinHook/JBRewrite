@@ -29,9 +29,9 @@ local function isLegalOrientId(p1)
 end
 local function getOrientId(p1)
 	if isAxisAligned(p1) then
-		local v1 = 6 * toNormalId(p1.RightVector) + toNormalId(p1.UpVector)
-		if math.floor(v1 / 6) % 3 ~= v1 % 3 then
-			return v1
+		local instance = 6 * toNormalId(p1.RightVector) + toNormalId(p1.UpVector)
+		if math.floor(instance / 6) % 3 ~= instance % 3 then
+			return instance
 		else
 			return -1
 		end
@@ -40,86 +40,86 @@ local function getOrientId(p1)
 	end
 end
 local function encodeMatrix(p1)
-	local v1, v2, v3, v4, v5, v6, v7, v8, v9 = select(4, p1:GetComponents())
-	local v10 = v1 + v5 + v9
-	local v11 = 2
-	local v12, v13, v14, v15
-	if v10 > 0 then
-		local v16 = v11 * math.sqrt(1 + v10)
-		v12 = (v8 - v6) / v16
-		v13 = (v3 - v7) / v16
-		v14 = (v4 - v2) / v16
-		v15 = v16 / 4
-	elseif v5 < v1 and v9 < v1 then
-		local v17 = v11 * math.sqrt(1 + v1 - v5 - v9)
-		v12 = v17 / 4
-		v13 = (v4 + v2) / v17
-		v14 = (v3 + v7) / v17
-		v15 = (v8 - v6) / v17
-	elseif v9 < v5 then
-		local v18 = v11 * math.sqrt(1 - v1 + v5 - v9)
-		v12 = (v4 + v2) / v18
-		v13 = v18 / 4
-		v14 = (v8 + v6) / v18
-		v15 = (v3 - v7) / v18
+	local instance, v2, var3, var4, var5, var6, var7, var8, v9 = select(4, p1:GetComponents())
+	local var10 = instance + var5 + v9
+	local var11 = 2
+	local v12, var13, table14, v15
+	if var10 > 0 then
+		local var16 = var11 * math.sqrt(1 + var10)
+		v12 = (var8 - var6) / var16
+		var13 = (var3 - var7) / var16
+		table14 = (var4 - v2) / var16
+		v15 = var16 / 4
+	elseif var5 < instance and v9 < instance then
+		local var17 = var11 * math.sqrt(1 + instance - var5 - v9)
+		v12 = var17 / 4
+		var13 = (var4 + v2) / var17
+		table14 = (var3 + var7) / var17
+		v15 = (var8 - var6) / var17
+	elseif v9 < var5 then
+		local var18 = var11 * math.sqrt(1 - instance + var5 - v9)
+		v12 = (var4 + v2) / var18
+		var13 = var18 / 4
+		table14 = (var8 + var6) / var18
+		v15 = (var3 - var7) / var18
 	else
-		local v19 = v11 * math.sqrt(1 - v1 - v5 + v9)
-		v12 = (v3 + v7) / v19
-		v13 = (v8 + v6) / v19
-		v14 = v19 / 4
-		v15 = (v4 - v2) / v19
+		local var19 = var11 * math.sqrt(1 - instance - var5 + v9)
+		v12 = (var3 + var7) / var19
+		var13 = (var8 + var6) / var19
+		table14 = var19 / 4
+		v15 = (var4 - v2) / var19
 	end
-	return { v12, v13, v14, v15 }
+	return { v12, var13, table14, v15 }
 end
 function t.encode(p1)
-	local v1 = Bitbuf.new()
+	local instance = Bitbuf.new()
 	local Position = p1.Position
-	v1:WriteFloat(32, Position.X)
-	v1:WriteFloat(32, Position.Y)
-	v1:WriteFloat(32, Position.Z)
+	instance:WriteFloat(32, Position.X)
+	instance:WriteFloat(32, Position.Y)
+	instance:WriteFloat(32, Position.Z)
 	local v2
 	if isAxisAligned(p1) then
-		local v3 = 6 * toNormalId(p1.RightVector) + toNormalId(p1.UpVector)
-		v2 = if math.floor(v3 / 6) % 3 ~= v3 % 3 then v3 else -1
+		local var3 = 6 * toNormalId(p1.RightVector) + toNormalId(p1.UpVector)
+		v2 = if math.floor(var3 / 6) % 3 ~= var3 % 3 then var3 else -1
 	else
 		v2 = -1
 	end
-	v1:WriteByte(v2 + 1)
+	instance:WriteByte(v2 + 1)
 	if v2 < 0 then
-		local v5 = encodeMatrix(p1)
-		v1:WriteByte(#v5)
-		for i, v in ipairs(v5) do
-			v1:WriteFloat(32, v)
+		local var5 = encodeMatrix(p1)
+		instance:WriteByte(#var5)
+		for i, v in ipairs(var5) do
+			instance:WriteFloat(32, v)
 		end
 	end
-	return Base85.encode((v1:String()))
+	return Base85.encode((instance:String()))
 end
 function t.decode(p1)
-	local v1, v2 = Base85.decode(p1)
-	if v1 then
-		assert(v1)
+	local instance, v2 = Base85.decode(p1)
+	if instance then
+		assert(instance)
 	end
-	local v3 = Bitbuf.fromString(v2)
-	local v4 = v3:ReadFloat(32)
-	local v5 = v3:ReadFloat(32)
-	local v6 = v3:ReadFloat(32)
-	local v7 = v3:ReadByte()
-	if v7 > 0 then
-		local v8 = v7 - 1
-		if math.floor(v8 / 6) % 3 ~= v8 % 3 then
-			local v10 = Vector3.new(v4, v5, v6)
-			local v11 = Vector3.FromNormalId(v8 / 6)
-			return CFrame.fromMatrix(v10, v11, (Vector3.FromNormalId(v8 % 6)))
+	local var3 = Bitbuf.fromString(v2)
+	local var4 = var3:ReadFloat(32)
+	local var5 = var3:ReadFloat(32)
+	local var6 = var3:ReadFloat(32)
+	local var7 = var3:ReadByte()
+	if var7 > 0 then
+		local var8 = var7 - 1
+		if math.floor(var8 / 6) % 3 ~= var8 % 3 then
+			local var10 = Vector3.new(var4, var5, var6)
+			local var11 = Vector3.FromNormalId(var8 / 6)
+			return CFrame.fromMatrix(var10, var11, (Vector3.FromNormalId(var8 % 6)))
 		else
-			return CFrame.new(v4, v5, v6)
+			return CFrame.new(var4, var5, var6)
 		end
 	else
-		local v13 = v3:ReadByte()
-		local v14 = table.create(v13)
-		for i = 1, v13 do
-			v14[i] = v3:ReadFloat(32)
+		local var13 = var3:ReadByte()
+		local table14 = table.create(var13)
+		for i = 1, var13 do
+			table14[i] = var3:ReadFloat(32)
 		end
-		return CFrame.new(v4, v5, v6, unpack(v14))
+		return CFrame.new(var4, var5, var6, unpack(table14))
 	end
 end
 return t

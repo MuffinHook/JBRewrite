@@ -109,50 +109,50 @@ return function(p1, p2)
 			p2.discardState(p1)
 		end
 	})
-	local v1 = false
+	local instance = false
 	local v2 = -1
-	local v3 = nil
-	local v4 = 0
+	local var3 = nil
+	local var4 = 0
 	local function UpdateChildContainerTransform(p12)
 		local PreviewContainer = p12.Instance.PreviewContainer
 		local ChildContainer = p12.ChildContainer
-		local v1 = PreviewContainer.AbsolutePosition - p2.GuiOffset
+		local instance = PreviewContainer.AbsolutePosition - p2.GuiOffset
 		local PopupBorderSize = p1._config.PopupBorderSize
 		local AbsoluteSize_2 = ChildContainer.Parent.AbsoluteSize
 		local Y = p12.UIListLayout.AbsoluteContentSize.Y
-		v4 = Y
+		var4 = Y
 		local v2 = Y + 2 * p1._config.WindowPadding.Y
-		local v3 = v1.Y + PreviewContainer.AbsoluteSize.Y + PopupBorderSize
+		local var3 = instance.Y + PreviewContainer.AbsoluteSize.Y + PopupBorderSize
 		local zero = Vector2.zero
-		local v42 = AbsoluteSize_2.Y - v3
-		if v42 < v2 and AbsoluteSize_2.Y / 2 < v3 then
-			v3 = v1.Y - PopupBorderSize
+		local var42 = AbsoluteSize_2.Y - var3
+		if var42 < v2 and AbsoluteSize_2.Y / 2 < var3 then
+			var3 = instance.Y - PopupBorderSize
 			zero = Vector2.yAxis
-			v42 = v3
+			var42 = var3
 		end
 		ChildContainer.AnchorPoint = zero
-		ChildContainer.Position = UDim2.fromOffset(v1.X, v3)
-		ChildContainer.Size = UDim2.fromOffset(PreviewContainer.AbsoluteSize.X, (math.min(v2, v42)))
+		ChildContainer.Position = UDim2.fromOffset(instance.X, var3)
+		ChildContainer.Size = UDim2.fromOffset(PreviewContainer.AbsoluteSize.X, (math.min(v2, var42)))
 	end
 	local function f5()
-		if v1 and (v3 and v3.UIListLayout.AbsoluteContentSize.Y ~= v4) then
-			UpdateChildContainerTransform(v3)
+		if instance and (var3 and var3.UIListLayout.AbsoluteContentSize.Y ~= var4) then
+			UpdateChildContainerTransform(var3)
 		end
 	end
 	table.insert(p1._postCycleCallbacks, f5)
 	local function UpdateComboState(p12)
 		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 or (p12.UserInputType == Enum.UserInputType.MouseButton2 or (p12.UserInputType == Enum.UserInputType.Touch or p12.UserInputType == Enum.UserInputType.MouseWheel))) then
-			if v1 == false or not v3 or v2 == p1._cycleTick then
+			if instance == false or not var3 or v2 == p1._cycleTick then
 				return
 			end
-			local v12 = p2.getMouseLocation()
-			local PreviewContainer = v3.Instance.PreviewContainer
-			local ChildContainer = v3.ChildContainer
-			if p2.isPosInsideRect(v12, PreviewContainer.AbsolutePosition - p2.GuiOffset, PreviewContainer.AbsolutePosition - p2.GuiOffset + PreviewContainer.AbsoluteSize) then
+			local var12 = p2.getMouseLocation()
+			local PreviewContainer = var3.Instance.PreviewContainer
+			local ChildContainer = var3.ChildContainer
+			if p2.isPosInsideRect(var12, PreviewContainer.AbsolutePosition - p2.GuiOffset, PreviewContainer.AbsolutePosition - p2.GuiOffset + PreviewContainer.AbsoluteSize) then
 				return
 			end
-			if not p2.isPosInsideRect(v12, ChildContainer.AbsolutePosition - p2.GuiOffset, ChildContainer.AbsolutePosition - p2.GuiOffset + ChildContainer.AbsoluteSize) then
-				v3.state.isOpened:set(false)
+			if not p2.isPosInsideRect(var12, ChildContainer.AbsolutePosition - p2.GuiOffset, ChildContainer.AbsolutePosition - p2.GuiOffset + ChildContainer.AbsoluteSize) then
+				var3.state.isOpened:set(false)
 			end
 		end
 	end
@@ -193,7 +193,7 @@ return function(p1, p2)
 			end)
 		},
 		Generate = function(p12)
-			local v12 = p1._config.TextSize + 2 * p1._config.FramePadding.Y
+			local var12 = p1._config.TextSize + 2 * p1._config.FramePadding.Y
 			local Iris_Combo = Instance.new("Frame")
 			Iris_Combo.Name = "Iris_Combo"
 			Iris_Combo.AutomaticSize = Enum.AutomaticSize.Y
@@ -211,7 +211,7 @@ return function(p1, p2)
 			PreviewContainer.ZIndex = 2
 			p2.applyFrameStyle(PreviewContainer, true)
 			p2.UIListLayout(PreviewContainer, Enum.FillDirection.Horizontal, UDim.new(0, 0))
-			p2.UISizeConstraint(PreviewContainer, Vector2.new(v12))
+			p2.UISizeConstraint(PreviewContainer, Vector2.new(var12))
 			PreviewContainer.Parent = Iris_Combo
 			local PreviewLabel = Instance.new("TextLabel")
 			PreviewLabel.Name = "PreviewLabel"
@@ -226,16 +226,16 @@ return function(p1, p2)
 			PreviewLabel.Parent = PreviewContainer
 			local DropdownButton = Instance.new("TextLabel")
 			DropdownButton.Name = "DropdownButton"
-			DropdownButton.Size = UDim2.new(0, v12, p1._config.ContentHeight.Scale, (math.max(p1._config.ContentHeight.Offset, v12)))
+			DropdownButton.Size = UDim2.new(0, var12, p1._config.ContentHeight.Scale, (math.max(p1._config.ContentHeight.Offset, var12)))
 			DropdownButton.BackgroundColor3 = p1._config.ButtonColor
 			DropdownButton.BackgroundTransparency = p1._config.ButtonTransparency
 			DropdownButton.BorderSizePixel = 0
 			DropdownButton.Text = ""
-			local v32 = v12 - math.round(v12 * 0.2) * 2
+			local var32 = var12 - math.round(var12 * 0.2) * 2
 			local Dropdown = Instance.new("ImageLabel")
 			Dropdown.Name = "Dropdown"
 			Dropdown.AnchorPoint = Vector2.new(0.5, 0.5)
-			Dropdown.Size = UDim2.fromOffset(v32, v32)
+			Dropdown.Size = UDim2.fromOffset(var32, var32)
 			Dropdown.Position = UDim2.fromScale(0.5, 0.5)
 			Dropdown.BackgroundTransparency = 1
 			Dropdown.BorderSizePixel = 0
@@ -268,14 +268,14 @@ return function(p1, p2)
 				}
 			})
 			p2.applyButtonClick(PreviewContainer, function()
-				if not v1 or v3 == p12 then
+				if not instance or var3 == p12 then
 					p12.state.isOpened:set(not p12.state.isOpened.value)
 				end
 			end)
 			local TextLabel = Instance.new("TextLabel")
 			TextLabel.Name = "TextLabel"
 			TextLabel.AutomaticSize = Enum.AutomaticSize.X
-			TextLabel.Size = UDim2.fromOffset(0, v12)
+			TextLabel.Size = UDim2.fromOffset(0, var12)
 			TextLabel.BackgroundTransparency = 1
 			TextLabel.BorderSizePixel = 0
 			p2.applyTextStyle(TextLabel)
@@ -298,11 +298,11 @@ return function(p1, p2)
 			p2.UIStroke(ComboContainer, p1._config.WindowBorderSize, p1._config.BorderColor, p1._config.BorderTransparency)
 			p2.UIPadding(ComboContainer, Vector2.new(2, p1._config.WindowPadding.Y))
 			p2.UISizeConstraint(ComboContainer, Vector2.new(100))
-			local v4 = p2.UIListLayout(ComboContainer, Enum.FillDirection.Vertical, UDim.new(0, p1._config.ItemSpacing.Y))
-			v4.VerticalAlignment = Enum.VerticalAlignment.Top
+			local var4 = p2.UIListLayout(ComboContainer, Enum.FillDirection.Vertical, UDim.new(0, p1._config.ItemSpacing.Y))
+			var4.VerticalAlignment = Enum.VerticalAlignment.Top
 			ComboContainer.Parent = p1._rootInstance and p1._rootInstance:WaitForChild("PopupScreenGui")
 			p12.ChildContainer = ComboContainer
-			p12.UIListLayout = v4
+			p12.UIListLayout = var4
 			return Iris_Combo
 		end,
 		GenerateState = function(p12)
@@ -320,11 +320,11 @@ return function(p1, p2)
 			end)
 		end,
 		Update = function(p12)
-			local v1 = p12.Instance
-			local PreviewContainer = v1.PreviewContainer
+			local instance = p12.Instance
+			local PreviewContainer = instance.PreviewContainer
 			local PreviewLabel = PreviewContainer.PreviewLabel
 			local DropdownButton = PreviewContainer.DropdownButton
-			v1.TextLabel.Text = p12.arguments.Text or "Combo"
+			instance.TextLabel.Text = p12.arguments.Text or "Combo"
 			if p12.arguments.NoButton then
 				DropdownButton.Visible = false
 				PreviewLabel.Size = UDim2.new(UDim.new(1, 0), PreviewLabel.Size.Height)
@@ -347,17 +347,17 @@ return function(p1, p2)
 			local PreviewContainer = p12.Instance.PreviewContainer
 			local Dropdown = PreviewContainer.DropdownButton.Dropdown
 			if p12.state.isOpened.value then
-				v1 = true
-				v3 = p12
+				instance = true
+				var3 = p12
 				v2 = p1._cycleTick
 				p12.lastOpenedTick = p1._cycleTick + 1
 				Dropdown.Image = p2.ICONS.RIGHT_POINTING_TRIANGLE
 				ChildContainer.Visible = true
 				UpdateChildContainerTransform(p12)
 			else
-				if v1 then
-					v1 = false
-					v3 = nil
+				if instance then
+					instance = false
+					var3 = nil
 					p12.lastClosedTick = p1._cycleTick + 1
 				end
 				Dropdown.Image = p2.ICONS.DOWN_POINTING_TRIANGLE
@@ -371,9 +371,9 @@ return function(p1, p2)
 			return p1.ChildContainer
 		end,
 		Discard = function(p1)
-			if v3 and v3 == p1 then
-				v3 = nil
-				v1 = false
+			if var3 and var3 == p1 then
+				var3 = nil
+				instance = false
 			end
 			p1.Instance:Destroy()
 			p1.ChildContainer:Destroy()

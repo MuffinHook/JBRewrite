@@ -1,110 +1,110 @@
 -- Reviewed by Claude
 -- variables reassigned
-local v1 = Random.new()
-local t = {
-	copyKeysSafe = function(p1, p2)
-		for k, v in pairs(p2) do
-			if p1[k] ~= nil then
-				error(("Table `to` already has key `%s` = %s"):format(k, p1[k]), 2)
+local randomGenerator = Random.new()
+local TableUtils = {
+	copyKeysSafe = function(destination, source)
+		for k, v in pairs(source) do
+			if destination[k] ~= nil then
+				error(("Table `to` already has key `%s` = %s"):format(k, destination[k]), 2)
 			end
-			p1[k] = v
+			destination[k] = v
 		end
-		return p1
+		return destination
 	end
 }
-local t2 = {
+local strictMetatable = {
 	__index = function(p1, p2)
 		error(("Table does not contain key `%s`"):format(p2), 2)
 	end
 }
-function t.requireValidIndex(p1)
-	if typeof(p1) == "table" then
-		setmetatable(p1, t2)
+function TableUtils.requireValidIndex(tbl)
+	if typeof(tbl) == "table" then
+		setmetatable(tbl, strictMetatable)
 	end
-	return p1
+	return tbl
 end
-function t.requireValidIndexAndFreeze(p1)
-	local function v1(p1)
-		assert(typeof(p1) == "table", "currTable is not a table")
-		local v2 = getmetatable(p1)
-		if not v2 or v2 == t2 then
-			for v4, v5 in p1 do
-				if typeof(v5) == "table" then
-					v1(v5)
+function TableUtils.requireValidIndexAndFreeze(tbl)
+	local function freezeRecursively(currTable)
+		assert(typeof(currTable) == "table", "currTable is not a table")
+		local mt = getmetatable(currTable)
+		if not mt or mt == strictMetatable then
+			for k, v in currTable do
+				if typeof(v) == "table" then
+					freezeRecursively(v)
 				end
 			end
-			if not table.isfrozen(p1) then
-				table.freeze(p1)
+			if not table.isfrozen(currTable) then
+				table.freeze(currTable)
 			end
-			return p1
+			return currTable
 		end
 	end
-	return v1(p1)
+	return freezeRecursively(tbl)
 end
-function t.shuffleInPlace(p1)
-	for i = #p1, 2, -1 do
-		local v1 = math.random(i)
-		local v3 = p1[i]
-		p1[i] = p1[v1]
-		p1[v1] = v3
+function TableUtils.shuffleInPlace(array)
+	for i = #array, 2, -1 do
+		local randomIndex = math.random(i)
+		local temp = array[i]
+		array[i] = array[randomIndex]
+		array[randomIndex] = temp
 	end
 end
-function t.filter(p1, p2)
-	local t = {}
-	for i = 1, #p1 do
-		if p2(p1[i]) then
-			table.insert(t, p1[i])
+function TableUtils.filter(array, predicate)
+	local result = {}
+	for i = 1, #array do
+		if predicate(array[i]) then
+			table.insert(result, array[i])
 		end
 	end
-	return t
+	return result
 end
-function t.map(p1, p2)
-	local t = {}
-	for i = 1, #p1 do
-		table.insert(t, p2(p1[i]))
+function TableUtils.map(array, fn)
+	local result = {}
+	for i = 1, #array do
+		table.insert(result, fn(array[i]))
 	end
-	return t
+	return result
 end
-function t.sum(p1)
+function TableUtils.sum(array)
 	local sum = 0
-	for i = 1, #p1 do
-		sum = sum + p1[i]
+	for i = 1, #array do
+		sum = sum + array[i]
 	end
 	return sum
 end
-function t.weightedRandom(p1, p2)
-	local v12 = p2 or t.sum(p1)
-	assert(v12)
-	local sum = v12 * v1:NextNumber()
-	for i = 1, #p1 do
-		sum = sum - p1[i]
-		if sum <= 0 then
+function TableUtils.weightedRandom(array, totalWeight)
+	local weightSum = totalWeight or TableUtils.sum(array)
+	assert(weightSum)
+	local randomValue = weightSum * randomGenerator:NextNumber()
+	for i = 1, #array do
+		randomValue = randomValue - array[i]
+		if randomValue <= 0 then
 			return i
 		end
 	end
 	error("Couldn\'t find value")
 end
-function t.hasDesiredValuesShallow(p1, p2)
-	for k, v in pairs(p2) do
-		if p1[k] ~= v then
+function TableUtils.hasDesiredValuesShallow(table1, table2)
+	for k, v in pairs(table2) do
+		if table1[k] ~= v then
 			return false
 		end
 	end
 	return true
 end
-function t.deepCompareTables(p1, p2, p3, p4)
-	assert(typeof(p1) == "table", "t1 is not a table")
-	assert(typeof(p2) == "table", "t2 is not a table")
-	local function valueCompareLogic(p1, p2, p3, p4)
-		local v1 = not p3
-		if typeof(p1) == typeof(p2) then
-			if typeof(p1) == "table" then
-				if t.deepCompareTables(p1, p2, p3, p4) then
+function TableUtils.deepCompareTables(table1, table2, ignoreValues, option4)
+	assert(typeof(table1) == "table", "t1 is not a table")
+	assert(typeof(table2) == "table", "t2 is not a table")
+	local function valueCompareLogic(val1, val2, ignoreVals, opt4)
+		local shouldIgnore = not ignoreVals
+		if typeof(val1) == typeof(val2) then
+			if typeof(val1) == "table" then
+				if TableUtils.deepCompareTables(val1, val2, ignoreVals, opt4) then
 					return true
 				else
 					return false
 				end
-			elseif v1 and p1 ~= p2 then
+			elseif shouldIgnore and val1 ~= val2 then
 				return false
 			else
 				return true
@@ -113,269 +113,269 @@ function t.deepCompareTables(p1, p2, p3, p4)
 			return false
 		end
 	end
-	local count = 0
-	local count_2 = 0
-	for k, v in pairs(p2) do
-		count = count + 1
+	local count2Keys = 0
+	local count1Keys = 0
+	for k, v in pairs(table2) do
+		count2Keys = count2Keys + 1
 	end
-	for k, v in pairs(p1) do
-		count_2 = count_2 + 1
+	for k, v in pairs(table1) do
+		count1Keys = count1Keys + 1
 	end
-	local v3 = count_2 == #p1
-	if v3 == (count == #p2) then
-		local v5 = not p3
-		if not v5 then
-			v5 = p4 or not v3
+	local isSequential1 = count1Keys == #table1
+	if isSequential1 == (count2Keys == #table2) then
+		local shouldCompare = not ignoreValues
+		if not shouldCompare then
+			shouldCompare = option4 or not isSequential1
 		end
 	end
 	return false
 end
-function t.deepCheckSubset(p1, p2, p3)
-	assert(typeof(p1) == "table", "t1 is not a table")
-	assert(typeof(p2) == "table", "t2 is not a table")
-	local count = 0
-	local count_2 = 0
-	for k, v in pairs(p2) do
-		count = count + 1
+function TableUtils.deepCheckSubset(table1, table2, option3)
+	assert(typeof(table1) == "table", "t1 is not a table")
+	assert(typeof(table2) == "table", "t2 is not a table")
+	local count2Keys = 0
+	local count1Keys = 0
+	for k, v in pairs(table2) do
+		count2Keys = count2Keys + 1
 	end
-	for k, v in pairs(p1) do
-		count_2 = count_2 + 1
+	for k, v in pairs(table1) do
+		count1Keys = count1Keys + 1
 	end
-	local v3, v4, v5
-	if count_2 < count then
+	local pairsFunc, pairsState, pairsVar
+	if count1Keys < count2Keys then
 		return false
 	end
-	v3, v4, v5 = pairs(p2)
-	local v6, v7 = v3(v4, v5)
-	if v6 ~= nil then
-		if p1[v6] then
-			local v8 = typeof(v7)
-			local _ = v8 == typeof(p1[v6])
+	pairsFunc, pairsState, pairsVar = pairs(table2)
+	local firstKey, firstValue = pairsFunc(pairsState, pairsVar)
+	if firstKey ~= nil then
+		if table1[firstKey] then
+			local firstType = typeof(firstValue)
+			local _ = firstType == typeof(table1[firstKey])
 		end
 		return false
 	else
 		return true
 	end
 end
-function t.deepCopy(p1, p2)
-	local v1 = p2 or {}
-	assert(v1)
-	if type(p1) == "table" then
-		if v1[p1] then
-			return v1[p1]
+function TableUtils.deepCopy(value, memoTable)
+	local memo = memoTable or {}
+	assert(memo)
+	if type(value) == "table" then
+		if memo[value] then
+			return memo[value]
 		else
-			local t2 = {}
-			v1[p1] = t2
-			local v2 = v1
-			for v3, v4 in next, p1 do
-				t2[t.deepCopy(v3, v2)] = t.deepCopy(v4, v2)
+			local copied = {}
+			memo[value] = copied
+			local memoRef = memo
+			for k, v in next, value do
+				copied[TableUtils.deepCopy(k, memoRef)] = TableUtils.deepCopy(v, memoRef)
 			end
-			return t2
+			return copied
 		end
 	else
-		return p1
+		return value
 	end
 end
-local function f2(p1, p2)
+local function acceptAll(p1, p2)
 	return true
 end
-local t3 = {
+local typeToInstanceMap = {
 	boolean = "BoolValue",
 	table = "Folder",
 	Instance = "ObjectValue"
 }
-local t4 = {
-	EnumItem = function(p1, p2)
-		local t = {
+local customSerializers = {
+	EnumItem = function(key, enumValue)
+		local result = {
 			instanceType = "StringValue",
-			serializedValue = p2.Name
+			serializedValue = enumValue.Name
 		}
-		local t2 = {
+		local attributes = {
 			_ValueType = "EnumItem"
 		}
-		t2._EnumType = tostring(p2.EnumType)
-		t.attributes = t2
-		return t
+		attributes._EnumType = tostring(enumValue.EnumType)
+		result.attributes = attributes
+		return result
 	end,
-	Vector2 = function(p1, p2)
-		local t = {
+	Vector2 = function(key, vec2Value)
+		local result = {
 			instanceType = "Vector3Value"
 		}
-		t.serializedValue = Vector3.new(p2.X, p2.Y, 0)
-		t.attributes = {
+		result.serializedValue = Vector3.new(vec2Value.X, vec2Value.Y, 0)
+		result.attributes = {
 			_ValueType = "Vector2"
 		}
-		return t
+		return result
 	end
 }
-local t5 = {
-	EnumItem = function(p1)
-		return Enum[p1:GetAttribute("_EnumType")][p1.Value]
+local customDeserializers = {
+	EnumItem = function(instance)
+		return Enum[instance:GetAttribute("_EnumType")][instance.Value]
 	end,
-	Vector2 = function(p1)
-		return Vector2.new(p1.Value.X, p1.Value.Y)
+	Vector2 = function(instance)
+		return Vector2.new(instance.Value.X, instance.Value.Y)
 	end
 }
-local function getSerializedTypeAndValue(p1, p2)
-	local v1 = typeof(p2)
-	if typeof(p1) ~= "number" and typeof(p1) ~= "string" then
+local function getSerializedTypeAndValue(key, value)
+	local valueType = typeof(value)
+	if typeof(key) ~= "number" and typeof(key) ~= "string" then
 		error("Cannot serialize non-string/number key")
 	end
-	local t = {
-		_KeyType = typeof(p1)
+	local attributes = {
+		_KeyType = typeof(key)
 	}
-	if t4[v1] then
-		local v2 = t4[v1](p1, p2)
-		for v3, v4 in t do
-			v2.attributes[v3] = v4
+	if customSerializers[valueType] then
+		local serialized = customSerializers[valueType](key, value)
+		for attrKey, attrValue in attributes do
+			serialized.attributes[attrKey] = attrValue
 		end
-		return v2.instanceType, v2.serializedValue, v2.attributes
+		return serialized.instanceType, serialized.serializedValue, serialized.attributes
 	else
-		local v6 = (t3[v1] or v1 .. "Value"):gsub("^%l", string.upper)
-		t._ValueType = v1
-		return v6, p2, t
+		local instanceClassName = (typeToInstanceMap[valueType] or valueType .. "Value"):gsub("^%l", string.upper)
+		attributes._ValueType = valueType
+		return instanceClassName, value, attributes
 	end
 end
-local function deserializeValue(p1)
-	local v1 = p1:GetAttribute("_ValueType")
-	return t5[v1] and t5[v1](p1) or p1.Value
+local function deserializeValue(instance)
+	local valueType = instance:GetAttribute("_ValueType")
+	return customDeserializers[valueType] and customDeserializers[valueType](instance) or instance.Value
 end
-function t.observeObjectValuesChanged(p1, p2)
-	assert(p1 and p1:IsA("Instance"), "Invalid rootFolder passed")
+function TableUtils.observeObjectValuesChanged(rootFolder, callback)
+	assert(rootFolder and rootFolder:IsA("Instance"), "Invalid rootFolder passed")
 	local function handleUpdate()
-		p2(t.createTableFromObjectValues(p1), (p1:GetAttribute("_TableUtilsLastUpdated")))
+		callback(TableUtils.createTableFromObjectValues(rootFolder), (rootFolder:GetAttribute("_TableUtilsLastUpdated")))
 	end
-	local v2 = p1:GetAttributeChangedSignal("_TableUtilsLastUpdated"):Connect(handleUpdate)
-	p2(t.createTableFromObjectValues(p1), (p1:GetAttribute("_TableUtilsLastUpdated")))
-	return v2
+	local connection = rootFolder:GetAttributeChangedSignal("_TableUtilsLastUpdated"):Connect(handleUpdate)
+	callback(TableUtils.createTableFromObjectValues(rootFolder), (rootFolder:GetAttribute("_TableUtilsLastUpdated")))
+	return connection
 end
-function t.createObjectValuesFromTable(p1, p2, p3)
-	assert(typeof(p1) == "table", "Incorrect originalTable type passed")
-	assert(typeof(p2) == "function" or p2 == nil, "Incorrect filterPredicate type passed")
-	assert(if p3 == nil then true else p3:IsA("Instance"), "Incorrect rootFolder type passed")
-	local v5 = p2 or f2
-	local v7 = p3 or Instance.new("Folder")
-	if not (v7 and v5) then
+function TableUtils.createObjectValuesFromTable(originalTable, filterPredicate, rootFolder)
+	assert(typeof(originalTable) == "table", "Incorrect originalTable type passed")
+	assert(typeof(filterPredicate) == "function" or filterPredicate == nil, "Incorrect filterPredicate type passed")
+	assert(if rootFolder == nil then true else rootFolder:IsA("Instance"), "Incorrect rootFolder type passed")
+	local filter = filterPredicate or acceptAll
+	local folder = rootFolder or Instance.new("Folder")
+	if not (folder and filter) then
 		error("no folder")
 	end
-	local function v8(p1, p2)
-		local t = {}
-		for v1, v2 in p2:GetChildren() do
-			t[v2.Name] = v2
+	local function populateFolder(tableData, parentInstance)
+		local existingInstances = {}
+		for i, child in parentInstance:GetChildren() do
+			existingInstances[child.Name] = child
 		end
-		for v3, v4 in p1 do
-			if v5(v3, v4) then
-				local v52 = p2:FindFirstChild((tostring(v3)))
-				local v6, v7, v82 = getSerializedTypeAndValue(v3, v4)
-				if v52 and v52.ClassName ~= v6 then
-					v52:Destroy()
-					v52 = nil
+		for key, value in tableData do
+			if filter(key, value) then
+				local existingInstance = parentInstance:FindFirstChild((tostring(key)))
+				local instanceType, serializedValue, attributes = getSerializedTypeAndValue(key, value)
+				if existingInstance and existingInstance.ClassName ~= instanceType then
+					existingInstance:Destroy()
+					existingInstance = nil
 				end
-				if v52 then
-					t[v52.Name] = nil
+				if existingInstance then
+					existingInstances[existingInstance.Name] = nil
 				else
-					local v9 = Instance.new(v6)
-					v9.Name = tostring(v3)
-					v52 = v9
+					local newInstance = Instance.new(instanceType)
+					newInstance.Name = tostring(key)
+					existingInstance = newInstance
 				end
-				if v6 ~= "Folder" then
-					v52.Value = v7
+				if instanceType ~= "Folder" then
+					existingInstance.Value = serializedValue
 				end
-				for v10, v11 in v82 do
-					v52:SetAttribute(v10, v11)
+				for attrKey, attrValue in attributes do
+					existingInstance:SetAttribute(attrKey, attrValue)
 				end
-				if typeof(v4) == "table" then
-					v8(v4, v52)
+				if typeof(value) == "table" then
+					populateFolder(value, existingInstance)
 				end
-				if not v52.Parent then
-					v52.Parent = p2
+				if not existingInstance.Parent then
+					existingInstance.Parent = parentInstance
 				end
 			end
 		end
-		for v12, v13 in t do
-			v13:Destroy()
+		for unusedName, unusedInstance in existingInstances do
+			unusedInstance:Destroy()
 		end
 	end
-	v8(p1, v7)
+	populateFolder(originalTable, folder)
 	task.delay(0, function()
-		v7:SetAttribute("_TableUtilsLastUpdated", workspace:GetServerTimeNow())
+		folder:SetAttribute("_TableUtilsLastUpdated", workspace:GetServerTimeNow())
 	end)
-	return v7
+	return folder
 end
-function t.createTableFromObjectValues(p1)
-	assert(typeof(p1) == "Instance", "Invalid objectValues passed")
-	local function v2(p1)
-		local t = {}
-		for v3, v4 in p1:GetChildren() do
-			local v1, v22
-			v1 = v4:GetAttribute("_KeyType") == "number" and tonumber(v4.Name) or v4.Name
-			if v4:IsA("Folder") then
-				t[v1] = v2(v4)
+function TableUtils.createTableFromObjectValues(rootInstance)
+	assert(typeof(rootInstance) == "Instance", "Invalid objectValues passed")
+	local function reconstructTable(instance)
+		local result = {}
+		for i, child in instance:GetChildren() do
+			local key, value
+			key = child:GetAttribute("_KeyType") == "number" and tonumber(child.Name) or child.Name
+			if child:IsA("Folder") then
+				result[key] = reconstructTable(child)
 			else
-				local v6 = v4:GetAttribute("_ValueType")
-				v22 = t5[v6] and t5[v6](v4) or v4.Value
-				t[v1] = v22
+				local valueType = child:GetAttribute("_ValueType")
+				value = customDeserializers[valueType] and customDeserializers[valueType](child) or child.Value
+				result[key] = value
 			end
 		end
-		return t
+		return result
 	end
-	return v2(p1)
+	return reconstructTable(rootInstance)
 end
-function t.isValidSequentialArray(p1)
-	for v2, v3 in p1 do
-		local _ = typeof(v2) == "number"
+function TableUtils.isValidSequentialArray(array)
+	for key, value in array do
+		local _ = typeof(key) == "number"
 		return false
 	end
-	return #p1 == 0
+	return #array == 0
 end
-function t.insertDesc(p1, p2)
-	local v1 = #p1 + 1
-	for i = #p1, 1, -1 do
-		if p2 < p1[i] then
+function TableUtils.insertDesc(array, value)
+	local position = #array + 1
+	for i = #array, 1, -1 do
+		if value < array[i] then
 			break
 		end
-		v1 = i
+		position = i
 	end
-	return v1
+	return position
 end
-function t.insertAsc(p1, p2)
-	local v1 = 0
-	for i = 1, #p1 do
-		if p2 < p1[i] then
+function TableUtils.insertAsc(array, value)
+	local position = 0
+	for i = 1, #array do
+		if value < array[i] then
 			break
 		end
-		v1 = i
+		position = i
 	end
-	return v1 + 1
+	return position + 1
 end
-function t.concat(p1, p2)
-	local v1 = table.create(#p1 + #p2)
-	table.move(p1, 1, #p1, 1, v1)
-	table.move(p2, 1, #p2, #p1 + 1, v1)
-	return v1
+function TableUtils.concat(array1, array2)
+	local result = table.create(#array1 + #array2)
+	table.move(array1, 1, #array1, 1, result)
+	table.move(array2, 1, #array2, #array1 + 1, result)
+	return result
 end
-function t.concatInPlace(p1, p2)
-	table.move(p2, 1, #p2, #p1 + 1, p1)
+function TableUtils.concatInPlace(array1, array2)
+	table.move(array2, 1, #array2, #array1 + 1, array1)
 end
-function t.mergeDeepInPlace(p1, p2)
-	assert(type(p1) == "table", "The \'from\' parameter must be a table.")
-	assert(type(p2) == "table", "The \'to\' parameter must be a table.")
-	for v3, v4 in p1 do
-		if type(v4) == "table" and type(p2[v3]) == "table" then
-			t.mergeDeepInPlace(v4, p2[v3])
+function TableUtils.mergeDeepInPlace(fromTable, toTable)
+	assert(type(fromTable) == "table", "The \'from\' parameter must be a table.")
+	assert(type(toTable) == "table", "The \'to\' parameter must be a table.")
+	for key, value in fromTable do
+		if type(value) == "table" and type(toTable[key]) == "table" then
+			TableUtils.mergeDeepInPlace(value, toTable[key])
 		else
-			p2[v3] = v4
+			toTable[key] = value
 		end
 	end
 end
-function t.deepFreeze(p1)
-	if typeof(p1) == "table" then
-		if not table.isfrozen(p1) then
-			table.freeze(p1)
+function TableUtils.deepFreeze(tbl)
+	if typeof(tbl) == "table" then
+		if not table.isfrozen(tbl) then
+			table.freeze(tbl)
 		end
-		for v1, v2 in p1 do
-			t.deepFreeze(v2)
+		for k, v in tbl do
+			TableUtils.deepFreeze(v)
 		end
 	end
 end
-return t
+return TableUtils

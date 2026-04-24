@@ -55,32 +55,32 @@ return function(p1, p2)
 			p1.Instance:Destroy()
 		end
 	})
-	local v1 = 0
+	local instance = 0
 	local v2 = nil
-	local v3 = false
-	local v4 = nil
-	local v5 = nil
-	local v6 = false
-	local v7 = false
-	local v8 = false
+	local var3 = false
+	local var4 = nil
+	local var5 = nil
+	local var6 = false
+	local var7 = false
+	local var8 = false
 	local Top = Enum.TopBottom.Top
 	local Left = Enum.LeftRight.Left
-	local v9 = nil
-	local v10 = nil
-	local v11 = false
+	local var9 = nil
+	local var10 = nil
+	local var11 = false
 	local t = {}
 	local function quickSwapWindows()
 		if p1._config.UseScreenGUIs == false then
 			return
 		end
-		local v1 = 65535
+		local instance = 65535
 		local v2 = nil
-		for v3, v4 in t do
-			if v4.state.isOpened.value and (not v4.arguments.NoNav and v4.Instance:IsA("ScreenGui")) then
-				local DisplayOrder = v4.Instance.DisplayOrder
-				if DisplayOrder < v1 then
-					v1 = DisplayOrder
-					v2 = v4
+		for var3, var4 in t do
+			if var4.state.isOpened.value and (not var4.arguments.NoNav and var4.Instance:IsA("ScreenGui")) then
+				local DisplayOrder = var4.Instance.DisplayOrder
+				if DisplayOrder < instance then
+					instance = DisplayOrder
+					v2 = var4
 				end
 			end
 		end
@@ -92,24 +92,24 @@ return function(p1, p2)
 		end
 	end
 	local function fitSizeToWindowBounds(p12, p22)
-		local v1 = Vector2.new(p12.state.position.value.X, p12.state.position.value.Y)
+		local instance = Vector2.new(p12.state.position.value.X, p12.state.position.value.Y)
 		local v2 = (p1._config.TextSize + 2 * p1._config.FramePadding.Y) * 2
-		local v3 = p2.getScreenSizeForWindow(p12) - v1 - Vector2.new(p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.X, p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.Y)
-		return Vector2.new(math.clamp(p22.X, v2, (math.max(v3.X, v2))), (math.clamp(p22.Y, v2, (math.max(v3.Y, v2)))))
+		local var3 = p2.getScreenSizeForWindow(p12) - instance - Vector2.new(p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.X, p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.Y)
+		return Vector2.new(math.clamp(p22.X, v2, (math.max(var3.X, v2))), (math.clamp(p22.Y, v2, (math.max(var3.Y, v2)))))
 	end
 	local function fitPositionToWindowBounds(p12, p22)
-		local v1 = p12.Instance
+		local instance = p12.Instance
 		local v2 = p2.getScreenSizeForWindow(p12)
-		local v3 = Vector2.new(p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.X, p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.Y)
-		return Vector2.new(math.clamp(p22.X, v3.X, (math.max(v3.X, v2.X - v1.WindowButton.AbsoluteSize.X - v3.X))), (math.clamp(p22.Y, v3.Y, (math.max(v3.Y, v2.Y - v1.WindowButton.AbsoluteSize.Y - v3.Y)))))
+		local var3 = Vector2.new(p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.X, p1._config.WindowBorderSize + p1._config.DisplaySafeAreaPadding.Y)
+		return Vector2.new(math.clamp(p22.X, var3.X, (math.max(var3.X, v2.X - instance.WindowButton.AbsoluteSize.X - var3.X))), (math.clamp(p22.Y, var3.Y, (math.max(var3.Y, v2.Y - instance.WindowButton.AbsoluteSize.Y - var3.Y)))))
 	end
 	function p1.SetFocusedWindow(p12)
-		if v10 ~= p12 then
-			if v11 and v10 ~= nil then
-				if t[v10.ID] then
-					local WindowButton = v10.Instance.WindowButton
+		if var10 ~= p12 then
+			if var11 and var10 ~= nil then
+				if t[var10.ID] then
+					local WindowButton = var10.Instance.WindowButton
 					local TitleBar = WindowButton.Content.TitleBar
-					if v10.state.isUncollapsed.value then
+					if var10.state.isUncollapsed.value then
 						TitleBar.BackgroundColor3 = p1._config.TitleBgColor
 						TitleBar.BackgroundTransparency = p1._config.TitleBgTransparency
 					else
@@ -118,23 +118,23 @@ return function(p1, p2)
 					end
 					WindowButton.UIStroke.Color = p1._config.BorderColor
 				end
-				v11 = false
-				v10 = nil
+				var11 = false
+				var10 = nil
 			end
 			if p12 ~= nil then
-				v11 = true
-				v10 = p12
-				local v12 = p12.Instance
-				local WindowButton = v12.WindowButton
+				var11 = true
+				var10 = p12
+				local instance12 = p12.Instance
+				local WindowButton = instance12.WindowButton
 				local TitleBar = WindowButton.Content.TitleBar
 				TitleBar.BackgroundColor3 = p1._config.TitleBgActiveColor
 				TitleBar.BackgroundTransparency = p1._config.TitleBgActiveTransparency
 				WindowButton.UIStroke.Color = p1._config.BorderActiveColor
-				v1 = v1 + 1
+				instance = instance + 1
 				if p12.usesScreenGuis then
-					v12.DisplayOrder = v1 + p1._config.DisplayOrderOffset
+					instance12.DisplayOrder = instance + p1._config.DisplayOrderOffset
 				else
-					v12.ZIndex = v1 + p1._config.DisplayOrderOffset
+					instance12.ZIndex = instance + p1._config.DisplayOrderOffset
 				end
 				if p12.state.isUncollapsed.value == false then
 					p12.state.isUncollapsed:set(true)
@@ -152,12 +152,12 @@ return function(p1, p2)
 	p2.registerEvent("InputBegan", function(p12)
 		if p1._started then
 			if p12.UserInputType == Enum.UserInputType.MouseButton1 then
-				local v1 = p2.getMouseLocation()
-				for v3, v4 in t do
-					local v52 = v4.Instance
-					if v52 then
-						local ResizeBorder = v52.WindowButton.ResizeBorder
-						local _ = ResizeBorder and p2.isPosInsideRect(v1, ResizeBorder.AbsolutePosition - p2.GuiOffset, ResizeBorder.AbsolutePosition - p2.GuiOffset + ResizeBorder.AbsoluteSize)
+				local instance = p2.getMouseLocation()
+				for var3, var4 in t do
+					local instance52 = var4.Instance
+					if instance52 then
+						local ResizeBorder = instance52.WindowButton.ResizeBorder
+						local _ = ResizeBorder and p2.isPosInsideRect(instance, ResizeBorder.AbsolutePosition - p2.GuiOffset, ResizeBorder.AbsolutePosition - p2.GuiOffset + ResizeBorder.AbsoluteSize)
 					end
 				end
 				if not false then
@@ -167,18 +167,18 @@ return function(p1, p2)
 			if p12.KeyCode == Enum.KeyCode.Tab and (p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)) then
 				quickSwapWindows()
 			end
-			if p12.UserInputType == Enum.UserInputType.MouseButton1 and (v7 and (not v8 and (v11 and v10))) then
-				local v72 = p2.getMouseLocation() - (v10.state.position.value + v10.state.size.value / 2)
-				local v82 = math.abs(v72.X) * v10.state.size.value.Y
-				if math.abs(v72.Y) * v10.state.size.value.X <= v82 then
+			if p12.UserInputType == Enum.UserInputType.MouseButton1 and (var7 and (not var8 and (var11 and var10))) then
+				local var72 = p2.getMouseLocation() - (var10.state.position.value + var10.state.size.value / 2)
+				local var82 = math.abs(var72.X) * var10.state.size.value.Y
+				if math.abs(var72.Y) * var10.state.size.value.X <= var82 then
 					Top = Enum.TopBottom.Center
-					Left = if math.sign(v72.X) == -1 then Enum.LeftRight.Left else Enum.LeftRight.Right
+					Left = if math.sign(var72.X) == -1 then Enum.LeftRight.Left else Enum.LeftRight.Right
 				else
 					Left = Enum.LeftRight.Center
-					Top = if math.sign(v72.Y) == -1 then Enum.TopBottom.Top else Enum.TopBottom.Bottom
+					Top = if math.sign(var72.Y) == -1 then Enum.TopBottom.Top else Enum.TopBottom.Bottom
 				end
-				v6 = true
-				v5 = v10
+				var6 = true
+				var5 = var10
 			end
 		end
 	end)
@@ -189,44 +189,44 @@ return function(p1, p2)
 	end)
 	p2.registerEvent("InputChanged", function(p12)
 		if p1._started then
-			if v3 and v2 then
-				local v1
+			if var3 and v2 then
+				local instance
 				if p12.UserInputType == Enum.UserInputType.Touch then
 					local Position = p12.Position
-					v1 = Vector2.new(Position.X, Position.Y)
+					instance = Vector2.new(Position.X, Position.Y)
 				else
-					v1 = p2.getMouseLocation()
+					instance = p2.getMouseLocation()
 				end
-				local v42 = fitPositionToWindowBounds(v2, v1 - v4)
-				v2.Instance.WindowButton.Position = UDim2.fromOffset(v42.X, v42.Y)
-				v2.state.position.value = v42
+				local var42 = fitPositionToWindowBounds(v2, instance - var4)
+				v2.Instance.WindowButton.Position = UDim2.fromOffset(var42.X, var42.Y)
+				v2.state.position.value = var42
 			end
-			if v6 and (v5 and v5.arguments.NoResize ~= true) then
-				local WindowButton = v5.Instance.WindowButton
-				local v52 = Vector2.new(WindowButton.Position.X.Offset, WindowButton.Position.Y.Offset)
-				local v62 = Vector2.new(WindowButton.Size.X.Offset, WindowButton.Size.Y.Offset)
-				local v7 = if p12.UserInputType == Enum.UserInputType.Touch then p12.Delta else p2.getMouseLocation() - v9
-				local v11 = v52 + Vector2.new(if Left == Enum.LeftRight.Left then v7.X else 0, if Top == Enum.TopBottom.Top then v7.Y else 0)
-				local v15 = fitSizeToWindowBounds(v5, v62 + Vector2.new(if Left == Enum.LeftRight.Left then -v7.X elseif Left == Enum.LeftRight.Right then v7.X else 0, if Top == Enum.TopBottom.Top then -v7.Y elseif Top == Enum.TopBottom.Bottom then v7.Y else 0))
-				local v16 = fitPositionToWindowBounds(v5, v11)
-				WindowButton.Size = UDim2.fromOffset(v15.X, v15.Y)
-				v5.state.size.value = v15
-				WindowButton.Position = UDim2.fromOffset(v16.X, v16.Y)
-				v5.state.position.value = v16
+			if var6 and (var5 and var5.arguments.NoResize ~= true) then
+				local WindowButton = var5.Instance.WindowButton
+				local instance52 = Vector2.new(WindowButton.Position.X.Offset, WindowButton.Position.Y.Offset)
+				local instance62 = Vector2.new(WindowButton.Size.X.Offset, WindowButton.Size.Y.Offset)
+				local var7 = if p12.UserInputType == Enum.UserInputType.Touch then p12.Delta else p2.getMouseLocation() - var9
+				local var11 = instance52 + Vector2.new(if Left == Enum.LeftRight.Left then var7.X else 0, if Top == Enum.TopBottom.Top then var7.Y else 0)
+				local instance15 = fitSizeToWindowBounds(var5, instance62 + Vector2.new(if Left == Enum.LeftRight.Left then -var7.X elseif Left == Enum.LeftRight.Right then var7.X else 0, if Top == Enum.TopBottom.Top then -var7.Y elseif Top == Enum.TopBottom.Bottom then var7.Y else 0))
+				local var16 = fitPositionToWindowBounds(var5, var11)
+				WindowButton.Size = UDim2.fromOffset(instance15.X, instance15.Y)
+				var5.state.size.value = instance15
+				WindowButton.Position = UDim2.fromOffset(var16.X, var16.Y)
+				var5.state.position.value = var16
 			end
-			v9 = p2.getMouseLocation()
+			var9 = p2.getMouseLocation()
 		end
 	end)
 	p2.registerEvent("InputEnded", function(p12, p2)
 		if p1._started then
-			if (p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch) and (v3 and v2) then
+			if (p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch) and (var3 and v2) then
 				local WindowButton = v2.Instance.WindowButton
-				v3 = false
+				var3 = false
 				v2.state.position:set(Vector2.new(WindowButton.Position.X.Offset, WindowButton.Position.Y.Offset))
 			end
-			if (p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch) and (v6 and v5) then
-				v6 = false
-				v5.state.size:set(v5.Instance.WindowButton.AbsoluteSize)
+			if (p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch) and (var6 and var5) then
+				var6 = false
+				var5.state.size:set(var5.Instance.WindowButton.AbsoluteSize)
 			end
 			if p12.KeyCode == Enum.KeyCode.ButtonX then
 				quickSwapWindows()
@@ -324,8 +324,8 @@ return function(p1, p2)
 					end
 					if not p12.arguments.NoMove and p13.UserInputType == Enum.UserInputType.MouseButton1 then
 						v2 = p12
-						v3 = true
-						v4 = p2.getMouseLocation() - p12.state.position.value
+						var3 = true
+						var4 = p2.getMouseLocation() - p12.state.position.value
 					end
 				end
 			end)
@@ -337,9 +337,9 @@ return function(p1, p2)
 			Frame.BackgroundTransparency = 1
 			Frame.ClipsDescendants = true
 			Frame.Parent = WindowButton
-			local v1 = p2.UIListLayout(Frame, Enum.FillDirection.Vertical, UDim.new(0, 0))
-			v1.HorizontalAlignment = Enum.HorizontalAlignment.Center
-			v1.VerticalAlignment = Enum.VerticalAlignment.Top
+			local instance = p2.UIListLayout(Frame, Enum.FillDirection.Vertical, UDim.new(0, 0))
+			instance.HorizontalAlignment = Enum.HorizontalAlignment.Center
+			instance.VerticalAlignment = Enum.VerticalAlignment.Top
 			local WindowContainer = Instance.new("ScrollingFrame")
 			WindowContainer.Name = "WindowContainer"
 			WindowContainer.Size = UDim2.fromScale(1, 1)
@@ -390,17 +390,17 @@ return function(p1, p2)
 			p2.applyInputBegan(TitleBar, function(p1)
 				if p1.UserInputType == Enum.UserInputType.Touch and not p12.arguments.NoMove then
 					v2 = p12
-					v3 = true
+					var3 = true
 					local Position = p1.Position
-					v4 = Vector2.new(Position.X, Position.Y) - p12.state.position.value
+					var4 = Vector2.new(Position.X, Position.Y) - p12.state.position.value
 				end
 			end)
-			local v22 = p1._config.TextSize + (p1._config.FramePadding.Y - 1) * 2
+			local var22 = p1._config.TextSize + (p1._config.FramePadding.Y - 1) * 2
 			local CollapseButton = Instance.new("TextButton")
 			CollapseButton.Name = "CollapseButton"
 			CollapseButton.AutomaticSize = Enum.AutomaticSize.None
 			CollapseButton.AnchorPoint = Vector2.new(0, 0.5)
-			CollapseButton.Size = UDim2.fromOffset(v22, v22)
+			CollapseButton.Size = UDim2.fromOffset(var22, var22)
 			CollapseButton.Position = UDim2.fromScale(0, 0.5)
 			CollapseButton.BackgroundTransparency = 1
 			CollapseButton.BorderSizePixel = 0
@@ -422,7 +422,7 @@ return function(p1, p2)
 			local Arrow = Instance.new("ImageLabel")
 			Arrow.Name = "Arrow"
 			Arrow.AnchorPoint = Vector2.new(0.5, 0.5)
-			Arrow.Size = UDim2.fromOffset(math.floor(0.7 * v22), (math.floor(0.7 * v22)))
+			Arrow.Size = UDim2.fromOffset(math.floor(0.7 * var22), (math.floor(0.7 * var22)))
 			Arrow.Position = UDim2.fromScale(0.5, 0.5)
 			Arrow.BackgroundTransparency = 1
 			Arrow.BorderSizePixel = 0
@@ -434,7 +434,7 @@ return function(p1, p2)
 			CloseButton.Name = "CloseButton"
 			CloseButton.AutomaticSize = Enum.AutomaticSize.None
 			CloseButton.AnchorPoint = Vector2.new(1, 0.5)
-			CloseButton.Size = UDim2.fromOffset(v22, v22)
+			CloseButton.Size = UDim2.fromOffset(var22, var22)
 			CloseButton.Position = UDim2.fromScale(1, 0.5)
 			CloseButton.BackgroundTransparency = 1
 			CloseButton.BorderSizePixel = 0
@@ -457,7 +457,7 @@ return function(p1, p2)
 			local Icon = Instance.new("ImageLabel")
 			Icon.Name = "Icon"
 			Icon.AnchorPoint = Vector2.new(0.5, 0.5)
-			Icon.Size = UDim2.fromOffset(math.floor(0.7 * v22), (math.floor(0.7 * v22)))
+			Icon.Size = UDim2.fromOffset(math.floor(0.7 * var22), (math.floor(0.7 * var22)))
 			Icon.Position = UDim2.fromScale(0.5, 0.5)
 			Icon.BackgroundTransparency = 1
 			Icon.BorderSizePixel = 0
@@ -480,13 +480,13 @@ return function(p1, p2)
 			UIFlexItem_2.ItemLineAlignment = Enum.ItemLineAlignment.Center
 			UIFlexItem_2.Parent = Title
 			Title.Parent = TitleBar
-			local v32 = p1._config.TextSize + p1._config.FramePadding.X
+			local var32 = p1._config.TextSize + p1._config.FramePadding.X
 			local LeftResizeGrip = Instance.new("ImageButton")
 			LeftResizeGrip.Name = "LeftResizeGrip"
 			LeftResizeGrip.AnchorPoint = Vector2.yAxis
 			LeftResizeGrip.Rotation = 180
 			LeftResizeGrip.Position = UDim2.fromScale(0, 1)
-			LeftResizeGrip.Size = UDim2.fromOffset(v32, v32)
+			LeftResizeGrip.Size = UDim2.fromOffset(var32, var32)
 			LeftResizeGrip.BackgroundTransparency = 1
 			LeftResizeGrip.BorderSizePixel = 0
 			LeftResizeGrip.Image = p2.ICONS.BOTTOM_RIGHT_CORNER
@@ -504,20 +504,20 @@ return function(p1, p2)
 				ActiveTransparency = p1._config.ResizeGripActiveTransparency
 			})
 			p2.applyButtonDown(LeftResizeGrip, function()
-				if not v11 or v10 ~= p12 then
+				if not var11 or var10 ~= p12 then
 					p1.SetFocusedWindow(p12)
 				end
-				v6 = true
+				var6 = true
 				Top = Enum.TopBottom.Bottom
 				Left = Enum.LeftRight.Left
-				v5 = p12
+				var5 = p12
 			end)
 			local RightResizeGrip = Instance.new("ImageButton")
 			RightResizeGrip.Name = "RightResizeGrip"
 			RightResizeGrip.AnchorPoint = Vector2.one
 			RightResizeGrip.Rotation = 90
 			RightResizeGrip.Position = UDim2.fromScale(1, 1)
-			RightResizeGrip.Size = UDim2.fromOffset(v32, v32)
+			RightResizeGrip.Size = UDim2.fromOffset(var32, var32)
 			RightResizeGrip.BackgroundTransparency = 1
 			RightResizeGrip.BorderSizePixel = 0
 			RightResizeGrip.Image = p2.ICONS.BOTTOM_RIGHT_CORNER
@@ -535,13 +535,13 @@ return function(p1, p2)
 				ActiveTransparency = p1._config.ResizeGripActiveTransparency
 			})
 			p2.applyButtonDown(RightResizeGrip, function()
-				if not v11 or v10 ~= p12 then
+				if not var11 or var10 ~= p12 then
 					p1.SetFocusedWindow(p12)
 				end
-				v6 = true
+				var6 = true
 				Top = Enum.TopBottom.Bottom
 				Left = Enum.LeftRight.Right
-				v5 = p12
+				var5 = p12
 			end)
 			local LeftResizeBorder = Instance.new("ImageButton")
 			LeftResizeBorder.Name = "LeftResizeBorder"
@@ -650,13 +650,13 @@ return function(p1, p2)
 			ResizeBorder.ClipsDescendants = false
 			ResizeBorder.Parent = WindowButton
 			p2.applyMouseEnter(ResizeBorder, function()
-				if v10 == p12 then
-					v7 = true
+				if var10 == p12 then
+					var7 = true
 				end
 			end)
 			p2.applyMouseLeave(ResizeBorder, function()
-				if v10 == p12 then
-					v7 = false
+				if var10 == p12 then
+					var7 = false
 				end
 			end)
 			p2.applyInputBegan(ResizeBorder, function(p13)
@@ -665,13 +665,13 @@ return function(p1, p2)
 				end
 			end)
 			p2.applyMouseEnter(WindowButton, function()
-				if v10 == p12 then
-					v8 = true
+				if var10 == p12 then
+					var8 = true
 				end
 			end)
 			p2.applyMouseLeave(WindowButton, function()
-				if v10 == p12 then
-					v8 = false
+				if var10 == p12 then
+					var8 = false
 				end
 			end)
 			p12.ChildContainer = WindowContainer
@@ -682,7 +682,7 @@ return function(p1, p2)
 				p12.state.size = p1._widgetState(p12, "size", Vector2.new(400, 300))
 			end
 			if p12.state.position == nil then
-				p12.state.position = p1._widgetState(p12, "position", if v11 and v10 then v10.state.position.value + Vector2.new(15, 45) else Vector2.new(150, 250))
+				p12.state.position = p1._widgetState(p12, "position", if var11 and var10 then var10.state.position.value + Vector2.new(15, 45) else Vector2.new(150, 250))
 			end
 			p12.state.position.value = fitPositionToWindowBounds(p12, p12.state.position.value)
 			p12.state.size.value = fitSizeToWindowBounds(p12, p12.state.size.value)
@@ -762,9 +762,9 @@ return function(p1, p2)
 			local value_3 = p12.state.isUncollapsed.value
 			local value_4 = p12.state.isOpened.value
 			local value_5 = p12.state.scrollDistance.value
-			local v1 = p12.Instance
+			local instance = p12.Instance
 			local ChildContainer = p12.ChildContainer
-			local WindowButton = v1.WindowButton
+			local WindowButton = instance.WindowButton
 			local v2 = WindowButton.Content
 			local TitleBar = v2.TitleBar
 			local Iris_MenuBar = v2:FindFirstChild("Iris_MenuBar")
@@ -778,17 +778,17 @@ return function(p1, p2)
 			WindowButton.Position = UDim2.fromOffset(value_2.X, value_2.Y)
 			if value_4 then
 				if p12.usesScreenGuis then
-					v1.Enabled = true
+					instance.Enabled = true
 				else
-					v1.Visible = true
+					instance.Visible = true
 				end
 				WindowButton.Visible = true
 				p12.lastOpenedTick = p1._cycleTick + 1
 			else
 				if p12.usesScreenGuis then
-					v1.Enabled = false
+					instance.Enabled = false
 				else
-					v1.Visible = false
+					instance.Visible = false
 				end
 				WindowButton.Visible = false
 				p12.lastClosedTick = p1._cycleTick + 1
@@ -833,41 +833,41 @@ return function(p1, p2)
 				p1.SetFocusedWindow(nil)
 			end
 			if value_5 and value_5 ~= 0 then
-				local v3 = #p1._postCycleCallbacks + 1
-				local v4 = p1._cycleTick + 1
-				p1._postCycleCallbacks[v3] = function()
-					if v4 <= p1._cycleTick then
+				local var3 = #p1._postCycleCallbacks + 1
+				local var4 = p1._cycleTick + 1
+				p1._postCycleCallbacks[var3] = function()
+					if var4 <= p1._cycleTick then
 						if p12.lastCycleTick ~= -1 then
 							ChildContainer.CanvasPosition = Vector2.new(0, value_5)
 						end
-						p1._postCycleCallbacks[v3] = nil
+						p1._postCycleCallbacks[var3] = nil
 					end
 				end
 			end
 		end,
 		ChildAdded = function(p1, p2)
-			local v1 = p1.Instance.WindowButton.Content
+			local instance = p1.Instance.WindowButton.Content
 			if p2.type == "MenuBar" then
 				local ChildContainer = p1.ChildContainer
 				p2.Instance.ZIndex = ChildContainer.ZIndex + 1
 				p2.Instance.LayoutOrder = ChildContainer.LayoutOrder - 1
-				return v1
+				return instance
 			else
 				return p1.ChildContainer
 			end
 		end,
 		Discard = function(p1)
-			if v10 == p1 then
-				v10 = nil
-				v11 = false
+			if var10 == p1 then
+				var10 = nil
+				var11 = false
 			end
 			if v2 == p1 then
 				v2 = nil
-				v3 = false
+				var3 = false
 			end
-			if v5 == p1 then
-				v5 = nil
-				v6 = false
+			if var5 == p1 then
+				var5 = nil
+				var6 = false
 			end
 			t[p1.ID] = nil
 			p1.Instance:Destroy()

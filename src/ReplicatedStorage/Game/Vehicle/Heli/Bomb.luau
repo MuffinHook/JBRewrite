@@ -3,50 +3,50 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RayCast = require(ReplicatedStorage.Module.RayCast)
-local v1 = nil
-local v2 = nil
+local instance = nil
+local table2 = nil
 local t = {}
 t.__index = t
 function t.new(p1, p2)
-	local v2 = setmetatable({}, t)
-	v2.p0 = p1
-	v2.v0 = p2
-	local v3 = ReplicatedStorage.Resource.HeliBomb:Clone()
-	v1.WeldAllTo(v3, v3.Rocket)
-	v3.Rocket.Anchored = true
-	v3.Rocket.CFrame = p1
-	v3.Parent = workspace
-	v2.Model = v3
-	return v2
+	local table2 = setmetatable({}, t)
+	table2.p0 = p1
+	table2.v0 = p2
+	local var3 = ReplicatedStorage.Resource.HeliBomb:Clone()
+	instance.WeldAllTo(var3, var3.Rocket)
+	var3.Rocket.Anchored = true
+	var3.Rocket.CFrame = p1
+	var3.Parent = workspace
+	table2.Model = var3
+	return table2
 end
-local v3 = Vector3.new()
-local v4 = CFrame.Angles(0, math.pi, 0)
+local var3 = Vector3.new()
+local cframe4 = CFrame.Angles(0, math.pi, 0)
 function t.Animate(p1, p2)
-	local v22 = p2 or v2.GetNowSync()
-	local v32 = v22
+	local var22 = p2 or table2.GetNowSync()
+	local var32 = var22
 	local function Heartbeat()
-		local v1 = v2.GetNowSync()
-		local v23 = v1 - v22
-		local v33 = v1 - v32
-		v32 = v1
-		local v42 = p1.v0 * v23 + Vector3.new(0, -98.10000000000001 * v23 * v23, 0)
-		p1.Model.Rocket.CFrame = CFrame.new(v3, (p1.p0.LookVector:Lerp(Vector3.new(0, -1, 0), (math.min(1, v23 * 1.3333333333333333))))) * v4 + p1.p0.p + v42
-		if v23 - v33 < 0.3 and v23 > 0.3 then
+		local instance = table2.GetNowSync()
+		local var23 = instance - var22
+		local var33 = instance - var32
+		var32 = instance
+		local vector42 = p1.v0 * var23 + Vector3.new(0, -98.10000000000001 * var23 * var23, 0)
+		p1.Model.Rocket.CFrame = CFrame.new(var3, (p1.p0.LookVector:Lerp(Vector3.new(0, -1, 0), (math.min(1, var23 * 1.3333333333333333))))) * cframe4 + p1.p0.p + vector42
+		if var23 - var33 < 0.3 and var23 > 0.3 then
 			p1.Model.Fire.Particle.Enabled = true
 		end
-		if v23 > 0.3 then
-			local v8, v9 = RayCast.RayIgnoreNonCollide(p1.p0.p + v42, Vector3.new(0, -1, 0), math.abs(p1.v0.Y + -196.20000000000002 * v23) * v33, p1.Model)
+		if var23 > 0.3 then
+			local v8, v9 = RayCast.RayIgnoreNonCollide(p1.p0.p + vector42, Vector3.new(0, -1, 0), math.abs(p1.v0.Y + -196.20000000000002 * var23) * var33, p1.Model)
 			if v8 then
 				p1:Explode(v9)
 			end
 		end
-		if v23 > 5 and not p1.Exploded then
+		if var23 > 5 and not p1.Exploded then
 			p1:Destroy()
 		end
 	end
 	p1.Runtime = RunService.Heartbeat:Connect(Heartbeat)
 end
-local v5 = nil
+local var5 = nil
 function t.Explode(p1, p2)
 	p1.Exploded = true
 	delay(2, function()
@@ -74,16 +74,16 @@ function t.Explode(p1, p2)
 		if Humanoid then
 			local RootPart = Humanoid.RootPart
 			if RootPart then
-				local v1 = RootPart.Position - p2
-				local v3 = math.max(24 - v1.Magnitude, 0) / 24
-				if v3 > 0.001 then
-					RootPart.Velocity = RootPart.Velocity + v1.Unit * v3 * 30
+				local instance = RootPart.Position - p2
+				local var3 = math.max(24 - instance.Magnitude, 0) / 24
+				if var3 > 0.001 then
+					RootPart.Velocity = RootPart.Velocity + instance.Unit * var3 * 30
 					if p1._owner then
 						print(p1._owner)
-						v5:FireServer("x" .. ("oo9w30"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "41csnt", v3 * 50, p1._owner, "Bomb")
+						var5:FireServer("x" .. ("oo9w30"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "41csnt", var3 * 50, p1._owner, "Bomb")
 						return
 					end
-					v5:FireServer("x" .. ("mcv6ee23"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("dkwkvfcpa"):sub(5, 5):reverse() .. "1us6", v3 * 50, "Explode")
+					var5:FireServer("x" .. ("mcv6ee23"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("dkwkvfcpa"):sub(5, 5):reverse() .. "1us6", var3 * 50, "Explode")
 				end
 			end
 		end
@@ -100,15 +100,15 @@ function t.Destroy(p1)
 	p1.Model:Destroy()
 end
 local function DropBomb(p1, p2, p3, p4)
-	local v1 = t.new(p1, p2)
-	v1:SetOwner(p4)
-	v1:Animate(p3)
+	local instance = t.new(p1, p2)
+	instance:SetOwner(p4)
+	instance:Animate(p3)
 end
 return {
 	Init = function(p1)
-		v5 = p1.Event
-		v2 = require(ReplicatedStorage.Module.Time)
-		v1 = require(ReplicatedStorage.Std.Joint)
+		var5 = p1.Event
+		table2 = require(ReplicatedStorage.Module.Time)
+		instance = require(ReplicatedStorage.Std.Joint)
 	end,
 	DropBomb = DropBomb
 }

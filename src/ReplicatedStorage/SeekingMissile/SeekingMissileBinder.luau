@@ -11,41 +11,41 @@ local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
 function t.new(p1, p2)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
-	v1.alignOrientation = p2.alignOrientation
-	v1.vectorForce = p2.vectorForce
-	v1.targetPartObj = p2.targetPartObj
-	v1.runMaid = Maid.new()
-	v1.maid:GiveTask(v1.runMaid)
-	SeekingMissileShared._init(v1)
-	v1.maid:GiveTask(v1.onApplyingThrustChanged:Connect(function()
-		p2.applyingThrustRemote:FireServer(v1.flagApplyingThrust)
+	local instance = BaseObject.new(p1)
+	setmetatable(instance, t)
+	instance.alignOrientation = p2.alignOrientation
+	instance.vectorForce = p2.vectorForce
+	instance.targetPartObj = p2.targetPartObj
+	instance.runMaid = Maid.new()
+	instance.maid:GiveTask(instance.runMaid)
+	SeekingMissileShared._init(instance)
+	instance.maid:GiveTask(instance.onApplyingThrustChanged:Connect(function()
+		p2.applyingThrustRemote:FireServer(instance.flagApplyingThrust)
 	end))
-	v1.maid:GiveTask(v1.onExploded:Connect(function(...)
+	instance.maid:GiveTask(instance.onExploded:Connect(function(...)
 		p2.explodeRemote:FireServer(...)
 	end))
-	v1.maid:GiveTask(p2.explodeRemote.OnClientEvent:Connect(function(...)
-		v1.onExploded:Fire(...)
+	instance.maid:GiveTask(p2.explodeRemote.OnClientEvent:Connect(function(...)
+		instance.onExploded:Fire(...)
 	end))
-	v1.maid:GivePromise(NetworkOwnedBinder:Promise(p1):andThen(function(p12)
+	instance.maid:GivePromise(NetworkOwnedBinder:Promise(p1):andThen(function(p12)
 		local function handle()
-			v1.runMaid:DoCleaning()
+			instance.runMaid:DoCleaning()
 			if p2.targetPartObj.Value or SeekingMissileUtils.getTargetPos(p1) then
 				if p12:GetOwner() then
-					SeekingMissileShared._run(v1)
+					SeekingMissileShared._run(instance)
 				end
 			end
 		end
-		v1.runMaid:DoCleaning()
+		instance.runMaid:DoCleaning()
 		if (p2.targetPartObj.Value or SeekingMissileUtils.getTargetPos(p1)) and p12:GetOwner() then
-			SeekingMissileShared._run(v1)
+			SeekingMissileShared._run(instance)
 		end
-		v1.maid:GiveTask(p2.targetPartObj.Changed:Connect(handle))
-		v1.maid:GiveTask(SeekingMissileUtils.getTargetPosChangedSignal(p1):Connect(handle))
-		v1.maid:GiveTask(p12:GetOwnerChangedSignal():Connect(handle))
+		instance.maid:GiveTask(p2.targetPartObj.Changed:Connect(handle))
+		instance.maid:GiveTask(SeekingMissileUtils.getTargetPosChangedSignal(p1):Connect(handle))
+		instance.maid:GiveTask(p12:GetOwnerChangedSignal():Connect(handle))
 	end))
-	return v1
+	return instance
 end
 function t.SetTargetPart(p1, p2)
 	p1.targetPartObj.Value = p2

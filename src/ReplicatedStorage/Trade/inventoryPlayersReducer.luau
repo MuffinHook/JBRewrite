@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
 local Rodux = require(ReplicatedStorage.Rodux)
@@ -7,19 +8,19 @@ return Rodux.createReducer({
 	selectedPlayer = Players.LocalPlayer,
 	allPlayers = {}
 }, {
-	setInventoryPlayers = function(p1, p2)
-		assert(p2.allPlayers ~= nil, "missing allPlayers")
+	setInventoryPlayers = function(state, action)
+		assert(action.allPlayers ~= nil, "missing allPlayers")
 		return {
-			selectedPlayer = p1.selectedPlayer,
-			allPlayers = p2.allPlayers
+			selectedPlayer = state.selectedPlayer,
+			allPlayers = action.allPlayers
 		}
 	end,
-	setInventoryPlayer = function(p1, p2)
-		assert(p2.selectedPlayer ~= nil, "missing selectedPlayer")
-		ReplicatedStorage:FindFirstChild(TradeConsts.UPDATE_INVENTORY_PLAYER_REMOTE_NAME):FireServer(p2.selectedPlayer, true)
+	setInventoryPlayer = function(state, action)
+		assert(action.selectedPlayer ~= nil, "missing selectedPlayer")
+		ReplicatedStorage:FindFirstChild(TradeConsts.UPDATE_INVENTORY_PLAYER_REMOTE_NAME):FireServer(action.selectedPlayer, true)
 		return {
-			allPlayers = p1.allPlayers,
-			selectedPlayer = p2.selectedPlayer
+			allPlayers = state.allPlayers,
+			selectedPlayer = action.selectedPlayer
 		}
 	end
 })

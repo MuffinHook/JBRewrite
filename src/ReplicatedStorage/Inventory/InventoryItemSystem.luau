@@ -15,62 +15,62 @@ local t = {
 	_unequipConditions = {}
 }
 function t.init()
-	local function handleInventoryItemAdded(p1)
+	local function handleInventoryItemAdded(self)
 		local v1 = nil
 		local function handleEquipped()
-			local v12 = p1:GetOwner() and true or false
-			local v2 = InventoryItemUtils.getEquipped(p1.obj)
-			if v12 then
+			local var12 = self:GetOwner() and true or false
+			local v2 = InventoryItemUtils.getEquipped(self.obj)
+			if var12 then
 				if v2 == v1 then
 					return
 				end
 				v1 = v2
 				if v2 then
-					t.onInventoryItemEquipped:Fire(p1)
+					t.onInventoryItemEquipped:Fire(self)
 				else
-					t.onInventoryItemUnequipped:Fire(p1)
+					t.onInventoryItemUnequipped:Fire(self)
 				end
 			end
 		end
 		handleEquipped()
-		p1._maid:GiveTask(InventoryItemUtils.getEquippedSignal(p1.obj):Connect(handleEquipped))
-		if not p1:GetOwner() then
-			p1._maid:GivePromise(p1:PromiseOwner():andThen(handleEquipped))
+		self._maid:GiveTask(InventoryItemUtils.getEquippedSignal(self.obj):Connect(handleEquipped))
+		if not self:GetOwner() then
+			self._maid:GivePromise(self:PromiseOwner():andThen(handleEquipped))
 		end
 	end
 	InventoryItemBinder:GetClassAddedSignal():Connect(handleInventoryItemAdded)
-	local function handleInventoryItemRemoved(p1)
-		if InventoryItemUtils.getEquipped(p1.obj) then
-			t.onInventoryItemUnequipped:Fire(p1)
+	local function handleInventoryItemRemoved(self)
+		if InventoryItemUtils.getEquipped(self.obj) then
+			t.onInventoryItemUnequipped:Fire(self)
 		end
 	end
 	InventoryItemBinder:GetClassRemovingSignal():Connect(handleInventoryItemRemoved)
-	InventoryItemBinder:GetClassAddedSignal():Connect(function(p1)
-		p1._maid:GiveTask(p1.onAttemptSelect:Connect(function()
-			local v1 = InventoryItemUtils.getEquipped(p1.obj)
+	InventoryItemBinder:GetClassAddedSignal():Connect(function(self)
+		self._maid:GiveTask(self.onAttemptSelect:Connect(function()
+			local v1 = InventoryItemUtils.getEquipped(self.obj)
 			if t.unequipAll() and not v1 then
-				t.toggleEquip(p1)
+				t.toggleEquip(self)
 			end
 		end))
 	end)
 	InventoryItemBinder:Start()
 	InventoryItemOwnerBinder:Start()
-	t.addUnequipCondition(function(p1)
-		return not InventoryItemUtils.getLocked(p1.obj)
+	t.addUnequipCondition(function(self)
+		return not InventoryItemUtils.getLocked(self.obj)
 	end)
-	UserInputService.InputBegan:Connect(function(p1, p2)
-		if not p2 and (p1.UserInputType == Enum.UserInputType.Keyboard and p1.KeyCode == Enum.KeyCode.Backspace) then
+	UserInputService.InputBegan:Connect(function(self, p2)
+		if not p2 and (self.UserInputType == Enum.UserInputType.Keyboard and self.KeyCode == Enum.KeyCode.Backspace) then
 			for i, v in ipairs((t.getEquippedFor(Players.LocalPlayer))) do
 				v:AttemptDrop()
 			end
 		end
 	end)
 end
-function t.addEquipCondition(p1)
-	table.insert(t._equipConditions, p1)
+function t.addEquipCondition(self)
+	table.insert(t._equipConditions, self)
 end
-function t.addUnequipCondition(p1)
-	table.insert(t._unequipConditions, p1)
+function t.addUnequipCondition(self)
+	table.insert(t._unequipConditions, self)
 end
 function t.unequipAll()
 	for i, v in ipairs((t.getInventoryItemsFor(Players.LocalPlayer))) do
@@ -85,44 +85,44 @@ function t.unequipAll()
 	end
 	return true
 end
-function t.toggleEquip(p1)
-	if InventoryItemUtils.getEquipped(p1.obj) then
+function t.toggleEquip(self)
+	if InventoryItemUtils.getEquipped(self.obj) then
 		for i, v in ipairs(t._unequipConditions) do
-			if not v(p1) then
+			if not v(self) then
 				return
 			end
 		end
-		p1:AttemptSetEquipped(false)
+		self:AttemptSetEquipped(false)
 	else
 		for i, v in ipairs(t._equipConditions) do
-			if not v(p1) then
+			if not v(self) then
 				return
 			end
 		end
-		p1:AttemptSetEquipped(true)
+		self:AttemptSetEquipped(true)
 	end
 	return true
 end
-function t.getInventoryItemsFor(p1)
+function t.getInventoryItemsFor(self)
 	return TableUtils.filter(InventoryItemBinder:GetAll(), function(p12)
-		return p12:GetOwner() == p1
+		return p12:GetOwner() == self
 	end)
 end
-function t.getInventoryItemsOfInventoryValue(p1)
-	return BinderUtils.getChildren(InventoryItemBinder, p1)
+function t.getInventoryItemsOfInventoryValue(self)
+	return BinderUtils.getChildren(InventoryItemBinder, self)
 end
 function t.getEquipped()
-	return TableUtils.filter(InventoryItemBinder:GetAll(), function(p1)
-		return InventoryItemUtils.getEquipped(p1.obj)
+	return TableUtils.filter(InventoryItemBinder:GetAll(), function(self)
+		return InventoryItemUtils.getEquipped(self.obj)
 	end)
 end
-function t.getEquippedFor(p1)
+function t.getEquippedFor(self)
 	return TableUtils.filter(t.getEquipped(), function(p12)
-		return p12:GetOwner() == p1
+		return p12:GetOwner() == self
 	end)
 end
-function t.playerHasItem(p1, p2)
-	for i, v in ipairs(t.getInventoryItemsFor(p1)) do
+function t.playerHasItem(self, p2)
+	for i, v in ipairs(t.getInventoryItemsFor(self)) do
 		if v:GetName() == p2 then
 			return true
 		end

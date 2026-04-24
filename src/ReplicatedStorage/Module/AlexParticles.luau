@@ -1,12 +1,12 @@
 -- Reviewed by Claude
 local RunService = game:GetService("RunService")
-local v1 = CFrame.new
+local cframe = CFrame.new
 local Angles = CFrame.Angles
-local v2 = Vector3.new
-v1(0, 0, 0)
-local v3 = Vector3.new(0, 0, 0)
-local Dot = v3.Dot
-local Cross = v3.Cross
+local vector2 = Vector3.new
+cframe(0, 0, 0)
+local vector3 = Vector3.new(0, 0, 0)
+local Dot = vector3.Dot
+local Cross = vector3.Cross
 local sin = math.sin
 local cos = math.cos
 local atan = math.atan
@@ -21,15 +21,15 @@ local deg = math.deg
 local insert = table.insert
 local remove = table.remove
 local function RandomVector(p1)
-	local v1 = random()
-	local v22 = random()
-	local v3
-	if v22 < v1 then
-		v22, v3 = v1, v22
+	local cframe = random()
+	local var22 = random()
+	local vector3
+	if var22 < cframe then
+		var22, vector3 = cframe, var22
 	else
-		v3 = v1
+		vector3 = cframe
 	end
-	return v2(v22 * p1 * cos(6.283185307179586 * v3 / v22), v22 * p1 * sin(6.283185307179586 * v3 / v22), 0)
+	return vector2(var22 * p1 * cos(6.283185307179586 * vector3 / var22), var22 * p1 * sin(6.283185307179586 * vector3 / var22), 0)
 end
 local function MakeState()
 	return {
@@ -73,130 +73,130 @@ local function Single(p1, p2, p3, p4)
 	return t
 end
 local function Firework(p1, p2, p3, p4)
-	local v1 = Single(p1, p2, p3, p4)
-	v1.Frame.Visible = false
-	insert(p1.Fireworks, v1)
-	return v1
+	local cframe = Single(p1, p2, p3, p4)
+	cframe.Frame.Visible = false
+	insert(p1.Fireworks, cframe)
+	return cframe
 end
 local function Explosion(p1, p2)
-	local v1 = Color3.fromHSV(random(), 0.9, 0.9)
+	local cframe = Color3.fromHSV(random(), 0.9, 0.9)
 	for i = 1, 30 do
-		local v22
-		local v4 = 200 + random() * 100
-		local v5 = random()
-		local v6 = random()
-		if v6 < v5 then
-			v6, v22 = v5, v6
+		local var22
+		local var4 = 200 + random() * 100
+		local var5 = random()
+		local var6 = random()
+		if var6 < var5 then
+			var6, var22 = var5, var6
 		else
-			v22 = v5
+			var22 = var5
 		end
-		local v7 = Single(p1, p2, v2(v6 * v4 * cos(6.283185307179586 * v22 / v6), v6 * v4 * sin(6.283185307179586 * v22 / v6), 0), Vector3.new(0, 0, 0))
-		v7.ttl = 1
-		v7.Frame.BackgroundColor3 = v1
+		local vector7 = Single(p1, p2, vector2(var6 * var4 * cos(6.283185307179586 * var22 / var6), var6 * var4 * sin(6.283185307179586 * var22 / var6), 0), Vector3.new(0, 0, 0))
+		vector7.ttl = 1
+		vector7.Frame.BackgroundColor3 = cframe
 	end
-	local v8 = Color3.fromHSV(random(), 0.9, 0.9)
+	local color8 = Color3.fromHSV(random(), 0.9, 0.9)
 	for j = 1, 10 do
 		local v9
-		local v11 = random()
-		local v12 = random()
-		if v12 < v11 then
-			v12, v9 = v11, v12
+		local var11 = random()
+		local var12 = random()
+		if var12 < var11 then
+			var12, v9 = var11, var12
 		else
-			v9 = v11
+			v9 = var11
 		end
-		local v13 = Single(p1, p2, v2(v12 * 100 * cos(6.283185307179586 * v9 / v12), v12 * 100 * sin(6.283185307179586 * v9 / v12), 0), Vector3.new(0, 0, 0))
-		v13.ttl = 1.5
-		v13.Frame.BackgroundColor3 = v8
+		local vector13 = Single(p1, p2, vector2(var12 * 100 * cos(6.283185307179586 * v9 / var12), var12 * 100 * sin(6.283185307179586 * v9 / var12), 0), Vector3.new(0, 0, 0))
+		vector13.ttl = 1.5
+		vector13.Frame.BackgroundColor3 = color8
 	end
 end
 local function Update(p1, p2)
-	local v1 = tick()
+	local cframe = tick()
 	local Simulate = p1.Simulate
 	for i = #Simulate, 1, -1 do
-		local v22 = Simulate[i]
-		local p = v22.p
-		local v3 = v22.v + v22.a * p2
-		local v4 = p + v3 * p2
-		local x_2 = v4.x
-		local y_2 = v4.y
-		local v5 = x_2 - p.x
-		local v6 = y_2 - p.y
-		local v7 = (v5 * v5 + v6 * v6) ^ 0.5
-		v22.p = v4
-		v22.v = v3
-		local Frame = v22.Frame
-		if not v22.Fake then
-			if v7 < 2 then
+		local var22 = Simulate[i]
+		local p = var22.p
+		local vector3 = var22.v + var22.a * p2
+		local var4 = p + vector3 * p2
+		local x_2 = var4.x
+		local y_2 = var4.y
+		local var5 = x_2 - p.x
+		local var6 = y_2 - p.y
+		local vector7 = (var5 * var5 + var6 * var6) ^ 0.5
+		var22.p = var4
+		var22.v = vector3
+		local Frame = var22.Frame
+		if not var22.Fake then
+			if vector7 < 2 then
 				Frame.Position = UDim2.new(0, x_2 - 1, 0, y_2 - 1)
 				Frame.Size = UDim2.new(0, 2, 0, 2)
 			else
-				Frame.Position = UDim2.new(0, x_2 + (v5 - v7) * 0.5, 0, y_2 + (v6 - v7) * 0.5)
-				Frame.Size = UDim2.new(0, v7, 0, 3)
-				Frame.Rotation = deg((atan2(v6, v5)))
+				Frame.Position = UDim2.new(0, x_2 + (var5 - vector7) * 0.5, 0, y_2 + (var6 - vector7) * 0.5)
+				Frame.Size = UDim2.new(0, vector7, 0, 3)
+				Frame.Rotation = deg((atan2(var6, var5)))
 			end
 		end
-		local v8 = v1 - v22.t
-		local ttl = v22.ttl
-		if ttl <= v8 then
+		local color8 = cframe - var22.t
+		local ttl = var22.ttl
+		if ttl <= color8 then
 			remove(Simulate, i)
-			v22.Frame:Destroy()
-		elseif ttl * 0.5 <= v8 then
-			v22.Frame.Transparency = tanh((v8 - ttl * 0.5) / (ttl * 0.5)) * 1.313
+			var22.Frame:Destroy()
+		elseif ttl * 0.5 <= color8 then
+			var22.Frame.Transparency = tanh((color8 - ttl * 0.5) / (ttl * 0.5)) * 1.313
 		end
 	end
 	local Fireworks = p1.Fireworks
 	for j = #Fireworks, 1, -1 do
 		local v10
-		local v11 = Fireworks[j]
-		if v1 - v11.t >= v11.ttl then
+		local var11 = Fireworks[j]
+		if cframe - var11.t >= var11.ttl then
 			remove(Fireworks, j)
-			v11.Frame:Destroy()
-			if v11.OnDestroy then
-				v11:OnDestroy()
+			var11.Frame:Destroy()
+			if var11.OnDestroy then
+				var11:OnDestroy()
 			end
-			local v12 = Color3.fromHSV(random(), 0.9, 0.9)
+			local var12 = Color3.fromHSV(random(), 0.9, 0.9)
 			for k = 1, 30 do
-				local v13
-				local v15 = 200 + random() * 100
-				local v16 = random()
-				local v17 = random()
-				if v17 < v16 then
-					v17, v13 = v16, v17
+				local vector13
+				local var15 = 200 + random() * 100
+				local var16 = random()
+				local var17 = random()
+				if var17 < var16 then
+					var17, vector13 = var16, var17
 				else
-					v13 = v16
+					vector13 = var16
 				end
-				local v18 = Single(p1, v11.p, v2(v17 * v15 * cos(6.283185307179586 * v13 / v17), v17 * v15 * sin(6.283185307179586 * v13 / v17), 0), Vector3.new(0, 0, 0))
-				v18.ttl = 1
-				v18.Frame.BackgroundColor3 = v12
+				local vector18 = Single(p1, var11.p, vector2(var17 * var15 * cos(6.283185307179586 * vector13 / var17), var17 * var15 * sin(6.283185307179586 * vector13 / var17), 0), Vector3.new(0, 0, 0))
+				vector18.ttl = 1
+				vector18.Frame.BackgroundColor3 = var12
 			end
-			local v19 = Color3.fromHSV(random(), 0.9, 0.9)
+			local color19 = Color3.fromHSV(random(), 0.9, 0.9)
 			for n = 1, 10 do
 				local v20
-				local v22 = random()
-				local v23 = random()
-				if v23 < v22 then
-					v23, v20 = v22, v23
+				local var22 = random()
+				local var23 = random()
+				if var23 < var22 then
+					var23, v20 = var22, var23
 				else
-					v20 = v22
+					v20 = var22
 				end
-				local v24 = Single(p1, v11.p, v2(v23 * 100 * cos(6.283185307179586 * v20 / v23), v23 * 100 * sin(6.283185307179586 * v20 / v23), 0), Vector3.new(0, 0, 0))
-				v24.ttl = 1.5
-				v24.Frame.BackgroundColor3 = v19
+				local vector24 = Single(p1, var11.p, vector2(var23 * 100 * cos(6.283185307179586 * v20 / var23), var23 * 100 * sin(6.283185307179586 * v20 / var23), 0), Vector3.new(0, 0, 0))
+				vector24.ttl = 1.5
+				vector24.Frame.BackgroundColor3 = color19
 			end
 		end
-		local v26 = random()
-		local v27 = random()
-		if v27 < v26 then
-			v27, v10 = v26, v27
+		local var26 = random()
+		local var27 = random()
+		if var27 < var26 then
+			var27, v10 = var26, var27
 		else
-			v10 = v26
+			v10 = var26
 		end
-		Single(p1, v11.p, v2(v27 * 60 * cos(6.283185307179586 * v10 / v27), v27 * 60 * sin(6.283185307179586 * v10 / v27), 0), Vector3.new(0, 400, 0)).ttl = 0.8
+		Single(p1, var11.p, vector2(var27 * 60 * cos(6.283185307179586 * v10 / var27), var27 * 60 * sin(6.283185307179586 * v10 / var27), 0), Vector3.new(0, 400, 0)).ttl = 0.8
 	end
 end
 local function Clear(p1)
-	for v1, v2 in next, p1.Simulate do
-		v2.Frame:Destroy()
+	for cframe, vector2 in next, p1.Simulate do
+		vector2.Frame:Destroy()
 	end
 	p1.Simulate = {}
 end
@@ -209,9 +209,9 @@ return {
 		local function Heartbeat(p12)
 			Update(p1, p12)
 		end
-		local v1 = RunService.Heartbeat:Connect(Heartbeat)
+		local cframe = RunService.Heartbeat:Connect(Heartbeat)
 		local function Finish()
-			v1:Disconnect()
+			cframe:Disconnect()
 			Clear(p1)
 		end
 		delay(p2, Finish)

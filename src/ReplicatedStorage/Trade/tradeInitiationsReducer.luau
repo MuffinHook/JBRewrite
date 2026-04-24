@@ -1,14 +1,15 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	tradeInitiationsSet = function(p1, p2)
-		assert(p2.list ~= nil, "missing list")
-		return p2.list
+	tradeInitiationsSet = function(state, action)
+		assert(action.list ~= nil, "missing list")
+		return action.list
 	end,
-	tradeInitiationsRemoveByIndex = function(p1, p2)
-		assert(p2.index ~= nil, "missing index")
-		local v2 = table.clone(p1)
-		table.remove(v2, p2.index)
-		return v2
+	tradeInitiationsRemoveByIndex = function(state, action)
+		assert(action.index ~= nil, "missing index")
+		local updatedList = table.clone(state)
+		table.remove(updatedList, action.index)
+		return updatedList
 	end
 })

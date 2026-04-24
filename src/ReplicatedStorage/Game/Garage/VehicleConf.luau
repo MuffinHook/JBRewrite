@@ -53,8 +53,8 @@ return {
 	GetCategoriesByModel = function(p1)
 		local t3 = {}
 		for v1, v2 in t do
-			local v3 = t2[v2]
-			if not v3 or v3(p1) then
+			local var3 = t2[v2]
+			if not var3 or var3(p1) then
 				table.insert(t3, v2)
 			end
 		end

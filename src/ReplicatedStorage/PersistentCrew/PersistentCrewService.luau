@@ -48,8 +48,8 @@ function t.init()
 		})
 	end
 	local function attemptLeave()
-		local local2 = Confirmation.new("Are you sure you want to leave? If you joined for less than " .. ("%d days"):format(ClanConsts.CLAN_JOIN_COOLDOWN_DURATION / 86400) .. ", you\'ll have to wait to join another crew.")
-		local2.Maid:GiveTask(local2.OnYes:Connect(function()
+		local leaveConfirmation = Confirmation.new("Are you sure you want to leave? If you joined for less than " .. ("%d days"):format(ClanConsts.CLAN_JOIN_COOLDOWN_DURATION / 86400) .. ", you\'ll have to wait to join another crew.")
+		leaveConfirmation.Maid:GiveTask(leaveConfirmation.OnYes:Connect(function()
 			persistentCrewStore:dispatch({
 				type = "setNetworkMutexLocked",
 				value = true
@@ -62,64 +62,64 @@ function t.init()
 			})
 		end
 	end
-	local function attemptCreate(self, self)
+	local function attemptCreate(crewName, crewMotd)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
 		})
-		ReplicatedStorage:FindFirstChild(ClanConsts.CREATE_CLAN_REMOTE_NAME):FireServer(self, self)
+		ReplicatedStorage:FindFirstChild(ClanConsts.CREATE_CLAN_REMOTE_NAME):FireServer(crewName, crewMotd)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 				Volume = 0.2
 			})
 		end
 	end
-	local function attemptRequestJoinUserId(self)
+	local function attemptRequestJoinUserId(targetClanId)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
 		})
-		ReplicatedStorage:FindFirstChild(ClanConsts.REQUEST_JOIN_CLAN_REMOTE_NAME):FireServer(self)
+		ReplicatedStorage:FindFirstChild(ClanConsts.REQUEST_JOIN_CLAN_REMOTE_NAME):FireServer(targetClanId)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 				Volume = 0.2
 			})
 		end
 	end
-	local function attemptBattleClanId(self, self)
+	local function attemptBattleClanId(targetClanId, numPlayersPerTeam)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
 		})
-		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.CUSTOM_BATTLE_INVITE_REMOTE_NAME):FireServer(self, self)
+		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.CUSTOM_BATTLE_INVITE_REMOTE_NAME):FireServer(targetClanId, numPlayersPerTeam)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 				Volume = 0.2
 			})
 		end
 	end
-	local function attemptViewUserIdClan(self)
+	local function attemptViewUserIdClan(userIdToView)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
 		})
-		ReplicatedStorage:FindFirstChild(PersistentCrewConsts.VIEW_CLAN_REMOTE_NAME):FireServer(self)
+		ReplicatedStorage:FindFirstChild(PersistentCrewConsts.VIEW_CLAN_REMOTE_NAME):FireServer(userIdToView)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 				Volume = 0.2
 			})
 		end
 	end
-	local function onAcceptBattleInvite(self)
-		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.RESPONSE_REMOTE_NAME):FireServer(self.obj.Name, true)
+	local function onAcceptBattleInvite(inviteData)
+		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.RESPONSE_REMOTE_NAME):FireServer(inviteData.obj.Name, true)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 				Volume = 0.2
 			})
 		end
 	end
-	local function onDeclineBattleInvite(self)
-		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.RESPONSE_REMOTE_NAME):FireServer(self.obj.Name, false)
+	local function onDeclineBattleInvite(inviteData)
+		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.RESPONSE_REMOTE_NAME):FireServer(inviteData.obj.Name, false)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 				Volume = 0.2
@@ -134,16 +134,16 @@ function t.init()
 			})
 		end
 	end
-	local function attemptKick(self)
-		local counter, local2 = PlayerUtils.promiseNameFromUserId(self):await()
-		if counter then
-			local local3 = Confirmation.new("Are you sure you want to kick " .. local2 .. "?")
-			local3.Maid:GiveTask(local3.OnYes:Connect(function()
+	local function attemptKick(userIdToKick)
+		local wasSuccessful, playerDisplayName = PlayerUtils.promiseNameFromUserId(userIdToKick):await()
+		if wasSuccessful then
+			local kickConfirmation = Confirmation.new("Are you sure you want to kick " .. playerDisplayName .. "?")
+			kickConfirmation.Maid:GiveTask(kickConfirmation.OnYes:Connect(function()
 				persistentCrewStore:dispatch({
 					type = "setNetworkMutexLocked",
 					value = true
 				})
-				ReplicatedStorage:FindFirstChild(ClanConsts.REMOVE_PLAYER_FROM_CLAN_REMOTE_NAME):FireServer(self)
+				ReplicatedStorage:FindFirstChild(ClanConsts.REMOVE_PLAYER_FROM_CLAN_REMOTE_NAME):FireServer(userIdToKick)
 			end))
 			if Players.LocalPlayer.PlayerGui then
 				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
@@ -152,26 +152,26 @@ function t.init()
 			end
 		end
 	end
-	local function attemptAdmin(self)
+	local function attemptAdmin(userIdToPromote)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
 		})
-		ReplicatedStorage:FindFirstChild(ClanConsts.ADD_PLAYER_AS_ADMIN_REMOTE_NAME):FireServer(self)
+		ReplicatedStorage:FindFirstChild(ClanConsts.ADD_PLAYER_AS_ADMIN_REMOTE_NAME):FireServer(userIdToPromote)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 				Volume = 0.2
 			})
 		end
 	end
-	local function attemptRenameCrew(self)
-		local local2 = Confirmation.new("Are you sure you want to rename your crew? This will cost " .. "$" .. String.comma((tostring(ClanConsts.CLAN_RENAME_COST))))
-		local2.Maid:GiveTask(local2.OnYes:Connect(function()
+	local function attemptRenameCrew(newCrewName)
+		local renameConfirmation = Confirmation.new("Are you sure you want to rename your crew? This will cost " .. "$" .. String.comma((tostring(ClanConsts.CLAN_RENAME_COST))))
+		renameConfirmation.Maid:GiveTask(renameConfirmation.OnYes:Connect(function()
 			persistentCrewStore:dispatch({
 				type = "setNetworkMutexLocked",
 				value = true
 			})
-			ReplicatedStorage:FindFirstChild(ClanConsts.RENAME_CLAN_REMOTE_NAME):FireServer(self)
+			ReplicatedStorage:FindFirstChild(ClanConsts.RENAME_CLAN_REMOTE_NAME):FireServer(newCrewName)
 		end))
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
@@ -179,36 +179,36 @@ function t.init()
 			})
 		end
 	end
-	local function attemptUnAdmin(self)
+	local function attemptUnAdmin(userIdToDemote)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
 		})
-		ReplicatedStorage:FindFirstChild(ClanConsts.REMOVE_PLAYER_ADMIN_REMOTE_NAME):FireServer(self)
+		ReplicatedStorage:FindFirstChild(ClanConsts.REMOVE_PLAYER_ADMIN_REMOTE_NAME):FireServer(userIdToDemote)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 				Volume = 0.2
 			})
 		end
 	end
-	local function onClickJoinRequestAccept(self)
+	local function onClickJoinRequestAccept(requestingUserId)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
 		})
-		ReplicatedStorage:FindFirstChild(ClanConsts.ACCEPT_JOIN_REQUEST_REMOTE_NAME):FireServer(self)
+		ReplicatedStorage:FindFirstChild(ClanConsts.ACCEPT_JOIN_REQUEST_REMOTE_NAME):FireServer(requestingUserId)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 				Volume = 0.2
 			})
 		end
 	end
-	local function onClickJoinRequestDeny(self)
+	local function onClickJoinRequestDeny(requestingUserId)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
 			value = true
 		})
-		ReplicatedStorage:FindFirstChild(ClanConsts.DENY_JOIN_REQUEST_REMOTE_NAME):FireServer(self)
+		ReplicatedStorage:FindFirstChild(ClanConsts.DENY_JOIN_REQUEST_REMOTE_NAME):FireServer(requestingUserId)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617491114, {
 				Volume = 0.2
@@ -239,20 +239,20 @@ function t.init()
 			})
 		end
 	end
-	local function attemptReportCrew(self, self)
-		assert(typeof(self) == "string", "invalid report option")
-		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.REPORT_CLAN_REMOTE_NAME):FireServer(self, self)
+	local function attemptReportCrew(targetClanId, reportOption)
+		assert(typeof(reportOption) == "string", "invalid report option")
+		ReplicatedStorage:FindFirstChild(PersistentCrewBattleConsts.REPORT_CLAN_REMOTE_NAME):FireServer(targetClanId, reportOption)
 	end
-	local counter = 0
+	local countdownTimesPlayed = 0
 	local function onCountdownFinished()
-		if counter < 1 and Players.LocalPlayer.PlayerGui then
+		if countdownTimesPlayed < 1 and Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 12617487453, {
 				Volume = 0.5
 			})
 		end
-		counter = counter + 1
+		countdownTimesPlayed = countdownTimesPlayed + 1
 	end
-	local local2 = Roact.mount(createElement("ScreenGui", {
+	local guiElement = Roact.mount(createElement("ScreenGui", {
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		ResetOnSpawn = false,
 		IgnoreGuiInset = true,
@@ -281,23 +281,23 @@ function t.init()
 				attemptReportCrew = attemptReportCrew
 			}) }) }), Players.LocalPlayer.PlayerGui, "PersistentCrewUI")
 	t.maid:GiveTask(function()
-		Roact.unmount(local2)
+		Roact.unmount(guiElement)
 	end)
-	RxInstanceUtils.observeAttribute(Players.LocalPlayer, ClanConsts.NETWORK_MUTEX_LOCKED_ATTR_NAME, function(self)
+	RxInstanceUtils.observeAttribute(Players.LocalPlayer, ClanConsts.NETWORK_MUTEX_LOCKED_ATTR_NAME, function(lockValue)
 		persistentCrewStore:dispatch({
 			type = "setNetworkMutexLocked",
-			value = self
+			value = lockValue
 		})
 	end)
-	local local3 = nil
-	persistentCrewStore.changed:connect(function(self, self)
-		if self.networkMutexLocked ~= self.networkMutexLocked then
-			if local3 then
-				task.cancel(local3)
-				local3 = nil
+	local networkMutexTimeoutTask = nil
+	persistentCrewStore.changed:connect(function(newState, oldState)
+		if newState.networkMutexLocked ~= oldState.networkMutexLocked then
+			if networkMutexTimeoutTask then
+				task.cancel(networkMutexTimeoutTask)
+				networkMutexTimeoutTask = nil
 			end
-			if self.networkMutexLocked then
-				local3 = task.delay(0.75, function()
+			if newState.networkMutexLocked then
+				networkMutexTimeoutTask = task.delay(0.75, function()
 					if not Players.LocalPlayer:GetAttribute(ClanConsts.NETWORK_MUTEX_LOCKED_ATTR_NAME) then
 						persistentCrewStore:dispatch({
 							type = "setNetworkMutexLocked",
@@ -307,91 +307,91 @@ function t.init()
 				end)
 			end
 		end
-		if self.groupVisible ~= self.groupVisible then
-			ReplicatedStorage:FindFirstChild(PersistentCrewConsts.INFORM_UI_IS_OPEN_REMOTE_NAME):FireServer(self.groupVisible)
+		if newState.groupVisible ~= oldState.groupVisible then
+			ReplicatedStorage:FindFirstChild(PersistentCrewConsts.INFORM_UI_IS_OPEN_REMOTE_NAME):FireServer(newState.groupVisible)
 		end
 	end)
-	RxInstanceUtils.waitForChild(ReplicatedStorage, PersistentCrewConsts.UPDATE_PERSISTENT_CREW_REMOTE_NAME):andThen(function(self)
-		self.OnClientEvent:Connect(function(self)
-			if self then
+	RxInstanceUtils.waitForChild(ReplicatedStorage, PersistentCrewConsts.UPDATE_PERSISTENT_CREW_REMOTE_NAME):andThen(function(updateCrewRemote)
+		updateCrewRemote.OnClientEvent:Connect(function(crewInfo)
+			if crewInfo then
 				persistentCrewStore:dispatch({
 					type = "setViewingClanInfo",
-					value = self
+					value = crewInfo
 				})
-				if self.IsPlayersClan then
+				if crewInfo.IsPlayersClan then
 					persistentCrewStore:dispatch({
 						type = "setCurrentClanInfo",
-						value = self
+						value = crewInfo
 					})
 				end
-				local AdminIdMap = self.AdminIdMap
-				local counter = AdminIdMap[tostring(Players.LocalPlayer.UserId)] == true
-				local local2 = self.MemberBattleInfoMap or {}
-				local t = {}
-				local table2 = {}
-				for local3, local4 in self.Members do
-					local local5 = local2[local3] or {}
-					local local6 = local5.BattlesWon or 0
-					local local7 = local5.BattlesPlayed or 0
-					local local8 = tonumber(local3)
-					table.insert(t, PlayerUtils.promiseNameFromUserId(local8):andThen(function(self)
-						local t = {
-							id = local8,
-							userId = local8,
-							displayName = self,
-							isAdmin = AdminIdMap[local3],
-							showKick = counter
+				local AdminIdMap = crewInfo.AdminIdMap
+				local isPlayerAdmin = AdminIdMap[tostring(Players.LocalPlayer.UserId)] == true
+				local memberBattleInfoMap = crewInfo.MemberBattleInfoMap or {}
+				local promisesArray = {}
+				local membersList = {}
+				for memberIdStr, memberData in crewInfo.Members do
+					local battleInfo = memberBattleInfoMap[memberIdStr] or {}
+					local battlesWon = battleInfo.BattlesWon or 0
+					local battlesPlayed = battleInfo.BattlesPlayed or 0
+					local memberId = tonumber(memberIdStr)
+					table.insert(promisesArray, PlayerUtils.promiseNameFromUserId(memberId):andThen(function(displayName)
+						local memberDisplayInfo = {
+							id = memberId,
+							userId = memberId,
+							displayName = displayName,
+							isAdmin = AdminIdMap[memberIdStr],
+							showKick = isPlayerAdmin
 						}
-						local local2 = counter
-						if local2 then
-							local2 = not (AdminIdMap[local3] == true)
+						local canShowAdminButton = isPlayerAdmin
+						if canShowAdminButton then
+							canShowAdminButton = not (AdminIdMap[memberIdStr] == true)
 						end
-						t.showAdmin = local2
-						t.showUnAdmin = counter and AdminIdMap[local3] == true
-						t.battlesPlayed = local7
-						t.battlesWon = local6
-						table.insert(table2, t)
+						memberDisplayInfo.showAdmin = canShowAdminButton
+						memberDisplayInfo.showUnAdmin = isPlayerAdmin and AdminIdMap[memberIdStr] == true
+						memberDisplayInfo.battlesPlayed = battlesPlayed
+						memberDisplayInfo.battlesWon = battlesWon
+						table.insert(membersList, memberDisplayInfo)
 					end))
 				end
-				Promise.all(t):andThen(function()
+				Promise.all(promisesArray):andThen(function()
 					persistentCrewStore:dispatch({
 						type = "setMembers",
-						value = table2
+						value = membersList
 					})
 				end)
-				local table3 = {}
-				if counter then
-					local table4 = {}
-					for local10 in self.JoinRequests do
-						local local11 = tonumber(local10)
-						table.insert(table4, PlayerUtils.promiseNameFromUserId(local11):andThen(function(self)
-							table.insert(table3, {
-								id = local11,
-								userId = local11,
-								displayName = self,
-								showRequestAccept = counter,
-								showRequestDeny = counter
+				local joinRequestsList = {}
+				if isPlayerAdmin then
+					local joinRequestPromises = {}
+					for requestIdStr in crewInfo.JoinRequests do
+						local requestUserId = tonumber(requestIdStr)
+						table.insert(joinRequestPromises, PlayerUtils.promiseNameFromUserId(requestUserId):andThen(function(displayName)
+							table.insert(joinRequestsList, {
+								id = requestUserId,
+								userId = requestUserId,
+								displayName = displayName,
+								showRequestAccept = isPlayerAdmin,
+								showRequestDeny = isPlayerAdmin
 							})
-						end):catch(function(self)
-							table.insert(table3, {
-								id = local11,
-								userId = local11,
-								displayName = "[#" .. local11 .. "]",
-								showRequestAccept = counter,
-								showRequestDeny = counter
+						end):catch(function()
+							table.insert(joinRequestsList, {
+								id = requestUserId,
+								userId = requestUserId,
+								displayName = "[#" .. requestUserId .. "]",
+								showRequestAccept = isPlayerAdmin,
+								showRequestDeny = isPlayerAdmin
 							})
 						end))
 					end
-					Promise.allSettled(table4):andThen(function()
+					Promise.allSettled(joinRequestPromises):andThen(function()
 						persistentCrewStore:dispatch({
 							type = "setJoinRequests",
-							value = table3
+							value = joinRequestsList
 						})
 					end)
 				else
 					persistentCrewStore:dispatch({
 						type = "setJoinRequests",
-						value = table3
+						value = joinRequestsList
 					})
 				end
 			end
@@ -403,74 +403,74 @@ function t.init()
 			value = nil
 		})
 	end
-	local local4 = Maid.new()
+	local viewingClanMaid = Maid.new()
 	local function updateViewingInfo()
-		local4:DoCleaning()
+		viewingClanMaid:DoCleaning()
 		persistentCrewStore:dispatch({
 			type = "setMembersOnlineMap",
 			value = nil
 		})
-		local counter = PersistentCrewUtils.getPlayerViewingClanId(Players.LocalPlayer)
-		if not counter then
+		local viewingClanId = PersistentCrewUtils.getPlayerViewingClanId(Players.LocalPlayer)
+		if not viewingClanId then
 			persistentCrewStore:dispatch({
 				type = "setViewingClanInfo",
 				value = nil
 			})
 		end
-		if counter then
-			local4:GivePromise(waitForChild(ReplicatedStorage, ClanConsts.MEMBERS_ONLINE_OBJECT_NAME, 5):andThen(function(self)
-				return waitForChild(self, counter, 5)
+		if viewingClanId then
+			viewingClanMaid:GivePromise(waitForChild(ReplicatedStorage, ClanConsts.MEMBERS_ONLINE_OBJECT_NAME, 5):andThen(function(membersOnlineFolder)
+				return waitForChild(membersOnlineFolder, viewingClanId, 5)
 			end):andThen(function()
 				local function updateOnline()
 					persistentCrewStore:dispatch({
 						type = "setMembersOnlineMap",
-						value = ClanUtils.getMembersOnline(counter)
+						value = ClanUtils.getMembersOnline(viewingClanId)
 					})
 				end
 				persistentCrewStore:dispatch({
 					type = "setMembersOnlineMap",
-					value = ClanUtils.getMembersOnline(counter)
+					value = ClanUtils.getMembersOnline(viewingClanId)
 				})
-				local4:GiveTask(ClanUtils.getMembersOnlineChangedSignal(counter):Connect(updateOnline))
+				viewingClanMaid:GiveTask(ClanUtils.getMembersOnlineChangedSignal(viewingClanId):Connect(updateOnline))
 			end))
 		end
 	end
 	PersistentCrewUtils.getPlayerViewingClanIdChangedSignal(Players.LocalPlayer):Connect(updateViewingInfo)
 	updateViewingInfo()
-	local local5 = Maid.new()
+	local currentClanMaid = Maid.new()
 	local function updateCurrentInfo()
-		local counter = ClanUtils.getCurrentClanId(Players.LocalPlayer)
-		if not counter then
+		local currentClanId = ClanUtils.getCurrentClanId(Players.LocalPlayer)
+		if not currentClanId then
 			persistentCrewStore:dispatch({
 				type = "setCurrentClanInfo",
 				value = nil
 			})
 		end
-		local local2
-		if counter then
+		local readyUpObservable
+		if currentClanId then
 			local function dispatchReadyUpChanges()
 				persistentCrewStore:dispatch({
 					type = "setIsReadiedUp",
-					value = ClanMatchmakingUtils.getIsClanReadiedUp(counter)
+					value = ClanMatchmakingUtils.getIsClanReadiedUp(currentClanId)
 				})
 			end
-			local function callbackWrapper(self, self)
+			local function observableCallback(maid)
 				persistentCrewStore:dispatch({
 					type = "setIsReadiedUp",
-					value = ClanMatchmakingUtils.getIsClanReadiedUp(counter)
+					value = ClanMatchmakingUtils.getIsClanReadiedUp(currentClanId)
 				})
-				self:GiveTask(dispatchReadyUpChanges)
+				maid:GiveTask(dispatchReadyUpChanges)
 			end
-			local local3 = ClanMatchmakingUtils.observeIsClanReadiedUp(counter, callbackWrapper)
+			readyUpObservable = ClanMatchmakingUtils.observeIsClanReadiedUp(currentClanId, observableCallback)
 			persistentCrewStore:dispatch({
 				type = "setIsReadiedUp",
-				value = ClanMatchmakingUtils.getIsClanReadiedUp(counter)
+				value = ClanMatchmakingUtils.getIsClanReadiedUp(currentClanId)
 			})
-			local2 = local3
+			readyUpObservable = readyUpObservable
 		else
-			local2 = nil
+			readyUpObservable = nil
 		end
-		local5.observingClan = local2
+		currentClanMaid.observingClan = readyUpObservable
 	end
 	ClanUtils.getCurrentClanIdChangedSignal(Players.LocalPlayer):Connect(updateCurrentInfo)
 	updateCurrentInfo()

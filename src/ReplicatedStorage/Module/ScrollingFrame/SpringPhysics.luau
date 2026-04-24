@@ -2,101 +2,101 @@
 local t = {}
 local cos = math.cos
 local sin = math.sin
-local v1 = tick
-local v2 = Vector3.new
+local delta = tick
+local vector2 = Vector3.new
 t.Spring = {}
 t.NumberSpring = {}
 t.VectorSpring = {}
 local function New(p1)
-	local v12 = v1()
-	local v2 = p1 or 0
-	local v3 = p1 or 0
-	local v4 = p1 and 0 * p1 or 0
-	local v5 = 1
-	local v6 = 1
-	local v7 = nil
+	local var12 = delta()
+	local vector2 = p1 or 0
+	local var3 = p1 or 0
+	local var4 = p1 and 0 * p1 or 0
+	local var5 = 1
+	local var6 = 1
+	local var7 = nil
 	local function PositionVelocity(p1)
-		local v1 = p1 - v12
-		local v22 = v3 - v2
-		if v6 == 0 then
-			return v3, 0
-		elseif v5 < 1 then
-			local v32 = (1 - v5 * v5) ^ 0.5
-			local v42 = (v4 / v6 + v5 * v22) / v32
-			local v52 = cos(v32 * v6 * v1)
-			local v62 = sin(v32 * v6 * v1)
-			local v7 = 2.718281828459045 ^ (v5 * v6 * v1)
-			return v2 + (v22 * v52 + v42 * v62) / v7, v6 * ((v32 * v42 - v5 * v22) * v52 - (v32 * v22 + v5 * v42) * v62) / v7
+		local delta = p1 - var12
+		local var22 = var3 - vector2
+		if var6 == 0 then
+			return var3, 0
+		elseif var5 < 1 then
+			local var32 = (1 - var5 * var5) ^ 0.5
+			local var42 = (var4 / var6 + var5 * var22) / var32
+			local var52 = cos(var32 * var6 * delta)
+			local var62 = sin(var32 * var6 * delta)
+			local var7 = 2.718281828459045 ^ (var5 * var6 * delta)
+			return vector2 + (var22 * var52 + var42 * var62) / var7, var6 * ((var32 * var42 - var5 * var22) * var52 - (var32 * var22 + var5 * var42) * var62) / var7
 		else
-			local v8 = v4 / v6 + v22
-			local v9 = 2.718281828459045 ^ (v6 * v1)
-			return v2 + (v22 + v8 * v6 * v1) / v9, v6 * (v8 - v22 - v8 * v6 * v1) / v9
+			local var8 = var4 / var6 + var22
+			local var9 = 2.718281828459045 ^ (var6 * delta)
+			return vector2 + (var22 + var8 * var6 * delta) / var9, var6 * (var8 - var22 - var8 * var6 * delta) / var9
 		end
 	end
-	v7 = setmetatable({
+	var7 = setmetatable({
 		Impulse = function(p1, p2)
-			v7.Velocity = v7.Velocity + p2
+			var7.Velocity = var7.Velocity + p2
 		end,
 		TimeSkip = function(p1, p2)
-			local v13 = v1()
-			local v2, v32 = PositionVelocity(v13 + p2)
-			v3 = v2
-			v4 = v32
-			v12 = v13
+			local var13 = delta()
+			local vector2, var32 = PositionVelocity(var13 + p2)
+			var3 = vector2
+			var4 = var32
+			var12 = var13
 		end
 	}, {
 		__index = function(p1, p2)
 			if p2 == "Value" or (p2 == "Position" or p2 == "p") then
-				local v12, _ = PositionVelocity(v1())
-				return v12
+				local var12, _ = PositionVelocity(delta())
+				return var12
 			end
 			if p2 == "Velocity" or p2 == "v" then
-				local _, v22 = PositionVelocity(v1())
-				return v22
+				local _, var22 = PositionVelocity(delta())
+				return var22
 			end
 			if p2 == "Target" or p2 == "t" then
-				return v2
+				return vector2
 			end
 			if p2 == "Damper" or p2 == "d" then
-				return v5
+				return var5
 			end
 			if p2 == "Speed" or p2 == "s" then
-				return v6
+				return var6
 			end
 			error(p2 .. " is not a valid member of Spring")
 		end,
 		__newindex = function(p1, p2, p3)
-			local v13 = v1()
+			local var13 = delta()
 			if p2 == "Value" or (p2 == "Position" or p2 == "p") then
-				local _, v22 = PositionVelocity(v13)
-				v3 = p3
-				v4 = v22
+				local _, var22 = PositionVelocity(var13)
+				var3 = p3
+				var4 = var22
 			elseif p2 == "Velocity" or p2 == "v" then
-				local v32, _ = PositionVelocity(v13)
-				v3 = v32
-				v4 = p3
+				local var32, _ = PositionVelocity(var13)
+				var3 = var32
+				var4 = p3
 			elseif p2 == "Target" or p2 == "t" then
-				local v42, v52 = PositionVelocity(v13)
-				v3 = v42
-				v4 = v52
-				v2 = p3
+				local var42, var52 = PositionVelocity(var13)
+				var3 = var42
+				var4 = var52
+				vector2 = p3
 			elseif p2 == "Damper" or p2 == "d" then
-				local v62, v7 = PositionVelocity(v13)
-				v3 = v62
-				v4 = v7
-				v5 = if p3 < 0 then 0 elseif p3 < 1 then p3 else 1
+				local var62, var7 = PositionVelocity(var13)
+				var3 = var62
+				var4 = var7
+				var5 = if p3 < 0 then 0 elseif p3 < 1 then p3 else 1
 			elseif p2 == "Speed" or p2 == "s" then
-				local v9, v10 = PositionVelocity(v13)
-				v3 = v9
-				v4 = v10
-				v6 = if p3 < 0 then 0 else p3
+				local var9, v10 = PositionVelocity(var13)
+				var3 = var9
+				var4 = v10
+				var6 = if p3 < 0 then 0 else p3
 			else
 				error(p2 .. " is not a valid member of Spring")
 			end
-			v12 = v13
+			var12 = var13
 		end
 	})
-	return v7
+	return var7
 end
 t.Spring.New = New
 local function New_2(p1)
@@ -104,7 +104,7 @@ local function New_2(p1)
 end
 t.NumberSpring.New = New_2
 local function New_3(p1)
-	return t.Spring.New(p1 or v2())
+	return t.Spring.New(p1 or vector2())
 end
 t.VectorSpring.New = New_3
 return t

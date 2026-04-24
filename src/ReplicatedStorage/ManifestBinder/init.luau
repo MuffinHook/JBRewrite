@@ -90,8 +90,8 @@ function t._stopBoundFn(p1, p2)
 		if v1.Destroy then
 			v1:Destroy()
 		else
-			local v3 = warn
-			v3(("[ManifestBinder._remove] - Class %q no longer has destroy, something destroyed it!"):format((tostring(p1._tagName))))
+			local var3 = warn
+			var3(("[ManifestBinder._remove] - Class %q no longer has destroy, something destroyed it!"):format((tostring(p1._tagName))))
 		end
 		p1._rootInstToClass[p2] = nil
 	end
@@ -116,9 +116,9 @@ function t._startBoundFn(p1, p2, p3)
 		if typeof(v1) == "table" then
 			if typeof(v1.Destroy) == "function" then
 				p1._rootInstToClass[p2] = v1
-				local v4 = p1._listeners[p2]
-				if v4 then
-					for k, v in pairs(v4) do
+				local var4 = p1._listeners[p2]
+				if var4 then
+					for k, v in pairs(var4) do
 						task.spawn(k, v1)
 					end
 				end
@@ -151,32 +151,32 @@ function t._bindRoot(p1, p2)
 	p1._rootInstToRootNode[p2] = t2
 	for k, v in pairs(p1._manifest) do
 		local v2 = parsePath(v)
-		local v3 = t2
+		local var3 = t2
 		for i, v5 in ipairs(v2) do
-			local v4
-			v4 = i == #v2
-			local v52 = v3.children[v5] or {}
-			if v4 then
-				if v52.alias ~= nil then
+			local var4
+			var4 = i == #v2
+			local table52 = var3.children[v5] or {}
+			if var4 then
+				if table52.alias ~= nil then
 					error("Multiple aliases assigned to one instance")
 				end
-				v52.alias = k
+				table52.alias = k
 			else
-				v52.children = v52.children or {}
-				v52.connections = v52.connections or {}
+				table52.children = table52.children or {}
+				table52.connections = table52.connections or {}
 			end
-			v3.children[v5] = v52
-			v3 = v52
+			var3.children[v5] = table52
+			var3 = table52
 		end
 	end
 	debug.profileend()
 	local function v8(p12)
-		local v12 = assert(p12.instance)
+		local var12 = assert(p12.instance)
 		local children = p12.children
 		local alias = p12.alias
 		local v2 = not children
 		if alias then
-			t[alias] = v12
+			t[alias] = var12
 		end
 		if not v2 then
 			local function processAddChild(p1)
@@ -187,31 +187,31 @@ function t._bindRoot(p1, p2)
 				end
 			end
 			local function processDeleteChild(p12)
-				local v13 = p12.Name
-				local v2 = children[v13]
+				local var13 = p12.Name
+				local v2 = children[var13]
 				if v2 and v2.instance == p12 then
 					p1:_stopBoundFn(p2)
 					v1(v2, t)
 					assert(v2.instance == nil)
-					local v3 = v12:FindFirstChild(v13)
-					if v3 then
-						local v4 = children[v3.Name]
-						if v4 and v4.instance == nil then
-							v4.instance = v3
-							v8(v4)
+					local var3 = var12:FindFirstChild(var13)
+					if var3 then
+						local var4 = children[var3.Name]
+						if var4 and var4.instance == nil then
+							var4.instance = var3
+							v8(var4)
 						end
 					end
 				end
 			end
-			for i, v in ipairs(v12:GetChildren()) do
-				local v3 = children[v.Name]
-				if v3 and v3.instance == nil then
-					v3.instance = v
-					v8(v3)
+			for i, v in ipairs(var12:GetChildren()) do
+				local var3 = children[v.Name]
+				if var3 and var3.instance == nil then
+					var3.instance = v
+					v8(var3)
 				end
 			end
-			table.insert(p12.connections, v12.ChildAdded:Connect(processAddChild))
-			table.insert(p12.connections, v12.ChildRemoved:Connect(processDeleteChild))
+			table.insert(p12.connections, var12.ChildAdded:Connect(processAddChild))
+			table.insert(p12.connections, var12.ChildRemoved:Connect(processDeleteChild))
 		end
 		if v2 then
 			local _manifestSizeTarget = p1._manifestSizeTarget
@@ -229,9 +229,9 @@ function t._bindRoot(p1, p2)
 end
 function t._unbindRoot(p1, p2)
 	p1:_stopBoundFn(p2)
-	local v12 = p1._rootInstToRootNode[p2]
-	if v12 then
-		v1(v12, (assert(p1._rootInstToManifest[p2])))
+	local var12 = p1._rootInstToRootNode[p2]
+	if var12 then
+		v1(var12, (assert(p1._rootInstToManifest[p2])))
 		p1._rootInstToRootNode[p2] = nil
 	end
 	p1._rootInstToManifest[p2] = nil
@@ -283,11 +283,11 @@ function t.GetClassRemovingSignal(p1)
 end
 function t.Destroy(p1)
 	debug.profilebegin("ManifestBinder:Destroy")
-	local v12 = next(p1._rootInstToClass)
-	while v12 ~= nil do
-		p1:_stopBoundFn(v12)
-		assert(p1._rootInstToClass[v12] == nil, "Failed to remove")
-		v12 = next(p1._rootInstToClass)
+	local var12 = next(p1._rootInstToClass)
+	while var12 ~= nil do
+		p1:_stopBoundFn(var12)
+		assert(p1._rootInstToClass[var12] == nil, "Failed to remove")
+		var12 = next(p1._rootInstToClass)
 	end
 	table.clear(p1._rootInstToClass)
 	for i, v in ipairs(p1._connections) do

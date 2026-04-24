@@ -1,16 +1,16 @@
 -- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
-local v1 = CFrame.new
-local v2 = Vector3.new
-v1()
-local v3 = v2()
+local cframe = CFrame.new
+local vector2 = Vector3.new
+cframe()
+local var3 = vector2()
 return {
 	MakeCinematicCamera = function()
 		return {
 			StartPosition = nil,
-			Position = v3,
+			Position = var3,
 			TargetPosition = nil,
-			LookVector = v3,
+			LookVector = var3,
 			TargetFocus = nil
 		}
 	end,
@@ -25,6 +25,6 @@ return {
 		if p2.TargetFocus then
 			p2.LookVector = p2.LookVector + ((p2.TargetFocus - p2.Position).unit - p2.LookVector) * p1 * p3
 		end
-		CurrentCamera.CoordinateFrame = v1(v3, p2.LookVector) + p2.Position
+		CurrentCamera.CoordinateFrame = cframe(var3, p2.LookVector) + p2.Position
 	end
 }

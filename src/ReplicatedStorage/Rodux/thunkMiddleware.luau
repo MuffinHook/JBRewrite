@@ -1,24 +1,25 @@
 -- Reviewed by Claude
-local function tracebackReporter(p1)
-	return debug.traceback(p1)
+-- variables reassigned
+local function tracebackReporter(error)
+	return debug.traceback(error)
 end
-return function(p1, p2)
-	return function(p12)
- if typeof(p12) == "function" then
- local v1, v2 = xpcall(function()
- return p12(p2)
+return function(nextDispatch, store)
+	return function(action)
+ if typeof(action) == "function" then
+ local success, result = xpcall(function()
+ return action(store)
  end, tracebackReporter)
- if v1 then
- return v2
+ if success then
+ return result
  else
- p2._errorReporter.reportReducerError(p2:getState(), p12, {
+ store._errorReporter.reportReducerError(store:getState(), action, {
  message = "Caught error in thunk",
- thrownValue = v2
+ thrownValue = result
  })
  return nil
  end
  else
- return p1(p12)
+ return nextDispatch(action)
  end
 	end
 end

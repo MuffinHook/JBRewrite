@@ -9,24 +9,24 @@ local TradeButton = require(script.Parent.TradeButton)
 local ScrollingGrid = require(ReplicatedStorage.EzUi.ScrollingGrid)
 local store = require(ReplicatedStorage.App.store)
 local TradeChat = require(script.Parent.TradeChat)
-local v1 = Roact.PureComponent:extend("TradeInventory")
-v1.defaultProps = {
+local color = Roact.PureComponent:extend("TradeInventory")
+color.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	position = UDim2.new(0, 0, 0, 0),
 	cornerPixel = 4,
 	sortEnabled = true,
 	displayName = ""
 }
-function v1.init(p1)
+function color.init(p1)
 	p1.itemDefaults = {
 		cornerPixel = p1.props.cornerPixel,
 		onClick = p1.props.onClickItem,
 		onCardFlipped = p1.props.onCardFlipped
 	}
 end
-function v1.render(p1)
+function color.render(p1)
 	local cornerPixel = p1.props.cornerPixel
-	local v1 = Color3.new(51/255, 51/255, 51/255)
+	local color = Color3.new(51/255, 51/255, 51/255)
 	local v2 = nil
 	if p1.props.sortId == EnumSort.Alphabetical then
 		v2 = "ALPHABETICAL"
@@ -80,7 +80,7 @@ function v1.render(p1)
 	}
 	local t4 = {
 		BorderSizePixel = 0,
-		BackgroundColor3 = v1,
+		BackgroundColor3 = color,
 		Size = UDim2.new(0.984375, 0, 0.08, 0),
 		Position = UDim2.new(0.0078125, 0, 0.0125, 0)
 	}
@@ -136,11 +136,11 @@ function v1.render(p1)
 			Text = "",
 			[Roact.Ref] = p1.boxRef,
 			[Roact.Change.Text] = function(p1)
-				local v1 = p1.Text:upper():gsub("[^%w%s]", "")
-				p1.Text = v1
+				local color = p1.Text:upper():gsub("[^%w%s]", "")
+				p1.Text = color
 				store:dispatch({
 					type = "setTradeInventorySearchText",
-					value = v1
+					value = color
 				})
 			end
 		})
@@ -216,7 +216,7 @@ function v1.render(p1)
 	t3.Header = createElement("Frame", t4, t5)
 	t3.OtherPlayerInventoryContainers = createElement("Frame", {
 		BorderSizePixel = 0,
-		BackgroundColor3 = v1,
+		BackgroundColor3 = color,
 		BackgroundTransparency = 0,
 		Size = UDim2.new(0.13828125, 0, 1, 0),
 		AnchorPoint = Vector2.new(1, 0),
@@ -240,7 +240,7 @@ function v1.render(p1)
 	})
 	t3.ItemTypesContainer = createElement("Frame", {
 		BorderSizePixel = 0,
-		BackgroundColor3 = v1,
+		BackgroundColor3 = color,
 		Size = UDim2.new(0.13828125, 0, 0.79, 0),
 		Position = UDim2.new(0.0078125, 0, 0.10500000000000001, 0)
 	}, {
@@ -261,7 +261,7 @@ function v1.render(p1)
 	})
 	t3.ItemsContainer = createElement("Frame", {
 		BorderSizePixel = 0,
-		BackgroundColor3 = v1,
+		BackgroundColor3 = color,
 		Size = UDim2.new(0.83828125, 0, 0.79, 0),
 		Position = UDim2.new(0.15390625, 0, 0.10500000000000001, 0)
 	}, {
@@ -281,7 +281,7 @@ function v1.render(p1)
 	})
 	t3.Footer = createElement("Frame", {
 		BorderSizePixel = 0,
-		BackgroundColor3 = v1,
+		BackgroundColor3 = color,
 		Size = UDim2.new(0.984375, 0, 0.08, 0),
 		Position = UDim2.new(0.0078125, 0, 0.9075, 0)
 	}, {
@@ -326,4 +326,4 @@ function v1.render(p1)
 		AnchorPoint = p1.props.anchorPoint
 	}, t3)
 end
-return v1
+return color

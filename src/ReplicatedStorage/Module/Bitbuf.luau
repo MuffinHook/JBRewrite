@@ -2,11 +2,11 @@
 local t = {}
 local function int_from_uint(p1, p2)
 	local v1 = 2 ^ p1
-	local v2 = p2 % v1
-	if v1 / 2 <= v2 then
-		return v2 - v1
+	local table2 = p2 % v1
+	if v1 / 2 <= table2 then
+		return table2 - v1
 	else
-		return v2
+		return table2
 	end
 end
 local function int_to_uint(p1, p2)
@@ -26,17 +26,17 @@ local function float64_from_uint(p1)
 end
 local function float_to_fixed(p1, p2, p3)
 	local v1 = 2 ^ (p1 + p2)
-	local v2 = math.floor(p3 * 2 ^ p2) % v1
-	if v1 / 2 <= v2 then
-		return v2 - v1
+	local table2 = math.floor(p3 * 2 ^ p2) % v1
+	if v1 / 2 <= table2 then
+		return table2 - v1
 	else
-		return v2
+		return table2
 	end
 end
 local function float_from_fixed(p1, p2, p3)
 	local v1 = 2 ^ (p1 + p2)
-	local v2 = p3 % v1
-	return math.floor(if v1 / 2 <= v2 then v2 - v1 else v2) * 2 ^ (-p2)
+	local table2 = p3 % v1
+	return math.floor(if v1 / 2 <= table2 then table2 - v1 else table2) * 2 ^ (-p2)
 end
 local function float_to_ufixed(p1, p2, p3)
 	return math.floor(p3 * 2 ^ p2) % 2 ^ (p1 + p2)
@@ -49,64 +49,64 @@ local t2 = {
 }
 function t.new(p1)
 	assert(p1 == nil or type(p1) == "number", "number expected")
-	local v2 = p1 or 0
+	local table2 = p1 or 0
 	return setmetatable({
-		buf = table.create(math.ceil(v2 / 32), 0),
-		len = v2,
+		buf = table.create(math.ceil(table2 / 32), 0),
+		len = table2,
 		i = 0
 	}, t2)
 end
 function t.fromString(p1)
 	assert(type(p1) == "string", "string expected")
-	local v2 = math.ceil(#p1 / 4)
+	local table2 = math.ceil(#p1 / 4)
 	local t = {
-		buf = table.create(v2, 0),
+		buf = table.create(table2, 0),
 		len = #p1 * 8,
 		i = 0
 	}
 	for i = 0, math.floor(#p1 / 4) - 1 do
-		local v3, v4, v5, v6 = string.byte(p1, i * 4 + 1, i * 4 + 4)
-		t.buf[i + 1] = bit32.bor(v3, v4 * 256, v5 * 65536, v6 * 16777216)
+		local table3, var4, var5, var6 = string.byte(p1, i * 4 + 1, i * 4 + 4)
+		t.buf[i + 1] = bit32.bor(table3, var4 * 256, var5 * 65536, var6 * 16777216)
 	end
 	for j = 0, #p1 % 4 - 1 do
-		t.buf[v2] = bit32.bor(t.buf[v2], string.byte(p1, (v2 - 1) * 4 + j + 1) * 256 ^ j)
+		t.buf[table2] = bit32.bor(t.buf[table2], string.byte(p1, (table2 - 1) * 4 + j + 1) * 256 ^ j)
 	end
 	return setmetatable(t, t2)
 end
 local function String(p1)
-	local v2 = math.ceil(p1.len / 32)
-	local v3 = table.create(v2, "")
-	for i in ipairs(v3) do
-		local v4 = p1.buf[i]
-		if v4 then
-			v3[i] = string.pack("<I4", v4)
+	local table2 = math.ceil(p1.len / 32)
+	local table3 = table.create(table2, "")
+	for i in ipairs(table3) do
+		local var4 = p1.buf[i]
+		if var4 then
+			table3[i] = string.pack("<I4", var4)
 		else
-			v3[i] = "\0\0\0\0"
+			table3[i] = "\0\0\0\0"
 		end
 	end
-	local v5 = p1.len % 32
-	if v5 > 0 then
-		local v8 = bit32.band(p1.buf[v2] or 0, bit32.lshift(1, v5) - 1)
-		v3[v2] = string.pack("<I" .. math.floor((p1.len - 1) / 8) % 4 + 1, v8)
+	local var5 = p1.len % 32
+	if var5 > 0 then
+		local var8 = bit32.band(p1.buf[table2] or 0, bit32.lshift(1, var5) - 1)
+		table3[table2] = string.pack("<I" .. math.floor((p1.len - 1) / 8) % 4 + 1, var8)
 	end
-	return table.concat(v3)
+	return table.concat(table3)
 end
 t2.__index.String = String
 local function writeUnit(p1, p2, p3)
 	assert(if p2 >= 0 then p2 <= 32 else false, "size must be in range [0,32]")
 	if p2 ~= 0 then
-		local v2 = bit32.rshift(p1.i, 5) + 1
-		local v3 = p1.i % 32
-		if v3 == 0 and p2 == 32 then
-			p1.buf[v2] = bit32.band(p3, 4294967295)
+		local table2 = bit32.rshift(p1.i, 5) + 1
+		local table3 = p1.i % 32
+		if table3 == 0 and p2 == 32 then
+			p1.buf[table2] = bit32.band(p3, 4294967295)
 		else
-			local v4 = 32 - v3
-			local v5 = p2 - v4
-			if v5 <= 0 then
-				p1.buf[v2] = bit32.replace(p1.buf[v2] or 0, p3, v3, p2)
+			local var4 = 32 - table3
+			local var5 = p2 - var4
+			if var5 <= 0 then
+				p1.buf[table2] = bit32.replace(p1.buf[table2] or 0, p3, table3, p2)
 			else
-				p1.buf[v2] = bit32.replace(p1.buf[v2] or 0, bit32.extract(p3, 0, v4), v3, v4)
-				p1.buf[v2 + 1] = bit32.replace(p1.buf[v2 + 1] or 0, bit32.extract(p3, v4, v5), 0, v5)
+				p1.buf[table2] = bit32.replace(p1.buf[table2] or 0, bit32.extract(p3, 0, var4), table3, var4)
+				p1.buf[table2 + 1] = bit32.replace(p1.buf[table2 + 1] or 0, bit32.extract(p3, var4, var5), 0, var5)
 			end
 		end
 		p1.i = p1.i + p2
@@ -121,21 +121,21 @@ local function readUnit(p1, p2)
 	if p2 == 0 then
 		return 0
 	else
-		local v2 = bit32.rshift(p1.i, 5) + 1
-		local v3 = p1.i % 32
+		local table2 = bit32.rshift(p1.i, 5) + 1
+		local table3 = p1.i % 32
 		p1.i = p1.i + p2
 		if p1.i > p1.len then
 			p1.len = p1.i
 		end
-		if v3 == 0 and p2 == 32 then
-			return p1.buf[v2] or 0
+		if table3 == 0 and p2 == 32 then
+			return p1.buf[table2] or 0
 		else
-			local v4 = 32 - v3
-			local v5 = v4 - p2
-			if v5 >= 0 then
-				return bit32.extract(p1.buf[v2] or 0, v3, p2)
+			local var4 = 32 - table3
+			local var5 = var4 - p2
+			if var5 >= 0 then
+				return bit32.extract(p1.buf[table2] or 0, table3, p2)
 			else
-				return bit32.bor(bit32.extract(p1.buf[v2] or 0, v3, v4), (bit32.lshift(bit32.extract(p1.buf[v2 + 1] or 0, 0, -v5), v4)))
+				return bit32.bor(bit32.extract(p1.buf[table2] or 0, table3, var4), (bit32.lshift(bit32.extract(p1.buf[table2 + 1] or 0, 0, -var5), var4)))
 			end
 		end
 	end
@@ -241,22 +241,22 @@ local function fastWriteBytes(p1, p2)
 	if #p2 <= 4 then
 		p1:writeUnit(#p2 * 8, (string.unpack("<I" .. #p2, p2)))
 	else
-		local v2 = math.floor(3 - (p1.i / 8 - 1) % 4)
-		if v2 > 0 then
-			p1:writeUnit(v2 * 8, (string.unpack("<I" .. v2, p2)))
+		local table2 = math.floor(3 - (p1.i / 8 - 1) % 4)
+		if table2 > 0 then
+			p1:writeUnit(table2 * 8, (string.unpack("<I" .. table2, p2)))
 		end
-		local v3 = math.floor((#p2 - v2) / 4)
-		local v4 = bit32.rshift(p1.i, 5) + 1
-		for i2 = 0, v3 - 1 do
-			p1.buf[v4 + i2] = string.unpack("<I4", p2, v2 + i2 * 4 + 1)
+		local table3 = math.floor((#p2 - table2) / 4)
+		local var4 = bit32.rshift(p1.i, 5) + 1
+		for i2 = 0, table3 - 1 do
+			p1.buf[var4 + i2] = string.unpack("<I4", p2, table2 + i2 * 4 + 1)
 		end
-		p1.i = p1.i + v3 * 32
+		p1.i = p1.i + table3 * 32
 		if p1.i > p1.len then
 			p1.len = p1.i
 		end
-		local v5 = (#p2 - v2) % 4
-		if v5 > 0 then
-			p1:writeUnit(v5 * 8, string.unpack("<I" .. v5, p2, #p2 - v5 + 1))
+		local var5 = (#p2 - table2) % 4
+		if var5 > 0 then
+			p1:writeUnit(var5 * 8, string.unpack("<I" .. var5, p2, #p2 - var5 + 1))
 		end
 	end
 end
@@ -277,33 +277,33 @@ local function fastReadBytes(p1, p2)
 	if p2 <= 4 then
 		return string.pack("<I" .. p2, p1:readUnit(p2 * 8))
 	else
-		local v2 = math.floor(3 - (p1.i / 8 - 1) % 4)
-		local v3 = (p2 - v2) % 4
-		local v4 = table.create((p2 - v2) / 4 + v3, nil)
+		local table2 = math.floor(3 - (p1.i / 8 - 1) % 4)
+		local table3 = (p2 - table2) % 4
+		local var4 = table.create((p2 - table2) / 4 + table3, nil)
 		local count = 1
-		if v2 > 0 then
-			v4[count] = string.pack("<I" .. v2, p1:readUnit(v2 * 8))
+		if table2 > 0 then
+			var4[count] = string.pack("<I" .. table2, p1:readUnit(table2 * 8))
 			count = count + 1
 		end
-		local v5 = math.floor((p2 - v2) / 4)
-		local v6 = bit32.rshift(p1.i, 5) + 1
-		for i2 = 0, v5 - 1 do
-			local v7 = p1.buf[v6 + i2]
-			if v7 then
-				v4[count] = string.pack("<I4", v7)
+		local var5 = math.floor((p2 - table2) / 4)
+		local var6 = bit32.rshift(p1.i, 5) + 1
+		for i2 = 0, var5 - 1 do
+			local var7 = p1.buf[var6 + i2]
+			if var7 then
+				var4[count] = string.pack("<I4", var7)
 			else
-				v4[count] = "\0\0\0\0"
+				var4[count] = "\0\0\0\0"
 			end
 			count = count + 1
 		end
-		p1.i = p1.i + v5 * 32
+		p1.i = p1.i + var5 * 32
 		if p1.len < count then
 			p1.len = count
 		end
-		if v3 > 0 then
-			v4[count] = string.pack("<I" .. v3, p1:readUnit(v3 * 8))
+		if table3 > 0 then
+			var4[count] = string.pack("<I" .. table3, p1:readUnit(table3 * 8))
 		end
-		return table.concat(v4)
+		return table.concat(var4)
 	end
 end
 local function ReadBytes(p1, p2)
@@ -313,11 +313,11 @@ local function ReadBytes(p1, p2)
 	elseif p1.i % 8 == 0 then
 		return fastReadBytes(p1, p2)
 	else
-		local v2 = table.create(p2, "")
+		local table2 = table.create(p2, "")
 		for i = 1, p2 do
-			v2[i] = string.char(p1:readUnit(8))
+			table2[i] = string.char(p1:readUnit(8))
 		end
-		return table.concat(v2)
+		return table.concat(table2)
 	end
 end
 t2.__index.ReadBytes = ReadBytes
@@ -329,9 +329,9 @@ local function WriteUint(p1, p2, p3)
 	elseif p2 <= 32 then
 		p1:writeUnit(p2, p3)
 	else
-		local v4 = p3 % 2 ^ p2
-		p1:writeUnit(32, v4)
-		p1:writeUnit(p2 - 32, (math.floor(v4 / 4294967296)))
+		local var4 = p3 % 2 ^ p2
+		p1:writeUnit(32, var4)
+		p1:writeUnit(p2 - 32, (math.floor(var4 / 4294967296)))
 	end
 end
 t2.__index.WriteUint = WriteUint
@@ -375,12 +375,12 @@ local function WriteInt(p1, p2, p3)
 	if p2 == 0 then
 		return
 	end
-	local v4 = p3 % 2 ^ p2
+	local var4 = p3 % 2 ^ p2
 	if p2 <= 32 then
-		p1:writeUnit(p2, v4)
+		p1:writeUnit(p2, var4)
 	else
-		p1:writeUnit(32, v4)
-		p1:writeUnit(p2 - 32, (math.floor(v4 / 4294967296)))
+		p1:writeUnit(32, var4)
+		p1:writeUnit(p2 - 32, (math.floor(var4 / 4294967296)))
 	end
 end
 t2.__index.WriteInt = WriteInt
@@ -390,12 +390,12 @@ local function ReadInt(p1, p2)
 	if p2 == 0 then
 		return 0
 	else
-		local v5 = 2 ^ p2
-		local v6 = if p2 <= 32 then p1:readUnit(p2) else p1:readUnit(32) + p1:readUnit(p2 - 32) * 4294967296 % v5
-		if v5 / 2 <= v6 then
-			return v6 - v5
+		local var5 = 2 ^ p2
+		local var6 = if p2 <= 32 then p1:readUnit(p2) else p1:readUnit(32) + p1:readUnit(p2 - 32) * 4294967296 % var5
+		if var5 / 2 <= var6 then
+			return var6 - var5
 		else
-			return v6
+			return var6
 		end
 	end
 end
@@ -414,11 +414,11 @@ t2.__index.WriteFloat = WriteFloat
 local function ReadFloat(p1, p2)
 	assert(type(p2) == "number", "number expected")
 	assert(p2 == 32 or p2 == 64, "size must be 32 or 64")
-	local v3 = p1:ReadBytes(p2 / 8)
+	local table3 = p1:ReadBytes(p2 / 8)
 	if p2 == 32 then
-		return string.unpack("<f", v3)
+		return string.unpack("<f", table3)
 	else
-		return string.unpack("<d", v3)
+		return string.unpack("<d", table3)
 	end
 end
 t2.__index.ReadFloat = ReadFloat
@@ -448,9 +448,9 @@ local function WriteFixed(p1, p2, p3, p4)
 	assert(p3 >= 0, "fractional size must be >= 0")
 	assert(p2 + p3 <= 53, "combined size must be <= 53")
 	assert(type(p4) == "number", "number expected")
-	local v8 = 2 ^ (p2 + p3)
-	local v9 = math.floor(p4 * 2 ^ p3) % v8
-	p1:WriteInt(p2 + p3, if v8 / 2 <= v9 then v9 - v8 else v9)
+	local var8 = 2 ^ (p2 + p3)
+	local var9 = math.floor(p4 * 2 ^ p3) % var8
+	p1:WriteInt(p2 + p3, if var8 / 2 <= var9 then var9 - var8 else var9)
 end
 t2.__index.WriteFixed = WriteFixed
 local function ReadFixed(p1, p2, p3)
@@ -459,9 +459,9 @@ local function ReadFixed(p1, p2, p3)
 	assert(p2 >= 0, "integer size must be >= 0")
 	assert(p3 >= 0, "fractional size must be >= 0")
 	assert(p2 + p3 <= 53, "combined size must be <= 53")
-	local v6 = 2 ^ (p2 + p3)
-	local v7 = p1:ReadInt(p2 + p3) % v6
-	return math.floor(if v6 / 2 <= v7 then v7 - v6 else v7) * 2 ^ (-p3)
+	local var6 = 2 ^ (p2 + p3)
+	local var7 = p1:ReadInt(p2 + p3) % var6
+	return math.floor(if var6 / 2 <= var7 then var7 - var6 else var7) * 2 ^ (-p3)
 end
 t2.__index.ReadFixed = ReadFixed
 function t.isBuffer(p1)

@@ -18,384 +18,384 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalizationService = game:GetService("LocalizationService")
 local ScriptContext = game:GetService("ScriptContext")
 local Postie = require(script.Postie)
-local v1 = nil
-local t2 = {}
-local t3 = {}
-local t4 = {}
-local t5 = {}
-local t6 = {}
-local t7 = {}
-local function addToInitializationQueue(p1, ...)
-	if t6 == nil then
+local onPlayerReadyEvent = nil
+local cachedProductInfo = {}
+local errorDataStore = {}
+local errorCounts = {}
+local errorCountsChanged = {}
+local initializationQueue = {}
+local playerInitializationQueues = {}
+local function addToInitializationQueue(func, ...)
+	if initializationQueue == nil then
 		Logger:w("Initialization queue already cleared.")
 	else
-		table.insert(t6, {
-			Func = p1,
+		table.insert(initializationQueue, {
+			Func = func,
 			Args = { ... }
 		})
 		Logger:i("Added event to initialization queue")
 	end
 end
-local function addToInitializationQueueByUserId(p1, p2, ...)
-	if t:isPlayerReady(p1) then
+local function addToInitializationQueueByUserId(userId, func, ...)
+	if t:isPlayerReady(userId) then
 		Logger:w("Player initialization queue already cleared.")
 	else
-		if t7[p1] == nil then
-			t7[p1] = {}
+		if playerInitializationQueues[userId] == nil then
+			playerInitializationQueues[userId] = {}
 		end
-		table.insert(t7[p1], {
-			Func = p2,
+		table.insert(playerInitializationQueues[userId], {
+			Func = func,
 			Args = { ... }
 		})
 		Logger:i("Added event to player initialization queue")
 	end
 end
-local function isSdkReady(p1)
-	local v1 = p1.playerId or nil
-	local v2 = p1.needsInitialized or true
-	local v3 = p1.shouldWarn or false
-	local v4 = p1.message or ""
-	if v2 and not State.Initialized then
-		if v3 then
-			Logger:w(v4 .. " SDK is not initialized")
+local function isSdkReady(options)
+	local playerId = options.playerId or nil
+	local needsInitialized = options.needsInitialized or true
+	local shouldWarn = options.shouldWarn or false
+	local message = options.message or ""
+	if needsInitialized and not State.Initialized then
+		if shouldWarn then
+			Logger:w(message .. " SDK is not initialized")
 		end
-	elseif v2 and (v1 and not State:isEnabled(v1)) then
-		if v3 then
-			Logger:w(v4 .. " SDK is disabled")
+	elseif needsInitialized and (playerId and not State:isEnabled(playerId)) then
+		if shouldWarn then
+			Logger:w(message .. " SDK is disabled")
 		end
-	elseif v2 and (v1 and not State:sessionIsStarted(v1)) then
-		if v3 then
-			Logger:w(v4 .. " Session has not started yet")
+	elseif needsInitialized and (playerId and not State:sessionIsStarted(playerId)) then
+		if shouldWarn then
+			Logger:w(message .. " Session has not started yet")
 		end
 	else
 		return true
 	end
 	return false
 end
-function t.configureAvailableCustomDimensions01(p1, p2)
+function t.configureAvailableCustomDimensions01(_, dimensions)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
 	}) then
 		Logger:w("Available custom dimensions must be set before SDK is initialized")
 	else
-		State:setAvailableCustomDimensions01(p2)
+		State:setAvailableCustomDimensions01(dimensions)
 	end
 end
-function t.configureAvailableCustomDimensions02(p1, p2)
+function t.configureAvailableCustomDimensions02(_, dimensions)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
 	}) then
 		Logger:w("Available custom dimensions must be set before SDK is initialized")
 	else
-		State:setAvailableCustomDimensions02(p2)
+		State:setAvailableCustomDimensions02(dimensions)
 	end
 end
-function t.configureAvailableCustomDimensions03(p1, p2)
+function t.configureAvailableCustomDimensions03(_, dimensions)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
 	}) then
 		Logger:w("Available custom dimensions must be set before SDK is initialized")
 	else
-		State:setAvailableCustomDimensions03(p2)
+		State:setAvailableCustomDimensions03(dimensions)
 	end
 end
-function t.configureAvailableResourceCurrencies(p1, p2)
+function t.configureAvailableResourceCurrencies(_, currencies)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
 	}) then
 		Logger:w("Available resource currencies must be set before SDK is initialized")
 	else
-		Events:setAvailableResourceCurrencies(p2)
+		Events:setAvailableResourceCurrencies(currencies)
 	end
 end
-function t.configureAvailableResourceItemTypes(p1, p2)
+function t.configureAvailableResourceItemTypes(_, itemTypes)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
 	}) then
 		Logger:w("Available resource item types must be set before SDK is initialized")
 	else
-		Events:setAvailableResourceItemTypes(p2)
+		Events:setAvailableResourceItemTypes(itemTypes)
 	end
 end
-function t.configureBuild(p1, p2)
+function t.configureBuild(_, build)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
 	}) then
 		Logger:w("Build version must be set before SDK is initialized.")
 	else
-		Events:setBuild(p2)
+		Events:setBuild(build)
 	end
 end
-function t.configureAvailableGamepasses(p1, p2)
+function t.configureAvailableGamepasses(_, gamepasses)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
 	}) then
 		Logger:w("Available gamepasses must be set before SDK is initialized.")
 	else
-		State:setAvailableGamepasses(p2)
+		State:setAvailableGamepasses(gamepasses)
 	end
 end
-function t.startNewSession(p1, p2, p3)
+function t.startNewSession(_, userId, sessionData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if State.Initialized then
-				State:startNewSession(p2, p3)
+				State:startNewSession(userId, sessionData)
 			else
 				Logger:w("Cannot start new session. SDK is not initialized yet.")
 			end
 		end
 	end)
 end
-function t.endSession(p1, p2)
+function t.endSession(_, userId)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
-			State:endSession(p2)
+			State:endSession(userId)
 		end
 	end)
 end
-function t.filterForBusinessEvent(p1, p2)
-	return string.gsub(p2, "[^A-Za-z0-9%s%-_%.%(%)!%?]", "")
+function t.filterForBusinessEvent(_, text)
+	return string.gsub(text, "[^A-Za-z0-9%s%-_%.%(%)!%?]", "")
 end
-function t.addBusinessEvent(p1, p2, p3)
+function t.addBusinessEvent(_, userId, eventData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
-				playerId = p2,
+				playerId = userId,
 				needsInitialized = true,
 				shouldWarn = false,
 				message = "Could not add business event"
 			}) then
-				local v2 = p3.itemType or ""
-				local v4 = p3.cartType or ""
-				local v5 = math.floor((p3.amount or 0) * 0.7 * 0.35)
-				local v6 = p3.gamepassId or nil
-				Events:addBusinessEvent(p2, "USD", v5, v2, p3.itemId or "", v4)
-				if v2 == "Gamepass" and v4 ~= "Website" then
-					local v7 = Players:GetPlayerByUserId(p2)
-					local v8 = Store:GetPlayerDataFromCache(p2)
-					if not v8.OwnedGamepasses then
-						v8.OwnedGamepasses = {}
+				local itemType = eventData.itemType or ""
+				local cartType = eventData.cartType or ""
+				local amount = math.floor((eventData.amount or 0) * 0.7 * 0.35)
+				local gamepassId = eventData.gamepassId or nil
+				Events:addBusinessEvent(userId, "USD", amount, itemType, eventData.itemId or "", cartType)
+				if itemType == "Gamepass" and cartType ~= "Website" then
+					local player = Players:GetPlayerByUserId(userId)
+					local playerData = Store:GetPlayerDataFromCache(userId)
+					if not playerData.OwnedGamepasses then
+						playerData.OwnedGamepasses = {}
 					end
-					table.insert(v8.OwnedGamepasses, v6)
-					Store.PlayerCache[p2] = v8
-					Store:SavePlayerData(v7)
+					table.insert(playerData.OwnedGamepasses, gamepassId)
+					Store.PlayerCache[userId] = playerData
+					Store:SavePlayerData(player)
 				end
-			elseif p2 then
-				addToInitializationQueueByUserId(p2, t.addBusinessEvent, t, p2, p3)
+			elseif userId then
+				addToInitializationQueueByUserId(userId, t.addBusinessEvent, t, userId, eventData)
 			else
-				addToInitializationQueue(t.addBusinessEvent, t, p2, p3)
+				addToInitializationQueue(t.addBusinessEvent, t, userId, eventData)
 			end
 		end
 	end)
 end
-function t.addResourceEvent(p1, p2, p3)
+function t.addResourceEvent(_, userId, eventData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
-				playerId = p2,
+				playerId = userId,
 				needsInitialized = true,
 				shouldWarn = false,
 				message = "Could not add resource event"
 			}) then
-				Events:addResourceEvent(p2, p3.flowType or 0, p3.currency or "", p3.amount or 0, p3.itemType or "", p3.itemId or "")
-			elseif p2 then
-				addToInitializationQueueByUserId(p2, t.addResourceEvent, t, p2, p3)
+				Events:addResourceEvent(userId, eventData.flowType or 0, eventData.currency or "", eventData.amount or 0, eventData.itemType or "", eventData.itemId or "")
+			elseif userId then
+				addToInitializationQueueByUserId(userId, t.addResourceEvent, t, userId, eventData)
 			else
-				addToInitializationQueue(t.addResourceEvent, t, p2, p3)
+				addToInitializationQueue(t.addResourceEvent, t, userId, eventData)
 			end
 		end
 	end)
 end
-function t.addProgressionEvent(p1, p2, p3)
+function t.addProgressionEvent(_, userId, eventData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
-				playerId = p2,
+				playerId = userId,
 				needsInitialized = true,
 				shouldWarn = false,
 				message = "Could not add progression event"
 			}) then
-				Events:addProgressionEvent(p2, p3.progressionStatus or 0, p3.progression01 or "", p3.progression02 or nil, p3.progression03 or nil, p3.score or nil)
-			elseif p2 then
-				addToInitializationQueueByUserId(p2, t.addProgressionEvent, t, p2, p3)
+				Events:addProgressionEvent(userId, eventData.progressionStatus or 0, eventData.progression01 or "", eventData.progression02 or nil, eventData.progression03 or nil, eventData.score or nil)
+			elseif userId then
+				addToInitializationQueueByUserId(userId, t.addProgressionEvent, t, userId, eventData)
 			else
-				addToInitializationQueue(t.addProgressionEvent, t, p2, p3)
+				addToInitializationQueue(t.addProgressionEvent, t, userId, eventData)
 			end
 		end
 	end)
 end
-function t.addDesignEvent(p1, p2, p3)
+function t.addDesignEvent(_, userId, eventData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
-				playerId = p2,
+				playerId = userId,
 				needsInitialized = true,
 				shouldWarn = false,
 				message = "Could not add design event"
 			}) then
-				Events:addDesignEvent(p2, p3.eventId or "", p3.value or nil)
-			elseif p2 then
-				addToInitializationQueueByUserId(p2, t.addDesignEvent, t, p2, p3)
+				Events:addDesignEvent(userId, eventData.eventId or "", eventData.value or nil)
+			elseif userId then
+				addToInitializationQueueByUserId(userId, t.addDesignEvent, t, userId, eventData)
 			else
-				addToInitializationQueue(t.addDesignEvent, t, p2, p3)
+				addToInitializationQueue(t.addDesignEvent, t, userId, eventData)
 			end
 		end
 	end)
 end
-function t.addErrorEvent(p1, p2, p3)
+function t.addErrorEvent(_, userId, eventData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
-				playerId = p2,
+				playerId = userId,
 				needsInitialized = true,
 				shouldWarn = false,
 				message = "Could not add error event"
 			}) then
-				Events:addErrorEvent(p2, p3.severity or 0, p3.message or "")
-			elseif p2 then
-				addToInitializationQueueByUserId(p2, t.addErrorEvent, t, p2, p3)
+				Events:addErrorEvent(userId, eventData.severity or 0, eventData.message or "")
+			elseif userId then
+				addToInitializationQueueByUserId(userId, t.addErrorEvent, t, userId, eventData)
 			else
-				addToInitializationQueue(t.addErrorEvent, t, p2, p3)
+				addToInitializationQueue(t.addErrorEvent, t, userId, eventData)
 			end
 		end
 	end)
 end
-function t.setEnabledDebugLog(p1, p2)
+function t.setEnabledDebugLog(_, enabled)
 	if RunService:IsStudio() then
-		if p2 then
-			Logger:setDebugLog(p2)
+		if enabled then
+			Logger:setDebugLog(enabled)
 			Logger:i("Debug logging enabled")
 		else
 			Logger:i("Debug logging disabled")
-			Logger:setDebugLog(p2)
+			Logger:setDebugLog(enabled)
 		end
 	else
 		Logger:i("setEnabledDebugLog can only be used in studio")
 	end
 end
-function t.setEnabledInfoLog(p1, p2)
-	if p2 then
-		Logger:setInfoLog(p2)
+function t.setEnabledInfoLog(_, enabled)
+	if enabled then
+		Logger:setInfoLog(enabled)
 		Logger:i("Info logging enabled")
 	else
 		Logger:i("Info logging disabled")
-		Logger:setInfoLog(p2)
+		Logger:setInfoLog(enabled)
 	end
 end
-function t.setEnabledVerboseLog(p1, p2)
-	if p2 then
-		Logger:setVerboseLog(p2)
+function t.setEnabledVerboseLog(_, enabled)
+	if enabled then
+		Logger:setVerboseLog(enabled)
 		Logger:ii("Verbose logging enabled")
 	else
 		Logger:ii("Verbose logging disabled")
-		Logger:setVerboseLog(p2)
+		Logger:setVerboseLog(enabled)
 	end
 end
-function t.setEnabledEventSubmission(p1, p2)
+function t.setEnabledEventSubmission(_, enabled)
 	Threading:performTaskOnGAThread(function()
-		if p2 then
-			State:setEventSubmission(p2)
+		if enabled then
+			State:setEventSubmission(enabled)
 			Logger:i("Event submission enabled")
 		else
 			Logger:i("Event submission disabled")
-			State:setEventSubmission(p2)
+			State:setEventSubmission(enabled)
 		end
 	end)
 end
-function t.setCustomDimension01(p1, p2, p3)
+function t.setCustomDimension01(_, userId, dimensionValue)
 	Threading:performTaskOnGAThread(function()
-		if Validation:validateDimension(State._availableCustomDimensions01, p3) then
+		if Validation:validateDimension(State._availableCustomDimensions01, dimensionValue) then
 			if isSdkReady({
-				playerId = p2,
+				playerId = userId,
 				needsInitialized = true,
 				shouldWarn = true,
 				message = "Could not set custom01 dimension"
 			}) then
-				State:setCustomDimension01(p2, p3)
+				State:setCustomDimension01(userId, dimensionValue)
 			end
 		else
-			Logger:w("Could not set custom01 dimension value to \'" .. p3 .. "\'. Value not found in available custom01 dimension values")
+			Logger:w("Could not set custom01 dimension value to \'" .. dimensionValue .. "\'. Value not found in available custom01 dimension values")
 		end
 	end)
 end
-function t.setCustomDimension02(p1, p2, p3)
+function t.setCustomDimension02(_, userId, dimensionValue)
 	Threading:performTaskOnGAThread(function()
-		if Validation:validateDimension(State._availableCustomDimensions02, p3) then
+		if Validation:validateDimension(State._availableCustomDimensions02, dimensionValue) then
 			if isSdkReady({
-				playerId = p2,
+				playerId = userId,
 				needsInitialized = true,
 				shouldWarn = true,
 				message = "Could not set custom02 dimension"
 			}) then
-				State:setCustomDimension02(p2, p3)
+				State:setCustomDimension02(userId, dimensionValue)
 			end
 		else
-			Logger:w("Could not set custom02 dimension value to \'" .. p3 .. "\'. Value not found in available custom02 dimension values")
+			Logger:w("Could not set custom02 dimension value to \'" .. dimensionValue .. "\'. Value not found in available custom02 dimension values")
 		end
 	end)
 end
-function t.setCustomDimension03(p1, p2, p3)
+function t.setCustomDimension03(_, userId, dimensionValue)
 	Threading:performTaskOnGAThread(function()
-		if Validation:validateDimension(State._availableCustomDimensions03, p3) then
+		if Validation:validateDimension(State._availableCustomDimensions03, dimensionValue) then
 			if isSdkReady({
-				playerId = p2,
+				playerId = userId,
 				needsInitialized = true,
 				shouldWarn = true,
 				message = "Could not set custom03 dimension"
 			}) then
-				State:setCustomDimension03(p2, p3)
+				State:setCustomDimension03(userId, dimensionValue)
 			end
 		else
-			Logger:w("Could not set custom03 dimension value to \'" .. p3 .. "\'. Value not found in available custom03 dimension values")
+			Logger:w("Could not set custom03 dimension value to \'" .. dimensionValue .. "\'. Value not found in available custom03 dimension values")
 		end
 	end)
 end
-function t.setEnabledReportErrors(p1, p2)
+function t.setEnabledReportErrors(_, enabled)
 	Threading:performTaskOnGAThread(function()
-		State.ReportErrors = p2
+		State.ReportErrors = enabled
 	end)
 end
-function t.setEnabledCustomUserId(p1, p2)
+function t.setEnabledCustomUserId(_, enabled)
 	Threading:performTaskOnGAThread(function()
-		State.UseCustomUserId = p2
+		State.UseCustomUserId = enabled
 	end)
 end
-function t.setEnabledAutomaticSendBusinessEvents(p1, p2)
+function t.setEnabledAutomaticSendBusinessEvents(_, enabled)
 	Threading:performTaskOnGAThread(function()
-		State.AutomaticSendBusinessEvents = p2
+		State.AutomaticSendBusinessEvents = enabled
 	end)
 end
-function t.addGameAnalyticsTeleportData(p1, p2, p3)
-	local t = {}
-	for i, v in ipairs(p2) do
-		local v1 = Store:GetPlayerDataFromCache(v)
-		v1.PlayerTeleporting = true
-		t[tostring(v)] = {
-			SessionID = v1.SessionID,
-			Sessions = v1.Sessions,
-			SessionStart = v1.SessionStart
+function t.addGameAnalyticsTeleportData(_, userIds, teleportData)
+	local gameAnalyticsData = {}
+	for i, userId in ipairs(userIds) do
+		local playerData = Store:GetPlayerDataFromCache(userId)
+		playerData.PlayerTeleporting = true
+		gameAnalyticsData[tostring(userId)] = {
+			SessionID = playerData.SessionID,
+			Sessions = playerData.Sessions,
+			SessionStart = playerData.SessionStart
 		}
 	end
-	p3.gameanalyticsData = t
-	return p3
+	teleportData.gameanalyticsData = gameAnalyticsData
+	return teleportData
 end
-function t.getRemoteConfigsValueAsString(p1, p2, p3)
-	return State:getRemoteConfigsStringValue(p2, p3.key or "", p3.defaultValue or nil)
+function t.getRemoteConfigsValueAsString(_, userId, configOptions)
+	return State:getRemoteConfigsStringValue(userId, configOptions.key or "", configOptions.defaultValue or nil)
 end
-function t.isRemoteConfigsReady(p1, p2)
-	return State:isRemoteConfigsReady(p2)
+function t.isRemoteConfigsReady(_, userId)
+	return State:isRemoteConfigsReady(userId)
 end
-function t.getRemoteConfigsContentAsString(p1, p2)
-	return State:getRemoteConfigsContentAsString(p2)
+function t.getRemoteConfigsContentAsString(_, userId)
+	return State:getRemoteConfigsContentAsString(userId)
 end
-function t.PlayerJoined(self, player)
+function t.PlayerJoined(_, player)
 	local TeleportData = player:GetJoinData().TeleportData
 	local playerData = Store:GetPlayerData(player)
 	local teleportGameAnalyticsData
@@ -451,163 +451,163 @@ function t.PlayerJoined(self, player)
 			playerData.CustomUserId = customUserId
 		end
 		t:startNewSession(player, teleportGameAnalyticsData)
-		v1 = v1 or ReplicatedStorage:WaitForChild("OnPlayerReadyEvent")
-		v1:Fire(p2)
+		onPlayerReadyEvent = onPlayerReadyEvent or ReplicatedStorage:WaitForChild("OnPlayerReadyEvent")
+		onPlayerReadyEvent:Fire(player)
 		if State.AutomaticSendBusinessEvents then
-			if v12.OwnedGamepasses == nil then
-				v12.OwnedGamepasses = {}
-				for i, v in ipairs(State._availableGamepasses) do
-					if MarketplaceService:UserOwnsGamePassAsync(p2.UserId, v) then
-						table.insert(v12.OwnedGamepasses, v)
+			if playerData.OwnedGamepasses == nil then
+				playerData.OwnedGamepasses = {}
+				for i, gamepassId in ipairs(State._availableGamepasses) do
+					if MarketplaceService:UserOwnsGamePassAsync(player.UserId, gamepassId) then
+						table.insert(playerData.OwnedGamepasses, gamepassId)
 					end
 				end
 			else
-				local list = {}
-				for i, v in ipairs(State._availableGamepasses) do
-					if MarketplaceService:UserOwnsGamePassAsync(p2.UserId, v) then
-						table.insert(list, v)
+				local newGamepassList = {}
+				for i, gamepassId in ipairs(State._availableGamepasses) do
+					if MarketplaceService:UserOwnsGamePassAsync(player.UserId, gamepassId) then
+						table.insert(newGamepassList, gamepassId)
 					end
 				end
-				local t3 = {}
-				for i, v in ipairs(v12.OwnedGamepasses) do
-					t3[v] = true
+				local ownedGamepassSet = {}
+				for i, gamepassId in ipairs(playerData.OwnedGamepasses) do
+					ownedGamepassSet[gamepassId] = true
 				end
-				for i, v in ipairs(list) do
-					if not t3[v] then
-						table.insert(v12.OwnedGamepasses, v)
-						local v14 = t2[v]
-						if not v14 then
-							local v15 = MarketplaceService:GetProductInfo(v, Enum.InfoType.GamePass)
-							t2[v] = v15
-							v14 = v15
+				for i, gamepassId in ipairs(newGamepassList) do
+					if not ownedGamepassSet[gamepassId] then
+						table.insert(playerData.OwnedGamepasses, gamepassId)
+						local gamepassInfo = cachedProductInfo[gamepassId]
+						if not gamepassInfo then
+							local productInfo = MarketplaceService:GetProductInfo(gamepassId, Enum.InfoType.GamePass)
+							cachedProductInfo[gamepassId] = productInfo
+							gamepassInfo = productInfo
 						end
-						t:addBusinessEvent(p2.UserId, {
-							amount = v14.PriceInRobux,
+						t:addBusinessEvent(player.UserId, {
+							amount = gamepassInfo.PriceInRobux,
 							itemType = "Gamepass",
-							itemId = t:filterForBusinessEvent(v14.Name),
+							itemId = t:filterForBusinessEvent(gamepassInfo.Name),
 							cartType = "Website"
 						})
 					end
 				end
 			end
-			Store.PlayerCache[p2.UserId] = v12
-			Store:SavePlayerData(p2)
+			Store.PlayerCache[player.UserId] = playerData
+			Store:SavePlayerData(player)
 		end
-		local v16 = t7[p2.UserId]
-		if v16 then
-			t7[p2.UserId] = nil
-			for i, v in ipairs(v16) do
-				v.Func(unpack(v.Args))
+		local playerQueuedEvents = playerInitializationQueues[player.UserId]
+		if playerQueuedEvents then
+			playerInitializationQueues[player.UserId] = nil
+			for i, queuedEvent in ipairs(playerQueuedEvents) do
+				queuedEvent.Func(unpack(queuedEvent.Args))
 			end
-			Logger:i("Player initialization queue called #" .. #v16 .. " events")
+			Logger:i("Player initialization queue called #" .. #playerQueuedEvents .. " events")
 		end
 	end
 end
-function t.PlayerRemoved(p1, p2)
-	Store:SavePlayerData(p2)
-	local v1 = Store:GetPlayerDataFromCache(p2.UserId)
-	if v1 and v1.PlayerTeleporting then
-		Store.PlayerCache[p2.UserId] = nil
-		Store.DataStoreQueue.RemoveKey(p2.UserId)
-	elseif v1 then
-		t:endSession(p2.UserId)
+function t.PlayerRemoved(_, player)
+	Store:SavePlayerData(player)
+	local playerData = Store:GetPlayerDataFromCache(player.UserId)
+	if playerData and playerData.PlayerTeleporting then
+		Store.PlayerCache[player.UserId] = nil
+		Store.DataStoreQueue.RemoveKey(player.UserId)
+	elseif playerData then
+		t:endSession(player.UserId)
 	end
 end
-function t.isPlayerReady(p1, p2)
-	return Store:GetPlayerDataFromCache(p2) and true or false
+function t.isPlayerReady(_, userId)
+	return Store:GetPlayerDataFromCache(userId) and true or false
 end
-function t.ProcessReceiptCallback(p1, p2)
-	local v1 = t2[p2.ProductId]
-	if not v1 then
+function t.ProcessReceiptCallback(_, receiptData)
+	local productInfo = cachedProductInfo[receiptData.ProductId]
+	if not productInfo then
 		pcall(function()
-			v1 = MarketplaceService:GetProductInfo(p2.ProductId, Enum.InfoType.Product)
-			t2[p2.ProductId] = v1
+			productInfo = MarketplaceService:GetProductInfo(receiptData.ProductId, Enum.InfoType.Product)
+			cachedProductInfo[receiptData.ProductId] = productInfo
 		end)
 	end
-	if v1 then
-		t:addBusinessEvent(p2.PlayerId, {
-			amount = p2.CurrencySpent,
+	if productInfo then
+		t:addBusinessEvent(receiptData.PlayerId, {
+			amount = receiptData.CurrencySpent,
 			itemType = "DeveloperProduct",
-			itemId = t:filterForBusinessEvent(v1.Name)
+			itemId = t:filterForBusinessEvent(productInfo.Name)
 		})
 	end
 end
-function t.GamepassPurchased(p1, p2, p3, p4)
-	local v1 = t2[p3]
-	if not v1 then
-		local v2 = MarketplaceService:GetProductInfo(p3, Enum.InfoType.GamePass)
-		t2[p3] = v2
-		v1 = v2
+function t.GamepassPurchased(_, player, gamepassId, gamepassInfo)
+	local cachedInfo = cachedProductInfo[gamepassId]
+	if not cachedInfo then
+		local productInfo = MarketplaceService:GetProductInfo(gamepassId, Enum.InfoType.GamePass)
+		cachedProductInfo[gamepassId] = productInfo
+		cachedInfo = productInfo
 	end
-	local v3 = 0
-	local v4 = "GamePass"
-	if p4 then
-		v3 = p4.PriceInRobux
-		v4 = p4.Name
-	elseif v1 then
-		v3 = v1.PriceInRobux
-		v4 = v1.Name
+	local amount = 0
+	local gamepassName = "GamePass"
+	if gamepassInfo then
+		amount = gamepassInfo.PriceInRobux
+		gamepassName = gamepassInfo.Name
+	elseif cachedInfo then
+		amount = cachedInfo.PriceInRobux
+		gamepassName = cachedInfo.Name
 	end
-	t:addBusinessEvent(p2.UserId, {
-		amount = v3 or 0,
+	t:addBusinessEvent(player.UserId, {
+		amount = amount or 0,
 		itemType = "Gamepass",
-		itemId = t:filterForBusinessEvent(v4),
-		gamepassId = p3
+		itemId = t:filterForBusinessEvent(gamepassName),
+		gamepassId = gamepassId
 	})
 end
-local t8 = { "gameKey", "secretKey" }
-function t.initServer(p1, p2, p3)
+local requiredInitKeys = { "gameKey", "secretKey" }
+function t.initServer(_, gameKey, secretKey)
 	t:initialize({
-		gameKey = p2,
-		secretKey = p3
+		gameKey = gameKey,
+		secretKey = secretKey
 	})
 end
-function t.initialize(p1, p2)
+function t.initialize(_, config)
 	Threading:performTaskOnGAThread(function()
-		for i, v in ipairs(t8) do
-			if p2[v] == nil then
-				Logger:e("Initialize \'" .. v .. "\' option missing")
+		for i, requiredKey in ipairs(requiredInitKeys) do
+			if config[requiredKey] == nil then
+				Logger:e("Initialize \'" .. requiredKey .. "\' option missing")
 				return
 			end
 		end
-		if p2.enableInfoLog ~= nil and p2.enableInfoLog then
-			t:setEnabledInfoLog(p2.enableInfoLog)
+		if config.enableInfoLog ~= nil and config.enableInfoLog then
+			t:setEnabledInfoLog(config.enableInfoLog)
 		end
-		if p2.enableVerboseLog ~= nil and p2.enableVerboseLog then
-			t:setEnabledVerboseLog(p2.enableVerboseLog)
+		if config.enableVerboseLog ~= nil and config.enableVerboseLog then
+			t:setEnabledVerboseLog(config.enableVerboseLog)
 		end
-		if p2.availableCustomDimensions01 ~= nil and #p2.availableCustomDimensions01 > 0 then
-			t:configureAvailableCustomDimensions01(p2.availableCustomDimensions01)
+		if config.availableCustomDimensions01 ~= nil and #config.availableCustomDimensions01 > 0 then
+			t:configureAvailableCustomDimensions01(config.availableCustomDimensions01)
 		end
-		if p2.availableCustomDimensions02 ~= nil and #p2.availableCustomDimensions02 > 0 then
-			t:configureAvailableCustomDimensions02(p2.availableCustomDimensions02)
+		if config.availableCustomDimensions02 ~= nil and #config.availableCustomDimensions02 > 0 then
+			t:configureAvailableCustomDimensions02(config.availableCustomDimensions02)
 		end
-		if p2.availableCustomDimensions03 ~= nil and #p2.availableCustomDimensions03 > 0 then
-			t:configureAvailableCustomDimensions03(p2.availableCustomDimensions03)
+		if config.availableCustomDimensions03 ~= nil and #config.availableCustomDimensions03 > 0 then
+			t:configureAvailableCustomDimensions03(config.availableCustomDimensions03)
 		end
-		if p2.availableResourceCurrencies ~= nil and #p2.availableResourceCurrencies > 0 then
-			t:configureAvailableResourceCurrencies(p2.availableResourceCurrencies)
+		if config.availableResourceCurrencies ~= nil and #config.availableResourceCurrencies > 0 then
+			t:configureAvailableResourceCurrencies(config.availableResourceCurrencies)
 		end
-		if p2.availableResourceItemTypes ~= nil and #p2.availableResourceItemTypes > 0 then
-			t:configureAvailableResourceItemTypes(p2.availableResourceItemTypes)
+		if config.availableResourceItemTypes ~= nil and #config.availableResourceItemTypes > 0 then
+			t:configureAvailableResourceItemTypes(config.availableResourceItemTypes)
 		end
-		if p2.build ~= nil and #p2.build > 0 then
-			t:configureBuild(p2.build)
+		if config.build ~= nil and #config.build > 0 then
+			t:configureBuild(config.build)
 		end
-		if p2.availableGamepasses ~= nil and #p2.availableGamepasses > 0 then
-			t:configureAvailableGamepasses(p2.availableGamepasses)
+		if config.availableGamepasses ~= nil and #config.availableGamepasses > 0 then
+			t:configureAvailableGamepasses(config.availableGamepasses)
 		end
-		if p2.enableDebugLog ~= nil then
-			t:setEnabledDebugLog(p2.enableDebugLog)
+		if config.enableDebugLog ~= nil then
+			t:setEnabledDebugLog(config.enableDebugLog)
 		end
-		if p2.automaticSendBusinessEvents ~= nil then
-			t:setEnabledAutomaticSendBusinessEvents(p2.automaticSendBusinessEvents)
+		if config.automaticSendBusinessEvents ~= nil then
+			t:setEnabledAutomaticSendBusinessEvents(config.automaticSendBusinessEvents)
 		end
-		if p2.reportErrors ~= nil then
-			t:setEnabledReportErrors(p2.reportErrors)
+		if config.reportErrors ~= nil then
+			t:setEnabledReportErrors(config.reportErrors)
 		end
-		if p2.useCustomUserId ~= nil then
-			t:setEnabledCustomUserId(p2.useCustomUserId)
+		if config.useCustomUserId ~= nil then
+			t:setEnabledCustomUserId(config.useCustomUserId)
 		end
 		if isSdkReady({
 			needsInitialized = true,
@@ -616,26 +616,26 @@ function t.initialize(p1, p2)
 			Logger:w("SDK already initialized. Can only be called once.")
 			return
 		end
-		local gameKey = p2.gameKey
-		local secretKey = p2.secretKey
+		local gameKey = config.gameKey
+		local secretKey = config.secretKey
 		if Validation:validateKeys(gameKey, secretKey) then
 			Events.GameKey = gameKey
 			Events.SecretKey = secretKey
 			State.Initialized = true
-			Players.PlayerAdded:Connect(function(p1)
-				t:PlayerJoined(p1)
+			Players.PlayerAdded:Connect(function(joinedPlayer)
+				t:PlayerJoined(joinedPlayer)
 			end)
-			Players.PlayerRemoving:Connect(function(p1)
-				t:PlayerRemoved(p1)
+			Players.PlayerRemoving:Connect(function(leavingPlayer)
+				t:PlayerRemoved(leavingPlayer)
 			end)
-			for i, v in ipairs(Players:GetPlayers()) do
-				coroutine.wrap(t.PlayerJoined)(t, v)
+			for i, joinedPlayer in ipairs(Players:GetPlayers()) do
+				coroutine.wrap(t.PlayerJoined)(t, joinedPlayer)
 			end
-			for i, v in ipairs(t6) do
-				task.spawn(v.Func, unpack(v.Args))
+			for i, queuedEvent in ipairs(initializationQueue) do
+				task.spawn(queuedEvent.Func, unpack(queuedEvent.Args))
 			end
-			Logger:i("Server initialization queue called #" .. #t6 .. " events")
-			t6 = nil
+			Logger:i("Server initialization queue called #" .. #initializationQueue .. " events")
+			initializationQueue = nil
 			Events:processEventQueue()
 		else
 			Logger:w("SDK failed initialize. Game key or secret key is invalid. Can only contain characters A-z 0-9, gameKey is 32 length, secretKey is 40 length. Failed keys - gameKey: " .. gameKey .. ", secretKey: " .. secretKey)
@@ -653,65 +653,65 @@ if not ReplicatedStorage:FindFirstChild("OnPlayerReadyEvent") then
 	OnPlayerReadyEvent.Parent = ReplicatedStorage
 end
 task.spawn(function()
-	t3 = Store:GetErrorDataStore((math.floor(os.time() / 3600)))
+	errorDataStore = Store:GetErrorDataStore((math.floor(os.time() / 3600)))
 	while task.wait(3600) do
-		t3 = Store:GetErrorDataStore((math.floor(os.time() / 3600)))
-		t4 = {}
-		t5 = {}
+		errorDataStore = Store:GetErrorDataStore((math.floor(os.time() / 3600)))
+		errorCounts = {}
+		errorCountsChanged = {}
 	end
 end)
 task.spawn(function()
 	while task.wait(Store.AutoSaveData) do
-		for k, v in pairs(t5) do
-			local v1 = t4[v]
-			t4[v].countInDS = Store:IncrementErrorCount(t3, v, v1.currentCount - v1.countInDS)
-			t4[v].currentCount = t4[v].countInDS
+		for errorKey, errorSignature in pairs(errorCountsChanged) do
+			local errorCount = errorCounts[errorSignature]
+			errorCounts[errorSignature].countInDS = Store:IncrementErrorCount(errorDataStore, errorSignature, errorCount.currentCount - errorCount.countInDS)
+			errorCounts[errorSignature].currentCount = errorCounts[errorSignature].countInDS
 		end
 	end
 end)
-local function ErrorHandler(p1, p2, p3, p4)
-	local v4 = if p3 == nil then "(null)" else p3 .. ": message=" .. if p1 == nil then "(null)" else p1 .. ", trace=" .. if p2 == nil then "(null)" else p2
-	if #v4 > 8192 then
-		v4 = string.sub(v4, 1, 8192)
+local function ErrorHandler(message, traceback, scriptName, player)
+	local fullErrorMessage = if scriptName == nil then "(null)" else scriptName .. ": message=" .. if message == nil then "(null)" else message .. ", trace=" .. if traceback == nil then "(null)" else traceback
+	if #fullErrorMessage > 8192 then
+		fullErrorMessage = string.sub(fullErrorMessage, 1, 8192)
 	end
-	local v6
-	if p4 then
-		v6 = p4.UserId
-		v4 = v4:gsub(p4.Name, "[LocalPlayer]")
+	local userId
+	if player then
+		userId = player.UserId
+		fullErrorMessage = fullErrorMessage:gsub(player.Name, "[LocalPlayer]")
 	else
-		v6 = nil
+		userId = nil
 	end
-	local v8 = if #v4 > 50 then string.sub(v4, 1, 50) else v4
-	if t4[v8] == nil then
-		t5[#t5 + 1] = v8
-		t4[v8] = {}
-		t4[v8].countInDS = 0
-		t4[v8].currentCount = 0
+	local errorSignature = if #fullErrorMessage > 50 then string.sub(fullErrorMessage, 1, 50) else fullErrorMessage
+	if errorCounts[errorSignature] == nil then
+		errorCountsChanged[#errorCountsChanged + 1] = errorSignature
+		errorCounts[errorSignature] = {}
+		errorCounts[errorSignature].countInDS = 0
+		errorCounts[errorSignature].currentCount = 0
 	end
-	if not (t4[v8].currentCount > 10) then
-		t:addErrorEvent(v6, {
+	if not (errorCounts[errorSignature].currentCount > 10) then
+		t:addErrorEvent(userId, {
 			severity = t.EGAErrorSeverity.error,
-			message = v4
+			message = fullErrorMessage
 		})
-		t4[v8].currentCount = t4[v8].currentCount + 1
+		errorCounts[errorSignature].currentCount = errorCounts[errorSignature].currentCount + 1
 	end
 end
-local function ErrorHandlerFromServer(p1, p2, p3)
+local function ErrorHandlerFromServer(message, traceback, scriptInstance)
 	if State.ReportErrors then
-		if p3 then
-			local v1 = nil
-			local v2, _ = pcall(function()
-				v1 = p3:GetFullName()
+		if scriptInstance then
+			local scriptName = nil
+			local success, _ = pcall(function()
+				scriptName = scriptInstance:GetFullName()
 			end)
-			if v2 then
-				return ErrorHandler(p1, p2, v1)
+			if success then
+				return ErrorHandler(message, traceback, scriptName)
 			end
 		end
 	end
 end
-local function ErrorHandlerFromClient(p1, p2, p3, p4)
+local function ErrorHandlerFromClient(message, traceback, scriptName, player)
 	if State.ReportErrors then
-		return ErrorHandler(p1, p2, p3, p4)
+		return ErrorHandler(message, traceback, scriptName, player)
 	end
 end
 ScriptContext.Error:Connect(ErrorHandlerFromServer)
@@ -720,14 +720,14 @@ if not ReplicatedStorage:FindFirstChild("GameAnalyticsError") then
 	GameAnalyticsError.Name = "GameAnalyticsError"
 	GameAnalyticsError.Parent = ReplicatedStorage
 end
-ReplicatedStorage.GameAnalyticsError.OnServerEvent:Connect(function(p1, p2, p3, p4)
+ReplicatedStorage.GameAnalyticsError.OnServerEvent:Connect(function(player, message, traceback, scriptName)
 	if State.ReportErrors then
-		ErrorHandler(p2, p3, p4, p1)
+		ErrorHandler(message, traceback, scriptName, player)
 	end
 end)
-MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(p1, p2, p3)
-	if State.AutomaticSendBusinessEvents and p3 then
-		t:GamepassPurchased(p1, p2)
+MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, gamepassId, purchased)
+	if State.AutomaticSendBusinessEvents and purchased then
+		t:GamepassPurchased(player, gamepassId)
 	end
 end)
 return t

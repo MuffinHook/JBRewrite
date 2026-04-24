@@ -17,17 +17,17 @@ function t.new()
 	return t2
 end
 function t.Run(p1)
-	local v1 = Timeline.new(p1.Seqs)
+	local instance = Timeline.new(p1.Seqs)
 	if not p1.BornAt then
 		p1.BornAt = workspace:GetServerTimeNow()
 	end
 	local v2 = 0
 	p1.Maid:GiveTask(RunService.Heartbeat:Connect(function()
-		local v12 = workspace:GetServerTimeNow()
-		if v12 - v2 > 0.5 then
-			v2 = v12
-			if v1:Update(p1.Speed * (v12 - p1.BornAt)) then
-				v1 = nil
+		local var12 = workspace:GetServerTimeNow()
+		if var12 - v2 > 0.5 then
+			v2 = var12
+			if instance:Update(p1.Speed * (var12 - p1.BornAt)) then
+				instance = nil
 				p1:Destroy()
 			end
 		end
@@ -65,9 +65,9 @@ function t.LoadData(p1, p2)
 				if p1.MapEventSignal[v3] ~= nil then
 					error(("There already exists an event named: %s"):format(v3))
 				end
-				local v32 = Signal.new()
-				p1.MapEventSignal[v3] = v32
-				p1.Maid:GiveTask(v32)
+				local instance32 = Signal.new()
+				p1.MapEventSignal[v3] = instance32
+				p1.Maid:GiveTask(instance32)
 				table.insert(p1.ListEventUnconnected, v3)
 			end
 		end

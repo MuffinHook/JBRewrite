@@ -8,58 +8,58 @@ local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
 function t.new(p1)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
-	local v3 = 0
-	local v4 = nil
+	local instance = BaseObject.new(p1)
+	setmetatable(instance, t)
+	local var3 = 0
+	local var4 = nil
 	local function update()
-		local v12 = v3 + 1
-		v3 = v12
-		if v4 then
-			task.cancel(v4)
-			v4 = nil
+		local var12 = var3 + 1
+		var3 = var12
+		if var4 then
+			task.cancel(var4)
+			var4 = nil
 		end
-		v4 = task.delay(0.1, function()
-			if v12 == v3 then
+		var4 = task.delay(0.1, function()
+			if var12 == var3 then
 				StreamingHelperUtils.yieldForAllValuesPopulated(p1)
-				if v12 == v3 then
-					v1.packet = TableUtils.createTableFromObjectValues(p1)
+				if var12 == var3 then
+					instance.packet = TableUtils.createTableFromObjectValues(p1)
 				end
 			end
 		end)
 	end
-	v1.maid:GiveTask(p1.DescendantAdded:Connect(function(p12)
+	instance.maid:GiveTask(p1.DescendantAdded:Connect(function(p12)
 		if p12:IsA("ValueBase") then
-			local v12 = v3 + 1
-			v3 = v12
-			if v4 then
-				task.cancel(v4)
-				v4 = nil
+			local var12 = var3 + 1
+			var3 = var12
+			if var4 then
+				task.cancel(var4)
+				var4 = nil
 			end
-			v4 = task.delay(0.1, function()
-				if v12 == v3 then
+			var4 = task.delay(0.1, function()
+				if var12 == var3 then
 					StreamingHelperUtils.yieldForAllValuesPopulated(p1)
-					if v12 == v3 then
-						v1.packet = TableUtils.createTableFromObjectValues(p1)
+					if var12 == var3 then
+						instance.packet = TableUtils.createTableFromObjectValues(p1)
 					end
 				end
 			end)
 		end
 	end))
-	local v5 = v3 + 1
-	v3 = v5
-	if v4 then
-		task.cancel(v4)
-		v4 = nil
+	local var5 = var3 + 1
+	var3 = var5
+	if var4 then
+		task.cancel(var4)
+		var4 = nil
 	end
-	v4 = task.delay(0.1, function()
-		if v5 == v3 then
+	var4 = task.delay(0.1, function()
+		if var5 == var3 then
 			StreamingHelperUtils.yieldForAllValuesPopulated(p1)
-			if v5 == v3 then
-				v1.packet = TableUtils.createTableFromObjectValues(p1)
+			if var5 == var3 then
+				instance.packet = TableUtils.createTableFromObjectValues(p1)
 			end
 		end
 	end)
-	return v1
+	return instance
 end
 return Binder.new("VehicleState", t)

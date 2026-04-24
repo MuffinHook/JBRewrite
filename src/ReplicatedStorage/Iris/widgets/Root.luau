@@ -1,7 +1,7 @@
 -- Reviewed by Claude
 require(script.Parent.Parent.Types)
 return function(p1, p2)
-	local v1 = 0
+	local delta = 0
 	p1.WidgetConstructor("Root", {
 		hasState = false,
 		hasChildren = true,
@@ -87,33 +87,33 @@ return function(p1, p2)
 			return Iris_Root
 		end,
 		Update = function(p1)
-			if v1 > 0 then
+			if delta > 0 then
 				p1.Instance.PseudoWindowScreenGui.PseudoWindow.Visible = true
 			end
 		end,
 		Discard = function(p1)
-			v1 = 0
+			delta = 0
 			p1.Instance:Destroy()
 		end,
 		ChildAdded = function(p1, p2)
-			local v12 = p1.Instance
+			local instance12 = p1.Instance
 			if p2.type == "Window" then
 				return p1.Instance
 			elseif p2.type == "Tooltip" then
-				return v12.PopupScreenGui.TooltipContainer
+				return instance12.PopupScreenGui.TooltipContainer
 			elseif p2.type == "MenuBar" then
-				return v12.PopupScreenGui.MenuBarContainer
+				return instance12.PopupScreenGui.MenuBarContainer
 			else
-				local PseudoWindow = v12.PseudoWindowScreenGui.PseudoWindow
-				v1 = v1 + 1
+				local PseudoWindow = instance12.PseudoWindowScreenGui.PseudoWindow
+				delta = delta + 1
 				PseudoWindow.Visible = true
 				return PseudoWindow
 			end
 		end,
 		ChildDiscarded = function(p1, p2)
 			if p2.type ~= "Window" and (p2.type ~= "Tooltip" and p2.type ~= "MenuBar") then
-				v1 = v1 - 1
-				if v1 == 0 then
+				delta = delta - 1
+				if delta == 0 then
 					p1.Instance.PseudoWindowScreenGui.PseudoWindow.Visible = false
 				end
 			end

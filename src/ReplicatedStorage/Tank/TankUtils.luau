@@ -7,14 +7,14 @@ function t.getGunner(p1)
 		if v2.Name == "Seat" or v2.Name == "Passenger" then
 			local ControlGunPriority = v2:FindFirstChild("ControlGunPriority")
 			if ControlGunPriority and ControlGunPriority:IsA("IntValue") then
-				local v3 = ControlGunPriority.Value
+				local var3 = ControlGunPriority.Value
 				local PlayerName = v2:FindFirstChild("PlayerName")
 				if PlayerName then
-					local v4 = Players:FindFirstChild(PlayerName.Value)
-					if v4 then
+					local localPlayer = Players:FindFirstChild(PlayerName.Value)
+					if localPlayer then
 						table.insert(t2, {
-							player = v4,
-							priority = v3
+							player = localPlayer,
+							priority = var3
 						})
 					end
 				end
@@ -35,9 +35,9 @@ function t.getDriver(p1)
 		if v2.Name == "Seat" then
 			local PlayerName = v2:FindFirstChild("PlayerName")
 			if PlayerName then
-				local v3 = Players:FindFirstChild(PlayerName.Value)
-				if v3 then
-					return v3
+				local var3 = Players:FindFirstChild(PlayerName.Value)
+				if var3 then
+					return var3
 				end
 			end
 		end

@@ -20,12 +20,12 @@ function t.new(p1)
 	return t2
 end
 function t.Update(p1)
-	local v1 = (os.clock() - p1.BornAt) / p1.Duration
-	if v1 >= 1 and p1.IsCompleted == false then
+	local progress = (os.clock() - p1.BornAt) / p1.Duration
+	if progress >= 1 and p1.IsCompleted == false then
 		p1.IsCompleted = true
 		p1.OnCompleted:Fire()
 	end
-	return math.clamp(v1, 0, 1)
+	return math.clamp(progress, 0, 1)
 end
 function t.Destroy(p1)
 	if p1.Maid ~= nil then

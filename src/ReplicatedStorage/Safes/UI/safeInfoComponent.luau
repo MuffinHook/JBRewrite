@@ -18,9 +18,9 @@ return function(p1)
 	local count = 0
 	for i = 1, v1 do
 		local v2 = RewardSpinnerConsts.RARITIES[i]
-		local v3 = 1.6 / v1
-		local v4 = p1.RarityProbabilities[v2.id]
-		if v4 then
+		local var3 = 1.6 / v1
+		local var4 = p1.RarityProbabilities[v2.id]
+		if var4 then
 			count = count + 1
 			t[count] = createElement("Frame", {
 				BackgroundTransparency = 1,
@@ -31,9 +31,9 @@ return function(p1)
 			}, {
 				Number = createElement("TextLabel", {
 					BackgroundTransparency = 1,
-					Size = UDim2.new(v3, 0, 1, 0),
+					Size = UDim2.new(var3, 0, 1, 0),
 					Position = UDim2.new(0, 0, 0, 0),
-					Text = tostring(v4) .. "%",
+					Text = tostring(var4) .. "%",
 					TextXAlignment = Enum.TextXAlignment.Right,
 					Font = Enum.Font.Bangers,
 					LineHeight = 1,
@@ -42,8 +42,8 @@ return function(p1)
 				}),
 				Text = createElement("TextLabel", {
 					BackgroundTransparency = 1,
-					Size = UDim2.new(1 - v3, 0, 1, 0),
-					Position = UDim2.new(v3 + 1 / verticalPaddingRatio / aspectRatio, 0, 0, 0),
+					Size = UDim2.new(1 - var3, 0, 1, 0),
+					Position = UDim2.new(var3 + 1 / verticalPaddingRatio / aspectRatio, 0, 0, 0),
 					Text = v2.name,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					Font = Enum.Font.Bangers,

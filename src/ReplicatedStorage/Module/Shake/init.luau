@@ -1,26 +1,26 @@
 -- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Trove = require(script.Trove)
-local v1 = Random.new()
-local v2 = 0
+local instance = Random.new()
+local table2 = 0
 local t = {}
 t.__index = t
 function t.new()
-	local v2 = setmetatable({}, t)
-	v2.Amplitude = 1
-	v2.Frequency = 1
-	v2.FadeInTime = 1
-	v2.FadeOutTime = 1
-	v2.SustainTime = 0
-	v2.Sustain = false
-	v2.PositionInfluence = Vector3.new(1, 1, 1)
-	v2.RotationInfluence = Vector3.new(1, 1, 1)
-	v2.TimeFunction = if RunService:IsRunning() then time else os.clock
-	v2._timeOffset = v1:NextNumber(-1000000000, 1000000000)
-	v2._startTime = 0
-	v2._trove = Trove.new()
-	v2._running = false
-	return v2
+	local table2 = setmetatable({}, t)
+	table2.Amplitude = 1
+	table2.Frequency = 1
+	table2.FadeInTime = 1
+	table2.FadeOutTime = 1
+	table2.SustainTime = 0
+	table2.Sustain = false
+	table2.PositionInfluence = Vector3.new(1, 1, 1)
+	table2.RotationInfluence = Vector3.new(1, 1, 1)
+	table2.TimeFunction = if RunService:IsRunning() then time else os.clock
+	table2._timeOffset = instance:NextNumber(-1000000000, 1000000000)
+	table2._startTime = 0
+	table2._trove = Trove.new()
+	table2._running = false
+	return table2
 end
 function t.InverseSquare(p1, p2)
 	if p2 < 1 then
@@ -29,8 +29,8 @@ function t.InverseSquare(p1, p2)
 	return p1 * (1 / (p2 * p2))
 end
 function t.NextRenderName()
-	v2 = v2 + 1
-	return ("__shake_%.4i__"):format(v2)
+	table2 = table2 + 1
+	return ("__shake_%.4i__"):format(table2)
 end
 function t.Start(p1)
 	p1._startTime = p1.TimeFunction()
@@ -46,35 +46,35 @@ function t.IsShaking(p1)
 	return p1._running
 end
 function t.StopSustain(p1)
-	local v1 = p1.TimeFunction()
+	local instance = p1.TimeFunction()
 	p1.Sustain = false
-	p1.SustainTime = v1 - p1._startTime - p1.FadeInTime
+	p1.SustainTime = instance - p1._startTime - p1.FadeInTime
 end
 function t.Update(p1)
-	local v1 = false
-	local v2 = p1.TimeFunction()
-	local v3 = v2 - p1._startTime
-	local v4 = (v2 + p1._timeOffset) / p1.Frequency % 1000000
-	local v5 = 1
-	local v6 = if v3 < p1.FadeInTime then v3 / p1.FadeInTime else 1
-	if not p1.Sustain and p1.FadeInTime + p1.SustainTime < v3 then
+	local instance = false
+	local table2 = p1.TimeFunction()
+	local var3 = table2 - p1._startTime
+	local var4 = (table2 + p1._timeOffset) / p1.Frequency % 1000000
+	local var5 = 1
+	local var6 = if var3 < p1.FadeInTime then var3 / p1.FadeInTime else 1
+	if not p1.Sustain and p1.FadeInTime + p1.SustainTime < var3 then
 		if p1.FadeOutTime == 0 then
-			v1 = true
+			instance = true
 		else
-			v5 = 1 - (v3 - p1.FadeInTime - p1.SustainTime) / p1.FadeOutTime
-			if not p1.Sustain and p1.FadeInTime + p1.SustainTime + p1.FadeOutTime <= v3 then
-				v1 = true
+			var5 = 1 - (var3 - p1.FadeInTime - p1.SustainTime) / p1.FadeOutTime
+			if not p1.Sustain and p1.FadeInTime + p1.SustainTime + p1.FadeOutTime <= var3 then
+				instance = true
 			end
 		end
 	end
-	local v7 = math.noise(v4, 0) / 2
-	local v8 = math.noise(0, v4) / 2
-	local v9 = math.noise(v4, v4) / 2
-	local v10 = Vector3.new(v7, v8, v9) * p1.Amplitude * math.min(v6, v5)
-	if v1 then
+	local var7 = math.noise(var4, 0) / 2
+	local var8 = math.noise(0, var4) / 2
+	local var9 = math.noise(var4, var4) / 2
+	local vector10 = Vector3.new(var7, var8, var9) * p1.Amplitude * math.min(var6, var5)
+	if instance then
 		p1:Stop()
 	end
-	return p1.PositionInfluence * v10, p1.RotationInfluence * v10, v1
+	return p1.PositionInfluence * vector10, p1.RotationInfluence * vector10, instance
 end
 function t.OnSignal(p1, p2, p3)
 	return p1._trove:Connect(p2, function()
@@ -87,8 +87,8 @@ function t.BindToRenderStep(p1, p2, p3, p4)
 	end)
 end
 function t.Clone(p1)
-	local v1 = t.new()
-	for v2, v3 in {
+	local instance = t.new()
+	for table2, var3 in {
 		"Amplitude",
 		"Frequency",
 		"FadeInTime",
@@ -99,9 +99,9 @@ function t.Clone(p1)
 		"RotationInfluence",
 		"TimeFunction"
 	} do
-		v1[v3] = p1[v3]
+		instance[var3] = p1[var3]
 	end
-	return v1
+	return instance
 end
 function t.Destroy(p1)
 	p1:Stop()
