@@ -1,13 +1,13 @@
 -- Reviewed by Claude
 return function(...)
-	local t = {}
+	local tbl = {}
 	for i = 1, select("#", ...) do
- local v1 = select(i, ...)
- if v1 ~= nil then
- for k, v in pairs(v1) do
- t[k] = v
+ local vararg = select(i, ...)
+ if vararg ~= nil then
+ for k, v in pairs(vararg) do
+ tbl[k] = v
  end
  end
 	end
-	return t
+	return tbl
 end

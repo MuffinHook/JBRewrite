@@ -15,7 +15,7 @@ local t = {
 	onRollBegan = Signal.new(),
 	onRollEnded = Signal.new()
 }
-local v1 = RateLimiter.new(10, 10)
+local rollRateLimiter = RateLimiter.new(10, 10)
 function t.attemptRoll()
 	local LocalPlayer = Players.LocalPlayer
 	local PrimaryPart = LocalPlayer.Character.PrimaryPart
@@ -23,15 +23,15 @@ function t.attemptRoll()
 	if Humanoid.Sit or Humanoid.PlatformStand or (Humanoid.WalkSpeed < 4 or (Falling.IsRagdolling() or (Falling.IsSkydiving() or CharacterUtil.IsCrawling))) then
 		return
 	end
-	local v12 = RaycastParams.new()
-	v12.FilterDescendantsInstances = { LocalPlayer.Character }
-	if Raycast.collidable(PrimaryPart.Position, Vector3.new(-0, -1, -0), 32, v12) and t.mapLastRollTime[LocalPlayer] == nil then
+	local raycastParams = RaycastParams.new()
+	raycastParams.FilterDescendantsInstances = { LocalPlayer.Character }
+	if Raycast.collidable(PrimaryPart.Position, Vector3.new(-0, -1, -0), 32, raycastParams) and t.mapLastRollTime[LocalPlayer] == nil then
 		local MoveDirection = Humanoid.MoveDirection
-		if v1:UseBudget(LocalPlayer.UserId, 1) then
+		if rollRateLimiter:UseBudget(LocalPlayer.UserId, 1) then
 			if MoveDirection.Magnitude < 0.25 then
 				MoveDirection = PrimaryPart.CFrame.LookVector
 			end
-			local v2 = Maid.new()
+			local rollMaid = Maid.new()
 			local LinearVelocity = Instance.new("LinearVelocity")
 			LinearVelocity.Attachment0 = PrimaryPart:FindFirstChild("RootAttachment")
 			LinearVelocity.VelocityConstraintMode = Enum.VelocityConstraintMode.Plane
@@ -39,7 +39,7 @@ function t.attemptRoll()
 			LinearVelocity.SecondaryTangentAxis = Vector3.new(0, 0, 1)
 			LinearVelocity.MaxForce = PrimaryPart.AssemblyMass * 500
 			LinearVelocity.Parent = PrimaryPart
-			v2:GiveTask(LinearVelocity)
+			rollMaid:GiveTask(LinearVelocity)
 			local ImpulseAttachment = Instance.new("Attachment")
 			ImpulseAttachment.Name = "ImpulseAttachment"
 			ImpulseAttachment.Parent = PrimaryPart
@@ -50,36 +50,36 @@ function t.attemptRoll()
 			ImpulseAlignOrientation.RigidityEnabled = true
 			ImpulseAlignOrientation.CFrame = ImpulseAttachment.WorldCFrame
 			ImpulseAlignOrientation.Parent = PrimaryPart
-			v2:GiveTask(function()
+			rollMaid:GiveTask(function()
 				task.delay(0.1, function()
 					ImpulseAlignOrientation:Destroy()
 				end)
 			end)
-			v2:GiveTask(ImpulseAttachment)
+			rollMaid:GiveTask(ImpulseAttachment)
 			Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-			v2:GiveTask(function()
+			rollMaid:GiveTask(function()
 				if Humanoid:GetState() == Enum.HumanoidStateType.Physics and Humanoid:GetStateEnabled(Enum.HumanoidStateType.Running) then
 					Humanoid:ChangeState(Enum.HumanoidStateType.Running)
 				end
 			end)
 			if UserGameSettings.RotationType == Enum.RotationType.CameraRelative then
 				UserGameSettings.RotationType = Enum.RotationType.MovementRelative
-				v2:GiveTask(function()
+				rollMaid:GiveTask(function()
 					UserGameSettings.RotationType = Enum.RotationType.CameraRelative
 				end)
 			end
-			v2:GiveTask(RunService.Heartbeat:Connect(function()
-				local v1 = (MoveDirection * Vector3.new(1, 0, 1)).Unit * 70
-				LinearVelocity.PlaneVelocity = Vector2.new(v1.X, v1.Z)
+			rollMaid:GiveTask(RunService.Heartbeat:Connect(function()
+				local rollVelocity = (MoveDirection * Vector3.new(1, 0, 1)).Unit * 70
+				LinearVelocity.PlaneVelocity = Vector2.new(rollVelocity.X, rollVelocity.Z)
 			end))
 			t.onRollBegan:Fire(LocalPlayer, 0.3)
 			t.mapPlayerRolling[LocalPlayer] = true
-			v2:GiveTask(function()
+			rollMaid:GiveTask(function()
 				t.mapPlayerRolling[LocalPlayer] = nil
 				t.onRollEnded:Fire(LocalPlayer)
 			end)
-			v2:GiveTask(task.delay(0.3, function()
-				task.defer(v2.Destroy, v2)
+			rollMaid:GiveTask(task.delay(0.3, function()
+				task.defer(rollMaid.Destroy, rollMaid)
 			end))
 			t.mapLastRollTime[LocalPlayer] = os.clock()
 			task.delay(1, function()

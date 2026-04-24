@@ -7,12 +7,12 @@ local SeekingMissileBinder = require(ReplicatedStorage.SeekingMissile.SeekingMis
 local SeekingMissileConsts = require(ReplicatedStorage.SeekingMissile.SeekingMissileConsts)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local Binder = require(ReplicatedStorage.Std.Binder)
-local t = {}
-t.__index = t
-setmetatable(t, BaseObject)
-function t.new(p1)
+local tbl = {}
+tbl.__index = tbl
+setmetatable(tbl, BaseObject)
+function tbl.new(p1)
 	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
+	setmetatable(v1, tbl)
 	assert(CollectionService:HasTag(v1.obj, SeekingMissileConsts.TAG_NAME), "Must be seeking missile")
 	SeekingMissileBinder:Promise(v1.obj):andThen(function(p1)
  p1.onExploded:Connect(function(p1)
@@ -21,4 +21,4 @@ function t.new(p1)
 	end)
 	return v1
 end
-return Binder.new(RocketLauncherConsts.ROCKET_TAG_NAME, t)
+return Binder.new(RocketLauncherConsts.ROCKET_TAG_NAME, tbl)

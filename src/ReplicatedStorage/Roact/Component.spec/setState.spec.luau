@@ -11,7 +11,7 @@ return function()
 		it("should not trigger an extra update when called in init", function()
 			local v12 = 0
 			local v2 = 0
-			local v3 = nil
+			local fn = nil
 			local v4 = Component:extend("InitComponent")
 			function v4.init(p1)
 				p1:setState({
@@ -23,13 +23,13 @@ return function()
 			end
 			function v4.render(p1)
 				v12 = v12 + 1
-				v3 = p1.state
+				fn = p1.state
 				return nil
 			end
 			v1.mountVirtualTree((createElement(v4)))
 			expect(v12).to.equal(1)
 			expect(v2).to.equal(0)
-			expect(v3.a).to.equal(1)
+			expect(fn.a).to.equal(1)
 		end)
 		it("should throw when called in render", function()
 			local v12 = Component:extend("TestComponent")
@@ -38,8 +38,8 @@ return function()
 					a = 1
 				})
 			end
-			local v3, v4 = pcall(v1.mountVirtualTree, (createElement(v12)))
-			expect(v3).to.equal(false)
+			local fn, v4 = pcall(v1.mountVirtualTree, (createElement(v12)))
+			expect(fn).to.equal(false)
 			expect(v4:match("render")).to.be.ok()
 			expect(v4:match("TestComponent")).to.be.ok()
 		end)
@@ -54,8 +54,8 @@ return function()
 				})
 			end
 			local v2 = createElement(v12)
-			local v3 = createElement(v12)
-			local v5, v6 = pcall(v1.updateVirtualTree, v1.mountVirtualTree(v2), v3)
+			local fn = createElement(v12)
+			local v5, v6 = pcall(v1.updateVirtualTree, v1.mountVirtualTree(v2), fn)
 			expect(v5).to.equal(false)
 			expect(v6:match("shouldUpdate")).to.be.ok()
 			expect(v6:match("TestComponent")).to.be.ok()
@@ -71,8 +71,8 @@ return function()
 				})
 			end
 			local v2 = createElement(v12)
-			local v3 = createElement(v12)
-			local v5, v6 = pcall(v1.updateVirtualTree, v1.mountVirtualTree(v2), v3)
+			local fn = createElement(v12)
+			local v5, v6 = pcall(v1.updateVirtualTree, v1.mountVirtualTree(v2), fn)
 			expect(v5).to.equal(false)
 			expect(v6:match("willUpdate")).to.be.ok()
 			expect(v6:match("TestComponent")).to.be.ok()
@@ -93,12 +93,12 @@ return function()
 		it("should remove values from state when the value is None", function()
 			local v12 = Component:extend("TestComponent")
 			local v2 = nil
-			local v3 = nil
+			local fn = nil
 			function v12.init(p1)
 				v2 = function(p12)
 					p1:setState(p12)
 				end
-				v3 = function()
+				fn = function()
 					return p1.state
 				end
 				p1:setState({
@@ -109,23 +109,23 @@ return function()
 				return nil
 			end
 			local v5 = v1.mountVirtualNode(createElement(v12), nil, "Test")
-			expect(v3().value).to.equal(0)
+			expect(fn().value).to.equal(0)
 			v2({
 				value = None
 			})
-			expect(v3().value).to.equal(nil)
+			expect(fn().value).to.equal(nil)
 			v1.unmountVirtualNode(v5)
 		end)
 		it("should invoke functions to compute a partial state", function()
 			local v12 = Component:extend("TestComponent")
 			local v2 = nil
-			local v3 = nil
+			local fn = nil
 			local v4 = nil
 			function v12.init(p1)
 				v2 = function(p12)
 					p1:setState(p12)
 				end
-				v3 = function()
+				fn = function()
 					return p1.state
 				end
 				v4 = function()
@@ -139,21 +139,21 @@ return function()
 				return nil
 			end
 			local v6 = v1.mountVirtualNode(createElement(v12), nil, "Test")
-			expect(v3().value).to.equal(0)
+			expect(fn().value).to.equal(0)
 			v2(function(p1, p2)
-				expect(p1).to.equal(v3())
+				expect(p1).to.equal(fn())
 				expect(p2).to.equal(v4())
 				return {
 					value = p1.value + 1
 				}
 			end)
-			expect(v3().value).to.equal(1)
+			expect(fn().value).to.equal(1)
 			v1.unmountVirtualNode(v6)
 		end)
 		it("should cancel rendering if the function returns nil", function()
 			local v12 = Component:extend("TestComponent")
 			local v2 = nil
-			local v3 = 0
+			local fn = 0
 			function v12.init(p1)
 				v2 = function(p12)
 					p1:setState(p12)
@@ -163,15 +163,15 @@ return function()
 				})
 			end
 			function v12.render(p1)
-				v3 = v3 + 1
+				fn = fn + 1
 				return nil
 			end
 			local v5 = v1.mountVirtualNode(createElement(v12), nil, "Test")
-			expect(v3).to.equal(1)
+			expect(fn).to.equal(1)
 			v2(function(p1, p2)
 				return nil
 			end)
-			expect(v3).to.equal(1)
+			expect(fn).to.equal(1)
 			v1.unmountVirtualNode(v5)
 		end)
 	end)
@@ -185,13 +185,13 @@ return function()
 			function v12.didMount(p1)
 				p1.props.callback()
 			end
-			local v3 = Component:extend("Parent")
-			function v3.init(p1)
+			local fn = Component:extend("Parent")
+			function fn.init(p1)
 				v2 = function()
 					return p1.state
 				end
 			end
-			function v3.render(p1)
+			function fn.render(p1)
 				return createElement(v12, {
 					callback = function()
 						p1:setState({
@@ -200,7 +200,7 @@ return function()
 					end
 				})
 			end
-			expect((v1.mountVirtualNode(createElement(v3), nil, "Test"))).to.be.ok()
+			expect((v1.mountVirtualNode(createElement(fn), nil, "Test"))).to.be.ok()
 			expect(v2().foo).to.equal("bar")
 		end)
 		it("should defer setState triggered while reconciling during an update", function()
@@ -212,13 +212,13 @@ return function()
 			function v12.didUpdate(p1)
 				p1.props.callback()
 			end
-			local v3 = Component:extend("Parent")
-			function v3.init(p1)
+			local fn = Component:extend("Parent")
+			function fn.init(p1)
 				v2 = function()
 					return p1.state
 				end
 			end
-			function v3.render(p1)
+			function fn.render(p1)
 				return createElement(v12, {
 					callback = function()
 						if not p1.state.foo then
@@ -229,10 +229,10 @@ return function()
 					end
 				})
 			end
-			local v5 = v1.mountVirtualNode(createElement(v3), nil, "Test")
+			local v5 = v1.mountVirtualNode(createElement(fn), nil, "Test")
 			expect(v5).to.be.ok()
 			expect(v2().foo).to.equal(nil)
-			local v6 = v1.updateVirtualNode(v5, createElement(v3))
+			local v6 = v1.updateVirtualNode(v5, createElement(fn))
 			expect(v6).to.be.ok()
 			expect(v2().foo).to.equal("bar")
 			v1.unmountVirtualNode(v6)
@@ -247,13 +247,13 @@ return function()
 				p1.props.callback("foo", 1)
 				p1.props.callback("bar", 3)
 			end
-			local v3 = Component:extend("Parent")
-			function v3.init(p1)
+			local fn = Component:extend("Parent")
+			function fn.init(p1)
 				v2 = function()
 					return p1.state
 				end
 			end
-			function v3.render(p1)
+			function fn.render(p1)
 				return createElement(v12, {
 					callback = function(p12, p2)
 						p1:setState({
@@ -262,7 +262,7 @@ return function()
 					end
 				})
 			end
-			local v5 = v1.mountVirtualNode(createElement(v3), nil, "Test")
+			local v5 = v1.mountVirtualNode(createElement(fn), nil, "Test")
 			expect(v5).to.be.ok()
 			expect(v2().foo).to.equal(1)
 			expect(v2().bar).to.equal(3)
@@ -277,7 +277,7 @@ return function()
 				p1.props.callback()
 			end
 			local v2 = Component:extend("Parent")
-			local v3 = createSpy(function(p1)
+			local fn = createSpy(function(p1)
 				return createElement(v12, {
 					callback = function()
 						p1:setState(function()
@@ -286,10 +286,10 @@ return function()
 					end
 				})
 			end)
-			v2.render = v3.value
+			v2.render = fn.value
 			local v5 = v1.mountVirtualNode(createElement(v2), nil, "Test")
 			expect(v5).to.be.ok()
-			expect(v3.callCount).to.equal(1)
+			expect(fn.callCount).to.equal(1)
 			v1.unmountVirtualNode(v5)
 		end)
 		it("should still apply pending state if a subsequent state update was aborted", function()
@@ -308,20 +308,20 @@ return function()
 					return nil
 				end)
 			end
-			local v3 = Component:extend("Parent")
-			function v3.init(p1)
+			local fn = Component:extend("Parent")
+			function fn.init(p1)
 				v2 = function()
 					return p1.state
 				end
 			end
-			function v3.render(p1)
+			function fn.render(p1)
 				return createElement(v12, {
 					callback = function(p12)
 						p1:setState(p12)
 					end
 				})
 			end
-			local v5 = v1.mountVirtualNode(createElement(v3), nil, "Test")
+			local v5 = v1.mountVirtualNode(createElement(fn), nil, "Test")
 			expect(v5).to.be.ok()
 			expect(v2().foo).to.equal(1)
 			v1.unmountVirtualNode(v5)
@@ -329,8 +329,8 @@ return function()
 		it("should not re-process new state when pending state is present after update", function()
 			local v12 = nil
 			local v2 = nil
-			local v3 = Component:extend("MyComponent")
-			function v3.init(p1)
+			local fn = Component:extend("MyComponent")
+			function fn.init(p1)
 				p1:setState({
 					hasUpdatedOnce = false,
 					counter = 0
@@ -342,17 +342,17 @@ return function()
 					return p1.state
 				end
 			end
-			function v3.render(p1)
+			function fn.render(p1)
 				return nil
 			end
-			function v3.didUpdate(p1)
+			function fn.didUpdate(p1)
 				if p1.state.hasUpdatedOnce == false then
 					p1:setState({
 						hasUpdatedOnce = true
 					})
 				end
 			end
-			v1.mountVirtualNode(createElement(v3), nil, "Test")
+			v1.mountVirtualNode(createElement(fn), nil, "Test")
 			expect(v2().hasUpdatedOnce).to.equal(false)
 			expect(v2().counter).to.equal(0)
 			v12(function(p1)
@@ -374,8 +374,8 @@ return function()
 			function v12.didUpdate(p1)
 				p1:setState({})
 			end
-			local v3, v4 = pcall(v1.mountVirtualNode, createElement(v12), nil, "Test")
-			expect(v3).to.equal(false)
+			local fn, v4 = pcall(v1.mountVirtualNode, createElement(v12), nil, "Test")
+			expect(fn).to.equal(false)
 			expect(v4:find("InfiniteUpdater")).to.be.ok()
 			expect(v4:find("reached the setState update recursion limit")).to.be.ok()
 		end)

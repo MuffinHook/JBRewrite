@@ -12,13 +12,13 @@ return function()
 	it("should update refs when switching between children", function()
  local function FunctionComponent(p1)
  local forwardedRef = p1.forwardedRef
- local v1, v2
+ local v1, fn2
  if p1.setRefOnDiv then
  v1 = forwardedRef
- v2 = nil
+ fn2 = nil
  else
  v1 = nil
- v2 = forwardedRef
+ fn2 = forwardedRef
  end
  return createElement("Frame", nil, {
  First = createElement("Frame", {
@@ -29,7 +29,7 @@ return function()
  })
  }),
  Second = createElement("ScrollingFrame", {
- [Ref] = v2
+ [Ref] = fn2
  }, {
  Child = createElement("TextLabel", {
  Text = "Second"
@@ -37,49 +37,49 @@ return function()
  })
  })
  end
- local v12 = forwardRef(function(p1, p2)
+ local fn = forwardRef(function(p1, p2)
  return createElement(FunctionComponent, assign({}, p1, {
  forwardedRef = p2
  }))
  end)
- local v2 = createRef()
- local v4 = v1.mountVirtualTree(createElement(v12, {
- [Ref] = v2,
+ local fn2 = createRef()
+ local v4 = v1.mountVirtualTree(createElement(fn, {
+ [Ref] = fn2,
  setRefOnDiv = true
  }), nil, "switch refs")
- expect(v2.current.ClassName).to.equal("Frame")
+ expect(fn2.current.ClassName).to.equal("Frame")
  v1.unmountVirtualTree(v4)
- local v6 = v1.mountVirtualTree(createElement(v12, {
- [Ref] = v2,
+ local v6 = v1.mountVirtualTree(createElement(fn, {
+ [Ref] = fn2,
  setRefOnDiv = false
  }), nil, "switch refs")
- expect(v2.current.ClassName).to.equal("ScrollingFrame")
+ expect(fn2.current.ClassName).to.equal("ScrollingFrame")
  v1.unmountVirtualTree(v6)
 	end)
 	it("should support rendering nil", function()
- local v12 = forwardRef(function(p1, p2)
+ local fn = forwardRef(function(p1, p2)
  return nil
  end)
- local v2 = createRef()
- local v4 = v1.mountVirtualTree(createElement(v12, {
- [Ref] = v2
+ local fn2 = createRef()
+ local v4 = v1.mountVirtualTree(createElement(fn, {
+ [Ref] = fn2
  }), nil, "nil ref")
- expect(v2.current).to.equal(nil)
+ expect(fn2.current).to.equal(nil)
  v1.unmountVirtualTree(v4)
 	end)
 	it("should support rendering nil for multiple children", function()
- local v12 = forwardRef(function(p1, p2)
+ local fn = forwardRef(function(p1, p2)
  return nil
  end)
- local v2 = createRef()
+ local fn2 = createRef()
  local v4 = v1.mountVirtualTree(createElement("Frame", nil, {
  NoRef1 = createElement("Frame"),
- WithRef = createElement(v12, {
- [Ref] = v2
+ WithRef = createElement(fn, {
+ [Ref] = fn2
  }),
  NoRef2 = createElement("Frame")
  }), nil, "multiple children nil ref")
- expect(v2.current).to.equal(nil)
+ expect(fn2.current).to.equal(nil)
  v1.unmountVirtualTree(v4)
 	end)
 	itSKIP("should support defaultProps", function()
@@ -91,29 +91,29 @@ return function()
  RequiredChild = p1.required
  })
  end
- local v12 = forwardRef(function(p1, p2)
+ local fn = forwardRef(function(p1, p2)
  return createElement(FunctionComponent, assign({}, p1, {
  forwardedRef = p2
  }))
  end)
- v12.defaultProps = {
+ fn.defaultProps = {
  optional = createElement("TextLabel")
  }
- local v2 = createRef()
- local v4 = v1.mountVirtualTree(createElement(v12, {
- [Ref] = v2,
+ local fn2 = createRef()
+ local v4 = v1.mountVirtualTree(createElement(fn, {
+ [Ref] = fn2,
  optional = createElement("Frame"),
  required = createElement("ScrollingFrame")
  }), nil, "with optional")
- expect(v2.current:FindFirstChild("OptionalChild").ClassName).to.equal("Frame")
- expect(v2.current:FindFirstChild("RequiredChild").ClassName).to.equal("ScrollingFrame")
+ expect(fn2.current:FindFirstChild("OptionalChild").ClassName).to.equal("Frame")
+ expect(fn2.current:FindFirstChild("RequiredChild").ClassName).to.equal("ScrollingFrame")
  v1.unmountVirtualTree(v4)
- local v6 = v1.mountVirtualTree(createElement(v12, {
- [Ref] = v2,
+ local v6 = v1.mountVirtualTree(createElement(fn, {
+ [Ref] = fn2,
  required = createElement("ScrollingFrame")
  }), nil, "with default")
- expect(v2.current:FindFirstChild("OptionalChild").ClassName).to.equal("TextLabel")
- expect(v2.current:FindFirstChild("RequiredChild").ClassName).to.equal("ScrollingFrame")
+ expect(fn2.current:FindFirstChild("OptionalChild").ClassName).to.equal("TextLabel")
+ expect(fn2.current:FindFirstChild("RequiredChild").ClassName).to.equal("ScrollingFrame")
  v1.unmountVirtualTree(v6)
 	end)
 	it("should error if not provided a callback when type checking is enabled", function()
@@ -150,9 +150,9 @@ return function()
  }), nil, "nil ref")))
 	end)
 	it("should forward a ref for a single child", function()
- local v12 = nil
+ local fn = nil
  local function Child(p1)
- v12 = p1.value
+ fn = p1.value
  return createElement("Frame", {
  [Ref] = p1[Ref]
  })
@@ -162,18 +162,18 @@ return function()
  [Ref] = p1.forwardedRef
  }))
  end
- local v2 = forwardRef(function(p1, p2)
+ local fn2 = forwardRef(function(p1, p2)
  return createElement(Wrapper, assign({}, p1, {
  forwardedRef = p2
  }))
  end)
- local v3 = createRef()
- local v5 = v1.mountVirtualTree(createElement(v2, {
- [Ref] = v3,
+ local fn3 = createRef()
+ local v5 = v1.mountVirtualTree(createElement(fn2, {
+ [Ref] = fn3,
  value = 123
  }), nil, "single child ref")
- expect(v12).to.equal(123)
- expect(v3.current.ClassName).to.equal("Frame")
+ expect(fn).to.equal(123)
+ expect(fn3.current.ClassName).to.equal("Frame")
  v1.unmountVirtualTree(v5)
 	end)
 	it("should forward a ref for multiple children", function()
@@ -187,26 +187,26 @@ return function()
  [Ref] = p1.forwardedRef
  }))
  end
- local v12 = forwardRef(function(p1, p2)
+ local fn = forwardRef(function(p1, p2)
  return createElement(Wrapper, assign({}, p1, {
  forwardedRef = p2
  }))
  end)
- local v2 = createRef()
+ local fn2 = createRef()
  local v4 = v1.mountVirtualTree(createElement("Frame", nil, {
  NoRef1 = createElement("Frame"),
- WithRef = createElement(v12, {
- [Ref] = v2
+ WithRef = createElement(fn, {
+ [Ref] = fn2
  }),
  NoRef2 = createElement("Frame")
  }), nil, "multi child ref")
- expect(v2.current.ClassName).to.equal("Frame")
+ expect(fn2.current.ClassName).to.equal("Frame")
  v1.unmountVirtualTree(v4)
 	end)
 	it("should maintain child instance and ref through updates", function()
- local v12 = nil
+ local fn = nil
  local function Child(p1)
- v12 = p1.value
+ fn = p1.value
  return createElement("Frame", {
  [Ref] = p1[Ref]
  })
@@ -216,89 +216,89 @@ return function()
  [Ref] = p1.forwardedRef
  }))
  end
- local v2 = forwardRef(function(p1, p2)
+ local fn2 = forwardRef(function(p1, p2)
  return createElement(Wrapper, assign({}, p1, {
  forwardedRef = p2
  }))
  end)
- local v3 = 0
+ local fn3 = 0
  local v4 = nil
  local function f5(p1)
- v3 = v3 + 1
+ fn3 = fn3 + 1
  v4 = p1
  end
- local v7 = v1.mountVirtualTree(createElement(v2, {
+ local v7 = v1.mountVirtualTree(createElement(fn2, {
  [Ref] = f5,
  value = 123
  }), nil, "maintains instance")
- expect(v12).to.equal(123)
+ expect(fn).to.equal(123)
  expect(v4.ClassName).to.equal("Frame")
- expect(v3).to.equal(1)
- local v9 = v1.updateVirtualTree(v7, (createElement(v2, {
+ expect(fn3).to.equal(1)
+ local v9 = v1.updateVirtualTree(v7, (createElement(fn2, {
  [Ref] = f5,
  value = 456
  })))
- expect(v12).to.equal(456)
- expect(v3).to.equal(1)
+ expect(fn).to.equal(456)
+ expect(fn3).to.equal(1)
  v1.unmountVirtualTree(v9)
 	end)
 	it("should not re-run the render callback on a deep setState", function()
- local v12 = nil
- local t = {}
- local v2 = Component:extend("Inner")
- function v2.render(p1)
- table.insert(t, "Inner")
- v12 = p1
+ local fn = nil
+ local tbl = {}
+ local fn2 = Component:extend("Inner")
+ function fn2.render(p1)
+ table.insert(tbl, "Inner")
+ fn = p1
  return createElement("Frame", {
  [Ref] = p1.props.forwardedRef
  })
  end
  local function Middle(p1)
- table.insert(t, "Middle")
- return createElement(v2, p1)
+ table.insert(tbl, "Middle")
+ return createElement(fn2, p1)
  end
- local v3 = forwardRef(function(p1, p2)
- table.insert(t, "Forward")
+ local fn3 = forwardRef(function(p1, p2)
+ table.insert(tbl, "Forward")
  return createElement(Middle, assign({}, p1, {
  forwardedRef = p2
  }))
  end)
  local function App()
- table.insert(t, "App")
- return createElement(v3)
+ table.insert(tbl, "App")
+ return createElement(fn3)
  end
  local v4 = v1.mountVirtualTree(createElement(App), nil, "deep setState")
- expect(#t).to.equal(4)
- expect(t[1]).to.equal("App")
- expect(t[2]).to.equal("Forward")
- expect(t[3]).to.equal("Middle")
- expect(t[4]).to.equal("Inner")
- t = {}
- v12:setState({})
- expect(#t).to.equal(1)
- expect(t[1]).to.equal("Inner")
+ expect(#tbl).to.equal(4)
+ expect(tbl[1]).to.equal("App")
+ expect(tbl[2]).to.equal("Forward")
+ expect(tbl[3]).to.equal("Middle")
+ expect(tbl[4]).to.equal("Inner")
+ tbl = {}
+ fn:setState({})
+ expect(#tbl).to.equal(1)
+ expect(tbl[1]).to.equal("Inner")
  v1.unmountVirtualTree(v4)
 	end)
 	it("should not include the ref in the forwarded props", function()
- local v12 = nil
+ local fn = nil
  local function CaptureProps(p1)
- v12 = p1
+ fn = p1
  return createElement("Frame", {
  [Ref] = p1.forwardedRef
  })
  end
- local v2 = forwardRef(function(p1, p2)
+ local fn2 = forwardRef(function(p1, p2)
  return createElement(CaptureProps, assign({}, p1, {
  forwardedRef = p2
  }))
  end)
- local v3 = createRef()
- local v5 = v1.mountVirtualTree(createElement(v2, {
- [Ref] = v3
+ local fn3 = createRef()
+ local v5 = v1.mountVirtualTree(createElement(fn2, {
+ [Ref] = fn3
  }), nil, "no ref in props")
- expect(v12).to.be.ok()
- expect(v12.forwardedRef).to.equal(v3)
- expect(v12[Ref]).to.equal(nil)
+ expect(fn).to.be.ok()
+ expect(fn.forwardedRef).to.equal(fn3)
+ expect(fn[Ref]).to.equal(nil)
  v1.unmountVirtualTree(v5)
 	end)
 end

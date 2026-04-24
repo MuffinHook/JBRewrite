@@ -12,27 +12,27 @@ return function()
 		local v12 = Component:extend("MyComponent")
 		local v2 = nil
 		local v3 = nil
-		local v4 = createSpy(function(p1)
+		local fn = createSpy(function(p1)
 			v2 = p1.props
 			v3 = p1.state
 			return true
 		end)
-		v12.shouldUpdate = v4.value
+		v12.shouldUpdate = fn.value
 		function v12.render(p1)
 			return nil
 		end
 		local t = {
 			a = 5
 		}
-		local v6 = v1.mountVirtualNode(createElement(v12, t), nil, "Test")
-		expect(v4.callCount).to.equal(0)
+		local fn2 = v1.mountVirtualNode(createElement(v12, t), nil, "Test")
+		expect(fn.callCount).to.equal(0)
 		local t2 = {
 			a = 6,
 			b = 2
 		}
-		v1.updateVirtualNode(v6, (createElement(v12, t2)))
-		expect(v4.callCount).to.equal(1)
-		local v8 = v4:captureValues("self", "newProps", "newState")
+		v1.updateVirtualNode(fn2, (createElement(v12, t2)))
+		expect(fn.callCount).to.equal(1)
+		local v8 = fn:captureValues("self", "newProps", "newState")
 		expect(Type.of(v8.self)).to.equal(Type.StatefulComponentInstance)
 		assertDeepEqual(v8.newProps, t2)
 		assertDeepEqual(v2, t)
@@ -53,29 +53,29 @@ return function()
 			p1:setState(t)
 			v3 = p1.state
 		end
-		local v4 = nil
+		local fn = nil
 		local v5 = nil
-		local v6 = createSpy(function(p1)
-			v4 = p1.props
+		local fn2 = createSpy(function(p1)
+			fn = p1.props
 			v5 = p1.state
 			return true
 		end)
-		v12.shouldUpdate = v6.value
+		v12.shouldUpdate = fn2.value
 		function v12.render(p1)
 			return nil
 		end
 		v1.mountVirtualNode(createElement(v12), nil, "Test")
-		expect(v6.callCount).to.equal(0)
+		expect(fn2.callCount).to.equal(0)
 		local t2 = {
 			a = 2,
 			b = 3
 		}
 		v2(t2)
-		expect(v6.callCount).to.equal(1)
-		local v8 = v6:captureValues("self", "newProps", "newState")
+		expect(fn2.callCount).to.equal(1)
+		local v8 = fn2:captureValues("self", "newProps", "newState")
 		expect(Type.of(v8.self)).to.equal(Type.StatefulComponentInstance)
-		expect(v8.newProps).to.equal(v4)
-		assertDeepEqual(v4, {})
+		expect(v8.newProps).to.equal(fn)
+		assertDeepEqual(fn, {})
 		assertDeepEqual(v5, t)
 		expect(v5).to.equal(v3)
 		assertDeepEqual(v8.newState, t2)
@@ -87,9 +87,9 @@ return function()
 		end
 		local v2 = createSpy()
 		v12.render = v2.value
-		local v4 = v1.mountVirtualNode(createElement(v12), nil, "Test")
+		local fn = v1.mountVirtualNode(createElement(v12), nil, "Test")
 		expect(v2.callCount).to.equal(1)
-		v1.updateVirtualNode(v4, (createElement(v12)))
+		v1.updateVirtualNode(fn, (createElement(v12)))
 		expect(v2.callCount).to.equal(2)
 	end)
 	it("should abort an update when retuning false", function()
@@ -99,9 +99,9 @@ return function()
 		end
 		local v2 = createSpy()
 		v12.render = v2.value
-		local v4 = v1.mountVirtualNode(createElement(v12), nil, "Test")
+		local fn = v1.mountVirtualNode(createElement(v12), nil, "Test")
 		expect(v2.callCount).to.equal(1)
-		v1.updateVirtualNode(v4, (createElement(v12)))
+		v1.updateVirtualNode(fn, (createElement(v12)))
 		expect(v2.callCount).to.equal(1)
 	end)
 end

@@ -1,14 +1,14 @@
 -- Reviewed by Claude
-local t = {}
-t.__index = t
-function t.new()
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._data = {}
-	t2._observe = {}
-	return t2
+local HashMutex = {}
+HashMutex.__index = HashMutex
+function HashMutex.new()
+	local instance = {}
+	setmetatable(instance, HashMutex)
+	instance._data = {}
+	instance._observe = {}
+	return instance
 end
-function t.AcquireFor(p1, p2, p3)
+function HashMutex.AcquireFor(p1, p2, p3)
 	if p1._data[p2] then
 		return false
 	else
@@ -22,33 +22,33 @@ function t.AcquireFor(p1, p2, p3)
 		return true
 	end
 end
-function t.ReleaseFor(p1, p2)
-	local v1 = p1._data[p2]
-	if v1 then
-		task.cancel(v1.thread)
+function HashMutex.ReleaseFor(p1, p2)
+	local lockEntry = p1._data[p2]
+	if lockEntry then
+		task.cancel(lockEntry.thread)
 		p1._data[p2] = nil
 		p1:_fireKeyChangedCallbacks(p2)
 	end
-	return v1 ~= nil
+	return lockEntry ~= nil
 end
-function t._fireKeyChangedCallbacks(p1, p2)
-	local v1 = p1._data[p2] ~= nil
+function HashMutex._fireKeyChangedCallbacks(p1, p2)
+	local isHeld = p1._data[p2] ~= nil
 	if p1._observe[p2] then
-		for v2, v3 in p1._observe[p2] do
-			v3(v1)
+		for _, callback in p1._observe[p2] do
+			callback(isHeld)
 		end
 	end
 end
-function t.AddKeyChangedCallback(p1, p2, p3)
+function HashMutex.AddKeyChangedCallback(p1, p2, p3)
 	if not p1._observe[p2] then
 		p1._observe[p2] = {}
 	end
 	table.insert(p1._observe[p2], p3)
 	return function()
 		if p1._observe[p2] then
-			local v1 = table.find(p1._observe[p2], p3)
-			if v1 then
-				table.remove(p1._observe[p2], v1)
+			local foundIndex = table.find(p1._observe[p2], p3)
+			if foundIndex then
+			table.remove(p1._observe[p2], foundIndex)
 				if #p1._observe[p2] == 0 then
 					p1._observe[p2] = nil
 				end
@@ -61,14 +61,14 @@ function t.AddKeyChangedCallback(p1, p2, p3)
 		end
 	end
 end
-function t.ObserveKey(p1, p2, p3)
+function HashMutex.ObserveKey(p1, p2, p3)
 	p3(p1._data[p2] ~= nil)
 	return p1:AddKeyChangedCallback(p2, p3)
 end
-function t.Destroy(p1)
-	for v1 in p1._data do
-		p1:ReleaseFor(v1)
+function HashMutex.Destroy(p1)
+	for key in p1._data do
+		p1:ReleaseFor(key)
 	end
 	setmetatable(p1, nil)
 end
-return t
+return HashMutex

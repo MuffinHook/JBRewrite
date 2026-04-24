@@ -55,8 +55,8 @@ function v1.render(p1)
 		local v5 = v4 / 1 * v3
 		local v6 = 1 - 0.03125 / aspectRatio
 		local v7 = v6 / 0.8015625 * aspectRatio
-		local v8 = 1 - 0.038986354775828465 / v7
-		local v9 = 1.138568129330254 * (v8 / 0.9610136452241715 * v7)
+		local count = 1 - 0.038986354775828465 / v7
+		local v9 = 1.138568129330254 * (count / 0.9610136452241715 * v7)
 		local colsPerRow = p1.props.colsPerRow
 		local v10 = 64 * v9 * 0.8015625 * 0.9610136452241715 * 0.8782961460446247
 		local t = {
@@ -90,7 +90,7 @@ function v1.render(p1)
 			Position = UDim2.new(0.015625 / aspectRatio, 0, 0.015625, 0),
 			Size = UDim2.new(v2, 0, 0.1515625, 0)
 		}
-		local t5 = {}
+		local tbl = {}
 		local t6 = {
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 			BorderSizePixel = 0,
@@ -119,8 +119,8 @@ function v1.render(p1)
 		t10.Image = p1.props.config.iconImageId and "rbxassetid://" .. tostring(p1.props.config.iconImageId) or nil
 		t9.Image = createElement("ImageLabel", t10)
 		t7.Circle = createElement("Frame", t8, t9)
-		t5.Icon = createElement("Frame", t6, t7)
-		t5.Title = createElement("Frame", {
+		tbl.Icon = createElement("Frame", t6, t7)
+		tbl.Title = createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 			Size = UDim2.new(v4, 0, 1, 0),
@@ -150,7 +150,7 @@ function v1.render(p1)
 				})
 			})
 		})
-		t3.Top = createElement("Frame", t4, t5)
+		t3.Top = createElement("Frame", t4, tbl)
 		t3.Body = createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
@@ -165,7 +165,7 @@ function v1.render(p1)
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				Position = UDim2.new(0.019493177387914232 / v7, 0, 0.019493177387914232, 0),
-				Size = UDim2.new(v8, 0, 0.9610136452241715, 0),
+				Size = UDim2.new(count, 0, 0.9610136452241715, 0),
 				ZIndex = 0
 			}, {
 				Container = createElement("Frame", {
@@ -231,8 +231,8 @@ function v1.render(p1)
 			Position = UDim2.new(0.005, 0, 1, 0),
 			Size = UDim2.new(v2, 0, 0.1515625, 0)
 		}
-		local t12 = {}
-		t12.Title = p1.props.config.extraText and createElement("Frame", {
+		local tbl2 = {}
+		tbl2.Title = p1.props.config.extraText and createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 			Size = UDim2.new(1, 0, 1, 0),
@@ -262,7 +262,7 @@ function v1.render(p1)
 				})
 			})
 		}) or nil
-		t3.Bottom = createElement("Frame", t11, t12)
+		t3.Bottom = createElement("Frame", t11, tbl2)
 		return createElement("Frame", t2, t3)
 	end
 end
@@ -272,9 +272,9 @@ function v1._spin(p1)
 	local v2 = os.clock()
 	local v3 = false
 	local v5 = math.ceil(p1.props.colsPerRow * 0.5 + 0.5)
-	local v8 = #p1.props.config.items - math.floor(p1.props.colsPerRow * 0.5 + 0.5)
+	local count = #p1.props.config.items - math.floor(p1.props.colsPerRow * 0.5 + 0.5)
 	local winIndex = p1.props.config.winIndex
-	if v8 < winIndex then
+	if count < winIndex then
 		warn("winIndex is > maxVisibleIndex, player will see empty space")
 	end
 	local v10 = winIndex + math.clamp(math.random() - 0.5, -0.48, 0.48)

@@ -5,12 +5,12 @@ local getItemPropsFromRewardData = require(ReplicatedStorage.RewardSpinner.getIt
 return Rodux.createReducer(nil, {
 	setRewardSpinnerConfig = function(p1, p2)
 		if p2.items then
-			local t = {}
+			local tbl = {}
 			for v1, v2 in p2.items do
-				table.insert(t, (getItemPropsFromRewardData(v2)))
+				table.insert(tbl, (getItemPropsFromRewardData(v2)))
 			end
 			return {
-				items = t,
+				items = tbl,
 				duration = p2.duration,
 				winIndex = p2.winIndex,
 				title = p2.title,

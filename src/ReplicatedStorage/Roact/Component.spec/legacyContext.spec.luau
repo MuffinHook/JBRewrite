@@ -48,12 +48,12 @@ return function()
 			hello = "world",
 			value = 6
 		}
-		local v4 = v1.mountVirtualNode(createElement(function()
+		local fn = v1.mountVirtualNode(createElement(function()
 			return createElement(v12)
 		end), nil, "Parent", nil, t)
 		expect(v2).never.to.equal(t)
-		expect(v2).never.to.equal(v4.legacyContext)
-		assertDeepEqual(v4.legacyContext, t)
+		expect(v2).never.to.equal(fn.legacyContext)
+		assertDeepEqual(fn.legacyContext, t)
 		assertDeepEqual(v2, t)
 	end)
 	it("should contain values put into the tree by parent nodes", function()
@@ -96,10 +96,10 @@ return function()
 		end
 		function v12.render(p1)  end
 		local v3 = Component:extend("ConsumerB")
-		local v4 = nil
+		local fn = nil
 		function v3.init(p1)
 			p1._context.B = "hello"
-			v4 = p1._context
+			fn = p1._context
 		end
 		function v3.render(p1)  end
 		local v5 = Component:extend("Provider")
@@ -121,7 +121,7 @@ return function()
 		v1.updateVirtualNode(v7, (createElement(v5, {
 			useConsumerB = true
 		})))
-		assertDeepEqual(v4, {
+		assertDeepEqual(fn, {
 			frob = "ulator",
 			B = "hello"
 		})

@@ -18,17 +18,17 @@ return function()
  a = createElement("TextLabel"),
  b = createElement("TextLabel")
  }
- local t2 = {}
+ local tbl = {}
  local count = 0
  for v1, v2 in ElementUtils.iterateElements(t) do
  expect((typeof(v1))).to.equal("string")
  expect(Type.of(v2)).to.equal(Type.Element)
- t2[v2] = v1
+ tbl[v2] = v1
  count = count + 1
  end
  expect(count).to.equal(2)
- expect(t2[t.a]).to.equal("a")
- expect(t2[t.b]).to.equal("b")
+ expect(tbl[t.a]).to.equal("a")
+ expect(tbl[t.b]).to.equal("b")
  end)
  it("should return a zero-element iterator for booleans", function()
  expect(ElementUtils.iterateElements(false)()).to.equal(nil)

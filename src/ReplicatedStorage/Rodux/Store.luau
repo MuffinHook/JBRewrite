@@ -25,45 +25,45 @@ function t2.new(p1, p2, p3, p4)
  assert(typeof(p3[i]) == "function", ("Expected the middleware (\'%s\') at index %d to be a function."):format(tostring(p3[i]), i))
  end
 	end
-	local t3 = {}
-	t3._errorReporter = p4 or t
-	t3._isDispatching = false
-	t3._reducer = p1
+	local tbl = {}
+	tbl._errorReporter = p4 or t
+	tbl._isDispatching = false
+	tbl._reducer = p1
 	local t4 = {
  type = "@@INIT"
 	}
-	t3._actionLog = { t4 }
+	tbl._actionLog = { t4 }
 	local v8, v9 = xpcall(function()
- t3._state = p1(p2, t4)
+ tbl._state = p1(p2, t4)
 	end, tracebackReporter)
 	if not v8 then
- t3._errorReporter.reportReducerError(p2, t4, {
+ tbl._errorReporter.reportReducerError(p2, t4, {
  message = "Caught error in reducer with init",
  thrownValue = v9
  })
- t3._state = p2
+ tbl._state = p2
 	end
-	t3._lastState = t3._state
-	t3._mutatedSinceFlush = false
-	t3._connections = {}
-	t3.changed = Signal.new(t3)
-	setmetatable(t3, t2)
-	table.insert(t3._connections, (t3._flushEvent:Connect(function()
- t3:flush()
+	tbl._lastState = tbl._state
+	tbl._mutatedSinceFlush = false
+	tbl._connections = {}
+	tbl.changed = Signal.new(tbl)
+	setmetatable(tbl, t2)
+	table.insert(tbl._connections, (tbl._flushEvent:Connect(function()
+ tbl:flush()
 	end)))
 	if p3 then
- local dispatch = t3.dispatch
+ local dispatch = tbl.dispatch
  local function f12(...)
- return dispatch(t3, ...)
+ return dispatch(tbl, ...)
  end
  for j = #p3, 1, -1 do
- f12 = p3[j](f12, t3)
+ f12 = p3[j](f12, tbl)
  end
- function t3.dispatch(p1, ...)
+ function tbl.dispatch(p1, ...)
  return f12(...)
  end
 	end
-	return t3
+	return tbl
 end
 function t2.getState(p1)
 	if p1._isDispatching then

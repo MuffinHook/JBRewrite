@@ -2,15 +2,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local RocketLauncherConsts = require(script.Parent.RocketLauncherConsts)
-local t = {}
+local tbl = {}
 local t2 = {
 	explosion_large_02 = 2205008239
 }
-function t.getMissileItemPoolObj(p1)
+function tbl.getMissileItemPoolObj(p1)
 	assert(typeof(p1) == "Instance")
 	return p1:FindFirstChild(RocketLauncherConsts.MISSILE_OBJ_POOL_NAME)
 end
-function t.explodeAt(p1)
+function tbl.explodeAt(p1)
 	assert(p1)
 	local Part = Instance.new("Part")
 	Part.Size = Vector3.new(0.1, 0.1, 0.1)
@@ -39,4 +39,4 @@ function t.explodeAt(p1)
  Volume = 1
 	}).EmitterSize = 20
 end
-return t
+return tbl

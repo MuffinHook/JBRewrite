@@ -6,7 +6,7 @@ local Children = require(script.Parent.PropMarkers.Children)
 local Symbol = require(script.Parent.Symbol)
 local internalAssert = require(script.Parent.internalAssert)
 local v1 = require(script.Parent.GlobalConfig).get()
-local v2 = Symbol.named("InternalData")
+local typeSymbol = Symbol.named("InternalData")
 return function(p1)
 	local v12 = nil
 	local v22 = nil
@@ -18,12 +18,12 @@ return function(p1)
  if not p1.wasUnmounted then
  v4(p1)
  end
- local v2 = v22(p2, p1.hostParent, p1.hostKey, p1.originalContext or p1.context, p1.parentLegacyContext)
- if v2 ~= nil then
- v2.depth = depth
- v2.parent = parent
+ local typeSymbol = v22(p2, p1.hostParent, p1.hostKey, p1.originalContext or p1.context, p1.parentLegacyContext)
+ if typeSymbol ~= nil then
+ typeSymbol.depth = depth
+ typeSymbol.parent = parent
  end
- return v2
+ return typeSymbol
 	end
 	local function updateChildren(p1, p2, p3)
  if v1.internalTypeChecks then
@@ -34,17 +34,17 @@ return function(p1)
  local updateChildrenCount = p1.updateChildrenCount
  local tbl = {}
  for k, v in pairs(p1.children) do
- local v2 = v3(v, (ElementUtils.getElementByKey(p3, k)))
+ local typeSymbol = v3(v, (ElementUtils.getElementByKey(p3, k)))
  if p1.updateChildrenCount ~= updateChildrenCount then
- if v2 and v2 ~= p1.children[k] then
- v4(v2)
+ if typeSymbol and typeSymbol ~= p1.children[k] then
+ v4(typeSymbol)
  end
  return
  end
- if v2 == nil then
+ if typeSymbol == nil then
  tbl[k] = true
  else
- p1.children[k] = v2
+ p1.children[k] = typeSymbol
  end
  end
  for k in pairs(tbl) do
@@ -85,25 +85,25 @@ return function(p1)
  internalAssert(isVirtualNode, "Expected arg #1 to be of type VirtualNode")
  end
  p12.wasUnmounted = true
- local v2 = ElementKind.of(p12.currentElement)
- if v2 == ElementKind.Host then
+ local typeSymbol = ElementKind.of(p12.currentElement)
+ if typeSymbol == ElementKind.Host then
  p1.unmountHostNode(v12, p12)
- elseif v2 == ElementKind.Function then
+ elseif typeSymbol == ElementKind.Function then
  for k, v in pairs(p12.children) do
  v4(v)
  end
- elseif v2 == ElementKind.Stateful then
+ elseif typeSymbol == ElementKind.Stateful then
  p12.instance:__unmount()
- elseif v2 == ElementKind.Portal then
+ elseif typeSymbol == ElementKind.Portal then
  for k, v in pairs(p12.children) do
  v4(v)
  end
- elseif v2 == ElementKind.Fragment then
+ elseif typeSymbol == ElementKind.Fragment then
  for k, v in pairs(p12.children) do
  v4(v)
  end
  else
- error(("Unknown ElementKind %q"):format((tostring(v2))), 2)
+ error(("Unknown ElementKind %q"):format((tostring(typeSymbol))), 2)
  end
 	end
 	local function updateFunctionVirtualNode(p1, p2)
@@ -201,11 +201,11 @@ return function(p1)
 	end
 	local function createVirtualNode(p12, p2, p3, p4, p5)
  if v1.internalTypeChecks then
- local v2 = p1.isHostObject(p2)
- if not v2 then
- v2 = p2 == nil
+ local typeSymbol = p1.isHostObject(p2)
+ if not typeSymbol then
+ typeSymbol = p2 == nil
  end
- internalAssert(v2, "Expected arg #2 to be a host object")
+ internalAssert(typeSymbol, "Expected arg #2 to be a host object")
  internalAssert(typeof(p4) == "table" or p4 == nil, "Expected arg #4 to be of type table or nil")
  internalAssert(typeof(p5) == "table" or p5 == nil, "Expected arg #5 to be of type table or nil")
  end
@@ -245,11 +245,11 @@ return function(p1)
 	end
 	v22 = function(p12, p2, p3, p4, p5)
  if v1.internalTypeChecks then
- local v2 = p1.isHostObject(p2)
- if not v2 then
- v2 = p2 == nil
+ local typeSymbol = p1.isHostObject(p2)
+ if not typeSymbol then
+ typeSymbol = p2 == nil
  end
- internalAssert(v2, "Expected arg #2 to be a host object")
+ internalAssert(typeSymbol, "Expected arg #2 to be a host object")
  internalAssert(typeof(p5) == "table" or p5 == nil, "Expected arg #5 to be of type table or nil")
  end
  if v1.typeChecks then
@@ -297,16 +297,16 @@ return function(p1)
  end
  local t = {
  [Type] = Type.VirtualTree,
- [v2] = {
+ [typeSymbol] = {
  rootNode = nil,
  mounted = true
  }
  }
- t[v2].rootNode = v22(p12, p2, p3)
+ t[typeSymbol].rootNode = v22(p12, p2, p3)
  return t
  end,
  unmountVirtualTree = function(p1)
- local v12 = p1[v2]
+ local v12 = p1[typeSymbol]
  if v1.typeChecks then
  local isVirtualTree = Type.of(p1) == Type.VirtualTree
  assert(isVirtualTree, "Expected arg #1 to be a Roact handle")
@@ -318,7 +318,7 @@ return function(p1)
  end
  end,
  updateVirtualTree = function(p1, p2)
- local v12 = p1[v2]
+ local v12 = p1[typeSymbol]
  if v1.typeChecks then
  local isVirtualTree = Type.of(p1) == Type.VirtualTree
  assert(isVirtualTree, "Expected arg #1 to be a Roact handle")

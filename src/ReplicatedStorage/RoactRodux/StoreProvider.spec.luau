@@ -4,29 +4,29 @@ return function()
 	local Roact = require(script.Parent.Parent.Roact)
 	local Rodux = require(script.Parent.Parent.Rodux)
 	it("should be instantiable as a component", function()
- local v1 = Rodux.Store.new(function()
+ local fn = Rodux.Store.new(function()
  return 0
  end)
  local v2 = Roact.createElement(StoreProvider, {
- store = v1
+ store = fn
  })
  expect(v2).to.be.ok()
  Roact.unmount((Roact.mount(v2, nil, "StoreProvider-test")))
- v1:destruct()
+ fn:destruct()
 	end)
 	it("should expect a \'store\' prop", function()
- local v1 = Roact.createElement(StoreProvider)
+ local fn = Roact.createElement(StoreProvider)
  expect(function()
- Roact.mount(v1)
+ Roact.mount(fn)
  end).to.throw()
 	end)
 	it("should accept a single child", function()
- local v1 = Rodux.Store.new(function()
+ local fn = Rodux.Store.new(function()
  return 0
  end)
  local v2 = Instance.new("Folder")
  local v3 = Roact.createElement(StoreProvider, {
- store = v1
+ store = fn
  }, {
  test1 = Roact.createElement("Frame")
  })
@@ -36,6 +36,6 @@ return function()
  expect(v5).to.be.ok()
  expect(v5:IsA("Frame")).to.equal(true)
  Roact.unmount(v4)
- v1:destruct()
+ fn:destruct()
 	end)
 end

@@ -6,41 +6,41 @@ local Symbol = require(script.Parent.Symbol)
 local invalidSetStateMessages = require(script.Parent.invalidSetStateMessages)
 local internalAssert = require(script.Parent.internalAssert)
 local v1 = require(script.Parent.GlobalConfig).get()
-local v2 = Symbol.named("InternalData")
+local typeSymbol = Symbol.named("InternalData")
 local t = {
 	__tostring = function(p1)
 		return p1.__componentName
 	end
 }
-local t2 = {}
-setmetatable(t2, t)
-t2[Type] = Type.StatefulComponentClass
-t2.__index = t2
-t2.__componentName = "Component"
-function t2.extend(p1, p2)
+local tbl = {}
+setmetatable(tbl, t)
+tbl[Type] = Type.StatefulComponentClass
+tbl.__index = tbl
+tbl.__componentName = "Component"
+function tbl.extend(p1, p2)
 	if v1.typeChecks then
 		local isStatefulComponentClass = Type.of(p1) == Type.StatefulComponentClass
 		assert(isStatefulComponentClass, "Invalid `self` argument to `extend`.")
 		assert(typeof(p2) == "string", "Component class name must be a string")
 	end
-	local t2 = {}
+	local tbl = {}
 	for k, v in pairs(p1) do
 		if k ~= "extend" then
-			t2[k] = v
+			tbl[k] = v
 		end
 	end
-	t2[Type] = Type.StatefulComponentClass
-	t2.__index = t2
-	t2.__componentName = p2
-	setmetatable(t2, t)
-	return t2
+	tbl[Type] = Type.StatefulComponentClass
+	tbl.__index = tbl
+	tbl.__componentName = p2
+	setmetatable(tbl, t)
+	return tbl
 end
-function t2.__getDerivedState(p1, p2, p3)
+function tbl.__getDerivedState(p1, p2, p3)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__getDerivedState`")
 	end
-	local componentClass = p1[v2].componentClass
+	local componentClass = p1[typeSymbol].componentClass
 	if componentClass.getDerivedStateFromProps == nil then
 		return nil
 	else
@@ -55,12 +55,12 @@ function t2.__getDerivedState(p1, p2, p3)
 		end
 	end
 end
-function t2.setState(p1, p2)
+function tbl.setState(p1, p2)
 	if v1.typeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		assert(isStatefulComponentInstance, "Invalid `self` argument to `extend`.")
 	end
-	local v12 = p1[v2]
+	local v12 = p1[typeSymbol]
 	local lifecyclePhase = v12.lifecyclePhase
 	if lifecyclePhase == ComponentLifecyclePhase.ShouldUpdate or (lifecyclePhase == ComponentLifecyclePhase.WillUpdate or lifecyclePhase == ComponentLifecyclePhase.Render) then
 		error(invalidSetStateMessages[v12.lifecyclePhase]:format((tostring(v12.componentClass))), 2)
@@ -108,26 +108,26 @@ function t2.setState(p1, p2)
 		end
 	end
 end
-function t2.getElementTraceback(p1)
-	return p1[v2].virtualNode.currentElement.source
+function tbl.getElementTraceback(p1)
+	return p1[typeSymbol].virtualNode.currentElement.source
 end
-function t2.render(p1)
-	error(("The component %q is missing the `render` method.\n`render` must be defined when creating a Roact component!"):format((tostring(p1[v2].componentClass))), 0)
+function tbl.render(p1)
+	error(("The component %q is missing the `render` method.\n`render` must be defined when creating a Roact component!"):format((tostring(p1[typeSymbol].componentClass))), 0)
 end
-function t2.__getContext(p1, p2)
+function tbl.__getContext(p1, p2)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__getContext`")
 		internalAssert(p2 ~= nil, "Context key cannot be nil")
 	end
-	return p1[v2].virtualNode.context[p2]
+	return p1[typeSymbol].virtualNode.context[p2]
 end
-function t2.__addContext(p1, p2, p3)
+function tbl.__addContext(p1, p2, p3)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__addContext`")
 	end
-	local virtualNode = p1[v2].virtualNode
+	local virtualNode = p1[typeSymbol].virtualNode
 	if virtualNode.originalContext == nil then
 		virtualNode.originalContext = virtualNode.context
 	end
@@ -135,9 +135,9 @@ function t2.__addContext(p1, p2, p3)
 		[p2] = p3
 	})
 end
-function t2.__validateProps(p1, p2)
+function tbl.__validateProps(p1, p2)
 	if v1.propValidation then
-		local validateProps = p1[v2].componentClass.validateProps
+		local validateProps = p1[typeSymbol].componentClass.validateProps
 		if validateProps ~= nil then
 			if typeof(validateProps) ~= "function" then
 				error(("validateProps must be a function, but it is a %s.\nCheck the definition of the component %q."):format(typeof(validateProps), p1.__componentName))
@@ -149,7 +149,7 @@ function t2.__validateProps(p1, p2)
 		end
 	end
 end
-function t2.__mount(p1, p2, p3)
+function tbl.__mount(p1, p2, p3)
 	if v1.internalTypeChecks then
 		local isStatefulComponentClass = Type.of(p1) == Type.StatefulComponentClass
 		internalAssert(isStatefulComponentClass, "Invalid use of `__mount`")
@@ -164,44 +164,44 @@ function t2.__mount(p1, p2, p3)
 		lifecyclePhase = ComponentLifecyclePhase.Init,
 		pendingState = nil
 	}
-	local t2 = {
+	local tbl = {
 		[Type] = Type.StatefulComponentInstance,
-		[v2] = t
+		[typeSymbol] = t
 	}
-	setmetatable(t2, p1)
-	p3.instance = t2
+	setmetatable(tbl, p1)
+	p3.instance = tbl
 	local props = currentElement.props
 	if p1.defaultProps ~= nil then
 		props = assign({}, p1.defaultProps, props)
 	end
-	t2:__validateProps(props)
-	t2.props = props
-	t2._context = assign({}, p3.legacyContext)
-	t2.state = assign({}, t2:__getDerivedState(t2.props, {}))
-	if t2.init ~= nil then
-		t2:init(t2.props)
-		assign(t2.state, t2:__getDerivedState(t2.props, t2.state))
+	tbl:__validateProps(props)
+	tbl.props = props
+	tbl._context = assign({}, p3.legacyContext)
+	tbl.state = assign({}, tbl:__getDerivedState(tbl.props, {}))
+	if tbl.init ~= nil then
+		tbl:init(tbl.props)
+		assign(tbl.state, tbl:__getDerivedState(tbl.props, tbl.state))
 	end
-	p3.legacyContext = t2._context
+	p3.legacyContext = tbl._context
 	t.lifecyclePhase = ComponentLifecyclePhase.Render
-	local v5 = t2:render()
+	local v5 = tbl:render()
 	t.lifecyclePhase = ComponentLifecyclePhase.ReconcileChildren
 	p2.updateVirtualNodeWithRenderResult(p3, hostParent, v5)
-	if t2.didMount ~= nil then
+	if tbl.didMount ~= nil then
 		t.lifecyclePhase = ComponentLifecyclePhase.DidMount
-		t2:didMount()
+		tbl:didMount()
 	end
 	if t.pendingState ~= nil then
-		t2:__update(nil, nil)
+		tbl:__update(nil, nil)
 	end
 	t.lifecyclePhase = ComponentLifecyclePhase.Idle
 end
-function t2.__unmount(p1)
+function tbl.__unmount(p1)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__unmount`")
 	end
-	local v22 = p1[v2]
+	local v22 = p1[typeSymbol]
 	local virtualNode = v22.virtualNode
 	local reconciler = v22.reconciler
 	if p1.willUnmount ~= nil then
@@ -212,14 +212,14 @@ function t2.__unmount(p1)
 		reconciler.unmountVirtualNode(v)
 	end
 end
-function t2.__update(p1, p2, p3)
+function tbl.__update(p1, p2, p3)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__update`")
 		internalAssert(Type.of(p2) == Type.Element or p2 == nil, "Expected arg #1 to be of type Element or nil")
 		internalAssert(typeof(p3) == "table" or p3 == nil, "Expected arg #2 to be of type table or nil")
 	end
-	local v6 = p1[v2]
+	local v6 = p1[typeSymbol]
 	local componentClass = v6.componentClass
 	local props = p1.props
 	if p2 ~= nil then
@@ -266,12 +266,12 @@ function t2.__update(p1, p2, p3)
 		end
 	end
 end
-function t2.__resolveUpdate(p1, p2, p3)
+function tbl.__resolveUpdate(p1, p2, p3)
 	if v1.internalTypeChecks then
 		local isStatefulComponentInstance = Type.of(p1) == Type.StatefulComponentInstance
 		internalAssert(isStatefulComponentInstance, "Invalid use of `__resolveUpdate`")
 	end
-	local v22 = p1[v2]
+	local v22 = p1[typeSymbol]
 	local virtualNode = v22.virtualNode
 	local reconciler = v22.reconciler
 	local props = p1.props
@@ -325,4 +325,4 @@ function t2.__resolveUpdate(p1, p2, p3)
 		end
 	end
 end
-return t2
+return tbl

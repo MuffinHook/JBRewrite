@@ -8,10 +8,10 @@ local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
 function t.new(p1, p2)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
-	v1.manifest = p2
-	return v1
+	local instance = BaseObject.new(p1)
+	setmetatable(instance, t)
+	instance.manifest = p2
+	return instance
 end
 function t.GetOwner(p1)
 	return Players:GetPlayerByUserId(p1.manifest.networkOwnerIdObj.Value)

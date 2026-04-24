@@ -47,9 +47,9 @@ return function(p1, p2)
  function v5.init(p13, p22)
  p13.store = p22.store
  if p13.store == nil then
- local t = {}
- t[1] = tostring(p12)
- error((table.concat({ "Cannot initialize Roact-Rodux connection without being a descendent of StoreProvider!", "Tried to wrap component %q", "Make sure there is a StoreProvider above this component in the tree." }, "\n"):format(unpack(t or {}))))
+ local tbl = {}
+ tbl[1] = tostring(p12)
+ error((table.concat({ "Cannot initialize Roact-Rodux connection without being a descendent of StoreProvider!", "Tried to wrap component %q", "Make sure there is a StoreProvider above this component in the tree." }, "\n"):format(unpack(tbl or {}))))
  end
  local v5 = p13.store:getState()
  local v6 = p1
@@ -58,8 +58,8 @@ return function(p1, p2)
  v7, v6 = v7(v5, p13.props.innerProps), v7
  end
  if v7 ~= nil and typeof(v7) ~= "table" then
- local t = { tostring(v7), (typeof(v7)) }
- error((table.concat({ "mapStateToProps must either return a table, or return another function that returns a table.", "Instead, it returned %q, which is of type %s." }, "\n"):format(unpack(t or {}))))
+ local tbl = { tostring(v7), (typeof(v7)) }
+ error((table.concat({ "mapStateToProps must either return a table, or return another function that returns a table.", "Instead, it returned %q, which is of type %s." }, "\n"):format(unpack(tbl or {}))))
  end
  local function dispatch(...)
  return p13.store:dispatch(...)

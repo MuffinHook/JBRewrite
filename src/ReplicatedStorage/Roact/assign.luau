@@ -2,9 +2,9 @@
 local None = require(script.Parent.None)
 return function(p1, ...)
 	for i = 1, select("#", ...) do
- local v1 = select(i, ...)
- if v1 ~= nil then
- for k, v in pairs(v1) do
+ local vararg = select(i, ...)
+ if vararg ~= nil then
+ for k, v in pairs(vararg) do
  if v == None then
  p1[k] = nil
  else

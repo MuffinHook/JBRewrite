@@ -29,14 +29,14 @@ local t = {
 		color = Color3.fromRGB(144, 85, 254)
 	}
 }
-local t2 = {}
+local tbl = {}
 for v1, v2 in t do
 	v2.index = v1
-	t2[v2.id] = v2
+	tbl[v2.id] = v2
 end
 return TableUtils.requireValidIndexAndFreeze({
 	COLLECT_REWARD_REMOTE_NAME = "RewardSpinnerCollectReward",
 	SPIN_REMOTE_NAME = "RewardSpinnerSpin",
 	RARITIES = t,
-	RARITY_ID_TO_RARITY = t2
+	RARITY_ID_TO_RARITY = tbl
 })

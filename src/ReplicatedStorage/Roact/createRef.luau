@@ -2,8 +2,8 @@
 local Binding = require(script.Parent.Binding)
 return function()
 	local v1, _ = Binding.create(nil)
-	local t = {}
-	setmetatable(t, {
+	local tbl = {}
+	setmetatable(tbl, {
  __index = function(p1, p2)
  if p2 == "current" then
  return v1:getValue()
@@ -21,5 +21,5 @@ return function()
  return ("RoactRef(%s)"):format((tostring(v1:getValue())))
  end
 	})
-	return t
+	return tbl
 end

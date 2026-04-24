@@ -1,8 +1,8 @@
 -- Reviewed by Claude
 local v1 = require(script.Parent.Symbol).named("Nil")
-local t = {}
+local tbl = {}
 return function(p1, p2)
-	local v12 = t[p1]
+	local v12 = tbl[p1]
 	local v2, v3, v4
 	if v12 then
  local v5 = v12[p2]
@@ -27,7 +27,7 @@ return function(p1, p2)
  end
 	end
 	v12 = {}
-	t[p1] = v12
+	tbl[p1] = v12
 	v2 = Instance.new(p1)
 	v3, v4 = pcall(function()
  return v2[p2]

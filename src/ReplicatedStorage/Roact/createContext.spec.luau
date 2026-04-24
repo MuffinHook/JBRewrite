@@ -10,7 +10,7 @@ return function()
 	local createReconciler = require(script.Parent.createReconciler)
 	local createSpy = require(script.Parent.createSpy)
 	local v1 = createReconciler(NoopRenderer)
-	local v2 = createReconciler((require(script.Parent.RobloxRenderer)))
+	local fn = createReconciler((require(script.Parent.RobloxRenderer)))
 	it("should return a table", function()
  local v1 = createContext("Test")
  expect(v1).to.be.ok()
@@ -24,15 +24,15 @@ return function()
 	describe("Provider", function()
  it("should render its children", function()
  local v12 = createContext("Test")
- local v2 = createSpy(function()
+ local fn = createSpy(function()
  return nil
  end)
  v1.unmountVirtualTree((v1.mountVirtualTree(createElement(v12.Provider, {
  value = "Test"
  }, {
- Listener = createElement(v2.value)
+ Listener = createElement(fn.value)
  }), nil, "Provide Tree")))
- expect(v2.callCount).to.equal(1)
+ expect(fn.callCount).to.equal(1)
  end)
 	end)
 	describe("Consumer", function()
@@ -51,13 +51,13 @@ return function()
  end)
  it("should pass the value to the render function", function()
  local v12 = createSpy()
- local v2 = createContext("Test")
+ local fn = createContext("Test")
  local function Listener()
- return createElement(v2.Consumer, {
+ return createElement(fn.Consumer, {
  render = v12.value
  })
  end
- v1.unmountVirtualTree((v1.mountVirtualTree(createElement(v2.Provider, {
+ v1.unmountVirtualTree((v1.mountVirtualTree(createElement(fn.Provider, {
  value = "NewTest"
  }, {
  Listener = createElement(Listener)
@@ -66,20 +66,20 @@ return function()
  end)
  it("should update when the value updates", function()
  local v12 = createSpy()
- local v2 = createContext("Test")
+ local fn = createContext("Test")
  local function Listener()
- return createElement(v2.Consumer, {
+ return createElement(fn.Consumer, {
  render = v12.value
  })
  end
- local v4 = v1.mountVirtualTree(createElement(v2.Provider, {
+ local v4 = v1.mountVirtualTree(createElement(fn.Provider, {
  value = "NewTest"
  }, {
  Listener = createElement(Listener)
  }), nil, "Provide Tree")
  expect(v12.callCount).to.equal(1)
  v12:assertCalledWith("NewTest")
- v1.updateVirtualTree(v4, createElement(v2.Provider, {
+ v1.updateVirtualTree(v4, createElement(fn.Provider, {
  value = "ThirdTest"
  }, {
  Listener = createElement(Listener)
@@ -90,7 +90,7 @@ return function()
  end)
  it("should update when the value updates through an update blocking component", function()
  local v12 = createSpy()
- local v2 = createContext("Test")
+ local fn = createContext("Test")
  local v3 = Component:extend("UpdateBlocker")
  function v3.render(p1)
  return createFragment(p1.props[Children])
@@ -99,11 +99,11 @@ return function()
  return false
  end
  local function Listener()
- return createElement(v2.Consumer, {
+ return createElement(fn.Consumer, {
  render = v12.value
  })
  end
- local v5 = v1.mountVirtualTree(createElement(v2.Provider, {
+ local v5 = v1.mountVirtualTree(createElement(fn.Provider, {
  value = "NewTest"
  }, {
  Blocker = createElement(v3, nil, {
@@ -112,7 +112,7 @@ return function()
  }), nil, "Provide Tree")
  expect(v12.callCount).to.equal(1)
  v12:assertCalledWith("NewTest")
- v1.updateVirtualTree(v5, createElement(v2.Provider, {
+ v1.updateVirtualTree(v5, createElement(fn.Provider, {
  value = "ThirdTest"
  }, {
  Blocker = createElement(v3, nil, {
@@ -125,24 +125,24 @@ return function()
  end)
  it("should behave correctly when the default value is nil", function()
  local v12 = createContext(nil)
- local v2 = createSpy()
+ local fn = createSpy()
  local function Listener()
  return createElement(v12.Consumer, {
- render = v2.value
+ render = fn.value
  })
  end
  local v3 = v1.mountVirtualTree(createElement(Listener), nil, "Provide Tree")
- expect(v2.callCount).to.equal(1)
- v2:assertCalledWith(nil)
+ expect(fn.callCount).to.equal(1)
+ fn:assertCalledWith(nil)
  v1.unmountVirtualTree((v1.updateVirtualTree(v3, createElement(Listener))))
- expect(v2.callCount).to.equal(2)
- v2:assertCalledWith(nil)
+ expect(fn.callCount).to.equal(2)
+ fn:assertCalledWith(nil)
  end)
 	end)
 	describe("Update order", function()
  it("should update context at the same time as props", function()
  local v12 = false
- local v2 = false
+ local fn = false
  local v3 = 0
  local v4 = createContext("default")
  local function Listener(p1)
@@ -154,7 +154,7 @@ return function()
  v12 = true
  elseif p12 == "context_2" then
  expect(p1.someProp).to.equal("prop_2")
- v2 = true
+ fn = true
  else
  error("Unexpected context value")
  end
@@ -178,7 +178,7 @@ return function()
  v1.updateVirtualTree(v1.mountVirtualTree(v5, nil, "UpdateObservationIsFun"), v6)
  expect(v3).to.equal(2)
  expect(v12).to.equal(true)
- expect(v2).to.equal(true)
+ expect(fn).to.equal(true)
  end)
 	end)
 	it("does not throw if willUnmount is called twice on a context consumer", function()
@@ -252,7 +252,7 @@ return function()
  end
  local ScreenGui = Instance.new("ScreenGui")
  ScreenGui.Parent = ReplicatedStorage
- v2.mountVirtualNode(createElement(v6), ScreenGui, "Some Key")
+ fn.mountVirtualNode(createElement(v6), ScreenGui, "Some Key")
  expect(function()
  v5()
  end).never.to.throw()

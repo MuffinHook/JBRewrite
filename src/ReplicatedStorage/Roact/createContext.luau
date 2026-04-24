@@ -71,19 +71,19 @@ local function createConsumer(p1)
 	end
 	return v1
 end
-local t = {}
-t.__index = t
-function t.new(p1)
+local tbl = {}
+tbl.__index = tbl
+function tbl.new(p1)
 	return setmetatable({
  defaultValue = p1,
  key = Symbol.named("ContextKey")
-	}, t)
+	}, tbl)
 end
-function t.__tostring(p1)
+function tbl.__tostring(p1)
 	return "RoactContext"
 end
 return function(p1)
-	local v1 = t.new(p1)
+	local v1 = tbl.new(p1)
 	return {
  Provider = createProvider(v1),
  Consumer = createConsumer(v1)

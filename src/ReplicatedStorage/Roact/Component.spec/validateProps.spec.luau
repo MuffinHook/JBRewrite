@@ -12,15 +12,15 @@ return function()
 			propValidation = true
 		}, function()
 			local v12 = Component:extend("MyComponent")
-			local v2 = createSpy(function()
+			local fn = createSpy(function()
 				return true
 			end)
-			v12.validateProps = v2.value
+			v12.validateProps = fn.value
 			function v12.render(p1)
 				return nil
 			end
 			v1.mountVirtualNode(createElement(v12), nil, "Test")
-			expect(v2.callCount).to.equal(1)
+			expect(fn.callCount).to.equal(1)
 		end)
 	end)
 	it("should be invoked when props change", function()
@@ -28,25 +28,25 @@ return function()
 			propValidation = true
 		}, function()
 			local v12 = Component:extend("MyComponent")
-			local v2 = createSpy(function()
+			local fn = createSpy(function()
 				return true
 			end)
-			v12.validateProps = v2.value
+			v12.validateProps = fn.value
 			function v12.render(p1)
 				return nil
 			end
 			local v4 = v1.mountVirtualNode(createElement(v12, {
 				a = 1
 			}), nil, "Test")
-			expect(v2.callCount).to.equal(1)
-			v2:assertCalledWithDeepEqual({
+			expect(fn.callCount).to.equal(1)
+			fn:assertCalledWithDeepEqual({
 				a = 1
 			})
 			v1.updateVirtualNode(v4, (createElement(v12, {
 				a = 2
 			})))
-			expect(v2.callCount).to.equal(2)
-			v2:assertCalledWithDeepEqual({
+			expect(fn.callCount).to.equal(2)
+			fn:assertCalledWithDeepEqual({
 				a = 2
 			})
 		end)
@@ -56,13 +56,13 @@ return function()
 			propValidation = true
 		}, function()
 			local v12 = Component:extend("MyComponent")
-			local v2 = nil
-			local v3 = createSpy(function()
+			local fn = nil
+			local fn2 = createSpy(function()
 				return true
 			end)
-			v12.validateProps = v3.value
+			v12.validateProps = fn2.value
 			function v12.init(p1)
-				v2 = function(p12)
+				fn = function(p12)
 					p1:setState(p12)
 				end
 			end
@@ -72,14 +72,14 @@ return function()
 			v1.mountVirtualNode(createElement(v12, {
 				a = 1
 			}), nil, "Test")
-			expect(v3.callCount).to.equal(1)
-			v3:assertCalledWithDeepEqual({
+			expect(fn2.callCount).to.equal(1)
+			fn2:assertCalledWithDeepEqual({
 				a = 1
 			})
-			v2({
+			fn({
 				b = 1
 			})
-			expect(v3.callCount).to.equal(1)
+			expect(fn2.callCount).to.equal(1)
 		end)
 	end)
 	it("should throw if validateProps is not a function", function()
@@ -91,9 +91,9 @@ return function()
 			function v12.render(p1)
 				return nil
 			end
-			local v2 = createElement(v12)
+			local fn = createElement(v12)
 			expect(function()
-				v1.mountVirtualNode(v2, nil, "Test")
+				v1.mountVirtualNode(fn, nil, "Test")
 			end).to.throw()
 		end)
 	end)
@@ -108,9 +108,9 @@ return function()
 			function v12.render(p1)
 				return nil
 			end
-			local v2 = createElement(v12)
+			local fn = createElement(v12)
 			expect(function()
-				v1.mountVirtualNode(v2, nil, "Test")
+				v1.mountVirtualNode(fn, nil, "Test")
 			end).to.throw()
 		end)
 	end)
@@ -125,11 +125,11 @@ return function()
 			function v12.render(p1)
 				return nil
 			end
-			local v2 = createElement(v12)
-			local v3, v4 = pcall(function()
-				v1.mountVirtualNode(v2, nil, "Test")
+			local fn = createElement(v12)
+			local fn2, v4 = pcall(function()
+				v1.mountVirtualNode(fn, nil, "Test")
 			end)
-			expect(v3).to.equal(false)
+			expect(fn2).to.equal(false)
 			expect((v4:find("MyComponent"))).to.be.ok()
 		end)
 	end)
@@ -138,10 +138,10 @@ return function()
 			propValidation = true
 		}, function()
 			local v12 = Component:extend("MyComponent")
-			local v2 = createSpy(function()
+			local fn = createSpy(function()
 				return true
 			end)
-			v12.validateProps = v2.value
+			v12.validateProps = fn.value
 			function v12.render(p1)
 				return nil
 			end
@@ -151,16 +151,16 @@ return function()
 			local v4 = v1.mountVirtualNode(createElement(v12, {
 				a = 1
 			}), nil, "Test")
-			expect(v2.callCount).to.equal(1)
-			v2:assertCalledWithDeepEqual({
+			expect(fn.callCount).to.equal(1)
+			fn:assertCalledWithDeepEqual({
 				a = 1,
 				b = 2
 			})
 			v1.updateVirtualNode(v4, (createElement(v12, {
 				a = 2
 			})))
-			expect(v2.callCount).to.equal(2)
-			v2:assertCalledWithDeepEqual({
+			expect(fn.callCount).to.equal(2)
+			fn:assertCalledWithDeepEqual({
 				a = 2,
 				b = 2
 			})
@@ -171,21 +171,21 @@ return function()
 			propValidation = false
 		}, function()
 			local v12 = Component:extend("MyComponent")
-			local v2 = createSpy(function()
+			local fn = createSpy(function()
 				return true
 			end)
-			v12.validateProps = v2.value
+			v12.validateProps = fn.value
 			function v12.render(p1)
 				return nil
 			end
 			local v4 = v1.mountVirtualNode(createElement(v12, {
 				a = 1
 			}), nil, "Test")
-			expect(v2.callCount).to.equal(0)
+			expect(fn.callCount).to.equal(0)
 			v1.updateVirtualNode(v4, (createElement(v12, {
 				a = 2
 			})))
-			expect(v2.callCount).to.equal(0)
+			expect(fn.callCount).to.equal(0)
 		end)
 	end)
 end

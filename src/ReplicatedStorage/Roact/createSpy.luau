@@ -17,31 +17,31 @@ return function(p1)
  end
 	end
 	function t.assertCalledWith(p1, ...)
- local v1 = select("#", ...)
- if t.valuesLength ~= v1 then
- error(("Expected %d arguments, but was called with %d arguments"):format(t.valuesLength, v1), 2)
+ local vararg = select("#", ...)
+ if t.valuesLength ~= vararg then
+ error(("Expected %d arguments, but was called with %d arguments"):format(t.valuesLength, vararg), 2)
  end
- for i = 1, v1 do
+ for i = 1, vararg do
  assert(select(i, ...) == t.values[i], "value differs")
  end
 	end
 	function t.assertCalledWithDeepEqual(p1, ...)
- local v1 = select("#", ...)
- if t.valuesLength ~= v1 then
- error(("Expected %d arguments, but was called with %d arguments"):format(t.valuesLength, v1), 2)
+ local vararg = select("#", ...)
+ if t.valuesLength ~= vararg then
+ error(("Expected %d arguments, but was called with %d arguments"):format(t.valuesLength, vararg), 2)
  end
- for i = 1, v1 do
+ for i = 1, vararg do
  assertDeepEqual(t.values[i], (select(i, ...)))
  end
 	end
 	function t.captureValues(p1, ...)
- local v1 = select("#", ...)
- local t2 = {}
- assert(t.valuesLength == v1, "length of expected values differs from stored values")
- for i = 1, v1 do
- t2[select(i, ...)] = t.values[i]
+ local vararg = select("#", ...)
+ local tbl = {}
+ assert(t.valuesLength == vararg, "length of expected values differs from stored values")
+ for i = 1, vararg do
+ tbl[select(i, ...)] = t.values[i]
  end
- return t2
+ return tbl
 	end
 	setmetatable(t, {
  __index = function(p1, p2)

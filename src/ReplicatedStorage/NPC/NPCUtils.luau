@@ -11,13 +11,13 @@ local t = {
 	end
 }
 function t.getTarget(p1)
-	local v1 = t.getTargetType(p1)
-	if v1 == NPCConsts.DEST_TYPE.POS or v1 == NPCConsts.DEST_TYPE.IDLE then
+	local targetType = t.getTargetType(p1)
+	if targetType == NPCConsts.DEST_TYPE.POS or targetType == NPCConsts.DEST_TYPE.IDLE then
 		return p1:GetAttribute(NPCConsts.DEST_POS_ATTR_NAME)
-	elseif v1 == NPCConsts.DEST_TYPE.OBJ then
-		local v2 = p1:FindFirstChild(NPCConsts.DEST_OBJ_VALUE_NAME)
-		if v2 then
-			return v2.Value
+	elseif targetType == NPCConsts.DEST_TYPE.OBJ then
+		local destObjValue = p1:FindFirstChild(NPCConsts.DEST_OBJ_VALUE_NAME)
+		if destObjValue then
+			return destObjValue.Value
 		else
 			return nil
 		end
@@ -59,13 +59,13 @@ function t.setLookAtType(p1, p2)
 	p1:SetAttribute(NPCConsts.LOOK_AT_TYPE_ATTR_NAME, p2)
 end
 function t.getLookAt(p1)
-	local v1 = t.getLookAtType(p1)
-	if v1 == NPCConsts.DEST_TYPE.POS or v1 == NPCConsts.DEST_TYPE.IDLE then
+	local lookAtType = t.getLookAtType(p1)
+	if lookAtType == NPCConsts.DEST_TYPE.POS or lookAtType == NPCConsts.DEST_TYPE.IDLE then
 		return p1:GetAttribute(NPCConsts.LOOK_AT_POS_ATTR_NAME)
-	elseif v1 == NPCConsts.DEST_TYPE.OBJ then
-		local v2 = p1:FindFirstChild(NPCConsts.LOOK_AT_OBJ_VALUE_NAME)
-		if v2 then
-			return v2.Value
+	elseif lookAtType == NPCConsts.DEST_TYPE.OBJ then
+		local lookAtObjValue = p1:FindFirstChild(NPCConsts.LOOK_AT_OBJ_VALUE_NAME)
+		if lookAtObjValue then
+			return lookAtObjValue.Value
 		else
 			return nil
 		end
@@ -95,9 +95,9 @@ function t.setLookAt(p1, p2, p3)
 	end
 end
 function t.getNetworkOwner(p1)
-	local v1 = p1:GetAttribute(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME)
-	if v1 then
-		return Players:GetPlayerByUserId(v1)
+	local networkOwnerId = p1:GetAttribute(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME)
+	if networkOwnerId then
+		return Players:GetPlayerByUserId(networkOwnerId)
 	end
 end
 function t.setExtrapolateTargetMovement(p1, p2)

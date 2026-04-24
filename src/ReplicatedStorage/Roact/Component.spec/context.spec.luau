@@ -55,12 +55,12 @@ return function()
 			hello = "world",
 			value = 6
 		}
-		local v4 = v1.mountVirtualNode(createElement(function()
+		local fn = v1.mountVirtualNode(createElement(function()
 			return createElement(v12)
 		end), nil, "Parent", t)
 		expect(v2).never.to.equal(t)
-		expect(v2).never.to.equal(v4.context)
-		assertDeepEqual(v4.context, t)
+		expect(v2).never.to.equal(fn.context)
+		assertDeepEqual(fn.context, t)
 		assertDeepEqual(v2, t)
 	end)
 	it("should not copy the context table if it doesn\'t need to", function()
@@ -75,8 +75,8 @@ return function()
 		assertDeepEqual(v3.context, {
 			parent = "I\'m here!"
 		})
-		local v4 = oneChild(v3.children)
-		expect(v3.context).to.equal(v4.context)
+		local fn = oneChild(v3.children)
+		expect(v3.context).to.equal(fn.context)
 	end)
 	it("should not allow context to move up the tree", function()
 		local v12 = Component:extend("ChildProvider")
@@ -91,9 +91,9 @@ return function()
 		function v2.render(p1)
 			return createElement(v12)
 		end
-		local v4 = v1.mountVirtualNode(createElement(v2), nil, "Parent")
-		local v5 = oneChild(v4.children)
-		assertDeepEqual(v4.context, {
+		local fn = v1.mountVirtualNode(createElement(v2), nil, "Parent")
+		local v5 = oneChild(fn.children)
+		assertDeepEqual(fn.context, {
 			parent = "I\'m here!"
 		})
 		assertDeepEqual(v5.context, {
@@ -151,10 +151,10 @@ return function()
 		end
 		function v12.render(p1)  end
 		local v3 = Component:extend("ConsumerB")
-		local v4 = nil
+		local fn = nil
 		function v3.init(p1)
 			p1:__addContext("B", "hello")
-			v4 = captureAllContext(p1)
+			fn = captureAllContext(p1)
 		end
 		function v3.render(p1)  end
 		local v5 = Component:extend("Provider")
@@ -176,7 +176,7 @@ return function()
 		v1.updateVirtualNode(v7, (createElement(v5, {
 			useConsumerB = true
 		})))
-		assertDeepEqual(v4, {
+		assertDeepEqual(fn, {
 			frob = "ulator",
 			B = "hello"
 		})

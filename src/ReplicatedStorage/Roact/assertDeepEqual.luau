@@ -2,16 +2,16 @@
 local function v1(p1, p2)
 	if typeof(p1) == typeof(p2) then
  if typeof(p1) == "table" then
- local t = {}
+ local tbl = {}
  for k, v in pairs(p1) do
- t[k] = true
+ tbl[k] = true
  local v12, v2 = v1(v, p2[k])
  if not v12 and v2 then
  return false, v2:gsub("{1}", ("{1}[%s]"):format((tostring(k)))):gsub("{2}", ("{2}[%s]"):format((tostring(k))))
  end
  end
  for k, v in pairs(p2) do
- if not t[k] then
+ if not tbl[k] then
  local v3, v4 = v1(v, p1[k])
  if not v3 and v4 then
  return false, v4:gsub("{1}", ("{1}[%s]"):format((tostring(k)))):gsub("{2}", ("{2}[%s]"):format((tostring(k))))

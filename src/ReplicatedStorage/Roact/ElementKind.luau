@@ -2,7 +2,7 @@
 local Symbol = require(script.Parent.Symbol)
 local strict = require(script.Parent.strict)
 local Portal = require(script.Parent.Portal)
-local v1 = newproxy(true)
+local metaProxy = newproxy(true)
 local t = {
 	Portal = Symbol.named("Portal"),
 	Host = Symbol.named("Host"),
@@ -11,7 +11,7 @@ local t = {
 	Fragment = Symbol.named("Fragment"),
 	of = function(p1)
 		if typeof(p1) == "table" then
-			return p1[v1]
+			return p1[metaProxy]
 		else
 			return nil
 		end
@@ -24,11 +24,11 @@ local t2 = {
 }
 function t.fromComponent(p1)
 	if p1 == Portal then
-		return v1.Portal
+		return metaProxy.Portal
 	else
 		return t2[typeof(p1)]
 	end
 end
-getmetatable(v1).__index = t
+getmetatable(metaProxy).__index = t
 strict(t, "ElementKind")
-return v1
+return metaProxy

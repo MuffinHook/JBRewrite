@@ -8,19 +8,19 @@ local NPCShared = require(ReplicatedStorage.NPC.NPCShared)
 local t = {}
 t.__index = t
 function t.new(p1, p2)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.maid = Maid.new()
-	t2._maid = t2.maid
-	t2.obj = p1
-	t2.manifest = p2
-	t2.humanoid = p2.humanoid
-	t2._humanoid = t2.humanoid
-	t2.maid:GiveTask(task.delay(0.5, function()
-		t2.maid:GiveTask(setupAnimations(p1))
+	local instance = {}
+	setmetatable(instance, t)
+	instance.maid = Maid.new()
+	instance._maid = instance.maid
+	instance.obj = p1
+	instance.manifest = p2
+	instance.humanoid = p2.humanoid
+	instance._humanoid = instance.humanoid
+	instance.maid:GiveTask(task.delay(0.5, function()
+		instance.maid:GiveTask(setupAnimations(p1))
 	end))
-	NPCShared.setup(t2)
-	return t2
+	NPCShared.setup(instance)
+	return instance
 end
 function t.IsLocallyOwned(p1)
 	local isLocalPlayer = NPCUtils.getNetworkOwner(p1.obj) == Players.LocalPlayer

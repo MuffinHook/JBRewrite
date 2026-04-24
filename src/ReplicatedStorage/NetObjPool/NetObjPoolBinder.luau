@@ -12,16 +12,16 @@ function t.new(p1)
 	return v1
 end
 function t.Get(p1)
-	local v1 = nil
-	for v2, v3 in NetObjPoolItemBinder:GetAll() do
-		if v3:GetPoolObj() == p1.obj and v3:GetActive() == true then
-			v1 = v3
+	local result = nil
+	for _, poolItem in NetObjPoolItemBinder:GetAll() do
+		if poolItem:GetPoolObj() == p1.obj and poolItem:GetActive() == true then
+			result = poolItem
 			break
 		end
 	end
-	if not v1 then
+	if not result then
 		error("Nothing exists in this pool...")
 	end
-	return v1
+	return result
 end
 return Binder.new("NetObjPool", t)

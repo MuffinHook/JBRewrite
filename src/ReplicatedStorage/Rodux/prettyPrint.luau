@@ -1,27 +1,27 @@
 -- Reviewed by Claude
 local function v1(p1, p2)
 	local v12 = p2 or 0
-	local t = {}
+	local tbl = {}
 	if typeof(p1) == "table" then
- table.insert(t, "{\n")
+ table.insert(tbl, "{\n")
  for k, v in pairs(p1) do
- table.insert(t, (" "):rep(v12 + 1))
- table.insert(t, (tostring(k)))
- table.insert(t, " = ")
- table.insert(t, v1(v, v12 + 1))
- table.insert(t, "\n")
+ table.insert(tbl, (" "):rep(v12 + 1))
+ table.insert(tbl, (tostring(k)))
+ table.insert(tbl, " = ")
+ table.insert(tbl, v1(v, v12 + 1))
+ table.insert(tbl, "\n")
  end
- table.insert(t, (" "):rep(v12))
- table.insert(t, "}")
+ table.insert(tbl, (" "):rep(v12))
+ table.insert(tbl, "}")
 	elseif typeof(p1) == "string" then
- table.insert(t, string.format("%q", p1))
- table.insert(t, " (string)")
+ table.insert(tbl, string.format("%q", p1))
+ table.insert(tbl, " (string)")
 	else
- table.insert(t, (tostring(p1)))
- table.insert(t, " (")
- table.insert(t, (typeof(p1)))
- table.insert(t, ")")
+ table.insert(tbl, (tostring(p1)))
+ table.insert(tbl, " (")
+ table.insert(tbl, (typeof(p1)))
+ table.insert(tbl, ")")
 	end
-	return table.concat(t, "")
+	return table.concat(tbl, "")
 end
 return v1

@@ -4,10 +4,10 @@ return function(p1)
  if p12 == nil then
  p12 = {}
  end
- local t = {}
+ local tbl = {}
  for k, v in pairs(p1) do
- t[k] = v(p12[k], p2)
+ tbl[k] = v(p12[k], p2)
  end
- return t
+ return tbl
 	end
 end

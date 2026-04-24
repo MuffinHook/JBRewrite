@@ -134,28 +134,28 @@ local list = {
  }
 	}
 }
-local t = {}
+local tbl = {}
 for i, v in ipairs(list) do
 	local v1, v2
 	v1 = v.key ~= nil
 	assert(v1)
 	v2 = v.name ~= nil
 	assert(v2)
-	table.insert(t, v.key)
+	table.insert(tbl, v.key)
 end
-local v3 = Enumer(t)
-local t2 = {}
-local t3 = {}
+local v3 = Enumer(tbl)
+local tbl2 = {}
+local tbl3 = {}
 for i, v in ipairs(list) do
-	t2[v3[v.key]] = v.name
-	t3[v3[v.key]] = v
+	tbl2[v3[v.key]] = v.name
+	tbl3[v3[v.key]] = v
 end
 return TableUtils.requireValidIndexAndFreeze({
 	FOLDER_NAME = "RobberyFolder",
-	DATA_ROBBERY = t3,
-	LIST_ROBBERY = t,
+	DATA_ROBBERY = tbl3,
+	LIST_ROBBERY = tbl,
 	ENUM_ROBBERY = v3,
-	PRETTY_NAME = t2,
+	PRETTY_NAME = tbl2,
 	STATUS_ATTR_NAME = "RobberyStatus",
 	ENUM_STATUS = Enumer({ "OPENED", "STARTED", "CLOSED" }),
 	DISABLE_AUTO_OPEN_ATTR_NAME = "RobberyDisableAutoOpen",

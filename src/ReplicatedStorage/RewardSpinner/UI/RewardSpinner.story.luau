@@ -7,7 +7,7 @@ return function(p1)
 	local v1 = Roact.Component:extend("App")
 	local RewardSpinner = require(script.Parent.RewardSpinner)
 	local store = require(ReplicatedStorage.App.store)
-	local t = {}
+	local tbl = {}
 	local v2 = 0
 	for i = 1, 80 do
 		local v3
@@ -17,12 +17,12 @@ return function(p1)
 		v3 = if math.random() > 0.5 then 1000 else 0
 		t2.Amount = v3
 		t2.RarityId = EnumRarity.Epic
-		table.insert(t, t2)
+		table.insert(tbl, t2)
 	end
 	function v1.init(p1)
 		local t2 = {
 			type = "setRewardSpinnerConfig",
-			items = t,
+			items = tbl,
 			duration = 5,
 			winIndex = 77
 		}
@@ -37,7 +37,7 @@ return function(p1)
 					v2 = v2 + 1
 					local t2 = {
 						type = "setRewardSpinnerConfig",
-						items = t,
+						items = tbl,
 						duration = 5,
 						winIndex = 77
 					}

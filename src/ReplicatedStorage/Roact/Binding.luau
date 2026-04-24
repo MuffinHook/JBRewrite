@@ -3,51 +3,51 @@ local createSignal = require(script.Parent.createSignal)
 local Symbol = require(script.Parent.Symbol)
 local Type = require(script.Parent.Type)
 local v1 = require(script.Parent.GlobalConfig).get()
-local v2 = Symbol.named("BindingImpl")
-local t = {}
-local t2 = {
+local typeSymbol = Symbol.named("BindingImpl")
+local tbl = {}
+local tbl3 = {
 	__index = {
 		getValue = function(p1)
-			return t.getValue(p1)
+			return tbl.getValue(p1)
 		end,
 		map = function(p1, p2)
-			return t.map(p1, p2)
+			return tbl.map(p1, p2)
 		end
 	},
 	__tostring = function(p1)
 		return string.format("RoactBinding(%s)", (tostring(p1:getValue())))
 	end
 }
-function t.update(p1, p2)
-	return p1[v2].update(p2)
+function tbl.update(p1, p2)
+	return p1[typeSymbol].update(p2)
 end
-function t.subscribe(p1, p2)
-	return p1[v2].subscribe(p2)
+function tbl.subscribe(p1, p2)
+	return p1[typeSymbol].subscribe(p2)
 end
-function t.getValue(p1)
-	return p1[v2].getValue()
+function tbl.getValue(p1)
+	return p1[typeSymbol].getValue()
 end
-function t.create(p1)
-	local t = {
+function tbl.create(p1)
+	local tbl = {
 		value = p1,
 		changeSignal = createSignal()
 	}
-	function t.subscribe(p1)
-		return t.changeSignal:subscribe(p1)
+	function tbl.subscribe(p1)
+		return tbl.changeSignal:subscribe(p1)
 	end
-	function t.update(p1)
-		t.value = p1
-		t.changeSignal:fire(p1)
+	function tbl.update(p1)
+		tbl.value = p1
+		tbl.changeSignal:fire(p1)
 	end
-	function t.getValue()
-		return t.value
+	function tbl.getValue()
+		return tbl.value
 	end
 	return setmetatable({
 		[Type] = Type.Binding,
-		[v2] = t
-	}, t2), t.update
+		[typeSymbol] = tbl
+	}, tbl3), tbl.update
 end
-function t.map(p1, p2)
+function tbl.map(p1, p2)
 	if v1.typeChecks then
 		local isBinding = Type.of(p1) == Type.Binding
 		assert(isBinding, "Expected arg #1 to be a binding")
@@ -55,9 +55,9 @@ function t.map(p1, p2)
 	end
 	return setmetatable({
 		[Type] = Type.Binding,
-		[v2] = {
+		[typeSymbol] = {
 			subscribe = function(p12)
-				return t.subscribe(p1, function(p1)
+				return tbl.subscribe(p1, function(p1)
 					p12(p2(p1))
 				end)
 			end,
@@ -68,9 +68,9 @@ function t.map(p1, p2)
 				return p2(p1:getValue())
 			end
 		}
-	}, t2)
+	}, tbl3)
 end
-function t.join(p1)
+function tbl.join(p1)
 	if v1.typeChecks then
 		assert(typeof(p1) == "table", "Expected arg #1 to be of type table")
 		for k, v in pairs(p1) do
@@ -79,39 +79,39 @@ function t.join(p1)
 			end
 		end
 	end
-	local t3 = {}
+	local tbl2 = {}
 	local function getValue()
-		local t = {}
+		local tbl = {}
 		for k, v in pairs(p1) do
-			t[k] = v:getValue()
+			tbl[k] = v:getValue()
 		end
-		return t
+		return tbl
 	end
-	function t3.subscribe(p12)
-		local t2 = {}
+	function tbl2.subscribe(p12)
+		local tbl3 = {}
 		for k, v in pairs(p1) do
-			t2[k] = t.subscribe(v, function(p1)
+			tbl3[k] = tbl.subscribe(v, function(p1)
 				p12((getValue()))
 			end)
 		end
 		return function()
-			if t2 ~= nil then
-				for k, v in pairs(t2) do
+			if tbl3 ~= nil then
+				for k, v in pairs(tbl3) do
 					v()
 				end
-				t2 = nil
+				tbl3 = nil
 			end
 		end
 	end
-	function t3.update(p1)
+	function tbl2.update(p1)
 		error("Bindings created by joinBindings(...) cannot be updated directly", 2)
 	end
-	function t3.getValue()
+	function tbl2.getValue()
 		return getValue()
 	end
 	return setmetatable({
 		[Type] = Type.Binding,
-		[v2] = t3
-	}, t2)
+		[typeSymbol] = tbl2
+	}, tbl3)
 end
-return t
+return tbl
