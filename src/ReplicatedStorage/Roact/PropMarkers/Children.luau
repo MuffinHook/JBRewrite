@@ -1,2 +1,5 @@
--- Reviewed by Claude
-return require(script.Parent.Parent.Symbol).named("Children")
+local Symbol = require(script.Parent.Parent.Symbol)
+
+local Children = Symbol.named("Children")
+
+return Children

@@ -1,41 +1,55 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local Binding = require(script.Parent.Binding)
 	local Type = require(script.Parent.Type)
+
 	local createRef = require(script.Parent.createRef)
+
 	it("should create refs, which are specialized bindings", function()
- local varType = createRef()
- expect(Type.of(varType)).to.equal(Type.Binding)
- expect(varType.current).to.equal(nil)
+		local ref = createRef()
+
+		expect(Type.of(ref)).to.equal(Type.Binding)
+		expect(ref.current).to.equal(nil)
 	end)
-	it("should have a \'current\' field that is the same as the internal binding\'s value", function()
- local varType = createRef()
- expect(varType.current).to.equal(nil)
- Binding.update(varType, 10)
- expect(varType.current).to.equal(10)
+
+	it("should have a 'current' field that is the same as the internal binding's value", function()
+		local ref = createRef()
+
+		expect(ref.current).to.equal(nil)
+
+		Binding.update(ref, 10)
+		expect(ref.current).to.equal(10)
 	end)
+
 	it("should support tostring on refs", function()
- local varType = createRef()
- expect(varType.current).to.equal(nil)
- expect((tostring(varType))).to.equal("RoactRef(nil)")
- Binding.update(varType, 10)
- expect((tostring(varType))).to.equal("RoactRef(10)")
+		local ref = createRef()
+
+		expect(ref.current).to.equal(nil)
+		expect(tostring(ref)).to.equal("RoactRef(nil)")
+
+		Binding.update(ref, 10)
+		expect(tostring(ref)).to.equal("RoactRef(10)")
 	end)
-	it("should not allow assignments to the \'current\' field", function()
- local varType = createRef()
- expect(varType.current).to.equal(nil)
- Binding.update(varType, 99)
- expect(varType.current).to.equal(99)
- expect(function()
- varType.current = 77
- end).to.throw()
- expect(varType.current).to.equal(99)
+
+	it("should not allow assignments to the 'current' field", function()
+		local ref = createRef()
+
+		expect(ref.current).to.equal(nil)
+
+		Binding.update(ref, 99)
+		expect(ref.current).to.equal(99)
+
+		expect(function()
+			ref.current = 77
+		end).to.throw()
+
+		expect(ref.current).to.equal(99)
 	end)
+
 	it("should return the same thing from getValue as its current field", function()
- local varType = createRef()
- Binding.update(varType, 10)
- expect(varType:getValue()).to.equal(10)
- expect(varType:getValue()).to.equal(varType.current)
+		local ref = createRef()
+		Binding.update(ref, 10)
+
+		expect(ref:getValue()).to.equal(10)
+		expect(ref:getValue()).to.equal(ref.current)
 	end)
 end

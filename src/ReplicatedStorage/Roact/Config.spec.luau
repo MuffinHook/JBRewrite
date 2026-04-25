@@ -1,35 +1,52 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local Config = require(script.Parent.Config)
+
 	it("should accept valid configuration", function()
-		local state1 = Config.new()
-		local state2 = state1.get()
-		expect(state2.elementTracing).to.equal(false)
-		state1.set({
-			elementTracing = true
+		local config = Config.new()
+		local values = config.get()
+
+		expect(values.elementTracing).to.equal(false)
+
+		config.set({
+			elementTracing = true,
 		})
-		expect(state2.elementTracing).to.equal(true)
+
+		expect(values.elementTracing).to.equal(true)
 	end)
+
 	it("should reject invalid configuration keys", function()
-		local state1 = Config.new()
-		local state2, newState = pcall(function()
-			state1.set({
-				garblegoop = true
+		local config = Config.new()
+
+		local badKey = "garblegoop"
+
+		local ok, err = pcall(function()
+			config.set({
+				[badKey] = true,
 			})
 		end)
-		expect(state2).to.equal(false)
-		expect(newState:find("garblegoop")).to.be.ok()
+
+		expect(ok).to.equal(false)
+
+		-- The error should mention our bad key somewhere.
+		expect(err:find(badKey)).to.be.ok()
 	end)
+
 	it("should reject invalid configuration values", function()
-		local state1 = Config.new()
-		local state2, newState = pcall(function()
-			state1.set({
-				elementTracing = "Hello there!"
+		local config = Config.new()
+
+		local goodKey = "elementTracing"
+		local badValue = "Hello there!"
+
+		local ok, err = pcall(function()
+			config.set({
+				[goodKey] = badValue,
 			})
 		end)
-		expect(state2).to.equal(false)
-		expect(newState:find("elementTracing")).to.be.ok()
-		expect(newState:find("Hello there!")).to.be.ok()
+
+		expect(ok).to.equal(false)
+
+		-- The error should mention both our key and value
+		expect(err:find(goodKey)).to.be.ok()
+		expect(err:find(badValue)).to.be.ok()
 	end)
 end

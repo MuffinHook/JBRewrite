@@ -1,2 +1,5 @@
--- Reviewed by Claude
-return require(script.Parent.Parent.Roact).createContext()
+local Roact = require(script.Parent.Parent.Roact)
+
+local StoreContext = Roact.createContext()
+
+return StoreContext

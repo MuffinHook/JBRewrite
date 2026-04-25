@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
@@ -7,56 +5,89 @@ return function()
 	local createSpy = require(script.Parent.Parent.createSpy)
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
 	local Type = require(script.Parent.Parent.Type)
+
 	local Component = require(script.Parent.Parent.Component)
-	local v1 = createReconciler(NoopRenderer)
+
+	local noopReconciler = createReconciler(NoopRenderer)
+
 	it("should be invoked when updated via updateVirtualNode", function()
-		local internalData = Component:extend("MyComponent")
-		local v2 = createSpy()
-		internalData.willUpdate = v2.value
-		function internalData.render(self)
+		local MyComponent = Component:extend("MyComponent")
+
+		local willUpdateSpy = createSpy()
+
+		MyComponent.willUpdate = willUpdateSpy.value
+
+		function MyComponent:render()
 			return nil
 		end
-		local currentState = v1.mountVirtualNode(createElement(internalData, {
-			a = 5
-		}), nil, "Test")
-		local t = {
-			a = 6,
-			b = 2
+
+		local initialProps = {
+			a = 5,
 		}
-		v1.updateVirtualNode(currentState, (createElement(internalData, t)))
-		expect(v2.callCount).to.equal(1)
-		local tempState = v2:captureValues("self", "newProps", "newState")
-		expect(Type.of(tempState.self)).to.equal(Type.StatefulComponentInstance)
-		assertDeepEqual(tempState.newProps, t)
-		assertDeepEqual(tempState.newState, {})
+		local initialElement = createElement(MyComponent, initialProps)
+		local hostParent = nil
+		local key = "Test"
+
+		local node = noopReconciler.mountVirtualNode(initialElement, hostParent, key)
+
+		local newProps = {
+			a = 6,
+			b = 2,
+		}
+		local newElement = createElement(MyComponent, newProps)
+		noopReconciler.updateVirtualNode(node, newElement)
+
+		expect(willUpdateSpy.callCount).to.equal(1)
+
+		local values = willUpdateSpy:captureValues("self", "newProps", "newState")
+
+		expect(Type.of(values.self)).to.equal(Type.StatefulComponentInstance)
+		assertDeepEqual(values.newProps, newProps)
+		assertDeepEqual(values.newState, {})
 	end)
+
 	it("it should be invoked when updated via setState", function()
-		local internalData = Component:extend("MyComponent")
-		local v2 = nil
-		local newState = createSpy()
-		internalData.willUpdate = newState.value
-		function internalData.init(self)
-			v2 = function(param12)
-				self:setState(param12)
+		local MyComponent = Component:extend("MyComponent")
+		local setComponentState
+
+		local willUpdateSpy = createSpy()
+
+		MyComponent.willUpdate = willUpdateSpy.value
+
+		function MyComponent:init()
+			setComponentState = function(state)
+				self:setState(state)
 			end
+
 			self:setState({
-				foo = 1
+				foo = 1,
 			})
 		end
-		function internalData.render(self)
+
+		function MyComponent:render()
 			return nil
 		end
-		v1.mountVirtualNode(createElement(internalData), nil, "Test")
-		expect(newState.callCount).to.equal(0)
-		v2({
-			foo = 2
+
+		local initialElement = createElement(MyComponent)
+		local hostParent = nil
+		local key = "Test"
+
+		noopReconciler.mountVirtualNode(initialElement, hostParent, key)
+
+		expect(willUpdateSpy.callCount).to.equal(0)
+
+		setComponentState({
+			foo = 2,
 		})
-		expect(newState.callCount).to.equal(1)
-		local nextState = newState:captureValues("self", "newProps", "newState")
-		expect(Type.of(nextState.self)).to.equal(Type.StatefulComponentInstance)
-		assertDeepEqual(nextState.newProps, {})
-		assertDeepEqual(nextState.newState, {
-			foo = 2
+
+		expect(willUpdateSpy.callCount).to.equal(1)
+
+		local values = willUpdateSpy:captureValues("self", "newProps", "newState")
+
+		expect(Type.of(values.self)).to.equal(Type.StatefulComponentInstance)
+		assertDeepEqual(values.newProps, {})
+		assertDeepEqual(values.newState, {
+			foo = 2,
 		})
 	end)
 end

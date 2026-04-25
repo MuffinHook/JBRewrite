@@ -1,37 +1,69 @@
--- Reviewed by Claude
--- variables reassigned
-local function state1(self, callback)
-	if typeof(self) == typeof(callback) then
- if typeof(self) == "table" then
- local tableObj = {}
- for k, v in pairs(self) do
- tableObj[k] = true
- local internalData, result2 = state1(v, callback[k])
- if not internalData and result2 then
- return false, result2:gsub("{1}", ("{1}[%s]"):format((tostring(k)))):gsub("{2}", ("{2}[%s]"):format((tostring(k))))
- end
- end
- for k, v in pairs(callback) do
- if not tableObj[k] then
- local newState, currentState = state1(v, self[k])
- if not newState and currentState then
- return false, currentState:gsub("{1}", ("{1}[%s]"):format((tostring(k)))):gsub("{2}", ("{2}[%s]"):format((tostring(k))))
- end
- end
- end
- return true, nil
- elseif self == callback then
- return true, nil
- else
- return false, "{1} ~= {2}"
- end
-	else
- return false, ("{1} is of type %s, but {2} is of type %s"):format(typeof(self), (typeof(callback)))
+--!strict
+--[[
+	A utility used to assert that two objects are value-equal recursively. It
+	outputs fairly nicely formatted messages to help diagnose why two objects
+	would be different.
+
+	This should only be used in tests.
+]]
+
+local function deepEqual(a: any, b: any): (boolean, string?)
+	if typeof(a) ~= typeof(b) then
+		local message = ("{1} is of type %s, but {2} is of type %s"):format(typeof(a), typeof(b))
+		return false, message
+	end
+
+	if typeof(a) == "table" then
+		local visitedKeys = {}
+
+		for key, value in pairs(a) do
+			visitedKeys[key] = true
+
+			local success, innerMessage = deepEqual(value, b[key])
+			if not success and innerMessage then
+				local message = innerMessage
+					:gsub("{1}", ("{1}[%s]"):format(tostring(key)))
+					:gsub("{2}", ("{2}[%s]"):format(tostring(key)))
+
+				return false, message
+			end
+		end
+
+		for key, value in pairs(b) do
+			if not visitedKeys[key] then
+				local success, innerMessage = deepEqual(value, a[key])
+
+				if not success and innerMessage then
+					local message = innerMessage
+						:gsub("{1}", ("{1}[%s]"):format(tostring(key)))
+						:gsub("{2}", ("{2}[%s]"):format(tostring(key)))
+
+					return false, message
+				end
+			end
+		end
+
+		return true, nil
+	end
+
+	if a == b then
+		return true, nil
+	end
+
+	local message = "{1} ~= {2}"
+	return false, message
+end
+
+local function assertDeepEqual(a, b)
+	local success, innerMessageTemplate = deepEqual(a, b)
+
+	if not success and innerMessageTemplate then
+		local innerMessage = innerMessageTemplate:gsub("{1}", "first"):gsub("{2}", "second")
+
+		local message = ("Values were not deep-equal.\n%s"):format(innerMessage)
+
+		error(message, 2)
 	end
 end
-return function(self, callback)
-	local internalData, result2 = state1(self, callback)
-	if not internalData and result2 then
- error(("Values were not deep-equal.\n%s"):format((result2:gsub("{1}", "first"):gsub("{2}", "second"))), 2)
-	end
-end
+
+return assertDeepEqual

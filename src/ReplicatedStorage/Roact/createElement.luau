@@ -1,33 +1,74 @@
--- Reviewed by Claude
--- variables reassigned
 local Children = require(script.Parent.PropMarkers.Children)
 local ElementKind = require(script.Parent.ElementKind)
 local Logging = require(script.Parent.Logging)
 local Type = require(script.Parent.Type)
+
 local config = require(script.Parent.GlobalConfig).get()
-return function(self, callback, self)
+
+local multipleChildrenMessage = [[
+The prop `Roact.Children` was defined but was overridden by the third parameter to createElement!
+This can happen when a component passes props through to a child element but also uses the `children` argument:
+
+	Roact.createElement("Frame", passedProps, {
+		child = ...
+	})
+
+Instead, consider using a utility function to merge tables of children together:
+
+	local children = mergeTables(passedProps[Roact.Children], {
+		child = ...
+	})
+
+	local fullProps = mergeTables(passedProps, {
+		[Roact.Children] = children
+	})
+
+	Roact.createElement("Frame", fullProps)]]
+
+--[[
+	Creates a new element representing the given component.
+
+	Elements are lightweight representations of what a component instance should
+	look like.
+
+	Children is a shorthand for specifying `Roact.Children` as a key inside
+	props. If specified, the passed `props` table is mutated!
+]]
+local function createElement(component, props, children)
 	if config.typeChecks then
- assert(self ~= nil, "`component` is required")
- assert(typeof(callback) == "table" or callback == nil, "`props` must be a table or nil")
- assert(typeof(self) == "table" or self == nil, "`children` must be a table or nil")
+		assert(component ~= nil, "`component` is required")
+		assert(typeof(props) == "table" or props == nil, "`props` must be a table or nil")
+		assert(typeof(children) == "table" or children == nil, "`children` must be a table or nil")
 	end
-	if callback == nil then
- callback = {}
+
+	if props == nil then
+		props = {}
 	end
-	if self ~= nil then
- if callback[Children] ~= nil then
- Logging.warnOnce("The prop `Roact.Children` was defined but was overridden by the third parameter to createElement!\nThis can happen when a component passes props through to a child element but also uses the `children` argument:\n\n\tRoact.createElement(\"Frame\", passedProps, {\n\tbl\tchild = ...\n\tbl})\n\nInstead, consider using a utility function to merge tables of children together:\n\n\tlocal children = mergeTables(passedProps[Roact.Children], {\n\tbl\tchild = ...\n\tbl})\n\n\tlocal fullProps = mergeTables(passedProps, {\n\tbl\tbl[Roact.Children] = children\n\tbl})\n\n\tRoact.createElement(\"Frame\", fullProps)")
- end
- callback[Children] = self
+
+	if children ~= nil then
+		if props[Children] ~= nil then
+			Logging.warnOnce(multipleChildrenMessage)
+		end
+
+		props[Children] = children
 	end
-	local tbl = {
- [Type] = Type.Element,
- [ElementKind] = ElementKind.fromComponent(self),
- component = self,
- props = callback
+
+	local elementKind = ElementKind.fromComponent(component)
+
+	local element = {
+		[Type] = Type.Element,
+		[ElementKind] = elementKind,
+		component = component,
+		props = props,
 	}
+
 	if config.elementTracing then
- tbl.source = debug.traceback("", 2):sub(2)
+		-- We trim out the leading newline since there's no way to specify the
+		-- trace level without also specifying a message.
+		element.source = debug.traceback("", 2):sub(2)
 	end
-	return tbl
+
+	return element
 end
+
+return createElement

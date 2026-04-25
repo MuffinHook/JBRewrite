@@ -1,20 +1,41 @@
--- Reviewed by Claude
--- variables reassigned
+--[[
+	A version of Component with a `shouldUpdate` method that forces the
+	resulting component to be pure.
+]]
+
 local Component = require(script.Parent.Component)
-local result1 = Component:extend("PureComponent")
-result1.extend = Component.extend
-function result1.shouldUpdate(self, callback, self)
-	if self == self.state then
- if callback ~= self.props then
- for k, v in pairs(callback) do
- local _ = self.props[k] ~= v
- end
- for k, v in pairs(self.props) do
- local _ = callback[k] ~= v
- end
- end
- return false
+
+local PureComponent = Component:extend("PureComponent")
+
+-- When extend()ing a component, you don't get an extend method.
+-- This is to promote composition over inheritance.
+-- PureComponent is an exception to this rule.
+PureComponent.extend = Component.extend
+
+function PureComponent:shouldUpdate(newProps, newState)
+	-- In a vast majority of cases, if state updated, something has updated.
+	-- We don't bother checking in this case.
+	if newState ~= self.state then
+		return true
 	end
-	return true
+
+	if newProps == self.props then
+		return false
+	end
+
+	for key, value in pairs(newProps) do
+		if self.props[key] ~= value then
+			return true
+		end
+	end
+
+	for key, value in pairs(self.props) do
+		if newProps[key] ~= value then
+			return true
+		end
+	end
+
+	return false
 end
-return result1
+
+return PureComponent

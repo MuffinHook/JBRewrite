@@ -1,45 +1,54 @@
--- Reviewed by Claude
--- variables reassigned
-local module1 = require(script.Parent.Symbol).named("Nil")
-local tableObj = {}
-return function(self, callback)
-	local internalData = tableObj[self]
-	local state2, newState, currentState
-	if internalData then
- local nextState = internalData[callback]
- if nextState == module1 then
- return true, nil
- elseif nextState == nil then
- state2 = Instance.new(self)
- newState, currentState = pcall(function()
- return state2[callback]
- end)
- state2:Destroy()
- if newState then
- if currentState == nil then
- internalData[callback] = module1
- return newState, currentState
- end
- internalData[callback] = currentState
- end
- return newState, currentState
- else
- return true, nextState
- end
+--[[
+	Attempts to get the default value of a given property on a Roblox instance.
+
+	This is used by the reconciler in cases where a prop was previously set on a
+	primitive component, but is no longer present in a component's new props.
+
+	Eventually, Roblox might provide a nicer API to query the default property
+	of an object without constructing an instance of it.
+]]
+
+local Symbol = require(script.Parent.Symbol)
+
+local Nil = Symbol.named("Nil")
+local _cachedPropertyValues = {}
+
+local function getDefaultInstanceProperty(className, propertyName)
+	local classCache = _cachedPropertyValues[className]
+
+	if classCache then
+		local propValue = classCache[propertyName]
+
+		-- We have to use a marker here, because Lua doesn't distinguish
+		-- between 'nil' and 'not in a table'
+		if propValue == Nil then
+			return true, nil
+		end
+
+		if propValue ~= nil then
+			return true, propValue
+		end
+	else
+		classCache = {}
+		_cachedPropertyValues[className] = classCache
 	end
-	internalData = {}
-	tableObj[self] = internalData
-	state2 = Instance.new(self)
-	newState, currentState = pcall(function()
- return state2[callback]
+
+	local created = Instance.new(className)
+	local ok, defaultValue = pcall(function()
+		return created[propertyName]
 	end)
-	state2:Destroy()
-	if newState then
- if currentState == nil then
- internalData[callback] = module1
- return newState, currentState
- end
- internalData[callback] = currentState
+
+	created:Destroy()
+
+	if ok then
+		if defaultValue == nil then
+			classCache[propertyName] = Nil
+		else
+			classCache[propertyName] = defaultValue
+		end
 	end
-	return newState, currentState
+
+	return ok, defaultValue
 end
+
+return getDefaultInstanceProperty

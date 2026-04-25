@@ -1,259 +1,351 @@
--- Reviewed by Claude
 return function()
 	local connect = require(script.Parent.connect)
+
 	local StoreProvider = require(script.Parent.StoreProvider)
+
 	local Roact = require(script.Parent.Parent.Roact)
 	local Rodux = require(script.Parent.Parent.Rodux)
+
+	type AnyActionCreator = Rodux.ActionCreator<any, any>
+
 	local function noop()
- return nil
+		return nil
 	end
+
 	local function NoopComponent()
- return nil
+		return nil
 	end
-	local function countReducer(p1, p2)
- local fn3 = p1 or 0
- if p2.type == "increment" then
- return fn3 + 1
- else
- return fn3
- end
+
+	local function countReducer(state, action)
+		state = state or 0
+
+		if action.type == "increment" then
+			return state + 1
+		end
+
+		return state
 	end
-	local fn3 = Rodux.combineReducers({
- count = countReducer
+
+	local reducer = Rodux.combineReducers({
+		count = countReducer,
 	})
+
 	describe("Argument validation", function()
- it("should accept no arguments", function()
- connect()
- end)
- it("should accept one function", function()
- connect(noop)
- end)
- it("should accept two functions", function()
- connect(noop, noop)
- end)
- it("should accept only the second function", function()
- connect(nil, function() end)
- end)
- it("should accept one table of action creators", function()
- connect(nil, {
- foo = function() end
- })
- end)
- it("should throw if not passed a component", function()
- local function f1(p1)
- return {}
- end
- expect(function()
- connect(f1)(nil)
- end).to.throw()
- end)
+		it("should accept no arguments", function()
+			connect()
+		end)
+
+		it("should accept one function", function()
+			connect(noop)
+		end)
+
+		it("should accept two functions", function()
+			connect(noop, noop)
+		end)
+
+		it("should accept only the second function", function()
+			connect(nil, function() end)
+		end)
+
+		it("should accept one table of action creators", function()
+			connect(nil, {
+				foo = (function() end :: any) :: AnyActionCreator,
+			})
+		end)
+
+		it("should accept action creators that are callable tables", function()
+			connect(nil, {
+				foo = Rodux.makeActionCreator("Foo", function() end),
+			})
+		end)
+
+		it("should throw if not passed a component", function()
+			local selector = function(store)
+				return {}
+			end
+
+			expect(function()
+				connect(selector)(nil)
+			end).to.throw()
+		end)
 	end)
+
 	it("should throw if not mounted under a StoreProvider", function()
- local fn3 = connect()(NoopComponent)
- expect(function()
- Roact.mount(Roact.createElement(fn3))
- end).to.throw()
+		local ConnectedSomeComponent = connect()(NoopComponent)
+
+		expect(function()
+			Roact.mount(Roact.createElement(ConnectedSomeComponent))
+		end).to.throw()
 	end)
+
 	it("should accept a higher-order function mapStateToProps", function()
- local fn = connect(function()
- return function(p1)
- return {
- count = p1.count
- }
- end
- end)(NoopComponent)
- Roact.unmount((Roact.mount((Roact.createElement(StoreProvider, {
- store = Rodux.Store.new(fn3)
- }, {
- someComponent = Roact.createElement(fn)
- })))))
+		local function mapStateToProps()
+			return function(state)
+				return {
+					count = state.count,
+				}
+			end
+		end
+
+		local ConnectedSomeComponent = connect(mapStateToProps)(NoopComponent)
+
+		local store = Rodux.Store.new(reducer)
+		local tree = Roact.createElement(StoreProvider, {
+			store = store,
+		}, {
+			someComponent = Roact.createElement(ConnectedSomeComponent),
+		})
+
+		local handle = Roact.mount(tree)
+
+		Roact.unmount(handle)
 	end)
+
 	it("should not accept a higher-order mapStateToProps that returns a non-table value", function()
- local fn = connect(function()
- return function(p1)
- return "nope"
- end
- end)(NoopComponent)
- local v3 = Roact.createElement(StoreProvider, {
- store = Rodux.Store.new(fn3)
- }, {
- someComponent = Roact.createElement(fn)
- })
- expect(function()
- Roact.mount(v3)
- end).to.throw()
+		local function mapStateToProps()
+			return function(state)
+				return "nope"
+			end
+		end
+
+		local ConnectedSomeComponent = connect(mapStateToProps)(NoopComponent)
+
+		local store = Rodux.Store.new(reducer)
+		local tree = Roact.createElement(StoreProvider, {
+			store = store,
+		}, {
+			someComponent = Roact.createElement(ConnectedSomeComponent),
+		})
+
+		expect(function()
+			Roact.mount(tree)
+		end).to.throw()
 	end)
+
 	it("should not accept a mapStateToProps that returns a non-table value", function()
- local fn = connect(function()
- return "nah"
- end)(NoopComponent)
- local v3 = Roact.createElement(StoreProvider, {
- store = Rodux.Store.new(fn3)
- }, {
- someComponent = Roact.createElement(fn)
- })
- expect(function()
- Roact.mount(v3)
- end).to.throw()
+		local function mapStateToProps()
+			return "nah"
+		end
+
+		local ConnectedSomeComponent = connect(mapStateToProps)(NoopComponent)
+
+		local store = Rodux.Store.new(reducer)
+		local tree = Roact.createElement(StoreProvider, {
+			store = store,
+		}, {
+			someComponent = Roact.createElement(ConnectedSomeComponent),
+		})
+
+		expect(function()
+			Roact.mount(tree)
+		end).to.throw()
 	end)
+
 	it("should abort renders when mapStateToProps returns the same data", function()
- local function mapStateToProps(p1)
- return {
- count = p1.count
- }
- end
- local fn = 0
- local function SomeComponent(p1)
- fn = fn + 1
- end
- local fn2 = connect(mapStateToProps)(SomeComponent)
- local v3 = Rodux.Store.new(fn3)
- local v5 = Roact.mount((Roact.createElement(StoreProvider, {
- store = v3
- }, {
- someComponent = Roact.createElement(fn2)
- })))
- expect(fn).to.equal(1)
- v3:dispatch({
- type = "an unknown action"
- })
- v3:flush()
- expect(fn).to.equal(1)
- v3:dispatch({
- type = "increment"
- })
- v3:flush()
- expect(fn).to.equal(2)
- Roact.unmount(v5)
+		local function mapStateToProps(state)
+			return {
+				count = state.count,
+			}
+		end
+
+		local renderCount = 0
+		local function SomeComponent(props)
+			renderCount = renderCount + 1
+		end
+
+		local ConnectedSomeComponent = connect(mapStateToProps)(SomeComponent)
+
+		local store = Rodux.Store.new(reducer)
+		local tree = Roact.createElement(StoreProvider, {
+			store = store,
+		}, {
+			someComponent = Roact.createElement(ConnectedSomeComponent),
+		})
+
+		local handle = Roact.mount(tree)
+
+		expect(renderCount).to.equal(1)
+
+		store:dispatch({ type = "an unknown action" })
+		store:flush()
+
+		expect(renderCount).to.equal(1)
+
+		store:dispatch({ type = "increment" })
+		store:flush()
+
+		expect(renderCount).to.equal(2)
+
+		Roact.unmount(handle)
 	end)
+
 	it("should only call mapDispatchToProps once and never re-render if no mapStateToProps was passed", function()
- local fn = 0
- local function f2(p1)
- fn = fn + 1
- return {
- increment = function()
- return p1({
- type = "increment"
- })
- end
- }
- end
- local v3 = 0
- local function SomeComponent(p1)
- v3 = v3 + 1
- end
- local v4 = connect(nil, f2)(SomeComponent)
- local v5 = Rodux.Store.new(fn3)
- local v7 = Roact.mount((Roact.createElement(StoreProvider, {
- store = v5
- }, {
- someComponent = Roact.createElement(v4)
- })))
- expect(fn).to.equal(1)
- expect(v3).to.equal(1)
- v5:dispatch({
- type = "an unknown action"
- })
- v5:flush()
- expect(fn).to.equal(1)
- expect(v3).to.equal(1)
- v5:dispatch({
- type = "increment"
- })
- v5:flush()
- expect(fn).to.equal(1)
- expect(v3).to.equal(1)
- Roact.unmount(v7)
+		local dispatchCount = 0
+		local mapDispatchToProps = function(dispatch)
+			dispatchCount = dispatchCount + 1
+
+			return {
+				increment = function()
+					return dispatch({ type = "increment" })
+				end,
+			}
+		end
+
+		local renderCount = 0
+		local function SomeComponent(props)
+			renderCount = renderCount + 1
+		end
+
+		local ConnectedSomeComponent = connect(nil, mapDispatchToProps)(SomeComponent)
+
+		local store = Rodux.Store.new(reducer)
+		local tree = Roact.createElement(StoreProvider, {
+			store = store,
+		}, {
+			someComponent = Roact.createElement(ConnectedSomeComponent),
+		})
+
+		local handle = Roact.mount(tree)
+
+		expect(dispatchCount).to.equal(1)
+		expect(renderCount).to.equal(1)
+
+		store:dispatch({ type = "an unknown action" })
+		store:flush()
+
+		expect(dispatchCount).to.equal(1)
+		expect(renderCount).to.equal(1)
+
+		store:dispatch({ type = "increment" })
+		store:flush()
+
+		expect(dispatchCount).to.equal(1)
+		expect(renderCount).to.equal(1)
+
+		Roact.unmount(handle)
 	end)
+
 	it("should dispatch the action using a table of action creators", function()
- local tbl = {
- increment = function()
- return {
- type = "increment"
- }
- end
- }
- local function SomeComponent(p1)
- p1.increment()
- end
- local fn = connect(nil, tbl)(SomeComponent)
- local fn2 = Rodux.Store.new(fn3)
- local v4 = Roact.mount((Roact.createElement(StoreProvider, {
- store = fn2
- }, {
- someComponent = Roact.createElement(fn)
- })))
- fn2.changed:connect(function(p1)
- expect(p1.count).to.equal(1)
- end)
- Roact.unmount(v4)
+		local mapDispatchToProps = {
+			increment = (function()
+				return {
+					type = "increment",
+				}
+			end :: any) :: AnyActionCreator,
+		}
+
+		local function SomeComponent(props)
+			props.increment()
+		end
+
+		local ConnectedSomeComponent = connect(nil, mapDispatchToProps)(SomeComponent)
+
+		local store = Rodux.Store.new(reducer)
+		local tree = Roact.createElement(StoreProvider, {
+			store = store,
+		}, {
+			someComponent = Roact.createElement(ConnectedSomeComponent),
+		})
+
+		local handle = Roact.mount(tree)
+
+		store.changed:connect(function(state)
+			expect(state.count).to.equal(1)
+		end)
+
+		Roact.unmount(handle)
 	end)
+
 	it("should return result values from the dispatch passed to mapDispatchToProps", function()
- local function reducer()
- return 0
- end
- local function fiveThunk()
- return 5
- end
- local fn3 = nil
- local function SomeComponent(p1)
- fn3 = p1.dispatch
- end
- local fn2 = connect(nil, function(p1)
- return {
- dispatch = p1
- }
- end)(SomeComponent)
- local v5 = Roact.mount((Roact.createElement(StoreProvider, {
- store = Rodux.Store.new(reducer, nil, { Rodux.thunkMiddleware })
- }, {
- someComponent = Roact.createElement(fn2)
- })))
- expect(fn3).to.be.a("function")
- expect(fn3(fiveThunk)).to.equal(5)
- Roact.unmount(v5)
+		local function reducer()
+			return 0
+		end
+
+		local function fiveThunk()
+			return 5
+		end
+
+		local dispatch
+		local function SomeComponent(props)
+			dispatch = props.dispatch
+		end
+
+		local function mapDispatchToProps(dispatch)
+			return {
+				dispatch = dispatch,
+			}
+		end
+
+		local ConnectedSomeComponent = connect(nil, mapDispatchToProps)(SomeComponent)
+
+		-- We'll use the thunk middleware, as it should always return its result
+		local store = Rodux.Store.new(reducer, nil, { Rodux.thunkMiddleware })
+		local tree = Roact.createElement(StoreProvider, {
+			store = store,
+		}, {
+			someComponent = Roact.createElement(ConnectedSomeComponent),
+		})
+
+		local handle = Roact.mount(tree)
+
+		expect(dispatch).to.be.a("function")
+		expect(dispatch(fiveThunk)).to.equal(5)
+
+		Roact.unmount(handle)
 	end)
+
 	it("should allow fields to be assigned on connected components", function()
- local fn3 = connect(function(p1)
- return {
- count = p1.count
- }
- end)(NoopComponent)
- expect(function()
- fn3.SomeEnum = {
- Value = 1
- }
- end).never.to.throw()
- expect(fn3.SomeEnum).to.be.ok()
- expect(fn3.SomeEnum.Value).to.equal(1)
+		local function mapStateToProps(state)
+			return {
+				count = state.count,
+			}
+		end
+
+		local ConnectedSomeComponent = connect(mapStateToProps)(NoopComponent)
+
+		expect(function()
+			ConnectedSomeComponent.SomeEnum = {
+				Value = 1,
+			}
+		end).never.to.throw()
+
+		expect(ConnectedSomeComponent.SomeEnum).to.be.ok()
+		expect(ConnectedSomeComponent.SomeEnum.Value).to.equal(1)
 	end)
+
+	-- Issue https://github.com/Roblox/roact-rodux/issues/48
 	it("should never pass the store and innerProps to `mapStateToProps`", function()
- local tbl = {}
- local fn = nil
- local fn2 = connect(function(p1, p2)
- fn = p2
- expect(p2.store).to.equal(nil)
- expect(p2.innerProps).to.equal(nil)
- expect(p2.somePropName).to.equal(tbl)
- return {
- count = p1.count
- }
- end)(NoopComponent)
- local v3 = Rodux.Store.new(fn3)
- local v5 = Roact.mount((Roact.createElement(StoreProvider, {
- store = v3
- }, {
- parent = Roact.createElement(fn2, {
- somePropName = tbl
- })
- })))
- v3:dispatch({
- type = "increment"
- })
- v3:flush()
- expect(fn.store).to.equal(nil)
- expect(fn.innerProps).to.equal(nil)
- expect(fn.somePropName).to.equal(tbl)
- Roact.unmount(v5)
+		local somePropValue = {}
+		local lastMappedProps = nil
+		local function mapStateToProps(state, props)
+			lastMappedProps = props
+			expect(props.store).to.equal(nil)
+			expect(props.innerProps).to.equal(nil)
+			expect(props.somePropName).to.equal(somePropValue)
+			return {
+				count = state.count,
+			}
+		end
+		local ConnectedComponent = connect(mapStateToProps)(NoopComponent)
+
+		local store = Rodux.Store.new(reducer)
+		local tree = Roact.createElement(StoreProvider, {
+			store = store,
+		}, {
+			parent = Roact.createElement(ConnectedComponent, {
+				somePropName = somePropValue,
+			}),
+		})
+
+		local handle = Roact.mount(tree)
+
+		store:dispatch({ type = "increment" })
+		store:flush()
+
+		expect(lastMappedProps.store).to.equal(nil)
+		expect(lastMappedProps.innerProps).to.equal(nil)
+		expect(lastMappedProps.somePropName).to.equal(somePropValue)
+
+		Roact.unmount(handle)
 	end)
 end

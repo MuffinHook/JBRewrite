@@ -1,12 +1,31 @@
--- Reviewed by Claude
-return {
-	named = function(self)
- assert(type(self) == "string", "Symbols must be created using a string name!")
- local metaProxy = newproxy(true)
- local newState = ("Symbol(%s)"):format(self)
- getmetatable(metaProxy).__tostring = function()
- return newState
- end
- return metaProxy
+--!strict
+--[[
+	A 'Symbol' is an opaque marker type.
+
+	Symbols have the type 'userdata', but when printed to the console, the name
+	of the symbol is shown.
+]]
+
+local Symbol = {}
+
+--[[
+	Creates a Symbol with the given name.
+
+	When printed or coerced to a string, the symbol will turn into the string
+	given as its name.
+]]
+function Symbol.named(name)
+	assert(type(name) == "string", "Symbols must be created using a string name!")
+
+	local self = newproxy(true)
+
+	local wrappedName = ("Symbol(%s)"):format(name)
+
+	getmetatable(self).__tostring = function()
+		return wrappedName
 	end
-}
+
+	return self
+end
+
+return Symbol

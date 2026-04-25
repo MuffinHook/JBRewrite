@@ -1,55 +1,82 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local createElement = require(script.Parent.createElement)
 	local createReconciler = require(script.Parent.createReconciler)
 	local Logging = require(script.Parent.Logging)
 	local NoopRenderer = require(script.Parent.NoopRenderer)
+
 	local createReconcilerCompat = require(script.Parent.createReconcilerCompat)
-	local var1 = createReconciler(NoopRenderer)
-	local var2 = createReconcilerCompat(var1)
+
+	local noopReconciler = createReconciler(NoopRenderer)
+	local compatReconciler = createReconcilerCompat(noopReconciler)
+
 	it("reify should only warn once per call site", function()
- local fn = Logging.capture(function()
- var1.unmountVirtualTree((var2.reify(createElement("StringValue"))))
- var1.unmountVirtualTree((var2.reify(createElement("StringValue"))))
- end)
- expect(#fn.warnings).to.equal(1)
- expect(fn.warnings[1]:find("reify")).to.be.ok()
- local fn2 = Logging.capture(function()
- var1.unmountVirtualTree((var2.reify(createElement("StringValue"))))
- end)
- expect(#fn2.warnings).to.equal(1)
- expect(fn2.warnings[1]:find("reify")).to.be.ok()
+		local logInfo = Logging.capture(function()
+			-- We're using a loop so that we get the same stack trace and only one
+			-- warning hopefully.
+			for _ = 1, 2 do
+				local handle = compatReconciler.reify(createElement("StringValue"))
+				noopReconciler.unmountVirtualTree(handle)
+			end
+		end)
+
+		expect(#logInfo.warnings).to.equal(1)
+		expect(logInfo.warnings[1]:find("reify")).to.be.ok()
+
+		logInfo = Logging.capture(function()
+			-- This is a different call site, which should trigger another warning.
+			local handle = compatReconciler.reify(createElement("StringValue"))
+			noopReconciler.unmountVirtualTree(handle)
+		end)
+
+		expect(#logInfo.warnings).to.equal(1)
+		expect(logInfo.warnings[1]:find("reify")).to.be.ok()
 	end)
+
 	it("teardown should only warn once per call site", function()
- local fn = Logging.capture(function()
- var2.teardown((var1.mountVirtualTree(createElement("StringValue"))))
- var2.teardown((var1.mountVirtualTree(createElement("StringValue"))))
- end)
- expect(#fn.warnings).to.equal(1)
- expect(fn.warnings[1]:find("teardown")).to.be.ok()
- local fn2 = Logging.capture(function()
- var2.teardown((var1.mountVirtualTree(createElement("StringValue"))))
- end)
- expect(#fn2.warnings).to.equal(1)
- expect(fn2.warnings[1]:find("teardown")).to.be.ok()
+		local logInfo = Logging.capture(function()
+			-- We're using a loop so that we get the same stack trace and only one
+			-- warning hopefully.
+			for _ = 1, 2 do
+				local handle = noopReconciler.mountVirtualTree(createElement("StringValue"))
+				compatReconciler.teardown(handle)
+			end
+		end)
+
+		expect(#logInfo.warnings).to.equal(1)
+		expect(logInfo.warnings[1]:find("teardown")).to.be.ok()
+
+		logInfo = Logging.capture(function()
+			-- This is a different call site, which should trigger another warning.
+			local handle = noopReconciler.mountVirtualTree(createElement("StringValue"))
+			compatReconciler.teardown(handle)
+		end)
+
+		expect(#logInfo.warnings).to.equal(1)
+		expect(logInfo.warnings[1]:find("teardown")).to.be.ok()
 	end)
+
 	it("update should only warn once per call site", function()
- local fn = Logging.capture(function()
- for i = 1, 2 do
- local fn = var1.mountVirtualTree(createElement("StringValue"))
- var2.reconcile(fn, createElement("StringValue"))
- var1.unmountVirtualTree(fn)
- end
- end)
- expect(#fn.warnings).to.equal(1)
- expect(fn.warnings[1]:find("reconcile")).to.be.ok()
- local fn2 = Logging.capture(function()
- local fn = var1.mountVirtualTree(createElement("StringValue"))
- var2.reconcile(fn, createElement("StringValue"))
- var1.unmountVirtualTree(fn)
- end)
- expect(#fn2.warnings).to.equal(1)
- expect(fn2.warnings[1]:find("reconcile")).to.be.ok()
+		local logInfo = Logging.capture(function()
+			-- We're using a loop so that we get the same stack trace and only one
+			-- warning hopefully.
+			for _ = 1, 2 do
+				local handle = noopReconciler.mountVirtualTree(createElement("StringValue"))
+				compatReconciler.reconcile(handle, createElement("StringValue"))
+				noopReconciler.unmountVirtualTree(handle)
+			end
+		end)
+
+		expect(#logInfo.warnings).to.equal(1)
+		expect(logInfo.warnings[1]:find("reconcile")).to.be.ok()
+
+		logInfo = Logging.capture(function()
+			-- This is a different call site, which should trigger another warning.
+			local handle = noopReconciler.mountVirtualTree(createElement("StringValue"))
+			compatReconciler.reconcile(handle, createElement("StringValue"))
+			noopReconciler.unmountVirtualTree(handle)
+		end)
+
+		expect(#logInfo.warnings).to.equal(1)
+		expect(logInfo.warnings[1]:find("reconcile")).to.be.ok()
 	end)
 end

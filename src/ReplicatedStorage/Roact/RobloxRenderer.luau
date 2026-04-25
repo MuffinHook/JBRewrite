@@ -1,5 +1,9 @@
--- Reviewed by Claude
--- variables reassigned
+--[[
+	Renderer that deals in terms of Roblox Instances. This is the most
+	well-supported renderer after NoopRenderer and is currently the only
+	renderer that does anything.
+]]
+
 local Binding = require(script.Parent.Binding)
 local Children = require(script.Parent.PropMarkers.Children)
 local ElementKind = require(script.Parent.ElementKind)
@@ -8,196 +12,271 @@ local getDefaultInstanceProperty = require(script.Parent.getDefaultInstancePrope
 local Ref = require(script.Parent.PropMarkers.Ref)
 local Type = require(script.Parent.Type)
 local internalAssert = require(script.Parent.internalAssert)
+
 local config = require(script.Parent.GlobalConfig).get()
+
+local applyPropsError = [[
+Error applying props:
+	%s
+In element:
+%s
+]]
+
+local updatePropsError = [[
+Error updating props:
+	%s
+In element:
+%s
+]]
+
 local function identity(...)
 	return ...
 end
-local function applyRef(self, callback)
-	if self == nil then
-	elseif typeof(self) == "function" then
- self(callback)
-	elseif Type.of(self) == Type.Binding then
- Binding.update(self, callback)
+
+local function applyRef(ref, newHostObject)
+	if ref == nil then
+		return
+	end
+
+	if typeof(ref) == "function" then
+		ref(newHostObject)
+	elseif Type.of(ref) == Type.Binding then
+		Binding.update(ref, newHostObject)
 	else
- error(("Invalid ref: Expected type Binding but got %s"):format((typeof(self))))
+		-- TODO (#197): Better error message
+		error(("Invalid ref: Expected type Binding but got %s"):format(typeof(ref)))
 	end
 end
-local function setRobloxInstanceProperty(self, callback, p3)
-	if p3 == nil then
- local _, config = getDefaultInstanceProperty(self.ClassName, callback)
- p3 = config
+
+local function setRobloxInstanceProperty(hostObject, key, newValue)
+	if newValue == nil then
+		local hostClass = hostObject.ClassName
+		local _, defaultValue = getDefaultInstanceProperty(hostClass, key)
+		newValue = defaultValue
 	end
-	self[callback] = p3
+
+	-- Assign the new value to the object
+	hostObject[key] = newValue
+
+	return
 end
-local function removeBinding(self, callback)
-	self.bindings[callback]()
-	self.bindings[callback] = nil
+
+local function removeBinding(virtualNode, key)
+	local disconnect = virtualNode.bindings[key]
+	disconnect()
+	virtualNode.bindings[key] = nil
 end
-local function attachBinding(self, callback, p3)
-	local function updateBoundProperty(param12)
- local config, v2 = xpcall(function()
- local hostObject = self.hostObject
- local config = callback
- local v2 = param12
- if v2 == nil then
- local _, newState = getDefaultInstanceProperty(hostObject.ClassName, config)
- v2 = newState
- end
- hostObject[config] = v2
- end, identity)
- if not config then
- local source = self.currentElement.source
- if source == nil then
- source = "<enable element tracebacks>"
- end
- error(("Error updating props:\n\t%s\nIn element:\n%s\n"):format(v2, source), 0)
- end
+
+local function attachBinding(virtualNode, key, newBinding)
+	local function updateBoundProperty(newValue)
+		local success, errorMessage = xpcall(function()
+			setRobloxInstanceProperty(virtualNode.hostObject, key, newValue)
+		end, identity)
+
+		if not success then
+			local source = virtualNode.currentElement.source
+
+			if source == nil then
+				source = "<enable element tracebacks>"
+			end
+
+			local fullMessage = updatePropsError:format(errorMessage, source)
+			error(fullMessage, 0)
+		end
 	end
-	if self.bindings == nil then
- self.bindings = {}
+
+	if virtualNode.bindings == nil then
+		virtualNode.bindings = {}
 	end
-	self.bindings[callback] = Binding.subscribe(p3, updateBoundProperty)
-	updateBoundProperty(p3:getValue())
+
+	virtualNode.bindings[key] = Binding.subscribe(newBinding, updateBoundProperty)
+
+	updateBoundProperty(newBinding:getValue())
 end
-local function detachAllBindings(self)
-	if self.bindings ~= nil then
- for k, v in pairs(self.bindings) do
- v()
- end
- self.bindings = nil
+
+local function detachAllBindings(virtualNode)
+	if virtualNode.bindings ~= nil then
+		for _, disconnect in pairs(virtualNode.bindings) do
+			disconnect()
+		end
+		virtualNode.bindings = nil
 	end
 end
-local function applyProp(self, callback, p3, p4)
-	if p3 == p4 or (callback == Ref or callback == Children) then
- return
+
+local function applyProp(virtualNode, key, newValue, oldValue)
+	if newValue == oldValue then
+		return
 	end
-	local config = Type.of(callback)
-	if config == Type.HostEvent or config == Type.HostChangeEvent then
- if self.eventManager == nil then
- self.eventManager = SingleEventManager.new(self.hostObject)
- end
- local name = callback.name
- if config == Type.HostChangeEvent then
- self.eventManager:connectPropertyChange(name, p3)
- else
- self.eventManager:connectEvent(name, p3)
- end
+
+	if key == Ref or key == Children then
+		-- Refs and children are handled in a separate pass
+		return
+	end
+
+	local internalKeyType = Type.of(key)
+
+	if internalKeyType == Type.HostEvent or internalKeyType == Type.HostChangeEvent then
+		if virtualNode.eventManager == nil then
+			virtualNode.eventManager = SingleEventManager.new(virtualNode.hostObject)
+		end
+
+		local eventName = key.name
+
+		if internalKeyType == Type.HostChangeEvent then
+			virtualNode.eventManager:connectPropertyChange(eventName, newValue)
+		else
+			virtualNode.eventManager:connectEvent(eventName, newValue)
+		end
+
+		return
+	end
+
+	local newIsBinding = Type.of(newValue) == Type.Binding
+	local oldIsBinding = Type.of(oldValue) == Type.Binding
+
+	if oldIsBinding then
+		removeBinding(virtualNode, key)
+	end
+
+	if newIsBinding then
+		attachBinding(virtualNode, key, newValue)
 	else
- local isBinding = Type.of(p3) == Type.Binding
- if Type.of(p4) == Type.Binding then
- self.bindings[callback]()
- self.bindings[callback] = nil
- end
- if isBinding then
- attachBinding(self, callback, p3)
- else
- local hostObject = self.hostObject
- local newState
- if p3 == nil then
- local _, currentState = getDefaultInstanceProperty(hostObject.ClassName, callback)
- newState = currentState
- else
- newState = p3
- end
- hostObject[callback] = newState
- end
+		setRobloxInstanceProperty(virtualNode.hostObject, key, newValue)
 	end
 end
-local function applyProps(self, callback)
-	for k, v in pairs(callback) do
- applyProp(self, k, v, nil)
+
+local function applyProps(virtualNode, props)
+	for propKey, value in pairs(props) do
+		applyProp(virtualNode, propKey, value, nil)
 	end
 end
-local function updateProps(self, callback, p3)
-	for k, v in pairs(p3) do
- applyProp(self, k, v, callback[k])
+
+local function updateProps(virtualNode, oldProps, newProps)
+	-- Apply props that were added or updated
+	for propKey, newValue in pairs(newProps) do
+		local oldValue = oldProps[propKey]
+
+		applyProp(virtualNode, propKey, newValue, oldValue)
 	end
-	for k, v in pairs(callback) do
- if p3[k] == nil then
- applyProp(self, k, nil, v)
- end
+
+	-- Clean up props that were removed
+	for propKey, oldValue in pairs(oldProps) do
+		local newValue = newProps[propKey]
+
+		if newValue == nil then
+			applyProp(virtualNode, propKey, nil, oldValue)
+		end
 	end
 end
-return {
-	isHostObject = function(self)
- return typeof(self) == "Instance"
-	end,
-	mountHostNode = function(self, callback)
- local currentElement = callback.currentElement
- local hostParent = callback.hostParent
- local hostKey = callback.hostKey
- if config.internalTypeChecks then
- local isHost = ElementKind.of(currentElement) == ElementKind.Host
- internalAssert(isHost, "Element at given node is not a host Element")
- end
- if config.typeChecks then
- assert(currentElement.props.Name == nil, "Name can not be specified as a prop to a host component in Roact.")
- assert(currentElement.props.Parent == nil, "Parent can not be specified as a prop to a host component in Roact.")
- end
- local newState = Instance.new(currentElement.component)
- callback.hostObject = newState
- local currentState, nextState = xpcall(function()
- applyProps(callback, currentElement.props)
- end, identity)
- if not currentState then
- local source = currentElement.source
- if source == nil then
- source = "<enable element tracebacks>"
- end
- error(("Error applying props:\n\t%s\nIn element:\n%s\n"):format(nextState, source), 0)
- end
- newState.Name = tostring(hostKey)
- local mergedState = currentElement.props[Children]
- if mergedState ~= nil then
- self.updateVirtualNodeWithChildren(callback, callback.hostObject, mergedState)
- end
- newState.Parent = hostParent
- callback.hostObject = newState
- applyRef(currentElement.props[Ref], newState)
- if callback.eventManager ~= nil then
- callback.eventManager:resume()
- end
-	end,
-	unmountHostNode = function(self, callback)
- applyRef(callback.currentElement.props[Ref], nil)
- for k, v in pairs(callback.children) do
- self.unmountVirtualNode(v)
- end
- if callback.bindings ~= nil then
- for k, v in pairs(callback.bindings) do
- v()
- end
- callback.bindings = nil
- end
- callback.hostObject:Destroy()
-	end,
-	updateHostNode = function(self, callback, p3)
- local props = callback.currentElement.props
- local props_2 = p3.props
- if callback.eventManager ~= nil then
- callback.eventManager:suspend()
- end
- if props[Ref] ~= props_2[Ref] then
- applyRef(props[Ref], nil)
- applyRef(props_2[Ref], callback.hostObject)
- end
- local config, v2 = xpcall(function()
- updateProps(callback, props, props_2)
- end, identity)
- if not config then
- local source = p3.source
- if source == nil then
- source = "<enable element tracebacks>"
- end
- error(("Error updating props:\n\t%s\nIn element:\n%s\n"):format(v2, source), 0)
- end
- local currentState = p3.props[Children]
- if currentState ~= nil or props[Children] ~= nil then
- self.updateVirtualNodeWithChildren(callback, callback.hostObject, currentState)
- end
- if callback.eventManager ~= nil then
- callback.eventManager:resume()
- end
- return callback
+
+local RobloxRenderer = {}
+
+function RobloxRenderer.isHostObject(target)
+	return typeof(target) == "Instance"
+end
+
+function RobloxRenderer.mountHostNode(reconciler, virtualNode)
+	local element = virtualNode.currentElement
+	local hostParent = virtualNode.hostParent
+	local hostKey = virtualNode.hostKey
+
+	if config.internalTypeChecks then
+		internalAssert(ElementKind.of(element) == ElementKind.Host, "Element at given node is not a host Element")
 	end
-}
+	if config.typeChecks then
+		assert(element.props.Name == nil, "Name can not be specified as a prop to a host component in Roact.")
+		assert(element.props.Parent == nil, "Parent can not be specified as a prop to a host component in Roact.")
+	end
+
+	local instance = Instance.new(element.component)
+	virtualNode.hostObject = instance
+
+	local success, errorMessage = xpcall(function()
+		applyProps(virtualNode, element.props)
+	end, identity)
+
+	if not success then
+		local source = element.source
+
+		if source == nil then
+			source = "<enable element tracebacks>"
+		end
+
+		local fullMessage = applyPropsError:format(errorMessage, source)
+		error(fullMessage, 0)
+	end
+
+	instance.Name = tostring(hostKey)
+
+	local children = element.props[Children]
+
+	if children ~= nil then
+		reconciler.updateVirtualNodeWithChildren(virtualNode, virtualNode.hostObject, children)
+	end
+
+	instance.Parent = hostParent
+	virtualNode.hostObject = instance
+
+	applyRef(element.props[Ref], instance)
+
+	if virtualNode.eventManager ~= nil then
+		virtualNode.eventManager:resume()
+	end
+end
+
+function RobloxRenderer.unmountHostNode(reconciler, virtualNode)
+	local element = virtualNode.currentElement
+
+	applyRef(element.props[Ref], nil)
+
+	for _, childNode in pairs(virtualNode.children) do
+		reconciler.unmountVirtualNode(childNode)
+	end
+
+	detachAllBindings(virtualNode)
+
+	virtualNode.hostObject:Destroy()
+end
+
+function RobloxRenderer.updateHostNode(reconciler, virtualNode, newElement)
+	local oldProps = virtualNode.currentElement.props
+	local newProps = newElement.props
+
+	if virtualNode.eventManager ~= nil then
+		virtualNode.eventManager:suspend()
+	end
+
+	-- If refs changed, detach the old ref and attach the new one
+	if oldProps[Ref] ~= newProps[Ref] then
+		applyRef(oldProps[Ref], nil)
+		applyRef(newProps[Ref], virtualNode.hostObject)
+	end
+
+	local success, errorMessage = xpcall(function()
+		updateProps(virtualNode, oldProps, newProps)
+	end, identity)
+
+	if not success then
+		local source = newElement.source
+
+		if source == nil then
+			source = "<enable element tracebacks>"
+		end
+
+		local fullMessage = updatePropsError:format(errorMessage, source)
+		error(fullMessage, 0)
+	end
+
+	local children = newElement.props[Children]
+	if children ~= nil or oldProps[Children] ~= nil then
+		reconciler.updateVirtualNodeWithChildren(virtualNode, virtualNode.hostObject, children)
+	end
+
+	if virtualNode.eventManager ~= nil then
+		virtualNode.eventManager:resume()
+	end
+
+	return virtualNode
+end
+
+return RobloxRenderer

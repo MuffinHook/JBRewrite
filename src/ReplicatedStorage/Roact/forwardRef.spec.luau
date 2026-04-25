@@ -1,5 +1,6 @@
--- Reviewed by Claude
--- variables reassigned
+-- Tests loosely adapted from those found at:
+-- * https://github.com/facebook/react/blob/v17.0.1/packages/react/src/__tests__/forwardRef-test.js
+-- * https://github.com/facebook/react/blob/v17.0.1/packages/react/src/__tests__/forwardRef-test.internal.js
 return function()
 	local assign = require(script.Parent.assign)
 	local createElement = require(script.Parent.createElement)
@@ -9,297 +10,335 @@ return function()
 	local Component = require(script.Parent.Component)
 	local GlobalConfig = require(script.Parent.GlobalConfig)
 	local Ref = require(script.Parent.PropMarkers.Ref)
-	local module1 = createReconciler((require(script.Parent.RobloxRenderer)))
+
+	local RobloxRenderer = require(script.Parent.RobloxRenderer)
+
+	local reconciler = createReconciler(RobloxRenderer)
+
 	it("should update refs when switching between children", function()
- local function FunctionComponent(self)
- local forwardedRef = self.forwardedRef
- local module1, fn2
- if self.setRefOnDiv then
- module1 = forwardedRef
- fn2 = nil
- else
- module1 = nil
- fn2 = forwardedRef
- end
- return createElement("Frame", nil, {
- First = createElement("Frame", {
- [Ref] = module1
- }, {
- Child = createElement("TextLabel", {
- Text = "First"
- })
- }),
- Second = createElement("ScrollingFrame", {
- [Ref] = fn2
- }, {
- Child = createElement("TextLabel", {
- Text = "Second"
- })
- })
- })
- end
- local fn = forwardRef(function(self, callback)
- return createElement(FunctionComponent, assign({}, self, {
- forwardedRef = callback
- }))
- end)
- local fn2 = createRef()
- local currentState = module1.mountVirtualTree(createElement(fn, {
- [Ref] = fn2,
- setRefOnDiv = true
- }), nil, "switch refs")
- expect(fn2.current.ClassName).to.equal("Frame")
- module1.unmountVirtualTree(currentState)
- local tempState = module1.mountVirtualTree(createElement(fn, {
- [Ref] = fn2,
- setRefOnDiv = false
- }), nil, "switch refs")
- expect(fn2.current.ClassName).to.equal("ScrollingFrame")
- module1.unmountVirtualTree(tempState)
+		local function FunctionComponent(props)
+			local forwardedRef = props.forwardedRef
+			local setRefOnDiv = props.setRefOnDiv
+			-- deviation: clearer to express this way, since we don't have real
+			-- ternaries
+			local firstRef, secondRef
+			if setRefOnDiv then
+				firstRef = forwardedRef
+			else
+				secondRef = forwardedRef
+			end
+			return createElement("Frame", nil, {
+				First = createElement("Frame", {
+					[Ref] = firstRef,
+				}, {
+					Child = createElement("TextLabel", {
+						Text = "First",
+					}),
+				}),
+				Second = createElement("ScrollingFrame", {
+					[Ref] = secondRef,
+				}, {
+					Child = createElement("TextLabel", {
+						Text = "Second",
+					}),
+				}),
+			})
+		end
+
+		local RefForwardingComponent = forwardRef(function(props, ref)
+			return createElement(FunctionComponent, assign({}, props, { forwardedRef = ref }))
+		end)
+
+		local ref = createRef()
+
+		local element = createElement(RefForwardingComponent, {
+			[Ref] = ref,
+			setRefOnDiv = true,
+		})
+		local tree = reconciler.mountVirtualTree(element, nil, "switch refs")
+		expect(ref.current.ClassName).to.equal("Frame")
+		reconciler.unmountVirtualTree(tree)
+
+		element = createElement(RefForwardingComponent, {
+			[Ref] = ref,
+			setRefOnDiv = false,
+		})
+		tree = reconciler.mountVirtualTree(element, nil, "switch refs")
+		expect(ref.current.ClassName).to.equal("ScrollingFrame")
+		reconciler.unmountVirtualTree(tree)
 	end)
+
 	it("should support rendering nil", function()
- local fn = forwardRef(function(self, callback)
- return nil
- end)
- local fn2 = createRef()
- local currentState = module1.mountVirtualTree(createElement(fn, {
- [Ref] = fn2
- }), nil, "nil ref")
- expect(fn2.current).to.equal(nil)
- module1.unmountVirtualTree(currentState)
+		local RefForwardingComponent = forwardRef(function(_props, _ref)
+			return nil
+		end)
+
+		local ref = createRef()
+
+		local element = createElement(RefForwardingComponent, { [Ref] = ref })
+		local tree = reconciler.mountVirtualTree(element, nil, "nil ref")
+		expect(ref.current).to.equal(nil)
+		reconciler.unmountVirtualTree(tree)
 	end)
+
 	it("should support rendering nil for multiple children", function()
- local fn = forwardRef(function(self, callback)
- return nil
- end)
- local fn2 = createRef()
- local currentState = module1.mountVirtualTree(createElement("Frame", nil, {
- NoRef1 = createElement("Frame"),
- WithRef = createElement(fn, {
- [Ref] = fn2
- }),
- NoRef2 = createElement("Frame")
- }), nil, "multiple children nil ref")
- expect(fn2.current).to.equal(nil)
- module1.unmountVirtualTree(currentState)
+		local RefForwardingComponent = forwardRef(function(_props, _ref)
+			return nil
+		end)
+
+		local ref = createRef()
+
+		local element = createElement("Frame", nil, {
+			NoRef1 = createElement("Frame"),
+			WithRef = createElement(RefForwardingComponent, { [Ref] = ref }),
+			NoRef2 = createElement("Frame"),
+		})
+		local tree = reconciler.mountVirtualTree(element, nil, "multiple children nil ref")
+		expect(ref.current).to.equal(nil)
+		reconciler.unmountVirtualTree(tree)
 	end)
+
+	-- We could support this by having forwardRef return a stateful component,
+	-- but it's likely not necessary
 	itSKIP("should support defaultProps", function()
- local function FunctionComponent(self)
- return createElement("Frame", {
- [Ref] = self.forwardedRef
- }, {
- OptionalChild = self.optional,
- RequiredChild = self.required
- })
- end
- local fn = forwardRef(function(self, callback)
- return createElement(FunctionComponent, assign({}, self, {
- forwardedRef = callback
- }))
- end)
- fn.defaultProps = {
- optional = createElement("TextLabel")
- }
- local fn2 = createRef()
- local currentState = module1.mountVirtualTree(createElement(fn, {
- [Ref] = fn2,
- optional = createElement("Frame"),
- required = createElement("ScrollingFrame")
- }), nil, "with optional")
- expect(fn2.current:FindFirstChild("OptionalChild").ClassName).to.equal("Frame")
- expect(fn2.current:FindFirstChild("RequiredChild").ClassName).to.equal("ScrollingFrame")
- module1.unmountVirtualTree(currentState)
- local tempState = module1.mountVirtualTree(createElement(fn, {
- [Ref] = fn2,
- required = createElement("ScrollingFrame")
- }), nil, "with default")
- expect(fn2.current:FindFirstChild("OptionalChild").ClassName).to.equal("TextLabel")
- expect(fn2.current:FindFirstChild("RequiredChild").ClassName).to.equal("ScrollingFrame")
- module1.unmountVirtualTree(tempState)
+		local function FunctionComponent(props)
+			local forwardedRef = props.forwardedRef
+			local optional = props.optional
+			local required = props.required
+			return createElement("Frame", {
+				[Ref] = forwardedRef,
+			}, {
+				OptionalChild = optional,
+				RequiredChild = required,
+			})
+		end
+
+		local RefForwardingComponent = forwardRef(function(props, ref)
+			return createElement(
+				FunctionComponent,
+				assign({}, props, {
+					forwardedRef = ref,
+				})
+			)
+		end)
+		RefForwardingComponent.defaultProps = {
+			optional = createElement("TextLabel"),
+		}
+
+		local ref = createRef()
+
+		local element = createElement(RefForwardingComponent, {
+			[Ref] = ref,
+			optional = createElement("Frame"),
+			required = createElement("ScrollingFrame"),
+		})
+
+		local tree = reconciler.mountVirtualTree(element, nil, "with optional")
+
+		expect(ref.current:FindFirstChild("OptionalChild").ClassName).to.equal("Frame")
+		expect(ref.current:FindFirstChild("RequiredChild").ClassName).to.equal("ScrollingFrame")
+
+		reconciler.unmountVirtualTree(tree)
+		element = createElement(RefForwardingComponent, {
+			[Ref] = ref,
+			required = createElement("ScrollingFrame"),
+		})
+		tree = reconciler.mountVirtualTree(element, nil, "with default")
+
+		expect(ref.current:FindFirstChild("OptionalChild").ClassName).to.equal("TextLabel")
+		expect(ref.current:FindFirstChild("RequiredChild").ClassName).to.equal("ScrollingFrame")
+		reconciler.unmountVirtualTree(tree)
 	end)
+
 	it("should error if not provided a callback when type checking is enabled", function()
- GlobalConfig.scoped({
- typeChecks = true
- }, function()
- expect(function()
- forwardRef(nil)
- end).to.throw()
- end)
- GlobalConfig.scoped({
- typeChecks = true
- }, function()
- expect(function()
- forwardRef("foo")
- end).to.throw()
- end)
+		GlobalConfig.scoped({
+			typeChecks = true,
+		}, function()
+			expect(function()
+				forwardRef(nil)
+			end).to.throw()
+		end)
+
+		GlobalConfig.scoped({
+			typeChecks = true,
+		}, function()
+			expect(function()
+				forwardRef("foo")
+			end).to.throw()
+		end)
 	end)
+
 	it("should work without a ref to be forwarded", function()
- local function Child()
- return nil
- end
- local function Wrapper(self)
- return createElement(Child, assign({}, self, {
- [Ref] = self.forwardedRef
- }))
- end
- module1.unmountVirtualTree((module1.mountVirtualTree(createElement(forwardRef(function(self, callback)
- return createElement(Wrapper, assign({}, self, {
- forwardedRef = callback
- }))
- end), {
- value = 123
- }), nil, "nil ref")))
+		local function Child()
+			return nil
+		end
+
+		local function Wrapper(props)
+			return createElement(Child, assign({}, props, { [Ref] = props.forwardedRef }))
+		end
+
+		local RefForwardingComponent = forwardRef(function(props, ref)
+			return createElement(Wrapper, assign({}, props, { forwardedRef = ref }))
+		end)
+
+		local element = createElement(RefForwardingComponent, { value = 123 })
+		local tree = reconciler.mountVirtualTree(element, nil, "nil ref")
+		reconciler.unmountVirtualTree(tree)
 	end)
+
 	it("should forward a ref for a single child", function()
- local fn = nil
- local function Child(self)
- fn = self.value
- return createElement("Frame", {
- [Ref] = self[Ref]
- })
- end
- local function Wrapper(self)
- return createElement(Child, assign({}, self, {
- [Ref] = self.forwardedRef
- }))
- end
- local fn2 = forwardRef(function(self, callback)
- return createElement(Wrapper, assign({}, self, {
- forwardedRef = callback
- }))
- end)
- local fn3 = createRef()
- local nextState = module1.mountVirtualTree(createElement(fn2, {
- [Ref] = fn3,
- value = 123
- }), nil, "single child ref")
- expect(fn).to.equal(123)
- expect(fn3.current.ClassName).to.equal("Frame")
- module1.unmountVirtualTree(nextState)
+		local value
+		local function Child(props)
+			value = props.value
+			return createElement("Frame", {
+				[Ref] = props[Ref],
+			})
+		end
+
+		local function Wrapper(props)
+			return createElement(Child, assign({}, props, { [Ref] = props.forwardedRef }))
+		end
+
+		local RefForwardingComponent = forwardRef(function(props, ref)
+			return createElement(Wrapper, assign({}, props, { forwardedRef = ref }))
+		end)
+
+		local ref = createRef()
+
+		local element = createElement(RefForwardingComponent, { [Ref] = ref, value = 123 })
+		local tree = reconciler.mountVirtualTree(element, nil, "single child ref")
+		expect(value).to.equal(123)
+		expect(ref.current.ClassName).to.equal("Frame")
+		reconciler.unmountVirtualTree(tree)
 	end)
+
 	it("should forward a ref for multiple children", function()
- local function Child(self)
- return createElement("Frame", {
- [Ref] = self[Ref]
- })
- end
- local function Wrapper(self)
- return createElement(Child, assign({}, self, {
- [Ref] = self.forwardedRef
- }))
- end
- local fn = forwardRef(function(self, callback)
- return createElement(Wrapper, assign({}, self, {
- forwardedRef = callback
- }))
- end)
- local fn2 = createRef()
- local currentState = module1.mountVirtualTree(createElement("Frame", nil, {
- NoRef1 = createElement("Frame"),
- WithRef = createElement(fn, {
- [Ref] = fn2
- }),
- NoRef2 = createElement("Frame")
- }), nil, "multi child ref")
- expect(fn2.current.ClassName).to.equal("Frame")
- module1.unmountVirtualTree(currentState)
+		local function Child(props)
+			return createElement("Frame", {
+				[Ref] = props[Ref],
+			})
+		end
+
+		local function Wrapper(props)
+			return createElement(Child, assign({}, props, { [Ref] = props.forwardedRef }))
+		end
+
+		local RefForwardingComponent = forwardRef(function(props, ref)
+			return createElement(Wrapper, assign({}, props, { forwardedRef = ref }))
+		end)
+
+		local ref = createRef()
+
+		local element = createElement("Frame", nil, {
+			NoRef1 = createElement("Frame"),
+			WithRef = createElement(RefForwardingComponent, { [Ref] = ref }),
+			NoRef2 = createElement("Frame"),
+		})
+		local tree = reconciler.mountVirtualTree(element, nil, "multi child ref")
+		expect(ref.current.ClassName).to.equal("Frame")
+		reconciler.unmountVirtualTree(tree)
 	end)
+
 	it("should maintain child instance and ref through updates", function()
- local fn = nil
- local function Child(self)
- fn = self.value
- return createElement("Frame", {
- [Ref] = self[Ref]
- })
- end
- local function Wrapper(self)
- return createElement(Child, assign({}, self, {
- [Ref] = self.forwardedRef
- }))
- end
- local fn2 = forwardRef(function(self, callback)
- return createElement(Wrapper, assign({}, self, {
- forwardedRef = callback
- }))
- end)
- local fn3 = 0
- local currentState = nil
- local function f5(self)
- fn3 = fn3 + 1
- currentState = self
- end
- local mergedState = module1.mountVirtualTree(createElement(fn2, {
- [Ref] = f5,
- value = 123
- }), nil, "maintains instance")
- expect(fn).to.equal(123)
- expect(currentState.ClassName).to.equal("Frame")
- expect(fn3).to.equal(1)
- local finalState = module1.updateVirtualTree(mergedState, (createElement(fn2, {
- [Ref] = f5,
- value = 456
- })))
- expect(fn).to.equal(456)
- expect(fn3).to.equal(1)
- module1.unmountVirtualTree(finalState)
+		local value
+		local function Child(props)
+			value = props.value
+			return createElement("Frame", {
+				[Ref] = props[Ref],
+			})
+		end
+
+		local function Wrapper(props)
+			return createElement(Child, assign({}, props, { [Ref] = props.forwardedRef }))
+		end
+
+		local RefForwardingComponent = forwardRef(function(props, ref)
+			return createElement(Wrapper, assign({}, props, { forwardedRef = ref }))
+		end)
+
+		local setRefCount = 0
+		local refValue
+
+		local setRef = function(r)
+			setRefCount = setRefCount + 1
+			refValue = r
+		end
+
+		local element = createElement(RefForwardingComponent, { [Ref] = setRef, value = 123 })
+		local tree = reconciler.mountVirtualTree(element, nil, "maintains instance")
+
+		expect(value).to.equal(123)
+		expect(refValue.ClassName).to.equal("Frame")
+		expect(setRefCount).to.equal(1)
+
+		element = createElement(RefForwardingComponent, { [Ref] = setRef, value = 456 })
+		tree = reconciler.updateVirtualTree(tree, element)
+
+		expect(value).to.equal(456)
+		expect(setRefCount).to.equal(1)
+		reconciler.unmountVirtualTree(tree)
 	end)
+
 	it("should not re-run the render callback on a deep setState", function()
- local fn = nil
- local tableObj = {}
- local fn2 = Component:extend("Inner")
- function fn2.render(self)
- table.insert(tableObj, "Inner")
- fn = self
- return createElement("Frame", {
- [Ref] = self.props.forwardedRef
- })
- end
- local function Middle(self)
- table.insert(tableObj, "Middle")
- return createElement(fn2, self)
- end
- local fn3 = forwardRef(function(self, callback)
- table.insert(tableObj, "Forward")
- return createElement(Middle, assign({}, self, {
- forwardedRef = callback
- }))
- end)
- local function App()
- table.insert(tableObj, "App")
- return createElement(fn3)
- end
- local currentState = module1.mountVirtualTree(createElement(App), nil, "deep setState")
- expect(#tableObj).to.equal(4)
- expect(tableObj[1]).to.equal("App")
- expect(tableObj[2]).to.equal("Forward")
- expect(tableObj[3]).to.equal("Middle")
- expect(tableObj[4]).to.equal("Inner")
- tableObj = {}
- fn:setState({})
- expect(#tableObj).to.equal(1)
- expect(tableObj[1]).to.equal("Inner")
- module1.unmountVirtualTree(currentState)
+		local inst
+		local renders = {}
+
+		local Inner = Component:extend("Inner")
+		function Inner:render()
+			table.insert(renders, "Inner")
+			inst = self
+			return createElement("Frame", { [Ref] = self.props.forwardedRef })
+		end
+
+		local function Middle(props)
+			table.insert(renders, "Middle")
+			return createElement(Inner, props)
+		end
+
+		local Forward = forwardRef(function(props, ref)
+			table.insert(renders, "Forward")
+			return createElement(Middle, assign({}, props, { forwardedRef = ref }))
+		end)
+
+		local function App()
+			table.insert(renders, "App")
+			return createElement(Forward)
+		end
+
+		local tree = reconciler.mountVirtualTree(createElement(App), nil, "deep setState")
+		expect(#renders).to.equal(4)
+		expect(renders[1]).to.equal("App")
+		expect(renders[2]).to.equal("Forward")
+		expect(renders[3]).to.equal("Middle")
+		expect(renders[4]).to.equal("Inner")
+
+		renders = {}
+		inst:setState({})
+		expect(#renders).to.equal(1)
+		expect(renders[1]).to.equal("Inner")
+		reconciler.unmountVirtualTree(tree)
 	end)
+
 	it("should not include the ref in the forwarded props", function()
- local fn = nil
- local function CaptureProps(self)
- fn = self
- return createElement("Frame", {
- [Ref] = self.forwardedRef
- })
- end
- local fn2 = forwardRef(function(self, callback)
- return createElement(CaptureProps, assign({}, self, {
- forwardedRef = callback
- }))
- end)
- local fn3 = createRef()
- local nextState = module1.mountVirtualTree(createElement(fn2, {
- [Ref] = fn3
- }), nil, "no ref in props")
- expect(fn).to.be.ok()
- expect(fn.forwardedRef).to.equal(fn3)
- expect(fn[Ref]).to.equal(nil)
- module1.unmountVirtualTree(nextState)
+		local capturedProps
+		local function CaptureProps(props)
+			capturedProps = props
+			return createElement("Frame", { [Ref] = props.forwardedRef })
+		end
+
+		local RefForwardingComponent = forwardRef(function(props, ref)
+			return createElement(CaptureProps, assign({}, props, { forwardedRef = ref }))
+		end)
+
+		local ref = createRef()
+		local element = createElement(RefForwardingComponent, {
+			[Ref] = ref,
+		})
+
+		local tree = reconciler.mountVirtualTree(element, nil, "no ref in props")
+		expect(capturedProps).to.be.ok()
+		expect(capturedProps.forwardedRef).to.equal(ref)
+		expect(capturedProps[Ref]).to.equal(nil)
+		reconciler.unmountVirtualTree(tree)
 	end)
 end

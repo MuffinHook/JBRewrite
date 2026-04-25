@@ -88,7 +88,7 @@ if script.Parent == ReplicatedFirst then
 		end
 		ScreenGui.Parent = PlayerGui
 	end
-	local isEnabled = false
+	local isEnabled = true
 	local teleportData = TeleportService:GetLocalPlayerTeleportData()
 	if teleportData then
 		ReplicatedFirst:RemoveDefaultLoadingScreen()
@@ -106,6 +106,7 @@ if script.Parent == ReplicatedFirst then
 	if not LocalPlayer.Character then
 		LocalPlayer.CharacterAdded:Wait()
 	end
+	isEnabled = true
 	ScreenGui.Parent = nil
 	require(ReplicatedStorage.Std.Maid).new():GiveTask(ReplicatedStorage:WaitForChild(require(ReplicatedStorage.WorldTeleport.WorldTeleportConsts).TELEPORT_HAPPENING_REMOTE).onClientEvent:Connect(function(p1)
 		handleTeleport(p1)

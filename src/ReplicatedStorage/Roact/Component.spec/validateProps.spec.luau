@@ -1,192 +1,269 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
 	local createSpy = require(script.Parent.Parent.createSpy)
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
 	local GlobalConfig = require(script.Parent.Parent.GlobalConfig)
+
 	local Component = require(script.Parent.Parent.Component)
-	local v1 = createReconciler(NoopRenderer)
+
+	local noopReconciler = createReconciler(NoopRenderer)
+
 	it("should be invoked when mounted", function()
-		GlobalConfig.scoped({
-			propValidation = true
-		}, function()
-			local internalData = Component:extend("MyComponent")
-			local fn = createSpy(function()
+		local config = {
+			propValidation = true,
+		}
+
+		GlobalConfig.scoped(config, function()
+			local MyComponent = Component:extend("MyComponent")
+
+			local validatePropsSpy = createSpy(function()
 				return true
 			end)
-			internalData.validateProps = fn.value
-			function internalData.render(self)
+
+			MyComponent.validateProps = validatePropsSpy.value
+
+			function MyComponent:render()
 				return nil
 			end
-			v1.mountVirtualNode(createElement(internalData), nil, "Test")
-			expect(fn.callCount).to.equal(1)
+
+			local element = createElement(MyComponent)
+			local hostParent = nil
+			local key = "Test"
+
+			noopReconciler.mountVirtualNode(element, hostParent, key)
+			expect(validatePropsSpy.callCount).to.equal(1)
 		end)
 	end)
+
 	it("should be invoked when props change", function()
-		GlobalConfig.scoped({
-			propValidation = true
-		}, function()
-			local internalData = Component:extend("MyComponent")
-			local fn = createSpy(function()
+		local config = {
+			propValidation = true,
+		}
+
+		GlobalConfig.scoped(config, function()
+			local MyComponent = Component:extend("MyComponent")
+
+			local validatePropsSpy = createSpy(function()
 				return true
 			end)
-			internalData.validateProps = fn.value
-			function internalData.render(self)
+
+			MyComponent.validateProps = validatePropsSpy.value
+
+			function MyComponent:render()
 				return nil
 			end
-			local currentState = v1.mountVirtualNode(createElement(internalData, {
-				a = 1
-			}), nil, "Test")
-			expect(fn.callCount).to.equal(1)
-			fn:assertCalledWithDeepEqual({
-				a = 1
+
+			local element = createElement(MyComponent, { a = 1 })
+			local hostParent = nil
+			local key = "Test"
+
+			local node = noopReconciler.mountVirtualNode(element, hostParent, key)
+			expect(validatePropsSpy.callCount).to.equal(1)
+			validatePropsSpy:assertCalledWithDeepEqual({
+				a = 1,
 			})
-			v1.updateVirtualNode(currentState, (createElement(internalData, {
-				a = 2
-			})))
-			expect(fn.callCount).to.equal(2)
-			fn:assertCalledWithDeepEqual({
-				a = 2
+
+			local newElement = createElement(MyComponent, { a = 2 })
+			noopReconciler.updateVirtualNode(node, newElement)
+			expect(validatePropsSpy.callCount).to.equal(2)
+			validatePropsSpy:assertCalledWithDeepEqual({
+				a = 2,
 			})
 		end)
 	end)
+
 	it("should not be invoked when state changes", function()
-		GlobalConfig.scoped({
-			propValidation = true
-		}, function()
-			local internalData = Component:extend("MyComponent")
-			local fn = nil
-			local fn2 = createSpy(function()
+		local config = {
+			propValidation = true,
+		}
+
+		GlobalConfig.scoped(config, function()
+			local MyComponent = Component:extend("MyComponent")
+
+			local setStateCallback = nil
+			local validatePropsSpy = createSpy(function()
 				return true
 			end)
-			internalData.validateProps = fn2.value
-			function internalData.init(self)
-				fn = function(param12)
-					self:setState(param12)
+
+			MyComponent.validateProps = validatePropsSpy.value
+
+			function MyComponent:init()
+				setStateCallback = function(newState)
+					self:setState(newState)
 				end
 			end
-			function internalData.render(self)
+
+			function MyComponent:render()
 				return nil
 			end
-			v1.mountVirtualNode(createElement(internalData, {
-				a = 1
-			}), nil, "Test")
-			expect(fn2.callCount).to.equal(1)
-			fn2:assertCalledWithDeepEqual({
-				a = 1
-			})
-			fn({
-				b = 1
-			})
-			expect(fn2.callCount).to.equal(1)
-		end)
-	end)
-	it("should throw if validateProps is not a function", function()
-		GlobalConfig.scoped({
-			propValidation = true
-		}, function()
-			local internalData = Component:extend("MyComponent")
-			internalData.validateProps = 1
-			function internalData.render(self)
-				return nil
-			end
-			local fn = createElement(internalData)
-			expect(function()
-				v1.mountVirtualNode(fn, nil, "Test")
-			end).to.throw()
-		end)
-	end)
-	it("should throw if validateProps returns false", function()
-		GlobalConfig.scoped({
-			propValidation = true
-		}, function()
-			local internalData = Component:extend("MyComponent")
-			function internalData.validateProps()
-				return false
-			end
-			function internalData.render(self)
-				return nil
-			end
-			local fn = createElement(internalData)
-			expect(function()
-				v1.mountVirtualNode(fn, nil, "Test")
-			end).to.throw()
-		end)
-	end)
-	it("should include the component name in the error message", function()
-		GlobalConfig.scoped({
-			propValidation = true
-		}, function()
-			local internalData = Component:extend("MyComponent")
-			function internalData.validateProps()
-				return false
-			end
-			function internalData.render(self)
-				return nil
-			end
-			local fn = createElement(internalData)
-			local fn2, currentState = pcall(function()
-				v1.mountVirtualNode(fn, nil, "Test")
-			end)
-			expect(fn2).to.equal(false)
-			expect((currentState:find("MyComponent"))).to.be.ok()
-		end)
-	end)
-	it("should be invoked after defaultProps are applied", function()
-		GlobalConfig.scoped({
-			propValidation = true
-		}, function()
-			local internalData = Component:extend("MyComponent")
-			local fn = createSpy(function()
-				return true
-			end)
-			internalData.validateProps = fn.value
-			function internalData.render(self)
-				return nil
-			end
-			internalData.defaultProps = {
-				b = 2
-			}
-			local currentState = v1.mountVirtualNode(createElement(internalData, {
-				a = 1
-			}), nil, "Test")
-			expect(fn.callCount).to.equal(1)
-			fn:assertCalledWithDeepEqual({
+
+			local element = createElement(MyComponent, { a = 1 })
+			local hostParent = nil
+			local key = "Test"
+
+			noopReconciler.mountVirtualNode(element, hostParent, key)
+			expect(validatePropsSpy.callCount).to.equal(1)
+			validatePropsSpy:assertCalledWithDeepEqual({
 				a = 1,
-				b = 2
 			})
-			v1.updateVirtualNode(currentState, (createElement(internalData, {
-				a = 2
-			})))
-			expect(fn.callCount).to.equal(2)
-			fn:assertCalledWithDeepEqual({
+
+			setStateCallback({
+				b = 1,
+			})
+
+			expect(validatePropsSpy.callCount).to.equal(1)
+		end)
+	end)
+
+	it("should throw if validateProps is not a function", function()
+		local config = {
+			propValidation = true,
+		}
+
+		GlobalConfig.scoped(config, function()
+			local MyComponent = Component:extend("MyComponent")
+			MyComponent.validateProps = 1
+
+			function MyComponent:render()
+				return nil
+			end
+
+			local element = createElement(MyComponent)
+			local hostParent = nil
+			local key = "Test"
+
+			expect(function()
+				noopReconciler.mountVirtualNode(element, hostParent, key)
+			end).to.throw()
+		end)
+	end)
+
+	it("should throw if validateProps returns false", function()
+		local config = {
+			propValidation = true,
+		}
+
+		GlobalConfig.scoped(config, function()
+			local MyComponent = Component:extend("MyComponent")
+			MyComponent.validateProps = function()
+				return false
+			end
+
+			function MyComponent:render()
+				return nil
+			end
+
+			local element = createElement(MyComponent)
+			local hostParent = nil
+			local key = "Test"
+
+			expect(function()
+				noopReconciler.mountVirtualNode(element, hostParent, key)
+			end).to.throw()
+		end)
+	end)
+
+	it("should include the component name in the error message", function()
+		local config = {
+			propValidation = true,
+		}
+
+		GlobalConfig.scoped(config, function()
+			local MyComponent = Component:extend("MyComponent")
+			MyComponent.validateProps = function()
+				return false
+			end
+
+			function MyComponent:render()
+				return nil
+			end
+
+			local element = createElement(MyComponent)
+			local hostParent = nil
+			local key = "Test"
+
+			local success, error = pcall(function()
+				noopReconciler.mountVirtualNode(element, hostParent, key)
+			end)
+
+			expect(success).to.equal(false)
+			local startIndex = error:find("MyComponent")
+			expect(startIndex).to.be.ok()
+		end)
+	end)
+
+	it("should be invoked after defaultProps are applied", function()
+		local config = {
+			propValidation = true,
+		}
+
+		GlobalConfig.scoped(config, function()
+			local MyComponent = Component:extend("MyComponent")
+
+			local validatePropsSpy = createSpy(function()
+				return true
+			end)
+
+			MyComponent.validateProps = validatePropsSpy.value
+
+			function MyComponent:render()
+				return nil
+			end
+
+			MyComponent.defaultProps = {
+				b = 2,
+			}
+
+			local element = createElement(MyComponent, { a = 1 })
+			local hostParent = nil
+			local key = "Test"
+
+			local node = noopReconciler.mountVirtualNode(element, hostParent, key)
+			expect(validatePropsSpy.callCount).to.equal(1)
+			validatePropsSpy:assertCalledWithDeepEqual({
+				a = 1,
+				b = 2,
+			})
+
+			local newElement = createElement(MyComponent, { a = 2 })
+			noopReconciler.updateVirtualNode(node, newElement)
+			expect(validatePropsSpy.callCount).to.equal(2)
+			validatePropsSpy:assertCalledWithDeepEqual({
 				a = 2,
-				b = 2
+				b = 2,
 			})
 		end)
 	end)
+
 	it("should not be invoked if the flag is off", function()
-		GlobalConfig.scoped({
-			propValidation = false
-		}, function()
-			local internalData = Component:extend("MyComponent")
-			local fn = createSpy(function()
+		local config = {
+			propValidation = false,
+		}
+
+		GlobalConfig.scoped(config, function()
+			local MyComponent = Component:extend("MyComponent")
+
+			local validatePropsSpy = createSpy(function()
 				return true
 			end)
-			internalData.validateProps = fn.value
-			function internalData.render(self)
+
+			MyComponent.validateProps = validatePropsSpy.value
+
+			function MyComponent:render()
 				return nil
 			end
-			local currentState = v1.mountVirtualNode(createElement(internalData, {
-				a = 1
-			}), nil, "Test")
-			expect(fn.callCount).to.equal(0)
-			v1.updateVirtualNode(currentState, (createElement(internalData, {
-				a = 2
-			})))
-			expect(fn.callCount).to.equal(0)
+
+			local element = createElement(MyComponent, { a = 1 })
+			local hostParent = nil
+			local key = "Test"
+
+			local node = noopReconciler.mountVirtualNode(element, hostParent, key)
+			expect(validatePropsSpy.callCount).to.equal(0)
+
+			local newElement = createElement(MyComponent, { a = 2 })
+			noopReconciler.updateVirtualNode(node, newElement)
+			expect(validatePropsSpy.callCount).to.equal(0)
 		end)
 	end)
 end

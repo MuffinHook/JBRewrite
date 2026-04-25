@@ -1,43 +1,67 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
 	local GlobalConfig = require(script.Parent.Parent.GlobalConfig)
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
+
 	local Component = require(script.Parent.Parent.Component)
-	local key = createReconciler(NoopRenderer)
+
+	local noopReconciler = createReconciler(NoopRenderer)
+
 	it("should return stack traces in initial renders", function()
-		local internalData = Component:extend("TestComponent")
-		local var2 = nil
-		function internalData.init(self)
-			var2 = self:getElementTraceback()
+		local TestComponent = Component:extend("TestComponent")
+
+		local stackTrace
+		function TestComponent:init()
+			stackTrace = self:getElementTraceback()
 		end
-		function internalData.render(self)
+
+		function TestComponent:render()
 			return nil
 		end
-		GlobalConfig.scoped({
-			elementTracing = true
-		}, function()
-			key.mountVirtualNode(createElement(internalData), nil, "Some key")
+
+		local config = {
+			elementTracing = true,
+		}
+
+		GlobalConfig.scoped(config, function()
+			local element = createElement(TestComponent)
+			local hostParent = nil
+			local key = "Some key"
+
+			noopReconciler.mountVirtualNode(element, hostParent, key)
 		end)
-		expect(var2).to.be.a("string")
+
+		expect(stackTrace).to.be.a("string")
 	end)
-	itSKIP("it should return an updated stack trace after an update", function()  end)
+
+	itSKIP("it should return an updated stack trace after an update", function() end)
+
 	it("should return nil when elementTracing is off", function()
-		local internalData = nil
-		local var2 = Component:extend("TestComponent")
-		function var2.init(self)
-			internalData = self:getElementTraceback()
+		local stackTrace = nil
+
+		local config = {
+			elementTracing = false,
+		}
+
+		local TestComponent = Component:extend("TestComponent")
+
+		function TestComponent:init()
+			stackTrace = self:getElementTraceback()
 		end
-		function var2.render(self)
+
+		function TestComponent:render()
 			return nil
 		end
-		GlobalConfig.scoped({
-			elementTracing = false
-		}, function()
-			key.mountVirtualNode(createElement(var2), nil, "Some key")
+
+		GlobalConfig.scoped(config, function()
+			local element = createElement(TestComponent)
+			local hostParent = nil
+			local key = "Some key"
+
+			noopReconciler.mountVirtualNode(element, hostParent, key)
 		end)
-		expect(internalData).to.equal(nil)
+
+		expect(stackTrace).to.equal(nil)
 	end)
 end

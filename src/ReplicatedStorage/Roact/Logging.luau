@@ -1,87 +1,159 @@
--- Reviewed by Claude
--- variables reassigned
-local count = true
-local tableObj = {}
-local tbl2 = {}
-local function indent(self, callback)
-	local count = ("\tableObj"):rep(callback)
-	return count .. self:gsub("\n", "\n" .. count)
+--[[
+	Centralized place to handle logging. Lets us:
+	- Unit test log output via `Logging.capture`
+	- Disable verbose log messages when not debugging Roact
+
+	This should be broken out into a separate library with the addition of
+	scoping and logging configuration.
+]]
+
+-- Determines whether log messages will go to stdout/stderr
+local outputEnabled = true
+
+-- A set of LogInfo objects that should have messages inserted into them.
+-- This is a set so that nested calls to Logging.capture will behave.
+local collectors = {}
+
+-- A set of all stack traces that have called warnOnce.
+local onceUsedLocations = {}
+
+--[[
+	Indent a potentially multi-line string with the given number of tabs, in
+	addition to any indentation the string already has.
+]]
+local function indent(source, indentLevel)
+	local indentString = ("\t"):rep(indentLevel)
+
+	return indentString .. source:gsub("\n", "\n" .. indentString)
 end
-local function indentLines(self, callback)
-	local tableObj = {}
-	for i, v in ipairs(self) do
- local count = ("\tableObj"):rep(callback)
- table.insert(tableObj, count .. v:gsub("\n", "\n" .. count))
+
+--[[
+	Indents a list of strings and then concatenates them together with newlines
+	into a single string.
+]]
+local function indentLines(lines, indentLevel)
+	local outputBuffer = {}
+
+	for _, line in ipairs(lines) do
+		table.insert(outputBuffer, indent(line, indentLevel))
 	end
-	return table.concat(tableObj, "\n")
+
+	return table.concat(outputBuffer, "\n")
 end
-local metadata = {
-	__tostring = function(self)
- local tableObj = { "LogInfo {" }
- local count = #self.errors
- local count2 = #self.warnings
- local count3 = #self.infos
- if count + count2 + count3 == 0 then
- table.insert(tableObj, "\tableObj(no messages)")
- end
- if count > 0 then
- table.insert(tableObj, ("\tErrors (%d) {"):format(count))
- table.insert(tableObj, indentLines(self.errors, 2))
- table.insert(tableObj, "\tableObj}")
- end
- if count2 > 0 then
- table.insert(tableObj, ("\tWarnings (%d) {"):format(count2))
- table.insert(tableObj, indentLines(self.warnings, 2))
- table.insert(tableObj, "\tableObj}")
- end
- if count3 > 0 then
- table.insert(tableObj, ("\tInfos (%d) {"):format(count3))
- table.insert(tableObj, indentLines(self.infos, 2))
- table.insert(tableObj, "\tableObj}")
- end
- table.insert(tableObj, "}")
- return table.concat(tableObj, "\n")
+
+local logInfoMetatable = {}
+
+--[[
+	Automatic coercion to strings for LogInfo objects to enable debugging them
+	more easily.
+]]
+function logInfoMetatable:__tostring()
+	local outputBuffer = { "LogInfo {" }
+
+	local errorCount = #self.errors
+	local warningCount = #self.warnings
+	local infosCount = #self.infos
+
+	if errorCount + warningCount + infosCount == 0 then
+		table.insert(outputBuffer, "\t(no messages)")
 	end
-}
+
+	if errorCount > 0 then
+		table.insert(outputBuffer, ("\tErrors (%d) {"):format(errorCount))
+		table.insert(outputBuffer, indentLines(self.errors, 2))
+		table.insert(outputBuffer, "\t}")
+	end
+
+	if warningCount > 0 then
+		table.insert(outputBuffer, ("\tWarnings (%d) {"):format(warningCount))
+		table.insert(outputBuffer, indentLines(self.warnings, 2))
+		table.insert(outputBuffer, "\t}")
+	end
+
+	if infosCount > 0 then
+		table.insert(outputBuffer, ("\tInfos (%d) {"):format(infosCount))
+		table.insert(outputBuffer, indentLines(self.infos, 2))
+		table.insert(outputBuffer, "\t}")
+	end
+
+	table.insert(outputBuffer, "}")
+
+	return table.concat(outputBuffer, "\n")
+end
+
 local function createLogInfo()
-	local tableObj = {
- errors = {},
- warnings = {},
- infos = {}
+	local logInfo = {
+		errors = {},
+		warnings = {},
+		infos = {},
 	}
-	setmetatable(tableObj, metadata)
-	return tableObj
+
+	setmetatable(logInfo, logInfoMetatable)
+
+	return logInfo
 end
-local tbl4 = {
-	capture = function(self)
- local internalData = createLogInfo()
- local count2 = count
- count = false
- tableObj[internalData] = true
- local count3, currentState = pcall(self)
- tableObj[internalData] = nil
- count = count2
- assert(count3, currentState)
- return internalData
-	end,
-	warn = function(self, ...)
- local internalData = self:format(...)
- for k in pairs(tableObj) do
- table.insert(k.warnings, internalData)
- end
- local count2 = debug.traceback("", 2):sub(2)
- local count3 = ("\tableObj"):rep(1)
- local currentState = ("%s\n%s"):format(internalData, count3 .. count2:gsub("\n", "\n" .. count3))
- if count then
- warn(currentState)
- end
+
+local Logging = {}
+
+--[[
+	Invokes `callback`, capturing all output that happens during its execution.
+
+	Output will not go to stdout or stderr and will instead be put into a
+	LogInfo object that is returned. If `callback` throws, the error will be
+	bubbled up to the caller of `Logging.capture`.
+]]
+function Logging.capture(callback)
+	local collector = createLogInfo()
+
+	local wasOutputEnabled = outputEnabled
+	outputEnabled = false
+	collectors[collector] = true
+
+	local success, result = pcall(callback)
+
+	collectors[collector] = nil
+	outputEnabled = wasOutputEnabled
+
+	assert(success, result)
+
+	return collector
+end
+
+--[[
+	Issues a warning with an automatically attached stack trace.
+]]
+function Logging.warn(messageTemplate, ...)
+	local message = messageTemplate:format(...)
+
+	for collector in pairs(collectors) do
+		table.insert(collector.warnings, message)
 	end
-}
-function tbl4.warnOnce(self, ...)
-	local count = debug.traceback()
-	if not tbl2[count] then
- tbl2[count] = true
- tbl4.warn(self, ...)
+
+	-- debug.traceback inserts a leading newline, so we trim it here
+	local trace = debug.traceback("", 2):sub(2)
+	local fullMessage = ("%s\n%s"):format(message, indent(trace, 1))
+
+	if outputEnabled then
+		warn(fullMessage)
 	end
 end
-return tbl4
+
+--[[
+	Issues a warning like `Logging.warn`, but only outputs once per call site.
+
+	This is useful for marking deprecated functions that might be called a lot;
+	using `warnOnce` instead of `warn` will reduce output noise while still
+	correctly marking all call sites.
+]]
+function Logging.warnOnce(messageTemplate, ...)
+	local trace = debug.traceback()
+
+	if onceUsedLocations[trace] then
+		return
+	end
+
+	onceUsedLocations[trace] = true
+	Logging.warn(messageTemplate, ...)
+end
+
+return Logging

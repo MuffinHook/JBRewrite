@@ -1,21 +1,23 @@
--- Reviewed by Claude
--- variables reassigned
-return function(tableA, tableB)
-	if tableA == nil then
- return tableB == nil
+local function shallowEqual(a, b)
+	if a == nil then
+		return b == nil
+	elseif b == nil then
+		return a == nil
 	end
-	if tableB == nil then
- return tableA == nil
+
+	for key, value in pairs(a) do
+		if value ~= b[key] then
+			return false
+		end
 	end
-	for k, v in pairs(tableA) do
- if v ~= tableB[k] then
- return false
- end
+
+	for key, value in pairs(b) do
+		if value ~= a[key] then
+			return false
+		end
 	end
-	for k, v in pairs(tableB) do
- if v ~= tableA[k] then
- return false
- end
-	end
+
 	return true
 end
+
+return shallowEqual

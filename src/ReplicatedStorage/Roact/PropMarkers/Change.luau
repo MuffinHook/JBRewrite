@@ -1,21 +1,38 @@
--- Reviewed by Claude
--- variables reassigned
+--[[
+	Change is used to generate special prop keys that can be used to connect to
+	GetPropertyChangedSignal.
+
+	Generally, Change is indexed by a Roblox property name:
+
+		Roact.createElement("TextBox", {
+			[Roact.Change.Text] = function(rbx)
+				print("The TextBox", rbx, "changed text to", rbx.Text)
+			end,
+		})
+]]
+
 local Type = require(script.Parent.Parent.Type)
-local tableObj = {}
-local tbl2 = {
+
+local Change = {}
+
+local changeMetatable = {
 	__tostring = function(self)
- return ("RoactHostChangeEvent(%s)"):format(self.name)
-	end
+		return ("RoactHostChangeEvent(%s)"):format(self.name)
+	end,
 }
-setmetatable(tableObj, {
-	__index = function(self, callback)
- local metadata = {
- [Type] = Type.HostChangeEvent,
- name = callback
- }
- setmetatable(metadata, tbl2)
- tableObj[callback] = metadata
- return metadata
-	end
+
+setmetatable(Change, {
+	__index = function(_self, propertyName)
+		local changeListener = {
+			[Type] = Type.HostChangeEvent,
+			name = propertyName,
+		}
+
+		setmetatable(changeListener, changeMetatable)
+		Change[propertyName] = changeListener
+
+		return changeListener
+	end,
 })
-return tableObj
+
+return Change

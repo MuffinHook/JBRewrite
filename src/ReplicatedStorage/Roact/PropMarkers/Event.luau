@@ -1,21 +1,41 @@
--- Reviewed by Claude
--- variables reassigned
+--[[
+	Index into `Event` to get a prop key for attaching to an event on a Roblox
+	Instance.
+
+	Example:
+
+		Roact.createElement("TextButton", {
+			Text = "Hello, world!",
+
+			[Roact.Event.MouseButton1Click] = function(rbx)
+				print("Clicked", rbx)
+			end
+		})
+]]
+
 local Type = require(script.Parent.Parent.Type)
-local tableObj = {}
-local tbl2 = {
+
+local Event = {}
+
+local eventMetatable = {
 	__tostring = function(self)
- return ("RoactHostEvent(%s)"):format(self.name)
-	end
+		return ("RoactHostEvent(%s)"):format(self.name)
+	end,
 }
-setmetatable(tableObj, {
-	__index = function(self, callback)
- local metadata = {
- [Type] = Type.HostEvent,
- name = callback
- }
- setmetatable(metadata, tbl2)
- tableObj[callback] = metadata
- return metadata
-	end
+
+setmetatable(Event, {
+	__index = function(_self, eventName)
+		local event = {
+			[Type] = Type.HostEvent,
+			name = eventName,
+		}
+
+		setmetatable(event, eventMetatable)
+
+		Event[eventName] = event
+
+		return event
+	end,
 })
-return tableObj
+
+return Event

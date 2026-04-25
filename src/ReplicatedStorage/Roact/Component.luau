@@ -1,329 +1,512 @@
--- Reviewed by Claude
--- variables reassigned
 local assign = require(script.Parent.assign)
 local ComponentLifecyclePhase = require(script.Parent.ComponentLifecyclePhase)
 local Type = require(script.Parent.Type)
 local Symbol = require(script.Parent.Symbol)
 local invalidSetStateMessages = require(script.Parent.invalidSetStateMessages)
 local internalAssert = require(script.Parent.internalAssert)
+
 local config = require(script.Parent.GlobalConfig).get()
-local typeSymbol = Symbol.named("InternalData")
-local t = {
-	__tostring = function(self)
-		return self.__componentName
-	end
-}
-local tableObj = {}
-setmetatable(tableObj, t)
-tableObj[Type] = Type.StatefulComponentClass
-tableObj.__index = tableObj
-tableObj.__componentName = "Component"
-function tableObj.extend(self, callback)
+
+--[[
+	Calling setState during certain lifecycle allowed methods has the potential
+	to create an infinitely updating component. Rather than time out, we exit
+	with an error if an unreasonable number of self-triggering updates occur
+]]
+local MAX_PENDING_UPDATES = 100
+
+local InternalData = Symbol.named("InternalData")
+
+local componentMissingRenderMessage = [[
+The component %q is missing the `render` method.
+`render` must be defined when creating a Roact component!]]
+
+local tooManyUpdatesMessage = [[
+The component %q has reached the setState update recursion limit.
+When using `setState` in `didUpdate`, make sure that it won't repeat infinitely!]]
+
+local componentClassMetatable = {}
+
+function componentClassMetatable:__tostring()
+	return self.__componentName
+end
+
+local Component = {}
+setmetatable(Component, componentClassMetatable)
+
+Component[Type] = Type.StatefulComponentClass
+Component.__index = Component
+Component.__componentName = "Component"
+
+--[[
+	A method called by consumers of Roact to create a new component class.
+	Components can not be extended beyond this point, with the exception of
+	PureComponent.
+]]
+function Component:extend(name)
 	if config.typeChecks then
-		local isStatefulComponentClass = Type.of(self) == Type.StatefulComponentClass
-		assert(isStatefulComponentClass, "Invalid `self` argument to `extend`.")
-		assert(typeof(callback) == "string", "Component class name must be a string")
+		assert(Type.of(self) == Type.StatefulComponentClass, "Invalid `self` argument to `extend`.")
+		assert(typeof(name) == "string", "Component class name must be a string")
 	end
-	local tableObj = {}
-	for k, v in pairs(self) do
-		if k ~= "extend" then
-			tableObj[k] = v
+
+	local class = {}
+
+	for key, value in pairs(self) do
+		-- Roact opts to make consumers use composition over inheritance, which
+		-- lines up with React.
+		-- https://reactjs.org/docs/composition-vs-inheritance.html
+		if key ~= "extend" then
+			class[key] = value
 		end
 	end
-	tableObj[Type] = Type.StatefulComponentClass
-	tableObj.__index = tableObj
-	tableObj.__componentName = callback
-	setmetatable(tableObj, t)
-	return tableObj
+
+	class[Type] = Type.StatefulComponentClass
+	class.__index = class
+	class.__componentName = name
+
+	setmetatable(class, componentClassMetatable)
+
+	return class
 end
-function tableObj.__getDerivedState(self, callback, p3)
+
+function Component:__getDerivedState(incomingProps, incomingState)
 	if config.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
-		internalAssert(isStatefulComponentInstance, "Invalid use of `__getDerivedState`")
+		internalAssert(Type.of(self) == Type.StatefulComponentInstance, "Invalid use of `__getDerivedState`")
 	end
-	local componentClass = self[typeSymbol].componentClass
-	if componentClass.getDerivedStateFromProps == nil then
-		return nil
-	else
-		local derivedState = componentClass.getDerivedStateFromProps(callback, p3)
-		if derivedState == nil then
-			return nil
-		else
+
+	local internalData = self[InternalData]
+	local componentClass = internalData.componentClass
+
+	if componentClass.getDerivedStateFromProps ~= nil then
+		local derivedState = componentClass.getDerivedStateFromProps(incomingProps, incomingState)
+
+		if derivedState ~= nil then
 			if config.typeChecks then
 				assert(typeof(derivedState) == "table", "getDerivedStateFromProps must return a table!")
 			end
+
 			return derivedState
 		end
 	end
+
+	return nil
 end
-function tableObj.setState(self, callback)
+
+function Component:setState(mapState)
 	if config.typeChecks then
-		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
-		assert(isStatefulComponentInstance, "Invalid `self` argument to `extend`.")
+		assert(Type.of(self) == Type.StatefulComponentInstance, "Invalid `self` argument to `extend`.")
 	end
-	local internalData = self[typeSymbol]
+
+	local internalData = self[InternalData]
 	local lifecyclePhase = internalData.lifecyclePhase
-	if lifecyclePhase == ComponentLifecyclePhase.ShouldUpdate or (lifecyclePhase == ComponentLifecyclePhase.WillUpdate or lifecyclePhase == ComponentLifecyclePhase.Render) then
-		error(invalidSetStateMessages[internalData.lifecyclePhase]:format((tostring(internalData.componentClass))), 2)
-	end
-	local derivedState, newState, mergedState
-	if lifecyclePhase == ComponentLifecyclePhase.WillUnmount then
+
+	--[[
+		When preparing to update, render, or unmount, it is not safe
+		to call `setState` as it will interfere with in-flight updates. It's
+		also disallowed during unmounting
+	]]
+	if
+		lifecyclePhase == ComponentLifecyclePhase.ShouldUpdate
+		or lifecyclePhase == ComponentLifecyclePhase.WillUpdate
+		or lifecyclePhase == ComponentLifecyclePhase.Render
+	then
+		local messageTemplate = invalidSetStateMessages[internalData.lifecyclePhase]
+
+		local message = messageTemplate:format(tostring(internalData.componentClass))
+		error(message, 2)
+	elseif lifecyclePhase == ComponentLifecyclePhase.WillUnmount then
+		-- Should not print error message. See https://github.com/facebook/react/pull/22114
 		return
 	end
-	derivedState = internalData.pendingState
-	if typeof(callback) == "function" then
-		local currentState, nextState
-		currentState = derivedState or self.state
-		nextState = callback(currentState, self.props)
-		if nextState == nil then
+
+	local pendingState = internalData.pendingState
+
+	local partialState
+	if typeof(mapState) == "function" then
+		partialState = mapState(pendingState or self.state, self.props)
+
+		-- Abort the state update if the given state updater function returns nil
+		if partialState == nil then
 			return
 		end
-		newState = nextState
-	elseif typeof(callback) == "table" then
-		newState = callback
+	elseif typeof(mapState) == "table" then
+		partialState = mapState
 	else
 		error("Invalid argument to setState, expected function or table", 2)
 	end
-	if derivedState == nil then
-		local tempState
-		tempState = assign({}, self.state, newState)
-		mergedState = tempState
+
+	local newState
+	if pendingState ~= nil then
+		newState = assign(pendingState, partialState)
 	else
-		local updatedState
-		updatedState = assign(derivedState, newState)
-		mergedState = updatedState
+		newState = assign({}, self.state, partialState)
 	end
+
 	if lifecyclePhase == ComponentLifecyclePhase.Init then
-		self.state = assign(mergedState, (self:__getDerivedState(self.props, mergedState)))
+		-- If `setState` is called in `init`, we can skip triggering an update!
+		local derivedState = self:__getDerivedState(self.props, newState)
+		self.state = assign(newState, derivedState)
+	elseif
+		lifecyclePhase == ComponentLifecyclePhase.DidMount
+		or lifecyclePhase == ComponentLifecyclePhase.DidUpdate
+		or lifecyclePhase == ComponentLifecyclePhase.ReconcileChildren
+	then
+		--[[
+			During certain phases of the component lifecycle, it's acceptable to
+			allow `setState` but defer the update until we're done with ones in flight.
+			We do this by collapsing it into any pending updates we have.
+		]]
+		local derivedState = self:__getDerivedState(self.props, newState)
+		internalData.pendingState = assign(newState, derivedState)
+	elseif lifecyclePhase == ComponentLifecyclePhase.Idle then
+		-- Outside of our lifecycle, the state update is safe to make immediately
+		self:__update(nil, newState)
 	else
-		local finalState, var10, var11
-		if lifecyclePhase == ComponentLifecyclePhase.DidMount or (lifecyclePhase == ComponentLifecyclePhase.DidUpdate or lifecyclePhase == ComponentLifecyclePhase.ReconcileChildren) then
-			internalData.pendingState = assign(mergedState, (self:__getDerivedState(self.props, mergedState)))
-		elseif lifecyclePhase == ComponentLifecyclePhase.Idle then
-			self:__update(nil, mergedState)
-		else
-			finalState = invalidSetStateMessages.default
-			var10 = internalData.componentClass
-			var11 = finalState:format((tostring(var10)))
-			error(var11, 2)
-		end
+		local messageTemplate = invalidSetStateMessages.default
+
+		local message = messageTemplate:format(tostring(internalData.componentClass))
+
+		error(message, 2)
 	end
 end
-function tableObj.getElementTraceback(self)
-	return self[typeSymbol].virtualNode.currentElement.source
+
+--[[
+	Returns the stack trace of where the element was created that this component
+	instance's properties are based on.
+
+	Intended to be used primarily by diagnostic tools.
+]]
+function Component:getElementTraceback()
+	return self[InternalData].virtualNode.currentElement.source
 end
-function tableObj.render(self)
-	error(("The component %q is missing the `render` method.\n`render` must be defined when creating a Roact component!"):format((tostring(self[typeSymbol].componentClass))), 0)
+
+--[[
+	Returns a snapshot of this component given the current props and state. Must
+	be overridden by consumers of Roact and should be a pure function with
+	regards to props and state.
+
+	TODO (#199): Accept props and state as arguments.
+]]
+function Component:render()
+	local internalData = self[InternalData]
+
+	local message = componentMissingRenderMessage:format(tostring(internalData.componentClass))
+
+	error(message, 0)
 end
-function tableObj.__getContext(self, callback)
+
+--[[
+	Retrieves the context value corresponding to the given key. Can return nil
+	if a requested context key is not present
+]]
+function Component:__getContext(key)
 	if config.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
-		internalAssert(isStatefulComponentInstance, "Invalid use of `__getContext`")
-		internalAssert(callback ~= nil, "Context key cannot be nil")
+		internalAssert(Type.of(self) == Type.StatefulComponentInstance, "Invalid use of `__getContext`")
+		internalAssert(key ~= nil, "Context key cannot be nil")
 	end
-	return self[typeSymbol].virtualNode.context[callback]
+
+	local virtualNode = self[InternalData].virtualNode
+	local context = virtualNode.context
+
+	return context[key]
 end
-function tableObj.__addContext(self, callback, p3)
+
+--[[
+	Adds a new context entry to this component's context table (which will be
+	passed down to child components).
+]]
+function Component:__addContext(key, value)
 	if config.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
-		internalAssert(isStatefulComponentInstance, "Invalid use of `__addContext`")
+		internalAssert(Type.of(self) == Type.StatefulComponentInstance, "Invalid use of `__addContext`")
 	end
-	local virtualNode = self[typeSymbol].virtualNode
+	local virtualNode = self[InternalData].virtualNode
+
+	-- Make sure we store a reference to the component's original, unmodified
+	-- context the virtual node. In the reconciler, we'll restore the original
+	-- context if we need to replace the node (this happens when a node gets
+	-- re-rendered as a different component)
 	if virtualNode.originalContext == nil then
 		virtualNode.originalContext = virtualNode.context
 	end
-	virtualNode.context = assign({}, virtualNode.context, {
-		[callback] = p3
-	})
+
+	-- Build a new context table on top of the existing one, then apply it to
+	-- our virtualNode
+	local existing = virtualNode.context
+	virtualNode.context = assign({}, existing, { [key] = value })
 end
-function tableObj.__validateProps(self, callback)
-	if config.propValidation then
-		local validateProps = self[typeSymbol].componentClass.validateProps
-		if validateProps ~= nil then
-			if typeof(validateProps) ~= "function" then
-				error(("validateProps must be a function, but it is a %s.\nCheck the definition of the component %q."):format(typeof(validateProps), self.__componentName))
-			end
-			local internalData, derivedState = validateProps(callback)
-			if not internalData then
-				error(("Property validation failed in %s: %s\n\n%s"):format(self.__componentName, tostring(derivedState or "<Validator function did not supply a message>"), self:getElementTraceback() or "<enable element tracebacks>"), 0)
-			end
-		end
+
+--[[
+	Performs property validation if the static method validateProps is declared.
+	validateProps should follow assert's expected arguments:
+	(false, message: string) | true. The function may return a message in the
+	true case; it will be ignored. If this fails, the function will throw the
+	error.
+]]
+function Component:__validateProps(props)
+	if not config.propValidation then
+		return
+	end
+
+	local validator = self[InternalData].componentClass.validateProps
+
+	if validator == nil then
+		return
+	end
+
+	if typeof(validator) ~= "function" then
+		error(
+			("validateProps must be a function, but it is a %s.\nCheck the definition of the component %q."):format(
+				typeof(validator),
+				self.__componentName
+			)
+		)
+	end
+
+	local success, failureReason = validator(props)
+
+	if not success then
+		failureReason = failureReason or "<Validator function did not supply a message>"
+		error(
+			("Property validation failed in %s: %s\n\n%s"):format(
+				self.__componentName,
+				tostring(failureReason),
+				self:getElementTraceback() or "<enable element tracebacks>"
+			),
+			0
+		)
 	end
 end
-function tableObj.__mount(self, callback, p3)
+
+--[[
+	An internal method used by the reconciler to construct a new component
+	instance and attach it to the given virtualNode.
+]]
+function Component:__mount(reconciler, virtualNode)
 	if config.internalTypeChecks then
-		local isStatefulComponentClass = Type.of(self) == Type.StatefulComponentClass
-		internalAssert(isStatefulComponentClass, "Invalid use of `__mount`")
-		internalAssert(Type.of(p3) == Type.VirtualNode, "Expected arg #2 to be of type VirtualNode")
+		internalAssert(Type.of(self) == Type.StatefulComponentClass, "Invalid use of `__mount`")
+		internalAssert(Type.of(virtualNode) == Type.VirtualNode, "Expected arg #2 to be of type VirtualNode")
 	end
-	local currentElement = p3.currentElement
-	local hostParent = p3.hostParent
-	local t = {
-		reconciler = callback,
-		virtualNode = p3,
+
+	local currentElement = virtualNode.currentElement
+	local hostParent = virtualNode.hostParent
+
+	-- Contains all the information that we want to keep from consumers of
+	-- Roact, or even other parts of the codebase like the reconciler.
+	local internalData = {
+		reconciler = reconciler,
+		virtualNode = virtualNode,
 		componentClass = self,
 		lifecyclePhase = ComponentLifecyclePhase.Init,
-		pendingState = nil
+		pendingState = nil,
 	}
-	local tableObj = {
+
+	local instance = {
 		[Type] = Type.StatefulComponentInstance,
-		[typeSymbol] = t
+		[InternalData] = internalData,
 	}
-	setmetatable(tableObj, self)
-	p3.instance = tableObj
+
+	setmetatable(instance, self)
+
+	virtualNode.instance = instance
+
 	local props = currentElement.props
+
 	if self.defaultProps ~= nil then
 		props = assign({}, self.defaultProps, props)
 	end
-	tableObj:__validateProps(props)
-	tableObj.props = props
-	tableObj._context = assign({}, p3.legacyContext)
-	tableObj.state = assign({}, tableObj:__getDerivedState(tableObj.props, {}))
-	if tableObj.init ~= nil then
-		tableObj:init(tableObj.props)
-		assign(tableObj.state, tableObj:__getDerivedState(tableObj.props, tableObj.state))
+
+	instance:__validateProps(props)
+
+	instance.props = props
+
+	local newContext = assign({}, virtualNode.legacyContext)
+	instance._context = newContext
+
+	instance.state = assign({}, instance:__getDerivedState(instance.props, {}))
+
+	if instance.init ~= nil then
+		instance:init(instance.props)
+		assign(instance.state, instance:__getDerivedState(instance.props, instance.state))
 	end
-	p3.legacyContext = tableObj._context
-	t.lifecyclePhase = ComponentLifecyclePhase.Render
-	local nextState = tableObj:render()
-	t.lifecyclePhase = ComponentLifecyclePhase.ReconcileChildren
-	callback.updateVirtualNodeWithRenderResult(p3, hostParent, nextState)
-	if tableObj.didMount ~= nil then
-		t.lifecyclePhase = ComponentLifecyclePhase.DidMount
-		tableObj:didMount()
+
+	-- It's possible for init() to redefine _context!
+	virtualNode.legacyContext = instance._context
+
+	internalData.lifecyclePhase = ComponentLifecyclePhase.Render
+	local renderResult = instance:render()
+
+	internalData.lifecyclePhase = ComponentLifecyclePhase.ReconcileChildren
+	reconciler.updateVirtualNodeWithRenderResult(virtualNode, hostParent, renderResult)
+
+	if instance.didMount ~= nil then
+		internalData.lifecyclePhase = ComponentLifecyclePhase.DidMount
+		instance:didMount()
 	end
-	if t.pendingState ~= nil then
-		tableObj:__update(nil, nil)
+
+	if internalData.pendingState ~= nil then
+		-- __update will handle pendingState, so we don't pass any new element or state
+		instance:__update(nil, nil)
 	end
-	t.lifecyclePhase = ComponentLifecyclePhase.Idle
+
+	internalData.lifecyclePhase = ComponentLifecyclePhase.Idle
 end
-function tableObj.__unmount(self)
+
+--[[
+	Internal method used by the reconciler to clean up any resources held by
+	this component instance.
+]]
+function Component:__unmount()
 	if config.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
-		internalAssert(isStatefulComponentInstance, "Invalid use of `__unmount`")
+		internalAssert(Type.of(self) == Type.StatefulComponentInstance, "Invalid use of `__unmount`")
 	end
-	local derivedState = self[typeSymbol]
-	local virtualNode = derivedState.virtualNode
-	local reconciler = derivedState.reconciler
+
+	local internalData = self[InternalData]
+	local virtualNode = internalData.virtualNode
+	local reconciler = internalData.reconciler
+
 	if self.willUnmount ~= nil then
-		derivedState.lifecyclePhase = ComponentLifecyclePhase.WillUnmount
+		internalData.lifecyclePhase = ComponentLifecyclePhase.WillUnmount
 		self:willUnmount()
 	end
-	for k, v in pairs(virtualNode.children) do
-		reconciler.unmountVirtualNode(v)
+
+	for _, childNode in pairs(virtualNode.children) do
+		reconciler.unmountVirtualNode(childNode)
 	end
 end
-function tableObj.__update(self, callback, p3)
+
+--[[
+	Internal method used by setState (to trigger updates based on state) and by
+	the reconciler (to trigger updates based on props)
+
+	Returns true if the update was completed, false if it was cancelled by shouldUpdate
+]]
+function Component:__update(updatedElement, updatedState)
 	if config.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
-		internalAssert(isStatefulComponentInstance, "Invalid use of `__update`")
-		internalAssert(Type.of(callback) == Type.Element or callback == nil, "Expected arg #1 to be of type Element or nil")
-		internalAssert(typeof(p3) == "table" or p3 == nil, "Expected arg #2 to be of type table or nil")
+		internalAssert(Type.of(self) == Type.StatefulComponentInstance, "Invalid use of `__update`")
+		internalAssert(
+			Type.of(updatedElement) == Type.Element or updatedElement == nil,
+			"Expected arg #1 to be of type Element or nil"
+		)
+		internalAssert(
+			typeof(updatedState) == "table" or updatedState == nil,
+			"Expected arg #2 to be of type table or nil"
+		)
 	end
-	local tempState = self[typeSymbol]
-	local componentClass = tempState.componentClass
-	local props = self.props
-	if callback ~= nil then
-		props = callback.props
+
+	local internalData = self[InternalData]
+	local componentClass = internalData.componentClass
+
+	local newProps = self.props
+	if updatedElement ~= nil then
+		newProps = updatedElement.props
+
 		if componentClass.defaultProps ~= nil then
-			props = assign({}, componentClass.defaultProps, props)
+			newProps = assign({}, componentClass.defaultProps, newProps)
 		end
-		self:__validateProps(props)
+
+		self:__validateProps(newProps)
 	end
-	local count = 0
-	while true do
-		local updatedState, finalState, var10
-		if tempState.pendingState == nil then
+
+	local updateCount = 0
+	repeat
+		local finalState
+		local pendingState = nil
+
+		-- Consume any pending state we might have
+		if internalData.pendingState ~= nil then
+			pendingState = internalData.pendingState
+			internalData.pendingState = nil
+		end
+
+		-- Consume a standard update to state or props
+		if updatedState ~= nil or newProps ~= self.props then
+			if pendingState == nil then
+				finalState = updatedState or self.state
+			else
+				finalState = assign(pendingState, updatedState)
+			end
+
+			local derivedState = self:__getDerivedState(newProps, finalState)
+
+			if derivedState ~= nil then
+				finalState = assign({}, finalState, derivedState)
+			end
+
 			updatedState = nil
 		else
-			updatedState = tempState.pendingState
-			tempState.pendingState = nil
+			finalState = pendingState
 		end
-		if p3 == nil and props == self.props then
-			finalState = updatedState
-		else
-			if updatedState == nil then
-				var10 = p3 or self.state
-				finalState = var10
-			else
-				finalState = assign(updatedState, p3)
-			end
-			local internalData = self:__getDerivedState(props, finalState)
-			if internalData ~= nil then
-				finalState = assign({}, finalState, internalData)
-			end
-			p3 = nil
-		end
-		if not self:__resolveUpdate(props, finalState) then
+
+		if not self:__resolveUpdate(newProps, finalState) then
+			-- If the update was short-circuited, bubble the result up to the caller
 			return false
 		end
-		count = count + 1
-		if count > 100 then
-			local v14 = error
-			v14(("The component %q has reached the setState update recursion limit.\nWhen using `setState` in `didUpdate`, make sure that it won\'t repeat infinitely!"):format((tostring(tempState.componentClass))), 3)
+
+		updateCount = updateCount + 1
+
+		if updateCount > MAX_PENDING_UPDATES then
+			error(tooManyUpdatesMessage:format(tostring(internalData.componentClass)), 3)
 		end
-		if tempState.pendingState == nil then
-			return true
-		end
-	end
+	until internalData.pendingState == nil
+
+	return true
 end
-function tableObj.__resolveUpdate(self, callback, p3)
+
+--[[
+	Internal method used by __update to apply new props and state
+
+	Returns true if the update was completed, false if it was cancelled by shouldUpdate
+]]
+function Component:__resolveUpdate(incomingProps, incomingState)
 	if config.internalTypeChecks then
-		local isStatefulComponentInstance = Type.of(self) == Type.StatefulComponentInstance
-		internalAssert(isStatefulComponentInstance, "Invalid use of `__resolveUpdate`")
+		internalAssert(Type.of(self) == Type.StatefulComponentInstance, "Invalid use of `__resolveUpdate`")
 	end
-	local derivedState = self[typeSymbol]
-	local virtualNode = derivedState.virtualNode
-	local reconciler = derivedState.reconciler
-	local props = self.props
-	local state = self.state
-	if callback == nil then
-		callback = props
+
+	local internalData = self[InternalData]
+	local virtualNode = internalData.virtualNode
+	local reconciler = internalData.reconciler
+
+	local oldProps = self.props
+	local oldState = self.state
+
+	if incomingProps == nil then
+		incomingProps = oldProps
 	end
-	if p3 == nil then
-		p3 = state
+	if incomingState == nil then
+		incomingState = oldState
 	end
-	local newState
-	if self.shouldUpdate == nil then
-		if self.willUpdate ~= nil then
-			derivedState.lifecyclePhase = ComponentLifecyclePhase.WillUpdate
-			self:willUpdate(callback, p3)
-		end
-		derivedState.lifecyclePhase = ComponentLifecyclePhase.Render
-		self.props = callback
-		self.state = p3
-		newState = virtualNode.instance:render()
-		derivedState.lifecyclePhase = ComponentLifecyclePhase.ReconcileChildren
-		reconciler.updateVirtualNodeWithRenderResult(virtualNode, virtualNode.hostParent, newState)
-		if self.didUpdate ~= nil then
-			derivedState.lifecyclePhase = ComponentLifecyclePhase.DidUpdate
-			self:didUpdate(props, state)
-		end
-		derivedState.lifecyclePhase = ComponentLifecyclePhase.Idle
-		return true
-	else
-		derivedState.lifecyclePhase = ComponentLifecyclePhase.ShouldUpdate
-		if self:shouldUpdate(callback, p3) then
-			if self.willUpdate ~= nil then
-				derivedState.lifecyclePhase = ComponentLifecyclePhase.WillUpdate
-				self:willUpdate(callback, p3)
-			end
-			derivedState.lifecyclePhase = ComponentLifecyclePhase.Render
-			self.props = callback
-			self.state = p3
-			newState = virtualNode.instance:render()
-			derivedState.lifecyclePhase = ComponentLifecyclePhase.ReconcileChildren
-			reconciler.updateVirtualNodeWithRenderResult(virtualNode, virtualNode.hostParent, newState)
-			if self.didUpdate ~= nil then
-				derivedState.lifecyclePhase = ComponentLifecyclePhase.DidUpdate
-				self:didUpdate(props, state)
-			end
-			derivedState.lifecyclePhase = ComponentLifecyclePhase.Idle
-			return true
-		else
-			derivedState.lifecyclePhase = ComponentLifecyclePhase.Idle
+
+	if self.shouldUpdate ~= nil then
+		internalData.lifecyclePhase = ComponentLifecyclePhase.ShouldUpdate
+		local continueWithUpdate = self:shouldUpdate(incomingProps, incomingState)
+
+		if not continueWithUpdate then
+			internalData.lifecyclePhase = ComponentLifecyclePhase.Idle
 			return false
 		end
 	end
+
+	if self.willUpdate ~= nil then
+		internalData.lifecyclePhase = ComponentLifecyclePhase.WillUpdate
+		self:willUpdate(incomingProps, incomingState)
+	end
+
+	internalData.lifecyclePhase = ComponentLifecyclePhase.Render
+
+	self.props = incomingProps
+	self.state = incomingState
+
+	local renderResult = virtualNode.instance:render()
+
+	internalData.lifecyclePhase = ComponentLifecyclePhase.ReconcileChildren
+	reconciler.updateVirtualNodeWithRenderResult(virtualNode, virtualNode.hostParent, renderResult)
+
+	if self.didUpdate ~= nil then
+		internalData.lifecyclePhase = ComponentLifecyclePhase.DidUpdate
+		self:didUpdate(oldProps, oldState)
+	end
+
+	internalData.lifecyclePhase = ComponentLifecyclePhase.Idle
+	return true
 end
-return tableObj
+
+return Component

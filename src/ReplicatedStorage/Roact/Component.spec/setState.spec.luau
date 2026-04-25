@@ -1,409 +1,600 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
 	local createSpy = require(script.Parent.Parent.createSpy)
 	local None = require(script.Parent.Parent.None)
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
+
 	local Component = require(script.Parent.Parent.Component)
-	local v1 = createReconciler(NoopRenderer)
+
+	local noopReconciler = createReconciler(NoopRenderer)
+
 	describe("setState", function()
 		it("should not trigger an extra update when called in init", function()
-			local internalData = 0
-			local v2 = 0
-			local fn = nil
-			local currentState = Component:extend("InitComponent")
-			function currentState.init(self)
+			local renderCount = 0
+			local updateCount = 0
+			local capturedState
+
+			local InitComponent = Component:extend("InitComponent")
+
+			function InitComponent:init()
 				self:setState({
-					a = 1
+					a = 1,
 				})
 			end
-			function currentState.willUpdate(self)
-				v2 = v2 + 1
+
+			function InitComponent:willUpdate()
+				updateCount = updateCount + 1
 			end
-			function currentState.render(self)
-				internalData = internalData + 1
-				fn = self.state
+
+			function InitComponent:render()
+				renderCount = renderCount + 1
+				capturedState = self.state
 				return nil
 			end
-			v1.mountVirtualTree((createElement(currentState)))
-			expect(internalData).to.equal(1)
-			expect(v2).to.equal(0)
-			expect(fn.a).to.equal(1)
+
+			local initElement = createElement(InitComponent)
+
+			noopReconciler.mountVirtualTree(initElement)
+
+			expect(renderCount).to.equal(1)
+			expect(updateCount).to.equal(0)
+			expect(capturedState.a).to.equal(1)
 		end)
+
 		it("should throw when called in render", function()
-			local internalData = Component:extend("TestComponent")
-			function internalData.render(self)
+			local TestComponent = Component:extend("TestComponent")
+
+			function TestComponent:render()
 				self:setState({
-					a = 1
+					a = 1,
 				})
 			end
-			local fn, currentState = pcall(v1.mountVirtualTree, (createElement(internalData)))
-			expect(fn).to.equal(false)
-			expect(currentState:match("render")).to.be.ok()
-			expect(currentState:match("TestComponent")).to.be.ok()
+
+			local renderElement = createElement(TestComponent)
+
+			local success, result = pcall(noopReconciler.mountVirtualTree, renderElement)
+
+			expect(success).to.equal(false)
+			expect(result:match("render")).to.be.ok()
+			expect(result:match("TestComponent")).to.be.ok()
 		end)
+
 		it("should throw when called in shouldUpdate", function()
-			local internalData = Component:extend("TestComponent")
-			function internalData.render(self)
+			local TestComponent = Component:extend("TestComponent")
+
+			function TestComponent:render()
 				return nil
 			end
-			function internalData.shouldUpdate(self)
+
+			function TestComponent:shouldUpdate()
 				self:setState({
-					a = 1
+					a = 1,
 				})
 			end
-			local v2 = createElement(internalData)
-			local fn = createElement(internalData)
-			local nextState, tempState = pcall(v1.updateVirtualTree, v1.mountVirtualTree(v2), fn)
-			expect(nextState).to.equal(false)
-			expect(tempState:match("shouldUpdate")).to.be.ok()
-			expect(tempState:match("TestComponent")).to.be.ok()
+
+			local initialElement = createElement(TestComponent)
+			local updatedElement = createElement(TestComponent)
+
+			local tree = noopReconciler.mountVirtualTree(initialElement)
+
+			local success, result = pcall(noopReconciler.updateVirtualTree, tree, updatedElement)
+
+			expect(success).to.equal(false)
+			expect(result:match("shouldUpdate")).to.be.ok()
+			expect(result:match("TestComponent")).to.be.ok()
 		end)
+
 		it("should throw when called in willUpdate", function()
-			local internalData = Component:extend("TestComponent")
-			function internalData.render(self)
+			local TestComponent = Component:extend("TestComponent")
+
+			function TestComponent:render()
 				return nil
 			end
-			function internalData.willUpdate(self)
+
+			function TestComponent:willUpdate()
 				self:setState({
-					a = 1
+					a = 1,
 				})
 			end
-			local v2 = createElement(internalData)
-			local fn = createElement(internalData)
-			local nextState, tempState = pcall(v1.updateVirtualTree, v1.mountVirtualTree(v2), fn)
-			expect(nextState).to.equal(false)
-			expect(tempState:match("willUpdate")).to.be.ok()
-			expect(tempState:match("TestComponent")).to.be.ok()
+
+			local initialElement = createElement(TestComponent)
+			local updatedElement = createElement(TestComponent)
+			local tree = noopReconciler.mountVirtualTree(initialElement)
+
+			local success, result = pcall(noopReconciler.updateVirtualTree, tree, updatedElement)
+
+			expect(success).to.equal(false)
+			expect(result:match("willUpdate")).to.be.ok()
+			expect(result:match("TestComponent")).to.be.ok()
 		end)
+
 		it("should not throw when called in willUnmount", function()
-			local internalData = Component:extend("TestComponent")
-			function internalData.render(self)
+			local TestComponent = Component:extend("TestComponent")
+
+			function TestComponent:render()
 				return nil
 			end
-			function internalData.willUnmount(self)
+
+			function TestComponent:willUnmount()
 				self:setState({
-					a = 1
+					a = 1,
 				})
 			end
-			local currentState, _ = pcall(v1.unmountVirtualTree, (v1.mountVirtualTree((createElement(internalData)))))
-			expect(currentState).to.equal(true)
+
+			local element = createElement(TestComponent)
+			local tree = noopReconciler.mountVirtualTree(element)
+
+			local success, _ = pcall(noopReconciler.unmountVirtualTree, tree)
+
+			expect(success).to.equal(true)
 		end)
+
 		it("should remove values from state when the value is None", function()
-			local internalData = Component:extend("TestComponent")
-			local v2 = nil
-			local fn = nil
-			function internalData.init(self)
-				v2 = function(param12)
-					self:setState(param12)
+			local TestComponent = Component:extend("TestComponent")
+			local setStateCallback, getStateCallback
+
+			function TestComponent:init()
+				setStateCallback = function(newState)
+					self:setState(newState)
 				end
-				fn = function()
+
+				getStateCallback = function()
 					return self.state
 				end
+
 				self:setState({
-					value = 0
+					value = 0,
 				})
 			end
-			function internalData.render(self)
+
+			function TestComponent:render()
 				return nil
 			end
-			local nextState = v1.mountVirtualNode(createElement(internalData), nil, "Test")
-			expect(fn().value).to.equal(0)
-			v2({
-				value = None
+
+			local element = createElement(TestComponent)
+			local instance = noopReconciler.mountVirtualNode(element, nil, "Test")
+
+			expect(getStateCallback().value).to.equal(0)
+
+			setStateCallback({
+				value = None,
 			})
-			expect(fn().value).to.equal(nil)
-			v1.unmountVirtualNode(nextState)
+
+			expect(getStateCallback().value).to.equal(nil)
+
+			noopReconciler.unmountVirtualNode(instance)
 		end)
+
 		it("should invoke functions to compute a partial state", function()
-			local internalData = Component:extend("TestComponent")
-			local v2 = nil
-			local fn = nil
-			local currentState = nil
-			function internalData.init(self)
-				v2 = function(param12)
-					self:setState(param12)
+			local TestComponent = Component:extend("TestComponent")
+			local setStateCallback, getStateCallback, getPropsCallback
+
+			function TestComponent:init()
+				setStateCallback = function(newState)
+					self:setState(newState)
 				end
-				fn = function()
+
+				getStateCallback = function()
 					return self.state
 				end
-				currentState = function()
+
+				getPropsCallback = function()
 					return self.props
 				end
+
 				self:setState({
-					value = 0
+					value = 0,
 				})
 			end
-			function internalData.render(self)
+
+			function TestComponent:render()
 				return nil
 			end
-			local tempState = v1.mountVirtualNode(createElement(internalData), nil, "Test")
-			expect(fn().value).to.equal(0)
-			v2(function(self, callback)
-				expect(self).to.equal(fn())
-				expect(callback).to.equal(currentState())
+
+			local element = createElement(TestComponent)
+			local instance = noopReconciler.mountVirtualNode(element, nil, "Test")
+
+			expect(getStateCallback().value).to.equal(0)
+
+			setStateCallback(function(state, props)
+				expect(state).to.equal(getStateCallback())
+				expect(props).to.equal(getPropsCallback())
+
 				return {
-					value = self.value + 1
+					value = state.value + 1,
 				}
 			end)
-			expect(fn().value).to.equal(1)
-			v1.unmountVirtualNode(tempState)
+
+			expect(getStateCallback().value).to.equal(1)
+
+			noopReconciler.unmountVirtualNode(instance)
 		end)
+
 		it("should cancel rendering if the function returns nil", function()
-			local internalData = Component:extend("TestComponent")
-			local v2 = nil
-			local fn = 0
-			function internalData.init(self)
-				v2 = function(param12)
-					self:setState(param12)
+			local TestComponent = Component:extend("TestComponent")
+			local setStateCallback
+			local renderCount = 0
+
+			function TestComponent:init()
+				setStateCallback = function(newState)
+					self:setState(newState)
 				end
+
 				self:setState({
-					value = 0
+					value = 0,
 				})
 			end
-			function internalData.render(self)
-				fn = fn + 1
+
+			function TestComponent:render()
+				renderCount = renderCount + 1
 				return nil
 			end
-			local nextState = v1.mountVirtualNode(createElement(internalData), nil, "Test")
-			expect(fn).to.equal(1)
-			v2(function(self, callback)
+
+			local element = createElement(TestComponent)
+			local instance = noopReconciler.mountVirtualNode(element, nil, "Test")
+			expect(renderCount).to.equal(1)
+
+			setStateCallback(function(_state, _props)
 				return nil
 			end)
-			expect(fn).to.equal(1)
-			v1.unmountVirtualNode(nextState)
+
+			expect(renderCount).to.equal(1)
+
+			noopReconciler.unmountVirtualNode(instance)
 		end)
 	end)
+
 	describe("setState suspension", function()
 		it("should defer setState triggered while reconciling", function()
-			local internalData = Component:extend("Child")
-			local v2 = nil
-			function internalData.render(self)
+			local Child = Component:extend("Child")
+			local getParentStateCallback
+
+			function Child:render()
 				return nil
 			end
-			function internalData.didMount(self)
+
+			function Child:didMount()
 				self.props.callback()
 			end
-			local fn = Component:extend("Parent")
-			function fn.init(self)
-				v2 = function()
+
+			local Parent = Component:extend("Parent")
+
+			function Parent:init()
+				getParentStateCallback = function()
 					return self.state
 				end
 			end
-			function fn.render(self)
-				return createElement(internalData, {
+
+			function Parent:render()
+				return createElement(Child, {
 					callback = function()
 						self:setState({
-							foo = "bar"
+							foo = "bar",
 						})
-					end
+					end,
 				})
 			end
-			expect((v1.mountVirtualNode(createElement(fn), nil, "Test"))).to.be.ok()
-			expect(v2().foo).to.equal("bar")
+
+			local element = createElement(Parent)
+			local hostParent = nil
+			local key = "Test"
+
+			local result = noopReconciler.mountVirtualNode(element, hostParent, key)
+
+			expect(result).to.be.ok()
+			expect(getParentStateCallback().foo).to.equal("bar")
 		end)
+
 		it("should defer setState triggered while reconciling during an update", function()
-			local internalData = Component:extend("Child")
-			local v2 = nil
-			function internalData.render(self)
+			local Child = Component:extend("Child")
+			local getParentStateCallback
+
+			function Child:render()
 				return nil
 			end
-			function internalData.didUpdate(self)
+
+			function Child:didUpdate()
 				self.props.callback()
 			end
-			local fn = Component:extend("Parent")
-			function fn.init(self)
-				v2 = function()
+
+			local Parent = Component:extend("Parent")
+
+			function Parent:init()
+				getParentStateCallback = function()
 					return self.state
 				end
 			end
-			function fn.render(self)
-				return createElement(internalData, {
+
+			function Parent:render()
+				return createElement(Child, {
 					callback = function()
+						-- This guards against a stack overflow that would be OUR fault
 						if not self.state.foo then
 							self:setState({
-								foo = "bar"
+								foo = "bar",
 							})
 						end
-					end
+					end,
 				})
 			end
-			local nextState = v1.mountVirtualNode(createElement(fn), nil, "Test")
-			expect(nextState).to.be.ok()
-			expect(v2().foo).to.equal(nil)
-			local tempState = v1.updateVirtualNode(nextState, createElement(fn))
-			expect(tempState).to.be.ok()
-			expect(v2().foo).to.equal("bar")
-			v1.unmountVirtualNode(tempState)
+
+			local element = createElement(Parent)
+			local hostParent = nil
+			local key = "Test"
+
+			local result = noopReconciler.mountVirtualNode(element, hostParent, key)
+
+			expect(result).to.be.ok()
+			expect(getParentStateCallback().foo).to.equal(nil)
+
+			result = noopReconciler.updateVirtualNode(result, createElement(Parent))
+
+			expect(result).to.be.ok()
+			expect(getParentStateCallback().foo).to.equal("bar")
+
+			noopReconciler.unmountVirtualNode(result)
 		end)
+
 		it("should combine pending state changes properly", function()
-			local internalData = Component:extend("Child")
-			local v2 = nil
-			function internalData.render(self)
+			local Child = Component:extend("Child")
+			local getParentStateCallback
+
+			function Child:render()
 				return nil
 			end
-			function internalData.didMount(self)
+
+			function Child:didMount()
 				self.props.callback("foo", 1)
 				self.props.callback("bar", 3)
 			end
-			local fn = Component:extend("Parent")
-			function fn.init(self)
-				v2 = function()
+
+			local Parent = Component:extend("Parent")
+
+			function Parent:init()
+				getParentStateCallback = function()
 					return self.state
 				end
 			end
-			function fn.render(self)
-				return createElement(internalData, {
-					callback = function(param12, callback)
+
+			function Parent:render()
+				return createElement(Child, {
+					callback = function(key, value)
 						self:setState({
-							[param12] = callback
+							[key] = value,
 						})
-					end
+					end,
 				})
 			end
-			local nextState = v1.mountVirtualNode(createElement(fn), nil, "Test")
-			expect(nextState).to.be.ok()
-			expect(v2().foo).to.equal(1)
-			expect(v2().bar).to.equal(3)
-			v1.unmountVirtualNode(nextState)
+
+			local element = createElement(Parent)
+			local hostParent = nil
+			local key = "Test"
+
+			local result = noopReconciler.mountVirtualNode(element, hostParent, key)
+
+			expect(result).to.be.ok()
+			expect(getParentStateCallback().foo).to.equal(1)
+			expect(getParentStateCallback().bar).to.equal(3)
+
+			noopReconciler.unmountVirtualNode(result)
 		end)
+
 		it("should abort properly when functional setState returns nil while deferred", function()
-			local internalData = Component:extend("Child")
-			function internalData.render(self)
+			local Child = Component:extend("Child")
+
+			function Child:render()
 				return nil
 			end
-			function internalData.didMount(self)
+
+			function Child:didMount()
 				self.props.callback()
 			end
-			local v2 = Component:extend("Parent")
-			local fn = createSpy(function(self)
-				return createElement(internalData, {
+
+			local Parent = Component:extend("Parent")
+
+			local renderSpy = createSpy(function(self)
+				return createElement(Child, {
 					callback = function()
 						self:setState(function()
+							-- abort the setState
 							return nil
 						end)
-					end
+					end,
 				})
 			end)
-			v2.render = fn.value
-			local nextState = v1.mountVirtualNode(createElement(v2), nil, "Test")
-			expect(nextState).to.be.ok()
-			expect(fn.callCount).to.equal(1)
-			v1.unmountVirtualNode(nextState)
+
+			Parent.render = renderSpy.value
+
+			local element = createElement(Parent)
+			local hostParent = nil
+			local key = "Test"
+
+			local result = noopReconciler.mountVirtualNode(element, hostParent, key)
+
+			expect(result).to.be.ok()
+			expect(renderSpy.callCount).to.equal(1)
+
+			noopReconciler.unmountVirtualNode(result)
 		end)
+
 		it("should still apply pending state if a subsequent state update was aborted", function()
-			local internalData = Component:extend("Child")
-			local v2 = nil
-			function internalData.render(self)
+			local Child = Component:extend("Child")
+			local getParentStateCallback
+
+			function Child:render()
 				return nil
 			end
-			function internalData.didMount(self)
+
+			function Child:didMount()
 				self.props.callback(function()
 					return {
-						foo = 1
+						foo = 1,
 					}
 				end)
 				self.props.callback(function()
 					return nil
 				end)
 			end
-			local fn = Component:extend("Parent")
-			function fn.init(self)
-				v2 = function()
+
+			local Parent = Component:extend("Parent")
+
+			function Parent:init()
+				getParentStateCallback = function()
 					return self.state
 				end
 			end
-			function fn.render(self)
-				return createElement(internalData, {
-					callback = function(param12)
-						self:setState(param12)
-					end
+
+			function Parent:render()
+				return createElement(Child, {
+					callback = function(stateUpdater)
+						self:setState(stateUpdater)
+					end,
 				})
 			end
-			local nextState = v1.mountVirtualNode(createElement(fn), nil, "Test")
-			expect(nextState).to.be.ok()
-			expect(v2().foo).to.equal(1)
-			v1.unmountVirtualNode(nextState)
+
+			local element = createElement(Parent)
+			local hostParent = nil
+			local key = "Test"
+
+			local result = noopReconciler.mountVirtualNode(element, hostParent, key)
+
+			expect(result).to.be.ok()
+			expect(getParentStateCallback().foo).to.equal(1)
+
+			noopReconciler.unmountVirtualNode(result)
 		end)
+
 		it("should not re-process new state when pending state is present after update", function()
-			local internalData = nil
-			local v2 = nil
-			local fn = Component:extend("MyComponent")
-			function fn.init(self)
+			local setComponentState
+			local getComponentState
+
+			local MyComponent = Component:extend("MyComponent")
+
+			function MyComponent:init()
 				self:setState({
 					hasUpdatedOnce = false,
-					counter = 0
+					counter = 0,
 				})
-				internalData = function(param12)
-					self:setState(param12)
+
+				setComponentState = function(mapState)
+					self:setState(mapState)
 				end
-				v2 = function()
+
+				getComponentState = function()
 					return self.state
 				end
 			end
-			function fn.render(self)
+
+			function MyComponent:render()
 				return nil
 			end
-			function fn.didUpdate(self)
+
+			function MyComponent:didUpdate()
 				if self.state.hasUpdatedOnce == false then
 					self:setState({
-						hasUpdatedOnce = true
+						hasUpdatedOnce = true,
 					})
 				end
 			end
-			v1.mountVirtualNode(createElement(fn), nil, "Test")
-			expect(v2().hasUpdatedOnce).to.equal(false)
-			expect(v2().counter).to.equal(0)
-			internalData(function(self)
+
+			local element = createElement(MyComponent)
+			local hostParent = nil
+			local key = "Test"
+
+			noopReconciler.mountVirtualNode(element, hostParent, key)
+
+			expect(getComponentState().hasUpdatedOnce).to.equal(false)
+			expect(getComponentState().counter).to.equal(0)
+
+			setComponentState(function(state)
 				return {
-					counter = self.counter + 1
+					counter = state.counter + 1,
 				}
 			end)
-			expect(v2().hasUpdatedOnce).to.equal(true)
-			expect(v2().counter).to.equal(1)
+
+			expect(getComponentState().hasUpdatedOnce).to.equal(true)
+			expect(getComponentState().counter).to.equal(1)
 		end)
+
 		it("should throw when an infinite update is triggered", function()
-			local internalData = Component:extend("InfiniteUpdater")
-			function internalData.render(self)
+			local InfiniteUpdater = Component:extend("InfiniteUpdater")
+
+			function InfiniteUpdater:render()
 				return nil
 			end
-			function internalData.didMount(self)
+
+			function InfiniteUpdater:didMount()
 				self:setState({})
 			end
-			function internalData.didUpdate(self)
+
+			function InfiniteUpdater:didUpdate()
 				self:setState({})
 			end
-			local fn, currentState = pcall(v1.mountVirtualNode, createElement(internalData), nil, "Test")
-			expect(fn).to.equal(false)
-			expect(currentState:find("InfiniteUpdater")).to.be.ok()
-			expect(currentState:find("reached the setState update recursion limit")).to.be.ok()
+
+			local element = createElement(InfiniteUpdater)
+			local hostParent = nil
+			local key = "Test"
+
+			local success, result = pcall(noopReconciler.mountVirtualNode, element, hostParent, key)
+
+			expect(success).to.equal(false)
+			expect(result:find("InfiniteUpdater")).to.be.ok()
+			expect(result:find("reached the setState update recursion limit")).to.be.ok()
 		end)
-		itSKIP("should process single updates with both new and pending state", function()  end)
+
+		itSKIP("should process single updates with both new and pending state", function()
+			--[[
+				This situation shouldn't be possible currently, but the implementation
+				should support it for future update de-duplication
+			]]
+		end)
+
 		it("should call trigger update after didMount when setting state in didMount", function()
-			local internalData = Component:extend("MyComponent")
-			function internalData.init(self)
+			--[[
+				Before setState suspension, it was possible to call setState in didMount but it would
+				not actually finish resolving didMount until after the entire update.
+
+				This is theoretically problematic, as it means that lifecycle methods like didUpdate
+				could be called before didMount is finished. setState suspension resolves this by
+				suspending state updates made in didMount and didUpdate as well as reconciliation
+			]]
+			local MyComponent = Component:extend("MyComponent")
+
+			function MyComponent:init()
 				self:setState({
-					status = "initial mount"
+					status = "initial mount",
 				})
+
 				self.isMounted = false
 			end
-			function internalData.render(self)
+
+			function MyComponent:render()
 				return nil
 			end
-			function internalData.didMount(self)
+
+			function MyComponent:didMount()
 				self:setState({
-					status = "mounted"
+					status = "mounted",
 				})
+
 				self.isMounted = true
 			end
-			function internalData.didUpdate(self, callback, p3)
-				expect(p3.status).to.equal("initial mount")
+
+			function MyComponent:didUpdate(_oldProps, oldState)
+				expect(oldState.status).to.equal("initial mount")
 				expect(self.state.status).to.equal("mounted")
+
 				expect(self.isMounted).to.equal(true)
 			end
-			expect((v1.mountVirtualNode(createElement(internalData), nil, "Test"))).to.be.ok()
+
+			local element = createElement(MyComponent)
+			local hostParent = nil
+			local key = "Test"
+
+			local result = noopReconciler.mountVirtualNode(element, hostParent, key)
+
+			expect(result).to.be.ok()
 		end)
 	end)
 end

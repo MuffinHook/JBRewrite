@@ -1,13 +1,22 @@
--- Reviewed by Claude
--- variables reassigned
-return function(self, callback)
-	local varType = callback or tostring(self)
-	return setmetatable(self, {
- __index = function(self, callback)
- error(("%q (%s) is not a valid member of %s"):format(tostring(callback), typeof(callback), varType), 2)
- end,
- __newindex = function(self, callback, self)
- error(("%q (%s) is not a valid member of %s"):format(tostring(callback), typeof(callback), varType), 2)
- end
+--!strict
+local function strict(t: { [any]: any }, name: string?)
+	-- FIXME Luau: Need to define a new variable since reassigning `name = ...`
+	-- doesn't narrow the type
+	local newName = name or tostring(t)
+
+	return setmetatable(t, {
+		__index = function(_self, key)
+			local message = ("%q (%s) is not a valid member of %s"):format(tostring(key), typeof(key), newName)
+
+			error(message, 2)
+		end,
+
+		__newindex = function(_self, key, _value)
+			local message = ("%q (%s) is not a valid member of %s"):format(tostring(key), typeof(key), newName)
+
+			error(message, 2)
+		end,
 	})
 end
+
+return strict

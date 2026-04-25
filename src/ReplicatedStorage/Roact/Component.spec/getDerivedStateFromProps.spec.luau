@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createSpy = require(script.Parent.Parent.createSpy)
@@ -7,174 +5,282 @@ return function()
 	local createFragment = require(script.Parent.Parent.createFragment)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
+
 	local Component = require(script.Parent.Parent.Component)
-	local state1 = createReconciler(NoopRenderer)
+
+	local noopReconciler = createReconciler(NoopRenderer)
+
 	it("should be invoked on initial mount", function()
-		local internalData = createSpy()
-		local fn = Component:extend("WithDerivedState")
-		fn.getDerivedStateFromProps = internalData.value
-		function fn.render(self)
+		local getDerivedSpy = createSpy()
+		local WithDerivedState = Component:extend("WithDerivedState")
+
+		WithDerivedState.getDerivedStateFromProps = getDerivedSpy.value
+
+		function WithDerivedState:render()
 			return nil
 		end
-		state1.mountVirtualNode(createElement(fn, {
-			someProp = 1
-		}), nil, "WithDerivedState")
-		expect(internalData.callCount).to.equal(1)
-		local currentState = internalData:captureValues("props", "state")
-		assertDeepEqual(currentState.props, {
-			someProp = 1
+
+		local element = createElement(WithDerivedState, {
+			someProp = 1,
 		})
-		assertDeepEqual(currentState.state, {})
+		local hostParent = nil
+		local hostKey = "WithDerivedState"
+
+		noopReconciler.mountVirtualNode(element, hostParent, hostKey)
+
+		expect(getDerivedSpy.callCount).to.equal(1)
+
+		local values = getDerivedSpy:captureValues("props", "state")
+
+		assertDeepEqual(values.props, { someProp = 1 })
+		assertDeepEqual(values.state, {})
 	end)
+
 	it("should be invoked when updated via props", function()
-		local internalData = createSpy()
-		local fn = Component:extend("WithDerivedState")
-		fn.getDerivedStateFromProps = internalData.value
-		function fn.render(self)
+		local getDerivedSpy = createSpy()
+		local WithDerivedState = Component:extend("WithDerivedState")
+
+		WithDerivedState.getDerivedStateFromProps = getDerivedSpy.value
+
+		function WithDerivedState:render()
 			return nil
 		end
-		state1.updateVirtualNode(state1.mountVirtualNode(createElement(fn, {
-			someProp = 1
-		}), nil, "WithDerivedState"), createElement(fn, {
-			someProp = 2
-		}))
-		expect(internalData.callCount).to.equal(2)
-		local currentState = internalData:captureValues("props", "state")
-		assertDeepEqual(currentState.props, {
-			someProp = 2
-		})
-		assertDeepEqual(currentState.state, {})
+
+		local hostParent = nil
+		local hostKey = "WithDerivedState"
+
+		local node = noopReconciler.mountVirtualNode(
+			createElement(WithDerivedState, {
+				someProp = 1,
+			}),
+			hostParent,
+			hostKey
+		)
+
+		noopReconciler.updateVirtualNode(
+			node,
+			createElement(WithDerivedState, {
+				someProp = 2,
+			})
+		)
+
+		expect(getDerivedSpy.callCount).to.equal(2)
+
+		local values = getDerivedSpy:captureValues("props", "state")
+
+		assertDeepEqual(values.props, { someProp = 2 })
+		assertDeepEqual(values.state, {})
 	end)
+
 	it("should be invoked when updated via state", function()
-		local internalData = createSpy()
-		local fn = Component:extend("WithDerivedState")
-		fn.getDerivedStateFromProps = internalData.value
-		function fn.init(self)
+		local getDerivedSpy = createSpy()
+		local WithDerivedState = Component:extend("WithDerivedState")
+
+		WithDerivedState.getDerivedStateFromProps = getDerivedSpy.value
+
+		function WithDerivedState:init()
 			self:setState({
-				someState = 1
+				someState = 1,
 			})
 		end
-		function fn.render(self)
+
+		function WithDerivedState:render()
 			return nil
 		end
-		local newState = createElement(fn)
-		state1.updateVirtualNode(state1.mountVirtualNode(newState, nil, "WithDerivedState"), newState, {
-			someState = 2
+
+		local element = createElement(WithDerivedState)
+		local hostParent = nil
+		local hostKey = "WithDerivedState"
+
+		local node = noopReconciler.mountVirtualNode(element, hostParent, hostKey)
+
+		noopReconciler.updateVirtualNode(node, element, {
+			someState = 2,
 		})
-		expect(internalData.callCount).to.equal(4)
-		local nextState = internalData:captureValues("props", "state")
-		assertDeepEqual(nextState.props, {})
-		assertDeepEqual(nextState.state, {
-			someState = 2
-		})
+
+		-- getDerivedStateFromProps will be called:
+		-- * Once on empty props
+		-- * Once during the self:setState in init
+		-- * Once more, defensively, on the resulting state AFTER init
+		-- * On updating with new state via updateVirtualNode
+		expect(getDerivedSpy.callCount).to.equal(4)
+
+		local values = getDerivedSpy:captureValues("props", "state")
+
+		assertDeepEqual(values.props, {})
+		assertDeepEqual(values.state, { someState = 2 })
 	end)
+
 	it("should be invoked when updating via state in init (which skips reconciliation)", function()
-		local internalData = createSpy()
-		local fn = Component:extend("WithDerivedState")
-		fn.getDerivedStateFromProps = internalData.value
-		function fn.init(self)
+		local getDerivedSpy = createSpy()
+		local WithDerivedState = Component:extend("WithDerivedState")
+
+		WithDerivedState.getDerivedStateFromProps = getDerivedSpy.value
+
+		function WithDerivedState:init()
 			self:setState({
-				stateFromInit = 1
+				stateFromInit = 1,
 			})
 		end
-		function fn.render(self)
+
+		function WithDerivedState:render()
 			return nil
 		end
-		state1.mountVirtualNode(createElement(fn, {
-			someProp = 1
-		}), nil, "WithDerivedState")
-		expect(internalData.callCount).to.equal(3)
-		local currentState = internalData:captureValues("props", "state")
-		assertDeepEqual(currentState.props, {
-			someProp = 1
+
+		local element = createElement(WithDerivedState, {
+			someProp = 1,
 		})
-		assertDeepEqual(currentState.state, {
-			stateFromInit = 1
+		local hostParent = nil
+		local hostKey = "WithDerivedState"
+
+		noopReconciler.mountVirtualNode(element, hostParent, hostKey)
+
+		-- getDerivedStateFromProps will be called:
+		-- * Once on empty props
+		-- * Once during the self:setState in init
+		-- * Once more, defensively, on the resulting state AFTER init
+		expect(getDerivedSpy.callCount).to.equal(3)
+
+		local values = getDerivedSpy:captureValues("props", "state")
+
+		assertDeepEqual(values.props, {
+			someProp = 1,
+		})
+		assertDeepEqual(values.state, {
+			stateFromInit = 1,
 		})
 	end)
+
 	it("should receive defaultProps", function()
-		local internalData = createSpy()
-		local fn = Component:extend("WithDerivedState")
-		fn.defaultProps = {
-			someDefaultProp = "foo"
+		local getDerivedSpy = createSpy()
+		local WithDerivedState = Component:extend("WithDerivedState")
+
+		WithDerivedState.defaultProps = {
+			someDefaultProp = "foo",
 		}
-		fn.getDerivedStateFromProps = internalData.value
-		function fn.render(self)
+
+		WithDerivedState.getDerivedStateFromProps = getDerivedSpy.value
+
+		function WithDerivedState:render()
 			return nil
 		end
-		local currentState = state1.mountVirtualNode(createElement(fn, {
-			someProp = 1
-		}), nil, "WithDerivedState")
-		expect(internalData.callCount).to.equal(1)
-		assertDeepEqual(internalData:captureValues("props", "state").props, {
-			someDefaultProp = "foo",
-			someProp = 1
+
+		local element = createElement(WithDerivedState, {
+			someProp = 1,
 		})
-		state1.updateVirtualNode(currentState, (createElement(fn, {
-			someProp = 2
-		})))
-		expect(internalData.callCount).to.equal(2)
-		assertDeepEqual(internalData:captureValues("props", "state").props, {
+		local hostParent = nil
+		local hostKey = "WithDerivedState"
+
+		local node = noopReconciler.mountVirtualNode(element, hostParent, hostKey)
+
+		expect(getDerivedSpy.callCount).to.equal(1)
+
+		local values = getDerivedSpy:captureValues("props", "state")
+
+		assertDeepEqual(values.props, {
 			someDefaultProp = "foo",
-			someProp = 2
+			someProp = 1,
+		})
+
+		-- Update via props, confirm that defaultProp is still present
+		element = createElement(WithDerivedState, {
+			someProp = 2,
+		})
+
+		noopReconciler.updateVirtualNode(node, element)
+
+		expect(getDerivedSpy.callCount).to.equal(2)
+
+		values = getDerivedSpy:captureValues("props", "state")
+
+		assertDeepEqual(values.props, {
+			someDefaultProp = "foo",
+			someProp = 2,
 		})
 	end)
+
 	it("should derive state for all setState updates, even when deferred", function()
-		local internalData = Component:extend("Child")
-		local fn = createSpy(function()
+		local Child = Component:extend("Child")
+		local stateUpdaterSpy = createSpy(function()
 			return {}
 		end)
-		local newState = createSpy()
-		function internalData.render(self)
+		local stateDerivedSpy = createSpy()
+
+		function Child:render()
 			return nil
 		end
-		function internalData.didMount(self)
+
+		function Child:didMount()
 			self.props.callback()
 		end
-		local currentState = Component:extend("Parent")
-		currentState.getDerivedStateFromProps = newState.value
-		function currentState.render(self)
-			local function f1()
-				self:setState(fn.value)
+
+		local Parent = Component:extend("Parent")
+
+		Parent.getDerivedStateFromProps = stateDerivedSpy.value
+
+		function Parent:render()
+			local callback = function()
+				self:setState(stateUpdaterSpy.value)
 			end
+
 			return createFragment({
-				ChildA = createElement(internalData, {
-					callback = f1
+				ChildA = createElement(Child, {
+					callback = callback,
 				}),
-				ChildB = createElement(internalData, {
-					callback = f1
-				})
+				ChildB = createElement(Child, {
+					callback = callback,
+				}),
 			})
 		end
-		state1.mountVirtualNode(createElement(currentState), nil, "Test")
-		expect(fn.callCount).to.equal(2)
-		expect(newState.callCount).to.equal(3)
+
+		local element = createElement(Parent)
+		local hostParent = nil
+		local key = "Test"
+
+		noopReconciler.mountVirtualNode(element, hostParent, key)
+
+		expect(stateUpdaterSpy.callCount).to.equal(2)
+
+		-- getDerivedStateFromProps is always called on initial state
+		expect(stateDerivedSpy.callCount).to.equal(3)
 	end)
+
 	it("should have derived state after assigning to state in init", function()
-		local internalData = nil
-		local fn = createSpy(function()
+		local getStateCallback
+		local getDerivedSpy = createSpy(function()
 			return {
-				derived = true
+				derived = true,
 			}
 		end)
-		local newState = Component:extend("WithDerivedState")
-		newState.getDerivedStateFromProps = fn.value
-		function newState.init(self)
+		local WithDerivedState = Component:extend("WithDerivedState")
+
+		WithDerivedState.getDerivedStateFromProps = getDerivedSpy.value
+
+		function WithDerivedState:init()
 			self.state = {
-				init = true
+				init = true,
 			}
-			internalData = function()
+
+			getStateCallback = function()
 				return self.state
 			end
 		end
-		function newState.render(self)
+
+		function WithDerivedState:render()
 			return nil
 		end
-		state1.mountVirtualNode(createElement(newState), nil, "WithDerivedState")
-		expect(fn.callCount).to.equal(2)
-		assertDeepEqual(internalData(), {
+
+		local hostParent = nil
+		local hostKey = "WithDerivedState"
+		local element = createElement(WithDerivedState)
+
+		noopReconciler.mountVirtualNode(element, hostParent, hostKey)
+
+		expect(getDerivedSpy.callCount).to.equal(2)
+
+		assertDeepEqual(getStateCallback(), {
 			init = true,
-			derived = true
+			derived = true,
 		})
 	end)
 end

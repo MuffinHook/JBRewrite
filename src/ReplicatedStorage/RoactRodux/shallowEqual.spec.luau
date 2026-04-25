@@ -1,39 +1,45 @@
--- Reviewed by Claude
 return function()
 	local shallowEqual = require(script.Parent.shallowEqual)
+
 	it("should compare dictionaries", function()
- local tbl = {
- a = "a",
- b = {},
- c = 6
- }
- local t2 = {
- b = tbl.b,
- c = tbl.c,
- a = tbl.a
- }
- local t3 = {
- b = {},
- a = tbl.a,
- c = tbl.c
- }
- local t4 = {
- a = tbl.a,
- b = tbl.b,
- c = tbl.c,
- d = "hello"
- }
- expect(shallowEqual(tbl, tbl)).to.equal(true)
- expect(shallowEqual(tbl, t2)).to.equal(true)
- expect(shallowEqual(tbl, t3)).to.equal(false)
- expect(shallowEqual(t2, t3)).to.equal(false)
- expect(shallowEqual(tbl, t4)).to.equal(false)
- expect(shallowEqual(t2, t4)).to.equal(false)
+		local a = {
+			a = "a",
+			b = {},
+			c = 6,
+		}
+
+		local b = {
+			b = a.b,
+			c = a.c,
+			a = a.a,
+		}
+
+		local c = {
+			b = {},
+			a = a.a,
+			c = a.c,
+		}
+
+		local d = {
+			a = a.a,
+			b = a.b,
+			c = a.c,
+			d = "hello",
+		}
+
+		expect(shallowEqual(a, a)).to.equal(true)
+		expect(shallowEqual(a, b)).to.equal(true)
+		expect(shallowEqual(a, c)).to.equal(false)
+		expect(shallowEqual(b, c)).to.equal(false)
+		expect(shallowEqual(a, d)).to.equal(false)
+		expect(shallowEqual(b, d)).to.equal(false)
 	end)
+
 	it("should handle nil for either argument", function()
- local tbl = {}
- expect(shallowEqual(nil, nil)).to.equal(true)
- expect(shallowEqual(tbl, nil)).to.equal(false)
- expect(shallowEqual(nil, tbl)).to.equal(false)
+		local a = {}
+
+		expect(shallowEqual(nil, nil)).to.equal(true)
+		expect(shallowEqual(a, nil)).to.equal(false)
+		expect(shallowEqual(nil, a)).to.equal(false)
 	end)
 end

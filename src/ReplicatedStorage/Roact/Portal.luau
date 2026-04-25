@@ -1,2 +1,5 @@
--- Reviewed by Claude
-return require(script.Parent.Symbol).named("Portal")
+local Symbol = require(script.Parent.Symbol)
+
+local Portal = Symbol.named("Portal")
+
+return Portal

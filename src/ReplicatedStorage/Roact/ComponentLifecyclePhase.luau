@@ -1,6 +1,8 @@
--- Reviewed by Claude
 local Symbol = require(script.Parent.Symbol)
-return require(script.Parent.strict)({
+local strict = require(script.Parent.strict)
+
+local ComponentLifecyclePhase = strict({
+	-- Component methods
 	Init = Symbol.named("init"),
 	Render = Symbol.named("render"),
 	ShouldUpdate = Symbol.named("shouldUpdate"),
@@ -8,6 +10,10 @@ return require(script.Parent.strict)({
 	DidMount = Symbol.named("didMount"),
 	DidUpdate = Symbol.named("didUpdate"),
 	WillUnmount = Symbol.named("willUnmount"),
+
+	-- Phases describing reconciliation status
 	ReconcileChildren = Symbol.named("reconcileChildren"),
-	Idle = Symbol.named("idle")
+	Idle = Symbol.named("idle"),
 }, "ComponentLifecyclePhase")
+
+return ComponentLifecyclePhase

@@ -1,22 +1,29 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local Type = require(script.Parent.Parent.Type)
+
 	local Component = require(script.Parent.Parent.Component)
+
 	it("should be extendable", function()
-		local state1 = Component:extend("The Senate")
-		expect(state1).to.be.ok()
-		expect(Type.of(state1)).to.equal(Type.StatefulComponentClass)
+		local MyComponent = Component:extend("The Senate")
+
+		expect(MyComponent).to.be.ok()
+		expect(Type.of(MyComponent)).to.equal(Type.StatefulComponentClass)
 	end)
+
 	it("should prevent extending a user component", function()
-		local state1 = Component:extend("Sheev")
+		local MyComponent = Component:extend("Sheev")
+
 		expect(function()
-			state1:extend("Frank")
+			MyComponent:extend("Frank")
 		end).to.throw()
 	end)
+
 	it("should use a given name", function()
-		local var2 = tostring((Component:extend("FooBar")))
-		expect(var2).to.be.a("string")
-		expect(var2:find("FooBar")).to.be.ok()
+		local MyComponent = Component:extend("FooBar")
+
+		local name = tostring(MyComponent)
+
+		expect(name).to.be.a("string")
+		expect(name:find("FooBar")).to.be.ok()
 	end)
 end

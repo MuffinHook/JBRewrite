@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
@@ -7,87 +5,146 @@ return function()
 	local createSpy = require(script.Parent.Parent.createSpy)
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
 	local Type = require(script.Parent.Parent.Type)
+
 	local Component = require(script.Parent.Parent.Component)
-	local v1 = createReconciler(NoopRenderer)
+
+	local noopReconciler = createReconciler(NoopRenderer)
+
 	it("should throw on mount if not overridden", function()
-		local internalData = createElement((Component:extend("MyComponent")))
-		local v2, newState = pcall(function()
-			v1.mountVirtualNode(internalData, nil, "Test")
+		local MyComponent = Component:extend("MyComponent")
+
+		local element = createElement(MyComponent)
+		local hostParent = nil
+		local key = "Test"
+
+		local success, result = pcall(function()
+			noopReconciler.mountVirtualNode(element, hostParent, key)
 		end)
-		expect(v2).to.equal(false)
-		expect(newState:match("MyComponent")).to.be.ok()
-		expect(newState:match("render")).to.be.ok()
+
+		expect(success).to.equal(false)
+		expect(result:match("MyComponent")).to.be.ok()
+		expect(result:match("render")).to.be.ok()
 	end)
+
 	it("should be invoked when a component is mounted", function()
-		local internalData = Component:extend("Foo")
-		local v2 = nil
-		local newState = nil
-		local fn = createSpy(function(self)
-			v2 = self.props
-			newState = self.state
+		local Foo = Component:extend("Foo")
+
+		local capturedProps
+		local capturedState
+		local renderSpy = createSpy(function(self)
+			capturedProps = self.props
+			capturedState = self.state
 		end)
-		internalData.render = fn.value
-		v1.mountVirtualNode(createElement(internalData), nil, "Foo Test")
-		expect(fn.callCount).to.equal(1)
-		expect(Type.of(fn:captureValues("self").self)).to.equal(Type.StatefulComponentInstance)
-		assertDeepEqual(v2, {})
-		assertDeepEqual(newState, {})
+		Foo.render = renderSpy.value
+
+		local element = createElement(Foo)
+		local hostParent = nil
+		local key = "Foo Test"
+
+		noopReconciler.mountVirtualNode(element, hostParent, key)
+
+		expect(renderSpy.callCount).to.equal(1)
+
+		local renderArguments = renderSpy:captureValues("self")
+
+		expect(Type.of(renderArguments.self)).to.equal(Type.StatefulComponentInstance)
+		assertDeepEqual(capturedProps, {})
+		assertDeepEqual(capturedState, {})
 	end)
+
 	it("should be invoked when a component is updated via props", function()
-		local internalData = Component:extend("Foo")
-		local v2 = nil
-		local newState = nil
-		local fn = createSpy(function(self)
-			v2 = self.props
-			newState = self.state
+		local Foo = Component:extend("Foo")
+
+		local capturedProps
+		local capturedState
+		local renderSpy = createSpy(function(self)
+			capturedProps = self.props
+			capturedState = self.state
 		end)
-		internalData.render = fn.value
-		local t = {
-			a = 2
+		Foo.render = renderSpy.value
+
+		local initialProps = {
+			a = 2,
 		}
-		local tempState = v1.mountVirtualNode(createElement(internalData, t), nil, "Foo Test")
-		expect(fn.callCount).to.equal(1)
-		local updatedState = v2
-		local finalState = newState
-		expect(Type.of(fn:captureValues("self").self)).to.equal(Type.StatefulComponentInstance)
-		assertDeepEqual(updatedState, t)
-		assertDeepEqual(finalState, {})
-		local tbl2 = {
-			a = 3
+		local element = createElement(Foo, initialProps)
+		local hostParent = nil
+		local key = "Foo Test"
+
+		local node = noopReconciler.mountVirtualNode(element, hostParent, key)
+
+		expect(renderSpy.callCount).to.equal(1)
+
+		local firstRenderArguments = renderSpy:captureValues("self")
+		local firstProps = capturedProps
+		local firstState = capturedState
+
+		expect(Type.of(firstRenderArguments.self)).to.equal(Type.StatefulComponentInstance)
+		assertDeepEqual(firstProps, initialProps)
+		assertDeepEqual(firstState, {})
+
+		local updatedProps = {
+			a = 3,
 		}
-		v1.updateVirtualNode(tempState, (createElement(internalData, tbl2)))
-		expect(fn.callCount).to.equal(2)
-		local v122 = v2
-		expect(Type.of(fn:captureValues("self").self)).to.equal(Type.StatefulComponentInstance)
-		expect(v122).never.to.equal(updatedState)
-		assertDeepEqual(v122, tbl2)
-		expect(newState).to.equal(finalState)
+		local newElement = createElement(Foo, updatedProps)
+
+		noopReconciler.updateVirtualNode(node, newElement)
+
+		expect(renderSpy.callCount).to.equal(2)
+
+		local secondRenderArguments = renderSpy:captureValues("self")
+		local secondProps = capturedProps
+		local secondState = capturedState
+
+		expect(Type.of(secondRenderArguments.self)).to.equal(Type.StatefulComponentInstance)
+		expect(secondProps).never.to.equal(firstProps)
+		assertDeepEqual(secondProps, updatedProps)
+		expect(secondState).to.equal(firstState)
 	end)
+
 	it("should be invoked when a component is updated via state", function()
-		local internalData = Component:extend("Foo")
-		local v2 = nil
-		function internalData.init(self)
-			v2 = function(...)
+		local Foo = Component:extend("Foo")
+
+		local setState
+		function Foo:init()
+			setState = function(...)
 				return self:setState(...)
 			end
 		end
-		local newState = nil
-		local fn = nil
-		local fn2 = createSpy(function(self)
-			newState = self.props
-			fn = self.state
+
+		local capturedProps
+		local capturedState
+		local renderSpy = createSpy(function(self)
+			capturedProps = self.props
+			capturedState = self.state
 		end)
-		internalData.render = fn2.value
-		v1.mountVirtualNode(createElement(internalData), nil, "Foo Test")
-		expect(fn2.callCount).to.equal(1)
-		expect(Type.of(fn2:captureValues("self").self)).to.equal(Type.StatefulComponentInstance)
-		v2({})
-		expect(fn2.callCount).to.equal(2)
-		expect(Type.of(fn2:captureValues("self").self)).to.equal(Type.StatefulComponentInstance)
-		expect(newState).to.equal(newState)
-		expect(fn).never.to.equal(fn)
+		Foo.render = renderSpy.value
+
+		local element = createElement(Foo)
+		local hostParent = nil
+		local key = "Foo Test"
+
+		noopReconciler.mountVirtualNode(element, hostParent, key)
+
+		expect(renderSpy.callCount).to.equal(1)
+
+		local firstRenderArguments = renderSpy:captureValues("self")
+		local firstProps = capturedProps
+		local firstState = capturedState
+
+		expect(Type.of(firstRenderArguments.self)).to.equal(Type.StatefulComponentInstance)
+
+		setState({})
+
+		expect(renderSpy.callCount).to.equal(2)
+
+		local renderArguments = renderSpy:captureValues("self")
+
+		expect(Type.of(renderArguments.self)).to.equal(Type.StatefulComponentInstance)
+		expect(capturedProps).to.equal(firstProps)
+		expect(capturedState).never.to.equal(firstState)
 	end)
-	itSKIP("Test defaultProps on initial render", function()  end)
-	itSKIP("Test defaultProps on prop update", function()  end)
-	itSKIP("Test defaultProps on state update", function()  end)
+
+	itSKIP("Test defaultProps on initial render", function() end)
+	itSKIP("Test defaultProps on prop update", function() end)
+	itSKIP("Test defaultProps on state update", function() end)
 end

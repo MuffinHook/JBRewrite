@@ -1,25 +1,33 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local getDefaultInstanceProperty = require(script.Parent.getDefaultInstanceProperty)
+
 	it("should get default name string values", function()
- local _, var1 = getDefaultInstanceProperty("StringValue", "Name")
- expect(var1).to.equal("Value")
+		local _, defaultName = getDefaultInstanceProperty("StringValue", "Name")
+
+		expect(defaultName).to.equal("Value")
 	end)
+
 	it("should get default empty string values", function()
- local _, var1 = getDefaultInstanceProperty("StringValue", "Value")
- expect(var1).to.equal("")
+		local _, defaultValue = getDefaultInstanceProperty("StringValue", "Value")
+
+		expect(defaultValue).to.equal("")
 	end)
+
 	it("should get default number values", function()
- local _, var1 = getDefaultInstanceProperty("IntValue", "Value")
- expect(var1).to.equal(0)
+		local _, defaultValue = getDefaultInstanceProperty("IntValue", "Value")
+
+		expect(defaultValue).to.equal(0)
 	end)
+
 	it("should get nil default values", function()
- local _, var1 = getDefaultInstanceProperty("ObjectValue", "Value")
- expect(var1).to.equal(nil)
+		local _, defaultValue = getDefaultInstanceProperty("ObjectValue", "Value")
+
+		expect(defaultValue).to.equal(nil)
 	end)
+
 	it("should get bool default values", function()
- local _, var1 = getDefaultInstanceProperty("BoolValue", "Value")
- expect(var1).to.equal(false)
+		local _, defaultValue = getDefaultInstanceProperty("BoolValue", "Value")
+
+		expect(defaultValue).to.equal(false)
 	end)
 end

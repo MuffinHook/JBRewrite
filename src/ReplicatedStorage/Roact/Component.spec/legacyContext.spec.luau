@@ -1,130 +1,203 @@
--- Reviewed by Claude
--- variables reassigned
 return function()
 	local assertDeepEqual = require(script.Parent.Parent.assertDeepEqual)
 	local createElement = require(script.Parent.Parent.createElement)
 	local createReconciler = require(script.Parent.Parent.createReconciler)
 	local NoopRenderer = require(script.Parent.Parent.NoopRenderer)
+
 	local Component = require(script.Parent.Parent.Component)
-	local v1 = createReconciler(NoopRenderer)
+
+	local noopReconciler = createReconciler(NoopRenderer)
+
 	it("should be provided as a mutable self._context in Component:init", function()
-		local internalData = Component:extend("Provider")
-		function internalData.init(self)
+		local Provider = Component:extend("Provider")
+
+		function Provider:init()
 			self._context.foo = "bar"
 		end
-		function internalData.render(self)  end
-		assertDeepEqual(v1.mountVirtualNode(createElement(internalData), nil, "Provider").legacyContext, {
-			foo = "bar"
-		})
+
+		function Provider:render() end
+
+		local element = createElement(Provider)
+		local hostParent = nil
+		local hostKey = "Provider"
+		local node = noopReconciler.mountVirtualNode(element, hostParent, hostKey)
+
+		local expectedContext = {
+			foo = "bar",
+		}
+
+		assertDeepEqual(node.legacyContext, expectedContext)
 	end)
+
 	it("should be inherited from parent stateful nodes", function()
-		local internalData = Component:extend("Consumer")
-		local v2 = nil
-		function internalData.init(self)
-			v2 = self._context
+		local Consumer = Component:extend("Consumer")
+
+		local capturedContext
+		function Consumer:init()
+			capturedContext = self._context
 		end
-		function internalData.render(self)  end
-		local newState = Component:extend("Parent")
-		function newState.render(self)
-			return createElement(internalData)
+
+		function Consumer:render() end
+
+		local Parent = Component:extend("Parent")
+
+		function Parent:render()
+			return createElement(Consumer)
 		end
-		local t = {
+
+		local element = createElement(Parent)
+		local hostParent = nil
+		local hostKey = "Parent"
+		local context = {
 			hello = "world",
-			value = 6
+			value = 6,
 		}
-		local nextState = v1.mountVirtualNode(createElement(newState), nil, "Parent", nil, t)
-		expect(v2).never.to.equal(t)
-		expect(v2).never.to.equal(nextState.legacyContext)
-		assertDeepEqual(nextState.legacyContext, t)
-		assertDeepEqual(v2, t)
+		local node = noopReconciler.mountVirtualNode(element, hostParent, hostKey, nil, context)
+
+		expect(capturedContext).never.to.equal(context)
+		expect(capturedContext).never.to.equal(node.legacyContext)
+		assertDeepEqual(node.legacyContext, context)
+		assertDeepEqual(capturedContext, context)
 	end)
+
 	it("should be inherited from parent function nodes", function()
-		local internalData = Component:extend("Consumer")
-		local v2 = nil
-		function internalData.init(self)
-			v2 = self._context
+		local Consumer = Component:extend("Consumer")
+
+		local capturedContext
+		function Consumer:init()
+			capturedContext = self._context
 		end
-		function internalData.render(self)  end
-		local t = {
+
+		function Consumer:render() end
+
+		local function Parent()
+			return createElement(Consumer)
+		end
+
+		local element = createElement(Parent)
+		local hostParent = nil
+		local hostKey = "Parent"
+		local context = {
 			hello = "world",
-			value = 6
+			value = 6,
 		}
-		local fn = v1.mountVirtualNode(createElement(function()
-			return createElement(internalData)
-		end), nil, "Parent", nil, t)
-		expect(v2).never.to.equal(t)
-		expect(v2).never.to.equal(fn.legacyContext)
-		assertDeepEqual(fn.legacyContext, t)
-		assertDeepEqual(v2, t)
+		local node = noopReconciler.mountVirtualNode(element, hostParent, hostKey, nil, context)
+
+		expect(capturedContext).never.to.equal(context)
+		expect(capturedContext).never.to.equal(node.legacyContext)
+		assertDeepEqual(node.legacyContext, context)
+		assertDeepEqual(capturedContext, context)
 	end)
+
 	it("should contain values put into the tree by parent nodes", function()
-		local internalData = Component:extend("Consumer")
-		local v2 = nil
-		function internalData.init(self)
-			v2 = self._context
+		local Consumer = Component:extend("Consumer")
+
+		local capturedContext
+		function Consumer:init()
+			capturedContext = self._context
 		end
-		function internalData.render(self)  end
-		local newState = Component:extend("Provider")
-		function newState.init(self)
+
+		function Consumer:render() end
+
+		local Provider = Component:extend("Provider")
+
+		function Provider:init()
 			self._context.frob = "ulator"
 		end
-		function newState.render(self)
-			return createElement(internalData)
+
+		function Provider:render()
+			return createElement(Consumer)
 		end
-		local t = {
-			dont = "try it"
-		}
-		local nextState = v1.mountVirtualNode(createElement(newState), nil, "Consumer", nil, t)
-		local tbl2 = {
+
+		local element = createElement(Provider)
+		local hostParent = nil
+		local hostKey = "Consumer"
+		local context = {
 			dont = "try it",
-			frob = "ulator"
 		}
-		expect(nextState.legacyContext).never.to.equal(t)
-		expect(v2).never.to.equal(t)
-		expect(v2).never.to.equal(nextState.legacyContext)
-		assertDeepEqual(t, {
-			dont = "try it"
-		})
-		assertDeepEqual(nextState.legacyContext, tbl2)
-		assertDeepEqual(v2, tbl2)
+		local node = noopReconciler.mountVirtualNode(element, hostParent, hostKey, nil, context)
+
+		local initialContext = {
+			dont = "try it",
+		}
+
+		local expectedContext = {
+			dont = "try it",
+			frob = "ulator",
+		}
+
+		-- Because components mutate context, we're careful with equality
+		expect(node.legacyContext).never.to.equal(context)
+		expect(capturedContext).never.to.equal(context)
+		expect(capturedContext).never.to.equal(node.legacyContext)
+
+		assertDeepEqual(context, initialContext)
+		assertDeepEqual(node.legacyContext, expectedContext)
+		assertDeepEqual(capturedContext, expectedContext)
 	end)
+
 	it("should transfer context to children that are replaced", function()
-		local internalData = Component:extend("ConsumerA")
-		local v2 = nil
-		function internalData.init(self)
+		local ConsumerA = Component:extend("ConsumerA")
+
+		local capturedContextA
+		function ConsumerA:init()
 			self._context.A = "hello"
-			v2 = self._context
+
+			capturedContextA = self._context
 		end
-		function internalData.render(self)  end
-		local newState = Component:extend("ConsumerB")
-		local fn = nil
-		function newState.init(self)
+
+		function ConsumerA:render() end
+
+		local ConsumerB = Component:extend("ConsumerB")
+
+		local capturedContextB
+		function ConsumerB:init()
 			self._context.B = "hello"
-			fn = self._context
+
+			capturedContextB = self._context
 		end
-		function newState.render(self)  end
-		local nextState = Component:extend("Provider")
-		function nextState.init(self)
+
+		function ConsumerB:render() end
+
+		local Provider = Component:extend("Provider")
+
+		function Provider:init()
 			self._context.frob = "ulator"
 		end
-		function nextState.render(self)
-			if self.props.useConsumerB then
-				return createElement(newState)
+
+		function Provider:render()
+			local useConsumerB = self.props.useConsumerB
+
+			if useConsumerB then
+				return createElement(ConsumerB)
 			else
-				return createElement(internalData)
+				return createElement(ConsumerA)
 			end
 		end
-		local mergedState = v1.mountVirtualNode(createElement(nextState), nil, "Consumer")
-		assertDeepEqual(v2, {
+
+		local hostParent = nil
+		local hostKey = "Consumer"
+
+		local element = createElement(Provider)
+		local node = noopReconciler.mountVirtualNode(element, hostParent, hostKey)
+
+		local expectedContextA = {
 			frob = "ulator",
-			A = "hello"
-		})
-		v1.updateVirtualNode(mergedState, (createElement(nextState, {
-			useConsumerB = true
-		})))
-		assertDeepEqual(fn, {
+			A = "hello",
+		}
+
+		assertDeepEqual(capturedContextA, expectedContextA)
+
+		local expectedContextB = {
 			frob = "ulator",
-			B = "hello"
+			B = "hello",
+		}
+
+		local replacedElement = createElement(Provider, {
+			useConsumerB = true,
 		})
+		noopReconciler.updateVirtualNode(node, replacedElement)
+
+		assertDeepEqual(capturedContextB, expectedContextB)
 	end)
 end
