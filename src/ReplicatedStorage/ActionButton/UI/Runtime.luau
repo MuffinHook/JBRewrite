@@ -60,12 +60,12 @@ function RuntimeComponent._fetchInputType(p1)
 	end
 end
 function RuntimeComponent._fetchStateButton(p1, p2, p3, p4, p5)
-	local v1 = ("%s_%d_%s"):format(p4, p5, "onReleased")
-	local v2 = ("%s_%d_%s"):format(p4, p5, "onPressed")
-	local v3 = ("%s_%d_%s"):format(p4, p5, "image")
-	local v4 = ("%s_%d_%s"):format(p4, p5, "keyCode")
-	local v5 = ("%s_%d_%s"):format(p4, p5, "button")
-	p2[v4] = InputUtils.getBestKeyCode(p3.keyCodes, p1.state.inputType) or Roact.None
+	local onReleasedKey = ("%s_%d_%s"):format(p4, p5, "onReleased")
+	local onPressedKey = ("%s_%d_%s"):format(p4, p5, "onPressed")
+	local imageKey = ("%s_%d_%s"):format(p4, p5, "image")
+	local keyCodeKey = ("%s_%d_%s"):format(p4, p5, "keyCode")
+	local buttonKey = ("%s_%d_%s"):format(p4, p5, "button")
+	p2[keyCodeKey] = InputUtils.getBestKeyCode(p3.keyCodes, p1.state.inputType) or Roact.None
 	if p3.useEvery and not p3.progressBinding then
 		local progressBinding, updateProgressBinding = Roact.createBinding(0)
 		p3.progressBinding = progressBinding
@@ -75,10 +75,10 @@ function RuntimeComponent._fetchStateButton(p1, p2, p3, p4, p5)
 		local v1 = p3
 		local _inputTypePressed = v1._inputTypePressed
 		if not if _inputTypePressed == Enum.UserInputType.Touch or _inputTypePressed == Enum.UserInputType.MouseButton1 then if v1.touchIsToggle then true else _inputTypePressed == Enum.UserInputType.Gamepad1 and v1.gamepadIsToggle and true or false else _inputTypePressed == Enum.UserInputType.Gamepad1 and v1.gamepadIsToggle and true or false and p3._i then
-			local v3 = ("%s_%d_%s"):format(p3._groupKey, p3._i, "pressed")
-			if p1.state[v3] then
+			local pressedKey = ("%s_%d_%s"):format(p3._groupKey, p3._i, "pressed")
+			if p1.state[pressedKey] then
 				p1:setState({
-					[v3] = false
+					[pressedKey] = false
 				})
 				p3._pressed = false
 				if p3.onReleased then
@@ -87,19 +87,19 @@ function RuntimeComponent._fetchStateButton(p1, p2, p3, p4, p5)
 			end
 		end
 	end
-	p2[v1] = releaseState
+	p2[onReleasedKey] = releaseState
 	p3._releaseState = releaseState
 	local function pressState(...)
-		local v1 = ("%s_%d_%s"):format(p3._groupKey, p3._i, "pressed")
+		local pressedKey = ("%s_%d_%s"):format(p3._groupKey, p3._i, "pressed")
 		local v2 = true
 		local v3 = p3
 		local _inputTypePressed = v3._inputTypePressed
 		if if _inputTypePressed == Enum.UserInputType.Touch or _inputTypePressed == Enum.UserInputType.MouseButton1 then (v3.touchIsToggle or _inputTypePressed == Enum.UserInputType.Gamepad1 and v3.gamepadIsToggle) and true or false else _inputTypePressed == Enum.UserInputType.Gamepad1 and v3.gamepadIsToggle and true or false then
-			v2 = not p1.state[v1]
+			v2 = not p1.state[pressedKey]
 		end
-		if (p1.state[v1] and true or false) ~= v2 then
+		if (p1.state[pressedKey] and true or false) ~= v2 then
 			p1:setState({
-				[v1] = v2
+				[pressedKey] = v2
 			})
 			p3._pressed = v2
 			if v2 then
@@ -135,10 +135,10 @@ function RuntimeComponent._fetchStateButton(p1, p2, p3, p4, p5)
 			end
 		end
 	end
-	p2[v2] = pressState
+	p2[onPressedKey] = pressState
 	p3._pressState = pressState
-	p2[v3] = p3.image or Roact.None
-	p2[v5] = p3
+	p2[imageKey] = p3.image or Roact.None
+	p2[buttonKey] = p3
 	local buttonPressedStateKey = ("%s_%d_%s"):format(p4, p5, "pressed")
 	if p3._pressed then
 		p2[buttonPressedStateKey] = true
@@ -159,14 +159,14 @@ function RuntimeComponent._fetchState(p1)
 		end
 	end
 	local stateTable = {}
-	local v1 = ActionButtonService.getDataInner()
-	stateTable.countInner = #v1
-	for i, v in ipairs(v1) do
+	local innerData = ActionButtonService.getDataInner()
+	stateTable.countInner = #innerData
+	for i, v in ipairs(innerData) do
 		p1:_fetchStateButton(stateTable, v, "inner", i)
 	end
-	local v2 = ActionButtonService.getDataOuter()
-	stateTable.countOuter = #v2
-	for i, v in ipairs(v2) do
+	local outerData = ActionButtonService.getDataOuter()
+	stateTable.countOuter = #outerData
+	for i, v in ipairs(outerData) do
 		p1:_fetchStateButton(stateTable, v, "outer", i)
 	end
 	p1:setState(stateTable)
@@ -255,18 +255,18 @@ function RuntimeComponent.didMount(p1)
 	end))
 end
 function RuntimeComponent._copyStateButton(p1, p2, p3, p4)
-	local v1 = ("%s_%d_%s"):format(p3, p4, "onReleased")
-	local v2 = ("%s_%d_%s"):format(p3, p4, "onPressed")
-	local v3 = ("%s_%d_%s"):format(p3, p4, "image")
-	local v4 = ("%s_%d_%s"):format(p3, p4, "pressed")
-	local v5 = ("%s_%d_%s"):format(p3, p4, "keyCode")
-	local v6 = ("%s_%d_%s"):format(p3, p4, "button")
-	p2[v1] = p1.state[v1]
-	p2[v2] = p1.state[v2]
-	p2[v3] = p1.state[v3]
-	p2[v4] = p1.state[v4]
-	p2[v5] = p1.state[v5]
-	p2[v6] = p1.state[v6]
+	local onReleasedKey = ("%s_%d_%s"):format(p3, p4, "onReleased")
+	local onPressedKey = ("%s_%d_%s"):format(p3, p4, "onPressed")
+	local imageKey = ("%s_%d_%s"):format(p3, p4, "image")
+	local pressedKey = ("%s_%d_%s"):format(p3, p4, "pressed")
+	local keyCodeKey = ("%s_%d_%s"):format(p3, p4, "keyCode")
+	local buttonKey = ("%s_%d_%s"):format(p3, p4, "button")
+	p2[onReleasedKey] = p1.state[onReleasedKey]
+	p2[onPressedKey] = p1.state[onPressedKey]
+	p2[imageKey] = p1.state[imageKey]
+	p2[pressedKey] = p1.state[pressedKey]
+	p2[keyCodeKey] = p1.state[keyCodeKey]
+	p2[buttonKey] = p1.state[buttonKey]
 end
 function RuntimeComponent.render(p1)
 	if ActionButtonService.enabled then
@@ -282,18 +282,18 @@ function RuntimeComponent.render(p1)
 			end
 		end
 		if p1.props.DEBUG_forceRadial or p1.state.touchControls then
-			local v1, v2
+			local size, position
 			if p1.state.isSmallScreen then
-				local v3 = UDim2.new(0.6, 0, 0.6, 0)
-				v1, v2 = v3, UDim2.new(1, 10, 1, -10)
+				local smallScreenSize = UDim2.new(0.6, 0, 0.6, 0)
+				size, position = smallScreenSize, UDim2.new(1, 10, 1, -10)
 			else
-				local v5 = UDim2.new(0.4, 0, 0.4, 0)
-				v1, v2 = v5, UDim2.new(1, 10, 1, 10)
+				local normalScreenSize = UDim2.new(0.4, 0, 0.4, 0)
+				size, position = normalScreenSize, UDim2.new(1, 10, 1, 10)
 			end
 			return createElement(Radial, Dictionary.merge({
 				anchorPoint = Vector2.new(1, 1),
-				size = v1,
-				position = v2,
+				size = size,
+				position = position,
 				countInner = p1.state.countInner,
 				countOuter = p1.state.countOuter,
 				enabled = p1.props.enabled,

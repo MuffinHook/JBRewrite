@@ -1,27 +1,28 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClanMatchmakingConsts = require(ReplicatedStorage.ClanMatchmaking.ClanMatchmakingConsts)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 return {
-	setIsClanReadiedUp = function(p1, p2)
-		assert(typeof(p1) == "string", "Invalid clanId passed")
-		local v2 = ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME)
-		local v3 = v2:FindFirstChild(p1)
-		if p2 then
-			if not v3 then
-				local v4 = Instance.new("BoolValue")
-				v4.Name = p1
-				v4.Parent = v2
+	setIsClanReadiedUp = function(clanId, isReadiedUp)
+		assert(typeof(clanId) == "string", "Invalid clanId passed")
+		local clanReadiedUpModel = ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME)
+		local clanReadiedUpValue = clanReadiedUpModel:FindFirstChild(clanId)
+		if isReadiedUp then
+			if not clanReadiedUpValue then
+				local newClanReadiedUpValue = Instance.new("BoolValue")
+				newClanReadiedUpValue.Name = clanId
+				newClanReadiedUpValue.Parent = clanReadiedUpModel
 			end
-		elseif v3 then
-			v3:Destroy()
+		elseif clanReadiedUpValue then
+			clanReadiedUpValue:Destroy()
 		end
 	end,
-	getIsClanReadiedUp = function(p1)
-		assert(typeof(p1) == "string", "Invalid clanId passed")
-		local v2 = ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME):FindFirstChild(p1)
-		if v2 then
-			return v2 ~= nil
+	getIsClanReadiedUp = function(clanId)
+		assert(typeof(clanId) == "string", "Invalid clanId passed")
+		local clanReadiedUpValue = ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME):FindFirstChild(clanId)
+		if clanReadiedUpValue then
+			return clanReadiedUpValue ~= nil
 		else
 			return false
 		end

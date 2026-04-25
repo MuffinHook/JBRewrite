@@ -1,22 +1,23 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Util = require(ReplicatedStorage.CmdrClient.Shared.Util)
 local TYPE_ENUM_TO_NAME = require(ReplicatedStorage.AirDrop.AirDropConsts).TYPE_ENUM_TO_NAME
-local v1 = Util.MakeFuzzyFinder(TYPE_ENUM_TO_NAME)
-local t = {
-	Transform = function(p1)
-		return v1(p1)
+local fuzzyFinder = Util.MakeFuzzyFinder(TYPE_ENUM_TO_NAME)
+local airDropDifficultyType = {
+	Transform = function(input)
+		return fuzzyFinder(input)
 	end,
-	Validate = function(p1)
-		return #p1 > 0, "No valid airDropDifficulty with that name could be found."
+	Validate = function(input)
+		return #input > 0, "No valid airDropDifficulty with that name could be found."
 	end,
-	Autocomplete = function(p1)
-		return p1
+	Autocomplete = function(input)
+		return input
 	end,
-	Parse = function(p1)
-		return p1[1]
+	Parse = function(input)
+		return input[1]
 	end
 }
-return function(p1)
-	p1:RegisterType("airDropDifficulty", t)
+return function(cmdr)
+	cmdr:RegisterType("airDropDifficulty", airDropDifficultyType)
 end

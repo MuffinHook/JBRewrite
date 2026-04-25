@@ -1,172 +1,173 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local Argument = require(script.Parent.Argument)
-local v1 = RunService:IsServer()
-local t = {}
-t.__index = t
-function t.new(p1)
-	local t2 = {
-		Dispatcher = p1.Dispatcher,
-		Cmdr = p1.Dispatcher.Cmdr,
-		Name = p1.CommandObject.Name,
-		RawText = p1.Text,
-		Object = p1.CommandObject,
-		Group = p1.CommandObject.Group,
+local isServer = RunService:IsServer()
+local Command = {}
+Command.__index = Command
+function Command.new(command)
+	local commandInstance = {
+		Dispatcher = command.Dispatcher,
+		Cmdr = command.Dispatcher.Cmdr,
+		Name = command.CommandObject.Name,
+		RawText = command.Text,
+		Object = command.CommandObject,
+		Group = command.CommandObject.Group,
 		State = {},
-		Aliases = p1.CommandObject.Aliases,
-		Alias = p1.Alias,
-		Description = p1.CommandObject.Description,
-		Executor = p1.Executor,
-		ArgumentDefinitions = p1.CommandObject.Args,
-		RawArguments = p1.Arguments,
+		Aliases = command.CommandObject.Aliases,
+		Alias = command.Alias,
+		Description = command.CommandObject.Description,
+		Executor = command.Executor,
+		ArgumentDefinitions = command.CommandObject.Args,
+		RawArguments = command.Arguments,
 		Arguments = {},
-		Data = p1.Data,
+		Data = command.Data,
 		Response = nil,
-		Guards = p1.Guards
+		Guards = command.Guards
 	}
-	setmetatable(t2, t)
-	return t2
+	setmetatable(commandInstance, Command)
+	return commandInstance
 end
-function t.Parse(p1, p2)
-	local v1 = false
-	for i, v in ipairs(p1.ArgumentDefinitions) do
-		local v2
+function Command.Parse(command, p2)
+	local hasRequiredArgument = false
+	for i, v in ipairs(command.ArgumentDefinitions) do
+		local isRequired
 		if type(v) == "function" then
-			local v3 = v(p1)
-			if v3 == nil then
+			local parsedArgument = v(command)
+			if parsedArgument == nil then
 				return true
 			end
-			v = v3
+			v = parsedArgument
 		end
-		v2 = if v.Default == nil then v.Optional ~= true else false
-		if v2 and v1 then
-			error(("[Cmdr] Command %q: Required arguments cannot occur after optional arguments."):format(p1.Name))
-		elseif not v2 then
-			v1 = true
+		isRequired = if v.Default == nil then v.Optional ~= true else false
+		if isRequired and hasRequiredArgument then
+			error(("[Cmdr] Command %q: Required arguments cannot occur after optional arguments."):format(command.Name))
+		elseif not isRequired then
+			hasRequiredArgument = true
 		end
-		if p1.RawArguments[i] == nil and (v2 and p2 ~= true) then
+		if command.RawArguments[i] == nil and (isRequired and p2 ~= true) then
 			return false, ("Required argument #%d %s is missing."):format(i, v.Name)
 		end
-		if p1.RawArguments[i] or p2 then
-			p1.Arguments[i] = Argument.new(p1, v, p1.RawArguments[i] or "")
+		if command.RawArguments[i] or p2 then
+			command.Arguments[i] = Argument.new(command, v, command.RawArguments[i] or "")
 		end
 	end
 	return true
 end
-function t.Validate(p1, p2)
-	p1._Validated = true
-	local v1 = ""
-	local v2 = true
-	for k, v in pairs(p1.Arguments) do
-		local v3, v4 = v:Validate(p2)
-		if not v3 then
-			v1, v2 = ("%s; #%d %s: %s"):format(v1, k, v.Name, v4 or "error"), false
+function Command.Validate(command, p2)
+	command._Validated = true
+	local validationMessage = ""
+	local isValid = true
+	for k, v in pairs(command.Arguments) do
+		local validationResult, errorMessage = v:Validate(p2)
+		if not validationResult then
+			validationMessage, isValid = ("%s; #%d %s: %s"):format(validationMessage, k, v.Name, errorMessage or "error"), false
 		end
 	end
-	return v2, v1:sub(3)
+	return isValid, validationMessage:sub(3)
 end
-function t.GetLastArgument(p1)
-	for i = #p1.Arguments, 1, -1 do
-		if p1.Arguments[i].RawValue then
-			return p1.Arguments[i]
+function Command.GetLastArgument(command)
+	for i = #command.Arguments, 1, -1 do
+		if command.Arguments[i].RawValue then
+			return command.Arguments[i]
 		end
 	end
 end
-function t.GatherArgumentValues(p1)
-	local t = {}
-	for i = 1, #p1.ArgumentDefinitions do
-		local v1 = p1.Arguments[i]
-		if v1 then
-			t[i] = v1:GetValue()
+function Command.GatherArgumentValues(command)
+	local argumentValues = {}
+	for i = 1, #command.ArgumentDefinitions do
+		local currentArgument = command.Arguments[i]
+		if currentArgument then
+			argumentValues[i] = currentArgument:GetValue()
 		else
-			if type(p1.ArgumentDefinitions[i]) == "table" then
-				t[i] = p1.ArgumentDefinitions[i].Default
+			if type(command.ArgumentDefinitions[i]) == "table" then
+				argumentValues[i] = command.ArgumentDefinitions[i].Default
 			end
 		end
 	end
-	return t, #p1.ArgumentDefinitions
+	return argumentValues, #command.ArgumentDefinitions
 end
-function t.Run(p1)
-	if p1._Validated == nil then
+function Command.Run(command)
+	if command._Validated == nil then
 		error("[Cmdr] Must validate a command before running.")
 	end
-	local v12 = p1.Dispatcher:RunHooks("BeforeRun", p1)
-	if v12 then
-		return v12
+	local beforeRunHookResult = command.Dispatcher:RunHooks("BeforeRun", command)
+	if beforeRunHookResult then
+		return beforeRunHookResult
 	else
-		local v2 = p1.Dispatcher:RunGuards(p1)
-		if v2 then
-			return v2
+		local guardResult = command.Dispatcher:RunGuards(command)
+		if guardResult then
+			return guardResult
 		else
-			if not v1 and (p1.Object.Data and p1.Data == nil) then
-				local v3, v4 = p1:GatherArgumentValues()
-				p1.Data = p1.Object.Data(p1, unpack(v3, 1, v4))
+			if not isServer and (command.Object.Data and command.Data == nil) then
+				local argumentValues, argumentCount = command:GatherArgumentValues()
+				command.Data = command.Object.Data(command, unpack(argumentValues, 1, argumentCount))
 			end
-			if not v1 and p1.Object.ClientRun then
-				local v5, v6 = p1:GatherArgumentValues()
-				p1.Response = p1.Object.ClientRun(p1, unpack(v5, 1, v6))
+			if not isServer and command.Object.ClientRun then
+				local argumentValues, argumentCount = command:GatherArgumentValues()
+				command.Response = command.Object.ClientRun(command, unpack(argumentValues, 1, argumentCount))
 			end
-			if p1.Response == nil then
-				if p1.Object.Run then
-					local v7, v8 = p1:GatherArgumentValues()
-					p1.Response = p1.Object.Run(p1, unpack(v7, 1, v8))
-				elseif v1 then
-					if p1.Object.ClientRun then
-						warn((("[Cmdr] %* command fell back to the server because ClientRun returned nil, but there is no server implementation! Either return a string from ClientRun, or create a server implementation for this command."):format(p1.Name)))
+			if command.Response == nil then
+				if command.Object.Run then
+					local argumentValues, argumentCount = command:GatherArgumentValues()
+					command.Response = command.Object.Run(command, unpack(argumentValues, 1, argumentCount))
+				elseif isServer then
+					if command.Object.ClientRun then
+						warn((("[Cmdr] %* command fell back to the server because ClientRun returned nil, but there is no server implementation! Either return a string from ClientRun, or create a server implementation for this command."):format(command.Name)))
 					else
-						warn((("[Cmdr] %* command has no implementation!"):format(p1.Name)))
+						warn((("[Cmdr] %* command has no implementation!"):format(command.Name)))
 					end
-					p1.Response = "No implementation."
+					command.Response = "No implementation."
 				else
-					p1.Response = p1.Dispatcher:Send(p1.RawText, p1.Data)
+					command.Response = command.Dispatcher:Send(command.RawText, command.Data)
 				end
 			end
-			local v9 = p1.Dispatcher:RunHooks("AfterRun", p1)
-			if v9 then
-				return v9
+			local afterRunHookResult = command.Dispatcher:RunHooks("AfterRun", command)
+			if afterRunHookResult then
+				return afterRunHookResult
 			else
-				return p1.Response
+				return command.Response
 			end
 		end
 	end
 end
-function t.GetArgument(p1, p2)
-	return p1.Arguments[p2]
+function Command.GetArgument(command, p2)
+	return command.Arguments[p2]
 end
-function t.GetData(p1)
-	if not p1.Data and (p1.Object.Data and not v1) then
-		p1.Data = p1.Object.Data(p1)
+function Command.GetData(command)
+	if not command.Data and (command.Object.Data and not isServer) then
+		command.Data = command.Object.Data(command)
 	end
-	return p1.Data
+	return command.Data
 end
-function t.SendEvent(p1, p2, p3, ...)
+function Command.SendEvent(command, p2, eventName, ...)
 	assert(if typeof(p2) == "Instance" then p2:IsA("Player") else false, "[Cmdr] Argument #1 must be a Player")
-	assert(type(p3) == "string", "[Cmdr] Argument #2 must be a string")
-	if v1 then
-		p1.Dispatcher.Cmdr.RemoteEvent:FireClient(p2, p3, ...)
-	elseif p1.Dispatcher.Cmdr.Events[p3] then
+	assert(type(eventName) == "string", "[Cmdr] Argument #2 must be a string")
+	if isServer then
+		command.Dispatcher.Cmdr.RemoteEvent:FireClient(p2, eventName, ...)
+	elseif command.Dispatcher.Cmdr.Events[eventName] then
 		assert(p2 == Players.LocalPlayer, "[Cmdr] Event messages can only be sent to the local player on the client.")
-		p1.Dispatcher.Cmdr.Events[p3](...)
+		command.Dispatcher.Cmdr.Events[eventName](...)
 	end
 end
-function t.BroadcastEvent(p1, ...)
-	if not v1 then
+function Command.BroadcastEvent(command, ...)
+	if not isServer then
 		error("[Cmdr] Can\'t broadcast event messages from the client.", 2)
 	end
-	p1.Dispatcher.Cmdr.RemoteEvent:FireAllClients(...)
+	command.Dispatcher.Cmdr.RemoteEvent:FireAllClients(...)
 end
-function t.Reply(p1, ...)
-	return p1:SendEvent(p1.Executor, "AddLine", ...)
+function Command.Reply(command, ...)
+	return command:SendEvent(command.Executor, "AddLine", ...)
 end
-function t.GetStore(p1, ...)
-	return p1.Dispatcher.Cmdr.Registry:GetStore(...)
+function Command.GetStore(command, ...)
+	return command.Dispatcher.Cmdr.Registry:GetStore(...)
 end
-function t.HasImplementation(p1)
-	if RunService:IsClient() and p1.Object.ClientRun or p1.Object.Run then
+function Command.HasImplementation(command)
+	if RunService:IsClient() and command.Object.ClientRun or command.Object.Run then
 		return true
 	else
 		return false
 	end
 end
-return t
+return Command

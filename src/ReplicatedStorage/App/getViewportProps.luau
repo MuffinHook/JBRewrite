@@ -13,9 +13,9 @@ local function updateVehicleCamera(model, boundingBox)
 	local animationTime = os.clock() / 2
 	model.CFrame = CFrame.Angles(0, animationTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(animationTime * 0.5) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, boundingBox.BoundingBox.Size.Magnitude * 0.8)
 end
-local function getVehicleDataForMake(p1)
+local function getVehicleDataForMake(make)
 	for i, v in ipairs(VehicleData) do
-		if v.Make == p1 then
+		if v.Make == make then
 			return v
 		end
 	end

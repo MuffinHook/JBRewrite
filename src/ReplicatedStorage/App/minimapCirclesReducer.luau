@@ -1,23 +1,24 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	addMinimapCircle = function(p1, p2)
-		assert(p2.circle.name ~= nil, "minimap circle missing unique name")
+	addMinimapCircle = function(state, action)
+		assert(action.circle.name ~= nil, "minimap circle missing unique name")
 		local localTable = {}
-		for i, v in ipairs(p1) do
-			if v.name ~= p2.circle.name then
-				table.insert(localTable, v)
+		for i, circle in ipairs(state) do
+			if circle.name ~= action.circle.name then
+				table.insert(localTable, circle)
 			end
 		end
-		table.insert(localTable, p2.circle)
+		table.insert(localTable, action.circle)
 		return localTable
 	end,
-	removeMinimapCircle = function(p1, p2)
-		assert(p2.name ~= nil, "minimap circle missing unique name")
+	removeMinimapCircle = function(state, action)
+		assert(action.name ~= nil, "minimap circle missing unique name")
 		local localTable = {}
-		for i, v in ipairs(p1) do
-			if v.name ~= p2.name then
-				table.insert(localTable, v)
+		for i, circle in ipairs(state) do
+			if circle.name ~= action.name then
+				table.insert(localTable, circle)
 			end
 		end
 		return localTable

@@ -1,22 +1,23 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 return function(p1)
-	local v1 = Roact.Component:extend("App")
+	local AppComponent = Roact.Component:extend("App")
 	require(ReplicatedStorage.App.store)
 	local Minimap = require(script.Parent.Minimap)
-	function v1.init(p1)
-		p1:setState({
+	function AppComponent.init(self)
+		self:setState({
 			waypoint = Vector3.new(0, 0, 0)
 		})
-		local v1, v2 = Roact.createBinding(Vector3.new(567, 0, 89))
-		p1.worldPosition = v1
-		p1.updateWorldPosition = v2
-		local v3, v4 = Roact.createBinding((Vector3.new(1, 0, 1)).Unit)
-		p1.worldDirection = v3
-		p1.updateWorldDirection = v4
-		p1.points = {
+		local worldPositionBinding, updateWorldPosition = Roact.createBinding(Vector3.new(567, 0, 89))
+		self.worldPosition = worldPositionBinding
+		self.updateWorldPosition = updateWorldPosition
+		local worldDirectionBinding, updateWorldDirection = Roact.createBinding((Vector3.new(1, 0, 1)).Unit)
+		self.worldDirection = worldDirectionBinding
+		self.updateWorldDirection = updateWorldDirection
+		self.points = {
 			{
 				name = "badcc",
 				part = workspace.Teams.Police_Military,
@@ -30,7 +31,7 @@ return function(p1)
 			}
 		}
 	end
-	local t = {
+	local waypointLabels = {
 		{
 			title = "CITY",
 			position = Vector3.new(20.82, 17.42, 1063.76)
@@ -42,18 +43,18 @@ return function(p1)
 			markerColor = Color3.new(255/255, 0/255, 0/255)
 		}
 	}
-	local v2, _ = Roact.createBinding(Vector3.new(900, 0, 900))
-	local v3, _2 = Roact.createBinding(2048)
-	local t2 = {
+	local battlePositionBinding, _ = Roact.createBinding(Vector3.new(900, 0, 900))
+	local battleRadiusBinding, _2 = Roact.createBinding(2048)
+	local circleMarkers = {
 		{
 			name = "battleRoyale",
-			worldPositionBinding = v2,
-			worldRadiusBinding = v3,
+			worldPositionBinding = battlePositionBinding,
+			worldRadiusBinding = battleRadiusBinding,
 			color = Color3.fromRGB(155, 31, 232),
 			transparency = 0.3
 		}
 	}
-	function v1.render(p1)
+	function AppComponent.render(self)
 		return Roact.createElement(Minimap, {
 			mapImageId = 86921803889926,
 			mapWorldWidth = 9984,
@@ -62,24 +63,24 @@ return function(p1)
 			mapWorldCenterY = -1550,
 			mapImageWidth = 1024,
 			mapImageHeight = 1024,
-			worldPosition = p1.worldPosition,
-			worldDirection = p1.worldDirection,
-			points = p1.points,
-			numPoints = #p1.points,
-			labels = t,
-			circles = t2,
-			waypoint = p1.state.waypoint,
+			worldPosition = self.worldPosition,
+			worldDirection = self.worldDirection,
+			points = self.points,
+			numPoints = #self.points,
+			labels = waypointLabels,
+			circles = circleMarkers,
+			waypoint = self.state.waypoint,
 			color = Color3.new(255/255, 0/255, 0/255),
-			onSetWaypoint = function(p12)
-				p1:setState({
-					waypoint = p12
+			onSetWaypoint = function(waypointPosition)
+				self:setState({
+					waypoint = waypointPosition
 				})
 			end
 		})
 	end
-	function v1.willUnmount(p1)end
-	local v4 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(self)end
+	local mountedComponent = Roact.mount(Roact.createElement(AppComponent), p1)
 	return function()
-		Roact.unmount(v4)
+		Roact.unmount(mountedComponent)
 	end
 end

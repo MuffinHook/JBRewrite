@@ -1,11 +1,12 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemCamera = require(ReplicatedStorage.Game.ItemSystem.ItemCamera)
 local PartUtils = require(ReplicatedStorage.Std.PartUtils)
-local v1 = require(Players.LocalPlayer.PlayerScripts.PlayerModule):GetCameras()
+local cameraControllers = require(Players.LocalPlayer.PlayerScripts.PlayerModule):GetCameras()
 local Basic = require(script.Parent.Basic)
-local t = {
+local motionConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -27,18 +28,18 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local v3 = nil
-local t2 = {
+local screenGui = nil
+local BinocularsClass = {
 	__ClassName = "Binoculars"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.Init(p1)
-	v3 = p1.ScreenGui
+BinocularsClass.__index = BinocularsClass
+setmetatable(BinocularsClass, Basic)
+function BinocularsClass.Init(p1)
+	screenGui = p1.ScreenGui
 end
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
+function BinocularsClass.new(p1, p2, p3)
+	local v1 = Basic.new(p1, p2, motionConfig, p3)
+	setmetatable(v1, BinocularsClass)
 	if v1.Local then
 		v1.Maid:GiveTask(function()
 			v1:Hide()
@@ -46,19 +47,19 @@ function t2.new(p1, p2, p3)
 	end
 	return v1
 end
-function t2.Look(p1)
+function BinocularsClass.Look(p1)
 	if p1.Local then
-		local v12 = v3.AbsoluteSize.X + 40
-		local Y = v3.AbsoluteSize.Y
-		v3.Binoculars.ImageLabel.Size = UDim2.new(0, v12, 0, v12 * 0.6)
-		v3.Binoculars.ImageLabel.Position = UDim2.new(0.5, -v12 * 0.5, 0.5, -v12 * 0.6 * 0.5)
-		v3.Binoculars.BarTop.Position = UDim2.new(0, 0, 0, -100)
-		v3.Binoculars.BarTop.Size = UDim2.new(1, 0, 0, (Y - v12 * 0.6) * 0.5 + 20 + 100)
-		v3.Binoculars.BarBottom.Size = UDim2.new(1, 0, 0, (Y - v12 * 0.6) * 0.5 + 20)
-		v3.Binoculars.BarBottom.Position = UDim2.new(0, 0, 1, -((Y - v12 * 0.6) * 0.5 + 20))
-		v3.Binoculars.Visible = true
+		local binocularWidth = screenGui.AbsoluteSize.X + 40
+		local Y = screenGui.AbsoluteSize.Y
+		screenGui.Binoculars.ImageLabel.Size = UDim2.new(0, binocularWidth, 0, binocularWidth * 0.6)
+		screenGui.Binoculars.ImageLabel.Position = UDim2.new(0.5, -binocularWidth * 0.5, 0.5, -binocularWidth * 0.6 * 0.5)
+		screenGui.Binoculars.BarTop.Position = UDim2.new(0, 0, 0, -100)
+		screenGui.Binoculars.BarTop.Size = UDim2.new(1, 0, 0, (Y - binocularWidth * 0.6) * 0.5 + 20 + 100)
+		screenGui.Binoculars.BarBottom.Size = UDim2.new(1, 0, 0, (Y - binocularWidth * 0.6) * 0.5 + 20)
+		screenGui.Binoculars.BarBottom.Position = UDim2.new(0, 0, 1, -((Y - binocularWidth * 0.6) * 0.5 + 20))
+		screenGui.Binoculars.Visible = true
 		ItemCamera.Zoom(15)
-		local activeCameraController = v1.activeCameraController
+		local activeCameraController = cameraControllers.activeCameraController
 		if activeCameraController then
 			p1.prevSubjectDistance = activeCameraController.currentSubjectDistance
 			activeCameraController:SetCameraToSubjectDistance(0.5)
@@ -71,13 +72,13 @@ function t2.Look(p1)
 	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Eyes.Springs.NeckRotation)
 	p1.SpringWaistRotation:SetTarget(p1.Config.Motion.Eyes.Springs.WaistRotation)
 end
-function t2.Hide(p1)
+function BinocularsClass.Hide(p1)
 	if p1.Local then
-		if v3.Binoculars.Visible then
-			v3.Binoculars.Visible = false
+		if screenGui.Binoculars.Visible then
+			screenGui.Binoculars.Visible = false
 			ItemCamera.Zoom(70)
 			if p1.prevSubjectDistance then
-				local activeCameraController = v1.activeCameraController
+				local activeCameraController = cameraControllers.activeCameraController
 				if activeCameraController then
 					activeCameraController:SetCameraToSubjectDistance(p1.prevSubjectDistance)
 				end
@@ -95,7 +96,7 @@ function t2.Hide(p1)
 	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
 	p1.SpringWaistRotation:SetTarget(p1.Config.Motion.Hip.Springs.WaistRotation)
 end
-function t2.InputBegan(p1, p2, p3)
+function BinocularsClass.InputBegan(p1, p2, p3)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		p1:Look()
 		if p1.Local then
@@ -104,7 +105,7 @@ function t2.InputBegan(p1, p2, p3)
 	end
 	Basic.InputBegan(p1, p2, p3)
 end
-function t2.InputEnded(p1, p2)
+function BinocularsClass.InputEnded(p1, p2)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		p1:Hide()
 		if p1.Local then
@@ -112,4 +113,4 @@ function t2.InputEnded(p1, p2)
 		end
 	end
 end
-return t2
+return BinocularsClass

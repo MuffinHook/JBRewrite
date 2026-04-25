@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Util = require(script.Parent.Util)
 local function unescapeOperators(p1)
 	for i, v in ipairs({ "%.", "%?", "%*", "%*%*" }) do
@@ -6,37 +7,37 @@ local function unescapeOperators(p1)
 	end
 	return p1
 end
-local t = {}
-t.__index = t
-function t.new(p1, p2, p3)
-	local t2 = {
+local Argument = {}
+Argument.__index = Argument
+function Argument.new(p1, p2, rawValue)
+	local instance = {
 		Command = p1,
 		Type = nil,
 		Name = p2.Name,
 		Object = p2
 	}
-	t2.Required = if p2.Default == nil then p2.Optional ~= true else false
-	t2.Executor = p1.Executor
-	t2.RawValue = p3
-	t2.RawSegments = {}
-	t2.TransformedValues = {}
-	t2.Prefix = ""
-	t2.TextSegmentInProgress = ""
-	t2.RawSegmentsAreAutocomplete = false
+	instance.Required = if p2.Default == nil then p2.Optional ~= true else false
+	instance.Executor = p1.Executor
+	instance.RawValue = rawValue
+	instance.RawSegments = {}
+	instance.TransformedValues = {}
+	instance.Prefix = ""
+	instance.TextSegmentInProgress = ""
+	instance.RawSegmentsAreAutocomplete = false
 	if type(p2.Type) == "table" then
-		t2.Type = p2.Type
+		instance.Type = p2.Type
 	else
-		local v2, v3, v4 = Util.ParsePrefixedUnionType(p1.Cmdr.Registry:GetTypeName(p2.Type), p3)
-		t2.Type = p1.Dispatcher.Registry:GetType(v2)
-		t2.RawValue = v3
-		t2.Prefix = v4
-		if t2.Type == nil then
-			error(("[Cmdr] %* has an unregistered type %%q"):format(t2.Name or "none"):format(v2 or "<none>"))
+		local v2, v3, v4 = Util.ParsePrefixedUnionType(p1.Cmdr.Registry:GetTypeName(p2.Type), rawValue)
+		instance.Type = p1.Dispatcher.Registry:GetType(v2)
+		instance.RawValue = v3
+		instance.Prefix = v4
+		if instance.Type == nil then
+			error(("[Cmdr] %* has an unregistered type %%q"):format(instance.Name or "none"):format(v2 or "<none>"))
 		end
 	end
-	setmetatable(t2, t)
-	t2:Transform()
-	return t2
+	setmetatable(instance, Argument)
+	instance:Transform()
+	return instance
 end
 function t.GetDefaultAutocomplete(p1)
 	if p1.Type.Autocomplete then

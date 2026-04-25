@@ -1,9 +1,10 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local Enumer = require(ReplicatedStorage.Std.Enumer)
-local v1 = TableUtils.requireValidIndexAndFreeze({ "Easy", "Medium", "Hard" })
-local t = {
+local difficultyLevels = TableUtils.requireValidIndexAndFreeze({ "Easy", "Medium", "Hard" })
+local AirDropConsts = {
 	FORCEFIELD_DISALLOWED_PART_SIZE = Vector3.new(30, 1, 30),
 	IN_AMBULANCE_STRETCHER_OBJ_NAME = "InAmbulanceStretcher",
 	FIREWORK_FX_REMOTE_NAME = "AirDropFireworks",
@@ -61,8 +62,8 @@ local t = {
 	},
 	GUARD_BUFFER_LENGTH_FROM_AIRDROP = 4,
 	MONEY_DROP_MINIMUM_SPACE = 20,
-	TYPE_ENUM_TO_NAME = v1,
-	TYPE_ENUM = Enumer(v1),
+	TYPE_ENUM_TO_NAME = difficultyLevels,
+	TYPE_ENUM = Enumer(difficultyLevels),
 	AIR_DROP_TYPE_ENUM_ATTRIBUTE_NAME = "AirDropTypeEnum",
 	AIR_DROP_OPEN_DURATION = 4,
 	SPINNER_TOTAL_NUM_CARDS = 30,
@@ -72,6 +73,6 @@ local t = {
 	MAX_MANSION_INVITES = 5,
 	PLAYER_ROB_COOLDOWN = 360
 }
-t.GUARD_ITEM_TO_DATA_MAP.Revolver = TableUtils.deepCopy(t.GUARD_ITEM_TO_DATA_MAP.Pistol)
-t.SPINNER_STOP_INDEX = t.SPINNER_TOTAL_NUM_CARDS - 4
-return TableUtils.requireValidIndexAndFreeze(t)
+AirDropConsts.GUARD_ITEM_TO_DATA_MAP.Revolver = TableUtils.deepCopy(AirDropConsts.GUARD_ITEM_TO_DATA_MAP.Pistol)
+AirDropConsts.SPINNER_STOP_INDEX = AirDropConsts.SPINNER_TOTAL_NUM_CARDS - 4
+return TableUtils.requireValidIndexAndFreeze(AirDropConsts)

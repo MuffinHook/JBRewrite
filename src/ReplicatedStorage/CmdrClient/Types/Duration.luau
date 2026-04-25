@@ -1,6 +1,7 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Util = require(script.Parent.Parent.Shared.Util)
-local tbl = {
+local durationUnits = {
 	Years = 31556926,
 	Months = 2629744,
 	Weeks = 604800,
@@ -9,96 +10,96 @@ local tbl = {
 	Minutes = 60,
 	Seconds = 1
 }
-local t = {}
-for k, v in pairs(tbl) do
-	table.insert(t, k)
+local unitKeys = {}
+for k, v in pairs(durationUnits) do
+	table.insert(unitKeys, k)
 end
-local v1 = Util.MakeFuzzyFinder(t)
-local function stringToSecondDuration(p1)
-	if p1 == nil or p1 == "" then
+local fuzzyFindUnit = Util.MakeFuzzyFinder(unitKeys)
+local function stringToSecondDuration(input)
+	if input == nil or input == "" then
 		return nil
 	else
-		local v12 = tonumber(p1)
-		if v12 and v12 == 0 then
+		local parsedNum = tonumber(input)
+		if parsedNum and parsedNum == 0 then
 			return 0, 0, true
 		else
-			local v2 = p1:gsub("-?%d+%a+", ""):match("-?%d+")
-			if v2 then
-				return nil, tonumber(v2), true
+			local remainder = input:gsub("-?%d+%a+", ""):match("-?%d+")
+			if remainder then
+				return nil, tonumber(remainder), true
 			else
 				local sum = nil
-				local v3 = nil
-				for v5 in p1:gmatch("-?%d+%a+") do
-					local v4
-					local v6, v7 = v5:match("(-?%d+)(%a+)")
-					local v8 = v1(v7, false, true)
-					if #v8 == 0 then
-						return nil, tonumber(v6)
+				local lastUnitValue = nil
+				for durationComponent in input:gmatch("-?%d+%a+") do
+					local unitMultiplier
+					local numPart, unitPart = durationComponent:match("(-?%d+)(%a+)")
+					local matchedUnits = fuzzyFindUnit(unitPart, false, true)
+					if #matchedUnits == 0 then
+						return nil, tonumber(numPart)
 					end
 					if sum == nil then
 						sum = 0
 					end
-					if v7:lower() == "m" then
-						v3 = v6
-						v4 = 60
+					if unitPart:lower() == "m" then
+						lastUnitValue = numPart
+						unitMultiplier = 60
 					else
-						v4 = tbl[v8[1]]
-						v3 = v6
+						unitMultiplier = durationUnits[matchedUnits[1]]
+						lastUnitValue = numPart
 					end
-					sum = sum + v4 * tonumber(v3)
+					sum = sum + unitMultiplier * tonumber(lastUnitValue)
 				end
 				if sum == nil then
 					return nil
 				else
-					return sum, tonumber(v3)
+					return sum, tonumber(lastUnitValue)
 				end
 			end
 		end
 	end
 end
-local function mapUnits(p1, p2, p3, p4)
-	local v1 = p4 or 1
-	local t = {}
-	for k, v in pairs(p1) do
-		if p3 == 1 then
-			t[k] = p2 .. v:sub(v1, #v - 1)
+local function mapUnits(unitTable, prefix, shouldTruncate, offset)
+	local startIndex = offset or 1
+	local result = {}
+	for k, v in pairs(unitTable) do
+		if shouldTruncate == 1 then
+			result[k] = prefix .. v:sub(startIndex, #v - 1)
 		else
-			t[k] = p2 .. v:sub(v1)
+			result[k] = prefix .. v:sub(startIndex)
 		end
 	end
-	return t
+	return result
 end
-local t2 = {
-	Transform = function(p1)
-		return p1, stringToSecondDuration(p1)
+local durationTypeDefinition = {
+	Transform = function(input)
+		return input, stringToSecondDuration(input)
 	end,
-	Validate = function(p1, p2)
-		return p2 ~= nil
+	Validate = function(input, result)
+		return result ~= nil
 	end,
-	Autocomplete = function(p1, p2, p3, p4, p5)
-		local t = {}
-		if p4 or p5 then
-			local v12 = p4 == true and v1("", false, true) or p5
-			if p4 == true then
-				return mapUnits(v12, p1, p3)
+	Autocomplete = function(input, currentValue, truncateFlag, fuzzyBool, manualUnits)
+		local result = {}
+		if fuzzyBool or manualUnits then
+			local fuzzyResults = fuzzyBool == true and fuzzyFindUnit("", false, true) or manualUnits
+			if fuzzyBool == true then
+				return mapUnits(fuzzyResults, input, truncateFlag)
 			else
-				return mapUnits(v12, p1, p1:match("^.*(%a+)$"):len() + 1)
+				return mapUnits(fuzzyResults, input, input:match("^.*(%a+)$"):len() + 1)
 			end
 		else
-			if p2 ~= nil then
-				local v2 = p1:match("^.*-?%d+(%a+)%s?$")
-				local v3 = mapUnits(v1(v2, false, true), p1, p3, #v2 + 1)
-				table.sort(v3)
-				t = v3
+			if currentValue ~= nil then
+				local matchedUnit = input:match("^.*-?%d+(%a+)%s?$")
+				local mappedUnits = mapUnits(fuzzyFindUnit(matchedUnit, false, true), input, truncateFlag, #matchedUnit + 1)
+				table.sort(mappedUnits)
+				result = mappedUnits
 			end
-			return t
+			return result
 		end
 	end,
-	Parse = function(p1, p2)
-		return p2
+	Parse = function(input, result)
+		return result
 	end
 }
-return function(p1)
-	p1:RegisterType("duration", t2)
-	p1:RegisterType("durations", Util.MakeListableType(t2))
+return function(typeRegistry)
+	typeRegistry:RegisterType("duration", durationTypeDefinition)
+	typeRegistry:RegisterType("durations", Util.MakeListableType(durationTypeDefinition))
 end

@@ -31,8 +31,8 @@ return {
 		ImportantLocationMarkerClass.__index = ImportantLocationMarkerClass
 		setmetatable(ImportantLocationMarkerClass, BaseObject)
 		function ImportantLocationMarkerClass.new(markerInstance)
-			local v12 = BaseObject.new(markerInstance)
-			setmetatable(v12, ImportantLocationMarkerClass)
+			local marker = BaseObject.new(markerInstance)
+			setmetatable(marker, ImportantLocationMarkerClass)
 			local markerConfig = localTable[markerInstance.Name]
 			if not markerConfig then
 				error(("Missing important location marker entry for: %s"):format(markerInstance.Name))
@@ -46,10 +46,10 @@ return {
 			worldMarker:SetIcon(ImageId)
 			worldMarker.FrameInner.ImageColor3 = markerConfig.Color
 			markerGroup:Add(worldMarker)
-			v12.maid:GiveTask(function()
+			marker.maid:GiveTask(function()
 				markerGroup:Remove(worldMarker)
 			end)
-			v12.worldMarker = worldMarker
+			marker.worldMarker = worldMarker
 			local positionBinding, updatePositionBinding = Roact.createBinding(worldMarker:GetPosition())
 			local colorBinding, updateColorBinding = Roact.createBinding(markerConfig.Color)
 			store:dispatch({
@@ -71,7 +71,7 @@ return {
 				updatePositionBinding(markerInstance.Position)
 			end))
 			worldMarker:SetEnabled(isLocationMarkerEnabled)
-			return v12
+			return marker
 		end
 		Binder.new("ImportantLocationMarker", ImportantLocationMarkerClass):Start()
 		local function setEnabled()

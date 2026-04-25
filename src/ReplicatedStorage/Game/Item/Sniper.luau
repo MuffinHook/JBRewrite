@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Lighting = game:GetService("Lighting")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 game:GetService("UserInputService")
@@ -7,101 +8,101 @@ local Audio = require(ReplicatedStorage.Std.Audio)
 local Spring = require(ReplicatedStorage.Std.Spring)
 local ItemCamera = require(ReplicatedStorage.Game.ItemSystem.ItemCamera)
 local Gun = require(script.Parent.Gun)
-local t = {
+local Sniper = {
 	__ClassName = "Sniper"
 }
-t.__index = t
-setmetatable(t, Gun)
-function t.new(p1, p2, p3)
-	local v1 = Gun.new(p1, p2, p3)
-	setmetatable(v1, t)
-	v1:Setup(p3)
-	if v1.Local then
+Sniper.__index = Sniper
+setmetatable(Sniper, Gun)
+function Sniper.new(p1, p2, p3)
+	local instance = Gun.new(p1, p2, p3)
+	setmetatable(instance, Sniper)
+	instance:Setup(p3)
+	if instance.Local then
 		local ScopeGui = ReplicatedStorage.Resource.ItemSystem.Gui.ScopeGui
 		assert(ScopeGui)
-		local v3 = ScopeGui:Clone()
-		v3.ScreenInsets = Enum.ScreenInsets.None
-		v3.DisplayOrder = -1
-		v3.Enabled = false
-		v3.Parent = LocalPlayer.PlayerGui
-		v1.ScopeGui = v3
-		v1.Maid:GiveTask(v3)
+		local scopeGui = ScopeGui:Clone()
+		scopeGui.ScreenInsets = Enum.ScreenInsets.None
+		scopeGui.DisplayOrder = -1
+		scopeGui.Enabled = false
+		scopeGui.Parent = LocalPlayer.PlayerGui
+		instance.ScopeGui = scopeGui
+		instance.Maid:GiveTask(scopeGui)
 		local BlurEffect = Instance.new("BlurEffect")
 		BlurEffect.Size = 0
 		BlurEffect.Enabled = false
 		BlurEffect.Parent = Lighting
-		v1.Blur = BlurEffect
-		v1.Maid:GiveTask(BlurEffect)
-		v1.SpringBlur = Spring.new(0, 0, 0.8, 5)
+		instance.Blur = BlurEffect
+		instance.Maid:GiveTask(BlurEffect)
+		instance.SpringBlur = Spring.new(0, 0, 0.8, 5)
 	end
-	return v1
+	return instance
 end
-function t.Heartbeat(p1)
-	if p1.Local then
-		local v1 = p1.SpringBlur:Update()
-		if v1 >= 0.01 and p1.IsScoping then
-			if p1.Blur.Enabled == false then
-				p1.Blur.Enabled = true
+function Sniper.Heartbeat(self)
+	if self.Local then
+		local blurValue = self.SpringBlur:Update()
+		if blurValue >= 0.01 and self.IsScoping then
+			if self.Blur.Enabled == false then
+				self.Blur.Enabled = true
 			end
-			p1.Blur.Size = v1
-		elseif p1.Blur.Enabled == true then
-			p1.Blur.Enabled = false
+			self.Blur.Size = blurValue
+		elseif self.Blur.Enabled == true then
+			self.Blur.Enabled = false
 		end
 	end
 end
-function t.ShootSound(p1, p2)
+function Sniper.ShootSound(self, p2)
 	if not p2 then
-		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.shoot, {
+		Audio.ObjectLocal(self.Tip, self.Config.Sound.shoot, {
 			Pitch = 1 + math.random() * 0.1 - 0.05,
 			Volume = 0.6
 		})
 	end
 end
-function t.ScopeBegin(p1)
-	if Gun.ScopeBegin(p1) == false then
+function Sniper.ScopeBegin(self)
+	if Gun.ScopeBegin(self) == false then
 		return false
 	end
-	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.scope)
-	if p1.Local then
-		p1._cameraSensitivity = ItemCamera.getSensitivity()
-		ItemCamera.setSensitivity(p1._cameraSensitivity * 0.05)
-		p1._CameraDistance = ItemCamera.GetCameraDistance()
+	Audio.ObjectLocal(self.Tip, self.Config.Sound.scope)
+	if self.Local then
+		self._cameraSensitivity = ItemCamera.getSensitivity()
+		ItemCamera.setSensitivity(self._cameraSensitivity * 0.05)
+		self._CameraDistance = ItemCamera.GetCameraDistance()
 		ItemCamera.SetCameraDistance(0)
-		p1.ScopeGui.Enabled = true
-		p1.SpringBlur:Accelerate(500)
+		self.ScopeGui.Enabled = true
+		self.SpringBlur:Accelerate(500)
 	end
 end
-function t.ScopeEnd(p1)
-	if Gun.ScopeEnd(p1) == false then
+function Sniper.ScopeEnd(self)
+	if Gun.ScopeEnd(self) == false then
 		return false
 	end
-	if p1.Local then
-		if p1._CameraDistance ~= nil then
-			ItemCamera.SetCameraDistance(p1._CameraDistance)
-			p1._CameraDistance = nil
+	if self.Local then
+		if self._CameraDistance ~= nil then
+			ItemCamera.SetCameraDistance(self._CameraDistance)
+			self._CameraDistance = nil
 		end
-		if p1._cameraSensitivity ~= nil then
-			ItemCamera.setSensitivity(p1._cameraSensitivity)
-			p1._cameraSensitivity = nil
+		if self._cameraSensitivity ~= nil then
+			ItemCamera.setSensitivity(self._cameraSensitivity)
+			self._cameraSensitivity = nil
 		end
-		p1.ScopeGui.Enabled = false
+		self.ScopeGui.Enabled = false
 	end
 end
-function t.ReloadDropAmmoVisual(p1)  end
-function t.ReloadRefillAmmoVisual(p1)  end
-function t.ReloadDropAmmoSound(p1)
-	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.mag_out, {
+function Sniper.ReloadDropAmmoVisual(self)  end
+function Sniper.ReloadRefillAmmoVisual(self)  end
+function Sniper.ReloadDropAmmoSound(self)
+	Audio.ObjectLocal(self.Tip, self.Config.Sound.mag_out, {
 		RollOffMaxDistance = 129
 	})
 end
-function t.ReloadRefillAmmoSound(p1)
-	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.mag_in, {
+function Sniper.ReloadRefillAmmoSound(self)
+	Audio.ObjectLocal(self.Tip, self.Config.Sound.mag_in, {
 		RollOffMaxDistance = 129
 	})
 	wait(0.5)
-	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.cock, {
+	Audio.ObjectLocal(self.Tip, self.Config.Sound.cock, {
 		RollOffMaxDistance = 129
 	})
 	wait(0.2)
 end
-return t
+return Sniper

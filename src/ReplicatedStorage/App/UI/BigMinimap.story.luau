@@ -1,19 +1,20 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(container)
+	local AppComponent = Roact.Component:extend("App")
 	local store = require(ReplicatedStorage.App.store)
 	local BigMinimap = require(script.Parent.BigMinimap)
-	function v1.init(p1)
-		local v1, v2 = Roact.createBinding(Vector3.new(2567, 0, 89))
-		p1.worldPosition = v1
-		p1.updateWorldPosition = v2
-		local v3, v4 = Roact.createBinding((Vector3.new(1, 0, 1)).Unit)
-		p1.worldDirection = v3
-		p1.updateWorldDirection = v4
-		p1.points = {
+	function AppComponent.init(component)
+		local worldPositionValue, updateWorldPosition = Roact.createBinding(Vector3.new(2567, 0, 89))
+		component.worldPosition = worldPositionValue
+		component.updateWorldPosition = updateWorldPosition
+		local worldDirectionValue, updateWorldDirection = Roact.createBinding((Vector3.new(1, 0, 1)).Unit)
+		component.worldDirection = worldDirectionValue
+		component.updateWorldDirection = updateWorldDirection
+		component.points = {
 			{
 				name = "badcc",
 				part = workspace.Teams.Police_Military,
@@ -22,7 +23,7 @@ return function(p1)
 			}
 		}
 	end
-	local t = {
+	local waypointLocations = {
 		{
 			title = "CITY",
 			position = Vector3.new(20.82, 17.42, 1063.76)
@@ -34,7 +35,7 @@ return function(p1)
 			markerColor = Color3.new(255/255, 0/255, 0/255)
 		}
 	}
-	function v1.render(p1)
+	function AppComponent.render(component)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(BigMinimap, {
@@ -45,23 +46,23 @@ return function(p1)
 				mapWorldCenterY = 1536,
 				mapImageWidth = 1024,
 				mapImageHeight = 1024,
-				worldPosition = p1.worldPosition,
-				worldDirection = p1.worldDirection,
-				points = p1.points,
-				numPoints = #p1.points,
-				labels = t,
+				worldPosition = component.worldPosition,
+				worldDirection = component.worldDirection,
+				points = component.points,
+				numPoints = #component.points,
+				labels = waypointLocations,
 				size = UDim2.new(1, 0, 0.75, 0),
 				color = Color3.new(255/255, 0/255, 0/255),
-				onSetWaypoint = function(p12)
-					p1:setState({
-						waypoint = p12
+				onSetWaypoint = function(waypoint)
+					component:setState({
+						waypoint = waypoint
 					})
 				end
 			}) })
 	end
-	function v1.willUnmount(p1)end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(component)end
+	local mountedComponent = Roact.mount(Roact.createElement(AppComponent), container)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedComponent)
 	end
 end

@@ -8,15 +8,15 @@ local InputUtils = require(script.Parent.InputUtils)
 local Roact = require(ReplicatedStorage.Roact)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local createElement = Roact.createElement
-return function(p1, p2, p3, p4, p5, p6)
-	local pressedEventKey = ("%s_%d_%s"):format(p2, p3, "pressed")
-	local onReleasedEventKey = ("%s_%d_%s"):format(p2, p3, "onReleased")
-	local onPressedEventKey = ("%s_%d_%s"):format(p2, p3, "onPressed")
-	local imageEventKey = ("%s_%d_%s"):format(p2, p3, "image")
-	local keyCodeEventKey = ("%s_%d_%s"):format(p2, p3, "keyCode")
-	local buttonConfig = p1[("%s_%d_%s"):format(p2, p3, "button")]
-	local inputKeyCode = p1[keyCodeEventKey]
-	local baseColor = p1.color or Color3.new(255/255, 255/255, 255/255)
+return function(config, buttonId, actionName, zIndex, buttonSize, buttonPosition)
+	local pressedEventKey = ("%s_%d_%s"):format(buttonId, actionName, "pressed")
+	local onReleasedEventKey = ("%s_%d_%s"):format(buttonId, actionName, "onReleased")
+	local onPressedEventKey = ("%s_%d_%s"):format(buttonId, actionName, "onPressed")
+	local imageEventKey = ("%s_%d_%s"):format(buttonId, actionName, "image")
+	local keyCodeEventKey = ("%s_%d_%s"):format(buttonId, actionName, "keyCode")
+	local buttonConfig = config[("%s_%d_%s"):format(buttonId, actionName, "button")]
+	local inputKeyCode = config[keyCodeEventKey]
+	local baseColor = config.color or Color3.new(255/255, 255/255, 255/255)
 	if buttonConfig and buttonConfig.saturateTo then
 		baseColor = ColorUtils.saturateTo(baseColor, buttonConfig.saturateTo)
 	end
@@ -27,31 +27,31 @@ return function(p1, p2, p3, p4, p5, p6)
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		Active = false,
-		Image = p1[imageEventKey]
+		Image = config[imageEventKey]
 	}
-	imageLabelProps.ImageColor3 = if p1[pressedEventKey] and darkenedColor then darkenedColor else baseColor
+	imageLabelProps.ImageColor3 = if config[pressedEventKey] and darkenedColor then darkenedColor else baseColor
 	local childElements = {}
 	if buttonConfig and buttonConfig.title then
 		imageLabelProps.Position = UDim2.new(0.5, 0, 0.4, 0)
 		imageLabelProps.Size = UDim2.new(1, 0, 0.8, 0)
-		local t3 = {
+		local textLabelProps = {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0.8, 0, 0.2, 0),
 			AnchorPoint = Vector2.new(0.5, 0),
 			Position = UDim2.new(0.5, 0, 0.6, 0)
 		}
-		t3.TextColor3 = if p1[pressedEventKey] and darkenedColor then darkenedColor else baseColor
-		t3.TextScaled = true
-		t3.Text = buttonConfig.title
-		t3.Font = Enum.Font.LuckiestGuy
-		childElements.Label = createElement("TextLabel", t3)
+		textLabelProps.TextColor3 = if config[pressedEventKey] and darkenedColor then darkenedColor else baseColor
+		textLabelProps.TextScaled = true
+		textLabelProps.Text = buttonConfig.title
+		textLabelProps.Font = Enum.Font.LuckiestGuy
+		childElements.Label = createElement("TextLabel", textLabelProps)
 	end
 	childElements.ImageLabel = createElement("ImageLabel", imageLabelProps, {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = 1
 		})
 	})
-	local inputIconScale = if p1[pressedEventKey] then 0.5 else 1
+	local inputIconScale = if config[pressedEventKey] then 0.5 else 1
 	if inputKeyCode and InputUtils.isGamepadKeyCode(inputKeyCode) then
 		childElements.Input = ControllerImage:GetRoactImageLabel(inputKeyCode, "Dark", {
 			AnchorPoint = Vector2.new(0.5, 0.5),
@@ -84,56 +84,56 @@ return function(p1, p2, p3, p4, p5, p6)
 		})
 	end
 	if buttonConfig and buttonConfig.progressBinding then
-		local t3 = {
+		local progressBarConfig = {
 			progressBinding = buttonConfig.progressBinding,
 			size = UDim2.fromScale(0.94, 0.94),
 			zIndex = 3
 		}
-		t3.color = if p1[pressedEventKey] and darkenedColor then darkenedColor else baseColor
-		childElements.Progress = createElement(CircularProgressBar, t3)
+		progressBarConfig.color = if config[pressedEventKey] and darkenedColor then darkenedColor else baseColor
+		childElements.Progress = createElement(CircularProgressBar, progressBarConfig)
 	end
-	local t3 = {
-		ZIndex = p4,
+	local buttonProps = {
+		ZIndex = zIndex,
 		BackgroundTransparency = 1,
-		Size = p5,
+		Size = buttonSize,
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = p6,
+		Position = buttonPosition,
 		Image = "rbxassetid://7852334955"
 	}
-	t3.Active = buttonConfig and not buttonConfig.noSink
-	t3.ImageColor3 = if p1[pressedEventKey] and darkenedColor then darkenedColor else baseColor
-	t3[Roact.Event.InputBegan] = function(p12, p2)
-		if p2.UserInputType == Enum.UserInputType.Touch or p2.UserInputType == Enum.UserInputType.MouseButton1 then
+	buttonProps.Active = buttonConfig and not buttonConfig.noSink
+	buttonProps.ImageColor3 = if config[pressedEventKey] and darkenedColor then darkenedColor else baseColor
+	buttonProps[Roact.Event.InputBegan] = function(button, inputEvent)
+		if inputEvent.UserInputType == Enum.UserInputType.Touch or inputEvent.UserInputType == Enum.UserInputType.MouseButton1 then
 			local allowTouchSlide = buttonConfig.allowTouchSlide
 			if allowTouchSlide then
-				allowTouchSlide = p2.UserInputState == Enum.UserInputState.Change
+				allowTouchSlide = inputEvent.UserInputState == Enum.UserInputState.Change
 			end
-			if p2.UserInputState == Enum.UserInputState.Begin or allowTouchSlide then
-				buttonConfig._inputTypePressed = p2.UserInputType
-				if p1[onPressedEventKey] then
-					p1[onPressedEventKey](p2.UserInputType)
+			if inputEvent.UserInputState == Enum.UserInputState.Begin or allowTouchSlide then
+				buttonConfig._inputTypePressed = inputEvent.UserInputType
+				if config[onPressedEventKey] then
+					config[onPressedEventKey](inputEvent.UserInputType)
 				end
-				local pressedCallback = p1[onReleasedEventKey]
+				local pressedCallback = config[onReleasedEventKey]
 				buttonConfig._enteredViaSlide = allowTouchSlide
-				buttonConfig._maid.waitForEnd = p2:GetPropertyChangedSignal("UserInputState"):Connect(function()
-					if p2.UserInputState == Enum.UserInputState.End then
+				buttonConfig._maid.waitForEnd = inputEvent:GetPropertyChangedSignal("UserInputState"):Connect(function()
+					if inputEvent.UserInputState == Enum.UserInputState.End then
 						buttonConfig._maid.waitForEnd = nil
 						if pressedCallback then
-							pressedCallback(p2.UserInputType)
+							pressedCallback(inputEvent.UserInputType)
 						end
 					end
 				end)
 			end
 		end
 	end
-	t3[Roact.Event.MouseLeave] = function()
+	buttonProps[Roact.Event.MouseLeave] = function()
 		if buttonConfig and buttonConfig._enteredViaSlide then
 			buttonConfig._maid.waitForEnd = nil
-			local releasedCallback = p1[onReleasedEventKey]
+			local releasedCallback = config[onReleasedEventKey]
 			if releasedCallback then
 				releasedCallback()
 			end
 		end
 	end
-	return createElement("ImageButton", t3, childElements)
+	return createElement("ImageButton", buttonProps, childElements)
 end

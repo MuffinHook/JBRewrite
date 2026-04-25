@@ -1,26 +1,27 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GameLocations = require(ReplicatedStorage.App.GameLocations)
 local Util = require(ReplicatedStorage.CmdrClient.Shared.Util)
-local t = {}
-for v1 in GameLocations do
-	table.insert(t, v1)
+local gameLocationsList = {}
+for location in GameLocations do
+	table.insert(gameLocationsList, location)
 end
-local v2 = Util.MakeFuzzyFinder(t)
-local t2 = {
-	Transform = function(p1)
-		return v2(p1)
+local fuzzyFinder = Util.MakeFuzzyFinder(gameLocationsList)
+local typeDefinition = {
+	Transform = function(input)
+		return fuzzyFinder(input)
 	end,
-	Validate = function(p1)
-		return #p1 > 0, "No valid robbery with that name could be found."
+	Validate = function(input)
+		return #input > 0, "No valid robbery with that name could be found."
 	end,
-	Autocomplete = function(p1)
-		return p1
+	Autocomplete = function(input)
+		return input
 	end,
-	Parse = function(p1)
-		return p1[1]
+	Parse = function(input)
+		return input[1]
 	end
 }
-return function(p1)
-	p1:RegisterType("gameLocation", t2)
+return function(cmdr)
+	cmdr:RegisterType("gameLocation", typeDefinition)
 end

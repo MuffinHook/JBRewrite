@@ -1,10 +1,11 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local v1 = script.Parent
+local itemParent = script.Parent
 local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-local Basic = require(v1.Basic)
-local t = {
+local Basic = require(itemParent.Basic)
+local defaultMotionConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -18,28 +19,28 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local t2 = {
+local CustomClass = {
 	__ClassName = "Custom"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.new(p1, p2, p3)
-	local v1 = TableUtils.deepCopy(t)
-	local v2 = InventoryItemUtils.getAttr(p2, "ItemOffset")
-	if v2 then
-		v1.Motion.Hip.Springs.ItemOffset = v2
+CustomClass.__index = CustomClass
+setmetatable(CustomClass, Basic)
+function CustomClass.new(player, item, config)
+	local defaultMotion = TableUtils.deepCopy(defaultMotionConfig)
+	local itemOffsetAttr = InventoryItemUtils.getAttr(item, "ItemOffset")
+	if itemOffsetAttr then
+		defaultMotion.Motion.Hip.Springs.ItemOffset = itemOffsetAttr
 	end
-	local v3 = Basic.new(p1, p2, v1, p3)
-	v3.__ClassName = InventoryItemUtils.getName(p2)
-	setmetatable(v3, t2)
-	v3:DefaultDisableCamLock()
-	return v3
+	local instance = Basic.new(player, item, defaultMotion, config)
+	instance.__ClassName = InventoryItemUtils.getName(item)
+	setmetatable(instance, CustomClass)
+	instance:DefaultDisableCamLock()
+	return instance
 end
-function t2.GetLeftArmPosition(p1)
+function CustomClass.GetLeftArmPosition(player)
 	return nil
 end
-function t2.InputBegan(p1, ...)
-	Basic.InputBegan(p1, ...)
+function CustomClass.InputBegan(player, ...)
+	Basic.InputBegan(player, ...)
 end
-function t2.InputEnded(p1)  end
-return t2
+function CustomClass.InputEnded(player)  end
+return CustomClass
