@@ -129,6 +129,8 @@ function RuntimeComponent._fetchStateButton(p1, p2, p3, p4, p5)
 						p3._maid.progress = nil
 						p3.updateProgressBinding(0)
 					end)
+				elseif p3.onReleased then
+					p3.onReleased(...)
 				end
 			end
 		end
