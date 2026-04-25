@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
@@ -21,11 +22,11 @@ local function isToggle(p1)
 		return _inputTypePressed == Enum.UserInputType.Gamepad1 and p1.gamepadIsToggle and true or false
 	end
 end
-local v1 = Roact.PureComponent:extend("Runtime")
-v1.defaultProps = {
+local RuntimeComponent = Roact.PureComponent:extend("Runtime")
+RuntimeComponent.defaultProps = {
 	gridPosition = UDim2.new(1, -10, 1, -70)
 }
-function v1.init(p1)
+function RuntimeComponent.init(p1)
 	p1._maid = Maid.new()
 	p1:_fetchInputType()
 	p1._maid:GiveTask(UserInputService.LastInputTypeChanged:Connect(function()
@@ -44,21 +45,21 @@ function v1.init(p1)
 	end))
 	p1:_updateViewType()
 end
-function v1._updateViewType(p1)
+function RuntimeComponent._updateViewType(p1)
 	p1:setState({
 		touchControls = InputUtils_2.isTouch(),
 		isSmallScreen = Utils.isSmallScreen()
 	})
 end
-function v1._fetchInputType(p1)
-	local v1 = UserInputService:GetLastInputType()
-	if v1 == Enum.UserInputType.Gamepad1 or (v1 == Enum.UserInputType.Keyboard or v1 == Enum.UserInputType.Touch) then
+function RuntimeComponent._fetchInputType(p1)
+	local lastInputType = UserInputService:GetLastInputType()
+	if lastInputType == Enum.UserInputType.Gamepad1 or (lastInputType == Enum.UserInputType.Keyboard or lastInputType == Enum.UserInputType.Touch) then
 		p1:setState({
-			inputType = v1
+			inputType = lastInputType
 		})
 	end
 end
-function v1._fetchStateButton(p1, p2, p3, p4, p5)
+function RuntimeComponent._fetchStateButton(p1, p2, p3, p4, p5)
 	local v1 = ("%s_%d_%s"):format(p4, p5, "onReleased")
 	local v2 = ("%s_%d_%s"):format(p4, p5, "onPressed")
 	local v3 = ("%s_%d_%s"):format(p4, p5, "image")
@@ -66,9 +67,9 @@ function v1._fetchStateButton(p1, p2, p3, p4, p5)
 	local v5 = ("%s_%d_%s"):format(p4, p5, "button")
 	p2[v4] = InputUtils.getBestKeyCode(p3.keyCodes, p1.state.inputType) or Roact.None
 	if p3.useEvery and not p3.progressBinding then
-		local v7, v8 = Roact.createBinding(0)
-		p3.progressBinding = v7
-		p3.updateProgressBinding = v8
+		local progressBinding, updateProgressBinding = Roact.createBinding(0)
+		p3.progressBinding = progressBinding
+		p3.updateProgressBinding = updateProgressBinding
 	end
 	local function releaseState(...)
 		local v1 = p3
@@ -129,8 +130,6 @@ function v1._fetchStateButton(p1, p2, p3, p4, p5)
 						p3.updateProgressBinding(0)
 					end)
 				end
-			elseif p3.onReleased then
-				p3.onReleased(...)
 			end
 		end
 	end
@@ -138,16 +137,16 @@ function v1._fetchStateButton(p1, p2, p3, p4, p5)
 	p3._pressState = pressState
 	p2[v3] = p3.image or Roact.None
 	p2[v5] = p3
-	local v10 = ("%s_%d_%s"):format(p4, p5, "pressed")
+	local buttonPressedStateKey = ("%s_%d_%s"):format(p4, p5, "pressed")
 	if p3._pressed then
-		p2[v10] = true
+		p2[buttonPressedStateKey] = true
 	else
-		p2[v10] = false
+		p2[buttonPressedStateKey] = false
 	end
 	p3._groupKey = p4
 	p3._i = p5
 end
-function v1._fetchState(p1)
+function RuntimeComponent._fetchState(p1)
 	for i, v in ipairs(ActionButtonService.active) do
 		v._groupKey = nil
 		v._i = nil
@@ -157,79 +156,79 @@ function v1._fetchState(p1)
 			v._maid = Maid.new()
 		end
 	end
-	local t = {}
+	local stateTable = {}
 	local v1 = ActionButtonService.getDataInner()
-	t.countInner = #v1
+	stateTable.countInner = #v1
 	for i, v in ipairs(v1) do
-		p1:_fetchStateButton(t, v, "inner", i)
+		p1:_fetchStateButton(stateTable, v, "inner", i)
 	end
 	local v2 = ActionButtonService.getDataOuter()
-	t.countOuter = #v2
+	stateTable.countOuter = #v2
 	for i, v in ipairs(v2) do
-		p1:_fetchStateButton(t, v, "outer", i)
+		p1:_fetchStateButton(stateTable, v, "outer", i)
 	end
-	p1:setState(t)
+	p1:setState(stateTable)
 end
-function v1.didMount(p1)
-	local v1 = 0
+function RuntimeComponent.didMount(p1)
+	local lastMenuCloseTime = 0
 	p1._maid:GiveTask(UserInputService.InputBegan:Connect(function(p1, p2)
-		local v12, v2, v3, v4, v5
+		local pressedKeyCode, matchingButtons, buttonKeyCodes, v4, currentButton
 		if p2 then
-			if (p1.KeyCode == Enum.KeyCode.ButtonA or p1.KeyCode == Enum.KeyCode.ButtonR3) and ((p1.KeyCode ~= Enum.KeyCode.ButtonA or not (GuiService.SelectedObject or (GuiService.MenuIsOpen or os.clock() - v1 < 0.1))) and (p1.UserInputType == Enum.UserInputType.Keyboard or p1.UserInputType == Enum.UserInputType.Gamepad1)) then
-				v12 = p1.KeyCode
-				v2 = {}
+			if (p1.KeyCode == Enum.KeyCode.ButtonA or p1.KeyCode == Enum.KeyCode.ButtonR3) and ((p1.KeyCode ~= Enum.KeyCode.ButtonA or not (GuiService.SelectedObject or (GuiService.MenuIsOpen or os.clock() - lastMenuCloseTime < 0.1))) and (p1.UserInputType == Enum.UserInputType.Keyboard or p1.UserInputType == Enum.UserInputType.Gamepad1)) then
+				pressedKeyCode = p1.KeyCode
+				matchingButtons = {}
 				for i2, v in ipairs(ActionButtonService.active) do
 					if not v.disabled and v.keyCodes then
-						v3 = v.keyCodes
-						v4 = typeof(v3) == "table"
+						buttonKeyCodes = v.keyCodes
+						v4 = typeof(buttonKeyCodes) == "table"
 						assert(v4, "keyCodes was not a table")
-						if table.find(v.keyCodes, v12) then
-							table.insert(v2, v)
+						if table.find(v.keyCodes, pressedKeyCode) then
+							table.insert(matchingButtons, v)
 						end
 					end
 				end
-				if #v2 ~= 0 then
-					table.sort(v2, function(p1_2, p2_2)
+				if #matchingButtons ~= 0 then
+					table.sort(matchingButtons, function(p1_2, p2_2)
 						return (p1_2.priority or 1) > (p2_2.priority or 1)
 					end)
-					for i = 1, #v2 do
-						v5 = v2[i]
-						v5._keyCodePressed = v12
-						v5._inputTypePressed = p1.UserInputType
-						if v5._pressState then
-							v5._pressState(p1.UserInputType)
+					for i = 1, #matchingButtons do
+						currentButton = matchingButtons[i]
+						currentButton._keyCodePressed = pressedKeyCode
+						currentButton._inputTypePressed = p1.UserInputType
+						if currentButton._pressState then
+							currentButton._pressState(p1.UserInputType)
 						end
-						if not v5.allowPassThrough then
+						if not currentButton.allowPassThrough then
 							break
 						end
 					end
 				end
 			end
 		elseif p1.UserInputType == Enum.UserInputType.Keyboard or p1.UserInputType == Enum.UserInputType.Gamepad1 then
-			v12 = p1.KeyCode
-			v2 = {}
+			pressedKeyCode = p1.KeyCode
+			matchingButtons = {}
 			for i2, v in ipairs(ActionButtonService.active) do
 				if not v.disabled and v.keyCodes then
-					v3 = v.keyCodes
-					v4 = typeof(v3) == "table"
+					buttonKeyCodes = v.keyCodes
+					v4 = typeof(buttonKeyCodes) == "table"
 					assert(v4, "keyCodes was not a table")
-					if table.find(v.keyCodes, v12) then
-						table.insert(v2, v)
+					if table.find(v.keyCodes, pressedKeyCode) then
+						table.insert(matchingButtons, v)
 					end
 				end
 			end
-			if #v2 ~= 0 then
-				table.sort(v2, function(p1_2, p2_2)
+			if #matchingButtons ~= 0 then
+				table.sort(matchingButtons, function(p1_2, p2_2)
 					return (p1_2.priority or 1) > (p2_2.priority or 1)
 				end)
-				for i = 1, #v2 do
-					v5 = v2[i]
-					v5._keyCodePressed = v12
-					v5._inputTypePressed = p1.UserInputType
-					if v5._pressState then
-						v5._pressState(p1.UserInputType)
+				for i = 1, #matchingButtons do
+					currentButton = matchingButtons[i]
+					currentButton._keyCodePressed = pressedKeyCode
+					currentButton._inputTypePressed = p1.UserInputType
+					if currentButton._pressState then
+						currentButton._pressState(p1.UserInputType)
 					end
-					if not v5.allowPassThrough then
+					if not currentButton.allowPassThrough then
 						break
 					end
 				end
@@ -250,10 +249,10 @@ function v1.didMount(p1)
 		end
 	end))
 	p1._maid:GiveTask(GuiService.MenuClosed:Connect(function()
-		v1 = os.clock()
+		lastMenuCloseTime = os.clock()
 	end))
 end
-function v1._copyStateButton(p1, p2, p3, p4)
+function RuntimeComponent._copyStateButton(p1, p2, p3, p4)
 	local v1 = ("%s_%d_%s"):format(p3, p4, "onReleased")
 	local v2 = ("%s_%d_%s"):format(p3, p4, "onPressed")
 	local v3 = ("%s_%d_%s"):format(p3, p4, "image")
@@ -267,17 +266,17 @@ function v1._copyStateButton(p1, p2, p3, p4)
 	p2[v5] = p1.state[v5]
 	p2[v6] = p1.state[v6]
 end
-function v1.render(p1)
+function RuntimeComponent.render(p1)
 	if ActionButtonService.enabled then
-		local t = {}
+		local stateTable = {}
 		if p1.state.countInner then
 			for i = 1, p1.state.countInner do
-				p1:_copyStateButton(t, "inner", i)
+				p1:_copyStateButton(stateTable, "inner", i)
 			end
 		end
 		if p1.state.countOuter then
 			for j = 1, p1.state.countOuter do
-				p1:_copyStateButton(t, "outer", j)
+				p1:_copyStateButton(stateTable, "outer", j)
 			end
 		end
 		if p1.props.DEBUG_forceRadial or p1.state.touchControls then
@@ -297,7 +296,7 @@ function v1.render(p1)
 				countOuter = p1.state.countOuter,
 				enabled = p1.props.enabled,
 				color = p1.props.color
-			}, t))
+			}, stateTable))
 		else
 			return createElement(Grid, Dictionary.merge({
 				anchorPoint = Vector2.new(1, 1),
@@ -307,13 +306,13 @@ function v1.render(p1)
 				countOuter = p1.state.countOuter,
 				enabled = p1.props.enabled,
 				color = p1.props.color
-			}, t))
+			}, stateTable))
 		end
 	else
 		return nil
 	end
 end
-function v1.willUnmount(p1)
+function RuntimeComponent.willUnmount(p1)
 	p1._maid:Destroy()
 end
-return v1
+return RuntimeComponent

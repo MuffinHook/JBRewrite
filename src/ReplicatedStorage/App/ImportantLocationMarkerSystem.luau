@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local store = require(ReplicatedStorage.App.store)
 local WorldMarker = require(ReplicatedStorage.Game.WorldMarker.WorldMarker)
@@ -13,7 +14,7 @@ local Interval = require(ReplicatedStorage.Std.Interval)
 local String = require(ReplicatedStorage.Std.String)
 return {
 	init = function()
-		local v1 = true
+		local isLocationMarkerEnabled = true
 		local localTable = {
 			Gun = {
 				ImageId = 15632538723,
@@ -24,72 +25,72 @@ return {
 				Color = Color3.fromRGB(217, 66, 120)
 			}
 		}
-		local v2 = WorldMarkerGroup.new()
-		WorldMarkerSystem.addGroup(v2)
-		local t2 = {}
-		t2.__index = t2
-		setmetatable(t2, BaseObject)
-		function t2.new(p1)
-			local v12 = BaseObject.new(p1)
-			setmetatable(v12, t2)
-			local v3 = localTable[p1.Name]
-			if not v3 then
-				error(("Missing important location marker entry for: %s"):format(p1.Name))
+		local markerGroup = WorldMarkerGroup.new()
+		WorldMarkerSystem.addGroup(markerGroup)
+		local ImportantLocationMarkerClass = {}
+		ImportantLocationMarkerClass.__index = ImportantLocationMarkerClass
+		setmetatable(ImportantLocationMarkerClass, BaseObject)
+		function ImportantLocationMarkerClass.new(markerInstance)
+			local v12 = BaseObject.new(markerInstance)
+			setmetatable(v12, ImportantLocationMarkerClass)
+			local markerConfig = localTable[markerInstance.Name]
+			if not markerConfig then
+				error(("Missing important location marker entry for: %s"):format(markerInstance.Name))
 			end
-			local ImageId = v3.ImageId
-			local v4 = p1.Name .. String.base85UUID(10)
+			local ImageId = markerConfig.ImageId
+			local markerId = markerInstance.Name .. String.base85UUID(10)
 			assert(ImageId)
-			local v5 = WorldMarker.new()
-			v5:SetScreenGui(WorldMarkerSystem.gui)
-			v5:SetAdornee(p1)
-			v5:SetIcon(ImageId)
-			v5.FrameInner.ImageColor3 = v3.Color
-			v2:Add(v5)
+			local worldMarker = WorldMarker.new()
+			worldMarker:SetScreenGui(WorldMarkerSystem.gui)
+			worldMarker:SetAdornee(markerInstance)
+			worldMarker:SetIcon(ImageId)
+			worldMarker.FrameInner.ImageColor3 = markerConfig.Color
+			markerGroup:Add(worldMarker)
 			v12.maid:GiveTask(function()
-				v2:Remove(v5)
+				markerGroup:Remove(worldMarker)
 			end)
-			v12.worldMarker = v5
-			local v6, v7 = Roact.createBinding(v5:GetPosition())
-			local v8, v9 = Roact.createBinding(v3.Color)
+			v12.worldMarker = worldMarker
+			local positionBinding, updatePositionBinding = Roact.createBinding(worldMarker:GetPosition())
+			local colorBinding, updateColorBinding = Roact.createBinding(markerConfig.Color)
 			store:dispatch({
 				type = "addMinimapLabel",
-				title = v4,
+				title = markerId,
 				imageId = ImageId,
-				position = v6,
-				updatePosition = v7,
-				markerColor = v8,
-				updateMarkerColor = v9
+				position = positionBinding,
+				updatePosition = updatePositionBinding,
+				markerColor = colorBinding,
+				updateMarkerColor = updateColorBinding
 			})
-			v5._maid:GiveTask(function()
+			worldMarker._maid:GiveTask(function()
 				store:dispatch({
 					type = "removeMinimapLabel",
-					title = v4
+					title = markerId
 				})
 			end)
-			v5._maid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
-				v7(p1.Position)
+			worldMarker._maid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
+				updatePositionBinding(markerInstance.Position)
 			end))
-			v5:SetEnabled(v1)
+			worldMarker:SetEnabled(isLocationMarkerEnabled)
 			return v12
 		end
-		Binder.new("ImportantLocationMarker", t2):Start()
+		Binder.new("ImportantLocationMarker", ImportantLocationMarkerClass):Start()
 		local function setEnabled()
-			v2:SetEnabled(v1)
+			markerGroup:SetEnabled(isLocationMarkerEnabled)
 		end
-		local t3 = {
+		local markerSettingConfig = {
 			name = "locationMarkers",
 			title = "Location Markers",
 			type = gameSettingType.Checkbox,
 			defaultValue = true,
 			order = 41
 		}
-		GameSettingsService.add(t3)
-		local function handleSetting(p1)
-			v1 = p1
-			v2:SetEnabled(p1)
+		GameSettingsService.add(markerSettingConfig)
+		local function handleSetting(settingValue)
+			isLocationMarkerEnabled = settingValue
+			markerGroup:SetEnabled(settingValue)
 		end
-		v1 = t3:getValue()
-		v2:SetEnabled(v1)
-		t3.onChanged:Connect(handleSetting)
+		isLocationMarkerEnabled = markerSettingConfig:getValue()
+		markerGroup:SetEnabled(isLocationMarkerEnabled)
+		markerSettingConfig.onChanged:Connect(handleSetting)
 	end
 }

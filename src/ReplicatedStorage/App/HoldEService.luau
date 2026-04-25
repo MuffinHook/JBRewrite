@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
@@ -24,45 +25,45 @@ function module.init()
 		end
 	}
 	ActionButtonService.add(module._button)
-	CircleAction.onVisibilityChanged:Connect(function(p1)
-		if p1 and module._button._pressed then
+	CircleAction.onVisibilityChanged:Connect(function(visibilityState)
+		if visibilityState and module._button._pressed then
 			module._button.onPressed()
 		end
 	end)
-	local function updateVisibility(p1)
-		local v1 = ItemSystem.GetEquipped(Players.LocalPlayer)
-		local v2 = not VehicleUtils.GetLocalVehiclePacket()
-		local v3 = not v1
-		if not v3 then
-			v3 = v1.ShootBegin == nil
+	local function updateVisibility(forceUpdate)
+		local equippedItem = ItemSystem.GetEquipped(Players.LocalPlayer)
+		local isNotInVehicle = not VehicleUtils.GetLocalVehiclePacket()
+		local shouldBeSecondary = not equippedItem
+		if not shouldBeSecondary then
+			shouldBeSecondary = equippedItem.ShootBegin == nil
 		end
-		if module._button.disabled == v2 or p1 then
-			ActionButtonService.setButtonEnabled(module._button, v2)
+		if module._button.disabled == isNotInVehicle or forceUpdate then
+			ActionButtonService.setButtonEnabled(module._button, isNotInVehicle)
 		end
-		ActionButtonService.setButtonPrimary(module._button, v3)
-		ActionButtonService.setButtonPriority(module._button, if v3 or v1 == nil then 1050 else 775)
+		ActionButtonService.setButtonPrimary(module._button, shouldBeSecondary)
+		ActionButtonService.setButtonPriority(module._button, if shouldBeSecondary or equippedItem == nil then 1050 else 775)
 	end
 	updateVisibility(true)
-	local function handleItem(p1)
-		p1._maid:GiveTask(p1:GetEquippedSignal():Connect(function()
-			if p1:GetOwner() == Players.LocalPlayer then
+	local function handleItem(inventoryItem)
+		inventoryItem._maid:GiveTask(inventoryItem:GetEquippedSignal():Connect(function()
+			if inventoryItem:GetOwner() == Players.LocalPlayer then
 				updateVisibility()
 			end
 		end))
-		if p1:GetOwner() == Players.LocalPlayer then
-			p1._maid:GiveTask(function()
+		if inventoryItem:GetOwner() == Players.LocalPlayer then
+			inventoryItem._maid:GiveTask(function()
 				updateVisibility()
 			end)
 		end
 	end
-	for v1, v2 in InventoryItemBinder:GetAll() do
-		handleItem(v2)
+	for itemIndex, item in InventoryItemBinder:GetAll() do
+		handleItem(item)
 	end
 	InventoryItemBinder:GetClassAddedSignal():Connect(handleItem)
-	VehicleUtils.OnVehicleEntered:Connect(function(p1)
+	VehicleUtils.OnVehicleEntered:Connect(function(vehicle)
 		updateVisibility()
 	end)
-	VehicleUtils.OnVehicleExited:Connect(function(p1)
+	VehicleUtils.OnVehicleExited:Connect(function(vehicle)
 		updateVisibility()
 	end)
 end
