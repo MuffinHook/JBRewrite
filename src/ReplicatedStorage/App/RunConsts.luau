@@ -1,7 +1,8 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-local v1 = TableUtils.requireValidIndexAndFreeze({
+local ENV_TO_WORLD_TO_PLACE_IDS = TableUtils.requireValidIndexAndFreeze({
 	PROD = TableUtils.requireValidIndexAndFreeze({
 		MAIN_WORLD = {
 			Default = 606849621,
@@ -48,25 +49,25 @@ local v1 = TableUtils.requireValidIndexAndFreeze({
 	})
 })
 local localTable = {}
-local t2 = {}
-local t3 = {}
-for v2, v3 in v1 do
-	for v4, v5 in v3 do
-		for v7, v8 in v5 do
-			local v6
-			v6 = localTable[v8] == nil
-			assert(v6, "env was already populated for this placeId.. duplicate?")
-			localTable[v8] = v2
-			t2[v8] = v4
-			t3[v8] = v7
+local PLACE_ID_TO_WORLD_MAP = {}
+local PLACE_ID_TO_PLACE_TYPE_MAP = {}
+for environmentName, worldData in ENV_TO_WORLD_TO_PLACE_IDS do
+	for worldName, placeData in worldData do
+		for placeType, placeId in placeData do
+			local isNotPopulated
+			isNotPopulated = localTable[placeId] == nil
+			assert(isNotPopulated, "env was already populated for this placeId.. duplicate?")
+			localTable[placeId] = environmentName
+			PLACE_ID_TO_WORLD_MAP[placeId] = worldName
+			PLACE_ID_TO_PLACE_TYPE_MAP[placeId] = placeType
 		end
 	end
 end
 return TableUtils.requireValidIndexAndFreeze({
-	ENV_TO_WORLD_TO_PLACE_IDS_MAP = v1,
+	ENV_TO_WORLD_TO_PLACE_IDS_MAP = ENV_TO_WORLD_TO_PLACE_IDS,
 	PLACE_ID_TO_ENV_MAP = TableUtils.requireValidIndexAndFreeze(localTable),
-	PLACE_ID_TO_WORLD_MAP = TableUtils.requireValidIndexAndFreeze(t2),
-	PLACE_ID_TO_PLACE_TYPE_MAP = TableUtils.requireValidIndexAndFreeze(t3),
+	PLACE_ID_TO_WORLD_MAP = TableUtils.requireValidIndexAndFreeze(PLACE_ID_TO_WORLD_MAP),
+	PLACE_ID_TO_PLACE_TYPE_MAP = TableUtils.requireValidIndexAndFreeze(PLACE_ID_TO_PLACE_TYPE_MAP),
 	MAIN_WORLD_NAME = "MAIN_WORLD",
 	TRADE_WORLD_NAME = "TRADE_WORLD",
 	PROD_NAME = "PROD",

@@ -1,46 +1,47 @@
 -- Reviewed by Claude
-local t = {
+-- variables reassigned
+local queueModule = {
 	QR = true,
 	Queue = {},
 	Process = 0
 }
-local t2 = {}
+local timestampCache = {}
 task.spawn(function()
-	while t.QR do
+	while queueModule.QR do
 		task.wait()
-		if #t.Queue > 0 then
-			local v1 = t.Queue[1]
-			table.remove(t.Queue, 1)
-			if not t2[v1.Key] then
-				t2[v1.Key] = 0
+		if #queueModule.Queue > 0 then
+			local queueEntry = queueModule.Queue[1]
+			table.remove(queueModule.Queue, 1)
+			if not timestampCache[queueEntry.Key] then
+				timestampCache[queueEntry.Key] = 0
 			end
-			local v2 = t
+			local v2 = queueModule
 			v2.Process = v2.Process + 1
-			local v3 = v1.Delay + t2[v1.Key] - DateTime.now().UnixTimestamp
-			if v3 <= 0 then
-				v3 = 0
+			local delayTime = queueEntry.Delay + timestampCache[queueEntry.Key] - DateTime.now().UnixTimestamp
+			if delayTime <= 0 then
+				delayTime = 0
 			end
-			task.delay(v3, function()
+			task.delay(delayTime, function()
 				while true do
-					t2[v1.Key] = DateTime.now().UnixTimestamp
-					local v12, v2, v3 = pcall(v1.Func)
-					if not v12 then
+					timestampCache[queueEntry.Key] = DateTime.now().UnixTimestamp
+					local success, v2, v3 = pcall(queueEntry.Func)
+					if not success then
 						warn(v2)
 					end
 					local v4 = v2
-					if v12 and v4 then
+					if success and v4 then
 						local _2
-						_ = v12
+						_ = success
 						_2 = v3
 						break
 					end
-					if not v1.Delay then
-						_ = v12
+					if not queueEntry.Delay then
+						_ = success
 						break
 					end
-					task.wait(v1.Delay)
-					if v12 and v4 then
-						_ = v12
+					task.wait(queueEntry.Delay)
+					if success and v4 then
+						_ = success
 						break
 					end
 				end
@@ -48,18 +49,18 @@ task.spawn(function()
 		end
 	end
 end)
-function t.AddRequest(p1, p2, p3)
-	local v1 = Instance.new("BindableEvent")
-	table.insert(t.Queue, {
-		Key = p1,
-		Delay = p3,
-		Func = p2,
-		Event = v1
+function queueModule.AddRequest(key, func, delay)
+	local event = Instance.new("BindableEvent")
+	table.insert(queueModule.Queue, {
+		Key = key,
+		Delay = delay,
+		Func = func,
+		Event = event
 	})
-	local v2, v3, v4 = v1.Event:Wait()
+	local v2, v3, v4 = event.Event:Wait()
 	return v2, v3, v4
 end
-function t.RemoveKey(p1)
-	t2[p1] = nil
+function queueModule.RemoveKey(key)
+	timestampCache[key] = nil
 end
-return t
+return queueModule

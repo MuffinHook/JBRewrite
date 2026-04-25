@@ -1,24 +1,25 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local Color = require(script.Parent.Color)
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
-local function GetInstance(p1)
-	local v1 = VehicleUtils.GetLocalVehicleModel()
-	assert(v1)
-	local v2 = v1:Clone()
-	VehicleUtils.CleanVehicleModel(v2)
-	v2.PrimaryPart = v2.BoundingBox
-	v2:SetPrimaryPartCFrame(CFrame.new(0, 0, 0))
-	local SpoilerPart = v2:FindFirstChild("SpoilerPart")
+local function GetInstance(paintConfig)
+	local localVehicleModel = VehicleUtils.GetLocalVehicleModel()
+	assert(localVehicleModel)
+	local vehicleClone = localVehicleModel:Clone()
+	VehicleUtils.CleanVehicleModel(vehicleClone)
+	vehicleClone.PrimaryPart = vehicleClone.BoundingBox
+	vehicleClone:SetPrimaryPartCFrame(CFrame.new(0, 0, 0))
+	local SpoilerPart = vehicleClone:FindFirstChild("SpoilerPart")
 	if SpoilerPart then
-		SpoilerPart.Color = Paint.GetColor(p1.Name)
+		SpoilerPart.Color = Paint.GetColor(paintConfig.Name)
 	end
-	return v2
+	return vehicleClone
 end
-local function Update(p1, p2)
-	local v1 = os.clock() / 2
-	p1.CFrame = CFrame.Angles(0, math.cos(v1 % 6.283185307179586) * 0.1, 0) * CFrame.Angles(math.sin(v1) * 0.1 - 0.1, 0, 0) * CFrame.new(0, 0, p2.PrimaryPart.Size.Magnitude * 0.7)
+local function Update(part, config)
+	local timeValue = os.clock() / 2
+	part.CFrame = CFrame.Angles(0, math.cos(timeValue % 6.283185307179586) * 0.1, 0) * CFrame.Angles(math.sin(timeValue) * 0.1 - 0.1, 0, 0) * CFrame.new(0, 0, config.PrimaryPart.Size.Magnitude * 0.7)
 end
 return {
 	Items = Color.Items,

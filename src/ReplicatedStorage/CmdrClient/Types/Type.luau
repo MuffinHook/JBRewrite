@@ -1,7 +1,8 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Util = require(script.Parent.Parent.Shared.Util)
 return function(p1)
-	local t = {
+	local typeConfig = {
 		Transform = function(p12)
 			return Util.MakeFuzzyFinder(p1:GetTypeNames())(p12)
 		end,
@@ -15,6 +16,6 @@ return function(p1)
 			return p1[1]
 		end
 	}
-	p1:RegisterType("type", t)
-	p1:RegisterType("types", Util.MakeListableType(t))
+	p1:RegisterType("type", typeConfig)
+	p1:RegisterType("types", Util.MakeListableType(typeConfig))
 end

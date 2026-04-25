@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -9,27 +10,27 @@ local Audio = require(ReplicatedStorage.Std.Audio)
 local SeasonUtils = require(ReplicatedStorage.Game.Season.SeasonUtils)
 local SeasonConsts = require(ReplicatedStorage.Game.Season.SeasonConsts)
 return {
-	hookGiftContainer = function(p1, p2)
+	hookGiftContainer = function(containerElement, taskManager)
 		local function clearInputs()
-			p1.ContainerIcon.Icon.Image = ""
-			p1.ContainerPlayerName.Text = ""
+			containerElement.ContainerIcon.Icon.Image = ""
+			containerElement.ContainerPlayerName.Text = ""
 		end
-		p1.ContainerIcon.Icon.Image = ""
-		p1.ContainerPlayerName.Text = ""
-		p2:GiveTask(LocalPlayer:FindFirstChild(SeasonConsts.PLAYER_SEASON_PASS_GIFT_VALUES_FOLDER_NAME):FindFirstChild(SeasonConsts.PLAYER_ALLOWED_TO_ATTEMPT_SEASON_PASS_GIFT_FLAG_NAME).Changed:Connect(function(p12)
-			p1.Visible = p12
+		containerElement.ContainerIcon.Icon.Image = ""
+		containerElement.ContainerPlayerName.Text = ""
+		taskManager:GiveTask(LocalPlayer:FindFirstChild(SeasonConsts.PLAYER_SEASON_PASS_GIFT_VALUES_FOLDER_NAME):FindFirstChild(SeasonConsts.PLAYER_ALLOWED_TO_ATTEMPT_SEASON_PASS_GIFT_FLAG_NAME).Changed:Connect(function(visibilityFlag)
+			containerElement.Visible = visibilityFlag
 			return true
 		end))
-		p2:GiveTask(p1.PurchaseButton.MouseButton1Down:Connect(function()
+		taskManager:GiveTask(containerElement.PurchaseButton.MouseButton1Down:Connect(function()
 			if RunUtils.isStudio() or not (SeasonUtils.getRemainingTime() < 0) then
 				Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
 				assert(Settings.getFirstProductByType("SeasonPass") ~= nil)
 				local v2 = ReplicatedStorage:FindFirstChild(SeasonConsts.SEASON_PASS_GIFT_ATTEMPT_REMOTE_NAME)
-				local Text = p1.ContainerPlayerName.Text
+				local Text = containerElement.ContainerPlayerName.Text
 				if #Text ~= 0 then
 					v2:FireServer((Players:GetUserIdFromNameAsync(Text)))
-					p1.ContainerIcon.Icon.Image = ""
-					p1.ContainerPlayerName.Text = ""
+					containerElement.ContainerIcon.Icon.Image = ""
+					containerElement.ContainerPlayerName.Text = ""
 				end
 			else
 				Notification.new({
@@ -37,26 +38,26 @@ return {
 				})
 			end
 		end))
-		local v1 = 0
-		p2:GiveTask(p1.ContainerPlayerName:GetPropertyChangedSignal("Text"):Connect(function()
-			v1 = v1 + 1
-			local Text = p1.ContainerPlayerName.Text
+		local updateCounter = 0
+		taskManager:GiveTask(containerElement.ContainerPlayerName:GetPropertyChangedSignal("Text"):Connect(function()
+			updateCounter = updateCounter + 1
+			local Text = containerElement.ContainerPlayerName.Text
 			local v2 = nil
-			local v3 = pcall(function()
+			local pcallSuccess = pcall(function()
 				v2 = Players:GetUserIdFromNameAsync(Text)
 			end)
-			local v4
-			if v3 then
-				local v5, v6 = Players:GetUserThumbnailAsync(v2, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size180x180)
-				v3 = v6
-				v4 = v5
+			local thumbnailUrl
+			if pcallSuccess then
+				local thumbnailData, thumbnailStatus = Players:GetUserThumbnailAsync(v2, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size180x180)
+				pcallSuccess = thumbnailStatus
+				thumbnailUrl = thumbnailData
 			else
-				v4 = nil
+				thumbnailUrl = nil
 			end
-			if v1 ~= v1 then
+			if updateCounter ~= updateCounter then
 				return false
 			end
-			p1.ContainerIcon.Icon.Image = if v3 and v4 then v4 else ""
+			containerElement.ContainerIcon.Icon.Image = if pcallSuccess and thumbnailUrl then thumbnailUrl else ""
 		end))
 	end
 }

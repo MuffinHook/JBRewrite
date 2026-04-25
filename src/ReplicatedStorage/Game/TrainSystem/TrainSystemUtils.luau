@@ -1,70 +1,71 @@
 -- Reviewed by Claude
-local function CalculateSegment(p1, p2)
-	local v1 = p1.SegmentsById[p1.SegmentId]
-	if not (p2 < v1.Length) then
+-- variables reassigned
+local function CalculateSegment(train, offset)
+	local currentSegment = train.SegmentsById[train.SegmentId]
+	if not (offset < currentSegment.Length) then
 		repeat
-			local v2
-			p2 = p2 - v1.Length
-			v1 = p1.SegmentsById[v2[v1.BranchIndex]]
-			if not (v1.Length <= p2) then
+			local nextSegments
+			offset = offset - currentSegment.Length
+			currentSegment = train.SegmentsById[nextSegments[currentSegment.BranchIndex]]
+			if not (currentSegment.Length <= offset) then
 				break
 			end
-			v2 = p1.SegmentsNext[v1.Id]
-		until not v2
+			nextSegments = train.SegmentsNext[currentSegment.Id]
+		until not nextSegments
 	end
-	return v1, p2
+	return currentSegment, offset
 end
-local function CalculateDistanceAhead(p1, p2, p3, p4, p5)
-	if p2 == p4 then
-		return p5 - p3
+local function CalculateDistanceAhead(train, fromSegmentId, fromDistance, toSegmentId, toDistance)
+	if fromSegmentId == toSegmentId then
+		return toDistance - fromDistance
 	end
-	local v1 = p1.SegmentsById[p2]
-	local sum = v1.Length - p3
-	local v2 = p2
+	local currentSegment = train.SegmentsById[fromSegmentId]
+	local sum = currentSegment.Length - fromDistance
+	local segmentId = fromSegmentId
 	for i = 1, 3 do
-		local v3 = p1.SegmentsNext[v2]
-		if not v3 then
+		local nextSegments = train.SegmentsNext[segmentId]
+		if not nextSegments then
 			return false
 		end
-		v2 = v3[v1.BranchIndex]
-		v1 = p1.SegmentsById[v2]
-		if v2 == p4 then
-			return sum + p5
+		segmentId = nextSegments[currentSegment.BranchIndex]
+		currentSegment = train.SegmentsById[segmentId]
+		if segmentId == toSegmentId then
+			return sum + toDistance
 		end
-		sum = sum + v1.Length
+		sum = sum + currentSegment.Length
 	end
-	local v4 = p1.SegmentsById[p4]
-	local sum_2 = v4.Length - p5
-	local v5 = p4
+	local targetSegment = train.SegmentsById[toSegmentId]
+	local sum_2 = targetSegment.Length - toDistance
+	local segmentId_2 = toSegmentId
 	for j = 1, 3 do
-		local v6 = p1.SegmentsNext[v5]
-		if not v6 then
+		local nextSegments_2 = train.SegmentsNext[segmentId_2]
+		if not nextSegments_2 then
 			break
 		end
-		v5 = v6[v4.BranchIndex]
-		v4 = p1.SegmentsById[v5]
-		if v5 == p2 then
-			return -sum_2 - p3
+		segmentId_2 = nextSegments_2[targetSegment.BranchIndex]
+		targetSegment = train.SegmentsById[segmentId_2]
+		if segmentId_2 == fromSegmentId then
+			return -sum_2 - fromDistance
 		end
-		sum_2 = sum_2 + v4.Length
+		sum_2 = sum_2 + targetSegment.Length
 	end
 	return false
 end
 return {
 	CalculateSegment = CalculateSegment,
-	CalculatePosition = function(p1, p2)
-		local v1, v2 = CalculateSegment(p1, p2)
-		if v1 then
-			local CF = v1.CF
-			return CF * Vector3.new(0, 0, v1.Length * 0.5 - v2), CF - CF.p
+	CalculatePosition = function(train, offset)
+		local currentSegment, offsetRemainder = CalculateSegment(train, offset)
+		if currentSegment then
+			local CF = currentSegment.CF
+			return CF * Vector3.new(0, 0, currentSegment.Length * 0.5 - offsetRemainder), CF - CF.p
 		else
 			return false
 		end
 	end,
 	CalculateDistanceAhead = CalculateDistanceAhead,
-	MoveTrain = function(p1, p2)
-		local v1, v2 = CalculateSegment(p1, p1.Offset + p2 * p1.Speed)
-		p1.SegmentId = v1.Id
-		p1.Offset = v2
+	MoveTrain = function(train, deltaOffset)
+		local currentSegment, offsetRemainder = CalculateSegment(train, train.Offset + deltaOffset * train.Speed)
+		train.SegmentId = currentSegment.Id
+		train.Offset = offsetRemainder
 	end
 }

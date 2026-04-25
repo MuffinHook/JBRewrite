@@ -1,48 +1,49 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SeasonConsts = require(ReplicatedStorage.Game.Season.SeasonConsts)
 local LevelConsts = require(script.Parent.LevelConsts)
 local t = {
-	getLevelValue = function(p1)
-		assert(p1 ~= nil)
-		return p1:FindFirstChild(LevelConsts.LEVEL_VALUE_NAME)
+	getLevelValue = function(instance)
+		assert(instance ~= nil)
+		return instance:FindFirstChild(LevelConsts.LEVEL_VALUE_NAME)
 	end,
-	yieldLevelValue = function(p1)
-		assert(p1 ~= nil)
-		return p1:WaitForChild(LevelConsts.LEVEL_VALUE_NAME)
+	yieldLevelValue = function(instance)
+		assert(instance ~= nil)
+		return instance:WaitForChild(LevelConsts.LEVEL_VALUE_NAME)
 	end
 }
-function t.yieldLevel(p1)
-	assert(p1 ~= nil)
-	return t.yieldLevelValue(p1).Value
+function t.yieldLevel(instance)
+	assert(instance ~= nil)
+	return t.yieldLevelValue(instance).Value
 end
-function t.getLevel(p1)
-	local v1 = t.getLevelValue(p1)
-	if v1 then
-		return v1.Value
+function t.getLevel(instance)
+	local levelValue = t.getLevelValue(instance)
+	if levelValue then
+		return levelValue.Value
 	end
 end
-function t.getExpValue(p1)
-	assert(p1 ~= nil)
-	return p1:FindFirstChild(LevelConsts.EXP_VALUE_NAME)
+function t.getExpValue(instance)
+	assert(instance ~= nil)
+	return instance:FindFirstChild(LevelConsts.EXP_VALUE_NAME)
 end
-function t.yieldExpValue(p1)
-	assert(p1 ~= nil)
-	return p1:WaitForChild(LevelConsts.EXP_VALUE_NAME)
+function t.yieldExpValue(instance)
+	assert(instance ~= nil)
+	return instance:WaitForChild(LevelConsts.EXP_VALUE_NAME)
 end
-function t.yieldExp(p1)
-	assert(p1 ~= nil)
-	return t.yieldExpValue(p1).Value
+function t.yieldExp(instance)
+	assert(instance ~= nil)
+	return t.yieldExpValue(instance).Value
 end
-function t.getExp(p1)
-	local v1 = t.getExpValue(p1)
-	if v1 then
-		return v1.Value
+function t.getExp(instance)
+	local expValue = t.getExpValue(instance)
+	if expValue then
+		return expValue.Value
 	end
 end
-function t.yieldTotalExp(p1)
-	local v1 = t.yieldLevel(p1)
-	return t.calculateExpOfLevel(v1) + t.yieldExp(p1)
+function t.yieldTotalExp(instance)
+	local level = t.yieldLevel(instance)
+	return t.calculateExpOfLevel(level) + t.yieldExp(instance)
 end
 local function getTotalExpAtLevel(p1, p2, p3, p4)
 	local v1 = if p4 == 1 then p2 / p3 else p2 * (1 - p4) / (1 - p4 ^ p3)
@@ -53,39 +54,39 @@ local function getTotalExpAtLevel(p1, p2, p3, p4)
 	end
 	return count
 end
-local v1 = LevelConsts.EFFICIENCY * (LevelConsts.AVG_EXP_PER_CONTRACT * LevelConsts.CONTRACTS_PER_DAY * LevelConsts.TOTAL_DAYS + LevelConsts.MAX_DAILY_EXP * LevelConsts.TOTAL_DAYS)
+local baseExpPerDay = LevelConsts.EFFICIENCY * (LevelConsts.AVG_EXP_PER_CONTRACT * LevelConsts.CONTRACTS_PER_DAY * LevelConsts.TOTAL_DAYS + LevelConsts.MAX_DAILY_EXP * LevelConsts.TOTAL_DAYS)
 local CURVE_K = LevelConsts.CURVE_K
-function t.calculateExpNextLevel(p1)
-	return t.calculateExpOfLevel(p1 + 1) - t.calculateExpOfLevel(p1)
+function t.calculateExpNextLevel(instance)
+	return t.calculateExpOfLevel(instance + 1) - t.calculateExpOfLevel(instance)
 end
-function t.calculateExpOfLevel(p1)
-	if p1 <= 0 then
+function t.calculateExpOfLevel(instance)
+	if instance <= 0 then
 		return 0
 	else
-		local v12 = p1 - 1
-		local v2 = v1
-		local v3 = SeasonConsts.MAX_REWARD_LEVEL - 1
-		local v4 = CURVE_K
-		local v5 = if v4 == 1 then v2 / v3 else v2 * (1 - v4) / (1 - v4 ^ v3)
-		local v6 = if v4 == 1 then v5 * v12 else v5 * (1 - v4 ^ v12) / (1 - v4)
-		local count = math.floor(v6)
-		if v6 - count >= 0.5 then
+		local previousLevel = instance - 1
+		local totalBaseExp = baseExpPerDay
+		local maxRewardLevel = SeasonConsts.MAX_REWARD_LEVEL - 1
+		local curveK = CURVE_K
+		local baseExpPerLevel = if curveK == 1 then totalBaseExp / maxRewardLevel else totalBaseExp * (1 - curveK) / (1 - curveK ^ maxRewardLevel)
+		local expAtLevel = if curveK == 1 then baseExpPerLevel * previousLevel else baseExpPerLevel * (1 - curveK ^ previousLevel) / (1 - curveK)
+		local count = math.floor(expAtLevel)
+		if expAtLevel - count >= 0.5 then
 			count = count + 1
 		end
 		return count
 	end
 end
-function t.calculateLevelFromExp(p1)
-	local count = 1
-	local v1 = 0
+function t.calculateLevelFromExp(totalExp)
+	local currentLevel = 1
+	local previousExpAtLevel = 0
 	while true do
-		count = count + 1
-		local v2 = t.calculateExpOfLevel(count)
-		if p1 < v2 then
+		currentLevel = currentLevel + 1
+		local expAtCurrentLevel = t.calculateExpOfLevel(currentLevel)
+		if totalExp < expAtCurrentLevel then
 			break
 		end
-		v1 = v2
+		previousExpAtLevel = expAtCurrentLevel
 	end
-	return count - 1, p1 - v1
+	return currentLevel - 1, totalExp - previousExpAtLevel
 end
 return t

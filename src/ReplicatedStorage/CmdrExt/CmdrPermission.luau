@@ -1,95 +1,96 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
 local RunConsts = require(ReplicatedStorage.App.RunConsts)
-local t = { 606723718, 2837719, 2025110 }
-local t2 = { 174178041, 5613127327, 820499, 75308445, 55124844, 2235908458, 391034465 }
-local t3 = {
+local adminUserIds = { 606723718, 2837719, 2025110 }
+local vipOpUserIds = { 174178041, 5613127327, 820499, 75308445, 55124844, 2235908458, 391034465 }
+local permissionsTable = {
 	Help = true,
 	UserAlias = true
 }
-local t4 = {
+local qaGroupConfig = {
 	groupId = 3059674,
 	minRank = 253
 }
-local t5 = {
+local devStudioGroupConfig = {
 	groupId = 5770760,
 	minRank = 100
 }
 if RunUtils.getEnv() == RunConsts.QA_NAME or (RunUtils.getEnv() == RunConsts.DEV_NAME or RunUtils.getEnv() == RunConsts.STUDIO_NAME) then
-	t3.DefaultAdmin = t5
-	t3.Op = {
+	permissionsTable.DefaultAdmin = devStudioGroupConfig
+	permissionsTable.Op = {
 		vipOwner = true,
 		op = true,
-		groupId = t5.groupId,
-		minRank = t5.minRank,
-		userIds = t2
+		groupId = devStudioGroupConfig.groupId,
+		minRank = devStudioGroupConfig.minRank,
+		userIds = vipOpUserIds
 	}
-	t3.DefaultDebug = t5
-	t3.DefaultUtil = t5
-	t3.VipOwner = {
+	permissionsTable.DefaultDebug = devStudioGroupConfig
+	permissionsTable.DefaultUtil = devStudioGroupConfig
+	permissionsTable.VipOwner = {
 		vipOwner = true,
-		groupId = t5.groupId,
-		minRank = t5.minRank
+		groupId = devStudioGroupConfig.groupId,
+		minRank = devStudioGroupConfig.minRank
 	}
-	t3.Moderator = {
-		groupId = t5.groupId,
-		minRank = t5.minRank,
-		userIds = t2
+	permissionsTable.Moderator = {
+		groupId = devStudioGroupConfig.groupId,
+		minRank = devStudioGroupConfig.minRank,
+		userIds = vipOpUserIds
 	}
 else
-	t3.DefaultAdmin = {
-		userIds = t
+	permissionsTable.DefaultAdmin = {
+		userIds = adminUserIds
 	}
-	t3.Op = {
+	permissionsTable.Op = {
 		vipOwner = true,
 		op = true,
-		groupId = t4.groupId,
-		minRank = t4.minRank,
-		userIds = t2
+		groupId = qaGroupConfig.groupId,
+		minRank = qaGroupConfig.minRank,
+		userIds = vipOpUserIds
 	}
-	t3.DefaultDebug = t4
-	t3.DefaultUtil = t4
-	t3.VipOwner = {
+	permissionsTable.DefaultDebug = qaGroupConfig
+	permissionsTable.DefaultUtil = qaGroupConfig
+	permissionsTable.VipOwner = {
 		vipOwner = true,
-		groupId = t4.groupId,
-		minRank = t4.minRank
+		groupId = qaGroupConfig.groupId,
+		minRank = qaGroupConfig.minRank
 	}
-	t3.Moderator = {
-		groupId = t4.groupId,
-		minRank = t4.minRank,
-		userIds = t2
+	permissionsTable.Moderator = {
+		groupId = qaGroupConfig.groupId,
+		minRank = qaGroupConfig.minRank,
+		userIds = vipOpUserIds
 	}
 end
-function t3.isOp(p1)
-	return ReplicatedStorage:FindFirstChild("OpList"):FindFirstChild(p1.UserId) ~= nil
+function permissionsTable.isOp(player)
+	return ReplicatedStorage:FindFirstChild("OpList"):FindFirstChild(player.UserId) ~= nil
 end
-function t3.groupAllowed(p1, p2)
-	assert(p1 ~= nil, "player missing")
-	assert(p1.Parent == game:GetService("Players"), "player is not a Player")
-	assert(p2 ~= nil, "group missing")
-	assert(typeof(p2) == "string", "group must be a string")
+function permissionsTable.groupAllowed(player, groupName)
+	assert(player ~= nil, "player missing")
+	assert(player.Parent == game:GetService("Players"), "player is not a Player")
+	assert(groupName ~= nil, "group missing")
+	assert(typeof(groupName) == "string", "group must be a string")
 	if RunUtils.isStudio() then
 		return true
 	else
-		local v5 = t3[p2]
-		if v5 and typeof(v5) == "boolean" then
+		local groupConfig = permissionsTable[groupName]
+		if groupConfig and typeof(groupConfig) == "boolean" then
 			return true
-		elseif v5 and typeof(v5) == "table" then
-			if v5.vipOwner then
+		elseif groupConfig and typeof(groupConfig) == "table" then
+			if groupConfig.vipOwner then
 				local VipOwnerId = ReplicatedStorage:FindFirstChild("VipOwnerId")
 				if VipOwnerId then
 					assert(VipOwnerId.Value > 0, "vipOwnerId not > 0")
-					if p1.UserId == VipOwnerId.Value or (v5.op and t3.isOp(p1) or v5.userIds and table.find(v5.userIds, p1.UserId)) then
+					if player.UserId == VipOwnerId.Value or (groupConfig.op and permissionsTable.isOp(player) or groupConfig.userIds and table.find(groupConfig.userIds, player.UserId)) then
 						return true
-					elseif v5.groupId then
-						if v5.minRank then
-							if p1:GetRankInGroup(v5.groupId) >= v5.minRank then
+					elseif groupConfig.groupId then
+						if groupConfig.minRank then
+							if player:GetRankInGroup(groupConfig.groupId) >= groupConfig.minRank then
 								return true
 							else
 								return false
 							end
-						elseif p1:IsInGroup(v5.groupId) then
+						elseif player:IsInGroup(groupConfig.groupId) then
 							return true
 						else
 							return false
@@ -97,16 +98,16 @@ function t3.groupAllowed(p1, p2)
 					else
 						return false
 					end
-				elseif v5.op and t3.isOp(p1) or v5.userIds and table.find(v5.userIds, p1.UserId) then
+				elseif groupConfig.op and permissionsTable.isOp(player) or groupConfig.userIds and table.find(groupConfig.userIds, player.UserId) then
 					return true
-				elseif v5.groupId then
-					if v5.minRank then
-						if p1:GetRankInGroup(v5.groupId) >= v5.minRank then
+				elseif groupConfig.groupId then
+					if groupConfig.minRank then
+						if player:GetRankInGroup(groupConfig.groupId) >= groupConfig.minRank then
 							return true
 						else
 							return false
 						end
-					elseif p1:IsInGroup(v5.groupId) then
+					elseif player:IsInGroup(groupConfig.groupId) then
 						return true
 					else
 						return false
@@ -114,16 +115,16 @@ function t3.groupAllowed(p1, p2)
 				else
 					return false
 				end
-			elseif v5.op and t3.isOp(p1) or v5.userIds and table.find(v5.userIds, p1.UserId) then
+			elseif groupConfig.op and permissionsTable.isOp(player) or groupConfig.userIds and table.find(groupConfig.userIds, player.UserId) then
 				return true
-			elseif v5.groupId then
-				if v5.minRank then
-					if p1:GetRankInGroup(v5.groupId) >= v5.minRank then
+			elseif groupConfig.groupId then
+				if groupConfig.minRank then
+					if player:GetRankInGroup(groupConfig.groupId) >= groupConfig.minRank then
 						return true
 					else
 						return false
 					end
-				elseif p1:IsInGroup(v5.groupId) then
+				elseif player:IsInGroup(groupConfig.groupId) then
 					return true
 				else
 					return false
@@ -136,4 +137,4 @@ function t3.groupAllowed(p1, p2)
 		end
 	end
 end
-return t3
+return permissionsTable

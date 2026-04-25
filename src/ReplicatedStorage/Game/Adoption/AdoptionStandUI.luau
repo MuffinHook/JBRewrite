@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -7,7 +8,7 @@ local GameUtil = require(ReplicatedStorage.Game.GameUtil)
 local Format = require(ReplicatedStorage.Module.Format)
 local Interval = require(ReplicatedStorage.Std.Interval)
 local Settings = require(ReplicatedStorage.Resource.Settings)
-local t = {
+local dogNames = {
 	"ACE",
 	"RACER",
 	"HENRY",
@@ -33,46 +34,46 @@ local t = {
 	"GRACIE",
 	"MOLLY"
 }
-local t2 = {}
-function t2.init()
+local module = {}
+function module.init()
 	local AdoptionStandGui = ReplicatedStorage.StarterGui:FindFirstChild("AdoptionStandGui")
 	AdoptionStandGui.Parent = LocalPlayer.PlayerGui
-	t2.gui = AdoptionStandGui
-	local v1 = Window.new()
-	v1:GetOnOpenedSignal():Connect(t2._open)
-	v1:GetOnClosedSignal():Connect(t2._close)
-	t2._window = v1
-	GameUtil.getCenterWindowGroup():Add(v1)
+	module.gui = AdoptionStandGui
+	local window = Window.new()
+	window:GetOnOpenedSignal():Connect(module._open)
+	window:GetOnClosedSignal():Connect(module._close)
+	module._window = window
+	GameUtil.getCenterWindowGroup():Add(window)
 end
-function t2.setTitle(p1)
-	assert(p1 ~= nil)
-	t2.gui.Container.Right.Title.TextLabel.Text = p1
+function module.setTitle(title)
+	assert(title ~= nil)
+	module.gui.Container.Right.Title.TextLabel.Text = title
 end
-function t2.setImageId(p1)
-	assert(p1 ~= nil)
-	t2.gui.Container.Left.Icon.ImageLabel.Image = ("rbxassetid://%d"):format(p1)
+function module.setImageId(imageId)
+	assert(imageId ~= nil)
+	module.gui.Container.Left.Icon.ImageLabel.Image = ("rbxassetid://%d"):format(imageId)
 end
-function t2.setPrice(p1)
-	t2.gui.Container.Right.Price.TextLabel.Text = if p1 == nil then "FREE" else Format.Currency(p1) or "FREE"
+function module.setPrice(price)
+	module.gui.Container.Right.Price.TextLabel.Text = if price == nil then "FREE" else Format.Currency(price) or "FREE"
 end
-function t2.setFirstAdopt(p1)
-	assert(p1 ~= nil)
-	assert(type(p1) == "boolean")
-	t2.gui.Container.Right.Adopt.TextLabel.Text = if p1 then "ADOPT" else "RE-ADOPT"
+function module.setFirstAdopt(isFirstAdopt)
+	assert(isFirstAdopt ~= nil)
+	assert(type(isFirstAdopt) == "boolean")
+	module.gui.Container.Right.Adopt.TextLabel.Text = if isFirstAdopt then "ADOPT" else "RE-ADOPT"
 end
-function t2.setDescriptionTeam(p1)
-	local v1 = nil
-	if p1 == Settings.EnumTeam.Criminal then
-		v1 = "criminal"
-	elseif p1 == Settings.EnumTeam.Police then
-		v1 = "police"
+function module.setDescriptionTeam(teamId)
+	local teamName = nil
+	if teamId == Settings.EnumTeam.Criminal then
+		teamName = "criminal"
+	elseif teamId == Settings.EnumTeam.Police then
+		teamName = "police"
 	else
 		error("Invalid teamId for `setDescriptionTeam`")
 	end
-	t2.gui.Container.Right.Description.TextLabel.Text = ("This breed does more damage when playing on the %s team!"):format(v1)
+	module.gui.Container.Right.Description.TextLabel.Text = ("This breed does more damage when playing on the %s team!"):format(teamName)
 end
-function t2.getName()
-	local TextBox = t2.gui.Container.Left.DogName.TextBox
+function module.getName()
+	local TextBox = module.gui.Container.Left.DogName.TextBox
 	local Text = TextBox.Text
 	if #Text == 0 then
 		Text = TextBox.PlaceholderText:match("%w+")
@@ -85,55 +86,55 @@ function t2.getName()
 	end
 	return Text
 end
-function t2.setName(p1)
-	t2.gui.Container.Left.DogName.TextBox.Text = p1
+function module.setName(name)
+	module.gui.Container.Left.DogName.TextBox.Text = name
 end
-function t2._open()
-	assert(t2._maid == nil)
-	local v1 = Maid.new()
-	t2._maid = v1
-	local gui = t2.gui
+function module._open()
+	assert(module._maid == nil)
+	local maid = Maid.new()
+	module._maid = maid
+	local gui = module.gui
 	gui.Enabled = true
-	v1:GiveTask(function()
+	maid:GiveTask(function()
 		gui.Enabled = false
 	end)
 	local TextBox = gui.Container.Left.DogName.TextBox
-	v1:GiveTask(TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+	maid:GiveTask(TextBox:GetPropertyChangedSignal("Text"):Connect(function()
 		local Text = TextBox.Text
 		if #Text > 10 then
 			Text = Text:sub(1, 10)
 		end
 		TextBox.Text = Text
 	end))
-	local v2 = t[math.random(1, #t)]
-	local v3 = 0
-	v1:GiveTask(Interval.every(0.5):Connect(function()
-		v3 = v3 % 3 + 1
-		TextBox.PlaceholderText = ("%s%s"):format(v2, ("."):rep(v3))
+	local randomDogName = dogNames[math.random(1, #dogNames)]
+	local dotCount = 0
+	maid:GiveTask(Interval.every(0.5):Connect(function()
+		dotCount = dotCount % 3 + 1
+		TextBox.PlaceholderText = ("%s%s"):format(randomDogName, ("."):rep(dotCount))
 	end))
-	v1:GiveTask(gui.Container.Close.MouseButton1Down:Connect(function()
-		t2.close()
+	maid:GiveTask(gui.Container.Close.MouseButton1Down:Connect(function()
+		module.close()
 	end))
 end
-function t2._close()
-	assert(t2._maid ~= nil)
-	local _maid = t2._maid
-	t2._maid = nil
+function module._close()
+	assert(module._maid ~= nil)
+	local _maid = module._maid
+	module._maid = nil
 	_maid:Destroy()
 end
-function t2.open()
-	t2._window:Open()
+function module.open()
+	module._window:Open()
 end
-function t2.close()
-	t2._window:Close()
+function module.close()
+	module._window:Close()
 end
-function t2.isOpen()
-	return t2._window:IsOpen()
+function module.isOpen()
+	return module._window:IsOpen()
 end
-function t2.getOnClosedSignal()
-	return t2._window:GetOnClosedSignal()
+function module.getOnClosedSignal()
+	return module._window:GetOnClosedSignal()
 end
-function t2.getOnClickAdoptSignal()
-	return t2.gui.Container.Right.Adopt.MouseButton1Down
+function module.getOnClickAdoptSignal()
+	return module.gui.Container.Right.Adopt.MouseButton1Down
 end
-return t2
+return module

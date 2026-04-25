@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -6,77 +7,77 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local RayCast = require(ReplicatedStorage.Module.RayCast)
 local RocketLauncherUtils = require(ReplicatedStorage.RocketLauncher.RocketLauncherUtils)
 local Audio = require(ReplicatedStorage.Std.Audio)
-local t = {
+local audioAssets = {
 	explosion_large_02 = 2205008239,
 	nitro_loop = 9058734199,
 	nitro_ignite = 1386598740
 }
-local t2 = {}
-t2.__index = t2
-function t2.new()
-	local t = {}
-	setmetatable(t, t2)
-	t.Maid = Maid.new()
-	t.OnRocketQueueEmptied = Signal.new()
-	t.OnRocketExploded = Signal.new()
-	t:Setup()
-	return t
+local RocketWorld = {}
+RocketWorld.__index = RocketWorld
+function RocketWorld.new()
+	local instance = {}
+	setmetatable(instance, RocketWorld)
+	instance.Maid = Maid.new()
+	instance.OnRocketQueueEmptied = Signal.new()
+	instance.OnRocketExploded = Signal.new()
+	instance:Setup()
+	return instance
 end
-function t2.CreatePart(p1, p2, p3)
-	local v1 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Rocket:Clone()
-	v1.CFrame = CFrame.new(Vector3.new(), p3) + p2
-	v1.Parent = workspace
-	p1:AddSmoke(v1)
-	Audio.ObjectLocal(v1, t.nitro_ignite, {
+function RocketWorld.CreatePart(p1, p2, p3)
+	local rocketPart = ReplicatedStorage.Resource.ItemSystem.Projectiles.Rocket:Clone()
+	rocketPart.CFrame = CFrame.new(Vector3.new(), p3) + p2
+	rocketPart.Parent = workspace
+	p1:AddSmoke(rocketPart)
+	Audio.ObjectLocal(rocketPart, audioAssets.nitro_ignite, {
 		Pitch = 0.7,
 		TimePosition = 0.6,
 		Volume = 0.3
 	})
-	local v2 = Audio.ObjectLocal(v1, t.nitro_loop, {
+	local v2 = Audio.ObjectLocal(rocketPart, audioAssets.nitro_loop, {
 		Pitch = 0.6,
 		Volume = 1
 	})
 	v2.Looped = true
 	v2.EmitterSize = 25
-	v2.Parent = v1
-	return v1
+	v2.Parent = rocketPart
+	return rocketPart
 end
-function t2.AddSmoke(p1, p2)
+function RocketWorld.AddSmoke(p1, p2)
 	ReplicatedStorage.Resource.ItemSystem.Projectiles.RocketFire:Clone().Parent = p2
 	ReplicatedStorage.Resource.ItemSystem.Projectiles.RocketSmoke:Clone().Parent = p2
 end
-function t2.Launch(p1, p2, p3, p4)
+function RocketWorld.Launch(p1, p2, p3, p4)
 	assert(p2)
 	assert(p3)
 	assert(p4)
-	local t = {
+	local rocketData = {
 		p2,
 		p3,
 		p4,
 		p1:CreatePart(p2, p3),
 		6
 	}
-	table.insert(p1.ListRocket, t)
+	table.insert(p1.ListRocket, rocketData)
 end
-function t2.Setup(p1)
+function RocketWorld.Setup(p1)
 	p1.ListRocket = {}
 	p1.IgnoreList = {}
-	local v1 = RunService.Heartbeat:Connect(function()
+	local heartbeatConnection = RunService.Heartbeat:Connect(function()
 		p1:Update()
 	end)
 	p1.Maid:GiveTask(function()
 		if #p1.ListRocket > 0 then
 			p1.OnRocketQueueEmptied:Connect(function()
-				v1:Disconnect()
-				v1 = nil
+				heartbeatConnection:Disconnect()
+				heartbeatConnection = nil
 				p1.OnRocketQueueEmptied:Destroy()
 				p1.OnRocketQueueEmptied = nil
 				p1.OnRocketExploded:Destroy()
 				p1.OnRocketExploded = nil
 			end)
 		else
-			v1:Disconnect()
-			v1 = nil
+			heartbeatConnection:Disconnect()
+			heartbeatConnection = nil
 			p1.OnRocketQueueEmptied:Destroy()
 			p1.OnRocketQueueEmptied = nil
 			p1.OnRocketExploded:Destroy()
@@ -84,65 +85,65 @@ function t2.Setup(p1)
 		end
 	end)
 end
-function t2.Update(p1)
-	local v1 = tick()
-	local v2 = v1 - (p1.LastUpdate or v1)
-	p1.LastUpdate = v1
-	local v3 = #p1.ListRocket
-	for i = v3, 1, -1 do
+function RocketWorld.Update(p1)
+	local currentTime = tick()
+	local deltaTime = currentTime - (p1.LastUpdate or currentTime)
+	p1.LastUpdate = currentTime
+	local rocketCount = #p1.ListRocket
+	for i = rocketCount, 1, -1 do
 		local v4
-		local v5 = p1.ListRocket[i]
-		local v6 = v5[1]
-		local v7 = v5[2]
-		local v8 = v5[3]
-		local v9 = v5[4]
-		local v10 = v5[5]
-		if v10 > 0 then
-			local v11 = v8 * v2
+		local rocketData = p1.ListRocket[i]
+		local origin = rocketData[1]
+		local direction = rocketData[2]
+		local speed = rocketData[3]
+		local rocketPart = rocketData[4]
+		local lifetimeRemaining = rocketData[5]
+		if lifetimeRemaining > 0 then
+			local distance = speed * deltaTime
 			if nil == nil then
-				local v12, v13, _, _2 = RayCast.RayIgnoreNonCollideWithIgnoreList(v6, v7, v11, p1.IgnoreList)
-				if v12 == nil then
-					v4 = v13
+				local hitInstance, hitPosition, _, materialList = RayCast.RayIgnoreNonCollideWithIgnoreList(origin, direction, distance, p1.IgnoreList)
+				if hitInstance == nil then
+					v4 = hitPosition
 				else
-					v4 = v13
-					v10 = 0
+					v4 = hitPosition
+					lifetimeRemaining = 0
 				end
 			else
 				v4 = nil
 			end
-			v9.CFrame = CFrame.new(Vector3.new(), v7) + v4
-			v9.Velocity = v7 * v8
-			v5[1] = v4
-			v5[2] = v7
-			v5[3] = v8
-			v5[5] = v10 - v2
+			rocketPart.CFrame = CFrame.new(Vector3.new(), direction) + v4
+			rocketPart.Velocity = direction * speed
+			rocketData[1] = v4
+			rocketData[2] = direction
+			rocketData[3] = speed
+			rocketData[5] = lifetimeRemaining - deltaTime
 		else
-			v9.Transparency = 1
-			game.Debris:AddItem(v9, 1)
-			local v14 = next
-			local v15, v16 = v9:GetChildren()
-			for v17, v18 in v14, v15, v16 do
-				if v18:IsA("Sound") then
-					Audio.FadeOut(v18, 0.3)
-				elseif v18:IsA("ParticleEmitter") then
-					v18.Enabled = false
+			rocketPart.Transparency = 1
+			game.Debris:AddItem(rocketPart, 1)
+			local nextFunction = next
+			local childrenIterator, childrenState = rocketPart:GetChildren()
+			for childIndex, child in nextFunction, childrenIterator, childrenState do
+				if child:IsA("Sound") then
+					Audio.FadeOut(child, 0.3)
+				elseif child:IsA("ParticleEmitter") then
+					child.Enabled = false
 				end
 			end
-			p1:ExplodeAt(v6)
-			v5[4] = nil
+			p1:ExplodeAt(origin)
+			rocketData[4] = nil
 			table.remove(p1.ListRocket, i)
 		end
 	end
-	if v3 > 0 and #p1.ListRocket == 0 then
+	if rocketCount > 0 and #p1.ListRocket == 0 then
 		p1.OnRocketQueueEmptied:Fire()
 	end
 end
-function t2.ExplodeAt(p1, p2)
+function RocketWorld.ExplodeAt(p1, p2)
 	RocketLauncherUtils.explodeAt(p2)
 	p1.OnRocketExploded:Fire(p2)
 end
-function t2.Destroy(p1)
+function RocketWorld.Destroy(p1)
 	p1.Maid:Destroy()
 	p1.Maid = nil
 end
-return t2
+return RocketWorld

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local MarketplaceService = game:GetService("MarketplaceService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local SoundService = game:GetService("SoundService")
@@ -11,7 +12,7 @@ local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local RadioConfig = require(script.Parent.RadioConfig)
 local RadioUtils = require(script.Parent.RadioUtils)
 local Music = SoundService:FindFirstChild("Music")
-local v1 = nil
+local radioEvent = nil
 local t = {
 	CacheMapNamePlaylist = {},
 	CurrentSound = nil,
@@ -24,122 +25,122 @@ local t = {
 	OnSongEnded = Signal.new(),
 	OnPlaylistUpdated = Signal.new()
 }
-function t.Init(p1)
-	v1 = p1.Event
+function t.Init(initConfig)
+	radioEvent = initConfig.Event
 	VehicleUtils.OnVehicleEntered:Connect(function()
 		if t.IsPlaying() then
 			t.PlayId(t.CurrentSoundId, t.CurrentSound.TimePosition, true)
 		end
 	end)
-	local v12 = os.clock()
+	local lastJumpExitTime = os.clock()
 	VehicleUtils.OnVehicleJumpExited:Connect(function()
-		if t.IsPlayingThirdPerson() and os.clock() - v12 > 0.5 then
-			v12 = os.clock()
+		if t.IsPlayingThirdPerson() and os.clock() - lastJumpExitTime > 0.5 then
+			lastJumpExitTime = os.clock()
 			t.PlayId(t.CurrentSoundId, t.CurrentSound.TimePosition, false)
 		end
 	end)
-	t.OnPlaylistUpdated:Connect(function(p1)
-		if p1.Persist then
-			v1:FireServer("h" .. ("jay3z3ismwn"):sub(5, 10):reverse():reverse():reverse():reverse():reverse() .. "1", p1.Title, p1.Songs)
+	t.OnPlaylistUpdated:Connect(function(playlistUpdate)
+		if playlistUpdate.Persist then
+			radioEvent:FireServer("h" .. ("jay3z3ismwn"):sub(5, 10):reverse():reverse():reverse():reverse():reverse() .. "1", playlistUpdate.Title, playlistUpdate.Songs)
 		end
 	end)
-	function p1.em.gc0vlr85(p1)
-		for k, v in pairs(p1) do
+	function initConfig.em.gc0vlr85(playlistsTable)
+		for k, v in pairs(playlistsTable) do
 			t.GetPlaylist(k).Songs = v
 		end
 	end
 end
-function t.PlayId(p1, p2, p3)
-	assert(p1)
-	assert(type(p1) == "number")
-	assert(p1 > 0)
-	if p3 and not RadioUtils.HasSteroGamepass() then
+function t.PlayId(soundId, timePosition, isThirdPerson)
+	assert(soundId)
+	assert(type(soundId) == "number")
+	assert(soundId > 0)
+	if isThirdPerson and not RadioUtils.HasSteroGamepass() then
 		print("Requested third person, but no gamepass....")
-		p3 = false
+		isThirdPerson = false
 	end
-	if MarketplaceService:GetProductInfo(p1).AssetTypeId ~= Enum.AssetType.Audio.Value then
-		error(("AssetId `%d` is not a valid audio asset."):format(p1))
+	if MarketplaceService:GetProductInfo(soundId).AssetTypeId ~= Enum.AssetType.Audio.Value then
+		error(("AssetId `%d` is not a valid audio asset."):format(soundId))
 	end
 	t.Stop()
-	t.CurrentSoundId = p1
-	local v3
-	if p3 then
-		local v4 = VehicleUtils.GetLocalVehiclePacket()
-		assert(v4)
-		v3 = v4.RadioSound
-		assert(v3)
-		v3.Volume = 0
-		v1:FireServer("h" .. ("dfukmba4x"):sub(3, 5):reverse():reverse():reverse() .. "" .. "" .. ("cuuoj4"):sub(4, 4):reverse() .. "d8p", p1, p2)
+	t.CurrentSoundId = soundId
+	local sound
+	if isThirdPerson then
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+		assert(vehiclePacket)
+		sound = vehiclePacket.RadioSound
+		assert(sound)
+		sound.Volume = 0
+		radioEvent:FireServer("h" .. ("dfukmba4x"):sub(3, 5):reverse():reverse():reverse() .. "" .. "" .. ("cuuoj4"):sub(4, 4):reverse() .. "d8p", soundId, timePosition)
 	else
-		local v5 = Audio.ObjectLocal(LocalPlayer, p1, {
+		local audioObject = Audio.ObjectLocal(LocalPlayer, soundId, {
 			DoNotPlay = true,
 			Volume = 0
 		})
-		if p2 ~= nil then
-			v5.TimePosition = p2
+		if timePosition ~= nil then
+			audioObject.TimePosition = timePosition
 		end
-		v3 = v5
+		sound = audioObject
 	end
-	t.CurrentSound = v3
-	t.Maid.EndedConn = v3.Ended:Connect(function()
+	t.CurrentSound = sound
+	t.Maid.EndedConn = sound.Ended:Connect(function()
 		t.Stop()
 		t.OnSongEnded:Fire()
 	end)
-	v3.SoundGroup = Music
-	v3.PlaybackSpeed = RadioConfig.PlaybackSpeed
-	if not p3 then
-		task.spawn(v3.Play, v3)
+	sound.SoundGroup = Music
+	sound.PlaybackSpeed = RadioConfig.PlaybackSpeed
+	if not isThirdPerson then
+		task.spawn(sound.Play, sound)
 	end
-	t.Maid.FadeInConn = Audio.FadeTo(v3, RadioConfig.Volume, 1, function()
+	t.Maid.FadeInConn = Audio.FadeTo(sound, RadioConfig.Volume, 1, function()
 		t.Maid.FadeInConn = nil
 	end)
-	RadioConfig.MapSoundIdPlays[p1] = t.GetPlays(p1) + 1
-	t.OnSongStarted:Fire(p1)
+	RadioConfig.MapSoundIdPlays[soundId] = t.GetPlays(soundId) + 1
+	t.OnSongStarted:Fire(soundId)
 end
 function t.PlayRandomSong()
 	local Songs = t.GetPlaylist(RadioConfig.Playlist).Songs
-	local v1 = assert(Songs)
-	if #v1 ~= 0 then
+	local songsList = assert(Songs)
+	if #songsList ~= 0 then
 		local list = {}
-		for i, v in ipairs(v1) do
+		for i, v in ipairs(songsList) do
 			list[i] = t.GetPlays(v.AssetId)
 		end
-		local v3 = math.min(unpack(list))
-		local t2 = {}
+		local minPlays = math.min(unpack(list))
+		local weights = {}
 		for i, v in ipairs(list) do
-			local v4
-			v4 = if v <= v3 then 1 else 0
-			t2[i] = v4
+			local weight
+			weight = if v <= minPlays then 1 else 0
+			weights[i] = weight
 		end
-		local v5 = v1[Math.WeightedRandom(t2)]
-		local v6 = VehicleUtils.GetLocalVehiclePacket()
-		local v8 = t.IsPlayingThirdPerson()
-		if not v8 then
-			v8 = if v6 == nil then false else not v6.Passenger
+		local selectedSong = songsList[Math.WeightedRandom(weights)]
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+		local playThirdPerson = t.IsPlayingThirdPerson()
+		if not playThirdPerson then
+			playThirdPerson = if vehiclePacket == nil then false else not vehiclePacket.Passenger
 		end
-		t.PlayId(v5.AssetId, nil, v8)
+		t.PlayId(selectedSong.AssetId, nil, playThirdPerson)
 	end
 end
-function t.GetPlaylist(p1)
-	if not t.CacheMapNamePlaylist[p1] then
-		t.CacheMapNamePlaylist[p1] = require(script.Parent.PlaylistData[p1])
+function t.GetPlaylist(playlistName)
+	if not t.CacheMapNamePlaylist[playlistName] then
+		t.CacheMapNamePlaylist[playlistName] = require(script.Parent.PlaylistData[playlistName])
 	end
-	return t.CacheMapNamePlaylist[p1]
+	return t.CacheMapNamePlaylist[playlistName]
 end
-function t.GetPlays(p1)
-	return RadioConfig.MapSoundIdPlays[p1] or 0
+function t.GetPlays(soundId)
+	return RadioConfig.MapSoundIdPlays[soundId] or 0
 end
-function t.SetVolume(p1)
+function t.SetVolume(volume)
 	if t.IsPlaying() then
-		t.CurrentSound.Volume = p1
+		t.CurrentSound.Volume = volume
 	end
 end
-function t.SetBass(p1)
-	local v1 = 1 - p1
-	local v2 = 1 - v1
-	Music.EqualizerSoundEffect.LowGain = v1 * -5 + v2 * 5
-	Music.EqualizerSoundEffect.MidGain = v2 * -1.5 + v1 * 1.5
-	Music.EqualizerSoundEffect.HighGain = v2 * -1.5 + v1 * 1.5
+function t.SetBass(bassLevel)
+	local bassReduction = 1 - bassLevel
+	local bassAmplification = 1 - bassReduction
+	Music.EqualizerSoundEffect.LowGain = bassReduction * -5 + bassAmplification * 5
+	Music.EqualizerSoundEffect.MidGain = bassAmplification * -1.5 + bassReduction * 1.5
+	Music.EqualizerSoundEffect.HighGain = bassAmplification * -1.5 + bassReduction * 1.5
 end
 function t.Stop()
 	t.Maid.FadeInConn = nil
@@ -148,7 +149,7 @@ function t.Stop()
 		local CurrentSound = t.CurrentSound
 		t.CurrentSound = nil
 		if CurrentSound:IsDescendantOf(workspace) then
-			v1:FireServer("y" .. ("rky9ixk"):sub(4, 4):reverse() .. "" .. "" .. ("lr38h"):sub(3, 4):reverse():reverse():reverse() .. "xui6")
+			radioEvent:FireServer("y" .. ("rky9ixk"):sub(4, 4):reverse() .. "" .. "" .. ("lr38h"):sub(3, 4):reverse():reverse():reverse() .. "xui6")
 		else
 			Audio.FadeTo(CurrentSound, 0, 1, function()
 				CurrentSound:Destroy()

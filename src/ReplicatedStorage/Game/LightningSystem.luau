@@ -1,23 +1,24 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Anim = require(ReplicatedStorage.Module.Anim)
 local LightningUtils = require(ReplicatedStorage.Game.LightningUtils)
-local v1 = 0
+local lastStrikeTime = 0
 local t = {
-	StrikePosition = function(p1, p2)
-		local v12 = LightningUtils.strikePosition({
-			Origin = p1,
-			Target = p2,
+	StrikePosition = function(origin, target)
+		local lightningModel = LightningUtils.strikePosition({
+			Origin = origin,
+			Target = target,
 			Transparency = 0.6
 		})
 		local Part = Instance.new("Part")
 		Part.Anchored = true
 		Part.CanCollide = false
 		Part.Transparency = 1
-		Part.Position = p2
+		Part.Position = target
 		Part.Parent = workspace
 		Audio.ObjectLocal(Part, 5042136770, {
 			Volume = 2,
@@ -32,55 +33,55 @@ local t = {
 		delay(8, function()
 			Part:Destroy()
 		end)
-		local v2 = tick()
-		if v2 - v1 > 1 then
-			v1 = v2
-			local v3 = Color3.fromRGB(164, 172, 186)
-			local v4 = Color3.fromRGB(64, 76, 93)
-			Lighting.OutdoorAmbient = v3
+		local currentTime = tick()
+		if currentTime - lastStrikeTime > 1 then
+			lastStrikeTime = currentTime
+			local ambientColor = Color3.fromRGB(164, 172, 186)
+			local cloudsColor = Color3.fromRGB(64, 76, 93)
+			Lighting.OutdoorAmbient = ambientColor
 			local Clouds = workspace.Terrain.Clouds
 			Clouds.Density = 1
 			Clouds.Cover = 0.9
-			Clouds.Color = v4
+			Clouds.Color = cloudsColor
 			task.delay(0.2, function()
-				local v1 = nil
-				local v2 = os.clock()
-				v1 = RunService.Heartbeat:Connect(function()
-					local v12 = (os.clock() - v2) / 0.5
-					if v12 >= 1 then
-						v12 = 1
+				local heartbeatConnection = nil
+				local startTime = os.clock()
+				heartbeatConnection = RunService.Heartbeat:Connect(function()
+					local progress = (os.clock() - startTime) / 0.5
+					if progress >= 1 then
+						progress = 1
 					end
-					Lighting.OutdoorAmbient = v3:lerp(Lighting:GetAttribute("_OutdoorAmbient"), v12)
-					Clouds.Density = math.lerp(1, Lighting:GetAttribute("_CloudsDensity"), v12)
-					Clouds.Cover = math.lerp(0.9, Lighting:GetAttribute("_CloudsCover"), v12)
-					Clouds.Color = v4:lerp(Lighting:GetAttribute("_CloudsColor"), v12)
-					if v12 == 1 then
-						v1:Disconnect()
+					Lighting.OutdoorAmbient = ambientColor:lerp(Lighting:GetAttribute("_OutdoorAmbient"), progress)
+					Clouds.Density = math.lerp(1, Lighting:GetAttribute("_CloudsDensity"), progress)
+					Clouds.Cover = math.lerp(0.9, Lighting:GetAttribute("_CloudsCover"), progress)
+					Clouds.Color = cloudsColor:lerp(Lighting:GetAttribute("_CloudsColor"), progress)
+					if progress == 1 then
+						heartbeatConnection:Disconnect()
 					end
 				end)
 			end)
 		end
 		task.delay(1, function()
-			local v1 = v12:GetChildren()
-			local v2 = Anim.new(4)
-			local v3 = RunService.Heartbeat:Connect(function()
-				local v12 = v2:Update()
-				for i, v in ipairs(v1) do
-					v.Transparency = 0.6 * (1 - v12) + 1 * v12
+			local lightningParts = lightningModel:GetChildren()
+			local animator = Anim.new(4)
+			local animConnection = RunService.Heartbeat:Connect(function()
+				local progress = animator:Update()
+				for i, v in ipairs(lightningParts) do
+					v.Transparency = 0.6 * (1 - progress) + 1 * progress
 				end
 			end)
-			v2.OnCompleted:Connect(function()
-				v3:Disconnect()
-				v3 = nil
-				v2:Destroy()
-				v12:Destroy()
+			animator.OnCompleted:Connect(function()
+				animConnection:Disconnect()
+				animConnection = nil
+				animator:Destroy()
+				lightningModel:Destroy()
 			end)
 		end)
 	end
 }
-function t.Init(p1)
-	function p1.em.tqftmpkl(p1, p2)
-		t.StrikePosition(p1, p2)
+function t.Init(target)
+	function target.em.tqftmpkl(target, attackerPosition)
+		t.StrikePosition(target, attackerPosition)
 	end
 end
 return t

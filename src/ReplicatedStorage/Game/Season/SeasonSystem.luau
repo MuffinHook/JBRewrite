@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -10,12 +11,12 @@ local Signal = require(ReplicatedStorage.Std.Signal)
 local Interval = require(ReplicatedStorage.Std.Interval)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local waitForChild = require(ReplicatedStorage.Std.waitForChild)
-local v1 = nil
+local levelUISystem = nil
 local AwardData = require(script.Parent.AwardData)
 local SeasonConsts = require(script.Parent.SeasonConsts)
 local SeasonUtils = require(script.Parent.SeasonUtils)
-local function SelectIfGamepad(p1)
-	EzUtils.selectIfGamepad(p1)
+local function SelectIfGamepad(guiElement)
+	EzUtils.selectIfGamepad(guiElement)
 end
 local t = {
 	_maid = Maid.new(),
@@ -23,7 +24,7 @@ local t = {
 	onLevelsAwardedChanged = Signal.new()
 }
 function t.init()
-	v1 = require(ReplicatedStorage.Game.Level2.LevelUISystem)
+	levelUISystem = require(ReplicatedStorage.Game.Level2.LevelUISystem)
 	local SeasonUISystem = require(script.Parent.SeasonUISystem)
 	local function playerAdded(p1)
 		p1:WaitForChild(SeasonConsts.HAS_SEASON_PASS_VALUE_NAME).Changed:Connect(function(p12)
@@ -65,22 +66,22 @@ function t.init()
 	if RunUtils.isMainWorld() and not RunUtils.isStudio() then
 		waitForChild(workspace, "SeasonPrompts", 30):andThen(function(p1)
 			task.wait(1)
-			local v1 = Region.new(RegionUtils.ConditionPlayer)
+			local seasonPromptRegion = Region.new(RegionUtils.ConditionPlayer)
 			for i, v in ipairs(p1:GetChildren()) do
-				v1:AddPart(v)
+				seasonPromptRegion:AddPart(v)
 			end
-			v1.OnObjAdded:Connect(function()
+			seasonPromptRegion.OnObjAdded:Connect(function()
 				if not SeasonUISystem._window:IsOpen() then
 					SeasonUISystem.open()
 				end
 			end)
-			v1.OnObjRemoved:Connect(function()
+			seasonPromptRegion.OnObjRemoved:Connect(function()
 				if SeasonUISystem._window:IsOpen() then
 					SeasonUISystem.close()
 				end
 			end)
 			Interval.every(0.2):Connect(function()
-				v1:Update({ Players.LocalPlayer })
+				seasonPromptRegion:Update({ Players.LocalPlayer })
 			end)
 		end):catch(warn)
 	end
@@ -92,26 +93,26 @@ function t.getLevelAwarded(p1)
 	return t._mapLevelsAwarded[tostring(p1)]
 end
 function t.displayReward()
-	local Redeem = v1.gui.Background.Body.InfoButton.Redeem
-	local v12 = false
-	local v2
+	local Redeem = levelUISystem.gui.Background.Body.InfoButton.Redeem
+	local isBonusAward = false
+	local awardId
 	if #t._unrewardedBonus > 0 then
-		v2 = table.remove(t._unrewardedBonus, 1)
-		v12 = true
+		awardId = table.remove(t._unrewardedBonus, 1)
+		isBonusAward = true
 	else
-		v2 = table.remove(t._unrewardedLevels, 1)
+		awardId = table.remove(t._unrewardedLevels, 1)
 	end
-	if v2 then
+	if awardId then
 		Redeem.Visible = true
-		local v3 = v12 and t.getClientBonusAward(v2) or t.getClientLevelAward(v2)
-		if not v3.imageId then
-			error(("Missing `imageId` for client level award: %d"):format(v2))
+		local awardData = isBonusAward and t.getClientBonusAward(awardId) or t.getClientLevelAward(awardId)
+		if not awardData.imageId then
+			error(("Missing `imageId` for client level award: %d"):format(awardId))
 		end
-		Redeem.Container.Icon.Image = ("rbxassetid://%d"):format(v3.imageId)
+		Redeem.Container.Icon.Image = ("rbxassetid://%d"):format(awardData.imageId)
 		local function redeem()
 			t._maid.clickRedeem = nil
 			Redeem.Visible = false
-			t._redeemRemote:FireServer(v2, v12)
+			t._redeemRemote:FireServer(awardId, isBonusAward)
 			t.displayReward()
 		end
 		t._maid.clickRedeem = Redeem.MouseButton1Down:Connect(redeem)
@@ -126,9 +127,9 @@ function t.getSeasonPassOwnedSignal()
 end
 function t.doesPlayerOwnSeasonPass(p1)
 	assert(p1 ~= nil)
-	local v2 = p1:FindFirstChild(SeasonConsts.HAS_SEASON_PASS_VALUE_NAME)
-	if v2 then
-		return v2.Value
+	local hasSeasonPassValue = p1:FindFirstChild(SeasonConsts.HAS_SEASON_PASS_VALUE_NAME)
+	if hasSeasonPassValue then
+		return hasSeasonPassValue.Value
 	else
 		return false
 	end
@@ -136,15 +137,15 @@ end
 function t.getClientLevelAward(p1)
 	assert(p1 ~= nil)
 	assert(type(p1) == "number")
-	local v3 = AwardData.Level[p1]
-	assert(v3, "missing level award")
-	return v3
+	local levelAwardData = AwardData.Level[p1]
+	assert(levelAwardData, "missing level award")
+	return levelAwardData
 end
 function t.getClientBonusAward(p1)
 	assert(p1 ~= nil)
 	assert(type(p1) == "number")
-	local v3 = AwardData.Bonus[p1]
-	assert(v3, "missing bonus award")
-	return v3
+	local bonusAwardData = AwardData.Bonus[p1]
+	assert(bonusAwardData, "missing bonus award")
+	return bonusAwardData
 end
 return t

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local CurrentCamera = workspace.CurrentCamera
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
@@ -22,143 +23,143 @@ local function GetRootPart()
 end
 local t = {}
 t.__index = t
-function t.new(p1, p2)
-	assert(p1 ~= nil)
-	assert(p2 ~= nil)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.Maid = Maid.new()
-	t2.Position = p1
-	t2.Duration = assert(p2.Duration)
-	t2.MaxRadius = assert(p2.MaxRadius)
-	t2.FlagPastLocalPlayer = false
-	t2.FlagFirstPass = false
-	t2.OnPastLocalPlayer = Signal.new()
-	t2.Maid:GiveTask(t2.OnPastLocalPlayer)
-	t2.OnDestroyed = Signal.new()
-	t2.Maid:GiveTask(t2.OnDestroyed)
-	t2.SpringBlur = Spring.new(0, 0, 1, 1)
-	t2.SpringColor = Spring.new(0, 0, 1, 0.5)
-	t2.FxDisabled = p2.FxDisabled == true
-	t2.Color = p2.Color or Color3.fromRGB(234, 117, 90)
-	t2.TintColor = p2.TintColor or p2.Color or Color3.fromRGB(255, 200, 0)
-	t2.Power = p2.Power or 10
-	t2.StartTransparency = p2.StartTransparency
-	t2.EndTransparency = p2.EndTransparency
-	t2:CreateFx()
-	t2:CreatePart()
-	t2.BornAt = tick()
-	t2.Maid:GiveTask(RunService.Heartbeat:Connect(function()
-		t2:Update()
+function t.new(position, options)
+	assert(position ~= nil)
+	assert(options ~= nil)
+	local shockwave = {}
+	setmetatable(shockwave, t)
+	shockwave.Maid = Maid.new()
+	shockwave.Position = position
+	shockwave.Duration = assert(options.Duration)
+	shockwave.MaxRadius = assert(options.MaxRadius)
+	shockwave.FlagPastLocalPlayer = false
+	shockwave.FlagFirstPass = false
+	shockwave.OnPastLocalPlayer = Signal.new()
+	shockwave.Maid:GiveTask(shockwave.OnPastLocalPlayer)
+	shockwave.OnDestroyed = Signal.new()
+	shockwave.Maid:GiveTask(shockwave.OnDestroyed)
+	shockwave.SpringBlur = Spring.new(0, 0, 1, 1)
+	shockwave.SpringColor = Spring.new(0, 0, 1, 0.5)
+	shockwave.FxDisabled = options.FxDisabled == true
+	shockwave.Color = options.Color or Color3.fromRGB(234, 117, 90)
+	shockwave.TintColor = options.TintColor or options.Color or Color3.fromRGB(255, 200, 0)
+	shockwave.Power = options.Power or 10
+	shockwave.StartTransparency = options.StartTransparency
+	shockwave.EndTransparency = options.EndTransparency
+	shockwave:CreateFx()
+	shockwave:CreatePart()
+	shockwave.BornAt = tick()
+	shockwave.Maid:GiveTask(RunService.Heartbeat:Connect(function()
+		shockwave:Update()
 	end))
-	return t2
+	return shockwave
 end
-function t.Update(p1)
-	local v1 = (tick() - p1.BornAt) / p1.Duration
-	if v1 >= 1 then
-		v1 = 1
+function t.Update(self)
+	local progress = (tick() - self.BornAt) / self.Duration
+	if progress >= 1 then
+		progress = 1
 	end
-	local v2 = v1 * p1.MaxRadius
-	local v3 = false
+	local currentRadius = progress * self.MaxRadius
+	local isInRadius = false
 	local Character = LocalPlayer.Character
-	local v4
+	local rootPart
 	if Character == nil then
-		v4 = nil
+		rootPart = nil
 	else
 		local Humanoid = Character:FindFirstChild("Humanoid")
-		v4 = if Humanoid == nil then nil else Humanoid.RootPart
+		rootPart = if Humanoid == nil then nil else Humanoid.RootPart
 	end
-	if v4 ~= nil then
-		v3 = (p1.Position - v4.Position).Magnitude < v2
+	if rootPart ~= nil then
+		isInRadius = (self.Position - rootPart.Position).Magnitude < currentRadius
 	end
-	if p1.FlagPastLocalPlayer ~= v3 then
-		p1.FlagPastLocalPlayer = v3
-		if v3 == true and p1.FlagFirstPass == false then
-			p1.FlagFirstPass = true
-			if not p1.FxDisabled then
-				p1.SpringBlur:Accelerate(200 * p1.Power)
-				p1.SpringColor:Accelerate(400 * p1.Power)
+	if self.FlagPastLocalPlayer ~= isInRadius then
+		self.FlagPastLocalPlayer = isInRadius
+		if isInRadius == true and self.FlagFirstPass == false then
+			self.FlagFirstPass = true
+			if not self.FxDisabled then
+				self.SpringBlur:Accelerate(200 * self.Power)
+				self.SpringColor:Accelerate(400 * self.Power)
 				Audio.ObjectLocal(LocalPlayer, 3217484827)
 			end
-			p1.OnPastLocalPlayer:Fire(p1.Position - v4.Position)
+			self.OnPastLocalPlayer:Fire(self.Position - rootPart.Position)
 		end
 	end
-	local v5 = p1.SpringBlur:Update()
-	local v6 = v5 >= 0.01
-	if v6 then
-		p1.Blur.Size = v5
-		local v7 = 1 - math.clamp(v5 / 10, 0, 1) * 0.2
-		if v7 < 0.999 then
-			p1.OrangeFrame.Visible = true
+	local blurSize = self.SpringBlur:Update()
+	local isBlurActive = blurSize >= 0.01
+	if isBlurActive then
+		self.Blur.Size = blurSize
+		local blurTransparency = 1 - math.clamp(blurSize / 10, 0, 1) * 0.2
+		if blurTransparency < 0.999 then
+			self.OrangeFrame.Visible = true
 		else
-			p1.OrangeFrame.Visible = false
+			self.OrangeFrame.Visible = false
 		end
-		p1.OrangeFrame.Transparency = v7
+		self.OrangeFrame.Transparency = blurTransparency
 	end
-	if p1.Blur.Enabled ~= v6 then
-		p1.Blur.Enabled = v6
+	if self.Blur.Enabled ~= isBlurActive then
+		self.Blur.Enabled = isBlurActive
 	end
-	local v8 = p1.SpringColor:Update()
-	local v9 = v8 > 0.01
-	if v9 then
-		local v10 = math.clamp(v8 / 10, 0, 1)
-		p1.ColorCorrection.Saturation = v10 * -1
-		p1.ColorCorrection.TintColor = Color3.new((1 - p1.TintColor.r) * (1 - v10) + p1.TintColor.r, (1 - p1.TintColor.g) * (1 - v10) + p1.TintColor.g, (1 - p1.TintColor.b) * (1 - v10) + p1.TintColor.b)
+	local colorSpring = self.SpringColor:Update()
+	local isColorActive = colorSpring > 0.01
+	if isColorActive then
+		local colorSaturationFactor = math.clamp(colorSpring / 10, 0, 1)
+		self.ColorCorrection.Saturation = colorSaturationFactor * -1
+		self.ColorCorrection.TintColor = Color3.new((1 - self.TintColor.r) * (1 - colorSaturationFactor) + self.TintColor.r, (1 - self.TintColor.g) * (1 - colorSaturationFactor) + self.TintColor.g, (1 - self.TintColor.b) * (1 - colorSaturationFactor) + self.TintColor.b)
 	end
-	if p1.ColorCorrection.Enabled ~= v9 then
-		p1.ColorCorrection.Enabled = v9
+	if self.ColorCorrection.Enabled ~= isColorActive then
+		self.ColorCorrection.Enabled = isColorActive
 	end
-	p1.Mesh.Scale = Vector3.new(1, 1, 1) * v2 * 2
-	if p1.StartTransparency and p1.EndTransparency then
-		p1.Part.Transparency = p1.StartTransparency + (p1.EndTransparency - p1.StartTransparency) * v1
+	self.Mesh.Scale = Vector3.new(1, 1, 1) * currentRadius * 2
+	if self.StartTransparency and self.EndTransparency then
+		self.Part.Transparency = self.StartTransparency + (self.EndTransparency - self.StartTransparency) * progress
 	end
-	if v1 == 1 and (v6 == false and v9 == false) then
-		p1:Destroy()
+	if progress == 1 and (isBlurActive == false and isColorActive == false) then
+		self:Destroy()
 	end
 end
-function t.CreateFx(p1)
+function t.CreateFx(self)
 	local BlurEffect = Instance.new("BlurEffect")
 	BlurEffect.Size = 0
 	BlurEffect.Enabled = false
 	BlurEffect.Parent = game:GetService("Lighting")
-	p1.Blur = BlurEffect
-	p1.Maid:GiveTask(p1.Blur)
+	self.Blur = BlurEffect
+	self.Maid:GiveTask(self.Blur)
 	local ColorCorrectionEffect = Instance.new("ColorCorrectionEffect")
 	ColorCorrectionEffect.Enabled = false
 	ColorCorrectionEffect.Parent = game:GetService("Lighting")
-	p1.ColorCorrection = ColorCorrectionEffect
-	p1.Maid:GiveTask(p1.ColorCorrection)
+	self.ColorCorrection = ColorCorrectionEffect
+	self.Maid:GiveTask(self.ColorCorrection)
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.IgnoreGuiInset = true
 	ScreenGui.Parent = LocalPlayer.PlayerGui
-	p1.Maid:GiveTask(ScreenGui)
+	self.Maid:GiveTask(ScreenGui)
 	local Frame = Instance.new("Frame")
 	Frame.Size = UDim2.new(1, 0, 1, 0)
-	Frame.BackgroundColor3 = p1.Color
+	Frame.BackgroundColor3 = self.Color
 	Frame.Visible = false
 	Frame.Parent = ScreenGui
-	p1.OrangeFrame = Frame
+	self.OrangeFrame = Frame
 end
-function t.CreatePart(p1)
+function t.CreatePart(self)
 	local Part = Instance.new("Part")
-	Part.Color = p1.Color
+	Part.Color = self.Color
 	Part.Size = Vector3.new(1, 1, 1)
 	Part.Material = Enum.Material.Neon
 	Part.CastShadow = false
 	Part.Anchored = true
-	Part.CFrame = CFrame.new(p1.Position)
+	Part.CFrame = CFrame.new(self.Position)
 	Part.Parent = workspace
-	p1.Maid:GiveTask(Part)
+	self.Maid:GiveTask(Part)
 	local SpecialMesh = Instance.new("SpecialMesh")
 	SpecialMesh.MeshType = Enum.MeshType.Sphere
 	SpecialMesh.Scale = Vector3.new(1, 1, 1)
 	SpecialMesh.Parent = Part
-	p1.Mesh = SpecialMesh
-	p1.Part = Part
+	self.Mesh = SpecialMesh
+	self.Part = Part
 end
-function t.Destroy(p1)
-	p1.OnDestroyed:Fire()
-	p1.Maid:Destroy()
-	p1.Maid = nil
+function t.Destroy(self)
+	self.OnDestroyed:Fire()
+	self.Maid:Destroy()
+	self.Maid = nil
 end
 return t

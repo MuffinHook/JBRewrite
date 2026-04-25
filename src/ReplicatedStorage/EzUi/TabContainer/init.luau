@@ -1,12 +1,13 @@
 -- Reviewed by Claude
-local v1 = script:FindFirstAncestor("EzUi")
-local Roact = require(v1.Parent.Roact)
+-- variables reassigned
+local ezUiModule = script:FindFirstAncestor("EzUi")
+local Roact = require(ezUiModule.Parent.Roact)
 local createElement = Roact.createElement
 local RunService = game:GetService("RunService")
-local ColorUtils = require(v1.Parent.Std.ColorUtils)
-local AccelTween = require(v1.Parent.Std.AccelTween)
-local Maid = require(v1.Parent.Std.Maid)
-local Dictionary = require(v1.Dictionary)
+local ColorUtils = require(ezUiModule.Parent.Std.ColorUtils)
+local AccelTween = require(ezUiModule.Parent.Std.AccelTween)
+local Maid = require(ezUiModule.Parent.Std.Maid)
+local Dictionary = require(ezUiModule.Dictionary)
 local Tab = require(script.Tab)
 local TabPage = require(script.TabPage)
 local v2 = Roact.PureComponent:extend("TabContainer")
@@ -14,83 +15,83 @@ v2.defaultProps = {
 	size = UDim2.new(0.5, 0, 0.5, 0),
 	isSmallScreen = true
 }
-function v2.init(p1)
-	p1.pageLayoutRef = Roact.createRef()
-	p1.data = {}
+function v2.init(self)
+	self.pageLayoutRef = Roact.createRef()
+	self.data = {}
 end
-function v2.render(p1)
-	local v1 = if p1.props.isSmallScreen then 1 else 4
-	local v2 = #p1.props.pages
-	local t = {}
-	local t2 = {}
-	for i, v in ipairs(p1.props.pages) do
-		local v3
-		local currentPage = p1.props.currentPage
+function v2.render(self)
+	local columnsPerPage = if self.props.isSmallScreen then 1 else 4
+	local pageCount = #self.props.pages
+	local pageElements = {}
+	local tabElements = {}
+	for i, v in ipairs(self.props.pages) do
+		local opacityOffset
+		local currentPage = self.props.currentPage
 		if currentPage then
-			currentPage = v[Roact.Ref]:getValue() == p1.props.currentPage
+			currentPage = v[Roact.Ref]:getValue() == self.props.currentPage
 		end
-		v3 = if currentPage then 0.1 else 0
-		local v5 = (1 + v3) / (v2 + 0.1)
-		local v6 = p1.data[v.title]
-		if not v6 then
-			v6 = {}
-			p1.data[v.title] = v6
-			v6.maid = Maid.new()
-			local v7, v8 = Roact.createBinding(v5)
-			v6.scaleXBinding = v7
-			v6.updateScaleXBinding = v8
-			v6.scaleXAccelTween = AccelTween.new(15)
-			v6.scaleXAccelTween.p = v5
+		opacityOffset = if currentPage then 0.1 else 0
+		local tabScaleX = (1 + opacityOffset) / (pageCount + 0.1)
+		local pageData = self.data[v.title]
+		if not pageData then
+			pageData = {}
+			self.data[v.title] = pageData
+			pageData.maid = Maid.new()
+			local scaleXBindingValue, updateScaleXValue = Roact.createBinding(tabScaleX)
+			pageData.scaleXBinding = scaleXBindingValue
+			pageData.updateScaleXBinding = updateScaleXValue
+			pageData.scaleXAccelTween = AccelTween.new(15)
+			pageData.scaleXAccelTween.p = tabScaleX
 		end
-		v6.scaleXAccelTween.t = v5
-		v6.maid.scaleXUpdate = RunService.Heartbeat:Connect(function()
-			if v6.scaleXAccelTween.rtime == 0 then
-				v6.maid.scaleXUpdate = nil
+		pageData.scaleXAccelTween.t = tabScaleX
+		pageData.maid.scaleXUpdate = RunService.Heartbeat:Connect(function()
+			if pageData.scaleXAccelTween.rtime == 0 then
+				pageData.maid.scaleXUpdate = nil
 			end
-			v6.updateScaleXBinding(v6.scaleXAccelTween.p)
+			pageData.updateScaleXBinding(pageData.scaleXAccelTween.p)
 		end)
-		local v9 = math.ceil(v1 * (1 / v2 + 1))
-		t[v.title] = createElement(TabPage, {
+		local tabPaddingX = math.ceil(columnsPerPage * (1 / pageCount + 1))
+		pageElements[v.title] = createElement(TabPage, {
 			[Roact.Ref] = v[Roact.Ref],
 			layoutOrder = v.layoutOrder,
 			backgroundColor = v.backgroundColor,
 			backgroundTransparency = v.backgroundTransparency,
 			[Roact.Children] = v[Roact.Children]
 		})
-		t2[v.title] = createElement(Tab, {
-			backgroundColor = p1.props.color,
+		tabElements[v.title] = createElement(Tab, {
+			backgroundColor = self.props.color,
 			title = v.title,
-			scaleXBinding = v6.scaleXBinding,
-			paddingX = v9,
+			scaleXBinding = pageData.scaleXBinding,
+			paddingX = tabPaddingX,
 			active = currentPage,
 			layoutOrder = v.layoutOrder,
 			onClick = function()
 				local v1 = v[Roact.Ref]:getValue()
-				if p1.props.currentPage ~= v1 then
-					p1.props.updatePage(v1)
+				if self.props.currentPage ~= v1 then
+					self.props.updatePage(v1)
 				end
 			end
 		})
 	end
-	local v10 = if p1.props.isSmallScreen then 0.1 else 0.05
+	local topBarHeightRatio = if self.props.isSmallScreen then 0.1 else 0.05
 	return createElement("Frame", {
-		Visible = p1.props.visible,
+		Visible = self.props.visible,
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
-		Size = p1.props.size,
-		Position = p1.props.position,
-		AnchorPoint = p1.props.anchorPoint,
+		Size = self.props.size,
+		Position = self.props.position,
+		AnchorPoint = self.props.anchorPoint,
 		ClipsDescendants = true
 	}, {
 		Tabs = createElement("Frame", {
 			BorderSizePixel = 0,
-			BackgroundColor3 = ColorUtils.brightenTo(p1.props.color, 0.3),
+			BackgroundColor3 = ColorUtils.brightenTo(self.props.color, 0.3),
 			BackgroundTransparency = 0,
-			Size = UDim2.new(1, 0, v10, 0)
+			Size = UDim2.new(1, 0, topBarHeightRatio, 0)
 		}, Dictionary.merge({
 			Padding = createElement("UIPadding", {
-				PaddingTop = UDim.new(0, v1),
-				PaddingBottom = UDim.new(0, v1)
+				PaddingTop = UDim.new(0, columnsPerPage),
+				PaddingBottom = UDim.new(0, columnsPerPage)
 			}),
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, 6)
@@ -100,14 +101,14 @@ function v2.render(p1)
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				FillDirection = Enum.FillDirection.Horizontal,
-				Padding = UDim.new(0, v1)
+				Padding = UDim.new(0, columnsPerPage)
 			})
-		}, t2)),
+		}, tabElements)),
 		Container = createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
-			Position = UDim2.new(0, 0, v10, v1),
-			Size = UDim2.new(1, 0, 1 - v10, -v1)
+			Position = UDim2.new(0, 0, topBarHeightRatio, columnsPerPage),
+			Size = UDim2.new(1, 0, 1 - topBarHeightRatio, -columnsPerPage)
 		}, Dictionary.merge({
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, 6)
@@ -116,26 +117,26 @@ function v2.render(p1)
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				EasingStyle = Enum.EasingStyle.Quad,
 				TweenTime = 0.2,
-				[Roact.Change.CurrentPage] = function(p12)
-					local CurrentPage = p12.CurrentPage
-					if p1.props.currentPage ~= CurrentPage then
-						p1.props.updatePage(CurrentPage)
+				[Roact.Change.CurrentPage] = function(component)
+					local CurrentPage = component.CurrentPage
+					if self.props.currentPage ~= CurrentPage then
+						self.props.updatePage(CurrentPage)
 					end
 				end,
-				[Roact.Ref] = p1.pageLayoutRef
+				[Roact.Ref] = self.pageLayoutRef
 			})
-		}, t))
+		}, pageElements))
 	})
 end
-function v2.didUpdate(p1, p2, p3)
-	if p1.props.currentPage ~= p3.currentPage and p1.pageLayoutRef:getValue().CurrentPage ~= p1.props.currentPage then
-		p1.pageLayoutRef:getValue():JumpTo(p1.props.currentPage)
+function v2.didUpdate(self, prevProps, prevState)
+	if self.props.currentPage ~= prevState.currentPage and self.pageLayoutRef:getValue().CurrentPage ~= self.props.currentPage then
+		self.pageLayoutRef:getValue():JumpTo(self.props.currentPage)
 	end
 end
-function v2.willUnmount(p1)
-	for k, v in pairs(p1.data) do
+function v2.willUnmount(self)
+	for k, v in pairs(self.data) do
 		v.maid:DoCleaning()
 	end
-	table.clear(p1.data)
+	table.clear(self.data)
 end
 return v2

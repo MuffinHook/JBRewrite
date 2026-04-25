@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GunUtils = require(ReplicatedStorage.Game.GunShop.GunUtils)
@@ -16,8 +17,8 @@ local function FromAxisAngle(p1)
 	local z = p1.z
 	local v1 = (x * x + y * y + z * z) ^ 0.5
 	if v1 > 0.00001 then
-		local v22 = math.sin(v1 * 0.5) / v1
-		return CFrame.new(0, 0, 0, v22 * x, v22 * y, v22 * z, (math.cos(v1 * 0.5)))
+		local sinHalf = math.sin(v1 * 0.5) / v1
+		return CFrame.new(0, 0, 0, sinHalf * x, sinHalf * y, sinHalf * z, (math.cos(v1 * 0.5)))
 	else
 		return v2
 	end
@@ -97,16 +98,16 @@ function t.SetupSprings(p1, p2)
 	end
 end
 function t.SetupModel(p1)
-	local v1 = InventoryItemUtils.getName(p1.inventoryItemValue)
-	local v2 = ReplicatedStorage.Resource.ItemSystem.Models:FindFirstChild(v1)
-	if v2 == nil then
-		error(("Could not find model for item `%s`"):format(v1))
+	local itemName = InventoryItemUtils.getName(p1.inventoryItemValue)
+	local modelTemplate = ReplicatedStorage.Resource.ItemSystem.Models:FindFirstChild(itemName)
+	if modelTemplate == nil then
+		error(("Could not find model for item `%s`"):format(itemName))
 	end
-	local v3 = v2:Clone()
-	p1.Model = v3
-	local Center = v3.Skeleton.Center
+	local modelClone = modelTemplate:Clone()
+	p1.Model = modelClone
+	local Center = modelClone.Skeleton.Center
 	p1.Center = Center
-	Joint.WeldAllTo(v3, Center)
+	Joint.WeldAllTo(modelClone, Center)
 	p1.Maid:GiveTask(function()
 		p1.Model:Destroy()
 		p1.Model = nil
@@ -115,9 +116,9 @@ end
 function t.AttachModelToPlayer(p1)
 	local UpperTorso = p1.UpperTorso
 	p1.Center.CFrame = UpperTorso.CFrame
-	local v1 = Joint.BlankMotor(p1.Center, UpperTorso)
+	local motor = Joint.BlankMotor(p1.Center, UpperTorso)
 	p1.Model.Parent = workspace.Items
-	p1.Motor = v1
+	p1.Motor = motor
 	p1.Maid:GiveTask(function()
 		p1.Motor:Destroy()
 		p1.Motor = nil
@@ -130,9 +131,9 @@ function t.SwingSwoosh(p1)
 	error("TODO: Implement")
 end
 function t.Heartbeat(p1)
-	local v1 = p1.SpringItemOffset:Update()
-	local v2 = FromAxisAngle((p1.SpringItemRotation:Update()))
-	p1.Motor.C1 = CFrame.new(v1) * v2 * CFrame.new(1.6, 1, -1.5) * p1.JointWaist.C1
+	local springOffset = p1.SpringItemOffset:Update()
+	local rotationCFrame = FromAxisAngle((p1.SpringItemRotation:Update()))
+	p1.Motor.C1 = CFrame.new(springOffset) * rotationCFrame * CFrame.new(1.6, 1, -1.5) * p1.JointWaist.C1
 	ConstraintUtils.setJointC0(p1.JointWaist, p1.JointWaistC0 * FromAxisAngle((p1.SpringWaistRotation:Update())))
 	ConstraintUtils.setJointC0(p1.JointNeck, p1.JointNeckC0 * FromAxisAngle((p1.SpringNeckRotation:Update())))
 end

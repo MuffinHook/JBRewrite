@@ -1,28 +1,29 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunConsts = require(ReplicatedStorage.App.RunConsts)
 local Util = require(ReplicatedStorage.CmdrClient.Shared.Util)
-local t = {}
-for v1, v2 in RunConsts.PLACE_ID_TO_WORLD_MAP do
-	if table.find(t, v2) == nil then
-		table.insert(t, v2)
+local worldsList = {}
+for placeId, worldName in RunConsts.PLACE_ID_TO_WORLD_MAP do
+	if table.find(worldsList, worldName) == nil then
+		table.insert(worldsList, worldName)
 	end
 end
-local v3 = Util.MakeFuzzyFinder(t)
-local t2 = {
-	Transform = function(p1)
-		return v3(p1)
+local worldFuzzyFinder = Util.MakeFuzzyFinder(worldsList)
+local worldTypedef = {
+	Transform = function(input)
+		return worldFuzzyFinder(input)
 	end,
-	Validate = function(p1)
-		return #p1 > 0, "No valid world with that name could be found."
+	Validate = function(input)
+		return #input > 0, "No valid world with that name could be found."
 	end,
-	Autocomplete = function(p1)
-		return p1
+	Autocomplete = function(input)
+		return input
 	end,
-	Parse = function(p1)
-		return p1[1]
+	Parse = function(input)
+		return input[1]
 	end
 }
-return function(p1)
-	p1:RegisterType("world", t2)
+return function(input)
+	input:RegisterType("world", worldTypedef)
 end

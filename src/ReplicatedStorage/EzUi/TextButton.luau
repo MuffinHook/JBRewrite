@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
 local v2 = Roact.Component:extend("TextButton")
@@ -8,21 +9,21 @@ v2.defaultProps = {
 	borderSize = 0,
 	borderColor = Color3.new(0/255, 0/255, 0/255)
 }
-function v2.render(p1)
+function v2.render(self)
 	return createElement("TextButton", {
-		AnchorPoint = p1.props.anchorPoint,
-		BorderSizePixel = p1.props.borderSize,
-		BorderColor3 = p1.props.borderColor,
-		BackgroundColor3 = p1.props.backgroundColor,
-		Text = p1.props.text,
-		TextColor3 = p1.props.textColor,
-		Size = p1.props.size,
+		AnchorPoint = self.props.anchorPoint,
+		BorderSizePixel = self.props.borderSize,
+		BorderColor3 = self.props.borderColor,
+		BackgroundColor3 = self.props.backgroundColor,
+		Text = self.props.text,
+		TextColor3 = self.props.textColor,
+		Size = self.props.size,
 		Font = Enum.Font.SourceSansBold,
 		TextScaled = true,
-		Position = p1.props.position,
-		LayoutOrder = p1.props.layoutOrder,
-		Visible = p1.props.visible,
-		[Roact.Event.Activated] = p1.props.onClick
-	}, p1.props[Roact.Children])
+		Position = self.props.position,
+		LayoutOrder = self.props.layoutOrder,
+		Visible = self.props.visible,
+		[Roact.Event.Activated] = self.props.onClick
+	}, self.props[Roact.Children])
 end
 return v2

@@ -1,80 +1,81 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Util = require(script.Parent.Parent.Shared.Util)
-local t = {
-	Validate = function(p1)
-		return p1 ~= nil
+local stringType = {
+	Validate = function(value)
+		return value ~= nil
 	end,
-	Parse = function(p1)
-		return tostring(p1)
+	Parse = function(value)
+		return tostring(value)
 	end
 }
-local t2 = {
-	Transform = function(p1)
-		return tonumber(p1)
+local numberType = {
+	Transform = function(value)
+		return tonumber(value)
 	end,
-	Validate = function(p1)
-		return p1 ~= nil
+	Validate = function(value)
+		return value ~= nil
 	end,
-	Parse = function(p1)
-		return p1
+	Parse = function(value)
+		return value
 	end
 }
-local t3 = {
-	Transform = function(p1)
-		return tonumber(p1)
+local integerType = {
+	Transform = function(value)
+		return tonumber(value)
 	end,
-	Validate = function(p1)
-		return if p1 == nil then false else p1 == math.floor(p1), "Only whole numbers are valid."
+	Validate = function(value)
+		return if value == nil then false else value == math.floor(value), "Only whole numbers are valid."
 	end,
-	Parse = function(p1)
-		return p1
+	Parse = function(value)
+		return value
 	end
 }
-local t4 = {
-	Transform = function(p1)
-		return tonumber(p1)
+local positiveIntegerType = {
+	Transform = function(value)
+		return tonumber(value)
 	end,
-	Validate = function(p1)
-		return if p1 == nil or p1 ~= math.floor(p1) then false else p1 > 0, "Only positive whole numbers are valid."
+	Validate = function(value)
+		return if value == nil or value ~= math.floor(value) then false else value > 0, "Only positive whole numbers are valid."
 	end,
-	Parse = function(p1)
-		return p1
+	Parse = function(value)
+		return value
 	end
 }
-local t5 = {
-	Transform = function(p1)
-		return tonumber(p1)
+local nonNegativeIntegerType = {
+	Transform = function(value)
+		return tonumber(value)
 	end,
-	Validate = function(p1)
-		return if p1 == nil or p1 ~= math.floor(p1) then false else p1 >= 0, "Only non-negative whole numbers are valid."
+	Validate = function(value)
+		return if value == nil or value ~= math.floor(value) then false else value >= 0, "Only non-negative whole numbers are valid."
 	end,
-	Parse = function(p1)
-		return p1
+	Parse = function(value)
+		return value
 	end
 }
-local t6 = {
-	Transform = function(p1)
-		return tonumber(p1)
+local byteType = {
+	Transform = function(value)
+		return tonumber(value)
 	end,
-	Validate = function(p1)
-		return if p1 == nil or (p1 ~= math.floor(p1) or not (p1 >= 0)) then false else p1 <= 255, "Only bytes are valid."
+	Validate = function(value)
+		return if value == nil or (value ~= math.floor(value) or not (value >= 0)) then false else value <= 255, "Only bytes are valid."
 	end,
-	Parse = function(p1)
-		return p1
+	Parse = function(value)
+		return value
 	end
 }
-local t7 = {
-	Transform = function(p1)
-		return tonumber(p1)
+local digitType = {
+	Transform = function(value)
+		return tonumber(value)
 	end,
-	Validate = function(p1)
-		return if p1 == nil or (p1 ~= math.floor(p1) or not (p1 >= 0)) then false else p1 <= 9, "Only digits are valid."
+	Validate = function(value)
+		return if value == nil or (value ~= math.floor(value) or not (value >= 0)) then false else value <= 9, "Only digits are valid."
 	end,
-	Parse = function(p1)
-		return p1
+	Parse = function(value)
+		return value
 	end
 }
-local v1 = Util.MakeDictionary({
+local trueValues = Util.MakeDictionary({
 	"true",
 	"t",
 	"yes",
@@ -85,7 +86,7 @@ local v1 = Util.MakeDictionary({
 	"1",
 	"+"
 })
-local v2 = Util.MakeDictionary({
+local falseValues = Util.MakeDictionary({
 	"false",
 	"f",
 	"no",
@@ -96,38 +97,38 @@ local v2 = Util.MakeDictionary({
 	"0",
 	"-"
 })
-local t8 = {
-	Transform = function(p1)
-		return p1:lower()
+local booleanType = {
+	Transform = function(value)
+		return value:lower()
 	end,
-	Validate = function(p1)
-		return if v1[p1] == nil then v2[p1] ~= nil else true, "Please use true/yes/on or false/no/off."
+	Validate = function(value)
+		return if trueValues[value] == nil then falseValues[value] ~= nil else true, "Please use true/yes/on or false/no/off."
 	end,
-	Parse = function(p1)
-		if v1[p1] then
+	Parse = function(value)
+		if trueValues[value] then
 			return true
-		elseif v2[p1] then
+		elseif falseValues[value] then
 			return false
 		else
 			return nil
 		end
 	end
 }
-return function(p1)
-	p1:RegisterType("string", t)
-	p1:RegisterType("number", t2)
-	p1:RegisterType("integer", t3)
-	p1:RegisterType("positiveInteger", t4)
-	p1:RegisterType("nonNegativeInteger", t5)
-	p1:RegisterType("byte", t6)
-	p1:RegisterType("digit", t7)
-	p1:RegisterType("boolean", t8)
-	p1:RegisterType("strings", Util.MakeListableType(t))
-	p1:RegisterType("numbers", Util.MakeListableType(t2))
-	p1:RegisterType("integers", Util.MakeListableType(t3))
-	p1:RegisterType("positiveIntegers", Util.MakeListableType(t4))
-	p1:RegisterType("nonNegativeIntegers", Util.MakeListableType(t5))
-	p1:RegisterType("bytes", Util.MakeListableType(t6))
-	p1:RegisterType("digits", Util.MakeListableType(t7))
-	p1:RegisterType("booleans", Util.MakeListableType(t8))
+return function(typeRegistry)
+	typeRegistry:RegisterType("string", stringType)
+	typeRegistry:RegisterType("number", numberType)
+	typeRegistry:RegisterType("integer", integerType)
+	typeRegistry:RegisterType("positiveInteger", positiveIntegerType)
+	typeRegistry:RegisterType("nonNegativeInteger", nonNegativeIntegerType)
+	typeRegistry:RegisterType("byte", byteType)
+	typeRegistry:RegisterType("digit", digitType)
+	typeRegistry:RegisterType("boolean", booleanType)
+	typeRegistry:RegisterType("strings", Util.MakeListableType(stringType))
+	typeRegistry:RegisterType("numbers", Util.MakeListableType(numberType))
+	typeRegistry:RegisterType("integers", Util.MakeListableType(integerType))
+	typeRegistry:RegisterType("positiveIntegers", Util.MakeListableType(positiveIntegerType))
+	typeRegistry:RegisterType("nonNegativeIntegers", Util.MakeListableType(nonNegativeIntegerType))
+	typeRegistry:RegisterType("bytes", Util.MakeListableType(byteType))
+	typeRegistry:RegisterType("digits", Util.MakeListableType(digitType))
+	typeRegistry:RegisterType("booleans", Util.MakeListableType(booleanType))
 end

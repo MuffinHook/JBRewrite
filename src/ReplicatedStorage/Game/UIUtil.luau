@@ -1,18 +1,19 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
 local LocalPlayer = Players.LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
-local t = {
+local uiUtilModule = {
 	ChatModule = nil,
 	IsSmallScreen = function()
 		return math.min(CurrentCamera.ViewportSize.X, CurrentCamera.ViewportSize.y) <= 500
 	end
 }
-function t.GetChatModule()
-	if t.ChatModule then
-		return t.ChatModule
+function uiUtilModule.GetChatModule()
+	if uiUtilModule.ChatModule then
+		return uiUtilModule.ChatModule
 	else
 		local ChatScript = LocalPlayer.PlayerScripts:FindFirstChild("ChatScript")
 		if ChatScript == nil then
@@ -22,58 +23,58 @@ function t.GetChatModule()
 			if ChatMain == nil then
 				return nil
 			else
-				local v1 = nil
-				local v2, v3 = pcall(function()
-					v1 = require(ChatMain)
+				local chatModuleResult = nil
+				local success, errorMessage = pcall(function()
+					chatModuleResult = require(ChatMain)
 				end)
-				if v2 then
-					t.ChatModule = v1
-					return t.ChatModule
+				if success then
+					uiUtilModule.ChatModule = chatModuleResult
+					return uiUtilModule.ChatModule
 				else
-					warn(v3)
+					warn(errorMessage)
 					return nil
 				end
 			end
 		end
 	end
 end
-function t.GetChatVisible()
-	local v1 = t.GetChatModule()
-	if v1 == nil or v1.GetVisibility == nil then
+function uiUtilModule.GetChatVisible()
+	local chatModule = uiUtilModule.GetChatModule()
+	if chatModule == nil or chatModule.GetVisibility == nil then
 		warn("Could not set chat visibility. API changed?")
 		return false
 	else
-		local v2 = nil
-		local v3, v4 = pcall(function()
-			v2 = v1:GetVisibility()
+		local visibilityResult = nil
+		local getVisibilitySuccess, getVisibilityError = pcall(function()
+			visibilityResult = chatModule:GetVisibility()
 		end)
-		if not v3 then
-			warn(v4)
+		if not getVisibilitySuccess then
+			warn(getVisibilityError)
 		end
-		return v2
+		return visibilityResult
 	end
 end
-function t.SetChatVisible(p1)
-	local v1 = t.GetChatModule()
-	if v1 == nil or v1.SetVisible == nil then
+function uiUtilModule.SetChatVisible(isVisible)
+	local chatModule = uiUtilModule.GetChatModule()
+	if chatModule == nil or chatModule.SetVisible == nil then
 		warn("Could not set chat visibility. API changed?")
 		return false
 	else
-		local v2, v3 = pcall(function()
-			v1:SetVisible(p1)
+		local setVisibleSuccess, setVisibleError = pcall(function()
+			chatModule:SetVisible(isVisible)
 		end)
-		if not v2 then
-			warn(v3)
+		if not setVisibleSuccess then
+			warn(setVisibleError)
 		end
 		return true
 	end
 end
-function t.getJumpButtonPosition()
-	local v1 = t.IsSmallScreen()
-	local v2 = if v1 then 70 else 120
-	return v1 and UDim2.new(1, -(v2 * 1.5 - 10), 1, -v2 - 20) or UDim2.new(1, -(v2 * 1.5 - 10), 1, -v2 * 1.75)
+function uiUtilModule.getJumpButtonPosition()
+	local isSmallScreen = uiUtilModule.IsSmallScreen()
+	local buttonOffset = if isSmallScreen then 70 else 120
+	return isSmallScreen and UDim2.new(1, -(buttonOffset * 1.5 - 10), 1, -buttonOffset - 20) or UDim2.new(1, -(buttonOffset * 1.5 - 10), 1, -buttonOffset * 1.75)
 end
-function t.selectIfGamepad(p1)
-	EzUtils.selectIfGamepad(p1)
+function uiUtilModule.selectIfGamepad(guiElement)
+	EzUtils.selectIfGamepad(guiElement)
 end
-return t
+return uiUtilModule

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -12,28 +13,28 @@ local v1 = nil
 local v2 = nil
 local v3 = nil
 local CircleAction = UI.CircleAction
-local v4 = 0
-local v5 = nil
-local t = {}
+local lastUpdateTime = 0
+local currentCharacter = nil
+local drawerData = {}
 local function ShowFun(p1)
 	local ValidRoot = p1.ValidRoot
-	ValidRoot:SetPrimaryPartCFrame(t[ValidRoot.Drawer].Opened)
+	ValidRoot:SetPrimaryPartCFrame(drawerData[ValidRoot.Drawer].Opened)
 end
 local function HideFun(p1)
 	local ValidRoot = p1.ValidRoot
-	ValidRoot:SetPrimaryPartCFrame(t[ValidRoot.Drawer].Closed)
+	ValidRoot:SetPrimaryPartCFrame(drawerData[ValidRoot.Drawer].Closed)
 end
 local function Update(p1)
 	local v1 = tick()
-	if not (v1 - v4 < 0.1) then
-		v4 = v1
+	if not (v1 - lastUpdateTime < 0.1) then
+		lastUpdateTime = v1
 		local v2 = InventoryItemSystem.getEquippedFor(LocalPlayer)[1]
 		local ValidRoot = p1.ValidRoot
-		local v3 = v5
+		local v3 = currentCharacter
 		if v3 then
-			v3 = v5.Model == ValidRoot.Parent.Parent
+			v3 = currentCharacter.Model == ValidRoot.Parent.Parent
 		end
-		local v42
+		local actionDuration
 		if v3 then
 			local v52 = BinderUtils.findFirstChild(InventoryItemBinder, ValidRoot)
 			if v2 then
@@ -47,22 +48,22 @@ local function Update(p1)
 			else
 				p1.Name = "Inspect Drawer"
 			end
-			v42 = 0.5
+			actionDuration = 0.5
 		else
 			p1.Name = "Inspect Drawer"
-			v42 = 3
+			actionDuration = 3
 		end
-		assert(v42)
-		p1.Duration = v42
+		assert(actionDuration)
+		p1.Duration = actionDuration
 	end
 end
 local function Action(p1, p2)
 	if p2 then
 		local v1 = InventoryItemSystem.getEquippedFor(LocalPlayer)[1]
 		local ValidRoot = p1.ValidRoot
-		local v22 = v5
+		local v22 = currentCharacter
 		if v22 then
-			v22 = v5.Model == ValidRoot.Parent.Parent
+			v22 = currentCharacter.Model == ValidRoot.Parent.Parent
 		end
 		if v22 then
 			local v3 = BinderUtils.findFirstChild(InventoryItemBinder, ValidRoot)
@@ -91,13 +92,13 @@ local function AddedFun(p1)
 		ShowFun = ShowFun,
 		HideFun = HideFun
 	}, p1)
-	t[p1] = {
+	drawerData[p1] = {
 		Closed = p1.CFrame,
 		Opened = p1.CFrame * CFrame.new(0, 0, -1.5)
 	}
 end
 local function RemovedFun(p1)
-	t[p1] = nil
+	drawerData[p1] = nil
 	CircleAction.Remove(p1)
 end
 return {
@@ -109,7 +110,7 @@ return {
 		local ScreenGui = p1.ScreenGui
 		function em.aa02dq4j(p1)
 			assert(p1)
-			v5 = p1
+			currentCharacter = p1
 		end
 		local v22 = 0
 		function em.fwrmzn28()

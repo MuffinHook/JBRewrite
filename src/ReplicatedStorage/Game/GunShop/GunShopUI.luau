@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
@@ -10,8 +11,8 @@ local GunShopSystem = require(script.Parent.GunShopSystem)
 local GunShopSlider = require(script.Parent.GunShopSlider)
 local GunShopItem = require(script.Parent.GunShopItem)
 local GunShopUtils = require(script.Parent.GunShopUtils)
-local v1 = nil
-local v2 = nil
+local eventSignal = nil
+local eventManager = nil
 local function SelectIfGamepad(p1)
 	EzUtils.selectIfGamepad(p1)
 end
@@ -20,8 +21,8 @@ local t = {
 	currentSlider = nil
 }
 function t.init(p1)
-	v1 = p1.Event
-	v2 = p1.em
+	eventSignal = p1.Event
+	eventManager = p1.em
 	local GunShopGui = ReplicatedStorage.StarterGui:FindFirstChild("GunShopGui")
 	GunShopGui.Parent = LocalPlayer.PlayerGui
 	t.gui = GunShopGui
@@ -70,9 +71,9 @@ function t.open()
 	end))
 end
 function t.displayList(p1)
-	local v12 = GunShopSlider.new(p1)
-	t.maid.currentSlider = v12
-	v12:SetParent(t.gui.Container.Container.Main.Container)
+	local sliderInstance = GunShopSlider.new(p1)
+	t.maid.currentSlider = sliderInstance
+	sliderInstance:SetParent(t.gui.Container.Container.Main.Container)
 	for i, v in ipairs(p1) do
 		local v2
 		local v3 = v.Name
@@ -102,11 +103,11 @@ function t.displayList(p1)
 			v6:SetLevel(v4.Level)
 			v6._maid:GiveTask(v6.onMouseButton1Down:Connect(function()
 				if v6:GetEquipped() then
-					v1:FireServer("y" .. ("krhwwn"):sub(3, 3):reverse() .. "" .. "" .. ("kmadf"):sub(2, 3):reverse():reverse():reverse() .. "" .. "" .. ("xed5y4"):sub(2, 2):reverse() .. "qcz", v3)
+					eventSignal:FireServer("y" .. ("krhwwn"):sub(3, 3):reverse() .. "" .. "" .. ("kmadf"):sub(2, 3):reverse():reverse():reverse() .. "" .. "" .. ("xed5y4"):sub(2, 2):reverse() .. "qcz", v3)
 				elseif GunShopSystem.doesPlayerOwn(v3) then
-					v1:FireServer("t" .. ("cdtv2wm"):sub(5, 5):reverse() .. "" .. "" .. ("j9gelw"):sub(4, 5):reverse():reverse():reverse() .. "y62p", v3)
+					eventSignal:FireServer("t" .. ("cdtv2wm"):sub(5, 5):reverse() .. "" .. "" .. ("j9gelw"):sub(4, 5):reverse():reverse():reverse() .. "y62p", v3)
 				else
-					v1:FireServer("tlcucis3", v3)
+					eventSignal:FireServer("tlcucis3", v3)
 				end
 			end))
 			if v4.RequireAnyGamepass then
@@ -117,12 +118,12 @@ function t.displayList(p1)
 			if v5 then
 				v6:SetOwned(true)
 			end
-			v12:AddItem(v6)
+			sliderInstance:AddItem(v6)
 			v6:SetLayoutOrder((v4.SortOrderPage or 0) * 100000 + v4.Price * 10)
 		end
 	end
-	v12._maid:GiveTask(GunShopSystem.onAnyOwned:Connect(function(p1)
-		for i, v in ipairs(v12._listItem) do
+	sliderInstance._maid:GiveTask(GunShopSystem.onAnyOwned:Connect(function(p1)
+		for i, v in ipairs(sliderInstance._listItem) do
 			if v:GetName() == p1 then
 				v:SetOwned(true)
 				return
@@ -131,7 +132,7 @@ function t.displayList(p1)
 	end))
 	local function handleInventoryItemAdded(p1)
 		if p1:GetOwner() == LocalPlayer then
-			for i, v in ipairs(v12._listItem) do
+			for i, v in ipairs(sliderInstance._listItem) do
 				if v:GetName() == p1:GetName() then
 					v:SetEquipped(true)
 					return
@@ -141,7 +142,7 @@ function t.displayList(p1)
 	end
 	local function handleInventoryItemRemoved(p1)
 		if p1:GetOwner() == LocalPlayer then
-			for i, v in ipairs(v12._listItem) do
+			for i, v in ipairs(sliderInstance._listItem) do
 				if v:GetName() == p1:GetName() then
 					v:SetEquipped(false)
 					return
@@ -149,11 +150,11 @@ function t.displayList(p1)
 			end
 		end
 	end
-	v12._maid:GiveTask(InventoryItemBinder:GetClassAddedSignal():Connect(handleInventoryItemAdded))
+	sliderInstance._maid:GiveTask(InventoryItemBinder:GetClassAddedSignal():Connect(handleInventoryItemAdded))
 	for i, v in ipairs(InventoryItemBinder:GetAll()) do
 		handleInventoryItemAdded(v)
 	end
-	v12._maid:GiveTask(InventoryItemBinder:GetClassRemovingSignal():Connect(handleInventoryItemRemoved))
+	sliderInstance._maid:GiveTask(InventoryItemBinder:GetClassRemovingSignal():Connect(handleInventoryItemRemoved))
 end
 function t.close()
 	assert(t.isOpen())

@@ -1,10 +1,11 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BountyBoardService = require(ReplicatedStorage.Bounty.BountyBoardService)
 require(ReplicatedStorage.CCTV.CCTVService)
 local Basic = require(script.Parent.Basic)
-local t = {
+local motionConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -18,21 +19,21 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local t2 = {
+local CCTVClass = {
 	__ClassName = "CCTV"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	v1:DefaultDisableCamLock()
-	if v1.Local then
-		v1:_showGui()
+CCTVClass.__index = CCTVClass
+setmetatable(CCTVClass, Basic)
+function CCTVClass.new(p1, p2, p3)
+	local instance = Basic.new(p1, p2, motionConfig, p3)
+	setmetatable(instance, CCTVClass)
+	instance:DefaultDisableCamLock()
+	if instance.Local then
+		instance:_showGui()
 	end
-	return v1
+	return instance
 end
-function t2._showGui(p1)
+function CCTVClass._showGui(self)
 	local BountyBoard = Instance.new("ScreenGui")
 	BountyBoard.Name = "BountyBoard"
 	BountyBoard.Parent = Players.LocalPlayer:FindFirstChild("PlayerGui")
@@ -64,14 +65,14 @@ function t2._showGui(p1)
 	UIPadding.PaddingLeft = UDim.new(0, 10)
 	UIPadding.PaddingRight = UDim.new(0, 10)
 	UIPadding.Parent = Container
-	local v1 = BountyBoardService.getTopBounties(6)
+	local bounties = BountyBoardService.getTopBounties(6)
 	local Title = Instance.new("TextLabel")
 	Title.Name = "Title"
 	Title.BackgroundTransparency = 1
 	Title.Size = UDim2.new(1, 0, 0.15, 0)
 	Title.Position = UDim2.new(0.5, 0, 0, 0)
 	Title.AnchorPoint = Vector2.new(0.5, 0)
-	Title.Text = if #v1 == 0 then "No criminals have a bounty" else "Bounty board. Arrest to collect!"
+	Title.Text = if #bounties == 0 then "No criminals have a bounty" else "Bounty board. Arrest to collect!"
 	Title.TextColor3 = Color3.new(255/255, 255/255, 255/255)
 	Title.Font = Enum.Font.Bangers
 	Title.TextScaled = true
@@ -94,14 +95,14 @@ function t2._showGui(p1)
 	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 	UIListLayout.Parent = ContentFrame
-	BountyBoardService.updateGui(ContentFrame, v1)
-	p1.maid:GiveTask(BountyBoard)
+	BountyBoardService.updateGui(ContentFrame, bounties)
+	self.maid:GiveTask(BountyBoard)
 end
-function t2.GetLeftArmPosition(p1)
+function CCTVClass.GetLeftArmPosition(self)
 	return nil
 end
-function t2.InputBegan(p1, p2, p3)
-	Basic.InputBegan(p1, p2, p3)
+function CCTVClass.InputBegan(self, p2, p3)
+	Basic.InputBegan(self, p2, p3)
 end
-function t2.InputEnded(p1) end
-return t2
+function CCTVClass.InputEnded(self) end
+return CCTVClass

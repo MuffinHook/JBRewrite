@@ -1,92 +1,93 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PartUtils = require(ReplicatedStorage.Std.PartUtils)
 local Customize = require(ReplicatedStorage.Game.Garage.Customize)
-return function(p1, p2)
-	assert(p1 ~= nil, "missing vehicle make")
-	assert(p2 ~= nil, "missing vehicle type")
-	if p1 == "MCL36FREE" then
-		p1 = "MCL36"
+return function(vehicleMake, vehicleType)
+	assert(vehicleMake ~= nil, "missing vehicle make")
+	assert(vehicleType ~= nil, "missing vehicle type")
+	if vehicleMake == "MCL36FREE" then
+		vehicleMake = "MCL36"
 	end
-	local var3 = ReplicatedStorage.Resource.Vehicles:FindFirstChild(p1) or ReplicatedStorage.Resource.Plane:FindFirstChild(p1) or ReplicatedStorage.Resource.Boat:FindFirstChild(p1)
-	if var3 then
-		local var4 = var3:Clone()
-		local var5 = var4
-		for v7, v8 in var4:GetDescendants() do
-			local v6
-			if v8:IsA("Model") and (v8.Name:sub(1, 5) == "Wheel" and (v8.Name ~= "Wheels" and v8.Name ~= "WheelModels")) then
-				local var9 = v8:FindFirstChild("Wheel") or v8:FindFirstChild("WheelRoot")
-				if not var9 then
-					print("could not find wheelRoot in", v8:GetFullName())
+	local vehicleModel = ReplicatedStorage.Resource.Vehicles:FindFirstChild(vehicleMake) or ReplicatedStorage.Resource.Plane:FindFirstChild(vehicleMake) or ReplicatedStorage.Resource.Boat:FindFirstChild(vehicleMake)
+	if vehicleModel then
+		local clonedModel = vehicleModel:Clone()
+		local resultModel = clonedModel
+		for v7, descendant in clonedModel:GetDescendants() do
+			local wheelRootFound
+			if descendant:IsA("Model") and (descendant.Name:sub(1, 5) == "Wheel" and (descendant.Name ~= "Wheels" and descendant.Name ~= "WheelModels")) then
+				local wheelRoot = descendant:FindFirstChild("Wheel") or descendant:FindFirstChild("WheelRoot")
+				if not wheelRoot then
+					print("could not find wheelRoot in", descendant:GetFullName())
 				end
-				v6 = var9 ~= nil
-				assert(v6, "could not find wheelRoot")
-				v8.PrimaryPart = var9
+				wheelRootFound = wheelRoot ~= nil
+				assert(wheelRootFound, "could not find wheelRoot")
+				descendant.PrimaryPart = wheelRoot
 			end
 		end
-		local WheelModels = var5:FindFirstChild("WheelModels")
+		local WheelModels = resultModel:FindFirstChild("WheelModels")
 		if WheelModels then
-			for v11, v12 in WheelModels:GetChildren() do
-				local v10
-				if v12:IsA("Model") then
-					local Wheel = v12:FindFirstChild("Wheel")
+			for v11, wheelModel in WheelModels:GetChildren() do
+				local wheelFound
+				if wheelModel:IsA("Model") then
+					local Wheel = wheelModel:FindFirstChild("Wheel")
 					if not Wheel then
-						print("could not find tirePart in", v12:GetFullName())
+						print("could not find tirePart in", wheelModel:GetFullName())
 					end
-					v10 = Wheel ~= nil
-					assert(v10, "could not find tirePart")
-					v12.PrimaryPart = Wheel
+					wheelFound = Wheel ~= nil
+					assert(wheelFound, "could not find tirePart")
+					wheelModel.PrimaryPart = Wheel
 				end
 			end
 		end
-		var5.PrimaryPart = var5.BoundingBox
-		var5:SetPrimaryPartCFrame(CFrame.new())
-		if var5:FindFirstChild("Spoiler") then
-			var5.Spoiler.Transparency = 1
+		resultModel.PrimaryPart = resultModel.BoundingBox
+		resultModel:SetPrimaryPartCFrame(CFrame.new())
+		if resultModel:FindFirstChild("Spoiler") then
+			resultModel.Spoiler.Transparency = 1
 		end
-		if var5:FindFirstChild("PoliceLights") then
-			var5.PoliceLights.Transparency = 1
+		if resultModel:FindFirstChild("PoliceLights") then
+			resultModel.PoliceLights.Transparency = 1
 		end
-		if p2 ~= "Chassis3" then
-			local t = {
-				Make = p1,
-				Type = p2,
-				Model = var5
+		if vehicleType ~= "Chassis3" then
+			local customizeConfig = {
+				Make = vehicleMake,
+				Type = vehicleType,
+				Model = resultModel
 			}
 			Customize.Apply({
 				Name = "Classic"
-			}, "Spoiler", t)
+			}, "Spoiler", customizeConfig)
 			Customize.Apply({
 				Name = "Arachnid"
-			}, "Rim", t)
-			if p1 == "NASCAR1" then
+			}, "Rim", customizeConfig)
+			if vehicleMake == "NASCAR1" then
 				Customize.Apply({
 					Name = "NASCAR1"
-				}, "Texture", t)
-			elseif p1 == "NASCAR2" then
+				}, "Texture", customizeConfig)
+			elseif vehicleMake == "NASCAR2" then
 				Customize.Apply({
 					Name = "NASCAR2"
-				}, "Texture", t)
-			elseif p1 == "MCL36" then
+				}, "Texture", customizeConfig)
+			elseif vehicleMake == "MCL36" then
 				Customize.Apply({
 					Name = "MCL36"
-				}, "Texture", t)
-			elseif p1 == "NASCAR75th" then
+				}, "Texture", customizeConfig)
+			elseif vehicleMake == "NASCAR75th" then
 				Customize.Apply({
 					Name = "NASCAR75th"
-				}, "Texture", t)
+				}, "Texture", customizeConfig)
 			else
-				Customize.Apply(nil, "Texture", t)
+				Customize.Apply(nil, "Texture", customizeConfig)
 			end
 			Customize.Apply({
 				Name = "Black"
-			}, "WindowColor", t)
+			}, "WindowColor", customizeConfig)
 			Customize.Apply({
 				Name = "Black"
-			}, "WheelColor", t)
-			PartUtils.setAnchored(var5, true)
+			}, "WheelColor", customizeConfig)
+			PartUtils.setAnchored(resultModel, true)
 		end
-		return var5
+		return resultModel
 	end
-	error("Could not find vehicle model: " .. p1)
+	error("Could not find vehicle model: " .. vehicleMake)
 end

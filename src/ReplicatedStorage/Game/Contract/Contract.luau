@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SeasonUtils = require(ReplicatedStorage.Game.Season.SeasonUtils)
@@ -22,13 +23,13 @@ function t.new(p1)
 		t2.obj = nil
 	end)
 	t2._stateValue = p1:WaitForChild(ContractConsts.STATE_VALUE_NAME, 5)
-	local v2 = t2:GetStateId()
+	local previousStateId = t2:GetStateId()
 	t2._maid:GiveTask(t2:GetStateValue():GetPropertyChangedSignal("Value"):Connect(function()
-		local v1 = t2:GetStateId()
+		local stateId = t2:GetStateId()
 		if t2._onStateChanged then
-			t2._onStateChanged:Fire(v1, v2)
+			t2._onStateChanged:Fire(stateId, previousStateId)
 		end
-		v2 = v1
+		previousStateId = stateId
 	end))
 	t2._progressValue = p1:WaitForChild(ContractConsts.PROGRESS_VALUE_NAME, 5)
 	t2._goalValue = p1:WaitForChild(ContractConsts.GOAL_VALUE_NAME, 5)
@@ -36,40 +37,40 @@ function t.new(p1)
 	t2._contractActionRemote = p1:WaitForChild(ContractConsts.CONTRACT_ACTION_REMOTE_NAME, 5)
 	t2._requireSeasonPassValue = p1:WaitForChild(ContractConsts.REQUIRE_SEASON_PASS_VALUE_NAME, 5)
 	t2._rerolledValue = p1:WaitForChild(ContractConsts.REROLLED_VALUE_NAME, 5)
-	local v3 = t2:GetName()
-	local v4 = Data:FindFirstChild(v3)
-	if not v4 then
-		error(("Cannot find client data module for contract: %s"):format(v3))
+	local contractName = t2:GetName()
+	local dataModule = Data:FindFirstChild(contractName)
+	if not dataModule then
+		error(("Cannot find client data module for contract: %s"):format(contractName))
 	end
-	local v5 = require(v4)
-	if not v5.teamId then
+	local clientData = require(dataModule)
+	if not clientData.teamId then
 		error("Missing `clientData.teamId` value")
 	end
-	t2:SetTeamId(v5.teamId)
-	if not v5.rewardExp then
+	t2:SetTeamId(clientData.teamId)
+	if not clientData.rewardExp then
 		error("Missing `clientData.rewardExp` value")
 	end
-	t2:SetRewardExp(v5.rewardExp * SeasonUtils.getSeasonExpMult())
-	if not v5.message then
+	t2:SetRewardExp(clientData.rewardExp * SeasonUtils.getSeasonExpMult())
+	if not clientData.message then
 		error("Missing `clientData.message` value")
 	end
-	local v7 = nil
-	if type(v5.message) == "string" then
-		v7 = v5.message
+	local messageText = nil
+	if type(clientData.message) == "string" then
+		messageText = clientData.message
 	else
-		if type(v5.message) == "function" then
-			v7 = v5.message(t2)
+		if type(clientData.message) == "function" then
+			messageText = clientData.message(t2)
 		end
 	end
-	t2:SetMessage(v7)
+	t2:SetMessage(messageText)
 	return t2
 end
 function t.GetPlayer(p1)
-	local v1 = Players:GetPlayerByUserId(p1._obj.Parent.Name)
-	if v1 then
-		local isParent = v1.Parent == game:GetService("Players")
+	local player = Players:GetPlayerByUserId(p1._obj.Parent.Name)
+	if player then
+		local isParent = player.Parent == game:GetService("Players")
 		assert(isParent)
-		return v1
+		return player
 	end
 end
 function t.GetName(p1)

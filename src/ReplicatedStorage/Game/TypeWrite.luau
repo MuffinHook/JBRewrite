@@ -1,18 +1,19 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
-return function(p1, p2, p3)
-	local v1 = tick()
-	local v2 = utf8.len(p1)
-	local v3 = v2 / (p3 or 25)
-	p2("")
-	local v4 = nil
-	v4 = RunService.Heartbeat:Connect(function()
-		local v12 = (tick() - v1) / v3
-		if v12 > 1 then
-			v4:Disconnect()
-			v12 = 1
+return function(text, callback, charsPerSecond)
+	local startTime = tick()
+	local textLength = utf8.len(text)
+	local totalDuration = textLength / (charsPerSecond or 25)
+	callback("")
+	local heartbeatConnection = nil
+	heartbeatConnection = RunService.Heartbeat:Connect(function()
+		local progress = (tick() - startTime) / totalDuration
+		if progress > 1 then
+			heartbeatConnection:Disconnect()
+			progress = 1
 		end
-		p2(utf8.char(utf8.codepoint(p1, 1, v12 * v2)))
+		callback(utf8.char(utf8.codepoint(text, 1, progress * textLength)))
 	end)
-	return v4
+	return heartbeatConnection
 end

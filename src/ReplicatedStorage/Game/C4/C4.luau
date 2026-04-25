@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
@@ -11,9 +12,9 @@ local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local Promise = require(ReplicatedStorage.Std.Promise)
 local C4Consts = require(script.Parent.C4Consts)
 local function closestPointToPart(p1, p2)
-	local v1 = p2.CFrame
-	local v2 = v1:PointToObjectSpace(p1)
-	return v1 * Vector3.new(math.clamp(v2.X, -p2.Size.X * 0.5, p2.Size.X * 0.5), math.clamp(v2.Y, -p2.Size.Y * 0.5, p2.Size.Y * 0.5), (math.clamp(v2.Z, -p2.Size.Z * 0.5, p2.Size.Z * 0.5)))
+	local partCFrame = p2.CFrame
+	local objectSpacePoint = partCFrame:PointToObjectSpace(p1)
+	return partCFrame * Vector3.new(math.clamp(objectSpacePoint.X, -p2.Size.X * 0.5, p2.Size.X * 0.5), math.clamp(objectSpacePoint.Y, -p2.Size.Y * 0.5, p2.Size.Y * 0.5), (math.clamp(objectSpacePoint.Z, -p2.Size.Z * 0.5, p2.Size.Z * 0.5)))
 end
 local t = {}
 t.__index = t
@@ -84,18 +85,18 @@ function t.ListenForAttach(p1)
 				Promise.delay(1):andThen(function()
 					p1._locallyStuck = p1._stuckValue.Value
 				end)
-				local v1 = RaycastParams.new()
-				v1.FilterDescendantsInstances = { p12 }
-				v1.FilterType = Enum.RaycastFilterType.Whitelist
+				local raycastParams = RaycastParams.new()
+				raycastParams.FilterDescendantsInstances = { p12 }
+				raycastParams.FilterType = Enum.RaycastFilterType.Whitelist
 				local PrimaryPart = p1._obj.PrimaryPart
-				local v2 = closestPointToPart(PrimaryPart.Position, p12) - PrimaryPart.Position
-				local v3 = workspace:Raycast(PrimaryPart.Position - v2.Unit * 5, v2.Unit * 10, v1)
-				local v4
-				if v3 then
-					PrimaryPart.CFrame = CFrame.new(Vector3.new(), v3.Normal) * CFrame.Angles(0, 0, math.random() * 2 * math.pi) + v3.Position
-					v4 = PrimaryPart.CFrame:ToObjectSpace(p12.CFrame)
+				local raycastOffset = closestPointToPart(PrimaryPart.Position, p12) - PrimaryPart.Position
+				local raycastResult = workspace:Raycast(PrimaryPart.Position - raycastOffset.Unit * 5, raycastOffset.Unit * 10, raycastParams)
+				local objectCFrameOffset
+				if raycastResult then
+					PrimaryPart.CFrame = CFrame.new(Vector3.new(), raycastResult.Normal) * CFrame.Angles(0, 0, math.random() * 2 * math.pi) + raycastResult.Position
+					objectCFrameOffset = PrimaryPart.CFrame:ToObjectSpace(p12.CFrame)
 				else
-					v4 = PrimaryPart.CFrame:ToObjectSpace(p12.CFrame)
+					objectCFrameOffset = PrimaryPart.CFrame:ToObjectSpace(p12.CFrame)
 				end
 				local Anchored = p12.Anchored
 				if Anchored then
@@ -119,7 +120,7 @@ function t.ListenForAttach(p1)
 						WeldConstraint:Destroy()
 					end)
 				end
-				p1._stickRemote:FireServer(p12, v4)
+				p1._stickRemote:FireServer(p12, objectCFrameOffset)
 			end
 		end)
 	end

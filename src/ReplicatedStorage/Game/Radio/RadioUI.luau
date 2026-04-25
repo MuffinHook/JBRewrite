@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local RadioConfig = require(script.Parent.RadioConfig)
@@ -7,20 +8,20 @@ local RadioPlayer = require(script.Parent.RadioPlayer)
 local RadioUtils = require(script.Parent.RadioUtils)
 local Slider = require(script.Parent.Slider)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
-local t = {}
-t.__index = t
-function t.new(p1)
-	assert(p1)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.Gui = p1
-	t2.Maid = Maid.new()
-	t2:ConnectPlayer()
-	t2:ConnectStations()
-	t2.Gui.Enabled = true
-	return t2
+local RadioUI = {}
+RadioUI.__index = RadioUI
+function RadioUI.new(guiElement)
+	assert(guiElement)
+	local radioUiInstance = {}
+	setmetatable(radioUiInstance, RadioUI)
+	radioUiInstance.Gui = guiElement
+	radioUiInstance.Maid = Maid.new()
+	radioUiInstance:ConnectPlayer()
+	radioUiInstance:ConnectStations()
+	radioUiInstance.Gui.Enabled = true
+	return radioUiInstance
 end
-function t.ConnectPlayer(p1)
+function RadioUI.ConnectPlayer(p1)
 	local Player = p1.Gui.Container.Player
 	local TextBox = Player.Left.SongId.TextBox
 	p1.Maid:GiveTask(TextBox:GetPropertyChangedSignal("Text"):Connect(function()
@@ -44,22 +45,22 @@ function t.ConnectPlayer(p1)
 	p1.Maid:GiveTask(RadioPlayer.OnSongEnded:Connect(function()
 		p1:UpdatePlayButton()
 	end))
-	local v1 = Slider.new(Player.Right.SliderBass)
-	p1.Maid:GiveTask(v1)
-	v1.OnValueChanged:Connect(function(p1)
-		RadioConfig.Bass = p1
-		RadioPlayer.SetBass(p1)
+	local bassSlider = Slider.new(Player.Right.SliderBass)
+	p1.Maid:GiveTask(bassSlider)
+	bassSlider.OnValueChanged:Connect(function(bassValue)
+		RadioConfig.Bass = bassValue
+		RadioPlayer.SetBass(bassValue)
 	end)
-	v1:SetValue(RadioConfig.Bass)
-	local v2 = Slider.new(Player.Right.SliderVolume)
-	v2.OnValueChanged:Connect(function(p1)
-		RadioConfig.Volume = p1
-		RadioPlayer.SetVolume(p1)
+	bassSlider:SetValue(RadioConfig.Bass)
+	local volumeSlider = Slider.new(Player.Right.SliderVolume)
+	volumeSlider.OnValueChanged:Connect(function(volumeValue)
+		RadioConfig.Volume = volumeValue
+		RadioPlayer.SetVolume(volumeValue)
 	end)
-	v2:SetValue(RadioConfig.Volume)
-	p1.Maid:GiveTask(v2)
+	volumeSlider:SetValue(RadioConfig.Volume)
+	p1.Maid:GiveTask(volumeSlider)
 end
-function t.ConnectStations(p1)
+function RadioUI.ConnectStations(p1)
 	for i, v in ipairs(p1.Gui.Container.Stations.ContainerStations:GetChildren()) do
 		if v:IsA("Frame") then
 			p1.Maid:GiveTask(v.Button.MouseButton1Down:Connect(function()
@@ -74,7 +75,7 @@ function t.ConnectStations(p1)
 		p1:OpenSidebar(RadioConfig.Playlist)
 	end
 end
-function t.OpenSidebar(p1, p2)
+function RadioUI.OpenSidebar(p1, p2)
 	if p1.mRadioList ~= nil then
 		p1.mRadioList:Destroy()
 		p1.mRadioList = nil
@@ -85,32 +86,32 @@ function t.OpenSidebar(p1, p2)
 		p1:OpenSidebar(p2)
 	end))
 end
-function t.StopSong(p1)
+function RadioUI.StopSong(p1)
 	RadioPlayer.Stop()
 end
-function t.PlayCustomSong(p1)
-	local v1 = tonumber(p1.Gui.Container.Player.Left.SongId.TextBox.Text)
-	if v1 == nil and RadioConfig.Playlist ~= nil then
+function RadioUI.PlayCustomSong(p1)
+	local songId = tonumber(p1.Gui.Container.Player.Left.SongId.TextBox.Text)
+	if songId == nil and RadioConfig.Playlist ~= nil then
 		RadioPlayer.PlayRandomSongAfter = true
 		RadioPlayer.PlayRandomSong()
 	else
-		assert(v1)
+		assert(songId)
 		if not RadioUtils.CheckOrPromptStereoGamepass() then
 			return false
 		end
-		local v2 = VehicleUtils.GetLocalVehiclePacket()
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
 		RadioPlayer.PlayRandomSongAfter = true
-		local v4 = RadioPlayer.IsPlayingThirdPerson()
-		if not v4 then
-			v4 = if v2 == nil then false else not v2.Passenger
+		local isThirdPerson = RadioPlayer.IsPlayingThirdPerson()
+		if not isThirdPerson then
+			isThirdPerson = if vehiclePacket == nil then false else not vehiclePacket.Passenger
 		end
-		RadioPlayer.PlayId(v1, nil, v4)
+		RadioPlayer.PlayId(songId, nil, isThirdPerson)
 	end
 end
-function t.UpdatePlayButton(p1)
+function RadioUI.UpdatePlayButton(p1)
 	p1.Gui.Container.Player.Left.Toggle.TextLabel.Text = if RadioPlayer.IsPlaying() then "PAUSE" else "PLAY"
 end
-function t.Destroy(p1)
+function RadioUI.Destroy(p1)
 	p1.Gui.Enabled = false
 	p1.Gui = nil
 	if p1.mRadioList then
@@ -120,4 +121,4 @@ function t.Destroy(p1)
 	p1.Maid:Destroy()
 	p1.Maid = nil
 end
-return t
+return RadioUI

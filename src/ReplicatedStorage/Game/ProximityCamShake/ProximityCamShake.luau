@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
@@ -10,74 +11,74 @@ local Promise = require(ReplicatedStorage.Std.Promise)
 local CamShaker = require(ReplicatedStorage.Game.CamShaker.CamShaker)
 local CameraShakeInstance = require(ReplicatedStorage.Game.CamShaker.CameraShakeInstance)
 local ProximityCamShakeConsts = require(script.Parent.ProximityCamShakeConsts)
-local v1 = Random.new()
-local function Ease_InOutQuad(p1)
-	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
+local randomGenerator = Random.new()
+local function Ease_InOutQuad(progress)
+	return progress < 0.5 and 2 * progress * progress or -1 - 2 * (progress - 2) * progress
 end
-local t = {}
-t.__index = t
+local ProximityCamShakeClass = {}
+ProximityCamShakeClass.__index = ProximityCamShakeClass
 local function makeCamShakeInst()
-	local v1 = CameraShakeInstance.new(2, 6, 1, 1)
-	v1.PositionInfluence = Vector3.new(0.25, 0.25, 0.25)
-	v1.RotationInfluence = Vector3.new(1, 1, 1)
-	return v1
+	local cameraShakeInstance = CameraShakeInstance.new(2, 6, 1, 1)
+	cameraShakeInstance.PositionInfluence = Vector3.new(0.25, 0.25, 0.25)
+	cameraShakeInstance.RotationInfluence = Vector3.new(1, 1, 1)
+	return cameraShakeInstance
 end
-function t.new(p1)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._maid = Maid.new()
-	if not p1:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
-		p1:SetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME, false)
+function ProximityCamShakeClass.new(targetObject)
+	local instance = {}
+	setmetatable(instance, ProximityCamShakeClass)
+	instance._maid = Maid.new()
+	if not targetObject:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
+		targetObject:SetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME, false)
 	end
-	if not p1:GetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME) then
-		p1:SetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME, 32)
+	if not targetObject:GetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME) then
+		targetObject:SetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME, 32)
 	end
-	if not p1:GetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME) then
-		p1:SetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME, 1)
+	if not targetObject:GetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME) then
+		targetObject:SetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME, 1)
 	end
 	local function updateEnabled()
-		if p1:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
-			t2:Listen(p1)
+		if targetObject:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
+			instance:Listen(targetObject)
 		else
-			t2._maid._listenLoop = nil
+			instance._maid._listenLoop = nil
 		end
 	end
-	t2._maid:GiveTask(p1:GetAttributeChangedSignal(ProximityCamShakeConsts.ENABLED_ATTR_NAME):Connect(updateEnabled))
-	if p1:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
-		t2:Listen(p1)
+	instance._maid:GiveTask(targetObject:GetAttributeChangedSignal(ProximityCamShakeConsts.ENABLED_ATTR_NAME):Connect(updateEnabled))
+	if targetObject:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
+		instance:Listen(targetObject)
 	else
-		t2._maid._listenLoop = nil
+		instance._maid._listenLoop = nil
 	end
-	return t2
+	return instance
 end
-function t.Listen(p1, p2)
-	p1._maid._listenLoop = Interval.every(0.5):Connect(function()
-		local v1 = PlayerUtils.getRootPart(LocalPlayer)
-		if v1 and ((v1.Position - p2.Position).Magnitude / p2:GetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME) <= 1 and not p1._maid._camUpdater) then
-			p1:StartUpdater(p2)
+function ProximityCamShakeClass.Listen(self, targetObject)
+	self._maid._listenLoop = Interval.every(0.5):Connect(function()
+		local rootPart = PlayerUtils.getRootPart(LocalPlayer)
+		if rootPart and ((rootPart.Position - targetObject.Position).Magnitude / targetObject:GetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME) <= 1 and not self._maid._camUpdater) then
+			self:StartUpdater(targetObject)
 		end
 	end)
 end
-function t.StartUpdater(p1, p2)
-	local v12 = Enum.RenderPriority.Camera.Value + 5
+function ProximityCamShakeClass.StartUpdater(self, targetObject)
+	local renderPriority = Enum.RenderPriority.Camera.Value + 5
 	local v2 = CurrentCamera.CFrame
-	local v3 = CamShaker.new(v12, function(p1)
+	local camShaker = CamShaker.new(renderPriority, function(p1)
 		v2 = CurrentCamera.CFrame
 		CurrentCamera.CFrame = CurrentCamera.CFrame * p1
 	end)
 	local v4 = RunService.Heartbeat:Connect(function()
 		CurrentCamera.CFrame = v2
 	end)
-	v3._renderName = "ProximityCamShake_" .. tostring((v1:NextInteger(1, 1000000000)))
-	v3:Start()
-	local v6 = CameraShakeInstance.new(2, 6, 1, 1)
-	v6.PositionInfluence = Vector3.new(0.25, 0.25, 0.25)
-	v6.RotationInfluence = Vector3.new(1, 1, 1)
-	local v7 = v3:ShakeSustain(v6)
-	p1._maid._camUpdater = RunService.Heartbeat:Connect(function()
-		local v2 = (CurrentCamera.CFrame.Position - p2.Position).Magnitude / p2:GetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME)
-		if v2 > 1 or not p2:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
-			p1._maid._stop = nil
+	camShaker._renderName = "ProximityCamShake_" .. tostring((randomGenerator:NextInteger(1, 1000000000)))
+	camShaker:Start()
+	local shakeInstance = CameraShakeInstance.new(2, 6, 1, 1)
+	shakeInstance.PositionInfluence = Vector3.new(0.25, 0.25, 0.25)
+	shakeInstance.RotationInfluence = Vector3.new(1, 1, 1)
+	local shakeSustain = camShaker:ShakeSustain(shakeInstance)
+	self._maid._camUpdater = RunService.Heartbeat:Connect(function()
+		local v2 = (CurrentCamera.CFrame.Position - targetObject.Position).Magnitude / targetObject:GetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME)
+		if v2 > 1 or not targetObject:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
+			self._maid._stop = nil
 		else
 			local v3 = 1 - v2
 			local v4, v5
@@ -91,23 +92,23 @@ function t.StartUpdater(p1, p2)
 				v5 = v3
 				v4 = -1 - 2 * (v3 - 2) * v3
 			end
-			v7:SetScaleMagnitude(v4 * p2:GetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME))
+			shakeSustain:SetScaleMagnitude(v4 * targetObject:GetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME))
 		end
 	end)
-	function p1._maid._stop()
-		v7:StartFadeOut(1)
+	function self._maid._stop()
+		shakeSustain:StartFadeOut(1)
 		Promise.delay(1):andThen(function()
-			v3:Stop()
+			camShaker:Stop()
 			v4:Disconnect()
 		end):catch(warn)
-		if p1._maid then
-			p1._maid._camUpdater = nil
+		if self._maid then
+			self._maid._camUpdater = nil
 		end
 	end
 end
-function t.Destroy(p1)
-	local _maid = p1._maid
-	p1._maid = nil
+function ProximityCamShakeClass.Destroy(self)
+	local _maid = self._maid
+	self._maid = nil
 	_maid:Destroy()
 end
-return t
+return ProximityCamShakeClass

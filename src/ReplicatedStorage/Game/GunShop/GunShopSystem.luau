@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
@@ -13,39 +14,39 @@ local t = {
 	itemsValue = nil
 }
 function t.init()
-	waitForChild(LocalPlayer, GunShopConsts.ITEMS_VALUE_NAME):andThen(function(p1)
-		t.itemsValue = p1
-		p1.ChildAdded:Connect(function(p1)
-			t.onAnyOwned:Fire(p1.Name)
+	waitForChild(LocalPlayer, GunShopConsts.ITEMS_VALUE_NAME):andThen(function(itemsValueChild)
+		t.itemsValue = itemsValueChild
+		itemsValueChild.ChildAdded:Connect(function(child)
+			t.onAnyOwned:Fire(child.Name)
 		end)
 	end):catch(warn)
 	local GunShopUI = require(script.Parent.GunShopUI)
-	local v1 = Region.new(RegionUtils.ConditionPlayer)
-	v1.OnObjAdded:Connect(function()
+	local playerRegion = Region.new(RegionUtils.ConditionPlayer)
+	playerRegion.OnObjAdded:Connect(function()
 		if not GunShopUI.isOpen() then
 			GunShopUI.open()
 		end
 	end)
-	v1.OnObjRemoved:Connect(function()
+	playerRegion.OnObjRemoved:Connect(function()
 		if GunShopUI.isOpen() then
 			GunShopUI.close()
 		end
 	end)
 	local function updatePrisms()
-		v1.Prisms = {}
+		playerRegion.Prisms = {}
 		for i, v in ipairs(CollectionService:GetTagged("GunShopRegion")) do
-			v1:AddPart(v)
+			playerRegion:AddPart(v)
 		end
 	end
 	updatePrisms()
 	CollectionService:GetInstanceAddedSignal("GunShopRegion"):Connect(updatePrisms)
 	CollectionService:GetInstanceRemovedSignal("GunShopRegion"):Connect(updatePrisms)
-	local v2 = tick()
+	local lastUpdateTime = tick()
 	RunService.Heartbeat:Connect(function()
-		local v12 = tick()
-		if not (v12 - v2 < 0.5) then
-			v2 = v12
-			v1:Update({ LocalPlayer }, true)
+		local currentTime = tick()
+		if not (currentTime - lastUpdateTime < 0.5) then
+			lastUpdateTime = currentTime
+			playerRegion:Update({ LocalPlayer }, true)
 		end
 	end)
 end

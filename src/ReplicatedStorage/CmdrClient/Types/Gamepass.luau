@@ -1,14 +1,15 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Util = require(ReplicatedStorage.CmdrClient.Shared.Util)
-local t = {}
+local gamepassTitles = {}
 for v1, v2 in require(ReplicatedStorage.Gamepass.GamepassData) do
-	table.insert(t, v2.Title)
+	table.insert(gamepassTitles, v2.Title)
 end
-local v3 = Util.MakeFuzzyFinder(t)
-local t2 = {
+local gamepassFinder = Util.MakeFuzzyFinder(gamepassTitles)
+local gamepassType = {
 	Transform = function(p1)
-		return v3(p1)
+		return gamepassFinder(p1)
 	end,
 	Validate = function(p1)
 		return #p1 > 0, "No valid robbery with that name could be found."
@@ -21,5 +22,5 @@ local t2 = {
 	end
 }
 return function(p1)
-	p1:RegisterType("gamepass", t2)
+	p1:RegisterType("gamepass", gamepassType)
 end

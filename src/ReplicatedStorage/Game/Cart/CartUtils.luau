@@ -1,44 +1,45 @@
 -- Reviewed by Claude
+-- variables reassigned
 return {
 	computeRail = function(p1, p2)
-		local t = {
+		local visitedRails = {
 			[p1] = true,
 			[p2] = true
 		}
 		local list = { p1, p2 }
 		while true do
-			local v1, v2
-			local v3 = p2:FindFirstChild("_front").Value
-			local v4 = p2:FindFirstChild("_back").Value
-			v1 = p1 == v3
-			v2 = if v1 and v4 then v4 else v3
-			if t[v2] then
+			local isFrontMatch, nextVector
+			local frontVector = p2:FindFirstChild("_front").Value
+			local backVector = p2:FindFirstChild("_back").Value
+			isFrontMatch = p1 == frontVector
+			nextVector = if isFrontMatch and backVector then backVector else frontVector
+			if visitedRails[nextVector] then
 				local sum = 0
-				local t2 = {}
+				local segmentLengths = {}
 				for i, v in ipairs(list) do
 					local Z = v.Size.Z
-					table.insert(t2, Z)
+					table.insert(segmentLengths, Z)
 					sum = sum + Z
 				end
-				local t3 = {}
+				local directionCache = {}
 				for i = 1, #list do
-					local v5
-					local v6 = list[i]
-					local v7 = list[(i - 1 + 1) % #list + 1]
-					local v8 = v6:FindFirstChild("_front").Value
-					v5 = if v7 == v8 then v6.CFrame.LookVector elseif v7 == v6:FindFirstChild("_back").Value then -v6.CFrame.LookVector else Vector3.new(0, 1, 0)
-					table.insert(t3, v5)
+					local segmentDirection
+					local currentSegment = list[i]
+					local previousSegment = list[(i - 1 + 1) % #list + 1]
+					local currentFrontVector = currentSegment:FindFirstChild("_front").Value
+					segmentDirection = if previousSegment == currentFrontVector then currentSegment.CFrame.LookVector elseif previousSegment == currentSegment:FindFirstChild("_back").Value then -currentSegment.CFrame.LookVector else Vector3.new(0, 1, 0)
+					table.insert(directionCache, segmentDirection)
 				end
 				return {
 					listSegment = list,
-					lengthCache = t2,
+					lengthCache = segmentLengths,
 					totalLength = sum,
-					directionCache = t3
+					directionCache = directionCache
 				}
 			end
-			t[v2] = true
-			table.insert(list, v2)
-			p2, p1 = v2, p2
+			visitedRails[nextVector] = true
+			table.insert(list, nextVector)
+			p2, p1 = nextVector, p2
 		end
 	end,
 	calculateSegment = function(p1, p2)

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local CurrentCamera = workspace.CurrentCamera
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
@@ -14,7 +15,7 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 require(ReplicatedStorage.Std.Raycast)
 local Spring = require(ReplicatedStorage.Std.Spring)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
-local v1 = nil
+local PlayerModule = nil
 Vector3.new()
 local function v2(p1)
 	local sum = 0
@@ -26,17 +27,17 @@ local function v2(p1)
 	end
 	return sum
 end
-local v3 = CFrame.new()
+local IdentityCFrame = CFrame.new()
 local function FromAxisAngle(p1)
 	local x = p1.x
 	local y = p1.y
 	local z = p1.z
-	local v1 = (x * x + y * y + z * z) ^ 0.5
-	if v1 > 0.00001 then
-		local v2 = math.sin(v1 * 0.5) / v1
-		return CFrame.new(0, 0, 0, v2 * x, v2 * y, v2 * z, (math.cos(v1 * 0.5)))
+	local magnitude = (x * x + y * y + z * z) ^ 0.5
+	if magnitude > 0.00001 then
+		local sinHalf = math.sin(magnitude * 0.5) / magnitude
+		return CFrame.new(0, 0, 0, sinHalf * x, sinHalf * y, sinHalf * z, (math.cos(magnitude * 0.5)))
 	else
-		return v3
+		return IdentityCFrame
 	end
 end
 local t = {
@@ -44,7 +45,7 @@ local t = {
 }
 t.__index = t
 function t.Init()
-	v1 = require(LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"))
+	PlayerModule = require(LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"))
 end
 function t.new(p1, p2)
 	local t2 = {}
@@ -61,13 +62,13 @@ function t.new(p1, p2)
 	t2.Force = t2.PartBase.VectorForce
 	t2.AlignOrientation = t2.PartBase.AlignOrientation
 	t2:SetupSeats()
-	local v2 = false
+	local wasPopped = false
 	t2.maid:GiveTask(Interval.every(0.1):Connect(function()
-		local v1 = t2:GetAreTiresPopped()
-		if v1 ~= v2 then
-			t2.Model:FindFirstChild("Visual"):FindFirstChild("Body"):FindFirstChild("Smoke").Enabled = v1
+		local areTiresPoppped = t2:GetAreTiresPopped()
+		if areTiresPoppped ~= wasPopped then
+			t2.Model:FindFirstChild("Visual"):FindFirstChild("Body"):FindFirstChild("Smoke").Enabled = areTiresPoppped
 		end
-		v2 = v1
+		wasPopped = areTiresPoppped
 	end))
 	return t2
 end
@@ -145,44 +146,44 @@ function t.UpdateCharacterJoints(p1, p2)
 	ConstraintUtils.setJointC0(p2.JointWaist, p2.JointWaistC0 * FromAxisAngle((p2.SpringWaistRotation:Update())))
 	ConstraintUtils.setJointC0(p2.JointNeck, p2.JointNeckC0 * FromAxisAngle((p2.SpringNeckRotation:Update())))
 end
-local t2 = {
+local KeyCodeMap = {
 	[Enum.KeyCode.A] = 2,
 	[Enum.KeyCode.D] = 4,
 	[Enum.KeyCode.ButtonR2] = 1,
 	[Enum.KeyCode.ButtonL2] = 3
 }
 function t.UpdateInput(p1)
-	local v12 = p1.WASD[1] - p1.WASD[3]
-	local v2 = p1.WASD[2] - p1.WASD[4]
+	local horizontalInput = p1.WASD[1] - p1.WASD[3]
+	local verticalInput = p1.WASD[2] - p1.WASD[4]
 	if InputUtils.isTouch() then
-		local X = v1:GetControls():GetMoveVector().X
-		local v3 = math.clamp(X, -1, 1)
-		v2 = -v3 * math.abs(v3)
+		local X = PlayerModule:GetControls():GetMoveVector().X
+		local clampedX = math.clamp(X, -1, 1)
+		verticalInput = -clampedX * math.abs(clampedX)
 	end
-	p1.Forward = v12
-	p1.Heading = v2
-	p1.SpringForwardp = p1.SpringForward:SetTarget(v12)
-	p1.SpringHeadingp = p1.SpringHeading:SetTarget(v2)
+	p1.Forward = horizontalInput
+	p1.Heading = verticalInput
+	p1.SpringForwardp = p1.SpringForward:SetTarget(horizontalInput)
+	p1.SpringHeadingp = p1.SpringHeading:SetTarget(verticalInput)
 	p1.SpringAccelp = p1.SpringAccel:SetTarget(p1.Forward)
 end
 function t.UpdateThirdInput(p1)
 	error("TODO: Implement")
 end
 function t.CalculateSway(p1)
-	local v1 = tick() - p1.BornAt
-	local v2 = -125925.51356 + p1.BornAt
-	local v3 = -51235.65816 + p1.BornAt
-	local v4 = math.cos(v1 * 1.1 + v2) * 0.1 * (0.5 * (1 - p1.SpringForwardp) + 0.5) + math.noise(v1, v2) * 0.05
-	local v5 = math.abs(p1.SpringForwardp)
-	p1.SwayX = v4 * (1 - v5)
-	p1.SwayY = (math.sin(v1 * 0.8 + v3) * 0.4 + math.noise(v1, v3) * 0.1) * (1 - v5)
+	local elapsedTime = tick() - p1.BornAt
+	local swayOffset1 = -125925.51356 + p1.BornAt
+	local swayOffset2 = -51235.65816 + p1.BornAt
+	local swayX = math.cos(elapsedTime * 1.1 + swayOffset1) * 0.1 * (0.5 * (1 - p1.SpringForwardp) + 0.5) + math.noise(elapsedTime, swayOffset1) * 0.05
+	local forwardMagnitude = math.abs(p1.SpringForwardp)
+	p1.SwayX = swayX * (1 - forwardMagnitude)
+	p1.SwayY = (math.sin(elapsedTime * 0.8 + swayOffset2) * 0.4 + math.noise(elapsedTime, swayOffset2) * 0.1) * (1 - forwardMagnitude)
 end
 function t.GetAreTiresPopped(p1)
-	local v1 = p1.Model:GetAttribute(BoatConsts.TIRES_POPPED_AT_ATTR_NAME) or 0
-	return v1 + VehicleUtils.getVehicleCombatConfig(p1.Model.Name).DisableDuration > workspace:GetServerTimeNow()
+	local tiresPoppedAt = p1.Model:GetAttribute(BoatConsts.TIRES_POPPED_AT_ATTR_NAME) or 0
+	return tiresPoppedAt + VehicleUtils.getVehicleCombatConfig(p1.Model.Name).DisableDuration > workspace:GetServerTimeNow()
 end
 function t.UpdatePhysics(p1)
-	local v1 = p1:GetAreTiresPopped()
+	local areTiresPopped = p1:GetAreTiresPopped()
 	local BuoyancySensor = p1.BuoyancySensor
 	if not BuoyancySensor then
 		local BuoyancySensor_2 = Instance.new("BuoyancySensor")
@@ -193,21 +194,21 @@ function t.UpdatePhysics(p1)
 	end
 	local TouchingSurface = BuoyancySensor.TouchingSurface
 	p1.AlignOrientation.Enabled = TouchingSurface
-	local v2 = p1.PartBase.CFrame
-	local v3 = v2:VectorToObjectSpace(p1.PartBase.Velocity)
-	local v6 = Vector3.new(0, 0, -p1.SpringAccelp * if p1.SpringAccelp > 0 then p1.Config.SpeedForward else p1.Config.SpeedForward * 0.5)
-	if v1 then
-		v6 = v6 * 0.05
+	local baseCFrame = p1.PartBase.CFrame
+	local localVelocity = baseCFrame:VectorToObjectSpace(p1.PartBase.Velocity)
+	local forceVector = Vector3.new(0, 0, -p1.SpringAccelp * if p1.SpringAccelp > 0 then p1.Config.SpeedForward else p1.Config.SpeedForward * 0.5)
+	if areTiresPopped then
+		forceVector = forceVector * 0.05
 	end
 	if not TouchingSurface then
-		v6 = v6 * 0.25
+		forceVector = forceVector * 0.25
 	end
-	p1.Force.Force = v6 * p1.PartBase.AssemblyMass * 10 + -Vector3.new(v3.X * 3, 0, v3.Z * (p1.Config.FrictionFwd or 0.05) + v3.Z * math.abs(v3.Z) * 0.001) * p1.PartBase.AssemblyMass
-	local v13 = math.clamp(-v2:VectorToObjectSpace(p1.PartBase.RotVelocity).Y / 0.5, -1, 1)
-	local v15 = math.clamp(-v3.z / 80, -1, 1) * 0.8 + p1.SpringAccelp * 0.2
-	local v24 = math.clamp(1 - (p1.Config.TurnCurveCoeff or 1) * math.sqrt((math.clamp((math.abs(-v3.Z) - 100) / 800, 0, 1))), 0.05, 1) * (p1.SpringHeadingp * math.pi * p1.Config.MaximumTurnAngle) * 0.25
-	local v25 = CFrame.new
-	p1.AlignOrientation.CFrame = v25(Vector3.new(0, 0, 0), Vector3.new(v2.LookVector.X, 0, v2.LookVector.Z).Unit) * CFrame.Angles(0, 0, (v13 + p1.SwayY) * math.pi * 0.03) * CFrame.Angles((v15 + p1.SwayX) * math.pi * 0.02, 0, 0) * CFrame.Angles(0, v24, 0) + v2.p
+	p1.Force.Force = forceVector * p1.PartBase.AssemblyMass * 10 + -Vector3.new(localVelocity.X * 3, 0, localVelocity.Z * (p1.Config.FrictionFwd or 0.05) + localVelocity.Z * math.abs(localVelocity.Z) * 0.001) * p1.PartBase.AssemblyMass
+	local rotationInput = math.clamp(-baseCFrame:VectorToObjectSpace(p1.PartBase.RotVelocity).Y / 0.5, -1, 1)
+	local pitchInput = math.clamp(-localVelocity.z / 80, -1, 1) * 0.8 + p1.SpringAccelp * 0.2
+	local yawAngle = math.clamp(1 - (p1.Config.TurnCurveCoeff or 1) * math.sqrt((math.clamp((math.abs(-localVelocity.Z) - 100) / 800, 0, 1))), 0.05, 1) * (p1.SpringHeadingp * math.pi * p1.Config.MaximumTurnAngle) * 0.25
+	local CFrameNew = CFrame.new
+	p1.AlignOrientation.CFrame = CFrameNew(Vector3.new(0, 0, 0), Vector3.new(baseCFrame.LookVector.X, 0, baseCFrame.LookVector.Z).Unit) * CFrame.Angles(0, 0, (rotationInput + p1.SwayY) * math.pi * 0.03) * CFrame.Angles((pitchInput + p1.SwayX) * math.pi * 0.02, 0, 0) * CFrame.Angles(0, yawAngle, 0) + baseCFrame.p
 end
 function t.HeartbeatDriver(p1, p2)
 	assert(p2 ~= nil)
@@ -228,8 +229,8 @@ function t.SetupLocalDriverInputs(p1, p2)
 		if p2 then
 			return true
 		end
-		if p12.UserInputType == Enum.UserInputType.Keyboard and t2[p12.KeyCode] then
-			p1.WASD[t2[p12.KeyCode]] = 1
+		if p12.UserInputType == Enum.UserInputType.Keyboard and KeyCodeMap[p12.KeyCode] then
+			p1.WASD[KeyCodeMap[p12.KeyCode]] = 1
 		end
 	end
 	p2.Maid:GiveTask(UserInputService.InputBegan:Connect(InputBegan))
@@ -237,8 +238,8 @@ function t.SetupLocalDriverInputs(p1, p2)
 		if p2 then
 			return true
 		end
-		if p12.UserInputType == Enum.UserInputType.Keyboard and t2[p12.KeyCode] then
-			p1.WASD[t2[p12.KeyCode]] = 0
+		if p12.UserInputType == Enum.UserInputType.Keyboard and KeyCodeMap[p12.KeyCode] then
+			p1.WASD[KeyCodeMap[p12.KeyCode]] = 0
 		end
 	end
 	p2.Maid:GiveTask(UserInputService.InputEnded:Connect(InputEnded))
@@ -253,7 +254,7 @@ function t.SetupLocalDriverInputs(p1, p2)
 				p1.WASD[4] = X > 0.24 and X ^ 2 or 0
 			elseif KeyCode == Enum.KeyCode.ButtonR2 or KeyCode == Enum.KeyCode.ButtonL2 then
 				local Z = p12.Position.Z
-				p1.WASD[t2[KeyCode]] = Z > 0.05 and Z ^ 0.5 or 0
+				p1.WASD[KeyCodeMap[KeyCode]] = Z > 0.05 and Z ^ 0.5 or 0
 			end
 		end
 	end

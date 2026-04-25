@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
 	Items = {
@@ -28,17 +29,17 @@ return {
 			Price = 50000
 		}
 	},
-	GetInstance = function(p1)
-		local v1 = ReplicatedStorage.Resource.Engine:FindFirstChild(p1.Name)
-		if not v1 then
-			error("No Engine named: " .. p1.Name)
+	GetInstance = function(engineConfig)
+		local engineInstance = ReplicatedStorage.Resource.Engine:FindFirstChild(engineConfig.Name)
+		if not engineInstance then
+			error("No Engine named: " .. engineConfig.Name)
 		end
-		local v2 = v1:Clone()
-		v2.CFrame = CFrame.new(0, 0, 0)
-		return v2
+		local clonedEngine = engineInstance:Clone()
+		clonedEngine.CFrame = CFrame.new(0, 0, 0)
+		return clonedEngine
 	end,
-	Update = function(p1, p2)
-		local v1 = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.1 - 0.3, 0, 0) * CFrame.new(0, 0, p2.Size.Magnitude)
+	Update = function(engine, config)
+		local elapsedTime = os.clock() / 2
+		engine.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.1 - 0.3, 0, 0) * CFrame.new(0, 0, config.Size.Magnitude)
 	end
 }

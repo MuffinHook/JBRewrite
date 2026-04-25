@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -20,33 +21,33 @@ function t.new(p1, p2)
 	return table2
 end
 local var3 = Vector3.new()
-local cframe4 = CFrame.Angles(0, math.pi, 0)
+local bombRotationOffset = CFrame.Angles(0, math.pi, 0)
 function t.Animate(p1, p2)
-	local var22 = p2 or table2.GetNowSync()
-	local var32 = var22
+	local elapsedTime = p2 or table2.GetNowSync()
+	local lastFrameTime = elapsedTime
 	local function Heartbeat()
-		local instance = table2.GetNowSync()
-		local var23 = instance - var22
-		local var33 = instance - var32
-		var32 = instance
-		local vector42 = p1.v0 * var23 + Vector3.new(0, -98.10000000000001 * var23 * var23, 0)
-		p1.Model.Rocket.CFrame = CFrame.new(var3, (p1.p0.LookVector:Lerp(Vector3.new(0, -1, 0), (math.min(1, var23 * 1.3333333333333333))))) * cframe4 + p1.p0.p + vector42
-		if var23 - var33 < 0.3 and var23 > 0.3 then
+		local currentTime = table2.GetNowSync()
+		local deltaTime = currentTime - elapsedTime
+		local frameDelta = currentTime - lastFrameTime
+		lastFrameTime = currentTime
+		local velocityVector = p1.v0 * deltaTime + Vector3.new(0, -98.10000000000001 * deltaTime * deltaTime, 0)
+		p1.Model.Rocket.CFrame = CFrame.new(var3, (p1.p0.LookVector:Lerp(Vector3.new(0, -1, 0), (math.min(1, deltaTime * 1.3333333333333333))))) * bombRotationOffset + p1.p0.p + velocityVector
+		if deltaTime - frameDelta < 0.3 and deltaTime > 0.3 then
 			p1.Model.Fire.Particle.Enabled = true
 		end
-		if var23 > 0.3 then
-			local v8, v9 = RayCast.RayIgnoreNonCollide(p1.p0.p + vector42, Vector3.new(0, -1, 0), math.abs(p1.v0.Y + -196.20000000000002 * var23) * var33, p1.Model)
+		if deltaTime > 0.3 then
+			local v8, v9 = RayCast.RayIgnoreNonCollide(p1.p0.p + velocityVector, Vector3.new(0, -1, 0), math.abs(p1.v0.Y + -196.20000000000002 * deltaTime) * frameDelta, p1.Model)
 			if v8 then
 				p1:Explode(v9)
 			end
 		end
-		if var23 > 5 and not p1.Exploded then
+		if deltaTime > 5 and not p1.Exploded then
 			p1:Destroy()
 		end
 	end
 	p1.Runtime = RunService.Heartbeat:Connect(Heartbeat)
 end
-local var5 = nil
+local eventRemote = nil
 function t.Explode(p1, p2)
 	p1.Exploded = true
 	delay(2, function()
@@ -80,10 +81,10 @@ function t.Explode(p1, p2)
 					RootPart.Velocity = RootPart.Velocity + instance.Unit * var3 * 30
 					if p1._owner then
 						print(p1._owner)
-						var5:FireServer("x" .. ("oo9w30"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "41csnt", var3 * 50, p1._owner, "Bomb")
+						eventRemote:FireServer("x" .. ("oo9w30"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "41csnt", var3 * 50, p1._owner, "Bomb")
 						return
 					end
-					var5:FireServer("x" .. ("mcv6ee23"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("dkwkvfcpa"):sub(5, 5):reverse() .. "1us6", var3 * 50, "Explode")
+					eventRemote:FireServer("x" .. ("mcv6ee23"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("dkwkvfcpa"):sub(5, 5):reverse() .. "1us6", var3 * 50, "Explode")
 				end
 			end
 		end
@@ -106,7 +107,7 @@ local function DropBomb(p1, p2, p3, p4)
 end
 return {
 	Init = function(p1)
-		var5 = p1.Event
+		eventRemote = p1.Event
 		table2 = require(ReplicatedStorage.Module.Time)
 		instance = require(ReplicatedStorage.Std.Joint)
 	end,

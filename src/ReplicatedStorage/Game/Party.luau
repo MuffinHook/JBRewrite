@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local SoundService = game:GetService("SoundService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CollectionService = game:GetService("CollectionService")
@@ -7,24 +8,24 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local RunService = game:GetService("RunService")
 local Animation = Instance.new("Animation")
 Animation.AnimationId = "rbxassetid://3066265539"
-local v1 = nil
-local v2 = nil
-local v3 = Maid.new()
-local v4 = nil
-local v5 = false
+local animationTrack = nil
+local fireworksCallback = nil
+local maidCleaner = Maid.new()
+local partyModel = nil
+local partyActive = false
 local function PartyStart()
-	assert(not v5)
-	v5 = true
-	local v22 = tick()
-	local v32 = tick()
+	assert(not partyActive)
+	partyActive = true
+	local heartbeatCheckpoint = tick()
+	local secondCheckpoint = tick()
 	local function Heartbeat(p1)
-		local v1 = tick()
+		local currentTime = tick()
 		local v23 = CFrame.Angles(0, 0.3 * p1, 0)
-		local Disco = v4:FindFirstChild("Disco")
+		local Disco = partyModel:FindFirstChild("Disco")
 		if Disco then
-			local v3 = next
-			local v42, v5 = v4:GetChildren()
-			for v6, v7 in v3, v42, v5 do
+			local iterNext = next
+			local v42, v5 = partyModel:GetChildren()
+			for v6, v7 in iterNext, v42, v5 do
 				if v7.Name == "Laser" then
 					v7.CFrame = Disco.CFrame:toWorldSpace(v23 * Disco.CFrame:toObjectSpace(v7.CFrame))
 				end
@@ -32,20 +33,20 @@ local function PartyStart()
 			Disco.CFrame = Disco.CFrame * v23
 			Disco:FindFirstChild("Music").SoundGroup = SoundService.Music
 		end
-		local Cloud = v4:FindFirstChild("Cloud")
+		local Cloud = partyModel:FindFirstChild("Cloud")
 		if Cloud then
-			local v8 = Color3.fromHSV(math.cos(v1 * 0.1) * 0.5 + 0.5, 1, 1)
+			local discoColor = Color3.fromHSV(math.cos(currentTime * 0.1) * 0.5 + 0.5, 1, 1)
 			local v9 = next
 			local v10, v11 = Cloud:GetChildren()
 			for v12, v13 in v9, v10, v11 do
 				if v13:IsA("Decal") then
-					v13.Color3 = v8
+					v13.Color3 = discoColor
 				end
 			end
 		end
-		if v1 - v22 > 0.5 then
-			v22 = v1
-			local SmallDanceFloor = v4:FindFirstChild("SmallDanceFloor")
+		if currentTime - heartbeatCheckpoint > 0.5 then
+			heartbeatCheckpoint = currentTime
+			local SmallDanceFloor = partyModel:FindFirstChild("SmallDanceFloor")
 			if SmallDanceFloor then
 				local v14 = next
 				local v15, v16 = SmallDanceFloor:GetChildren()
@@ -56,49 +57,49 @@ local function PartyStart()
 				end
 			end
 		end
-		if v1 - v32 > 1 then
-			v32 = v1
-			v2(1)
+		if currentTime - secondCheckpoint > 1 then
+			secondCheckpoint = currentTime
+			fireworksCallback(1)
 		end
 	end
-	v3.Runtime = RunService.Heartbeat:Connect(Heartbeat)
+	maidCleaner.Runtime = RunService.Heartbeat:Connect(Heartbeat)
 	local Character = LocalPlayer.Character
 	if Character then
 		local Humanoid = Character:FindFirstChild("Humanoid")
 		if Humanoid then
-			v1 = Humanoid:LoadAnimation(Animation)
-			v1:Play()
+			animationTrack = Humanoid:LoadAnimation(Animation)
+			animationTrack:Play()
 		end
 	end
 end
 local function PartyEnd()
-	assert(v5)
-	v5 = false
-	v3:Destroy()
-	v1:Stop()
-	v1:Destroy()
-	v1 = nil
+	assert(partyActive)
+	partyActive = false
+	maidCleaner:Destroy()
+	animationTrack:Stop()
+	animationTrack:Destroy()
+	animationTrack = nil
 end
 local function AddedFun(p1)
-	v4 = p1
+	partyModel = p1
 	PartyStart()
 end
 local function RemovedFun(p1)
-	assert(v5)
-	v5 = false
-	v3:Destroy()
-	v1:Stop()
-	v1:Destroy()
-	v1 = nil
-	v4 = nil
+	assert(partyActive)
+	partyActive = false
+	maidCleaner:Destroy()
+	animationTrack:Stop()
+	animationTrack:Destroy()
+	animationTrack = nil
+	partyModel = nil
 end
 return {
 	Init = function(p1)
-		v2 = p1.Fireworks
+		fireworksCallback = p1.Fireworks
 		local v1 = next
 		local v22, v3 = CollectionService:GetTagged("PartyThemeModel")
 		for v42, v5 in v1, v22, v3 do
-			v4 = v5
+			partyModel = v5
 			PartyStart()
 		end
 		CollectionService:GetInstanceAddedSignal("PartyThemeModel"):Connect(AddedFun)

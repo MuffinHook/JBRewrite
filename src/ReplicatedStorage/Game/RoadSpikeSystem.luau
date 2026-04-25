@@ -1,17 +1,18 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Module.Time)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
-local v1 = nil
-local t = {}
-local function FromPart(p1)
+local spikeEvent = nil
+local spikeParts = {}
+local function FromPart(part)
 	return {
-		Part = p1
+		Part = part
 	}
 end
-local v2 = nil
+local previousPosition = nil
 local function Check()
 	local v12 = VehicleUtils.GetLocalVehiclePacket()
 	if v12 == nil then
@@ -21,16 +22,16 @@ local function Check()
 	elseif v12.Model:IsDescendantOf(workspace) then
 		local Position = v12.Model.PrimaryPart.Position
 		if v2 ~= nil then
-			for i, v in ipairs(t) do
+			for i, v in ipairs(spikeParts) do
 				local Part = v.Part
-				local v22 = Part.CFrame
-				local p = v22.p
-				local v3 = (v2 - p).Unit:Dot(v22.LookVector)
-				local v4 = (Position - p).Unit:Dot(v22.LookVector)
-				if math.sign(v3) ~= math.sign(v4) then
-					local v5 = (Position - p):Dot(v22.RightVector)
-					if math.abs(v5) <= Part.Size.X * 0.5 and math.abs(((Position - p):Dot(v22.UpVector))) < 16 then
-						v1:FireServer("a" .. ("cvqx0sn8"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("nwqycdqc"):sub(4, 5):reverse() .. "m8fr", Part)
+				local partCFrame = Part.CFrame
+				local partPosition = partCFrame.p
+				local prevDotProduct = (v2 - partPosition).Unit:Dot(partCFrame.LookVector)
+				local currentDotProduct = (Position - partPosition).Unit:Dot(partCFrame.LookVector)
+				if math.sign(prevDotProduct) ~= math.sign(currentDotProduct) then
+					local crossAxisDot = (Position - partPosition):Dot(partCFrame.RightVector)
+					if math.abs(crossAxisDot) <= Part.Size.X * 0.5 and math.abs(((Position - partPosition):Dot(partCFrame.UpVector))) < 16 then
+						spikeEvent:FireServer("a" .. ("cvqx0sn8"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("nwqycdqc"):sub(4, 5):reverse() .. "m8fr", Part)
 					end
 				end
 			end
@@ -38,33 +39,33 @@ local function Check()
 		v2 = Position
 	end
 end
-local v3 = 0
+local lastCheckTime = 0
 local function Stepped()
-	local v1 = tick()
-	if v1 - v3 > 0.1 then
-		v3 = v1
+	local currentTick = tick()
+	if currentTick - lastCheckTime > 0.1 then
+		lastCheckTime = currentTick
 		Check()
 	end
 end
 return {
-	Init = function(p1)
-		v1 = p1.Event
+	Init = function(config)
+		spikeEvent = config.Event
 		RunService.Heartbeat:Connect(Stepped)
-		local function AddedFun(p1)
-			table.insert(t, {
-				Part = p1
+		local function AddedFun(part)
+			table.insert(spikeParts, {
+				Part = part
 			})
 		end
-		local function RemovedFun(p1)
-			for i = #t, 1, -1 do
-				if t[i].Part == p1 then
-					table.remove(t, i)
+		local function RemovedFun(part)
+			for i = #spikeParts, 1, -1 do
+				if spikeParts[i].Part == part then
+					table.remove(spikeParts, i)
 					return
 				end
 			end
 		end
 		for i, v in ipairs(CollectionService:GetTagged("RoadSpike")) do
-			table.insert(t, {
+			table.insert(spikeParts, {
 				Part = v
 			})
 		end

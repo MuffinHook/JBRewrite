@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -7,34 +8,34 @@ local createElement = Roact.createElement
 local BigButton = require(script.Parent.BigButton)
 local BigButtonService = require(ReplicatedStorage.App.BigButtonService)
 local v1 = Roact.PureComponent:extend("TopbarHolder")
-function v1.init(p1)
-	p1:setState({
+function v1.init(component)
+	component:setState({
 		counter = 0
 	})
-	p1._maid = Maid.new()
+	component._maid = Maid.new()
 end
-function v1.didMount(p1)
-	p1._maid:GiveTask(BigButtonService.triggerUpdate:Connect(function()
-		p1:_fetchState()
+function v1.didMount(component)
+	component._maid:GiveTask(BigButtonService.triggerUpdate:Connect(function()
+		component:_fetchState()
 	end))
 end
-function v1._fetchState(p1)
-	p1:setState({
-		counter = p1.state.counter + 1
+function v1._fetchState(component)
+	component:setState({
+		counter = component.state.counter + 1
 	})
 end
-function v1.render(p1)
-	local t = {}
-	for i, v in ipairs(p1.props.buttons) do
-		t[v.name] = createElement(BigButton, {
-			imageId = v.imageId,
-			imageScale = v.imageScale,
-			count = v.count,
-			onClick = v.onClick,
-			enabled = v.enabled,
-			ref = v.ref,
-			displayOrder = v.displayOrder or i,
-			color = p1.props.color
+function v1.render(component)
+	local buttonElements = {}
+	for i, button in ipairs(component.props.buttons) do
+		buttonElements[button.name] = createElement(BigButton, {
+			imageId = button.imageId,
+			imageScale = button.imageScale,
+			count = button.count,
+			onClick = button.onClick,
+			enabled = button.enabled,
+			ref = button.ref,
+			displayOrder = button.displayOrder or i,
+			color = component.props.color
 		})
 	end
 	return createElement("Frame", {
@@ -71,10 +72,10 @@ function v1.render(p1)
 				FillDirection = Enum.FillDirection.Horizontal,
 				Padding = UDim.new(0, 8)
 			})
-		}, t))
+		}, buttonElements))
 	})
 end
-function v1.willUnmount(p1)
-	p1._maid:DoCleaning()
+function v1.willUnmount(component)
+	component._maid:DoCleaning()
 end
 return v1

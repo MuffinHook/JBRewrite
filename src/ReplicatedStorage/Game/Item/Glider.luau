@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Basic = require(script.Parent.Basic)
 local t = {
 	Motion = {
@@ -14,31 +15,31 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local v2 = nil
+local eventSignal = nil
 local t2 = {
 	__ClassName = "Glider"
 }
 t2.__index = t2
 setmetatable(t2, Basic)
-function t2.Init(p1)
-	v2 = p1.Event
+function t2.Init(eventData)
+	eventSignal = eventData.Event
 end
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	return v1
+function t2.new(itemId, p2, p3)
+	local instance = Basic.new(itemId, p2, t, p3)
+	setmetatable(instance, t2)
+	return instance
 end
-function t2.GetLeftArmPosition(p1)
+function t2.GetLeftArmPosition(self)
 	return nil
 end
-function t2.ShootBegin(p1, p2)
-	v2:FireServer("k" .. ("ialwnl1sco"):sub(4, 7):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("r5gc0"):sub(2, 3):reverse():reverse():reverse() .. "x")
+function t2.ShootBegin(self, input)
+	eventSignal:FireServer("k" .. ("ialwnl1sco"):sub(4, 7):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("r5gc0"):sub(2, 3):reverse():reverse():reverse() .. "x")
 end
-function t2.InputBegan(p1, p2, p3)
-	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
-		p1:ShootBegin(p2)
+function t2.InputBegan(self, inputObject, gameProcessed)
+	if if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then true elseif inputObject.UserInputType == Enum.UserInputType.Gamepad1 then inputObject.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		self:ShootBegin(inputObject)
 	end
-	Basic.InputBegan(p1, p2, p3)
+	Basic.InputBegan(self, inputObject, gameProcessed)
 end
-function t2.InputEnded(p1)  end
+function t2.InputEnded(self)  end
 return t2

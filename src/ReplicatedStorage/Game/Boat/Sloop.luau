@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Spring = require(ReplicatedStorage.Std.Spring)
@@ -17,28 +18,28 @@ local t2 = {
 t2.__index = t2
 setmetatable(t2, Boat)
 function t2.new(p1)
-	local v1 = Boat.new(t, p1)
-	setmetatable(v1, t2)
-	v1:Setup()
-	v1.PartSailBack = v1.Model.Physics.SailBack.Sail
-	v1.PartSailBackSize = v1.PartSailBack.Size
-	v1.MastMotor = v1.Model:FindFirstChild("MastMotor")
-	v1.MotorSail = v1.Model:FindFirstChild("MotorSail")
-	v1.MotorSteeringWheel = v1.Model:FindFirstChild("MotorSteeringWheel")
-	v1.SoundCreak = Audio.ObjectLocal(v1.PartBase, 9058593096, {
+	local boat = Boat.new(t, p1)
+	setmetatable(boat, t2)
+	boat:Setup()
+	boat.PartSailBack = boat.Model.Physics.SailBack.Sail
+	boat.PartSailBackSize = boat.PartSailBack.Size
+	boat.MastMotor = boat.Model:FindFirstChild("MastMotor")
+	boat.MotorSail = boat.Model:FindFirstChild("MotorSail")
+	boat.MotorSteeringWheel = boat.Model:FindFirstChild("MotorSteeringWheel")
+	boat.SoundCreak = Audio.ObjectLocal(boat.PartBase, 9058593096, {
 		Volume = 0.5,
 		EmitterSize = 20,
 		Looped = true,
 		DoNotPlay = true
 	})
-	v1.SoundWater = Audio.ObjectLocal(v1.PartBase, 9058608516, {
+	boat.SoundWater = Audio.ObjectLocal(boat.PartBase, 9058608516, {
 		Looped = true,
 		EmitterSize = 20,
 		DoNotPlay = true
 	})
-	v1.ParticleMist = v1.Model.Visual.MistEmitter.Particle
-	v1.ParticleWake = v1.Model.Visual.WakeEmitter.Particle
-	return v1
+	boat.ParticleMist = boat.Model.Visual.MistEmitter.Particle
+	boat.ParticleWake = boat.Model.Visual.WakeEmitter.Particle
+	return boat
 end
 function t2.Setup(p1)
 	Boat.Setup(p1)
@@ -99,41 +100,41 @@ function t2.SteppedDriver(p1, p2)
 end
 function t2.HeartbeatDriver(p1, p2)
 	Boat.HeartbeatDriver(p1, p2)
-	local v1, v2, v3
+	local headingValue, headingAngle, forwardMagnitude
 	if p2.Local then
-		v1 = p1.SpringSlowHeadingp + p1.SwayY
-		v2 = p1.SpringHeadingp
-		local v4 = math.abs(p1.SpringForwardp)
-		local v5 = math.abs(p1.SpringHeadingp) * 0.5 + 0.5
-		p1.MotorSail.C1 = CFrame.new(0, 0, -v5 * 0.5)
-		p1.PartSailBack.Size = p1.PartSailBackSize + Vector3.new(0, 0, v5)
-		v3 = v4
+		headingValue = p1.SpringSlowHeadingp + p1.SwayY
+		headingAngle = p1.SpringHeadingp
+		local sailFactor = math.abs(p1.SpringForwardp)
+		local sailSize = math.abs(p1.SpringHeadingp) * 0.5 + 0.5
+		p1.MotorSail.C1 = CFrame.new(0, 0, -sailSize * 0.5)
+		p1.PartSailBack.Size = p1.PartSailBackSize + Vector3.new(0, 0, sailSize)
+		forwardMagnitude = sailFactor
 	else
-		v1 = p1.SpringSlowHeadingp
-		v2 = p1.SpringHeadingp
-		v3 = math.abs(p1.SpringForwardp)
+		headingValue = p1.SpringSlowHeadingp
+		headingAngle = p1.SpringHeadingp
+		forwardMagnitude = math.abs(p1.SpringForwardp)
 	end
-	p1.MastMotor.C1 = CFrame.Angles(0, -v1 * math.pi * 0.05, 0)
-	p1.MotorSteeringWheel.C1 = p1.MotorSteeringWheel.C0:Inverse() * CFrame.Angles(v2 * math.pi * 0.3, 0, 0) * p1.MotorSteeringWheel.C0
-	p1.SoundCreak.Volume = 1 * (0.75 + 0.25 * v3)
-	p1.SoundWater.Volume = 1 * (0.25 + 0.75 * v3)
+	p1.MastMotor.C1 = CFrame.Angles(0, -headingValue * math.pi * 0.05, 0)
+	p1.MotorSteeringWheel.C1 = p1.MotorSteeringWheel.C0:Inverse() * CFrame.Angles(headingAngle * math.pi * 0.3, 0, 0) * p1.MotorSteeringWheel.C0
+	p1.SoundCreak.Volume = 1 * (0.75 + 0.25 * forwardMagnitude)
+	p1.SoundWater.Volume = 1 * (0.25 + 0.75 * forwardMagnitude)
 	if math.abs(p1.Heading) > 0.5 then
-		local v7 = math.sign(p1.Heading)
-		if p1.LastHeadingSign ~= v7 then
-			p1.LastHeadingSign = v7
+		local headingSign = math.sign(p1.Heading)
+		if p1.LastHeadingSign ~= headingSign then
+			p1.LastHeadingSign = headingSign
 			Audio.ObjectLocal(p1.PartSailBack, 4828088801, {
 				Volume = 0.8
 			})
 		end
 	end
-	local Magnitude = p1.PartBase.Velocity.Magnitude
-	local v8 = if p1.SpringForwardp > 0 then Magnitude > 20 else false
-	local v9 = if p1.SpringForwardp > 0 then Magnitude > 30 else false
-	if p1.ParticleWake.Enabled ~= v8 then
-		p1.ParticleWake.Enabled = v8
+	local velocityMagnitude = p1.PartBase.Velocity.Magnitude
+	local wakeEnabled = if p1.SpringForwardp > 0 then velocityMagnitude > 20 else false
+	local mistEnabled = if p1.SpringForwardp > 0 then velocityMagnitude > 30 else false
+	if p1.ParticleWake.Enabled ~= wakeEnabled then
+		p1.ParticleWake.Enabled = wakeEnabled
 	end
-	if p1.ParticleMist.Enabled ~= v9 then
-		p1.ParticleMist.Enabled = v9
+	if p1.ParticleMist.Enabled ~= mistEnabled then
+		p1.ParticleMist.Enabled = mistEnabled
 	end
 end
 return t2

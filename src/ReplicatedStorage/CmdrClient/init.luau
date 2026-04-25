@@ -1,11 +1,12 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local Shared = script:WaitForChild("Shared")
 local Util = require(Shared:WaitForChild("Util"))
 if RunService:IsClient() == false then
 	error("[Cmdr] Server scripts cannot require the client library. Please require the server library from the server to use Cmdr in your own code.")
 end
-local v1 = setmetatable({
+local CmdrClient = setmetatable({
 	ReplicatedRoot = script,
 	RemoteFunction = script:WaitForChild("CmdrFunction"),
 	RemoteEvent = script:WaitForChild("CmdrEvent"),
@@ -20,68 +21,68 @@ local v1 = setmetatable({
 	Util = Util,
 	Events = {}
 }, {
-	__index = function(p1, p2)
-		local v1 = p1.Dispatcher[p2]
-		if v1 and type(v1) == "function" then
-			return function(p12, ...)
-				return v1(p1.Dispatcher, ...)
+	__index = function(self, p2)
+		local method = self.Dispatcher[p2]
+		if method and type(method) == "function" then
+			return function(firstArg, ...)
+				return method(self.Dispatcher, ...)
 			end
 		end
 	end
 })
-v1.Registry = require(Shared.Registry)(v1)
-v1.Dispatcher = require(Shared.Dispatcher)(v1)
-local v2 = require(script.CmdrInterface)(v1)
-function v1.SetActivationKeys(p1, p2)
-	p1.ActivationKeys = Util.MakeDictionary(p2)
+CmdrClient.Registry = require(Shared.Registry)(CmdrClient)
+CmdrClient.Dispatcher = require(Shared.Dispatcher)(CmdrClient)
+local Interface = require(script.CmdrInterface)(CmdrClient)
+function CmdrClient.SetActivationKeys(self, p2)
+	self.ActivationKeys = Util.MakeDictionary(p2)
 end
-function v1.SetPlaceName(p1, p2)
-	p1.PlaceName = p2
-	v2.Window:UpdateLabel()
+function CmdrClient.SetPlaceName(self, p2)
+	self.PlaceName = p2
+	Interface.Window:UpdateLabel()
 end
-function v1.SetEnabled(p1, p2)
-	p1.Enabled = p2
+function CmdrClient.SetEnabled(self, p2)
+	self.Enabled = p2
 end
-function v1.SetActivationUnlocksMouse(p1, p2)
-	p1.ActivationUnlocksMouse = p2
+function CmdrClient.SetActivationUnlocksMouse(self, p2)
+	self.ActivationUnlocksMouse = p2
 end
-function v1.Show(p1)
-	if p1.Enabled then
-		v2.Window:Show()
+function CmdrClient.Show(self)
+	if self.Enabled then
+		Interface.Window:Show()
 	end
 end
-function v1.Hide(p1)
-	v2.Window:Hide()
+function CmdrClient.Hide(self)
+	Interface.Window:Hide()
 end
-function v1.Toggle(p1)
-	if p1.Enabled then
-		v2.Window:SetVisible(not v2.Window:IsVisible())
+function CmdrClient.Toggle(self)
+	if self.Enabled then
+		Interface.Window:SetVisible(not Interface.Window:IsVisible())
 	else
-		p1:Hide()
+		self:Hide()
 	end
 end
-function v1.SetMashToEnable(p1, p2)
-	p1.MashToEnable = p2
+function CmdrClient.SetMashToEnable(self, p2)
+	self.MashToEnable = p2
 	if p2 then
-		p1:SetEnabled(false)
+		self:SetEnabled(false)
 	end
 end
-function v1.SetHideOnLostFocus(p1, p2)
-	p1.HideOnLostFocus = p2
+function CmdrClient.SetHideOnLostFocus(self, p2)
+	self.HideOnLostFocus = p2
 end
-function v1.HandleEvent(p1, p2, p3)
-	p1.Events[p2] = p3
+function CmdrClient.HandleEvent(self, p2, handler)
+	self.Events[p2] = handler
 end
 if RunService:IsServer() == false then
 	task.delay(1, function()
-		v1.Registry:RegisterTypesIn(script:WaitForChild("Types"))
-		v1.Registry:RegisterCommandsIn(script:WaitForChild("Commands"))
+		CmdrClient.Registry:RegisterTypesIn(script:WaitForChild("Types"))
+		CmdrClient.Registry:RegisterCommandsIn(script:WaitForChild("Commands"))
 	end)
 end
-v1.RemoteEvent.OnClientEvent:Connect(function(p1, ...)
-	if v1.Events[p1] then
-		v1.Events[p1](...)
+CmdrClient.RemoteEvent.OnClientEvent:Connect(function(p1, ...)
+	if CmdrClient.Events[p1] then
+		CmdrClient.Events[p1](...)
 	end
 end)
-require(script.DefaultEventHandlers)(v1)
-return v1
+require(script.DefaultEventHandlers)(CmdrClient)
+return CmdrClient

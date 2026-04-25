@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return function(p1, p2)
 	local Type = p2.Type
@@ -11,11 +12,11 @@ return function(p1, p2)
 		end
 		local TireMesh = p12:FindFirstChild("TireMesh")
 		if p1 and p1.TextureId then
-			local v2 = TireMesh:QueryDescendants("Decal")
-			if #v2 > 0 then
-				for v3, v4 in v2 do
-					v4.Texture = ("rbxassetid://%d"):format(p1.TextureId)
-					v4.Color3 = p1.DecalColor or Color3.new(255/255, 255/255, 255/255)
+			local decals = TireMesh:QueryDescendants("Decal")
+			if #decals > 0 then
+				for v3, decal in decals do
+					decal.Texture = ("rbxassetid://%d"):format(p1.TextureId)
+					decal.Color3 = p1.DecalColor or Color3.new(255/255, 255/255, 255/255)
 				end
 			else
 				local Decal = Instance.new("Decal")
@@ -23,13 +24,13 @@ return function(p1, p2)
 				Decal.Face = Enum.NormalId.Left
 				Decal.Texture = ("rbxassetid://%d"):format(p1.TextureId)
 				Decal.Parent = TireMesh:FindFirstChild("Dual1") or TireMesh
-				local v7 = Decal:Clone()
-				v7.Face = Enum.NormalId.Right
-				v7.Parent = TireMesh:FindFirstChild("Dual2") or TireMesh
+				local decalClone = Decal:Clone()
+				decalClone.Face = Enum.NormalId.Right
+				decalClone.Parent = TireMesh:FindFirstChild("Dual2") or TireMesh
 			end
 		else
-			for v8, v9 in TireMesh:QueryDescendants("Decal") do
-				v9:Destroy()
+			for v8, decal in TireMesh:QueryDescendants("Decal") do
+				decal:Destroy()
 			end
 		end
 		if p1 and p1.ParticleEmitterName then
@@ -37,31 +38,31 @@ return function(p1, p2)
 			if TireMesh:FindFirstChild(ParticleEmitterName) then
 				return
 			end
-			local v10 = ReplicatedStorage.Resource.TireStickerParticles:FindFirstChild(ParticleEmitterName)
-			if v10 then
-				v10:Clone().Parent = TireMesh
+			local particleEmitter = ReplicatedStorage.Resource.TireStickerParticles:FindFirstChild(ParticleEmitterName)
+			if particleEmitter then
+				particleEmitter:Clone().Parent = TireMesh
 			end
 		else
-			for v11, v12 in TireMesh:GetChildren() do
-				if v12:IsA("ParticleEmitter") then
-					v12:Destroy()
+			for v11, child in TireMesh:GetChildren() do
+				if child:IsA("ParticleEmitter") then
+					child:Destroy()
 				end
 			end
 		end
 	end
 	if Type == "Chassis" then
-		for v1, v2 in Model:GetDescendants() do
-			if v2:IsA("Model") and (v2.Name:sub(1, 5) == "Wheel" and v2.Name ~= "Wheels") then
-				UpdateWheel(v2)
+		for v1, descendant in Model:GetDescendants() do
+			if descendant:IsA("Model") and (descendant.Name:sub(1, 5) == "Wheel" and descendant.Name ~= "Wheels") then
+				UpdateWheel(descendant)
 			end
 		end
 	elseif Type == "DuneBuggy" then
-		for v3, v4 in next, { "FrontLeft", "FrontRight", "BackLeft", "BackRight" } do
-			UpdateWheel((Model.WheelModels:FindFirstChild(v4)))
+		for v3, wheelName in next, { "FrontLeft", "FrontRight", "BackLeft", "BackRight" } do
+			UpdateWheel((Model.WheelModels:FindFirstChild(wheelName)))
 		end
 	elseif Type == "Motorcycle" then
-		for v5, v6 in next, { "Back", "Front" } do
-			UpdateWheel((Model.WheelModels:FindFirstChild(v6)))
+		for v5, wheelName in next, { "Back", "Front" } do
+			UpdateWheel((Model.WheelModels:FindFirstChild(wheelName)))
 		end
 	end
 end

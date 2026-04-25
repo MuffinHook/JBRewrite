@@ -1,11 +1,12 @@
 -- Reviewed by Claude
+-- variables reassigned
 local DataStoreService = game:GetService("DataStoreService")
 local RunService = game:GetService("RunService")
 local DataStoreQueue = require(script.DataStoreQueue)
-local t = {}
-t.PlayerDS = RunService:IsStudio() and {} or DataStoreService:GetDataStore("GA_PlayerDS_1.0.0")
-t.AutoSaveData = 180
-t.BasePlayerData = {
+local Store = {}
+Store.PlayerDS = RunService:IsStudio() and {} or DataStoreService:GetDataStore("GA_PlayerDS_1.0.0")
+Store.AutoSaveData = 180
+Store.BasePlayerData = {
 	Sessions = 0,
 	Transactions = 0,
 	ProgressionTries = {},
@@ -25,65 +26,65 @@ t.BasePlayerData = {
 	CountryCode = "",
 	CustomUserId = ""
 }
-t.DataToSave = { "Sessions", "Transactions", "ProgressionTries", "CurrentCustomDimension01", "CurrentCustomDimension02", "CurrentCustomDimension03", "OwnedGamepasses" }
-t.PlayerCache = {}
-t.EventsQueue = {}
-t.DataStoreQueue = DataStoreQueue
-function t.GetPlayerData(p1, p2)
-	local UserId = p2.UserId
-	local v1, v2 = DataStoreQueue.AddRequest(UserId, function()
-		return RunService:IsStudio() and ({} or (t.PlayerDS:GetAsync(UserId) or {})) or (t.PlayerDS:GetAsync(UserId) or {})
+Store.DataToSave = { "Sessions", "Transactions", "ProgressionTries", "CurrentCustomDimension01", "CurrentCustomDimension02", "CurrentCustomDimension03", "OwnedGamepasses" }
+Store.PlayerCache = {}
+Store.EventsQueue = {}
+Store.DataStoreQueue = DataStoreQueue
+function Store.GetPlayerData(p1, player)
+	local UserId = player.UserId
+	local success, data = DataStoreQueue.AddRequest(UserId, function()
+		return RunService:IsStudio() and ({} or (Store.PlayerDS:GetAsync(UserId) or {})) or (Store.PlayerDS:GetAsync(UserId) or {})
 	end, 7)
-	if not v1 then
-		v2 = {}
+	if not success then
+		data = {}
 	end
-	return v2
+	return data
 end
-function t.GetPlayerDataFromCache(p1, p2)
-	local v1 = t.PlayerCache[tonumber(p2)]
-	if v1 then
-		return v1
+function Store.GetPlayerDataFromCache(p1, player)
+	local cachedPlayerData = Store.PlayerCache[tonumber(player)]
+	if cachedPlayerData then
+		return cachedPlayerData
 	else
-		return t.PlayerCache[tostring(p2)]
+		return Store.PlayerCache[tostring(player)]
 	end
 end
-function t.GetErrorDataStore(p1, p2)
-	local v1 = nil
+function Store.GetErrorDataStore(p1, player)
+	local errorStore = nil
 	if not pcall(function()
-		v1 = RunService:IsStudio() and {} or DataStoreService:GetDataStore("GA_ErrorDS_1.0.0", p2)
+		errorStore = RunService:IsStudio() and {} or DataStoreService:GetDataStore("GA_ErrorDS_1.0.0", player)
 	end) then
-		v1 = {}
+		errorStore = {}
 	end
-	return v1
+	return errorStore
 end
-function t.SavePlayerData(p1, p2)
-	local v1 = t:GetPlayerDataFromCache(p2.UserId)
-	local t2 = {}
-	if v1 then
-		for k, v in pairs(t.DataToSave) do
-			t2[v] = v1[v]
+function Store.SavePlayerData(p1, player)
+	local playerData = Store:GetPlayerDataFromCache(player.UserId)
+	local dataToSave = {}
+	if playerData then
+		for k, v in pairs(Store.DataToSave) do
+			dataToSave[v] = playerData[v]
 		end
-		local UserId = p2.UserId
+		local UserId = player.UserId
 		if not RunService:IsStudio() then
 			DataStoreQueue.AddRequest(UserId, function()
-				return t.PlayerDS:SetAsync(UserId, t2)
+				return Store.PlayerDS:SetAsync(UserId, dataToSave)
 			end, 7)
 		end
 	end
 end
-function t.IncrementErrorCount(p1, p2, p3, p4)
-	if p3 then
-		local v1
+function Store.IncrementErrorCount(p1, p2, errorDataStore, incrementAmount)
+	if errorDataStore then
+		local errorCount
 		if RunService:IsStudio() then
-			v1 = 0
+			errorCount = 0
 		else
-			local v2, v3 = DataStoreQueue.AddRequest(p3, function()
-				return p2:IncrementAsync(p3, p4)
+			local _success, incrementResult = DataStoreQueue.AddRequest(errorDataStore, function()
+				return p2:IncrementAsync(errorDataStore, incrementAmount)
 			end, 7)
-			_ = v2
-			v1 = v3
+			--_ = success
+			errorCount = incrementResult
 		end
-		return v1
+		return errorCount
 	end
 end
-return t
+return Store

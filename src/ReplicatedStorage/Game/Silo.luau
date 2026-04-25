@@ -1,86 +1,87 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Anim = require(ReplicatedStorage.Module.Anim)
-local function Ease_InOutQuad(p1)
-	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
+local function Ease_InOutQuad(progress)
+	return progress < 0.5 and 2 * progress * progress or -1 - 2 * (progress - 2) * progress
 end
 local t = {}
 t.__index = t
-function t.new(p1)
-	assert(p1 ~= nil)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.Model = p1
-	t2.Door1CF = t2.Model.Door1.CFrame
-	t2.Door2CF = t2.Model.Door2.CFrame
-	t2.OnOpened = Signal.new()
-	t2.Anim = nil
-	t2.IsOpen = false
-	return t2
+function t.new(model)
+	assert(model ~= nil)
+	local instance = {}
+	setmetatable(instance, t)
+	instance.Model = model
+	instance.Door1CF = instance.Model.Door1.CFrame
+	instance.Door2CF = instance.Model.Door2.CFrame
+	instance.OnOpened = Signal.new()
+	instance.Anim = nil
+	instance.IsOpen = false
+	return instance
 end
-function t.Transition(p1, p2, p3)
-	if p1.Anim ~= nil then
-		p1.Anim:Destroy()
+function t.Transition(self, duration, updateCallback)
+	if self.Anim ~= nil then
+		self.Anim:Destroy()
 	end
-	p1.Anim = Anim.new(p2 or 6)
-	p1.Anim.OnCompleted:Connect(function()
-		p1.Anim:Destroy()
-		p1.Anim = nil
+	self.Anim = Anim.new(duration or 6)
+	self.Anim.OnCompleted:Connect(function()
+		self.Anim:Destroy()
+		self.Anim = nil
 	end)
-	p1.Anim.OnCanceled:Connect(function()
-		p1.Anim:Destroy()
-		p1.Anim = nil
+	self.Anim.OnCanceled:Connect(function()
+		self.Anim:Destroy()
+		self.Anim = nil
 	end)
-	p1.Anim.Maid:GiveTask(RunService.RenderStepped:Connect(function()
-		p3(p1, (p1.Anim:Update()))
+	self.Anim.Maid:GiveTask(RunService.RenderStepped:Connect(function()
+		updateCallback(self, (self.Anim:Update()))
 	end))
 end
-function t.Open(p1, p2)
-	p1.IsOpen = true
-	return p1:Transition(p2, p1.SeqOpen)
+function t.Open(self, duration)
+	self.IsOpen = true
+	return self:Transition(duration, self.SeqOpen)
 end
-function t.Close(p1, p2)
-	p1.IsOpen = false
-	return p1:Transition(p2, p1.SeqClose)
+function t.Close(self, duration)
+	self.IsOpen = false
+	return self:Transition(duration, self.SeqClose)
 end
-function t.SetDoorOpen(p1, p2)
-	local Model = p1.Model
+function t.SetDoorOpen(self, openAmount)
+	local Model = self.Model
 	local Door1 = Model.Door1
-	local v1 = CFrame.new(0, 0, -Door1.Size.Z * 0.5)
-	Door1.CFrame = p1.Door1CF * v1 * CFrame.Angles(p2 * math.pi * 0.5, 0, 0) * v1:Inverse()
+	local pivotOffset1 = CFrame.new(0, 0, -Door1.Size.Z * 0.5)
+	Door1.CFrame = self.Door1CF * pivotOffset1 * CFrame.Angles(openAmount * math.pi * 0.5, 0, 0) * pivotOffset1:Inverse()
 	local Door2 = Model.Door2
-	local v2 = CFrame.new(0, 0, -Door2.Size.Z * 0.5)
-	Door2.CFrame = p1.Door2CF * v2 * CFrame.Angles(p2 * math.pi * 0.5, 0, 0) * v2:Inverse()
+	local pivotOffset2 = CFrame.new(0, 0, -Door2.Size.Z * 0.5)
+	Door2.CFrame = self.Door2CF * pivotOffset2 * CFrame.Angles(openAmount * math.pi * 0.5, 0, 0) * pivotOffset2:Inverse()
 end
-function t.SeqOpen(p1, p2)
-	if p2 == 1 then
-		p1.OnOpened:Fire()
+function t.SeqOpen(self, progress)
+	if progress == 1 then
+		self.OnOpened:Fire()
 	end
-	local v1, v2
-	if p2 < 0.5 then
-		v1 = 2 * p2 * p2
-		if not v1 then
-			v2 = p2
-			v1 = -1 - 2 * (p2 - 2) * p2
+	local easedProgress, v2
+	if progress < 0.5 then
+		easedProgress = 2 * progress * progress
+		if not easedProgress then
+			v2 = progress
+			easedProgress = -1 - 2 * (progress - 2) * progress
 		end
 	else
-		v2 = p2
-		v1 = -1 - 2 * (p2 - 2) * p2
+		v2 = progress
+		easedProgress = -1 - 2 * (progress - 2) * progress
 	end
-	p1:SetDoorOpen(v1)
+	self:SetDoorOpen(easedProgress)
 end
-function t.SeqClose(p1, p2)
-	local v1 = 1 - p2
-	p1:SetDoorOpen(v1 < 0.5 and 2 * v1 * v1 or -1 - 2 * (v1 - 2) * v1)
+function t.SeqClose(self, progress)
+	local invertedProgress = 1 - progress
+	self:SetDoorOpen(invertedProgress < 0.5 and 2 * invertedProgress * invertedProgress or -1 - 2 * (invertedProgress - 2) * invertedProgress)
 end
-function t.Destroy(p1)
-	if p1.Anim ~= nil then
-		p1.Anim:Destroy()
-		p1.Anim = nil
+function t.Destroy(self)
+	if self.Anim ~= nil then
+		self.Anim:Destroy()
+		self.Anim = nil
 	end
-	p1.OnOpened:Destroy()
-	p1.OnOpened = nil
+	self.OnOpened:Destroy()
+	self.OnOpened = nil
 end
 return t

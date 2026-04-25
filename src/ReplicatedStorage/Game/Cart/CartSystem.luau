@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UI = require(ReplicatedStorage.Module.UI)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
@@ -7,8 +8,8 @@ local CartBinder = require(script.Parent.CartBinder)
 local CartConsts = require(script.Parent.CartConsts)
 return {
 	init = function()
-		CartBinder:GetClassAddedSignal():Connect(function(p1)
-			local _obj = p1._obj
+		CartBinder:GetClassAddedSignal():Connect(function(cartInstance)
+			local _obj = cartInstance._obj
 			RxInstanceUtils.yieldForProperty(_obj, "PrimaryPart")
 			local function action(p1, p2)
 				if p2 then
@@ -16,8 +17,8 @@ return {
 					return true
 				end
 			end
-			local function preUpdateFun(p12)
-				p12.Enabled = p1:GetOccupant() == nil
+			local function preUpdateFun(circleActionState)
+				circleActionState.Enabled = cartInstance:GetOccupant() == nil
 			end
 			local PrimaryPart = _obj.PrimaryPart
 			CircleAction.Add({
@@ -30,16 +31,16 @@ return {
 				PreUpdatePeriod = 0.5,
 				Callback = action
 			}, PrimaryPart)
-			p1._maid:GiveTask(function()
+			cartInstance._maid:GiveTask(function()
 				CircleAction.Remove(PrimaryPart)
 			end)
 		end)
 		CartBinder:Start()
 	end,
-	getCartForCharacter = function(p1)
-		assert(p1:IsDescendantOf(workspace))
+	getCartForCharacter = function(character)
+		assert(character:IsDescendantOf(workspace))
 		for i, v in ipairs(CartBinder:GetAll()) do
-			if v:GetOccupant() == p1 then
+			if v:GetOccupant() == character then
 				return v
 			end
 		end

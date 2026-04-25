@@ -1,11 +1,12 @@
 -- Reviewed by Claude
-local v1 = script:FindFirstAncestor("EzUi")
-local Dictionary = require(v1.Dictionary)
-local Roact = require(v1.Parent.Roact)
+-- variables reassigned
+local rootModule = script:FindFirstAncestor("EzUi")
+local Dictionary = require(rootModule.Dictionary)
+local Roact = require(rootModule.Parent.Roact)
 local createElement = Roact.createElement
 local GridUtils = require(script.Parent.GridUtils)
-local v2 = Roact.PureComponent:extend("Grid")
-v2.defaultProps = {
+local GridComponent = Roact.PureComponent:extend("Grid")
+GridComponent.defaultProps = {
 	rowsPerPage = 3,
 	colsPerRow = 9,
 	itemAspectRatio = nil,
@@ -13,8 +14,8 @@ v2.defaultProps = {
 	infHorizontal = false,
 	reverseY = false
 }
-function v2.init(p1)  end
-function v2.render(p1)
+function GridComponent.init(p1)  end
+function GridComponent.render(p1)
 	local aspectRatio = p1.props.aspectRatio
 	if p1.props.paddingRatio then
 		assert(aspectRatio, "aspectRatio is required when using paddingRatio.")
@@ -22,53 +23,53 @@ function v2.render(p1)
 		p1.props.verticalPaddingRatio = p1.props.paddingRatio / aspectRatio
 		p1.props.paddingRatio = nil
 	end
-	local v1 = p1.props.verticalPaddingRatio * aspectRatio
+	local horizontalPaddingRatio = p1.props.verticalPaddingRatio * aspectRatio
 	local colsPerRow = p1.props.colsPerRow
 	local rowsPerPage = p1.props.rowsPerPage
 	if p1.props.itemAspectRatio then
 		rowsPerPage = colsPerRow / aspectRatio * p1.props.itemAspectRatio
 		p1.props.rowsPerPage = rowsPerPage
 	end
-	local v2 = GridUtils.getRowRatio(p1.props)
-	local v3 = GridUtils.getColRatio(p1.props, v2)
-	local v4 = p1.props.itemDefaults or {}
+	local rowRatio = GridUtils.getRowRatio(p1.props)
+	local colRatio = GridUtils.getColRatio(p1.props, rowRatio)
+	local itemDefaults = p1.props.itemDefaults or {}
 	local canvasHeight = p1.props.canvasHeight
 	local t = {}
 	for i = 1, #p1.props.items do
-		local v6, v7
+		local rowNum, colNum
 		if p1.props.infHorizontal then
-			v6 = 1
-			v7 = i
+			rowNum = 1
+			colNum = i
 		else
-			v6 = math.floor((i - 1) / colsPerRow) + 1
-			v7 = (i - 1) % colsPerRow + 1
+			rowNum = math.floor((i - 1) / colsPerRow) + 1
+			colNum = (i - 1) % colsPerRow + 1
 		end
 		if p1.props.reverseY then
-			v6 = rowsPerPage - v6 + 1
+			rowNum = rowsPerPage - rowNum + 1
 		end
-		local v8 = UDim2.new(v3 / v2, 0, aspectRatio * 1 / v2 / canvasHeight, 0)
-		local v9 = UDim2.new(v3 / v2 * (v7 - 1) + 1 / v1 * v7, 0, aspectRatio / canvasHeight * ((v6 - 1) * 1 / v2 + v6 * 1 / v1), 0)
-		local v12 = Dictionary.merge(p1.props.items and p1.props.items[i] or {}, p1.props.metadata and p1.props.metadata[i] or {}, v4)
-		local v13 = v12.id or v12.name or #t + 1
-		local v14 = createElement(p1.props.component, Dictionary.merge({
-			size = v8,
-			position = v9,
-			aspectRatio = v3,
+		local itemSize = UDim2.new(colRatio / rowRatio, 0, aspectRatio * 1 / rowRatio / canvasHeight, 0)
+		local itemPosition = UDim2.new(colRatio / rowRatio * (colNum - 1) + 1 / horizontalPaddingRatio * colNum, 0, aspectRatio / canvasHeight * ((rowNum - 1) * 1 / rowRatio + rowNum * 1 / horizontalPaddingRatio), 0)
+		local itemData = Dictionary.merge(p1.props.items and p1.props.items[i] or {}, p1.props.metadata and p1.props.metadata[i] or {}, itemDefaults)
+		local itemId = itemData.id or itemData.name or #t + 1
+		local itemElement = createElement(p1.props.component, Dictionary.merge({
+			size = itemSize,
+			position = itemPosition,
+			aspectRatio = colRatio,
 			cornerPixel = 4,
-			paddingRatio = v2 / v1,
-			verticalPaddingRatio = v1 / v2,
+			paddingRatio = rowRatio / horizontalPaddingRatio,
+			verticalPaddingRatio = horizontalPaddingRatio / rowRatio,
 			parentAspectRatio = aspectRatio,
-			parentVerticalPaddingRatio = v1 / aspectRatio,
-			layoutOrder = 2 * v7,
+			parentVerticalPaddingRatio = horizontalPaddingRatio / aspectRatio,
+			layoutOrder = 2 * colNum,
 			index = i,
-			rowIndex = v6,
-			colIndex = v7
-		}, v12))
-		if t[v13] then
-			warn("An item already exists in grid by key: " .. v13)
+			rowIndex = rowNum,
+			colIndex = colNum
+		}, itemData))
+		if t[itemId] then
+			warn("An item already exists in grid by key: " .. itemId)
 		end
-		t[v13] = v14
+		t[itemId] = itemElement
 	end
 	return Roact.createFragment(t)
 end
-return v2
+return GridComponent

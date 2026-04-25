@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -14,119 +15,119 @@ local SeasonUtils = require(ReplicatedStorage.Game.Season.SeasonUtils)
 local ContractConsts = require(script.Parent.ContractConsts)
 local ContractSystem = require(script.Parent.ContractSystem)
 local ContractUtils = require(script.Parent.ContractUtils)
-local t = {}
-t.__index = t
-t.__ClassName = "ContractUI"
-function t.new()
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._maid = Maid.new()
-	return t2
+local ContractUI = {}
+ContractUI.__index = ContractUI
+ContractUI.__ClassName = "ContractUI"
+function ContractUI.new()
+	local instance = {}
+	setmetatable(instance, ContractUI)
+	instance._maid = Maid.new()
+	return instance
 end
-function t.SetFrame(p1, p2)
-	assert(p2 ~= nil)
-	assert(not p1._frame)
-	p1._frame = p2
-	p1._maid:GiveTask(p1._frame)
-	p1._maid:GiveTask(p1._frame.Background.Body.Bottom.Action.MouseButton1Down:Connect(function()
+function ContractUI.SetFrame(self, frame)
+	assert(frame ~= nil)
+	assert(not self._frame)
+	self._frame = frame
+	self._maid:GiveTask(self._frame)
+	self._maid:GiveTask(self._frame.Background.Body.Bottom.Action.MouseButton1Down:Connect(function()
 		Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
-		if p1._contract:GetStateId() == ContractConsts.enumState.ACTIVE then
-			local v1 = Confirmation.new(("Re-roll for a random contract for $%s?"):format(String.comma(ContractConsts.REROLL_PRICE)))
-			v1.Maid:GiveTask(v1.OnYes:Connect(function()
-				p1._contract._contractActionRemote:FireServer()
+		if self._contract:GetStateId() == ContractConsts.enumState.ACTIVE then
+			local confirmationDialog = Confirmation.new(("Re-roll for a random contract for $%s?"):format(String.comma(ContractConsts.REROLL_PRICE)))
+			confirmationDialog.Maid:GiveTask(confirmationDialog.OnYes:Connect(function()
+				self._contract._contractActionRemote:FireServer()
 			end))
-			p1._contract._rerollConfirm = v1
+			self._contract._rerollConfirm = confirmationDialog
 		else
-			p1._contract._contractActionRemote:FireServer()
+			self._contract._contractActionRemote:FireServer()
 		end
 	end))
-	p1._maid:GiveTask(ContractSystem.getAnyContractActiveTransitionSignal():Connect(function()
-		if getmetatable(p1) == nil then
+	self._maid:GiveTask(ContractSystem.getAnyContractActiveTransitionSignal():Connect(function()
+		if getmetatable(self) == nil then
 			return
 		end
-		if getmetatable(p1._contract) ~= nil then
-			p1:_updateState(p1._contract:GetStateId())
+		if getmetatable(self._contract) ~= nil then
+			self:_updateState(self._contract:GetStateId())
 		end
 	end))
 end
-function t.SetLayoutOrder(p1, p2)
-	assert(p2 ~= nil)
-	p1._frame.LayoutOrder = p2
+function ContractUI.SetLayoutOrder(self, layoutOrder)
+	assert(layoutOrder ~= nil)
+	self._frame.LayoutOrder = layoutOrder
 end
-function t.SetContract(p1, p2)
-	assert(not p1._contract)
-	p1._contract = p2
-	p1._maid:GiveTask(p1._contract:GetProgressValue():GetPropertyChangedSignal("Value"):Connect(function()
-		p1:_updateProgress()
+function ContractUI.SetContract(self, contract)
+	assert(not self._contract)
+	self._contract = contract
+	self._maid:GiveTask(self._contract:GetProgressValue():GetPropertyChangedSignal("Value"):Connect(function()
+		self:_updateProgress()
 	end))
-	p1:_updateProgress()
+	self:_updateProgress()
 	local function updateState()
-		p1:_updateState(p1._contract:GetStateId())
+		self:_updateState(self._contract:GetStateId())
 	end
-	p1._maid:GiveTask(p1._contract:GetRequireSeasonPassValue():GetPropertyChangedSignal("Value"):Connect(updateState))
-	p1._maid:GiveTask(p1._contract:GetStateValue():GetPropertyChangedSignal("Value"):Connect(updateState))
-	p1._maid:GiveTask(ContractUtils.getNumTimesRerolledObject(p1._contract.obj).Changed:Connect(updateState))
-	p1:_updateState(p1._contract:GetStateId())
-	p1._maid:GiveTask(SeasonSystem.getSeasonPassOwnedSignal():Connect(function(p12)
-		if p12 == LocalPlayer then
-			p1:_updateState(p1._contract:GetStateId())
+	self._maid:GiveTask(self._contract:GetRequireSeasonPassValue():GetPropertyChangedSignal("Value"):Connect(updateState))
+	self._maid:GiveTask(self._contract:GetStateValue():GetPropertyChangedSignal("Value"):Connect(updateState))
+	self._maid:GiveTask(ContractUtils.getNumTimesRerolledObject(self._contract.obj).Changed:Connect(updateState))
+	self:_updateState(self._contract:GetStateId())
+	self._maid:GiveTask(SeasonSystem.getSeasonPassOwnedSignal():Connect(function(player)
+		if player == LocalPlayer then
+			self:_updateState(self._contract:GetStateId())
 		end
 	end))
-	p1._frame.Name = p1._contract:GetName()
-	p1:_setTeamId(p1._contract:GetTeamId())
-	p1:_setRewardExp(p1._contract:GetRewardExp())
-	p1:_setMessage(p1._contract:GetMessage())
+	self._frame.Name = self._contract:GetName()
+	self:_setTeamId(self._contract:GetTeamId())
+	self:_setRewardExp(self._contract:GetRewardExp())
+	self:_setMessage(self._contract:GetMessage())
 end
-function t.SetTitle(p1, p2)
-	p1._frame.Background.Title.TextLabel.Text = p2
+function ContractUI.SetTitle(self, title)
+	self._frame.Background.Title.TextLabel.Text = title
 end
-function t._setMessage(p1, p2)
-	p1._frame.Background.Body.Top.ContractDesc.Text = p2
+function ContractUI._setMessage(self, message)
+	self._frame.Background.Body.Top.ContractDesc.Text = message
 end
-function t._setRewardExp(p1, p2)
-	p1._frame.Background.Body.Bottom.Reward.Amount.Text = ("REWARD: %d XP"):format(p2)
+function ContractUI._setRewardExp(self, rewardExp)
+	self._frame.Background.Body.Bottom.Reward.Amount.Text = ("REWARD: %d XP"):format(rewardExp)
 end
-function t._setTeamId(p1, p2)
-	local v1 = nil
-	if p2 == Settings.EnumTeam.Police then
-		v1 = 5955472455
-	elseif p2 == Settings.EnumTeam.Criminal then
-		v1 = 5955427564
+function ContractUI._setTeamId(self, teamId)
+	local teamImageId = nil
+	if teamId == Settings.EnumTeam.Police then
+		teamImageId = 5955472455
+	elseif teamId == Settings.EnumTeam.Criminal then
+		teamImageId = 5955427564
 	else
-		error(("Invalid teamId: %d"):format(p2))
+		error(("Invalid teamId: %d"):format(teamId))
 	end
-	p1._frame.Background.Image = ("rbxassetid://%d"):format(v1)
+	self._frame.Background.Image = ("rbxassetid://%d"):format(teamImageId)
 end
-function t._updateProgress(p1)
-	local v1 = if p1._contract:GetStateId() == ContractConsts.enumState.ACTIVE then p1._contract:GetProgress() else nil
-	local Bottom = p1._frame.Background.Body.Bottom
-	Bottom.Progress.Visible = v1 ~= nil
-	if v1 ~= nil then
-		Bottom.Progress.Text = ("PROGRESS: %d/%d"):format(p1._contract:GetProgress(), p1._contract:GetGoal())
+function ContractUI._updateProgress(self)
+	local progressValue = if self._contract:GetStateId() == ContractConsts.enumState.ACTIVE then self._contract:GetProgress() else nil
+	local Bottom = self._frame.Background.Body.Bottom
+	Bottom.Progress.Visible = progressValue ~= nil
+	if progressValue ~= nil then
+		Bottom.Progress.Text = ("PROGRESS: %d/%d"):format(self._contract:GetProgress(), self._contract:GetGoal())
 	end
 end
-function t._updateState(p1, p2)
-	if getmetatable(p1) ~= nil then
-		local v1 = nil
-		local v2 = nil
-		local v3 = GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.VIP)
-		if p2 == ContractConsts.enumState.ACCEPTABLE then
-			v1 = 5955426934
-			v2 = "ACCEPT"
-		elseif p2 == ContractConsts.enumState.ACTIVE and ContractUtils.canReroll(p1._contract.obj, v3) then
-			v1 = 5955427217
-			v2 = "RE-ROLL"
-		elseif p2 ~= ContractConsts.enumState.FAILED and (p2 ~= ContractConsts.enumState.ABORTED and p2 == ContractConsts.enumState.COMPLETED) then
-			v1 = 5955427217
-			v2 = "COMPLETED"
+function ContractUI._updateState(self, stateId)
+	if getmetatable(self) ~= nil then
+		local buttonImageId = nil
+		local buttonText = nil
+		local hasVip = GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.VIP)
+		if stateId == ContractConsts.enumState.ACCEPTABLE then
+			buttonImageId = 5955426934
+			buttonText = "ACCEPT"
+		elseif stateId == ContractConsts.enumState.ACTIVE and ContractUtils.canReroll(self._contract.obj, hasVip) then
+			buttonImageId = 5955427217
+			buttonText = "RE-ROLL"
+		elseif stateId ~= ContractConsts.enumState.FAILED and (stateId ~= ContractConsts.enumState.ABORTED and stateId == ContractConsts.enumState.COMPLETED) then
+			buttonImageId = 5955427217
+			buttonText = "COMPLETED"
 		end
-		local _frame = p1._frame
+		local _frame = self._frame
 		local Top = _frame.Background.Body.Top
 		local Bottom = _frame.Background.Body.Bottom
-		if v1 and v2 then
-			Bottom.Action.Image = ("rbxassetid://%d"):format(v1)
-			Bottom.Action.TextLabel.Text = v2
-			if p2 == ContractConsts.enumState.ACTIVE then
+		if buttonImageId and buttonText then
+			Bottom.Action.Image = ("rbxassetid://%d"):format(buttonImageId)
+			Bottom.Action.TextLabel.Text = buttonText
+			if stateId == ContractConsts.enumState.ACTIVE then
 				Bottom.Action.TextLabel.TextColor3 = Color3.new(255/255, 0/255, 0/255)
 				Bottom.Action.ImageColor3 = Color3.new(255/255, 0/255, 0/255)
 			else
@@ -134,45 +135,45 @@ function t._updateState(p1, p2)
 				Bottom.Action.ImageColor3 = Color3.new(255/255, 255/255, 255/255)
 			end
 		end
-		local v4 = p1._contract:GetRequireSeasonPass()
-		local v6 = v4 and not SeasonSystem.doesPlayerOwnSeasonPass(LocalPlayer)
-		local v7 = ContractSystem.getActiveContract(p1._contract:GetTeamId())
-		local v8 = if v7 == nil or (v7 == p1._contract or p2 == ContractConsts.enumState.COMPLETED) then false else not v6 and not ContractConsts.ALLOW_MULTIPLE_ACTIVE
-		Bottom.OneActive.Visible = v8
-		local v9 = if p2 == ContractConsts.enumState.ABORTED or p2 == ContractConsts.enumState.FAILED then not v8 else false
-		Bottom.Retry.Visible = v9
-		if v9 then
+		local requiresSeasonPass = self._contract:GetRequireSeasonPass()
+		local seasonPassBlocked = requiresSeasonPass and not SeasonSystem.doesPlayerOwnSeasonPass(LocalPlayer)
+		local activeContractForTeam = ContractSystem.getActiveContract(self._contract:GetTeamId())
+		local oneActiveBlocked = if activeContractForTeam == nil or (activeContractForTeam == self._contract or stateId == ContractConsts.enumState.COMPLETED) then false else not seasonPassBlocked and not ContractConsts.ALLOW_MULTIPLE_ACTIVE
+		Bottom.OneActive.Visible = oneActiveBlocked
+		local showRetry = if stateId == ContractConsts.enumState.ABORTED or stateId == ContractConsts.enumState.FAILED then not oneActiveBlocked else false
+		Bottom.Retry.Visible = showRetry
+		if showRetry then
 			local function updateRetryTimer()
-				Bottom.Retry.Text = ("RETRY AVAILABLE IN: %s"):format((SeasonUtils.formatRemaining((math.max(ContractConsts.COOLDOWN_DURATION - (DateTime.now().UnixTimestamp - p1._contract:GetLastStateUpdate()), 0)))))
+				Bottom.Retry.Text = ("RETRY AVAILABLE IN: %s"):format((SeasonUtils.formatRemaining((math.max(ContractConsts.COOLDOWN_DURATION - (DateTime.now().UnixTimestamp - self._contract:GetLastStateUpdate()), 0)))))
 			end
-			p1._maid.stateUpdateLoop = Interval.every(1):Connect(updateRetryTimer)
+			self._maid.stateUpdateLoop = Interval.every(1):Connect(updateRetryTimer)
 			updateRetryTimer()
 		else
-			p1._maid.stateUpdateLoop = nil
+			self._maid.stateUpdateLoop = nil
 		end
-		local v10
-		if p2 == ContractConsts.enumState.ABORTED or p2 == ContractConsts.enumState.FAILED then
-			v10 = false
+		local showAction
+		if stateId == ContractConsts.enumState.ABORTED or stateId == ContractConsts.enumState.FAILED then
+			showAction = false
 		else
-			v10 = not v8
-			if v10 then
-				v10 = not v6
-				if v10 then
-					v10 = not if p2 == ContractConsts.enumState.ACTIVE then not ContractUtils.canReroll(p1._contract.obj, v3) else false
+			showAction = not oneActiveBlocked
+			if showAction then
+				showAction = not seasonPassBlocked
+				if showAction then
+					showAction = not if stateId == ContractConsts.enumState.ACTIVE then not ContractUtils.canReroll(self._contract.obj, hasVip) else false
 				end
 			end
 		end
-		Bottom.Action.Visible = v10
-		Top.ContractDesc.Visible = not v6
-		Top.SeasonPassIcon.Visible = v6
-		Bottom.SeasonPassUnlockText.Visible = v6
-		p1:_updateProgress()
+		Bottom.Action.Visible = showAction
+		Top.ContractDesc.Visible = not seasonPassBlocked
+		Top.SeasonPassIcon.Visible = seasonPassBlocked
+		Bottom.SeasonPassUnlockText.Visible = seasonPassBlocked
+		self:_updateProgress()
 	end
 end
-function t.Destroy(p1)
-	assert(p1._maid ~= nil)
-	p1._maid:Destroy()
-	p1._maid = nil
-	setmetatable(p1, nil)
+function ContractUI.Destroy(self)
+	assert(self._maid ~= nil)
+	self._maid:Destroy()
+	self._maid = nil
+	setmetatable(self, nil)
 end
-return t
+return ContractUI

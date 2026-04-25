@@ -1,53 +1,54 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
-local function Ease_InOutQuad(p1)
-	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
+local function Ease_InOutQuad(progress)
+	return progress < 0.5 and 2 * progress * progress or -1 - 2 * (progress - 2) * progress
 end
-local t = {}
-t.__index = t
-function t.new(p1, p2)
-	assert(p1 ~= nil)
-	assert(p2 ~= nil)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.HingeCF = p2.CFrame
-	t2.Model = p1
-	t2.Model.PrimaryPart = p2
-	t2.Event = nil
-	t2.Angle = 0
-	return t2
+local Drawbridge = {}
+Drawbridge.__index = Drawbridge
+function Drawbridge.new(model, hinge)
+	assert(model ~= nil)
+	assert(hinge ~= nil)
+	local instance = {}
+	setmetatable(instance, Drawbridge)
+	instance.HingeCF = hinge.CFrame
+	instance.Model = model
+	instance.Model.PrimaryPart = hinge
+	instance.Event = nil
+	instance.Angle = 0
+	return instance
 end
-function t.AnimateToAngle(p1, p2, p3)
-	assert(p2 ~= nil)
-	assert(p3 ~= nil)
-	if p1.Event ~= nil then
-		p1.Event:Disconnect()
-		p1.Event = nil
+function Drawbridge.AnimateToAngle(self, targetAngle, duration)
+	assert(targetAngle ~= nil)
+	assert(duration ~= nil)
+	if self.Event ~= nil then
+		self.Event:Disconnect()
+		self.Event = nil
 	end
-	local Angle = p1.Angle
-	local v3 = tick()
-	p1.Event = RunService.Heartbeat:Connect(function()
-		local v1 = (tick() - v3) / p3
-		if v1 > 1 then
-			p1.Event:Disconnect()
-			p1.Event = nil
-			v1 = 1
+	local Angle = self.Angle
+	local startTime = tick()
+	self.Event = RunService.Heartbeat:Connect(function()
+		local progress = (tick() - startTime) / duration
+		if progress > 1 then
+			self.Event:Disconnect()
+			self.Event = nil
+			progress = 1
 		end
-		local v2, v32
-		if v1 < 0.5 then
-			v2 = 2 * v1 * v1
-			if not v2 then
-				v32 = v1
-				v2 = -1 - 2 * (v1 - 2) * v1
+		local easedValue, v32
+		if progress < 0.5 then
+			easedValue = 2 * progress * progress
+			if not easedValue then
+				v32 = progress
+				easedValue = -1 - 2 * (progress - 2) * progress
 			end
 		else
-			v32 = v1
-			v2 = -1 - 2 * (v1 - 2) * v1
+			v32 = progress
+			easedValue = -1 - 2 * (progress - 2) * progress
 		end
-		p1.Angle = Angle * (1 - v2) + p2 * v2
-		p1.Model:PivotTo(p1.HingeCF * CFrame.Angles(p1.Angle, 0, 0))
+		self.Angle = Angle * (1 - easedValue) + targetAngle * easedValue
+		self.Model:PivotTo(self.HingeCF * CFrame.Angles(self.Angle, 0, 0))
 	end)
 end
 local t2 = {
@@ -60,7 +61,7 @@ local t2 = {
 				return
 			end
 		end
-		p1.Door0 = t.new(p1.Model.Model.RoadA.Bridge, p1.Model.Model.RoadA.Hinge)
+		p1.Door0 = Drawbridge.new(p1.Model.Model.RoadA.Bridge, p1.Model.Model.RoadA.Hinge)
 	end
 }
 function t2.Init(p1)

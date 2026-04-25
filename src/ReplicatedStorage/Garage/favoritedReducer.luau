@@ -1,22 +1,23 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	setCategoryItemFavorited = function(p1, p2)
-		assert(p2.category ~= nil, "missing category")
-		assert(p2.name ~= nil, "missing name")
-		assert(p2.favorited ~= nil, "missing favorited")
-		local t = {}
-		for k, v in pairs(p1) do
-			t[k] = v
+	setCategoryItemFavorited = function(currentState, action)
+		assert(action.category ~= nil, "missing category")
+		assert(action.name ~= nil, "missing name")
+		assert(action.favorited ~= nil, "missing favorited")
+		local newState = {}
+		for k, v in pairs(currentState) do
+			newState[k] = v
 		end
-		if not t[p2.category] then
-			t[p2.category] = {}
+		if not newState[action.category] then
+			newState[action.category] = {}
 		end
-		t[p2.category][p2.name] = p2.favorited
-		return t
+		newState[action.category][action.name] = action.favorited
+		return newState
 	end,
-	setFavoritedRaw = function(p1, p2)
-		assert(p2.favorited ~= nil, "missing favorited table")
-		return p2.favorited
+	setFavoritedRaw = function(currentState, action)
+		assert(action.favorited ~= nil, "missing favorited table")
+		return action.favorited
 	end
 })

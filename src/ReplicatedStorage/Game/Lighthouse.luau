@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Binder = require(ReplicatedStorage.Std.Binder)
@@ -6,19 +7,19 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local CurrentCamera = workspace.CurrentCamera
 return {
 	Init = function()
-		Binder.new("LighthouseLight", function(p1)
-			local v1 = Maid.new()
-			assert(p1.PrimaryPart.Name == "Center", "LighthouseLight must have Center as PrimaryPart")
-			v1:GiveTask(RunService.Heartbeat:Connect(function(p12)
-				local v1 = p1:GetPivot()
-				local Magnitude = (CurrentCamera.CFrame.Position - v1.Position).Magnitude
+		Binder.new("LighthouseLight", function(lighthousePart)
+			local maid = Maid.new()
+			assert(lighthousePart.PrimaryPart.Name == "Center", "LighthouseLight must have Center as PrimaryPart")
+			maid:GiveTask(RunService.Heartbeat:Connect(function(deltaTime)
+				local pivot = lighthousePart:GetPivot()
+				local Magnitude = (CurrentCamera.CFrame.Position - pivot.Position).Magnitude
 				if not (Magnitude * Magnitude > 1048576) then
 					debug.profilebegin("Lighthouse")
-					p1:PivotTo(v1 * CFrame.Angles(0, 0.5 * p12, 0))
+					lighthousePart:PivotTo(pivot * CFrame.Angles(0, 0.5 * deltaTime, 0))
 					debug.profileend()
 				end
 			end))
-			return v1
+			return maid
 		end):Start()
 	end
 }

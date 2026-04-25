@@ -1,68 +1,69 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Util = require(script.Parent.Parent.Shared.Util)
 local Players = game:GetService("Players")
-local t = {}
-local function getUserId(p1)
-	if t[p1] then
-		return t[p1]
-	elseif Players:FindFirstChild(p1) then
-		t[p1] = Players[p1].UserId
-		return Players[p1].UserId
+local userIdCache = {}
+local function getUserId(playerName)
+	if userIdCache[playerName] then
+		return userIdCache[playerName]
+	elseif Players:FindFirstChild(playerName) then
+		userIdCache[playerName] = Players[playerName].UserId
+		return Players[playerName].UserId
 	else
-		local v1, v2 = pcall(Players.GetUserIdFromNameAsync, Players, p1)
-		if v1 then
-			t[p1] = v2
-			return v2
+		local success, userId = pcall(Players.GetUserIdFromNameAsync, Players, playerName)
+		if success then
+			userIdCache[playerName] = userId
+			return userId
 		else
 			return nil
 		end
 	end
 end
-local t2 = {
+local playerIdType = {
 	DisplayName = "Full Player Name",
 	Prefixes = "# positiveInteger",
-	Transform = function(p1)
-		return p1, Util.MakeFuzzyFinder(Players:GetPlayers())(p1)
+	Transform = function(playerName)
+		return playerName, Util.MakeFuzzyFinder(Players:GetPlayers())(playerName)
 	end,
-	ValidateOnce = function(p1)
-		local v1
-		if t[p1] then
-			v1 = t[p1]
-		elseif Players:FindFirstChild(p1) then
-			t[p1] = Players[p1].UserId
-			v1 = Players[p1].UserId
+	ValidateOnce = function(playerName)
+		local userId
+		if userIdCache[playerName] then
+			userId = userIdCache[playerName]
+		elseif Players:FindFirstChild(playerName) then
+			userIdCache[playerName] = Players[playerName].UserId
+			userId = Players[playerName].UserId
 		else
-			local v2, v3 = pcall(Players.GetUserIdFromNameAsync, Players, p1)
-			if v2 then
-				t[p1] = v3
-				v1 = v3
+			local success, resultId = pcall(Players.GetUserIdFromNameAsync, Players, playerName)
+			if success then
+				userIdCache[playerName] = resultId
+				userId = resultId
 			else
-				v1 = nil
+				userId = nil
 			end
 		end
-		return v1 ~= nil, "No player with that name could be found."
+		return userId ~= nil, "No player with that name could be found."
 	end,
-	Autocomplete = function(p1, p2)
-		return Util.GetNames(p2)
+	Autocomplete = function(playerName, playerList)
+		return Util.GetNames(playerList)
 	end,
-	Parse = function(p1)
-		if t[p1] then
-			return t[p1]
-		elseif Players:FindFirstChild(p1) then
-			t[p1] = Players[p1].UserId
-			return Players[p1].UserId
+	Parse = function(playerName)
+		if userIdCache[playerName] then
+			return userIdCache[playerName]
+		elseif Players:FindFirstChild(playerName) then
+			userIdCache[playerName] = Players[playerName].UserId
+			return Players[playerName].UserId
 		else
-			local v1, v2 = pcall(Players.GetUserIdFromNameAsync, Players, p1)
-			if v1 then
-				t[p1] = v2
-				return v2
+			local success, userId = pcall(Players.GetUserIdFromNameAsync, Players, playerName)
+			if success then
+				userIdCache[playerName] = userId
+				return userId
 			else
 				return nil
 			end
 		end
 	end,
-	Default = function(p1)
-		return p1.Name
+	Default = function(playerName)
+		return playerName.Name
 	end,
 	ArgumentOperatorAliases = {
 		me = ".",
@@ -71,9 +72,9 @@ local t2 = {
 		random = "?"
 	}
 }
-return function(p1)
-	p1:RegisterType("playerId", t2)
-	p1:RegisterType("playerIds", Util.MakeListableType(t2, {
+return function(playerName)
+	playerName:RegisterType("playerId", playerIdType)
+	playerName:RegisterType("playerIds", Util.MakeListableType(playerIdType, {
 		Prefixes = "# positiveIntegers"
 	}))
 end

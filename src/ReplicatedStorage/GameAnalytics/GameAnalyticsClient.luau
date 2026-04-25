@@ -1,19 +1,20 @@
 -- Reviewed by Claude
-local t = {}
+-- variables reassigned
+local GameAnalyticsClientModule = {}
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ScriptContext = game:GetService("ScriptContext")
-function t.initClient()
+function GameAnalyticsClientModule.initClient()
 	local Postie = require(script.Parent.GameAnalytics.Postie)
-	ScriptContext.Error:Connect(function(p1, p2, p3)
-		if p3 then
-			local v1 = nil
-			local v2, _ = pcall(function()
-				v1 = p3:GetFullName()
+	ScriptContext.Error:Connect(function(errorMessage, errorTraceback, errorSource)
+		if errorSource then
+			local sourceFullName = nil
+			local pcallSuccess, _ = pcall(function()
+				sourceFullName = errorSource:GetFullName()
 			end)
-			if v2 then
-				ReplicatedStorage.GameAnalyticsError:FireServer(p1, p2, v1)
+			if pcallSuccess then
+				ReplicatedStorage.GameAnalyticsError:FireServer(errorMessage, errorTraceback, sourceFullName)
 			end
 		end
 	end)
@@ -28,4 +29,4 @@ function t.initClient()
 	end
 	Postie.setCallback("getPlatform", getPlatform)
 end
-return t
+return GameAnalyticsClientModule

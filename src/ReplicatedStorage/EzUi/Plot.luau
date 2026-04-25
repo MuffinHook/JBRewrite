@@ -1,82 +1,83 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
 local v2 = Roact.Component:extend("Plot")
-function v2.init(p1)
-	p1:setState({
+function v2.init(self)
+	self:setState({
 		aspectRatio = 1
 	})
 end
-function v2.CalculateAspectRatio(p1, p2)
-	p1:setState({
-		aspectRatio = p2.AbsoluteSize.Y / p2.AbsoluteSize.X
+function v2.CalculateAspectRatio(self, sizeContainer)
+	self:setState({
+		aspectRatio = sizeContainer.AbsoluteSize.Y / sizeContainer.AbsoluteSize.X
 	})
 end
-function v2.render(p1)
-	local window = p1.props.window
-	local v1 = window[1]
-	local v2 = window[2]
-	local v3 = window[3] - v1
-	local v4 = window[4] - v2
-	local t = {}
-	if p1.props.lines then
-		local v5 = p1.props.lineWidth or 2
-		for i, v in ipairs(p1.props.lines) do
-			local v6 = (v[1] - v1) / v3
-			local v7 = (v[2] - v2) / v4
-			local v8 = (v[3] - v1) / v3
-			local v9 = (v[4] - v2) / v4
-			local v12 = v8 - v6
-			local v13 = v9 - v7
-			local v15 = math.sqrt(v13 * v13 * p1.state.aspectRatio * p1.state.aspectRatio + v12 * v12)
-			local v17 = math.atan2(v13 * p1.state.aspectRatio, v12)
-			local t2 = {
+function v2.render(self)
+	local window = self.props.window
+	local minX = window[1]
+	local minY = window[2]
+	local width = window[3] - minX
+	local height = window[4] - minY
+	local frameElements = {}
+	if self.props.lines then
+		local lineWidth = self.props.lineWidth or 2
+		for i, v in ipairs(self.props.lines) do
+			local normalizedX1 = (v[1] - minX) / width
+			local normalizedY1 = (v[2] - minY) / height
+			local normalizedX2 = (v[3] - minX) / width
+			local normalizedY2 = (v[4] - minY) / height
+			local deltaX = normalizedX2 - normalizedX1
+			local deltaY = normalizedY2 - normalizedY1
+			local lineLength = math.sqrt(deltaY * deltaY * self.state.aspectRatio * self.state.aspectRatio + deltaX * deltaX)
+			local angle = math.atan2(deltaY * self.state.aspectRatio, deltaX)
+			local frameProps = {
 				AnchorPoint = Vector2.new(0.5, 0.5)
 			}
-			t2.BackgroundColor3 = p1.props.lineColor or Color3.new(255/255, 255/255, 255/255)
-			t2.BorderSizePixel = 0
-			t2.Size = UDim2.new(v15, 0, 0, v5)
-			t2.Rotation = math.deg(-v17)
-			t2.Position = UDim2.new((v6 + v8) * 0.5, 0, 1 - (v7 + v9) * 0.5, 0)
-			table.insert(t, createElement("Frame", t2))
+			frameProps.BackgroundColor3 = self.props.lineColor or Color3.new(255/255, 255/255, 255/255)
+			frameProps.BorderSizePixel = 0
+			frameProps.Size = UDim2.new(lineLength, 0, 0, lineWidth)
+			frameProps.Rotation = math.deg(-angle)
+			frameProps.Position = UDim2.new((normalizedX1 + normalizedX2) * 0.5, 0, 1 - (normalizedY1 + normalizedY2) * 0.5, 0)
+			table.insert(frameElements, createElement("Frame", frameProps))
 		end
 	end
-	if p1.props.points then
-		local v21 = p1.props.pointRadius or 3
-		for i, v in ipairs(p1.props.points) do
-			local t2 = {
+	if self.props.points then
+		local pointRadius = self.props.pointRadius or 3
+		for i, v in ipairs(self.props.points) do
+			local frameProps = {
 				AnchorPoint = Vector2.new(0.5, 0.5)
 			}
-			t2.BackgroundColor3 = p1.props.pointColor or Color3.new(255/255, 255/255, 255/255)
-			t2.BorderSizePixel = 0
-			t2.Size = UDim2.new(0, v21 * 2, 0, v21 * 2)
-			t2.Position = UDim2.new((v[1] - v1) / v3, 0, 1 - (v[2] - v2) / v4, 0)
-			table.insert(t, createElement("Frame", t2))
+			frameProps.BackgroundColor3 = self.props.pointColor or Color3.new(255/255, 255/255, 255/255)
+			frameProps.BorderSizePixel = 0
+			frameProps.Size = UDim2.new(0, pointRadius * 2, 0, pointRadius * 2)
+			frameProps.Position = UDim2.new((v[1] - minX) / width, 0, 1 - (v[2] - minY) / height, 0)
+			table.insert(frameElements, createElement("Frame", frameProps))
 		end
 	end
-	if p1.props.labels then
-		for i, v in ipairs(p1.props.labels) do
-			local t2 = {
+	if self.props.labels then
+		for i, v in ipairs(self.props.labels) do
+			local frameProps = {
 				BackgroundTransparency = 1,
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Text = v[1]
 			}
-			t2.TextColor3 = p1.props.labelColor or Color3.new(255/255, 255/255, 255/255)
-			t2.Position = UDim2.new((v[2] - v1) / v3, 0, 1 - (v[3] - v2) / v4, 0)
-			table.insert(t, createElement("TextLabel", t2))
+			frameProps.TextColor3 = self.props.labelColor or Color3.new(255/255, 255/255, 255/255)
+			frameProps.Position = UDim2.new((v[2] - minX) / width, 0, 1 - (v[3] - minY) / height, 0)
+			table.insert(frameElements, createElement("TextLabel", frameProps))
 		end
 	end
 	return createElement("Frame", {
 		BorderSizePixel = 1,
 		BorderColor3 = Color3.new(255/255, 255/255, 255/255),
 		BackgroundColor3 = Color3.fromRGB(20, 20, 20),
-		BackgroundTransparency = p1.props.backgroundTransparency,
-		Size = p1.props.size,
-		Position = p1.props.position,
-		ZIndex = p1.props.zIndex,
-		[Roact.Change.AbsoluteSize] = function(p12)
-			p1:CalculateAspectRatio(p12)
+		BackgroundTransparency = self.props.backgroundTransparency,
+		Size = self.props.size,
+		Position = self.props.position,
+		ZIndex = self.props.zIndex,
+		[Roact.Change.AbsoluteSize] = function(sizeContainer)
+			self:CalculateAspectRatio(sizeContainer)
 		end
-	}, t)
+	}, frameElements)
 end
 return v2

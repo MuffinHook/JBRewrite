@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
 local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
@@ -9,39 +10,39 @@ return Rodux.createReducer({}, {
 	setSaveSlot = function(p1, p2)
 		assert(p2.name, "missing slot name")
 		assert(p2.equipped, "missing slot equipped")
-		local t = {}
+		local stateCopy = {}
 		for k, v in pairs(p1) do
-			t[k] = v
+			stateCopy[k] = v
 		end
 		local name_2 = p2.name
 		local equipped_2 = p2.equipped
 		if GarageUtils.getIsSaveSlotValid(tonumber(name_2:match("%d+")), (GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.VIP))) then
-			t[name_2] = equipped_2
+			stateCopy[name_2] = equipped_2
 		end
-		local v3 = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_SAVE_REMOTE_NAME)
-		if v3 then
-			v3:FireServer(name_2)
+		local slotSaveRemote = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_SAVE_REMOTE_NAME)
+		if slotSaveRemote then
+			slotSaveRemote:FireServer(name_2)
 		end
-		return t
+		return stateCopy
 	end,
 	deleteSaveSlot = function(p1, p2)
 		assert(p2.name, "missing slot name")
-		local t = {}
+		local stateCopy = {}
 		for k, v in pairs(p1) do
-			t[k] = v
+			stateCopy[k] = v
 		end
-		t[p2.name] = nil
-		local v1 = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_DELETE_REMOTE_NAME)
-		if v1 then
-			v1:FireServer(p2.name)
+		stateCopy[p2.name] = nil
+		local slotDeleteRemote = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_DELETE_REMOTE_NAME)
+		if slotDeleteRemote then
+			slotDeleteRemote:FireServer(p2.name)
 		end
-		return t
+		return stateCopy
 	end,
 	loadSaveSlot = function(p1, p2)
 		assert(p2.name, "missing slot name")
-		local v1 = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_LOAD_REMOTE_NAME)
-		if v1 then
-			v1:FireServer(p2.name)
+		local slotLoadRemote = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_LOAD_REMOTE_NAME)
+		if slotLoadRemote then
+			slotLoadRemote:FireServer(p2.name)
 		end
 		return p1
 	end,

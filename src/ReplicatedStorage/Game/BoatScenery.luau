@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
@@ -7,25 +8,25 @@ return {
 		BoatScenery.Parent = workspace
 		local t = {}
 		for i, v in ipairs(BoatScenery:GetChildren()) do
-			local v1 = nil
+			local speed = nil
 			if v.Name:find("Ship") then
-				v1 = -20
+				speed = -20
 			elseif v.Name:find("Sailboat") then
-				v1 = 45 + math.random() * 20
+				speed = 45 + math.random() * 20
 			end
-			assert(v1)
+			assert(speed)
 			table.insert(t, {
 				Part = v,
-				Speed = v1,
+				Speed = speed,
 				Angle = math.random() * math.pi * 2 * 0.1,
 				Radius = 6489.6 + (math.random() * 2 - 1) * 50
 			})
 		end
-		RunService.Heartbeat:Connect(function(p1)
+		RunService.Heartbeat:Connect(function(deltaTime)
 			for i, v in ipairs(t) do
-				v.Angle = v.Angle + v.Speed * p1 / v.Radius
-				local v2 = CFrame.Angles(0, v.Angle, 0) * CFrame.new(v.Radius, 0, 0) + Vector3.new(169, 0, -1550)
-				v.Part.CFrame = v2 + Vector3.new(0, v.Part.Size.Y * 0.5, 0)
+				v.Angle = v.Angle + v.Speed * deltaTime / v.Radius
+				local cframe = CFrame.Angles(0, v.Angle, 0) * CFrame.new(v.Radius, 0, 0) + Vector3.new(169, 0, -1550)
+				v.Part.CFrame = cframe + Vector3.new(0, v.Part.Size.Y * 0.5, 0)
 			end
 		end)
 	end

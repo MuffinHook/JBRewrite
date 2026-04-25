@@ -1,9 +1,10 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Settings = require(ReplicatedStorage.Resource.Settings)
 local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
 local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConsts)
-local t = {
+local COLORS = {
 	Chrome = {
 		Color = Color3.fromRGB(248, 248, 248),
 		Reflectance = 1,
@@ -115,59 +116,59 @@ local t = {
 		Color = Color3.fromRGB(255, 255, 255)
 	}
 }
-for v1, v2 in HyperChromeUtils.getListOfHyperChromeNames() do
-	local v3 = HyperChromeUtils.getColorFromName(v2)
-	local v4 = HyperChromeConsts.COLOR_TO_INFO_MAP[v3].LevelToColor[HyperChromeUtils.getLevelFromName(v2)]
-	local v8, v9, v10 = Color3.new(math.clamp(v4.r, 0, 1), math.clamp(v4.g, 0, 1), (math.clamp(v4.b, 0, 1))):ToHSV()
-	t[v2] = {
-		Color = Color3.fromHSV(v8, v9, (math.clamp(v10 * 2 / 3, 0, 1))),
+for v1, hyperchromeNames in HyperChromeUtils.getListOfHyperChromeNames() do
+	local chromeColor = HyperChromeUtils.getColorFromName(hyperchromeNames)
+	local colorLevelInfo = HyperChromeConsts.COLOR_TO_INFO_MAP[chromeColor].LevelToColor[HyperChromeUtils.getLevelFromName(hyperchromeNames)]
+	local hue, saturation, value = Color3.new(math.clamp(colorLevelInfo.r, 0, 1), math.clamp(colorLevelInfo.g, 0, 1), (math.clamp(colorLevelInfo.b, 0, 1))):ToHSV()
+	COLORS[hyperchromeNames] = {
+		Color = Color3.fromHSV(hue, saturation, (math.clamp(value * 2 / 3, 0, 1))),
 		Reflectance = 0.1
 	}
 end
-t[HyperChromeConsts.COLOR_SHIFT_NAME] = {
+COLORS[HyperChromeConsts.COLOR_SHIFT_NAME] = {
 	Color = Color3.fromRGB(1, 1, 1),
 	Reflectance = 0.1
 }
 return {
-	GetColor = function(p1)
-		if t[p1] then
-			return t[p1].Color
-		elseif Settings.Colors[p1] then
-			return Settings.Colors[p1]
+	GetColor = function(colorName)
+		if COLORS[colorName] then
+			return COLORS[colorName].Color
+		elseif Settings.Colors[colorName] then
+			return Settings.Colors[colorName]
 		else
 			return nil
 		end
 	end,
-	Part = function(p1, p2, p3)
-		assert(p1 ~= nil)
-		assert(p2 ~= nil)
-		assert(p3 ~= nil)
-		assert(p3.DefaultReflectance ~= nil)
-		assert(if p3.DefaultMaterial == nil then p3.DisableMaterial == true else true)
-		if t[p2] then
-			local v6 = t[p2]
-			p1.Color = v6.Color
-			if not p3.DisableReflectance then
-				if v6.Reflectance == nil then
-					p1.Reflectance = p3.DefaultReflectance
+	Part = function(part, colorName, paintOptions)
+		assert(part ~= nil)
+		assert(colorName ~= nil)
+		assert(paintOptions ~= nil)
+		assert(paintOptions.DefaultReflectance ~= nil)
+		assert(if paintOptions.DefaultMaterial == nil then paintOptions.DisableMaterial == true else true)
+		if COLORS[colorName] then
+			local paintColorInfo = COLORS[colorName]
+			part.Color = paintColorInfo.Color
+			if not paintOptions.DisableReflectance then
+				if paintColorInfo.Reflectance == nil then
+					part.Reflectance = paintOptions.DefaultReflectance
 				else
-					p1.Reflectance = p3.OverrideReflectance or v6.Reflectance
+					part.Reflectance = paintOptions.OverrideReflectance or paintColorInfo.Reflectance
 				end
 			end
-			if p3.DisableMaterial then
-			elseif v6.Material == nil then
-				p1.Material = p3.DefaultMaterial
+			if paintOptions.DisableMaterial then
+			elseif paintColorInfo.Material == nil then
+				part.Material = paintOptions.DefaultMaterial
 			else
-				p1.Material = p3.OverrideMaterial or v6.Material
+				part.Material = paintOptions.OverrideMaterial or paintColorInfo.Material
 			end
-		elseif Settings.Colors[p2] then
-			p1.Color = Settings.Colors[p2]
-			p1.Reflectance = p3.DefaultReflectance
-			if not p3.DisableMaterial then
-				p1.Material = p3.DefaultMaterial
+		elseif Settings.Colors[colorName] then
+			part.Color = Settings.Colors[colorName]
+			part.Reflectance = paintOptions.DefaultReflectance
+			if not paintOptions.DisableMaterial then
+				part.Material = paintOptions.DefaultMaterial
 			end
 		else
-			error(("No color exists named: %s"):format(p2))
+			error(("No color exists named: %s"):format(colorName))
 		end
 	end
 }

@@ -1,10 +1,11 @@
 -- Reviewed by Claude
+-- variables reassigned
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Std.Promise)
 local MarketplaceService = game:GetService("MarketplaceService")
 local SeasonConsts = require(script.Parent.SeasonConsts)
-local t = {
+local seasonUtils = {
 	getRemainingTime = function()
 		local UnixTimestamp = DateTime.now().UnixTimestamp
 		return SeasonConsts.SEASON_END_UNIX - UnixTimestamp
@@ -25,43 +26,43 @@ local t = {
 		end
 	end
 }
-function t.isBuyEnabled()
-	return if t.getRemainingTime() < 0 then t.getRemainingBuyTime() >= 0 else false
+function seasonUtils.isBuyEnabled()
+	return if seasonUtils.getRemainingTime() < 0 then seasonUtils.getRemainingBuyTime() >= 0 else false
 end
-local t2 = {}
-function t.getProductPrice(p1)
-	if t2[p1] then
-		return Promise.resolve(t2[p1])
+local productPriceCache = {}
+function seasonUtils.getProductPrice(productId)
+	if productPriceCache[productId] then
+		return Promise.resolve(productPriceCache[productId])
 	else
-		return Promise.defer(function(p12)
-			local PriceInRobux = MarketplaceService:GetProductInfo(p1, Enum.InfoType.Product).PriceInRobux
-			t2[p1] = PriceInRobux
-			p12(PriceInRobux)
+		return Promise.defer(function(resolve)
+			local PriceInRobux = MarketplaceService:GetProductInfo(productId, Enum.InfoType.Product).PriceInRobux
+			productPriceCache[productId] = PriceInRobux
+			resolve(PriceInRobux)
 		end)
 	end
 end
-function t.serializeLevelsAwarded(p1)
-	assert(type(p1) == "table")
-	return HttpService:JSONEncode(p1)
+function seasonUtils.serializeLevelsAwarded(levelsTable)
+	assert(type(levelsTable) == "table")
+	return HttpService:JSONEncode(levelsTable)
 end
-function t.deserializeLevelsAwarded(p1)
-	assert(type(p1) == "string")
-	return HttpService:JSONDecode(p1)
+function seasonUtils.deserializeLevelsAwarded(levelsJson)
+	assert(type(levelsJson) == "string")
+	return HttpService:JSONDecode(levelsJson)
 end
-function t.formatRemaining(p1)
-	local v1 = math.max(0, p1)
-	local v2 = math.floor(v1 / 86400)
-	local v3 = math.floor(v1 % 86400 / 3600)
-	local v4 = math.floor(v1 % 3600 / 60)
-	local v5 = math.floor(v1 % 60)
-	if v2 > 0 then
-		return ("%dd %dh"):format(v2, v3)
-	elseif v3 > 0 then
-		return ("%dh %dm"):format(v3, v4)
-	elseif v4 > 0 then
-		return ("%dm %ds"):format(v4, v5)
+function seasonUtils.formatRemaining(totalSeconds)
+	local remainingSeconds = math.max(0, totalSeconds)
+	local days = math.floor(remainingSeconds / 86400)
+	local hours = math.floor(remainingSeconds % 86400 / 3600)
+	local minutes = math.floor(remainingSeconds % 3600 / 60)
+	local seconds = math.floor(remainingSeconds % 60)
+	if days > 0 then
+		return ("%dd %dh"):format(days, hours)
+	elseif hours > 0 then
+		return ("%dh %dm"):format(hours, minutes)
+	elseif minutes > 0 then
+		return ("%dm %ds"):format(minutes, seconds)
 	else
-		return ("%ds"):format(v5)
+		return ("%ds"):format(seconds)
 	end
 end
-return t
+return seasonUtils

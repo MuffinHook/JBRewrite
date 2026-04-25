@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -9,43 +10,43 @@ function t.Init()
 	PoliceReportGui.Parent = LocalPlayer.PlayerGui
 	t.Gui = PoliceReportGui
 end
-function t.Display(p1)
+function t.Display(reportData)
 	if t.IsOpen() then
 		t.Hide()
 	end
 	local Gui = t.Gui
-	local v1 = Maid.new()
-	t.Maid = v1
+	local maid = Maid.new()
+	t.Maid = maid
 	local List = Gui.Container.Top.List
 	local sum = 0
-	for i, v in ipairs(p1) do
-		local v2, v3
-		local v4 = assert(v.Title)
-		local v5 = assert(v.Amount)
-		v2 = type(v5) == "number"
-		assert(v2)
+	for i, v in ipairs(reportData) do
+		local isAmount, hasSubtitle
+		local reportTitle = assert(v.Title)
+		local reportAmount = assert(v.Amount)
+		isAmount = type(reportAmount) == "number"
+		assert(isAmount)
 		local SubTitle = v.SubTitle
-		local v6 = List.Preset:Clone()
-		v6.LayoutOrder = i
-		v6.Parent = List
-		v6.Title.Text = v4
-		v6.Amount.Text = Math.FormatMoney(v5)
+		local reportItem = List.Preset:Clone()
+		reportItem.LayoutOrder = i
+		reportItem.Parent = List
+		reportItem.Title.Text = reportTitle
+		reportItem.Amount.Text = Math.FormatMoney(reportAmount)
 		if SubTitle ~= nil then
-			v6.SubTitle.Text = SubTitle
+			reportItem.SubTitle.Text = SubTitle
 		end
-		v3 = SubTitle ~= nil
-		v6.SubTitle.Visible = v3
-		v6.Visible = true
-		v1:GiveTask(v6)
-		sum = sum + v5
+		hasSubtitle = SubTitle ~= nil
+		reportItem.SubTitle.Visible = hasSubtitle
+		reportItem.Visible = true
+		maid:GiveTask(reportItem)
+		sum = sum + reportAmount
 	end
 	Gui.Container.Bottom.Container.Sum.Text = ("+%s"):format(Math.FormatMoney(sum))
-	v1:GiveTask(Gui.Container.Close.MouseButton1Down:Connect(function()
+	maid:GiveTask(Gui.Container.Close.MouseButton1Down:Connect(function()
 		t.Hide()
 	end))
 	Gui.Enabled = true
-	delay(5, function()
-		if v1 == t.Maid then
+	task.delay(5, function()
+		if maid == t.Maid then
 			t.Hide()
 		end
 	end)

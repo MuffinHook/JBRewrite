@@ -1,7 +1,8 @@
 -- Reviewed by Claude
+-- variables reassigned
 local t = {}
 t.__index = t
-local v1 = Vector3.new
+local Vector3_new = Vector3.new
 local noise = math.noise
 t.CameraShakeState = {
 	FadingIn = 0,
@@ -20,27 +21,27 @@ function t.new(p1, p2, p3, p4)
 	assert(type(p2) == "number", "Roughness must be a number")
 	assert(type(p3) == "number", "FadeInTime must be a number")
 	assert(type(p4) == "number", "FadeOutTime must be a number")
-	local t2 = {
+	local shakeInstance = {
 		Magnitude = p1,
 		Roughness = p2,
-		PositionInfluence = v1(),
-		RotationInfluence = v1(),
+		PositionInfluence = Vector3_new(),
+		RotationInfluence = Vector3_new(),
 		DeleteOnInactive = true,
 		roughMod = 1,
 		magnMod = 1,
 		fadeOutDuration = p4,
 		fadeInDuration = p3
 	}
-	t2.sustain = p3 > 0
-	t2.currentFadeTime = if p3 > 0 then 0 else 1
-	t2.tick = Random.new():NextNumber(-100, 100)
-	t2._camShakeInstance = true
-	return setmetatable(t2, t)
+	shakeInstance.sustain = p3 > 0
+	shakeInstance.currentFadeTime = if p3 > 0 then 0 else 1
+	shakeInstance.tick = Random.new():NextNumber(-100, 100)
+	shakeInstance._camShakeInstance = true
+	return setmetatable(shakeInstance, t)
 end
 function t.UpdateShake(p1, p2)
-	local v12 = p1.tick
+	local tickValue = p1.tick
 	local currentFadeTime = p1.currentFadeTime
-	local v2 = v1(noise(v12, 0) * 0.5, noise(0, v12) * 0.5, noise(v12, v12) * 0.5)
+	local noiseOffset = Vector3_new(noise(tickValue, 0) * 0.5, noise(0, tickValue) * 0.5, noise(tickValue, tickValue) * 0.5)
 	if p1.fadeInDuration > 0 and p1.sustain then
 		if currentFadeTime < 1 then
 			currentFadeTime = currentFadeTime + p2 / p1.fadeInDuration
@@ -52,12 +53,12 @@ function t.UpdateShake(p1, p2)
 		currentFadeTime = currentFadeTime - p2 / p1.fadeOutDuration
 	end
 	if p1.sustain then
-		p1.tick = v12 + p2 * p1.Roughness * p1.roughMod
+		p1.tick = tickValue + p2 * p1.Roughness * p1.roughMod
 	else
-		p1.tick = v12 + p2 * p1.Roughness * p1.roughMod * currentFadeTime
+		p1.tick = tickValue + p2 * p1.Roughness * p1.roughMod * currentFadeTime
 	end
 	p1.currentFadeTime = currentFadeTime
-	return v2 * p1.Magnitude * p1.magnMod * currentFadeTime
+	return noiseOffset * p1.Magnitude * p1.magnMod * currentFadeTime
 end
 function t.StartFadeOut(p1, p2)
 	if p2 == 0 then

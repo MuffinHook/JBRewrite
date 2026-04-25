@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -10,19 +11,19 @@ local GarageConsts = require(ReplicatedStorage.Game.Garage.GarageConsts)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local PrivateServerUtils = require(ReplicatedStorage.PrivateServer.PrivateServerUtils)
 local t = {
-	isPlayerInPhysicalGarage = function(p1)
-		local v1 = false
-		local v2 = CollectionService:GetTagged("Garage")
-		local v3 = CharacterUtils.getRootPart(p1.Character)
-		if v3 then
-			local Position = v3.Position
-			for i, v in ipairs(v2) do
+	isPlayerInPhysicalGarage = function(player)
+		local isInGarage = false
+		local garageRegions = CollectionService:GetTagged("Garage")
+		local characterRootPart = CharacterUtils.getRootPart(player.Character)
+		if characterRootPart then
+			local Position = characterRootPart.Position
+			for i, v in ipairs(garageRegions) do
 				local Region = v:FindFirstChild("Region")
 				if Region and RegionUtils.CastPoint(RegionUtils.getPrism(Region.CFrame, Region.Size), Position) then
-					v1 = true
+					isInGarage = true
 				end
 			end
-			return v1
+			return isInGarage
 		end
 	end
 }
@@ -35,20 +36,20 @@ end
 function t.hasPremium()
 	return GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.PremiumGarage) or PrivateServerUtils.getIsBattleServer()
 end
-function t.isVehicleCustomizationLimited(p1)
-	return if p1.Hidden == true or (p1.HiddenAll == true or (p1.Level ~= nil or p1.Season ~= nil)) then true else not p1.Price
+function t.isVehicleCustomizationLimited(vehicleConfig)
+	return if vehicleConfig.Hidden == true or (vehicleConfig.HiddenAll == true or (vehicleConfig.Level ~= nil or vehicleConfig.Season ~= nil)) then true else not vehicleConfig.Price
 end
-function t.isVehicleLimited(p1)
-	return if p1.Hidden == true or (p1.Retired == true or p1.Level ~= nil) then true else p1.Season ~= nil
+function t.isVehicleLimited(vehicleConfig)
+	return if vehicleConfig.Hidden == true or (vehicleConfig.Retired == true or vehicleConfig.Level ~= nil) then true else vehicleConfig.Season ~= nil
 end
-function t.getIsSaveSlotValid(p1, p2)
-	assert(typeof(p1) == "number", "saveSlotNum must be a number")
-	assert(typeof(p2) == "boolean", "isVIP must be a boolean")
-	if p1 == p1 then
-		if p2 then
-			return if p1 > 0 then p1 <= GarageConsts.NUM_SAVE_SLOTS else false
+function t.getIsSaveSlotValid(saveSlotNum, isVIP)
+	assert(typeof(saveSlotNum) == "number", "saveSlotNum must be a number")
+	assert(typeof(isVIP) == "boolean", "isVIP must be a boolean")
+	if saveSlotNum == saveSlotNum then
+		if isVIP then
+			return if saveSlotNum > 0 then saveSlotNum <= GarageConsts.NUM_SAVE_SLOTS else false
 		else
-			return if p1 > 0 then p1 <= GarageConsts.NUM_FREE_SAVE_SLOTS else false
+			return if saveSlotNum > 0 then saveSlotNum <= GarageConsts.NUM_FREE_SAVE_SLOTS else false
 		end
 	else
 		return false

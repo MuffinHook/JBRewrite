@@ -1,51 +1,52 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Joint = require(ReplicatedStorage.Std.Joint)
 local WheelColor = require(script.Parent.WheelColor)
-local v1 = CFrame.new
+local cfNew = CFrame.new
 local Angles = CFrame.Angles
-local v2 = v1()
+local defaultCFrame = cfNew()
 local _ = Vector3.new
-local function getRimAndCf(p1, p2, p3, p4)
-	local PrimaryPart = p2.PrimaryPart
+local function getRimAndCf(vehicleModel, wheelPart, rimConfig, isLeftWheel)
+	local PrimaryPart = wheelPart.PrimaryPart
 	if not PrimaryPart then
-		print(p2:GetFullName())
-		print(p2:GetChildren())
+		print(wheelPart:GetFullName())
+		print(wheelPart:GetChildren())
 		error("Vehicle wheel model is missing `Wheel` part as PrimaryPart")
 	end
-	local v1 = PrimaryPart
-	local v22
+	local currentPart = PrimaryPart
+	local enginePart
 	repeat
-		v1 = v1.Parent
-		v22 = v1:FindFirstChild("Engine")
-	until v22 ~= nil
-	local v3
-	if p4 == nil then
-		if v22.CFrame:PointToObjectSpace(PrimaryPart.Position).X < -1 then
-			v3 = v22
-			p4 = true
+		currentPart = currentPart.Parent
+		enginePart = currentPart:FindFirstChild("Engine")
+	until enginePart ~= nil
+	local enginePartRef
+	if isLeftWheel == nil then
+		if enginePart.CFrame:PointToObjectSpace(PrimaryPart.Position).X < -1 then
+			enginePartRef = enginePart
+			isLeftWheel = true
 		else
-			v3 = v22
-			p4 = false
+			enginePartRef = enginePart
+			isLeftWheel = false
 		end
 	else
-		v3 = v22
+		enginePartRef = enginePart
 	end
-	local v4 = Vector3.new(1, 1, 1)
-	local v5 = p2:FindFirstChild("InnerWheelPct") or p1:FindFirstChild("InnerWheelPct")
-	if v5 then
-		v4 = Vector3.new(1, v5.Value, v5.Value)
+	local scaleVector = Vector3.new(1, 1, 1)
+	local innerWheelPct = wheelPart:FindFirstChild("InnerWheelPct") or vehicleModel:FindFirstChild("InnerWheelPct")
+	if innerWheelPct then
+		scaleVector = Vector3.new(1, innerWheelPct.Value, innerWheelPct.Value)
 	end
-	local v9 = p2:FindFirstChild("InnerWheelScale") or p1:FindFirstChild("InnerWheelScale")
-	if v9 then
-		v4 = v9.Value
+	local innerWheelScale = wheelPart:FindFirstChild("InnerWheelScale") or vehicleModel:FindFirstChild("InnerWheelScale")
+	if innerWheelScale then
+		scaleVector = innerWheelScale.Value
 	end
-	local v11 = ReplicatedStorage.Resource.Rims:FindFirstChild(p3.Name)
-	local Size = v11.Size
-	if not v11 then
+	local rimResource = ReplicatedStorage.Resource.Rims:FindFirstChild(rimConfig.Name)
+	local Size = rimResource.Size
+	if not rimResource then
 		error("No rim exists under requested name")
 	end
-	local Rim = v11:Clone()
+	local Rim = rimResource:Clone()
 	Rim.Name = "Rim"
 	Rim.Massless = true
 	Rim.CanCollide = false
@@ -53,51 +54,51 @@ local function getRimAndCf(p1, p2, p3, p4)
 	if Rim:FindFirstChildOfClass("Sound") then
 		Rim:FindFirstChildOfClass("Sound"):Play()
 	end
-	local v12 = Rim
+	local clonedRim = Rim
 	local X = PrimaryPart.Size.X
-	local v15 = X * (p3.OffsetXPct or 0)
+	local v15 = X * (rimConfig.OffsetXPct or 0)
 	local v16 = math.max(X + v15, 0.01)
-	local _ = v12.Size.Y * 0.25 + v12.Size.Z * 0.25
-	local v18 = (PrimaryPart.Size.Y * 0.25 + PrimaryPart.Size.Z * 0.25) * (1 + (p3.OffsetRadiusPct or 0))
-	v12.Size = Vector3.new(v16, v18 * 2, v18 * 2) * v4
-	if v4.X <= 0.02 or (v4.Y <= 0.02 or v4.Z <= 0.02) then
-		v12.Transparency = 1
+	local _ = clonedRim.Size.Y * 0.25 + clonedRim.Size.Z * 0.25
+	local v18 = (PrimaryPart.Size.Y * 0.25 + PrimaryPart.Size.Z * 0.25) * (1 + (rimConfig.OffsetRadiusPct or 0))
+	clonedRim.Size = Vector3.new(v16, v18 * 2, v18 * 2) * scaleVector
+	if scaleVector.X <= 0.02 or (scaleVector.Y <= 0.02 or scaleVector.Z <= 0.02) then
+		clonedRim.Transparency = 1
 	end
-	local v20 = v12.Size / Size
-	for v21, v222 in v12:GetDescendants() do
+	local sizeRatio = clonedRim.Size / Size
+	for v21, v222 in clonedRim:GetDescendants() do
 		if v222:IsA("Attachment") then
-			v222.Position = v222.Position * v20
+			v222.Position = v222.Position * sizeRatio
 		elseif v222:IsA("ParticleEmitter") then
-			local t = {}
+			local keypointList = {}
 			for i, v in ipairs(v222.Size.Keypoints) do
-				table.insert(t, (NumberSequenceKeypoint.new(v.Time, v.Value * v12.Size.Y / Size.Y)))
+				table.insert(keypointList, (NumberSequenceKeypoint.new(v.Time, v.Value * clonedRim.Size.Y / Size.Y)))
 			end
-			v222.Size = NumberSequence.new(t)
+			v222.Size = NumberSequence.new(keypointList)
 		end
 	end
-	local v24 = CFrame.new()
-	if not p4 then
-		v24 = v24 * CFrame.Angles(0, math.pi, 0)
+	local baseCFrame = CFrame.new()
+	if not isLeftWheel then
+		baseCFrame = baseCFrame * CFrame.Angles(0, math.pi, 0)
 	end
-	local v25 = v24 * CFrame.new(v16 * 0.5 - X * 0.5 - v15 - 0.01, 0, 0) * CFrame.Angles(0, math.pi, 0)
-	if p3.FlipY then
-		v25 = v25 * CFrame.Angles(0, math.pi, 0)
+	local rimCFrame = baseCFrame * CFrame.new(v16 * 0.5 - X * 0.5 - v15 - 0.01, 0, 0) * CFrame.Angles(0, math.pi, 0)
+	if rimConfig.FlipY then
+		rimCFrame = rimCFrame * CFrame.Angles(0, math.pi, 0)
 	end
-	local BoundingBox = p1:FindFirstChild("BoundingBox")
+	local BoundingBox = vehicleModel:FindFirstChild("BoundingBox")
 	if BoundingBox and BoundingBox.Anchored then
-		v12.Anchored = true
-		if p2.Name == "WheelExtra" then
-			v12.CFrame = PrimaryPart.CFrame * v25
+		clonedRim.Anchored = true
+		if wheelPart.Name == "WheelExtra" then
+			clonedRim.CFrame = PrimaryPart.CFrame * rimCFrame
 		else
-			v12.CFrame = v3.CFrame * CFrame.new((v3.CFrame:PointToObjectSpace(PrimaryPart.Position))) * v25
+			clonedRim.CFrame = enginePartRef.CFrame * CFrame.new((enginePartRef.CFrame:PointToObjectSpace(PrimaryPart.Position))) * rimCFrame
 		end
 	else
-		v12.Anchored = false
-		Joint.CustomWeld(v12, PrimaryPart, v2, v25)
+		clonedRim.Anchored = false
+		Joint.CustomWeld(clonedRim, PrimaryPart, defaultCFrame, rimCFrame)
 	end
-	return v12
+	return clonedRim
 end
-local t = {
+local rimModule = {
 	Chassis = {}
 }
 local function setChassisRim(p1, p2, p3)
@@ -120,8 +121,8 @@ local function SetRims(p1, p2)
 		end
 	end
 end
-t.Chassis.SetRims = SetRims
-t.Motorcycle = {}
+rimModule.Chassis.SetRims = SetRims
+rimModule.Motorcycle = {}
 local function setMotorcycleRim(p1, p2, p3)
 	local RimLeft = p1:FindFirstChild("RimLeft")
 	if RimLeft then
@@ -146,9 +147,9 @@ local function SetRims_2(p1, p2)
 		end
 	end
 end
-t.Motorcycle.SetRims = SetRims_2
-t.DuneBuggy = {}
-local t2 = {
+rimModule.Motorcycle.SetRims = SetRims_2
+rimModule.DuneBuggy = {}
+local wheelNameSet = {
 	BackLeft = true,
 	BackRight = true,
 	FrontLeft = true,
@@ -156,7 +157,7 @@ local t2 = {
 }
 local function SetRims_3(p1, p2)
 	for v1, v2 in p1.Model.WheelModels:GetChildren() do
-		if t2[v2.Name] and v2 then
+		if wheelNameSet[v2.Name] and v2 then
 			local Rim = v2:FindFirstChild("Rim")
 			if Rim then
 				Rim:Destroy()
@@ -165,10 +166,10 @@ local function SetRims_3(p1, p2)
 		end
 	end
 end
-t.DuneBuggy.SetRims = SetRims_3
+rimModule.DuneBuggy.SetRims = SetRims_3
 local function SetRimsRaw(p1, p2, p3, p4)
-	if t[p1] then
-		t[p1].SetRims({
+	if rimModule[p1] then
+		rimModule[p1].SetRims({
 			Type = p1,
 			Make = p2,
 			Model = p3

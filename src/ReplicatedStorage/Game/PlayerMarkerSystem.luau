@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WorldMarker = require(ReplicatedStorage.Game.WorldMarker.WorldMarker)
@@ -13,17 +14,17 @@ local Settings = require(ReplicatedStorage.Resource.Settings)
 local Players = game:GetService("Players")
 local FriendsService = require(ReplicatedStorage.Friends.FriendsService)
 local HumanoidUnloadConsts = require(ReplicatedStorage.HumanoidUnload.HumanoidUnloadConsts)
-local t = {
+local markerSizes = {
 	4,
 	{ 24, 0 },
 	{ (1 / 0), 8 }
 }
-local v1 = Enumer({ "Police", "Criminal", "Friend", "Spotted" })
-local t2 = {
-	[v1.Police] = Color3.fromRGB(84, 215, 253),
-	[v1.Criminal] = Color3.fromRGB(253, 148, 81),
-	[v1.Friend] = Color3.fromRGB(240, 240, 240),
-	[v1.Spotted] = Color3.fromRGB(220, 220, 10)
+local markerStates = Enumer({ "Police", "Criminal", "Friend", "Spotted" })
+local stateColors = {
+	[markerStates.Police] = Color3.fromRGB(84, 215, 253),
+	[markerStates.Criminal] = Color3.fromRGB(253, 148, 81),
+	[markerStates.Friend] = Color3.fromRGB(240, 240, 240),
+	[markerStates.Spotted] = Color3.fromRGB(220, 220, 10)
 }
 local t3 = {
 	_mapPlayerIdPlayerMarker = {},
@@ -84,18 +85,18 @@ function t3._rxChildAdded(p1, p2)
 			local function update()
 				local v12 = if GameUtil.Team == Settings.EnumTeam.Police then Settings.EnumTeam.Police else Settings.EnumTeam.Criminal
 				local v2 = if p12.Value == Settings.Team.Police then Settings.EnumTeam.Police else Settings.EnumTeam.Criminal
-				local v3 = if v2 == v12 then if v2 == Settings.EnumTeam.Police then v1.Police else v1.Criminal else nil
+				local v3 = if v2 == v12 then if v2 == Settings.EnumTeam.Police then markerStates.Police else markerStates.Criminal else nil
 				if FriendsService.getIsFriendsWith(Players.LocalPlayer, p1.UserId, true) and v2 == v12 then
-					v3 = v1.Friend
+					v3 = markerStates.Friend
 				end
 				if p1:GetAttribute("CCTVSpotted") == true then
-					v3 = v1.Spotted
+					v3 = markerStates.Spotted
 				end
 				if v3 then
 					if not t3._doesMarkerExist(p1) then
 						t3._constructMarker(p1)
 					end
-					t3._setColor(p1, t2[v3])
+					t3._setColor(p1, stateColors[v3])
 				elseif t3._doesMarkerExist(p1) then
 					t3._destructMarker(p1)
 				end
@@ -124,7 +125,7 @@ function t3._constructMarker(p1)
 	end
 	local v2 = WorldMarker.new()
 	v2:SetScreenGui(WorldMarkerSystem.gui)
-	v2:SetSizes(t)
+	v2:SetSizes(markerSizes)
 	v2:SetIcon(7028057307)
 	t3._playerMarkerGroup:Add(v2)
 	t3._mapPlayerIdPlayerMarker[p1.UserId] = {

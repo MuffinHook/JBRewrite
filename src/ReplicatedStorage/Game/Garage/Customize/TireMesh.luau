@@ -1,89 +1,90 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Joint = require(ReplicatedStorage.Std.Joint)
 local TireSticker = require(ReplicatedStorage.Game.Garage.Customize.TireSticker)
 local Rim = require(ReplicatedStorage.Game.Garage.Customize.Rim)
 local StoreData = require(ReplicatedStorage.Game.Garage.StoreData)
-local t = {
+local specialVehicles = {
 	Trailblazer = true,
 	BlackWidow = true,
 	Semi = true
 }
-return function(p1, p2, p3)
-	local Model = p2.Model
-	if not p1 then
-		p1 = {
+return function(tireConfig, vehicleData, customizationOptions)
+	local Model = vehicleData.Model
+	if not tireConfig then
+		tireConfig = {
 			Name = "Classic"
 		}
 	end
-	local v1 = ReplicatedStorage.Resource.TireMesh:FindFirstChild(p1.Name)
-	if not v1 then
-		error("Could not find tire mesh: " .. p1.Name)
+	local tireTemplate = ReplicatedStorage.Resource.TireMesh:FindFirstChild(tireConfig.Name)
+	if not tireTemplate then
+		error("Could not find tire mesh: " .. tireConfig.Name)
 	end
-	local function updateWheelModel(p12)
-		local TireMesh = p12:FindFirstChild("TireMesh")
+	local function updateWheelModel(wheelModel)
+		local TireMesh = wheelModel:FindFirstChild("TireMesh")
 		if TireMesh then
 			TireMesh:Destroy()
 		end
-		local PrimaryPart = p12.PrimaryPart
+		local PrimaryPart = wheelModel.PrimaryPart
 		if not PrimaryPart then
-			print(p12:GetFullName())
-			print(p12:GetChildren())
+			print(wheelModel:GetFullName())
+			print(wheelModel:GetChildren())
 			error("Vehicle wheel model is missing `Wheel` part as PrimaryPart")
 		end
-		local v12 = PrimaryPart
-		local v2
+		local currentPart = PrimaryPart
+		local enginePart
 		repeat
-			v12 = v12.Parent
-			v2 = v12:FindFirstChild("Engine")
-		until v2 ~= nil
-		local v3 = nil
-		if v3 == nil then
-			v3 = v2.CFrame:PointToObjectSpace(PrimaryPart.Position).X < -1
+			currentPart = currentPart.Parent
+			enginePart = currentPart:FindFirstChild("Engine")
+		until enginePart ~= nil
+		local isLeftSide = nil
+		if isLeftSide == nil then
+			isLeftSide = enginePart.CFrame:PointToObjectSpace(PrimaryPart.Position).X < -1
 		end
-		local TireMesh_2 = v1:Clone()
-		TireMesh_2.Size = p12.PrimaryPart.Size
+		local TireMesh_2 = tireTemplate:Clone()
+		TireMesh_2.Size = wheelModel.PrimaryPart.Size
 		TireMesh_2.Name = "TireMesh"
 		TireMesh_2.Anchored = false
 		TireMesh_2.CanCollide = false
 		TireMesh_2.CanQuery = false
 		TireMesh_2.CanTouch = false
 		TireMesh_2.Massless = true
-		TireMesh_2.Parent = p12
-		local InnerWheelScale = p12:FindFirstChild("InnerWheelScale")
+		TireMesh_2.Parent = wheelModel
+		local InnerWheelScale = wheelModel:FindFirstChild("InnerWheelScale")
 		if not InnerWheelScale then
 			local InnerWheelScale_2 = Instance.new("Vector3Value")
 			InnerWheelScale_2.Name = "InnerWheelScale"
-			InnerWheelScale_2.Parent = p12
+			InnerWheelScale_2.Parent = wheelModel
 			InnerWheelScale = InnerWheelScale_2
 		end
-		local InnerWheelScale_2 = p1.InnerWheelScale
+		local InnerWheelScale_2 = tireConfig.InnerWheelScale
 		if not InnerWheelScale_2 then
-			InnerWheelScale_2 = Vector3.new(1, p1.InnerWheelPct or 0.7, p1.InnerWheelPct or 0.7)
+			InnerWheelScale_2 = Vector3.new(1, tireConfig.InnerWheelPct or 0.7, tireConfig.InnerWheelPct or 0.7)
 		end
 		InnerWheelScale.Value = InnerWheelScale_2
-		local v6 = CFrame.Angles(0, 0, 0)
-		if not v3 then
-			v6 = CFrame.Angles(0, math.pi, 0)
+		local rotationCFrame = CFrame.Angles(0, 0, 0)
+		if not isLeftSide then
+			rotationCFrame = CFrame.Angles(0, math.pi, 0)
 		end
 		if Model:FindFirstChild("BoundingBox").Anchored then
 			TireMesh_2.Anchored = true
-			TireMesh_2.CFrame = PrimaryPart.CFrame * v6
+			TireMesh_2.CFrame = PrimaryPart.CFrame * rotationCFrame
 		else
-			local v8 = Joint.BlankWeld(TireMesh_2, PrimaryPart)
-			v8.C1 = v6
-			v8.Parent = TireMesh_2
+			local weldJoint = Joint.BlankWeld(TireMesh_2, PrimaryPart)
+			weldJoint.C1 = rotationCFrame
+			weldJoint.Parent = TireMesh_2
 		end
-		if t[p2.Make] and p12.Name:find("Back") then
+		if specialVehicles[vehicleData.Make] and wheelModel.Name:find("Back") then
 			for i = 1, 2 do
-				local v10
-				local v11 = Instance.fromExisting(TireMesh_2)
-				v11.Name = "Dual" .. i
-				v11.Size = v11.Size * Vector3.new(0.5, 1, 1)
-				v10 = if i == 1 then -1 else 1
-				v11.CFrame = TireMesh_2.CFrame * CFrame.new(v11.Size.X * v10 / 2, 0, 0)
-				v11.Parent = TireMesh_2
-				Joint.Weld(v11, TireMesh_2)
+				local offsetDirection
+				local dualTireMesh = Instance.fromExisting(TireMesh_2)
+				dualTireMesh.Name = "Dual" .. i
+				dualTireMesh.Size = dualTireMesh.Size * Vector3.new(0.5, 1, 1)
+				offsetDirection = if i == 1 then -1 else 1
+				dualTireMesh.CFrame = TireMesh_2.CFrame * CFrame.new(dualTireMesh.Size.X * offsetDirection / 2, 0, 0)
+				dualTireMesh.Parent = TireMesh_2
+				Joint.Weld(dualTireMesh, TireMesh_2)
 			end
 			TireMesh_2.Transparency = 1
 		end
@@ -101,12 +102,12 @@ return function(p1, p2, p3)
 			end
 		end
 	end
-	if p3 then
-		if p3.TireSticker then
-			TireSticker(StoreData.GetItemByName("TireSticker", p3.TireSticker), p2)
+	if customizationOptions then
+		if customizationOptions.TireSticker then
+			TireSticker(StoreData.GetItemByName("TireSticker", customizationOptions.TireSticker), vehicleData)
 		end
-		if p3.Rim then
-			Rim(StoreData.GetItemByName("Rim", p3.Rim), p2, p3)
+		if customizationOptions.Rim then
+			Rim(StoreData.GetItemByName("Rim", customizationOptions.Rim), vehicleData, customizationOptions)
 		end
 	end
 end

@@ -1,83 +1,84 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
-local v1 = script:FindFirstAncestor("EzUi")
-local Dictionary = require(v1.Dictionary)
-local Maid = require(v1.Parent.Std.Maid)
-local Roact = require(v1.Parent.Roact)
+local module = script:FindFirstAncestor("EzUi")
+local Dictionary = require(module.Dictionary)
+local Maid = require(module.Parent.Std.Maid)
+local Roact = require(module.Parent.Roact)
 local createElement = Roact.createElement
-local v2 = Roact.PureComponent:extend("ViewportFrame")
-v2.defaultProps = {
+local component = Roact.PureComponent:extend("ViewportFrame")
+component.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	position = UDim2.new(0, 0, 0, 0),
 	fieldOfView = 70
 }
-function v2.init(p1)
-	p1.maid = Maid.new()
-	if p1.props.cameraRef then
-		p1.cameraRef = p1.props.cameraRef
+function component.init(self)
+	self.maid = Maid.new()
+	if self.props.cameraRef then
+		self.cameraRef = self.props.cameraRef
 	else
-		p1.cameraRef = Roact.createRef()
+		self.cameraRef = Roact.createRef()
 	end
-	if p1.props.viewportRef then
-		p1.viewportRef = p1.props.viewportRef
+	if self.props.viewportRef then
+		self.viewportRef = self.props.viewportRef
 	else
-		p1.viewportRef = Roact.createRef()
+		self.viewportRef = Roact.createRef()
 	end
 end
-function v2.render(p1)
+function component.render(self)
 	return createElement("ViewportFrame", {
-		BackgroundColor3 = p1.props.backgroundColor,
-		BackgroundTransparency = p1.props.backgroundTransparency,
+		BackgroundColor3 = self.props.backgroundColor,
+		BackgroundTransparency = self.props.backgroundTransparency,
 		BorderSizePixel = 0,
-		Position = p1.props.position,
-		Size = p1.props.size,
-		AnchorPoint = p1.props.anchorPoint,
-		ZIndex = p1.props.zIndex,
+		Position = self.props.position,
+		Size = self.props.size,
+		AnchorPoint = self.props.anchorPoint,
+		ZIndex = self.props.zIndex,
 		Ambient = Color3.new(255/255, 255/255, 255/255),
 		LightColor = Color3.new(255/255, 255/255, 255/255),
-		CurrentCamera = p1.cameraRef,
-		[Roact.Ref] = p1.viewportRef
+		CurrentCamera = self.cameraRef,
+		[Roact.Ref] = self.viewportRef
 	}, Dictionary.merge({
 		Camera = createElement("Camera", {
-			FieldOfView = p1.props.fieldOfView,
-			[Roact.Ref] = p1.cameraRef
+			FieldOfView = self.props.fieldOfView,
+			[Roact.Ref] = self.cameraRef
 		})
-	}, p1.props[Roact.Children]))
+	}, self.props[Roact.Children]))
 end
-function v2._updateViewport(p1)
-	local v1 = p1.cameraRef:getValue()
-	local inst = p1.maid.inst
+function component._updateViewport(self)
+	local cameraRef = self.cameraRef:getValue()
+	local inst = self.maid.inst
 	if inst and inst.Parent ~= nil then
-		p1.props.updateCamera(v1, inst)
+		self.props.updateCamera(cameraRef, inst)
 	end
 end
-function v2._reparent(p1)
-	local v1 = p1.viewportRef:getValue()
-	p1.maid.inst = nil
-	if p1.props.getInst then
-		local v2 = task.delay(math.random() * 0.1, function()
-			local v12 = p1.props.getInst()
-			p1.maid.inst = v12
-			v12.Parent = v1
+function component._reparent(self)
+	local viewportRef = self.viewportRef:getValue()
+	self.maid.inst = nil
+	if self.props.getInst then
+		local delayThread = task.delay(math.random() * 0.1, function()
+			local instance = self.props.getInst()
+			self.maid.inst = instance
+			instance.Parent = viewportRef
 		end)
-		function p1.maid.cancelDelayThread()
-			task.cancel(v2)
+		function self.maid.cancelDelayThread()
+			task.cancel(delayThread)
 		end
 	end
-	p1:_updateViewport()
+	self:_updateViewport()
 end
-function v2.didMount(p1)
-	p1:_reparent()
-	p1.maid.updateCamera = RunService.Heartbeat:Connect(function()
-		p1:_updateViewport()
+function component.didMount(self)
+	self:_reparent()
+	self.maid.updateCamera = RunService.Heartbeat:Connect(function()
+		self:_updateViewport()
 	end)
 end
-function v2.didUpdate(p1, p2)
-	if p1.props.getInstCompare and p1.props.getInstCompare ~= p2.getInstCompare or not p1.props.getInstCompare and p1.props.getInst ~= p2.getInst then
-		p1:_reparent()
+function component.didUpdate(self, previousProps)
+	if self.props.getInstCompare and self.props.getInstCompare ~= previousProps.getInstCompare or not self.props.getInstCompare and self.props.getInst ~= previousProps.getInst then
+		self:_reparent()
 	end
 end
-function v2.willUnmount(p1)
-	p1.maid:DoCleaning()
+function component.willUnmount(self)
+	self.maid:DoCleaning()
 end
-return v2
+return component

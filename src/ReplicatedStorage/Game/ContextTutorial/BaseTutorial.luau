@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -36,36 +37,36 @@ end
 function t.SetEdge(p1, p2)
 	if p1:GetRunning() then
 		p1._maid.updatePosition = nil
-		local v1 = p1.Messages[p2]
-		if v1 ~= nil then
+		local message = p1.Messages[p2]
+		if message ~= nil then
 			if not ContextMessageUI.isOpen() then
 				ContextMessageUI.open()
 				ContextMessageUI._maid:GiveTask(ContextMessageUI.onCloseClicked:Connect(function()
 					p1._remoteEvent:FireServer()
 				end))
 			end
-			ContextMessageUI.setMessage(v1.text)
-			if v1.position then
-				local v2 = typeof(v1.position)
-				if v2 == "Vector3" then
-					ContextMessageUI.setWorldMarkerPosition(v1.position)
-				elseif v2 == "Instance" and v1.position:IsA("Vector3Value") then
-					local Position = v1.Position
+			ContextMessageUI.setMessage(message.text)
+			if message.position then
+				local positionType = typeof(message.position)
+				if positionType == "Vector3" then
+					ContextMessageUI.setWorldMarkerPosition(message.position)
+				elseif positionType == "Instance" and message.position:IsA("Vector3Value") then
+					local Position = message.Position
 					ContextMessageUI.setWorldMarkerPosition(Position.Value)
 					p1._maid.updatePosition = Position.Changed:Connect(function()
 						ContextMessageUI.setWorldMarkerPosition(Position.Value)
 					end)
-				elseif v2 == "function" then
+				elseif positionType == "function" then
 					local function update()
-						ContextMessageUI.setWorldMarkerPosition((v1.position()))
+						ContextMessageUI.setWorldMarkerPosition((message.position()))
 					end
 					p1._maid.updatePosition = Interval.every(5):Connect(update)
 				else
-					error(("Invalid type for message `position`: %s"):format(v2))
+					error(("Invalid type for message `position`: %s"):format(positionType))
 				end
 			end
-			ContextMessageUI.setWorldMarkerSizes(v1.sizes)
-			ContextMessageUI.setWorldMarkerEnabled(v1.position ~= nil)
+			ContextMessageUI.setWorldMarkerSizes(message.sizes)
+			ContextMessageUI.setWorldMarkerEnabled(message.position ~= nil)
 		end
 	end
 end

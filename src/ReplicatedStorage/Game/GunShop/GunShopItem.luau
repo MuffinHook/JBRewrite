@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LevelSystem = require(ReplicatedStorage.Game.Level2.LevelSystem)
@@ -12,123 +13,123 @@ local t = {}
 t.__index = t
 t.__ClassName = "GunShopItem"
 function t.new()
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._maid = Maid.new()
-	t2._itemFrame = GunShop.PresetItem:Clone()
-	t2._maid:GiveTask(t2._itemFrame)
-	t2._layoutOrder = 0
+	local self = {}
+	setmetatable(self, t)
+	self._maid = Maid.new()
+	self._itemFrame = GunShop.PresetItem:Clone()
+	self._maid:GiveTask(self._itemFrame)
+	self._layoutOrder = 0
 	local TextButton = Instance.new("TextButton")
 	TextButton.BackgroundTransparency = 1
 	TextButton.Text = ""
 	TextButton.Size = UDim2.fromScale(1, 1)
-	TextButton.Parent = t2._itemFrame
-	t2.onMouseButton1Down = TextButton.MouseButton1Click
-	t2._price = 0
-	t2._owned = false
-	t2._equipped = false
-	t2._level = nil
-	t2._itemName = nil
-	t2._maid:GiveTask(LevelSystem.getOnLevelChangedSignal():Connect(function(p1)
-		if p1 == LocalPlayer then
-			t2:UpdateLevel()
+	TextButton.Parent = self._itemFrame
+	self.onMouseButton1Down = TextButton.MouseButton1Click
+	self._price = 0
+	self._owned = false
+	self._equipped = false
+	self._level = nil
+	self._itemName = nil
+	self._maid:GiveTask(LevelSystem.getOnLevelChangedSignal():Connect(function(changedPlayer)
+		if changedPlayer == LocalPlayer then
+			self:UpdateLevel()
 		end
 	end))
-	return t2
+	return self
 end
-function t.GetName(p1)
-	return p1._itemName
+function t.GetName(self)
+	return self._itemName
 end
-function t.SetName(p1, p2, p3)
-	p1._itemName = p2
-	p1._itemFrame.Name = p2
-	p1._itemFrame.Top.Title.Text = p3:upper()
+function t.SetName(self, itemName, displayName)
+	self._itemName = itemName
+	self._itemFrame.Name = itemName
+	self._itemFrame.Top.Title.Text = displayName:upper()
 end
-function t.SetImageId(p1, p2)
-	if typeof(p2) == "number" then
-		p2 = ("rbxassetid://%d"):format(p2)
+function t.SetImageId(self, imageId)
+	if typeof(imageId) == "number" then
+		imageId = ("rbxassetid://%d"):format(imageId)
 	end
-	p1._itemFrame.Top.Icon.Image = p2
+	self._itemFrame.Top.Icon.Image = imageId
 end
-function t.SetImageColor(p1, p2)
-	p1._itemFrame.Top.Icon.ImageColor3 = p2
+function t.SetImageColor(self, color)
+	self._itemFrame.Top.Icon.ImageColor3 = color
 end
-function t.SetPrice(p1, p2)
-	p1._price = p2
-	p1:Update()
+function t.SetPrice(self, price)
+	self._price = price
+	self:Update()
 end
-function t.SetLevel(p1, p2)
-	p1._level = p2
-	p1:UpdateLevel()
+function t.SetLevel(self, level)
+	self._level = level
+	self:UpdateLevel()
 end
-function t.SetOwned(p1, p2)
-	if p1._owned ~= p2 then
-		p1._owned = p2
-		p1:Update()
-		p1:UpdateLevel()
-	end
-end
-function t.GetEquipped(p1)
-	return p1._equipped
-end
-function t.SetEquipped(p1, p2)
-	if p1._equipped ~= p2 then
-		p1._equipped = p2
-		p1:Update()
+function t.SetOwned(self, owned)
+	if self._owned ~= owned then
+		self._owned = owned
+		self:Update()
+		self:UpdateLevel()
 	end
 end
-function t.UpdateLevel(p1)
-	local v1 = if p1._level == nil then false else not p1._owned
-	p1._itemFrame.Bottom.Level.Visible = v1
-	if v1 then
-		p1._itemFrame.Bottom.Level.Text = ("LVL %d"):format(p1._level)
-		p1._itemFrame.Bottom.Level.Lock.Visible = LevelUtils.yieldLevel(LocalPlayer) < p1._level
+function t.GetEquipped(self)
+	return self._equipped
+end
+function t.SetEquipped(self, equipped)
+	if self._equipped ~= equipped then
+		self._equipped = equipped
+		self:Update()
 	end
 end
-function t.AddRequiredGamepass(p1, p2)
-	assert(p2)
-	local v1 = GunShop.PresetRequiredIcon:Clone()
-	v1.Parent = p1._itemFrame.Bottom.RequiredContainer
-	p1._maid:GivePromise(GamepassSystem.promiseImageId(GamepassUtils.GetGamepassFromEnum(p2).PassId):andThen(function(p1)
-		v1.Image = ("rbxassetid://%d"):format(p1)
-		v1.Visible = true
+function t.UpdateLevel(self)
+	local shouldShowLevel = if self._level == nil then false else not self._owned
+	self._itemFrame.Bottom.Level.Visible = shouldShowLevel
+	if shouldShowLevel then
+		self._itemFrame.Bottom.Level.Text = ("LVL %d"):format(self._level)
+		self._itemFrame.Bottom.Level.Lock.Visible = LevelUtils.yieldLevel(LocalPlayer) < self._level
+	end
+end
+function t.AddRequiredGamepass(self, gamepassEnum)
+	assert(gamepassEnum)
+	local iconElement = GunShop.PresetRequiredIcon:Clone()
+	iconElement.Parent = self._itemFrame.Bottom.RequiredContainer
+	self._maid:GivePromise(GamepassSystem.promiseImageId(GamepassUtils.GetGamepassFromEnum(gamepassEnum).PassId):andThen(function(gamepassId)
+		iconElement.Image = ("rbxassetid://%d"):format(gamepassId)
+		iconElement.Visible = true
 	end):catch(warn))
-	p1._maid:GiveTask(v1.MouseButton1Down:Connect(function()
-		GamepassUtils.PromptGamepass(p2)
+	self._maid:GiveTask(iconElement.MouseButton1Down:Connect(function()
+		GamepassUtils.PromptGamepass(gamepassEnum)
 	end))
 end
-function t.Update(p1)
-	if p1._equipped then
-		p1._itemFrame.Bottom.Action.Text = "UNEQUIP"
-		p1._itemFrame.Bottom.Action.TextColor3 = Color3.fromRGB(212, 39, 39)
-	elseif p1._owned then
-		p1._itemFrame.Bottom.Action.Text = "EQUIP"
-		p1._itemFrame.Bottom.Action.TextColor3 = Color3.fromRGB(212, 39, 39)
+function t.Update(self)
+	if self._equipped then
+		self._itemFrame.Bottom.Action.Text = "UNEQUIP"
+		self._itemFrame.Bottom.Action.TextColor3 = Color3.fromRGB(212, 39, 39)
+	elseif self._owned then
+		self._itemFrame.Bottom.Action.Text = "EQUIP"
+		self._itemFrame.Bottom.Action.TextColor3 = Color3.fromRGB(212, 39, 39)
 	else
-		if p1._price == 0 then
-			p1._itemFrame.Bottom.Action.Text = "FREE"
+		if self._price == 0 then
+			self._itemFrame.Bottom.Action.Text = "FREE"
 		else
-			p1._itemFrame.Bottom.Action.Text = Format.Currency(p1._price)
+			self._itemFrame.Bottom.Action.Text = Format.Currency(self._price)
 		end
-		p1._itemFrame.Bottom.Action.TextColor3 = Color3.fromRGB(112, 212, 69)
+		self._itemFrame.Bottom.Action.TextColor3 = Color3.fromRGB(112, 212, 69)
 	end
-	if p1._owned then
-		p1._itemFrame.Image = "rbxassetid://5834235796"
+	if self._owned then
+		self._itemFrame.Image = "rbxassetid://5834235796"
 	else
-		p1._itemFrame.Image = "rbxassetid://5834236192"
+		self._itemFrame.Image = "rbxassetid://5834236192"
 	end
 end
-function t.GetLayoutOrder(p1)
-	return p1._itemFrame.LayoutOrder
+function t.GetLayoutOrder(self)
+	return self._itemFrame.LayoutOrder
 end
-function t.SetLayoutOrder(p1, p2)
-	p1._itemFrame.LayoutOrder = p2
+function t.SetLayoutOrder(self, layoutOrder)
+	self._itemFrame.LayoutOrder = layoutOrder
 end
-function t.SetParent(p1, p2)
-	p1._itemFrame.Parent = p2
+function t.SetParent(self, parent)
+	self._itemFrame.Parent = parent
 end
-function t.Destroy(p1)
-	p1._maid:Destroy()
-	p1._maid = nil
+function t.Destroy(self)
+	self._maid:Destroy()
+	self._maid = nil
 end
 return t

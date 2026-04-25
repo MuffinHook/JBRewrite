@@ -1,9 +1,10 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local v1 = script.Parent
+local itemScript = script.Parent
 local HapticEffect = require(ReplicatedStorage.App.HapticEffect)
-local Basic = require(v1.Basic)
-local t = {
+local Basic = require(itemScript.Basic)
+local motionConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -17,31 +18,31 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local t2 = {
+local classDefinition = {
 	__ClassName = "Cuffed"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	v1.SpringItemOffset.Damp = 0.5
-	v1.SpringItemOffset.Freq = 7
-	v1.SpringWaistRotation.Damp = 0.5
-	v1.SpringWaistRotation.Freq = 7
-	v1.SpringNeckRotation.Damp = 0.5
-	v1.SpringNeckRotation.Freq = 7
-	v1.SpringItemOffset:SetTarget(Vector3.new(0, 0, 0.2))
-	v1.SpringWaistRotation:SetTarget(Vector3.new(-0.5, 0, 0))
-	v1.SpringNeckRotation:SetTarget(Vector3.new(-0.5, 0, 0))
-	v1:DefaultDisableCamLock()
-	if v1.Local then
+classDefinition.__index = classDefinition
+setmetatable(classDefinition, Basic)
+function classDefinition.new(item, tag, config)
+	local instance = Basic.new(item, tag, motionConfig, config)
+	setmetatable(instance, classDefinition)
+	instance.SpringItemOffset.Damp = 0.5
+	instance.SpringItemOffset.Freq = 7
+	instance.SpringWaistRotation.Damp = 0.5
+	instance.SpringWaistRotation.Freq = 7
+	instance.SpringNeckRotation.Damp = 0.5
+	instance.SpringNeckRotation.Freq = 7
+	instance.SpringItemOffset:SetTarget(Vector3.new(0, 0, 0.2))
+	instance.SpringWaistRotation:SetTarget(Vector3.new(-0.5, 0, 0))
+	instance.SpringNeckRotation:SetTarget(Vector3.new(-0.5, 0, 0))
+	instance:DefaultDisableCamLock()
+	if instance.Local then
 		HapticEffect.basic(1, 0.2)
 	end
-	return v1
+	return instance
 end
-function t2.InputBegan(p1, ...)
-	Basic.InputBegan(p1, ...)
+function classDefinition.InputBegan(item, ...)
+	Basic.InputBegan(item, ...)
 end
-function t2.InputEnded(p1) end
-return t2
+function classDefinition.InputEnded(item) end
+return classDefinition

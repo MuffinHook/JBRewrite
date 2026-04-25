@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Basic = require(script.Parent.Basic)
 local t = {
 	Motion = {
@@ -20,11 +21,11 @@ local t2 = {
 t2.__index = t2
 setmetatable(t2, Basic)
 function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	v1.Enabled = false
-	v1.SpringItemOffset:SetTarget(Vector3.new(1, 0.6, -1.5))
-	return v1
+	local instance = Basic.new(p1, p2, t, p3)
+	setmetatable(instance, t2)
+	instance.Enabled = false
+	instance.SpringItemOffset:SetTarget(Vector3.new(1, 0.6, -1.5))
+	return instance
 end
 function t2.GetLeftArmPosition(p1)
 	return nil
@@ -33,9 +34,9 @@ function t2.Toggle(p1)
 	p1.Enabled = not p1.Enabled
 	local Model = p1.Model
 	Model.Model.Light.Material = p1.Enabled and Enum.Material.Neon or Enum.Material.Plastic
-	for v2, v3 in Model.Model:GetDescendants() do
-		if v3:IsA("SpotLight") then
-			v3.Enabled = p1.Enabled
+	for v2, descendant in Model.Model:GetDescendants() do
+		if descendant:IsA("SpotLight") then
+			descendant.Enabled = p1.Enabled
 		end
 	end
 end

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
@@ -35,9 +36,9 @@ local function MakeCar(p1, p2)
 	Sound_2.RollOffMinDistance = 16
 	Sound_2.RollOffMode = Enum.RollOffMode.InverseTapered
 	Sound_2.Parent = Model.BackBogey
-	local v1 = Sound_2
-	v1.Looped = true
-	v1:Play()
+	local hornBogeySound = Sound_2
+	hornBogeySound.Looped = true
+	hornBogeySound:Play()
 	local Sound_3 = Instance.new("Sound")
 	Sound_3.SoundId = "rbxassetid://" .. tostring(10563992041)
 	Sound_3.Volume = 0.25
@@ -45,32 +46,32 @@ local function MakeCar(p1, p2)
 	Sound_3.RollOffMinDistance = 16
 	Sound_3.RollOffMode = Enum.RollOffMode.InverseTapered
 	Sound_3.Parent = Part
-	local v2 = Sound_3
-	v2.Looped = true
-	v2:Play()
+	local wheelSound = Sound_3
+	wheelSound.Looped = true
+	wheelSound:Play()
 	p1.SoundPart = Part
 	p1.SoundHorn = Sound
-	local v3 = tick()
+	local lastTouchTime = tick()
 	Model.Model.Front.Touched:connect(function(p1)
 		if not RunUtils.isStudio() then
-			local v1 = tick()
-			if not (v1 - v3 < 0.1) then
+			local currentTouchTime = tick()
+			if not (currentTouchTime - lastTouchTime < 0.1) then
 				local Vehicles = workspace:FindFirstChild("Vehicles")
 				if Vehicles and p1:IsDescendantOf(Vehicles) then
-					local v2 = p1
+					local currentVehicle = p1
 					repeat
-						v2 = v2.Parent
-					until v2.Parent == Vehicles or v2 == Vehicles
-					if v2.Parent == Vehicles then
+						currentVehicle = currentVehicle.Parent
+					until currentVehicle.Parent == Vehicles or currentVehicle == Vehicles
+					if currentVehicle.Parent == Vehicles then
 						ReplicatedStorage:FindFirstChild("HitByTrainRemote"):FireServer()
 					end
 				end
-				local v32 = p1.Parent
-				if v32 == LocalPlayer.Character then
-					local Humanoid = v32:FindFirstChild("Humanoid")
+				local hitObject = p1.Parent
+				if hitObject == LocalPlayer.Character then
+					local Humanoid = hitObject:FindFirstChild("Humanoid")
 					if Humanoid and Humanoid.Health > 1 then
 						p2:FireServer("x" .. ("b1v6eb1nt"):sub(2, 5):reverse() .. "us6", 100, "Train")
-						v3 = v1
+						lastTouchTime = currentTouchTime
 					end
 				end
 			end
@@ -88,37 +89,37 @@ local function UpdateSound(p1, p2)
 			local RootPart = Humanoid.RootPart
 			if RootPart then
 				local Position = RootPart.Position
-				local v1 = tick()
-				if v1 - p1.LastHorn > p1.HornWait then
-					p1.LastHorn = v1
+				local currentTime = tick()
+				if currentTime - p1.LastHorn > p1.HornWait then
+					p1.LastHorn = currentTime
 					p1.HornWait = math.random() > 0.9 and 4 + math.random() * 2 or math.random() * 20 + 40
 					p1.SoundHorn:Play()
 				end
-				local v3 = 500
-				v4 = nil
-				v5 = v3
-				v6 = nil
+				local closestDistance = 500
+				closestPosition = nil
+				secondClosestDistance = closestDistance
+				secondClosestPosition = nil
 				for i = 1, #p2.Cars do
-					local v7 = p2.Cars[i]
-					if v7.Loaded then
-						local Position_2 = v7.Model.Base.Position
+					local car = p2.Cars[i]
+					if car.Loaded then
+						local Position_2 = car.Model.Base.Position
 						local Magnitude = (Position - Position_2).Magnitude
-						if Magnitude < v3 then
-							v3, v4, v5, v6 = Magnitude, Position_2, v3, v4
-						elseif Magnitude < v5 then
-							v5 = Magnitude
-							v6 = Position_2
+						if Magnitude < closestDistance then
+							closestDistance, closestPosition, secondClosestDistance, secondClosestPosition = Magnitude, Position_2, closestDistance, closestPosition
+						elseif Magnitude < secondClosestDistance then
+							secondClosestDistance = Magnitude
+							secondClosestPosition = Position_2
 						end
 					end
 				end
 				local SoundPart = p1.SoundPart
-				if v6 and v4 then
+				if secondClosestPosition and closestPosition then
 					if SoundPart.Parent ~= workspace then
 						SoundPart.Parent = workspace
 					end
-					local v8 = (v4 + v6) / 2
-					local v9 = if (v8 - SoundPart.Position).Magnitude > 200 then 0.2 else 0.05
-					SoundPart.CFrame = SoundPart.CFrame:Lerp(CFrame.new(v8), v9)
+					local midPoint = (closestPosition + secondClosestPosition) / 2
+					local lerpSpeed = if (midPoint - SoundPart.Position).Magnitude > 200 then 0.2 else 0.05
+					SoundPart.CFrame = SoundPart.CFrame:Lerp(CFrame.new(midPoint), lerpSpeed)
 					return
 				elseif SoundPart.Parent == workspace then
 					SoundPart.Parent = nil

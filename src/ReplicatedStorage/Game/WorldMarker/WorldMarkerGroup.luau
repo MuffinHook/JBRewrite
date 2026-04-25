@@ -1,39 +1,40 @@
 -- Reviewed by Claude
-local t = {}
-t.__index = t
-t.__ClassName = "WorldMarkerGroup"
-function t.new()
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._listWorldMarker = {}
-	t2._enabled = true
-	return t2
+-- variables reassigned
+local WorldMarkerGroup = {}
+WorldMarkerGroup.__index = WorldMarkerGroup
+WorldMarkerGroup.__ClassName = "WorldMarkerGroup"
+function WorldMarkerGroup.new()
+	local newInstance = {}
+	setmetatable(newInstance, WorldMarkerGroup)
+	newInstance._listWorldMarker = {}
+	newInstance._enabled = true
+	return newInstance
 end
-function t.Add(p1, p2)
-	p2:SetEnabled(p1._enabled)
-	table.insert(p1._listWorldMarker, p2)
+function WorldMarkerGroup.Add(self, p2)
+	p2:SetEnabled(self._enabled)
+	table.insert(self._listWorldMarker, p2)
 end
-function t.Remove(p1, p2)
-	local v1 = table.find(p1._listWorldMarker, p2)
+function WorldMarkerGroup.Remove(self, p2)
+	local v1 = table.find(self._listWorldMarker, p2)
 	assert(v1, "Removing worldMarker that doesn\'t exist in _listWorldMarker")
-	table.remove(p1._listWorldMarker, v1)
+	table.remove(self._listWorldMarker, v1)
 end
-function t.Update(p1)
-	if p1._enabled then
-		for i = #p1._listWorldMarker, 1, -1 do
-			local v1 = p1._listWorldMarker[i]
+function WorldMarkerGroup.Update(self)
+	if self._enabled then
+		for i = #self._listWorldMarker, 1, -1 do
+			local v1 = self._listWorldMarker[i]
 			assert(v1.Update, "destroyed/nil worldMarker is being Updated")
 			v1:Update()
 		end
 	end
 end
-function t.SetEnabled(p1, p2)
-	p1._enabled = p2
-	for i, v in ipairs(p1._listWorldMarker) do
+function WorldMarkerGroup.SetEnabled(self, p2)
+	self._enabled = p2
+	for i, v in ipairs(self._listWorldMarker) do
 		v:SetEnabled(p2)
 	end
 end
-function t.GetAll(p1)
-	return p1._listWorldMarker
+function WorldMarkerGroup.GetAll(self)
+	return self._listWorldMarker
 end
-return t
+return WorldMarkerGroup

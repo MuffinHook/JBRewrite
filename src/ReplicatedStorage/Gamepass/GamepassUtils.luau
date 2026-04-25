@@ -1,47 +1,48 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Enumer = require(ReplicatedStorage.Std.Enumer)
 local GamepassData = require(ReplicatedStorage.Gamepass.GamepassData)
 local Settings = require(ReplicatedStorage.Resource.Settings)
-local t = {}
-for i, v in ipairs(GamepassData) do
-	table.insert(t, v.Title)
+local gamepassTitlesList = {}
+for i, gamepassEntry in ipairs(GamepassData) do
+	table.insert(gamepassTitlesList, gamepassEntry.Title)
 end
-local t2 = {
-	ListGamepassTitle = t,
-	EnumGamepass = Enumer(t),
+local module = {
+	ListGamepassTitle = gamepassTitlesList,
+	EnumGamepass = Enumer(gamepassTitlesList),
 	GIFT_REMOTE_NAME = "GiftGamepassRemote",
 	GAME_PASS_GIFT_DATASTORE_KEY = "GamePassGiftData",
 	PLAYER_ALLOWED_TO_ATTEMPT_GAME_PASS_GIFT_ATTR_NAME = "AllowedToAttemptGamePassGift",
 	PLAYER_GAME_PASS_GIFT_ATTEMPT_RECEIVER_USER_ID_ATTR_NAME = "GamePassGiftReceiverUserId"
 }
-function t2.Init(p1)
-	t2.PromptPurchase = assert(p1.PromptPurchase)
+function module.Init(settings)
+	module.PromptPurchase = assert(settings.PromptPurchase)
 end
-function t2.GetGamepassFromEnum(p1)
-	for i, v in ipairs(GamepassData) do
-		if t2.EnumGamepass[v.Title] == p1 then
-			return v
+function module.GetGamepassFromEnum(enumValue)
+	for i, gamepassEntry in ipairs(GamepassData) do
+		if module.EnumGamepass[gamepassEntry.Title] == enumValue then
+			return gamepassEntry
 		end
 	end
 end
-function t2.PromptGamepass(p1)
-	local v1 = t2.GetGamepassFromEnum(p1)
-	assert(v1)
-	t2.PromptPurchase(v1)
+function module.PromptGamepass(enumValue)
+	local gamepass = module.GetGamepassFromEnum(enumValue)
+	assert(gamepass)
+	module.PromptPurchase(gamepass)
 end
-function t2.GetGamepassFromPassId(p1)
-	for i, v in ipairs(GamepassData) do
-		if v.PassId == p1 then
-			return v
+function module.GetGamepassFromPassId(passId)
+	for i, gamepassEntry in ipairs(GamepassData) do
+		if gamepassEntry.PassId == passId then
+			return gamepassEntry
 		end
 	end
 end
-function t2.GetGiftProductInfoFromGamepass(p1)
-	for i, v in ipairs(Settings.DevProduct) do
-		if v.Type == "GiftGamepass" and v.Name == p1 then
-			return v
+function module.GetGiftProductInfoFromGamepass(gamepassName)
+	for i, productEntry in ipairs(Settings.DevProduct) do
+		if productEntry.Type == "GiftGamepass" and productEntry.Name == gamepassName then
+			return productEntry
 		end
 	end
 end
-return t2
+return module

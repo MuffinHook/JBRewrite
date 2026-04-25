@@ -1,41 +1,42 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-local t = {}
-function t.init()
-	t._handlePlayer(Players.LocalPlayer)
+local CharacterAnimModule = {}
+function CharacterAnimModule.init()
+	CharacterAnimModule._handlePlayer(Players.LocalPlayer)
 end
-function t._handlePlayer(p1)
-	if p1.Character then
-		t._handleCharacter(p1.Character)
+function CharacterAnimModule._handlePlayer(character)
+	if character.Character then
+		CharacterAnimModule._handleCharacter(character.Character)
 	end
-	p1.CharacterAdded:Connect(t._handleCharacter)
+	character.CharacterAdded:Connect(CharacterAnimModule._handleCharacter)
 end
-function t._handleCharacter(p1)
-	local Animator = p1:WaitForChild("Humanoid"):WaitForChild("Animator")
-	local v1 = Animator:LoadAnimation(p1:WaitForChild("Animate"):WaitForChild("idle"):WaitForChild("Animation1"))
-	v1.Priority = Enum.AnimationPriority.Action
-	v1:AdjustSpeed(0)
-	t._idleTrack = v1
-	t._skydiveTrack = Animator:LoadAnimation(ReplicatedStorage.Resource.Skydive)
-	local v2 = Animator:LoadAnimation(ReplicatedStorage.Resource.RopeGrabAnimation)
-	v2.Priority = Enum.AnimationPriority.Action
-	v2:AdjustSpeed(0)
-	t._ropeGrabTrack = v2
-	local v3 = Animator:LoadAnimation(ReplicatedStorage.Resource.CarSitAnimation)
-	v3:AdjustSpeed(0)
-	t._carSitTrack = v3
+function CharacterAnimModule._handleCharacter(character)
+	local Animator = character:WaitForChild("Humanoid"):WaitForChild("Animator")
+	local idleTrack = Animator:LoadAnimation(character:WaitForChild("Animate"):WaitForChild("idle"):WaitForChild("Animation1"))
+	idleTrack.Priority = Enum.AnimationPriority.Action
+	idleTrack:AdjustSpeed(0)
+	CharacterAnimModule._idleTrack = idleTrack
+	CharacterAnimModule._skydiveTrack = Animator:LoadAnimation(ReplicatedStorage.Resource.Skydive)
+	local ropeGrabTrack = Animator:LoadAnimation(ReplicatedStorage.Resource.RopeGrabAnimation)
+	ropeGrabTrack.Priority = Enum.AnimationPriority.Action
+	ropeGrabTrack:AdjustSpeed(0)
+	CharacterAnimModule._ropeGrabTrack = ropeGrabTrack
+	local carSitTrack = Animator:LoadAnimation(ReplicatedStorage.Resource.CarSitAnimation)
+	carSitTrack:AdjustSpeed(0)
+	CharacterAnimModule._carSitTrack = carSitTrack
 end
-function t.getIdleTrack()
-	return t._idleTrack
+function CharacterAnimModule.getIdleTrack()
+	return CharacterAnimModule._idleTrack
 end
-function t.getSkydiveTrack()
-	return t._skydiveTrack
+function CharacterAnimModule.getSkydiveTrack()
+	return CharacterAnimModule._skydiveTrack
 end
-function t.getRopeGrabTrack()
-	return t._ropeGrabTrack
+function CharacterAnimModule.getRopeGrabTrack()
+	return CharacterAnimModule._ropeGrabTrack
 end
-function t.getCarSitTrack()
-	return t._carSitTrack
+function CharacterAnimModule.getCarSitTrack()
+	return CharacterAnimModule._carSitTrack
 end
-return t
+return CharacterAnimModule

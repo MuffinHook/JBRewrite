@@ -1,6 +1,7 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local t = {
+local CATEGORIES_ARRAY = {
 	require(ReplicatedStorage.Sale.SaleConsts).CATEGORY_NAME,
 	"Texture",
 	"SecondTexture",
@@ -25,7 +26,7 @@ local t = {
 	"SpoilerColor",
 	"HeadlightsColor"
 }
-local t2 = {
+local CATEGORY_TO_FUNC_MAP = {
 	Texture = require(script.Parent.Category.Texture),
 	SecondTexture = require(script.Parent.Category.SecondTexture),
 	BodyColor = require(script.Parent.Category.BodyColor),
@@ -50,16 +51,16 @@ local t2 = {
 	HeadlightsColor = require(script.Parent.Category.HeadlightsColor)
 }
 return {
-	GetCategoriesByModel = function(p1)
-		local t3 = {}
-		for v1, v2 in t do
-			local var3 = t2[v2]
-			if not var3 or var3(p1) then
-				table.insert(t3, v2)
+	GetCategoriesByModel = function(model)
+		local filteredCategories = {}
+		for categoryIndex, categoryName in CATEGORIES_ARRAY do
+			local categoryFilterFunc = CATEGORY_TO_FUNC_MAP[categoryName]
+			if not categoryFilterFunc or categoryFilterFunc(model) then
+				table.insert(filteredCategories, categoryName)
 			end
 		end
-		return t3
+		return filteredCategories
 	end,
-	CATEGORIES = t,
-	MAP_CATEGORY_TO_FUNC = t2
+	CATEGORIES = CATEGORIES_ARRAY,
+	MAP_CATEGORY_TO_FUNC = CATEGORY_TO_FUNC_MAP
 }

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local TracerRoot = Instance.new("Part")
@@ -11,23 +12,23 @@ TracerRoot.Parent = workspace
 local TracerLines = Instance.new("Folder")
 TracerLines.Name = "TracerLines"
 TracerLines.Parent = workspace
-local t = {}
-t.__index = t
-setmetatable(t, BaseObject)
-function t.new()
-	local v1 = BaseObject.new()
-	setmetatable(v1, t)
-	v1:_setup()
-	v1:SetColor(Color3.fromRGB(255, 235, 141))
-	return v1
+local TracerClass = {}
+TracerClass.__index = TracerClass
+setmetatable(TracerClass, BaseObject)
+function TracerClass.new()
+	local tracerInstance = BaseObject.new()
+	setmetatable(tracerInstance, TracerClass)
+	tracerInstance:_setup()
+	tracerInstance:SetColor(Color3.fromRGB(255, 235, 141))
+	return tracerInstance
 end
-function t.SetColor(p1, p2)
-	p1.lineHandle.Color3 = p2
+function TracerClass.SetColor(self, color)
+	self.lineHandle.Color3 = color
 end
-function t.SetThickness(p1, p2)
-	p1.lineHandle.Thickness = p2
+function TracerClass.SetThickness(self, thickness)
+	self.lineHandle.Thickness = thickness
 end
-function t._setup(p1)
+function TracerClass._setup(self)
 	local LineHandleAdornment = Instance.new("LineHandleAdornment")
 	LineHandleAdornment.Adornee = TracerRoot
 	LineHandleAdornment.Transparency = 0.1
@@ -36,11 +37,11 @@ function t._setup(p1)
 	LineHandleAdornment.Length = 0
 	LineHandleAdornment.CFrame = CFrame.new()
 	LineHandleAdornment.Parent = TracerLines
-	p1.maid:GiveTask(LineHandleAdornment)
-	p1.lineHandle = LineHandleAdornment
+	self.maid:GiveTask(LineHandleAdornment)
+	self.lineHandle = LineHandleAdornment
 end
-function t.Draw(p1, p2, p3)
-	p1.lineHandle.Length = (p3 - p2).Magnitude
-	p1.lineHandle.CFrame = CFrame.lookAt(p2, p3)
+function TracerClass.Draw(self, startPos, endPos)
+	self.lineHandle.Length = (endPos - startPos).Magnitude
+	self.lineHandle.CFrame = CFrame.lookAt(startPos, endPos)
 end
-return t
+return TracerClass

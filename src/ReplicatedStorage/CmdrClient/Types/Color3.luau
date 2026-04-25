@@ -1,45 +1,46 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Util = require(script.Parent.Parent.Shared.Util)
-local v1 = Util.MakeSequenceType({
+local sequenceType = Util.MakeSequenceType({
 	Prefixes = "# hexColor3 ! brickColor3",
-	ValidateEach = function(p1, p2)
-		if p1 == nil then
-			return false, ("Invalid or missing number at position %d in Color3 type."):format(p2)
-		elseif p1 < 0 or p1 > 255 then
-			return false, ("Number out of acceptable range 0-255 at position %d in Color3 type."):format(p2)
-		elseif p1 % 1 == 0 then
+	ValidateEach = function(value, position)
+		if value == nil then
+			return false, ("Invalid or missing number at position %d in Color3 type."):format(position)
+		elseif value < 0 or value > 255 then
+			return false, ("Number out of acceptable range 0-255 at position %d in Color3 type."):format(position)
+		elseif value % 1 == 0 then
 			return true
 		else
-			return false, ("Number is not an integer at position %d in Color3 type."):format(p2)
+			return false, ("Number is not an integer at position %d in Color3 type."):format(position)
 		end
 	end,
 	TransformEach = tonumber,
 	Constructor = Color3.fromRGB,
 	Length = 3
 })
-local function parseHexDigit(p1)
-	if #p1 == 1 then
-		p1 = p1 .. p1
+local function parseHexDigit(hexString)
+	if #hexString == 1 then
+		hexString = hexString .. hexString
 	end
-	return tonumber(p1, 16)
+	return tonumber(hexString, 16)
 end
-local t = {
-	Transform = function(p1)
-		local v1, v2, v3 = p1:match("^#?(%x%x?)(%x%x?)(%x%x?)$")
-		return Util.Each(parseHexDigit, v1, v2, v3)
+local hexColorType = {
+	Transform = function(colorString)
+		local redHex, greenHex, blueHex = colorString:match("^#?(%x%x?)(%x%x?)(%x%x?)$")
+		return Util.Each(parseHexDigit, redHex, greenHex, blueHex)
 	end,
-	Validate = function(p1, p2, p3)
-		return if p1 == nil or p2 == nil then false else p3 ~= nil, "Invalid hex color"
+	Validate = function(red, green, blue)
+		return if red == nil or green == nil then false else blue ~= nil, "Invalid hex color"
 	end,
 	Parse = function(...)
 		return Color3.fromRGB(...)
 	end
 }
-return function(p1)
-	p1:RegisterType("color3", v1)
-	p1:RegisterType("color3s", Util.MakeListableType(v1, {
+return function(registry)
+	registry:RegisterType("color3", sequenceType)
+	registry:RegisterType("color3s", Util.MakeListableType(sequenceType, {
 		Prefixes = "# hexColor3s ! brickColor3s"
 	}))
-	p1:RegisterType("hexColor3", t)
-	p1:RegisterType("hexColor3s", Util.MakeListableType(t))
+	registry:RegisterType("hexColor3", hexColorType)
+	registry:RegisterType("hexColor3s", Util.MakeListableType(hexColorType))
 end

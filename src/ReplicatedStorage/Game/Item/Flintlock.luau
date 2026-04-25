@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Joint = require(ReplicatedStorage.Std.Joint)
@@ -46,14 +47,14 @@ function t.UpdateItemSprings(p1)
 	p1.LeverPosition = p1.SpringLever:Update()
 	p1.KnockbackPosition = p1.SpringKnockback:Update()
 end
-local v3 = os.clock()
+local lastUpdateTime = os.clock()
 function t.UpdateItemJoints(p1)
 	Gun.UpdateItemJoints(p1)
 	p1.MotorLever.C1 = FromAxisAngle(p1.LeverPosition)
 	if p1.KnockbackPosition > 0.1 and not (VehicleUtils.GetLocalVehiclePacket() or p1.Humanoid.Sit) then
-		p1.RootPart.CFrame = p1.RootPart.CFrame * CFrame.new(0, 0, p1.KnockbackPosition * 60 * (os.clock() - v3))
+		p1.RootPart.CFrame = p1.RootPart.CFrame * CFrame.new(0, 0, p1.KnockbackPosition * 60 * (os.clock() - lastUpdateTime))
 	end
-	v3 = os.clock()
+	lastUpdateTime = os.clock()
 end
 function t.SetupArmWelds(p1)
 	Joint.Weld(p1.Model.Skeleton.RightArm, p1.BoundingBox)

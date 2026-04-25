@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local t = {
@@ -12,26 +13,26 @@ local t = {
 		end
 		return p1
 	end,
-	getVehiclePath = function(p1)
-		local t = { p1.Name }
-		local v1 = p1
-		while not v1:FindFirstChild("BoundingBox") do
-			v1 = v1.Parent
-			if not v1 then
+	getVehiclePath = function(rootPart)
+		local t = { rootPart.Name }
+		local currentParent = rootPart
+		while not currentParent:FindFirstChild("BoundingBox") do
+			currentParent = currentParent.Parent
+			if not currentParent then
 				warn(table.concat(t, "."))
 				error("getVehiclePath failed, reached nil")
 			end
-			table.insert(t, v1.Name)
+			table.insert(t, currentParent.Name)
 		end
 		return t
 	end
 }
-function t.GetDefaultVehiclePart(p1)
-	local v1 = t.getVehiclePath(p1)
+function t.GetDefaultVehiclePart(part)
+	local vehiclePath = t.getVehiclePath(part)
 	if RunService:IsServer() then
-		return t.drill(ReplicatedStorage.Resource:FindFirstChild("Vehicles"), v1) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Plane"), v1) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Boat"), v1) or t.drill(game:GetService("ServerStorage").Resource:FindFirstChild("ServerVehicles"), v1)
+		return t.drill(ReplicatedStorage.Resource:FindFirstChild("Vehicles"), vehiclePath) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Plane"), vehiclePath) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Boat"), vehiclePath) or t.drill(game:GetService("ServerStorage").Resource:FindFirstChild("ServerVehicles"), vehiclePath)
 	else
-		return t.drill(ReplicatedStorage.Resource:FindFirstChild("Vehicles"), v1) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Plane"), v1) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Boat"), v1)
+		return t.drill(ReplicatedStorage.Resource:FindFirstChild("Vehicles"), vehiclePath) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Plane"), vehiclePath) or t.drill(ReplicatedStorage.Resource:FindFirstChild("Boat"), vehiclePath)
 	end
 end
 return t

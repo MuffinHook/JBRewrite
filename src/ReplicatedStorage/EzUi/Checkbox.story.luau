@@ -1,27 +1,28 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(story)
+	local AppComponent = Roact.Component:extend("App")
 	local Checkbox = require(script.Parent.Checkbox)
-	function v1.init(p1)
-		p1:setState({
+	function AppComponent.init(self)
+		self:setState({
 			checked = false
 		})
 	end
-	function v1.render(p1)
+	function AppComponent.render(self)
 		return Roact.createElement(Checkbox, {
 			size = UDim2.new(0, 30, 0, 30),
 			position = UDim2.new(0.25, 0, 0.5, 0),
-			value = p1.state.checked,
-			onChecked = function(p12)
-				p1:setState({
-					checked = p12
+			value = self.state.checked,
+			onChecked = function(isChecked)
+				self:setState({
+					checked = isChecked
 				})
 			end
 		})
 	end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	local mountedInstance = Roact.mount(Roact.createElement(AppComponent), story)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedInstance)
 	end
 end

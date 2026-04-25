@@ -1,23 +1,24 @@
 -- Reviewed by Claude
+-- variables reassigned
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Logic = require(ReplicatedStorage.Module.Logic)
 local function Update(p1, p2)
-	local v1 = p1.Spring:Update()
+	local springOffset = p1.Spring:Update()
 	local CrossHair = p1.Gui.CrossHair
-	local v2 = p2 or UserInputService:GetMouseLocation()
+	local mousePos = p2 or UserInputService:GetMouseLocation()
 	local AbsoluteSize = CrossHair.AbsoluteSize
-	CrossHair.Position = UDim2.new(0, v2.X - AbsoluteSize.X * 0.5, 0, v2.Y - AbsoluteSize.Y * 0.5)
-	CrossHair.VerticalTop.Position = UDim2.new(0.5, 0, 0, -v1)
-	CrossHair.VerticalBottom.Position = UDim2.new(0.5, 0, 0.5, v1)
-	CrossHair.HorizontalLeft.Position = UDim2.new(0, -v1, 0.5, -1)
-	CrossHair.HorizontalRight.Position = UDim2.new(0.5, v1, 0.5, -1)
+	CrossHair.Position = UDim2.new(0, mousePos.X - AbsoluteSize.X * 0.5, 0, mousePos.Y - AbsoluteSize.Y * 0.5)
+	CrossHair.VerticalTop.Position = UDim2.new(0.5, 0, 0, -springOffset)
+	CrossHair.VerticalBottom.Position = UDim2.new(0.5, 0, 0.5, springOffset)
+	CrossHair.HorizontalLeft.Position = UDim2.new(0, -springOffset, 0.5, -1)
+	CrossHair.HorizontalRight.Position = UDim2.new(0.5, springOffset, 0.5, -1)
 end
-local v1 = Color3.new(255/255, 0/255, 0/255)
-local v2 = Color3.new(255/255, 255/255, 255/255)
+local redColor = Color3.new(255/255, 0/255, 0/255)
+local whiteColor = Color3.new(255/255, 255/255, 255/255)
 local function FlareCrossHair(p1)
-	local v12 = p1.Int + 1
-	p1.Int = v12
+	local prevInt = p1.Int + 1
+	p1.Int = prevInt
 	local Gui = p1.Gui
 	if not Gui then
 		return false
@@ -27,16 +28,16 @@ local function FlareCrossHair(p1)
 	local VerticalBottom = CrossHair.VerticalBottom
 	local HorizontalLeft = CrossHair.HorizontalLeft
 	local HorizontalRight = CrossHair.HorizontalRight
-	VerticalTop.BackgroundColor3 = v1
-	VerticalBottom.BackgroundColor3 = v1
-	HorizontalLeft.BackgroundColor3 = v1
-	HorizontalRight.BackgroundColor3 = v1
+	VerticalTop.BackgroundColor3 = redColor
+	VerticalBottom.BackgroundColor3 = redColor
+	HorizontalLeft.BackgroundColor3 = redColor
+	HorizontalRight.BackgroundColor3 = redColor
 	delay(0.1, function()
-		if p1.Int == v12 then
-			VerticalTop.BackgroundColor3 = v2
-			VerticalBottom.BackgroundColor3 = v2
-			HorizontalLeft.BackgroundColor3 = v2
-			HorizontalRight.BackgroundColor3 = v2
+		if p1.Int == prevInt then
+			VerticalTop.BackgroundColor3 = whiteColor
+			VerticalBottom.BackgroundColor3 = whiteColor
+			HorizontalLeft.BackgroundColor3 = whiteColor
+			HorizontalRight.BackgroundColor3 = whiteColor
 		end
 	end)
 end
@@ -59,17 +60,17 @@ local function DestroyCrossHair(p1)
 end
 return {
 	Make = function()
-		local v1 = Logic.MakeSpring()
-		v1.p = 0
-		v1.v = 0
-		v1.Target = 5
-		v1.Freq = 20
-		v1.Damp = 0.7
-		local v2 = ReplicatedStorage.Resource.CrossHairGui:Clone()
-		v2.Enabled = false
-		local t = {
-			Gui = v2,
-			Spring = v1,
+		local spring = Logic.MakeSpring()
+		spring.p = 0
+		spring.v = 0
+		spring.Target = 5
+		spring.Freq = 20
+		spring.Damp = 0.7
+		local guiClone = ReplicatedStorage.Resource.CrossHairGui:Clone()
+		guiClone.Enabled = false
+		local crosshairModule = {
+			Gui = guiClone,
+			Spring = spring,
 			Update = Update,
 			Destroy = DestroyCrossHair,
 			ADS = ADS,
@@ -79,7 +80,7 @@ return {
 			Disable = DisableCrossHair
 		}
 		UserInputService.MouseIconEnabled = false
-		t.Gui.Enabled = true
-		return t
+		crosshairModule.Gui.Enabled = true
+		return crosshairModule
 	end
 }

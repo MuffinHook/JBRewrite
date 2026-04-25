@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return function(p1, p2, p3, p4)
 	if not p1 then
@@ -7,22 +8,22 @@ return function(p1, p2, p3, p4)
 			Name = "Classic"
 		}
 	end
-	local v1 = ReplicatedStorage.Resource:FindFirstChild("DriftParticles"):FindFirstChild(p1.Name):GetChildren()
-	local t = {}
-	for v2, v3 in p2.Model:FindFirstChild("Preset"):GetChildren() do
-		if v3.Name == "Drift" then
-			table.insert(t, v3)
+	local driftParticlesList = ReplicatedStorage.Resource:FindFirstChild("DriftParticles"):FindFirstChild(p1.Name):GetChildren()
+	local driftPresets = {}
+	for presetIndex, presetChild in p2.Model:FindFirstChild("Preset"):GetChildren() do
+		if presetChild.Name == "Drift" then
+			table.insert(driftPresets, presetChild)
 		end
 	end
-	for v4, v5 in t do
-		for v6, v7 in v5:GetChildren() do
-			if v7:IsA("ParticleEmitter") then
-				v7:Destroy()
+	for presetIdx, presetObj in driftPresets do
+		for childIdx, childObj in presetObj:GetChildren() do
+			if childObj:IsA("ParticleEmitter") then
+				childObj:Destroy()
 			end
 		end
-		for v8, v9 in v1 do
-			if v9:IsA("ParticleEmitter") then
-				local ParticleEmitter = v9:Clone()
+		for particleIdx, particleObj in driftParticlesList do
+			if particleObj:IsA("ParticleEmitter") then
+				local ParticleEmitter = particleObj:Clone()
 				ParticleEmitter.Name = "ParticleEmitter"
 				ParticleEmitter.Enabled = false
 				ParticleEmitter.EmissionDirection = Enum.NormalId.Back
@@ -31,7 +32,7 @@ return function(p1, p2, p3, p4)
 					ParticleEmitter.Speed = NumberRange.new(15)
 					ParticleEmitter.Enabled = true
 				end
-				ParticleEmitter.Parent = v5
+				ParticleEmitter.Parent = presetObj
 			end
 		end
 	end

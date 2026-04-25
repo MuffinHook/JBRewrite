@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SpecialTextureData = require(ReplicatedStorage.Game.Garage.SpecialTextureData)
 local TextureData = require(ReplicatedStorage.Game.Garage.TextureData)
@@ -78,17 +79,17 @@ return function(p1, p2, p3)
 		end
 	end
 	if p1 and not p1.None then
-		local v2 = if Make == "TinyToy" then "Camaro" else Make
-		local v3 = p1.Name
-		local v4 = nil
-		if TextureData[v3] == nil then
-			if SpecialTextureData[v3] then
-				v4 = SpecialTextureData[v3]
+		local textureCategory = if Make == "TinyToy" then "Camaro" else Make
+		local textureName = p1.Name
+		local textureId = nil
+		if TextureData[textureName] == nil then
+			if SpecialTextureData[textureName] then
+				textureId = SpecialTextureData[textureName]
 			end
 		else
-			v4 = TextureData[v3][v2]
+			textureId = TextureData[textureName][textureCategory]
 		end
-		if v4 == nil then
+		if textureId == nil then
 			for i, v in ipairs(list) do
 				if v:IsA("MeshPart") then
 					v.TextureID = ""
@@ -97,7 +98,7 @@ return function(p1, p2, p3)
 		else
 			for i, v in ipairs(list) do
 				if v:IsA("MeshPart") then
-					v.TextureID = ("rbxassetid://%d"):format(v4)
+					v.TextureID = ("rbxassetid://%d"):format(textureId)
 				end
 			end
 		end
@@ -109,13 +110,13 @@ return function(p1, p2, p3)
 		end
 	end
 	if p1 and v1 then
-		local v5 = v1:FindFirstChild(GarageConsts.PIXEL_PARTICLE_EMITTER_NAME)
+		local pixelEmitter = v1:FindFirstChild(GarageConsts.PIXEL_PARTICLE_EMITTER_NAME)
 		if p1.Name == "Pixel" then
-			if not v5 then
+			if not pixelEmitter then
 				ReplicatedStorage.Resource:FindFirstChild(GarageConsts.PIXEL_PARTICLE_EMITTER_NAME):Clone().Parent = v1
 			end
-		elseif v5 then
-			v5:Destroy()
+		elseif pixelEmitter then
+			pixelEmitter:Destroy()
 		end
 	end
 	if Make == "MCL36" and (p1 and p1.Name) == "MCL36" then
@@ -126,12 +127,12 @@ return function(p1, p2, p3)
 		Model_2:FindFirstChild("Wing").TextureID = ""
 	end
 	if Make == "SWATVan" then
-		local v7 = p1 and p1.Name
+		local graffitiName = p1 and p1.Name
 		for v9, v10 in Model_2.Body:GetChildren() do
-			local v8
+			local transparency
 			if v10:IsA("Decal") then
-				v8 = if v7 == "SWATGraffiti" then 1 else 0
-				v10.Transparency = v8
+				transparency = if graffitiName == "SWATGraffiti" then 1 else 0
+				v10.Transparency = transparency
 			end
 		end
 	end

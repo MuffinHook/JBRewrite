@@ -1,20 +1,21 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local PaintUtils = require(ReplicatedStorage.Game.Garage.PaintUtils)
-local function getPaintConfig(p1)
-	local v1 = PaintUtils.GetDefaultVehiclePart(p1)
+local function getPaintConfig(paintColorName)
+	local colorName = PaintUtils.GetDefaultVehiclePart(paintColorName)
 	return {
-		DefaultReflectance = v1.Reflectance,
-		DefaultMaterial = v1.Material
+		DefaultReflectance = colorName.Reflectance,
+		DefaultMaterial = colorName.Material
 	}
 end
-return function(p1, p2)
-	local Model = p2.Model
-	local Type = p2.Type
-	local Make = p2.Make
-	if p1 then
-		local v1 = p1.Name
+return function(paintColorName, modelInfo)
+	local Model = modelInfo.Model
+	local Type = modelInfo.Type
+	local Make = modelInfo.Make
+	if paintColorName then
+		local colorName = paintColorName.Name
 		local list = {}
 		for i, v in ipairs(Model:GetDescendants()) do
 			if v.Name == "Windows" then
@@ -22,15 +23,15 @@ return function(p1, p2)
 			end
 		end
 		for i, v in ipairs(list) do
-			local v2 = PaintUtils.GetDefaultVehiclePart(v)
-			local t = {
-				DefaultReflectance = v2.Reflectance,
-				DefaultMaterial = v2.Material
+			local defaultPart = PaintUtils.GetDefaultVehiclePart(v)
+			local paintConfig = {
+				DefaultReflectance = defaultPart.Reflectance,
+				DefaultMaterial = defaultPart.Material
 			}
 			if Make == "Concept" then
-				t.OverrideMaterial = Enum.Material.ForceField
+				paintConfig.OverrideMaterial = Enum.Material.ForceField
 			end
-			Paint.Part(v, v1, t)
+			Paint.Part(v, colorName, paintConfig)
 			if Make == "Heli" or (Make == "BlackHawk" or Make == "LittleBird") then
 				local Color = v.Color
 				v.Color = Color3.new(math.clamp(Color.r * 1.4, 0, 1), math.clamp(Color.g * 1.4, 0, 1), (math.clamp(Color.b * 1.4, 0, 1)))
@@ -42,10 +43,10 @@ return function(p1, p2)
 			if DoorLeft then
 				local Window = DoorLeft:FindFirstChild("Window")
 				if Window then
-					local v9 = PaintUtils.GetDefaultVehiclePart(Window)
-					Paint.Part(Window, v1, {
-						DefaultReflectance = v9.Reflectance,
-						DefaultMaterial = v9.Material
+					local defaultWindowPart = PaintUtils.GetDefaultVehiclePart(Window)
+					Paint.Part(Window, colorName, {
+						DefaultReflectance = defaultWindowPart.Reflectance,
+						DefaultMaterial = defaultWindowPart.Material
 					})
 				end
 			end
@@ -53,10 +54,10 @@ return function(p1, p2)
 			if DoorRight then
 				local Window = DoorRight:FindFirstChild("Window")
 				if Window then
-					local v10 = PaintUtils.GetDefaultVehiclePart(Window)
-					Paint.Part(Window, v1, {
-						DefaultReflectance = v10.Reflectance,
-						DefaultMaterial = v10.Material
+					local defaultDoorWindowPart = PaintUtils.GetDefaultVehiclePart(Window)
+					Paint.Part(Window, colorName, {
+						DefaultReflectance = defaultDoorWindowPart.Reflectance,
+						DefaultMaterial = defaultDoorWindowPart.Material
 					})
 				end
 			end

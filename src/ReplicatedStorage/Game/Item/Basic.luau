@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local CurrentCamera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -18,8 +19,8 @@ local function FromAxisAngle(p1)
 	local z = p1.z
 	local v1 = (x * x + y * y + z * z) ^ 0.5
 	if v1 > 0.00001 then
-		local v22 = math.sin(v1 * 0.5) / v1
-		return CFrame.new(0, 0, 0, v22 * x, v22 * y, v22 * z, (math.cos(v1 * 0.5)))
+		local sinHalf = math.sin(v1 * 0.5) / v1
+		return CFrame.new(0, 0, 0, sinHalf * x, sinHalf * y, sinHalf * z, (math.cos(v1 * 0.5)))
 	else
 		return v2
 	end

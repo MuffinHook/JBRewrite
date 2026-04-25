@@ -1,10 +1,11 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local Roact = require(script.Parent.Roact)
 local t = {}
-local t2 = {
+local controllerImageIds = {
 	ButtonA = "rbxassetid://129272408813511",
 	ButtonCross = "rbxassetid://123705746509283",
 	ButtonB = "rbxassetid://127556782775053",
@@ -42,20 +43,20 @@ local t2 = {
 	PSDPadLeft = "rbxassetid://116409886750178"
 }
 local function getImageIdForKeyCode(p1)
-	local v1 = UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross"
-	local v2 = UserInputService:GetStringForKeyCode(p1)
-	if v1 and v2:find("DPad") then
-		v2 = "PS" .. v2
+	local isPSController = UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross"
+	local keyCodeString = UserInputService:GetStringForKeyCode(p1)
+	if isPSController and keyCodeString:find("DPad") then
+		keyCodeString = "PS" .. keyCodeString
 	end
-	return t2[v2] or UserInputService:GetImageForKeyCode(p1)
+	return controllerImageIds[keyCodeString] or UserInputService:GetImageForKeyCode(p1)
 end
 local function getImageInstance(p1, p2, p3)
-	local v1 = Instance.new(p1)
-	v1.BackgroundTransparency = 1
-	v1.BorderSizePixel = 1
-	v1.Image = UserInputService:GetImageForKeyCode(p2)
-	v1.Size = UDim2.fromScale(1, 1)
-	return v1
+	local instance = Instance.new(p1)
+	instance.BackgroundTransparency = 1
+	instance.BorderSizePixel = 1
+	instance.Image = UserInputService:GetImageForKeyCode(p2)
+	instance.Size = UDim2.fromScale(1, 1)
+	return instance
 end
 function t.GetImageLabel(p1, p2, p3)
 	local ImageLabel = Instance.new("ImageLabel")
@@ -74,7 +75,7 @@ function t.GetImageButton(p1, p2, p3)
 	return ImageButton
 end
 local function getRoactImageInstance(p1, p2, p3, p4, p5)
-	local t = {
+	local elementProps = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Image = getImageIdForKeyCode(p2),
@@ -88,7 +89,7 @@ local function getRoactImageInstance(p1, p2, p3, p4, p5)
 			AspectRatio = 1
 		})
 	end
-	return Roact.createElement(p1, Dictionary.merge(t, p4), p5)
+	return Roact.createElement(p1, Dictionary.merge(elementProps, p4), p5)
 end
 function t.GetRoactImageLabel(p1, p2, p3, p4, p5)
 	return getRoactImageInstance("ImageLabel", p2, p3, p4, p5)

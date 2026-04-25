@@ -1,20 +1,21 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Util = require(script.Parent.Parent.Shared.Util)
-return function(p1)
-	local t = {
-		Transform = function(p12)
-			return Util.MakeFuzzyFinder(p1:GetCommandNames())(p12)
+return function(typeRegistry)
+	local commandTypeSpec = {
+		Transform = function(input)
+			return Util.MakeFuzzyFinder(typeRegistry:GetCommandNames())(input)
 		end,
-		Validate = function(p1)
-			return #p1 > 0, "No command with that name could be found."
+		Validate = function(commandInput)
+			return #commandInput > 0, "No command with that name could be found."
 		end,
-		Autocomplete = function(p1)
-			return p1
+		Autocomplete = function(commandInput)
+			return commandInput
 		end,
-		Parse = function(p1)
-			return p1[1]
+		Parse = function(commandInput)
+			return commandInput[1]
 		end
 	}
-	p1:RegisterType("command", t)
-	p1:RegisterType("commands", Util.MakeListableType(t))
+	typeRegistry:RegisterType("command", commandTypeSpec)
+	typeRegistry:RegisterType("commands", Util.MakeListableType(commandTypeSpec))
 end

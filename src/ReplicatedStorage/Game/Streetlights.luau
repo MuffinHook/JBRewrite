@@ -1,58 +1,59 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Binder = require(ReplicatedStorage.Std.Binder)
 local Maid = require(ReplicatedStorage.Std.Maid)
-local t = {}
-t.__index = t
-function t.new(p1)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._maid = Maid.new()
-	t2._obj = p1
-	return t2
+local StreetlightClass = {}
+StreetlightClass.__index = StreetlightClass
+function StreetlightClass.new(obj)
+	local instance = {}
+	setmetatable(instance, StreetlightClass)
+	instance._maid = Maid.new()
+	instance._obj = obj
+	return instance
 end
-function t.SetValue(p1, p2)
-	local Light = p1._obj:FindFirstChild("Light")
-	Light:FindFirstChildWhichIsA("Light", true).Enabled = p2
-	Light.Material = p2 and Enum.Material.Neon or Enum.Material.SmoothPlastic
+function StreetlightClass.SetValue(self, enabled)
+	local Light = self._obj:FindFirstChild("Light")
+	Light:FindFirstChildWhichIsA("Light", true).Enabled = enabled
+	Light.Material = enabled and Enum.Material.Neon or Enum.Material.SmoothPlastic
 end
-function t.Destroy(p1)
-	local _maid = p1._maid
-	p1._maid = nil
+function StreetlightClass.Destroy(self)
+	local _maid = self._maid
+	self._maid = nil
 	_maid:Destroy()
-	setmetatable(p1, nil)
+	setmetatable(self, nil)
 end
-local t2 = {
+local StreetlightsModule = {
 	_enabled = false
 }
-function t2.init()
-	local v1 = Binder.new("Streetlight", t)
-	t2._binder = v1
-	v1:GetClassAddedSignal():Connect(function(p1)
-		p1:SetValue(t2._enabled)
+function StreetlightsModule.init()
+	local binder = Binder.new("Streetlight", StreetlightClass)
+	StreetlightsModule._binder = binder
+	binder:GetClassAddedSignal():Connect(function(instance)
+		instance:SetValue(StreetlightsModule._enabled)
 	end)
-	v1:Start()
+	binder:Start()
 end
-function t2.SetEnabled(p1)
-	t2._enabled = p1
-	for i, v in ipairs(t2._binder:GetAll()) do
+function StreetlightsModule.SetEnabled(enabled)
+	StreetlightsModule._enabled = enabled
+	for i, v in ipairs(StreetlightsModule._binder:GetAll()) do
 		if v.SetValue then
-			v:SetValue(p1)
+			v:SetValue(enabled)
 		end
 		wait(math.random() * 0.1)
 	end
 end
-function t2.Flicker()
-	local v1 = true
+function StreetlightsModule.Flicker()
+	local isLit = true
 	for i = 1, 10 do
-		v1 = not v1
-		for i2, v in ipairs(t2._binder:GetAll()) do
-			v:SetValue(v1)
+		isLit = not isLit
+		for i2, v in ipairs(StreetlightsModule._binder:GetAll()) do
+			v:SetValue(isLit)
 		end
 		wait(0.2)
 	end
-	for i, v in ipairs(t2._binder:GetAll()) do
-		v:SetValue(t2._enabled)
+	for i, v in ipairs(StreetlightsModule._binder:GetAll()) do
+		v:SetValue(StreetlightsModule._enabled)
 	end
 end
-return t2
+return StreetlightsModule

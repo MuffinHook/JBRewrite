@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -11,10 +12,10 @@ local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local C4Binder = require(script.Parent.C4Binder)
 local CurrentCamera = workspace.CurrentCamera
 local t = {}
-local v1 = nil
-local v2 = false
+local emService = nil
+local initialized = false
 function t.onExplode(p1, p2, p3, p4, p5)
-	if v2 then
+	if initialized then
 		if not p3 then
 			p3 = 24
 		end
@@ -23,36 +24,36 @@ function t.onExplode(p1, p2, p3, p4, p5)
 		end
 		local Humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
 		local RootPart = Humanoid.RootPart
-		local v12 = RootPart.Position - p1
-		if v12.Magnitude < p2 then
+		local positionDifference = RootPart.Position - p1
+		if positionDifference.Magnitude < p2 then
 			if Humanoid.SeatPart then
 				Humanoid.Jump = true
 				task.wait(0.1)
 			end
-			task.spawn(v1.e9kobedq)
-			local v22 = CurrentCamera.CFrame
-			local v3 = CamShaker.new(Enum.RenderPriority.Camera.Value + 2, function(p1)
-				v22 = CurrentCamera.CFrame
+			task.spawn(emService.e9kobedq)
+			local cameraFrame = CurrentCamera.CFrame
+			local shaker = CamShaker.new(Enum.RenderPriority.Camera.Value + 2, function(p1)
+				cameraFrame = CurrentCamera.CFrame
 				CurrentCamera.CFrame = CurrentCamera.CFrame * p1
 			end)
-			local v4 = RunService.Heartbeat:Connect(function()
-				CurrentCamera.CFrame = v22
+			local heartbeatConnection = RunService.Heartbeat:Connect(function()
+				CurrentCamera.CFrame = cameraFrame
 			end)
-			v3:Start()
-			v3:Shake(CamShaker.Presets.Explosion)
+			shaker:Start()
+			shaker:Shake(CamShaker.Presets.Explosion)
 			Promise.delay(2):andThen(function()
-				v3:Stop()
-				v4:Disconnect()
+				shaker:Stop()
+				heartbeatConnection:Disconnect()
 			end)
 			if not p5 then
-				RootPart:ApplyImpulse(RootPart.AssemblyMass * v12.Unit * ((p4 - p3) * (1 - v12.Magnitude / p2) + p3))
+				RootPart:ApplyImpulse(RootPart.AssemblyMass * positionDifference.Unit * ((p4 - p3) * (1 - positionDifference.Magnitude / p2) + p3))
 			end
 		end
 	end
 end
 function t.init(p1)
-	v1 = p1.em
-	v2 = true
+	emService = p1.em
+	initialized = true
 	C4Binder:Start()
 	local function hide(p1)
 		p1._obj.PrimaryPart.Anchored = true
@@ -66,9 +67,9 @@ function t.init(p1)
 		end
 		p1._maid:GiveTask(p1._creatorIdValue:GetPropertyChangedSignal("Value"):Connect(function()
 			if p1:GetCreator() == LocalPlayer then
-				local v1 = p1
-				v1._obj.PrimaryPart.Anchored = true
-				v1._obj:SetPrimaryPartCFrame(CFrame.new(0, -100, 0))
+				local c4Obj = p1
+				c4Obj._obj.PrimaryPart.Anchored = true
+				c4Obj._obj:SetPrimaryPartCFrame(CFrame.new(0, -100, 0))
 			end
 		end))
 	end)

@@ -33,9 +33,9 @@ local function getNumActiveC4(p1)
 	return count
 end
 local function randomVector()
-	local v1 = math.random() * 2 - 1
-	local v2 = math.random() * 2 - 1
-	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
+	local randX = math.random() * 2 - 1
+	local randY = math.random() * 2 - 1
+	return Vector3.new(randX, randY, math.random() * 2 - 1).Unit
 end
 local eventObject = nil
 local C4 = {

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StreamingHelperUtils = require(ReplicatedStorage.App.StreamingHelperUtils)
 local Binder = require(ReplicatedStorage.Std.Binder)
@@ -7,56 +8,56 @@ local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local t = {}
 t.__index = t
 setmetatable(t, BaseObject)
-function t.new(p1)
-	local instance = BaseObject.new(p1)
+function t.new(stateContainer)
+	local instance = BaseObject.new(stateContainer)
 	setmetatable(instance, t)
-	local var3 = 0
-	local var4 = nil
+	local updateCounter = 0
+	local delayTask = nil
 	local function update()
-		local var12 = var3 + 1
-		var3 = var12
-		if var4 then
-			task.cancel(var4)
-			var4 = nil
+		local updateVersion = updateCounter + 1
+		updateCounter = updateVersion
+		if delayTask then
+			task.cancel(delayTask)
+			delayTask = nil
 		end
-		var4 = task.delay(0.1, function()
-			if var12 == var3 then
-				StreamingHelperUtils.yieldForAllValuesPopulated(p1)
-				if var12 == var3 then
-					instance.packet = TableUtils.createTableFromObjectValues(p1)
+		delayTask = task.delay(0.1, function()
+			if updateVersion == updateCounter then
+				StreamingHelperUtils.yieldForAllValuesPopulated(stateContainer)
+				if updateVersion == updateCounter then
+					instance.packet = TableUtils.createTableFromObjectValues(stateContainer)
 				end
 			end
 		end)
 	end
-	instance.maid:GiveTask(p1.DescendantAdded:Connect(function(p12)
-		if p12:IsA("ValueBase") then
-			local var12 = var3 + 1
-			var3 = var12
-			if var4 then
-				task.cancel(var4)
-				var4 = nil
+	instance.maid:GiveTask(stateContainer.DescendantAdded:Connect(function(descendant)
+		if descendant:IsA("ValueBase") then
+			local updateVersion = updateCounter + 1
+			updateCounter = updateVersion
+			if delayTask then
+				task.cancel(delayTask)
+				delayTask = nil
 			end
-			var4 = task.delay(0.1, function()
-				if var12 == var3 then
-					StreamingHelperUtils.yieldForAllValuesPopulated(p1)
-					if var12 == var3 then
-						instance.packet = TableUtils.createTableFromObjectValues(p1)
+			delayTask = task.delay(0.1, function()
+				if updateVersion == updateCounter then
+					StreamingHelperUtils.yieldForAllValuesPopulated(stateContainer)
+					if updateVersion == updateCounter then
+						instance.packet = TableUtils.createTableFromObjectValues(stateContainer)
 					end
 				end
 			end)
 		end
 	end))
-	local var5 = var3 + 1
-	var3 = var5
-	if var4 then
-		task.cancel(var4)
-		var4 = nil
+	local initialUpdateCounter = updateCounter + 1
+	updateCounter = initialUpdateCounter
+	if delayTask then
+		task.cancel(delayTask)
+		delayTask = nil
 	end
-	var4 = task.delay(0.1, function()
-		if var5 == var3 then
-			StreamingHelperUtils.yieldForAllValuesPopulated(p1)
-			if var5 == var3 then
-				instance.packet = TableUtils.createTableFromObjectValues(p1)
+	delayTask = task.delay(0.1, function()
+		if initialUpdateCounter == updateCounter then
+			StreamingHelperUtils.yieldForAllValuesPopulated(stateContainer)
+			if initialUpdateCounter == updateCounter then
+				instance.packet = TableUtils.createTableFromObjectValues(stateContainer)
 			end
 		end
 	end)

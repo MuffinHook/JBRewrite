@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("UserInputService")
@@ -42,9 +43,9 @@ local t = {
 		keyCodes = { Enum.KeyCode.R, Enum.KeyCode.DPadLeft }
 	}
 }
-function t.init(p1)
-	function t.jumpButton.onPressed(p1)
-		if p1 ~= Enum.UserInputType.Keyboard and p1 ~= Enum.UserInputType.Gamepad1 then
+function t.init(playerModule)
+	function t.jumpButton.onPressed(inputType)
+		if inputType ~= Enum.UserInputType.Keyboard and inputType ~= Enum.UserInputType.Gamepad1 then
 			PlayerModuleService.setIsJumping(true)
 		end
 		t.onJumpPressed:Fire()
@@ -55,18 +56,18 @@ function t.init(p1)
 	end
 	ActionButtonService.add(t.jumpButton)
 	function t.sprintButton.onPressed()
-		p1.setSprinting(true)
+		playerModule.setSprinting(true)
 	end
 	function t.sprintButton.onReleased()
-		p1.setSprinting(false)
+		playerModule.setSprinting(false)
 	end
 	ActionButtonService.add(t.sprintButton)
 	function t.crawlButton.onPressed()
-		p1.attemptToggleCrawling()
+		playerModule.attemptToggleCrawling()
 	end
 	ActionButtonService.add(t.crawlButton)
 	function t.punchButton.onPressed()
-		p1.attemptPunch()
+		playerModule.attemptPunch()
 	end
 	ActionButtonService.add(t.punchButton)
 	local Radio = require(ReplicatedStorage.Game.Radio.Radio)
@@ -74,34 +75,34 @@ function t.init(p1)
 		Radio.Toggle()
 	end
 	ActionButtonService.add(t.radioButton)
-	local function updatePunchVisibility(p1)
-		local v1 = VehicleUtils.GetLocalVehiclePacket() ~= nil
-		ActionButtonService.setButtonEnabled(t.punchButton, not v1 and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
-		if p1 then
-			ActionButtonService.setButtonPrimary(t.jumpButton, not v1)
+	local function updatePunchVisibility(shouldUpdateJump)
+		local isInVehicle = VehicleUtils.GetLocalVehiclePacket() ~= nil
+		ActionButtonService.setButtonEnabled(t.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
+		if shouldUpdateJump then
+			ActionButtonService.setButtonPrimary(t.jumpButton, not isInVehicle)
 		end
 	end
 	VehicleUtils.OnVehicleEntered:Connect(updatePunchVisibility)
 	VehicleUtils.OnVehicleExited:Connect(updatePunchVisibility)
-	local function handleItem(p1)
-		p1._maid:GiveTask(p1:GetEquippedSignal():Connect(function()
-			if p1:GetOwner() == Players.LocalPlayer then
-				local v1 = VehicleUtils.GetLocalVehiclePacket() ~= nil
-				ActionButtonService.setButtonEnabled(t.punchButton, not v1 and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
+	local function handleItem(item)
+		item._maid:GiveTask(item:GetEquippedSignal():Connect(function()
+			if item:GetOwner() == Players.LocalPlayer then
+				local isInVehicle = VehicleUtils.GetLocalVehiclePacket() ~= nil
+				ActionButtonService.setButtonEnabled(t.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
 			end
 		end))
-		if p1:GetOwner() == Players.LocalPlayer then
-			p1._maid:GiveTask(function()
-				local v1 = VehicleUtils.GetLocalVehiclePacket() ~= nil
-				ActionButtonService.setButtonEnabled(t.punchButton, not v1 and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
+		if item:GetOwner() == Players.LocalPlayer then
+			item._maid:GiveTask(function()
+				local isInVehicle = VehicleUtils.GetLocalVehiclePacket() ~= nil
+				ActionButtonService.setButtonEnabled(t.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
 			end)
 		end
 	end
-	for v1, v2 in InventoryItemBinder:GetAll() do
-		handleItem(v2)
+	for v1, item in InventoryItemBinder:GetAll() do
+		handleItem(item)
 	end
 	InventoryItemBinder:GetClassAddedSignal():Connect(handleItem)
-	local v3 = VehicleUtils.GetLocalVehiclePacket() ~= nil
-	ActionButtonService.setButtonEnabled(t.punchButton, not v3 and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
+	local isInVehicle = VehicleUtils.GetLocalVehiclePacket() ~= nil
+	ActionButtonService.setButtonEnabled(t.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
 end
 return t

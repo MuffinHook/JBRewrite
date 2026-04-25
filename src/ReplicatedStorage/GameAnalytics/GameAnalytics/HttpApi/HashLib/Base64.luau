@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local list = {}
 local t = {}
 for i = 65, 90 do
@@ -26,65 +27,65 @@ local t2 = {}
 local rshift = bit32.rshift
 local lshift = bit32.lshift
 local band = bit32.band
-function t2.Encode(p1)
-	local v1 = 0
-	local t = {}
-	for i = 1, #p1, 3 do
-		local v2, v3, v4 = string.byte(p1, i, i + 2)
-		local v5 = rshift(v2, 2)
-		local v6 = lshift(band(v2, 3), 4) + rshift(v3 or 0, 4)
-		local v7 = lshift(band(v3 or 0, 15), 2) + rshift(v4 or 0, 6)
-		local v8 = band(v4 or 0, 63)
-		local v9 = v1 + 1
-		t[v9] = list[v5 + 1]
-		local v10 = v9 + 1
-		t[v10] = list[v6 + 1]
-		local v11 = v10 + 1
-		t[v11] = v3 and list[v7 + 1] or 61
-		v1 = v11 + 1
-		t[v1] = v4 and list[v8 + 1] or 61
+function t2.Encode(inputString)
+	local outputIndex = 0
+	local encodedBytes = {}
+	for i = 1, #inputString, 3 do
+		local byte1, byte2, byte3 = string.byte(inputString, i, i + 2)
+		local index1 = rshift(byte1, 2)
+		local index2 = lshift(band(byte1, 3), 4) + rshift(byte2 or 0, 4)
+		local index3 = lshift(band(byte2 or 0, 15), 2) + rshift(byte3 or 0, 6)
+		local index4 = band(byte3 or 0, 63)
+		local pos1 = outputIndex + 1
+		encodedBytes[pos1] = list[index1 + 1]
+		local pos2 = pos1 + 1
+		encodedBytes[pos2] = list[index2 + 1]
+		local pos3 = pos2 + 1
+		encodedBytes[pos3] = byte2 and list[index3 + 1] or 61
+		outputIndex = pos3 + 1
+		encodedBytes[outputIndex] = byte3 and list[index4 + 1] or 61
 	end
 	local count = 0
 	local t2 = {}
-	for j = 1, v1, 4096 do
-		local v14
+	for j = 1, outputIndex, 4096 do
+		local chunkEnd
 		count = count + 1
-		local v15 = j + 4096 - 1
-		v14 = if v1 < v15 then v1 else v15
-		t2[count] = string.char(table.unpack(t, j, v14))
+		local maxPos = j + 4096 - 1
+		chunkEnd = if outputIndex < maxPos then outputIndex else maxPos
+		t2[count] = string.char(table.unpack(encodedBytes, j, chunkEnd))
 	end
 	return table.concat(t2)
 end
-function t2.Decode(p1)
+function t2.Decode(inputString)
 	local count = 0
-	local t2 = {}
-	for i = 1, #p1, 4 do
-		local v1, v2, v3, v4 = string.byte(p1, i, i + 3)
-		local v6 = t[v2] - 1
-		local v7 = (t[v3] or 1) - 1
-		local v9 = lshift(t[v1] - 1, 2) + rshift(v6, 4)
-		local v10 = lshift(band(v6, 15), 4) + rshift(v7, 2)
-		local v11 = lshift(band(v7, 3), 6) + ((t[v4] or 1) - 1)
+	local decodedBytes = {}
+	for i = 1, #inputString, 4 do
+		local byte1, byte2, byte3, byte4 = string.byte(inputString, i, i + 3)
+		local index2 = t[byte2] - 1
+		local index3 = (t[byte3] or 1) - 1
+		local decodedByte1 = lshift(t[byte1] - 1, 2) + rshift(index2, 4)
+		local decodedByte2 = lshift(band(index2, 15), 4) + rshift(index3, 2)
+		local decodedByte3 = lshift(band(index3, 3), 6) + ((t[byte4] or 1) - 1)
 		count = count + 1
-		t2[count] = v9
-		if v3 ~= 61 then
+		decodedBytes[count] = decodedByte1
+		if byte3 ~= 61 then
 			count = count + 1
-			t2[count] = v10
+			decodedBytes[count] = decodedByte2
 		end
-		if v4 ~= 61 then
+		if byte4 ~= 61 then
 			count = count + 1
-			t2[count] = v11
+			decodedBytes[count] = decodedByte3
 		end
 	end
 	local count_2 = 0
-	local t3 = {}
+	local decodedChunks = {}
 	for j = 1, count, 4096 do
-		local v12
+		local chunkEnd
 		count_2 = count_2 + 1
-		local v13 = j + 4096 - 1
-		v12 = if count < v13 then count else v13
-		t3[count_2] = string.char(table.unpack(t2, j, v12))
+		local maxPos = j + 4096 - 1
+		chunkEnd = if count < maxPos then count else maxPos
+		decodedChunks[count_2] = string.char(table.unpack(decodedBytes, j, chunkEnd))
 	end
-	return table.concat(t3)
+	return table.concat(decodedChunks)
 end
 return t2

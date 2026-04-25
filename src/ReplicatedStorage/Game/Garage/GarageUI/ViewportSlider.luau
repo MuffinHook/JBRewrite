@@ -1,23 +1,24 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local ScrollingFrame = require(ReplicatedStorage.Module.ScrollingFrame)
 local CurrentCamera = workspace.CurrentCamera
-local t = {}
-t.__index = t
-function t.new(p1, p2, p3, p4)
-	local v2 = setmetatable({}, t)
-	v2.Alpha = 0
-	v2.Maid = Maid.new()
-	v2.ListItem = p1
-	v2.ViewportUpdate = p4
-	v2.OnMouseEnter = Signal.new()
-	v2.Maid:GiveTask(v2.OnMouseEnter)
-	v2.OnMouseLeave = Signal.new()
-	v2.Maid:GiveTask(v2.OnMouseLeave)
-	v2.OnMouseClick = Signal.new()
-	v2.Maid:GiveTask(v2.OnMouseClick)
+local ViewportSlider = {}
+ViewportSlider.__index = ViewportSlider
+function ViewportSlider.new(listItem, onViewportSetup, createModel, onViewportUpdate)
+	local self = setmetatable({}, ViewportSlider)
+	self.Alpha = 0
+	self.Maid = Maid.new()
+	self.ListItem = listItem
+	self.ViewportUpdate = onViewportUpdate
+	self.OnMouseEnter = Signal.new()
+	self.Maid:GiveTask(self.OnMouseEnter)
+	self.OnMouseLeave = Signal.new()
+	self.Maid:GiveTask(self.OnMouseLeave)
+	self.OnMouseClick = Signal.new()
+	self.Maid:GiveTask(self.OnMouseClick)
 	local ImageLabel = Instance.new("ImageLabel")
 	ImageLabel.Size = UDim2.new(0.6, 0, 1, 0)
 	ImageLabel.LayoutOrder = 1
@@ -26,7 +27,7 @@ function t.new(p1, p2, p3, p4)
 	ImageLabel.SliceCenter = Rect.new(30, 30, 100, 100)
 	ImageLabel.BackgroundTransparency = 1
 	ImageLabel.BackgroundColor3 = Color3.new(255/255, 255/255, 255/255)
-	v2.Container = ImageLabel
+	self.Container = ImageLabel
 	local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
 	UIAspectRatioConstraint.AspectRatio = 3.825
 	UIAspectRatioConstraint.AspectType = Enum.AspectType.ScaleWithParentSize
@@ -44,7 +45,7 @@ function t.new(p1, p2, p3, p4)
 	Frame_2.Position = UDim2.new(0, 0, 0.85, 0)
 	Frame_2.ClipsDescendants = false
 	Frame_2.Parent = ImageLabel
-	v2._containerBottom = Frame_2
+	self._containerBottom = Frame_2
 	local Frame_3 = Instance.new("Frame")
 	Frame_3.Size = UDim2.new(1, 0, 1, 0)
 	Frame_3.BackgroundTransparency = 1
@@ -53,12 +54,12 @@ function t.new(p1, p2, p3, p4)
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	UIListLayout.FillDirection = Enum.FillDirection.Horizontal
 	UIListLayout.Parent = Frame_3
-	v2.UIListLayout = UIListLayout
-	local v3 = ScrollingFrame.new(Frame_3, true)
-	v2.mScrollingFrame = v3
-	local t2 = {}
-	for i = 1, #p1 do
-		local v4 = p1[i]
+	self.UIListLayout = UIListLayout
+	local scrollingFrame = ScrollingFrame.new(Frame_3, true)
+	self.mScrollingFrame = scrollingFrame
+	local viewports = {}
+	for i = 1, #listItem do
+		local item = listItem[i]
 		local Frame_4 = Instance.new("Frame")
 		Frame_4.LayoutOrder = i
 		Frame_4.Size = UDim2.new(1, 0, 1, 0)
@@ -71,7 +72,7 @@ function t.new(p1, p2, p3, p4)
 		UIAspectRatioConstraint_2.Parent = Frame_4
 		local ImageLabel_2 = Instance.new("ImageLabel")
 		ImageLabel_2.AnchorPoint = Vector2.new(0.5, 0.5)
-		ImageLabel_2.Size = UDim2.new(v2.Alpha, 0, v2.Alpha)
+		ImageLabel_2.Size = UDim2.new(self.Alpha, 0, self.Alpha)
 		ImageLabel_2.Position = UDim2.new(0.5, 0, 0.5, 0)
 		ImageLabel_2.BackgroundTransparency = 1
 		ImageLabel_2.Image = "rbxassetid://5834299976"
@@ -89,87 +90,87 @@ function t.new(p1, p2, p3, p4)
 		local Camera = Instance.new("Camera")
 		Camera.Parent = ViewportFrame
 		ViewportFrame.CurrentCamera = Camera
-		local v5 = p3(v4)
-		assert(v5)
-		v5.Parent = ViewportFrame
-		local t3 = {
+		local instance = createModel(item)
+		assert(instance)
+		instance.Parent = ViewportFrame
+		local viewportData = {
 			Frame = ImageLabel_2,
-			Inst = v5,
+			Inst = instance,
 			Camera = Camera
 		}
-		p2(v4, t3)
-		table.insert(t2, t3)
-		p4(Camera, v5)
+		onViewportSetup(item, viewportData)
+		table.insert(viewports, viewportData)
+		onViewportUpdate(Camera, instance)
 		local function OnMouseEnter()
-			v2.OnMouseEnter:Fire(v4, t3)
+			self.OnMouseEnter:Fire(item, viewportData)
 		end
-		v2.Maid:GiveTask(Frame_4.MouseEnter:Connect(OnMouseEnter))
+		self.Maid:GiveTask(Frame_4.MouseEnter:Connect(OnMouseEnter))
 		local function OnMouseLeave()
-			v2.OnMouseLeave:Fire(v4, t3)
+			self.OnMouseLeave:Fire(item, viewportData)
 		end
-		v2.Maid:GiveTask(Frame_4.MouseLeave:Connect(OnMouseLeave))
+		self.Maid:GiveTask(Frame_4.MouseLeave:Connect(OnMouseLeave))
 		local function OnMouseClick()
-			v2.OnMouseClick:Fire(v4, t3)
+			self.OnMouseClick:Fire(item, viewportData)
 		end
-		v2.Maid:GiveTask(v3:BindInput(Frame_4, {
+		self.Maid:GiveTask(scrollingFrame:BindInput(Frame_4, {
 			OnClick = OnMouseClick
 		}))
 	end
-	v2.Viewports = t2
-	return v2
+	self.Viewports = viewports
+	return self
 end
 local function Ease_OutQuad(p1)
 	return -(p1 - 2) * p1
 end
-function t.GetContainerBottom(p1)
-	return p1._containerBottom
+function ViewportSlider.GetContainerBottom(self)
+	return self._containerBottom
 end
-function t.SetParent(p1, p2)
-	p1.Container.Parent = p2
-	p1.UIListLayout.Parent.Size = UDim2.new(0, p1.UIListLayout.AbsoluteContentSize.X, 1, 0)
+function ViewportSlider.SetParent(self, parent)
+	self.Container.Parent = parent
+	self.UIListLayout.Parent.Size = UDim2.new(0, self.UIListLayout.AbsoluteContentSize.X, 1, 0)
 end
-function t.AddBackButton(p1)
+function ViewportSlider.AddBackButton(self)
 	local ImageButton = Instance.new("ImageButton")
 	ImageButton.BackgroundTransparency = 1
 	ImageButton.Image = "rbxassetid://4933143781"
 	ImageButton.Size = UDim2.new(0, 20, 0, 20)
 	ImageButton.Position = UDim2.new(0, -6, 0, -6)
-	ImageButton.Parent = p1.Container
-	p1.OnMouseClickBack = ImageButton.MouseButton1Down
+	ImageButton.Parent = self.Container
+	self.OnMouseClickBack = ImageButton.MouseButton1Down
 end
-function t.Update(p1)
-	local v1 = tick()
-	local v2 = v1 - (p1.LastUpdate or v1)
-	p1.LastUpdate = v1
-	local Viewports = p1.Viewports
-	if p1.Alpha < 1 then
-		p1.Alpha = p1.Alpha + v2 * (1 / (#Viewports * 0.1))
+function ViewportSlider.Update(self)
+	local currentTime = tick()
+	local deltaTime = currentTime - (self.LastUpdate or currentTime)
+	self.LastUpdate = currentTime
+	local Viewports = self.Viewports
+	if self.Alpha < 1 then
+		self.Alpha = self.Alpha + deltaTime * (1 / (#Viewports * 0.1))
 	else
-		p1.Alpha = 1
+		self.Alpha = 1
 	end
-	local X = p1.Container.AbsolutePosition.X
-	local v3 = X + p1.Container.AbsoluteSize.X
-	local v4 = 1 / #Viewports
+	local X = self.Container.AbsolutePosition.X
+	local containerRight = X + self.Container.AbsoluteSize.X
+	local itemAlphaStep = 1 / #Viewports
 	for i = 1, #Viewports do
-		local v5
-		local v6 = Viewports[i]
-		local v7 = p1.Alpha - (i - 1) / (#Viewports * (v4 + 1))
-		v5 = v7 > 0 and math.min(v7 / v4, 1) or 0
-		v6.Frame.Size = UDim2.new(0.9 * v5, 0, 0.9 * v5, 0)
-		local X_2 = v6.Frame.AbsolutePosition.X
-		if X < X_2 + v6.Frame.AbsoluteSize.X and X_2 < v3 then
-			p1.ViewportUpdate(v6.Camera, v6.Inst)
+		local itemAlpha
+		local viewport = Viewports[i]
+		local offsetAlpha = self.Alpha - (i - 1) / (#Viewports * (itemAlphaStep + 1))
+		itemAlpha = offsetAlpha > 0 and math.min(offsetAlpha / itemAlphaStep, 1) or 0
+		viewport.Frame.Size = UDim2.new(0.9 * itemAlpha, 0, 0.9 * itemAlpha, 0)
+		local frameX = viewport.Frame.AbsolutePosition.X
+		if X < frameX + viewport.Frame.AbsoluteSize.X and frameX < containerRight then
+			self.ViewportUpdate(viewport.Camera, viewport.Inst)
 		end
 	end
 end
-function t.Destroy(p1)
-	local Viewports = p1.Viewports
+function ViewportSlider.Destroy(self)
+	local Viewports = self.Viewports
 	for i = 1, #Viewports do
 		Viewports[i].Frame:Destroy()
 	end
-	p1.mScrollingFrame:Destroy()
-	p1.Container:Destroy()
-	p1.Maid:Destroy()
-	p1.Maid = nil
+	self.mScrollingFrame:Destroy()
+	self.Container:Destroy()
+	self.Maid:Destroy()
+	self.Maid = nil
 end
-return t
+return ViewportSlider

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
 local CurrentCamera = workspace.CurrentCamera
@@ -160,8 +161,8 @@ function t.UpdateMousePosition(p1)
 		vector = p1.LastMouseWorldPosition
 		cframe2 = p1.LastMouseWorldNormal
 	end
-	local var9 = vector - p1.Beam.Attachment0.WorldPosition
-	local Magnitude = var9.Magnitude
+	local directionToMouse = vector - p1.Beam.Attachment0.WorldPosition
+	local Magnitude = directionToMouse.Magnitude
 	if Magnitude > 160 then
 		Magnitude = 160
 		if p1.FakeCircle.Parent ~= nil then
@@ -169,8 +170,8 @@ function t.UpdateMousePosition(p1)
 		end
 		vector = p1.Beam.Attachment0.WorldPosition + p1.SpotlightMotor.Part1.CFrame.LookVector * 160
 	else
-		local var10 = var9.Unit * Magnitude + p1.Beam.Attachment0.WorldPosition
-		p1.FakeCircle.CFrame = CFrame.new(var10, var10 + cframe2)
+		local spotlightRayPosition = directionToMouse.Unit * Magnitude + p1.Beam.Attachment0.WorldPosition
+		p1.FakeCircle.CFrame = CFrame.new(spotlightRayPosition, spotlightRayPosition + cframe2)
 		if p1.FakeCircle.Parent ~= workspace then
 			p1.FakeCircle.Parent = workspace
 		end
@@ -178,12 +179,12 @@ function t.UpdateMousePosition(p1)
 	p1:SetDistance(Magnitude)
 	local v11, v12, v13 = p1.SpotlightMotor.Part1.CFrame:ToObjectSpace(LookAt(p1.SpotlightMotor.Part1.Position, vector)):ToEulerAnglesXYZ()
 	local x = p1.SpringAngles:Update().x
-	local vector14 = Vector3.new((v11 - x + math.pi) % 6.283185307179586 - math.pi + x, v12, v13)
-	p1:SetAngles(vector14)
-	local var15 = tick()
-	if var15 - p1.LastUpdateAngleDistance > 0.125 then
-		p1.LastUpdateAngleDistance = var15
-		p1.RemoteEvent:FireServer(SpotlightConstants.EVENT_UPDATE_ANGLE_DISTANCE, vector14, Magnitude)
+	local newAngles = Vector3.new((v11 - x + math.pi) % 6.283185307179586 - math.pi + x, v12, v13)
+	p1:SetAngles(newAngles)
+	local currentTime = tick()
+	if currentTime - p1.LastUpdateAngleDistance > 0.125 then
+		p1.LastUpdateAngleDistance = currentTime
+		p1.RemoteEvent:FireServer(SpotlightConstants.EVENT_UPDATE_ANGLE_DISTANCE, newAngles, Magnitude)
 	end
 end
 function t.Update(p1)

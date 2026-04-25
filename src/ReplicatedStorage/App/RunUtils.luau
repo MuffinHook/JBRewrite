@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 game:GetService("MaterialService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -18,11 +19,11 @@ local function getPlaceId()
 end
 module.isStudio()
 function module.getBuildCommit()
-	local v1 = "0ec1e2e"
-	if v1 == string.reverse("TIMMOC_DLIUB__") then
-		v1 = "UNKNOWN"
+	local buildCommit = "0ec1e2e"
+	if buildCommit == string.reverse("TIMMOC_DLIUB__") then
+		buildCommit = "UNKNOWN"
 	end
-	return v1
+	return buildCommit
 end
 function module.isTradeWorld()
 	if RunService:IsStudio() then
@@ -61,13 +62,13 @@ function module.getPlaceType()
 	end
 end
 function module.getPlaceIdFromEnvWorld(p1, p2, p3)
-	local v1 = RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[p1]
-	assert(v1, "Invalid env given")
-	local v2 = p3 or "Default"
-	assert(v2 == "Default" or (v2 == "VoiceChat" or v2 == "Hang") or v2 == "Pro", "Invalid place type: " .. tostring(v2))
-	local v5 = v1[p2][v2]
-	assert(v5, "Invalid world or no place id")
-	return v5
+	local envMap = RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[p1]
+	assert(envMap, "Invalid env given")
+	local placeType = p3 or "Default"
+	assert(placeType == "Default" or (placeType == "VoiceChat" or placeType == "Hang") or placeType == "Pro", "Invalid place type: " .. tostring(placeType))
+	local placeId = envMap[p2][placeType]
+	assert(placeId, "Invalid world or no place id")
+	return placeId
 end
 if RunService:IsServer() then
 	function module.isVIPServer()

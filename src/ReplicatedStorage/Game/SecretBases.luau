@@ -1,190 +1,126 @@
 -- Reviewed by Claude
+-- variables reassigned
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
 local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
 require(ReplicatedStorage.Std.Promise)
-game:GetService("CollectionService")
-local RunService = game:GetService("RunService")
-local function EphThread(p1, p2)
-	local v1 = tick()
-	local v2 = nil
-	v2 = RunService.Heartbeat:Connect(function()
-		local v12 = tick()
-		if p1 then
-			local v22 = (v12 - v1) / p1
-			local v3
-			if v22 >= 1 then
-				v22 = 1
-				v3 = true
-			else
-				v3 = false
+
+local ActiveDoors = {}
+
+local function EphThread(duration, callback)
+	local startTime = tick()
+	local connection
+
+	connection = RunService.Heartbeat:Connect(function()
+		local currentTime = tick()
+
+		if duration then
+			local progress = (currentTime - startTime) / duration
+			local isComplete = false
+
+			if progress >= 1 then
+				progress = 1
+				isComplete = true
 			end
-			if p2(v22) then
-				v3 = true
+
+			if callback(progress) then
+				isComplete = true
 			end
-			if v3 then
-				v2:Disconnect()
+
+			if isComplete then
+				connection:Disconnect()
 			end
-		elseif p2(v12 - v1) then
-			v2:Disconnect()
+		elseif callback(currentTime - startTime) then
+			connection:Disconnect()
 		end
 	end)
+
+	return connection
 end
-local t = {}
-local function AnimateDoor(p1, p2, p3)
-	if t[p1] then
+
+local function AnimateDoor(doorModel, distance, duration)
+	if ActiveDoors[doorModel] then
 		return false
 	end
-	t[p1] = true
-	local v1 = p1:GetChildren()
-	local v2 = v1[1]
-	local v3 = v1[2]
-	local Unit = (v3.Position - v2.Position).Unit
-	local v4 = v2.CFrame
-	local v5 = v3.CFrame
-	local v6 = v4 - Unit * p2
-	local v7 = v5 + Unit * p2
-	v2.CanCollide = false
-	v3.CanCollide = false
-	local v8 = p3 * 0.5
-	local function f9(p1)
-		v2.CFrame = v4:lerp(v6, p1)
-		v3.CFrame = v5:lerp(v7, p1)
-	end
-	local v10 = tick()
-	local v11 = nil
-	v11 = RunService.Heartbeat:Connect(function()
-		local v1 = tick()
-		if v8 then
-			local v2 = (v1 - v10) / v8
-			local v3
-			if v2 >= 1 then
-				v2 = 1
-				v3 = true
-			else
-				v3 = false
-			end
-			if f9(v2) then
-				v3 = true
-			end
-			if v3 then
-				v11:Disconnect()
-			end
-		elseif f9(v1 - v10) then
-			v11:Disconnect()
-		end
+
+	ActiveDoors[doorModel] = true
+
+	local children = doorModel:GetChildren()
+	local door1Part = children[1]
+	local door2Part = children[2]
+
+	local Unit = (door2Part.Position - door1Part.Position).Unit
+
+	local door1InitCFrame = door1Part.CFrame
+	local door2InitCFrame = door2Part.CFrame
+
+	local door1OpenCFrame = door1InitCFrame - Unit * distance
+	local door2OpenCFrame = door2InitCFrame + Unit * distance
+
+	door1Part.CanCollide = false
+	door2Part.CanCollide = false
+
+	local halfDuration = duration * 0.5
+
+	EphThread(halfDuration, function(progress)
+		door1Part.CFrame = door1InitCFrame:lerp(door1OpenCFrame, progress)
+		door2Part.CFrame = door2InitCFrame:lerp(door2OpenCFrame, progress)
 	end)
-	delay(p3 * 0.5 + 1, function()
-		local v1 = p3 * 0.5
-		local function f2(p1)
-			v2.CFrame = v6:lerp(v4, p1)
-			v3.CFrame = v7:lerp(v5, p1)
-		end
-		local v32 = tick()
-		local v42 = nil
-		v42 = RunService.Heartbeat:Connect(function()
-			local v12 = tick()
-			if v1 then
-				local v2 = (v12 - v32) / v1
-				local v3
-				if v2 >= 1 then
-					v2 = 1
-					v3 = true
-				else
-					v3 = false
-				end
-				if f2(v2) then
-					v3 = true
-				end
-				if v3 then
-					v42:Disconnect()
-				end
-			elseif f2(v12 - v32) then
-				v42:Disconnect()
-			end
+
+	task.delay(halfDuration + 1, function()
+		EphThread(halfDuration, function(progress)
+			door1Part.CFrame = door1OpenCFrame:lerp(door1InitCFrame, progress)
+			door2Part.CFrame = door2OpenCFrame:lerp(door2InitCFrame, progress)
 		end)
 	end)
-	delay(p3 + 1.1, function()
-		v2.CanCollide = true
-		v3.CanCollide = true
-		t[p1] = nil
+
+	task.delay(duration + 1.1, function()
+		door1Part.CanCollide = true
+		door2Part.CanCollide = true
+		ActiveDoors[doorModel] = nil
 	end)
+	return
 end
+
 return {
 	Init = function(p1)
-		local _ = p1.Event
 		local em = p1.em
-		function em.ukfy8gb8(p1, p2, p3)
-			AnimateDoor(p1, p2, p3)
+
+		function em.AnimateDoor(doorModel, distance, duration)
+			return AnimateDoor(doorModel, distance, duration)
 		end
-		function em.hfdr6rmx(p1, p2)
-			DoorUtils.setOpen(p1, p2)
+
+		function em.OpenDoor(doorModel, open)
+			DoorUtils.setOpen(doorModel, open)
 		end
-		local v1 = false
-		function em.bsjrqs6c(p1, p2)
-			if v1 then
+
+		local isAnimating = false
+
+		function em.AnimateModelLift(model, targetCFrame)
+			if isAnimating then
 				return false
 			end
-			v1 = true
-			delay(0, function()
-				local function f1(p12)
-					p1:SetPrimaryPartCFrame(p2 + Vector3.new(0, 20, 0) * p12)
-				end
-				local v2 = tick()
-				local v3 = nil
-				local v4 = 2
-				v3 = RunService.Heartbeat:Connect(function()
-					local v1 = tick()
-					if v4 then
-						local v22 = (v1 - v2) / v4
-						local v32
-						if v22 >= 1 then
-							v22 = 1
-							v32 = true
-						else
-							v32 = false
-						end
-						if f1(v22) then
-							v32 = true
-						end
-						if v32 then
-							v3:Disconnect()
-						end
-					elseif f1(v1 - v2) then
-						v3:Disconnect()
-					end
+
+			isAnimating = true
+
+			local offset = Vector3.new(0, 20, 0)
+
+			EphThread(2, function(progress)
+				model:SetPrimaryPartCFrame(targetCFrame + offset * progress)
+			end)
+
+			task.delay(4, function()
+				EphThread(2, function(progress)
+					model:SetPrimaryPartCFrame(targetCFrame + offset * (1 - progress))
 				end)
 			end)
-			delay(4, function()
-				local function f1(p12)
-					p1:SetPrimaryPartCFrame(p2 + Vector3.new(0, 20, 0) * (1 - p12))
-				end
-				local v2 = tick()
-				local v3 = nil
-				local v4 = 2
-				v3 = RunService.Heartbeat:Connect(function()
-					local v1 = tick()
-					if v4 then
-						local v22 = (v1 - v2) / v4
-						local v32
-						if v22 >= 1 then
-							v22 = 1
-							v32 = true
-						else
-							v32 = false
-						end
-						if f1(v22) then
-							v32 = true
-						end
-						if v32 then
-							v3:Disconnect()
-						end
-					elseif f1(v1 - v2) then
-						v3:Disconnect()
-					end
-				end)
+
+			task.delay(6, function()
+				isAnimating = false
 			end)
-			wait(6)
-			v1 = false
+			return
 		end
 	end
 }

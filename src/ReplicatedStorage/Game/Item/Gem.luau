@@ -1,6 +1,7 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Basic = require(script.Parent.Basic)
-local t = {
+local motionConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -14,21 +15,21 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local t2 = {
+local gemClass = {
 	__ClassName = "Gem"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	v1.SpringNeckRotation:SetTarget(Vector3.new(-0.4, 0, 0))
-	v1.SpringWaistRotation:SetTarget(Vector3.new(0.4, 0, 0))
-	v1:DefaultDisableCamLock()
-	return v1
+gemClass.__index = gemClass
+setmetatable(gemClass, Basic)
+function gemClass.new(self, item, config)
+	local gemInstance = Basic.new(self, item, motionConfig, config)
+	setmetatable(gemInstance, gemClass)
+	gemInstance.SpringNeckRotation:SetTarget(Vector3.new(-0.4, 0, 0))
+	gemInstance.SpringWaistRotation:SetTarget(Vector3.new(0.4, 0, 0))
+	gemInstance:DefaultDisableCamLock()
+	return gemInstance
 end
-function t2.InputBegan(p1, ...)
-	Basic.InputBegan(p1, ...)
+function gemClass.InputBegan(self, ...)
+	Basic.InputBegan(self, ...)
 end
-function t2.InputEnded(p1)  end
-return t2
+function gemClass.InputEnded(self)  end
+return gemClass

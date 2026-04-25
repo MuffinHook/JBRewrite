@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -7,16 +8,16 @@ local SimulatedPhysicsProjectile = require(ReplicatedStorage.Module.SimulatedPhy
 local t = {}
 t.__index = t
 function t.new()
-	local t2 = {}
-	setmetatable(t2, t)
-	local v2 = ReplicatedStorage.Resource.Nuke:Clone()
-	v2.PrimaryPart = v2.Base
-	v2.Parent = workspace
-	t2.Model = v2
-	t2.Maid = Maid.new()
-	t2.OnImpact = Signal.new()
-	t2.Maid:GiveTask(t2.OnImpact)
-	return t2
+	local nukeInstance = {}
+	setmetatable(nukeInstance, t)
+	local nukeModel = ReplicatedStorage.Resource.Nuke:Clone()
+	nukeModel.PrimaryPart = nukeModel.Base
+	nukeModel.Parent = workspace
+	nukeInstance.Model = nukeModel
+	nukeInstance.Maid = Maid.new()
+	nukeInstance.OnImpact = Signal.new()
+	nukeInstance.Maid:GiveTask(nukeInstance.OnImpact)
+	return nukeInstance
 end
 function t.Launch(p1, p2)
 	assert(p2 ~= nil)
@@ -35,11 +36,11 @@ function t.Launch(p1, p2)
 end
 function t.RenderStepped(p1)
 	local _PrevUpdatePosition = p1.ProjPhysics._PrevUpdatePosition
-	local v1 = p1.ProjPhysics:GetElapsed()
-	local v2 = p1.ProjPhysics:CalculateElapsedPosition(v1)
-	p1.ProjPhysics._PrevUpdatePosition = v2
-	p1.Model:SetPrimaryPartCFrame((CFrame.new(_PrevUpdatePosition, v2)))
-	if p1.ProjPhysics.Duration < v1 then
+	local elapsedTime = p1.ProjPhysics:GetElapsed()
+	local newPosition = p1.ProjPhysics:CalculateElapsedPosition(elapsedTime)
+	p1.ProjPhysics._PrevUpdatePosition = newPosition
+	p1.Model:SetPrimaryPartCFrame((CFrame.new(_PrevUpdatePosition, newPosition)))
+	if p1.ProjPhysics.Duration < elapsedTime then
 		p1.OnImpact:Fire()
 		p1:Destroy()
 	end

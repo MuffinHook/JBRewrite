@@ -1,94 +1,95 @@
 -- Reviewed by Claude
-local t = {
+-- variables reassigned
+local TreeClass = {
 	ClassName = "Tree"
 }
-t.__index = t
-function t.new()
-	local v2 = setmetatable({}, t)
+TreeClass.__index = TreeClass
+function TreeClass.new()
+	local v2 = setmetatable({}, TreeClass)
 	v2.Root = true
 	v2.Depth = 1
 	v2.Branches = {}
 	v2.Leaf = nil
 	return v2
 end
-function t.AddBranch(p1, p2)
-	assert(p2.ClassName == t.ClassName)
+function TreeClass.AddBranch(p1, p2)
+	assert(p2.ClassName == TreeClass.ClassName)
 	assert(p2.Root)
 	p2.Root = false
 	p2.Depth = p1.Depth + 1
 	table.insert(p1.Branches, p2)
 end
-function t.Complete(p1)
+function TreeClass.Complete(p1)
 	p1.State = 4
 	for i = 1, #p1.Branches do
 		p1.Branches[i].State = 2
 	end
 end
-local t2 = {
-	Welcome = t.new()
+local tutorialTree = {
+	Welcome = TreeClass.new()
 }
-t2.Welcome.Leaf = {
+tutorialTree.Welcome.Leaf = {
 	Title = "Welcome to Jailbreak!",
 	Body = "This tutorial will teach you the basics of Jailbreak.",
 	Duration = 15
 }
-t2.Escape = t.new()
-t2.Escape.Leaf = {
+tutorialTree.Escape = TreeClass.new()
+tutorialTree.Escape.Leaf = {
 	Title = "Getting Started",
 	Body = "Figure out how to escape the prison.",
 	Duration = 15,
 	Team = 2
 }
-t2.GetCar = t.new()
-t2.GetCar.Leaf = {
+tutorialTree.GetCar = TreeClass.new()
+tutorialTree.GetCar.Leaf = {
 	Title = "Life of a Criminal",
 	Body = "You escaped! Look for a car to drive...",
 	Duration = 15,
 	Team = 2
 }
-t2.GetCarDone = t.new()
-t2.GetCarDone.Leaf = {
+tutorialTree.GetCarDone = TreeClass.new()
+tutorialTree.GetCarDone.Leaf = {
 	Title = "Driving",
 	Body = "This is your starter car. You can upgrade it, and buy other cars!",
 	Duration = 15,
 	Team = 2,
 	OneShot = true
 }
-t2.BankRobbery = t.new()
-t2.BankRobbery.Leaf = {
+tutorialTree.BankRobbery = TreeClass.new()
+tutorialTree.BankRobbery.Leaf = {
 	Title = "Robbery",
 	Body = "Go to the bank in the city to rob it!",
 	Duration = 15,
 	Team = 2
 }
-t2.BankRobberyDone = t.new()
-t2.BankRobberyDone.Leaf = {
+tutorialTree.BankRobberyDone = TreeClass.new()
+tutorialTree.BankRobberyDone.Leaf = {
 	Title = "Robbery Complete",
 	Body = "Earn money by robbing the bank, jewelry store, train, museum, and more!",
 	Duration = 15,
 	Team = 2,
 	OneShot = true
 }
-t2.CustomizeCar = t.new()
-t2.CustomizeCar.Leaf = {
+tutorialTree.CustomizeCar = TreeClass.new()
+tutorialTree.CustomizeCar.Leaf = {
 	Title = "Customize Your Car",
 	Body = "Go to the garage in the city to customize your car.",
 	Duration = 15,
 	Team = 2
 }
-t2.Welcome:AddBranch(t2.Escape)
-t2.Escape:AddBranch(t2.GetCar)
-t2.GetCar:AddBranch(t2.GetCarDone)
-t2.GetCar:AddBranch(t2.BankRobbery)
-t2.BankRobbery:AddBranch(t2.BankRobberyDone)
-t2.GetCar:AddBranch(t2.CustomizeCar)
+tutorialTree.Welcome:AddBranch(tutorialTree.Escape)
+tutorialTree.Escape:AddBranch(tutorialTree.GetCar)
+tutorialTree.GetCar:AddBranch(tutorialTree.GetCarDone)
+tutorialTree.GetCar:AddBranch(tutorialTree.BankRobbery)
+tutorialTree.BankRobbery:AddBranch(tutorialTree.BankRobberyDone)
+tutorialTree.GetCar:AddBranch(tutorialTree.CustomizeCar)
 local function CompleteTree(p1)
 	p1.State = 4
 	for i = 1, #p1.Branches do
 		p1.Branches[i].State = 2
 	end
 end
-local function v1(p1)
+local function findNextActiveNode(p1)
 	assert(p1.State == 4 or p1.State == 2)
 	if p1.State == 2 then
 		return p1
@@ -106,7 +107,7 @@ local function v1(p1)
 		for j = 1, #p1.Branches do
 			local v5 = p1.Branches[j]
 			if v5.State == 4 or v5.State == 2 then
-				local v6 = v1(v5)
+				local v6 = findNextActiveNode(v5)
 				if v6 then
 					local Depth = v6.Depth
 					if v3 < Depth then
@@ -121,13 +122,13 @@ local function v1(p1)
 end
 local v2 = nil
 local t3 = {}
-local v3 = false
+local isQueueProcessing = false
 local function ProcessMessage(p1)
 	v2.Message.Inner.Title.Text = p1.Title
 	v2.Message.Inner.Body.Text = p1.Body
 end
 local function ProcessQueue()
-	v3 = true
+	isQueueProcessing = true
 	if v2.Icon.Visible then
 		v2.Icon:TweenPosition(UDim2.new(1, 0, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function()
 			v2.Icon.Visible = false
@@ -150,29 +151,29 @@ local function ProcessQueue()
 	wait(0.5)
 	v2.Icon.Visible = true
 	v2.Icon:TweenPosition(UDim2.new(1, -40, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
-	v3 = false
+	isQueueProcessing = false
 end
 local function ShowMessage(p1)
 	table.insert(t3, p1)
-	if not v3 then
-		v3 = true
+	if not isQueueProcessing then
+		isQueueProcessing = true
 		spawn(ProcessQueue)
 	end
 end
 local function ShowNextMessage()
-	local Leaf = v1(t2.Welcome).Leaf
+	local Leaf = findNextActiveNode(tutorialTree.Welcome).Leaf
 	table.insert(t3, Leaf)
-	if not v3 then
-		v3 = true
+	if not isQueueProcessing then
+		isQueueProcessing = true
 		spawn(ProcessQueue)
 	end
 end
 local function Complete(p1)
 	p1:Complete()
-	local Leaf = v1(t2.Welcome).Leaf
+	local Leaf = findNextActiveNode(tutorialTree.Welcome).Leaf
 	table.insert(t3, Leaf)
-	if not v3 then
-		v3 = true
+	if not isQueueProcessing then
+		isQueueProcessing = true
 		spawn(ProcessQueue)
 	end
 end
@@ -180,16 +181,16 @@ return {
 	Init = function(p1)
 		local _ = p1.Event
 		v2 = p1.GetScreenGui("Tutorial")
-		table.insert(t3, t2.Welcome.Leaf)
-		if not v3 then
-			v3 = true
+		table.insert(t3, tutorialTree.Welcome.Leaf)
+		if not isQueueProcessing then
+			isQueueProcessing = true
 			spawn(ProcessQueue)
 		end
-		t2.Welcome:Complete()
-		local Leaf_2 = v1(t2.Welcome).Leaf
+		tutorialTree.Welcome:Complete()
+		local Leaf_2 = findNextActiveNode(tutorialTree.Welcome).Leaf
 		table.insert(t3, Leaf_2)
-		if not v3 then
-			v3 = true
+		if not isQueueProcessing then
+			isQueueProcessing = true
 			spawn(ProcessQueue)
 		end
 		local v32 = tick()
@@ -200,10 +201,10 @@ return {
 					return false
 				end
 				v32 = v12
-				local Leaf = v1(t2.Welcome).Leaf
+				local Leaf = findNextActiveNode(tutorialTree.Welcome).Leaf
 				table.insert(t3, Leaf)
-				if not v3 then
-					v3 = true
+				if not isQueueProcessing then
+					isQueueProcessing = true
 					spawn(ProcessQueue)
 				end
 			end
@@ -214,10 +215,10 @@ return {
 				return false
 			end
 			v32 = v12
-			local Leaf = v1(t2.Welcome).Leaf
+			local Leaf = findNextActiveNode(tutorialTree.Welcome).Leaf
 			table.insert(t3, Leaf)
-			if not v3 then
-				v3 = true
+			if not isQueueProcessing then
+				isQueueProcessing = true
 				spawn(ProcessQueue)
 			end
 		end
@@ -225,16 +226,16 @@ return {
 		v2.Icon.MouseEnter:Connect(IconMouseEnter)
 		function p1.em.nvyrkw5r(p1, p2)
 			for v12, v2 in next, p1 do
-				local v32 = t2[v12]
+				local v32 = tutorialTree[v12]
 				if v32 and v32.State ~= 4 then
 					if p2 then
-						t:Complete()
+						TreeClass:Complete()
 					else
-						t:Complete()
-						local Leaf = v1(t2.Welcome).Leaf
+						TreeClass:Complete()
+						local Leaf = findNextActiveNode(tutorialTree.Welcome).Leaf
 						table.insert(t3, Leaf)
-						if not v3 then
-							v3 = true
+						if not isQueueProcessing then
+							isQueueProcessing = true
 							spawn(ProcessQueue)
 						end
 					end

@@ -1,11 +1,12 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Validation = require(script.Parent.Validation)
 local Logger = require(script.Parent.Logger)
 local HttpApi = require(script.Parent.HttpApi)
 local Store = require(script.Parent.Store)
 local Events = require(script.Parent.Events)
 local HttpService = game:GetService("HttpService")
-local t = {
+local StateModule = {
 	_availableCustomDimensions01 = {},
 	_availableCustomDimensions02 = {},
 	_availableCustomDimensions03 = {},
@@ -17,128 +18,128 @@ local t = {
 	AutomaticSendBusinessEvents = true,
 	ConfigsHash = ""
 }
-local v1 = nil
-local function getClientTsAdjusted(p1)
-	local v1 = Store:GetPlayerDataFromCache(p1)
-	if v1 then
-		local v2 = os.time()
-		local v3 = v2 + v1.ClientServerTimeOffset
-		if Validation:validateClientTs(v3) then
-			return v3
+local remoteConfigsSignal = nil
+local function getClientTsAdjusted(userId)
+	local playerData = Store:GetPlayerDataFromCache(userId)
+	if playerData then
+		local currentTime = os.time()
+		local adjustedTime = currentTime + playerData.ClientServerTimeOffset
+		if Validation:validateClientTs(adjustedTime) then
+			return adjustedTime
 		else
-			return v2
+			return currentTime
 		end
 	else
 		return os.time()
 	end
 end
-local function populateConfigurations(p1)
-	local v12 = Store:GetPlayerDataFromCache(p1.UserId)
-	local SdkConfig = v12.SdkConfig
+local function populateConfigurations(player)
+	local playerData = Store:GetPlayerDataFromCache(player.UserId)
+	local SdkConfig = playerData.SdkConfig
 	if SdkConfig.configs then
 		for k, v in pairs(SdkConfig.configs) do
-			local v2
+			local validatedTs
 			if v then
-				local v3 = v.key or ""
-				local v6 = Store:GetPlayerDataFromCache(p1.UserId)
-				if v6 then
-					local v7 = os.time()
-					local v8 = v7 + v6.ClientServerTimeOffset
-					v2 = if Validation:validateClientTs(v8) then v8 else v7
+				local configKey = v.key or ""
+				local playerData2 = Store:GetPlayerDataFromCache(player.UserId)
+				if playerData2 then
+					local currentTime = os.time()
+					local adjustedTime = currentTime + playerData2.ClientServerTimeOffset
+					validatedTs = if Validation:validateClientTs(adjustedTime) then adjustedTime else currentTime
 				else
-					v2 = os.time()
+					validatedTs = os.time()
 				end
-				if #v3 > 0 and (v.value and ((v.start_ts or 0) < v2 and v2 < (v.end_ts or (1 / 0)))) then
-					v12.Configurations[v3] = v.value
+				if #configKey > 0 and (v.value and ((v.start_ts or 0) < validatedTs and validatedTs < (v.end_ts or (1 / 0)))) then
+					playerData.Configurations[configKey] = v.value
 					Logger:d("configuration added: key=" .. v.key .. ", value=" .. v.value)
 				end
 			end
 		end
 	end
 	Logger:i("Remote configs populated")
-	v12.RemoteConfigsIsReady = true
-	v1 = v1 or game:GetService("ReplicatedStorage"):WaitForChild("GameAnalyticsRemoteConfigs")
-	v1:FireClient(p1, v12.Configurations)
+	playerData.RemoteConfigsIsReady = true
+	remoteConfigsSignal = remoteConfigsSignal or game:GetService("ReplicatedStorage"):WaitForChild("GameAnalyticsRemoteConfigs")
+	remoteConfigsSignal:FireClient(player, playerData.Configurations)
 end
-function t.sessionIsStarted(p1, p2)
-	local v1 = Store:GetPlayerDataFromCache(p2)
-	if v1 then
-		return v1.SessionStart ~= 0
+function StateModule.sessionIsStarted(self, userId)
+	local playerData = Store:GetPlayerDataFromCache(userId)
+	if playerData then
+		return playerData.SessionStart ~= 0
 	else
 		return false
 	end
 end
-function t.isEnabled(p1, p2)
-	local v1 = Store:GetPlayerDataFromCache(p2)
-	if v1 then
-		return v1.InitAuthorized and true or false
+function StateModule.isEnabled(self, userId)
+	local playerData = Store:GetPlayerDataFromCache(userId)
+	if playerData then
+		return playerData.InitAuthorized and true or false
 	else
 		return false
 	end
 end
-function t.validateAndFixCurrentDimensions(p1, p2)
-	local v1 = Store:GetPlayerDataFromCache(p2)
-	if not Validation:validateDimension(p1._availableCustomDimensions01, v1.CurrentCustomDimension01) then
-		Logger:d("Invalid dimension01 found in variable. Setting to nil. Invalid dimension: " .. v1.CurrentCustomDimension01)
+function StateModule.validateAndFixCurrentDimensions(self, userId)
+	local playerData = Store:GetPlayerDataFromCache(userId)
+	if not Validation:validateDimension(self._availableCustomDimensions01, playerData.CurrentCustomDimension01) then
+		Logger:d("Invalid dimension01 found in variable. Setting to nil. Invalid dimension: " .. playerData.CurrentCustomDimension01)
 	end
-	if not Validation:validateDimension(p1._availableCustomDimensions02, v1.CurrentCustomDimension02) then
-		Logger:d("Invalid dimension02 found in variable. Setting to nil. Invalid dimension: " .. v1.CurrentCustomDimension02)
+	if not Validation:validateDimension(self._availableCustomDimensions02, playerData.CurrentCustomDimension02) then
+		Logger:d("Invalid dimension02 found in variable. Setting to nil. Invalid dimension: " .. playerData.CurrentCustomDimension02)
 	end
-	if not Validation:validateDimension(p1._availableCustomDimensions03, v1.CurrentCustomDimension03) then
-		Logger:d("Invalid dimension03 found in variable. Setting to nil. Invalid dimension: " .. v1.CurrentCustomDimension03)
-	end
-end
-function t.setAvailableCustomDimensions01(p1, p2)
-	if Validation:validateCustomDimensions(p2) then
-		p1._availableCustomDimensions01 = p2
-		Logger:i("Set available custom01 dimension values: (" .. table.concat(p2, ", ") .. ")")
+	if not Validation:validateDimension(self._availableCustomDimensions03, playerData.CurrentCustomDimension03) then
+		Logger:d("Invalid dimension03 found in variable. Setting to nil. Invalid dimension: " .. playerData.CurrentCustomDimension03)
 	end
 end
-function t.setAvailableCustomDimensions02(p1, p2)
-	if Validation:validateCustomDimensions(p2) then
-		p1._availableCustomDimensions02 = p2
-		Logger:i("Set available custom02 dimension values: (" .. table.concat(p2, ", ") .. ")")
+function StateModule.setAvailableCustomDimensions01(self, dimensions)
+	if Validation:validateCustomDimensions(dimensions) then
+		self._availableCustomDimensions01 = dimensions
+		Logger:i("Set available custom01 dimension values: (" .. table.concat(dimensions, ", ") .. ")")
 	end
 end
-function t.setAvailableCustomDimensions03(p1, p2)
-	if Validation:validateCustomDimensions(p2) then
-		p1._availableCustomDimensions03 = p2
-		Logger:i("Set available custom03 dimension values: (" .. table.concat(p2, ", ") .. ")")
+function StateModule.setAvailableCustomDimensions02(self, dimensions)
+	if Validation:validateCustomDimensions(dimensions) then
+		self._availableCustomDimensions02 = dimensions
+		Logger:i("Set available custom02 dimension values: (" .. table.concat(dimensions, ", ") .. ")")
 	end
 end
-function t.setAvailableGamepasses(p1, p2)
-	p1._availableGamepasses = p2
-	Logger:i("Set available game passes: (" .. table.concat(p2, ", ") .. ")")
+function StateModule.setAvailableCustomDimensions03(self, dimensions)
+	if Validation:validateCustomDimensions(dimensions) then
+		self._availableCustomDimensions03 = dimensions
+		Logger:i("Set available custom03 dimension values: (" .. table.concat(dimensions, ", ") .. ")")
+	end
 end
-function t.setEventSubmission(p1, p2)
-	p1._enableEventSubmission = p2
+function StateModule.setAvailableGamepasses(self, gamepasses)
+	self._availableGamepasses = gamepasses
+	Logger:i("Set available game passes: (" .. table.concat(gamepasses, ", ") .. ")")
 end
-function t.isEventSubmissionEnabled(p1)
-	return p1._enableEventSubmission
+function StateModule.setEventSubmission(self, enabled)
+	self._enableEventSubmission = enabled
 end
-function t.setCustomDimension01(p1, p2, p3)
-	Store:GetPlayerDataFromCache(p2).CurrentCustomDimension01 = p3
+function StateModule.isEventSubmissionEnabled(self)
+	return self._enableEventSubmission
 end
-function t.setCustomDimension02(p1, p2, p3)
-	Store:GetPlayerDataFromCache(p2).CurrentCustomDimension02 = p3
+function StateModule.setCustomDimension01(self, userId, dimensionValue)
+	Store:GetPlayerDataFromCache(userId).CurrentCustomDimension01 = dimensionValue
 end
-function t.setCustomDimension03(p1, p2, p3)
-	Store:GetPlayerDataFromCache(p2).CurrentCustomDimension03 = p3
+function StateModule.setCustomDimension02(self, userId, dimensionValue)
+	Store:GetPlayerDataFromCache(userId).CurrentCustomDimension02 = dimensionValue
 end
-function t.startNewSession(p1, p2, p3)
-	if t:isEventSubmissionEnabled() and p3 == nil then
+function StateModule.setCustomDimension03(self, userId, dimensionValue)
+	Store:GetPlayerDataFromCache(userId).CurrentCustomDimension03 = dimensionValue
+end
+function StateModule.startNewSession(self, player, sessionData)
+	if StateModule:isEventSubmissionEnabled() and sessionData == nil then
 		Logger:i("Starting a new session.")
 	end
-	local v1 = Store:GetPlayerDataFromCache(p2.UserId)
-	t:validateAndFixCurrentDimensions(p2.UserId)
-	local v2 = HttpApi:initRequest(Events.GameKey, Events.SecretKey, Events.Build, v1, p2.UserId)
-	local statusCode = v2.statusCode
-	local body = v2.body
+	local playerData = Store:GetPlayerDataFromCache(player.UserId)
+	StateModule:validateAndFixCurrentDimensions(player.UserId)
+	local httpResponse = HttpApi:initRequest(Events.GameKey, Events.SecretKey, Events.Build, playerData, player.UserId)
+	local statusCode = httpResponse.statusCode
+	local body = httpResponse.body
 	if (statusCode == HttpApi.EGAHTTPApiResponse.Ok or statusCode == HttpApi.EGAHTTPApiResponse.Created) and body then
-		local v3 = body.server_ts or -1
-		body.time_offset = if v3 > 0 then v3 - os.time() else 0
+		local serverTs = body.server_ts or -1
+		body.time_offset = if serverTs > 0 then serverTs - os.time() else 0
 		if statusCode ~= HttpApi.EGAHTTPApiResponse.Created then
-			local SdkConfig = v1.SdkConfig
+			local SdkConfig = playerData.SdkConfig
 			if SdkConfig.configs then
 				body.configs = SdkConfig.configs
 			end
@@ -149,11 +150,11 @@ function t.startNewSession(p1, p2, p3)
 				body.ab_variant_id = SdkConfig.ab_variant_id
 			end
 		end
-		v1.SdkConfig = body
-		v1.InitAuthorized = true
+		playerData.SdkConfig = body
+		playerData.InitAuthorized = true
 	elseif statusCode == HttpApi.EGAHTTPApiResponse.Unauthorized then
 		Logger:w("Initialize SDK failed - Unauthorized")
-		v1.InitAuthorized = false
+		playerData.InitAuthorized = false
 	else
 		if statusCode == HttpApi.EGAHTTPApiResponse.NoResponse or statusCode == HttpApi.EGAHTTPApiResponse.RequestTimeout then
 			Logger:i("Init call (session start) failed - no response. Could be offline or timeout.")
@@ -162,53 +163,53 @@ function t.startNewSession(p1, p2, p3)
 		elseif statusCode == HttpApi.EGAHTTPApiResponse.BadRequest or statusCode == HttpApi.EGAHTTPApiResponse.UnknownResponseCode then
 			Logger:i("Init call (session start) failed - bad request or unknown response.")
 		end
-		v1.InitAuthorized = true
+		playerData.InitAuthorized = true
 	end
-	v1.ClientServerTimeOffset = v1.SdkConfig.time_offset or 0
-	v1.ConfigsHash = v1.SdkConfig.configs_hash or ""
-	v1.AbId = v1.SdkConfig.ab_id or ""
-	v1.AbVariantId = v1.SdkConfig.ab_variant_id or ""
-	populateConfigurations(p2)
-	if t:isEnabled(p2.UserId) then
-		if p3 then
-			v1.SessionID = p3.SessionID
-			v1.SessionStart = p3.SessionStart
+	playerData.ClientServerTimeOffset = playerData.SdkConfig.time_offset or 0
+	playerData.ConfigsHash = playerData.SdkConfig.configs_hash or ""
+	playerData.AbId = playerData.SdkConfig.ab_id or ""
+	playerData.AbVariantId = playerData.SdkConfig.ab_variant_id or ""
+	populateConfigurations(player)
+	if StateModule:isEnabled(player.UserId) then
+		if sessionData then
+			playerData.SessionID = sessionData.SessionID
+			playerData.SessionStart = sessionData.SessionStart
 		else
-			v1.SessionID = string.lower(HttpService:GenerateGUID(false))
-			local v5 = Store:GetPlayerDataFromCache(p2.UserId)
-			local v6
-			if v5 then
-				local v7 = os.time()
-				local v8 = v7 + v5.ClientServerTimeOffset
-				v6 = if Validation:validateClientTs(v8) then v8 else v7
+			playerData.SessionID = string.lower(HttpService:GenerateGUID(false))
+			local playerData2 = Store:GetPlayerDataFromCache(player.UserId)
+			local validatedSessionStart
+			if playerData2 then
+				local currentTime = os.time()
+				local adjustedTime = currentTime + playerData2.ClientServerTimeOffset
+				validatedSessionStart = if Validation:validateClientTs(adjustedTime) then adjustedTime else currentTime
 			else
-				v6 = os.time()
+				validatedSessionStart = os.time()
 			end
-			v1.SessionStart = v6
+			playerData.SessionStart = validatedSessionStart
 		end
-		if t:isEventSubmissionEnabled() then
-			Events:addSessionStartEvent(p2.UserId, p3)
+		if StateModule:isEventSubmissionEnabled() then
+			Events:addSessionStartEvent(player.UserId, sessionData)
 		end
 	else
 		Logger:w("Could not start session: SDK is disabled.")
 	end
 end
-function t.endSession(p1, p2)
-	if t.Initialized and t:isEventSubmissionEnabled() then
+function StateModule.endSession(self, userId)
+	if StateModule.Initialized and StateModule:isEventSubmissionEnabled() then
 		Logger:i("Ending session.")
-		if t:isEnabled(p2) and t:sessionIsStarted(p2) then
-			Events:addSessionEndEvent(p2)
-			Store.PlayerCache[p2] = nil
+		if StateModule:isEnabled(userId) and StateModule:sessionIsStarted(userId) then
+			Events:addSessionEndEvent(userId)
+			Store.PlayerCache[userId] = nil
 		end
 	end
 end
-function t.getRemoteConfigsStringValue(p1, p2, p3, p4)
-	return Store:GetPlayerDataFromCache(p2).Configurations[p3] or p4
+function StateModule.getRemoteConfigsStringValue(self, userId, configKey, defaultValue)
+	return Store:GetPlayerDataFromCache(userId).Configurations[configKey] or defaultValue
 end
-function t.isRemoteConfigsReady(p1, p2)
-	return Store:GetPlayerDataFromCache(p2).RemoteConfigsIsReady
+function StateModule.isRemoteConfigsReady(self, userId)
+	return Store:GetPlayerDataFromCache(userId).RemoteConfigsIsReady
 end
-function t.getRemoteConfigsContentAsString(p1, p2)
-	return HttpService:JSONEncode(Store:GetPlayerDataFromCache(p2).Configurations)
+function StateModule.getRemoteConfigsContentAsString(self, userId)
+	return HttpService:JSONEncode(Store:GetPlayerDataFromCache(userId).Configurations)
 end
-return t
+return StateModule

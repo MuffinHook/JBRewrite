@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -7,90 +8,90 @@ local Audio = require(ReplicatedStorage.Std.Audio)
 local Spring = require(ReplicatedStorage.Std.Spring)
 local SimulatedPhysicsProjectile = require(ReplicatedStorage.Module.SimulatedPhysicsProjectile)
 local DartDispenserConsts = require(script.Parent.DartDispenserConsts)
-local v1 = Random.new()
+local randomGenerator = Random.new()
 local Darts = Instance.new("Folder")
 Darts.Name = "Darts"
 Darts.Parent = workspace
 local t = {}
 t.__index = t
-function t.new(p1)
+function t.new(self)
 	local t2 = {}
 	setmetatable(t2, t)
 	t2._maid = Maid.new()
-	t2._maid:GiveTask(p1:WaitForChild(DartDispenserConsts.FIRE_REMOTE_NAME).OnClientEvent:Connect(function()
-		t2:_fire(p1)
+	t2._maid:GiveTask(self:WaitForChild(DartDispenserConsts.FIRE_REMOTE_NAME).OnClientEvent:Connect(function()
+		t2:_fire(self)
 	end))
-	t2._damageRemote = p1:WaitForChild(DartDispenserConsts.DAMAGE_REMOTE_NAME)
+	t2._damageRemote = self:WaitForChild(DartDispenserConsts.DAMAGE_REMOTE_NAME)
 	return t2
 end
-function t._fire(p1, p2)
-	local v12 = v1:NextInteger(1, 1000000000)
-	local v2 = ("update_%d"):format(v12)
-	local v3 = ("part_%d"):format(v12)
-	local v6 = p2.CFrame * Vector3.new(0, 0, -p2.Size.Z * 0.5)
-	local v7 = ReplicatedStorage.Resource.Robbery.Tomb:FindFirstChild("Arrow"):Clone()
-	v7.Parent = Darts
-	local PrimaryPart = v7.PrimaryPart
-	p1._maid[v3] = v7
-	Audio.ObjectLocal(p2, 6856219972, {
+function t._fire(self, dispenserPart)
+	local v12 = randomGenerator:NextInteger(1, 1000000000)
+	local updateKey = ("update_%d"):format(v12)
+	local partKey = ("part_%d"):format(v12)
+	local spawnCFrame = dispenserPart.CFrame * Vector3.new(0, 0, -dispenserPart.Size.Z * 0.5)
+	local dart = ReplicatedStorage.Resource.Robbery.Tomb:FindFirstChild("Arrow"):Clone()
+	dart.Parent = Darts
+	local PrimaryPart = dart.PrimaryPart
+	self._maid[partKey] = dart
+	Audio.ObjectLocal(dispenserPart, 6856219972, {
 		Volume = 0.6,
 		RollOffMaxDistance = 128
 	})
-	local v8 = SimulatedPhysicsProjectile.new(v6)
-	function v8.CollidableFunc(p1)
+	local projectile = SimulatedPhysicsProjectile.new(spawnCFrame)
+	function projectile.CollidableFunc(p1)
 		return if p1.Parent == LocalPlayer.Character then true else p1:IsA("Terrain")
 	end
-	v8.IgnoreList = { Darts }
-	v8._GravityVector = v8._GravityVector / 20
-	v8.Velocity = p2.CFrame.LookVector * 300
-	local v9 = v6
-	local LookVector = p2.CFrame.LookVector
-	local v10 = nil
-	local v11 = nil
-	local v122 = nil
-	local v13 = Spring.new(0, 0, 0.3, 30)
-	local v14 = os.clock()
-	p1._maid[v2] = RunService.Heartbeat:Connect(function()
-		if v10 then
-			local v1, v22 = v13:Update()
+	projectile.IgnoreList = { Darts }
+	projectile._GravityVector = projectile._GravityVector / 20
+	projectile.Velocity = dispenserPart.CFrame.LookVector * 300
+	local currentPosition = spawnCFrame
+	local LookVector = dispenserPart.CFrame.LookVector
+	local hitPart = nil
+	local hitOffset = nil
+	local rotationAxis = nil
+	local rotationSpring = Spring.new(0, 0, 0.3, 30)
+	local startTime = os.clock()
+	self._maid[updateKey] = RunService.Heartbeat:Connect(function()
+		if hitPart then
+			local v1, v22 = rotationSpring:Update()
 			if math.abs(v1) < 0.001 and math.abs(v22) < 0.001 then
-				p1._maid[v2] = nil
-				p1._maid[v3] = nil
+				self._maid[updateKey] = nil
+				self._maid[partKey] = nil
 				return
 			end
-			v7:SetPrimaryPartCFrame(v10.CFrame * v11 * CFrame.fromAxisAngle(v122, v1) * CFrame.new(0, 0, PrimaryPart.Size.Z * 0.5))
+			dart:SetPrimaryPartCFrame(hitPart.CFrame * hitOffset * CFrame.fromAxisAngle(rotationAxis, v1) * CFrame.new(0, 0, PrimaryPart.Size.Z * 0.5))
 		else
-			local v32, v4, v5 = v8:Step(v8:_GetNow(), v9)
-			local v6 = CFrame.new(v9, v32) * CFrame.new(0, 0, PrimaryPart.Size.Z * 0.5)
+			local v32, v4, v5 = projectile:Step(projectile:_GetNow(), currentPosition)
+			local v6 = CFrame.new(currentPosition, v32) * CFrame.new(0, 0, PrimaryPart.Size.Z * 0.5)
 			local LookVector_2 = v6.LookVector
 			if v4 then
-				v122 = LookVector:Cross(LookVector_2)
-				v13:Accelerate(20)
+				rotationAxis = LookVector:Cross(LookVector_2)
+				rotationSpring:Accelerate(20)
 				local v72 = CFrame.new(v32, v32 + LookVector_2)
 				v6 = v72 * CFrame.new(0, 0, PrimaryPart.Size.Z * 0.5)
-				v10 = v5
-				v11 = v5.CFrame:ToObjectSpace(v72)
+				hitPart = v5
+				hitOffset = v5.CFrame:ToObjectSpace(v72)
 				Audio.ObjectLocal(PrimaryPart, 6856219902, {
 					Volume = 0.6,
 					RollOffMaxDistance = 128
 				})
 				if v5:IsDescendantOf(LocalPlayer.Character) then
-					p1._damageRemote:FireServer()
+					self._damageRemote:FireServer()
 				end
 			end
-			v7:SetPrimaryPartCFrame(v6)
+			dart:SetPrimaryPartCFrame(v6)
 			LookVector = LookVector_2
-			v9 = v32
+			currentPosition = v32
 		end
-		if os.clock() - v14 > 3 then
-			p1._maid[v2] = nil
-			p1._maid[v3] = nil
+		if os.clock() - startTime > 3 then
+			self._maid[updateKey] = nil
+			self._maid[partKey] = nil
 		end
 	end)
 end
-function t.Destroy(p1)
-	local _maid = p1._maid
-	p1._maid = nil
+function t.Destroy(self)
+	local _maid = self._maid
+	self._maid = nil
 	_maid:Destroy()
 end
 return t

@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -9,75 +10,75 @@ require(ReplicatedStorage.App.RunUtils)
 local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local Maid = require(ReplicatedStorage.Std.Maid)
-local v1 = 0
-UserInputService.InputBegan:Connect(function(p1)
-	if p1.UserInputType ~= Enum.UserInputType.Gamepad1 then
-		v1 = os.clock()
+local lastMouseInputTime = 0
+UserInputService.InputBegan:Connect(function(inputEvent)
+	if inputEvent.UserInputType ~= Enum.UserInputType.Gamepad1 then
+		lastMouseInputTime = os.clock()
 	end
 end)
-UserInputService.InputChanged:Connect(function(p1)
-	if p1.UserInputType ~= Enum.UserInputType.Gamepad1 then
-		v1 = os.clock()
+UserInputService.InputChanged:Connect(function(inputEvent)
+	if inputEvent.UserInputType ~= Enum.UserInputType.Gamepad1 then
+		lastMouseInputTime = os.clock()
 	end
 end)
 local function canAimAssist()
 	if Players.LocalPlayer:GetAttribute("AimbotEnabled") then
 		return true
 	else
-		return InputUtils.isGamepad() and os.clock() - v1 > 10 and true or false
+		return InputUtils.isGamepad() and os.clock() - lastMouseInputTime > 10 and true or false
 	end
 end
 local function hasLineOfSight(p1, p2)
 	local Position = workspace.CurrentCamera.CFrame.Position
-	local v1 = RaycastParams.new()
-	v1.FilterType = Enum.RaycastFilterType.Exclude
-	v1.RespectCanCollide = true
-	v1.FilterDescendantsInstances = { Players.LocalPlayer.Character, workspace.Items }
-	v1.IgnoreWater = true
-	local v2 = workspace:Raycast(Position, p2 - Position, v1)
-	if v2 then
-		return v2.Instance:IsDescendantOf(p1)
+	local raycastParams = RaycastParams.new()
+	raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+	raycastParams.RespectCanCollide = true
+	raycastParams.FilterDescendantsInstances = { Players.LocalPlayer.Character, workspace.Items }
+	raycastParams.IgnoreWater = true
+	local raycastResult = workspace:Raycast(Position, p2 - Position, raycastParams)
+	if raycastResult then
+		return raycastResult.Instance:IsDescendantOf(p1)
 	else
 		return true
 	end
 end
 return {
 	aimAssist = function(p1, p2)
-		local v12 = Maid.new()
+		local taskMaid = Maid.new()
 		local CurrentCamera = workspace.CurrentCamera
-		local v2 = Players.LocalPlayer:GetAttribute("AimbotEnabled") == true
-		local v3 = Players.LocalPlayer.Character:GetPivot()
-		local Position = v3.Position
-		local LookVector = v3.LookVector
+		local isAimbot = Players.LocalPlayer:GetAttribute("AimbotEnabled") == true
+		local playerPivot = Players.LocalPlayer.Character:GetPivot()
+		local Position = playerPivot.Position
+		local LookVector = playerPivot.LookVector
 		local function findBestCharacter()
-			local t = {}
-			local t2 = {}
+			local targets = {}
+			local processedCharacters = {}
 			local function handleCharacter(p1)
-				if t2[p1] then
+				if processedCharacters[p1] then
 					return
 				end
-				t2[p1] = true
+				processedCharacters[p1] = true
 				local Humanoid = p1:FindFirstChild("Humanoid")
 				if Humanoid then
 					if Humanoid.Health == 0 or p1 == Players.LocalPlayer.Character then
 						return
 					end
-					local v1 = Players:GetPlayerFromCharacter(p1)
-					if v1 and PlayerUtils.getTeam(v1) == PlayerUtils.getTeam(Players.LocalPlayer) then
+					local player = Players:GetPlayerFromCharacter(p1)
+					if player and PlayerUtils.getTeam(player) == PlayerUtils.getTeam(Players.LocalPlayer) then
 						return
 					end
 					local PrimaryPart = p1.PrimaryPart
 					if PrimaryPart then
 						local Head = p1:FindFirstChild("Head")
-						local v2 = if Head then (Head.Position - PrimaryPart.Position) * Vector3.new(0, 1, 0) / 2 else Vector3.new(0, 0, 0)
-						local v3 = PrimaryPart.CFrame * v2
-						if hasLineOfSight(p1, v3) then
-							table.insert(t, {
+						local headOffset = if Head then (Head.Position - PrimaryPart.Position) * Vector3.new(0, 1, 0) / 2 else Vector3.new(0, 0, 0)
+						local targetPosition = PrimaryPart.CFrame * headOffset
+						if hasLineOfSight(p1, targetPosition) then
+							table.insert(targets, {
 								humanoid = Humanoid,
 								part = PrimaryPart,
-								offset = v2,
-								distance = (v3 - Position).Magnitude,
-								dot = (v3 - Position).Unit:Dot(LookVector)
+								offset = headOffset,
+								distance = (targetPosition - Position).Magnitude,
+								dot = (targetPosition - Position).Unit:Dot(LookVector)
 							})
 						end
 					end
@@ -86,42 +87,42 @@ return {
 			for v1, v2 in CollectionService:GetTagged("Humanoid") do
 				handleCharacter(v2.Parent)
 			end
-			table.sort(t, function(p1, p2)
+			table.sort(targets, function(p1, p2)
 				return p1.dot > p2.dot
 			end)
-			for i = 1, #t do
-				local v3 = t[i]
-				if v3.dot > 0.9396926207859084 and v3.distance <= 100 then
-					return v3
+			for i = 1, #targets do
+				local targetData = targets[i]
+				if targetData.dot > 0.9396926207859084 and targetData.distance <= 100 then
+					return targetData
 				end
 			end
 			return nil
 		end
-		local v4 = findBestCharacter()
-		if v4 then
-			local part = v4.part
-			v12:GiveTask(RunService.RenderStepped:Connect(function(p12)
-				local v12 = CFrame.lookAt(CurrentCamera.CFrame.Position, part.CFrame * v4.offset)
-				local v22 = p1:GetMouseLocation()
-				local v3 = CurrentCamera:ViewportPointToRay(v22.X, v22.Y, 0)
-				local v42 = v3.Direction:Cross(CurrentCamera.CFrame.LookVector)
-				local v5 = v3.Direction:Dot(CurrentCamera.CFrame.LookVector)
-				if v5 < 0.999 then
-					v12 = v12 * CFrame.fromAxisAngle(v42, (math.acos(v5)))
+		local bestTarget = findBestCharacter()
+		if bestTarget then
+			local part = bestTarget.part
+			taskMaid:GiveTask(RunService.RenderStepped:Connect(function(deltaTime)
+				local targetLookCFrame = CFrame.lookAt(CurrentCamera.CFrame.Position, part.CFrame * bestTarget.offset)
+				local mouseLocation = p1:GetMouseLocation()
+				local viewportRay = CurrentCamera:ViewportPointToRay(mouseLocation.X, mouseLocation.Y, 0)
+				local crossProduct = viewportRay.Direction:Cross(CurrentCamera.CFrame.LookVector)
+				local alignment = viewportRay.Direction:Dot(CurrentCamera.CFrame.LookVector)
+				if alignment < 0.999 then
+					targetLookCFrame = targetLookCFrame * CFrame.fromAxisAngle(crossProduct, (math.acos(alignment)))
 				end
-				local v7 = part.CFrame * v4.offset
-				if hasLineOfSight(part.Parent, v7) then
-					if (Players.LocalPlayer.Character:GetPivot().Position - v7).Magnitude > 100 then
+				local targetPosition = part.CFrame * bestTarget.offset
+				if hasLineOfSight(part.Parent, targetPosition) then
+					if (Players.LocalPlayer.Character:GetPivot().Position - targetPosition).Magnitude > 100 then
 						p2()
 						return
 					end
-					local v8 = 1 - math.exp(-9 * p12)
-					if v2 then
-						v8 = 1
+					local lerpAlpha = 1 - math.exp(-9 * deltaTime)
+					if isAimbot then
+						lerpAlpha = 1
 					end
-					CurrentCamera.CFrame = CurrentCamera.CFrame:Lerp(v12, v8)
-					if if Players.LocalPlayer:GetAttribute("AimbotEnabled") then true else InputUtils.isGamepad() and os.clock() - v1 > 10 and true or false then
-						if v4.humanoid.Health == 0 or not part:IsDescendantOf(workspace) then
+					CurrentCamera.CFrame = CurrentCamera.CFrame:Lerp(targetLookCFrame, lerpAlpha)
+					if if Players.LocalPlayer:GetAttribute("AimbotEnabled") then true else InputUtils.isGamepad() and os.clock() - lastMouseInputTime > 10 and true or false then
+						if bestTarget.humanoid.Health == 0 or not part:IsDescendantOf(workspace) then
 							p2()
 						end
 					else
@@ -131,7 +132,7 @@ return {
 					p2()
 				end
 			end))
-			return v12
+			return taskMaid
 		else
 			return nil
 		end

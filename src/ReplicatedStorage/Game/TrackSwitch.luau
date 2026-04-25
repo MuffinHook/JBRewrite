@@ -1,27 +1,28 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NetSync = require(ReplicatedStorage.Module.NetSync)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local RunService = game:GetService("RunService")
-local t = {}
-t.__index = t
-function t.new(p1, p2)
-	local v2 = setmetatable({}, t)
+local TrackSwitch = {}
+TrackSwitch.__index = TrackSwitch
+function TrackSwitch.new(p1, callback)
+	local instance = setmetatable({}, TrackSwitch)
 	local v3 = tick()
 	local function Heartbeat(p1)
 		local v1 = tick() - v3
 		if v1 >= 1 then
-			v2.Event:Disconnect()
-			v2.Done = true
+			instance.Event:Disconnect()
+			instance.Done = true
 			v1 = 1
 		end
-		p2(v1, p1)
+		callback(v1, p1)
 	end
-	v2.Event = RunService.Heartbeat:Connect(Heartbeat)
-	v2.Done = false
-	return v2
+	instance.Event = RunService.Heartbeat:Connect(Heartbeat)
+	instance.Done = false
+	return instance
 end
-function t.Destroy(p1)
+function TrackSwitch.Destroy(p1)
 	p1.Event:Disconnect()
 	p1.Event = nil
 	p1.Done = true
@@ -44,13 +45,13 @@ return {
 			local Inst = p1.Inst
 			local Rail = Inst.Parent.Parent.Rail
 			local Invert = Rail:FindFirstChild("Invert")
-			local v12 = if p1.Flipped then 0 else 1
-			Rail.Transparency = Invert and 1 - v12 or v12
+			local transparency = if p1.Flipped then 0 else 1
+			Rail.Transparency = Invert and 1 - transparency or transparency
 			local v3 = Inst.Parent
 			v3.PrimaryPart = v3.Root
 			local Root = v3.Parent.Model.Root
-			v1 = t.new(0.5, function(p12, p2)
-				p1.Rot = if p1.Flipped then -0.9424777960769379 else 0 * p12 + (p1.Rot or 0) * (1 - p12)
+			v1 = TrackSwitch.new(0.5, function(progressFactor, p2)
+				p1.Rot = if p1.Flipped then -0.9424777960769379 else 0 * progressFactor + (p1.Rot or 0) * (1 - progressFactor)
 				v3:SetPrimaryPartCFrame(Root.CFrame * CFrame.Angles(0, 0, p1.Rot))
 			end)
 			Audio.ObjectLocal(Inst, 2803301098)

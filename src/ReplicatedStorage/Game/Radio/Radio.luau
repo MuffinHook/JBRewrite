@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Window = require(ReplicatedStorage.Module.Window.Window)
@@ -12,17 +13,17 @@ function t.Init()
 	RadioGui.Parent = LocalPlayer.PlayerGui
 	t.Gui = RadioGui
 	t.Window = Window.new()
-	local v1 = nil
+	local radioUI = nil
 	t.Window:GetOnOpenedSignal():Connect(function()
-		v1 = RadioUI.new(t.Gui)
-		v1.Maid:GiveTask(v1.Gui.Container.Close.MouseButton1Down:Connect(function()
+		radioUI = RadioUI.new(t.Gui)
+		radioUI.Maid:GiveTask(radioUI.Gui.Container.Close.MouseButton1Down:Connect(function()
 			t.Close()
 		end))
-		v1.Maid:GiveTask(ActionButtonService.pushHide())
+		radioUI.Maid:GiveTask(ActionButtonService.pushHide())
 	end)
 	t.Window:GetOnClosedSignal():Connect(function()
-		v1:Destroy()
-		v1 = nil
+		radioUI:Destroy()
+		radioUI = nil
 	end)
 	if t.Gui.Enabled then
 		t.Window:Open()
@@ -30,8 +31,8 @@ function t.Init()
 	RadioPlayer.OnSongEnded:Connect(function()
 		if RadioPlayer.PlayRandomSongAfter then
 			RadioPlayer.PlayRandomSong()
-			if v1 ~= nil then
-				v1:UpdatePlayButton()
+			if radioUI ~= nil then
+				radioUI:UpdatePlayButton()
 			end
 		end
 	end)

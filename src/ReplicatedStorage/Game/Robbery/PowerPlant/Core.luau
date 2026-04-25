@@ -1,39 +1,40 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local RunService = game:GetService("RunService")
 local CurrentCamera = workspace.CurrentCamera
-local t = {}
-t.__index = t
-function t.new(p1)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.Model = p1
-	local Spinner = t2.Model:FindFirstChild("Spinner")
-	t2.Spinner = Spinner
+local PowerPlantCore = {}
+PowerPlantCore.__index = PowerPlantCore
+function PowerPlantCore.new(model)
+	local self = {}
+	setmetatable(self, PowerPlantCore)
+	self.Model = model
+	local Spinner = self.Model:FindFirstChild("Spinner")
+	self.Spinner = Spinner
 	RxInstanceUtils.yieldForProperty(Spinner, "PrimaryPart")
-	assert(t2.Spinner.PrimaryPart, "spinner is missing PrimaryPart")
-	t2.Spinner.PrimaryPart.CFrame = CFrame.new(t2.Spinner.PrimaryPart.Position)
-	t2.Maid = Maid.new()
-	t2.Maid:GiveTask(RunService.Heartbeat:Connect(function(p1)
-		t2:Heartbeat(p1)
+	assert(self.Spinner.PrimaryPart, "spinner is missing PrimaryPart")
+	self.Spinner.PrimaryPart.CFrame = CFrame.new(self.Spinner.PrimaryPart.Position)
+	self.Maid = Maid.new()
+	self.Maid:GiveTask(RunService.Heartbeat:Connect(function(deltaTime)
+		self:Heartbeat(deltaTime)
 	end))
-	return t2
+	return self
 end
-function t.Heartbeat(p1, p2)
-	local Magnitude = (CurrentCamera.CFrame.Position - p1.Spinner.PrimaryPart.Position).Magnitude
+function PowerPlantCore.Heartbeat(self, deltaTime)
+	local Magnitude = (CurrentCamera.CFrame.Position - self.Spinner.PrimaryPart.Position).Magnitude
 	if not (Magnitude * Magnitude > 250000) then
 		debug.profilebegin("PowerPlant Core")
-		p1.Spinner:SetPrimaryPartCFrame(p1.Spinner.PrimaryPart.CFrame * CFrame.Angles(0, p2, 0))
-		local v2 = math.cos(tick() * 2) * 20
-		p1.Model.Part.Color = Color3.fromRGB(v2 + 129, v2 + 125, v2 + 152)
-		p1.Model.PowerWire.Color = Color3.fromRGB(v2 + 129, v2 + 125, v2 + 152)
+		self.Spinner:SetPrimaryPartCFrame(self.Spinner.PrimaryPart.CFrame * CFrame.Angles(0, deltaTime, 0))
+		local colorCycleOffset = math.cos(tick() * 2) * 20
+		self.Model.Part.Color = Color3.fromRGB(colorCycleOffset + 129, colorCycleOffset + 125, colorCycleOffset + 152)
+		self.Model.PowerWire.Color = Color3.fromRGB(colorCycleOffset + 129, colorCycleOffset + 125, colorCycleOffset + 152)
 		debug.profileend()
 	end
 end
-function t.Destroy(p1)
-	p1.Maid:Destroy()
-	p1.Maid = nil
+function PowerPlantCore.Destroy(self)
+	self.Maid:Destroy()
+	self.Maid = nil
 end
-return t
+return PowerPlantCore

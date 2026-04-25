@@ -1,49 +1,50 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local waitForChild = require(ReplicatedStorage.Std.waitForChild)
 local RobberyConsts = require(ReplicatedStorage.Robbery.RobberyConsts)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local MoneyTruckConsts = require(script.Parent.MoneyTruckConsts)
-local t = {
+local moneyTruckSystem = {
 	onRunningChanged = Signal.new(),
 	onVehicleModelChanged = Signal.new(),
 	_vehicleModelValue = nil
 }
 local function onClientEvent()
-	local v1 = t.getVehicleModel()
-	if v1 and (v1:FindFirstChild("Model") and v1.Model:FindFirstChild("Cash")) then
-		v1.Model.Cash:Destroy()
+	local vehicleModel = moneyTruckSystem.getVehicleModel()
+	if vehicleModel and (vehicleModel:FindFirstChild("Model") and vehicleModel.Model:FindFirstChild("Cash")) then
+		vehicleModel.Model.Cash:Destroy()
 	end
-	local v2 = v1 and v1:FindFirstChild(MoneyTruckConsts.ROBBERY_MUSIC_VALUE_NAME)
-	if v2 and v2.Value then
-		Audio.promiseFadeTo(v2.Value, 0, 2)
+	local musicValue = vehicleModel and vehicleModel:FindFirstChild(MoneyTruckConsts.ROBBERY_MUSIC_VALUE_NAME)
+	if musicValue and musicValue.Value then
+		Audio.promiseFadeTo(musicValue.Value, 0, 2)
 	end
 end
-function t.init()
-	waitForChild(workspace, RobberyConsts.FOLDER_NAME, 30):andThen(function(p1)
-		return waitForChild(p1, MoneyTruckConsts.ROBBERY_VALUE_NAME, 30)
-	end):andThen(t._setup):catch(warn)
+function moneyTruckSystem.init()
+	waitForChild(workspace, RobberyConsts.FOLDER_NAME, 30):andThen(function(robberyFolder)
+		return waitForChild(robberyFolder, MoneyTruckConsts.ROBBERY_VALUE_NAME, 30)
+	end):andThen(moneyTruckSystem._setup):catch(warn)
 end
-function t._setup(p1)
-	waitForChild(p1, MoneyTruckConsts.RUNNING_VALUE_NAME, 30):andThen(function(p1)
-		t.onRunningChanged:Fire(p1.Value)
+function moneyTruckSystem._setup(robberyFolder)
+	waitForChild(robberyFolder, MoneyTruckConsts.RUNNING_VALUE_NAME, 30):andThen(function(p1)
+		moneyTruckSystem.onRunningChanged:Fire(p1.Value)
 		p1.Changed:Connect(function(p1)
-			t.onRunningChanged:Fire(p1)
+			moneyTruckSystem.onRunningChanged:Fire(p1)
 		end)
 	end):catch(warn)
-	waitForChild(p1, MoneyTruckConsts.VEHICLE_MODEL_VALUE_NAME, 30):andThen(function(p1)
-		t._vehicleModelValue = p1
-		t.onVehicleModelChanged:Fire(p1.Value)
+	waitForChild(robberyFolder, MoneyTruckConsts.VEHICLE_MODEL_VALUE_NAME, 30):andThen(function(p1)
+		moneyTruckSystem._vehicleModelValue = p1
+		moneyTruckSystem.onVehicleModelChanged:Fire(p1.Value)
 		p1.Changed:Connect(function(p1)
-			t.onVehicleModelChanged:Fire(p1)
+			moneyTruckSystem.onVehicleModelChanged:Fire(p1)
 		end)
 	end):catch(warn)
-	waitForChild(p1, MoneyTruckConsts.HIDE_CASH_REMOTE_NAME, 30):andThen(function(p1)
+	waitForChild(robberyFolder, MoneyTruckConsts.HIDE_CASH_REMOTE_NAME, 30):andThen(function(p1)
 		p1.OnClientEvent:Connect(onClientEvent)
 	end):catch(warn)
 end
-function t.getVehicleModel()
-	return t._vehicleModelValue and t._vehicleModelValue.Value
+function moneyTruckSystem.getVehicleModel()
+	return moneyTruckSystem._vehicleModelValue and moneyTruckSystem._vehicleModelValue.Value
 end
-return t
+return moneyTruckSystem

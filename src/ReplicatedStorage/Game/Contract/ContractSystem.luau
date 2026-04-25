@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -7,25 +8,25 @@ local ContractBinder = require(script.Parent.ContractBinder)
 local ContractConsts = require(script.Parent.ContractConsts)
 local t = {}
 function t.init()
-	ContractBinder:GetClassAddedSignal():Connect(function(p1)
-		if p1:GetPlayer() == Players.LocalPlayer then
-			p1._maid:GiveTask(p1:GetOnStateChangedSignal():Connect(function(p12, p2)
-				if (p12 == ContractConsts.enumState.ACTIVE or p2 == ContractConsts.enumState.ACTIVE) and t._onAnyContractActiveTransition then
-					t._onAnyContractActiveTransition:Fire(p1)
+	ContractBinder:GetClassAddedSignal():Connect(function(contract)
+		if contract:GetPlayer() == Players.LocalPlayer then
+			contract._maid:GiveTask(contract:GetOnStateChangedSignal():Connect(function(oldState, newState)
+				if (oldState == ContractConsts.enumState.ACTIVE or newState == ContractConsts.enumState.ACTIVE) and t._onAnyContractActiveTransition then
+					t._onAnyContractActiveTransition:Fire(contract)
 				end
 			end))
 		end
 	end)
-	ContractBinder:GetClassRemovingSignal():Connect(function(p1)
-		if p1:GetPlayer() == Players.LocalPlayer and (p1:GetStateId() == ContractConsts.enumState.ACTIVE and t._onAnyContractActiveTransition) then
+	ContractBinder:GetClassRemovingSignal():Connect(function(contract)
+		if contract:GetPlayer() == Players.LocalPlayer and (contract:GetStateId() == ContractConsts.enumState.ACTIVE and t._onAnyContractActiveTransition) then
 			t._onAnyContractActiveTransition:Fire()
 		end
 	end)
 	ContractBinder:Start()
 end
-function t.getPlayerContractDataFolder(p1)
-	assert(p1 ~= nil)
-	return ReplicatedStorage:FindFirstChild(ContractConsts.CONTRACT_DATA_FOLDER_NAME):FindFirstChild(p1.UserId)
+function t.getPlayerContractDataFolder(contract)
+	assert(contract ~= nil)
+	return ReplicatedStorage:FindFirstChild(ContractConsts.CONTRACT_DATA_FOLDER_NAME):FindFirstChild(contract.UserId)
 end
 function t.getAnyContractActiveTransitionSignal()
 	if not t._onAnyContractActiveTransition then
@@ -33,9 +34,9 @@ function t.getAnyContractActiveTransitionSignal()
 	end
 	return t._onAnyContractActiveTransition
 end
-function t.getActiveContract(p1)
+function t.getActiveContract(contract)
 	for i, v in ipairs((t.getContracts())) do
-		if v:GetStateId() == ContractConsts.enumState.ACTIVE and v:GetTeamId() == p1 then
+		if v:GetStateId() == ContractConsts.enumState.ACTIVE and v:GetTeamId() == contract then
 			return v
 		end
 	end

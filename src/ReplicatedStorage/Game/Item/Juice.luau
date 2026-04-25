@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Basic = require(script.Parent.Basic)
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -6,7 +7,7 @@ local ShockwaveScreenFx = require(ReplicatedStorage.Game.ShockwaveScreenFx)
 local CharacterUtil = require(ReplicatedStorage.Game.CharacterUtil)
 require(ReplicatedStorage.Module.R15IKv2)
 local Audio = require(ReplicatedStorage.Std.Audio)
-local t = {
+local motionConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -28,42 +29,42 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local v2 = nil
-local t2 = {
+local eventObject = nil
+local Juice = {
 	__ClassName = "Juice"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.Init(p1)
-	v2 = p1.Event
+Juice.__index = Juice
+setmetatable(Juice, Basic)
+function Juice.Init(p1)
+	eventObject = p1.Event
 	function p1.em.l2x2ypvi()
 		CharacterUtil.IsJuiced = true
 		CharacterUtil.WalkSpeedSpring:Accelerate(20)
-		local v1 = ShockwaveScreenFx.new()
-		v1._maid:GiveTask(RunService.Heartbeat:Connect(function()
-			v1:Update()
+		local shockwaveFx = ShockwaveScreenFx.new()
+		shockwaveFx._maid:GiveTask(RunService.Heartbeat:Connect(function()
+			shockwaveFx:Update()
 		end))
-		v1:SetActive(true)
+		shockwaveFx:SetActive(true)
 		task.delay(3, function()
-			v1:SetActive(false)
+			shockwaveFx:SetActive(false)
 			CharacterUtil.IsJuiced = false
 			task.wait(5)
-			v1:Destroy()
+			shockwaveFx:Destroy()
 		end)
 	end
 end
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	v1:DefaultDisableCamLock()
-	return v1
+function Juice.new(p1, p2, p3)
+	local juiceInstance = Basic.new(p1, p2, motionConfig, p3)
+	setmetatable(juiceInstance, Juice)
+	juiceInstance:DefaultDisableCamLock()
+	return juiceInstance
 end
-function t2.UpdateArmIK(p1)
+function Juice.UpdateArmIK(p1)
 	local IK = p1.IK
 	IK.RightArm = p1.Model.Skeleton.RightArm.Position
 	IK.RightAngle = p1.Config.Motion.RightElbowAngle
 end
-function t2.InputBegan(p1, p2, p3)
+function Juice.InputBegan(p1, p2, p3)
 	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		p1.SpringItemOffset:SetTarget(p1.Config.Motion.Eat.Springs.ItemOffset)
 		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Eat.Springs.ItemRotation)
@@ -74,13 +75,13 @@ function t2.InputBegan(p1, p2, p3)
 			p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
 			p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
 			if p1.Local then
-				local v1 = tick()
-				local v22 = p1.LastConsumed or 0
-				p1.LastConsumed = v1
-				if v1 - v22 < 5 then
+				local now = tick()
+				local lastConsumedTime = p1.LastConsumed or 0
+				p1.LastConsumed = now
+				if now - lastConsumedTime < 5 then
 					return false
 				end
-				v2:FireServer("l" .. "" .. ("ux2m3"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "2ypvi")
+				eventObject:FireServer("l" .. "" .. ("ux2m3"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "2ypvi")
 			end
 		end)
 		if p1.Local then
@@ -89,5 +90,5 @@ function t2.InputBegan(p1, p2, p3)
 	end
 	Basic.InputBegan(p1, p2, p3)
 end
-function t2.InputEnded(p1)  end
-return t2
+function Juice.InputEnded(p1)  end
+return Juice

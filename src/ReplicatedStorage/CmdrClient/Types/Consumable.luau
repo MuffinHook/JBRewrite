@@ -1,25 +1,26 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Util = require(ReplicatedStorage.CmdrClient.Shared.Util)
-local t = {}
-for v1, v2 in require(ReplicatedStorage.Consumables.ConsumablesData) do
-	table.insert(t, v1)
+local consumableList = {}
+for name, _ in require(ReplicatedStorage.Consumables.ConsumablesData) do
+	table.insert(consumableList, name)
 end
-local v3 = Util.MakeFuzzyFinder(t)
-local t2 = {
-	Transform = function(p1)
-		return v3(p1)
+local fuzzyFinder = Util.MakeFuzzyFinder(consumableList)
+local consumableTypeConfig = {
+	Transform = function(consumableName)
+		return fuzzyFinder(consumableName)
 	end,
-	Validate = function(p1)
-		return #p1 > 0, "No valid consumable with that name could be found."
+	Validate = function(consumableName)
+		return #consumableName > 0, "No valid consumable with that name could be found."
 	end,
-	Autocomplete = function(p1)
-		return p1
+	Autocomplete = function(consumableName)
+		return consumableName
 	end,
-	Parse = function(p1)
-		return p1[1]
+	Parse = function(consumableName)
+		return consumableName[1]
 	end
 }
-return function(p1)
-	p1:RegisterType("consumable", t2)
+return function(consumableName)
+	consumableName:RegisterType("consumable", consumableTypeConfig)
 end

@@ -1,53 +1,54 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
-local t = {}
-local t2 = {}
-for v1, v2 in script:GetChildren() do
-	t[v2.Name] = false
+local categoryLoaded = {}
+local categoryModules = {}
+for v1, child in script:GetChildren() do
+	categoryLoaded[child.Name] = false
 end
-local function GetCategoryByName(p1)
-	assert(p1)
-	if not t[p1] then
-		local v1 = script:FindFirstChild(p1)
-		if not v1 then
-			print(("No category module: %s"):format(p1))
+local function GetCategoryByName(categoryName)
+	assert(categoryName)
+	if not categoryLoaded[categoryName] then
+		local foundScript = script:FindFirstChild(categoryName)
+		if not foundScript then
+			print(("No category module: %s"):format(categoryName))
 			error("No category module")
 		end
-		t2[p1] = require(v1)
-		t[p1] = true
+		categoryModules[categoryName] = require(foundScript)
+		categoryLoaded[categoryName] = true
 	end
-	return t2[p1]
+	return categoryModules[categoryName]
 end
-local function GetItemByName(p1, p2)
-	assert(p1)
-	assert(p2)
-	local v1 = GetCategoryByName(p1)
-	if v1 then
-		assert(v1, p1)
-		if v1.GetItemByName then
-			return v1.GetItemByName(p2)
+local function GetItemByName(categoryName, itemName)
+	assert(categoryName)
+	assert(itemName)
+	local categoryModule = GetCategoryByName(categoryName)
+	if categoryModule then
+		assert(categoryModule, categoryName)
+		if categoryModule.GetItemByName then
+			return categoryModule.GetItemByName(itemName)
 		end
-		for v3, v4 in if v1.GetItems then v1.GetItems() else v1.Items do
-			if v4.Name == p2 then
-				return v4
+		for v3, item in if categoryModule.GetItems then categoryModule.GetItems() else categoryModule.Items do
+			if item.Name == itemName then
+				return item
 			end
 		end
 	end
-	local v5 = ("No CategoryName/ItemName: %s/%s"):format(p1, p2)
+	local errorMessage = ("No CategoryName/ItemName: %s/%s"):format(categoryName, itemName)
 	if RunService:IsServer() then
-		warn(v5)
+		warn(errorMessage)
 	end
 	return nil
 end
 return {
 	GetCategoryByName = GetCategoryByName,
 	GetItemByName = GetItemByName,
-	GetMapFromSelection = function(p1)
-		assert(p1)
-		local t = {}
-		for k, v in pairs(p1) do
-			t[k] = GetItemByName(k, v)
+	GetMapFromSelection = function(selectionMap)
+		assert(selectionMap)
+		local result = {}
+		for k, v in pairs(selectionMap) do
+			result[k] = GetItemByName(k, v)
 		end
-		return t
+		return result
 	end
 }

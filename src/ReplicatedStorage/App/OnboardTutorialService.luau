@@ -1,13 +1,14 @@
 -- Reviewed by Claude
+-- variables reassigned
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local MinimapService = require(script.Parent.MinimapService)
 local module = {}
-local function getRobberyMarkerForName(p1)
-	for v1, v2 in CollectionService:GetTagged("RobberyMarker") do
-		if v2.Name == p1 then
-			return v2
+local function getRobberyMarkerForName(markerName)
+	for index, marker in CollectionService:GetTagged("RobberyMarker") do
+		if marker.Name == markerName then
+			return marker
 		end
 	end
 	return nil
@@ -15,30 +16,30 @@ end
 function module.init()
 	task.spawn(function()
 		local SetRobberyWaypointRemote = ReplicatedStorage.App:WaitForChild("SetRobberyWaypointRemote")
-		local v1 = 0
-		SetRobberyWaypointRemote.OnClientEvent:Connect(function(p1)
-			local v12 = v1 + 1
-			v1 = v12
+		local requestCounter = 0
+		SetRobberyWaypointRemote.OnClientEvent:Connect(function(waypointData)
+			local currentRequest = requestCounter + 1
+			requestCounter = currentRequest
 			while true do
-				local markerName = p1.markerName
-				local v2 = nil
-				local v3 = false
-				for v4, v5 in CollectionService:GetTagged("RobberyMarker") do
-					if v5.Name == markerName then
-						v2 = v5
+				local markerName = waypointData.markerName
+				local foundMarker = nil
+				local success = false
+				for idx, marker in CollectionService:GetTagged("RobberyMarker") do
+					if marker.Name == markerName then
+						foundMarker = marker
 						break
 					end
 				end
-				if v2 then
-					MinimapService.addWaypoint(Dictionary.merge(p1, {
-						part = v2
+				if foundMarker then
+					MinimapService.addWaypoint(Dictionary.merge(waypointData, {
+						part = foundMarker
 					}))
-					v3 = true
+					success = true
 				else
-					warn("No part found for marker name", p1.markerName)
+					warn("No part found for marker name", waypointData.markerName)
 					task.wait(1)
 				end
-				if v3 or v12 ~= v12 then
+				if success or currentRequest ~= currentRequest then
 					return
 				end
 			end

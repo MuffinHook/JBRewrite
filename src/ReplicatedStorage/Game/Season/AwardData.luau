@@ -1,67 +1,68 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SeasonConsts = require(ReplicatedStorage.Game.Season.SeasonConsts)
-local t = {}
-local t2 = {}
-t.Level = t2
-local t3 = {}
-t.Bonus = t3
-local function gatherStoreData(p1, p2)
-	for v3, v4 in p2 do
-		local v1, v2
-		if v4.Season and v4.Season == SeasonConsts.SEASON_NUM then
-			if not v4.SeasonIconId then
-				print(v4)
-				error(("Missing SeasonIconId for: %s:^"):format(p1))
+local levelRewards = {}
+local levelRewardsByLevel = {}
+levelRewards.Level = levelRewardsByLevel
+local bonusRewards = {}
+levelRewards.Bonus = bonusRewards
+local function gatherStoreData(rewardType, itemsData)
+	for index, item in itemsData do
+		local isValidIconId, isValidScoreLte
+		if item.Season and item.Season == SeasonConsts.SEASON_NUM then
+			if not item.SeasonIconId then
+				print(item)
+				error(("Missing SeasonIconId for: %s:^"):format(rewardType))
 			end
-			v1 = v4.SeasonIconId > 0
-			assert(v1, "missing SeasonIconId value")
-			local t = {
-				type = p1
+			isValidIconId = item.SeasonIconId > 0
+			assert(isValidIconId, "missing SeasonIconId value")
+			local rewardEntry = {
+				type = rewardType
 			}
-			t.name = v4.Name or v4.Make
-			t.imageId = v4.SeasonIconId
-			if v4.Level then
-				t2[v4.Level] = t
-			elseif v4.TopPct then
-				assert(#t3 == 0, "a bonus already exists")
-				t.scoreLte = v4.TopPct / 100
-				v2 = if t.scoreLte > 0 then t.scoreLte <= 1 else false
-				assert(v2, "invalid TopPct")
-				t3[1] = t
+			rewardEntry.name = item.Name or item.Make
+			rewardEntry.imageId = item.SeasonIconId
+			if item.Level then
+				levelRewardsByLevel[item.Level] = rewardEntry
+			elseif item.TopPct then
+				assert(#bonusRewards == 0, "a bonus already exists")
+				rewardEntry.scoreLte = item.TopPct / 100
+				isValidScoreLte = if rewardEntry.scoreLte > 0 then rewardEntry.scoreLte <= 1 else false
+				assert(isValidScoreLte, "invalid TopPct")
+				bonusRewards[1] = rewardEntry
 			else
-				warn(v4)
+				warn(item)
 				error("Missing Level or TopPct")
 			end
 		end
 	end
 end
-local function gatherModelData(p1, p2)
-	for v3, v4 in p2:GetChildren() do
-		local v1, v2
-		local Season = v4:FindFirstChild("Season")
-		local Level = v4:FindFirstChild("Level")
-		local TopPct = v4:FindFirstChild("TopPct")
-		local SeasonIconId = v4:FindFirstChild("SeasonIconId")
+local function gatherModelData(rewardType, parentFolder)
+	for index, child in parentFolder:GetChildren() do
+		local isValidIconId, isValidScoreLte
+		local Season = child:FindFirstChild("Season")
+		local Level = child:FindFirstChild("Level")
+		local TopPct = child:FindFirstChild("TopPct")
+		local SeasonIconId = child:FindFirstChild("SeasonIconId")
 		if Season and Season.Value == SeasonConsts.SEASON_NUM then
 			if not SeasonIconId then
-				error(("Missing SeasonIconId for %s:%s"):format(p1, v4.Name))
+				error(("Missing SeasonIconId for %s:%s"):format(rewardType, child.Name))
 			end
-			v1 = SeasonIconId.Value > 0
-			assert(v1, "missing SeasonIconId value")
-			local t = {
-				type = p1,
-				name = v4.Name,
+			isValidIconId = SeasonIconId.Value > 0
+			assert(isValidIconId, "missing SeasonIconId value")
+			local rewardEntry = {
+				type = rewardType,
+				name = child.Name,
 				imageId = SeasonIconId.Value
 			}
 			if Level then
-				t2[Level.Value] = t
+				levelRewardsByLevel[Level.Value] = rewardEntry
 			elseif TopPct then
-				assert(#t3 == 0, "a bonus already exists")
-				t.scoreLte = TopPct.Value / 100
-				v2 = if t.scoreLte > 0 then t.scoreLte <= 1 else false
-				assert(v2, "invalid TopPct")
-				t3[1] = t
+				assert(#bonusRewards == 0, "a bonus already exists")
+				rewardEntry.scoreLte = TopPct.Value / 100
+				isValidScoreLte = if rewardEntry.scoreLte > 0 then rewardEntry.scoreLte <= 1 else false
+				assert(isValidScoreLte, "invalid TopPct")
+				bonusRewards[1] = rewardEntry
 			else
 				error("Missing Level or TopPct")
 			end
@@ -80,13 +81,13 @@ gatherStoreData("Color", require(ReplicatedStorage.Game.Garage.StoreData.Color).
 gatherStoreData("Drift", require(ReplicatedStorage.Game.Garage.StoreData.Drift).Items)
 gatherModelData("HomeItem", ReplicatedStorage.Resource.HomeItem)
 for i = 2, SeasonConsts.MAX_REWARD_LEVEL do
-	if t2[i] == nil then
+	if levelRewardsByLevel[i] == nil then
 		error("Missing reward for Level: " .. tostring(i))
 	end
 end
 for j = 1, SeasonConsts.NUM_BONUS_AWARDS do
-	if t3[j] == nil then
+	if bonusRewards[j] == nil then
 		error("Missing reward for Bonus: " .. tostring(j))
 	end
 end
-return t
+return levelRewards

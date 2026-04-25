@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Players = game:GetService("Players")
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -6,25 +7,25 @@ local Notification = require(ReplicatedStorage.Game.Notification)
 local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
-local function catalogPurchase(p1, p2)
-	local v1 = Maid.new()
-	local function action(p1, p22)
-		if p22 then
-			MarketplaceService:PromptPurchase(Players.LocalPlayer, p2.assetIdObj.Value, true)
+local function catalogPurchase(part, config)
+	local maid = Maid.new()
+	local function action(part, shouldPurchase)
+		if shouldPurchase then
+			MarketplaceService:PromptPurchase(Players.LocalPlayer, config.assetIdObj.Value, true)
 		end
 		return true
 	end
 	CircleAction.Add({
-		Part = p1,
+		Part = part,
 		Timed = false,
-		Name = ("Buy %s"):format(p2.displayNameObj.Value),
+		Name = ("Buy %s"):format(config.displayNameObj.Value),
 		Dist = 16,
 		Callback = action
-	}, p1)
-	v1:GiveTask(function()
-		CircleAction.Remove(p1)
+	}, part)
+	maid:GiveTask(function()
+		CircleAction.Remove(part)
 	end)
-	return v1
+	return maid
 end
 return {
 	init = function()
@@ -32,9 +33,9 @@ return {
 			assetIdObj = "AssetId",
 			displayNameObj = "DisplayName"
 		}, catalogPurchase):Start()
-		MarketplaceService.PromptPurchaseFinished:Connect(function(p1, p2, p3)
-			if p1 == Players.LocalPlayer then
-				if p3 then
+		MarketplaceService.PromptPurchaseFinished:Connect(function(player, assetId, isPurchased)
+			if player == Players.LocalPlayer then
+				if isPurchased then
 					Notification.new({
 						Text = "Go to the Roblox avatar editor to wear this item!"
 					})

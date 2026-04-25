@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local CollectionService = game:GetService("CollectionService")
@@ -79,9 +80,9 @@ function ViewerComponent.render(self)
 			BackgroundTransparency = 0,
 			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
-			Size = p1.props.size,
-			Position = p1.props.position,
-			LayoutOrder = p1.props.layoutOrder,
+			Size = self.props.size,
+			Position = self.props.position,
+			LayoutOrder = self.props.layoutOrder,
 			AnchorPoint = Vector2.new(0.5, 0.5)
 		}, {
 			Padding = createElement("UIPadding", {
@@ -104,7 +105,7 @@ function ViewerComponent.render(self)
 				Position = UDim2.new(0, 0, 0),
 				Size = UDim2.new(0.1, 0, 0.1, 0),
 				Selectable = true,
-				[Roact.Event.MouseButton1Down] = p1.props.onClickClose
+				[Roact.Event.MouseButton1Down] = self.props.onClickClose
 			}, {
 				AspectRatio = createElement("UIAspectRatioConstraint", {
 					AspectRatio = 1
@@ -120,15 +121,15 @@ function ViewerComponent.render(self)
 				Camera = createElement(CCTV, {
 					size = UDim2.new(1, 0, 1, 0),
 					position = UDim2.new(0.5, 0, 0.5, 0),
-					distance = p1.props.distance,
-					aspectRatio = p1.props.aspectRatio,
-					cameraCFrame = t[p1.state.index],
-					fieldOfView = p1.props.fieldOfView,
-					disabled = t3[p1.state.index],
-					flash = p1.flash,
-					onCharacterEnter = function(p12)
-						CameraBinder:Get(p1.state.cameraParts[p1.state.index]):Spot(p12)
-						p1:_flash()
+					distance = self.props.distance,
+					aspectRatio = self.props.aspectRatio,
+					cameraCFrame = cameraCFrameList[self.state.index],
+					fieldOfView = self.props.fieldOfView,
+					disabled = isDisabledList[self.state.index],
+					flash = self.flash,
+					onCharacterEnter = function(character)
+						CameraBinder:Get(self.state.cameraParts[self.state.index]):Spot(character)
+						self:_flash()
 					end
 				}),
 				Number = createElement("Frame", {
@@ -150,7 +151,7 @@ function ViewerComponent.render(self)
 						Position = UDim2.new(0.5, 0, 0.6, 0),
 						TextColor3 = Color3.new(255/255, 255/255, 255/255),
 						TextScaled = true,
-						Text = ("%02d/%02d"):format(p1.state.index, #t),
+						Text = ("%02d/%02d"):format(self.state.index, #cameraCFrameList),
 						Font = Enum.Font.LuckiestGuy
 					})
 				}),
@@ -173,7 +174,7 @@ function ViewerComponent.render(self)
 						Position = UDim2.new(0.5, 0, 0.6, 0),
 						TextColor3 = Color3.new(255/255, 255/255, 255/255),
 						TextScaled = true,
-						Text = t2[p1.state.index],
+						Text = cameraNameList[self.state.index],
 						Font = Enum.Font.LuckiestGuy,
 						TextXAlignment = Enum.TextXAlignment.Left
 					})
@@ -199,8 +200,8 @@ function ViewerComponent.render(self)
 					LayoutOrder = 100,
 					Text = "",
 					[Roact.Event.MouseButton1Down] = function()
-						p1:setState({
-							index = (p1.state.index + 1 - 1) % #t + 1
+						self:setState({
+							index = (self.state.index + 1 - 1) % #cameraCFrameList + 1
 						})
 					end
 				}, {
@@ -226,8 +227,8 @@ function ViewerComponent.render(self)
 					LayoutOrder = 101,
 					Text = "",
 					[Roact.Event.MouseButton1Down] = function()
-						p1:setState({
-							index = (p1.state.index - 1 - 1) % #t + 1
+						self:setState({
+							index = (self.state.index - 1 - 1) % #cameraCFrameList + 1
 						})
 					end
 				}, {

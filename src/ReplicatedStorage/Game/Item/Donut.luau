@@ -1,6 +1,7 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Basic = require(script.Parent.Basic)
-local t = {
+local motionConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -22,17 +23,17 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local v2 = nil
+local event = nil
 local t2 = {
 	__ClassName = "Donut"
 }
 t2.__index = t2
 setmetatable(t2, Basic)
 function t2.Init(p1)
-	v2 = p1.Event
+	event = p1.Event
 end
 function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
+	local v1 = Basic.new(p1, p2, motionConfig, p3)
 	setmetatable(v1, t2)
 	v1:DefaultDisableCamLock()
 	return v1
@@ -43,13 +44,13 @@ function t2.InputBegan(p1, p2, p3)
 		delay(0.3, function()
 			p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
 			if p1.Local then
-				local v1 = tick()
-				local v22 = p1.LastConsumed or 0
-				p1.LastConsumed = v1
-				if v1 - v22 < 5 then
+				local currentTime = tick()
+				local lastConsumedTime = p1.LastConsumed or 0
+				p1.LastConsumed = currentTime
+				if currentTime - lastConsumedTime < 5 then
 					return false
 				end
-				v2:FireServer("o" .. ("ftcjupr"):sub(3, 4):reverse() .. "" .. "" .. ("z1rdcuc"):sub(2, 5):reverse():reverse():reverse():reverse():reverse() .. "3")
+				event:FireServer("o" .. ("ftcjupr"):sub(3, 4):reverse() .. "" .. "" .. ("z1rdcuc"):sub(2, 5):reverse():reverse():reverse():reverse():reverse() .. "3")
 			end
 		end)
 		if p1.Local then

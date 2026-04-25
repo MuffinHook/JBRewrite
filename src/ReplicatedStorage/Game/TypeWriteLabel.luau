@@ -1,23 +1,24 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
-return function(p1, p2, p3, p4)
-	p2.Text = p1
-	p2.MaxVisibleGraphemes = 0
-	local v1 = os.clock()
-	local v2 = utf8.len(p1)
-	local v3 = v2 / (p3 or 25)
-	local v4 = nil
-	v4 = RunService.Heartbeat:Connect(function()
-		local v12 = (os.clock() - v1) / v3
-		if v12 > 1 then
-			v4:Disconnect()
-			v12 = 1
+return function(textContent, textLabel, charsPerSecond, onProgressCallback)
+	textLabel.Text = textContent
+	textLabel.MaxVisibleGraphemes = 0
+	local startTime = os.clock()
+	local totalCharCount = utf8.len(textContent)
+	local totalDuration = totalCharCount / (charsPerSecond or 25)
+	local heartbeatConnection = nil
+	heartbeatConnection = RunService.Heartbeat:Connect(function()
+		local animationProgress = (os.clock() - startTime) / totalDuration
+		if animationProgress > 1 then
+			heartbeatConnection:Disconnect()
+			animationProgress = 1
 		end
-		local v22 = v12 * v2
-		p2.MaxVisibleGraphemes = v22
-		if p4 then
-			p4(v22)
+		local visibleCharCount = animationProgress * totalCharCount
+		textLabel.MaxVisibleGraphemes = visibleCharCount
+		if onProgressCallback then
+			onProgressCallback(visibleCharCount)
 		end
 	end)
-	return v4
+	return heartbeatConnection
 end

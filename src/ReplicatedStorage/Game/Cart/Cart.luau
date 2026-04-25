@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -16,77 +17,77 @@ local t = {}
 t.__index = t
 t.__ClassName = "Cart"
 function t.new(p1)
-	local t2 = {}
-	setmetatable(t2, t)
+	local instance = {}
+	setmetatable(instance, t)
 	RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
-	t2._maid = Maid.new()
-	t2._obj = p1
-	t2._firstSegmentValue = p1:WaitForChild(CartConsts.FIRST_SEGMENT_VALUE_NAME)
-	t2._secondSegmentValue = p1:WaitForChild(CartConsts.SECOND_SEGMENT_VALUE_NAME)
-	t2._graphValue = p1:WaitForChild(CartConsts.GRAPH_VALUE_NAME)
-	t2._offsetValue = p1:WaitForChild(CartConsts.OFFSET_VALUE_NAME)
-	t2._updatedAtValue = p1:WaitForChild(CartConsts.UPDATED_AT_VALUE_NAME)
-	t2._seatOwnedPartValue = p1:WaitForChild(CartConsts.SEAT_OWNED_PART_VALUE_NAME)
-	t2._yOffset = 1
-	t2._graph = nil
+	instance._maid = Maid.new()
+	instance._obj = p1
+	instance._firstSegmentValue = p1:WaitForChild(CartConsts.FIRST_SEGMENT_VALUE_NAME)
+	instance._secondSegmentValue = p1:WaitForChild(CartConsts.SECOND_SEGMENT_VALUE_NAME)
+	instance._graphValue = p1:WaitForChild(CartConsts.GRAPH_VALUE_NAME)
+	instance._offsetValue = p1:WaitForChild(CartConsts.OFFSET_VALUE_NAME)
+	instance._updatedAtValue = p1:WaitForChild(CartConsts.UPDATED_AT_VALUE_NAME)
+	instance._seatOwnedPartValue = p1:WaitForChild(CartConsts.SEAT_OWNED_PART_VALUE_NAME)
+	instance._yOffset = 1
+	instance._graph = nil
 	local function decodeGraphStr()
-		local _graphValue = t2._graphValue.Value
+		local _graphValue = instance._graphValue.Value
 		if _graphValue then
-			t2._graph = HttpService:JSONDecode(_graphValue)
+			instance._graph = HttpService:JSONDecode(_graphValue)
 		else
-			t2._graph = nil
+			instance._graph = nil
 		end
 	end
-	local _graphValue = t2._graphValue.Value
+	local _graphValue = instance._graphValue.Value
 	if _graphValue then
-		t2._graph = HttpService:JSONDecode(_graphValue)
+		instance._graph = HttpService:JSONDecode(_graphValue)
 	else
-		t2._graph = nil
+		instance._graph = nil
 	end
-	t2._maid:GiveTask(t2._graphValue.Changed:Connect(decodeGraphStr))
-	t2._maid:GiveTask(t2._firstSegmentValue.Changed:Connect(function()
-		t2:_onSegmentUpdate()
+	instance._maid:GiveTask(instance._graphValue.Changed:Connect(decodeGraphStr))
+	instance._maid:GiveTask(instance._firstSegmentValue.Changed:Connect(function()
+		instance:_onSegmentUpdate()
 	end))
-	t2._maid:GiveTask(t2._secondSegmentValue.Changed:Connect(function()
-		t2:_onSegmentUpdate()
+	instance._maid:GiveTask(instance._secondSegmentValue.Changed:Connect(function()
+		instance:_onSegmentUpdate()
 	end))
-	t2:_onSegmentUpdate()
-	t2._maid._seatMaid = Maid.new()
-	local v2 = nil
+	instance:_onSegmentUpdate()
+	instance._maid._seatMaid = Maid.new()
+	local seatPromise = nil
 	local function onOwnedPart(p1)
-		if v2 then
-			v2:cancel()
-			v2 = nil
+		if seatPromise then
+			seatPromise:cancel()
+			seatPromise = nil
 		end
-		t2._ownedPartSeat = nil
+		instance._ownedPartSeat = nil
 		if p1 then
-			t2._maid._onSeated = RxInstanceUtils.observeOneChildNamed(p1, "SeatWeld", function(p1, p2)
-				local v1
-				if p1 then
-					local Part0 = p1.Part0
+			instance._maid._onSeated = RxInstanceUtils.observeOneChildNamed(p1, "SeatWeld", function(weld, maid)
+				local character
+				if weld then
+					local Part0 = weld.Part0
 					assert(Part0:IsA("BasePart"))
-					v1 = Part0.Parent
-					assert(v1 and v1:IsA("Model"), "SeatWeld.Part0.Parent was a: " .. (v1 and v1.ClassName or "nil"))
+					character = Part0.Parent
+					assert(character and character:IsA("Model"), "SeatWeld.Part0.Parent was a: " .. (character and character.ClassName or "nil"))
 				else
-					v1 = nil
+					character = nil
 				end
-				p2:GiveTask(function()
-					t2._maid._seatMaid:DoCleaning()
-					t2:_onSeated(nil, t2._maid._seatMaid)
+				maid:GiveTask(function()
+					instance._maid._seatMaid:DoCleaning()
+					instance:_onSeated(nil, instance._maid._seatMaid)
 				end)
-				t2._maid._seatMaid:DoCleaning()
-				t2:_onSeated(v1, t2._maid._seatMaid)
+				instance._maid._seatMaid:DoCleaning()
+				instance:_onSeated(character, instance._maid._seatMaid)
 			end)
-			v2 = BinderUtils.promiseBoundClass(OwnedPartBinder, p1):andThen(function(p1)
-				t2._ownedPartSeat = p1
+			seatPromise = BinderUtils.promiseBoundClass(OwnedPartBinder, p1):andThen(function(p1)
+				instance._ownedPartSeat = p1
 			end)
 		else
-			t2._maid._onSeated = nil
+			instance._maid._onSeated = nil
 		end
 	end
-	onOwnedPart(t2._seatOwnedPartValue.Value)
-	t2._maid:GiveTask(t2._seatOwnedPartValue.Changed:Connect(onOwnedPart))
-	return t2
+	onOwnedPart(instance._seatOwnedPartValue.Value)
+	instance._maid:GiveTask(instance._seatOwnedPartValue.Changed:Connect(onOwnedPart))
+	return instance
 end
 function t.GetOnSeatedSignal(p1)
 	if not p1._onSeatedSignal then
@@ -100,17 +101,17 @@ function t._onSeated(p1, p2, p3)
 		local Humanoid = p2:FindFirstChild("Humanoid")
 		CharacterUtil.stopAnims(Humanoid)
 		Humanoid.Sit = true
-		local v1 = Humanoid:FindFirstChildOfClass("Animator"):LoadAnimation(ReplicatedStorage.Resource.CartSitAnimation)
+		local animation = Humanoid:FindFirstChildOfClass("Animator"):LoadAnimation(ReplicatedStorage.Resource.CartSitAnimation)
 		CharacterUtil.setHumanoidEnabled(Humanoid, false)
-		v1:AdjustSpeed(0)
-		v1:Play()
+		animation:AdjustSpeed(0)
+		animation:Play()
 		p3:GiveTask(function()
 			Humanoid.Sit = false
 		end)
 		p3:GiveTask(function()
-			v1:Stop()
+			animation:Stop()
 		end)
-		p3:GiveTask(v1)
+		p3:GiveTask(animation)
 		p3:GiveTask(function()
 			CharacterUtil.setHumanoidEnabled(Humanoid, true)
 		end)
@@ -131,13 +132,13 @@ function t.GetSecondSegment(p1)
 end
 function t._startUpdate(p1)
 	p1._maid._updateLoop = RunService.Heartbeat:Connect(function()
-		local v1 = Time.GetNowSync() - p1:GetUpdatedAt()
-		local v2 = GraphUtils.calculateDist(p1._graph, v1) + p1:GetOffset()
-		local v3, v4 = CartUtils.calculateSegment(p1._rail, v2 - 1.5)
-		local v5 = CartUtils.calculatePosition(p1._rail, v3, v4)
-		local v6, v7 = CartUtils.calculateSegment(p1._rail, v2 + 1.5)
-		local v8 = CartUtils.calculatePosition(p1._rail, v6, v7)
-		p1._obj.PrimaryPart.CFrame = CFrame.lookAt(Vector3.new(), v8 - v5) * CFrame.new(0, p1._yOffset, 0) + (v5 + v8) * 0.5
+		local elapsedTime = Time.GetNowSync() - p1:GetUpdatedAt()
+		local distance = GraphUtils.calculateDist(p1._graph, elapsedTime) + p1:GetOffset()
+		local segment1Index, segment1Progress = CartUtils.calculateSegment(p1._rail, distance - 1.5)
+		local backPos = CartUtils.calculatePosition(p1._rail, segment1Index, segment1Progress)
+		local segment2Index, segment2Progress = CartUtils.calculateSegment(p1._rail, distance + 1.5)
+		local frontPos = CartUtils.calculatePosition(p1._rail, segment2Index, segment2Progress)
+		p1._obj.PrimaryPart.CFrame = CFrame.lookAt(Vector3.new(), frontPos - backPos) * CFrame.new(0, p1._yOffset, 0) + (backPos + frontPos) * 0.5
 		if p1._ownedPartSeat then
 			p1._ownedPartSeat._obj.CFrame = p1._obj:FindFirstChild("Seat").CFrame
 			p1._ownedPartSeat._obj.AssemblyLinearVelocity = Vector3.new()
@@ -145,18 +146,18 @@ function t._startUpdate(p1)
 	end)
 end
 function t._onSegmentUpdate(p1)
-	local v1 = p1:GetFirstSegment()
-	if v1 then
-		local v2 = p1:GetSecondSegment()
-		if v2 then
-			p1._rail = CartUtils.computeRail(v1, v2)
+	local firstSegment = p1:GetFirstSegment()
+	if firstSegment then
+		local secondSegment = p1:GetSecondSegment()
+		if secondSegment then
+			p1._rail = CartUtils.computeRail(firstSegment, secondSegment)
 			p1:_startUpdate()
 			p1._maid.railUpdateMaid = Maid.new()
-			for i, v in ipairs(p1._rail.listSegment) do
-				p1._maid.railUpdateMaid:GiveTask(v._front.Changed:Connect(function()
+			for i, segment in ipairs(p1._rail.listSegment) do
+				p1._maid.railUpdateMaid:GiveTask(segment._front.Changed:Connect(function()
 					p1:_onSegmentUpdate()
 				end))
-				p1._maid.railUpdateMaid:GiveTask(v._back.Changed:Connect(function()
+				p1._maid.railUpdateMaid:GiveTask(segment._back.Changed:Connect(function()
 					p1:_onSegmentUpdate()
 				end))
 			end

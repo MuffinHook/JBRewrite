@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Module.R15IKv2)
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -24,24 +25,24 @@ local function getNumActiveSmokeGrenade(p1)
 	return count
 end
 local function randomVector()
-	local v1 = math.random() * 2 - 1
-	local v2 = math.random() * 2 - 1
-	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
+	local randomX = math.random() * 2 - 1
+	local randomY = math.random() * 2 - 1
+	return Vector3.new(randomX, randomY, math.random() * 2 - 1).Unit
 end
-local v2 = nil
+local eventSignal = nil
 local t = {
 	__ClassName = "SmokeGrenade"
 }
 t.__index = t
 setmetatable(t, Gun)
 function t.Init(p1)
-	v2 = p1.Event
+	eventSignal = p1.Event
 end
 function t.new(p1, p2, p3)
-	local v1 = Gun.new(p1, p2, p3)
-	setmetatable(v1, t)
-	v1:Setup(p3)
-	return v1
+	local gun = Gun.new(p1, p2, p3)
+	setmetatable(gun, t)
+	gun:Setup(p3)
+	return gun
 end
 t.ApplySkin = false
 function t.SetupArmWelds(p1)  end
@@ -56,7 +57,7 @@ end
 function t.BulletEmitterOnLocalHitPlayer(p1)  end
 function t.ShootBegin(p1, p2)
 	tick()
-	local v1
+	local grenadeInstance
 	if p1.Local then
 		if getNumActiveSmokeGrenade(p1.Player) >= 1 then
 			Notification.new({
@@ -64,30 +65,30 @@ function t.ShootBegin(p1, p2)
 			})
 			error("Too many SmokeGrenade, detonate before launching more.")
 		end
-		local v22 = getThrowableSmokeGrenade(p1.Player)
-		if not v22 then
+		local throwableGrenade = getThrowableSmokeGrenade(p1.Player)
+		if not throwableGrenade then
 			error("No throwable SmokeGrenade left in pool")
 		end
-		v1 = v22
+		grenadeInstance = throwableGrenade
 	else
-		v1 = nil
+		grenadeInstance = nil
 	end
 	if not p1:ShootCheckConditions() then
 		return false
 	end
 	if p1.Local then
-		local v3 = p1.UpperTorso.CFrame * Vector3.new(0, 0, -2)
-		local v4, _ = SimulatedPhysicsProjectile.CalculateVelocityToHitTargetWithSpeed(v3, p1.MousePosition, 100, workspace.Gravity, false)
-		v1._obj.PrimaryPart.Anchored = false
-		v1._obj:SetPrimaryPartCFrame(CFrame.new(v3, v3 + v4))
-		v1:SetVelocity(v4)
-		local v5 = -0.25 * v4:Cross(Vector3.new(0, 1, 0))
-		v1:SetRotVelocity(v5 + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 5)
-		v1:SetThrown(true)
-		v1._maid:GiveTask(function()  end)
+		local launchOrigin = p1.UpperTorso.CFrame * Vector3.new(0, 0, -2)
+		local launchVelocity, _ = SimulatedPhysicsProjectile.CalculateVelocityToHitTargetWithSpeed(launchOrigin, p1.MousePosition, 100, workspace.Gravity, false)
+		grenadeInstance._obj.PrimaryPart.Anchored = false
+		grenadeInstance._obj:SetPrimaryPartCFrame(CFrame.new(launchOrigin, launchOrigin + launchVelocity))
+		grenadeInstance:SetVelocity(launchVelocity)
+		local rotationAxis = -0.25 * launchVelocity:Cross(Vector3.new(0, 1, 0))
+		grenadeInstance:SetRotVelocity(rotationAxis + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 5)
+		grenadeInstance:SetThrown(true)
+		grenadeInstance._maid:GiveTask(function()  end)
 		p1:SetNextShotPossible()
 		p1:DecrementAmmo()
-		v2:FireServer("i" .. ("v3p4ig"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("tpzkady"):sub(2, 3):reverse():reverse():reverse() .. "6p5r")
+		eventSignal:FireServer("i" .. ("v3p4ig"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("tpzkady"):sub(2, 3):reverse():reverse():reverse() .. "6p5r")
 		p1:ReloadDropAmmoVisual()
 		delay(0.1, function()
 			if p1.Destroyed then

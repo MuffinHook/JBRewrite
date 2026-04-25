@@ -1,17 +1,18 @@
 -- Reviewed by Claude
+-- variables reassigned
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
-return function(p1)
-	local v1, v2 = Roact.createBinding("hello, world!")
+return function(parent)
+	local textBinding, setTextBinding = Roact.createBinding("hello, world!")
 	local TextButton = require(script.Parent.TextButton)
-	local v3 = Roact.mount(Roact.createElement(TextButton, {
+	local mountRef = Roact.mount(Roact.createElement(TextButton, {
 		size = UDim2.new(0.5, 0, 0, 30),
 		position = UDim2.new(0.25, 0, 0.5, 0),
-		text = v1,
-		onClick = function(p1, p2, p3)
-			v2(("click %d"):format(p3))
+		text = textBinding,
+		onClick = function(button, userInputState, inputObject)
+			setTextBinding(("click %d"):format(inputObject))
 		end
-	}), p1)
+	}), parent)
 	return function()
-		Roact.unmount(v3)
+		Roact.unmount(mountRef)
 	end
 end

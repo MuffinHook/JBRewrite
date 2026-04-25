@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 game:GetService("CollectionService")
@@ -12,8 +13,8 @@ local Time = require(ReplicatedStorage.Module.Time)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Maid_2 = require(ReplicatedStorage.Std.Maid)
 local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
-local v1 = nil
-local v2 = nil
+local bankEventSignal = nil
+local eventManager = nil
 local function PlaySound(p1, p2)
 	local Sound = Instance.new("Sound")
 	Sound.SoundId = ("rbxassetid://%d"):format(p2)
@@ -24,139 +25,139 @@ local function PlaySound(p1, p2)
 		game.Debris:AddItem(Sound, Sound.TimeLength)
 	end)
 end
-local t = {}
-t.__index = t
-function t.new(p1, p2)
+local RobberyBankClass = {}
+RobberyBankClass.__index = RobberyBankClass
+function RobberyBankClass.new(p1, p2)
 	assert(p1 ~= nil)
 	assert(p2 ~= nil)
-	local t2 = {}
-	setmetatable(t2, t)
-	local v4 = p2.Layout:GetChildren()[1]
-	assert(v4 ~= nil)
-	t2.ModelLayout = v4
-	t2.Maid = Maid_2.new()
-	t2.BornAtSync = p1
-	if t2.ModelLayout:FindFirstChild("Lasers") then
-		t2:SetupLasers(v4)
+	local instance = {}
+	setmetatable(instance, RobberyBankClass)
+	local layoutChild = p2.Layout:GetChildren()[1]
+	assert(layoutChild ~= nil)
+	instance.ModelLayout = layoutChild
+	instance.Maid = Maid_2.new()
+	instance.BornAtSync = p1
+	if instance.ModelLayout:FindFirstChild("Lasers") then
+		instance:SetupLasers(layoutChild)
 	end
-	return t2
+	return instance
 end
-function t.SetupLasers(p1, p2)
+function RobberyBankClass.SetupLasers(p1, p2)
 	local Lasers = p2:WaitForChild("Lasers")
 	assert(Lasers)
-	local t = {}
+	local laserTable = {}
 	for i, v in ipairs(Lasers:GetChildren()) do
 		if v.Name == "Laser" or (v.Name == "LaserWall" or v.Name == "LaserTrack") then
-			local v1 = 2
+			local laserPeriod = 2
 			if v.Name == "LaserWall" then
-				v1 = 5
+				laserPeriod = 5
 			elseif v.Name == "LaserTrack" then
-				v1 = 7
+				laserPeriod = 7
 			end
 			local Part = v:WaitForChild("Part", 3)
-			table.insert(t, {
+			table.insert(laserTable, {
 				Part = Part,
 				Origin = Part.CFrame,
 				Target = v.End.CFrame,
-				Period = v1
+				Period = laserPeriod
 			})
 		end
 	end
 	p1.Maid:GiveTask(RunService.Heartbeat:Connect(function()
-		local v1 = Time.GetNowSync() - p1.BornAtSync
-		for i, v in ipairs(t) do
-			v.Part.CFrame = v.Origin:lerp(v.Target, math.cos(v1 * (6.283185307179586 / v.Period)) * -0.5 + 0.5)
+		local elapsedTime = Time.GetNowSync() - p1.BornAtSync
+		for i, v in ipairs(laserTable) do
+			v.Part.CFrame = v.Origin:lerp(v.Target, math.cos(elapsedTime * (6.283185307179586 / v.Period)) * -0.5 + 0.5)
 		end
 	end))
 	p1.Maid:GiveTask(function()
-		for i, v in ipairs(t) do
+		for i, v in ipairs(laserTable) do
 			v.Part.CFrame = v.Origin
 		end
 	end)
 end
-function t.Destroy(p1)
+function RobberyBankClass.Destroy(p1)
 	p1.Maid:Destroy()
 	p1.Maid = nil
 end
 return {
 	Init = function(p1)
 		local em = p1.em
-		v1 = p1.Event
-		v2 = em
+		bankEventSignal = p1.Event
+		eventManager = em
 		local Sound = Instance.new("Sound")
 		Sound.SoundId = "rbxassetid://1848209466"
 		Sound.Looped = true
 		Sound.Volume = 0
 		Sound.SoundGroup = game:GetService("SoundService").RobberyMusic
 		Sound.Parent = LocalPlayer.PlayerGui
-		local v22 = nil
-		local v3 = nil
-		local v4 = nil
+		local soundFadeConnection = nil
+		local bankInstance = nil
+		local moneyRenderConnection = nil
 		function em.qqzqeh08(p1, p2, p3, p4)
-			if not v4 then
-				local v1 = nil
-				local v2 = p4:FindFirstChild(DuffelBagConsts.MAXIMUM_VALUE_NAME)
-				local v3 = p4:FindFirstChild(DuffelBagConsts.MULT_VALUE_NAME)
-				local v42 = p4:FindFirstChild(DuffelBagConsts.MULT_ENABLED_VALUE_NAME)
-				v4 = RunService.RenderStepped:Connect(function()
-					if not v1 then
-						v1 = DuffelBagBinder:Get(p4)
+			if not moneyRenderConnection then
+				local duffelBinder = nil
+				local maxValue = p4:FindFirstChild(DuffelBagConsts.MAXIMUM_VALUE_NAME)
+				local multValue = p4:FindFirstChild(DuffelBagConsts.MULT_VALUE_NAME)
+				local multEnabledValue = p4:FindFirstChild(DuffelBagConsts.MULT_ENABLED_VALUE_NAME)
+				moneyRenderConnection = RunService.RenderStepped:Connect(function()
+					if not duffelBinder then
+						duffelBinder = DuffelBagBinder:Get(p4)
 					end
-					if v1 and p4.Parent then
-						local v22 = math.floor(p2 + (workspace:GetServerTimeNow() - p1) * p3)
-						local v32 = v42.Value and math.ceil(v2.Value * v3.Value) or v2.Value
-						RobberyMoneyUI.SetMoney(math.clamp(v22, 0, v32), v32, true)
+					if duffelBinder and p4.Parent then
+						local currentMoney = math.floor(p2 + (workspace:GetServerTimeNow() - p1) * p3)
+						local maxMoney = multEnabledValue.Value and math.ceil(maxValue.Value * multValue.Value) or maxValue.Value
+						RobberyMoneyUI.SetMoney(math.clamp(currentMoney, 0, maxMoney), maxMoney, true)
 					end
 				end)
 			end
 		end
 		function em.jpukwdz9(p1)
-			if v4 then
-				v4:Disconnect()
-				v4 = nil
+			if moneyRenderConnection then
+				moneyRenderConnection:Disconnect()
+				moneyRenderConnection = nil
 			end
-			local v1 = p1 and p1:FindFirstChild(DuffelBagConsts.MULT_ENABLED_VALUE_NAME)
-			if v1 then
-				v1.Value = not v1.Value
-				v1.Value = not v1.Value
+			local multEnabledValue = p1 and p1:FindFirstChild(DuffelBagConsts.MULT_ENABLED_VALUE_NAME)
+			if multEnabledValue then
+				multEnabledValue.Value = not multEnabledValue.Value
+				multEnabledValue.Value = not multEnabledValue.Value
 			end
 		end
 		function em.d0ltid0f(p1, p2)
-			assert(v3 == nil)
+			assert(bankInstance == nil)
 			assert(p2 ~= nil)
-			v3 = t.new(p1, p2)
+			bankInstance = RobberyBankClass.new(p1, p2)
 			Audio.ObjectLocal(LocalPlayer, 1837831244)
 			delay(1, function()
 				Audio.ObjectLocal(LocalPlayer, 1843025542)
 			end)
-			if v22 ~= nil then
-				v22:Disconnect()
-				v22 = nil
+			if soundFadeConnection ~= nil then
+				soundFadeConnection:Disconnect()
+				soundFadeConnection = nil
 			end
 			if Sound.Playing == false then
 				Sound:Play()
 			end
-			v22 = Audio.FadeTo(Sound, 1, 5)
+			soundFadeConnection = Audio.FadeTo(Sound, 1, 5)
 		end
 		function em.zwfzfdnm()
-			if v3 ~= nil then
-				v3:Destroy()
-				v3 = nil
+			if bankInstance ~= nil then
+				bankInstance:Destroy()
+				bankInstance = nil
 			end
-			if v22 ~= nil then
-				v22:Disconnect()
-				v22 = nil
+			if soundFadeConnection ~= nil then
+				soundFadeConnection:Disconnect()
+				soundFadeConnection = nil
 			end
-			v22 = Audio.FadeTo(Sound, 0, 5, function()
+			soundFadeConnection = Audio.FadeTo(Sound, 0, 5, function()
 				Sound:Stop()
 			end)
-			if v4 then
-				v4:Disconnect()
-				v4 = nil
+			if moneyRenderConnection then
+				moneyRenderConnection:Disconnect()
+				moneyRenderConnection = nil
 			end
 		end
 		Binder.new("BankDoorEscapeRoute", function(p1)
-			local v12 = Maid.new()
+			local maid = Maid.new()
 			local t = {
 				Part = p1,
 				Name = "Place Dynamite",
@@ -165,7 +166,7 @@ return {
 				Dist = 8,
 				Callback = function(p12, p2)
 					if p2 then
-						v1:FireServer("b" .. ("uxo0p3bs0ymu4"):sub(5, 9):reverse() .. "pj", p1)
+						bankEventSignal:FireServer("b" .. ("uxo0p3bs0ymu4"):sub(5, 9):reverse() .. "pj", p1)
 					end
 					return true
 				end
@@ -174,12 +175,12 @@ return {
 				t.Enabled = p1:GetAttribute("Open") == nil
 			end
 			t.Enabled = p1:GetAttribute("Open") == nil
-			v12:GiveTask(CircleAction.Add(t, p1))
-			v12:GiveTask(p1:GetAttributeChangedSignal("Open"):Connect(update))
-			return v12
+			maid:GiveTask(CircleAction.Add(t, p1))
+			maid:GiveTask(p1:GetAttributeChangedSignal("Open"):Connect(update))
+			return maid
 		end):Start()
 		Binder.new("BankTopFloorButton", function(p1)
-			local v1 = Maid.new()
+			local maid = Maid.new()
 			local t = {
 				Part = p1,
 				Name = "Open Shutters",
@@ -199,9 +200,9 @@ return {
 				t.Enabled = p1:GetAttribute("ButtonDisabled") ~= true
 			end
 			t.Enabled = p1:GetAttribute("ButtonDisabled") ~= true
-			v1:GiveTask(CircleAction.Add(t, p1))
-			v1:GiveTask(p1:GetAttributeChangedSignal("ButtonDisabled"):Connect(update))
-			return v1
+			maid:GiveTask(CircleAction.Add(t, p1))
+			maid:GiveTask(p1:GetAttributeChangedSignal("ButtonDisabled"):Connect(update))
+			return maid
 		end):Start()
 	end
 }

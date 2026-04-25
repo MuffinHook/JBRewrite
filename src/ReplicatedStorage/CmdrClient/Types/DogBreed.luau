@@ -1,22 +1,23 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Util = require(ReplicatedStorage.CmdrClient.Shared.Util)
 local LIST_BREED = require(ReplicatedStorage.Game.Dog.DogConsts).LIST_BREED
-local v1 = Util.MakeFuzzyFinder(LIST_BREED)
+local fuzzyFinder = Util.MakeFuzzyFinder(LIST_BREED)
 local t = {
-	Transform = function(p1)
-		return v1(p1)
+	Transform = function(input)
+		return fuzzyFinder(input)
 	end,
-	Validate = function(p1)
-		return #p1 > 0, "No valid breeds with that name could be found."
+	Validate = function(input)
+		return #input > 0, "No valid breeds with that name could be found."
 	end,
-	Autocomplete = function(p1)
-		return p1
+	Autocomplete = function(input)
+		return input
 	end,
-	Parse = function(p1)
-		return p1[1]
+	Parse = function(input)
+		return input[1]
 	end
 }
-return function(p1)
-	p1:RegisterType("dogbreed", t)
+return function(registry)
+	registry:RegisterType("dogbreed", t)
 end

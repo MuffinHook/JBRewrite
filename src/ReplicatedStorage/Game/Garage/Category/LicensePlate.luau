@@ -1,10 +1,11 @@
 -- Reviewed by Claude
+-- variables reassigned
 return function(p1)
 	local Model = p1.Model
 	if Model then
-		local Model_2 = Model:FindFirstChild("Model")
-		if Model_2 then
-			return Model_2:FindFirstChild("plate")
+		local modelChild = Model:FindFirstChild("Model")
+		if modelChild then
+			return modelChild:FindFirstChild("plate")
 		end
 	end
 end

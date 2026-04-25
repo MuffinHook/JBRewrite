@@ -1,4 +1,5 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local Roact = require(ReplicatedStorage.Roact)
@@ -36,16 +37,16 @@ function v1.didMount(p1)
 	end))
 end
 function v1.render(p1)
-	local v1 = p1.props.endTime - workspace:GetServerTimeNow()
-	if v1 < 0 then
-		v1 = 0
+	local elapsedTime = p1.props.endTime - workspace:GetServerTimeNow()
+	if elapsedTime < 0 then
+		elapsedTime = 0
 	end
-	local v3 = p1.props.timeFormatFunc((math.round(v1)))
-	local t2 = {}
-	local t3 = {
+	local formattedTime = p1.props.timeFormatFunc((math.round(elapsedTime)))
+	local textLabelChildren = {}
+	local textLabelProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1.5),
-		Text = p1.props.prefix .. tostring(v3) .. p1.props.suffix,
+		Text = p1.props.prefix .. tostring(formattedTime) .. p1.props.suffix,
 		TextColor3 = p1.props.textColor,
 		TextScaled = true,
 		Position = UDim2.fromScale(0.5, 0.5),
@@ -54,12 +55,12 @@ function v1.render(p1)
 		TextXAlignment = p1.props.textXAlignment,
 		TextYAlignment = p1.props.textYAlignment
 	}
-	local t4 = {}
-	t4.Stroke = if p1.props.strokeThickness > 0 then createElement("UIStroke", {
+	local strokeProps = {}
+	strokeProps.Stroke = if p1.props.strokeThickness > 0 then createElement("UIStroke", {
 	Thickness = p1.props.strokeThickness,
 	Color = p1.props.strokeColor
 }) else false
-	t2.Title = createElement("TextLabel", t3, t4)
+	textLabelChildren.Title = createElement("TextLabel", textLabelProps, strokeProps)
 	return createElement(PaddedContainer, {
 		backgroundTransparency = p1.props.backgroundTransparency,
 		size = p1.props.size,
@@ -73,7 +74,7 @@ function v1.render(p1)
 		paddingBottom = p1.props.paddingBottom,
 		paddingNone = p1.props.paddingNone,
 		zIndex = p1.props.zIndex
-	}, t2)
+	}, textLabelChildren)
 end
 function v1.willUnmount(p1)
 	p1.maid:Destroy()

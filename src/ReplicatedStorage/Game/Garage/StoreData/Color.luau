@@ -1,9 +1,10 @@
 -- Reviewed by Claude
+-- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
 local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConsts)
-local t = {
+local colorsList = {
 	{
 		Name = "SnowWhite",
 		Hidden = true,
@@ -237,24 +238,24 @@ local t = {
 	}
 }
 for v1, v2 in HyperChromeUtils.getListOfHyperChromeNames() do
-	table.insert(t, 1, {
+	table.insert(colorsList, 1, {
 		Name = v2,
 		Hidden = true,
 		HiddenAll = true
 	})
 end
-table.insert(t, 1, {
+table.insert(colorsList, 1, {
 	Name = HyperChromeConsts.COLOR_SHIFT_NAME,
 	Hidden = true,
 	HiddenAll = true,
 	NoTrade = true
 })
-local function Update(p1, p2)
-	local v1 = os.clock() / 2
-	p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+local function Update(colorPart, p2)
+	local timeAngle = os.clock() / 2
+	colorPart.CFrame = CFrame.Angles(0, timeAngle % 6.283185307179586, 0) * CFrame.Angles(math.sin(timeAngle) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 end
 return {
-	Items = t,
+	Items = colorsList,
 	GetInstance = function(p1)
 		local Part = Instance.new("Part")
 		Part.Shape = Enum.PartType.Ball

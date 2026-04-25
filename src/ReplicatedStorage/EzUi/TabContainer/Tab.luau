@@ -1,54 +1,55 @@
 -- Reviewed by Claude
-local v1 = script:FindFirstAncestor("EzUi")
-local ColorUtils = require(v1.Parent.Std.ColorUtils)
-local Roact = require(v1.Parent.Roact)
+-- variables reassigned
+local ezUiAncestor = script:FindFirstAncestor("EzUi")
+local ColorUtils = require(ezUiAncestor.Parent.Std.ColorUtils)
+local Roact = require(ezUiAncestor.Parent.Roact)
 local createElement = Roact.createElement
 local v2 = Roact.PureComponent:extend("Tab")
-function v2.init(p1)
-	p1:setState({
+function v2.init(component)
+	component:setState({
 		hover = false
 	})
 end
-function v2.render(p1)
-	local v1 = p1.props.active and p1.props.backgroundColor or (p1.state.hover and ColorUtils.brightenTo(p1.props.backgroundColor, 0.4) or ColorUtils.brightenTo(p1.props.backgroundColor, 0.2))
-	local t = {
-		Size = p1.props.scaleXBinding:map(function(p12)
-			return UDim2.new(p12, -p1.props.paddingX, 1, 0)
+function v2.render(component)
+	local buttonColor = component.props.active and component.props.backgroundColor or (component.state.hover and ColorUtils.brightenTo(component.props.backgroundColor, 0.4) or ColorUtils.brightenTo(component.props.backgroundColor, 0.2))
+	local buttonProps = {
+		Size = component.props.scaleXBinding:map(function(p12)
+			return UDim2.new(p12, -component.props.paddingX, 1, 0)
 		end),
 		BorderSizePixel = 0,
 		BackgroundTransparency = 0,
-		BackgroundColor3 = v1,
-		LayoutOrder = p1.props.layoutOrder,
+		BackgroundColor3 = buttonColor,
+		LayoutOrder = component.props.layoutOrder,
 		Text = "",
 		AutoButtonColor = false,
-		[Roact.Event.MouseButton1Down] = p1.props.onClick,
+		[Roact.Event.MouseButton1Down] = component.props.onClick,
 		[Roact.Event.MouseEnter] = function()
-			p1:setState({
+			component:setState({
 				hover = true
 			})
 		end,
 		[Roact.Event.MouseLeave] = function()
-			p1:setState({
+			component:setState({
 				hover = false
 			})
 		end
 	}
-	local t2 = {
+	local buttonChildren = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 6)
 		})
 	}
-	local t3 = {
+	local titleProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0.6, 0, 0.6, 0),
 		Position = UDim2.new(0.2, 0, 0.2, 0),
-		Text = p1.props.title,
+		Text = component.props.title,
 		Font = Enum.Font.LuckiestGuy,
 		LineHeight = 0.7,
 		TextScaled = true
 	}
-	t3.TextColor3 = p1.props.active and Color3.new(255/255, 255/255, 255/255) or ColorUtils.saturateTo(ColorUtils.brightenBy(v1, 2), 0)
-	t2.Title = createElement("TextLabel", t3)
-	return createElement("TextButton", t, t2)
+	titleProps.TextColor3 = component.props.active and Color3.new(255/255, 255/255, 255/255) or ColorUtils.saturateTo(ColorUtils.brightenBy(buttonColor, 2), 0)
+	buttonChildren.Title = createElement("TextLabel", titleProps)
+	return createElement("TextButton", buttonProps, buttonChildren)
 end
 return v2
