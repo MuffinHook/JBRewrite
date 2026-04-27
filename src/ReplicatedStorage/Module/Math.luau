@@ -56,7 +56,7 @@ function MathModule.Spring(spring, currentTime)
 		local dampingFactor = (1 - damping * damping) ^ 0.5
 		local positionDelta = position - target
 		local intermediateValue = (damping * positionDelta + velocity / stiffness) / dampingFactor
-		local exponentialDecay = 2.718281828459045 ^ (-damping * stiffness * elapsedTime)
+		local exponentialDecay = math.exp(1) ^ (-damping * stiffness * elapsedTime)
 		local cosComponent = cos(dampingFactor * stiffness * elapsedTime)
 		local sinComponent = sin(dampingFactor * stiffness * elapsedTime)
 		return target + (positionDelta * cosComponent + intermediateValue * sinComponent) * exponentialDecay, ((positionDelta * damping - damping * intermediateValue - velocity) * cosComponent + (positionDelta * dampingFactor + intermediateValue * damping) * sinComponent) * -exponentialDecay
@@ -64,7 +64,7 @@ function MathModule.Spring(spring, currentTime)
 	if not (damping > 1) then
 		local positionDelta = position - target
 		local intermediateValue = positionDelta + velocity / stiffness
-		local exponentialDecay = 2.718281828459045 ^ (-stiffness * elapsedTime)
+		local exponentialDecay = math.exp(1) ^ (-stiffness * elapsedTime)
 		return target + (positionDelta + intermediateValue * stiffness * elapsedTime) * exponentialDecay, stiffness * (intermediateValue - positionDelta - intermediateValue * stiffness * elapsedTime) * exponentialDecay
 	end
 	assert(false, "not implemented")
@@ -476,7 +476,7 @@ function MathModule.Uniform2D(radius)
 	else
 		swappedValue = randomRadius
 	end
-	return createVector3(randomAngle * radius * cos(6.283185307179586 * swappedValue / randomAngle), randomAngle * radius * sin(6.283185307179586 * swappedValue / randomAngle), 0)
+	return createVector3(randomAngle * radius * cos(math.tau * swappedValue / randomAngle), randomAngle * radius * sin(math.tau * swappedValue / randomAngle), 0)
 end
 local randomGenerator = Random.new()
 function MathModule.WeightedRandom(weights)

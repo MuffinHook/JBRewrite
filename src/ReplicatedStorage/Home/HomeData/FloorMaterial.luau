@@ -22,7 +22,7 @@ local FloorMaterialModule = {
 	end,
 	updateCamera = function(camera, p2)
 		local progress = os.clock() / 2
-		camera.CFrame = CFrame.Angles(0, progress % 6.283185307179586, 0) * CFrame.Angles(math.sin(progress) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+		camera.CFrame = CFrame.Angles(0, progress % math.tau, 0) * CFrame.Angles(math.sin(progress) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 	end
 }
 local floorMaterials = {

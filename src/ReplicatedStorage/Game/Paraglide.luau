@@ -184,7 +184,7 @@ local function RawGlider()
 						}
 						local BodyGyro = Instance.new("BodyGyro")
 						BodyGyro.MaxTorque = Vector3.new(inf, inf, inf)
-						BodyGyro.CFrame = CurrentCamera.CFrame * CFrame.Angles(-1.5707963267948966, 0, 0)
+						BodyGyro.CFrame = CurrentCamera.CFrame * CFrame.Angles(-math.pi / 2, 0, 0)
 						BodyGyro.Parent = PrimaryPart
 						local BodyVelocity = Instance.new("BodyVelocity")
 						BodyVelocity.MaxForce = Vector3.new(1000000, 1000000, 1000000)

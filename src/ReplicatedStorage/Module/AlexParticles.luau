@@ -28,7 +28,7 @@ local function RandomVector(magnitude)
 	else
 		maxRandom = randomX
 	end
-	return vector2(randomY * magnitude * cos(6.283185307179586 * maxRandom / randomY), randomY * magnitude * sin(6.283185307179586 * maxRandom / randomY), 0)
+	return vector2(randomY * magnitude * cos(math.tau * maxRandom / randomY), randomY * magnitude * sin(math.tau * maxRandom / randomY), 0)
 end
 local function MakeState()
 	return {
@@ -89,7 +89,7 @@ local function Explosion(state, position)
 		else
 			angleRadians = randomValue1
 		end
-		local primaryParticle = Single(state, position, vector2(randomValue2 * speed * cos(6.283185307179586 * angleRadians / randomValue2), randomValue2 * speed * sin(6.283185307179586 * angleRadians / randomValue2), 0), Vector3.new(0, 0, 0))
+		local primaryParticle = Single(state, position, vector2(randomValue2 * speed * cos(math.tau * angleRadians / randomValue2), randomValue2 * speed * sin(math.tau * angleRadians / randomValue2), 0), Vector3.new(0, 0, 0))
 		primaryParticle.ttl = 1
 		primaryParticle.Frame.BackgroundColor3 = explosionColor
 	end
@@ -103,7 +103,7 @@ local function Explosion(state, position)
 		else
 			secondaryAngle = randomComponent1
 		end
-		local secondaryParticle = Single(state, position, vector2(randomComponent2 * 100 * cos(6.283185307179586 * secondaryAngle / randomComponent2), randomComponent2 * 100 * sin(6.283185307179586 * secondaryAngle / randomComponent2), 0), Vector3.new(0, 0, 0))
+		local secondaryParticle = Single(state, position, vector2(randomComponent2 * 100 * cos(math.tau * secondaryAngle / randomComponent2), randomComponent2 * 100 * sin(math.tau * secondaryAngle / randomComponent2), 0), Vector3.new(0, 0, 0))
 		secondaryParticle.ttl = 1.5
 		secondaryParticle.Frame.BackgroundColor3 = secondaryColor
 	end
@@ -164,7 +164,7 @@ local function Update(state, deltaTime)
 				else
 					burstAngle = burstRand1
 				end
-				local burstParticle = Single(state, firework.position, vector2(burstRand2 * burstSpeed * cos(6.283185307179586 * burstAngle / burstRand2), burstRand2 * burstSpeed * sin(6.283185307179586 * burstAngle / burstRand2), 0), Vector3.new(0, 0, 0))
+				local burstParticle = Single(state, firework.position, vector2(burstRand2 * burstSpeed * cos(math.tau * burstAngle / burstRand2), burstRand2 * burstSpeed * sin(math.tau * burstAngle / burstRand2), 0), Vector3.new(0, 0, 0))
 				burstParticle.ttl = 1
 				burstParticle.Frame.BackgroundColor3 = burstColor
 			end
@@ -178,7 +178,7 @@ local function Update(state, deltaTime)
 				else
 					trailAngle = trailRand1
 				end
-				local trailParticle = Single(state, firework.position, vector2(trailRand2 * 100 * cos(6.283185307179586 * trailAngle / trailRand2), trailRand2 * 100 * sin(6.283185307179586 * trailAngle / trailRand2), 0), Vector3.new(0, 0, 0))
+				local trailParticle = Single(state, firework.position, vector2(trailRand2 * 100 * cos(math.tau * trailAngle / trailRand2), trailRand2 * 100 * sin(math.tau * trailAngle / trailRand2), 0), Vector3.new(0, 0, 0))
 				trailParticle.ttl = 1.5
 				trailParticle.Frame.BackgroundColor3 = trailColor
 			end
@@ -190,7 +190,7 @@ local function Update(state, deltaTime)
 		else
 			fireworkTrailAngle = streamRand1
 		end
-		Single(state, firework.position, vector2(streamRand2 * 60 * cos(6.283185307179586 * fireworkTrailAngle / streamRand2), streamRand2 * 60 * sin(6.283185307179586 * fireworkTrailAngle / streamRand2), 0), Vector3.new(0, 400, 0)).ttl = 0.8
+		Single(state, firework.position, vector2(streamRand2 * 60 * cos(math.tau * fireworkTrailAngle / streamRand2), streamRand2 * 60 * sin(math.tau * fireworkTrailAngle / streamRand2), 0), Vector3.new(0, 400, 0)).ttl = 0.8
 	end
 end
 local function Clear(state)

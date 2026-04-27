@@ -366,7 +366,7 @@ function HomeApp.render(self)
 				backgroundTransparency = 0,
 				backgroundColor = Color3.new(51/255, 51/255, 51/255),
 				size = UDim2.fromScale(1, 0.8350000000000001),
-				position = UDim2.fromScale(0, 0.16499999999999998),
+				position = UDim2.fromScale(0, 0.165),
 				paddingTop = 0.5,
 				paddingBottom = 0,
 				paddingLeft = 0,
@@ -464,7 +464,7 @@ function HomeApp.render(self)
 				backgroundTransparency = 0,
 				backgroundColor = Color3.new(51/255, 51/255, 51/255),
 				size = UDim2.fromScale(1, 0.8350000000000001),
-				position = UDim2.fromScale(0, 0.16499999999999998),
+				position = UDim2.fromScale(0, 0.165),
 				paddingTop = 0.5,
 				paddingBottom = 0,
 				paddingLeft = 0,
@@ -587,7 +587,7 @@ function HomeApp.render(self)
 			}, {
 				Title = createElement(PaddedContainer, {
 					backgroundTransparency = 1,
-					size = UDim2.fromScale(1, 0.16499999999999998),
+					size = UDim2.fromScale(1, 0.165),
 					paddingTop = 0,
 					paddingLeft = 0,
 					paddingRight = 0,
@@ -613,7 +613,7 @@ function HomeApp.render(self)
 				Pages = createElement(PaddedContainer, {
 					backgroundTransparency = 1,
 					size = UDim2.fromScale(1, 0.275),
-					position = UDim2.fromScale(0, 0.16499999999999998),
+					position = UDim2.fromScale(0, 0.165),
 					paddingTop = 0,
 					paddingLeft = 0,
 					paddingRight = 0,

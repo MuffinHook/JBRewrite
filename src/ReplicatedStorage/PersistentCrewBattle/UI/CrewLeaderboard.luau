@@ -8,7 +8,7 @@ local ClanRating = require(ReplicatedStorage.PersistentCrewBattle.UI.ClanRating)
 local CrewLeaderboard = Roact.PureComponent:extend("CrewLeaderboard")
 CrewLeaderboard.defaultProps = {
 	verticalPaddingRatio = 96,
-	aspectRatio = 1.7777777777777777
+	aspectRatio = 16/9
 }
 function CrewLeaderboard.render(self)
 	assert(self.props.displayType, "No display type set")
@@ -34,7 +34,7 @@ function CrewLeaderboard.render(self)
 	uiElements.Header = createElement(PaddedContainer, {
 		backgroundColor = Color3.fromRGB(57, 58, 65),
 		backgroundTransparency = 0,
-		size = UDim2.new(1, 0, 0.1111111111111111, 0),
+		size = UDim2.new(1, 0, 1/9, 0),
 		paddingTop = 0,
 		paddingBottom = 0.5,
 		paddingLeft = 0,
@@ -64,8 +64,8 @@ function CrewLeaderboard.render(self)
 	uiElements.Body = createElement(PaddedContainer, {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
-		position = UDim2.new(0, 0, 0.1111111111111111, 0),
-		size = UDim2.new(1, 0, 0.8888888888888888, 0),
+		position = UDim2.new(0, 0, 1/9, 0),
+		size = UDim2.new(1, 0, 8/9, 0),
 		paddingTop = 0.5,
 		paddingBottom = 0,
 		paddingLeft = 0,

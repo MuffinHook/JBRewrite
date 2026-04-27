@@ -57,8 +57,8 @@ function BatonClass.SwingSwoosh(self)
 	})
 	self.SpringItemOffset:Accelerate(Vector3.new(10, 30, 5))
 	self.SpringItemRotation:Accelerate(Vector3.new(-31.415928, 23.561945, 0))
-	self.SpringWaistRotation:Accelerate(Vector3.new(-3.1415927, 15.707964, 0))
-	self.SpringNeckRotation:Accelerate(Vector3.new(1.2566371, -3.1415927, 0))
+	self.SpringWaistRotation:Accelerate(Vector3.new(-math.pi, 15.707964, 0))
+	self.SpringNeckRotation:Accelerate(Vector3.new(1.2566371, -math.pi, 0))
 	if self.Local then
 		batonEvent:FireServer("m6rmpdf6", 1)
 	end

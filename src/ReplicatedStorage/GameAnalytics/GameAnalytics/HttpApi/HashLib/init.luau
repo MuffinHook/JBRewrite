@@ -546,7 +546,7 @@ local primeCandidate = 1
 repeat
 	primeCandidate = primeCandidate + primes[primeCandidate % 6]
 	if sum < primeCandidate * primeCandidate then
-		local cubeRoot = sum ^ 0.3333333333333333
+		local cubeRoot = sum ^ 1/3
 		local cubeRootScaled = mul(table.create(1, (math.floor(cubeRoot * 1099511627776))), roundBases, 1, 2)
 		local _, cubedValue = mul(cubeRootScaled, mul(cubeRootScaled, cubeRootScaled, 1, 4), -1, 4)
 		local sha256InitialLo = cubeRootScaled[2] % 65536 * 65536 + math.floor(cubeRootScaled[1] / 256)

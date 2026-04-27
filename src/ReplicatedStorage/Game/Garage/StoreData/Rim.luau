@@ -1172,6 +1172,6 @@ return {
 	end,
 	Update = function(rimToUpdate, p2)
 		local elapsedTime = os.clock() / 2
-		rimToUpdate.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, 3)
+		rimToUpdate.CFrame = CFrame.Angles(0, elapsedTime % math.tau, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, 3)
 	end
 }

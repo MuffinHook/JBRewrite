@@ -24,7 +24,7 @@ function WallColorModule.getInstance(colorItem)
 end
 function WallColorModule.updateCamera(camera, parent)
 	local elapsedTime = os.clock() / 2
-	camera.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+	camera.CFrame = CFrame.Angles(0, elapsedTime % math.tau, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 end
 local colorItems = table.clone(Color.Items)
 table.insert(colorItems, 1, {

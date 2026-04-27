@@ -12,7 +12,7 @@ return {
 					lastModel = targetModel
 				end
 				local currentTime = os.clock()
-				camera.CFrame = CFrame.new(0, 0, 0) * CFrame.Angles(0, currentTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(currentTime * 0.5) * 0.3 - 0.4, 0, 0) * CFrame.new(0, 0, boundingBoxSize.Magnitude * 0.8)
+				camera.CFrame = CFrame.new(0, 0, 0) * CFrame.Angles(0, currentTime % math.tau, 0) * CFrame.Angles(math.sin(currentTime * 0.5) * 0.3 - 0.4, 0, 0) * CFrame.new(0, 0, boundingBoxSize.Magnitude * 0.8)
 			end
 		end
 	end,

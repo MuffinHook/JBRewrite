@@ -121,7 +121,7 @@ function PersistentCrewAppComponent.render(self)
 			local crewContainerSize = UDim2.fromScale(1, 0.5)
 			local responseAdjustedPosition = UDim2.fromScale(0.5, 0.5 - if self.props.battleResponseData == nil then 0 else 0.1)
 			local crewInfoProps = {
-				aspectRatio = 1.7777777777777777,
+				aspectRatio = 16/9,
 				verticalPaddingRatio = 128,
 				clanId = targetClanInfo.ClanId,
 				playersClanId = targetClanInfo.PlayersClanId
@@ -180,7 +180,7 @@ function PersistentCrewAppComponent.render(self)
 			local joinCreateSize = UDim2.fromScale(1, 0.35)
 			local joinCreatePosition = UDim2.fromScale(0.5, 0.5)
 			crewElements.JoinOrCreate = createElement(JoinOrCreate, {
-				aspectRatio = 1.7777777777777777,
+				aspectRatio = 16/9,
 				verticalPaddingRatio = 128,
 				attemptCreate = self.props.attemptCreate,
 				attemptViewUserIdClan = self.props.attemptViewUserIdClan,
@@ -198,7 +198,7 @@ function PersistentCrewAppComponent.render(self)
 			AnchorPoint = self.props.anchorPoint
 		}, Dictionary.merge({
 			AspectRatio = createElement("UIAspectRatioConstraint", {
-				AspectRatio = 1.7777777777777777
+				AspectRatio = 16/9
 			}),
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, 8)
@@ -211,9 +211,9 @@ function PersistentCrewAppComponent.render(self)
 		})
 	end
 	local battleInvitesProps = {
-		size = UDim2.new(0.3333333333333333, 0, 0.3333333333333333, 0)
+		size = UDim2.new(1/3, 0, 1/3, 0)
 	}
-	battleInvitesProps.position = self.state.isSmallScreen and UDim2.new(0.5, 0, 0.6666666666666666, 0) or UDim2.new(1, 0, 0.5, 0)
+	battleInvitesProps.position = self.state.isSmallScreen and UDim2.new(0.5, 0, 2/3, 0) or UDim2.new(1, 0, 0.5, 0)
 	battleInvitesProps.anchorPoint = self.state.isSmallScreen and Vector2.new(0.5, 0.5) or Vector2.new(1, 0.5)
 	battleInvitesProps.onAccept = self.props.onAcceptBattleInvite
 	battleInvitesProps.onDecline = self.props.onDeclineBattleInvite

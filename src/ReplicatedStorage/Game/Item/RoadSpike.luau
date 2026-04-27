@@ -16,7 +16,7 @@ local itemConfig = {
 			Springs = {
 				ItemOffset = Vector3.new(0, 2.4, -1.7),
 				ItemRotation = Vector3.new(),
-				NeckRotation = Vector3.new(0.7853982, 0, 0),
+				NeckRotation = Vector3.new(math.pi / 4, 0, 0),
 				WaistRotation = Vector3.new(-1.8849556, 0, 0)
 			}
 		},

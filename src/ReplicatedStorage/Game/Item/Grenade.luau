@@ -20,7 +20,7 @@ local function CalculateProjectileVelocity(startPosition, targetPosition, projec
 		local sqrtDisc = discriminant ^ 0.5
 		launchAngle = math.min(math.atan((projectileSpeed * projectileSpeed + sqrtDisc) / (Gravity * horizontalDist)), (math.atan((projectileSpeed * projectileSpeed - sqrtDisc) / (Gravity * horizontalDist))))
 	else
-		launchAngle = 0.7853981633974483
+		launchAngle = math.pi / 4
 	end
 	return Vector3.new(projectileSpeed * displacement.x / horizontalDist * math.cos(launchAngle), projectileSpeed * math.sin(launchAngle), projectileSpeed * displacement.z / horizontalDist * math.cos(launchAngle)), horizontalDist / (projectileSpeed * math.cos(launchAngle))
 end

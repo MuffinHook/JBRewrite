@@ -56,7 +56,7 @@ function VehicleLinkBinder._hookNearest(self, maid)
 	maid:GiveTask(visualBlock)
 	local loadingBar = LoadingBar.new()
 	maid:GiveTask(loadingBar)
-	loadingBar:SetPosition(UDim2.new(0.5, 0, 0.6666666666666666, 0))
+	loadingBar:SetPosition(UDim2.new(0.5, 0, 2/3, 0))
 	local lastUpdateTime = 0
 	local clockStartTime = os.clock()
 	local function update()

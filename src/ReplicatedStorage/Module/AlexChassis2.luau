@@ -537,7 +537,7 @@ local function UpdateHQ(state, dt)
 			local _ = math.abs(localVel.Z) < 1
 		end
 		_cachedEngine.NoGravForce.Force = Vector3.new(0, 1, 0) * _cachedEngine.AssemblyMass * workspace.Gravity * (1 - if Nitro then 30 else 100 / 196.20000000000002)
-		state.WheelRotation = (state.WheelRotation + localVel.Z * dt / Wheels[1].VisualHalfHeight) % 6.283185307179586
+		state.WheelRotation = (state.WheelRotation + localVel.Z * dt / Wheels[1].VisualHalfHeight) % math.tau
 		UpdateWheels(state, dt, true)
 		VehicleTypes[state.Make].UpdateHQ(state, dt)
 		local rpmNormalized = math.clamp(wheelSpeedRPS * Gears[1] * currentGearRatio * 30 / math.pi / state.Config.RPMTopLine, 0, 1)
@@ -574,9 +574,9 @@ local function UpdateLQ(state, dt)
 		local localVel = vectorToObjectSpace(_cachedEngine.CFrame, _cachedEngine.Velocity)
 		state.VisualTurnAngle = -_cachedEngine.RotVelocity.Y * 0.3
 		local Wheels = state.Wheels
-		state.WheelRotation = (state.WheelRotation + localVel.Z * dt / Wheels[1].VisualHalfHeight) % 6.283185307179586
+		state.WheelRotation = (state.WheelRotation + localVel.Z * dt / Wheels[1].VisualHalfHeight) % math.tau
 		UpdateWheels(state, dt, false)
-		local rpmNormalized = math.clamp(math.abs(localVel.Z) * 60 * dt / Wheels[1].VisualHalfHeight * Gears[1] * Gears[3] * 60 / 6.283185307179586 / state.Config.RPMTopLine, 0, 1)
+		local rpmNormalized = math.clamp(math.abs(localVel.Z) * 60 * dt / Wheels[1].VisualHalfHeight * Gears[1] * Gears[3] * 60 / math.tau / state.Config.RPMTopLine, 0, 1)
 		local rpmSlowOld = state.RPMSlow or 0
 		local rpmSlowNew = rpmSlowOld + (rpmNormalized - rpmSlowOld) * 0.1
 		state.RPMSlow = rpmSlowNew

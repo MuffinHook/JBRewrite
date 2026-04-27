@@ -110,7 +110,7 @@ function color.render(component)
 	inventoryTitleContent.Text = createElement("TextLabel", inventoryTitleTextProperties)
 	headerContent.Title = createElement("Frame", inventoryTitleProperties, inventoryTitleContent)
 	headerContent.Input = createElement("Frame", {
-		BackgroundTransparency = 0.6666666666666666,
+		BackgroundTransparency = 2/3,
 		BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
 		Size = UDim2.new(0.2, 0, 0.7, 0),
 		Position = UDim2.new(0.65, 0, 0.5, 0),

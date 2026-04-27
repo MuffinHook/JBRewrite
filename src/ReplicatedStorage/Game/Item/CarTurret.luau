@@ -175,8 +175,8 @@ function CarTurret.Stepped(self)
 		self.LastUpdate = currentTime
 		local spinVelocity = self.SpringSpin:Update()
 		local newSpinTotal = self.SpinTotal + deltaTime * spinVelocity
-		if newSpinTotal > 6.283185307179586 then
-			newSpinTotal = newSpinTotal - 6.283185307179586
+		if newSpinTotal > math.tau then
+			newSpinTotal = newSpinTotal - math.tau
 		end
 		self.SpinTotal = newSpinTotal
 		self:AnimateBarrel(deltaTime, spinVelocity)

@@ -1210,7 +1210,7 @@ do
 					_cachedWheelRadius = p1.Wheels[1].Model.PrimaryPart.Size.Y / 2
 					p1._cachedWheelRadius = _cachedWheelRadius
 				end
-				local func = (p1.WheelRotation + isEnabled.Z * p2 / _cachedWheelRadius) % 6.283185307179586
+				local func = (p1.WheelRotation + isEnabled.Z * p2 / _cachedWheelRadius) % math.tau
 				p1.WheelRotation = func
 				local cframe = Model:GetAttribute("GarageSuspensionHeight")
 				if cframe then
@@ -2971,7 +2971,7 @@ do
 		end
 		local function Touched(p1)
 			local cframe = tick()
-			if not (cframe - isEnabled < 0.03333333333333333) then
+			if not (cframe - isEnabled < 1/30) then
 				isEnabled = cframe
 				DoorPlayer()
 			end
@@ -3117,7 +3117,7 @@ do
 	end
 	CollectionService:GetInstanceAddedSignal("SewerHatch"):Connect(AddHatch)
 	CollectionService:GetInstanceRemovedSignal("SewerHatch"):Connect(RemoveHatch)
-	ThreadLoopAdd(0.16666666666666666, function()
+	ThreadLoopAdd(1/6, function()
 		local Character = LocalPlayer.Character
 		if Character then
 			local PrimaryPart = Character.PrimaryPart
@@ -3921,8 +3921,8 @@ do
 				if PrimaryPart and (PrimaryPart_2 and (Humanoid and not (Humanoid.Sit or Humanoid.PlatformStand))) then
 					local cframe = PrimaryPart.CFrame
 					local cframe = PrimaryPart_2.CFrame
-					local cframe = cframe.lookVector:Dot(cframe.lookVector) >= 0.3333333333333333
-					if cframe and cframe.lookVector:Dot((cframe.p - cframe.p).unit) >= 0.3333333333333333 then
+					local cframe = cframe.lookVector:Dot(cframe.lookVector) >= 1/3
+					if cframe and cframe.lookVector:Dot((cframe.p - cframe.p).unit) >= 1/3 then
 						isEnabled = true
 					end
 				end

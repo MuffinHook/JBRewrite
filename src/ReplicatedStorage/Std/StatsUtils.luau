@@ -78,7 +78,7 @@ function t.sampleNormalDistribution(mean, stdDev)
 	local uniformRandom1 = math.random()
 	local uniformRandom2 = math.random()
 	local logTransform = math.log(uniformRandom1) * -2
-	return mean + stdDev * (math.sqrt(logTransform) * math.cos(6.283185307179586 * uniformRandom2))
+	return mean + stdDev * (math.sqrt(logTransform) * math.cos(math.tau * uniformRandom2))
 end
 function t.sampleExponentialDistribution(mean)
 	assert(mean >= 0, "Invalid mean given")

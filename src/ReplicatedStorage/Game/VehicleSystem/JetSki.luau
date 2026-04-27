@@ -88,8 +88,8 @@ local function UpdateArms(jetski, seatData)
 		local Steering = jetski.Model.Model.Steering
 		IKP.RightArm = Steering.CFrame * Vector3.new(1.2, 0.6, 1.1)
 		IKP.LeftArm = Steering.CFrame * Vector3.new(-1.2, 0.6, 1.1)
-		ConstraintUtils.setJointC1(IKP.RightWrist, CFrame.Angles(0, -1.5707963267948966, 0))
-		ConstraintUtils.setJointC1(IKP.LeftWrist, CFrame.Angles(0, 1.5707963267948966, 0))
+		ConstraintUtils.setJointC1(IKP.RightWrist, CFrame.Angles(0, -math.pi / 2, 0))
+		ConstraintUtils.setJointC1(IKP.LeftWrist, CFrame.Angles(0, math.pi / 2, 0))
 		R15IKv2.Arms(IKP)
 	end
 end
@@ -178,7 +178,7 @@ local function MountLocalPlayer(jetski, player, seat)
 		ConstraintUtils.setJointC1(Waist, waistAdjustment)
 		ConstraintUtils.setJointC1(Neck, neckAdjustment)
 		local SteeringMotor = seat.SteeringMotor
-		SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -0.39999999999999997) * CFrame.Angles(0, pitchValue * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
+		SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -2/5) * CFrame.Angles(0, pitchValue * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
 		if seat.Driver then
 			local LowSound = jetski.LowSound
 			local Magnitude = jetski.EnginePart.Velocity.Magnitude
@@ -259,7 +259,7 @@ local function MountThirdPlayer(jetski, player, seat)
 		UpdateArms(jetski, seat)
 		local rotVelocityLocal = EnginePart.CFrame:VectorToObjectSpace(EnginePart.RotVelocity)
 		local SteeringMotor = seat.SteeringMotor
-		SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -0.39999999999999997) * CFrame.Angles(0, rotVelocityLocal.Y * 0.3 * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
+		SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -2/5) * CFrame.Angles(0, rotVelocityLocal.Y * 0.3 * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
 		if seat.Driver then
 			local LowSound = jetski.LowSound
 			local Magnitude = jetski.EnginePart.Velocity.Magnitude
@@ -309,7 +309,7 @@ function JetSki.MountPlayer(jetski, player, seat)
 			UpdateArms(jetski, seat)
 			local rotVelocityLocal = EnginePart.CFrame:VectorToObjectSpace(EnginePart.RotVelocity)
 			local SteeringMotor = seat.SteeringMotor
-			SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -0.39999999999999997) * CFrame.Angles(0, rotVelocityLocal.Y * 0.3 * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
+			SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -2/5) * CFrame.Angles(0, rotVelocityLocal.Y * 0.3 * 0.5, 0) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
 			if seat.Driver then
 				local LowSound = jetski.LowSound
 				local Magnitude = jetski.EnginePart.Velocity.Magnitude
@@ -359,7 +359,7 @@ local function UnmountLocalPlayer(jetski, player, seat)
 	jetski.VectorForce.Force = Vector3.new(0, 0, 0)
 	jetski.BodyGyro.CFrame = CFrame.new(Vector3.new(), engineCFrame.LookVector) + engineCFrame.p
 	local SteeringMotor = seat.SteeringMotor
-	SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -0.39999999999999997) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
+	SteeringMotor.C1 = SteeringMotor.C0:inverse() * CFrame.new(0, 0.4, -2/5) * CFrame.new(0, 0, 0.6) * SteeringMotor.C0
 	if jetski.Model:IsDescendantOf(workspace) then
 		local Skeleton = jetski.Model.Skeleton
 		Skeleton.JetEmitter.Particle.Enabled = false

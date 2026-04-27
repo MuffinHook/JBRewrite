@@ -9,7 +9,7 @@ local GLIDER_CONFIG = {
 				WaistRotation = Vector3.new()
 			}
 		},
-		RightWristRotation = CFrame.Angles(0, 1.5707963267948966, 0),
+		RightWristRotation = CFrame.Angles(0, math.pi / 2, 0),
 		LeftWristRotation = CFrame.new()
 	}
 }

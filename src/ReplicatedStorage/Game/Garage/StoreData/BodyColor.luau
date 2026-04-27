@@ -21,7 +21,7 @@ local function GetInstance(colorData)
 end
 local function Update(model, part)
 	local rotationTime = os.clock() / 2
-	model.CFrame = CFrame.Angles(0, rotationTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(rotationTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, part:GetExtentsSize().Magnitude * 0.6)
+	model.CFrame = CFrame.Angles(0, rotationTime % math.tau, 0) * CFrame.Angles(math.sin(rotationTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, part:GetExtentsSize().Magnitude * 0.6)
 end
 return {
 	Items = Color.Items,

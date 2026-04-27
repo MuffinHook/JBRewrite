@@ -64,7 +64,7 @@ function RobberyBankClass.SetupLasers(instance, layout)
 	instance.Maid:GiveTask(RunService.Heartbeat:Connect(function()
 		local elapsedTime = Time.GetNowSync() - instance.BornAtSync
 		for i, laser in ipairs(laserTable) do
-			laser.Part.CFrame = laser.Origin:lerp(laser.Target, math.cos(elapsedTime * (6.283185307179586 / laser.Period)) * -0.5 + 0.5)
+			laser.Part.CFrame = laser.Origin:lerp(laser.Target, math.cos(elapsedTime * (math.tau / laser.Period)) * -0.5 + 0.5)
 		end
 	end))
 	instance.Maid:GiveTask(function()

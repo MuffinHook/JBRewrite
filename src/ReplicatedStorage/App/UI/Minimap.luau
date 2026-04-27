@@ -103,7 +103,7 @@ function Minimap.didMount(self) --[[ Line: 130 | Upvalues: RunService (copy), Ch
 								shouldBeVisible = false
 							end
 							if shouldBeVisible then
-								v.nextVisibleToggle = now + 0.3333333333333333
+								v.nextVisibleToggle = now + 1/3
 							else
 								invisibilityDuration = v.invisibilityTimeFunc and v.invisibilityTimeFunc() or 3
 								v.nextVisibleToggle = now + invisibilityDuration
@@ -243,7 +243,7 @@ function Minimap.render(self) --[[ Line: 179 | Upvalues: Roact (copy), createEle
 				return MinimapUtils.worldToScale(bindingPosition.X, bindingPosition.Z, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapWorldWidth, self.props.mapWorldHeight)
 			end),
 			Rotation = self.props.worldDirection:map(function(directionValue) --[[ Line: 317 ]]
-				return -math.deg(math.atan2(-directionValue.Z, directionValue.X) - 1.5707963267948966)
+				return -math.deg(math.atan2(-directionValue.Z, directionValue.X) - math.pi / 2)
 			end)
 		})
 		if self.props.waypoint then

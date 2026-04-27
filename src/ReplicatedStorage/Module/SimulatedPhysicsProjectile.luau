@@ -27,7 +27,7 @@ function SimulatedPhysicsProjectile.CalculateVelocityToHitTargetWithSpeed(origin
 		local lowerAngle = math.atan((initialSpeed * initialSpeed - discriminantSqrt) / (gravityMagnitude * horizontalDistance))
 		launchAngle = if preferHigherAngle then math.max(higherAngle, lowerAngle) else math.min(higherAngle, lowerAngle)
 	else
-		launchAngle = 0.7853981633974483
+		launchAngle = math.pi / 4
 	end
 	local velocityX = initialSpeed * positionDelta.x / horizontalDistance * math.cos(launchAngle)
 	local velocityY = initialSpeed * math.sin(launchAngle)

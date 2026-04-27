@@ -33,7 +33,7 @@ return {
 		return math.atan2(positionObjectSpace.y, -positionObjectSpace.z)
 	end,
 	updateModel = function(joint, joint2, horizontalAngle, verticalAngle)
-		joint.C1 = joint.C0:Inverse() * CFrame.Angles(0, horizontalAngle - 1.5707963267948966, 0) * joint.C0
+		joint.C1 = joint.C0:Inverse() * CFrame.Angles(0, horizontalAngle - math.pi / 2, 0) * joint.C0
 		joint2.C1 = joint2.C0:Inverse() * CFrame.Angles(verticalAngle, 0, 0) * joint2.C0
 	end
 }

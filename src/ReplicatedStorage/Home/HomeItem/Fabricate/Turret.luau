@@ -28,8 +28,8 @@ local function offsetLookAtTarget(self, targetDistance, p3, pitchX, pitchY, pitc
 	end
 end
 local function shortAngleDist(self, angleTarget)
-	local angleDiff = (angleTarget - self) % 6.283185307179586
-	return 2 * angleDiff % 6.283185307179586 - angleDiff
+	local angleDiff = (angleTarget - self) % math.tau
+	return 2 * angleDiff % math.tau - angleDiff
 end
 local function getNearestPlayer(self, maxDistance)
 	local closestDistance = maxDistance or (1 / 0)
@@ -114,8 +114,8 @@ return {
 			local relativePos = turretCFrame:PointToObjectSpace(targetPos)
 			local elevationAngle, rollAngle = offsetLookAtTarget(0.3935546875, 1.7648589611053467, nil, relativePos.x, relativePos.y, relativePos.z)
 			targetRollAngle = rollAngle
-			local angleOffset = (elevationAngle - targetElevationAngle) % 6.283185307179586
-			targetElevationAngle = targetElevationAngle + math.clamp(2 * angleOffset % 6.283185307179586 - angleOffset, -2.5132741228718345 * deltaTime, 2.5132741228718345 * deltaTime)
+			local angleOffset = (elevationAngle - targetElevationAngle) % math.tau
+			targetElevationAngle = targetElevationAngle + math.clamp(2 * angleOffset % math.tau - angleOffset, -2.5132741228718345 * deltaTime, 2.5132741228718345 * deltaTime)
 			local rollAngleTarget = rollAngleSpring:SetTarget(rollAngle)
 			local elevationAngleTarget = elevationAngleSpring:SetTarget(targetElevationAngle)
 			local recoilAmount = recoilSpring:Update()

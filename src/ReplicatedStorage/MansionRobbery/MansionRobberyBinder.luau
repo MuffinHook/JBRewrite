@@ -187,7 +187,7 @@ function MansionRobberyBinder._hookBossCameras(self)
 					local coneEnd = intersectionPoint + LookVector * 6
 					local Magnitude = (coneEnd - coneStart).Magnitude
 					manifestParts.conePart.Size = Vector3.new(15, Magnitude, 15)
-					manifestParts.conePart.CFrame = CFrame.lookAt(coneStart, coneEnd, (Vector3.new(1, 1, 1)).Unit) * CFrame.new(0, 0, -Magnitude / 2) * CFrame.Angles(1.5707963267948966, 0, 0)
+					manifestParts.conePart.CFrame = CFrame.lookAt(coneStart, coneEnd, (Vector3.new(1, 1, 1)).Unit) * CFrame.new(0, 0, -Magnitude / 2) * CFrame.Angles(math.pi / 2, 0, 0)
 					manifestParts.floorCircle.CFrame = CFrame.new(intersectionPoint)
 				end
 			end

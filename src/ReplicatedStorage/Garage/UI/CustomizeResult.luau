@@ -86,7 +86,7 @@ function CustomizeResultComponent.didMount(self)
 			local elapsedTime = os.clock()
 			local modelSize = self.model:GetExtentsSize()
 			local rotationTime = elapsedTime / 2
-			camera.CFrame = CFrame.Angles(0, rotationTime % 6.283185307179586, 0) * CFrame.Angles(-0.18849555921538758 + math.sin(rotationTime / 2) * math.pi * 0.01, 0, 0) * CFrame.new(0, 0, modelSize.Magnitude * 0.66 + (math.cos(rotationTime * 2) * 0.5 + 0.5) * (modelSize.Z / modelSize.X) * 1.5)
+			camera.CFrame = CFrame.Angles(0, rotationTime % math.tau, 0) * CFrame.Angles(-0.18849555921538758 + math.sin(rotationTime / 2) * math.pi * 0.01, 0, 0) * CFrame.new(0, 0, modelSize.Magnitude * 0.66 + (math.cos(rotationTime * 2) * 0.5 + 0.5) * (modelSize.Z / modelSize.X) * 1.5)
 		end
 	end)
 end

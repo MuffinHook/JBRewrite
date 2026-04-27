@@ -74,7 +74,7 @@ function OtherTradeServerItem.render(component)
 	containerChildren.JoinServer = createElement(PaddedContainer, joinButtonPaddingProps, joinButtonChildren)
 	local playerCountPaddingProps = {
 		backgroundTransparency = 1,
-		size = UDim2.fromScale(0.06999999999999999, 1),
+		size = UDim2.fromScale(7/100, 1),
 		position = UDim2.fromScale(0.12, 0),
 		paddingTop = 1,
 		paddingLeft = 1,

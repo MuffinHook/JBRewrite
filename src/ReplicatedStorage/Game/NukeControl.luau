@@ -59,7 +59,7 @@ return {
 					launchConnection:Disconnect()
 					launchProgress = 1
 				end
-				nukeModel.Model:SetPrimaryPartCFrame(CFrame.new(tubePosition) * CFrame.Angles(1.5707963267948966, 0, 0) * CFrame.new(0, 0, 48 * (1 - launchProgress) + 12 * launchProgress))
+				nukeModel.Model:SetPrimaryPartCFrame(CFrame.new(tubePosition) * CFrame.Angles(math.pi / 2, 0, 0) * CFrame.new(0, 0, 48 * (1 - launchProgress) + 12 * launchProgress))
 			end)
 			siloInstance.OnOpened:Connect(function()
 				nukeConfig.Nuke.Origin = nukeModel.Model.PrimaryPart.CFrame.p

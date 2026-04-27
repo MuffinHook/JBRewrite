@@ -333,7 +333,7 @@ function HeliModule.Update(vehiclePacket, dt)
 		maxSpeed = maxSpeed * 0.65
 	end
 	if vehiclePacket.IsCelsior and inputForward < 0 then
-		inputForward = inputForward * 0.6666666666666666
+		inputForward = inputForward * 2/3
 	end
 	local vForward = vehiclePacket.vForward
 	local newVForward = vForward + inputForward * dt * 60 - vForward * if inputForward == 0 then 0.02 else forwardDrag * dt * 60

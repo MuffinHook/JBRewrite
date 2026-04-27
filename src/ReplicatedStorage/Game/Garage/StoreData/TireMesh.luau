@@ -185,6 +185,6 @@ return {
 	end,
 	Update = function(tireMesh, parentSize)
 		local elapsedTime = os.clock() / 2
-		tireMesh.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, parentSize.Size.Magnitude * 0.707)
+		tireMesh.CFrame = CFrame.Angles(0, elapsedTime % math.tau, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, parentSize.Size.Magnitude * 0.707)
 	end
 }

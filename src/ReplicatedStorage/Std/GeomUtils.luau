@@ -159,7 +159,7 @@ end
 function module.randomPointInSphere()
 	local azimuthAngle = math.random() * 2 * math.pi
 	local polarAngle = math.acos(2 * math.random() - 1)
-	local radialScale = math.random() ^ 0.3333333333333333
+	local radialScale = math.random() ^ 1/3
 	local sinAzimuth = math.sin(azimuthAngle)
 	local cosAzimuth = math.cos(azimuthAngle)
 	local sinPolar = math.sin(polarAngle)
@@ -167,8 +167,8 @@ function module.randomPointInSphere()
 end
 function module.shortAngleDist(angle1, angle2)
 	local direction = math.sign(angle2 - angle1)
-	local normalizedDelta = direction * (math.abs(angle2 - angle1) % 6.283185307179586)
-	return direction * (math.abs(normalizedDelta) * 2 % 6.283185307179586) - normalizedDelta
+	local normalizedDelta = direction * (math.abs(angle2 - angle1) % math.tau)
+	return direction * (math.abs(normalizedDelta) * 2 % math.tau) - normalizedDelta
 end
 function module.waveTriangle(time, amplitude, period)
 	local amp = amplitude or 1

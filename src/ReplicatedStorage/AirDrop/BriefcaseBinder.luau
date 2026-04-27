@@ -151,7 +151,7 @@ function BriefcaseBinder.new(briefcaseModel)
 				circleActionConfig.ForceRelease = true
 			end
 		end))
-		self.maid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
+		self.maid:GiveTask(Interval.every(1/3):Connect(function()
 			if circleActionConfig.Pressed then
 				holdUpdateRemote:FireServer()
 			end

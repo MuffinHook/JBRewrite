@@ -14,7 +14,7 @@ local function GetInstance(paintData)
 end
 local function Update(part, _)
 	local elapsedRotation = os.clock() / 2
-	part.CFrame = CFrame.Angles(0, elapsedRotation % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedRotation) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+	part.CFrame = CFrame.Angles(0, elapsedRotation % math.tau, 0) * CFrame.Angles(math.sin(elapsedRotation) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 end
 return {
 	Items = Color.Items,

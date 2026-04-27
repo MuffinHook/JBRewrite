@@ -40,7 +40,7 @@ function ChooseSpawnComponent.render(self)
 		local leftFrameProps = {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
-			Size = UDim2.new(0.16666666666666666, 0, 1, 0)
+			Size = UDim2.new(1/6, 0, 1, 0)
 		}
 		local leftChildrenProps = {}
 		local timerInnerProps = {
@@ -77,8 +77,8 @@ function ChooseSpawnComponent.render(self)
 		childrenProps.Right = createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
-			Position = UDim2.new(0.16666666666666666, 0, 0, 0),
-			Size = UDim2.new(0.8333333333333334, 0, 1, 0)
+			Position = UDim2.new(1/6, 0, 0, 0),
+			Size = UDim2.new(5/6, 0, 1, 0)
 		}, {
 			Inner = createElement("TextButton", {
 				Text = "",

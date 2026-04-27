@@ -92,8 +92,8 @@ function Sloop.SteppedDriver(self, player)
 	local springHeadingValue = self.SpringHeadingValue
 	IKP.RightArm = Part0.CFrame * Vector3.new(0.15, 0, -1.5)
 	IKP.LeftArm = Part0.CFrame * Vector3.new(0.15, -0.1, 1.5)
-	IKP.RightWrist.Transform = CFrame.Angles(0, -1.5707963267948966 * (1 - springHeadingValue), 0)
-	IKP.LeftWrist.Transform = CFrame.Angles(0, -1.5707963267948966 * (1 - springHeadingValue), 0)
+	IKP.RightWrist.Transform = CFrame.Angles(0, -math.pi / 2 * (1 - springHeadingValue), 0)
+	IKP.LeftWrist.Transform = CFrame.Angles(0, -math.pi / 2 * (1 - springHeadingValue), 0)
 	R15IKv2.Arms(IKP)
 end
 function Sloop.HeartbeatDriver(self, player)

@@ -7,14 +7,14 @@ local t = {
 		Hip = {
 			Springs = {
 				ItemOffset = Vector3.new(0.8, 1.4, -0.8),
-				ItemRotation = Vector3.new(0, 0.7853982, 0),
+				ItemRotation = Vector3.new(0, math.pi / 4, 0),
 				NeckRotation = Vector3.new()
 			}
 		},
 		Scope = {
 			Springs = {
 				ItemOffset = Vector3.new(0.8, 1.4, -0.8),
-				ItemRotation = Vector3.new(0, 0.7853982, 0),
+				ItemRotation = Vector3.new(0, math.pi / 4, 0),
 				NeckRotation = Vector3.new(0, 0, 0)
 			}
 		},

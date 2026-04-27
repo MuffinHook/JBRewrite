@@ -21,7 +21,7 @@ return {
 		},
 		LeftWristRotation = CFrame.Angles(0, 2.199114857512855, 0),
 		RightWristRotation = CFrame.new(),
-		LeftElbowAngle = 0.7853981633974483,
+		LeftElbowAngle = math.pi / 4,
 		RightElbowAngle = 0
 	},
 	Sound = {
@@ -34,7 +34,7 @@ return {
 	BulletSpeed = 950,
 	FireAuto = false,
 	FireAutoMobile = true,
-	FireFreq = 1.6666666666666667,
+	FireFreq = 5/3,
 	IgnoreVerifyFireFreq = true,
 	BulletsPerShot = 20,
 	BulletSpread = 0.15,

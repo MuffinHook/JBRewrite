@@ -171,8 +171,8 @@ function StuntTurretClass.Stepped(self)
 		self.LastUpdate = currentTime
 		local spinSpeed = self.SpringSpin:Update()
 		local sum = self.SpinTotal + deltaTime * spinSpeed
-		if sum > 6.283185307179586 then
-			sum = sum - 6.283185307179586
+		if sum > math.tau then
+			sum = sum - math.tau
 		end
 		self.SpinTotal = sum
 		self:AnimateBarrel(deltaTime, spinSpeed)

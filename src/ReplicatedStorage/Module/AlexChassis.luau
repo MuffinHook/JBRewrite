@@ -375,8 +375,8 @@ local function UpdateGearsAndRPM(chassis, gears, speed, forwardInput, dt)
 			chassis.gearBlendProgress = 0
 		end
 	end
-	local visualRpm = wheelAngularSpeed * gears[1] * blendedGearRatio * 60 / 6.283185307179586
-	local targetRpm = wheelAngularSpeed * gears[1] * gears[2 + Gear] * 60 / 6.283185307179586
+	local visualRpm = wheelAngularSpeed * gears[1] * blendedGearRatio * 60 / math.tau
+	local targetRpm = wheelAngularSpeed * gears[1] * gears[2 + Gear] * 60 / math.tau
 	local rpmDelta = targetRpm - LastRPM
 	if not (chassis.NoGears or chassis.ManualGear) then
 		if forwardInput > 0 and (rpmDelta > 0 and (targetRpm > 6000 and Gear < #gears - 2)) then
@@ -1316,7 +1316,7 @@ function chassisInput.UpdateEngine(chassis, engineThruster, dt)
 			local laneAlignment = (laneDetectionResult.CFrame * Vector3New(-laneDetectionResult.Size.X * 0.5 + math.floor((laneDetectionResult.CFrame:toObjectSpace(engineCFrame).X + laneDetectionResult.Size.X * 0.5) / 12) * 12 + 6, 0, -laneDetectionResult.Size.Z * 0.5 * if engineCFrame.lookVector:Dot(laneDetectionResult.CFrame.lookVector) > 0 then 1 else -1) - engineCFrame.p).unit:Dot(headingDirection)
 			local alignmentStrength = laneAlignment * 4
 			local steerAdjustment = steerInput - if alignmentStrength < -1 then -1 elseif alignmentStrength > 1 then 1 else alignmentStrength
-			local forwardAdjustment = forwardInput + (1 - abs(laneAlignment) ^ 0.16666666666666666) - abs(laneAlignment) ^ 4 * 0.3
+			local forwardAdjustment = forwardInput + (1 - abs(laneAlignment) ^ 1/6) - abs(laneAlignment) ^ 4 * 0.3
 			forwardInput = if forwardAdjustment > 1 then 1 elseif forwardAdjustment < -1 then -1 else forwardAdjustment
 			steerInput = if steerAdjustment > 1 then 1 elseif steerAdjustment < -1 then -1 else steerAdjustment
 		end
@@ -1365,7 +1365,7 @@ function chassisInput.UpdateEngine(chassis, engineThruster, dt)
 	if IsNaN(forwardVelocityFrame) then
 		forwardVelocityFrame = 0
 	end
-	engineThruster.WheelRotation = ((engineThruster.WheelRotation or 0) + forwardVelocityFrame / (chassis.Wheels[1].Model.PrimaryPart.Size.Y * 0.5)) % 6.283185307179586
+	engineThruster.WheelRotation = ((engineThruster.WheelRotation or 0) + forwardVelocityFrame / (chassis.Wheels[1].Model.PrimaryPart.Size.Y * 0.5)) % math.tau
 	local velocityDampingFactor = tanh(abs(localVelocity.magnitude) * 0.03)
 	local Traction = chassis.Traction
 	local tractionScale = (handbrakeEnabled or isRecentDrift) and (1 - velocityDampingFactor) ^ 2 or 1
@@ -1470,7 +1470,7 @@ function chassisInput.UpdateEngine(chassis, engineThruster, dt)
 	elseif EnumMakeId == EnumMake.Ambulance then
 		rotationFactor = 5
 	elseif EnumMakeId == EnumMake.Bandit then
-		rotationFactor = 11.399999999999999 * gravityNormalized / 4300
+		rotationFactor = 57/5 * gravityNormalized / 4300
 	elseif EnumMakeId == EnumMake.FrostCrawler then
 		rotationFactor = 2.485 * gravityNormalized / 4600
 	elseif EnumMakeId == EnumMake.Laviolette then
@@ -1512,7 +1512,7 @@ function chassisInput.UpdateEngine(chassis, engineThruster, dt)
 	elseif EnumMakeId == EnumMake.Trailblazer then
 		rotationFactor = 12.552631578947368
 	elseif EnumMakeId == EnumMake.Concept then
-		rotationFactor = 9.636363636363637
+		rotationFactor = 106/11
 	elseif EnumMakeId == EnumMake.Torero then
 		rotationFactor = 15.847
 	elseif EnumMakeId == EnumMake.Beignet then
@@ -1526,7 +1526,7 @@ function chassisInput.UpdateEngine(chassis, engineThruster, dt)
 	elseif EnumMakeId == EnumMake.BananaCar then
 		rotationFactor = 18
 	elseif EnumMakeId == EnumMake.Challenger then
-		rotationFactor = 5.459999999999999
+		rotationFactor = 273/50
 	elseif EnumMakeId == EnumMake.Surus then
 		rotationFactor = 6
 	elseif EnumMakeId == EnumMake.MoltenM12 then
@@ -1568,7 +1568,7 @@ function chassisInput.UpdateEngine(chassis, engineThruster, dt)
 	elseif EnumMakeId == EnumMake.Sentinel then
 		rotationFactor = 7
 	elseif EnumMakeId == EnumMake.TheCamper then
-		rotationFactor = 18.974999999999998
+		rotationFactor = 759/40
 	elseif EnumMakeId == EnumMake.R8 then
 		rotationFactor = 6.072
 	elseif EnumMakeId == EnumMake.Semi then
@@ -1600,7 +1600,7 @@ function chassisInput.UpdateEngine(chassis, engineThruster, dt)
 	elseif EnumMakeId == EnumMake.Manta then
 		rotationFactor = rotationFactor * 9.2
 	elseif EnumMakeId == EnumMake.Iceborn then
-		rotationFactor = rotationFactor * (gravityNormalized / 2250 * 1.0093333333333334 * 1.05)
+		rotationFactor = rotationFactor * (gravityNormalized / 2250 * 1.00933 * 1.05)
 	elseif EnumMakeId == EnumMake.Tanker then
 		rotationFactor = rotationFactor * 3
 	elseif EnumMakeId == EnumMake.Revox then
@@ -1793,7 +1793,7 @@ function chassisInput.UpdateEngine(chassis, engineThruster, dt)
 		local engineFlapTarget = if isMovingForward then chassis.SpringEngineFlaps:SetTarget(1) else chassis.SpringEngineFlaps:SetTarget(0)
 		Model.Preset.RattlerEngine.EngineMetal["EngineMetal->Engine"].C1 = CFrame.new((chassis.SpringEngineRattle:Update()))
 		local engineFlapMotor = Model.Preset.RattlerEngine.EngineFlaps["EngineFlaps->Engine"]
-		engineFlapMotor.C1 = engineFlapMotor.C0:Inverse() * CFrame.Angles(engineFlapTarget * -3.141592653589793 * 0.45, 0, 0) * engineFlapMotor.C0
+		engineFlapMotor.C1 = engineFlapMotor.C0:Inverse() * CFrame.Angles(engineFlapTarget * -math.pi * 0.45, 0, 0) * engineFlapMotor.C0
 		for i, v in ipairs(chassis.RattleFire) do
 			v.Enabled = isMovingForward
 		end
@@ -1816,7 +1816,7 @@ function chassisInput.UpdateEngine(chassis, engineThruster, dt)
 		local flapAngle = if hasInput then chassis.SpringEngineFlaps:SetTarget(1) else chassis.SpringEngineFlaps:SetTarget(0)
 		Model.Preset.RattlerEngine.EngineBody["EngineBody->Engine"].C1 = CFrame.new((chassis.SpringEngineRattle:Update()))
 		local flapMotor = Model.Preset.RattlerEngine.EngineFlaps["EngineFlaps->Engine"]
-		flapMotor.C1 = flapMotor.C0:Inverse() * CFrame.Angles(flapAngle * -3.141592653589793 * 0.45, 0, 0) * flapMotor.C0
+		flapMotor.C1 = flapMotor.C0:Inverse() * CFrame.Angles(flapAngle * -math.pi * 0.45, 0, 0) * flapMotor.C0
 		for i, v in ipairs(chassis.RattleSmoke) do
 			v.Enabled = not hasInput
 		end

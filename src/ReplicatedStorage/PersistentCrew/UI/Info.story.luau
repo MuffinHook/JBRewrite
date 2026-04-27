@@ -63,7 +63,7 @@ return function(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement(Info, {
-				aspectRatio = 1.7777777777777777,
+				aspectRatio = 16/9,
 				verticalPaddingRatio = 128,
 				attemptLeave = self.props.attemptLeave,
 				playersClanId = nil,

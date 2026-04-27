@@ -58,7 +58,7 @@ function DamageIndicatorService.add(indicatorData)
 			local bornAt = indicatorData.bornAt
 			local cameraSpace = CurrentCamera.CFrame:PointToObjectSpace(indicatorData.worldPosition)
 			currentAngle = currentAngle + GeomUtils.shortAngleDist(currentAngle, (math.atan2(-cameraSpace.x, -cameraSpace.z))) / 5
-			indicatorData.updateAngle(-1.5707963267948966 - currentAngle)
+			indicatorData.updateAngle(-math.pi / 2 - currentAngle)
 			local progress = tweenFadeOut.p
 			indicatorData.updateTransparency((1 - indicatorData.strength) * (1 - progress) + 1 * progress)
 			local currentTime = os.clock()

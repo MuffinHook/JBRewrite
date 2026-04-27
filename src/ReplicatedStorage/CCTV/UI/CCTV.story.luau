@@ -6,7 +6,7 @@ return function(guiParent)
 		size = UDim2.new(0.5, 0, 0.5, 0),
 		position = UDim2.new(0.5, 0, 0.5, 0),
 		distance = 96,
-		aspectRatio = 1.7777777777777777,
+		aspectRatio = 16/9,
 		cameraCFrame = workspace.CurrentCamera.CFrame,
 		fieldOfView = 70
 	}), guiParent)

@@ -15,7 +15,7 @@ local function GetInstance(wheelInstance)
 end
 local function Update(wheelInstance, wheelConfig)
 	local elapsedTime = os.clock() / 2
-	wheelInstance.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, wheelConfig.BoundingBox.Size.Magnitude * 0.7)
+	wheelInstance.CFrame = CFrame.Angles(0, elapsedTime % math.tau, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, wheelConfig.BoundingBox.Size.Magnitude * 0.7)
 end
 return {
 	Items = Color.Items,

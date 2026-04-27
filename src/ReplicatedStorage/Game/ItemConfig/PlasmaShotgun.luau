@@ -27,7 +27,7 @@ return {
 	MagSize = 4,
 	CamShakeMagnitude = 80,
 	FireAuto = false,
-	FireFreq = 1.6666666666666667,
+	FireFreq = 5/3,
 	BulletsPerShot = 15,
 	BulletSpread = 0.2,
 	ReloadTime = 1.5,

@@ -17,7 +17,7 @@ local function GetInstance(paintConfig)
 end
 local function Update(part, config)
 	local timeValue = os.clock() / 2
-	part.CFrame = CFrame.Angles(0, math.cos(timeValue % 6.283185307179586) * 0.1, 0) * CFrame.Angles(math.sin(timeValue) * 0.1 - 0.1, 0, 0) * CFrame.new(0, 0, config.PrimaryPart.Size.Magnitude * 0.7)
+	part.CFrame = CFrame.Angles(0, math.cos(timeValue % math.tau) * 0.1, 0) * CFrame.Angles(math.sin(timeValue) * 0.1 - 0.1, 0, 0) * CFrame.new(0, 0, config.PrimaryPart.Size.Magnitude * 0.7)
 end
 return {
 	Items = Color.Items,

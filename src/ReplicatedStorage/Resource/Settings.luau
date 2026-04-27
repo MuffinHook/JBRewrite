@@ -628,7 +628,7 @@ Settings.DevProduct = {
 		},
 		Type = "DuffelBagUpgrade",
 		Tier = 2,
-		AmountMult = 1.3333333333333333
+		AmountMult = 4/3
 	},
 	{
 		Id = 1109061774,
@@ -638,7 +638,7 @@ Settings.DevProduct = {
 		},
 		Type = "DuffelBagUpgrade",
 		Tier = 3,
-		AmountMult = 1.6666666666666665
+		AmountMult = 5/3
 	},
 	{
 		Id = 1109061792,

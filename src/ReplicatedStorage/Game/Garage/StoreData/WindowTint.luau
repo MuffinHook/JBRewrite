@@ -37,6 +37,6 @@ return {
 	end,
 	Update = function(displayPart, boundingBoxReference)
 		local animationTime = os.clock() / 2
-		displayPart.CFrame = CFrame.Angles(0, 2.356194490192345 + math.cos(animationTime % 6.283185307179586) * 0.1, 0) * CFrame.Angles(math.sin(animationTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, boundingBoxReference.BoundingBox.Size.Magnitude * 0.6)
+		displayPart.CFrame = CFrame.Angles(0, 2.356194490192345 + math.cos(animationTime % math.tau) * 0.1, 0) * CFrame.Angles(math.sin(animationTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, boundingBoxReference.BoundingBox.Size.Magnitude * 0.6)
 	end
 }

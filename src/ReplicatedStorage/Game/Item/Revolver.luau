@@ -35,7 +35,7 @@ end
 function Revolver.UpdateItemSprings(itemProperties)
 	Gun.UpdateItemSprings(itemProperties)
 	itemProperties.CylinderPosition = itemProperties.SpringCylinder:Update()
-	itemProperties.CylinderTotalSpin = (itemProperties.CylinderTotalSpin + itemProperties.SpringCylinderSpin:Update()) % 6.283185307179586
+	itemProperties.CylinderTotalSpin = (itemProperties.CylinderTotalSpin + itemProperties.SpringCylinderSpin:Update()) % math.tau
 end
 function Revolver.UpdateItemJoints(itemProperties)
 	Gun.UpdateItemJoints(itemProperties)

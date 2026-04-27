@@ -614,7 +614,7 @@ return {
 	end,
 	Update = function(model, extents)
 		local elapsedTime = os.clock() / 2
-		model.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, extents:GetExtentsSize().Magnitude * 0.6)
+		model.CFrame = CFrame.Angles(0, elapsedTime % math.tau, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, extents:GetExtentsSize().Magnitude * 0.6)
 	end,
 	IsValidForMake = function(textureData)
 		local vehicleMake = VehicleUtils.GetLocalVehiclePacket().Make

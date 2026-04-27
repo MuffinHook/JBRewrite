@@ -87,7 +87,7 @@ local function GetInstance(itemData)
 end
 local function ViewportUpdate(modelInstance, skeletonInfo)
 	local currentTime = tick()
-	modelInstance.CFrame = CFrame.Angles(0, currentTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(currentTime * 0.5) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, skeletonInfo.Skeleton.BoundingBox.Size.Magnitude * 0.8)
+	modelInstance.CFrame = CFrame.Angles(0, currentTime % math.tau, 0) * CFrame.Angles(math.sin(currentTime * 0.5) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, skeletonInfo.Skeleton.BoundingBox.Size.Magnitude * 0.8)
 end
 local UIModule = {
 	OnSkinClick = Signal.new(),
