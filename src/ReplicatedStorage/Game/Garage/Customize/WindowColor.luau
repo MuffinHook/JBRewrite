@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local PaintUtils = require(ReplicatedStorage.Game.Garage.PaintUtils)
@@ -17,13 +15,13 @@ return function(paintColorName, modelInfo)
 	if paintColorName then
 		local colorName = paintColorName.Name
 		local list = {}
-		for i, v in ipairs(Model:GetDescendants()) do
-			if v.Name == "Windows" then
-				table.insert(list, v)
+		for i, window in ipairs(Model:GetDescendants()) do
+			if window.Name == "Windows" then
+				table.insert(list, window)
 			end
 		end
-		for i, v in ipairs(list) do
-			local defaultPart = PaintUtils.GetDefaultVehiclePart(v)
+		for i, window in ipairs(list) do
+			local defaultPart = PaintUtils.GetDefaultVehiclePart(window)
 			local paintConfig = {
 				DefaultReflectance = defaultPart.Reflectance,
 				DefaultMaterial = defaultPart.Material
@@ -31,10 +29,10 @@ return function(paintColorName, modelInfo)
 			if Make == "Concept" then
 				paintConfig.OverrideMaterial = Enum.Material.ForceField
 			end
-			Paint.Part(v, colorName, paintConfig)
+			Paint.Part(window, colorName, paintConfig)
 			if Make == "Heli" or (Make == "BlackHawk" or Make == "LittleBird") then
-				local Color = v.Color
-				v.Color = Color3.new(math.clamp(Color.r * 1.4, 0, 1), math.clamp(Color.g * 1.4, 0, 1), (math.clamp(Color.b * 1.4, 0, 1)))
+				local Color = window.Color
+				window.Color = Color3.new(math.clamp(Color.r * 1.4, 0, 1), math.clamp(Color.g * 1.4, 0, 1), (math.clamp(Color.b * 1.4, 0, 1)))
 			end
 		end
 		local Preset = Model:FindFirstChild("Preset")

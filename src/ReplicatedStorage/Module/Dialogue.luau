@@ -1,100 +1,99 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Timeline = require(ReplicatedStorage.Module.Timeline)
-local t = {}
-t.__index = t
-function t.new()
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.Maid = Maid.new()
-	t2.OnMessage = Signal.new()
-	t2.ListEventUnconnected = {}
-	t2.MapEventSignal = {}
-	t2.Speed = 1
-	return t2
+local DialogueModule = {}
+DialogueModule.__index = DialogueModule
+function DialogueModule.new()
+	local self = {}
+	setmetatable(self, DialogueModule)
+	self.Maid = Maid.new()
+	self.OnMessage = Signal.new()
+	self.ListEventUnconnected = {}
+	self.MapEventSignal = {}
+	self.Speed = 1
+	return self
 end
-function t.Run(p1)
-	local instance = Timeline.new(p1.Seqs)
-	if not p1.BornAt then
-		p1.BornAt = workspace:GetServerTimeNow()
+function DialogueModule.Run(dialogue)
+	local instance = Timeline.new(dialogue.Seqs)
+	if not dialogue.BornAt then
+		dialogue.BornAt = workspace:GetServerTimeNow()
 	end
-	local v2 = 0
-	p1.Maid:GiveTask(RunService.Heartbeat:Connect(function()
-		local var12 = workspace:GetServerTimeNow()
-		if var12 - v2 > 0.5 then
-			v2 = var12
-			if instance:Update(p1.Speed * (var12 - p1.BornAt)) then
+	local lastHeartbeatTime = 0
+	dialogue.Maid:GiveTask(RunService.Heartbeat:Connect(function()
+		local currentTime = workspace:GetServerTimeNow()
+		if currentTime - lastHeartbeatTime > 0.5 then
+			lastHeartbeatTime = currentTime
+			if instance:Update(dialogue.Speed * (currentTime - dialogue.BornAt)) then
 				instance = nil
-				p1:Destroy()
+				dialogue:Destroy()
 			end
 		end
 	end))
 end
-function t.SetBornAt(p1, p2)
-	p1.BornAt = p2
+function DialogueModule.SetBornAt(dialogue, timestamp)
+	dialogue.BornAt = timestamp
 end
-function t.SetSpeed(p1, p2)
-	p1.Speed = p2
+function DialogueModule.SetSpeed(dialogue, speed)
+	dialogue.Speed = speed
 end
-function t.LoadData(p1, p2)
-	assert(p1.Data == nil)
-	p1.Data = p2
-	local t = {}
-	for i, v in ipairs(p2) do
-		local v2
-		v2 = v.Duration ~= nil
-		assert(v2)
-		table.insert(t, { function(p12)
-				if p12 == 0 then
-					p1.OnMessage:Fire(v)
-					if v.Events ~= nil then
-						for i, v2 in ipairs(v.Events) do
-							if p1.MapEventSignal[v2] == nil then
-								error(("Missing signal for event: %s"):format(v2))
+function DialogueModule.LoadData(dialogue, data)
+	assert(dialogue.Data == nil)
+	dialogue.Data = data
+	local sequences = {}
+	for i, messageData in ipairs(data) do
+		local hasDuration
+		hasDuration = messageData.Duration ~= nil
+		assert(hasDuration)
+		table.insert(sequences, { function(progress)
+				if progress == 0 then
+					dialogue.OnMessage:Fire(messageData)
+					if messageData.Events ~= nil then
+						for i, eventName in ipairs(messageData.Events) do
+							if dialogue.MapEventSignal[eventName] == nil then
+								error(("Missing signal for event: %s"):format(eventName))
 							end
-							p1.MapEventSignal[v2]:Fire(v)
+							dialogue.MapEventSignal[eventName]:Fire(messageData)
 						end
 					end
 				end
-			end, v.Duration })
-		if v.Events ~= nil then
-			for i2, v3 in ipairs(v.Events) do
-				if p1.MapEventSignal[v3] ~= nil then
-					error(("There already exists an event named: %s"):format(v3))
+			end, messageData.Duration })
+		if messageData.Events ~= nil then
+			for eventIndex, eventName in ipairs(messageData.Events) do
+				if dialogue.MapEventSignal[eventName] ~= nil then
+					error(("There already exists an event named: %s"):format(eventName))
 				end
-				local instance32 = Signal.new()
-				p1.MapEventSignal[v3] = instance32
-				p1.Maid:GiveTask(instance32)
-				table.insert(p1.ListEventUnconnected, v3)
+				local eventSignal = Signal.new()
+				dialogue.MapEventSignal[eventName] = eventSignal
+				dialogue.Maid:GiveTask(eventSignal)
+				table.insert(dialogue.ListEventUnconnected, eventName)
 			end
 		end
 	end
-	p1.Seqs = t
+	dialogue.Seqs = sequences
 end
-function t.Connect(p1, p2, p3)
-	for i = #p1.ListEventUnconnected, 1, -1 do
-		if p1.ListEventUnconnected[i] == p2 then
-			table.remove(p1.ListEventUnconnected, i)
+function DialogueModule.Connect(dialogue, eventName, callback)
+	for i = #dialogue.ListEventUnconnected, 1, -1 do
+		if dialogue.ListEventUnconnected[i] == eventName then
+			table.remove(dialogue.ListEventUnconnected, i)
 			break
 		end
 	end
-	if p1.MapEventSignal[p2] == nil then
-		error(("No signal exists for event: %s"):format(p2))
+	if dialogue.MapEventSignal[eventName] == nil then
+		error(("No signal exists for event: %s"):format(eventName))
 	end
-	p1.MapEventSignal[p2]:Connect(p3)
+	dialogue.MapEventSignal[eventName]:Connect(callback)
 end
-function t.VerifyAllConnected(p1)
-	if #p1.ListEventUnconnected > 0 then
-		error(("Not all events are unconnected... remaining: %s"):format(table.concat(p1.ListEventUnconnected, ", ")))
+function DialogueModule.VerifyAllConnected(dialogue)
+	if #dialogue.ListEventUnconnected > 0 then
+		error(("Not all events are unconnected... remaining: %s"):format(table.concat(dialogue.ListEventUnconnected, ", ")))
 	end
 end
-function t.Destroy(p1)
-	p1.MapEventSignal = nil
-	p1.Maid:Destroy()
-	p1.Maid = nil
-	setmetatable(p1, nil)
+function DialogueModule.Destroy(dialogue)
+	dialogue.MapEventSignal = nil
+	dialogue.Maid:Destroy()
+	dialogue.Maid = nil
+	setmetatable(dialogue, nil)
 end
-return t
+return DialogueModule

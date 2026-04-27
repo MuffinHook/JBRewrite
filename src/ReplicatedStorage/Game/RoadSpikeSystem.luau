@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Module.Time)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
@@ -14,29 +12,29 @@ local function FromPart(part)
 end
 local previousPosition = nil
 local function Check()
-	local v12 = VehicleUtils.GetLocalVehiclePacket()
-	if v12 == nil then
-		if v2 then
-			v2 = nil
+	local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+	if vehiclePacket == nil then
+		if previousVehiclePosition then
+			previousVehiclePosition = nil
 		end
-	elseif v12.Model:IsDescendantOf(workspace) then
-		local Position = v12.Model.PrimaryPart.Position
-		if v2 ~= nil then
-			for i, v in ipairs(spikeParts) do
-				local Part = v.Part
+	elseif vehiclePacket.Model:IsDescendantOf(workspace) then
+		local Position = vehiclePacket.Model.PrimaryPart.Position
+		if previousVehiclePosition ~= nil then
+			for i, spikePart in ipairs(spikeParts) do
+				local Part = spikePart.Part
 				local partCFrame = Part.CFrame
 				local partPosition = partCFrame.p
-				local prevDotProduct = (v2 - partPosition).Unit:Dot(partCFrame.LookVector)
+				local prevDotProduct = (previousVehiclePosition - partPosition).Unit:Dot(partCFrame.LookVector)
 				local currentDotProduct = (Position - partPosition).Unit:Dot(partCFrame.LookVector)
 				if math.sign(prevDotProduct) ~= math.sign(currentDotProduct) then
 					local crossAxisDot = (Position - partPosition):Dot(partCFrame.RightVector)
 					if math.abs(crossAxisDot) <= Part.Size.X * 0.5 and math.abs(((Position - partPosition):Dot(partCFrame.UpVector))) < 16 then
-						spikeEvent:FireServer("a" .. ("cvqx0sn8"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("nwqycdqc"):sub(4, 5):reverse() .. "m8fr", Part)
+						spikeEvent:FireServer("a0cym8fr", Part)
 					end
 				end
 			end
 		end
-		v2 = Position
+		previousVehiclePosition = Position
 	end
 end
 local lastCheckTime = 0
@@ -51,12 +49,12 @@ return {
 	Init = function(config)
 		spikeEvent = config.Event
 		RunService.Heartbeat:Connect(Stepped)
-		local function AddedFun(part)
+		local function onSpikePartAdded(part)
 			table.insert(spikeParts, {
 				Part = part
 			})
 		end
-		local function RemovedFun(part)
+		local function onSpikePartRemoved(part)
 			for i = #spikeParts, 1, -1 do
 				if spikeParts[i].Part == part then
 					table.remove(spikeParts, i)
@@ -64,12 +62,12 @@ return {
 				end
 			end
 		end
-		for i, v in ipairs(CollectionService:GetTagged("RoadSpike")) do
+		for i, spikePart in ipairs(CollectionService:GetTagged("RoadSpike")) do
 			table.insert(spikeParts, {
-				Part = v
+				Part = spikePart
 			})
 		end
-		CollectionService:GetInstanceAddedSignal("RoadSpike"):Connect(AddedFun)
-		CollectionService:GetInstanceRemovedSignal("RoadSpike"):Connect(RemovedFun)
+		CollectionService:GetInstanceAddedSignal("RoadSpike"):Connect(onSpikePartAdded)
+		CollectionService:GetInstanceRemovedSignal("RoadSpike"):Connect(onSpikePartRemoved)
 	end
 }

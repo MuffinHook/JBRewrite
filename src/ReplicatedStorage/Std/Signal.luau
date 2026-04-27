@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local freeRunnerThread = nil
 local function acquireRunnerThreadAndCallEventHandler(handler, ...)
 	local savedThread = freeRunnerThread

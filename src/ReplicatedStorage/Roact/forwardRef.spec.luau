@@ -259,9 +259,9 @@ return function()
 		local setRefCount = 0
 		local refValue
 
-		local setRef = function(r)
+		local setRef = function(refInstance)
 			setRefCount = setRefCount + 1
-			refValue = r
+			refValue = refInstance
 		end
 
 		local element = createElement(RefForwardingComponent, { [Ref] = setRef, value = 123 })

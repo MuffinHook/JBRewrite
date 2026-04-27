@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -10,8 +9,8 @@ local Roact = require(ReplicatedStorage.Roact)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local createElement = Roact.createElement
 local MinimapUtils = require(script.Parent.MinimapUtils)
-local v1 = Roact.PureComponent:extend("Minimap")
-v1.defaultProps = {
+local Minimap = Roact.PureComponent:extend("Minimap")
+Minimap.defaultProps = {
 	visible = true,
 	open = true,
 	size = UDim2.new(1, 0, 1, 0),
@@ -19,97 +18,97 @@ v1.defaultProps = {
 	mapScale = 1,
 	showToggleButton = true
 }
-function v1.init(p1) --[[ Line: 23 | Upvalues: Maid (copy), Roact (copy) ]]
-	p1._maid = Maid.new()
-	if p1.props.containerSize then
-		local updateContainerSize = p1.props.updateContainerSize
-		p1.containerSize = p1.props.containerSize
-		p1.updateContainerSize = updateContainerSize
+function Minimap.init(self) --[[ Line: 23 | Upvalues: Maid (copy), Roact (copy) ]]
+	self._maid = Maid.new()
+	if self.props.containerSize then
+		local updateContainerSize = self.props.updateContainerSize
+		self.containerSize = self.props.containerSize
+		self.updateContainerSize = updateContainerSize
 	else
-		local v1, v2 = Roact.createBinding(Vector2.new(512, 512))
-		p1.containerSize = v1
-		p1.updateContainerSize = v2
+		local containerSizeBinding, updateContainerSize = Roact.createBinding(Vector2.new(512, 512))
+		self.containerSize = containerSizeBinding
+		self.updateContainerSize = updateContainerSize
 	end
-	if p1.props.containerRef then
-		p1.containerRef = p1.props.containerRef
+	if self.props.containerRef then
+		self.containerRef = self.props.containerRef
 	else
-		p1.containerRef = Roact.createRef()
+		self.containerRef = Roact.createRef()
 	end
-	p1:setState({
+	self:setState({
 		trackVisible = false
 	})
 end
-local function makeMinimap(p1, p2, p3, p4, p5, p6) --[[ Line: 40 | Upvalues: createElement (copy), MinimapUtils (copy) ]]
+local function makeMinimap(self, positionBinding, imageId, zIndex, scale, transparency) --[[ Line: 40 | Upvalues: createElement (copy), MinimapUtils (copy) ]]
 	return createElement("ImageLabel", {
-		Image = ("rbxassetid://%d"):format(p3),
-		ImageColor3 = p1.props.mapImageColor3,
-		BackgroundTransparency = p6,
-		Position = p2:map(function(p12) --[[ Line: 46 | Upvalues: MinimapUtils (ref), p1 (copy), p5 (copy) ]]
-			local v1, v2, v3 = MinimapUtils.computeOffsetXY(p12[2], p12[1], p1.props.mapWorldWidth, p1.props.mapWorldHeight, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapImageWidth * p5, p1.props.mapImageHeight * p5, p1.props.mapScale)
-			if v1 then
-				return UDim2.new(0, -v2, 0, -v3)
+		Image = ("rbxassetid://%d"):format(imageId),
+		ImageColor3 = self.props.mapImageColor3,
+		BackgroundTransparency = transparency,
+		Position = positionBinding:map(function(bindingPosition) --[[ Line: 46 | Upvalues: MinimapUtils (ref), self (copy), scale (copy) ]]
+			local isValid, offsetX, offsetY = MinimapUtils.computeOffsetXY(bindingPosition[2], bindingPosition[1], self.props.mapWorldWidth, self.props.mapWorldHeight, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapImageWidth * scale, self.props.mapImageHeight * scale, self.props.mapScale)
+			if isValid then
+				return UDim2.new(0, -offsetX, 0, -offsetY)
 			else
 				return UDim2.new(0, 0, 0, 0)
 			end
 		end),
-		Size = p2:map(function(p12) --[[ Line: 63 | Upvalues: MinimapUtils (ref), p1 (copy), p5 (copy) ]]
-			local v1, _, _2, v2 = MinimapUtils.computeOffsetXY(p12[2], p12[1], p1.props.mapWorldWidth, p1.props.mapWorldHeight, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapImageWidth * p5, p1.props.mapImageHeight * p5, p1.props.mapScale)
-			if v1 then
-				return UDim2.new(0, p1.props.mapImageWidth * p5 * v2, 0, p1.props.mapImageHeight * p5 * v2)
+		Size = positionBinding:map(function(bindingPosition) --[[ Line: 63 | Upvalues: MinimapUtils (ref), self (copy), scale (copy) ]]
+			local isValid, _, _2, scaleValue = MinimapUtils.computeOffsetXY(bindingPosition[2], bindingPosition[1], self.props.mapWorldWidth, self.props.mapWorldHeight, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapImageWidth * scale, self.props.mapImageHeight * scale, self.props.mapScale)
+			if isValid then
+				return UDim2.new(0, self.props.mapImageWidth * scale * scaleValue, 0, self.props.mapImageHeight * scale * scaleValue)
 			else
 				return UDim2.new(1, 0, 1, 0)
 			end
 		end),
-		ImageRectSize = p2:map(function(p12) --[[ Line: 84 | Upvalues: MinimapUtils (ref), p1 (copy), p5 (copy) ]]
-			local v1, _, _2, v2 = MinimapUtils.computeOffsetXY(p12[2], p12[1], p1.props.mapWorldWidth, p1.props.mapWorldHeight, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapImageWidth * p5, p1.props.mapImageHeight * p5, p1.props.mapScale)
-			if v1 then
+		ImageRectSize = positionBinding:map(function(bindingPosition) --[[ Line: 84 | Upvalues: MinimapUtils (ref), self (copy), scale (copy) ]]
+			local isValid, _, _2, scaleValue = MinimapUtils.computeOffsetXY(bindingPosition[2], bindingPosition[1], self.props.mapWorldWidth, self.props.mapWorldHeight, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapImageWidth * scale, self.props.mapImageHeight * scale, self.props.mapScale)
+			if isValid then
 				return nil
 			end
-			local v3 = p12[1]
-			if v3 then
-				return v3 / v2
+			local imageRectSizeValue = bindingPosition[1]
+			if imageRectSizeValue then
+				return imageRectSizeValue / scaleValue
 			end
 		end),
-		ImageRectOffset = p2:map(function(p12) --[[ Line: 105 | Upvalues: MinimapUtils (ref), p1 (copy), p5 (copy) ]]
-			local v1, v2, v3, v4 = MinimapUtils.computeOffsetXY(p12[2], p12[1], p1.props.mapWorldWidth, p1.props.mapWorldHeight, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapImageWidth * p5, p1.props.mapImageHeight * p5, p1.props.mapScale)
-			if v1 then
+		ImageRectOffset = positionBinding:map(function(bindingPosition) --[[ Line: 105 | Upvalues: MinimapUtils (ref), self (copy), scale (copy) ]]
+			local isValid, offsetX, offsetY, scaleValue = MinimapUtils.computeOffsetXY(bindingPosition[2], bindingPosition[1], self.props.mapWorldWidth, self.props.mapWorldHeight, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapImageWidth * scale, self.props.mapImageHeight * scale, self.props.mapScale)
+			if isValid then
 				return nil
 			else
-				return Vector2.new(v2, v3) / v4
+				return Vector2.new(offsetX, offsetY) / scaleValue
 			end
 		end),
-		ZIndex = p4
+		ZIndex = zIndex
 	}, {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
 		})
 	})
 end
-function v1.didMount(p1) --[[ Line: 130 | Upvalues: RunService (copy), CharacterUtils (copy), Players (copy) ]]
-	p1._maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 131 | Upvalues: p1 (copy), CharacterUtils (ref), Players (ref) ]]
-		local v1 = os.clock()
-		if p1.props.points then
-			for i, v in ipairs(p1.props.points) do
-				local v2, v3
+function Minimap.didMount(self) --[[ Line: 130 | Upvalues: RunService (copy), CharacterUtils (copy), Players (copy) ]]
+	self._maid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 131 | Upvalues: self (copy), CharacterUtils (ref), Players (ref) ]]
+		local now = os.clock()
+		if self.props.points then
+			for i, v in ipairs(self.props.points) do
+				local distanceToPlayer, invisibilityDuration
 				if v._position and v.part then
 					v._updatePosition(v.part.Position)
 				end
 				if v._visible then
 					if v.flash then
-						if v.nextVisibleToggle < v1 then
-							local v4 = not v._visible:getValue()
-							local v5 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-							v2 = if v5 and v._position then (v5.Position - v._position:getValue()).Magnitude else 1.797693134862316e308
-							if v2 > 700 then
-								v4 = false
+						if v.nextVisibleToggle < now then
+							local shouldBeVisible = not v._visible:getValue()
+							local playerRoot = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+							distanceToPlayer = if playerRoot and v._position then (playerRoot.Position - v._position:getValue()).Magnitude else 1.797693134862316e308
+							if distanceToPlayer > 700 then
+								shouldBeVisible = false
 							end
-							if v4 then
-								v.nextVisibleToggle = v1 + 0.3333333333333333
+							if shouldBeVisible then
+								v.nextVisibleToggle = now + 0.3333333333333333
 							else
-								v3 = v.invisibilityTimeFunc and v.invisibilityTimeFunc() or 3
-								v.nextVisibleToggle = v1 + v3
+								invisibilityDuration = v.invisibilityTimeFunc and v.invisibilityTimeFunc() or 3
+								v.nextVisibleToggle = now + invisibilityDuration
 							end
-							v._updateVisible(v4)
+							v._updateVisible(shouldBeVisible)
 						end
 					elseif not v._visible:getValue() then
 						v._updateVisible(true)
@@ -118,89 +117,89 @@ function v1.didMount(p1) --[[ Line: 130 | Upvalues: RunService (copy), Character
 			end
 		end
 	end))
-	p1._maid:GiveTask(workspace:GetAttributeChangedSignal("RaceTrackActive"):Connect(function() --[[ Line: 168 | Upvalues: p1 (copy) ]]
-		local t = {}
-		t.trackVisible = workspace:GetAttribute("RaceTrackActive") == true
-		p1:setState(t)
+	self._maid:GiveTask(workspace:GetAttributeChangedSignal("RaceTrackActive"):Connect(function() --[[ Line: 168 | Upvalues: self (copy) ]]
+		local stateUpdate = {}
+		stateUpdate.trackVisible = workspace:GetAttribute("RaceTrackActive") == true
+		self:setState(stateUpdate)
 	end))
-	local isNotTrackVisible = p1.state.trackVisible ~= workspace:GetAttribute("RaceTrackActive")
+	local isNotTrackVisible = self.state.trackVisible ~= workspace:GetAttribute("RaceTrackActive")
 	if isNotTrackVisible == true then
-		local t = {}
-		t.trackVisible = workspace:GetAttribute("RaceTrackActive") == true
-		p1:setState(t)
+		local stateUpdate = {}
+		stateUpdate.trackVisible = workspace:GetAttribute("RaceTrackActive") == true
+		self:setState(stateUpdate)
 	end
 end
-function v1.render(p1) --[[ Line: 179 | Upvalues: Roact (copy), createElement (copy), MinimapUtils (copy), ColorUtils (copy), Dictionary (copy), makeMinimap (copy) ]]
-	if p1.props.visible then
-		local v1 = p1.props.pointsChildren or {}
-		if p1.props.points then
-			for i, v in ipairs(p1.props.points) do
+function Minimap.render(self) --[[ Line: 179 | Upvalues: Roact (copy), createElement (copy), MinimapUtils (copy), ColorUtils (copy), Dictionary (copy), makeMinimap (copy) ]]
+	if self.props.visible then
+		local children = self.props.pointsChildren or {}
+		if self.props.points then
+			for i, v in ipairs(self.props.points) do
 				if not v._position then
-					local v2 = v.worldPosition or v.part and v.part.Position
-					if not v2 then
+					local initialPosition = v.worldPosition or v.part and v.part.Position
+					if not initialPosition then
 						if typeof(v._debugStr) == "string" then
 							warn("^ debug str: " .. v._debugStr)
 						end
-						v2 = Vector3.new(0, 0, 0)
+						initialPosition = Vector3.new(0, 0, 0)
 					end
-					local v3, v4 = Roact.createBinding(v2)
-					v._position = v3
-					v._updatePosition = v4
+					local positionBinding, updatePosition = Roact.createBinding(initialPosition)
+					v._position = positionBinding
+					v._updatePosition = updatePosition
 				end
 				if not v._visible then
 					v.nextVisibleToggle = os.clock()
-					local v5, v6 = Roact.createBinding(not v.flash)
-					v._visible = v5
-					v._updateVisible = v6
+					local visibleBinding, updateVisible = Roact.createBinding(not v.flash)
+					v._visible = visibleBinding
+					v._updateVisible = updateVisible
 				end
-				local v7 = v.size or UDim2.new(0, 16, 0, 16)
-				if p1.props.isSmallScreen then
-					v7 = UDim2.new(0, v7.X.Offset / 2, 0, v7.Y.Offset / 2)
+				local iconSize = v.size or UDim2.new(0, 16, 0, 16)
+				if self.props.isSmallScreen then
+					iconSize = UDim2.new(0, iconSize.X.Offset / 2, 0, iconSize.Y.Offset / 2)
 				end
-				v1[v.name] = createElement("ImageLabel", {
+				children[v.name] = createElement("ImageLabel", {
 					BackgroundTransparency = 1,
 					Image = "rbxassetid://4903883144",
 					ImageColor3 = v.color,
-					Size = v7,
+					Size = iconSize,
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Visible = v._visible,
 					ZIndex = 3,
-					Position = v._position:map(function(p12) --[[ Line: 212 | Upvalues: MinimapUtils (ref), p1 (copy) ]]
-						return MinimapUtils.worldToScale(p12.X, p12.Z, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapWorldWidth, p1.props.mapWorldHeight)
+					Position = v._position:map(function(bindingPosition) --[[ Line: 212 | Upvalues: MinimapUtils (ref), self (copy) ]]
+						return MinimapUtils.worldToScale(bindingPosition.X, bindingPosition.Z, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapWorldWidth, self.props.mapWorldHeight)
 					end)
 				})
 			end
 		end
-		if p1.props.labels then
-			for i, v in ipairs(p1.props.labels) do
-				local v9 = ("label_%s"):format(v.title)
-				local v10 = nil
+		if self.props.labels then
+			for i, v in ipairs(self.props.labels) do
+				local labelKey = ("label_%s"):format(v.title)
+				local labelPosition = nil
 				if typeof(v.position) == "Vector3" then
 					local position_2 = v.position
-					v10 = MinimapUtils.worldToScale(position_2.X, position_2.Z, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapWorldWidth, p1.props.mapWorldHeight)
+					labelPosition = MinimapUtils.worldToScale(position_2.X, position_2.Z, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapWorldWidth, self.props.mapWorldHeight)
 				else
 					if typeof(v.position) == "table" and v.position.map then
-						v10 = v.position:map(function(p12) --[[ Line: 240 | Upvalues: MinimapUtils (ref), p1 (copy) ]]
-							return MinimapUtils.worldToScale(p12.X, p12.Z, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapWorldWidth, p1.props.mapWorldHeight)
+						labelPosition = v.position:map(function(bindingPosition) --[[ Line: 240 | Upvalues: MinimapUtils (ref), self (copy) ]]
+							return MinimapUtils.worldToScale(bindingPosition.X, bindingPosition.Z, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapWorldWidth, self.props.mapWorldHeight)
 						end)
 					end
 				end
-				local v13 = nil
-				local t = {
+				local labelClassName = nil
+				local labelProps = {
 					BackgroundTransparency = 1,
 					AnchorPoint = Vector2.new(0.5, 0.5),
-					Position = v10,
+					Position = labelPosition,
 					ZIndex = 1
 				}
-				local t2 = {}
+				local labelChildren = {}
 				if v.imageId then
-					v13 = "ImageLabel"
-					t.Image = "rbxassetid://2819326547"
-					t.Size = p1.containerSize:map(function(p1) --[[ Line: 262 ]]
-						return UDim2.new(0, p1.X * 0.03, 0, p1.X * 0.03)
+					labelClassName = "ImageLabel"
+					labelProps.Image = "rbxassetid://2819326547"
+					labelProps.Size = self.containerSize:map(function(containerSizeValue) --[[ Line: 262 ]]
+						return UDim2.new(0, containerSizeValue.X * 0.03, 0, containerSizeValue.X * 0.03)
 					end)
-					t.ImageColor3 = v.markerColor
-					local t3 = {
+					labelProps.ImageColor3 = v.markerColor
+					local iconChildren = {
 						Icon = createElement("ImageLabel", {
 							BackgroundTransparency = 1,
 							Size = UDim2.new(1, 0, 1, 0),
@@ -208,75 +207,75 @@ function v1.render(p1) --[[ Line: 179 | Upvalues: Roact (copy), createElement (c
 							Image = ("rbxassetid://%s"):format(v.imageId)
 						})
 					}
-					t3.UIScale = v.scale and createElement("UIScale", {
+					iconChildren.UIScale = v.scale and createElement("UIScale", {
 						Scale = v.scale
 					})
-					t2 = t3
+					labelChildren = iconChildren
 				elseif v.title then
-					t.Size = p1.containerSize:map(function(p1) --[[ Line: 279 ]]
-						return UDim2.new(0, p1.X * 0.1, 0, p1.X * 0.02)
+					labelProps.Size = self.containerSize:map(function(containerSizeValue) --[[ Line: 279 ]]
+						return UDim2.new(0, containerSizeValue.X * 0.1, 0, containerSizeValue.X * 0.02)
 					end)
-					t.Font = Enum.Font.GothamBlack
-					t.TextColor3 = Color3.new(255/255, 255/255, 255/255)
-					t.Text = v.title
-					t.TextScaled = true
-					t.ZIndex = 2
-					t2.UIStroke = createElement("UIStroke", {
+					labelProps.Font = Enum.Font.GothamBlack
+					labelProps.TextColor3 = Color3.new(255/255, 255/255, 255/255)
+					labelProps.Text = v.title
+					labelProps.TextScaled = true
+					labelProps.ZIndex = 2
+					labelChildren.UIStroke = createElement("UIStroke", {
 						Color = Color3.new(0/255, 0/255, 0/255),
 						Thickness = 2
 					})
-					v13 = "TextLabel"
+					labelClassName = "TextLabel"
 				end
-				assert(v13, "missing classname for label")
-				v1[v9] = createElement(v13, t, t2)
+				assert(labelClassName, "missing classname for label")
+				children[labelKey] = createElement(labelClassName, labelProps, labelChildren)
 			end
 		end
-		v1._you = createElement("ImageLabel", {
+		children._you = createElement("ImageLabel", {
 			BackgroundTransparency = 1,
 			Image = "rbxassetid://4903882925",
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			Size = p1.containerSize:map(function(p1) --[[ Line: 301 ]]
-				return UDim2.new(0, math.min(20, p1.X * 0.1), 0, (math.min(20, p1.X * 0.1)))
+			Size = self.containerSize:map(function(containerSizeValue) --[[ Line: 301 ]]
+				return UDim2.new(0, math.min(20, containerSizeValue.X * 0.1), 0, (math.min(20, containerSizeValue.X * 0.1)))
 			end),
-			ImageColor3 = p1.props.color,
+			ImageColor3 = self.props.color,
 			ZIndex = 5,
-			Position = p1.props.worldPosition:map(function(p12) --[[ Line: 307 | Upvalues: MinimapUtils (ref), p1 (copy) ]]
-				return MinimapUtils.worldToScale(p12.X, p12.Z, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapWorldWidth, p1.props.mapWorldHeight)
+			Position = self.props.worldPosition:map(function(bindingPosition) --[[ Line: 307 | Upvalues: MinimapUtils (ref), self (copy) ]]
+				return MinimapUtils.worldToScale(bindingPosition.X, bindingPosition.Z, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapWorldWidth, self.props.mapWorldHeight)
 			end),
-			Rotation = p1.props.worldDirection:map(function(p1) --[[ Line: 317 ]]
-				return -math.deg(math.atan2(-p1.Z, p1.X) - 1.5707963267948966)
+			Rotation = self.props.worldDirection:map(function(directionValue) --[[ Line: 317 ]]
+				return -math.deg(math.atan2(-directionValue.Z, directionValue.X) - 1.5707963267948966)
 			end)
 		})
-		if p1.props.waypoint then
-			local waypoint = p1.props.waypoint
-			local t = {
+		if self.props.waypoint then
+			local waypoint = self.props.waypoint
+			local waypointProps = {
 				BackgroundTransparency = 1,
 				Image = "rbxassetid://8971844725",
 				ImageColor3 = Color3.new(255/255, 255/255, 255/255)
 			}
-			t.Size = p1.props.isSmallScreen and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 48, 0, 48)
-			t.AnchorPoint = Vector2.new(0.5, 0.5)
-			t.ZIndex = 3
-			t.Position = MinimapUtils.worldToScale(waypoint.X, waypoint.Z, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapWorldWidth, p1.props.mapWorldHeight)
-			v1._waypoint = createElement("ImageLabel", t)
+			waypointProps.Size = self.props.isSmallScreen and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 48, 0, 48)
+			waypointProps.AnchorPoint = Vector2.new(0.5, 0.5)
+			waypointProps.ZIndex = 3
+			waypointProps.Position = MinimapUtils.worldToScale(waypoint.X, waypoint.Z, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapWorldWidth, self.props.mapWorldHeight)
+			children._waypoint = createElement("ImageLabel", waypointProps)
 		end
-		local v18 = p1.props[Roact.Children] or {}
-		if p1.props.square then
-			v18.AspectRatio = createElement("UIAspectRatioConstraint", {
+		local frameChildren = self.props[Roact.Children] or {}
+		if self.props.square then
+			frameChildren.AspectRatio = createElement("UIAspectRatioConstraint", {
 				AspectRatio = 1
 			})
 		end
-		if p1.props.time ~= nil then
-			local t = {
+		if self.props.time ~= nil then
+			local timeProps = {
 				BackgroundTransparency = 1,
 				Image = "rbxassetid://4903944433",
-				ImageColor3 = p1.props.color,
+				ImageColor3 = self.props.color,
 				Size = UDim2.new(0.5, 0, 1, 0)
 			}
-			t.AnchorPoint = p1.props.open and Vector2.new(0.9, 0.5) or Vector2.new(0, 0)
-			t.Position = UDim2.new(if p1.props.open then 1 elseif p1.props.isSmallScreen then 0.05 else 0, 0, if p1.props.open then 1 elseif p1.props.isSmallScreen then 0.05 else 0, 0)
-			t.ZIndex = 2
-			v18.Time = createElement("ImageLabel", t, {
+			timeProps.AnchorPoint = self.props.open and Vector2.new(0.9, 0.5) or Vector2.new(0, 0)
+			timeProps.Position = UDim2.new(if self.props.open then 1 elseif self.props.isSmallScreen then 0.05 else 0, 0, if self.props.open then 1 elseif self.props.isSmallScreen then 0.05 else 0, 0)
+			timeProps.ZIndex = 2
+			frameChildren.Time = createElement("ImageLabel", timeProps, {
 				AspectRatio = createElement("UIAspectRatioConstraint", {
 					AspectRatio = 3
 				}),
@@ -286,7 +285,7 @@ function v1.render(p1) --[[ Line: 179 | Upvalues: Roact (copy), createElement (c
 				Time = createElement("TextLabel", {
 					BackgroundTransparency = 1,
 					Font = Enum.Font.LuckiestGuy,
-					Text = p1.props.time,
+					Text = self.props.time,
 					TextColor3 = Color3.new(255/255, 255/255, 255/255),
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Size = UDim2.new(0.7, 0, 0.7, 0),
@@ -295,21 +294,21 @@ function v1.render(p1) --[[ Line: 179 | Upvalues: Roact (copy), createElement (c
 				})
 			})
 		end
-		if p1.props.showToggleButton then
-			local t = {
+		if self.props.showToggleButton then
+			local toggleProps = {
 				BackgroundTransparency = 1,
 				Image = "rbxassetid://4933143781",
 				AnchorPoint = Vector2.new(0.4, 0.4),
 				ZIndex = 3,
 				Position = UDim2.new(0, 0, 0, 0)
 			}
-			t.Size = p1.props.isSmallScreen and UDim2.new(0.2, 0, 0.2, 0) or UDim2.new(0.1, 0, 0.1, 0)
-			t[Roact.Event.MouseButton1Down] = function() --[[ Line: 388 | Upvalues: p1 (copy) ]]
-				if p1.props.onToggle then
-					p1.props.onToggle(not p1.props.open)
+			toggleProps.Size = self.props.isSmallScreen and UDim2.new(0.2, 0, 0.2, 0) or UDim2.new(0.1, 0, 0.1, 0)
+			toggleProps[Roact.Event.MouseButton1Down] = function() --[[ Line: 388 | Upvalues: self (copy) ]]
+				if self.props.onToggle then
+					self.props.onToggle(not self.props.open)
 				end
 			end
-			v18.Toggle = createElement("ImageButton", t, {
+			frameChildren.Toggle = createElement("ImageButton", toggleProps, {
 				AspectRatio = createElement("UIAspectRatioConstraint", {
 					AspectRatio = 1
 				}),
@@ -318,9 +317,9 @@ function v1.render(p1) --[[ Line: 179 | Upvalues: Roact (copy), createElement (c
 				})
 			})
 		end
-		local t = {}
-		if p1.props.circles then
-			for v29, v30 in p1.props.circles do
+		local circlesTable = {}
+		if self.props.circles then
+			for v29, v30 in self.props.circles do
 				if not v30.worldRadiusBinding then
 					error("circle missing worldRadiusBinding")
 				end
@@ -330,32 +329,32 @@ function v1.render(p1) --[[ Line: 179 | Upvalues: Roact (copy), createElement (c
 				if not v30.name then
 					error("circle missing name")
 				end
-				local v31 = ("circle_%s"):format(v30.name)
-				if t[v31] then
+				local circleKey = ("circle_%s"):format(v30.name)
+				if circlesTable[circleKey] then
 					error(("duplicate circle name %s"):format(v30.name))
 				end
-				local v32 = v30.worldRadiusBinding:map(function(p12) --[[ Line: 419 | Upvalues: MinimapUtils (ref), p1 (copy) ]]
-					return MinimapUtils.relativeWorldToScale(2 * p12, 2 * p12, p1.props.mapWorldWidth, p1.props.mapWorldHeight)
+				local scaledRadius = v30.worldRadiusBinding:map(function(bindingPosition) --[[ Line: 419 | Upvalues: MinimapUtils (ref), self (copy) ]]
+					return MinimapUtils.relativeWorldToScale(2 * bindingPosition, 2 * bindingPosition, self.props.mapWorldWidth, self.props.mapWorldHeight)
 				end)
-				local v33 = v30.worldPositionBinding:map(function(p12) --[[ Line: 426 | Upvalues: MinimapUtils (ref), p1 (copy) ]]
-					return MinimapUtils.worldToScale(p12.X, p12.Z, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapWorldWidth, p1.props.mapWorldHeight)
+				local scaledPosition = v30.worldPositionBinding:map(function(bindingPosition) --[[ Line: 426 | Upvalues: MinimapUtils (ref), self (copy) ]]
+					return MinimapUtils.worldToScale(bindingPosition.X, bindingPosition.Z, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapWorldWidth, self.props.mapWorldHeight)
 				end)
-				local v34 = v30.color or Color3.new(255/255, 255/255, 255/255)
+				local circleColor = v30.color or Color3.new(255/255, 255/255, 255/255)
 				if v30.invert then
-					t[v31] = createElement("Frame", {
+					circlesTable[circleKey] = createElement("Frame", {
 						BackgroundTransparency = v30.transparency or 0,
-						BackgroundColor3 = v34,
+						BackgroundColor3 = circleColor,
 						BorderSizePixel = 0,
 						AnchorPoint = Vector2.new(0.5, 0.5),
-						Position = v33,
-						Size = v32,
+						Position = scaledPosition,
+						Size = scaledRadius,
 						ZIndex = 1
 					}, {
 						Corner = createElement("UICorner", {
 							CornerRadius = UDim.new(1, 0)
 						}),
 						StrokeOuter = createElement("UIStroke", {
-							Color = v34,
+							Color = circleColor,
 							Thickness = 500,
 							Transparency = 0
 						}),
@@ -367,95 +366,95 @@ function v1.render(p1) --[[ Line: 179 | Upvalues: Roact (copy), createElement (c
 								CornerRadius = UDim.new(1, 0)
 							}),
 							Stroke = createElement("UIStroke", {
-								Color = ColorUtils.brightenBy(v34, -0.2),
+								Color = ColorUtils.brightenBy(circleColor, -0.2),
 								Thickness = 2
 							})
 						})
 					})
 				else
-					t[v31] = createElement("Frame", {
+					circlesTable[circleKey] = createElement("Frame", {
 						BackgroundTransparency = v30.transparency or 0,
-						BackgroundColor3 = v34,
+						BackgroundColor3 = circleColor,
 						BorderSizePixel = 0,
 						AnchorPoint = Vector2.new(0.5, 0.5),
-						Position = v33,
-						Size = v32,
+						Position = scaledPosition,
+						Size = scaledRadius,
 						ZIndex = 1
 					}, {
 						Corner = createElement("UICorner", {
 							CornerRadius = UDim.new(1, 0)
 						}),
 						Stroke = createElement("UIStroke", {
-							Color = ColorUtils.brightenBy(v34, -0.2),
+							Color = ColorUtils.brightenBy(circleColor, -0.2),
 							Thickness = 2
 						})
 					})
 				end
 			end
 		end
-		if p1.props.open then
-			local v35 = Roact.joinBindings({ p1.containerSize, p1.props.worldPosition })
-			local t2 = {
+		if self.props.open then
+			local containerSizeAndPosition = Roact.joinBindings({ self.containerSize, self.props.worldPosition })
+			local mapButtonProps = {
 				AutoButtonColor = false,
 				Text = "",
 				BackgroundTransparency = 0,
 				Size = UDim2.new(1, 0, 1, 0),
-				BackgroundColor3 = p1.props.color,
-				[Roact.Event.Activated] = p1.props.onClick
+				BackgroundColor3 = self.props.color,
+				[Roact.Event.Activated] = self.props.onClick
 			}
-			local t3 = {
+			local mapButtonChildren = {
 				UICorner = createElement("UICorner", {
 					CornerRadius = UDim.new(0, 4)
 				})
 			}
-			local t4 = {}
-			t4.BackgroundColor3 = p1.props.mapImageColor3 and p1.props.mapImageColor3:map(function(p1) --[[ Line: 508 ]]
-				return Color3.fromRGB(84 * p1.r, 128 * p1.g, 178 * p1.b)
+			local containerProps = {}
+			containerProps.BackgroundColor3 = self.props.mapImageColor3 and self.props.mapImageColor3:map(function(colorValue) --[[ Line: 508 ]]
+				return Color3.fromRGB(84 * colorValue.r, 128 * colorValue.g, 178 * colorValue.b)
 			end) or Color3.new(0.1, 0.1, 0.1)
-			t4.BackgroundTransparency = 0
-			t4.AnchorPoint = Vector2.new(0.5, 0.5)
-			t4.Size = UDim2.new(1, -4, 1, -4)
-			t4.Position = UDim2.new(0.5, 0, 0.5, 0)
-			t4.ClipsDescendants = true
-			t4[Roact.Ref] = p1.containerRef
-			t4[Roact.Change.AbsoluteSize] = function(p12) --[[ Line: 519 | Upvalues: p1 (copy) ]]
-				if p12 then
-					p1.updateContainerSize(p12.AbsoluteSize)
+			containerProps.BackgroundTransparency = 0
+			containerProps.AnchorPoint = Vector2.new(0.5, 0.5)
+			containerProps.Size = UDim2.new(1, -4, 1, -4)
+			containerProps.Position = UDim2.new(0.5, 0, 0.5, 0)
+			containerProps.ClipsDescendants = true
+			containerProps[Roact.Ref] = self.containerRef
+			containerProps[Roact.Change.AbsoluteSize] = function(bindingPosition) --[[ Line: 519 | Upvalues: self (copy) ]]
+				if bindingPosition then
+					self.updateContainerSize(bindingPosition.AbsoluteSize)
 				end
 			end
-			local t5 = {
+			local containerChildren = {
 				UICorner = createElement("UICorner", {
 					CornerRadius = UDim.new(0, 4)
 				}),
 				Points = createElement("Frame", {
 					BackgroundTransparency = 1,
 					AnchorPoint = Vector2.new(0, 0),
-					Position = v35:map(function(p12) --[[ Line: 532 | Upvalues: MinimapUtils (ref), p1 (copy) ]]
-						local _, v1, v2 = MinimapUtils.computeOffsetXY(p12[2], p12[1], p1.props.mapWorldWidth, p1.props.mapWorldHeight, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapImageWidth, p1.props.mapImageHeight, p1.props.mapScale)
-						return UDim2.new(0, -v1, 0, -v2)
+					Position = containerSizeAndPosition:map(function(bindingPosition) --[[ Line: 532 | Upvalues: MinimapUtils (ref), self (copy) ]]
+						local _, offsetX, offsetY = MinimapUtils.computeOffsetXY(bindingPosition[2], bindingPosition[1], self.props.mapWorldWidth, self.props.mapWorldHeight, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapImageWidth, self.props.mapImageHeight, self.props.mapScale)
+						return UDim2.new(0, -offsetX, 0, -offsetY)
 					end),
-					Size = v35:map(function(p12) --[[ Line: 546 | Upvalues: MinimapUtils (ref), p1 (copy) ]]
-						local _, _2, _3, v1 = MinimapUtils.computeOffsetXY(p12[2], p12[1], p1.props.mapWorldWidth, p1.props.mapWorldHeight, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapImageWidth, p1.props.mapImageHeight, p1.props.mapScale)
-						return UDim2.new(0, p1.props.mapImageWidth * v1, 0, p1.props.mapImageHeight * v1)
+					Size = containerSizeAndPosition:map(function(bindingPosition) --[[ Line: 546 | Upvalues: MinimapUtils (ref), self (copy) ]]
+						local _, _2, _3, scaleValue = MinimapUtils.computeOffsetXY(bindingPosition[2], bindingPosition[1], self.props.mapWorldWidth, self.props.mapWorldHeight, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapImageWidth, self.props.mapImageHeight, self.props.mapScale)
+						return UDim2.new(0, self.props.mapImageWidth * scaleValue, 0, self.props.mapImageHeight * scaleValue)
 					end),
 					ZIndex = 2
-				}, Dictionary.merge(v1, t)),
-				Render = makeMinimap(p1, v35, p1.props.mapImageId, 0, 1, 0)
+				}, Dictionary.merge(children, circlesTable)),
+				Render = makeMinimap(self, containerSizeAndPosition, self.props.mapImageId, 0, 1, 0)
 			}
-			t5.RenderTrack = p1.state.trackVisible and makeMinimap(p1, v35, 106966740654302, 1, 2, 1) or nil
-			t3.Container = createElement("Frame", t4, Dictionary.merge(t5, p1.props.containerChildren))
-			v18.Map = createElement("TextButton", t2, t3)
+			containerChildren.RenderTrack = self.state.trackVisible and makeMinimap(self, containerSizeAndPosition, 106966740654302, 1, 2, 1) or nil
+			mapButtonChildren.Container = createElement("Frame", containerProps, Dictionary.merge(containerChildren, self.props.containerChildren))
+			frameChildren.Map = createElement("TextButton", mapButtonProps, mapButtonChildren)
 		end
 		return createElement("Frame", {
 			BackgroundTransparency = 1,
-			Size = p1.props.size,
-			Position = p1.props.position,
-			AnchorPoint = p1.props.anchorPoint,
-			LayoutOrder = p1.props.displayOrder
-		}, v18)
+			Size = self.props.size,
+			Position = self.props.position,
+			AnchorPoint = self.props.anchorPoint,
+			LayoutOrder = self.props.displayOrder
+		}, frameChildren)
 	end
 end
-function v1.willUnmount(p1) --[[ Line: 579 ]]
-	p1._maid:DoCleaning()
+function Minimap.willUnmount(self) --[[ Line: 579 ]]
+	self._maid:DoCleaning()
 end
-return v1
+return Minimap

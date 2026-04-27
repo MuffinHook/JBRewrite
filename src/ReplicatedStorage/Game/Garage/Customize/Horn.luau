@@ -1,8 +1,7 @@
--- Reviewed by Claude
-return function(p1, p2)
-	local Model = p2.Model
-	if p1 then
-		Model:SetAttribute("VehicleHornId", p1.SoundId)
-		Model:SetAttribute("VehicleHornLoopable", p1.Loopable)
+return function(horn, vehicleData)
+	local Model = vehicleData.Model
+	if horn then
+		Model:SetAttribute("VehicleHornId", horn.SoundId)
+		Model:SetAttribute("VehicleHornLoopable", horn.Loopable)
 	end
 end

@@ -1,9 +1,7 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	setMembers = function(arg1, self)
-		assert(self.value ~= nil, "members cannot be nil; try blank table?")
-		return self.value
+	setMembers = function(previousState, action)
+		assert(action.value ~= nil, "members cannot be nil; try blank table?")
+		return action.value
 	end
 })

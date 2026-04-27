@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local CameraShakeInstance = require(script.Parent.CameraShakeInstance)
 local presets = {
 	Bump = function()

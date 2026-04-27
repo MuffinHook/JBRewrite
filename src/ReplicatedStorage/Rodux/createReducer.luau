@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 return function(initialState, actionsTable)
 	return function(state, action)
  if state == nil then

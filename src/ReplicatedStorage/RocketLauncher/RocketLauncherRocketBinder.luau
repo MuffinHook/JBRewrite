@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RocketLauncherConsts = require(ReplicatedStorage.RocketLauncher.RocketLauncherConsts)
@@ -10,13 +9,13 @@ local Binder = require(ReplicatedStorage.Std.Binder)
 local tbl = {}
 tbl.__index = tbl
 setmetatable(tbl, BaseObject)
-function tbl.new(p1)
-	local instance = BaseObject.new(p1)
+function tbl.new(baseConfig)
+	local instance = BaseObject.new(baseConfig)
 	setmetatable(instance, tbl)
 	assert(CollectionService:HasTag(instance.obj, SeekingMissileConsts.TAG_NAME), "Must be seeking missile")
-	SeekingMissileBinder:Promise(instance.obj):andThen(function(p1)
- p1.onExploded:Connect(function(p1)
- RocketLauncherUtils.explodeAt(p1)
+	SeekingMissileBinder:Promise(instance.obj):andThen(function(seekingMissile)
+ seekingMissile.onExploded:Connect(function(explosionPosition)
+ RocketLauncherUtils.explodeAt(explosionPosition)
  end)
 	end)
 	return instance

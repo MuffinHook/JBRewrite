@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Settings = require(ReplicatedStorage.Resource.Settings)
 local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
@@ -116,7 +114,7 @@ local COLORS = {
 		Color = Color3.fromRGB(255, 255, 255)
 	}
 }
-for v1, hyperchromeNames in HyperChromeUtils.getListOfHyperChromeNames() do
+for _, hyperchromeNames in HyperChromeUtils.getListOfHyperChromeNames() do
 	local chromeColor = HyperChromeUtils.getColorFromName(hyperchromeNames)
 	local colorLevelInfo = HyperChromeConsts.COLOR_TO_INFO_MAP[chromeColor].LevelToColor[HyperChromeUtils.getLevelFromName(hyperchromeNames)]
 	local hue, saturation, value = Color3.new(math.clamp(colorLevelInfo.r, 0, 1), math.clamp(colorLevelInfo.g, 0, 1), (math.clamp(colorLevelInfo.b, 0, 1))):ToHSV()

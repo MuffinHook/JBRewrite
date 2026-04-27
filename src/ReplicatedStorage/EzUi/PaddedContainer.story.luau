@@ -1,9 +1,8 @@
--- Reviewed by Claude
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
-return function(p1)
+return function(parent)
 	local PaddedContainer = require(script.Parent.PaddedContainer)
-	local v1 = Roact.mount(createElement("Frame", {
+	local roactHandle = Roact.mount(createElement("Frame", {
 		BackgroundTransparency = 0.9,
 		BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
 		Size = UDim2.new(1, 0, 1, 0)
@@ -47,8 +46,8 @@ return function(p1)
 				}, {})
 			})
 		})
-	}), p1)
+	}), parent)
 	return function()
-		Roact.unmount(v1)
+		Roact.unmount(roactHandle)
 	end
 end

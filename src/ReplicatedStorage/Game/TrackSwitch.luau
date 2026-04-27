@@ -1,58 +1,56 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NetSync = require(ReplicatedStorage.Module.NetSync)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local RunService = game:GetService("RunService")
 local TrackSwitch = {}
 TrackSwitch.__index = TrackSwitch
-function TrackSwitch.new(p1, callback)
+function TrackSwitch.new(duration, callback)
 	local instance = setmetatable({}, TrackSwitch)
-	local v3 = tick()
-	local function Heartbeat(p1)
-		local v1 = tick() - v3
-		if v1 >= 1 then
+	local startTime = tick()
+	local function Heartbeat(deltaTime)
+		local elapsedTime = tick() - startTime
+		if elapsedTime >= 1 then
 			instance.Event:Disconnect()
 			instance.Done = true
-			v1 = 1
+			elapsedTime = 1
 		end
-		callback(v1, p1)
+		callback(elapsedTime, deltaTime)
 	end
 	instance.Event = RunService.Heartbeat:Connect(Heartbeat)
 	instance.Done = false
 	return instance
 end
-function TrackSwitch.Destroy(p1)
-	p1.Event:Disconnect()
-	p1.Event = nil
-	p1.Done = true
+function TrackSwitch.Destroy(self)
+	self.Event:Disconnect()
+	self.Event = nil
+	self.Done = true
 end
 return {
-	Init = function(p1)
-		local _ = p1.Event
-		local em = p1.em
-		local v1 = nil
-		local function Update(p1)
-			if not p1.Tagged then
+	Init = function(eventManager)
+		local _ = eventManager.Event
+		local em = eventManager.em
+		local trackSwitchInstance = nil
+		local function Update(trackData)
+			if not trackData.Tagged then
 				return false
 			end
-			if p1.Type ~= "TrackSwitch" then
+			if trackData.Type ~= "TrackSwitch" then
 				return false
 			end
-			if v1 and not v1.Done then
-				v1:Destroy()
+			if trackSwitchInstance and not trackSwitchInstance.Done then
+				trackSwitchInstance:Destroy()
 			end
-			local Inst = p1.Inst
+			local Inst = trackData.Inst
 			local Rail = Inst.Parent.Parent.Rail
 			local Invert = Rail:FindFirstChild("Invert")
-			local transparency = if p1.Flipped then 0 else 1
+			local transparency = if trackData.Flipped then 0 else 1
 			Rail.Transparency = Invert and 1 - transparency or transparency
-			local v3 = Inst.Parent
-			v3.PrimaryPart = v3.Root
-			local Root = v3.Parent.Model.Root
-			v1 = TrackSwitch.new(0.5, function(progressFactor, p2)
-				p1.Rot = if p1.Flipped then -0.9424777960769379 else 0 * progressFactor + (p1.Rot or 0) * (1 - progressFactor)
-				v3:SetPrimaryPartCFrame(Root.CFrame * CFrame.Angles(0, 0, p1.Rot))
+			local parentModel = Inst.Parent
+			parentModel.PrimaryPart = parentModel.Root
+			local Root = parentModel.Parent.Model.Root
+			trackSwitchInstance = TrackSwitch.new(0.5, function(progressFactor, deltaTime)
+				trackData.Rot = if trackData.Flipped then -0.9424777960769379 else 0 * progressFactor + (trackData.Rot or 0) * (1 - progressFactor)
+				parentModel:SetPrimaryPartCFrame(Root.CFrame * CFrame.Angles(0, 0, trackData.Rot))
 			end)
 			Audio.ObjectLocal(Inst, 2803301098)
 		end

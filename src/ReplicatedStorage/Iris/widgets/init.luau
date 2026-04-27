@@ -1,13 +1,12 @@
--- Reviewed by Claude
 require(script.Parent.Types)
-local t = {}
-return function(p1)
-	t.GuiService = game:GetService("GuiService")
-	t.RunService = game:GetService("RunService")
-	t.UserInputService = game:GetService("UserInputService")
-	t.ContextActionService = game:GetService("ContextActionService")
-	t.TextService = game:GetService("TextService")
-	t.ICONS = {
+local utilities = {}
+return function(iris)
+	utilities.GuiService = game:GetService("GuiService")
+	utilities.RunService = game:GetService("RunService")
+	utilities.UserInputService = game:GetService("UserInputService")
+	utilities.ContextActionService = game:GetService("ContextActionService")
+	utilities.TextService = game:GetService("TextService")
+	utilities.ICONS = {
 		BLANK_SQUARE = "rbxasset://textures/SurfacesDefault.png",
 		RIGHT_POINTING_TRIANGLE = "rbxasset://textures/DeveloperFramework/button_arrow_right.png",
 		DOWN_POINTING_TRIANGLE = "rbxasset://textures/DeveloperFramework/button_arrow_down.png",
@@ -18,340 +17,340 @@ return function(p1)
 		ALPHA_BACKGROUND_TEXTURE = "rbxasset://textures/meshPartFallback.png",
 		UNKNOWN_TEXTURE = "rbxasset://textures/ui/GuiImagePlaceholder.png"
 	}
-	t.IS_STUDIO = t.RunService:IsStudio()
-	function t.getTime()
-		if t.IS_STUDIO then
+	utilities.IS_STUDIO = utilities.RunService:IsStudio()
+	function utilities.getTime()
+		if utilities.IS_STUDIO then
 			return os.clock()
 		else
 			return time()
 		end
 	end
-	t.GuiOffset = if p1._config.IgnoreGuiInset then -t.GuiService:GetGuiInset() else Vector2.zero
-	t.MouseOffset = if p1._config.IgnoreGuiInset then Vector2.zero else t.GuiService:GetGuiInset()
-	local var5 = nil
-	var5 = t.GuiService:GetPropertyChangedSignal("TopbarInset"):Once(function()
-		t.MouseOffset = if p1._config.IgnoreGuiInset then Vector2.zero else t.GuiService:GetGuiInset()
-		t.GuiOffset = if p1._config.IgnoreGuiInset then -t.GuiService:GetGuiInset() else Vector2.zero
-		var5:Disconnect()
+	utilities.GuiOffset = if iris._config.IgnoreGuiInset then -utilities.GuiService:GetGuiInset() else Vector2.zero
+	utilities.MouseOffset = if iris._config.IgnoreGuiInset then Vector2.zero else utilities.GuiService:GetGuiInset()
+	local topbarInsetConnection = nil
+	topbarInsetConnection = utilities.GuiService:GetPropertyChangedSignal("TopbarInset"):Once(function()
+		utilities.MouseOffset = if iris._config.IgnoreGuiInset then Vector2.zero else utilities.GuiService:GetGuiInset()
+		utilities.GuiOffset = if iris._config.IgnoreGuiInset then -utilities.GuiService:GetGuiInset() else Vector2.zero
+		topbarInsetConnection:Disconnect()
 	end)
 	task.delay(5, function()
-		var5:Disconnect()
+		topbarInsetConnection:Disconnect()
 	end)
-	function t.getMouseLocation()
-		return t.UserInputService:GetMouseLocation() - t.MouseOffset
+	function utilities.getMouseLocation()
+		return utilities.UserInputService:GetMouseLocation() - utilities.MouseOffset
 	end
-	function t.isPosInsideRect(p1, p2, p3)
-		return if p1.X >= p2.X and (p1.X <= p3.X and p1.Y >= p2.Y) then p1.Y <= p3.Y else false
+	function utilities.isPosInsideRect(position, minBounds, maxBounds)
+		return if position.X >= minBounds.X and (position.X <= maxBounds.X and position.Y >= minBounds.Y) then position.Y <= maxBounds.Y else false
 	end
-	function t.findBestWindowPosForPopup(p1, p2, p3, p4)
-		local instance = if p1.X + p2.X + 20 > p4.X then if p1.Y + p2.Y + 20 > p4.Y then p1 + Vector2.new(0, -(20 + p2.Y)) else p1 + Vector2.new(0, 20) else p1 + Vector2.new(20)
-		return Vector2.new(math.max(math.min(instance.X + p2.X, p4.X) - p2.X, p3.X), (math.max(math.min(instance.Y + p2.Y, p4.Y) - p2.Y, p3.Y)))
+	function utilities.findBestWindowPosForPopup(position, size, minBounds, screenBounds)
+		local adjustedPosition = if position.X + size.X + 20 > screenBounds.X then if position.Y + size.Y + 20 > screenBounds.Y then position + Vector2.new(0, -(20 + size.Y)) else position + Vector2.new(0, 20) else position + Vector2.new(20)
+		return Vector2.new(math.max(math.min(adjustedPosition.X + size.X, screenBounds.X) - size.X, minBounds.X), (math.max(math.min(adjustedPosition.Y + size.Y, screenBounds.Y) - size.Y, minBounds.Y)))
 	end
-	function t.getScreenSizeForWindow(p1)
-		if p1.Instance:IsA("GuiBase2d") then
-			return p1.Instance.AbsoluteSize
+	function utilities.getScreenSizeForWindow(guiElement)
+		if guiElement.Instance:IsA("GuiBase2d") then
+			return guiElement.Instance.AbsoluteSize
 		else
-			local instance = p1.Instance.Parent
-			if instance:IsA("GuiBase2d") or instance.Parent:IsA("GuiBase2d") then
-				return instance.AbsoluteSize
+			local parentElement = guiElement.Instance.Parent
+			if parentElement:IsA("GuiBase2d") or parentElement.Parent:IsA("GuiBase2d") then
+				return parentElement.AbsoluteSize
 			else
 				return workspace.CurrentCamera.ViewportSize
 			end
 		end
 	end
-	function t.extend(p1, p2)
-		local instance = table.clone(p1)
-		for v2, v3 in p2 do
-			instance[v2] = v3
+	function utilities.extend(sourceTable, overrideTable)
+		local mergedTable = table.clone(sourceTable)
+		for key, value in overrideTable do
+			mergedTable[key] = value
 		end
-		return instance
+		return mergedTable
 	end
-	function t.UIPadding(p1, p2)
+	function utilities.UIPadding(guiElement, padding)
 		local UIPadding = Instance.new("UIPadding")
-		UIPadding.PaddingLeft = UDim.new(0, p2.X)
-		UIPadding.PaddingRight = UDim.new(0, p2.X)
-		UIPadding.PaddingTop = UDim.new(0, p2.Y)
-		UIPadding.PaddingBottom = UDim.new(0, p2.Y)
-		UIPadding.Parent = p1
+		UIPadding.PaddingLeft = UDim.new(0, padding.X)
+		UIPadding.PaddingRight = UDim.new(0, padding.X)
+		UIPadding.PaddingTop = UDim.new(0, padding.Y)
+		UIPadding.PaddingBottom = UDim.new(0, padding.Y)
+		UIPadding.Parent = guiElement
 		return UIPadding
 	end
-	function t.UIListLayout(p1, p2, p3)
+	function utilities.UIListLayout(guiElement, fillDirection, padding)
 		local UIListLayout = Instance.new("UIListLayout")
 		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		UIListLayout.Padding = p3
-		UIListLayout.FillDirection = p2
-		UIListLayout.Parent = p1
+		UIListLayout.Padding = padding
+		UIListLayout.FillDirection = fillDirection
+		UIListLayout.Parent = guiElement
 		return UIListLayout
 	end
-	function t.UIStroke(p1, p2, p3, p4)
+	function utilities.UIStroke(guiElement, thickness, color, transparency)
 		local UIStroke = Instance.new("UIStroke")
-		UIStroke.Thickness = p2
-		UIStroke.Color = p3
-		UIStroke.Transparency = p4
+		UIStroke.Thickness = thickness
+		UIStroke.Color = color
+		UIStroke.Transparency = transparency
 		UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		UIStroke.LineJoinMode = Enum.LineJoinMode.Round
-		UIStroke.Parent = p1
+		UIStroke.Parent = guiElement
 		return UIStroke
 	end
-	function t.UICorner(p1, p2)
+	function utilities.UICorner(guiElement, cornerRadius)
 		local UICorner = Instance.new("UICorner")
-		UICorner.CornerRadius = UDim.new(if p2 then 0 else 1, p2 or 0)
-		UICorner.Parent = p1
+		UICorner.CornerRadius = UDim.new(if cornerRadius then 0 else 1, cornerRadius or 0)
+		UICorner.Parent = guiElement
 		return UICorner
 	end
-	function t.UISizeConstraint(p1, p2, p3)
+	function utilities.UISizeConstraint(guiElement, minSize, maxSize)
 		local UISizeConstraint = Instance.new("UISizeConstraint")
-		UISizeConstraint.MinSize = p2 or UISizeConstraint.MinSize
-		UISizeConstraint.MaxSize = p3 or UISizeConstraint.MaxSize
-		UISizeConstraint.Parent = p1
+		UISizeConstraint.MinSize = minSize or UISizeConstraint.MinSize
+		UISizeConstraint.MaxSize = maxSize or UISizeConstraint.MaxSize
+		UISizeConstraint.Parent = guiElement
 		return UISizeConstraint
 	end
-	function t.applyTextStyle(p12)
-		p12.FontFace = p1._config.TextFont
-		p12.TextSize = p1._config.TextSize
-		p12.TextColor3 = p1._config.TextColor
-		p12.TextTransparency = p1._config.TextTransparency
-		p12.TextXAlignment = Enum.TextXAlignment.Left
-		p12.TextYAlignment = Enum.TextYAlignment.Center
-		p12.RichText = p1._config.RichText
-		p12.TextWrapped = p1._config.TextWrapped
-		p12.AutoLocalize = false
+	function utilities.applyTextStyle(textLabel)
+		textLabel.FontFace = iris._config.TextFont
+		textLabel.TextSize = iris._config.TextSize
+		textLabel.TextColor3 = iris._config.TextColor
+		textLabel.TextTransparency = iris._config.TextTransparency
+		textLabel.TextXAlignment = Enum.TextXAlignment.Left
+		textLabel.TextYAlignment = Enum.TextYAlignment.Center
+		textLabel.RichText = iris._config.RichText
+		textLabel.TextWrapped = iris._config.TextWrapped
+		textLabel.AutoLocalize = false
 	end
-	function t.applyInteractionHighlights(p12, p2, p3, p4)
-		local instance = false
-		t.applyMouseEnter(p2, function()
-			p3[p12 .. "Color3"] = p4.HoveredColor
-			p3[p12 .. "Transparency"] = p4.HoveredTransparency
-			instance = false
+	function utilities.applyInteractionHighlights(propertyPrefix, guiElement, properties, styleConfig)
+		local isMouseDown = false
+		utilities.applyMouseEnter(guiElement, function()
+			properties[propertyPrefix .. "Color3"] = styleConfig.HoveredColor
+			properties[propertyPrefix .. "Transparency"] = styleConfig.HoveredTransparency
+			isMouseDown = false
 		end)
-		t.applyMouseLeave(p2, function()
-			p3[p12 .. "Color3"] = p4.Color
-			p3[p12 .. "Transparency"] = p4.Transparency
-			instance = true
+		utilities.applyMouseLeave(guiElement, function()
+			properties[propertyPrefix .. "Color3"] = styleConfig.Color
+			properties[propertyPrefix .. "Transparency"] = styleConfig.Transparency
+			isMouseDown = true
 		end)
-		t.applyInputBegan(p2, function(p1)
-			if p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Gamepad1 then
-				p3[p12 .. "Color3"] = p4.ActiveColor
-				p3[p12 .. "Transparency"] = p4.ActiveTransparency
+		utilities.applyInputBegan(guiElement, function(inputEvent)
+			if inputEvent.UserInputType == Enum.UserInputType.MouseButton1 or inputEvent.UserInputType == Enum.UserInputType.Gamepad1 then
+				properties[propertyPrefix .. "Color3"] = styleConfig.ActiveColor
+				properties[propertyPrefix .. "Transparency"] = styleConfig.ActiveTransparency
 			end
 		end)
-		t.applyInputEnded(p2, function(p1)
-			if (p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Gamepad1) and not instance then
-				if p1.UserInputType == Enum.UserInputType.MouseButton1 then
-					p3[p12 .. "Color3"] = p4.HoveredColor
-					p3[p12 .. "Transparency"] = p4.HoveredTransparency
+		utilities.applyInputEnded(guiElement, function(inputEvent)
+			if (inputEvent.UserInputType == Enum.UserInputType.MouseButton1 or inputEvent.UserInputType == Enum.UserInputType.Gamepad1) and not isMouseDown then
+				if inputEvent.UserInputType == Enum.UserInputType.MouseButton1 then
+					properties[propertyPrefix .. "Color3"] = styleConfig.HoveredColor
+					properties[propertyPrefix .. "Transparency"] = styleConfig.HoveredTransparency
 				end
-				if p1.UserInputType == Enum.UserInputType.Gamepad1 then
-					p3[p12 .. "Color3"] = p4.Color
-					p3[p12 .. "Transparency"] = p4.Transparency
+				if inputEvent.UserInputType == Enum.UserInputType.Gamepad1 then
+					properties[propertyPrefix .. "Color3"] = styleConfig.Color
+					properties[propertyPrefix .. "Transparency"] = styleConfig.Transparency
 				end
 			end
 		end)
-		p2.SelectionImageObject = p1.SelectionImageObject
+		guiElement.SelectionImageObject = iris.SelectionImageObject
 	end
-	function t.applyInteractionHighlightsWithMultiHighlightee(p12, p2, p3)
-		local instance = false
-		t.applyMouseEnter(p2, function()
-			for v12, v2 in p3 do
-				v2[1][p12 .. "Color3"] = v2[2].HoveredColor
-				v2[1][p12 .. "Transparency"] = v2[2].HoveredTransparency
-				instance = false
+	function utilities.applyInteractionHighlightsWithMultiHighlightee(propertyPrefix, guiElement, highlightTargets)
+		local isMouseDown = false
+		utilities.applyMouseEnter(guiElement, function()
+			for index, highlightInfo in highlightTargets do
+				highlightInfo[1][propertyPrefix .. "Color3"] = highlightInfo[2].HoveredColor
+				highlightInfo[1][propertyPrefix .. "Transparency"] = highlightInfo[2].HoveredTransparency
+				isMouseDown = false
 			end
 		end)
-		t.applyMouseLeave(p2, function()
-			for v12, v2 in p3 do
-				v2[1][p12 .. "Color3"] = v2[2].Color
-				v2[1][p12 .. "Transparency"] = v2[2].Transparency
-				instance = true
+		utilities.applyMouseLeave(guiElement, function()
+			for index, highlightInfo in highlightTargets do
+				highlightInfo[1][propertyPrefix .. "Color3"] = highlightInfo[2].Color
+				highlightInfo[1][propertyPrefix .. "Transparency"] = highlightInfo[2].Transparency
+				isMouseDown = true
 			end
 		end)
-		t.applyInputBegan(p2, function(p1)
-			if p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Gamepad1 then
-				for instance, v2 in p3 do
-					v2[1][p12 .. "Color3"] = v2[2].ActiveColor
-					v2[1][p12 .. "Transparency"] = v2[2].ActiveTransparency
+		utilities.applyInputBegan(guiElement, function(inputEvent)
+			if inputEvent.UserInputType == Enum.UserInputType.MouseButton1 or inputEvent.UserInputType == Enum.UserInputType.Gamepad1 then
+				for index, highlightInfo in highlightTargets do
+					highlightInfo[1][propertyPrefix .. "Color3"] = highlightInfo[2].ActiveColor
+					highlightInfo[1][propertyPrefix .. "Transparency"] = highlightInfo[2].ActiveTransparency
 				end
 			end
 		end)
-		t.applyInputEnded(p2, function(p1)
-			if (p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Gamepad1) and not instance then
-				for v12, v2 in p3 do
-					if p1.UserInputType == Enum.UserInputType.MouseButton1 then
-						v2[1][p12 .. "Color3"] = v2[2].HoveredColor
-						v2[1][p12 .. "Transparency"] = v2[2].HoveredTransparency
+		utilities.applyInputEnded(guiElement, function(inputEvent)
+			if (inputEvent.UserInputType == Enum.UserInputType.MouseButton1 or inputEvent.UserInputType == Enum.UserInputType.Gamepad1) and not isMouseDown then
+				for index, highlightInfo in highlightTargets do
+					if inputEvent.UserInputType == Enum.UserInputType.MouseButton1 then
+						highlightInfo[1][propertyPrefix .. "Color3"] = highlightInfo[2].HoveredColor
+						highlightInfo[1][propertyPrefix .. "Transparency"] = highlightInfo[2].HoveredTransparency
 					end
-					if p1.UserInputType == Enum.UserInputType.Gamepad1 then
-						v2[1][p12 .. "Color3"] = v2[2].Color
-						v2[1][p12 .. "Transparency"] = v2[2].Transparency
+					if inputEvent.UserInputType == Enum.UserInputType.Gamepad1 then
+						highlightInfo[1][propertyPrefix .. "Color3"] = highlightInfo[2].Color
+						highlightInfo[1][propertyPrefix .. "Transparency"] = highlightInfo[2].Transparency
 					end
 				end
 			end
 		end)
-		p2.SelectionImageObject = p1.SelectionImageObject
+		guiElement.SelectionImageObject = iris.SelectionImageObject
 	end
-	function t.applyFrameStyle(p12, p2, p3)
-		local FrameBorderSize = p1._config.FrameBorderSize
-		local FrameRounding = p1._config.FrameRounding
-		p12.BorderSizePixel = 0
-		if FrameBorderSize > 0 then
-			t.UIStroke(p12, FrameBorderSize, p1._config.BorderColor, p1._config.BorderTransparency)
+	function utilities.applyFrameStyle(frame, skipPadding, skipCorner)
+		local frameBorderSize = iris._config.FrameBorderSize
+		local frameRounding = iris._config.FrameRounding
+		frame.BorderSizePixel = 0
+		if frameBorderSize > 0 then
+			utilities.UIStroke(frame, frameBorderSize, iris._config.BorderColor, iris._config.BorderTransparency)
 		end
-		if FrameRounding > 0 and not p3 then
-			t.UICorner(p12, FrameRounding)
+		if frameRounding > 0 and not skipCorner then
+			utilities.UICorner(frame, frameRounding)
 		end
-		if not p2 then
-			t.UIPadding(p12, p1._config.FramePadding)
-		end
-	end
-	function t.applyButtonClick(p1, p2)
-		p1.MouseButton1Click:Connect(function()
-			p2()
-		end)
-	end
-	function t.applyButtonDown(p1, p2)
-		p1.MouseButton1Down:Connect(function(p1, p22)
-			local instance = Vector2.new(p1, p22) - t.MouseOffset
-			p2(instance.X, instance.Y)
-		end)
-	end
-	function t.applyMouseEnter(p1, p2)
-		p1.MouseEnter:Connect(function(p1, p22)
-			local instance = Vector2.new(p1, p22) - t.MouseOffset
-			p2(instance.X, instance.Y)
-		end)
-	end
-	function t.applyMouseMoved(p1, p2)
-		p1.MouseMoved:Connect(function(p1, p22)
-			local instance = Vector2.new(p1, p22) - t.MouseOffset
-			p2(instance.X, instance.Y)
-		end)
-	end
-	function t.applyMouseLeave(p1, p2)
-		p1.MouseLeave:Connect(function(p1, p22)
-			local instance = Vector2.new(p1, p22) - t.MouseOffset
-			p2(instance.X, instance.Y)
-		end)
-	end
-	function t.applyInputBegan(p1, p2)
-		p1.InputBegan:Connect(function(...)
-			p2(...)
-		end)
-	end
-	function t.applyInputEnded(p1, p2)
-		p1.InputEnded:Connect(function(...)
-			p2(...)
-		end)
-	end
-	function t.discardState(p1)
-		for instance, v2 in p1.state do
-			v2.ConnectedWidgets[p1.ID] = nil
+		if not skipPadding then
+			utilities.UIPadding(frame, iris._config.FramePadding)
 		end
 	end
-	function t.registerEvent(p12, p2)
-		local function f1()
-			table.insert(p1._connections, t.UserInputService[p12]:Connect(p2))
-		end
-		table.insert(p1._initFunctions, f1)
+	function utilities.applyButtonClick(button, callback)
+		button.MouseButton1Click:Connect(function()
+			callback()
+		end)
 	end
-	t.EVENTS = {
-		hover = function(p1)
+	function utilities.applyButtonDown(button, callback)
+		button.MouseButton1Down:Connect(function(mouseX, mouseY)
+			local offsetPosition = Vector2.new(mouseX, mouseY) - utilities.MouseOffset
+			callback(offsetPosition.X, offsetPosition.Y)
+		end)
+	end
+	function utilities.applyMouseEnter(guiElement, callback)
+		guiElement.MouseEnter:Connect(function(mouseX, mouseY)
+			local offsetPosition = Vector2.new(mouseX, mouseY) - utilities.MouseOffset
+			callback(offsetPosition.X, offsetPosition.Y)
+		end)
+	end
+	function utilities.applyMouseMoved(guiElement, callback)
+		guiElement.MouseMoved:Connect(function(mouseX, mouseY)
+			local offsetPosition = Vector2.new(mouseX, mouseY) - utilities.MouseOffset
+			callback(offsetPosition.X, offsetPosition.Y)
+		end)
+	end
+	function utilities.applyMouseLeave(guiElement, callback)
+		guiElement.MouseLeave:Connect(function(mouseX, mouseY)
+			local offsetPosition = Vector2.new(mouseX, mouseY) - utilities.MouseOffset
+			callback(offsetPosition.X, offsetPosition.Y)
+		end)
+	end
+	function utilities.applyInputBegan(guiElement, callback)
+		guiElement.InputBegan:Connect(function(...)
+			callback(...)
+		end)
+	end
+	function utilities.applyInputEnded(guiElement, callback)
+		guiElement.InputEnded:Connect(function(...)
+			callback(...)
+		end)
+	end
+	function utilities.discardState(widget)
+		for index, stateObject in widget.state do
+			stateObject.ConnectedWidgets[widget.ID] = nil
+		end
+	end
+	function utilities.registerEvent(eventName, callback)
+		local function registerConnection()
+			table.insert(iris._connections, utilities.UserInputService[eventName]:Connect(callback))
+		end
+		table.insert(iris._initFunctions, registerConnection)
+	end
+	utilities.EVENTS = {
+		hover = function(getGuiElement)
 			return {
-				Init = function(p12)
-					local instance = p1(p12)
-					t.applyMouseEnter(instance, function()
-						p12.isHoveredEvent = true
+				Init = function(widget)
+					local guiElement = getGuiElement(widget)
+					utilities.applyMouseEnter(guiElement, function()
+						widget.isHoveredEvent = true
 					end)
-					t.applyMouseLeave(instance, function()
-						p12.isHoveredEvent = false
+					utilities.applyMouseLeave(guiElement, function()
+						widget.isHoveredEvent = false
 					end)
-					p12.isHoveredEvent = false
+					widget.isHoveredEvent = false
 				end,
-				Get = function(p1)
-					return p1.isHoveredEvent
+				Get = function(widget)
+					return widget.isHoveredEvent
 				end
 			}
 		end,
-		click = function(p12)
+		click = function(getGuiElement)
 			return {
-				Init = function(p13)
-					local instance = p12(p13)
-					p13.lastClickedTick = -1
-					t.applyButtonClick(instance, function()
-						p13.lastClickedTick = p1._cycleTick + 1
+				Init = function(widget)
+					local guiElement = getGuiElement(widget)
+					widget.lastClickedTick = -1
+					utilities.applyButtonClick(guiElement, function()
+						widget.lastClickedTick = iris._cycleTick + 1
 					end)
 				end,
-				Get = function(p12)
-					return p12.lastClickedTick == p1._cycleTick
+				Get = function(widget)
+					return widget.lastClickedTick == iris._cycleTick
 				end
 			}
 		end,
-		rightClick = function(p12)
+		rightClick = function(getGuiElement)
 			return {
-				Init = function(p13)
-					local instance = p12(p13)
-					p13.lastRightClickedTick = -1
-					instance.MouseButton2Click:Connect(function()
-						p13.lastRightClickedTick = p1._cycleTick + 1
+				Init = function(widget)
+					local guiElement = getGuiElement(widget)
+					widget.lastRightClickedTick = -1
+					guiElement.MouseButton2Click:Connect(function()
+						widget.lastRightClickedTick = iris._cycleTick + 1
 					end)
 				end,
-				Get = function(p12)
-					return p12.lastRightClickedTick == p1._cycleTick
+				Get = function(widget)
+					return widget.lastRightClickedTick == iris._cycleTick
 				end
 			}
 		end,
-		doubleClick = function(p12)
+		doubleClick = function(getGuiElement)
 			return {
-				Init = function(p13)
-					local instance = p12(p13)
-					p13.lastClickedTime = -1
-					p13.lastClickedPosition = Vector2.zero
-					p13.lastDoubleClickedTick = -1
-					t.applyButtonDown(instance, function(p12, p2)
-						local instance = t.getTime()
-						if instance - p13.lastClickedTime < p1._config.MouseDoubleClickTime and (Vector2.new(p12, p2) - p13.lastClickedPosition).Magnitude < p1._config.MouseDoubleClickMaxDist then
-							p13.lastDoubleClickedTick = p1._cycleTick + 1
+				Init = function(widget)
+					local guiElement = getGuiElement(widget)
+					widget.lastClickedTime = -1
+					widget.lastClickedPosition = Vector2.zero
+					widget.lastDoubleClickedTick = -1
+					utilities.applyButtonDown(guiElement, function(mouseX, mouseY)
+						local currentTime = utilities.getTime()
+						if currentTime - widget.lastClickedTime < iris._config.MouseDoubleClickTime and (Vector2.new(mouseX, mouseY) - widget.lastClickedPosition).Magnitude < iris._config.MouseDoubleClickMaxDist then
+							widget.lastDoubleClickedTick = iris._cycleTick + 1
 						else
-							p13.lastClickedTime = instance
-							p13.lastClickedPosition = Vector2.new(p12, p2)
+							widget.lastClickedTime = currentTime
+							widget.lastClickedPosition = Vector2.new(mouseX, mouseY)
 						end
 					end)
 				end,
-				Get = function(p12)
-					return p12.lastDoubleClickedTick == p1._cycleTick
+				Get = function(widget)
+					return widget.lastDoubleClickedTick == iris._cycleTick
 				end
 			}
 		end,
-		ctrlClick = function(p12)
+		ctrlClick = function(getGuiElement)
 			return {
-				Init = function(p13)
-					local instance = p12(p13)
-					p13.lastCtrlClickedTick = -1
-					t.applyButtonClick(instance, function()
-						if t.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or t.UserInputService:IsKeyDown(Enum.KeyCode.RightControl) then
-							p13.lastCtrlClickedTick = p1._cycleTick + 1
+				Init = function(widget)
+					local guiElement = getGuiElement(widget)
+					widget.lastCtrlClickedTick = -1
+					utilities.applyButtonClick(guiElement, function()
+						if utilities.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or utilities.UserInputService:IsKeyDown(Enum.KeyCode.RightControl) then
+							widget.lastCtrlClickedTick = iris._cycleTick + 1
 						end
 					end)
 				end,
-				Get = function(p12)
-					return p12.lastCtrlClickedTick == p1._cycleTick
+				Get = function(widget)
+					return widget.lastCtrlClickedTick == iris._cycleTick
 				end
 			}
-		end
+		}
 	}
-	p1._utility = t
-	require(script.Root)(p1, t)
-	require(script.Window)(p1, t)
-	require(script.Menu)(p1, t)
-	require(script.Format)(p1, t)
-	require(script.Text)(p1, t)
-	require(script.Button)(p1, t)
-	require(script.Checkbox)(p1, t)
-	require(script.RadioButton)(p1, t)
-	require(script.Image)(p1, t)
-	require(script.Tree)(p1, t)
-	require(script.Tab)(p1, t)
-	require(script.Input)(p1, t)
-	require(script.Combo)(p1, t)
-	require(script.Plot)(p1, t)
-	require(script.Table)(p1, t)
+	iris._utility = utilities
+	require(script.Root)(iris, utilities)
+	require(script.Window)(iris, utilities)
+	require(script.Menu)(iris, utilities)
+	require(script.Format)(iris, utilities)
+	require(script.Text)(iris, utilities)
+	require(script.Button)(iris, utilities)
+	require(script.Checkbox)(iris, utilities)
+	require(script.RadioButton)(iris, utilities)
+	require(script.Image)(iris, utilities)
+	require(script.Tree)(iris, utilities)
+	require(script.Tab)(iris, utilities)
+	require(script.Input)(iris, utilities)
+	require(script.Combo)(iris, utilities)
+	require(script.Plot)(iris, utilities)
+	require(script.Table)(iris, utilities)
 end

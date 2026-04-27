@@ -1,10 +1,9 @@
--- Reviewed by Claude
 local TweenService = game:GetService("TweenService")
-local t = {}
-local t2 = {}
-function t.new(p1, p2)
-	local t = {
-		Tension = p2 or 0.5,
+local CatmullRomSpline = {}
+local CatmullRomSplineMethods = {}
+function CatmullRomSpline.new(initialPoints, initialTension)
+	local newSpline = {
+		Tension = initialTension or 0.5,
 		Points = {},
 		GlobalPoints = {},
 		LengthIterations = 2000,
@@ -12,331 +11,331 @@ function t.new(p1, p2)
 		Length = 0,
 		ConnectedSplines = {}
 	}
-	if p1 ~= nil then
-		for k, v in pairs(p1) do
-			t2.AddPoint(t, v)
+	if initialPoints ~= nil then
+		for k, v in pairs(initialPoints) do
+			CatmullRomSplineMethods.AddPoint(newSpline, v)
 		end
 	end
-	setmetatable(t, {
-		__index = t2,
-		__newindex = function(p1, p2, p3)
+	setmetatable(newSpline, {
+		__index = CatmullRomSplineMethods,
+		__newindex = function(tableSelf, indexName, newValue)
 			error("Cannot add new indices to CatmullRomSplineObject!")
 		end
 	})
-	return t
+	return newSpline
 end
-function t2.ChangeTension(p1, p2)
-	if type(p2) ~= "number" then
-		error("CatmullRomSpline:ChangeTension() expected a number as an input, got " .. tostring(p2) .. "!")
+function CatmullRomSplineMethods.ChangeTension(spline, newTension)
+	if type(newTension) ~= "number" then
+		error("CatmullRomSpline:ChangeTension() expected a number as an input, got " .. tostring(newTension) .. "!")
 	end
-	p1.Tension = p2
-	t2.UpdateLength(p1)
+	spline.Tension = newTension
+	CatmullRomSplineMethods.UpdateLength(spline)
 end
-function t2.ChangeAllSplineTensions(p1, p2)
-	if type(p2) ~= "number" then
-		error("CatmullRomSpline:ChangeAllSplineTensions() expected a number as an input, got " .. tostring(p2) .. "!")
+function CatmullRomSplineMethods.ChangeAllSplineTensions(spline, newTension)
+	if type(newTension) ~= "number" then
+		error("CatmullRomSpline:ChangeAllSplineTensions() expected a number as an input, got " .. tostring(newTension) .. "!")
 	end
-	for k, v in pairs((t2.GetSplines(p1))) do
-		v:ChangeTension(p2)
+	for k, v in pairs((CatmullRomSplineMethods.GetSplines(spline))) do
+		v:ChangeTension(newTension)
 	end
 end
-function t2.AddPoint(p1, p2, p3)
-	local Points = p1.Points
-	local function checkIfPointsMatch(p12)
-		for k, v in pairs((t2._getPoints(p1))) do
-			if typeof(v) ~= typeof(p12) then
+function CatmullRomSplineMethods.AddPoint(spline, point, insertIndex)
+	local Points = spline.Points
+	local function checkIfPointsMatch(pointValue)
+		for k, v in pairs((CatmullRomSplineMethods._getPoints(spline))) do
+			if typeof(v) ~= typeof(pointValue) then
 				return false
 			end
 		end
 		return true
 	end
 	if #Points == 4 then
-		if typeof(p2) == "number" or (typeof(p2) == "Vector2" or typeof(p2) == "Vector3") then
-			if checkIfPointsMatch(p2) then
-				local instance = t2.GetSplines(p1)
-				local table2 = instance[#instance]
-				t2.ConnectSpline(p1, (t.new({
-					table2.Points[2],
-					table2.Points[3],
-					table2.Points[4],
-					p2
-				}, table2.Tension)))
+		if typeof(point) == "number" or (typeof(point) == "Vector2" or typeof(point) == "Vector3") then
+			if checkIfPointsMatch(point) then
+				local connectedSplines = CatmullRomSplineMethods.GetSplines(spline)
+				local lastConnectedSpline = connectedSplines[#connectedSplines]
+				CatmullRomSplineMethods.ConnectSpline(spline, (CatmullRomSpline.new({
+					lastConnectedSpline.Points[2],
+					lastConnectedSpline.Points[3],
+					lastConnectedSpline.Points[4],
+					point
+				}, lastConnectedSpline.Tension)))
 			end
-		elseif p2:IsA("BasePart") and checkIfPointsMatch(p2.Position) then
-			local var4 = t2.GetSplines(p1)
-			local var5 = var4[#var4]
-			t2.ConnectSpline(p1, (t.new({
-				var5.Points[2],
-				var5.Points[3],
-				var5.Points[4],
-				p2
-			}, var5.Tension)))
+		elseif point:IsA("BasePart") and checkIfPointsMatch(point.Position) then
+			local connectedSplines = CatmullRomSplineMethods.GetSplines(spline)
+			local lastConnectedSpline = connectedSplines[#connectedSplines]
+			CatmullRomSplineMethods.ConnectSpline(spline, (CatmullRomSpline.new({
+				lastConnectedSpline.Points[2],
+				lastConnectedSpline.Points[3],
+				lastConnectedSpline.Points[4],
+				point
+			}, lastConnectedSpline.Tension)))
 		end
-	elseif typeof(p2) == "number" or (typeof(p2) == "Vector2" or typeof(p2) == "Vector3") then
-		if checkIfPointsMatch(p2) then
-			table.insert(Points, p3 or #Points + 1, p2)
+	elseif typeof(point) == "number" or (typeof(point) == "Vector2" or typeof(point) == "Vector3") then
+		if checkIfPointsMatch(point) then
+			table.insert(Points, insertIndex or #Points + 1, point)
 		end
-	elseif p2:IsA("BasePart") then
-		if checkIfPointsMatch(p2.Position) then
-			table.insert(Points, p3 or #Points + 1, p2)
+	elseif point:IsA("BasePart") then
+		if checkIfPointsMatch(point.Position) then
+			table.insert(Points, insertIndex or #Points + 1, point)
 		end
 	else
-		error("Invalid input received for CatmullRomSpline:AddPoint(), expected Vector3 or BasePart, got " .. tostring(p2) .. "!")
+		error("Invalid input received for CatmullRomSpline:AddPoint(), expected Vector3 or BasePart, got " .. tostring(point) .. "!")
 	end
 	if #Points == 4 then
-		t2.UpdateLength(p1)
+		CatmullRomSplineMethods.UpdateLength(spline)
 	end
 end
-function t2.RemovePoint(p1, p2)
-	for k, v in pairs((t2.GetSplines(p1))) do
-		local table2 = table.find(v.Points, p2)
-		if table2 then
-			table.remove(v.Points, table2)
+function CatmullRomSplineMethods.RemovePoint(spline, pointToRemove)
+	for k, v in pairs((CatmullRomSplineMethods.GetSplines(spline))) do
+		local foundIndex = table.find(v.Points, pointToRemove)
+		if foundIndex then
+			table.remove(v.Points, foundIndex)
 		end
 	end
 end
-function t2._getPoints(p1)
-	local t = {}
-	for i = 1, #p1.Points do
-		t[i] = typeof(p1.Points[i]) == "Instance" and p1.Points[i].Position or p1.Points[i]
+function CatmullRomSplineMethods._getPoints(spline)
+	local pointsList = {}
+	for i = 1, #spline.Points do
+		pointsList[i] = typeof(spline.Points[i]) == "Instance" and spline.Points[i].Position or spline.Points[i]
 	end
-	return t
+	return pointsList
 end
-function t2.ConnectSpline(p1, p2)
-	local Points = p2.Points
-	local instance = t2.GetSplines(p1)
-	local Points_2 = instance[#instance].Points
-	local function checkIfPointsMatch(p12)
-		for k, v in pairs((t2._getPoints(p1))) do
-			if typeof(v) ~= typeof(p12) then
+function CatmullRomSplineMethods.ConnectSpline(spline, newSpline)
+	local Points = newSpline.Points
+	local connectedSplines = CatmullRomSplineMethods.GetSplines(spline)
+	local lastSplinePoints = connectedSplines[#connectedSplines].Points
+	local function checkIfPointsMatch(pointValue)
+		for k, v in pairs((CatmullRomSplineMethods._getPoints(spline))) do
+			if typeof(v) ~= typeof(pointValue) then
 				return false
 			end
 		end
 		return true
 	end
-	local var3, var4
-	if typeof(Points_2[1]) == "number" then
-		var3 = Points_2[1]
-		var4 = checkIfPointsMatch
-		if not var3 then
-			var3 = Points_2[1].Position
+	local firstPointValue, pointTypeChecker
+	if typeof(lastSplinePoints[1]) == "number" then
+		firstPointValue = lastSplinePoints[1]
+		pointTypeChecker = checkIfPointsMatch
+		if not firstPointValue then
+			firstPointValue = lastSplinePoints[1].Position
 		end
 	else
-		if typeof(Points_2[1]) == "Vector3" then
-			var3 = Points_2[1]
-			if var3 then
-				var3 = Points_2[1].Position
+		if typeof(lastSplinePoints[1]) == "Vector3" then
+			firstPointValue = lastSplinePoints[1]
+			if firstPointValue then
+				firstPointValue = lastSplinePoints[1].Position
 			end
 		else
-			var4 = checkIfPointsMatch
-			var3 = Points_2[1].Position
+			pointTypeChecker = checkIfPointsMatch
+			firstPointValue = lastSplinePoints[1].Position
 		end
 	end
-	if not var4(var3) then
+	if not pointTypeChecker(firstPointValue) then
 		error("Cannot connect the spline because the splines do not have the same types of points!")
 	end
-	if Points_2[2] == Points[1] and (Points_2[3] == Points[2] and Points_2[4] == Points[3]) then
-		table.insert(p1.ConnectedSplines, p2)
-		t2.UpdateLength(p1)
+	if lastSplinePoints[2] == Points[1] and (lastSplinePoints[3] == Points[2] and lastSplinePoints[4] == Points[3]) then
+		table.insert(spline.ConnectedSplines, newSpline)
+		CatmullRomSplineMethods.UpdateLength(spline)
 	else
 		error("Cannot connect the spline because the splines do not share 3 common points!")
 	end
 end
-function t2.GetSplines(p1)
-	local t = { p1 }
-	for i = 1, #p1.ConnectedSplines do
-		table.insert(t, p1.ConnectedSplines[i])
+function CatmullRomSplineMethods.GetSplines(spline)
+	local splinesList = { spline }
+	for i = 1, #spline.ConnectedSplines do
+		table.insert(splinesList, spline.ConnectedSplines[i])
 	end
-	return t
+	return splinesList
 end
-function t2.GetSplineAt(p1, p2)
-	local instance = t2.GetSplines(p1)
-	local function percentage(p1, p2, p3)
-		local instance = 1 / (p3 - p2)
-		return instance * p1 - instance * p3 + 1
+function CatmullRomSplineMethods.GetSplineAt(spline, targetTime)
+	local splinesList = CatmullRomSplineMethods.GetSplines(spline)
+	local function percentage(value, minValue, maxValue)
+		local reciprocal = 1 / (maxValue - minValue)
+		return reciprocal * value - reciprocal * maxValue + 1
 	end
-	if type(p2) ~= "number" then
-		error("CatmullRomSpline:GetSplineAt() expected a number as an input, got " .. tostring(p2) .. "!")
+	if type(targetTime) ~= "number" then
+		error("CatmullRomSpline:GetSplineAt() expected a number as an input, got " .. tostring(targetTime) .. "!")
 	end
-	if #instance == 1 then
-		return p1, p2
+	if #splinesList == 1 then
+		return spline, targetTime
 	else
-		local table2 = 1 / #instance
-		if p2 <= 0 then
-			return p1, p2 * table2
-		elseif p2 >= 1 then
-			return instance[#instance], (p2 - 1) * table2 + 1
+		local splineSegmentSize = 1 / #splinesList
+		if targetTime <= 0 then
+			return spline, targetTime * splineSegmentSize
+		elseif targetTime >= 1 then
+			return splinesList[#splinesList], (targetTime - 1) * splineSegmentSize + 1
 		else
-			local var3 = math.ceil(p2 * #instance)
-			local var4 = var3 * table2
-			local var5 = 1 / (var4 - (var3 - 1) * table2)
-			return instance[var3], var5 * p2 - var5 * var4 + 1
+			local splineIndex = math.ceil(targetTime * #splinesList)
+			local splineStartTime = splineIndex * splineSegmentSize
+			local normalizedTime = 1 / (splineStartTime - (splineIndex - 1) * splineSegmentSize)
+			return splinesList[splineIndex], normalizedTime * targetTime - normalizedTime * splineStartTime + 1
 		end
 	end
 end
-function t2.UpdateLength(p1, p2)
-	local t = {}
+function CatmullRomSplineMethods.UpdateLength(spline, yieldFrequency)
+	local allPoints = {}
 	local sum = 0
-	for k, v in pairs((t2.GetSplines(p1))) do
-		local table2 = t2._getPoints(v)
-		if #table2 ~= 4 then
-			error("Cannot get the length of the CatmullRomSpline object, expected 4 control points for all splines, got " .. tostring(#t) .. " points for spline " .. tostring(k) .. "!")
+	for k, v in pairs((CatmullRomSplineMethods.GetSplines(spline))) do
+		local splinePoints = CatmullRomSplineMethods._getPoints(v)
+		if #splinePoints ~= 4 then
+			error("Cannot get the length of the CatmullRomSpline object, expected 4 control points for all splines, got " .. tostring(#allPoints) .. " points for spline " .. tostring(k) .. "!")
 		end
-		for k2, var3 in pairs(table2) do
-			table.insert(t, var3)
+		for k2, pointValue in pairs(splinePoints) do
+			table.insert(allPoints, pointValue)
 		end
 	end
-	local LengthIterations = p1.LengthIterations
-	local t3 = {}
+	local LengthIterations = spline.LengthIterations
+	local lengthIndexTable = {}
 	for i = 1, LengthIterations do
-		if p2 and i % p2 == 0 then
+		if yieldFrequency and i % yieldFrequency == 0 then
 			task.wait()
 		end
-		local var3 = t2.CalculateDerivativeAt(p1, (i - 1) / (LengthIterations - 1))
-		sum = if typeof(var3) == "number" then sum + var3 * (1 / LengthIterations) else sum + var3.Magnitude * (1 / LengthIterations)
-		table.insert(t3, { (i - 1) / (LengthIterations - 1), sum, var3 })
+		local derivativeValue = CatmullRomSplineMethods.CalculateDerivativeAt(spline, (i - 1) / (LengthIterations - 1))
+		sum = if typeof(derivativeValue) == "number" then sum + derivativeValue * (1 / LengthIterations) else sum + derivativeValue.Magnitude * (1 / LengthIterations)
+		table.insert(lengthIndexTable, { (i - 1) / (LengthIterations - 1), sum, derivativeValue })
 	end
-	p1.Length = sum
-	p1.LengthIndices = t3
+	spline.Length = sum
+	spline.LengthIndices = lengthIndexTable
 end
-function t2.CalculatePositionAt(p1, p2)
-	if type(p2) ~= "number" then
-		error("The given t value in CatmullRomSpline:CalculatePositionAt() was not between 0 and 1, got " .. tostring(p2) .. "!")
+function CatmullRomSplineMethods.CalculatePositionAt(spline, parameterT)
+	if type(parameterT) ~= "number" then
+		error("The given t value in CatmullRomSpline:CalculatePositionAt() was not between 0 and 1, got " .. tostring(parameterT) .. "!")
 	end
-	local instance, table2 = t2.GetSplineAt(p1, p2)
-	local var3 = t2._getPoints(instance)
-	if #var3 ~= 4 then
-		error("The CatmullRomSpline object has an invalid number of points (" .. tostring(#var3) .. "), expected 4 points!")
+	local targetSpline, normalizedT = CatmullRomSplineMethods.GetSplineAt(spline, parameterT)
+	local controlPoints = CatmullRomSplineMethods._getPoints(targetSpline)
+	if #controlPoints ~= 4 then
+		error("The CatmullRomSpline object has an invalid number of points (" .. tostring(#controlPoints) .. "), expected 4 points!")
 	end
-	local Tension = instance.Tension
-	return var3[2] + Tension * (var3[3] - var3[1]) * table2 + (3 * (var3[3] - var3[2]) - Tension * (var3[4] - var3[2]) - 2 * Tension * (var3[3] - var3[1])) * table2 ^ 2 + (-2 * (var3[3] - var3[2]) + Tension * (var3[4] - var3[2]) + Tension * (var3[3] - var3[1])) * table2 ^ 3
+	local Tension = targetSpline.Tension
+	return controlPoints[2] + Tension * (controlPoints[3] - controlPoints[1]) * normalizedT + (3 * (controlPoints[3] - controlPoints[2]) - Tension * (controlPoints[4] - controlPoints[2]) - 2 * Tension * (controlPoints[3] - controlPoints[1])) * normalizedT ^ 2 + (-2 * (controlPoints[3] - controlPoints[2]) + Tension * (controlPoints[4] - controlPoints[2]) + Tension * (controlPoints[3] - controlPoints[1])) * normalizedT ^ 3
 end
-function t2.CalculatePositionRelativeToLength(p1, p2)
-	if type(p2) ~= "number" then
-		error("CatmullRomSpline:CalculatePositionRelativeToLength() only accepts a number, got " .. tostring(p2) .. "!")
+function CatmullRomSplineMethods.CalculatePositionRelativeToLength(spline, targetLength)
+	if type(targetLength) ~= "number" then
+		error("CatmullRomSpline:CalculatePositionRelativeToLength() only accepts a number, got " .. tostring(targetLength) .. "!")
 	end
-	local Points = p1.Points
+	local Points = spline.Points
 	if #Points == 4 then
-		local LengthIndices = p1.LengthIndices
-		local LengthIterations = p1.LengthIterations
-		t2._getPoints(p1)
-		local instance = p1.Length * p2
-		local table2 = nil
-		local var3 = nil
+		local LengthIndices = spline.LengthIndices
+		local LengthIterations = spline.LengthIterations
+		CatmullRomSplineMethods._getPoints(spline)
+		local targetLengthValue = spline.Length * targetLength
+		local foundIndexInTable = nil
+		local correspondingLengthEntry = nil
 		for i, v in ipairs(LengthIndices) do
-			if instance - v[2] <= 0 or i == #LengthIndices then
-				table2 = i
-				var3 = v
+			if targetLengthValue - v[2] <= 0 or i == #LengthIndices then
+				foundIndexInTable = i
+				correspondingLengthEntry = v
 				break
 			end
 		end
-		local var4, var5
-		if LengthIndices[table2 - 1] then
-			local var6 = t2.CalculatePositionAt(p1, LengthIndices[table2 - 1][1])
-			var4, var5 = var6, t2.CalculatePositionAt(p1, var3[1])
+		local startPosition, endPosition
+		if LengthIndices[foundIndexInTable - 1] then
+			local prevPosition = CatmullRomSplineMethods.CalculatePositionAt(spline, LengthIndices[foundIndexInTable - 1][1])
+			startPosition, endPosition = prevPosition, CatmullRomSplineMethods.CalculatePositionAt(spline, correspondingLengthEntry[1])
 		else
-			local var8 = t2.CalculatePositionAt(p1, var3[1])
-			var4, var5 = var8, t2.CalculatePositionAt(p1, LengthIndices[table2 + 1][1])
+			local nextPosition = CatmullRomSplineMethods.CalculatePositionAt(spline, correspondingLengthEntry[1])
+			startPosition, endPosition = nextPosition, CatmullRomSplineMethods.CalculatePositionAt(spline, LengthIndices[foundIndexInTable + 1][1])
 		end
-		if typeof(var4) == "number" and typeof(var5) == "number" then
-			return var4 + (var5 - var4) * (1 - (var3[2] - instance) / (var5 - var4))
+		if typeof(startPosition) == "number" and typeof(endPosition) == "number" then
+			return startPosition + (endPosition - startPosition) * (1 - (correspondingLengthEntry[2] - targetLengthValue) / (endPosition - startPosition))
 		else
-			return var4 + (var5 - var4) * (1 - (var3[2] - instance) / (var5 - var4).Magnitude)
+			return startPosition + (endPosition - startPosition) * (1 - (correspondingLengthEntry[2] - targetLengthValue) / (endPosition - startPosition).Magnitude)
 		end
 	else
 		error("The CatmullRomSpline object has an invalid number of points (" .. tostring(#Points) .. "), expected 4 points!")
 	end
 end
-function t2.CalculateDerivativeAt(p1, p2)
-	if type(p2) ~= "number" then
-		error("The given t value in CatmullRomSpline:CalculateDerivativeAt() was not between 0 and 1, got " .. tostring(p2) .. "!")
+function CatmullRomSplineMethods.CalculateDerivativeAt(spline, parameterT)
+	if type(parameterT) ~= "number" then
+		error("The given t value in CatmullRomSpline:CalculateDerivativeAt() was not between 0 and 1, got " .. tostring(parameterT) .. "!")
 	end
-	local instance, table2 = t2.GetSplineAt(p1, p2)
-	local var3 = t2._getPoints(instance)
-	if #var3 ~= 4 then
-		error("The CatmullRomSpline object has an invalid number of points (" .. tostring(#var3) .. "), expected 4 points!")
+	local targetSpline, normalizedT = CatmullRomSplineMethods.GetSplineAt(spline, parameterT)
+	local controlPoints = CatmullRomSplineMethods._getPoints(targetSpline)
+	if #controlPoints ~= 4 then
+		error("The CatmullRomSpline object has an invalid number of points (" .. tostring(#controlPoints) .. "), expected 4 points!")
 	end
-	local Tension = instance.Tension
-	return Tension * (var3[3] - var3[1]) + 2 * (3 * (var3[3] - var3[2]) - Tension * (var3[4] - var3[2]) - 2 * Tension * (var3[3] - var3[1])) * table2 + 3 * (-2 * (var3[3] - var3[2]) + Tension * (var3[4] - var3[2]) + Tension * (var3[3] - var3[1])) * table2 ^ 2
+	local Tension = targetSpline.Tension
+	return Tension * (controlPoints[3] - controlPoints[1]) + 2 * (3 * (controlPoints[3] - controlPoints[2]) - Tension * (controlPoints[4] - controlPoints[2]) - 2 * Tension * (controlPoints[3] - controlPoints[1])) * normalizedT + 3 * (-2 * (controlPoints[3] - controlPoints[2]) + Tension * (controlPoints[4] - controlPoints[2]) + Tension * (controlPoints[3] - controlPoints[1])) * normalizedT ^ 2
 end
-function t2.CalculateDerivativeRelativeToLength(p1, p2)
-	if type(p2) ~= "number" then
-		error("CatmullRomSpline:CalculateDerivativeRelativeToLength() only accepts a number, got " .. tostring(p2) .. "!")
+function CatmullRomSplineMethods.CalculateDerivativeRelativeToLength(spline, targetLength)
+	if type(targetLength) ~= "number" then
+		error("CatmullRomSpline:CalculateDerivativeRelativeToLength() only accepts a number, got " .. tostring(targetLength) .. "!")
 	end
-	local Points = p1.Points
+	local Points = spline.Points
 	if #Points == 4 then
-		local LengthIndices = p1.LengthIndices
-		local LengthIterations = p1.LengthIterations
-		t2._getPoints(p1)
-		local instance = p1.Length * p2
-		local table2 = nil
-		local var3 = nil
+		local LengthIndices = spline.LengthIndices
+		local LengthIterations = spline.LengthIterations
+		CatmullRomSplineMethods._getPoints(spline)
+		local targetLengthValue = spline.Length * targetLength
+		local foundIndexInTable = nil
+		local correspondingLengthEntry = nil
 		for i, v in ipairs(LengthIndices) do
-			if instance - v[2] <= 0 or i == #LengthIndices then
-				table2 = i
-				var3 = v
+			if targetLengthValue - v[2] <= 0 or i == #LengthIndices then
+				foundIndexInTable = i
+				correspondingLengthEntry = v
 				break
 			end
 		end
-		local var4, var5
-		if LengthIndices[table2 - 1] then
-			local var6 = t2.CalculateDerivativeAt(p1, LengthIndices[table2 - 1][1])
-			var4, var5 = var6, t2.CalculateDerivativeAt(p1, var3[1])
+		local startDerivative, endDerivative
+		if LengthIndices[foundIndexInTable - 1] then
+			local prevDerivative = CatmullRomSplineMethods.CalculateDerivativeAt(spline, LengthIndices[foundIndexInTable - 1][1])
+			startDerivative, endDerivative = prevDerivative, CatmullRomSplineMethods.CalculateDerivativeAt(spline, correspondingLengthEntry[1])
 		else
-			local var8 = t2.CalculateDerivativeAt(p1, var3[1])
-			var4, var5 = var8, t2.CalculateDerivativeAt(p1, LengthIndices[table2 + 1][1])
+			local nextDerivative = CatmullRomSplineMethods.CalculateDerivativeAt(spline, correspondingLengthEntry[1])
+			startDerivative, endDerivative = nextDerivative, CatmullRomSplineMethods.CalculateDerivativeAt(spline, LengthIndices[foundIndexInTable + 1][1])
 		end
-		return var4 + (var5 - var4) * (1 - if typeof(var4) == "number" and typeof(var5) == "number" then if math.abs(var5 - var4) > 0 then (var3[2] - instance) / (var5 - var4) else 0 elseif (var5 - var4).Magnitude > 0 then (var3[2] - instance) / (var5 - var4).Magnitude else 0)
+		return startDerivative + (endDerivative - startDerivative) * (1 - if typeof(startDerivative) == "number" and typeof(endDerivative) == "number" then if math.abs(endDerivative - startDerivative) > 0 then (correspondingLengthEntry[2] - targetLengthValue) / (endDerivative - startDerivative) else 0 elseif (endDerivative - startDerivative).Magnitude > 0 then (correspondingLengthEntry[2] - targetLengthValue) / (endDerivative - startDerivative).Magnitude else 0)
 	end
 	error("The CatmullRomSpline object has an invalid number of points (" .. tostring(#Points) .. "), expected 4 points!")
 end
-function t2.CreateTween(p1, p2, p3, p4, p5)
-	if typeof(p2) ~= "Instance" then
-		error("CatmullRomSplineObject:CreateTween() expected an instance as the first input, got " .. tostring(p2) .. "!")
+function CatmullRomSplineMethods.CreateTween(spline, targetObject, tweenInfo, propertyTable, useRelativeLength)
+	if typeof(targetObject) ~= "Instance" then
+		error("CatmullRomSplineObject:CreateTween() expected an instance as the first input, got " .. tostring(targetObject) .. "!")
 	end
-	if typeof(p3) ~= "TweenInfo" then
-		error("CatmullRomSplineObject:CreateTween() expected a TweenInfo object as the second input, got " .. tostring(p3) .. "!")
+	if typeof(tweenInfo) ~= "TweenInfo" then
+		error("CatmullRomSplineObject:CreateTween() expected a TweenInfo object as the second input, got " .. tostring(tweenInfo) .. "!")
 	end
-	local instance = true
-	for k, v in pairs(p4) do
-		local table2, var3 = pcall(function()
-			return p2[v]
+	local allPropertiesExist = true
+	for k, v in pairs(propertyTable) do
+		local propertyExists, propertyValue = pcall(function()
+			return targetObject[v]
 		end)
-		if not table2 or var3 == nil then
-			instance = false
+		if not propertyExists or propertyValue == nil then
+			allPropertiesExist = false
 		end
 	end
-	if not instance then
+	if not allPropertiesExist then
 		error("CatmullRomSplineObject:CreateTween() was given properties in the property table that do not belong to the instance!")
 	end
-	local var4 = Instance.new("NumberValue")
-	local var5 = TweenService:Create(var4, p3, {
+	local tweenProgress = Instance.new("NumberValue")
+	local createdTween = TweenService:Create(tweenProgress, tweenInfo, {
 		Value = 1
 	})
-	local var6 = nil
-	var5.Changed:Connect(function(p12)
-		if p12 == "PlaybackState" and var5.PlaybackState == Enum.PlaybackState.Playing then
-			var6 = var4.Changed:Connect(function(p12)
-				for k, v in pairs(p4) do
-					local instance = p5 and t2.CalculatePositionRelativeToLength(p1, p12) or t2.CalculatePositionAt(p1, p12)
-					local table2 = p5 and t2.CalculateDerivativeRelativeToLength(p1, p12) or t2.CalculateDerivativeAt(p1, p12)
-					local var3 = typeof(instance) == "Vector3" and typeof(table2) == "Vector3" and CFrame.new(instance, instance + table2) or instance
-					if typeof(p2[v]) == "number" or (typeof(p2[v] == "Vector2") or typeof(p2[v]) == "CFrame") then
-						p2[v] = var3
+	local valueChangedConnection = nil
+	createdTween.Changed:Connect(function(propertyName)
+		if propertyName == "PlaybackState" and createdTween.PlaybackState == Enum.PlaybackState.Playing then
+			valueChangedConnection = tweenProgress.Changed:Connect(function(currentProgress)
+				for k, v in pairs(propertyTable) do
+					local calculatedPosition = useRelativeLength and CatmullRomSplineMethods.CalculatePositionRelativeToLength(spline, currentProgress) or CatmullRomSplineMethods.CalculatePositionAt(spline, currentProgress)
+					local calculatedDerivative = useRelativeLength and CatmullRomSplineMethods.CalculateDerivativeRelativeToLength(spline, currentProgress) or CatmullRomSplineMethods.CalculateDerivativeAt(spline, currentProgress)
+					local finalValue = typeof(calculatedPosition) == "Vector3" and typeof(calculatedDerivative) == "Vector3" and CFrame.new(calculatedPosition, calculatedPosition + calculatedDerivative) or calculatedPosition
+					if typeof(targetObject[v]) == "number" or (typeof(targetObject[v] == "Vector2") or typeof(targetObject[v]) == "CFrame") then
+						targetObject[v] = finalValue
 					else
-						if typeof(p2[v] == "Vector3") then
-							p2[v] = var3.Position
+						if typeof(targetObject[v] == "Vector3") then
+							targetObject[v] = finalValue.Position
 						else
 							error("CatmullRomSplineObject:CreateTween() could not set the value of the instance property " .. tostring(v) .. ", not a numerical value!")
 						end
 					end
 				end
 			end)
-		elseif p12 == "PlaybackState" and var6 ~= nil then
-			var6:Disconnect()
-			var6 = nil
+		elseif propertyName == "PlaybackState" and valueChangedConnection ~= nil then
+			valueChangedConnection:Disconnect()
+			valueChangedConnection = nil
 		end
 	end)
-	return var5
+	return createdTween
 end
-return t
+return CatmullRomSpline

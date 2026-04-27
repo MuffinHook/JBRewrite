@@ -1,26 +1,25 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("TradeResult")
-v1.defaultProps = {
+local TradeResult = Roact.PureComponent:extend("TradeResult")
+TradeResult.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	position = UDim2.new(0, 0, 0, 0),
 	anchorPoint = Vector2.new()
 }
-function v1.init(p1)  end
-function v1.render(p1)
-	local tradeResult = p1.props.tradeResult
+function TradeResult.init(self)  end
+function TradeResult.render(self)
+	local tradeResult = self.props.tradeResult
 	if tradeResult then
-		local t = {
-			Size = p1.props.size,
-			Position = p1.props.position,
-			AnchorPoint = p1.props.anchorPoint,
+		local frameProps = {
+			Size = self.props.size,
+			Position = self.props.position,
+			AnchorPoint = self.props.anchorPoint,
 			BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
 			BackgroundTransparency = 0
 		}
-		local t2 = {
+		local frameChildren = {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, 8)
 			}),
@@ -28,28 +27,28 @@ function v1.render(p1)
 				AspectRatio = 3
 			})
 		}
-		local t3 = {
+		local titleFrameProps = {
 			BackgroundTransparency = 1,
 			BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
 			Size = UDim2.new(1, 0, 0.5, 0),
 			Position = UDim2.new(0, 0, 0, 0)
 		}
-		local t4 = {}
-		local t5 = {
+		local titleChildren = {}
+		local titleTextProps = {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5)
 		}
-		t5.TextColor3 = tradeResult.success and Color3.fromRGB(53, 171, 84) or Color3.fromRGB(237, 66, 69)
-		t5.Text = tradeResult.title
-		t5.TextXAlignment = Enum.TextXAlignment.Center
-		t5.Font = Enum.Font.Bangers
-		t5.LineHeight = 1
-		t5.TextScaled = true
-		t4.Text = createElement("TextLabel", t5)
-		t2.Title = createElement("Frame", t3, t4)
-		t2.Desc = createElement("Frame", {
+		titleTextProps.TextColor3 = tradeResult.success and Color3.fromRGB(53, 171, 84) or Color3.fromRGB(237, 66, 69)
+		titleTextProps.Text = tradeResult.title
+		titleTextProps.TextXAlignment = Enum.TextXAlignment.Center
+		titleTextProps.Font = Enum.Font.Bangers
+		titleTextProps.LineHeight = 1
+		titleTextProps.TextScaled = true
+		titleChildren.Text = createElement("TextLabel", titleTextProps)
+		frameChildren.Title = createElement("Frame", titleFrameProps, titleChildren)
+		frameChildren.Desc = createElement("Frame", {
 			BackgroundTransparency = 1,
 			BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
 			Size = UDim2.new(1, 0, 0.5, 0),
@@ -68,12 +67,12 @@ function v1.render(p1)
 				TextScaled = true
 			})
 		})
-		return createElement("Frame", t, t2)
+		return createElement("Frame", frameProps, frameChildren)
 	end
 end
-function v1.willUnmount(p1)  end
-return RoactRodux.connect(function(p1, p2)
+function TradeResult.willUnmount(self)  end
+return RoactRodux.connect(function(state, action)
 	return {
-		tradeResult = p1.tradeResult
+		tradeResult = state.tradeResult
 	}
-end)(v1)
+end)(TradeResult)

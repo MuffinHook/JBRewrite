@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
@@ -15,10 +14,10 @@ local GamepassData = require(ReplicatedStorage.Gamepass.GamepassData)
 local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Signal = require(ReplicatedStorage.Std.Signal)
-local v1 = nil
-local v2 = nil
-local v3 = Color3.fromRGB(87, 87, 87)
-local v4 = Color3.fromRGB(138, 138, 138)
+local cashDropEvent = nil
+local eventManager = nil
+local darkGrayColor = Color3.fromRGB(87, 87, 87)
+local lightGrayColor = Color3.fromRGB(138, 138, 138)
 local function PlayButtonClick()
 	task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 		Volume = 0.15
@@ -29,10 +28,10 @@ local t = {
 	Loaded = false,
 	OnLoaded = Signal.new()
 }
-local v5 = nil
-function t.Init(p1)
-	v1 = p1.Event
-	v2 = p1.em
+local vipSubscriptionPrice = nil
+function t.Init(config)
+	cashDropEvent = config.Event
+	eventManager = config.em
 	local CashGui = ReplicatedStorage.StarterGui:FindFirstChild("CashGui")
 	CashGui.Parent = LocalPlayer.PlayerGui
 	t.Gui = CashGui
@@ -56,11 +55,11 @@ function t.Init(p1)
 	end)
 	t.SetupCashDrop()
 	task.spawn(function()
-		local v1, v2 = pcall(function()
+		local success, vipInfo = pcall(function()
 			return MarketplaceService:GetSubscriptionProductInfoAsync(SubscriptionConsts.VIP.SUBSCRIPTION_ID)
 		end)
-		if v1 and v2 then
-			v5 = v2.PriceInRobux or 100
+		if success and vipInfo then
+			vipSubscriptionPrice = vipInfo.PriceInRobux or 100
 		end
 	end)
 end
@@ -69,8 +68,8 @@ function t.OpenTabCash()
 	Gui.Container.Content.ContainerCash.Visible = true
 	Gui.Container.Content.ContainerPasses.Visible = false
 	Gui.Container.Content.ContainerTop.ContainerRight.ContainerCash.Visible = true
-	Gui.Container.Content.ContainerTop.ContainerLeft.Cash.BackgroundColor3 = v4
-	Gui.Container.Content.ContainerTop.ContainerLeft.Passes.BackgroundColor3 = v3
+	Gui.Container.Content.ContainerTop.ContainerLeft.Cash.BackgroundColor3 = lightGrayColor
+	Gui.Container.Content.ContainerTop.ContainerLeft.Passes.BackgroundColor3 = darkGrayColor
 	t.Maid.Gifting = nil
 	task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 		Volume = 0.15
@@ -81,8 +80,8 @@ function t.OpenTabPasses()
 	Gui.Container.Content.ContainerCash.Visible = false
 	Gui.Container.Content.ContainerPasses.Visible = true
 	Gui.Container.Content.ContainerTop.ContainerRight.ContainerCash.Visible = false
-	Gui.Container.Content.ContainerTop.ContainerLeft.Cash.BackgroundColor3 = v3
-	Gui.Container.Content.ContainerTop.ContainerLeft.Passes.BackgroundColor3 = v4
+	Gui.Container.Content.ContainerTop.ContainerLeft.Cash.BackgroundColor3 = darkGrayColor
+	Gui.Container.Content.ContainerTop.ContainerLeft.Passes.BackgroundColor3 = lightGrayColor
 	t.Maid.Gifting = nil
 	task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 		Volume = 0.15
@@ -92,38 +91,38 @@ function t.OpenTabGiftPasses()
 	local Gui = t.Gui
 	Gui.Container.Content.ContainerCash.Visible = false
 	Gui.Container.Content.ContainerPasses.Visible = false
-	Gui.Container.Content.ContainerTop.ContainerLeft.Cash.BackgroundColor3 = v3
-	Gui.Container.Content.ContainerTop.ContainerLeft.Passes.BackgroundColor3 = v3
+	Gui.Container.Content.ContainerTop.ContainerLeft.Cash.BackgroundColor3 = darkGrayColor
+	Gui.Container.Content.ContainerTop.ContainerLeft.Passes.BackgroundColor3 = darkGrayColor
 	task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 		Volume = 0.15
 	})
 	t.SetupGiftingUI()
 end
-function t.SetCash(p1)
-	t.Gui.Container.Content.ContainerTop.ContainerRight.ContainerCash.TextLabel.Text = Format.Currency(p1)
+function t.SetCash(amount)
+	t.Gui.Container.Content.ContainerTop.ContainerRight.ContainerCash.TextLabel.Text = Format.Currency(amount)
 end
 function t.SetupCashDrop()
-	function v2.gkw6n126(p1)
-		local v1 = nil
-		if p1.NotEnoughMoney then
-			v1 = "You don\'t have that much money."
-		elseif p1.InvalidWorld then
-			v1 = "Cannot drop cash in current world."
-		elseif p1.TooLittleQuantity then
-			v1 = ("Drop more than %s."):format(Format.Currency(p1.TooLittleQuantity))
-		elseif p1.TooMuchQuantity then
-			v1 = ("Drop less than %s."):format(Format.Currency(p1.TooMuchQuantity))
-		elseif p1.Debounce then
-			v1 = ("Wait %d seconds."):format(p1.Debounce)
-		elseif p1.Daily then
-			v1 = ("Can only donate %s per day."):format(Format.Currency(p1.Quantity))
-		elseif p1.SmallVIP then
-			v1 = "Donations disabled in small private servers."
+	function eventManager.gkw6n126(errorInfo)
+		local errorMessage = nil
+		if errorInfo.NotEnoughMoney then
+			errorMessage = "You don\'t have that much money."
+		elseif errorInfo.InvalidWorld then
+			errorMessage = "Cannot drop cash in current world."
+		elseif errorInfo.TooLittleQuantity then
+			errorMessage = ("Drop more than %s."):format(Format.Currency(errorInfo.TooLittleQuantity))
+		elseif errorInfo.TooMuchQuantity then
+			errorMessage = ("Drop less than %s."):format(Format.Currency(errorInfo.TooMuchQuantity))
+		elseif errorInfo.Debounce then
+			errorMessage = ("Wait %d seconds."):format(errorInfo.Debounce)
+		elseif errorInfo.Daily then
+			errorMessage = ("Can only donate %s per day."):format(Format.Currency(errorInfo.Quantity))
+		elseif errorInfo.SmallVIP then
+			errorMessage = "Donations disabled in small private servers."
 		end
-		if v1 then
-			v2.mq92d5a8({
+		if errorMessage then
+			eventManager.mq92d5a8({
 				Title = "Donation",
-				Text = v1
+				Text = errorMessage
 			})
 		end
 	end
@@ -136,34 +135,34 @@ function t.SetupCashDrop()
 		task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 			Volume = 0.15
 		})
-		local v12 = tonumber(Amount.Text)
-		if v12 then
-			v1:FireServer("h" .. ("b4xm"):sub(2, 2):reverse() .. "ogv4dl", v12)
+		local dropAmount = tonumber(Amount.Text)
+		if dropAmount then
+			cashDropEvent:FireServer("h4ogv4dl", dropAmount)
 		end
 	end)
 	local CircleAction = UI.CircleAction
-	local function Action(p1, p2)
-		local v12 = p1.Part.Parent
-		if p2 then
-			v1:FireServer("x" .. ("jqs2gh59"):sub(3, 4):reverse():reverse():reverse() .. "" .. "" .. ("y1mga"):sub(4, 4):reverse():reverse():reverse() .. "" .. "" .. ("mpcvuogh5"):sub(5, 7):reverse():reverse():reverse():reverse():reverse() .. "q", v12)
+	local function Action(dropModel, isConfirmed)
+		local targetDrop = dropModel.Part.Parent
+		if isConfirmed then
+			cashDropEvent:FireServer("x2sggouq", targetDrop)
 			return true
 		end
 	end
-	local function AddedFun(p1)
-		local Amount = p1:WaitForChild("Amount", 2)
-		local PlayerName = p1:WaitForChild("PlayerName", 2)
+	local function AddedFun(dropInstance)
+		local Amount = dropInstance:WaitForChild("Amount", 2)
+		local PlayerName = dropInstance:WaitForChild("PlayerName", 2)
 		CircleAction.Add({
-			Part = p1.PrimaryPart,
-			ValidRoot = p1,
+			Part = dropInstance.PrimaryPart,
+			ValidRoot = dropInstance,
 			Name = ("Collect %s from %s"):format(Format.Currency(Amount.Value), PlayerName.Value),
 			Timed = true,
 			Duration = 1,
 			Dist = 10,
 			Callback = Action
-		}, p1)
+		}, dropInstance)
 	end
-	local function RemovedFun(p1)
-		CircleAction.Remove(p1)
+	local function RemovedFun(dropInstance)
+		CircleAction.Remove(dropInstance)
 	end
 	for i, v in ipairs(CollectionService:GetTagged("CashDrop")) do
 		AddedFun(v)
@@ -171,43 +170,43 @@ function t.SetupCashDrop()
 	CollectionService:GetInstanceAddedSignal("CashDrop"):Connect(AddedFun)
 	CollectionService:GetInstanceRemovedSignal("CashDrop"):Connect(RemovedFun)
 end
-local function TransformPassIntoOwned(p1)
-	p1.Product.ContainerCost.Amount.Text = "OWNED"
-	p1.Product.ContainerImage.Thumbnail.ImageTransparency = 0.75
+local function TransformPassIntoOwned(container)
+	container.Product.ContainerCost.Amount.Text = "OWNED"
+	container.Product.ContainerImage.Thumbnail.ImageTransparency = 0.75
 end
 local function ClickVIPSubscription()
 	t.Maid.Subscription = nil
-	local v1 = Maid.new()
-	t.Maid.Subscription = v1
+	local subscriptionMaid = Maid.new()
+	t.Maid.Subscription = subscriptionMaid
 	local Gui = t.Gui
 	local VIPSubscription = Gui.VIPSubscription
 	local Container = Gui.Container
 	Container.Visible = false
 	VIPSubscription.Visible = true
-	v1:GiveTask(function()
+	subscriptionMaid:GiveTask(function()
 		VIPSubscription.Visible = false
 		Container.Visible = true
 	end)
 	local VIP = GamepassUtils.EnumGamepass.VIP
-	local v2 = GamepassUtils.GetGamepassFromEnum(VIP)
-	local v3 = false
-	local v4 = false
-	v1:GiveTask(VIPSubscription.Close.MouseButton1Down:Connect(function()
+	local vipGamepass = GamepassUtils.GetGamepassFromEnum(VIP)
+	local isVIPOwned = false
+	local isSubscriptionActive = false
+	subscriptionMaid:GiveTask(VIPSubscription.Close.MouseButton1Down:Connect(function()
 		task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 			Volume = 0.15
 		})
-		v1:DoCleaning()
+		subscriptionMaid:DoCleaning()
 	end))
-	v1:GiveTask(VIPSubscription.Container.Gamepass.MouseButton1Down:Connect(function()
-		if not v3 then
+	subscriptionMaid:GiveTask(VIPSubscription.Container.Gamepass.MouseButton1Down:Connect(function()
+		if not isVIPOwned then
 			task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 				Volume = 0.15
 			})
 			GamepassUtils.PromptGamepass(VIP)
 		end
 	end))
-	v1:GiveTask(VIPSubscription.Container.Subscription.MouseButton1Down:Connect(function()
-		if not (v3 or v4) then
+	subscriptionMaid:GiveTask(VIPSubscription.Container.Subscription.MouseButton1Down:Connect(function()
+		if not (isVIPOwned or isSubscriptionActive) then
 			task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 				Volume = 0.15
 			})
@@ -215,60 +214,60 @@ local function ClickVIPSubscription()
 		end
 	end))
 	local function updateOwned()
-		v3 = LocalPlayer:GetAttribute(SubscriptionConsts.VIP.LIFETIME_ATTR_NAME)
-		v4 = LocalPlayer:GetAttribute(SubscriptionConsts.VIP.SUBSCRIPTION_ATTR_NAME)
-		local v1 = utf8.char(57346)
-		local v32 = v1 .. if v5 then Format.Comma(v5) else "N/A"
-		local v42 = utf8.char(57346) .. Format.Comma(v2.PriceInRobux)
-		if v3 then
+		isVIPOwned = LocalPlayer:GetAttribute(SubscriptionConsts.VIP.LIFETIME_ATTR_NAME)
+		isSubscriptionActive = LocalPlayer:GetAttribute(SubscriptionConsts.VIP.SUBSCRIPTION_ATTR_NAME)
+		local robuxIcon = utf8.char(57346)
+		local subscriptionPriceText = robuxIcon .. if vipSubscriptionPrice then Format.Comma(vipSubscriptionPrice) else "N/A"
+		local gamepassPriceText = robuxIcon .. Format.Comma(vipGamepass.PriceInRobux)
+		if isVIPOwned then
 			VIPSubscription.Container.Gamepass.Text = "OWNED"
 			VIPSubscription.Container.Gamepass.AutoButtonColor = false
 			VIPSubscription.Container.Subscription.Text = "N/A"
 			VIPSubscription.Container.Subscription.AutoButtonColor = false
-		elseif v4 then
-			VIPSubscription.Container.Gamepass.Text = v42
+		elseif isSubscriptionActive then
+			VIPSubscription.Container.Gamepass.Text = gamepassPriceText
 			VIPSubscription.Container.Gamepass.AutoButtonColor = true
 			VIPSubscription.Container.Subscription.Text = "ACTIVE"
 			VIPSubscription.Container.Subscription.AutoButtonColor = false
 		else
-			VIPSubscription.Container.Gamepass.Text = v42
+			VIPSubscription.Container.Gamepass.Text = gamepassPriceText
 			VIPSubscription.Container.Gamepass.AutoButtonColor = true
-			VIPSubscription.Container.Subscription.Text = v32
+			VIPSubscription.Container.Subscription.Text = subscriptionPriceText
 			VIPSubscription.Container.Subscription.AutoButtonColor = true
 		end
 	end
 	updateOwned()
-	v1:GiveTask(LocalPlayer:GetAttributeChangedSignal(SubscriptionConsts.VIP.SUBSCRIPTION_ATTR_NAME):Connect(updateOwned))
-	v1:GiveTask(LocalPlayer:GetAttributeChangedSignal(SubscriptionConsts.VIP.LIFETIME_ATTR_NAME):Connect(updateOwned))
+	subscriptionMaid:GiveTask(LocalPlayer:GetAttributeChangedSignal(SubscriptionConsts.VIP.SUBSCRIPTION_ATTR_NAME):Connect(updateOwned))
+	subscriptionMaid:GiveTask(LocalPlayer:GetAttributeChangedSignal(SubscriptionConsts.VIP.LIFETIME_ATTR_NAME):Connect(updateOwned))
 end
 function t.UpdatePrices()
 	local Gui = t.Gui
-	local t2 = {}
+	local productsByIndex = {}
 	for i, v in ipairs(Settings.DevProduct) do
 		if v.Type == "Cash" then
-			t2[v.Index] = v
+			productsByIndex[v.Index] = v
 		end
 	end
 	for i = 1, 5 do
-		if t2[i] == nil then
+		if productsByIndex[i] == nil then
 			error(("Missing product frame: %d"):format(i))
 		end
 	end
 	local ContainerProducts = Gui.Container.Content.ContainerCash.ContainerProducts
 	for j = 1, 5 do
-		local v1 = ("ContainerProduct%d"):format(j)
-		local v2 = ContainerProducts:FindFirstChild(v1)
-		local v3 = t2[j]
-		v2.Product.ContainerAmount.Amount.Text = Format.Currency(v3.Cash)
-		v2.Product.ContainerCost.Amount.Text = utf8.char(57346) .. Format.Comma(v3.Robux)
-		if v3.ImageId then
-			v2.Product.ContainerCash.Cash.Image = ("rbxassetid://%d"):format(v3.ImageId)
+		local containerName = ("ContainerProduct%d"):format(j)
+		local containerFrame = ContainerProducts:FindFirstChild(containerName)
+		local productData = productsByIndex[j]
+		containerFrame.Product.ContainerAmount.Amount.Text = Format.Currency(productData.Cash)
+		containerFrame.Product.ContainerCost.Amount.Text = utf8.char(57346) .. Format.Comma(productData.Robux)
+		if productData.ImageId then
+			containerFrame.Product.ContainerCash.Cash.Image = ("rbxassetid://%d"):format(productData.ImageId)
 		end
-		t.Maid[v1] = v2.Product.MouseButton1Down:Connect(function()
+		t.Maid[containerName] = containerFrame.Product.MouseButton1Down:Connect(function()
 			task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 				Volume = 0.15
 			})
-			MarketplaceService:PromptProductPurchase(LocalPlayer, v3.Id)
+			MarketplaceService:PromptProductPurchase(LocalPlayer, productData.Id)
 		end)
 	end
 	local ContainerProducts_2 = Gui.Container.Content.ContainerPasses.ContainerProducts
@@ -280,26 +279,26 @@ function t.UpdatePrices()
 	local ContainerPreset = ContainerProducts_2.ContainerPreset
 	local count = 0
 	for i, v in ipairs(GamepassData) do
-		local v4, v5, v6
+		local isVIPPass, layoutOrder, priceDisplay
 		if v.PriceInRobux and not v.HideFromUI then
-			v4 = v.Title == "VIP"
-			local v7 = ("ContainerProduct%d_%s"):format(i, v.Title)
-			local v8 = ContainerPreset:Clone()
-			v5 = if v4 then -1 else i
-			v8.LayoutOrder = v5
-			v8.Name = v7
-			v8.Product.ContainerTitle.Title.Text = v.DisplayName or v.Title
-			GamepassSystem.promiseImageId(v.PassId):andThen(function(p1)
-				v8.Product.ContainerImage.Thumbnail.Image = ("rbxassetid://%d"):format(p1)
+			isVIPPass = v.Title == "VIP"
+			local containerName = ("ContainerProduct%d_%s"):format(i, v.Title)
+			local containerFrame = ContainerPreset:Clone()
+			layoutOrder = if isVIPPass then -1 else i
+			containerFrame.LayoutOrder = layoutOrder
+			containerFrame.Name = containerName
+			containerFrame.Product.ContainerTitle.Title.Text = v.DisplayName or v.Title
+			GamepassSystem.promiseImageId(v.PassId):andThen(function(imageId)
+				containerFrame.Product.ContainerImage.Thumbnail.Image = ("rbxassetid://%d"):format(imageId)
 			end)
-			v6 = if v4 then "VIEW" else utf8.char(57346) .. Format.Comma(v.PriceInRobux)
-			v8.Product.ContainerCost.Amount.Text = v6
-			if v4 then
+			priceDisplay = if isVIPPass then "VIEW" else utf8.char(57346) .. Format.Comma(v.PriceInRobux)
+			containerFrame.Product.ContainerCost.Amount.Text = priceDisplay
+			if isVIPPass then
 				local UIScale = Instance.new("UIScale")
 				UIScale.Scale = 1.1
-				UIScale.Parent = v8
-				v8.Product.ContainerImage.ImageTransparency = 1
-				v8.Product.ContainerCost.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				UIScale.Parent = containerFrame
+				containerFrame.Product.ContainerImage.ImageTransparency = 1
+				containerFrame.Product.ContainerCost.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				local ImageLabel = Instance.new("ImageLabel")
 				ImageLabel.BackgroundTransparency = 1
 				ImageLabel.Image = "rbxassetid://10046133665"
@@ -309,46 +308,46 @@ function t.UpdatePrices()
 				ImageLabel.Position = UDim2.fromScale(0.5, 0.5)
 				ImageLabel.ZIndex = 0
 				Instance.new("UIAspectRatioConstraint").Parent = ImageLabel
-				ImageLabel.Parent = v8
+				ImageLabel.Parent = containerFrame
 			end
-			v8.Visible = true
-			v8.Parent = ContainerPreset.Parent
+			containerFrame.Visible = true
+			containerFrame.Parent = ContainerPreset.Parent
 			count = count + 1
-			local v10 = GamepassUtils.EnumGamepass[v.Title]
-			t.Maid[v7] = v8.Product.MouseButton1Down:Connect(function()
-				if v8.Product.ContainerCost.Amount.Text == "OWNED" then
+			local gamepassEnum = GamepassUtils.EnumGamepass[v.Title]
+			t.Maid[containerName] = containerFrame.Product.MouseButton1Down:Connect(function()
+				if containerFrame.Product.ContainerCost.Amount.Text == "OWNED" then
 					return
 				end
 				task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 					Volume = 0.15
 				})
-				if v4 then
+				if isVIPPass then
 					ClickVIPSubscription()
 				else
 					GamepassUtils.PromptPurchase(v)
 				end
 			end)
-			if not v4 and GamepassSystem.DoesPlayerOwn(v10) then
-				v8.Product.ContainerCost.Amount.Text = "OWNED"
-				v8.Product.ContainerImage.Thumbnail.ImageTransparency = 0.75
+			if not isVIPPass and GamepassSystem.DoesPlayerOwn(gamepassEnum) then
+				containerFrame.Product.ContainerCost.Amount.Text = "OWNED"
+				containerFrame.Product.ContainerImage.Thumbnail.ImageTransparency = 0.75
 			end
-			if not v4 then
-				t.Maid[v7 .. "Owned"] = GamepassSystem.GetGamepassOwnedSignal(v10):Connect(function()
-					local v1 = v8
-					v1.Product.ContainerCost.Amount.Text = "OWNED"
-					v1.Product.ContainerImage.Thumbnail.ImageTransparency = 0.75
+			if not isVIPPass then
+				t.Maid[containerName .. "Owned"] = GamepassSystem.GetGamepassOwnedSignal(gamepassEnum):Connect(function()
+					local updatingFrame = containerFrame
+					updatingFrame.Product.ContainerCost.Amount.Text = "OWNED"
+					updatingFrame.Product.ContainerImage.Thumbnail.ImageTransparency = 0.75
 				end)
 			end
 			if v.Title == "DuffelBag" then
 				if LocalPlayer:GetAttribute("EffectivelyDuffelBag") then
-					v8.Product.ContainerCost.Amount.Text = "OWNED"
-					v8.Product.ContainerImage.Thumbnail.ImageTransparency = 0.75
+					containerFrame.Product.ContainerCost.Amount.Text = "OWNED"
+					containerFrame.Product.ContainerImage.Thumbnail.ImageTransparency = 0.75
 				else
 					LocalPlayer:GetAttributeChangedSignal("EffectivelyDuffelBag"):Connect(function(...)
 						if LocalPlayer:GetAttribute("EffectivelyDuffelBag") then
-							local v1 = v8
-							v1.Product.ContainerCost.Amount.Text = "OWNED"
-							v1.Product.ContainerImage.Thumbnail.ImageTransparency = 0.75
+							local updatingFrame = containerFrame
+							updatingFrame.Product.ContainerCost.Amount.Text = "OWNED"
+							updatingFrame.Product.ContainerImage.Thumbnail.ImageTransparency = 0.75
 						end
 					end)
 				end
@@ -379,41 +378,41 @@ function t.SetupGiftingUI()
 		GiftContainer.ContainerPlayerName.Text = ""
 	end)
 	local ContainerPreset = ContainerProducts.ContainerPreset
-	local v1 = nil
+	local selectedPassTitle = nil
 	local count = 0
 	for i, v in ipairs(GamepassData) do
-		local v2 = GetGiftProductInfoFromGamepass(v.Title)
-		if v.PriceInRobux and (not v.HideFromUI and (v2 and v2.Robux)) then
-			local v3 = ("ContainerProduct%d_%s"):format(i, v.Title)
-			local v4 = ContainerPreset:Clone()
-			v4.LayoutOrder = i
-			v4.Name = v3
-			v4.Product.ContainerTitle.Title.Text = v.DisplayName or v.Title
-			v4.Product.ContainerImage.Thumbnail.Image = ("rbxassetid://%d"):format(v2.ImageId or 0)
-			v4.Product.ContainerCost.Amount.Text = utf8.char(57346) .. Format.Comma(v2.Robux)
-			v4.Visible = true
-			v4.Parent = ContainerPreset.Parent
-			t.Maid.Gifting[v3] = v4
-			t.Maid.Gifting[v3 .. "Button"] = v4.Product.MouseButton1Down:Connect(function()
-				local v12 = LocalPlayer:GetAttribute(GamepassUtils.PLAYER_ALLOWED_TO_ATTEMPT_GAME_PASS_GIFT_ATTR_NAME)
+		local giftProductInfo = GetGiftProductInfoFromGamepass(v.Title)
+		if v.PriceInRobux and (not v.HideFromUI and (giftProductInfo and giftProductInfo.Robux)) then
+			local containerName = ("ContainerProduct%d_%s"):format(i, v.Title)
+			local containerFrame = ContainerPreset:Clone()
+			containerFrame.LayoutOrder = i
+			containerFrame.Name = containerName
+			containerFrame.Product.ContainerTitle.Title.Text = v.DisplayName or v.Title
+			containerFrame.Product.ContainerImage.Thumbnail.Image = ("rbxassetid://%d"):format(giftProductInfo.ImageId or 0)
+			containerFrame.Product.ContainerCost.Amount.Text = utf8.char(57346) .. Format.Comma(giftProductInfo.Robux)
+			containerFrame.Visible = true
+			containerFrame.Parent = ContainerPreset.Parent
+			t.Maid.Gifting[containerName] = containerFrame
+			t.Maid.Gifting[containerName .. "Button"] = containerFrame.Product.MouseButton1Down:Connect(function()
+				local isPlayerAllowedToGift = LocalPlayer:GetAttribute(GamepassUtils.PLAYER_ALLOWED_TO_ATTEMPT_GAME_PASS_GIFT_ATTR_NAME)
 				task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 					Volume = 0.15
 				})
 				t.Maid.Gifting.Unselect = nil
-				if v1 == v.Title then
-					v1 = nil
+				if selectedPassTitle == v.Title then
+					selectedPassTitle = nil
 					GiftContainer.Visible = false
 				else
-					v1 = v.Title
-					v4.Product.ContainerImage.SelectedFrame.Visible = true
+					selectedPassTitle = v.Title
+					containerFrame.Product.ContainerImage.SelectedFrame.Visible = true
 					t.Maid.Gifting.Unselect = function()
-						if v4.Parent then
-							v4.Product.ContainerImage.SelectedFrame.Visible = false
+						if containerFrame.Parent then
+							containerFrame.Product.ContainerImage.SelectedFrame.Visible = false
 						end
 					end
 					GiftContainer.ContainerIcon.Icon.Image = ""
 					GiftContainer.ContainerPlayerName.Text = ""
-					GiftContainer.Visible = v12
+					GiftContainer.Visible = isPlayerAllowedToGift
 				end
 			end)
 			count = count + 1
@@ -422,43 +421,43 @@ function t.SetupGiftingUI()
 	GiftContainer.ContainerIcon.Icon.Image = ""
 	GiftContainer.ContainerPlayerName.Text = ""
 	t.Maid.Gifting:GiveTask(LocalPlayer:GetAttributeChangedSignal(GamepassUtils.PLAYER_ALLOWED_TO_ATTEMPT_GAME_PASS_GIFT_ATTR_NAME):Connect(function()
-		GiftContainer.Visible = LocalPlayer:GetAttribute(GamepassUtils.PLAYER_ALLOWED_TO_ATTEMPT_GAME_PASS_GIFT_ATTR_NAME) and v1 ~= nil
+		GiftContainer.Visible = LocalPlayer:GetAttribute(GamepassUtils.PLAYER_ALLOWED_TO_ATTEMPT_GAME_PASS_GIFT_ATTR_NAME) and selectedPassTitle ~= nil
 		return true
 	end))
 	t.Maid.Gifting:GiveTask(GiftContainer.PurchaseButton.MouseButton1Down:Connect(function()
 		task.spawn(Audio.ObjectLocal, LocalPlayer.PlayerGui, 6105461542, {
 			Volume = 0.15
 		})
-		assert(v1 ~= nil)
-		assert(GetGiftProductInfoFromGamepass(v1) ~= nil)
-		local v3 = ReplicatedStorage:FindFirstChild(GamepassUtils.GIFT_REMOTE_NAME)
-		local Text = GiftContainer.ContainerPlayerName.Text
-		if #Text ~= 0 then
-			v3:FireServer(Players:GetUserIdFromNameAsync(Text), GamepassUtils.EnumGamepass[v1])
+		assert(selectedPassTitle ~= nil)
+		assert(GetGiftProductInfoFromGamepass(selectedPassTitle) ~= nil)
+		local giftRemote = ReplicatedStorage:FindFirstChild(GamepassUtils.GIFT_REMOTE_NAME)
+		local targetPlayerName = GiftContainer.ContainerPlayerName.Text
+		if #targetPlayerName ~= 0 then
+			giftRemote:FireServer(Players:GetUserIdFromNameAsync(targetPlayerName), GamepassUtils.EnumGamepass[selectedPassTitle])
 			GiftContainer.ContainerIcon.Icon.Image = ""
 			GiftContainer.ContainerPlayerName.Text = ""
 		end
 	end))
-	local v6 = 0
+	local textChangeCounter = 0
 	t.Maid.Gifting:GiveTask(GiftContainer.ContainerPlayerName:GetPropertyChangedSignal("Text"):Connect(function()
-		v6 = v6 + 1
-		local Text = GiftContainer.ContainerPlayerName.Text
-		local v2 = nil
-		local v3 = pcall(function()
-			v2 = Players:GetUserIdFromNameAsync(Text)
+		textChangeCounter = textChangeCounter + 1
+		local targetPlayerName = GiftContainer.ContainerPlayerName.Text
+		local userId = nil
+		local lookupSuccess = pcall(function()
+			userId = Players:GetUserIdFromNameAsync(targetPlayerName)
 		end)
-		local v4
-		if v3 then
-			local v5, v62 = Players:GetUserThumbnailAsync(v2, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size180x180)
-			v3 = v62
-			v4 = v5
+		local thumbnailUrl
+		if lookupSuccess then
+			local url, thumbnailSize = Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size180x180)
+			lookupSuccess = thumbnailSize
+			thumbnailUrl = url
 		else
-			v4 = nil
+			thumbnailUrl = nil
 		end
-		if v6 ~= v6 then
+		if textChangeCounter ~= textChangeCounter then
 			return false
 		end
-		GiftContainer.ContainerIcon.Icon.Image = if v3 and v4 then v4 else ""
+		GiftContainer.ContainerIcon.Icon.Image = if lookupSuccess and thumbnailUrl then thumbnailUrl else ""
 	end))
 end
 function t.Open()

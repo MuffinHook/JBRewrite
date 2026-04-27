@@ -1,4 +1,3 @@
--- Reviewed by Claude
 game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -7,66 +6,66 @@ local GuiService = game:GetService("GuiService")
 local MakeMaid = require(script.ScrollingFrameMaid).MakeMaid
 local SpringPhysics = require(script.SpringPhysics)
 local Signal = require(script.Signal)
-local t = {
+local Scroller = {
 	ClassName = "Scroller"
 }
-t.__index = t
-t._Position = 0
-t._Min = 0
-t._Max = 100
-t._ViewSize = 50
-function t.new()
-	local table2 = setmetatable({}, t)
-	table2.Spring = SpringPhysics.Spring.New(0)
-	table2.Spring.Speed = 20
-	return table2
+Scroller.__index = Scroller
+Scroller._Position = 0
+Scroller._Min = 0
+Scroller._Max = 100
+Scroller._ViewSize = 50
+function Scroller.new()
+	local scrollerInstance = setmetatable({}, Scroller)
+	scrollerInstance.Spring = SpringPhysics.Spring.New(0)
+	scrollerInstance.Spring.Speed = 20
+	return scrollerInstance
 end
-function t.GetTimesOverBounds(p1, p2)
-	return p1:GetDisplacementPastBounds(p2) / p1.BackBounceInputRange
+function Scroller.GetTimesOverBounds(self, offset)
+	return self:GetDisplacementPastBounds(offset) / self.BackBounceInputRange
 end
-function t.GetDisplacementPastBounds(p1, p2)
-	if p1.ContentMax < p2 then
-		return p2 - p1.ContentMax
-	elseif p2 < p1.ContentMin then
-		return p2
+function Scroller.GetDisplacementPastBounds(self, targetPosition)
+	if self.ContentMax < targetPosition then
+		return targetPosition - self.ContentMax
+	elseif targetPosition < self.ContentMin then
+		return targetPosition
 	else
 		return 0
 	end
 end
-function t.GetScale(p1, p2)
-	return 1 - 0.5 ^ math.abs(p2)
+function Scroller.GetScale(self, bounceAmount)
+	return 1 - 0.5 ^ math.abs(bounceAmount)
 end
-function t.__index(p1, p2)
-	if p2 == "TotalContentLength" then
-		return p1._Max - p1._Min
-	elseif p2 == "ViewSize" then
-		return p1._ViewSize
-	elseif p2 == "Max" then
-		return p1._Max
-	elseif p2 == "ContentMax" then
-		if p1._Max <= p1.ContentMin + p1._ViewSize then
-			return p1.ContentMin
+function Scroller.__index(self, key)
+	if key == "TotalContentLength" then
+		return self._Max - self._Min
+	elseif key == "ViewSize" then
+		return self._ViewSize
+	elseif key == "Max" then
+		return self._Max
+	elseif key == "ContentMax" then
+		if self._Max <= self.ContentMin + self._ViewSize then
+			return self.ContentMin
 		else
-			return p1._Max - p1._ViewSize
+			return self._Max - self._ViewSize
 		end
-	elseif p2 == "Min" or p2 == "ContentMin" then
-		return p1._Min
-	elseif p2 == "Position" then
-		return p1.Spring.Position
-	elseif p2 == "BackBounceInputRange" or p2 == "BackBounceRenderRange" then
-		return p1._ViewSize
-	elseif p2 == "ContentScrollPercentSize" then
-		if p1.TotalContentLength == 0 then
+	elseif key == "Min" or key == "ContentMin" then
+		return self._Min
+	elseif key == "Position" then
+		return self.Spring.Position
+	elseif key == "BackBounceInputRange" or key == "BackBounceRenderRange" then
+		return self._ViewSize
+	elseif key == "ContentScrollPercentSize" then
+		if self.TotalContentLength == 0 then
 			return 0
 		else
-			return p1._ViewSize / p1.TotalContentLength
+			return self._ViewSize / self.TotalContentLength
 		end
-	elseif p2 == "RenderedContentScrollPercentSize" then
-		return p1.ContentScrollPercentSize * (1 - p1:GetScale(p1:GetTimesOverBounds(p1.Position)))
-	elseif p2 == "ContentScrollPercent" then
-		return (p1.Position - p1._Min) / (p1.TotalContentLength - p1._ViewSize)
-	elseif p2 == "RenderedContentScrollPercent" then
-		local ContentScrollPercent = p1.ContentScrollPercent
+	elseif key == "RenderedContentScrollPercentSize" then
+		return self.ContentScrollPercentSize * (1 - self:GetScale(self:GetTimesOverBounds(self.Position)))
+	elseif key == "ContentScrollPercent" then
+		return (self.Position - self._Min) / (self.TotalContentLength - self._ViewSize)
+	elseif key == "RenderedContentScrollPercent" then
+		local ContentScrollPercent = self.ContentScrollPercent
 		if ContentScrollPercent < 0 then
 			return 0
 		elseif ContentScrollPercent > 1 then
@@ -74,359 +73,359 @@ function t.__index(p1, p2)
 		else
 			return ContentScrollPercent
 		end
-	elseif p2 == "BoundedRenderPosition" then
-		local Position = p1.Position
-		local tbl = p1:GetTimesOverBounds(Position)
-		local table2 = p1:GetScale(tbl)
-		if tbl > 0 then
-			return -p1.ContentMax - table2 * p1.BackBounceRenderRange
-		elseif tbl < 0 then
-			return p1.ContentMin + table2 * p1.BackBounceRenderRange
+	elseif key == "BoundedRenderPosition" then
+		local Position = self.Position
+		local timesOverBounds = self:GetTimesOverBounds(Position)
+		local scaleAmount = self:GetScale(timesOverBounds)
+		if timesOverBounds > 0 then
+			return -self.ContentMax - scaleAmount * self.BackBounceRenderRange
+		elseif timesOverBounds < 0 then
+			return self.ContentMin + scaleAmount * self.BackBounceRenderRange
 		else
 			return -Position
 		end
 	else
-		if p2 == "Velocity" then
-			return p1.Spring.Velocity
+		if key == "Velocity" then
+			return self.Spring.Velocity
 		end
-		if p2 == "Target" then
-			return p1.Spring.Target
+		if key == "Target" then
+			return self.Spring.Target
 		end
-		if p2 == "AtRest" then
-			return if math.abs(p1.Spring.Target - p1.Spring.Position) < 0.00001 then math.abs(p1.Spring.Velocity) < 0.00001 else false
+		if key == "AtRest" then
+			return if math.abs(self.Spring.Target - self.Spring.Position) < 0.00001 then math.abs(self.Spring.Velocity) < 0.00001 else false
 		end
-		if t[p2] then
-			return t[p2]
+		if Scroller[key] then
+			return Scroller[key]
 		end
-		error(("[Scroller] - \'%s\' is not a valid member"):format((tostring(p2))))
+		error(("[Scroller] - \'%s\' is not a valid member"):format((tostring(key))))
 	end
 end
-function t.__newindex(p1, p2, p3)
-	if t[p2] or p2 == "Spring" then
-		rawset(p1, p2, p3)
-	elseif p2 == "Min" or p2 == "ContentMin" then
-		p1._Min = p3
-	elseif p2 == "Max" then
-		p1._Max = p3
-		p1.Target = p1.Target
-	elseif p2 == "TotalContentLength" then
-		p1.Max = p1._Min + p3
-	elseif p2 == "ViewSize" then
-		p1._ViewSize = p3
-	elseif p2 == "Position" then
-		p1.Spring.Position = p3
-	elseif p2 == "TargetContentScrollPercent" then
-		p1.Target = p1._Min + p3 * (p1.TotalContentLength - p1._ViewSize)
-	elseif p2 == "ContentScrollPercent" then
-		p1.Position = p1._Min + p3 * (p1.TotalContentLength - p1._ViewSize)
-	elseif p2 == "Target" then
-		if p1.ContentMax < p3 then
-			p3 = p1.ContentMax
-		elseif p3 < p1.ContentMin then
-			p3 = p1.ContentMin
+function Scroller.__newindex(self, key, newValue)
+	if Scroller[key] or key == "Spring" then
+		rawset(self, key, newValue)
+	elseif key == "Min" or key == "ContentMin" then
+		self._Min = newValue
+	elseif key == "Max" then
+		self._Max = newValue
+		self.Target = self.Target
+	elseif key == "TotalContentLength" then
+		self.Max = self._Min + newValue
+	elseif key == "ViewSize" then
+		self._ViewSize = newValue
+	elseif key == "Position" then
+		self.Spring.Position = newValue
+	elseif key == "TargetContentScrollPercent" then
+		self.Target = self._Min + newValue * (self.TotalContentLength - self._ViewSize)
+	elseif key == "ContentScrollPercent" then
+		self.Position = self._Min + newValue * (self.TotalContentLength - self._ViewSize)
+	elseif key == "Target" then
+		if self.ContentMax < newValue then
+			newValue = self.ContentMax
+		elseif newValue < self.ContentMin then
+			newValue = self.ContentMin
 		end
-		p1.Spring.Target = p3
-	elseif p2 == "Velocity" then
-		p1.Spring.Velocity = p3
+		self.Spring.Target = newValue
+	elseif key == "Velocity" then
+		self.Spring.Velocity = newValue
 	else
-		error(("[Scroller] - \'%s\' is not a valid member"):format((tostring(p2))))
+		error(("[Scroller] - \'%s\' is not a valid member"):format((tostring(key))))
 	end
 end
-local t2 = {
+local ScrollingFrameBase = {
 	ClassName = "Base"
 }
-t2.__index = t2
-function t2.new(p1)
-	local table2 = setmetatable({}, t2)
-	table2.Maid = MakeMaid()
-	table2.Gui = p1 or error("No Gui")
-	table2.Container = table2.Gui.Parent or error("No container")
-	return table2
+ScrollingFrameBase.__index = ScrollingFrameBase
+function ScrollingFrameBase.new(guiElement)
+	local baseInstance = setmetatable({}, ScrollingFrameBase)
+	baseInstance.Maid = MakeMaid()
+	baseInstance.Gui = guiElement or error("No Gui")
+	baseInstance.Container = baseInstance.Gui.Parent or error("No container")
+	return baseInstance
 end
-function t2.Destroy(p1)
-	p1.Maid:DoCleaning()
-	p1.Maid = nil
-	setmetatable(p1, nil)
+function ScrollingFrameBase.Destroy(self)
+	self.Maid:DoCleaning()
+	self.Maid = nil
+	setmetatable(self, nil)
 end
-local tbl = setmetatable({}, t2)
-tbl.ClassName = "Scrollbar"
-tbl.__index = tbl
-function tbl.new(p1, p2)
-	local instance3 = setmetatable(t2.new(p1), tbl)
-	instance3.ScrollingFrame = p2 or error("No ScrollingFrame")
-	instance3.ParentScroller = instance3.ScrollingFrame:GetScroller()
-	instance3:UpdateRender()
-	instance3.DraggingBegan = Signal.new()
-	instance3.Maid.InputBeganGui = instance3.Gui.InputBegan:connect(function(p1)
-		if p1.UserInputType == Enum.UserInputType.MouseButton1 then
-			instance3:InputBegan(p1)
+local scrollbarClass = setmetatable({}, ScrollingFrameBase)
+scrollbarClass.ClassName = "Scrollbar"
+scrollbarClass.__index = scrollbarClass
+function scrollbarClass.new(guiElement, scrollingFrame)
+	local scrollbarInstance = setmetatable(ScrollingFrameBase.new(guiElement), scrollbarClass)
+	scrollbarInstance.ScrollingFrame = scrollingFrame or error("No ScrollingFrame")
+	scrollbarInstance.ParentScroller = scrollbarInstance.ScrollingFrame:GetScroller()
+	scrollbarInstance:UpdateRender()
+	scrollbarInstance.DraggingBegan = Signal.new()
+	scrollbarInstance.Maid.InputBeganGui = scrollbarInstance.Gui.InputBegan:connect(function(inputObject)
+		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+			scrollbarInstance:InputBegan(inputObject)
 		end
 	end)
-	instance3.Maid.InputBeganContainer = instance3.Container.InputBegan:connect(function(p1)
-		if p1.UserInputType == Enum.UserInputType.MouseButton1 then
-			instance3.LastContainerInputObject = p1
+	scrollbarInstance.Maid.InputBeganContainer = scrollbarInstance.Container.InputBegan:connect(function(inputObject)
+		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+			scrollbarInstance.LastContainerInputObject = inputObject
 		end
 	end)
-	instance3.Maid.InputEndedContainer = instance3.Container.InputEnded:connect(function(p1)
-		if p1 == instance3.LastContainerInputObject then
-			instance3.ParentScroller.TargetContentScrollPercent = (p1.Position.Y - instance3.Container.AbsolutePosition.Y - instance3.Container.AbsoluteSize.Y * instance3.ParentScroller.ContentScrollPercentSize / 2) / (instance3.Container.AbsoluteSize.Y * (1 - instance3.ParentScroller.ContentScrollPercentSize))
-			instance3.ParentScroller.Velocity = 0
-			instance3.ScrollingFrame:FreeScroll()
+	scrollbarInstance.Maid.InputEndedContainer = scrollbarInstance.Container.InputEnded:connect(function(inputObject)
+		if inputObject == scrollbarInstance.LastContainerInputObject then
+			scrollbarInstance.ParentScroller.TargetContentScrollPercent = (inputObject.Position.Y - scrollbarInstance.Container.AbsolutePosition.Y - scrollbarInstance.Container.AbsoluteSize.Y * scrollbarInstance.ParentScroller.ContentScrollPercentSize / 2) / (scrollbarInstance.Container.AbsoluteSize.Y * (1 - scrollbarInstance.ParentScroller.ContentScrollPercentSize))
+			scrollbarInstance.ParentScroller.Velocity = 0
+			scrollbarInstance.ScrollingFrame:FreeScroll()
 		end
 	end)
-	return instance3
+	return scrollbarInstance
 end
-function tbl.StopDrag(p1)
-	p1.ScrollingFrame:StopDrag()
+function scrollbarClass.StopDrag(self)
+	self.ScrollingFrame:StopDrag()
 end
-function tbl.InputBegan(p1, p2)
-	local tbl = MakeMaid()
-	local Position = p2.Position
-	local ContentScrollPercent = p1.ParentScroller.ContentScrollPercent
-	local table2 = p1.ScrollingFrame:GetVelocityTracker(0.25)
-	tbl.InputChanged = UserInputService.InputChanged:connect(function(p12)
-		if p12.UserInputType == Enum.UserInputType.MouseMovement then
-			p1.ParentScroller.ContentScrollPercent = ContentScrollPercent + (p12.Position - Position).y / (p1.Container.AbsoluteSize.Y * (1 - p1.ParentScroller.ContentScrollPercentSize))
-			p1.ParentScroller.TargetContentScrollPercent = p1.ParentScroller.ContentScrollPercent
-			p1.ScrollingFrame:UpdateRender()
-			table2()
+function scrollbarClass.InputBegan(self, inputObject)
+	local inputMaid = MakeMaid()
+	local Position = inputObject.Position
+	local ContentScrollPercent = self.ParentScroller.ContentScrollPercent
+	local velocityTracker = self.ScrollingFrame:GetVelocityTracker(0.25)
+	inputMaid.InputChanged = UserInputService.InputChanged:connect(function(changedInput)
+		if changedInput.UserInputType == Enum.UserInputType.MouseMovement then
+			self.ParentScroller.ContentScrollPercent = ContentScrollPercent + (changedInput.Position - Position).y / (self.Container.AbsoluteSize.Y * (1 - self.ParentScroller.ContentScrollPercentSize))
+			self.ParentScroller.TargetContentScrollPercent = self.ParentScroller.ContentScrollPercent
+			self.ScrollingFrame:UpdateRender()
+			velocityTracker()
 		end
 	end)
-	tbl.InputEnded = UserInputService.InputEnded:connect(function(p12)
-		if p12 == p2 then
-			p1:StopDrag()
+	inputMaid.InputEnded = UserInputService.InputEnded:connect(function(changedInput)
+		if changedInput == inputObject then
+			self:StopDrag()
 		end
 	end)
-	p1.Maid.UpdateMaid = tbl
-	p1.ScrollingFrame.Maid.UpdateMaid = tbl
+	self.Maid.UpdateMaid = inputMaid
+	self.ScrollingFrame.Maid.UpdateMaid = inputMaid
 end
-function tbl.UpdateRender(p1)
-	if p1.ParentScroller.TotalContentLength > p1.ParentScroller.ViewSize then
-		local RenderedContentScrollPercentSize = p1.ParentScroller.RenderedContentScrollPercentSize
-		p1.Gui.Size = UDim2.new(UDim.new(RenderedContentScrollPercentSize, 0), p1.Gui.Size.Y)
-		p1.Gui.Position = UDim2.new(UDim.new((1 - RenderedContentScrollPercentSize) * p1.ParentScroller.RenderedContentScrollPercent, 0), p1.Gui.Position.Y)
-		p1.Gui.Visible = true
+function scrollbarClass.UpdateRender(self)
+	if self.ParentScroller.TotalContentLength > self.ParentScroller.ViewSize then
+		local RenderedContentScrollPercentSize = self.ParentScroller.RenderedContentScrollPercentSize
+		self.Gui.Size = UDim2.new(UDim.new(RenderedContentScrollPercentSize, 0), self.Gui.Size.Y)
+		self.Gui.Position = UDim2.new(UDim.new((1 - RenderedContentScrollPercentSize) * self.ParentScroller.RenderedContentScrollPercent, 0), self.Gui.Position.Y)
+		self.Gui.Visible = true
 	else
-		p1.Gui.Visible = false
+		self.Gui.Visible = false
 	end
 end
-local table2 = setmetatable({}, t2)
-table2.ClassName = "ScrollingFrame"
-table2.__index = table2
-function table2.new(p1, p2)
-	local instance3 = setmetatable(t2.new(p1), table2)
-	instance3.Scrollbars = {}
-	instance3.Scroller = t.new()
-	instance3.Horizontal = p2
-	instance3.Maid:GiveTask(instance3:BindInput(instance3.Container))
-	instance3.Maid.ContainerChanged = instance3.Container.Changed:connect(function(p1)
-		if p1 == "AbsoluteSize" then
-			instance3:UpdateScroller()
-			instance3:FreeScroll()
+local ScrollingFrameClass = setmetatable({}, ScrollingFrameBase)
+ScrollingFrameClass.ClassName = "ScrollingFrame"
+ScrollingFrameClass.__index = ScrollingFrameClass
+function ScrollingFrameClass.new(guiElement, isHorizontal)
+	local scrollingFrameInstance = setmetatable(ScrollingFrameBase.new(guiElement), ScrollingFrameClass)
+	scrollingFrameInstance.Scrollbars = {}
+	scrollingFrameInstance.Scroller = Scroller.new()
+	scrollingFrameInstance.Horizontal = isHorizontal
+	scrollingFrameInstance.Maid:GiveTask(scrollingFrameInstance:BindInput(scrollingFrameInstance.Container))
+	scrollingFrameInstance.Maid.ContainerChanged = scrollingFrameInstance.Container.Changed:connect(function(propertyName)
+		if propertyName == "AbsoluteSize" then
+			scrollingFrameInstance:UpdateScroller()
+			scrollingFrameInstance:FreeScroll()
 		end
 	end)
-	instance3.Maid.GuiChanged = instance3.Gui.Changed:connect(function(p1)
-		if p1 == "AbsoluteSize" then
-			instance3:UpdateScroller()
-			instance3:FreeScroll()
+	scrollingFrameInstance.Maid.GuiChanged = scrollingFrameInstance.Gui.Changed:connect(function(propertyName)
+		if propertyName == "AbsoluteSize" then
+			scrollingFrameInstance:UpdateScroller()
+			scrollingFrameInstance:FreeScroll()
 		end
 	end)
-	instance3:UpdateScroller()
-	instance3:UpdateRender()
-	return instance3
+	scrollingFrameInstance:UpdateScroller()
+	scrollingFrameInstance:UpdateRender()
+	return scrollingFrameInstance
 end
-function table2.GetScroller(p1)
-	return p1.Scroller
+function ScrollingFrameClass.GetScroller(self)
+	return self.Scroller
 end
-function table2.AddScrollbar(p1, p2)
-	local instance12 = tbl.new(p2, p1)
-	table.insert(p1.Scrollbars, instance12)
-	p1.Maid[p2] = instance12
+function ScrollingFrameClass.AddScrollbar(self, scrollBarGui)
+	local scrollbarInstance = scrollbarClass.new(scrollBarGui, self)
+	table.insert(self.Scrollbars, scrollbarInstance)
+	self.Maid[scrollBarGui] = scrollbarInstance
 end
-function table2.AddScrollbarFromContainer(p1, p2)
+function ScrollingFrameClass.AddScrollbarFromContainer(self, container)
 	local ScrollBar = Instance.new("ImageButton")
 	ScrollBar.Size = UDim2.new(1, 0, 0, 100)
 	ScrollBar.Name = "ScrollBar"
 	ScrollBar.BackgroundColor3 = Color3.new(204/255, 204/255, 204/255)
 	ScrollBar.BorderSizePixel = 0
 	ScrollBar.Image = ""
-	ScrollBar.Parent = p2
+	ScrollBar.Parent = container
 	ScrollBar.AutoButtonColor = false
-	ScrollBar.ZIndex = p2.ZIndex
-	ScrollBar.Parent = p2
-	return p1:AddScrollbar(ScrollBar)
+	ScrollBar.ZIndex = container.ZIndex
+	ScrollBar.Parent = container
+	return self:AddScrollbar(ScrollBar)
 end
-function table2.UpdateScroller(p1)
-	if p1.Horizontal then
-		p1.Scroller.TotalContentLength = p1.Gui.AbsoluteSize.x
-		p1.Scroller.ViewSize = p1.Container.AbsoluteSize.x
+function ScrollingFrameClass.UpdateScroller(self)
+	if self.Horizontal then
+		self.Scroller.TotalContentLength = self.Gui.AbsoluteSize.x
+		self.Scroller.ViewSize = self.Container.AbsoluteSize.x
 	else
-		p1.Scroller.TotalContentLength = p1.Gui.AbsoluteSize.y
-		p1.Scroller.ViewSize = p1.Container.AbsoluteSize.y
+		self.Scroller.TotalContentLength = self.Gui.AbsoluteSize.y
+		self.Scroller.ViewSize = self.Container.AbsoluteSize.y
 	end
 end
-function table2.UpdateRender(p1)
-	if p1.Horizontal then
-		p1.Gui.Position = UDim2.new(UDim.new(0, p1.Scroller.BoundedRenderPosition), p1.Gui.Position.Y)
+function ScrollingFrameClass.UpdateRender(self)
+	if self.Horizontal then
+		self.Gui.Position = UDim2.new(UDim.new(0, self.Scroller.BoundedRenderPosition), self.Gui.Position.Y)
 	else
-		p1.Gui.Position = UDim2.new(p1.Gui.Position.X, UDim.new(0, p1.Scroller.BoundedRenderPosition))
+		self.Gui.Position = UDim2.new(self.Gui.Position.X, UDim.new(0, self.Scroller.BoundedRenderPosition))
 	end
-	for k, v in pairs(p1.Scrollbars) do
-		v:UpdateRender()
+	for k, scrollbar in pairs(self.Scrollbars) do
+		scrollbar:UpdateRender()
 	end
 end
-function table2.StopUpdate(p1)
-	p1.Maid.UpdateMaid = nil
+function ScrollingFrameClass.StopUpdate(self)
+	self.Maid.UpdateMaid = nil
 end
-function table2.StopDrag(p1)
-	local Position = p1.Scroller.Position
-	if p1.Scroller:GetDisplacementPastBounds(p1.Scroller.Position) == 0 then
-		if p1.Scroller.Velocity > 0 then
-			p1.Scroller.Target = math.max(p1.Scroller.Target, p1.Scroller.Position + p1.Scroller.Velocity * 0.5)
+function ScrollingFrameClass.StopDrag(self)
+	local Position = self.Scroller.Position
+	if self.Scroller:GetDisplacementPastBounds(self.Scroller.Position) == 0 then
+		if self.Scroller.Velocity > 0 then
+			self.Scroller.Target = math.max(self.Scroller.Target, self.Scroller.Position + self.Scroller.Velocity * 0.5)
 		else
-			p1.Scroller.Target = math.min(p1.Scroller.Target, p1.Scroller.Position + p1.Scroller.Velocity * 0.5)
+			self.Scroller.Target = math.min(self.Scroller.Target, self.Scroller.Position + self.Scroller.Velocity * 0.5)
 		end
 	end
-	p1:FreeScroll()
+	self:FreeScroll()
 end
-function table2.FreeScroll(p1)
-	local tbl = MakeMaid()
-	p1:UpdateRender()
-	tbl.RenderStepped = RunService.RenderStepped:connect(function()
-		p1:UpdateRender()
-		if p1.Scroller.AtRest then
-			p1:StopUpdate()
+function ScrollingFrameClass.FreeScroll(self)
+	local renderMaid = MakeMaid()
+	self:UpdateRender()
+	renderMaid.RenderStepped = RunService.RenderStepped:connect(function()
+		self:UpdateRender()
+		if self.Scroller.AtRest then
+			self:StopUpdate()
 		end
 	end)
-	p1.Maid.UpdateMaid = tbl
+	self.Maid.UpdateMaid = renderMaid
 end
-function table2.GetVelocityTracker(p1, p2)
-	local tbl = p2 or 1
-	p1.Scroller.Velocity = 0
-	local table2 = tick()
-	local Position = p1.Scroller.Position
+function ScrollingFrameClass.GetVelocityTracker(self, damping)
+	local dampingAmount = damping or 1
+	self.Scroller.Velocity = 0
+	local lastTickTime = tick()
+	local lastPosition = self.Scroller.Position
 	return function()
-		local Position_2 = p1.Scroller.Position
-		local instance12 = tick() - table2
-		table2 = tick()
-		local var22 = Position - Position_2
-		Position = Position_2
-		p1.Scroller.Velocity = p1.Scroller.Velocity - var22 / (0.0001 + instance12) * tbl
+		local currentPosition = self.Scroller.Position
+		local deltaTime = tick() - lastTickTime
+		lastTickTime = tick()
+		local positionDelta = lastPosition - currentPosition
+		lastPosition = currentPosition
+		self.Scroller.Velocity = self.Scroller.Velocity - positionDelta / (0.0001 + deltaTime) * dampingAmount
 	end
 end
-function table2.GetProcessInput(p1, p2)
-	local Position = p1.Scroller.Position
-	local tbl = p1:GetVelocityTracker(0.25)
-	local Position_2 = p2.Position
-	return function(p12)
-		local instance12 = if p1.Horizontal then (p12.Position - Position_2).x else (p12.Position - Position_2).y
-		local table2 = Position - instance12
-		p1.Scroller.Position = table2
-		p1.Scroller.Target = table2
-		p1:UpdateRender()
-		tbl()
-		return instance12
+function ScrollingFrameClass.GetProcessInput(self, inputObject)
+	local Position = self.Scroller.Position
+	local velocityTracker = self:GetVelocityTracker(0.25)
+	local startingInputPosition = inputObject.Position
+	return function(currentInput)
+		local displacement = if self.Horizontal then (currentInput.Position - startingInputPosition).x else (currentInput.Position - startingInputPosition).y
+		local newPosition = Position - displacement
+		self.Scroller.Position = newPosition
+		self.Scroller.Target = newPosition
+		self:UpdateRender()
+		velocityTracker()
+		return displacement
 	end
 end
-function table2.ScrollTo(p1, p2, p3)
-	p1.Scroller.Target = p2
-	if p3 then
-		p1.Scroller.Position = p1.Scroller.Target
-		p1.Scroller.Velocity = 0
+function ScrollingFrameClass.ScrollTo(self, targetPosition, skipAnimation)
+	self.Scroller.Target = targetPosition
+	if skipAnimation then
+		self.Scroller.Position = self.Scroller.Target
+		self.Scroller.Velocity = 0
 	end
 end
-function table2.ScrollToTop(p1, p2)
-	p1:ScrollTo(p1.Scroller.Min, p2)
+function ScrollingFrameClass.ScrollToTop(self, skipAnimation)
+	self:ScrollTo(self.Scroller.Min, skipAnimation)
 end
-function table2.ScrollToBottom(p1, p2)
-	p1:ScrollTo(p1.Scroller.Max, p2)
+function ScrollingFrameClass.ScrollToBottom(self, skipAnimation)
+	self:ScrollTo(self.Scroller.Max, skipAnimation)
 end
-function table2.BindInput(p1, p2, p3)
-	local tbl = MakeMaid()
-	local table2 = 0
-	tbl.GuiInputBegan = p2.InputBegan:connect(function(p12)
-		if p12.UserInputType == Enum.UserInputType.MouseMovement then
+function ScrollingFrameClass.BindInput(self, container, callbackData)
+	local inputMaid = MakeMaid()
+	local lastInputTime = 0
+	inputMaid.GuiInputBegan = container.InputBegan:connect(function(inputObject)
+		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
 			local SelectedObject = GuiService.SelectedObject
 			if SelectedObject then
-				local tbl = tick()
-				if tbl - table2 > 0.1 then
-					table2 = tbl
-					if p1.Horizontal then
-						p1.Scroller.Target = SelectedObject.AbsolutePosition.X - p1.Gui.AbsolutePosition.X - 100
+				local currentTime = tick()
+				if currentTime - lastInputTime > 0.1 then
+					lastInputTime = currentTime
+					if self.Horizontal then
+						self.Scroller.Target = SelectedObject.AbsolutePosition.X - self.Gui.AbsolutePosition.X - 100
 					end
-					p1:FreeScroll()
+					self:FreeScroll()
 				end
 			end
 		end
-		p1:InputBegan(p12, p3)
+		self:InputBegan(inputObject, callbackData)
 	end)
-	tbl.GuiInputChanged = p2.InputChanged:connect(function(p12)
-		if p2.Active and p12.UserInputType == Enum.UserInputType.MouseWheel then
-			p1.Scroller.Target = p1.Scroller.Target + -p12.Position.z * 80
-			p1:FreeScroll()
+	inputMaid.GuiInputChanged = container.InputChanged:connect(function(inputObject)
+		if container.Active and inputObject.UserInputType == Enum.UserInputType.MouseWheel then
+			self.Scroller.Target = self.Scroller.Target + -inputObject.Position.z * 80
+			self:FreeScroll()
 		end
 	end)
-	tbl.AllInputBegan = UserInputService.InputBegan:Connect(function(p12)
-		if p12.UserInputType == Enum.UserInputType.Gamepad1 then
+	inputMaid.AllInputBegan = UserInputService.InputBegan:Connect(function(inputObject)
+		if inputObject.UserInputType == Enum.UserInputType.Gamepad1 then
 			local SelectedObject = GuiService.SelectedObject
-			if SelectedObject and SelectedObject:IsDescendantOf(p2) then
-				p1:InputBegan(p12, p3)
+			if SelectedObject and SelectedObject:IsDescendantOf(container) then
+				self:InputBegan(inputObject, callbackData)
 			end
 		end
 	end)
-	local instance3 = tick()
-	tbl.AllInputChanged = UserInputService.InputChanged:Connect(function(p12)
-		if p12.UserInputType == Enum.UserInputType.Gamepad1 then
-			if tick() - instance3 < 0.01 then
+	local lastGamepadInputTime = tick()
+	inputMaid.AllInputChanged = UserInputService.InputChanged:Connect(function(inputObject)
+		if inputObject.UserInputType == Enum.UserInputType.Gamepad1 then
+			if tick() - lastGamepadInputTime < 0.01 then
 				return false
 			end
-			instance3 = tick()
+			lastGamepadInputTime = tick()
 			local SelectedObject = GuiService.SelectedObject
-			if SelectedObject and SelectedObject:IsDescendantOf(p2) then
-				if p1.Horizontal then
-					p1.Scroller.Target = SelectedObject.AbsolutePosition.X - p1.Gui.AbsolutePosition.X - 200
+			if SelectedObject and SelectedObject:IsDescendantOf(container) then
+				if self.Horizontal then
+					self.Scroller.Target = SelectedObject.AbsolutePosition.X - self.Gui.AbsolutePosition.X - 200
 				end
-				p1:FreeScroll()
+				self:FreeScroll()
 			end
 		end
 	end)
-	return tbl
+	return inputMaid
 end
-function table2.InputBegan(p1, p2, p3)
-	if p2.UserInputType == Enum.UserInputType.MouseButton1 or (p2.UserInputType == Enum.UserInputType.Touch or p2.UserInputType == Enum.UserInputType.Gamepad1 and p2.KeyCode == Enum.KeyCode.ButtonA) then
-		local tbl = MakeMaid()
-		local table2 = tick()
-		local instance3 = 0
-		local var4 = p1:GetProcessInput(p2)
-		if p2.UserInputType == Enum.UserInputType.MouseButton1 then
-			tbl.InputChanged = UserInputService.InputChanged:connect(function(p1, p2)
-				if p1.UserInputType == Enum.UserInputType.MouseMovement then
-					instance3 = instance3 + math.abs((var4(p1)))
+function ScrollingFrameClass.InputBegan(self, inputObject, callbackData)
+	if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or (inputObject.UserInputType == Enum.UserInputType.Touch or inputObject.UserInputType == Enum.UserInputType.Gamepad1 and inputObject.KeyCode == Enum.KeyCode.ButtonA) then
+		local dragMaid = MakeMaid()
+		local dragStartTime = tick()
+		local dragDistance = 0
+		local processInputFn = self:GetProcessInput(inputObject)
+		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragMaid.InputChanged = UserInputService.InputChanged:connect(function(changedInput, changedInputType)
+				if changedInput.UserInputType == Enum.UserInputType.MouseMovement then
+					dragDistance = dragDistance + math.abs((processInputFn(changedInput)))
 				end
 			end)
-		elseif p2.UserInputType == Enum.UserInputType.Touch then
-			local function Update(p1, p2)
-				if p1.UserInputType == Enum.UserInputType.Touch then
-					instance3 = instance3 + math.abs((var4(p1)))
+		elseif inputObject.UserInputType == Enum.UserInputType.Touch then
+			local function Update(changedInput, changedInputType)
+				if changedInput.UserInputType == Enum.UserInputType.Touch then
+					dragDistance = dragDistance + math.abs((processInputFn(changedInput)))
 				end
 			end
-			tbl.InputChanged = UserInputService.InputChanged:connect(Update)
+			dragMaid.InputChanged = UserInputService.InputChanged:connect(Update)
 		end
-		function tbl.Cleanup()
-			p1:UpdateRender()
-			if p3 and p3.OnClick and if tick() - table2 <= 0.1 then true else instance3 < 1 then
-				p3.OnClick(p2)
+		function dragMaid.Cleanup()
+			self:UpdateRender()
+			if callbackData and callbackData.OnClick and if tick() - dragStartTime <= 0.1 then true else dragDistance < 1 then
+				callbackData.OnClick(inputObject)
 			end
 		end
-		tbl.InputEnded = UserInputService.InputEnded:connect(function(p12, p22)
-			if p12 == p2 then
-				p1:StopDrag()
+		dragMaid.InputEnded = UserInputService.InputEnded:connect(function(endedInput, endedInputType)
+			if endedInput == inputObject then
+				self:StopDrag()
 			end
 		end)
-		tbl.WindowFocusReleased = UserInputService.WindowFocusReleased:connect(function()
-			p1:StopDrag()
+		dragMaid.WindowFocusReleased = UserInputService.WindowFocusReleased:connect(function()
+			self:StopDrag()
 		end)
-		p1.Maid.UpdateMaid = tbl
+		self.Maid.UpdateMaid = dragMaid
 	end
 end
-return table2
+return ScrollingFrameClass

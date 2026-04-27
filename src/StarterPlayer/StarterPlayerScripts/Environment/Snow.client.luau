@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -11,54 +9,54 @@ local Raycast = require(ReplicatedStorage.Std.Raycast)
 local LocalPlayer = Players.LocalPlayer
 if EnvironmentConsts.SNOW then
 	local DefaultSnow = ReplicatedStorage.Resource.DefaultSnow
-	local v1 = Maid.new()
-	for v2, vector in DefaultSnow:GetChildren() do
-		if vector:IsA("BasePart") then
-			vector.CanCollide = false
-			vector.CanTouch = false
-			vector.CanQuery = false
+	local snowMaid = Maid.new()
+	for index, snowPart in DefaultSnow:GetChildren() do
+		if snowPart:IsA("BasePart") then
+			snowPart.CanCollide = false
+			snowPart.CanTouch = false
+			snowPart.CanQuery = false
 		end
 	end
 	local function StartSnow()
 		DefaultSnow.Parent = workspace
-		v1:GiveTask(function()
+		snowMaid:GiveTask(function()
 			DefaultSnow.Parent = ReplicatedStorage.Resource
 		end)
-		local vector = Vector3.new(0, 0, 0)
-		local v2 = 0
-		v1:GiveTask(RunService.Heartbeat:Connect(function(p1)
+		local targetPosition = Vector3.new(0, 0, 0)
+		local timeSinceLastUpdate = 0
+		snowMaid:GiveTask(RunService.Heartbeat:Connect(function(deltaTime)
 			debug.profilebegin("snow Update")
-			v2 = v2 + p1
-			if v2 > 0.2 then
-				v2 = 0
+			timeSinceLastUpdate = timeSinceLastUpdate + deltaTime
+			if timeSinceLastUpdate > 0.2 then
+				timeSinceLastUpdate = 0
 			end
-			local v1 = LocalPlayer.Character and LocalPlayer.Character.PrimaryPart
-			if v1 then
-				vector = v1.Position + v1.Velocity * Vector3.new(1, 0, 1)
+			local playerCharacterPart = LocalPlayer.Character and LocalPlayer.Character.PrimaryPart
+			if playerCharacterPart then
+				targetPosition = playerCharacterPart.Position + playerCharacterPart.Velocity * Vector3.new(1, 0, 1)
 			end
-			if v2 == 0 then
-				local v22 = RaycastParams.new()
-				v22.FilterDescendantsInstances = {
+			if timeSinceLastUpdate == 0 then
+				local raycastParams = RaycastParams.new()
+				raycastParams.FilterDescendantsInstances = {
 					workspace.Vehicles,
 					LocalPlayer.Character,
 					DefaultSnow,
 					workspace:FindFirstChild("Clouds")
 				}
-				local vector = Raycast.collidable(vector, Vector3.new(0, 1, 0), 100, v22) ~= nil
-				if DefaultSnow.RainFall.Rain.Enabled == true and vector then
+				local isPositionOccluded = Raycast.collidable(targetPosition, Vector3.new(0, 1, 0), 100, raycastParams) ~= nil
+				if DefaultSnow.RainFall.Rain.Enabled == true and isPositionOccluded then
 					DefaultSnow.RainFall.Rain:Clear()
 				end
-				DefaultSnow.RainFall.Rain.Enabled = not vector
+				DefaultSnow.RainFall.Rain.Enabled = not isPositionOccluded
 			end
 			if DefaultSnow.RainFall.Rain.Enabled then
-				DefaultSnow.RainFall.Position = vector + Vector3.new(0, 37, 0)
+				DefaultSnow.RainFall.Position = targetPosition + Vector3.new(0, 37, 0)
 			end
 			debug.profileend()
 		end))
 	end
 	local function UpdateSnowCheck()
 		if EnvironmentUtils.getPrecipitation() == EnvironmentConsts.PRECIPITATION_ENUM.Rain then
-			v1:Destroy()
+			snowMaid:Destroy()
 			return false
 		else
 			StartSnow()
@@ -67,13 +65,13 @@ if EnvironmentConsts.SNOW then
 	end
 	EnvironmentUtils.getPrecipitationChangedSignal():Connect(function()
 		if EnvironmentUtils.getPrecipitation() == EnvironmentConsts.PRECIPITATION_ENUM.Rain then
-			v1:Destroy()
+			snowMaid:Destroy()
 		else
 			StartSnow()
 		end
 	end)
 	if EnvironmentUtils.getPrecipitation() == EnvironmentConsts.PRECIPITATION_ENUM.Rain then
-		v1:Destroy()
+		snowMaid:Destroy()
 	else
 		StartSnow()
 	end

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local Enumer = require(ReplicatedStorage.Std.Enumer)

@@ -1,11 +1,9 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
 return function(self)
-	local local1 = Roact.Component:extend("App")
+	local AppStoryComponent = Roact.Component:extend("App")
 	local PersistentCrewApp = require(script.Parent.PersistentCrewApp)
 	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
 	persistentCrewStore:dispatch({
@@ -117,7 +115,7 @@ return function(self)
 			}
 		}
 	})
-	function local1.init(self)
+	function AppStoryComponent.init(self)
 		function self.attemptLeave()
 			persistentCrewStore:dispatch({
 				type = "setViewingClanInfo",
@@ -215,7 +213,7 @@ return function(self)
 			print("player wants to UNadmin", self)
 		end
 	end
-	function local1.render(self)
+	function AppStoryComponent.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement(PersistentCrewApp, {
@@ -227,13 +225,13 @@ return function(self)
 				attemptAdmin = self.attemptAdmin,
 				attemptUnAdmin = self.attemptUnAdmin,
 				numMembersOnline = 11,
-				attemptReportCrew = function(self, arg2, arg3)
-					print("player wants to report", self, arg2, arg3)
+				attemptReportCrew = function(self, crewIdentifier, reportReason)
+					print("player wants to report", self, crewIdentifier, reportReason)
 				end
 			}) })
 	end
-	local local2 = Roact.mount(Roact.createElement(local1), self)
+	local mountedAppInstance = Roact.mount(Roact.createElement(AppStoryComponent), self)
 	return function()
-		Roact.unmount(local2)
+		Roact.unmount(mountedAppInstance)
 	end
 end

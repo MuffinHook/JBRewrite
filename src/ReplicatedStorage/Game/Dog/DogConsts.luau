@@ -1,13 +1,12 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Game.PlaceConsts)
 local Enumer = require(ReplicatedStorage.Std.Enumer)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local Settings = require(ReplicatedStorage.Resource.Settings)
-local v1 = Enumer({ "FOLLOW", "ATTACK", "REST", "PET" })
-local v2 = Enumer({ "IDLE", "IDLE_PLAY", "WALK", "SPRINT", "BARK", "REST", "PET", "POINT" })
-local t = { "GERMAN", "BULLDOG" }
-local v3 = Enumer(t)
+local STATE = Enumer({ "FOLLOW", "ATTACK", "REST", "PET" })
+local ANIM_STATE = Enumer({ "IDLE", "IDLE_PLAY", "WALK", "SPRINT", "BARK", "REST", "PET", "POINT" })
+local BREED_LIST = { "GERMAN", "BULLDOG" }
+local BREED_ENUM = Enumer(BREED_LIST)
 return TableUtils.requireValidIndexAndFreeze({
 	TAG_NAME = "Dog",
 	BREED_ID_VALUE_NAME = "BreedId",
@@ -28,65 +27,65 @@ return TableUtils.requireValidIndexAndFreeze({
 	GIVE_UP_AFTER_STUCK_FOR = 10,
 	TELEPORT_AFTER_STUCK_FOR = 10,
 	TELEPORT_AFTER_DIST = 200,
-	STATE = v1,
+	STATE = STATE,
 	ATTACK_STATE = Enumer({ "TO", "AWAY" }),
-	ANIM_STATE = v2,
+	ANIM_STATE = ANIM_STATE,
 	ANIM_SPS = {
-		[v3.GERMAN] = {
-			[v2.WALK] = 5.3,
-			[v2.SPRINT] = 20
+		[BREED_ENUM.GERMAN] = {
+			[ANIM_STATE.WALK] = 5.3,
+			[ANIM_STATE.SPRINT] = 20
 		},
-		[v3.BULLDOG] = {
-			[v2.WALK] = 3.5,
-			[v2.SPRINT] = 15
+		[BREED_ENUM.BULLDOG] = {
+			[ANIM_STATE.WALK] = 3.5,
+			[ANIM_STATE.SPRINT] = 15
 		}
 	},
-	LIST_BREED = t,
-	ENUM_BREED = v3,
+	LIST_BREED = BREED_LIST,
+	ENUM_BREED = BREED_ENUM,
 	PRICE = {
-		[v3.GERMAN] = 50000,
-		[v3.BULLDOG] = 80000
+		[BREED_ENUM.GERMAN] = 50000,
+		[BREED_ENUM.BULLDOG] = 80000
 	},
 	TITLE = {
-		[v3.GERMAN] = "German Shepherd",
-		[v3.BULLDOG] = "Bulldog"
+		[BREED_ENUM.GERMAN] = "German Shepherd",
+		[BREED_ENUM.BULLDOG] = "Bulldog"
 	},
 	IMAGE_ID = {
-		[v3.GERMAN] = 6347878911,
-		[v3.BULLDOG] = 6347879072
+		[BREED_ENUM.GERMAN] = 6347878911,
+		[BREED_ENUM.BULLDOG] = 6347879072
 	},
 	BARK_SOUND_ID = {
-		[v3.GERMAN] = 6293873737,
-		[v3.BULLDOG] = 6338502764
+		[BREED_ENUM.GERMAN] = 6293873737,
+		[BREED_ENUM.BULLDOG] = 6338502764
 	},
 	TOP_SPEED = {
-		[v3.GERMAN] = 50,
-		[v3.BULLDOG] = 40
+		[BREED_ENUM.GERMAN] = 50,
+		[BREED_ENUM.BULLDOG] = 40
 	},
 	OPT_TEAM = {
-		[v3.GERMAN] = Settings.EnumTeam.Police,
-		[v3.BULLDOG] = Settings.EnumTeam.Criminal
+		[BREED_ENUM.GERMAN] = Settings.EnumTeam.Police,
+		[BREED_ENUM.BULLDOG] = Settings.EnumTeam.Criminal
 	},
 	ANIM_ID = {
-		[v3.GERMAN] = {
-			[v2.IDLE] = 6252140847,
-			[v2.IDLE_PLAY] = 6279995452,
-			[v2.WALK] = 6252143393,
-			[v2.SPRINT] = 6257288839,
-			[v2.BARK] = 6293871070,
-			[v2.REST] = 6293999630,
-			[v2.POINT] = 6318248236,
-			[v2.PET] = 6318247355
+		[BREED_ENUM.GERMAN] = {
+			[ANIM_STATE.IDLE] = 6252140847,
+			[ANIM_STATE.IDLE_PLAY] = 6279995452,
+			[ANIM_STATE.WALK] = 6252143393,
+			[ANIM_STATE.SPRINT] = 6257288839,
+			[ANIM_STATE.BARK] = 6293871070,
+			[ANIM_STATE.REST] = 6293999630,
+			[ANIM_STATE.POINT] = 6318248236,
+			[ANIM_STATE.PET] = 6318247355
 		},
-		[v3.BULLDOG] = {
-			[v2.IDLE] = 6318234238,
-			[v2.IDLE_PLAY] = 6318235063,
-			[v2.WALK] = 6318231969,
-			[v2.SPRINT] = 6318232952,
-			[v2.BARK] = 6293871070,
-			[v2.REST] = 6318236534,
-			[v2.POINT] = 6318237482,
-			[v2.PET] = 6318238515
+		[BREED_ENUM.BULLDOG] = {
+			[ANIM_STATE.IDLE] = 6318234238,
+			[ANIM_STATE.IDLE_PLAY] = 6318235063,
+			[ANIM_STATE.WALK] = 6318231969,
+			[ANIM_STATE.SPRINT] = 6318232952,
+			[ANIM_STATE.BARK] = 6293871070,
+			[ANIM_STATE.REST] = 6318236534,
+			[ANIM_STATE.POINT] = 6318237482,
+			[ANIM_STATE.PET] = 6318238515
 		}
 	},
 	BODY_VELOCITY_MAX_FORCE = Vector3.new(5000, 0, 5000),

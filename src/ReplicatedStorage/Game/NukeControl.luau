@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
@@ -21,24 +19,24 @@ local UI = require(ReplicatedStorage.Module.UI)
 local Joint = require(ReplicatedStorage.Std.Joint)
 local CircleAction = UI.CircleAction
 local NukeEvent = nil
-local function SetTransparency(p1, p2)
-	for i, v in ipairs(p1:GetChildren()) do
+local function SetTransparency(instance, isVisible)
+	for i, child in ipairs(instance:GetChildren()) do
 		local transparency
-		if v:IsA("BasePart") then
-			transparency = if p2 then 0 else 1
-			v.Transparency = transparency
+		if child:IsA("BasePart") then
+			transparency = if isVisible then 0 else 1
+			child.Transparency = transparency
 		end
-		SetTransparency(v, p2)
+		SetTransparency(child, isVisible)
 	end
 end
 return {
-	Init = function(p1)
-		NukeEvent = p1.Event
-		local em = p1.em
-		function em.qx3dpfz6(p1)
-			assert(p1 ~= nil)
-			assert(p1.Nuke ~= nil)
-			assert(p1.Shockwave ~= nil)
+	Init = function(initConfig)
+		NukeEvent = initConfig.Event
+		local em = initConfig.em
+		function em.qx3dpfz6(nukeConfig)
+			assert(nukeConfig ~= nil)
+			assert(nukeConfig.Nuke ~= nil)
+			assert(nukeConfig.Shockwave ~= nil)
 			local launchAudio = Audio.ObjectLocal(LocalPlayer, 9058580326, {
 				Looped = true,
 				Volume = 0,
@@ -47,8 +45,8 @@ return {
 			Audio.FadeTo(launchAudio, 0.5, 5)
 			local siloInstance = Silo.new(workspace:WaitForChild("Silo", 1))
 			local tubePosition = siloInstance.Model.Tube.Position + Vector3.new(0, siloInstance.Model.Tube.Size.Y * 0.5, 0)
-			local camShaker = CamShaker.new(Enum.RenderPriority.Camera.Value + 1, function(p1)
-				CurrentCamera.CFrame = CurrentCamera.CFrame * p1
+			local camShaker = CamShaker.new(Enum.RenderPriority.Camera.Value + 1, function(cameraOffset)
+				CurrentCamera.CFrame = CurrentCamera.CFrame * cameraOffset
 			end)
 			camShaker:Start()
 			local nukeModel = Nuke.new()
@@ -64,8 +62,8 @@ return {
 				nukeModel.Model:SetPrimaryPartCFrame(CFrame.new(tubePosition) * CFrame.Angles(1.5707963267948966, 0, 0) * CFrame.new(0, 0, 48 * (1 - launchProgress) + 12 * launchProgress))
 			end)
 			siloInstance.OnOpened:Connect(function()
-				p1.Nuke.Origin = nukeModel.Model.PrimaryPart.CFrame.p
-				nukeModel:Launch(p1.Nuke)
+				nukeConfig.Nuke.Origin = nukeModel.Model.PrimaryPart.CFrame.p
+				nukeModel:Launch(nukeConfig.Nuke)
 				Audio.ObjectLocal(LocalPlayer, 2205008075)
 				local impactAudio = Audio.ObjectLocal(LocalPlayer, 4828205974, {
 					Volume = 0,
@@ -89,7 +87,7 @@ return {
 						impactAudio = nil
 					end)
 					local mushroomCloud = ReplicatedStorage.Resource.MushroomCloud:Clone()
-					mushroomCloud.CFrame = CFrame.new(p1.Nuke.Target) + Vector3.new(0, 261.646, 0)
+					mushroomCloud.CFrame = CFrame.new(nukeConfig.Nuke.Target) + Vector3.new(0, 261.646, 0)
 					mushroomCloud.Transparency = 1
 					mushroomCloud.Parent = workspace
 					local function FadeInCloud()
@@ -126,9 +124,9 @@ return {
 						end
 						mushroomCloud.Transparency = 1 * (1 - cloudFadeProgress) + 0 * cloudFadeProgress
 					end)
-					local shockwave = Shockwave.new(p1.Nuke.Target, p1.Shockwave)
+					local shockwave = Shockwave.new(nukeConfig.Nuke.Target, nukeConfig.Shockwave)
 					shockwave.OnPastLocalPlayer:Connect(function()
-						NukeEvent:FireServer("j" .. ("x669lyj"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("no8ta8ph1czx"):sub(5, 9):reverse():reverse():reverse() .. "m")
+						NukeEvent:FireServer("jl1hp8am")
 						local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
 						if vehiclePacket ~= nil then
 							if vehiclePacket.Make == "AdminNuke" and not vehiclePacket.Passenger then
@@ -177,16 +175,16 @@ return {
 				confirmPurchase = nil
 			end)
 		end
-		local function Action(p1, p2)
-			if p2 then
-				NukeEvent:FireServer("z" .. "" .. ("aidmekvo"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("b6wv0"):sub(3, 3):reverse() .. "clj")
+		local function Action(actionState, shouldLaunch)
+			if shouldLaunch then
+				NukeEvent:FireServer("zmdiwclj")
 				return true
 			end
 		end
 		local currentNukeUranium = nil
-		local function AddedFun(p1)
-			currentNukeUranium = p1
-			local Button = p1:WaitForChild("Button")
+		local function AddedFun(uraniumPickup)
+			currentNukeUranium = uraniumPickup
+			local Button = uraniumPickup:WaitForChild("Button")
 			CircleAction.Add({
 				Part = Button,
 				ValidRoot = Button.Parent,
@@ -195,28 +193,28 @@ return {
 				Duration = 3,
 				Dist = 10,
 				Callback = Action
-			}, p1)
+			}, uraniumPickup)
 		end
-		local function RemovedFun(p1)
+		local function RemovedFun(uraniumPickup)
 			currentNukeUranium = nil
-			CircleAction.Remove(p1)
+			CircleAction.Remove(uraniumPickup)
 		end
 		for i, v in ipairs(CollectionService:GetTagged("NukeUranium")) do
 			AddedFun(v)
 		end
 		CollectionService:GetInstanceAddedSignal("NukeUranium"):Connect(AddedFun)
 		CollectionService:GetInstanceRemovedSignal("NukeUranium"):Connect(RemovedFun)
-		function em.lw1ioe8o(p1)
+		function em.lw1ioe8o(isVisible)
 			if currentNukeUranium ~= nil then
 				local Visual = currentNukeUranium:FindFirstChild("Visual")
 				if Visual ~= nil then
-					SetTransparency(Visual, p1)
+					SetTransparency(Visual, isVisible)
 				end
 			end
 		end
-		CollectionService:GetInstanceAddedSignal("C4Nuke"):Connect(function(p1)
-			local c4CamShaker = CamShaker.new(Enum.RenderPriority.Camera.Value + 1, function(p1)
-				CurrentCamera.CFrame = CurrentCamera.CFrame * p1
+		CollectionService:GetInstanceAddedSignal("C4Nuke"):Connect(function(c4NukeModel)
+			local c4CamShaker = CamShaker.new(Enum.RenderPriority.Camera.Value + 1, function(cameraOffset)
+				CurrentCamera.CFrame = CurrentCamera.CFrame * cameraOffset
 			end)
 			c4CamShaker:Start()
 			Audio.ObjectLocal(LocalPlayer, 2205008075)
@@ -229,8 +227,8 @@ return {
 			local c4Nuke = ReplicatedStorage.Resource.Nuke:Clone()
 			local Base = c4Nuke.Base
 			c4Nuke.PrimaryPart = Base
-			local Position = (p1.CFrame * CFrame.new(0, 0, -400)).Position
-			local Position_2 = (p1.CFrame * CFrame.new(0, 0, 0)).Position
+			local Position = (c4NukeModel.CFrame * CFrame.new(0, 0, -400)).Position
+			local Position_2 = (c4NukeModel.CFrame * CFrame.new(0, 0, 0)).Position
 			c4Nuke.Parent = workspace
 			Joint.WeldAllTo(c4Nuke, Base)
 			Base.Anchored = true

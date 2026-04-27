@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -26,49 +24,49 @@ local t = {
 function t.init()
 	levelUISystem = require(ReplicatedStorage.Game.Level2.LevelUISystem)
 	local SeasonUISystem = require(script.Parent.SeasonUISystem)
-	local function playerAdded(p1)
-		p1:WaitForChild(SeasonConsts.HAS_SEASON_PASS_VALUE_NAME).Changed:Connect(function(p12)
-			if p12 and t._onSeasonPassOwned then
-				t._onSeasonPassOwned:Fire(p1)
+	local function playerAdded(player)
+		player:WaitForChild(SeasonConsts.HAS_SEASON_PASS_VALUE_NAME).Changed:Connect(function(newValue)
+			if newValue and t._onSeasonPassOwned then
+				t._onSeasonPassOwned:Fire(player)
 			end
 		end)
 	end
-	for i, v in ipairs(Players:GetPlayers()) do
-		v:WaitForChild(SeasonConsts.HAS_SEASON_PASS_VALUE_NAME).Changed:Connect(function(p1)
-			if p1 and t._onSeasonPassOwned then
-				t._onSeasonPassOwned:Fire(v)
+	for i, player in ipairs(Players:GetPlayers()) do
+		player:WaitForChild(SeasonConsts.HAS_SEASON_PASS_VALUE_NAME).Changed:Connect(function(newValue)
+			if newValue and t._onSeasonPassOwned then
+				t._onSeasonPassOwned:Fire(player)
 			end
 		end)
 	end
 	Players.PlayerAdded:Connect(playerAdded)
-	waitForChild(ReplicatedStorage, SeasonConsts.OPENED_SEASON_REMOTE_NAME, 30):andThen(function(p1)
+	waitForChild(ReplicatedStorage, SeasonConsts.OPENED_SEASON_REMOTE_NAME, 30):andThen(function(openedSeasonRemote)
 		SeasonUISystem._window:GetOnOpenedSignal():Connect(function()
-			p1:FireServer()
+			openedSeasonRemote:FireServer()
 		end)
 	end):catch(warn)
-	waitForChild(ReplicatedStorage, SeasonConsts.REDEEM_REMOTE_NAME, 30):andThen(function(p1)
-		t._redeemRemote = p1
-		p1.OnClientEvent:Connect(function(p1, p2)
-			t._unrewardedLevels = p1
-			t._unrewardedBonus = p2
+	waitForChild(ReplicatedStorage, SeasonConsts.REDEEM_REMOTE_NAME, 30):andThen(function(redeemRemote)
+		t._redeemRemote = redeemRemote
+		redeemRemote.OnClientEvent:Connect(function(unrewardedLevels, unrewardedBonus)
+			t._unrewardedLevels = unrewardedLevels
+			t._unrewardedBonus = unrewardedBonus
 			t.displayReward()
 		end)
 	end):catch(warn)
-	waitForChild(LocalPlayer, SeasonConsts.LEVELS_AWARDED_VALUE_NAME, 30):andThen(function(p1)
+	waitForChild(LocalPlayer, SeasonConsts.LEVELS_AWARDED_VALUE_NAME, 30):andThen(function(levelsAwardedValue)
 		local function handle()
-			t._mapLevelsAwarded = SeasonUtils.deserializeLevelsAwarded(p1.Value)
+			t._mapLevelsAwarded = SeasonUtils.deserializeLevelsAwarded(levelsAwardedValue.Value)
 			t.onLevelsAwardedChanged:Fire()
 		end
-		p1.Changed:Connect(handle)
-		t._mapLevelsAwarded = SeasonUtils.deserializeLevelsAwarded(p1.Value)
+		levelsAwardedValue.Changed:Connect(handle)
+		t._mapLevelsAwarded = SeasonUtils.deserializeLevelsAwarded(levelsAwardedValue.Value)
 		t.onLevelsAwardedChanged:Fire()
 	end):catch(warn)
 	if RunUtils.isMainWorld() and not RunUtils.isStudio() then
-		waitForChild(workspace, "SeasonPrompts", 30):andThen(function(p1)
+		waitForChild(workspace, "SeasonPrompts", 30):andThen(function(seasonPromptsFolder)
 			task.wait(1)
 			local seasonPromptRegion = Region.new(RegionUtils.ConditionPlayer)
-			for i, v in ipairs(p1:GetChildren()) do
-				seasonPromptRegion:AddPart(v)
+			for i, prompt in ipairs(seasonPromptsFolder:GetChildren()) do
+				seasonPromptRegion:AddPart(prompt)
 			end
 			seasonPromptRegion.OnObjAdded:Connect(function()
 				if not SeasonUISystem._window:IsOpen() then
@@ -89,8 +87,8 @@ end
 function t.getLevelsAwarded()
 	return t._mapLevelsAwarded
 end
-function t.getLevelAwarded(p1)
-	return t._mapLevelsAwarded[tostring(p1)]
+function t.getLevelAwarded(levelId)
+	return t._mapLevelsAwarded[tostring(levelId)]
 end
 function t.displayReward()
 	local Redeem = levelUISystem.gui.Background.Body.InfoButton.Redeem
@@ -125,26 +123,26 @@ function t.getSeasonPassOwnedSignal()
 	end
 	return t._onSeasonPassOwned
 end
-function t.doesPlayerOwnSeasonPass(p1)
-	assert(p1 ~= nil)
-	local hasSeasonPassValue = p1:FindFirstChild(SeasonConsts.HAS_SEASON_PASS_VALUE_NAME)
+function t.doesPlayerOwnSeasonPass(player)
+	assert(player ~= nil)
+	local hasSeasonPassValue = player:FindFirstChild(SeasonConsts.HAS_SEASON_PASS_VALUE_NAME)
 	if hasSeasonPassValue then
 		return hasSeasonPassValue.Value
 	else
 		return false
 	end
 end
-function t.getClientLevelAward(p1)
-	assert(p1 ~= nil)
-	assert(type(p1) == "number")
-	local levelAwardData = AwardData.Level[p1]
+function t.getClientLevelAward(awardId)
+	assert(awardId ~= nil)
+	assert(type(awardId) == "number")
+	local levelAwardData = AwardData.Level[awardId]
 	assert(levelAwardData, "missing level award")
 	return levelAwardData
 end
-function t.getClientBonusAward(p1)
-	assert(p1 ~= nil)
-	assert(type(p1) == "number")
-	local bonusAwardData = AwardData.Bonus[p1]
+function t.getClientBonusAward(awardId)
+	assert(awardId ~= nil)
+	assert(type(awardId) == "number")
+	local bonusAwardData = AwardData.Bonus[awardId]
 	assert(bonusAwardData, "missing bonus award")
 	return bonusAwardData
 end

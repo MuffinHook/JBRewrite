@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CATEGORIES_ARRAY = {
 	require(ReplicatedStorage.Sale.SaleConsts).CATEGORY_NAME,

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -15,9 +14,9 @@ local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local NPCConsts = require(ReplicatedStorage.NPC.NPCConsts)
 local NPCUtils = require(ReplicatedStorage.NPC.NPCUtils)
 local DestructibleConsts = require(ReplicatedStorage.Game.Destructible.DestructibleConsts)
-local t = {}
-function t.setup(self)
-	local obj = self.obj
+local NPCShared = {}
+function NPCShared.setup(self)
+	local npcModel = self.obj
 	self.maid:GiveTask(function()
 		if self._path then
 			self._path:Destroy()
@@ -34,112 +33,112 @@ function t.setup(self)
 		return true
 	end
 	self.lookAtConstraint = nil
-	self.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.LOOK_AT_CONSTRAINT_NAME, function(p12, p2)
-		self.lookAtConstraint = p12
-		p2:GiveTask(function()
+	self.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(npcModel, NPCConsts.LOOK_AT_CONSTRAINT_NAME, function(constraintInstance, constraintMaid)
+		self.lookAtConstraint = constraintInstance
+		constraintMaid:GiveTask(function()
 			self.lookAtConstraint = nil
 		end)
 	end))
 	local function updateTarget()
-		local instance = Maid.new()
-		self.maid.targetMaid = instance
-		if self:IsLocallyOwned() and (not self.customUpdateTarget or self:customUpdateTarget(instance) ~= true) then
-			local vector2 = NPCUtils.getTargetType(obj)
-			if vector2 and vector2 == NPCConsts.DEST_TYPE.OBJ then
-				if NPCUtils.getTarget(obj) then
-					instance:GiveTask(RunService.PostSimulation:Connect(function()
-						if obj.PrimaryPart then
-							local instance = NPCUtils.getTarget(obj)
-							local Position = instance.Position
-							local Magnitude = (instance.Velocity * Vector3.new(1, 0, 1)).Magnitude
-							local Position_2 = obj.PrimaryPart.Position
-							local vector2 = if Magnitude > 0.1 then (instance.Velocity * Vector3.new(1, 0, 1)).Unit else Vector3.new(0, 0, 0)
-							local var3 = GeomUtils.getTrajectoryInterceptTime(Position_2, obj.PrimaryPart.Velocity.Magnitude, Position, Magnitude, vector2)
-							local Magnitude_3 = ((Position - Position_2) * Vector3.new(1, 0, 1)).Magnitude
-							if not var3 then
-								var3 = math.clamp(Magnitude_3 / 36, 0, 1) * 3
+		local targetMaidInstance = Maid.new()
+		self.maid.targetMaid = targetMaidInstance
+		if self:IsLocallyOwned() and (not self.customUpdateTarget or self:customUpdateTarget(targetMaidInstance) ~= true) then
+			local destType = NPCUtils.getTargetType(npcModel)
+			if destType and destType == NPCConsts.DEST_TYPE.OBJ then
+				if NPCUtils.getTarget(npcModel) then
+					targetMaidInstance:GiveTask(RunService.PostSimulation:Connect(function()
+						if npcModel.PrimaryPart then
+							local targetInstance = NPCUtils.getTarget(npcModel)
+							local targetPosition = targetInstance.Position
+							local targetVelMagnitude = (targetInstance.Velocity * Vector3.new(1, 0, 1)).Magnitude
+							local npcPosition = npcModel.PrimaryPart.Position
+							local targetDirection = if targetVelMagnitude > 0.1 then (targetInstance.Velocity * Vector3.new(1, 0, 1)).Unit else Vector3.new(0, 0, 0)
+							local interceptTime = GeomUtils.getTrajectoryInterceptTime(npcPosition, npcModel.PrimaryPart.Velocity.Magnitude, targetPosition, targetVelMagnitude, targetDirection)
+							local distanceToTarget = ((targetPosition - npcPosition) * Vector3.new(1, 0, 1)).Magnitude
+							if not interceptTime then
+								interceptTime = math.clamp(distanceToTarget / 36, 0, 1) * 3
 							end
-							local var4 = if NPCUtils.getExtrapolateTargetMovement(obj) then Position + vector2 * Magnitude * var3 else Position
-							local var5, vector6
+							local extrapolatedTargetPos = if NPCUtils.getExtrapolateTargetMovement(npcModel) then targetPosition + targetDirection * targetVelMagnitude * interceptTime else targetPosition
+							local targetInRegion, npcInRegion
 							if self.hasAllowedRegion then
-								local var7 = self.allowedRegion:CastPoint(Position)
-								var5, vector6 = var7, self.allowedRegion:CastPoint(Position_2)
+								local targetCastPoint = self.allowedRegion:CastPoint(targetPosition)
+								targetInRegion, npcInRegion = targetCastPoint, self.allowedRegion:CastPoint(npcPosition)
 							else
-								var5 = true
-								vector6 = true
+								targetInRegion = true
+								npcInRegion = true
 							end
-							local var9 = NPCUtils.getHomePosition(obj)
-							if var5 then
-								t.goTo(self, var4)
-							elseif var9 and not vector6 then
-								t.goTo(self, var9)
+							local homePos = NPCUtils.getHomePosition(npcModel)
+							if targetInRegion then
+								NPCShared.goTo(self, extrapolatedTargetPos)
+							elseif homePos and not npcInRegion then
+								NPCShared.goTo(self, homePos)
 							else
-								t.move(self.humanoid, Vector3.new(0, 0, 0))
+								NPCShared.move(self.humanoid, Vector3.new(0, 0, 0))
 							end
 						end
 					end))
 				end
-			elseif vector2 and vector2 == NPCConsts.DEST_TYPE.POS then
-				local var3 = NPCUtils.getTarget(obj)
-				if var3 then
-					instance:GiveTask(RunService.Heartbeat:Connect(function()
-						t.goTo(self, var3)
+			elseif destType and destType == NPCConsts.DEST_TYPE.POS then
+				local destPos = NPCUtils.getTarget(npcModel)
+				if destPos then
+					targetMaidInstance:GiveTask(RunService.Heartbeat:Connect(function()
+						NPCShared.goTo(self, destPos)
 					end))
 				end
-			elseif vector2 and vector2 == NPCConsts.DEST_TYPE.IDLE then
-				local var4 = nil
-				instance:GiveTask(RunService.Heartbeat:Connect(function()
-					if var4 then
-						t.goTo(self, var4)
+			elseif destType and destType == NPCConsts.DEST_TYPE.IDLE then
+				local idleWanderTarget = nil
+				targetMaidInstance:GiveTask(RunService.Heartbeat:Connect(function()
+					if idleWanderTarget then
+						NPCShared.goTo(self, idleWanderTarget)
 					end
 				end))
-				instance:GiveTask(Interval.every(2):Connect(function()
-					local instance = NPCUtils.getTarget(obj)
-					if instance then
-						local vector2 = GeomUtils.randomPointOnCircle() * 16
+				targetMaidInstance:GiveTask(Interval.every(2):Connect(function()
+					local currentIdleTarget = NPCUtils.getTarget(npcModel)
+					if currentIdleTarget then
+						local randomOffset = GeomUtils.randomPointOnCircle() * 16
 						if math.random() < 0.5 then
-							var4 = instance + Vector3.new(vector2.X, 0, vector2.Y)
+							idleWanderTarget = currentIdleTarget + Vector3.new(randomOffset.X, 0, randomOffset.Y)
 						end
 					end
 				end))
-			elseif vector2 then
-				error("invalid targeType", vector2)
+			elseif destType then
+				error("invalid targeType", destType)
 			end
 		end
 	end
 	updateTarget()
-	self.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.DEST_POS_ATTR_NAME):Connect(updateTarget))
-	self.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.DEST_TYPE_ATTR_NAME):Connect(updateTarget))
-	self.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.DEST_OBJ_VALUE_NAME, function(self, p2)
+	self.maid:GiveTask(npcModel:GetAttributeChangedSignal(NPCConsts.DEST_POS_ATTR_NAME):Connect(updateTarget))
+	self.maid:GiveTask(npcModel:GetAttributeChangedSignal(NPCConsts.DEST_TYPE_ATTR_NAME):Connect(updateTarget))
+	self.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(npcModel, NPCConsts.DEST_OBJ_VALUE_NAME, function(self, destObjMaid)
 		updateTarget()
-		p2:GiveTask(self.Changed:Connect(updateTarget))
+		destObjMaid:GiveTask(self.Changed:Connect(updateTarget))
 	end))
-	self.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME):Connect(updateTarget))
+	self.maid:GiveTask(npcModel:GetAttributeChangedSignal(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME):Connect(updateTarget))
 	local function updateLookAt()
-		local instance = Maid.new()
-		self.maid.lookAtMaid = instance
+		local lookAtMaidInstance = Maid.new()
+		self.maid.lookAtMaid = lookAtMaidInstance
 		if self:IsLocallyOwned() then
-			local vector2 = NPCUtils.getLookAtType(obj)
-			if vector2 and vector2 == NPCConsts.DEST_TYPE.OBJ then
-				local var3 = NPCUtils.getLookAt(obj)
-				if var3 then
-					instance.runtime = RunService.Heartbeat:Connect(function()
-						t.lookAt(self, var3.Position)
+			local lookAtType = NPCUtils.getLookAtType(npcModel)
+			if lookAtType and lookAtType == NPCConsts.DEST_TYPE.OBJ then
+				local lookAtObj = NPCUtils.getLookAt(npcModel)
+				if lookAtObj then
+					lookAtMaidInstance.runtime = RunService.Heartbeat:Connect(function()
+						NPCShared.lookAt(self, lookAtObj.Position)
 					end)
 				else
 					return
 				end
-			elseif vector2 and vector2 == NPCConsts.DEST_TYPE.POS then
-				local var4 = NPCUtils.getLookAt(obj)
-				if var4 then
-					instance.runtime = RunService.Heartbeat:Connect(function()
-						t.lookAt(self, var4)
+			elseif lookAtType and lookAtType == NPCConsts.DEST_TYPE.POS then
+				local lookAtPos = NPCUtils.getLookAt(npcModel)
+				if lookAtPos then
+					lookAtMaidInstance.runtime = RunService.Heartbeat:Connect(function()
+						NPCShared.lookAt(self, lookAtPos)
 					end)
 				else
 					return
 				end
 			end
-			instance:GiveTask(function()
+			lookAtMaidInstance:GiveTask(function()
 				if self.lookAtConstraint then
 					self.lookAtConstraint.Enabled = false
 				end
@@ -147,20 +146,20 @@ function t.setup(self)
 		end
 	end
 	updateLookAt()
-	self.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.LOOK_AT_POS_ATTR_NAME):Connect(updateLookAt))
-	self.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.LOOK_AT_TYPE_ATTR_NAME):Connect(updateLookAt))
-	self.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.LOOK_AT_OBJ_VALUE_NAME, function(self, p2)
+	self.maid:GiveTask(npcModel:GetAttributeChangedSignal(NPCConsts.LOOK_AT_POS_ATTR_NAME):Connect(updateLookAt))
+	self.maid:GiveTask(npcModel:GetAttributeChangedSignal(NPCConsts.LOOK_AT_TYPE_ATTR_NAME):Connect(updateLookAt))
+	self.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(npcModel, NPCConsts.LOOK_AT_OBJ_VALUE_NAME, function(self, lookAtObjMaid)
 		updateLookAt()
-		p2:GiveTask(self.Changed:Connect(updateLookAt))
+		lookAtObjMaid:GiveTask(self.Changed:Connect(updateLookAt))
 	end))
-	self.maid:GiveTask(obj:GetAttributeChangedSignal(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME):Connect(updateLookAt))
+	self.maid:GiveTask(npcModel:GetAttributeChangedSignal(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME):Connect(updateLookAt))
 	self.maid:GiveTask(Interval.every(1):Connect(function()
-		t._createNewPath(self)
-		t._updatePathfind(self)
+		NPCShared._createNewPath(self)
+		NPCShared._updatePathfind(self)
 	end))
 	self.maid:GiveTask(Interval.every(1):Connect(function()
 		if self:IsLocallyOwned() then
-			local t = {
+			local allowedHumanoidStates = {
 				[Enum.HumanoidStateType.Dead] = true,
 				[Enum.HumanoidStateType.Running] = true,
 				[Enum.HumanoidStateType.Jumping] = true,
@@ -168,81 +167,81 @@ function t.setup(self)
 				[Enum.HumanoidStateType.Freefall] = true
 			}
 			local humanoid = self.humanoid
-			for i, v in ipairs(Enum.HumanoidStateType:GetEnumItems()) do
-				if v ~= Enum.HumanoidStateType.None and (humanoid:GetStateEnabled(v) and not t[v]) then
-					humanoid:SetStateEnabled(v, false)
+			for i, humanoidState in ipairs(Enum.HumanoidStateType:GetEnumItems()) do
+				if humanoidState ~= Enum.HumanoidStateType.None and (humanoid:GetStateEnabled(humanoidState) and not allowedHumanoidStates[humanoidState]) then
+					humanoid:SetStateEnabled(humanoidState, false)
 				end
 			end
-			if not t[humanoid:GetState()] then
+			if not allowedHumanoidStates[humanoid:GetState()] then
 				humanoid:ChangeState(Enum.HumanoidStateType.Running)
 			end
 		end
 	end))
-	local instance = RaycastParams.new()
-	instance.FilterType = Enum.RaycastFilterType.Blacklist
-	instance.FilterDescendantsInstances = {}
-	instance.IgnoreWater = true
-	self.occlusionCastParams = instance
+	local raycastParams = RaycastParams.new()
+	raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+	raycastParams.FilterDescendantsInstances = {}
+	raycastParams.IgnoreWater = true
+	self.occlusionCastParams = raycastParams
 	self.maid:GiveTask(Interval.every(1):Connect(function()
-		instance.FilterDescendantsInstances = t._buildOcclusionBlacklist(self)
+		raycastParams.FilterDescendantsInstances = NPCShared._buildOcclusionBlacklist(self)
 	end))
 	self.allowedRegion = Region.new(RegionUtils.NilCondition)
 	self.maid:GiveTask(self.allowedRegion)
 	self.hasAllowedRegion = false
-	self.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.ALLOWED_PRISMS_FOLDER_NAME, function(p12, p2)
-		p2:GiveTask(RxInstanceUtils.observeChildren(p12, function(p13, p2)
-			local t = {
-				c = CFrame.new(),
-				s = Vector3.new()
+	self.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(npcModel, NPCConsts.ALLOWED_PRISMS_FOLDER_NAME, function(prismsFolder, prismsMaid)
+		prismsMaid:GiveTask(RxInstanceUtils.observeChildren(prismsFolder, function(prismChild, prismChildMaid)
+			local prismData = {
+				cframe = CFrame.new(),
+				size = Vector3.new()
 			}
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p13, "c", function(self)
-				t.c = self.Value
+			prismChildMaid:GiveTask(RxInstanceUtils.observeOneChildNamed(prismChild, "c", function(self)
+				prismData.cframe = self.Value
 			end))
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p13, "s", function(self)
-				t.s = self.Value
+			prismChildMaid:GiveTask(RxInstanceUtils.observeOneChildNamed(prismChild, "s", function(self)
+				prismData.size = self.Value
 			end))
-			p2:GiveTask((self.allowedRegion:AddPrism(t)))
-			local function f()
-				self.hasAllowedRegion = #p12:GetChildren() > 0
+			prismChildMaid:GiveTask((self.allowedRegion:AddPrism(prismData)))
+			local function updateAllowedRegionStatus()
+				self.hasAllowedRegion = #prismsFolder:GetChildren() > 0
 			end
-			self.hasAllowedRegion = #p12:GetChildren() > 0
-			p2:GiveTask(f)
+			self.hasAllowedRegion = #prismsFolder:GetChildren() > 0
+			prismChildMaid:GiveTask(updateAllowedRegionStatus)
 		end))
 	end))
-	self.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(obj, NPCConsts.HOME_POSITION_OBJ_NAME, function(p12, p2)
+	self.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(npcModel, NPCConsts.HOME_POSITION_OBJ_NAME, function(homePositionObj, homePosMaid)
 		local function update()
-			self.homePosition = NPCUtils.getHomePosition(obj)
+			self.homePosition = NPCUtils.getHomePosition(npcModel)
 		end
-		self.homePosition = NPCUtils.getHomePosition(obj)
-		p2:GiveTask(p12.Changed:Connect(update))
-		p2:GiveTask(function()
+		self.homePosition = NPCUtils.getHomePosition(npcModel)
+		homePosMaid:GiveTask(homePositionObj.Changed:Connect(update))
+		homePosMaid:GiveTask(function()
 			self.homePosition = nil
 		end)
 	end))
 end
-function t._buildOcclusionBlacklist(self)
-	local t = { self.obj }
-	local t2 = {}
-	for instance, vector2 in CollectionService:GetTagged("Humanoid") do
-		t2[vector2] = true
-		table.insert(t, vector2.Parent)
+function NPCShared._buildOcclusionBlacklist(self)
+	local blacklistTable = { self.obj }
+	local humanoidInstanceMap = {}
+	for instance, humanoid in CollectionService:GetTagged("Humanoid") do
+		humanoidInstanceMap[humanoid] = true
+		table.insert(blacklistTable, humanoid.Parent)
 	end
-	for i, v in ipairs(Players:GetPlayers()) do
-		if v.Character then
-			local Humanoid = v.Character:FindFirstChild("Humanoid")
-			if Humanoid and not t2[Humanoid.Parent] then
-				table.insert(t, Humanoid.Parent)
+	for i, player in ipairs(Players:GetPlayers()) do
+		if player.Character then
+			local Humanoid = player.Character:FindFirstChild("Humanoid")
+			if Humanoid and not humanoidInstanceMap[Humanoid.Parent] then
+				table.insert(blacklistTable, Humanoid.Parent)
 			end
 		end
 	end
-	for var5, vector6 in CollectionService:GetTagged(DestructibleConsts.SPAWN_TAG_NAME) do
-		if vector6:FindFirstChild(DestructibleConsts.INSTANCE_VALUE_NAME) and vector6[DestructibleConsts.INSTANCE_VALUE_NAME].Value then
-			table.insert(t, vector6[DestructibleConsts.INSTANCE_VALUE_NAME].Value)
+	for destructibleIndex, destructibleInstance in CollectionService:GetTagged(DestructibleConsts.SPAWN_TAG_NAME) do
+		if destructibleInstance:FindFirstChild(DestructibleConsts.INSTANCE_VALUE_NAME) and destructibleInstance[DestructibleConsts.INSTANCE_VALUE_NAME].Value then
+			table.insert(blacklistTable, destructibleInstance[DestructibleConsts.INSTANCE_VALUE_NAME].Value)
 		end
 	end
-	return t
+	return blacklistTable
 end
-function t._createNewPath(self)
+function NPCShared._createNewPath(self)
 	if self._path then
 		self._path:Destroy()
 		self._path = nil
@@ -254,66 +253,66 @@ function t._createNewPath(self)
 		Costs = self.agentCosts
 	})
 end
-function t.pathfindTo(self, p2)
-	self._pathfindTo = p2
+function NPCShared.pathfindTo(self, destination)
+	self._pathfindTo = destination
 end
-function t._updatePathfind(self)
-	local _pathfindTo = self._pathfindTo
-	if _pathfindTo then
-		local instance, _ = pcall(function()
-			self._path:ComputeAsync(self.obj.PrimaryPart.Position + self.obj.PrimaryPart.CFrame.UpVector * -4, _pathfindTo)
+function NPCShared._updatePathfind(self)
+	local pathfindDestination = self._pathfindTo
+	if pathfindDestination then
+		local isSuccess, _ = pcall(function()
+			self._path:ComputeAsync(self.obj.PrimaryPart.Position + self.obj.PrimaryPart.CFrame.UpVector * -4, pathfindDestination)
 		end)
 		if self.Destroy == nil then
 			return
 		end
-		local vector2 = instance and self._path.Status == Enum.PathStatus.Success
-		self._doesPathfindingPathExist = vector2
-		if vector2 then
+		local pathExists = isSuccess and self._path.Status == Enum.PathStatus.Success
+		self._doesPathfindingPathExist = pathExists
+		if pathExists then
 			self._waypoints = self._path:GetWaypoints()
 			if not self.maid.reachedConnection then
-				self.maid.reachedConnection = self.humanoid.MoveToFinished:Connect(function(p12)
-					if p12 and (self._waypoints and self._nextWaypointIndex < #self._waypoints) then
+				self.maid.reachedConnection = self.humanoid.MoveToFinished:Connect(function(reachedWaypoint)
+					if reachedWaypoint and (self._waypoints and self._nextWaypointIndex < #self._waypoints) then
 						local instance = self
 						instance._nextWaypointIndex = instance._nextWaypointIndex + 1
-						local vector2 = self._waypoints[self._nextWaypointIndex]
-						self.onWaypoint:Fire(vector2)
-						if self.obj:GetAttribute(NPCConsts.JUMPING_DISABLED_ATTR_NAME) ~= true and vector2.Action == Enum.PathWaypointAction.Jump then
+						local currentWaypoint = self._waypoints[self._nextWaypointIndex]
+						self.onWaypoint:Fire(currentWaypoint)
+						if self.obj:GetAttribute(NPCConsts.JUMPING_DISABLED_ATTR_NAME) ~= true and currentWaypoint.Action == Enum.PathWaypointAction.Jump then
 							self._lastJump = os.clock()
 							self.humanoid.Jump = true
 						end
-						if self.shouldMoveToNextWaypointFunc(vector2) then
-							t.moveTo(self.humanoid, vector2.Position)
+						if self.shouldMoveToNextWaypointFunc(currentWaypoint) then
+							NPCShared.moveTo(self.humanoid, currentWaypoint.Position)
 						end
 					else
-						t.move(self.humanoid, Vector3.new(0, 0, 0))
+						NPCShared.move(self.humanoid, Vector3.new(0, 0, 0))
 						self.maid.reachedConnection = nil
 					end
 				end)
 			end
 			self._nextWaypointIndex = 2
-			local var3 = self._waypoints[self._nextWaypointIndex]
-			if var3 then
-				self.onWaypoint:Fire(var3)
-				if self.obj:GetAttribute(NPCConsts.JUMPING_DISABLED_ATTR_NAME) ~= true and var3.Action == Enum.PathWaypointAction.Jump then
+			local firstWaypoint = self._waypoints[self._nextWaypointIndex]
+			if firstWaypoint then
+				self.onWaypoint:Fire(firstWaypoint)
+				if self.obj:GetAttribute(NPCConsts.JUMPING_DISABLED_ATTR_NAME) ~= true and firstWaypoint.Action == Enum.PathWaypointAction.Jump then
 					self._lastJump = os.clock()
 					self.humanoid.Jump = true
 				end
-				if self.shouldMoveToNextWaypointFunc(var3) then
-					t.moveTo(self.humanoid, var3.Position)
+				if self.shouldMoveToNextWaypointFunc(firstWaypoint) then
+					NPCShared.moveTo(self.humanoid, firstWaypoint.Position)
 				end
 			else
-				t.move(self.humanoid, Vector3.new(0, 0, 0))
+				NPCShared.move(self.humanoid, Vector3.new(0, 0, 0))
 			end
 		else
-			t.move(self.humanoid, Vector3.new(0, 0, 0))
+			NPCShared.move(self.humanoid, Vector3.new(0, 0, 0))
 		end
 	elseif self.maid.reachedConnection then
 		self.maid.reachedConnection = nil
 	end
 end
-function t.lookAt(self, p2)
+function NPCShared.lookAt(self, targetPos)
 	if self.lookAtConstraint ~= nil then
-		if p2 == nil then
+		if targetPos == nil then
 			if self.lookAtConstraint.Enabled then
 				self.lookAtConstraint.Enabled = false
 			end
@@ -321,66 +320,66 @@ function t.lookAt(self, p2)
 			if not self.lookAtConstraint.Enabled then
 				self.lookAtConstraint.Enabled = true
 			end
-			self.lookAtConstraint.CFrame = CFrame.lookAt(self.lookAtConstraint.Attachment0.WorldPosition, p2)
+			self.lookAtConstraint.CFrame = CFrame.lookAt(self.lookAtConstraint.Attachment0.WorldPosition, targetPos)
 		end
 	end
 end
-function t.goTo(self, p2)
+function NPCShared.goTo(self, targetPos)
 	local humanoid = self.humanoid
-	local instance = os.clock()
+	local currentTime = os.clock()
 	if not self._lastTargetOcclusionCheck then
 		self._lastTargetOcclusionCheck = 0
 	end
-	if instance - self._lastTargetOcclusionCheck > 1 then
-		self._lastTargetOcclusionCheck = instance
-		self._isTargetNonOccludedCached = t.isNonOccluded(humanoid.RootPart, p2, self.occlusionCastParams)
+	if currentTime - self._lastTargetOcclusionCheck > 1 then
+		self._lastTargetOcclusionCheck = currentTime
+		self._isTargetNonOccludedCached = NPCShared.isNonOccluded(humanoid.RootPart, targetPos, self.occlusionCastParams)
 	end
-	if t.getDistTo(humanoid.RootPart, p2) >= humanoid.Parent:GetAttribute(NPCConsts.MIN_DIST_TO_TARGET_ATTR_NAME) then
+	if NPCShared.getDistTo(humanoid.RootPart, targetPos) >= humanoid.Parent:GetAttribute(NPCConsts.MIN_DIST_TO_TARGET_ATTR_NAME) then
 		if self._isTargetNonOccludedCached then
-			t.zigZagTowards(humanoid, p2)
+			NPCShared.zigZagTowards(humanoid, targetPos)
 			self._pathfindTo = nil
 			return
 		end
-		t.pathfindTo(self, p2)
+		NPCShared.pathfindTo(self, targetPos)
 		if not self._doesPathfindingPathExist then
-			t.moveTowards(humanoid, p2)
+			NPCShared.moveTowards(humanoid, targetPos)
 		end
 	else
-		t.move(humanoid, Vector3.new(0, 0, 0))
+		NPCShared.move(humanoid, Vector3.new(0, 0, 0))
 	end
 end
-function t.isNonOccluded(self, p2, p3)
-	local Position = self.Position
-	local instance = p2 - Position
-	if instance.Magnitude < 0.1 then
+function NPCShared.isNonOccluded(self, rayDestination, raycastParams)
+	local originPos = self.Position
+	local rayDirection = rayDestination - originPos
+	if rayDirection.Magnitude < 0.1 then
 		return false
 	else
-		local vector2 = Raycast.collidable(Position, instance.Unit, instance.Magnitude, p3)
-		if vector2 then
-			return (vector2.Position - p2).Magnitude < 0.1
+		local raycastResult = Raycast.collidable(originPos, rayDirection.Unit, rayDirection.Magnitude, raycastParams)
+		if raycastResult then
+			return (raycastResult.Position - rayDestination).Magnitude < 0.1
 		else
 			return true
 		end
 	end
 end
-function t.moveTo(self, p2)
-	self:MoveTo(p2)
+function NPCShared.moveTo(self, targetPos)
+	self:MoveTo(targetPos)
 end
-function t.moveTowards(self, p2)
-	t.move(self, (p2 - self.RootPart.Position).Unit)
+function NPCShared.moveTowards(self, targetPos)
+	NPCShared.move(self, (targetPos - self.RootPart.Position).Unit)
 end
-function t.zigZagTowards(self, p2)
-	local instance = self.Parent:GetAttribute(NPCConsts.SIDE_STRAFE_MULT_ATTR_NAME)
-	local vector2 = self.Parent:GetAttribute(NPCConsts.FREQ_OFFSET_ATTR_NAME)
-	local var3 = p2 - self.RootPart.Position
-	local var5 = math.clamp(var3.Magnitude / 24, 0, 1)
-	local vector6 = var3.Unit:Cross(Vector3.new(0, 1, 0))
-	t.move(self, var3.Unit + vector6 * (math.cos(os.clock() * 7 + vector2) * var5) * 0.3 * instance)
+function NPCShared.zigZagTowards(self, targetPos)
+	local strafeMult = self.Parent:GetAttribute(NPCConsts.SIDE_STRAFE_MULT_ATTR_NAME)
+	local freqOffset = self.Parent:GetAttribute(NPCConsts.FREQ_OFFSET_ATTR_NAME)
+	local directionToTarget = targetPos - self.RootPart.Position
+	local distanceRatio = math.clamp(directionToTarget.Magnitude / 24, 0, 1)
+	local perpendicular = directionToTarget.Unit:Cross(Vector3.new(0, 1, 0))
+	NPCShared.move(self, directionToTarget.Unit + perpendicular * (math.cos(os.clock() * 7 + freqOffset) * distanceRatio) * 0.3 * strafeMult)
 end
-function t.move(self, p2)
-	self:Move(p2)
+function NPCShared.move(self, movementDir)
+	self:Move(movementDir)
 end
-function t.getDistTo(self, p2)
-	return ((p2 - self.Position) * Vector3.new(1, 0, 1)).Magnitude
+function NPCShared.getDistTo(self, targetPos)
+	return ((targetPos - self.Position) * Vector3.new(1, 0, 1)).Magnitude
 end
-return t
+return NPCShared

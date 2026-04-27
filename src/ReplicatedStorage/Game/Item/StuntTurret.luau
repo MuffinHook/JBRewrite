@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Std.Audio)
@@ -10,226 +9,226 @@ local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local CurrentCamera = workspace.CurrentCamera
 local Gun = require(script.Parent.Gun)
 local function RandomVector()
-	local v1 = math.random() * 2 - 1
-	local v2 = math.random() * 2 - 1
-	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
+	local randomX = math.random() * 2 - 1
+	local randomY = math.random() * 2 - 1
+	return Vector3.new(randomX, randomY, math.random() * 2 - 1).Unit
 end
-local t = {
+local StuntTurretClass = {
 	__ClassName = "StuntTurret"
 }
-t.__index = t
-setmetatable(t, Gun)
-function t.new(p1, p2, p3)
-	local v1 = Gun.new(p1, p2)
-	setmetatable(v1, t)
-	v1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p2, "PlaneModel", function(p1, p2)
-		if p1 then
-			p2:GiveTask(RxInstanceUtils.observeProperty(p1, "Value", function(p1, p2)
-				v1.Model = p1
-				if p1 then
-					v1:_getTips()
-					if v1.Local then
-						p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "UpdateHeatRemote", function(p1)
-							v1._updateHeatRemote = p1
+StuntTurretClass.__index = StuntTurretClass
+setmetatable(StuntTurretClass, Gun)
+function StuntTurretClass.new(baseGun, modelParent, p3)
+	local newInstance = Gun.new(baseGun, modelParent)
+	setmetatable(newInstance, StuntTurretClass)
+	newInstance.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(modelParent, "PlaneModel", function(planeModel, observerMaid)
+		if planeModel then
+			observerMaid:GiveTask(RxInstanceUtils.observeProperty(planeModel, "Value", function(modelValue, valueMaid)
+				newInstance.Model = modelValue
+				if modelValue then
+					newInstance:_getTips()
+					if newInstance.Local then
+						valueMaid:GiveTask(RxInstanceUtils.observeOneChildNamed(modelValue, "UpdateHeatRemote", function(heatRemote)
+							newInstance._updateHeatRemote = heatRemote
 						end))
 					end
 				end
 			end))
 		end
 	end))
-	v1.ShootActionButtonConfig = {
+	newInstance.ShootActionButtonConfig = {
 		primary = false,
 		saturateTo = 100,
 		priority = 500
 	}
-	v1:Setup()
-	v1:DefaultDisableCamLock()
-	return v1
+	newInstance:Setup()
+	newInstance:DefaultDisableCamLock()
+	return newInstance
 end
-function t._getTips(p1)
-	if p1.Model then
-		local Model = p1.Model:FindFirstChild("Model")
+function StuntTurretClass._getTips(self)
+	if self.Model then
+		local Model = self.Model:FindFirstChild("Model")
 		if Model then
 			local BlackChrome = Model:FindFirstChild("BlackChrome")
 			if BlackChrome then
-				p1.Tips = TableUtils.filter(BlackChrome:GetChildren(), function(p1)
-					return p1.Name == "MachineGun"
+				self.Tips = TableUtils.filter(BlackChrome:GetChildren(), function(child)
+					return child.Name == "MachineGun"
 				end)
 			end
 		end
 	end
 end
-function t._updateIgnoreList(p1)
-	p1.IgnoreList = { p1.Character, p1.Model, workspace.Items }
-	if p1.BulletEmitter then
-		p1.BulletEmitter.IgnoreList = p1.IgnoreList
+function StuntTurretClass._updateIgnoreList(self)
+	self.IgnoreList = { self.Character, self.Model, workspace.Items }
+	if self.BulletEmitter then
+		self.BulletEmitter.IgnoreList = self.IgnoreList
 	end
 end
-function t.Setup(p1)
-	p1:_updateIgnoreList()
-	p1.LastShoot = 0
-	p1.LastPlayerImpact = 0
-	p1.SpringThirdMousePosition = Spring.new(Vector3.new(), Vector3.new(), 0.9, 30)
-	if p1.Local then
-		p1.SpringCamera = Spring.new(Vector3.new(), Vector3.new(), 0.6, 300)
+function StuntTurretClass.Setup(self)
+	self:_updateIgnoreList()
+	self.LastShoot = 0
+	self.LastPlayerImpact = 0
+	self.SpringThirdMousePosition = Spring.new(Vector3.new(), Vector3.new(), 0.9, 30)
+	if self.Local then
+		self.SpringCamera = Spring.new(Vector3.new(), Vector3.new(), 0.6, 300)
 	end
-	p1.SpringSpin = Spring.new(0, 0, 0.6, 7)
-	p1.SpinTotal = 0
-	p1.MouseDown = false
-	if not p1.Tips then
-		p1.Tips = {}
+	self.SpringSpin = Spring.new(0, 0, 0.6, 7)
+	self.SpinTotal = 0
+	self.MouseDown = false
+	if not self.Tips then
+		self.Tips = {}
 	end
-	p1.TipIndex = 1
-	p1:SetupBulletEmitter()
-	p1:SetupShoot()
-	p1:UpdateMousePosition()
-	p1.Maid:GiveTask(RunService.RenderStepped:Connect(function()
-		p1:RenderStepped()
+	self.TipIndex = 1
+	self:SetupBulletEmitter()
+	self:SetupShoot()
+	self:UpdateMousePosition()
+	self.Maid:GiveTask(RunService.RenderStepped:Connect(function()
+		self:RenderStepped()
 	end))
-	p1.Maid:GiveTask(RunService.Stepped:Connect(function()
-		p1:Stepped()
+	self.Maid:GiveTask(RunService.Stepped:Connect(function()
+		self:Stepped()
 	end))
 end
-function t.BulletEmitterOnLocalHitPlayer(p1, ...)
-	local v1 = tick()
-	if v1 - p1.LastPlayerImpact > 0.1 then
-		p1.LastPlayerImpact = v1
-		Gun.BulletEmitterOnLocalHitPlayer(p1, ...)
+function StuntTurretClass.BulletEmitterOnLocalHitPlayer(self, ...)
+	local currentTime = tick()
+	if currentTime - self.LastPlayerImpact > 0.1 then
+		self.LastPlayerImpact = currentTime
+		Gun.BulletEmitterOnLocalHitPlayer(self, ...)
 	end
 end
-t.Reload = false
-function t.TransformLocalMousePosition(p1, p2)
-	return p1.SpringThirdMousePosition:SetTarget(p2)
+StuntTurretClass.Reload = false
+function StuntTurretClass.TransformLocalMousePosition(self, targetPosition)
+	return self.SpringThirdMousePosition:SetTarget(targetPosition)
 end
-function t.UpdateArmJoints(p1)  end
-function t.UpdateCamera(p1)
-	local v1 = p1.SpringCamera:Update()
-	local v2 = CurrentCamera
-	v2.CFrame = v2.CFrame * CFrame.new(v1.x * 1, v1.y * 1, 0)
+function StuntTurretClass.UpdateArmJoints(self)  end
+function StuntTurretClass.UpdateCamera(self)
+	local cameraOffset = self.SpringCamera:Update()
+	local currentCam = CurrentCamera
+	currentCam.CFrame = currentCam.CFrame * CFrame.new(cameraOffset.x * 1, cameraOffset.y * 1, 0)
 end
-function t.RenderStepped(p1)
-	p1:UpdateMousePosition()
-	if p1.Local then
-		p1:UpdateCamera()
+function StuntTurretClass.RenderStepped(self)
+	self:UpdateMousePosition()
+	if self.Local then
+		self:UpdateCamera()
 	end
 end
-function t.Shoot(p1)
-	p1:_updateIgnoreList()
-	local v1 = p1.Tips[p1.TipIndex]
-	if v1 then
-		p1.Tip = v1
-		p1.BulletEmitter:Emit(v1.WorldPosition, v1.WorldCFrame.LookVector, p1.Config.BulletSpeed)
-		p1.TipIndex = p1.TipIndex % #p1.Tips + 1
-		if p1.Local then
-			local v3 = math.clamp(20 / (p1.Model.PrimaryPart.Position - CurrentCamera.CFrame.p).Magnitude, 0.1, 1)
-			p1.SpringCamera:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * v3 * 5)
+function StuntTurretClass.Shoot(self)
+	self:_updateIgnoreList()
+	local currentTip = self.Tips[self.TipIndex]
+	if currentTip then
+		self.Tip = currentTip
+		self.BulletEmitter:Emit(currentTip.WorldPosition, currentTip.WorldCFrame.LookVector, self.Config.BulletSpeed)
+		self.TipIndex = self.TipIndex % #self.Tips + 1
+		if self.Local then
+			local recoilMagnitude = math.clamp(20 / (self.Model.PrimaryPart.Position - CurrentCamera.CFrame.p).Magnitude, 0.1, 1)
+			self.SpringCamera:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * recoilMagnitude * 5)
 		end
 	else
-		p1:_getTips()
+		self:_getTips()
 	end
 end
-function t.ShootCheckConditions(p1)
+function StuntTurretClass.ShootCheckConditions(self)
 	return true
 end
-function t.AnimateBarrel(p1, p2, p3)
-	if p1.Model then
-		local v1 = tick()
-		if p1.Sound then
-			p1.Sound.Volume = p3 * 0.5
+function StuntTurretClass.AnimateBarrel(self, heatIncrement, spinSpeed)
+	if self.Model then
+		local currentTime = tick()
+		if self.Sound then
+			self.Sound.Volume = spinSpeed * 0.5
 		end
-		local MaxHeat = p1.Config.MaxHeat
-		local sum = p1.Model:GetAttribute("Heat")
-		if p3 >= 0.6 and sum < MaxHeat then
-			if 1 / (10 + 30 * p3) < v1 - p1.LastShoot then
-				sum = sum + p2
+		local MaxHeat = self.Config.MaxHeat
+		local sum = self.Model:GetAttribute("Heat")
+		if spinSpeed >= 0.6 and sum < MaxHeat then
+			if 1 / (10 + 30 * spinSpeed) < currentTime - self.LastShoot then
+				sum = sum + heatIncrement
 				if MaxHeat <= sum then
-					p1:InputEnded({
+					self:InputEnded({
 						UserInputType = Enum.UserInputType.MouseButton1
 					})
 					sum = sum + 3
 				end
-				p1.LastShoot = v1
-				if p1.Local then
-					p1:_attemptShoot()
+				self.LastShoot = currentTime
+				if self.Local then
+					self:_attemptShoot()
 				end
 			end
 		else
 			if sum > 0 then
-				sum = sum - p2
+				sum = sum - heatIncrement
 			end
 			if sum < 0 then
 				sum = 0
 			end
 		end
 		local _ = math.clamp(sum, 0, MaxHeat) / MaxHeat
-		p1.Model:SetAttribute("Heat", sum)
+		self.Model:SetAttribute("Heat", sum)
 	end
 end
-function t.Stepped(p1)
-	if p1.Model then
-		local v1 = tick()
-		local v2 = v1 - (p1.LastUpdate or v1)
-		p1.LastUpdate = v1
-		local v3 = p1.SpringSpin:Update()
-		local sum = p1.SpinTotal + v2 * v3
+function StuntTurretClass.Stepped(self)
+	if self.Model then
+		local currentTime = tick()
+		local deltaTime = currentTime - (self.LastUpdate or currentTime)
+		self.LastUpdate = currentTime
+		local spinSpeed = self.SpringSpin:Update()
+		local sum = self.SpinTotal + deltaTime * spinSpeed
 		if sum > 6.283185307179586 then
 			sum = sum - 6.283185307179586
 		end
-		p1.SpinTotal = sum
-		p1:AnimateBarrel(v2, v3)
+		self.SpinTotal = sum
+		self:AnimateBarrel(deltaTime, spinSpeed)
 	end
 end
-t.ApplySkin = false
-t.ScopeBegin = false
-function t.Heartbeat(p1)  end
-function t.InputBegan(p1, p2, p3)
-	if p3 then
+StuntTurretClass.ApplySkin = false
+StuntTurretClass.ScopeBegin = false
+function StuntTurretClass.Heartbeat(self)  end
+function StuntTurretClass.InputBegan(self, inputObject, isGameProcessed)
+	if isGameProcessed then
 		return false
 	end
-	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonX else false then
-		if p1.Model:GetAttribute("Heat") < p1.Config.MaxHeat then
-			p1.SpringSpin:SetTarget(1)
-			p1.MouseDown = true
-			if not p1.Sound then
+	if if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then true elseif inputObject.UserInputType == Enum.UserInputType.Gamepad1 then inputObject.KeyCode == Enum.KeyCode.ButtonX else false then
+		if self.Model:GetAttribute("Heat") < self.Config.MaxHeat then
+			self.SpringSpin:SetTarget(1)
+			self.MouseDown = true
+			if not self.Sound then
 				local Sound = Instance.new("Sound")
 				Sound.SoundId = "rbxassetid://2198390391"
 				Sound.Volume = 0
 				Sound.Looped = true
-				Sound.Parent = p1.Model.PrimaryPart
+				Sound.Parent = self.Model.PrimaryPart
 				Sound:Play()
-				p1.Sound = Sound
+				self.Sound = Sound
 			end
 		end
-		if p1.Local then
-			p1:BroadcastInputBegan(p2)
+		if self.Local then
+			self:BroadcastInputBegan(inputObject)
 		end
 	end
 end
-function t.InputEnded(p1, p2, p3)
-	if p3 then
+function StuntTurretClass.InputEnded(self, inputObject, isGameProcessed)
+	if isGameProcessed then
 		return false
 	end
-	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonX else false then
-		p1.SpringSpin:SetTarget(0)
-		p1.MouseDown = false
+	if if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then true elseif inputObject.UserInputType == Enum.UserInputType.Gamepad1 then inputObject.KeyCode == Enum.KeyCode.ButtonX else false then
+		self.SpringSpin:SetTarget(0)
+		self.MouseDown = false
 		delay(0.5, function()
-			if p1.Sound and not p1.MouseDown then
-				p1.Sound:Destroy()
-				p1.Sound = nil
+			if self.Sound and not self.MouseDown then
+				self.Sound:Destroy()
+				self.Sound = nil
 			end
 		end)
-		if p1.Local then
-			p1:BroadcastInputEnded(p2)
+		if self.Local then
+			self:BroadcastInputEnded(inputObject)
 		end
 	end
 end
-function t.Unequip(p1)
-	if p1.Local and p1._updateHeatRemote then
-		p1._updateHeatRemote:FireServer(p1.Model:GetAttribute("Heat"))
+function StuntTurretClass.Unequip(self)
+	if self.Local and self._updateHeatRemote then
+		self._updateHeatRemote:FireServer(self.Model:GetAttribute("Heat"))
 	end
-	if p1.Sound then
-		p1.Sound:Destroy()
-		p1.Sound = nil
+	if self.Sound then
+		self.Sound:Destroy()
+		self.Sound = nil
 	end
 end
-return t
+return StuntTurretClass

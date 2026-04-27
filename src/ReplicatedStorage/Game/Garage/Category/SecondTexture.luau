@@ -1,5 +1,4 @@
--- Reviewed by Claude
-local t = {
+local supportedMakes = {
 	Trailblazer = true,
 	R8 = true,
 	MoltenM12 = true,
@@ -22,11 +21,11 @@ local t = {
 	OrionM42 = true,
 	Polaire = true
 }
-return function(p1)
-	if t[p1.Make] then
+return function(vehicleData)
+	if supportedMakes[vehicleData.Make] then
 		return false
 	end
-	local Model = p1.Model
+	local Model = vehicleData.Model
 	if Model then
 		return Model:FindFirstChild("SecondBody", true)
 	end

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
@@ -9,15 +7,15 @@ local Region = require(ReplicatedStorage.Std.Region)
 local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)
 local waitForChild = require(ReplicatedStorage.Std.waitForChild)
 local GunShopConsts = require(script.Parent.GunShopConsts)
-local t = {
+local GunShopSystem = {
 	onAnyOwned = Signal.new(),
 	itemsValue = nil
 }
-function t.init()
+function GunShopSystem.init()
 	waitForChild(LocalPlayer, GunShopConsts.ITEMS_VALUE_NAME):andThen(function(itemsValueChild)
-		t.itemsValue = itemsValueChild
+		GunShopSystem.itemsValue = itemsValueChild
 		itemsValueChild.ChildAdded:Connect(function(child)
-			t.onAnyOwned:Fire(child.Name)
+			GunShopSystem.onAnyOwned:Fire(child.Name)
 		end)
 	end):catch(warn)
 	local GunShopUI = require(script.Parent.GunShopUI)
@@ -34,8 +32,8 @@ function t.init()
 	end)
 	local function updatePrisms()
 		playerRegion.Prisms = {}
-		for i, v in ipairs(CollectionService:GetTagged("GunShopRegion")) do
-			playerRegion:AddPart(v)
+		for i, gunShopRegion in ipairs(CollectionService:GetTagged("GunShopRegion")) do
+			playerRegion:AddPart(gunShopRegion)
 		end
 	end
 	updatePrisms()
@@ -50,7 +48,7 @@ function t.init()
 		end
 	end)
 end
-function t.doesPlayerOwn(p1)
-	return LocalPlayer:WaitForChild(GunShopConsts.ITEMS_VALUE_NAME):FindFirstChild(p1) ~= nil
+function GunShopSystem.doesPlayerOwn(itemName)
+	return LocalPlayer:WaitForChild(GunShopConsts.ITEMS_VALUE_NAME):FindFirstChild(itemName) ~= nil
 end
-return t
+return GunShopSystem

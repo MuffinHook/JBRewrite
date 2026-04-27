@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Notification = require(ReplicatedStorage.Game.Notification)

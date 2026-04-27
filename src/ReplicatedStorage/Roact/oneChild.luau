@@ -10,13 +10,13 @@ local function oneChild(children)
 		return nil
 	end
 
-	local key, child = next(children)
+	local firstChildKey, child = next(children)
 
 	if not child then
 		return nil
 	end
 
-	local after = next(children, key)
+	local after = next(children, firstChildKey)
 
 	if after then
 		error("Expected at most child, had more than one child.", 2)

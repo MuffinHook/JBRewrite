@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
 local Settings = require(ReplicatedStorage.Resource.Settings)

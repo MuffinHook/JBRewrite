@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local MarketplaceService = game:GetService("MarketplaceService")
@@ -500,8 +499,8 @@ ambientVolumes.Storm = stormVolumes
 Settings.Ambient = ambientVolumes
 local GamepassData = require(ReplicatedStorage.Gamepass.GamepassData)
 Settings.Gamepass = {}
-for i, v in ipairs(GamepassData) do
-	Settings.Gamepass[v.Title] = v
+for i, gamepassItem in ipairs(GamepassData) do
+	Settings.Gamepass[gamepassItem.Title] = gamepassItem
 end
 Settings.Badge = {
 	MVP = {
@@ -660,26 +659,26 @@ Settings.DevProduct = {
 	}
 }
 if game.PlaceId ~= 606849621 then
-	for i, v in ipairs(Settings.DevProduct) do
-		if v.TestId and v.TestId[game.PlaceId] then
-			v.Id = v.TestId[game.PlaceId]
+	for i, devProduct in ipairs(Settings.DevProduct) do
+		if devProduct.TestId and devProduct.TestId[game.PlaceId] then
+			devProduct.Id = devProduct.TestId[game.PlaceId]
 		end
 	end
 end
 function Settings.getFirstProductByType(productType)
 	assert(productType ~= nil)
-	for i, v in ipairs(Settings.DevProduct) do
-		if v.Type == productType then
-			return v
+	for i, devProduct in ipairs(Settings.DevProduct) do
+		if devProduct.Type == productType then
+			return devProduct
 		end
 	end
 end
-for i, v in ipairs(GamepassData) do
-	if v.GiftProductId ~= nil then
+for i, gamepassItem in ipairs(GamepassData) do
+	if gamepassItem.GiftProductId ~= nil then
 		table.insert(Settings.DevProduct, {
-			Id = v.GiftProductId,
+			Id = gamepassItem.GiftProductId,
 			Type = "GiftGamepass",
-			Name = v.Title
+			Name = gamepassItem.Title
 		})
 	end
 end
@@ -688,34 +687,34 @@ function Settings.FetchProducts()
 	task.spawn(function()
 		Settings.FetchedMarketplace = false
 		local count = 0
-		for k, v in pairs(Settings.DevProduct) do
+		for k, devProduct in pairs(Settings.DevProduct) do
 			count = count + 1
 			task.spawn(function()
-				local Type = v.Type
-				local Id = v.Id
+				local Type = devProduct.Type
+				local Id = devProduct.Id
 				if Type == "Nitro" then
 					local productInfo = MarketplaceService:GetProductInfoAsync(Id, Enum.InfoType.Product)
 					local fuel = tonumber((productInfo.Name:gsub("[^%d]+", "")))
-					v.Robux = productInfo.PriceInRobux
-					v.Fuel = fuel
+					devProduct.Robux = productInfo.PriceInRobux
+					devProduct.Fuel = fuel
 				elseif Type == "Cash" or (Type == "Rent" or (Type == "SeasonPass" or Type == "GiftGamepass")) then
 					local productInfo = MarketplaceService:GetProductInfoAsync(Id, Enum.InfoType.Product)
-					v.Robux = productInfo.PriceInRobux
-					v.ImageId = productInfo.IconImageAssetId
+					devProduct.Robux = productInfo.PriceInRobux
+					devProduct.ImageId = productInfo.IconImageAssetId
 				end
 				count = count - 1
 			end)
 		end
-		for k, v in pairs(GamepassData) do
-			if v.PassId then
+		for k, gamepassItem in pairs(GamepassData) do
+			if gamepassItem.PassId then
 				count = count + 1
 				task.spawn(function()
-					local success, passInfo = pcall(MarketplaceService.GetProductInfo, MarketplaceService, v.PassId, Enum.InfoType.GamePass)
+					local success, passInfo = pcall(MarketplaceService.GetProductInfo, MarketplaceService, gamepassItem.PassId, Enum.InfoType.GamePass)
 					if success then
-						v.ImageId = passInfo.IconImageAssetId
-						v.PriceInRobux = passInfo.PriceInRobux
+						gamepassItem.ImageId = passInfo.IconImageAssetId
+						gamepassItem.PriceInRobux = passInfo.PriceInRobux
 					else
-						warn("Failed to fetch gamepass info for " .. v.Title .. " with id " .. v.PassId)
+						warn("Failed to fetch gamepass info for " .. gamepassItem.Title .. " with id " .. gamepassItem.PassId)
 					end
 					count = count - 1
 				end)

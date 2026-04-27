@@ -1,33 +1,32 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local Roact = require(ReplicatedStorage.Roact)
 local Interval = require(ReplicatedStorage.Std.Interval)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local createElement = Roact.createElement
-local color = Roact.PureComponent:extend("LikePrompt")
-color.defaultProps = {
+local LikePrompt = Roact.PureComponent:extend("LikePrompt")
+LikePrompt.defaultProps = {
 	size = UDim2.fromScale(0.75, 0.05),
 	anchorPoint = Vector2.new(0.5, 0),
 	position = UDim2.fromScale(0.5, 0)
 }
-function color.init(p1)
-	p1.maid = Maid.new()
-	p1:setState({
+function LikePrompt.init(self)
+	self.maid = Maid.new()
+	self:setState({
 		remaining = 0
 	})
 end
-function color.render(p1)
-	if p1.props.visible then
-		local color = Color3.fromRGB(1, 255, 171)
-		local t = {
+function LikePrompt.render(self)
+	if self.props.visible then
+		local accentColor = Color3.fromRGB(1, 255, 171)
+		local rootFrameProps = {
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 			BackgroundTransparency = 0,
-			Size = p1.props.size,
-			AnchorPoint = p1.props.anchorPoint,
-			Position = p1.props.position
+			Size = self.props.size,
+			AnchorPoint = self.props.anchorPoint,
+			Position = self.props.position
 		}
-		local t2 = {
+		local innerContainerChildren = {
 			Corner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
 			}),
@@ -35,7 +34,7 @@ function color.render(p1)
 				AspectRatio = 18
 			})
 		}
-		local t3 = {
+		local contentChildren = {
 			TitleContainer = createElement(PaddedContainer, {
 				backgroundTransparency = 1,
 				size = UDim2.fromScale(0.7944444444444444, 1),
@@ -68,9 +67,9 @@ function color.render(p1)
 					BackgroundTransparency = 0,
 					Size = UDim2.fromScale(1, 1),
 					Text = "",
-					BackgroundColor3 = color,
+					BackgroundColor3 = accentColor,
 					Selectable = true,
-					[Roact.Event.Activated] = p1.props.onClickDone
+					[Roact.Event.Activated] = self.props.onClickDone
 				}, {
 					Corner = createElement("UICorner", {
 						CornerRadius = UDim.new(1, 0)
@@ -93,54 +92,54 @@ function color.render(p1)
 				})
 			})
 		}
-		local t4 = {
+		local countdownFrameProps = {
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(0.05555555555555555, 1),
 			Position = UDim2.fromScale(0.9444444444444444, 0)
 		}
-		local t5 = {}
-		local t6 = {
+		local countdownTextChildren = {}
+		local countdownTextProps = {
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 0.8),
 			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Font = Enum.Font.FredokaOne
 		}
-		t6.Text = tostring((math.max(0, (math.floor(p1.state.remaining)))))
-		t6.TextColor3 = Color3.new(0.3, 0.3, 0.3)
-		t6.TextScaled = true
-		t5.Text = createElement("TextLabel", t6)
-		t3.CountdownContainer = createElement("Frame", t4, t5)
-		t2.Inner = createElement(PaddedContainer, {
+		countdownTextProps.Text = tostring((math.max(0, (math.floor(self.state.remaining)))))
+		countdownTextProps.TextColor3 = Color3.new(0.3, 0.3, 0.3)
+		countdownTextProps.TextScaled = true
+		countdownTextChildren.Text = createElement("TextLabel", countdownTextProps)
+		contentChildren.CountdownContainer = createElement("Frame", countdownFrameProps, countdownTextChildren)
+		innerContainerChildren.Inner = createElement(PaddedContainer, {
 			aspectRatio = 18,
 			verticalPaddingRatio = 7.111111111111111,
 			backgroundTransparency = 1
-		}, t3)
-		t2.Stroke = createElement("UIStroke", {
+		}, contentChildren)
+		innerContainerChildren.Stroke = createElement("UIStroke", {
 			Thickness = 1,
 			Color = Color3.new(0.7, 0.7, 0.7)
 		})
-		return createElement("Frame", t, t2)
+		return createElement("Frame", rootFrameProps, innerContainerChildren)
 	end
 end
-function color._update(p1)
-	if p1.props.visible then
-		local color = p1.props.countdownTil - workspace:GetServerTimeNow()
-		p1:setState({
-			remaining = color
+function LikePrompt._update(self)
+	if self.props.visible then
+		local secondsRemaining = self.props.countdownTil - workspace:GetServerTimeNow()
+		self:setState({
+			remaining = secondsRemaining
 		})
-		if p1.state.remaining > 0 and (color <= 0 and p1.props.onExpired) then
-			p1.props.onExpired()
+		if self.state.remaining > 0 and (secondsRemaining <= 0 and self.props.onExpired) then
+			self.props.onExpired()
 		end
 	end
 end
-function color.didMount(p1)
-	p1:_update()
-	p1.maid:GiveTask(Interval.every(1):Connect(function()
-		p1:_update()
+function LikePrompt.didMount(self)
+	self:_update()
+	self.maid:GiveTask(Interval.every(1):Connect(function()
+		self:_update()
 	end))
 end
-function color.willUnmount(p1)
-	p1.maid:DoCleaning()
+function LikePrompt.willUnmount(self)
+	self.maid:DoCleaning()
 end
-return color
+return LikePrompt

@@ -1,43 +1,41 @@
--- Reviewed by Claude
--- variables reassigned
-local t = {
-	clamp01 = function(p1, p2, p3)
-		return math.clamp(p1, 0, 1), math.clamp(p2, 0, 1), math.clamp(p3, 0, 1)
+local ColorUtils = {
+	clamp01 = function(hue, saturation, value)
+		return math.clamp(hue, 0, 1), math.clamp(saturation, 0, 1), math.clamp(value, 0, 1)
 	end
 }
-function t.saturateBy(p1, p2)
-	local v1, v2, v3 = p1:ToHSV()
-	local v4, v5, v6 = t.clamp01(v1, v2 * (1 + p2), v3)
-	return Color3.fromHSV(v4, v5, v6)
+function ColorUtils.saturateBy(color, saturationMultiplier)
+	local hue, saturation, value = color:ToHSV()
+	local clampedHue, clampedSaturation, clampedValue = ColorUtils.clamp01(hue, saturation * (1 + saturationMultiplier), value)
+	return Color3.fromHSV(clampedHue, clampedSaturation, clampedValue)
 end
-function t.saturateTo(p1, p2)
-	local v1, _, v2 = p1:ToHSV()
-	local v3, v4, v5 = t.clamp01(v1, p2, v2)
-	return Color3.fromHSV(v3, v4, v5)
+function ColorUtils.saturateTo(color, saturationTarget)
+	local hue, _, value = color:ToHSV()
+	local clampedHue, clampedSaturation, clampedValue = ColorUtils.clamp01(hue, saturationTarget, value)
+	return Color3.fromHSV(clampedHue, clampedSaturation, clampedValue)
 end
-function t.brightenBy(p1, p2)
-	local v1, v2, v3 = p1:ToHSV()
-	local v4, v5, v6 = t.clamp01(v1, v2, v3 * (1 + p2))
-	return Color3.fromHSV(v4, v5, v6)
+function ColorUtils.brightenBy(color, brightnessMultiplier)
+	local hue, saturation, value = color:ToHSV()
+	local clampedHue, clampedSaturation, clampedValue = ColorUtils.clamp01(hue, saturation, value * (1 + brightnessMultiplier))
+	return Color3.fromHSV(clampedHue, clampedSaturation, clampedValue)
 end
-function t.brightenTo(p1, p2)
-	local v1, v2, _ = p1:ToHSV()
-	local v3, v4, v5 = t.clamp01(v1, v2, p2)
-	return Color3.fromHSV(v3, v4, v5)
+function ColorUtils.brightenTo(color, brightnessTarget)
+	local hue, saturation, _ = color:ToHSV()
+	local clampedHue, clampedSaturation, clampedValue = ColorUtils.clamp01(hue, saturation, brightnessTarget)
+	return Color3.fromHSV(clampedHue, clampedSaturation, clampedValue)
 end
-function t.hueBy(p1, p2)
-	local v1, v2, v3 = p1:ToHSV()
-	local v4, v5, v6 = t.clamp01((v1 + p2) % 1, v2, v3)
-	return Color3.fromHSV(v4, v5, v6)
+function ColorUtils.hueBy(color, hueShift)
+	local hue, saturation, value = color:ToHSV()
+	local clampedHue, clampedSaturation, clampedValue = ColorUtils.clamp01((hue + hueShift) % 1, saturation, value)
+	return Color3.fromHSV(clampedHue, clampedSaturation, clampedValue)
 end
-function t.hueTo(p1, p2)
-	local _, v1, v2 = p1:ToHSV()
-	local v3, v4, v5 = t.clamp01(p2, v1, v2)
-	return Color3.fromHSV(v3, v4, v5)
+function ColorUtils.hueTo(color, hueTarget)
+	local _, saturation, value = color:ToHSV()
+	local clampedHue, clampedSaturation, clampedValue = ColorUtils.clamp01(hueTarget, saturation, value)
+	return Color3.fromHSV(clampedHue, clampedSaturation, clampedValue)
 end
-function t.adjustBy(p1, p2, p3, p4)
-	local v1, v2, v3 = p1:ToHSV()
-	local v4, v5, v6 = t.clamp01((v1 + p2) % 1, v2 * (1 + p3), v3 * (1 + p4))
-	return Color3.fromHSV(v4, v5, v6)
+function ColorUtils.adjustBy(color, hueShift, saturationMultiplier, brightnessMultiplier)
+	local hue, saturation, value = color:ToHSV()
+	local clampedHue, clampedSaturation, clampedValue = ColorUtils.clamp01((hue + hueShift) % 1, saturation * (1 + saturationMultiplier), value * (1 + brightnessMultiplier))
+	return Color3.fromHSV(clampedHue, clampedSaturation, clampedValue)
 end
-return t
+return ColorUtils

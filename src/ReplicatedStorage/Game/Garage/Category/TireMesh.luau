@@ -1,4 +1,3 @@
--- Reviewed by Claude
-return function(p1)
-	return if p1.Type == "Chassis" and p1.Make ~= "Volt4x4" or p1.Type == "DuneBuggy" then true else p1.Type == "Motorcycle"
+return function(vehicleConfig)
+	return if vehicleConfig.Type == "Chassis" and vehicleConfig.Make ~= "Volt4x4" or vehicleConfig.Type == "DuneBuggy" then true else vehicleConfig.Type == "Motorcycle"
 end

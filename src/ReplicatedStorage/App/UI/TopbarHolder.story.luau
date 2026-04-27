@@ -1,11 +1,10 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(parent)
+	local AppComponent = Roact.Component:extend("App")
 	local TopbarHolder = require(script.Parent.TopbarHolder)
-	function v1.init(p1)end
-	function v1.render(p1)
+	function AppComponent.init(self)end
+	function AppComponent.render(self)
 		return Roact.createElement(TopbarHolder, {
 			buttons = {
 				{
@@ -16,8 +15,8 @@ return function(p1)
 					name = "Contracts",
 					imageId = 6132976621,
 					count = 3,
-					onClick = function(p1)
-						print("clicked contracts", p1)
+					onClick = function(button)
+						print("clicked contracts", button)
 					end
 				},
 				{
@@ -31,9 +30,9 @@ return function(p1)
 			}
 		})
 	end
-	function v1.willUnmount(p1)end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(self)end
+	local mountedComponent = Roact.mount(Roact.createElement(AppComponent), parent)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedComponent)
 	end
 end

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Avatar = require(script.Parent.Avatar)
 local Roact = require(ReplicatedStorage.Roact)
@@ -9,39 +8,39 @@ local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
 local Players = game:GetService("Players")
 local FriendsService = require(ReplicatedStorage.Friends.FriendsService)
-local v1 = Roact.PureComponent:extend("OtherTradeServerItem")
-function v1.render(p1)
-	local v1 = TableUtils.map(p1.props.userIds, function(p1)
+local OtherTradeServerItem = Roact.PureComponent:extend("OtherTradeServerItem")
+function OtherTradeServerItem.render(component)
+	local usersWithFriendStatus = TableUtils.map(component.props.userIds, function(userId)
 		return {
-			userId = p1,
-			isFriend = FriendsService.getIsFriendsWith(Players.LocalPlayer, p1)
+			userId = userId,
+			isFriend = FriendsService.getIsFriendsWith(Players.LocalPlayer, userId)
 		}
 	end)
-	table.sort(v1, function(p1, p2)
-		return p1.isFriend and not p2.isFriend
+	table.sort(usersWithFriendStatus, function(userA, userB)
+		return userA.isFriend and not userB.isFriend
 	end)
-	local t2 = {
+	local frameChildren = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 6)
 		})
 	}
-	local t3 = {
+	local containerProps = {
 		backgroundColor = Color3.new(0.3, 0.3, 0.3),
 		backgroundTransparency = 0,
-		aspectRatio = p1.props.aspectRatio,
-		verticalPaddingRatio = p1.props.verticalPaddingRatio,
+		aspectRatio = component.props.aspectRatio,
+		verticalPaddingRatio = component.props.verticalPaddingRatio,
 		paddingTop = 0,
 		paddingLeft = 0,
 		paddingRight = 0,
 		paddingBottom = 0,
 		size = UDim2.fromScale(1, 1)
 	}
-	local t4 = {
+	local containerChildren = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 6)
 		})
 	}
-	local t5 = {
+	local joinButtonPaddingProps = {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(0.12, 1),
 		position = UDim2.fromScale(0, 0),
@@ -50,30 +49,30 @@ function v1.render(p1)
 		paddingRight = 2,
 		paddingBottom = 1
 	}
-	local t6 = {}
-	local t7 = {}
-	t7.BackgroundColor3 = if #p1.props.userIds >= TradeConsts.MAX_TRADE_SERVER_SIZE then Color3.fromHex("908f91") else Color3.fromHex("5cc76d")
-	t7.BackgroundTransparency = 0
-	t7.Size = UDim2.new(1, 0, 1, 0)
-	t7.Position = UDim2.new(0.5, 0, 0.5, 0)
-	t7.AnchorPoint = Vector2.new(0.5, 0.5)
-	t7.Text = "JOIN"
-	t7.TextTransparency = 0.3
-	t7.Font = Enum.Font.FredokaOne
-	t7.TextXAlignment = Enum.TextXAlignment.Center
-	t7.LineHeight = 1
-	t7.TextSize = 26
-	t7.TextColor3 = Color3.new(255/255, 255/255, 255/255)
-	t7[Roact.Event.Activated] = function()
-		p1.props.onJoinOtherTradeServer(p1.props.otherServerId)
+	local joinButtonChildren = {}
+	local joinButtonProps = {}
+	joinButtonProps.BackgroundColor3 = if #component.props.userIds >= TradeConsts.MAX_TRADE_SERVER_SIZE then Color3.fromHex("908f91") else Color3.fromHex("5cc76d")
+	joinButtonProps.BackgroundTransparency = 0
+	joinButtonProps.Size = UDim2.new(1, 0, 1, 0)
+	joinButtonProps.Position = UDim2.new(0.5, 0, 0.5, 0)
+	joinButtonProps.AnchorPoint = Vector2.new(0.5, 0.5)
+	joinButtonProps.Text = "JOIN"
+	joinButtonProps.TextTransparency = 0.3
+	joinButtonProps.Font = Enum.Font.FredokaOne
+	joinButtonProps.TextXAlignment = Enum.TextXAlignment.Center
+	joinButtonProps.LineHeight = 1
+	joinButtonProps.TextSize = 26
+	joinButtonProps.TextColor3 = Color3.new(255/255, 255/255, 255/255)
+	joinButtonProps[Roact.Event.Activated] = function()
+		component.props.onJoinOtherTradeServer(component.props.otherServerId)
 	end
-	t6.TextButton = createElement("TextButton", t7, {
+	joinButtonChildren.TextButton = createElement("TextButton", joinButtonProps, {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 6)
 		})
 	})
-	t4.JoinServer = createElement(PaddedContainer, t5, t6)
-	local t8 = {
+	containerChildren.JoinServer = createElement(PaddedContainer, joinButtonPaddingProps, joinButtonChildren)
+	local playerCountPaddingProps = {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(0.06999999999999999, 1),
 		position = UDim2.fromScale(0.12, 0),
@@ -82,8 +81,8 @@ function v1.render(p1)
 		paddingRight = 1,
 		paddingBottom = 1
 	}
-	local t9 = {}
-	local t10 = {
+	local playerCountChildren = {}
+	local playerCountLabelProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -91,13 +90,13 @@ function v1.render(p1)
 		Font = Enum.Font.FredokaOne,
 		TextXAlignment = Enum.TextXAlignment.Center
 	}
-	local v15 = tostring(#p1.props.userIds)
-	t10.Text = v15 .. "/" .. tostring(TradeConsts.MAX_TRADE_SERVER_SIZE)
-	t10.TextScaled = true
-	t10.TextColor3 = Color3.fromHex("5cc76d")
-	t9.Text = createElement("TextLabel", t10)
-	t4.NumPlayers = createElement(PaddedContainer, t8, t9)
-	t4.ServerPlayersContainer = createElement(PaddedContainer, {
+	local playerCountText = tostring(#component.props.userIds)
+	playerCountLabelProps.Text = playerCountText .. "/" .. tostring(TradeConsts.MAX_TRADE_SERVER_SIZE)
+	playerCountLabelProps.TextScaled = true
+	playerCountLabelProps.TextColor3 = Color3.fromHex("5cc76d")
+	playerCountChildren.Text = createElement("TextLabel", playerCountLabelProps)
+	containerChildren.NumPlayers = createElement(PaddedContainer, playerCountPaddingProps, playerCountChildren)
+	containerChildren.ServerPlayersContainer = createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(0.81, 1),
 		position = UDim2.fromScale(0.19, 0),
@@ -109,16 +108,16 @@ function v1.render(p1)
 			rowsPerPage = 1,
 			colsPerRow = 17,
 			component = Avatar,
-			items = v1
+			items = usersWithFriendStatus
 		})
 	})
-	t2.Container = createElement(PaddedContainer, t3, t4)
+	frameChildren.Container = createElement(PaddedContainer, containerProps, containerChildren)
 	return createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
-		Size = p1.props.size,
-		Position = p1.props.position,
-		AnchorPoint = p1.props.anchorPoint
-	}, t2)
+		Size = component.props.size,
+		Position = component.props.position,
+		AnchorPoint = component.props.anchorPoint
+	}, frameChildren)
 end
-return v1
+return OtherTradeServerItem

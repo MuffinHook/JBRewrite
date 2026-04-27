@@ -1,21 +1,20 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("SpectateSelector")
-v1.defaultProps = {
+local selectorComponent = Roact.PureComponent:extend("SpectateSelector")
+selectorComponent.defaultProps = {
 	size = UDim2.fromScale(1, 1),
 	position = UDim2.fromScale(0.5, 0.5),
 	title = "N/A"
 }
-function v1.render(p1)
+function selectorComponent.render(self)
 	return createElement("Frame", {
 		BackgroundTransparency = 0.8,
 		BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
-		Size = p1.props.size,
+		Size = self.props.size,
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = p1.props.position
+		Position = self.props.position
 	}, {
 		Corner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
@@ -43,7 +42,7 @@ function v1.render(p1)
 					TextScaled = true,
 					Text = "<",
 					Selectable = true,
-					[Roact.Event.Activated] = p1.props.onClickPrev
+					[Roact.Event.Activated] = self.props.onClickPrev
 				}, {
 					Corner = createElement("UICorner", {
 						CornerRadius = UDim.new(0, 4)
@@ -66,7 +65,7 @@ function v1.render(p1)
 					Size = UDim2.new(1, 0, 1.25, 0),
 					Position = UDim2.new(0.5, 0, 0.5, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
-					Text = p1.props.title,
+					Text = self.props.title,
 					Font = Enum.Font.FredokaOne,
 					TextColor3 = Color3.new(255/255, 255/255, 255/255),
 					TextScaled = true
@@ -86,7 +85,7 @@ function v1.render(p1)
 					TextScaled = true,
 					Text = ">",
 					Selectable = true,
-					[Roact.Event.Activated] = p1.props.onClickNext
+					[Roact.Event.Activated] = self.props.onClickNext
 				}, {
 					Corner = createElement("UICorner", {
 						CornerRadius = UDim.new(0, 4)
@@ -96,4 +95,4 @@ function v1.render(p1)
 		})
 	})
 end
-return v1
+return selectorComponent

@@ -1,30 +1,29 @@
--- Reviewed by Claude
 return {
-	getPrimaryPart = function(p1)
-		return p1:FindFirstChild("BoundingBox") or p1.PrimaryPart
+	getPrimaryPart = function(vehicle)
+		return vehicle:FindFirstChild("BoundingBox") or vehicle.PrimaryPart
 	end,
-	setMaxLinkLength = function(p1, p2)
-		p1:SetAttribute("MaxLinkLength", p2)
+	setMaxLinkLength = function(vehicle, value)
+		vehicle:SetAttribute("MaxLinkLength", value)
 	end,
-	getMaxLinkLength = function(p1)
-		return p1:GetAttribute("MaxLinkLength")
+	getMaxLinkLength = function(vehicle)
+		return vehicle:GetAttribute("MaxLinkLength")
 	end,
-	setIsLinked = function(p1, p2)
-		p1:SetAttribute("IsLinked", p2)
+	setIsLinked = function(vehicle, value)
+		vehicle:SetAttribute("IsLinked", value)
 	end,
-	getIsLinked = function(p1)
-		return p1:GetAttribute("IsLinked")
+	getIsLinked = function(vehicle)
+		return vehicle:GetAttribute("IsLinked")
 	end,
-	getIsLinkedChangedSignal = function(p1)
-		return p1:GetAttributeChangedSignal("IsLinked")
+	getIsLinkedChangedSignal = function(vehicle)
+		return vehicle:GetAttributeChangedSignal("IsLinked")
 	end,
-	setDisabled = function(p1, p2)
-		p1:SetAttribute("LinkDisabled", p2)
+	setDisabled = function(vehicle, value)
+		vehicle:SetAttribute("LinkDisabled", value)
 	end,
-	getDisabled = function(p1)
-		return p1:GetAttribute("LinkDisabled")
+	getDisabled = function(vehicle)
+		return vehicle:GetAttribute("LinkDisabled")
 	end,
-	getDisabledChangedSignal = function(p1)
-		return p1:GetAttributeChangedSignal("LinkDisabled")
+	getDisabledChangedSignal = function(vehicle)
+		return vehicle:GetAttributeChangedSignal("LinkDisabled")
 	end
 }

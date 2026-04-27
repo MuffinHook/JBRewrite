@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Std.Promise)
 local Signal = require(ReplicatedStorage.Std.Signal)

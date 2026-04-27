@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
@@ -7,42 +6,42 @@ local ViewportFrame = require(ReplicatedStorage.EzUi.ViewportFrame)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local ScrollingGrid = require(ReplicatedStorage.EzUi.ScrollingGrid)
-local function infoComponent(p1)
-	local v1 = p1.valueColor or Color3.new(255/255, 255/255, 255/255)
-	local t2 = {}
-	local t3 = {
+local function infoComponent(props)
+	local valueColor = props.valueColor or Color3.new(255/255, 255/255, 255/255)
+	local children = {}
+	local titleProperties = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0.9, 0, 0.3, 0),
 		Position = UDim2.new(0.5, 0, 0, 0),
 		AnchorPoint = Vector2.new(0.5, 0),
-		Text = p1.title,
+		Text = props.title,
 		Font = Enum.Font.Bangers,
 		TextXAlignment = Enum.TextXAlignment.Center,
 		LineHeight = 1,
 		TextScaled = true
 	}
-	t3.TextColor3 = p1.titleColor or Color3.new(255/255, 255/255, 255/255)
-	t2.Title = createElement("TextLabel", t3)
-	t2.Value = createElement("TextLabel", {
+	titleProperties.TextColor3 = props.titleColor or Color3.new(255/255, 255/255, 255/255)
+	children.Title = createElement("TextLabel", titleProperties)
+	children.Value = createElement("TextLabel", {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0.9, 0, 0.7, 0),
 		Position = UDim2.new(0.5, 0, 0.3, 0),
 		AnchorPoint = Vector2.new(0.5, 0),
-		Text = p1.value,
+		Text = props.value,
 		Font = Enum.Font.Bangers,
 		TextXAlignment = Enum.TextXAlignment.Center,
 		LineHeight = 1,
 		TextScaled = true,
-		TextColor3 = v1
+		TextColor3 = valueColor
 	})
 	return createElement("Frame", {
 		BackgroundTransparency = 1,
-		Size = p1.size,
-		Position = p1.position
-	}, t2)
+		Size = props.size,
+		Position = props.position
+	}, children)
 end
-local v1 = Roact.PureComponent:extend("TradeCard")
-v1.defaultProps = {
+local TradeCard = Roact.PureComponent:extend("TradeCard")
+TradeCard.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	position = UDim2.new(0, 0, 0, 0),
 	cornerPixel = 8,
@@ -51,62 +50,62 @@ v1.defaultProps = {
 	number = nil,
 	isOriginalOwner = false
 }
-function v1.init(p1)
-	p1:setState({
+function TradeCard.init(props)
+	props:setState({
 		hover = false,
 		hoverInfo = false,
 		showInfo = false
 	})
-	function p1.setHoverTrue()
-		p1:setState({
+	function props.setHoverTrue()
+		props:setState({
 			hover = true
 		})
 	end
-	function p1.setHoverFalse()
-		p1:setState({
+	function props.setHoverFalse()
+		props:setState({
 			hover = false
 		})
 	end
-	function p1.setHoverInfoTrue()
-		p1:setState({
+	function props.setHoverInfoTrue()
+		props:setState({
 			hoverInfo = true
 		})
 	end
-	function p1.setHoverInfoFalse()
-		p1:setState({
+	function props.setHoverInfoFalse()
+		props:setState({
 			hoverInfo = false
 		})
 	end
 end
-function v1.render(p1)
-	local aspectRatio = p1.props.aspectRatio
-	local v3 = 10
-	local v4 = 8
-	if p1.state.showInfo then
-		v4 = v4 * 2
-		v3 = v3 * 2
+function TradeCard.render(props)
+	local aspectRatio = props.props.aspectRatio
+	local baseHeaderHeight = 10
+	local baseTitleHeight = 8
+	if props.state.showInfo then
+		baseTitleHeight = baseTitleHeight * 2
+		baseHeaderHeight = baseHeaderHeight * 2
 	end
-	local v5 = 1 / (1 - 1 / v4 - 1 / v3 - 0.05)
-	local v6 = 0.8 * aspectRatio
-	local v7 = if p1.props.showPlus then Color3.fromRGB(0, 200, 90) elseif p1.props.itemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then Color3.fromRGB(122, 212, 255) elseif p1.props.itemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then Color3.fromRGB(255, 90, 82) elseif p1.props.itemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then Color3.fromRGB(255, 213, 122) elseif p1.props.itemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then Color3.fromRGB(167, 131, 255) elseif p1.props.itemType == PlayerDataConsts.SAFE_ITEM_TYPE then Color3.fromRGB(255, 126, 191) else Color3.new(204/255, 204/255, 204/255)
-	local v15, v16, v17
-	if p1.state.hover and not p1.state.hoverInfo then
-		v15 = v7
-		v16 = v7
-		v17 = -0.2
+	local infoContainerScale = 1 / (1 - 1 / baseTitleHeight - 1 / baseHeaderHeight - 0.05)
+	local scaledItemHeight = 0.8 * aspectRatio
+	local itemColor = if props.props.showPlus then Color3.fromRGB(0, 200, 90) elseif props.props.itemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then Color3.fromRGB(122, 212, 255) elseif props.props.itemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then Color3.fromRGB(255, 90, 82) elseif props.props.itemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then Color3.fromRGB(255, 213, 122) elseif props.props.itemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then Color3.fromRGB(167, 131, 255) elseif props.props.itemType == PlayerDataConsts.SAFE_ITEM_TYPE then Color3.fromRGB(255, 126, 191) else Color3.new(204/255, 204/255, 204/255)
+	local baseItemColor, hoverColor, brightnessOffset
+	if props.state.hover and not props.state.hoverInfo then
+		baseItemColor = itemColor
+		hoverColor = itemColor
+		brightnessOffset = -0.2
 	else
-		v15 = v7
-		v16 = v7
-		v17 = 0
+		baseItemColor = itemColor
+		hoverColor = itemColor
+		brightnessOffset = 0
 	end
-	local v18 = ColorUtils.brightenBy(v16, v17)
-	local t = {}
-	if p1.props.showPlus then
-		t.Plus = createElement("Frame", {
-			BackgroundColor3 = v18,
+	local finalItemColor = ColorUtils.brightenBy(hoverColor, brightnessOffset)
+	local children = {}
+	if props.props.showPlus then
+		children.Plus = createElement("Frame", {
+			BackgroundColor3 = finalItemColor,
 			BackgroundTransparency = 0,
 			Size = UDim2.new(0.8, 0, 0.8 * aspectRatio, 0),
-			Position = UDim2.new(0.09999999999999998, 0, 1 - v6 - 0.09999999999999998, 0)
+			Position = UDim2.new(0.09999999999999998, 0, 1 - scaledItemHeight - 0.09999999999999998, 0)
 		}, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
@@ -124,26 +123,26 @@ function v1.render(p1)
 				TextColor3 = Color3.new(255/255, 255/255, 255/255)
 			})
 		})
-	elseif p1.props.blank then
-		t.Blank = createElement("Frame", {
-			BackgroundColor3 = v18,
+	elseif props.props.blank then
+		children.Blank = createElement("Frame", {
+			BackgroundColor3 = finalItemColor,
 			BackgroundTransparency = 0,
 			Size = UDim2.new(0.8, 0, 0.8 * aspectRatio, 0),
-			Position = UDim2.new(0.09999999999999998, 0, 1 - v6 - 0.09999999999999998, 0)
+			Position = UDim2.new(0.09999999999999998, 0, 1 - scaledItemHeight - 0.09999999999999998, 0)
 		}, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
 			})
 		})
-	elseif p1.state.showInfo then
-		local t2 = {
+	elseif props.state.showInfo then
+		local infoFrameProperties = {
 			BorderSizePixel = 0
 		}
-		t2.BackgroundColor3 = (p1.state.hover or p1.state.hoverInfo) and Color3.new(0.1, 0.1, 0.1) or Color3.new(0.25, 0.25, 0.25)
-		t2.Size = UDim2.new(0.15, 0, 0.15 * aspectRatio, 0)
-		t2.Position = UDim2.new(0.834375, 0, 0.015625 * aspectRatio, 0)
-		t2.ZIndex = 4
-		t.Info = createElement("Frame", t2, {
+		infoFrameProperties.BackgroundColor3 = (props.state.hover or props.state.hoverInfo) and Color3.new(0.1, 0.1, 0.1) or Color3.new(0.25, 0.25, 0.25)
+		infoFrameProperties.Size = UDim2.new(0.15, 0, 0.15 * aspectRatio, 0)
+		infoFrameProperties.Position = UDim2.new(0.834375, 0, 0.015625 * aspectRatio, 0)
+		infoFrameProperties.ZIndex = 4
+		children.Info = createElement("Frame", infoFrameProperties, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
 			}),
@@ -159,7 +158,7 @@ function v1.render(p1)
 				TextColor3 = Color3.new(255/255, 255/255, 255/255)
 			})
 		})
-		t.ClickInfo = createElement("TextButton", {
+		children.ClickInfo = createElement("TextButton", {
 			BackgroundTransparency = 1,
 			Selectable = false,
 			AutoButtonColor = false,
@@ -169,23 +168,23 @@ function v1.render(p1)
 			Size = UDim2.new(0.3, 0, 0.3 * aspectRatio, 0),
 			Position = UDim2.new(0.7, 0, 0, 0),
 			ZIndex = 4,
-			[Roact.Event.MouseEnter] = p1.setHoverInfoTrue,
-			[Roact.Event.MouseLeave] = p1.setHoverInfoFalse,
-			[Roact.Event.SelectionGained] = p1.setHoverInfoTrue,
-			[Roact.Event.SelectionLost] = p1.setHoverInfoFalse,
+			[Roact.Event.MouseEnter] = props.setHoverInfoTrue,
+			[Roact.Event.MouseLeave] = props.setHoverInfoFalse,
+			[Roact.Event.SelectionGained] = props.setHoverInfoTrue,
+			[Roact.Event.SelectionLost] = props.setHoverInfoFalse,
 			[Roact.Event.Activated] = function()
-				p1:setState({
+				props:setState({
 					showInfo = false
 				})
-				if p1.props.onCardFlipped then
-					p1.props.onCardFlipped()
+				if props.props.onCardFlipped then
+					props.props.onCardFlipped()
 				end
 			end
 		})
-		t.InfoContainer = createElement("Frame", {
+		children.InfoContainer = createElement("Frame", {
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1 / v5, 0),
-			Position = UDim2.new(0, 0, 1 - 1 / v5, 0)
+			Size = UDim2.new(1, 0, 1 / infoContainerScale, 0),
+			Position = UDim2.new(0, 0, 1 - 1 / infoContainerScale, 0)
 		}, {
 			Line = createElement("Frame", {
 				BackgroundTransparency = 0.8,
@@ -193,35 +192,35 @@ function v1.render(p1)
 				Size = UDim2.new(1, 0, 0, 1)
 			}),
 			InfoItems = createElement(ScrollingGrid, {
-				aspectRatio = v5,
+				aspectRatio = infoContainerScale,
 				paddingRatio = 64,
 				rowsPerPage = 3,
 				colsPerRow = 1,
 				component = infoComponent,
-				items = p1.props.info
+				items = props.props.info
 			})
 		})
 	else
-		if p1.props.getInst then
-			t.ViewportFrame = createElement(ViewportFrame, {
-				backgroundColor = v18,
+		if props.props.getInst then
+			children.ViewportFrame = createElement(ViewportFrame, {
+				backgroundColor = finalItemColor,
 				backgroundTransparency = 0,
-				getInst = p1.props.getInst,
-				getInstCompare = p1.props.getInstCompare,
-				updateCamera = p1.props.updateCamera,
+				getInst = props.props.getInst,
+				getInstCompare = props.props.getInstCompare,
+				updateCamera = props.props.updateCamera,
 				size = UDim2.new(0.8, 0, 0.8 * aspectRatio, 0),
-				position = UDim2.new(0.09999999999999998, 0, 1 - v6 - 0.09999999999999998, 0)
+				position = UDim2.new(0.09999999999999998, 0, 1 - scaledItemHeight - 0.09999999999999998, 0)
 			}, {
 				UICorner = createElement("UICorner", {
 					CornerRadius = UDim.new(1, 0)
 				})
 			})
 		else
-			t.ViewportFrame = createElement("Frame", {
+			children.ViewportFrame = createElement("Frame", {
 				BorderSizePixel = 0,
-				BackgroundColor3 = v18,
+				BackgroundColor3 = finalItemColor,
 				Size = UDim2.new(0.8, 0, 0.8 * aspectRatio, 0),
-				Position = UDim2.new(0.09999999999999998, 0, 1 - v6 - 0.09999999999999998, 0)
+				Position = UDim2.new(0.09999999999999998, 0, 1 - scaledItemHeight - 0.09999999999999998, 0)
 			}, {
 				UICorner = createElement("UICorner", {
 					CornerRadius = UDim.new(1, 0)
@@ -231,18 +230,18 @@ function v1.render(p1)
 					Size = UDim2.new(0.9, 0, 0.9, 0),
 					Position = UDim2.new(0.5, 0, 0.5, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
-					Image = p1.props.image
+					Image = props.props.image
 				})
 			})
 		end
-		local v22 = v18
-		local v23 = v6 * 0.5 * 0.5956993044924335
-		if p1.props.season then
-			t.Season = createElement("Frame", {
-				BackgroundColor3 = v22,
+		local accentColor = finalItemColor
+		local seasonBadgeOffset = scaledItemHeight * 0.5 * 0.5956993044924335
+		if props.props.season then
+			children.Season = createElement("Frame", {
+				BackgroundColor3 = accentColor,
 				Size = UDim2.new(0.25, 0, 0.25 * aspectRatio, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.new(0.17871698740774206, 0, 0.9 - v6 * 0.5 + v23, 0),
+				Position = UDim2.new(0.17871698740774206, 0, 0.9 - scaledItemHeight * 0.5 + seasonBadgeOffset, 0),
 				ZIndex = 3
 			}, {
 				UICorner = createElement("UICorner", {
@@ -257,7 +256,7 @@ function v1.render(p1)
 					Size = UDim2.new(0.9, 0, 0.8, 0),
 					Position = UDim2.new(0.5, 0, 0.5, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
-					Text = ("S%d"):format(p1.props.season),
+					Text = ("S%d"):format(props.props.season),
 					Font = Enum.Font.Bangers,
 					LineHeight = 1,
 					TextScaled = true,
@@ -265,13 +264,13 @@ function v1.render(p1)
 				})
 			})
 		end
-		local v24 = v6 * 0.5 * 0.9569403357322089
-		if p1.props.level then
-			t.Level = createElement("Frame", {
-				BackgroundColor3 = v22,
+		local levelBadgeOffset = scaledItemHeight * 0.5 * 0.9569403357322089
+		if props.props.level then
+			children.Level = createElement("Frame", {
+				BackgroundColor3 = accentColor,
 				Size = UDim2.new(0.2, 0, 0.2 * aspectRatio, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.new(0.3838861290982151, 0, 0.9 - v6 * 0.5 + v24, 0),
+				Position = UDim2.new(0.3838861290982151, 0, 0.9 - scaledItemHeight * 0.5 + levelBadgeOffset, 0),
 				ZIndex = 4
 			}, {
 				UICorner = createElement("UICorner", {
@@ -286,7 +285,7 @@ function v1.render(p1)
 					Size = UDim2.new(0.9, 0, 0.8, 0),
 					Position = UDim2.new(0.5, 0, 0.5, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
-					Text = ("L%d"):format(p1.props.level),
+					Text = ("L%d"):format(props.props.level),
 					Font = Enum.Font.Bangers,
 					LineHeight = 1,
 					TextScaled = true,
@@ -294,13 +293,13 @@ function v1.render(p1)
 				})
 			})
 		end
-		local t2 = {
+		local infoButtonProperties = {
 			BorderSizePixel = 0
 		}
-		t2.BackgroundColor3 = p1.state.hoverInfo and Color3.new(0.1, 0.1, 0.1) or Color3.new(0.25, 0.25, 0.25)
-		t2.Size = UDim2.new(0.15, 0, 0.15 * aspectRatio, 0)
-		t2.Position = UDim2.new(0.834375, 0, 0.015625 * aspectRatio, 0)
-		t.Info = createElement("Frame", t2, {
+		infoButtonProperties.BackgroundColor3 = props.state.hoverInfo and Color3.new(0.1, 0.1, 0.1) or Color3.new(0.25, 0.25, 0.25)
+		infoButtonProperties.Size = UDim2.new(0.15, 0, 0.15 * aspectRatio, 0)
+		infoButtonProperties.Position = UDim2.new(0.834375, 0, 0.015625 * aspectRatio, 0)
+		children.Info = createElement("Frame", infoButtonProperties, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
 			}),
@@ -316,7 +315,7 @@ function v1.render(p1)
 				TextColor3 = Color3.new(255/255, 255/255, 255/255)
 			})
 		})
-		t.ClickInfo = createElement("TextButton", {
+		children.ClickInfo = createElement("TextButton", {
 			BackgroundTransparency = 1,
 			AutoButtonColor = false,
 			BorderSizePixel = 0,
@@ -325,21 +324,21 @@ function v1.render(p1)
 			Size = UDim2.new(0.3, 0, 0.3 * aspectRatio, 0),
 			Position = UDim2.new(0.7, 0, 0, 0),
 			ZIndex = 4,
-			[Roact.Event.MouseEnter] = p1.setHoverInfoTrue,
-			[Roact.Event.MouseLeave] = p1.setHoverInfoFalse,
-			[Roact.Event.SelectionGained] = p1.setHoverInfoTrue,
-			[Roact.Event.SelectionLost] = p1.setHoverInfoFalse,
+			[Roact.Event.MouseEnter] = props.setHoverInfoTrue,
+			[Roact.Event.MouseLeave] = props.setHoverInfoFalse,
+			[Roact.Event.SelectionGained] = props.setHoverInfoTrue,
+			[Roact.Event.SelectionLost] = props.setHoverInfoFalse,
 			[Roact.Event.Activated] = function()
-				p1:setState({
+				props:setState({
 					showInfo = true
 				})
-				if p1.props.onCardFlipped then
-					p1.props.onCardFlipped()
+				if props.props.onCardFlipped then
+					props.props.onCardFlipped()
 				end
 			end
 		})
-		if p1.props.number then
-			local t3 = {
+		if props.props.number then
+			local numberFrameProperties = {
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
@@ -347,33 +346,33 @@ function v1.render(p1)
 				Position = UDim2.new(0.834375, 0, 0.85 - 0.015625 * aspectRatio, 0),
 				ZIndex = 3
 			}
-			local t4 = {}
-			local t5 = {
+			local numberChildren = {}
+			local numberTextProperties = {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5)
 			}
-			t5.Text = "#" .. tostring(p1.props.number)
-			t5.Font = Enum.Font.SourceSansBold
-			t5.TextXAlignment = Enum.TextXAlignment.Right
-			t5.LineHeight = 1
-			t5.TextScaled = true
-			t5.TextColor3 = v22
-			t4.Text = createElement("TextLabel", t5)
-			t.Number = createElement("Frame", t3, t4)
+			numberTextProperties.Text = "#" .. tostring(props.props.number)
+			numberTextProperties.Font = Enum.Font.SourceSansBold
+			numberTextProperties.TextXAlignment = Enum.TextXAlignment.Right
+			numberTextProperties.LineHeight = 1
+			numberTextProperties.TextScaled = true
+			numberTextProperties.TextColor3 = accentColor
+			numberChildren.Text = createElement("TextLabel", numberTextProperties)
+			children.Number = createElement("Frame", numberFrameProperties, numberChildren)
 		end
 	end
-	if not (p1.props.showPlus or p1.props.blank or p1.state.showInfo) or p1.state.showInfo then
-		local v30 = Color3.new(0.25, 0.25, 0.25)
-		if p1.state.showInfo then
-			v30 = Color3.new(255/255, 255/255, 255/255)
+	if not (props.props.showPlus or props.props.blank or props.state.showInfo) or props.state.showInfo then
+		local categoryTextColor = Color3.new(0.25, 0.25, 0.25)
+		if props.state.showInfo then
+			categoryTextColor = Color3.new(255/255, 255/255, 255/255)
 		end
-		t.Category = createElement("Frame", {
+		children.Category = createElement("Frame", {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
-			Size = UDim2.new(0.95, 0, 1 / v3, 0),
+			Size = UDim2.new(0.95, 0, 1 / baseHeaderHeight, 0),
 			Position = UDim2.new(0.05, 0, 0.05 * aspectRatio, 0),
 			ZIndex = 3
 		}, {
@@ -382,24 +381,24 @@ function v1.render(p1)
 				Size = UDim2.new(1, 0, 1.2, 0),
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Text = p1.props.categoryTitle,
+				Text = props.props.categoryTitle,
 				Font = Enum.Font.Bangers,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				LineHeight = 1,
 				TextScaled = true,
-				TextColor3 = v30
+				TextColor3 = categoryTextColor
 			})
 		})
-		local v32 = Color3.new(0.1, 0.1, 0.1)
-		if p1.state.showInfo then
-			v32 = Color3.new(255/255, 255/255, 255/255)
+		local titleTextColor = Color3.new(0.1, 0.1, 0.1)
+		if props.state.showInfo then
+			titleTextColor = Color3.new(255/255, 255/255, 255/255)
 		end
-		t.Title = createElement("Frame", {
+		children.Title = createElement("Frame", {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
-			Size = UDim2.new(0.95, 0, 1 / v4, 0),
-			Position = UDim2.new(0.05, 0, 1 / v3 + 0.05 * aspectRatio, 0),
+			Size = UDim2.new(0.95, 0, 1 / baseTitleHeight, 0),
+			Position = UDim2.new(0.05, 0, 1 / baseHeaderHeight + 0.05 * aspectRatio, 0),
 			ZIndex = 3
 		}, {
 			Text = createElement("TextLabel", {
@@ -407,59 +406,59 @@ function v1.render(p1)
 				Size = UDim2.new(1, 0, 1.2, 0),
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Text = p1.props.title,
+				Text = props.props.title,
 				Font = Enum.Font.Bangers,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				LineHeight = 1,
 				TextScaled = true,
-				TextColor3 = v32
+				TextColor3 = titleTextColor
 			})
 		})
 	end
-	if p1.props.selected then
-		t.Selected = createElement("ImageLabel", {
+	if props.props.selected then
+		children.Selected = createElement("ImageLabel", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0.8, 0, 0.8 * aspectRatio, 0),
-			Position = UDim2.new(0.09999999999999998, 0, 1 - v6 - 0.09999999999999998, 0),
+			Position = UDim2.new(0.09999999999999998, 0, 1 - scaledItemHeight - 0.09999999999999998, 0),
 			Image = "rbxassetid://9839329507",
 			ZIndex = 6
 		})
 	end
-	local v34 = p1.props.isOriginalOwner and Color3.fromRGB(255, 238, 152) or Color3.new(255/255, 255/255, 255/255)
-	if p1.state.showInfo then
-		v34 = v15
+	local borderColor = props.props.isOriginalOwner and Color3.fromRGB(255, 238, 152) or Color3.new(255/255, 255/255, 255/255)
+	if props.state.showInfo then
+		borderColor = baseItemColor
 	end
-	if p1.state.hover and not (p1.state.hoverInfo or p1.state.showInfo) then
-		v34 = ColorUtils.brightenBy(v34, -0.1)
+	if props.state.hover and not (props.state.hoverInfo or props.state.showInfo) then
+		borderColor = ColorUtils.brightenBy(borderColor, -0.1)
 	end
 	return createElement("TextButton", {
 		AutoButtonColor = false,
 		BorderSizePixel = 0,
 		Selectable = true,
-		Size = p1.props.size,
-		Position = p1.props.position,
-		BackgroundColor3 = v34,
+		Size = props.props.size,
+		Position = props.props.position,
+		BackgroundColor3 = borderColor,
 		Text = "",
-		[Roact.Event.MouseEnter] = p1.setHoverTrue,
-		[Roact.Event.MouseLeave] = p1.setHoverFalse,
-		[Roact.Event.SelectionGained] = p1.setHoverTrue,
-		[Roact.Event.SelectionLost] = p1.setHoverFalse,
+		[Roact.Event.MouseEnter] = props.setHoverTrue,
+		[Roact.Event.MouseLeave] = props.setHoverFalse,
+		[Roact.Event.SelectionGained] = props.setHoverTrue,
+		[Roact.Event.SelectionLost] = props.setHoverFalse,
 		[Roact.Event.Activated] = function()
-			if p1.state.showInfo then
-				p1:setState({
+			if props.state.showInfo then
+				props:setState({
 					showInfo = false
 				})
-				if p1.props.onCardFlipped then
-					p1.props.onCardFlipped()
+				if props.props.onCardFlipped then
+					props.props.onCardFlipped()
 				end
-			elseif p1.props.onClick then
-				p1.props.onClick(p1.props.index)
+			elseif props.props.onClick then
+				props.props.onClick(props.props.index)
 			end
 		end
 	}, Dictionary.merge({
 		UICorner = createElement("UICorner", {
-			CornerRadius = UDim.new(0, p1.props.cornerPixel)
+			CornerRadius = UDim.new(0, props.props.cornerPixel)
 		})
-	}, t))
+	}, children))
 end
-return v1
+return TradeCard

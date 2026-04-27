@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.ActionButton.ActionButtonService)
 local Basic = require(script.Parent.Basic)

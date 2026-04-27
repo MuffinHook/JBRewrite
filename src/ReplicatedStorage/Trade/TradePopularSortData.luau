@@ -1,9 +1,8 @@
--- Reviewed by Claude
-local t = {}
-function t.setPopularTradeItemData(p1)
-	t._popularTradeItemData = p1
+local TradePopularSortDataModule = {}
+function TradePopularSortDataModule.setPopularTradeItemData(tradeItemData)
+	TradePopularSortDataModule._popularTradeItemData = tradeItemData
 end
-function t.getPopularTradeItemData()
-	return t._popularTradeItemData
+function TradePopularSortDataModule.getPopularTradeItemData()
+	return TradePopularSortDataModule._popularTradeItemData
 end
-return t
+return TradePopularSortDataModule

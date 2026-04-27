@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
@@ -13,30 +11,30 @@ local GunShopItem = require(script.Parent.GunShopItem)
 local GunShopUtils = require(script.Parent.GunShopUtils)
 local eventSignal = nil
 local eventManager = nil
-local function SelectIfGamepad(p1)
-	EzUtils.selectIfGamepad(p1)
+local function SelectIfGamepad(guiElement)
+	EzUtils.selectIfGamepad(guiElement)
 end
-local t = {
+local GunShopUI = {
 	maid = nil,
 	currentSlider = nil
 }
-function t.init(p1)
-	eventSignal = p1.Event
-	eventManager = p1.em
+function GunShopUI.init(configData)
+	eventSignal = configData.Event
+	eventManager = configData.em
 	local GunShopGui = ReplicatedStorage.StarterGui:FindFirstChild("GunShopGui")
 	GunShopGui.Parent = LocalPlayer.PlayerGui
-	t.gui = GunShopGui
+	GunShopUI.gui = GunShopGui
 end
-function t.isOpen()
-	return t.maid ~= nil
+function GunShopUI.isOpen()
+	return GunShopUI.maid ~= nil
 end
-function t.open()
-	assert(not t.isOpen())
-	local v2 = Maid.new()
-	t.maid = v2
-	local gui = t.gui
+function GunShopUI.open()
+	assert(not GunShopUI.isOpen())
+	local uiMaid = Maid.new()
+	GunShopUI.maid = uiMaid
+	local gui = GunShopUI.gui
 	gui.Enabled = true
-	v2:GiveTask(function()
+	uiMaid:GiveTask(function()
 		gui.Enabled = false
 	end)
 	local Sidebar = gui.Container.Container.Sidebar
@@ -46,104 +44,104 @@ function t.open()
 			table.insert(list, v)
 		end
 	end
-	local function onButtonClick(p1)
-		assert(p1)
+	local function onButtonClick(categoryButton)
+		assert(categoryButton)
 		for i, v in ipairs(list) do
 			v.Image = "rbxassetid://5834230837"
 		end
-		p1.Image = "rbxassetid://5834230671"
-		local v1 = p1.Name
-		local v2 = GunShopUtils.getCategoryData(v1)
-		if not v2 then
-			error(("No data for gun shop category: %s"):format(v1))
+		categoryButton.Image = "rbxassetid://5834230671"
+		local categoryName = categoryButton.Name
+		local categoryData = GunShopUtils.getCategoryData(categoryName)
+		if not categoryData then
+			error(("No data for gun shop category: %s"):format(categoryName))
 		end
-		t.displayList(v2)
+		GunShopUI.displayList(categoryData)
 	end
 	for i, v in ipairs(list) do
-		v2:GiveTask(v.MouseButton1Down:Connect(function()
+		uiMaid:GiveTask(v.MouseButton1Down:Connect(function()
 			onButtonClick(v)
 		end))
 	end
 	onButtonClick(Sidebar.Held)
 	EzUtils.selectIfGamepad(Sidebar.Held)
-	v2:GiveTask(gui.Container.Close.MouseButton1Down:Connect(function()
-		t.close()
+	uiMaid:GiveTask(gui.Container.Close.MouseButton1Down:Connect(function()
+		GunShopUI.close()
 	end))
 end
-function t.displayList(p1)
-	local sliderInstance = GunShopSlider.new(p1)
-	t.maid.currentSlider = sliderInstance
-	sliderInstance:SetParent(t.gui.Container.Container.Main.Container)
-	for i, v in ipairs(p1) do
-		local v2
-		local v3 = v.Name
-		local v4 = ItemSystem.GetConfig(v3)
-		if not v4 then
-			error(("Missing item config for item: %s"):format(v3))
+function GunShopUI.displayList(itemList)
+	local sliderInstance = GunShopSlider.new(itemList)
+	GunShopUI.maid.currentSlider = sliderInstance
+	sliderInstance:SetParent(GunShopUI.gui.Container.Container.Main.Container)
+	for i, v in ipairs(itemList) do
+		local shouldDisplay
+		local itemName = v.Name
+		local itemConfig = ItemSystem.GetConfig(itemName)
+		if not itemConfig then
+			error(("Missing item config for item: %s"):format(itemName))
 		end
-		if not v4.Price then
-			error(("Missing price data for item: %s"):format(v3))
+		if not itemConfig.Price then
+			error(("Missing price data for item: %s"):format(itemName))
 		end
-		if not v4.ImageId then
-			error(("Missing image asset for item: %s"):format(v3))
+		if not itemConfig.ImageId then
+			error(("Missing image asset for item: %s"):format(itemName))
 		end
-		local v5 = GunShopSystem.doesPlayerOwn(v3)
-		v2 = not v4.ShopHidden or v5
-		if v2 then
-			local v6 = GunShopItem.new()
-			v6:SetName(v3, GunShopUtils.getTranslatedTitleFromName(v3))
-			v6:SetPrice(v4.Price)
-			if not v4.ImageId then
-				error(("Missing image asset for item: %s"):format(v3))
+		local isPlayerOwned = GunShopSystem.doesPlayerOwn(itemName)
+		shouldDisplay = not itemConfig.ShopHidden or isPlayerOwned
+		if shouldDisplay then
+			local gunShopItem = GunShopItem.new()
+			gunShopItem:SetName(itemName, GunShopUtils.getTranslatedTitleFromName(itemName))
+			gunShopItem:SetPrice(itemConfig.Price)
+			if not itemConfig.ImageId then
+				error(("Missing image asset for item: %s"):format(itemName))
 			end
-			v6:SetImageId(v4.ImageId)
-			if v4.ImageColor then
-				v6:SetImageColor(v4.ImageColor)
+			gunShopItem:SetImageId(itemConfig.ImageId)
+			if itemConfig.ImageColor then
+				gunShopItem:SetImageColor(itemConfig.ImageColor)
 			end
-			v6:SetLevel(v4.Level)
-			v6._maid:GiveTask(v6.onMouseButton1Down:Connect(function()
-				if v6:GetEquipped() then
-					eventSignal:FireServer("y" .. ("krhwwn"):sub(3, 3):reverse() .. "" .. "" .. ("kmadf"):sub(2, 3):reverse():reverse():reverse() .. "" .. "" .. ("xed5y4"):sub(2, 2):reverse() .. "qcz", v3)
-				elseif GunShopSystem.doesPlayerOwn(v3) then
-					eventSignal:FireServer("t" .. ("cdtv2wm"):sub(5, 5):reverse() .. "" .. "" .. ("j9gelw"):sub(4, 5):reverse():reverse():reverse() .. "y62p", v3)
+			gunShopItem:SetLevel(itemConfig.Level)
+			gunShopItem._maid:GiveTask(gunShopItem.onMouseButton1Down:Connect(function()
+				if gunShopItem:GetEquipped() then
+					eventSignal:FireServer("yhameqcz", itemName)
+				elseif GunShopSystem.doesPlayerOwn(itemName) then
+					eventSignal:FireServer("t2ley62p", itemName)
 				else
-					eventSignal:FireServer("tlcucis3", v3)
+					eventSignal:FireServer("tlcucis3", itemName)
 				end
 			end))
-			if v4.RequireAnyGamepass then
-				for i2, v7 in ipairs(v4.RequireAnyGamepass) do
-					v6:AddRequiredGamepass(v7)
+			if itemConfig.RequireAnyGamepass then
+				for i2, gampassId in ipairs(itemConfig.RequireAnyGamepass) do
+					gunShopItem:AddRequiredGamepass(gampassId)
 				end
 			end
-			if v5 then
-				v6:SetOwned(true)
+			if isPlayerOwned then
+				gunShopItem:SetOwned(true)
 			end
-			sliderInstance:AddItem(v6)
-			v6:SetLayoutOrder((v4.SortOrderPage or 0) * 100000 + v4.Price * 10)
+			sliderInstance:AddItem(gunShopItem)
+			gunShopItem:SetLayoutOrder((itemConfig.SortOrderPage or 0) * 100000 + itemConfig.Price * 10)
 		end
 	end
-	sliderInstance._maid:GiveTask(GunShopSystem.onAnyOwned:Connect(function(p1)
+	sliderInstance._maid:GiveTask(GunShopSystem.onAnyOwned:Connect(function(ownedItemName)
 		for i, v in ipairs(sliderInstance._listItem) do
-			if v:GetName() == p1 then
+			if v:GetName() == ownedItemName then
 				v:SetOwned(true)
 				return
 			end
 		end
 	end))
-	local function handleInventoryItemAdded(p1)
-		if p1:GetOwner() == LocalPlayer then
+	local function handleInventoryItemAdded(inventoryItem)
+		if inventoryItem:GetOwner() == LocalPlayer then
 			for i, v in ipairs(sliderInstance._listItem) do
-				if v:GetName() == p1:GetName() then
+				if v:GetName() == inventoryItem:GetName() then
 					v:SetEquipped(true)
 					return
 				end
 			end
 		end
 	end
-	local function handleInventoryItemRemoved(p1)
-		if p1:GetOwner() == LocalPlayer then
+	local function handleInventoryItemRemoved(inventoryItem)
+		if inventoryItem:GetOwner() == LocalPlayer then
 			for i, v in ipairs(sliderInstance._listItem) do
-				if v:GetName() == p1:GetName() then
+				if v:GetName() == inventoryItem:GetName() then
 					v:SetEquipped(false)
 					return
 				end
@@ -156,10 +154,10 @@ function t.displayList(p1)
 	end
 	sliderInstance._maid:GiveTask(InventoryItemBinder:GetClassRemovingSignal():Connect(handleInventoryItemRemoved))
 end
-function t.close()
-	assert(t.isOpen())
-	local maid = t.maid
-	t.maid = nil
+function GunShopUI.close()
+	assert(GunShopUI.isOpen())
+	local maid = GunShopUI.maid
+	GunShopUI.maid = nil
 	maid:Destroy()
 end
-return t
+return GunShopUI

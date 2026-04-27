@@ -1,36 +1,35 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WindowTint = require(ReplicatedStorage.Game.Garage.StoreData.WindowTint)
 return {
-	getInstance = function(p1)
+	getInstance = function(tintConfig)
 		local Part = Instance.new("Part")
 		Part.Shape = Enum.PartType.Ball
 		Part.Size = Vector3.new(4, 4, 4)
 		Part.TopSurface = 0
 		Part.BottomSurface = 0
-		Part.Color = Color3.new(p1.Value, p1.Value, p1.Value)
+		Part.Color = Color3.new(tintConfig.Value, tintConfig.Value, tintConfig.Value)
 		Part.Anchored = true
 		Part.CFrame = CFrame.new()
 		return Part
 	end,
-	updateCamera = function(p1, p2)
+	updateCamera = function(camera, p2)
 		local progress = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, progress % 6.283185307179586, 0) * CFrame.Angles(math.sin(progress) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+		camera.CFrame = CFrame.Angles(0, progress % 6.283185307179586, 0) * CFrame.Angles(math.sin(progress) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 	end,
 	getItems = function()
 		return WindowTint.Items
 	end,
-	apply = function(p1, p2)
-		local Windows = p2:FindFirstChild("Windows")
+	apply = function(tintConfig, targetModel)
+		local Windows = targetModel:FindFirstChild("Windows")
 		if Windows then
 			local count = 0
-			for progress, v2 in Windows:GetChildren() do
-				if v2:IsA("BasePart") then
+			for index, windowPart in Windows:GetChildren() do
+				if windowPart:IsA("BasePart") then
 					count = count + 1
-					if p1 and not p1.None then
-						v2.Transparency = p1.Value
+					if tintConfig and not tintConfig.None then
+						windowPart.Transparency = tintConfig.Value
 					else
-						v2.Transparency = v2:GetAttribute("OriginalTransparency")
+						windowPart.Transparency = windowPart:GetAttribute("OriginalTransparency")
 					end
 				end
 			end

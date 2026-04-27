@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local function prettyPrintValue(value, indentLevel)
 	local indentSize = indentLevel or 0
 	local resultParts = {}

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local prettyPrint = require(script.Parent.prettyPrint)
 local loggerMiddleware = {
 	outputFunction = print

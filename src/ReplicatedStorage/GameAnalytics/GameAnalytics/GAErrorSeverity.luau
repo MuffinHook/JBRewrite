@@ -1,10 +1,9 @@
--- Reviewed by Claude
-local function readonlytable(p1)
+local function readonlytable(sourceTable)
 	return setmetatable({}, {
-		__index = p1,
+		__index = sourceTable,
 		__metatable = false,
-		__newindex = function(p1, p2, p3)
-			error("Attempt to modify read-only table: " .. p1 .. ", key=" .. p2 .. ", value=" .. p3)
+		__newindex = function(readonlyTable, attemptedKey, attemptedValue)
+			error("Attempt to modify read-only table: " .. readonlyTable .. ", key=" .. attemptedKey .. ", value=" .. attemptedValue)
 		end
 	})
 end

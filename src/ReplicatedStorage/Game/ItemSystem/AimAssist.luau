@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -28,22 +26,22 @@ local function canAimAssist()
 		return InputUtils.isGamepad() and os.clock() - lastMouseInputTime > 10 and true or false
 	end
 end
-local function hasLineOfSight(p1, p2)
+local function hasLineOfSight(targetCharacter, rayDirection)
 	local Position = workspace.CurrentCamera.CFrame.Position
 	local raycastParams = RaycastParams.new()
 	raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 	raycastParams.RespectCanCollide = true
 	raycastParams.FilterDescendantsInstances = { Players.LocalPlayer.Character, workspace.Items }
 	raycastParams.IgnoreWater = true
-	local raycastResult = workspace:Raycast(Position, p2 - Position, raycastParams)
+	local raycastResult = workspace:Raycast(Position, rayDirection - Position, raycastParams)
 	if raycastResult then
-		return raycastResult.Instance:IsDescendantOf(p1)
+		return raycastResult.Instance:IsDescendantOf(targetCharacter)
 	else
 		return true
 	end
 end
 return {
-	aimAssist = function(p1, p2)
+	aimAssist = function(userInputService, stopCallback)
 		local taskMaid = Maid.new()
 		local CurrentCamera = workspace.CurrentCamera
 		local isAimbot = Players.LocalPlayer:GetAttribute("AimbotEnabled") == true
@@ -53,26 +51,26 @@ return {
 		local function findBestCharacter()
 			local targets = {}
 			local processedCharacters = {}
-			local function handleCharacter(p1)
-				if processedCharacters[p1] then
+			local function handleCharacter(character)
+				if processedCharacters[character] then
 					return
 				end
-				processedCharacters[p1] = true
-				local Humanoid = p1:FindFirstChild("Humanoid")
+				processedCharacters[character] = true
+				local Humanoid = character:FindFirstChild("Humanoid")
 				if Humanoid then
-					if Humanoid.Health == 0 or p1 == Players.LocalPlayer.Character then
+					if Humanoid.Health == 0 or character == Players.LocalPlayer.Character then
 						return
 					end
-					local player = Players:GetPlayerFromCharacter(p1)
+					local player = Players:GetPlayerFromCharacter(character)
 					if player and PlayerUtils.getTeam(player) == PlayerUtils.getTeam(Players.LocalPlayer) then
 						return
 					end
-					local PrimaryPart = p1.PrimaryPart
+					local PrimaryPart = character.PrimaryPart
 					if PrimaryPart then
-						local Head = p1:FindFirstChild("Head")
+						local Head = character:FindFirstChild("Head")
 						local headOffset = if Head then (Head.Position - PrimaryPart.Position) * Vector3.new(0, 1, 0) / 2 else Vector3.new(0, 0, 0)
 						local targetPosition = PrimaryPart.CFrame * headOffset
-						if hasLineOfSight(p1, targetPosition) then
+						if hasLineOfSight(character, targetPosition) then
 							table.insert(targets, {
 								humanoid = Humanoid,
 								part = PrimaryPart,
@@ -84,11 +82,11 @@ return {
 					end
 				end
 			end
-			for v1, v2 in CollectionService:GetTagged("Humanoid") do
-				handleCharacter(v2.Parent)
+			for tagName, humanoidInstance in CollectionService:GetTagged("Humanoid") do
+				handleCharacter(humanoidInstance.Parent)
 			end
-			table.sort(targets, function(p1, p2)
-				return p1.dot > p2.dot
+			table.sort(targets, function(targetA, targetB)
+				return targetA.dot > targetB.dot
 			end)
 			for i = 1, #targets do
 				local targetData = targets[i]
@@ -103,7 +101,7 @@ return {
 			local part = bestTarget.part
 			taskMaid:GiveTask(RunService.RenderStepped:Connect(function(deltaTime)
 				local targetLookCFrame = CFrame.lookAt(CurrentCamera.CFrame.Position, part.CFrame * bestTarget.offset)
-				local mouseLocation = p1:GetMouseLocation()
+				local mouseLocation = userInputService:GetMouseLocation()
 				local viewportRay = CurrentCamera:ViewportPointToRay(mouseLocation.X, mouseLocation.Y, 0)
 				local crossProduct = viewportRay.Direction:Cross(CurrentCamera.CFrame.LookVector)
 				local alignment = viewportRay.Direction:Dot(CurrentCamera.CFrame.LookVector)
@@ -113,7 +111,7 @@ return {
 				local targetPosition = part.CFrame * bestTarget.offset
 				if hasLineOfSight(part.Parent, targetPosition) then
 					if (Players.LocalPlayer.Character:GetPivot().Position - targetPosition).Magnitude > 100 then
-						p2()
+						stopCallback()
 						return
 					end
 					local lerpAlpha = 1 - math.exp(-9 * deltaTime)
@@ -123,13 +121,13 @@ return {
 					CurrentCamera.CFrame = CurrentCamera.CFrame:Lerp(targetLookCFrame, lerpAlpha)
 					if if Players.LocalPlayer:GetAttribute("AimbotEnabled") then true else InputUtils.isGamepad() and os.clock() - lastMouseInputTime > 10 and true or false then
 						if bestTarget.humanoid.Health == 0 or not part:IsDescendantOf(workspace) then
-							p2()
+							stopCallback()
 						end
 					else
-						p2()
+						stopCallback()
 					end
 				else
-					p2()
+					stopCallback()
 				end
 			end))
 			return taskMaid

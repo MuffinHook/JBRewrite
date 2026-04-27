@@ -1,6 +1,5 @@
--- Reviewed by Claude
 return {
-	frame = function(p1)
+	frame = function(parent)
 		local Frame = Instance.new("ScrollingFrame")
 		Frame.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
 		Frame.BackgroundTransparency = 1
@@ -14,7 +13,7 @@ return {
 		Frame.Selectable = false
 		Frame.Size = UDim2.new(1, 0, 1, 0)
 		Frame.Visible = false
-		Frame.Parent = p1
+		Frame.Parent = parent
 		local UIListLayout = Instance.new("UIListLayout")
 		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 		UIListLayout.Parent = Frame
@@ -81,7 +80,7 @@ return {
 		TextLabel.Parent = Entry
 		return Frame
 	end,
-	autocomplete = function(p1)
+	autocomplete = function(parent)
 		local Autocomplete = Instance.new("ScrollingFrame")
 		Autocomplete.CanvasSize = UDim2.new()
 		Autocomplete.AutomaticCanvasSize = Enum.AutomaticSize.Y
@@ -92,7 +91,7 @@ return {
 		Autocomplete.Position = UDim2.new(0, 167, 0, 75)
 		Autocomplete.Size = UDim2.new(0, 200, 0, 200)
 		Autocomplete.Visible = false
-		Autocomplete.Parent = p1
+		Autocomplete.Parent = parent
 		local UIListLayout = Instance.new("UIListLayout")
 		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 		UIListLayout.Parent = Autocomplete

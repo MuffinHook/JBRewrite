@@ -58,8 +58,8 @@ return function()
 			local word, updateWord = Binding.create("hi")
 
 			local wordLength = word:map(string.len)
-			local isEvenLength = wordLength:map(function(value)
-				return value % 2 == 0
+			local isEvenLength = wordLength:map(function(currentValue)
+				return currentValue % 2 == 0
 			end)
 
 			expect(word:getValue()).to.equal("hi")
@@ -87,8 +87,8 @@ return function()
 			local disconnectLength = Binding.subscribe(length, lengthSpy.value)
 
 			-- binding -> binding -> base binding
-			local isEvenLength = length:map(function(value)
-				return value % 2 == 0
+			local isEvenLength = length:map(function(currentValue)
+				return currentValue % 2 == 0
 			end)
 
 			local isEvenLengthSpy = createSpy()
@@ -122,8 +122,8 @@ return function()
 
 		it("should throw when updated directly", function()
 			local source = Binding.create(1)
-			local mapped = source:map(function(v)
-				return v
+			local mapped = source:map(function(currentValue)
+				return currentValue
 			end)
 
 			expect(function()

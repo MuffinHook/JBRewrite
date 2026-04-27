@@ -1,13 +1,11 @@
--- Reviewed by Claude
--- variables reassigned
 return {
 	isStringNullOrEmpty = function(self, inputString)
 		return not inputString or #inputString == 0
 	end,
 	stringArrayContainsString = function(self, stringArray, searchString)
 		if #stringArray ~= 0 then
-			for i, v in ipairs(stringArray) do
-				if v == searchString then
+			for index, currentString in ipairs(stringArray) do
+				if currentString == searchString then
 					return true
 				end
 			end

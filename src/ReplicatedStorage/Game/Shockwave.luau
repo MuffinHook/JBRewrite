@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local CurrentCamera = workspace.CurrentCamera
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local RunService = game:GetService("RunService")

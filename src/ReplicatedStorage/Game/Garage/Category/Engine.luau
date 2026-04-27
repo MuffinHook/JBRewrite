@@ -1,4 +1,3 @@
--- Reviewed by Claude
-return function(p1)
-	return if p1.Type == "Chassis" or p1.Type == "DuneBuggy" then true else p1.Type == "Motorcycle"
+return function(vehicle)
+	return if vehicle.Type == "Chassis" or vehicle.Type == "DuneBuggy" then true else vehicle.Type == "Motorcycle"
 end

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 game:GetService("Players")
 game:GetService("Chat")
 local RunService = game:GetService("RunService")
@@ -10,27 +8,27 @@ if RunService:IsServer() then
 else
 	serverAdoptionUtils = nil
 end
-local function GetFilteredLicensePlate(p1, p2)
-	local cleanedPlate = p2:upper():gsub("[^%w%s]", ""):sub(1, 7)
+local function GetFilteredLicensePlate(playerDriver, plateName)
+	local cleanedPlate = plateName:upper():gsub("[^%w%s]", ""):sub(1, 7)
 	if #cleanedPlate ~= 0 then
-		local filteredPlateText = serverAdoptionUtils.getFilteredDogName(p1, cleanedPlate)
+		local filteredPlateText = serverAdoptionUtils.getFilteredDogName(playerDriver, cleanedPlate)
 		if filteredPlateText and #filteredPlateText ~= 0 then
 			return filteredPlateText
 		end
 	end
 end
-return function(p1, p2)
+return function(vehicleData, vehicleConfig)
 	if RunService:IsClient() then
 		warn("LICENSE PLATE CUSTOMIZE SHOULD NOT BE RUN LOCALLY!", debug.traceback())
 	else
-		local Type = p2.Type
-		local Make = p2.Make
-		local Driver = p2.Driver
-		local Model_2 = p2.Model:FindFirstChild("Model")
-		if Model_2 then
-			local plate = Model_2:FindFirstChild("plate")
-			if plate and (p1 and Driver) and plate.SurfaceGui.Frame.TextLabel.Text ~= p1.Name then
-				local filteredPlate = GetFilteredLicensePlate(Driver, p1.Name)
+		local Type = vehicleConfig.Type
+		local Make = vehicleConfig.Make
+		local playerDriver = vehicleConfig.Driver
+		local modelPart = vehicleConfig.Model:FindFirstChild("Model")
+		if modelPart then
+			local plate = modelPart:FindFirstChild("plate")
+			if plate and (vehicleData and playerDriver) and plate.SurfaceGui.Frame.TextLabel.Text ~= vehicleData.Name then
+				local filteredPlate = GetFilteredLicensePlate(playerDriver, vehicleData.Name)
 				if filteredPlate then
 					plate.SurfaceGui.Frame.TextLabel.Text = filteredPlate
 				end

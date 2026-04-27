@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Window = require(ReplicatedStorage.Module.Window.Window)

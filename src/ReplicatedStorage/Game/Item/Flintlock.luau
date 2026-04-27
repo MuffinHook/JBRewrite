@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Joint = require(ReplicatedStorage.Std.Joint)
@@ -7,17 +5,17 @@ local Spring = require(ReplicatedStorage.Std.Spring)
 local RayCast = require(ReplicatedStorage.Module.RayCast)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local Gun = require(script.Parent.Gun)
-local v2 = CFrame.new()
-local function FromAxisAngle(p1)
-	local X = p1.X
-	local Y = p1.Y
-	local Z = p1.Z
-	local v1 = (X * X + Y * Y + Z * Z) ^ 0.5
-	if v1 > 0.00001 then
-		local v22 = math.sin(v1 * 0.5) / v1
-		return CFrame.new(0, 0, 0, v22 * X, v22 * Y, v22 * Z, (math.cos(v1 * 0.5)))
+local identityCFrame = CFrame.new()
+local function FromAxisAngle(axisAngle)
+	local X = axisAngle.X
+	local Y = axisAngle.Y
+	local Z = axisAngle.Z
+	local magnitude = (X * X + Y * Y + Z * Z) ^ 0.5
+	if magnitude > 0.00001 then
+		local sinHalf = math.sin(magnitude * 0.5) / magnitude
+		return CFrame.new(0, 0, 0, sinHalf * X, sinHalf * Y, sinHalf * Z, (math.cos(magnitude * 0.5)))
 	else
-		return v2
+		return identityCFrame
 	end
 end
 local t = {
@@ -25,65 +23,65 @@ local t = {
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.new(p1, p2, p3)
-	local v1 = Gun.new(p1, p2, p3)
-	setmetatable(v1, t)
-	v1:Setup(p3)
-	return v1
+function t.new(model, config, gunConfig)
+	local self = Gun.new(model, config, gunConfig)
+	setmetatable(self, t)
+	self:Setup(gunConfig)
+	return self
 end
-function t.SetupModel(p1)
-	Gun.SetupModel(p1)
-	local Lever = p1.Model.Motion.Lever
-	local v1 = Joint.Motor(Lever, p1.BoundingBox)
+function t.SetupModel(self)
+	Gun.SetupModel(self)
+	local Lever = self.Model.Motion.Lever
+	local motorLever = Joint.Motor(Lever, self.BoundingBox)
 	Lever.Anchored = false
-	local v2 = Spring.new(Vector3.new(0, 0, 0), Vector3.new(), 0.8, 20)
-	local v3 = Spring.new(0, 0, 0.9, 20)
-	p1.MotorLever = v1
-	p1.SpringLever = v2
-	p1.SpringKnockback = v3
+	local leverSpring = Spring.new(Vector3.new(0, 0, 0), Vector3.new(), 0.8, 20)
+	local knockbackSpring = Spring.new(0, 0, 0.9, 20)
+	self.MotorLever = motorLever
+	self.SpringLever = leverSpring
+	self.SpringKnockback = knockbackSpring
 end
-function t.UpdateItemSprings(p1)
-	Gun.UpdateItemSprings(p1)
-	p1.LeverPosition = p1.SpringLever:Update()
-	p1.KnockbackPosition = p1.SpringKnockback:Update()
+function t.UpdateItemSprings(self)
+	Gun.UpdateItemSprings(self)
+	self.LeverPosition = self.SpringLever:Update()
+	self.KnockbackPosition = self.SpringKnockback:Update()
 end
 local lastUpdateTime = os.clock()
-function t.UpdateItemJoints(p1)
-	Gun.UpdateItemJoints(p1)
-	p1.MotorLever.C1 = FromAxisAngle(p1.LeverPosition)
-	if p1.KnockbackPosition > 0.1 and not (VehicleUtils.GetLocalVehiclePacket() or p1.Humanoid.Sit) then
-		p1.RootPart.CFrame = p1.RootPart.CFrame * CFrame.new(0, 0, p1.KnockbackPosition * 60 * (os.clock() - lastUpdateTime))
+function t.UpdateItemJoints(self)
+	Gun.UpdateItemJoints(self)
+	self.MotorLever.C1 = FromAxisAngle(self.LeverPosition)
+	if self.KnockbackPosition > 0.1 and not (VehicleUtils.GetLocalVehiclePacket() or self.Humanoid.Sit) then
+		self.RootPart.CFrame = self.RootPart.CFrame * CFrame.new(0, 0, self.KnockbackPosition * 60 * (os.clock() - lastUpdateTime))
 	end
 	lastUpdateTime = os.clock()
 end
-function t.SetupArmWelds(p1)
-	Joint.Weld(p1.Model.Skeleton.RightArm, p1.BoundingBox)
-	p1.Model.Skeleton.RightArm.Anchored = false
+function t.SetupArmWelds(self)
+	Joint.Weld(self.Model.Skeleton.RightArm, self.BoundingBox)
+	self.Model.Skeleton.RightArm.Anchored = false
 end
-function t.UpdateArmIK(p1)
-	local IK = p1.IK
-	IK.RightArm = p1.Model.Skeleton.RightArm.Position
-	IK.RightAngle = p1.Config.Motion.RightElbowAngle
+function t.UpdateArmIK(self)
+	local IK = self.IK
+	IK.RightArm = self.Model.Skeleton.RightArm.Position
+	IK.RightAngle = self.Config.Motion.RightElbowAngle
 end
-function t.ShootSound(p1, p2)
-	if not p2 then
-		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.flintlock_shoot, {
+function t.ShootSound(self, isRemote)
+	if not isRemote then
+		Audio.ObjectLocal(self.Tip, self.Config.Sound.flintlock_shoot, {
 			Pitch = 0.7,
 			Volume = 0.7
 		})
-		p1.SpringLever:Accelerate(Vector3.new(30, 0, 0))
-		if RayCast.RayIgnoreNonCollide(p1.RootPart.Position, -p1.RootPart.CFrame.LookVector, 5, p1.Character) == nil then
-			p1.SpringKnockback:Accelerate(50)
+		self.SpringLever:Accelerate(Vector3.new(30, 0, 0))
+		if RayCast.RayIgnoreNonCollide(self.RootPart.Position, -self.RootPart.CFrame.LookVector, 5, self.Character) == nil then
+			self.SpringKnockback:Accelerate(50)
 		end
 	end
 end
-function t.ReloadDropAmmoSound(p1)
-	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.flintlock_reload_open, {
+function t.ReloadDropAmmoSound(self)
+	Audio.ObjectLocal(self.Tip, self.Config.Sound.flintlock_reload_open, {
 		RollOffMaxDistance = 129
 	})
 end
-function t.ReloadRefillAmmoSound(p1)
-	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.flintlock_reload_close, {
+function t.ReloadRefillAmmoSound(self)
+	Audio.ObjectLocal(self.Tip, self.Config.Sound.flintlock_reload_close, {
 		RollOffMaxDistance = 129
 	})
 end

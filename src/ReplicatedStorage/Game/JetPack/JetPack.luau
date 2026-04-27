@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerModule = nil
@@ -70,7 +69,7 @@ local function CheckThreads()
 		return false
 	end
 end
-local function Stepped(_, dt)
+local function Stepped(_, deltaTime)
 	local shouldReturn
 	if ThreadsRunning == false then
 		shouldReturn = true
@@ -89,10 +88,10 @@ local function Stepped(_, dt)
 		return false
 	end
 	for i = #Packets, 1, -1 do
-		JetPack.Stepped(Packets[i], dt)
+		JetPack.Stepped(Packets[i], deltaTime)
 	end
 end
-local function Heartbeat(dt)
+local function Heartbeat(deltaTime)
 	local shouldReturn
 	if ThreadsRunning == false then
 		shouldReturn = true
@@ -111,7 +110,7 @@ local function Heartbeat(dt)
 		return false
 	end
 	for i = #Packets, 1, -1 do
-		JetPack.Heartbeat(Packets[i], dt)
+		JetPack.Heartbeat(Packets[i], deltaTime)
 	end
 end
 local function StartThreads()
@@ -185,7 +184,7 @@ function JetPack.Equip(player, fuelData)
 					SteppedConn = RunService.Heartbeat:Connect(Heartbeat)
 				end
 				if player == LocalPlayer then
-					Event:FireServer("e" .. ("sf63ffuh6"):sub(5, 6):reverse():reverse():reverse() .. "" .. "" .. ("ccrw"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "lru")
+					Event:FireServer("effrclru")
 				end
 				return packet
 			else
@@ -224,9 +223,9 @@ function JetPack.EquipLocal(packet)
 		local localPlayer = Players.LocalPlayer
 		local foundPacket = nil
 		for i = #Packets, 1, -1 do
-			local p = Packets[i]
-			if p.Player == localPlayer then
-				foundPacket = p
+			local jetPacket = Packets[i]
+			if jetPacket.Player == localPlayer then
+				foundPacket = jetPacket
 				break
 			end
 		end
@@ -291,7 +290,7 @@ function JetPack.Unequip(player)
 			JetPack.UnequipLocal(foundPacket)
 		end
 		if player == LocalPlayer then
-			Event:FireServer("a" .. ("acbuq"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "3zo4do")
+			Event:FireServer("ab3zo4do")
 		end
 	end
 	return nil
@@ -331,13 +330,13 @@ function JetPack.UpdateJoints(packet, thrustBlend)
 	Character.RightLowerLeg.RightKnee.Transform = CFrame.Angles(math.pi * thrustBlend * -0.3, 0, 0)
 	Character.LeftLowerLeg.LeftKnee.Transform = CFrame.Angles(math.pi * thrustBlend * -0.3, 0, 0)
 end
-function JetPack.Stepped(packet, dt)
+function JetPack.Stepped(packet, deltaTime)
 	local Humanoid = packet.Humanoid
 	if Humanoid.Health <= 0 then
 		JetPack.Unequip(packet.Player)
 	elseif Humanoid:IsDescendantOf(workspace) then
 		if packet.Player == LocalPlayer then
-			JetPack.SteppedLocal(packet, dt)
+			JetPack.SteppedLocal(packet, deltaTime)
 		else
 			JetPack.UpdateJoints(packet, (math.clamp(packet.RootPart.Velocity.Magnitude / 20, 0, 1)))
 		end
@@ -345,27 +344,27 @@ function JetPack.Stepped(packet, dt)
 		JetPack.Unequip(packet.Player)
 	end
 end
-function JetPack.SteppedLocal(packet, dt)
+function JetPack.SteppedLocal(packet, deltaTime)
 	JetPack.UpdateJoints(packet, packet.MovingSpring:Update() * 0.5 + 0.5)
 	for i, zone in ipairs(NoFlyZones) do
 		zone.Region:Update({ LocalPlayer })
 	end
 end
-function JetPack.Heartbeat(packet, dt)
+function JetPack.Heartbeat(packet, deltaTime)
 	local Humanoid = packet.Humanoid
 	if Humanoid.Health <= 0 then
 		JetPack.Unequip(packet.Player)
 	elseif Humanoid:IsDescendantOf(workspace) then
 		packet.SoundThrust.Volume = packet.SoundThrust.Volume + (packet.SoundThrustVolumeTarget - packet.SoundThrust.Volume) * 0.1
 		if packet.Player == LocalPlayer then
-			JetPack.HeartbeatLocal(packet, dt)
+			JetPack.HeartbeatLocal(packet, deltaTime)
 		end
 	else
 		JetPack.Unequip(packet.Player)
 	end
 end
 local ThrustAccelTween = AccelTween.new(80)
-function JetPack.HeartbeatLocal(packet, dt)
+function JetPack.HeartbeatLocal(packet, deltaTime)
 	local now = tick()
 	local moveVector = PlayerModule:GetControls():GetMoveVector()
 	local _, _2, _3, _4, m12, m13, _5, m22, m23, _6, m32, m33 = CurrentCamera.CFrame:GetComponents()
@@ -403,7 +402,7 @@ function JetPack.HeartbeatLocal(packet, dt)
 			ThrustAccelTween.t = targetSpeed
 		end
 	end
-	packet.BodyVelocity.Velocity = Velocity + (Vector3.new(0, -2746.8, 0) + Vector3.new(dragScale * -4 * 0.5 * Velocity.x * abs(Velocity.x), -6 * Velocity.y * abs(Velocity.y), dragScale * -4 * 0.5 * Velocity.z * abs(Velocity.z)) + RootPart.CFrame.UpVector * (14 * ThrustAccelTween.p)) / 14 * dt
+	packet.BodyVelocity.Velocity = Velocity + (Vector3.new(0, -2746.8, 0) + Vector3.new(dragScale * -4 * 0.5 * Velocity.x * abs(Velocity.x), -6 * Velocity.y * abs(Velocity.y), dragScale * -4 * 0.5 * Velocity.z * abs(Velocity.z)) + RootPart.CFrame.UpVector * (14 * ThrustAccelTween.p)) / 14 * deltaTime
 	local groundHit, groundPos = RayCast.RayIgnoreNonCollide(RootPart.Position, Vector3.new(0, -1, 0), 20, LocalPlayer.Character)
 	if groundHit ~= nil and (packet.IsThrusting and (now - packet.GroundSmokeLastEmit > 0.05 and packet.LastCF)) then
 		packet.GroundSmokeRight.CFrame = CFrame.new(groundPos.x, groundPos.y + 1, groundPos.z) + packet.LastCF * Vector3.new(2, 0, 0)
@@ -418,7 +417,7 @@ function JetPack.HeartbeatLocal(packet, dt)
 			JetPack.Unequip(LocalPlayer)
 		end
 	end
-	JetPack.LocalFuel = JetPack.LocalFuel - dt * if packet.IsThrusting then 1 else 0.3333333333333333
+	JetPack.LocalFuel = JetPack.LocalFuel - deltaTime * if packet.IsThrusting then 1 else 0.3333333333333333
 	if JetPack.LocalFuel < 0 then
 		JetPack.LocalFuel = 0
 		JetPack.Unequip(packet.Player)
@@ -448,9 +447,9 @@ function JetPack.StartThrust(player)
 	assert(player)
 	local packet = nil
 	for i = #Packets, 1, -1 do
-		local p = Packets[i]
-		if p.Player == player then
-			packet = p
+		local currentPacket = Packets[i]
+		if currentPacket.Player == player then
+			packet = currentPacket
 			break
 		end
 	end
@@ -466,7 +465,7 @@ function JetPack.StartThrust(player)
 		packet.SoundThrustVolumeTarget = 0.3
 		JetPack.SetThrustVisual(packet, 1)
 		if player == LocalPlayer then
-			Event:FireServer("d" .. ("pxq1r0o"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("mqf90gsik"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("jey2y"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("u1kn4n3a"):sub(4, 5):reverse() .. "e")
+			Event:FireServer("d0r024ne")
 		end
 	end
 end
@@ -474,9 +473,9 @@ function JetPack.StopThrust(player)
 	assert(player)
 	local packet = nil
 	for i = #Packets, 1, -1 do
-		local p = Packets[i]
-		if p.Player == player then
-			packet = p
+		local currentPacket = Packets[i]
+		if currentPacket.Player == player then
+			packet = currentPacket
 			break
 		end
 	end
@@ -486,7 +485,7 @@ function JetPack.StopThrust(player)
 		packet.SoundThrustVolumeTarget = 0.05
 		JetPack.SetThrustVisual(packet, 0.3)
 		if player == LocalPlayer then
-			Event:FireServer("m" .. ("gplxj1n5"):sub(2, 6):reverse():reverse():reverse():reverse():reverse() .. "0h")
+			Event:FireServer("m1jxlp0h")
 		end
 	end
 end
@@ -494,9 +493,9 @@ local function IsFlying()
 	local localPlayer = LocalPlayer
 	local packet = nil
 	for i = #Packets, 1, -1 do
-		local p = Packets[i]
-		if p.Player == localPlayer then
-			packet = p
+		local currentPacket = Packets[i]
+		if currentPacket.Player == localPlayer then
+			packet = currentPacket
 			break
 		end
 	end
@@ -506,9 +505,9 @@ local function IsThrusting()
 	local localPlayer = LocalPlayer
 	local packet = nil
 	for i = #Packets, 1, -1 do
-		local p = Packets[i]
-		if p.Player == localPlayer then
-			packet = p
+		local currentPacket = Packets[i]
+		if currentPacket.Player == localPlayer then
+			packet = currentPacket
 			break
 		end
 	end
@@ -524,9 +523,9 @@ local function OnJump()
 		local localPlayer = LocalPlayer
 		local packet = nil
 		for i = #Packets, 1, -1 do
-			local p = Packets[i]
-			if p.Player == localPlayer then
-				packet = p
+			local currentPacket = Packets[i]
+			if currentPacket.Player == localPlayer then
+				packet = currentPacket
 				break
 			end
 		end
@@ -550,9 +549,9 @@ local function jumpReleased()
 	local localPlayer = LocalPlayer
 	local packet = nil
 	for i = #Packets, 1, -1 do
-		local p = Packets[i]
-		if p.Player == localPlayer then
-			packet = p
+		local currentPacket = Packets[i]
+		if currentPacket.Player == localPlayer then
+			packet = currentPacket
 			break
 		end
 	end
@@ -564,9 +563,9 @@ local function Stunned()
 	local localPlayer = LocalPlayer
 	local packet = nil
 	for i = #Packets, 1, -1 do
-		local p = Packets[i]
-		if p.Player == localPlayer then
-			packet = p
+		local currentPacket = Packets[i]
+		if currentPacket.Player == localPlayer then
+			packet = currentPacket
 			break
 		end
 	end
@@ -584,28 +583,28 @@ return {
 		Falling.OnRagdolled:Connect(function()
 			JetPack.Unequip(LocalPlayer)
 		end)
-		local em = initData.em
+		local eventManager = initData.em
 		Event = initData.Event
-		function em.OnEquipJetPack(player, fuelData)
+		function eventManager.OnEquipJetPack(player, fuelData)
 			assert(player)
 			JetPack.Equip(player, fuelData)
 		end
-		function em.OnUnequipJetPack(player)
+		function eventManager.OnUnequipJetPack(player)
 			assert(player)
 			JetPack.Unequip(player)
 		end
-		function em.OnStartThrust(player)
+		function eventManager.OnStartThrust(player)
 			assert(player)
 			JetPack.StartThrust(player)
 		end
-		function em.OnStopThrust(player)
+		function eventManager.OnStopThrust(player)
 			assert(player)
 			JetPack.StopThrust(player)
 		end
 		local hasJetPack = false
 		local jumpPressedConn = nil
 		local jumpReleasedConn = nil
-		function em.OnInitializeJetPack()
+		function eventManager.OnInitializeJetPack()
 			assert(hasJetPack == false)
 			jumpPressedConn = DefaultActions.onJumpPressed:Connect(jumpPressed)
 			jumpReleasedConn = DefaultActions.onJumpReleased:Connect(jumpReleased)
@@ -613,7 +612,7 @@ return {
 			JetPack.LocalFuel = JetPack.LocalMaxFuel
 			JetPack.UpdateFuel()
 		end
-		function em.OnRemoveJetPack()
+		function eventManager.OnRemoveJetPack()
 			assert(hasJetPack == true)
 			jumpPressedConn:Disconnect()
 			jumpPressedConn = nil
@@ -623,9 +622,9 @@ return {
 			local localPlayer = LocalPlayer
 			local packet = nil
 			for i = #Packets, 1, -1 do
-				local p = Packets[i]
-				if p.Player == localPlayer then
-					packet = p
+				local currentPacket = Packets[i]
+				if currentPacket.Player == localPlayer then
+					packet = currentPacket
 					break
 				end
 			end
@@ -634,7 +633,7 @@ return {
 				JetPack.UpdateFuel()
 			end
 		end
-		function em.OnTakeDamage(damage)
+		function eventManager.OnTakeDamage(damage)
 			JetPack.LocalFuel = math.max(JetPack.LocalFuel - damage / 10, 0)
 			JetPack.UpdateFuel()
 		end
@@ -650,9 +649,9 @@ return {
 				local localPlayer = LocalPlayer
 				local packet = nil
 				for i = #Packets, 1, -1 do
-					local p = Packets[i]
-					if p.Player == localPlayer then
-						packet = p
+					local currentPacket = Packets[i]
+					if currentPacket.Player == localPlayer then
+						packet = currentPacket
 						break
 					end
 				end
@@ -676,8 +675,8 @@ return {
 				end
 			end
 		end
-		for i, v in ipairs(CollectionService:GetTagged("JetPackNoFly")) do
-			AddedFun(v)
+		for i, taggedPart in ipairs(CollectionService:GetTagged("JetPackNoFly")) do
+			AddedFun(taggedPart)
 		end
 		CollectionService:GetInstanceAddedSignal("JetPackNoFly"):Connect(AddedFun)
 		CollectionService:GetInstanceRemovedSignal("JetPackNoFly"):Connect(RemovedFun)
@@ -685,9 +684,9 @@ return {
 			local localPlayer = LocalPlayer
 			local packet = nil
 			for i = #Packets, 1, -1 do
-				local p = Packets[i]
-				if p.Player == localPlayer then
-					packet = p
+				local currentPacket = Packets[i]
+				if currentPacket.Player == localPlayer then
+					packet = currentPacket
 					break
 				end
 			end
@@ -703,8 +702,8 @@ return {
 				local RootPart = Humanoid.RootPart
 				assert(RootPart)
 				if RayCast.RayIgnoreNonCollide(RootPart.Position, Vector3.new(0, -1, 0), Humanoid.HipHeight + RootPart.Size.Y * 0.5 + 2, character) ~= nil and JetPack.LocalFuel < JetPack.LocalMaxFuel then
-					local t = JetPack
-					t.LocalFuel = t.LocalFuel + 0.1
+					local jetPackRef = JetPack
+					jetPackRef.LocalFuel = jetPackRef.LocalFuel + 0.1
 					if JetPack.LocalFuel > JetPack.LocalMaxFuel then
 						JetPack.LocalFuel = JetPack.LocalMaxFuel
 					end
@@ -716,9 +715,9 @@ return {
 			local localPlayer = LocalPlayer
 			local packet = nil
 			for i = #Packets, 1, -1 do
-				local p = Packets[i]
-				if p.Player == localPlayer then
-					packet = p
+				local currentPacket = Packets[i]
+				if currentPacket.Player == localPlayer then
+					packet = currentPacket
 					break
 				end
 			end

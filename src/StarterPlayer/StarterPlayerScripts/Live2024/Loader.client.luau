@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunConsts = require(ReplicatedStorage.App.RunConsts)
 if require(ReplicatedStorage.App.RunUtils).getWorld() ~= RunConsts.MAIN_WORLD_NAME then
@@ -18,32 +17,32 @@ local function getRunnerModule()
 	end
 end
 repeat
-	local v1 = nil
-	local v2, v3 = pcall(function()
+	local runnerModule = nil
+	local loadSuccess, loadError = pcall(function()
 		local Live2024 = ReplicatedStorage:FindFirstChild("Live2024")
-		local module12
+		local runnerInstance
 		if Live2024 then
 			local Runner = Live2024:FindFirstChild("Runner")
-			module12 = if Runner and Runner:IsA("ModuleScript") then Runner else nil
+			runnerInstance = if Runner and Runner:IsA("ModuleScript") then Runner else nil
 		else
-			module12 = nil
+			runnerInstance = nil
 		end
-		v1 = module12
+		runnerModule = runnerInstance
 	end)
-	if not v2 then
-		warn(v3)
+	if not loadSuccess then
+		warn(loadError)
 	end
-	if v1 then
+	if runnerModule then
 		task.wait(1)
-		local v4, v5 = pcall(function()
-			local module12 = require(v1)
+		local startSuccess, startError = pcall(function()
+			local runnerInstance = require(runnerModule)
 			print("gonna start!")
-			module12.start()
+			runnerInstance.start()
 		end)
-		if not v4 then
-			warn(v5)
+		if not startSuccess then
+			warn(startError)
 		end
 	else
 		task.wait(1)
 	end
-until not v2
+until not loadSuccess

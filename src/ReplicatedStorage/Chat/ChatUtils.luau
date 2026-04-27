@@ -1,4 +1,3 @@
--- Reviewed by Claude
 game:GetService("TextChatService")
 local StarterGui = game:GetService("StarterGui")
 local ChatUtils = {}

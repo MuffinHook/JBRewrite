@@ -1,9 +1,8 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
 	teamId = require(ReplicatedStorage.Resource.Settings).EnumTeam.Criminal,
-	message = function(p1)
-		return ("Take down %d police without dying."):format(p1:GetGoal())
+	message = function(contract)
+		return ("Take down %d police without dying."):format(contract:GetGoal())
 	end,
 	goal = 5,
 	rewardExp = 50

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DonutExchangerConsts = require(script.Parent.DonutExchangerConsts)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)

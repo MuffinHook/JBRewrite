@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local vehicleDataTable = {
 	{
 		Type = "Chassis",

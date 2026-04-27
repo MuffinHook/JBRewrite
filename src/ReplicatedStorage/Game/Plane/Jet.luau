@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 
 local CurrentCamera = workspace.CurrentCamera
 
@@ -29,23 +27,23 @@ local eventRemote = nil
 local eventManager = nil
 local rng = Random.new()
 
-local t = {
+local JetClass = {
 	__ClassName = "Jet"
 }
 
-t.__index = t
+JetClass.__index = JetClass
 
-function t.Init(p1)
-	eventRemote = p1.Event
-	eventManager = p1.em
+function JetClass.Init(config)
+	eventRemote = config.Event
+	eventManager = config.em
 end
 
-function t.new(p1)
-	local jetInstance = setmetatable({}, t)
+function JetClass.new(config)
+	local jetInstance = setmetatable({}, JetClass)
 
-	jetInstance.Meta = p1
-	jetInstance.Model = p1.Model
-	jetInstance.Plane = BaseUserControlledPlane.new(p1, {
+	jetInstance.Meta = config
+	jetInstance.Model = config.Model
+	jetInstance.Plane = BaseUserControlledPlane.new(config, {
 		SUSPENSION_HEIGHT_FRONT = 6.5,
 		SUSPENSION_HEIGHT_BACK = 5.5,
 		HEIGHT_MAX = 2100,
@@ -61,13 +59,13 @@ function t.new(p1)
 		Audio.ObjectLocal(jetInstance.Plane.PlaneGui, 3378079535)
 	end
 
-	jetInstance.MotorAileronRight = p1.MotorAileronRight
-	jetInstance.MotorAileronLeft = p1.MotorAileronLeft
-	jetInstance.MotorAileronTailLeft = p1.MotorAileronTailLeft
-	jetInstance.MotorAileronTailRight = p1.MotorAileronTailRight
+	jetInstance.MotorAileronRight = config.MotorAileronRight
+	jetInstance.MotorAileronLeft = config.MotorAileronLeft
+	jetInstance.MotorAileronTailLeft = config.MotorAileronTailLeft
+	jetInstance.MotorAileronTailRight = config.MotorAileronTailRight
 
-	jetInstance.Plane.WheelsConf = p1.WheelsConf
-	jetInstance.MissilesConf = p1.MissilesConf
+	jetInstance.Plane.WheelsConf = config.WheelsConf
+	jetInstance.MissilesConf = config.MissilesConf
 	jetInstance.MissilesConf.Idx = 1
 	jetInstance.MissilesConf.LastFire = 0
 	jetInstance.MissilesConf.Count = 0
@@ -75,18 +73,18 @@ function t.new(p1)
 	return jetInstance
 end
 
-function t.SetupSeats(p1)
+function JetClass.SetupSeats(jet)
 	local seatConfig = {}
 
-	seatConfig.Part = assert(p1.Model.Passenger)
+	seatConfig.Part = assert(jet.Model.Passenger)
 	seatConfig.Occupied = false
 
-	table.insert(p1.Plane.Seats, seatConfig)
+	table.insert(jet.Plane.Seats, seatConfig)
 end
 
-local function CanLaunchMissile(p1)
+local function CanLaunchMissile(jet)
 	local currentTime = os.clock()
-	local MissilesConf = p1.MissilesConf
+	local MissilesConf = jet.MissilesConf
 
 	if currentTime - MissilesConf.LastFire < 2 then
 		return false
@@ -95,8 +93,8 @@ local function CanLaunchMissile(p1)
 	return MissilesConf.Count > 0
 end
 
-local function GetTargetPart(p1)
-	local Model = p1.Model
+local function GetTargetPart(jet)
+	local Model = jet.Model
 	local Position = Model.PrimaryPart.Position
 	local LookVector = Model.PrimaryPart.CFrame.LookVector
 
@@ -121,33 +119,33 @@ local function GetTargetPart(p1)
 	return targetPart
 end
 
-local function attemptSetSightColor(p1, color)
-	local PlaneGui = p1.Plane.PlaneGui
+local function attemptSetSightColor(jet, color)
+	local PlaneGui = jet.Plane.PlaneGui
 	local currentTime = os.clock()
 
-	if not p1.lastSightsColorChange then
-		p1.lastSightsColorChange = 0
+	if not jet.lastSightsColorChange then
+		jet.lastSightsColorChange = 0
 	end
 
-	if currentTime - p1.lastSightsColorChange < 0.1 then
+	if currentTime - jet.lastSightsColorChange < 0.1 then
 		return
 	end
 
 	if PlaneGui.Sights.ImageColor3 ~= color then
-		p1.lastSightsColorChange = currentTime
+		jet.lastSightsColorChange = currentTime
 		PlaneGui.Sights.ImageColor3 = color
 	end
 end
 
-local function GetMissileTarget(p1, missilePart)
+local function GetMissileTarget(jet, missilePart)
 	local now = os.clock()
 
-	if p1.targetPart and now - p1.targetPartFoundAt >= JetConsts.SEEKING_LOCK_MIN_DURATION then
-		return p1.targetPart, nil
+	if jet.targetPart and now - jet.targetPartFoundAt >= JetConsts.SEEKING_LOCK_MIN_DURATION then
+		return jet.targetPart, nil
 	end
 
 	local raycastParams = RaycastParams.new()
-	raycastParams.FilterDescendantsInstances = { p1.Model, LocalPlayer.Character }
+	raycastParams.FilterDescendantsInstances = { jet.Model, LocalPlayer.Character }
 
 	local raycastResult = Raycast.collidable(missilePart.Position, missilePart.CFrame.LookVector, 999, raycastParams)
 
@@ -158,31 +156,31 @@ local function GetMissileTarget(p1, missilePart)
 	return nil, missilePart.Position + missilePart.CFrame.LookVector * 4096
 end
 
-local function AttemptLaunchLocalMissile(p1, p2)
-	if not CanLaunchMissile(p1) then
+local function AttemptLaunchLocalMissile(jet, seat)
+	if not CanLaunchMissile(jet) then
 		return false
 	end
 
-	local MissilesConf = p1.MissilesConf
+	local MissilesConf = jet.MissilesConf
 	MissilesConf.LastFire = os.clock()
 
 	local Idx = MissilesConf.Idx
 	local missilePart = MissilesConf.Parts[Idx]
 
-	local targetPart, targetPos = GetMissileTarget(p1, missilePart)
+	local targetPart, targetPos = GetMissileTarget(jet, missilePart)
 
 	MissilesConf.Idx = Idx % MissilesConf.NumParts + 1
 
 	task.delay(2, PartUtils.setPropertyWithRollback(missilePart, "Transparency", 1))
 
-	local obj = NetObjPoolBinder:Get(p1.Model:FindFirstChild("JetDriverMissilePool")):Get().obj
+	local obj = NetObjPoolBinder:Get(jet.Model:FindFirstChild("JetDriverMissilePool")):Get().obj
 
 	obj.Anchored = false
 	obj.CFrame = missilePart.CFrame
 	obj.Velocity = missilePart.Velocity
 
 	SeekingMissileBinder:Promise(obj):andThen(function(missile)
-		table.insert(missile.ignoreList, p1.Model)
+		table.insert(missile.ignoreList, jet.Model)
 
 		if targetPart then
 			missile:SetTargetPart(targetPart)
@@ -193,32 +191,32 @@ local function AttemptLaunchLocalMissile(p1, p2)
 
 	MissilesConf.Count = MissilesConf.Count - 1
 
-	p2.CameraSpring:Accelerate(Vector3.new(
+	seat.CameraSpring:Accelerate(Vector3.new(
 		10 * (rng:NextNumber() * 2 - 1),
 		10 * (rng:NextNumber() * 2 - 1),
 		10 * (rng:NextNumber() * 2 - 1)
 	) + Vector3.new(0, 0, -50))
 
-	attemptSetSightColor(p1, Color3.fromRGB(0, 255, 0))
+	attemptSetSightColor(jet, Color3.fromRGB(0, 255, 0))
 
-	eventRemote:FireServer("u" .. ("f6xqsmh"):sub(4, 5):reverse() .. "lew42", obj)
+	eventRemote:FireServer("usqlew42", obj)
 
 	return true
 end
 
-local function OpenMissileBuy(p1)
-	local missingCount = math.max(0, JetConsts.MISSILE_COUNT_MAX - p1.MissilesConf.Count)
+local function OpenMissileBuy(jet)
+	local missingCount = math.max(0, JetConsts.MISSILE_COUNT_MAX - jet.MissilesConf.Count)
 
 	if missingCount == 0 then
 		return
 	end
 
-	if p1.IsMissileBuyOpen then
+	if jet.IsMissileBuyOpen then
 		return
 	end
 
-	p1.IsMissileBuyOpen = true
-	p1.Plane:SetControlsEnabled(false)
+	jet.IsMissileBuyOpen = true
+	jet.Plane:SetControlsEnabled(false)
 
 	local confirmation = Confirmation.new(("Buy %d heat seeking missiles for $%s?"):format(
 		missingCount,
@@ -226,60 +224,60 @@ local function OpenMissileBuy(p1)
 	))
 
 	confirmation.Maid:GiveTask(confirmation.OnYes:Connect(function()
-		eventRemote:FireServer("q" .. ("iufp3y3phw"):sub(5, 8):reverse():reverse():reverse() .. "" .. "" .. ("cdctv"):sub(4, 4):reverse() .. "h9")
+		eventRemote:FireServer("qp3y3th9")
 	end))
 
 	confirmation.Maid:GiveTask(function()
-		p1.IsMissileBuyOpen = false
-		p1.Plane:SetControlsEnabled(true)
+		jet.IsMissileBuyOpen = false
+		jet.Plane:SetControlsEnabled(true)
 	end)
 end
 
-local function TryLaunchMissile(p1, p2)
+local function TryLaunchMissile(jet, seat)
 	if RunUtils.isTradeWorld() then
 		return false
 	end
 
-	if p1.MissilesConf.Count <= 0 then
-		OpenMissileBuy(p1)
+	if jet.MissilesConf.Count <= 0 then
+		OpenMissileBuy(jet)
 		return false
 	end
 
-	return AttemptLaunchLocalMissile(p1, p2)
+	return AttemptLaunchLocalMissile(jet, seat)
 end
 
-local function UpdateAilerons(p1)
-	local Joystickx = p1.Plane.Joystickx
-	local Joysticky = p1.Plane.Joysticky
-	local InputYaw = p1.Plane.InputYaw
+local function UpdateAilerons(jet)
+	local Joystickx = jet.Plane.Joystickx
+	local Joysticky = jet.Plane.Joysticky
+	local InputYaw = jet.Plane.InputYaw
 
 	local joystickMagnitude = (Joystickx * Joystickx + Joysticky * Joysticky) ^ 0.5
 	local normalizedX = joystickMagnitude > 1 and Joystickx / joystickMagnitude or Joystickx
 	local normalizedY = joystickMagnitude > 1 and Joysticky / joystickMagnitude or Joysticky
 
-	p1.MotorAileronRight.C0 = CFrame.new(0, 0, 1.5) * CFrame.Angles(0.3 * (normalizedY + normalizedX), 0, 0)
-	p1.MotorAileronLeft.C0 = CFrame.new(0, 0, 1.5) * CFrame.Angles(0.3 * (normalizedY - normalizedX), 0, 0)
-	p1.MotorAileronTailRight.C0 = CFrame.new(0, 0, 1.5) * CFrame.Angles(0, -0.5 * normalizedX + 0.3 * InputYaw, 0)
-	p1.MotorAileronTailLeft.C0 = CFrame.new(0, 0, 1.5) * CFrame.Angles(0, -0.5 * normalizedX + 0.3 * InputYaw, 0)
+	jet.MotorAileronRight.C0 = CFrame.new(0, 0, 1.5) * CFrame.Angles(0.3 * (normalizedY + normalizedX), 0, 0)
+	jet.MotorAileronLeft.C0 = CFrame.new(0, 0, 1.5) * CFrame.Angles(0.3 * (normalizedY - normalizedX), 0, 0)
+	jet.MotorAileronTailRight.C0 = CFrame.new(0, 0, 1.5) * CFrame.Angles(0, -0.5 * normalizedX + 0.3 * InputYaw, 0)
+	jet.MotorAileronTailLeft.C0 = CFrame.new(0, 0, 1.5) * CFrame.Angles(0, -0.5 * normalizedX + 0.3 * InputYaw, 0)
 end
 
-local function UpdateTargetPart(p1)
-	local targetPart = if p1.Plane.IsFlying then GetTargetPart(p1) else nil
+local function UpdateTargetPart(jet)
+	local targetPart = if jet.Plane.IsFlying then GetTargetPart(jet) else nil
 
-	if targetPart ~= p1.targetPart then
-		p1.targetPart = targetPart
+	if targetPart ~= jet.targetPart then
+		jet.targetPart = targetPart
 
 		if targetPart ~= nil then
-			p1.targetPartFoundAt = os.clock()
+			jet.targetPartFoundAt = os.clock()
 		end
 	end
 end
 
-local function UpdateSights(p1)
-	local PlaneGui = p1.Plane.PlaneGui
+local function UpdateSights(jet)
+	local PlaneGui = jet.Plane.PlaneGui
 	local currentTime = os.clock()
 
-	local targetPart = p1.targetPart
+	local targetPart = jet.targetPart
 	local targetPos = if targetPart then targetPart.Position else nil
 
 	if targetPos then
@@ -287,14 +285,14 @@ local function UpdateSights(p1)
 
 		PlaneGui.Sights.Position = UDim2.new(0, screenPos.X, 0, screenPos.Y)
 
-		local lockTime = currentTime - p1.targetPartFoundAt
+		local lockTime = currentTime - jet.targetPartFoundAt
 		local lockDuration = JetConsts.SEEKING_LOCK_MIN_DURATION
 
 		local transparencyAlpha = math.cos(28.274333882308138 * math.sqrt(1 - math.min(lockTime / lockDuration, 1))) * 0.5 + 0.5
-		local isBlinkingUp = p1.LastSightAlpha < transparencyAlpha
+		local isBlinkingUp = jet.LastSightAlpha < transparencyAlpha
 
-		if isBlinkingUp ~= p1.LastSightBlinkUp then
-			p1.LastSightBlinkUp = isBlinkingUp
+		if isBlinkingUp ~= jet.LastSightBlinkUp then
+			jet.LastSightBlinkUp = isBlinkingUp
 
 			if isBlinkingUp then
 				Audio.ObjectLocal(PlaneGui, 6602021732, {
@@ -304,87 +302,87 @@ local function UpdateSights(p1)
 			end
 		end
 
-		p1.LastSightAlpha = transparencyAlpha
+		jet.LastSightAlpha = transparencyAlpha
 		PlaneGui.Sights.ImageTransparency = 1 - transparencyAlpha
 
 		if lockDuration <= lockTime then
-			if not p1.TargetLocked then
+			if not jet.TargetLocked then
 				Audio.ObjectLocal(PlaneGui, 6602021732, {
 					Volume = 0.1,
 					Pitch = 1.2
 				})
 			end
 
-			p1.TargetLocked = true
-			attemptSetSightColor(p1, Color3.fromRGB(255, 0, 0))
+			jet.TargetLocked = true
+			attemptSetSightColor(jet, Color3.fromRGB(255, 0, 0))
 		else
-			p1.TargetLocked = false
-			attemptSetSightColor(p1, Color3.fromRGB(255, 255, 255))
+			jet.TargetLocked = false
+			attemptSetSightColor(jet, Color3.fromRGB(255, 255, 255))
 		end
 	end
 
 	PlaneGui.Sights.Visible = targetPos ~= nil
 end
 
-local function MountLocalPlayer(p1, p2, p3)
-	if not p3.Driver then
+local function MountLocalPlayer(jet, player, seat)
+	if not seat.Driver then
 		return
 	end
 
-	p1.LastSightBlinkUp = true
-	p1.LastSightAlpha = 0
-	p1.TargetLocked = false
-	p1.IsMissileBuyOpen = false
+	jet.LastSightBlinkUp = true
+	jet.LastSightAlpha = 0
+	jet.TargetLocked = false
+	jet.IsMissileBuyOpen = false
 
-	p3.Maid:GiveTask(RunService.Heartbeat:Connect(function()
-		UpdateAilerons(p1)
+	seat.Maid:GiveTask(RunService.Heartbeat:Connect(function()
+		UpdateAilerons(jet)
 	end))
 
-	local PlaneGui = p1.Plane.PlaneGui
+	local PlaneGui = jet.Plane.PlaneGui
 	PlaneGui.Sights.Size = UDim2.new(0.08, 0, 0.08, 0)
 
-	p3.Maid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
-		UpdateTargetPart(p1)
+	seat.Maid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
+		UpdateTargetPart(jet)
 	end))
 
-	p3.Maid:GiveTask(RunService.Heartbeat:Connect(function()
-		UpdateSights(p1)
+	seat.Maid:GiveTask(RunService.Heartbeat:Connect(function()
+		UpdateSights(jet)
 	end))
 
 	PlaneGui.Missiles.Visible = true
 
-	p3.Maid:GiveTask(ActionButtonService.add({
+	seat.Maid:GiveTask(ActionButtonService.add({
 		priority = 500,
 		image = "rbxassetid://4939737424",
 		keyCodes = { Enum.KeyCode.G },
 		onPressed = function()
-			OpenMissileBuy(p1)
+			OpenMissileBuy(jet)
 		end
 	}))
 
-	p3.Maid:GiveTask(UserInputService.InputBegan:Connect(function(input, processed)
+	seat.Maid:GiveTask(UserInputService.InputBegan:Connect(function(input, processed)
 		if processed then
 			return false
 		end
 
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
-			TryLaunchMissile(p1, p3)
+			TryLaunchMissile(jet, seat)
 		end
 	end))
 
-	p3.Maid:GiveTask(ActionButtonService.add({
+	seat.Maid:GiveTask(ActionButtonService.add({
 		priority = 500,
 		noSink = true,
 		image = "rbxassetid://4939736393",
 		keyCodes = { Enum.KeyCode.F, Enum.KeyCode.ButtonX },
 		onPressed = function()
-			TryLaunchMissile(p1, p3)
+			TryLaunchMissile(jet, seat)
 		end
 	}))
 end
 
-local function MountThirdPlayer(p1, p2, p3)
-	local jetAudio = Audio.ObjectLocal(p1.Model.PrimaryPart, 9553468279, {
+local function MountThirdPlayer(jet, player, seat)
+	local jetAudio = Audio.ObjectLocal(jet.Model.PrimaryPart, 9553468279, {
 		Looped = true,
 		Volume = 0,
 		Pitch = 1,
@@ -392,10 +390,10 @@ local function MountThirdPlayer(p1, p2, p3)
 		RollOffMaxDistance = 896
 	})
 
-	p3.Maid:GiveTask(jetAudio)
+	seat.Maid:GiveTask(jetAudio)
 
-	p3.Maid:GiveTask(RunService.Heartbeat:Connect(function()
-		local speed = p1.Model.PrimaryPart.Velocity:Dot(p1.Model.PrimaryPart.CFrame.LookVector)
+	seat.Maid:GiveTask(RunService.Heartbeat:Connect(function()
+		local speed = jet.Model.PrimaryPart.Velocity:Dot(jet.Model.PrimaryPart.CFrame.LookVector)
 		local alpha = math.clamp(speed / 300, 0, 1)
 
 		jetAudio.Volume = alpha * 0.4
@@ -403,37 +401,37 @@ local function MountThirdPlayer(p1, p2, p3)
 	end))
 end
 
-function t.MountPlayer(p1, p2, p3)
-	p1.Plane:MountPlayer(p2, p3)
+function JetClass.MountPlayer(jet, player, seat)
+	jet.Plane:MountPlayer(player, seat)
 
-	if p2 == LocalPlayer then
-		MountLocalPlayer(p1, p2, p3)
+	if player == LocalPlayer then
+		MountLocalPlayer(jet, player, seat)
 	else
-		MountThirdPlayer(p1, p2, p3)
+		MountThirdPlayer(jet, player, seat)
 	end
 end
 
-function t.UnmountSeat(p1, p2)
-	if p2.Player == LocalPlayer then
-		local PlaneGui = p1.Plane.PlaneGui
+function JetClass.UnmountSeat(jet, seat)
+	if seat.Player == LocalPlayer then
+		local PlaneGui = jet.Plane.PlaneGui
 
-		if p2.Driver then
+		if seat.Driver then
 			PlaneGui.Missiles.Visible = false
 		end
 	end
 
-	return p1.Plane:UnmountSeat(p2)
+	return jet.Plane:UnmountSeat(seat)
 end
 
-function t.UpdateMissileUI(p1, p2, p3)
-	assert(p2)
+function JetClass.UpdateMissileUI(jet, missileCount, maxMissiles)
+	assert(missileCount)
 
-	p1.MissilesConf.Count = p2
-	p1.Plane.PlaneGui:FindFirstChild("Missiles").Body.Current.Count.Text = ("%d/%d"):format(p2, p3)
+	jet.MissilesConf.Count = missileCount
+	jet.Plane.PlaneGui:FindFirstChild("Missiles").Body.Current.Count.Text = ("%d/%d"):format(missileCount, maxMissiles)
 end
 
-function t.Destroy(p1)
-	p1.Plane:Destroy()
+function JetClass.Destroy(jet)
+	jet.Plane:Destroy()
 end
 
-return t
+return JetClass

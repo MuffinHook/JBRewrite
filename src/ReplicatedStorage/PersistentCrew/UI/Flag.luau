@@ -1,17 +1,15 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local local1 = Roact.PureComponent:extend("Flag")
-local1.defaultProps = {
+local FlagComponent = Roact.PureComponent:extend("Flag")
+FlagComponent.defaultProps = {
 	flagColor = Color3.new(255/255, 255/255, 255/255),
 	userId = 1,
 	size = UDim2.fromScale(1, 1),
 	position = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5)
 }
-function local1.render(self)
+function FlagComponent.render(self)
 	return createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundColor3 = self.props.flagColor,
@@ -51,4 +49,4 @@ function local1.render(self)
 		})
 	})
 end
-return local1
+return FlagComponent

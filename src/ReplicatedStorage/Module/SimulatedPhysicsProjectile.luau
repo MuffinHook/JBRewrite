@@ -1,89 +1,88 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RayCast = require(ReplicatedStorage.Module.RayCast)
-local t = {}
-t.__index = t
-function t.new(p1)
-	local table2 = setmetatable({}, t)
-	table2.Origin = p1
-	table2.Target = nil
-	table2.Velocity = nil
-	table2._PrevUpdatePosition = table2.Origin
-	table2._GetNow = os.clock
-	table2.Birthdate = table2:_GetNow()
-	table2.Gravity = workspace.Gravity
-	table2.CollidableFunc = nil
-	table2._GravityVector = Vector3.new(0, -table2.Gravity, 0)
-	table2.IgnoreList = {}
-	return table2
+local SimulatedPhysicsProjectile = {}
+SimulatedPhysicsProjectile.__index = SimulatedPhysicsProjectile
+function SimulatedPhysicsProjectile.new(initialOrigin)
+	local instance = setmetatable({}, SimulatedPhysicsProjectile)
+	instance.Origin = initialOrigin
+	instance.Target = nil
+	instance.Velocity = nil
+	instance._PrevUpdatePosition = instance.Origin
+	instance._GetNow = os.clock
+	instance.Birthdate = instance:_GetNow()
+	instance.Gravity = workspace.Gravity
+	instance.CollidableFunc = nil
+	instance._GravityVector = Vector3.new(0, -instance.Gravity, 0)
+	instance.IgnoreList = {}
+	return instance
 end
-function t.CalculateVelocityToHitTargetWithSpeed(p1, p2, p3, p4, p5)
-	local delta = p2 - p1
-	local table2 = (delta.x * delta.x + delta.z * delta.z) ^ 0.5
-	local var3 = p3 * p3 * p3 * p3 - p4 * (p4 * table2 * table2 + 2 * delta.y * p3 * p3)
-	local v4
-	if var3 >= 0 then
-		local var5 = var3 ^ 0.5
-		local var6 = math.atan((p3 * p3 + var5) / (p4 * table2))
-		local var7 = math.atan((p3 * p3 - var5) / (p4 * table2))
-		v4 = if p5 then math.max(var6, var7) else math.min(var6, var7)
+function SimulatedPhysicsProjectile.CalculateVelocityToHitTargetWithSpeed(originPosition, targetPosition, initialSpeed, gravityMagnitude, preferHigherAngle)
+	local positionDelta = targetPosition - originPosition
+	local horizontalDistance = (positionDelta.x * positionDelta.x + positionDelta.z * positionDelta.z) ^ 0.5
+	local discriminant = initialSpeed * initialSpeed * initialSpeed * initialSpeed - gravityMagnitude * (gravityMagnitude * horizontalDistance * horizontalDistance + 2 * positionDelta.y * initialSpeed * initialSpeed)
+	local launchAngle
+	if discriminant >= 0 then
+		local discriminantSqrt = discriminant ^ 0.5
+		local higherAngle = math.atan((initialSpeed * initialSpeed + discriminantSqrt) / (gravityMagnitude * horizontalDistance))
+		local lowerAngle = math.atan((initialSpeed * initialSpeed - discriminantSqrt) / (gravityMagnitude * horizontalDistance))
+		launchAngle = if preferHigherAngle then math.max(higherAngle, lowerAngle) else math.min(higherAngle, lowerAngle)
 	else
-		v4 = 0.7853981633974483
+		launchAngle = 0.7853981633974483
 	end
-	local var10 = p3 * delta.x / table2 * math.cos(v4)
-	local var11 = p3 * math.sin(v4)
-	return Vector3.new(var10, var11, p3 * delta.z / table2 * math.cos(v4)), table2 / (p3 * math.cos(v4))
+	local velocityX = initialSpeed * positionDelta.x / horizontalDistance * math.cos(launchAngle)
+	local velocityY = initialSpeed * math.sin(launchAngle)
+	return Vector3.new(velocityX, velocityY, initialSpeed * positionDelta.z / horizontalDistance * math.cos(launchAngle)), horizontalDistance / (initialSpeed * math.cos(launchAngle))
 end
-function t.HitTargetWithSpeed(p1, p2, p3, p4)
-	p1.Target = p2
-	local delta, table2 = t.CalculateVelocityToHitTargetWithSpeed(p1.Origin, p2, p3, p1.Gravity, p4)
-	p1.Velocity = delta
-	p1.Duration = table2
+function SimulatedPhysicsProjectile.HitTargetWithSpeed(self, targetPosition, desiredSpeed, preferHigherAngle)
+	self.Target = targetPosition
+	local calculatedVelocity, timeToHit = SimulatedPhysicsProjectile.CalculateVelocityToHitTargetWithSpeed(self.Origin, targetPosition, desiredSpeed, self.Gravity, preferHigherAngle)
+	self.Velocity = calculatedVelocity
+	self.Duration = timeToHit
 	return true
 end
-function t.CalculateElapsedPosition(p1, p2)
-	assert(p2 ~= nil)
-	return p1.Origin + p1.Velocity * p2 + 0.5 * p1._GravityVector * p2 * p2
+function SimulatedPhysicsProjectile.CalculateElapsedPosition(self, elapsedTime)
+	assert(elapsedTime ~= nil)
+	return self.Origin + self.Velocity * elapsedTime + 0.5 * self._GravityVector * elapsedTime * elapsedTime
 end
-function t.Step(p1, p2, p3)
-	assert(p2)
-	assert(p1.Velocity)
-	local table2 = p1:CalculateElapsedPosition(p2 - p1.Birthdate)
-	local var3 = table2 - p3
-	local v4, var5 = RayCast.RayIgnoreNonCollideWithIgnoreList(p3, var3.Unit, var3.Magnitude, p1.IgnoreList, nil, nil, p1.CollidableFunc)
-	if v4 then
-		return var5, true, v4
+function SimulatedPhysicsProjectile.Step(self, currentTime, previousPosition)
+	assert(currentTime)
+	assert(self.Velocity)
+	local projectedPosition = self:CalculateElapsedPosition(currentTime - self.Birthdate)
+	local rayDirection = projectedPosition - previousPosition
+	local hitInstance, hitPosition = RayCast.RayIgnoreNonCollideWithIgnoreList(previousPosition, rayDirection.Unit, rayDirection.Magnitude, self.IgnoreList, nil, nil, self.CollidableFunc)
+	if hitInstance then
+		return hitPosition, true, hitInstance
 	else
-		return table2, false
+		return projectedPosition, false
 	end
 end
-function t.Update(p1)
-	local delta, table2 = p1:Step(p1:_GetNow(), p1._PrevUpdatePosition)
-	p1._PrevUpdatePosition = delta
-	return delta, table2
+function SimulatedPhysicsProjectile.Update(self)
+	local currentPosition, collided = self:Step(self:_GetNow(), self._PrevUpdatePosition)
+	self._PrevUpdatePosition = currentPosition
+	return currentPosition, collided
 end
-function t.CalculateNextInstantCollision(p1, p2)
-	local delta, table2 = p1:Update()
-	if table2 then
-		return delta, 0
+function SimulatedPhysicsProjectile.CalculateNextInstantCollision(self, timestep)
+	local currentPosition, collided = self:Update()
+	if collided then
+		return currentPosition, 0
 	else
 		local FallenPartsDestroyHeight = workspace.FallenPartsDestroyHeight
-		local sum = p1:_GetNow()
-		local var3 = sum
-		local v4
+		local currentTime = self:_GetNow()
+		local startTime = currentTime
+		local stepPosition
 		while true do
-			sum = sum + p2
-			local var5
-			v4, var5 = p1:Step(sum, delta)
-			if var5 or v4.y <= FallenPartsDestroyHeight then
+			currentTime = currentTime + timestep
+			local hasHit
+			stepPosition, hasHit = self:Step(currentTime, currentPosition)
+			if hasHit or stepPosition.y <= FallenPartsDestroyHeight then
 				break
 			end
-			delta = v4
+			currentPosition = stepPosition
 		end
-		return v4, sum - var3
+		return stepPosition, currentTime - startTime
 	end
 end
-function t.GetElapsed(p1)
-	return p1:_GetNow() - p1.Birthdate
+function SimulatedPhysicsProjectile.GetElapsed(self)
+	return self:_GetNow() - self.Birthdate
 end
-return t
+return SimulatedPhysicsProjectile

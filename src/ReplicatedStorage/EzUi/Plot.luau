@@ -1,19 +1,17 @@
--- Reviewed by Claude
--- variables reassigned
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
-local v2 = Roact.Component:extend("Plot")
-function v2.init(self)
+local Plot = Roact.Component:extend("Plot")
+function Plot.init(self)
 	self:setState({
 		aspectRatio = 1
 	})
 end
-function v2.CalculateAspectRatio(self, sizeContainer)
+function Plot.CalculateAspectRatio(self, sizeContainer)
 	self:setState({
 		aspectRatio = sizeContainer.AbsoluteSize.Y / sizeContainer.AbsoluteSize.X
 	})
 end
-function v2.render(self)
+function Plot.render(self)
 	local window = self.props.window
 	local minX = window[1]
 	local minY = window[2]
@@ -22,11 +20,11 @@ function v2.render(self)
 	local frameElements = {}
 	if self.props.lines then
 		local lineWidth = self.props.lineWidth or 2
-		for i, v in ipairs(self.props.lines) do
-			local normalizedX1 = (v[1] - minX) / width
-			local normalizedY1 = (v[2] - minY) / height
-			local normalizedX2 = (v[3] - minX) / width
-			local normalizedY2 = (v[4] - minY) / height
+		for i, lineData in ipairs(self.props.lines) do
+			local normalizedX1 = (lineData[1] - minX) / width
+			local normalizedY1 = (lineData[2] - minY) / height
+			local normalizedX2 = (lineData[3] - minX) / width
+			local normalizedY2 = (lineData[4] - minY) / height
 			local deltaX = normalizedX2 - normalizedX1
 			local deltaY = normalizedY2 - normalizedY1
 			local lineLength = math.sqrt(deltaY * deltaY * self.state.aspectRatio * self.state.aspectRatio + deltaX * deltaX)
@@ -44,26 +42,26 @@ function v2.render(self)
 	end
 	if self.props.points then
 		local pointRadius = self.props.pointRadius or 3
-		for i, v in ipairs(self.props.points) do
+		for i, pointData in ipairs(self.props.points) do
 			local frameProps = {
 				AnchorPoint = Vector2.new(0.5, 0.5)
 			}
 			frameProps.BackgroundColor3 = self.props.pointColor or Color3.new(255/255, 255/255, 255/255)
 			frameProps.BorderSizePixel = 0
 			frameProps.Size = UDim2.new(0, pointRadius * 2, 0, pointRadius * 2)
-			frameProps.Position = UDim2.new((v[1] - minX) / width, 0, 1 - (v[2] - minY) / height, 0)
+			frameProps.Position = UDim2.new((pointData[1] - minX) / width, 0, 1 - (pointData[2] - minY) / height, 0)
 			table.insert(frameElements, createElement("Frame", frameProps))
 		end
 	end
 	if self.props.labels then
-		for i, v in ipairs(self.props.labels) do
+		for i, labelData in ipairs(self.props.labels) do
 			local frameProps = {
 				BackgroundTransparency = 1,
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Text = v[1]
+				Text = labelData[1]
 			}
 			frameProps.TextColor3 = self.props.labelColor or Color3.new(255/255, 255/255, 255/255)
-			frameProps.Position = UDim2.new((v[2] - minX) / width, 0, 1 - (v[3] - minY) / height, 0)
+			frameProps.Position = UDim2.new((labelData[2] - minX) / width, 0, 1 - (labelData[3] - minY) / height, 0)
 			table.insert(frameElements, createElement("TextLabel", frameProps))
 		end
 	end
@@ -80,4 +78,4 @@ function v2.render(self)
 		end
 	}, frameElements)
 end
-return v2
+return Plot

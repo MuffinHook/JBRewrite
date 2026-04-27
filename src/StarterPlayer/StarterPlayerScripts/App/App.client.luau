@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local CurrentCamera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
@@ -32,17 +30,17 @@ Maid.new():GiveTask(RunService.Heartbeat:Connect(function()
 	end
 end))
 require(ReplicatedStorage.HumanoidUnload.HumanoidUnloadService)
-local function getColorFromTeam(p1)
-	if p1 == Settings.Team.Police then
+local function getColorFromTeam(team)
+	if team == Settings.Team.Police then
 		return Settings.TeamColor[Settings.EnumTeam.Police]
 	else
 		return Settings.TeamColor[Settings.EnumTeam.Criminal]
 	end
 end
-CharacterUtils.observeLocalCharacterAdded(function(p1, p2)
-	local Humanoid = p1:FindFirstChild("Humanoid")
+CharacterUtils.observeLocalCharacterAdded(function(character, maid)
+	local Humanoid = character:FindFirstChild("Humanoid")
 	local Health = Humanoid.Health
-	p2:GiveTask(Humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+	maid:GiveTask(Humanoid:GetPropertyChangedSignal("Health"):Connect(function()
 		if Humanoid.Health <= 0 then
 			HapticEffect.basic(1, 1)
 		elseif Humanoid.Health < Health then
@@ -51,47 +49,47 @@ CharacterUtils.observeLocalCharacterAdded(function(p1, p2)
 		Health = Humanoid.Health
 	end))
 end)
-CharacterUtils.observeCharacterAdded(function(p1, p2)
-	local Humanoid = p1:FindFirstChild("Humanoid")
+CharacterUtils.observeCharacterAdded(function(character, maid)
+	local Humanoid = character:FindFirstChild("Humanoid")
 	assert(Humanoid)
-	local localPlayer = Players:GetPlayerFromCharacter(p1)
-	if localPlayer ~= Players.LocalPlayer then
+	local teammate = Players:GetPlayerFromCharacter(character)
+	if teammate ~= Players.LocalPlayer then
 		local configTable = {
-			name = localPlayer.Name,
+			name = teammate.Name,
 			flash = false
 		}
-		p2:GivePromise(Promise.all({ RxInstanceUtils.waitForChild(localPlayer, "TeamValue", 5), RxInstanceUtils.waitForChild(Players.LocalPlayer, "TeamValue", 5) }):andThen(function(p1)
-			local localPlayer = p1[1]
-			local v2 = p1[2]
-			local v6, v7 = Roact.createBinding(if localPlayer.Value == Settings.Team.Police then Settings.TeamColor[Settings.EnumTeam.Police] else Settings.TeamColor[Settings.EnumTeam.Criminal])
-			configTable.color = v6
-			configTable.updateColor = v7
+		maid:GivePromise(Promise.all({ RxInstanceUtils.waitForChild(teammate, "TeamValue", 5), RxInstanceUtils.waitForChild(Players.LocalPlayer, "TeamValue", 5) }):andThen(function(teamValues)
+			local teammateTeamValue = teamValues[1]
+			local localPlayerTeamValue = teamValues[2]
+			local colorBinding, updateColor = Roact.createBinding(if teammateTeamValue.Value == Settings.Team.Police then Settings.TeamColor[Settings.EnumTeam.Police] else Settings.TeamColor[Settings.EnumTeam.Criminal])
+			configTable.color = colorBinding
+			configTable.updateColor = updateColor
 			local function updateFlash()
-				configTable.flash = if v2.Value == localPlayer.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
+				configTable.flash = if localPlayerTeamValue.Value == teammateTeamValue.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end
-			p2:GiveTask(localPlayer.Changed:Connect(function(p1)
-				configTable.updateColor(if p1 == Settings.Team.Police then Settings.TeamColor[Settings.EnumTeam.Police] else Settings.TeamColor[Settings.EnumTeam.Criminal])
-				configTable.flash = if v2.Value == localPlayer.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
+			maid:GiveTask(teammateTeamValue.Changed:Connect(function(newValue)
+				configTable.updateColor(if newValue == Settings.Team.Police then Settings.TeamColor[Settings.EnumTeam.Police] else Settings.TeamColor[Settings.EnumTeam.Criminal])
+				configTable.flash = if localPlayerTeamValue.Value == teammateTeamValue.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end))
-			p2:GiveTask(v2.Changed:Connect(function()
-				configTable.flash = if v2.Value == localPlayer.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
+			maid:GiveTask(localPlayerTeamValue.Changed:Connect(function()
+				configTable.flash = if localPlayerTeamValue.Value == teammateTeamValue.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end))
-			p2:GiveTask(Players.LocalPlayer:GetAttributeChangedSignal("DisablePlayerMarkers"):Connect(function()
-				configTable.flash = if v2.Value == localPlayer.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
+			maid:GiveTask(Players.LocalPlayer:GetAttributeChangedSignal("DisablePlayerMarkers"):Connect(function()
+				configTable.flash = if localPlayerTeamValue.Value == teammateTeamValue.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
 			end))
-			configTable.flash = if v2.Value == localPlayer.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
-			p2:GiveTask(MinimapService.add(configTable))
+			configTable.flash = if localPlayerTeamValue.Value == teammateTeamValue.Value then Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") == true else true
+			maid:GiveTask(MinimapService.add(configTable))
 		end))
-		p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "HumanoidRootPart", function(p1, p2)
-			configTable.part = p1
-			p2:GiveTask(function()
+		maid:GiveTask(RxInstanceUtils.observeOneChildNamed(character, "HumanoidRootPart", function(humanoidRoot, rootMaid)
+			configTable.part = humanoidRoot
+			rootMaid:GiveTask(function()
 				configTable.part = nil
 			end)
 		end))
-		p2:GiveTask(Interval.every(0.1):Connect(function()
-			local localPlayer = Humanoid:FindFirstChild(HumanoidUnloadConsts.SERVER_POSITION_OBJ_NAME)
-			if configTable._position and (not configTable.part and localPlayer) then
-				configTable._updatePosition((configTable._position:getValue():Lerp(localPlayer.Value, 0.3333333333333333)))
+		maid:GiveTask(Interval.every(0.1):Connect(function()
+			local serverPosition = Humanoid:FindFirstChild(HumanoidUnloadConsts.SERVER_POSITION_OBJ_NAME)
+			if configTable._position and (not configTable.part and serverPosition) then
+				configTable._updatePosition((configTable._position:getValue():Lerp(serverPosition.Value, 0.3333333333333333)))
 			end
 		end))
 	end
@@ -109,125 +107,125 @@ GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.PremiumGarage):
 		premium = true
 	})
 end)
-for v2, v3 in GamepassUtils.EnumGamepass:GetEnumItems() do
-	local localPlayer = GamepassUtils.EnumGamepass[v3]
+for enumIndex, gamepassName in GamepassUtils.EnumGamepass:GetEnumItems() do
+	local gamepassEnum = GamepassUtils.EnumGamepass[gamepassName]
 	store:dispatch({
 		type = "setGamepassOwned",
-		gamepassEnum = localPlayer,
-		gamepassOwned = GamepassSystem.DoesPlayerOwn(localPlayer)
+		gamepassEnum = gamepassEnum,
+		gamepassOwned = GamepassSystem.DoesPlayerOwn(gamepassEnum)
 	})
-	GamepassSystem.GetGamepassOwnedSignal(localPlayer):Connect(function()
+	GamepassSystem.GetGamepassOwnedSignal(gamepassEnum):Connect(function()
 		store:dispatch({
 			type = "setGamepassOwned",
-			gamepassEnum = localPlayer,
-			gamepassOwned = GamepassSystem.DoesPlayerOwn(localPlayer)
+			gamepassEnum = gamepassEnum,
+			gamepassOwned = GamepassSystem.DoesPlayerOwn(gamepassEnum)
 		})
 	end)
 end
-local v5 = Maid.new()
-local v6 = WorldMarkerGroup.new()
-WorldMarkerSystem.addGroup(v6)
-local function setWaypoint(p1)
-	v5:DoCleaning()
-	if p1 then
-		local position = p1.position
-		local part = p1.part
-		local minDist = p1.minDist
-		local localPlayer = ReplicatedStorage.App.Res:FindFirstChild("WaypointMarker"):Clone()
+local waypointMaid = Maid.new()
+local markerGroup = WorldMarkerGroup.new()
+WorldMarkerSystem.addGroup(markerGroup)
+local function setWaypoint(waypointConfig)
+	waypointMaid:DoCleaning()
+	if waypointConfig then
+		local position = waypointConfig.position
+		local part = waypointConfig.part
+		local minDist = waypointConfig.minDist
+		local waypointMarker = ReplicatedStorage.App.Res:FindFirstChild("WaypointMarker"):Clone()
 		if position then
-			localPlayer:PivotTo(CFrame.new(position))
+			waypointMarker:PivotTo(CFrame.new(position))
 		elseif part then
 			position = part.Position
-			localPlayer:PivotTo(CFrame.new(position))
-			v5:GiveTask(Interval.every(0.5):Connect(function()
+			waypointMarker:PivotTo(CFrame.new(position))
+			waypointMaid:GiveTask(Interval.every(0.5):Connect(function()
 				if part and part:IsDescendantOf(workspace) then
 					position = part.Position
-					localPlayer:PivotTo(CFrame.new(position))
+					waypointMarker:PivotTo(CFrame.new(position))
 				else
 					store:dispatch({
 						type = "removeWaypointByName",
-						name = p1.name
+						name = waypointConfig.name
 					})
 				end
 			end))
 		end
-		localPlayer.Parent = workspace
-		v5:GiveTask(RunService.Heartbeat:Connect(function()
-			localPlayer.Arrow.CFrame = localPlayer.ArrowRoot.CFrame * CFrame.Angles(0, os.clock() % 6.283185307179586, 0)
+		waypointMarker.Parent = workspace
+		waypointMaid:GiveTask(RunService.Heartbeat:Connect(function()
+			waypointMarker.Arrow.CFrame = waypointMarker.ArrowRoot.CFrame * CFrame.Angles(0, os.clock() % 6.283185307179586, 0)
 		end))
-		v5:GiveTask(localPlayer)
+		waypointMaid:GiveTask(waypointMarker)
 		local Attachment = Instance.new("Attachment")
-		Attachment.Parent = localPlayer.PrimaryPart
-		local v2 = ReplicatedStorage.App.Res:FindFirstChild("SlowArrowBeam"):Clone()
-		v2.Attachment0 = Attachment
-		v2.Parent = localPlayer
-		v5:GiveTask(v2)
-		local v3 = WorldMarker.new()
-		v3:SetScreenGui(WorldMarkerSystem.gui)
+		Attachment.Parent = waypointMarker.PrimaryPart
+		local beamClone = ReplicatedStorage.App.Res:FindFirstChild("SlowArrowBeam"):Clone()
+		beamClone.Attachment0 = Attachment
+		beamClone.Parent = waypointMarker
+		waypointMaid:GiveTask(beamClone)
+		local worldMarker = WorldMarker.new()
+		worldMarker:SetScreenGui(WorldMarkerSystem.gui)
 		if position then
-			v3:SetPosition(position)
+			worldMarker:SetPosition(position)
 		elseif part then
-			v3:SetAdornee(part)
+			worldMarker:SetAdornee(part)
 		end
-		v3:SetIcon(5920742944)
-		v3.FrameInner.ImageColor3 = Color3.fromRGB(255, 108, 98)
-		v6:Add(v3)
-		v5:GiveTask(function()
-			v6:Remove(v3)
-			v3:Destroy()
+		worldMarker:SetIcon(5920742944)
+		worldMarker.FrameInner.ImageColor3 = Color3.fromRGB(255, 108, 98)
+		markerGroup:Add(worldMarker)
+		waypointMaid:GiveTask(function()
+			markerGroup:Remove(worldMarker)
+			worldMarker:Destroy()
 		end)
 		store:dispatch({
 			type = "addMinimapLabel",
-			title = p1.name .. "_",
+			title = waypointConfig.name .. "_",
 			imageId = 5920742944,
-			position = v3:GetPosition(),
-			markerColor = v3.FrameInner.ImageColor3,
+			position = worldMarker:GetPosition(),
+			markerColor = worldMarker.FrameInner.ImageColor3,
 			scale = 1.5
 		})
-		v3._maid:GiveTask(function()
+		worldMarker._maid:GiveTask(function()
 			store:dispatch({
 				type = "removeMinimapLabel",
-				title = p1.name .. "_"
+				title = waypointConfig.name .. "_"
 			})
 		end)
 		local function update()
 			local localPlayer = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
 			if localPlayer then
-				v2.Attachment1 = localPlayer:FindFirstChildOfClass("Attachment")
+				beamClone.Attachment1 = localPlayer:FindFirstChildOfClass("Attachment")
 				if ((localPlayer.PrimaryPart.Position - localPlayer.Position) * Vector3.new(1, 0, 1)).Magnitude < minDist then
 					store:dispatch({
 						type = "removeWaypointByName",
-						name = p1.name
+						name = waypointConfig.name
 					})
 				end
 			end
 		end
 		update()
-		v5:GiveTask(Interval.every(1):Connect(update))
-		if p1.message then
+		waypointMaid:GiveTask(Interval.every(1):Connect(update))
+		if waypointConfig.message then
 			local function getComponent()
-				local localPlayer = EzUtils.isSmallScreen()
-				local configTable = {
+				local isSmallScreen = EzUtils.isSmallScreen()
+				local screenGuiProps = {
 					ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 					ResetOnSpawn = false,
 					IgnoreGuiInset = true
 				}
-				local configTable = {}
-				local configTable = {
+				local messageFrameChildren = {}
+				local messageFrameProps = {
 					LayoutOrder = 1,
 					BackgroundTransparency = 1
 				}
-				configTable.Size = UDim2.fromScale(0.6, if localPlayer then 0.07500000000000001 else 0.045)
-				configTable.AnchorPoint = Vector2.new(0.5, 1)
-				configTable.Position = UDim2.fromScale(0.5, 0.75)
-				configTable.Message = createElement("Frame", configTable, {
+				messageFrameProps.Size = UDim2.fromScale(0.6, if isSmallScreen then 0.07500000000000001 else 0.045)
+				messageFrameProps.AnchorPoint = Vector2.new(0.5, 1)
+				messageFrameProps.Position = UDim2.fromScale(0.5, 0.75)
+				messageFrameProps.Message = createElement("Frame", messageFrameProps, {
 					Text = createElement("TextLabel", {
 						BackgroundTransparency = 1,
 						Size = UDim2.fromScale(1, 1),
 						Position = UDim2.fromScale(0.5, 0.5),
 						AnchorPoint = Vector2.new(0.5, 0.5),
 						Font = Enum.Font.FredokaOne,
-						Text = p1.message,
+						Text = waypointConfig.message,
 						TextColor3 = Color3.new(0.95, 0.05, 0.05),
 						TextScaled = true
 					}, {
@@ -238,26 +236,26 @@ local function setWaypoint(p1)
 						})
 					})
 				})
-				return createElement("ScreenGui", configTable, configTable)
+				return createElement("ScreenGui", messageFrameProps, messageFrameChildren)
 			end
-			local localPlayer = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "WaypointGui")
-			v5:GiveTask(function()
-				Roact.unmount(localPlayer)
+			local waypointGui = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "WaypointGui")
+			waypointMaid:GiveTask(function()
+				Roact.unmount(waypointGui)
 			end)
 		end
 	end
 end
-store.changed:connect(function(p1, p2)
-	if p1.minimapWaypoints == p2.minimapWaypoints then
-		if p1.otherTradeServerListConfig ~= p2.otherTradeServerListConfig then
-			if p1.otherTradeServerListConfig.visible then
+store.changed:connect(function(oldState, newState)
+	if oldState.minimapWaypoints == newState.minimapWaypoints then
+		if oldState.otherTradeServerListConfig ~= newState.otherTradeServerListConfig then
+			if oldState.otherTradeServerListConfig.visible then
 				ChatUtils.setEnabled(false)
 				return
 			end
 			ChatUtils.setEnabled(true)
 		end
 	else
-		local minimapWaypoints = p1.minimapWaypoints
+		local minimapWaypoints = oldState.minimapWaypoints
 		setWaypoint(minimapWaypoints[#minimapWaypoints])
 	end
 end)

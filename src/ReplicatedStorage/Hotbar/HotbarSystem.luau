@@ -1,14 +1,13 @@
--- Reviewed by Claude
 local HotbarItemRes = require(script.Parent.HotbarItemRes)
 return {
 	init = function()
 		require(script.Parent.HotbarItemSystem).init()
 	end,
-	setColor = function(p1)
-		for i, v in ipairs(HotbarItemRes.gui.Container:GetChildren()) do
-			if v:IsA(HotbarItemRes.presetFrame.ClassName) then
-				v.ImageColor3 = p1
-				v.Index.TextColor3 = p1
+	setColor = function(color)
+		for i, hotbarItem in ipairs(HotbarItemRes.gui.Container:GetChildren()) do
+			if hotbarItem:IsA(HotbarItemRes.presetFrame.ClassName) then
+				hotbarItem.ImageColor3 = color
+				hotbarItem.Index.TextColor3 = color
 			end
 		end
 	end,

@@ -1,22 +1,20 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaintUtils = require(ReplicatedStorage.Game.Garage.PaintUtils)
-local function setTransparency(p1, p2)
-	if p2 == nil then
-		p2 = PaintUtils.GetDefaultVehiclePart(p1).Transparency
+local function setTransparency(part, transparency)
+	if transparency == nil then
+		transparency = PaintUtils.GetDefaultVehiclePart(part).Transparency
 	end
-	p1.Transparency = p2
+	part.Transparency = transparency
 end
-return function(p1, p2)
-	local Model = p2.Model
-	local transparencyValue = p1 and p1.Value
+return function(config, vehicle)
+	local Model = vehicle.Model
+	local transparencyValue = config and config.Value
 	if Model:FindFirstChild("Model") then
-		for i, v in ipairs(Model:GetDescendants()) do
+		for i, descendant in ipairs(Model:GetDescendants()) do
 			local windowTransparency
-			if v.Name == "Windows" then
-				windowTransparency = if transparencyValue == nil then PaintUtils.GetDefaultVehiclePart(v).Transparency else transparencyValue
-				v.Transparency = windowTransparency
+			if descendant.Name == "Windows" then
+				windowTransparency = if transparencyValue == nil then PaintUtils.GetDefaultVehiclePart(descendant).Transparency else transparencyValue
+				descendant.Transparency = windowTransparency
 			end
 		end
 		local Preset = Model:FindFirstChild("Preset")

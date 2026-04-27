@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local RunService = game:GetService("RunService")
@@ -252,19 +251,19 @@ return function(character)
 		maxLvY = 0
 		minLvY = 0
 		for k, v in pairs(strafeAnimations) do
-			local lv = v.lv
-			if lv then
-				if maxLvX < lv.x then
-					maxLvX = lv.x
+			local linearVel = v.lv
+			if linearVel then
+				if maxLvX < linearVel.x then
+					maxLvX = linearVel.x
 				end
-				if maxLvY < lv.y then
-					maxLvY = lv.y
+				if maxLvY < linearVel.y then
+					maxLvY = linearVel.y
 				end
-				if lv.x < minLvX then
-					minLvX = lv.x
+				if linearVel.x < minLvX then
+					minLvX = linearVel.x
 				end
-				if lv.y < minLvY then
-					minLvY = lv.y
+				if linearVel.y < minLvY then
+					minLvY = linearVel.y
 				end
 			end
 		end
@@ -789,10 +788,10 @@ return function(character)
 	end
 	local lastStepTime = 0
 	local function stepAnimate(clockTime)
-		local dt = clockTime - lastStepTime
+		local deltaTime = clockTime - lastStepTime
 		lastStepTime = clockTime
 		if jumpFallTimer > 0 then
-			jumpFallTimer = jumpFallTimer - dt
+			jumpFallTimer = jumpFallTimer - deltaTime
 		end
 		if currentState == "FreeFall" and jumpFallTimer <= 0 then
 			playAnimation("fall", 0.2, Humanoid)

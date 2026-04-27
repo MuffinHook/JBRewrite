@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -8,29 +7,29 @@ local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
 local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
-local t = {}
-t.__index = t
-setmetatable(t, BaseObject)
-function t.new(self, p2)
+local LaserTrapClass = {}
+LaserTrapClass.__index = LaserTrapClass
+setmetatable(LaserTrapClass, BaseObject)
+function LaserTrapClass.new(self, binderConfig)
 	local instance = BaseObject.new(self)
-	setmetatable(instance, t)
+	setmetatable(instance, LaserTrapClass)
 	instance._flashing = false
 	instance.buttonsModel = nil
-	instance.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(self, "Buttons", function(p12, p22)
-		instance.buttonsModel = p12
-		p22:GiveTask(RxInstanceUtils.observeChildren(p12, function(p12, p22)
-			p22:GivePromise(DoorUtils.promiseInnerModel(p12):andThen(function(self)
+	instance.maid:GiveTask(RxInstanceUtils.observeOneChildNamed(self, "Buttons", function(buttonsModelChild, buttonsMaid)
+		instance.buttonsModel = buttonsModelChild
+		buttonsMaid:GiveTask(RxInstanceUtils.observeChildren(buttonsModelChild, function(buttonChild, buttonMaid)
+			buttonMaid:GivePromise(DoorUtils.promiseInnerModel(buttonChild):andThen(function(self)
 				return RxInstanceUtils.waitForChild(self, "Touch")
-			end):andThen(function(p12)
-				local var12 = os.clock()
-				p22:GiveTask(p12.Touched:Connect(function(p12)
-					local var13 = CharacterUtils.getAncestorPartHumanoid(p12)
-					if var13 and (var13.Parent == Players.LocalPlayer.Character and var13:GetLimb(p12) ~= Enum.Limb.Unknown) then
-						local v2 = os.clock()
-						if not (v2 - var12 < 1 or instance._flashing) then
-							var12 = v2
-							var13:TakeDamage((assert(self:GetAttribute("LaserTrapDamage"), "missing LaserTrapDamage")))
-							p2.replicateRemote:FireServer()
+			end):andThen(function(touchPart)
+				local lastTouchTime = os.clock()
+				buttonMaid:GiveTask(touchPart.Touched:Connect(function(hit)
+					local characterHumanoid = CharacterUtils.getAncestorPartHumanoid(hit)
+					if characterHumanoid and (characterHumanoid.Parent == Players.LocalPlayer.Character and characterHumanoid:GetLimb(hit) ~= Enum.Limb.Unknown) then
+						local currentTime = os.clock()
+						if not (currentTime - lastTouchTime < 1 or instance._flashing) then
+							lastTouchTime = currentTime
+							characterHumanoid:TakeDamage((assert(self:GetAttribute("LaserTrapDamage"), "missing LaserTrapDamage")))
+							binderConfig.replicateRemote:FireServer()
 							instance:_flicker()
 						end
 					end
@@ -38,65 +37,65 @@ function t.new(self, p2)
 			end))
 		end))
 	end))
-	instance.maid:GiveTask(p2.replicateRemote.OnClientEvent:Connect(function()
+	instance.maid:GiveTask(binderConfig.replicateRemote.OnClientEvent:Connect(function()
 		instance:_flicker()
 	end))
 	return instance
 end
-function t._setPartsVisible(self, p2)
+function LaserTrapClass._setPartsVisible(self, shouldBeVisible)
 	local Lasers = self.obj:FindFirstChild("Lasers")
-	for instance, v2 in assert(Lasers, "no lasersModel exists"):GetChildren() do
-		if p2 then
-			v2.CanTouch = true
-			v2.Transparency = 0.2
+	for instance, laserPart in assert(Lasers, "no lasersModel exists"):GetChildren() do
+		if shouldBeVisible then
+			laserPart.CanTouch = true
+			laserPart.Transparency = 0.2
 		else
-			v2.CanTouch = false
-			v2.Transparency = 1
+			laserPart.CanTouch = false
+			laserPart.Transparency = 1
 		end
 	end
 end
-function t._setTouchPartsTriggered(self)
-	local t = {}
-	local t2 = {}
-	for instance, v2 in self.buttonsModel:GetChildren() do
-		local Touch = DoorUtils.getInnerModel(v2):FindFirstChild("Touch")
-		t[Touch] = Touch.Transparency
-		t2[Touch] = Touch.Color
+function LaserTrapClass._setTouchPartsTriggered(self)
+	local originalTransparencies = {}
+	local originalColors = {}
+	for instance, buttonChild in self.buttonsModel:GetChildren() do
+		local Touch = DoorUtils.getInnerModel(buttonChild):FindFirstChild("Touch")
+		originalTransparencies[Touch] = Touch.Transparency
+		originalColors[Touch] = Touch.Color
 		Touch.Transparency = 0
 		Touch.Color = Color3.new(0.9, 0, 0)
 	end
 	return function()
-		for instance, v2 in t do
-			instance.Transparency = v2
+		for touchPart, originalTransparency in originalTransparencies do
+			touchPart.Transparency = originalTransparency
 		end
-		for var3, v4 in t2 do
-			var3.Color = v4
+		for touchPart, originalColor in originalColors do
+			touchPart.Color = originalColor
 		end
 	end
 end
-function t._flicker(self)
+function LaserTrapClass._flicker(self)
 	if not self._flashing then
 		self._flashing = true
 		Audio.ObjectLocal(self.obj:FindFirstChild("SoundPart"), 11793588989, {
 			Volume = 1
 		})
-		local instance = self:_setTouchPartsTriggered()
+		local restoreFunction = self:_setTouchPartsTriggered()
 		for i = 0, 6 do
-			local v2
-			v2 = i % 2 == 0
-			self:_setPartsVisible(v2)
-			local var3 = os.clock()
+			local isLaserOn
+			isLaserOn = i % 2 == 0
+			self:_setPartsVisible(isLaserOn)
+			local flickerStartTime = os.clock()
 			repeat
 				RunService.Heartbeat:Wait()
-			until 0.7777777777777778 ^ (6 - i) * 0.06666666666666667 <= os.clock() - var3
+			until 0.7777777777777778 ^ (6 - i) * 0.06666666666666667 <= os.clock() - flickerStartTime
 		end
 		self:_setPartsVisible(true)
 		task.wait(2)
 		self:_setPartsVisible(false)
-		instance()
+		restoreFunction()
 		self._flashing = false
 	end
 end
 return ManifestBinder.new("LaserTrap", {
 	replicateRemote = "ReplicateRemote"
-}, t)
+}, LaserTrapClass)

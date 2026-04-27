@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunConsts = require(script.Parent.RunConsts)
 local RunUtils = require(script.Parent.RunUtils)
 local module = {

@@ -1,6 +1,5 @@
--- Reviewed by Claude
 local MansionRobberyConsts = require(script.Parent.MansionRobberyConsts)
-local t = {
+local dialogueLines = {
 	{
 		IsPlayer = true,
 		Text = "There he is! Get him!",
@@ -45,7 +44,7 @@ local t = {
 		NOW_END = true
 	}
 }
-for v1, v2 in t do
-	v2.Duration = v2.PauseDuration + utf8.len(v2.Text) / MansionRobberyConsts.CHAR_PER_SECOND
+for index, dialogueLine in dialogueLines do
+	dialogueLine.Duration = dialogueLine.PauseDuration + utf8.len(dialogueLine.Text) / MansionRobberyConsts.CHAR_PER_SECOND
 end
-return t
+return dialogueLines

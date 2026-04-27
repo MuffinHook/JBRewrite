@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("UserInputService")
@@ -15,33 +13,33 @@ configTable.animationId = if RunUtils.getEnv() == RunConsts.QA_NAME then "rbxass
 configTable.looped = false
 configTable.Roll = configTable
 local configTable = {}
-for v2, v3 in configTable do
-	configTable[v2] = Instance.new("Animation")
-	configTable[v2].AnimationId = v3.animationId
+for animationName, animationConfig in configTable do
+	configTable[animationName] = Instance.new("Animation")
+	configTable[animationName].AnimationId = animationConfig.animationId
 end
 local configTable = {}
-local function characterAdded(p1)
-	local Animator = p1:WaitForChild("Humanoid"):WaitForChild("Animator")
-	for v1, v2 in configTable do
-		local var4 = Animator:LoadAnimation(v2)
-		var4.Priority = Enum.AnimationPriority.Action
-		var4.Looped = configTable[v1].looped
-		configTable[v1] = var4
+local function characterAdded(character)
+	local Animator = character:WaitForChild("Humanoid"):WaitForChild("Animator")
+	for animationName, animationInstance in configTable do
+		local loadedAnimation = Animator:LoadAnimation(animationInstance)
+		loadedAnimation.Priority = Enum.AnimationPriority.Action
+		loadedAnimation.Looped = configTable[animationName].looped
+		configTable[animationName] = loadedAnimation
 	end
 end
-local function playerAdded(p1)
-	if p1.Character then
-		characterAdded(p1.Character)
+local function playerAdded(player)
+	if player.Character then
+		characterAdded(player.Character)
 	end
-	p1.CharacterAdded:Connect(characterAdded)
+	player.CharacterAdded:Connect(characterAdded)
 end
 local LocalPlayer = Players.LocalPlayer
 if LocalPlayer.Character then
 	characterAdded(LocalPlayer.Character)
 end
 LocalPlayer.CharacterAdded:Connect(characterAdded)
-local function playRollSound(p1)
-	local PrimaryPart = p1.PrimaryPart
+local function playRollSound(character)
+	local PrimaryPart = character.PrimaryPart
 	if PrimaryPart then
 		Audio.ObjectLocal(PrimaryPart, 13621046723, {
 			Volume = 0.5
@@ -49,20 +47,20 @@ local function playRollSound(p1)
 	end
 end
 local ReplicateMovementRollRemote = ReplicatedStorage:WaitForChild("ReplicateMovementRollRemote")
-MovementRollService.onRollBegan:Connect(function(p1, p2)
+MovementRollService.onRollBegan:Connect(function(player, rollDuration)
 	configTable.Roll:Play()
-	configTable.Roll:AdjustSpeed(0.54 * configTable.Roll.Length / p2)
+	configTable.Roll:AdjustSpeed(0.54 * configTable.Roll.Length / rollDuration)
 	ReplicateMovementRollRemote:FireServer()
-	local PrimaryPart = p1.Character.PrimaryPart
+	local PrimaryPart = player.Character.PrimaryPart
 	if PrimaryPart then
 		Audio.ObjectLocal(PrimaryPart, 13621046723, {
 			Volume = 0.5
 		})
 	end
 end)
-ReplicateMovementRollRemote.OnClientEvent:Connect(function(p1)
-	if p1 ~= Players.LocalPlayer then
-		local Character = p1.Character
+ReplicateMovementRollRemote.OnClientEvent:Connect(function(remotePlayer)
+	if remotePlayer ~= Players.LocalPlayer then
+		local Character = remotePlayer.Character
 		if Character then
 			local PrimaryPart = Character.PrimaryPart
 			if PrimaryPart then
@@ -80,18 +78,18 @@ local configTable = {
 	useEvery = 5,
 	image = "rbxassetid://13613171070",
 	keyCodes = { Enum.KeyCode.LeftControl, Enum.KeyCode.RightControl, Enum.KeyCode.ButtonL3 },
-	onPressed = function(p1)
+	onPressed = function(buttonConfig)
 		return MovementRollService.attemptRoll() and true or false
 	end,
 	onReleased = function()  end
 }
 ActionButtonService.add(configTable)
 local function updateVisibility()
-	local v1 = VehicleUtils.GetLocalVehiclePacket()
-	ActionButtonService.setButtonEnabled(configTable, not v1 and ReplicatedStorage:GetAttribute("RollingEnabled") == true)
+	local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+	ActionButtonService.setButtonEnabled(configTable, not vehiclePacket and ReplicatedStorage:GetAttribute("RollingEnabled") == true)
 end
 VehicleUtils.OnVehicleEntered:Connect(updateVisibility)
 VehicleUtils.OnVehicleExited:Connect(updateVisibility)
 ReplicatedStorage:GetAttributeChangedSignal("RollingEnabled"):Connect(updateVisibility)
-local var4 = VehicleUtils.GetLocalVehiclePacket()
-ActionButtonService.setButtonEnabled(configTable, not var4 and ReplicatedStorage:GetAttribute("RollingEnabled") == true)
+local localVehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+ActionButtonService.setButtonEnabled(configTable, not localVehiclePacket and ReplicatedStorage:GetAttribute("RollingEnabled") == true)

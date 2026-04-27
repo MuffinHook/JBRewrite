@@ -1,12 +1,11 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(containerElement)
+	local AppComponent = Roact.Component:extend("App")
 	local store = require(ReplicatedStorage.App.store)
 	local TradeResult = require(script.Parent.TradeResult)
-	function v1.init(p1)
+	function AppComponent.init(self)
 		store:dispatch({
 			type = "setTradeResult",
 			value = {
@@ -16,14 +15,14 @@ return function(p1)
 			}
 		})
 	end
-	function v1.render(p1)
+	function AppComponent.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(TradeResult, {}) })
 	end
-	function v1.willUnmount(p1)  end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(self)  end
+	local mountedComponentHandle = Roact.mount(Roact.createElement(AppComponent), containerElement)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedComponentHandle)
 	end
 end

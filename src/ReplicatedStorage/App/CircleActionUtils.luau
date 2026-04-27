@@ -1,38 +1,37 @@
--- Reviewed by Claude
 return {
-	setDist = function(p1, p2)
-		assert(p1:IsA("Model") or p1:IsA("BasePart"))
-		assert(p1:HasTag("CircleAction"))
-		p1:SetAttribute("CircleActionDist", p2)
+	setDist = function(target, value)
+		assert(target:IsA("Model") or target:IsA("BasePart"))
+		assert(target:HasTag("CircleAction"))
+		target:SetAttribute("CircleActionDist", value)
 	end,
-	setDuration = function(p1, p2)
-		assert(p1:IsA("Model") or p1:IsA("BasePart"))
-		assert(p1:HasTag("CircleAction"))
-		p1:SetAttribute("CircleActionDuration", p2)
+	setDuration = function(target, value)
+		assert(target:IsA("Model") or target:IsA("BasePart"))
+		assert(target:HasTag("CircleAction"))
+		target:SetAttribute("CircleActionDuration", value)
 	end,
-	setText = function(p1, p2)
-		assert(p1:IsA("Model") or p1:IsA("BasePart"))
-		assert(p1:HasTag("CircleAction"))
-		p1:SetAttribute("CircleActionText", p2)
+	setText = function(target, value)
+		assert(target:IsA("Model") or target:IsA("BasePart"))
+		assert(target:HasTag("CircleAction"))
+		target:SetAttribute("CircleActionText", value)
 	end,
-	setDisabled = function(p1, p2)
-		assert(p1:IsA("Model") or p1:IsA("BasePart"))
-		assert(p1:HasTag("CircleAction"))
-		p1:SetAttribute("CircleActionDisabled", p2)
+	setDisabled = function(target, value)
+		assert(target:IsA("Model") or target:IsA("BasePart"))
+		assert(target:HasTag("CircleAction"))
+		target:SetAttribute("CircleActionDisabled", value)
 	end,
-	getDisabled = function(p1)
-		assert(p1:IsA("Model") or p1:IsA("BasePart"))
-		assert(p1:HasTag("CircleAction"))
-		return p1:GetAttribute("CircleActionDisabled") == true
+	getDisabled = function(target)
+		assert(target:IsA("Model") or target:IsA("BasePart"))
+		assert(target:HasTag("CircleAction"))
+		return target:GetAttribute("CircleActionDisabled") == true
 	end,
-	getTagPart = function(p1)
-		assert(p1:IsA("Model") or p1:IsA("BasePart"))
-		assert(p1:HasTag("CircleAction"))
-		if p1:IsA("Model") then
-			return p1.PrimaryPart
+	getTagPart = function(target)
+		assert(target:IsA("Model") or target:IsA("BasePart"))
+		assert(target:HasTag("CircleAction"))
+		if target:IsA("Model") then
+			return target.PrimaryPart
 		else
-			assert(p1:IsA("BasePart"))
-			return p1
+			assert(target:IsA("BasePart"))
+			return target
 		end
 	end
 }

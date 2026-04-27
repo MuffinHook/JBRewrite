@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local GameAnalyticsClientModule = {}
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")

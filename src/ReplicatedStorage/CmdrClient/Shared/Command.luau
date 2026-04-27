@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local Argument = require(script.Parent.Argument)
@@ -29,7 +27,7 @@ function Command.new(command)
 	setmetatable(commandInstance, Command)
 	return commandInstance
 end
-function Command.Parse(command, p2)
+function Command.Parse(command, skipValidation)
 	local hasRequiredArgument = false
 	for i, v in ipairs(command.ArgumentDefinitions) do
 		local isRequired
@@ -46,21 +44,21 @@ function Command.Parse(command, p2)
 		elseif not isRequired then
 			hasRequiredArgument = true
 		end
-		if command.RawArguments[i] == nil and (isRequired and p2 ~= true) then
+		if command.RawArguments[i] == nil and (isRequired and skipValidation ~= true) then
 			return false, ("Required argument #%d %s is missing."):format(i, v.Name)
 		end
-		if command.RawArguments[i] or p2 then
+		if command.RawArguments[i] or skipValidation then
 			command.Arguments[i] = Argument.new(command, v, command.RawArguments[i] or "")
 		end
 	end
 	return true
 end
-function Command.Validate(command, p2)
+function Command.Validate(command, validatorOptions)
 	command._Validated = true
 	local validationMessage = ""
 	local isValid = true
 	for k, v in pairs(command.Arguments) do
-		local validationResult, errorMessage = v:Validate(p2)
+		local validationResult, errorMessage = v:Validate(validatorOptions)
 		if not validationResult then
 			validationMessage, isValid = ("%s; #%d %s: %s"):format(validationMessage, k, v.Name, errorMessage or "error"), false
 		end
@@ -132,8 +130,8 @@ function Command.Run(command)
 		end
 	end
 end
-function Command.GetArgument(command, p2)
-	return command.Arguments[p2]
+function Command.GetArgument(command, argumentIndex)
+	return command.Arguments[argumentIndex]
 end
 function Command.GetData(command)
 	if not command.Data and (command.Object.Data and not isServer) then
@@ -141,13 +139,13 @@ function Command.GetData(command)
 	end
 	return command.Data
 end
-function Command.SendEvent(command, p2, eventName, ...)
-	assert(if typeof(p2) == "Instance" then p2:IsA("Player") else false, "[Cmdr] Argument #1 must be a Player")
+function Command.SendEvent(command, targetPlayer, eventName, ...)
+	assert(if typeof(targetPlayer) == "Instance" then targetPlayer:IsA("Player") else false, "[Cmdr] Argument #1 must be a Player")
 	assert(type(eventName) == "string", "[Cmdr] Argument #2 must be a string")
 	if isServer then
-		command.Dispatcher.Cmdr.RemoteEvent:FireClient(p2, eventName, ...)
+		command.Dispatcher.Cmdr.RemoteEvent:FireClient(targetPlayer, eventName, ...)
 	elseif command.Dispatcher.Cmdr.Events[eventName] then
-		assert(p2 == Players.LocalPlayer, "[Cmdr] Event messages can only be sent to the local player on the client.")
+		assert(targetPlayer == Players.LocalPlayer, "[Cmdr] Event messages can only be sent to the local player on the client.")
 		command.Dispatcher.Cmdr.Events[eventName](...)
 	end
 end

@@ -1,7 +1,5 @@
--- Reviewed by Claude
--- variables reassigned
 local list = {}
-local t = {}
+local characterIndexMap = {}
 for i = 65, 90 do
 	table.insert(list, i)
 end
@@ -21,13 +19,13 @@ table.insert(list, 57)
 table.insert(list, 43)
 table.insert(list, 47)
 for i, v in ipairs(list) do
-	t[v] = i
+	characterIndexMap[v] = i
 end
-local t2 = {}
+local module = {}
 local rshift = bit32.rshift
 local lshift = bit32.lshift
 local band = bit32.band
-function t2.Encode(inputString)
+function module.Encode(inputString)
 	local outputIndex = 0
 	local encodedBytes = {}
 	for i = 1, #inputString, 3 do
@@ -46,26 +44,26 @@ function t2.Encode(inputString)
 		encodedBytes[outputIndex] = byte3 and list[index4 + 1] or 61
 	end
 	local count = 0
-	local t2 = {}
+	local chunks = {}
 	for j = 1, outputIndex, 4096 do
 		local chunkEnd
 		count = count + 1
 		local maxPos = j + 4096 - 1
 		chunkEnd = if outputIndex < maxPos then outputIndex else maxPos
-		t2[count] = string.char(table.unpack(encodedBytes, j, chunkEnd))
+		chunks[count] = string.char(table.unpack(encodedBytes, j, chunkEnd))
 	end
-	return table.concat(t2)
+	return table.concat(chunks)
 end
-function t2.Decode(inputString)
+function module.Decode(inputString)
 	local count = 0
 	local decodedBytes = {}
 	for i = 1, #inputString, 4 do
 		local byte1, byte2, byte3, byte4 = string.byte(inputString, i, i + 3)
-		local index2 = t[byte2] - 1
-		local index3 = (t[byte3] or 1) - 1
-		local decodedByte1 = lshift(t[byte1] - 1, 2) + rshift(index2, 4)
+		local index2 = characterIndexMap[byte2] - 1
+		local index3 = (characterIndexMap[byte3] or 1) - 1
+		local decodedByte1 = lshift(characterIndexMap[byte1] - 1, 2) + rshift(index2, 4)
 		local decodedByte2 = lshift(band(index2, 15), 4) + rshift(index3, 2)
-		local decodedByte3 = lshift(band(index3, 3), 6) + ((t[byte4] or 1) - 1)
+		local decodedByte3 = lshift(band(index3, 3), 6) + ((characterIndexMap[byte4] or 1) - 1)
 		count = count + 1
 		decodedBytes[count] = decodedByte1
 		if byte3 ~= 61 then
@@ -88,4 +86,4 @@ function t2.Decode(inputString)
 	end
 	return table.concat(decodedChunks)
 end
-return t2
+return module

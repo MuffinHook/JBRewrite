@@ -1,65 +1,64 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("TradeCategory")
-v1.defaultProps = {
+local TradeCategory = Roact.PureComponent:extend("TradeCategory")
+TradeCategory.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	position = UDim2.new(0, 0, 0, 0),
 	cornerPixel = 8,
 	selected = false
 }
-function v1.init(p1)
-	p1:setState({
+function TradeCategory.init(self)
+	self:setState({
 		hover = false
 	})
 end
-function v1.render(p1)
-	local v1 = if p1.props.itemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then Color3.fromRGB(122, 212, 255) elseif p1.props.itemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then Color3.fromRGB(255, 90, 82) elseif p1.props.itemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then Color3.fromRGB(255, 213, 122) elseif p1.props.itemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then Color3.fromRGB(167, 131, 255) elseif p1.props.itemType == PlayerDataConsts.SAFE_ITEM_TYPE then Color3.fromRGB(255, 126, 191) else Color3.new(204/255, 204/255, 204/255)
-	if not p1.props.selected and p1.state.hover then
-		v1 = ColorUtils.brightenBy(v1, -0.2)
+function TradeCategory.render(self)
+	local buttonColor = if self.props.itemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then Color3.fromRGB(122, 212, 255) elseif self.props.itemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then Color3.fromRGB(255, 90, 82) elseif self.props.itemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then Color3.fromRGB(255, 213, 122) elseif self.props.itemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then Color3.fromRGB(167, 131, 255) elseif self.props.itemType == PlayerDataConsts.SAFE_ITEM_TYPE then Color3.fromRGB(255, 126, 191) else Color3.new(204/255, 204/255, 204/255)
+	if not self.props.selected and self.state.hover then
+		buttonColor = ColorUtils.brightenBy(buttonColor, -0.2)
 	end
-	local aspectRatio = p1.props.aspectRatio
+	local aspectRatio = self.props.aspectRatio
 	return createElement("TextButton", {
 		BackgroundTransparency = 0,
 		AutoButtonColor = false,
 		BorderSizePixel = 0,
-		Size = p1.props.size,
-		Position = p1.props.position,
-		BackgroundColor3 = v1,
+		Size = self.props.size,
+		Position = self.props.position,
+		BackgroundColor3 = buttonColor,
 		Text = "",
 		[Roact.Event.MouseEnter] = function()
-			p1:setState({
+			self:setState({
 				hover = true
 			})
 		end,
 		[Roact.Event.MouseLeave] = function()
-			p1:setState({
+			self:setState({
 				hover = false
 			})
 		end,
 		[Roact.Event.SelectionGained] = function()
-			p1:setState({
+			self:setState({
 				hover = true
 			})
 		end,
 		[Roact.Event.SelectionLost] = function()
-			p1:setState({
+			self:setState({
 				hover = false
 			})
 		end,
-		[Roact.Event.Activated] = p1.props.onClick
+		[Roact.Event.Activated] = self.props.onClick
 	}, Dictionary.merge({
 		UICorner = createElement("UICorner", {
-			CornerRadius = UDim.new(0, p1.props.cornerPixel)
+			CornerRadius = UDim.new(0, self.props.cornerPixel)
 		}),
 		UIStroke = createElement("UIStroke", {
-			Color = ColorUtils.saturateTo(v1, 0.3),
+			Color = ColorUtils.saturateTo(buttonColor, 0.3),
 			Thickness = 2,
-			Enabled = p1.props.selected,
+			Enabled = self.props.selected,
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		}),
 		Title = createElement("Frame", {
@@ -73,8 +72,8 @@ function v1.render(p1)
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				TextColor3 = ColorUtils.brightenBy(v1, -0.8),
-				Text = p1.props.title,
+				TextColor3 = ColorUtils.brightenBy(buttonColor, -0.8),
+				Text = self.props.title,
 				TextXAlignment = Enum.TextXAlignment.Center,
 				Font = Enum.Font.Bangers,
 				LineHeight = 1,
@@ -83,4 +82,4 @@ function v1.render(p1)
 		})
 	}, {}))
 end
-return v1
+return TradeCategory

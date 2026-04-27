@@ -1,238 +1,236 @@
--- Reviewed by Claude
--- variables reassigned
 local Promise = require(script.Parent.Promise)
 local Maid = require(script.Parent.Maid)
-local t = {
+local rxInstanceUtils = {
 	waitForChild = require(script.Parent.waitForChild)
 }
-local function f1()
+local function defaultValidator()
 	return true
 end
-function t.waitForProperty(p1, p2, p3)
-	if p3 == nil then
-		p3 = f1
+function rxInstanceUtils.waitForProperty(instance, propertyName, validator)
+	if validator == nil then
+		validator = defaultValidator
 	end
-	local v1 = p3
-	return Promise.new(function(p12, p22, p3)
-		if p1[p2] and v1(p1[p2]) then
-			p12(p1[p2])
+	local validationFunction = validator
+	return Promise.new(function(resolvePromise, rejectPromise, onCancel)
+		if instance[propertyName] and validationFunction(instance[propertyName]) then
+			resolvePromise(instance[propertyName])
 		else
-			local v12 = nil
-			v12 = p1:GetPropertyChangedSignal(p2):Connect(function()
-				if p1[p2] and v1(p1[p2]) then
-					v12:Disconnect()
-					v12 = nil
-					p12(p1[p2])
+			local connection = nil
+			connection = instance:GetPropertyChangedSignal(propertyName):Connect(function()
+				if instance[propertyName] and validationFunction(instance[propertyName]) then
+					connection:Disconnect()
+					connection = nil
+					resolvePromise(instance[propertyName])
 				end
 			end)
-			p3(function()
-				v12:Disconnect()
-				v12 = nil
+			onCancel(function()
+				connection:Disconnect()
+				connection = nil
 			end)
 		end
 	end)
 end
-function t.observeProperty(p1, p2, p3)
-	local v1 = Maid.new()
-	v1._property = Maid.new()
-	p3(p1[p2], v1._property)
-	v1:GiveTask(p1:GetPropertyChangedSignal(p2):Connect(function()
-		v1._property:DoCleaning()
-		p3(p1[p2], v1._property)
+function rxInstanceUtils.observeProperty(instance, propertyName, callback)
+	local lifecycle = Maid.new()
+	lifecycle._property = Maid.new()
+	callback(instance[propertyName], lifecycle._property)
+	lifecycle:GiveTask(instance:GetPropertyChangedSignal(propertyName):Connect(function()
+		lifecycle._property:DoCleaning()
+		callback(instance[propertyName], lifecycle._property)
 	end))
-	return v1
+	return lifecycle
 end
-function t.observeAttribute(p1, p2, p3)
-	local v1 = Maid.new()
-	v1._property = Maid.new()
-	p3(p1:GetAttribute(p2), v1._property)
-	v1:GiveTask(p1:GetAttributeChangedSignal(p2):Connect(function()
-		v1._property:DoCleaning()
-		p3(p1:GetAttribute(p2), v1._property)
+function rxInstanceUtils.observeAttribute(instance, attributeName, callback)
+	local lifecycle = Maid.new()
+	lifecycle._property = Maid.new()
+	callback(instance:GetAttribute(attributeName), lifecycle._property)
+	lifecycle:GiveTask(instance:GetAttributeChangedSignal(attributeName):Connect(function()
+		lifecycle._property:DoCleaning()
+		callback(instance:GetAttribute(attributeName), lifecycle._property)
 	end))
-	return v1
+	return lifecycle
 end
-function t.observeChildren(p1, p2)
-	local v1 = Maid.new()
-	local function handleChildAdded(p1)
-		assert(v1[p1] == nil)
-		local v2 = Maid.new()
-		v1[p1] = v2
-		p2(p1, v2)
+function rxInstanceUtils.observeChildren(instance, callback)
+	local lifecycle = Maid.new()
+	local function handleChildAdded(child)
+		assert(lifecycle[child] == nil)
+		local childMaid = Maid.new()
+		lifecycle[child] = childMaid
+		callback(child, childMaid)
 	end
-	for i, v in ipairs(p1:GetChildren()) do
-		local v2
-		v2 = v1[v] == nil
-		assert(v2)
-		local v3 = Maid.new()
-		v1[v] = v3
-		p2(v, v3)
+	for i, child in ipairs(instance:GetChildren()) do
+		local isNewChild
+		isNewChild = lifecycle[child] == nil
+		assert(isNewChild)
+		local childMaid = Maid.new()
+		lifecycle[child] = childMaid
+		callback(child, childMaid)
 	end
-	v1:GiveTask(p1.ChildAdded:Connect(handleChildAdded))
-	v1:GiveTask(p1.ChildRemoved:Connect(function(p1)
-		v1[p1] = nil
+	lifecycle:GiveTask(instance.ChildAdded:Connect(handleChildAdded))
+	lifecycle:GiveTask(instance.ChildRemoved:Connect(function(child)
+		lifecycle[child] = nil
 	end))
-	return v1
+	return lifecycle
 end
-function t.observeChildrenNamed(p1, p2, p3)
-	local v1 = Maid.new()
-	local function handleChildAdded(p1)
-		if p1.Name == p2 then
-			assert(v1[p1] == nil)
-			local v2 = Maid.new()
-			v1[p1] = v2
-			p3(p1, v2)
+function rxInstanceUtils.observeChildrenNamed(instance, childName, callback)
+	local lifecycle = Maid.new()
+	local function handleChildAdded(child)
+		if child.Name == childName then
+			assert(lifecycle[child] == nil)
+			local childMaid = Maid.new()
+			lifecycle[child] = childMaid
+			callback(child, childMaid)
 		end
 	end
-	for i, v in ipairs(p1:GetChildren()) do
-		local v2
-		if v.Name == p2 then
-			v2 = v1[v] == nil
-			assert(v2)
-			local v3 = Maid.new()
-			v1[v] = v3
-			p3(v, v3)
+	for i, child in ipairs(instance:GetChildren()) do
+		local childMaid
+		if child.Name == childName then
+			childMaid = lifecycle[child] == nil
+			assert(childMaid)
+			local newChildMaid = Maid.new()
+			lifecycle[child] = newChildMaid
+			callback(child, newChildMaid)
 		end
 	end
-	v1:GiveTask(p1.ChildAdded:Connect(handleChildAdded))
-	v1:GiveTask(p1.ChildRemoved:Connect(function(p1)
-		v1[p1] = nil
+	lifecycle:GiveTask(instance.ChildAdded:Connect(handleChildAdded))
+	lifecycle:GiveTask(instance.ChildRemoved:Connect(function(child)
+		lifecycle[child] = nil
 	end))
-	return v1
+	return lifecycle
 end
-function t.observeOneChildNamed(p1, p2, p3)
-	local v1 = Maid.new()
-	local function handleChildAdded(p1)
-		assert(v1[p1] == nil)
-		local v2 = Maid.new()
-		v1[p1] = v2
-		p3(p1, v2)
+function rxInstanceUtils.observeOneChildNamed(instance, childName, callback)
+	local lifecycle = Maid.new()
+	local function handleChildAdded(child)
+		assert(lifecycle[child] == nil)
+		local childMaid = Maid.new()
+		lifecycle[child] = childMaid
+		callback(child, childMaid)
 	end
-	local v2 = nil
-	local v3 = nil
+	local setupListener = nil
+	local cleanupListener = nil
 	local function check()
-		local v12 = p1:FindFirstChild(p2)
-		if v12 then
-			assert(v1[v12] == nil)
-			local v32 = Maid.new()
-			v1[v12] = v32
-			p3(v12, v32)
-			v3()
+		local foundChild = instance:FindFirstChild(childName)
+		if foundChild then
+			assert(lifecycle[foundChild] == nil)
+			local foundChildMaid = Maid.new()
+			lifecycle[foundChild] = foundChildMaid
+			callback(foundChild, foundChildMaid)
+			cleanupListener()
 		else
-			v2()
+			setupListener()
 		end
 	end
-	v2 = function()
-		v1.childAdded = p1.ChildAdded:Connect(function(p12)
-			if p12.Name == p2 then
-				v1.childAdded = nil
-				local v12 = p1:FindFirstChild(p2)
-				if v12 then
-					assert(v1[v12] == nil)
-					local v32 = Maid.new()
-					v1[v12] = v32
-					p3(v12, v32)
-					v3()
+	setupListener = function()
+		lifecycle.childAdded = instance.ChildAdded:Connect(function(child)
+			if child.Name == childName then
+				lifecycle.childAdded = nil
+				local foundChild = instance:FindFirstChild(childName)
+				if foundChild then
+					assert(lifecycle[foundChild] == nil)
+					local foundChildMaid = Maid.new()
+					lifecycle[foundChild] = foundChildMaid
+					callback(foundChild, foundChildMaid)
+					cleanupListener()
 					return
 				end
-				v2()
+				setupListener()
 			end
 		end)
 	end
-	v3 = function()
-		v1.childRemoved = p1.ChildRemoved:Connect(function(p12)
-			if v1[p12] then
-				v1[p12] = nil
-				v1.childRemoved = nil
-				local v12 = p1:FindFirstChild(p2)
-				if v12 then
-					assert(v1[v12] == nil)
-					local v32 = Maid.new()
-					v1[v12] = v32
-					p3(v12, v32)
-					v3()
+	cleanupListener = function()
+		lifecycle.childRemoved = instance.ChildRemoved:Connect(function(child)
+			if lifecycle[child] then
+				lifecycle[child] = nil
+				lifecycle.childRemoved = nil
+				local foundChild = instance:FindFirstChild(childName)
+				if foundChild then
+					assert(lifecycle[foundChild] == nil)
+					local foundChildMaid = Maid.new()
+					lifecycle[foundChild] = foundChildMaid
+					callback(foundChild, foundChildMaid)
+					cleanupListener()
 					return
 				end
-				v2()
+				setupListener()
 			end
 		end)
 	end
-	local v4 = p1:FindFirstChild(p2)
-	if v4 then
-		assert(v1[v4] == nil)
-		local v6 = Maid.new()
-		v1[v4] = v6
-		p3(v4, v6)
-		v3()
+	local initialChild = instance:FindFirstChild(childName)
+	if initialChild then
+		assert(lifecycle[initialChild] == nil)
+		local initialChildMaid = Maid.new()
+		lifecycle[initialChild] = initialChildMaid
+		callback(initialChild, initialChildMaid)
+		cleanupListener()
 	else
-		v2()
+		setupListener()
 	end
-	return v1
+	return lifecycle
 end
-function t.observeDescendants(p1, p2)
-	local v1 = Maid.new()
-	local function handleDescendantAdded(p1)
-		assert(v1[p1] == nil)
-		local v2 = Maid.new()
-		v1[p1] = v2
-		p2(p1, v2)
+function rxInstanceUtils.observeDescendants(instance, callback)
+	local lifecycle = Maid.new()
+	local function handleDescendantAdded(descendant)
+		assert(lifecycle[descendant] == nil)
+		local descendantMaid = Maid.new()
+		lifecycle[descendant] = descendantMaid
+		callback(descendant, descendantMaid)
 	end
-	for i, v in ipairs(p1:GetDescendants()) do
-		local v2
-		v2 = v1[v] == nil
-		assert(v2)
-		local v3 = Maid.new()
-		v1[v] = v3
-		p2(v, v3)
+	for i, descendant in ipairs(instance:GetDescendants()) do
+		local isNewDescendant
+		isNewDescendant = lifecycle[descendant] == nil
+		assert(isNewDescendant)
+		local descendantMaid = Maid.new()
+		lifecycle[descendant] = descendantMaid
+		callback(descendant, descendantMaid)
 	end
-	v1:GiveTask(p1.DescendantAdded:Connect(handleDescendantAdded))
-	v1:GiveTask(p1.DescendantRemoving:Connect(function(p1)
-		if v1[p1] then
-			v1[p1] = nil
+	lifecycle:GiveTask(instance.DescendantAdded:Connect(handleDescendantAdded))
+	lifecycle:GiveTask(instance.DescendantRemoving:Connect(function(descendant)
+		if lifecycle[descendant] then
+			lifecycle[descendant] = nil
 		end
 	end))
-	return v1
+	return lifecycle
 end
-function t.waitForAttribute(p1, p2)
-	return Promise.new(function(p12, p22, p3)
-		local v1 = p1:GetAttribute(p2)
-		if v1 == nil then
-			local v2 = nil
-			if not p3(function()
-				if v2 then
-					v2:Disconnect()
-					v2 = nil
+function rxInstanceUtils.waitForAttribute(instance, attributeName)
+	return Promise.new(function(resolvePromise, rejectPromise, onCancel)
+		local attributeValue = instance:GetAttribute(attributeName)
+		if attributeValue == nil then
+			local connection = nil
+			if not onCancel(function()
+				if connection then
+					connection:Disconnect()
+					connection = nil
 				end
 			end) then
-				v2 = p1:GetAttributeChangedSignal(p2):Connect(function()
-					v1 = p1:GetAttribute(p2)
-					if v1 ~= nil then
-						p12(v1)
+				connection = instance:GetAttributeChangedSignal(attributeName):Connect(function()
+					attributeValue = instance:GetAttribute(attributeName)
+					if attributeValue ~= nil then
+						resolvePromise(attributeValue)
 					end
 				end)
 			end
 		else
-			p12(v1)
+			resolvePromise(attributeValue)
 			return
 		end
 	end)
 end
-function t.yieldForProperty(p1, p2)
-	if not p1[p2] then
-		local v1 = coroutine.running()
-		local v2 = Maid.new()
-		v2:GiveTask(p1:GetPropertyChangedSignal(p2):Connect(function()
-			if p1[p2] then
-				v2:DoCleaning()
-				task.spawn(v1)
+function rxInstanceUtils.yieldForProperty(instance, propertyName)
+	if not instance[propertyName] then
+		local runningCoroutine = coroutine.running()
+		local lifecycle = Maid.new()
+		lifecycle:GiveTask(instance:GetPropertyChangedSignal(propertyName):Connect(function()
+			if instance[propertyName] then
+				lifecycle:DoCleaning()
+				task.spawn(runningCoroutine)
 			end
 		end))
-		local v3 = debug.traceback("[yieldForProperty] Timeout on " .. p1:GetFullName() .. "." .. p2, 2)
-		v2:GiveTask(task.delay(5, function()
-			warn(v3)
-			task.defer(v2.DoCleaning, v2)
+		local timeoutMessage = debug.traceback("[yieldForProperty] Timeout on " .. instance:GetFullName() .. "." .. propertyName, 2)
+		lifecycle:GiveTask(task.delay(5, function()
+			warn(timeoutMessage)
+			task.defer(lifecycle.DoCleaning, lifecycle)
 		end))
 		coroutine.yield()
 	end
 end
-return t
+return rxInstanceUtils

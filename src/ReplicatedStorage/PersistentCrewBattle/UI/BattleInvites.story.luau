@@ -1,13 +1,11 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(arg1)
-	local local1 = Roact.Component:extend("App")
+return function(storybook)
+	local AppComponent = Roact.Component:extend("App")
 	local BattleInvites = require(script.Parent.BattleInvites)
 	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
-	function local1.init(arg1)
+	function AppComponent.init(self)
 		persistentCrewStore:dispatch({
 			type = "battleInvitesSet",
 			list = {
@@ -28,21 +26,21 @@ return function(arg1)
 			}
 		})
 	end
-	function local1.render(arg1)
+	function AppComponent.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement(BattleInvites, {
-				onAccept = function(arg1)
-					print("accept", arg1)
+				onAccept = function(battleInvite)
+					print("accept", battleInvite)
 				end,
-				onDecline = function(arg1)
-					print("decline", arg1)
+				onDecline = function(battleInvite)
+					print("decline", battleInvite)
 				end
 			}) })
 	end
-	function local1.willUnmount(arg1)  end
-	local local2 = Roact.mount(Roact.createElement(local1), arg1)
+	function AppComponent.willUnmount(self)  end
+	local roactHandle = Roact.mount(Roact.createElement(AppComponent), storybook)
 	return function()
-		Roact.unmount(local2)
+		Roact.unmount(roactHandle)
 	end
 end

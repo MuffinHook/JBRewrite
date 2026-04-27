@@ -1,38 +1,37 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local CategoryItem = require(script.Parent.CategoryItem)
-local v1 = Roact.PureComponent:extend("Categories")
-v1.defaultProps = {
+local CategoriesComponent = Roact.PureComponent:extend("Categories")
+CategoriesComponent.defaultProps = {
 	categoriesPerPage = 10
 }
-function v1.init(p1)  end
-function v1.render(p1)
-	local mainRatio = p1.props.mainRatio
-	local paddingRatio = p1.props.paddingRatio
-	local cornerPixel = p1.props.cornerPixel
-	local categoriesPerPage = p1.props.categoriesPerPage
-	local v2 = 1 / (1 / (mainRatio * categoriesPerPage) - 1 / paddingRatio + 1 / paddingRatio / categoriesPerPage)
-	local t = {}
-	for k, v in pairs(p1.props.categories) do
-		local v3
-		local t2 = {
+function CategoriesComponent.init(self)  end
+function CategoriesComponent.render(self)
+	local mainRatio = self.props.mainRatio
+	local paddingRatio = self.props.paddingRatio
+	local cornerPixel = self.props.cornerPixel
+	local categoriesPerPage = self.props.categoriesPerPage
+	local calculatedMainRatio = 1 / (1 / (mainRatio * categoriesPerPage) - 1 / paddingRatio + 1 / paddingRatio / categoriesPerPage)
+	local elementsList = {}
+	for k, category in pairs(self.props.categories) do
+		local isSelected
+		local categoryItemProps = {
 			layoutOrder = 2 * k,
-			mainRatio = v2,
+			mainRatio = calculatedMainRatio,
 			paddingRatio = paddingRatio,
 			cornerPixel = cornerPixel,
-			title = v.title
+			title = category.title
 		}
-		v3 = p1.props.selectedCategory == v.name
-		t2.selected = v3
-		function t2.onSelect()
-			p1.props.setCategory(v.name, p1.props.sortId)
+		isSelected = self.props.selectedCategory == category.name
+		categoryItemProps.selected = isSelected
+		function categoryItemProps.onSelect()
+			self.props.setCategory(category.name, self.props.sortId)
 		end
-		table.insert(t, (createElement(CategoryItem, t2)))
-		table.insert(t, (createElement("Frame", {
+		table.insert(elementsList, (createElement(CategoryItem, categoryItemProps)))
+		table.insert(elementsList, (createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 0.6,
 			BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
@@ -49,7 +48,7 @@ function v1.render(p1)
 		BackgroundTransparency = 0,
 		BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
 		Size = UDim2.new(1, 0, 1, 0),
-		LayoutOrder = p1.props.layoutOrder
+		LayoutOrder = self.props.layoutOrder
 	}, {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = mainRatio
@@ -63,7 +62,7 @@ function v1.render(p1)
 			BorderSizePixel = 0,
 			ScrollBarThickness = 4,
 			ScrollBarImageColor3 = Color3.new(255/255, 255/255, 255/255),
-			CanvasSize = UDim2.new(0, 0, (1 + mainRatio / paddingRatio) * #p1.props.categories / categoriesPerPage - mainRatio / paddingRatio, 0),
+			CanvasSize = UDim2.new(0, 0, (1 + mainRatio / paddingRatio) * #self.props.categories / categoriesPerPage - mainRatio / paddingRatio, 0),
 			Size = UDim2.new(1, 0, 1, 0),
 			ElasticBehavior = Enum.ElasticBehavior.Always,
 			VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left,
@@ -76,23 +75,23 @@ function v1.render(p1)
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Vertical
 			})
-		}, t))
+		}, elementsList))
 	})
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(stateSlice, dispatchAction)
 	return {
-		categories = p1.garageCategories,
-		selectedCategory = p1.garageCategory,
-		sortId = p1.garageSort
+		categories = stateSlice.garageCategories,
+		selectedCategory = stateSlice.garageCategory,
+		sortId = stateSlice.garageSort
 	}
-end, function(p1)
+end, function(dispatchAction)
 	return {
-		setCategory = function(p12, p2)
-			p1({
+		setCategory = function(categoryName, sortId)
+			dispatchAction({
 				type = "setCategory",
-				categoryName = p12,
-				sortId = p2
+				categoryName = categoryName,
+				sortId = sortId
 			})
 		end
 	}
-end)(v1)
+end)(CategoriesComponent)

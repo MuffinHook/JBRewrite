@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("StarterPlayer")
@@ -59,18 +58,18 @@ local function SpinProp(vehiclePacket, dt)
 	end
 end
 local function FadeInProp(vehiclePacket)
-	local alpha = 0
+	local fadeProgress = 0
 	local heartbeatConn = nil
 	local overrideIndex = vehiclePacket.OverrideSpinPropi and vehiclePacket.OverrideSpinPropi + 1 or 0
 	vehiclePacket.OverrideSpinPropi = overrideIndex
 	local function Heartbeat(dt)
-		alpha = alpha + dt * 1 / 3
-		if alpha >= 1 then
-			alpha = 1
+		fadeProgress = fadeProgress + dt * 1 / 3
+		if fadeProgress >= 1 then
+			fadeProgress = 1
 		end
-		vehiclePacket.PropAlpha = alpha
+		vehiclePacket.PropAlpha = fadeProgress
 		SpinProp(vehiclePacket, dt)
-		if alpha >= 1 then
+		if fadeProgress >= 1 then
 			vehiclePacket.OverrideSpinPropi = nil
 			heartbeatConn:disconnect()
 		end
@@ -81,18 +80,18 @@ local function FadeInProp(vehiclePacket)
 	heartbeatConn = RunService.Heartbeat:connect(Heartbeat)
 end
 local function FadeOutProp(vehiclePacket)
-	local alpha = 0
+	local fadeProgress = 0
 	local heartbeatConn = nil
 	local overrideIndex = vehiclePacket.OverrideSpinPropi and vehiclePacket.OverrideSpinPropi + 1 or 0
 	vehiclePacket.OverrideSpinPropi = overrideIndex
 	local function Heartbeat(dt)
-		alpha = alpha + dt * 1 / 1
-		if alpha >= 1 then
-			alpha = 1
+		fadeProgress = fadeProgress + dt * 1 / 1
+		if fadeProgress >= 1 then
+			fadeProgress = 1
 		end
-		vehiclePacket.PropAlpha = 1 - alpha
+		vehiclePacket.PropAlpha = 1 - fadeProgress
 		SpinProp(vehiclePacket, dt)
-		if alpha >= 1 then
+		if fadeProgress >= 1 then
 			vehiclePacket.OverrideSpinPropi = nil
 			heartbeatConn:disconnect()
 		end
@@ -103,16 +102,16 @@ local function FadeOutProp(vehiclePacket)
 	heartbeatConn = RunService.Heartbeat:connect(Heartbeat)
 end
 local function FadeOutSpringSpin(vehiclePacket)
-	local alpha = 0
+	local fadeProgress = 0
 	local heartbeatConn = nil
 	local overrideIndex = (vehiclePacket.OverrideSpringFadePropi or 0) + 1
 	vehiclePacket.OverrideSpringFadePropi = overrideIndex
 	local function Heartbeat(dt)
-		alpha = alpha + dt * 1 / 1
-		if alpha >= 1 then
-			alpha = 1
+		fadeProgress = fadeProgress + dt * 1 / 1
+		if fadeProgress >= 1 then
+			fadeProgress = 1
 		end
-		local spinAlpha = 1 - alpha
+		local spinAlpha = 1 - fadeProgress
 		if vehiclePacket.IsUFO then
 			HeliModule.SpinUFO(vehiclePacket, dt, spinAlpha)
 		elseif vehiclePacket.IsDrone then
@@ -120,7 +119,7 @@ local function FadeOutSpringSpin(vehiclePacket)
 		elseif vehiclePacket.IsCrewCapsule then
 			HeliModule.SpinCrewCapsule(vehiclePacket, dt, spinAlpha)
 		end
-		if alpha >= 1 then
+		if fadeProgress >= 1 then
 			vehiclePacket.OverrideSpringFadePropi = nil
 			heartbeatConn:disconnect()
 		end
@@ -479,7 +478,7 @@ function HeliModule.InputChanged(inputObject)
 	end
 end
 return function(initPacket)
-	local em = initPacket.em
+	local eventModule = initPacket.em
 	serverEvent = initPacket.Event
 	local ScreenGui = initPacket.ScreenGui
 	local MainWindowGroup = initPacket.MainWindowGroup
@@ -514,18 +513,18 @@ return function(initPacket)
 			vehiclePacket.vHeading = 0
 			if vehiclePacket.IsHeli or (vehiclePacket.IsBlackHawk or vehiclePacket.IsLittleBird) then
 				vehiclePacket.PropAlpha = 0
-				local alpha = 0
+				local fadeProgress = 0
 				local heartbeatConn = nil
 				local overrideIndex = vehiclePacket.OverrideSpinPropi and vehiclePacket.OverrideSpinPropi + 1 or 0
 				vehiclePacket.OverrideSpinPropi = overrideIndex
 				local function Heartbeat(dt)
-					alpha = alpha + dt * 1 / 3
-					if alpha >= 1 then
-						alpha = 1
+					fadeProgress = fadeProgress + dt * 1 / 3
+					if fadeProgress >= 1 then
+						fadeProgress = 1
 					end
-					vehiclePacket.PropAlpha = alpha
+					vehiclePacket.PropAlpha = fadeProgress
 					SpinProp(vehiclePacket, dt)
-					if alpha >= 1 then
+					if fadeProgress >= 1 then
 						vehiclePacket.OverrideSpinPropi = nil
 						heartbeatConn:disconnect()
 					end
@@ -563,18 +562,18 @@ return function(initPacket)
 		end
 		if not vehiclePacket.Passenger then
 			if vehiclePacket.IsHeli or (vehiclePacket.IsBlackHawk or vehiclePacket.IsLittleBird) then
-				local alpha = 0
+				local fadeProgress = 0
 				local heartbeatConn = nil
 				local overrideIndex = vehiclePacket.OverrideSpinPropi and vehiclePacket.OverrideSpinPropi + 1 or 0
 				vehiclePacket.OverrideSpinPropi = overrideIndex
 				local function Heartbeat(dt)
-					alpha = alpha + dt * 1 / 1
-					if alpha >= 1 then
-						alpha = 1
+					fadeProgress = fadeProgress + dt * 1 / 1
+					if fadeProgress >= 1 then
+						fadeProgress = 1
 					end
-					vehiclePacket.PropAlpha = 1 - alpha
+					vehiclePacket.PropAlpha = 1 - fadeProgress
 					SpinProp(vehiclePacket, dt)
-					if alpha >= 1 then
+					if fadeProgress >= 1 then
 						vehiclePacket.OverrideSpinPropi = nil
 						heartbeatConn:disconnect()
 					end
@@ -585,16 +584,16 @@ return function(initPacket)
 				heartbeatConn = RunService.Heartbeat:connect(Heartbeat)
 			end
 			if vehiclePacket.IsUFO or (vehiclePacket.IsDrone or vehiclePacket.IsCrewCapsule) then
-				local alpha = 0
+				local fadeProgress = 0
 				local heartbeatConn = nil
 				local overrideIndex = (vehiclePacket.OverrideSpringFadePropi or 0) + 1
 				vehiclePacket.OverrideSpringFadePropi = overrideIndex
 				local function Heartbeat(dt)
-					alpha = alpha + dt * 1 / 1
-					if alpha >= 1 then
-						alpha = 1
+					fadeProgress = fadeProgress + dt * 1 / 1
+					if fadeProgress >= 1 then
+						fadeProgress = 1
 					end
-					local spinAlpha = 1 - alpha
+					local spinAlpha = 1 - fadeProgress
 					if vehiclePacket.IsUFO then
 						HeliModule.SpinUFO(vehiclePacket, dt, spinAlpha)
 					elseif vehiclePacket.IsDrone then
@@ -602,7 +601,7 @@ return function(initPacket)
 					elseif vehiclePacket.IsCrewCapsule then
 						HeliModule.SpinCrewCapsule(vehiclePacket, dt, spinAlpha)
 					end
-					if alpha >= 1 then
+					if fadeProgress >= 1 then
 						vehiclePacket.OverrideSpringFadePropi = nil
 						heartbeatConn:disconnect()
 					end
@@ -636,7 +635,7 @@ return function(initPacket)
 		assert(HeliModule.Roped)
 		serverEvent:FireServer("s5mzpnz8")
 	end
-	function em.shbm9fuh(isRoped)
+	function eventModule.shbm9fuh(isRoped)
 		HeliModule.Roped = isRoped
 		for i, v in ipairs(LocalPlayer.Character.Humanoid:GetPlayingAnimationTracks()) do
 			v:Stop()
@@ -685,18 +684,18 @@ return function(initPacket)
 		CollectionService:GetInstanceAddedSignal("RopePull"):Connect(AddedFun)
 		CollectionService:GetInstanceRemovedSignal("RopePull"):Connect(RemovedFun)
 	end
-	function em.fevtvl2i(result)
+	function eventModule.fevtvl2i(result)
 		if result.NonZero then
-			em.mq92d5a8({
+			eventModule.mq92d5a8({
 				Title = "Store",
 				Text = "Try again when you have 0 explosives!"
 			})
 		elseif result.NotEnoughMoney then
-			em.mq92d5a8({
+			eventModule.mq92d5a8({
 				Title = "Store",
 				Text = "You don\'t have enough cash!"
 			})
-			em.qx9ks3jo()
+			eventModule.qx9ks3jo()
 		else
 			assert(false, "No flag found")
 		end
@@ -752,7 +751,7 @@ return function(initPacket)
 		Missile.LaunchMissile(missileCFrame, missileVelocity, aimTarget, fireTime)
 		Missiles.i = Missiles.i % #Missiles.Parts + 1
 	end
-	function em.exva0l4q(missileCFrame, missileVelocity, aimTarget, fireTime, extraParam1, extraParam2, extraParam3)
+	function eventModule.exva0l4q(missileCFrame, missileVelocity, aimTarget, fireTime, extraParam1, extraParam2, extraParam3)
 		Missile.LaunchMissile(missileCFrame, missileVelocity, aimTarget, fireTime, extraParam1, extraParam2, extraParam3)
 	end
 	local function AttemptDropBomb()
@@ -779,7 +778,7 @@ return function(initPacket)
 		Bomb.DropBomb(dropCFrame, dropVelocity, dropTime, LocalPlayer)
 		serverEvent:FireServer("ukkcmz0e", dropCFrame, dropVelocity, dropTime)
 	end
-	function em.ukkcmz0e(dropCFrame, dropVelocity, dropTime, player)
+	function eventModule.ukkcmz0e(dropCFrame, dropVelocity, dropTime, player)
 		Bomb.DropBomb(dropCFrame, dropVelocity, dropTime, player)
 	end
 	function HeliModule.attemptDropRope()

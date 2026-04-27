@@ -1,124 +1,123 @@
--- Reviewed by Claude
-local t = {}
-local function RagdollSetup(p1)
+local ragdollStateTable = {}
+local function RagdollSetup(character)
 	local RagdollNeck = Instance.new("BallSocketConstraint")
 	RagdollNeck.Name = "RagdollNeck"
-	RagdollNeck.Attachment0 = p1.UpperTorso.NeckRigAttachment
-	RagdollNeck.Attachment1 = p1.Head.NeckRigAttachment
+	RagdollNeck.Attachment0 = character.UpperTorso.NeckRigAttachment
+	RagdollNeck.Attachment1 = character.Head.NeckRigAttachment
 	RagdollNeck.LimitsEnabled = true
 	RagdollNeck.UpperAngle = 45
 	RagdollNeck.TwistLimitsEnabled = true
 	RagdollNeck.TwistLowerAngle = -40
 	RagdollNeck.TwistUpperAngle = 40
 	RagdollNeck.Enabled = false
-	RagdollNeck.Parent = p1
+	RagdollNeck.Parent = character
 	local RagdollWaist = Instance.new("BallSocketConstraint")
 	RagdollWaist.Name = "RagdollWaist"
-	RagdollWaist.Attachment0 = p1.LowerTorso.WaistRigAttachment
-	RagdollWaist.Attachment1 = p1.UpperTorso.WaistRigAttachment
+	RagdollWaist.Attachment0 = character.LowerTorso.WaistRigAttachment
+	RagdollWaist.Attachment1 = character.UpperTorso.WaistRigAttachment
 	RagdollWaist.LimitsEnabled = true
 	RagdollWaist.UpperAngle = 5
 	RagdollWaist.Enabled = false
-	RagdollWaist.Parent = p1
+	RagdollWaist.Parent = character
 	local RagdollLeftWrist = Instance.new("HingeConstraint")
 	RagdollLeftWrist.Name = "RagdollLeftWrist"
-	RagdollLeftWrist.Attachment0 = p1.LeftLowerArm.LeftWristRigAttachment
-	RagdollLeftWrist.Attachment1 = p1.LeftHand.LeftWristRigAttachment
+	RagdollLeftWrist.Attachment0 = character.LeftLowerArm.LeftWristRigAttachment
+	RagdollLeftWrist.Attachment1 = character.LeftHand.LeftWristRigAttachment
 	RagdollLeftWrist.Enabled = false
-	RagdollLeftWrist.Parent = p1
+	RagdollLeftWrist.Parent = character
 	local RagdollRightWrist = Instance.new("HingeConstraint")
 	RagdollRightWrist.Name = "RagdollRightWrist"
-	RagdollRightWrist.Attachment0 = p1.RightLowerArm.RightWristRigAttachment
-	RagdollRightWrist.Attachment1 = p1.RightHand.RightWristRigAttachment
+	RagdollRightWrist.Attachment0 = character.RightLowerArm.RightWristRigAttachment
+	RagdollRightWrist.Attachment1 = character.RightHand.RightWristRigAttachment
 	RagdollRightWrist.Enabled = false
-	RagdollRightWrist.Parent = p1
+	RagdollRightWrist.Parent = character
 	local RagdollLeftKnee = Instance.new("HingeConstraint")
 	RagdollLeftKnee.Name = "RagdollLeftKnee"
-	RagdollLeftKnee.Attachment0 = p1.LeftUpperLeg.LeftKneeRigAttachment
-	RagdollLeftKnee.Attachment1 = p1.LeftLowerLeg.LeftKneeRigAttachment
+	RagdollLeftKnee.Attachment0 = character.LeftUpperLeg.LeftKneeRigAttachment
+	RagdollLeftKnee.Attachment1 = character.LeftLowerLeg.LeftKneeRigAttachment
 	RagdollLeftKnee.LimitsEnabled = true
 	RagdollLeftKnee.UpperAngle = 15
 	RagdollLeftKnee.LowerAngle = -45
 	RagdollLeftKnee.Enabled = false
-	RagdollLeftKnee.Parent = p1
+	RagdollLeftKnee.Parent = character
 	local RagdollRightKnee = Instance.new("HingeConstraint")
 	RagdollRightKnee.Name = "RagdollRightKnee"
-	RagdollRightKnee.Attachment0 = p1.RightUpperLeg.RightKneeRigAttachment
-	RagdollRightKnee.Attachment1 = p1.RightLowerLeg.RightKneeRigAttachment
+	RagdollRightKnee.Attachment0 = character.RightUpperLeg.RightKneeRigAttachment
+	RagdollRightKnee.Attachment1 = character.RightLowerLeg.RightKneeRigAttachment
 	RagdollRightKnee.LimitsEnabled = true
 	RagdollRightKnee.UpperAngle = 15
 	RagdollRightKnee.LowerAngle = -45
 	RagdollRightKnee.Enabled = false
-	RagdollRightKnee.Parent = p1
+	RagdollRightKnee.Parent = character
 	local RagdollLeftAnkle = Instance.new("HingeConstraint")
 	RagdollLeftAnkle.Name = "RagdollLeftAnkle"
-	RagdollLeftAnkle.Attachment0 = p1.LeftLowerLeg.LeftAnkleRigAttachment
-	RagdollLeftAnkle.Attachment1 = p1.LeftFoot.LeftAnkleRigAttachment
+	RagdollLeftAnkle.Attachment0 = character.LeftLowerLeg.LeftAnkleRigAttachment
+	RagdollLeftAnkle.Attachment1 = character.LeftFoot.LeftAnkleRigAttachment
 	RagdollLeftAnkle.LimitsEnabled = true
 	RagdollLeftAnkle.UpperAngle = 15
 	RagdollLeftAnkle.LowerAngle = -45
 	RagdollLeftAnkle.Enabled = false
-	RagdollLeftAnkle.Parent = p1
+	RagdollLeftAnkle.Parent = character
 	local RagdollRightAnkle = Instance.new("HingeConstraint")
 	RagdollRightAnkle.Name = "RagdollRightAnkle"
-	RagdollRightAnkle.Attachment0 = p1.RightLowerLeg.RightAnkleRigAttachment
-	RagdollRightAnkle.Attachment1 = p1.RightFoot.RightAnkleRigAttachment
+	RagdollRightAnkle.Attachment0 = character.RightLowerLeg.RightAnkleRigAttachment
+	RagdollRightAnkle.Attachment1 = character.RightFoot.RightAnkleRigAttachment
 	RagdollRightAnkle.LimitsEnabled = true
 	RagdollRightAnkle.UpperAngle = 15
 	RagdollRightAnkle.LowerAngle = -45
 	RagdollRightAnkle.Enabled = false
-	RagdollRightAnkle.Parent = p1
+	RagdollRightAnkle.Parent = character
 	local RagdollLeftShoulder = Instance.new("BallSocketConstraint")
 	RagdollLeftShoulder.Name = "RagdollLeftShoulder"
-	RagdollLeftShoulder.Attachment0 = p1.UpperTorso.LeftShoulderRigAttachment
-	RagdollLeftShoulder.Attachment1 = p1.LeftUpperArm.LeftShoulderRigAttachment
+	RagdollLeftShoulder.Attachment0 = character.UpperTorso.LeftShoulderRigAttachment
+	RagdollLeftShoulder.Attachment1 = character.LeftUpperArm.LeftShoulderRigAttachment
 	RagdollLeftShoulder.Enabled = false
-	RagdollLeftShoulder.Parent = p1
+	RagdollLeftShoulder.Parent = character
 	local RagdollRightShoulder = Instance.new("BallSocketConstraint")
 	RagdollRightShoulder.Name = "RagdollRightShoulder"
-	RagdollRightShoulder.Attachment0 = p1.UpperTorso.RightShoulderRigAttachment
-	RagdollRightShoulder.Attachment1 = p1.RightUpperArm.RightShoulderRigAttachment
+	RagdollRightShoulder.Attachment0 = character.UpperTorso.RightShoulderRigAttachment
+	RagdollRightShoulder.Attachment1 = character.RightUpperArm.RightShoulderRigAttachment
 	RagdollRightShoulder.Enabled = false
-	RagdollRightShoulder.Parent = p1
+	RagdollRightShoulder.Parent = character
 	local RagdollLeftElbow = Instance.new("BallSocketConstraint")
 	RagdollLeftElbow.Name = "RagdollLeftElbow"
-	RagdollLeftElbow.Attachment0 = p1.LeftUpperArm.LeftElbowRigAttachment
-	RagdollLeftElbow.Attachment1 = p1.LeftLowerArm.LeftElbowRigAttachment
+	RagdollLeftElbow.Attachment0 = character.LeftUpperArm.LeftElbowRigAttachment
+	RagdollLeftElbow.Attachment1 = character.LeftLowerArm.LeftElbowRigAttachment
 	RagdollLeftElbow.Enabled = false
-	RagdollLeftElbow.Parent = p1
+	RagdollLeftElbow.Parent = character
 	local RagdollRightElbow = Instance.new("BallSocketConstraint")
 	RagdollRightElbow.Name = "RagdollRightElbow"
-	RagdollRightElbow.Attachment0 = p1.RightUpperArm.RightElbowRigAttachment
-	RagdollRightElbow.Attachment1 = p1.RightLowerArm.RightElbowRigAttachment
+	RagdollRightElbow.Attachment0 = character.RightUpperArm.RightElbowRigAttachment
+	RagdollRightElbow.Attachment1 = character.RightLowerArm.RightElbowRigAttachment
 	RagdollRightElbow.Enabled = false
-	RagdollRightElbow.Parent = p1
+	RagdollRightElbow.Parent = character
 	local RagdollLeftHip = Instance.new("BallSocketConstraint")
 	RagdollLeftHip.Name = "RagdollLeftHip"
-	RagdollLeftHip.Attachment0 = p1.LowerTorso.LeftHipRigAttachment
-	RagdollLeftHip.Attachment1 = p1.LeftUpperLeg.LeftHipRigAttachment
+	RagdollLeftHip.Attachment0 = character.LowerTorso.LeftHipRigAttachment
+	RagdollLeftHip.Attachment1 = character.LeftUpperLeg.LeftHipRigAttachment
 	RagdollLeftHip.Enabled = false
-	RagdollLeftHip.Parent = p1
+	RagdollLeftHip.Parent = character
 	local RagdollRightHip = Instance.new("BallSocketConstraint")
 	RagdollRightHip.Name = "RagdollRightHip"
-	RagdollRightHip.Attachment0 = p1.LowerTorso.RightHipRigAttachment
-	RagdollRightHip.Attachment1 = p1.RightUpperLeg.RightHipRigAttachment
+	RagdollRightHip.Attachment0 = character.LowerTorso.RightHipRigAttachment
+	RagdollRightHip.Attachment1 = character.RightUpperLeg.RightHipRigAttachment
 	RagdollRightHip.Enabled = false
-	RagdollRightHip.Parent = p1
+	RagdollRightHip.Parent = character
 end
-local function EnableHumanoid(p1, p2)
-	local v1 = next
-	local v2, v3 = Enum.HumanoidStateType:GetEnumItems()
-	for v4, var5 in v1, v2, v3 do
-		if var5 ~= Enum.HumanoidStateType.None and var5 ~= Enum.HumanoidStateType.Dead then
-			p1:SetStateEnabled(var5, p2)
+local function EnableHumanoid(humanoid, isEnabled)
+	local iteratorFunction = next
+	local humanoidStateTypes, endMarker = Enum.HumanoidStateType:GetEnumItems()
+	for index, stateType in iteratorFunction, humanoidStateTypes, endMarker do
+		if stateType ~= Enum.HumanoidStateType.None and stateType ~= Enum.HumanoidStateType.Dead then
+			humanoid:SetStateEnabled(stateType, isEnabled)
 		end
 	end
 end
 return {
-	Ragdoll = function(p1)
-		local Humanoid = p1:FindFirstChild("Humanoid")
-		if Humanoid and p1.PrimaryPart then
-			local UpperTorso = p1:FindFirstChild("UpperTorso")
+	Ragdoll = function(character)
+		local Humanoid = character:FindFirstChild("Humanoid")
+		if Humanoid and character.PrimaryPart then
+			local UpperTorso = character:FindFirstChild("UpperTorso")
 			if UpperTorso then
 				workspace.CurrentCamera.CameraSubject = UpperTorso
 				EnableHumanoid(Humanoid, false)
@@ -126,25 +125,25 @@ return {
 			end
 		end
 	end,
-	Unragdoll = function(p1)
-		local Humanoid = p1:FindFirstChild("Humanoid")
+	Unragdoll = function(character)
+		local Humanoid = character:FindFirstChild("Humanoid")
 		if Humanoid then
 			local RootPart = Humanoid.RootPart
 			if not Humanoid.Sit then
-				local v1, v2, v3, v4, _, var5, v6, v7, v8, v9, _2, var10 = RootPart.CFrame:GetComponents()
-				local cframe11 = if v7 >= 0 then CFrame.new(v1, v2, v3, v4, 0, var5, v6, 1, v8, v9, 0, var10) else CFrame.new(v1, v2, v3, v4, 0, -var5, v6, 1, -v8, v9, 0, -var10)
-				RootPart.CFrame = cframe11 * CFrame.new(0, Humanoid.HipHeight, 0)
+				local posX, posY, posZ, r00, r01, r02, r10, r11, r12, r20, r21, r22 = RootPart.CFrame:GetComponents()
+				local adjustedCFrame = if r10 >= 0 then CFrame.new(posX, posY, posZ, r00, 0, r02, r10, 1, r12, r20, 0, r22) else CFrame.new(posX, posY, posZ, r00, 0, -r02, r10, 1, -r12, r20, 0, -r22)
+				RootPart.CFrame = adjustedCFrame * CFrame.new(0, Humanoid.HipHeight, 0)
 			end
 			EnableHumanoid(Humanoid, true)
-			if not p1:GetAttribute("InVehicle") then
+			if not character:GetAttribute("InVehicle") then
 				Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
 				workspace.CurrentCamera.CameraSubject = Humanoid
 			end
 		end
 	end,
-	RagdollServer = function(p1)
-		local v1 = p1.Name
-		local Character = p1.Character
+	RagdollServer = function(player)
+		local playerName = player.Name
+		local Character = player.Character
 		if not Character then
 			return false
 		end
@@ -168,54 +167,54 @@ return {
 		if UpperTorso then
 			UpperTorso.Velocity = PrimaryPart.Velocity * 3
 			UpperTorso.RotVelocity = PrimaryPart.Velocity * 0.5
-			local v2 = t[v1]
-			if not v2 then
-				v2 = {}
-				t[v1] = v2
+			local playerMotorTable = ragdollStateTable[playerName]
+			if not playerMotorTable then
+				playerMotorTable = {}
+				ragdollStateTable[playerName] = playerMotorTable
 			end
 			if not PrimaryPart.Anchored then
-				local v3, v4 = pcall(function()
-					PrimaryPart:SetNetworkOwner(p1)
+				local success, errorMessage = pcall(function()
+					PrimaryPart:SetNetworkOwner(player)
 				end)
-				if v3 == false then
-					print(v4)
+				if success == false then
+					print(errorMessage)
 				end
 			end
-			local var5 = next
-			local v6, v7 = Character:GetChildren()
-			for v8, v9 in var5, v6, v7 do
-				if v9:IsA("BasePart") then
-					local var10 = next
-					local cframe11, v12 = v9:GetChildren()
-					for v13, v14 in var10, cframe11, v12 do
-						if v14:IsA("Motor") and v14.Name ~= "Root" then
-							v2[v14] = v14.Part1
-							v14.Part1 = nil
+			local iteratorFunction = next
+			local childrenList, endMarker = Character:GetChildren()
+			for childIndex, childPart in iteratorFunction, childrenList, endMarker do
+				if childPart:IsA("BasePart") then
+					local motorIterator = next
+					local motorChildren, motorEnd = childPart:GetChildren()
+					for motorIndex, motor in motorIterator, motorChildren, motorEnd do
+						if motor:IsA("Motor") and motor.Name ~= "Root" then
+							playerMotorTable[motor] = motor.Part1
+							motor.Part1 = nil
 						end
 					end
-				elseif v9:IsA("Accessory") then
-					v9.Handle.CanCollide = false
+				elseif childPart:IsA("Accessory") then
+					childPart.Handle.CanCollide = false
 				end
 			end
 			if not Character:FindFirstChild("RagdollWaist") then
 				RagdollSetup(Character)
 			end
-			local var15 = next
-			local v16, v17 = Character:GetChildren()
-			for v18, v19 in var15, v16, v17 do
-				if v19:IsA("Constraint") and v19.Name:sub(1, 7) == "Ragdoll" then
-					v19.Enabled = true
+			local constraintIterator = next
+			local constraintChildren, constraintEnd = Character:GetChildren()
+			for constraintIndex, constraint in constraintIterator, constraintChildren, constraintEnd do
+				if constraint:IsA("Constraint") and constraint.Name:sub(1, 7) == "Ragdoll" then
+					constraint.Enabled = true
 				end
 			end
 			return true
 		end
 	end,
-	UnragdollServer = function(p1)
-		local v1 = p1.Name
-		local Character = p1.Character
+	UnragdollServer = function(player)
+		local playerName = player.Name
+		local Character = player.Character
 		if Character and Character:FindFirstChild("RagdollWaist") then
-			local v2 = t[v1]
-			if v2 and Character:FindFirstChild("Humanoid") then
+			local playerMotorTable = ragdollStateTable[playerName]
+			if playerMotorTable and Character:FindFirstChild("Humanoid") then
 				local PrimaryPart = Character.PrimaryPart
 				if PrimaryPart then
 					PrimaryPart.CanCollide = true
@@ -223,15 +222,15 @@ return {
 					if Head then
 						Head.CanCollide = false
 					end
-					for v3, v4 in next, v2 do
-						v3.Part1 = v4
+					for motor, previousPart in next, playerMotorTable do
+						motor.Part1 = previousPart
 					end
-					t[v1] = nil
-					local var5 = next
-					local v6, v7 = Character:GetChildren()
-					for v8, v9 in var5, v6, v7 do
-						if v9:IsA("Constraint") and v9.Name:sub(1, 7) == "Ragdoll" then
-							v9:Destroy()
+					ragdollStateTable[playerName] = nil
+					local constraintIterator = next
+					local constraintChildren, constraintEnd = Character:GetChildren()
+					for constraintIndex, constraint in constraintIterator, constraintChildren, constraintEnd do
+						if constraint:IsA("Constraint") and constraint.Name:sub(1, 7) == "Ragdoll" then
+							constraint:Destroy()
 						end
 					end
 					return true
@@ -245,11 +244,11 @@ return {
 			return false
 		end
 	end,
-	PlayerRemoving = function(p1)
-		t[p1] = nil
+	PlayerRemoving = function(player)
+		ragdollStateTable[player] = nil
 	end,
-	IsRagdoll = function(p1)
-		local Character = p1.Character
+	IsRagdoll = function(character)
+		local Character = character.Character
 		if Character then
 			local RagdollWaist = Character:FindFirstChild("RagdollWaist")
 			if RagdollWaist then

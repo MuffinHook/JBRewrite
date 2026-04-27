@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -174,46 +172,46 @@ function SpawnSelectionComponent.render(self)
 		return createElement(Minimap, minimapProps, minimapChildren)
 	end
 end
-function delta._startTimer(p1)
+function SpawnSelectionComponent._startTimer(self)
 	local function update()
-		local delta = workspace:GetServerTimeNow() - p1.props.bornAt
-		if p1.props.duration <= delta then
-			p1.maid.countdown = nil
+		local elapsedTime = workspace:GetServerTimeNow() - self.props.bornAt
+		if self.props.duration <= elapsedTime then
+			self.maid.countdown = nil
 		end
-		local t = {}
-		t.remaining = math.max(0, (math.ceil(p1.props.duration - delta)))
-		p1:setState(t)
+		local stateUpdate = {}
+		stateUpdate.remaining = math.max(0, (math.ceil(self.props.duration - elapsedTime)))
+		self:setState(stateUpdate)
 	end
 	update()
-	p1.maid.countdown = Interval.every(1):Connect(update)
+	self.maid.countdown = Interval.every(1):Connect(update)
 end
-function delta.didUpdate(p1, p2, p3)
-	if #p1.props.spawns ~= #p2.spawns then
-		p1:_startTimer()
+function SpawnSelectionComponent.didUpdate(self, prevProps, prevState)
+	if #self.props.spawns ~= #prevProps.spawns then
+		self:_startTimer()
 	end
 end
-function delta.didMount(p1)
-	if #p1.props.spawns > 0 then
-		p1:_startTimer()
+function SpawnSelectionComponent.didMount(self)
+	if #self.props.spawns > 0 then
+		self:_startTimer()
 	end
 end
-function delta.willUnmount(p1)
-	p1.maid:DoCleaning()
+function SpawnSelectionComponent.willUnmount(self)
+	self.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(state, dispatch)
 	return {
-		spawns = p1.minimapSpawns,
-		bornAt = p1.spawnSelectionReceivedAt,
-		points = p1.minimapPoints,
-		circles = p1.minimapCircles
+		spawns = state.minimapSpawns,
+		bornAt = state.spawnSelectionReceivedAt,
+		points = state.minimapPoints,
+		circles = state.minimapCircles
 	}
-end, function(p1)
+end, function(dispatch)
 	return {
 		hide = function()
-			p1({
+			dispatch({
 				type = "minimapSetSpawns",
 				spawns = {}
 			})
 		end
 	}
-end)(delta)
+end)(SpawnSelectionComponent)

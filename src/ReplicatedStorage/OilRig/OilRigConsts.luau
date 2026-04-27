@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)

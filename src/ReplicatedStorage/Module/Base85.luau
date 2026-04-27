@@ -1,6 +1,5 @@
--- Reviewed by Claude
-local t = {}
-local t2 = {
+local base85Module = {}
+local base85Alphabet = {
 	"0",
 	"1",
 	"2",
@@ -87,26 +86,26 @@ local t2 = {
 	"}",
 	"~"
 }
-function t.encode(p1)
-	local tbl = table.create(math.floor((#p1 + 3) / 4) * 5)
-	local sum = 1
-	local sum_2 = 1
-	while sum <= #p1 do
-		local v2, var3, v4, v5 = string.byte(p1, sum, sum + 3)
-		local var6 = (v2 or 0) * 16777216 + (var3 or 0) * 65536 + (v4 or 0) * 256 + (v5 or 0)
+function base85Module.encode(inputData)
+	local tbl = table.create(math.floor((#inputData + 3) / 4) * 5)
+	local byteIndex = 1
+	local outputIndex = 1
+	while byteIndex <= #inputData do
+		local byte1, byte2, byte3, byte4 = string.byte(inputData, byteIndex, byteIndex + 3)
+		local accumulatedValue = (byte1 or 0) * 16777216 + (byte2 or 0) * 65536 + (byte3 or 0) * 256 + (byte4 or 0)
 		for i = 4, 0, -1 do
-			tbl[sum_2 + i] = t2[math.floor(var6 % 85) + 1]
-			var6 = math.floor(var6 / 85)
+			tbl[outputIndex + i] = base85Alphabet[math.floor(accumulatedValue % 85) + 1]
+			accumulatedValue = math.floor(accumulatedValue / 85)
 		end
-		sum = sum + 4
-		sum_2 = sum_2 + 5
+		byteIndex = byteIndex + 4
+		outputIndex = outputIndex + 5
 	end
-	for j = 1, sum - #p1 - 1 do
-		tbl[sum_2 - j] = nil
+	for j = 1, byteIndex - #inputData - 1 do
+		tbl[outputIndex - j] = nil
 	end
 	return table.concat(tbl)
 end
-local t3 = {
+local charToValueMap = {
 	[48] = 0,
 	[49] = 1,
 	[50] = 2,
@@ -201,37 +200,37 @@ local t3 = {
 	[133] = -1,
 	[160] = -1
 }
-function t.decode(p1)
-	local tbl = table.create((math.floor(#p1 * 4 / 5)))
-	local v2 = 0
-	local count = 0
-	for i = 1, #p1 do
-		local var3 = t3[string.byte(p1, i)]
-		if not var3 then
+function base85Module.decode(inputData)
+	local tbl = table.create((math.floor(#inputData * 4 / 5)))
+	local accumulatedValue = 0
+	local byteCount = 0
+	for i = 1, #inputData do
+		local charValue = charToValueMap[string.byte(inputData, i)]
+		if not charValue then
 			return "invalid byte at " .. i, ""
 		end
-		if var3 >= 0 then
-			v2 = v2 * 85 + var3
-			count = count + 1
-			if count == 5 then
-				table.insert(tbl, (string.char(math.floor(v2 / 16777216 % 256), math.floor(v2 / 65536 % 256), math.floor(v2 / 256 % 256), (math.floor(v2 % 256)))))
-				v2 = 0
-				count = 0
+		if charValue >= 0 then
+			accumulatedValue = accumulatedValue * 85 + charValue
+			byteCount = byteCount + 1
+			if byteCount == 5 then
+				table.insert(tbl, (string.char(math.floor(accumulatedValue / 16777216 % 256), math.floor(accumulatedValue / 65536 % 256), math.floor(accumulatedValue / 256 % 256), (math.floor(accumulatedValue % 256)))))
+				accumulatedValue = 0
+				byteCount = 0
 			end
 		end
 	end
-	if count > 0 then
-		if count == 1 then
+	if byteCount > 0 then
+		if byteCount == 1 then
 			return "corrupted base85 data at byte " .. #tbl - 1, ""
 		end
-		for j = count, 4 do
-			v2 = v2 * 85 + 84
+		for j = byteCount, 4 do
+			accumulatedValue = accumulatedValue * 85 + 84
 		end
-		for k = 0, count - 2 do
-			table.insert(tbl, (string.char((math.floor(v2 / 16777216 % 256)))))
-			v2 = v2 * 256
+		for k = 0, byteCount - 2 do
+			table.insert(tbl, (string.char((math.floor(accumulatedValue / 16777216 % 256)))))
+			accumulatedValue = accumulatedValue * 256
 		end
 	end
 	return nil, table.concat(tbl)
 end
-return t
+return base85Module

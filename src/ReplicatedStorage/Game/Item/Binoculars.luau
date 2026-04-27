@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemCamera = require(ReplicatedStorage.Game.ItemSystem.ItemCamera)
@@ -34,82 +32,82 @@ local BinocularsClass = {
 }
 BinocularsClass.__index = BinocularsClass
 setmetatable(BinocularsClass, Basic)
-function BinocularsClass.Init(p1)
-	screenGui = p1.ScreenGui
+function BinocularsClass.Init(config)
+	screenGui = config.ScreenGui
 end
-function BinocularsClass.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, motionConfig, p3)
-	setmetatable(v1, BinocularsClass)
-	if v1.Local then
-		v1.Maid:GiveTask(function()
-			v1:Hide()
+function BinocularsClass.new(self, player, config)
+	local instance = Basic.new(self, player, motionConfig, config)
+	setmetatable(instance, BinocularsClass)
+	if instance.Local then
+		instance.Maid:GiveTask(function()
+			instance:Hide()
 		end)
 	end
-	return v1
+	return instance
 end
-function BinocularsClass.Look(p1)
-	if p1.Local then
+function BinocularsClass.Look(self)
+	if self.Local then
 		local binocularWidth = screenGui.AbsoluteSize.X + 40
-		local Y = screenGui.AbsoluteSize.Y
+		local screenHeight = screenGui.AbsoluteSize.Y
 		screenGui.Binoculars.ImageLabel.Size = UDim2.new(0, binocularWidth, 0, binocularWidth * 0.6)
 		screenGui.Binoculars.ImageLabel.Position = UDim2.new(0.5, -binocularWidth * 0.5, 0.5, -binocularWidth * 0.6 * 0.5)
 		screenGui.Binoculars.BarTop.Position = UDim2.new(0, 0, 0, -100)
-		screenGui.Binoculars.BarTop.Size = UDim2.new(1, 0, 0, (Y - binocularWidth * 0.6) * 0.5 + 20 + 100)
-		screenGui.Binoculars.BarBottom.Size = UDim2.new(1, 0, 0, (Y - binocularWidth * 0.6) * 0.5 + 20)
-		screenGui.Binoculars.BarBottom.Position = UDim2.new(0, 0, 1, -((Y - binocularWidth * 0.6) * 0.5 + 20))
+		screenGui.Binoculars.BarTop.Size = UDim2.new(1, 0, 0, (screenHeight - binocularWidth * 0.6) * 0.5 + 20 + 100)
+		screenGui.Binoculars.BarBottom.Size = UDim2.new(1, 0, 0, (screenHeight - binocularWidth * 0.6) * 0.5 + 20)
+		screenGui.Binoculars.BarBottom.Position = UDim2.new(0, 0, 1, -((screenHeight - binocularWidth * 0.6) * 0.5 + 20))
 		screenGui.Binoculars.Visible = true
 		ItemCamera.Zoom(15)
 		local activeCameraController = cameraControllers.activeCameraController
 		if activeCameraController then
-			p1.prevSubjectDistance = activeCameraController.currentSubjectDistance
+			self.prevSubjectDistance = activeCameraController.currentSubjectDistance
 			activeCameraController:SetCameraToSubjectDistance(0.5)
 		end
 		ItemCamera.setSensitivity(0.3)
-		p1.rollbackTransparency = PartUtils.setPropertyWithRollback(p1.Model, "LocalTransparencyModifier", 1)
+		self.rollbackTransparency = PartUtils.setPropertyWithRollback(self.Model, "LocalTransparencyModifier", 1)
 	end
-	p1.SpringItemOffset:SetTarget(p1.Config.Motion.Eyes.Springs.ItemOffset)
-	p1.SpringItemRotation:SetTarget(p1.Config.Motion.Eyes.Springs.ItemRotation)
-	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Eyes.Springs.NeckRotation)
-	p1.SpringWaistRotation:SetTarget(p1.Config.Motion.Eyes.Springs.WaistRotation)
+	self.SpringItemOffset:SetTarget(self.Config.Motion.Eyes.Springs.ItemOffset)
+	self.SpringItemRotation:SetTarget(self.Config.Motion.Eyes.Springs.ItemRotation)
+	self.SpringNeckRotation:SetTarget(self.Config.Motion.Eyes.Springs.NeckRotation)
+	self.SpringWaistRotation:SetTarget(self.Config.Motion.Eyes.Springs.WaistRotation)
 end
-function BinocularsClass.Hide(p1)
-	if p1.Local then
+function BinocularsClass.Hide(self)
+	if self.Local then
 		if screenGui.Binoculars.Visible then
 			screenGui.Binoculars.Visible = false
 			ItemCamera.Zoom(70)
-			if p1.prevSubjectDistance then
+			if self.prevSubjectDistance then
 				local activeCameraController = cameraControllers.activeCameraController
 				if activeCameraController then
-					activeCameraController:SetCameraToSubjectDistance(p1.prevSubjectDistance)
+					activeCameraController:SetCameraToSubjectDistance(self.prevSubjectDistance)
 				end
-				p1.prevSubjectDistance = nil
+				self.prevSubjectDistance = nil
 			end
 			ItemCamera.setSensitivity(1)
 		end
-		if p1.rollbackTransparency then
-			p1.rollbackTransparency()
-			p1.rollbackTransparency = nil
+		if self.rollbackTransparency then
+			self.rollbackTransparency()
+			self.rollbackTransparency = nil
 		end
 	end
-	p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
-	p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
-	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
-	p1.SpringWaistRotation:SetTarget(p1.Config.Motion.Hip.Springs.WaistRotation)
+	self.SpringItemOffset:SetTarget(self.Config.Motion.Hip.Springs.ItemOffset)
+	self.SpringItemRotation:SetTarget(self.Config.Motion.Hip.Springs.ItemRotation)
+	self.SpringNeckRotation:SetTarget(self.Config.Motion.Hip.Springs.NeckRotation)
+	self.SpringWaistRotation:SetTarget(self.Config.Motion.Hip.Springs.WaistRotation)
 end
-function BinocularsClass.InputBegan(p1, p2, p3)
-	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
-		p1:Look()
-		if p1.Local then
-			p1:BroadcastInputBegan(p2)
+function BinocularsClass.InputBegan(self, inputObject, gameProcessed)
+	if if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then true elseif inputObject.UserInputType == Enum.UserInputType.Gamepad1 then inputObject.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		self:Look()
+		if self.Local then
+			self:BroadcastInputBegan(inputObject)
 		end
 	end
-	Basic.InputBegan(p1, p2, p3)
+	Basic.InputBegan(self, inputObject, gameProcessed)
 end
-function BinocularsClass.InputEnded(p1, p2)
-	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
-		p1:Hide()
-		if p1.Local then
-			p1:BroadcastInputBegan(p2)
+function BinocularsClass.InputEnded(self, inputObject)
+	if if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then true elseif inputObject.UserInputType == Enum.UserInputType.Gamepad1 then inputObject.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		self:Hide()
+		if self.Local then
+			self:BroadcastInputBegan(inputObject)
 		end
 	end
 end

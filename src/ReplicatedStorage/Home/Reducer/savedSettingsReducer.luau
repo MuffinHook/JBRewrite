@@ -1,12 +1,11 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	setSavedSetting = function(p1, p2)
-		if p1[p2.key] == p2.value then
-			return p1
+	setSavedSetting = function(state, action)
+		if state[action.key] == action.value then
+			return state
 		else
-			local tbl = table.clone(p1)
-			tbl[p2.key] = p2.value
+			local tbl = table.clone(state)
+			tbl[action.key] = action.value
 			return tbl
 		end
 	end

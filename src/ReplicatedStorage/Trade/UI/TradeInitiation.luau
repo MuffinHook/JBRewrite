@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -6,33 +5,33 @@ local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
 local TradeButton = require(script.Parent.TradeButton)
-local v1 = Roact.PureComponent:extend("TradeInitiation")
-v1.defaultProps = {
+local TradeInitiationComponent = Roact.PureComponent:extend("TradeInitiation")
+TradeInitiationComponent.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	position = UDim2.new(0, 0, 0, 0),
 	aspectRatio = 6,
 	displayName = "TWENTYMOREMINUTES"
 }
-function v1.init(p1)
-	p1:setState({
+function TradeInitiationComponent.init(self)
+	self:setState({
 		remaining = 0,
 		createdAt = workspace:GetServerTimeNow()
 	})
-	function p1.onAccept()
-		p1.props.onAccept(p1.props.index)
+	function self.onAccept()
+		self.props.onAccept(self.props.index)
 	end
-	function p1.onDecline()
-		p1.props.onDecline(p1.props.index)
+	function self.onDecline()
+		self.props.onDecline(self.props.index)
 	end
-	p1.maid = Maid.new()
+	self.maid = Maid.new()
 end
-function v1.render(p1)
-	local aspectRatio = p1.props.aspectRatio
-	local isTradingVIP = p1.props.isTradingVIP
-	local v1 = isTradingVIP and TradeConsts.VIP_INITIATION_COLOR or Color3.new(255/255, 255/255, 255/255)
-	local t = {
+function TradeInitiationComponent.render(self)
+	local aspectRatio = self.props.aspectRatio
+	local isTradingVIP = self.props.isTradingVIP
+	local titleColor = isTradingVIP and TradeConsts.VIP_INITIATION_COLOR or Color3.new(255/255, 255/255, 255/255)
+	local children = {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
-			AspectRatio = p1.props.aspectRatio
+			AspectRatio = self.props.aspectRatio
 		}),
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
@@ -48,8 +47,8 @@ function v1.render(p1)
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				TextColor3 = v1,
-				Text = p1.props.displayName .. " wants to trade!",
+				TextColor3 = titleColor,
+				Text = self.props.displayName .. " wants to trade!",
 				TextXAlignment = Enum.TextXAlignment.Left,
 				Font = Enum.Font.FredokaOne,
 				LineHeight = 1,
@@ -57,51 +56,51 @@ function v1.render(p1)
 			})
 		})
 	}
-	local t2 = {
+	local timeFrameProps = {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
 		BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
 		Size = UDim2.new(0.3177083333333333, 0, 0.5 - 0.03125 * aspectRatio, 0),
 		Position = UDim2.new(0.015625, 0, 0.5 + 0.015625 * aspectRatio, 0)
 	}
-	local t3 = {}
-	local t4 = {
+	local timeTextContainer = {}
+	local timeTextProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		TextColor3 = Color3.new(255/255, 0/255, 0/255)
 	}
-	t4.Text = tostring(p1.state.remaining) .. "s"
-	t4.TextXAlignment = Enum.TextXAlignment.Left
-	t4.TextYAlignment = Enum.TextYAlignment.Bottom
-	t4.Font = Enum.Font.FredokaOne
-	t4.LineHeight = 1
-	t4.TextScaled = true
-	t3.Text = createElement("TextLabel", t4)
-	t.Time = createElement("Frame", t2, t3)
-	t.Accept = createElement(TradeButton, {
+	timeTextProps.Text = tostring(self.state.remaining) .. "s"
+	timeTextProps.TextXAlignment = Enum.TextXAlignment.Left
+	timeTextProps.TextYAlignment = Enum.TextYAlignment.Bottom
+	timeTextProps.Font = Enum.Font.FredokaOne
+	timeTextProps.LineHeight = 1
+	timeTextProps.TextScaled = true
+	timeTextContainer.Text = createElement("TextLabel", timeTextProps)
+	children.Time = createElement("Frame", timeFrameProps, timeTextContainer)
+	children.Accept = createElement(TradeButton, {
 		backgroundColor = Color3.fromRGB(42, 170, 255),
 		size = UDim2.new(0.25, 0, 0.5 - 0.015625 * aspectRatio, 0),
 		position = UDim2.new(0.734375, 0, 0.5, 0),
 		aspectRatio = Roact.None,
 		text = "Trade",
-		onClick = p1.onAccept,
+		onClick = self.onAccept,
 		cornerPixel = 0,
 		cornerScale = 1
 	})
-	t.Decline = createElement(TradeButton, {
+	children.Decline = createElement(TradeButton, {
 		backgroundColor = Color3.fromRGB(255, 58, 43),
 		size = UDim2.new(0.25, 0, 0.5 - 0.015625 * aspectRatio, 0),
 		position = UDim2.new(0.46875, 0, 0.5, 0),
 		aspectRatio = Roact.None,
 		text = "Decline",
-		onClick = p1.onDecline,
+		onClick = self.onDecline,
 		cornerPixel = 0,
 		cornerScale = 1
 	})
 	if isTradingVIP then
-		t.UIStroke = createElement("UIStroke", {
+		children.UIStroke = createElement("UIStroke", {
 			Transparency = 0.5,
 			Thickness = 3,
 			Color = TradeConsts.VIP_INITIATION_COLOR
@@ -111,39 +110,39 @@ function v1.render(p1)
 		BorderSizePixel = 0,
 		BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 		BackgroundTransparency = 0.5,
-		Size = p1.props.size,
-		Position = p1.props.position,
-		AnchorPoint = p1.props.anchorPoint
-	}, t)
+		Size = self.props.size,
+		Position = self.props.position,
+		AnchorPoint = self.props.anchorPoint
+	}, children)
 end
-function v1._hookObj(p1)
-	p1:setState({
-		createdAt = p1.props.obj:GetAttribute(TradeConsts.INITIATION_CREATED_AT_ATTR_NAME)
+function TradeInitiationComponent._hookObj(self)
+	self:setState({
+		createdAt = self.props.obj:GetAttribute(TradeConsts.INITIATION_CREATED_AT_ATTR_NAME)
 	})
-	p1.maid:GiveTask(p1.props.obj:GetAttributeChangedSignal(TradeConsts.INITIATION_CREATED_AT_ATTR_NAME):Connect(function()
-		p1:setState({
-			createdAt = p1.props.obj:GetAttribute(TradeConsts.INITIATION_CREATED_AT_ATTR_NAME)
+	self.maid:GiveTask(self.props.obj:GetAttributeChangedSignal(TradeConsts.INITIATION_CREATED_AT_ATTR_NAME):Connect(function()
+		self:setState({
+			createdAt = self.props.obj:GetAttribute(TradeConsts.INITIATION_CREATED_AT_ATTR_NAME)
 		})
 	end))
 end
-function v1.didMount(p1)
-	if p1.props.obj then
-		p1:_hookObj()
+function TradeInitiationComponent.didMount(self)
+	if self.props.obj then
+		self:_hookObj()
 	end
 	local function update()
-		local t = {}
-		t.remaining = math.floor((math.max(0, (p1.props.isTradingVIP and TradeConsts.VIP_INITIATION_TIMEOUT or TradeConsts.INITIATION_TIMEOUT) - (workspace:GetServerTimeNow() - p1.state.createdAt))))
-		p1:setState(t)
+		local updateState = {}
+		updateState.remaining = math.floor((math.max(0, (self.props.isTradingVIP and TradeConsts.VIP_INITIATION_TIMEOUT or TradeConsts.INITIATION_TIMEOUT) - (workspace:GetServerTimeNow() - self.state.createdAt))))
+		self:setState(updateState)
 	end
 	update()
-	p1.maid:GiveTask(Interval.every(1):Connect(update))
+	self.maid:GiveTask(Interval.every(1):Connect(update))
 end
-function v1.didUpdate(p1, p2, p3)
-	if p1.props.obj ~= p2.obj and p1.props.obj then
-		p1:_hookObj()
+function TradeInitiationComponent.didUpdate(self, previousProps, previousState)
+	if self.props.obj ~= previousProps.obj and self.props.obj then
+		self:_hookObj()
 	end
 end
-function v1.willUnmount(p1)
-	p1.maid:DoCleaning()
+function TradeInitiationComponent.willUnmount(self)
+	self.maid:DoCleaning()
 end
-return v1
+return TradeInitiationComponent

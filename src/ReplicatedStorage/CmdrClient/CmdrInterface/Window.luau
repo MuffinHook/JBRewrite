@@ -1,11 +1,10 @@
--- Reviewed by Claude
 local GuiService = game:GetService("GuiService")
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
 game:GetService("TextChatService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
-local t = { Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2, Enum.UserInputType.Touch }
-local t2 = {
+local inputTypes = { Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2, Enum.UserInputType.Touch }
+local interface = {
 	Valid = true,
 	AutoComplete = nil,
 	ProcessEntry = nil,
@@ -13,261 +12,261 @@ local t2 = {
 	Cmdr = nil,
 	HistoryState = nil
 }
-local v1 = LocalPlayer:WaitForChild("CmdrFrameValue").Value
-local Line = v1:WaitForChild("Line")
-local Entry = v1:WaitForChild("Entry")
+local cmdrFrame = LocalPlayer:WaitForChild("CmdrFrameValue").Value
+local Line = cmdrFrame:WaitForChild("Line")
+local Entry = cmdrFrame:WaitForChild("Entry")
 Line.Parent = nil
-function t2.UpdateLabel(p1)
-	Entry.TextLabel.Text = ("%*%*$"):format(LocalPlayer.Name, if p1.Cmdr.PlaceName and p1.Cmdr.PlaceName ~= "" then ("@%*"):format(p1.Cmdr.PlaceName) else "")
+function interface.UpdateLabel(cmdrInterface)
+	Entry.TextLabel.Text = ("%*%*$"):format(LocalPlayer.Name, if cmdrInterface.Cmdr.PlaceName and cmdrInterface.Cmdr.PlaceName ~= "" then ("@%*"):format(cmdrInterface.Cmdr.PlaceName) else "")
 end
-function t2.GetLabel(p1)
+function interface.GetLabel(cmdrInterface)
 	return Entry.TextLabel.Text
 end
-function t2.UpdateWindowHeight(p1)
-	v1.CanvasPosition = Vector2.new(0, (math.max(v1.UIListLayout.AbsoluteContentSize.Y + 20 - v1.AbsoluteWindowSize.Y, 0)))
+function interface.UpdateWindowHeight(cmdrInterface)
+	cmdrFrame.CanvasPosition = Vector2.new(0, (math.max(cmdrFrame.UIListLayout.AbsoluteContentSize.Y + 20 - cmdrFrame.AbsoluteWindowSize.Y, 0)))
 end
-function t2.AddLine(p1, p2, p3)
-	local v12 = p3 or {}
-	local v2 = tostring(p2)
-	local v3 = if typeof(v12) == "Color3" then {
-	Color = v12
-} else v12
-	if #v2 == 0 then
-		t2:UpdateWindowHeight()
+function interface.AddLine(cmdrInterface, message, options)
+	local colorOptions = options or {}
+	local textString = tostring(message)
+	local colorOptions = if typeof(colorOptions) == "Color3" then {
+		Color = colorOptions
+	} else colorOptions
+	if #textString == 0 then
+		interface:UpdateWindowHeight()
 	else
-		local v4 = p1.Cmdr.Util.EmulateTabstops(v2 or "nil", 8)
-		local v5 = Line:Clone()
-		v5.Text = v4
-		v5.TextColor3 = v3.Color or v5.TextColor3
-		v5.RichText = v3.RichText or false
-		v5.TextWrapped = #v2 < 150
-		v5.Parent = v1
+		local formattedText = cmdrInterface.Cmdr.Util.EmulateTabstops(textString or "nil", 8)
+		local lineClone = Line:Clone()
+		lineClone.Text = formattedText
+		lineClone.TextColor3 = colorOptions.Color or lineClone.TextColor3
+		lineClone.RichText = colorOptions.RichText or false
+		lineClone.TextWrapped = #textString < 150
+		lineClone.Parent = cmdrFrame
 	end
 end
-function t2.IsVisible(p1)
-	return v1.Visible
+function interface.IsVisible(cmdrInterface)
+	return cmdrFrame.Visible
 end
-local function SafeGetCore(p1)
-	local v1, v2 = pcall(function()
-		return StarterGui:GetCore(p1)
+local function SafeGetCore(coreKey)
+	local success, result = pcall(function()
+		return StarterGui:GetCore(coreKey)
 	end)
-	if v1 then
-		return v2
+	if success then
+		return result
 	else
 		return true
 	end
 end
-local function SafeSetCore(p1, p2)
+local function SafeSetCore(coreKey, coreValue)
 	local _, _2 = pcall(function()
-		return StarterGui:SetCore(p1, p2)
+		return StarterGui:SetCore(coreKey, coreValue)
 	end)
 end
-function t2.SetVisible(p1, p2)
-	v1.Visible = p2
-	if p2 then
-		local v12 = "ChatActive"
-		local v2, v3 = pcall(function()
-			return StarterGui:GetCore(v12)
+function interface.SetVisible(cmdrInterface, isVisible)
+	cmdrFrame.Visible = isVisible
+	if isVisible then
+		local chatActiveKey = "ChatActive"
+		local success, wasActive = pcall(function()
+			return StarterGui:GetCore(chatActiveKey)
 		end)
-		p1.PreviousChatActive = if v2 then v3 else true
-		local v5 = "ChatActive"
-		local v6 = false
+		cmdrInterface.PreviousChatActive = if success then wasActive else true
+		local chatActiveKey2 = "ChatActive"
+		local shouldDisableChat = false
 		local _, _2 = pcall(function()
-			return StarterGui:SetCore(v5, v6)
+			return StarterGui:SetCore(chatActiveKey2, shouldDisableChat)
 		end)
 		Entry.TextBox:CaptureFocus()
 		task.wait()
-		p1:SetEntryText("")
-		if p1.Cmdr.ActivationUnlocksMouse then
-			p1.PreviousMouseBehavior = UserInputService.MouseBehavior
+		cmdrInterface:SetEntryText("")
+		if cmdrInterface.Cmdr.ActivationUnlocksMouse then
+			cmdrInterface.PreviousMouseBehavior = UserInputService.MouseBehavior
 			UserInputService.MouseBehavior = Enum.MouseBehavior.Default
 		end
 	else
-		local v7 = "ChatActive"
-		local v8, v9 = pcall(function()
-			return StarterGui:GetCore(v7)
+		local chatActiveKey3 = "ChatActive"
+		local success, chatActiveState = pcall(function()
+			return StarterGui:GetCore(chatActiveKey3)
 		end)
-		if not if v8 then v9 else true then
-			local PreviousChatActive = p1.PreviousChatActive
-			local v11 = "ChatActive"
+		if not if success then chatActiveState else true then
+			local PreviousChatActive = cmdrInterface.PreviousChatActive
+			local chatActiveKey4 = "ChatActive"
 			local _, _2 = pcall(function()
-				return StarterGui:SetCore(v11, PreviousChatActive)
+				return StarterGui:SetCore(chatActiveKey4, PreviousChatActive)
 			end)
 		end
 		Entry.TextBox:ReleaseFocus()
-		p1.AutoComplete:Hide()
-		if p1.PreviousMouseBehavior then
-			UserInputService.MouseBehavior = p1.PreviousMouseBehavior
-			p1.PreviousMouseBehavior = nil
+		cmdrInterface.AutoComplete:Hide()
+		if cmdrInterface.PreviousMouseBehavior then
+			UserInputService.MouseBehavior = cmdrInterface.PreviousMouseBehavior
+			cmdrInterface.PreviousMouseBehavior = nil
 		end
 	end
 end
-function t2.Hide(p1)
-	return p1:SetVisible(false)
+function interface.Hide(cmdrInterface)
+	return cmdrInterface:SetVisible(false)
 end
-function t2.Show(p1)
-	return p1:SetVisible(true)
+function interface.Show(cmdrInterface)
+	return cmdrInterface:SetVisible(true)
 end
-function t2.SetEntryText(p1, p2)
-	Entry.TextBox.Text = p2
-	if p1:IsVisible() then
+function interface.SetEntryText(cmdrInterface, text)
+	Entry.TextBox.Text = text
+	if cmdrInterface:IsVisible() then
 		Entry.TextBox:CaptureFocus()
-		Entry.TextBox.CursorPosition = #p2 + 1
-		t2:UpdateWindowHeight()
+		Entry.TextBox.CursorPosition = #text + 1
+		interface:UpdateWindowHeight()
 	end
 end
-function t2.GetEntryText(p1)
+function interface.GetEntryText(cmdrInterface)
 	return Entry.TextBox.Text:gsub("\t", "")
 end
-function t2.SetIsValidInput(p1, p2, p3)
-	Entry.TextBox.TextColor3 = p2 and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 73, 73)
-	p1.Valid = p2
-	p1._errorText = p3
+function interface.SetIsValidInput(cmdrInterface, isValid, errorText)
+	Entry.TextBox.TextColor3 = isValid and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 73, 73)
+	cmdrInterface.Valid = isValid
+	cmdrInterface._errorText = errorText
 end
-function t2.HideInvalidState(p1)
+function interface.HideInvalidState(cmdrInterface)
 	Entry.TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 end
-function t2.LoseFocus(p1, p2)
+function interface.LoseFocus(cmdrInterface, focusState)
 	local Text = Entry.TextBox.Text
-	p1:ClearHistoryState()
-	if v1.Visible and not (GuiService.MenuIsOpen or UserInputService.TouchEnabled) then
+	cmdrInterface:ClearHistoryState()
+	if cmdrFrame.Visible and not (GuiService.MenuIsOpen or UserInputService.TouchEnabled) then
 		Entry.TextBox:CaptureFocus()
-	elseif GuiService.MenuIsOpen and v1.Visible then
-		p1:Hide()
+	elseif GuiService.MenuIsOpen and cmdrFrame.Visible then
+		cmdrInterface:Hide()
 	end
-	if p2 and p1.Valid then
+	if focusState and cmdrInterface.Valid then
 		wait()
-		p1:SetEntryText("")
-		p1.ProcessEntry(Text)
-	elseif p2 then
-		p1:AddLine(p1._errorText, Color3.fromRGB(255, 153, 153))
+		cmdrInterface:SetEntryText("")
+		cmdrInterface.ProcessEntry(Text)
+	elseif focusState then
+		cmdrInterface:AddLine(cmdrInterface._errorText, Color3.fromRGB(255, 153, 153))
 	end
 end
-function t2.TraverseHistory(p1, p2)
-	local v1 = p1.Cmdr.Dispatcher:GetHistory()
-	if p1.HistoryState == nil then
-		p1.HistoryState = {
-			Position = #v1 + 1,
-			InitialText = p1:GetEntryText()
+function interface.TraverseHistory(cmdrInterface, direction)
+	local history = cmdrInterface.Cmdr.Dispatcher:GetHistory()
+	if cmdrInterface.HistoryState == nil then
+		cmdrInterface.HistoryState = {
+			Position = #history + 1,
+			InitialText = cmdrInterface:GetEntryText()
 		}
 	end
-	p1.HistoryState.Position = math.clamp(p1.HistoryState.Position + p2, 1, #v1 + 1)
-	p1:SetEntryText(p1.HistoryState.Position == #v1 + 1 and p1.HistoryState.InitialText or v1[p1.HistoryState.Position])
+	cmdrInterface.HistoryState.Position = math.clamp(cmdrInterface.HistoryState.Position + direction, 1, #history + 1)
+	cmdrInterface:SetEntryText(cmdrInterface.HistoryState.Position == #history + 1 and cmdrInterface.HistoryState.InitialText or history[cmdrInterface.HistoryState.Position])
 end
-function t2.ClearHistoryState(p1)
-	p1.HistoryState = nil
+function interface.ClearHistoryState(cmdrInterface)
+	cmdrInterface.HistoryState = nil
 end
-function t2.SelectVertical(p1, p2)
-	if p1.AutoComplete:IsVisible() and not p1.HistoryState then
-		p1.AutoComplete:Select(p2)
+function interface.SelectVertical(cmdrInterface, direction)
+	if cmdrInterface.AutoComplete:IsVisible() and not cmdrInterface.HistoryState then
+		cmdrInterface.AutoComplete:Select(direction)
 	else
-		p1:TraverseHistory(p2)
+		cmdrInterface:TraverseHistory(direction)
 	end
 end
-local v2 = 0
-local v3 = 0
-function t2.BeginInput(p1, p2, p3)
+local lastActivationTick = 0
+local mashCount = 0
+function interface.BeginInput(cmdrInterface, input, isGameProcessed)
 	if GuiService.MenuIsOpen then
-		p1:Hide()
+		cmdrInterface:Hide()
 	end
-	if not p3 or p1:IsVisible() ~= false then
-		if p1.Cmdr.ActivationKeys[p2.KeyCode] then
-			if p1.Cmdr.MashToEnable and not p1.Cmdr.Enabled then
-				if tick() - v2 < 1 then
-					if v3 >= 5 then
-						return p1.Cmdr:SetEnabled(true)
+	if not isGameProcessed or cmdrInterface:IsVisible() ~= false then
+		if cmdrInterface.Cmdr.ActivationKeys[input.KeyCode] then
+			if cmdrInterface.Cmdr.MashToEnable and not cmdrInterface.Cmdr.Enabled then
+				if tick() - lastActivationTick < 1 then
+					if mashCount >= 5 then
+						return cmdrInterface.Cmdr:SetEnabled(true)
 					end
-					v3 = v3 + 1
+					mashCount = mashCount + 1
 				else
-					v3 = 1
+					mashCount = 1
 				end
-				v2 = tick()
-			elseif p1.Cmdr.Enabled then
-				p1:SetVisible(not p1:IsVisible())
+				lastActivationTick = tick()
+			elseif cmdrInterface.Cmdr.Enabled then
+				cmdrInterface:SetVisible(not cmdrInterface:IsVisible())
 				wait()
-				p1:SetEntryText("")
+				cmdrInterface:SetEntryText("")
 				if GuiService.MenuIsOpen then
-					p1:Hide()
+					cmdrInterface:Hide()
 				end
 			end
-		elseif p1.Cmdr.Enabled == false or not p1:IsVisible() then
-			if p1:IsVisible() then
-				p1:Hide()
+		elseif cmdrInterface.Cmdr.Enabled == false or not cmdrInterface:IsVisible() then
+			if cmdrInterface:IsVisible() then
+				cmdrInterface:Hide()
 			end
-		elseif p1.Cmdr.HideOnLostFocus and table.find(t, p2.UserInputType) then
-			local Position = p2.Position
-			local AbsolutePosition = v1.AbsolutePosition
-			local AbsoluteSize = v1.AbsoluteSize
+		elseif cmdrInterface.Cmdr.HideOnLostFocus and table.find(inputTypes, input.UserInputType) then
+			local Position = input.Position
+			local AbsolutePosition = cmdrFrame.AbsolutePosition
+			local AbsoluteSize = cmdrFrame.AbsoluteSize
 			if Position.X < AbsolutePosition.X or (Position.X > AbsolutePosition.X + AbsoluteSize.X or (Position.Y < AbsolutePosition.Y or Position.Y > AbsolutePosition.Y + AbsoluteSize.Y)) then
-				p1:Hide()
+				cmdrInterface:Hide()
 			end
-		elseif p2.KeyCode == Enum.KeyCode.Down then
-			p1:SelectVertical(1)
-		elseif p2.KeyCode == Enum.KeyCode.Up then
-			p1:SelectVertical(-1)
-		elseif p2.KeyCode == Enum.KeyCode.Return then
+		elseif input.KeyCode == Enum.KeyCode.Down then
+			cmdrInterface:SelectVertical(1)
+		elseif input.KeyCode == Enum.KeyCode.Up then
+			cmdrInterface:SelectVertical(-1)
+		elseif input.KeyCode == Enum.KeyCode.Return then
 			wait()
-			p1:SetEntryText(p1:GetEntryText():gsub("\n", ""):gsub("\r", ""))
-		elseif p2.KeyCode == Enum.KeyCode.Tab then
-			local v12 = p1.AutoComplete:GetSelectedItem()
-			local v22 = p1:GetEntryText()
-			if v12 and not (v22:sub(#v22, #v22):match("%s") and p1.AutoComplete.LastItem) then
-				local v32 = v12[2]
-				local Command = p1.AutoComplete.Command
-				local v4, v5
+			cmdrInterface:SetEntryText(cmdrInterface:GetEntryText():gsub("\n", ""):gsub("\r", ""))
+		elseif input.KeyCode == Enum.KeyCode.Tab then
+			local selectedItem = cmdrInterface.AutoComplete:GetSelectedItem()
+			local entryText = cmdrInterface:GetEntryText()
+			if selectedItem and not (entryText:sub(#entryText, #entryText):match("%s") and cmdrInterface.AutoComplete.LastItem) then
+				local itemName = selectedItem[2]
+				local Command = cmdrInterface.AutoComplete.Command
+				local commandText, needsSpace
 				if Command then
-					local Arg = p1.AutoComplete.Arg
-					v4 = Command.Alias
-					local v6 = if p1.AutoComplete.NumArgs == #Command.ArgumentDefinitions then false else p1.AutoComplete.IsPartial == false
+					local Arg = cmdrInterface.AutoComplete.Arg
+					commandText = Command.Alias
+					local isPartial = if cmdrInterface.AutoComplete.NumArgs == #Command.ArgumentDefinitions then false else cmdrInterface.AutoComplete.IsPartial == false
 					local Arguments = Command.Arguments
-					v5 = v6
+					needsSpace = isPartial
 					for i = 1, #Arguments do
-						local v7 = Arguments[i]
-						local RawSegments = v7.RawSegments
-						if v7 == Arg then
-							RawSegments[#RawSegments] = v32
+						local currentArg = Arguments[i]
+						local RawSegments = currentArg.RawSegments
+						if currentArg == Arg then
+							RawSegments[#RawSegments] = itemName
 						end
-						local v8 = v7.Prefix .. table.concat(RawSegments, ",")
-						if v8:find(" ") or v8 == "" then
-							v8 = ("%q"):format(v8)
+						local formattedArg = currentArg.Prefix .. table.concat(RawSegments, ",")
+						if formattedArg:find(" ") or formattedArg == "" then
+							formattedArg = ("%q"):format(formattedArg)
 						end
-						local v10 = ("%s %s"):format(v4, v8)
-						if v7 == Arg then
-							v4 = v10
+						local commandWithArg = ("%s %s"):format(commandText, formattedArg)
+						if currentArg == Arg then
+							commandText = commandWithArg
 							break
 						end
-						v4 = v10
+						commandText = commandWithArg
 					end
 				else
-					v4 = v32
-					v5 = true
+					commandText = itemName
+					needsSpace = true
 				end
 				wait()
-				p1:SetEntryText(v4 .. if v5 then " " else "")
+				cmdrInterface:SetEntryText(commandText .. if needsSpace then " " else "")
 			else
 				wait()
-				p1:SetEntryText(p1:GetEntryText())
+				cmdrInterface:SetEntryText(cmdrInterface:GetEntryText())
 			end
 		else
-			p1:ClearHistoryState()
+			cmdrInterface:ClearHistoryState()
 		end
 	end
 end
-Entry.TextBox.FocusLost:Connect(function(p1)
-	return t2:LoseFocus(p1)
+Entry.TextBox.FocusLost:Connect(function(focusState)
+	return interface:LoseFocus(focusState)
 end)
-UserInputService.InputBegan:Connect(function(p1, p2)
-	return t2:BeginInput(p1, p2)
+UserInputService.InputBegan:Connect(function(input, isGameProcessed)
+	return interface:BeginInput(input, isGameProcessed)
 end)
 Entry.TextBox:GetPropertyChangedSignal("Text"):Connect(function()
-	v1.CanvasPosition = Vector2.new(0, v1.AbsoluteCanvasSize.Y)
+	cmdrFrame.CanvasPosition = Vector2.new(0, cmdrFrame.AbsoluteCanvasSize.Y)
 	if Entry.TextBox.Text:match("\t") then
 		Entry.TextBox.Text = Entry.TextBox.Text:gsub("\t", "")
-	elseif t2.OnTextChanged then
-		return t2.OnTextChanged(Entry.TextBox.Text)
+	elseif interface.OnTextChanged then
+		return interface.OnTextChanged(Entry.TextBox.Text)
 	end
 end)
-v1.ChildAdded:Connect(function()
-	task.defer(t2.UpdateWindowHeight)
+cmdrFrame.ChildAdded:Connect(function()
+	task.defer(interface.UpdateWindowHeight)
 end)
-return t2
+return interface

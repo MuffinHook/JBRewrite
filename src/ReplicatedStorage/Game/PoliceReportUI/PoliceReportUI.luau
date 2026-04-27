@@ -1,31 +1,29 @@
--- Reviewed by Claude
--- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Math = require(ReplicatedStorage.Module.Math)
-local t = {}
-function t.Init()
+local PoliceReportUI = {}
+function PoliceReportUI.Init()
 	local PoliceReportGui = ReplicatedStorage.StarterGui:FindFirstChild("PoliceReportGui")
 	PoliceReportGui.Parent = LocalPlayer.PlayerGui
-	t.Gui = PoliceReportGui
+	PoliceReportUI.Gui = PoliceReportGui
 end
-function t.Display(reportData)
-	if t.IsOpen() then
-		t.Hide()
+function PoliceReportUI.Display(reportData)
+	if PoliceReportUI.IsOpen() then
+		PoliceReportUI.Hide()
 	end
-	local Gui = t.Gui
+	local Gui = PoliceReportUI.Gui
 	local maid = Maid.new()
-	t.Maid = maid
+	PoliceReportUI.Maid = maid
 	local List = Gui.Container.Top.List
 	local sum = 0
-	for i, v in ipairs(reportData) do
+	for i, reportEntry in ipairs(reportData) do
 		local isAmount, hasSubtitle
-		local reportTitle = assert(v.Title)
-		local reportAmount = assert(v.Amount)
+		local reportTitle = assert(reportEntry.Title)
+		local reportAmount = assert(reportEntry.Amount)
 		isAmount = type(reportAmount) == "number"
 		assert(isAmount)
-		local SubTitle = v.SubTitle
+		local SubTitle = reportEntry.SubTitle
 		local reportItem = List.Preset:Clone()
 		reportItem.LayoutOrder = i
 		reportItem.Parent = List
@@ -42,24 +40,24 @@ function t.Display(reportData)
 	end
 	Gui.Container.Bottom.Container.Sum.Text = ("+%s"):format(Math.FormatMoney(sum))
 	maid:GiveTask(Gui.Container.Close.MouseButton1Down:Connect(function()
-		t.Hide()
+		PoliceReportUI.Hide()
 	end))
 	Gui.Enabled = true
 	task.delay(5, function()
-		if maid == t.Maid then
-			t.Hide()
+		if maid == PoliceReportUI.Maid then
+			PoliceReportUI.Hide()
 		end
 	end)
 end
-function t.Hide()
-	local Gui = t.Gui
-	if t.IsOpen() then
-		t.Maid:Destroy()
-		t.Maid = nil
+function PoliceReportUI.Hide()
+	local Gui = PoliceReportUI.Gui
+	if PoliceReportUI.IsOpen() then
+		PoliceReportUI.Maid:Destroy()
+		PoliceReportUI.Maid = nil
 		Gui.Enabled = false
 	end
 end
-function t.IsOpen()
-	return t.Maid ~= nil
+function PoliceReportUI.IsOpen()
+	return PoliceReportUI.Maid ~= nil
 end
-return t
+return PoliceReportUI

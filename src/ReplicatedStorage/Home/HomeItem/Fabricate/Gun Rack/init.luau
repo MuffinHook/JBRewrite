@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GunShopUtils = require(ReplicatedStorage.Game.GunShop.GunShopUtils)
@@ -8,51 +7,51 @@ local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSystem)
 local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
 local GunRackConsts = require(script.GunRackConsts)
-local t = {}
-t.__index = t
-function t.new(self)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._obj = self._obj
-	t2._maid = Maid.new()
-	local function action(self, p2)
-		if p2 then
-			t2._obj:FindFirstChild(GunRackConsts.INTERACT_REMOTE_NAME):FireServer()
+local GunRack = {}
+GunRack.__index = GunRack
+function GunRack.new(self)
+	local gunRackInstance = {}
+	setmetatable(gunRackInstance, GunRack)
+	gunRackInstance._obj = self._obj
+	gunRackInstance._maid = Maid.new()
+	local function action(self, isPressed)
+		if isPressed then
+			gunRackInstance._obj:FindFirstChild(GunRackConsts.INTERACT_REMOTE_NAME):FireServer()
 			return true
 		end
 	end
 	local function preUpdateFun(self)
-		local instance = t2:GetItemName()
+		local instance = gunRackInstance:GetItemName()
 		local localPlayer = InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1]
-		local var3 = localPlayer and localPlayer:GetName()
-		if not GunRackConsts.WHITELIST[var3] then
-			var3 = nil
+		local equippedGunName = localPlayer and localPlayer:GetName()
+		if not GunRackConsts.WHITELIST[equippedGunName] then
+			equippedGunName = nil
 		end
-		local var4 = not HomeItemSystem.isCustomizing()
-		if instance and (localPlayer and instance == var3) then
-			var4 = false
+		local isActionEnabled = not HomeItemSystem.isCustomizing()
+		if instance and (localPlayer and instance == equippedGunName) then
+			isActionEnabled = false
 		end
-		if var3 and instance then
+		if equippedGunName and instance then
 			self.Duration = 0.5
 			self.Timed = true
 		else
 			self.Timed = false
 		end
-		if var3 and instance then
-			self.Name = ("Replace %s with %s"):format(GunShopUtils.getTranslatedTitleFromName(instance), GunShopUtils.getTranslatedTitleFromName(var3))
+		if equippedGunName and instance then
+			self.Name = ("Replace %s with %s"):format(GunShopUtils.getTranslatedTitleFromName(instance), GunShopUtils.getTranslatedTitleFromName(equippedGunName))
 		elseif instance then
 			self.Name = ("Grab %s"):format(GunShopUtils.getTranslatedTitleFromName(instance))
-		elseif var3 then
-			self.Name = ("Mount %s"):format(GunShopUtils.getTranslatedTitleFromName(var3))
+		elseif equippedGunName then
+			self.Name = ("Mount %s"):format(GunShopUtils.getTranslatedTitleFromName(equippedGunName))
 		else
-			var4 = false
+			isActionEnabled = false
 		end
-		self.Enabled = var4
+		self.Enabled = isActionEnabled
 	end
-	t2._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(t2._obj, "Prompt", function(self, p2)
+	gunRackInstance._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(gunRackInstance._obj, "Prompt", function(self, maid)
 		CircleAction.Add({
 			Part = self,
-			ValidRoot = t2._obj,
+			ValidRoot = gunRackInstance._obj,
 			Name = "Interact",
 			Timed = false,
 			Dist = 10,
@@ -60,16 +59,16 @@ function t.new(self)
 			PreUpdateFun = preUpdateFun,
 			PreUpdatePeriod = 0.5
 		}, self)
-		p2:GiveTask(function()
+		maid:GiveTask(function()
 			CircleAction.Remove(self)
 		end)
 	end))
-	return t2
+	return gunRackInstance
 end
-function t.GetItemName(self)
+function GunRack.GetItemName(self)
 	return self._obj:GetAttribute(GunRackConsts.ITEM_NAME_ATTR_NAME)
 end
-function t.Destroy(self)
+function GunRack.Destroy(self)
 	local _maid = self._maid
 	assert(_maid ~= nil)
 	self._maid = nil
@@ -77,7 +76,7 @@ function t.Destroy(self)
 end
 return {
 	setup = function(self)
-		local instance = t.new(self)
+		local instance = GunRack.new(self)
 		self._maid:GiveTask(instance)
 		self._gunRack = instance
 	end

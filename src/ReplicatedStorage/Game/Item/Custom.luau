@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local itemParent = script.Parent
 local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)

@@ -1,40 +1,39 @@
--- Reviewed by Claude
 return {
-	computeHorizontalAngle = function(p1, p2, p3)
-		assert(p3)
-		assert(p2)
-		assert(p2.Part1)
-		local Base = p1:FindFirstChild("Base")
+	computeHorizontalAngle = function(turretModel, joint, targetPosition)
+		assert(targetPosition)
+		assert(joint)
+		assert(joint.Part1)
+		local Base = turretModel:FindFirstChild("Base")
 		assert(Base)
-		local Arm = p1:FindFirstChild("Arm")
+		local Arm = turretModel:FindFirstChild("Arm")
 		assert(Arm)
-		local cframe = (p2.Part1.CFrame * p2.C0:Inverse()):PointToObjectSpace(p3)
-		local cframe2 = Base.Root.CFrame:PointToObjectSpace(Arm.Tip.Position)
-		local var4 = math.sqrt(cframe.x * cframe.x + cframe.z * cframe.z)
-		local var6 = math.atan2(-cframe.z, cframe.x)
-		local v7, v8
-		if cframe2.x < var4 then
-			v7 = math.asin(cframe2.x / var4)
-			if not v7 then
-				v8 = var4 / cframe2.x
-				v7 = math.asin(v8)
+		local positionObjectSpace = (joint.Part1.CFrame * joint.C0:Inverse()):PointToObjectSpace(targetPosition)
+		local armTipObjectSpace = Base.Root.CFrame:PointToObjectSpace(Arm.Tip.Position)
+		local horizontalDistance = math.sqrt(positionObjectSpace.x * positionObjectSpace.x + positionObjectSpace.z * positionObjectSpace.z)
+		local baseAngle = math.atan2(-positionObjectSpace.z, positionObjectSpace.x)
+		local calculatedAngle, distanceRatio
+		if armTipObjectSpace.x < horizontalDistance then
+			calculatedAngle = math.asin(armTipObjectSpace.x / horizontalDistance)
+			if not calculatedAngle then
+				distanceRatio = horizontalDistance / armTipObjectSpace.x
+				calculatedAngle = math.asin(distanceRatio)
 			end
 		else
-			v8 = var4 / cframe2.x
-			v7 = math.asin(v8)
+			distanceRatio = horizontalDistance / armTipObjectSpace.x
+			calculatedAngle = math.asin(distanceRatio)
 		end
-		return var6 + v7
+		return baseAngle + calculatedAngle
 	end,
-	computeVerticalAngle = function(p1, p2, p3)
-		assert(p3)
-		local Arm = p1:FindFirstChild("Arm")
+	computeVerticalAngle = function(turretModel, joint, targetPosition)
+		assert(targetPosition)
+		local Arm = turretModel:FindFirstChild("Arm")
 		assert(Arm)
-		assert(p2.Part1)
-		local cframe = (p2.Part1.CFrame * p2.C0:Inverse()):PointToObjectSpace(p3)
-		return math.atan2(cframe.y, -cframe.z)
+		assert(joint.Part1)
+		local positionObjectSpace = (joint.Part1.CFrame * joint.C0:Inverse()):PointToObjectSpace(targetPosition)
+		return math.atan2(positionObjectSpace.y, -positionObjectSpace.z)
 	end,
-	updateModel = function(p1, p2, p3, p4)
-		p1.C1 = p1.C0:Inverse() * CFrame.Angles(0, p3 - 1.5707963267948966, 0) * p1.C0
-		p2.C1 = p2.C0:Inverse() * CFrame.Angles(p4, 0, 0) * p2.C0
+	updateModel = function(joint, joint2, horizontalAngle, verticalAngle)
+		joint.C1 = joint.C0:Inverse() * CFrame.Angles(0, horizontalAngle - 1.5707963267948966, 0) * joint.C0
+		joint2.C1 = joint2.C0:Inverse() * CFrame.Angles(verticalAngle, 0, 0) * joint2.C0
 	end
 }

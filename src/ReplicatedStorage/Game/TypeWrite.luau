@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 return function(text, callback, charsPerSecond)
 	local startTime = tick()

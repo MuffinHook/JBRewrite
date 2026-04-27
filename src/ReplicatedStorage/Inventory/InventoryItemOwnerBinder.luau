@@ -1,24 +1,23 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local Binder = require(ReplicatedStorage.Std.Binder)
 local Signal = require(ReplicatedStorage.Std.Signal)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 require(ReplicatedStorage.Std.Maid)
-local t = {}
-t.__index = t
-setmetatable(t, BaseObject)
-function t.new(p1)
-	local instance = BaseObject.new(p1)
-	setmetatable(instance, t)
-	instance.Name = p1.Name
+local InventoryItemOwnerClass = {}
+InventoryItemOwnerClass.__index = InventoryItemOwnerClass
+setmetatable(InventoryItemOwnerClass, BaseObject)
+function InventoryItemOwnerClass.new(inventoryItem)
+	local instance = BaseObject.new(inventoryItem)
+	setmetatable(instance, InventoryItemOwnerClass)
+	instance.Name = inventoryItem.Name
 	instance._onCharacterChanged = Signal.new()
 	local function update()
-		if p1.Value then
-			instance.maid.observeChar = RxInstanceUtils.observeProperty(p1.Value, "PrimaryPart", function(p12)
+		if inventoryItem.Value then
+			instance.maid.observeChar = RxInstanceUtils.observeProperty(inventoryItem.Value, "PrimaryPart", function(primaryPart)
 				task.wait()
-				if p12 then
-					instance.Character = p1.Value
+				if primaryPart then
+					instance.Character = inventoryItem.Value
 				else
 					instance.Character = nil
 				end
@@ -26,24 +25,24 @@ function t.new(p1)
 			end)
 		end
 	end
-	if p1.Value then
-		instance.maid.observeChar = RxInstanceUtils.observeProperty(p1.Value, "PrimaryPart", function(p12)
+	if inventoryItem.Value then
+		instance.maid.observeChar = RxInstanceUtils.observeProperty(inventoryItem.Value, "PrimaryPart", function(primaryPart)
 			task.wait()
-			if p12 then
-				instance.Character = p1.Value
+			if primaryPart then
+				instance.Character = inventoryItem.Value
 			else
 				instance.Character = nil
 			end
 			instance._onCharacterChanged:Fire(instance.Character)
 		end)
 	end
-	instance.maid:GiveTask(p1.Changed:Connect(update))
+	instance.maid:GiveTask(inventoryItem.Changed:Connect(update))
 	return instance
 end
-function t.GetAttribute(p1, p2)
-	return p1["attr" .. tostring(p2)]
+function InventoryItemOwnerClass.GetAttribute(inventoryItem, attributeName)
+	return inventoryItem["attr" .. tostring(attributeName)]
 end
-function t.SetAttribute(p1, p2, p3)
-	p1["attr" .. tostring(p2)] = p3
+function InventoryItemOwnerClass.SetAttribute(inventoryItem, attributeName, attributeValue)
+	inventoryItem["attr" .. tostring(attributeName)] = attributeValue
 end
-return Binder.new("InventoryItemOwner", t)
+return Binder.new("InventoryItemOwner", InventoryItemOwnerClass)

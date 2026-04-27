@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local Dictionary = require(ReplicatedStorage.Std.Dictionary)
@@ -8,30 +6,30 @@ local createElement = Roact.createElement
 local Elapsed = require(script.Parent.Elapsed)
 local BattleRobberyStatus = require(script.Parent.BattleRobberyStatus)
 local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
-local local1 = Roact.PureComponent:extend("BattleCrewInfo")
-local1.defaultProps = {
+local BattleCrewInfo = Roact.PureComponent:extend("BattleCrewInfo")
+BattleCrewInfo.defaultProps = {
 	backgroundColor = Color3.new(0/255, 0/255, 0/255),
 	size = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5),
 	position = UDim2.fromScale(0.5, 0.5),
 	attacking = false
 }
-function local1.render(self)
-	local local1 = ColorUtils.saturateBy(self.props.backgroundColor, -0.9)
+function BattleCrewInfo.render(self)
+	local darkerBackgroundColor = ColorUtils.saturateBy(self.props.backgroundColor, -0.9)
 	local count = 0
-	local t = {}
-	for local2, local3 in self.props.robberiesCompleted do
-		if local3.robberyCompleted then
+	local robberyStatusElements = {}
+	for robberyIndex, robberyData in self.props.robberiesCompleted do
+		if robberyData.robberyCompleted then
 			count = count + 1
 		end
-		t["Robbery_" .. tostring(local3.robberyType)] = createElement(BattleRobberyStatus, {
-			rowIndex = local2,
-			robberyType = local3.robberyType,
-			robberyCompleted = local3.robberyCompleted,
-			backgroundColor = local1
+		robberyStatusElements["Robbery_" .. tostring(robberyData.robberyType)] = createElement(BattleRobberyStatus, {
+			rowIndex = robberyIndex,
+			robberyType = robberyData.robberyType,
+			robberyCompleted = robberyData.robberyCompleted,
+			backgroundColor = darkerBackgroundColor
 		})
 	end
-	local table3 = {
+	local uiElements = {
 		UICorners = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
 		}),
@@ -52,7 +50,7 @@ function local1.render(self)
 			})
 		})
 	}
-	table3.TakenContainer = self.props.attacking and createElement("Frame", {
+	uiElements.TakenContainer = self.props.attacking and createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundColor3 = self.props.backgroundColor,
 		Size = UDim2.new(0.5, -2, 0.8, 0),
@@ -71,7 +69,7 @@ function local1.render(self)
 			prefix = "Time Taken: "
 		})
 	})
-	table3.RobberyList = self.props.attacking and createElement("Frame", {
+	uiElements.RobberyList = self.props.attacking and createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundColor3 = self.props.backgroundColor,
 		Size = UDim2.new(0.5, -2, 0.8, 0),
@@ -97,8 +95,8 @@ function local1.render(self)
 				TextColor3 = ColorUtils.brightenBy(self.props.backgroundColor, -0.5)
 			})
 		})
-	}, t))
-	table3.BeatContainer = not self.props.attacking and createElement("Frame", {
+	}, robberyStatusElements))
+	uiElements.BeatContainer = not self.props.attacking and createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundColor3 = self.props.backgroundColor,
 		Size = UDim2.new(0.5, -2, 0.8, 0),
@@ -117,7 +115,7 @@ function local1.render(self)
 			prefix = "Time Taken: "
 		})
 	})
-	table3.Help = not self.props.attacking and createElement("Frame", {
+	uiElements.Help = not self.props.attacking and createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundColor3 = self.props.backgroundColor,
 		Size = UDim2.new(0.5, -2, 0.8, 0),
@@ -150,6 +148,6 @@ function local1.render(self)
 		Size = self.props.size,
 		AnchorPoint = self.props.anchorPoint,
 		Position = self.props.position
-	}, Dictionary.merge(self.props[Roact.Children], table3))
+	}, Dictionary.merge(self.props[Roact.Children], uiElements))
 end
-return local1
+return BattleCrewInfo

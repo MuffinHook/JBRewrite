@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local StringUtils = {
 	comma = function(number)
 		local before, middle, after = string.match(tostring(number), "^([^%d]*%d)(%d*)(.-)$")

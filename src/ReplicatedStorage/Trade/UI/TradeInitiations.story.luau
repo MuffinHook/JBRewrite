@@ -1,12 +1,11 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(parentElement)
+	local AppComponent = Roact.Component:extend("App")
 	local TradeInitiations = require(script.Parent.TradeInitiations)
 	local store = require(ReplicatedStorage.App.store)
-	function v1.init(p1)
+	function AppComponent.init(self)
 		store:dispatch({
 			type = "tradeInitiationsSet",
 			list = {
@@ -25,21 +24,21 @@ return function(p1)
 			}
 		})
 	end
-	function v1.render(p1)
+	function AppComponent.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(TradeInitiations, {
-				onAccept = function(p1)
-					print("accept", p1)
+				onAccept = function(tradeInitiation)
+					print("accept", tradeInitiation)
 				end,
-				onDecline = function(p1)
-					print("decline", p1)
+				onDecline = function(tradeInitiation)
+					print("decline", tradeInitiation)
 				end
 			}) })
 	end
-	function v1.willUnmount(p1)  end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(self)  end
+	local mountedInstance = Roact.mount(Roact.createElement(AppComponent), parentElement)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedInstance)
 	end
 end

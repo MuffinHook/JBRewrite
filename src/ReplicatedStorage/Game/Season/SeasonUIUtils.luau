@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -25,10 +23,10 @@ return {
 			if RunUtils.isStudio() or not (SeasonUtils.getRemainingTime() < 0) then
 				Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
 				assert(Settings.getFirstProductByType("SeasonPass") ~= nil)
-				local v2 = ReplicatedStorage:FindFirstChild(SeasonConsts.SEASON_PASS_GIFT_ATTEMPT_REMOTE_NAME)
+				local giftAttemptRemote = ReplicatedStorage:FindFirstChild(SeasonConsts.SEASON_PASS_GIFT_ATTEMPT_REMOTE_NAME)
 				local Text = containerElement.ContainerPlayerName.Text
 				if #Text ~= 0 then
-					v2:FireServer((Players:GetUserIdFromNameAsync(Text)))
+					giftAttemptRemote:FireServer((Players:GetUserIdFromNameAsync(Text)))
 					containerElement.ContainerIcon.Icon.Image = ""
 					containerElement.ContainerPlayerName.Text = ""
 				end
@@ -42,13 +40,13 @@ return {
 		taskManager:GiveTask(containerElement.ContainerPlayerName:GetPropertyChangedSignal("Text"):Connect(function()
 			updateCounter = updateCounter + 1
 			local Text = containerElement.ContainerPlayerName.Text
-			local v2 = nil
+			local userId = nil
 			local pcallSuccess = pcall(function()
-				v2 = Players:GetUserIdFromNameAsync(Text)
+				userId = Players:GetUserIdFromNameAsync(Text)
 			end)
 			local thumbnailUrl
 			if pcallSuccess then
-				local thumbnailData, thumbnailStatus = Players:GetUserThumbnailAsync(v2, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size180x180)
+				local thumbnailData, thumbnailStatus = Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size180x180)
 				pcallSuccess = thumbnailStatus
 				thumbnailUrl = thumbnailData
 			else

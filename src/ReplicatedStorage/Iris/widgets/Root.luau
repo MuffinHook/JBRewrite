@@ -1,23 +1,22 @@
--- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2)
-	local delta = 0
-	p1.WidgetConstructor("Root", {
+return function(irisConfig, utils)
+	local childCount = 0
+	irisConfig.WidgetConstructor("Root", {
 		hasState = false,
 		hasChildren = true,
 		Args = {},
 		Events = {},
-		Generate = function(p12)
+		Generate = function(widgetObject)
 			local Iris_Root = Instance.new("Folder")
 			Iris_Root.Name = "Iris_Root"
 			local PseudoWindowScreenGui
-			if p1._config.UseScreenGUIs then
+			if irisConfig._config.UseScreenGUIs then
 				local ScreenGui = Instance.new("ScreenGui")
 				ScreenGui.ResetOnSpawn = false
 				ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-				ScreenGui.ScreenInsets = p1._config.ScreenInsets
-				ScreenGui.IgnoreGuiInset = p1._config.IgnoreGuiInset
-				ScreenGui.DisplayOrder = p1._config.DisplayOrderOffset
+				ScreenGui.ScreenInsets = irisConfig._config.ScreenInsets
+				ScreenGui.IgnoreGuiInset = irisConfig._config.IgnoreGuiInset
+				ScreenGui.DisplayOrder = irisConfig._config.DisplayOrderOffset
 				PseudoWindowScreenGui = ScreenGui
 			else
 				local Frame = Instance.new("Frame")
@@ -25,19 +24,19 @@ return function(p1, p2)
 				Frame.Position = UDim2.fromScale(0.5, 0.5)
 				Frame.Size = UDim2.fromScale(1, 1)
 				Frame.BackgroundTransparency = 1
-				Frame.ZIndex = p1._config.DisplayOrderOffset
+				Frame.ZIndex = irisConfig._config.DisplayOrderOffset
 				PseudoWindowScreenGui = Frame
 			end
 			PseudoWindowScreenGui.Name = "PseudoWindowScreenGui"
 			PseudoWindowScreenGui.Parent = Iris_Root
 			local PopupScreenGui
-			if p1._config.UseScreenGUIs then
+			if irisConfig._config.UseScreenGUIs then
 				local ScreenGui = Instance.new("ScreenGui")
 				ScreenGui.ResetOnSpawn = false
 				ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-				ScreenGui.DisplayOrder = p1._config.DisplayOrderOffset + 1024
-				ScreenGui.ScreenInsets = p1._config.ScreenInsets
-				ScreenGui.IgnoreGuiInset = p1._config.IgnoreGuiInset
+				ScreenGui.DisplayOrder = irisConfig._config.DisplayOrderOffset + 1024
+				ScreenGui.ScreenInsets = irisConfig._config.ScreenInsets
+				ScreenGui.IgnoreGuiInset = irisConfig._config.IgnoreGuiInset
 				PopupScreenGui = ScreenGui
 			else
 				local Frame = Instance.new("Frame")
@@ -45,7 +44,7 @@ return function(p1, p2)
 				Frame.Position = UDim2.fromScale(0.5, 0.5)
 				Frame.Size = UDim2.fromScale(1, 1)
 				Frame.BackgroundTransparency = 1
-				Frame.ZIndex = p1._config.DisplayOrderOffset + 1024
+				Frame.ZIndex = irisConfig._config.DisplayOrderOffset + 1024
 				PopupScreenGui = Frame
 			end
 			PopupScreenGui.Name = "PopupScreenGui"
@@ -56,7 +55,7 @@ return function(p1, p2)
 			TooltipContainer.Size = UDim2.fromOffset(0, 0)
 			TooltipContainer.BackgroundTransparency = 1
 			TooltipContainer.BorderSizePixel = 0
-			p2.UIListLayout(TooltipContainer, Enum.FillDirection.Vertical, UDim.new(0, p1._config.PopupBorderSize))
+			utils.UIListLayout(TooltipContainer, Enum.FillDirection.Vertical, UDim.new(0, irisConfig._config.PopupBorderSize))
 			TooltipContainer.Parent = PopupScreenGui
 			local MenuBarContainer = Instance.new("Frame")
 			MenuBarContainer.Name = "MenuBarContainer"
@@ -70,10 +69,10 @@ return function(p1, p2)
 			PseudoWindow.AutomaticSize = Enum.AutomaticSize.XY
 			PseudoWindow.Size = UDim2.new(0, 0, 0, 0)
 			PseudoWindow.Position = UDim2.fromOffset(0, 22)
-			PseudoWindow.BackgroundTransparency = p1._config.WindowBgTransparency
-			PseudoWindow.BackgroundColor3 = p1._config.WindowBgColor
-			PseudoWindow.BorderSizePixel = p1._config.WindowBorderSize
-			PseudoWindow.BorderColor3 = p1._config.BorderColor
+			PseudoWindow.BackgroundTransparency = irisConfig._config.WindowBgTransparency
+			PseudoWindow.BackgroundColor3 = irisConfig._config.WindowBgColor
+			PseudoWindow.BorderSizePixel = irisConfig._config.WindowBorderSize
+			PseudoWindow.BorderColor3 = irisConfig._config.BorderColor
 			PseudoWindow.Selectable = false
 			PseudoWindow.SelectionGroup = true
 			PseudoWindow.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
@@ -81,40 +80,40 @@ return function(p1, p2)
 			PseudoWindow.SelectionBehaviorLeft = Enum.SelectionBehavior.Stop
 			PseudoWindow.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
 			PseudoWindow.Visible = false
-			p2.UIPadding(PseudoWindow, p1._config.WindowPadding)
-			p2.UIListLayout(PseudoWindow, Enum.FillDirection.Vertical, UDim.new(0, p1._config.ItemSpacing.Y))
+			utils.UIPadding(PseudoWindow, irisConfig._config.WindowPadding)
+			utils.UIListLayout(PseudoWindow, Enum.FillDirection.Vertical, UDim.new(0, irisConfig._config.ItemSpacing.Y))
 			PseudoWindow.Parent = PseudoWindowScreenGui
 			return Iris_Root
 		end,
-		Update = function(p1)
-			if delta > 0 then
-				p1.Instance.PseudoWindowScreenGui.PseudoWindow.Visible = true
+		Update = function(widgetState)
+			if childCount > 0 then
+				widgetState.Instance.PseudoWindowScreenGui.PseudoWindow.Visible = true
 			end
 		end,
-		Discard = function(p1)
-			delta = 0
-			p1.Instance:Destroy()
+		Discard = function(widgetState)
+			childCount = 0
+			widgetState.Instance:Destroy()
 		end,
-		ChildAdded = function(p1, p2)
-			local instance12 = p1.Instance
-			if p2.type == "Window" then
-				return p1.Instance
-			elseif p2.type == "Tooltip" then
-				return instance12.PopupScreenGui.TooltipContainer
-			elseif p2.type == "MenuBar" then
-				return instance12.PopupScreenGui.MenuBarContainer
+		ChildAdded = function(widgetState, childInfo)
+			local instanceRoot = widgetState.Instance
+			if childInfo.type == "Window" then
+				return widgetState.Instance
+			elseif childInfo.type == "Tooltip" then
+				return instanceRoot.PopupScreenGui.TooltipContainer
+			elseif childInfo.type == "MenuBar" then
+				return instanceRoot.PopupScreenGui.MenuBarContainer
 			else
-				local PseudoWindow = instance12.PseudoWindowScreenGui.PseudoWindow
-				delta = delta + 1
+				local PseudoWindow = instanceRoot.PseudoWindowScreenGui.PseudoWindow
+				childCount = childCount + 1
 				PseudoWindow.Visible = true
 				return PseudoWindow
 			end
 		end,
-		ChildDiscarded = function(p1, p2)
-			if p2.type ~= "Window" and (p2.type ~= "Tooltip" and p2.type ~= "MenuBar") then
-				delta = delta - 1
-				if delta == 0 then
-					p1.Instance.PseudoWindowScreenGui.PseudoWindow.Visible = false
+		ChildDiscarded = function(widgetState, childInfo)
+			if childInfo.type ~= "Window" and (childInfo.type ~= "Tooltip" and childInfo.type ~= "MenuBar") then
+				childCount = childCount - 1
+				if childCount == 0 then
+					widgetState.Instance.PseudoWindowScreenGui.PseudoWindow.Visible = false
 				end
 			end
 		end

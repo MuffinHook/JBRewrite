@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClanConsts = require(ReplicatedStorage.Clan.ClanConsts)
 local ClanUtils = {

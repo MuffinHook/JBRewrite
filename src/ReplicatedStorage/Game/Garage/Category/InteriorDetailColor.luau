@@ -1,7 +1,6 @@
--- Reviewed by Claude
-return function(p1)
-	local Model = p1.Model
+return function(vehicleData)
+	local Model = vehicleData.Model
 	if Model then
-		return Model:FindFirstChild("SecondInterior", true) or p1.Make == "Sloop"
+		return Model:FindFirstChild("SecondInterior", true) or vehicleData.Make == "Sloop"
 	end
 end

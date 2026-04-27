@@ -1,33 +1,32 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Glicko2Consts = require(ReplicatedStorage.Glicko2.Glicko2Consts)
 local MathUtils = require(ReplicatedStorage.Std.MathUtils)
 local Glicko2Utils = {
-	g = function(ratingDeviation)
+	ratingFactor = function(ratingDeviation)
 		return 1 / math.sqrt(1 + 3 * ratingDeviation ^ 2 / 9.869604401089358)
 	end
 }
-function Glicko2Utils.E(playerRating, opponentRating, opponentDeviation)
-	return 1 / (math.exp(-Glicko2Utils.g(opponentDeviation) * (playerRating - opponentRating)) + 1)
+function Glicko2Utils.expectedScore(playerRating, opponentRating, opponentDeviation)
+	return 1 / (math.exp(-Glicko2Utils.ratingFactor(opponentDeviation) * (playerRating - opponentRating)) + 1)
 end
-function Glicko2Utils.v(playerRating, opponentRatings, opponentDeviations)
+function Glicko2Utils.varianceInverse(playerRating, opponentRatings, opponentDeviations)
 	local sum = 0
 	for i = 1, #opponentRatings do
 		local opponentDeviation = opponentDeviations[i]
-		local expectedScore = Glicko2Utils.E(playerRating, opponentRatings[i], opponentDeviation)
-		sum = sum + Glicko2Utils.g(opponentDeviation) ^ 2 * expectedScore * (1 - expectedScore)
+		local expectedScoreValue = Glicko2Utils.expectedScore(playerRating, opponentRatings[i], opponentDeviation)
+		sum = sum + Glicko2Utils.ratingFactor(opponentDeviation) ^ 2 * expectedScoreValue * (1 - expectedScoreValue)
 	end
 	return 1 / sum
 end
-function Glicko2Utils.delta(varianceInverse, playerRating, opponentRatings, opponentDeviations, scores)
+function Glicko2Utils.delta(varianceInverseValue, playerRating, opponentRatings, opponentDeviations, scores)
 	local sum = 0
 	for i = 1, #opponentRatings do
 		local opponentDeviation = opponentDeviations[i]
-		sum = sum + Glicko2Utils.g(opponentDeviation) * (scores[i] - Glicko2Utils.E(playerRating, opponentRatings[i], opponentDeviation))
+		sum = sum + Glicko2Utils.ratingFactor(opponentDeviation) * (scores[i] - Glicko2Utils.expectedScore(playerRating, opponentRatings[i], opponentDeviation))
 	end
-	return varianceInverse * sum
+	return varianceInverseValue * sum
 end
-function Glicko2Utils.f(x, delta, variance, ratingDeviation, sigma, tau)
+function Glicko2Utils.tauIterationFunction(x, delta, variance, ratingDeviation, sigma, tau)
 	return 0.5 * (math.exp(x) * (delta ^ 2 - variance ^ 2 - x - math.exp(x))) / (variance ^ 2 + x + math.exp(x)) ^ 2 - (x - math.log(sigma ^ 2)) / tau ^ 2
 end
 function Glicko2Utils.convertToGlicko2Rating(rating, ratingDeviation)
@@ -58,17 +57,17 @@ function Glicko2Utils.calculateNewRatingData(rating, ratingDeviation, sigma, opp
 			table.insert(glicko2OpponentDeviations, glicko2OpponentDeviation)
 		end
 		local effectiveTau = tau or Glicko2Consts.DEFAULT_TAU
-		local variance = Glicko2Utils.v(glicko2Rating, glicko2OpponentRatings, glicko2OpponentDeviations)
+		local variance = Glicko2Utils.varianceInverse(glicko2Rating, glicko2OpponentRatings, glicko2OpponentDeviations)
 		local delta = Glicko2Utils.delta(variance, glicko2Rating, glicko2OpponentRatings, glicko2OpponentDeviations, scores)
 		local function iterateX(x)
-			return Glicko2Utils.f(x, delta, variance, glicko2Deviation, sigma, effectiveTau)
+			return Glicko2Utils.tauIterationFunction(x, delta, variance, glicko2Deviation, sigma, effectiveTau)
 		end
 		local a = math.exp(MathUtils.regulaFalsi(iterateX) / 2)
 		local newDeviation = 1 / math.sqrt(1 / (glicko2Deviation ^ 2 + a ^ 2) + 1 / variance)
 		local sum = 0
 		for j = 1, #glicko2OpponentRatings do
 			local opponentDeviation = glicko2OpponentDeviations[j]
-			sum = sum + Glicko2Utils.g(opponentDeviation) * (scores[j] - Glicko2Utils.E(glicko2Rating, glicko2OpponentRatings[j], opponentDeviation))
+			sum = sum + Glicko2Utils.ratingFactor(opponentDeviation) * (scores[j] - Glicko2Utils.expectedScore(glicko2Rating, glicko2OpponentRatings[j], opponentDeviation))
 		end
 		local newRating, newSigma = Glicko2Utils.convertFromGlicko2Rating(glicko2Rating + newDeviation ^ 2 * sum, newDeviation)
 		return newRating, newSigma, a

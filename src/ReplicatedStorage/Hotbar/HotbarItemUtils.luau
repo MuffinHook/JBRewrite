@@ -1,58 +1,57 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HotbarItemConsts = require(ReplicatedStorage.Hotbar.HotbarItemConsts)
 local InventoryItemConsts = require(ReplicatedStorage.Inventory.InventoryItemConsts)
 return {
-	calculateNewIndex = function(p1, p2, p3)
-		if p1 == p2 then
-			return p3
-		elseif p2 < p3 then
-			if p2 < p1 and p1 <= p3 then
-				return p1 - 1
+	calculateNewIndex = function(currentIndex, oldIndex, newIndex)
+		if currentIndex == oldIndex then
+			return newIndex
+		elseif oldIndex < newIndex then
+			if oldIndex < currentIndex and currentIndex <= newIndex then
+				return currentIndex - 1
 			else
-				return p1
+				return currentIndex
 			end
-		elseif p3 < p2 and (p1 < p2 and p3 <= p1) then
-			return p1 + 1
+		elseif newIndex < oldIndex and (currentIndex < oldIndex and newIndex <= currentIndex) then
+			return currentIndex + 1
 		else
-			return p1
+			return currentIndex
 		end
 	end,
-	getOnHotbar = function(p1)
-		assert(CollectionService:HasTag(p1, InventoryItemConsts.TAG_NAME), "provided inventoryItemValue is not an InventoryItem")
-		return CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME)
+	getOnHotbar = function(inventoryItem)
+		assert(CollectionService:HasTag(inventoryItem, InventoryItemConsts.TAG_NAME), "provided inventoryItemValue is not an InventoryItem")
+		return CollectionService:HasTag(inventoryItem, HotbarItemConsts.TAG_NAME)
 	end,
-	setOnHotbar = function(p1, p2)
-		assert(CollectionService:HasTag(p1, InventoryItemConsts.TAG_NAME), "provided inventoryItemValue is not an InventoryItem")
-		assert(typeof(p2) == "boolean", "value must be a boolean")
-		if p2 then
-			CollectionService:AddTag(p1, HotbarItemConsts.TAG_NAME)
+	setOnHotbar = function(inventoryItem, isOnHotbar)
+		assert(CollectionService:HasTag(inventoryItem, InventoryItemConsts.TAG_NAME), "provided inventoryItemValue is not an InventoryItem")
+		assert(typeof(isOnHotbar) == "boolean", "value must be a boolean")
+		if isOnHotbar then
+			CollectionService:AddTag(inventoryItem, HotbarItemConsts.TAG_NAME)
 		else
-			CollectionService:RemoveTag(p1, HotbarItemConsts.TAG_NAME)
+			CollectionService:RemoveTag(inventoryItem, HotbarItemConsts.TAG_NAME)
 		end
 	end,
-	getDisplayOrder = function(p1)
-		assert(CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
-		return p1:GetAttribute(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME)
+	getDisplayOrder = function(hotbarItem)
+		assert(CollectionService:HasTag(hotbarItem, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
+		return hotbarItem:GetAttribute(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME)
 	end,
-	setDisplayOrder = function(p1, p2)
-		assert(CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
-		assert(typeof(p2) == "number", "value must be a string")
-		p1:SetAttribute(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME, p2)
+	setDisplayOrder = function(hotbarItem, displayOrder)
+		assert(CollectionService:HasTag(hotbarItem, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
+		assert(typeof(displayOrder) == "number", "value must be a string")
+		hotbarItem:SetAttribute(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME, displayOrder)
 	end,
-	getImageSrc = function(p1)
-		assert(CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
-		return p1:GetAttribute(HotbarItemConsts.IMAGE_SRC_ATTR_NAME)
+	getImageSrc = function(hotbarItem)
+		assert(CollectionService:HasTag(hotbarItem, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
+		return hotbarItem:GetAttribute(HotbarItemConsts.IMAGE_SRC_ATTR_NAME)
 	end,
-	setImageSrc = function(p1, p2)
-		assert(CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
-		assert(typeof(p2) == "string", "value must be a string")
-		p1:SetAttribute(HotbarItemConsts.IMAGE_SRC_ATTR_NAME, p2)
+	setImageSrc = function(hotbarItem, imageSrc)
+		assert(CollectionService:HasTag(hotbarItem, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
+		assert(typeof(imageSrc) == "string", "value must be a string")
+		hotbarItem:SetAttribute(HotbarItemConsts.IMAGE_SRC_ATTR_NAME, imageSrc)
 	end,
-	setBind = function(p1, p2)
-		assert(CollectionService:HasTag(p1, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
-		assert(typeof(p2) == "string", "value must be a string")
-		p1:SetAttribute(HotbarItemConsts.IMAGE_SRC_ATTR_NAME, p2)
+	setBind = function(hotbarItem, bindKey)
+		assert(CollectionService:HasTag(hotbarItem, HotbarItemConsts.TAG_NAME), "provided hotbarItemValue is not a HotbarItem")
+		assert(typeof(bindKey) == "string", "value must be a string")
+		hotbarItem:SetAttribute(HotbarItemConsts.IMAGE_SRC_ATTR_NAME, bindKey)
 	end
 }

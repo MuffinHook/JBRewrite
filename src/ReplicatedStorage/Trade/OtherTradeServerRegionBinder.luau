@@ -1,4 +1,3 @@
--- Reviewed by Claude
 game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -10,31 +9,31 @@ local Binder = require(ReplicatedStorage.Std.Binder)
 local Interval = require(ReplicatedStorage.Std.Interval)
 local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)
 local TradeConsts = require(ReplicatedStorage.Trade.TradeConsts)
-local t = {}
-t.__index = t
-setmetatable(t, BaseObject)
-function t.new(p1)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
-	local v3 = RegionUtils.getPrism(p1.CFrame, p1.Size)
-	p1.Parent = ReplicatedStorage
-	local v4 = false
-	v1.maid:GiveTask(Interval.every(0.1):Connect(function()
+local OtherTradeServerRegionBinder = {}
+OtherTradeServerRegionBinder.__index = OtherTradeServerRegionBinder
+setmetatable(OtherTradeServerRegionBinder, BaseObject)
+function OtherTradeServerRegionBinder.new(regionPart)
+	local binderInstance = BaseObject.new(regionPart)
+	setmetatable(binderInstance, OtherTradeServerRegionBinder)
+	local regionPrism = RegionUtils.getPrism(regionPart.CFrame, regionPart.Size)
+	regionPart.Parent = ReplicatedStorage
+	local isInRegion = false
+	binderInstance.maid:GiveTask(Interval.every(0.1):Connect(function()
 		local Character = Players.LocalPlayer.Character
 		if Character then
 			local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
 			if HumanoidRootPart then
-				local v1 = RegionUtils.CastPoint(v3, HumanoidRootPart.Position)
-				if v1 ~= v4 then
-					v4 = v1
+				local playerInRegion = RegionUtils.CastPoint(regionPrism, HumanoidRootPart.Position)
+				if playerInRegion ~= isInRegion then
+					isInRegion = playerInRegion
 					store:dispatch({
 						type = "setOtherTradeServerListVisible",
-						value = v1
+						value = playerInRegion
 					})
 				end
 			end
 		end
 	end))
-	return v1
+	return binderInstance
 end
-return Binder.new(TradeConsts.OTHER_TRADE_SERVER_LIST_REGION_TAG_NAME, t)
+return Binder.new(TradeConsts.OTHER_TRADE_SERVER_LIST_REGION_TAG_NAME, OtherTradeServerRegionBinder)

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local module = script:FindFirstAncestor("EzUi")
 local Dictionary = require(module.Dictionary)

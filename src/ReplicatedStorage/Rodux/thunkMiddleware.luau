@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local function tracebackReporter(error)
 	return debug.traceback(error)
 end

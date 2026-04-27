@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local HashMutex = {}
 HashMutex.__index = HashMutex
 function HashMutex.new()
@@ -8,49 +7,49 @@ function HashMutex.new()
 	instance._observe = {}
 	return instance
 end
-function HashMutex.AcquireFor(p1, p2, p3)
-	if p1._data[p2] then
+function HashMutex.AcquireFor(self, key, duration)
+	if self._data[key] then
 		return false
 	else
-		p1._data[p2] = {
-			thread = task.delay(p3, function()
-				p1._data[p2] = nil
-				p1:_fireKeyChangedCallbacks(p2)
+		self._data[key] = {
+			thread = task.delay(duration, function()
+				self._data[key] = nil
+				self:_fireKeyChangedCallbacks(key)
 			end)
 		}
-		p1:_fireKeyChangedCallbacks(p2)
+		self:_fireKeyChangedCallbacks(key)
 		return true
 	end
 end
-function HashMutex.ReleaseFor(p1, p2)
-	local lockEntry = p1._data[p2]
+function HashMutex.ReleaseFor(self, key)
+	local lockEntry = self._data[key]
 	if lockEntry then
 		task.cancel(lockEntry.thread)
-		p1._data[p2] = nil
-		p1:_fireKeyChangedCallbacks(p2)
+		self._data[key] = nil
+		self:_fireKeyChangedCallbacks(key)
 	end
 	return lockEntry ~= nil
 end
-function HashMutex._fireKeyChangedCallbacks(p1, p2)
-	local isHeld = p1._data[p2] ~= nil
-	if p1._observe[p2] then
-		for _, callback in p1._observe[p2] do
+function HashMutex._fireKeyChangedCallbacks(self, key)
+	local isHeld = self._data[key] ~= nil
+	if self._observe[key] then
+		for _, callback in self._observe[key] do
 			callback(isHeld)
 		end
 	end
 end
-function HashMutex.AddKeyChangedCallback(p1, p2, p3)
-	if not p1._observe[p2] then
-		p1._observe[p2] = {}
+function HashMutex.AddKeyChangedCallback(self, key, callback)
+	if not self._observe[key] then
+		self._observe[key] = {}
 	end
-	table.insert(p1._observe[p2], p3)
+	table.insert(self._observe[key], callback)
 	return function()
-		if p1._observe[p2] then
-			local foundIndex = table.find(p1._observe[p2], p3)
+		if self._observe[key] then
+			local foundIndex = table.find(self._observe[key], callback)
 			if foundIndex then
-			table.remove(p1._observe[p2], foundIndex)
-				if #p1._observe[p2] == 0 then
-					p1._observe[p2] = nil
+			table.remove(self._observe[key], foundIndex)
+				if #self._observe[key] == 0 then
+					self._observe[key] = nil
 				end
 				return true
 			else
@@ -61,14 +60,14 @@ function HashMutex.AddKeyChangedCallback(p1, p2, p3)
 		end
 	end
 end
-function HashMutex.ObserveKey(p1, p2, p3)
-	p3(p1._data[p2] ~= nil)
-	return p1:AddKeyChangedCallback(p2, p3)
+function HashMutex.ObserveKey(self, key, callback)
+	callback(self._data[key] ~= nil)
+	return self:AddKeyChangedCallback(key, callback)
 end
-function HashMutex.Destroy(p1)
-	for key in p1._data do
-		p1:ReleaseFor(key)
+function HashMutex.Destroy(self)
+	for key in self._data do
+		self:ReleaseFor(key)
 	end
-	setmetatable(p1, nil)
+	setmetatable(self, nil)
 end
 return HashMutex

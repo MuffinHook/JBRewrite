@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local CurrentCamera = workspace.CurrentCamera
@@ -418,14 +417,14 @@ function Gun.SetupBulletEmitter(self)
 			self.LastImpact = now
 			if hitPart:IsDescendantOf(workspace.Vehicles) then
 				local current = hitPart
-				count = 0
+				loopCount = 0
 				repeat
 					current = current.Parent
-					count = count + 1
+					loopCount = loopCount + 1
 					if current ~= nil and current:FindFirstChild("BoundingBox") then
 						break
 					end
-				until count >= 5
+				until loopCount >= 5
 				local vehicleBoundingBox = if current == nil then false else current:FindFirstChild("BoundingBox")
 				if vehicleBoundingBox then
 					gunEvent:FireServer("uw4j5uqm", vehicleBoundingBox.Parent, self.__ClassName)

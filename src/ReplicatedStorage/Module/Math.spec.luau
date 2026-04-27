@@ -1,4 +1,3 @@
--- Reviewed by Claude
 return function()
 	local Math = require(script.parent.Math)
 	describe("isNaN", function()

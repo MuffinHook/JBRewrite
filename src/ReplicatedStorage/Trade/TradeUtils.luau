@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
 local OwnershipConsts = require(ReplicatedStorage.Ownership.OwnershipConsts)
@@ -18,47 +16,47 @@ return {
 		return player:GetAttribute(TradeConsts.ARE_TRADE_REQUESTS_ENABLED_ATTR_NAME)
 	end,
 	getCategories = function()
-		local t = {}
-		for k in pairs(PlayerDataConsts.ITEM_TYPE_SET) do
+		local categoriesList = {}
+		for itemType in pairs(PlayerDataConsts.ITEM_TYPE_SET) do
 			local count = (1 / 0)
-			if k == PlayerDataConsts.VEHICLE_ITEM_TYPE then
+			if itemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then
 				count = 100
-			elseif k == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then
+			elseif itemType == PlayerDataConsts.HOME_ITEM_ITEM_TYPE then
 				count = 200
-			elseif k == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then
+			elseif itemType == PlayerDataConsts.ITEM_SKIN_ITEM_TYPE then
 				count = 300
-			elseif k == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
+			elseif itemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
 				count = 400
 			end
-			if k == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
-				for i, v in ipairs(OwnershipConsts.VEHICLE_CUSTOMIZATION_CATEGORY_NAMES) do
-					if not TradeConsts.MAP_CATEGORY_IGNORE[v] then
-						table.insert(t, {
-							categoryName = v,
-							categoryTitle = TradeTranslationUtils.getCategoryTitle(v),
+			if itemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE then
+				for i, categoryName in ipairs(OwnershipConsts.VEHICLE_CUSTOMIZATION_CATEGORY_NAMES) do
+					if not TradeConsts.MAP_CATEGORY_IGNORE[categoryName] then
+						table.insert(categoriesList, {
+							categoryName = categoryName,
+							categoryTitle = TradeTranslationUtils.getCategoryTitle(categoryName),
 							match = {
-								itemType = k,
-								categoryName = v
+								itemType = itemType,
+								categoryName = categoryName
 							},
 							sortOrder = count
 						})
 						count = count + 1
 					end
 				end
-			elseif not TradeConsts.MAP_CATEGORY_IGNORE[k] then
-				table.insert(t, {
-					categoryName = k,
-					categoryTitle = TradeTranslationUtils.getCategoryTitle(k),
+			elseif not TradeConsts.MAP_CATEGORY_IGNORE[itemType] then
+				table.insert(categoriesList, {
+					categoryName = itemType,
+					categoryTitle = TradeTranslationUtils.getCategoryTitle(itemType),
 					match = {
-						itemType = k
+						itemType = itemType
 					},
 					sortOrder = count
 				})
 			end
 		end
-		table.sort(t, function(p1, p2)
-			return p1.sortOrder < p2.sortOrder
+		table.sort(categoriesList, function(categoryA, categoryB)
+			return categoryA.sortOrder < categoryB.sortOrder
 		end)
-		return t
+		return categoriesList
 	end
 }

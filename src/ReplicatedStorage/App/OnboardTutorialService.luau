@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)

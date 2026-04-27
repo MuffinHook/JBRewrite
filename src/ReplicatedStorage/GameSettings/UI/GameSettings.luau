@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
@@ -26,13 +24,13 @@ function GameSettingsComponent._forceUpdate(self)
 end
 function GameSettingsComponent.render(self)
 	local elementsByName = {}
-	for i, v in ipairs(GameSettingsService.getAll()) do
+	for settingIndex, gameSetting in ipairs(GameSettingsService.getAll()) do
 		local element = nil
-		if v.type == gameSettingType.Checkbox then
+		if gameSetting.type == gameSettingType.Checkbox then
 			local frameProps = {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 1, 0),
-				LayoutOrder = v.order
+				LayoutOrder = gameSetting.order
 			}
 			local frameChildren = {
 				AspectRatio = createElement("UIAspectRatioConstraint", {
@@ -47,11 +45,11 @@ function GameSettingsComponent.render(self)
 				}),
 				Value = createElement(Checkbox, {
 					size = UDim2.new(1, 0, 1, 0),
-					value = v._value,
+					value = gameSetting._value,
 					onChecked = function(newValue)
-						v._value = newValue
+						gameSetting._value = newValue
 						self:_forceUpdate()
-						v.onChanged:Fire(newValue)
+						gameSetting.onChanged:Fire(newValue)
 					end,
 					layoutOrder = 1,
 					checkColor = self.props.color
@@ -62,7 +60,7 @@ function GameSettingsComponent.render(self)
 				Size = UDim2.new(0.85, 0, 0.8, 0),
 				Position = UDim2.new(0, 0, 0, 0)
 			}
-			labelProps.Text = v.title or v.name
+			labelProps.Text = gameSetting.title or gameSetting.name
 			labelProps.Font = Enum.Font.LuckiestGuy
 			labelProps.LineHeight = 0.7
 			labelProps.TextXAlignment = Enum.TextXAlignment.Left
@@ -71,11 +69,11 @@ function GameSettingsComponent.render(self)
 			labelProps.LayoutOrder = 2
 			frameChildren.Title = createElement("TextLabel", labelProps)
 			element = createElement("Frame", frameProps, frameChildren)
-		elseif v.type == gameSettingType.Slider then
+		elseif gameSetting.type == gameSettingType.Slider then
 			local frameProps = {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 1, 0),
-				LayoutOrder = v.order
+				LayoutOrder = gameSetting.order
 			}
 			local frameChildren = {
 				AspectRatio = createElement("UIAspectRatioConstraint", {
@@ -92,16 +90,16 @@ function GameSettingsComponent.render(self)
 					backgroundColor = Color3.new(0/255, 0/255, 0/255),
 					handleColor = Color3.new(255/255, 255/255, 255/255),
 					size = UDim2.new(0.48, 0, 1, 0),
-					min = v.min,
-					max = v.max,
-					step = v.step,
-					value = v._value,
+					min = gameSetting.min,
+					max = gameSetting.max,
+					step = gameSetting.step,
+					value = gameSetting._value,
 					updateValue = function(newValue)
-						v._updateValue(newValue)
-						v.onChanged:Fire(newValue)
+						gameSetting._updateValue(newValue)
+						gameSetting.onChanged:Fire(newValue)
 					end,
 					layoutOrder = 1,
-					text = v._value:map(v.textMap)
+					text = gameSetting._value:map(gameSetting.textMap)
 				})
 			}
 			local labelProps = {
@@ -109,7 +107,7 @@ function GameSettingsComponent.render(self)
 				Size = UDim2.new(0.5, 0, 0.8, 0),
 				Position = UDim2.new(0, 0, 0, 0)
 			}
-			labelProps.Text = v.title or v.name
+			labelProps.Text = gameSetting.title or gameSetting.name
 			labelProps.Font = Enum.Font.LuckiestGuy
 			labelProps.LineHeight = 0.7
 			labelProps.TextXAlignment = Enum.TextXAlignment.Left
@@ -119,7 +117,7 @@ function GameSettingsComponent.render(self)
 			frameChildren.Title = createElement("TextLabel", labelProps)
 			element = createElement("Frame", frameProps, frameChildren)
 		end
-		elementsByName[v.name] = element
+		elementsByName[gameSetting.name] = element
 	end
 	return createElement("ScrollingFrame", {
 		BackgroundTransparency = 1,

@@ -1,22 +1,21 @@
--- Reviewed by Claude
-local t = {}
+local ValidationModule = {}
 local Logger = require(script.Parent.Logger)
 local Utilities = require(script.Parent.Utilities)
-function t.validateCustomDimensions(p1, p2)
-	return t:validateArrayOfStrings(20, 32, false, "custom dimensions", p2)
+function ValidationModule.validateCustomDimensions(self, customDimensions)
+	return ValidationModule:validateArrayOfStrings(20, 32, false, "custom dimensions", customDimensions)
 end
-function t.validateDimension(p1, p2, p3)
-	if Utilities:isStringNullOrEmpty(p3) then
+function ValidationModule.validateDimension(self, dimensionList, dimensionValue)
+	if Utilities:isStringNullOrEmpty(dimensionValue) then
 		return true
 	else
-		return Utilities:stringArrayContainsString(p2, p3) and true or false
+		return Utilities:stringArrayContainsString(dimensionList, dimensionValue) and true or false
 	end
 end
-function t.validateResourceCurrencies(p1, p2)
-	if t:validateArrayOfStrings(20, 64, false, "resource currencies", p2) then
-		for k, v in pairs(p2) do
-			if not string.find(v, "^[A-Za-z]+$") then
-				Logger:w("resource currencies validation failed: a resource currency can only be A-Z, a-z. String was: " .. v)
+function ValidationModule.validateResourceCurrencies(self, resourceCurrencies)
+	if ValidationModule:validateArrayOfStrings(20, 64, false, "resource currencies", resourceCurrencies) then
+		for k, currencyString in pairs(resourceCurrencies) do
+			if not string.find(currencyString, "^[A-Za-z]+$") then
+				Logger:w("resource currencies validation failed: a resource currency can only be A-Z, a-z. String was: " .. currencyString)
 				return false
 			end
 		end
@@ -25,11 +24,11 @@ function t.validateResourceCurrencies(p1, p2)
 		return false
 	end
 end
-function t.validateResourceItemTypes(p1, p2)
-	if t:validateArrayOfStrings(20, 32, false, "resource item types", p2) then
-		for k, v in pairs(p2) do
-			if not t:validateEventPartCharacters(v) then
-				Logger:w("resource item types validation failed: a resource item type cannot contain other characters than A-z, 0-9, -_., ()!?. String was: " .. v)
+function ValidationModule.validateResourceItemTypes(self, resourceItemTypes)
+	if ValidationModule:validateArrayOfStrings(20, 32, false, "resource item types", resourceItemTypes) then
+		for k, itemTypeString in pairs(resourceItemTypes) do
+			if not ValidationModule:validateEventPartCharacters(itemTypeString) then
+				Logger:w("resource item types validation failed: a resource item type cannot contain other characters than A-z, 0-9, -_., ()!?. String was: " .. itemTypeString)
 				return false
 			end
 		end
@@ -38,227 +37,227 @@ function t.validateResourceItemTypes(p1, p2)
 		return false
 	end
 end
-function t.validateEventPartCharacters(p1, p2)
-	return string.find(p2, "^[A-Za-z0-9%s%-_%.%(%)!%?]+$") and true or false
+function ValidationModule.validateEventPartCharacters(self, eventPart)
+	return string.find(eventPart, "^[A-Za-z0-9%s%-_%.%(%)!%?]+$") and true or false
 end
-function t.validateArrayOfStrings(p1, p2, p3, p4, p5, p6)
-	local v1 = p5 or "Array"
-	if p6 then
-		if p4 or #p6 ~= 0 then
-			if p2 > 0 and p2 < #p6 then
-				Logger:w(v1 .. " validation failed: array cannot exceed " .. tostring(p2) .. " values. It has " .. #p6 .. " values.")
+function ValidationModule.validateArrayOfStrings(self, minLength, maxLength, allowNull, arrayName, arrayToValidate)
+	local displayName = arrayToValidate or "Array"
+	if arrayToValidate then
+		if allowNull or #arrayToValidate ~= 0 then
+			if maxLength > 0 and maxLength < #arrayToValidate then
+				Logger:w(displayName .. " validation failed: array cannot exceed " .. tostring(maxLength) .. " values. It has " .. #arrayToValidate .. " values.")
 				return false
 			else
-				for i, v in ipairs(p6) do
-					local v2
-					v2 = if v then #v else 0
-					if v2 == 0 then
-						Logger:w(v1 .. " validation failed: contained an empty string.")
+				for i, stringValue in ipairs(arrayToValidate) do
+					local stringLength
+					stringLength = if stringValue then #stringValue else 0
+					if stringLength == 0 then
+						Logger:w(displayName .. " validation failed: contained an empty string.")
 						return false
 					end
-					if p3 > 0 and p3 < v2 then
-						Logger:w(v1 .. " validation failed: a string exceeded max allowed length (which is: " .. tostring(p3) .. "). String was: " .. v)
+					if minLength > 0 and minLength < stringLength then
+						Logger:w(displayName .. " validation failed: a string exceeded max allowed length (which is: " .. tostring(minLength) .. "). String was: " .. stringValue)
 						return false
 					end
 				end
 				return true
 			end
 		else
-			Logger:w(v1 .. " validation failed: array cannot be empty.")
+			Logger:w(displayName .. " validation failed: array cannot be empty.")
 			return false
 		end
 	else
-		Logger:w(v1 .. " validation failed: array cannot be nil.")
+		Logger:w(displayName .. " validation failed: array cannot be nil.")
 		return false
 	end
 end
-function t.validateBuild(p1, p2)
-	return t:validateShortString(p2, false) and true or false
+function ValidationModule.validateBuild(self, buildValue)
+	return ValidationModule:validateShortString(buildValue, false) and true or false
 end
-function t.validateShortString(p1, p2, p3)
-	if p3 and Utilities:isStringNullOrEmpty(p2) then
+function ValidationModule.validateShortString(self, stringValue, allowNullValue)
+	if allowNullValue and Utilities:isStringNullOrEmpty(stringValue) then
 		return true
 	else
-		return not (Utilities:isStringNullOrEmpty(p2) or #p2 > 32)
+		return not (Utilities:isStringNullOrEmpty(stringValue) or #stringValue > 32)
 	end
 end
-function t.validateKeys(p1, p2, p3)
-	return string.find(p2, "^[A-Za-z0-9]+$") and (#p2 == 32 and (string.find(p3, "^[A-Za-z0-9]+$") and #p3 == 40)) and true or false
+function ValidationModule.validateKeys(self, publicKey, privateKey)
+	return string.find(publicKey, "^[A-Za-z0-9]+$") and (#publicKey == 32 and (string.find(privateKey, "^[A-Za-z0-9]+$") and #privateKey == 40)) and true or false
 end
-function t.validateAndCleanInitRequestResponse(p1, p2, p3)
-	if p2 then
-		local t = {}
-		local v1 = p2.server_ts or -1
-		if v1 > 0 then
-			t.server_ts = v1
+function ValidationModule.validateAndCleanInitRequestResponse(self, responseData, includeConfigs)
+	if responseData then
+		local cleanedResponse = {}
+		local serverTimestamp = responseData.server_ts or -1
+		if serverTimestamp > 0 then
+			cleanedResponse.server_ts = serverTimestamp
 		end
-		if p3 then
-			t.configs = p2.configs or {}
-			t.ab_id = p2.ab_id or ""
-			t.ab_variant_id = p2.ab_variant_id or ""
+		if includeConfigs then
+			cleanedResponse.configs = responseData.configs or {}
+			cleanedResponse.ab_id = responseData.ab_id or ""
+			cleanedResponse.ab_variant_id = responseData.ab_variant_id or ""
 		end
-		return t
+		return cleanedResponse
 	else
 		Logger:w("validateInitRequestResponse failed - no response dictionary.")
 		return nil
 	end
 end
-function t.validateClientTs(p1, p2)
-	return not (p2 < 1000000000 or p2 > 9999999999)
+function ValidationModule.validateClientTs(self, timestamp)
+	return not (timestamp < 1000000000 or timestamp > 9999999999)
 end
-function t.validateCurrency(p1, p2)
-	if Utilities:isStringNullOrEmpty(p2) then
+function ValidationModule.validateCurrency(self, currencyCode)
+	if Utilities:isStringNullOrEmpty(currencyCode) then
 		return false
 	else
-		return string.find(p2, "^[A-Z]+$") and #p2 == 3 and true or false
+		return string.find(currencyCode, "^[A-Z]+$") and #currencyCode == 3 and true or false
 	end
 end
-function t.validateEventPartLength(p1, p2, p3)
-	if p3 and Utilities:isStringNullOrEmpty(p2) then
+function ValidationModule.validateEventPartLength(self, eventPart, allowNullValue)
+	if allowNullValue and Utilities:isStringNullOrEmpty(eventPart) then
 		return true
-	elseif Utilities:isStringNullOrEmpty(p2) then
+	elseif Utilities:isStringNullOrEmpty(eventPart) then
 		return false
 	else
-		return #p2 ~= 0 and not (#p2 > 64) and true or false
+		return #eventPart ~= 0 and not (#eventPart > 64) and true or false
 	end
 end
-function t.validateBusinessEvent(p1, p2, p3, p4, p5, p6)
-	if t:validateCurrency(p2) then
-		if p3 < 0 then
-			Logger:w("Validation fail - business event - amount: Cannot be less then 0. Failed amount: " .. p3)
+function ValidationModule.validateBusinessEvent(self, currencyCode, amount, cartType, itemType, itemId)
+	if ValidationModule:validateCurrency(currencyCode) then
+		if amount < 0 then
+			Logger:w("Validation fail - business event - amount: Cannot be less then 0. Failed amount: " .. amount)
 			return false
-		elseif t:validateShortString(p4, true) then
-			if t:validateEventPartLength(p5, false) then
-				if t:validateEventPartCharacters(p5) then
-					if t:validateEventPartLength(p6, false) then
-						if t:validateEventPartCharacters(p6) then
+		elseif ValidationModule:validateShortString(cartType, true) then
+			if ValidationModule:validateEventPartLength(itemType, false) then
+				if ValidationModule:validateEventPartCharacters(itemType) then
+					if ValidationModule:validateEventPartLength(itemId, false) then
+						if ValidationModule:validateEventPartCharacters(itemId) then
 							return true
 						else
-							Logger:w("Validation fail - business event - itemId: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. p6)
+							Logger:w("Validation fail - business event - itemId: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. itemId)
 							return false
 						end
 					else
-						Logger:w("Validation fail - business event - itemId. Cannot be (null), empty or above 64 characters. String: " .. p6)
+						Logger:w("Validation fail - business event - itemId. Cannot be (null), empty or above 64 characters. String: " .. itemId)
 						return false
 					end
 				else
-					Logger:w("Validation fail - business event - itemType: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. p5)
+					Logger:w("Validation fail - business event - itemType: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. itemType)
 					return false
 				end
 			else
-				Logger:w("Validation fail - business event - itemType: Cannot be (null), empty or above 64 characters. String: " .. p5)
+				Logger:w("Validation fail - business event - itemType: Cannot be (null), empty or above 64 characters. String: " .. itemType)
 				return false
 			end
 		else
-			Logger:w("Validation fail - business event - cartType. Cannot be above 32 length. String: " .. p4)
+			Logger:w("Validation fail - business event - cartType. Cannot be above 32 length. String: " .. cartType)
 			return false
 		end
 	else
-		Logger:w("Validation fail - business event - currency: Cannot be (null) and need to be A-Z, 3 characters and in the standard at openexchangerates.org. Failed currency: " .. p2)
+		Logger:w("Validation fail - business event - currency: Cannot be (null) and need to be A-Z, 3 characters and in the standard at openexchangerates.org. Failed currency: " .. currencyCode)
 		return false
 	end
 end
-function t.validateResourceEvent(p1, p2, p3, p4, p5, p6, p7, p8, p9)
-	if p3 == p2.Source or p3 == p2.Sink then
-		if Utilities:isStringNullOrEmpty(p4) then
+function ValidationModule.validateResourceEvent(self, flowType, resourceReference, currency, amount, itemType, itemId, availableCurrencies, availableItemTypes)
+	if flowType == resourceReference.Source or flowType == resourceReference.Sink then
+		if Utilities:isStringNullOrEmpty(currency) then
 			Logger:w("Validation fail - resource event - currency: Cannot be (null)")
 			return false
-		elseif Utilities:stringArrayContainsString(p8, p4) then
-			if p5 > 0 then
-				if Utilities:isStringNullOrEmpty(p6) then
+		elseif Utilities:stringArrayContainsString(availableCurrencies, currency) then
+			if amount > 0 then
+				if Utilities:isStringNullOrEmpty(itemType) then
 					Logger:w("Validation fail - resource event - itemType: Cannot be (null)")
 					return false
-				elseif t:validateEventPartLength(p6, false) then
-					if t:validateEventPartCharacters(p6) then
-						if Utilities:stringArrayContainsString(p9, p6) then
-							if t:validateEventPartLength(p7, false) then
-								if t:validateEventPartCharacters(p7) then
+				elseif ValidationModule:validateEventPartLength(itemType, false) then
+					if ValidationModule:validateEventPartCharacters(itemType) then
+						if Utilities:stringArrayContainsString(availableItemTypes, itemType) then
+							if ValidationModule:validateEventPartLength(itemId, false) then
+								if ValidationModule:validateEventPartCharacters(itemId) then
 									return true
 								else
-									Logger:w("Validation fail - resource event - itemId: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. p7)
+									Logger:w("Validation fail - resource event - itemId: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. itemId)
 									return false
 								end
 							else
-								Logger:w("Validation fail - resource event - itemId: Cannot be (null), empty or above 64 characters. String: " .. p7)
+								Logger:w("Validation fail - resource event - itemId: Cannot be (null), empty or above 64 characters. String: " .. itemId)
 								return false
 							end
 						else
-							Logger:w("Validation fail - resource event - itemType: Not found in list of pre-defined available resource itemTypes. String: " .. p6)
+							Logger:w("Validation fail - resource event - itemType: Not found in list of pre-defined available resource itemTypes. String: " .. itemType)
 							return false
 						end
 					else
-						Logger:w("Validation fail - resource event - itemType: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. p6)
+						Logger:w("Validation fail - resource event - itemType: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. itemType)
 						return false
 					end
 				else
-					Logger:w("Validation fail - resource event - itemType: Cannot be (null), empty or above 64 characters. String: " .. p6)
+					Logger:w("Validation fail - resource event - itemType: Cannot be (null), empty or above 64 characters. String: " .. itemType)
 					return false
 				end
 			else
-				Logger:w("Validation fail - resource event - amount: Float amount cannot be 0 or negative. Value: " .. tostring(p5))
+				Logger:w("Validation fail - resource event - amount: Float amount cannot be 0 or negative. Value: " .. tostring(amount))
 				return false
 			end
 		else
-			Logger:w("Validation fail - resource event - currency: Not found in list of pre-defined available resource currencies. String: " .. p4)
+			Logger:w("Validation fail - resource event - currency: Not found in list of pre-defined available resource currencies. String: " .. currency)
 			return false
 		end
 	else
-		Logger:w("Validation fail - resource event - flowType: Invalid flow type " .. tostring(p3))
+		Logger:w("Validation fail - resource event - flowType: Invalid flow type " .. tostring(flowType))
 		return false
 	end
 end
-function t.validateProgressionEvent(p1, p2, p3, p4, p5, p6)
-	if p3 == p2.Start or (p3 == p2.Complete or p3 == p2.Fail) then
-		if Utilities:isStringNullOrEmpty(p6) or (not Utilities:isStringNullOrEmpty(p5) or Utilities:isStringNullOrEmpty(p4)) then
-			if Utilities:isStringNullOrEmpty(p5) or not Utilities:isStringNullOrEmpty(p4) then
-				if Utilities:isStringNullOrEmpty(p4) then
+function ValidationModule.validateProgressionEvent(self, progressionStatusEnum, progressionStatus, progression01, progression02, progression03)
+	if progressionStatus == progressionStatusEnum.Start or (progressionStatus == progressionStatusEnum.Complete or progressionStatus == progressionStatusEnum.Fail) then
+		if Utilities:isStringNullOrEmpty(progression03) or (not Utilities:isStringNullOrEmpty(progression02) or Utilities:isStringNullOrEmpty(progression01)) then
+			if Utilities:isStringNullOrEmpty(progression02) or not Utilities:isStringNullOrEmpty(progression01) then
+				if Utilities:isStringNullOrEmpty(progression01) then
 					Logger:w("Validation fail - progression event: progression01 not valid. Progressions must be set as either 01, 01+02 or 01+02+03")
 					return false
-				elseif t:validateEventPartLength(p4, false) then
-					if t:validateEventPartCharacters(p4) then
-						if Utilities:isStringNullOrEmpty(p5) then
-							if Utilities:isStringNullOrEmpty(p6) then
+				elseif ValidationModule:validateEventPartLength(progression01, false) then
+					if ValidationModule:validateEventPartCharacters(progression01) then
+						if Utilities:isStringNullOrEmpty(progression02) then
+							if Utilities:isStringNullOrEmpty(progression03) then
 								return true
-							elseif t:validateEventPartLength(p6, false) then
-								if t:validateEventPartCharacters(p6) then
+							elseif ValidationModule:validateEventPartLength(progression03, false) then
+								if ValidationModule:validateEventPartCharacters(progression03) then
 									return true
 								else
-									Logger:w("Validation fail - progression event - progression03: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. p6)
+									Logger:w("Validation fail - progression event - progression03: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. progression03)
 									return false
 								end
 							else
-								Logger:w("Validation fail - progression event - progression03: Cannot be empty or above 64 characters. String: " .. p6)
+								Logger:w("Validation fail - progression event - progression03: Cannot be empty or above 64 characters. String: " .. progression03)
 								return false
 							end
-						elseif t:validateEventPartLength(p5, false) then
-							if t:validateEventPartCharacters(p5) then
-								if Utilities:isStringNullOrEmpty(p6) then
+						elseif ValidationModule:validateEventPartLength(progression02, false) then
+							if ValidationModule:validateEventPartCharacters(progression02) then
+								if Utilities:isStringNullOrEmpty(progression03) then
 									return true
-								elseif t:validateEventPartLength(p6, false) then
-									if t:validateEventPartCharacters(p6) then
+								elseif ValidationModule:validateEventPartLength(progression03, false) then
+									if ValidationModule:validateEventPartCharacters(progression03) then
 										return true
 									else
-										Logger:w("Validation fail - progression event - progression03: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. p6)
+										Logger:w("Validation fail - progression event - progression03: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. progression03)
 										return false
 									end
 								else
-									Logger:w("Validation fail - progression event - progression03: Cannot be empty or above 64 characters. String: " .. p6)
+									Logger:w("Validation fail - progression event - progression03: Cannot be empty or above 64 characters. String: " .. progression03)
 									return false
 								end
 							else
-								Logger:w("Validation fail - progression event - progression02: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. p5)
+								Logger:w("Validation fail - progression event - progression02: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. progression02)
 								return false
 							end
 						else
-							Logger:w("Validation fail - progression event - progression02: Cannot be empty or above 64 characters. String: " .. p5)
+							Logger:w("Validation fail - progression event - progression02: Cannot be empty or above 64 characters. String: " .. progression02)
 							return false
 						end
 					else
-						Logger:w("Validation fail - progression event - progression01: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. p4)
+						Logger:w("Validation fail - progression event - progression01: Cannot contain other characters than A-z, 0-9, -_., ()!?. String: " .. progression01)
 						return false
 					end
 				else
-					Logger:w("Validation fail - progression event - progression01: Cannot be (null), empty or above 64 characters. String: " .. p4)
+					Logger:w("Validation fail - progression event - progression01: Cannot be (null), empty or above 64 characters. String: " .. progression01)
 					return false
 				end
 			else
@@ -270,62 +269,62 @@ function t.validateProgressionEvent(p1, p2, p3, p4, p5, p6)
 			return false
 		end
 	else
-		Logger:w("Validation fail - progression event: Invalid progression status " .. tostring(p3))
+		Logger:w("Validation fail - progression event: Invalid progression status " .. tostring(progressionStatus))
 		return false
 	end
 end
-function t.validateEventIdLength(p1, p2)
-	if not Utilities:isStringNullOrEmpty(p2) then
-		local count = 0
-		for v1 in string.gmatch(p2, "([^:]+)") do
-			count = count + 1
+function ValidationModule.validateEventIdLength(self, eventId)
+	if not Utilities:isStringNullOrEmpty(eventId) then
+		local partCount = 0
+		for eventPart in string.gmatch(eventId, "([^:]+)") do
+			partCount = partCount + 1
 		end
 		return true
 	end
 	return false
 end
-function t.validateEventIdCharacters(p1, p2)
-	if not Utilities:isStringNullOrEmpty(p2) then
-		local count = 0
-		for v1 in string.gmatch(p2, "([^:]+)") do
-			count = count + 1
-			local _ = count > 5 or not string.find(v1, "^[A-Za-z0-9%s%-_%.%(%)!%?]+$")
+function ValidationModule.validateEventIdCharacters(self, eventId)
+	if not Utilities:isStringNullOrEmpty(eventId) then
+		local partCount = 0
+		for eventPart in string.gmatch(eventId, "([^:]+)") do
+			partCount = partCount + 1
+			local _ = partCount > 5 or not string.find(eventPart, "^[A-Za-z0-9%s%-_%.%(%)!%?]+$")
 		end
 		return true
 	end
 	return false
 end
-function t.validateDesignEvent(p1, p2)
-	if t:validateEventIdLength(p2) then
-		if t:validateEventIdCharacters(p2) then
+function ValidationModule.validateDesignEvent(self, eventId)
+	if ValidationModule:validateEventIdLength(eventId) then
+		if ValidationModule:validateEventIdCharacters(eventId) then
 			return true
 		else
-			Logger:w("Validation fail - design event - eventId: Non valid characters. Only allowed A-z, 0-9, -_., ()!?. String: " .. p2)
+			Logger:w("Validation fail - design event - eventId: Non valid characters. Only allowed A-z, 0-9, -_., ()!?. String: " .. eventId)
 			return false
 		end
 	else
-		Logger:w("Validation fail - design event - eventId: Cannot be (null) or empty. Only 5 event parts allowed seperated by :. Each part need to be 32 characters or less. String: " .. p2)
+		Logger:w("Validation fail - design event - eventId: Cannot be (null) or empty. Only 5 event parts allowed seperated by :. Each part need to be 32 characters or less. String: " .. eventId)
 		return false
 	end
 end
-function t.validateLongString(p1, p2, p3)
-	if p3 and Utilities:isStringNullOrEmpty(p2) then
+function ValidationModule.validateLongString(self, stringValue, allowNullValue)
+	if allowNullValue and Utilities:isStringNullOrEmpty(stringValue) then
 		return true
 	else
-		return not (Utilities:isStringNullOrEmpty(p2) or #p2 > 8192)
+		return not (Utilities:isStringNullOrEmpty(stringValue) or #stringValue > 8192)
 	end
 end
-function t.validateErrorEvent(p1, p2, p3, p4)
-	if p3 == p2.debug or (p3 == p2.info or (p3 == p2.warning or (p3 == p2.error or p3 == p2.critical))) then
-		if t:validateLongString(p4, true) then
+function ValidationModule.validateErrorEvent(self, severityEnum, severity, message)
+	if severity == severityEnum.debug or (severity == severityEnum.info or (severity == severityEnum.warning or (severity == severityEnum.error or severity == severityEnum.critical))) then
+		if ValidationModule:validateLongString(message, true) then
 			return true
 		else
 			Logger:w("Validation fail - error event - message: Message cannot be above 8192 characters.")
 			return false
 		end
 	else
-		Logger:w("Validation fail - error event - severity: Severity was unsupported value " .. tostring(p3))
+		Logger:w("Validation fail - error event - severity: Severity was unsupported value " .. tostring(severity))
 		return false
 	end
 end
-return t
+return ValidationModule

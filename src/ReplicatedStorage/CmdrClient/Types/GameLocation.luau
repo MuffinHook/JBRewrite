@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GameLocations = require(ReplicatedStorage.App.GameLocations)
 local Util = require(ReplicatedStorage.CmdrClient.Shared.Util)

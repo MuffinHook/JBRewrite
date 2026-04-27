@@ -1,197 +1,195 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 local Maid = require(script.Parent.Maid)
 local Signal = require(script.Parent.Signal)
 local promiseBoundClass = require(script.promiseBoundClass)
-local t = {}
-t.__index = t
-t.ClassName = "Binder"
-function t.new(p1, p2, ...)
-	local v2 = setmetatable({}, t)
-	v2._maid = Maid.new()
-	v2._tagName = p1 or error("Bad argument \'tagName\', expected string")
-	v2._constructor = p2 or error("Bad argument \'constructor\', expected table or function")
-	v2._instToClass = {}
-	v2._allClassSet = {}
-	v2._pendingInstSet = {}
-	v2._listeners = {}
-	v2._args = { ... }
+local Binder = {}
+Binder.__index = Binder
+Binder.ClassName = "Binder"
+function Binder.new(tagName, constructor, ...)
+	local boundInstance = setmetatable({}, Binder)
+	boundInstance._maid = Maid.new()
+	boundInstance._tagName = tagName or error("Bad argument \'tagName\', expected string")
+	boundInstance._constructor = constructor or error("Bad argument \'constructor\', expected table or function")
+	boundInstance._instToClass = {}
+	boundInstance._allClassSet = {}
+	boundInstance._pendingInstSet = {}
+	boundInstance._listeners = {}
+	boundInstance._args = { ... }
 	delay(5, function()
-		if not v2._loaded then
-			warn(("Binder %q is not loaded. Call :Start() on it!"):format(v2._tagName))
+		if not boundInstance._loaded then
+			warn(("Binder %q is not loaded. Call :Start() on it!"):format(boundInstance._tagName))
 		end
 	end)
-	return v2
+	return boundInstance
 end
-function t.isBinder(p1)
-	return if type(p1) == "table" then p1.ClassName == "Binder" else false
+function Binder.isBinder(self)
+	return if type(self) == "table" then self.ClassName == "Binder" else false
 end
-local function setModelStreamingMode(p1)
-	if not RunService:IsClient() and (p1:IsA("Model") and p1.ModelStreamingMode == Enum.ModelStreamingMode.Default) then
-		p1.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
+local function setModelStreamingMode(instance)
+	if not RunService:IsClient() and (instance:IsA("Model") and instance.ModelStreamingMode == Enum.ModelStreamingMode.Default) then
+		instance.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 	end
 end
-function t.Start(p1)
-	if not p1._loaded then
-		p1._loaded = true
-		for k, v in pairs(CollectionService:GetTagged(p1._tagName)) do
-			if not RunService:IsClient() and (v:IsA("Model") and v.ModelStreamingMode == Enum.ModelStreamingMode.Default) then
-				v.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
+function Binder.Start(self)
+	if not self._loaded then
+		self._loaded = true
+		for k, taggedInstance in pairs(CollectionService:GetTagged(self._tagName)) do
+			if not RunService:IsClient() and (taggedInstance:IsA("Model") and taggedInstance.ModelStreamingMode == Enum.ModelStreamingMode.Default) then
+				taggedInstance.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 			end
-			task.spawn(p1._add, p1, v)
+			task.spawn(self._add, self, taggedInstance)
 		end
-		p1._maid:GiveTask(CollectionService:GetInstanceAddedSignal(p1._tagName):Connect(function(p12)
-			if not RunService:IsClient() and (p12:IsA("Model") and p12.ModelStreamingMode == Enum.ModelStreamingMode.Default) then
-				p12.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
+		self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(self._tagName):Connect(function(addedInstance)
+			if not RunService:IsClient() and (addedInstance:IsA("Model") and addedInstance.ModelStreamingMode == Enum.ModelStreamingMode.Default) then
+				addedInstance.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 			end
-			p1:_add(p12)
+			self:_add(addedInstance)
 		end))
-		p1._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(p1._tagName):Connect(function(p12)
-			p1:_remove(p12)
+		self._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(self._tagName):Connect(function(removedInstance)
+			self:_remove(removedInstance)
 		end))
 	end
 end
-function t.GetTag(p1)
-	return p1._tagName
+function Binder.GetTag(self)
+	return self._tagName
 end
-function t.GetConstructor(p1)
-	return p1._constructor
+function Binder.GetConstructor(self)
+	return self._constructor
 end
-function t.ObserveInstance(p1, p2, p3)
-	p1._listeners[p2] = p1._listeners[p2] or {}
-	p1._listeners[p2][p3] = true
+function Binder.ObserveInstance(self, instance, listener)
+	self._listeners[instance] = self._listeners[instance] or {}
+	self._listeners[instance][listener] = true
 	return function()
-		if p1._listeners[p2] then
-			p1._listeners[p2][p3] = nil
-			if not next(p1._listeners[p2]) then
-				p1._listeners[p2] = nil
+		if self._listeners[instance] then
+			self._listeners[instance][listener] = nil
+			if not next(self._listeners[instance]) then
+				self._listeners[instance] = nil
 			end
 		end
 	end
 end
-function t.GetClassAddedSignal(p1)
-	if not p1._classAddedSignal then
-		p1._classAddedSignal = Signal.new()
-		p1._maid:GiveTask(p1._classAddedSignal)
+function Binder.GetClassAddedSignal(self)
+	if not self._classAddedSignal then
+		self._classAddedSignal = Signal.new()
+		self._maid:GiveTask(self._classAddedSignal)
 	end
-	return p1._classAddedSignal
+	return self._classAddedSignal
 end
-function t.GetClassRemovingSignal(p1)
-	if not p1._classRemovingSignal then
-		p1._classRemovingSignal = Signal.new()
-		p1._maid:GiveTask(p1._classRemovingSignal)
+function Binder.GetClassRemovingSignal(self)
+	if not self._classRemovingSignal then
+		self._classRemovingSignal = Signal.new()
+		self._maid:GiveTask(self._classRemovingSignal)
 	end
-	return p1._classRemovingSignal
+	return self._classRemovingSignal
 end
-function t.GetAll(p1)
-	local t = {}
-	for k, v in pairs(p1._allClassSet) do
-		t[#t + 1] = k
+function Binder.GetAll(self)
+	local resultTable = {}
+	for boundClass, k in pairs(self._allClassSet) do
+		resultTable[#resultTable + 1] = boundClass
 	end
-	return t
+	return resultTable
 end
-function t.GetAllSet(p1)
-	return p1._allClassSet
+function Binder.GetAllSet(self)
+	return self._allClassSet
 end
-function t.Bind(p1, p2)
+function Binder.Bind(self, instance)
 	if RunService:IsClient() then
-		warn(("[Binder.Bind] - Bindings \'%s\' done on the client! Will be disrupted upon server replication! %s"):format(p1._tagName, debug.traceback()))
+		warn(("[Binder.Bind] - Bindings \'%s\' done on the client! Will be disrupted upon server replication! %s"):format(self._tagName, debug.traceback()))
 	end
-	CollectionService:AddTag(p2, p1._tagName)
-	return p1:Get(p2)
+	CollectionService:AddTag(instance, self._tagName)
+	return self:Get(instance)
 end
-function t.Unbind(p1, p2)
-	assert(typeof(p2) == "Instance", "Bad inst\'")
+function Binder.Unbind(self, instance)
+	assert(typeof(instance) == "Instance", "Bad inst\'")
 	if RunService:IsClient() then
-		warn(("[Binder.Bind] - Unbinding \'%s\' done on the client! Might be disrupted upon server replication! %s"):format(p1._tagName, debug.traceback()))
+		warn(("[Binder.Bind] - Unbinding \'%s\' done on the client! Might be disrupted upon server replication! %s"):format(self._tagName, debug.traceback()))
 	end
-	CollectionService:RemoveTag(p2, p1._tagName)
+	CollectionService:RemoveTag(instance, self._tagName)
 end
-function t.BindClient(p1, p2)
+function Binder.BindClient(self, instance)
 	if not RunService:IsClient() then
-		warn(("[Binder.BindClient] - Bindings \'%s\' done on the server! Will be replicated!"):format(p1._tagName))
+		warn(("[Binder.BindClient] - Bindings \'%s\' done on the server! Will be replicated!"):format(self._tagName))
 	end
-	CollectionService:AddTag(p2, p1._tagName)
-	return p1:Get(p2)
+	CollectionService:AddTag(instance, self._tagName)
+	return self:Get(instance)
 end
-function t.UnbindClient(p1, p2)
-	assert(typeof(p2) == "Instance", "Bad inst")
-	CollectionService:RemoveTag(p2, p1._tagName)
+function Binder.UnbindClient(self, instance)
+	assert(typeof(instance) == "Instance", "Bad inst")
+	CollectionService:RemoveTag(instance, self._tagName)
 end
-function t.Get(p1, p2)
-	assert(typeof(p2) == "Instance", "Argument \'inst\' is not an Instance")
-	return p1._instToClass[p2]
+function Binder.Get(self, instance)
+	assert(typeof(instance) == "Instance", "Argument \'inst\' is not an Instance")
+	return self._instToClass[instance]
 end
-function t.Promise(p1, p2)
-	assert(typeof(p2) == "Instance", "Argument \'inst\' is not an Instance")
-	return promiseBoundClass(p1, p2)
+function Binder.Promise(self, instance)
+	assert(typeof(instance) == "Instance", "Argument \'inst\' is not an Instance")
+	return promiseBoundClass(self, instance)
 end
-function t._add(p1, p2)
-	assert(typeof(p2) == "Instance", "Argument \'inst\' is not an Instance")
-	if not p1._instToClass[p2] then
-		if p1._pendingInstSet[p2] == true then
+function Binder._add(self, instance)
+	assert(typeof(instance) == "Instance", "Argument \'inst\' is not an Instance")
+	if not self._instToClass[instance] then
+		if self._pendingInstSet[instance] == true then
 			warn("[Binder._add] - Reentered add. Still loading, probably caused by error in constructor.")
 			return
 		end
-		p1._pendingInstSet[p2] = true
-		local v2 = if type(p1._constructor) == "function" then p1._constructor(p2, unpack(p1._args)) elseif p1._constructor.Create then p1._constructor:Create(p2, unpack(p1._args)) else p1._constructor.new(p2, unpack(p1._args))
-		if p1._pendingInstSet[p2] == true then
-			p1._pendingInstSet[p2] = nil
-			if type(v2) == "table" and type(v2.Destroy) == "function" then
-				assert(p1._instToClass[p2] == nil, "Overwrote")
-				p1._allClassSet[v2] = true
-				p1._instToClass[p2] = v2
-				local v8 = p1._listeners[p2]
-				if v8 then
-					for k, v in pairs(v8) do
-						task.spawn(k, v2)
+		self._pendingInstSet[instance] = true
+		local boundClass = if type(self._constructor) == "function" then self._constructor(instance, unpack(self._args)) elseif self._constructor.Create then self._constructor:Create(instance, unpack(self._args)) else self._constructor.new(instance, unpack(self._args))
+		if self._pendingInstSet[instance] == true then
+			self._pendingInstSet[instance] = nil
+			if type(boundClass) == "table" and type(boundClass.Destroy) == "function" then
+				assert(self._instToClass[instance] == nil, "Overwrote")
+				self._allClassSet[boundClass] = true
+				self._instToClass[instance] = boundClass
+				local instanceListeners = self._listeners[instance]
+				if instanceListeners then
+					for listenerCallback, v in pairs(instanceListeners) do
+						task.spawn(listenerCallback, boundClass)
 					end
 				end
-				if p1._classAddedSignal then
-					p1._classAddedSignal:Fire(v2, p2)
+				if self._classAddedSignal then
+					self._classAddedSignal:Fire(boundClass, instance)
 				end
 			else
-				warn(("[Binder._add] - Bad class constructed for tag %q"):format(p1._tagName))
+				warn(("[Binder._add] - Bad class constructed for tag %q"):format(self._tagName))
 			end
 		else
-			warn(("[Binder._add] - Failed to load instance %q of %q, removed while loading!"):format(p2:GetFullName(), (tostring(type(p1._constructor) == "table" and p1._constructor.ClassName or p1._constructor))))
+			warn(("[Binder._add] - Failed to load instance %q of %q, removed while loading!"):format(instance:GetFullName(), (tostring(type(self._constructor) == "table" and self._constructor.ClassName or self._constructor))))
 		end
 	end
 end
-function t._remove(p1, p2)
-	p1._pendingInstSet[p2] = nil
-	local v1 = p1._instToClass[p2]
-	if v1 == nil then
+function Binder._remove(self, instance)
+	self._pendingInstSet[instance] = nil
+	local boundClass = self._instToClass[instance]
+	if boundClass == nil then
 		return
 	end
-	if p1._classRemovingSignal then
-		p1._classRemovingSignal:Fire(v1, p2)
+	if self._classRemovingSignal then
+		self._classRemovingSignal:Fire(boundClass, instance)
 	end
-	p1._instToClass[p2] = nil
-	p1._allClassSet[v1] = nil
-	local v2 = p1._listeners[p2]
-	if v2 then
-		for k, v in pairs(v2) do
-			task.spawn(k, nil)
+	self._instToClass[instance] = nil
+	self._allClassSet[boundClass] = nil
+	local instanceListeners = self._listeners[instance]
+	if instanceListeners then
+		for listenerCallback, v in pairs(instanceListeners) do
+			task.spawn(listenerCallback, nil)
 		end
 	end
-	if v1.Destroy then
-		v1:Destroy()
+	if boundClass.Destroy then
+		boundClass:Destroy()
 	else
-		local v3 = warn
-		v3(("[Binder._remove] - Class %q no longer has destroy, something destroyed it!"):format((tostring(p1._tagName))))
+		local warnFunction = warn
+		warnFunction(("[Binder._remove] - Class %q no longer has destroy, something destroyed it!"):format((tostring(self._tagName))))
 	end
 end
-function t.Destroy(p1)
-	local v1, v2 = next(p1._instToClass)
-	while v2 ~= nil do
-		p1:_remove(v1)
-		assert(p1._instToClass[v1] == nil, "Failed to remove")
-		local v4, v5 = next(p1._instToClass)
-		v2, v1 = v5, v4
+function Binder.Destroy(self)
+	local instKey, nextClass = next(self._instToClass)
+	while nextClass ~= nil do
+		self:_remove(instKey)
+		assert(self._instToClass[instKey] == nil, "Failed to remove")
+		local nextKey, nextValue = next(self._instToClass)
+		nextClass, instKey = nextValue, nextKey
 	end
-	p1._maid:DoCleaning()
+	self._maid:DoCleaning()
 end
-return t
+return Binder

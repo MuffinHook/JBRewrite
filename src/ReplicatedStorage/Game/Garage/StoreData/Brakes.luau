@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
 	Items = {
@@ -18,18 +17,18 @@ return {
 			Amount = 5
 		}
 	},
-	GetInstance = function(p1)
-		local v1 = ReplicatedStorage.Resource.Brakes:FindFirstChild(p1.Name)
-		if not v1 then
-			error("No Brakes named: " .. p1.Name)
+	GetInstance = function(brakeItem)
+		local brakeTemplate = ReplicatedStorage.Resource.Brakes:FindFirstChild(brakeItem.Name)
+		if not brakeTemplate then
+			error("No Brakes named: " .. brakeItem.Name)
 		end
-		local v2 = v1:Clone()
-		v2.PrimaryPart = v2.Center
-		v2:SetPrimaryPartCFrame(CFrame.new() * CFrame.Angles(1.5707963267948966, 0, 0))
-		return v2
+		local clonedBrake = brakeTemplate:Clone()
+		clonedBrake.PrimaryPart = clonedBrake.Center
+		clonedBrake:SetPrimaryPartCFrame(CFrame.new() * CFrame.Angles(1.5707963267948966, 0, 0))
+		return clonedBrake
 	end,
-	Update = function(p1, p2)
-		local v1 = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.5 - 0.2, 0, 0) * CFrame.new(0, 0, 10)
+	Update = function(brakePart, p2)
+		local rotationTime = os.clock() / 2
+		brakePart.CFrame = CFrame.Angles(0, rotationTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(rotationTime) * 0.5 - 0.2, 0, 0) * CFrame.new(0, 0, 10)
 	end
 }

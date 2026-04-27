@@ -1,45 +1,44 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Rodux = require(ReplicatedStorage.Rodux)
-local function addLabel(p1, p2)
-	assert(p2.title, "minimap label missing unique title")
-	table.insert(p1, {
-		title = p2.title,
-		imageId = p2.imageId,
-		position = p2.position,
-		updatePosition = p2.updatePosition,
-		adornee = p2.adornee,
-		markerColor = p2.markerColor,
-		updateMarkerColor = p2.updateMarkerColor,
-		scale = p2.scale
+local function addLabel(currentState, payload)
+	assert(payload.title, "minimap label missing unique title")
+	table.insert(currentState, {
+		title = payload.title,
+		imageId = payload.imageId,
+		position = payload.position,
+		updatePosition = payload.updatePosition,
+		adornee = payload.adornee,
+		markerColor = payload.markerColor,
+		updateMarkerColor = payload.updateMarkerColor,
+		scale = payload.scale
 	})
 end
 return Rodux.createReducer({}, {
-	addMinimapLabel = function(p1, p2)
-		assert(p2.title, "minimap label missing unique title")
+	addMinimapLabel = function(currentState, payload)
+		assert(payload.title, "minimap label missing unique title")
 		local localTable = {}
-		for i, v in ipairs(p1) do
-			if v.title ~= p2.title then
-				table.insert(localTable, v)
+		for i, label in ipairs(currentState) do
+			if label.title ~= payload.title then
+				table.insert(localTable, label)
 			end
 		end
-		addLabel(localTable, p2)
+		addLabel(localTable, payload)
 		return localTable
 	end,
-	addMinimapLabels = function(p1, p2)
-		assert(p2.labels, "missing labels")
-		local v1 = table.clone(p1)
-		for i, v in ipairs(p2.labels) do
-			addLabel(v1, v)
+	addMinimapLabels = function(currentState, payload)
+		assert(payload.labels, "missing labels")
+		local clonedState = table.clone(currentState)
+		for i, label in ipairs(payload.labels) do
+			addLabel(clonedState, label)
 		end
-		return v1
+		return clonedState
 	end,
-	removeMinimapLabel = function(p1, p2)
-		assert(p2.title, "minimap label missing unique title")
+	removeMinimapLabel = function(currentState, payload)
+		assert(payload.title, "minimap label missing unique title")
 		local localTable = {}
-		for i, v in ipairs(p1) do
-			if v.title ~= p2.title then
-				table.insert(localTable, v)
+		for i, label in ipairs(currentState) do
+			if label.title ~= payload.title then
+				table.insert(localTable, label)
 			end
 		end
 		return localTable

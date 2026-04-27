@@ -1,4 +1,3 @@
--- Reviewed by Claude
-return function(p1)
-	return if p1.Type == "Chassis" or (p1.Type == "DuneBuggy" or p1.Type == "Motorcycle") then true else p1.Make == "Tank"
+return function(vehicle)
+	return if vehicle.Type == "Chassis" or (vehicle.Type == "DuneBuggy" or vehicle.Type == "Motorcycle") then true else vehicle.Make == "Tank"
 end

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local InputUtilsModule = {
 	isGamepadKeyCode = function(keyCode)
 		local keycodeName = keyCode.Name

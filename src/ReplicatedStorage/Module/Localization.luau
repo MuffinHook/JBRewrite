@@ -1,51 +1,50 @@
--- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local LocalizationService = game:GetService("LocalizationService")
-local v1 = nil
+local playerTranslator = nil
 if LocalPlayer then
 	task.spawn(function()
-		local var12, table2 = pcall(function()
-			v1 = LocalizationService:GetTranslatorForPlayerAsync(LocalPlayer)
+		local successPlayerTranslator, errorMessagePlayerTranslator = pcall(function()
+			playerTranslator = LocalizationService:GetTranslatorForPlayerAsync(LocalPlayer)
 		end)
-		if not var12 then
-			warn(table2)
-			v1 = nil
+		if not successPlayerTranslator then
+			warn(errorMessagePlayerTranslator)
+			playerTranslator = nil
 		end
 	end)
 end
-local table2 = LocalizationService.GameLocalizationTable:GetTranslator(LocalizationService.RobloxLocaleId)
-local table3 = LocalizationService.GameLocalizationTable:GetTranslator("en-us")
-local t = {}
-local function _formatByKey(p1, ...)
-	local t = { ... }
-	local var12 = nil
-	local func22 = pcall(function()
-		var12 = v1:FormatByKey(p1, unpack(t))
+local gameTranslator = LocalizationService.GameLocalizationTable:GetTranslator(LocalizationService.RobloxLocaleId)
+local englishTranslator = LocalizationService.GameLocalizationTable:GetTranslator("en-us")
+local localizationModule = {}
+local function _formatByKey(translationKey, ...)
+	local formattedArguments = { ... }
+	local formattedResult = nil
+	local successFromPlayer = pcall(function()
+		formattedResult = playerTranslator:FormatByKey(translationKey, unpack(formattedArguments))
 	end)
-	if not func22 then
-		func22 = pcall(function()
-			var12 = table2:FormatByKey(p1, unpack(t))
+	if not successFromPlayer then
+		successFromPlayer = pcall(function()
+			formattedResult = gameTranslator:FormatByKey(translationKey, unpack(formattedArguments))
 		end)
 	end
-	if not func22 then
-		func22 = pcall(function()
-			var12 = table3:FormatByKey(p1, unpack(t))
+	if not successFromPlayer then
+		successFromPlayer = pcall(function()
+			formattedResult = englishTranslator:FormatByKey(translationKey, unpack(formattedArguments))
 		end)
 	end
-	if not func22 then
-		var12 = p1
+	if not successFromPlayer then
+		formattedResult = translationKey
 	end
-	return func22, var12
+	return successFromPlayer, formattedResult
 end
-function t.FormatByKey(p1, ...)
-	local v1, table2 = _formatByKey(...)
-	if not v1 then
-		warn("No valid translation for: " .. table2)
+function localizationModule.FormatByKey(translationKey, ...)
+	local successFormat, formattedText = _formatByKey(...)
+	if not successFormat then
+		warn("No valid translation for: " .. formattedText)
 	end
-	return table2
+	return formattedText
 end
-function t.AttemptFormatByKey(p1, ...)
-	local v1, table2 = _formatByKey(...)
-	return v1, table2
+function localizationModule.AttemptFormatByKey(translationKey, ...)
+	local successFormat, formattedText = _formatByKey(...)
+	return successFormat, formattedText
 end
-return t
+return localizationModule

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
 	Items = {
@@ -1211,29 +1210,29 @@ return {
 			Tags = { "Soccer" }
 		}
 	},
-	GetInstance = function(p1)
-		if p1.None then
+	GetInstance = function(itemConfig)
+		if itemConfig.None then
 			local Part = Instance.new("Part")
 			Part.Transparency = 1
 			Part.Anchored = true
 			Part.CFrame = CFrame.new(0, 0, 0)
 			return Part
 		else
-			local spoilerTemplate = ReplicatedStorage.Resource.Spoiler:FindFirstChild(p1.Name)
+			local spoilerTemplate = ReplicatedStorage.Resource.Spoiler:FindFirstChild(itemConfig.Name)
 			if not spoilerTemplate then
-				error("No Spoiler named: " .. p1.Name)
+				error("No Spoiler named: " .. itemConfig.Name)
 			end
 			local spoilerClone = spoilerTemplate:Clone()
 			spoilerClone.Color = Color3.new(0.5, 0.5, 0.5)
 			spoilerClone.CFrame = CFrame.new(0, 0, 0)
-			if p1.ViewportFlipX then
+			if itemConfig.ViewportFlipX then
 				spoilerClone.CFrame = spoilerClone.CFrame * CFrame.Angles(math.pi, 0, 0)
 			end
 			return spoilerClone
 		end
 	end,
-	Update = function(p1, p2)
+	Update = function(spoilerInstance, sizeReference)
 		local elapsedTime = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, p2.Size.Magnitude * 0.707)
+		spoilerInstance.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, sizeReference.Size.Magnitude * 0.707)
 	end
 }

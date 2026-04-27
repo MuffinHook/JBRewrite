@@ -1,133 +1,132 @@
--- Reviewed by Claude
-local function CubicBezierCurve(p1, p2, p3, p4, p5)
-	local v1 = 1 - p1
-	return v1 * v1 * v1 * p2 + 3 * v1 * v1 * p1 * p3 + 3 * v1 * p1 * p1 * p4 + p1 * p1 * p1 * p5
+local function CubicBezierCurve(t, point1, point2, point3, point4)
+	local oneMinusT = 1 - t
+	return oneMinusT * oneMinusT * oneMinusT * point1 + 3 * oneMinusT * oneMinusT * t * point2 + 3 * oneMinusT * t * t * point3 + t * t * t * point4
 end
-local function DCubicBezierCurve(p1, p2, p3, p4, p5)
-	local v1 = 1 - p1
-	return 3 * v1 * v1 * (p3 - p2) + 6 * v1 * p1 * (p4 - p3) + 3 * p1 * p1 * (p5 - p4)
+local function DCubicBezierCurve(t, point1, point2, point3, point4)
+	local oneMinusT = 1 - t
+	return 3 * oneMinusT * oneMinusT * (point2 - point1) + 6 * oneMinusT * t * (point3 - point2) + 3 * t * t * (point4 - point3)
 end
-local function ApproximateVectorCubicBezierCurveLength(p1, p2, p3, p4, p5)
+local function ApproximateVectorCubicBezierCurveLength(iterations, point1, point2, point3, point4)
 	local sum = 0
-	for i = 1, p1 do
-		local v1 = (i - 1) / p1
-		local v2 = 1 - v1
-		sum = sum + (3 * v2 * v2 * (p3 - p2) + 6 * v2 * v1 * (p4 - p3) + 3 * v1 * v1 * (p5 - p4)).Magnitude / p1
+	for i = 1, iterations do
+		local t = (i - 1) / iterations
+		local oneMinusT = 1 - t
+		sum = sum + (3 * oneMinusT * oneMinusT * (point2 - point1) + 6 * oneMinusT * t * (point3 - point2) + 3 * t * t * (point4 - point3)).Magnitude / iterations
 	end
 	return sum
 end
-local t = {}
-t.__index = t
-function t.new()
-	local v2 = setmetatable({}, t)
-	v2.Points = nil
-	v2.NumPoints = nil
-	v2.LastIndex = nil
-	v2.OffsetStart = 0
-	v2.OffsetEnd = 0
-	v2.t = 0
-	v2.lengthCache = {}
-	return v2
+local BezierPath = {}
+BezierPath.__index = BezierPath
+function BezierPath.new()
+	local self = setmetatable({}, BezierPath)
+	self.Points = nil
+	self.NumPoints = nil
+	self.LastIndex = nil
+	self.OffsetStart = 0
+	self.OffsetEnd = 0
+	self.progress = 0
+	self.lengthCache = {}
+	return self
 end
-function t.SetNodeOffset(p1, p2, p3)
-	assert(p2)
-	assert(p3)
-	p1.OffsetStart = p2
-	p1.OffsetEnd = p3
+function BezierPath.SetNodeOffset(self, startOffset, endOffset)
+	assert(startOffset)
+	assert(endOffset)
+	self.OffsetStart = startOffset
+	self.OffsetEnd = endOffset
 end
-function t.SetPoints(p1, p2)
-	p1.Points = p2
-	p1.NumPoints = #p2
-	p1:_recomputeLengthCache()
+function BezierPath.SetPoints(self, points)
+	self.Points = points
+	self.NumPoints = #points
+	self:_recomputeLengthCache()
 end
-function t._recomputeLengthCache(p1)
-	for i = 1, p1.NumPoints do
-		local v1 = p1:GetPoint(i)
-		local v2 = p1:GetPoint(i + 1)
-		local Magnitude = (v2 - v1).Magnitude
-		local v3 = v1 + (v2 - p1:GetPoint(i - 1)).Unit * Magnitude / 3
-		p1.lengthCache[i] = ApproximateVectorCubicBezierCurveLength(10000, v1, v3, v2 - (p1:GetPoint(i + 2) - v1).Unit * Magnitude / 3, v2)
+function BezierPath._recomputeLengthCache(self)
+	for i = 1, self.NumPoints do
+		local currentPoint = self:GetPoint(i)
+		local nextPoint = self:GetPoint(i + 1)
+		local magnitude = (nextPoint - currentPoint).Magnitude
+		local controlPoint1 = currentPoint + (nextPoint - self:GetPoint(i - 1)).Unit * magnitude / 3
+		self.lengthCache[i] = ApproximateVectorCubicBezierCurveLength(10000, currentPoint, controlPoint1, nextPoint - (self:GetPoint(i + 2) - currentPoint).Unit * magnitude / 3, nextPoint)
 	end
 end
-function t.GetPoint(p1, p2)
-	return p1.Points[(p2 - 1) % p1.NumPoints + 1]
+function BezierPath.GetPoint(self, index)
+	return self.Points[(index - 1) % self.NumPoints + 1]
 end
-function t.ApproximateLength(p1, p2)
+function BezierPath.ApproximateLength(self, precision)
 	local sum = 0
-	for i = p1.OffsetStart + 1, p1.NumPoints - p1.OffsetEnd do
-		local v1 = p1:GetPoint(i)
-		local v2 = p1:GetPoint(i + 1)
-		local Magnitude = (v2 - v1).Magnitude
-		sum = sum + ApproximateVectorCubicBezierCurveLength(p2, v1, v1 + (v2 - p1:GetPoint(i - 1)).Unit * Magnitude / 3, v2 - (p1:GetPoint(i + 2) - v1).Unit * Magnitude / 3, v2)
+	for i = self.OffsetStart + 1, self.NumPoints - self.OffsetEnd do
+		local currentPoint = self:GetPoint(i)
+		local nextPoint = self:GetPoint(i + 1)
+		local magnitude = (nextPoint - currentPoint).Magnitude
+		sum = sum + ApproximateVectorCubicBezierCurveLength(precision, currentPoint, currentPoint + (nextPoint - self:GetPoint(i - 1)).Unit * magnitude / 3, nextPoint - (self:GetPoint(i + 2) - currentPoint).Unit * magnitude / 3, nextPoint)
 	end
 	return sum
 end
-function t.Step(p1, p2)
-	local t = p1.t
-	local v1 = t * (p1.NumPoints - p1.OffsetStart - p1.OffsetEnd) + p1.OffsetStart
-	local v2 = v1 % 1
-	local v3 = math.floor(v1) + 1
-	local v4, v5, v6, v7
-	if p1.LastIndex == v3 then
-		v4 = p1._p0
-		v5 = p1._c0
-		v6 = p1._c1
-		v7 = p1._p1
+function BezierPath.Step(self, distance)
+	local currentProgress = self.progress
+	local interpolatedPosition = currentProgress * (self.NumPoints - self.OffsetStart - self.OffsetEnd) + self.OffsetStart
+	local fractionalPart = interpolatedPosition % 1
+	local segmentIndex = math.floor(interpolatedPosition) + 1
+	local p0, c0, c1, p1
+	if self.LastIndex == segmentIndex then
+		p0 = self._p0
+		c0 = self._c0
+		c1 = self._c1
+		p1 = self._p1
 	else
-		local v8 = p1:GetPoint(v3)
-		local v9 = p1:GetPoint(v3 + 1)
-		local Magnitude = (v9 - v8).Magnitude
-		v5 = v8 + (v9 - p1:GetPoint(v3 - 1)).Unit * Magnitude / 3
-		v6 = v9 - (p1:GetPoint(v3 + 2) - v8).Unit * Magnitude / 3
-		p1._p0 = v8
-		p1._c0 = v5
-		p1._c1 = v6
-		p1._p1 = v9
-		v4 = v8
-		v7 = v9
+		local currentPoint = self:GetPoint(segmentIndex)
+		local nextPoint = self:GetPoint(segmentIndex + 1)
+		local magnitude = (nextPoint - currentPoint).Magnitude
+		c0 = currentPoint + (nextPoint - self:GetPoint(segmentIndex - 1)).Unit * magnitude / 3
+		c1 = nextPoint - (self:GetPoint(segmentIndex + 2) - currentPoint).Unit * magnitude / 3
+		self._p0 = currentPoint
+		self._c0 = c0
+		self._c1 = c1
+		self._p1 = nextPoint
+		p0 = currentPoint
+		p1 = nextPoint
 	end
-	p1.LastIndex = v3
-	local v10 = 1 - v2
-	local v11 = 3 * v10 * v10 * (v5 - v4) + 6 * v10 * v2 * (v6 - v5) + 3 * v2 * v2 * (v7 - v6)
-	local Magnitude = v11.Magnitude
-	local v12 = 1 - v2
-	if Magnitude > 0 then
-		p1.t = t + p2 / Magnitude / (p1.NumPoints - p1.OffsetStart - p1.OffsetEnd)
+	self.LastIndex = segmentIndex
+	local oneMinusFrac = 1 - fractionalPart
+	local tangent = 3 * oneMinusFrac * oneMinusFrac * (c0 - p0) + 6 * oneMinusFrac * fractionalPart * (c1 - c0) + 3 * fractionalPart * fractionalPart * (p1 - c1)
+	local tangentMagnitude = tangent.Magnitude
+	local oneMinusFracCube = 1 - fractionalPart
+	if tangentMagnitude > 0 then
+		self.progress = currentProgress + distance / tangentMagnitude / (self.NumPoints - self.OffsetStart - self.OffsetEnd)
 	end
-	return v12 * v12 * v12 * v4 + 3 * v12 * v12 * v2 * v5 + 3 * v12 * v2 * v2 * v6 + v2 * v2 * v2 * v7, v11
+	return oneMinusFracCube * oneMinusFracCube * oneMinusFracCube * p0 + 3 * oneMinusFracCube * oneMinusFracCube * fractionalPart * c0 + 3 * oneMinusFracCube * fractionalPart * fractionalPart * c1 + fractionalPart * fractionalPart * fractionalPart * p1, tangent
 end
-function t.GetWorldPositionAt(p1, p2)
-	local count = 1 + p1.OffsetStart
+function BezierPath.GetWorldPositionAt(self, distance)
+	local segmentIndex = 1 + self.OffsetStart
 	while true do
-		local v1, v2
-		local v3 = p1:GetPoint(count)
-		local v4 = p1:GetPoint(count + 1)
-		local Magnitude = (v4 - v3).Magnitude
-		local v5 = v3 + (v4 - p1:GetPoint(count - 1)).Unit * Magnitude / 3
-		local v6 = v4 - (p1:GetPoint(count + 2) - v3).Unit * Magnitude / 3
-		local v7 = p1.lengthCache[(count - 1) % p1.NumPoints + 1]
-		if v7 then
-			v1 = v3
-			v2 = v4
+		local p0, p1
+		local currentPoint = self:GetPoint(segmentIndex)
+		local nextPoint = self:GetPoint(segmentIndex + 1)
+		local magnitude = (nextPoint - currentPoint).Magnitude
+		local controlPoint1 = currentPoint + (nextPoint - self:GetPoint(segmentIndex - 1)).Unit * magnitude / 3
+		local controlPoint2 = nextPoint - (self:GetPoint(segmentIndex + 2) - currentPoint).Unit * magnitude / 3
+		local segmentLength = self.lengthCache[(segmentIndex - 1) % self.NumPoints + 1]
+		if segmentLength then
+			p0 = currentPoint
+			p1 = nextPoint
 		else
-			v7, v1, v2 = ApproximateVectorCubicBezierCurveLength(10000, v3, v5, v6, v4), v3, v4
+			segmentLength, p0, p1 = ApproximateVectorCubicBezierCurveLength(10000, currentPoint, controlPoint1, controlPoint2, nextPoint), currentPoint, nextPoint
 		end
-		if p2 < v7 then
-			local v9 = p2 / v7
-			local v10 = 1 - v9
-			local v11 = 1 - v9
-			return v10 * v10 * v10 * v1 + 3 * v10 * v10 * v9 * v5 + 3 * v10 * v9 * v9 * v6 + v9 * v9 * v9 * v2, 3 * v11 * v11 * (v5 - v1) + 6 * v11 * v9 * (v6 - v5) + 3 * v9 * v9 * (v2 - v6)
+		if distance < segmentLength then
+			local t = distance / segmentLength
+			local oneMinusT = 1 - t
+			local oneMinusT2 = 1 - t
+			return oneMinusT * oneMinusT * oneMinusT * p0 + 3 * oneMinusT * oneMinusT * t * controlPoint1 + 3 * oneMinusT * t * t * controlPoint2 + t * t * t * p1, 3 * oneMinusT2 * oneMinusT2 * (controlPoint1 - p0) + 6 * oneMinusT2 * t * (controlPoint2 - controlPoint1) + 3 * t * t * (p1 - controlPoint2)
 		end
-		count = count + 1
-		p2 = p2 - v7
+		segmentIndex = segmentIndex + 1
+		distance = distance - segmentLength
 	end
 end
-function t.Reset(p1)
-	p1.t = 0
-	p1._p0 = nil
-	p1._c0 = nil
-	p1._c1 = nil
-	p1._p1 = nil
-	p1.LastIndex = nil
+function BezierPath.Reset(self)
+	self.progress = 0
+	self._p0 = nil
+	self._c0 = nil
+	self._c1 = nil
+	self._p1 = nil
+	self.LastIndex = nil
 end
-return t
+return BezierPath

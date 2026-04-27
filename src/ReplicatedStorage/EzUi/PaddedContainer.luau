@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local eZUiModule = script:FindFirstAncestor("EzUi")
 local Dictionary = require(eZUiModule.Dictionary)
 local Roact = require(eZUiModule.Parent.Roact)

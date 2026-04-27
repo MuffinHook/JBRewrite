@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ezUiModule = script:FindFirstAncestor("EzUi")
 local Roact = require(ezUiModule.Parent.Roact)
 local createElement = Roact.createElement
@@ -10,32 +8,32 @@ local Maid = require(ezUiModule.Parent.Std.Maid)
 local Dictionary = require(ezUiModule.Dictionary)
 local Tab = require(script.Tab)
 local TabPage = require(script.TabPage)
-local v2 = Roact.PureComponent:extend("TabContainer")
-v2.defaultProps = {
+local TabContainer = Roact.PureComponent:extend("TabContainer")
+TabContainer.defaultProps = {
 	size = UDim2.new(0.5, 0, 0.5, 0),
 	isSmallScreen = true
 }
-function v2.init(self)
+function TabContainer.init(self)
 	self.pageLayoutRef = Roact.createRef()
 	self.data = {}
 end
-function v2.render(self)
+function TabContainer.render(self)
 	local columnsPerPage = if self.props.isSmallScreen then 1 else 4
 	local pageCount = #self.props.pages
 	local pageElements = {}
 	local tabElements = {}
-	for i, v in ipairs(self.props.pages) do
+	for i, pageConfig in ipairs(self.props.pages) do
 		local opacityOffset
 		local currentPage = self.props.currentPage
 		if currentPage then
-			currentPage = v[Roact.Ref]:getValue() == self.props.currentPage
+			currentPage = pageConfig[Roact.Ref]:getValue() == self.props.currentPage
 		end
 		opacityOffset = if currentPage then 0.1 else 0
 		local tabScaleX = (1 + opacityOffset) / (pageCount + 0.1)
-		local pageData = self.data[v.title]
+		local pageData = self.data[pageConfig.title]
 		if not pageData then
 			pageData = {}
-			self.data[v.title] = pageData
+			self.data[pageConfig.title] = pageData
 			pageData.maid = Maid.new()
 			local scaleXBindingValue, updateScaleXValue = Roact.createBinding(tabScaleX)
 			pageData.scaleXBinding = scaleXBindingValue
@@ -51,24 +49,24 @@ function v2.render(self)
 			pageData.updateScaleXBinding(pageData.scaleXAccelTween.p)
 		end)
 		local tabPaddingX = math.ceil(columnsPerPage * (1 / pageCount + 1))
-		pageElements[v.title] = createElement(TabPage, {
-			[Roact.Ref] = v[Roact.Ref],
-			layoutOrder = v.layoutOrder,
-			backgroundColor = v.backgroundColor,
-			backgroundTransparency = v.backgroundTransparency,
-			[Roact.Children] = v[Roact.Children]
+		pageElements[pageConfig.title] = createElement(TabPage, {
+			[Roact.Ref] = pageConfig[Roact.Ref],
+			layoutOrder = pageConfig.layoutOrder,
+			backgroundColor = pageConfig.backgroundColor,
+			backgroundTransparency = pageConfig.backgroundTransparency,
+			[Roact.Children] = pageConfig[Roact.Children]
 		})
-		tabElements[v.title] = createElement(Tab, {
+		tabElements[pageConfig.title] = createElement(Tab, {
 			backgroundColor = self.props.color,
-			title = v.title,
+			title = pageConfig.title,
 			scaleXBinding = pageData.scaleXBinding,
 			paddingX = tabPaddingX,
 			active = currentPage,
-			layoutOrder = v.layoutOrder,
+			layoutOrder = pageConfig.layoutOrder,
 			onClick = function()
-				local v1 = v[Roact.Ref]:getValue()
-				if self.props.currentPage ~= v1 then
-					self.props.updatePage(v1)
+				local pageComponent = pageConfig[Roact.Ref]:getValue()
+				if self.props.currentPage ~= pageComponent then
+					self.props.updatePage(pageComponent)
 				end
 			end
 		})
@@ -128,15 +126,15 @@ function v2.render(self)
 		}, pageElements))
 	})
 end
-function v2.didUpdate(self, prevProps, prevState)
+function TabContainer.didUpdate(self, prevProps, prevState)
 	if self.props.currentPage ~= prevState.currentPage and self.pageLayoutRef:getValue().CurrentPage ~= self.props.currentPage then
 		self.pageLayoutRef:getValue():JumpTo(self.props.currentPage)
 	end
 end
-function v2.willUnmount(self)
+function TabContainer.willUnmount(self)
 	for k, v in pairs(self.data) do
 		v.maid:DoCleaning()
 	end
 	table.clear(self.data)
 end
-return v2
+return TabContainer

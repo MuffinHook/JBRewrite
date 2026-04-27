@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
@@ -7,12 +6,12 @@ local Roact = require(ReplicatedStorage.Roact)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local createElement = Roact.createElement
-local function comma(p1)
-	local color, color2, var3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
-	return color .. color2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. var3
+local function comma(numberString)
+	local numberPart, decimalPart, suffix = string.match(numberString, "^([^%d]*%d)(%d*)(.-)$")
+	return numberPart .. decimalPart:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. suffix
 end
-local color = Roact.PureComponent:extend("Speedometer")
-color.defaultProps = {
+local component = Roact.PureComponent:extend("Speedometer")
+component.defaultProps = {
 	metric = "MPH",
 	hasLicensePlate = true,
 	licensePlate = "JAILBRK!",
@@ -26,98 +25,98 @@ color.defaultProps = {
 	position = UDim2.new(0, 0, 0, 0),
 	enabled = true
 }
-function color.init(p1)
-	p1:setState({
+function component.init(self)
+	self:setState({
 		ejectOpen = false
 	})
-	p1.color_strokeRef = Roact.createRef()
-	p1.color_frameRef = Roact.createRef()
-	p1.color_frame2Ref = Roact.createRef()
+	self.color_strokeRef = Roact.createRef()
+	self.color_frameRef = Roact.createRef()
+	self.color_frame2Ref = Roact.createRef()
 end
-function color.didMount(p1)
-	p1.maid = Maid.new()
-	local color = VehicleUtils.GetLocalVehicleModel()
-	assert(color, "No local vehicle model")
-	p1.maid:GiveTask(VehicleUtils.getTireHealthChangedSignal(color):Connect(function()
-		p1:setState({
+function component.didMount(self)
+	self.maid = Maid.new()
+	local vehicleModel = VehicleUtils.GetLocalVehicleModel()
+	assert(vehicleModel, "No local vehicle model")
+	self.maid:GiveTask(VehicleUtils.getTireHealthChangedSignal(vehicleModel):Connect(function()
+		self:setState({
 			_c = math.random()
 		})
 	end))
-	p1.maid:GiveTask(VehicleUtils.getTireMaxHealthChangedSignal(color):Connect(function()
-		p1:setState({
+	self.maid:GiveTask(VehicleUtils.getTireMaxHealthChangedSignal(vehicleModel):Connect(function()
+		self:setState({
 			_c = math.random()
 		})
 	end))
-	local function setColor(p12)
-		local color = p1.color_strokeRef:getValue()
-		local color2 = p1.color_frameRef:getValue()
-		local var3 = p1.color_frame2Ref:getValue()
-		if color then
-			color.Color = p12
+	local function setColor(colorValue)
+		local strokeElement = self.color_strokeRef:getValue()
+		local frameElement = self.color_frameRef:getValue()
+		local frame2Element = self.color_frame2Ref:getValue()
+		if strokeElement then
+			strokeElement.Color = colorValue
 		end
-		if color2 then
-			color2.BackgroundColor3 = p12
+		if frameElement then
+			frameElement.BackgroundColor3 = colorValue
 		end
-		if var3 then
-			var3.BackgroundColor3 = p12
+		if frame2Element then
+			frame2Element.BackgroundColor3 = colorValue
 		end
 	end
 	local function hyperChromeUpdated()
-		if color:GetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME) == HyperChromeConsts.COLOR_SHIFT_NAME then
-			p1.maid.hyperShiftParticleRainbowHeartbeat = RunService.Heartbeat:Connect(function()
-				local color2 = Color3.fromHSV(os.clock() % HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME / HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME, 1, 1)
-				local var3 = p1.color_strokeRef:getValue()
-				local var4 = p1.color_frameRef:getValue()
-				local var5 = p1.color_frame2Ref:getValue()
-				if var3 then
-					var3.Color = color2
+		if vehicleModel:GetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME) == HyperChromeConsts.COLOR_SHIFT_NAME then
+			self.maid.hyperShiftParticleRainbowHeartbeat = RunService.Heartbeat:Connect(function()
+				local rainbowColor = Color3.fromHSV(os.clock() % HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME / HyperChromeConsts.RAINBOW_ANIMATION_CYCLE_TIME, 1, 1)
+				local strokeElement = self.color_strokeRef:getValue()
+				local frameElement = self.color_frameRef:getValue()
+				local frame2Element = self.color_frame2Ref:getValue()
+				if strokeElement then
+					strokeElement.Color = rainbowColor
 				end
-				if var4 then
-					var4.BackgroundColor3 = color2
+				if frameElement then
+					frameElement.BackgroundColor3 = rainbowColor
 				end
-				if var5 then
-					var5.BackgroundColor3 = color2
+				if frame2Element then
+					frame2Element.BackgroundColor3 = rainbowColor
 				end
 			end)
 		else
-			p1.maid.hyperShiftParticleRainbowHeartbeat = nil
-			local color = p1.props.color
-			local var12 = p1.color_strokeRef:getValue()
-			local color2 = p1.color_frameRef:getValue()
-			local var3 = p1.color_frame2Ref:getValue()
-			if var12 then
-				var12.Color = color
+			self.maid.hyperShiftParticleRainbowHeartbeat = nil
+			local baseColor = self.props.color
+			local strokeElement = self.color_strokeRef:getValue()
+			local frameElement = self.color_frameRef:getValue()
+			local frame2Element = self.color_frame2Ref:getValue()
+			if strokeElement then
+				strokeElement.Color = baseColor
 			end
-			if color2 then
-				color2.BackgroundColor3 = color
+			if frameElement then
+				frameElement.BackgroundColor3 = baseColor
 			end
-			if var3 then
-				var3.BackgroundColor3 = color
+			if frame2Element then
+				frame2Element.BackgroundColor3 = baseColor
 			end
 		end
 	end
 	task.spawn(hyperChromeUpdated)
-	p1.maid:GiveTask(color:GetAttributeChangedSignal(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME):Connect(hyperChromeUpdated))
+	self.maid:GiveTask(vehicleModel:GetAttributeChangedSignal(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME):Connect(hyperChromeUpdated))
 end
-function color.render(p1)
-	if p1.props.enabled then
-		local smallUI = p1.props.smallUI
-		local color = VehicleUtils.GetLocalVehicleModel()
-		if color then
-			local color2 = VehicleUtils.getTireHealth(color)
-			local var3 = VehicleUtils.getTireMaxHealth(color)
+function component.render(self)
+	if self.props.enabled then
+		local smallUI = self.props.smallUI
+		local vehicleModel = VehicleUtils.GetLocalVehicleModel()
+		if vehicleModel then
+			local tireHealth = VehicleUtils.getTireHealth(vehicleModel)
+			local tireMaxHealth = VehicleUtils.getTireMaxHealth(vehicleModel)
 			if RunService:IsRunning() then
-				assert(color2 and var3, "No health or maxHealth")
+				assert(tireHealth and tireMaxHealth, "No health or maxHealth")
 			else
-				color2 = 75
-				var3 = 150
+				tireHealth = 75
+				tireMaxHealth = 150
 			end
-			local var4 = color2 / var3
-			local t = {}
-			if p1.state.ejectOpen and p1.props.passengers then
-				for i, v in ipairs(p1.props.passengers) do
-					local var5 = v.Name
-					t[var5] = createElement("TextButton", {
+			local healthRatio = tireHealth / tireMaxHealth
+			local passengerElements = {}
+			if self.state.ejectOpen and self.props.passengers then
+				for i, v in ipairs(self.props.passengers) do
+					local passengerName = v.Name
+					passengerElements[passengerName] = createElement("TextButton", {
 						BackgroundTransparency = 0,
 						BorderSizePixel = 0,
 						BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
@@ -126,11 +125,11 @@ function color.render(p1)
 						Text = "",
 						LayoutOrder = 10 - i,
 						[Roact.Event.MouseButton1Down] = function()
-							p1:setState({
+							self:setState({
 								ejectOpen = false
 							})
-							if p1.props.onClickEjectName then
-								p1.props.onClickEjectName(var5)
+							if self.props.onClickEjectName then
+								self.props.onClickEjectName(passengerName)
 							end
 						end
 					}, {
@@ -139,7 +138,7 @@ function color.render(p1)
 						}),
 						Title = createElement("TextLabel", {
 							BackgroundTransparency = 1,
-							Text = var5,
+							Text = passengerName,
 							Font = Enum.Font.LuckiestGuy,
 							TextColor3 = Color3.new(51/255, 51/255, 51/255),
 							TextScaled = true,
@@ -150,24 +149,24 @@ function color.render(p1)
 					})
 				end
 			end
-			local t2 = {}
+			local accelerationBarElements = {}
 			for i = 1, 9 do
-				t2[i] = createElement("ImageLabel", {
+				accelerationBarElements[i] = createElement("ImageLabel", {
 					BackgroundTransparency = 1,
 					ImageTransparency = 0,
 					Image = "rbxassetid://8208058512",
 					Size = UDim2.new(1, 0, 1, 0),
-					ImageColor3 = p1.props.accelRatio:map(function(p1)
-						local color = Color3.new(255/255, 255/255, 255/255)
-						local color2 = i / 10
-						local var3 = (i + 1) / 10
-						if p1 < color2 then
+					ImageColor3 = self.props.accelRatio:map(function(accelRatio)
+						local whiteColor = Color3.new(255/255, 255/255, 255/255)
+						local barLowerThreshold = i / 10
+						local barUpperThreshold = (i + 1) / 10
+						if accelRatio < barLowerThreshold then
 							return Color3.new(0/255, 0/255, 0/255)
 						else
-							if p1 < var3 then
-								color = Color3.new(0/255, 0/255, 0/255):lerp(color, ((p1 - color2) / (var3 - color2)) ^ 2)
+							if accelRatio < barUpperThreshold then
+								whiteColor = Color3.new(0/255, 0/255, 0/255):lerp(whiteColor, ((accelRatio - barLowerThreshold) / (barUpperThreshold - barLowerThreshold)) ^ 2)
 							end
-							return color
+							return whiteColor
 						end
 					end),
 					LayoutOrder = i
@@ -177,56 +176,56 @@ function color.render(p1)
 					})
 				})
 			end
-			local t3 = {
+			local mainFrameProps = {
 				BackgroundTransparency = 0.6666666666666666,
 				BackgroundColor3 = Color3.new(51/255, 51/255, 51/255),
-				Size = p1.props.size,
-				Position = p1.props.position,
-				AnchorPoint = p1.props.anchorPoint
+				Size = self.props.size,
+				Position = self.props.position,
+				AnchorPoint = self.props.anchorPoint
 			}
-			local t4 = {}
-			local t5 = {}
-			t5.AspectRatio = if smallUI then 5 else 3
-			t4.AspectRatio = createElement("UIAspectRatioConstraint", t5)
-			t4.UICorner = createElement("UICorner", {
+			local speedometerChildren = {}
+			local aspectRatioConstraintProps = {}
+			aspectRatioConstraintProps.AspectRatio = if smallUI then 5 else 3
+			speedometerChildren.AspectRatio = createElement("UIAspectRatioConstraint", aspectRatioConstraintProps)
+			speedometerChildren.UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0.25, 0)
 			})
-			t4.UIStroke = createElement("UIStroke", {
-				Color = p1.props.color,
+			speedometerChildren.UIStroke = createElement("UIStroke", {
+				Color = self.props.color,
 				Thickness = 3,
-				[Roact.Ref] = p1.color_strokeRef
+				[Roact.Ref] = self.color_strokeRef
 			})
-			local t6 = {
+			local topSectionProps = {
 				BackgroundTransparency = 1
 			}
-			t6.Size = UDim2.new(1, 0, if smallUI then 1 else 0.5714285714285714, 0)
-			t6.Position = UDim2.new(0, 0, 0, 0)
-			t6.ZIndex = 2
-			local t7 = {}
-			local t8 = {
+			topSectionProps.Size = UDim2.new(1, 0, if smallUI then 1 else 0.5714285714285714, 0)
+			topSectionProps.Position = UDim2.new(0, 0, 0, 0)
+			topSectionProps.ZIndex = 2
+			local topSectionChildren = {}
+			local speedLabelProps = {
 				BackgroundTransparency = 1
 			}
-			t8.Size = UDim2.new(0.4, 0, if smallUI then 0.75 else 1, 0)
-			t8.AnchorPoint = Vector2.new(0.5, 0)
-			t8.Position = UDim2.new(0.5, 0, 0, 0)
-			t8.TextColor3 = Color3.new(255/255, 255/255, 255/255)
-			t8.TextScaled = true
-			t8.Text = p1.props.speed:map(function(p1)
-				return ("%03d"):format(p1)
+			speedLabelProps.Size = UDim2.new(0.4, 0, if smallUI then 0.75 else 1, 0)
+			speedLabelProps.AnchorPoint = Vector2.new(0.5, 0)
+			speedLabelProps.Position = UDim2.new(0.5, 0, 0, 0)
+			speedLabelProps.TextColor3 = Color3.new(255/255, 255/255, 255/255)
+			speedLabelProps.TextScaled = true
+			speedLabelProps.Text = self.props.speed:map(function(speed)
+				return ("%03d"):format(speed)
 			end)
-			t8.Font = Enum.Font.Bangers
-			t7.Speed = createElement("TextLabel", t8)
-			t7.Metric = createElement("TextLabel", {
+			speedLabelProps.Font = Enum.Font.Bangers
+			topSectionChildren.Speed = createElement("TextLabel", speedLabelProps)
+			topSectionChildren.Metric = createElement("TextLabel", {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0.1, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0),
 				Position = UDim2.new(0.7124999999999999, 0, 0.1, 0),
 				TextColor3 = Color3.new(255/255, 255/255, 255/255),
 				TextScaled = true,
-				Text = p1.props.metric,
+				Text = self.props.metric,
 				Font = Enum.Font.Bangers
 			})
-			t7.Amount = smallUI and createElement("TextLabel", {
+			topSectionChildren.Amount = smallUI and createElement("TextLabel", {
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
@@ -235,14 +234,14 @@ function color.render(p1)
 				Position = UDim2.new(1, 0, 0.72, 0),
 				TextColor3 = Color3.new(255/255, 255/255, 255/255),
 				TextScaled = true,
-				Text = p1.props.distance:map(function(p1)
-					local color2, var3, var4 = string.match(math.floor(p1 + 0.5), "^([^%d]*%d)(%d*)(.-)$")
-					return ("%s mi"):format(color2 .. var3:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. var4)
+				Text = self.props.distance:map(function(distance)
+					local numberPart, decimalPart, suffix = string.match(math.floor(distance + 0.5), "^([^%d]*%d)(%d*)(.-)$")
+					return ("%s mi"):format(numberPart .. decimalPart:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. suffix)
 				end),
 				Font = Enum.Font.LuckiestGuy,
 				TextYAlignment = Enum.TextYAlignment.Bottom
 			})
-			t7.Plate = not smallUI and createElement("TextButton", {
+			topSectionChildren.Plate = not smallUI and createElement("TextButton", {
 				BackgroundTransparency = 0,
 				BorderSizePixel = 0,
 				BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
@@ -250,8 +249,8 @@ function color.render(p1)
 				AnchorPoint = Vector2.new(1, 1),
 				Position = UDim2.new(1, 0, 1, -6),
 				Text = "",
-				Visible = p1.props.hasLicensePlate,
-				[Roact.Event.MouseButton1Down] = p1.props.onClickPlate
+				Visible = self.props.hasLicensePlate,
+				[Roact.Event.MouseButton1Down] = self.props.onClickPlate
 			}, {
 				AspectRatio = createElement("UIAspectRatioConstraint", {
 					AspectRatio = 4
@@ -263,48 +262,48 @@ function color.render(p1)
 					Position = UDim2.new(0.5, 0, 0.2, 0),
 					TextColor3 = Color3.new(255/255, 255/255, 255/255),
 					TextScaled = true,
-					Text = p1.props.licensePlate,
+					Text = self.props.licensePlate,
 					Font = Enum.Font.LuckiestGuy
 				})
 			})
-			local t9 = {
+			local lockButtonProps = {
 				BackgroundTransparency = 1,
 				ImageColor3 = Color3.new(255/255, 255/255, 255/255),
 				Image = "rbxassetid://8208059198",
 				Size = UDim2.new(0.5, 0, 0.5, 0),
 				Position = UDim2.new(0.04, 0, 0.14, 0),
-				Visible = p1.props.lockEnabled,
-				[Roact.Event.MouseButton1Down] = p1.props.onClickLock
+				Visible = self.props.lockEnabled,
+				[Roact.Event.MouseButton1Down] = self.props.onClickLock
 			}
-			local t10 = {
+			local lockButtonChildren = {
 				AspectRatio = createElement("UIAspectRatioConstraint", {
 					AspectRatio = 1
 				})
 			}
-			local t11 = {
+			local lockIconProps = {
 				BackgroundTransparency = 1,
 				ImageColor3 = Color3.new(255/255, 255/255, 255/255)
 			}
-			t11.Image = if p1.props.locked then "rbxassetid://5928936980" else "rbxassetid://5928936296"
-			t11.Size = UDim2.new(0.6, 0, 0.6, 0)
-			t11.AnchorPoint = Vector2.new(0.5, 0.5)
-			t11.Position = UDim2.new(0.5, 0, 0.5, 0)
-			t10.Icon = createElement("ImageLabel", t11)
-			t7.Lock = createElement("ImageButton", t9, t10)
-			t7.Eject = createElement("ImageButton", {
+			lockIconProps.Image = if self.props.locked then "rbxassetid://5928936980" else "rbxassetid://5928936296"
+			lockIconProps.Size = UDim2.new(0.6, 0, 0.6, 0)
+			lockIconProps.AnchorPoint = Vector2.new(0.5, 0.5)
+			lockIconProps.Position = UDim2.new(0.5, 0, 0.5, 0)
+			lockButtonChildren.Icon = createElement("ImageLabel", lockIconProps)
+			topSectionChildren.Lock = createElement("ImageButton", lockButtonProps, lockButtonChildren)
+			topSectionChildren.Eject = createElement("ImageButton", {
 				BackgroundTransparency = 1,
 				ImageColor3 = Color3.new(255/255, 255/255, 255/255),
 				Image = "rbxassetid://8208059198",
 				Size = UDim2.new(0.5, 0, 0.5, 0),
 				Position = UDim2.new(0.16, 0, 0.14, 0),
-				Visible = p1.props.ejectEnabled,
+				Visible = self.props.ejectEnabled,
 				[Roact.Event.MouseButton1Down] = function()
-					local color = not p1.state.ejectOpen
-					p1:setState({
-						ejectOpen = color
+					local isEjectOpen = not self.state.ejectOpen
+					self:setState({
+						ejectOpen = isEjectOpen
 					})
-					if p1.props.onClickEject then
-						p1.props.onClickEject(color)
+					if self.props.onClickEject then
+						self.props.onClickEject(isEjectOpen)
 					end
 				end
 			}, {
@@ -325,7 +324,7 @@ function color.render(p1)
 					Size = UDim2.new(4, 0, 0.8, 0),
 					Position = UDim2.new(0.5, 0, -0.8, 0),
 					AnchorPoint = Vector2.new(0.5, 1),
-					Visible = p1.props.ejectOpen
+					Visible = self.props.ejectOpen
 				}, Dictionary.merge({
 					ListLayout = createElement("UIListLayout", {
 						HorizontalAlignment = Enum.HorizontalAlignment.Center,
@@ -334,20 +333,20 @@ function color.render(p1)
 						FillDirection = Enum.FillDirection.Vertical,
 						Padding = UDim.new(0.2, 0)
 					})
-				}, t))
+				}, passengerElements))
 			})
-			t7.Missiles = createElement("TextLabel", {
+			topSectionChildren.Missiles = createElement("TextLabel", {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0.25, 0, 0.3, 0),
 				AnchorPoint = Vector2.new(0, 1),
 				Position = UDim2.new(0.04, 0, 0.96, 0),
 				TextColor3 = Color3.new(255/255, 255/255, 255/255),
 				TextScaled = true,
-				Text = ("%d/%d MISSILES"):format(p1.props.missileCount, p1.props.missileMax),
+				Text = ("%d/%d MISSILES"):format(self.props.missileCount, self.props.missileMax),
 				Font = Enum.Font.LuckiestGuy,
-				Visible = p1.props.missilesEnabled
+				Visible = self.props.missilesEnabled
 			})
-			t7.MissileBuy = createElement("TextButton", {
+			topSectionChildren.MissileBuy = createElement("TextButton", {
 				BorderSizePixel = 0,
 				BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
 				Size = UDim2.new(1, 0, 0.18, 0),
@@ -355,8 +354,8 @@ function color.render(p1)
 				Position = UDim2.new(0.15, 0, 1.07, 0),
 				ZIndex = 4,
 				Text = "",
-				Visible = p1.props.missilesEnabled,
-				[Roact.Event.MouseButton1Down] = p1.props.onClickMissileBuy
+				Visible = self.props.missilesEnabled,
+				[Roact.Event.MouseButton1Down] = self.props.onClickMissileBuy
 			}, {
 				AspectRatio = createElement("UIAspectRatioConstraint", {
 					AspectRatio = 3
@@ -376,51 +375,51 @@ function color.render(p1)
 					ZIndex = 5
 				})
 			})
-			t4.Top = createElement("Frame", t6, t7)
-			local t12 = {
+			speedometerChildren.Top = createElement("Frame", topSectionProps, topSectionChildren)
+			local bottomSectionProps = {
 				BackgroundTransparency = 1
 			}
-			t12.Size = UDim2.new(1, 0, if smallUI then 1 else 0.5714285714285714, 0)
-			t12.Position = UDim2.new(0, 0, if smallUI then 0.7272727272727273 else 0.5714285714285714, 0)
-			local t13 = {
+			bottomSectionProps.Size = UDim2.new(1, 0, if smallUI then 1 else 0.5714285714285714, 0)
+			bottomSectionProps.Position = UDim2.new(0, 0, if smallUI then 0.7272727272727273 else 0.5714285714285714, 0)
+			local bottomSectionChildren = {
 				Line0 = createElement("Frame", {
 					BorderSizePixel = 0,
-					BackgroundColor3 = p1.props.color,
+					BackgroundColor3 = self.props.color,
 					Size = UDim2.new(1, 0, 0, 2),
-					[Roact.Ref] = p1.color_frameRef
+					[Roact.Ref] = self.color_frameRef
 				})
 			}
-			t13.Line1 = not smallUI and createElement("Frame", {
+			bottomSectionChildren.Line1 = not smallUI and createElement("Frame", {
 				BorderSizePixel = 0,
-				BackgroundColor3 = p1.props.color,
+				BackgroundColor3 = self.props.color,
 				Size = UDim2.new(1, 0, 0, 2),
 				Position = UDim2.new(0, 0, 0, -6),
-				[Roact.Ref] = p1.color_frame2Ref
+				[Roact.Ref] = self.color_frame2Ref
 			})
-			local t14 = {
+			local healthBarProps = {
 				BackgroundTransparency = 0,
 				BackgroundColor3 = Color3.fromHex("cb342a"),
 				Size = UDim2.new(0.85, 0, 0.1, 0)
 			}
-			t14.Position = UDim2.new(0.5, 0, if smallUI then 0.15 else 0.47, 0)
-			t14.AnchorPoint = Vector2.new(0.5, 0.5)
-			t14.Text = ""
-			t14.TextScaled = true
-			t14.TextColor3 = Color3.new(255/255, 255/255, 255/255)
-			t14.TextXAlignment = Enum.TextXAlignment.Right
-			t13.HealthBar = createElement("TextLabel", t14, {
+			healthBarProps.Position = UDim2.new(0.5, 0, if smallUI then 0.15 else 0.47, 0)
+			healthBarProps.AnchorPoint = Vector2.new(0.5, 0.5)
+			healthBarProps.Text = ""
+			healthBarProps.TextScaled = true
+			healthBarProps.TextColor3 = Color3.new(255/255, 255/255, 255/255)
+			healthBarProps.TextXAlignment = Enum.TextXAlignment.Right
+			bottomSectionChildren.HealthBar = createElement("TextLabel", healthBarProps, {
 				UICorner = createElement("UICorner", {
 					CornerRadius = UDim.new(1, 0)
 				}),
 				Inner = createElement("Frame", {
 					BackgroundTransparency = 1,
-					Size = UDim2.new(var4, 0, 1, 0),
+					Size = UDim2.new(healthRatio, 0, 1, 0),
 					ClipsDescendants = true
 				}, {
 					Value = createElement("Frame", {
 						BackgroundTransparency = 0,
 						BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
-						Size = UDim2.new(math.min(1 / var4, 2), 0, 1, 0)
+						Size = UDim2.new(math.min(1 / healthRatio, 2), 0, 1, 0)
 					}, {
 						UICorner = createElement("UICorner", {
 							CornerRadius = UDim.new(1, 0)
@@ -433,30 +432,30 @@ function color.render(p1)
 					})
 				})
 			})
-			t13.NitroBar = not smallUI and createElement("TextButton", {
+			bottomSectionChildren.NitroBar = not smallUI and createElement("TextButton", {
 				BackgroundTransparency = 0,
 				BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 				Size = UDim2.new(0.85, 0, 0.1, 0),
 				Position = UDim2.new(0.5, 0, 0.62, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Text = "",
-				[Roact.Event.MouseButton1Down] = p1.props.onClickBar
+				[Roact.Event.MouseButton1Down] = self.props.onClickBar
 			}, {
 				UICorner = createElement("UICorner", {
 					CornerRadius = UDim.new(1, 0)
 				}),
 				Inner = createElement("Frame", {
 					BackgroundTransparency = 1,
-					Size = p1.props.barRatio:map(function(p1)
-						return UDim2.new(p1, 0, 1, 0)
+					Size = self.props.barRatio:map(function(barRatio)
+						return UDim2.new(barRatio, 0, 1, 0)
 					end),
 					ClipsDescendants = true
 				}, {
 					Value = createElement("Frame", {
 						BackgroundTransparency = 0,
 						BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
-						Size = p1.props.barRatio:map(function(p1)
-							return UDim2.new(math.min(1 / p1, 2), 0, 1, 0)
+						Size = self.props.barRatio:map(function(barRatio)
+							return UDim2.new(math.min(1 / barRatio, 2), 0, 1, 0)
 						end)
 					}, {
 						UICorner = createElement("UICorner", {
@@ -470,7 +469,7 @@ function color.render(p1)
 					})
 				})
 			})
-			t13.Meter = not smallUI and createElement("Frame", {
+			bottomSectionChildren.Meter = not smallUI and createElement("Frame", {
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				Size = UDim2.new(1, 0, 0.31, 0),
@@ -501,20 +500,20 @@ function color.render(p1)
 						Position = UDim2.new(0.5, 0, 0.6, 0),
 						TextColor3 = Color3.new(255/255, 255/255, 255/255),
 						TextScaled = true,
-						Text = p1.props.distance:map(function(p1)
-							local color2, var3, var4 = string.match(math.floor(p1 + 0.5), "^([^%d]*%d)(%d*)(.-)$")
-							return ("%s mi"):format(color2 .. var3:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. var4)
+						Text = self.props.distance:map(function(distance)
+							local numberPart, decimalPart, suffix = string.match(math.floor(distance + 0.5), "^([^%d]*%d)(%d*)(.-)$")
+							return ("%s mi"):format(numberPart .. decimalPart:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. suffix)
 						end),
 						Font = Enum.Font.LuckiestGuy
 					})
 				})
-			}, t2))
-			t4.Bottom = createElement("Frame", t12, t13)
-			return createElement("Frame", t3, t4)
+			}, accelerationBarElements))
+			speedometerChildren.Bottom = createElement("Frame", bottomSectionProps, bottomSectionChildren)
+			return createElement("Frame", mainFrameProps, speedometerChildren)
 		end
 	end
 end
-function color.willUnmount(p1)
-	p1.maid:Destroy()
+function component.willUnmount(self)
+	self.maid:Destroy()
 end
-return color
+return component

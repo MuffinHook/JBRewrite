@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -10,14 +9,14 @@ local Roact = require(ReplicatedStorage.Roact)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local createElement = Roact.createElement
 local function wipeTags(instance)
-	for i, v in ipairs((CollectionService:GetTags(instance))) do
-		CollectionService:RemoveTag(instance, v)
+	for i, tag in ipairs((CollectionService:GetTags(instance))) do
+		CollectionService:RemoveTag(instance, tag)
 	end
 end
 local function wipeTagsRecursively(instance)
 	wipeTags(instance)
-	for i, v in ipairs(instance:GetDescendants()) do
-		wipeTags(v)
+	for i, descendant in ipairs(instance:GetDescendants()) do
+		wipeTags(descendant)
 	end
 end
 local CharacterCloneManager = {}
@@ -53,8 +52,8 @@ function CharacterCloneManager.new(character)
 			elseif clonedPart:IsA("Humanoid") then
 				clonedPart.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 			end
-			for i, v in ipairs(sourceInstance:GetChildren()) do
-				cloneChild(v, clonedPart)
+			for i, child in ipairs(sourceInstance:GetChildren()) do
+				cloneChild(child, clonedPart)
 			end
 			return clonedPart
 		end
@@ -64,9 +63,9 @@ function CharacterCloneManager.new(character)
 			cloneChild(instance, cloneModel)
 		end
 	end
-	for i, v in ipairs(character:GetChildren()) do
-		if shouldCopy(v) then
-			cloneChild(v, cloneModel)
+	for i, child in ipairs(character:GetChildren()) do
+		if shouldCopy(child) then
+			cloneChild(child, cloneModel)
 		end
 	end
 	self._maid:GiveTask(character.ChildAdded:Connect(handleObj))
@@ -76,8 +75,8 @@ function CharacterCloneManager.new(character)
 	return self
 end
 function CharacterCloneManager.Update(self)
-	for k, v in pairs(self.cloneRef) do
-		k.CFrame = v.CFrame
+	for clonedPart, sourcePart in pairs(self.cloneRef) do
+		clonedPart.CFrame = sourcePart.CFrame
 	end
 end
 function CharacterCloneManager.Destroy(self)
@@ -160,9 +159,9 @@ function CCTVComponent.render(self)
 	return createElement("Frame", frameProps, childrenProps)
 end
 function CCTVComponent._clear(self)
-	for i, v in ipairs(self.viewportRef:getValue():GetChildren()) do
-		if not (v:IsA("UICorner") or v:IsA("Camera")) then
-			v:Destroy()
+	for i, child in ipairs(self.viewportRef:getValue():GetChildren()) do
+		if not (child:IsA("UICorner") or child:IsA("Camera")) then
+			child:Destroy()
 		end
 	end
 end
@@ -176,16 +175,16 @@ function CCTVComponent._redraw(self)
 	local viewportHeight = 2 * distance * math.tan((math.rad(self.props.fieldOfView / 2)))
 	local renderBounds = Vector3.new(viewportHeight * self.props.aspectRatio, viewportHeight, distance)
 	local filterList = { workspace:FindFirstChild("Items") }
-	for i, v in ipairs(Players:GetPlayers()) do
-		if v.Character then
-			table.insert(filterList, v.Character)
+	for i, player in ipairs(Players:GetPlayers()) do
+		if player.Character then
+			table.insert(filterList, player.Character)
 		end
 	end
 	local overlapParams = OverlapParams.new()
 	overlapParams.FilterType = Enum.RaycastFilterType.Blacklist
 	overlapParams.FilterDescendantsInstances = filterList
-	for i, v in ipairs((workspace:GetPartBoundsInBox(cameraCFrame * CFrame.new(0, 0, -renderBounds.z * 0.5), renderBounds, overlapParams))) do
-		local clonedPart = v:Clone()
+	for i, part in ipairs((workspace:GetPartBoundsInBox(cameraCFrame * CFrame.new(0, 0, -renderBounds.z * 0.5), renderBounds, overlapParams))) do
+		local clonedPart = part:Clone()
 		if clonedPart then
 			wipeTags(clonedPart)
 			for i2, descendant in ipairs(clonedPart:GetDescendants()) do

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -7,7 +5,7 @@ local Joint = require(ReplicatedStorage.Std.Joint)
 local TrainSystemUtils = require(script.Parent.TrainSystemUtils)
 local function ApplyVelocityToDescendants(part, velocity, rotationalVelocity)
 	local children = part:GetChildren()
-	for v4, child in next, children do
+	for _, child in next, children do
 		if child:IsA("BasePart") then
 			child.Velocity = velocity
 			child.RotVelocity = rotationalVelocity
@@ -32,11 +30,11 @@ return {
 		Model.BackBogey.Anchored = false
 		Base.Anchored = true
 		local Magnitude = (Model.FrontBogeyRoot.Position - Base.CFrame * Vector3.new(0, 0, -Length * 0.5)).Magnitude
-		local Magnitude_2 = (Model.BackBogeyRoot.Position - Base.CFrame * Vector3.new(0, 0, Length * 0.5)).Magnitude
+		local backBogeyDistance = (Model.BackBogeyRoot.Position - Base.CFrame * Vector3.new(0, 0, Length * 0.5)).Magnitude
 		carConfig.BogeyMotorFront = frontBogeyMotor
 		carConfig.BogeyMotorBack = backBogeyMotor
 		carConfig.BogeyOffsetFront = Magnitude
-		carConfig.BogeyOffsetBack = Magnitude_2
+		carConfig.BogeyOffsetBack = backBogeyDistance
 		local Skeleton = Model:FindFirstChild("Skeleton")
 		if Skeleton then
 			carConfig.DoorOpenFuncs = {}

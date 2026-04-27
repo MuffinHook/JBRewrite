@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ContentProvider = game:GetService("ContentProvider")
@@ -10,36 +9,36 @@ local TypeWrite = require(ReplicatedStorage.Game.TypeWrite)
 require(ReplicatedStorage.Game.GameUtil)
 require(ReplicatedStorage.Resource.Settings)
 local RobberyConsts = require(ReplicatedStorage.Robbery.RobberyConsts)
-local v1 = 0
+local notificationCounter = 0
 local CurrentCamera = workspace.CurrentCamera
-local v2 = Vector2.new(1539, 804)
-local v3 = TweenInfo.new(0.3, Enum.EasingStyle.Linear)
-local function getBox(p1)
-	return math.min(p1.X, p1.Y)
+local referenceScreenSize = Vector2.new(1539, 804)
+local tweenAnimation = TweenInfo.new(0.3, Enum.EasingStyle.Linear)
+local function getBox(vector)
+	return math.min(vector.X, vector.Y)
 end
 local function getScreenRatio()
 	local ViewportSize = CurrentCamera.ViewportSize
-	local v1 = math.min(ViewportSize.X, ViewportSize.Y)
-	local v22 = v2
-	return v1 / math.min(v22.X, v22.Y)
+	local minViewportSize = math.min(ViewportSize.X, ViewportSize.Y)
+	local referenceSize = referenceScreenSize
+	return minViewportSize / math.min(referenceSize.X, referenceSize.Y)
 end
-local function ScaleNotification(p1)
-	p1.Message.TextSize = math.floor(24 * (CurrentCamera.ViewportSize.Y / v2.Y))
+local function ScaleNotification(notificationFrame)
+	notificationFrame.Message.TextSize = math.floor(24 * (CurrentCamera.ViewportSize.Y / referenceScreenSize.Y))
 	local ViewportSize = CurrentCamera.ViewportSize
-	local v22 = math.min(ViewportSize.X, ViewportSize.Y)
-	local v3 = v2
-	p1.UIStroke.Thickness = v22 / math.min(v3.X, v3.Y) * 3
+	local minViewportSize = math.min(ViewportSize.X, ViewportSize.Y)
+	local referenceSize = referenceScreenSize
+	notificationFrame.UIStroke.Thickness = minViewportSize / math.min(referenceSize.X, referenceSize.Y) * 3
 end
-local t = {}
-local t2 = {}
+local notificationQueue = {}
+local activeNotifications = {}
 local function ProcessQueue()
-	if #t > 0 then
-		local v1 = table.remove(t, 1)
-		table.insert(t2, v1)
-		v1:Hook()
+	if #notificationQueue > 0 then
+		local queuedNotification = table.remove(notificationQueue, 1)
+		table.insert(activeNotifications, queuedNotification)
+		queuedNotification:Hook()
 	end
 end
-local t3 = {
+local notificationStyles = {
 	Default = {
 		Color = Color3.fromRGB(249, 210, 49),
 		Sound = 131184732929614
@@ -58,217 +57,217 @@ local t3 = {
 		Sound = 2671105631
 	}
 }
-local t4 = {}
-t4.__index = t4
-function t4.Init(p1)
-	local em = p1.em
+local Notification = {}
+Notification.__index = Notification
+function Notification.Init(config)
+	local em = config.em
 	local NotificationGui = ReplicatedStorage.StarterGui:FindFirstChild("NotificationGui")
 	NotificationGui.Parent = LocalPlayer.PlayerGui
 	NotificationGui.DisplayOrder = 9
-	t4.Gui = NotificationGui
-	t4.Templates = NotificationGui:WaitForChild("Templates")
+	Notification.Gui = NotificationGui
+	Notification.Templates = NotificationGui:WaitForChild("Templates")
 	CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-		for v1, v22 in t2 do
-			local Frame = v22.Frame
-			Frame.Message.TextSize = math.floor(24 * (CurrentCamera.ViewportSize.Y / v2.Y))
+		for index, notification in activeNotifications do
+			local Frame = notification.Frame
+			Frame.Message.TextSize = math.floor(24 * (CurrentCamera.ViewportSize.Y / referenceScreenSize.Y))
 			local ViewportSize = CurrentCamera.ViewportSize
-			local v4 = math.min(ViewportSize.X, ViewportSize.Y)
-			local v5 = v2
-			Frame.UIStroke.Thickness = v4 / math.min(v5.X, v5.Y) * 3
+			local minViewportSize = math.min(ViewportSize.X, ViewportSize.Y)
+			local referenceSize = referenceScreenSize
+			Frame.UIStroke.Thickness = minViewportSize / math.min(referenceSize.X, referenceSize.Y) * 3
 		end
 	end)
 end
-local function GetTextLines(p1)
+local function GetTextLines(text)
 	local GetTextBoundsParams = Instance.new("GetTextBoundsParams")
-	GetTextBoundsParams.Text = p1
+	GetTextBoundsParams.Text = text
 	GetTextBoundsParams.Font = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Bold, Enum.FontStyle.Italic)
 	GetTextBoundsParams.Size = 24
 	GetTextBoundsParams.Width = 312
 	return math.ceil(TextService:GetTextBoundsAsync(GetTextBoundsParams).Y / 24)
 end
-function t4.notifyBoss(p1, p2)
-	local Gui = t4.Gui
-	local v1 = t4.Templates.BossAlert:Clone()
-	local v2 = p1[1] and RobberyConsts.PRETTY_NAME[p1[1]] or ""
-	if p2 then
-		v1.TitleMessage.Text = "CRIME BOSS ALERT"
-		v1.OpenMessage.Text = "The " .. v2 .. " is about to open"
+function Notification.notifyBoss(robberyTypes, isOpening)
+	local Gui = Notification.Gui
+	local notificationFrame = Notification.Templates.BossAlert:Clone()
+	local robberyName = robberyTypes[1] and RobberyConsts.PRETTY_NAME[robberyTypes[1]] or ""
+	if isOpening then
+		notificationFrame.TitleMessage.Text = "CRIME BOSS ALERT"
+		notificationFrame.OpenMessage.Text = "The " .. robberyName .. " is about to open"
 	else
-		v1.TitleMessage.Text = "ROBBERY ALERT"
-		v1.OpenMessage.Text = "The " .. v2 .. " is open"
+		notificationFrame.TitleMessage.Text = "ROBBERY ALERT"
+		notificationFrame.OpenMessage.Text = "The " .. robberyName .. " is open"
 	end
-	for v32, v4 in p1 do
-		local v5 = RobberyConsts.DATA_ROBBERY[v4]
-		if v5 then
-			local v6 = t4.Templates.RobberyFrame:Clone()
-			v6.LayoutOrder = v32
-			v6.ImageLabel.RobberyIcon.Image = "rbxassetid://" .. v5.imageId
-			v6.Visible = true
-			v6.Parent = v1.ListFrame
+	for robberyIndex, robberyType in robberyTypes do
+		local robberyData = RobberyConsts.DATA_ROBBERY[robberyType]
+		if robberyData then
+			local robberyFrame = Notification.Templates.RobberyFrame:Clone()
+			robberyFrame.LayoutOrder = robberyIndex
+			robberyFrame.ImageLabel.RobberyIcon.Image = "rbxassetid://" .. robberyData.imageId
+			robberyFrame.Visible = true
+			robberyFrame.Parent = notificationFrame.ListFrame
 		end
 	end
-	ContentProvider:PreloadAsync(v1:GetDescendants())
-	v1.LayoutOrder = 10
-	v1.Parent = Gui.Container
+	ContentProvider:PreloadAsync(notificationFrame:GetDescendants())
+	notificationFrame.LayoutOrder = 10
+	notificationFrame.Parent = Gui.Container
 	if Gui.Enabled then
 		Audio.ObjectLocal(Gui, 1837831357, {
 			Volume = 0.15,
 			YieldForLoaded = true
 		})
 	end
-	for v7, v8 in v1:GetDescendants() do
-		if v8:IsA("TextLabel") then
-			v8.TextTransparency = 1
-			TweenService:Create(v8, v3, {
+	for descendantIndex, descendant in notificationFrame:GetDescendants() do
+		if descendant:IsA("TextLabel") then
+			descendant.TextTransparency = 1
+			TweenService:Create(descendant, tweenAnimation, {
 				TextTransparency = 0
 			}):Play()
-		elseif v8:IsA("ImageLabel") then
-			v8.ImageTransparency = 1
-			TweenService:Create(v8, v3, {
+		elseif descendant:IsA("ImageLabel") then
+			descendant.ImageTransparency = 1
+			TweenService:Create(descendant, tweenAnimation, {
 				ImageTransparency = 0
 			}):Play()
 		end
 	end
-	v1.Visible = true
+	notificationFrame.Visible = true
 	task.delay(3.5, function()
-		for v12, v2 in v1:GetDescendants() do
-			if v2:IsA("TextLabel") then
-				TweenService:Create(v2, v3, {
+		for descendantIndex, descendant in notificationFrame:GetDescendants() do
+			if descendant:IsA("TextLabel") then
+				TweenService:Create(descendant, tweenAnimation, {
 					TextTransparency = 1
 				}):Play()
-			elseif v2:IsA("ImageLabel") then
-				TweenService:Create(v2, v3, {
+			elseif descendant:IsA("ImageLabel") then
+				TweenService:Create(descendant, tweenAnimation, {
 					ImageTransparency = 1
 				}):Play()
 			end
 		end
-		task.wait(v3.Time)
-		v1:Destroy()
+		task.wait(tweenAnimation.Time)
+		notificationFrame:Destroy()
 	end)
 end
-local function getNumOfNotificationsWith(p1)
+local function getNumOfNotificationsWith(text)
 	local count = 0
-	for v1, v2 in t2 do
-		if v2.Text == p1 then
+	for index, notification in activeNotifications do
+		if notification.Text == text then
 			count = count + 1
 		end
 	end
-	for v3, v4 in t do
-		if v4.Text == p1 then
+	for queueIndex, queuedNotification in notificationQueue do
+		if queuedNotification.Text == text then
 			count = count + 1
 		end
 	end
 	return count
 end
-function t4.new(p1)
-	assert(p1 ~= nil)
-	assert(p1.Text ~= nil)
-	if p1.Duration == nil then
-		p1.Duration = math.min(5, 4 * utf8.len(p1.Text) / 50)
+function Notification.new(config)
+	assert(config ~= nil)
+	assert(config.Text ~= nil)
+	if config.Duration == nil then
+		config.Duration = math.min(5, 4 * utf8.len(config.Text) / 50)
 	end
-	if p1.Style == nil then
-		p1.Style = "Default"
+	if config.Style == nil then
+		config.Style = "Default"
 	end
-	if not t3[p1.Style] then
-		warn("INVALID NOTIFICATION STYLE FOR STRING:", p1.Text)
-		p1.Style = "Default"
+	if not notificationStyles[config.Style] then
+		warn("INVALID NOTIFICATION STYLE FOR STRING:", config.Text)
+		config.Style = "Default"
 	end
-	if p1.Style ~= "Default" or not (getNumOfNotificationsWith(p1.Text) >= 3) then
-		assert(p1.Duration ~= nil)
-		assert(p1.Style ~= nil)
-		local t5 = {}
-		setmetatable(t5, t4)
-		t5.Maid = Maid.new()
-		t5.Text = p1.Text
-		t5.Duration = p1.Duration
-		t5.Style = p1.Style
-		table.insert(t, t5)
-		if #t2 < 3 and #t > 0 then
-			local v5 = table.remove(t, 1)
-			table.insert(t2, v5)
-			v5:Hook()
+	if config.Style ~= "Default" or not (getNumOfNotificationsWith(config.Text) >= 3) then
+		assert(config.Duration ~= nil)
+		assert(config.Style ~= nil)
+		local newNotification = {}
+		setmetatable(newNotification, Notification)
+		newNotification.Maid = Maid.new()
+		newNotification.Text = config.Text
+		newNotification.Duration = config.Duration
+		newNotification.Style = config.Style
+		table.insert(notificationQueue, newNotification)
+		if #activeNotifications < 3 and #notificationQueue > 0 then
+			local queuedNotification = table.remove(notificationQueue, 1)
+			table.insert(activeNotifications, queuedNotification)
+			queuedNotification:Hook()
 		end
-		return t5
+		return newNotification
 	end
 end
-function t4.Hook(p1)
-	v1 = v1 + 1
-	local Gui = t4.Gui
-	local v12 = t4.Templates.Notification:Clone()
-	local v22 = t3[p1.Style]
-	p1.Frame = v12
-	v12.Visible = true
-	v12.UIStroke.Color = v22.Color
-	v12.LayoutOrder = -v1
-	v12.Message.Text = p1.Text
-	v12.Message.MaxVisibleGraphemes = 0
-	local Size = v12.Size
-	local v3 = GetTextLines(p1.Text)
-	if v3 > 1 then
-		Size = UDim2.fromScale(v12.Size.X.Scale, v12.Size.Y.Scale * (1 + 0.5 * (v3 - 1)))
+function Notification.Hook(notification)
+	notificationCounter = notificationCounter + 1
+	local Gui = Notification.Gui
+	local notificationFrame = Notification.Templates.Notification:Clone()
+	local styleConfig = notificationStyles[notification.Style]
+	notification.Frame = notificationFrame
+	notificationFrame.Visible = true
+	notificationFrame.UIStroke.Color = styleConfig.Color
+	notificationFrame.LayoutOrder = -notificationCounter
+	notificationFrame.Message.Text = notification.Text
+	notificationFrame.Message.MaxVisibleGraphemes = 0
+	local Size = notificationFrame.Size
+	local lineCount = GetTextLines(notification.Text)
+	if lineCount > 1 then
+		Size = UDim2.fromScale(notificationFrame.Size.X.Scale, notificationFrame.Size.Y.Scale * (1 + 0.5 * (lineCount - 1)))
 	end
-	v12.Message.TextSize = math.floor(24 * (CurrentCamera.ViewportSize.Y / v2.Y))
+	notificationFrame.Message.TextSize = math.floor(24 * (CurrentCamera.ViewportSize.Y / referenceScreenSize.Y))
 	local ViewportSize = CurrentCamera.ViewportSize
-	local v5 = math.min(ViewportSize.X, ViewportSize.Y)
-	local v6 = v2
-	v12.UIStroke.Thickness = v5 / math.min(v6.X, v6.Y) * 3
-	v12.Size = UDim2.fromScale(v12.Size.X.Scale, 0)
-	TweenService:Create(v12, TweenInfo.new(0.2, 0), {
+	local minViewportSize = math.min(ViewportSize.X, ViewportSize.Y)
+	local referenceSize = referenceScreenSize
+	notificationFrame.UIStroke.Thickness = minViewportSize / math.min(referenceSize.X, referenceSize.Y) * 3
+	notificationFrame.Size = UDim2.fromScale(notificationFrame.Size.X.Scale, 0)
+	TweenService:Create(notificationFrame, TweenInfo.new(0.2, 0), {
 		Size = Size
 	}):Play()
 	local Sound = Instance.new("Sound")
 	Sound.SoundId = ("rbxassetid://%d"):format(215658476)
 	Sound.Volume = 0.3
-	Sound.Parent = v12
-	p1.Maid:GiveTask(Sound)
-	v12.Parent = Gui.Container
-	local v7 = 1
-	p1.Maid:GiveTask(TypeWrite(p1.Text, function(p12)
-		if p1.Maid == nil then
+	Sound.Parent = notificationFrame
+	notification.Maid:GiveTask(Sound)
+	notificationFrame.Parent = Gui.Container
+	local characterIndex = 1
+	notification.Maid:GiveTask(TypeWrite(notification.Text, function(typedText)
+		if notification.Maid == nil then
 			return false
 		end
-		if v7 == 1 and Gui.Enabled then
+		if characterIndex == 1 and Gui.Enabled then
 			Sound:Play()
 		end
-		v7 = v7 % 3 + 1
-		v12.Message.MaxVisibleGraphemes = #p12
+		characterIndex = characterIndex % 3 + 1
+		notificationFrame.Message.MaxVisibleGraphemes = #typedText
 	end, 50))
 	if Gui.Enabled then
-		Audio.ObjectLocal(Gui, v22.Sound, {
+		Audio.ObjectLocal(Gui, styleConfig.Sound, {
 			Volume = 0.25,
-			TimePosition = v22.TimePosition or 0
+			TimePosition = styleConfig.TimePosition or 0
 		})
 	end
-	task.delay(p1.Duration, function()
-		p1:Destroy()
+	task.delay(notification.Duration, function()
+		notification:Destroy()
 	end)
 end
-function t4.Destroy(p1)
-	if p1.Maid ~= nil then
-		local Gui = t4.Gui
-		TweenService:Create(p1.Frame, v3, {
+function Notification.Destroy(notification)
+	if notification.Maid ~= nil then
+		local Gui = Notification.Gui
+		TweenService:Create(notification.Frame, tweenAnimation, {
 			BackgroundTransparency = 1
 		}):Play()
-		TweenService:Create(p1.Frame.Message, v3, {
+		TweenService:Create(notification.Frame.Message, tweenAnimation, {
 			TextTransparency = 1
 		}):Play()
-		TweenService:Create(p1.Frame.UIStroke, v3, {
+		TweenService:Create(notification.Frame.UIStroke, tweenAnimation, {
 			Transparency = 1
 		}):Play()
-		task.delay(v3.Time, function()
-			p1.Frame:Destroy()
-			local v1 = table.find(t2, p1)
-			if v1 then
-				table.remove(t2, v1)
+		task.delay(tweenAnimation.Time, function()
+			notification.Frame:Destroy()
+			local foundIndex = table.find(activeNotifications, notification)
+			if foundIndex then
+				table.remove(activeNotifications, foundIndex)
 			end
-			p1.Maid:Destroy()
-			p1.Maid = nil
-			if #t > 0 then
-				local v2 = table.remove(t, 1)
-				table.insert(t2, v2)
-				v2:Hook()
+			notification.Maid:Destroy()
+			notification.Maid = nil
+			if #notificationQueue > 0 then
+				local queuedNotification = table.remove(notificationQueue, 1)
+				table.insert(activeNotifications, queuedNotification)
+				queuedNotification:Hook()
 			end
 		end)
 	end
 end
-return t4
+return Notification

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
@@ -11,23 +10,23 @@ local UserInputService = game:GetService("UserInputService")
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local Raycast = require(ReplicatedStorage.Std.Raycast)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
-local v1 = Random.new()
-local v2 = RaycastParams.new()
-v2.RespectCanCollide = true
-local function customCollideFunc(p1)
-	if p1:GetAttribute("InvisibleToBullets") == true then
+local randomGenerator = Random.new()
+local raycastParams = RaycastParams.new()
+raycastParams.RespectCanCollide = true
+local function customCollideFunc(part)
+	if part:GetAttribute("InvisibleToBullets") == true then
 		return false
 	else
-		return p1.CanCollide
+		return part.CanCollide
 	end
 end
-local t = {
+local Item = {
 	__ClassName = "Item"
 }
-t.__index = t
-function t.new(p1, p2)
-	assert(p1)
-	local Character = p1.Character
+Item.__index = Item
+function Item.new(player, config)
+	assert(player)
+	local Character = player.Character
 	assert(Character)
 	local Humanoid = Character:FindFirstChild("Humanoid")
 	assert(Humanoid)
@@ -42,50 +41,50 @@ function t.new(p1, p2)
 	assert(Waist)
 	local Root = Character:FindFirstChild("LowerTorso"):FindFirstChild("Root")
 	assert(Root)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.Maid = Maid.new()
-	t2.maid = t2.Maid
-	t2.Player = p1
-	t2.Character = Character
-	t2.Humanoid = Humanoid
-	t2.RootPart = PrimaryPart
-	t2.UpperTorso = UpperTorso
-	t2.JointNeck = Neck
-	t2.JointWaist = Waist
-	t2.JointRoot = Root
-	t2.Locked = false
-	t2._customCollideFunc = customCollideFunc
-	t2.Local = p1 == LocalPlayer
-	if t2.Local then
-		t2.Maid:GiveTask(task.defer(function()
-			ItemCamera.OnItemEquipped(p2 ~= nil, t2.DoNotHide)
+	local itemInstance = {}
+	setmetatable(itemInstance, Item)
+	itemInstance.Maid = Maid.new()
+	itemInstance.maid = itemInstance.Maid
+	itemInstance.Player = player
+	itemInstance.Character = Character
+	itemInstance.Humanoid = Humanoid
+	itemInstance.RootPart = PrimaryPart
+	itemInstance.UpperTorso = UpperTorso
+	itemInstance.JointNeck = Neck
+	itemInstance.JointWaist = Waist
+	itemInstance.JointRoot = Root
+	itemInstance.Locked = false
+	itemInstance._customCollideFunc = customCollideFunc
+	itemInstance.Local = player == LocalPlayer
+	if itemInstance.Local then
+		itemInstance.Maid:GiveTask(task.defer(function()
+			ItemCamera.OnItemEquipped(config ~= nil, itemInstance.DoNotHide)
 		end))
-		t2.Maid:GiveTask(function()
+		itemInstance.Maid:GiveTask(function()
 			ItemCamera.OnItemUnequipped()
 		end)
 	end
-	if t2.Local then
-		local v4 = "GunCamera" .. tostring((v1:NextInteger(1, 1000000000)))
-		RunService:BindToRenderStep(v4, Enum.RenderPriority.Camera.Value + 1, function()
-			t2:UpdateCamera()
+	if itemInstance.Local then
+		local cameraRenderBindingName = "GunCamera" .. tostring((randomGenerator:NextInteger(1, 1000000000)))
+		RunService:BindToRenderStep(cameraRenderBindingName, Enum.RenderPriority.Camera.Value + 1, function()
+			itemInstance:UpdateCamera()
 		end)
-		t2.Maid:GiveTask(function()
-			RunService:UnbindFromRenderStep(v4)
+		itemInstance.Maid:GiveTask(function()
+			RunService:UnbindFromRenderStep(cameraRenderBindingName)
 		end)
 	end
-	return t2
+	return itemInstance
 end
-function t.TransformLocalMousePosition(p1, p2)
-	return p2
+function Item.TransformLocalMousePosition(player, position)
+	return position
 end
-function t.ProjectMouseLocationToWorld(p1, p2)
-	local v1 = CurrentCamera:ViewportPointToRay(p2.x, p2.y)
-	v2.FilterDescendantsInstances = p1.IgnoreList
-	local v22 = Raycast.collidable(v1.Origin, v1.Direction, 999, v2, customCollideFunc)
-	return p1:TransformLocalMousePosition(if v22 then v22.Position else v1.Origin + v1.Direction * 999)
+function Item.ProjectMouseLocationToWorld(player, mousePos)
+	local viewportRay = CurrentCamera:ViewportPointToRay(mousePos.x, mousePos.y)
+	raycastParams.FilterDescendantsInstances = player.IgnoreList
+	local raycastHit = Raycast.collidable(viewportRay.Origin, viewportRay.Direction, 999, raycastParams, customCollideFunc)
+	return player:TransformLocalMousePosition(if raycastHit then raycastHit.Position else viewportRay.Origin + viewportRay.Direction * 999)
 end
-function t.GetMouseLocation(p1)
+function Item.GetMouseLocation(player)
 	if InputUtils.isTouch() then
 		local ViewportSize = workspace.CurrentCamera.ViewportSize
 		return Vector3.new(ViewportSize.X * 0.5, ViewportSize.Y * 0.5, 0)
@@ -96,23 +95,23 @@ function t.GetMouseLocation(p1)
 		return UserInputService:GetMouseLocation()
 	end
 end
-local t2 = {}
-t2.__index = t2
-function t2.new()
-	local t = {}
-	setmetatable(t, t2)
-	t.maid = Maid.new()
-	local function createProgressBarGradient(p1, p2)
+local ProgressBar = {}
+ProgressBar.__index = ProgressBar
+function ProgressBar.new()
+	local progressBarInstance = {}
+	setmetatable(progressBarInstance, ProgressBar)
+	progressBarInstance.maid = Maid.new()
+	local function createProgressBarGradient(parentContainer, isLeftSide)
 		local Frame = Instance.new("Frame")
 		Frame.Size = UDim2.fromScale(0.5, 1)
-		Frame.Position = UDim2.fromScale(if p2 then 0 else 0.5, 0)
+		Frame.Position = UDim2.fromScale(if isLeftSide then 0 else 0.5, 0)
 		Frame.BackgroundTransparency = 1
 		Frame.ClipsDescendants = true
-		Frame.Parent = p1
+		Frame.Parent = parentContainer
 		local ImageLabel = Instance.new("ImageLabel")
 		ImageLabel.BackgroundTransparency = 1
 		ImageLabel.Size = UDim2.fromScale(2, 1)
-		ImageLabel.Position = UDim2.fromScale(if p2 then 0 else -1, 0)
+		ImageLabel.Position = UDim2.fromScale(if isLeftSide then 0 else -1, 0)
 		ImageLabel.Image = "rbxasset://textures/ui/Controls/RadialFill.png"
 		ImageLabel.Parent = Frame
 		local UIGradient = Instance.new("UIGradient")
@@ -122,7 +121,7 @@ function t2.new()
 			NumberSequenceKeypoint.new(0.5, 1),
 			NumberSequenceKeypoint.new(1, 1)
 		})
-		UIGradient.Rotation = if p2 then 180 else 0
+		UIGradient.Rotation = if isLeftSide then 180 else 0
 		UIGradient.Parent = ImageLabel
 		return UIGradient
 	end
@@ -133,92 +132,92 @@ function t2.new()
 	CircularProgressBar.Position = UDim2.fromScale(0.5, 0.5)
 	CircularProgressBar.BackgroundTransparency = 1
 	CircularProgressBar.Visible = true
-	local v2 = createProgressBarGradient(CircularProgressBar, true)
-	local v3 = createProgressBarGradient(CircularProgressBar, false)
+	local leftGradient = createProgressBarGradient(CircularProgressBar, true)
+	local rightGradient = createProgressBarGradient(CircularProgressBar, false)
 	local Progress = Instance.new("NumberValue")
 	Progress.Name = "Progress"
 	Progress.Parent = CircularProgressBar
-	t.progressBar = CircularProgressBar
-	t.gradient1 = v2
-	t.gradient2 = v3
-	return t
+	progressBarInstance.progressBar = CircularProgressBar
+	progressBarInstance.gradient1 = leftGradient
+	progressBarInstance.gradient2 = rightGradient
+	return progressBarInstance
 end
-function t2.UpdatePosition(p1, p2)
-	p1.progressBar.Position = UDim2.new(0, p2.X, 0, p2.Y)
+function ProgressBar.UpdatePosition(progressBarInstance, mousePos)
+	progressBarInstance.progressBar.Position = UDim2.new(0, mousePos.X, 0, mousePos.Y)
 end
-function t2.UpdateProgress(p1, p2)
-	local v1 = math.clamp(p2 * 360, 0, 360)
-	p1.gradient1.Rotation = math.clamp(v1, 180, 360)
-	p1.gradient2.Rotation = math.clamp(v1, 0, 180)
+function ProgressBar.UpdateProgress(progressBarInstance, progress)
+	local rotationDegrees = math.clamp(progress * 360, 0, 360)
+	progressBarInstance.gradient1.Rotation = math.clamp(rotationDegrees, 180, 360)
+	progressBarInstance.gradient2.Rotation = math.clamp(rotationDegrees, 0, 180)
 end
-function t2.Destroy(p1)
-	p1.maid:Destroy()
-	setmetatable(p1, nil)
+function ProgressBar.Destroy(progressBarInstance)
+	progressBarInstance.maid:Destroy()
+	setmetatable(progressBarInstance, nil)
 end
-function t.StartReloadProgressCircle(p1, p2, p3)
+function Item.StartReloadProgressCircle(player, reloadDuration, startTime)
 	local GunReload = Instance.new("ScreenGui")
 	GunReload.Name = "GunReload"
 	GunReload.Enabled = false
 	GunReload.Parent = Players.LocalPlayer.PlayerGui
-	local v1 = t2.new()
+	local progressBarInstance = ProgressBar.new()
 	GunReload.IgnoreGuiInset = true
-	local v2 = Maid.new()
-	v2.gunReloadScreenGui = GunReload
-	v2.circularProgressBar = v1
-	local v4 = p3 or os.clock()
-	if not p2 then
-		p2 = p1.Config.ReloadTime
+	local guiMaid = Maid.new()
+	guiMaid.gunReloadScreenGui = GunReload
+	guiMaid.circularProgressBar = progressBarInstance
+	local reloadStartTime = startTime or os.clock()
+	if not reloadDuration then
+		reloadDuration = player.Config.ReloadTime
 	end
-	v2.progressBarUpdater = RunService.Heartbeat:Connect(function()
-		local v12 = (os.clock() - v4) / p2
-		if v12 >= 1 then
-			p1.Maid.guiMaid = nil
+	guiMaid.progressBarUpdater = RunService.Heartbeat:Connect(function()
+		local progressRatio = (os.clock() - reloadStartTime) / reloadDuration
+		if progressRatio >= 1 then
+			player.Maid.guiMaid = nil
 		else
-			v1:UpdateProgress(v12)
-			v1:UpdatePosition(p1:GetMouseLocation())
+			progressBarInstance:UpdateProgress(progressRatio)
+			progressBarInstance:UpdatePosition(player:GetMouseLocation())
 		end
 	end)
-	p1.Maid.guiMaid = v2
-	v1.progressBar.Parent = GunReload
+	player.Maid.guiMaid = guiMaid
+	progressBarInstance.progressBar.Parent = GunReload
 	GunReload.Enabled = true
 end
-function t.DefaultDisableCamLock(p1)
-	if p1.Local then
+function Item.DefaultDisableCamLock(player)
+	if player.Local then
 		local Locked = ItemCamera.Locked
 		if ItemCamera.Locked == true then
 			ItemCamera.Locked = false
-			p1:UpdateCameraLocked()
+			player:UpdateCameraLocked()
 		end
 		if Locked then
-			p1.Maid:GiveTask(function()
+			player.Maid:GiveTask(function()
 				ItemCamera.Locked = Locked
 			end)
 		end
 	end
 end
-function t.UpdateCamera(p1)
+function Item.UpdateCamera(player)
 	ItemCamera.Update()
 end
-function t.UpdateCameraLocked(p1)
+function Item.UpdateCameraLocked(player)
 	if ItemCamera.Locked then
-		ItemCamera.OnItemEquipped(true, p1.DoNotHide)
+		ItemCamera.OnItemEquipped(true, player.DoNotHide)
 	else
 		ItemCamera.OnItemUnequipped()
 	end
 end
-function t.InputBegan(p1, p2, p3)
-	if not p3 and if p2.UserInputType == Enum.UserInputType.Keyboard and p2.KeyCode == Enum.KeyCode.V then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonB else false then
+function Item.InputBegan(player, inputObject, gameProcessed)
+	if not gameProcessed and if inputObject.UserInputType == Enum.UserInputType.Keyboard and inputObject.KeyCode == Enum.KeyCode.V then true elseif inputObject.UserInputType == Enum.UserInputType.Gamepad1 then inputObject.KeyCode == Enum.KeyCode.ButtonB else false then
 		ItemCamera.setLocked(not ItemCamera.Locked)
 		GameSettingsService.setValue(ItemCamera.UISetting, ItemCamera.Locked)
 	end
 end
-function t.InputEnded(p1, ...)
+function Item.InputEnded(player, ...)
 	error("TODO: Implement")
 end
-function t.Destroy(p1)
-	p1.Maid:Destroy()
-	p1.Maid = nil
-	p1.Destroyed = true
-	setmetatable(p1, nil)
+function Item.Destroy(player)
+	player.Maid:Destroy()
+	player.Maid = nil
+	player.Destroyed = true
+	setmetatable(player, nil)
 end
-return t
+return Item

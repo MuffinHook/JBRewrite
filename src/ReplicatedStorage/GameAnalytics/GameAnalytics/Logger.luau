@@ -1,38 +1,37 @@
--- Reviewed by Claude
 return {
 	_infoLogEnabled = false,
 	_infoLogAdvancedEnabled = false,
 	_debugEnabled = game:GetService("RunService"):IsStudio(),
-	setDebugLog = function(p1, p2)
-		p1._debugEnabled = p2
+	setDebugLog = function(logger, isEnabled)
+		logger._debugEnabled = isEnabled
 	end,
-	setInfoLog = function(p1, p2)
-		p1._infoLogEnabled = p2
+	setInfoLog = function(logger, isEnabled)
+		logger._infoLogEnabled = isEnabled
 	end,
-	setVerboseLog = function(p1, p2)
-		p1._infoLogAdvancedEnabled = p2
+	setVerboseLog = function(logger, isEnabled)
+		logger._infoLogAdvancedEnabled = isEnabled
 	end,
-	i = function(p1, p2)
-		if p1._infoLogEnabled then
-			print("Info/GameAnalytics: " .. p2)
+	info = function(logger, message)
+		if logger._infoLogEnabled then
+			print("Info/GameAnalytics: " .. message)
 		end
 	end,
-	w = function(p1, p2)
-		warn("Warning/GameAnalytics: " .. p2)
+	warnLog = function(logger, message)
+		warn("Warning/GameAnalytics: " .. message)
 	end,
-	e = function(p1, p2)
+	errorLog = function(logger, message)
 		task.spawn(function()
-			error("Error/GameAnalytics: " .. p2, 0)
+			error("Error/GameAnalytics: " .. message, 0)
 		end)
 	end,
-	d = function(p1, p2)
-		if p1._debugEnabled then
-			print("Debug/GameAnalytics: " .. p2)
+	debug = function(logger, message)
+		if logger._debugEnabled then
+			print("Debug/GameAnalytics: " .. message)
 		end
 	end,
-	ii = function(p1, p2)
-		if p1._infoLogAdvancedEnabled then
-			print("Verbose/GameAnalytics: " .. p2)
+	verboseInfo = function(logger, message)
+		if logger._infoLogAdvancedEnabled then
+			print("Verbose/GameAnalytics: " .. message)
 		end
 	end
 }

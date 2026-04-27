@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 return function(reducersMap)
 	return function(state, action)
  if state == nil then

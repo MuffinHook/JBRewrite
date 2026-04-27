@@ -1,110 +1,109 @@
--- Reviewed by Claude
-local t = {}
+local module = {}
 local cos = math.cos
 local sin = math.sin
-local delta = tick
-local vector2 = Vector3.new
-t.Spring = {}
-t.NumberSpring = {}
-t.VectorSpring = {}
-local function New(p1)
-	local var12 = delta()
-	local vector2 = p1 or 0
-	local var3 = p1 or 0
-	local var4 = p1 and 0 * p1 or 0
-	local var5 = 1
-	local var6 = 1
-	local var7 = nil
-	local function PositionVelocity(p1)
-		local delta = p1 - var12
-		local var22 = var3 - vector2
-		if var6 == 0 then
-			return var3, 0
-		elseif var5 < 1 then
-			local var32 = (1 - var5 * var5) ^ 0.5
-			local var42 = (var4 / var6 + var5 * var22) / var32
-			local var52 = cos(var32 * var6 * delta)
-			local var62 = sin(var32 * var6 * delta)
-			local var7 = 2.718281828459045 ^ (var5 * var6 * delta)
-			return vector2 + (var22 * var52 + var42 * var62) / var7, var6 * ((var32 * var42 - var5 * var22) * var52 - (var32 * var22 + var5 * var42) * var62) / var7
+local tick = tick
+local vector3 = Vector3.new
+module.Spring = {}
+module.NumberSpring = {}
+module.VectorSpring = {}
+local function New(targetValue)
+	local lastUpdateTime = tick()
+	local targetPosition = targetValue or 0
+	local currentPosition = targetValue or 0
+	local currentVelocity = targetValue and 0 * targetValue or 0
+	local damper = 1
+	local speed = 1
+	local springObject = nil
+	local function PositionVelocity(currentTime)
+		local elapsedTime = currentTime - lastUpdateTime
+		local offsetFromTarget = currentPosition - targetPosition
+		if speed == 0 then
+			return currentPosition, 0
+		elseif damper < 1 then
+			local dampingRatio = (1 - damper * damper) ^ 0.5
+			local scaledAcceleration = (currentVelocity / speed + damper * offsetFromTarget) / dampingRatio
+			local cosineValue = cos(dampingRatio * speed * elapsedTime)
+			local sineValue = sin(dampingRatio * speed * elapsedTime)
+			local exponentialDecay = 2.718281828459045 ^ (damper * speed * elapsedTime)
+			return targetPosition + (offsetFromTarget * cosineValue + scaledAcceleration * sineValue) / exponentialDecay, speed * ((dampingRatio * scaledAcceleration - damper * offsetFromTarget) * cosineValue - (dampingRatio * offsetFromTarget + damper * scaledAcceleration) * sineValue) / exponentialDecay
 		else
-			local var8 = var4 / var6 + var22
-			local var9 = 2.718281828459045 ^ (var6 * delta)
-			return vector2 + (var22 + var8 * var6 * delta) / var9, var6 * (var8 - var22 - var8 * var6 * delta) / var9
+			local adjustedVelocity = currentVelocity / speed + offsetFromTarget
+			local exponentialDecay = 2.718281828459045 ^ (speed * elapsedTime)
+			return targetPosition + (offsetFromTarget + adjustedVelocity * speed * elapsedTime) / exponentialDecay, speed * (adjustedVelocity - offsetFromTarget - adjustedVelocity * speed * elapsedTime) / exponentialDecay
 		end
 	end
-	var7 = setmetatable({
-		Impulse = function(p1, p2)
-			var7.Velocity = var7.Velocity + p2
+	springObject = setmetatable({
+		Impulse = function(self, impulseForce)
+			springObject.Velocity = springObject.Velocity + impulseForce
 		end,
-		TimeSkip = function(p1, p2)
-			local var13 = delta()
-			local vector2, var32 = PositionVelocity(var13 + p2)
-			var3 = vector2
-			var4 = var32
-			var12 = var13
+		TimeSkip = function(self, skipDuration)
+			local currentTime = tick()
+			local newPosition, newVelocity = PositionVelocity(currentTime + skipDuration)
+			currentPosition = newPosition
+			currentVelocity = newVelocity
+			lastUpdateTime = currentTime
 		end
 	}, {
-		__index = function(p1, p2)
-			if p2 == "Value" or (p2 == "Position" or p2 == "p") then
-				local var12, _ = PositionVelocity(delta())
-				return var12
+		__index = function(self, propertyName)
+			if propertyName == "Value" or (propertyName == "Position" or propertyName == "p") then
+				local position, _ = PositionVelocity(tick())
+				return position
 			end
-			if p2 == "Velocity" or p2 == "v" then
-				local _, var22 = PositionVelocity(delta())
-				return var22
+			if propertyName == "Velocity" or propertyName == "v" then
+				local _, velocity = PositionVelocity(tick())
+				return velocity
 			end
-			if p2 == "Target" or p2 == "t" then
-				return vector2
+			if propertyName == "Target" or propertyName == "t" then
+				return targetPosition
 			end
-			if p2 == "Damper" or p2 == "d" then
-				return var5
+			if propertyName == "Damper" or propertyName == "d" then
+				return damper
 			end
-			if p2 == "Speed" or p2 == "s" then
-				return var6
+			if propertyName == "Speed" or propertyName == "s" then
+				return speed
 			end
-			error(p2 .. " is not a valid member of Spring")
+			error(propertyName .. " is not a valid member of Spring")
 		end,
-		__newindex = function(p1, p2, p3)
-			local var13 = delta()
-			if p2 == "Value" or (p2 == "Position" or p2 == "p") then
-				local _, var22 = PositionVelocity(var13)
-				var3 = p3
-				var4 = var22
-			elseif p2 == "Velocity" or p2 == "v" then
-				local var32, _ = PositionVelocity(var13)
-				var3 = var32
-				var4 = p3
-			elseif p2 == "Target" or p2 == "t" then
-				local var42, var52 = PositionVelocity(var13)
-				var3 = var42
-				var4 = var52
-				vector2 = p3
-			elseif p2 == "Damper" or p2 == "d" then
-				local var62, var7 = PositionVelocity(var13)
-				var3 = var62
-				var4 = var7
-				var5 = if p3 < 0 then 0 elseif p3 < 1 then p3 else 1
-			elseif p2 == "Speed" or p2 == "s" then
-				local var9, v10 = PositionVelocity(var13)
-				var3 = var9
-				var4 = v10
-				var6 = if p3 < 0 then 0 else p3
+		__newindex = function(self, propertyName, newValue)
+			local currentTime = tick()
+			if propertyName == "Value" or (propertyName == "Position" or propertyName == "p") then
+				local _, velocity = PositionVelocity(currentTime)
+				currentPosition = newValue
+				currentVelocity = velocity
+			elseif propertyName == "Velocity" or propertyName == "v" then
+				local position, _ = PositionVelocity(currentTime)
+				currentPosition = position
+				currentVelocity = newValue
+			elseif propertyName == "Target" or propertyName == "t" then
+				local position, velocity = PositionVelocity(currentTime)
+				currentPosition = position
+				currentVelocity = velocity
+				targetPosition = newValue
+			elseif propertyName == "Damper" or propertyName == "d" then
+				local position, velocity = PositionVelocity(currentTime)
+				currentPosition = position
+				currentVelocity = velocity
+				damper = if newValue < 0 then 0 elseif newValue < 1 then newValue else 1
+			elseif propertyName == "Speed" or propertyName == "s" then
+				local position, velocity = PositionVelocity(currentTime)
+				currentPosition = position
+				currentVelocity = velocity
+				speed = if newValue < 0 then 0 else newValue
 			else
-				error(p2 .. " is not a valid member of Spring")
+				error(propertyName .. " is not a valid member of Spring")
 			end
-			var12 = var13
+			lastUpdateTime = currentTime
 		end
 	})
-	return var7
+	return springObject
 end
-t.Spring.New = New
-local function New_2(p1)
-	return t.Spring.New(p1)
+module.Spring.New = New
+local function New_2(targetValue)
+	return module.Spring.New(targetValue)
 end
-t.NumberSpring.New = New_2
-local function New_3(p1)
-	return t.Spring.New(p1 or vector2())
+module.NumberSpring.New = New_2
+local function New_3(targetValue)
+	return module.Spring.New(targetValue or vector3())
 end
-t.VectorSpring.New = New_3
-return t
+module.VectorSpring.New = New_3
+return module

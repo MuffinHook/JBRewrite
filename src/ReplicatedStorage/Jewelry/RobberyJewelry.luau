@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -30,7 +29,7 @@ local function AddedJewel(jewelPart)
 		Dist = 8,
 		Callback = function(part, isActive)
 			if isActive then
-				jewelEvent:FireServer("k" .. ("uoc0rvi9o"):sub(5, 6):reverse() .. "m5wlx", jewelPart.Name)
+				jewelEvent:FireServer("kvrm5wlx", jewelPart.Name)
 				Audio.ObjectLocal(LocalPlayer.PlayerGui, 6875006205, {
 					Volume = 0.4
 				})
@@ -46,7 +45,7 @@ local function AddedLaserButton(laserPart)
 		Dist = 8,
 		Callback = function(part, isActive)
 			if isActive then
-				jewelEvent:FireServer("k" .. ("m0jvrvmjdv"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("f5mwc"):sub(3, 3):reverse() .. "" .. "" .. ("f55i"):sub(3, 3):reverse() .. "" .. "" .. ("klwp"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "x", "LaserButton")
+				jewelEvent:FireServer("kvrm5wlx", "LaserButton")
 			end
 			return true
 		end
@@ -72,61 +71,61 @@ return {
 			task.wait(2)
 			Sound:Stop()
 		end
-		function em.kx2z39za(p1)
+		function em.kx2z39za(jewelPart)
 			task.delay(0.2, function()
-				p1.Transparency = 0.25
-				TweenService:Create(p1, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false), {
+				jewelPart.Transparency = 0.25
+				TweenService:Create(jewelPart, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false), {
 					Transparency = 0.4
 				}):Play()
 			end)
 		end
-		function em.yo65te3x(p1, p2)
+		function em.yo65te3x(shouldShake, jewelParts)
 			PlaySound(LocalPlayer, 1837831244)
 			delay(1, function()
 				PlaySound(LocalPlayer, 1843025542)
 			end)
 			spawn(FadeInSound)
-			if p1 then
-				for v1, v2 in p2 do
-					v2.CanCollide = true
+			if shouldShake then
+				for index, jewelPart in jewelParts do
+					jewelPart.CanCollide = true
 					task.delay(2, function()
-						v2.CanCollide = false
+						jewelPart.CanCollide = false
 					end)
 				end
 				local CurrentCamera = workspace.CurrentCamera
-				local cframe3 = CurrentCamera.CFrame
-				local instance4 = CamShaker.new(Enum.RenderPriority.Camera.Value + 2, function(p1)
-					cframe3 = CurrentCamera.CFrame
-					CurrentCamera.CFrame = CurrentCamera.CFrame * p1
+				local originalCFrame = CurrentCamera.CFrame
+				local camShaker = CamShaker.new(Enum.RenderPriority.Camera.Value + 2, function(offsetCFrame)
+					originalCFrame = CurrentCamera.CFrame
+					CurrentCamera.CFrame = CurrentCamera.CFrame * offsetCFrame
 				end)
-				local func5 = RunService.Heartbeat:Connect(function()
-					CurrentCamera.CFrame = cframe3
+				local heartbeatConnection = RunService.Heartbeat:Connect(function()
+					CurrentCamera.CFrame = originalCFrame
 				end)
-				instance4:Start()
-				instance4:Shake(CamShaker.Presets.Explosion)
+				camShaker:Start()
+				camShaker:Shake(CamShaker.Presets.Explosion)
 				Promise.delay(2):andThenCall(function()
-					instance4:Stop()
-					func5:Disconnect()
+					camShaker:Stop()
+					heartbeatConnection:Disconnect()
 				end)
 			end
 		end
 		function em.eckwjayf()
 			spawn(FadeOutSound)
 		end
-		local var22 = next
-		local cframe3, instance4 = CollectionService:GetTagged("RobberyJewelryJewel")
-		for func5, v6 in var22, cframe3, instance4 do
-			if v6:GetAttribute("LaserButton") then
-				AddedLaserButton(v6)
+		local nextIterator = next
+		local jewelList, endIndex = CollectionService:GetTagged("RobberyJewelryJewel")
+		for jewelIndex, jewelInstance in nextIterator, jewelList, endIndex do
+			if jewelInstance:GetAttribute("LaserButton") then
+				AddedLaserButton(jewelInstance)
 			else
-				AddedJewel(v6)
+				AddedJewel(jewelInstance)
 			end
 		end
-		CollectionService:GetInstanceAddedSignal("RobberyJewelryJewel"):Connect(function(p1)
-			if p1:GetAttribute("LaserButton") then
-				AddedLaserButton(p1)
+		CollectionService:GetInstanceAddedSignal("RobberyJewelryJewel"):Connect(function(jewelPart)
+			if jewelPart:GetAttribute("LaserButton") then
+				AddedLaserButton(jewelPart)
 			else
-				AddedJewel(p1)
+				AddedJewel(jewelPart)
 			end
 		end)
 		CollectionService:GetInstanceRemovedSignal("RobberyJewelryJewel"):Connect(CircleAction.Remove)

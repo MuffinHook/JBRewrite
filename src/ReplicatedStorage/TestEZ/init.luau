@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Expectation = require(script.Expectation)
 local TestBootstrap = require(script.TestBootstrap)
 local TestEnum = require(script.TestEnum)
@@ -11,8 +10,8 @@ local TextReporter = require(script.Reporters.TextReporter)
 local TextReporterQuiet = require(script.Reporters.TextReporterQuiet)
 local TeamCityReporter = require(script.Reporters.TeamCityReporter)
 return {
-	run = function(p1, p2)
-		p2((TestRunner.runPlan((TestPlanner.createPlan((TestBootstrap:getModules(p1)))))))
+	run = function(modulesRoot, onTestsComplete)
+		onTestsComplete((TestRunner.runPlan((TestPlanner.createPlan((TestBootstrap:getModules(modulesRoot)))))))
 	end,
 	Expectation = Expectation,
 	TestBootstrap = TestBootstrap,

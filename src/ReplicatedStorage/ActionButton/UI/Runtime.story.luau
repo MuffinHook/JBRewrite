@@ -1,14 +1,13 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
 local Roact = require(ReplicatedStorage.Roact)
 local Maid = require(ReplicatedStorage.Std.Maid)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(parent)
+	local AppComponent = Roact.Component:extend("App")
 	local Runtime = require(script.Parent.Runtime)
-	function v1.init(p1)
-		p1._maid = Maid.new()
-		p1._maid:GiveTask(ActionButtonService.add({
+	function AppComponent.init(self)
+		self._maid = Maid.new()
+		self._maid:GiveTask(ActionButtonService.add({
 			primary = true,
 			priority = 1000,
 			saturateTo = 0,
@@ -22,7 +21,7 @@ return function(p1)
 			end,
 			onReleased = function()  end
 		}))
-		p1._maid:GiveTask(ActionButtonService.add({
+		self._maid:GiveTask(ActionButtonService.add({
 			primary = true,
 			priority = 700,
 			saturateTo = 0,
@@ -34,7 +33,7 @@ return function(p1)
 			end,
 			onReleased = function()  end
 		}))
-		p1._maid:GiveTask(ActionButtonService.add({
+		self._maid:GiveTask(ActionButtonService.add({
 			priority = 900,
 			image = "rbxassetid://4939735995",
 			keyCodes = { Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonB },
@@ -43,7 +42,7 @@ return function(p1)
 			onPressed = function()  end,
 			onReleased = function()  end
 		}))
-		p1._maid:GiveTask(ActionButtonService.add({
+		self._maid:GiveTask(ActionButtonService.add({
 			priority = 950,
 			image = "rbxassetid://4939759147",
 			useEvery = 5,
@@ -53,31 +52,31 @@ return function(p1)
 				return true
 			end
 		}))
-		p1._maid:GiveTask(ActionButtonService.add({
+		self._maid:GiveTask(ActionButtonService.add({
 			priority = 975,
 			image = "rbxassetid://4939740172",
 			keyCodes = { Enum.KeyCode.F, Enum.KeyCode.ButtonR2 },
 			onPressed = function()  end
 		}))
-		p1._maid:GiveTask(ActionButtonService.add({
+		self._maid:GiveTask(ActionButtonService.add({
 			priority = 650,
 			image = "rbxassetid://4970993126",
 			keyCodes = { Enum.KeyCode.R },
 			onPressed = function()  end
 		}))
 	end
-	function v1.render(p1)
+	function AppComponent.render(self)
 		return Roact.createElement(Runtime, {
 			enabled = true,
 			color = Color3.new(255/255, 0/255, 0/255),
 			DEBUG_forceRadial = true
 		})
 	end
-	function v1.willUnmount(p1)
-		p1._maid:Destroy()
+	function AppComponent.willUnmount(self)
+		self._maid:Destroy()
 	end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	local mountedInstance = Roact.mount(Roact.createElement(AppComponent), parent)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedInstance)
 	end
 end

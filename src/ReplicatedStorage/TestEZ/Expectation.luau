@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local expectationClass = {}
 local modifierKeywords = {
 	to = true,

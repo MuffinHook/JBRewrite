@@ -1,229 +1,227 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local table2Lua = require(ReplicatedStorage.Std.Debug.table2Lua)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-local function checkIfShouldDebugPrint(p1)
+local function checkIfShouldDebugPrint(debugEnabled)
 	return false
 end
-local function checkIfShouldDebugPrintMultiple(p1)
-	for v1, v2 in p1 do
+local function checkIfShouldDebugPrintMultiple(debugFlags)
+	for v1, v2 in debugFlags do
 		if not false then
 			return false
 		end
 	end
 	return true
 end
-local t = {}
-t.__index = t
-function t.new(p1)
-	local v2 = setmetatable({}, t)
-	v2._rawTable = p1
-	v2._mapKeyToCallbacks = {}
-	v2._mapUpdateInProgress = {}
-	return v2
+local ObservableTable = {}
+ObservableTable.__index = ObservableTable
+function ObservableTable.new(initialTable)
+	local self = setmetatable({}, ObservableTable)
+	self._rawTable = initialTable
+	self._mapKeyToCallbacks = {}
+	self._mapUpdateInProgress = {}
+	return self
 end
-function t.GetRawTable(p1)
-	return p1._rawTable
+function ObservableTable.GetRawTable(self)
+	return self._rawTable
 end
-function t.Get(p1, p2)
-	assert(typeof(p2) == "string", "key must be string")
-	local v2 = p1._rawTable[p2]
-	if typeof(v2) == "table" then
-		TableUtils.deepFreeze(v2)
+function ObservableTable.Get(self, key)
+	assert(typeof(key) == "string", "key must be string")
+	local value = self._rawTable[key]
+	if typeof(value) == "table" then
+		TableUtils.deepFreeze(value)
 	end
-	return v2
+	return value
 end
-local function errHandler(p1)
-	print(p1)
+local function errHandler(errorMessage)
+	print(errorMessage)
 	warn("^^^ _mapKeyToCallbacks err ^^^")
 end
-function t._rawSet(p1, p2, p3)
-	assert(typeof(p2) == "string", "key must be string")
-	if typeof(p3) == "table" then
-		TableUtils.deepFreeze(p3)
+function ObservableTable._rawSet(self, key, newValue)
+	assert(typeof(key) == "string", "key must be string")
+	if typeof(newValue) == "table" then
+		TableUtils.deepFreeze(newValue)
 	end
-	if p1._rawTable[p2] ~= p3 then
-		p1._rawTable[p2] = p3
-		if p1._mapKeyToCallbacks[p2] then
-			for v2, v3 in p1._mapKeyToCallbacks[p2] do
-				local v4 = task.delay(0, function()
-					warn((("ObservableTable:Observe callback on %* took too long"):format(p2)))
+	if self._rawTable[key] ~= newValue then
+		self._rawTable[key] = newValue
+		if self._mapKeyToCallbacks[key] then
+			for callbackIndex, callback in self._mapKeyToCallbacks[key] do
+				local timeoutHandle = task.delay(0, function()
+					warn((("ObservableTable:Observe callback on %* took too long"):format(key)))
 				end)
-				xpcall(v3, errHandler, p3)
-				task.cancel(v4)
+				xpcall(callback, errHandler, newValue)
+				task.cancel(timeoutHandle)
 			end
 		end
 	end
 end
-function t._set(p1, p2, p3)
-	assert(typeof(p2) == "string", "key must be string")
-	if p1:_getIsUpdateInProgress(p2) then
-		error("Cannot set, key update in progress: " .. p2)
+function ObservableTable._set(self, key, newValue)
+	assert(typeof(key) == "string", "key must be string")
+	if self:_getIsUpdateInProgress(key) then
+		error("Cannot set, key update in progress: " .. key)
 	end
-	p1:_setIsUpdateInProgress(p2, true)
-	p1:_rawSet(p2, p3)
-	p1:_setIsUpdateInProgress(p2, false)
+	self:_setIsUpdateInProgress(key, true)
+	self:_rawSet(key, newValue)
+	self:_setIsUpdateInProgress(key, false)
 end
-function t._setIsUpdateInProgress(p1, p2, p3)
-	assert(typeof(p2) == "string", "key must be string")
-	assert(typeof(p3) == "boolean", "isUpdating must be boolean")
-	if p3 == (p1._mapUpdateInProgress[p2] == true) then
-		error("Trying to set same isUpdating value on key, shouldn\'t be valid: " .. p2)
+function ObservableTable._setIsUpdateInProgress(self, key, isUpdating)
+	assert(typeof(key) == "string", "key must be string")
+	assert(typeof(isUpdating) == "boolean", "isUpdating must be boolean")
+	if isUpdating == (self._mapUpdateInProgress[key] == true) then
+		error("Trying to set same isUpdating value on key, shouldn\'t be valid: " .. key)
 	end
-	p1._mapUpdateInProgress[p2] = if p3 then true else nil
+	self._mapUpdateInProgress[key] = if isUpdating then true else nil
 end
-function t._getIsUpdateInProgress(p1, p2)
-	assert(typeof(p2) == "string", "key must be string")
-	return p1._mapUpdateInProgress[p2] == true
+function ObservableTable._getIsUpdateInProgress(self, key)
+	assert(typeof(key) == "string", "key must be string")
+	return self._mapUpdateInProgress[key] == true
 end
-function t.Update(p1, p2, p3)
-	assert(typeof(p2) == "string", "key must be string")
-	local v2 = p1:UpdateMultiple({ p2 }, function(p1)
-		return { (p3(p1[1])) }
+function ObservableTable.Update(self, key, updateFunction)
+	assert(typeof(key) == "string", "key must be string")
+	local result = self:UpdateMultiple({ key }, function(values)
+		return { (updateFunction(values[1])) }
 	end)
-	if v2 == nil then
+	if result == nil then
 		return nil
 	else
-		return v2[1]
+		return result[1]
 	end
 end
-function t.UpdateMultiple(p1, p2, p3)
-	local v1 = true
-	for v2, v3 in p2 do
+function ObservableTable.UpdateMultiple(self, keys, updateFunction)
+	local shouldDebugPrint = true
+	for v2, v3 in keys do
 		if not false then
-			v1 = false
+			shouldDebugPrint = false
 			break
 		end
 	end
-	if v1 then
-		print("ObservableTable:UpdateMultiple starting", p2)
+	if shouldDebugPrint then
+		print("ObservableTable:UpdateMultiple starting", keys)
 	end
-	assert(if typeof(p2) == "table" then #p2 > 0 else false, "keys must be non-empty table")
-	local t = {}
-	for v7, v8 in p2 do
-		local v6
-		v6 = typeof(v8) == "string"
-		assert(v6, "key must be string")
-		assert(not t[v8], "keys must be unique")
-		t[v8] = true
+	assert(if typeof(keys) == "table" then #keys > 0 else false, "keys must be non-empty table")
+	local keySet = {}
+	for v7, keyName in keys do
+		local isString
+		isString = typeof(keyName) == "string"
+		assert(isString, "key must be string")
+		assert(not keySet[keyName], "keys must be unique")
+		keySet[keyName] = true
 	end
 	local function finishUpdate()
-		for v1, v2 in p2 do
-			p1:_setIsUpdateInProgress(v2, false)
+		for v1, keyName in keys do
+			self:_setIsUpdateInProgress(keyName, false)
 		end
 	end
-	local v10 = TableUtils.filter(p2, function(p12)
-		return p1:_getIsUpdateInProgress(p12)
+	local alreadyUpdatingKeys = TableUtils.filter(keys, function(keyName)
+		return self:_getIsUpdateInProgress(keyName)
 	end)
-	if #v10 > 0 then
-		error("Cannot update, keys already updating: " .. table.concat(v10, ", "))
+	if #alreadyUpdatingKeys > 0 then
+		error("Cannot update, keys already updating: " .. table.concat(alreadyUpdatingKeys, ", "))
 	end
-	for v11, v12 in p2 do
-		p1:_setIsUpdateInProgress(v12, true)
+	for v11, keyName in keys do
+		self:_setIsUpdateInProgress(keyName, true)
 	end
-	local t2 = {}
-	for v13, v14 in p2 do
-		local v15 = p1:Get(v14)
-		if typeof(v15) == "table" then
-			v15 = TableUtils.deepCopy(v15)
+	local currentValues = {}
+	for v13, keyName in keys do
+		local value = self:Get(keyName)
+		if typeof(value) == "table" then
+			value = TableUtils.deepCopy(value)
 		end
-		table.insert(t2, v15)
+		table.insert(currentValues, value)
 	end
-	local v17 = task.delay(0, function()
-		warn((("ObservableTable:Update callback on %* took too long: %*"):format(table2Lua(p2), (debug.traceback()))))
+	local timeoutHandle = task.delay(0, function()
+		warn((("ObservableTable:Update callback on %* took too long: %*"):format(table2Lua(keys), (debug.traceback()))))
 	end)
-	local v18, v19 = pcall(p3, t2)
-	task.cancel(v17)
-	if not v18 then
-		warn(debug.traceback("ObservableTable:Update callback error: " .. tostring(v19)))
+	local successFlag, callbackResult = pcall(updateFunction, currentValues)
+	task.cancel(timeoutHandle)
+	if not successFlag then
+		warn(debug.traceback("ObservableTable:Update callback error: " .. tostring(callbackResult)))
 		finishUpdate()
 		return nil
 	end
-	local v20 = true
-	for v21, v22 in p2 do
+	local shouldDebugResult = true
+	for v21, v22 in keys do
 		if not false then
-			v20 = false
+			shouldDebugResult = false
 			break
 		end
 	end
-	if v20 then
-		print("ObservableTable:Update callback return", p2, v19)
+	if shouldDebugResult then
+		print("ObservableTable:Update callback return", keys, callbackResult)
 	end
-	if v19 == nil then
-		local v24 = true
-		for v25, v26 in p2 do
+	if callbackResult == nil then
+		local shouldDebugNil = true
+		for v25, v26 in keys do
 			if not false then
-				v24 = false
+				shouldDebugNil = false
 				break
 			end
 		end
-		if v24 then
-			print("ObservableTable:Update callback returned nil overall", p2)
+		if shouldDebugNil then
+			print("ObservableTable:Update callback returned nil overall", keys)
 		end
 		finishUpdate()
 		return nil
 	else
-		for i = 1, #p2 do
-			if v19[i] == nil then
-				local _ = p2[i] == "dailyQuestProgress"
+		for i = 1, #keys do
+			if callbackResult[i] == nil then
+				local _ = keys[i] == "dailyQuestProgress"
 				finishUpdate()
 				return nil
 			end
 		end
-		local v29 = true
-		for v30, v31 in p2 do
+		local shouldDebugSet = true
+		for v30, v31 in keys do
 			if not false then
-				v29 = false
+				shouldDebugSet = false
 				break
 			end
 		end
-		if v29 then
-			print("ObservableTable:Update set starting", p2)
+		if shouldDebugSet then
+			print("ObservableTable:Update set starting", keys)
 		end
-		for v33, v34 in p2 do
-			p1:_rawSet(v34, v19[v33])
+		for keyIndex, keyName in keys do
+			self:_rawSet(keyName, callbackResult[keyIndex])
 		end
-		local v35 = true
-		for v36, v37 in p2 do
+		local shouldDebugFinish = true
+		for v36, v37 in keys do
 			if not false then
-				v35 = false
+				shouldDebugFinish = false
 				break
 			end
 		end
-		if v35 then
-			print("ObservableTable:Update set finished", p2)
+		if shouldDebugFinish then
+			print("ObservableTable:Update set finished", keys)
 		end
 		finishUpdate()
-		return v19
+		return callbackResult
 	end
 end
-function t.Remove(p1, p2)
-	assert(typeof(p2) == "string", "key must be string")
-	p1:_set(p2, nil)
+function ObservableTable.Remove(self, key)
+	assert(typeof(key) == "string", "key must be string")
+	self:_set(key, nil)
 end
-function t.Connect(p1, p2, p3)
-	assert(typeof(p2) == "string", "key must be string")
-	local v2 = p1._mapKeyToCallbacks[p2]
-	if not v2 then
-		v2 = {}
-		p1._mapKeyToCallbacks[p2] = v2
+function ObservableTable.Connect(self, key, callback)
+	assert(typeof(key) == "string", "key must be string")
+	local callbackList = self._mapKeyToCallbacks[key]
+	if not callbackList then
+		callbackList = {}
+		self._mapKeyToCallbacks[key] = callbackList
 	end
-	table.insert(v2, p3)
+	table.insert(callbackList, callback)
 	return function()
-		v2 = p1._mapKeyToCallbacks[p2]
-		local v1 = table.find(v2, p3)
-		if v1 then
-			table.remove(v2, v1)
+		callbackList = self._mapKeyToCallbacks[key]
+		local callbackIndex = table.find(callbackList, callback)
+		if callbackIndex then
+			table.remove(callbackList, callbackIndex)
 		end
-		if #v2 == 0 then
-			p1._mapKeyToCallbacks[p2] = nil
+		if #callbackList == 0 then
+			self._mapKeyToCallbacks[key] = nil
 		end
 	end
 end
-function t.Observe(p1, p2, p3)
-	assert(typeof(p2) == "string", "key must be string")
-	p3(p1:Get(p2))
-	return p1:Connect(p2, p3)
+function ObservableTable.Observe(self, key, callback)
+	assert(typeof(key) == "string", "key must be string")
+	callback(self:Get(key))
+	return self:Connect(key, callback)
 end
-return t
+return ObservableTable

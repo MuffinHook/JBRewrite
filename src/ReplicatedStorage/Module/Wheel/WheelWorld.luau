@@ -1,54 +1,53 @@
--- Reviewed by Claude
-local function v1(p1)
-	local var12 = next
-	local table2, var3 = p1:GetChildren()
+local function calculateTotalMass(instance)
+	local nextIterator = next
+	local children, index = instance:GetChildren()
 	local sum = 0
-	for v4, v5 in var12, table2, var3 do
-		if v5:IsA("BasePart") then
-			sum = sum + v5:GetMass()
+	for childIndex, child in nextIterator, children, index do
+		if child:IsA("BasePart") then
+			sum = sum + child:GetMass()
 		end
-		sum = sum + v1(v5)
+		sum = sum + calculateTotalMass(child)
 	end
 	return sum
 end
-local t = {}
-t.__index = t
-function t.new()
-	local table2 = setmetatable({}, t)
-	table2.Model = nil
-	table2.Wheels = {}
-	return table2
+local WheelWorldModule = {}
+WheelWorldModule.__index = WheelWorldModule
+function WheelWorldModule.new()
+	local self = setmetatable({}, WheelWorldModule)
+	self.Model = nil
+	self.Wheels = {}
+	return self
 end
-function t.SetModel(p1, p2)
-	p1.Model = p2
+function WheelWorldModule.SetModel(self, model)
+	self.Model = model
 end
-function t.AddWheel(p1, p2)
-	assert(p2)
-	table.insert(p1.Wheels, p2)
-	p1:Calculate()
+function WheelWorldModule.AddWheel(self, wheel)
+	assert(wheel)
+	table.insert(self.Wheels, wheel)
+	self:Calculate()
 end
-function t.GetEffWheelCount(p1)
+function WheelWorldModule.GetEffWheelCount(self)
 	local count = 0
-	for i, v in ipairs(p1.Wheels) do
-		if v._applyForces then
+	for i, wheel in ipairs(self.Wheels) do
+		if wheel._applyForces then
 			count = count + 1
 		end
 	end
 	return count
 end
-function t.Calculate(p1)
-	local var12 = if p1.Model == nil then 0 else v1(p1.Model)
-	local var3 = var12 * (1 / p1:GetEffWheelCount())
-	for i = 1, #p1.Wheels do
-		p1.Wheels[i].EffectiveMass = var3
-		p1.Wheels[i].IgnoreModel = p1.Model
+function WheelWorldModule.Calculate(self)
+	local totalMass = if self.Model == nil then 0 else calculateTotalMass(self.Model)
+	local massPerWheel = totalMass * (1 / self:GetEffWheelCount())
+	for i = 1, #self.Wheels do
+		self.Wheels[i].EffectiveMass = massPerWheel
+		self.Wheels[i].IgnoreModel = self.Model
 	end
-	p1.Mass = var12
+	self.Mass = totalMass
 end
-function t.Destroy(p1)
-	for i = 1, #p1.Wheels do
-		p1.Wheels[i]:Destroy()
+function WheelWorldModule.Destroy(self)
+	for i = 1, #self.Wheels do
+		self.Wheels[i]:Destroy()
 	end
-	p1.Wheels = {}
+	self.Wheels = {}
 end
-return t
+return WheelWorldModule

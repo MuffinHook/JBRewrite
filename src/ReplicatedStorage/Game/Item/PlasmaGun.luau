@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GunUtils = require(ReplicatedStorage.Game.GunShop.GunUtils)
@@ -15,37 +14,37 @@ end
 local function RandomVector()
 	return GeomUtils.randomPointOnSphere()
 end
-local t = {
+local PlasmaGun = {
 	__ClassName = "PlasmaGun"
 }
-t.__index = t
-setmetatable(t, Gun)
-function t.new(p1, p2, p3)
-	local gun = Gun.new(p1, p2, p3)
-	setmetatable(gun, t)
+PlasmaGun.__index = PlasmaGun
+setmetatable(PlasmaGun, Gun)
+function PlasmaGun.new(parent, equipmentInstance, sourceValue)
+	local gun = Gun.new(parent, equipmentInstance, sourceValue)
+	setmetatable(gun, PlasmaGun)
 	gun.ListZap = {}
 	return gun
 end
-function t.UpdateZap(p1, p2)
-	local Origin = p2.Origin
-	local Target = p2.Target
-	local OffsetRadius = p2.OffsetRadius
-	local Width = p2.Width
-	local elapsedTime = tick() - p2.BornAt
-	local fireFreqCapped = math.min(1 / p1.Config.FireFreq, 0.1)
-	local totalSegments = math.ceil((Target - Origin).Magnitude / p2.PerDistance)
+function PlasmaGun.UpdateZap(self, zapConfig)
+	local Origin = zapConfig.Origin
+	local Target = zapConfig.Target
+	local OffsetRadius = zapConfig.OffsetRadius
+	local Width = zapConfig.Width
+	local elapsedTime = tick() - zapConfig.BornAt
+	local fireFreqCapped = math.min(1 / self.Config.FireFreq, 0.1)
+	local totalSegments = math.ceil((Target - Origin).Magnitude / zapConfig.PerDistance)
 	local progress = 0.3333333333333333 + 0.6666666666666666 * elapsedTime / fireFreqCapped
 	local currentSegmentIndex = math.ceil(progress * totalSegments)
-	local LastPositionIndex = p2.LastPositionIndex
+	local LastPositionIndex = zapConfig.LastPositionIndex
 	for i = LastPositionIndex, currentSegmentIndex do
-		if p2.NextPosition == nil then
+		if zapConfig.NextPosition == nil then
 			local interpolationFactor = i / totalSegments
 			local sum = Origin * (1 - interpolationFactor) + Target * interpolationFactor
 			if i < totalSegments then
 				sum = sum + GeomUtils.randomPointInSphere() * OffsetRadius
 			end
-			p2.NextPosition = sum
-			local LastPosition = p2.LastPosition
+			zapConfig.NextPosition = sum
+			local LastPosition = zapConfig.LastPosition
 			local Magnitude = (sum - LastPosition).Magnitude
 			local Part = Instance.new("Part")
 			Part.Anchored = true
@@ -66,133 +65,133 @@ function t.UpdateZap(p1, p2)
 			SurfaceLight.Range = 16
 			SurfaceLight.Shadows = false
 			SurfaceLight.Parent = Part
-			p2.Part = Part
-			table.insert(p2.Parts, Part)
+			zapConfig.Part = Part
+			table.insert(zapConfig.Parts, Part)
 		end
 		if i == LastPositionIndex then
 			local fadeAlpha = math.clamp(progress * totalSegments - i + 1, 0, 1)
-			local LastPosition = p2.LastPosition
-			local currentPosition = p2.NextPosition * fadeAlpha + LastPosition * (1 - fadeAlpha)
-			local Part = p2.Part
+			local LastPosition = zapConfig.LastPosition
+			local currentPosition = zapConfig.NextPosition * fadeAlpha + LastPosition * (1 - fadeAlpha)
+			local Part = zapConfig.Part
 			local Magnitude = (currentPosition - LastPosition).Magnitude
 			Part.Size = Vector3.new(Width, Width, Magnitude)
 			Part.CFrame = CFrame.new(LastPosition, currentPosition) * CFrame.new(0, 0, -Magnitude * 0.5)
 		else
-			p2.LastPosition = p2.NextPosition
-			p2.NextPosition = nil
+			zapConfig.LastPosition = zapConfig.NextPosition
+			zapConfig.NextPosition = nil
 		end
 	end
-	p2.LastPositionIndex = currentSegmentIndex
+	zapConfig.LastPositionIndex = currentSegmentIndex
 	return progress >= 1
 end
-function t.DestroyZap(p1, p2)
-	for i, v in ipairs(p2.Parts) do
-		v:Destroy()
+function PlasmaGun.DestroyZap(self, zapConfig)
+	for i, part in ipairs(zapConfig.Parts) do
+		part:Destroy()
 	end
-	p2.Parts = nil
+	zapConfig.Parts = nil
 end
-function t.DestroyZaps(p1)
-	for i = #p1.ListZap, 1, -1 do
-		table.remove(p1.ListZap, i)
-		p1:DestroyZap(p1.ListZap[i])
+function PlasmaGun.DestroyZaps(self)
+	for i = #self.ListZap, 1, -1 do
+		table.remove(self.ListZap, i)
+		self:DestroyZap(self.ListZap[i])
 	end
 end
-function t.UpdateZaps(p1)
-	for i = #p1.ListZap, 1, -1 do
-		local currentZap = p1.ListZap[i]
-		if p1:UpdateZap(currentZap) then
-			table.remove(p1.ListZap, i)
-			p1:DestroyZap(currentZap)
+function PlasmaGun.UpdateZaps(self)
+	for i = #self.ListZap, 1, -1 do
+		local currentZap = self.ListZap[i]
+		if self:UpdateZap(currentZap) then
+			table.remove(self.ListZap, i)
+			self:DestroyZap(currentZap)
 		end
 	end
 end
-function t.Heartbeat(p1)
-	p1:UpdateZaps()
+function PlasmaGun.Heartbeat(self)
+	self:UpdateZaps()
 end
-function t.Zap(p1, p2, p3, p4, p5, p6)
+function PlasmaGun.Zap(self, originPosition, targetPosition, width, offsetRadius, perDistance)
 	local zapConfig = {
-		Width = p4,
-		OffsetRadius = p5,
-		PerDistance = p6,
-		Origin = p2,
-		Target = p3
+		Width = width,
+		OffsetRadius = offsetRadius,
+		PerDistance = perDistance,
+		Origin = originPosition,
+		Target = targetPosition
 	}
 	zapConfig.LastPosition = zapConfig.Origin
 	zapConfig.NextPosition = nil
 	zapConfig.LastPositionIndex = 1
 	zapConfig.Parts = {}
 	zapConfig.BornAt = tick()
-	table.insert(p1.ListZap, zapConfig)
+	table.insert(self.ListZap, zapConfig)
 end
-function t.ShootOther(p1)
-	local Tip = p1.Tip
-	p1.SpringItemOffset:Accelerate(Vector3.new(0, 0, 30) + GeomUtils.randomPointOnSphere() * 3)
-	p1.SpringItemRotation:Accelerate((Vector3.new(-1, 2, 0)).Unit * 12 + GeomUtils.randomPointOnSphere() * 2)
+function PlasmaGun.ShootOther(self)
+	local Tip = self.Tip
+	self.SpringItemOffset:Accelerate(Vector3.new(0, 0, 30) + GeomUtils.randomPointOnSphere() * 3)
+	self.SpringItemRotation:Accelerate((Vector3.new(-1, 2, 0)).Unit * 12 + GeomUtils.randomPointOnSphere() * 2)
 	local raycastParams = RaycastParams.new()
-	raycastParams.FilterDescendantsInstances = p1.IgnoreList
+	raycastParams.FilterDescendantsInstances = self.IgnoreList
 	raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-	local function collidableFunc(p1)
-		if p1:GetAttribute("InvisibleToBullets") == true then
+	local function collidableFunc(part)
+		if part:GetAttribute("InvisibleToBullets") == true then
 			return false
-		elseif CharacterUtils.getAncestorPartHumanoid(p1) then
+		elseif CharacterUtils.getAncestorPartHumanoid(part) then
 			return true
 		else
-			return p1.CanCollide
+			return part.CanCollide
 		end
 	end
-	for i = 1, p1.Config.BulletsPerShot or 1 do
+	for i = 1, self.Config.BulletsPerShot or 1 do
 		local bulletHitPosition
 		local tipCFrame = Tip.CFrame
-		if not p1.TipDirection then
+		if not self.TipDirection then
 			warn("No cached tipDirection")
 		end
-		local bulletDirection = GunUtils.getBulletDirection(tipCFrame, p1.TipDirection or tipCFrame.LookVector, p1.Config.BulletSpread or 0)
-		local raycastResult = Raycast.collidable(Tip.Position, bulletDirection, p1.Config.Range, raycastParams, collidableFunc)
+		local bulletDirection = GunUtils.getBulletDirection(tipCFrame, self.TipDirection or tipCFrame.LookVector, self.Config.BulletSpread or 0)
+		local raycastResult = Raycast.collidable(Tip.Position, bulletDirection, self.Config.Range, raycastParams, collidableFunc)
 		local hitInstance = nil
 		if raycastResult then
 			hitInstance = raycastResult.Instance
 			bulletHitPosition = raycastResult.Position
 		else
-			bulletHitPosition = Tip.Position + bulletDirection * p1.Config.Range
+			bulletHitPosition = Tip.Position + bulletDirection * self.Config.Range
 		end
-		if (p1.Local or p1.SimulateLocal) and hitInstance then
+		if (self.Local or self.SimulateLocal) and hitInstance then
 			local targetHumanoid = CharacterUtils.getAncestorPartHumanoid(hitInstance)
 			if targetHumanoid then
-				p1.inventoryItemValue:FindFirstChild(GunSystemConsts.DAMAGE_REMOTE_NAME):FireServer(bulletHitPosition, targetHumanoid)
-				if p1.CrossHair then
-					p1.CrossHair:Flare()
+				self.inventoryItemValue:FindFirstChild(GunSystemConsts.DAMAGE_REMOTE_NAME):FireServer(bulletHitPosition, targetHumanoid)
+				if self.CrossHair then
+					self.CrossHair:Flare()
 				end
-				if os.clock() - (p1.soundDebounce or 0) > 0.1 then
-					Audio.ObjectLocal(p1.Tip, p1.Config.Sound.bullet_impact_bass, {
+				if os.clock() - (self.soundDebounce or 0) > 0.1 then
+					Audio.ObjectLocal(self.Tip, self.Config.Sound.bullet_impact_bass, {
 						TimePosition = 0,
 						Volume = 1,
 						Pitch = 1
 					})
-					p1.soundDebounce = os.clock()
+					self.soundDebounce = os.clock()
 				end
 			end
 		end
-		p1:Zap(Tip.Position, bulletHitPosition, 0.2, 0.5, 6)
+		self:Zap(Tip.Position, bulletHitPosition, 0.2, 0.5, 6)
 	end
-	p1:Zap(Tip.Position, Tip.CFrame * Vector3.new(0, 0, -4) + GeomUtils.randomPointOnSphere() * 3, 0.06, 0.2, 1)
-	p1:Zap(Tip.Position, Tip.CFrame * Vector3.new(0, 0, -4) + GeomUtils.randomPointOnSphere() * 3, 0.06, 0.2, 1)
-	p1:Zap(Tip.Position, Tip.CFrame * Vector3.new(0, 0, -4) + GeomUtils.randomPointOnSphere() * 3, 0.06, 0.2, 1)
+	self:Zap(Tip.Position, Tip.CFrame * Vector3.new(0, 0, -4) + GeomUtils.randomPointOnSphere() * 3, 0.06, 0.2, 1)
+	self:Zap(Tip.Position, Tip.CFrame * Vector3.new(0, 0, -4) + GeomUtils.randomPointOnSphere() * 3, 0.06, 0.2, 1)
+	self:Zap(Tip.Position, Tip.CFrame * Vector3.new(0, 0, -4) + GeomUtils.randomPointOnSphere() * 3, 0.06, 0.2, 1)
 end
-function t.ShootSound(p1, p2)
-	if not p2 then
-		Audio.ObjectLocal(p1.Tip, 4752401149)
+function PlasmaGun.ShootSound(self, shouldPlaySound)
+	if not shouldPlaySound then
+		Audio.ObjectLocal(self.Tip, 4752401149)
 	end
 end
-function t.ReloadDropAmmoVisual(p1)  end
-function t.ReloadRefillAmmoVisual(p1)  end
-function t.ReloadDropAmmoSound(p1)
-	Audio.ObjectLocal(p1.Tip, 16652902841, {
+function PlasmaGun.ReloadDropAmmoVisual(self)  end
+function PlasmaGun.ReloadRefillAmmoVisual(self)  end
+function PlasmaGun.ReloadDropAmmoSound(self)
+	Audio.ObjectLocal(self.Tip, 16652902841, {
 		Volume = 1
 	})
 end
-function t.ReloadRefillAmmoSound(p1)  end
-function t.Unequip(p1)
-	Gun.Unequip(p1)
-	p1:DestroyZaps()
+function PlasmaGun.ReloadRefillAmmoSound(self)  end
+function PlasmaGun.Unequip(self)
+	Gun.Unequip(self)
+	self:DestroyZaps()
 end
-return t
+return PlasmaGun

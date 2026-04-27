@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -10,42 +9,42 @@ local HotbarItemRes = require(script.Parent.HotbarItemRes)
 local HotbarItemUtils = require(script.Parent.HotbarItemUtils)
 local InventoryItemBinder = require(ReplicatedStorage.Inventory.InventoryItemBinder)
 local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
-local t = {}
-t.__index = t
-function t.new(self)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.obj = self
-	t2._maid = Maid.new()
-	if t2:GetOwner() == Players.LocalPlayer then
-		t2:_setupLocal()
+local HotbarItem = {}
+HotbarItem.__index = HotbarItem
+function HotbarItem.new(self)
+	local hotbarItem = {}
+	setmetatable(hotbarItem, HotbarItem)
+	hotbarItem.obj = self
+	hotbarItem._maid = Maid.new()
+	if hotbarItem:GetOwner() == Players.LocalPlayer then
+		hotbarItem:_setupLocal()
 	end
-	t2.lastDroppedAt = 0
-	return t2
+	hotbarItem.lastDroppedAt = 0
+	return hotbarItem
 end
-function t.GetOwner(self)
-	local v1 = self.obj.Parent.Parent
-	local isParent = v1.Parent == game:GetService("Players")
+function HotbarItem.GetOwner(self)
+	local player = self.obj.Parent.Parent
+	local isParent = player.Parent == game:GetService("Players")
 	assert(isParent, "this hotbarItem is not a valid descendant of a player")
-	return v1
+	return player
 end
-function t.SetKeyCode(self, p2)
-	self.keyCode = p2
+function HotbarItem.SetKeyCode(self, keyCode)
+	self.keyCode = keyCode
 end
-function t.SetBindText(self, p2)
-	self._frame.Index.Visible = p2 ~= nil
-	if p2 then
-		self._frame.Index.Text = p2
+function HotbarItem.SetBindText(self, bindText)
+	self._frame.Index.Visible = bindText ~= nil
+	if bindText then
+		self._frame.Index.Text = bindText
 	end
 end
-function t.SetDropVisible(self, p2)
-	assert(typeof(p2) == "boolean", "value must be a boolean")
-	self._frame.Drop.Visible = p2
+function HotbarItem.SetDropVisible(self, isVisible)
+	assert(typeof(isVisible) == "boolean", "value must be a boolean")
+	self._frame.Drop.Visible = isVisible
 end
-function t._setupLocal(self)
-	local v1 = HotbarItemRes.presetFrame:Clone()
-	v1.Parent = HotbarItemRes.gui.Container
-	self._frame = v1
+function HotbarItem._setupLocal(self)
+	local itemFrame = HotbarItemRes.presetFrame:Clone()
+	itemFrame.Parent = HotbarItemRes.gui.Container
+	self._frame = itemFrame
 	self._maid:GiveTask(self._frame)
 	self:_setupDisplayOrder()
 	self:_setupImageSrc()
@@ -59,26 +58,26 @@ function t._setupLocal(self)
 	end
 	self._maid:GiveTask(InventoryItemUtils.getEquippedSignal(self.obj):Connect(handleEquipped))
 	self._frame.ImageTransparency = if InventoryItemUtils.getEquipped(self.obj) then 0.5 else 0
-	self._maid:GiveTask(v1.Drop.MouseButton1Down:Connect(function()
+	self._maid:GiveTask(itemFrame.Drop.MouseButton1Down:Connect(function()
 		self:GetInventoryItem():AttemptDrop()
 		self.lastDroppedAt = os.clock()
 	end))
 end
-function t._setupDisplayOrder(self)
+function HotbarItem._setupDisplayOrder(self)
 	local function update()
 		self._frame.LayoutOrder = HotbarItemUtils.getDisplayOrder(self.obj) or 0
 	end
 	self._frame.LayoutOrder = HotbarItemUtils.getDisplayOrder(self.obj) or 0
 	self._maid:GiveTask(self.obj:GetAttributeChangedSignal(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME):Connect(update))
 end
-function t._setupImageSrc(self)
+function HotbarItem._setupImageSrc(self)
 	local function update()
 		self._frame.Icon.Image = HotbarItemUtils.getImageSrc(self.obj) or ""
 	end
 	self._frame.Icon.Image = HotbarItemUtils.getImageSrc(self.obj) or ""
 	self._maid:GiveTask(self.obj:GetAttributeChangedSignal(HotbarItemConsts.IMAGE_SRC_ATTR_NAME):Connect(update))
 end
-function t._setupDragging(self)
+function HotbarItem._setupDragging(self)
 	self._maid:GiveTask(self._frame.MouseButton1Down:Connect(function()
 		self:_onPressStarted()
 	end))
@@ -86,52 +85,52 @@ function t._setupDragging(self)
 		self:_onPressEnded()
 	end))
 end
-function t._onPressStarted(self)
-	local v1 = (self._pressCounter or 0) + 1
-	self._pressCounter = v1
+function HotbarItem._onPressStarted(self)
+	local newPressCounter = (self._pressCounter or 0) + 1
+	self._pressCounter = newPressCounter
 	self._pressCounterAtStart = self._pressCounter
 	task.delay(HotbarItemConsts.MIN_DRAG_DURATION, function()
-		if self._pressCounter == v1 then
+		if self._pressCounter == newPressCounter then
 			self._pressCounter = self._pressCounter + 1
 			self.onDragStarted:Fire()
 		end
 	end)
 end
-function t._onPressEnded(self)
+function HotbarItem._onPressEnded(self)
 	if os.clock() - self.lastDroppedAt < 0.1 then
 	elseif self._pressCounter == self._pressCounterAtStart then
 		self._pressCounter = (self._pressCounter or 0) + 1
 		self:GetInventoryItem():AttemptSelect()
 	end
 end
-function t.GetInventoryItem(self)
+function HotbarItem.GetInventoryItem(self)
 	return InventoryItemBinder:Get(self.obj)
 end
-function t.SetSize(self, p2)
-	self.sizeSpring:SetTarget(p2)
+function HotbarItem.SetSize(self, targetSize)
+	self.sizeSpring:SetTarget(targetSize)
 	self._maid.springHeartbeat = RunService.Heartbeat:Connect(function()
-		local v1, v2 = self.sizeSpring:Update()
-		if math.abs(p2 - v1) < 0.001 and math.abs(v2) < 0.001 then
+		local sizeValue, sizeVelocity = self.sizeSpring:Update()
+		if math.abs(targetSize - sizeValue) < 0.001 and math.abs(sizeVelocity) < 0.001 then
 			self._maid.springHeartbeat = nil
-			v1 = p2
+			sizeValue = targetSize
 		end
-		self._frame.Size = UDim2.new(v1, 0, v1, 0)
+		self._frame.Size = UDim2.new(sizeValue, 0, sizeValue, 0)
 	end)
 end
-function t.Spin(self)
+function HotbarItem.Spin(self)
 	self.spinSpring:SetTarget(360)
 	self.spinSpring.p = 0
 	self._maid.spinHeartbeat = RunService.Heartbeat:Connect(function()
-		local v1, v2 = self.spinSpring:Update()
-		if math.abs(360 - v1) < 0.001 and math.abs(v2) < 0.001 then
+		local rotationValue, rotationVelocity = self.spinSpring:Update()
+		if math.abs(360 - rotationValue) < 0.001 and math.abs(rotationVelocity) < 0.001 then
 			self._maid.spinHeartbeat = nil
-			v1 = 0
+			rotationValue = 0
 		end
-		self._frame.Icon.Rotation = v1
+		self._frame.Icon.Rotation = rotationValue
 	end)
 end
-function t.Destroy(self)
+function HotbarItem.Destroy(self)
 	self._maid:Destroy()
 	setmetatable(self, nil)
 end
-return t
+return HotbarItem

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local Enumer = require(ReplicatedStorage.Std.Enumer)
@@ -134,32 +133,32 @@ local list = {
  }
 	}
 }
-local tbl = {}
+local robberyKeys = {}
 for i, v in ipairs(list) do
-	local v1, v2
-	v1 = v.key ~= nil
-	assert(v1)
-	v2 = v.name ~= nil
-	assert(v2)
-	table.insert(tbl, v.key)
+	local hasKey, hasName
+	hasKey = v.key ~= nil
+	assert(hasKey)
+	hasName = v.name ~= nil
+	assert(hasName)
+	table.insert(robberyKeys, v.key)
 end
-local v3 = Enumer(tbl)
-local tbl2 = {}
-local tbl3 = {}
+local robberyEnum = Enumer(robberyKeys)
+local robberyNameMap = {}
+local robberyDataMap = {}
 for i, v in ipairs(list) do
-	tbl2[v3[v.key]] = v.name
-	tbl3[v3[v.key]] = v
+	robberyNameMap[robberyEnum[v.key]] = v.name
+	robberyDataMap[robberyEnum[v.key]] = v
 end
 return TableUtils.requireValidIndexAndFreeze({
 	FOLDER_NAME = "RobberyFolder",
-	DATA_ROBBERY = tbl3,
-	LIST_ROBBERY = tbl,
-	ENUM_ROBBERY = v3,
-	PRETTY_NAME = tbl2,
+	DATA_ROBBERY = robberyDataMap,
+	LIST_ROBBERY = robberyKeys,
+	ENUM_ROBBERY = robberyEnum,
+	PRETTY_NAME = robberyNameMap,
 	STATUS_ATTR_NAME = "RobberyStatus",
 	ENUM_STATUS = Enumer({ "OPENED", "STARTED", "CLOSED" }),
 	DISABLE_AUTO_OPEN_ATTR_NAME = "RobberyDisableAutoOpen",
-	IGNORE_STATUS = { v3.STORE_GAS, v3.STORE_DONUT, v3.HOME_VAULT },
+	IGNORE_STATUS = { robberyEnum.STORE_GAS, robberyEnum.STORE_DONUT, robberyEnum.HOME_VAULT },
 	ROUND_MIN_DURATION = 180,
 	ROUND_MAX_DURATION = 420,
 	ROBBERY_STARTED_ROUND_PROTECTION_DURATION = 240,

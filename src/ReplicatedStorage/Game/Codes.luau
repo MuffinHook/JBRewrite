@@ -1,4 +1,3 @@
--- Reviewed by Claude
 game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AlexWM = require(ReplicatedStorage.Module.AlexWM)
@@ -6,47 +5,47 @@ local CollectionService = game:GetService("CollectionService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
 return {
-	Init = function(p1)
+	Init = function(service)
 		local CodesGui = ReplicatedStorage.StarterGui:FindFirstChild("CodesGui")
 		CodesGui.Parent = LocalPlayer.PlayerGui
-		local v1 = p1.Event
+		local codeEvent = service.Event
 		local function WindowOpen()
 			CodesGui.Enabled = true
 		end
 		local function WindowClose()
 			CodesGui.Enabled = false
 		end
-		local function RemovedFun(p1)
-			CircleAction.Remove(p1)
+		local function RemovedFun(atmPart)
+			CircleAction.Remove(atmPart)
 			return true
 		end
-		local v2 = AlexWM.MakeWindow()
-		v2.OpenFun = WindowOpen
-		v2.CloseFun = WindowClose
-		AlexWM.WindowGroupAdd(p1.MainWindowGroup, v2)
+		local codesWindow = AlexWM.MakeWindow()
+		codesWindow.OpenFun = WindowOpen
+		codesWindow.CloseFun = WindowClose
+		AlexWM.WindowGroupAdd(service.MainWindowGroup, codesWindow)
 		CodesGui.CodeContainer.Close.MouseButton1Down:Connect(function()
-			AlexWM.WindowClose(v2)
+			AlexWM.WindowClose(codesWindow)
 		end)
-		local function preUpdateFun(p1)
-			p1.Enabled = not v2.IsOpen
+		local function preUpdateFun(guiElement)
+			guiElement.Enabled = not codesWindow.IsOpen
 		end
-		local function action(p1, p2)
-			if p2 then
-				AlexWM.WindowOpen(v2)
-				p1.Enabled = not v2.IsOpen
+		local function action(guiElement, isActivated)
+			if isActivated then
+				AlexWM.WindowOpen(codesWindow)
+				guiElement.Enabled = not codesWindow.IsOpen
 			end
 		end
-		local function AddedFun(p1)
+		local function AddedFun(atmPart)
 			CircleAction.Add({
-				Part = p1,
+				Part = atmPart,
 				Name = "Open ATM",
 				Timed = false,
 				Dist = 7,
 				Callback = action,
-				ValidRoot = p1.Parent,
+				ValidRoot = atmPart.Parent,
 				PreUpdateFun = preUpdateFun,
 				PreUpdatePeriod = 0.5
-			}, p1)
+			}, atmPart)
 			return true
 		end
 		local function Submit()
@@ -55,28 +54,28 @@ return {
 				return false
 			end
 			CodesGui.CodeContainer.Background.CodeContainer.Code.Text = ""
-			v1:FireServer("k" .. ("ufdiwhmg"):sub(4, 6):reverse():reverse():reverse() .. "" .. "" .. ("yklotvu"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "hx", Text)
-			AlexWM.WindowClose(v2)
+			codeEvent:FireServer("khwitohx", Text)
+			AlexWM.WindowClose(codesWindow)
 		end
 		CodesGui.CodeContainer.Background.Redeem.MouseButton1Down:Connect(Submit)
-		CodesGui.CodeContainer.Background.CodeContainer.Code.FocusLost:Connect(function(p1)
-			if p1 then
+		CodesGui.CodeContainer.Background.CodeContainer.Code.FocusLost:Connect(function(focusEvent)
+			if focusEvent then
 				Submit()
 			end
 		end)
-		local v3 = next
-		local v4, v5 = CollectionService:GetTagged("ATM")
-		for v6, v7 in v3, v4, v5 do
+		local nextIterator = next
+		local atmInstances, iterationState = CollectionService:GetTagged("ATM")
+		for index, atmInstance in nextIterator, atmInstances, iterationState do
 			CircleAction.Add({
-				Part = v7,
+				Part = atmInstance,
 				Name = "Open ATM",
 				Timed = false,
 				Dist = 7,
 				Callback = action,
-				ValidRoot = v7.Parent,
+				ValidRoot = atmInstance.Parent,
 				PreUpdateFun = preUpdateFun,
 				PreUpdatePeriod = 0.5
-			}, v7)
+			}, atmInstance)
 		end
 		CollectionService:GetInstanceAddedSignal("ATM"):Connect(AddedFun)
 		CollectionService:GetInstanceRemovedSignal("ATM"):Connect(RemovedFun)

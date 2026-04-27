@@ -1,5 +1,4 @@
--- Reviewed by Claude
-local t = {
+local GameAnalyticsModule = {
 	EGAResourceFlowType = require(script.GAResourceFlowType),
 	EGAProgressionStatus = require(script.GAProgressionStatus),
 	EGAErrorSeverity = require(script.GAErrorSeverity)
@@ -37,7 +36,7 @@ local function addToInitializationQueue(func, ...)
 	end
 end
 local function addToInitializationQueueByUserId(userId, func, ...)
-	if t:isPlayerReady(userId) then
+	if GameAnalyticsModule:isPlayerReady(userId) then
 		Logger:w("Player initialization queue already cleared.")
 	else
 		if playerInitializationQueues[userId] == nil then
@@ -72,7 +71,7 @@ local function isSdkReady(options)
 	end
 	return false
 end
-function t.configureAvailableCustomDimensions01(_, dimensions)
+function GameAnalyticsModule.configureAvailableCustomDimensions01(_, dimensions)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -82,7 +81,7 @@ function t.configureAvailableCustomDimensions01(_, dimensions)
 		State:setAvailableCustomDimensions01(dimensions)
 	end
 end
-function t.configureAvailableCustomDimensions02(_, dimensions)
+function GameAnalyticsModule.configureAvailableCustomDimensions02(_, dimensions)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -92,7 +91,7 @@ function t.configureAvailableCustomDimensions02(_, dimensions)
 		State:setAvailableCustomDimensions02(dimensions)
 	end
 end
-function t.configureAvailableCustomDimensions03(_, dimensions)
+function GameAnalyticsModule.configureAvailableCustomDimensions03(_, dimensions)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -102,7 +101,7 @@ function t.configureAvailableCustomDimensions03(_, dimensions)
 		State:setAvailableCustomDimensions03(dimensions)
 	end
 end
-function t.configureAvailableResourceCurrencies(_, currencies)
+function GameAnalyticsModule.configureAvailableResourceCurrencies(_, currencies)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -112,7 +111,7 @@ function t.configureAvailableResourceCurrencies(_, currencies)
 		Events:setAvailableResourceCurrencies(currencies)
 	end
 end
-function t.configureAvailableResourceItemTypes(_, itemTypes)
+function GameAnalyticsModule.configureAvailableResourceItemTypes(_, itemTypes)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -122,7 +121,7 @@ function t.configureAvailableResourceItemTypes(_, itemTypes)
 		Events:setAvailableResourceItemTypes(itemTypes)
 	end
 end
-function t.configureBuild(_, build)
+function GameAnalyticsModule.configureBuild(_, build)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -132,7 +131,7 @@ function t.configureBuild(_, build)
 		Events:setBuild(build)
 	end
 end
-function t.configureAvailableGamepasses(_, gamepasses)
+function GameAnalyticsModule.configureAvailableGamepasses(_, gamepasses)
 	if isSdkReady({
 		needsInitialized = true,
 		shouldWarn = false
@@ -142,7 +141,7 @@ function t.configureAvailableGamepasses(_, gamepasses)
 		State:setAvailableGamepasses(gamepasses)
 	end
 end
-function t.startNewSession(_, userId, sessionData)
+function GameAnalyticsModule.startNewSession(_, userId, sessionData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if State.Initialized then
@@ -153,17 +152,17 @@ function t.startNewSession(_, userId, sessionData)
 		end
 	end)
 end
-function t.endSession(_, userId)
+function GameAnalyticsModule.endSession(_, userId)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			State:endSession(userId)
 		end
 	end)
 end
-function t.filterForBusinessEvent(_, text)
+function GameAnalyticsModule.filterForBusinessEvent(_, text)
 	return string.gsub(text, "[^A-Za-z0-9%s%-_%.%(%)!%?]", "")
 end
-function t.addBusinessEvent(_, userId, eventData)
+function GameAnalyticsModule.addBusinessEvent(_, userId, eventData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
@@ -188,14 +187,14 @@ function t.addBusinessEvent(_, userId, eventData)
 					Store:SavePlayerData(player)
 				end
 			elseif userId then
-				addToInitializationQueueByUserId(userId, t.addBusinessEvent, t, userId, eventData)
+				addToInitializationQueueByUserId(userId, GameAnalyticsModule.addBusinessEvent, GameAnalyticsModule, userId, eventData)
 			else
-				addToInitializationQueue(t.addBusinessEvent, t, userId, eventData)
+				addToInitializationQueue(GameAnalyticsModule.addBusinessEvent, GameAnalyticsModule, userId, eventData)
 			end
 		end
 	end)
 end
-function t.addResourceEvent(_, userId, eventData)
+function GameAnalyticsModule.addResourceEvent(_, userId, eventData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
@@ -206,14 +205,14 @@ function t.addResourceEvent(_, userId, eventData)
 			}) then
 				Events:addResourceEvent(userId, eventData.flowType or 0, eventData.currency or "", eventData.amount or 0, eventData.itemType or "", eventData.itemId or "")
 			elseif userId then
-				addToInitializationQueueByUserId(userId, t.addResourceEvent, t, userId, eventData)
+				addToInitializationQueueByUserId(userId, GameAnalyticsModule.addResourceEvent, GameAnalyticsModule, userId, eventData)
 			else
-				addToInitializationQueue(t.addResourceEvent, t, userId, eventData)
+				addToInitializationQueue(GameAnalyticsModule.addResourceEvent, GameAnalyticsModule, userId, eventData)
 			end
 		end
 	end)
 end
-function t.addProgressionEvent(_, userId, eventData)
+function GameAnalyticsModule.addProgressionEvent(_, userId, eventData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
@@ -224,14 +223,14 @@ function t.addProgressionEvent(_, userId, eventData)
 			}) then
 				Events:addProgressionEvent(userId, eventData.progressionStatus or 0, eventData.progression01 or "", eventData.progression02 or nil, eventData.progression03 or nil, eventData.score or nil)
 			elseif userId then
-				addToInitializationQueueByUserId(userId, t.addProgressionEvent, t, userId, eventData)
+				addToInitializationQueueByUserId(userId, GameAnalyticsModule.addProgressionEvent, GameAnalyticsModule, userId, eventData)
 			else
-				addToInitializationQueue(t.addProgressionEvent, t, userId, eventData)
+				addToInitializationQueue(GameAnalyticsModule.addProgressionEvent, GameAnalyticsModule, userId, eventData)
 			end
 		end
 	end)
 end
-function t.addDesignEvent(_, userId, eventData)
+function GameAnalyticsModule.addDesignEvent(_, userId, eventData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
@@ -242,14 +241,14 @@ function t.addDesignEvent(_, userId, eventData)
 			}) then
 				Events:addDesignEvent(userId, eventData.eventId or "", eventData.value or nil)
 			elseif userId then
-				addToInitializationQueueByUserId(userId, t.addDesignEvent, t, userId, eventData)
+				addToInitializationQueueByUserId(userId, GameAnalyticsModule.addDesignEvent, GameAnalyticsModule, userId, eventData)
 			else
-				addToInitializationQueue(t.addDesignEvent, t, userId, eventData)
+				addToInitializationQueue(GameAnalyticsModule.addDesignEvent, GameAnalyticsModule, userId, eventData)
 			end
 		end
 	end)
 end
-function t.addErrorEvent(_, userId, eventData)
+function GameAnalyticsModule.addErrorEvent(_, userId, eventData)
 	Threading:performTaskOnGAThread(function()
 		if State:isEventSubmissionEnabled() then
 			if isSdkReady({
@@ -260,14 +259,14 @@ function t.addErrorEvent(_, userId, eventData)
 			}) then
 				Events:addErrorEvent(userId, eventData.severity or 0, eventData.message or "")
 			elseif userId then
-				addToInitializationQueueByUserId(userId, t.addErrorEvent, t, userId, eventData)
+				addToInitializationQueueByUserId(userId, GameAnalyticsModule.addErrorEvent, GameAnalyticsModule, userId, eventData)
 			else
-				addToInitializationQueue(t.addErrorEvent, t, userId, eventData)
+				addToInitializationQueue(GameAnalyticsModule.addErrorEvent, GameAnalyticsModule, userId, eventData)
 			end
 		end
 	end)
 end
-function t.setEnabledDebugLog(_, enabled)
+function GameAnalyticsModule.setEnabledDebugLog(_, enabled)
 	if RunService:IsStudio() then
 		if enabled then
 			Logger:setDebugLog(enabled)
@@ -280,7 +279,7 @@ function t.setEnabledDebugLog(_, enabled)
 		Logger:i("setEnabledDebugLog can only be used in studio")
 	end
 end
-function t.setEnabledInfoLog(_, enabled)
+function GameAnalyticsModule.setEnabledInfoLog(_, enabled)
 	if enabled then
 		Logger:setInfoLog(enabled)
 		Logger:i("Info logging enabled")
@@ -289,7 +288,7 @@ function t.setEnabledInfoLog(_, enabled)
 		Logger:setInfoLog(enabled)
 	end
 end
-function t.setEnabledVerboseLog(_, enabled)
+function GameAnalyticsModule.setEnabledVerboseLog(_, enabled)
 	if enabled then
 		Logger:setVerboseLog(enabled)
 		Logger:ii("Verbose logging enabled")
@@ -298,7 +297,7 @@ function t.setEnabledVerboseLog(_, enabled)
 		Logger:setVerboseLog(enabled)
 	end
 end
-function t.setEnabledEventSubmission(_, enabled)
+function GameAnalyticsModule.setEnabledEventSubmission(_, enabled)
 	Threading:performTaskOnGAThread(function()
 		if enabled then
 			State:setEventSubmission(enabled)
@@ -309,7 +308,7 @@ function t.setEnabledEventSubmission(_, enabled)
 		end
 	end)
 end
-function t.setCustomDimension01(_, userId, dimensionValue)
+function GameAnalyticsModule.setCustomDimension01(_, userId, dimensionValue)
 	Threading:performTaskOnGAThread(function()
 		if Validation:validateDimension(State._availableCustomDimensions01, dimensionValue) then
 			if isSdkReady({
@@ -325,7 +324,7 @@ function t.setCustomDimension01(_, userId, dimensionValue)
 		end
 	end)
 end
-function t.setCustomDimension02(_, userId, dimensionValue)
+function GameAnalyticsModule.setCustomDimension02(_, userId, dimensionValue)
 	Threading:performTaskOnGAThread(function()
 		if Validation:validateDimension(State._availableCustomDimensions02, dimensionValue) then
 			if isSdkReady({
@@ -341,7 +340,7 @@ function t.setCustomDimension02(_, userId, dimensionValue)
 		end
 	end)
 end
-function t.setCustomDimension03(_, userId, dimensionValue)
+function GameAnalyticsModule.setCustomDimension03(_, userId, dimensionValue)
 	Threading:performTaskOnGAThread(function()
 		if Validation:validateDimension(State._availableCustomDimensions03, dimensionValue) then
 			if isSdkReady({
@@ -357,22 +356,22 @@ function t.setCustomDimension03(_, userId, dimensionValue)
 		end
 	end)
 end
-function t.setEnabledReportErrors(_, enabled)
+function GameAnalyticsModule.setEnabledReportErrors(_, enabled)
 	Threading:performTaskOnGAThread(function()
 		State.ReportErrors = enabled
 	end)
 end
-function t.setEnabledCustomUserId(_, enabled)
+function GameAnalyticsModule.setEnabledCustomUserId(_, enabled)
 	Threading:performTaskOnGAThread(function()
 		State.UseCustomUserId = enabled
 	end)
 end
-function t.setEnabledAutomaticSendBusinessEvents(_, enabled)
+function GameAnalyticsModule.setEnabledAutomaticSendBusinessEvents(_, enabled)
 	Threading:performTaskOnGAThread(function()
 		State.AutomaticSendBusinessEvents = enabled
 	end)
 end
-function t.addGameAnalyticsTeleportData(_, userIds, teleportData)
+function GameAnalyticsModule.addGameAnalyticsTeleportData(_, userIds, teleportData)
 	local gameAnalyticsData = {}
 	for i, userId in ipairs(userIds) do
 		local playerData = Store:GetPlayerDataFromCache(userId)
@@ -386,16 +385,16 @@ function t.addGameAnalyticsTeleportData(_, userIds, teleportData)
 	teleportData.gameanalyticsData = gameAnalyticsData
 	return teleportData
 end
-function t.getRemoteConfigsValueAsString(_, userId, configOptions)
+function GameAnalyticsModule.getRemoteConfigsValueAsString(_, userId, configOptions)
 	return State:getRemoteConfigsStringValue(userId, configOptions.key or "", configOptions.defaultValue or nil)
 end
-function t.isRemoteConfigsReady(_, userId)
+function GameAnalyticsModule.isRemoteConfigsReady(_, userId)
 	return State:isRemoteConfigsReady(userId)
 end
-function t.getRemoteConfigsContentAsString(_, userId)
+function GameAnalyticsModule.getRemoteConfigsContentAsString(_, userId)
 	return State:getRemoteConfigsContentAsString(userId)
 end
-function t.PlayerJoined(_, player)
+function GameAnalyticsModule.PlayerJoined(_, player)
 	local TeleportData = player:GetJoinData().TeleportData
 	local playerData = Store:GetPlayerData(player)
 	local teleportGameAnalyticsData
@@ -418,12 +417,12 @@ function t.PlayerJoined(_, player)
 	else
 		local platformSuccess, platform = Postie.invokeClient("getPlatform", player, 5)
 		local platformName = if platformSuccess then platform else "unknown"
-		for k, v in pairs(Store.BasePlayerData) do
-			if not playerData[k] then
-				if typeof(v) == "table" then
-					playerData[k] = Utilities:copyTable(v)
+		for baseDataKey, baseDataValue in pairs(Store.BasePlayerData) do
+			if not playerData[baseDataKey] then
+				if typeof(baseDataValue) == "table" then
+					playerData[baseDataKey] = Utilities:copyTable(baseDataValue)
 				else
-					playerData[k] = v
+					playerData[baseDataKey] = baseDataValue
 				end
 			end
 		end
@@ -450,7 +449,7 @@ function t.PlayerJoined(_, player)
 			Logger:i("Using custom id: " .. customUserId)
 			playerData.CustomUserId = customUserId
 		end
-		t:startNewSession(player, teleportGameAnalyticsData)
+		GameAnalyticsModule:startNewSession(player, teleportGameAnalyticsData)
 		onPlayerReadyEvent = onPlayerReadyEvent or ReplicatedStorage:WaitForChild("OnPlayerReadyEvent")
 		onPlayerReadyEvent:Fire(player)
 		if State.AutomaticSendBusinessEvents then
@@ -481,10 +480,10 @@ function t.PlayerJoined(_, player)
 							cachedProductInfo[gamepassId] = productInfo
 							gamepassInfo = productInfo
 						end
-						t:addBusinessEvent(player.UserId, {
+						GameAnalyticsModule:addBusinessEvent(player.UserId, {
 							amount = gamepassInfo.PriceInRobux,
 							itemType = "Gamepass",
-							itemId = t:filterForBusinessEvent(gamepassInfo.Name),
+							itemId = GameAnalyticsModule:filterForBusinessEvent(gamepassInfo.Name),
 							cartType = "Website"
 						})
 					end
@@ -503,20 +502,20 @@ function t.PlayerJoined(_, player)
 		end
 	end
 end
-function t.PlayerRemoved(_, player)
+function GameAnalyticsModule.PlayerRemoved(_, player)
 	Store:SavePlayerData(player)
 	local playerData = Store:GetPlayerDataFromCache(player.UserId)
 	if playerData and playerData.PlayerTeleporting then
 		Store.PlayerCache[player.UserId] = nil
 		Store.DataStoreQueue.RemoveKey(player.UserId)
 	elseif playerData then
-		t:endSession(player.UserId)
+		GameAnalyticsModule:endSession(player.UserId)
 	end
 end
-function t.isPlayerReady(_, userId)
+function GameAnalyticsModule.isPlayerReady(_, userId)
 	return Store:GetPlayerDataFromCache(userId) and true or false
 end
-function t.ProcessReceiptCallback(_, receiptData)
+function GameAnalyticsModule.ProcessReceiptCallback(_, receiptData)
 	local productInfo = cachedProductInfo[receiptData.ProductId]
 	if not productInfo then
 		pcall(function()
@@ -525,14 +524,14 @@ function t.ProcessReceiptCallback(_, receiptData)
 		end)
 	end
 	if productInfo then
-		t:addBusinessEvent(receiptData.PlayerId, {
+		GameAnalyticsModule:addBusinessEvent(receiptData.PlayerId, {
 			amount = receiptData.CurrencySpent,
 			itemType = "DeveloperProduct",
-			itemId = t:filterForBusinessEvent(productInfo.Name)
+			itemId = GameAnalyticsModule:filterForBusinessEvent(productInfo.Name)
 		})
 	end
 end
-function t.GamepassPurchased(_, player, gamepassId, gamepassInfo)
+function GameAnalyticsModule.GamepassPurchased(_, player, gamepassId, gamepassInfo)
 	local cachedInfo = cachedProductInfo[gamepassId]
 	if not cachedInfo then
 		local productInfo = MarketplaceService:GetProductInfo(gamepassId, Enum.InfoType.GamePass)
@@ -548,21 +547,21 @@ function t.GamepassPurchased(_, player, gamepassId, gamepassInfo)
 		amount = cachedInfo.PriceInRobux
 		gamepassName = cachedInfo.Name
 	end
-	t:addBusinessEvent(player.UserId, {
+	GameAnalyticsModule:addBusinessEvent(player.UserId, {
 		amount = amount or 0,
 		itemType = "Gamepass",
-		itemId = t:filterForBusinessEvent(gamepassName),
+		itemId = GameAnalyticsModule:filterForBusinessEvent(gamepassName),
 		gamepassId = gamepassId
 	})
 end
 local requiredInitKeys = { "gameKey", "secretKey" }
-function t.initServer(_, gameKey, secretKey)
-	t:initialize({
+function GameAnalyticsModule.initServer(_, gameKey, secretKey)
+	GameAnalyticsModule:initialize({
 		gameKey = gameKey,
 		secretKey = secretKey
 	})
 end
-function t.initialize(_, config)
+function GameAnalyticsModule.initialize(_, config)
 	Threading:performTaskOnGAThread(function()
 		for i, requiredKey in ipairs(requiredInitKeys) do
 			if config[requiredKey] == nil then
@@ -571,43 +570,43 @@ function t.initialize(_, config)
 			end
 		end
 		if config.enableInfoLog ~= nil and config.enableInfoLog then
-			t:setEnabledInfoLog(config.enableInfoLog)
+			GameAnalyticsModule:setEnabledInfoLog(config.enableInfoLog)
 		end
 		if config.enableVerboseLog ~= nil and config.enableVerboseLog then
-			t:setEnabledVerboseLog(config.enableVerboseLog)
+			GameAnalyticsModule:setEnabledVerboseLog(config.enableVerboseLog)
 		end
 		if config.availableCustomDimensions01 ~= nil and #config.availableCustomDimensions01 > 0 then
-			t:configureAvailableCustomDimensions01(config.availableCustomDimensions01)
+			GameAnalyticsModule:configureAvailableCustomDimensions01(config.availableCustomDimensions01)
 		end
 		if config.availableCustomDimensions02 ~= nil and #config.availableCustomDimensions02 > 0 then
-			t:configureAvailableCustomDimensions02(config.availableCustomDimensions02)
+			GameAnalyticsModule:configureAvailableCustomDimensions02(config.availableCustomDimensions02)
 		end
 		if config.availableCustomDimensions03 ~= nil and #config.availableCustomDimensions03 > 0 then
-			t:configureAvailableCustomDimensions03(config.availableCustomDimensions03)
+			GameAnalyticsModule:configureAvailableCustomDimensions03(config.availableCustomDimensions03)
 		end
 		if config.availableResourceCurrencies ~= nil and #config.availableResourceCurrencies > 0 then
-			t:configureAvailableResourceCurrencies(config.availableResourceCurrencies)
+			GameAnalyticsModule:configureAvailableResourceCurrencies(config.availableResourceCurrencies)
 		end
 		if config.availableResourceItemTypes ~= nil and #config.availableResourceItemTypes > 0 then
-			t:configureAvailableResourceItemTypes(config.availableResourceItemTypes)
+			GameAnalyticsModule:configureAvailableResourceItemTypes(config.availableResourceItemTypes)
 		end
 		if config.build ~= nil and #config.build > 0 then
-			t:configureBuild(config.build)
+			GameAnalyticsModule:configureBuild(config.build)
 		end
 		if config.availableGamepasses ~= nil and #config.availableGamepasses > 0 then
-			t:configureAvailableGamepasses(config.availableGamepasses)
+			GameAnalyticsModule:configureAvailableGamepasses(config.availableGamepasses)
 		end
 		if config.enableDebugLog ~= nil then
-			t:setEnabledDebugLog(config.enableDebugLog)
+			GameAnalyticsModule:setEnabledDebugLog(config.enableDebugLog)
 		end
 		if config.automaticSendBusinessEvents ~= nil then
-			t:setEnabledAutomaticSendBusinessEvents(config.automaticSendBusinessEvents)
+			GameAnalyticsModule:setEnabledAutomaticSendBusinessEvents(config.automaticSendBusinessEvents)
 		end
 		if config.reportErrors ~= nil then
-			t:setEnabledReportErrors(config.reportErrors)
+			GameAnalyticsModule:setEnabledReportErrors(config.reportErrors)
 		end
 		if config.useCustomUserId ~= nil then
-			t:setEnabledCustomUserId(config.useCustomUserId)
+			GameAnalyticsModule:setEnabledCustomUserId(config.useCustomUserId)
 		end
 		if isSdkReady({
 			needsInitialized = true,
@@ -623,13 +622,13 @@ function t.initialize(_, config)
 			Events.SecretKey = secretKey
 			State.Initialized = true
 			Players.PlayerAdded:Connect(function(joinedPlayer)
-				t:PlayerJoined(joinedPlayer)
+				GameAnalyticsModule:PlayerJoined(joinedPlayer)
 			end)
 			Players.PlayerRemoving:Connect(function(leavingPlayer)
-				t:PlayerRemoved(leavingPlayer)
+				GameAnalyticsModule:PlayerRemoved(leavingPlayer)
 			end)
 			for i, joinedPlayer in ipairs(Players:GetPlayers()) do
-				coroutine.wrap(t.PlayerJoined)(t, joinedPlayer)
+				coroutine.wrap(GameAnalyticsModule.PlayerJoined)(GameAnalyticsModule, joinedPlayer)
 			end
 			for i, queuedEvent in ipairs(initializationQueue) do
 				task.spawn(queuedEvent.Func, unpack(queuedEvent.Args))
@@ -689,8 +688,8 @@ local function ErrorHandler(message, traceback, scriptName, player)
 		errorCounts[errorSignature].currentCount = 0
 	end
 	if not (errorCounts[errorSignature].currentCount > 10) then
-		t:addErrorEvent(userId, {
-			severity = t.EGAErrorSeverity.error,
+		GameAnalyticsModule:addErrorEvent(userId, {
+			severity = GameAnalyticsModule.EGAErrorSeverity.error,
 			message = fullErrorMessage
 		})
 		errorCounts[errorSignature].currentCount = errorCounts[errorSignature].currentCount + 1
@@ -727,7 +726,7 @@ ReplicatedStorage.GameAnalyticsError.OnServerEvent:Connect(function(player, mess
 end)
 MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, gamepassId, purchased)
 	if State.AutomaticSendBusinessEvents and purchased then
-		t:GamepassPurchased(player, gamepassId)
+		GameAnalyticsModule:GamepassPurchased(player, gamepassId)
 	end
 end)
-return t
+return GameAnalyticsModule

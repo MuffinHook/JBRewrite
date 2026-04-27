@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Util = require(script.Parent.Parent.Shared.Util)
 return function(typeRegistry)
 	local commandTypeSpec = {

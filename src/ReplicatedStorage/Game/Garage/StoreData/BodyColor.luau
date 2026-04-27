@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local Color = require(script.Parent.Color)

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -6,117 +5,117 @@ local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local createElement = Roact.createElement
 local PortalBase = require(script.Parent.PortalBase)
-local v1 = Roact.PureComponent:extend("PortalCustomize")
-function v1.render(p1)
-	local category = p1.props.category
-	local v1 = nil
-	for i, v in ipairs(p1.props.categories) do
+local PortalCustomizeComponent = Roact.PureComponent:extend("PortalCustomize")
+function PortalCustomizeComponent.render(self)
+	local category = self.props.category
+	local categoryTitle = nil
+	for i, v in ipairs(self.props.categories) do
 		if v.name == category then
-			v1 = v.title
+			categoryTitle = v.title
 			break
 		end
 	end
-	local t = {}
-	local t2 = {}
-	for i, v in ipairs(p1.props.receipt) do
-		t[v.category .. v.name] = true
+	local selectedItems = {}
+	local itemMetadata = {}
+	for i, v in ipairs(self.props.receipt) do
+		selectedItems[v.category .. v.name] = true
 	end
-	for i = 1, #p1.props.items do
-		local v2, v3, v4
-		local v5 = p1.props.items[i]
-		local categoryName = v5.categoryName
-		local v6 = nil
-		for i2, v in ipairs(p1.props.categories) do
+	for i = 1, #self.props.items do
+		local isFavorited, isOwned, isEquipped
+		local currentItem = self.props.items[i]
+		local categoryName = currentItem.categoryName
+		local itemCategoryTitle = nil
+		for i2, v in ipairs(self.props.categories) do
 			if v.name == categoryName then
-				v6 = v.title
+				itemCategoryTitle = v.title
 				break
 			end
 		end
-		if not v6 then
+		if not itemCategoryTitle then
 			error("missing category title for " .. categoryName)
 		end
-		v2 = if p1.props.favorited[categoryName] then p1.props.favorited[categoryName][v5.name] == true else false
-		v3 = if p1.props.owned[categoryName] then p1.props.owned[categoryName][v5.name] == true else false
-		local t3 = {
-			selected = t[v5.categoryName .. v5.name]
+		isFavorited = if self.props.favorited[categoryName] then self.props.favorited[categoryName][currentItem.name] == true else false
+		isOwned = if self.props.owned[categoryName] then self.props.owned[categoryName][currentItem.name] == true else false
+		local itemProperties = {
+			selected = selectedItems[currentItem.categoryName .. currentItem.name]
 		}
-		v4 = v5.name == (p1.props.equipped[categoryName] or "None")
-		t3.equipped = v4
-		t3.owned = v3
-		t3.faved = v2
-		function t3.onSelect()
-			if p1.props.attemptEquipItem then
-				p1.props.attemptEquipItem(categoryName, v5.name)
+		isEquipped = currentItem.name == (self.props.equipped[categoryName] or "None")
+		itemProperties.equipped = isEquipped
+		itemProperties.owned = isOwned
+		itemProperties.faved = isFavorited
+		function itemProperties.onSelect()
+			if self.props.attemptEquipItem then
+				self.props.attemptEquipItem(categoryName, currentItem.name)
 			end
-			p1.props.onSelectItem(categoryName, v6, v5, t3)
+			self.props.onSelectItem(categoryName, itemCategoryTitle, currentItem, itemProperties)
 		end
-		function t3.onFavorite(p12)
-			if p1.props.attemptFavoriteItem then
-				p1.props.attemptFavoriteItem(categoryName, v5.name, p12)
+		function itemProperties.onFavorite(favorited)
+			if self.props.attemptFavoriteItem then
+				self.props.attemptFavoriteItem(categoryName, currentItem.name, favorited)
 			end
-			p1.props.onFavoriteItem(categoryName, v5.name, p12)
+			self.props.onFavoriteItem(categoryName, currentItem.name, favorited)
 		end
-		t2[i] = t3
+		itemMetadata[i] = itemProperties
 	end
 	return createElement(PortalBase, {
-		title = v1,
-		items = p1.props.items,
-		metadata = t2,
-		cornerPixel = p1.props.cornerPixel,
-		portalRatio = p1.props.portalRatio,
-		paddingRatio = p1.props.paddingRatio,
+		title = categoryTitle,
+		items = self.props.items,
+		metadata = itemMetadata,
+		cornerPixel = self.props.cornerPixel,
+		portalRatio = self.props.portalRatio,
+		paddingRatio = self.props.paddingRatio,
 		sortEnabled = true,
-		onSelectSort = p1.props.onSelectSort,
-		showFavorited = p1.props.showFavorited,
-		onToggleFavorited = p1.props.onToggleFavorited,
-		showAll = p1.props.showAll,
-		onToggleAll = p1.props.onToggleAll,
-		colsPerRow = p1.props.colsPerRow,
-		rowsPerPage = p1.props.rowsPerPage
+		onSelectSort = self.props.onSelectSort,
+		showFavorited = self.props.showFavorited,
+		onToggleFavorited = self.props.onToggleFavorited,
+		showAll = self.props.showAll,
+		onToggleAll = self.props.onToggleAll,
+		colsPerRow = self.props.colsPerRow,
+		rowsPerPage = self.props.rowsPerPage
 	})
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(state, dispatch)
 	return {
-		category = p1.garageCategory,
-		categories = p1.garageCategories,
-		receipt = p1.garageReceipt,
-		favorited = p1.garageFavorited
+		category = state.garageCategory,
+		categories = state.garageCategories,
+		receipt = state.garageReceipt,
+		favorited = state.garageFavorited
 	}
-end, function(p1)
+end, function(dispatch)
 	return {
-		onSelectItem = function(p12, p2, p3, p4)
+		onSelectItem = function(category, categoryTitle, item, itemProperties)
 			if Players.LocalPlayer and Players.LocalPlayer.PlayerGui then
 				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 					Volume = 0.25
 				})
 			end
-			if p3.onItemSelected then
-				p3.onItemSelected()
+			if item.onItemSelected then
+				item.onItemSelected()
 			end
-			p1({
+			dispatch({
 				type = "addReceiptItem",
-				category = p12,
-				categoryTitle = p2,
-				name = p3.name,
-				title = p3.title,
-				price = p3.price,
-				limited = p3.limited
+				category = category,
+				categoryTitle = categoryTitle,
+				name = item.name,
+				title = item.title,
+				price = item.price,
+				limited = item.limited
 			})
-			if p4.owned then
-				p1({
+			if itemProperties.owned then
+				dispatch({
 					type = "setCategoryEquipped",
-					category = p12,
-					name = p3.name
+					category = category,
+					name = item.name
 				})
 			end
 		end,
-		onFavoriteItem = function(p12, p2, p3)
-			p1({
+		onFavoriteItem = function(category, itemName, favorited)
+			dispatch({
 				type = "setCategoryItemFavorited",
-				category = p12,
-				name = p2,
-				favorited = p3
+				category = category,
+				name = itemName,
+				favorited = favorited
 			})
 		end
 	}
-end)(v1)
+end)(PortalCustomizeComponent)

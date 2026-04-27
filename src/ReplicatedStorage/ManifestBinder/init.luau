@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -33,273 +32,273 @@ local function cleanupNode(node, manifest)
 		end
 	end
 end
-local t = {}
-t.__index = t
-function t.new(p1, p2, p3)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._tagName = p1 or error("Bad argument \'tagName\', expected string")
-	t2._manifest = p2 or error("Bad argument `manifest`, expected table")
-	t2._constructor = p3 or error("Bad argument `constructor`, expected table or function")
-	t2._connections = {}
-	t2._rootInstToClass = {}
-	t2._rootInstToRootNode = {}
-	t2._rootInstToManifest = {}
-	t2._pendingRootInstSet = {}
-	t2._listeners = {}
+local ManifestBinder = {}
+ManifestBinder.__index = ManifestBinder
+function ManifestBinder.new(tagName, manifest, constructor)
+	local self = {}
+	setmetatable(self, ManifestBinder)
+	self._tagName = tagName or error("Bad argument \'tagName\', expected string")
+	self._manifest = manifest or error("Bad argument `manifest`, expected table")
+	self._constructor = constructor or error("Bad argument `constructor`, expected table or function")
+	self._connections = {}
+	self._rootInstToClass = {}
+	self._rootInstToRootNode = {}
+	self._rootInstToManifest = {}
+	self._pendingRootInstSet = {}
+	self._listeners = {}
 	local count = 1
-	for k in pairs(p2) do
+	for k in pairs(manifest) do
 		count = count + 1
 	end
-	t2._manifestSizeTarget = count
+	self._manifestSizeTarget = count
 	task.delay(5, function()
-		if not t2._loaded then
-			warn(("ManifestBinder %q is not loaded. Call :Start() on it!"):format(t2._tagName))
+		if not self._loaded then
+			warn(("ManifestBinder %q is not loaded. Call :Start() on it!"):format(self._tagName))
 		end
 	end)
-	return t2
+	return self
 end
-function t.Start(p1)
-	if p1._loaded then
+function ManifestBinder.Start(self)
+	if self._loaded then
 		warn("ManifestBinder already loaded.")
 	else
-		p1._loaded = true
-		for i, v in ipairs(CollectionService:GetTagged(p1._tagName)) do
-			task.spawn(p1._bindRoot, p1, v)
+		self._loaded = true
+		for i, v in ipairs(CollectionService:GetTagged(self._tagName)) do
+			task.spawn(self._bindRoot, self, v)
 		end
-		table.insert(p1._connections, CollectionService:GetInstanceAddedSignal(p1._tagName):Connect(function(p12)
-			p1:_bindRoot(p12)
+		table.insert(self._connections, CollectionService:GetInstanceAddedSignal(self._tagName):Connect(function(instance)
+			self:_bindRoot(instance)
 		end))
-		table.insert(p1._connections, CollectionService:GetInstanceRemovedSignal(p1._tagName):Connect(function(p12)
-			p1:_unbindRoot(p12)
+		table.insert(self._connections, CollectionService:GetInstanceRemovedSignal(self._tagName):Connect(function(instance)
+			self:_unbindRoot(instance)
 		end))
 	end
 end
-function t._stopBoundFn(p1, p2)
-	local v1 = p1._rootInstToClass[p2]
-	if v1 then
-		if p1._classRemovingSignal then
-			p1._classRemovingSignal:Fire(v1, p2)
+function ManifestBinder._stopBoundFn(self, rootInstance)
+	local boundClass = self._rootInstToClass[rootInstance]
+	if boundClass then
+		if self._classRemovingSignal then
+			self._classRemovingSignal:Fire(boundClass, rootInstance)
 		end
-		local v2 = p1._listeners[p2]
-		if v2 then
-			for k, v in pairs(v2) do
+		local listeners = self._listeners[rootInstance]
+		if listeners then
+			for k, v in pairs(listeners) do
 				task.spawn(k, nil)
 			end
 		end
-		if v1.Destroy then
-			v1:Destroy()
+		if boundClass.Destroy then
+			boundClass:Destroy()
 		else
-			local var3 = warn
-			var3(("[ManifestBinder._remove] - Class %q no longer has destroy, something destroyed it!"):format((tostring(p1._tagName))))
+			local warnFunc = warn
+			warnFunc(("[ManifestBinder._remove] - Class %q no longer has destroy, something destroyed it!"):format((tostring(self._tagName))))
 		end
-		p1._rootInstToClass[p2] = nil
+		self._rootInstToClass[rootInstance] = nil
 	end
 end
-function t._startBoundFn(p1, p2, p3)
-	p1:_stopBoundFn(p2)
-	if p1._pendingRootInstSet[p2] == true then
+function ManifestBinder._startBoundFn(self, rootInstance, manifestTable)
+	self:_stopBoundFn(rootInstance)
+	if self._pendingRootInstSet[rootInstance] == true then
 		warn("[ManifestBinder._startBoundFn] - Re-entered add. Still loading, probably caused by error in constructor.")
 		return
 	end
-	p1._pendingRootInstSet[p2] = true
-	local v1 = nil
-	if typeof(p1._constructor) == "function" then
-		v1 = p1._constructor(p2, p3)
-	elseif p1._constructor.new then
-		v1 = p1._constructor.new(p2, p3)
+	self._pendingRootInstSet[rootInstance] = true
+	local constructedClass = nil
+	if typeof(self._constructor) == "function" then
+		constructedClass = self._constructor(rootInstance, manifestTable)
+	elseif self._constructor.new then
+		constructedClass = self._constructor.new(rootInstance, manifestTable)
 	else
 		error("Invalid constructor, expected table or function")
 	end
-	if p1._pendingRootInstSet[p2] == true then
-		p1._pendingRootInstSet[p2] = nil
-		if typeof(v1) == "table" then
-			if typeof(v1.Destroy) == "function" then
-				p1._rootInstToClass[p2] = v1
-				local var4 = p1._listeners[p2]
-				if var4 then
-					for k, v in pairs(var4) do
-						task.spawn(k, v1)
+	if self._pendingRootInstSet[rootInstance] == true then
+		self._pendingRootInstSet[rootInstance] = nil
+		if typeof(constructedClass) == "table" then
+			if typeof(constructedClass.Destroy) == "function" then
+				self._rootInstToClass[rootInstance] = constructedClass
+				local listeners = self._listeners[rootInstance]
+				if listeners then
+					for k, v in pairs(listeners) do
+						task.spawn(k, constructedClass)
 					end
 				end
-				if p1._classAddedSignal then
-					p1._classAddedSignal:Fire(v1, p2)
+				if self._classAddedSignal then
+					self._classAddedSignal:Fire(constructedClass, rootInstance)
 				end
 			else
-				warn(("[ManifestBinder._startBoundFn] - Bad class constructed for tag %q"):format(p1._tagName))
+				warn(("[ManifestBinder._startBoundFn] - Bad class constructed for tag %q"):format(self._tagName))
 			end
 		else
-			warn(("[ManifestBinder._startBoundFn] - Bad class constructed for tag %q"):format(p1._tagName))
+			warn(("[ManifestBinder._startBoundFn] - Bad class constructed for tag %q"):format(self._tagName))
 		end
 	else
-		warn(("[ManifestBinder._startBoundFn] - Failed to load instance %q of %q, removed while loading!"):format(p2:GetFullName(), (tostring(type(p1._constructor) == "table" and p1._constructor.ClassName or p1._constructor))))
+		warn(("[ManifestBinder._startBoundFn] - Failed to load instance %q of %q, removed while loading!"):format(rootInstance:GetFullName(), (tostring(type(self._constructor) == "table" and self._constructor.ClassName or self._constructor))))
 	end
 end
-function t._bindRoot(p1, p2)
-	assert(p1._rootInstToManifest[p2] == nil)
-	local t = {}
-	p1._rootInstToManifest[p2] = t
+function ManifestBinder._bindRoot(self, rootInstance)
+	assert(self._rootInstToManifest[rootInstance] == nil)
+	local manifestResult = {}
+	self._rootInstToManifest[rootInstance] = manifestResult
 	debug.profilebegin("initializeBoundTree")
-	local t2 = {
+	local rootNode = {
 		alias = "root",
-		instance = p2
+		instance = rootInstance
 	}
-	if next(p1._manifest) then
-		t2.children = {}
-		t2.connections = {}
+	if next(self._manifest) then
+		rootNode.children = {}
+		rootNode.connections = {}
 	end
-	p1._rootInstToRootNode[p2] = t2
-	for k, v in pairs(p1._manifest) do
-		local v2 = parsePath(v)
-		local var3 = t2
-		for i, v5 in ipairs(v2) do
-			local var4
-			var4 = i == #v2
-			local table52 = var3.children[v5] or {}
-			if var4 then
-				if table52.alias ~= nil then
+	self._rootInstToRootNode[rootInstance] = rootNode
+	for k, v in pairs(self._manifest) do
+		local pathParts = parsePath(v)
+		local currentNode = rootNode
+		for i, pathPart in ipairs(pathParts) do
+			local isLeafNode
+			isLeafNode = i == #pathParts
+			local treeNode = currentNode.children[pathPart] or {}
+			if isLeafNode then
+				if treeNode.alias ~= nil then
 					error("Multiple aliases assigned to one instance")
 				end
-				table52.alias = k
+				treeNode.alias = k
 			else
-				table52.children = table52.children or {}
-				table52.connections = table52.connections or {}
+				treeNode.children = treeNode.children or {}
+				treeNode.connections = treeNode.connections or {}
 			end
-			var3.children[v5] = table52
-			var3 = table52
+			currentNode.children[pathPart] = treeNode
+			currentNode = treeNode
 		end
 	end
 	debug.profileend()
-	local function v8(p12)
-		local var12 = assert(p12.instance)
-		local children = p12.children
-		local alias = p12.alias
-		local v2 = not children
+	local function initializeNodeTree(node)
+		local nodeInstance = assert(node.instance)
+		local children = node.children
+		local alias = node.alias
+		local isLeafNode = not children
 		if alias then
-			t[alias] = var12
+			manifestResult[alias] = nodeInstance
 		end
-		if not v2 then
-			local function processAddChild(p1)
-				local v1 = children[p1.Name]
-				if v1 and v1.instance == nil then
-					v1.instance = p1
-					v8(v1)
+		if not isLeafNode then
+			local function processAddChild(addedChild)
+				local childNode = children[addedChild.Name]
+				if childNode and childNode.instance == nil then
+					childNode.instance = addedChild
+					initializeNodeTree(childNode)
 				end
 			end
-			local function processDeleteChild(p12)
-				local var13 = p12.Name
-				local v2 = children[var13]
-				if v2 and v2.instance == p12 then
-					p1:_stopBoundFn(p2)
-					v1(v2, t)
-					assert(v2.instance == nil)
-					local var3 = var12:FindFirstChild(var13)
-					if var3 then
-						local var4 = children[var3.Name]
-						if var4 and var4.instance == nil then
-							var4.instance = var3
-							v8(var4)
+			local function processDeleteChild(removedChild)
+				local childName = removedChild.Name
+				local childNode = children[childName]
+				if childNode and childNode.instance == removedChild then
+					self:_stopBoundFn(rootInstance)
+					cleanupNode(childNode, manifestResult)
+					assert(childNode.instance == nil)
+					local sibling = nodeInstance:FindFirstChild(childName)
+					if sibling then
+						local siblingNode = children[sibling.Name]
+						if siblingNode and siblingNode.instance == nil then
+							siblingNode.instance = sibling
+							initializeNodeTree(siblingNode)
 						end
 					end
 				end
 			end
-			for i, v in ipairs(var12:GetChildren()) do
-				local var3 = children[v.Name]
-				if var3 and var3.instance == nil then
-					var3.instance = v
-					v8(var3)
+			for i, v in ipairs(nodeInstance:GetChildren()) do
+				local childNode = children[v.Name]
+				if childNode and childNode.instance == nil then
+					childNode.instance = v
+					initializeNodeTree(childNode)
 				end
 			end
-			table.insert(p12.connections, var12.ChildAdded:Connect(processAddChild))
-			table.insert(p12.connections, var12.ChildRemoved:Connect(processDeleteChild))
+			table.insert(node.connections, nodeInstance.ChildAdded:Connect(processAddChild))
+			table.insert(node.connections, nodeInstance.ChildRemoved:Connect(processDeleteChild))
 		end
-		if v2 then
-			local _manifestSizeTarget = p1._manifestSizeTarget
+		if isLeafNode then
+			local manifestSizeTarget = self._manifestSizeTarget
 			local count = 0
-			for k in pairs(t) do
+			for k in pairs(manifestResult) do
 				count = count + 1
 			end
-			assert(count <= _manifestSizeTarget, count)
-			if count == _manifestSizeTarget then
-				p1:_startBoundFn(p2, t)
+			assert(count <= manifestSizeTarget, count)
+			if count == manifestSizeTarget then
+				self:_startBoundFn(rootInstance, manifestResult)
 			end
 		end
 	end
-	v8(t2)
+	initializeNodeTree(rootNode)
 end
-function t._unbindRoot(p1, p2)
-	p1:_stopBoundFn(p2)
-	local var12 = p1._rootInstToRootNode[p2]
-	if var12 then
-		v1(var12, (assert(p1._rootInstToManifest[p2])))
-		p1._rootInstToRootNode[p2] = nil
+function ManifestBinder._unbindRoot(self, rootInstance)
+	self:_stopBoundFn(rootInstance)
+	local rootNode = self._rootInstToRootNode[rootInstance]
+	if rootNode then
+		cleanupNode(rootNode, (assert(self._rootInstToManifest[rootInstance])))
+		self._rootInstToRootNode[rootInstance] = nil
 	end
-	p1._rootInstToManifest[p2] = nil
+	self._rootInstToManifest[rootInstance] = nil
 end
-function t.GetAllSet(p1)
-	return p1._rootInstToClass
+function ManifestBinder.GetAllSet(self)
+	return self._rootInstToClass
 end
-function t.GetAll(p1)
-	local t = {}
-	for k, v in pairs(p1._rootInstToClass) do
-		t[#t + 1] = v
+function ManifestBinder.GetAll(self)
+	local resultList = {}
+	for k, v in pairs(self._rootInstToClass) do
+		resultList[#resultList + 1] = v
 	end
-	return t
+	return resultList
 end
-function t.GetTag(p1)
-	return p1._tagName
+function ManifestBinder.GetTag(self)
+	return self._tagName
 end
-function t.Get(p1, p2)
-	return p1._rootInstToClass[p2]
+function ManifestBinder.Get(self, rootInstance)
+	return self._rootInstToClass[rootInstance]
 end
-function t.Promise(p1, p2)
-	return promiseBoundClass(p1, p2)
+function ManifestBinder.Promise(self, rootInstance)
+	return promiseBoundClass(self, rootInstance)
 end
-function t.ObserveInstance(p1, p2, p3)
-	p1._listeners[p2] = p1._listeners[p2] or {}
-	p1._listeners[p2][p3] = true
+function ManifestBinder.ObserveInstance(self, rootInstance, callback)
+	self._listeners[rootInstance] = self._listeners[rootInstance] or {}
+	self._listeners[rootInstance][callback] = true
 	return function()
-		if p1._listeners[p2] then
-			p1._listeners[p2][p3] = nil
-			if not next(p1._listeners[p2]) then
-				p1._listeners[p2] = nil
+		if self._listeners[rootInstance] then
+			self._listeners[rootInstance][callback] = nil
+			if not next(self._listeners[rootInstance]) then
+				self._listeners[rootInstance] = nil
 			end
 		end
 	end
 end
-function t.GetClassAddedSignal(p1)
-	if not p1._classAddedSignal then
-		p1._classAddedSignal = Signal.new()
-		table.insert(p1._connections, p1._classAddedSignal)
+function ManifestBinder.GetClassAddedSignal(self)
+	if not self._classAddedSignal then
+		self._classAddedSignal = Signal.new()
+		table.insert(self._connections, self._classAddedSignal)
 	end
-	return p1._classAddedSignal
+	return self._classAddedSignal
 end
-function t.GetClassRemovingSignal(p1)
-	if not p1._classRemovingSignal then
-		p1._classRemovingSignal = Signal.new()
-		table.insert(p1._connections, p1._classRemovingSignal)
+function ManifestBinder.GetClassRemovingSignal(self)
+	if not self._classRemovingSignal then
+		self._classRemovingSignal = Signal.new()
+		table.insert(self._connections, self._classRemovingSignal)
 	end
-	return p1._classRemovingSignal
+	return self._classRemovingSignal
 end
-function t.Destroy(p1)
+function ManifestBinder.Destroy(self)
 	debug.profilebegin("ManifestBinder:Destroy")
-	local var12 = next(p1._rootInstToClass)
-	while var12 ~= nil do
-		p1:_stopBoundFn(var12)
-		assert(p1._rootInstToClass[var12] == nil, "Failed to remove")
-		var12 = next(p1._rootInstToClass)
+	local currentRootInstance = next(self._rootInstToClass)
+	while currentRootInstance ~= nil do
+		self:_stopBoundFn(currentRootInstance)
+		assert(self._rootInstToClass[currentRootInstance] == nil, "Failed to remove")
+		currentRootInstance = next(self._rootInstToClass)
 	end
-	table.clear(p1._rootInstToClass)
-	for i, v in ipairs(p1._connections) do
+	table.clear(self._rootInstToClass)
+	for i, v in ipairs(self._connections) do
 		v:Disconnect()
 	end
-	table.clear(p1._connections)
-	local _rootInstToManifest = p1._rootInstToManifest
-	for k, v in pairs(p1._rootInstToRootNode) do
-		v1(v, (assert(_rootInstToManifest[k])))
+	table.clear(self._connections)
+	local manifestMap = self._rootInstToManifest
+	for k, v in pairs(self._rootInstToRootNode) do
+		cleanupNode(v, (assert(manifestMap[k])))
 	end
-	table.clear(p1._rootInstToManifest)
-	table.clear(p1._rootInstToRootNode)
+	table.clear(self._rootInstToManifest)
+	table.clear(self._rootInstToRootNode)
 	debug.profileend()
 end
-return t
+return ManifestBinder

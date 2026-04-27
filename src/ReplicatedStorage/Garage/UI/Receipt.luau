@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local String = require(ReplicatedStorage.Std.String)
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
@@ -6,39 +5,39 @@ local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local ReceiptItem = require(script.Parent.ReceiptItem)
-local v1 = Roact.PureComponent:extend("Receipt")
-v1.defaultProps = {
+local Receipt = Roact.PureComponent:extend("Receipt")
+Receipt.defaultProps = {
 	showTotal = true
 }
-function v1.init(p1)  end
-function v1.render(p1)
-	local mainRatio = p1.props.mainRatio
-	local cornerPixel = p1.props.cornerPixel
-	local paddingRatio = p1.props.paddingRatio
-	local v1 = p1.props.paddingRatio * 2
-	local v2 = p1.props.showTotal and 1 / (1 / mainRatio - 0.2222222222222222) or mainRatio
+function Receipt.init(self)  end
+function Receipt.render(self)
+	local mainRatio = self.props.mainRatio
+	local cornerPixel = self.props.cornerPixel
+	local paddingRatio = self.props.paddingRatio
+	local doublePaddingRatio = self.props.paddingRatio * 2
+	local adjustedRatio = self.props.showTotal and 1 / (1 / mainRatio - 0.2222222222222222) or mainRatio
 	local sum = 0
-	local t = {}
+	local receiptElements = {}
 	local count = 0
-	for i = 1, #p1.props.receipt do
-		local v3
-		local v4 = p1.props.receipt[i]
-		local v5 = v4.price or 0
-		v3 = not (p1.props.owned[v4.category] and p1.props.owned[v4.category][v4.name])
-		if v4.limited then
-			v3 = false
+	for i = 1, #self.props.receipt do
+		local isVisible
+		local receiptItem = self.props.receipt[i]
+		local itemPrice = receiptItem.price or 0
+		isVisible = not (self.props.owned[receiptItem.category] and self.props.owned[receiptItem.category][receiptItem.name])
+		if receiptItem.limited then
+			isVisible = false
 		end
-		if v3 then
-			table.insert(t, (createElement(ReceiptItem, Dictionary.merge({
+		if isVisible then
+			table.insert(receiptElements, (createElement(ReceiptItem, Dictionary.merge({
 				layoutOrder = i * 2,
-				mainRatio = 1 / (1 / (v2 * 6) - 1 / v1 + 1 / v1 / 6),
+				mainRatio = 1 / (1 / (adjustedRatio * 6) - 1 / doublePaddingRatio + 1 / doublePaddingRatio / 6),
 				paddingRatio = paddingRatio,
 				cornerPixel = cornerPixel,
 				onRequestRemove = function()
-					p1.props.onRequestRemove(v4)
+					self.props.onRequestRemove(receiptItem)
 				end
-			}, v4))))
-			table.insert(t, (createElement("Frame", {
+			}, receiptItem))))
+			table.insert(receiptElements, (createElement("Frame", {
 				BorderSizePixel = 0,
 				BackgroundTransparency = 0,
 				BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
@@ -46,21 +45,21 @@ function v1.render(p1)
 				LayoutOrder = i * 2 + 1
 			}, {
 				AspectRatio = createElement("UIAspectRatioConstraint", {
-					AspectRatio = v1
+					AspectRatio = doublePaddingRatio
 				})
 			})))
-			sum = sum + v5
+			sum = sum + itemPrice
 			count = count + 1
 		end
 	end
-	local t2 = {
+	local mainFrameProps = {
 		BackgroundTransparency = 0,
 		BorderSizePixel = 0,
 		BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
 		Size = UDim2.new(1, 0, 1, 0),
-		LayoutOrder = p1.props.layoutOrder
+		LayoutOrder = self.props.layoutOrder
 	}
-	local t3 = {
+	local mainFrameChildren = {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = mainRatio
 		}),
@@ -73,8 +72,8 @@ function v1.render(p1)
 			BorderSizePixel = 0,
 			ScrollBarThickness = 4,
 			ScrollBarImageColor3 = Color3.new(255/255, 255/255, 255/255),
-			CanvasSize = UDim2.new(0, 0, ((1 + mainRatio / v1) * count / 6 - mainRatio / v1) * mainRatio / v2, 0),
-			Size = UDim2.new(1, 0, mainRatio / v2, 0),
+			CanvasSize = UDim2.new(0, 0, ((1 + mainRatio / doublePaddingRatio) * count / 6 - mainRatio / doublePaddingRatio) * mainRatio / adjustedRatio, 0),
+			Size = UDim2.new(1, 0, mainRatio / adjustedRatio, 0),
 			ElasticBehavior = Enum.ElasticBehavior.Always,
 			VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left,
 			VerticalScrollBarInset = Enum.ScrollBarInset.None
@@ -85,17 +84,17 @@ function v1.render(p1)
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Vertical
 			})
-		}, t))
+		}, receiptElements))
 	}
-	local t4 = {
+	local bottomFrameProps = {
 		BackgroundTransparency = 0.6,
 		BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 		BorderSizePixel = 0,
 		Size = UDim2.new(1, 0, mainRatio / 4.5, 0),
 		Position = UDim2.new(0, 0, 1 - mainRatio / 4.5, 0),
-		Visible = p1.props.showTotal
+		Visible = self.props.showTotal
 	}
-	local t5 = {
+	local bottomFrameChildren = {
 		Line = createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, 1),
 			Position = UDim2.new(0, 0, 0, 0),
@@ -123,39 +122,39 @@ function v1.render(p1)
 			})
 		})
 	}
-	local t6 = {
+	local priceFrameProps = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Size = UDim2.new(0.5 - 0.5 / paddingRatio - 1 / paddingRatio, 0, 0.6, 0),
 		Position = UDim2.new(0.5 + 0.5 / paddingRatio, 0, 0.2, 0)
 	}
-	local t7 = {}
-	local t8 = {
+	local priceFrameChildren = {}
+	local priceTextProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.new(0, 0, 0, 0),
 		AnchorPoint = Vector2.new(0, 0)
 	}
-	t8.Text = if sum > 0 then "-" else "" .. "$" .. String.comma(sum)
-	t8.Font = Enum.Font.Bangers
-	t8.LineHeight = 0.95
-	t8.TextScaled = true
-	t8.TextColor3 = sum > 0 and Color3.new(255/255, 0/255, 0/255) or Color3.fromRGB(134, 195, 81)
-	t8.TextXAlignment = Enum.TextXAlignment.Left
-	t8.TextYAlignment = Enum.TextYAlignment.Center
-	t7.Title = createElement("TextLabel", t8)
-	t5.Price = createElement("Frame", t6, t7)
-	t3.Bottom = createElement("Frame", t4, t5)
-	return createElement("Frame", t2, t3)
+	priceTextProps.Text = if sum > 0 then "-" else "" .. "$" .. String.comma(sum)
+	priceTextProps.Font = Enum.Font.Bangers
+	priceTextProps.LineHeight = 0.95
+	priceTextProps.TextScaled = true
+	priceTextProps.TextColor3 = sum > 0 and Color3.new(255/255, 0/255, 0/255) or Color3.fromRGB(134, 195, 81)
+	priceTextProps.TextXAlignment = Enum.TextXAlignment.Left
+	priceTextProps.TextYAlignment = Enum.TextYAlignment.Center
+	priceFrameChildren.Title = createElement("TextLabel", priceTextProps)
+	bottomFrameChildren.Price = createElement("Frame", priceFrameProps, priceFrameChildren)
+	mainFrameChildren.Bottom = createElement("Frame", bottomFrameProps, bottomFrameChildren)
+	return createElement("Frame", mainFrameProps, mainFrameChildren)
 end
-return RoactRodux.connect(function(p1, p2)  end, function(p1)
+return RoactRodux.connect(function(store, prevState)  end, function(dispatch)
 	return {
-		onRequestRemove = function(p12)
-			p1({
+		onRequestRemove = function(removedItem)
+			dispatch({
 				type = "removeReceiptItem",
-				name = p12.name,
-				category = p12.category
+				name = removedItem.name,
+				category = removedItem.category
 			})
 		end
 	}
-end)(v1)
+end)(Receipt)

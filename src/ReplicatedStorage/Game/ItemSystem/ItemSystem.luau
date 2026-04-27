@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -22,63 +21,63 @@ local InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSys
 local InventoryItemBinder = require(ReplicatedStorage.Inventory.InventoryItemBinder)
 local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
 local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)
-local v1 = nil
-local t = {}
-local t2 = {}
-local t3 = {}
-local t4 = {
+local itemDropEvent = nil
+local itemRegistry = {}
+local equippedItemsByPlayer = {}
+local recentlyUnequippedItems = {}
+local ItemSystem = {
 	OnLocalItemEquipped = Signal.new(),
 	OnLocalItemUnequipped = Signal.new(),
 	onItemEquipped = Signal.new()
 }
-function t4.Init(p1)
-	v1 = p1.Event
-	local em = p1.em
-	function em.ogsbqczn(p1, p2, p3)
-		local v1 = t4.GetEquipped(p1)
-		if v1 ~= nil then
-			v1:InputBegan({
-				UserInputType = p2,
-				KeyCode = p3
+function ItemSystem.Init(configData)
+	itemDropEvent = configData.Event
+	local eventManager = configData.em
+	function eventManager.ogsbqczn(player, inputType, keyCode)
+		local equippedItem = ItemSystem.GetEquipped(player)
+		if equippedItem ~= nil then
+			equippedItem:InputBegan({
+				UserInputType = inputType,
+				KeyCode = keyCode
 			}, false)
 		end
 	end
-	function em.p2ylc2nx(p1, p2, p3)
-		local v1 = t4.GetEquipped(p1)
-		if v1 ~= nil then
-			v1:InputEnded({
-				UserInputType = p2,
-				KeyCode = p3
+	function eventManager.p2ylc2nx(player, inputType, keyCode)
+		local equippedItem = ItemSystem.GetEquipped(player)
+		if equippedItem ~= nil then
+			equippedItem:InputEnded({
+				UserInputType = inputType,
+				KeyCode = keyCode
 			}, false)
 		end
 	end
 	InventoryItemSystem.addEquipCondition(function()
-		return not t2[LocalPlayer]
+		return not equippedItemsByPlayer[LocalPlayer]
 	end)
 	InventoryItemSystem.addEquipCondition(function()
 		if CharacterUtil.IsCrawling or (Falling.IsRagdolling() or JetPack.IsFlying()) then
 			return false
 		else
-			local v1 = PlayerUtils.getHumanoid(LocalPlayer)
-			if v1 then
-				return not (v1.Health <= 0.001)
+			local humanoid = PlayerUtils.getHumanoid(LocalPlayer)
+			if humanoid then
+				return not (humanoid.Health <= 0.001)
 			else
 				return false
 			end
 		end
 	end)
 	InventoryItemSystem.addEquipCondition(function()
-		local v1 = VehicleUtils.GetLocalVehiclePacket()
-		local v2 = tick()
-		if v1 then
-			local v3 = false
-			if v2 - VehicleUtils.LastVehicleExit > 0.1 then
-				local Seat = v1.Seat
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+		local currentTime = tick()
+		if vehiclePacket then
+			local isValidForEquip = false
+			if currentTime - VehicleUtils.LastVehicleExit > 0.1 then
+				local Seat = vehiclePacket.Seat
 				if Seat:FindFirstChild("Lean") or Seat:FindFirstChild("Items") then
-					v3 = true
+					isValidForEquip = true
 				end
 			end
-			if v3 then
+			if isValidForEquip then
 				return true
 			else
 				return false
@@ -87,108 +86,108 @@ function t4.Init(p1)
 			return true
 		end
 	end)
-	local function handleEquipped(p1)
-		if t2[p1:GetOwner()] then
-			t4._unequip(p1:GetOwner())
+	local function handleEquipped(inventoryItem)
+		if equippedItemsByPlayer[inventoryItem:GetOwner()] then
+			ItemSystem._unequip(inventoryItem:GetOwner())
 			warn("An item was already equipped, choosing newer server state.")
 		end
-		local v1 = t4._equip(p1:GetOwner(), p1.obj)
-		if v1.SetLeaning then
-			local v2 = VehicleUtils.GetLocalVehiclePacket()
-			if v2 then
-				local Seat = v2.Seat
+		local equippedItem = ItemSystem._equip(inventoryItem:GetOwner(), inventoryItem.obj)
+		if equippedItem.SetLeaning then
+			local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+			if vehiclePacket then
+				local Seat = vehiclePacket.Seat
 				if Seat:FindFirstChild("Lean") then
-					v1:SetLeaning(true, v2.Model:FindFirstChild("Engine").CFrame:PointToObjectSpace(Seat.Position).X > 0)
+					equippedItem:SetLeaning(true, vehiclePacket.Model:FindFirstChild("Engine").CFrame:PointToObjectSpace(Seat.Position).X > 0)
 				end
 			end
 		end
-		if v1.Model then
-			local Character = p1:GetOwner().Character
-			local v4 = v1.Model.Parent
+		if equippedItem.Model then
+			local Character = inventoryItem:GetOwner().Character
+			local itemModelParent = equippedItem.Model.Parent
 			local function updateParent()
-				if v1.Model then
+				if equippedItem.Model then
 					if Character.Parent then
-						v1.Model.Parent = v4
+						equippedItem.Model.Parent = itemModelParent
 					else
-						v1.Model.Parent = nil
+						equippedItem.Model.Parent = nil
 					end
 				end
 			end
-			if v1.Model then
+			if equippedItem.Model then
 				if Character.Parent then
-					v1.Model.Parent = v4
+					equippedItem.Model.Parent = itemModelParent
 				else
-					v1.Model.Parent = nil
+					equippedItem.Model.Parent = nil
 				end
 			end
-			p1._maid.listenParent = Character.AncestryChanged:Connect(updateParent)
+			inventoryItem._maid.listenParent = Character.AncestryChanged:Connect(updateParent)
 		end
-		if not InventoryItemUtils.getLocked(p1.obj) then
-			Audio.ObjectLocal(v1.RootPart, 690572276, {
+		if not InventoryItemUtils.getLocked(inventoryItem.obj) then
+			Audio.ObjectLocal(equippedItem.RootPart, 690572276, {
 				Volume = 0.8
 			})
 		end
 	end
-	local function updateCharacter(p1)
-		local obj = p1.obj
-		p1.maid:GiveTask(InventoryItemSystem.onInventoryItemEquipped:Connect(function(p1)
-			if p1:GetOwner().Character == obj then
-				handleEquipped(p1)
+	local function updateCharacter(characterData)
+		local obj = characterData.obj
+		characterData.maid:GiveTask(InventoryItemSystem.onInventoryItemEquipped:Connect(function(inventoryItem)
+			if inventoryItem:GetOwner().Character == obj then
+				handleEquipped(inventoryItem)
 			end
 		end))
-		for v1, v2 in InventoryItemSystem.getEquipped() do
-			if v2:GetOwner().Character == obj then
-				handleEquipped(v2)
+		for _, equippedItem in InventoryItemSystem.getEquipped() do
+			if equippedItem:GetOwner().Character == obj then
+				handleEquipped(equippedItem)
 			end
 		end
 	end
-	for v12, v2 in CharacterBinder:GetAll() do
-		updateCharacter(v2)
+	for _, characterBinding in CharacterBinder:GetAll() do
+		updateCharacter(characterBinding)
 	end
 	CharacterBinder:GetClassAddedSignal():Connect(updateCharacter)
-	InventoryItemSystem.onInventoryItemEquipped:Connect(function(p1)
-		local v1 = p1:GetOwner()
-		if typeof(v1) == "table" and getmetatable(v1) == InventoryItemOwnerBinder:GetConstructor() then
-			if v1.Character then
-				handleEquipped(p1)
+	InventoryItemSystem.onInventoryItemEquipped:Connect(function(inventoryItem)
+		local owner = inventoryItem:GetOwner()
+		if typeof(owner) == "table" and getmetatable(owner) == InventoryItemOwnerBinder:GetConstructor() then
+			if owner.Character then
+				handleEquipped(inventoryItem)
 			end
-			p1._maid:GiveTask(v1._onCharacterChanged:Connect(function()
-				if v1.Character then
-					handleEquipped(p1)
+			inventoryItem._maid:GiveTask(owner._onCharacterChanged:Connect(function()
+				if owner.Character then
+					handleEquipped(inventoryItem)
 				end
 			end))
 		end
 	end)
-	local function handleUnequippedRaw(p1, p2)
-		t3[p1] = p2
+	local function handleUnequippedRaw(player, unequippedItem)
+		recentlyUnequippedItems[player] = unequippedItem
 		task.delay(1, function()
-			if t3[p1] == p2 then
-				t3[p1] = nil
+			if recentlyUnequippedItems[player] == unequippedItem then
+				recentlyUnequippedItems[player] = nil
 			end
 		end)
-		if p2.IsLeaning then
-			p2:SetLeaning(false)
+		if unequippedItem.IsLeaning then
+			unequippedItem:SetLeaning(false)
 		end
-		t4._unequip(p1)
+		ItemSystem._unequip(player)
 	end
 	local function clearUnknownOwners()
-		for v2, v3 in t2 do
-			local v1
-			local Character = v2.Character
-			v1 = not (Character and (Character.PrimaryPart and Character.PrimaryPart:IsDescendantOf(workspace)))
-			if v1 then
-				handleUnequippedRaw(v2, v3)
+		for player, equippedItem in equippedItemsByPlayer do
+			local isInvalid
+			local Character = player.Character
+			isInvalid = not (Character and (Character.PrimaryPart and Character.PrimaryPart:IsDescendantOf(workspace)))
+			if isInvalid then
+				handleUnequippedRaw(player, equippedItem)
 			end
 		end
 	end
 	Interval.every(1):Connect(clearUnknownOwners)
-	local function handleUnequipped(p1)
-		local v1 = InventoryItemUtils.getName(p1.obj)
-		local v2 = p1:GetOwner()
-		if v2 then
-			local v3 = t4.GetEquipped(v2)
-			if v3 and v3.__ClassName == v1 then
-				handleUnequippedRaw(v2, v3)
+	local function handleUnequipped(inventoryItem)
+		local itemName = InventoryItemUtils.getName(inventoryItem.obj)
+		local owner = inventoryItem:GetOwner()
+		if owner then
+			local equippedItem = ItemSystem.GetEquipped(owner)
+			if equippedItem and equippedItem.__ClassName == itemName then
+				handleUnequippedRaw(owner, equippedItem)
 			end
 		else
 			clearUnknownOwners()
@@ -197,47 +196,47 @@ function t4.Init(p1)
 	InventoryItemSystem.onInventoryItemUnequipped:Connect(handleUnequipped)
 	local priority = DefaultActions.crawlButton.priority
 	local priority_2 = DefaultActions.sprintButton.priority
-	t4.OnLocalItemEquipped:Connect(function(p1)
-		local Maid = p1.Maid
-		if p1.ShootBegin then
-			local v1 = p1.ShootActionButtonConfig or {}
-			local t = {}
-			t.primary = if v1.primary == nil then true else v1.primary
-			t.priority = if v1.priority == nil then 1050 else v1.priority
-			t.saturateTo = if v1.saturateTo == nil then 0 else v1.saturateTo
-			t.noSink = true
-			t.keyCodes = v1.keyCodes
-			t.image = "rbxassetid://4939736393"
-			function t.onPressed()
-				p1:InputBegan({
+	ItemSystem.OnLocalItemEquipped:Connect(function(equippedItem)
+		local Maid = equippedItem.Maid
+		if equippedItem.ShootBegin then
+			local shootConfig = equippedItem.ShootActionButtonConfig or {}
+			local shootButton = {}
+			shootButton.primary = if shootConfig.primary == nil then true else shootConfig.primary
+			shootButton.priority = if shootConfig.priority == nil then 1050 else shootConfig.priority
+			shootButton.saturateTo = if shootConfig.saturateTo == nil then 0 else shootConfig.saturateTo
+			shootButton.noSink = true
+			shootButton.keyCodes = shootConfig.keyCodes
+			shootButton.image = "rbxassetid://4939736393"
+			function shootButton.onPressed()
+				equippedItem:InputBegan({
 					UserInputType = Enum.UserInputType.MouseButton1
 				})
 			end
-			function t.onReleased()
-				if p1.InputEnded then
-					p1:InputEnded({
+			function shootButton.onReleased()
+				if equippedItem.InputEnded then
+					equippedItem:InputEnded({
 						UserInputType = Enum.UserInputType.MouseButton1
 					})
 				end
 			end
-			Maid:GiveTask(ActionButtonService.add(t))
+			Maid:GiveTask(ActionButtonService.add(shootButton))
 		end
-		if p1.Reload then
+		if equippedItem.Reload then
 			Maid:GiveTask(ActionButtonService.add({
 				priority = 750,
 				image = "rbxassetid://4939737424",
 				keyCodes = { Enum.KeyCode.R },
 				onPressed = function()
-					p1:InputBegan({
+					equippedItem:InputBegan({
 						UserInputType = Enum.UserInputType.Keyboard,
 						KeyCode = Enum.KeyCode.R
 					})
 				end
 			}))
 		end
-		local ScopeBegin = p1.ScopeBegin
+		local ScopeBegin = equippedItem.ScopeBegin
 		if ScopeBegin then
-			ScopeBegin = typeof(p1.ScopeBegin) == "function"
+			ScopeBegin = typeof(equippedItem.ScopeBegin) == "function"
 		end
 		if ScopeBegin then
 			Maid:GiveTask(ActionButtonService.add({
@@ -247,36 +246,36 @@ function t4.Init(p1)
 				keyCodes = { Enum.KeyCode.Q, Enum.KeyCode.ButtonL2 },
 				noSink = true,
 				onPressed = function()
-					p1:InputBegan({
+					equippedItem:InputBegan({
 						UserInputType = Enum.UserInputType.MouseButton2
 					})
 				end,
 				onReleased = function()
-					if p1.InputEnded then
-						p1:InputEnded({
+					if equippedItem.InputEnded then
+						equippedItem:InputEnded({
 							UserInputType = Enum.UserInputType.MouseButton2
 						})
 					end
 				end
 			}))
 		end
-		if p1.ApplySkin and typeof(p1.ApplySkin) == "function" then
-			local v5 = false
+		if equippedItem.ApplySkin and typeof(equippedItem.ApplySkin) == "function" then
+			local inSkinRegion = false
 			local function checkFlagToggleSkins()
-				local v1 = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
-				if v1 then
-					local v2 = false
-					for v3, v4 in CollectionService:GetTagged("GunSkinUIRegion") do
-						if RegionUtils.isPointInPart(v4, v1.Position) then
-							v2 = true
+				local rootPart = CharacterUtils.getRootPart(Players.LocalPlayer.Character)
+				if rootPart then
+					local isInRegion = false
+					for _, region in CollectionService:GetTagged("GunSkinUIRegion") do
+						if RegionUtils.isPointInPart(region, rootPart.Position) then
+							isInRegion = true
 							break
 						end
 					end
-					if v2 ~= v5 then
-						p1:InputBegan({
-							FlagToggleSkins = v2
+					if isInRegion ~= inSkinRegion then
+						equippedItem:InputBegan({
+							FlagToggleSkins = isInRegion
 						})
-						v5 = v2
+						inSkinRegion = isInRegion
 					end
 				end
 			end
@@ -293,110 +292,110 @@ function t4.Init(p1)
 				ActionButtonService.setButtonPriority(DefaultActions.sprintButton, priority_2)
 			end)
 		end
-		local v6 = VehicleUtils.GetLocalVehiclePacket()
-		if v6 == nil or v6.Passenger then
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+		if vehiclePacket == nil or vehiclePacket.Passenger then
 			ActionButtonService.setButtonEnabled(DefaultActions.radioButton, false)
 			Maid:GiveTask(function()
 				ActionButtonService.setButtonEnabled(DefaultActions.radioButton, true)
 			end)
 		end
 	end)
-	InventoryItemBinder:GetClassAddedSignal():Connect(function(p1)
-		p1._maid:GiveTask(p1.onAttemptDrop:Connect(function()
-			if p1:GetOwner() == Players.LocalPlayer then
-				v1:FireServer("x" .. ("cutr"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("sdartlwu"):sub(4, 5):reverse():reverse():reverse() .. "1qyd")
+	InventoryItemBinder:GetClassAddedSignal():Connect(function(inventoryItem)
+		inventoryItem._maid:GiveTask(inventoryItem.onAttemptDrop:Connect(function()
+			if inventoryItem:GetOwner() == Players.LocalPlayer then
+				itemDropEvent:FireServer("xutr1qyd")
 			end
 		end))
 	end)
 end
-function t4.Register(p1)
-	assert(p1.__ClassName)
-	assert(t[p1.__ClassName] == nil)
-	t[p1.__ClassName] = p1
+function ItemSystem.Register(itemModule)
+	assert(itemModule.__ClassName)
+	assert(itemRegistry[itemModule.__ClassName] == nil)
+	itemRegistry[itemModule.__ClassName] = itemModule
 end
-function t4.GetConfig(p1)
-	return ItemDataUtils.getConfig(p1)
+function ItemSystem.GetConfig(player)
+	return ItemDataUtils.getConfig(player)
 end
-function t4.GetEquipped(p1)
-	return t2[p1]
+function ItemSystem.GetEquipped(player)
+	return equippedItemsByPlayer[player]
 end
-function t4.GetLocalEquipped()
-	return t4.GetEquipped(LocalPlayer)
+function ItemSystem.GetLocalEquipped()
+	return ItemSystem.GetEquipped(LocalPlayer)
 end
-function t4._equip(p1, p2)
-	assert(p1, "missing player")
-	assert(p2, "missing inventoryItemValue")
-	local v12 = InventoryItemUtils.getName(p2)
-	local v5 = t[if InventoryItemUtils.getAttr(p2, "CustomItem") == true then "Custom" else v12]
-	if not v5 then
-		error(("No module for item: %s"):format(v12))
+function ItemSystem._equip(player, inventoryItemValue)
+	assert(player, "missing player")
+	assert(inventoryItemValue, "missing inventoryItemValue")
+	local itemClassName = InventoryItemUtils.getName(inventoryItemValue)
+	local itemModule = itemRegistry[if InventoryItemUtils.getAttr(inventoryItemValue, "CustomItem") == true then "Custom" else itemClassName]
+	if not itemModule then
+		error(("No module for item: %s"):format(itemClassName))
 	end
-	local v6 = v5.new(p1, p2, t3[p1])
-	if v6.Local then
-		v6.Maid:GiveTask(UserInputService.InputBegan:Connect(function(p1, p2)
-			v6:InputBegan(p1, p2)
+	local equippedItem = itemModule.new(player, inventoryItemValue, recentlyUnequippedItems[player])
+	if equippedItem.Local then
+		equippedItem.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputEvent, gameProcessed)
+			equippedItem:InputBegan(inputEvent, gameProcessed)
 		end))
-		v6.Maid:GiveTask(UserInputService.InputEnded:Connect(function(...)
-			v6:InputEnded(...)
+		equippedItem.Maid:GiveTask(UserInputService.InputEnded:Connect(function(...)
+			equippedItem:InputEnded(...)
 		end))
-		if v6.ShootBegin == nil then
-			v6.Maid:GiveTask(UserInputService.TouchStarted:connect(function(p1, p2)
-				if p2 then
+		if equippedItem.ShootBegin == nil then
+			equippedItem.Maid:GiveTask(UserInputService.TouchStarted:connect(function(touchInput, gameProcessed)
+				if gameProcessed then
 					return false
 				end
-				v6:InputBegan({
+				equippedItem:InputBegan({
 					UserInputType = Enum.UserInputType.MouseButton1,
-					Position = p1.Position
+					Position = touchInput.Position
 				})
 			end))
-			v6.Maid:GiveTask(UserInputService.TouchEnded:connect(function(p1, p2)
-				if p2 then
+			equippedItem.Maid:GiveTask(UserInputService.TouchEnded:connect(function(touchInput, gameProcessed)
+				if gameProcessed then
 					return false
 				end
-				v6:InputEnded({
+				equippedItem:InputEnded({
 					UserInputType = Enum.UserInputType.MouseButton1,
-					Position = p1.Position
+					Position = touchInput.Position
 				})
 			end))
 		end
-		function v6.BroadcastInputBegan(p1, p2)
-			assert(p2 ~= nil)
-			v1:FireServer("ogsbqczn", p2.UserInputType, p2.KeyCode)
+		function equippedItem.BroadcastInputBegan(self, inputEvent)
+			assert(inputEvent ~= nil)
+			itemDropEvent:FireServer("ogsbqczn", inputEvent.UserInputType, inputEvent.KeyCode)
 		end
-		function v6.BroadcastInputEnded(p1, p2)
-			assert(p2 ~= nil)
-			v1:FireServer("p" .. ("t2dblf"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("lclyh"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("pn2l"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "x", p2.UserInputType, p2.KeyCode)
+		function equippedItem.BroadcastInputEnded(self, inputEvent)
+			assert(inputEvent ~= nil)
+			itemDropEvent:FireServer("p2ylc2nx", inputEvent.UserInputType, inputEvent.KeyCode)
 		end
 	end
-	t2[p1] = v6
-	if v6.Local then
-		for i, v in ipairs(UserInputService:GetKeysPressed()) do
-			v6:InputBegan(v)
+	equippedItemsByPlayer[player] = equippedItem
+	if equippedItem.Local then
+		for i, pressedInput in ipairs(UserInputService:GetKeysPressed()) do
+			equippedItem:InputBegan(pressedInput)
 		end
-		for i, v in ipairs(UserInputService:GetMouseButtonsPressed()) do
-			if v.UserInputType ~= Enum.UserInputType.MouseButton1 then
-				v6:InputBegan(v)
+		for i, pressedInput in ipairs(UserInputService:GetMouseButtonsPressed()) do
+			if pressedInput.UserInputType ~= Enum.UserInputType.MouseButton1 then
+				equippedItem:InputBegan(pressedInput)
 			end
 		end
 	end
-	if v6.Local then
-		t4.OnLocalItemEquipped:Fire(v6)
+	if equippedItem.Local then
+		ItemSystem.OnLocalItemEquipped:Fire(equippedItem)
 	end
-	t4.onItemEquipped:Fire(v6)
-	return v6
+	ItemSystem.onItemEquipped:Fire(equippedItem)
+	return equippedItem
 end
-function t4._unequip(p1)
-	assert(p1, "missing player")
-	local v1 = t2[p1]
-	if v1 then
-		v1:Destroy()
-		t2[p1] = nil
-		if v1.Local then
-			t4.OnLocalItemUnequipped:Fire()
+function ItemSystem._unequip(player)
+	assert(player, "missing player")
+	local equippedItem = equippedItemsByPlayer[player]
+	if equippedItem then
+		equippedItem:Destroy()
+		equippedItemsByPlayer[player] = nil
+		if equippedItem.Local then
+			ItemSystem.OnLocalItemUnequipped:Fire()
 		end
 		return true
 	else
 		return false
 	end
 end
-return t4
+return ItemSystem

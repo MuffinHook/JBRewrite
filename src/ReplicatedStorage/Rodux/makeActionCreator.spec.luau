@@ -1,4 +1,3 @@
--- Reviewed by Claude
 return function()
 	local makeActionCreator = require(script.Parent.makeActionCreator)
 	it("should set the name of the actionCreator creator", function()
@@ -17,9 +16,9 @@ return function()
  end)().type).to.equal("foo")
 	end)
 	it("should set values", function()
- expect(makeActionCreator("foo", function(p1)
+ expect(makeActionCreator("foo", function(actionPayload)
  return {
- value = p1
+ value = actionPayload
  }
  end)(100).value).to.equal(100)
 	end)

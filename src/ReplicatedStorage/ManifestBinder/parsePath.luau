@@ -1,4 +1,3 @@
--- Reviewed by Claude
 return function(path)
 	local pathSegments = string.split(path, "/")
 	for i = #pathSegments, 1, -1 do

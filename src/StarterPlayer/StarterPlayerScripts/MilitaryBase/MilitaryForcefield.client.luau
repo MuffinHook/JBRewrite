@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -22,12 +20,12 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local RateLimiter = require(ReplicatedStorage.Std.RateLimiter)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local LocalPlayer = Players.LocalPlayer
-local v1 = RateLimiter.new(1, 3)
-local function flingPlayer(p1, p2)
+local forcefieldImpactLimiter = RateLimiter.new(1, 3)
+local function flingPlayer(hitPlayer, toggleFlashCallback)
 	local PrimaryPart = LocalPlayer.Character.PrimaryPart
 	if PrimaryPart then
 		if PrimaryPart.CollisionGroup == "PlayersInTrain" then
-		elseif v1:UseBudget(1) then
+		elseif forcefieldImpactLimiter:UseBudget(1) then
 			Audio.ObjectLocal(PrimaryPart, 17183453324, {
 				Volume = 0.5
 			})
@@ -41,308 +39,308 @@ local function flingPlayer(p1, p2)
 				CharacterUtil.OnJump()
 				task.wait(0.3)
 			end
-			C4System.onExplode(p1, 100000, 98, 98, false)
-			p2(true)
+			C4System.onExplode(hitPlayer, 100000, 98, 98, false)
+			toggleFlashCallback(true)
 			task.delay(0.2, function()
-				p2(false)
+				toggleFlashCallback(false)
 			end)
 		end
 	end
 end
-Binder.new("MilitaryForcefield", function(p1)
-	local v1 = Maid.new()
-	local vector = p1.Position - Vector3.new(0, 1, 0) * p1.Position.Y
-	local v3 = p1.Size.X / 2
-	local Size = p1.Size
-	local Position = p1.Position
+Binder.new("MilitaryForcefield", function(forcefieldPart)
+	local maid = Maid.new()
+	local forcefieldCenterPosition = forcefieldPart.Position - Vector3.new(0, 1, 0) * forcefieldPart.Position.Y
+	local forcefieldRadius = forcefieldPart.Size.X / 2
+	local Size = forcefieldPart.Size
+	local Position = forcefieldPart.Position
 	local configTable = {
-		Position = vector,
-		Radius = v3,
-		Part = p1
+		Position = forcefieldCenterPosition,
+		Radius = forcefieldRadius,
+		Part = forcefieldPart
 	}
 	BulletEmitter._militaryForcefield = configTable
-	v1:GiveTask(function()
+	maid:GiveTask(function()
 		if BulletEmitter._militaryForcefield == configTable then
 			BulletEmitter._militaryForcefield = nil
 		end
 	end)
 	local configTable = {}
-	local function toggleFlash(p1)
-		for vector, v3 in configTable do
-			local v1
-			v1 = if p1 then 0 else 1
-			v3.Transparency = v1
+	local function toggleFlash(shouldFlash)
+		for decalIndex, decal in configTable do
+			local transparency
+			transparency = if shouldFlash then 0 else 1
+			decal.Transparency = transparency
 		end
 	end
-	local v4 = v3 - 50
-	local v5 = v3 + 50
-	local v6 = 0
-	for v7, v8 in Enum.NormalId:GetEnumItems() do
+	local minDetectionRadius = forcefieldRadius - 50
+	local maxDetectionRadius = forcefieldRadius + 50
+	local lastToggleTime = 0
+	for faceIndex, faceNormalId in Enum.NormalId:GetEnumItems() do
 		local Decal = Instance.new("Decal")
-		Decal.Face = v8
+		Decal.Face = faceNormalId
 		Decal.Texture = "rbxassetid://50282315"
 		Decal.Color3 = Color3.fromRGB(475, 280, 510)
 		Decal.Transparency = 1
-		Decal.Parent = p1
+		Decal.Parent = forcefieldPart
 		table.insert(configTable, Decal)
-		v1:GiveTask(Decal)
+		maid:GiveTask(Decal)
 	end
-	v1:GiveTask(Audio.ObjectLocal(p1, 17183453324, {
+	maid:GiveTask(Audio.ObjectLocal(forcefieldPart, 17183453324, {
 		DoNotPlay = true
 	}))
 	local function isServerDisabled()
-		return p1:GetAttribute("Disabled") == true
+		return forcefieldPart:GetAttribute("Disabled") == true
 	end
-	local v9 = nil
-	local isEnabled = false
-	local isEnabled = InventoryItemSystem.playerHasItem(LocalPlayer, "Key") == true
-	local isEnabled = true
+	local enableForcefield = nil
+	local hasKeyAccess = false
+	local hasKeyAccess = InventoryItemSystem.playerHasItem(LocalPlayer, "Key") == true
+	local hasKeyAccess = true
 	local function updatePermsToEnter()
-		isEnabled = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-		p1.CanCollide = not isEnabled and isEnabled
-		if not (isEnabled or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
-			v9()
+		hasKeyAccess = hasKeyAccess or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+		forcefieldPart.CanCollide = not hasKeyAccess and hasKeyAccess
+		if not (hasKeyAccess or hasKeyAccess) and (forcefieldPart:GetAttribute("Disabled") ~= true and enableForcefield) then
+			enableForcefield()
 		end
 	end
-	local v14 = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-	p1.CanCollide = not v14 and isEnabled
-	if not (v14 or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
-		v9()
+	local canEnterForcefield = hasKeyAccess or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+	forcefieldPart.CanCollide = not canEnterForcefield and hasKeyAccess
+	if not (canEnterForcefield or hasKeyAccess) and (forcefieldPart:GetAttribute("Disabled") ~= true and enableForcefield) then
+		enableForcefield()
 	end
-	v1:GiveTask(GameUtil.OnTeamChanged:Connect(updatePermsToEnter))
-	v1:GiveTask(InventoryItemBinder:GetClassAddedSignal():Connect(function(p12)
-		if p12:GetOwner() == LocalPlayer and p12:GetName() == "Key" then
-			isEnabled = true
-			v14 = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-			p1.CanCollide = not v14 and isEnabled
-			if not (v14 or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
-				v9()
+	maid:GiveTask(GameUtil.OnTeamChanged:Connect(updatePermsToEnter))
+	maid:GiveTask(InventoryItemBinder:GetClassAddedSignal():Connect(function(inventoryItem)
+		if inventoryItem:GetOwner() == LocalPlayer and inventoryItem:GetName() == "Key" then
+			hasKeyAccess = true
+			canEnterForcefield = hasKeyAccess or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+			forcefieldPart.CanCollide = not canEnterForcefield and hasKeyAccess
+			if not (canEnterForcefield or hasKeyAccess) and (forcefieldPart:GetAttribute("Disabled") ~= true and enableForcefield) then
+				enableForcefield()
 			end
 		end
 	end))
-	v1:GiveTask(InventoryItemBinder:GetClassRemovingSignal():Connect(function(p12)
-		if p12:GetOwner() == LocalPlayer and p12:GetName() == "Key" then
-			isEnabled = false
-			v14 = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-			p1.CanCollide = not v14 and isEnabled
-			if not (v14 or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
-				v9()
+	maid:GiveTask(InventoryItemBinder:GetClassRemovingSignal():Connect(function(inventoryItem)
+		if inventoryItem:GetOwner() == LocalPlayer and inventoryItem:GetName() == "Key" then
+			hasKeyAccess = false
+			canEnterForcefield = hasKeyAccess or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+			forcefieldPart.CanCollide = not canEnterForcefield and hasKeyAccess
+			if not (canEnterForcefield or hasKeyAccess) and (forcefieldPart:GetAttribute("Disabled") ~= true and enableForcefield) then
+				enableForcefield()
 			end
 		end
 	end))
 	local function getSoundAttachment()
-		local SoundAttachment = p1:FindFirstChild("SoundAttachment")
+		local SoundAttachment = forcefieldPart:FindFirstChild("SoundAttachment")
 		if not SoundAttachment then
 			local SoundAttachment_2 = Instance.new("Attachment")
 			SoundAttachment_2.Name = "SoundAttachment"
-			SoundAttachment_2.Parent = p1
-			SoundAttachment_2.Position = Vector3.new(-0, -1, -0) * v3 / 2
+			SoundAttachment_2.Parent = forcefieldPart
+			SoundAttachment_2.Position = Vector3.new(-0, -1, -0) * forcefieldRadius / 2
 			SoundAttachment = SoundAttachment_2
 		end
 		return SoundAttachment
 	end
-	local v16 = nil
-	local isEnabled = false
-	local SoundAttachment = p1:FindFirstChild("SoundAttachment")
+	local audioFadeTween = nil
+	local isAudioPlaying = false
+	local SoundAttachment = forcefieldPart:FindFirstChild("SoundAttachment")
 	if not SoundAttachment then
 		SoundAttachment = Instance.new("Attachment")
 		SoundAttachment.Name = "SoundAttachment"
-		SoundAttachment.Parent = p1
-		SoundAttachment.Position = Vector3.new(-0, -1, -0) * v3 / 2
+		SoundAttachment.Parent = forcefieldPart
+		SoundAttachment.Position = Vector3.new(-0, -1, -0) * forcefieldRadius / 2
 	end
-	local v18 = Audio.ObjectLocal(SoundAttachment, 104027245185669, {
+	local forcefieldAudio = Audio.ObjectLocal(SoundAttachment, 104027245185669, {
 		Volume = 2,
-		RollOffMaxDistance = v3 + 200,
-		RollOffMinDistance = v3,
+		RollOffMaxDistance = forcefieldRadius + 200,
+		RollOffMinDistance = forcefieldRadius,
 		Looped = true
 	})
-	v1:GiveTask(function()
-		if v16 then
-			v16:cancel()
+	maid:GiveTask(function()
+		if audioFadeTween then
+			audioFadeTween:cancel()
 		end
-		v18:Destroy()
+		forcefieldAudio:Destroy()
 	end)
-	local function safeActiveFadeTo(p1, p2)
-		if v16 then
-			v16:cancel()
+	local function safeActiveFadeTo(targetVolume, fadeDuration)
+		if audioFadeTween then
+			audioFadeTween:cancel()
 		end
-		v16 = Audio.promiseFadeTo(v18, p1, p2)
+		audioFadeTween = Audio.promiseFadeTo(forcefieldAudio, targetVolume, fadeDuration)
 	end
-	local isEnabled = false
-	v1:GiveTask(CharacterUtils.observeLocalCharacterAdded(function(p1, p2)
-		if v16 then
-			v16:cancel()
+	local characterSpawnedAudio = false
+	maid:GiveTask(CharacterUtils.observeLocalCharacterAdded(function(character, previousCharacter)
+		if audioFadeTween then
+			audioFadeTween:cancel()
 		end
-		v18.Volume = 0.2
-		isEnabled = true
+		forcefieldAudio.Volume = 0.2
+		characterSpawnedAudio = true
 	end))
-	local v20 = TweenInfo.new(0.6, Enum.EasingStyle.Bounce, Enum.EasingDirection.In)
-	local v21 = TweenInfo.new(0.8, Enum.EasingStyle.Bounce, Enum.EasingDirection.In)
-	local v22 = TweenInfo.new(1, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+	local enableTweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Bounce, Enum.EasingDirection.In)
+	local disableTweenInfo = TweenInfo.new(0.8, Enum.EasingStyle.Bounce, Enum.EasingDirection.In)
+	local sizeTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 	local function disableForcefield()
-		if isEnabled then
-			isEnabled = false
-			v14 = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-			p1.CanCollide = not v14 and isEnabled
-			if not (v14 or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
-				v9()
+		if hasKeyAccess then
+			hasKeyAccess = false
+			canEnterForcefield = hasKeyAccess or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+			forcefieldPart.CanCollide = not canEnterForcefield and hasKeyAccess
+			if not (canEnterForcefield or hasKeyAccess) and (forcefieldPart:GetAttribute("Disabled") ~= true and enableForcefield) then
+				enableForcefield()
 			end
-			local SoundAttachment = p1:FindFirstChild("SoundAttachment")
+			local SoundAttachment = forcefieldPart:FindFirstChild("SoundAttachment")
 			if not SoundAttachment then
 				local SoundAttachment_2 = Instance.new("Attachment")
 				SoundAttachment_2.Name = "SoundAttachment"
-				SoundAttachment_2.Parent = p1
-				SoundAttachment_2.Position = Vector3.new(-0, -1, -0) * v3 / 2
+				SoundAttachment_2.Parent = forcefieldPart
+				SoundAttachment_2.Position = Vector3.new(-0, -1, -0) * forcefieldRadius / 2
 				SoundAttachment = SoundAttachment_2
 			end
-			v1:GiveTask(Audio.ObjectLocal(SoundAttachment, 2992428082, {
+			maid:GiveTask(Audio.ObjectLocal(SoundAttachment, 2992428082, {
 				Volume = 0.6,
-				RollOffMaxDistance = v3 + 200,
-				RollOffMinDistance = v3
+				RollOffMaxDistance = forcefieldRadius + 200,
+				RollOffMinDistance = forcefieldRadius
 			}))
-			TweenService:Create(p1, v21, {
+			TweenService:Create(forcefieldPart, disableTweenInfo, {
 				Transparency = 1
 			}):Play()
-			for v6, v7 in p1.Parent:QueryDescendants("Beam") do
-				v7.Enabled = false
+			for beamIndex, beam in forcefieldPart.Parent:QueryDescendants("Beam") do
+				beam.Enabled = false
 			end
-			if v16 then
-				v16:cancel()
+			if audioFadeTween then
+				audioFadeTween:cancel()
 			end
-			v16 = Audio.promiseFadeTo(v18, 0, 1)
+			audioFadeTween = Audio.promiseFadeTo(forcefieldAudio, 0, 1)
 		end
 	end
-	v9 = function()
-		if isEnabled then
+	enableForcefield = function()
+		if hasKeyAccess then
 			return
 		end
-		isEnabled = true
-		v14 = isEnabled or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
-		p1.CanCollide = not v14 and isEnabled
-		if not (v14 or isEnabled) and (p1:GetAttribute("Disabled") ~= true and v9) then
-			v9()
+		hasKeyAccess = true
+		canEnterForcefield = hasKeyAccess or PlayerUtils.getTeamId(LocalPlayer) == Settings.EnumTeam.Police
+		forcefieldPart.CanCollide = not canEnterForcefield and hasKeyAccess
+		if not (canEnterForcefield or hasKeyAccess) and (forcefieldPart:GetAttribute("Disabled") ~= true and enableForcefield) then
+			enableForcefield()
 		end
-		local SoundAttachment = p1:FindFirstChild("SoundAttachment")
+		local SoundAttachment = forcefieldPart:FindFirstChild("SoundAttachment")
 		if not SoundAttachment then
 			local SoundAttachment_2 = Instance.new("Attachment")
 			SoundAttachment_2.Name = "SoundAttachment"
-			SoundAttachment_2.Parent = p1
-			SoundAttachment_2.Position = Vector3.new(-0, -1, -0) * v3 / 2
+			SoundAttachment_2.Parent = forcefieldPart
+			SoundAttachment_2.Position = Vector3.new(-0, -1, -0) * forcefieldRadius / 2
 			SoundAttachment = SoundAttachment_2
 		end
-		v1:GiveTask(Audio.ObjectLocal(SoundAttachment, 4058366615, {
+		maid:GiveTask(Audio.ObjectLocal(SoundAttachment, 4058366615, {
 			Volume = 0.45,
-			RollOffMaxDistance = v3 + 200,
-			RollOffMinDistance = v3 - 50
+			RollOffMaxDistance = forcefieldRadius + 200,
+			RollOffMinDistance = forcefieldRadius - 50
 		}))
-		TweenService:Create(p1, v20, {
+		TweenService:Create(forcefieldPart, enableTweenInfo, {
 			Transparency = -5
 		}):Play()
 		task.delay(0.5, function()
-			for v1, vector in p1.Parent:QueryDescendants("Beam") do
-				vector.Enabled = true
+			for beamIndex, beam in forcefieldPart.Parent:QueryDescendants("Beam") do
+				beam.Enabled = true
 			end
 		end)
-		p1.Size = Size * 0.7
-		local v7 = p1
-		v7.Position = v7.Position - Vector3.new(0, (Size.Y - p1.Size.Y) / 2, 0)
-		TweenService:Create(p1, v22, {
+		forcefieldPart.Size = Size * 0.7
+		local partRef = forcefieldPart
+		partRef.Position = partRef.Position - Vector3.new(0, (Size.Y - forcefieldPart.Size.Y) / 2, 0)
+		TweenService:Create(forcefieldPart, sizeTweenInfo, {
 			Size = Size,
 			Position = Position
 		}):Play()
-		if isEnabled then
-			if v16 then
-				v16:cancel()
+		if hasKeyAccess then
+			if audioFadeTween then
+				audioFadeTween:cancel()
 			end
-			v16 = Audio.promiseFadeTo(v18, 0.2, 1)
+			audioFadeTween = Audio.promiseFadeTo(forcefieldAudio, 0.2, 1)
 		else
-			if v16 then
-				v16:cancel()
+			if audioFadeTween then
+				audioFadeTween:cancel()
 			end
-			v16 = Audio.promiseFadeTo(v18, 1.7, 1)
+			audioFadeTween = Audio.promiseFadeTo(forcefieldAudio, 1.7, 1)
 		end
 	end
 	local function updateServerState()
-		if p1:GetAttribute("Disabled") == true and isEnabled then
+		if forcefieldPart:GetAttribute("Disabled") == true and hasKeyAccess then
 			disableForcefield()
 		else
-			if not (p1:GetAttribute("Disabled") == true or isEnabled) then
-				v9()
+			if not (forcefieldPart:GetAttribute("Disabled") == true or hasKeyAccess) then
+				enableForcefield()
 			end
 		end
 	end
-	v1:GiveTask(p1:GetAttributeChangedSignal("Disabled"):Connect(updateServerState))
+	maid:GiveTask(forcefieldPart:GetAttributeChangedSignal("Disabled"):Connect(updateServerState))
 	task.spawn(updateServerState)
-	p1.Transparency = -5
-	p1.LocalTransparencyModifier = 1
-	for v23, v24 in p1.Parent:QueryDescendants("Beam") do
-		v24.LocalTransparencyModifier = 1
-		v24.Enabled = true
+	forcefieldPart.Transparency = -5
+	forcefieldPart.LocalTransparencyModifier = 1
+	for beamIndex, beam in forcefieldPart.Parent:QueryDescendants("Beam") do
+		beam.LocalTransparencyModifier = 1
+		beam.Enabled = true
 	end
-	local v25 = 0
-	local isEnabled = false
-	v1:GiveTask(RunService.Heartbeat:Connect(function()
-		local v13 = os.clock()
-		if not (v13 < v25) then
+	local lastHeartbeatTime = 0
+	local isWithinAudioRange = false
+	maid:GiveTask(RunService.Heartbeat:Connect(function()
+		local currentTime = os.clock()
+		if not (currentTime < lastHeartbeatTime) then
 			local Character = LocalPlayer.Character
-			local v22 = Character and Character.PrimaryPart
-			if v22 then
-				local Position = v22.Position
-				local Magnitude = (vector - Position).Magnitude
-				local v32 = if 400 + v3 < Magnitude then 1 else 0.05
-				v25 = v13 + v32
-				local v42 = Magnitude < 1800 + v3
-				if v42 and not isEnabled then
-					isEnabled = true
-					v1._distFade = Maid.new()
-					for v52, v62 in p1.Parent:QueryDescendants("Beam, BasePart#Forcefield") do
-						v1._distFade:GiveTask(Fade.linear(v62, "LocalTransparencyModifier", 0, 3))
+			local primaryPart = Character and Character.PrimaryPart
+			if primaryPart then
+				local Position = primaryPart.Position
+				local Magnitude = (forcefieldCenterPosition - Position).Magnitude
+				local updateInterval = if 400 + forcefieldRadius < Magnitude then 1 else 0.05
+				lastHeartbeatTime = currentTime + updateInterval
+				local isWithinAudioRangeCheck = Magnitude < 1800 + forcefieldRadius
+				if isWithinAudioRangeCheck and not isWithinAudioRange then
+					isWithinAudioRange = true
+					maid._distFade = Maid.new()
+					for descendantIndex, descendant in forcefieldPart.Parent:QueryDescendants("Beam, BasePart#Forcefield") do
+						maid._distFade:GiveTask(Fade.linear(descendant, "LocalTransparencyModifier", 0, 3))
 					end
-				elseif not v42 and isEnabled then
-					isEnabled = false
-					v1._distFade = Maid.new()
-					for v7, v8 in p1.Parent:QueryDescendants("Beam, BasePart#Forcefield") do
-						v1._distFade:GiveTask(Fade.linear(v8, "LocalTransparencyModifier", 1, 3))
+				elseif not isWithinAudioRangeCheck and isWithinAudioRange then
+					isWithinAudioRange = false
+					maid._distFade = Maid.new()
+					for descendantIndex, descendant in forcefieldPart.Parent:QueryDescendants("Beam, BasePart#Forcefield") do
+						maid._distFade:GiveTask(Fade.linear(descendant, "LocalTransparencyModifier", 1, 3))
 					end
 				end
-				if v32 == 0.05 then
-					local isEnabled = if v4 < Magnitude and (Magnitude < v5 and Position.Y >= vector.Y) then v14 else false
-					if isEnabled then
-						v6 = os.clock()
+				if updateInterval == 0.05 then
+					local canPlayerToggle = if minDetectionRadius < Magnitude and (Magnitude < maxDetectionRadius and Position.Y >= forcefieldCenterPosition.Y) then canEnterForcefield else false
+					if canPlayerToggle then
+						lastToggleTime = os.clock()
 					end
-					if isEnabled and isEnabled then
+					if canPlayerToggle and hasKeyAccess then
 						disableForcefield()
-					elseif not (isEnabled or isEnabled) then
-						local isEnabled = p1:GetAttribute("Disabled") == true
-						if not isEnabled and os.clock() - v6 > 3 then
-							v9()
+					elseif not (canPlayerToggle or hasKeyAccess) then
+						local isServerDisabledCheck = forcefieldPart:GetAttribute("Disabled") == true
+						if not isServerDisabledCheck and os.clock() - lastToggleTime > 3 then
+							enableForcefield()
 						end
 					end
-					if if v3 - 4 < Magnitude and Magnitude < v3 + 6 then Position.Y >= vector.Y else false and (not v14 and isEnabled) then
-						flingPlayer(vector, toggleFlash)
+					if if forcefieldRadius - 4 < Magnitude and Magnitude < forcefieldRadius + 6 then Position.Y >= forcefieldCenterPosition.Y else false and (not canEnterForcefield and hasKeyAccess) then
+						flingPlayer(forcefieldCenterPosition, toggleFlash)
 					end
-					local v122 = Magnitude < v3
-					configTable.Ignore = v122
-					if v122 ~= isEnabled or isEnabled then
-						isEnabled = false
-						isEnabled = v122
-						if isEnabled then
-							if v122 then
-								if v16 then
-									v16:cancel()
+					local isInsideForcefield = Magnitude < forcefieldRadius
+					configTable.Ignore = isInsideForcefield
+					if isInsideForcefield ~= isAudioPlaying or characterSpawnedAudio then
+						isAudioPlaying = false
+						characterSpawnedAudio = isInsideForcefield
+						if characterSpawnedAudio then
+							if isInsideForcefield then
+								if audioFadeTween then
+									audioFadeTween:cancel()
 								end
-								v16 = Audio.promiseFadeTo(v18, 0.2, 1)
+								audioFadeTween = Audio.promiseFadeTo(forcefieldAudio, 0.2, 1)
 								return
 							end
-							if v16 then
-								v16:cancel()
+							if audioFadeTween then
+								audioFadeTween:cancel()
 							end
-							v16 = Audio.promiseFadeTo(v18, 1.7, 1)
+							audioFadeTween = Audio.promiseFadeTo(forcefieldAudio, 1.7, 1)
 						end
 					end
 				end
 			end
 		end
 	end))
-	return v1
+	return maid
 end):Start()

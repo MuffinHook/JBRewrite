@@ -1,52 +1,50 @@
--- Reviewed by Claude
--- variables reassigned
-local t = {}
-function t.setAnchored(p1, p2)
-	return t.setProperty(p1, "Anchored", p2)
+local PartUtils = {}
+function PartUtils.setAnchored(rootPart, isAnchored)
+	return PartUtils.setProperty(rootPart, "Anchored", isAnchored)
 end
-function t.setCanCollide(p1, p2)
-	return t.setProperty(p1, "CanCollide", p2)
+function PartUtils.setCanCollide(rootPart, canCollide)
+	return PartUtils.setProperty(rootPart, "CanCollide", canCollide)
 end
-function t.setCanQuery(p1, p2)
-	return t.setProperty(p1, "CanQuery", p2)
+function PartUtils.setCanQuery(rootPart, canQuery)
+	return PartUtils.setProperty(rootPart, "CanQuery", canQuery)
 end
-function t.setCanTouch(p1, p2)
-	return t.setProperty(p1, "CanTouch", p2)
+function PartUtils.setCanTouch(rootPart, canTouch)
+	return PartUtils.setProperty(rootPart, "CanTouch", canTouch)
 end
-function t.setProperty(p1, p2, p3)
-	assert(p1 ~= nil, "missing root")
-	if p1:IsA("BasePart") then
-		p1[p2] = p3
+function PartUtils.setProperty(rootPart, propertyName, propertyValue)
+	assert(rootPart ~= nil, "missing root")
+	if rootPart:IsA("BasePart") then
+		rootPart[propertyName] = propertyValue
 	end
-	for i, v in ipairs(p1:GetDescendants()) do
-		if v:IsA("BasePart") then
-			v[p2] = p3
+	for i, descendantPart in ipairs(rootPart:GetDescendants()) do
+		if descendantPart:IsA("BasePart") then
+			descendantPart[propertyName] = propertyValue
 		end
 	end
 end
-local t2 = {}
-function t.setPropertyWithRollback(p1, p2, p3)
-	local t = {}
-	if p1:IsA("BasePart") then
-		t[p1] = if p1[p2] == nil then t2 else p1[p2]
-		p1[p2] = p3
+local UNSET_SENTINEL = {}
+function PartUtils.setPropertyWithRollback(rootPart, propertyName, propertyValue)
+	local rollbackTable = {}
+	if rootPart:IsA("BasePart") then
+		rollbackTable[rootPart] = if rootPart[propertyName] == nil then UNSET_SENTINEL else rootPart[propertyName]
+		rootPart[propertyName] = propertyValue
 	end
-	for i, v in ipairs(p1:GetDescendants()) do
-		local v2
-		if v:IsA("BasePart") then
-			v2 = if v[p2] == nil then t2 else v[p2]
-			t[v] = v2
-			v[p2] = p3
+	for i, descendantPart in ipairs(rootPart:GetDescendants()) do
+		local previousValue
+		if descendantPart:IsA("BasePart") then
+			previousValue = if descendantPart[propertyName] == nil then UNSET_SENTINEL else descendantPart[propertyName]
+			rollbackTable[descendantPart] = previousValue
+			descendantPart[propertyName] = propertyValue
 		end
 	end
 	return function()
-		for v1, v2 in t do
-			if v2 == t2 then
-				v1[p2] = nil
+		for part, previousValue in rollbackTable do
+			if previousValue == UNSET_SENTINEL then
+				part[propertyName] = nil
 			else
-				v1[p2] = v2
+				part[propertyName] = previousValue
 			end
 		end
 	end
 end
-return t
+return PartUtils

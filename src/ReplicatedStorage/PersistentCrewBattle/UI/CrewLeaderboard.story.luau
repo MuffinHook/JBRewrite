@@ -1,15 +1,13 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClanConsts = require(ReplicatedStorage.Clan.ClanConsts)
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 return function(self)
-	local local1 = Roact.Component:extend("App")
+	local AppComponent = Roact.Component:extend("App")
 	local CrewLeaderboard = require(script.Parent.CrewLeaderboard)
 	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
 	local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
-	function local1.init(self)
+	function AppComponent.init(self)
 		self.aspectRatio = 1.5
 		self.leaderboardInfo = {
 			{
@@ -210,7 +208,7 @@ return function(self)
 			}
 		}
 	end
-	function local1.render(self)
+	function AppComponent.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement("Frame", {
@@ -229,8 +227,8 @@ return function(self)
 				})
 			}) })
 	end
-	local local2 = Roact.mount(Roact.createElement(local1), self)
+	local mountedComponent = Roact.mount(Roact.createElement(AppComponent), self)
 	return function()
-		Roact.unmount(local2)
+		Roact.unmount(mountedComponent)
 	end
 end

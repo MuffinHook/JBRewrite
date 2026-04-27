@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Interval = require(ReplicatedStorage.Std.Interval)
 local CollectionService = game:GetService("CollectionService")
@@ -27,9 +25,9 @@ return {
 			elseif CollectionService:HasTag(prefab, "Powerline") then
 				destructible._maid:GiveTask(destructible:GetOnHitSignal():Connect(function()
 					local inst = destructible:GetInst()
-					for i, v in ipairs(inst:GetChildren()) do
-						if v:IsA("BasePart") and v.Name == "Town_Wire" then
-							v.CanCollide = false
+					for i, child in ipairs(inst:GetChildren()) do
+						if child:IsA("BasePart") and child.Name == "Town_Wire" then
+							child.CanCollide = false
 						end
 					end
 					local MeshPart = inst.MeshPart

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local t = {}
 local function isPointInPrism(point, prismCFrame, prismSize)
 	local pointLocal = prismCFrame:pointToObjectSpace(point) + prismSize * 0.5

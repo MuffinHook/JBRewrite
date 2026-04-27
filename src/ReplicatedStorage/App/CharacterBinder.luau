@@ -1,13 +1,12 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ManifestBinder = require(ReplicatedStorage.ManifestBinder)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local localTable = {}
 localTable.__index = localTable
-function localTable.new(p1, p2)
-	local v1 = BaseObject.new(p1)
-	v1.manifest = p2
-	return v1
+function localTable.new(character, manifest)
+	local boundCharacter = BaseObject.new(character)
+	boundCharacter.manifest = manifest
+	return boundCharacter
 end
 return ManifestBinder.new("Character", {
 	HumanoidRootPart = "HumanoidRootPart",

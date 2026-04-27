@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local SurfaceBinder = require(script.Parent.SurfaceBinder)
 return {
 	init = function()

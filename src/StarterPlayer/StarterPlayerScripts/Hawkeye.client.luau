@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local LocalizationService = game:GetService("LocalizationService")
 game:GetService("ReplicatedStorage"):WaitForChild("HawkeyeRemoteFunction").OnClientInvoke = function()
 	return {

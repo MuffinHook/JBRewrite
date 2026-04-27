@@ -1,12 +1,11 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-return function(p1)
+return function(parentElement)
 	local TeamSelect = require(script.Parent.TeamSelect)
-	local v1 = Roact.mount(createElement(TeamSelect, {
-		onTeamSelected = function(p1)
-			print("team selected!", p1)
+	local mountedComponent = Roact.mount(createElement(TeamSelect, {
+		onTeamSelected = function(selectedTeam)
+			print("team selected!", selectedTeam)
 		end,
 		serverButtons = {
 			{
@@ -29,8 +28,8 @@ return function(p1)
 				text = "TRADE WORLD"
 			}
 		}
-	}), p1)
+	}), parentElement)
 	return function()
-		Roact.unmount(v1)
+		Roact.unmount(mountedComponent)
 	end
 end

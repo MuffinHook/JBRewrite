@@ -1,16 +1,14 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-return function(p1, p2, p3, p4)
-	if not p1 then
+return function(driftItem, vehicleModel, p3, options)
+	if not driftItem then
 		warn("Drift Item not found, using default")
-		p1 = {
+		driftItem = {
 			Name = "Classic"
 		}
 	end
-	local driftParticlesList = ReplicatedStorage.Resource:FindFirstChild("DriftParticles"):FindFirstChild(p1.Name):GetChildren()
+	local driftParticlesList = ReplicatedStorage.Resource:FindFirstChild("DriftParticles"):FindFirstChild(driftItem.Name):GetChildren()
 	local driftPresets = {}
-	for presetIndex, presetChild in p2.Model:FindFirstChild("Preset"):GetChildren() do
+	for presetIndex, presetChild in vehicleModel.Model:FindFirstChild("Preset"):GetChildren() do
 		if presetChild.Name == "Drift" then
 			table.insert(driftPresets, presetChild)
 		end
@@ -27,7 +25,7 @@ return function(p1, p2, p3, p4)
 				ParticleEmitter.Name = "ParticleEmitter"
 				ParticleEmitter.Enabled = false
 				ParticleEmitter.EmissionDirection = Enum.NormalId.Back
-				if p4 and p4.IsEditing then
+				if options and options.IsEditing then
 					ParticleEmitter.Rate = 36
 					ParticleEmitter.Speed = NumberRange.new(15)
 					ParticleEmitter.Enabled = true

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -10,12 +9,12 @@ local InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSys
 local HotbarItemConsts = require(script.Parent.HotbarItemConsts)
 local HotbarItemBinder = require(script.Parent.HotbarItemBinder)
 local HotbarItemUtils = require(script.Parent.HotbarItemUtils)
-local t = {
+local HotbarItemSystem = {
 	isDragging = false
 }
-function t.init()
+function HotbarItemSystem.init()
 	require(script.Parent.HotbarItemRes).init()
-	local t2 = {
+	local keyCodesList = {
 		Enum.KeyCode.One,
 		Enum.KeyCode.Two,
 		Enum.KeyCode.Three,
@@ -28,76 +27,76 @@ function t.init()
 		Enum.KeyCode.Zero
 	}
 	local function updateDisplayOrder()
-		if not t.isDragging then
-			local localPlayer = t.getSortedHotbarItemsFor(Players.LocalPlayer)
-			for i = 1, #localPlayer do
-				local instance2 = localPlayer[i]
-				if t2[i] then
-					instance2:SetKeyCode(t2[i])
-					instance2:SetBindText(("%d"):format(i))
+		if not HotbarItemSystem.isDragging then
+			local sortedItems = HotbarItemSystem.getSortedHotbarItemsFor(Players.LocalPlayer)
+			for i = 1, #sortedItems do
+				local hotbarItem = sortedItems[i]
+				if keyCodesList[i] then
+					hotbarItem:SetKeyCode(keyCodesList[i])
+					hotbarItem:SetBindText(("%d"):format(i))
 				else
-					instance2:SetKeyCode(nil)
-					instance2:SetBindText(nil)
+					hotbarItem:SetKeyCode(nil)
+					hotbarItem:SetBindText(nil)
 				end
 			end
 		end
 	end
 	HotbarItemBinder:GetClassAddedSignal():Connect(function(self)
 		if self:GetOwner() == Players.LocalPlayer then
-			local function f2(self)
-				local localPlayer = HotbarItemUtils.getDisplayOrder(self.obj) or 0
-				if localPlayer > 50 then
-					localPlayer = 0
+			local function getMaxDisplayOrder(hotbarItemRef)
+				local displayOrder = HotbarItemUtils.getDisplayOrder(hotbarItemRef.obj) or 0
+				if displayOrder > 50 then
+					displayOrder = 0
 				end
-				return localPlayer
+				return displayOrder
 			end
-			local table4 = math.max(unpack(TableUtils.map(t.getHotbarItemsFor(self:GetOwner()), f2)))
+			local maxDisplayOrder = math.max(unpack(TableUtils.map(HotbarItemSystem.getHotbarItemsFor(self:GetOwner()), getMaxDisplayOrder)))
 			if not HotbarItemUtils.getDisplayOrder(self.obj) then
-				HotbarItemUtils.setDisplayOrder(self.obj, table4 + 1)
+				HotbarItemUtils.setDisplayOrder(self.obj, maxDisplayOrder + 1)
 			end
 			updateDisplayOrder()
 			self._maid:GiveTask(self.obj:GetAttributeChangedSignal(HotbarItemConsts.DISPLAY_ORDER_ATTR_NAME):Connect(updateDisplayOrder))
 			self._maid:GiveTask(self.onDragStarted:Connect(function()
-				assert(not t.isDragging, "somehow hotbar is already dragging")
-				t.isDragging = true
-				local instance2 = Maid.new()
-				instance2:GiveTask(function()
-					t.isDragging = false
+				assert(not HotbarItemSystem.isDragging, "somehow hotbar is already dragging")
+				HotbarItemSystem.isDragging = true
+				local dragMaid = Maid.new()
+				dragMaid:GiveTask(function()
+					HotbarItemSystem.isDragging = false
 				end)
-				self._maid._dragMaid = instance2
-				local var3 = t.getSortedHotbarItemsFor(self:GetOwner())
-				local table4 = #var3
+				self._maid._dragMaid = dragMaid
+				local sortedHotbarItems = HotbarItemSystem.getSortedHotbarItemsFor(self:GetOwner())
+				local itemCount = #sortedHotbarItems
 				self:SetSize(1.2)
-				instance2:GiveTask(function()
+				dragMaid:GiveTask(function()
 					self:SetSize(1)
 					self:Spin()
 				end)
-				local table5 = table.find(var3, self)
-				local var6 = table5
-				local X = self._frame.Parent.UIListLayout.AbsoluteContentSize.X
-				local var7 = self._frame.Parent.AbsolutePosition.X + self._frame.Parent.AbsoluteSize.X * 0.5 - X * 0.5
-				local var8 = X / table4
-				instance2:GiveTask(RunService.Heartbeat:Connect(function()
-					var6 = math.floor((UserInputService:GetMouseLocation().X - var7) / var8) + 1
-					if var6 < 1 then
-						var6 = 1
-					elseif table4 < var6 then
-						var6 = table4
+				local originalIndex = table.find(sortedHotbarItems, self)
+				local targetIndex = originalIndex
+				local layoutStartX = self._frame.Parent.UIListLayout.AbsoluteContentSize.X
+				local layoutOffsetX = self._frame.Parent.AbsolutePosition.X + self._frame.Parent.AbsoluteSize.X * 0.5 - layoutStartX * 0.5
+				local itemWidth = layoutStartX / itemCount
+				dragMaid:GiveTask(RunService.Heartbeat:Connect(function()
+					targetIndex = math.floor((UserInputService:GetMouseLocation().X - layoutOffsetX) / itemWidth) + 1
+					if targetIndex < 1 then
+						targetIndex = 1
+					elseif itemCount < targetIndex then
+						targetIndex = itemCount
 					end
-					for i, v in ipairs(var3) do
-						HotbarItemUtils.setDisplayOrder(v.obj, HotbarItemUtils.calculateNewIndex(i, table5, var6))
+					for i, v in ipairs(sortedHotbarItems) do
+						HotbarItemUtils.setDisplayOrder(v.obj, HotbarItemUtils.calculateNewIndex(i, originalIndex, targetIndex))
 					end
 				end))
-				instance2:GiveTask(UserInputService.InputEnded:Connect(function(p12)
-					if p12.UserInputType == Enum.UserInputType.MouseButton1 or (p12.UserInputType == Enum.UserInputType.Touch or p12.UserInputType == Enum.UserInputType.Gamepad1) then
+				dragMaid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject)
+					if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or (inputObject.UserInputType == Enum.UserInputType.Touch or inputObject.UserInputType == Enum.UserInputType.Gamepad1) then
 						self._maid._dragMaid = nil
 						updateDisplayOrder()
 					end
 				end))
 			end))
 			self._maid:GiveTask(self:GetInventoryItem():GetEquippedSignal():Connect(function()
-				local localPlayer = self:GetInventoryItem()
-				self:SetDropVisible(localPlayer and localPlayer:GetEquipped() and true or false)
+				local inventoryItem = self:GetInventoryItem()
+				self:SetDropVisible(inventoryItem and inventoryItem:GetEquipped() and true or false)
 			end))
 			if self:GetInventoryItem():GetEquipped() then
 				self:SetDropVisible(self:GetInventoryItem():GetEquipped())
@@ -110,65 +109,65 @@ function t.init()
 		end
 	end)
 	HotbarItemBinder:Start()
-	UserInputService.InputBegan:Connect(function(self, p2)
-		if not p2 and self.UserInputType == Enum.UserInputType.Keyboard then
-			for i, v in ipairs((t.getHotbarItemsFor(Players.LocalPlayer))) do
+	UserInputService.InputBegan:Connect(function(self, isGameProcessed)
+		if not isGameProcessed and self.UserInputType == Enum.UserInputType.Keyboard then
+			for i, v in ipairs((HotbarItemSystem.getHotbarItemsFor(Players.LocalPlayer))) do
 				if self.KeyCode == v.keyCode then
-					local instance2 = InventoryItemBinder:Get(v.obj)
-					assert(instance2, "hotbarItem is somehow not simultaneously inventoryItem")
-					instance2:AttemptSelect()
+					local inventoryItem = InventoryItemBinder:Get(v.obj)
+					assert(inventoryItem, "hotbarItem is somehow not simultaneously inventoryItem")
+					inventoryItem:AttemptSelect()
 				end
 			end
 		end
 	end)
-	UserInputService.InputBegan:Connect(function(self, p2)
-		if p2 then
+	UserInputService.InputBegan:Connect(function(self, isGameProcessed)
+		if isGameProcessed then
 			return false
 		end
 		if self.UserInputType == Enum.UserInputType.Gamepad1 then
-			local localPlayer = nil
+			local direction = nil
 			if self.KeyCode == Enum.KeyCode.ButtonL1 then
-				localPlayer = -1
+				direction = -1
 			elseif self.KeyCode == Enum.KeyCode.ButtonR1 then
-				localPlayer = 1
+				direction = 1
 			end
-			if localPlayer then
-				local instance2 = InventoryItemSystem.getEquippedFor(Players.LocalPlayer)
-				local var3 = t.getSortedHotbarItemsFor(Players.LocalPlayer)
-				local table4 = instance2[1]
-				local sum = if localPlayer < 0 then #var3 else 1
-				if table4 then
-					for i = 1, #var3 do
-						if var3[i].obj == table4.obj then
-							sum = i
+			if direction then
+				local currentItem = InventoryItemSystem.getEquippedFor(Players.LocalPlayer)
+				local sortedHotbarItems = HotbarItemSystem.getSortedHotbarItemsFor(Players.LocalPlayer)
+				local currentItemRef = currentItem[1]
+				local selectedIndex = if direction < 0 then #sortedHotbarItems else 1
+				if currentItemRef then
+					for i = 1, #sortedHotbarItems do
+						if sortedHotbarItems[i].obj == currentItemRef.obj then
+							selectedIndex = i
 							break
 						end
 					end
-					sum = sum + localPlayer
-					if sum <= 0 then
-						sum = 0
-					elseif #var3 + 1 <= sum then
-						sum = #var3 + 1
+					selectedIndex = selectedIndex + direction
+					if selectedIndex <= 0 then
+						selectedIndex = 0
+					elseif #sortedHotbarItems + 1 <= selectedIndex then
+						selectedIndex = #sortedHotbarItems + 1
 					end
 					InventoryItemSystem.unequipAll()
 				end
-				if var3[sum] then
-					InventoryItemSystem.toggleEquip(var3[sum]:GetInventoryItem())
+				if sortedHotbarItems[selectedIndex] then
+					InventoryItemSystem.toggleEquip(sortedHotbarItems[selectedIndex]:GetInventoryItem())
 				end
 			end
 		end
 	end)
 end
-function t.getHotbarItemsFor(self)
-	return TableUtils.filter(HotbarItemBinder:GetAll(), function(p12)
-		return p12:GetOwner() == self
+function HotbarItemSystem.getHotbarItemsFor(self)
+	return TableUtils.filter(HotbarItemBinder:GetAll(), function(hotbarItem)
+		return hotbarItem:GetOwner() == self
 	end)
 end
-function t.getSortedHotbarItemsFor(self)
-	local localPlayer = t.getHotbarItemsFor(self)
-	table.sort(localPlayer, function(self, p2)
-		return (HotbarItemUtils.getDisplayOrder(self.obj) or 0) < (HotbarItemUtils.getDisplayOrder(p2.obj) or 0)
+function HotbarItemSystem.getSortedHotbarItemsFor(self)
+	local sortedItems = HotbarItemSystem.getHotbarItemsFor(self)
+	table.sort(sortedItems, function(self, otherHotbarItem)
+		return (HotbarItemUtils.getDisplayOrder(self.obj) or 0) < (HotbarItemUtils.getDisplayOrder(otherHotbarItem.obj) or 0)
 	end)
-	return localPlayer
+	return sortedItems
 end
-return t
+return HotbarItemSystem

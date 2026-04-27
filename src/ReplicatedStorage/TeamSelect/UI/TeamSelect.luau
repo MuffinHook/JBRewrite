@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
 local Countdown = require(ReplicatedStorage.EzUi.Countdown)
@@ -15,39 +14,39 @@ local Settings = require(ReplicatedStorage.Resource.Settings)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 require(ReplicatedStorage.Std.Interval)
 local TeamSelectConsts = require(ReplicatedStorage.TeamSelect.TeamSelectConsts)
-local t = {
+local teamImageAssets = {
 	Police = "rbxassetid://116966056798634",
 	Criminal = "rbxassetid://115514483147983",
 	Prison = "rbxassetid://92321803810937"
 }
-local v1 = Roact.PureComponent:extend("TeamSelect")
-v1.defaultProps = {
+local TeamSelectComponent = Roact.PureComponent:extend("TeamSelect")
+TeamSelectComponent.defaultProps = {
 	aspectRatio = 1.75,
 	verticalPaddingRatio = 64,
 	size = UDim2.fromScale(1, 1),
 	position = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5)
 }
-function v1.init(p1)
-	p1.maid = Maid.new()
+function TeamSelectComponent.init(self)
+	self.maid = Maid.new()
 end
-function v1.render(p1)
-	local function buttonComponent(p1)
-		local t = {
-			Size = p1.size,
-			Position = p1.position,
-			AnchorPoint = p1.anchorPoint,
+function TeamSelectComponent.render(componentProps)
+	local function buttonComponent(buttonProps)
+		local buttonProperties = {
+			Size = buttonProps.size,
+			Position = buttonProps.position,
+			AnchorPoint = buttonProps.anchorPoint,
 			BackgroundTransparency = 0.15,
 			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-			Text = " " .. p1.text
+			Text = " " .. buttonProps.text
 		}
-		t.TextColor3 = p1.textColor or Color3.fromRGB(255, 255, 255)
-		t.TextScaled = true
-		t.Font = Enum.Font.Bangers
-		t.Selectable = true
-		t.TextXAlignment = Enum.TextXAlignment.Left
-		t[Roact.Event.Activated] = p1.onClicked
-		local t2 = {
+		buttonProperties.TextColor3 = buttonProps.textColor or Color3.fromRGB(255, 255, 255)
+		buttonProperties.TextScaled = true
+		buttonProperties.Font = Enum.Font.Bangers
+		buttonProperties.Selectable = true
+		buttonProperties.TextXAlignment = Enum.TextXAlignment.Left
+		buttonProperties[Roact.Event.Activated] = buttonProps.onClicked
+		local childrenElements = {
 			UIStroke = createElement("UIStroke", {
 				Thickness = 2,
 				Color = Color3.new(255/255, 255/255, 255/255),
@@ -57,7 +56,7 @@ function v1.render(p1)
 				CornerRadius = UDim.new(0, 8)
 			})
 		}
-		t2.Countdown = if p1.text == "OG JAILBREAK" then createElement(Countdown, {
+		childrenElements.Countdown = if buttonProps.text == "OG JAILBREAK" then createElement(Countdown, {
 	injectPaddedContainerProps = true,
 	endTime = TeamSelectConsts.OG_JB_END_TIME,
 	size = UDim2.fromScale(0.4, 0.4),
@@ -66,48 +65,48 @@ function v1.render(p1)
 	paddingNone = true,
 	textXAlignment = Enum.TextXAlignment.Right,
 	fontFace = Font.fromEnum(Enum.Font.Bangers),
-	timeFormatFunc = function(p1)
-		local v2 = p1 % 86400
-		return ("%*D %*H %*M"):format(math.floor(p1 / 86400), math.floor(v2 / 3600), (math.floor(v2 % 3600 / 60)))
+	timeFormatFunc = function(totalSeconds)
+		local secondsWithoutDays = totalSeconds % 86400
+		return ("%*D %*H %*M"):format(math.floor(totalSeconds / 86400), math.floor(secondsWithoutDays / 3600), (math.floor(secondsWithoutDays % 3600 / 60)))
 	end
 }) else false
-		return createElement("TextButton", t, t2)
+		return createElement("TextButton", buttonProperties, childrenElements)
 	end
-	local v1 = AllUpdateText:split("\n")
-	local v2 = nil
-	local t2 = {}
-	local var3 = false
-	local t3 = {}
-	local t4 = {}
-	for v4, v5 in v1 do
-		v5 = v5:gsub("^%s+", "")
-		if v5:sub(1, 9) == "[version:" or v4 == #v1 then
-			if v2 ~= nil then
-				table.insert(t2, v2 .. "\n")
+	local updateLines = AllUpdateText:split("\n")
+	local currentVersionText = nil
+	local versionTexts = {}
+	local isInVersion = false
+	local descriptionTexts = {}
+	local updatesList = {}
+	for lineIndex, line in updateLines do
+		line = line:gsub("^%s+", "")
+		if line:sub(1, 9) == "[version:" or lineIndex == #updateLines then
+			if currentVersionText ~= nil then
+				table.insert(versionTexts, currentVersionText .. "\n")
 			end
-			v2 = ""
-			var3 = false
-		elseif var3 then
-			v2 = v2 .. "\n" .. v5
+			currentVersionText = ""
+			isInVersion = false
+		elseif isInVersion then
+			currentVersionText = currentVersionText .. "\n" .. line
 		else
-			table.insert(t3, v5)
-			var3 = true
+			table.insert(descriptionTexts, line)
+			isInVersion = true
 		end
 	end
-	assert(#t2 == #t3)
-	local t5 = {}
-	local t6 = {}
-	for i = #t2, 1, -1 do
-		table.insert(t5, t2[i])
-		table.insert(t6, t3[i])
+	assert(#versionTexts == #descriptionTexts)
+	local reversedVersions = {}
+	local reversedDescriptions = {}
+	for i = #versionTexts, 1, -1 do
+		table.insert(reversedVersions, versionTexts[i])
+		table.insert(reversedDescriptions, descriptionTexts[i])
 	end
-	for v9, v10 in t5 do
-		table.insert(t4, createElement("TextLabel", {
+	for updateIndex, updateVersion in reversedVersions do
+		table.insert(updatesList, createElement("TextLabel", {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(0.9, 0, 0.15, 0),
-			Text = t6[v9],
-			LayoutOrder = v9 * 3,
+			Text = reversedDescriptions[updateIndex],
+			LayoutOrder = updateIndex * 3,
 			Font = Enum.Font.SourceSansBold,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextColor3 = Color3.new(255/255, 255/255, 255/255),
@@ -119,72 +118,72 @@ function v1.render(p1)
 				ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
 			})
 		}))
-		table.insert(t4, createElement("TextLabel", {
+		table.insert(updatesList, createElement("TextLabel", {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0.7, 0),
 			RichText = true,
-			Text = t5[v9],
-			LayoutOrder = v9 * 3 + 1,
+			Text = reversedVersions[updateIndex],
+			LayoutOrder = updateIndex * 3 + 1,
 			Font = Enum.Font.SourceSansBold,
 			TextYAlignment = Enum.TextYAlignment.Top,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextColor3 = Color3.new(255/255, 255/255, 255/255),
 			TextScaled = true
 		}))
-		table.insert(t4, createElement("Frame", {
+		table.insert(updatesList, createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, 1),
 			BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
 			BorderSizePixel = 0,
-			LayoutOrder = v9 * 3 + 2
+			LayoutOrder = updateIndex * 3 + 2
 		}))
 	end
-	t4.ListLayout = createElement("UIListLayout", {
+	updatesList.ListLayout = createElement("UIListLayout", {
 		HorizontalAlignment = Enum.HorizontalAlignment.Left,
 		VerticalAlignment = Enum.VerticalAlignment.Top,
 		SortOrder = Enum.SortOrder.LayoutOrder,
 		FillDirection = Enum.FillDirection.Vertical,
 		Padding = UDim.new(0, 0)
 	})
-	local color16 = Color3.fromHex("6687ce")
-	local color17 = Color3.fromHex("de4833")
-	local color18 = Color3.fromRGB(253, 123, 49)
-	local function getText(p1, p2)
+	local policeColor = Color3.fromHex("6687ce")
+	local criminalColor = Color3.fromHex("de4833")
+	local prisonerColor = Color3.fromRGB(253, 123, 49)
+	local function getText(labelText, strokeColor)
 		return createElement("TextLabel", {
 			Size = UDim2.fromScale(1, 0.2),
 			Position = UDim2.fromScale(0, 0.9),
 			AnchorPoint = Vector2.new(0, 1),
 			BackgroundTransparency = 1,
-			Text = p1,
+			Text = labelText,
 			Font = Enum.Font.Bangers,
 			TextScaled = true,
 			TextColor3 = Color3.fromRGB(255, 255, 255)
 		}, {
 			UIStroke = createElement("UIStroke", {
 				Thickness = 2,
-				Color = p2
+				Color = strokeColor
 			})
 		})
 	end
-	local function getNumPlayers(p1, p2)
+	local function getNumPlayers(playerCount, strokeColor)
 		return createElement("TextLabel", {
 			Size = UDim2.fromScale(0.4, 0.09),
 			Position = UDim2.fromScale(0.5, 0.9),
 			AnchorPoint = Vector2.new(0.5, 0),
 			BackgroundTransparency = 1,
-			Text = ("%* PLAYERS"):format(p1 or 0),
+			Text = ("%* PLAYERS"):format(playerCount or 0),
 			Font = Enum.Font.Bangers,
 			TextScaled = true,
 			TextColor3 = Color3.fromRGB(255, 255, 255)
 		}, {
 			UIStroke = createElement("UIStroke", {
 				Thickness = 2,
-				Color = p2
+				Color = strokeColor
 			})
 		})
 	end
-	local v19, v20 = Roact.createBinding(color16)
-	local _, _2 = Roact.createBinding(color17)
+	local policeColorBinding, setPoliceColor = Roact.createBinding(policeColor)
+	local _, _2 = Roact.createBinding(criminalColor)
 	return createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
 		Position = UDim2.fromScale(0.5, 0.5),
@@ -257,7 +256,7 @@ function v1.render(p1)
 							ElasticBehavior = Enum.ElasticBehavior.Always,
 							VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right,
 							VerticalScrollBarInset = Enum.ScrollBarInset.None
-						}, t4)
+						}, updatesList)
 					})
 				}),
 				Buttons = createElement(PaddedContainer, {
@@ -281,21 +280,21 @@ function v1.render(p1)
 							rowsPerPage = 3,
 							colsPerRow = 1,
 							component = buttonComponent,
-							items = p1.props.serverButtons
+							items = componentProps.props.serverButtons
 						})
 					})
 				})
 			})
 		}),
 		Frame = createElement("Frame", {
-			Size = p1.props.size,
-			Position = p1.props.position,
-			AnchorPoint = p1.props.anchorPoint,
+			Size = componentProps.props.size,
+			Position = componentProps.props.position,
+			AnchorPoint = componentProps.props.anchorPoint,
 			BackgroundTransparency = 1
 		}, {
 			MiddleContainer = createElement(PaddedContainer, {
-				verticalPaddingRatio = p1.props.verticalPaddingRatio,
-				aspectRatio = p1.props.aspectRatio,
+				verticalPaddingRatio = componentProps.props.verticalPaddingRatio,
+				aspectRatio = componentProps.props.aspectRatio,
 				anchorPoint = Vector2.new(0.5, 0.5),
 				position = UDim2.fromScale(0.5, 0.45),
 				size = UDim2.fromScale(0.5, 0.5),
@@ -353,16 +352,16 @@ function v1.render(p1)
 							AnchorPoint = Vector2.new(1, 0),
 							Position = UDim2.fromScale(0.48, 0),
 							BackgroundTransparency = 0,
-							BackgroundColor3 = v19,
-							Image = t.Police,
+							BackgroundColor3 = policeColorBinding,
+							Image = teamImageAssets.Police,
 							[Roact.Event.Activated] = function()
-								p1.props.onTeamSelected(Settings.EnumTeam.Police)
+								componentProps.props.onTeamSelected(Settings.EnumTeam.Police)
 							end,
 							[Roact.Event.MouseEnter] = function()
-								v20(ColorUtils.brightenBy(color16, -0.5))
+								setPoliceColor(ColorUtils.brightenBy(policeColor, -0.5))
 							end,
 							[Roact.Event.MouseLeave] = function()
-								v20(color16)
+								setPoliceColor(policeColor)
 							end,
 							Selectable = true
 						}, {
@@ -374,44 +373,44 @@ function v1.render(p1)
 							}),
 							UIStroke = createElement("UIStroke", {
 								Thickness = 3,
-								Color = v19
+								Color = policeColorBinding
 							}),
-							Text = getText(Localization:FormatByKey("Teams.TeamPolice"), color16),
-							NumPlayers = getNumPlayers(p1.props.numPolice, color16)
+							Text = getText(Localization:FormatByKey("Teams.TeamPolice"), policeColor),
+							NumPlayers = getNumPlayers(componentProps.props.numPolice, policeColor)
 						}),
 						NonPoliceTeam = (function()
-							local isAllowCriminal = p1.props.allowCriminal == true
-							local v1, v2, var3
+							local isAllowCriminal = componentProps.props.allowCriminal == true
+							local selectedTeam, teamColor, teamLabel
 							if isAllowCriminal then
-								v1 = Settings.EnumTeam.Criminal
-								v2 = color17
-								var3 = Localization:FormatByKey("Teams.TeamCriminal")
+								selectedTeam = Settings.EnumTeam.Criminal
+								teamColor = criminalColor
+								teamLabel = Localization:FormatByKey("Teams.TeamCriminal")
 							else
-								v1 = Settings.EnumTeam.Prisoner
-								v2 = color18
-								var3 = Localization:FormatByKey("Teams.TeamPrisoner")
+								selectedTeam = Settings.EnumTeam.Prisoner
+								teamColor = prisonerColor
+								teamLabel = Localization:FormatByKey("Teams.TeamPrisoner")
 							end
-							local v6, v7 = Roact.createBinding(v2)
-							local t2 = {
+							local teamColorBinding, setTeamColor = Roact.createBinding(teamColor)
+							local buttonProps = {
 								Size = UDim2.fromScale(0.45, 1),
 								AnchorPoint = Vector2.new(0, 0),
 								Position = UDim2.fromScale(0.52, 0),
 								BackgroundTransparency = 0,
-								BackgroundColor3 = v6
+								BackgroundColor3 = teamColorBinding
 							}
-							t2.Image = isAllowCriminal and t.Criminal or t.Prison
-							t2[Roact.Ref] = p1.props.criminalButtonRef
-							t2[Roact.Event.Activated] = function()
-								p1.props.onTeamSelected(v1)
+							buttonProps.Image = isAllowCriminal and teamImageAssets.Criminal or teamImageAssets.Prison
+							buttonProps[Roact.Ref] = componentProps.props.criminalButtonRef
+							buttonProps[Roact.Event.Activated] = function()
+								componentProps.props.onTeamSelected(selectedTeam)
 							end
-							t2[Roact.Event.MouseEnter] = function()
-								v7(ColorUtils.brightenBy(v2, -0.5))
+							buttonProps[Roact.Event.MouseEnter] = function()
+								setTeamColor(ColorUtils.brightenBy(teamColor, -0.5))
 							end
-							t2[Roact.Event.MouseLeave] = function()
-								v7(v2)
+							buttonProps[Roact.Event.MouseLeave] = function()
+								setTeamColor(teamColor)
 							end
-							t2.Selectable = true
-							return createElement("ImageButton", t2, {
+							buttonProps.Selectable = true
+							return createElement("ImageButton", buttonProps, {
 								UIAspectRatioConstraint = createElement("UIAspectRatioConstraint", {
 									AspectRatio = 1
 								}),
@@ -420,10 +419,10 @@ function v1.render(p1)
 								}),
 								UIStroke = createElement("UIStroke", {
 									Thickness = 3,
-									Color = v6
+									Color = teamColorBinding
 								}),
-								Text = getText(var3, v2),
-								NumPlayers = getNumPlayers(p1.props.numCriminals, v2)
+								Text = getText(teamLabel, teamColor),
+								NumPlayers = getNumPlayers(componentProps.props.numCriminals, teamColor)
 							})
 						end)()
 					})
@@ -432,7 +431,7 @@ function v1.render(p1)
 		})
 	})
 end
-function v1.willUnmount(p1)
-	p1.maid:Destroy()
+function TeamSelectComponent.willUnmount(self)
+	self.maid:Destroy()
 end
-return v1
+return TeamSelectComponent

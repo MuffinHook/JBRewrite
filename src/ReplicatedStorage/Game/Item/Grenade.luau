@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 require(ReplicatedStorage.Module.R15IKv2)
@@ -12,47 +10,47 @@ local function RandomVector()
 	local dirY = math.random() * 2 - 1
 	return Vector3.new(dirX, dirY, math.random() * 2 - 1).Unit
 end
-local function CalculateProjectileVelocity(p1, p2, p3)
-	local displacement = p2 - p1
+local function CalculateProjectileVelocity(startPosition, targetPosition, projectileSpeed)
+	local displacement = targetPosition - startPosition
 	local horizontalDist = (displacement.x * displacement.x + displacement.z * displacement.z) ^ 0.5
 	local Gravity = workspace.Gravity
-	local discriminant = p3 * p3 * p3 * p3 - Gravity * (Gravity * horizontalDist * horizontalDist + 2 * displacement.Y * p3 * p3)
+	local discriminant = projectileSpeed * projectileSpeed * projectileSpeed * projectileSpeed - Gravity * (Gravity * horizontalDist * horizontalDist + 2 * displacement.Y * projectileSpeed * projectileSpeed)
 	local launchAngle
 	if discriminant >= 0 then
 		local sqrtDisc = discriminant ^ 0.5
-		launchAngle = math.min(math.atan((p3 * p3 + sqrtDisc) / (Gravity * horizontalDist)), (math.atan((p3 * p3 - sqrtDisc) / (Gravity * horizontalDist))))
+		launchAngle = math.min(math.atan((projectileSpeed * projectileSpeed + sqrtDisc) / (Gravity * horizontalDist)), (math.atan((projectileSpeed * projectileSpeed - sqrtDisc) / (Gravity * horizontalDist))))
 	else
 		launchAngle = 0.7853981633974483
 	end
-	return Vector3.new(p3 * displacement.x / horizontalDist * math.cos(launchAngle), p3 * math.sin(launchAngle), p3 * displacement.z / horizontalDist * math.cos(launchAngle)), horizontalDist / (p3 * math.cos(launchAngle))
+	return Vector3.new(projectileSpeed * displacement.x / horizontalDist * math.cos(launchAngle), projectileSpeed * math.sin(launchAngle), projectileSpeed * displacement.z / horizontalDist * math.cos(launchAngle)), horizontalDist / (projectileSpeed * math.cos(launchAngle))
 end
 local t = {
 	__ClassName = "Grenade"
 }
 t.__index = t
 setmetatable(t, Gun)
-function t.new(p1, p2, p3)
-	local instance = Gun.new(p1, p2, p3)
+function t.new(player, config, setupConfig)
+	local instance = Gun.new(player, config, setupConfig)
 	setmetatable(instance, t)
-	instance:Setup(p3)
+	instance:Setup(setupConfig)
 	instance.ShootProxy = 1
 	return instance
 end
-function t.SetupArmWelds(p1)  end
-function t.UpdateArmIK(p1)
-	local IK = p1.IK
-	IK.RightArm = p1.Model.Model.Base.Position
-	IK.RightAngle = p1.Config.Motion.RightElbowAngle
+function t.SetupArmWelds(grenadeInstance)  end
+function t.UpdateArmIK(grenadeInstance)
+	local IK = grenadeInstance.IK
+	IK.RightArm = grenadeInstance.Model.Model.Base.Position
+	IK.RightAngle = grenadeInstance.Config.Motion.RightElbowAngle
 end
-function t.SetupTip(p1)
-	p1.TipOffset = Vector3.new()
+function t.SetupTip(grenadeInstance)
+	grenadeInstance.TipOffset = Vector3.new()
 end
-local function GrenadeExplode(p1, p2)
-	local Position = p2.Skeleton.BoundingBox.Position
-	if p1.BulletEmitter.Bullets then
+local function GrenadeExplode(grenadeInstance, grenadeModel)
+	local Position = grenadeModel.Skeleton.BoundingBox.Position
+	if grenadeInstance.BulletEmitter.Bullets then
 		for i = 1, 30 do
 			local Unit = Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit
-			p1.BulletEmitter:Emit(Position, Unit, 400)
+			grenadeInstance.BulletEmitter:Emit(Position, Unit, 400)
 		end
 	end
 	local Part = Instance.new("Part")
@@ -78,14 +76,14 @@ local function GrenadeExplode(p1, p2)
 		landingSmokeEffect.Enabled = false
 	end)
 	game.Debris:AddItem(Part, 5)
-	Audio.ObjectLocal(Part, p1.Config.Sound.explosion_large_02, {
+	Audio.ObjectLocal(Part, grenadeInstance.Config.Sound.explosion_large_02, {
 		Volume = 1
 	}).EmitterSize = 20
-	if p1.Local then
-		p1.inventoryItemValue:FindFirstChild(GunSystemConsts.DAMAGE_REMOTE_NAME):FireServer(Position)
+	if grenadeInstance.Local then
+		grenadeInstance.inventoryItemValue:FindFirstChild(GunSystemConsts.DAMAGE_REMOTE_NAME):FireServer(Position)
 	end
 end
-function t.GrenadeThrow(p1, p2, p3)
+function t.GrenadeThrow(grenadeInstance, targetPosition, fuseTime)
 	local grenadeModel = assert(ReplicatedStorage.Resource.ItemSystem.Models.Grenade, ("Item model for %s does not exist."):format("Grenade")):Clone()
 	grenadeModel.Model.Handle:Destroy()
 	Joint.Weld(grenadeModel.Model.Base, grenadeModel.Skeleton.BoundingBox)
@@ -94,40 +92,40 @@ function t.GrenadeThrow(p1, p2, p3)
 	grenadeModel.Parent = workspace.Items
 	grenadeModel.PrimaryPart = grenadeModel.Skeleton.BoundingBox
 	local PrimaryPart = grenadeModel.PrimaryPart
-	PrimaryPart.Velocity = CalculateProjectileVelocity(p1.Model.Skeleton.BoundingBox.Position, p2, 100)
-	grenadeModel:SetPrimaryPartCFrame(CFrame.new(Vector3.new(), PrimaryPart.Velocity) + p1.Model.Skeleton.BoundingBox.Position)
+	PrimaryPart.Velocity = CalculateProjectileVelocity(grenadeInstance.Model.Skeleton.BoundingBox.Position, targetPosition, 100)
+	grenadeModel:SetPrimaryPartCFrame(CFrame.new(Vector3.new(), PrimaryPart.Velocity) + grenadeInstance.Model.Skeleton.BoundingBox.Position)
 	PrimaryPart.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.9, 0.5, 20, 1)
 	delay(0, function()
 		PrimaryPart.CanCollide = true
 	end)
-	delay(p3, function()
-		GrenadeExplode(p1, grenadeModel)
+	delay(fuseTime, function()
+		GrenadeExplode(grenadeInstance, grenadeModel)
 		grenadeModel.Model.Base.CanCollide = true
 		local randomX = math.random() * 2 - 1
 		local randomY = math.random() * 2 - 1
 		grenadeModel.Model.Base.Velocity = Vector3.new(randomX, randomY, math.random() * 2 - 1).Unit * 50
 	end)
-	delay(p3 + 2, function()
+	delay(fuseTime + 2, function()
 		grenadeModel:Destroy()
 	end)
-	if p1.Local then
-		p1.inventoryItemValue:FindFirstChild(GunSystemConsts.SHOOT_REMOTE_NAME):FireServer()
+	if grenadeInstance.Local then
+		grenadeInstance.inventoryItemValue:FindFirstChild(GunSystemConsts.SHOOT_REMOTE_NAME):FireServer()
 	end
 end
-function t.BulletEmitterOnLocalHitPlayer(p1)  end
-function t.ShootBegin(p1, p2)
-	if not p1:ShootCheckConditions() then
+function t.BulletEmitterOnLocalHitPlayer(grenadeInstance)  end
+function t.ShootBegin(grenadeInstance, inputDirection)
+	if not grenadeInstance:ShootCheckConditions() then
 		return false
 	end
-	p1:DecrementAmmo()
-	p1:SetNextShotPossible()
-	p1.GrenadeHeldAt = tick()
-	local proxyIncrement = p1.ShootProxy + 1
-	p1.ShootProxy = proxyIncrement
-	p1.SpringItemOffset:SetTarget(p1.Config.Motion.Raise.Springs.ItemOffset)
-	p1.SpringItemRotation:SetTarget(p1.Config.Motion.Raise.Springs.ItemRotation)
-	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Raise.Springs.NeckRotation)
-	local detachedHandle = p1.Model.Model.Handle:Clone()
+	grenadeInstance:DecrementAmmo()
+	grenadeInstance:SetNextShotPossible()
+	grenadeInstance.GrenadeHeldAt = tick()
+	local proxyIncrement = grenadeInstance.ShootProxy + 1
+	grenadeInstance.ShootProxy = proxyIncrement
+	grenadeInstance.SpringItemOffset:SetTarget(grenadeInstance.Config.Motion.Raise.Springs.ItemOffset)
+	grenadeInstance.SpringItemRotation:SetTarget(grenadeInstance.Config.Motion.Raise.Springs.ItemRotation)
+	grenadeInstance.SpringNeckRotation:SetTarget(grenadeInstance.Config.Motion.Raise.Springs.NeckRotation)
+	local detachedHandle = grenadeInstance.Model.Model.Handle:Clone()
 	detachedHandle:ClearAllChildren()
 	detachedHandle.CanCollide = true
 	detachedHandle.Anchored = false
@@ -138,52 +136,52 @@ function t.ShootBegin(p1, p2)
 	delay(5, function()
 		detachedHandle:Destroy()
 	end)
-	p1.Model.Model.Handle.Transparency = 1
-	delay(p1.Config.FuseTime, function()
-		if not p1.Destroyed then
-			if p1.ShootProxy ~= proxyIncrement then
+	grenadeInstance.Model.Model.Handle.Transparency = 1
+	delay(grenadeInstance.Config.FuseTime, function()
+		if not grenadeInstance.Destroyed then
+			if grenadeInstance.ShootProxy ~= proxyIncrement then
 				return false
 			end
-			p1:ShootEnd(p2)
+			grenadeInstance:ShootEnd(inputDirection)
 		end
 	end)
-	if p1.Local then
-		p1:BroadcastInputBegan(p2)
+	if grenadeInstance.Local then
+		grenadeInstance:BroadcastInputBegan(inputDirection)
 	end
 end
-function t.ShootEnd(p1, p2)
-	if not p1.GrenadeHeldAt then
+function t.ShootEnd(grenadeInstance, inputDirection)
+	if not grenadeInstance.GrenadeHeldAt then
 		return false
 	end
-	local remainingFuse = p1.Config.FuseTime - (tick() - p1.GrenadeHeldAt)
-	p1.GrenadeHeldAt = nil
-	p1.SpringItemOffset:SetTarget(p1.Config.Motion.Launch.Springs.ItemOffset)
-	p1.SpringItemRotation:SetTarget(p1.Config.Motion.Launch.Springs.ItemRotation)
-	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Launch.Springs.NeckRotation)
+	local remainingFuse = grenadeInstance.Config.FuseTime - (tick() - grenadeInstance.GrenadeHeldAt)
+	grenadeInstance.GrenadeHeldAt = nil
+	grenadeInstance.SpringItemOffset:SetTarget(grenadeInstance.Config.Motion.Launch.Springs.ItemOffset)
+	grenadeInstance.SpringItemRotation:SetTarget(grenadeInstance.Config.Motion.Launch.Springs.ItemRotation)
+	grenadeInstance.SpringNeckRotation:SetTarget(grenadeInstance.Config.Motion.Launch.Springs.NeckRotation)
 	delay(0.2, function()
-		p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
-		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
-		p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
+		grenadeInstance.SpringItemOffset:SetTarget(grenadeInstance.Config.Motion.Hip.Springs.ItemOffset)
+		grenadeInstance.SpringItemRotation:SetTarget(grenadeInstance.Config.Motion.Hip.Springs.ItemRotation)
+		grenadeInstance.SpringNeckRotation:SetTarget(grenadeInstance.Config.Motion.Hip.Springs.NeckRotation)
 	end)
-	local Model = p1.Model
+	local Model = grenadeInstance.Model
 	Model.Model.Base.Transparency = 1
 	Model.Model.Handle.Transparency = 1
-	delay(p1.Config.ReloadTime, function()
-		if p1.Destroyed then
+	delay(grenadeInstance.Config.ReloadTime, function()
+		if grenadeInstance.Destroyed then
 			return false
 		end
 		Model.Model.Base.Transparency = 0
 		Model.Model.Handle.Transparency = 0
 	end)
-	p1:GrenadeThrow(p1.MousePosition, remainingFuse)
-	if p1.Local then
-		p1:BroadcastInputEnded(p2)
+	grenadeInstance:GrenadeThrow(grenadeInstance.MousePosition, remainingFuse)
+	if grenadeInstance.Local then
+		grenadeInstance:BroadcastInputEnded(inputDirection)
 	end
 end
-function t.ShootOther(p1)  end
-function t.ShootSound(p1, p2)
-	if p2 then
-		Audio.ObjectLocal(p1.Model.Skeleton.BoundingBox, p1.Config.Sound.gun_pistol_dry_fire_01, {
+function t.ShootOther(grenadeInstance)  end
+function t.ShootSound(grenadeInstance, shouldPlayDryFire)
+	if shouldPlayDryFire then
+		Audio.ObjectLocal(grenadeInstance.Model.Skeleton.BoundingBox, grenadeInstance.Config.Sound.gun_pistol_dry_fire_01, {
 			Volume = 0.6,
 			Pitch = 1 + math.random() * 0.1 - 0.05
 		})

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VaultUtils = require(script.VaultUtils)
@@ -14,50 +13,50 @@ require(ReplicatedStorage.Resource.Settings)
 local BinderUtils = require(ReplicatedStorage.Std.Binder.BinderUtils)
 local LocalPlayer = Players.LocalPlayer
 local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
-local t = {}
-t.__index = t
-function t.new(self)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._homeItem = self
-	t2._obj = t2._homeItem._obj
-	t2.obj = t2._obj
-	t2._maid = Maid.new()
-	t2.maid = t2._maid
-	t2._deadlineValue = t2._obj:WaitForChild(VaultConsts.DEADLINE_VALUE_NAME)
-	t2._maid:GiveTask(t2._deadlineValue.Changed:Connect(function()
-		t2:_onDeadlineChanged()
+local Vault = {}
+Vault.__index = Vault
+function Vault.new(self)
+	local vaultInstance = {}
+	setmetatable(vaultInstance, Vault)
+	vaultInstance._homeItem = self
+	vaultInstance._obj = vaultInstance._homeItem._obj
+	vaultInstance.obj = vaultInstance._obj
+	vaultInstance._maid = Maid.new()
+	vaultInstance.maid = vaultInstance._maid
+	vaultInstance._deadlineValue = vaultInstance._obj:WaitForChild(VaultConsts.DEADLINE_VALUE_NAME)
+	vaultInstance._maid:GiveTask(vaultInstance._deadlineValue.Changed:Connect(function()
+		vaultInstance:_onDeadlineChanged()
 	end))
-	t2:_onDeadlineChanged()
-	t2._amountValue = t2._obj:WaitForChild(VaultConsts.AMOUNT_VALUE_NAME)
-	t2._maid:GiveTask(t2._amountValue.Changed:Connect(function()
-		t2:_onAmountChanged()
+	vaultInstance:_onDeadlineChanged()
+	vaultInstance._amountValue = vaultInstance._obj:WaitForChild(VaultConsts.AMOUNT_VALUE_NAME)
+	vaultInstance._maid:GiveTask(vaultInstance._amountValue.Changed:Connect(function()
+		vaultInstance:_onAmountChanged()
 	end))
-	t2:_onAmountChanged()
-	t2._vaultInteractRemote = t2._obj:WaitForChild(VaultConsts.VAULT_INTERACT_REMOTE_NAME)
-	t2:_findDoor()
-	return t2
+	vaultInstance:_onAmountChanged()
+	vaultInstance._vaultInteractRemote = vaultInstance._obj:WaitForChild(VaultConsts.VAULT_INTERACT_REMOTE_NAME)
+	vaultInstance:_findDoor()
+	return vaultInstance
 end
-function t._setArmJ(self, p2)
+function Vault._setArmJ(self, armSizeMultiplier)
 	for i, v in ipairs(DoorUtils.getInnerModel(self._doorModel):GetChildren()) do
 		if v.Name == "Arm" then
-			local cframe2 = v.CFrame
-			v.Size = Vector3.new(p2 * 7.6 + (1 - p2) * 4, 0.5, 0.5)
-			v.CFrame = cframe2
+			local originalCFrame = v.CFrame
+			v.Size = Vector3.new(armSizeMultiplier * 7.6 + (1 - armSizeMultiplier) * 4, 0.5, 0.5)
+			v.CFrame = originalCFrame
 		end
 	end
 end
-function t._onDeadlineChanged(self)
-	local instance = Time.GetNowSync()
-	if instance < self:GetDeadline() then
+function Vault._onDeadlineChanged(self)
+	local currentTime = Time.GetNowSync()
+	if currentTime < self:GetDeadline() then
 		self._maid._deadlineLoop = Interval.every(1):Connect(function()
-			instance = Time.GetNowSync()
-			local var12 = self:GetDeadline() - instance
-			if var12 < 0 then
-				var12 = 0
+			currentTime = Time.GetNowSync()
+			local timeRemaining = self:GetDeadline() - currentTime
+			if timeRemaining < 0 then
+				timeRemaining = 0
 			end
-			self:_updateDeadlineUi(var12)
-			if var12 == 0 then
+			self:_updateDeadlineUi(timeRemaining)
+			if timeRemaining == 0 then
 				self._maid._deadlineLoop = nil
 			end
 		end)
@@ -65,35 +64,35 @@ function t._onDeadlineChanged(self)
 		self:_updateDeadlineUi(0)
 	end
 end
-function t._findDoor(self)
+function Vault._findDoor(self)
 	local Door = self._obj:WaitForChild("Door")
 	self._doorModel = Door
-	BinderUtils.promiseBoundClass(DoorBinder, Door):andThen(function(p12)
-		self:_receiveDoor(p12)
+	BinderUtils.promiseBoundClass(DoorBinder, Door):andThen(function(doorInstance)
+		self:_receiveDoor(doorInstance)
 	end):catch(warn)
 end
-function t._receiveDoor(self, p2)
-	local function preUpdateFun(p12)
-		local instance = DoorUtils.getOpen(self._doorModel)
-		local cframe2 = self:IsCounting()
-		local var3 = self._homeItem:GetHome()
-		local v4
-		if var3 and (var3:HasPermissionToEnter(LocalPlayer) and not cframe2) then
-			p12.Name = "Arm"
-			v4 = true
+function Vault._receiveDoor(self, doorInstance)
+	local function preUpdateFun(armPart)
+		local isDoorOpen = DoorUtils.getOpen(self._doorModel)
+		local isCounting = self:IsCounting()
+		local home = self._homeItem:GetHome()
+		local shouldShowArmButton
+		if home and (home:HasPermissionToEnter(LocalPlayer) and not isCounting) then
+			armPart.Name = "Arm"
+			shouldShowArmButton = true
 		else
-			v4 = false
+			shouldShowArmButton = false
 		end
 		if self._homeItem:IsBeingDragged() then
-			v4 = false
+			shouldShowArmButton = false
 		end
-		if not instance then
-			v4 = false
+		if not isDoorOpen then
+			shouldShowArmButton = false
 		end
-		p12.Enabled = v4
+		armPart.Enabled = shouldShowArmButton
 	end
-	local function action(p12, p2)
-		if p2 then
+	local function action(armPart, isActivated)
+		if isActivated then
 			self._vaultInteractRemote:FireServer()
 			return true
 		end
@@ -114,17 +113,17 @@ function t._receiveDoor(self, p2)
 		CircleAction.Remove(Body)
 	end)
 end
-function t.GetIsVaultArmed(self)
+function Vault.GetIsVaultArmed(self)
 	return not DoorUtils.getOpen(self.obj.Door)
 end
-function t.GetArmingTeamId(self)
+function Vault.GetArmingTeamId(self)
 	return VaultUtils.getArmingTeamId(self.obj)
 end
-function t._updateDeadlineUi(self, p2)
-	local instance = math.floor(p2 / 60)
-	DoorUtils.getInnerModel(self._obj.Door).Timer.SurfaceGui.TextLabel.Text = ("%02d:%02d"):format(instance, p2 % 60)
+function Vault._updateDeadlineUi(self, timeRemaining)
+	local minutesElapsed = math.floor(timeRemaining / 60)
+	DoorUtils.getInnerModel(self._obj.Door).Timer.SurfaceGui.TextLabel.Text = ("%02d:%02d"):format(minutesElapsed, timeRemaining % 60)
 end
-function t._onAmountChanged(self)
+function Vault._onAmountChanged(self)
 	local SurfaceGui = DoorUtils.getInnerModel(self._obj.Door).Cash.SurfaceGui
 	if self._amountValue.Value > 0 then
 		SurfaceGui.TextLabel.BackgroundColor3 = Color3.fromRGB(115, 250, 121)
@@ -135,13 +134,13 @@ function t._onAmountChanged(self)
 	end
 	SurfaceGui.TextLabel.Text = ("%s"):format(Format.Currency(self._amountValue.Value))
 end
-function t.GetDeadline(self)
+function Vault.GetDeadline(self)
 	return self._deadlineValue.Value
 end
-function t.IsCounting(self)
+function Vault.IsCounting(self)
 	return self:GetDeadline() > Time.GetNowSync()
 end
-function t.Destroy(self)
+function Vault.Destroy(self)
 	local _maid = self._maid
 	assert(_maid ~= nil)
 	self._maid = nil
@@ -149,7 +148,7 @@ function t.Destroy(self)
 end
 return {
 	setup = function(self)
-		local instance = t.new(self)
+		local instance = Vault.new(self)
 		self._maid:GiveTask(instance)
 		self._vault = instance
 	end

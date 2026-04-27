@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)

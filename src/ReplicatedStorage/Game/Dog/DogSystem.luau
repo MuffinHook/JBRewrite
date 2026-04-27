@@ -1,39 +1,38 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 require(ReplicatedStorage.App.RunUtils)
-local v1 = nil
-local t = {}
-function t.init()
+local dogBinder = nil
+local DogSystem = {}
+function DogSystem.init()
 	local DogConsts = require(script.Parent.DogConsts)
 	local PlaceId = game.PlaceId
-	local t2 = {}
+	local animationInstances = {}
 	for k, v in pairs(DogConsts.ANIM_ID) do
-		t2[k] = {}
+		animationInstances[k] = {}
 		for k2, v2 in pairs(v) do
 			local Animation = Instance.new("Animation")
 			Animation.AnimationId = ("rbxassetid://%d"):format(v2)
-			t2[k][k2] = Animation
+			animationInstances[k][k2] = Animation
 		end
 	end
-	t._mapAnimInst = t2
-	v1 = require(script.Parent.DogBinder)
-	v1:Start()
-	local function setupCharacter(p1)
-		t._petTrack = p1:WaitForChild("Humanoid"):LoadAnimation(ReplicatedStorage.Resource.Dog.Anim.Pet)
+	DogSystem._mapAnimInst = animationInstances
+	dogBinder = require(script.Parent.DogBinder)
+	dogBinder:Start()
+	local function setupCharacter(character)
+		DogSystem._petTrack = character:WaitForChild("Humanoid"):LoadAnimation(ReplicatedStorage.Resource.Dog.Anim.Pet)
 	end
 	LocalPlayer.CharacterAdded:Connect(setupCharacter)
 	if LocalPlayer.Character then
-		t._petTrack = LocalPlayer.Character:WaitForChild("Humanoid"):LoadAnimation(ReplicatedStorage.Resource.Dog.Anim.Pet)
+		DogSystem._petTrack = LocalPlayer.Character:WaitForChild("Humanoid"):LoadAnimation(ReplicatedStorage.Resource.Dog.Anim.Pet)
 	end
 end
-function t.getAnimInsts(p1)
-	return t._mapAnimInst[p1]
+function DogSystem.getAnimInsts(animationName)
+	return DogSystem._mapAnimInst[animationName]
 end
-function t.getAll()
-	return v1:GetAll()
+function DogSystem.getAll()
+	return dogBinder:GetAll()
 end
-function t.getPetTrack()
-	return t._petTrack
+function DogSystem.getPetTrack()
+	return DogSystem._petTrack
 end
-return t
+return DogSystem

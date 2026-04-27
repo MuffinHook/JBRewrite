@@ -1,4 +1,3 @@
--- Reviewed by Claude
 return {
 	TestStatus = {
 		Success = "Success",

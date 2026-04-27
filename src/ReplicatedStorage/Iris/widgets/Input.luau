@@ -1,176 +1,175 @@
--- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2)
-	local t = {
-		Init = function(p1) end,
-		Get = function(p12)
-			return p12.lastNumberChangedTick == p1._cycleTick
+return function(iris, util)
+	local numberChangedEvent = {
+		Init = function(widget) end,
+		Get = function(widget)
+			return widget.lastNumberChangedTick == iris._cycleTick
 		end
 	}
-	local function getValueByIndex(p1, p2, p3)
-		if typeof(p1) == "number" then
-			return p1
+	local function getValueByIndex(value, componentIndex, config)
+		if typeof(value) == "number" then
+			return value
 		else
-			if typeof(p1) == "Vector2" then
-				if p2 == 1 then
-					return p1.X
+			if typeof(value) == "Vector2" then
+				if componentIndex == 1 then
+					return value.X
 				end
-				if p2 == 2 then
-					return p1.Y
-				end
-				return
-			elseif typeof(p1) == "Vector3" then
-				if p2 == 1 then
-					return p1.X
-				end
-				if p2 == 2 then
-					return p1.Y
-				end
-				if p2 == 3 then
-					return p1.Z
+				if componentIndex == 2 then
+					return value.Y
 				end
 				return
-			elseif typeof(p1) == "UDim" then
-				if p2 == 1 then
-					return p1.Scale
+			elseif typeof(value) == "Vector3" then
+				if componentIndex == 1 then
+					return value.X
 				end
-				if p2 == 2 then
-					return p1.Offset
+				if componentIndex == 2 then
+					return value.Y
 				end
-				return
-			elseif typeof(p1) == "UDim2" then
-				if p2 == 1 then
-					return p1.X.Scale
-				end
-				if p2 == 2 then
-					return p1.X.Offset
-				end
-				if p2 == 3 then
-					return p1.Y.Scale
-				end
-				if p2 == 4 then
-					return p1.Y.Offset
+				if componentIndex == 3 then
+					return value.Z
 				end
 				return
-			elseif typeof(p1) == "Color3" then
-				local instance = if p3.UseHSV then { p1:ToHSV() } else { p1.R, p1.G, p1.B }
-				if p2 == 1 then
-					return instance[1]
+			elseif typeof(value) == "UDim" then
+				if componentIndex == 1 then
+					return value.Scale
 				end
-				if p2 == 2 then
-					return instance[2]
-				end
-				if p2 == 3 then
-					return instance[3]
+				if componentIndex == 2 then
+					return value.Offset
 				end
 				return
-			elseif typeof(p1) == "Rect" then
-				if p2 == 1 then
-					return p1.Min.X
+			elseif typeof(value) == "UDim2" then
+				if componentIndex == 1 then
+					return value.X.Scale
 				end
-				if p2 == 2 then
-					return p1.Min.Y
+				if componentIndex == 2 then
+					return value.X.Offset
 				end
-				if p2 == 3 then
-					return p1.Max.X
+				if componentIndex == 3 then
+					return value.Y.Scale
 				end
-				if p2 == 4 then
-					return p1.Max.Y
+				if componentIndex == 4 then
+					return value.Y.Offset
 				end
-			elseif typeof(p1) == "table" then
-				return p1[p2]
+				return
+			elseif typeof(value) == "Color3" then
+				local colorComponents = if config.UseHSV then { value:ToHSV() } else { value.R, value.G, value.B }
+				if componentIndex == 1 then
+					return colorComponents[1]
+				end
+				if componentIndex == 2 then
+					return colorComponents[2]
+				end
+				if componentIndex == 3 then
+					return colorComponents[3]
+				end
+				return
+			elseif typeof(value) == "Rect" then
+				if componentIndex == 1 then
+					return value.Min.X
+				end
+				if componentIndex == 2 then
+					return value.Min.Y
+				end
+				if componentIndex == 3 then
+					return value.Max.X
+				end
+				if componentIndex == 4 then
+					return value.Max.Y
+				end
+			elseif typeof(value) == "table" then
+				return value[componentIndex]
 			end
-			error((("Incorrect datatype or value: %* %* %*."):format(p1, typeof(p1), p2)))
+			error((("Incorrect datatype or value: %* %* %*."):format(value, typeof(value), componentIndex)))
 		end
 	end
-	local function updateValueByIndex(p1, p2, p3, p4)
-		if typeof(p1) == "number" then
-			return p3
+	local function updateValueByIndex(value, componentIndex, newValue, config)
+		if typeof(value) == "number" then
+			return newValue
 		else
-			if typeof(p1) == "Vector2" then
-				if p2 == 1 then
-					return Vector2.new(p3, p1.Y)
+			if typeof(value) == "Vector2" then
+				if componentIndex == 1 then
+					return Vector2.new(newValue, value.Y)
 				end
-				if p2 == 2 then
-					return Vector2.new(p1.X, p3)
-				end
-				return
-			elseif typeof(p1) == "Vector3" then
-				if p2 == 1 then
-					return Vector3.new(p3, p1.Y, p1.Z)
-				end
-				if p2 == 2 then
-					return Vector3.new(p1.X, p3, p1.Z)
-				end
-				if p2 == 3 then
-					return Vector3.new(p1.X, p1.Y, p3)
+				if componentIndex == 2 then
+					return Vector2.new(value.X, newValue)
 				end
 				return
-			elseif typeof(p1) == "UDim" then
-				if p2 == 1 then
-					return UDim.new(p3, p1.Offset)
+			elseif typeof(value) == "Vector3" then
+				if componentIndex == 1 then
+					return Vector3.new(newValue, value.Y, value.Z)
 				end
-				if p2 == 2 then
-					return UDim.new(p1.Scale, p3)
+				if componentIndex == 2 then
+					return Vector3.new(value.X, newValue, value.Z)
 				end
-				return
-			elseif typeof(p1) == "UDim2" then
-				if p2 == 1 then
-					return UDim2.new(UDim.new(p3, p1.X.Offset), p1.Y)
-				end
-				if p2 == 2 then
-					return UDim2.new(UDim.new(p1.X.Scale, p3), p1.Y)
-				end
-				if p2 == 3 then
-					return UDim2.new(p1.X, UDim.new(p3, p1.Y.Offset))
-				end
-				if p2 == 4 then
-					return UDim2.new(p1.X, UDim.new(p1.Y.Scale, p3))
+				if componentIndex == 3 then
+					return Vector3.new(value.X, value.Y, newValue)
 				end
 				return
-			elseif typeof(p1) == "Rect" then
-				if p2 == 1 then
-					return Rect.new(Vector2.new(p3, p1.Min.Y), p1.Max)
+			elseif typeof(value) == "UDim" then
+				if componentIndex == 1 then
+					return UDim.new(newValue, value.Offset)
 				end
-				if p2 == 2 then
-					return Rect.new(Vector2.new(p1.Min.X, p3), p1.Max)
-				end
-				if p2 == 3 then
-					return Rect.new(p1.Min, Vector2.new(p3, p1.Max.Y))
-				end
-				if p2 == 4 then
-					return Rect.new(p1.Min, Vector2.new(p1.Max.X, p3))
+				if componentIndex == 2 then
+					return UDim.new(value.Scale, newValue)
 				end
 				return
-			elseif typeof(p1) == "Color3" then
-				if p4.UseHSV then
-					local instance, instance2, var3 = p1:ToHSV()
-					if p2 == 1 then
-						return Color3.fromHSV(p3, instance2, var3)
+			elseif typeof(value) == "UDim2" then
+				if componentIndex == 1 then
+					return UDim2.new(UDim.new(newValue, value.X.Offset), value.Y)
+				end
+				if componentIndex == 2 then
+					return UDim2.new(UDim.new(value.X.Scale, newValue), value.Y)
+				end
+				if componentIndex == 3 then
+					return UDim2.new(value.X, UDim.new(newValue, value.Y.Offset))
+				end
+				if componentIndex == 4 then
+					return UDim2.new(value.X, UDim.new(value.Y.Scale, newValue))
+				end
+				return
+			elseif typeof(value) == "Rect" then
+				if componentIndex == 1 then
+					return Rect.new(Vector2.new(newValue, value.Min.Y), value.Max)
+				end
+				if componentIndex == 2 then
+					return Rect.new(Vector2.new(value.Min.X, newValue), value.Max)
+				end
+				if componentIndex == 3 then
+					return Rect.new(value.Min, Vector2.new(newValue, value.Max.Y))
+				end
+				if componentIndex == 4 then
+					return Rect.new(value.Min, Vector2.new(value.Max.X, newValue))
+				end
+				return
+			elseif typeof(value) == "Color3" then
+				if config.UseHSV then
+					local hue, saturation, brightness = value:ToHSV()
+					if componentIndex == 1 then
+						return Color3.fromHSV(newValue, saturation, brightness)
 					end
-					if p2 == 2 then
-						return Color3.fromHSV(instance, p3, var3)
+					if componentIndex == 2 then
+						return Color3.fromHSV(hue, newValue, brightness)
 					end
-					if p2 == 3 then
-						return Color3.fromHSV(instance, instance2, p3)
+					if componentIndex == 3 then
+						return Color3.fromHSV(hue, saturation, newValue)
 					end
 				end
-				if p2 == 1 then
-					return Color3.new(p3, p1.G, p1.B)
+				if componentIndex == 1 then
+					return Color3.new(newValue, value.G, value.B)
 				end
-				if p2 == 2 then
-					return Color3.new(p1.R, p3, p1.B)
+				if componentIndex == 2 then
+					return Color3.new(value.R, newValue, value.B)
 				end
-				if p2 == 3 then
-					return Color3.new(p1.R, p1.G, p3)
+				if componentIndex == 3 then
+					return Color3.new(value.R, value.G, newValue)
 				end
 			else
 				return
 			end
-			error((("Incorrect datatype or value %* %* %*."):format(p1, typeof(p1), p2)))
+			error((("Incorrect datatype or value %* %* %*."):format(value, typeof(value), componentIndex)))
 		end
 	end
-	local t2 = {
+	local defaultIncrement = {
 		Num = { 1 },
 		Vector2 = { 1, 1 },
 		Vector3 = { 1, 1, 1 },
@@ -180,7 +179,7 @@ return function(p1, p2)
 		Color4 = { 1, 1, 1, 1 },
 		Rect = { 1, 1, 1, 1 }
 	}
-	local t3 = {
+	local defaultMin = {
 		Num = { 0 },
 		Vector2 = { 0, 0 },
 		Vector3 = { 0, 0, 0 },
@@ -188,7 +187,7 @@ return function(p1, p2)
 		UDim2 = { 0, 0, 0, 0 },
 		Rect = { 0, 0, 0, 0 }
 	}
-	local t4 = {
+	local defaultMax = {
 		Num = { 100 },
 		Vector2 = { 100, 100 },
 		Vector3 = { 100, 100, 100 },
@@ -196,7 +195,7 @@ return function(p1, p2)
 		UDim2 = { 1, 960, 1, 960 },
 		Rect = { 960, 960, 960, 960 }
 	}
-	local t5 = {
+	local defaultFormatPrefix = {
 		Num = { "" },
 		Vector2 = { "X: ", "Y: " },
 		Vector3 = { "X: ", "Y: ", "Z: " },
@@ -208,7 +207,7 @@ return function(p1, p2)
 		Color4_HSV = { "H: ", "S: ", "V: ", "T: " },
 		Rect = { "X: ", "Y: ", "X: ", "Y: " }
 	}
-	local t6 = {
+	local defaultDecimalPlaces = {
 		Num = { 0 },
 		Vector2 = { 0, 0 },
 		Vector3 = { 0, 0, 0 },
@@ -218,7 +217,7 @@ return function(p1, p2)
 		Color4 = { 0, 0, 0, 0 },
 		Rect = { 0, 0, 0, 0 }
 	}
-	local function generateAbstract(p12, p22, p3, p4)
+	local function generateAbstract(widgetType, widgetIndex, componentCount, defaultValue)
 		return {
 			hasState = true,
 			hasChildren = false,
@@ -230,257 +229,257 @@ return function(p1, p2)
 				Format = 5
 			},
 			Events = {
-				numberChanged = t,
-				hovered = p2.EVENTS.hover(function(p1)
-					return p1.Instance
+				numberChanged = numberChangedEvent,
+				hovered = util.EVENTS.hover(function(widget)
+					return widget.Instance
 				end)
 			},
-			GenerateState = function(p12)
-				if p12.state.number == nil then
-					p12.state.number = p1._widgetState(p12, "number", p4)
+			GenerateState = function(widget)
+				if widget.state.number == nil then
+					widget.state.number = iris._widgetState(widget, "number", defaultValue)
 				end
-				if p12.state.editingText == nil then
-					p12.state.editingText = p1._widgetState(p12, "editingText", 0)
+				if widget.state.editingText == nil then
+					widget.state.editingText = iris._widgetState(widget, "editingText", 0)
 				end
 			end,
-			Update = function(p13)
-				local instance = p13.Instance
-				instance.TextLabel.Text = p13.arguments.Text or ("Input %*"):format(p22)
-				local var3, var4, var5, var6, var7, var8, var9, var10, v11, var12, v13, v14, v15, v16, v17, v18, v19
-				if p13.arguments.Format then
-					if typeof(p13.arguments.Format) == "table" then
-						if not p13.arguments.Format then
-							var3 = {}
-							for i = 1, p3 do
-								var4 = t6[p22][i]
-								if p13.arguments.Increment then
-									var5 = getValueByIndex(p13.arguments.Increment, i, p13.arguments)
-									var6 = if var5 == 0 then 1 else var5
-									var7 = -math.log10(var6)
-									var8 = math.ceil(var7)
-									var9 = math.max(var4, var8, var4)
-									var4 = var9
+			Update = function(widget)
+				local frameInstance = widget.Instance
+				frameInstance.TextLabel.Text = widget.arguments.Text or ("Input %*"):format(widgetIndex)
+				local formatTable, decimalPlaces, increment, incrementDivided, logValue, decimalCount, maxDecimals, maxValue, maxFromIncrement, maxFromMax, maxDividedValue, logMaxValue, maxDecimalFromMax, decimalFromMax, maxFromMin, maxDividedMinValue, logMinValue, maxDecimalFromMin, decimalFromMin
+				if widget.arguments.Format then
+					if typeof(widget.arguments.Format) == "table" then
+						if not widget.arguments.Format then
+							formatTable = {}
+							for i = 1, componentCount do
+								decimalPlaces = defaultDecimalPlaces[widgetIndex][i]
+								if widget.arguments.Increment then
+									increment = getValueByIndex(widget.arguments.Increment, i, widget.arguments)
+									incrementDivided = if increment == 0 then 1 else increment
+									logValue = -math.log10(incrementDivided)
+									decimalCount = math.ceil(logValue)
+									maxDecimals = math.max(decimalPlaces, decimalCount, decimalPlaces)
+									decimalPlaces = maxDecimals
 								end
-								if p13.arguments.Max then
-									var10 = getValueByIndex(p13.arguments.Max, i, p13.arguments)
-									v11 = if var10 == 0 then 1 else var10
-									var12 = -math.log10(v11)
-									v13 = math.ceil(var12)
-									v14 = math.max(var4, v13, var4)
-									var4 = v14
+								if widget.arguments.Max then
+									maxValue = getValueByIndex(widget.arguments.Max, i, widget.arguments)
+									maxDividedValue = if maxValue == 0 then 1 else maxValue
+									logMaxValue = -math.log10(maxDividedValue)
+									maxDecimalFromMax = math.ceil(logMaxValue)
+									decimalFromMax = math.max(decimalPlaces, maxDecimalFromMax, decimalPlaces)
+									decimalPlaces = decimalFromMax
 								end
-								if p13.arguments.Min then
-									v15 = getValueByIndex(p13.arguments.Min, i, p13.arguments)
-									v16 = if v15 == 0 then 1 else v15
-									v17 = -math.log10(v16)
-									v18 = math.ceil(v17)
-									v19 = math.max(var4, v18, var4)
-									var4 = v19
+								if widget.arguments.Min then
+									maxFromMin = getValueByIndex(widget.arguments.Min, i, widget.arguments)
+									maxDividedMinValue = if maxFromMin == 0 then 1 else maxFromMin
+									logMinValue = -math.log10(maxDividedMinValue)
+									maxDecimalFromMin = math.ceil(logMinValue)
+									decimalFromMin = math.max(decimalPlaces, maxDecimalFromMin, decimalPlaces)
+									decimalPlaces = decimalFromMin
 								end
-								if var4 > 0 then
-									var3[i] = ("%%.%*f"):format(var4)
+								if decimalPlaces > 0 then
+									formatTable[i] = ("%%.%*f"):format(decimalPlaces)
 								else
-									var3[i] = "%d"
+									formatTable[i] = "%d"
 								end
 							end
-							p13.arguments.Format = var3
-							p13.arguments.Prefix = t5[p22]
+							widget.arguments.Format = formatTable
+							widget.arguments.Prefix = defaultFormatPrefix[widgetIndex]
 						end
 					else
-						p13.arguments.Format = { p13.arguments.Format }
+						widget.arguments.Format = { widget.arguments.Format }
 					end
-				elseif not p13.arguments.Format then
-					var3 = {}
-					for i = 1, p3 do
-						var4 = t6[p22][i]
-						if p13.arguments.Increment then
-							var5 = getValueByIndex(p13.arguments.Increment, i, p13.arguments)
-							var6 = if var5 == 0 then 1 else var5
-							var7 = -math.log10(var6)
-							var8 = math.ceil(var7)
-							var9 = math.max(var4, var8, var4)
-							var4 = var9
+				elseif not widget.arguments.Format then
+					formatTable = {}
+					for i = 1, componentCount do
+						decimalPlaces = defaultDecimalPlaces[widgetIndex][i]
+						if widget.arguments.Increment then
+							increment = getValueByIndex(widget.arguments.Increment, i, widget.arguments)
+							incrementDivided = if increment == 0 then 1 else increment
+							logValue = -math.log10(incrementDivided)
+							decimalCount = math.ceil(logValue)
+							maxDecimals = math.max(decimalPlaces, decimalCount, decimalPlaces)
+							decimalPlaces = maxDecimals
 						end
-						if p13.arguments.Max then
-							var10 = getValueByIndex(p13.arguments.Max, i, p13.arguments)
-							v11 = if var10 == 0 then 1 else var10
-							var12 = -math.log10(v11)
-							v13 = math.ceil(var12)
-							v14 = math.max(var4, v13, var4)
-							var4 = v14
+						if widget.arguments.Max then
+							maxValue = getValueByIndex(widget.arguments.Max, i, widget.arguments)
+							maxDividedValue = if maxValue == 0 then 1 else maxValue
+							logMaxValue = -math.log10(maxDividedValue)
+							maxDecimalFromMax = math.ceil(logMaxValue)
+							decimalFromMax = math.max(decimalPlaces, maxDecimalFromMax, decimalPlaces)
+							decimalPlaces = decimalFromMax
 						end
-						if p13.arguments.Min then
-							v15 = getValueByIndex(p13.arguments.Min, i, p13.arguments)
-							v16 = if v15 == 0 then 1 else v15
-							v17 = -math.log10(v16)
-							v18 = math.ceil(v17)
-							v19 = math.max(var4, v18, var4)
-							var4 = v19
+						if widget.arguments.Min then
+							maxFromMin = getValueByIndex(widget.arguments.Min, i, widget.arguments)
+							maxDividedMinValue = if maxFromMin == 0 then 1 else maxFromMin
+							logMinValue = -math.log10(maxDividedMinValue)
+							maxDecimalFromMin = math.ceil(logMinValue)
+							decimalFromMin = math.max(decimalPlaces, maxDecimalFromMin, decimalPlaces)
+							decimalPlaces = decimalFromMin
 						end
-						if var4 > 0 then
-							var3[i] = ("%%.%*f"):format(var4)
+						if decimalPlaces > 0 then
+							formatTable[i] = ("%%.%*f"):format(decimalPlaces)
 						else
-							var3[i] = "%d"
+							formatTable[i] = "%d"
 						end
 					end
-					p13.arguments.Format = var3
-					p13.arguments.Prefix = t5[p22]
+					widget.arguments.Format = formatTable
+					widget.arguments.Prefix = defaultFormatPrefix[widgetIndex]
 				end
-				if p12 == "Input" and p22 == "Num" then
-					instance.SubButton.Visible = not p13.arguments.NoButtons
-					instance.AddButton.Visible = not p13.arguments.NoButtons
-					instance.InputField1.Size = UDim2.new(UDim.new(p1._config.ContentWidth.Scale, p1._config.ContentWidth.Offset - if p13.arguments.NoButtons then 0 else 2 * p1._config.ItemInnerSpacing.X + 2 * (p1._config.TextSize + 2 * p1._config.FramePadding.Y)), p1._config.ContentHeight)
+				if widgetType == "Input" and widgetIndex == "Num" then
+					frameInstance.SubButton.Visible = not widget.arguments.NoButtons
+					frameInstance.AddButton.Visible = not widget.arguments.NoButtons
+					frameInstance.InputField1.Size = UDim2.new(UDim.new(iris._config.ContentWidth.Scale, iris._config.ContentWidth.Offset - if widget.arguments.NoButtons then 0 else 2 * iris._config.ItemInnerSpacing.X + 2 * (iris._config.TextSize + 2 * iris._config.FramePadding.Y)), iris._config.ContentHeight)
 				end
-				if p12 == "Slider" then
-					for j = 1, p3 do
-						local v21, var22, v23
-						local GrabBar = instance:FindFirstChild("SliderField" .. tostring(j)).GrabBar
-						v21 = p13.arguments.Increment and getValueByIndex(p13.arguments.Increment, j, p13.arguments) or t2[p22][j]
-						var22 = p13.arguments.Min and getValueByIndex(p13.arguments.Min, j, p13.arguments) or t3[p22][j]
-						v23 = p13.arguments.Max and getValueByIndex(p13.arguments.Max, j, p13.arguments) or t4[p22][j]
-						GrabBar.Size = UDim2.fromScale(1 / math.floor((1 + v23 - var22) / v21), 1)
+				if widgetType == "Slider" then
+					for j = 1, componentCount do
+						local sliderField, sliderMin, sliderMax
+						local GrabBar = frameInstance:FindFirstChild("SliderField" .. tostring(j)).GrabBar
+						sliderField = widget.arguments.Increment and getValueByIndex(widget.arguments.Increment, j, widget.arguments) or defaultIncrement[widgetIndex][j]
+						sliderMin = widget.arguments.Min and getValueByIndex(widget.arguments.Min, j, widget.arguments) or defaultMin[widgetIndex][j]
+						sliderMax = widget.arguments.Max and getValueByIndex(widget.arguments.Max, j, widget.arguments) or defaultMax[widgetIndex][j]
+						GrabBar.Size = UDim2.fromScale(1 / math.floor((1 + sliderMax - sliderMin) / sliderField), 1)
 					end
-					local var25 = #p1._postCycleCallbacks + 1
-					local var26 = p1._cycleTick + 1
-					p1._postCycleCallbacks[var25] = function()
-						if var26 <= p1._cycleTick then
-							if p13.lastCycleTick ~= -1 then
-								p13.state.number.lastChangeTick = p1._cycleTick
-								p1._widgets[("Slider%*"):format(p22)].UpdateState(p13)
+					local callbackIndex = #iris._postCycleCallbacks + 1
+					local targetCycleTick = iris._cycleTick + 1
+					iris._postCycleCallbacks[callbackIndex] = function()
+						if targetCycleTick <= iris._cycleTick then
+							if widget.lastCycleTick ~= -1 then
+								widget.state.number.lastChangeTick = iris._cycleTick
+								iris._widgets[("Slider%*"):format(widgetIndex)].UpdateState(widget)
 							end
-							p1._postCycleCallbacks[var25] = nil
+							iris._postCycleCallbacks[callbackIndex] = nil
 						end
 					end
 				end
 			end,
-			Discard = function(p1)
-				p1.Instance:Destroy()
-				p2.discardState(p1)
+			Discard = function(widget)
+				widget.Instance:Destroy()
+				util.discardState(widget)
 			end
 		}
 	end
-	local function focusLost(p12, p2, p3, p4)
-		local instance = tonumber(p2.Text:match("-?%d*%.?%d*"))
-		local number = p12.state.number
-		if p4 == "Color4" and p3 == 4 then
-			number = p12.state.transparency
-		elseif p4 == "Color3" or p4 == "Color4" then
-			number = p12.state.color
+	local function focusLost(widget, textBox, componentIndex, dataType)
+		local parsedNumber = tonumber(textBox.Text:match("-?%d*%.?%d*"))
+		local numberState = widget.state.number
+		if dataType == "Color4" and componentIndex == 4 then
+			numberState = widget.state.transparency
+		elseif dataType == "Color3" or dataType == "Color4" then
+			numberState = widget.state.color
 		end
-		if instance ~= nil then
-			if p4 == "Color3" or p4 == "Color4" and not p12.arguments.UseFloats then
-				instance = instance / 255
+		if parsedNumber ~= nil then
+			if dataType == "Color3" or dataType == "Color4" and not widget.arguments.UseFloats then
+				parsedNumber = parsedNumber / 255
 			end
-			if p12.arguments.Min ~= nil then
-				instance = math.max(instance, getValueByIndex(p12.arguments.Min, p3, p12.arguments))
+			if widget.arguments.Min ~= nil then
+				parsedNumber = math.max(parsedNumber, getValueByIndex(widget.arguments.Min, componentIndex, widget.arguments))
 			end
-			if p12.arguments.Max ~= nil then
-				instance = math.min(instance, getValueByIndex(p12.arguments.Max, p3, p12.arguments))
+			if widget.arguments.Max ~= nil then
+				parsedNumber = math.min(parsedNumber, getValueByIndex(widget.arguments.Max, componentIndex, widget.arguments))
 			end
-			if p12.arguments.Increment then
-				local var6 = instance / getValueByIndex(p12.arguments.Increment, p3, p12.arguments)
-				instance = math.round(var6) * getValueByIndex(p12.arguments.Increment, p3, p12.arguments)
+			if widget.arguments.Increment then
+				local roundedValue = parsedNumber / getValueByIndex(widget.arguments.Increment, componentIndex, widget.arguments)
+				parsedNumber = math.round(roundedValue) * getValueByIndex(widget.arguments.Increment, componentIndex, widget.arguments)
 			end
-			number:set(updateValueByIndex(number.value, p3, instance, p12.arguments))
-			p12.lastNumberChangedTick = p1._cycleTick + 1
+			numberState:set(updateValueByIndex(numberState.value, componentIndex, parsedNumber, widget.arguments))
+			widget.lastNumberChangedTick = iris._cycleTick + 1
 		end
-		local var7 = getValueByIndex(number.value, p3, p12.arguments)
-		if p4 == "Color3" or p4 == "Color4" and not p12.arguments.UseFloats then
-			var7 = math.round(var7 * 255)
+		local displayValue = getValueByIndex(numberState.value, componentIndex, widget.arguments)
+		if dataType == "Color3" or dataType == "Color4" and not widget.arguments.UseFloats then
+			displayValue = math.round(displayValue * 255)
 		end
-		local var9 = p12.arguments.Format[p3] or p12.arguments.Format[1]
-		if p12.arguments.Prefix then
-			var9 = p12.arguments.Prefix[p3] .. var9
+		local formatString = widget.arguments.Format[componentIndex] or widget.arguments.Format[1]
+		if widget.arguments.Prefix then
+			formatString = widget.arguments.Prefix[componentIndex] .. formatString
 		end
-		p2.Text = string.format(var9, var7)
-		p12.state.editingText:set(0)
-		p2:ReleaseFocus(true)
+		textBox.Text = string.format(formatString, displayValue)
+		widget.state.editingText:set(0)
+		textBox:ReleaseFocus(true)
 	end
-	local function generateButtons(p12, p22, p3)
-		local SubButton = p2.abstractButton.Generate(p12)
+	local function generateButtons(widget, parent, buttonSize)
+		local SubButton = util.abstractButton.Generate(widget)
 		SubButton.Name = "SubButton"
-		SubButton.Size = UDim2.fromOffset(p1._config.TextSize + 2 * p1._config.FramePadding.Y, p1._config.TextSize)
+		SubButton.Size = UDim2.fromOffset(iris._config.TextSize + 2 * iris._config.FramePadding.Y, iris._config.TextSize)
 		SubButton.Text = "-"
 		SubButton.TextXAlignment = Enum.TextXAlignment.Center
 		SubButton.ZIndex = 5
 		SubButton.LayoutOrder = 5
-		SubButton.Parent = p22
-		p2.applyButtonClick(SubButton, function()
-			local instance = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
-			local var4 = p12.state.number.value - (p12.arguments.Increment and getValueByIndex(p12.arguments.Increment, 1, p12.arguments) or 1) * if instance then 100 else 1
-			if p12.arguments.Min ~= nil then
-				var4 = math.max(var4, getValueByIndex(p12.arguments.Min, 1, p12.arguments))
+		SubButton.Parent = parent
+		util.applyButtonClick(SubButton, function()
+			local isCtrlHeld = util.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or util.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+			local newValue = widget.state.number.value - (widget.arguments.Increment and getValueByIndex(widget.arguments.Increment, 1, widget.arguments) or 1) * if isCtrlHeld then 100 else 1
+			if widget.arguments.Min ~= nil then
+				newValue = math.max(newValue, getValueByIndex(widget.arguments.Min, 1, widget.arguments))
 			end
-			if p12.arguments.Max ~= nil then
-				var4 = math.min(var4, getValueByIndex(p12.arguments.Max, 1, p12.arguments))
+			if widget.arguments.Max ~= nil then
+				newValue = math.min(newValue, getValueByIndex(widget.arguments.Max, 1, widget.arguments))
 			end
-			p12.state.number:set(var4)
-			p12.lastNumberChangedTick = p1._cycleTick + 1
+			widget.state.number:set(newValue)
+			widget.lastNumberChangedTick = iris._cycleTick + 1
 		end)
-		local AddButton = p2.abstractButton.Generate(p12)
+		local AddButton = util.abstractButton.Generate(widget)
 		AddButton.Name = "AddButton"
-		AddButton.Size = UDim2.fromOffset(p1._config.TextSize + 2 * p1._config.FramePadding.Y, p1._config.TextSize)
+		AddButton.Size = UDim2.fromOffset(iris._config.TextSize + 2 * iris._config.FramePadding.Y, iris._config.TextSize)
 		AddButton.Text = "+"
 		AddButton.TextXAlignment = Enum.TextXAlignment.Center
 		AddButton.ZIndex = 6
 		AddButton.LayoutOrder = 6
-		AddButton.Parent = p22
-		p2.applyButtonClick(AddButton, function()
-			local instance = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
-			local var4 = p12.state.number.value + (p12.arguments.Increment and getValueByIndex(p12.arguments.Increment, 1, p12.arguments) or 1) * if instance then 100 else 1
-			if p12.arguments.Min ~= nil then
-				var4 = math.max(var4, getValueByIndex(p12.arguments.Min, 1, p12.arguments))
+		AddButton.Parent = parent
+		util.applyButtonClick(AddButton, function()
+			local isCtrlHeld = util.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or util.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+			local newValue = widget.state.number.value + (widget.arguments.Increment and getValueByIndex(widget.arguments.Increment, 1, widget.arguments) or 1) * if isCtrlHeld then 100 else 1
+			if widget.arguments.Min ~= nil then
+				newValue = math.max(newValue, getValueByIndex(widget.arguments.Min, 1, widget.arguments))
 			end
-			if p12.arguments.Max ~= nil then
-				var4 = math.min(var4, getValueByIndex(p12.arguments.Max, 1, p12.arguments))
+			if widget.arguments.Max ~= nil then
+				newValue = math.min(newValue, getValueByIndex(widget.arguments.Max, 1, widget.arguments))
 			end
-			p12.state.number:set(var4)
-			p12.lastNumberChangedTick = p1._cycleTick + 1
+			widget.state.number:set(newValue)
+			widget.lastNumberChangedTick = iris._cycleTick + 1
 		end)
-		return 2 * p1._config.ItemInnerSpacing.X + p3 * 2
+		return 2 * iris._config.ItemInnerSpacing.X + buttonSize * 2
 	end
-	local function generateField(p12, p22, p3, p4)
+	local function generateField(widget, fieldIndex, fieldSize, dataType)
 		local TextBox = Instance.new("TextBox")
-		TextBox.Name = "InputField" .. tostring(p22)
+		TextBox.Name = "InputField" .. tostring(fieldIndex)
 		TextBox.AutomaticSize = Enum.AutomaticSize.Y
-		TextBox.Size = UDim2.new(p3, p1._config.ContentHeight)
-		TextBox.BackgroundColor3 = p1._config.FrameBgColor
-		TextBox.BackgroundTransparency = p1._config.FrameBgTransparency
+		TextBox.Size = UDim2.new(fieldSize, iris._config.ContentHeight)
+		TextBox.BackgroundColor3 = iris._config.FrameBgColor
+		TextBox.BackgroundTransparency = iris._config.FrameBgTransparency
 		TextBox.TextTruncate = Enum.TextTruncate.AtEnd
 		TextBox.ClearTextOnFocus = false
-		TextBox.ZIndex = p22
-		TextBox.LayoutOrder = p22
+		TextBox.ZIndex = fieldIndex
+		TextBox.LayoutOrder = fieldIndex
 		TextBox.ClipsDescendants = true
-		p2.applyFrameStyle(TextBox)
-		p2.applyTextStyle(TextBox)
-		p2.UISizeConstraint(TextBox, Vector2.xAxis)
+		util.applyFrameStyle(TextBox)
+		util.applyTextStyle(TextBox)
+		util.UISizeConstraint(TextBox, Vector2.xAxis)
 		TextBox.FocusLost:Connect(function()
-			focusLost(p12, TextBox, p22, p4)
+			focusLost(widget, TextBox, fieldIndex, dataType)
 		end)
 		TextBox.Focused:Connect(function()
 			TextBox.CursorPosition = #TextBox.Text + 1
 			TextBox.SelectionStart = 1
-			p12.state.editingText:set(p22)
+			widget.state.editingText:set(fieldIndex)
 		end)
 		return TextBox
 	end
-	local function generateInputScalar(p12, p22, p3)
-		return p2.extend(generateAbstract("Input", p12, p22, p3), {
-			Generate = function(p13)
+	local function generateInputScalar(typeKey, componentCount, defaultVal)
+		return util.extend(generateAbstract("Input", typeKey, componentCount, defaultVal), {
+			Generate = function(widget)
 				local Frame = Instance.new("Frame")
-				Frame.Name = "Iris_Input" .. p12
+				Frame.Name = "Iris_Input" .. typeKey
 				Frame.AutomaticSize = Enum.AutomaticSize.Y
-				Frame.Size = UDim2.new(p1._config.ItemWidth, UDim.new())
+				Frame.Size = UDim2.new(iris._config.ItemWidth, UDim.new())
 				Frame.BackgroundTransparency = 1
 				Frame.BorderSizePixel = 0
-				p2.UIListLayout(Frame, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
-				local instance2 = if p22 == 1 then generateButtons(p13, Frame, p1._config.TextSize + 2 * p1._config.FramePadding.Y) else 0
-				local var4 = UDim.new(p1._config.ContentWidth.Scale / p22, (p1._config.ContentWidth.Offset - p1._config.ItemInnerSpacing.X * (p22 - 1) - instance2) / p22)
-				local var6 = p1._config.ContentWidth - UDim.new(var4.Scale * (p22 - 1), var4.Offset * (p22 - 1) + p1._config.ItemInnerSpacing.X * (p22 - 1) + instance2)
-				for i = 1, p22 do
-					local var7
-					var7 = if i == p22 then var6 else var4
-					generateField(p13, i, var7, p12).Parent = Frame
+				util.UIListLayout(Frame, Enum.FillDirection.Horizontal, UDim.new(0, iris._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
+				local buttonWidth = if componentCount == 1 then generateButtons(widget, Frame, iris._config.TextSize + 2 * iris._config.FramePadding.Y) else 0
+				local fieldDimension = UDim.new(iris._config.ContentWidth.Scale / componentCount, (iris._config.ContentWidth.Offset - iris._config.ItemInnerSpacing.X * (componentCount - 1) - buttonWidth) / componentCount)
+				local lastFieldDimension = iris._config.ContentWidth - UDim.new(fieldDimension.Scale * (componentCount - 1), fieldDimension.Offset * (componentCount - 1) + iris._config.ItemInnerSpacing.X * (componentCount - 1) + buttonWidth)
+				for i = 1, componentCount do
+					local currentFieldDimension
+					currentFieldDimension = if i == componentCount then lastFieldDimension else fieldDimension
+					generateField(widget, i, currentFieldDimension, typeKey).Parent = Frame
 				end
 				local TextLabel = Instance.new("TextLabel")
 				TextLabel.Name = "TextLabel"
@@ -488,105 +487,105 @@ return function(p1, p2)
 				TextLabel.BackgroundTransparency = 1
 				TextLabel.BorderSizePixel = 0
 				TextLabel.LayoutOrder = 7
-				p2.applyTextStyle(TextLabel)
+				util.applyTextStyle(TextLabel)
 				TextLabel.Parent = Frame
 				return Frame
 			end,
-			UpdateState = function(p1)
-				local instance = p1.Instance
-				for i = 1, p22 do
-					local instance2 = instance:FindFirstChild("InputField" .. tostring(i))
-					local var3 = p1.arguments.Format[i] or p1.arguments.Format[1]
-					if p1.arguments.Prefix then
-						var3 = p1.arguments.Prefix[i] .. var3
+			UpdateState = function(widget)
+				local frameInstance = widget.Instance
+				for i = 1, componentCount do
+					local fieldTextBox = frameInstance:FindFirstChild("InputField" .. tostring(i))
+					local formatStr = widget.arguments.Format[i] or widget.arguments.Format[1]
+					if widget.arguments.Prefix then
+						formatStr = widget.arguments.Prefix[i] .. formatStr
 					end
-					instance2.Text = string.format(var3, getValueByIndex(p1.state.number.value, i, p1.arguments))
+					fieldTextBox.Text = string.format(formatStr, getValueByIndex(widget.state.number.value, i, widget.arguments))
 				end
 			end
 		})
 	end
-	local instance = 0
-	local instance2 = false
-	local var3 = nil
-	local var4 = 0
-	local var5 = ""
+	local lastMouseX = 0
+	local isDragging = false
+	local draggedWidget = nil
+	local dragComponentIndex = 0
+	local dragDataType = ""
 	local function updateActiveDrag()
-		local X = p2.getMouseLocation().X
-		local var12 = X - instance
-		instance = X
-		if instance2 == false then
-		elseif var3 ~= nil then
-			local number = var3.state.number
-			if var5 == "Color3" or var5 == "Color4" then
-				local var22 = var3
-				number = var22.state.color
-				if var4 == 4 then
-					number = var22.state.transparency
+		local currentMouseX = util.getMouseLocation().X
+		local mouseDeltaX = currentMouseX - lastMouseX
+		lastMouseX = currentMouseX
+		if isDragging == false then
+		elseif draggedWidget ~= nil then
+			local numberState = draggedWidget.state.number
+			if dragDataType == "Color3" or dragDataType == "Color4" then
+				local colorWidget = draggedWidget
+				numberState = colorWidget.state.color
+				if dragComponentIndex == 4 then
+					numberState = colorWidget.state.transparency
 				end
 			end
-			local var32 = var3.arguments.Increment and getValueByIndex(var3.arguments.Increment, var4, var3.arguments) or t2[var5][var4]
-			local var52 = var32 * if p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightShift) then 10 else 1
-			local var7 = var52 * if p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightAlt) then 0.1 else 1
-			local var9 = getValueByIndex(number.value, var4, var3.arguments) + var12 * (var7 * if var5 == "Color3" or var5 == "Color4" then 5 else 1)
-			if var3.arguments.Min ~= nil then
-				var9 = math.max(var9, getValueByIndex(var3.arguments.Min, var4, var3.arguments))
+			local incrementValue = draggedWidget.arguments.Increment and getValueByIndex(draggedWidget.arguments.Increment, dragComponentIndex, draggedWidget.arguments) or defaultIncrement[dragDataType][dragComponentIndex]
+			local shiftMultiplier = incrementValue * if util.UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or util.UserInputService:IsKeyDown(Enum.KeyCode.RightShift) then 10 else 1
+			local altMultiplier = shiftMultiplier * if util.UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) or util.UserInputService:IsKeyDown(Enum.KeyCode.RightAlt) then 0.1 else 1
+			local newDragValue = getValueByIndex(numberState.value, dragComponentIndex, draggedWidget.arguments) + mouseDeltaX * (altMultiplier * if dragDataType == "Color3" or dragDataType == "Color4" then 5 else 1)
+			if draggedWidget.arguments.Min ~= nil then
+				newDragValue = math.max(newDragValue, getValueByIndex(draggedWidget.arguments.Min, dragComponentIndex, draggedWidget.arguments))
 			end
-			if var3.arguments.Max ~= nil then
-				var9 = math.min(var9, getValueByIndex(var3.arguments.Max, var4, var3.arguments))
+			if draggedWidget.arguments.Max ~= nil then
+				newDragValue = math.min(newDragValue, getValueByIndex(draggedWidget.arguments.Max, dragComponentIndex, draggedWidget.arguments))
 			end
-			number:set(updateValueByIndex(number.value, var4, var9, var3.arguments))
-			var3.lastNumberChangedTick = p1._cycleTick + 1
+			numberState:set(updateValueByIndex(numberState.value, dragComponentIndex, newDragValue, draggedWidget.arguments))
+			draggedWidget.lastNumberChangedTick = iris._cycleTick + 1
 		end
 	end
-	local function DragMouseDown(p12, p22, p3, p4, p5)
-		local instance = p2.getTime()
-		local var32 = p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
-		if instance - p12.lastClickedTime < p1._config.MouseDoubleClickTime and (Vector2.new(p4, p5) - p12.lastClickedPosition).Magnitude < p1._config.MouseDoubleClickMaxDist or var32 then
-			p12.state.editingText:set(p3)
+	local function DragMouseDown(widget, dataType, componentIndex, mouseX, mouseY)
+		local currentTime = util.getTime()
+		local isCtrlHeld = util.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or util.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+		if currentTime - widget.lastClickedTime < iris._config.MouseDoubleClickTime and (Vector2.new(mouseX, mouseY) - widget.lastClickedPosition).Magnitude < iris._config.MouseDoubleClickMaxDist or isCtrlHeld then
+			widget.state.editingText:set(componentIndex)
 		else
-			p12.lastClickedTime = instance
-			p12.lastClickedPosition = Vector2.new(p4, p5)
-			instance2 = true
-			var3 = p12
-			var4 = p3
-			var5 = p22
+			widget.lastClickedTime = currentTime
+			widget.lastClickedPosition = Vector2.new(mouseX, mouseY)
+			isDragging = true
+			draggedWidget = widget
+			dragComponentIndex = componentIndex
+			dragDataType = dataType
 			updateActiveDrag()
 		end
 	end
-	p2.registerEvent("InputChanged", function()
-		if p1._started then
+	util.registerEvent("InputChanged", function()
+		if iris._started then
 			updateActiveDrag()
 		end
 	end)
-	p2.registerEvent("InputEnded", function(p12)
-		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 and instance2) then
-			instance2 = false
-			var3 = nil
-			var4 = 0
+	util.registerEvent("InputEnded", function(input)
+		if iris._started and (input.UserInputType == Enum.UserInputType.MouseButton1 and isDragging) then
+			isDragging = false
+			draggedWidget = nil
+			dragComponentIndex = 0
 		end
 	end)
-	local function generateField_2(p12, p22, p3, p4)
+	local function generateField_2(widget, fieldIndex, fieldSize, dataType)
 		local TextButton = Instance.new("TextButton")
-		TextButton.Name = "DragField" .. tostring(p22)
+		TextButton.Name = "DragField" .. tostring(fieldIndex)
 		TextButton.AutomaticSize = Enum.AutomaticSize.Y
-		TextButton.Size = p3
-		TextButton.BackgroundColor3 = p1._config.FrameBgColor
-		TextButton.BackgroundTransparency = p1._config.FrameBgTransparency
+		TextButton.Size = fieldSize
+		TextButton.BackgroundColor3 = iris._config.FrameBgColor
+		TextButton.BackgroundTransparency = iris._config.FrameBgTransparency
 		TextButton.Text = ""
 		TextButton.AutoButtonColor = false
-		TextButton.LayoutOrder = p22
+		TextButton.LayoutOrder = fieldIndex
 		TextButton.ClipsDescendants = true
-		p2.applyFrameStyle(TextButton)
-		p2.applyTextStyle(TextButton)
-		p2.UISizeConstraint(TextButton, Vector2.xAxis)
+		util.applyFrameStyle(TextButton)
+		util.applyTextStyle(TextButton)
+		util.UISizeConstraint(TextButton, Vector2.xAxis)
 		TextButton.TextXAlignment = Enum.TextXAlignment.Center
-		p2.applyInteractionHighlights("Background", TextButton, TextButton, {
-			Color = p1._config.FrameBgColor,
-			Transparency = p1._config.FrameBgTransparency,
-			HoveredColor = p1._config.FrameBgHoveredColor,
-			HoveredTransparency = p1._config.FrameBgHoveredTransparency,
-			ActiveColor = p1._config.FrameBgActiveColor,
-			ActiveTransparency = p1._config.FrameBgActiveTransparency
+		util.applyInteractionHighlights("Background", TextButton, TextButton, {
+			Color = iris._config.FrameBgColor,
+			Transparency = iris._config.FrameBgTransparency,
+			HoveredColor = iris._config.FrameBgHoveredColor,
+			HoveredTransparency = iris._config.FrameBgHoveredTransparency,
+			ActiveColor = iris._config.FrameBgActiveColor,
+			ActiveTransparency = iris._config.FrameBgActiveTransparency
 		})
 		local InputField = Instance.new("TextBox")
 		InputField.Name = "InputField"
@@ -596,54 +595,54 @@ return function(p1, p2)
 		InputField.TextTruncate = Enum.TextTruncate.AtEnd
 		InputField.ClipsDescendants = true
 		InputField.Visible = false
-		p2.applyFrameStyle(InputField, true)
-		p2.applyTextStyle(InputField)
+		util.applyFrameStyle(InputField, true)
+		util.applyTextStyle(InputField)
 		InputField.Parent = TextButton
 		InputField.FocusLost:Connect(function()
-			focusLost(p12, InputField, p22, p4)
+			focusLost(widget, InputField, fieldIndex, dataType)
 		end)
 		InputField.Focused:Connect(function()
 			InputField.CursorPosition = #InputField.Text + 1
 			InputField.SelectionStart = 1
-			p12.state.editingText:set(p22)
+			widget.state.editingText:set(fieldIndex)
 		end)
-		p2.applyButtonDown(TextButton, function(p1, p2)
-			DragMouseDown(p12, p4, p22, p1, p2)
+		util.applyButtonDown(TextButton, function(mouseX, mouseY)
+			DragMouseDown(widget, dataType, fieldIndex, mouseX, mouseY)
 		end)
 		return TextButton
 	end
-	local function generateDragScalar(p12, p22, p3)
-		return p2.extend(generateAbstract("Drag", p12, p22, p3), {
-			Generate = function(p13)
-				p13.lastClickedTime = -1
-				p13.lastClickedPosition = Vector2.zero
+	local function generateDragScalar(typeKey, componentCount, defaultVal)
+		return util.extend(generateAbstract("Drag", typeKey, componentCount, defaultVal), {
+			Generate = function(widget)
+				widget.lastClickedTime = -1
+				widget.lastClickedPosition = Vector2.zero
 				local Frame = Instance.new("Frame")
-				Frame.Name = "Iris_Drag" .. p12
+				Frame.Name = "Iris_Drag" .. typeKey
 				Frame.AutomaticSize = Enum.AutomaticSize.Y
-				Frame.Size = UDim2.new(p1._config.ItemWidth, UDim.new())
+				Frame.Size = UDim2.new(iris._config.ItemWidth, UDim.new())
 				Frame.BackgroundTransparency = 1
 				Frame.BorderSizePixel = 0
-				p2.UIListLayout(Frame, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
-				local sum = 0
-				local instance = p1._config.TextSize + 2 * p1._config.FramePadding.Y
-				if p12 == "Color3" or p12 == "Color4" then
-					sum = sum + (p1._config.ItemInnerSpacing.X + instance)
+				util.UIListLayout(Frame, Enum.FillDirection.Horizontal, UDim.new(0, iris._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
+				local colorBoxWidth = 0
+				local buttonSize = iris._config.TextSize + 2 * iris._config.FramePadding.Y
+				if typeKey == "Color3" or typeKey == "Color4" then
+					colorBoxWidth = colorBoxWidth + (iris._config.ItemInnerSpacing.X + buttonSize)
 					local ColorBox = Instance.new("ImageLabel")
 					ColorBox.Name = "ColorBox"
-					ColorBox.Size = UDim2.fromOffset(instance, instance)
+					ColorBox.Size = UDim2.fromOffset(buttonSize, buttonSize)
 					ColorBox.BorderSizePixel = 0
-					ColorBox.Image = p2.ICONS.ALPHA_BACKGROUND_TEXTURE
+					ColorBox.Image = util.ICONS.ALPHA_BACKGROUND_TEXTURE
 					ColorBox.ImageTransparency = 1
 					ColorBox.LayoutOrder = 5
-					p2.applyFrameStyle(ColorBox, true)
+					util.applyFrameStyle(ColorBox, true)
 					ColorBox.Parent = Frame
 				end
-				local instance2 = UDim.new(p1._config.ContentWidth.Scale / p22, (p1._config.ContentWidth.Offset - p1._config.ItemInnerSpacing.X * (p22 - 1) - sum) / p22)
-				local var4 = p1._config.ContentWidth - UDim.new(instance2.Scale * (p22 - 1), instance2.Offset * (p22 - 1) + p1._config.ItemInnerSpacing.X * (p22 - 1) + sum)
-				for i = 1, p22 do
-					local var5
-					var5 = if i == p22 then UDim2.new(var4, p1._config.ContentHeight) else UDim2.new(instance2, p1._config.ContentHeight)
-					generateField_2(p13, i, var5, p12).Parent = Frame
+				local fieldDimension = UDim.new(iris._config.ContentWidth.Scale / componentCount, (iris._config.ContentWidth.Offset - iris._config.ItemInnerSpacing.X * (componentCount - 1) - colorBoxWidth) / componentCount)
+				local lastFieldDimension = iris._config.ContentWidth - UDim.new(fieldDimension.Scale * (componentCount - 1), fieldDimension.Offset * (componentCount - 1) + iris._config.ItemInnerSpacing.X * (componentCount - 1) + colorBoxWidth)
+				for i = 1, componentCount do
+					local currentFieldSize
+					currentFieldSize = if i == componentCount then UDim2.new(lastFieldDimension, iris._config.ContentHeight) else UDim2.new(fieldDimension, iris._config.ContentHeight)
+					generateField_2(widget, i, currentFieldSize, typeKey).Parent = Frame
 				end
 				local TextLabel = Instance.new("TextLabel")
 				TextLabel.Name = "TextLabel"
@@ -651,174 +650,174 @@ return function(p1, p2)
 				TextLabel.BackgroundTransparency = 1
 				TextLabel.BorderSizePixel = 0
 				TextLabel.LayoutOrder = 6
-				p2.applyTextStyle(TextLabel)
+				util.applyTextStyle(TextLabel)
 				TextLabel.Parent = Frame
 				return Frame
 			end,
-			UpdateState = function(p13)
-				local instance = p13.Instance
-				for i = 1, p22 do
-					local number = p13.state.number
-					if p12 == "Color3" or p12 == "Color4" then
-						number = p13.state.color
+			UpdateState = function(widget)
+				local frameInstance = widget.Instance
+				for i = 1, componentCount do
+					local numberState = widget.state.number
+					if typeKey == "Color3" or typeKey == "Color4" then
+						numberState = widget.state.color
 						if i == 4 then
-							number = p13.state.transparency
+							numberState = widget.state.transparency
 						end
 					end
-					local instance2 = instance:FindFirstChild("DragField" .. tostring(i))
-					local InputField = instance2.InputField
-					local var3 = getValueByIndex(number.value, i, p13.arguments)
-					if (p12 == "Color3" or p12 == "Color4") and not p13.arguments.UseFloats then
-						var3 = math.round(var3 * 255)
+					local dragField = frameInstance:FindFirstChild("DragField" .. tostring(i))
+					local InputField = dragField.InputField
+					local displayValue = getValueByIndex(numberState.value, i, widget.arguments)
+					if (typeKey == "Color3" or typeKey == "Color4") and not widget.arguments.UseFloats then
+						displayValue = math.round(displayValue * 255)
 					end
-					local var5 = p13.arguments.Format[i] or p13.arguments.Format[1]
-					if p13.arguments.Prefix then
-						var5 = p13.arguments.Prefix[i] .. var5
+					local formatStr = widget.arguments.Format[i] or widget.arguments.Format[1]
+					if widget.arguments.Prefix then
+						formatStr = widget.arguments.Prefix[i] .. formatStr
 					end
-					instance2.Text = string.format(var5, var3)
-					InputField.Text = tostring(var3)
-					if p13.state.editingText.value == i then
+					dragField.Text = string.format(formatStr, displayValue)
+					InputField.Text = tostring(displayValue)
+					if widget.state.editingText.value == i then
 						InputField.Visible = true
 						InputField:CaptureFocus()
-						instance2.TextTransparency = 1
+						dragField.TextTransparency = 1
 					else
 						InputField.Visible = false
-						instance2.TextTransparency = p1._config.TextTransparency
+						dragField.TextTransparency = iris._config.TextTransparency
 					end
 				end
-				if p12 == "Color3" or p12 == "Color4" then
-					local ColorBox = instance.ColorBox
-					ColorBox.BackgroundColor3 = p13.state.color.value
-					if p12 == "Color4" then
-						ColorBox.ImageTransparency = 1 - p13.state.transparency.value
+				if typeKey == "Color3" or typeKey == "Color4" then
+					local ColorBox = frameInstance.ColorBox
+					ColorBox.BackgroundColor3 = widget.state.color.value
+					if typeKey == "Color4" then
+						ColorBox.ImageTransparency = 1 - widget.state.transparency.value
 					end
 				end
 			end
 		})
 	end
-	local function generateColorDragScalar(p12, ...)
-		local t = { ... }
-		return p2.extend(generateDragScalar(p12, if p12 == "Color4" then 4 else 3, t[1]), {
+	local function generateColorDragScalar(colorType, ...)
+		local defaultValues = { ... }
+		return util.extend(generateDragScalar(colorType, if colorType == "Color4" then 4 else 3, defaultValues[1]), {
 			Args = {
 				Text = 1,
 				UseFloats = 2,
 				UseHSV = 3,
 				Format = 4
 			},
-			Update = function(p13)
-				local Text = p13.arguments.Text
-				if not Text then
-					Text = ("Drag %*"):format(p12)
+			Update = function(widget)
+				local labelText = widget.arguments.Text
+				if not labelText then
+					labelText = ("Drag %*"):format(colorType)
 				end
-				p13.Instance.TextLabel.Text = Text
-				local instance2, var3, var4, var5
-				if p13.arguments.Format then
-					if typeof(p13.arguments.Format) == "table" then
-						if not p13.arguments.Format then
-							if p13.arguments.UseFloats then
-								p13.arguments.Format = { "%.3f" }
+				widget.Instance.TextLabel.Text = labelText
+				local argsCopy, prefixTable, colorKey, colorSuffix
+				if widget.arguments.Format then
+					if typeof(widget.arguments.Format) == "table" then
+						if not widget.arguments.Format then
+							if widget.arguments.UseFloats then
+								widget.arguments.Format = { "%.3f" }
 							else
-								p13.arguments.Format = { "%d" }
+								widget.arguments.Format = { "%d" }
 							end
-							instance2 = p13.arguments
-							var3 = t5
-							var4 = p12
-							var5 = if p13.arguments.UseHSV then "_HSV" else "_RGB"
-							instance2.Prefix = t5[p12 .. var5]
+							argsCopy = widget.arguments
+							prefixTable = defaultFormatPrefix
+							colorKey = colorType
+							colorSuffix = if widget.arguments.UseHSV then "_HSV" else "_RGB"
+							argsCopy.Prefix = defaultFormatPrefix[colorType .. colorSuffix]
 						end
 					else
-						p13.arguments.Format = { p13.arguments.Format }
+						widget.arguments.Format = { widget.arguments.Format }
 					end
-				elseif not p13.arguments.Format then
-					if p13.arguments.UseFloats then
-						p13.arguments.Format = { "%.3f" }
+				elseif not widget.arguments.Format then
+					if widget.arguments.UseFloats then
+						widget.arguments.Format = { "%.3f" }
 					else
-						p13.arguments.Format = { "%d" }
+						widget.arguments.Format = { "%d" }
 					end
-					instance2 = p13.arguments
-					var3 = t5
-					var4 = p12
-					var5 = if p13.arguments.UseHSV then "_HSV" else "_RGB"
-					instance2.Prefix = t5[p12 .. var5]
+					argsCopy = widget.arguments
+					prefixTable = defaultFormatPrefix
+					colorKey = colorType
+					colorSuffix = if widget.arguments.UseHSV then "_HSV" else "_RGB"
+					argsCopy.Prefix = defaultFormatPrefix[colorType .. colorSuffix]
 				end
-				p13.arguments.Min = { 0, 0, 0, 0 }
-				p13.arguments.Max = { 1, 1, 1, 1 }
-				p13.arguments.Increment = { 0.001, 0.001, 0.001, 0.001 }
-				if p13.state then
-					p13.state.color.lastChangeTick = p1._cycleTick
-					if p12 == "Color4" then
-						p13.state.transparency.lastChangeTick = p1._cycleTick
+				widget.arguments.Min = { 0, 0, 0, 0 }
+				widget.arguments.Max = { 1, 1, 1, 1 }
+				widget.arguments.Increment = { 0.001, 0.001, 0.001, 0.001 }
+				if widget.state then
+					widget.state.color.lastChangeTick = iris._cycleTick
+					if colorType == "Color4" then
+						widget.state.transparency.lastChangeTick = iris._cycleTick
 					end
-					p1._widgets[p13.type].UpdateState(p13)
+					iris._widgets[widget.type].UpdateState(widget)
 				end
 			end,
-			GenerateState = function(p13)
-				if p13.state.color == nil then
-					p13.state.color = p1._widgetState(p13, "color", t[1])
+			GenerateState = function(widget)
+				if widget.state.color == nil then
+					widget.state.color = iris._widgetState(widget, "color", defaultValues[1])
 				end
-				if p12 == "Color4" and p13.state.transparency == nil then
-					p13.state.transparency = p1._widgetState(p13, "transparency", t[2])
+				if colorType == "Color4" and widget.state.transparency == nil then
+					widget.state.transparency = iris._widgetState(widget, "transparency", defaultValues[2])
 				end
-				if p13.state.editingText == nil then
-					p13.state.editingText = p1._widgetState(p13, "editingText", false)
+				if widget.state.editingText == nil then
+					widget.state.editingText = iris._widgetState(widget, "editingText", false)
 				end
 			end
 		})
 	end
-	local var6 = false
-	local var7 = nil
-	local var8 = 0
-	local var9 = ""
+	local isSliderDragging = false
+	local sliderDraggedWidget = nil
+	local sliderDragComponentIndex = 0
+	local sliderDragDataType = ""
 	local function updateActiveSlider()
-		if var6 == false then
-		elseif var7 ~= nil then
-			local instance2 = var7.Instance:FindFirstChild("SliderField" .. tostring(var8))
-			local var3 = var7.arguments.Increment and getValueByIndex(var7.arguments.Increment, var8, var7.arguments) or t2[var9][var8]
-			local var4 = var7.arguments.Min and getValueByIndex(var7.arguments.Min, var8, var7.arguments) or t3[var9][var8]
-			local var5 = var7.arguments.Max and getValueByIndex(var7.arguments.Max, var8, var7.arguments) or t4[var9][var8]
-			local X = instance2.GrabBar.AbsoluteSize.X
-			var7.state.number:set(updateValueByIndex(var7.state.number.value, var8, math.clamp(math.round((p2.getMouseLocation().X - (instance2.AbsolutePosition.X - p2.GuiOffset.X + X / 2)) / (instance2.AbsoluteSize.X - X) * math.floor((var5 - var4) / var3)) * var3 + var4, var4, var5), var7.arguments))
-			var7.lastNumberChangedTick = p1._cycleTick + 1
+		if isSliderDragging == false then
+		elseif sliderDraggedWidget ~= nil then
+			local sliderField = sliderDraggedWidget.Instance:FindFirstChild("SliderField" .. tostring(sliderDragComponentIndex))
+			local incrementValue = sliderDraggedWidget.arguments.Increment and getValueByIndex(sliderDraggedWidget.arguments.Increment, sliderDragComponentIndex, sliderDraggedWidget.arguments) or defaultIncrement[sliderDragDataType][sliderDragComponentIndex]
+			local minValue = sliderDraggedWidget.arguments.Min and getValueByIndex(sliderDraggedWidget.arguments.Min, sliderDragComponentIndex, sliderDraggedWidget.arguments) or defaultMin[sliderDragDataType][sliderDragComponentIndex]
+			local maxValue = sliderDraggedWidget.arguments.Max and getValueByIndex(sliderDraggedWidget.arguments.Max, sliderDragComponentIndex, sliderDraggedWidget.arguments) or defaultMax[sliderDragDataType][sliderDragComponentIndex]
+			local grabBarWidth = sliderField.GrabBar.AbsoluteSize.X
+			sliderDraggedWidget.state.number:set(updateValueByIndex(sliderDraggedWidget.state.number.value, sliderDragComponentIndex, math.clamp(math.round((util.getMouseLocation().X - (sliderField.AbsolutePosition.X - util.GuiOffset.X + grabBarWidth / 2)) / (sliderField.AbsoluteSize.X - grabBarWidth) * math.floor((maxValue - minValue) / incrementValue)) * incrementValue + minValue, minValue, maxValue), sliderDraggedWidget.arguments))
+			sliderDraggedWidget.lastNumberChangedTick = iris._cycleTick + 1
 		end
 	end
-	local function SliderMouseDown(p1, p22, p3)
-		if p2.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or p2.UserInputService:IsKeyDown(Enum.KeyCode.RightControl) then
-			p1.state.editingText:set(p3)
+	local function SliderMouseDown(widget, sliderDataType, sliderComponentIndex)
+		if util.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or util.UserInputService:IsKeyDown(Enum.KeyCode.RightControl) then
+			widget.state.editingText:set(sliderComponentIndex)
 		else
-			var6 = true
-			var7 = p1
-			var8 = p3
-			var9 = p22
+			isSliderDragging = true
+			sliderDraggedWidget = widget
+			sliderDragComponentIndex = sliderComponentIndex
+			sliderDragDataType = sliderDataType
 			updateActiveSlider()
 		end
 	end
-	p2.registerEvent("InputChanged", function()
-		if p1._started then
+	util.registerEvent("InputChanged", function()
+		if iris._started then
 			updateActiveSlider()
 		end
 	end)
-	p2.registerEvent("InputEnded", function(p12)
-		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 and var6) then
-			var6 = false
-			var7 = nil
-			var8 = 0
-			var9 = ""
+	util.registerEvent("InputEnded", function(input)
+		if iris._started and (input.UserInputType == Enum.UserInputType.MouseButton1 and isSliderDragging) then
+			isSliderDragging = false
+			sliderDraggedWidget = nil
+			sliderDragComponentIndex = 0
+			sliderDragDataType = ""
 		end
 	end)
-	local function generateField_3(p12, p22, p3, p4)
+	local function generateField_3(widget, fieldIndex, fieldSize, dataType)
 		local TextButton = Instance.new("TextButton")
-		TextButton.Name = "SliderField" .. tostring(p22)
+		TextButton.Name = "SliderField" .. tostring(fieldIndex)
 		TextButton.AutomaticSize = Enum.AutomaticSize.Y
-		TextButton.Size = p3
-		TextButton.BackgroundColor3 = p1._config.FrameBgColor
-		TextButton.BackgroundTransparency = p1._config.FrameBgTransparency
+		TextButton.Size = fieldSize
+		TextButton.BackgroundColor3 = iris._config.FrameBgColor
+		TextButton.BackgroundTransparency = iris._config.FrameBgTransparency
 		TextButton.Text = ""
 		TextButton.AutoButtonColor = false
-		TextButton.LayoutOrder = p22
+		TextButton.LayoutOrder = fieldIndex
 		TextButton.ClipsDescendants = true
-		p2.applyFrameStyle(TextButton)
-		p2.applyTextStyle(TextButton)
-		p2.UISizeConstraint(TextButton, Vector2.xAxis)
+		util.applyFrameStyle(TextButton)
+		util.applyTextStyle(TextButton)
+		util.UISizeConstraint(TextButton, Vector2.xAxis)
 		local OverlayText = Instance.new("TextLabel")
 		OverlayText.Name = "OverlayText"
 		OverlayText.Size = UDim2.fromScale(1, 1)
@@ -826,16 +825,16 @@ return function(p1, p2)
 		OverlayText.BorderSizePixel = 0
 		OverlayText.ZIndex = 10
 		OverlayText.ClipsDescendants = true
-		p2.applyTextStyle(OverlayText)
+		util.applyTextStyle(OverlayText)
 		OverlayText.TextXAlignment = Enum.TextXAlignment.Center
 		OverlayText.Parent = TextButton
-		p2.applyInteractionHighlights("Background", TextButton, TextButton, {
-			Color = p1._config.FrameBgColor,
-			Transparency = p1._config.FrameBgTransparency,
-			HoveredColor = p1._config.FrameBgHoveredColor,
-			HoveredTransparency = p1._config.FrameBgHoveredTransparency,
-			ActiveColor = p1._config.FrameBgActiveColor,
-			ActiveTransparency = p1._config.FrameBgActiveTransparency
+		util.applyInteractionHighlights("Background", TextButton, TextButton, {
+			Color = iris._config.FrameBgColor,
+			Transparency = iris._config.FrameBgTransparency,
+			HoveredColor = iris._config.FrameBgHoveredColor,
+			HoveredTransparency = iris._config.FrameBgHoveredTransparency,
+			ActiveColor = iris._config.FrameBgActiveColor,
+			ActiveTransparency = iris._config.FrameBgActiveTransparency
 		})
 		local InputField = Instance.new("TextBox")
 		InputField.Name = "InputField"
@@ -845,59 +844,59 @@ return function(p1, p2)
 		InputField.TextTruncate = Enum.TextTruncate.AtEnd
 		InputField.ClipsDescendants = true
 		InputField.Visible = false
-		p2.applyFrameStyle(InputField, true)
-		p2.applyTextStyle(InputField)
+		util.applyFrameStyle(InputField, true)
+		util.applyTextStyle(InputField)
 		InputField.Parent = TextButton
 		InputField.FocusLost:Connect(function()
-			focusLost(p12, InputField, p22, p4)
+			focusLost(widget, InputField, fieldIndex, dataType)
 		end)
 		InputField.Focused:Connect(function()
 			InputField.CursorPosition = #InputField.Text + 1
 			InputField.SelectionStart = 1
-			p12.state.editingText:set(p22)
+			widget.state.editingText:set(fieldIndex)
 		end)
-		p2.applyButtonDown(TextButton, function()
-			SliderMouseDown(p12, p4, p22)
+		util.applyButtonDown(TextButton, function()
+			SliderMouseDown(widget, dataType, fieldIndex)
 		end)
 		local GrabBar = Instance.new("Frame")
 		GrabBar.Name = "GrabBar"
 		GrabBar.AnchorPoint = Vector2.new(0.5, 0.5)
 		GrabBar.Position = UDim2.fromScale(0, 0.5)
-		GrabBar.BackgroundColor3 = p1._config.SliderGrabColor
-		GrabBar.Transparency = p1._config.SliderGrabTransparency
+		GrabBar.BackgroundColor3 = iris._config.SliderGrabColor
+		GrabBar.Transparency = iris._config.SliderGrabTransparency
 		GrabBar.BorderSizePixel = 0
 		GrabBar.ZIndex = 5
-		p2.applyInteractionHighlights("Background", TextButton, GrabBar, {
-			Color = p1._config.SliderGrabColor,
-			Transparency = p1._config.SliderGrabTransparency,
-			HoveredColor = p1._config.SliderGrabColor,
-			HoveredTransparency = p1._config.SliderGrabTransparency,
-			ActiveColor = p1._config.SliderGrabActiveColor,
-			ActiveTransparency = p1._config.SliderGrabActiveTransparency
+		util.applyInteractionHighlights("Background", TextButton, GrabBar, {
+			Color = iris._config.SliderGrabColor,
+			Transparency = iris._config.SliderGrabTransparency,
+			HoveredColor = iris._config.SliderGrabColor,
+			HoveredTransparency = iris._config.SliderGrabTransparency,
+			ActiveColor = iris._config.SliderGrabActiveColor,
+			ActiveTransparency = iris._config.SliderGrabActiveTransparency
 		})
-		if p1._config.GrabRounding > 0 then
-			p2.UICorner(GrabBar, p1._config.GrabRounding)
+		if iris._config.GrabRounding > 0 then
+			util.UICorner(GrabBar, iris._config.GrabRounding)
 		end
-		p2.UISizeConstraint(GrabBar, Vector2.new(p1._config.GrabMinSize, 0))
+		util.UISizeConstraint(GrabBar, Vector2.new(iris._config.GrabMinSize, 0))
 		GrabBar.Parent = TextButton
 		return TextButton
 	end
-	local function generateSliderScalar(p12, p22, p3)
-		return p2.extend(generateAbstract("Slider", p12, p22, p3), {
-			Generate = function(p13)
+	local function generateSliderScalar(typeKey, componentCount, defaultVal)
+		return util.extend(generateAbstract("Slider", typeKey, componentCount, defaultVal), {
+			Generate = function(widget)
 				local Frame = Instance.new("Frame")
-				Frame.Name = "Iris_Slider" .. p12
+				Frame.Name = "Iris_Slider" .. typeKey
 				Frame.AutomaticSize = Enum.AutomaticSize.Y
-				Frame.Size = UDim2.new(p1._config.ItemWidth, UDim.new())
+				Frame.Size = UDim2.new(iris._config.ItemWidth, UDim.new())
 				Frame.BackgroundTransparency = 1
 				Frame.BorderSizePixel = 0
-				p2.UIListLayout(Frame, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
-				local instance = UDim.new(p1._config.ContentWidth.Scale / p22, (p1._config.ContentWidth.Offset - p1._config.ItemInnerSpacing.X * (p22 - 1)) / p22)
-				local var3 = p1._config.ContentWidth - UDim.new(instance.Scale * (p22 - 1), instance.Offset * (p22 - 1) + p1._config.ItemInnerSpacing.X * (p22 - 1))
-				for i = 1, p22 do
-					local var4
-					var4 = if i == p22 then UDim2.new(var3, p1._config.ContentHeight) else UDim2.new(instance, p1._config.ContentHeight)
-					generateField_3(p13, i, var4, p12).Parent = Frame
+				util.UIListLayout(Frame, Enum.FillDirection.Horizontal, UDim.new(0, iris._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
+				local fieldDimension = UDim.new(iris._config.ContentWidth.Scale / componentCount, (iris._config.ContentWidth.Offset - iris._config.ItemInnerSpacing.X * (componentCount - 1)) / componentCount)
+				local lastFieldDimension = iris._config.ContentWidth - UDim.new(fieldDimension.Scale * (componentCount - 1), fieldDimension.Offset * (componentCount - 1) + iris._config.ItemInnerSpacing.X * (componentCount - 1))
+				for i = 1, componentCount do
+					local currentFieldSize
+					currentFieldSize = if i == componentCount then UDim2.new(lastFieldDimension, iris._config.ContentHeight) else UDim2.new(fieldDimension, iris._config.ContentHeight)
+					generateField_3(widget, i, currentFieldSize, typeKey).Parent = Frame
 				end
 				local TextLabel = Instance.new("TextLabel")
 				TextLabel.Name = "TextLabel"
@@ -905,32 +904,32 @@ return function(p1, p2)
 				TextLabel.BackgroundTransparency = 1
 				TextLabel.BorderSizePixel = 0
 				TextLabel.LayoutOrder = 5
-				p2.applyTextStyle(TextLabel)
+				util.applyTextStyle(TextLabel)
 				TextLabel.Parent = Frame
 				return Frame
 			end,
-			UpdateState = function(p1)
-				local instance = p1.Instance
-				for i = 1, p22 do
-					local instance2 = instance:FindFirstChild("SliderField" .. tostring(i))
-					local InputField = instance2.InputField
-					local OverlayText = instance2.OverlayText
-					local GrabBar = instance2.GrabBar
-					local var3 = getValueByIndex(p1.state.number.value, i, p1.arguments)
-					local var4 = p1.arguments.Format[i] or p1.arguments.Format[1]
-					if p1.arguments.Prefix then
-						var4 = p1.arguments.Prefix[i] .. var4
+			UpdateState = function(widget)
+				local frameInstance = widget.Instance
+				for i = 1, componentCount do
+					local sliderField = frameInstance:FindFirstChild("SliderField" .. tostring(i))
+					local InputField = sliderField.InputField
+					local OverlayText = sliderField.OverlayText
+					local GrabBar = sliderField.GrabBar
+					local displayValue = getValueByIndex(widget.state.number.value, i, widget.arguments)
+					local formatStr = widget.arguments.Format[i] or widget.arguments.Format[1]
+					if widget.arguments.Prefix then
+						formatStr = widget.arguments.Prefix[i] .. formatStr
 					end
-					OverlayText.Text = string.format(var4, var3)
-					InputField.Text = tostring(var3)
-					local var5 = p1.arguments.Increment and getValueByIndex(p1.arguments.Increment, i, p1.arguments) or t2[p12][i]
-					local var6 = p1.arguments.Min and getValueByIndex(p1.arguments.Min, i, p1.arguments) or t3[p12][i]
-					local var7 = p1.arguments.Max and getValueByIndex(p1.arguments.Max, i, p1.arguments) or t4[p12][i]
-					local X = instance2.AbsoluteSize.X
-					local var8 = X - GrabBar.AbsoluteSize.X
-					local var9 = math.floor((var7 - var6) / var5)
-					GrabBar.Position = UDim2.fromScale(var8 / X * math.clamp(math.floor((var3 - var6) / (var7 - var6) * var9) / var9, 0, 1) + (1 - var8 / X) / 2, 0.5)
-					if p1.state.editingText.value == i then
+					OverlayText.Text = string.format(formatStr, displayValue)
+					InputField.Text = tostring(displayValue)
+					local incrementValue = widget.arguments.Increment and getValueByIndex(widget.arguments.Increment, i, widget.arguments) or defaultIncrement[typeKey][i]
+					local minValue = widget.arguments.Min and getValueByIndex(widget.arguments.Min, i, widget.arguments) or defaultMin[typeKey][i]
+					local maxValue = widget.arguments.Max and getValueByIndex(widget.arguments.Max, i, widget.arguments) or defaultMax[typeKey][i]
+					local sliderWidth = sliderField.AbsoluteSize.X
+					local grabBarWidth = sliderWidth - GrabBar.AbsoluteSize.X
+					local valueRange = math.floor((maxValue - minValue) / incrementValue)
+					GrabBar.Position = UDim2.fromScale(grabBarWidth / sliderWidth * math.clamp(math.floor((displayValue - minValue) / (maxValue - minValue) * valueRange) / valueRange, 0, 1) + (1 - grabBarWidth / sliderWidth) / 2, 0.5)
+					if widget.state.editingText.value == i then
 						InputField.Visible = true
 						OverlayText.Visible = false
 						GrabBar.Visible = false
@@ -944,61 +943,61 @@ return function(p1, p2)
 			end
 		})
 	end
-	local function generateEnumSliderScalar(p12, p22)
-		local instance = generateSliderScalar("Enum", 1, p22.Value)
-		local t = { string }
-		for instance2, var3 in p12:GetEnumItems() do
-			t[var3.Value] = var3.Name
+	local function generateEnumSliderScalar(enumType, enumValue)
+		local baseSlider = generateSliderScalar("Enum", 1, enumValue.Value)
+		local enumLookupTable = { string }
+		for enumItem, enumItemValue in enumType:GetEnumItems() do
+			enumLookupTable[enumItemValue.Value] = enumItemValue.Name
 		end
-		return p2.extend(instance, {
+		return util.extend(baseSlider, {
 			Args = {
 				Text = 1
 			},
-			Update = function(p1)
-				local instance = p1.Instance
-				instance.TextLabel.Text = p1.arguments.Text or "Input Enum"
-				p1.arguments.Increment = 1
-				p1.arguments.Min = 0
-				p1.arguments.Max = #p12:GetEnumItems() - 1
-				local GrabBar = instance:FindFirstChild("SliderField1").GrabBar
-				GrabBar.Size = UDim2.fromScale(1 / math.floor(#p12:GetEnumItems()), 1)
+			Update = function(widget)
+				local frameInstance = widget.Instance
+				frameInstance.TextLabel.Text = widget.arguments.Text or "Input Enum"
+				widget.arguments.Increment = 1
+				widget.arguments.Min = 0
+				widget.arguments.Max = #enumType:GetEnumItems() - 1
+				local GrabBar = frameInstance:FindFirstChild("SliderField1").GrabBar
+				GrabBar.Size = UDim2.fromScale(1 / math.floor(#enumType:GetEnumItems()), 1)
 			end,
-			GenerateState = function(p12)
-				if p12.state.number == nil then
-					p12.state.number = p1._widgetState(p12, "number", p22.Value)
+			GenerateState = function(widget)
+				if widget.state.number == nil then
+					widget.state.number = iris._widgetState(widget, "number", enumValue.Value)
 				end
-				if p12.state.enumItem == nil then
-					p12.state.enumItem = p1._widgetState(p12, "enumItem", p22)
+				if widget.state.enumItem == nil then
+					widget.state.enumItem = iris._widgetState(widget, "enumItem", enumValue)
 				end
-				if p12.state.editingText == nil then
-					p12.state.editingText = p1._widgetState(p12, "editingText", false)
+				if widget.state.editingText == nil then
+					widget.state.editingText = iris._widgetState(widget, "editingText", false)
 				end
 			end
 		})
 	end
-	local var10 = generateInputScalar("Num", 1, 0)
-	var10.Args.NoButtons = 6
-	p1.WidgetConstructor("InputNum", var10)
-	p1.WidgetConstructor("InputVector2", generateInputScalar("Vector2", 2, Vector2.zero))
-	p1.WidgetConstructor("InputVector3", generateInputScalar("Vector3", 3, Vector3.new(0, 0, 0)))
-	p1.WidgetConstructor("InputUDim", generateInputScalar("UDim", 2, UDim.new()))
-	p1.WidgetConstructor("InputUDim2", generateInputScalar("UDim2", 4, UDim2.new()))
-	p1.WidgetConstructor("InputRect", generateInputScalar("Rect", 4, Rect.new(0, 0, 0, 0)))
-	p1.WidgetConstructor("DragNum", generateDragScalar("Num", 1, 0))
-	p1.WidgetConstructor("DragVector2", generateDragScalar("Vector2", 2, Vector2.zero))
-	p1.WidgetConstructor("DragVector3", generateDragScalar("Vector3", 3, Vector3.new(0, 0, 0)))
-	p1.WidgetConstructor("DragUDim", generateDragScalar("UDim", 2, UDim.new()))
-	p1.WidgetConstructor("DragUDim2", generateDragScalar("UDim2", 4, UDim2.new()))
-	p1.WidgetConstructor("DragRect", generateDragScalar("Rect", 4, Rect.new(0, 0, 0, 0)))
-	p1.WidgetConstructor("InputColor3", generateColorDragScalar("Color3", Color3.fromRGB(0, 0, 0)))
-	p1.WidgetConstructor("InputColor4", generateColorDragScalar("Color4", Color3.fromRGB(0, 0, 0), 0))
-	p1.WidgetConstructor("SliderNum", generateSliderScalar("Num", 1, 0))
-	p1.WidgetConstructor("SliderVector2", generateSliderScalar("Vector2", 2, Vector2.zero))
-	p1.WidgetConstructor("SliderVector3", generateSliderScalar("Vector3", 3, Vector3.new(0, 0, 0)))
-	p1.WidgetConstructor("SliderUDim", generateSliderScalar("UDim", 2, UDim.new()))
-	p1.WidgetConstructor("SliderUDim2", generateSliderScalar("UDim2", 4, UDim2.new()))
-	p1.WidgetConstructor("SliderRect", generateSliderScalar("Rect", 4, Rect.new(0, 0, 0, 0)))
-	p1.WidgetConstructor("InputText", {
+	local inputNumWidget = generateInputScalar("Num", 1, 0)
+	inputNumWidget.Args.NoButtons = 6
+	iris.WidgetConstructor("InputNum", inputNumWidget)
+	iris.WidgetConstructor("InputVector2", generateInputScalar("Vector2", 2, Vector2.zero))
+	iris.WidgetConstructor("InputVector3", generateInputScalar("Vector3", 3, Vector3.new(0, 0, 0)))
+	iris.WidgetConstructor("InputUDim", generateInputScalar("UDim", 2, UDim.new()))
+	iris.WidgetConstructor("InputUDim2", generateInputScalar("UDim2", 4, UDim2.new()))
+	iris.WidgetConstructor("InputRect", generateInputScalar("Rect", 4, Rect.new(0, 0, 0, 0)))
+	iris.WidgetConstructor("DragNum", generateDragScalar("Num", 1, 0))
+	iris.WidgetConstructor("DragVector2", generateDragScalar("Vector2", 2, Vector2.zero))
+	iris.WidgetConstructor("DragVector3", generateDragScalar("Vector3", 3, Vector3.new(0, 0, 0)))
+	iris.WidgetConstructor("DragUDim", generateDragScalar("UDim", 2, UDim.new()))
+	iris.WidgetConstructor("DragUDim2", generateDragScalar("UDim2", 4, UDim2.new()))
+	iris.WidgetConstructor("DragRect", generateDragScalar("Rect", 4, Rect.new(0, 0, 0, 0)))
+	iris.WidgetConstructor("InputColor3", generateColorDragScalar("Color3", Color3.fromRGB(0, 0, 0)))
+	iris.WidgetConstructor("InputColor4", generateColorDragScalar("Color4", Color3.fromRGB(0, 0, 0), 0))
+	iris.WidgetConstructor("SliderNum", generateSliderScalar("Num", 1, 0))
+	iris.WidgetConstructor("SliderVector2", generateSliderScalar("Vector2", 2, Vector2.zero))
+	iris.WidgetConstructor("SliderVector3", generateSliderScalar("Vector3", 3, Vector3.new(0, 0, 0)))
+	iris.WidgetConstructor("SliderUDim", generateSliderScalar("UDim", 2, UDim.new()))
+	iris.WidgetConstructor("SliderUDim2", generateSliderScalar("UDim2", 4, UDim2.new()))
+	iris.WidgetConstructor("SliderRect", generateSliderScalar("Rect", 4, Rect.new(0, 0, 0, 0)))
+	iris.WidgetConstructor("InputText", {
 		hasState = true,
 		hasChildren = false,
 		Args = {
@@ -1009,74 +1008,74 @@ return function(p1, p2)
 		},
 		Events = {
 			textChanged = {
-				Init = function(p1)
-					p1.lastTextChangedTick = 0
+				Init = function(widget)
+					widget.lastTextChangedTick = 0
 				end,
-				Get = function(p12)
-					return p12.lastTextChangedTick == p1._cycleTick
+				Get = function(widget)
+					return widget.lastTextChangedTick == iris._cycleTick
 				end
 			},
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance
+			hovered = util.EVENTS.hover(function(widget)
+				return widget.Instance
 			end)
 		},
-		Generate = function(p12)
+		Generate = function(widget)
 			local Iris_InputText = Instance.new("Frame")
 			Iris_InputText.Name = "Iris_InputText"
 			Iris_InputText.AutomaticSize = Enum.AutomaticSize.Y
-			Iris_InputText.Size = UDim2.new(p1._config.ItemWidth, UDim.new())
+			Iris_InputText.Size = UDim2.new(iris._config.ItemWidth, UDim.new())
 			Iris_InputText.BackgroundTransparency = 1
 			Iris_InputText.BorderSizePixel = 0
-			p2.UIListLayout(Iris_InputText, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
+			util.UIListLayout(Iris_InputText, Enum.FillDirection.Horizontal, UDim.new(0, iris._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
 			local InputField = Instance.new("TextBox")
 			InputField.Name = "InputField"
 			InputField.AutomaticSize = Enum.AutomaticSize.Y
-			InputField.Size = UDim2.new(p1._config.ContentWidth, p1._config.ContentHeight)
-			InputField.BackgroundColor3 = p1._config.FrameBgColor
-			InputField.BackgroundTransparency = p1._config.FrameBgTransparency
+			InputField.Size = UDim2.new(iris._config.ContentWidth, iris._config.ContentHeight)
+			InputField.BackgroundColor3 = iris._config.FrameBgColor
+			InputField.BackgroundTransparency = iris._config.FrameBgTransparency
 			InputField.Text = ""
 			InputField.TextYAlignment = Enum.TextYAlignment.Top
-			InputField.PlaceholderColor3 = p1._config.TextDisabledColor
+			InputField.PlaceholderColor3 = iris._config.TextDisabledColor
 			InputField.ClearTextOnFocus = false
 			InputField.ClipsDescendants = true
-			p2.applyFrameStyle(InputField)
-			p2.applyTextStyle(InputField)
-			p2.UISizeConstraint(InputField, Vector2.xAxis)
+			util.applyFrameStyle(InputField)
+			util.applyTextStyle(InputField)
+			util.UISizeConstraint(InputField, Vector2.xAxis)
 			InputField.Parent = Iris_InputText
 			InputField.FocusLost:Connect(function()
-				p12.state.text:set(InputField.Text)
-				p12.lastTextChangedTick = p1._cycleTick + 1
+				widget.state.text:set(InputField.Text)
+				widget.lastTextChangedTick = iris._cycleTick + 1
 			end)
 			local TextLabel = Instance.new("TextLabel")
 			TextLabel.Name = "TextLabel"
 			TextLabel.AutomaticSize = Enum.AutomaticSize.X
-			TextLabel.Size = UDim2.fromOffset(0, p1._config.TextSize + 2 * p1._config.FramePadding.Y)
+			TextLabel.Size = UDim2.fromOffset(0, iris._config.TextSize + 2 * iris._config.FramePadding.Y)
 			TextLabel.BackgroundTransparency = 1
 			TextLabel.BorderSizePixel = 0
 			TextLabel.LayoutOrder = 1
-			p2.applyTextStyle(TextLabel)
+			util.applyTextStyle(TextLabel)
 			TextLabel.Parent = Iris_InputText
 			return Iris_InputText
 		end,
-		GenerateState = function(p12)
-			if p12.state.text == nil then
-				p12.state.text = p1._widgetState(p12, "text", "")
+		GenerateState = function(widget)
+			if widget.state.text == nil then
+				widget.state.text = iris._widgetState(widget, "text", "")
 			end
 		end,
-		Update = function(p1)
-			local instance = p1.Instance
-			local InputField = instance.InputField
-			instance.TextLabel.Text = p1.arguments.Text or "Input Text"
-			InputField.PlaceholderText = p1.arguments.TextHint or ""
-			InputField.TextEditable = not p1.arguments.ReadOnly
-			InputField.MultiLine = p1.arguments.MultiLine or false
+		Update = function(widget)
+			local frameInstance = widget.Instance
+			local InputField = frameInstance.InputField
+			frameInstance.TextLabel.Text = widget.arguments.Text or "Input Text"
+			InputField.PlaceholderText = widget.arguments.TextHint or ""
+			InputField.TextEditable = not widget.arguments.ReadOnly
+			InputField.MultiLine = widget.arguments.MultiLine or false
 		end,
-		UpdateState = function(p1)
-			p1.Instance.InputField.Text = p1.state.text.value
+		UpdateState = function(widget)
+			widget.Instance.InputField.Text = widget.state.text.value
 		end,
-		Discard = function(p1)
-			p1.Instance:Destroy()
-			p2.discardState(p1)
+		Discard = function(widget)
+			widget.Instance:Destroy()
+			util.discardState(widget)
 		end
 	})
 end

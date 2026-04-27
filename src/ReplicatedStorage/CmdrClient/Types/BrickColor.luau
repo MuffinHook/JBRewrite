@@ -1,6 +1,5 @@
--- Reviewed by Claude
 local Util = require(script.Parent.Parent.Shared.Util)
-local v1 = Util.MakeFuzzyFinder({
+local colorFuzzyFinder = Util.MakeFuzzyFinder({
 	"White",
 	"Grey",
 	"Light yellow",
@@ -210,38 +209,38 @@ local v1 = Util.MakeFuzzyFinder({
 	"Royal purple",
 	"Hot pink"
 })
-local t = {
+local brickColorType = {
 	Prefixes = "% teamColor",
-	Transform = function(p1)
-		local t = {}
-		for k, v in pairs(v1(p1)) do
-			t[k] = BrickColor.new(v)
+	Transform = function(input)
+		local results = {}
+		for colorName, colorString in pairs(colorFuzzyFinder(input)) do
+			results[colorName] = BrickColor.new(colorString)
 		end
-		return t
+		return results
 	end,
-	Validate = function(p1)
-		return #p1 > 0, "No valid brick colors with that name could be found."
+	Validate = function(input)
+		return #input > 0, "No valid brick colors with that name could be found."
 	end,
-	Autocomplete = function(p1)
-		return Util.GetNames(p1)
+	Autocomplete = function(input)
+		return Util.GetNames(input)
 	end,
-	Parse = function(p1)
-		return p1[1]
+	Parse = function(input)
+		return input[1]
 	end
 }
-local t2 = {
-	Transform = t.Transform,
-	Validate = t.Validate,
-	Autocomplete = t.Autocomplete,
-	Parse = function(p1)
-		return p1[1].Color
+local brickColor3Type = {
+	Transform = brickColorType.Transform,
+	Validate = brickColorType.Validate,
+	Autocomplete = brickColorType.Autocomplete,
+	Parse = function(input)
+		return input[1].Color
 	end
 }
-return function(p1)
-	p1:RegisterType("brickColor", t)
-	p1:RegisterType("brickColors", Util.MakeListableType(t, {
+return function(input)
+	input:RegisterType("brickColor", brickColorType)
+	input:RegisterType("brickColors", Util.MakeListableType(brickColorType, {
 		Prefixes = "% teamColors"
 	}))
-	p1:RegisterType("brickColor3", t2)
-	p1:RegisterType("brickColor3s", Util.MakeListableType(t2))
+	input:RegisterType("brickColor3", brickColor3Type)
+	input:RegisterType("brickColor3s", Util.MakeListableType(brickColor3Type))
 end

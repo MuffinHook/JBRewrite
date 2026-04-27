@@ -1,17 +1,15 @@
--- Reviewed by Claude
--- variables reassigned
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
-return function(p1)
+return function(parent)
 	local consoleRef = Roact.createRef()
 	local settingsRef = Roact.createRef()
 	local gamemodesRef = Roact.createRef()
 	local AppComponent = Roact.PureComponent:extend("App")
-	function AppComponent.init(p1)
-		p1:setState({
+	function AppComponent.init(self)
+		self:setState({
 			currentPage = nil
 		})
 	end
-	function AppComponent.render(p1)
+	function AppComponent.render(self)
 		return Roact.createElement(require(script.Parent), {
 			visible = true,
 			size = UDim2.new(0.95, 0, 0.95, 0),
@@ -37,15 +35,15 @@ return function(p1)
 				}
 			},
 			color = Color3.fromRGB(252, 40, 47),
-			currentPage = p1.state.currentPage,
+			currentPage = self.state.currentPage,
 			updatePage = function(selectedPage)
-				p1:setState({
+				self:setState({
 					currentPage = selectedPage
 				})
 			end
 		})
 	end
-	local mountedHandle = Roact.mount(Roact.createElement(AppComponent), p1)
+	local mountedHandle = Roact.mount(Roact.createElement(AppComponent), parent)
 	return function()
 		Roact.unmount(mountedHandle)
 	end

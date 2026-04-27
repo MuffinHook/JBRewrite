@@ -1,12 +1,10 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Interval = require(ReplicatedStorage.Std.Interval)
 local Tracer = require(ReplicatedStorage.Game.Tracer)
 local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
-local function computePosition(p1, p2)
-	return CFrame.fromAxisAngle(p1.axis, p2 + p1.angle0) * p1.origin
+local function computePosition(rotationData, rotationOffset)
+	return CFrame.fromAxisAngle(rotationData.axis, rotationOffset + rotationData.angle0) * rotationData.origin
 end
 local module = {
 	list = {}
@@ -38,16 +36,16 @@ function module.init()
 		end
 	end)
 end
-function module.create(p1, p2, p3)
+function module.create(spawnPosition, axis, lifetime)
 	local tracer = Tracer.new()
 	tracer:SetColor(Color3.new(255/255, 255/255, 255/255))
 	tracer:SetThickness(1)
 	table.insert(module.list, {
 		bornAt = os.clock(),
 		tracer = tracer,
-		origin = p1,
-		axis = p2,
-		lifetime = p3,
+		origin = spawnPosition,
+		axis = axis,
+		lifetime = lifetime,
 		angle0 = math.random() * math.pi
 	})
 end

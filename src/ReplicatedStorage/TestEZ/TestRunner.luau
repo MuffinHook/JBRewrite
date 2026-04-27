@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local TestEnum = require(script.Parent.TestEnum)
 local TestSession = require(script.Parent.TestSession)
 local LifecycleHooks = require(script.Parent.LifecycleHooks)
@@ -19,109 +17,109 @@ local function wrapExpectContextWithPublicApi(expectationContext)
 	})
 end
 function testRunnerModule.runPlan(plan)
-	local instance = TestSession.new(p1)
-	local instance2 = LifecycleHooks.new()
-	instance.hasFocusNodes = #p1:findNodes(function(p1)
-		return p1.modifier == TestEnum.NodeModifier.Focus
+	local testSession = TestSession.new(plan)
+	local hooksManager = LifecycleHooks.new()
+	testSession.hasFocusNodes = #plan:findNodes(function(node)
+		return node.modifier == TestEnum.NodeModifier.Focus
 	end) > 0
-	t.runPlanNode(instance, p1, instance2)
-	return instance:finalize()
+	testRunnerModule.runPlanNode(testSession, plan, hooksManager)
+	return testSession:finalize()
 end
-function t.runPlanNode(p1, p2, p3)
-	local function runCallback(p12, p2)
+function testRunnerModule.runPlanNode(testRunner, planNode, lifecycleHooks)
+	local function runCallback(callback, errorPrefix)
 		_G.__TESTEZ_RUNNING_TEST__ = true
-		local instance = getfenv(p12)
-		local instance2 = true
-		local var3 = nil
-		local var4 = p2 or ""
-		for k, v in pairs(t.environment) do
-			instance[k] = v
+		local instance = getfenv(callback)
+		local testPassed = true
+		local errorTrace = nil
+		local errorPrefixBase = errorPrefix or ""
+		for key, environmentValue in pairs(testRunnerModule.environment) do
+			instance[key] = environmentValue
 		end
-		function instance.fail(p1)
-			if p1 == nil then
-				p1 = "fail() was called."
+		function instance.fail(failMessage)
+			if failMessage == nil then
+				failMessage = "fail() was called."
 			end
-			instance2 = false
-			var3 = var4 .. debug.traceback(tostring(p1), 2)
+			testPassed = false
+			errorTrace = errorPrefixBase .. debug.traceback(tostring(failMessage), 2)
 		end
-		instance.expect = wrapExpectContextWithPublicApi(p1:getExpectationContext())
-		local var5 = p1:getContext()
-		local v6, v7 = xpcall(function()
-			p12(var5)
-		end, function(p1)
-			return var4 .. debug.traceback(tostring(p1), 2)
+		instance.expect = wrapExpectContextWithPublicApi(planNode:getExpectationContext())
+		local nodeContext = planNode:getContext()
+		local callSucceeded, callError = xpcall(function()
+			callback(nodeContext)
+		end, function(errorMsg)
+			return errorPrefixBase .. debug.traceback(tostring(errorMsg), 2)
 		end)
-		if not v6 then
-			instance2 = false
-			var3 = v7
+		if not callSucceeded then
+			testPassed = false
+			errorTrace = callError
 		end
 		_G.__TESTEZ_RUNNING_TEST__ = nil
-		return instance2, var3
+		return testPassed, errorTrace
 	end
-	local function runNode(p1)
-		for i, v in ipairs(p3:getBeforeEachHooks()) do
-			local instance, instance2 = runCallback(v, "beforeEach hook: ")
-			if not instance then
-				return false, instance2
+	local function runNode(testNode)
+		for i, hook in ipairs(lifecycleHooks:getBeforeEachHooks()) do
+			local nodeSucceeded, nodeError = runCallback(hook, "beforeEach hook: ")
+			if not nodeSucceeded then
+				return false, nodeError
 			end
 		end
-		local var3, var4 = runCallback(p1.callback)
-		for i, v in ipairs(p3:getAfterEachHooks()) do
-			local var5, v6 = runCallback(v, "afterEach hook: ")
-			if not var5 and var3 then
-				return false, v6
-			elseif not var5 then
-				return false, var4 .. "\nWhile cleaning up the failed test another error was found:\n" .. v6
+		local testSucceeded, testError = runCallback(testNode.callback)
+		for i, hook in ipairs(lifecycleHooks:getAfterEachHooks()) do
+			local afterEachSucceeded, afterEachError = runCallback(hook, "afterEach hook: ")
+			if not afterEachSucceeded and testSucceeded then
+				return false, afterEachError
+			elseif not afterEachSucceeded then
+				return false, testError .. "\nWhile cleaning up the failed test another error was found:\n" .. afterEachError
 			end
 		end
-		if var3 then
+		if testSucceeded then
 			return true, nil
 		else
-			return false, var4
+			return false, testError
 		end
 	end
-	p3:pushHooksFrom(p2)
-	local instance = false
-	for i, v in ipairs(p3:getBeforeAllHooks()) do
-		local instance2, var3 = runCallback(v, "beforeAll hook: ")
-		if not instance2 then
-			p1:addDummyError("beforeAll", var3)
-			instance = true
+	lifecycleHooks:pushHooksFrom(planNode)
+	local hasBeforeAllError = false
+	for i, hook in ipairs(lifecycleHooks:getBeforeAllHooks()) do
+		local beforeAllSucceeded, beforeAllError = runCallback(hook, "beforeAll hook: ")
+		if not beforeAllSucceeded then
+			testRunner:addDummyError("beforeAll", beforeAllError)
+			hasBeforeAllError = true
 		end
 	end
-	if not instance then
-		for i, v in ipairs(p2.children) do
-			if v.type == TestEnum.NodeType.It then
-				p1:pushNode(v)
-				if p1:shouldSkip() then
-					p1:setSkipped()
+	if not hasBeforeAllError then
+		for i, child in ipairs(planNode.children) do
+			if child.type == TestEnum.NodeType.It then
+				testRunner:pushNode(child)
+				if testRunner:shouldSkip() then
+					testRunner:setSkipped()
 				else
-					local var4, var5 = runNode(v)
-					if var4 then
-						p1:setSuccess()
+					local testNodeSucceeded, testNodeError = runNode(child)
+					if testNodeSucceeded then
+						testRunner:setSuccess()
 					else
-						p1:setError(var5)
+						testRunner:setError(testNodeError)
 					end
 				end
-				p1:popNode()
-			elseif v.type == TestEnum.NodeType.Describe then
-				p1:pushNode(v)
-				t.runPlanNode(p1, v, p3)
-				if v.loadError then
-					p1:setError("Error during planning: " .. v.loadError)
+				testRunner:popNode()
+			elseif child.type == TestEnum.NodeType.Describe then
+				testRunner:pushNode(child)
+				testRunnerModule.runPlanNode(testRunner, child, lifecycleHooks)
+				if child.loadError then
+					testRunner:setError("Error during planning: " .. child.loadError)
 				else
-					p1:setStatusFromChildren()
+					testRunner:setStatusFromChildren()
 				end
-				p1:popNode()
+				testRunner:popNode()
 			end
 		end
 	end
-	for i, v in ipairs(p3:getAfterAllHooks()) do
-		local v6, v7 = runCallback(v, "afterAll hook: ")
-		if not v6 then
-			p1:addDummyError("afterAll", v7)
+	for i, hook in ipairs(lifecycleHooks:getAfterAllHooks()) do
+		local afterAllSucceeded, afterAllError = runCallback(hook, "afterAll hook: ")
+		if not afterAllSucceeded then
+			testRunner:addDummyError("afterAll", afterAllError)
 		end
 	end
-	p3:popHooks()
+	lifecycleHooks:popHooks()
 end
-return t
+return testRunnerModule

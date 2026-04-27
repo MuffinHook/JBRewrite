@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SeasonUtils = require(ReplicatedStorage.Game.Season.SeasonUtils)
@@ -9,35 +7,35 @@ local Data = script.Parent.Data
 local ContractConsts = require(script.Parent.ContractConsts)
 require(ReplicatedStorage.Game.Season.SeasonConsts)
 require(script.Parent.ContractUtils)
-local t = {}
-t.__index = t
-t.__ClassName = "Contract"
-function t.new(p1)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._maid = Maid.new()
-	t2._obj = p1
-	t2.obj = t2._obj
-	t2._maid:GiveTask(function()
-		t2._obj = nil
-		t2.obj = nil
+local ContractClass = {}
+ContractClass.__index = ContractClass
+ContractClass.__ClassName = "Contract"
+function ContractClass.new(contractInstance)
+	local self = {}
+	setmetatable(self, ContractClass)
+	self._maid = Maid.new()
+	self._obj = contractInstance
+	self.obj = self._obj
+	self._maid:GiveTask(function()
+		self._obj = nil
+		self.obj = nil
 	end)
-	t2._stateValue = p1:WaitForChild(ContractConsts.STATE_VALUE_NAME, 5)
-	local previousStateId = t2:GetStateId()
-	t2._maid:GiveTask(t2:GetStateValue():GetPropertyChangedSignal("Value"):Connect(function()
-		local stateId = t2:GetStateId()
-		if t2._onStateChanged then
-			t2._onStateChanged:Fire(stateId, previousStateId)
+	self._stateValue = contractInstance:WaitForChild(ContractConsts.STATE_VALUE_NAME, 5)
+	local previousStateId = self:GetStateId()
+	self._maid:GiveTask(self:GetStateValue():GetPropertyChangedSignal("Value"):Connect(function()
+		local stateId = self:GetStateId()
+		if self._onStateChanged then
+			self._onStateChanged:Fire(stateId, previousStateId)
 		end
 		previousStateId = stateId
 	end))
-	t2._progressValue = p1:WaitForChild(ContractConsts.PROGRESS_VALUE_NAME, 5)
-	t2._goalValue = p1:WaitForChild(ContractConsts.GOAL_VALUE_NAME, 5)
-	t2._lastStateUpdateValue = p1:WaitForChild(ContractConsts.LAST_STATE_UPDATE_VALUE_NAME, 5)
-	t2._contractActionRemote = p1:WaitForChild(ContractConsts.CONTRACT_ACTION_REMOTE_NAME, 5)
-	t2._requireSeasonPassValue = p1:WaitForChild(ContractConsts.REQUIRE_SEASON_PASS_VALUE_NAME, 5)
-	t2._rerolledValue = p1:WaitForChild(ContractConsts.REROLLED_VALUE_NAME, 5)
-	local contractName = t2:GetName()
+	self._progressValue = contractInstance:WaitForChild(ContractConsts.PROGRESS_VALUE_NAME, 5)
+	self._goalValue = contractInstance:WaitForChild(ContractConsts.GOAL_VALUE_NAME, 5)
+	self._lastStateUpdateValue = contractInstance:WaitForChild(ContractConsts.LAST_STATE_UPDATE_VALUE_NAME, 5)
+	self._contractActionRemote = contractInstance:WaitForChild(ContractConsts.CONTRACT_ACTION_REMOTE_NAME, 5)
+	self._requireSeasonPassValue = contractInstance:WaitForChild(ContractConsts.REQUIRE_SEASON_PASS_VALUE_NAME, 5)
+	self._rerolledValue = contractInstance:WaitForChild(ContractConsts.REROLLED_VALUE_NAME, 5)
+	local contractName = self:GetName()
 	local dataModule = Data:FindFirstChild(contractName)
 	if not dataModule then
 		error(("Cannot find client data module for contract: %s"):format(contractName))
@@ -46,11 +44,11 @@ function t.new(p1)
 	if not clientData.teamId then
 		error("Missing `clientData.teamId` value")
 	end
-	t2:SetTeamId(clientData.teamId)
+	self:SetTeamId(clientData.teamId)
 	if not clientData.rewardExp then
 		error("Missing `clientData.rewardExp` value")
 	end
-	t2:SetRewardExp(clientData.rewardExp * SeasonUtils.getSeasonExpMult())
+	self:SetRewardExp(clientData.rewardExp * SeasonUtils.getSeasonExpMult())
 	if not clientData.message then
 		error("Missing `clientData.message` value")
 	end
@@ -59,83 +57,83 @@ function t.new(p1)
 		messageText = clientData.message
 	else
 		if type(clientData.message) == "function" then
-			messageText = clientData.message(t2)
+			messageText = clientData.message(self)
 		end
 	end
-	t2:SetMessage(messageText)
-	return t2
+	self:SetMessage(messageText)
+	return self
 end
-function t.GetPlayer(p1)
-	local player = Players:GetPlayerByUserId(p1._obj.Parent.Name)
+function ContractClass.GetPlayer(self)
+	local player = Players:GetPlayerByUserId(self._obj.Parent.Name)
 	if player then
 		local isParent = player.Parent == game:GetService("Players")
 		assert(isParent)
 		return player
 	end
 end
-function t.GetName(p1)
-	return p1._obj.Name
+function ContractClass.GetName(self)
+	return self._obj.Name
 end
-function t.SetMessage(p1, p2)
-	assert(p2 ~= nil)
-	assert(type(p2) == "string")
-	p1._message = p2
+function ContractClass.SetMessage(self, messageText)
+	assert(messageText ~= nil)
+	assert(type(messageText) == "string")
+	self._message = messageText
 end
-function t.GetMessage(p1)
-	return p1._message
+function ContractClass.GetMessage(self)
+	return self._message
 end
-function t.GetRequireSeasonPassValue(p1)
-	return p1._requireSeasonPassValue
+function ContractClass.GetRequireSeasonPassValue(self)
+	return self._requireSeasonPassValue
 end
-function t.GetRequireSeasonPass(p1)
-	return p1:GetRequireSeasonPassValue().Value
+function ContractClass.GetRequireSeasonPass(self)
+	return self:GetRequireSeasonPassValue().Value
 end
-function t.GetStateValue(p1)
-	return p1._stateValue
+function ContractClass.GetStateValue(self)
+	return self._stateValue
 end
-function t.GetStateId(p1)
-	return p1._stateValue.Value
+function ContractClass.GetStateId(self)
+	return self._stateValue.Value
 end
-function t.GetOnStateChangedSignal(p1)
-	if not p1._onStateChanged then
-		p1._onStateChanged = Signal.new()
-		p1._maid:GiveTask(p1._onStateChanged)
+function ContractClass.GetOnStateChangedSignal(self)
+	if not self._onStateChanged then
+		self._onStateChanged = Signal.new()
+		self._maid:GiveTask(self._onStateChanged)
 	end
-	return p1._onStateChanged
+	return self._onStateChanged
 end
-function t.GetProgressValue(p1)
-	return p1._progressValue
+function ContractClass.GetProgressValue(self)
+	return self._progressValue
 end
-function t.GetProgress(p1)
-	return p1._progressValue.Value
+function ContractClass.GetProgress(self)
+	return self._progressValue.Value
 end
-function t.SetTeamId(p1, p2)
-	p1._teamId = p2
+function ContractClass.SetTeamId(self, teamId)
+	self._teamId = teamId
 end
-function t.GetTeamId(p1)
-	return p1._teamId
+function ContractClass.GetTeamId(self)
+	return self._teamId
 end
-function t.SetGoal(p1, p2)
-	assert(p2 ~= nil)
-	assert(type(p2) == "number")
-	p1._goalValue.Value = p2
+function ContractClass.SetGoal(self, goalValue)
+	assert(goalValue ~= nil)
+	assert(type(goalValue) == "number")
+	self._goalValue.Value = goalValue
 end
-function t.GetGoal(p1)
-	return p1._goalValue.Value
+function ContractClass.GetGoal(self)
+	return self._goalValue.Value
 end
-function t.GetRewardExp(p1)
-	return p1._rewardExp
+function ContractClass.GetRewardExp(self)
+	return self._rewardExp
 end
-function t.SetRewardExp(p1, p2)
-	p1._rewardExp = p2
+function ContractClass.SetRewardExp(self, rewardExp)
+	self._rewardExp = rewardExp
 end
-function t.GetLastStateUpdate(p1)
-	return p1._lastStateUpdateValue.Value
+function ContractClass.GetLastStateUpdate(self)
+	return self._lastStateUpdateValue.Value
 end
-function t.Destroy(p1)
-	assert(p1._maid ~= nil)
-	p1._maid:Destroy()
-	p1._maid = nil
-	setmetatable(p1, nil)
+function ContractClass.Destroy(self)
+	assert(self._maid ~= nil)
+	self._maid:Destroy()
+	self._maid = nil
+	setmetatable(self, nil)
 end
-return t
+return ContractClass

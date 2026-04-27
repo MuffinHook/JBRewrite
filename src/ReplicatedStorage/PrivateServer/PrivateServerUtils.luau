@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PrivateServerConsts = require(ReplicatedStorage.PrivateServer.PrivateServerConsts)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)

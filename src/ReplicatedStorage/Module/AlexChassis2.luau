@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local Math = require(ReplicatedStorage.Module.Math)
@@ -107,15 +106,15 @@ local function hookAnimations(enginePart, maid, character)
 		tracks[3].weight = turnRight
 		tracks[4].weight = turnLeft
 		local activeIndices = {}
-		for i, v in ipairs(tracks) do
-			if v.weight > 0.1 then
+		for i, trackEntry in ipairs(tracks) do
+			if trackEntry.weight > 0.1 then
 				table.insert(activeIndices, i)
 			else
-				v.track:Stop(0.5)
+				trackEntry.track:Stop(0.5)
 			end
 		end
-		for i, v in ipairs(activeIndices) do
-			local entry = tracks[v]
+		for i, trackIndex in ipairs(activeIndices) do
+			local entry = tracks[trackIndex]
 			if not entry.track.IsPlaying then
 				entry.track:Play(0.25)
 			end
@@ -142,18 +141,18 @@ local function DirtbikeVehicleEnter(state, character)
 end
 VehicleTypes.Dirtbike.VehicleEnter = DirtbikeVehicleEnter
 local function DirtbikeUpdateWheel(state, wheel)
-	local vh = wheel.vh
+	local suspensionHeight = wheel.vh
 	if wheel.Front then
 		local turnCFrame = CFrame.fromAxisAngle((Vector3.new(0, 1, 1)).unit, -state.VisualTurnAngle)
 		if wheel.HoldJoint then
-			wheel.HoldJoint.C1 = CFrame.new(0, -vh, 0) * CFrame.new(0, wheel.HoldSize.Y * 1.5 - 0.1, wheel.HoldSize.Z * 0.5 - 0.05) * turnCFrame * CFrame.Angles(0, 0, math.pi)
+			wheel.HoldJoint.C1 = CFrame.new(0, -suspensionHeight, 0) * CFrame.new(0, wheel.HoldSize.Y * 1.5 - 0.1, wheel.HoldSize.Z * 0.5 - 0.05) * turnCFrame * CFrame.Angles(0, 0, math.pi)
 		end
-		wheel.VisualJoint.C1 = CFrame.new(0, -vh + wheel.VisualHalfHeight, 0) * turnCFrame * CFrame.Angles(state.WheelRotation, 0, 0)
+		wheel.VisualJoint.C1 = CFrame.new(0, -suspensionHeight + wheel.VisualHalfHeight, 0) * turnCFrame * CFrame.Angles(state.WheelRotation, 0, 0)
 	elseif wheel.Back then
 		if wheel.HoldJoint then
-			wheel.HoldJoint.C1 = CFrame.new(0, -vh, 0) * CFrame.new(0, wheel.HoldSize.Y * 1.5, -wheel.HoldSize.Z * 0.5 + 0.05) * CFrame.Angles(0, 0, math.pi)
+			wheel.HoldJoint.C1 = CFrame.new(0, -suspensionHeight, 0) * CFrame.new(0, wheel.HoldSize.Y * 1.5, -wheel.HoldSize.Z * 0.5 + 0.05) * CFrame.Angles(0, 0, math.pi)
 		end
-		wheel.VisualJoint.C1 = CFrame.new(0, -vh + wheel.VisualHalfHeight, 0) * CFrame.Angles(state.WheelRotation, 0, 0)
+		wheel.VisualJoint.C1 = CFrame.new(0, -suspensionHeight + wheel.VisualHalfHeight, 0) * CFrame.Angles(state.WheelRotation, 0, 0)
 	end
 end
 VehicleTypes.Dirtbike.UpdateWheel = DirtbikeUpdateWheel
@@ -204,12 +203,12 @@ end
 VehicleTypes.DuneBuggy.VehicleEnter = DuneBuggyVehicleEnter
 local function DuneBuggyUpdateWheel(state, wheel)
 	local Pivot = wheel.Pivot
-	local vh = wheel.vh
+	local suspensionHeight = wheel.vh
 	if wheel.Front then
 		local turnCFrame = CFrame.fromAxisAngle((Vector3.new(0, 1, 0.5)).unit, -state.VisualTurnAngle)
-		wheel.VisualJoint.C1 = CFrame.new(0, -vh + wheel.VisualHalfHeight, 0) * turnCFrame * CFrame.Angles(state.WheelRotation, 0, 0)
+		wheel.VisualJoint.C1 = CFrame.new(0, -suspensionHeight + wheel.VisualHalfHeight, 0) * turnCFrame * CFrame.Angles(state.WheelRotation, 0, 0)
 	elseif wheel.Back then
-		wheel.VisualJoint.C1 = CFrame.new(0, -vh + wheel.VisualHalfHeight, 0) * CFrame.Angles(state.WheelRotation, 0, 0)
+		wheel.VisualJoint.C1 = CFrame.new(0, -suspensionHeight + wheel.VisualHalfHeight, 0) * CFrame.Angles(state.WheelRotation, 0, 0)
 	end
 	wheel.PivotJoint.C1 = Pivot.CFrame:toObjectSpace(CFrame.new(Pivot.Position, wheel.VisualModelRoot.Position)) * CFrame.new(0, 0, -2)
 end
@@ -243,15 +242,15 @@ local function updateFOV(state)
 		rawBlend = 0
 	end
 	local clamped = math.clamp(rawBlend, 0, 3)
-	local fovBlend, unused
+	local fovBlend, cubeRoot
 	if clamped < 0.825155 then
 		fovBlend = clamped * clamped * clamped
 		if not fovBlend then
-			unused = clamped
+			cubeRoot = clamped
 			fovBlend = 1 - math.exp(-clamped)
 		end
 	else
-		unused = clamped
+		cubeRoot = clamped
 		fovBlend = 1 - math.exp(-clamped)
 	end
 	local FieldOfView = CurrentCamera.FieldOfView
@@ -296,8 +295,8 @@ local function VehicleLeave(state)
 					end
 				end
 			end
-			for k, v in pairs(state.Sounds) do
-				v.Volume = 0
+			for k, sound in pairs(state.Sounds) do
+				sound.Volume = 0
 			end
 			for _, wheel in next, state.Wheels do
 				wheel.VectorForce.Force = ZERO_VECTOR
@@ -310,8 +309,8 @@ local function VehicleLeave(state)
 end
 local function UpdateWheels(state, dt, applyForces)
 	local c4Models = {}
-	for k in pairs(C4Binder:GetAllSet()) do
-		c4Models[#c4Models + 1] = k._obj
+	for c4Item in pairs(C4Binder:GetAllSet()) do
+		c4Models[#c4Models + 1] = c4Item._obj
 	end
 	c4Models[#c4Models + 1] = state.Model
 	c4Models[#c4Models + 1] = LocalPlayer.Character
@@ -426,14 +425,14 @@ local function UpdateHQ(state, dt)
 		local currentGear = state.Gear or 1
 		local lastGear = state.LastGear or 1
 		local lastGearSwitch = state.LastGearSwitch or 0
-		local gearBlend = state.t3 or 0
-		state.LastFakeGear = lastGear * (1 - gearBlend) + currentGear * gearBlend
+		local gearBlendTime = state.t3 or 0
+		state.LastFakeGear = lastGear * (1 - gearBlendTime) + currentGear * gearBlendTime
 		local currentGearRatio
 		if lastGear == currentGear then
 			currentGearRatio = Gears[2 + currentGear]
 		else
-			currentGearRatio = Gears[2 + lastGear] * (1 - gearBlend * gearBlend) + Gears[2 + currentGear] * gearBlend * gearBlend
-			local newBlend = gearBlend + dt * 1 / 0.23
+			currentGearRatio = Gears[2 + lastGear] * (1 - gearBlendTime * gearBlendTime) + Gears[2 + currentGear] * gearBlendTime * gearBlendTime
+			local newBlend = gearBlendTime + dt * 1 / 0.23
 			state.t3 = newBlend
 			if newBlend >= 1 then
 				state.LastGear = currentGear

@@ -1,27 +1,26 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local Maid = require(ReplicatedStorage.Std.Maid)
-return function(p1)
+return function(storyContext)
 	local instance = Maid.new()
-	local v2, v3 = Roact.createBinding(123456)
-	local v4, v5 = Roact.createBinding(878)
-	local v6, v7 = Roact.createBinding(0.3)
-	local v8, v9 = Roact.createBinding(0.5)
+	local distanceValue, updateDistance = Roact.createBinding(123456)
+	local speedValue, updateSpeed = Roact.createBinding(878)
+	local barRatioValue, updateBarRatio = Roact.createBinding(0.3)
+	local accelRatioValue, updateAccelRatio = Roact.createBinding(0.5)
 	instance:GiveTask(RunService.Heartbeat:Connect(function()
-		local v2 = math.sin(os.clock() * 2) * 0.5 + 0.5
-		v5(v2 * 500)
-		v9(v2)
-		v7(math.cos((os.clock())) * 0.5 + 0.5)
-		v3((math.cos(os.clock() * 0.1) * 0.5 + 0.5) * 1000000)
+		local oscillationFactor = math.sin(os.clock() * 2) * 0.5 + 0.5
+		updateSpeed(oscillationFactor * 500)
+		updateAccelRatio(oscillationFactor)
+		updateBarRatio(math.cos((os.clock())) * 0.5 + 0.5)
+		updateDistance((math.cos(os.clock() * 0.1) * 0.5 + 0.5) * 1000000)
 	end))
 	local Speedometer = require(script.Parent.Speedometer)
-	local var10 = Roact.mount(Roact.createElement(Speedometer, {
-		distance = v2,
-		speed = v4,
-		barRatio = v6,
-		accelRatio = v8,
+	local speedometerHandle = Roact.mount(Roact.createElement(Speedometer, {
+		distance = distanceValue,
+		speed = speedValue,
+		barRatio = barRatioValue,
+		accelRatio = accelRatioValue,
 		size = UDim2.new(0.5, 0, 0.5, 0),
 		position = UDim2.new(0.25, 0, 0.25, 0),
 		color = Color3.fromRGB(252, 40, 47),
@@ -36,9 +35,9 @@ return function(p1)
 				Name = "TWENTYMOREMINUTES"
 			}
 		}
-	}), p1)
+	}), storyContext)
 	return function()
-		Roact.unmount(var10)
+		Roact.unmount(speedometerHandle)
 		instance:DoCleaning()
 	end
 end

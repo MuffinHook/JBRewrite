@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local GamepassUtils = require(script.Parent.GamepassUtils)
@@ -9,111 +8,111 @@ local Promise = require(ReplicatedStorage.Std.Promise)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local Signal = require(ReplicatedStorage.Std.Signal)
 local waitForChild = require(ReplicatedStorage.Std.waitForChild)
-local t = {}
-local t2 = {}
-local t3 = {
+local gamepassSignals = {}
+local ownedGamepassesCache = {}
+local GamepassSystem = {
 	OnAnyOwned = Signal.new(),
 	OnAnyPlayerAnyOwned = Signal.new()
 }
-function t3.Init()
-	t3.OnAnyOwned:Connect(function(p1)
-		t2[p1] = true
+function GamepassSystem.Init()
+	GamepassSystem.OnAnyOwned:Connect(function(gamepassId)
+		ownedGamepassesCache[gamepassId] = true
 	end)
-	waitForChild(LocalPlayer, "Gamepasses"):andThen(t3.Listen)
-	local t = {}
-	local function playerRemoving(p1)
-		t[p1] = nil
+	waitForChild(LocalPlayer, "Gamepasses"):andThen(GamepassSystem.Listen)
+	local playerMaids = {}
+	local function playerRemoving(player)
+		playerMaids[player] = nil
 	end
-	local function monitorGamepasses(p1)
-		local Gamepasses = p1:WaitForChild("Gamepasses")
-		t[p1]:GiveTask(RxInstanceUtils.observeChildren(Gamepasses, function(p12, p2)
-			t3.OnAnyPlayerAnyOwned:Fire(p1, p12.Value)
+	local function monitorGamepasses(player)
+		local Gamepasses = player:WaitForChild("Gamepasses")
+		playerMaids[player]:GiveTask(RxInstanceUtils.observeChildren(Gamepasses, function(gamepassInstance, removed)
+			GamepassSystem.OnAnyPlayerAnyOwned:Fire(player, gamepassInstance.Value)
 		end))
 	end
-	local function playerAdded(p1)
-		t[p1] = Maid.new()
-		local Gamepasses = p1:WaitForChild("Gamepasses")
-		t[p1]:GiveTask(RxInstanceUtils.observeChildren(Gamepasses, function(p12, p2)
-			t3.OnAnyPlayerAnyOwned:Fire(p1, p12.Value)
+	local function playerAdded(player)
+		playerMaids[player] = Maid.new()
+		local Gamepasses = player:WaitForChild("Gamepasses")
+		playerMaids[player]:GiveTask(RxInstanceUtils.observeChildren(Gamepasses, function(gamepassInstance, removed)
+			GamepassSystem.OnAnyPlayerAnyOwned:Fire(player, gamepassInstance.Value)
 		end))
 	end
-	for v1, v2 in Players:GetPlayers() do
-		t[v2] = Maid.new()
-		local Gamepasses = v2:WaitForChild("Gamepasses")
-		t[v2]:GiveTask(RxInstanceUtils.observeChildren(Gamepasses, function(p1, p2)
-			t3.OnAnyPlayerAnyOwned:Fire(v2, p1.Value)
+	for index, player in Players:GetPlayers() do
+		playerMaids[player] = Maid.new()
+		local Gamepasses = player:WaitForChild("Gamepasses")
+		playerMaids[player]:GiveTask(RxInstanceUtils.observeChildren(Gamepasses, function(gamepassInstance, removed)
+			GamepassSystem.OnAnyPlayerAnyOwned:Fire(player, gamepassInstance.Value)
 		end))
 	end
 	Players.PlayerAdded:Connect(playerAdded)
 	Players.PlayerRemoving:Connect(playerRemoving)
 end
-function t3.SetOwned(p1)
-	assert((GamepassUtils.GetGamepassFromEnum(p1)))
-	t3.OnAnyOwned:Fire(p1)
-	if t[p1] then
-		t[p1]:Fire(p1)
+function GamepassSystem.SetOwned(gamepassId)
+	assert((GamepassUtils.GetGamepassFromEnum(gamepassId)))
+	GamepassSystem.OnAnyOwned:Fire(gamepassId)
+	if gamepassSignals[gamepassId] then
+		gamepassSignals[gamepassId]:Fire(gamepassId)
 	end
 end
-function t3.DoesPlayerOwn(p1)
-	assert(p1)
-	assert(type(p1) == "number")
-	return t2[p1] == true
+function GamepassSystem.DoesPlayerOwn(gamepassId)
+	assert(gamepassId)
+	assert(type(gamepassId) == "number")
+	return ownedGamepassesCache[gamepassId] == true
 end
-function t3.doesPlayerOwnCached(p1, p2)
-	assert(p1 ~= nil, "missing player")
-	assert(p1.DisplayName ~= nil, "player was not a player")
-	assert(p2 ~= nil, "missing gamepassEnum")
-	local Gamepasses = p1:FindFirstChild("Gamepasses")
+function GamepassSystem.doesPlayerOwnCached(player, gamepassEnum)
+	assert(player ~= nil, "missing player")
+	assert(player.DisplayName ~= nil, "player was not a player")
+	assert(gamepassEnum ~= nil, "missing gamepassEnum")
+	local Gamepasses = player:FindFirstChild("Gamepasses")
 	if Gamepasses then
-		for i, v in ipairs(Gamepasses:GetChildren()) do
-			if v.Value == p2 then
+		for index, gamepass in ipairs(Gamepasses:GetChildren()) do
+			if gamepass.Value == gamepassEnum then
 				return true
 			end
 		end
 	end
 	return false
 end
-function t3.Listen(p1)
-	assert(p1)
-	local function OnObjAdded(p1)
-		if p1:IsA("IntValue") then
-			assert(p1.Value > 0)
-			t3.SetOwned(p1.Value)
+function GamepassSystem.Listen(gamepassesFolder)
+	assert(gamepassesFolder)
+	local function OnGamepassAdded(gamepassInstance)
+		if gamepassInstance:IsA("IntValue") then
+			assert(gamepassInstance.Value > 0)
+			GamepassSystem.SetOwned(gamepassInstance.Value)
 		end
 	end
-	for i, v in ipairs(p1:GetChildren()) do
-		if v:IsA("IntValue") then
-			assert(v.Value > 0)
-			t3.SetOwned(v.Value)
+	for index, gamepass in ipairs(gamepassesFolder:GetChildren()) do
+		if gamepass:IsA("IntValue") then
+			assert(gamepass.Value > 0)
+			GamepassSystem.SetOwned(gamepass.Value)
 		end
 	end
-	p1.ChildAdded:Connect(OnObjAdded)
+	gamepassesFolder.ChildAdded:Connect(OnGamepassAdded)
 end
-function t3.GetGamepassOwnedSignal(p1)
-	local v1 = t[p1]
-	if v1 == nil then
-		local v2 = Signal.new()
-		t[p1] = v2
-		v1 = v2
+function GamepassSystem.GetGamepassOwnedSignal(gamepassId)
+	local signal = gamepassSignals[gamepassId]
+	if signal == nil then
+		local newSignal = Signal.new()
+		gamepassSignals[gamepassId] = newSignal
+		signal = newSignal
 	end
-	return v1
+	return signal
 end
-local t4 = {}
-function t3.promiseProperty(p1, p2)
-	if t4[p1] then
-		return Promise.resolve(t4[p1][p2])
+local gamepassInfoCache = {}
+function GamepassSystem.promiseProperty(gamepassId, propertyName)
+	if gamepassInfoCache[gamepassId] then
+		return Promise.resolve(gamepassInfoCache[gamepassId][propertyName])
 	else
-		return Promise.defer(function(p12)
-			local v1 = MarketplaceService:GetProductInfo(p1, Enum.InfoType.GamePass)
-			t4[p1] = v1
-			p12(v1[p2])
+		return Promise.defer(function(resolve)
+			local productInfo = MarketplaceService:GetProductInfo(gamepassId, Enum.InfoType.GamePass)
+			gamepassInfoCache[gamepassId] = productInfo
+			resolve(productInfo[propertyName])
 		end)
 	end
 end
-function t3.promisePrice(p1)
-	return t3.promiseProperty(p1, "PriceInRobux")
+function GamepassSystem.promisePrice(gamepassId)
+	return GamepassSystem.promiseProperty(gamepassId, "PriceInRobux")
 end
-function t3.promiseImageId(p1)
-	return t3.promiseProperty(p1, "IconImageAssetId")
+function GamepassSystem.promiseImageId(gamepassId)
+	return GamepassSystem.promiseProperty(gamepassId, "IconImageAssetId")
 end
-return t3
+return GamepassSystem

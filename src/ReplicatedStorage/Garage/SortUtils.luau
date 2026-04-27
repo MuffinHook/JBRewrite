@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local EnumSort = require(script.Parent.EnumSort)
 local sortUtilsModule = {
 	getSortFunc = function(sortEnum)

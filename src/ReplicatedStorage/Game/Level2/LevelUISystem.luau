@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -11,75 +10,75 @@ local SeasonSystem = require(ReplicatedStorage.Game.Season.SeasonSystem)
 local LevelSystem = require(script.Parent.LevelSystem)
 local LevelConsts = require(script.Parent.LevelConsts)
 local LevelUtils = require(script.Parent.LevelUtils)
-local t = {
+local LevelUIModule = {
 	gui = nil,
 	hidden = false
 }
-function t.init()
+function LevelUIModule.init()
 	local LevelGui2 = ReplicatedStorage.StarterGui:FindFirstChild("LevelGui2")
 	LevelGui2.Parent = LocalPlayer.PlayerGui
-	t.gui = LevelGui2
-	LevelGui2.Enabled = not t.hidden
-	t.updateProgress(LocalPlayer)
-	LevelSystem.getOnLevelChangedSignal():Connect(t.updateProgress)
-	LevelSystem.getOnExpChangedSignal():Connect(t.updateProgress)
+	LevelUIModule.gui = LevelGui2
+	LevelGui2.Enabled = not LevelUIModule.hidden
+	LevelUIModule.updateProgress(LocalPlayer)
+	LevelSystem.getOnLevelChangedSignal():Connect(LevelUIModule.updateProgress)
+	LevelSystem.getOnExpChangedSignal():Connect(LevelUIModule.updateProgress)
 	LevelGui2.Background.Body.SeasonNum.Text = ("SEASON %d"):format(SeasonConsts.SEASON_NUM)
-	LevelGui2.Background.Body.InfoButton.MouseButton1Down:Connect(t.toggleInfo)
-	LevelGui2.Background.Body.MouseButton1Down:Connect(t.toggleInfo)
-	SeasonSystem.getSeasonPassOwnedSignal():Connect(function(p1)
-		if p1 == LocalPlayer then
-			t.updateProgress(LocalPlayer)
+	LevelGui2.Background.Body.InfoButton.MouseButton1Down:Connect(LevelUIModule.toggleInfo)
+	LevelGui2.Background.Body.MouseButton1Down:Connect(LevelUIModule.toggleInfo)
+	SeasonSystem.getSeasonPassOwnedSignal():Connect(function(player)
+		if player == LocalPlayer then
+			LevelUIModule.updateProgress(LocalPlayer)
 		end
 	end)
 end
-function t.toggleInfo()
+function LevelUIModule.toggleInfo()
 	Audio.ObjectLocal(LocalPlayer.PlayerGui, 6105461542)
-	local v1 = LocalPlayer:FindFirstChild(SeasonConsts.HAS_SEEN_REWARDS_VALUE_NAME)
+	local hasSeenRewardsValue = LocalPlayer:FindFirstChild(SeasonConsts.HAS_SEEN_REWARDS_VALUE_NAME)
 	if SeasonUISystem._window:IsOpen() then
 		SeasonUISystem.close()
 	elseif ContractUISystem._window:IsOpen() then
 		ContractUISystem.close()
 	else
-		local v2 = ContractUISystem
-		if not v1.Value or SeasonUtils.getRemainingTime() <= 0 then
-			v2 = SeasonUISystem
+		local selectedUISystem = ContractUISystem
+		if not hasSeenRewardsValue.Value or SeasonUtils.getRemainingTime() <= 0 then
+			selectedUISystem = SeasonUISystem
 		end
-		v2.open()
+		selectedUISystem.open()
 	end
 end
-function t.updateProgress(p1)
-	if p1 == LocalPlayer then
-		local v1 = LevelUtils.getLevel(p1)
-		local v2 = LevelUtils.getExp(p1)
-		if v1 and v2 then
-			t.setProgress(v1, v2)
+function LevelUIModule.updateProgress(player)
+	if player == LocalPlayer then
+		local playerLevel = LevelUtils.getLevel(player)
+		local playerExp = LevelUtils.getExp(player)
+		if playerLevel and playerExp then
+			LevelUIModule.setProgress(playerLevel, playerExp)
 		end
 	end
 end
-local function tweenFrameFromLastFracToFrac(p1, p2, p3)
-	if p3 then
-		p1.Size = UDim2.fromScale(0, 1)
-		p1.Position = UDim2.fromScale(0, 0)
+local function tweenFrameFromLastFracToFrac(frame, targetFraction, shouldReset)
+	if shouldReset then
+		frame.Size = UDim2.fromScale(0, 1)
+		frame.Position = UDim2.fromScale(0, 0)
 	end
-	local Scale = p1.Size.X.Scale
-	local v2 = (Scale < p2 and p2 - Scale or p2) / 1
-	p1:TweenSize(UDim2.new(p2, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, v2, true)
-	return v2
+	local Scale = frame.Size.X.Scale
+	local tweenDuration = (Scale < targetFraction and targetFraction - Scale or targetFraction) / 1
+	frame:TweenSize(UDim2.new(targetFraction, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, tweenDuration, true)
+	return tweenDuration
 end
-function t.setProgress(p1, p2)
-	local v1 = LevelUtils.calculateExpNextLevel(p1)
-	local v2 = p2 / v1
-	local gui = t.gui
+function LevelUIModule.setProgress(level, currentExp)
+	local expForNextLevel = LevelUtils.calculateExpNextLevel(level)
+	local progressFraction = currentExp / expForNextLevel
+	local gui = LevelUIModule.gui
 	local Scale = gui.Background.Body.Progress.Size.X.Scale
-	if v2 < Scale then
+	if progressFraction < Scale then
 		gui.Background.Body.Progress.Size = UDim2.fromScale(0, 1)
 		gui.Background.Body.ProgressDaily.Size = UDim2.fromScale(0, 1)
 		gui.Background.Body.ProgressDaily.Position = UDim2.fromScale(0, 0)
 	end
-	local v4 = (Scale < v2 and v2 - Scale or v2) / 1
-	gui.Background.Body.Progress:TweenSize(UDim2.new(v2, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, v4, true)
-	gui.Background.Body.Level.Text = ("LEVEL %d"):format(p1)
-	gui.Background.Body.ExpProgress.Text = ("%d/%d"):format(p2, v1)
+	local tweenDuration = (Scale < progressFraction and progressFraction - Scale or progressFraction) / 1
+	gui.Background.Body.Progress:TweenSize(UDim2.new(progressFraction, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, tweenDuration, true)
+	gui.Background.Body.Level.Text = ("LEVEL %d"):format(level)
+	gui.Background.Body.ExpProgress.Text = ("%d/%d"):format(currentExp, expForNextLevel)
 	local MAX_DAILY_EXP = LevelConsts.MAX_DAILY_EXP
 	if SeasonSystem.doesPlayerOwnSeasonPass(LocalPlayer) then
 		MAX_DAILY_EXP = LevelConsts.MAX_DAILY_EXP_SEASON_PASS
@@ -88,27 +87,27 @@ function t.setProgress(p1, p2)
 	if SeasonUtils.getRemainingTime() < 0 then
 		sum = 0
 	end
-	local v5 = Players.LocalPlayer:FindFirstChild(LevelConsts.DAILY_EXP_VALUE_NAME)
-	if v5 then
-		sum = sum - v5.Value
+	local dailyExpValue = Players.LocalPlayer:FindFirstChild(LevelConsts.DAILY_EXP_VALUE_NAME)
+	if dailyExpValue then
+		sum = sum - dailyExpValue.Value
 	end
 	if sum < 0 then
 		sum = 0
 	end
 	gui.Background.Body.Help1.Visible = sum > 0.001
-	gui.Background.Body.ProgressDaily:TweenSize(UDim2.new(math.min(1, (p2 + sum) / v1) - v2, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, v4, true)
-	gui.Background.Body.ProgressDaily:TweenPosition(UDim2.fromScale(v2, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, v4, true)
+	gui.Background.Body.ProgressDaily:TweenSize(UDim2.new(math.min(1, (currentExp + sum) / expForNextLevel) - progressFraction, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, tweenDuration, true)
+	gui.Background.Body.ProgressDaily:TweenPosition(UDim2.fromScale(progressFraction, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, tweenDuration, true)
 end
-function t.hideTopbar()
-	t.hidden = true
-	if t.gui then
-		t.gui.Enabled = not t.hidden
+function LevelUIModule.hideTopbar()
+	LevelUIModule.hidden = true
+	if LevelUIModule.gui then
+		LevelUIModule.gui.Enabled = not LevelUIModule.hidden
 	end
 end
-function t.showTopbar()
-	t.hidden = false
-	if t.gui then
-		t.gui.Enabled = not t.hidden
+function LevelUIModule.showTopbar()
+	LevelUIModule.hidden = false
+	if LevelUIModule.gui then
+		LevelUIModule.gui.Enabled = not LevelUIModule.hidden
 	end
 end
-return t
+return LevelUIModule

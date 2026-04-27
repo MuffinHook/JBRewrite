@@ -1,83 +1,82 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
 local Joint = require(ReplicatedStorage.Std.Joint)
 local Maid = require(ReplicatedStorage.Std.Maid)
-CharacterUtils.observeLocalCharacterAdded(function(p1, p2)
-	local Humanoid = p1:FindFirstChild("Humanoid")
-	local PlayEmote = p1:WaitForChild("Animate"):WaitForChild("PlayEmote")
+CharacterUtils.observeLocalCharacterAdded(function(character, maid)
+	local Humanoid = character:FindFirstChild("Humanoid")
+	local PlayEmote = character:WaitForChild("Animate"):WaitForChild("PlayEmote")
 	task.wait(1)
-	local v1 = nil
-	local function StopAnimation(p1)
-		p2.emoteBallConnection = nil
-		if v1 then
-			v1:Stop(if p1 then 0 else nil)
-			v1 = nil
+	local currentAnimation = nil
+	local function StopAnimation(character)
+		maid.emoteBallConnection = nil
+		if currentAnimation then
+			currentAnimation:Stop(if character then 0 else nil)
+			currentAnimation = nil
 		end
 	end
-	function PlayEmote.OnInvoke(p12)
-		p2.emoteBallConnection = nil
-		if v1 then
-			v1:Stop(nil)
-			v1 = nil
+	function PlayEmote.OnInvoke(animationAsset)
+		maid.emoteBallConnection = nil
+		if currentAnimation then
+			currentAnimation:Stop(nil)
+			currentAnimation = nil
 		end
 		if Humanoid:GetState() == Enum.HumanoidStateType.Running then
-			v1 = Humanoid:LoadAnimation(p12)
-			v1.Priority = Enum.AnimationPriority.Action
-			v1:Play()
-			local v12 = CharacterUtils.getRootPart(p1)
-			if v12 then
+			currentAnimation = Humanoid:LoadAnimation(animationAsset)
+			currentAnimation.Priority = Enum.AnimationPriority.Action
+			currentAnimation:Play()
+			local rootPart = CharacterUtils.getRootPart(character)
+			if rootPart then
 				local EmoteBall = Instance.new("Part")
 				EmoteBall.Shape = Enum.PartType.Ball
 				EmoteBall.Size = Vector3.new(4, 4, 4)
 				EmoteBall.Name = "EmoteBall"
 				EmoteBall.CanCollide = true
-				EmoteBall.CollisionGroup = v12.CollisionGroup
+				EmoteBall.CollisionGroup = rootPart.CollisionGroup
 				EmoteBall.CustomPhysicalProperties = PhysicalProperties.new(0.01, 0, 0, 1, 1)
-				EmoteBall.CFrame = v12.CFrame * CFrame.new(0, 0, 1)
+				EmoteBall.CFrame = rootPart.CFrame * CFrame.new(0, 0, 1)
 				EmoteBall.Transparency = 1
-				EmoteBall.Parent = p1
-				Joint.CustomWeld(EmoteBall, v12, CFrame.new(0, 0, 0), CFrame.new(0, 0, 0))
-				local v2 = Maid.new()
-				v2:GiveTask(function()
+				EmoteBall.Parent = character
+				Joint.CustomWeld(EmoteBall, rootPart, CFrame.new(0, 0, 0), CFrame.new(0, 0, 0))
+				local emoteMaid = Maid.new()
+				emoteMaid:GiveTask(function()
 					task.delay(0.25, function()
 						EmoteBall:Destroy()
 					end)
 				end)
-				v2:GiveTask(v1.Stopped:Connect(function()
-					p2.emoteBallConnection = nil
-					if v1 then
-						v1:Stop(nil)
-						v1 = nil
+				emoteMaid:GiveTask(currentAnimation.Stopped:Connect(function()
+					maid.emoteBallConnection = nil
+					if currentAnimation then
+						currentAnimation:Stop(nil)
+						currentAnimation = nil
 					end
 				end))
-				v2:GiveTask(RunService.Heartbeat:Connect(function()
-					if (p1.LowerTorso.Position - v12.Position).Magnitude > 3 then
-						p2.emoteBallConnection = nil
-						if v1 then
-							v1:Stop(0)
-							v1 = nil
+				emoteMaid:GiveTask(RunService.Heartbeat:Connect(function()
+					if (character.LowerTorso.Position - rootPart.Position).Magnitude > 3 then
+						maid.emoteBallConnection = nil
+						if currentAnimation then
+							currentAnimation:Stop(0)
+							currentAnimation = nil
 						end
 					end
 				end))
-				p2.emoteBallConnection = v2
+				maid.emoteBallConnection = emoteMaid
 			end
 			return true
 		end
 	end
-	p2:GiveTask(Humanoid.StateChanged:Connect(function(p1, p22)
-		p2.emoteBallConnection = nil
-		if v1 then
-			v1:Stop(nil)
-			v1 = nil
+	maid:GiveTask(Humanoid.StateChanged:Connect(function(oldState, newState)
+		maid.emoteBallConnection = nil
+		if currentAnimation then
+			currentAnimation:Stop(nil)
+			currentAnimation = nil
 		end
 	end))
-	p2:GiveTask(Humanoid.Running:Connect(function(p1)
-		p2.emoteBallConnection = nil
-		if v1 then
-			v1:Stop(nil)
-			v1 = nil
+	maid:GiveTask(Humanoid.Running:Connect(function(speed)
+		maid.emoteBallConnection = nil
+		if currentAnimation then
+			currentAnimation:Stop(nil)
+			currentAnimation = nil
 		end
 	end))
 end)

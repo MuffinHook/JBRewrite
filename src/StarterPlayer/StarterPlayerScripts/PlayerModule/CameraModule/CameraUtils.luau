@@ -1,2 +1,1 @@
--- Reviewed by Claude
 -- Ignored

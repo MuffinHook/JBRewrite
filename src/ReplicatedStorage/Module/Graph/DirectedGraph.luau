@@ -1,65 +1,64 @@
--- Reviewed by Claude
-local t = {}
-t.__index = t
-function t.new()
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.MapNodeNode = {}
-	t2.ListNode = {}
-	return t2
+local DirectedGraph = {}
+DirectedGraph.__index = DirectedGraph
+function DirectedGraph.new()
+	local newInstance = {}
+	setmetatable(newInstance, DirectedGraph)
+	newInstance.MapNodeNode = {}
+	newInstance.ListNode = {}
+	return newInstance
 end
-function t.GetNeighbors(p1, p2)
-	assert(p1.MapNodeNode[p2] ~= nil)
-	local t = {}
-	for k in pairs(p1.MapNodeNode[p2]) do
-		table.insert(t, k)
+function DirectedGraph.GetNeighbors(graph, sourceNode)
+	assert(graph.MapNodeNode[sourceNode] ~= nil)
+	local neighbors = {}
+	for node in pairs(graph.MapNodeNode[sourceNode]) do
+		table.insert(neighbors, node)
 	end
-	return t
+	return neighbors
 end
-function t.GetUndirectedNeighbors(p1, p2)
-	assert(p1.MapNodeNode[p2] ~= nil)
-	local t = {}
-	for k in pairs(p1.MapNodeNode[p2]) do
-		table.insert(t, k)
+function DirectedGraph.GetUndirectedNeighbors(graph, sourceNode)
+	assert(graph.MapNodeNode[sourceNode] ~= nil)
+	local neighbors = {}
+	for node in pairs(graph.MapNodeNode[sourceNode]) do
+		table.insert(neighbors, node)
 	end
-	for k, v in pairs(p1.MapNodeNode) do
-		if v[p2] then
-			table.insert(t, k)
+	for node, incomingNodes in pairs(graph.MapNodeNode) do
+		if incomingNodes[sourceNode] then
+			table.insert(neighbors, node)
 		end
 	end
-	return t
+	return neighbors
 end
-function t.AddNode(p1, p2)
-	if p1.MapNodeNode[p2] == nil then
-		p1.MapNodeNode[p2] = {}
-		table.insert(p1.ListNode, p2)
+function DirectedGraph.AddNode(graph, sourceNode)
+	if graph.MapNodeNode[sourceNode] == nil then
+		graph.MapNodeNode[sourceNode] = {}
+		table.insert(graph.ListNode, sourceNode)
 	end
 end
-function t.AddEdge(p1, p2, p3)
-	if p1.MapNodeNode[p2] == nil then
-		p1:AddNode(p2)
+function DirectedGraph.AddEdge(graph, sourceNode, destinationNode)
+	if graph.MapNodeNode[sourceNode] == nil then
+		graph:AddNode(sourceNode)
 	end
-	if p1.MapNodeNode[p3] == nil then
-		p1:AddNode(p3)
+	if graph.MapNodeNode[destinationNode] == nil then
+		graph:AddNode(destinationNode)
 	end
-	if p1.MapNodeNode[p2][p3] ~= nil then
-		error(("Edge already exists from `%s` to `%s`"):format(p2, p3))
+	if graph.MapNodeNode[sourceNode][destinationNode] ~= nil then
+		error(("Edge already exists from `%s` to `%s`"):format(sourceNode, destinationNode))
 	end
-	p1.MapNodeNode[p2][p3] = true
+	graph.MapNodeNode[sourceNode][destinationNode] = true
 end
-function t.HasEdge(p1, p2, p3)
-	return if p1.MapNodeNode[p2] == nil then false else p1.MapNodeNode[p2][p3] == true
+function DirectedGraph.HasEdge(graph, sourceNode, destinationNode)
+	return if graph.MapNodeNode[sourceNode] == nil then false else graph.MapNodeNode[sourceNode][destinationNode] == true
 end
-function t.Inverse(p1)
-	local instance = getmetatable(p1).new()
-	for i, v in ipairs(p1.ListNode) do
-		instance:AddNode(v)
+function DirectedGraph.Inverse(graph)
+	local instance = getmetatable(graph).new()
+	for i, node in ipairs(graph.ListNode) do
+		instance:AddNode(node)
 	end
-	for k, v in pairs(p1.MapNodeNode) do
-		for k2 in pairs(v) do
-			instance:AddEdge(k2, k)
+	for sourceNode, edgesFromSource in pairs(graph.MapNodeNode) do
+		for destinationNode in pairs(edgesFromSource) do
+			instance:AddEdge(destinationNode, sourceNode)
 		end
 	end
 	return instance
 end
-return t
+return DirectedGraph

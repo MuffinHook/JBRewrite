@@ -1,98 +1,97 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local CollectionService = game:GetService("CollectionService")
 local data = nil
-local function GetById(p1)
+local function GetById(searchId)
 	for i = #data, 1, -1 do
-		if data[i].Id == p1 then
+		if data[i].Id == searchId then
 			return i
 		end
 	end
 	return false
 end
-local t = {
+local module = {
 	InstAddedSignal = Signal.new(),
 	InstRemovedSignal = Signal.new(),
 	AddedSignal = Signal.new(),
 	RemovedSignal = Signal.new(),
 	UpdatedSignal = Signal.new()
 }
-local v2 = nil
-local var3 = nil
-local function NetSyncReplicateSingle(p1)
-	local var12 = p1
-	local Id = var12.Id
-	local v2 = false
+local eventManager = nil
+local eventManagerRef = nil
+local function NetSyncReplicateSingle(itemData)
+	local currentItem = itemData
+	local Id = currentItem.Id
+	local foundIndex = false
 	for i = #data, 1, -1 do
 		if data[i].Id == Id then
-			v2 = i
+			foundIndex = i
 			break
 		end
 	end
-	if v2 then
-		var12 = data[v2]
-		for var3, v4 in next, p1 do
-			if var3 ~= "Id" and (var3 ~= "Inst" and var3 ~= "Tagged") then
-				var12[var3] = v4
+	if foundIndex then
+		currentItem = data[foundIndex]
+		for fieldName, fieldValue in next, itemData do
+			if fieldName ~= "Id" and (fieldName ~= "Inst" and fieldName ~= "Tagged") then
+				currentItem[fieldName] = fieldValue
 			end
 		end
-		t.UpdatedSignal:Fire(var12)
+		module.UpdatedSignal:Fire(currentItem)
 	else
-		var12.Inst = nil
-		table.insert(data, var12)
-		t.AddedSignal:Fire(var12)
+		currentItem.Inst = nil
+		table.insert(data, currentItem)
+		module.AddedSignal:Fire(currentItem)
 	end
-	if var12.Tagged then
-		local var6 = ("NetSync_%d"):format(var12.Id)
-		if not var12.InstanceAddedSignal then
-			var12.InstanceAddedSignal = CollectionService:GetInstanceAddedSignal(var6)
-			local function InstanceAdded(p1)
-				var12.Inst = p1
-				t.InstAddedSignal:Fire(var12)
+	if currentItem.Tagged then
+		local tagLabel = ("NetSync_%d"):format(currentItem.Id)
+		if not currentItem.InstanceAddedSignal then
+			currentItem.InstanceAddedSignal = CollectionService:GetInstanceAddedSignal(tagLabel)
+			local function InstanceAdded(instance)
+				currentItem.Inst = instance
+				module.InstAddedSignal:Fire(currentItem)
 			end
-			var12.InstanceAddedSignal:Connect(InstanceAdded)
-			local var7 = next
-			local v8, v9 = CollectionService:GetTagged(var6)
-			for v10, v11 in var7, v8, v9 do
-				var12.Inst = v11
-				t.InstAddedSignal:Fire(var12)
+			currentItem.InstanceAddedSignal:Connect(InstanceAdded)
+			local nextFunction = next
+			local instances, endIndex = CollectionService:GetTagged(tagLabel)
+			for instanceKey, instance in nextFunction, instances, endIndex do
+				currentItem.Inst = instance
+				module.InstAddedSignal:Fire(currentItem)
 			end
 		end
-		if not var12.InstanceRemovedSignal then
-			var12.InstanceRemovedSignal = CollectionService:GetInstanceRemovedSignal(var6)
-			var12.InstanceRemovedSignal:Connect(function()
-				t.InstRemovedSignal:Fire(var12)
+		if not currentItem.InstanceRemovedSignal then
+			currentItem.InstanceRemovedSignal = CollectionService:GetInstanceRemovedSignal(tagLabel)
+			currentItem.InstanceRemovedSignal:Connect(function()
+				module.InstRemovedSignal:Fire(currentItem)
 			end)
 		end
 	end
 end
-local function NetSyncReplicateDestroy(p1)
+local function NetSyncReplicateDestroy(itemId)
 	assert(data)
-	local v2 = false
+	local foundIndex = false
 	for i = #data, 1, -1 do
-		if data[i].Id == p1 then
-			v2 = i
+		if data[i].Id == itemId then
+			foundIndex = i
 			break
 		end
 	end
-	t.RemovedSignal:Fire((table.remove(data, (assert(v2)))))
+	module.RemovedSignal:Fire((table.remove(data, (assert(foundIndex)))))
 	return false
 end
-local function NetSyncReplicateAll(p1)
-	for i = 1, #p1 do
-		NetSyncReplicateSingle(p1[i])
+local function NetSyncReplicateAll(itemsList)
+	for i = 1, #itemsList do
+		NetSyncReplicateSingle(itemsList[i])
 	end
 end
 return {
-	Init = function(p1)
+	Init = function(config)
 		data = {}
-		local em = p1.em
-		v2 = p1.Event
-		var3 = em
+		local em = config.em
+		eventManager = config.Event
+		eventManagerRef = em
 		em.ybfjndtk = NetSyncReplicateSingle
 		em.icqxr6a0 = NetSyncReplicateDestroy
 		em.u8darxdf = NetSyncReplicateAll
 	end,
-	Signals = t
+	Signals = module
 }

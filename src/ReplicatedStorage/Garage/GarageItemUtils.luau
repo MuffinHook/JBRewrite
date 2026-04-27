@@ -1,18 +1,17 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemUtils = require(ReplicatedStorage.App.ItemUtils)
 local OwnershipConsts = require(ReplicatedStorage.Ownership.OwnershipConsts)
-local t = {}
-function t.getVehicleCustomizationItemOwned(p1, p2)
-	return ItemUtils.createVehicleCustomizationItemTable(t.translateToItemOwnedCategoryName(p1), p2)
+local GarageItemUtils = {}
+function GarageItemUtils.getVehicleCustomizationItemOwned(categoryName, isOwned)
+	return ItemUtils.createVehicleCustomizationItemTable(GarageItemUtils.translateToItemOwnedCategoryName(categoryName), isOwned)
 end
-function t.translateToItemOwnedCategoryName(p1)
-	if OwnershipConsts.COLOR_CATEGORY_TYPES[p1] then
+function GarageItemUtils.translateToItemOwnedCategoryName(categoryName)
+	if OwnershipConsts.COLOR_CATEGORY_TYPES[categoryName] then
 		return "Color"
-	elseif OwnershipConsts.TEXTURE_CATEGORY_TYPES[p1] then
+	elseif OwnershipConsts.TEXTURE_CATEGORY_TYPES[categoryName] then
 		return "Texture"
 	else
-		return p1
+		return categoryName
 	end
 end
-return t
+return GarageItemUtils

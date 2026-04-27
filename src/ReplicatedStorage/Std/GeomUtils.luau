@@ -1,352 +1,350 @@
--- Reviewed by Claude
--- variables reassigned
-local t = {
-	doesLineIntersectLine = function(p1, p2, p3, p4, p5, p6, p7, p8)
-		if p1 == p3 and p2 == p4 or p5 == p7 and p6 == p8 then
+local module = {
+	doesLineIntersectLine = function(line1StartX, line1StartY, line1EndX, line1EndY, line2StartX, line2StartY, line2EndX, line2EndY)
+		if line1StartX == line1EndX and line1StartY == line1EndY or line2StartX == line2EndX and line2StartY == line2EndY then
 			return false
 		else
-			local v1 = (p8 - p6) * (p3 - p1) - (p7 - p5) * (p4 - p2)
-			if v1 == 0 then
+			local denominator = (line2EndY - line2StartY) * (line1EndX - line1StartX) - (line2EndX - line2StartX) * (line1EndY - line1StartY)
+			if denominator == 0 then
 				return false
 			else
-				local v2 = ((p7 - p5) * (p2 - p6) - (p8 - p6) * (p1 - p5)) / v1
-				local v3 = ((p3 - p1) * (p2 - p6) - (p4 - p2) * (p1 - p5)) / v1
-				return not (v2 < 0 or (v2 > 1 or (v3 < 0 or v3 > 1)))
+				local parameterT = ((line2EndX - line2StartX) * (line1StartY - line2StartY) - (line2EndY - line2StartY) * (line1StartX - line2StartX)) / denominator
+				local parameterU = ((line1EndX - line1StartX) * (line1StartY - line2StartY) - (line1EndY - line1StartY) * (line1StartX - line2StartX)) / denominator
+				return not (parameterT < 0 or (parameterT > 1 or (parameterU < 0 or parameterU > 1)))
 			end
 		end
 	end,
-	fasterComputeAABB = function(p1)
+	fasterComputeAABB = function(root)
 		local abs = math.abs
-		local v1 = (-1 / 0)
-		local v2 = (-1 / 0)
-		local v3 = (1 / 0)
-		local v4 = (1 / 0)
-		local v5 = (1 / 0)
-		local v6 = (-1 / 0)
-		for k, v in pairs(p1:GetDescendants()) do
-			if v:IsA("BasePart") then
-				local Size = v.Size
+		local maxY = (-1 / 0)
+		local maxZ = (-1 / 0)
+		local minX = (1 / 0)
+		local minY = (1 / 0)
+		local minZ = (1 / 0)
+		local maxX = (-1 / 0)
+		for k, part in pairs(root:GetDescendants()) do
+			if part:IsA("BasePart") then
+				local Size = part.Size
 				local X = Size.X
 				local Y = Size.Y
 				local Z = Size.Z
-				local v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19 = v.CFrame:GetComponents()
-				local v20 = 0.5 * (abs(v11) * X + abs(v12) * Y + abs(v13) * Z)
-				local v21 = 0.5 * (abs(v14) * X + abs(v15) * Y + abs(v16) * Z)
-				local v22 = 0.5 * (abs(v17) * X + abs(v18) * Y + abs(v19) * Z)
-				if v8 - v20 < v3 then
-					v3 = v8 - v20
+				local cframeX, cframeY, cframeZ, m01, m02, m03, m10, m11, m12, m20, m21, m22 = part.CFrame:GetComponents()
+				local extentX = 0.5 * (abs(m01) * X + abs(m02) * Y + abs(m03) * Z)
+				local extentY = 0.5 * (abs(m10) * X + abs(m11) * Y + abs(m12) * Z)
+				local extentZ = 0.5 * (abs(m20) * X + abs(m21) * Y + abs(m22) * Z)
+				if cframeX - extentX < minX then
+					minX = cframeX - extentX
 				end
-				if v9 - v21 < v4 then
-					v4 = v9 - v21
+				if cframeY - extentY < minY then
+					minY = cframeY - extentY
 				end
-				if v10 - v22 < v5 then
-					v5 = v10 - v22
+				if cframeZ - extentZ < minZ then
+					minZ = cframeZ - extentZ
 				end
-				if v6 < v8 + v20 then
-					v6 = v8 + v20
+				if maxX < cframeX + extentX then
+					maxX = cframeX + extentX
 				end
-				if v1 < v9 + v21 then
-					v1 = v9 + v21
+				if maxY < cframeY + extentY then
+					maxY = cframeY + extentY
 				end
-				if v2 < v10 + v22 then
-					v2 = v10 + v22
+				if maxZ < cframeZ + extentZ then
+					maxZ = cframeZ + extentZ
 				end
 			end
 		end
-		return Vector3.new(v3, v4, v5), Vector3.new(v6, v1, v2)
+		return Vector3.new(minX, minY, minZ), Vector3.new(maxX, maxY, maxZ)
 	end
 }
-function t.fasterComputeAABBPart(p1)
-	return t.fasterComputeAABBCFSize(p1.CFrame, p1.Size)
+function module.fasterComputeAABBPart(part)
+	return module.fasterComputeAABBCFSize(part.CFrame, part.Size)
 end
-function t.fasterComputeAABBCFSize(p1, p2)
+function module.fasterComputeAABBCFSize(cframe, size)
 	local abs = math.abs
-	local v1 = (1 / 0)
-	local v2 = (1 / 0)
-	local v3 = (1 / 0)
-	local v4 = (-1 / 0)
-	local v5 = (-1 / 0)
-	local v6 = (-1 / 0)
-	local X = p2.X
-	local Y = p2.Y
-	local Z = p2.Z
-	local v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 = p1:GetComponents()
-	local v19 = (abs(v10) * X + abs(v11) * Y + abs(v12) * Z) * 0.5
-	local v20 = (abs(v13) * X + abs(v14) * Y + abs(v15) * Z) * 0.5
-	local v21 = (abs(v16) * X + abs(v17) * Y + abs(v18) * Z) * 0.5
-	if v7 - v19 < v1 then
-		v1 = v7 - v19
+	local minX = (1 / 0)
+	local minY = (1 / 0)
+	local minZ = (1 / 0)
+	local maxX = (-1 / 0)
+	local maxY = (-1 / 0)
+	local maxZ = (-1 / 0)
+	local X = size.X
+	local Y = size.Y
+	local Z = size.Z
+	local cframeX, cframeY, cframeZ, m01, m02, m03, m10, m11, m12, m20, m21, m22 = cframe:GetComponents()
+	local extentX = (abs(m01) * X + abs(m02) * Y + abs(m03) * Z) * 0.5
+	local extentY = (abs(m10) * X + abs(m11) * Y + abs(m12) * Z) * 0.5
+	local extentZ = (abs(m20) * X + abs(m21) * Y + abs(m22) * Z) * 0.5
+	if cframeX - extentX < minX then
+		minX = cframeX - extentX
 	end
-	if v8 - v20 < v2 then
-		v2 = v8 - v20
+	if cframeY - extentY < minY then
+		minY = cframeY - extentY
 	end
-	if v9 - v21 < v3 then
-		v3 = v9 - v21
+	if cframeZ - extentZ < minZ then
+		minZ = cframeZ - extentZ
 	end
-	if v4 < v7 + v19 then
-		v4 = v7 + v19
+	if maxX < cframeX + extentX then
+		maxX = cframeX + extentX
 	end
-	if v5 < v8 + v20 then
-		v5 = v8 + v20
+	if maxY < cframeY + extentY then
+		maxY = cframeY + extentY
 	end
-	if v6 < v9 + v21 then
-		v6 = v9 + v21
+	if maxZ < cframeZ + extentZ then
+		maxZ = cframeZ + extentZ
 	end
-	return Vector3.new(v1, v2, v3), Vector3.new(v4, v5, v6)
+	return Vector3.new(minX, minY, minZ), Vector3.new(maxX, maxY, maxZ)
 end
-function t.calcRayIntersectSphere(p1, p2, p3, p4)
-	local Unit = (p2 - p1).Unit
-	local v1 = p3 - p1
-	local v2 = v1:Dot(Unit)
-	if v2 < 0 then
+function module.calcRayIntersectSphere(rayStart, rayEnd, sphereCenter, sphereRadius)
+	local Unit = (rayEnd - rayStart).Unit
+	local rayToSphere = sphereCenter - rayStart
+	local projectedDistance = rayToSphere:Dot(Unit)
+	if projectedDistance < 0 then
 		return nil, nil
 	else
-		local v4 = math.sqrt(v1:Dot(v1) - v2 ^ 2)
-		if v4 < 0 then
+		local closestDistance = math.sqrt(rayToSphere:Dot(rayToSphere) - projectedDistance ^ 2)
+		if closestDistance < 0 then
 			return nil, nil
 		else
-			local v5 = math.sqrt(p4 ^ 2 - v4 ^ 2)
-			local v6 = v2 - v5
-			local v7 = v2 + v5
-			local Magnitude = (p2 - p1).Magnitude
-			if v7 <= Magnitude then
-				return p1 + Unit * v6, p1 + Unit * v7
-			elseif v6 <= Magnitude then
-				return p1 + Unit * v6, nil
+			local perpDistance = math.sqrt(sphereRadius ^ 2 - closestDistance ^ 2)
+			local nearDistance = projectedDistance - perpDistance
+			local farDistance = projectedDistance + perpDistance
+			local Magnitude = (rayEnd - rayStart).Magnitude
+			if farDistance <= Magnitude then
+				return rayStart + Unit * nearDistance, rayStart + Unit * farDistance
+			elseif nearDistance <= Magnitude then
+				return rayStart + Unit * nearDistance, nil
 			else
 				return nil, nil
 			end
 		end
 	end
 end
-function t.intersectRayPlane(p1, p2, p3, p4)
-	local v1 = p4:Dot(p2)
-	if not (math.abs(v1) < 1e-6) then
-		local v2 = p4:Dot(p3 - p1) / v1
-		if not (v2 < 0) then
-			return p1 + p2 * v2
+function module.intersectRayPlane(rayStart, rayDirection, planePoint, planeNormal)
+	local denominator = planeNormal:Dot(rayDirection)
+	if not (math.abs(denominator) < 1e-6) then
+		local parameter = planeNormal:Dot(planePoint - rayStart) / denominator
+		if not (parameter < 0) then
+			return rayStart + rayDirection * parameter
 		end
 	end
 end
-function t.isPointInCylinder(p1, p2, p3, p4, p5)
-	local Unit = p3.Unit
-	local v1 = p1 - p2
-	local v2 = v1:Dot(Unit)
-	if v2 < 0 or p4 < v2 then
+function module.isPointInCylinder(point, cylinderBase, cylinderAxis, cylinderHeight, cylinderRadius)
+	local Unit = cylinderAxis.Unit
+	local pointRelative = point - cylinderBase
+	local heightAlongAxis = pointRelative:Dot(Unit)
+	if heightAlongAxis < 0 or cylinderHeight < heightAlongAxis then
 		return false
 	else
-		return not (p5 < (v1 - Unit * v2).Magnitude)
+		return not (cylinderRadius < (pointRelative - Unit * heightAlongAxis).Magnitude)
 	end
 end
-function t.randomPointInCircle()
-	local v2 = math.sqrt((math.random()))
-	local v3 = math.random() * 2 * math.pi
-	return Vector2.new(v2 * math.cos(v3), v2 * math.sin(v3))
+function module.randomPointInCircle()
+	local radius = math.sqrt((math.random()))
+	local angle = math.random() * 2 * math.pi
+	return Vector2.new(radius * math.cos(angle), radius * math.sin(angle))
 end
-function t.randomPointOnCircle()
-	local v1 = math.random() * 2 * math.pi
-	return Vector2.new(math.cos(v1), (math.sin(v1)))
+function module.randomPointOnCircle()
+	local angle = math.random() * 2 * math.pi
+	return Vector2.new(math.cos(angle), (math.sin(angle)))
 end
-function t.randomPointInRing(p1)
-	local v2 = math.sqrt(math.random() * (1 - p1 ^ 2) + p1 ^ 2)
-	local v3 = math.random() * 2 * math.pi
-	return Vector2.new(v2 * math.cos(v3), v2 * math.sin(v3))
+function module.randomPointInRing(innerRadiusRatio)
+	local radius = math.sqrt(math.random() * (1 - innerRadiusRatio ^ 2) + innerRadiusRatio ^ 2)
+	local angle = math.random() * 2 * math.pi
+	return Vector2.new(radius * math.cos(angle), radius * math.sin(angle))
 end
-function t.randomPointOnSphere()
-	local v1 = math.random() * math.pi * 2
-	local v2 = math.random() * 2 - 1
-	local v3 = math.sqrt(1 - v2 ^ 2) * math.cos(v1)
-	return Vector3.new(v3, math.sqrt(1 - v2 ^ 2) * math.sin(v1), v2)
+function module.randomPointOnSphere()
+	local azimuthAngle = math.random() * math.pi * 2
+	local yComponent = math.random() * 2 - 1
+	local xyRadius = math.sqrt(1 - yComponent ^ 2) * math.cos(azimuthAngle)
+	return Vector3.new(xyRadius, math.sqrt(1 - yComponent ^ 2) * math.sin(azimuthAngle), yComponent)
 end
-function t.randomPointInSphere()
-	local v1 = math.random() * 2 * math.pi
-	local v3 = math.acos(2 * math.random() - 1)
-	local v4 = math.random() ^ 0.3333333333333333
-	local v5 = math.sin(v1)
-	local v6 = math.cos(v1)
-	local v7 = math.sin(v3)
-	return Vector3.new(v4 * v7 * v6, v4 * v7 * v5, v4 * math.cos(v3))
+function module.randomPointInSphere()
+	local azimuthAngle = math.random() * 2 * math.pi
+	local polarAngle = math.acos(2 * math.random() - 1)
+	local radialScale = math.random() ^ 0.3333333333333333
+	local sinAzimuth = math.sin(azimuthAngle)
+	local cosAzimuth = math.cos(azimuthAngle)
+	local sinPolar = math.sin(polarAngle)
+	return Vector3.new(radialScale * sinPolar * cosAzimuth, radialScale * sinPolar * sinAzimuth, radialScale * math.cos(polarAngle))
 end
-function t.shortAngleDist(p1, p2)
-	local v1 = math.sign(p2 - p1)
-	local v2 = v1 * (math.abs(p2 - p1) % 6.283185307179586)
-	return v1 * (math.abs(v2) * 2 % 6.283185307179586) - v2
+function module.shortAngleDist(angle1, angle2)
+	local direction = math.sign(angle2 - angle1)
+	local normalizedDelta = direction * (math.abs(angle2 - angle1) % 6.283185307179586)
+	return direction * (math.abs(normalizedDelta) * 2 % 6.283185307179586) - normalizedDelta
 end
-function t.waveTriangle(p1, p2, p3)
-	local v1 = p2 or 1
-	assert(v1)
-	local v2 = p3 or 1
-	assert(v2)
-	return 4 * v1 / v2 * math.abs(p1 % v2 - v2 / 2) - v1
+function module.waveTriangle(time, amplitude, period)
+	local amp = amplitude or 1
+	assert(amp)
+	local dur = period or 1
+	assert(dur)
+	return 4 * amp / dur * math.abs(time % dur - dur / 2) - amp
 end
-function t.closestPointInPart(p1, p2)
-	local v1 = p1.CFrame
-	local v2 = v1:PointToObjectSpace(p2)
-	local v3 = p1.Size.X * 0.5
-	local v4 = p1.Size.Y * 0.5
-	local v5 = p1.Size.Z * 0.5
-	return v1 * Vector3.new(math.clamp(v2.X, -v3, v3), math.clamp(v2.Y, -v4, v4), (math.clamp(v2.Z, -v5, v5)))
+function module.closestPointInPart(part, targetPoint)
+	local partCFrame = part.CFrame
+	local localPoint = partCFrame:PointToObjectSpace(targetPoint)
+	local halfExtentX = part.Size.X * 0.5
+	local halfExtentY = part.Size.Y * 0.5
+	local halfExtentZ = part.Size.Z * 0.5
+	return partCFrame * Vector3.new(math.clamp(localPoint.X, -halfExtentX, halfExtentX), math.clamp(localPoint.Y, -halfExtentY, halfExtentY), (math.clamp(localPoint.Z, -halfExtentZ, halfExtentZ)))
 end
-function t.closestPointOnPart(p1, p2)
-	return p1:GetClosestPointOnSurface(p2)
+function module.closestPointOnPart(part, targetPoint)
+	return part:GetClosestPointOnSurface(targetPoint)
 end
-function t.closestPointOnLine(p1, p2, p3)
-	local Unit = p2.Unit
-	local v2 = p1 + Unit * math.clamp(Unit:Dot(p3 - p1), 0, p2.Magnitude)
-	return v2, (p3 - v2).Magnitude
+function module.closestPointOnLine(lineStart, lineDirection, targetPoint)
+	local Unit = lineDirection.Unit
+	local closestPoint = lineStart + Unit * math.clamp(Unit:Dot(targetPoint - lineStart), 0, lineDirection.Magnitude)
+	return closestPoint, (targetPoint - closestPoint).Magnitude
 end
-function t.getSunflowerSeedArrangementGenerator(p1, p2, p3)
-	local v2 = math.floor(p2 * math.sqrt(p1) + 0.5)
-	local v3 = 0
+function module.getSunflowerSeedArrangementGenerator(pointCount, goldenAngleScalar, baseRadius)
+	local goldenAngleFactor = math.floor(goldenAngleScalar * math.sqrt(pointCount) + 0.5)
+	local currentIndex = 0
 	return function()
-		if v3 < p1 then
-			v3 = v3 + 1
-			local v1 = p3
-			if v3 <= p1 - v2 then
-				v1 = p3 * math.sqrt((1 - v3 * 2) / (v2 - p1 * 2 + 1))
+		currentIndex = currentIndex + 1
+		if currentIndex <= pointCount then
+			local radiusParameter = baseRadius
+			if currentIndex <= pointCount - goldenAngleFactor then
+				radiusParameter = baseRadius * math.sqrt((1 - currentIndex * 2) / (goldenAngleFactor - pointCount * 2 + 1))
 			end
-			return Vector3.new(math.cos(2.399963229728653 * v3), 0, (math.sin(2.399963229728653 * v3))) * v1, v1
+			return Vector3.new(math.cos(2.399963229728653 * currentIndex), 0, (math.sin(2.399963229728653 * currentIndex))) * radiusParameter, radiusParameter
 		else
 			return nil, nil
 		end
 	end
 end
-function t.getTrajectoryInterceptTime(p1, p2, p3, p4, p5)
-	local X = p3.X
-	local Y = p3.Y
-	local Z = p3.Z
-	local X_2 = p5.X
-	local Y_2 = p5.Y
-	local Z_2 = p5.Z
-	local X_3 = p1.X
-	local Y_3 = p1.Y
-	local Z_3 = p1.Z
-	local v1 = p2 * p2 - (X_2 * X_2 + Y_2 * Y_2 + Z_2 * Z_2) * p4 * p4
-	local v2 = math.sqrt(p4 * 4 * p4 * (X_2 * (X_3 - X) + Y_2 * (Y_3 - Y) + Z_2 * (Z_3 - Z)) ^ 2 - ((X_2 * X_2 + Y_2 * Y_2 + Z_2 * Z_2) * p4 * p4 - p2 * p2) * 4 * ((X_3 - X) ^ 2 + (Y_3 - Y) ^ 2 + (Z_3 - Z) ^ 2)) * 0.5
-	local v3 = X_2 * X * p4 + Y_2 * Y * p4 + Z_2 * Z * p4 - X_2 * X_3 * p4 - Y_2 * Y_3 * p4 - Z_2 * Z_3 * p4
-	local v4 = (v3 + v2) / v1
-	local v5 = (v3 - v2) / v1
-	if v4 ~= v4 or v4 <= 0 then
-		v4 = nil
+function module.getTrajectoryInterceptTime(targetPosition, projectileSpeed, launcherPosition, launcherVelocityScale, targetVelocity)
+	local X = targetPosition.X
+	local Y = targetPosition.Y
+	local Z = targetPosition.Z
+	local X_2 = targetVelocity.X
+	local Y_2 = targetVelocity.Y
+	local Z_2 = targetVelocity.Z
+	local X_3 = launcherPosition.X
+	local Y_3 = launcherPosition.Y
+	local Z_3 = launcherPosition.Z
+	local quadraticA = projectileSpeed * projectileSpeed - (X_2 * X_2 + Y_2 * Y_2 + Z_2 * Z_2) * launcherVelocityScale * launcherVelocityScale
+	local discriminantTerm = math.sqrt(launcherVelocityScale * 4 * launcherVelocityScale * (X_2 * (X_3 - X) + Y_2 * (Y_3 - Y) + Z_2 * (Z_3 - Z)) ^ 2 - ((X_2 * X_2 + Y_2 * Y_2 + Z_2 * Z_2) * launcherVelocityScale * launcherVelocityScale - projectileSpeed * projectileSpeed) * 4 * ((X_3 - X) ^ 2 + (Y_3 - Y) ^ 2 + (Z_3 - Z) ^ 2)) * 0.5
+	local quadraticB = X_2 * X * launcherVelocityScale + Y_2 * Y * launcherVelocityScale + Z_2 * Z * launcherVelocityScale - X_2 * X_3 * launcherVelocityScale - Y_2 * Y_3 * launcherVelocityScale - Z_2 * Z_3 * launcherVelocityScale
+	local timeSolution1 = (quadraticB + discriminantTerm) / quadraticA
+	local timeSolution2 = (quadraticB - discriminantTerm) / quadraticA
+	if timeSolution1 ~= timeSolution1 or timeSolution1 <= 0 then
+		timeSolution1 = nil
 	end
-	if v5 ~= v5 or v5 <= 0 then
-		v5 = nil
+	if timeSolution2 ~= timeSolution2 or timeSolution2 <= 0 then
+		timeSolution2 = nil
 	end
-	if v4 and v5 then
-		return math.min(v4, v5)
+	if timeSolution1 and timeSolution2 then
+		return math.min(timeSolution1, timeSolution2)
 	else
-		return v4 or v5
+		return timeSolution1 or timeSolution2
 	end
 end
-function t.offsetLookAtTarget(p1, p2, p3, p4, p5, p6)
-	if p6 == 0 then
+function module.offsetLookAtTarget(observerDistance, observerSize, targetOffsetX, targetOffsetY, targetSize, cameraOffsetZ)
+	if cameraOffsetZ == 0 then
 		return 0, 0
 	else
-		local v1 = p4 * p4 + p6 * p6
-		local v2 = p6 < 0 and math.atan(p4 / p6) or math.pi - math.atan(-p4 / p6)
-		local v4 = v2 + (p1 * p1 < v1 and math.asin(p1 / v1 ^ 0.5) or math.asin(v1 ^ 0.5 / p1))
-		local v5 = p6 * math.cos(v4) + p4 * math.sin(v4)
-		local v6 = p5 * p5 + v5 * v5
-		local v7 = v5 < 0 and math.atan(-p5 / v5) or math.atan(p5 / v5)
-		return v4, v7 - (p2 * p2 < v6 and math.asin(p2 / v6 ^ 0.5) or math.asin(v6 ^ 0.5 / p2))
+		local radiusSquared = targetOffsetY * targetOffsetY + cameraOffsetZ * cameraOffsetZ
+		local azimuthAngle = cameraOffsetZ < 0 and math.atan(targetOffsetY / cameraOffsetZ) or math.pi - math.atan(-targetOffsetY / cameraOffsetZ)
+		local elevationAngle = azimuthAngle + (observerDistance * observerDistance < radiusSquared and math.asin(observerDistance / radiusSquared ^ 0.5) or math.asin(radiusSquared ^ 0.5 / observerDistance))
+		local projectedRadius = cameraOffsetZ * math.cos(elevationAngle) + targetOffsetY * math.sin(elevationAngle)
+		local finalRadiusSquared = targetSize * targetSize + projectedRadius * projectedRadius
+		local finalAzimuthAngle = projectedRadius < 0 and math.atan(-targetSize / projectedRadius) or math.atan(targetSize / projectedRadius)
+		return elevationAngle, finalAzimuthAngle - (observerSize * observerSize < finalRadiusSquared and math.asin(observerSize / finalRadiusSquared ^ 0.5) or math.asin(finalRadiusSquared ^ 0.5 / observerSize))
 	end
 end
-function t.generate2DPointClockwiseComparisonFunction(p1)
-	local v1 = p1 or Vector2.zero
-	assert(typeof(v1) == "Vector2", "optionalCenter must be a Vector2")
-	return function(p1, p2)
-		local v12 = p1 - v1
-		local v2 = p2 - v1
-		if v12.X >= 0 and v2.X < 0 then
+function module.generate2DPointClockwiseComparisonFunction(optionalCenter)
+	local center = optionalCenter or Vector2.zero
+	assert(typeof(center) == "Vector2", "optionalCenter must be a Vector2")
+	return function(point1, point2)
+		local point1Relative = point1 - center
+		local point2Relative = point2 - center
+		if point1Relative.X >= 0 and point2Relative.X < 0 then
 			return true
-		elseif v12.X < 0 and v2.X >= 0 then
+		elseif point1Relative.X < 0 and point2Relative.X >= 0 then
 			return false
 		else
-			if math.abs(v12.X) <= 0.001 and math.abs(v2.X) <= 0.001 then
-				if v12.Y >= 0 or v2.Y >= 0 then
-					return p1.Y > p2.Y
+			if math.abs(point1Relative.X) <= 0.001 and math.abs(point2Relative.X) <= 0.001 then
+				if point1Relative.Y >= 0 or point2Relative.Y >= 0 then
+					return point1.Y > point2.Y
 				else
-					return p2.Y > p1.Y
+					return point2.Y > point1.Y
 				end
 			else
-				local v3, v4
-				v3 = v12:Cross(v2)
-				if v3 < 0 then
+				local crossProduct, isLarger
+				crossProduct = point1Relative:Cross(point2Relative)
+				if crossProduct < 0 then
 					return true
-				elseif v3 > 0 then
+				elseif crossProduct > 0 then
 					return false
 				else
-					v4 = v12.Magnitude > v2.Magnitude
-					return v4
+					isLarger = point1Relative.Magnitude > point2Relative.Magnitude
+					return isLarger
 				end
 			end
 		end
 	end
 end
-function t.yieldNPointsOnSphere(p1)
-	local v1 = 2 / p1
-	local v2 = 1
+function module.yieldNPointsOnSphere(pointCount)
+	local verticalStep = 2 / pointCount
+	local currentIndex = 1
 	return function()
-		v2 = v2 + 1
-		if v2 <= p1 then
-			local v12 = v2 * v1 - 1 + v1 / 2
-			if v12 > 1 then
-				v12 = 1
+		currentIndex = currentIndex + 1
+		if currentIndex <= pointCount then
+			local normalizedHeight = currentIndex * verticalStep - 1 + verticalStep / 2
+			if normalizedHeight > 1 then
+				normalizedHeight = 1
 			end
-			local v22 = math.sqrt(1 - v12 * v12)
-			local v3 = v2 % p1 * 2.399963229728653
-			return math.cos(v3) * v22, v12, math.sin(v3) * v22, v2
+			local horizontalRadius = math.sqrt(1 - normalizedHeight * normalizedHeight)
+			local azimuthAngle = currentIndex % pointCount * 2.399963229728653
+			return math.cos(azimuthAngle) * horizontalRadius, normalizedHeight, math.sin(azimuthAngle) * horizontalRadius, currentIndex
 		end
 	end
 end
-function t.catmullRomSplinePoint(p1, p2, p3, p4, p5)
-	local v1 = p5 * p5
-	local v2 = v1 * p5
-	local v3 = (-v2 + v1 * 2 - p5) * 0.5
-	local v4 = (v2 * 3 - v1 * 5 + 2) * 0.5
-	local v5 = (v2 * -3 + v1 * 4 + p5) * 0.5
-	local v6 = (v2 - v1) * 0.5
-	return Vector3.new(v3 * p1.X + v4 * p2.X + v5 * p3.X + v6 * p4.X, v3 * p1.Y + v4 * p2.Y + v5 * p3.Y + v6 * p4.Y, v3 * p1.Z + v4 * p2.Z + v5 * p3.Z + v6 * p4.Z)
+function module.catmullRomSplinePoint(point0, point1, point2, point3, t)
+	local tSquared = t * t
+	local tCubed = tSquared * t
+	local basisP0 = (-tCubed + tSquared * 2 - t) * 0.5
+	local basisP1 = (tCubed * 3 - tSquared * 5 + 2) * 0.5
+	local basisP2 = (tCubed * -3 + tSquared * 4 + t) * 0.5
+	local basisP3 = (tCubed - tSquared) * 0.5
+	return Vector3.new(basisP0 * point0.X + basisP1 * point1.X + basisP2 * point2.X + basisP3 * point3.X, basisP0 * point0.Y + basisP1 * point1.Y + basisP2 * point2.Y + basisP3 * point3.Y, basisP0 * point0.Z + basisP1 * point1.Z + basisP2 * point2.Z + basisP3 * point3.Z)
 end
-function t.getNCatmullRomSplinePoints(p1, p2, p3, p4, p5)
-	local v1 = p5 or 100
-	assert(v1)
-	local t2 = {}
-	for i = 1, v1 do
-		table.insert(t2, (t.catmullRomSplinePoint(p1, p2, p3, p4, (i - 1) / (v1 - 1))))
+function module.getNCatmullRomSplinePoints(point0, point1, point2, point3, pointCount)
+	local count = pointCount or 100
+	assert(count)
+	local splinePoints = {}
+	for i = 1, count do
+		table.insert(splinePoints, (module.catmullRomSplinePoint(point0, point1, point2, point3, (i - 1) / (count - 1))))
 	end
-	return t2
+	return splinePoints
 end
-function t.yieldNCatmullRomSplinePoints(p1, p2, p3, p4, p5)
-	local v1 = p5 or 100
-	assert(v1)
-	local v3 = 1
+function module.yieldNCatmullRomSplinePoints(point0, point1, point2, point3, pointCount)
+	local count = pointCount or 100
+	assert(count)
+	local currentIndex = 1
 	return function()
-		if v3 <= v1 then
-			local v2 = t.catmullRomSplinePoint(p1, p2, p3, p4, (v3 - 1) / (v1 - 1))
-			v3 = v3 + 1
-			return v2, v3
+		if currentIndex <= count then
+			local splinePoint = module.catmullRomSplinePoint(point0, point1, point2, point3, (currentIndex - 1) / (count - 1))
+			currentIndex = currentIndex + 1
+			return splinePoint, currentIndex
 		end
 	end
 end
-function t.stepAlongPath(p1, p2, p3, p4)
-	while p4 > 0 do
-		local v2 = p2 + 1 <= #p1 and p2 + 1 or 1
-		local Magnitude = (p1[p2]:Lerp(p1[(p2 + 1 - 1) % #p1 + 1], p3) - p1[v2]).Magnitude
-		if p4 < Magnitude then
-			p4 = 0
-			p3 = p3 + p4 / Magnitude * (1 - p3)
+function module.stepAlongPath(pathPoints, currentWaypoint, currentT, remainingDistance)
+	while remainingDistance > 0 do
+		local nextWaypoint = currentWaypoint + 1 <= #pathPoints and currentWaypoint + 1 or 1
+		local Magnitude = (pathPoints[currentWaypoint]:Lerp(pathPoints[(currentWaypoint + 1 - 1) % #pathPoints + 1], currentT) - pathPoints[nextWaypoint]).Magnitude
+		if remainingDistance < Magnitude then
+			remainingDistance = 0
+			currentT = currentT + remainingDistance / Magnitude * (1 - currentT)
 		else
-			p4, p2, p3 = p4 - Magnitude, v2, 0
+			remainingDistance, currentWaypoint, currentT = remainingDistance - Magnitude, nextWaypoint, 0
 		end
 	end
-	return p2, p3
+	return currentWaypoint, currentT
 end
-function t.getDepthForWidth(p1, p2, p3)
-	local ViewportSize = p3.ViewportSize
-	return 0.5 * ViewportSize.X * p1 / (p2 * (ViewportSize.X / ViewportSize.Y * math.tan(math.rad(p3.FieldOfView) / 2)))
+function module.getDepthForWidth(width, focalLength, camera)
+	local ViewportSize = camera.ViewportSize
+	return 0.5 * ViewportSize.X * width / (focalLength * (ViewportSize.X / ViewportSize.Y * math.tan(math.rad(camera.FieldOfView) / 2)))
 end
-function t.transformRange(p1, p2, p3, p4, p5)
-	return p4 + (p1 - p2) * (p5 - p4) / (p3 - p2)
+function module.transformRange(value, oldMinimum, oldMaximum, newMinimum, newMaximum)
+	return newMinimum + (value - oldMinimum) * (newMaximum - newMinimum) / (oldMaximum - oldMinimum)
 end
-return t
+return module

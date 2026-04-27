@@ -1,31 +1,29 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("ServerStorage")
 local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
 local Binder = require(ReplicatedStorage.Std.Binder)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Promise = require(ReplicatedStorage.Std.Promise)
-Binder.new("ShootingRangeTarget", function(p1)
-	local v1 = Maid.new()
+Binder.new("ShootingRangeTarget", function(shootingRangeTarget)
+	local cleanupMaid = Maid.new()
 	local isEnabled = true
-	local v3 = nil
-	v1:GiveTask(function()
+	local togglePromise = nil
+	cleanupMaid:GiveTask(function()
 		isEnabled = false
-		if v3 then
-			v3:cancel()
+		if togglePromise then
+			togglePromise:cancel()
 		end
 	end)
-	v1:GivePromise(DoorUtils.promiseInnerModel(p1):andThen(function(p12)
+	cleanupMaid:GivePromise(DoorUtils.promiseInnerModel(shootingRangeTarget):andThen(function(innerModel)
 		task.wait(0.5)
-		local ShootingRangePart = p12:FindFirstChild("ShootingRangePart")
+		local ShootingRangePart = innerModel:FindFirstChild("ShootingRangePart")
 		if ShootingRangePart then
 			ShootingRangePart.CanCollide = true
 		end
 		while isEnabled do
-			v3 = Promise.resolve():andThenCall(DoorUtils.setOpen, p1, not DoorUtils.getOpen(p1)):andThenCall(Promise.delay, DoorUtils.getDuration(p1) or 1)
-			v3:await()
+			togglePromise = Promise.resolve():andThenCall(DoorUtils.setOpen, shootingRangeTarget, not DoorUtils.getOpen(shootingRangeTarget)):andThenCall(Promise.delay, DoorUtils.getDuration(shootingRangeTarget) or 1)
+			togglePromise:await()
 		end
 	end))
-	return v1
+	return cleanupMaid
 end):Start()

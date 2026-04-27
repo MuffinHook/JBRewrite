@@ -1,4 +1,3 @@
--- Reviewed by Claude
 game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -25,27 +24,27 @@ return {
 				WalmartGui.Background.Buy.Activated:Connect(function()
 					GamepassUtils.PromptGamepass(GamepassUtils.EnumGamepass.Walmart)
 				end)
-				Binder.new("WalmartPurchaseRegion", function(p1)
-					local instance = Maid.new()
-					local instance2 = Maid.new()
-					local instance3 = Region.new(RegionUtils.ConditionPlayer)
-					instance3:AddPart(p1)
-					instance:GiveTask(instance3)
-					instance:GiveTask(instance3.OnObjAdded:Connect(function(p1)
-						instance2:DoCleaning()
+				Binder.new("WalmartPurchaseRegion", function(regionPart)
+					local regionMaid = Maid.new()
+					local displayStateMaid = Maid.new()
+					local playerDetectionRegion = Region.new(RegionUtils.ConditionPlayer)
+					playerDetectionRegion:AddPart(regionPart)
+					regionMaid:GiveTask(playerDetectionRegion)
+					regionMaid:GiveTask(playerDetectionRegion.OnObjAdded:Connect(function(addedObject)
+						displayStateMaid:DoCleaning()
 						if not GamepassSystem.doesPlayerOwnCached(Players.LocalPlayer, GamepassUtils.EnumGamepass.Walmart) then
 							WalmartGui.Enabled = true
-							instance2:GiveTask(task.delay(2, function()  end))
+							displayStateMaid:GiveTask(task.delay(2, function()  end))
 						end
 					end))
-					instance:GiveTask(instance3.OnObjRemoved:Connect(function(p1)
-						instance2:DoCleaning()
+					regionMaid:GiveTask(playerDetectionRegion.OnObjRemoved:Connect(function(removedObject)
+						displayStateMaid:DoCleaning()
 						WalmartGui.Enabled = false
 					end))
-					instance:GiveTask(Interval.every(0.3333333333333333):Connect(function()
-						instance3:Update({ Players.LocalPlayer })
+					regionMaid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
+						playerDetectionRegion:Update({ Players.LocalPlayer })
 					end))
-					return instance
+					return regionMaid
 				end):Start()
 				GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.Walmart):Connect(function()
 					WalmartGui.Enabled = false

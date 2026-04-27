@@ -1,50 +1,49 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
-	addWaypoint = function(p1, p2)
-		assert(if p2.position == nil then p2.part ~= nil else true, "missing position or part")
-		assert(p2.priority ~= nil, "missing priority")
-		assert(p2.name ~= nil, "missing name")
-		local v4 = table.clone(p1)
-		for i = #v4, 1, -1 do
-			if v4[i].name == p2.name then
-				table.remove(v4, i)
+	addWaypoint = function(currentWaypoints, waypointData)
+		assert(if waypointData.position == nil then waypointData.part ~= nil else true, "missing position or part")
+		assert(waypointData.priority ~= nil, "missing priority")
+		assert(waypointData.name ~= nil, "missing name")
+		local updatedWaypoints = table.clone(currentWaypoints)
+		for i = #updatedWaypoints, 1, -1 do
+			if updatedWaypoints[i].name == waypointData.name then
+				table.remove(updatedWaypoints, i)
 				break
 			end
 		end
-		local v5 = #v4 + 1
-		for j = 1, #v4 do
-			if v4[j].priority > p2.priority then
-				v5 = j
+		local insertionIndex = #updatedWaypoints + 1
+		for j = 1, #updatedWaypoints do
+			if updatedWaypoints[j].priority > waypointData.priority then
+				insertionIndex = j
 				break
 			end
 		end
-		table.insert(v4, v5, {
-			position = p2.position,
-			part = p2.part,
-			priority = p2.priority,
-			name = p2.name,
-			minDist = p2.minDist or 48,
-			message = p2.message
+		table.insert(updatedWaypoints, insertionIndex, {
+			position = waypointData.position,
+			part = waypointData.part,
+			priority = waypointData.priority,
+			name = waypointData.name,
+			minDist = waypointData.minDist or 48,
+			message = waypointData.message
 		})
-		return v4
+		return updatedWaypoints
 	end,
-	removeWaypointByName = function(p1, p2)
-		assert(p2.name ~= nil, "missing name")
-		local v2 = table.clone(p1)
-		for i = #v2, 1, -1 do
-			if v2[i].name == p2.name then
-				table.remove(v2, i)
-				return v2
+	removeWaypointByName = function(currentWaypoints, waypointData)
+		assert(waypointData.name ~= nil, "missing name")
+		local updatedWaypoints = table.clone(currentWaypoints)
+		for i = #updatedWaypoints, 1, -1 do
+			if updatedWaypoints[i].name == waypointData.name then
+				table.remove(updatedWaypoints, i)
+				return updatedWaypoints
 			end
 		end
-		return v2
+		return updatedWaypoints
 	end,
-	removeWaypointCurrent = function(p1)
-		local v1 = table.clone(p1)
-		if #v1 > 0 then
-			table.remove(v1, #v1)
+	removeWaypointCurrent = function(currentWaypoints)
+		local updatedWaypoints = table.clone(currentWaypoints)
+		if #updatedWaypoints > 0 then
+			table.remove(updatedWaypoints, #updatedWaypoints)
 		end
-		return v1
+		return updatedWaypoints
 	end
 })

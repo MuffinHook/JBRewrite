@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
@@ -7,14 +6,14 @@ local topBarButtonsComponent = require(script.Parent.topBarButtonsComponent)
 local SafeComponent = require(script.Parent.SafeComponent)
 local paddedScrollingGrid = require(script.Parent.paddedScrollingGrid)
 local color = Roact.PureComponent:extend("SafesInventory")
-function color.render(p1)
-	local color = Color3.new(51/255, 51/255, 51/255)
+function color.render(props)
+	local darkGrayColor = Color3.new(51/255, 51/255, 51/255)
 	return createElement("Frame", {
 		BackgroundTransparency = 0.8,
 		BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
-		Size = p1.props.size,
-		Position = p1.props.position,
-		AnchorPoint = p1.props.anchorPoint
+		Size = props.size,
+		Position = props.position,
+		AnchorPoint = props.anchorPoint
 	}, {
 		Container = createElement(PaddedContainer, {
 			backgroundTransparency = 1,
@@ -22,7 +21,7 @@ function color.render(p1)
 			verticalPaddingRatio = 128
 		}, {
 			TopBar = createElement(PaddedContainer, {
-				backgroundColor = color,
+				backgroundColor = darkGrayColor,
 				paddingTop = 0,
 				paddingLeft = 0,
 				paddingRight = 0,
@@ -58,13 +57,13 @@ function color.render(p1)
 					Buttons = createElement(topBarButtonsComponent, {
 						exposePaddedContainerProps = true,
 						nextPageTitle = "BUY SAFES",
-						onSelectToggle = p1.props.onSelectBuySafes,
-						onSelectExit = p1.props.onSelectExit
+						onSelectToggle = props.onSelectBuySafes,
+						onSelectExit = props.onSelectExit
 					})
 				})
 			}),
 			Left = createElement(PaddedContainer, {
-				backgroundColor = color,
+				backgroundColor = darkGrayColor,
 				paddingTop = 0.5,
 				paddingLeft = 0,
 				paddingRight = 0.5,
@@ -81,12 +80,12 @@ function color.render(p1)
 					rowsPerPage = 4.5,
 					colsPerRow = 1,
 					component = SafeComponent,
-					items = p1.props.sidebarItems,
-					metadata = p1.props.sidebarItemMetadata
+					items = props.sidebarItems,
+					metadata = props.sidebarItemMetadata
 				})
 			}),
 			Body = createElement(PaddedContainer, {
-				backgroundColor = color,
+				backgroundColor = darkGrayColor,
 				paddingTop = 0.5,
 				paddingLeft = 0.5,
 				paddingRight = 0.5,
@@ -103,8 +102,8 @@ function color.render(p1)
 					rowsPerPage = 3.5,
 					colsPerRow = 6,
 					component = SafeComponent,
-					items = p1.props.items,
-					metadata = p1.props.itemMetadata
+					items = props.items,
+					metadata = props.itemMetadata
 				})
 			})
 		}),

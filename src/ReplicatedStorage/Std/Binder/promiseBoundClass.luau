@@ -1,33 +1,31 @@
--- Reviewed by Claude
--- variables reassigned
 local Promise = require(script.Parent.Parent.Promise)
 local Maid = require(script.Parent.Parent.Maid)
-return function(p1, p2)
-	local v1 = debug.traceback()
-	local v2 = p1:Get(p2)
-	if v2 then
-		return Promise.resolve(v2)
+return function(binder, instance)
+	local tracebackStack = debug.traceback()
+	local existingInstance = binder:Get(instance)
+	if existingInstance then
+		return Promise.resolve(existingInstance)
 	else
-		local v3 = Maid.new()
-		local v4 = Promise.defer(function(p12)
-			local v1 = p1:Get(p2)
-			if v1 then
-				p12(v1)
+		local cleanupMaid = Maid.new()
+		local instancePromise = Promise.defer(function(resolver)
+			local resolvedValue = binder:Get(instance)
+			if resolvedValue then
+				resolver(resolvedValue)
 			else
-				v3:GiveTask(p1:ObserveInstance(p2, function(p1)
-					p12(p1)
+				cleanupMaid:GiveTask(binder:ObserveInstance(instance, function(observedInstance)
+					resolver(observedInstance)
 				end))
 			end
 		end)
-		v4:finally(function()
-			v3:Destroy()
+		instancePromise:finally(function()
+			cleanupMaid:Destroy()
 		end)
 		task.delay(5, function()
-			if v4:getStatus() == Promise.Status.Started then
-				warn(("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n"):format(p2:GetFullName(), p1:GetTag()))
-				warn(v1)
+			if instancePromise:getStatus() == Promise.Status.Started then
+				warn(("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n"):format(instance:GetFullName(), binder:GetTag()))
+				warn(tracebackStack)
 			end
 		end)
-		return v4
+		return instancePromise
 	end
 end

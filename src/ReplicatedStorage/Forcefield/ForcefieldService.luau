@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ForcefieldConsts = require(ReplicatedStorage.Forcefield.ForcefieldConsts)
 local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)

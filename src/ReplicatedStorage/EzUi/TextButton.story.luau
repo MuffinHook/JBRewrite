@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 return function(parent)
 	local textBinding, setTextBinding = Roact.createBinding("hello, world!")

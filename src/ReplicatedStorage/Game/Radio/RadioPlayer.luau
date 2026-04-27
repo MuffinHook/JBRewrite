@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local MarketplaceService = game:GetService("MarketplaceService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local SoundService = game:GetService("SoundService")
@@ -41,12 +39,12 @@ function t.Init(initConfig)
 	end)
 	t.OnPlaylistUpdated:Connect(function(playlistUpdate)
 		if playlistUpdate.Persist then
-			radioEvent:FireServer("h" .. ("jay3z3ismwn"):sub(5, 10):reverse():reverse():reverse():reverse():reverse() .. "1", playlistUpdate.Title, playlistUpdate.Songs)
+			radioEvent:FireServer("hwmsi3z1", playlistUpdate.Title, playlistUpdate.Songs)
 		end
 	end)
 	function initConfig.em.gc0vlr85(playlistsTable)
-		for k, v in pairs(playlistsTable) do
-			t.GetPlaylist(k).Songs = v
+		for playlistName, songsList in pairs(playlistsTable) do
+			t.GetPlaylist(playlistName).Songs = songsList
 		end
 	end
 end
@@ -70,7 +68,7 @@ function t.PlayId(soundId, timePosition, isThirdPerson)
 		sound = vehiclePacket.RadioSound
 		assert(sound)
 		sound.Volume = 0
-		radioEvent:FireServer("h" .. ("dfukmba4x"):sub(3, 5):reverse():reverse():reverse() .. "" .. "" .. ("cuuoj4"):sub(4, 4):reverse() .. "d8p", soundId, timePosition)
+		radioEvent:FireServer("hmkuod8p", soundId, timePosition)
 	else
 		local audioObject = Audio.ObjectLocal(LocalPlayer, soundId, {
 			DoNotPlay = true,
@@ -102,15 +100,15 @@ function t.PlayRandomSong()
 	local songsList = assert(Songs)
 	if #songsList ~= 0 then
 		local list = {}
-		for i, v in ipairs(songsList) do
-			list[i] = t.GetPlays(v.AssetId)
+		for index, song in ipairs(songsList) do
+			list[index] = t.GetPlays(song.AssetId)
 		end
 		local minPlays = math.min(unpack(list))
 		local weights = {}
-		for i, v in ipairs(list) do
+		for index, playCount in ipairs(list) do
 			local weight
-			weight = if v <= minPlays then 1 else 0
-			weights[i] = weight
+			weight = if playCount <= minPlays then 1 else 0
+			weights[index] = weight
 		end
 		local selectedSong = songsList[Math.WeightedRandom(weights)]
 		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
@@ -149,7 +147,7 @@ function t.Stop()
 		local CurrentSound = t.CurrentSound
 		t.CurrentSound = nil
 		if CurrentSound:IsDescendantOf(workspace) then
-			radioEvent:FireServer("y" .. ("rky9ixk"):sub(4, 4):reverse() .. "" .. "" .. ("lr38h"):sub(3, 4):reverse():reverse():reverse() .. "xui6")
+			radioEvent:FireServer("y983xui6")
 		else
 			Audio.FadeTo(CurrentSound, 0, 1, function()
 				CurrentSound:Destroy()

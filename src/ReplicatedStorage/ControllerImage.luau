@@ -1,10 +1,8 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local Roact = require(script.Parent.Roact)
-local t = {}
+local controllerImageModule = {}
 local controllerImageIds = {
 	ButtonA = "rbxassetid://129272408813511",
 	ButtonCross = "rbxassetid://123705746509283",
@@ -42,60 +40,60 @@ local controllerImageIds = {
 	PSDPadRight = "rbxassetid://125339474802706",
 	PSDPadLeft = "rbxassetid://116409886750178"
 }
-local function getImageIdForKeyCode(p1)
+local function getImageIdForKeyCode(keyCode)
 	local isPSController = UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross"
-	local keyCodeString = UserInputService:GetStringForKeyCode(p1)
+	local keyCodeString = UserInputService:GetStringForKeyCode(keyCode)
 	if isPSController and keyCodeString:find("DPad") then
 		keyCodeString = "PS" .. keyCodeString
 	end
-	return controllerImageIds[keyCodeString] or UserInputService:GetImageForKeyCode(p1)
+	return controllerImageIds[keyCodeString] or UserInputService:GetImageForKeyCode(keyCode)
 end
-local function getImageInstance(p1, p2, p3)
-	local instance = Instance.new(p1)
+local function getImageInstance(instanceType, keyCode, unused)
+	local instance = Instance.new(instanceType)
 	instance.BackgroundTransparency = 1
 	instance.BorderSizePixel = 1
-	instance.Image = UserInputService:GetImageForKeyCode(p2)
+	instance.Image = UserInputService:GetImageForKeyCode(keyCode)
 	instance.Size = UDim2.fromScale(1, 1)
 	return instance
 end
-function t.GetImageLabel(p1, p2, p3)
+function controllerImageModule.GetImageLabel(unused, keyCode, unused2)
 	local ImageLabel = Instance.new("ImageLabel")
 	ImageLabel.BackgroundTransparency = 1
 	ImageLabel.BorderSizePixel = 1
-	ImageLabel.Image = UserInputService:GetImageForKeyCode(p2)
+	ImageLabel.Image = UserInputService:GetImageForKeyCode(keyCode)
 	ImageLabel.Size = UDim2.fromScale(1, 1)
 	return ImageLabel
 end
-function t.GetImageButton(p1, p2, p3)
+function controllerImageModule.GetImageButton(unused, keyCode, unused2)
 	local ImageButton = Instance.new("ImageButton")
 	ImageButton.BackgroundTransparency = 1
 	ImageButton.BorderSizePixel = 1
-	ImageButton.Image = UserInputService:GetImageForKeyCode(p2)
+	ImageButton.Image = UserInputService:GetImageForKeyCode(keyCode)
 	ImageButton.Size = UDim2.fromScale(1, 1)
 	return ImageButton
 end
-local function getRoactImageInstance(p1, p2, p3, p4, p5)
+local function getRoactImageInstance(componentType, keyCode, unused, props, children)
 	local elementProps = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		Image = getImageIdForKeyCode(p2),
+		Image = getImageIdForKeyCode(keyCode),
 		Size = UDim2.new(1, 0, 1, 0)
 	}
-	if not p5 then
-		p5 = {}
+	if not children then
+		children = {}
 	end
-	if not p5.AspectRatio then
-		p5.AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
+	if not children.AspectRatio then
+		children.AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
 			AspectRatio = 1
 		})
 	end
-	return Roact.createElement(p1, Dictionary.merge(elementProps, p4), p5)
+	return Roact.createElement(componentType, Dictionary.merge(elementProps, props), children)
 end
-function t.GetRoactImageLabel(p1, p2, p3, p4, p5)
-	return getRoactImageInstance("ImageLabel", p2, p3, p4, p5)
+function controllerImageModule.GetRoactImageLabel(unused, keyCode, unused2, props, children)
+	return getRoactImageInstance("ImageLabel", keyCode, unused2, props, children)
 end
-function t.GetRoactImageButton(p1, p2, p3, p4, p5)
-	return getRoactImageInstance("ImageButton", p2, p3, p4, p5)
+function controllerImageModule.GetRoactImageButton(unused, keyCode, unused2, props, children)
+	return getRoactImageInstance("ImageButton", keyCode, unused2, props, children)
 end
-t.getImageIdForKeyCode = getImageIdForKeyCode
-return t
+controllerImageModule.getImageIdForKeyCode = getImageIdForKeyCode
+return controllerImageModule

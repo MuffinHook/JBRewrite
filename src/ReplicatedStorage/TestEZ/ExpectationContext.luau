@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Expectation = require(script.Parent.Expectation)
 local checkMatcherNameCollisions = Expectation.checkMatcherNameCollisions
 local function copy(table)

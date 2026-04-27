@@ -1,19 +1,18 @@
--- Reviewed by Claude
-local t = {
-	studsToKm = function(p1)
-		return p1 / 3 / 1000
+local SpeedometerUtils = {
+	studsToKm = function(studs)
+		return studs / 3 / 1000
 	end,
-	kmToStuds = function(p1)
-		return p1 * 3 * 1000
+	kmToStuds = function(km)
+		return km * 3 * 1000
 	end
 }
-function t.studsToMi(p1)
-	return t.studsToKm(p1) * 0.621371
+function SpeedometerUtils.studsToMi(studs)
+	return SpeedometerUtils.studsToKm(studs) * 0.621371
 end
-function t.miToStuds(p1)
-	return t.kmToStuds(p1 / 0.621371)
+function SpeedometerUtils.miToStuds(miles)
+	return SpeedometerUtils.kmToStuds(miles / 0.621371)
 end
-function t.sToH(p1)
-	return p1 * 60 * 60
+function SpeedometerUtils.sToH(seconds)
+	return seconds * 60 * 60
 end
-return t
+return SpeedometerUtils

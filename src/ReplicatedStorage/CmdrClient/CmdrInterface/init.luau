@@ -1,23 +1,21 @@
--- Reviewed by Claude
--- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
-return function(p1)
-	local Util = p1.Util
+return function(cmdr)
+	local Util = cmdr.Util
 	local Window = require(script:WaitForChild("Window"))
-	Window.Cmdr = p1
-	local AutoComplete = require(script:WaitForChild("AutoComplete"))(p1)
+	Window.Cmdr = cmdr
+	local AutoComplete = require(script:WaitForChild("AutoComplete"))(cmdr)
 	Window.AutoComplete = AutoComplete
 	function Window.ProcessEntry(inputText)
 		local TrimmedInput = Util.TrimString(inputText)
 		if #TrimmedInput ~= 0 then
 			Window:AddLine(Window:GetLabel() .. " " .. TrimmedInput, Color3.fromRGB(255, 223, 93))
-			Window:AddLine(p1.Dispatcher:EvaluateAndRun(TrimmedInput, LocalPlayer, {
+			Window:AddLine(cmdr.Dispatcher:EvaluateAndRun(TrimmedInput, LocalPlayer, {
 				IsHuman = true
 			}))
 		end
 	end
 	function Window.OnTextChanged(inputText)
-		local EvalResult = p1.Dispatcher:Evaluate(inputText, LocalPlayer, true)
+		local EvalResult = cmdr.Dispatcher:Evaluate(inputText, LocalPlayer, true)
 		local Args = Util.SplitString(inputText)
 		local CommandName = table.remove(Args, 1)
 		local ArgsMatch
@@ -91,7 +89,7 @@ return function(p1)
 			end
 		elseif CommandName and #Args == 0 then
 			Window:SetIsValidInput(true)
-			local FoundCommand = p1.Registry:GetCommand(CommandName)
+			local FoundCommand = cmdr.Registry:GetCommand(CommandName)
 			local FirstArgSuggestion = nil
 			if FoundCommand then
 				local FirstArg = FoundCommand.Args and FoundCommand.Args[1]
@@ -114,9 +112,9 @@ return function(p1)
 				Window:SetIsValidInput(false, ("%q is not a valid command name. Use the help command to see all available commands."):format(CommandName))
 			end
 			local Suggestions = { FirstArgSuggestion }
-			for k, v in pairs(p1.Registry:GetCommandNames()) do
+			for k, v in pairs(cmdr.Registry:GetCommandNames()) do
 				if CommandName:lower() == v:lower():sub(1, #CommandName) and (FirstArgSuggestion == nil or FirstArgSuggestion[1] ~= CommandName) then
-					local MatchedCommand = p1.Registry:GetCommand(v)
+					local MatchedCommand = cmdr.Registry:GetCommand(v)
 					Suggestions[#Suggestions + 1] = {
 						CommandName,
 						v,

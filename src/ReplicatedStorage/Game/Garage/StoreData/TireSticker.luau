@@ -1,24 +1,23 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local function GetInstance(p1)
-	local v1 = ReplicatedStorage.Resource.TireMesh.Classic:Clone()
-	v1.Color = Color3.fromRGB(27, 42, 53)
-	v1.CFrame = CFrame.new(0, 0, 0)
-	if p1.TextureId then
+local function GetInstance(stickerConfig)
+	local clonedTire = ReplicatedStorage.Resource.TireMesh.Classic:Clone()
+	clonedTire.Color = Color3.fromRGB(27, 42, 53)
+	clonedTire.CFrame = CFrame.new(0, 0, 0)
+	if stickerConfig.TextureId then
 		local Decal = Instance.new("Decal")
 		Decal.Color3 = Color3.new(255/255, 255/255, 255/255)
 		Decal.Face = Enum.NormalId.Left
-		Decal.Texture = ("rbxassetid://%d"):format(p1.TextureId)
-		Decal.Parent = v1
-		local v2 = Decal:Clone()
-		v2.Face = Enum.NormalId.Right
-		v2.Parent = v1
+		Decal.Texture = ("rbxassetid://%d"):format(stickerConfig.TextureId)
+		Decal.Parent = clonedTire
+		local rightDecal = Decal:Clone()
+		rightDecal.Face = Enum.NormalId.Right
+		rightDecal.Parent = clonedTire
 	end
-	return v1
+	return clonedTire
 end
-local function Update(p1, p2)
-	local v1 = os.clock() / 2
-	p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.5, 0, 0) * CFrame.new(0, 0, 3)
+local function Update(tireInstance, updateDelta)
+	local elapsedTime = os.clock() / 2
+	tireInstance.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, 3)
 end
 return {
 	Items = {

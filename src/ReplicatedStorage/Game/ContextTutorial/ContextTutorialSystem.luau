@@ -1,13 +1,12 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Binder = require(ReplicatedStorage.Std.Binder)
 return {
 	init = function()
-		local t = {}
-		for i, v in ipairs(script.Parent.Module:GetChildren()) do
-			local v1 = Binder.new(v.Name, require(v.Class))
-			v1:Start()
-			table.insert(t, v1)
+		local binders = {}
+		for i, module in ipairs(script.Parent.Module:GetChildren()) do
+			local moduleBinder = Binder.new(module.Name, require(module.Class))
+			moduleBinder:Start()
+			table.insert(binders, moduleBinder)
 		end
 	end
 }

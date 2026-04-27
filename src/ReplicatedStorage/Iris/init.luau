@@ -1,42 +1,41 @@
--- Reviewed by Claude
 require(script.Types)
-local t = {}
-local module = require(script.Internal)(t)
-t.Disabled = false
-t.Args = {}
-t.Events = {}
-function t.Init(p1, p2, p3)
+local iris = {}
+local module = require(script.Internal)(iris)
+iris.Disabled = false
+iris.Args = {}
+iris.Events = {}
+function iris.Init(parentInstance, eventSignal, forceReinit)
 	assert(module._shutdown == false, "Iris.Init() cannot be called once shutdown.")
-	assert(if module._started == false then true else p3 == true, "Iris.Init() can only be called once.")
+	assert(if module._started == false then true else forceReinit == true, "Iris.Init() can only be called once.")
 	if not module._started then
-		if p1 == nil then
-			p1 = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+		if parentInstance == nil then
+			parentInstance = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 		end
-		if p2 == nil then
-			p2 = game:GetService("RunService").Heartbeat
+		if eventSignal == nil then
+			eventSignal = game:GetService("RunService").Heartbeat
 		end
-		module.parentInstance = p1
+		module.parentInstance = parentInstance
 		module._started = true
 		module._generateRootInstance()
 		module._generateSelectionImageObject()
-		for var3, v4 in module._initFunctions do
-			v4()
+		for _, initFunction in module._initFunctions do
+			initFunction()
 		end
 		task.spawn(function()
-			if typeof(p2) == "function" then
+			if typeof(eventSignal) == "function" then
 				while module._started do
-					module._cycle((p2()))
+					module._cycle((eventSignal()))
 				end
-			elseif p2 ~= nil and p2 ~= false then
-				module._eventConnection = p2:Connect(function(...)
+			elseif eventSignal ~= nil and eventSignal ~= false then
+				module._eventConnection = eventSignal:Connect(function(...)
 					module._cycle(...)
 				end)
 			end
 		end)
 	end
-	return t
+	return iris
 end
-function t.Shutdown()
+function iris.Shutdown()
 	module._started = false
 	module._shutdown = true
 	if module._eventConnection then
@@ -52,196 +51,196 @@ function t.Shutdown()
 	if module.SelectionImageObject then
 		module.SelectionImageObject:Destroy()
 	end
-	for var12, v2 in module._connections do
-		v2:Disconnect()
+	for _, connection in module._connections do
+		connection:Disconnect()
 	end
 end
-function t.Connect(p1, p2)
+function iris.Connect(signalName, callback)
 	if module._started == false then
 		warn("Iris:Connect() was called before calling Iris.Init(); always initialise Iris first.")
 	end
-	local var12 = #module._connectedFunctions + 1
-	module._connectedFunctions[var12] = p2
+	local callbackIndex = #module._connectedFunctions + 1
+	module._connectedFunctions[callbackIndex] = callback
 	return function()
-		module._connectedFunctions[var12] = nil
+		module._connectedFunctions[callbackIndex] = nil
 	end
 end
-function t.Append(p1)
-	local var12 = module._GetParentWidget()
-	p1.Parent = module._config.Parent or module._widgets[var12.type].ChildAdded(var12, {
+function iris.Append(userInstance)
+	local parentWidget = module._GetParentWidget()
+	userInstance.Parent = module._config.Parent or module._widgets[parentWidget.type].ChildAdded(parentWidget, {
 		type = "userInstance"
 	})
 end
-function t.End()
+function iris.End()
 	if module._stackIndex == 1 then
 		error("Too many calls to Iris.End().", 2)
 	end
 	module._IDStack[module._stackIndex] = nil
-	local var12 = module
-	var12._stackIndex = var12._stackIndex - 1
+	local stackManager = module
+	stackManager._stackIndex = stackManager._stackIndex - 1
 end
-function t.ForceRefresh()
+function iris.ForceRefresh()
 	module._globalRefreshRequested = true
 end
-function t.UpdateGlobalConfig(p1)
-	for var12, v2 in p1 do
-		module._rootConfig[var12] = v2
+function iris.UpdateGlobalConfig(configTable)
+	for key, configValue in configTable do
+		module._rootConfig[key] = configValue
 	end
-	t.ForceRefresh()
+	iris.ForceRefresh()
 end
-function t.PushConfig(p1)
-	local var12 = t.State(-1)
-	if var12.value == -1 then
-		var12:set(p1)
-	elseif module._deepCompare(var12:get(), p1) == false then
-		var12:set(p1)
+function iris.PushConfig(newConfig)
+	local configState = iris.State(-1)
+	if configState.value == -1 then
+		configState:set(newConfig)
+	elseif module._deepCompare(configState:get(), newConfig) == false then
+		configState:set(newConfig)
 		module._refreshStack[module._refreshLevel] = true
-		local v2 = module
-		v2._refreshCounter = v2._refreshCounter + 1
+		local refreshManager = module
+		refreshManager._refreshCounter = refreshManager._refreshCounter + 1
 	end
-	local var3 = module
-	var3._refreshLevel = var3._refreshLevel + 1
-	module._config = setmetatable(p1, {
+	local levelManager = module
+	levelManager._refreshLevel = levelManager._refreshLevel + 1
+	module._config = setmetatable(newConfig, {
 		__index = module._config
 	})
 end
-function t.PopConfig()
-	local var12 = module
-	var12._refreshLevel = var12._refreshLevel - 1
+function iris.PopConfig()
+	local popManager = module
+	popManager._refreshLevel = popManager._refreshLevel - 1
 	if module._refreshStack[module._refreshLevel] == true then
-		local v2 = module
-		v2._refreshCounter = v2._refreshCounter - 1
+		local refreshCounter = module
+		refreshCounter._refreshCounter = refreshCounter._refreshCounter - 1
 		module._refreshStack[module._refreshLevel] = nil
 	end
 	module._config = getmetatable(module._config).__index
 end
-t.TemplateConfig = require(script.config)
-t.UpdateGlobalConfig(t.TemplateConfig.colorDark)
-t.UpdateGlobalConfig(t.TemplateConfig.sizeDefault)
-t.UpdateGlobalConfig(t.TemplateConfig.utilityDefault)
+iris.TemplateConfig = require(script.config)
+iris.UpdateGlobalConfig(iris.TemplateConfig.colorDark)
+iris.UpdateGlobalConfig(iris.TemplateConfig.sizeDefault)
+iris.UpdateGlobalConfig(iris.TemplateConfig.utilityDefault)
 module._globalRefreshRequested = false
-function t.PushId(p1)
-	assert(typeof(p1) == "string", "The ID argument to Iris.PushId() to be a string.")
+function iris.PushId(idString)
+	assert(typeof(idString) == "string", "The ID argument to Iris.PushId() to be a string.")
 	module._newID = true
-	table.insert(module._pushedIds, p1)
+	table.insert(module._pushedIds, idString)
 end
-function t.PopId()
+function iris.PopId()
 	if #module._pushedIds ~= 0 then
 		table.remove(module._pushedIds)
 	end
 end
-function t.SetNextWidgetID(p1)
-	module._nextWidgetId = p1
+function iris.SetNextWidgetID(widgetId)
+	module._nextWidgetId = widgetId
 end
-function t.State(p1)
-	local var12 = module._getID(2)
-	if module._states[var12] then
-		return module._states[var12]
+function iris.State(initialValue)
+	local stateID = module._getID(2)
+	if module._states[stateID] then
+		return module._states[stateID]
 	else
-		local t2 = {
-			ID = var12,
-			value = p1,
-			lastChangeTick = t.Internal._cycleTick,
+		local stateObject = {
+			ID = stateID,
+			value = initialValue,
+			lastChangeTick = iris.Internal._cycleTick,
 			ConnectedWidgets = {},
 			ConnectedFunctions = {}
 		}
-		setmetatable(t2, module.StateClass)
-		module._states[var12] = t2
-		return t2
+		setmetatable(stateObject, module.StateClass)
+		module._states[stateID] = stateObject
+		return stateObject
 	end
 end
-function t.WeakState(p1)
-	local var12 = module._getID(2)
-	if module._states[var12] then
-		if next(module._states[var12].ConnectedWidgets) == nil then
-			module._states[var12] = nil
+function iris.WeakState(initialValue)
+	local stateID = module._getID(2)
+	if module._states[stateID] then
+		if next(module._states[stateID].ConnectedWidgets) == nil then
+			module._states[stateID] = nil
 		else
-			return module._states[var12]
+			return module._states[stateID]
 		end
 	end
-	local t2 = {
-		ID = var12,
-		value = p1,
-		lastChangeTick = t.Internal._cycleTick,
+	local stateObject = {
+		ID = stateID,
+		value = initialValue,
+		lastChangeTick = iris.Internal._cycleTick,
 		ConnectedWidgets = {},
 		ConnectedFunctions = {}
 	}
-	setmetatable(t2, module.StateClass)
-	module._states[var12] = t2
-	return t2
+	setmetatable(stateObject, module.StateClass)
+	module._states[stateID] = stateObject
+	return stateObject
 end
-function t.VariableState(p1, p2)
-	local var12 = module._getID(2)
-	local v2 = module._states[var12]
-	if v2 then
-		if p1 ~= v2.value then
-			v2:set(p1)
+function iris.VariableState(variableValue, changeCallback)
+	local stateID = module._getID(2)
+	local existingState = module._states[stateID]
+	if existingState then
+		if variableValue ~= existingState.value then
+			existingState:set(variableValue)
 		end
-		return v2
+		return existingState
 	else
-		local t2 = {
-			ID = var12,
-			value = p1,
-			lastChangeTick = t.Internal._cycleTick,
+		local stateObject = {
+			ID = stateID,
+			value = variableValue,
+			lastChangeTick = iris.Internal._cycleTick,
 			ConnectedWidgets = {},
 			ConnectedFunctions = {}
 		}
-		setmetatable(t2, module.StateClass)
-		module._states[var12] = t2
-		t2:onChange(p2)
-		return t2
+		setmetatable(stateObject, module.StateClass)
+		module._states[stateID] = stateObject
+		stateObject:onChange(changeCallback)
+		return stateObject
 	end
 end
-function t.TableState(p1, p2, p3)
-	local var12 = p1[p2]
-	local v2 = module._getID(2)
-	local var3 = module._states[v2]
-	if var3 then
-		if var12 ~= var3.value then
-			var3:set(var12)
+function iris.TableState(sourceTable, tableKey, validateCallback)
+	local tableValue = sourceTable[tableKey]
+	local stateID = module._getID(2)
+	local existingTableState = module._states[stateID]
+	if existingTableState then
+		if tableValue ~= existingTableState.value then
+			existingTableState:set(tableValue)
 		end
-		return var3
+		return existingTableState
 	else
-		local t2 = {
-			ID = v2,
-			value = var12,
-			lastChangeTick = t.Internal._cycleTick,
+		local stateObject = {
+			ID = stateID,
+			value = tableValue,
+			lastChangeTick = iris.Internal._cycleTick,
 			ConnectedWidgets = {},
 			ConnectedFunctions = {}
 		}
-		setmetatable(t2, module.StateClass)
-		module._states[v2] = t2
-		t2:onChange(function()
-			if p3 == nil then
-				p1[p2] = t2.value
-			elseif p3(t2.value) then
-				p1[p2] = t2.value
+		setmetatable(stateObject, module.StateClass)
+		module._states[stateID] = stateObject
+		stateObject:onChange(function()
+			if validateCallback == nil then
+				sourceTable[tableKey] = stateObject.value
+			elseif validateCallback(stateObject.value) then
+				sourceTable[tableKey] = stateObject.value
 			end
 		end)
-		return t2
+		return stateObject
 	end
 end
-function t.ComputedState(p1, p2)
-	local var12 = module._getID(2)
-	if module._states[var12] then
-		return module._states[var12]
+function iris.ComputedState(dependencyState, computeFunction)
+	local stateID = module._getID(2)
+	if module._states[stateID] then
+		return module._states[stateID]
 	else
-		local t2 = {
-			ID = var12,
-			value = p2(p1.value),
-			lastChangeTick = t.Internal._cycleTick,
+		local stateObject = {
+			ID = stateID,
+			value = computeFunction(dependencyState.value),
+			lastChangeTick = iris.Internal._cycleTick,
 			ConnectedWidgets = {},
 			ConnectedFunctions = {}
 		}
-		setmetatable(t2, module.StateClass)
-		module._states[var12] = t2
-		p1:onChange(function(p1)
-			t2:set(p2(p1))
+		setmetatable(stateObject, module.StateClass)
+		module._states[stateID] = stateObject
+		dependencyState:onChange(function(newDependencyValue)
+			stateObject:set(computeFunction(newDependencyValue))
 		end)
-		return t2
+		return stateObject
 	end
 end
-t.ShowDemoWindow = require(script.demoWindow)(t)
+iris.ShowDemoWindow = require(script.demoWindow)(iris)
 require(script.widgets)(module)
-require(script.API)(t)
-return t
+require(script.API)(iris)
+return iris

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local DataStoreService = game:GetService("DataStoreService")
 local RunService = game:GetService("RunService")
 local DataStoreQueue = require(script.DataStoreQueue)
@@ -30,7 +28,7 @@ Store.DataToSave = { "Sessions", "Transactions", "ProgressionTries", "CurrentCus
 Store.PlayerCache = {}
 Store.EventsQueue = {}
 Store.DataStoreQueue = DataStoreQueue
-function Store.GetPlayerData(p1, player)
+function Store.GetPlayerData(self, player)
 	local UserId = player.UserId
 	local success, data = DataStoreQueue.AddRequest(UserId, function()
 		return RunService:IsStudio() and ({} or (Store.PlayerDS:GetAsync(UserId) or {})) or (Store.PlayerDS:GetAsync(UserId) or {})
@@ -40,7 +38,7 @@ function Store.GetPlayerData(p1, player)
 	end
 	return data
 end
-function Store.GetPlayerDataFromCache(p1, player)
+function Store.GetPlayerDataFromCache(self, player)
 	local cachedPlayerData = Store.PlayerCache[tonumber(player)]
 	if cachedPlayerData then
 		return cachedPlayerData
@@ -48,7 +46,7 @@ function Store.GetPlayerDataFromCache(p1, player)
 		return Store.PlayerCache[tostring(player)]
 	end
 end
-function Store.GetErrorDataStore(p1, player)
+function Store.GetErrorDataStore(self, player)
 	local errorStore = nil
 	if not pcall(function()
 		errorStore = RunService:IsStudio() and {} or DataStoreService:GetDataStore("GA_ErrorDS_1.0.0", player)
@@ -57,12 +55,12 @@ function Store.GetErrorDataStore(p1, player)
 	end
 	return errorStore
 end
-function Store.SavePlayerData(p1, player)
+function Store.SavePlayerData(self, player)
 	local playerData = Store:GetPlayerDataFromCache(player.UserId)
 	local dataToSave = {}
 	if playerData then
-		for k, v in pairs(Store.DataToSave) do
-			dataToSave[v] = playerData[v]
+		for index, fieldName in pairs(Store.DataToSave) do
+			dataToSave[fieldName] = playerData[fieldName]
 		end
 		local UserId = player.UserId
 		if not RunService:IsStudio() then
@@ -72,14 +70,14 @@ function Store.SavePlayerData(p1, player)
 		end
 	end
 end
-function Store.IncrementErrorCount(p1, p2, errorDataStore, incrementAmount)
+function Store.IncrementErrorCount(self, errorStoreKey, errorDataStore, incrementAmount)
 	if errorDataStore then
 		local errorCount
 		if RunService:IsStudio() then
 			errorCount = 0
 		else
-			local _success, incrementResult = DataStoreQueue.AddRequest(errorDataStore, function()
-				return p2:IncrementAsync(errorDataStore, incrementAmount)
+			local _success, incrementResult = DataStoreQueue.AddRequest(errorStoreKey, function()
+				return errorDataStore:IncrementAsync(errorStoreKey, incrementAmount)
 			end, 7)
 			--_ = success
 			errorCount = incrementResult

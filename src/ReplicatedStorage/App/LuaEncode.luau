@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local tableLib = table
 local ipairsFunc = ipairs
 local stringLib = string
@@ -24,7 +23,7 @@ local typeofFunc = typeof or type
 local metatableTable = setmetatable({}, {
 	__mode = "k"
 })
-for v14, v15 in nextFunc, {
+for keyword, keywordValue in nextFunc, {
 	"and",
 	"break",
 	"do",
@@ -48,31 +47,31 @@ for v14, v15 in nextFunc, {
 	"while",
 	"continue"
 } do
-	metatableTable[v15] = true
+	metatableTable[keywordValue] = true
 end
-local v17 = tableLib.find or function(p1, p2)
-	for tableLib, v22 in ipairsFunc(p1) do
-		if v22 == p2 then
-			return tableLib
+local tableFind = tableLib.find or function(searchTable, searchValue)
+	for index, element in ipairsFunc(searchTable) do
+		if element == searchValue then
+			return index
 		end
 	end
 end
-local v19 = tableLib.clone or function(p1)
-	local localTable = {}
-	for tableLib, ipairsFunc in nextFunc, p1 do
-		localTable[tableLib] = ipairsFunc
+local tableClone = tableLib.clone or function(sourceTable)
+	local clonedTable = {}
+	for key, value in nextFunc, sourceTable do
+		clonedTable[key] = value
 	end
-	return localTable
+	return clonedTable
 end
-local function CheckType(p1, p2, ...)
-	local localTable = { ... }
-	local tableLib = typeofFunc(p1)
-	if not v17(localTable, tableLib) then
-		error(format("LuaEncode: Incorrect type for `%s`: `%s` expected, got `%s`", p2, concat(localTable, ", "), tableLib), 0)
+local function CheckType(inputValue, paramName, ...)
+	local expectedTypes = { ... }
+	local actualType = typeofFunc(inputValue)
+	if not tableFind(expectedTypes, actualType) then
+		error(format("LuaEncode: Incorrect type for `%s`: `%s` expected, got `%s`", paramName, concat(expectedTypes, ", "), actualType), 0)
 	end
-	return p1
+	return inputValue
 end
-local localTable = {
+local escapeMap = {
 	["\""] = "\\\"",
 	["\\"] = "\\\\",
 	["\7"] = "\\a",
@@ -84,411 +83,411 @@ local localTable = {
 	["\r"] = "\\r"
 }
 for i = 0, 255 do
-	local v20 = char(i)
-	if not localTable[v20] and (i < 32 or i > 126) then
-		localTable[v20] = "\\" .. i
+	local charCode = char(i)
+	if not escapeMap[charCode] and (i < 32 or i > 126) then
+		escapeMap[charCode] = "\\" .. i
 	end
 end
-local function SerializeString(p1)
-	return "\"" .. gsub(p1, "[%z\\\"\1-\31\127-\255]", localTable) .. "\""
+local function SerializeString(inputString)
+	return "\"" .. gsub(inputString, "[%z\\\"\1-\31\127-\255]", escapeMap) .. "\""
 end
-local function CommentBlock(p1)
-	local tableLib = ""
-	for ipairsFunc in gmatch(p1, "%](=*)%]") do
-		if #tableLib <= #ipairsFunc then
-			tableLib = ipairsFunc .. "="
+local function CommentBlock(content)
+	local equalCount = ""
+	for equalsFound in gmatch(content, "%](=*)%]") do
+		if #equalCount <= #equalsFound then
+			equalCount = equalsFound .. "="
 		end
 	end
-	return "--[" .. tableLib .. "[" .. p1 .. "]" .. tableLib .. "]"
+	return "--[" .. equalCount .. "[" .. content .. "]" .. equalCount .. "]"
 end
-local function IsService(p1)
-	local tableLib, ipairsFunc = pcallFunc(gameService.FindService, gameService, p1.ClassName)
-	return tableLib and ipairsFunc and true or false
+local function IsService(className)
+	local isValid, service = pcallFunc(gameService.FindService, gameService, className.ClassName)
+	return isValid and service and true or false
 end
-local function v21(p1, p2)
-	local tableLib = p2 or ""
-	local ipairsFunc = p1.Name
-	local ClassName = p1.ClassName
-	local stringLib = p1.Parent
-	local nextFunc
-	if stringLib == gameService then
-		local v52, v62 = pcallFunc(gameService.FindService, gameService, p1.ClassName)
-		nextFunc = if v52 and v62 and true or false then ":GetService(" .. SerializeString(ClassName) .. ")" .. tableLib elseif metatableTable[ipairsFunc] or not match(ipairsFunc, "^[A-Za-z_][A-Za-z0-9_]*$") then "[" .. SerializeString(ipairsFunc) .. "]" .. tableLib else "." .. ipairsFunc .. tableLib
+local function getInstancePath(instance, suffix)
+	local pathSuffix = suffix or ""
+	local instanceName = instance.Name
+	local className = instance.ClassName
+	local parentRef = instance.Parent
+	local pathPart
+	if parentRef == gameService then
+		local isService, serviceRef = pcallFunc(gameService.FindService, gameService, instance.ClassName)
+		pathPart = if isService and serviceRef and true or false then ":GetService(" .. SerializeString(className) .. ")" .. pathSuffix elseif metatableTable[instanceName] or not match(instanceName, "^[A-Za-z_][A-Za-z0-9_]*$") then "[" .. SerializeString(instanceName) .. "]" .. pathSuffix else "." .. instanceName .. pathSuffix
 	else
-		nextFunc = if metatableTable[ipairsFunc] or not match(ipairsFunc, "^[A-Za-z_][A-Za-z0-9_]*$") then "[" .. SerializeString(ipairsFunc) .. "]" .. tableLib else "." .. ipairsFunc .. tableLib
+		pathPart = if metatableTable[instanceName] or not match(instanceName, "^[A-Za-z_][A-Za-z0-9_]*$") then "[" .. SerializeString(instanceName) .. "]" .. pathSuffix else "." .. instanceName .. pathSuffix
 	end
-	if stringLib then
-		if stringLib == gameService then
-			return "game" .. nextFunc
-		elseif stringLib == workspaceRef then
-			return "workspace" .. nextFunc
+	if parentRef then
+		if parentRef == gameService then
+			return "game" .. pathPart
+		elseif parentRef == workspaceRef then
+			return "workspace" .. pathPart
 		else
-			return v21(stringLib, nextFunc)
+			return getInstancePath(parentRef, pathPart)
 		end
 	end
 end
-local function v22(p1, p2)
-	CheckType(p1, "inputTable", "table")
-	CheckType(p2, "options", "table", "nil")
-	if p2 then
-		CheckType(p2.Prettify, "options.Prettify", "boolean", "nil")
-		CheckType(p2.PrettyPrinting, "options.PrettyPrinting", "boolean", "nil")
-		CheckType(p2.IndentCount, "options.IndentCount", "number", "nil")
-		CheckType(p2.OutputWarnings, "options.OutputWarnings", "boolean", "nil")
-		CheckType(p2.StackLimit, "options.StackLimit", "number", "nil")
-		CheckType(p2.FunctionsReturnRaw, "options.FunctionsReturnRaw", "boolean", "nil")
-		CheckType(p2.UseInstancePaths, "options.UseInstancePaths", "boolean", "nil")
-		CheckType(p2._StackLevel, "options._StackLevel", "number", "nil")
-		CheckType(p2._VisitedTables, "options._StackLevel", "table", "nil")
+local function encode(inputTable, options)
+	CheckType(inputTable, "inputTable", "table")
+	CheckType(options, "options", "table", "nil")
+	if options then
+		CheckType(options.Prettify, "options.Prettify", "boolean", "nil")
+		CheckType(options.PrettyPrinting, "options.PrettyPrinting", "boolean", "nil")
+		CheckType(options.IndentCount, "options.IndentCount", "number", "nil")
+		CheckType(options.OutputWarnings, "options.OutputWarnings", "boolean", "nil")
+		CheckType(options.StackLimit, "options.StackLimit", "number", "nil")
+		CheckType(options.FunctionsReturnRaw, "options.FunctionsReturnRaw", "boolean", "nil")
+		CheckType(options.UseInstancePaths, "options.UseInstancePaths", "boolean", "nil")
+		CheckType(options._StackLevel, "options._StackLevel", "number", "nil")
+		CheckType(options._VisitedTables, "options._StackLevel", "table", "nil")
 	end
-	local ipairsFunc = p2 or {}
-	if ipairsFunc.Prettify == nil then
-		local isPrettyPrinting = ipairsFunc.PrettyPrinting == nil
+	local mergedOptions = options or {}
+	if mergedOptions.Prettify == nil then
+		local isPrettyPrinting = mergedOptions.PrettyPrinting == nil
 	end
-	local stringLib = if ipairsFunc.Prettify == nil then ipairsFunc.PrettyPrinting and ipairsFunc.PrettyPrinting else ipairsFunc.Prettify or ipairsFunc.PrettyPrinting and ipairsFunc.PrettyPrinting
-	local IndentCount = ipairsFunc.IndentCount
+	local shouldPrettify = if mergedOptions.Prettify == nil then mergedOptions.PrettyPrinting and mergedOptions.PrettyPrinting else mergedOptions.Prettify or mergedOptions.PrettyPrinting and mergedOptions.PrettyPrinting
+	local IndentCount = mergedOptions.IndentCount
 	if not IndentCount then
-		IndentCount = if stringLib then 4 else 0
+		IndentCount = if shouldPrettify then 4 else 0
 	end
-	local v42 = if ipairsFunc.OutputWarnings == nil then true else ipairsFunc.OutputWarnings
-	local v52 = ipairsFunc.StackLimit or 500
-	local isFunctionsReturnRaw = ipairsFunc.FunctionsReturnRaw == nil
-	local FunctionsReturnRaw = ipairsFunc.FunctionsReturnRaw
-	local gameService = if ipairsFunc.UseInstancePaths == nil then true else ipairsFunc.UseInstancePaths
-	local workspaceRef = ipairsFunc._StackLevel or 1
-	local mathLib = ipairsFunc._VisitedTables or {
-		[p1] = true
+	local shouldOutputWarnings = if mergedOptions.OutputWarnings == nil then true else mergedOptions.OutputWarnings
+	local stackLimit = mergedOptions.StackLimit or 500
+	local isFunctionsReturnRaw = mergedOptions.FunctionsReturnRaw == nil
+	local FunctionsReturnRaw = mergedOptions.FunctionsReturnRaw
+	local shouldUseInstancePaths = if mergedOptions.UseInstancePaths == nil then true else mergedOptions.UseInstancePaths
+	local currentStackLevel = mergedOptions._StackLevel or 1
+	local visitedTables = mergedOptions._VisitedTables or {
+		[inputTable] = true
 	}
-	if v52 <= workspaceRef then
-		return "{--[[LuaEncode: Stack level limit of `" .. v52 .. "` reached]]}"
+	if stackLimit <= currentStackLevel then
+		return "{--[[LuaEncode: Stack level limit of `" .. stackLimit .. "` reached]]}"
 	else
-		local v92 = if stringLib then "\n" else ""
-		local v102 = if stringLib then ", " else ","
-		local v112 = if stringLib then " " else ""
-		local v122 = rep(" ", IndentCount)
-		local v132 = stringLib and rep(v122, workspaceRef) or v122
-		local v14 = #v132 > 0 and sub(v132, 1, -IndentCount - 1) or ""
-		local v16 = 1
+		local newline = if shouldPrettify then "\n" else ""
+		local separator = if shouldPrettify then ", " else ","
+		local space = if shouldPrettify then " " else ""
+		local indentStr = rep(" ", IndentCount)
+		local currentIndent = shouldPrettify and rep(indentStr, currentStackLevel) or indentStr
+		local previousIndent = #currentIndent > 0 and sub(currentIndent, 1, -IndentCount - 1) or ""
+		local sequenceIndex = 1
 		local localTable = {}
-		local function TypeCase(p1, p2)
-			return localTable[p1](p2, false)
+		local function TypeCase(typeKey, value)
+			return localTable[typeKey](value, false)
 		end
 		local function Args(...)
-			local t2 = {}
-			for tableLib, ipairsFunc in nextFunc, { ... } do
-				insert(t2, (localTable[typeofFunc(ipairsFunc)](ipairsFunc, false)))
+			local argsList = {}
+			for index, argValue in nextFunc, { ... } do
+				insert(argsList, (localTable[typeofFunc(argValue)](argValue, false)))
 			end
-			return concat(t2, v102)
+			return concat(argsList, separator)
 		end
-		local function Params(p1, p2)
-			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ p1, (localTable.table(p2, false)) }, v102) .. ")"
+		local function Params(initValue, paramsTable)
+			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ initValue, (localTable.table(paramsTable, false)) }, separator) .. ")"
 		end
-		function localTable.number(p1, p2)
-			if p2 and p1 == v16 then
-				v16 = v16 + 1
+		function localTable.number(numValue, isSequence)
+			if isSequence and numValue == sequenceIndex then
+				sequenceIndex = sequenceIndex + 1
 				return nil, true
-			elseif p1 == huge then
+			elseif numValue == huge then
 				return "math.huge"
-			elseif p1 == -huge then
+			elseif numValue == -huge then
 				return "-math.huge"
 			else
-				return format("%.14g", p1)
+				return format("%.14g", numValue)
 			end
 		end
-		function localTable.string(p1, p2)
-			if p2 and (not metatableTable[p1] and match(p1, "^[A-Za-z_][A-Za-z0-9_]*$")) then
-				return p1, true
+		function localTable.string(strValue, isKey)
+			if isKey and (not metatableTable[strValue] and match(strValue, "^[A-Za-z_][A-Za-z0-9_]*$")) then
+				return strValue, true
 			else
-				return SerializeString(p1)
+				return SerializeString(strValue)
 			end
 		end
-		function localTable.table(p12, p2)
-			if mathLib[p12] then
-				return format("{--[[LuaEncode: Duplicate reference%s]]}", if p12 == p1 then " (of parent)" else "")
+		function localTable.table(tableInput, isSequence)
+			if visitedTables[tableInput] then
+				return format("{--[[LuaEncode: Duplicate reference%s]]}", if tableInput == inputTable then " (of parent)" else "")
 			else
-				mathLib[p12] = true
-				local nextFunc = v19(ipairsFunc)
-				nextFunc.Prettify = stringLib
-				nextFunc.IndentCount = if p2 then if stringLib then 1 else IndentCount or 1 else IndentCount
-				nextFunc._StackLevel = if p2 then 1 else workspaceRef + 1
-				nextFunc._VisitedTables = mathLib
-				return v22(p12, nextFunc)
+				visitedTables[tableInput] = true
+				local nextOptions = tableClone(mergedOptions)
+				nextOptions.Prettify = shouldPrettify
+				nextOptions.IndentCount = if isSequence then if shouldPrettify then 1 else IndentCount or 1 else IndentCount
+				nextOptions._StackLevel = if isSequence then 1 else currentStackLevel + 1
+				nextOptions._VisitedTables = visitedTables
+				return encode(tableInput, nextOptions)
 			end
 		end
-		function localTable.boolean(p1)
-			return tostringFunc(p1)
+		function localTable.boolean(boolValue)
+			return tostringFunc(boolValue)
 		end
-		localTable["nil"] = function(p1)
+		localTable["nil"] = function(nilValue)
 			return "nil"
 		end
-		localTable["function"] = function(p1)
+		localTable["function"] = function(funcValue)
 			if FunctionsReturnRaw then
-				return p1()
+				return funcValue()
 			else
 				return "function() --[[LuaEncode: `options.FunctionsReturnRaw` false; can\'localTable serialize functions]] return end"
 			end
 		end
-		function localTable.Axes(p1)
-			local localTable = {}
-			for tableLib, ipairsFunc in nextFunc, {
-				["Enum.Axis.X"] = p1.X,
-				["Enum.Axis.Y"] = p1.Y,
-				["Enum.Axis.Z"] = p1.Z
+		function localTable.Axes(axesValue)
+			local axesList = {}
+			for axisName, isActive in nextFunc, {
+				["Enum.Axis.X"] = axesValue.X,
+				["Enum.Axis.Y"] = axesValue.Y,
+				["Enum.Axis.Z"] = axesValue.Z
 			} do
-				if ipairsFunc then
-					insert(localTable, tableLib)
+				if isActive then
+					insert(axesList, axisName)
 				end
 			end
-			return "Axes.new(" .. concat(localTable, v102) .. ")"
+			return "Axes.new(" .. concat(axesList, separator) .. ")"
 		end
-		function localTable.BrickColor(p1)
-			local ipairsFunc = stringLib
-			if ipairsFunc then
-				ipairsFunc = localTable.string(p1.Name, false)
+		function localTable.BrickColor(colorValue)
+			local colorStr = shouldPrettify
+			if colorStr then
+				colorStr = localTable.string(colorValue.Name, false)
 			end
-			return "BrickColor.new(" .. ipairsFunc or p1.Number .. ")"
+			return "BrickColor.new(" .. colorStr or colorValue.Number .. ")"
 		end
-		function localTable.CFrame(p1)
-			return "CFrame.new(" .. Args(p1:components()) .. ")"
+		function localTable.CFrame(frameValue)
+			return "CFrame.new(" .. Args(frameValue:components()) .. ")"
 		end
-		function localTable.CatalogSearchParams(p1)
+		function localTable.CatalogSearchParams(paramsValue)
 			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ "CatalogSearchParams.new()", (localTable.table({
-					SearchKeyword = p1.SearchKeyword,
-					MinPrice = p1.MinPrice,
-					MaxPrice = p1.MaxPrice,
-					SortType = p1.SortType,
-					CategoryFilter = p1.CategoryFilter,
-					BundleTypes = p1.BundleTypes,
-					AssetTypes = p1.AssetTypes
-				}, false)) }, v102) .. ")"
+					SearchKeyword = paramsValue.SearchKeyword,
+					MinPrice = paramsValue.MinPrice,
+					MaxPrice = paramsValue.MaxPrice,
+					SortType = paramsValue.SortType,
+					CategoryFilter = paramsValue.CategoryFilter,
+					BundleTypes = paramsValue.BundleTypes,
+					AssetTypes = paramsValue.AssetTypes
+				}, false)) }, separator) .. ")"
 		end
-		function localTable.Color3(p1)
-			return "Color3.new(" .. Args(p1.R, p1.G, p1.B)
+		function localTable.Color3(colorValue)
+			return "Color3.new(" .. Args(colorValue.R, colorValue.G, colorValue.B)
 		end
-		function localTable.ColorSequence(p1)
-			return "ColorSequence.new(" .. localTable.table(p1.Keypoints, false) .. ")"
+		function localTable.ColorSequence(seqValue)
+			return "ColorSequence.new(" .. localTable.table(seqValue.Keypoints, false) .. ")"
 		end
-		function localTable.ColorSequenceKeypoint(p1)
-			return "ColorSequenceKeypoint.new(" .. Args(p1.Time, p1.Value) .. ")"
+		function localTable.ColorSequenceKeypoint(keypointValue)
+			return "ColorSequenceKeypoint.new(" .. Args(keypointValue.Time, keypointValue.Value) .. ")"
 		end
-		function localTable.DateTime(p1)
-			return "DateTime.fromUnixTimestamp(" .. p1.UnixTimestamp .. ")"
+		function localTable.DateTime(dtValue)
+			return "DateTime.fromUnixTimestamp(" .. dtValue.UnixTimestamp .. ")"
 		end
-		function localTable.DockWidgetPluginGuiInfo(p1)
-			local tableLib = tostringFunc(p1)
-			return "DockWidgetPluginGuiInfo.new(" .. Args(Enum.InitialDockState[match(tableLib, "InitialDockState:(%w+)")], match(tableLib, "InitialEnabled:(%w+)") == "1", match(tableLib, "InitialEnabledShouldOverrideRestore:(%w+)") == "1", tonumberFunc(match(tableLib, "FloatingXSize:(%w+)")), tonumberFunc(match(tableLib, "FloatingYSize:(%w+)")), tonumberFunc(match(tableLib, "MinWidth:(%w+)")), (tonumberFunc(match(tableLib, "MinHeight:(%w+)")))) .. ")"
+		function localTable.DockWidgetPluginGuiInfo(guiInfoValue)
+			local guiStr = tostringFunc(guiInfoValue)
+			return "DockWidgetPluginGuiInfo.new(" .. Args(Enum.InitialDockState[match(guiStr, "InitialDockState:(%w+)")], match(guiStr, "InitialEnabled:(%w+)") == "1", match(guiStr, "InitialEnabledShouldOverrideRestore:(%w+)") == "1", tonumberFunc(match(guiStr, "FloatingXSize:(%w+)")), tonumberFunc(match(guiStr, "FloatingYSize:(%w+)")), tonumberFunc(match(guiStr, "MinWidth:(%w+)")), (tonumberFunc(match(guiStr, "MinHeight:(%w+)")))) .. ")"
 		end
-		function localTable.Enum(p1)
-			return "Enum." .. tostringFunc(p1)
+		function localTable.Enum(enumValue)
+			return "Enum." .. tostringFunc(enumValue)
 		end
-		function localTable.EnumItem(p1)
-			return tostringFunc(p1)
+		function localTable.EnumItem(itemValue)
+			return tostringFunc(itemValue)
 		end
-		function localTable.Enums(p1)
+		function localTable.Enums(enumsValue)
 			return "Enum"
 		end
-		function localTable.Faces(p1)
-			local localTable = {}
-			for tableLib, ipairsFunc in nextFunc, {
-				["Enum.NormalId.Top"] = p1.Top,
-				["Enum.NormalId.Bottom"] = p1.Bottom,
-				["Enum.NormalId.Left"] = p1.Left,
-				["Enum.NormalId.Right"] = p1.Right,
-				["Enum.NormalId.Back"] = p1.Back,
-				["Enum.NormalId.Front"] = p1.Front
+		function localTable.Faces(facesValue)
+			local facesList = {}
+			for faceName, isActive in nextFunc, {
+				["Enum.NormalId.Top"] = facesValue.Top,
+				["Enum.NormalId.Bottom"] = facesValue.Bottom,
+				["Enum.NormalId.Left"] = facesValue.Left,
+				["Enum.NormalId.Right"] = facesValue.Right,
+				["Enum.NormalId.Back"] = facesValue.Back,
+				["Enum.NormalId.Front"] = facesValue.Front
 			} do
-				if ipairsFunc then
-					insert(localTable, tableLib)
+				if isActive then
+					insert(facesList, faceName)
 				end
 			end
-			return "Faces.new(" .. concat(localTable, v102) .. ")"
+			return "Faces.new(" .. concat(facesList, separator) .. ")"
 		end
-		function localTable.FloatCurveKey(p1)
-			return "FloatCurveKey.new(" .. Args(p1.Time, p1.Value, p1.Interpolation) .. ")"
+		function localTable.FloatCurveKey(keyValue)
+			return "FloatCurveKey.new(" .. Args(keyValue.Time, keyValue.Value, keyValue.Interpolation) .. ")"
 		end
-		function localTable.Font(p1)
-			return "Font.new(" .. Args(p1.Family, p1.Weight, p1.Style) .. ")"
+		function localTable.Font(fontValue)
+			return "Font.new(" .. Args(fontValue.Family, fontValue.Weight, fontValue.Style) .. ")"
 		end
-		function localTable.Instance(p1)
-			local tableLib, ipairsFunc, stringLib, nextFunc, pcallFunc
-			if gameService then
-				local v62 = v21(p1)
-				if v62 then
-					return v62
+		function localTable.Instance(instanceValue)
+			local space2, classNameStr, constructorCall, equalCount, commentStr
+			if shouldUseInstancePaths then
+				local instancePathStr = getInstancePath(instanceValue)
+				if instancePathStr then
+					return instancePathStr
 				else
-					tableLib = v112
-					ipairsFunc = p1.ClassName
-					stringLib = "Instance.new(" .. localTable.string(ipairsFunc, false) .. ")"
-					nextFunc = ""
-					pcallFunc = "nil"
-					for workspaceRef in gmatch(stringLib, "%](=*)%]") do
-						if #nextFunc <= #workspaceRef then
-							nextFunc = workspaceRef .. "="
+					space2 = space
+					classNameStr = instanceValue.ClassName
+					constructorCall = "Instance.new(" .. localTable.string(classNameStr, false) .. ")"
+					equalCount = ""
+					commentStr = "nil"
+					for equalsFound in gmatch(constructorCall, "%](=*)%]") do
+						if #equalCount <= #equalsFound then
+							equalCount = equalsFound .. "="
 						end
 					end
-					return pcallFunc .. v112 .. "--[" .. nextFunc .. "[" .. stringLib .. "]" .. nextFunc .. "]"
+					return commentStr .. space .. "--[" .. equalCount .. "[" .. constructorCall .. "]" .. equalCount .. "]"
 				end
 			else
-				tableLib = v112
-				ipairsFunc = p1.ClassName
-				stringLib = "Instance.new(" .. localTable.string(ipairsFunc, false) .. ")"
-				nextFunc = ""
-				pcallFunc = "nil"
-				for workspaceRef in gmatch(stringLib, "%](=*)%]") do
-					if #nextFunc <= #workspaceRef then
-						nextFunc = workspaceRef .. "="
+				space2 = space
+				classNameStr = instanceValue.ClassName
+				constructorCall = "Instance.new(" .. localTable.string(classNameStr, false) .. ")"
+				equalCount = ""
+				commentStr = "nil"
+				for equalsFound in gmatch(constructorCall, "%](=*)%]") do
+					if #equalCount <= #equalsFound then
+						equalCount = equalsFound .. "="
 					end
 				end
-				return pcallFunc .. v112 .. "--[" .. nextFunc .. "[" .. stringLib .. "]" .. nextFunc .. "]"
+				return commentStr .. space .. "--[" .. equalCount .. "[" .. constructorCall .. "]" .. equalCount .. "]"
 			end
 		end
-		function localTable.NumberRange(p1)
-			return "NumberRange.new(" .. Args(p1.Min, p1.Max) .. ")"
+		function localTable.NumberRange(rangeValue)
+			return "NumberRange.new(" .. Args(rangeValue.Min, rangeValue.Max) .. ")"
 		end
-		function localTable.NumberSequence(p1)
-			return "NumberSequence.new(" .. localTable.table(p1.Keypoints, false) .. ")"
+		function localTable.NumberSequence(seqValue)
+			return "NumberSequence.new(" .. localTable.table(seqValue.Keypoints, false) .. ")"
 		end
-		function localTable.NumberSequenceKeypoint(p1)
-			return "NumberSequenceKeypoint.new(" .. Args(p1.Time, p1.Value, p1.Envelope) .. ")"
+		function localTable.NumberSequenceKeypoint(keypointValue)
+			return "NumberSequenceKeypoint.new(" .. Args(keypointValue.Time, keypointValue.Value, keypointValue.Envelope) .. ")"
 		end
-		function localTable.OverlapParams(p1)
+		function localTable.OverlapParams(paramsValue)
 			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ "OverlapParams.new()", (localTable.table({
-					FilterDescendantsInstances = p1.FilterDescendantsInstances,
-					FilterType = p1.FilterType,
-					MaxParts = p1.MaxParts,
-					CollisionGroup = p1.CollisionGroup,
-					RespectCanCollide = p1.RespectCanCollide
-				}, false)) }, v102) .. ")"
+					FilterDescendantsInstances = paramsValue.FilterDescendantsInstances,
+					FilterType = paramsValue.FilterType,
+					MaxParts = paramsValue.MaxParts,
+					CollisionGroup = paramsValue.CollisionGroup,
+					RespectCanCollide = paramsValue.RespectCanCollide
+				}, false)) }, separator) .. ")"
 		end
-		function localTable.PathWaypoint(p1)
-			return "PathWaypoint.new(" .. Args(p1.Position, p1.Action, p1.Label) .. ")"
+		function localTable.PathWaypoint(waypointValue)
+			return "PathWaypoint.new(" .. Args(waypointValue.Position, waypointValue.Action, waypointValue.Label) .. ")"
 		end
-		function localTable.PhysicalProperties(p1)
-			return "PhysicalProperties.new(" .. Args(p1.Density, p1.Friction, p1.Elasticity, p1.FrictionWeight, p1.ElasticityWeight) .. ")"
+		function localTable.PhysicalProperties(propsValue)
+			return "PhysicalProperties.new(" .. Args(propsValue.Density, propsValue.Friction, propsValue.Elasticity, propsValue.FrictionWeight, propsValue.ElasticityWeight) .. ")"
 		end
 		function localTable.Random()
 			return "Random.new()"
 		end
-		function localTable.Ray(p1)
-			return "Ray.new(" .. Args(p1.Origin, p1.Direction) .. ")"
+		function localTable.Ray(rayValue)
+			return "Ray.new(" .. Args(rayValue.Origin, rayValue.Direction) .. ")"
 		end
-		function localTable.RaycastParams(p1)
+		function localTable.RaycastParams(paramsValue)
 			return "(function(v, p) for pn, pv in next, p do v[pn] = pv end return v end)(" .. concat({ "RaycastParams.new()", (localTable.table({
-					FilterDescendantsInstances = p1.FilterDescendantsInstances,
-					FilterType = p1.FilterType,
-					IgnoreWater = p1.IgnoreWater,
-					CollisionGroup = p1.CollisionGroup,
-					RespectCanCollide = p1.RespectCanCollide
-				}, false)) }, v102) .. ")"
+					FilterDescendantsInstances = paramsValue.FilterDescendantsInstances,
+					FilterType = paramsValue.FilterType,
+					IgnoreWater = paramsValue.IgnoreWater,
+					CollisionGroup = paramsValue.CollisionGroup,
+					RespectCanCollide = paramsValue.RespectCanCollide
+				}, false)) }, separator) .. ")"
 		end
-		function localTable.Rect(p1)
-			return "Rect.new(" .. Args(p1.Min, p1.Max) .. ")"
+		function localTable.Rect(rectValue)
+			return "Rect.new(" .. Args(rectValue.Min, rectValue.Max) .. ")"
 		end
-		function localTable.Region3(p1)
-			local tableLib = p1.CFrame
-			local Size = p1.Size
-			return "Region3.new(" .. Args(tableLib * CFrame.new(-Size / 2), tableLib * CFrame.new(Size / 2)) .. ")"
+		function localTable.Region3(regionValue)
+			local regionCFrame = regionValue.CFrame
+			local Size = regionValue.Size
+			return "Region3.new(" .. Args(regionCFrame * CFrame.new(-Size / 2), regionCFrame * CFrame.new(Size / 2)) .. ")"
 		end
-		function localTable.Region3int16(p1)
-			return "Region3int16.new(" .. Args(p1.Min, p1.Max) .. ")"
+		function localTable.Region3int16(regionValue)
+			return "Region3int16.new(" .. Args(regionValue.Min, regionValue.Max) .. ")"
 		end
-		function localTable.TweenInfo(p1)
-			return "TweenInfo.new(" .. Args(p1.Time, p1.EasingStyle, p1.EasingDirection, p1.RepeatCount, p1.Reverses, p1.DelayTime) .. ")"
+		function localTable.TweenInfo(tweenValue)
+			return "TweenInfo.new(" .. Args(tweenValue.Time, tweenValue.EasingStyle, tweenValue.EasingDirection, tweenValue.RepeatCount, tweenValue.Reverses, tweenValue.DelayTime) .. ")"
 		end
-		function localTable.RotationCurveKey(p1)
-			return "RotationCurveKey.new(" .. Args(p1.Time, p1.Value, p1.Interpolation) .. ")"
+		function localTable.RotationCurveKey(keyValue)
+			return "RotationCurveKey.new(" .. Args(keyValue.Time, keyValue.Value, keyValue.Interpolation) .. ")"
 		end
-		function localTable.UDim(p1)
-			return "UDim.new(" .. Args(p1.Scale, p1.Offset) .. ")"
+		function localTable.UDim(dimValue)
+			return "UDim.new(" .. Args(dimValue.Scale, dimValue.Offset) .. ")"
 		end
-		function localTable.UDim2(p1)
-			return "UDim2.new(" .. Args(p1.X.Scale, p1.X.Offset, p1.Y.Scale, p1.Y.Offset) .. ")"
+		function localTable.UDim2(dim2Value)
+			return "UDim2.new(" .. Args(dim2Value.X.Scale, dim2Value.X.Offset, dim2Value.Y.Scale, dim2Value.Y.Offset) .. ")"
 		end
-		function localTable.Vector2(p1)
-			return "Vector2.new(" .. Args(p1.X, p1.Y) .. ")"
+		function localTable.Vector2(vecValue)
+			return "Vector2.new(" .. Args(vecValue.X, vecValue.Y) .. ")"
 		end
-		function localTable.Vector2int16(p1)
-			return "Vector2int16.new(" .. Args(p1.X, p1.Y) .. ")"
+		function localTable.Vector2int16(vecValue)
+			return "Vector2int16.new(" .. Args(vecValue.X, vecValue.Y) .. ")"
 		end
-		function localTable.Vector3(p1)
-			return "Vector3.new(" .. Args(p1.X, p1.Y, p1.Z) .. ")"
+		function localTable.Vector3(vecValue)
+			return "Vector3.new(" .. Args(vecValue.X, vecValue.Y, vecValue.Z) .. ")"
 		end
-		function localTable.Vector3int16(p1)
-			return "Vector3int16.new(" .. Args(p1.X, p1.Y, p1.Z) .. ")"
+		function localTable.Vector3int16(vecValue)
+			return "Vector3int16.new(" .. Args(vecValue.X, vecValue.Y, vecValue.Z) .. ")"
 		end
-		function localTable.userdata(p1)
-			if getmetatableFunc(p1) then
+		function localTable.userdata(userdataValue)
+			if getmetatableFunc(userdataValue) then
 				return "newproxy(true)"
 			else
 				return "newproxy()"
 			end
 		end
-		local v17 = ""
-		for v25, v26 in nextFunc, p1 do
-			local v18, v192, v20, v212, v222, v23, v24
-			local v27 = typeofFunc(v25)
-			local v28 = typeofFunc(v26)
-			if localTable[v27] and localTable[v28] then
-				v18 = stringLib and v92 .. v132 or ""
-				local v29 = false
-				local v30, v31, v32 = pcallFunc(localTable[v27], v25, true)
-				local v33, v34 = pcallFunc(localTable[v28], v26, false)
-				if v30 and (v33 and v34) then
-					if v31 then
-						v192 = if v32 and v31 then v31 else format("[%s]", v31)
-						v20 = if stringLib then " = " else "="
-						v212 = v192 .. v20 or ""
+		local outputStr = ""
+		for tableKey, tableValue in nextFunc, inputTable do
+			local lineOutput, keyStr, keyFormatted, assignOp, assignmentPart, errorType, errorMsg, errorDetails, errorStr, commentContent, equalsForError, formattedError
+			local keyType = typeofFunc(tableKey)
+			local valueType = typeofFunc(tableValue)
+			if localTable[keyType] and localTable[valueType] then
+				lineOutput = shouldPrettify and newline .. currentIndent or ""
+				local isValidPair = false
+				local keySuccess, keyResult, keyIsKey = pcallFunc(localTable[keyType], tableKey, true)
+				local valueSuccess, valueResult = pcallFunc(localTable[valueType], tableValue, false)
+				if keySuccess and (valueSuccess and valueResult) then
+					if keyIsKey then
+						keyStr = if keyResult and keyIsKey then keyResult else format("[%s]", keyResult)
+						assignOp = if shouldPrettify then " = " else "="
+						assignmentPart = keyStr .. assignOp or ""
 					else
-						v212 = ""
+						assignmentPart = ""
 					end
-					v29 = true
-					v18 = v18 .. v212 .. v34
-				elseif v42 then
-					v222 = if v30 then if v33 then "key/value" else "value" else "key"
-					if v30 then
-						v23 = v28
-						if v33 then
-							v24 = "(Failed to get error message)"
+					isValidPair = true
+					lineOutput = lineOutput .. assignmentPart .. valueResult
+				elseif shouldOutputWarnings then
+					errorType = if keySuccess then if valueSuccess then "key/value" else "value" else "key"
+					if keySuccess then
+						errorDetails = valueType
+						if valueSuccess then
+							errorMsg = "(Failed to get error message)"
 						else
-							v24 = SerializeString(v34)
-							if not v24 then
-								v24 = "(Failed to get error message)"
+							errorMsg = SerializeString(valueResult)
+							if not errorMsg then
+								errorMsg = "(Failed to get error message)"
 							end
 						end
 					else
-						v24 = SerializeString(v31)
-						if v24 then
-							v23 = v28
-						elseif v33 then
-							v24 = "(Failed to get error message)"
+						errorMsg = SerializeString(keyResult)
+						if errorMsg then
+							errorDetails = valueType
+						elseif valueSuccess then
+							errorMsg = "(Failed to get error message)"
 						else
-							v24 = SerializeString(v34)
-							if not v24 then
-								v24 = "(Failed to get error message)"
+							errorMsg = SerializeString(valueResult)
+							if not errorMsg then
+								errorMsg = "(Failed to get error message)"
 							end
 						end
 					end
-					local v38 = format("LuaEncode: Failed to encode %s of DataType `%s`: %s", v222, v23, v24)
-					v39 = ""
-					v40 = v18
-					for v41 in gmatch(v38, "%](=*)%]") do
-						if #v39 <= #v41 then
-							v39 = v41 .. "="
+					local errorMessage = format("LuaEncode: Failed to encode %s of DataType `%s`: %s", errorType, errorDetails, errorMsg)
+					commentContent = ""
+					formattedError = lineOutput
+					for equalsMarker in gmatch(errorMessage, "%](=*)%]") do
+						if #commentContent <= #equalsMarker then
+							commentContent = equalsMarker .. "="
 						end
 					end
-					v18 = v40 .. "--[" .. v39 .. "[" .. v38 .. "]" .. v39 .. "]"
+					lineOutput = formattedError .. "--[" .. commentContent .. "[" .. errorMessage .. "]" .. commentContent .. "]"
 				end
-				if nextFunc(p1, v25) then
-					if v29 then
-						v18 = v18 .. ","
+				if nextFunc(inputTable, tableKey) then
+					if isValidPair then
+						lineOutput = lineOutput .. ","
 					end
 				else
-					v18 = v18 .. v92 .. v14
+					lineOutput = lineOutput .. newline .. previousIndent
 				end
-				v17 = v17 .. v18
+				outputStr = outputStr .. lineOutput
 			end
 		end
-		return "{" .. v17 .. "}"
+		return "{" .. outputStr .. "}"
 	end
 end
-return v22
+return encode

@@ -41,29 +41,29 @@ type Element = { [any]: any }
 	If `elementOrElements` is none of the above, this function will throw.
 ]]
 function ElementUtils.iterateElements<K>(elementOrElements): (Iterator<K, Element>, any, nil)
-	local richType = Type.of(elementOrElements)
+	local elementType = Type.of(elementOrElements)
 
 	-- Single child
-	if richType == Type.Element then
-		local called = false
+	if elementType == Type.Element then
+		local hasYielded = false
 
 		return function(_, _)
-			if called then
+			if hasYielded then
 				return nil
 			else
-				called = true
+				hasYielded = true
 				return ElementUtils.UseParentKey, elementOrElements
 			end
 		end
 	end
 
-	local regularType = typeof(elementOrElements)
+	local standardType = typeof(elementOrElements)
 
-	if elementOrElements == nil or regularType == "boolean" then
+	if elementOrElements == nil or standardType == "boolean" then
 		return (noop :: any) :: Iterator<K, Element>
 	end
 
-	if regularType == "table" then
+	if standardType == "table" then
 		return pairs(elementOrElements)
 	end
 

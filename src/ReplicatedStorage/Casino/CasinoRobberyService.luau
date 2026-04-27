@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)

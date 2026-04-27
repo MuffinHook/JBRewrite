@@ -1,4 +1,3 @@
--- Reviewed by Claude
 game:GetService("Debris")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -17,31 +16,31 @@ require(ReplicatedStorage.Std.Raycast)
 local ItemSystem = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
 local Math = require(ReplicatedStorage.Module.Math)
 local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
-local t = {
+local SoundIdMap = {
 	bullet_flyby_01 = 2121003369,
 	bullet_flyby_04 = 2121003636,
 	bullet_impact_body_thump_01 = 2121003873,
 	bullet_impact_bass = 2837091387
 }
-local function IntersectRaySphereF(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
-	local v1 = p7 * p7 * p4 * p4 + p7 * p7 * p5 * p5 + p7 * p7 * p6 * p6
-	local v2 = 2 * (p7 * p4 * (p1 - p8) + p7 * p5 * (p2 - p9) + p7 * p6 * (p3 - p10))
-	local v3 = v2 * v2 - 4 * v1 * (p8 * p8 + p9 * p9 + p10 * p10 + p1 * p1 + p2 * p2 + p3 * p3 - 2 * (p8 * p1 + p9 * p2 + p10 * p3) - p11 * p11)
-	if math.abs(v1) < 0.001 or v3 < 0 then
+local function IntersectRaySphereF(rayOriginX, rayOriginY, rayOriginZ, rayDirectionX, rayDirectionY, rayDirectionZ, rayLength, sphereCenterX, sphereCenterY, sphereCenterZ, sphereRadius)
+	local coefficientA = rayLength * rayLength * rayDirectionX * rayDirectionX + rayLength * rayLength * rayDirectionY * rayDirectionY + rayLength * rayLength * rayDirectionZ * rayDirectionZ
+	local coefficientB = 2 * (rayLength * rayDirectionX * (rayOriginX - sphereCenterX) + rayLength * rayDirectionY * (rayOriginY - sphereCenterY) + rayLength * rayDirectionZ * (rayOriginZ - sphereCenterZ))
+	local coefficientC = coefficientB * coefficientB - 4 * coefficientA * (sphereCenterX * sphereCenterX + sphereCenterY * sphereCenterY + sphereCenterZ * sphereCenterZ + rayOriginX * rayOriginX + rayOriginY * rayOriginY + rayOriginZ * rayOriginZ - 2 * (sphereCenterX * rayOriginX + sphereCenterY * rayOriginY + sphereCenterZ * rayOriginZ) - sphereRadius * sphereRadius)
+	if math.abs(coefficientA) < 0.001 or coefficientC < 0 then
 		return nil, nil
 	else
-		local v4 = v3 ^ 0.5
-		local v5 = (-v2 - v4) / (2 * v1)
-		local v6 = (-v2 + v4) / (2 * v1)
-		if v1 * (1 - v5) * (v6 - v5) < 0 or v1 * v6 * (v6 - v5) < 0 then
+		local discriminantSqrt = coefficientC ^ 0.5
+		local intersectionT1 = (-coefficientB - discriminantSqrt) / (2 * coefficientA)
+		local intersectionT2 = (-coefficientB + discriminantSqrt) / (2 * coefficientA)
+		if coefficientA * (1 - intersectionT1) * (intersectionT2 - intersectionT1) < 0 or coefficientA * intersectionT2 * (intersectionT2 - intersectionT1) < 0 then
 			return nil, nil
 		else
-			return v5, v6
+			return intersectionT1, intersectionT2
 		end
 	end
 end
-local function IntersectRaySphere(p1, p2, p3, p4, p5)
-	return IntersectRaySphereF(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p3, p4.x, p4.y, p4.z, p5)
+local function IntersectRaySphere(rayOrigin, rayDirection, rayLength, sphereCenter, sphereRadius)
+	return IntersectRaySphereF(rayOrigin.x, rayOrigin.y, rayOrigin.z, rayDirection.x, rayDirection.y, rayDirection.z, rayLength, sphereCenter.x, sphereCenter.y, sphereCenter.z, sphereRadius)
 end
 local Part = Instance.new("Part")
 Part.Anchored = true
@@ -49,73 +48,73 @@ Part.CFrame = CFrame.new(0, 0, 0)
 Part.CanCollide = false
 Part.Transparency = 1
 Part.Parent = workspace
-local v1 = Instance.new("Folder")
-v1.Parent = workspace
-local t2 = {}
-t2.__index = t2
-function t2.new(p1)
-	assert(p1 ~= nil)
-	local t = {}
-	setmetatable(t, t2)
-	t.Maid = Maid.new()
-	local v3 = Signal.new()
-	t.Maid:GiveTask(v3)
-	local v4 = Signal.new()
-	t.Maid:GiveTask(v4)
-	local v5 = Signal.new()
-	t.Maid:GiveTask(v5)
-	local v6 = Signal.new()
-	t.Maid:GiveTask(v6)
-	t.BulletWhizEnabled = true
-	t.Local = p1
-	t.IgnoreList = {}
-	t.IgnoreLocalPlayer = true
-	t.OnLocalHitPlayer = v3
-	t.OnHitSurface = v4
-	t.OnQueueEmptied = v5
-	t.OnShieldDamage = v6
-	t.Bullets = {}
-	t.LastUpdate = nil
-	t.LastPlayedWhizSound = nil
-	t.GravityVector = nil
-	t.LifeSpan = nil
-	t.Color = Color3.fromRGB(255, 235, 141)
-	t._mapLastHitSurface = {}
-	t._customCollidableFunc = t:_buildCustomCollidableFunc()
-	return t
+local BulletVisualsFolder = Instance.new("Folder")
+BulletVisualsFolder.Parent = workspace
+local BulletEmitter = {}
+BulletEmitter.__index = BulletEmitter
+function BulletEmitter.new(isLocalEmitter)
+	assert(isLocalEmitter ~= nil)
+	local instance = {}
+	setmetatable(instance, BulletEmitter)
+	instance.Maid = Maid.new()
+	local onLocalHitPlayerSignal = Signal.new()
+	instance.Maid:GiveTask(onLocalHitPlayerSignal)
+	local onHitSurfaceSignal = Signal.new()
+	instance.Maid:GiveTask(onHitSurfaceSignal)
+	local onQueueEmptiedSignal = Signal.new()
+	instance.Maid:GiveTask(onQueueEmptiedSignal)
+	local onShieldDamageSignal = Signal.new()
+	instance.Maid:GiveTask(onShieldDamageSignal)
+	instance.BulletWhizEnabled = true
+	instance.Local = isLocalEmitter
+	instance.IgnoreList = {}
+	instance.IgnoreLocalPlayer = true
+	instance.OnLocalHitPlayer = onLocalHitPlayerSignal
+	instance.OnHitSurface = onHitSurfaceSignal
+	instance.OnQueueEmptied = onQueueEmptiedSignal
+	instance.OnShieldDamage = onShieldDamageSignal
+	instance.Bullets = {}
+	instance.LastUpdate = nil
+	instance.LastPlayedWhizSound = nil
+	instance.GravityVector = nil
+	instance.LifeSpan = nil
+	instance.Color = Color3.fromRGB(255, 235, 141)
+	instance._mapLastHitSurface = {}
+	instance._customCollidableFunc = instance:_buildCustomCollidableFunc()
+	return instance
 end
-function t2.Emit(p1, p2, p3, p4)
+function BulletEmitter.Emit(emitter, position, direction, speed)
 	local LineHandleAdornment = Instance.new("LineHandleAdornment")
 	LineHandleAdornment.Adornee = Part
 	LineHandleAdornment.AdornCullingMode = Enum.AdornCullingMode.Automatic
 	LineHandleAdornment.Transparency = 0
-	LineHandleAdornment.Color3 = p1.Color
+	LineHandleAdornment.Color3 = emitter.Color
 	LineHandleAdornment.Thickness = 2
 	LineHandleAdornment.SizeRelativeOffset = Vector3.new(0, 0, 0)
 	LineHandleAdornment.Length = 0
 	LineHandleAdornment.CFrame = CFrame.new()
-	LineHandleAdornment.Parent = v1
-	local t = {
-		p2,
-		p3,
-		p4,
+	LineHandleAdornment.Parent = BulletVisualsFolder
+	local bulletData = {
+		position,
+		direction,
+		speed,
 		LineHandleAdornment,
-		p1.LifeSpan,
-		p2
+		emitter.LifeSpan,
+		position
 	}
-	local t2 = {}
-	for i, v in ipairs(p1.IgnoreList) do
-		t2[#t2 + 1] = v
+	local ignoreListCopy = {}
+	for i, ignoredPart in ipairs(emitter.IgnoreList) do
+		ignoreListCopy[#ignoreListCopy + 1] = ignoredPart
 	end
-	t[7] = t2
-	p1.Bullets[#p1.Bullets + 1] = t
+	bulletData[7] = ignoreListCopy
+	emitter.Bullets[#emitter.Bullets + 1] = bulletData
 end
-local t3 = { t.bullet_flyby_01, t.bullet_flyby_04 }
-local t4 = {}
+local WhizSoundIds = { SoundIdMap.bullet_flyby_01, SoundIdMap.bullet_flyby_04 }
+local WhizPartPool = {}
 local function getWhizPart()
-	local v1 = table.remove(t4)
-	if v1 then
-		return v1
+	local pooledPart = table.remove(WhizPartPool)
+	if pooledPart then
+		return pooledPart
 	else
 		local Part = Instance.new("Part")
 		Part.Transparency = 1
@@ -125,247 +124,247 @@ local function getWhizPart()
 		return Part
 	end
 end
-local function returnWhizPart(p1)
-	p1.Parent = nil
-	if #t4 < 8 then
-		t4[#t4 + 1] = p1
+local function returnWhizPart(whizPart)
+	whizPart.Parent = nil
+	if #WhizPartPool < 8 then
+		WhizPartPool[#WhizPartPool + 1] = whizPart
 	else
-		p1:Destroy()
+		whizPart:Destroy()
 	end
 end
-function t2.PlayWhiz(p1, p2, p3)
-	local v1 = table.remove(t4)
-	local v2
-	if v1 then
-		v2 = v1
+function BulletEmitter.PlayWhiz(emitter, position, distance)
+	local pooledPart = table.remove(WhizPartPool)
+	local whizPart
+	if pooledPart then
+		whizPart = pooledPart
 	else
 		local Part = Instance.new("Part")
 		Part.Transparency = 1
 		Part.Anchored = true
 		Part.CanCollide = false
 		Part.Size = Vector3.new(1, 1, 1)
-		v2 = Part
+		whizPart = Part
 	end
-	v2.Position = p2
-	v2.Parent = workspace
-	Audio.ObjectLocal(v2, t3[math.random(1, #t3)], {
+	whizPart.Position = position
+	whizPart.Parent = workspace
+	Audio.ObjectLocal(whizPart, WhizSoundIds[math.random(1, #WhizSoundIds)], {
 		TimePosition = 0.3,
-		Volume = 0.6 * (1 - p3 / 10),
+		Volume = 0.6 * (1 - distance / 10),
 		Pitch = 1 + math.random() * 0.1 - 0.05
 	})
-	task.delay(3, returnWhizPart, v2)
+	task.delay(3, returnWhizPart, whizPart)
 end
-function t2.CheckWhiz(p1, p2)
-	local v1 = tick()
-	local v2 = PlayerUtils.getRootPart(LocalPlayer)
-	if v2 ~= nil then
-		local v3 = p2[1]
-		local Magnitude = (v3 - v2.Position).Magnitude
-		if Magnitude < 10 and (p2[3] > 100 and v1 - (p1.LastPlayedWhizSound or 0) > 0.1) then
-			p1:PlayWhiz(v3, Magnitude)
-			p1.LastPlayedWhizSound = v1
+function BulletEmitter.CheckWhiz(emitter, bulletData)
+	local currentTime = tick()
+	local playerRootPart = PlayerUtils.getRootPart(LocalPlayer)
+	if playerRootPart ~= nil then
+		local bulletOrigin = bulletData[1]
+		local distanceToPlayer = (bulletOrigin - playerRootPart.Position).Magnitude
+		if distanceToPlayer < 10 and (bulletData[3] > 100 and currentTime - (emitter.LastPlayedWhizSound or 0) > 0.1) then
+			emitter:PlayWhiz(bulletOrigin, distanceToPlayer)
+			emitter.LastPlayedWhizSound = currentTime
 		end
 	end
 end
-function t2._buildCustomCollidableFunc(p1)
-	return function(p12)
-		if p12:GetAttribute("InvisibleToBullets") == true then
+function BulletEmitter._buildCustomCollidableFunc(emitter)
+	return function(part)
+		if part:GetAttribute("InvisibleToBullets") == true then
 			return false
 		else
-			if not p12.CanCollide and p1._listRootPart then
-				for i, v in ipairs(p1._listRootPart) do
-					local _ = p12:IsDescendantOf(v.Parent)
+			if not part.CanCollide and emitter._listRootPart then
+				for i, rootPart in ipairs(emitter._listRootPart) do
+					local _ = part:IsDescendantOf(rootPart.Parent)
 				end
 			end
 			return true
 		end
 	end
 end
-local t5 = {
+local attachmentNameSet = {
 	HairAttachment = true,
 	HatAttachment = true,
 	FaceFrontAttachment = true,
 	FaceCenterAttachment = true
 }
-function t2.Update(p1)
+function BulletEmitter.Update(emitter)
 	debug.profilebegin("BulletEmitter Update")
-	local v1 = tick()
-	local v2 = v1 - (p1.LastUpdate or v1)
-	p1.LastUpdate = v1
-	local v3 = nil
-	local v4 = p1.Local or p1.SimulateLocal
-	if v4 then
-		v3 = {}
-		local t = {}
-		local v5 = if LocalPlayer.Character then LocalPlayer.Character.PrimaryPart else nil
-		for v7, v8 in CollectionService:GetTagged("Humanoid") do
-			local v6
-			if v8:IsDescendantOf(workspace) then
-				local RootPart = v8.RootPart
-				if RootPart and not t[RootPart] then
-					t[RootPart] = true
-					v6 = not p1.IgnoreLocalPlayer or RootPart ~= v5
-					if p1.IgnoreGuards and GuardNPCBinder:Get(RootPart.Parent) then
-						v6 = false
+	local currentTime = tick()
+	local deltaTime = currentTime - (emitter.LastUpdate or currentTime)
+	emitter.LastUpdate = currentTime
+	local targetCharacterRootParts = nil
+	local isLocalCollisionEnabled = emitter.Local or emitter.SimulateLocal
+	if isLocalCollisionEnabled then
+		targetCharacterRootParts = {}
+		local rootPartSet = {}
+		local localPlayerPrimaryPart = if LocalPlayer.Character then LocalPlayer.Character.PrimaryPart else nil
+		for _, humanoid in CollectionService:GetTagged("Humanoid") do
+			local shouldIncludeRootPart
+			if humanoid:IsDescendantOf(workspace) then
+				local RootPart = humanoid.RootPart
+				if RootPart and not rootPartSet[RootPart] then
+					rootPartSet[RootPart] = true
+					shouldIncludeRootPart = not emitter.IgnoreLocalPlayer or RootPart ~= localPlayerPrimaryPart
+					if emitter.IgnoreGuards and GuardNPCBinder:Get(RootPart.Parent) then
+						shouldIncludeRootPart = false
 					end
-					if v6 then
-						v3[#v3 + 1] = RootPart
+					if shouldIncludeRootPart then
+						targetCharacterRootParts[#targetCharacterRootParts + 1] = RootPart
 					end
 				end
 			end
 		end
-		p1._listRootPart = v3
+		emitter._listRootPart = targetCharacterRootParts
 	end
-	local v9 = p1.ShieldBlockPct or 1
-	local v10 = #p1.Bullets
-	local LifeSpan = p1.LifeSpan
+	local shieldBlockChance = emitter.ShieldBlockPct or 1
+	local bulletCount = #emitter.Bullets
+	local LifeSpan = emitter.LifeSpan
 	local ListShields = ForcefieldService.ListShields
-	local v11 = #ListShields
-	if t2._militaryForcefield and (t2._militaryForcefield.Part.Transparency < 1 and not t2._militaryForcefield.Ignore) then
-		local v12 = table.clone(ListShields)
-		v12[v11 + 1] = t2._militaryForcefield
-		ListShields = v12
+	local shieldListLength = #ListShields
+	if BulletEmitter._militaryForcefield and (BulletEmitter._militaryForcefield.Part.Transparency < 1 and not BulletEmitter._militaryForcefield.Ignore) then
+		local shieldListClone = table.clone(ListShields)
+		shieldListClone[shieldListLength + 1] = BulletEmitter._militaryForcefield
+		ListShields = shieldListClone
 	end
-	local v13 = Players:GetPlayers()
-	for i = v10, 1, -1 do
-		local v14, v15, v16, v17
-		local v18 = p1.Bullets[i]
-		local v19 = v18[1]
-		local sum = v18[2]
-		local v20 = v18[3]
-		local v21 = v18[4]
-		local v22 = v18[5]
-		if v22 > 0 and sum then
-			local v23 = v20 * v2
-			local v24 = nil
-			local v25 = nil
-			local v26 = nil
-			local v27 = nil
-			local v28 = nil
-			v14 = v19
-			if not v24 then
-				for i2, v in ipairs(ListShields) do
-					local Position = v.Position
-					local v29 = IntersectRaySphereF(v19.x, v19.y, v19.z, sum.x, sum.y, sum.z, v23, Position.x, Position.y, Position.z, v.Radius)
-					if v29 ~= nil and math.random() < v9 then
-						v24 = true
-						local v30 = v19 + v29 * sum * v23
-						local Unit = (v30 - Position).Unit
-						v14 = v30 + Unit * 0.001
-						sum = sum - 2 * sum:Dot(Unit) * Unit
-						if not v.Part then
-							p1.OnShieldDamage:Fire(v, v14, Unit, v25)
+	local allPlayers = Players:GetPlayers()
+	for i = bulletCount, 1, -1 do
+		local hitPart, hitPosition, hitNormal, hitMaterial
+		local currentBullet = emitter.Bullets[i]
+		local bulletPosition = currentBullet[1]
+		local bulletDirection = currentBullet[2]
+		local bulletSpeed = currentBullet[3]
+		local bulletVisual = currentBullet[4]
+		local bulletLifespan = currentBullet[5]
+		if bulletLifespan > 0 and bulletDirection then
+			local rayDistance = bulletSpeed * deltaTime
+			local shieldBlocked = nil
+			local hitTargetHumanoid = nil
+			local hitPlayerBullet = nil
+			local headShotFlag = nil
+			local reflectedDirection = nil
+			local nextPosition = bulletPosition
+			if not shieldBlocked then
+				for i2, shield in ipairs(ListShields) do
+					local Position = shield.Position
+					local shieldIntersectionT = IntersectRaySphereF(bulletPosition.x, bulletPosition.y, bulletPosition.z, bulletDirection.x, bulletDirection.y, bulletDirection.z, rayDistance, Position.x, Position.y, Position.z, shield.Radius)
+					if shieldIntersectionT ~= nil and math.random() < shieldBlockChance then
+						shieldBlocked = true
+						local blockPosition = bulletPosition + shieldIntersectionT * bulletDirection * rayDistance
+						local blockNormal = (blockPosition - Position).Unit
+						nextPosition = blockPosition + blockNormal * 0.001
+						bulletDirection = bulletDirection - 2 * bulletDirection:Dot(blockNormal) * blockNormal
+						if not shield.Part then
+							emitter.OnShieldDamage:Fire(shield, nextPosition, blockNormal, hitTargetHumanoid)
 						end
 						break
 					end
 				end
-				for v31, v32 in v13 do
-					local v33 = ItemSystem.GetEquipped(v32)
-					if v33 and InventoryItemUtils.getName(v33.inventoryItemValue) == "ShieldSWAT" then
-						local BulletCollide = v33.Model:FindFirstChild("Skeleton"):FindFirstChild("BulletCollide")
-						local v34 = Math.IntersectRayPlane(v19, sum, BulletCollide.Position, BulletCollide.CFrame.LookVector)
+				for _, player in allPlayers do
+					local equippedItem = ItemSystem.GetEquipped(player)
+					if equippedItem and InventoryItemUtils.getName(equippedItem.inventoryItemValue) == "ShieldSWAT" then
+						local BulletCollide = equippedItem.Model:FindFirstChild("Skeleton"):FindFirstChild("BulletCollide")
+						local planeIntersectionT = Math.IntersectRayPlane(bulletPosition, bulletDirection, BulletCollide.Position, BulletCollide.CFrame.LookVector)
 					end
 				end
 			end
-			if not v24 and v4 then
-				for i2, v in ipairs(v3) do
-					local Position = v.Position
-					local v36 = IntersectRaySphereF(v19.x, v19.y, v19.z, sum.x, sum.y, sum.z, v23, Position.x, Position.y, Position.z, (CombatUtils.getRootPartHitRadius(v)))
-					if v36 ~= nil then
-						v14 = v19 + v36 * sum * v23
-						local Unit = (v14 - Position).Unit
-						local Humanoid = v.Parent:FindFirstChild("Humanoid")
+			if not shieldBlocked and isLocalCollisionEnabled then
+				for i2, rootPart in ipairs(targetCharacterRootParts) do
+					local Position = rootPart.Position
+					local characterHitT = IntersectRaySphereF(bulletPosition.x, bulletPosition.y, bulletPosition.z, bulletDirection.x, bulletDirection.y, bulletDirection.z, rayDistance, Position.x, Position.y, Position.z, (CombatUtils.getRootPartHitRadius(rootPart)))
+					if characterHitT ~= nil then
+						nextPosition = bulletPosition + characterHitT * bulletDirection * rayDistance
+						local characterNormal = (nextPosition - Position).Unit
+						local Humanoid = rootPart.Parent:FindFirstChild("Humanoid")
 						if not Humanoid or Humanoid.Health ~= 0 then
-							v26 = Humanoid
-							v27 = true
-							v24 = v
+							hitTargetHumanoid = Humanoid
+							hitPlayerBullet = true
+							shieldBlocked = rootPart
 							break
 						end
-						v24 = v
-						v26 = nil
+						shieldBlocked = rootPart
+						hitTargetHumanoid = nil
 					end
 				end
 			end
-			if not v24 then
-				local v37, v38, v39, v40 = RayCast.RayIgnoreNonCollideWithIgnoreList(v19, sum, v23, v18[7], nil, nil, p1._customCollidableFunc)
-				if v37 then
-					v18[7][#v18[7] + 1] = v37
-					if v4 then
-						v15 = v37
-						v14 = v38
-						v16 = v39
-						v17 = v40
-						for v41, v42 in v3 do
-							if v15:IsDescendantOf(v42.Parent) then
-								local Humanoid = v42.Parent:FindFirstChild("Humanoid")
+			if not shieldBlocked then
+				local rayHitPart, rayHitPosition, rayHitNormal, rayHitMaterial = RayCast.RayIgnoreNonCollideWithIgnoreList(bulletPosition, bulletDirection, rayDistance, currentBullet[7], nil, nil, emitter._customCollidableFunc)
+				if rayHitPart then
+					currentBullet[7][#currentBullet[7] + 1] = rayHitPart
+					if isLocalCollisionEnabled then
+						hitPart = rayHitPart
+						nextPosition = rayHitPosition
+						hitNormal = rayHitNormal
+						hitMaterial = rayHitMaterial
+						for _, rootPart in targetCharacterRootParts do
+							if hitPart:IsDescendantOf(rootPart.Parent) then
+								local Humanoid = rootPart.Parent:FindFirstChild("Humanoid")
 								local _ = Humanoid and Humanoid.Health > 0
 							end
 						end
-						if v26 then
-							local v43 = Players:GetPlayerFromCharacter(v26.Parent) ~= nil
-							if not v43 and v15.Name == "Head" then
-								v28 = true
-							elseif not v43 then
-								local Attachment = v15:FindFirstChildOfClass("Attachment")
-								if Attachment and t5[Attachment.Name] then
-									v28 = true
+						if hitTargetHumanoid then
+							local isPlayerHumanoid = Players:GetPlayerFromCharacter(hitTargetHumanoid.Parent) ~= nil
+							if not isPlayerHumanoid and hitPart.Name == "Head" then
+								headShotFlag = true
+							elseif not isPlayerHumanoid then
+								local Attachment = hitPart:FindFirstChildOfClass("Attachment")
+								if Attachment and attachmentNameSet[Attachment.Name] then
+									headShotFlag = true
 								end
 							end
 						end
 					else
-						v15 = v37
-						v14 = v38
-						v16 = v39
-						v17 = v40
+						hitPart = rayHitPart
+						nextPosition = rayHitPosition
+						hitNormal = rayHitNormal
+						hitMaterial = rayHitMaterial
 					end
-					p1.OnHitSurface:Fire(v15, v14, v16, v17)
-					v27 = true
+					emitter.OnHitSurface:Fire(hitPart, nextPosition, hitNormal, hitMaterial)
+					hitPlayerBullet = true
 				else
-					v14 = v38
+					nextPosition = rayHitPosition
 				end
 			end
-			if v26 then
-				local v44 = v18[6]
-				local v45 = LifeSpan - (v22 - v2 * ((v14 - v19).Magnitude / v23))
-				local _ = GuardNPCBinder:Get(v26.Parent) == nil
-				p1.OnLocalHitPlayer:Fire(v26, 0.7483072263887747 * v44.x - 0.6609848067581097 * v44.y - 0.055994465523689876 * v44.z, 0.2852117920578111 * sum.x + 0.3968011188544949 * sum.y - 0.8724695443091369 * sum.z, 0.7483072263887747 * v14.x - 0.6609848067581097 * v14.y - 0.055994465523689876 * v14.z, 0.7483072263887747 * v45, 0.2852117920578111 * v44.x + 0.3968011188544949 * v44.y - 0.8724695443091369 * v44.z, 0.5989077797169704 * v44.x + 0.6369049829533174 * v44.y + 0.485449805936436 * v44.z, 0.2852117920578111 * v45, 0.5989077797169704 * sum.x + 0.6369049829533174 * sum.y + 0.485449805936436 * sum.z, 0.7483072263887747 * sum.x - 0.6609848067581097 * sum.y - 0.055994465523689876 * sum.z, 0.5989077797169704 * v14.x + 0.6369049829533174 * v14.y + 0.485449805936436 * v14.z, 0.2852117920578111 * v14.x + 0.3968011188544949 * v14.y - 0.8724695443091369 * v14.z, 0.5989077797169704 * v45, {
-					isHeadshot = v28
+			if hitTargetHumanoid then
+				local bulletOrigin = currentBullet[6]
+				local remainingLifespan = LifeSpan - (bulletLifespan - deltaTime * ((nextPosition - bulletPosition).Magnitude / rayDistance))
+				local _ = GuardNPCBinder:Get(hitTargetHumanoid.Parent) == nil
+				emitter.OnLocalHitPlayer:Fire(hitTargetHumanoid, 0.7483072263887747 * bulletOrigin.x - 0.6609848067581097 * bulletOrigin.y - 0.055994465523689876 * bulletOrigin.z, 0.2852117920578111 * bulletDirection.x + 0.3968011188544949 * bulletDirection.y - 0.8724695443091369 * bulletDirection.z, 0.7483072263887747 * nextPosition.x - 0.6609848067581097 * nextPosition.y - 0.055994465523689876 * nextPosition.z, 0.7483072263887747 * remainingLifespan, 0.2852117920578111 * bulletOrigin.x + 0.3968011188544949 * bulletOrigin.y - 0.8724695443091369 * bulletOrigin.z, 0.5989077797169704 * bulletOrigin.x + 0.6369049829533174 * bulletOrigin.y + 0.485449805936436 * bulletOrigin.z, 0.2852117920578111 * remainingLifespan, 0.5989077797169704 * bulletDirection.x + 0.6369049829533174 * bulletDirection.y + 0.485449805936436 * bulletDirection.z, 0.7483072263887747 * bulletDirection.x - 0.6609848067581097 * bulletDirection.y - 0.055994465523689876 * bulletDirection.z, 0.5989077797169704 * nextPosition.x + 0.6369049829533174 * nextPosition.y + 0.485449805936436 * nextPosition.z, 0.2852117920578111 * nextPosition.x + 0.3968011188544949 * nextPosition.y - 0.8724695443091369 * nextPosition.z, 0.5989077797169704 * remainingLifespan, {
+					isHeadshot = headShotFlag
 				})
 			end
-			if v27 then
-				v22 = 0
+			if hitPlayerBullet then
+				bulletLifespan = 0
 			end
-			v21.Length = (v14 - v19).Magnitude
-			v21.CFrame = CFrame.new(v14, v19)
-			if p1.Local == false and p1.BulletWhizEnabled then
-				p1:CheckWhiz(v18)
+			bulletVisual.Length = (nextPosition - bulletPosition).Magnitude
+			bulletVisual.CFrame = CFrame.new(nextPosition, bulletPosition)
+			if emitter.Local == false and emitter.BulletWhizEnabled then
+				emitter:CheckWhiz(currentBullet)
 			end
-			if p1.GravityVector ~= nil then
-				sum = sum + p1.GravityVector * v2 / v20
+			if emitter.GravityVector ~= nil then
+				bulletDirection = bulletDirection + emitter.GravityVector * deltaTime / bulletSpeed
 			end
-			v18[1] = v14
-			v18[2] = sum
-			v18[3] = v20
-			v18[5] = v22 - v2
+			currentBullet[1] = nextPosition
+			currentBullet[2] = bulletDirection
+			currentBullet[3] = bulletSpeed
+			currentBullet[5] = bulletLifespan - deltaTime
 		else
-			v21:Destroy()
-			v18[4] = nil
-			table.remove(p1.Bullets, i)
+			bulletVisual:Destroy()
+			currentBullet[4] = nil
+			table.remove(emitter.Bullets, i)
 		end
 	end
-	if v10 > 0 and #p1.Bullets == 0 then
-		p1.OnQueueEmptied:Fire()
+	if bulletCount > 0 and #emitter.Bullets == 0 then
+		emitter.OnQueueEmptied:Fire()
 	end
 	debug.profileend()
 end
-function t2.Destroy(p1)
-	for i = #p1.Bullets, 1, -1 do
-		local v1 = p1.Bullets[i]
-		v1[4]:Destroy()
-		v1[4] = nil
+function BulletEmitter.Destroy(emitter)
+	for i = #emitter.Bullets, 1, -1 do
+		local bullet = emitter.Bullets[i]
+		bullet[4]:Destroy()
+		bullet[4] = nil
 	end
-	p1.Bullets = nil
-	p1.Maid:Destroy()
-	p1.Maid = nil
+	emitter.Bullets = nil
+	emitter.Maid:Destroy()
+	emitter.Maid = nil
 end
-return t2
+return BulletEmitter

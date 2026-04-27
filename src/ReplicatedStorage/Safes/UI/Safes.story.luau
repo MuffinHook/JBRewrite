@@ -1,12 +1,11 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(target)
+	local AppComponent = Roact.Component:extend("App")
 	local store = require(ReplicatedStorage.App.store)
 	local Safes = require(script.Parent.Safes)
-	function v1.init(p1)
+	function AppComponent.init(self)
 		store:dispatch({
 			type = "setSafesInventoryItems",
 			itemsOwned = {
@@ -62,7 +61,7 @@ return function(p1)
 			value = true
 		})
 	end
-	function v1.render(p1)
+	function AppComponent.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(Safes, {
@@ -72,9 +71,9 @@ return function(p1)
 				policyCashAvailable = 100000000
 			}) })
 	end
-	function v1.willUnmount(p1)  end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(self)  end
+	local mountedInstance = Roact.mount(Roact.createElement(AppComponent), target)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedInstance)
 	end
 end

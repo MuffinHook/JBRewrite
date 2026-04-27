@@ -1,63 +1,62 @@
--- Reviewed by Claude
 local t = {
-	dfs = function(p1, p2, p3, p4)
-		assert(p1 ~= nil, "missing Graph G")
-		assert(p2 ~= nil, "missing start vertex v")
-		assert(typeof(p3) == "nil" or typeof(p3) == "function", "invalid condition")
-		local var5 = p4 or p1.GetNeighbors
+	dfs = function(graph, startVertex, conditionFunction, customNeighborsFunction)
+		assert(graph ~= nil, "missing Graph G")
+		assert(startVertex ~= nil, "missing start vertex v")
+		assert(typeof(conditionFunction) == "nil" or typeof(conditionFunction) == "function", "invalid condition")
+		local neighborsFunction = customNeighborsFunction or graph.GetNeighbors
 		local t = {}
-		local function v6(p12)
-			t[p12] = true
-			for i, v in ipairs(var5(p1, p12)) do
-				if not t[v] and (p3 == nil or p3(v)) then
-					v6(v)
+		local function visitVertex(vertex)
+			t[vertex] = true
+			for i, neighbor in ipairs(neighborsFunction(graph, vertex)) do
+				if not t[neighbor] and (conditionFunction == nil or conditionFunction(neighbor)) then
+					visitVertex(neighbor)
 				end
 			end
 		end
-		v6(p2)
+		visitVertex(startVertex)
 		return t
 	end,
-	bfsSearch = function(p1, p2, p3)
-		local t = {}
-		table.insert(t, p2)
-		local t2 = {
-			[p2] = true
+	bfsSearch = function(graph, startNode, conditionFunction)
+		local queue = {}
+		table.insert(queue, startNode)
+		local visitedSet = {
+			[startNode] = true
 		}
-		while #t > 0 do
-			local tbl = table.remove(t)
-			if p3(tbl) then
-				return tbl
+		while #queue > 0 do
+			local currentNode = table.remove(queue)
+			if conditionFunction(currentNode) then
+				return currentNode
 			end
-			for i, v in ipairs(p1:GetNeighbors(tbl)) do
-				if not t2[v] then
-					t2[v] = true
-					table.insert(t, v)
+			for i, neighbor in ipairs(graph:GetNeighbors(currentNode)) do
+				if not visitedSet[neighbor] then
+					visitedSet[neighbor] = true
+					table.insert(queue, neighbor)
 				end
 			end
 		end
 	end
 }
-function t.weaklyConnectedComponents(p1)
-	assert(p1 ~= nil, "missing Graph G")
-	local t2 = {}
-	local t3 = {}
-	for i, v in ipairs(p1.ListNode) do
-		if not t2[v] then
-			t2[v] = true
-			local v2 = t.dfs(p1, v, nil, p1.GetUndirectedNeighbors)
-			local instance3 = getmetatable(p1).new()
-			for k in pairs(v2) do
-				t2[k] = true
-				instance3:AddNode(k)
-				for k2 in pairs(p1.MapNodeNode[k]) do
-					if v2[k2] then
-						instance3:AddEdge(k, k2)
+function t.weaklyConnectedComponents(graph)
+	assert(graph ~= nil, "missing Graph G")
+	local visitedGlobal = {}
+	local components = {}
+	for i, v in ipairs(graph.ListNode) do
+		if not visitedGlobal[v] then
+			visitedGlobal[v] = true
+			local componentVertices = t.dfs(graph, v, nil, graph.GetUndirectedNeighbors)
+			local componentGraph = getmetatable(graph).new()
+			for nodeKey in pairs(componentVertices) do
+				visitedGlobal[nodeKey] = true
+				componentGraph:AddNode(nodeKey)
+				for targetVertex in pairs(graph.MapNodeNode[nodeKey]) do
+					if componentVertices[targetVertex] then
+						componentGraph:AddEdge(nodeKey, targetVertex)
 					end
 				end
 			end
-			table.insert(t3, instance3)
+			table.insert(components, componentGraph)
 		end
 	end
-	return t3
+	return components
 end
 return t

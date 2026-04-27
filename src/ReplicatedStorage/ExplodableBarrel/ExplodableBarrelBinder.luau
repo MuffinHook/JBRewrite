@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local C4Utils = require(ReplicatedStorage.Game.C4.C4Utils)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)

@@ -1,22 +1,21 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
 local RunConsts = require(ReplicatedStorage.App.RunConsts)
 local isMAIN_WORLD_NAME = require(ReplicatedStorage.App.RunUtils).getWorld() == RunConsts.MAIN_WORLD_NAME
-local function _(p1, p2)
-	for i = 1, #p1 do
-		local v1 = p1[i]
-		if v1 == "1" then
-			task.spawn(p2, "1", 0.2)
+local function _(commands, callback)
+	for i = 1, #commands do
+		local commandCode = commands[i]
+		if commandCode == "1" then
+			task.spawn(callback, "1", 0.2)
 			task.wait(0.2)
 			task.wait(0.2)
-		elseif v1 == "2" then
-			task.spawn(p2, "2", 0.6000000000000001)
+		elseif commandCode == "2" then
+			task.spawn(callback, "2", 0.6000000000000001)
 			task.wait(0.6000000000000001)
 			task.wait(0.2)
-		elseif v1 == "4" then
+		elseif commandCode == "4" then
 			task.wait(0.6000000000000001)
-		elseif v1 == "3" then
+		elseif commandCode == "3" then
 			task.wait(1.4000000000000001)
 		end
 	end
@@ -27,73 +26,73 @@ end
 local function _()
 	v2:Destroy()
 end
-local function _(p1)
-	if p1 == "1" then
-		v3.Transparency = 0
-		v4.Transparency = 0.7
-		local v1 = v5.ObjectLocal(v6.PrimaryPart, 17091968256, {
+local function _(commandCode)
+	if commandCode == "1" then
+		laserVisual.Transparency = 0
+		sphereVisual.Transparency = 0.7
+		local commandSound = audioManager.ObjectLocal(doorPart.PrimaryPart, 17091968256, {
 			Volume = 1,
 			TimePosition = 0.1,
 			RollOffMaxDistance = 1536
 		})
 		task.wait(0.2)
-		v5.promiseFadeTo(v1, 0, 0.1):andThen(function()
-			v1:Destroy()
+		audioManager.promiseFadeTo(commandSound, 0, 0.1):andThen(function()
+			commandSound:Destroy()
 		end)
-		v3.Transparency = 1
-		v4.Transparency = 1
-	elseif p1 == "2" then
-		v3.Transparency = 0
-		v4.Transparency = 0.7
-		local v2 = v5.ObjectLocal(v6.PrimaryPart, 17091967549, {
+		laserVisual.Transparency = 1
+		sphereVisual.Transparency = 1
+	elseif commandCode == "2" then
+		laserVisual.Transparency = 0
+		sphereVisual.Transparency = 0.7
+		local commandSound = audioManager.ObjectLocal(doorPart.PrimaryPart, 17091967549, {
 			Volume = 1,
 			TimePosition = 0.1,
 			RollOffMaxDistance = 1536
 		})
 		task.wait(0.6000000000000001)
-		v5.promiseFadeTo(v2, 0, 0.1):andThen(function()
-			v2:Destroy()
+		audioManager.promiseFadeTo(commandSound, 0, 0.1):andThen(function()
+			commandSound:Destroy()
 		end)
-		v3.Transparency = 1
-		v4.Transparency = 1
+		laserVisual.Transparency = 1
+		sphereVisual.Transparency = 1
 	end
 end
-local function _(p1)
+local function _(commandSequence)
 	local Dish = workspace:WaitForChild("Live2024"):WaitForChild("Dish")
 	local Door = Dish:WaitForChild("Door")
 	local Laser = Dish:WaitForChild("Laser")
 	local Sphere = Dish:WaitForChild("Sphere")
-	local v1 = os.clock()
-	v7(p1, function(p1)
-		if p1 == "1" then
+	local startTime = os.clock()
+	playCommandSequence(commandSequence, function(commandCode)
+		if commandCode == "1" then
 			Laser.Transparency = 0
 			Sphere.Transparency = 0.7
-			local v1 = v8.ObjectLocal(Door.PrimaryPart, 17091968256, {
+			local commandSound = audioManager.ObjectLocal(Door.PrimaryPart, 17091968256, {
 				Volume = 1,
 				TimePosition = 0.1,
 				RollOffMaxDistance = 1536
 			})
 			task.wait(0.2)
-			v8.promiseFadeTo(v1, 0, 0.1):andThen(function()
-				v1:Destroy()
+			audioManager.promiseFadeTo(commandSound, 0, 0.1):andThen(function()
+				commandSound:Destroy()
 			end)
 			Laser.Transparency = 1
 			Sphere.Transparency = 1
-		elseif p1 == "2" then
+		elseif commandCode == "2" then
 			Laser.Transparency = 0
 			Sphere.Transparency = 0.7
-			local v2 = v8.ObjectLocal(Door.PrimaryPart, 17091967549, {
+			local commandSound = audioManager.ObjectLocal(Door.PrimaryPart, 17091967549, {
 				Volume = 1,
 				TimePosition = 0.1,
 				RollOffMaxDistance = 1536
 			})
 			task.wait(0.6000000000000001)
-			v8.promiseFadeTo(v2, 0, 0.1):andThen(function()
-				v2:Destroy()
+			audioManager.promiseFadeTo(commandSound, 0, 0.1):andThen(function()
+				commandSound:Destroy()
 			end)
 			Laser.Transparency = 1
 			Sphere.Transparency = 1
 		end
 	end)
-	print("Time taken: ", os.clock() - v1)
+	print("Time taken: ", os.clock() - startTime)
 end

@@ -1,6 +1,5 @@
--- Reviewed by Claude
 local Basic = require(script.Parent.Basic)
-local t = {
+local motionConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -14,21 +13,21 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local t2 = {
+local CrateClass = {
 	__ClassName = "Crate"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	v1.SpringNeckRotation:SetTarget(Vector3.new(-0.2, 0, 0))
-	v1.SpringWaistRotation:SetTarget(Vector3.new(0.2, 0, 0))
-	v1:DefaultDisableCamLock()
-	return v1
+CrateClass.__index = CrateClass
+setmetatable(CrateClass, Basic)
+function CrateClass.new(item, itemInstance, motionSettings)
+	local crateInstance = Basic.new(item, itemInstance, motionConfig, motionSettings)
+	setmetatable(crateInstance, CrateClass)
+	crateInstance.SpringNeckRotation:SetTarget(Vector3.new(-0.2, 0, 0))
+	crateInstance.SpringWaistRotation:SetTarget(Vector3.new(0.2, 0, 0))
+	crateInstance:DefaultDisableCamLock()
+	return crateInstance
 end
-function t2.InputBegan(p1, ...)
-	Basic.InputBegan(p1, ...)
+function CrateClass.InputBegan(self, ...)
+	Basic.InputBegan(self, ...)
 end
-function t2.InputEnded(p1) end
-return t2
+function CrateClass.InputEnded(self) end
+return CrateClass

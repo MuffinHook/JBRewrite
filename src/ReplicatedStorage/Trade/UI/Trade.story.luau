@@ -1,12 +1,11 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(target)
+	local AppComponent = Roact.Component:extend("App")
 	local store = require(ReplicatedStorage.App.store)
 	local Trade = require(script.Parent.Trade)
-	function v1.init(p1)
+	function AppComponent.init(target)
 		store:dispatch({
 			type = "updateTraderMe",
 			userId = 2025110,
@@ -24,14 +23,14 @@ return function(p1)
 			value = true
 		})
 	end
-	function v1.render(p1)
+	function AppComponent.render(target)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(Trade, {}) })
 	end
-	function v1.willUnmount(p1)  end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(target)  end
+	local mountedInstance = Roact.mount(Roact.createElement(AppComponent), target)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedInstance)
 	end
 end

@@ -1,9 +1,7 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local categoryLoaded = {}
 local categoryModules = {}
-for v1, child in script:GetChildren() do
+for index, child in script:GetChildren() do
 	categoryLoaded[child.Name] = false
 end
 local function GetCategoryByName(categoryName)
@@ -28,7 +26,7 @@ local function GetItemByName(categoryName, itemName)
 		if categoryModule.GetItemByName then
 			return categoryModule.GetItemByName(itemName)
 		end
-		for v3, item in if categoryModule.GetItems then categoryModule.GetItems() else categoryModule.Items do
+		for index, item in if categoryModule.GetItems then categoryModule.GetItems() else categoryModule.Items do
 			if item.Name == itemName then
 				return item
 			end
@@ -46,8 +44,8 @@ return {
 	GetMapFromSelection = function(selectionMap)
 		assert(selectionMap)
 		local result = {}
-		for k, v in pairs(selectionMap) do
-			result[k] = GetItemByName(k, v)
+		for categoryName, itemName in pairs(selectionMap) do
+			result[categoryName] = GetItemByName(categoryName, itemName)
 		end
 		return result
 	end

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
@@ -6,207 +5,207 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local Format = require(ReplicatedStorage.Module.Format)
 local RobberyConsts = require(ReplicatedStorage.Robbery.RobberyConsts)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
-local t = {
+local RobberyMoneyUI = {
 	Formatter = {},
 	CurrentTier = 1
 }
-local function Cash(p1, p2)
-	return ("%s / %s"):format(Format.Currency(p1), Format.Currency(p2))
+local function Cash(currentAmount, maxAmount)
+	return ("%s / %s"):format(Format.Currency(currentAmount), Format.Currency(maxAmount))
 end
-t.Formatter.Cash = Cash
-local function CashNoMax(p1)
-	return ("%s Cash"):format(Format.Currency(p1))
+RobberyMoneyUI.Formatter.Cash = Cash
+local function CashNoMax(currentAmount)
+	return ("%s Cash"):format(Format.Currency(currentAmount))
 end
-t.Formatter.CashNoMax = CashNoMax
-local function Weight(p1, p2)
-	return ("%d kg / %d kg"):format(p1, p2)
+RobberyMoneyUI.Formatter.CashNoMax = CashNoMax
+local function Weight(currentWeight, maxWeight)
+	return ("%d kg / %d kg"):format(currentWeight, maxWeight)
 end
-t.Formatter.Weight = Weight
-t.SelectedFormatter = t.Formatter.Cash
-function t.Init()
+RobberyMoneyUI.Formatter.Weight = Weight
+RobberyMoneyUI.SelectedFormatter = RobberyMoneyUI.Formatter.Cash
+function RobberyMoneyUI.Init()
 	local RobberyMoneyGui = ReplicatedStorage.StarterGui:FindFirstChild("RobberyMoneyGui")
 	RobberyMoneyGui.Parent = LocalPlayer.PlayerGui
-	t.Gui = RobberyMoneyGui.Frame
+	RobberyMoneyUI.Gui = RobberyMoneyGui.Frame
 end
-function t.GetMaxSizeForTier(p1)
-	assert(p1 ~= nil)
-	assert(p1 >= 1)
-	return t.Gui.Container.Bottom.Progress.Tiers:FindFirstChild("Tier" .. p1).Position.X.Scale
+function RobberyMoneyUI.GetMaxSizeForTier(tierNumber)
+	assert(tierNumber ~= nil)
+	assert(tierNumber >= 1)
+	return RobberyMoneyUI.Gui.Container.Bottom.Progress.Tiers:FindFirstChild("Tier" .. tierNumber).Position.X.Scale
 end
-local v1 = nil
-local v2 = TweenInfo.new(1.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-local v3 = TweenInfo.new(2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-function t.Show()
-	if t.Maid ~= nil then
+local guiTween = nil
+local showTweenInfo = TweenInfo.new(1.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+local hideTweenInfo = TweenInfo.new(2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+function RobberyMoneyUI.Show()
+	if RobberyMoneyUI.Maid ~= nil then
 		return false
 	end
-	local Gui = t.Gui
-	local v12 = Maid.new()
-	t.Maid = v12
-	if v1 then
-		v1:Cancel()
+	local Gui = RobberyMoneyUI.Gui
+	local maidInstance = Maid.new()
+	RobberyMoneyUI.Maid = maidInstance
+	if guiTween then
+		guiTween:Cancel()
 	end
 	Gui.Position = UDim2.fromScale(1, 0)
 	Gui.Visible = true
-	v1 = TweenService:Create(Gui, v2, {
+	guiTween = TweenService:Create(Gui, showTweenInfo, {
 		Position = UDim2.fromScale(0, 0)
 	})
-	v1:Play()
-	v12:GiveTask(function()
-		if v1 then
-			v1:Cancel()
+	guiTween:Play()
+	maidInstance:GiveTask(function()
+		if guiTween then
+			guiTween:Cancel()
 		end
-		v1 = TweenService:Create(Gui, v3, {
+		guiTween = TweenService:Create(Gui, hideTweenInfo, {
 			Position = UDim2.fromScale(1, 0)
 		})
-		v1:Play()
-		v1.Completed:Once(function(p1)
-			if p1 == Enum.PlaybackState.Completed then
+		guiTween:Play()
+		guiTween.Completed:Once(function(playbackState)
+			if playbackState == Enum.PlaybackState.Completed then
 				Gui.Visible = false
 			end
 		end)
 	end)
 	Gui.Container.Bottom.Progress.Slider.Value.Size = UDim2.new(0, 0, 1, 0)
-	v12:GiveTask(function()
+	maidInstance:GiveTask(function()
 		Gui.Container.Bottom.Progress.Slider.Value.Size = UDim2.new(0, 0, 1, 0)
 	end)
 end
-function t.getUpgradeButton()
-	return t.Gui.Container.Top.Upgrade
+function RobberyMoneyUI.getUpgradeButton()
+	return RobberyMoneyUI.Gui.Container.Top.Upgrade
 end
-function t.SetFormatter(p1)
-	t.SelectedFormatter = p1
+function RobberyMoneyUI.SetFormatter(formatter)
+	RobberyMoneyUI.SelectedFormatter = formatter
 end
-function t.SetTime(p1)
-	local Gui = t.Gui
-	Gui.Container.Time.Visible = p1 ~= nil
-	if p1 ~= nil then
-		if p1 > 60 then
-			local v2 = math.floor(p1 / 60)
-			local v3 = math.floor(p1 % 60)
-			Gui.Container.Time.Text = ("%d:%02d"):format(math.max(v2, 0), (math.max(v3, 0)))
+function RobberyMoneyUI.SetTime(secondsRemaining)
+	local Gui = RobberyMoneyUI.Gui
+	Gui.Container.Time.Visible = secondsRemaining ~= nil
+	if secondsRemaining ~= nil then
+		if secondsRemaining > 60 then
+			local minutes = math.floor(secondsRemaining / 60)
+			local seconds = math.floor(secondsRemaining % 60)
+			Gui.Container.Time.Text = ("%d:%02d"):format(math.max(minutes, 0), (math.max(seconds, 0)))
 			return
 		end
-		Gui.Container.Time.Text = ("%d"):format((math.max(p1, 0)))
+		Gui.Container.Time.Text = ("%d"):format((math.max(secondsRemaining, 0)))
 	end
 end
-function t.SetTier(p1, p2)
-	assert(p1 ~= nil)
-	assert(p1 >= 1)
-	assert(p2 ~= nil)
-	local Gui = t.Gui
+function RobberyMoneyUI.SetTier(tierIndex, isVisible)
+	assert(tierIndex ~= nil)
+	assert(tierIndex >= 1)
+	assert(isVisible ~= nil)
+	local Gui = RobberyMoneyUI.Gui
 	local Tiers = Gui.Container.Bottom.Progress.Tiers
 	local count = 0
-	for i, v in ipairs(Tiers:GetChildren()) do
-		if v:IsA("Frame") then
+	for _, tierInstance in ipairs(Tiers:GetChildren()) do
+		if tierInstance:IsA("Frame") then
 			count = count + 1
 		end
 	end
-	assert(p1 <= count)
+	assert(tierIndex <= count)
 	for i = 1, count do
-		local v5 = Tiers:FindFirstChild("Tier" .. i)
-		if i == p1 then
-			v5.BackgroundTransparency = 0
-			v5.Circle.Tier.UIGradient.Enabled = false
+		local tierFrame = Tiers:FindFirstChild("Tier" .. i)
+		if i == tierIndex then
+			tierFrame.BackgroundTransparency = 0
+			tierFrame.Circle.Tier.UIGradient.Enabled = false
 		else
-			v5.BackgroundTransparency = 0.7
-			v5.Circle.Tier.UIGradient.Enabled = true
+			tierFrame.BackgroundTransparency = 0.7
+			tierFrame.Circle.Tier.UIGradient.Enabled = true
 		end
-		v5.Visible = p2
+		tierFrame.Visible = isVisible
 	end
 	local Top = Gui.Container.Top
-	local v6 = if p1 < count then if t.SelectedFormatter == t.Formatter.CashNoMax then false else p2 else false
-	Top.Upgrade.Visible = v6
-	Top.Alternative.Visible = not v6
-	if v6 then
-		Top.Upgrade.Title.Text = ("Unlock Tier %d"):format(p1 + 1)
+	local shouldShowUpgrade = if tierIndex < count then if RobberyMoneyUI.SelectedFormatter == RobberyMoneyUI.Formatter.CashNoMax then false else isVisible else false
+	Top.Upgrade.Visible = shouldShowUpgrade
+	Top.Alternative.Visible = not shouldShowUpgrade
+	if shouldShowUpgrade then
+		Top.Upgrade.Title.Text = ("Unlock Tier %d"):format(tierIndex + 1)
 	end
-	t.CurrentTier = p2 and p1 or count
+	RobberyMoneyUI.CurrentTier = isVisible and tierIndex or count
 end
-local v4 = nil
-local v5 = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-function t.SetMoney(p1, p2, p3)
-	assert(p1)
-	assert(p2)
-	local Gui = t.Gui
-	Gui.Container.Bottom.Progress.Amount.Text = t.SelectedFormatter(p1, p2)
-	if v4 then
-		v4:Cancel()
+local moneySliderTween = nil
+local moneySliderTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+function RobberyMoneyUI.SetMoney(currentAmount, maxAmount, isInstant)
+	assert(currentAmount)
+	assert(maxAmount)
+	local Gui = RobberyMoneyUI.Gui
+	Gui.Container.Bottom.Progress.Amount.Text = RobberyMoneyUI.SelectedFormatter(currentAmount, maxAmount)
+	if moneySliderTween then
+		moneySliderTween:Cancel()
 	end
-	if t.SelectedFormatter == t.Formatter.CashNoMax then
-		if p3 then
+	if RobberyMoneyUI.SelectedFormatter == RobberyMoneyUI.Formatter.CashNoMax then
+		if isInstant then
 			Gui.Container.Bottom.Progress.Slider.Value.Size = UDim2.new(1, 0, 1, 0)
 		else
 			Gui.Container.Bottom.Progress.Slider.Value.Size = UDim2.new(0, 0, 1, 0)
-			v4 = TweenService:Create(Gui.Container.Bottom.Progress.Slider.Value, v5, {
+			moneySliderTween = TweenService:Create(Gui.Container.Bottom.Progress.Slider.Value, moneySliderTweenInfo, {
 				Size = UDim2.new(1, 0, 1, 0)
 			})
-			v4:Play()
+			moneySliderTween:Play()
 		end
 		Gui.Container.Bottom.Progress.Tiers.Visible = false
 	else
-		local v3 = UDim2.new(t.GetMaxSizeForTier(t.CurrentTier) * p1 / p2, 0, 1, 0)
-		if p3 then
-			Gui.Container.Bottom.Progress.Slider.Value.Size = v3
+		local targetSize = UDim2.new(RobberyMoneyUI.GetMaxSizeForTier(RobberyMoneyUI.CurrentTier) * currentAmount / maxAmount, 0, 1, 0)
+		if isInstant then
+			Gui.Container.Bottom.Progress.Slider.Value.Size = targetSize
 		else
-			v4 = TweenService:Create(Gui.Container.Bottom.Progress.Slider.Value, v5, {
-				Size = v3
+			moneySliderTween = TweenService:Create(Gui.Container.Bottom.Progress.Slider.Value, moneySliderTweenInfo, {
+				Size = targetSize
 			})
-			v4:Play()
+			moneySliderTween:Play()
 		end
 		Gui.Container.Bottom.Progress.Tiers.Visible = true
 	end
 end
-function t.SetMessage(p1)
-	local Gui = t.Gui
-	if p1 == nil then
+function RobberyMoneyUI.SetMessage(messageText)
+	local Gui = RobberyMoneyUI.Gui
+	if messageText == nil then
 		Gui.Container.Message.Visible = false
 	else
 		Gui.Container.Message.Visible = true
-		Gui.Container.Message.Text = p1
+		Gui.Container.Message.Text = messageText
 	end
 end
-local function setColor(p1, p2)
-	if p1:IsA("Frame") then
-		p1.BackgroundColor3 = p2
-	elseif p1:IsA("TextLabel") or p1:IsA("TextButton") then
-		p1.BackgroundColor3 = p2
-		p1.TextColor3 = p2
-	elseif p1:IsA("UIStroke") then
-		p1.Color = p2
-	elseif p1:IsA("UIGradient") then
-		p1.Color = ColorSequence.new(p2)
+local function setColor(instance, color)
+	if instance:IsA("Frame") then
+		instance.BackgroundColor3 = color
+	elseif instance:IsA("TextLabel") or instance:IsA("TextButton") then
+		instance.BackgroundColor3 = color
+		instance.TextColor3 = color
+	elseif instance:IsA("UIStroke") then
+		instance.Color = color
+	elseif instance:IsA("UIGradient") then
+		instance.Color = ColorSequence.new(color)
 	end
 end
-local function changeColor(p1, p2)
-	local v1 = ColorUtils.saturateBy(ColorUtils.brightenBy(p2, -0.455), 0.093)
-	if p2 == Color3.fromRGB(194, 248, 117) then
-		v1 = ColorUtils.hueBy(v1, 0.102)
+local function changeColor(container, baseColor)
+	local saturatedColor = ColorUtils.saturateBy(ColorUtils.brightenBy(baseColor, -0.455), 0.093)
+	if baseColor == Color3.fromRGB(194, 248, 117) then
+		saturatedColor = ColorUtils.hueBy(saturatedColor, 0.102)
 	end
-	local v3 = ColorUtils.brightenTo(p2, 1)
-	for v4, v5 in p1:QueryDescendants("[$baseColor]") do
-		setColor(v5, p2)
+	local brightColor = ColorUtils.brightenTo(baseColor, 1)
+	for _, baseElement in container:QueryDescendants("[$baseColor]") do
+		setColor(baseElement, baseColor)
 	end
-	for v6, v7 in p1:QueryDescendants("[$darkColor]") do
-		setColor(v7, v1)
+	for _, darkElement in container:QueryDescendants("[$darkColor]") do
+		setColor(darkElement, saturatedColor)
 	end
-	for v8, v9 in p1:QueryDescendants("[$brightColor]") do
-		setColor(v9, v3)
+	for _, brightElement in container:QueryDescendants("[$brightColor]") do
+		setColor(brightElement, brightColor)
 	end
 end
-function t.SetRobbery(p1)
-	local Container = t.Gui.Container
-	local v1 = RobberyConsts.DATA_ROBBERY[p1].frameData or {}
-	changeColor(Container, v1.color or Color3.fromRGB(194, 248, 117))
-	Container.Icon.Image = "rbxassetid://" .. (v1.topImageId or 83554444602066)
-	Container.Bottom.Progress.Icon.Image = "rbxassetid://" .. (v1.cashImageId or 4912231216)
-	Container.Top.Alternative.Title.Text = v1.alternativeText or "COLLECTING..."
+function RobberyMoneyUI.SetRobbery(robberyType)
+	local Container = RobberyMoneyUI.Gui.Container
+	local frameData = RobberyConsts.DATA_ROBBERY[robberyType].frameData or {}
+	changeColor(Container, frameData.color or Color3.fromRGB(194, 248, 117))
+	Container.Icon.Image = "rbxassetid://" .. (frameData.topImageId or 83554444602066)
+	Container.Bottom.Progress.Icon.Image = "rbxassetid://" .. (frameData.cashImageId or 4912231216)
+	Container.Top.Alternative.Title.Text = frameData.alternativeText or "COLLECTING..."
 end
-function t.Hide()
-	if t.Maid == nil then
+function RobberyMoneyUI.Hide()
+	if RobberyMoneyUI.Maid == nil then
 		return false
 	end
-	t.Maid:Destroy()
-	t.Maid = nil
+	RobberyMoneyUI.Maid:Destroy()
+	RobberyMoneyUI.Maid = nil
 end
-return t
+return RobberyMoneyUI

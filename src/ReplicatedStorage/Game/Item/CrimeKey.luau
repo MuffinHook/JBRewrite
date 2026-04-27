@@ -1,6 +1,5 @@
--- Reviewed by Claude
 local Basic = require(script.Parent.Basic)
-local t = {
+local itemConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -14,22 +13,22 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local t2 = {
+local CrimeKeyClass = {
 	__ClassName = "CrimeKey"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	v1:DefaultDisableCamLock()
-	return v1
+CrimeKeyClass.__index = CrimeKeyClass
+setmetatable(CrimeKeyClass, Basic)
+function CrimeKeyClass.new(model, instance, additional)
+	local itemInstance = Basic.new(model, instance, itemConfig, additional)
+	setmetatable(itemInstance, CrimeKeyClass)
+	itemInstance:DefaultDisableCamLock()
+	return itemInstance
 end
-function t2.GetLeftArmPosition(p1)
+function CrimeKeyClass.GetLeftArmPosition(self)
 	return nil
 end
-function t2.InputBegan(p1, ...)
-	Basic.InputBegan(p1, ...)
+function CrimeKeyClass.InputBegan(self, ...)
+	Basic.InputBegan(self, ...)
 end
-function t2.InputEnded(p1) end
-return t2
+function CrimeKeyClass.InputEnded(self) end
+return CrimeKeyClass

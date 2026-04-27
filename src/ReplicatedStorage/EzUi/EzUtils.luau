@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local GamepadService = game:GetService("GamepadService")
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")

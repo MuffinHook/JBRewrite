@@ -1,4 +1,3 @@
--- Reviewed by Claude
 return {
 	["Vehicle.JackRabbit"] = {
 		CreatorName = "oof_ed",

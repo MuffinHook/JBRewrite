@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Std.Audio)
@@ -9,257 +8,257 @@ require(ReplicatedStorage.Inventory.InventoryItemUtils)
 local CurrentCamera = workspace.CurrentCamera
 local Gun = require(script.Parent.Gun)
 local function RandomVector()
-	local v1 = math.random() * 2 - 1
-	local v2 = math.random() * 2 - 1
-	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
+	local randomX = math.random() * 2 - 1
+	local randomY = math.random() * 2 - 1
+	return Vector3.new(randomX, randomY, math.random() * 2 - 1).Unit
 end
-local t = {
+local TurretClass = {
 	__ClassName = "Turret"
 }
-t.__index = t
-setmetatable(t, Gun)
-function t.new(p1, p2, p3)
-	local v1 = Gun.new(p1, p2)
-	setmetatable(v1, t)
-	v1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p2, "TurretValue", function(p1, p2)
-		p2:GiveTask(RxInstanceUtils.observeProperty(p1, "Value", function(p1, p2)
-			v1.Model = p1
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "BarrelMotor", function(p1)
-				v1.BarrelMotor = p1
+TurretClass.__index = TurretClass
+setmetatable(TurretClass, Gun)
+function TurretClass.new(baseGun, parentContainer, p3)
+	local turret = Gun.new(baseGun, parentContainer)
+	setmetatable(turret, TurretClass)
+	turret.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(parentContainer, "TurretValue", function(turretValueInstance, maid)
+		maid:GiveTask(RxInstanceUtils.observeProperty(turretValueInstance, "Value", function(modelInstance, maid)
+			turret.Model = modelInstance
+			maid:GiveTask(RxInstanceUtils.observeOneChildNamed(modelInstance, "BarrelMotor", function(barrelMotor)
+				turret.BarrelMotor = barrelMotor
 			end))
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "VerticalMotor", function(p1)
-				v1.VerticalMotor = p1
+			maid:GiveTask(RxInstanceUtils.observeOneChildNamed(modelInstance, "VerticalMotor", function(verticalMotor)
+				turret.VerticalMotor = verticalMotor
 			end))
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "HorizontalMotor", function(p1)
-				v1.HorizontalMotor = p1
+			maid:GiveTask(RxInstanceUtils.observeOneChildNamed(modelInstance, "HorizontalMotor", function(horizontalMotor)
+				turret.HorizontalMotor = horizontalMotor
 			end))
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Flare", function(p1, p2)
-				p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "ParticleEmitter", function(p1)
-					v1.FlareEmitter = p1
+			maid:GiveTask(RxInstanceUtils.observeOneChildNamed(modelInstance, "Flare", function(flareInstance, maid)
+				maid:GiveTask(RxInstanceUtils.observeOneChildNamed(flareInstance, "ParticleEmitter", function(emitter)
+					turret.FlareEmitter = emitter
 				end))
 			end))
-			p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "Tips", function(p1, p2)
-				p2:GiveTask(RxInstanceUtils.observeChildren(p1, function()
-					v1.Tips = p1:GetChildren()
+			maid:GiveTask(RxInstanceUtils.observeOneChildNamed(modelInstance, "Tips", function(tipsContainer, maid)
+				maid:GiveTask(RxInstanceUtils.observeChildren(tipsContainer, function()
+					turret.Tips = tipsContainer:GetChildren()
 				end))
 			end))
-			if v1.Local then
-				v1.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "UpdateHeatRemote", function(p1)
-					v1._updateHeatRemote = p1
+			if turret.Local then
+				turret.Maid:GiveTask(RxInstanceUtils.observeOneChildNamed(modelInstance, "UpdateHeatRemote", function(heatRemote)
+					turret._updateHeatRemote = heatRemote
 				end))
 			end
 		end))
 	end))
-	v1:Setup()
-	v1:DefaultDisableCamLock()
-	return v1
+	turret:Setup()
+	turret:DefaultDisableCamLock()
+	return turret
 end
-function t.Setup(p1)
-	p1.IgnoreList = { p1.Character, p1.Model, workspace.Items }
-	p1.LastShoot = 0
-	p1.LastPlayerImpact = 0
-	p1.SpringThirdMousePosition = Spring.new(Vector3.new(), Vector3.new(), 0.9, 30)
-	if p1.Local then
-		p1.SpringCamera = Spring.new(Vector3.new(), Vector3.new(), 0.6, 75)
+function TurretClass.Setup(turret)
+	turret.IgnoreList = { turret.Character, turret.Model, workspace.Items }
+	turret.LastShoot = 0
+	turret.LastPlayerImpact = 0
+	turret.SpringThirdMousePosition = Spring.new(Vector3.new(), Vector3.new(), 0.9, 30)
+	if turret.Local then
+		turret.SpringCamera = Spring.new(Vector3.new(), Vector3.new(), 0.6, 75)
 	end
-	p1.SpringSpin = Spring.new(0, 0, 0.6, 7)
-	p1.SpinTotal = 0
-	p1.MouseDown = false
-	if not p1.Tips then
-		p1.Tips = {}
+	turret.SpringSpin = Spring.new(0, 0, 0.6, 7)
+	turret.SpinTotal = 0
+	turret.MouseDown = false
+	if not turret.Tips then
+		turret.Tips = {}
 	end
-	p1.TipIndex = 1
-	p1:SetupBulletEmitter()
-	if p1.Local then
-		p1:SetupCrossHair()
+	turret.TipIndex = 1
+	turret:SetupBulletEmitter()
+	if turret.Local then
+		turret:SetupCrossHair()
 	end
-	p1:SetupShoot()
-	p1.IK = R15IKv2.BuildPacketArms(p1.Character)
-	p1:UpdateMousePosition()
-	p1.Maid:GiveTask(RunService.RenderStepped:Connect(function(p12)
-		p1:RenderStepped(p12)
+	turret:SetupShoot()
+	turret.IK = R15IKv2.BuildPacketArms(turret.Character)
+	turret:UpdateMousePosition()
+	turret.Maid:GiveTask(RunService.RenderStepped:Connect(function(deltaTime)
+		turret:RenderStepped(deltaTime)
 	end))
-	p1.Maid:GiveTask(RunService.Stepped:Connect(function()
-		p1:Stepped()
+	turret.Maid:GiveTask(RunService.Stepped:Connect(function()
+		turret:Stepped()
 	end))
 end
-t.ApplySkin = false
-t.Reload = false
-function t.BulletEmitterOnLocalHitPlayer(p1, ...)
-	local v1 = tick()
-	if v1 - p1.LastPlayerImpact > 0.1 then
-		p1.LastPlayerImpact = v1
-		Gun.BulletEmitterOnLocalHitPlayer(p1, ...)
+TurretClass.ApplySkin = false
+TurretClass.Reload = false
+function TurretClass.BulletEmitterOnLocalHitPlayer(turret, ...)
+	local currentTime = tick()
+	if currentTime - turret.LastPlayerImpact > 0.1 then
+		turret.LastPlayerImpact = currentTime
+		Gun.BulletEmitterOnLocalHitPlayer(turret, ...)
 	end
 end
-function t.TransformLocalMousePosition(p1, p2)
-	return p1.SpringThirdMousePosition:SetTarget(p2)
+function TurretClass.TransformLocalMousePosition(turret, targetPosition)
+	return turret.SpringThirdMousePosition:SetTarget(targetPosition)
 end
-function t.UpdateArmJoints(p1)
-	local IK = p1.IK
-	local Model = p1.Model
+function TurretClass.UpdateArmJoints(turret)
+	local IK = turret.IK
+	local Model = turret.Model
 	IK.RightArm = Model.RightArm.Position
 	IK.LeftArm = Model.LeftArm.Position
 	R15IKv2.Arms(IK)
 end
-function t.UpdateCamera(p1)
-	local v1 = os.clock()
-	local v2 = v1 - (p1._lastCameraUpdate or v1)
-	p1._lastCameraUpdate = v1
-	local v3 = p1.SpringCamera:Update()
-	local v4 = CurrentCamera
-	v4.CFrame = v4.CFrame * (CFrame.Angles(0, v3.X * v2 * 60, 0) * CFrame.Angles(v3.Y * v2 * 60, 0, 0))
+function TurretClass.UpdateCamera(turret)
+	local currentTime = os.clock()
+	local deltaTime = currentTime - (turret._lastCameraUpdate or currentTime)
+	turret._lastCameraUpdate = currentTime
+	local cameraSpringUpdate = turret.SpringCamera:Update()
+	local camera = CurrentCamera
+	camera.CFrame = camera.CFrame * (CFrame.Angles(0, cameraSpringUpdate.X * deltaTime * 60, 0) * CFrame.Angles(cameraSpringUpdate.Y * deltaTime * 60, 0, 0))
 end
-function t.RenderStepped(p1, p2)
-	p1:UpdateMousePosition()
-	if p1.Local then
-		p1:UpdateCrossHair()
-		p1:UpdateCamera()
+function TurretClass.RenderStepped(turret, deltaTime)
+	turret:UpdateMousePosition()
+	if turret.Local then
+		turret:UpdateCrossHair()
+		turret:UpdateCamera()
 	end
 end
-function t.Shoot(p1)
-	local v1 = p1.Tips[p1.TipIndex]
-	p1.Tip = v1
-	p1.BulletEmitter:Emit(v1.Position, v1.CFrame.lookVector, p1.Config.BulletSpeed)
-	p1.TipIndex = p1.TipIndex % #p1.Tips + 1
-	if p1.Local then
-		p1.CrossHair.Spring:Accelerate(200)
-		local v3 = math.clamp(20 / (p1.Model.Back.Position - CurrentCamera.CFrame.p).Magnitude, 0.1, 1)
-		p1.SpringCamera:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * v3 * 0.15 * 15)
+function TurretClass.Shoot(turret)
+	local currentTip = turret.Tips[turret.TipIndex]
+	turret.Tip = currentTip
+	turret.BulletEmitter:Emit(currentTip.Position, currentTip.CFrame.lookVector, turret.Config.BulletSpeed)
+	turret.TipIndex = turret.TipIndex % #turret.Tips + 1
+	if turret.Local then
+		turret.CrossHair.Spring:Accelerate(200)
+		local recoilDampening = math.clamp(20 / (turret.Model.Back.Position - CurrentCamera.CFrame.p).Magnitude, 0.1, 1)
+		turret.SpringCamera:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * recoilDampening * 0.15 * 15)
 	end
 end
-function t.ShootCheckConditions(p1)
+function TurretClass.ShootCheckConditions(turret)
 	return true
 end
-function t.AnimateBarrel(p1, p2, p3)
-	if p1.Model then
-		local v1 = tick()
-		if p1.Sound then
-			p1.Sound.Volume = p3
+function TurretClass.AnimateBarrel(turret, heatIncrement, volumeMultiplier)
+	if turret.Model then
+		local currentTime = tick()
+		if turret.Sound then
+			turret.Sound.Volume = volumeMultiplier
 		end
-		local MaxHeat = p1.Config.MaxHeat
-		local sum = p1.Model:GetAttribute("Heat")
-		if p3 >= 0.6 and sum < MaxHeat then
-			if not p1.FlareEmitter.Enabled then
-				p1.FlareEmitter.Enabled = true
+		local MaxHeat = turret.Config.MaxHeat
+		local currentHeat = turret.Model:GetAttribute("Heat")
+		if volumeMultiplier >= 0.6 and currentHeat < MaxHeat then
+			if not turret.FlareEmitter.Enabled then
+				turret.FlareEmitter.Enabled = true
 			end
-			if 1 / (10 + 30 * p3) < v1 - p1.LastShoot then
-				sum = sum + p2
-				if MaxHeat <= sum then
-					p1:InputEnded({
+			if 1 / (10 + 30 * volumeMultiplier) < currentTime - turret.LastShoot then
+				currentHeat = currentHeat + heatIncrement
+				if MaxHeat <= currentHeat then
+					turret:InputEnded({
 						UserInputType = Enum.UserInputType.MouseButton1
 					})
-					sum = sum + 3
+					currentHeat = currentHeat + 3
 				end
-				p1.LastShoot = v1
-				if p1.Local then
-					p1:_attemptShoot()
+				turret.LastShoot = currentTime
+				if turret.Local then
+					turret:_attemptShoot()
 				end
 			end
 		else
-			if p1.FlareEmitter.Enabled then
-				p1.FlareEmitter.Enabled = false
+			if turret.FlareEmitter.Enabled then
+				turret.FlareEmitter.Enabled = false
 			end
-			if sum > 0 then
-				sum = sum - p2
+			if currentHeat > 0 then
+				currentHeat = currentHeat - heatIncrement
 			end
-			if sum < 0 then
-				sum = 0
+			if currentHeat < 0 then
+				currentHeat = 0
 			end
 		end
-		p1.Model.Barrel.Color = p1.Config.ColorNormal:Lerp(p1.Config.ColorHeat, math.clamp(sum, 0, MaxHeat) / MaxHeat)
-		p1.Model:SetAttribute("Heat", sum)
+		turret.Model.Barrel.Color = turret.Config.ColorNormal:Lerp(turret.Config.ColorHeat, math.clamp(currentHeat, 0, MaxHeat) / MaxHeat)
+		turret.Model:SetAttribute("Heat", currentHeat)
 	end
 end
-function t.Stepped(p1)
-	if p1.Model and (p1.HorizontalMotor and p1.BarrelMotor) then
-		if p1.VerticalMotor then
-			local v1 = tick()
-			local v2 = v1 - (p1.LastUpdate or v1)
-			p1.LastUpdate = v1
-			local v3 = p1.Model.Root.CFrame:PointToObjectSpace(p1.MousePosition)
-			local x = v3.x
-			local z = v3.z
-			local v4 = z < 0 and math.atan(x / z) or math.pi - math.atan(-x / z)
-			local v5 = z * math.cos(v4) + x * math.sin(v4)
-			local v6 = v3.y - p1.Model.AxisV.Position.Y + p1.Model.Root.Position.Y
-			local v9 = math.clamp(v5 < 0 and math.atan(-v6 / v5) or math.atan(v6 / v5), -0.47123889803846897, 0.6283185307179586)
-			local v10 = math.clamp(v9, -0.25132741228718347, 0.3141592653589793)
-			p1.JointWaist.Transform = CFrame.Angles(-v10 * 0.1, 0, 0)
-			p1.JointNeck.Transform = CFrame.Angles(v10, 0, 0)
-			local v11 = p1.SpringSpin:Update()
-			local sum = p1.SpinTotal + v2 * v11
-			if sum > 6.283185307179586 then
-				sum = sum - 6.283185307179586
+function TurretClass.Stepped(turret)
+	if turret.Model and (turret.HorizontalMotor and turret.BarrelMotor) then
+		if turret.VerticalMotor then
+			local currentTime = tick()
+			local deltaTime = currentTime - (turret.LastUpdate or currentTime)
+			turret.LastUpdate = currentTime
+			local relativeMousePosition = turret.Model.Root.CFrame:PointToObjectSpace(turret.MousePosition)
+			local x = relativeMousePosition.x
+			local z = relativeMousePosition.z
+			local horizontalAngle = z < 0 and math.atan(x / z) or math.pi - math.atan(-x / z)
+			local horizontalDistance = z * math.cos(horizontalAngle) + x * math.sin(horizontalAngle)
+			local verticalOffset = relativeMousePosition.y - turret.Model.AxisV.Position.Y + turret.Model.Root.Position.Y
+			local verticalAngleRaw = math.clamp(horizontalDistance < 0 and math.atan(-verticalOffset / horizontalDistance) or math.atan(verticalOffset / horizontalDistance), -0.47123889803846897, 0.6283185307179586)
+			local verticalAngleClamped = math.clamp(verticalAngleRaw, -0.25132741228718347, 0.3141592653589793)
+			turret.JointWaist.Transform = CFrame.Angles(-verticalAngleClamped * 0.1, 0, 0)
+			turret.JointNeck.Transform = CFrame.Angles(verticalAngleRaw, 0, 0)
+			local spinSpeed = turret.SpringSpin:Update()
+			local totalSpin = turret.SpinTotal + deltaTime * spinSpeed
+			if totalSpin > 6.283185307179586 then
+				totalSpin = totalSpin - 6.283185307179586
 			end
-			p1.SpinTotal = sum
-			p1.BarrelMotor.C1 = CFrame.Angles(0, 0, -16 * sum)
-			p1.VerticalMotor.C1 = CFrame.Angles(v9, 0, 0)
-			p1.HorizontalMotor.C1 = CFrame.Angles(0, (v4 + math.pi) % 6.283185307179586 - math.pi, 0)
-			p1:UpdateArmJoints()
-			p1:AnimateBarrel(v2, v11)
+			turret.SpinTotal = totalSpin
+			turret.BarrelMotor.C1 = CFrame.Angles(0, 0, -16 * totalSpin)
+			turret.VerticalMotor.C1 = CFrame.Angles(verticalAngleRaw, 0, 0)
+			turret.HorizontalMotor.C1 = CFrame.Angles(0, (horizontalAngle + math.pi) % 6.283185307179586 - math.pi, 0)
+			turret:UpdateArmJoints()
+			turret:AnimateBarrel(deltaTime, spinSpeed)
 		end
 	end
 end
-function t.Heartbeat(p1)  end
-function t.InputBegan(p1, p2, p3)
-	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
-		if p1.Model:GetAttribute("Heat") < p1.Config.MaxHeat then
-			p1.SpringSpin:SetTarget(1)
-			p1.MouseDown = true
-			if not p1.Sound then
+function TurretClass.Heartbeat(turret)  end
+function TurretClass.InputBegan(turret, inputData, p3)
+	if if inputData.UserInputType == Enum.UserInputType.MouseButton1 then true elseif inputData.UserInputType == Enum.UserInputType.Gamepad1 then inputData.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		if turret.Model:GetAttribute("Heat") < turret.Config.MaxHeat then
+			turret.SpringSpin:SetTarget(1)
+			turret.MouseDown = true
+			if not turret.Sound then
 				local Sound = Instance.new("Sound")
 				Sound.SoundId = "rbxassetid://2198390391"
 				Sound.Volume = 0
 				Sound.Looped = true
-				Sound.Parent = p1.Model.Barrel
+				Sound.Parent = turret.Model.Barrel
 				Sound:Play()
-				p1.Sound = Sound
+				turret.Sound = Sound
 			end
 		end
-		if p1.Local then
-			p1:BroadcastInputBegan(p2)
+		if turret.Local then
+			turret:BroadcastInputBegan(inputData)
 		end
 	end
 end
-function t.InputEnded(p1, p2, p3)
-	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
-		p1.SpringSpin:SetTarget(0)
-		p1.MouseDown = false
+function TurretClass.InputEnded(turret, inputData, p3)
+	if if inputData.UserInputType == Enum.UserInputType.MouseButton1 then true elseif inputData.UserInputType == Enum.UserInputType.Gamepad1 then inputData.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		turret.SpringSpin:SetTarget(0)
+		turret.MouseDown = false
 		delay(0.5, function()
-			if p1.Sound and not p1.MouseDown then
-				p1.Sound:Destroy()
-				p1.Sound = nil
+			if turret.Sound and not turret.MouseDown then
+				turret.Sound:Destroy()
+				turret.Sound = nil
 			end
 		end)
-		if p1.Local then
-			p1:BroadcastInputEnded(p2)
+		if turret.Local then
+			turret:BroadcastInputEnded(inputData)
 		end
 	end
 end
-function t.Unequip(p1)
-	if p1.FlareEmitter then
-		p1.FlareEmitter.Enabled = false
+function TurretClass.Unequip(turret)
+	if turret.FlareEmitter then
+		turret.FlareEmitter.Enabled = false
 	end
-	if p1.Model and p1.Model:FindFirstChild("Barrel") then
-		p1.Model.Barrel.Color = p1.Config.ColorNormal
+	if turret.Model and turret.Model:FindFirstChild("Barrel") then
+		turret.Model.Barrel.Color = turret.Config.ColorNormal
 	end
-	if p1.HorizontalMotor then
-		p1.HorizontalMotor.C1 = CFrame.new()
+	if turret.HorizontalMotor then
+		turret.HorizontalMotor.C1 = CFrame.new()
 	end
-	if p1.VerticalMotor then
-		p1.VerticalMotor.C1 = CFrame.new()
+	if turret.VerticalMotor then
+		turret.VerticalMotor.C1 = CFrame.new()
 	end
-	if p1.BarrelMotor then
-		p1.BarrelMotor.C1 = CFrame.new()
+	if turret.BarrelMotor then
+		turret.BarrelMotor.C1 = CFrame.new()
 	end
-	p1.SpinTotal = 0
-	if p1.Local and p1._updateHeatRemote then
-		p1._updateHeatRemote:FireServer(p1.Model:GetAttribute("Heat"))
+	turret.SpinTotal = 0
+	if turret.Local and turret._updateHeatRemote then
+		turret._updateHeatRemote:FireServer(turret.Model:GetAttribute("Heat"))
 	end
-	if p1.Sound then
-		p1.Sound:Destroy()
-		p1.Sound = nil
+	if turret.Sound then
+		turret.Sound:Destroy()
+		turret.Sound = nil
 	end
 end
-return t
+return TurretClass

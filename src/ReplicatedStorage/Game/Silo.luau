@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -7,12 +5,12 @@ local Anim = require(ReplicatedStorage.Module.Anim)
 local function Ease_InOutQuad(progress)
 	return progress < 0.5 and 2 * progress * progress or -1 - 2 * (progress - 2) * progress
 end
-local t = {}
-t.__index = t
-function t.new(model)
+local Silo = {}
+Silo.__index = Silo
+function Silo.new(model)
 	assert(model ~= nil)
 	local instance = {}
-	setmetatable(instance, t)
+	setmetatable(instance, Silo)
 	instance.Model = model
 	instance.Door1CF = instance.Model.Door1.CFrame
 	instance.Door2CF = instance.Model.Door2.CFrame
@@ -21,7 +19,7 @@ function t.new(model)
 	instance.IsOpen = false
 	return instance
 end
-function t.Transition(self, duration, updateCallback)
+function Silo.Transition(self, duration, updateCallback)
 	if self.Anim ~= nil then
 		self.Anim:Destroy()
 	end
@@ -38,15 +36,15 @@ function t.Transition(self, duration, updateCallback)
 		updateCallback(self, (self.Anim:Update()))
 	end))
 end
-function t.Open(self, duration)
+function Silo.Open(self, duration)
 	self.IsOpen = true
 	return self:Transition(duration, self.SeqOpen)
 end
-function t.Close(self, duration)
+function Silo.Close(self, duration)
 	self.IsOpen = false
 	return self:Transition(duration, self.SeqClose)
 end
-function t.SetDoorOpen(self, openAmount)
+function Silo.SetDoorOpen(self, openAmount)
 	local Model = self.Model
 	local Door1 = Model.Door1
 	local pivotOffset1 = CFrame.new(0, 0, -Door1.Size.Z * 0.5)
@@ -55,28 +53,28 @@ function t.SetDoorOpen(self, openAmount)
 	local pivotOffset2 = CFrame.new(0, 0, -Door2.Size.Z * 0.5)
 	Door2.CFrame = self.Door2CF * pivotOffset2 * CFrame.Angles(openAmount * math.pi * 0.5, 0, 0) * pivotOffset2:Inverse()
 end
-function t.SeqOpen(self, progress)
+function Silo.SeqOpen(self, progress)
 	if progress == 1 then
 		self.OnOpened:Fire()
 	end
-	local easedProgress, v2
+	local easedProgress, progressValue
 	if progress < 0.5 then
 		easedProgress = 2 * progress * progress
 		if not easedProgress then
-			v2 = progress
+			progressValue = progress
 			easedProgress = -1 - 2 * (progress - 2) * progress
 		end
 	else
-		v2 = progress
+		progressValue = progress
 		easedProgress = -1 - 2 * (progress - 2) * progress
 	end
 	self:SetDoorOpen(easedProgress)
 end
-function t.SeqClose(self, progress)
+function Silo.SeqClose(self, progress)
 	local invertedProgress = 1 - progress
 	self:SetDoorOpen(invertedProgress < 0.5 and 2 * invertedProgress * invertedProgress or -1 - 2 * (invertedProgress - 2) * invertedProgress)
 end
-function t.Destroy(self)
+function Silo.Destroy(self)
 	if self.Anim ~= nil then
 		self.Anim:Destroy()
 		self.Anim = nil
@@ -84,4 +82,4 @@ function t.Destroy(self)
 	self.OnOpened:Destroy()
 	self.OnOpened = nil
 end
-return t
+return Silo

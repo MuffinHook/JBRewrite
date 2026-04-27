@@ -1,12 +1,10 @@
--- Reviewed by Claude
--- variables reassigned
 return {
-	polynomialRollingHash = function(p1)
-		assert(typeof(p1) == "string", "str must be string")
-		local v2 = 0
-		for i = 1, #p1 do
-			v2 = (v2 * 31 + string.byte(p1, i)) % 1000000009
+	polynomialRollingHash = function(str)
+		assert(typeof(str) == "string", "str must be string")
+		local hash = 0
+		for i = 1, #str do
+			hash = (hash * 31 + string.byte(str, i)) % 1000000009
 		end
-		return v2
+		return hash
 	end
 }

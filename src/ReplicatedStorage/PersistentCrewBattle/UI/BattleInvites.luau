@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -15,53 +13,53 @@ local function playTick()
 		})
 	end
 end
-local constant = Roact.PureComponent:extend("BattleInvites")
-constant.defaultProps = {
+local BattleInvitesComponent = Roact.PureComponent:extend("BattleInvites")
+BattleInvitesComponent.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	position = UDim2.new(0, 0, 0, 0),
 	aspectRatio = 1.25,
 	maximumItemsDisplayed = 4
 }
-function constant.init(self)
-	function self.onAccept(arg12)
-		local constant = self.props.battleInvites[arg12]
-		self.props.removeByIndex(arg12)
+function BattleInvitesComponent.init(self)
+	function self.onAccept(inviteIndex)
+		local inviteData = self.props.battleInvites[inviteIndex]
+		self.props.removeByIndex(inviteIndex)
 		if Players.LocalPlayer and Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 				Volume = 0.15
 			})
 		end
 		if self.props.onAccept then
-			self.props.onAccept(constant)
+			self.props.onAccept(inviteData)
 		end
 	end
-	function self.onDecline(arg12)
-		local constant = self.props.battleInvites[arg12]
-		self.props.removeByIndex(arg12)
+	function self.onDecline(inviteIndex)
+		local inviteData = self.props.battleInvites[inviteIndex]
+		self.props.removeByIndex(inviteIndex)
 		if Players.LocalPlayer and Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 				Volume = 0.15
 			})
 		end
 		if self.props.onDecline then
-			self.props.onDecline(constant)
+			self.props.onDecline(inviteData)
 		end
 	end
 end
-function constant.render(self)
-	local constant = 1 / (1 / self.props.maximumItemsDisplayed - 1 / (256 / self.props.maximumItemsDisplayed)) * self.props.aspectRatio
-	local local2 = self.props.maximumItemsDisplayed * self.props.aspectRatio
-	local local3 = #self.props.battleInvites
-	local t = {}
-	for i = 1, math.min(local3, self.props.maximumItemsDisplayed) do
-		local local4 = local3 - i + 1
-		t[i] = createElement(BattleInvite, Dictionary.merge({
-			aspectRatio = constant,
-			position = UDim2.new(0, 0, 1 + (i - local3 - 1) / local2 * self.props.aspectRatio, 0),
-			index = local4,
+function BattleInvitesComponent.render(self)
+	local itemAspectRatio = 1 / (1 / self.props.maximumItemsDisplayed - 1 / (256 / self.props.maximumItemsDisplayed)) * self.props.aspectRatio
+	local verticalSpacing = self.props.maximumItemsDisplayed * self.props.aspectRatio
+	local totalInvites = #self.props.battleInvites
+	local inviteElements = {}
+	for i = 1, math.min(totalInvites, self.props.maximumItemsDisplayed) do
+		local reversedIndex = totalInvites - i + 1
+		inviteElements[i] = createElement(BattleInvite, Dictionary.merge({
+			aspectRatio = itemAspectRatio,
+			position = UDim2.new(0, 0, 1 + (i - totalInvites - 1) / verticalSpacing * self.props.aspectRatio, 0),
+			index = reversedIndex,
 			onAccept = self.onAccept,
 			onDecline = self.onDecline
-		}, self.props.battleInvites[local4]))
+		}, self.props.battleInvites[reversedIndex]))
 	end
 	return createElement("Frame", {
 		BackgroundTransparency = 1,
@@ -72,19 +70,19 @@ function constant.render(self)
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = self.props.aspectRatio
 		})
-	}, t))
+	}, inviteElements))
 end
-return RoactRodux.connect(function(self, arg2)
+return RoactRodux.connect(function(self, state)
 	return {
 		battleInvites = self.battleInvites
 	}
 end, function(self)
 	return {
-		removeByIndex = function(arg12)
+		removeByIndex = function(inviteIndex)
 			self({
 				type = "battleInvitesRemoveByIndex",
-				index = arg12
+				index = inviteIndex
 			})
 		end
 	}
-end)(constant)
+end)(BattleInvitesComponent)

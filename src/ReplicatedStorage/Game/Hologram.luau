@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local Logic = require(ReplicatedStorage.Module.Logic)
@@ -9,18 +8,18 @@ local LocalPlayer = Players.LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
 local Localization = require(ReplicatedStorage.Module.Localization)
 local abs = math.abs
-local function comma(p1)
-	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
-	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
+local function comma(numberString)
+	local leadingDigits, middleDigits, suffixPart = string.match(numberString, "^([^%d]*%d)(%d*)(.-)$")
+	return leadingDigits .. middleDigits:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. suffixPart
 end
-local function FormatMoney(p1)
-	local t = {}
-	local v4, v5, v6 = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
-	t[1] = v4 .. v5:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v6
-	return if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", t)
+local function FormatMoney(amount)
+	local formatTable = {}
+	local leadingDigits, middleDigits, suffixPart = string.match(abs(amount), "^([^%d]*%d)(%d*)(.-)$")
+	formatTable[1] = leadingDigits .. middleDigits:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. suffixPart
+	return if amount >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", formatTable)
 end
 local function MakeSystem()
-	local t = {
+	local hologramSystem = {
 		Scale = 0.015625,
 		Nodes = {},
 		Center = CFrame.new(),
@@ -28,29 +27,29 @@ local function MakeSystem()
 		LastRender = 0,
 		PlayerNodes = {}
 	}
-	t.Model.Name = "Hologram"
-	t.Model.Parent = workspace
-	return t
+	hologramSystem.Model.Name = "Hologram"
+	hologramSystem.Model.Parent = workspace
+	return hologramSystem
 end
-local t = {}
-local function DestroySystem(p1)
-	for i = #t, 1, -1 do
-		if t[i] == p1 then
-			table.remove(t, i)
+local holoSystems = {}
+local function DestroySystem(system)
+	for i = #holoSystems, 1, -1 do
+		if holoSystems[i] == system then
+			table.remove(holoSystems, i)
 			break
 		end
 	end
-	p1.Model:Destroy()
+	system.Model:Destroy()
 end
-local function SetNodeColor(p1, p2)
-	local Part = p1.Part
-	local r = p2.r
-	local g = p2.g
-	local b = p2.b
+local function SetNodeColor(node, colorData)
+	local Part = node.Part
+	local r = colorData.r
+	local g = colorData.g
+	local b = colorData.b
 	Part.Color = Color3.new(r, g, b)
 	Part.SelectionBox.Color3 = Color3.new(r + 0.2, g + 0.2, b + 0.2)
 end
-local function ConstructNode(p1, p2)
+local function ConstructNode(node, colorData)
 	local Part = Instance.new("Part")
 	Part.Transparency = 0
 	Part.Material = Enum.Material.SmoothPlastic
@@ -62,77 +61,77 @@ local function ConstructNode(p1, p2)
 	SelectionBox.Parent = Part
 	SelectionBox.Adornee = Part
 	SelectionBox.LineThickness = 0.0001
-	p1.Part = Part
-	local Part_2 = p1.Part
-	local r = p2.r
-	local g = p2.g
-	local b = p2.b
+	node.Part = Part
+	local Part_2 = node.Part
+	local r = colorData.r
+	local g = colorData.g
+	local b = colorData.b
 	Part_2.Color = Color3.new(r, g, b)
 	Part_2.SelectionBox.Color3 = Color3.new(r + 0.2, g + 0.2, b + 0.2)
 end
-local function MakeNode(p1, p2)
+local function MakeNode(centerCFrame, size)
 	return {
-		c = p1,
-		s = p2
+		c = centerCFrame,
+		s = size
 	}
 end
-local function HorizontalDistance(p1, p2)
-	return ((p1 - p2) * Vector3.new(1, 0, 1)).Magnitude
+local function HorizontalDistance(pos1, pos2)
+	return ((pos1 - pos2) * Vector3.new(1, 0, 1)).Magnitude
 end
-local function CloseToAny(p1, p2)
-	for v1, v2 in next, p2 do
-		if ((v2.Position - p1.Position) * Vector3.new(1, 0, 1)).Magnitude < 100 then
+local function CloseToAny(position, positionsList)
+	for index, otherPos in next, positionsList do
+		if ((otherPos.Position - position.Position) * Vector3.new(1, 0, 1)).Magnitude < 100 then
 			return true
 		end
 	end
 	return false
 end
-local function SimplifyCityParts(p1, p2)
-	while #p2 > 0 do
-		local v1 = table.remove(p2, 1)
-		local t = { v1 }
-		for i = #p2, 1, -1 do
-			local v2 = p2[i]
-			if v2.Name ~= "Bank" and v1.Color == v2.Color then
-				local v3 = false
-				for v4, v5 in next, t do
-					if ((v5.Position - v2.Position) * Vector3.new(1, 0, 1)).Magnitude < 100 then
-						v3 = true
+local function SimplifyCityParts(system, cityParts)
+	while #cityParts > 0 do
+		local currentPart = table.remove(cityParts, 1)
+		local groupedParts = { currentPart }
+		for i = #cityParts, 1, -1 do
+			local checkPart = cityParts[i]
+			if checkPart.Name ~= "Bank" and currentPart.Color == checkPart.Color then
+				local isClose = false
+				for groupIndex, groupPart in next, groupedParts do
+					if ((groupPart.Position - checkPart.Position) * Vector3.new(1, 0, 1)).Magnitude < 100 then
+						isClose = true
 						break
 					end
 				end
-				if v3 then
-					table.insert(t, table.remove(p2, i))
+				if isClose then
+					table.insert(groupedParts, table.remove(cityParts, i))
 				end
 			end
 		end
-		local v6, v7 = Logic.MultiAABB(t)
-		local t2 = {
-			c = v6,
-			s = v7
+		local boundingCFrame, boundingSize = Logic.MultiAABB(groupedParts)
+		local nodeData = {
+			c = boundingCFrame,
+			s = boundingSize
 		}
-		local v9 = math.floor(math.random() * 30)
-		ConstructNode(t2, Color3.fromRGB(v9 + 33, v9 + 84, v9 + 185))
-		t2.Part.Parent = p1.Model
-		table.insert(p1.Nodes, t2)
+		local randomColorComponent = math.floor(math.random() * 30)
+		ConstructNode(nodeData, Color3.fromRGB(randomColorComponent + 33, randomColorComponent + 84, randomColorComponent + 185))
+		nodeData.Part.Parent = system.Model
+		table.insert(system.Nodes, nodeData)
 	end
 end
-local function SimplifyTrees(p1, p2)
-	local v1 = next
-	local v2, v3 = p2:GetChildren()
-	for v4, v5 in v1, v2, v3 do
-		local v6, v7 = Logic.MultiAABB(v5:GetChildren())
-		local t = {
-			c = v6,
-			s = v7
+local function SimplifyTrees(system, treesParent)
+	local iteratorFunc = next
+	local treeChildren = treesParent:GetChildren()
+	for treeIndex, treeNode in iteratorFunc, treeChildren, nil do
+		local boundingCFrame, boundingSize = Logic.MultiAABB(treeNode:GetChildren())
+		local nodeData = {
+			c = boundingCFrame,
+			s = boundingSize
 		}
-		local v9 = math.floor(math.random() * 30)
-		ConstructNode(t, Color3.fromRGB(v9 + 30, v9 + 30, v9 + 30))
-		t.Part.Parent = p1.Model
-		table.insert(p1.Nodes, t)
+		local randomColorComponent = math.floor(math.random() * 30)
+		ConstructNode(nodeData, Color3.fromRGB(randomColorComponent + 30, randomColorComponent + 30, randomColorComponent + 30))
+		nodeData.Part.Parent = system.Model
+		table.insert(system.Nodes, nodeData)
 	end
 end
-local t2 = {
+local predefinedLocations = {
 	{
 		Color = Color3.fromRGB(255, 176, 0),
 		Loc = {
@@ -206,187 +205,187 @@ local t2 = {
 		}
 	}
 }
-local function SimplifyExtra(p1)
-	for v1, v2 in next, t2 do
-		for v3, v4 in next, v2.Loc do
-			local v6 = math.floor(math.random() * 30 / 255)
-			local t = {
-				c = v4.c,
-				s = v4.s
+local function SimplifyExtra(system)
+	for colorIndex, colorEntry in next, predefinedLocations do
+		for locIndex, locationData in next, colorEntry.Loc do
+			local colorComponentOffset = math.floor(math.random() * 30 / 255)
+			local nodeData = {
+				c = locationData.c,
+				s = locationData.s
 			}
-			local Color = v2.Color
-			ConstructNode(t, Color3.new(Color.r + v6, Color.g + v6, Color.b + v6))
-			t.Part.Parent = p1.Model
-			table.insert(p1.Nodes, t)
+			local Color = colorEntry.Color
+			ConstructNode(nodeData, Color3.new(Color.r + colorComponentOffset, Color.g + colorComponentOffset, Color.b + colorComponentOffset))
+			nodeData.Part.Parent = system.Model
+			table.insert(system.Nodes, nodeData)
 		end
 	end
 end
-local function RenderSystem(p1)
-	local Scale = p1.Scale
-	local v1 = tick()
-	for v2, v3 in next, p1.Nodes do
-		local c = v3.c
-		local Part = v3.Part
-		local v4 = c + c.p * (Scale - 1)
-		local _lastSize = v3._lastSize
-		local v6 = v3.s * Scale
-		if not _lastSize or (_lastSize - v6).Magnitude > 0.001 then
-			Part.Size = v6
-			v3._lastSize = v6
+local function RenderSystem(system)
+	local Scale = system.Scale
+	local currentTime = tick()
+	for nodeIndex, node in next, system.Nodes do
+		local centerCFrame = node.c
+		local Part = node.Part
+		local offsetCFrame = centerCFrame + centerCFrame.p * (Scale - 1)
+		local _lastSize = node._lastSize
+		local scaledSize = node.s * Scale
+		if not _lastSize or (_lastSize - scaledSize).Magnitude > 0.001 then
+			Part.Size = scaledSize
+			node._lastSize = scaledSize
 		end
-		Part.CFrame = p1.Center * v4 * CFrame.new(0, math.cos(0.1 * (v4.p.Magnitude / (64 * Scale)) + 2 * v1) * 0.2, 0)
+		Part.CFrame = system.Center * offsetCFrame * CFrame.new(0, math.cos(0.1 * (offsetCFrame.p.Magnitude / (64 * Scale)) + 2 * currentTime) * 0.2, 0)
 	end
-	local PlayerNodes = p1.PlayerNodes
-	local v7 = next
-	local v8, v9 = Players:GetPlayers()
-	local t = {}
-	for v11, v12 in v7, v8, v9 do
-		local v10
-		local v13 = v12.Name
-		local Character = v12.Character
+	local PlayerNodes = system.PlayerNodes
+	local iteratorFunc = next
+	local playersList = Players:GetPlayers()
+	local activePlayerNames = {}
+	for playerIndex, player in iteratorFunc, playersList, nil do
+		local signalColor
+		local playerName = player.Name
+		local Character = player.Character
 		if Character then
 			local PrimaryPart = Character.PrimaryPart
 			if PrimaryPart then
-				t[v13] = true
-				local v14 = PrimaryPart.CFrame
-				local v15 = PlayerNodes[v13]
-				if v15 then
-					PlayerNodes[v13].c = v14
+				activePlayerNames[playerName] = true
+				local primaryPartCFrame = PrimaryPart.CFrame
+				local existingPlayerNode = PlayerNodes[playerName]
+				if existingPlayerNode then
+					PlayerNodes[playerName].c = primaryPartCFrame
 				else
-					local t2 = {
-						c = v14,
+					local playerNodeData = {
+						c = primaryPartCFrame,
 						s = PrimaryPart.Size,
 						IsPolice = false
 					}
-					PlayerNodes[v13] = t2
-					ConstructNode(t2, Color3.fromRGB(240, 20, 20))
-					t2.Part.Parent = p1.Model
-					v15 = t2
+					PlayerNodes[playerName] = playerNodeData
+					ConstructNode(playerNodeData, Color3.fromRGB(240, 20, 20))
+					playerNodeData.Part.Parent = system.Model
+					existingPlayerNode = playerNodeData
 				end
-				local v16 = v1 % 6.283185307179586
-				local Part = v15.Part
-				local c = v15.c
-				Part.Size = Vector3.new(1, 1, 1) * ((math.cos(8 * v16) * 0.5 + 0.5) * 0.5 + 0.3) * 64 * Scale
-				Part.CFrame = p1.Center * (c + c.p * (Scale - 1)) * CFrame.Angles(0, 4 * v16, 0) * CFrame.Angles(0.7853981633974483, 0, 0.7853981633974483)
-				local TeamValue = v12:FindFirstChild("TeamValue")
+				local phaseValue = currentTime % 6.283185307179586
+				local Part = existingPlayerNode.Part
+				local centerCFrame = existingPlayerNode.c
+				Part.Size = Vector3.new(1, 1, 1) * ((math.cos(8 * phaseValue) * 0.5 + 0.5) * 0.5 + 0.3) * 64 * Scale
+				Part.CFrame = system.Center * (centerCFrame + centerCFrame.p * (Scale - 1)) * CFrame.Angles(0, 4 * phaseValue, 0) * CFrame.Angles(0.7853981633974483, 0, 0.7853981633974483)
+				local TeamValue = player:FindFirstChild("TeamValue")
 				if TeamValue then
-					local isValue = TeamValue.Value == "Police"
-					if not v15.BountyGui then
-						local v18 = ReplicatedStorage.Resource.HologramBounty:Clone()
-						v18.Parent = Part
-						v18.Frame.Player.Text = v12.DisplayName
-						v15.BountyGui = v18
+					local isPoliceTeam = TeamValue.Value == "Police"
+					if not existingPlayerNode.BountyGui then
+						local bountyGuiClone = ReplicatedStorage.Resource.HologramBounty:Clone()
+						bountyGuiClone.Parent = Part
+						bountyGuiClone.Frame.Player.Text = player.DisplayName
+						existingPlayerNode.BountyGui = bountyGuiClone
 					end
-					if v15.Bounty and not isValue then
-						v15.BountyGui.Frame.Bounty.Visible = true
-						local Bounty_2 = v15.Bounty
-						v10 = if Bounty_2 >= 0 then "" else "-"
-						local t2 = {}
-						local v21, v22, v23 = string.match(abs(Bounty_2), "^([^%d]*%d)(%d*)(.-)$")
-						t2[1] = v21 .. v22:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v23
-						v15.BountyGui.Frame.Bounty.Text = v10 .. Localization:FormatByKey("General.Cash", t2)
+					if existingPlayerNode.Bounty and not isPoliceTeam then
+						existingPlayerNode.BountyGui.Frame.Bounty.Visible = true
+						local BountyValue = existingPlayerNode.Bounty
+						signalColor = if BountyValue >= 0 then "" else "-"
+						local bountyFormatTable = {}
+						local bountyLeadingDigits, bountyMiddleDigits, bountySuffixPart = string.match(abs(BountyValue), "^([^%d]*%d)(%d*)(.-)$")
+						bountyFormatTable[1] = bountyLeadingDigits .. bountyMiddleDigits:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. bountySuffixPart
+						existingPlayerNode.BountyGui.Frame.Bounty.Text = signalColor .. Localization:FormatByKey("General.Cash", bountyFormatTable)
 					else
-						v15.BountyGui.Frame.Bounty.Visible = false
+						existingPlayerNode.BountyGui.Frame.Bounty.Visible = false
 					end
-					if v15.IsPolice ~= isValue then
-						v15.IsPolice = isValue
-						local v24 = isValue and Color3.new(255/255, 255/255, 255/255) or Color3.fromRGB(240, 20, 20)
-						local Part_2 = v15.Part
-						local r = v24.r
-						local g = v24.g
-						local b = v24.b
+					if existingPlayerNode.IsPolice ~= isPoliceTeam then
+						existingPlayerNode.IsPolice = isPoliceTeam
+						local teamColor = isPoliceTeam and Color3.new(255/255, 255/255, 255/255) or Color3.fromRGB(240, 20, 20)
+						local Part_2 = existingPlayerNode.Part
+						local r = teamColor.r
+						local g = teamColor.g
+						local b = teamColor.b
 						Part_2.Color = Color3.new(r, g, b)
 						Part_2.SelectionBox.Color3 = Color3.new(r + 0.2, g + 0.2, b + 0.2)
-						v15.BountyGui.Frame.Player.TextColor3 = v24
+						existingPlayerNode.BountyGui.Frame.Player.TextColor3 = teamColor
 					end
 				end
 			end
 		end
 	end
-	for v25, v26 in next, PlayerNodes do
-		if not t[v25] then
-			local v27 = PlayerNodes[v25]
-			if v27.BountyGui then
-				v27.BountyGui:Destroy()
+	for playerName, playerNode in next, PlayerNodes do
+		if not activePlayerNames[playerName] then
+			local nodeToRemove = PlayerNodes[playerName]
+			if nodeToRemove.BountyGui then
+				nodeToRemove.BountyGui:Destroy()
 			end
-			v27.Part:Destroy()
-			PlayerNodes[v25] = nil
+			nodeToRemove.Part:Destroy()
+			PlayerNodes[playerName] = nil
 		end
 	end
 end
 return {
 	Init = function()
-		BountyBoardService.onBountiesUpdated:Connect(function(p1)
-			for v1, v2 in next, t do
-				for v3, v4 in p1 do
-					local v5 = v2.PlayerNodes[v4.Name]
-					if v5 then
-						v5.Bounty = v4.Bounty
+		BountyBoardService.onBountiesUpdated:Connect(function(bountyUpdates)
+			for systemIndex, system in next, holoSystems do
+				for bountyIndex, bountyData in bountyUpdates do
+					local playerNode = system.PlayerNodes[bountyData.Name]
+					if playerNode then
+						playerNode.Bounty = bountyData.Bounty
 					end
 				end
 			end
 		end)
-		local t2 = {}
-		local t3 = {}
-		local function AddedFun(p1)
-			table.insert(t2, p1)
+		local taggedHolograms = {}
+		local systemMap = {}
+		local function AddedFun(hologramInstance)
+			table.insert(taggedHolograms, hologramInstance)
 		end
-		local function RemovedFun(p1)
-			for i = #t2, 1, -1 do
-				if t2[i] == p1 then
-					table.remove(t2, i)
-					local v1 = t3[p1]
-					if v1 then
-						DestroySystem(v1)
+		local function RemovedFun(hologramInstance)
+			for i = #taggedHolograms, 1, -1 do
+				if taggedHolograms[i] == hologramInstance then
+					table.remove(taggedHolograms, i)
+					local system = systemMap[hologramInstance]
+					if system then
+						DestroySystem(system)
 					end
 					break
 				end
 			end
 		end
-		local v1 = next
-		local v2, v3 = CollectionService:GetTagged("MapHologram")
-		for v4, v5 in v1, v2, v3 do
-			table.insert(t2, v5)
+		local iteratorFunc = next
+		local initialHolograms = CollectionService:GetTagged("MapHologram")
+		for hologramIndex, hologramInstance in iteratorFunc, initialHolograms, nil do
+			table.insert(taggedHolograms, hologramInstance)
 		end
 		CollectionService:GetInstanceAddedSignal("MapHologram"):Connect(AddedFun)
 		CollectionService:GetInstanceRemovedSignal("MapHologram"):Connect(RemovedFun)
-		local v6 = tick()
+		local lastUpdateTime = tick()
 		local function Heartbeat()
 			debug.profilebegin("Hologram")
-			local v1 = tick()
-			if v1 - v6 > 1 then
-				v6 = v1
-				for v2, v3 in next, t2 do
-					local v4 = t3[v3]
-					if (v3.Position - CurrentCamera.CFrame.p).Magnitude < 500 then
-						if not v4 then
-							local v62 = MakeSystem()
-							v62.Scale = v3.Size.X / 4096
-							v62.Center = v3.CFrame * CFrame.new(0, v3.Size.Y * 0.5 + 0.2, 0)
-							SimplifyCityParts(v62, CollectionService:GetTagged("BuildingNeon"))
-							SimplifyExtra(v62)
-							table.insert(t, v62)
-							t3[v3] = v62
+			local currentTime = tick()
+			if currentTime - lastUpdateTime > 1 then
+				lastUpdateTime = currentTime
+				for hologramIndex, hologramInstance in next, taggedHolograms do
+					local system = systemMap[hologramInstance]
+					if (hologramInstance.Position - CurrentCamera.CFrame.p).Magnitude < 500 then
+						if not system then
+							local newSystem = MakeSystem()
+							newSystem.Scale = hologramInstance.Size.X / 4096
+							newSystem.Center = hologramInstance.CFrame * CFrame.new(0, hologramInstance.Size.Y * 0.5 + 0.2, 0)
+							SimplifyCityParts(newSystem, CollectionService:GetTagged("BuildingNeon"))
+							SimplifyExtra(newSystem)
+							table.insert(holoSystems, newSystem)
+							systemMap[hologramInstance] = newSystem
 						end
-					elseif v4 then
-						t3[v3] = nil
-						DestroySystem(v4)
+					elseif system then
+						systemMap[hologramInstance] = nil
+						DestroySystem(system)
 					end
 				end
 			end
-			for v8, v9 in next, t do
-				local v10 = 1
-				local Magnitude = (v9.Center.p - CurrentCamera.CFrame.p).Magnitude
-				if Magnitude < 100 then
-					v10 = 0
-				elseif Magnitude < 300 then
-					v10 = 0.1
-				elseif Magnitude < 500 then
-					v10 = 0.2
+			for systemIndex, system in next, holoSystems do
+				local renderAlpha = 1
+				local cameraDistance = (system.Center.p - CurrentCamera.CFrame.p).Magnitude
+				if cameraDistance < 100 then
+					renderAlpha = 0
+				elseif cameraDistance < 300 then
+					renderAlpha = 0.1
+				elseif cameraDistance < 500 then
+					renderAlpha = 0.2
 				end
-				if v10 < v1 - v9.LastRender then
-					v9.LastRender = v1
-					RenderSystem(v9)
+				if renderAlpha < currentTime - system.LastRender then
+					system.LastRender = currentTime
+					RenderSystem(system)
 				end
 			end
 			debug.profileend()

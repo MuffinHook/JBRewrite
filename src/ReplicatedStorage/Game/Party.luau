@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local SoundService = game:GetService("SoundService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CollectionService = game:GetService("CollectionService")
@@ -18,29 +16,29 @@ local function PartyStart()
 	partyActive = true
 	local heartbeatCheckpoint = tick()
 	local secondCheckpoint = tick()
-	local function Heartbeat(p1)
+	local function Heartbeat(elapsedTime)
 		local currentTime = tick()
-		local v23 = CFrame.Angles(0, 0.3 * p1, 0)
+		local rotationAngle = CFrame.Angles(0, 0.3 * elapsedTime, 0)
 		local Disco = partyModel:FindFirstChild("Disco")
 		if Disco then
 			local iterNext = next
-			local v42, v5 = partyModel:GetChildren()
-			for v6, v7 in iterNext, v42, v5 do
-				if v7.Name == "Laser" then
-					v7.CFrame = Disco.CFrame:toWorldSpace(v23 * Disco.CFrame:toObjectSpace(v7.CFrame))
+			local discoChildren, discoChildIndex = partyModel:GetChildren()
+			for childIndex, child in iterNext, discoChildren, discoChildIndex do
+				if child.Name == "Laser" then
+					child.CFrame = Disco.CFrame:toWorldSpace(rotationAngle * Disco.CFrame:toObjectSpace(child.CFrame))
 				end
 			end
-			Disco.CFrame = Disco.CFrame * v23
+			Disco.CFrame = Disco.CFrame * rotationAngle
 			Disco:FindFirstChild("Music").SoundGroup = SoundService.Music
 		end
 		local Cloud = partyModel:FindFirstChild("Cloud")
 		if Cloud then
 			local discoColor = Color3.fromHSV(math.cos(currentTime * 0.1) * 0.5 + 0.5, 1, 1)
-			local v9 = next
-			local v10, v11 = Cloud:GetChildren()
-			for v12, v13 in v9, v10, v11 do
-				if v13:IsA("Decal") then
-					v13.Color3 = discoColor
+			local cloudIterator = next
+			local cloudChildren, cloudChildIndex = Cloud:GetChildren()
+			for decalIndex, decal in cloudIterator, cloudChildren, cloudChildIndex do
+				if decal:IsA("Decal") then
+					decal.Color3 = discoColor
 				end
 			end
 		end
@@ -48,11 +46,11 @@ local function PartyStart()
 			heartbeatCheckpoint = currentTime
 			local SmallDanceFloor = partyModel:FindFirstChild("SmallDanceFloor")
 			if SmallDanceFloor then
-				local v14 = next
-				local v15, v16 = SmallDanceFloor:GetChildren()
-				for v17, v18 in v14, v15, v16 do
-					if v18.Name == "Color" then
-						v18.Transparency = math.random() * 0.35 + 0.1
+				local danceFloorIterator = next
+				local danceFloorChildren, danceFloorChildIndex = SmallDanceFloor:GetChildren()
+				for colorIndex, colorPart in danceFloorIterator, danceFloorChildren, danceFloorChildIndex do
+					if colorPart.Name == "Color" then
+						colorPart.Transparency = math.random() * 0.35 + 0.1
 					end
 				end
 			end
@@ -80,11 +78,11 @@ local function PartyEnd()
 	animationTrack:Destroy()
 	animationTrack = nil
 end
-local function AddedFun(p1)
-	partyModel = p1
+local function AddedFun(partyTheme)
+	partyModel = partyTheme
 	PartyStart()
 end
-local function RemovedFun(p1)
+local function RemovedFun(partyTheme)
 	assert(partyActive)
 	partyActive = false
 	maidCleaner:Destroy()
@@ -94,12 +92,12 @@ local function RemovedFun(p1)
 	partyModel = nil
 end
 return {
-	Init = function(p1)
-		fireworksCallback = p1.Fireworks
-		local v1 = next
-		local v22, v3 = CollectionService:GetTagged("PartyThemeModel")
-		for v42, v5 in v1, v22, v3 do
-			partyModel = v5
+	Init = function(initConfig)
+		fireworksCallback = initConfig.Fireworks
+		local tagsIterator = next
+		local taggedModels, taggedModelIndex = CollectionService:GetTagged("PartyThemeModel")
+		for modelIndex, model in tagsIterator, taggedModels, taggedModelIndex do
+			partyModel = model
 			PartyStart()
 		end
 		CollectionService:GetInstanceAddedSignal("PartyThemeModel"):Connect(AddedFun)

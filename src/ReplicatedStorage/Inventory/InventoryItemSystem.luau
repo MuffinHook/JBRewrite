@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -8,27 +7,27 @@ local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local InventoryItemBinder = require(script.Parent.InventoryItemBinder)
 local InventoryItemUtils = require(script.Parent.InventoryItemUtils)
 local InventoryItemOwnerBinder = require(script.Parent.InventoryItemOwnerBinder)
-local t = {
+local InventoryItemSystem = {
 	onInventoryItemEquipped = Signal.new(),
 	onInventoryItemUnequipped = Signal.new(),
 	_equipConditions = {},
 	_unequipConditions = {}
 }
-function t.init()
+function InventoryItemSystem.init()
 	local function handleInventoryItemAdded(self)
-		local v1 = nil
+		local previousEquippedStatus = nil
 		local function handleEquipped()
-			local var12 = self:GetOwner() and true or false
-			local v2 = InventoryItemUtils.getEquipped(self.obj)
-			if var12 then
-				if v2 == v1 then
+			local hasOwner = self:GetOwner() and true or false
+			local currentEquippedStatus = InventoryItemUtils.getEquipped(self.obj)
+			if hasOwner then
+				if currentEquippedStatus == previousEquippedStatus then
 					return
 				end
-				v1 = v2
-				if v2 then
-					t.onInventoryItemEquipped:Fire(self)
+				previousEquippedStatus = currentEquippedStatus
+				if currentEquippedStatus then
+					InventoryItemSystem.onInventoryItemEquipped:Fire(self)
 				else
-					t.onInventoryItemUnequipped:Fire(self)
+					InventoryItemSystem.onInventoryItemUnequipped:Fire(self)
 				end
 			end
 		end
@@ -41,41 +40,41 @@ function t.init()
 	InventoryItemBinder:GetClassAddedSignal():Connect(handleInventoryItemAdded)
 	local function handleInventoryItemRemoved(self)
 		if InventoryItemUtils.getEquipped(self.obj) then
-			t.onInventoryItemUnequipped:Fire(self)
+			InventoryItemSystem.onInventoryItemUnequipped:Fire(self)
 		end
 	end
 	InventoryItemBinder:GetClassRemovingSignal():Connect(handleInventoryItemRemoved)
 	InventoryItemBinder:GetClassAddedSignal():Connect(function(self)
 		self._maid:GiveTask(self.onAttemptSelect:Connect(function()
-			local v1 = InventoryItemUtils.getEquipped(self.obj)
-			if t.unequipAll() and not v1 then
-				t.toggleEquip(self)
+			local isCurrentlyEquipped = InventoryItemUtils.getEquipped(self.obj)
+			if InventoryItemSystem.unequipAll() and not isCurrentlyEquipped then
+				InventoryItemSystem.toggleEquip(self)
 			end
 		end))
 	end)
 	InventoryItemBinder:Start()
 	InventoryItemOwnerBinder:Start()
-	t.addUnequipCondition(function(self)
+	InventoryItemSystem.addUnequipCondition(function(self)
 		return not InventoryItemUtils.getLocked(self.obj)
 	end)
-	UserInputService.InputBegan:Connect(function(self, p2)
-		if not p2 and (self.UserInputType == Enum.UserInputType.Keyboard and self.KeyCode == Enum.KeyCode.Backspace) then
-			for i, v in ipairs((t.getEquippedFor(Players.LocalPlayer))) do
+	UserInputService.InputBegan:Connect(function(self, inputData)
+		if not inputData and (self.UserInputType == Enum.UserInputType.Keyboard and self.KeyCode == Enum.KeyCode.Backspace) then
+			for i, v in ipairs((InventoryItemSystem.getEquippedFor(Players.LocalPlayer))) do
 				v:AttemptDrop()
 			end
 		end
 	end)
 end
-function t.addEquipCondition(self)
-	table.insert(t._equipConditions, self)
+function InventoryItemSystem.addEquipCondition(self)
+	table.insert(InventoryItemSystem._equipConditions, self)
 end
-function t.addUnequipCondition(self)
-	table.insert(t._unequipConditions, self)
+function InventoryItemSystem.addUnequipCondition(self)
+	table.insert(InventoryItemSystem._unequipConditions, self)
 end
-function t.unequipAll()
-	for i, v in ipairs((t.getInventoryItemsFor(Players.LocalPlayer))) do
+function InventoryItemSystem.unequipAll()
+	for i, v in ipairs((InventoryItemSystem.getInventoryItemsFor(Players.LocalPlayer))) do
 		if InventoryItemUtils.getEquipped(v.obj) then
-			for i2, v2 in ipairs(t._unequipConditions) do
+			for i2, v2 in ipairs(InventoryItemSystem._unequipConditions) do
 				if not v2(v) then
 					return false
 				end
@@ -85,16 +84,16 @@ function t.unequipAll()
 	end
 	return true
 end
-function t.toggleEquip(self)
+function InventoryItemSystem.toggleEquip(self)
 	if InventoryItemUtils.getEquipped(self.obj) then
-		for i, v in ipairs(t._unequipConditions) do
+		for i, v in ipairs(InventoryItemSystem._unequipConditions) do
 			if not v(self) then
 				return
 			end
 		end
 		self:AttemptSetEquipped(false)
 	else
-		for i, v in ipairs(t._equipConditions) do
+		for i, v in ipairs(InventoryItemSystem._equipConditions) do
 			if not v(self) then
 				return
 			end
@@ -103,30 +102,30 @@ function t.toggleEquip(self)
 	end
 	return true
 end
-function t.getInventoryItemsFor(self)
-	return TableUtils.filter(InventoryItemBinder:GetAll(), function(p12)
-		return p12:GetOwner() == self
+function InventoryItemSystem.getInventoryItemsFor(self)
+	return TableUtils.filter(InventoryItemBinder:GetAll(), function(inventoryItem)
+		return inventoryItem:GetOwner() == self
 	end)
 end
-function t.getInventoryItemsOfInventoryValue(self)
+function InventoryItemSystem.getInventoryItemsOfInventoryValue(self)
 	return BinderUtils.getChildren(InventoryItemBinder, self)
 end
-function t.getEquipped()
+function InventoryItemSystem.getEquipped()
 	return TableUtils.filter(InventoryItemBinder:GetAll(), function(self)
 		return InventoryItemUtils.getEquipped(self.obj)
 	end)
 end
-function t.getEquippedFor(self)
-	return TableUtils.filter(t.getEquipped(), function(p12)
-		return p12:GetOwner() == self
+function InventoryItemSystem.getEquippedFor(self)
+	return TableUtils.filter(InventoryItemSystem.getEquipped(), function(inventoryItem)
+		return inventoryItem:GetOwner() == self
 	end)
 end
-function t.playerHasItem(self, p2)
-	for i, v in ipairs(t.getInventoryItemsFor(self)) do
-		if v:GetName() == p2 then
+function InventoryItemSystem.playerHasItem(self, itemName)
+	for i, v in ipairs(InventoryItemSystem.getInventoryItemsFor(self)) do
+		if v:GetName() == itemName then
 			return true
 		end
 	end
 	return false
 end
-return t
+return InventoryItemSystem

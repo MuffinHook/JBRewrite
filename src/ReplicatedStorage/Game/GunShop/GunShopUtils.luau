@@ -1,57 +1,56 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemDataUtils = require(ReplicatedStorage.App.ItemDataUtils)
 local Localization = require(ReplicatedStorage.Module.Localization)
-local t = {
+local GunShopUtils = {
 	mapCategoryData = {},
 	allData = {},
 	takesAmmo = {}
 }
-for i, v in ipairs(script.Parent.Data:GetChildren()) do
-	t.mapCategoryData[v.Name] = require(v)
+for i, itemData in ipairs(script.Parent.Data:GetChildren()) do
+	GunShopUtils.mapCategoryData[itemData.Name] = require(itemData)
 end
-for k, v in pairs(t.mapCategoryData) do
-	for i, v2 in ipairs(v) do
-		table.insert(t.allData, v2)
-		if v2.For then
-			t.takesAmmo[v2.For] = true
+for k, categoryItems in pairs(GunShopUtils.mapCategoryData) do
+	for i, itemData in ipairs(categoryItems) do
+		table.insert(GunShopUtils.allData, itemData)
+		if itemData.For then
+			GunShopUtils.takesAmmo[itemData.For] = true
 		end
 	end
 end
-function t.getCategoryData(p1)
-	local v1 = t.mapCategoryData[p1]
-	if not v1 then
-		error(("No data exists for category: %s"):format(p1))
+function GunShopUtils.getCategoryData(categoryName)
+	local categoryData = GunShopUtils.mapCategoryData[categoryName]
+	if not categoryData then
+		error(("No data exists for category: %s"):format(categoryName))
 	end
-	return v1
+	return categoryData
 end
-function t.getAllData()
-	return t.allData
+function GunShopUtils.getAllData()
+	return GunShopUtils.allData
 end
-function t.doesTakeAmmo(p1)
-	return t.takesAmmo[p1]
+function GunShopUtils.doesTakeAmmo(itemName)
+	return GunShopUtils.takesAmmo[itemName]
 end
-function t.getDamage(p1, p2)
-	local v1 = ItemDataUtils.getConfig(p1)
-	if v1 then
-		if v1.DamageFun then
-			return v1.DamageFun(p2)
+function GunShopUtils.getDamage(itemName, damageMultiplier)
+	local itemConfig = ItemDataUtils.getConfig(itemName)
+	if itemConfig then
+		if itemConfig.DamageFun then
+			return itemConfig.DamageFun(damageMultiplier)
 		else
-			return assert(v1.Damage)
+			return assert(itemConfig.Damage)
 		end
 	else
 		return nil
 	end
 end
-function t.getMaxTotalAmmoForItem(p1)
-	if t.doesTakeAmmo(p1) then
-		return ItemDataUtils.getConfig(p1).MagSize
+function GunShopUtils.getMaxTotalAmmoForItem(itemName)
+	if GunShopUtils.doesTakeAmmo(itemName) then
+		return ItemDataUtils.getConfig(itemName).MagSize
 	else
 		return nil
 	end
 end
-function t.getTranslatedTitleFromName(p1)
-	local v1, v2 = Localization:AttemptFormatByKey("Item2." .. p1)
-	return v1 and v2 or p1
+function GunShopUtils.getTranslatedTitleFromName(itemName)
+	local translatedText, fallbackText = Localization:AttemptFormatByKey("Item2." .. itemName)
+	return translatedText and fallbackText or itemName
 end
-return t
+return GunShopUtils

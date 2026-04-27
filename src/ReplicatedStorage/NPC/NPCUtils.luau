@@ -1,23 +1,22 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NPCConsts = require(ReplicatedStorage.NPC.NPCConsts)
 local t = {
-	getTargetType = function(p1)
-		return p1:GetAttribute(NPCConsts.DEST_TYPE_ATTR_NAME)
+	getTargetType = function(npcInstance)
+		return npcInstance:GetAttribute(NPCConsts.DEST_TYPE_ATTR_NAME)
 	end,
-	setTargetType = function(p1, p2)
-		p1:SetAttribute(NPCConsts.DEST_TYPE_ATTR_NAME, p2)
+	setTargetType = function(npcInstance, targetType)
+		npcInstance:SetAttribute(NPCConsts.DEST_TYPE_ATTR_NAME, targetType)
 	end
 }
-function t.getTarget(p1)
-	local targetType = t.getTargetType(p1)
+function t.getTarget(npcInstance)
+	local targetType = t.getTargetType(npcInstance)
 	if targetType == NPCConsts.DEST_TYPE.POS or targetType == NPCConsts.DEST_TYPE.IDLE then
-		return p1:GetAttribute(NPCConsts.DEST_POS_ATTR_NAME)
+		return npcInstance:GetAttribute(NPCConsts.DEST_POS_ATTR_NAME)
 	elseif targetType == NPCConsts.DEST_TYPE.OBJ then
-		local destObjValue = p1:FindFirstChild(NPCConsts.DEST_OBJ_VALUE_NAME)
-		if destObjValue then
-			return destObjValue.Value
+		local destObjChild = npcInstance:FindFirstChild(NPCConsts.DEST_OBJ_VALUE_NAME)
+		if destObjChild then
+			return destObjChild.Value
 		else
 			return nil
 		end
@@ -25,47 +24,47 @@ function t.getTarget(p1)
 		return nil
 	end
 end
-function t.setTarget(p1, p2, p3)
-	if p3 == nil and typeof(p2) == "Vector3" then
-		p3 = NPCConsts.DEST_TYPE.POS
-	elseif p3 == nil and (typeof(p2) == "Instance" and p2:IsA("BasePart") or p2 == nil) then
-		p3 = NPCConsts.DEST_TYPE.OBJ
-	elseif p3 == nil then
+function t.setTarget(npcInstance, targetValue, targetType)
+	if targetType == nil and typeof(targetValue) == "Vector3" then
+		targetType = NPCConsts.DEST_TYPE.POS
+	elseif targetType == nil and (typeof(targetValue) == "Instance" and targetValue:IsA("BasePart") or targetValue == nil) then
+		targetType = NPCConsts.DEST_TYPE.OBJ
+	elseif targetType == nil then
 		error("Unknown targetType")
 	end
-	if p3 == NPCConsts.DEST_TYPE.POS or p3 == NPCConsts.DEST_TYPE.IDLE then
-		p1:SetAttribute(NPCConsts.DEST_POS_ATTR_NAME, p2)
-	elseif p3 == NPCConsts.DEST_TYPE.OBJ then
-		local v1 = p1:FindFirstChild(NPCConsts.DEST_OBJ_VALUE_NAME)
-		if not v1 then
+	if targetType == NPCConsts.DEST_TYPE.POS or targetType == NPCConsts.DEST_TYPE.IDLE then
+		npcInstance:SetAttribute(NPCConsts.DEST_POS_ATTR_NAME, targetValue)
+	elseif targetType == NPCConsts.DEST_TYPE.OBJ then
+		local destObjChild = npcInstance:FindFirstChild(NPCConsts.DEST_OBJ_VALUE_NAME)
+		if not destObjChild then
 			error("Could not find destObj")
 		end
-		v1.Value = p2
+		destObjChild.Value = targetValue
 	end
-	if t.getTargetType(p1) ~= p3 then
-		t.setTargetType(p1, p3)
+	if t.getTargetType(npcInstance) ~= targetType then
+		t.setTargetType(npcInstance, targetType)
 	end
 end
-function t.setHomePosition(p1, p2)
-	p1:SetAttribute(NPCConsts.HOME_POSITION_OBJ_NAME, p2)
+function t.setHomePosition(npcInstance, homePosition)
+	npcInstance:SetAttribute(NPCConsts.HOME_POSITION_OBJ_NAME, homePosition)
 end
-function t.getHomePosition(p1)
-	return p1:GetAttribute(NPCConsts.HOME_POSITION_OBJ_NAME)
+function t.getHomePosition(npcInstance)
+	return npcInstance:GetAttribute(NPCConsts.HOME_POSITION_OBJ_NAME)
 end
-function t.getLookAtType(p1)
-	return p1:GetAttribute(NPCConsts.LOOK_AT_TYPE_ATTR_NAME)
+function t.getLookAtType(npcInstance)
+	return npcInstance:GetAttribute(NPCConsts.LOOK_AT_TYPE_ATTR_NAME)
 end
-function t.setLookAtType(p1, p2)
-	p1:SetAttribute(NPCConsts.LOOK_AT_TYPE_ATTR_NAME, p2)
+function t.setLookAtType(npcInstance, lookAtType)
+	npcInstance:SetAttribute(NPCConsts.LOOK_AT_TYPE_ATTR_NAME, lookAtType)
 end
-function t.getLookAt(p1)
-	local lookAtType = t.getLookAtType(p1)
+function t.getLookAt(npcInstance)
+	local lookAtType = t.getLookAtType(npcInstance)
 	if lookAtType == NPCConsts.DEST_TYPE.POS or lookAtType == NPCConsts.DEST_TYPE.IDLE then
-		return p1:GetAttribute(NPCConsts.LOOK_AT_POS_ATTR_NAME)
+		return npcInstance:GetAttribute(NPCConsts.LOOK_AT_POS_ATTR_NAME)
 	elseif lookAtType == NPCConsts.DEST_TYPE.OBJ then
-		local lookAtObjValue = p1:FindFirstChild(NPCConsts.LOOK_AT_OBJ_VALUE_NAME)
-		if lookAtObjValue then
-			return lookAtObjValue.Value
+		local lookAtObjChild = npcInstance:FindFirstChild(NPCConsts.LOOK_AT_OBJ_VALUE_NAME)
+		if lookAtObjChild then
+			return lookAtObjChild.Value
 		else
 			return nil
 		end
@@ -73,43 +72,43 @@ function t.getLookAt(p1)
 		return nil
 	end
 end
-function t.setLookAt(p1, p2, p3)
-	if p3 == nil and typeof(p2) == "Vector3" then
-		p3 = NPCConsts.DEST_TYPE.POS
-	elseif p3 == nil and (typeof(p2) == "Instance" and p2:IsA("BasePart") or p2 == nil) then
-		p3 = NPCConsts.DEST_TYPE.OBJ
-	elseif p3 == nil then
+function t.setLookAt(npcInstance, lookAtValue, lookAtType)
+	if lookAtType == nil and typeof(lookAtValue) == "Vector3" then
+		lookAtType = NPCConsts.DEST_TYPE.POS
+	elseif lookAtType == nil and (typeof(lookAtValue) == "Instance" and lookAtValue:IsA("BasePart") or lookAtValue == nil) then
+		lookAtType = NPCConsts.DEST_TYPE.OBJ
+	elseif lookAtType == nil then
 		error("Unknown targetType")
 	end
-	if p3 == NPCConsts.DEST_TYPE.POS or p3 == NPCConsts.DEST_TYPE.IDLE then
-		p1:SetAttribute(NPCConsts.LOOK_AT_POS_ATTR_NAME, p2)
-	elseif p3 == NPCConsts.DEST_TYPE.OBJ then
-		local v1 = p1:FindFirstChild(NPCConsts.LOOK_AT_OBJ_VALUE_NAME)
-		if not v1 then
+	if lookAtType == NPCConsts.DEST_TYPE.POS or lookAtType == NPCConsts.DEST_TYPE.IDLE then
+		npcInstance:SetAttribute(NPCConsts.LOOK_AT_POS_ATTR_NAME, lookAtValue)
+	elseif lookAtType == NPCConsts.DEST_TYPE.OBJ then
+		local lookAtObjChild = npcInstance:FindFirstChild(NPCConsts.LOOK_AT_OBJ_VALUE_NAME)
+		if not lookAtObjChild then
 			error("Could not find destObj")
 		end
-		v1.Value = p2
+		lookAtObjChild.Value = lookAtValue
 	end
-	if t.getLookAtType(p1) ~= p3 then
-		t.setLookAtType(p1, p3)
+	if t.getLookAtType(npcInstance) ~= lookAtType then
+		t.setLookAtType(npcInstance, lookAtType)
 	end
 end
-function t.getNetworkOwner(p1)
-	local networkOwnerId = p1:GetAttribute(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME)
+function t.getNetworkOwner(npcInstance)
+	local networkOwnerId = npcInstance:GetAttribute(NPCConsts.NETWORK_OWNER_ID_ATTR_NAME)
 	if networkOwnerId then
 		return Players:GetPlayerByUserId(networkOwnerId)
 	end
 end
-function t.setExtrapolateTargetMovement(p1, p2)
-	return p1:SetAttribute(NPCConsts.EXTRAPOLATE_TARGET_MOVEMENT_ATTR_NAME, p2)
+function t.setExtrapolateTargetMovement(npcInstance, shouldExtrapolate)
+	return npcInstance:SetAttribute(NPCConsts.EXTRAPOLATE_TARGET_MOVEMENT_ATTR_NAME, shouldExtrapolate)
 end
-function t.getExtrapolateTargetMovement(p1)
-	return p1:GetAttribute(NPCConsts.EXTRAPOLATE_TARGET_MOVEMENT_ATTR_NAME)
+function t.getExtrapolateTargetMovement(npcInstance)
+	return npcInstance:GetAttribute(NPCConsts.EXTRAPOLATE_TARGET_MOVEMENT_ATTR_NAME)
 end
-function t.setCustomNetworkOwnership(p1, p2)
-	p1:SetAttribute(NPCConsts.CUSTOM_NETWORK_OWNERSHIP_ATTR_NAME, p2)
+function t.setCustomNetworkOwnership(npcInstance, customOwnership)
+	npcInstance:SetAttribute(NPCConsts.CUSTOM_NETWORK_OWNERSHIP_ATTR_NAME, customOwnership)
 end
-function t.getCustomNetworkOwnership(p1)
-	return p1:GetAttribute(NPCConsts.CUSTOM_NETWORK_OWNERSHIP_ATTR_NAME)
+function t.getCustomNetworkOwnership(npcInstance)
+	return npcInstance:GetAttribute(NPCConsts.CUSTOM_NETWORK_OWNERSHIP_ATTR_NAME)
 end
 return t

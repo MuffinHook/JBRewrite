@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -111,8 +110,8 @@ end
 function Dog._loadAnimations(self, breedId)
 	assert(breedId ~= nil)
 	assert(self._mapAnimTrack[DogConsts.ANIM_STATE.WALK] == nil)
-	for k, v in pairs(DogSystem.getAnimInsts(breedId)) do
-		self._mapAnimTrack[k] = self._animController:LoadAnimation(v)
+	for k, animInstance in pairs(DogSystem.getAnimInsts(breedId)) do
+		self._mapAnimTrack[k] = self._animController:LoadAnimation(animInstance)
 	end
 end
 function Dog._getAnimTrack(self, animStateId)
@@ -325,8 +324,8 @@ function Dog._getGoalSpeed(self, distToGoal)
 	if self._stateId == DogConsts.STATE.FOLLOW then
 		local speed
 		if distToGoal >= 1 then
-			local t = (distToGoal - 6) / 122
-			speed = math.max(self._targetSpeed + distToGoal / 5, (1 - t) * 10 + t * topSpeed)
+			local lerpFactor = (distToGoal - 6) / 122
+			speed = math.max(self._targetSpeed + distToGoal / 5, (1 - lerpFactor) * 10 + lerpFactor * topSpeed)
 		else
 			speed = 0
 		end

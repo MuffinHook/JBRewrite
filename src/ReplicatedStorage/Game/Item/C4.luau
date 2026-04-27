@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
 local AdminPermUtils = require(ReplicatedStorage.App.AdminPermUtils)
@@ -9,24 +7,24 @@ local C4Binder = require(ReplicatedStorage.Game.C4.C4Binder)
 local Audio = require(ReplicatedStorage.Std.Audio)
 require(ReplicatedStorage.Inventory.InventoryItemUtils)
 local Gun = require(script.Parent.Gun)
-local function getDetonatableC4(p1)
-	for i, v in ipairs((C4Binder:GetAll())) do
-		if v:GetCreator() == p1 and (not v:IsListening() and (not v:GetDetonated() and v:GetStuck())) then
-			return v
+local function getDetonatableC4(player)
+	for _, c4Item in ipairs((C4Binder:GetAll())) do
+		if c4Item:GetCreator() == player and (not c4Item:IsListening() and (not c4Item:GetDetonated() and c4Item:GetStuck())) then
+			return c4Item
 		end
 	end
 end
-local function getThrowableC4(p1)
-	for i, v in ipairs((C4Binder:GetAll())) do
-		if v:GetCreator() == p1 and not (v:IsListening() or (v:GetDetonated() or v:GetStuck())) then
-			return v
+local function getThrowableC4(player)
+	for _, c4Item in ipairs((C4Binder:GetAll())) do
+		if c4Item:GetCreator() == player and not (c4Item:IsListening() or (c4Item:GetDetonated() or c4Item:GetStuck())) then
+			return c4Item
 		end
 	end
 end
-local function getNumActiveC4(p1)
+local function getNumActiveC4(player)
 	local count = 0
-	for i, v in ipairs((C4Binder:GetAll())) do
-		if v:GetCreator() == p1 and (v:IsListening() or v:GetStuck()) then
+	for _, c4Item in ipairs((C4Binder:GetAll())) do
+		if c4Item:GetCreator() == player and (c4Item:IsListening() or c4Item:GetStuck()) then
 			count = count + 1
 		end
 	end
@@ -114,7 +112,7 @@ function C4.ShootBegin(self, inputState)
 			task.spawn(function()
 				c4Instance:ListenForAttach()
 			end)
-			eventObject:FireServer("x" .. ("guynw"):sub(4, 4):reverse():reverse():reverse() .. "" .. "" .. ("wpwlw8gc4"):sub(5, 6):reverse():reverse():reverse() .. "" .. "" .. ("st5golsm"):sub(5, 7):reverse():reverse():reverse() .. "k")
+			eventObject:FireServer("xn8wslok")
 			self.Model.Model.Screen.Color = Color3.new(255/255, 0/255, 0/255)
 		end
 		if self.Local then
@@ -176,7 +174,7 @@ function C4.ShootBegin(self, inputState)
 					task.spawn(function()
 						c4Instance:ListenForAttach()
 					end)
-					eventObject:FireServer("x" .. ("guynw"):sub(4, 4):reverse():reverse():reverse() .. "" .. "" .. ("wpwlw8gc4"):sub(5, 6):reverse():reverse():reverse() .. "" .. "" .. ("st5golsm"):sub(5, 7):reverse():reverse():reverse() .. "k")
+					eventObject:FireServer("xn8wslok")
 					self.Model.Model.Screen.Color = Color3.new(255/255, 0/255, 0/255)
 				end
 				if self.Local then

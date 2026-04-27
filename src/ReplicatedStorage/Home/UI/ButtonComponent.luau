@@ -1,24 +1,23 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local createElement = Roact.createElement
-return function(p1)
-	local cornerRadius = p1.cornerRadius
-	local t2 = {}
-	t2.Corner = cornerRadius and createElement("UICorner", {
+return function(props)
+	local cornerRadius = props.cornerRadius
+	local childElements = {}
+	childElements.Corner = cornerRadius and createElement("UICorner", {
 		CornerRadius = cornerRadius
 	})
-	t2.Title = createElement("TextLabel", {
+	childElements.Title = createElement("TextLabel", {
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1),
-		Text = p1.title,
+		Text = props.title,
 		Font = Enum.Font.Bangers,
 		LineHeight = 1,
 		TextScaled = true,
 		TextXAlignment = Enum.TextXAlignment.Center,
 		TextYAlignment = Enum.TextYAlignment.Center,
-		TextColor3 = ColorUtils.saturateBy(p1.backgroundColor, -0.7)
+		TextColor3 = ColorUtils.saturateBy(props.backgroundColor, -0.7)
 	}, {
 		Stroke = createElement("UIStroke", {
 			Color = Color3.new(0/255, 0/255, 0/255),
@@ -26,12 +25,12 @@ return function(p1)
 		})
 	})
 	return createElement("TextButton", {
-		BackgroundColor3 = p1.backgroundColor,
-		Size = p1.size,
-		Position = p1.position,
-		AnchorPoint = p1.anchorPoint,
+		BackgroundColor3 = props.backgroundColor,
+		Size = props.size,
+		Position = props.position,
+		AnchorPoint = props.anchorPoint,
 		Text = "",
 		Selectable = true,
-		[Roact.Event.Activated] = p1.onClick
-	}, t2)
+		[Roact.Event.Activated] = props.onClick
+	}, childElements)
 end

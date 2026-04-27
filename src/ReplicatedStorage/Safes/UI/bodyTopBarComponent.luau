@@ -1,7 +1,6 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local createElement = require(ReplicatedStorage.Roact).createElement
-return function(p1)
+return function(layoutProps)
 	return createElement("Frame", {
 		Size = UDim2.new(1, 0, 0.1, 0),
 		BackgroundTransparency = 1,
@@ -14,8 +13,8 @@ return function(p1)
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
-			Size = UDim2.new(1 - 2 / p1.verticalPaddingRatio / p1.aspectRatio, 0, 0.8 - 2 / p1.verticalPaddingRatio / 0.1, 0),
-			Position = UDim2.new(1 / p1.verticalPaddingRatio / p1.aspectRatio, 0, 0.1 + 1 / p1.verticalPaddingRatio / 0.1, 0)
+			Size = UDim2.new(1 - 2 / layoutProps.verticalPaddingRatio / layoutProps.aspectRatio, 0, 0.8 - 2 / layoutProps.verticalPaddingRatio / 0.1, 0),
+			Position = UDim2.new(1 / layoutProps.verticalPaddingRatio / layoutProps.aspectRatio, 0, 0.1 + 1 / layoutProps.verticalPaddingRatio / 0.1, 0)
 		}, {
 			Text = createElement("TextLabel", {
 				BackgroundTransparency = 1,

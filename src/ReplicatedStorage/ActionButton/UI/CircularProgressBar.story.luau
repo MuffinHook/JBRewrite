@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CircularProgressBar = require(script.Parent.CircularProgressBar)
 local Roact = require(ReplicatedStorage.Roact)

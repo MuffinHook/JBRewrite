@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local EzUiFolder = script:FindFirstAncestor("EzUi")
 local Dictionary = require(script.Parent.Dictionary)
 local Roact = require(EzUiFolder.Parent.Roact)

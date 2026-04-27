@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Game.ItemSystem.GunSystemConsts)
 local Settings = require(ReplicatedStorage.Resource.Settings)
@@ -34,13 +33,13 @@ return {
 	FireAuto = false,
 	FireFreq = 4,
 	ReloadTime = 4,
-	DamageFun = function(p1)
-		if p1 <= 20 then
+	DamageFun = function(distance)
+		if distance <= 20 then
 			return 40
-		elseif p1 >= 100 then
+		elseif distance >= 100 then
 			return 20
 		else
-			return 40 + -20 * ((p1 - 20) / 80)
+			return 40 + -20 * ((distance - 20) / 80)
 		end
 	end,
 	Price = 10000,

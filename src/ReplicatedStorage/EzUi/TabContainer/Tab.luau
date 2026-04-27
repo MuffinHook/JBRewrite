@@ -1,20 +1,18 @@
--- Reviewed by Claude
--- variables reassigned
 local ezUiAncestor = script:FindFirstAncestor("EzUi")
 local ColorUtils = require(ezUiAncestor.Parent.Std.ColorUtils)
 local Roact = require(ezUiAncestor.Parent.Roact)
 local createElement = Roact.createElement
-local v2 = Roact.PureComponent:extend("Tab")
-function v2.init(component)
+local TabComponent = Roact.PureComponent:extend("Tab")
+function TabComponent.init(component)
 	component:setState({
 		hover = false
 	})
 end
-function v2.render(component)
+function TabComponent.render(component)
 	local buttonColor = component.props.active and component.props.backgroundColor or (component.state.hover and ColorUtils.brightenTo(component.props.backgroundColor, 0.4) or ColorUtils.brightenTo(component.props.backgroundColor, 0.2))
 	local buttonProps = {
-		Size = component.props.scaleXBinding:map(function(p12)
-			return UDim2.new(p12, -component.props.paddingX, 1, 0)
+		Size = component.props.scaleXBinding:map(function(scaleX)
+			return UDim2.new(scaleX, -component.props.paddingX, 1, 0)
 		end),
 		BorderSizePixel = 0,
 		BackgroundTransparency = 0,
@@ -52,4 +50,4 @@ function v2.render(component)
 	buttonChildren.Title = createElement("TextLabel", titleProps)
 	return createElement("TextButton", buttonProps, buttonChildren)
 end
-return v2
+return TabComponent

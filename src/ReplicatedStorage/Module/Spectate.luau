@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -8,9 +7,9 @@ local CinematicCamera = require(ReplicatedStorage.Module.CinematicCamera)
 require(ReplicatedStorage.Std.Signal)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local SpectateGui = ReplicatedStorage.Resource.SpectateGui
-local function GetHumanoid(p1)
-	assert(p1)
-	local Character = p1.Character
+local function GetHumanoid(player)
+	assert(player)
+	local Character = player.Character
 	if Character then
 		local Humanoid = Character:FindFirstChild("Humanoid")
 		if Humanoid then
@@ -22,29 +21,29 @@ local function GetHumanoid(p1)
 		return nil
 	end
 end
-local function GetRootPart(p1)
-	assert(p1)
-	assert(p1)
-	local Character = p1.Character
-	local v1
+local function GetRootPart(player)
+	assert(player)
+	assert(player)
+	local Character = player.Character
+	local humanoid
 	if Character then
 		local Humanoid = Character:FindFirstChild("Humanoid")
-		v1 = Humanoid or nil
+		humanoid = Humanoid or nil
 	else
-		v1 = nil
+		humanoid = nil
 	end
-	if v1 then
-		local RootPart = v1.RootPart
+	if humanoid then
+		local RootPart = humanoid.RootPart
 		if RootPart then
 			return RootPart
 		end
 	end
 end
-local function SetCenterText(p1)
-	SpectateGui.Spectate.Center.TextLabel.Text = p1
+local function SetCenterText(text)
+	SpectateGui.Spectate.Center.TextLabel.Text = text
 end
-local v1 = CinematicCamera.MakeCinematicCamera()
-local t = {
+local cinematicCamera = CinematicCamera.MakeCinematicCamera()
+local SpectateModule = {
 	IsOpen = false,
 	NameList = nil,
 	SpectatingName = nil,
@@ -53,64 +52,64 @@ local t = {
 	Signal = {}
 }
 local function GetIndexFromName()
-	if t.SpectatingName == nil then
+	if SpectateModule.SpectatingName == nil then
 		return nil
 	end
-	if t.NameList == nil then
+	if SpectateModule.NameList == nil then
 		return nil
 	end
-	for i = 1, #t.NameList do
-		if t.NameList[i] == t.SpectatingName then
+	for i = 1, #SpectateModule.NameList do
+		if SpectateModule.NameList[i] == SpectateModule.SpectatingName then
 			return i
 		end
 	end
 end
 local function CycleRight()
-	local v1
-	if t.SpectatingName ~= nil and t.NameList ~= nil then
-		for i = 1, #t.NameList do
-			if t.NameList[i] == t.SpectatingName then
-				v1 = i
+	local currentIndex
+	if SpectateModule.SpectatingName ~= nil and SpectateModule.NameList ~= nil then
+		for i = 1, #SpectateModule.NameList do
+			if SpectateModule.NameList[i] == SpectateModule.SpectatingName then
+				currentIndex = i
 				break
 			end
 		end
 	end
-	v1 = nil
-	assert(v1)
-	if v1 == #t.NameList then
-		t.SpectatingName = t.NameList[1]
+	currentIndex = nil
+	assert(currentIndex)
+	if currentIndex == #SpectateModule.NameList then
+		SpectateModule.SpectatingName = SpectateModule.NameList[1]
 	else
-		t.SpectatingName = t.NameList[v1 + 1]
+		SpectateModule.SpectatingName = SpectateModule.NameList[currentIndex + 1]
 	end
-	SpectateGui.Spectate.Center.TextLabel.Text = t.SpectatingName
+	SpectateGui.Spectate.Center.TextLabel.Text = SpectateModule.SpectatingName
 end
 local function CycleLeft()
-	local v1
-	if t.SpectatingName ~= nil and t.NameList ~= nil then
-		for i = 1, #t.NameList do
-			if t.NameList[i] == t.SpectatingName then
-				v1 = i
+	local currentIndex
+	if SpectateModule.SpectatingName ~= nil and SpectateModule.NameList ~= nil then
+		for i = 1, #SpectateModule.NameList do
+			if SpectateModule.NameList[i] == SpectateModule.SpectatingName then
+				currentIndex = i
 				break
 			end
 		end
 	end
-	v1 = nil
-	assert(v1)
-	if v1 == 1 then
-		t.SpectatingName = t.NameList[#t.NameList]
+	currentIndex = nil
+	assert(currentIndex)
+	if currentIndex == 1 then
+		SpectateModule.SpectatingName = SpectateModule.NameList[#SpectateModule.NameList]
 	else
-		t.SpectatingName = t.NameList[v1 - 1]
+		SpectateModule.SpectatingName = SpectateModule.NameList[currentIndex - 1]
 	end
-	SpectateGui.Spectate.Center.TextLabel.Text = t.SpectatingName
+	SpectateGui.Spectate.Center.TextLabel.Text = SpectateModule.SpectatingName
 end
 local function ToggleView()
-	if t.Viewing then
-		t.Viewing = false
-	elseif t.NameList and #t.NameList > 0 then
+	if SpectateModule.Viewing then
+		SpectateModule.Viewing = false
+	elseif SpectateModule.NameList and #SpectateModule.NameList > 0 then
 		print("Cannot spectate, no NameList")
-		t.Viewing = true
+		SpectateModule.Viewing = true
 	end
-	if t.Viewing then
+	if SpectateModule.Viewing then
 		SpectateGui.Spectate.ButtonRight.Visible = true
 		SpectateGui.Spectate.ButtonLeft.Visible = true
 	else
@@ -118,61 +117,61 @@ local function ToggleView()
 		SpectateGui.Spectate.ButtonLeft.Visible = false
 		SpectateGui.Spectate.Center.TextLabel.Text = "Spectate"
 	end
-	local v1
-	if t.Viewing then
-		if t.SpectatingName ~= nil and t.NameList ~= nil then
-			for i = 1, #t.NameList do
-				if t.NameList[i] == t.SpectatingName then
-					v1 = i
+	local currentIndex
+	if SpectateModule.Viewing then
+		if SpectateModule.SpectatingName ~= nil and SpectateModule.NameList ~= nil then
+			for i = 1, #SpectateModule.NameList do
+				if SpectateModule.NameList[i] == SpectateModule.SpectatingName then
+					currentIndex = i
 					break
 				end
 			end
 		end
-		v1 = nil
+		currentIndex = nil
 	else
 		return
 	end
-	if v1 == nil then
-		t.SpectatingName = t.NameList[1]
+	if currentIndex == nil then
+		SpectateModule.SpectatingName = SpectateModule.NameList[1]
 	end
-	SpectateGui.Spectate.Center.TextLabel.Text = t.SpectatingName
+	SpectateGui.Spectate.Center.TextLabel.Text = SpectateModule.SpectatingName
 end
-local function Heartbeat(p1)
-	if t.Viewing then
+local function Heartbeat(deltaTime)
+	if SpectateModule.Viewing then
 		if CurrentCamera.CameraType ~= Enum.CameraType.Scriptable then
 			CurrentCamera.CameraType = Enum.CameraType.Scriptable
 		end
-		local var12 = false
-		if t.SpectatingName then
-			local localPlayer = Players:FindFirstChild(t.SpectatingName)
+		local foundTarget = false
+		if SpectateModule.SpectatingName then
+			local localPlayer = Players:FindFirstChild(SpectateModule.SpectatingName)
 			if localPlayer then
 				assert(localPlayer)
 				assert(localPlayer)
 				local Character = localPlayer.Character
-				local v3
+				local humanoid
 				if Character then
 					local Humanoid = Character:FindFirstChild("Humanoid")
-					v3 = Humanoid or nil
+					humanoid = Humanoid or nil
 				else
-					v3 = nil
+					humanoid = nil
 				end
-				local var4 = v3 and v3.RootPart or nil
-				if var4 then
-					v1.TargetFocus = var4.Position
-					v1.TargetPosition = var4.Position + var4.CFrame.LookVector * -10 + Vector3.new(0, 5, 0)
-					CinematicCamera.StepCinematicCamera(p1, v1, 3, 2)
-					var12 = true
+				local targetRootPart = humanoid and humanoid.RootPart or nil
+				if targetRootPart then
+					cinematicCamera.TargetFocus = targetRootPart.Position
+					cinematicCamera.TargetPosition = targetRootPart.Position + targetRootPart.CFrame.LookVector * -10 + Vector3.new(0, 5, 0)
+					CinematicCamera.StepCinematicCamera(deltaTime, cinematicCamera, 3, 2)
+					foundTarget = true
 				end
 			end
 		end
-		if var12 == false then
-			if t.NameList and #t.NameList > 0 then
+		if foundTarget == false then
+			if SpectateModule.NameList and #SpectateModule.NameList > 0 then
 				print("Choosing new player")
-				t.SpectatingName = t.NameList[math.random(1, #t.NameList)]
-				SpectateGui.Spectate.Center.TextLabel.Text = t.SpectatingName
+				SpectateModule.SpectatingName = SpectateModule.NameList[math.random(1, #SpectateModule.NameList)]
+				SpectateGui.Spectate.Center.TextLabel.Text = SpectateModule.SpectatingName
 			else
 				print("Could not find new player")
-				t.SpectatingName = nil
+				SpectateModule.SpectatingName = nil
 				ToggleView()
 			end
 		end
@@ -181,67 +180,67 @@ local function Heartbeat(p1)
 		local localPlayer = LocalPlayer
 		assert(localPlayer)
 		local Character = localPlayer.Character
-		local v7
+		local humanoid
 		if Character then
 			local Humanoid = Character:FindFirstChild("Humanoid")
-			v7 = Humanoid or nil
+			humanoid = Humanoid or nil
 		else
-			v7 = nil
+			humanoid = nil
 		end
-		CurrentCamera.CameraSubject = v7
+		CurrentCamera.CameraSubject = humanoid
 	end
 end
-function t.Start()
-	assert(t.IsOpen == false)
-	t.IsOpen = true
-	t.Maid = Maid.new()
+function SpectateModule.Start()
+	assert(SpectateModule.IsOpen == false)
+	SpectateModule.IsOpen = true
+	SpectateModule.Maid = Maid.new()
 	SpectateGui.Parent = LocalPlayer.PlayerGui
 	SpectateGui.Spectate.Center.TextLabel.Text = "Spectate"
-	t.SpectatingName = nil
-	t.Viewing = false
-	t.Maid:GiveTask(SpectateGui.Spectate.Center.MouseButton1Down:Connect(ToggleView))
-	t.Maid:GiveTask(SpectateGui.Spectate.ButtonRight.MouseButton1Down:Connect(CycleRight))
-	t.Maid:GiveTask(SpectateGui.Spectate.ButtonLeft.MouseButton1Down:Connect(CycleLeft))
-	t.Maid:GiveTask(RunService.Heartbeat:Connect(Heartbeat))
+	SpectateModule.SpectatingName = nil
+	SpectateModule.Viewing = false
+	SpectateModule.Maid:GiveTask(SpectateGui.Spectate.Center.MouseButton1Down:Connect(ToggleView))
+	SpectateModule.Maid:GiveTask(SpectateGui.Spectate.ButtonRight.MouseButton1Down:Connect(CycleRight))
+	SpectateModule.Maid:GiveTask(SpectateGui.Spectate.ButtonLeft.MouseButton1Down:Connect(CycleLeft))
+	SpectateModule.Maid:GiveTask(RunService.Heartbeat:Connect(Heartbeat))
 end
-function t.Stop()
-	assert(t.IsOpen == true)
+function SpectateModule.Stop()
+	assert(SpectateModule.IsOpen == true)
 	SpectateGui.Parent = script
-	t.Maid:Destroy()
-	t.Maid = nil
+	SpectateModule.Maid:Destroy()
+	SpectateModule.Maid = nil
 	CurrentCamera.CameraType = Enum.CameraType.Custom
 	local localPlayer = LocalPlayer
 	assert(localPlayer)
 	local Character = localPlayer.Character
-	local v3
+	local humanoid
 	if Character then
 		local Humanoid = Character:FindFirstChild("Humanoid")
-		v3 = Humanoid or nil
+		humanoid = Humanoid or nil
 	else
-		v3 = nil
+		humanoid = nil
 	end
-	CurrentCamera.CameraSubject = v3
-	t.IsOpen = false
+	CurrentCamera.CameraSubject = humanoid
+	SpectateModule.IsOpen = false
 end
-function t.Update(p1)
-	t.NameList = p1
-	local v1
-	if t.Viewing and t.SpectatingName then
-		if t.SpectatingName ~= nil and t.NameList ~= nil then
-			for i = 1, #t.NameList do
-				if t.NameList[i] == t.SpectatingName then
-					v1 = i
+function SpectateModule.Update(playerNameList)
+	SpectateModule.NameList = playerNameList
+	local currentIndex
+	if SpectateModule.Viewing and SpectateModule.SpectatingName then
+		if SpectateModule.SpectatingName ~= nil and SpectateModule.NameList ~= nil then
+			for i = 1, #SpectateModule.NameList do
+				if SpectateModule.NameList[i] == SpectateModule.SpectatingName then
+					currentIndex = i
 					break
 				end
 			end
 		end
-		v1 = nil
+		currentIndex = nil
 	else
 		return
 	end
-	if v1 == nil then
+	if currentIndex == nil then
 		print("Player no longer exists, will look for new one")
-		t.SpectatingName = nil
+		SpectateModule.SpectatingName = nil
 	end
 end
-return t
+return SpectateModule

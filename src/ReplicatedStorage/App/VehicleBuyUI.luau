@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Format = require(ReplicatedStorage.Module.Format)
@@ -179,12 +178,12 @@ return function()
 	UIPadding.PaddingRight = UDim.new(0, 8)
 	UIPadding.Parent = Rent
 	Rent.Parent = NewBuyVehicle
-	local instance = Signal.new()
-	local instance2 = Maid.new()
-	local var3 = 0
-	local function bindButtonTo(p1, p2)
-		instance2:GiveTask(p1.MouseButton1Click:Connect(function()
-			instance:Fire(p2)
+	local signal = Signal.new()
+	local maid = Maid.new()
+	local playerCash = 0
+	local function bindButtonTo(button, action)
+		maid:GiveTask(button.MouseButton1Click:Connect(function()
+			signal:Fire(action)
 		end))
 	end
 	task.spawn(function()
@@ -197,44 +196,44 @@ return function()
 	return {
 		Frame = NewBuyVehicle,
 		BuyButton = Buy,
-		onAction = instance,
-		setEnabled = function(p1)
-			NewBuyVehicle.Visible = p1
-			instance2:DoCleaning()
-			if p1 then
-				local var12 = "Cash"
-				instance2:GiveTask(BuyCash.MouseButton1Click:Connect(function()
-					instance:Fire(var12)
+		onAction = signal,
+		setEnabled = function(isEnabled)
+			NewBuyVehicle.Visible = isEnabled
+			maid:DoCleaning()
+			if isEnabled then
+				local actionCash = "Cash"
+				maid:GiveTask(BuyCash.MouseButton1Click:Connect(function()
+					signal:Fire(actionCash)
 				end))
-				local var22 = "Cash"
-				instance2:GiveTask(BuyCash2.MouseButton1Click:Connect(function()
-					instance:Fire(var22)
+				local actionCash2 = "Cash"
+				maid:GiveTask(BuyCash2.MouseButton1Click:Connect(function()
+					signal:Fire(actionCash2)
 				end))
-				local var3 = "Buy"
-				instance2:GiveTask(Buy.MouseButton1Click:Connect(function()
-					instance:Fire(var3)
+				local actionBuy = "Buy"
+				maid:GiveTask(Buy.MouseButton1Click:Connect(function()
+					signal:Fire(actionBuy)
 				end))
-				local var4 = "Cancel"
-				instance2:GiveTask(Cancel.MouseButton1Click:Connect(function()
-					instance:Fire(var4)
+				local actionCancel = "Cancel"
+				maid:GiveTask(Cancel.MouseButton1Click:Connect(function()
+					signal:Fire(actionCancel)
 				end))
-				local var5 = "Rent"
-				instance2:GiveTask(Rent.MouseButton1Click:Connect(function()
-					instance:Fire(var5)
+				local actionRent = "Rent"
+				maid:GiveTask(Rent.MouseButton1Click:Connect(function()
+					signal:Fire(actionRent)
 				end))
 				task.spawn(Audio.ObjectLocal, Players.LocalPlayer, 131184732929614, {
 					Volume = 0.15
 				})
 			end
 		end,
-		setCash = function(p1)
-			var3 = p1
-			Money.Text = Format.Currency(p1)
+		setCash = function(cash)
+			playerCash = cash
+			Money.Text = Format.Currency(cash)
 		end,
-		setVehicle = function(p1, p2, p3)
-			TextLabel.Text = ("Buy %s for %s?"):format(p1, Format.Currency(p2))
-			Rent.Visible = p3
-			Money.TextColor3 = if p2 <= var3 then Color3.new(255/255, 255/255, 255/255) else Color3.new(1, 0.262745, 0.262745)
+		setVehicle = function(vehicleName, vehiclePrice, isRentable)
+			TextLabel.Text = ("Buy %s for %s?"):format(vehicleName, Format.Currency(vehiclePrice))
+			Rent.Visible = isRentable
+			Money.TextColor3 = if vehiclePrice <= playerCash then Color3.new(255/255, 255/255, 255/255) else Color3.new(1, 0.262745, 0.262745)
 		end
 	}
 end

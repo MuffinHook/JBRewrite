@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local CurrentCamera = workspace.CurrentCamera
 local Players = game:GetService("Players")
@@ -22,8 +21,8 @@ local Confirmation = require(ReplicatedStorage.Module.Confirmation)
 local VehicleConsts = require(ReplicatedStorage.Vehicle.VehicleConsts)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Shockwave = require(ReplicatedStorage.Game.Shockwave)
-local v2 = nil
-local t = {
+local cameraModule = nil
+local VehicleUtils = {
 	OnVehicleEntered = Signal.new(),
 	OnVehicleExited = Signal.new(),
 	OnVehicleJumpExited = Signal.new(),
@@ -40,10 +39,10 @@ local t = {
 		end
 	end
 }
-function t.GetLocalVehiclePacketForCustomize()
-	local instance = t.GetLocalVehiclePacket()
-	if instance and not RunUtils.isTradeWorld() then
-		return instance
+function VehicleUtils.GetLocalVehiclePacketForCustomize()
+	local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+	if vehiclePacket and not RunUtils.isTradeWorld() then
+		return vehiclePacket
 	else
 		return {
 			Type = "Chassis",
@@ -51,265 +50,265 @@ function t.GetLocalVehiclePacketForCustomize()
 		}
 	end
 end
-function t.Init(p1)
-	v2 = require(Players.LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetCameras()
-	t.LastVehicleExit = 0
-	t.LastVehicleEject = 0
-	t.GetLocalVehiclePacket = p1.GetVehiclePacket
-	t.Classes = {}
-	local v3, v4 = Roact.createBinding(0)
-	t.spdBarRatio = v3
-	t.updateSpdBarRatio = v4
-	t._forceUpdateNitroBar = false
-	t.nitroState = p1.nitroState
-	local em = p1.em
-	local signal5 = p1.Event
-	function em.scrfqlpx(p1)
-		t.LastVehicleEject = p1
+function VehicleUtils.Init(vehicleConfig)
+	cameraModule = require(Players.LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetCameras()
+	VehicleUtils.LastVehicleExit = 0
+	VehicleUtils.LastVehicleEject = 0
+	VehicleUtils.GetLocalVehiclePacket = vehicleConfig.GetVehiclePacket
+	VehicleUtils.Classes = {}
+	local speedBarBinding, updateSpeedBarRatio = Roact.createBinding(0)
+	VehicleUtils.spdBarRatio = speedBarBinding
+	VehicleUtils.updateSpdBarRatio = updateSpeedBarRatio
+	VehicleUtils._forceUpdateNitroBar = false
+	VehicleUtils.nitroState = vehicleConfig.nitroState
+	local eventManager = vehicleConfig.em
+	local eventSignal = vehicleConfig.Event
+	function eventManager.scrfqlpx(ejectTime)
+		VehicleUtils.LastVehicleEject = ejectTime
 	end
-	function t.canLocalLock()
-		local instance = t.GetLocalVehiclePacket()
-		return instance and (not instance.Passenger and (instance.Model and not instance.Model:GetAttribute("DisableLocking"))) and true or false
+	function VehicleUtils.canLocalLock()
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+		return vehiclePacket and (not vehiclePacket.Passenger and (vehiclePacket.Model and not vehiclePacket.Model:GetAttribute("DisableLocking"))) and true or false
 	end
-	function t.toggleLocalLocked()
-		local instance = t.GetLocalVehiclePacket()
-		signal5:FireServer("r" .. "" .. ("fusvu"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("pjngo4g"):sub(2, 3):reverse():reverse():reverse() .. "" .. "" .. ("x4dvxg"):sub(4, 4):reverse():reverse():reverse() .. "omi", instance.Model:GetAttribute("Locked") ~= true)
+	function VehicleUtils.toggleLocalLocked()
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+		eventSignal:FireServer("runjvomi", vehiclePacket.Model:GetAttribute("Locked") ~= true)
 	end
-	function t.canLocalEject()
-		local instance = t.GetLocalVehiclePacket()
-		return instance and (not instance.Passenger and (instance.Model and not instance.Model:GetAttribute("DisableEjecting"))) and true or false
+	function VehicleUtils.canLocalEject()
+		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+		return vehiclePacket and (not vehiclePacket.Passenger and (vehiclePacket.Model and not vehiclePacket.Model:GetAttribute("DisableEjecting"))) and true or false
 	end
-	function t.attemptPassengerEject(p1)
-		signal5:FireServer("t" .. ("uug3jewsj"):sub(2, 7):reverse():reverse():reverse():reverse():reverse() .. "t", p1)
+	function VehicleUtils.attemptPassengerEject(passenger)
+		eventSignal:FireServer("twej3gut", passenger)
 	end
-	function t.attemptBuyMissiles()
-		signal5:FireServer("b" .. ("ji139irheem"):sub(4, 7):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ry5n2o"):sub(4, 5):reverse() .. "x")
+	function VehicleUtils.attemptBuyMissiles()
+		eventSignal:FireServer("bri932nx")
 	end
-	local var6 = false
-	function t.promptMissileBuy()
-		if not var6 then
-			var6 = true
-			local instance = Confirmation.new("Buy 10 Explosives for $5,000?")
-			instance.Maid:GiveTask(instance.OnYes:Connect(function()
-				t.attemptBuyMissiles()
+	local isMissileConfirmationOpen = false
+	function VehicleUtils.promptMissileBuy()
+		if not isMissileConfirmationOpen then
+			isMissileConfirmationOpen = true
+			local confirmationDialog = Confirmation.new("Buy 10 Explosives for $5,000?")
+			confirmationDialog.Maid:GiveTask(confirmationDialog.OnYes:Connect(function()
+				VehicleUtils.attemptBuyMissiles()
 			end))
-			instance.Maid:GiveTask(function()
-				var6 = false
+			confirmationDialog.Maid:GiveTask(function()
+				isMissileConfirmationOpen = false
 			end)
 		end
 	end
-	function em.asxzm3xn(...)
-		t.vehicleEffect(...)
+	function eventManager.asxzm3xn(...)
+		VehicleUtils.vehicleEffect(...)
 	end
 end
-function t.GetLocalVehicleModel()
-	local instance = t.GetLocalVehiclePacket()
-	if instance == nil then
+function VehicleUtils.GetLocalVehicleModel()
+	local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+	if vehiclePacket == nil then
 		return false
 	else
-		return instance.Model
+		return vehiclePacket.Model
 	end
 end
-function t.CleanVehicleModel(p1)
-	local instance = p1:GetDescendants()
-	for i = 1, #instance do
-		local v2 = instance[i]
-		if not (v2:IsA("BasePart") or (v2:IsA("Model") or v2:IsA("ValueBase"))) then
-			v2:Destroy()
+function VehicleUtils.CleanVehicleModel(vehicleModel)
+	local descendants = vehicleModel:GetDescendants()
+	for i = 1, #descendants do
+		local descendant = descendants[i]
+		if not (descendant:IsA("BasePart") or (descendant:IsA("Model") or descendant:IsA("ValueBase"))) then
+			descendant:Destroy()
 		end
 	end
 end
-function t.getHeadlights(p1)
-	local t = {}
-	for i, v in ipairs(p1.Model.Body:GetChildren()) do
+function VehicleUtils.getHeadlights(vehiclePacket)
+	local headlights = {}
+	for i, v in ipairs(vehiclePacket.Model.Body:GetChildren()) do
 		if v.Name == "Headlight" then
-			table.insert(t, (v:FindFirstChildWhichIsA("Light")))
+			table.insert(headlights, (v:FindFirstChildWhichIsA("Light")))
 		end
 	end
-	return t
+	return headlights
 end
-function t.setHeadlightsEnabled(p1, p2)
-	local Model = p1:FindFirstChild("Model")
+function VehicleUtils.setHeadlightsEnabled(vehicleRoot, isEnabled)
+	local Model = vehicleRoot:FindFirstChild("Model")
 	if Model then
 		local Body = Model:FindFirstChild("Body")
 		if Body then
 			for i, v in ipairs(Body:GetChildren()) do
 				if v.Name == "Headlight" then
-					local instance = v:FindFirstChildWhichIsA("Light")
-					if instance.Enabled ~= p2 then
-						instance.Enabled = p2
+					local lightInstance = v:FindFirstChildWhichIsA("Light")
+					if lightInstance.Enabled ~= isEnabled then
+						lightInstance.Enabled = isEnabled
 					end
 				end
 			end
-			local function scanModelForName(p1, p22)
-				for i, v in ipairs(p1:GetDescendants()) do
-					if v.Name == p22 then
-						local instance = p2 and Enum.Material.Neon or Enum.Material.Glass
-						if v.Material ~= instance then
-							v.Material = instance
+			local function scanModelForName(modelPart, partName)
+				for i, v in ipairs(modelPart:GetDescendants()) do
+					if v.Name == partName then
+						local materialValue = isEnabled and Enum.Material.Neon or Enum.Material.Glass
+						if v.Material ~= materialValue then
+							v.Material = materialValue
 						end
 						v.Reflectance = 0.1
-						for v2, v3 in v:GetDescendants() do
-							if v3:IsA("Beam") then
-								v3.Enabled = p2
+						for _, descendant in v:GetDescendants() do
+							if descendant:IsA("Beam") then
+								descendant.Enabled = isEnabled
 							end
 						end
 					end
 				end
 			end
 			scanModelForName(Model, "Headlights")
-			local Preset = p1:FindFirstChild("Preset")
+			local Preset = vehicleRoot:FindFirstChild("Preset")
 			if Preset then
 				scanModelForName(Preset, "Headlights")
 			end
 		end
 	end
 end
-function t.setBrakelightsEnabled(p1, p2)
-	local Model = p1:FindFirstChild("Model")
+function VehicleUtils.setBrakelightsEnabled(vehicleRoot, isEnabled)
+	local Model = vehicleRoot:FindFirstChild("Model")
 	if Model then
 		local Body = Model:FindFirstChild("Body")
 		if Body then
 			for i, v in ipairs(Body:GetChildren()) do
 				if v.Name == "Brakelight" then
-					local instance = v:FindFirstChildWhichIsA("Light")
-					if instance.Enabled ~= p2 then
-						instance.Enabled = p2
+					local lightInstance = v:FindFirstChildWhichIsA("Light")
+					if lightInstance.Enabled ~= isEnabled then
+						lightInstance.Enabled = isEnabled
 					end
 				end
 			end
 			for i, v in ipairs(Model:GetChildren()) do
-				local v2
+				local materialValue
 				if v.Name == "Brakelights" then
-					v2 = p2 and Enum.Material.Neon or Enum.Material.Glass
-					if v.Material ~= v2 then
-						v.Material = v2
+					materialValue = isEnabled and Enum.Material.Neon or Enum.Material.Glass
+					if v.Material ~= materialValue then
+						v.Material = materialValue
 					end
 					if math.abs(v.Reflectance - 0.1) > 0.001 then
 						v.Reflectance = 0.1
 					end
-					for v4, signal5 in v:GetChildren() do
-						if signal5:IsA("Trail") and signal5.Enabled ~= p2 then
-							signal5.Enabled = p2
+					for _, child in v:GetChildren() do
+						if child:IsA("Trail") and child.Enabled ~= isEnabled then
+							child.Enabled = isEnabled
 						end
 					end
 				end
 			end
-			p1:SetAttribute("BrakeLightEnabled", p2)
+			vehicleRoot:SetAttribute("BrakeLightEnabled", isEnabled)
 		end
 	end
 end
-function t.getBrakelightsEnabled(p1)
-	return p1:GetAttribute("BrakeLightEnabled") == true
+function VehicleUtils.getBrakelightsEnabled(vehicleRoot)
+	return vehicleRoot:GetAttribute("BrakeLightEnabled") == true
 end
-function t.getTireHealth(p1)
-	return p1:GetAttribute(VehicleConsts.TIRE_HEALTH_ATTR_NAME)
+function VehicleUtils.getTireHealth(tire)
+	return tire:GetAttribute(VehicleConsts.TIRE_HEALTH_ATTR_NAME)
 end
-function t.setTireHealth(p1, p2)
-	p1:SetAttribute(VehicleConsts.TIRE_HEALTH_ATTR_NAME, p2)
+function VehicleUtils.setTireHealth(tire, healthValue)
+	tire:SetAttribute(VehicleConsts.TIRE_HEALTH_ATTR_NAME, healthValue)
 end
-function t.getTireHealthChangedSignal(p1)
-	return p1:GetAttributeChangedSignal(VehicleConsts.TIRE_HEALTH_ATTR_NAME)
+function VehicleUtils.getTireHealthChangedSignal(tire)
+	return tire:GetAttributeChangedSignal(VehicleConsts.TIRE_HEALTH_ATTR_NAME)
 end
-function t.setTireMaxHealth(p1, p2)
-	p1:SetAttribute(VehicleConsts.TIRE_MAX_HEALTH_ATTR_NAME, p2)
+function VehicleUtils.setTireMaxHealth(tire, maxHealthValue)
+	tire:SetAttribute(VehicleConsts.TIRE_MAX_HEALTH_ATTR_NAME, maxHealthValue)
 end
-function t.getTireMaxHealth(p1)
-	return p1:GetAttribute(VehicleConsts.TIRE_MAX_HEALTH_ATTR_NAME)
+function VehicleUtils.getTireMaxHealth(tire)
+	return tire:GetAttribute(VehicleConsts.TIRE_MAX_HEALTH_ATTR_NAME)
 end
-function t.getTireMaxHealthChangedSignal(p1)
-	return p1:GetAttributeChangedSignal(VehicleConsts.TIRE_MAX_HEALTH_ATTR_NAME)
+function VehicleUtils.getTireMaxHealthChangedSignal(tire)
+	return tire:GetAttributeChangedSignal(VehicleConsts.TIRE_MAX_HEALTH_ATTR_NAME)
 end
-function t.getVehicleCombatConfig(p1)
-	assert(type(p1) == "string", "Invalid make")
-	local v2 = VehicleCombatData[p1]
-	if not v2 then
+function VehicleUtils.getVehicleCombatConfig(vehicleMake)
+	assert(type(vehicleMake) == "string", "Invalid make")
+	local combatConfig = VehicleCombatData[vehicleMake]
+	if not combatConfig then
 		if RunService:IsServer() then
-			instance.sendGameAnalyticsError(nil, "Missing combat config data for Make " .. p1, "critical")
+			instance.sendGameAnalyticsError(nil, "Missing combat config data for Make " .. vehicleMake, "critical")
 		end
-		v2 = VehicleCombatData.Default
+		combatConfig = VehicleCombatData.Default
 	end
-	return v2
+	return combatConfig
 end
-function t.getSeats(p1)
-	local t = {}
-	for i, v in ipairs(p1:GetChildren()) do
+function VehicleUtils.getSeats(vehicleModel)
+	local seats = {}
+	for i, v in ipairs(vehicleModel:GetChildren()) do
 		if v.Name == "Seat" or v.Name == "Passenger" then
 			local Player = v:FindFirstChild("Player")
 			local PlayerName = v:FindFirstChild("PlayerName")
 			if Player and (Player.Value and PlayerName) then
-				table.insert(t, {
+				table.insert(seats, {
 					Part = v,
 					Player = Players:FindFirstChild(PlayerName.Value)
 				})
 			end
 		end
 	end
-	table.sort(t, function(p1, p2)
-		return p1.Player.DisplayName < p2.Player.DisplayName
+	table.sort(seats, function(seatA, seatB)
+		return seatA.Player.DisplayName < seatB.Player.DisplayName
 	end)
-	return t
+	return seats
 end
-function t.prepareCameraSubject(p1, p2, p3)
-	local instance = nil
-	if p1.Seat and not p1.Seat:FindFirstChild("NoCameraSubject") then
-		if p1.Passenger then
-			instance = p1.Model:FindFirstChild("CameraPassenger", true)
+function VehicleUtils.prepareCameraSubject(vehiclePacket, isSeatCamera, shouldReturnOffsets)
+	local cameraSubject = nil
+	if vehiclePacket.Seat and not vehiclePacket.Seat:FindFirstChild("NoCameraSubject") then
+		if vehiclePacket.Passenger then
+			cameraSubject = vehiclePacket.Model:FindFirstChild("CameraPassenger", true)
 		end
-		if p1.Seat:FindFirstChild("Turret") then
-			instance = p1.Model:FindFirstChild("TurretCamera", true)
+		if vehiclePacket.Seat:FindFirstChild("Turret") then
+			cameraSubject = vehiclePacket.Model:FindFirstChild("TurretCamera", true)
 		end
-		if not instance then
-			instance = p1.Model:FindFirstChild("Camera", true)
+		if not cameraSubject then
+			cameraSubject = vehiclePacket.Model:FindFirstChild("Camera", true)
 		end
 	end
-	if instance then
-		instance:SetAttribute("VehicleSeatCam", p2 == true)
+	if cameraSubject then
+		cameraSubject:SetAttribute("VehicleSeatCam", isSeatCamera == true)
 	end
-	local BoundingBox = p1.Model:FindFirstChild("BoundingBox")
-	local activeCameraController = v2.activeCameraController
-	if activeCameraController and (instance and not p3) then
+	local BoundingBox = vehiclePacket.Model:FindFirstChild("BoundingBox")
+	local activeCameraController = cameraModule.activeCameraController
+	if activeCameraController and (cameraSubject and not shouldReturnOffsets) then
 		local Magnitude = BoundingBox.Size.Magnitude
 		activeCameraController:SetCameraToSubjectDistance(Magnitude)
-		CurrentCamera.CFrame = instance.CFrame * CFrame.Angles(-0.3141592653589793, 0, 0) * CFrame.new(0, 0, Magnitude)
-		return instance
-	elseif p3 then
+		CurrentCamera.CFrame = cameraSubject.CFrame * CFrame.Angles(-0.3141592653589793, 0, 0) * CFrame.new(0, 0, Magnitude)
+		return cameraSubject
+	elseif shouldReturnOffsets then
 		local Magnitude = BoundingBox.Size.Magnitude
-		return instance, (CFrame.Angles(-0.3141592653589793, 0, 0) * CFrame.new(0, 0, Magnitude)).Position, Magnitude
+		return cameraSubject, (CFrame.Angles(-0.3141592653589793, 0, 0) * CFrame.new(0, 0, Magnitude)).Position, Magnitude
 	else
-		return instance
+		return cameraSubject
 	end
 end
-function t.getParentModel(p1)
+function VehicleUtils.getParentModel(instance)
 	while true do
-		p1 = p1.Parent
-		if not p1 then
+		instance = instance.Parent
+		if not instance then
 			return
 		end
-		if CollectionService:HasTag(p1, "Vehicle") then
-			return p1
+		if CollectionService:HasTag(instance, "Vehicle") then
+			return instance
 		end
 	end
 end
-function t.getVehicleMakeFromModel(p1)
-	assert(CollectionService:HasTag(p1, "Vehicle"), "Model is not a vehicle")
-	return p1.Name
+function VehicleUtils.getVehicleMakeFromModel(vehicleModel)
+	assert(CollectionService:HasTag(vehicleModel, "Vehicle"), "Model is not a vehicle")
+	return vehicleModel.Name
 end
-function t.getVehicleDataForMake(p1)
+function VehicleUtils.getVehicleDataForMake(vehicleMake)
 	for i, v in ipairs(VehicleData) do
-		if v.Make == p1 then
+		if v.Make == vehicleMake then
 			return v
 		end
 	end
-	error("Invalid make: " .. p1)
+	error("Invalid make: " .. vehicleMake)
 end
-function t.fixNetworkingCharacters()
+function VehicleUtils.fixNetworkingCharacters()
 	local Falling = require(ReplicatedStorage.Game.Falling)
 	local Paraglide = require(ReplicatedStorage.Game.Paraglide)
 	task.delay(2, function()
 		local Character = Players.LocalPlayer.Character
 		if Character and (Falling.IsSkydiving() or (Paraglide.IsFlying() or Character.Humanoid:GetState() == Enum.HumanoidStateType.Freefall)) then
-			local instance = Character.Humanoid.HipHeight + Character.HumanoidRootPart.Size.Y / 2
+			local hipHeightOffset = Character.Humanoid.HipHeight + Character.HumanoidRootPart.Size.Y / 2
 			local Velocity = Character.HumanoidRootPart.Velocity
 			Character.Humanoid.JumpPower = 0
 			local NetworkFixPart1 = Instance.new("Part")
@@ -317,7 +316,7 @@ function t.fixNetworkingCharacters()
 			NetworkFixPart1.Transparency = 1
 			NetworkFixPart1.Size = Vector3.new(3, 0.1, 3)
 			NetworkFixPart1.Anchored = true
-			NetworkFixPart1.CFrame = Character.HumanoidRootPart.CFrame - Vector3.new(0, instance, 0)
+			NetworkFixPart1.CFrame = Character.HumanoidRootPart.CFrame - Vector3.new(0, hipHeightOffset, 0)
 			NetworkFixPart1.Parent = workspace
 			Character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
 			task.delay(0.01, function()
@@ -333,11 +332,11 @@ function t.fixNetworkingCharacters()
 		end
 	end)
 end
-function t.vehicleEffect(p1, p2)
-	if p1 == "Jump" and (p2 and p2.Parent) then
-		local JumpEffect = p2:FindFirstChild("JumpEffect", true)
-		local BlastEffect = p2:FindFirstChild("BlastEffect", true)
-		local Engine = p2:FindFirstChild("Engine")
+function VehicleUtils.vehicleEffect(effectType, vehicleModel)
+	if effectType == "Jump" and (vehicleModel and vehicleModel.Parent) then
+		local JumpEffect = vehicleModel:FindFirstChild("JumpEffect", true)
+		local BlastEffect = vehicleModel:FindFirstChild("BlastEffect", true)
+		local Engine = vehicleModel:FindFirstChild("Engine")
 		if BlastEffect then
 			BlastEffect:Emit(5)
 		end
@@ -352,16 +351,16 @@ function t.vehicleEffect(p1, p2)
 				Volume = 0.5
 			})
 		end
-	elseif p1 == "Nuke" and (p2 and (p2.Parent and p2.PrimaryPart)) then
-		Shockwave.new(p2.PrimaryPart.Position, {
+	elseif effectType == "Nuke" and (vehicleModel and (vehicleModel.Parent and vehicleModel.PrimaryPart)) then
+		Shockwave.new(vehicleModel.PrimaryPart.Position, {
 			Duration = 12,
 			MaxRadius = 6400,
 			Power = 80
 		}).OnPastLocalPlayer:Connect(function()
-			local instance = t.GetLocalVehiclePacket()
-			if instance ~= nil then
-				if instance.Make == "AdminNuke" and not instance.Passenger then
-					t.Classes.Chassis.runAction(true)
+			local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+			if vehiclePacket ~= nil then
+				if vehiclePacket.Make == "AdminNuke" and not vehiclePacket.Passenger then
+					VehicleUtils.Classes.Chassis.runAction(true)
 					return
 				end
 				CharacterUtil.OnJump()
@@ -370,4 +369,4 @@ function t.vehicleEffect(p1, p2)
 		end)
 	end
 end
-return t
+return VehicleUtils

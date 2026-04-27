@@ -1,7 +1,6 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer(nil, {
-	setHome = function(p1, p2)
-		return p2.value
+	setHome = function(state, action)
+		return action.value
 	end
 })

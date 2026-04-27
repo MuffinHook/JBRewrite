@@ -1,40 +1,39 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Maid = require(ReplicatedStorage.Std.Maid)
-local t = {}
-t.__index = t
-function t.new(p1)
-	assert(p1)
-	assert(p1 > 0)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.Maid = Maid.new()
-	t2.Duration = p1
-	t2.BornAt = os.clock()
-	t2.OnCompleted = Signal.new()
-	t2.Maid:GiveTask(t2.OnCompleted)
-	t2.OnCanceled = Signal.new()
-	t2.Maid:GiveTask(t2.OnCanceled)
-	t2.IsCompleted = false
-	return t2
+local Anim = {}
+Anim.__index = Anim
+function Anim.new(duration)
+	assert(duration)
+	assert(duration > 0)
+	local animInstance = {}
+	setmetatable(animInstance, Anim)
+	animInstance.Maid = Maid.new()
+	animInstance.Duration = duration
+	animInstance.BornAt = os.clock()
+	animInstance.OnCompleted = Signal.new()
+	animInstance.Maid:GiveTask(animInstance.OnCompleted)
+	animInstance.OnCanceled = Signal.new()
+	animInstance.Maid:GiveTask(animInstance.OnCanceled)
+	animInstance.IsCompleted = false
+	return animInstance
 end
-function t.Update(p1)
-	local progress = (os.clock() - p1.BornAt) / p1.Duration
-	if progress >= 1 and p1.IsCompleted == false then
-		p1.IsCompleted = true
-		p1.OnCompleted:Fire()
+function Anim.Update(animInstance)
+	local progress = (os.clock() - animInstance.BornAt) / animInstance.Duration
+	if progress >= 1 and animInstance.IsCompleted == false then
+		animInstance.IsCompleted = true
+		animInstance.OnCompleted:Fire()
 	end
 	return math.clamp(progress, 0, 1)
 end
-function t.Destroy(p1)
-	if p1.Maid ~= nil then
-		local Maid = p1.Maid
-		p1.Maid = nil
-		if p1.IsCompleted == false then
-			p1.OnCanceled:Fire()
+function Anim.Destroy(animInstance)
+	if animInstance.Maid ~= nil then
+		local Maid = animInstance.Maid
+		animInstance.Maid = nil
+		if animInstance.IsCompleted == false then
+			animInstance.OnCanceled:Fire()
 		end
 		Maid:Destroy()
 	end
 end
-return t
+return Anim

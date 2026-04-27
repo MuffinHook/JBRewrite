@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -22,8 +21,8 @@ local function playTick()
 		})
 	end
 end
-local v1 = Roact.PureComponent:extend("Trade")
-v1.defaultProps = {
+local TradeComponent = Roact.PureComponent:extend("Trade")
+TradeComponent.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	position = UDim2.new(0.5, 0, 0.5, 0),
 	anchorPoint = Vector2.new(0.5, 0.5)
@@ -38,42 +37,42 @@ local function resetInventoryUserEditedValues()
 		selectedPlayer = Players.LocalPlayer
 	})
 end
-function v1.init(p1)
-	p1.activeMaid = Maid.new()
-	p1.categories = TradeUtils.getCategories()
-	p1:setState({
-		inventoryItems = p1:_getFilteredInventoryItems(),
-		category = p1.categories[1]
+function TradeComponent.init(self)
+	self.activeMaid = Maid.new()
+	self.categories = TradeUtils.getCategories()
+	self:setState({
+		inventoryItems = self:_getFilteredInventoryItems(),
+		category = self.categories[1]
 	})
-	function p1.onClickExitInventory()
+	function self.onClickExitInventory()
 		resetInventoryUserEditedValues()
-		p1.props.setInventoryOpen(false)
+		self.props.setInventoryOpen(false)
 	end
-	function p1.promptInventory()
+	function self.promptInventory()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 				Volume = 0.15
 			})
 		end
-		p1.props.setInventoryOpen(true)
+		self.props.setInventoryOpen(true)
 	end
-	function p1.onClickInventoryItem(p12)
-		if p1.props.tradeActive and p1.props.inventoryPlayers.selectedPlayer == Players.LocalPlayer then
-			local v1 = p1.state.inventoryItems[p12]
-			local v2 = false
-			for i, v in ipairs(p1.props.traderMe.offerItems) do
-				if v.id == v1.id then
-					v2 = true
+	function self.onClickInventoryItem(itemIndex)
+		if self.props.tradeActive and self.props.inventoryPlayers.selectedPlayer == Players.LocalPlayer then
+			local selectedItem = self.state.inventoryItems[itemIndex]
+			local isItemAlreadyOffered = false
+			for i, item in ipairs(self.props.traderMe.offerItems) do
+				if item.id == selectedItem.id then
+					isItemAlreadyOffered = true
 					break
 				end
 			end
-			if v2 then
-				p1.props.removeTraderMeOfferItem(v1)
+			if isItemAlreadyOffered then
+				self.props.removeTraderMeOfferItem(selectedItem)
 			else
-				p1.props.addTraderMeOfferItem(v1)
+				self.props.addTraderMeOfferItem(selectedItem)
 			end
-			p1.props.setInventoryOpen(false)
-			p1:_updateMyOffer()
+			self.props.setInventoryOpen(false)
+			self:_updateMyOffer()
 			if Players.LocalPlayer.PlayerGui then
 				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 					Volume = 0.15
@@ -81,18 +80,18 @@ function v1.init(p1)
 			end
 		end
 	end
-	function p1.removeTraderMeOfferItemByIndex(p12)
-		p1.props.removeTraderMeOfferItemByIndex(p12)
-		p1:_updateMyOffer(false)
+	function self.removeTraderMeOfferItemByIndex(itemIndex)
+		self.props.removeTraderMeOfferItemByIndex(itemIndex)
+		self:_updateMyOffer(false)
 	end
-	function p1.onClickCategory(p12)
+	function self.onClickCategory(selectedCategory)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 				Volume = 0.25
 			})
 		end
-		p1:setState({
-			category = p12
+		self:setState({
+			category = selectedCategory
 		})
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
@@ -100,25 +99,25 @@ function v1.init(p1)
 			})
 		end
 	end
-	function p1.onClickReady()
-		p1.props.onClickReady()
-		p1:_updateMyOffer(true)
+	function self.onClickReady()
+		self.props.onClickReady()
+		self:_updateMyOffer(true)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 				Volume = 0.15
 			})
 		end
 	end
-	function p1.onClickUnready()
-		p1.props.onClickUnready()
-		p1:_updateMyOffer(false)
+	function self.onClickUnready()
+		self.props.onClickUnready()
+		self:_updateMyOffer(false)
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 				Volume = 0.15
 			})
 		end
 	end
-	function p1.onClickAccept()
+	function self.onClickAccept()
 		ReplicatedStorage:FindFirstChild(TradeConsts.ACCEPT_OFFERING_REMOTE_NAME):FireServer()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
@@ -126,7 +125,7 @@ function v1.init(p1)
 			})
 		end
 	end
-	function p1.onClickDecline()
+	function self.onClickDecline()
 		ReplicatedStorage:FindFirstChild(TradeConsts.DECLINE_OFFERING_REMOTE_NAME):FireServer()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
@@ -134,7 +133,7 @@ function v1.init(p1)
 			})
 		end
 	end
-	function p1.onClickExit()
+	function self.onClickExit()
 		ReplicatedStorage:FindFirstChild(TradeConsts.EXIT_OFFERING_REMOTE_NAME):FireServer()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
@@ -142,17 +141,17 @@ function v1.init(p1)
 			})
 		end
 	end
-	function p1.onCardFlipped()
+	function self.onCardFlipped()
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 9846199217, {
 				Volume = 0.15
 			})
 		end
 	end
-	function p1.onClickInventoryPlayer(p1)
+	function self.onClickInventoryPlayer(selectedPlayer)
 		store:dispatch({
 			type = "setInventoryPlayer",
-			selectedPlayer = p1
+			selectedPlayer = selectedPlayer
 		})
 		if Players.LocalPlayer.PlayerGui then
 			Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
@@ -161,219 +160,219 @@ function v1.init(p1)
 		end
 	end
 end
-function v1._updateMyOffer(p1, p2)
-	if p2 == nil then
-		p2 = p1.props.traderMe.ready
+function TradeComponent._updateMyOffer(self, isReady)
+	if isReady == nil then
+		isReady = self.props.traderMe.ready
 	end
-	local v1 = p1:_getMeOfferIds()
-	local v2 = ReplicatedStorage:FindFirstChild(TradeConsts.UPDATE_OFFERING_REMOTE_NAME)
-	if v2 then
-		v2:FireServer(p2, v1)
+	local offerIds = self:_getMeOfferIds()
+	local updateOfferingRemote = ReplicatedStorage:FindFirstChild(TradeConsts.UPDATE_OFFERING_REMOTE_NAME)
+	if updateOfferingRemote then
+		updateOfferingRemote:FireServer(isReady, offerIds)
 	end
 end
-function v1._getMeOfferIds(p1)
-	return TableUtils.map(p1.props.traderMe.offerItems, function(p1)
-		return assert(p1.id, "missing id itemProp")
+function TradeComponent._getMeOfferIds(self)
+	return TableUtils.map(self.props.traderMe.offerItems, function(itemId)
+		return assert(itemId.id, "missing id itemProp")
 	end)
 end
-function v1._getFilteredInventoryItems(p1)
-	local tradeInventorySearchText = p1.props.tradeInventorySearchText
-	local t = {}
-	for i, v in ipairs(p1.props.tradeInventory) do
-		if TableUtils.hasDesiredValuesShallow(v, p1.state.category.match) and (not tradeInventorySearchText or (tradeInventorySearchText == "" or string.find(v.title:lower(), tradeInventorySearchText:lower(), nil, true))) then
-			table.insert(t, v)
+function TradeComponent._getFilteredInventoryItems(self)
+	local tradeInventorySearchText = self.props.tradeInventorySearchText
+	local filteredItems = {}
+	for i, item in ipairs(self.props.tradeInventory) do
+		if TableUtils.hasDesiredValuesShallow(item, self.state.category.match) and (not tradeInventorySearchText or (tradeInventorySearchText == "" or string.find(item.title:lower(), tradeInventorySearchText:lower(), nil, true))) then
+			table.insert(filteredItems, item)
 		end
 	end
-	table.sort(t, SortUtils.getTradeSortFunc(p1.props.tradeSort))
-	return t
+	table.sort(filteredItems, SortUtils.getTradeSortFunc(self.props.tradeSort))
+	return filteredItems
 end
-function v1._getFilteredInventoryPlayers(p1)
-	table.sort(p1.props.inventoryPlayers.allPlayers, function(p1, p2)
-		if p1.UserId == Players.LocalPlayer.UserId then
+function TradeComponent._getFilteredInventoryPlayers(self)
+	table.sort(self.props.inventoryPlayers.allPlayers, function(player, otherPlayer)
+		if player.UserId == Players.LocalPlayer.UserId then
 			return true
-		elseif p2.UserId == Players.LocalPlayer.UserId then
+		elseif otherPlayer.UserId == Players.LocalPlayer.UserId then
 			return false
 		else
-			return p1.DisplayName < p2.DisplayName
+			return player.DisplayName < otherPlayer.DisplayName
 		end
 	end)
-	if p1.props.tradeActive then
-		local t = {
+	if self.props.tradeActive then
+		local filteredPlayers = {
 			allPlayers = {}
 		}
-		for v1, v2 in p1.props.inventoryPlayers.allPlayers do
-			if v2.UserId == p1.props.traderThem.userId or v2.UserId == Players.LocalPlayer.UserId then
-				table.insert(t.allPlayers, v2)
+		for index, inventoryPlayer in self.props.inventoryPlayers.allPlayers do
+			if inventoryPlayer.UserId == self.props.traderThem.userId or inventoryPlayer.UserId == Players.LocalPlayer.UserId then
+				table.insert(filteredPlayers.allPlayers, inventoryPlayer)
 			end
 		end
-		t.selectedPlayer = p1.props.inventoryPlayers.selectedPlayer
-		return t
+		filteredPlayers.selectedPlayer = self.props.inventoryPlayers.selectedPlayer
+		return filteredPlayers
 	else
-		return p1.props.inventoryPlayers
+		return self.props.inventoryPlayers
 	end
 end
-function v1.render(p1)
-	local t = {}
-	for i, v in ipairs(p1.props.traderMe.offerItems) do
-		t[v.id] = true
+function TradeComponent.render(self)
+	local offeredItemIds = {}
+	for i, item in ipairs(self.props.traderMe.offerItems) do
+		offeredItemIds[item.id] = true
 	end
-	if p1.props.tradeInventoryOpen then
-		local t2 = {}
-		for i, v in ipairs(p1.state.inventoryItems) do
-			local t3 = {}
-			if t[v.id] then
-				t3.selected = true
+	if self.props.tradeInventoryOpen then
+		local itemMetadataList = {}
+		for i, item in ipairs(self.state.inventoryItems) do
+			local itemMetadata = {}
+			if offeredItemIds[item.id] then
+				itemMetadata.selected = true
 			end
-			table.insert(t2, t3)
+			table.insert(itemMetadataList, itemMetadata)
 		end
 		return createElement(TradeInventory, {
-			size = p1.props.size,
-			position = p1.props.position,
-			anchorPoint = p1.props.anchorPoint,
-			categories = p1.categories,
-			category = p1.state.category,
-			items = p1.state.inventoryItems,
-			itemMetadata = t2,
-			onClickExit = p1.onClickExitInventory,
-			onClickItem = p1.onClickInventoryItem,
-			onClickCategory = p1.onClickCategory,
-			onCardFlipped = p1.onCardFlipped,
-			onSelectSort = p1.props.onSelectSort,
-			inventoryPlayers = p1:_getFilteredInventoryPlayers(),
-			onClickInventoryPlayer = p1.onClickInventoryPlayer,
-			sortId = p1.props.tradeSort,
-			showChat = p1.props.tradeActive,
-			tradeChatMessages = p1.props.tradeChatMessages
+			size = self.props.size,
+			position = self.props.position,
+			anchorPoint = self.props.anchorPoint,
+			categories = self.categories,
+			category = self.state.category,
+			items = self.state.inventoryItems,
+			itemMetadata = itemMetadataList,
+			onClickExit = self.onClickExitInventory,
+			onClickItem = self.onClickInventoryItem,
+			onClickCategory = self.onClickCategory,
+			onCardFlipped = self.onCardFlipped,
+			onSelectSort = self.props.onSelectSort,
+			inventoryPlayers = self:_getFilteredInventoryPlayers(),
+			onClickInventoryPlayer = self.onClickInventoryPlayer,
+			sortId = self.props.tradeSort,
+			showChat = self.props.tradeActive,
+			tradeChatMessages = self.props.tradeChatMessages
 		})
 	end
-	if p1.props.tradeActive then
-		local v1 = ""
-		if p1.props.tradeInfo then
-			if p1.props.tradeInfo.msg then
-				v1 = p1.props.tradeInfo.msg
-			elseif p1.props.tradeInfo.debugProbability then
-				v1 = ("P(you better) [debug] = %.1f%%"):format(p1.props.tradeInfo.debugProbability * 100)
+	if self.props.tradeActive then
+		local infoMessage = ""
+		if self.props.tradeInfo then
+			if self.props.tradeInfo.msg then
+				infoMessage = self.props.tradeInfo.msg
+			elseif self.props.tradeInfo.debugProbability then
+				infoMessage = ("P(you better) [debug] = %.1f%%"):format(self.props.tradeInfo.debugProbability * 100)
 			end
 		end
 		return createElement(TradeOffering, {
-			size = p1.props.size,
-			position = p1.props.position,
-			anchorPoint = p1.props.anchorPoint,
-			traderMe = p1.props.traderMe,
-			traderThem = p1.props.traderThem,
-			promptInventory = p1.promptInventory,
-			removeTraderMeOfferItem = p1.removeTraderMeOfferItemByIndex,
-			onClickReady = p1.onClickReady,
-			onClickUnready = p1.onClickUnready,
-			onClickAccept = p1.onClickAccept,
-			onClickDecline = p1.onClickDecline,
-			onClickExit = p1.onClickExit,
-			onCardFlipped = p1.onCardFlipped,
-			infoMessage = v1,
-			showChat = p1.props.tradeActive,
-			tradeChatMessages = p1.props.tradeChatMessages
+			size = self.props.size,
+			position = self.props.position,
+			anchorPoint = self.props.anchorPoint,
+			traderMe = self.props.traderMe,
+			traderThem = self.props.traderThem,
+			promptInventory = self.promptInventory,
+			removeTraderMeOfferItem = self.removeTraderMeOfferItemByIndex,
+			onClickReady = self.onClickReady,
+			onClickUnready = self.onClickUnready,
+			onClickAccept = self.onClickAccept,
+			onClickDecline = self.onClickDecline,
+			onClickExit = self.onClickExit,
+			onCardFlipped = self.onCardFlipped,
+			infoMessage = infoMessage,
+			showChat = self.props.tradeActive,
+			tradeChatMessages = self.props.tradeChatMessages
 		})
 	end
 end
-function v1.didUpdate(p1, p2, p3)
-	if p1.state.category ~= p3.category or (p1.props.tradeInventory ~= p2.tradeInventory or (p1.props.tradeInventorySearchText ~= p2.tradeInventorySearchText or p1.props.tradeSort ~= p2.tradeSort)) then
-		p1:setState({
-			inventoryItems = p1:_getFilteredInventoryItems()
+function TradeComponent.didUpdate(self, previousProps, previousState)
+	if self.state.category ~= previousState.category or (self.props.tradeInventory ~= previousProps.tradeInventory or (self.props.tradeInventorySearchText ~= previousProps.tradeInventorySearchText or self.props.tradeSort ~= previousProps.tradeSort)) then
+		self:setState({
+			inventoryItems = self:_getFilteredInventoryItems()
 		})
 	end
-	if p1.props.tradeActive ~= p2.tradeActive then
-		if not p1.props.tradeActive then
-			p1.activeMaid:DoCleaning()
-			p1:setState({
-				category = p1.categories[1]
+	if self.props.tradeActive ~= previousProps.tradeActive then
+		if not self.props.tradeActive then
+			self.activeMaid:DoCleaning()
+			self:setState({
+				category = self.categories[1]
 			})
-			p1.props.setInventoryOpen(false)
-			p1.props.resetTradeInfo()
+			self.props.setInventoryOpen(false)
+			self.props.resetTradeInfo()
 		end
-		if p1.props.tradeActive then
-			p1.activeMaid:GiveTask(ActionButtonService.pushHide())
+		if self.props.tradeActive then
+			self.activeMaid:GiveTask(ActionButtonService.pushHide())
 		end
 	end
-	if p1.props.tradeInventoryOpen and p1.props.tradeInventoryOpen ~= p2.tradeInventoryOpen then
+	if self.props.tradeInventoryOpen and self.props.tradeInventoryOpen ~= previousProps.tradeInventoryOpen then
 		resetInventoryUserEditedValues()
 	end
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(state, dispatch)
 	return {
-		traderMe = p1.traderMe,
-		traderThem = p1.traderThem,
-		tradeInventory = p1.tradeInventory,
-		tradeInventorySearchText = p1.tradeInventorySearchText,
-		tradeCategory = p1.tradeCategory,
-		tradeActive = p1.tradeActive,
-		tradeSort = p1.tradeSort,
-		tradeInventoryOpen = p1.tradeInventoryOpen,
-		tradeInfo = p1.tradeInfo,
-		inventoryPlayers = p1.inventoryPlayers,
-		tradeChatMessages = p1.tradeChatMessages
+		traderMe = state.traderMe,
+		traderThem = state.traderThem,
+		tradeInventory = state.tradeInventory,
+		tradeInventorySearchText = state.tradeInventorySearchText,
+		tradeCategory = state.tradeCategory,
+		tradeActive = state.tradeActive,
+		tradeSort = state.tradeSort,
+		tradeInventoryOpen = state.tradeInventoryOpen,
+		tradeInfo = state.tradeInfo,
+		inventoryPlayers = state.inventoryPlayers,
+		tradeChatMessages = state.tradeChatMessages
 	}
-end, function(p1)
+end, function(dispatch)
 	return {
-		onClickReady = function(p12)
-			p1({
+		onClickReady = function(sortId)
+			dispatch({
 				type = "updateTraderMe",
 				ready = true
 			})
 		end,
 		onClickUnready = function()
-			p1({
+			dispatch({
 				type = "updateTraderMe",
 				ready = false
 			})
 		end,
-		addTraderMeOfferItem = function(p12)
-			p1({
+		addTraderMeOfferItem = function(item)
+			dispatch({
 				type = "addTraderMeOfferItem",
-				item = p12
+				item = item
 			})
 		end,
-		removeTraderMeOfferItem = function(p12)
-			p1({
+		removeTraderMeOfferItem = function(item)
+			dispatch({
 				type = "removeTraderMeOfferItem",
-				item = p12
+				item = item
 			})
 		end,
-		removeTraderMeOfferItemByIndex = function(p12)
-			p1({
+		removeTraderMeOfferItemByIndex = function(itemIndex)
+			dispatch({
 				type = "removeTraderMeOfferItemByIndex",
-				index = p12
+				index = itemIndex
 			})
 		end,
-		onSelectSort = function(p12)
+		onSelectSort = function(sortId)
 			if Players.LocalPlayer.PlayerGui then
 				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 					Volume = 0.15
 				})
 			end
-			local v1 = nil
-			if p12 == EnumSort.Newest then
-				v1 = EnumSort.Popular
-			elseif p12 == EnumSort.Popular then
-				v1 = EnumSort.Alphabetical
-			elseif p12 == EnumSort.Alphabetical then
-				v1 = EnumSort.Newest
+			local nextSortId = nil
+			if sortId == EnumSort.Newest then
+				nextSortId = EnumSort.Popular
+			elseif sortId == EnumSort.Popular then
+				nextSortId = EnumSort.Alphabetical
+			elseif sortId == EnumSort.Alphabetical then
+				nextSortId = EnumSort.Newest
 			end
-			p1({
+			dispatch({
 				type = "setTradeSortId",
-				sortId = v1
+				sortId = nextSortId
 			})
 		end,
-		setInventoryOpen = function(p12)
-			p1({
+		setInventoryOpen = function(isOpen)
+			dispatch({
 				type = "setTradeInventoryOpen",
-				value = p12
+				value = isOpen
 			})
 		end,
 		resetTradeInfo = function()
-			p1({
+			dispatch({
 				type = "setTradeInfo",
 				info = nil
 			})
 		end
 	}
-end)(v1)
+end)(TradeComponent)

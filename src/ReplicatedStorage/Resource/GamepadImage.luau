@@ -1,26 +1,25 @@
--- Reviewed by Claude
-local tbl = {}
-local tbl2 = {}
-for k, v in pairs(script.Spritesheets:GetChildren()) do
-	tbl[v.Name] = {}
-	for k2, v2 in pairs(v:GetChildren()) do
-		tbl[v.Name][v2.Name] = require(v2).new()
+local spriteSheetCache = {}
+local gamepadImageModule = {}
+for spriteSheetName, spriteSheet in pairs(script.Spritesheets:GetChildren()) do
+	spriteSheetCache[spriteSheet.Name] = {}
+	for spriteName, spriteInstance in pairs(spriteSheet:GetChildren()) do
+		spriteSheetCache[spriteSheet.Name][spriteInstance.Name] = require(spriteInstance).new()
 	end
 end
-local function getImageInstance(p1, p2, p3)
-	if type(p2) == "userdata" then
-		p2 = string.sub(tostring(p2), 14)
+local function getImageInstance(elementType, enumOrName, gamepadStyle)
+	if type(enumOrName) == "userdata" then
+		enumOrName = string.sub(tostring(enumOrName), 14)
 	end
-	local var3 = tbl.XboxOne[p3]
-	if var3 then
-		return var3:GetSprite(p1, p2)
+	local spriteSheetStyle = spriteSheetCache.XboxOne[gamepadStyle]
+	if spriteSheetStyle then
+		return spriteSheetStyle:GetSprite(elementType, enumOrName)
 	end
-	warn("Could not find style: " .. p3)
+	warn("Could not find style: " .. gamepadStyle)
 end
-function tbl2.GetImageLabel(p1, p2, p3, p4)
-	return getImageInstance("ImageLabel", p2, p3, p4)
+function gamepadImageModule.GetImageLabel(self, elementType, gamepadStyle, unused)
+	return getImageInstance("ImageLabel", elementType, gamepadStyle)
 end
-function tbl2.GetImageButton(p1, p2, p3, p4)
-	return getImageInstance("ImageButton", p2, p3, p4)
+function gamepadImageModule.GetImageButton(self, elementType, gamepadStyle, unused)
+	return getImageInstance("ImageButton", elementType, gamepadStyle)
 end
-return tbl2
+return gamepadImageModule

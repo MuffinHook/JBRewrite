@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Validation = require(script.Parent.Validation)
 local Logger = require(script.Parent.Logger)
 local HttpApi = require(script.Parent.HttpApi)
@@ -37,21 +35,21 @@ local function populateConfigurations(player)
 	local playerData = Store:GetPlayerDataFromCache(player.UserId)
 	local SdkConfig = playerData.SdkConfig
 	if SdkConfig.configs then
-		for k, v in pairs(SdkConfig.configs) do
+		for configKeyName, configValue in pairs(SdkConfig.configs) do
 			local validatedTs
-			if v then
-				local configKey = v.key or ""
-				local playerData2 = Store:GetPlayerDataFromCache(player.UserId)
-				if playerData2 then
+			if configValue then
+				local configKey = configValue.key or ""
+				local playerDataVerification = Store:GetPlayerDataFromCache(player.UserId)
+				if playerDataVerification then
 					local currentTime = os.time()
-					local adjustedTime = currentTime + playerData2.ClientServerTimeOffset
+					local adjustedTime = currentTime + playerDataVerification.ClientServerTimeOffset
 					validatedTs = if Validation:validateClientTs(adjustedTime) then adjustedTime else currentTime
 				else
 					validatedTs = os.time()
 				end
-				if #configKey > 0 and (v.value and ((v.start_ts or 0) < validatedTs and validatedTs < (v.end_ts or (1 / 0)))) then
-					playerData.Configurations[configKey] = v.value
-					Logger:d("configuration added: key=" .. v.key .. ", value=" .. v.value)
+				if #configKey > 0 and (configValue.value and ((configValue.start_ts or 0) < validatedTs and validatedTs < (configValue.end_ts or (1 / 0)))) then
+					playerData.Configurations[configKey] = configValue.value
+					Logger:d("configuration added: key=" .. configValue.key .. ", value=" .. configValue.value)
 				end
 			end
 		end
@@ -176,11 +174,11 @@ function StateModule.startNewSession(self, player, sessionData)
 			playerData.SessionStart = sessionData.SessionStart
 		else
 			playerData.SessionID = string.lower(HttpService:GenerateGUID(false))
-			local playerData2 = Store:GetPlayerDataFromCache(player.UserId)
+			local playerDataForSession = Store:GetPlayerDataFromCache(player.UserId)
 			local validatedSessionStart
-			if playerData2 then
+			if playerDataForSession then
 				local currentTime = os.time()
-				local adjustedTime = currentTime + playerData2.ClientServerTimeOffset
+				local adjustedTime = currentTime + playerDataForSession.ClientServerTimeOffset
 				validatedSessionStart = if Validation:validateClientTs(adjustedTime) then adjustedTime else currentTime
 			else
 				validatedSessionStart = os.time()

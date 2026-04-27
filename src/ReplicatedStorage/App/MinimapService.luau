@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.Std.Dictionary)
 local Roact = require(ReplicatedStorage.Roact)
@@ -17,52 +15,52 @@ local mapWorldDirectionBinding, updateMapWorldDirection = Roact.createBinding((V
 module.mapWorldDirection = mapWorldDirectionBinding
 module.mapUpdateWorldDirection = updateMapWorldDirection
 function module.init()
-	waitForChild(ReplicatedStorage, MinimapConsts.ADD_WAYPOINT_REMOTE_NAME):andThen(function(p1)
-		p1.OnClientEvent:Connect(module.addWaypoint)
-		module._addWaypointRemote = p1
+	waitForChild(ReplicatedStorage, MinimapConsts.ADD_WAYPOINT_REMOTE_NAME):andThen(function(addWaypointRemote)
+		addWaypointRemote.OnClientEvent:Connect(module.addWaypoint)
+		module._addWaypointRemote = addWaypointRemote
 	end)
-	waitForChild(ReplicatedStorage, MinimapConsts.REMOVE_WAYPOINT_REMOTE_NAME):andThen(function(p1)
-		p1.OnClientEvent:Connect(module.removeWaypointByName)
+	waitForChild(ReplicatedStorage, MinimapConsts.REMOVE_WAYPOINT_REMOTE_NAME):andThen(function(removeWaypointRemote)
+		removeWaypointRemote.OnClientEvent:Connect(module.removeWaypointByName)
 	end)
 end
-function module.add(p1)
-	assert(p1.name ~= nil, "minimap point missing unique name")
+function module.add(point)
+	assert(point.name ~= nil, "minimap point missing unique name")
 	store:dispatch({
 		type = "addMinimapPoint",
-		point = p1
+		point = point
 	})
 	return function()
 		store:dispatch({
 			type = "removeMinimapPoint",
-			name = p1.name
+			name = point.name
 		})
 	end
 end
-function module.addCircle(p1)
-	assert(p1.name ~= nil, "minimap circle missing unique name")
+function module.addCircle(circle)
+	assert(circle.name ~= nil, "minimap circle missing unique name")
 	store:dispatch({
 		type = "addMinimapCircle",
-		circle = p1
+		circle = circle
 	})
 	return function()
 		store:dispatch({
 			type = "removeMinimapCircle",
-			name = p1.name
+			name = circle.name
 		})
 	end
 end
-function module.addWaypoint(p1)
+function module.addWaypoint(waypoint)
 	store:dispatch(Dictionary.merge({
 		type = "addWaypoint"
-	}, p1))
+	}, waypoint))
 	return function()
-		return module.removeWaypointByName(p1.name)
+		return module.removeWaypointByName(waypoint.name)
 	end
 end
-function module.removeWaypointByName(p1)
+function module.removeWaypointByName(name)
 	store:dispatch({
 		type = "removeWaypointByName",
-		name = p1
+		name = name
 	})
 end
 return module

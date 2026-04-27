@@ -1,196 +1,194 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Maid = require(script.Parent.Maid)
 local PlayerUtils = require(script.Parent.PlayerUtils)
-local t = {
-	getHumanoid = function(p1)
-		if p1 then
-			return p1:FindFirstChild("Humanoid")
+local CharacterUtils = {
+	getHumanoid = function(character)
+		if character then
+			return character:FindFirstChild("Humanoid")
 		else
 			return nil
 		end
 	end,
-	getRootPart = function(p1)
-		if p1 then
-			return p1.PrimaryPart
+	getRootPart = function(character)
+		if character then
+			return character.PrimaryPart
 		else
 			return nil
 		end
 	end,
-	setEnabled = function(p1, p2)
-		if p1 then
-			local Humanoid = p1:FindFirstChild("Humanoid")
+	setEnabled = function(character, isEnabled)
+		if character then
+			local Humanoid = character:FindFirstChild("Humanoid")
 			if Humanoid then
-				for i, v in ipairs(Enum.HumanoidStateType:GetEnumItems()) do
-					if v ~= Enum.HumanoidStateType.Dead and (v ~= Enum.HumanoidStateType.None and v ~= Enum.HumanoidStateType.Jumping) then
-						Humanoid:SetStateEnabled(v, p2)
+				for i, stateType in ipairs(Enum.HumanoidStateType:GetEnumItems()) do
+					if stateType ~= Enum.HumanoidStateType.Dead and (stateType ~= Enum.HumanoidStateType.None and stateType ~= Enum.HumanoidStateType.Jumping) then
+						Humanoid:SetStateEnabled(stateType, isEnabled)
 					end
 				end
 				Humanoid:ChangeState(Enum.HumanoidStateType.PlatformStanding)
 			end
 		end
 	end,
-	setMassless = function(p1, p2)
-		for i, v in ipairs(p1:GetDescendants()) do
-			if v:IsA("BasePart") then
-				local oldMassless = v:FindFirstChild("oldMassless")
-				if p2 then
-					if not oldMassless and v.Massless then
-						local oldMassless_2 = Instance.new("BoolValue")
-						oldMassless_2.Name = "oldMassless"
-						oldMassless_2.Parent = v
-						oldMassless_2.Value = v.Massless
+	setMassless = function(character, shouldBeMassless)
+		for i, descendant in ipairs(character:GetDescendants()) do
+			if descendant:IsA("BasePart") then
+				local oldMasslessValue = descendant:FindFirstChild("oldMassless")
+				if shouldBeMassless then
+					if not oldMasslessValue and descendant.Massless then
+						local oldMasslessStorage = Instance.new("BoolValue")
+						oldMasslessStorage.Name = "oldMassless"
+						oldMasslessStorage.Parent = descendant
+						oldMasslessStorage.Value = descendant.Massless
 					end
-					v.Massless = true
-				elseif oldMassless then
-					v.Massless = oldMassless.Value
-					oldMassless:Destroy()
+					descendant.Massless = true
+				elseif oldMasslessValue then
+					descendant.Massless = oldMasslessValue.Value
+					oldMasslessValue:Destroy()
 				else
-					v.Massless = false
+					descendant.Massless = false
 				end
 			end
 		end
 	end,
-	_setValue = function(p1, p2, p3)
+	_setValue = function(instance, propertyName, newValue)
 		local count = 0
 		repeat
 			count = count + 1
-		until not p1:FindFirstChild(("_stack_value_%d"):format(count))
-		local v1 = Instance.new("NumberValue")
-		v1.Name = ("_stack_value_%d"):format(count)
-		v1.Value = p1[p2]
-		v1.Parent = p1
-		p1[p2] = p3
+		until not instance:FindFirstChild(("_stack_value_%d"):format(count))
+		local stackValue = Instance.new("NumberValue")
+		stackValue.Name = ("_stack_value_%d"):format(count)
+		stackValue.Value = instance[propertyName]
+		stackValue.Parent = instance
+		instance[propertyName] = newValue
 	end,
-	_popValue = function(p1, p2)
+	_popValue = function(instance, propertyName)
 		local count = 0
 		repeat
 			count = count + 1
-		until not p1:FindFirstChild(("_stack_value_%d"):format(count))
-		local v1 = count - 1
-		if not (v1 <= 0) then
-			local v2 = p1:FindFirstChild(("_stack_value_%d"):format(v1))
-			assert(v2 ~= nil)
-			p1[p2] = v2.Value
-			v2:Destroy()
+		until not instance:FindFirstChild(("_stack_value_%d"):format(count))
+		local previousStackIndex = count - 1
+		if not (previousStackIndex <= 0) then
+			local previousStackValue = instance:FindFirstChild(("_stack_value_%d"):format(previousStackIndex))
+			assert(previousStackValue ~= nil)
+			instance[propertyName] = previousStackValue.Value
+			previousStackValue:Destroy()
 		end
 	end
 }
-function t.setInvisible(p1, p2)
-	if p1 then
-		for v1, v2 in p1:GetDescendants() do
-			if v2:IsA("BasePart") and (v2 ~= p1.PrimaryPart and (not p2 or p2(v2))) then
-				t._setValue(v2, "Transparency", 1)
+function CharacterUtils.setInvisible(character, filterCallback)
+	if character then
+		for index, descendant in character:GetDescendants() do
+			if descendant:IsA("BasePart") and (descendant ~= character.PrimaryPart and (not filterCallback or filterCallback(descendant))) then
+				CharacterUtils._setValue(descendant, "Transparency", 1)
 			end
 		end
-		local Head = p1:FindFirstChild("Head")
+		local Head = character:FindFirstChild("Head")
 		if Head then
 			local Decal = Head:FindFirstChildOfClass("Decal")
 			if Decal then
-				t._setValue(Decal, "Transparency", 1)
+				CharacterUtils._setValue(Decal, "Transparency", 1)
 			end
 		end
 	end
 end
-function t.popInvisible(p1, p2)
-	if p1 then
-		for v1, v2 in p1:GetDescendants() do
-			if v2:IsA("BasePart") and (v2 ~= p1.PrimaryPart and (not p2 or p2(v2))) then
-				t._popValue(v2, "Transparency")
+function CharacterUtils.popInvisible(character, filterCallback)
+	if character then
+		for index, descendant in character:GetDescendants() do
+			if descendant:IsA("BasePart") and (descendant ~= character.PrimaryPart and (not filterCallback or filterCallback(descendant))) then
+				CharacterUtils._popValue(descendant, "Transparency")
 			end
 		end
-		local Head = p1:FindFirstChild("Head")
+		local Head = character:FindFirstChild("Head")
 		if Head then
 			local Decal = Head:FindFirstChildOfClass("Decal")
 			if Decal then
-				t._popValue(Decal, "Transparency")
+				CharacterUtils._popValue(Decal, "Transparency")
 			end
 		end
 	end
 end
-function t.setScale(p1, p2)
-	local Humanoid = p1:FindFirstChild("Humanoid")
+function CharacterUtils.setScale(character, scaleFactor)
+	local Humanoid = character:FindFirstChild("Humanoid")
 	local HeadScale = Humanoid:FindFirstChild("HeadScale")
-	t._setValue(HeadScale, "Value", p2)
+	CharacterUtils._setValue(HeadScale, "Value", scaleFactor)
 	local BodyDepthScale = Humanoid:FindFirstChild("BodyDepthScale")
-	t._setValue(BodyDepthScale, "Value", p2)
+	CharacterUtils._setValue(BodyDepthScale, "Value", scaleFactor)
 	local BodyWidthScale = Humanoid:FindFirstChild("BodyWidthScale")
-	t._setValue(BodyWidthScale, "Value", p2)
+	CharacterUtils._setValue(BodyWidthScale, "Value", scaleFactor)
 	local BodyHeightScale = Humanoid:FindFirstChild("BodyHeightScale")
-	t._setValue(BodyHeightScale, "Value", p2)
+	CharacterUtils._setValue(BodyHeightScale, "Value", scaleFactor)
 end
-function t.popScale(p1)
-	local Humanoid = p1:FindFirstChild("Humanoid")
+function CharacterUtils.popScale(character)
+	local Humanoid = character:FindFirstChild("Humanoid")
 	local HeadScale = Humanoid:FindFirstChild("HeadScale")
-	t._popValue(HeadScale, "Value")
+	CharacterUtils._popValue(HeadScale, "Value")
 	local BodyDepthScale = Humanoid:FindFirstChild("BodyDepthScale")
-	t._popValue(BodyDepthScale, "Value")
+	CharacterUtils._popValue(BodyDepthScale, "Value")
 	local BodyWidthScale = Humanoid:FindFirstChild("BodyWidthScale")
-	t._popValue(BodyWidthScale, "Value")
+	CharacterUtils._popValue(BodyWidthScale, "Value")
 	local BodyHeightScale = Humanoid:FindFirstChild("BodyHeightScale")
-	t._popValue(BodyHeightScale, "Value")
+	CharacterUtils._popValue(BodyHeightScale, "Value")
 end
-function t.getAncestorPartHumanoid(p1)
-	if p1 and p1.Parent then
-		assert(p1)
-		local v1 = p1.Parent
+function CharacterUtils.getAncestorPartHumanoid(instance)
+	if instance and instance.Parent then
+		assert(instance)
+		local currentAncestor = instance.Parent
 		while true do
-			local Humanoid = v1:FindFirstChild("Humanoid")
+			local Humanoid = currentAncestor:FindFirstChild("Humanoid")
 			if Humanoid then
 				return Humanoid
 			end
-			v1 = v1.Parent
-			local _ = not v1 or v1 == workspace
+			currentAncestor = currentAncestor.Parent
+			local _ = not currentAncestor or currentAncestor == workspace
 		end
 	end
 end
-function t.getRootAttachment(p1)
-	assert(p1)
-	local RootAttachment = p1:FindFirstChild("RootAttachment")
+function CharacterUtils.getRootAttachment(instance)
+	assert(instance)
+	local RootAttachment = instance:FindFirstChild("RootAttachment")
 	if not RootAttachment then
-		local RootAttachment_2 = Instance.new("Attachment")
-		RootAttachment_2.Name = "RootAttachment"
-		RootAttachment_2.Parent = p1
-		RootAttachment = RootAttachment_2
+		local newRootAttachment = Instance.new("Attachment")
+		newRootAttachment.Name = "RootAttachment"
+		newRootAttachment.Parent = instance
+		RootAttachment = newRootAttachment
 	end
 	RootAttachment.CFrame = CFrame.new()
 	return RootAttachment
 end
-local function _observeOnPlayerAdded(p1, p2, p3)
-	local function onCharacterAdded(p1)
-		local v1 = Maid.new()
-		p2._characterMaid = v1
-		local Humanoid = p1:WaitForChild("Humanoid", 1)
+local function _observeOnPlayerAdded(player, playerMaid, characterCallback)
+	local function onCharacterAdded(character)
+		local characterMaid = Maid.new()
+		playerMaid._characterMaid = characterMaid
+		local Humanoid = character:WaitForChild("Humanoid", 1)
 		assert(Humanoid)
-		if Players:GetPlayerFromCharacter(p1) then
-			v1:GiveTask(p1.Destroying:Connect(function()
-				task.defer(v1.DoCleaning, v1)
+		if Players:GetPlayerFromCharacter(character) then
+			characterMaid:GiveTask(character.Destroying:Connect(function()
+				task.defer(characterMaid.DoCleaning, characterMaid)
 			end))
-			task.spawn(p3, p1, v1, p2)
+			task.spawn(characterCallback, character, characterMaid, playerMaid)
 		end
 	end
-	if p1.Character then
-		task.spawn(onCharacterAdded, p1.Character)
+	if player.Character then
+		task.spawn(onCharacterAdded, player.Character)
 	end
-	local function onCharacterRemoving(p1)
-		p2._characterMaid = nil
+	local function onCharacterRemoving(character)
+		playerMaid._characterMaid = nil
 	end
-	p2:GiveTask(p1.CharacterAdded:Connect(onCharacterAdded))
-	p2:GiveTask(p1.CharacterRemoving:Connect(onCharacterRemoving))
+	playerMaid:GiveTask(player.CharacterAdded:Connect(onCharacterAdded))
+	playerMaid:GiveTask(player.CharacterRemoving:Connect(onCharacterRemoving))
 end
-function t.observeCharacterAdded(p1)
-	local v1 = Maid.new()
-	v1:GiveTask(PlayerUtils.observePlayerAdded(function(p12, p2)
-		_observeOnPlayerAdded(p12, p2, p1)
+function CharacterUtils.observeCharacterAdded(characterCallback)
+	local observerMaid = Maid.new()
+	observerMaid:GiveTask(PlayerUtils.observePlayerAdded(function(player, playerMaid)
+		_observeOnPlayerAdded(player, playerMaid, characterCallback)
 	end))
-	return v1
+	return observerMaid
 end
-function t.observeLocalCharacterAdded(p1)
+function CharacterUtils.observeLocalCharacterAdded(characterCallback)
 	assert(RunService:IsClient(), "observeLocalCharacterAdded must be called on the client")
-	local v2 = Maid.new()
-	_observeOnPlayerAdded(Players.LocalPlayer, v2, p1)
-	return v2
+	local localPlayerMaid = Maid.new()
+	_observeOnPlayerAdded(Players.LocalPlayer, localPlayerMaid, characterCallback)
+	return localPlayerMaid
 end
-return t
+return CharacterUtils

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.Std.Dictionary)
 local PlayerUtils = require(ReplicatedStorage.Std.PlayerUtils)
@@ -13,7 +11,7 @@ local TextButton = require(script.Parent.TextButton)
 local horizontalSquareGrid = require(ReplicatedStorage.PersistentCrew.UI.horizontalSquareGrid)
 local function colorComponent(self)
 	local isName = self.selectedColorName == self.name
-	local t = {
+	local colorButtonProps = {
 		BorderSizePixel = 0,
 		BackgroundColor3 = self.color,
 		Size = self.size,
@@ -23,18 +21,18 @@ local function colorComponent(self)
 			self.setSelectedColorName(self.name)
 		end
 	}
-	local table2 = {
+	local cornerAndStrokeChildren = {
 		Corner = createElement("UICorner", {
 			CornerRadius = UDim.new(1, 0)
 		})
 	}
-	local table3 = {
+	local strokeProps = {
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	}
-	table3.Thickness = if isName then 2 else 1
-	table3.Color = ColorUtils.brightenBy(self.color, -0.3)
-	table2.Stroke = createElement("UIStroke", table3)
-	table2.Selected = isName and createElement("TextLabel", {
+	strokeProps.Thickness = if isName then 2 else 1
+	strokeProps.Color = ColorUtils.brightenBy(self.color, -0.3)
+	cornerAndStrokeChildren.Stroke = createElement("UIStroke", strokeProps)
+	cornerAndStrokeChildren.Selected = isName and createElement("TextLabel", {
 		BackgroundTransparency = 1,
 		Text = "\226\156\147",
 		Font = Enum.Font.SourceSansBold,
@@ -44,57 +42,57 @@ local function colorComponent(self)
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5)
 	})
-	return createElement("TextButton", t, table2)
+	return createElement("TextButton", colorButtonProps, cornerAndStrokeChildren)
 end
-local local1 = Roact.PureComponent:extend("JoinOrCreate")
-function local1.init(self)
+local JoinOrCreateComponent = Roact.PureComponent:extend("JoinOrCreate")
+function JoinOrCreateComponent.init(self)
 	self.playerTextBoxRef = Roact.createRef()
 	function self.onClickView()
-		local local1 = self.playerTextBoxRef:getValue()
-		local Text = local1.Text
-		local1.Text = ""
+		local textBoxInstance = self.playerTextBoxRef:getValue()
+		local Text = textBoxInstance.Text
+		textBoxInstance.Text = ""
 		PlayerUtils.promiseUserIdFromName(Text):andThen(function(self)
 			self.props.attemptViewUserIdClan(self)
 		end)
 	end
-	function self.playerTextBoxFocusLost(self, param2)
-		if param2 then
+	function self.playerTextBoxFocusLost(self, isEnter)
+		if isEnter then
 			self.onClickView()
 		end
 	end
-	local local1 = nil
+	local pendingRequestId = nil
 	function self.playerTextBoxTextChanged(self)
-		if local1 then
-			task.cancel(local1)
-			local1 = nil
+		if pendingRequestId then
+			task.cancel(pendingRequestId)
+			pendingRequestId = nil
 		end
-		local local12 = nil
-		local12 = task.delay(0.5, function()
+		local currentRequestId = nil
+		currentRequestId = task.delay(0.5, function()
 			PlayerUtils.promiseUserIdFromName(self.Text):andThen(function(self)
-				if local1 == local12 then
+				if pendingRequestId == currentRequestId then
 					self:setState({
 						avatarUserId = self
 					})
 				end
 			end):catch(function()
-				if local1 == local12 then
+				if pendingRequestId == currentRequestId then
 					self:setState({
 						avatarUserId = Roact.None
 					})
 				end
 			end)
 		end)
-		local1 = local12
+		pendingRequestId = currentRequestId
 	end
 	self.crewNameRef = Roact.createRef()
 	function self.onClickCreate()
-		local local1 = self.crewNameRef:getValue()
-		local Text = local1.Text
-		local1.Text = ""
+		local textBoxInstance = self.crewNameRef:getValue()
+		local Text = textBoxInstance.Text
+		textBoxInstance.Text = ""
 		self.props.attemptCreate(Text, self.state.selectedColorName)
 	end
-	function self.crewNameTextBoxFocusLost(self, param2)
-		if param2 then
+	function self.crewNameTextBoxFocusLost(self, isEnter)
+		if isEnter then
 			self.onClickCreate()
 		end
 	end
@@ -107,12 +105,12 @@ function local1.init(self)
 		selectedColorName = ClanConsts.CLAN_COLORS[math.random(1, #ClanConsts.CLAN_COLORS)].name
 	})
 end
-function local1.render(self)
-	local t = {}
-	for local1, local2 in ClanConsts.CLAN_COLORS do
-		table.insert(t, local2)
+function JoinOrCreateComponent.render(self)
+	local clanColorsList = {}
+	for colorIndex, colorData in ClanConsts.CLAN_COLORS do
+		table.insert(clanColorsList, colorData)
 	end
-	local table3 = {
+	local mainLayoutChildren = {
 		Title = createElement(PaddedContainer, {
 			backgroundColor = Color3.new(51/255, 51/255, 51/255),
 			backgroundTransparency = 0,
@@ -145,7 +143,7 @@ function local1.render(self)
 			})
 		})
 	}
-	local table4 = {
+	local bodyContainerProps = {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 1,
 		size = UDim2.new(1, 0, 0.7222222222222223, 0),
@@ -155,24 +153,24 @@ function local1.render(self)
 		paddingTop = 0.5,
 		paddingBottom = 0.5
 	}
-	local table5 = {
+	local bodyChildren = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 8)
 		})
 	}
-	local table6 = {
+	local leftPanelProps = {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 0,
 		BackgroundColor3 = Color3.new(51/255, 51/255, 51/255),
 		Size = UDim2.new(0.4625, 0, 1, 0),
 		Position = UDim2.new(0, 0, 0, 0)
 	}
-	local table7 = {
+	local leftPanelChildren = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 8)
 		})
 	}
-	local table8 = {
+	local viewCrewContainerChildren = {
 		ContainerTitle = createElement(PaddedContainer, {
 			backgroundTransparency = 1,
 			size = UDim2.new(1, 0, 0.25, 0),
@@ -202,7 +200,7 @@ function local1.render(self)
 			})
 		})
 	}
-	local table9 = {
+	local viewCrewBodyProps = {
 		backgroundColor = Color3.new(255/255, 0/255, 0/255),
 		backgroundTransparency = 1,
 		size = UDim2.new(1, 0, 0.75, 0),
@@ -212,7 +210,7 @@ function local1.render(self)
 		paddingRight = 0,
 		paddingBottom = 0
 	}
-	local table10 = {
+	local viewCrewBodyChildren = {
 		UserIdContainer = createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
@@ -244,22 +242,22 @@ function local1.render(self)
 			})
 		})
 	}
-	local table11 = {
+	local avatarContainerProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 0.65, 0),
 		Position = UDim2.new(0, 0, 0.15, 0)
 	}
-	local table12 = {}
-	local table13 = {
+	local avatarDisplayChildren = {}
+	local avatarImageProps = {
 		BorderSizePixel = 0,
 		BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
 		BackgroundTransparency = 1
 	}
-	table13.Image = "rbxthumb://type=AvatarHeadShot&w=150&h=150&id=" .. tostring(self.state.avatarUserId or 1)
-	table13.Size = UDim2.fromScale(0.9, 0.9)
-	table13.Position = UDim2.new(0.5, 0, 0.5, 0)
-	table13.AnchorPoint = Vector2.new(0.5, 0.5)
-	table12.Avatar = createElement("ImageLabel", table13, {
+	avatarImageProps.Image = "rbxthumb://type=AvatarHeadShot&w=150&h=150&id=" .. tostring(self.state.avatarUserId or 1)
+	avatarImageProps.Size = UDim2.fromScale(0.9, 0.9)
+	avatarImageProps.Position = UDim2.new(0.5, 0, 0.5, 0)
+	avatarImageProps.AnchorPoint = Vector2.new(0.5, 0.5)
+	avatarDisplayChildren.Avatar = createElement("ImageLabel", avatarImageProps, {
 		UIAspectRatioConstraint = createElement("UIAspectRatioConstraint", {
 			AspectRatio = 1,
 			AspectType = Enum.AspectType.FitWithinMaxSize,
@@ -269,8 +267,8 @@ function local1.render(self)
 			CornerRadius = UDim.new(1, 0)
 		})
 	})
-	table10.Center = createElement("Frame", table11, table12)
-	table10.RequestButton = createElement(TextButton, {
+	viewCrewBodyChildren.Center = createElement("Frame", avatarContainerProps, avatarDisplayChildren)
+	viewCrewBodyChildren.RequestButton = createElement(TextButton, {
 		size = UDim2.new(1, 0, 0.2, 0),
 		position = UDim2.new(0.5, 0, 1, 0),
 		anchorPoint = Vector2.new(0.5, 1),
@@ -279,24 +277,24 @@ function local1.render(self)
 		onClick = self.onClickView,
 		disabled = self.props.networkMutexLocked
 	})
-	table8.ContainerBody = createElement(PaddedContainer, table9, table10)
-	table7.Container = createElement(PaddedContainer, {
+	viewCrewContainerChildren.ContainerBody = createElement(PaddedContainer, viewCrewBodyProps, viewCrewBodyChildren)
+	leftPanelChildren.Container = createElement(PaddedContainer, {
 		backgroundTransparency = 1
-	}, table8)
-	table5.Left = createElement("Frame", table6, table7)
-	table5.LineTop = createElement("Frame", {
+	}, viewCrewContainerChildren)
+	bodyChildren.Left = createElement("Frame", leftPanelProps, leftPanelChildren)
+	bodyChildren.LineTop = createElement("Frame", {
 		BackgroundColor3 = Color3.new(0.3, 0.3, 0.3),
 		BorderSizePixel = 0,
 		Size = UDim2.new(0, 1, 0.4375, 0),
 		Position = UDim2.new(0.5, 0, 0, 0)
 	})
-	table5.LineBottom = createElement("Frame", {
+	bodyChildren.LineBottom = createElement("Frame", {
 		BackgroundColor3 = Color3.new(0.3, 0.3, 0.3),
 		BorderSizePixel = 0,
 		Size = UDim2.new(0, 1, 0.4375, 0),
 		Position = UDim2.new(0.5, 0, 0.5625, 0)
 	})
-	table5.OrText = createElement("TextLabel", {
+	bodyChildren.OrText = createElement("TextLabel", {
 		Font = Enum.Font.Bangers,
 		TextScaled = true,
 		BackgroundTransparency = 1,
@@ -306,7 +304,7 @@ function local1.render(self)
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5)
 	})
-	table5.Right = createElement("Frame", {
+	bodyChildren.Right = createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 0,
 		BackgroundColor3 = Color3.new(51/255, 51/255, 51/255),
@@ -433,7 +431,7 @@ function local1.render(self)
 							Grid = createElement(horizontalSquareGrid, {
 								exposePaddedContainerProps = true,
 								component = colorComponent,
-								items = t,
+								items = clanColorsList,
 								itemMetadata = {
 									selectedColorName = self.state.selectedColorName,
 									setSelectedColorName = self.setSelectedColorName
@@ -454,8 +452,8 @@ function local1.render(self)
 			})
 		})
 	})
-	table3.Body = createElement(PaddedContainer, table4, table5)
-	table3.Bottom = createElement(PaddedContainer, {
+	mainLayoutChildren.Body = createElement(PaddedContainer, bodyContainerProps, bodyChildren)
+	mainLayoutChildren.Bottom = createElement(PaddedContainer, {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
 		size = UDim2.new(1, 0, 0.1111111111111111, 0),
@@ -499,6 +497,6 @@ function local1.render(self)
 		backgroundColor = Color3.new(255/255, 255/255, 255/255),
 		aspectRatio = self.props.aspectRatio,
 		verticalPaddingRatio = self.props.verticalPaddingRatio
-	}, Dictionary.merge(self.props[Roact.Children], table3))
+	}, Dictionary.merge(self.props[Roact.Children], mainLayoutChildren))
 end
-return local1
+return JoinOrCreateComponent

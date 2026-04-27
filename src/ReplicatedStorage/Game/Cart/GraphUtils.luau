@@ -1,90 +1,89 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Module.Table)
 local t = {
-	calculateDist = function(p1, p2)
+	calculateDist = function(segments, targetTime)
 		local count = 1
-		local v1 = 0
+		local elapsedTime = 0
 		local sum = 0
 		while true do
-			local v2 = p1[count]
-			local v3 = v2.speedStart or v2.speed
-			local timeUntil = v2.timeUntil
-			local v5 = math.min(timeUntil, p2) - v1
-			sum = sum + (((v2.speedEnd or v2.speed) - v3) / (2 * (timeUntil - v1)) * v5 * v5 + v3 * v5)
-			v1 = v2.timeUntil
+			local segment = segments[count]
+			local speedDifference = segment.speedStart or segment.speed
+			local timeUntil = segment.timeUntil
+			local timeInSegment = math.min(timeUntil, targetTime) - elapsedTime
+			sum = sum + (((segment.speedEnd or segment.speed) - speedDifference) / (2 * (timeUntil - elapsedTime)) * timeInSegment * timeInSegment + speedDifference * timeInSegment)
+			elapsedTime = segment.timeUntil
 			count = count + 1
-			if #p1 < count or p2 < v1 then
+			if #segments < count or targetTime < elapsedTime then
 				return sum
 			end
 		end
 	end,
-	calculateSpeed = function(p1, p2)
-		local v1 = 0
-		for i = 1, #p1 do
-			local v2 = p1[i]
-			local timeUntil = v2.timeUntil
-			local v3 = math.min(timeUntil, p2) - v1
-			if p2 <= timeUntil then
-				local v4 = v2.speedStart or v2.speed
-				return ((v2.speedEnd or v2.speed) - v4) / (timeUntil - v1) * v3 + v4
+	calculateSpeed = function(segments, targetTime)
+		local elapsedTime = 0
+		for i = 1, #segments do
+			local segment = segments[i]
+			local timeUntil = segment.timeUntil
+			local timeInSegment = math.min(timeUntil, targetTime) - elapsedTime
+			if targetTime <= timeUntil then
+				local initialSpeed = segment.speedStart or segment.speed
+				return ((segment.speedEnd or segment.speed) - initialSpeed) / (timeUntil - elapsedTime) * timeInSegment + initialSpeed
 			end
-			v1 = v2.timeUntil
+			elapsedTime = segment.timeUntil
 		end
 	end
 }
-function t.calculateTime(p1, p2)
-	assert(#p1 > 0)
-	if not (t.calculateDist(p1, p1[#p1].timeUntil) < p2) then
-		local v2 = 0
-		local function v3(p12, p22)
-			local v1 = (p12 + p22) * 0.5
-			local v22 = t.calculateDist(p1, v1) - p2
-			if math.abs(v22) < 1e-6 then
-				return v1
+function t.calculateTime(segments, targetDistance)
+	assert(#segments > 0)
+	if not (t.calculateDist(segments, segments[#segments].timeUntil) < targetDistance) then
+		local lastError = 0
+		local function binarySearchSegment(minTime, maxTime)
+			local midpoint = (minTime + maxTime) * 0.5
+			local error = t.calculateDist(segments, midpoint) - targetDistance
+			if math.abs(error) < 1e-6 then
+				return midpoint
 			else
-				if math.abs(v22 - v2) < 1e-6 then
+				if math.abs(error - lastError) < 1e-6 then
 				else
-					v2 = v22
-					if v22 > 0 then
-						return v3(p12, v1)
+					lastError = error
+					if error > 0 then
+						return binarySearchSegment(minTime, midpoint)
 					else
-						return v3(v1, p22)
+						return binarySearchSegment(midpoint, maxTime)
 					end
 				end
 			end
 		end
-		return v3(0, p1[#p1].timeUntil)
+		return binarySearchSegment(0, segments[#segments].timeUntil)
 	end
 end
-function t.constrainLastTimeToReachTarget(p1, p2)
-	if #p1 > 1 and p2 < t.calculateDist(p1, p1[#p1 - 1].timeUntil) then
+function t.constrainLastTimeToReachTarget(segments, targetDistance)
+	if #segments > 1 and targetDistance < t.calculateDist(segments, segments[#segments - 1].timeUntil) then
 		return nil
 	else
-		local v1 = 0
-		local function v2(p12, p22)
-			local v12 = (p12 + p22) * 0.5
-			p1[#p1].timeUntil = v12
-			local v22 = t.calculateDist(p1, v12) - p2
-			if math.abs(v22) < 1e-6 then
-				return v12
+		local lastError = 0
+		local function binarySearchSegment(minTime, maxTime)
+			local midpoint = (minTime + maxTime) * 0.5
+			segments[#segments].timeUntil = midpoint
+			local error = t.calculateDist(segments, midpoint) - targetDistance
+			if math.abs(error) < 1e-6 then
+				return midpoint
 			else
-				if math.abs(v22 - v1) < 1e-6 then
+				if math.abs(error - lastError) < 1e-6 then
 				else
-					v1 = v22
-					if v22 > 0 then
-						return v2(p12, v12)
+					lastError = error
+					if error > 0 then
+						return binarySearchSegment(minTime, midpoint)
 					else
-						return v2(v12, p22)
+						return binarySearchSegment(midpoint, maxTime)
 					end
 				end
 			end
 		end
-		return v2(#p1 > 1 and p1[#p1 - 1].timeUntil or 0, 10000000000)
+		return binarySearchSegment(#segments > 1 and segments[#segments - 1].timeUntil or 0, 10000000000)
 	end
 end
-function t.cap(p1)
-	table.insert(p1, {
+function t.cap(segments)
+	table.insert(segments, {
 		timeUntil = 10000000000,
 		speedStart = 0,
 		speedEnd = 0

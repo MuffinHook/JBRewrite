@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunConsts = require(ReplicatedStorage.App.RunConsts)
 return require(ReplicatedStorage.Std.TableUtils).requireValidIndexAndFreeze({

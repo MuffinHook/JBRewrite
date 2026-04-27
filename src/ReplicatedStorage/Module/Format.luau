@@ -1,36 +1,35 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Localization = require(ReplicatedStorage.Module.Localization)
-local t = {
-	Comma = function(p1)
-		local v1, v2, var3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
-		return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. var3
+local Format = {
+	Comma = function(amount)
+		local leadingPart, digitsToFormat, suffix = string.match(amount, "^([^%d]*%d)(%d*)(.-)$")
+		return leadingPart .. digitsToFormat:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. suffix
 	end
 }
-function t.Currency(p1)
-	assert(p1 ~= nil)
-	local v2 = math.floor(p1 + 0.5)
-	return if v2 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", { t.Comma((math.abs(v2))) })
+function Format.Currency(amount)
+	assert(amount ~= nil)
+	local roundedAmount = math.floor(amount + 0.5)
+	return if roundedAmount >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", { Format.Comma((math.abs(roundedAmount))) })
 end
-function t.MinSec(p1)
-	local v1 = ""
-	local v2 = math.floor(p1 / 60)
-	local var3 = p1 % 60
-	if v2 > 0 then
-		v1 = v1 .. ("%d minute"):format(v2)
-		if v2 ~= 1 then
-			v1 = v1 .. "s"
+function Format.MinSec(amount)
+	local result = ""
+	local minutes = math.floor(amount / 60)
+	local seconds = amount % 60
+	if minutes > 0 then
+		result = result .. ("%d minute"):format(minutes)
+		if minutes ~= 1 then
+			result = result .. "s"
 		end
 	end
-	if v2 > 0 and var3 > 0 then
-		v1 = v1 .. " and "
+	if minutes > 0 and seconds > 0 then
+		result = result .. " and "
 	end
-	if var3 > 0 then
-		v1 = v1 .. ("%d second"):format(var3)
-		if var3 ~= 1 then
-			v1 = v1 .. "s"
+	if seconds > 0 then
+		result = result .. ("%d second"):format(seconds)
+		if seconds ~= 1 then
+			result = result .. "s"
 		end
 	end
-	return v1
+	return result
 end
-return t
+return Format

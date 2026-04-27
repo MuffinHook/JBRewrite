@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local Util = require(script.Parent.Util)
 local Registry = {
@@ -45,113 +43,113 @@ Registry.Stores = setmetatable({}, {
 	end
 })
 Registry.AutoExecBuffer = {}
-function Registry.RegisterType(p1, p2, p3)
-	if not p2 or typeof(p2) ~= "string" then
+function Registry.RegisterType(self, typeName, typeMethods)
+	if not typeName or typeof(typeName) ~= "string" then
 		error("[Cmdr] Invalid type name provided: nil")
 	end
-	if not p2:find("^[%d%l]%w*$") then
-		error((("[Cmdr] Invalid type name provided: \"%*\", type names must be alphanumeric and start with a lower-case letter or a digit."):format(p2)))
+	if not typeName:find("^[%d%l]%w*$") then
+		error((("[Cmdr] Invalid type name provided: \"%*\", type names must be alphanumeric and start with a lower-case letter or a digit."):format(typeName)))
 	end
-	for k in pairs(p3) do
-		if p1.TypeMethods[k] == nil then
-			error((("[Cmdr] Unknown key/method in type \"%*\": %*"):format(p2, k)))
+	for k in pairs(typeMethods) do
+		if self.TypeMethods[k] == nil then
+			error((("[Cmdr] Unknown key/method in type \"%*\": %*"):format(typeName, k)))
 		end
 	end
-	if p1.Types[p2] ~= nil then
-		error((("[Cmdr] Type %* has already been registered."):format(p2)))
+	if self.Types[typeName] ~= nil then
+		error((("[Cmdr] Type %* has already been registered."):format(typeName)))
 	end
-	p3.Name = p2
-	p3.DisplayName = p3.DisplayName or p2
-	p1.Types[p2] = p3
-	if p3.Prefixes then
-		p1:RegisterTypePrefix(p2, p3.Prefixes)
+	typeMethods.Name = typeName
+	typeMethods.DisplayName = typeMethods.DisplayName or typeName
+	self.Types[typeName] = typeMethods
+	if typeMethods.Prefixes then
+		self:RegisterTypePrefix(typeName, typeMethods.Prefixes)
 	end
 end
-function Registry.RegisterTypePrefix(p1, p2, p3)
-	if not p1.TypeAliases[p2] then
-		p1.TypeAliases[p2] = p2
+function Registry.RegisterTypePrefix(self, typeName, prefixes)
+	if not self.TypeAliases[typeName] then
+		self.TypeAliases[typeName] = typeName
 	end
-	p1.TypeAliases[p2] = ("%s %s"):format(p1.TypeAliases[p2], p3)
+	self.TypeAliases[typeName] = ("%s %s"):format(self.TypeAliases[typeName], prefixes)
 end
-function Registry.RegisterTypeAlias(p1, p2, p3)
-	assert(p1.TypeAliases[p2] == nil, (("[Cmdr] Type alias %* already exists!"):format(p3)))
-	p1.TypeAliases[p2] = p3
+function Registry.RegisterTypeAlias(self, aliasName, alias)
+	assert(self.TypeAliases[aliasName] == nil, (("[Cmdr] Type alias %* already exists!"):format(alias)))
+	self.TypeAliases[aliasName] = alias
 end
-function Registry.RegisterTypesIn(p1, p2)
-	for k, v in pairs(p2:GetChildren()) do
+function Registry.RegisterTypesIn(self, folder)
+	for k, v in pairs(folder:GetChildren()) do
 		if v:IsA("ModuleScript") then
-			v.Parent = p1.Cmdr.ReplicatedRoot.Types
-			require(v)(p1)
+			v.Parent = self.Cmdr.ReplicatedRoot.Types
+			require(v)(self)
 		else
-			p1:RegisterTypesIn(v)
+			self:RegisterTypesIn(v)
 		end
 	end
 end
 Registry.RegisterHooksIn = Registry.RegisterTypesIn
-function Registry.RegisterCommandObject(p1, p2)
-	for k in pairs(p2) do
-		if p1.CommandMethods[k] == nil then
-			error((("[Cmdr] Unknown key/method in command \"%*\": %*"):format(p2.Name or "unknown command", k)))
+function Registry.RegisterCommandObject(self, command)
+	for k in pairs(command) do
+		if self.CommandMethods[k] == nil then
+			error((("[Cmdr] Unknown key/method in command \"%*\": %*"):format(command.Name or "unknown command", k)))
 		end
 	end
-	if p2.Args then
-		for k, v in pairs(p2.Args) do
+	if command.Args then
+		for k, v in pairs(command.Args) do
 			if type(v) == "table" then
 				for k2 in pairs(v) do
-					if p1.CommandArgProps[k2] == nil then
-						error((("[Cmdr] Unknown property in command \"%*\" argument #%*: %*"):format(p2.Name or "unknown", k, k2)))
+					if self.CommandArgProps[k2] == nil then
+						error((("[Cmdr] Unknown property in command \"%*\" argument #%*: %*"):format(command.Name or "unknown", k, k2)))
 					end
 				end
 			end
 		end
 	end
-	if p2.AutoExec and RunService:IsClient() then
-		table.insert(p1.AutoExecBuffer, p2.AutoExec)
-		p1:FlushAutoExecBufferDeferred()
+	if command.AutoExec and RunService:IsClient() then
+		table.insert(self.AutoExecBuffer, command.AutoExec)
+		self:FlushAutoExecBufferDeferred()
 	end
-	local existingCommand = p1.Commands[p2.Name:lower()]
+	local existingCommand = self.Commands[command.Name:lower()]
 	if existingCommand and existingCommand.Aliases then
 		for k, v in pairs(existingCommand.Aliases) do
-			p1.Commands[v:lower()] = nil
+			self.Commands[v:lower()] = nil
 		end
 	elseif not existingCommand then
-		table.insert(p1.CommandsArray, p2)
+		table.insert(self.CommandsArray, command)
 	end
-	p1.Commands[p2.Name:lower()] = p2
-	if p2.Aliases then
-		for k, v in pairs(p2.Aliases) do
-			p1.Commands[v:lower()] = p2
+	self.Commands[command.Name:lower()] = command
+	if command.Aliases then
+		for k, v in pairs(command.Aliases) do
+			self.Commands[v:lower()] = command
 		end
 	end
 end
-function Registry.RegisterCommand(p1, p2, p3, p4)
-	local commandDef = require(p2)
-	assert(typeof(commandDef) == "table", (("[Cmdr] Invalid return value from command script \"%*\" (CommandDefinition expected, got %*)"):format(p2.Name, (typeof(commandDef)))))
-	if p3 then
+function Registry.RegisterCommand(self, commandModule, serverScript, validator)
+	local commandDef = require(commandModule)
+	assert(typeof(commandDef) == "table", (("[Cmdr] Invalid return value from command script \"%*\" (CommandDefinition expected, got %*)"):format(commandModule.Name, (typeof(commandDef)))))
+	if serverScript then
 		assert(RunService:IsServer(), "[Cmdr] The commandServerScript parameter is not valid for client usage.")
-		commandDef.Run = require(p3)
+		commandDef.Run = require(serverScript)
 	end
-	if not p4 or p4(commandDef) then
-		p1:RegisterCommandObject(commandDef)
-		p2.Parent = p1.Cmdr.ReplicatedRoot.Commands
+	if not validator or validator(commandDef) then
+		self:RegisterCommandObject(commandDef)
+		commandModule.Parent = self.Cmdr.ReplicatedRoot.Commands
 	end
 end
-function Registry.RegisterCommandsIn(p1, p2, p3)
+function Registry.RegisterCommandsIn(self, folder, groupFilter)
 	local serverScripts = {}
 	local sharedCommands = {}
-	for k, v in pairs(p2:GetChildren()) do
+	for k, v in pairs(folder:GetChildren()) do
 		if v:IsA("ModuleScript") then
 			if v.Name:find("Server") then
 				serverScripts[v] = true
 			else
-				local serverScript = p2:FindFirstChild(v.Name .. "Server")
+				local serverScript = folder:FindFirstChild(v.Name .. "Server")
 				if serverScript then
 					sharedCommands[serverScript] = true
 				end
-				p1:RegisterCommand(v, serverScript, p3)
+				self:RegisterCommand(v, serverScript, groupFilter)
 			end
 		else
-			p1:RegisterCommandsIn(v, p3)
+			self:RegisterCommandsIn(v, groupFilter)
 		end
 	end
 	for k in pairs(serverScripts) do
@@ -160,74 +158,74 @@ function Registry.RegisterCommandsIn(p1, p2, p3)
 		end
 	end
 end
-function Registry.RegisterDefaultCommands(p1, p2)
+function Registry.RegisterDefaultCommands(self, groupNames)
 	assert(RunService:IsServer(), "[Cmdr] RegisterDefaultCommands cannot be called from the client.")
-	local groupFilter = if type(p2) == "table" then Util.MakeDictionary(p2) else nil
-	p1:RegisterCommandsIn(p1.Cmdr.DefaultCommandsFolder, if groupFilter == nil then p2 else function(p1)
-	return groupFilter[p1.Group] or false
-end or p2)
+	local groupFilter = if type(groupNames) == "table" then Util.MakeDictionary(groupNames) else nil
+	self:RegisterCommandsIn(self.Cmdr.DefaultCommandsFolder, if groupFilter == nil then groupNames else function(self)
+	return groupFilter[self.Group] or false
+end or groupNames)
 end
-function Registry.GetCommand(p1, p2)
-	return p1.Commands[(p2 or ""):lower()]
+function Registry.GetCommand(self, commandName)
+	return self.Commands[(commandName or ""):lower()]
 end
-function Registry.GetCommands(p1)
-	return p1.CommandsArray
+function Registry.GetCommands(self)
+	return self.CommandsArray
 end
-function Registry.GetCommandNames(p1)
+function Registry.GetCommandNames(self)
 	local commandNames = {}
-	for k, v in pairs(p1.CommandsArray) do
+	for k, v in pairs(self.CommandsArray) do
 		table.insert(commandNames, v.Name)
 	end
 	return commandNames
 end
 Registry.GetCommandsAsStrings = Registry.GetCommandNames
-function Registry.GetTypeNames(p1)
+function Registry.GetTypeNames(self)
 	local typeNames = {}
-	for k in pairs(p1.Types) do
+	for k in pairs(self.Types) do
 		table.insert(typeNames, k)
 	end
 	return typeNames
 end
-function Registry.GetType(p1, p2)
-	return p1.Types[p2]
+function Registry.GetType(self, typeName)
+	return self.Types[typeName]
 end
-function Registry.GetTypeName(p1, p2)
-	return p1.TypeAliases[p2] or p2
+function Registry.GetTypeName(self, typeName)
+	return self.TypeAliases[typeName] or typeName
 end
-function Registry.RegisterHook(p1, p2, p3, p4)
-	if not p1.Hooks[p2] then
-		error(("[Cmdr] Invalid hook name: %q"):format(p2), 2)
+function Registry.RegisterHook(self, hookName, callback, priority)
+	if not self.Hooks[hookName] then
+		error(("[Cmdr] Invalid hook name: %q"):format(hookName), 2)
 	end
-	table.insert(p1.Hooks[p2], {
-		callback = p3,
-		priority = p4 or 0
+	table.insert(self.Hooks[hookName], {
+		callback = callback,
+		priority = priority or 0
 	})
-	table.sort(p1.Hooks[p2], function(p1, p2)
-		return p1.priority < p2.priority
+	table.sort(self.Hooks[hookName], function(hookA, hookB)
+		return hookA.priority < hookB.priority
 	end)
 end
 Registry.AddHook = Registry.RegisterHook
-function Registry.GetStore(p1, p2)
-	return p1.Stores[p2]
+function Registry.GetStore(self, storeName)
+	return self.Stores[storeName]
 end
-function Registry.FlushAutoExecBufferDeferred(p1)
-	if not p1.AutoExecFlushConnection then
-		p1.AutoExecFlushConnection = RunService.Heartbeat:Connect(function()
-			p1.AutoExecFlushConnection:Disconnect()
-			p1.AutoExecFlushConnection = nil
-			p1:FlushAutoExecBuffer()
+function Registry.FlushAutoExecBufferDeferred(self)
+	if not self.AutoExecFlushConnection then
+		self.AutoExecFlushConnection = RunService.Heartbeat:Connect(function()
+			self.AutoExecFlushConnection:Disconnect()
+			self.AutoExecFlushConnection = nil
+			self:FlushAutoExecBuffer()
 		end)
 	end
 end
-function Registry.FlushAutoExecBuffer(p1)
-	for i, v in ipairs(p1.AutoExecBuffer) do
+function Registry.FlushAutoExecBuffer(self)
+	for i, v in ipairs(self.AutoExecBuffer) do
 		for i2, v2 in ipairs(v) do
-			p1.Cmdr.Dispatcher:EvaluateAndRun(v2)
+			self.Cmdr.Dispatcher:EvaluateAndRun(v2)
 		end
 	end
-	p1.AutoExecBuffer = {}
+	self.AutoExecBuffer = {}
 end
-return function(p1)
-	Registry.Cmdr = p1
+return function(self)
+	Registry.Cmdr = self
 	return Registry
 end

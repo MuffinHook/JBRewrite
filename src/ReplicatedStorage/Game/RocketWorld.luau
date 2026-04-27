@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -23,76 +21,76 @@ function RocketWorld.new()
 	instance:Setup()
 	return instance
 end
-function RocketWorld.CreatePart(p1, p2, p3)
+function RocketWorld.CreatePart(self, offsetPosition, direction)
 	local rocketPart = ReplicatedStorage.Resource.ItemSystem.Projectiles.Rocket:Clone()
-	rocketPart.CFrame = CFrame.new(Vector3.new(), p3) + p2
+	rocketPart.CFrame = CFrame.new(Vector3.new(), direction) + offsetPosition
 	rocketPart.Parent = workspace
-	p1:AddSmoke(rocketPart)
+	self:AddSmoke(rocketPart)
 	Audio.ObjectLocal(rocketPart, audioAssets.nitro_ignite, {
 		Pitch = 0.7,
 		TimePosition = 0.6,
 		Volume = 0.3
 	})
-	local v2 = Audio.ObjectLocal(rocketPart, audioAssets.nitro_loop, {
+	local loopingSound = Audio.ObjectLocal(rocketPart, audioAssets.nitro_loop, {
 		Pitch = 0.6,
 		Volume = 1
 	})
-	v2.Looped = true
-	v2.EmitterSize = 25
-	v2.Parent = rocketPart
+	loopingSound.Looped = true
+	loopingSound.EmitterSize = 25
+	loopingSound.Parent = rocketPart
 	return rocketPart
 end
-function RocketWorld.AddSmoke(p1, p2)
-	ReplicatedStorage.Resource.ItemSystem.Projectiles.RocketFire:Clone().Parent = p2
-	ReplicatedStorage.Resource.ItemSystem.Projectiles.RocketSmoke:Clone().Parent = p2
+function RocketWorld.AddSmoke(self, rocketPart)
+	ReplicatedStorage.Resource.ItemSystem.Projectiles.RocketFire:Clone().Parent = rocketPart
+	ReplicatedStorage.Resource.ItemSystem.Projectiles.RocketSmoke:Clone().Parent = rocketPart
 end
-function RocketWorld.Launch(p1, p2, p3, p4)
-	assert(p2)
-	assert(p3)
-	assert(p4)
+function RocketWorld.Launch(self, origin, direction, speed)
+	assert(origin)
+	assert(direction)
+	assert(speed)
 	local rocketData = {
-		p2,
-		p3,
-		p4,
-		p1:CreatePart(p2, p3),
+		origin,
+		direction,
+		speed,
+		self:CreatePart(origin, direction),
 		6
 	}
-	table.insert(p1.ListRocket, rocketData)
+	table.insert(self.ListRocket, rocketData)
 end
-function RocketWorld.Setup(p1)
-	p1.ListRocket = {}
-	p1.IgnoreList = {}
+function RocketWorld.Setup(self)
+	self.ListRocket = {}
+	self.IgnoreList = {}
 	local heartbeatConnection = RunService.Heartbeat:Connect(function()
-		p1:Update()
+		self:Update()
 	end)
-	p1.Maid:GiveTask(function()
-		if #p1.ListRocket > 0 then
-			p1.OnRocketQueueEmptied:Connect(function()
+	self.Maid:GiveTask(function()
+		if #self.ListRocket > 0 then
+			self.OnRocketQueueEmptied:Connect(function()
 				heartbeatConnection:Disconnect()
 				heartbeatConnection = nil
-				p1.OnRocketQueueEmptied:Destroy()
-				p1.OnRocketQueueEmptied = nil
-				p1.OnRocketExploded:Destroy()
-				p1.OnRocketExploded = nil
+				self.OnRocketQueueEmptied:Destroy()
+				self.OnRocketQueueEmptied = nil
+				self.OnRocketExploded:Destroy()
+				self.OnRocketExploded = nil
 			end)
 		else
 			heartbeatConnection:Disconnect()
 			heartbeatConnection = nil
-			p1.OnRocketQueueEmptied:Destroy()
-			p1.OnRocketQueueEmptied = nil
-			p1.OnRocketExploded:Destroy()
-			p1.OnRocketExploded = nil
+			self.OnRocketQueueEmptied:Destroy()
+			self.OnRocketQueueEmptied = nil
+			self.OnRocketExploded:Destroy()
+			self.OnRocketExploded = nil
 		end
 	end)
 end
-function RocketWorld.Update(p1)
+function RocketWorld.Update(self)
 	local currentTime = tick()
-	local deltaTime = currentTime - (p1.LastUpdate or currentTime)
-	p1.LastUpdate = currentTime
-	local rocketCount = #p1.ListRocket
+	local deltaTime = currentTime - (self.LastUpdate or currentTime)
+	self.LastUpdate = currentTime
+	local rocketCount = #self.ListRocket
 	for i = rocketCount, 1, -1 do
-		local v4
-		local rocketData = p1.ListRocket[i]
+		local nextPosition
+		local rocketData = self.ListRocket[i]
 		local origin = rocketData[1]
 		local direction = rocketData[2]
 		local speed = rocketData[3]
@@ -101,19 +99,19 @@ function RocketWorld.Update(p1)
 		if lifetimeRemaining > 0 then
 			local distance = speed * deltaTime
 			if nil == nil then
-				local hitInstance, hitPosition, _, materialList = RayCast.RayIgnoreNonCollideWithIgnoreList(origin, direction, distance, p1.IgnoreList)
+				local hitInstance, hitPosition, _, materialList = RayCast.RayIgnoreNonCollideWithIgnoreList(origin, direction, distance, self.IgnoreList)
 				if hitInstance == nil then
-					v4 = hitPosition
+					nextPosition = hitPosition
 				else
-					v4 = hitPosition
+					nextPosition = hitPosition
 					lifetimeRemaining = 0
 				end
 			else
-				v4 = nil
+				nextPosition = nil
 			end
-			rocketPart.CFrame = CFrame.new(Vector3.new(), direction) + v4
+			rocketPart.CFrame = CFrame.new(Vector3.new(), direction) + nextPosition
 			rocketPart.Velocity = direction * speed
-			rocketData[1] = v4
+			rocketData[1] = nextPosition
 			rocketData[2] = direction
 			rocketData[3] = speed
 			rocketData[5] = lifetimeRemaining - deltaTime
@@ -129,21 +127,21 @@ function RocketWorld.Update(p1)
 					child.Enabled = false
 				end
 			end
-			p1:ExplodeAt(origin)
+			self:ExplodeAt(origin)
 			rocketData[4] = nil
-			table.remove(p1.ListRocket, i)
+			table.remove(self.ListRocket, i)
 		end
 	end
-	if rocketCount > 0 and #p1.ListRocket == 0 then
-		p1.OnRocketQueueEmptied:Fire()
+	if rocketCount > 0 and #self.ListRocket == 0 then
+		self.OnRocketQueueEmptied:Fire()
 	end
 end
-function RocketWorld.ExplodeAt(p1, p2)
-	RocketLauncherUtils.explodeAt(p2)
-	p1.OnRocketExploded:Fire(p2)
+function RocketWorld.ExplodeAt(self, explosionPosition)
+	RocketLauncherUtils.explodeAt(explosionPosition)
+	self.OnRocketExploded:Fire(explosionPosition)
 end
-function RocketWorld.Destroy(p1)
-	p1.Maid:Destroy()
-	p1.Maid = nil
+function RocketWorld.Destroy(self)
+	self.Maid:Destroy()
+	self.Maid = nil
 end
 return RocketWorld

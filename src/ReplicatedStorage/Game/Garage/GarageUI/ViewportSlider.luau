@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -119,8 +117,8 @@ function ViewportSlider.new(listItem, onViewportSetup, createModel, onViewportUp
 	self.Viewports = viewports
 	return self
 end
-local function Ease_OutQuad(p1)
-	return -(p1 - 2) * p1
+local function Ease_OutQuad(progress)
+	return -(progress - 2) * progress
 end
 function ViewportSlider.GetContainerBottom(self)
 	return self._containerBottom

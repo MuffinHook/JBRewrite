@@ -1,19 +1,17 @@
--- Reviewed by Claude
--- variables reassigned
 local HttpService = game:GetService("HttpService")
 local t = {}
-local function v1(p1)
-	for v12, v2 in p1 do
-		if typeof(v12) == "string" then
-			if #v12 >= 1000 then
+local function validateTableSafety(tableToValidate)
+	for keyOrIndex, valueInTable in tableToValidate do
+		if typeof(keyOrIndex) == "string" then
+			if #keyOrIndex >= 1000 then
 				warn("Key is too long")
 				return false
-			elseif not utf8.len(v12) then
+			elseif not utf8.len(keyOrIndex) then
 				warn("Key is not valid utf8")
 				return false
 			end
-		elseif typeof(v12) == "number" then
-			if v12 ~= v12 then
+		elseif typeof(keyOrIndex) == "number" then
+			if keyOrIndex ~= keyOrIndex then
 				warn("Key is NaN")
 				return false
 			end
@@ -21,22 +19,22 @@ local function v1(p1)
 			warn("Key is not a string or number")
 			return false
 		end
-		if typeof(v2) == "table" then
-			if not v1(v2) then
-				warn((("SubTable at %* was not safe"):format((tostring(v12)))))
+		if typeof(valueInTable) == "table" then
+			if not validateTableSafety(valueInTable) then
+				warn((("SubTable at %* was not safe"):format((tostring(keyOrIndex)))))
 				return false
 			end
-		elseif typeof(v2) ~= "number" then
-			if typeof(v2) == "string" then
-				if #v2 >= 4000000 then
+		elseif typeof(valueInTable) ~= "number" then
+			if typeof(valueInTable) == "string" then
+				if #valueInTable >= 4000000 then
 					warn("Value is too long")
 					return false
 				end
-				if not utf8.len(v2) then
+				if not utf8.len(valueInTable) then
 					warn("Value is not valid utf8")
 					return false
 				end
-			elseif typeof(v2) ~= "boolean" then
+			elseif typeof(valueInTable) ~= "boolean" then
 				warn("Value is not a table, number, or string")
 				return false
 			end
@@ -44,32 +42,32 @@ local function v1(p1)
 	end
 	return true
 end
-function t.isTableSafe(p1, p2)
-	if typeof(p1) == "table" then
-		local v12 = nil
-		local v2, v3 = pcall(function()
-			v12 = #HttpService:JSONEncode(p1)
+function t.isTableSafe(tableToValidate, options)
+	if typeof(tableToValidate) == "table" then
+		local encodedSize = nil
+		local success, errorMessage = pcall(function()
+			encodedSize = #HttpService:JSONEncode(tableToValidate)
 		end)
-		if v2 then
-			if if p2 and p2.maxTotalLength then p2.maxTotalLength else 4194304 <= v12 then
+		if success then
+			if if options and options.maxTotalLength then options.maxTotalLength else 4194304 <= encodedSize then
 				return false
 			else
-				return v1(p1)
+				return validateTableSafety(tableToValidate)
 			end
 		else
-			warn("Failed to encode to JSON: " .. tostring(v3))
+			warn("Failed to encode to JSON: " .. tostring(errorMessage))
 			return false
 		end
 	else
 		return false
 	end
 end
-function t.isStringSafe(p1)
-	if typeof(p1) == "string" then
-		if utf8.len(p1) == nil then
+function t.isStringSafe(inputString)
+	if typeof(inputString) == "string" then
+		if utf8.len(inputString) == nil then
 			return false
 		else
-			return not (#p1 > 1000000)
+			return not (#inputString > 1000000)
 		end
 	else
 		return false

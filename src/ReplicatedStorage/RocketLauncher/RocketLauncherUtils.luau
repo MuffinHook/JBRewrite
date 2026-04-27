@@ -1,41 +1,40 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local RocketLauncherConsts = require(script.Parent.RocketLauncherConsts)
 local tbl = {}
-local t2 = {
+local explosionAssets = {
 	explosion_large_02 = 2205008239
 }
-function tbl.getMissileItemPoolObj(p1)
-	assert(typeof(p1) == "Instance")
-	return p1:FindFirstChild(RocketLauncherConsts.MISSILE_OBJ_POOL_NAME)
+function tbl.getMissileItemPoolObj(parentInstance)
+	assert(typeof(parentInstance) == "Instance")
+	return parentInstance:FindFirstChild(RocketLauncherConsts.MISSILE_OBJ_POOL_NAME)
 end
-function tbl.explodeAt(p1)
-	assert(p1)
+function tbl.explodeAt(explosionPosition)
+	assert(explosionPosition)
 	local Part = Instance.new("Part")
 	Part.Size = Vector3.new(0.1, 0.1, 0.1)
 	Part.CanCollide = false
 	Part.Anchored = true
 	Part.Transparency = 1
-	Part.Position = p1
+	Part.Position = explosionPosition
 	Part.Parent = workspace
-	local v1 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Explosion:Clone()
-	v1.Parent = Part
-	v1:Emit(4)
-	local v2 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Debris:Clone()
-	v2.Parent = Part
-	v2:Emit(50)
-	local var3 = ReplicatedStorage.Resource.ItemSystem.Projectiles.Smoke:Clone()
-	var3.Parent = Part
-	var3:Emit(3)
-	local var4 = ReplicatedStorage.Resource.ItemSystem.Projectiles.LandingSmoke:Clone()
-	var4.Enabled = true
-	var4.Parent = Part
-	delay(10 - var4.Lifetime.Max, function()
- var4.Enabled = false
+	local explosionEmitter = ReplicatedStorage.Resource.ItemSystem.Projectiles.Explosion:Clone()
+	explosionEmitter.Parent = Part
+	explosionEmitter:Emit(4)
+	local debrisEmitter = ReplicatedStorage.Resource.ItemSystem.Projectiles.Debris:Clone()
+	debrisEmitter.Parent = Part
+	debrisEmitter:Emit(50)
+	local smokeEmitter = ReplicatedStorage.Resource.ItemSystem.Projectiles.Smoke:Clone()
+	smokeEmitter.Parent = Part
+	smokeEmitter:Emit(3)
+	local landingSmokeEmitter = ReplicatedStorage.Resource.ItemSystem.Projectiles.LandingSmoke:Clone()
+	landingSmokeEmitter.Enabled = true
+	landingSmokeEmitter.Parent = Part
+	delay(10 - landingSmokeEmitter.Lifetime.Max, function()
+ landingSmokeEmitter.Enabled = false
 	end)
 	game.Debris:AddItem(Part, 10)
-	Audio.ObjectLocal(Part, t2.explosion_large_02, {
+	Audio.ObjectLocal(Part, explosionAssets.explosion_large_02, {
  Volume = 1
 	}).EmitterSize = 20
 end

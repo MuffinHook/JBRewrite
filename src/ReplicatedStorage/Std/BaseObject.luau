@@ -1,18 +1,16 @@
--- Reviewed by Claude
--- variables reassigned
 local Maid = require(script.Parent.Maid)
-local t = {
+local BaseObject = {
 	ClassName = "BaseObject"
 }
-t.__index = t
-function t.new(p1)
-	local v2 = setmetatable({}, t)
-	v2.maid = Maid.new()
-	v2.obj = p1
-	return v2
+BaseObject.__index = BaseObject
+function BaseObject.new(obj)
+	local wrapper = setmetatable({}, BaseObject)
+	wrapper.maid = Maid.new()
+	wrapper.obj = obj
+	return wrapper
 end
-function t.Destroy(p1)
-	p1.maid:DoCleaning()
-	setmetatable(p1, nil)
+function BaseObject.Destroy(instance)
+	instance.maid:DoCleaning()
+	setmetatable(instance, nil)
 end
-return t
+return BaseObject

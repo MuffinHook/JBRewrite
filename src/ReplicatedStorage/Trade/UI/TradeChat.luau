@@ -1,23 +1,22 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
-local v1 = Roact.PureComponent:extend("TradeChat")
-v1.defaultProps = {
+local TradeChat = Roact.PureComponent:extend("TradeChat")
+TradeChat.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	position = UDim2.new(0, 0, 0, 0),
 	aspectRatio = 1,
 	verticalPaddingRatio = 128
 }
-function v1.init(p1)
-	p1.maid = Maid.new()
+function TradeChat.init(self)
+	self.maid = Maid.new()
 end
-function v1.render(p1)
-	local aspectRatio = p1.props.aspectRatio
-	local verticalPaddingRatio = p1.props.verticalPaddingRatio
-	local t = {
+function TradeChat.render(self)
+	local aspectRatio = self.props.aspectRatio
+	local verticalPaddingRatio = self.props.verticalPaddingRatio
+	local children = {
 		ListLayout = createElement("UIListLayout", {
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = Enum.VerticalAlignment.Top,
@@ -26,22 +25,22 @@ function v1.render(p1)
 			Padding = UDim.new(1 / verticalPaddingRatio, 0)
 		})
 	}
-	if p1.props.messages then
-		for v2, v3 in p1.props.messages do
-			local v1
-			local color = v3.color
+	if self.props.messages then
+		for messageIndex, message in self.props.messages do
+			local messageColor
+			local color = message.color
 			if not color then
-				v1 = if v3.me then Color3.new(255/255, 255/255, 255/255) else Color3.new(0.75, 0.75, 0.75) or Color3.new(255/255, 255/255, 255/255)
-				color = v1
+				messageColor = if message.me then Color3.new(255/255, 255/255, 255/255) else Color3.new(0.75, 0.75, 0.75) or Color3.new(255/255, 255/255, 255/255)
+				color = messageColor
 			end
-			t[v3] = createElement("TextLabel", {
+			children[message] = createElement("TextLabel", {
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				Size = UDim2.new(1, 0, 0, 0),
 				AutomaticSize = Enum.AutomaticSize.Y,
 				RichText = true,
-				Text = v3.displayName .. ": " .. v3.text,
-				LayoutOrder = v2,
+				Text = message.displayName .. ": " .. message.text,
+				LayoutOrder = messageIndex,
 				Font = Enum.Font.SourceSansBold,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextColor3 = color,
@@ -53,8 +52,8 @@ function v1.render(p1)
 	return createElement("Frame", {
 		BackgroundTransparency = 0.8,
 		BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
-		Size = p1.props.size,
-		Position = p1.props.position
+		Size = self.props.size,
+		Position = self.props.position
 	}, {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
@@ -110,9 +109,9 @@ function v1.render(p1)
 					ElasticBehavior = Enum.ElasticBehavior.Always,
 					VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right,
 					VerticalScrollBarInset = Enum.ScrollBarInset.None
-				}, t)
+				}, children)
 			})
 		})
 	})
 end
-return v1
+return TradeChat

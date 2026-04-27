@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Interval = require(ReplicatedStorage.Std.Interval)
@@ -11,7 +9,7 @@ local TextButton = require(ReplicatedStorage.PersistentCrew.UI.TextButton)
 local horizontalSquareGrid = require(ReplicatedStorage.PersistentCrew.UI.horizontalSquareGrid)
 local function avatarComponent(self)
 	if self.RespondedAt then
-		local t = {
+		local avatarProperties = {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 0,
 			BackgroundColor3 = Color3.new(0.9, 0.9, 0.9),
@@ -20,7 +18,7 @@ local function avatarComponent(self)
 			Position = self.position,
 			AnchorPoint = Vector2.new(0, 0)
 		}
-		local table2 = {
+		local avatarChildren = {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
 			}),
@@ -30,7 +28,7 @@ local function avatarComponent(self)
 				Color = Color3.new(0/255, 0/255, 0/255)
 			})
 		}
-		table2.AdminBadge = self.IsAdmin and createElement("ImageButton", {
+		avatarChildren.AdminBadge = self.IsAdmin and createElement("ImageButton", {
 			BackgroundTransparency = 1,
 			ZIndex = 3,
 			Size = UDim2.fromScale(0.4, 0.4),
@@ -38,17 +36,17 @@ local function avatarComponent(self)
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Image = "rbxassetid://12385263946"
 		})
-		return createElement("ImageLabel", t, table2)
+		return createElement("ImageLabel", avatarProperties, avatarChildren)
 	else
-		local t = {
+		local emptyFrameProperties = {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 0
 		}
-		t.BackgroundColor3 = if self.RespondedAt ~= nil then Color3.new(255/255, 255/255, 255/255) else Color3.new(102/255, 102/255, 102/255)
-		t.Size = self.size
-		t.Position = self.position
-		t.ZIndex = self.zIndex
-		return createElement("Frame", t, {
+		emptyFrameProperties.BackgroundColor3 = if self.RespondedAt ~= nil then Color3.new(255/255, 255/255, 255/255) else Color3.new(102/255, 102/255, 102/255)
+		emptyFrameProperties.Size = self.size
+		emptyFrameProperties.Position = self.position
+		emptyFrameProperties.ZIndex = self.zIndex
+		return createElement("Frame", emptyFrameProperties, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
 			}),
@@ -84,15 +82,15 @@ function constant.init(self)
 	})
 end
 function constant.render(self)
-	local constant = 0.385 / self.props.aspectRatio * 1.5
+	local flagSizeRatio = 0.385 / self.props.aspectRatio * 1.5
 	local identityColor = Color3.new(51/255, 51/255, 51/255)
-	local local3 = ("."):rep(self.state.dots - 1) .. ("ASSEMBLING %dv%d BATTLE"):format(self.props.numPlayersPerTeam, self.props.numPlayersPerTeam) .. ("."):rep(self.state.dots - 1)
+	local assemblyStatusText = ("."):rep(self.state.dots - 1) .. ("ASSEMBLING %dv%d BATTLE"):format(self.props.numPlayersPerTeam, self.props.numPlayersPerTeam) .. ("."):rep(self.state.dots - 1)
 	local clanColorOurs = self.props.clanColorOurs
 	local clanColorTheirs = self.props.clanColorTheirs
-	local local4 = ("rgb(%d, %d, %d)"):format(clanColorOurs.r * 255, clanColorOurs.g * 255, clanColorOurs.b * 255)
-	local local5 = if clanColorTheirs then ("rgb(%d, %d, %d)"):format(clanColorTheirs.r * 255, clanColorTheirs.g * 255, clanColorTheirs.b * 255) else "rgb(255, 255, 255)"
-	local local7 = ("<font color=\"" .. local4 .. "\">%s</font>"):format(self.props.clanNameOurs)
-	local local8 = ("<font color=\"" .. local5 .. "\">%s</font>"):format(self.props.clanNameTheirs or "")
+	local clanColorOursRgb = ("rgb(%d, %d, %d)"):format(clanColorOurs.r * 255, clanColorOurs.g * 255, clanColorOurs.b * 255)
+	local clanColorTheirsRgb = if clanColorTheirs then ("rgb(%d, %d, %d)"):format(clanColorTheirs.r * 255, clanColorTheirs.g * 255, clanColorTheirs.b * 255) else "rgb(255, 255, 255)"
+	local clanNameOursFormatted = ("<font color=\"" .. clanColorOursRgb .. "\">%s</font>"):format(self.props.clanNameOurs)
+	local clanNameTheirsFormatted = ("<font color=\"" .. clanColorTheirsRgb .. "\">%s</font>"):format(self.props.clanNameTheirs or "")
 	return createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 0.8,
@@ -138,7 +136,7 @@ function constant.render(self)
 					}),
 					Text = createElement("TextLabel", {
 						BackgroundTransparency = 1,
-						Text = local3,
+						Text = assemblyStatusText,
 						TextColor3 = Color3.new(255/255, 255/255, 255/255),
 						TextScaled = true,
 						Size = UDim2.new(1, 0, 1, 0),
@@ -160,7 +158,7 @@ function constant.render(self)
 					}),
 					Text = createElement("TextLabel", {
 						BackgroundTransparency = 1,
-						Text = local7,
+						Text = clanNameOursFormatted,
 						RichText = true,
 						TextColor3 = Color3.new(255/255, 255/255, 255/255),
 						TextScaled = true,
@@ -183,7 +181,7 @@ function constant.render(self)
 					}),
 					Text = createElement("TextLabel", {
 						BackgroundTransparency = 1,
-						Text = local8,
+						Text = clanNameTheirsFormatted,
 						RichText = true,
 						TextColor3 = Color3.new(255/255, 255/255, 255/255),
 						TextScaled = true,
@@ -196,7 +194,7 @@ function constant.render(self)
 			ClanAFlag = createElement(PaddedContainer, {
 				backgroundTransparency = 0,
 				backgroundColor = identityColor,
-				size = UDim2.new(constant, 0, 0.385, 0),
+				size = UDim2.new(flagSizeRatio, 0, 0.385, 0),
 				position = UDim2.new(0, 0, 0.13, 0),
 				paddingTop = 0,
 				paddingBottom = 0.5,
@@ -217,8 +215,8 @@ function constant.render(self)
 			}),
 			ClanA = createElement(PaddedContainer, {
 				backgroundColor = identityColor,
-				size = UDim2.new(1 - constant, 0, 0.385, 0),
-				position = UDim2.new(constant, 0, 0.13, 0),
+				size = UDim2.new(1 - flagSizeRatio, 0, 0.385, 0),
+				position = UDim2.new(flagSizeRatio, 0, 0.13, 0),
 				paddingTop = 0,
 				paddingBottom = 0.5,
 				paddingLeft = 0.5,
@@ -236,7 +234,7 @@ function constant.render(self)
 			}),
 			ClanBFlag = createElement(PaddedContainer, {
 				backgroundColor = identityColor,
-				size = UDim2.new(constant, 0, 0.385, 0),
+				size = UDim2.new(flagSizeRatio, 0, 0.385, 0),
 				position = UDim2.new(0, 0, 0.515, 0),
 				paddingTop = 0.5,
 				paddingBottom = 0,
@@ -257,8 +255,8 @@ function constant.render(self)
 			}),
 			ClanB = createElement(PaddedContainer, {
 				backgroundColor = identityColor,
-				size = UDim2.new(1 - constant, 0, 0.385, 0),
-				position = UDim2.new(constant, 0, 0.515, 0),
+				size = UDim2.new(1 - flagSizeRatio, 0, 0.385, 0),
+				position = UDim2.new(flagSizeRatio, 0, 0.515, 0),
 				paddingTop = 0.5,
 				paddingBottom = 0,
 				paddingLeft = 0.5,

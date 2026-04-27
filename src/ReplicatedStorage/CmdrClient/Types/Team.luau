@@ -1,41 +1,40 @@
--- Reviewed by Claude
 local Teams = game:GetService("Teams")
 local Util = require(script.Parent.Parent.Shared.Util)
-local t = {
-	Transform = function(p1)
-		return Util.MakeFuzzyFinder(Teams:GetTeams())(p1)
+local teamType = {
+	Transform = function(input)
+		return Util.MakeFuzzyFinder(Teams:GetTeams())(input)
 	end,
-	Validate = function(p1)
-		return #p1 > 0, "No team with that name could be found."
+	Validate = function(input)
+		return #input > 0, "No team with that name could be found."
 	end,
-	Autocomplete = function(p1)
-		return Util.GetNames(p1)
+	Autocomplete = function(input)
+		return Util.GetNames(input)
 	end,
-	Parse = function(p1)
-		return p1[1]
+	Parse = function(input)
+		return input[1]
 	end
 }
-local t2 = {
+local teamPlayersType = {
 	Listable = true,
-	Transform = t.Transform,
-	Validate = t.Validate,
-	Autocomplete = t.Autocomplete,
-	Parse = function(p1)
-		return p1[1]:GetPlayers()
+	Transform = teamType.Transform,
+	Validate = teamType.Validate,
+	Autocomplete = teamType.Autocomplete,
+	Parse = function(input)
+		return input[1]:GetPlayers()
 	end
 }
-local t3 = {
-	Transform = t.Transform,
-	Validate = t.Validate,
-	Autocomplete = t.Autocomplete,
-	Parse = function(p1)
-		return p1[1].TeamColor
+local teamColorType = {
+	Transform = teamType.Transform,
+	Validate = teamType.Validate,
+	Autocomplete = teamType.Autocomplete,
+	Parse = function(input)
+		return input[1].TeamColor
 	end
 }
-return function(p1)
-	p1:RegisterType("team", t)
-	p1:RegisterType("teams", Util.MakeListableType(t))
-	p1:RegisterType("teamPlayers", t2)
-	p1:RegisterType("teamColor", t3)
-	p1:RegisterType("teamColors", Util.MakeListableType(t3))
+return function(registry)
+	registry:RegisterType("team", teamType)
+	registry:RegisterType("teams", Util.MakeListableType(teamType))
+	registry:RegisterType("teamPlayers", teamPlayersType)
+	registry:RegisterType("teamColor", teamColorType)
+	registry:RegisterType("teamColors", Util.MakeListableType(teamColorType))
 end

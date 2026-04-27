@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
@@ -61,13 +59,13 @@ function ProximityCamShakeClass.Listen(self, targetObject)
 end
 function ProximityCamShakeClass.StartUpdater(self, targetObject)
 	local renderPriority = Enum.RenderPriority.Camera.Value + 5
-	local v2 = CurrentCamera.CFrame
-	local camShaker = CamShaker.new(renderPriority, function(p1)
-		v2 = CurrentCamera.CFrame
-		CurrentCamera.CFrame = CurrentCamera.CFrame * p1
+	local storedCameraFrame = CurrentCamera.CFrame
+	local camShaker = CamShaker.new(renderPriority, function(cameraOffsetDelta)
+		storedCameraFrame = CurrentCamera.CFrame
+		CurrentCamera.CFrame = CurrentCamera.CFrame * cameraOffsetDelta
 	end)
-	local v4 = RunService.Heartbeat:Connect(function()
-		CurrentCamera.CFrame = v2
+	local heartbeatConnection = RunService.Heartbeat:Connect(function()
+		CurrentCamera.CFrame = storedCameraFrame
 	end)
 	camShaker._renderName = "ProximityCamShake_" .. tostring((randomGenerator:NextInteger(1, 1000000000)))
 	camShaker:Start()
@@ -76,30 +74,30 @@ function ProximityCamShakeClass.StartUpdater(self, targetObject)
 	shakeInstance.RotationInfluence = Vector3.new(1, 1, 1)
 	local shakeSustain = camShaker:ShakeSustain(shakeInstance)
 	self._maid._camUpdater = RunService.Heartbeat:Connect(function()
-		local v2 = (CurrentCamera.CFrame.Position - targetObject.Position).Magnitude / targetObject:GetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME)
-		if v2 > 1 or not targetObject:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
+		local distanceRatio = (CurrentCamera.CFrame.Position - targetObject.Position).Magnitude / targetObject:GetAttribute(ProximityCamShakeConsts.RADIUS_ATTR_NAME)
+		if distanceRatio > 1 or not targetObject:GetAttribute(ProximityCamShakeConsts.ENABLED_ATTR_NAME) then
 			self._maid._stop = nil
 		else
-			local v3 = 1 - v2
-			local v4, v5
-			if v3 < 0.5 then
-				v4 = 2 * v3 * v3
-				if not v4 then
-					v5 = v3
-					v4 = -1 - 2 * (v3 - 2) * v3
+			local normalizedProximity = 1 - distanceRatio
+			local easedValue, fallbackEasedValue
+			if normalizedProximity < 0.5 then
+				easedValue = 2 * normalizedProximity * normalizedProximity
+				if not easedValue then
+					fallbackEasedValue = normalizedProximity
+					easedValue = -1 - 2 * (normalizedProximity - 2) * normalizedProximity
 				end
 			else
-				v5 = v3
-				v4 = -1 - 2 * (v3 - 2) * v3
+				fallbackEasedValue = normalizedProximity
+				easedValue = -1 - 2 * (normalizedProximity - 2) * normalizedProximity
 			end
-			shakeSustain:SetScaleMagnitude(v4 * targetObject:GetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME))
+			shakeSustain:SetScaleMagnitude(easedValue * targetObject:GetAttribute(ProximityCamShakeConsts.MAGNITUDE_ATTR_NAME))
 		end
 	end)
 	function self._maid._stop()
 		shakeSustain:StartFadeOut(1)
 		Promise.delay(1):andThen(function()
 			camShaker:Stop()
-			v4:Disconnect()
+			heartbeatConnection:Disconnect()
 		end):catch(warn)
 		if self._maid then
 			self._maid._camUpdater = nil

@@ -1,22 +1,21 @@
--- Reviewed by Claude
 game:GetService("ReplicatedStorage")
 local Default = require(script.Parent.Default)
 return {
-	MakeCar = function(p1)
-		return Default.MakeCar(p1)
+	MakeCar = function(carModel)
+		return Default.MakeCar(carModel)
 	end,
-	MoveCar = function(p1, p2, p3, p4)
-		if p2.Speed <= 5 and not p2.OpenedVault then
-			p2.OpenedVault = true
-			local VaultDoorMain = p1.Model.Model:FindFirstChild("VaultDoorMain")
+	MoveCar = function(carInstance, carData, deltaTime, direction)
+		if carData.Speed <= 5 and not carData.OpenedVault then
+			carData.OpenedVault = true
+			local VaultDoorMain = carInstance.Model.Model:FindFirstChild("VaultDoorMain")
 			if not VaultDoorMain then
 				error("Missing VaultDoorMain model")
 			end
 			VaultDoorMain:Destroy()
 		end
-		return Default.MoveCar(p1, p2, p3, p4)
+		return Default.MoveCar(carInstance, carData, deltaTime, direction)
 	end,
-	DestroyCar = function(p1)
-		return Default.DestroyCar(p1)
+	DestroyCar = function(carToDestroy)
+		return Default.DestroyCar(carToDestroy)
 	end
 }

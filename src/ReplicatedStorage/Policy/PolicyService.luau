@@ -1,48 +1,47 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Std.Promise)
 require(ReplicatedStorage.Std.Signal)
-local t = {
+local PolicyService = {
 	_data = {},
 	_observing = {}
 }
-function t.setCachedPlayerPolicyInfo(p1, p2)
-	t._data[p1.UserId] = p2
-	local tbl = t._observing[p1.UserId]
-	if tbl then
-		t._observing[p1.UserId] = nil
-		for v2, v3 in tbl do
-			v3(p2)
+function PolicyService.setCachedPlayerPolicyInfo(player, policyData)
+	PolicyService._data[player.UserId] = policyData
+	local observerCallbacks = PolicyService._observing[player.UserId]
+	if observerCallbacks then
+		PolicyService._observing[player.UserId] = nil
+		for index, callback in observerCallbacks do
+			callback(policyData)
 		end
 	end
 end
-function t.getCachedPlayerPolicyInfo(p1)
-	return t._data[p1.UserId]
+function PolicyService.getCachedPlayerPolicyInfo(player)
+	return PolicyService._data[player.UserId]
 end
-function t.promiseCachedPlayerPolicyInfo(p1)
-	local tbl = t.getCachedPlayerPolicyInfo(p1)
-	if tbl then
-		return Promise.resolve(tbl)
+function PolicyService.promiseCachedPlayerPolicyInfo(player)
+	local cachedInfo = PolicyService.getCachedPlayerPolicyInfo(player)
+	if cachedInfo then
+		return Promise.resolve(cachedInfo)
 	else
-		return Promise.new(function(p12, p2, p3)
-			local UserId = p1.UserId
-			if not t._observing[UserId] then
-				t._observing[UserId] = {}
+		return Promise.new(function(promiseCallback, resolve, onCancel)
+			local UserId = player.UserId
+			if not PolicyService._observing[UserId] then
+				PolicyService._observing[UserId] = {}
 			end
-			if not p3(function()
-				if t._observing[UserId] then
-					local tbl = table.find(t._observing[UserId], p12)
-					if tbl then
-						table.remove(t._observing[UserId], tbl)
+			if not onCancel(function()
+				if PolicyService._observing[UserId] then
+					local foundIndex = table.find(PolicyService._observing[UserId], promiseCallback)
+					if foundIndex then
+						table.remove(PolicyService._observing[UserId], foundIndex)
 					end
 				end
 			end) then
-				table.insert(t._observing[UserId], p12)
+				table.insert(PolicyService._observing[UserId], promiseCallback)
 			end
 		end)
 	end
 end
-function t.removeCachedPlayerPolicyInfo(p1)
-	t._data[p1.UserId] = nil
+function PolicyService.removeCachedPlayerPolicyInfo(player)
+	PolicyService._data[player.UserId] = nil
 end
-return t
+return PolicyService

@@ -1,16 +1,14 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Spring = require(ReplicatedStorage.Std.Spring)
-local t = {}
-t.__index = t
-function t.new(parentPart)
+local Piston = {}
+Piston.__index = Piston
+function Piston.new(parentPart)
 	local self = {}
-	setmetatable(self, t)
+	setmetatable(self, Piston)
 	self.Maid = Maid.new()
 	local Piston = parentPart:FindFirstChild("Piston")
 	local PistonOrigin = parentPart:FindFirstChild("PistonOrigin")
@@ -49,9 +47,9 @@ function t.new(parentPart)
 		Piston.CFrame = PistonOrigin.CFrame * CFrame.new(0, (1 - pistonSpring:Update()) * 10, 0)
 	end))
 	local lastSlamTime = 0
-	self.Maid:GiveTask(Piston.Touched:Connect(function(p1)
+	self.Maid:GiveTask(Piston.Touched:Connect(function(touchedPart)
 		local springProgress = pistonSpring:Update()
-		local affectedPlayer = Players:GetPlayerFromCharacter(p1.Parent)
+		local affectedPlayer = Players:GetPlayerFromCharacter(touchedPart.Parent)
 		if affectedPlayer then
 			local currentTime = tick()
 			if currentTime - lastSlamTime > 1.5 and (springProgress > 0.05 and (springProgress < 0.95 and isSpringIdle == false)) then
@@ -62,7 +60,7 @@ function t.new(parentPart)
 	end))
 	return self
 end
-function t.SlamPlayer(self, player)
+function Piston.SlamPlayer(self, player)
 	local Humanoid = player.Character.Humanoid
 	Humanoid.BodyHeightScale.Value = 0.3
 	Audio.ObjectLocal(Humanoid.RootPart, 5333889062)
@@ -72,8 +70,8 @@ function t.SlamPlayer(self, player)
 	end)
 	self.RemoteEvent:FireServer()
 end
-function t.Destroy(self)
+function Piston.Destroy(self)
 	self.Maid:Destroy()
 	self.Maid = nil
 end
-return t
+return Piston

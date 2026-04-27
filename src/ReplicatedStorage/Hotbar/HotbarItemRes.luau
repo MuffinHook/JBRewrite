@@ -1,17 +1,16 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Utils = require(ReplicatedStorage.EzUi.Utils)
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
-local t = {}
-function t.init()
+local hotbarModule = {}
+function hotbarModule.init()
 	local HotbarGui = script.Parent.Res.HotbarGui
 	HotbarGui.Parent = Players.LocalPlayer.PlayerGui
 	HotbarGui.DisplayOrder = 11
-	t.gui = HotbarGui
-	local v1 = HotbarGui.Container.Item:Clone()
+	hotbarModule.gui = HotbarGui
+	local itemTemplate = HotbarGui.Container.Item:Clone()
 	HotbarGui.Container.Item:Destroy()
-	t.presetFrame = v1
+	hotbarModule.presetFrame = itemTemplate
 	local function updateSize()
 		if Utils.isSmallScreen() then
 			HotbarGui.Container.Size = UDim2.new(0.7, 0, 1, 0)
@@ -28,4 +27,4 @@ function t.init()
 	Utils.getViewportSizeChangedSignal():Connect(updateSize)
 	updateSize()
 end
-return t
+return hotbarModule

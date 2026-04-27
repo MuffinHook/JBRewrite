@@ -1,40 +1,38 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-return function(p1, p2)
-	local Type = p2.Type
-	local Model = p2.Model
-	local function UpdateWheel(p12)
-		assert(p12 ~= nil, "WheelModel is nil")
-		if p12:FindFirstChild("Wheel") then
-			warn("Missing TireMesh, still using old Wheel format: " .. p2.Make)
+return function(stickerConfig, vehicleData)
+	local Type = vehicleData.Type
+	local Model = vehicleData.Model
+	local function UpdateWheel(wheelModel)
+		assert(wheelModel ~= nil, "WheelModel is nil")
+		if wheelModel:FindFirstChild("Wheel") then
+			warn("Missing TireMesh, still using old Wheel format: " .. vehicleData.Make)
 			return
 		end
-		local TireMesh = p12:FindFirstChild("TireMesh")
-		if p1 and p1.TextureId then
+		local TireMesh = wheelModel:FindFirstChild("TireMesh")
+		if stickerConfig and stickerConfig.TextureId then
 			local decals = TireMesh:QueryDescendants("Decal")
 			if #decals > 0 then
-				for v3, decal in decals do
-					decal.Texture = ("rbxassetid://%d"):format(p1.TextureId)
-					decal.Color3 = p1.DecalColor or Color3.new(255/255, 255/255, 255/255)
+				for decalIndex, decal in decals do
+					decal.Texture = ("rbxassetid://%d"):format(stickerConfig.TextureId)
+					decal.Color3 = stickerConfig.DecalColor or Color3.new(255/255, 255/255, 255/255)
 				end
 			else
 				local Decal = Instance.new("Decal")
-				Decal.Color3 = p1.DecalColor or Color3.new(255/255, 255/255, 255/255)
+				Decal.Color3 = stickerConfig.DecalColor or Color3.new(255/255, 255/255, 255/255)
 				Decal.Face = Enum.NormalId.Left
-				Decal.Texture = ("rbxassetid://%d"):format(p1.TextureId)
+				Decal.Texture = ("rbxassetid://%d"):format(stickerConfig.TextureId)
 				Decal.Parent = TireMesh:FindFirstChild("Dual1") or TireMesh
 				local decalClone = Decal:Clone()
 				decalClone.Face = Enum.NormalId.Right
 				decalClone.Parent = TireMesh:FindFirstChild("Dual2") or TireMesh
 			end
 		else
-			for v8, decal in TireMesh:QueryDescendants("Decal") do
+			for decalIndex, decal in TireMesh:QueryDescendants("Decal") do
 				decal:Destroy()
 			end
 		end
-		if p1 and p1.ParticleEmitterName then
-			local ParticleEmitterName = p1.ParticleEmitterName
+		if stickerConfig and stickerConfig.ParticleEmitterName then
+			local ParticleEmitterName = stickerConfig.ParticleEmitterName
 			if TireMesh:FindFirstChild(ParticleEmitterName) then
 				return
 			end
@@ -43,7 +41,7 @@ return function(p1, p2)
 				particleEmitter:Clone().Parent = TireMesh
 			end
 		else
-			for v11, child in TireMesh:GetChildren() do
+			for childIndex, child in TireMesh:GetChildren() do
 				if child:IsA("ParticleEmitter") then
 					child:Destroy()
 				end
@@ -51,17 +49,17 @@ return function(p1, p2)
 		end
 	end
 	if Type == "Chassis" then
-		for v1, descendant in Model:GetDescendants() do
+		for descendantIndex, descendant in Model:GetDescendants() do
 			if descendant:IsA("Model") and (descendant.Name:sub(1, 5) == "Wheel" and descendant.Name ~= "Wheels") then
 				UpdateWheel(descendant)
 			end
 		end
 	elseif Type == "DuneBuggy" then
-		for v3, wheelName in next, { "FrontLeft", "FrontRight", "BackLeft", "BackRight" } do
+		for wheelIndex, wheelName in next, { "FrontLeft", "FrontRight", "BackLeft", "BackRight" } do
 			UpdateWheel((Model.WheelModels:FindFirstChild(wheelName)))
 		end
 	elseif Type == "Motorcycle" then
-		for v5, wheelName in next, { "Back", "Front" } do
+		for wheelIndex, wheelName in next, { "Back", "Front" } do
 			UpdateWheel((Model.WheelModels:FindFirstChild(wheelName)))
 		end
 	end

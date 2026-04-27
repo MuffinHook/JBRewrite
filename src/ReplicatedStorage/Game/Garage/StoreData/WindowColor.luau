@@ -1,27 +1,26 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local Color = require(script.Parent.Color)
 local WindowColor = require(ReplicatedStorage.Game.Garage.Customize.WindowColor)
 local getDefaultVehicleModel = require(ReplicatedStorage.Game.getDefaultVehicleModel)
-local function GetInstance(p1)
-	local v1 = VehicleUtils.GetLocalVehiclePacketForCustomize()
-	local v2 = getDefaultVehicleModel(v1.Make, v1.Type)
-	local t = {
-		Model = v2,
-		Make = v1.Make,
-		Type = v1.Type
+local function GetInstance(colorConfig)
+	local vehiclePacket = VehicleUtils.GetLocalVehiclePacketForCustomize()
+	local defaultModel = getDefaultVehicleModel(vehiclePacket.Make, vehiclePacket.Type)
+	local customizeData = {
+		Model = defaultModel,
+		Make = vehiclePacket.Make,
+		Type = vehiclePacket.Type
 	}
-	if p1.None then
-		WindowColor(nil, t)
+	if colorConfig.None then
+		WindowColor(nil, customizeData)
 	else
-		WindowColor(p1, t)
+		WindowColor(colorConfig, customizeData)
 	end
-	return v2
+	return defaultModel
 end
-local function Update(p1, p2)
-	local v1 = os.clock() / 2
-	p1.CFrame = CFrame.Angles(0, 2.356194490192345 + math.cos(v1 % 6.283185307179586) * 0.1, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, p2.BoundingBox.Size.Magnitude * 0.6)
+local function Update(instance, targetModel)
+	local animationTime = os.clock() / 2
+	instance.CFrame = CFrame.Angles(0, 2.356194490192345 + math.cos(animationTime % 6.283185307179586) * 0.1, 0) * CFrame.Angles(math.sin(animationTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, targetModel.BoundingBox.Size.Magnitude * 0.6)
 end
 return {
 	Items = Color.Items,

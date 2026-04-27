@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local next = next
 local scriptChildren, scriptSecondChild = script:GetChildren()
 local categories = {}

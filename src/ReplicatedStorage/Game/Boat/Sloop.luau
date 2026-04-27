@@ -1,25 +1,23 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Spring = require(ReplicatedStorage.Std.Spring)
 local R15IKv2 = require(ReplicatedStorage.Module.R15IKv2)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Boat = require(script.Parent.Boat)
-local t = {
+local config = {
 	SpeedForward = 1.5,
 	MaximumTurnAngle = 0.03,
 	FrictionFwd = 0.04,
 	TurnCurveCoeff = 1
 }
-local t2 = {
+local Sloop = {
 	__ClassName = "Sloop"
 }
-t2.__index = t2
-setmetatable(t2, Boat)
-function t2.new(p1)
-	local boat = Boat.new(t, p1)
-	setmetatable(boat, t2)
+Sloop.__index = Sloop
+setmetatable(Sloop, Boat)
+function Sloop.new(boatConfig)
+	local boat = Boat.new(config, boatConfig)
+	setmetatable(boat, Sloop)
 	boat:Setup()
 	boat.PartSailBack = boat.Model.Physics.SailBack.Sail
 	boat.PartSailBackSize = boat.PartSailBack.Size
@@ -41,100 +39,100 @@ function t2.new(p1)
 	boat.ParticleWake = boat.Model.Visual.WakeEmitter.Particle
 	return boat
 end
-function t2.Setup(p1)
-	Boat.Setup(p1)
-	p1.SpringSlowHeading = Spring.new(0, 0, 0.25, 4)
-	p1.LastHeadingSign = 0
+function Sloop.Setup(self)
+	Boat.Setup(self)
+	self.SpringSlowHeading = Spring.new(0, 0, 0.25, 4)
+	self.LastHeadingSign = 0
 end
-function t2.UpdateInput(p1)
-	Boat.UpdateInput(p1)
-	p1.SpringSlowHeadingp = p1.SpringSlowHeading:SetTarget(p1.Heading)
+function Sloop.UpdateInput(self)
+	Boat.UpdateInput(self)
+	self.SpringSlowHeadingValue = self.SpringSlowHeading:SetTarget(self.Heading)
 end
-function t2.UpdateThirdInput(p1)
-	p1.Heading = math.clamp(p1.PartBase.RotVelocity.Y * 2, -1, 1)
-	p1.Forward = math.clamp(-p1.PartBase.CFrame:VectorToObjectSpace(p1.PartBase.Velocity).Z / 60, -1, 1)
-	p1.SpringHeadingp = p1.SpringHeading:SetTarget(p1.Heading)
-	p1.SpringForwardp = p1.SpringForward:SetTarget(p1.Forward)
-	p1.SpringSlowHeadingp = p1.SpringSlowHeading:SetTarget(p1.Heading)
+function Sloop.UpdateThirdInput(self)
+	self.Heading = math.clamp(self.PartBase.RotVelocity.Y * 2, -1, 1)
+	self.Forward = math.clamp(-self.PartBase.CFrame:VectorToObjectSpace(self.PartBase.Velocity).Z / 60, -1, 1)
+	self.SpringHeadingValue = self.SpringHeading:SetTarget(self.Heading)
+	self.SpringForwardValue = self.SpringForward:SetTarget(self.Forward)
+	self.SpringSlowHeadingValue = self.SpringSlowHeading:SetTarget(self.Heading)
 end
-function t2.MountPlayer(p1, p2, p3)
-	Boat.MountPlayer(p1, p2, p3)
-	if p3.Driver then
-		p3.IKP = R15IKv2.BuildPacketArms(p3.Character)
-		if p3.Local then
-			local v1 = p3.Humanoid:LoadAnimation(ReplicatedStorage.Resource.IdleAnimation)
-			v1:Play()
-			p3.Maid:GiveTask(function()
-				v1:Stop()
-				v1:Destroy()
+function Sloop.MountPlayer(self, player, passenger)
+	Boat.MountPlayer(self, player, passenger)
+	if passenger.Driver then
+		passenger.IKP = R15IKv2.BuildPacketArms(passenger.Character)
+		if passenger.Local then
+			local idleAnimation = passenger.Humanoid:LoadAnimation(ReplicatedStorage.Resource.IdleAnimation)
+			idleAnimation:Play()
+			passenger.Maid:GiveTask(function()
+				idleAnimation:Stop()
+				idleAnimation:Destroy()
 			end)
 		end
-		p3.Maid:GiveTask(RunService.Stepped:Connect(function()
-			if p1.Model ~= nil then
-				p1:SteppedDriver(p3)
+		passenger.Maid:GiveTask(RunService.Stepped:Connect(function()
+			if self.Model ~= nil then
+				self:SteppedDriver(passenger)
 			end
 		end))
-		p1.SoundCreak:Play()
-		p1.SoundWater:Play()
-		p3.Maid:GiveTask(function()
-			p1.SoundCreak:Stop()
+		self.SoundCreak:Play()
+		self.SoundWater:Play()
+		passenger.Maid:GiveTask(function()
+			self.SoundCreak:Stop()
 		end)
-		p3.Maid:GiveTask(function()
-			p1.SoundWater:Stop()
+		passenger.Maid:GiveTask(function()
+			self.SoundWater:Stop()
 		end)
-		p3.Maid:GiveTask(function()
-			p1.ParticleWake.Enabled = false
-			p1.ParticleMist.Enabled = false
+		passenger.Maid:GiveTask(function()
+			self.ParticleWake.Enabled = false
+			self.ParticleMist.Enabled = false
 		end)
 	end
 end
-function t2.SteppedDriver(p1, p2)
-	local IKP = p2.IKP
-	local Part0 = p1.MotorSteeringWheel.Part0
-	local SpringHeadingp = p1.SpringHeadingp
+function Sloop.SteppedDriver(self, player)
+	local IKP = player.IKP
+	local Part0 = self.MotorSteeringWheel.Part0
+	local springHeadingValue = self.SpringHeadingValue
 	IKP.RightArm = Part0.CFrame * Vector3.new(0.15, 0, -1.5)
 	IKP.LeftArm = Part0.CFrame * Vector3.new(0.15, -0.1, 1.5)
-	IKP.RightWrist.Transform = CFrame.Angles(0, -1.5707963267948966 * (1 - SpringHeadingp), 0)
-	IKP.LeftWrist.Transform = CFrame.Angles(0, -1.5707963267948966 * (1 - SpringHeadingp), 0)
+	IKP.RightWrist.Transform = CFrame.Angles(0, -1.5707963267948966 * (1 - springHeadingValue), 0)
+	IKP.LeftWrist.Transform = CFrame.Angles(0, -1.5707963267948966 * (1 - springHeadingValue), 0)
 	R15IKv2.Arms(IKP)
 end
-function t2.HeartbeatDriver(p1, p2)
-	Boat.HeartbeatDriver(p1, p2)
+function Sloop.HeartbeatDriver(self, player)
+	Boat.HeartbeatDriver(self, player)
 	local headingValue, headingAngle, forwardMagnitude
-	if p2.Local then
-		headingValue = p1.SpringSlowHeadingp + p1.SwayY
-		headingAngle = p1.SpringHeadingp
-		local sailFactor = math.abs(p1.SpringForwardp)
-		local sailSize = math.abs(p1.SpringHeadingp) * 0.5 + 0.5
-		p1.MotorSail.C1 = CFrame.new(0, 0, -sailSize * 0.5)
-		p1.PartSailBack.Size = p1.PartSailBackSize + Vector3.new(0, 0, sailSize)
+	if player.Local then
+		headingValue = self.SpringSlowHeadingValue + self.SwayY
+		headingAngle = self.SpringHeadingValue
+		local sailFactor = math.abs(self.SpringForwardValue)
+		local sailSize = math.abs(self.SpringHeadingValue) * 0.5 + 0.5
+		self.MotorSail.C1 = CFrame.new(0, 0, -sailSize * 0.5)
+		self.PartSailBack.Size = self.PartSailBackSize + Vector3.new(0, 0, sailSize)
 		forwardMagnitude = sailFactor
 	else
-		headingValue = p1.SpringSlowHeadingp
-		headingAngle = p1.SpringHeadingp
-		forwardMagnitude = math.abs(p1.SpringForwardp)
+		headingValue = self.SpringSlowHeadingValue
+		headingAngle = self.SpringHeadingValue
+		forwardMagnitude = math.abs(self.SpringForwardValue)
 	end
-	p1.MastMotor.C1 = CFrame.Angles(0, -headingValue * math.pi * 0.05, 0)
-	p1.MotorSteeringWheel.C1 = p1.MotorSteeringWheel.C0:Inverse() * CFrame.Angles(headingAngle * math.pi * 0.3, 0, 0) * p1.MotorSteeringWheel.C0
-	p1.SoundCreak.Volume = 1 * (0.75 + 0.25 * forwardMagnitude)
-	p1.SoundWater.Volume = 1 * (0.25 + 0.75 * forwardMagnitude)
-	if math.abs(p1.Heading) > 0.5 then
-		local headingSign = math.sign(p1.Heading)
-		if p1.LastHeadingSign ~= headingSign then
-			p1.LastHeadingSign = headingSign
-			Audio.ObjectLocal(p1.PartSailBack, 4828088801, {
+	self.MastMotor.C1 = CFrame.Angles(0, -headingValue * math.pi * 0.05, 0)
+	self.MotorSteeringWheel.C1 = self.MotorSteeringWheel.C0:Inverse() * CFrame.Angles(headingAngle * math.pi * 0.3, 0, 0) * self.MotorSteeringWheel.C0
+	self.SoundCreak.Volume = 1 * (0.75 + 0.25 * forwardMagnitude)
+	self.SoundWater.Volume = 1 * (0.25 + 0.75 * forwardMagnitude)
+	if math.abs(self.Heading) > 0.5 then
+		local headingSign = math.sign(self.Heading)
+		if self.LastHeadingSign ~= headingSign then
+			self.LastHeadingSign = headingSign
+			Audio.ObjectLocal(self.PartSailBack, 4828088801, {
 				Volume = 0.8
 			})
 		end
 	end
-	local velocityMagnitude = p1.PartBase.Velocity.Magnitude
-	local wakeEnabled = if p1.SpringForwardp > 0 then velocityMagnitude > 20 else false
-	local mistEnabled = if p1.SpringForwardp > 0 then velocityMagnitude > 30 else false
-	if p1.ParticleWake.Enabled ~= wakeEnabled then
-		p1.ParticleWake.Enabled = wakeEnabled
+	local velocityMagnitude = self.PartBase.Velocity.Magnitude
+	local wakeEnabled = if self.SpringForwardValue > 0 then velocityMagnitude > 20 else false
+	local mistEnabled = if self.SpringForwardValue > 0 then velocityMagnitude > 30 else false
+	if self.ParticleWake.Enabled ~= wakeEnabled then
+		self.ParticleWake.Enabled = wakeEnabled
 	end
-	if p1.ParticleMist.Enabled ~= mistEnabled then
-		p1.ParticleMist.Enabled = mistEnabled
+	if self.ParticleMist.Enabled ~= mistEnabled then
+		self.ParticleMist.Enabled = mistEnabled
 	end
 end
-return t2
+return Sloop

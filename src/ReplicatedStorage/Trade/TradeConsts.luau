@@ -1,8 +1,7 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-local t = {
+local TradeConstants = {
 	OTHER_TRADE_SERVER_LIST_REGION_TAG_NAME = "OtherTradeServerList",
 	MAX_TRADE_SERVER_SIZE = Players.MaxPlayers,
 	TRADE_SERVER_DATA_UPDATE_INTERVAL = 30,
@@ -51,14 +50,14 @@ local t = {
 		Safe = true
 	}
 }
-local function toUnix(p1)
-	return DateTime.fromUniversalTime(p1.year, p1.month, p1.day, p1.hour - -4).UnixTimestamp
+local function toUnix(dateTable)
+	return DateTime.fromUniversalTime(dateTable.year, dateTable.month, dateTable.day, dateTable.hour - -4).UnixTimestamp
 end
-local t2 = {
+local tradeUpdateDate = {
 	year = 2022,
 	month = 6,
 	day = 10,
 	hour = 20
 }
-t.TRADE_UPDATE_UNIX_TIMESTAMP = DateTime.fromUniversalTime(t2.year, t2.month, t2.day, t2.hour - -4).UnixTimestamp
-return TableUtils.requireValidIndexAndFreeze(t)
+TradeConstants.TRADE_UPDATE_UNIX_TIMESTAMP = DateTime.fromUniversalTime(tradeUpdateDate.year, tradeUpdateDate.month, tradeUpdateDate.day, tradeUpdateDate.hour - -4).UnixTimestamp
+return TableUtils.requireValidIndexAndFreeze(TradeConstants)

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Util = require(script.Parent.Parent.Shared.Util)
 local sequenceType = Util.MakeSequenceType({
 	Prefixes = "# hexColor3 ! brickColor3",

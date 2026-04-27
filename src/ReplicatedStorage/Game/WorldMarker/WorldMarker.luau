@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Anim = require(ReplicatedStorage.Module.Anim)
@@ -17,35 +16,35 @@ local function GetRootPart()
 		end
 	end
 end
-local t = {
+local radiusThresholds = {
 	4,
 	{ 48, 0 },
 	{ 192, 24 },
 	{ (1 / 0), 8 }
 }
-local t2 = {}
-t2.__index = t2
-function t2.new()
-	local t3 = {}
-	setmetatable(t3, t2)
-	t3._maid = Maid.new()
-	t3.ScreenGui = nil
-	t3.Position = nil
-	t3.Radius = 8
-	t3.AnimRadius = nil
-	t3.StartRadius = nil
-	t3.EndRadius = nil
-	t3.Enabled = false
-	local WorldMarker = Instance.new("ImageLabel")
-	WorldMarker.BorderSizePixel = 0
-	WorldMarker.BackgroundTransparency = 1
-	WorldMarker.ImageColor3 = Color3.new(0/255, 0/255, 0/255)
-	WorldMarker.Image = "rbxassetid://2819326547"
-	WorldMarker.AnchorPoint = Vector2.new(0.5, 0.5)
-	WorldMarker.ZIndex = 1
-	WorldMarker.Name = "WorldMarker"
-	t3.Frame = WorldMarker
-	t3._maid:GiveTask(t3.Frame)
+local WorldMarker = {}
+WorldMarker.__index = WorldMarker
+function WorldMarker.new()
+	local self = {}
+	setmetatable(self, WorldMarker)
+	self._maid = Maid.new()
+	self.ScreenGui = nil
+	self.Position = nil
+	self.Radius = 8
+	self.AnimRadius = nil
+	self.StartRadius = nil
+	self.EndRadius = nil
+	self.Enabled = false
+	local WorldMarkerFrame = Instance.new("ImageLabel")
+	WorldMarkerFrame.BorderSizePixel = 0
+	WorldMarkerFrame.BackgroundTransparency = 1
+	WorldMarkerFrame.ImageColor3 = Color3.new(0/255, 0/255, 0/255)
+	WorldMarkerFrame.Image = "rbxassetid://2819326547"
+	WorldMarkerFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+	WorldMarkerFrame.ZIndex = 1
+	WorldMarkerFrame.Name = "WorldMarker"
+	self.Frame = WorldMarkerFrame
+	self._maid:GiveTask(self.Frame)
 	local ImageLabel = Instance.new("ImageLabel")
 	ImageLabel.BorderSizePixel = 0
 	ImageLabel.BackgroundTransparency = 1
@@ -55,30 +54,30 @@ function t2.new()
 	ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 	ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 	ImageLabel.ZIndex = 2
-	ImageLabel.Parent = WorldMarker
-	t3.FrameInner = ImageLabel
-	t3:SetSizes(t)
-	t3:SetRadius(t3.Radius)
-	t3:SetEnabled(true)
-	return t3
+	ImageLabel.Parent = WorldMarkerFrame
+	self.FrameInner = ImageLabel
+	self:SetSizes(radiusThresholds)
+	self:SetRadius(self.Radius)
+	self:SetEnabled(true)
+	return self
 end
-function t2.SetSizes(p1, p2)
-	p2 = p2 or t
-	p1._sizes = p2
+function WorldMarker.SetSizes(self, sizes)
+	sizes = sizes or radiusThresholds
+	self._sizes = sizes
 end
-function t2.SetEnabled(p1, p2)
-	p1.Enabled = p2
-	p1.Frame.Visible = p2
-	if p1.Frame.Name == "ImportantLocationMarker" then
-		print("setting enabled", p2)
+function WorldMarker.SetEnabled(self, isEnabled)
+	self.Enabled = isEnabled
+	self.Frame.Visible = isEnabled
+	if self.Frame.Name == "ImportantLocationMarker" then
+		print("setting enabled", isEnabled)
 	end
 end
-function t2.SetScreenGui(p1, p2)
-	p1.ScreenGui = p2
-	p1.Frame.Parent = p1.ScreenGui
+function WorldMarker.SetScreenGui(self, screenGui)
+	self.ScreenGui = screenGui
+	self.Frame.Parent = self.ScreenGui
 end
-function t2.CreateFrameIcon(p1)
-	assert(p1.FrameIcon == nil)
+function WorldMarker.CreateFrameIcon(self)
+	assert(self.FrameIcon == nil)
 	local ImageLabel = Instance.new("ImageLabel")
 	ImageLabel.BorderSizePixel = 0
 	ImageLabel.BackgroundTransparency = 1
@@ -86,165 +85,165 @@ function t2.CreateFrameIcon(p1)
 	ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 	ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 	ImageLabel.ZIndex = 3
-	ImageLabel.Parent = p1.FrameInner
-	p1.FrameIcon = ImageLabel
+	ImageLabel.Parent = self.FrameInner
+	self.FrameIcon = ImageLabel
 end
-function t2.DestroyFrameIcon(p1)
-	assert(p1.FrameIcon ~= nil)
-	p1.FrameIcon:Destroy()
-	p1.FrameIcon = nil
+function WorldMarker.DestroyFrameIcon(self)
+	assert(self.FrameIcon ~= nil)
+	self.FrameIcon:Destroy()
+	self.FrameIcon = nil
 end
-function t2.SetIcon(p1, p2, p3)
-	if p2 == nil then
-		if p1.FrameIcon ~= nil then
-			p1:DestroyFrameIcon()
+function WorldMarker.SetIcon(self, assetId, color)
+	if assetId == nil then
+		if self.FrameIcon ~= nil then
+			self:DestroyFrameIcon()
 		end
 	else
-		if p1.FrameIcon == nil then
-			p1:CreateFrameIcon()
+		if self.FrameIcon == nil then
+			self:CreateFrameIcon()
 		end
-		p1.FrameIcon.Image = ("rbxassetid://%d"):format(p2)
-		if p3 then
-			p1.FrameIcon.ImageColor3 = p3
+		self.FrameIcon.Image = ("rbxassetid://%d"):format(assetId)
+		if color then
+			self.FrameIcon.ImageColor3 = color
 		end
-		p1:SetRadius(p1.Radius)
+		self:SetRadius(self.Radius)
 	end
 end
-function t2.SetPosition(p1, p2)
-	p1.Position = p2
+function WorldMarker.SetPosition(self, position)
+	self.Position = position
 end
-function t2.GetPosition(p1)
-	return p1.Position
+function WorldMarker.GetPosition(self)
+	return self.Position
 end
-function t2.SetRadius(p1, p2)
-	p1.Radius = p2
-	p1.Frame.Size = UDim2.new(0, 2 * p2, 0, 2 * p2)
-	if p1.FrameIcon ~= nil then
-		if p2 < 8 then
-			if p1.FrameIcon.Visible == true then
-				p1.FrameIcon.Visible = false
+function WorldMarker.SetRadius(self, radius)
+	self.Radius = radius
+	self.Frame.Size = UDim2.new(0, 2 * radius, 0, 2 * radius)
+	if self.FrameIcon ~= nil then
+		if radius < 8 then
+			if self.FrameIcon.Visible == true then
+				self.FrameIcon.Visible = false
 			end
-		elseif p1.FrameIcon.Visible == false then
-			p1.FrameIcon.Visible = true
+		elseif self.FrameIcon.Visible == false then
+			self.FrameIcon.Visible = true
 		end
 	end
 end
-function t2.AnimateRadius(p1, p2)
-	if p1.AnimRadius ~= nil then
-		p1.AnimRadius:Destroy()
-		p1.AnimRadius = nil
+function WorldMarker.AnimateRadius(self, targetRadius)
+	if self.AnimRadius ~= nil then
+		self.AnimRadius:Destroy()
+		self.AnimRadius = nil
 	end
-	p1.StartRadius = p1.Radius
-	p1.EndRadius = p2
-	local v1 = Anim.new(0.1)
-	v1.OnCompleted:Connect(function()
-		p1.AnimRadius:Destroy()
-		p1.AnimRadius = nil
-		p1:SetRadius(p1.EndRadius)
+	self.StartRadius = self.Radius
+	self.EndRadius = targetRadius
+	local radiusAnimation = Anim.new(0.1)
+	radiusAnimation.OnCompleted:Connect(function()
+		self.AnimRadius:Destroy()
+		self.AnimRadius = nil
+		self:SetRadius(self.EndRadius)
 	end)
-	p1.AnimRadius = v1
+	self.AnimRadius = radiusAnimation
 end
-function t2.SetAdornee(p1, p2)
-	p1._adornee = p2
-	p1.Position = p1._adornee.Position
+function WorldMarker.SetAdornee(self, adornee)
+	self._adornee = adornee
+	self.Position = self._adornee.Position
 end
-function t2.GetAdornee(p1)
-	return p1._adornee
+function WorldMarker.GetAdornee(self)
+	return self._adornee
 end
-function t2.Update(p1)
-	if p1.Enabled then
-		local AbsoluteSize = p1.ScreenGui.AbsoluteSize
+function WorldMarker.Update(self)
+	if self.Enabled then
+		local AbsoluteSize = self.ScreenGui.AbsoluteSize
 		local X = AbsoluteSize.X
 		local Y = AbsoluteSize.Y
-		if p1._adornee then
-			p1.Position = p1._adornee.Position
+		if self._adornee then
+			self.Position = self._adornee.Position
 		end
-		if p1.Position then
-			local v1 = CurrentCamera:WorldToViewportPoint(p1.Position)
-			local X_2 = v1.X
-			local Y_2 = v1.Y
-			local v3 = p1.Radius + 4
-			local v4 = p1.Radius + 4
-			local v5
-			if X_2 < v3 then
-				X_2 = v3
-				v5 = true
+		if self.Position then
+			local viewportPoint = CurrentCamera:WorldToViewportPoint(self.Position)
+			local X_2 = viewportPoint.X
+			local Y_2 = viewportPoint.Y
+			local minX = self.Radius + 4
+			local minY = self.Radius + 4
+			local isOutOfBounds
+			if X_2 < minX then
+				X_2 = minX
+				isOutOfBounds = true
 			else
-				v5 = false
+				isOutOfBounds = false
 			end
-			if X - v3 < X_2 then
-				X_2 = X - v3
-				v5 = true
+			if X - minX < X_2 then
+				X_2 = X - minX
+				isOutOfBounds = true
 			end
-			if Y_2 < v4 then
-				Y_2 = v4
-				v5 = true
+			if Y_2 < minY then
+				Y_2 = minY
+				isOutOfBounds = true
 			end
-			if Y - v4 < Y_2 then
-				Y_2 = Y - v4
-				v5 = true
+			if Y - minY < Y_2 then
+				Y_2 = Y - minY
+				isOutOfBounds = true
 			end
-			local v6, v7
-			if v1.Z < 0 then
-				v5 = true
-				v6 = X - X_2
-				v7 = Y - Y_2
-				if math.min(v6, X_2) < math.min(v7, Y_2) then
-					if v6 < X_2 then
-						v6 = v3
+			local frameX, frameY
+			if viewportPoint.Z < 0 then
+				isOutOfBounds = true
+				frameX = X - X_2
+				frameY = Y - Y_2
+				if math.min(frameX, X_2) < math.min(frameY, Y_2) then
+					if frameX < X_2 then
+						frameX = minX
 					else
-						v6 = X - v3
+						frameX = X - minX
 					end
-				elseif v7 < Y_2 then
-					v7 = v4
+				elseif frameY < Y_2 then
+					frameY = minY
 				else
-					v7 = Y - v4
+					frameY = Y - minY
 				end
 			else
-				v7 = Y_2
-				v6 = X_2
+				frameY = Y_2
+				frameX = X_2
 			end
-			p1.Frame.Position = UDim2.new(0, v6, 0, v7)
-			local v8 = (1 / 0)
+			self.Frame.Position = UDim2.new(0, frameX, 0, frameY)
+			local distanceToPlayer = (1 / 0)
 			local Character = LocalPlayer.Character
-			local v9
+			local playerRootPart
 			if Character == nil then
-				v9 = nil
+				playerRootPart = nil
 			else
 				local Humanoid = Character:FindFirstChild("Humanoid")
-				v9 = if Humanoid == nil then nil else Humanoid.RootPart
+				playerRootPart = if Humanoid == nil then nil else Humanoid.RootPart
 			end
-			if v9 then
-				v8 = (v9.Position - p1.Position).Magnitude
+			if playerRootPart then
+				distanceToPlayer = (playerRootPart.Position - self.Position).Magnitude
 			end
-			local v10 = nil
-			if v5 then
-				v10 = p1._sizes[1]
+			local targetRadius = nil
+			if isOutOfBounds then
+				targetRadius = self._sizes[1]
 			else
-				for i = 2, #p1._sizes do
-					local v12 = p1._sizes[i][2]
-					if v8 <= p1._sizes[i][1] then
-						v10 = v12
+				for i = 2, #self._sizes do
+					local distanceThreshold = self._sizes[i][2]
+					if distanceToPlayer <= self._sizes[i][1] then
+						targetRadius = distanceThreshold
 						break
 					end
 				end
 			end
-			assert(v10)
-			if p1.EndRadius ~= v10 then
-				p1:AnimateRadius(v10)
+			assert(targetRadius)
+			if self.EndRadius ~= targetRadius then
+				self:AnimateRadius(targetRadius)
 			end
-			if p1.AnimRadius ~= nil then
-				local v13 = p1.AnimRadius:Update()
-				p1:SetRadius(p1.StartRadius * (1 - v13) + p1.EndRadius * v13)
+			if self.AnimRadius ~= nil then
+				local animationProgress = self.AnimRadius:Update()
+				self:SetRadius(self.StartRadius * (1 - animationProgress) + self.EndRadius * animationProgress)
 			end
 		end
 	end
 end
-function t2.Destroy(p1)
-	p1._maid:Destroy()
-	p1._maid = nil
-	p1.ScreenGui = nil
-	p1.Position = nil
-	setmetatable(p1, nil)
+function WorldMarker.Destroy(self)
+	self._maid:Destroy()
+	self._maid = nil
+	self.ScreenGui = nil
+	self.Position = nil
+	setmetatable(self, nil)
 end
-return t2
+return WorldMarker

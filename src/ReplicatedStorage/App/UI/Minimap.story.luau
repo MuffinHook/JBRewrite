@@ -1,9 +1,7 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-return function(p1)
+return function(container)
 	local AppComponent = Roact.Component:extend("App")
 	require(ReplicatedStorage.App.store)
 	local Minimap = require(script.Parent.Minimap)
@@ -79,7 +77,7 @@ return function(p1)
 		})
 	end
 	function AppComponent.willUnmount(self)end
-	local mountedComponent = Roact.mount(Roact.createElement(AppComponent), p1)
+	local mountedComponent = Roact.mount(Roact.createElement(AppComponent), container)
 	return function()
 		Roact.unmount(mountedComponent)
 	end

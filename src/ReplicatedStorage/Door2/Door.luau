@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

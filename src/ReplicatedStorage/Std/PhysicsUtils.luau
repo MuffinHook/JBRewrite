@@ -1,21 +1,19 @@
--- Reviewed by Claude
--- variables reassigned
-local t = {
-	calculateVelocityForDesiredDistance = function(p1, p2, p3)
-		assert(typeof(p1) == "number")
-		assert(typeof(p2) == "number")
-		assert(typeof(p3) == "number")
-		if p2 / p3 < 0 then
-			return -p2 + math.sqrt(-p3 * 2 * (p2 ^ 2 / (-p3 * 2) + p1))
+local PhysicsUtils = {
+	calculateVelocityForDesiredDistance = function(distance, initialVelocity, acceleration)
+		assert(typeof(distance) == "number")
+		assert(typeof(initialVelocity) == "number")
+		assert(typeof(acceleration) == "number")
+		if initialVelocity / acceleration < 0 then
+			return -initialVelocity + math.sqrt(-acceleration * 2 * (initialVelocity ^ 2 / (-acceleration * 2) + distance))
 		else
-			return -p2 + math.sqrt(-p3 * 2 * p1)
+			return -initialVelocity + math.sqrt(-acceleration * 2 * distance)
 		end
 	end
 }
-function t.calculateVelocityForDesiredHeight(p1, p2)
-	return t.calculateVelocityForDesiredDistance(p1, p2, -workspace.Gravity)
+function PhysicsUtils.calculateVelocityForDesiredHeight(height, gravity)
+	return PhysicsUtils.calculateVelocityForDesiredDistance(height, gravity, -workspace.Gravity)
 end
-function t.calculateTimeForDesiredHeight(p1)
-	return math.sqrt(p1 * 2 / workspace.Gravity)
+function PhysicsUtils.calculateTimeForDesiredHeight(height)
+	return math.sqrt(height * 2 / workspace.Gravity)
 end
-return t
+return PhysicsUtils

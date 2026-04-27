@@ -1,12 +1,11 @@
--- Reviewed by Claude
 local HttpService = game:GetService("HttpService")
-return function(p1)
-	p1:RegisterType("json", {
-		Validate = function(p1)
-			return pcall(HttpService.JSONDecode, HttpService, p1)
+return function(typeRegistry)
+	typeRegistry:RegisterType("json", {
+		Validate = function(jsonString)
+			return pcall(HttpService.JSONDecode, HttpService, jsonString)
 		end,
-		Parse = function(p1)
-			return HttpService:JSONDecode(p1)
+		Parse = function(jsonString)
+			return HttpService:JSONDecode(jsonString)
 		end
 	})
 end

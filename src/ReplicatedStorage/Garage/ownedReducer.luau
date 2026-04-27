@@ -1,13 +1,11 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
 	setCategoryItemOwned = function(state, action)
 		assert(action.category ~= nil, "missing category")
 		assert(action.name ~= nil, "missing name")
 		local stateCopy = {}
-		for k, v in pairs(state) do
-			stateCopy[k] = v
+		for categoryKey, categoryState in pairs(state) do
+			stateCopy[categoryKey] = categoryState
 		end
 		if not stateCopy[action.category] then
 			stateCopy[action.category] = {}

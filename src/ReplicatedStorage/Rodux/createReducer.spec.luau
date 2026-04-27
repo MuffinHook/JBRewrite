@@ -1,84 +1,83 @@
--- Reviewed by Claude
 return function()
 	local createReducer = require(script.Parent.createReducer)
 	it("should handle actions", function()
- local v1 = createReducer({
+ local reducer = createReducer({
  a = 0,
  b = 0
  }, {
- a = function(p1, p2)
+ a = function(state, action)
  return {
- a = p1.a + 1,
- b = p1.b
+ a = state.a + 1,
+ b = state.b
  }
  end,
- b = function(p1, p2)
+ b = function(state, action)
  return {
- a = p1.a,
- b = p1.b + 2
+ a = state.a,
+ b = state.b + 2
  }
  end
  })
- local v2 = v1({
+ local nextState = reducer({
  a = 0,
  b = 0
  }, {
  type = "a"
  })
- expect(v2.a).to.equal(1)
- expect(v1(v2, {
+ expect(nextState.a).to.equal(1)
+ expect(reducer(nextState, {
  type = "b"
  }).b).to.equal(2)
 	end)
 	it("should return the initial state if the state is nil", function()
- local v1 = createReducer({
+ local resultState = createReducer({
  a = 0,
  b = 0
  }, {})(nil, {})
- expect(v1).to.be.ok()
- expect(v1.a).to.equal(0)
- expect(v1.b).to.equal(0)
+ expect(resultState).to.be.ok()
+ expect(resultState.a).to.equal(0)
+ expect(resultState.b).to.equal(0)
 	end)
 	it("should still run action handlers if the state is nil", function()
- local v1 = 0
- local v2 = createReducer(0, {
- foo = function(p1, p2)
- v1 = v1 + 1
+ local callCount = 0
+ local reducer = createReducer(0, {
+ foo = function(state, action)
+ callCount = callCount + 1
  return nil
  end
  })
- expect(v1).to.equal(0)
- local v3 = v2(nil, {
+ expect(callCount).to.equal(0)
+ local resultState = reducer(nil, {
  type = "foo"
  })
- expect(v1).to.equal(1)
- expect(v3).to.equal(nil)
- local v4 = v2(v3, {
+ expect(callCount).to.equal(1)
+ expect(resultState).to.equal(nil)
+ local secondResult = reducer(resultState, {
  type = "foo"
  })
- expect(v1).to.equal(2)
- expect(v4).to.equal(nil)
+ expect(callCount).to.equal(2)
+ expect(secondResult).to.equal(nil)
 	end)
 	it("should return the same state if the action is not handled", function()
- local t = {
+ local initialState = {
  a = 0,
  b = 0
  }
- expect((createReducer(t, {
- a = function(p1, p2)
+ expect((createReducer(initialState, {
+ a = function(state, action)
  return {
- a = p1.a + 1,
- b = p1.b
+ a = state.a + 1,
+ b = state.b
  }
  end,
- b = function(p1, p2)
+ b = function(state, action)
  return {
- a = p1.a,
- b = p1.b + 2
+ a = state.a,
+ b = state.b + 2
  }
  end
- })(t, {
+ })(initialState, {
  type = "c"
- }))).to.equal(t)
+ }))).to.equal(initialState)
 	end)
 end

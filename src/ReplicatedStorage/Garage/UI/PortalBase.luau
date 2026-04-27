@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Checkbox = require(ReplicatedStorage.EzUi.Checkbox)
@@ -14,84 +13,84 @@ local CustomizeItem = require(script.Parent.CustomizeItem)
 local EnumSort = require(script.Parent.Parent.EnumSort)
 local GarageConsts = require(script.Parent.Parent.GarageConsts)
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
-local v1 = Roact.PureComponent:extend("PortalBase")
-function v1.init(p1)
-	local v1, v2 = Roact.createBinding(p1.props.title)
-	p1.titleBinding = v1
-	p1.updateTitleBinding = v2
-	p1.maid = Maid.new()
-	p1.searchRef = Roact.createRef()
-	p1:setState({
+local PortalBase = Roact.PureComponent:extend("PortalBase")
+function PortalBase.init(self)
+	local titleBinding, updateTitleBinding = Roact.createBinding(self.props.title)
+	self.titleBinding = titleBinding
+	self.updateTitleBinding = updateTitleBinding
+	self.maid = Maid.new()
+	self.searchRef = Roact.createRef()
+	self:setState({
 		search = "",
 		aerialEnabled = false
 	})
 end
-function v1.render(p1)
-	local portalRatio = p1.props.portalRatio
-	local paddingRatio = p1.props.paddingRatio
-	local v1 = portalRatio * 10
-	local cornerPixel = p1.props.cornerPixel
-	local v2 = 1 / (1 / portalRatio - 1 / v1 - 1 / paddingRatio)
-	local v3 = 0.125 / v1
-	local v4 = 4.5 / v1
-	local v7 = 1 - 5 * v3 - 2 * v4
-	local v9 = nil
-	if p1.props.sortId == EnumSort.Alphabetical then
-		v9 = "ALPHABETICAL"
-	elseif p1.props.sortId == EnumSort.Newest then
-		v9 = "NEWEST"
-	elseif p1.props.sortId == EnumSort.Price then
-		v9 = "EXPENSIVE"
-	elseif p1.props.sortId == EnumSort.PriceLow then
-		v9 = "LOWEST"
-	elseif p1.props.sortId == EnumSort.Popular then
-		v9 = "POPULAR"
+function PortalBase.render(self)
+	local portalRatio = self.props.portalRatio
+	local paddingRatio = self.props.paddingRatio
+	local searchAreaRatio = portalRatio * 10
+	local cornerPixel = self.props.cornerPixel
+	local gridAspectRatio = 1 / (1 / portalRatio - 1 / searchAreaRatio - 1 / paddingRatio)
+	local smallSpacing = 0.125 / searchAreaRatio
+	local buttonSpacing = 4.5 / searchAreaRatio
+	local sortAreaWidth = 1 - 5 * smallSpacing - 2 * buttonSpacing
+	local sortDisplayText = nil
+	if self.props.sortId == EnumSort.Alphabetical then
+		sortDisplayText = "ALPHABETICAL"
+	elseif self.props.sortId == EnumSort.Newest then
+		sortDisplayText = "NEWEST"
+	elseif self.props.sortId == EnumSort.Price then
+		sortDisplayText = "EXPENSIVE"
+	elseif self.props.sortId == EnumSort.PriceLow then
+		sortDisplayText = "LOWEST"
+	elseif self.props.sortId == EnumSort.Popular then
+		sortDisplayText = "POPULAR"
 	end
-	local items = p1.props.items
-	local metadata = p1.props.metadata
-	local search = p1.state.search
-	local aerialEnabled = p1.state.aerialEnabled
-	local function shouldShow(p12, p2, p3)
-		local v1 = (p3 or ""):lower():gsub(" ", "")
-		local v3 = #v1 > 0
-		local v4 = v3 and string.find((p12.title or ""):lower():gsub(" ", ""), v1, 1, true) ~= nil
-		local v5 = not p1.props.showFavorited or p2.faved
-		local v6 = p1.props.showAll and not p12.hiddenAll or (p12.available or p2.owned)
-		local v7
+	local items = self.props.items
+	local metadata = self.props.metadata
+	local search = self.state.search
+	local aerialEnabled = self.state.aerialEnabled
+	local function shouldShow(itemData, itemMetadata, searchTerm)
+		local searchTermNormalized = (searchTerm or ""):lower():gsub(" ", "")
+		local hasSearchTerm = #searchTermNormalized > 0
+		local titleMatches = hasSearchTerm and string.find((itemData.title or ""):lower():gsub(" ", ""), searchTermNormalized, 1, true) ~= nil
+		local passesShowFilter = not self.props.showFavorited or itemMetadata.faved
+		local passesAvailabilityFilter = self.props.showAll and not itemData.hiddenAll or (itemData.available or itemMetadata.owned)
+		local passesAerialFilter
 		if aerialEnabled then
-			v7 = if aerialEnabled and p12.vehicleType == "Heli" then true elseif p1.props.title == "SPAWN" then RunUtils.isTradeWorld() else true
+			passesAerialFilter = if aerialEnabled and itemData.vehicleType == "Heli" then true elseif self.props.title == "SPAWN" then RunUtils.isTradeWorld() else true
 		else
-			v7 = not p12.aerialOnly
-			if not v7 then
-				v7 = if aerialEnabled and p12.vehicleType == "Heli" then true elseif p1.props.title == "SPAWN" then RunUtils.isTradeWorld() else true
+			passesAerialFilter = not itemData.aerialOnly
+			if not passesAerialFilter then
+				passesAerialFilter = if aerialEnabled and itemData.vehicleType == "Heli" then true elseif self.props.title == "SPAWN" then RunUtils.isTradeWorld() else true
 			end
 		end
-		if v3 then
-			return v5 and (v6 and (v4 and v7))
+		if hasSearchTerm then
+			return passesShowFilter and (passesAvailabilityFilter and (titleMatches and passesAerialFilter))
 		else
-			return v5 and (v6 and v7)
+			return passesShowFilter and (passesAvailabilityFilter and passesAerialFilter)
 		end
 	end
-	local t = {}
-	local t2 = {}
+	local filteredMetadata = {}
+	local filteredItems = {}
 	for i = 1, #items do
-		local v10 = items[i]
-		local v11 = metadata[i]
-		if shouldShow(v10, v11, search) then
-			local v12 = #t2 + 1
-			t2[v12] = v10
-			t[v12] = v11
+		local itemData = items[i]
+		local itemMetadata = metadata[i]
+		if shouldShow(itemData, itemMetadata, search) then
+			local filteredIndex = #filteredItems + 1
+			filteredItems[filteredIndex] = itemData
+			filteredMetadata[filteredIndex] = itemMetadata
 		end
 	end
-	p1:_updateTitle()
-	local t3 = {
+	self:_updateTitle()
+	local mainFrameProps = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
 		Size = UDim2.new(1, 0, 1, 0),
 		LayoutOrder = 3
 	}
-	local t4 = {
+	local containerProps = {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = portalRatio
 		}),
@@ -102,47 +101,47 @@ function v1.render(p1)
 			FillDirection = Enum.FillDirection.Vertical
 		})
 	}
-	local t5 = {
+	local headerFrameProps = {
 		BackgroundTransparency = 0.4,
 		BorderSizePixel = 0,
 		BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
 		Size = UDim2.new(1, 0, 1, 0),
 		LayoutOrder = 1
 	}
-	local t6 = {
+	local headerChildProps = {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
-			AspectRatio = v1
+			AspectRatio = searchAreaRatio
 		}),
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, cornerPixel)
 		})
 	}
-	local t7 = {
+	local titleProps = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Size = UDim2.new(0.5, 0, 0.5, 0),
-		Position = UDim2.new(0.25 / v1, 0, 0.5, 0),
+		Position = UDim2.new(0.25 / searchAreaRatio, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(0, 0.5),
-		Text = p1.titleBinding,
+		Text = self.titleBinding,
 		Font = Enum.Font.LuckiestGuy,
 		LineHeight = 0.7,
 		TextScaled = true,
 		TextXAlignment = Enum.TextXAlignment.Left
 	}
-	t7.TextColor3 = if p1.props.title == SaleConsts.CATEGORY_NAME then Color3.new(1, 0.1, 0.1) else Color3.fromRGB(98, 222, 253)
-	t7.ZIndex = 4
-	t6.Title = createElement("TextLabel", t7, {
+	titleProps.TextColor3 = if self.props.title == SaleConsts.CATEGORY_NAME then Color3.new(1, 0.1, 0.1) else Color3.fromRGB(98, 222, 253)
+	titleProps.ZIndex = 4
+	headerChildProps.Title = createElement("TextLabel", titleProps, {
 		UIStroke = createElement("UIStroke", {
 			Color = Color3.new(0/255, 0/255, 0/255),
 			Thickness = 1
 		})
 	})
-	t6.OwnedCheckbox = p1.props.sortEnabled and createElement("Frame", {
+	headerChildProps.OwnedCheckbox = self.props.sortEnabled and createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 0.75, 0),
 		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1 - 7 * v3 - 2 * v4 - 0.75 / v1, 0, 0.5, 0)
+		Position = UDim2.new(1 - 7 * smallSpacing - 2 * buttonSpacing - 0.75 / searchAreaRatio, 0, 0.5, 0)
 	}, {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = 2
@@ -176,66 +175,66 @@ function v1.render(p1)
 		}, {
 			Checkbox = createElement(Checkbox, {
 				size = UDim2.new(1, 0, 1, 0),
-				value = p1.props.showAll,
-				onChecked = p1.props.onToggleAll
+				value = self.props.showAll,
+				onChecked = self.props.onToggleAll
 			})
 		})
 	})
-	local sortEnabled = p1.props.sortEnabled
+	local sortEnabled = self.props.sortEnabled
 	if sortEnabled then
-		local t8 = {
+		local starFrameProps = {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0.75, 0),
 			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(v7, 0, 0.5, 0)
+			Position = UDim2.new(sortAreaWidth, 0, 0.5, 0)
 		}
-		local t9 = {
+		local starContainerProps = {
 			AspectRatio = createElement("UIAspectRatioConstraint", {
 				AspectRatio = 1
 			})
 		}
-		local t10 = {
+		local starButtonProps = {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5)
 		}
-		t10.ImageColor3 = (p1.props.showFavorited or p1.state.favHover) and Color3.fromRGB(255, 251, 0) or Color3.new(0.7, 0.7, 0.7)
-		t10.Image = "rbxassetid://8552830996"
-		t10.ZIndex = 10
-		t10[Roact.Event.MouseEnter] = function()
-			p1:setState({
+		starButtonProps.ImageColor3 = (self.props.showFavorited or self.state.favHover) and Color3.fromRGB(255, 251, 0) or Color3.new(0.7, 0.7, 0.7)
+		starButtonProps.Image = "rbxassetid://8552830996"
+		starButtonProps.ZIndex = 10
+		starButtonProps[Roact.Event.MouseEnter] = function()
+			self:setState({
 				favHover = true
 			})
 		end
-		t10[Roact.Event.MouseLeave] = function()
-			p1:setState({
+		starButtonProps[Roact.Event.MouseLeave] = function()
+			self:setState({
 				favHover = false
 			})
 		end
-		t10[Roact.Event.SelectionGained] = function()
-			p1:setState({
+		starButtonProps[Roact.Event.SelectionGained] = function()
+			self:setState({
 				favHover = true
 			})
 		end
-		t10[Roact.Event.SelectionLost] = function()
-			p1:setState({
+		starButtonProps[Roact.Event.SelectionLost] = function()
+			self:setState({
 				favHover = false
 			})
 		end
-		t10[Roact.Event.Activated] = p1.props.onToggleFavorited
-		t9.Star = createElement("ImageButton", t10)
-		sortEnabled = createElement("Frame", t8, t9)
+		starButtonProps[Roact.Event.Activated] = self.props.onToggleFavorited
+		starContainerProps.Star = createElement("ImageButton", starButtonProps)
+		sortEnabled = createElement("Frame", starFrameProps, starContainerProps)
 	end
-	t6.FavoritedCheckbox = sortEnabled
-	t6.SortContainer = p1.props.sortEnabled and createElement("Frame", {
+	headerChildProps.FavoritedCheckbox = sortEnabled
+	headerChildProps.SortContainer = self.props.sortEnabled and createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 0.75, 0),
 		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1 - 3 * v3 - v4, 0, 0.5, 0)
+		Position = UDim2.new(1 - 3 * smallSpacing - buttonSpacing, 0, 0.5, 0)
 	}, {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = 6
@@ -275,7 +274,7 @@ function v1.render(p1)
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0, 0, 0, 0),
 				[Roact.Event.Activated] = function()
-					p1.props.onSelectSort(p1.props.sortId)
+					self.props.onSelectSort(self.props.sortId)
 				end
 			}, {
 				UICorner = createElement("UICorner", {
@@ -287,7 +286,7 @@ function v1.render(p1)
 					Size = UDim2.new(0.9, 0, 0.8, 0),
 					Position = UDim2.new(0.5, 0, 0.5, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
-					Text = v9,
+					Text = sortDisplayText,
 					Font = Enum.Font.Bangers,
 					LineHeight = 0.95,
 					TextScaled = true,
@@ -298,12 +297,12 @@ function v1.render(p1)
 			})
 		})
 	})
-	t6.SearchContainer = p1.props.sortEnabled and createElement("Frame", {
+	headerChildProps.SearchContainer = self.props.sortEnabled and createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 0.75, 0),
 		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1 - v3, 0, 0.5, 0)
+		Position = UDim2.new(1 - smallSpacing, 0, 0.5, 0)
 	}, {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = 6
@@ -322,15 +321,15 @@ function v1.render(p1)
 			TextColor3 = Color3.new(0/255, 0/255, 0/255),
 			PlaceholderColor3 = Color3.new(0.5, 0.5, 0.5),
 			ZIndex = 1,
-			[Roact.Ref] = p1.searchRef
+			[Roact.Ref] = self.searchRef
 		}, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(0, cornerPixel)
 			})
 		})
 	})
-	t4.Top = createElement("Frame", t5, t6)
-	t4.Padding1 = createElement("Frame", {
+	containerProps.Top = createElement("Frame", headerFrameProps, headerChildProps)
+	containerProps.Padding1 = createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
 		BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
@@ -341,7 +340,7 @@ function v1.render(p1)
 			AspectRatio = paddingRatio
 		})
 	})
-	t4.Body = createElement("Frame", {
+	containerProps.Body = createElement("Frame", {
 		BackgroundTransparency = 0.4,
 		BorderSizePixel = 0,
 		BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
@@ -349,76 +348,76 @@ function v1.render(p1)
 		LayoutOrder = 3
 	}, {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
-			AspectRatio = v2
+			AspectRatio = gridAspectRatio
 		}),
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, cornerPixel)
 		}),
 		ScrollingGrid = createElement(ScrollingGrid, {
-			aspectRatio = v2,
+			aspectRatio = gridAspectRatio,
 			paddingRatio = paddingRatio,
 			component = CustomizeItem,
-			items = t2,
-			metadata = t,
-			onSelectItem = p1.props.onSelectItem,
-			colsPerRow = p1.props.colsPerRow,
-			rowsPerPage = p1.props.rowsPerPage
+			items = filteredItems,
+			metadata = filteredMetadata,
+			onSelectItem = self.props.onSelectItem,
+			colsPerRow = self.props.colsPerRow,
+			rowsPerPage = self.props.rowsPerPage
 		})
 	})
-	return createElement("Frame", t3, t4)
+	return createElement("Frame", mainFrameProps, containerProps)
 end
-function v1._updateTitle(p1)
-	if p1.props.title == SaleConsts.CATEGORY_NAME then
-		p1.updateTitleBinding(SaleConsts.CATEGORY_NAME .. ": " .. SaleUtils.formatRemaining(SaleUtils.getTimeToNextSale()))
+function PortalBase._updateTitle(self)
+	if self.props.title == SaleConsts.CATEGORY_NAME then
+		self.updateTitleBinding(SaleConsts.CATEGORY_NAME .. ": " .. SaleUtils.formatRemaining(SaleUtils.getTimeToNextSale()))
 	else
-		p1.updateTitleBinding(p1.props.title)
+		self.updateTitleBinding(self.props.title)
 	end
 end
-function v1.didMount(p1)
-	p1.maid.updateTitle = Interval.every(1):Connect(function()
-		p1:_updateTitle()
+function PortalBase.didMount(self)
+	self.maid.updateTitle = Interval.every(1):Connect(function()
+		self:_updateTitle()
 	end)
-	local v1 = p1.searchRef:getValue()
-	if v1 then
-		p1.maid:GiveTask(v1:GetPropertyChangedSignal("Text"):Connect(function()
-			p1.maid.searchDelay = task.delay(0.1, function()
-				p1:setState({
-					search = v1.Text
+	local searchTextBox = self.searchRef:getValue()
+	if searchTextBox then
+		self.maid:GiveTask(searchTextBox:GetPropertyChangedSignal("Text"):Connect(function()
+			self.maid.searchDelay = task.delay(0.1, function()
+				self:setState({
+					search = searchTextBox.Text
 				})
 			end)
 		end))
 	end
 	if Players.LocalPlayer then
-		p1.maid:GiveTask(Players.LocalPlayer:GetAttributeChangedSignal(GarageConsts.AERIAL_SPAWN_ATTR_NAME):Connect(function()
-			local t = {}
-			t.aerialEnabled = Players.LocalPlayer:GetAttribute(GarageConsts.AERIAL_SPAWN_ATTR_NAME) == true
-			p1:setState(t)
+		self.maid:GiveTask(Players.LocalPlayer:GetAttributeChangedSignal(GarageConsts.AERIAL_SPAWN_ATTR_NAME):Connect(function()
+			local aerialStateUpdate = {}
+			aerialStateUpdate.aerialEnabled = Players.LocalPlayer:GetAttribute(GarageConsts.AERIAL_SPAWN_ATTR_NAME) == true
+			self:setState(aerialStateUpdate)
 		end))
-		if p1.state.aerialEnabled ~= Players.LocalPlayer:GetAttribute(GarageConsts.AERIAL_SPAWN_ATTR_NAME) then
-			local t = {}
-			t.aerialEnabled = Players.LocalPlayer:GetAttribute(GarageConsts.AERIAL_SPAWN_ATTR_NAME) == true
-			p1:setState(t)
+		if self.state.aerialEnabled ~= Players.LocalPlayer:GetAttribute(GarageConsts.AERIAL_SPAWN_ATTR_NAME) then
+			local aerialStateUpdate = {}
+			aerialStateUpdate.aerialEnabled = Players.LocalPlayer:GetAttribute(GarageConsts.AERIAL_SPAWN_ATTR_NAME) == true
+			self:setState(aerialStateUpdate)
 		end
 	end
 end
-function v1.willUnmount(p1)
-	p1.maid:DoCleaning()
+function PortalBase.willUnmount(self)
+	self.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(state, dispatch)
 	return {
-		sortId = p1.garageSort
+		sortId = state.garageSort
 	}
-end, function(p1)
+end, function(dispatch)
 	return {
-		onSelectSort = function(p12)
-			local count = 0
-			for v1 in EnumSort:GetEnumItems() do
-				count = count + 1
+		onSelectSort = function(sortId)
+			local sortItemCount = 0
+			for enumItem in EnumSort:GetEnumItems() do
+				sortItemCount = sortItemCount + 1
 			end
-			p1({
+			dispatch({
 				type = "setSort",
-				id = p12 % count + 1
+				id = sortId % sortItemCount + 1
 			})
 		end
 	}
-end)(v1)
+end)(PortalBase)

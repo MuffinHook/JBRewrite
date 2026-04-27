@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
@@ -36,48 +34,48 @@ function Drawbridge.AnimateToAngle(self, targetAngle, duration)
 			self.Event = nil
 			progress = 1
 		end
-		local easedValue, v32
+		local easedValue, fallbackProgress
 		if progress < 0.5 then
 			easedValue = 2 * progress * progress
 			if not easedValue then
-				v32 = progress
+				fallbackProgress = progress
 				easedValue = -1 - 2 * (progress - 2) * progress
 			end
 		else
-			v32 = progress
+			fallbackProgress = progress
 			easedValue = -1 - 2 * (progress - 2) * progress
 		end
 		self.Angle = Angle * (1 - easedValue) + targetAngle * easedValue
 		self.Model:PivotTo(self.HingeCF * CFrame.Angles(self.Angle, 0, 0))
 	end)
 end
-local t2 = {
-	_initSpawned = function(p1)
-		p1.Model = workspace:WaitForChild("Drawbridge", 5)
-		if p1.Model == nil then
+local DrawbridgeModule = {
+	_initSpawned = function(module)
+		module.Model = workspace:WaitForChild("Drawbridge", 5)
+		if module.Model == nil then
 			if RunUtils.isMainWorld() and not RunService:IsStudio() then
 				error("Missing `Drawbridge` in Workspace.")
 			else
 				return
 			end
 		end
-		p1.Door0 = Drawbridge.new(p1.Model.Model.RoadA.Bridge, p1.Model.Model.RoadA.Hinge)
+		module.Door0 = Drawbridge.new(module.Model.Model.RoadA.Bridge, module.Model.Model.RoadA.Hinge)
 	end
 }
-function t2.Init(p1)
-	task.spawn(t2._initSpawned, t2)
-	function p1.em.fbs2dwjk(p1)
-		if p1 then
-			t2.Open()
+function DrawbridgeModule.Init(module)
+	task.spawn(DrawbridgeModule._initSpawned, DrawbridgeModule)
+	function module.em.fbs2dwjk(module)
+		if module then
+			DrawbridgeModule.Open()
 		else
-			t2.Close()
+			DrawbridgeModule.Close()
 		end
 	end
 end
-function t2.Open()
-	t2.Door0:AnimateToAngle(0.9424777960769379, 10)
+function DrawbridgeModule.Open()
+	DrawbridgeModule.Door0:AnimateToAngle(0.9424777960769379, 10)
 end
-function t2.Close()
-	t2.Door0:AnimateToAngle(0, 10)
+function DrawbridgeModule.Close()
+	DrawbridgeModule.Door0:AnimateToAngle(0, 10)
 end
-return t2
+return DrawbridgeModule

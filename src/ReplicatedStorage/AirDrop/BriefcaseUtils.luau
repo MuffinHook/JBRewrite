@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BriefcaseConsts = require(ReplicatedStorage.AirDrop.BriefcaseConsts)
 local function getQuaternionBetween(upVector, targetVector, refVector)

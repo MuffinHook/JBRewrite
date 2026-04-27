@@ -1,9 +1,8 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local Enumer = require(ReplicatedStorage.Std.Enumer)
 local RunConsts = require(ReplicatedStorage.App.RunConsts)
-local t = {
+local animationTable = {
 	Idle = {
 		[RunConsts.QA_NAME] = "rbxassetid://11695577214",
 		[RunConsts.PROD_NAME] = "rbxassetid://11815296654"
@@ -33,9 +32,9 @@ local t = {
 		[RunConsts.PROD_NAME] = "rbxassetid://11815402638"
 	}
 }
-for v1, v2 in t do
-	v2[RunConsts.DEV_NAME] = v2[RunConsts.PROD_NAME]
-	v2[RunConsts.STUDIO_NAME] = v2[RunConsts.DEV_NAME]
+for animationName, animationData in animationTable do
+	animationData[RunConsts.DEV_NAME] = animationData[RunConsts.PROD_NAME]
+	animationData[RunConsts.STUDIO_NAME] = animationData[RunConsts.DEV_NAME]
 end
 return TableUtils.requireValidIndexAndFreeze({
 	TAG_NAME = "MansionBossNPC",
@@ -58,7 +57,7 @@ return TableUtils.requireValidIndexAndFreeze({
 	AURA_BLAST_PERCENT_HEALTH_TO_RECOVER = 20,
 	WALK_TO_DEST_DURATION = 2,
 	DAMAGE_SELF_REMOTE_NAME = "MansionBossNPCDamage",
-	ANIMATION = t,
+	ANIMATION = animationTable,
 	ANIMATION_LINEAR_VELOCITY = {
 		Walk = Vector2.new(0, 32),
 		Run = Vector2.new(0, 32)

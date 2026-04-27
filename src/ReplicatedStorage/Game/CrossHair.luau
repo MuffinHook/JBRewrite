@@ -1,12 +1,10 @@
--- Reviewed by Claude
--- variables reassigned
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Logic = require(ReplicatedStorage.Module.Logic)
-local function Update(p1, p2)
-	local springOffset = p1.Spring:Update()
-	local CrossHair = p1.Gui.CrossHair
-	local mousePos = p2 or UserInputService:GetMouseLocation()
+local function Update(crosshairConfig, overrideMousePos)
+	local springOffset = crosshairConfig.Spring:Update()
+	local CrossHair = crosshairConfig.Gui.CrossHair
+	local mousePos = overrideMousePos or UserInputService:GetMouseLocation()
 	local AbsoluteSize = CrossHair.AbsoluteSize
 	CrossHair.Position = UDim2.new(0, mousePos.X - AbsoluteSize.X * 0.5, 0, mousePos.Y - AbsoluteSize.Y * 0.5)
 	CrossHair.VerticalTop.Position = UDim2.new(0.5, 0, 0, -springOffset)
@@ -16,10 +14,10 @@ local function Update(p1, p2)
 end
 local redColor = Color3.new(255/255, 0/255, 0/255)
 local whiteColor = Color3.new(255/255, 255/255, 255/255)
-local function FlareCrossHair(p1)
-	local prevInt = p1.Int + 1
-	p1.Int = prevInt
-	local Gui = p1.Gui
+local function FlareCrossHair(crosshairConfig)
+	local updateCounter = crosshairConfig.Int + 1
+	crosshairConfig.Int = updateCounter
+	local Gui = crosshairConfig.Gui
 	if not Gui then
 		return false
 	end
@@ -33,7 +31,7 @@ local function FlareCrossHair(p1)
 	HorizontalLeft.BackgroundColor3 = redColor
 	HorizontalRight.BackgroundColor3 = redColor
 	delay(0.1, function()
-		if p1.Int == prevInt then
+		if crosshairConfig.Int == updateCounter then
 			VerticalTop.BackgroundColor3 = whiteColor
 			VerticalBottom.BackgroundColor3 = whiteColor
 			HorizontalLeft.BackgroundColor3 = whiteColor
@@ -41,22 +39,22 @@ local function FlareCrossHair(p1)
 		end
 	end)
 end
-local function ADS(p1, p2)
-	p1.Spring:SetTarget(if p2 then 2 else 5)
+local function ADS(crosshairConfig, isAiming)
+	crosshairConfig.Spring:SetTarget(if isAiming then 2 else 5)
 end
-local function EnableCrossHair(p1)
+local function EnableCrossHair(crosshairConfig)
 	UserInputService.MouseIconEnabled = false
-	p1.Gui.Enabled = true
+	crosshairConfig.Gui.Enabled = true
 end
-local function DisableCrossHair(p1)
+local function DisableCrossHair(crosshairConfig)
 	UserInputService.MouseIconEnabled = true
-	p1.Gui.Enabled = false
+	crosshairConfig.Gui.Enabled = false
 end
-local function DestroyCrossHair(p1)
+local function DestroyCrossHair(crosshairConfig)
 	UserInputService.MouseIconEnabled = true
-	p1.Gui.Enabled = false
-	p1.Gui:Destroy()
-	p1.Gui = nil
+	crosshairConfig.Gui.Enabled = false
+	crosshairConfig.Gui:Destroy()
+	crosshairConfig.Gui = nil
 end
 return {
 	Make = function()

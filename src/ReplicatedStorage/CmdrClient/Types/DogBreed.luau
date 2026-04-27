@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Util = require(ReplicatedStorage.CmdrClient.Shared.Util)
 local LIST_BREED = require(ReplicatedStorage.Game.Dog.DogConsts).LIST_BREED

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
@@ -11,7 +9,7 @@ local Teams = game:GetService("Teams")
 local LocalPlayer = Players.LocalPlayer
 local InventoryItemSystem = nil
 local PlayerConsts = require(script.Parent.PlayerConsts)
-local t = {
+local PlayerUtils = {
 	init = function()
 		InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSystem)
 	end,
@@ -56,22 +54,22 @@ local t = {
 	end,
 	getPlayerFromDescendant = function(player)
 		if player then
-			for i, v in ipairs(Players:GetPlayers()) do
-				if v.Character and player:IsDescendantOf(v.Character) then
-					return v
+			for playerIndex, currentPlayer in ipairs(Players:GetPlayers()) do
+				if currentPlayer.Character and player:IsDescendantOf(currentPlayer.Character) then
+					return currentPlayer
 				end
 			end
 		end
 	end
 }
-function t.isInVehicle(player)
-	return t.isHumanoidInVehicle((CharacterUtils.getHumanoid(player.Character)))
+function PlayerUtils.isInVehicle(player)
+	return PlayerUtils.isHumanoidInVehicle((CharacterUtils.getHumanoid(player.Character)))
 end
-function t.isHumanoidInVehicle(player)
+function PlayerUtils.isHumanoidInVehicle(player)
 	if player then
 		return player.Parent:GetAttribute("InVehicle") == true
 	else
 		return false
 	end
 end
-return t
+return PlayerUtils

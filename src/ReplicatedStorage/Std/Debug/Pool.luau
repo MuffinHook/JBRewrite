@@ -1,34 +1,32 @@
--- Reviewed by Claude
--- variables reassigned
-local t = {}
-t.__index = t
-function t.new(p1, p2)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._pool = {}
-	t2._getInst = p1
-	t2._destroyInst = p2
-	return t2
+local Pool = {}
+Pool.__index = Pool
+function Pool.new(getInstanceFunction, destroyInstanceFunction)
+	local poolInstance = {}
+	setmetatable(poolInstance, Pool)
+	poolInstance._pool = {}
+	poolInstance._getInst = getInstanceFunction
+	poolInstance._destroyInst = destroyInstanceFunction
+	return poolInstance
 end
-function t.Get(p1)
-	if #p1._pool > 0 then
-		return table.remove(p1._pool)
+function Pool.Get(poolInstance)
+	if #poolInstance._pool > 0 then
+		return table.remove(poolInstance._pool)
 	else
-		return p1._getInst()
+		return poolInstance._getInst()
 	end
 end
-function t.Populate(p1, p2)
-	for i = 1, p2 do
-		p1:Free((p1._getInst()))
+function Pool.Populate(poolInstance, count)
+	for i = 1, count do
+		poolInstance:Free((poolInstance._getInst()))
 	end
 end
-function t.Free(p1, p2)
-	table.insert(p1._pool, p2)
+function Pool.Free(poolInstance, instance)
+	table.insert(poolInstance._pool, instance)
 end
-function t.Destroy(p1)
-	for i, v in ipairs(p1._pool) do
-		p1._destroyInst(v)
+function Pool.Destroy(poolInstance)
+	for i, pooledInstance in ipairs(poolInstance._pool) do
+		poolInstance._destroyInst(pooledInstance)
 	end
-	p1._pool = nil
+	poolInstance._pool = nil
 end
-return t
+return Pool

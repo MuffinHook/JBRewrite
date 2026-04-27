@@ -1,13 +1,12 @@
--- Reviewed by Claude
-local t = {}
-local t2 = {
-	GiveTask = function(p1, p2)
-		local v1 = #p1.Tasks + 1
-		p1.Tasks[v1] = p2
-		return v1
+local ScrollingFrameMaid = {}
+local MaidMethods = {
+	GiveTask = function(maid, task)
+		local nextIndex = #maid.Tasks + 1
+		maid.Tasks[nextIndex] = task
+		return nextIndex
 	end,
-	DoCleaning = function(p1)
-		local Tasks = p1.Tasks
+	DoCleaning = function(maid)
+		local Tasks = maid.Tasks
 		for k, v in pairs(Tasks) do
 			if type(v) == "function" then
 				v()
@@ -20,37 +19,37 @@ local t2 = {
 		end
 	end
 }
-t2.Destroy = t2.DoCleaning
-local t3 = {
-	__index = function(p1, p2)
-		if t2[p2] then
-			return t2[p2]
+MaidMethods.Destroy = MaidMethods.DoCleaning
+local MaidMetatable = {
+	__index = function(maid, key)
+		if MaidMethods[key] then
+			return MaidMethods[key]
 		else
-			return p1.Tasks[p2]
+			return maid.Tasks[key]
 		end
 	end,
-	__newindex = function(p1, p2, p3)
-		local Tasks = p1.Tasks
-		if p3 == nil then
-			if type(Tasks[p2]) ~= "function" and Tasks[p2] then
-				if typeof(Tasks[p2]) == "RBXScriptConnection" then
-					Tasks[p2]:disconnect()
+	__newindex = function(maid, key, value)
+		local Tasks = maid.Tasks
+		if value == nil then
+			if type(Tasks[key]) ~= "function" and Tasks[key] then
+				if typeof(Tasks[key]) == "RBXScriptConnection" then
+					Tasks[key]:disconnect()
 				else
-					Tasks[p2]:Destroy()
+					Tasks[key]:Destroy()
 				end
 			end
-		elseif Tasks[p2] then
-			p1[p2] = nil
+		elseif Tasks[key] then
+			maid[key] = nil
 		end
-		Tasks[p2] = p3
+		Tasks[key] = value
 	end
 }
 local function MakeMaid()
 	return setmetatable({
 		Tasks = {},
 		Instances = {}
-	}, t3)
+	}, MaidMetatable)
 end
-t.MakeMaid = MakeMaid
-t.new = MakeMaid
-return t
+ScrollingFrameMaid.MakeMaid = MakeMaid
+ScrollingFrameMaid.new = MakeMaid
+return ScrollingFrameMaid

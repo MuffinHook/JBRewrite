@@ -1,20 +1,18 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
-return function(arg1)
-	local local1 = Roact.Component:extend("App")
+return function(parentContainer)
+	local AppComponent = Roact.Component:extend("App")
 	local BattleInvite = require(script.Parent.BattleInvite)
-	function local1.init(arg1)  end
-	function local1.render(arg1)
+	function AppComponent.init(self)  end
+	function AppComponent.render(self)
 		return Roact.createElement(BattleInvite, {
 			battleNumPlayersPerTeam = 3,
 			ranked = true
 		})
 	end
-	function local1.willUnmount(arg1)  end
-	local local2 = Roact.mount(Roact.createElement(local1), arg1)
+	function AppComponent.willUnmount(self)  end
+	local mountHandle = Roact.mount(Roact.createElement(AppComponent), parentContainer)
 	return function()
-		Roact.unmount(local2)
+		Roact.unmount(mountHandle)
 	end
 end

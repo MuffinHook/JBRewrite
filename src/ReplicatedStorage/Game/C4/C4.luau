@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
@@ -11,31 +9,31 @@ require(ReplicatedStorage.Game.CamShaker.CamShaker)
 local BaseObject = require(ReplicatedStorage.Std.BaseObject)
 local Promise = require(ReplicatedStorage.Std.Promise)
 local C4Consts = require(script.Parent.C4Consts)
-local function closestPointToPart(p1, p2)
-	local partCFrame = p2.CFrame
-	local objectSpacePoint = partCFrame:PointToObjectSpace(p1)
-	return partCFrame * Vector3.new(math.clamp(objectSpacePoint.X, -p2.Size.X * 0.5, p2.Size.X * 0.5), math.clamp(objectSpacePoint.Y, -p2.Size.Y * 0.5, p2.Size.Y * 0.5), (math.clamp(objectSpacePoint.Z, -p2.Size.Z * 0.5, p2.Size.Z * 0.5)))
+local function closestPointToPart(pointPosition, targetPart)
+	local partCFrame = targetPart.CFrame
+	local objectSpacePoint = partCFrame:PointToObjectSpace(pointPosition)
+	return partCFrame * Vector3.new(math.clamp(objectSpacePoint.X, -targetPart.Size.X * 0.5, targetPart.Size.X * 0.5), math.clamp(objectSpacePoint.Y, -targetPart.Size.Y * 0.5, targetPart.Size.Y * 0.5), (math.clamp(objectSpacePoint.Z, -targetPart.Size.Z * 0.5, targetPart.Size.Z * 0.5)))
 end
-local t = {}
-t.__index = t
-t.__ClassName = "C4"
-setmetatable(t, BaseObject)
-function t.new(p1)
-	local v1 = BaseObject.new(p1)
-	setmetatable(v1, t)
-	v1._maid = Maid.new()
-	v1.maid = v1._maid
-	v1._obj = p1
-	v1.obj = p1
-	v1._stickRemote = p1:WaitForChild(C4Consts.STICK_REMOTE_NAME)
-	v1._detonateRemote = p1:WaitForChild(C4Consts.DETONATE_REMOTE_NAME)
-	v1._stuckValue = p1:WaitForChild(C4Consts.STUCK_VALUE_NAME)
-	v1._maid:GiveTask(v1._stuckValue:GetPropertyChangedSignal("Value"):Connect(function()
-		if v1._stuckValue.Value then
-			Audio.ObjectLocal(v1._obj.PrimaryPart, 6036721389, {
+local C4Class = {}
+C4Class.__index = C4Class
+C4Class.__ClassName = "C4"
+setmetatable(C4Class, BaseObject)
+function C4Class.new(c4Instance)
+	local self = BaseObject.new(c4Instance)
+	setmetatable(self, C4Class)
+	self._maid = Maid.new()
+	self.maid = self._maid
+	self._obj = c4Instance
+	self.obj = c4Instance
+	self._stickRemote = c4Instance:WaitForChild(C4Consts.STICK_REMOTE_NAME)
+	self._detonateRemote = c4Instance:WaitForChild(C4Consts.DETONATE_REMOTE_NAME)
+	self._stuckValue = c4Instance:WaitForChild(C4Consts.STUCK_VALUE_NAME)
+	self._maid:GiveTask(self._stuckValue:GetPropertyChangedSignal("Value"):Connect(function()
+		if self._stuckValue.Value then
+			Audio.ObjectLocal(self._obj.PrimaryPart, 6036721389, {
 				TimePosition = 0.1
 			})
-			Audio.ObjectLocal(v1._obj.PrimaryPart, 6036730402, {
+			Audio.ObjectLocal(self._obj.PrimaryPart, 6036730402, {
 				RollOffMaxDistance = 24,
 				RollOffMinDistance = 8,
 				Volume = 0.3,
@@ -43,65 +41,65 @@ function t.new(p1)
 			})
 		end
 	end))
-	v1._creatorIdValue = p1:WaitForChild(C4Consts.CREATOR_ID_VALUE_NAME)
-	v1._detonatedValue = p1:WaitForChild(C4Consts.DETONATED_VALUE_NAME)
-	v1._locallyDetonated = false
-	return v1
+	self._creatorIdValue = c4Instance:WaitForChild(C4Consts.CREATOR_ID_VALUE_NAME)
+	self._detonatedValue = c4Instance:WaitForChild(C4Consts.DETONATED_VALUE_NAME)
+	self._locallyDetonated = false
+	return self
 end
-function t.GetStuck(p1)
-	return p1._locallyStuck or p1._stuckValue.Value
+function C4Class.GetStuck(self)
+	return self._locallyStuck or self._stuckValue.Value
 end
-function t.GetCreator(p1)
-	return Players:GetPlayerByUserId(p1._creatorIdValue.Value)
+function C4Class.GetCreator(self)
+	return Players:GetPlayerByUserId(self._creatorIdValue.Value)
 end
-function t.Detonate(p1, p2)
-	p1._detonateRemote:FireServer(p2)
-	p1._locallyDetonated = true
+function C4Class.Detonate(self, detonationData)
+	self._detonateRemote:FireServer(detonationData)
+	self._locallyDetonated = true
 	Promise.delay(1):andThen(function()
-		p1._locallyDetonated = p1._detonatedValue.Value
+		self._locallyDetonated = self._detonatedValue.Value
 	end)
 end
-function t.GetDetonated(p1)
-	return p1._locallyDetonated or p1._detonatedValue.Value
+function C4Class.GetDetonated(self)
+	return self._locallyDetonated or self._detonatedValue.Value
 end
-function t.SetVelocity(p1, p2)
-	assert(p2 ~= nil)
-	p1._obj.PrimaryPart.Velocity = p2
+function C4Class.SetVelocity(self, velocity)
+	assert(velocity ~= nil)
+	self._obj.PrimaryPart.Velocity = velocity
 end
-function t.SetRotVelocity(p1, p2)
-	assert(p2 ~= nil)
-	p1._obj.PrimaryPart.RotVelocity = p2
+function C4Class.SetRotVelocity(self, rotationalVelocity)
+	assert(rotationalVelocity ~= nil)
+	self._obj.PrimaryPart.RotVelocity = rotationalVelocity
 end
-function t.IsListening(p1)
-	return p1._maid.attach ~= nil
+function C4Class.IsListening(self)
+	return self._maid.attach ~= nil
 end
-function t.ListenForAttach(p1)
-	if not p1:GetStuck() then
-		p1._maid.attach = p1._obj.PrimaryPart.Touched:Connect(function(p12)
-			if p12:IsDescendantOf(p1._obj) or LocalPlayer.Character and p12:IsDescendantOf(LocalPlayer.Character) then
-			elseif p12.CanCollide then
-				p1._locallyStuck = true
-				p1._maid.attach = nil
+function C4Class.ListenForAttach(self)
+	if not self:GetStuck() then
+		self._maid.attach = self._obj.PrimaryPart.Touched:Connect(function(touchedPart)
+			if touchedPart:IsDescendantOf(self._obj) or LocalPlayer.Character and touchedPart:IsDescendantOf(LocalPlayer.Character) then
+			elseif touchedPart.CanCollide then
+				self._locallyStuck = true
+				self._maid.attach = nil
 				Promise.delay(1):andThen(function()
-					p1._locallyStuck = p1._stuckValue.Value
+					self._locallyStuck = self._stuckValue.Value
 				end)
 				local raycastParams = RaycastParams.new()
-				raycastParams.FilterDescendantsInstances = { p12 }
+				raycastParams.FilterDescendantsInstances = { touchedPart }
 				raycastParams.FilterType = Enum.RaycastFilterType.Whitelist
-				local PrimaryPart = p1._obj.PrimaryPart
-				local raycastOffset = closestPointToPart(PrimaryPart.Position, p12) - PrimaryPart.Position
+				local PrimaryPart = self._obj.PrimaryPart
+				local raycastOffset = closestPointToPart(PrimaryPart.Position, touchedPart) - PrimaryPart.Position
 				local raycastResult = workspace:Raycast(PrimaryPart.Position - raycastOffset.Unit * 5, raycastOffset.Unit * 10, raycastParams)
 				local objectCFrameOffset
 				if raycastResult then
 					PrimaryPart.CFrame = CFrame.new(Vector3.new(), raycastResult.Normal) * CFrame.Angles(0, 0, math.random() * 2 * math.pi) + raycastResult.Position
-					objectCFrameOffset = PrimaryPart.CFrame:ToObjectSpace(p12.CFrame)
+					objectCFrameOffset = PrimaryPart.CFrame:ToObjectSpace(touchedPart.CFrame)
 				else
-					objectCFrameOffset = PrimaryPart.CFrame:ToObjectSpace(p12.CFrame)
+					objectCFrameOffset = PrimaryPart.CFrame:ToObjectSpace(touchedPart.CFrame)
 				end
-				local Anchored = p12.Anchored
+				local Anchored = touchedPart.Anchored
 				if Anchored then
 					for i, v in ipairs(Players:GetPlayers()) do
-						if p12:IsDescendantOf(v.Character) then
+						if touchedPart:IsDescendantOf(v.Character) then
 							Anchored = false
 							break
 						end
@@ -110,19 +108,19 @@ function t.ListenForAttach(p1)
 				if Anchored then
 					PrimaryPart.Anchored = true
 				else
-					assert(not p1._tempJoint)
+					assert(not self._tempJoint)
 					local WeldConstraint = Instance.new("WeldConstraint")
 					WeldConstraint.Name = C4Consts.TEMP_WELD_NAME
 					WeldConstraint.Part0 = PrimaryPart
-					WeldConstraint.Part1 = p12
+					WeldConstraint.Part1 = touchedPart
 					WeldConstraint.Parent = PrimaryPart
 					Promise.delay(0.1):andThen(function()
 						WeldConstraint:Destroy()
 					end)
 				end
-				p1._stickRemote:FireServer(p12, objectCFrameOffset)
+				self._stickRemote:FireServer(touchedPart, objectCFrameOffset)
 			end
 		end)
 	end
 end
-return t
+return C4Class

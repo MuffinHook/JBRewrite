@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StreamingHelperUtils = require(ReplicatedStorage.App.StreamingHelperUtils)
 local Binder = require(ReplicatedStorage.Std.Binder)

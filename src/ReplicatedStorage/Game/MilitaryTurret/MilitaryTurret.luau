@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -13,11 +12,11 @@ local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local RunService = game:GetService("RunService")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local function randomVector()
-	local v1 = math.random() * 2 - 1
-	local v2 = math.random() * 2 - 1
-	return Vector3.new(v1, v2, math.random() * 2 - 1).Unit
+	local randomX = math.random() * 2 - 1
+	local randomY = math.random() * 2 - 1
+	return Vector3.new(randomX, randomY, math.random() * 2 - 1).Unit
 end
-local t = {
+local audioEventIds = {
 	bullet_impact_bass = 2837091387,
 	reload = 6602025903,
 	shoot = 6602025330,
@@ -26,156 +25,156 @@ local t = {
 }
 local MilitaryTurretConsts = require(script.Parent.MilitaryTurretConsts)
 local MilitaryTurretUtils = require(script.Parent.MilitaryTurretUtils)
-local t2 = {}
-t2.__index = t2
-function t2.new(p1)
-	RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
-	local t3 = {}
-	setmetatable(t3, t2)
-	t3._maid = Maid.new()
-	t3.onBulletHit = Signal.new()
-	local t4 = { p1.Parent, workspace.Vehicles }
-	t3._lastPitch = 0
-	t3._lastYaw = 0
-	t3._pitchSpring = Spring.new(t3._lastPitch, 0, 0.6, 15)
-	t3._yawSpring = Spring.new(t3._lastYaw, 0, 0.6, 15)
-	t3._kickSpring = Spring.new(0, 0, 0.7, 70)
-	local v2 = BulletEmitter.new(true)
-	v2.IgnoreList = assert(t4)
-	v2.LifeSpan = 1
-	v2.IgnoreLocalPlayer = false
-	v2.GravityVector = Vector3.new(0, -2, 0)
-	t3._maid:GiveTask(v2.OnLocalHitPlayer:Connect(function(p1)
-		if Players:GetPlayerFromCharacter(p1.Parent) == LocalPlayer then
-			t3.onBulletHit:Fire(MilitaryTurretConsts.TURRET_DAMAGE)
+local MilitaryTurret = {}
+MilitaryTurret.__index = MilitaryTurret
+function MilitaryTurret.new(turretModel)
+	RxInstanceUtils.yieldForProperty(turretModel, "PrimaryPart")
+	local self = {}
+	setmetatable(self, MilitaryTurret)
+	self._maid = Maid.new()
+	self.onBulletHit = Signal.new()
+	local ignoreList = { turretModel.Parent, workspace.Vehicles }
+	self._lastPitch = 0
+	self._lastYaw = 0
+	self._pitchSpring = Spring.new(self._lastPitch, 0, 0.6, 15)
+	self._yawSpring = Spring.new(self._lastYaw, 0, 0.6, 15)
+	self._kickSpring = Spring.new(0, 0, 0.7, 70)
+	local bulletEmitter = BulletEmitter.new(true)
+	bulletEmitter.IgnoreList = assert(ignoreList)
+	bulletEmitter.LifeSpan = 1
+	bulletEmitter.IgnoreLocalPlayer = false
+	bulletEmitter.GravityVector = Vector3.new(0, -2, 0)
+	self._maid:GiveTask(bulletEmitter.OnLocalHitPlayer:Connect(function(bulletPart)
+		if Players:GetPlayerFromCharacter(bulletPart.Parent) == LocalPlayer then
+			self.onBulletHit:Fire(MilitaryTurretConsts.TURRET_DAMAGE)
 		end
-		Audio.ObjectLocal(p1.RootPart, t.bullet_impact_bass, {
+		Audio.ObjectLocal(bulletPart.RootPart, audioEventIds.bullet_impact_bass, {
 			Volume = 1
 		})
 	end))
-	t3._maid:GiveTask(v2)
-	t3._bulletEmitter = v2
-	t3._lastDt = os.clock()
-	t3._maxDYaw = 12.566370614359172
-	t3._turretMotorSound = Audio.ObjectLocal(p1.PrimaryPart, t.motor, {
+	self._maid:GiveTask(bulletEmitter)
+	self._bulletEmitter = bulletEmitter
+	self._lastDt = os.clock()
+	self._maxDYaw = 12.566370614359172
+	self._turretMotorSound = Audio.ObjectLocal(turretModel.PrimaryPart, audioEventIds.motor, {
 		Looped = true,
 		DoNotPlay = true,
 		Volume = 0.3,
 		RollOffMaxDistance = 256
 	})
-	t3._clipSize = MilitaryTurretConsts.MAG_SIZE
-	t3._lastFire = os.clock()
-	t3._lastPointAt = nil
-	t3._lastDetectedBeep = os.clock()
-	t3._maid:GiveTask(RunService.Heartbeat:Connect(function()
-		t3:_update(p1)
+	self._clipSize = MilitaryTurretConsts.MAG_SIZE
+	self._lastFire = os.clock()
+	self._lastPointAt = nil
+	self._lastDetectedBeep = os.clock()
+	self._maid:GiveTask(RunService.Heartbeat:Connect(function()
+		self:_update(turretModel)
 	end))
-	local MotorArm = p1:FindFirstChild("MotorArm")
-	local MotorBase = p1:FindFirstChild("MotorBase")
+	local MotorArm = turretModel:FindFirstChild("MotorArm")
+	local MotorBase = turretModel:FindFirstChild("MotorBase")
 	if MotorArm == nil then
-		RxInstanceUtils.yieldForProperty(p1.Top, "PrimaryPart")
-		RxInstanceUtils.yieldForProperty(p1.Post, "PrimaryPart")
-		Joint.WeldAllTo(p1.Top, p1.Top.PrimaryPart)
-		Joint.WeldAllTo(p1.Post, p1.Post.PrimaryPart)
-		local v3 = Joint.CustomWeld(p1.Top.PrimaryPart, p1.PivotTop, p1.Top.PrimaryPart.CFrame:ToObjectSpace(p1.PivotTop.CFrame), CFrame.new())
-		v3.Parent = p1
-		local v4 = Joint.CustomWeld(p1.Post.PrimaryPart, p1.PivotBottom, p1.Post.PrimaryPart.CFrame:ToObjectSpace(p1.PivotBottom.CFrame), CFrame.new())
-		v4.Parent = p1
-		MotorArm = v3
-		MotorBase = v4
+		RxInstanceUtils.yieldForProperty(turretModel.Top, "PrimaryPart")
+		RxInstanceUtils.yieldForProperty(turretModel.Post, "PrimaryPart")
+		Joint.WeldAllTo(turretModel.Top, turretModel.Top.PrimaryPart)
+		Joint.WeldAllTo(turretModel.Post, turretModel.Post.PrimaryPart)
+		local topWeld = Joint.CustomWeld(turretModel.Top.PrimaryPart, turretModel.PivotTop, turretModel.Top.PrimaryPart.CFrame:ToObjectSpace(turretModel.PivotTop.CFrame), CFrame.new())
+		topWeld.Parent = turretModel
+		local bottomWeld = Joint.CustomWeld(turretModel.Post.PrimaryPart, turretModel.PivotBottom, turretModel.Post.PrimaryPart.CFrame:ToObjectSpace(turretModel.PivotBottom.CFrame), CFrame.new())
+		bottomWeld.Parent = turretModel
+		MotorArm = topWeld
+		MotorBase = bottomWeld
 	end
-	t3._motorArm = MotorArm
-	t3._motorBase = MotorBase
-	return t3
+	self._motorArm = MotorArm
+	self._motorBase = MotorBase
+	return self
 end
-function t2._update(p1, p2)
-	local v1 = os.clock()
-	local v2 = PlayerUtils.getRootPart(LocalPlayer)
-	if v2 then
-		p1._bulletEmitter:Update()
-		if not ((v2.Position - p2.PrimaryPart.Position).Magnitude > 450) then
-			local v3 = MilitaryTurretUtils.getNearestNonPolice(p2.PrimaryPart.Position, 400)
-			local v4, v5
-			if v3 then
-				local v6 = PlayerUtils.getRootPart(v3)
-				v4 = v6.Parent
-				v5 = v6.Position
+function MilitaryTurret._update(self, turretModel)
+	local currentTime = os.clock()
+	local playerRoot = PlayerUtils.getRootPart(LocalPlayer)
+	if playerRoot then
+		self._bulletEmitter:Update()
+		if not ((playerRoot.Position - turretModel.PrimaryPart.Position).Magnitude > 450) then
+			local targetPlayer = MilitaryTurretUtils.getNearestNonPolice(turretModel.PrimaryPart.Position, 400)
+			local targetCharacter, targetPosition
+			if targetPlayer then
+				local targetRoot = PlayerUtils.getRootPart(targetPlayer)
+				targetCharacter = targetRoot.Parent
+				targetPosition = targetRoot.Position
 			else
-				v5 = nil
-				v4 = nil
+				targetPosition = nil
+				targetCharacter = nil
 			end
-			if v5 then
-				local Position = p2.Top.Tip.Position
-				local v7 = v5 - Position
-				local v8, v9 = RayCast.RayIgnoreNonCollideWithIgnoreList(Position, v7.Unit, v7.Magnitude, assert(p1._bulletEmitter.IgnoreList))
-				if v8 and ((v9 - v5).Magnitude > 1 and not (v4 and v8:IsDescendantOf(v4))) then
-					v5 = nil
+			if targetPosition then
+				local Position = turretModel.Top.Tip.Position
+				local directionToTarget = targetPosition - Position
+				local rayHitPart, rayHitPosition = RayCast.RayIgnoreNonCollideWithIgnoreList(Position, directionToTarget.Unit, directionToTarget.Magnitude, assert(self._bulletEmitter.IgnoreList))
+				if rayHitPart and ((rayHitPosition - targetPosition).Magnitude > 1 and not (targetCharacter and rayHitPart:IsDescendantOf(targetCharacter))) then
+					targetPosition = nil
 				end
 			end
-			if v5 then
-				if not p1._lastPointAt then
-					if not p1._turretMotorSound.IsPlaying then
-						p1._turretMotorSound:Play()
+			if targetPosition then
+				if not self._lastPointAt then
+					if not self._turretMotorSound.IsPlaying then
+						self._turretMotorSound:Play()
 					end
-					if v1 - p1._lastDetectedBeep > 2 then
-						p1._lastDetectedBeep = v1
-						Audio.ObjectLocal(p2.PrimaryPart, t.detected, {
+					if currentTime - self._lastDetectedBeep > 2 then
+						self._lastDetectedBeep = currentTime
+						Audio.ObjectLocal(turretModel.PrimaryPart, audioEventIds.detected, {
 							Volume = 1,
 							RollOffMaxDistance = 512
 						})
-						p1._lastFire = v1 + 0.5
+						self._lastFire = currentTime + 0.5
 					end
 				end
-				p1:_updateRotation(p2, v5)
-				if v1 - p1._lastFire > MilitaryTurretConsts.FIRE_RATE then
-					p1._lastFire = v1
-					if p1._clipSize > 0 then
-						p1._clipSize = p1._clipSize - 1
-						p1:_fire(p2)
+				self:_updateRotation(turretModel, targetPosition)
+				if currentTime - self._lastFire > MilitaryTurretConsts.FIRE_RATE then
+					self._lastFire = currentTime
+					if self._clipSize > 0 then
+						self._clipSize = self._clipSize - 1
+						self:_fire(turretModel)
 					else
-						p1._lastFire = v1 + MilitaryTurretConsts.RELOAD_TIME
-						p1._clipSize = MilitaryTurretConsts.MAG_SIZE
-						Audio.ObjectLocal(p2.PrimaryPart, t.reload, {
+						self._lastFire = currentTime + MilitaryTurretConsts.RELOAD_TIME
+						self._clipSize = MilitaryTurretConsts.MAG_SIZE
+						Audio.ObjectLocal(turretModel.PrimaryPart, audioEventIds.reload, {
 							Volume = 1,
 							RollOffMaxDistance = 512
 						})
 					end
 				end
 			end
-			if not v5 and (p1._lastPointAt and p1._turretMotorSound.IsPlaying) then
-				p1._turretMotorSound:Stop()
+			if not targetPosition and (self._lastPointAt and self._turretMotorSound.IsPlaying) then
+				self._turretMotorSound:Stop()
 			end
-			p1._lastPointAt = v5
+			self._lastPointAt = targetPosition
 		end
 	end
 end
-function t2._updateRotation(p1, p2, p3)
-	local v1 = os.clock()
-	local v2 = v1 - p1._lastDt
-	p1._lastDt = v1
-	local v3 = p1._kickSpring:Update()
-	local v4 = p2.PivotBottom.CFrame:PointToObjectSpace(p3)
-	local v7 = math.atan2(-v4.x, -v4.z)
-	local v8 = (p2.PivotTop.CFrame * CFrame.Angles(0, v7, 0)):PointToObjectSpace(p3)
-	local v10 = math.sqrt(v8.y * v8.y + v8.z * v8.z)
-	p1._lastPitch = math.atan2(v8.y, -v8.z) + math.asin(-0.56 / v10)
-	p1._lastYaw = p1._lastYaw + math.clamp(MilitaryTurretUtils.shortAngleDist(p1._lastYaw, v7), -p1._maxDYaw * v2, p1._maxDYaw * v2)
-	local v15 = p1._pitchSpring:SetTarget(p1._lastPitch)
-	local v16 = p1._yawSpring:SetTarget(p1._lastYaw)
-	p1._motorBase.C1 = CFrame.Angles(0, v16, 0)
-	p1._motorArm.C1 = CFrame.Angles(0, v16, 0) * CFrame.Angles(v15, 0, 0) * CFrame.new(0, 0, v3)
+function MilitaryTurret._updateRotation(self, turretModel, targetPosition)
+	local currentTime = os.clock()
+	local deltaTime = currentTime - self._lastDt
+	self._lastDt = currentTime
+	local kickOffset = self._kickSpring:Update()
+	local baseRelativeTarget = turretModel.PivotBottom.CFrame:PointToObjectSpace(targetPosition)
+	local yawAngle = math.atan2(-baseRelativeTarget.x, -baseRelativeTarget.z)
+	local armRelativeTarget = (turretModel.PivotTop.CFrame * CFrame.Angles(0, yawAngle, 0)):PointToObjectSpace(targetPosition)
+	local horizontalDistance = math.sqrt(armRelativeTarget.y * armRelativeTarget.y + armRelativeTarget.z * armRelativeTarget.z)
+	self._lastPitch = math.atan2(armRelativeTarget.y, -armRelativeTarget.z) + math.asin(-0.56 / horizontalDistance)
+	self._lastYaw = self._lastYaw + math.clamp(MilitaryTurretUtils.shortAngleDist(self._lastYaw, yawAngle), -self._maxDYaw * deltaTime, self._maxDYaw * deltaTime)
+	local pitchTarget = self._pitchSpring:SetTarget(self._lastPitch)
+	local yawTarget = self._yawSpring:SetTarget(self._lastYaw)
+	self._motorBase.C1 = CFrame.Angles(0, yawTarget, 0)
+	self._motorArm.C1 = CFrame.Angles(0, yawTarget, 0) * CFrame.Angles(pitchTarget, 0, 0) * CFrame.new(0, 0, kickOffset)
 end
-function t2._fire(p1, p2)
-	local v1 = p2.Top.Tip.CFrame
-	p1._bulletEmitter:Emit(v1.p, v1.LookVector + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 0.008, 400)
-	p1._kickSpring:Accelerate(40)
-	Audio.ObjectLocal(p2.Top.Tip, t.shoot, {
+function MilitaryTurret._fire(self, turretModel)
+	local firePoint = turretModel.Top.Tip.CFrame
+	self._bulletEmitter:Emit(firePoint.p, firePoint.LookVector + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 0.008, 400)
+	self._kickSpring:Accelerate(40)
+	Audio.ObjectLocal(turretModel.Top.Tip, audioEventIds.shoot, {
 		Volume = 0.5
 	})
 end
-function t2.Destroy(p1)
-	local _maid = p1._maid
-	p1._maid = nil
-	_maid:Destroy()
+function MilitaryTurret.Destroy(self)
+	local maidInstance = self._maid
+	self._maid = nil
+	maidInstance:Destroy()
 end
-return t2
+return MilitaryTurret

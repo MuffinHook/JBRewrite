@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -8,12 +6,12 @@ local Promise = require(ReplicatedStorage.Std.Promise)
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local RadioPlayer = require(script.Parent.RadioPlayer)
 local RadioUtils = require(script.Parent.RadioUtils)
-local t = {}
-t.__index = t
-function t.new(guiObject)
+local RadioList = {}
+RadioList.__index = RadioList
+function RadioList.new(guiObject)
 	assert(guiObject)
 	local instance = {}
-	setmetatable(instance, t)
+	setmetatable(instance, RadioList)
 	instance.Gui = guiObject
 	instance.Maid = Maid.new()
 	instance.OnRefreshRequested = Signal.new()
@@ -21,28 +19,27 @@ function t.new(guiObject)
 	instance.ListItem = {}
 	return instance
 end
-function t.Populate(self, playlist)
+function RadioList.Populate(self, playlist)
 	assert(playlist)
 	local ScrollingFrame = self.Gui.Container.Sidebar.ScrollingFrame
 	self.Maid:GiveTask(ScrollingFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 		ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, ScrollingFrame.UIListLayout.AbsoluteContentSize.Y)
 	end))
-	for i, v in ipairs(playlist.Songs) do
-		local itemVariable
+	for i, song in ipairs(playlist.Songs) do
 		local itemClone = ScrollingFrame.ItemPreset:Clone()
-		itemClone.Name = v.AssetId
-		local songName = v.Name
+		itemClone.Name = song.AssetId
+		local songName = song.Name
 		if not songName then
-			songName = tostring(v.AssetId)
+			songName = tostring(song.AssetId)
 		end
 		itemClone.Title.Text = songName
-		if v.Name == nil then
+		if song.Name == nil then
 			local namePromise = nil
 			namePromise = Promise.resolve():andThen(function()
-				return MarketplaceService:GetProductInfo(v.AssetId)
-			end):andThen(function(p1)
-				v.Name = tostring(p1.Name)
-				itemClone.Title.Text = v.Name
+				return MarketplaceService:GetProductInfo(song.AssetId)
+			end):andThen(function(productInfo)
+				song.Name = tostring(productInfo.Name)
+				itemClone.Title.Text = song.Name
 			end):finally(function()
 				if namePromise then
 					namePromise:cancel()
@@ -63,7 +60,7 @@ function t.Populate(self, playlist)
 			if not isThirdPerson then
 				isThirdPerson = if vehiclePacket == nil then false else not vehiclePacket.Passenger
 			end
-			RadioPlayer.PlayId(v.AssetId, nil, isThirdPerson)
+			RadioPlayer.PlayId(song.AssetId, nil, isThirdPerson)
 		end))
 		itemClone.Delete.Visible = playlist.Editable
 		if playlist.Editable then
@@ -74,8 +71,8 @@ function t.Populate(self, playlist)
 			end))
 		end
 		self.Maid:GiveTask(itemClone)
-		itemVariable = #self.ListItem == i - 1
-		assert(itemVariable)
+		local isListLengthValid = #self.ListItem == i - 1
+		assert(isListLengthValid)
 		table.insert(self.ListItem, itemClone)
 	end
 	if playlist.Editable then
@@ -85,8 +82,8 @@ function t.Populate(self, playlist)
 				error("Attempted to add song when no song is playing!")
 			end
 			local CurrentSoundId = RadioPlayer.CurrentSoundId
-			for i, v in ipairs(playlist.Songs) do
-				if v.AssetId == CurrentSoundId then
+			for i, song in ipairs(playlist.Songs) do
+				if song.AssetId == CurrentSoundId then
 					error("Attempted to add repeat song to playlist.")
 				end
 			end
@@ -102,8 +99,8 @@ function t.Populate(self, playlist)
 	end
 	ScrollingFrame.NewSong.Visible = playlist.Editable
 end
-function t.Destroy(self)
+function RadioList.Destroy(self)
 	self.Maid:Destroy()
 	self.Maid = nil
 end
-return t
+return RadioList

@@ -1,22 +1,21 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local Color = require(script.Parent.Color)
 local WheelColor = require(ReplicatedStorage.Game.Garage.Customize.WheelColor)
 local getDefaultVehicleModel = require(ReplicatedStorage.Game.getDefaultVehicleModel)
-local function GetInstance(p1)
-	local v1 = VehicleUtils.GetLocalVehiclePacketForCustomize()
-	local v2 = getDefaultVehicleModel(v1.Make, v1.Type)
-	WheelColor(p1, {
-		Model = v2,
-		Make = v1.Make,
-		Type = v1.Type
+local function GetInstance(wheelInstance)
+	local localVehiclePacket = VehicleUtils.GetLocalVehiclePacketForCustomize()
+	local defaultVehicleModel = getDefaultVehicleModel(localVehiclePacket.Make, localVehiclePacket.Type)
+	WheelColor(wheelInstance, {
+		Model = defaultVehicleModel,
+		Make = localVehiclePacket.Make,
+		Type = localVehiclePacket.Type
 	})
-	return v2
+	return defaultVehicleModel
 end
-local function Update(p1, p2)
-	local v1 = os.clock() / 2
-	p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, p2.BoundingBox.Size.Magnitude * 0.7)
+local function Update(wheelInstance, wheelConfig)
+	local elapsedTime = os.clock() / 2
+	wheelInstance.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, wheelConfig.BoundingBox.Size.Magnitude * 0.7)
 end
 return {
 	Items = Color.Items,

@@ -1,116 +1,115 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HomeItemUIUtils = require(ReplicatedStorage.Home.HomeItem.HomeItemUIUtils)
 local Rodux = require(ReplicatedStorage.Rodux)
-local function defaultSort(p1)
-	table.sort(p1, function(p1, p2)
-		if p1.limited == p2.limited then
-			if p1.season == p2.season then
-				return p1.name < p2.name
+local function defaultSort(items)
+	table.sort(items, function(item1, item2)
+		if item1.limited == item2.limited then
+			if item1.season == item2.season then
+				return item1.name < item2.name
 			else
-				return (p1.season or (1 / 0)) > (p2.season or (1 / 0))
+				return (item1.season or (1 / 0)) > (item2.season or (1 / 0))
 			end
 		else
-			return p2.limited
+			return item2.limited
 		end
 	end)
 end
 return Rodux.createReducer({}, {
-	setFurnitureCategory = function(p1, p2)
-		local t = {}
-		for v9, v10 in ReplicatedStorage.Resource.HomeItem:GetChildren() do
-			local v1, module2, v3, v4, v5, v6, v7, v8
-			local Price = v10:FindFirstChild("Price")
-			v1 = if Price then Price.Value else nil
-			local Level = v10:FindFirstChild("Level")
-			module2 = if Level then Level.Value else nil
-			local Season = v10:FindFirstChild("Season")
-			v3 = if Season then Season.Value else nil
-			local TopPct = v10:FindFirstChild("TopPct")
-			v4 = if TopPct then TopPct.Value else nil
-			local UpDot = v10:FindFirstChild("UpDot")
-			v5 = if UpDot then UpDot.Value else nil
-			local Category = v10:FindFirstChild("Category")
-			v6 = if Category then Category.Value else 1
-			local MaxPlaced = v10:FindFirstChild("MaxPlaced")
-			v7 = if MaxPlaced then MaxPlaced.Value else nil
-			if (p2.use == nil or p2.use == v6) and (p2.upDot == nil or v5 == nil or not (math.abs(p2.upDot - v5) > 0.01)) then
-				local v11, v12
-				v11 = v10.Name
-				v12 = {
+	setFurnitureCategory = function(state, action)
+		local items = {}
+		for index, item in ReplicatedStorage.Resource.HomeItem:GetChildren() do
+			local price, level, season, topPct, upDot, category, maxPlaced, isLimited
+			local Price = item:FindFirstChild("Price")
+			price = if Price then Price.Value else nil
+			local Level = item:FindFirstChild("Level")
+			level = if Level then Level.Value else nil
+			local Season = item:FindFirstChild("Season")
+			season = if Season then Season.Value else nil
+			local TopPct = item:FindFirstChild("TopPct")
+			topPct = if TopPct then TopPct.Value else nil
+			local UpDot = item:FindFirstChild("UpDot")
+			upDot = if UpDot then UpDot.Value else nil
+			local Category = item:FindFirstChild("Category")
+			category = if Category then Category.Value else 1
+			local MaxPlaced = item:FindFirstChild("MaxPlaced")
+			maxPlaced = if MaxPlaced then MaxPlaced.Value else nil
+			if (action.use == nil or action.use == category) and (action.upDot == nil or upDot == nil or not (math.abs(action.upDot - upDot) > 0.01)) then
+				local itemName, itemData
+				itemName = item.Name
+				itemData = {
 					module = "HomeItem",
-					name = v11,
-					title = v11,
-					price = v1,
-					level = module2,
-					season = v3,
-					topPct = v4
+					name = itemName,
+					title = itemName,
+					price = price,
+					level = level,
+					season = season,
+					topPct = topPct
 				}
-				v8 = if module2 == nil and v3 == nil then not v1 else true
-				v12.limited = v8
-				v12.maxPlaced = v7
-				function v12.getInst()
-					return HomeItemUIUtils.getModel(v11)
+				isLimited = if level == nil and season == nil then not price else true
+				itemData.limited = isLimited
+				itemData.maxPlaced = maxPlaced
+				function itemData.getInst()
+					return HomeItemUIUtils.getModel(itemName)
 				end
-				v12.updateCamera = HomeItemUIUtils.getUpdateCamera()
-				v12.getInstCompare = "HomeItem" .. v11
-				v12.available = not v12.limited
-				table.insert(t, v12)
+				itemData.updateCamera = HomeItemUIUtils.getUpdateCamera()
+				itemData.getInstCompare = "HomeItem" .. itemName
+				itemData.available = not itemData.limited
+				table.insert(items, itemData)
 			end
 		end
-		table.sort(t, function(p1, p2)
-			if p1.limited == p2.limited then
-				if p1.season == p2.season then
-					return p1.name < p2.name
+		table.sort(items, function(item1, item2)
+			if item1.limited == item2.limited then
+				if item1.season == item2.season then
+					return item1.name < item2.name
 				else
-					return (p1.season or (1 / 0)) > (p2.season or (1 / 0))
+					return (item1.season or (1 / 0)) > (item2.season or (1 / 0))
 				end
 			else
-				return p2.limited
+				return item2.limited
 			end
 		end)
-		return t
+		return items
 	end,
-	setCategory = function(p1, p2)
-		assert(p2.module ~= nil, "setCategory requires a module name")
-		local v1 = ReplicatedStorage.Home.HomeData:FindFirstChild(p2.module)
-		assert(v1, "setCategory requires a valid module name")
-		local module2 = require(v1)
-		local t = {}
-		for v4, v5 in module2.getItems() do
-			local v3
-			if not (v5.HiddenAll or (v5.Hidden or v5.VIP)) then
-				local t2 = {
-					module = p2.module,
-					name = v5.Name,
-					title = v5.Name,
-					price = v5.Price,
-					level = v5.Level,
-					season = v5.Season,
-					topPct = v5.TopPct,
+	setCategory = function(state, action)
+		assert(action.module ~= nil, "setCategory requires a module name")
+		local moduleInstance = ReplicatedStorage.Home.HomeData:FindFirstChild(action.module)
+		assert(moduleInstance, "setCategory requires a valid module name")
+		local categoryModule = require(moduleInstance)
+		local items = {}
+		for index, itemData in categoryModule.getItems() do
+			local isLimited
+			if not (itemData.HiddenAll or (itemData.Hidden or itemData.VIP)) then
+				local itemDataTable = {
+					module = action.module,
+					name = itemData.Name,
+					title = itemData.Name,
+					price = itemData.Price,
+					level = itemData.Level,
+					season = itemData.Season,
+					topPct = itemData.TopPct,
 					getInst = function()
-						return module2.getInstance(v5)
+						return categoryModule.getInstance(itemData)
 					end,
-					updateCamera = module2.updateCamera,
-					getInstCompare = p2.module .. v5.Name
+					updateCamera = categoryModule.updateCamera,
+					getInstCompare = action.module .. itemData.Name
 				}
-				v3 = if t2.level == nil and t2.season == nil then not t2.price and not v5.None else not v5.None
-				t2.limited = v3
-				t2.available = not t2.limited
-				table.insert(t, t2)
+				isLimited = if itemDataTable.level == nil and itemDataTable.season == nil then not itemDataTable.price and not itemData.None else not itemData.None
+				itemDataTable.limited = isLimited
+				itemDataTable.available = not itemDataTable.limited
+				table.insert(items, itemDataTable)
 			end
 		end
-		table.sort(t, function(p1, p2)
-			if p1.limited == p2.limited then
-				if p1.season == p2.season then
-					return p1.name < p2.name
+		table.sort(items, function(item1, item2)
+			if item1.limited == item2.limited then
+				if item1.season == item2.season then
+					return item1.name < item2.name
 				else
-					return (p1.season or (1 / 0)) > (p2.season or (1 / 0))
+					return (item1.season or (1 / 0)) > (item2.season or (1 / 0))
 				end
 			else
-				return p2.limited
+				return item2.limited
 			end
 		end)
-		return t
+		return items
 	end
 })

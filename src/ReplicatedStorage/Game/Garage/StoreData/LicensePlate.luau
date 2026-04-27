@@ -1,8 +1,7 @@
--- Reviewed by Claude
 game:GetService("ReplicatedStorage")
-function GetItemByName(p1)
+function GetItemByName(itemName)
 	return {
-		Name = p1
+		Name = itemName
 	}
 end
 return {

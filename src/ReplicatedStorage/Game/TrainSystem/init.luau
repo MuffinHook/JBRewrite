@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Time = require(ReplicatedStorage.Module.Time)
@@ -10,10 +9,10 @@ local Players = game:GetService("Players")
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local LocalPlayer = Players.LocalPlayer
 local CurrentCamera = workspace.CurrentCamera
-local v1 = nil
-local v2 = nil
-local v3 = nil
-local t = {
+local trainFolder = nil
+local eventSignal = nil
+local eventManager = nil
+local signals = {
 	OnCarCreated = Signal.new(),
 	OnCarDestroyed = Signal.new(),
 	OnCarEntered = Signal.new(),
@@ -22,152 +21,152 @@ local t = {
 local TrainSystemUtils = require(script.TrainSystemUtils)
 local CalculateDistanceAhead = TrainSystemUtils.CalculateDistanceAhead
 local MoveTrain = TrainSystemUtils.MoveTrain
-local v4 = RaycastParams.new()
-v4.FilterType = Enum.RaycastFilterType.Include
-v4.IgnoreWater = true
-local function PopulateCar(p1, p2, p3)
-	local Base = p3.Base
-	local v1 = require(p2)
-	p1.Model = p3
-	p1.Base = Base
-	p1.Length = Base.Size.Z
-	p1.InvertBogey = false
-	v1.MakeCar(p1, v2)
-	t.OnCarCreated:Fire(p1)
-	assert(p1.BogeyMotorFront)
-	assert(p1.BogeyMotorBack)
-	assert(p1.BogeyOffsetFront)
-	assert(p1.BogeyOffsetBack)
-	p1.MoveCar = v1.MoveCar
-	p1.DestroyCar = v1.DestroyCar
-	p1.Loaded = true
-	return p1
+local raycastParams = RaycastParams.new()
+raycastParams.FilterType = Enum.RaycastFilterType.Include
+raycastParams.IgnoreWater = true
+local function PopulateCar(car, carScript, carModel)
+	local Base = carModel.Base
+	local carModule = require(carScript)
+	car.Model = carModel
+	car.Base = Base
+	car.Length = Base.Size.Z
+	car.InvertBogey = false
+	carModule.MakeCar(car, eventSignal)
+	signals.OnCarCreated:Fire(car)
+	assert(car.BogeyMotorFront)
+	assert(car.BogeyMotorBack)
+	assert(car.BogeyOffsetFront)
+	assert(car.BogeyOffsetBack)
+	car.MoveCar = carModule.MoveCar
+	car.DestroyCar = carModule.DestroyCar
+	car.Loaded = true
+	return car
 end
-local function RenderTrain(p1, p2)
-	local v1 = 0
-	for i = #p1.Cars, 1, -1 do
-		local v2 = p1.Cars[i]
-		if v2.Loaded then
-			v2:MoveCar(p1, p2, v1)
-			v1 = v1 + v2.Length + p1.BufferLength
+local function RenderTrain(train, deltaTime)
+	local distanceOffset = 0
+	for i = #train.Cars, 1, -1 do
+		local car = train.Cars[i]
+		if car.Loaded then
+			car:MoveCar(train, deltaTime, distanceOffset)
+			distanceOffset = distanceOffset + car.Length + train.BufferLength
 		end
 	end
 end
-local t2 = {}
-local function GetSystemById(p1)
-	for i = 1, #t2 do
-		if t2[i].Id == p1 then
-			return t2[i]
+local trainSystems = {}
+local function GetSystemById(systemId)
+	for i = 1, #trainSystems do
+		if trainSystems[i].Id == systemId then
+			return trainSystems[i]
 		end
 	end
 	return false
 end
-local function GetCarById(p1, p2)
-	for i = 1, #p1.Cars do
-		if p1.Cars[i].Id == p2 then
-			return p1.Cars[i]
+local function GetCarById(train, carId)
+	for i = 1, #train.Cars do
+		if train.Cars[i].Id == carId then
+			return train.Cars[i]
 		end
 	end
 	return false
 end
 return {
-	Init = function(p1)
-		local em = p1.em
-		v2 = p1.Event
-		v3 = em
+	Init = function(config)
+		local eventManager = config.em
+		eventSignal = config.Event
+		eventManager = eventManager
 		local Trains = Instance.new("Folder")
 		Trains.Name = "Trains"
 		Trains.Parent = workspace
-		v1 = { Trains }
-		v4.FilterDescendantsInstances = { Trains }
+		trainFolder = { Trains }
+		raycastParams.FilterDescendantsInstances = { Trains }
 		local UnsafePositionReplication = ReplicatedStorage:FindFirstChild("UnsafePositionReplication")
 		local ChangePositionReplication = ReplicatedStorage:FindFirstChild("ChangePositionReplication")
-		local function PopulateTrain(p1)
-			for v1, v2 in next, p1.Cars do
-				v2.SystemId = p1.Id
-				local v3 = v2.Name
-				local v4 = ReplicatedStorage.Resource.TrainCars[v3]:Clone()
-				local v5 = script:FindFirstChild(v3) or script.Default
-				v4:PivotTo(CFrame.new(0, -200, 0))
-				v4.Parent = Trains
-				PopulateCar(v2, v5, v4)
+		local function PopulateTrain(trainSystem)
+			for carIndex, car in next, trainSystem.Cars do
+				car.SystemId = trainSystem.Id
+				local carName = car.Name
+				local carModel = ReplicatedStorage.Resource.TrainCars[carName]:Clone()
+				local carScript = script:FindFirstChild(carName) or script.Default
+				carModel:PivotTo(CFrame.new(0, -200, 0))
+				carModel.Parent = Trains
+				PopulateCar(car, carScript, carModel)
 				task.wait()
 			end
 		end
-		function em.b9qhzm8t(p1)
-			local Id = p1.Id
-			local v1 = false
-			for i = 1, #t2 do
-				if t2[i].Id == Id then
-					v1 = t2[i]
+		function eventManager.b9qhzm8t(trainSystem)
+			local Id = trainSystem.Id
+			local existingSystem = false
+			for i = 1, #trainSystems do
+				if trainSystems[i].Id == Id then
+					existingSystem = trainSystems[i]
 					break
 				end
 			end
-			if v1 then
+			if existingSystem then
 				assert("This train already exists on client.")
 			else
-				table.insert(t2, p1)
-				PopulateTrain(p1)
+				table.insert(trainSystems, trainSystem)
+				PopulateTrain(trainSystem)
 			end
 			return true
 		end
-		local v22 = 0
-		local function ReplicateTrain(p1)
-			local SystemId = p1.SystemId
-			local v1 = false
-			for i = 1, #t2 do
-				if t2[i].Id == SystemId then
-					v1 = t2[i]
+		local lastReplicationTime = 0
+		local function ReplicateTrain(replicationData)
+			local SystemId = replicationData.SystemId
+			local targetTrain = false
+			for i = 1, #trainSystems do
+				if trainSystems[i].Id == SystemId then
+					targetTrain = trainSystems[i]
 					break
 				end
 			end
-			if v1 then
-				local v23 = Time.GetNowSync() - p1.NowSync
-				assert(p1.SegmentId)
-				assert(v1.SegmentsById)
-				local SegmentId_2 = p1.SegmentId
-				local v3 = p1.Offset + v23 * p1.Speed
-				local v4 = CalculateDistanceAhead(v1, v1.SegmentId, v1.Offset, SegmentId_2, p1.Offset)
-				v1.ServerSpeed = p1.Speed
-				if v4 then
-					v1.ServerDistanceAhead = v4
+			if targetTrain then
+				local timeDelta = Time.GetNowSync() - replicationData.NowSync
+				assert(replicationData.SegmentId)
+				assert(targetTrain.SegmentsById)
+				local SegmentId_2 = replicationData.SegmentId
+				local calculatedOffset = replicationData.Offset + timeDelta * replicationData.Speed
+				local distanceAhead = CalculateDistanceAhead(targetTrain, targetTrain.SegmentId, targetTrain.Offset, SegmentId_2, replicationData.Offset)
+				targetTrain.ServerSpeed = replicationData.Speed
+				if distanceAhead then
+					targetTrain.ServerDistanceAhead = distanceAhead
 				else
 					print("Train force replication")
-					v1.ServerDistanceAhead = nil
-					v1.SegmentId = SegmentId_2
-					v1.Offset = v3
+					targetTrain.ServerDistanceAhead = nil
+					targetTrain.SegmentId = SegmentId_2
+					targetTrain.Offset = calculatedOffset
 				end
 				return true
 			else
-				local v5 = tick()
-				if v5 - v22 > 0.5 then
-					v22 = v5
-					v2:FireServer("k" .. ("pti4n"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("erpspq94"):sub(4, 5):reverse() .. "" .. "" .. ("d1gw"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("zg1jgvo"):sub(4, 4):reverse():reverse():reverse() .. "el", p1.SystemId)
+				local currentTime = tick()
+				if currentTime - lastReplicationTime > 0.5 then
+					lastReplicationTime = currentTime
+					eventSignal:FireServer("ktpsgjel", replicationData.SystemId)
 				end
 				return false
 			end
 		end
-		function em.pvopv1ja(p1)
-			for v1, v2 in next, p1 do
-				ReplicateTrain(v2)
+		function eventManager.pvopv1ja(replicationList)
+			for index, replicationData in next, replicationList do
+				ReplicateTrain(replicationData)
 			end
 		end
-		function em.mwxdlqx0(p1)
-			for i = 1, #t2 do
-				local v1 = t2[i]
-				if v1.Id == p1 then
-					table.remove(t2, i)
-					for v2, v3 in next, v1.Cars do
-						local v4 = os.clock()
+		function eventManager.mwxdlqx0(systemId)
+			for i = 1, #trainSystems do
+				local trainSystem = trainSystems[i]
+				if trainSystem.Id == systemId then
+					table.remove(trainSystems, i)
+					for carIndex, car in next, trainSystem.Cars do
+						local timeoutStart = os.clock()
 						repeat
 							task.wait()
-						until v3.DestroyCar ~= nil or v4 + 5 < os.clock()
-						if v3.DestroyCar then
-							t.OnCarDestroyed:Fire(v3)
-							v3:DestroyCar()
+						until car.DestroyCar ~= nil or timeoutStart + 5 < os.clock()
+						if car.DestroyCar then
+							signals.OnCarDestroyed:Fire(car)
+							car:DestroyCar()
 						else
 							warn("Car has no DestroyCar function")
-							print(v3)
+							print(car)
 						end
 					end
 					return true
@@ -175,183 +174,183 @@ return {
 			end
 			return false
 		end
-		function em.ptiew0pw(p1, p2, p3)
-			local v1 = false
-			for i = 1, #t2 do
-				if t2[i].Id == p1 then
-					v1 = t2[i]
+		function eventManager.ptiew0pw(systemId, segmentId, branchIndex)
+			local targetTrain = false
+			for i = 1, #trainSystems do
+				if trainSystems[i].Id == systemId then
+					targetTrain = trainSystems[i]
 					break
 				end
 			end
-			if not v1 then
+			if not targetTrain then
 				return false
 			end
-			local v2 = v1.SegmentsById[p2]
-			assert(v2)
-			v2.BranchIndex = p3
+			local segment = targetTrain.SegmentsById[segmentId]
+			assert(segment)
+			segment.BranchIndex = branchIndex
 		end
-		function em.r0klh6da(p1)
-			local v1 = false
-			for i = 1, #t2 do
-				if t2[i].Id == p1 then
-					v1 = t2[i]
+		function eventManager.r0klh6da(systemId)
+			local targetTrain = false
+			for i = 1, #trainSystems do
+				if trainSystems[i].Id == systemId then
+					targetTrain = trainSystems[i]
 					break
 				end
 			end
-			if not v1 then
+			if not targetTrain then
 				return false
 			end
-			for v2, v3 in v1.Cars do
-				if v3.SoundHorn then
-					v3.SoundHorn:Play()
-					v3.LastHorn = tick()
-				elseif v3.SoundWhistle then
-					v3.SoundWhistle:Play()
-					v3.LastHorn = tick()
+			for carIndex, car in targetTrain.Cars do
+				if car.SoundHorn then
+					car.SoundHorn:Play()
+					car.LastHorn = tick()
+				elseif car.SoundWhistle then
+					car.SoundWhistle:Play()
+					car.LastHorn = tick()
 				end
 			end
 		end
-		local t3 = {}
-		for v32, v42 in CollectionService:GetTagged("ReplicateCharacterTrain") do
-			table.insert(t3, v42)
+		local charactersTrain = {}
+		for characterIndex, character in CollectionService:GetTagged("ReplicateCharacterTrain") do
+			table.insert(charactersTrain, character)
 		end
-		local t4 = {}
-		local t5 = {}
-		CollectionService:GetInstanceAddedSignal("ReplicateCharacterTrain"):Connect(function(p1)
-			table.insert(t3, p1)
-			if t5[p1] then
-				task.cancel(t5[p1])
-				t5[p1] = nil
+		local characterLastPositions = {}
+		local characterCleanupTasks = {}
+		CollectionService:GetInstanceAddedSignal("ReplicateCharacterTrain"):Connect(function(character)
+			table.insert(charactersTrain, character)
+			if characterCleanupTasks[character] then
+				task.cancel(characterCleanupTasks[character])
+				characterCleanupTasks[character] = nil
 			end
 		end)
-		CollectionService:GetInstanceRemovedSignal("ReplicateCharacterTrain"):Connect(function(p1)
-			table.remove(t3, table.find(t3, p1))
-			if t5[p1] then
-				task.cancel(t5[p1])
+		CollectionService:GetInstanceRemovedSignal("ReplicateCharacterTrain"):Connect(function(character)
+			table.remove(charactersTrain, table.find(charactersTrain, character))
+			if characterCleanupTasks[character] then
+				task.cancel(characterCleanupTasks[character])
 			end
-			t5[p1] = task.delay(2, function()
-				t4[p1] = nil
-				t5[p1] = nil
+			characterCleanupTasks[character] = task.delay(2, function()
+				characterLastPositions[character] = nil
+				characterCleanupTasks[character] = nil
 			end)
 		end)
-		local v5 = nil
-		local v6 = nil
-		local v7 = os.clock()
-		local v8 = CFrame.new()
-		local function Stepped(p1)
-			if #t2 <= 0 then
-				if v5 then
-					t.OnCarExited:Fire(v5)
+		local currentCar = nil
+		local currentTrain = nil
+		local lastPositionUpdateTime = os.clock()
+		local lastPositionCFrame = CFrame.new()
+		local function Stepped(deltaTime)
+			if #trainSystems <= 0 then
+				if currentCar then
+					signals.OnCarExited:Fire(currentCar)
 				end
-				v5 = nil
-				v6 = nil
+				currentCar = nil
+				currentTrain = nil
 			else
 				debug.profilebegin("Train Update")
-				local v1 = nil
-				local v2 = nil
-				local v3 = nil
-				local v42 = nil
+				local castResult = nil
+				local carBaseFrame = nil
+				local previousBaseFrame = nil
+				local playerRootPart = nil
 				local Character = LocalPlayer.Character
 				if Character then
 					local Humanoid = Character:FindFirstChild("Humanoid")
 					if Humanoid then
-						v42 = Humanoid.RootPart
-						if v42 and not JetPack.IsFlying() then
-							local v52 = workspace:Raycast(v42.Position, Vector3.new(0, -20, 0), v4)
-							v1 = if v52 and v52.Instance then v52.Instance else v52
+						playerRootPart = Humanoid.RootPart
+						if playerRootPart and not JetPack.IsFlying() then
+							local raycastHit = workspace:Raycast(playerRootPart.Position, Vector3.new(0, -20, 0), raycastParams)
+							castResult = if raycastHit and raycastHit.Instance then raycastHit.Instance else raycastHit
 						end
 					end
 				end
-				if not v1 then
-					if v5 then
-						t.OnCarExited:Fire(v5)
+				if not castResult then
+					if currentCar then
+						signals.OnCarExited:Fire(currentCar)
 					end
-					v5 = nil
-					v6 = nil
+					currentCar = nil
+					currentTrain = nil
 				end
-				for v72, v82 in next, t2 do
-					local v62
-					for i = #v82.Cars, 1, -1 do
-						local v9 = v82.Cars[i]
-						if v9.Loaded and (v1 and v1:IsDescendantOf(v9.Model)) then
-							v2 = v9.Base
-							v3 = v2.CFrame
-							if v5 then
-								if v5 ~= v9 then
-									t.OnCarExited:Fire(v5, true)
-									t.OnCarEntered:Fire(v9)
+				for trainIndex, train in next, trainSystems do
+					local carCheckResult
+					for i = #train.Cars, 1, -1 do
+						local car = train.Cars[i]
+						if car.Loaded and (castResult and castResult:IsDescendantOf(car.Model)) then
+							carBaseFrame = car.Base
+							previousBaseFrame = carBaseFrame.CFrame
+							if currentCar then
+								if currentCar ~= car then
+									signals.OnCarExited:Fire(currentCar, true)
+									signals.OnCarEntered:Fire(car)
 								end
 							else
-								t.OnCarEntered:Fire(v9)
+								signals.OnCarEntered:Fire(car)
 							end
-							v5 = v9
-							v6 = v82
+							currentCar = car
+							currentTrain = train
 						end
 					end
-					v62 = if v82.ServerDistanceAhead then v82.ServerSpeed + v82.ServerDistanceAhead else v82.ServerSpeed or v82.Speed
-					v82.Speed = v82.Speed + (v62 - v82.Speed) * 0.1
-					MoveTrain(v82, p1)
-					RenderTrain(v82, p1)
+					carCheckResult = if train.ServerDistanceAhead then train.ServerSpeed + train.ServerDistanceAhead else train.ServerSpeed or train.Speed
+					train.Speed = train.Speed + (carCheckResult - train.Speed) * 0.1
+					MoveTrain(train, deltaTime)
+					RenderTrain(train, deltaTime)
 				end
 				debug.profileend()
-				if v2 then
-					local v10 = v2.CFrame
-					local v11 = v10 * v3:Inverse()
-					local v12 = VehicleUtils.GetLocalVehiclePacket()
-					if not (v12 and v12.Passenger) then
-						v42.CFrame = v11 * v42.CFrame
+				if carBaseFrame then
+					local currentBaseFrame = carBaseFrame.CFrame
+					local frameDifference = currentBaseFrame * previousBaseFrame:Inverse()
+					local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+					if not (vehiclePacket and vehiclePacket.Passenger) then
+						playerRootPart.CFrame = frameDifference * playerRootPart.CFrame
 					end
-					local v13 = CurrentCamera.CFrame:ToObjectSpace(CurrentCamera.Focus)
-					CurrentCamera.CFrame = CurrentCamera.CFrame * v13 * (v11 - v11.p) * v13:Inverse()
-					assert(v5)
-					if UnsafePositionReplication and os.clock() - v7 > 0.2 then
-						local v15 = v10:ToObjectSpace(v42.CFrame)
-						if not (v8 and v15:FuzzyEq(v8)) then
-							v7 = os.clock()
-							UnsafePositionReplication:FireServer("Train", v5.Id, v15)
-							v8 = v15
+					local cameraLocalOffset = CurrentCamera.CFrame:ToObjectSpace(CurrentCamera.Focus)
+					CurrentCamera.CFrame = CurrentCamera.CFrame * cameraLocalOffset * (frameDifference - frameDifference.p) * cameraLocalOffset:Inverse()
+					assert(currentCar)
+					if UnsafePositionReplication and os.clock() - lastPositionUpdateTime > 0.2 then
+						local playerRelativePosition = currentBaseFrame:ToObjectSpace(playerRootPart.CFrame)
+						if not (lastPositionCFrame and playerRelativePosition:FuzzyEq(lastPositionCFrame)) then
+							lastPositionUpdateTime = os.clock()
+							UnsafePositionReplication:FireServer("Train", currentCar.Id, playerRelativePosition)
+							lastPositionCFrame = playerRelativePosition
 						end
 					end
-					for v16, v17 in t3 do
-						local v18 = v17:GetAttribute("TrainCar")
-						local v19 = v17:GetAttribute("TrainOffset")
-						if Character ~= v17 and (v17.PrimaryPart and (v18 and v19)) then
-							local v20 = v6
-							local v21 = false
-							local v22 = v18
-							for j = 1, #v20.Cars do
-								if v20.Cars[j].Id == v22 then
-									v21 = v20.Cars[j]
+					for characterIndex, character in charactersTrain do
+						local carIdAttribute = character:GetAttribute("TrainCar")
+						local offsetAttribute = character:GetAttribute("TrainOffset")
+						if Character ~= character and (character.PrimaryPart and (carIdAttribute and offsetAttribute)) then
+							local trainForCharacter = currentTrain
+							local targetCarFound = false
+							local targetCarId = carIdAttribute
+							for j = 1, #trainForCharacter.Cars do
+								if trainForCharacter.Cars[j].Id == targetCarId then
+									targetCarFound = trainForCharacter.Cars[j]
 									break
 								end
 							end
-							if v21 and v21.Base then
-								local v23 = t4[v17]
-								if not v23 then
-									local t5 = {
-										LastCarId = v22,
-										LastOffset = v21.Base.CFrame:ToObjectSpace(v17.PrimaryPart.CFrame)
+							if targetCarFound and targetCarFound.Base then
+								local characterPositionData = characterLastPositions[character]
+								if not characterPositionData then
+									local newPositionData = {
+										LastCarId = targetCarId,
+										LastOffset = targetCarFound.Base.CFrame:ToObjectSpace(character.PrimaryPart.CFrame)
 									}
-									t4[v17] = t5
-									v23 = t5
+									characterLastPositions[character] = newPositionData
+									characterPositionData = newPositionData
 								end
-								local LastOffset = v23.LastOffset
-								if v23.LastCarId ~= v22 then
-									local v24 = v6
-									local LastCarId = v23.LastCarId
-									local v25 = false
-									for k = 1, #v24.Cars do
-										if v24.Cars[k].Id == LastCarId then
-											v25 = v24.Cars[k]
+								local LastOffset = characterPositionData.LastOffset
+								if characterPositionData.LastCarId ~= targetCarId then
+									local trainForLookup = currentTrain
+									local LastCarId = characterPositionData.LastCarId
+									local previousCarFound = false
+									for k = 1, #trainForLookup.Cars do
+										if trainForLookup.Cars[k].Id == LastCarId then
+											previousCarFound = trainForLookup.Cars[k]
 											break
 										end
 									end
-									LastOffset = if v25 and v25.Base then v21.Base.CFrame:ToObjectSpace(v25.Base.CFrame * LastOffset) else v21.Base.CFrame:ToObjectSpace(v17.PrimaryPart.CFrame)
-									v23.LastCarId = v22
+									LastOffset = if previousCarFound and previousCarFound.Base then targetCarFound.Base.CFrame:ToObjectSpace(previousCarFound.Base.CFrame * LastOffset) else targetCarFound.Base.CFrame:ToObjectSpace(character.PrimaryPart.CFrame)
+									characterPositionData.LastCarId = targetCarId
 								end
-								local v29 = LastOffset:Lerp(v19, 1 - math.exp(-5 * p1))
-								v23.LastOffset = v29
-								v17.PrimaryPart.CFrame = v21.Base.CFrame * v29
+								local interpolatedOffset = LastOffset:Lerp(offsetAttribute, 1 - math.exp(-5 * deltaTime))
+								characterPositionData.LastOffset = interpolatedOffset
+								character.PrimaryPart.CFrame = targetCarFound.Base.CFrame * interpolatedOffset
 							end
 						end
 					end
@@ -359,37 +358,37 @@ return {
 			end
 		end
 		RunService.Heartbeat:Connect(Stepped)
-		t.OnCarEntered:Connect(function(p1)
+		signals.OnCarEntered:Connect(function(enteredCar)
 			if LocalPlayer.Character then
-				local v1 = nil
-				local v2 = p1.Base and p1.Base.CFrame
-				for v3, v4 in LocalPlayer.Character:GetDescendants() do
-					if v4:IsA("BasePart") then
-						if v1 == nil and v4.Name == "HumanoidRootPart" then
-							v1 = v4.CFrame
+				local humanoidRootPart = nil
+				local carBaseFrame = enteredCar.Base and enteredCar.Base.CFrame
+				for descendantIndex, descendant in LocalPlayer.Character:GetDescendants() do
+					if descendant:IsA("BasePart") then
+						if humanoidRootPart == nil and descendant.Name == "HumanoidRootPart" then
+							humanoidRootPart = descendant.CFrame
 						end
-						v4.CollisionGroup = "PlayersInTrain"
+						descendant.CollisionGroup = "PlayersInTrain"
 					end
 				end
-				if v1 and (v2 and ChangePositionReplication) then
-					ChangePositionReplication:FireServer("Train", true, p1.Id, v2:ToObjectSpace(v1))
+				if humanoidRootPart and (carBaseFrame and ChangePositionReplication) then
+					ChangePositionReplication:FireServer("Train", true, enteredCar.Id, carBaseFrame:ToObjectSpace(humanoidRootPart))
 				end
 			end
 		end)
-		t.OnCarExited:Connect(function(p1, p2)
+		signals.OnCarExited:Connect(function(exitedCar, isInstantExit)
 			if LocalPlayer.Character then
-				for v1, v2 in LocalPlayer.Character:GetDescendants() do
-					if v2:IsA("BasePart") then
-						v2.CollisionGroup = "Players"
+				for descendantIndex, descendant in LocalPlayer.Character:GetDescendants() do
+					if descendant:IsA("BasePart") then
+						descendant.CollisionGroup = "Players"
 					end
 				end
 			end
-			if not p2 and ChangePositionReplication then
+			if not isInstantExit and ChangePositionReplication then
 				ChangePositionReplication:FireServer(nil, false)
 			end
 		end)
 	end,
-	Signals = t,
+	Signals = signals,
 	GetSystemById = GetSystemById,
 	GetCarById = GetCarById,
 	MoveTrain = MoveTrain

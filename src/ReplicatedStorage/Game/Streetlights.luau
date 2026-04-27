@@ -1,15 +1,13 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Binder = require(ReplicatedStorage.Std.Binder)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local StreetlightClass = {}
 StreetlightClass.__index = StreetlightClass
-function StreetlightClass.new(obj)
+function StreetlightClass.new(streetlightObject)
 	local instance = {}
 	setmetatable(instance, StreetlightClass)
 	instance._maid = Maid.new()
-	instance._obj = obj
+	instance._obj = streetlightObject
 	return instance
 end
 function StreetlightClass.SetValue(self, enabled)
@@ -29,16 +27,16 @@ local StreetlightsModule = {
 function StreetlightsModule.init()
 	local binder = Binder.new("Streetlight", StreetlightClass)
 	StreetlightsModule._binder = binder
-	binder:GetClassAddedSignal():Connect(function(instance)
-		instance:SetValue(StreetlightsModule._enabled)
+	binder:GetClassAddedSignal():Connect(function(streetlight)
+		streetlight:SetValue(StreetlightsModule._enabled)
 	end)
 	binder:Start()
 end
 function StreetlightsModule.SetEnabled(enabled)
 	StreetlightsModule._enabled = enabled
-	for i, v in ipairs(StreetlightsModule._binder:GetAll()) do
-		if v.SetValue then
-			v:SetValue(enabled)
+	for i, streetlight in ipairs(StreetlightsModule._binder:GetAll()) do
+		if streetlight.SetValue then
+			streetlight:SetValue(enabled)
 		end
 		wait(math.random() * 0.1)
 	end
@@ -47,13 +45,13 @@ function StreetlightsModule.Flicker()
 	local isLit = true
 	for i = 1, 10 do
 		isLit = not isLit
-		for i2, v in ipairs(StreetlightsModule._binder:GetAll()) do
-			v:SetValue(isLit)
+		for i2, streetlight in ipairs(StreetlightsModule._binder:GetAll()) do
+			streetlight:SetValue(isLit)
 		end
 		wait(0.2)
 	end
-	for i, v in ipairs(StreetlightsModule._binder:GetAll()) do
-		v:SetValue(StreetlightsModule._enabled)
+	for i, streetlight in ipairs(StreetlightsModule._binder:GetAll()) do
+		streetlight:SetValue(StreetlightsModule._enabled)
 	end
 end
 return StreetlightsModule

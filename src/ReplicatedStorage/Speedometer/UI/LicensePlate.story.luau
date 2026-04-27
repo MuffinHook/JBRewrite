@@ -1,13 +1,12 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
-return function(p1)
+return function(parentContainer)
 	local LicensePlate = require(script.Parent.LicensePlate)
-	local v1 = Roact.mount(Roact.createElement(LicensePlate, {
+	local componentHandle = Roact.mount(Roact.createElement(LicensePlate, {
 		size = UDim2.new(0.5, 0, 0.5, 0),
 		position = UDim2.new(0.25, 0, 0.25, 0)
-	}), p1)
+	}), parentContainer)
 	return function()
-		Roact.unmount(v1)
+		Roact.unmount(componentHandle)
 	end
 end

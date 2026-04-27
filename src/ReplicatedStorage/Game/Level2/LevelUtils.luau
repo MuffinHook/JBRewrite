@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SeasonConsts = require(ReplicatedStorage.Game.Season.SeasonConsts)
 local LevelConsts = require(script.Parent.LevelConsts)
@@ -45,11 +43,11 @@ function t.yieldTotalExp(instance)
 	local level = t.yieldLevel(instance)
 	return t.calculateExpOfLevel(level) + t.yieldExp(instance)
 end
-local function getTotalExpAtLevel(p1, p2, p3, p4)
-	local v1 = if p4 == 1 then p2 / p3 else p2 * (1 - p4) / (1 - p4 ^ p3)
-	local v2 = if p4 == 1 then v1 * p1 else v1 * (1 - p4 ^ p1) / (1 - p4)
-	local count = math.floor(v2)
-	if v2 - count >= 0.5 then
+local function getTotalExpAtLevel(levelCount, baseExpValue, maxRewardLevel, curveFactor)
+	local seriesSum = if curveFactor == 1 then baseExpValue / maxRewardLevel else baseExpValue * (1 - curveFactor) / (1 - curveFactor ^ maxRewardLevel)
+	local totalExp = if curveFactor == 1 then seriesSum * levelCount else seriesSum * (1 - curveFactor ^ levelCount) / (1 - curveFactor)
+	local count = math.floor(totalExp)
+	if totalExp - count >= 0.5 then
 		count = count + 1
 	end
 	return count

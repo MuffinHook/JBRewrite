@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AirDropConsts = require(ReplicatedStorage.AirDrop.AirDropConsts)
 local Players = game:GetService("Players")

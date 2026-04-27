@@ -1,25 +1,23 @@
--- Reviewed by Claude
--- variables reassigned
-local v1 = newproxy(true)
-getmetatable(v1).__tostring = function()
+local noneValue = newproxy(true)
+getmetatable(noneValue).__tostring = function()
 	return "None"
 end
 return {
-	None = v1,
+	None = noneValue,
 	merge = function(...)
-		local t = {}
+		local resultTable = {}
 		for i = 1, select("#", ...) do
-			local v12 = select(i, ...)
-			if v12 ~= nil then
-				for k, v in pairs(v12) do
-					if v == v1 then
-						t[k] = nil
+			local sourceTable = select(i, ...)
+			if sourceTable ~= nil then
+				for k, sourceValue in pairs(sourceTable) do
+					if sourceValue == noneValue then
+						resultTable[k] = nil
 					else
-						t[k] = v
+						resultTable[k] = sourceValue
 					end
 				end
 			end
 		end
-		return t
+		return resultTable
 	end
 }

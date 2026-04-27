@@ -1,7 +1,5 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local v1 = nil
+local initData = nil
 local initialized = false
 local function Check()
 	local April2020LiveEvent = ReplicatedStorage.Resource:FindFirstChild("April2020LiveEvent")
@@ -9,8 +7,8 @@ local function Check()
 		initialized = true
 		local April2020LiveEvent_2 = April2020LiveEvent:WaitForChild("April2020LiveEvent")
 		wait(0.1)
-		require(April2020LiveEvent_2).Init(v1)
-		v1 = nil
+		require(April2020LiveEvent_2).Init(initData)
+		initData = nil
 		print("Loaded april 2020 live event")
 	end
 end
@@ -24,8 +22,8 @@ local function Launch()
 	end
 end
 return {
-	Init = function(initData)
-		v1 = initData
+	Init = function(receivedInitData)
+		initData = receivedInitData
 		spawn(Launch)
 	end
 }

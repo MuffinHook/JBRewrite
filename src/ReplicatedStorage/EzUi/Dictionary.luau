@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local NoneProxy = newproxy(true)
 getmetatable(NoneProxy).__tostring = function()
 	return "None"

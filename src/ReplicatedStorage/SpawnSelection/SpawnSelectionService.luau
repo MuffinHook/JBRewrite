@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SpawnSelectionConsts = require(script.Parent.SpawnSelectionConsts)
@@ -12,17 +10,17 @@ local PrivateServerUtils = require(ReplicatedStorage.PrivateServer.PrivateServer
 local Roact = require(ReplicatedStorage.Roact)
 local Interval = require(ReplicatedStorage.Std.Interval)
 local Maid = require(ReplicatedStorage.Std.Maid)
-local t = {
+local SpawnSelectionService = {
 	_updateRemote = nil,
 	_maid = Maid.new()
 }
-function t.init()
+function SpawnSelectionService.init()
 	waitForChild(ReplicatedStorage, "SpawnSelectionUpdateSpawnData"):andThen(function(updateRemote)
-		t._updateRemote = updateRemote
-		updateRemote.OnClientEvent:Connect(t._receiveSpawns)
+		SpawnSelectionService._updateRemote = updateRemote
+		updateRemote.OnClientEvent:Connect(SpawnSelectionService._receiveSpawns)
 	end)
 	waitForChild(ReplicatedStorage, "SpawnSelectionOffer"):andThen(function(offerRemote)
-		t._offerRemote = offerRemote
+		SpawnSelectionService._offerRemote = offerRemote
 		offerRemote.OnClientEvent:Connect(function()
 			store:dispatch({
 				type = "setSpawnSelectionOfferVisible",
@@ -32,19 +30,19 @@ function t.init()
 	end)
 	store.changed:connect(function(newState, oldState)
 		if newState.minimapSpawns ~= oldState.minimapSpawns then
-			t._maid.receiveSpawnsMaid = nil
+			SpawnSelectionService._maid.receiveSpawnsMaid = nil
 		end
 	end)
 end
-function t.requestShowSpawns()
-	t._updateRemote:FireServer()
+function SpawnSelectionService.requestShowSpawns()
+	SpawnSelectionService._updateRemote:FireServer()
 end
-function t.attemptSelect(p1)
-	ReplicatedStorage:FindFirstChild("SpawnSelectionSelect"):FireServer(p1)
+function SpawnSelectionService.attemptSelect(selectedSpawnId)
+	ReplicatedStorage:FindFirstChild("SpawnSelectionSelect"):FireServer(selectedSpawnId)
 end
-function t._receiveSpawns(spawns)
+function SpawnSelectionService._receiveSpawns(spawns)
 	local maid = Maid.new()
-	t._maid.receiveSpawnsMaid = maid
+	SpawnSelectionService._maid.receiveSpawnsMaid = maid
 	local clanId = ClanUtils.getCurrentClanId(Players.LocalPlayer)
 	local spawnsData = {}
 	for index, spawnData in spawns do
@@ -88,4 +86,4 @@ function t._receiveSpawns(spawns)
 		receivedAt = workspace:GetServerTimeNow()
 	})
 end
-return t
+return SpawnSelectionService

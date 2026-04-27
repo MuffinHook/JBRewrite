@@ -1,7 +1,6 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-local t = {
+local ownershipConstants = {
 	COLOR_CATEGORY_TYPES = {
 		WheelColor = true,
 		BodyColor = true,
@@ -33,7 +32,7 @@ local t = {
 	},
 	VEHICLE_CUSTOMIZATION_CATEGORY_NAME_SET = {}
 }
-for i, v in ipairs(t.VEHICLE_CUSTOMIZATION_CATEGORY_NAMES) do
-	t.VEHICLE_CUSTOMIZATION_CATEGORY_NAME_SET[v] = true
+for index, categoryName in ipairs(ownershipConstants.VEHICLE_CUSTOMIZATION_CATEGORY_NAMES) do
+	ownershipConstants.VEHICLE_CUSTOMIZATION_CATEGORY_NAME_SET[categoryName] = true
 end
-return TableUtils.requireValidIndexAndFreeze(t)
+return TableUtils.requireValidIndexAndFreeze(ownershipConstants)

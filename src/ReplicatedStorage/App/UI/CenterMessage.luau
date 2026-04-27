@@ -1,17 +1,16 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("CenterMessage")
-function v1.init(p1)end
-function v1.render(p1)
+local CenterMessageComponent = Roact.PureComponent:extend("CenterMessage")
+function CenterMessageComponent.init(self)end
+function CenterMessageComponent.render(self)
 	return createElement("Frame", {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0.2, 0, 1, 0),
 		Position = UDim2.new(0.5, 0, 0.4, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Visible = p1.props.text:map(function(p1)
-			return #p1 > 0
+		Visible = self.props.text:map(function(text)
+			return #text > 0
 		end)
 	}, {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
@@ -26,9 +25,9 @@ function v1.render(p1)
 			TextColor3 = Color3.fromRGB(252, 40, 47),
 			TextStrokeColor3 = Color3.fromRGB(202, 0, 0),
 			TextStrokeTransparency = 0.5,
-			Text = p1.props.text
+			Text = self.props.text
 		})
 	})
 end
-function v1.willUnmount(p1)end
-return v1
+function CenterMessageComponent.willUnmount(self)end
+return CenterMessageComponent

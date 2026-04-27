@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
@@ -7,14 +6,14 @@ require(ReplicatedStorage.Std.Signal)
 local module = {}
 module.__index = module
 local function _makeFadeGui()
-	local _Fade = Instance.new("ScreenGui")
-	_Fade.DisplayOrder = 100
-	_Fade.IgnoreGuiInset = true
-	_Fade.ClipToDeviceSafeArea = false
-	_Fade.ScreenInsets = Enum.ScreenInsets.None
-	_Fade.SafeAreaCompatibility = Enum.SafeAreaCompatibility.None
-	_Fade.ResetOnSpawn = false
-	_Fade.Name = "_Fade"
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.DisplayOrder = 100
+	screenGui.IgnoreGuiInset = true
+	screenGui.ClipToDeviceSafeArea = false
+	screenGui.ScreenInsets = Enum.ScreenInsets.None
+	screenGui.SafeAreaCompatibility = Enum.SafeAreaCompatibility.None
+	screenGui.ResetOnSpawn = false
+	screenGui.Name = "_Fade"
 	local Frame = Instance.new("Frame")
 	Frame.Position = UDim2.fromScale(0, 0)
 	Frame.Size = UDim2.fromScale(1, 1)
@@ -22,39 +21,39 @@ local function _makeFadeGui()
 	Frame.Interactable = false
 	Frame.BackgroundTransparency = 1
 	Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-	Frame.Parent = _Fade
-	return _Fade, Frame
+	Frame.Parent = screenGui
+	return screenGui, Frame
 end
 function module.new()
-	local t2 = {}
-	setmetatable(t2, module)
-	t2.maid = Maid.new()
-	local v2, v3 = _makeFadeGui()
-	t2.maid:GiveTask(v2)
-	v2.Parent = Players.LocalPlayer.PlayerGui
-	t2.frame = v3
-	return t2
+	local self = {}
+	setmetatable(self, module)
+	self.maid = Maid.new()
+	local screenGui, frame = _makeFadeGui()
+	self.maid:GiveTask(screenGui)
+	screenGui.Parent = Players.LocalPlayer.PlayerGui
+	self.frame = frame
+	return self
 end
-function module._FadeTo(p1, p2, p3)
-	if p1._tween then
-		p1._tween:Cancel()
+function module._FadeTo(self, transparency, tweenInfo)
+	if self._tween then
+		self._tween:Cancel()
 	end
-	p1._tween = TweenService:Create(p1.frame, p3, {
-		BackgroundTransparency = p2
+	self._tween = TweenService:Create(self.frame, tweenInfo, {
+		BackgroundTransparency = transparency
 	})
-	p1._tween:Play()
+	self._tween:Play()
 end
-function module.FadeToLinear(p1, p2, p3)
-	p1:_FadeTo(p2, TweenInfo.new(p3, 0))
+function module.FadeToLinear(self, transparency, duration)
+	self:_FadeTo(transparency, TweenInfo.new(duration, 0))
 end
-function module.Set(p1, p2)
-	if p1._tween then
-		p1._tween:Cancel()
+function module.Set(self, transparency)
+	if self._tween then
+		self._tween:Cancel()
 	end
-	p1.frame.BackgroundTransparency = p2
+	self.frame.BackgroundTransparency = transparency
 end
-function module.Destroy(p1)
-	p1.maid:Destroy()
-	setmetatable(p1, nil)
+function module.Destroy(self)
+	self.maid:Destroy()
+	setmetatable(self, nil)
 end
 return module

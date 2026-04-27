@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("UserInputService")
@@ -9,7 +7,7 @@ local PlayerModuleService = require(ReplicatedStorage.PlayerModule.PlayerModuleS
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local InventoryItemBinder = require(ReplicatedStorage.Inventory.InventoryItemBinder)
 local InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSystem)
-local t = {
+local DefaultActions = {
 	onJumpPressed = Signal.new(),
 	onJumpReleased = Signal.new(),
 	jumpButton = {
@@ -43,43 +41,43 @@ local t = {
 		keyCodes = { Enum.KeyCode.R, Enum.KeyCode.DPadLeft }
 	}
 }
-function t.init(playerModule)
-	function t.jumpButton.onPressed(inputType)
+function DefaultActions.init(playerModule)
+	function DefaultActions.jumpButton.onPressed(inputType)
 		if inputType ~= Enum.UserInputType.Keyboard and inputType ~= Enum.UserInputType.Gamepad1 then
 			PlayerModuleService.setIsJumping(true)
 		end
-		t.onJumpPressed:Fire()
+		DefaultActions.onJumpPressed:Fire()
 	end
-	function t.jumpButton.onReleased()
+	function DefaultActions.jumpButton.onReleased()
 		PlayerModuleService.setIsJumping(false)
-		t.onJumpReleased:Fire()
+		DefaultActions.onJumpReleased:Fire()
 	end
-	ActionButtonService.add(t.jumpButton)
-	function t.sprintButton.onPressed()
+	ActionButtonService.add(DefaultActions.jumpButton)
+	function DefaultActions.sprintButton.onPressed()
 		playerModule.setSprinting(true)
 	end
-	function t.sprintButton.onReleased()
+	function DefaultActions.sprintButton.onReleased()
 		playerModule.setSprinting(false)
 	end
-	ActionButtonService.add(t.sprintButton)
-	function t.crawlButton.onPressed()
+	ActionButtonService.add(DefaultActions.sprintButton)
+	function DefaultActions.crawlButton.onPressed()
 		playerModule.attemptToggleCrawling()
 	end
-	ActionButtonService.add(t.crawlButton)
-	function t.punchButton.onPressed()
+	ActionButtonService.add(DefaultActions.crawlButton)
+	function DefaultActions.punchButton.onPressed()
 		playerModule.attemptPunch()
 	end
-	ActionButtonService.add(t.punchButton)
+	ActionButtonService.add(DefaultActions.punchButton)
 	local Radio = require(ReplicatedStorage.Game.Radio.Radio)
-	function t.radioButton.onPressed()
+	function DefaultActions.radioButton.onPressed()
 		Radio.Toggle()
 	end
-	ActionButtonService.add(t.radioButton)
+	ActionButtonService.add(DefaultActions.radioButton)
 	local function updatePunchVisibility(shouldUpdateJump)
 		local isInVehicle = VehicleUtils.GetLocalVehiclePacket() ~= nil
-		ActionButtonService.setButtonEnabled(t.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
+		ActionButtonService.setButtonEnabled(DefaultActions.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
 		if shouldUpdateJump then
-			ActionButtonService.setButtonPrimary(t.jumpButton, not isInVehicle)
+			ActionButtonService.setButtonPrimary(DefaultActions.jumpButton, not isInVehicle)
 		end
 	end
 	VehicleUtils.OnVehicleEntered:Connect(updatePunchVisibility)
@@ -88,21 +86,21 @@ function t.init(playerModule)
 		item._maid:GiveTask(item:GetEquippedSignal():Connect(function()
 			if item:GetOwner() == Players.LocalPlayer then
 				local isInVehicle = VehicleUtils.GetLocalVehiclePacket() ~= nil
-				ActionButtonService.setButtonEnabled(t.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
+				ActionButtonService.setButtonEnabled(DefaultActions.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
 			end
 		end))
 		if item:GetOwner() == Players.LocalPlayer then
 			item._maid:GiveTask(function()
 				local isInVehicle = VehicleUtils.GetLocalVehiclePacket() ~= nil
-				ActionButtonService.setButtonEnabled(t.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
+				ActionButtonService.setButtonEnabled(DefaultActions.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
 			end)
 		end
 	end
-	for v1, item in InventoryItemBinder:GetAll() do
+	for itemKey, item in InventoryItemBinder:GetAll() do
 		handleItem(item)
 	end
 	InventoryItemBinder:GetClassAddedSignal():Connect(handleItem)
 	local isInVehicle = VehicleUtils.GetLocalVehiclePacket() ~= nil
-	ActionButtonService.setButtonEnabled(t.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
+	ActionButtonService.setButtonEnabled(DefaultActions.punchButton, not isInVehicle and not InventoryItemSystem.getEquippedFor(Players.LocalPlayer)[1])
 end
-return t
+return DefaultActions

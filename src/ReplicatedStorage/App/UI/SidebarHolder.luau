@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -26,25 +24,25 @@ function SidebarHolder._fetchState(self)
 end
 function SidebarHolder.render(self)
 	local elements = {}
-	for i, v in ipairs(self.props.buttons) do
+	for i, button in ipairs(self.props.buttons) do
 		local buttonElement = createElement(BigButton, {
-			imageId = v.imageId,
-			imageScale = v.imageScale,
-			count = v.count,
-			onClick = v.onClick,
-			enabled = v.enabled,
-			ref = v.ref,
-			displayOrder = v.displayOrder or i,
+			imageId = button.imageId,
+			imageScale = button.imageScale,
+			count = button.count,
+			onClick = button.onClick,
+			enabled = button.enabled,
+			ref = button.ref,
+			displayOrder = button.displayOrder or i,
 			color = self.props.color,
 			size = UDim2.new(0.9, 0, 0.9, 0)
 		})
-		elements[v.name] = createElement("Frame", {
+		elements[button.name] = createElement("Frame", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0),
-			Visible = v.enabled,
-			LayoutOrder = v.displayOrder or i
+			Visible = button.enabled,
+			LayoutOrder = button.displayOrder or i
 		}, {
-			[v.name] = buttonElement
+			[button.name] = buttonElement
 		})
 	end
 	return createElement("Frame", {

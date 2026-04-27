@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TradePopularSortData = require(script.Parent.TradePopularSortData)
 local ItemUtils = require(ReplicatedStorage.App.ItemUtils)

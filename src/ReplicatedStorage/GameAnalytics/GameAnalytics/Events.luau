@@ -1,5 +1,4 @@
--- Reviewed by Claude
-local t = {
+local Events = {
 	ProcessEventsInterval = 8,
 	GameKey = "",
 	SecretKey = "",
@@ -18,109 +17,109 @@ local GAResourceFlowType = require(script.Parent.GAResourceFlowType)
 local GAProgressionStatus = require(script.Parent.GAProgressionStatus)
 local GAErrorSeverity = require(script.Parent.GAErrorSeverity)
 local HttpService = game:GetService("HttpService")
-local function addDimensionsToEvent(p1, p2)
-	if p2 and p1 then
-		local v1 = Store:GetPlayerDataFromCache(p1)
-		if v1 and (v1.CurrentCustomDimension01 and #v1.CurrentCustomDimension01 > 0) then
-			p2.custom_01 = v1.CurrentCustomDimension01
+local function addDimensionsToEvent(player, eventData)
+	if eventData and player then
+		local playerData = Store:GetPlayerDataFromCache(player)
+		if playerData and (playerData.CurrentCustomDimension01 and #playerData.CurrentCustomDimension01 > 0) then
+			eventData.custom_01 = playerData.CurrentCustomDimension01
 		end
-		if v1 and (v1.CurrentCustomDimension02 and #v1.CurrentCustomDimension02 > 0) then
-			p2.custom_02 = v1.CurrentCustomDimension02
+		if playerData and (playerData.CurrentCustomDimension02 and #playerData.CurrentCustomDimension02 > 0) then
+			eventData.custom_02 = playerData.CurrentCustomDimension02
 		end
-		if v1 and (v1.CurrentCustomDimension03 and #v1.CurrentCustomDimension03 > 0) then
-			p2.custom_03 = v1.CurrentCustomDimension03
+		if playerData and (playerData.CurrentCustomDimension03 and #playerData.CurrentCustomDimension03 > 0) then
+			eventData.custom_03 = playerData.CurrentCustomDimension03
 		end
 	end
 end
-local function getClientTsAdjusted(p1)
-	if p1 then
-		local v1 = Store:GetPlayerDataFromCache(p1)
-		local v2 = os.time()
-		local v3 = v2 + v1.ClientServerTimeOffset
-		if Validation:validateClientTs(v3) then
-			return v3
+local function getClientTsAdjusted(player)
+	if player then
+		local playerData = Store:GetPlayerDataFromCache(player)
+		local currentTime = os.time()
+		local adjustedTime = currentTime + playerData.ClientServerTimeOffset
+		if Validation:validateClientTs(adjustedTime) then
+			return adjustedTime
 		else
-			return v2
+			return currentTime
 		end
 	else
 		return os.time()
 	end
 end
-local v1 = HttpService:GenerateGUID(false):lower()
-local function Length(p1)
+local sessionId = HttpService:GenerateGUID(false):lower()
+local function Length(table)
 	local count = 0
-	for k, v in pairs(p1) do
+	for k, v in pairs(table) do
 		count = count + 1
 	end
 	return count
 end
-local function getEventAnnotations(p1)
-	local v12, v2
-	if p1 then
-		v12, v2 = p1, Store:GetPlayerDataFromCache(p1)
+local function getEventAnnotations(player)
+	local playerId, playerData
+	if player then
+		playerId, playerData = player, Store:GetPlayerDataFromCache(player)
 	else
-		v12 = "DummyId"
-		v2 = {
+		playerId = "DummyId"
+		playerData = {
 			OS = "uwp_desktop 0.0.0",
 			Platform = "uwp_desktop",
-			SessionID = v1,
+			SessionID = sessionId,
 			Sessions = 1,
 			CustomUserId = "Server"
 		}
 	end
-	local t2 = {
-		v = 2,
-		user_id = tostring(v12) .. v2.CustomUserId
+	local eventAnnotations = {
+		version = 2,
+		user_id = tostring(playerId) .. playerData.CustomUserId
 	}
-	local v4
-	if p1 then
-		local v5 = Store:GetPlayerDataFromCache(p1)
-		local v6 = os.time()
-		local v7 = v6 + v5.ClientServerTimeOffset
-		v4 = if Validation:validateClientTs(v7) then v7 else v6
+	local clientTimestamp
+	if player then
+		local playerDataTS = Store:GetPlayerDataFromCache(player)
+		local currentTime = os.time()
+		local adjustedTime = currentTime + playerDataTS.ClientServerTimeOffset
+		clientTimestamp = if Validation:validateClientTs(adjustedTime) then adjustedTime else currentTime
 	else
-		v4 = os.time()
+		clientTimestamp = os.time()
 	end
-	t2.client_ts = v4
-	t2.sdk_version = "roblox " .. Version.SdkVersion
-	t2.os_version = v2.OS
-	t2.manufacturer = "unknown"
-	t2.device = "unknown"
-	t2.platform = v2.Platform
-	t2.session_id = v2.SessionID
-	t2.session_num = v2.Sessions
-	if Utilities:isStringNullOrEmpty(v2.CountryCode) then
-		t2.country_code = "unknown"
+	eventAnnotations.client_ts = clientTimestamp
+	eventAnnotations.sdk_version = "roblox " .. Version.SdkVersion
+	eventAnnotations.os_version = playerData.OS
+	eventAnnotations.manufacturer = "unknown"
+	eventAnnotations.device = "unknown"
+	eventAnnotations.platform = playerData.Platform
+	eventAnnotations.session_id = playerData.SessionID
+	eventAnnotations.session_num = playerData.Sessions
+	if Utilities:isStringNullOrEmpty(playerData.CountryCode) then
+		eventAnnotations.country_code = "unknown"
 	else
-		t2.country_code = v2.CountryCode
+		eventAnnotations.country_code = playerData.CountryCode
 	end
-	if Validation:validateBuild(t.Build) then
-		t2.build = t.Build
+	if Validation:validateBuild(Events.Build) then
+		eventAnnotations.build = Events.Build
 	end
-	if v2.Configurations then
+	if playerData.Configurations then
 		local count = 0
-		for k, v in pairs(v2.Configurations) do
+		for k, v in pairs(playerData.Configurations) do
 			count = count + 1
 		end
 		if count > 0 then
-			t2.configurations = v2.Configurations
+			eventAnnotations.configurations = playerData.Configurations
 		end
 	end
-	if not Utilities:isStringNullOrEmpty(v2.AbId) then
-		t2.ab_id = v2.AbId
+	if not Utilities:isStringNullOrEmpty(playerData.AbId) then
+		eventAnnotations.ab_id = playerData.AbId
 	end
-	if not Utilities:isStringNullOrEmpty(v2.AbVariantId) then
-		t2.ab_variant_id = v2.AbVariantId
+	if not Utilities:isStringNullOrEmpty(playerData.AbVariantId) then
+		eventAnnotations.ab_variant_id = playerData.AbVariantId
 	end
-	return t2
+	return eventAnnotations
 end
-local function addEventToStore(p1, p2)
-	local v1 = getEventAnnotations(p1)
-	for k in pairs(p2) do
-		v1[k] = p2[k]
+local function addEventToStore(player, eventData)
+	local eventAnnotations = getEventAnnotations(player)
+	for k in pairs(eventData) do
+		eventAnnotations[k] = eventData[k]
 	end
-	Logger:ii("Event added to queue: " .. HttpService:JSONEncode(v1))
-	Store.EventsQueue[#Store.EventsQueue + 1] = v1
+	Logger:ii("Event added to queue: " .. HttpService:JSONEncode(eventAnnotations))
+	Store.EventsQueue[#Store.EventsQueue + 1] = eventAnnotations
 end
 local function dequeueMaxEvents()
 	if #Store.EventsQueue <= 500 then
@@ -132,37 +131,37 @@ local function dequeueMaxEvents()
 		if #Store.EventsQueue > 2000 then
 			Logger:w(("DROPPING EVENTS: More than %d events queued!"):format(2000))
 		end
-		local v1 = table.create(500)
+		local dequeuedEvents = table.create(500)
 		for i = 1, 500 do
-			v1[i] = Store.EventsQueue[i]
+			dequeuedEvents[i] = Store.EventsQueue[i]
 		end
-		local v2 = #Store.EventsQueue
-		for j = 1, math.min(2000, v2) do
+		local originalQueueLength = #Store.EventsQueue
+		for j = 1, math.min(2000, originalQueueLength) do
 			Store.EventsQueue[j] = Store.EventsQueue[j + 500]
 		end
-		for k = 2001, v2 do
+		for k = 2001, originalQueueLength do
 			Store.EventsQueue[k] = nil
 		end
-		return v1
+		return dequeuedEvents
 	end
 end
 local function processEvents()
-	local v1 = dequeueMaxEvents()
-	if #v1 == 0 then
+	local queuedEvents = dequeueMaxEvents()
+	if #queuedEvents == 0 then
 		Logger:i("Event queue: No events to send")
 		return
 	end
-	Logger:i("Event queue: Sending " .. tostring(#v1) .. " events.")
-	local v2 = HttpApi:sendEventsInArray(t.GameKey, t.SecretKey, v1)
-	local statusCode = v2.statusCode
-	local body = v2.body
+	Logger:i("Event queue: Sending " .. tostring(#queuedEvents) .. " events.")
+	local response = HttpApi:sendEventsInArray(Events.GameKey, Events.SecretKey, queuedEvents)
+	local statusCode = response.statusCode
+	local body = response.body
 	if statusCode == HttpApi.EGAHTTPApiResponse.Ok and body then
-		Logger:i("Event queue: " .. tostring(#v1) .. " events sent.")
+		Logger:i("Event queue: " .. tostring(#queuedEvents) .. " events sent.")
 		return
 	end
 	if statusCode == HttpApi.EGAHTTPApiResponse.NoResponse then
 		Logger:w("Event queue: Failed to send events to collector - Retrying next time")
-		for k, v in pairs(v1) do
+		for k, v in pairs(queuedEvents) do
 			if not (#Store.EventsQueue < 2000) then
 				break
 			end
@@ -170,181 +169,181 @@ local function processEvents()
 		end
 	else
 		if statusCode == HttpApi.EGAHTTPApiResponse.BadRequest and body then
-			Logger:w("Event queue: " .. tostring(#v1) .. " events sent. " .. tostring(#body) .. " events failed GA server validation.")
+			Logger:w("Event queue: " .. tostring(#queuedEvents) .. " events sent. " .. tostring(#body) .. " events failed GA server validation.")
 			return
 		end
 		Logger:w("Event queue: Failed to send events.")
 	end
 end
-function t.processEventQueue(p1)
+function Events.processEventQueue(self)
 	processEvents()
-	Threading:scheduleTimer(t.ProcessEventsInterval, function()
-		t:processEventQueue()
+	Threading:scheduleTimer(Events.ProcessEventsInterval, function()
+		Events:processEventQueue()
 	end)
 end
-function t.setBuild(p1, p2)
-	if Validation:validateBuild(p2) then
-		p1.Build = p2
-		Logger:i("Set build version: " .. p2)
+function Events.setBuild(self, buildVersion)
+	if Validation:validateBuild(buildVersion) then
+		self.Build = buildVersion
+		Logger:i("Set build version: " .. buildVersion)
 	else
-		Logger:w("Validation fail - configure build: Cannot be null, empty or above 32 length. String: " .. p2)
+		Logger:w("Validation fail - configure build: Cannot be null, empty or above 32 length. String: " .. buildVersion)
 	end
 end
-function t.setAvailableResourceCurrencies(p1, p2)
-	if Validation:validateResourceCurrencies(p2) then
-		p1._availableResourceCurrencies = p2
-		Logger:i("Set available resource currencies: (" .. table.concat(p2, ", ") .. ")")
+function Events.setAvailableResourceCurrencies(self, currenciesList)
+	if Validation:validateResourceCurrencies(currenciesList) then
+		self._availableResourceCurrencies = currenciesList
+		Logger:i("Set available resource currencies: (" .. table.concat(currenciesList, ", ") .. ")")
 	end
 end
-function t.setAvailableResourceItemTypes(p1, p2)
-	if Validation:validateResourceCurrencies(p2) then
-		p1._availableResourceItemTypes = p2
-		Logger:i("Set available resource item types: (" .. table.concat(p2, ", ") .. ")")
+function Events.setAvailableResourceItemTypes(self, itemTypesList)
+	if Validation:validateResourceCurrencies(itemTypesList) then
+		self._availableResourceItemTypes = itemTypesList
+		Logger:i("Set available resource item types: (" .. table.concat(itemTypesList, ", ") .. ")")
 	end
 end
-function t.addSessionStartEvent(p1, p2, p3)
-	local v1 = Store:GetPlayerDataFromCache(p2)
-	if p3 then
-		v1.Sessions = p3.Sessions
+function Events.addSessionStartEvent(self, player, options)
+	local playerData = Store:GetPlayerDataFromCache(player)
+	if options then
+		playerData.Sessions = options.Sessions
 	else
-		local t = {
+		local sessionEvent = {
 			category = "user"
 		}
-		v1.Sessions = v1.Sessions + 1
-		addDimensionsToEvent(p2, t)
-		addEventToStore(p2, t)
+		playerData.Sessions = playerData.Sessions + 1
+		addDimensionsToEvent(player, sessionEvent)
+		addEventToStore(player, sessionEvent)
 		Logger:i("Add SESSION START event")
 		processEvents()
 	end
 end
-function t.addSessionEndEvent(p1, p2)
-	local v1 = Store:GetPlayerDataFromCache(p2)
-	local SessionStart = v1.SessionStart
-	local v2
-	if p2 then
-		local v3 = Store:GetPlayerDataFromCache(p2)
-		local v4 = os.time()
-		local v5 = v4 + v3.ClientServerTimeOffset
-		v2 = if Validation:validateClientTs(v5) then v5 else v4
+function Events.addSessionEndEvent(self, player)
+	local playerData = Store:GetPlayerDataFromCache(player)
+	local SessionStart = playerData.SessionStart
+	local currentTimestamp
+	if player then
+		local playerDataTS = Store:GetPlayerDataFromCache(player)
+		local currentTime = os.time()
+		local adjustedTime = currentTime + playerDataTS.ClientServerTimeOffset
+		currentTimestamp = if Validation:validateClientTs(adjustedTime) then adjustedTime else currentTime
 	else
-		v2 = os.time()
+		currentTimestamp = os.time()
 	end
-	local v6 = if v2 == nil or SessionStart == nil then 0 else v2 - SessionStart
-	if v6 < 0 then
+	local sessionLength = if currentTimestamp == nil or SessionStart == nil then 0 else currentTimestamp - SessionStart
+	if sessionLength < 0 then
 		Logger:w("Session length was calculated to be less then 0. Should not be possible. Resetting to 0.")
-		v6 = 0
+		sessionLength = 0
 	end
-	local t = {
+	local sessionEndEvent = {
 		category = "session_end",
-		length = v6
+		length = sessionLength
 	}
-	addDimensionsToEvent(p2, t)
-	addEventToStore(p2, t)
-	v1.SessionStart = 0
+	addDimensionsToEvent(player, sessionEndEvent)
+	addEventToStore(player, sessionEndEvent)
+	playerData.SessionStart = 0
 	Logger:i("Add SESSION END event.")
 	processEvents()
 end
-function t.addBusinessEvent(p1, p2, p3, p4, p5, p6, p7)
-	if Validation:validateBusinessEvent(p3, p4, p7, p5, p6) then
-		local t = {}
-		local v1 = Store:GetPlayerDataFromCache(p2)
-		v1.Transactions = v1.Transactions + 1
-		t.event_id = p5 .. ":" .. p6
-		t.category = "business"
-		t.currency = p3
-		t.amount = p4
-		t.transaction_num = v1.Transactions
-		if not Utilities:isStringNullOrEmpty(p7) then
-			t.cart_type = p7
+function Events.addBusinessEvent(self, player, currency, amount, itemType, itemId, cartType)
+	if Validation:validateBusinessEvent(currency, amount, cartType, itemType, itemId) then
+		local businessEvent = {}
+		local playerData = Store:GetPlayerDataFromCache(player)
+		playerData.Transactions = playerData.Transactions + 1
+		businessEvent.event_id = itemType .. ":" .. itemId
+		businessEvent.category = "business"
+		businessEvent.currency = currency
+		businessEvent.amount = amount
+		businessEvent.transaction_num = playerData.Transactions
+		if not Utilities:isStringNullOrEmpty(cartType) then
+			businessEvent.cart_type = cartType
 		end
-		addDimensionsToEvent(p2, t)
-		Logger:i("Add BUSINESS event: {currency:" .. p3 .. ", amount:" .. tostring(p4) .. ", itemType:" .. p5 .. ", itemId:" .. p6 .. ", cartType:" .. p7 .. "}")
-		addEventToStore(p2, t)
+		addDimensionsToEvent(player, businessEvent)
+		Logger:i("Add BUSINESS event: {currency:" .. currency .. ", amount:" .. tostring(amount) .. ", itemType:" .. itemType .. ", itemId:" .. itemId .. ", cartType:" .. cartType .. "}")
+		addEventToStore(player, businessEvent)
 	end
 end
-function t.addResourceEvent(p1, p2, p3, p4, p5, p6, p7)
-	if Validation:validateResourceEvent(GAResourceFlowType, p3, p4, p5, p6, p7, p1._availableResourceCurrencies, p1._availableResourceItemTypes) then
-		if p3 == GAResourceFlowType.Sink then
-			p5 = -1 * p5
+function Events.addResourceEvent(self, player, flowType, currency, amount, itemType, itemId)
+	if Validation:validateResourceEvent(GAResourceFlowType, flowType, currency, amount, itemType, itemId, self._availableResourceCurrencies, self._availableResourceItemTypes) then
+		if flowType == GAResourceFlowType.Sink then
+			amount = -1 * amount
 		end
-		local t = {
-			event_id = GAResourceFlowType[p3] .. ":" .. p4 .. ":" .. p6 .. ":" .. p7,
+		local resourceEvent = {
+			event_id = GAResourceFlowType[flowType] .. ":" .. currency .. ":" .. itemType .. ":" .. itemId,
 			category = "resource",
-			amount = p5
+			amount = amount
 		}
-		addDimensionsToEvent(p2, t)
-		Logger:i("Add RESOURCE event: {currency:" .. p4 .. ", amount:" .. tostring(p5) .. ", itemType:" .. p6 .. ", itemId:" .. p7 .. "}")
-		addEventToStore(p2, t)
+		addDimensionsToEvent(player, resourceEvent)
+		Logger:i("Add RESOURCE event: {currency:" .. currency .. ", amount:" .. tostring(amount) .. ", itemType:" .. itemType .. ", itemId:" .. itemId .. "}")
+		addEventToStore(player, resourceEvent)
 	end
 end
-function t.addProgressionEvent(p1, p2, p3, p4, p5, p6, p7)
-	if Validation:validateProgressionEvent(GAProgressionStatus, p3, p4, p5, p6) then
-		local t = {}
-		local v1 = if Utilities:isStringNullOrEmpty(p5) then p4 elseif Utilities:isStringNullOrEmpty(p6) then p4 .. ":" .. p5 else p4 .. ":" .. p5 .. ":" .. p6
-		local v2 = GAProgressionStatus[p3]
-		t.category = "progression"
-		t.event_id = v2 .. ":" .. v1
-		local v3 = 0
-		if p7 ~= nil and p3 ~= GAProgressionStatus.Start then
-			t.score = p7
+function Events.addProgressionEvent(self, player, status, progression01, progression02, progression03, score)
+	if Validation:validateProgressionEvent(GAProgressionStatus, status, progression01, progression02, progression03) then
+		local progressionEvent = {}
+		local progressionId = if Utilities:isStringNullOrEmpty(progression02) then progression01 elseif Utilities:isStringNullOrEmpty(progression03) then progression01 .. ":" .. progression02 else progression01 .. ":" .. progression02 .. ":" .. progression03
+		local progressionStatus = GAProgressionStatus[status]
+		progressionEvent.category = "progression"
+		progressionEvent.event_id = progressionStatus .. ":" .. progressionId
+		local attemptNumber = 0
+		if score ~= nil and status ~= GAProgressionStatus.Start then
+			progressionEvent.score = score
 		end
-		local v4 = Store:GetPlayerDataFromCache(p2)
-		if p3 == GAProgressionStatus.Fail then
-			v4.ProgressionTries[v1] = (v4.ProgressionTries[v1] or 0) + 1
+		local playerDataProgression = Store:GetPlayerDataFromCache(player)
+		if status == GAProgressionStatus.Fail then
+			playerDataProgression.ProgressionTries[progressionId] = (playerDataProgression.ProgressionTries[progressionId] or 0) + 1
 		end
-		if p3 == GAProgressionStatus.Complete then
-			v4.ProgressionTries[v1] = (v4.ProgressionTries[v1] or 0) + 1
-			v3 = v4.ProgressionTries[v1]
-			t.attempt_num = v3
-			v4.ProgressionTries[v1] = 0
+		if status == GAProgressionStatus.Complete then
+			playerDataProgression.ProgressionTries[progressionId] = (playerDataProgression.ProgressionTries[progressionId] or 0) + 1
+			attemptNumber = playerDataProgression.ProgressionTries[progressionId]
+			progressionEvent.attempt_num = attemptNumber
+			playerDataProgression.ProgressionTries[progressionId] = 0
 		end
-		addDimensionsToEvent(p2, t)
-		local v7 = if Utilities:isStringNullOrEmpty(p5) then "" else p5
-		local v8 = if Utilities:isStringNullOrEmpty(p6) then "" else p6
-		Logger:i("Add PROGRESSION event: {status:" .. v2 .. ", progression01:" .. p4 .. ", progression02:" .. v7 .. ", progression03:" .. v8 .. ", score:" .. tostring(p7) .. ", attempt:" .. tostring(v3) .. "}")
-		addEventToStore(p2, t)
+		addDimensionsToEvent(player, progressionEvent)
+		local progression02Display = if Utilities:isStringNullOrEmpty(progression02) then "" else progression02
+		local progression03Display = if Utilities:isStringNullOrEmpty(progression03) then "" else progression03
+		Logger:i("Add PROGRESSION event: {status:" .. progressionStatus .. ", progression01:" .. progression01 .. ", progression02:" .. progression02Display .. ", progression03:" .. progression03Display .. ", score:" .. tostring(score) .. ", attempt:" .. tostring(attemptNumber) .. "}")
+		addEventToStore(player, progressionEvent)
 	end
 end
-function t.addDesignEvent(p1, p2, p3, p4)
-	if Validation:validateDesignEvent(p3) then
-		local t = {
+function Events.addDesignEvent(self, player, eventId, eventValue)
+	if Validation:validateDesignEvent(eventId) then
+		local designEvent = {
 			category = "design",
-			event_id = p3
+			event_id = eventId
 		}
-		if p4 ~= nil then
-			t.value = p4
+		if eventValue ~= nil then
+			designEvent.value = eventValue
 		end
-		addDimensionsToEvent(p2, t)
-		Logger:i("Add DESIGN event: {eventId:" .. p3 .. ", value:" .. tostring(p4) .. "}")
-		addEventToStore(p2, t)
+		addDimensionsToEvent(player, designEvent)
+		Logger:i("Add DESIGN event: {eventId:" .. eventId .. ", value:" .. tostring(eventValue) .. "}")
+		addEventToStore(player, designEvent)
 	end
 end
-function t.addErrorEvent(p1, p2, p3, p4)
-	if Validation:validateErrorEvent(GAErrorSeverity, p3, p4) then
-		local t = {}
-		local v1 = GAErrorSeverity[p3]
-		t.category = "error"
-		t.severity = v1
-		t.message = p4
-		addDimensionsToEvent(p2, t)
-		Logger:i("Add ERROR event: {severity:" .. v1 .. ", message:" .. if Utilities:isStringNullOrEmpty(p4) then "" else p4 .. "}")
-		addEventToStore(p2, t)
+function Events.addErrorEvent(self, player, severity, message)
+	if Validation:validateErrorEvent(GAErrorSeverity, severity, message) then
+		local errorEvent = {}
+		local errorSeverity = GAErrorSeverity[severity]
+		errorEvent.category = "error"
+		errorEvent.severity = errorSeverity
+		errorEvent.message = message
+		addDimensionsToEvent(player, errorEvent)
+		Logger:i("Add ERROR event: {severity:" .. errorSeverity .. ", message:" .. if Utilities:isStringNullOrEmpty(message) then "" else message .. "}")
+		addEventToStore(player, errorEvent)
 	end
 end
-function t.addSdkErrorEvent(p1, p2, p3, p4, p5, p6, p7)
-	local t = {
+function Events.addSdkErrorEvent(self, player, errorCategory, errorArea, errorAction, errorParameter, reason)
+	local sdkErrorEvent = {
 		category = "sdk_error",
-		error_category = p3,
-		error_area = p4,
-		error_action = p5
+		error_category = errorCategory,
+		error_area = errorArea,
+		error_action = errorAction
 	}
-	if not Utilities:isStringNullOrEmpty(p6) then
-		t.error_parameter = p6
+	if not Utilities:isStringNullOrEmpty(errorParameter) then
+		sdkErrorEvent.error_parameter = errorParameter
 	end
-	if not Utilities:isStringNullOrEmpty(p7) then
-		t.reason = p7
+	if not Utilities:isStringNullOrEmpty(reason) then
+		sdkErrorEvent.reason = reason
 	end
-	Logger:i("Add SDK ERROR event: {error_category:" .. p3 .. ", error_area:" .. p4 .. ", error_action:" .. p5 .. "}")
-	addEventToStore(p2, t)
+	Logger:i("Add SDK ERROR event: {error_category:" .. errorCategory .. ", error_area:" .. errorArea .. ", error_action:" .. errorAction .. "}")
+	addEventToStore(player, sdkErrorEvent)
 end
-return t
+return Events

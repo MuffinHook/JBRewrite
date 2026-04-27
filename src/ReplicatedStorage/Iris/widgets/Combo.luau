@@ -1,7 +1,6 @@
--- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2)
-	p1.WidgetConstructor("Selectable", {
+return function(iris, irisUtils)
+	iris.WidgetConstructor("Selectable", {
 		hasState = true,
 		hasChildren = false,
 		Args = {
@@ -11,154 +10,154 @@ return function(p1, p2)
 		},
 		Events = {
 			selected = {
-				Init = function(p1) end,
-				Get = function(p12)
-					return p12.lastSelectedTick == p1._cycleTick
+				Init = function(iris) end,
+				Get = function(widget)
+					return widget.lastSelectedTick == iris._cycleTick
 				end
 			},
 			unselected = {
-				Init = function(p1) end,
-				Get = function(p12)
-					return p12.lastUnselectedTick == p1._cycleTick
+				Init = function(iris) end,
+				Get = function(widget)
+					return widget.lastUnselectedTick == iris._cycleTick
 				end
 			},
 			active = {
-				Init = function(p1) end,
-				Get = function(p1)
-					return p1.state.index.value == p1.arguments.Index
+				Init = function(iris) end,
+				Get = function(iris)
+					return iris.state.index.value == iris.arguments.Index
 				end
 			},
-			clicked = p2.EVENTS.click(function(p1)
-				return p1.Instance.SelectableButton
+			clicked = irisUtils.EVENTS.click(function(iris)
+				return iris.Instance.SelectableButton
 			end),
-			rightClicked = p2.EVENTS.rightClick(function(p1)
-				return p1.Instance.SelectableButton
+			rightClicked = irisUtils.EVENTS.rightClick(function(iris)
+				return iris.Instance.SelectableButton
 			end),
-			doubleClicked = p2.EVENTS.doubleClick(function(p1)
-				return p1.Instance.SelectableButton
+			doubleClicked = irisUtils.EVENTS.doubleClick(function(iris)
+				return iris.Instance.SelectableButton
 			end),
-			ctrlClicked = p2.EVENTS.ctrlClick(function(p1)
-				return p1.Instance.SelectableButton
+			ctrlClicked = irisUtils.EVENTS.ctrlClick(function(iris)
+				return iris.Instance.SelectableButton
 			end),
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance.SelectableButton
+			hovered = irisUtils.EVENTS.hover(function(iris)
+				return iris.Instance.SelectableButton
 			end)
 		},
-		Generate = function(p12)
+		Generate = function(widget)
 			local Iris_Selectable = Instance.new("Frame")
 			Iris_Selectable.Name = "Iris_Selectable"
-			Iris_Selectable.Size = UDim2.new(p1._config.ItemWidth, UDim.new(0, p1._config.TextSize + 2 * p1._config.FramePadding.Y - p1._config.ItemSpacing.Y))
+			Iris_Selectable.Size = UDim2.new(iris._config.ItemWidth, UDim.new(0, iris._config.TextSize + 2 * iris._config.FramePadding.Y - iris._config.ItemSpacing.Y))
 			Iris_Selectable.BackgroundTransparency = 1
 			Iris_Selectable.BorderSizePixel = 0
 			local SelectableButton = Instance.new("TextButton")
 			SelectableButton.Name = "SelectableButton"
-			SelectableButton.Size = UDim2.new(1, 0, 0, p1._config.TextSize + 2 * p1._config.FramePadding.Y)
+			SelectableButton.Size = UDim2.new(1, 0, 0, iris._config.TextSize + 2 * iris._config.FramePadding.Y)
 			local fromOffset = UDim2.fromOffset
-			SelectableButton.Position = fromOffset(0, -bit32.rshift(p1._config.ItemSpacing.Y, 1))
-			SelectableButton.BackgroundColor3 = p1._config.HeaderColor
+			SelectableButton.Position = fromOffset(0, -bit32.rshift(iris._config.ItemSpacing.Y, 1))
+			SelectableButton.BackgroundColor3 = iris._config.HeaderColor
 			SelectableButton.ClipsDescendants = true
-			p2.applyFrameStyle(SelectableButton)
-			p2.applyTextStyle(SelectableButton)
-			p2.UISizeConstraint(SelectableButton, Vector2.xAxis)
-			p12.ButtonColors = {
-				Color = p1._config.HeaderColor,
+			irisUtils.applyFrameStyle(SelectableButton)
+			irisUtils.applyTextStyle(SelectableButton)
+			irisUtils.UISizeConstraint(SelectableButton, Vector2.xAxis)
+			widget.ButtonColors = {
+				Color = iris._config.HeaderColor,
 				Transparency = 1,
-				HoveredColor = p1._config.HeaderHoveredColor,
-				HoveredTransparency = p1._config.HeaderHoveredTransparency,
-				ActiveColor = p1._config.HeaderActiveColor,
-				ActiveTransparency = p1._config.HeaderActiveTransparency
+				HoveredColor = iris._config.HeaderHoveredColor,
+				HoveredTransparency = iris._config.HeaderHoveredTransparency,
+				ActiveColor = iris._config.HeaderActiveColor,
+				ActiveTransparency = iris._config.HeaderActiveTransparency
 			}
-			p2.applyInteractionHighlights("Background", SelectableButton, SelectableButton, p12.ButtonColors)
-			p2.applyButtonClick(SelectableButton, function()
-				if p12.arguments.NoClick ~= true then
-					if type(p12.state.index.value) == "boolean" then
-						p12.state.index:set(not p12.state.index.value)
+			irisUtils.applyInteractionHighlights("Background", SelectableButton, SelectableButton, widget.ButtonColors)
+			irisUtils.applyButtonClick(SelectableButton, function()
+				if widget.arguments.NoClick ~= true then
+					if type(widget.state.index.value) == "boolean" then
+						widget.state.index:set(not widget.state.index.value)
 						return
 					end
-					p12.state.index:set(p12.arguments.Index)
+					widget.state.index:set(widget.arguments.Index)
 				end
 			end)
 			SelectableButton.Parent = Iris_Selectable
 			return Iris_Selectable
 		end,
-		GenerateState = function(p12)
-			if p12.state.index == nil then
-				if p12.arguments.Index ~= nil then
+		GenerateState = function(widget)
+			if widget.state.index == nil then
+				if widget.arguments.Index ~= nil then
 					error("A shared state index is required for Iris.Selectables() with an Index argument.", 5)
 				end
-				p12.state.index = p1._widgetState(p12, "index", false)
+				widget.state.index = iris._widgetState(widget, "index", false)
 			end
 		end,
-		Update = function(p1)
-			p1.Instance.SelectableButton.Text = p1.arguments.Text or "Selectable"
+		Update = function(iris)
+			iris.Instance.SelectableButton.Text = iris.arguments.Text or "Selectable"
 		end,
-		UpdateState = function(p12)
-			local SelectableButton = p12.Instance.SelectableButton
-			if p12.state.index.value == p12.arguments.Index or p12.state.index.value == true then
-				p12.ButtonColors.Transparency = p1._config.HeaderTransparency
-				SelectableButton.BackgroundTransparency = p1._config.HeaderTransparency
-				p12.lastSelectedTick = p1._cycleTick + 1
+		UpdateState = function(widget)
+			local SelectableButton = widget.Instance.SelectableButton
+			if widget.state.index.value == widget.arguments.Index or widget.state.index.value == true then
+				widget.ButtonColors.Transparency = iris._config.HeaderTransparency
+				SelectableButton.BackgroundTransparency = iris._config.HeaderTransparency
+				widget.lastSelectedTick = iris._cycleTick + 1
 			else
-				p12.ButtonColors.Transparency = 1
+				widget.ButtonColors.Transparency = 1
 				SelectableButton.BackgroundTransparency = 1
-				p12.lastUnselectedTick = p1._cycleTick + 1
+				widget.lastUnselectedTick = iris._cycleTick + 1
 			end
 		end,
-		Discard = function(p1)
-			p1.Instance:Destroy()
-			p2.discardState(p1)
+		Discard = function(iris)
+			iris.Instance:Destroy()
+			irisUtils.discardState(iris)
 		end
 	})
-	local instance = false
-	local v2 = -1
-	local var3 = nil
-	local var4 = 0
-	local function UpdateChildContainerTransform(p12)
-		local PreviewContainer = p12.Instance.PreviewContainer
-		local ChildContainer = p12.ChildContainer
-		local instance = PreviewContainer.AbsolutePosition - p2.GuiOffset
-		local PopupBorderSize = p1._config.PopupBorderSize
+	local isComboOpen = false
+	local lastToggleTick = -1
+	local openedCombo = nil
+	local lastContentHeight = 0
+	local function UpdateChildContainerTransform(widget)
+		local PreviewContainer = widget.Instance.PreviewContainer
+		local ChildContainer = widget.ChildContainer
+		local containerPosition = PreviewContainer.AbsolutePosition - irisUtils.GuiOffset
+		local PopupBorderSize = iris._config.PopupBorderSize
 		local AbsoluteSize_2 = ChildContainer.Parent.AbsoluteSize
-		local Y = p12.UIListLayout.AbsoluteContentSize.Y
-		var4 = Y
-		local v2 = Y + 2 * p1._config.WindowPadding.Y
-		local var3 = instance.Y + PreviewContainer.AbsoluteSize.Y + PopupBorderSize
-		local zero = Vector2.zero
-		local var42 = AbsoluteSize_2.Y - var3
-		if var42 < v2 and AbsoluteSize_2.Y / 2 < var3 then
-			var3 = instance.Y - PopupBorderSize
-			zero = Vector2.yAxis
-			var42 = var3
+		local Y = widget.UIListLayout.AbsoluteContentSize.Y
+		lastContentHeight = Y
+		local contentHeightWithPadding = Y + 2 * iris._config.WindowPadding.Y
+		local popupYPosition = containerPosition.Y + PreviewContainer.AbsoluteSize.Y + PopupBorderSize
+		local anchorPoint = Vector2.zero
+		local availableSpace = AbsoluteSize_2.Y - popupYPosition
+		if availableSpace < contentHeightWithPadding and AbsoluteSize_2.Y / 2 < popupYPosition then
+			popupYPosition = containerPosition.Y - PopupBorderSize
+			anchorPoint = Vector2.yAxis
+			availableSpace = popupYPosition
 		end
-		ChildContainer.AnchorPoint = zero
-		ChildContainer.Position = UDim2.fromOffset(instance.X, var3)
-		ChildContainer.Size = UDim2.fromOffset(PreviewContainer.AbsoluteSize.X, (math.min(v2, var42)))
+		ChildContainer.AnchorPoint = anchorPoint
+		ChildContainer.Position = UDim2.fromOffset(containerPosition.X, popupYPosition)
+		ChildContainer.Size = UDim2.fromOffset(PreviewContainer.AbsoluteSize.X, (math.min(contentHeightWithPadding, availableSpace)))
 	end
-	local function f5()
-		if instance and (var3 and var3.UIListLayout.AbsoluteContentSize.Y ~= var4) then
-			UpdateChildContainerTransform(var3)
+	local function checkContentSizeChanged()
+		if isComboOpen and (openedCombo and openedCombo.UIListLayout.AbsoluteContentSize.Y ~= lastContentHeight) then
+			UpdateChildContainerTransform(openedCombo)
 		end
 	end
-	table.insert(p1._postCycleCallbacks, f5)
-	local function UpdateComboState(p12)
-		if p1._started and (p12.UserInputType == Enum.UserInputType.MouseButton1 or (p12.UserInputType == Enum.UserInputType.MouseButton2 or (p12.UserInputType == Enum.UserInputType.Touch or p12.UserInputType == Enum.UserInputType.MouseWheel))) then
-			if instance == false or not var3 or v2 == p1._cycleTick then
+	table.insert(iris._postCycleCallbacks, checkContentSizeChanged)
+	local function UpdateComboState(inputObject)
+		if iris._started and (inputObject.UserInputType == Enum.UserInputType.MouseButton1 or (inputObject.UserInputType == Enum.UserInputType.MouseButton2 or (inputObject.UserInputType == Enum.UserInputType.Touch or inputObject.UserInputType == Enum.UserInputType.MouseWheel))) then
+			if isComboOpen == false or not openedCombo or lastToggleTick == iris._cycleTick then
 				return
 			end
-			local var12 = p2.getMouseLocation()
-			local PreviewContainer = var3.Instance.PreviewContainer
-			local ChildContainer = var3.ChildContainer
-			if p2.isPosInsideRect(var12, PreviewContainer.AbsolutePosition - p2.GuiOffset, PreviewContainer.AbsolutePosition - p2.GuiOffset + PreviewContainer.AbsoluteSize) then
+			local mouseLocation = irisUtils.getMouseLocation()
+			local PreviewContainer = openedCombo.Instance.PreviewContainer
+			local ChildContainer = openedCombo.ChildContainer
+			if irisUtils.isPosInsideRect(mouseLocation, PreviewContainer.AbsolutePosition - irisUtils.GuiOffset, PreviewContainer.AbsolutePosition - irisUtils.GuiOffset + PreviewContainer.AbsoluteSize) then
 				return
 			end
-			if not p2.isPosInsideRect(var12, ChildContainer.AbsolutePosition - p2.GuiOffset, ChildContainer.AbsolutePosition - p2.GuiOffset + ChildContainer.AbsoluteSize) then
-				var3.state.isOpened:set(false)
+			if not irisUtils.isPosInsideRect(mouseLocation, ChildContainer.AbsolutePosition - irisUtils.GuiOffset, ChildContainer.AbsolutePosition - irisUtils.GuiOffset + ChildContainer.AbsoluteSize) then
+				openedCombo.state.isOpened:set(false)
 			end
 		end
 	end
-	p2.registerEvent("InputBegan", UpdateComboState)
-	p2.registerEvent("InputChanged", UpdateComboState)
-	p1.WidgetConstructor("Combo", {
+	irisUtils.registerEvent("InputBegan", UpdateComboState)
+	irisUtils.registerEvent("InputChanged", UpdateComboState)
+	iris.WidgetConstructor("Combo", {
 		hasState = true,
 		hasChildren = true,
 		Args = {
@@ -168,216 +167,216 @@ return function(p1, p2)
 		},
 		Events = {
 			opened = {
-				Init = function(p1) end,
-				Get = function(p12)
-					return p12.lastOpenedTick == p1._cycleTick
+				Init = function(iris) end,
+				Get = function(widget)
+					return widget.lastOpenedTick == iris._cycleTick
 				end
 			},
 			closed = {
-				Init = function(p1) end,
-				Get = function(p12)
-					return p12.lastClosedTick == p1._cycleTick
+				Init = function(iris) end,
+				Get = function(widget)
+					return widget.lastClosedTick == iris._cycleTick
 				end
 			},
 			changed = {
-				Init = function(p1) end,
-				Get = function(p12)
-					return p12.lastChangedTick == p1._cycleTick
+				Init = function(iris) end,
+				Get = function(widget)
+					return widget.lastChangedTick == iris._cycleTick
 				end
 			},
-			clicked = p2.EVENTS.click(function(p1)
-				return p1.Instance.PreviewContainer
+			clicked = irisUtils.EVENTS.click(function(iris)
+				return iris.Instance.PreviewContainer
 			end),
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance
+			hovered = irisUtils.EVENTS.hover(function(iris)
+				return iris.Instance
 			end)
 		},
-		Generate = function(p12)
-			local var12 = p1._config.TextSize + 2 * p1._config.FramePadding.Y
+		Generate = function(widget)
+			local buttonHeight = iris._config.TextSize + 2 * iris._config.FramePadding.Y
 			local Iris_Combo = Instance.new("Frame")
 			Iris_Combo.Name = "Iris_Combo"
 			Iris_Combo.AutomaticSize = Enum.AutomaticSize.Y
-			Iris_Combo.Size = UDim2.new(p1._config.ItemWidth, UDim.new())
+			Iris_Combo.Size = UDim2.new(iris._config.ItemWidth, UDim.new())
 			Iris_Combo.BackgroundTransparency = 1
 			Iris_Combo.BorderSizePixel = 0
-			p2.UIListLayout(Iris_Combo, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
+			irisUtils.UIListLayout(Iris_Combo, Enum.FillDirection.Horizontal, UDim.new(0, iris._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
 			local PreviewContainer = Instance.new("TextButton")
 			PreviewContainer.Name = "PreviewContainer"
 			PreviewContainer.AutomaticSize = Enum.AutomaticSize.Y
-			PreviewContainer.Size = UDim2.new(p1._config.ContentWidth, UDim.new(0, 0))
+			PreviewContainer.Size = UDim2.new(iris._config.ContentWidth, UDim.new(0, 0))
 			PreviewContainer.BackgroundTransparency = 1
 			PreviewContainer.Text = ""
 			PreviewContainer.AutoButtonColor = false
 			PreviewContainer.ZIndex = 2
-			p2.applyFrameStyle(PreviewContainer, true)
-			p2.UIListLayout(PreviewContainer, Enum.FillDirection.Horizontal, UDim.new(0, 0))
-			p2.UISizeConstraint(PreviewContainer, Vector2.new(var12))
+			irisUtils.applyFrameStyle(PreviewContainer, true)
+			irisUtils.UIListLayout(PreviewContainer, Enum.FillDirection.Horizontal, UDim.new(0, 0))
+			irisUtils.UISizeConstraint(PreviewContainer, Vector2.new(buttonHeight))
 			PreviewContainer.Parent = Iris_Combo
 			local PreviewLabel = Instance.new("TextLabel")
 			PreviewLabel.Name = "PreviewLabel"
 			PreviewLabel.AutomaticSize = Enum.AutomaticSize.Y
-			PreviewLabel.Size = UDim2.new(UDim.new(1, 0), p1._config.ContentHeight)
-			PreviewLabel.BackgroundColor3 = p1._config.FrameBgColor
-			PreviewLabel.BackgroundTransparency = p1._config.FrameBgTransparency
+			PreviewLabel.Size = UDim2.new(UDim.new(1, 0), iris._config.ContentHeight)
+			PreviewLabel.BackgroundColor3 = iris._config.FrameBgColor
+			PreviewLabel.BackgroundTransparency = iris._config.FrameBgTransparency
 			PreviewLabel.BorderSizePixel = 0
 			PreviewLabel.ClipsDescendants = true
-			p2.applyTextStyle(PreviewLabel)
-			p2.UIPadding(PreviewLabel, p1._config.FramePadding)
+			irisUtils.applyTextStyle(PreviewLabel)
+			irisUtils.UIPadding(PreviewLabel, iris._config.FramePadding)
 			PreviewLabel.Parent = PreviewContainer
 			local DropdownButton = Instance.new("TextLabel")
 			DropdownButton.Name = "DropdownButton"
-			DropdownButton.Size = UDim2.new(0, var12, p1._config.ContentHeight.Scale, (math.max(p1._config.ContentHeight.Offset, var12)))
-			DropdownButton.BackgroundColor3 = p1._config.ButtonColor
-			DropdownButton.BackgroundTransparency = p1._config.ButtonTransparency
+			DropdownButton.Size = UDim2.new(0, buttonHeight, iris._config.ContentHeight.Scale, (math.max(iris._config.ContentHeight.Offset, buttonHeight)))
+			DropdownButton.BackgroundColor3 = iris._config.ButtonColor
+			DropdownButton.BackgroundTransparency = iris._config.ButtonTransparency
 			DropdownButton.BorderSizePixel = 0
 			DropdownButton.Text = ""
-			local var32 = var12 - math.round(var12 * 0.2) * 2
+			local dropdownIconSize = buttonHeight - math.round(buttonHeight * 0.2) * 2
 			local Dropdown = Instance.new("ImageLabel")
 			Dropdown.Name = "Dropdown"
 			Dropdown.AnchorPoint = Vector2.new(0.5, 0.5)
-			Dropdown.Size = UDim2.fromOffset(var32, var32)
+			Dropdown.Size = UDim2.fromOffset(dropdownIconSize, dropdownIconSize)
 			Dropdown.Position = UDim2.fromScale(0.5, 0.5)
 			Dropdown.BackgroundTransparency = 1
 			Dropdown.BorderSizePixel = 0
-			Dropdown.ImageColor3 = p1._config.TextColor
-			Dropdown.ImageTransparency = p1._config.TextTransparency
+			Dropdown.ImageColor3 = iris._config.TextColor
+			Dropdown.ImageTransparency = iris._config.TextTransparency
 			Dropdown.Parent = DropdownButton
 			DropdownButton.Parent = PreviewContainer
-			p2.applyInteractionHighlightsWithMultiHighlightee("Background", PreviewContainer, {
+			irisUtils.applyInteractionHighlightsWithMultiHighlightee("Background", PreviewContainer, {
 				{
 					PreviewLabel,
 					{
-						Color = p1._config.FrameBgColor,
-						Transparency = p1._config.FrameBgTransparency,
-						HoveredColor = p1._config.FrameBgHoveredColor,
-						HoveredTransparency = p1._config.FrameBgHoveredTransparency,
-						ActiveColor = p1._config.FrameBgActiveColor,
-						ActiveTransparency = p1._config.FrameBgActiveTransparency
+						Color = iris._config.FrameBgColor,
+						Transparency = iris._config.FrameBgTransparency,
+						HoveredColor = iris._config.FrameBgHoveredColor,
+						HoveredTransparency = iris._config.FrameBgHoveredTransparency,
+						ActiveColor = iris._config.FrameBgActiveColor,
+						ActiveTransparency = iris._config.FrameBgActiveTransparency
 					}
 				},
 				{
 					DropdownButton,
 					{
-						Color = p1._config.ButtonColor,
-						Transparency = p1._config.ButtonTransparency,
-						HoveredColor = p1._config.ButtonHoveredColor,
-						HoveredTransparency = p1._config.ButtonHoveredTransparency,
-						ActiveColor = p1._config.ButtonHoveredColor,
-						ActiveTransparency = p1._config.ButtonHoveredTransparency
+						Color = iris._config.ButtonColor,
+						Transparency = iris._config.ButtonTransparency,
+						HoveredColor = iris._config.ButtonHoveredColor,
+						HoveredTransparency = iris._config.ButtonHoveredTransparency,
+						ActiveColor = iris._config.ButtonHoveredColor,
+						ActiveTransparency = iris._config.ButtonHoveredTransparency
 					}
 				}
 			})
-			p2.applyButtonClick(PreviewContainer, function()
-				if not instance or var3 == p12 then
-					p12.state.isOpened:set(not p12.state.isOpened.value)
+			irisUtils.applyButtonClick(PreviewContainer, function()
+				if not isComboOpen or openedCombo == widget then
+					widget.state.isOpened:set(not widget.state.isOpened.value)
 				end
 			end)
 			local TextLabel = Instance.new("TextLabel")
 			TextLabel.Name = "TextLabel"
 			TextLabel.AutomaticSize = Enum.AutomaticSize.X
-			TextLabel.Size = UDim2.fromOffset(0, var12)
+			TextLabel.Size = UDim2.fromOffset(0, buttonHeight)
 			TextLabel.BackgroundTransparency = 1
 			TextLabel.BorderSizePixel = 0
-			p2.applyTextStyle(TextLabel)
+			irisUtils.applyTextStyle(TextLabel)
 			TextLabel.Parent = Iris_Combo
 			local ComboContainer = Instance.new("ScrollingFrame")
 			ComboContainer.Name = "ComboContainer"
-			ComboContainer.BackgroundColor3 = p1._config.PopupBgColor
-			ComboContainer.BackgroundTransparency = p1._config.PopupBgTransparency
+			ComboContainer.BackgroundColor3 = iris._config.PopupBgColor
+			ComboContainer.BackgroundTransparency = iris._config.PopupBgTransparency
 			ComboContainer.BorderSizePixel = 0
 			ComboContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
-			ComboContainer.ScrollBarImageTransparency = p1._config.ScrollbarGrabTransparency
-			ComboContainer.ScrollBarImageColor3 = p1._config.ScrollbarGrabColor
-			ComboContainer.ScrollBarThickness = p1._config.ScrollbarSize
+			ComboContainer.ScrollBarImageTransparency = iris._config.ScrollbarGrabTransparency
+			ComboContainer.ScrollBarImageColor3 = iris._config.ScrollbarGrabColor
+			ComboContainer.ScrollBarThickness = iris._config.ScrollbarSize
 			ComboContainer.CanvasSize = UDim2.fromScale(0, 0)
 			ComboContainer.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
-			ComboContainer.TopImage = p2.ICONS.BLANK_SQUARE
-			ComboContainer.MidImage = p2.ICONS.BLANK_SQUARE
-			ComboContainer.BottomImage = p2.ICONS.BLANK_SQUARE
+			ComboContainer.TopImage = irisUtils.ICONS.BLANK_SQUARE
+			ComboContainer.MidImage = irisUtils.ICONS.BLANK_SQUARE
+			ComboContainer.BottomImage = irisUtils.ICONS.BLANK_SQUARE
 			ComboContainer.ClipsDescendants = true
-			p2.UIStroke(ComboContainer, p1._config.WindowBorderSize, p1._config.BorderColor, p1._config.BorderTransparency)
-			p2.UIPadding(ComboContainer, Vector2.new(2, p1._config.WindowPadding.Y))
-			p2.UISizeConstraint(ComboContainer, Vector2.new(100))
-			local var4 = p2.UIListLayout(ComboContainer, Enum.FillDirection.Vertical, UDim.new(0, p1._config.ItemSpacing.Y))
-			var4.VerticalAlignment = Enum.VerticalAlignment.Top
-			ComboContainer.Parent = p1._rootInstance and p1._rootInstance:WaitForChild("PopupScreenGui")
-			p12.ChildContainer = ComboContainer
-			p12.UIListLayout = var4
+			irisUtils.UIStroke(ComboContainer, iris._config.WindowBorderSize, iris._config.BorderColor, iris._config.BorderTransparency)
+			irisUtils.UIPadding(ComboContainer, Vector2.new(2, iris._config.WindowPadding.Y))
+			irisUtils.UISizeConstraint(ComboContainer, Vector2.new(100))
+			local comboListLayout = irisUtils.UIListLayout(ComboContainer, Enum.FillDirection.Vertical, UDim.new(0, iris._config.ItemSpacing.Y))
+			comboListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+			ComboContainer.Parent = iris._rootInstance and iris._rootInstance:WaitForChild("PopupScreenGui")
+			widget.ChildContainer = ComboContainer
+			widget.UIListLayout = comboListLayout
 			return Iris_Combo
 		end,
-		GenerateState = function(p12)
-			if p12.state.index == nil then
-				p12.state.index = p1._widgetState(p12, "index", "No Selection")
+		GenerateState = function(widget)
+			if widget.state.index == nil then
+				widget.state.index = iris._widgetState(widget, "index", "No Selection")
 			end
-			if p12.state.isOpened == nil then
-				p12.state.isOpened = p1._widgetState(p12, "isOpened", false)
+			if widget.state.isOpened == nil then
+				widget.state.isOpened = iris._widgetState(widget, "isOpened", false)
 			end
-			p12.state.index:onChange(function()
-				p12.lastChangedTick = p1._cycleTick + 1
-				if p12.state.isOpened.value then
-					p12.state.isOpened:set(false)
+			widget.state.index:onChange(function()
+				widget.lastChangedTick = iris._cycleTick + 1
+				if widget.state.isOpened.value then
+					widget.state.isOpened:set(false)
 				end
 			end)
 		end,
-		Update = function(p12)
-			local instance = p12.Instance
+		Update = function(widget)
+			local instance = widget.Instance
 			local PreviewContainer = instance.PreviewContainer
 			local PreviewLabel = PreviewContainer.PreviewLabel
 			local DropdownButton = PreviewContainer.DropdownButton
-			instance.TextLabel.Text = p12.arguments.Text or "Combo"
-			if p12.arguments.NoButton then
+			instance.TextLabel.Text = widget.arguments.Text or "Combo"
+			if widget.arguments.NoButton then
 				DropdownButton.Visible = false
 				PreviewLabel.Size = UDim2.new(UDim.new(1, 0), PreviewLabel.Size.Height)
 			else
 				DropdownButton.Visible = true
-				PreviewLabel.Size = UDim2.new(UDim.new(1, -(p1._config.TextSize + 2 * p1._config.FramePadding.Y)), PreviewLabel.Size.Height)
+				PreviewLabel.Size = UDim2.new(UDim.new(1, -(iris._config.TextSize + 2 * iris._config.FramePadding.Y)), PreviewLabel.Size.Height)
 			end
-			if p12.arguments.NoPreview then
+			if widget.arguments.NoPreview then
 				PreviewLabel.Visible = false
 				PreviewContainer.Size = UDim2.new(0, 0, 0, 0)
 				PreviewContainer.AutomaticSize = Enum.AutomaticSize.XY
 			else
 				PreviewLabel.Visible = true
-				PreviewContainer.Size = UDim2.new(p1._config.ContentWidth, p1._config.ContentHeight)
+				PreviewContainer.Size = UDim2.new(iris._config.ContentWidth, iris._config.ContentHeight)
 				PreviewContainer.AutomaticSize = Enum.AutomaticSize.Y
 			end
 		end,
-		UpdateState = function(p12)
-			local ChildContainer = p12.ChildContainer
-			local PreviewContainer = p12.Instance.PreviewContainer
+		UpdateState = function(widget)
+			local ChildContainer = widget.ChildContainer
+			local PreviewContainer = widget.Instance.PreviewContainer
 			local Dropdown = PreviewContainer.DropdownButton.Dropdown
-			if p12.state.isOpened.value then
-				instance = true
-				var3 = p12
-				v2 = p1._cycleTick
-				p12.lastOpenedTick = p1._cycleTick + 1
-				Dropdown.Image = p2.ICONS.RIGHT_POINTING_TRIANGLE
+			if widget.state.isOpened.value then
+				isComboOpen = true
+				openedCombo = widget
+				lastToggleTick = iris._cycleTick
+				widget.lastOpenedTick = iris._cycleTick + 1
+				Dropdown.Image = irisUtils.ICONS.RIGHT_POINTING_TRIANGLE
 				ChildContainer.Visible = true
-				UpdateChildContainerTransform(p12)
+				UpdateChildContainerTransform(widget)
 			else
-				if instance then
-					instance = false
-					var3 = nil
-					p12.lastClosedTick = p1._cycleTick + 1
+				if isComboOpen then
+					isComboOpen = false
+					openedCombo = nil
+					widget.lastClosedTick = iris._cycleTick + 1
 				end
-				Dropdown.Image = p2.ICONS.DOWN_POINTING_TRIANGLE
+				Dropdown.Image = irisUtils.ICONS.DOWN_POINTING_TRIANGLE
 				ChildContainer.Visible = false
 			end
-			local value = p12.state.index.value
+			local value = widget.state.index.value
 			PreviewContainer.PreviewLabel.Text = if typeof(value) == "EnumItem" then value.Name else tostring(value)
 		end,
-		ChildAdded = function(p1, p2)
-			UpdateChildContainerTransform(p1)
-			return p1.ChildContainer
+		ChildAdded = function(widget, irisUtils)
+			UpdateChildContainerTransform(widget)
+			return widget.ChildContainer
 		end,
-		Discard = function(p1)
-			if var3 and var3 == p1 then
-				var3 = nil
-				instance = false
+		Discard = function(widget)
+			if openedCombo and openedCombo == widget then
+				openedCombo = nil
+				isComboOpen = false
 			end
-			p1.Instance:Destroy()
-			p1.ChildContainer:Destroy()
-			p2.discardState(p1)
+			widget.Instance:Destroy()
+			widget.ChildContainer:Destroy()
+			irisUtils.discardState(widget)
 		end
 	})
 end

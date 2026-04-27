@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local store = require(ReplicatedStorage.App.store)
 local WorldMarker = require(ReplicatedStorage.Game.WorldMarker.WorldMarker)

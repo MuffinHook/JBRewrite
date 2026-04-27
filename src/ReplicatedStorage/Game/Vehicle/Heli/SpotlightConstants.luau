@@ -1,4 +1,3 @@
--- Reviewed by Claude
 return {
 	EVENT_ENABLE = 0,
 	EVENT_DISABLE = 1,

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VehicleConf = require(ReplicatedStorage.Game.Garage.VehicleConf)
 local VehicleData = require(ReplicatedStorage.Game.Garage.VehicleData)
@@ -8,177 +7,177 @@ local GarageUtils = require(ReplicatedStorage.Garage.GarageUtils)
 local OwnershipConsts = require(ReplicatedStorage.Ownership.OwnershipConsts)
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Interval = require(ReplicatedStorage.Std.Interval)
-local t = {
+local SaleShared = {
 	onSaleRefresh = Signal.new()
 }
-local v1 = SaleUtils.getNextSaleTime()
+local lastKnownSaleTime = SaleUtils.getNextSaleTime()
 Interval.every(1):Connect(function()
-	local var12 = SaleUtils.getNextSaleTime()
-	if v1 + 0.01 < var12 then
-		v1 = var12
-		t.onSaleRefresh:Fire()
+	local currentSaleTime = SaleUtils.getNextSaleTime()
+	if lastKnownSaleTime + 0.01 < currentSaleTime then
+		lastKnownSaleTime = currentSaleTime
+		SaleShared.onSaleRefresh:Fire()
 	end
 end)
-local function canVehicleCustomizationGoOnSale(p1)
-	local v1 = not GarageUtils.isVehicleCustomizationLimited(p1)
-	if v1 then
-		v1 = not p1.None
-		if v1 then
-			v1 = if p1.Price and p1.Price < 1000000 then p1.Price > 0 else false
-			if v1 then
-				v1 = not p1.NoGarageUI
+local function canVehicleCustomizationGoOnSale(vehicleCustomization)
+	local isValidCustomization = not GarageUtils.isVehicleCustomizationLimited(vehicleCustomization)
+	if isValidCustomization then
+		isValidCustomization = not vehicleCustomization.None
+		if isValidCustomization then
+			isValidCustomization = if vehicleCustomization.Price and vehicleCustomization.Price < 1000000 then vehicleCustomization.Price > 0 else false
+			if isValidCustomization then
+				isValidCustomization = not vehicleCustomization.NoGarageUI
 			end
 		end
 	end
-	return v1
+	return isValidCustomization
 end
-local function canVehicleGoOnSale(p1)
-	local v1 = not GarageUtils.isVehicleLimited(p1)
-	if v1 then
-		v1 = not p1.None
-		if v1 then
-			v1 = if p1.Price and p1.Price < 1000000 then p1.Price > 0 else false
-			if v1 then
-				v1 = not p1.NoGarageUI and not p1.NoMainWorldGarageSpawn and not p1.ExcludeFromSale
+local function canVehicleGoOnSale(vehicle)
+	local isValidVehicle = not GarageUtils.isVehicleLimited(vehicle)
+	if isValidVehicle then
+		isValidVehicle = not vehicle.None
+		if isValidVehicle then
+			isValidVehicle = if vehicle.Price and vehicle.Price < 1000000 then vehicle.Price > 0 else false
+			if isValidVehicle then
+				isValidVehicle = not vehicle.NoGarageUI and not vehicle.NoMainWorldGarageSpawn and not vehicle.ExcludeFromSale
 			end
 		end
 	end
-	return v1
+	return isValidVehicle
 end
-local function applySeededSort(p1, p2)
-	table.sort(p1, function(p1, p22)
-		return p1.Pointer[p2] < p22.Pointer[p2]
+local function applySeededSort(itemsTable, seedKey)
+	table.sort(itemsTable, function(item1, item2)
+		return item1.Pointer[seedKey] < item2.Pointer[seedKey]
 	end)
-	local instance2 = Random.new((SaleUtils.getNumSalesPassed()))
-	for v3, v4 in p1 do
-		v4.SortNumber = instance2:NextNumber()
+	local randomGenerator = Random.new((SaleUtils.getNumSalesPassed()))
+	for index, item in itemsTable do
+		item.SortNumber = randomGenerator:NextNumber()
 	end
-	table.sort(p1, function(p1, p2)
-		return p1.SortNumber < p2.SortNumber
+	table.sort(itemsTable, function(item1, item2)
+		return item1.SortNumber < item2.SortNumber
 	end)
 end
 local function _getOnSaleVehicleCustomizations()
-	local t = {}
-	local t2 = {}
-	for v1, instance2 in VehicleConf.CATEGORIES do
-		if instance2 ~= SaleConsts.CATEGORY_NAME and not (OwnershipConsts.COLOR_CATEGORY_TYPES[instance2] or OwnershipConsts.TEXTURE_CATEGORY_TYPES[instance2]) then
-			for v3, v4 in require(ReplicatedStorage.Game.Garage.StoreData:FindFirstChild(instance2)).Items do
-				table.insert(t, {
-					CategoryName = instance2,
-					Pointer = v4
+	local customizationResults = {}
+	local seenCategories = {}
+	for categoryIndex, categoryName in VehicleConf.CATEGORIES do
+		if categoryName ~= SaleConsts.CATEGORY_NAME and not (OwnershipConsts.COLOR_CATEGORY_TYPES[categoryName] or OwnershipConsts.TEXTURE_CATEGORY_TYPES[categoryName]) then
+			for customizationIndex, customizationItem in require(ReplicatedStorage.Game.Garage.StoreData:FindFirstChild(categoryName)).Items do
+				table.insert(customizationResults, {
+					CategoryName = categoryName,
+					Pointer = customizationItem
 				})
 			end
-			t2[instance2] = true
+			seenCategories[categoryName] = true
 		end
 	end
-	local count = 0
-	for var5, v6 in t2 do
-		count = count + 1
+	local categoryCount = 0
+	for categoryNameInMap, _ in seenCategories do
+		categoryCount = categoryCount + 1
 	end
-	applySeededSort(t, "Name")
-	local t3 = {}
-	local t4 = {}
-	local t5 = {}
-	for v7, v8 in t do
-		local CategoryName = v8.CategoryName
-		local Pointer = v8.Pointer
-		local var9 = not GarageUtils.isVehicleCustomizationLimited(Pointer)
-		if var9 then
-			var9 = not Pointer.None
-			if var9 then
-				var9 = if Pointer.Price and Pointer.Price < 1000000 then Pointer.Price > 0 else false
-				var9 = var9 and not Pointer.NoGarageUI
+	applySeededSort(customizationResults, "Name")
+	local processedCategories = {}
+	local onSaleCustomizations = {}
+	local customizationsByCategory = {}
+	for itemIndex, itemData in customizationResults do
+		local CategoryName = itemData.CategoryName
+		local Pointer = itemData.Pointer
+		local isValidCustomizationItem = not GarageUtils.isVehicleCustomizationLimited(Pointer)
+		if isValidCustomizationItem then
+			isValidCustomizationItem = not Pointer.None
+			if isValidCustomizationItem then
+				isValidCustomizationItem = if Pointer.Price and Pointer.Price < 1000000 then Pointer.Price > 0 else false
+				isValidCustomizationItem = isValidCustomizationItem and not Pointer.NoGarageUI
 			end
 		end
-		if var9 and not t3[CategoryName] then
-			local table10 = table.clone(v8.Pointer)
-			table10.CategoryName = CategoryName
-			table.insert(t4, table10)
-			if not t5[CategoryName] then
-				t5[CategoryName] = {}
+		if isValidCustomizationItem and not processedCategories[CategoryName] then
+			local clonedCustomization = table.clone(itemData.Pointer)
+			clonedCustomization.CategoryName = CategoryName
+			table.insert(onSaleCustomizations, clonedCustomization)
+			if not customizationsByCategory[CategoryName] then
+				customizationsByCategory[CategoryName] = {}
 			end
-			t5[CategoryName][v8.Pointer.Name] = true
-			t3[CategoryName] = true
+			customizationsByCategory[CategoryName][itemData.Pointer.Name] = true
+			processedCategories[CategoryName] = true
 		end
-		if #t4 >= SaleConsts.NUM_VEHICLE_CUSTOMIZATIONS then
+		if #onSaleCustomizations >= SaleConsts.NUM_VEHICLE_CUSTOMIZATIONS then
 			break
 		end
 	end
-	return t4, t5
+	return onSaleCustomizations, customizationsByCategory
 end
 local function _getOnSaleVehicles()
-	local t = {}
-	for v1, instance2 in VehicleData do
-		table.insert(t, {
-			Pointer = instance2
+	local vehicleResults = {}
+	for vehicleIndex, vehicleData in VehicleData do
+		table.insert(vehicleResults, {
+			Pointer = vehicleData
 		})
 	end
-	applySeededSort(t, "Make")
-	local t2 = {}
-	local t3 = {}
-	for v3, v4 in t do
-		local Pointer = v4.Pointer
-		local var5 = not GarageUtils.isVehicleLimited(Pointer)
-		if var5 then
-			var5 = not Pointer.None
-			if var5 then
-				var5 = if Pointer.Price and Pointer.Price < 1000000 then Pointer.Price > 0 else false
-				var5 = var5 and (not Pointer.NoGarageUI and (not Pointer.NoMainWorldGarageSpawn and not Pointer.ExcludeFromSale))
+	applySeededSort(vehicleResults, "Make")
+	local onSaleVehicles = {}
+	local seenMakes = {}
+	for itemIndex, itemData in vehicleResults do
+		local Pointer = itemData.Pointer
+		local isValidVehicleItem = not GarageUtils.isVehicleLimited(Pointer)
+		if isValidVehicleItem then
+			isValidVehicleItem = not Pointer.None
+			if isValidVehicleItem then
+				isValidVehicleItem = if Pointer.Price and Pointer.Price < 1000000 then Pointer.Price > 0 else false
+				isValidVehicleItem = isValidVehicleItem and (not Pointer.NoGarageUI and (not Pointer.NoMainWorldGarageSpawn and not Pointer.ExcludeFromSale))
 			end
 		end
-		if var5 then
-			table.insert(t2, v4.Pointer)
-			t3[v4.Pointer.Make] = true
+		if isValidVehicleItem then
+			table.insert(onSaleVehicles, itemData.Pointer)
+			seenMakes[itemData.Pointer.Make] = true
 		end
-		if #t2 >= SaleConsts.NUM_VEHICLES then
+		if #onSaleVehicles >= SaleConsts.NUM_VEHICLES then
 			break
 		end
 	end
-	return t2, t3
+	return onSaleVehicles, seenMakes
 end
-t._cachedOnSaleVehicleCustomizations = nil
-t._cachedOnSaleVehicleCustomizationsMap = nil
+SaleShared._cachedOnSaleVehicleCustomizations = nil
+SaleShared._cachedOnSaleVehicleCustomizationsMap = nil
 local function cacheOnSaleVehicleCustomizationsIfNeeded()
-	if t._cachedOnSaleVehicleCustomizations == nil then
-		local v3, v4 = _getOnSaleVehicleCustomizations()
-		t._cachedOnSaleVehicleCustomizations = v3
-		t._cachedOnSaleVehicleCustomizationsMap = v4
+	if SaleShared._cachedOnSaleVehicleCustomizations == nil then
+		local customizationsList, customizationsMap = _getOnSaleVehicleCustomizations()
+		SaleShared._cachedOnSaleVehicleCustomizations = customizationsList
+		SaleShared._cachedOnSaleVehicleCustomizationsMap = customizationsMap
 		task.delay(math.min(60, SaleUtils.getTimeToNextSale() - 1), function()
-			t._cachedOnSaleVehicleCustomizations = nil
-			t._cachedOnSaleVehicleCustomizationsMap = nil
+			SaleShared._cachedOnSaleVehicleCustomizations = nil
+			SaleShared._cachedOnSaleVehicleCustomizationsMap = nil
 		end)
 	end
 end
-function t.getOnSaleVehicleCustomizations()
+function SaleShared.getOnSaleVehicleCustomizations()
 	cacheOnSaleVehicleCustomizationsIfNeeded()
-	return t._cachedOnSaleVehicleCustomizations
+	return SaleShared._cachedOnSaleVehicleCustomizations
 end
-function t.isVehicleCustomizationOnSale(p1, p2)
-	assert(p1 ~= nil, "categoryName must not be nil")
-	assert(p2 ~= nil, "itemName must not be nil")
+function SaleShared.isVehicleCustomizationOnSale(categoryName, itemName)
+	assert(categoryName ~= nil, "categoryName must not be nil")
+	assert(itemName ~= nil, "itemName must not be nil")
 	cacheOnSaleVehicleCustomizationsIfNeeded()
-	return if t._cachedOnSaleVehicleCustomizationsMap[p1] == nil then false else t._cachedOnSaleVehicleCustomizationsMap[p1][p2] == true
+	return if SaleShared._cachedOnSaleVehicleCustomizationsMap[categoryName] == nil then false else SaleShared._cachedOnSaleVehicleCustomizationsMap[categoryName][itemName] == true
 end
-t._cachedOnSaleVehicles = nil
-t._cachedOnSaleVehiclesMap = nil
+SaleShared._cachedOnSaleVehicles = nil
+SaleShared._cachedOnSaleVehiclesMap = nil
 local function cacheOnSaleVehiclesIfNeeded()
-	if t._cachedOnSaleVehicles == nil then
-		local v3, v4 = _getOnSaleVehicles()
-		t._cachedOnSaleVehicles = v3
-		t._cachedOnSaleVehiclesMap = v4
+	if SaleShared._cachedOnSaleVehicles == nil then
+		local vehiclesList, vehiclesMap = _getOnSaleVehicles()
+		SaleShared._cachedOnSaleVehicles = vehiclesList
+		SaleShared._cachedOnSaleVehiclesMap = vehiclesMap
 		task.delay(math.min(60, SaleUtils.getTimeToNextSale() - 1), function()
-			t._cachedOnSaleVehicles = nil
-			t._cachedOnSaleVehiclesMap = nil
+			SaleShared._cachedOnSaleVehicles = nil
+			SaleShared._cachedOnSaleVehiclesMap = nil
 		end)
 	end
 end
-function t.getOnSaleVehicles()
+function SaleShared.getOnSaleVehicles()
 	cacheOnSaleVehiclesIfNeeded()
-	return t._cachedOnSaleVehicles
+	return SaleShared._cachedOnSaleVehicles
 end
-function t.isVehicleOnSale(p1)
-	assert(p1 ~= nil, "vehicleMake must not be nil")
+function SaleShared.isVehicleOnSale(vehicleMake)
+	assert(vehicleMake ~= nil, "vehicleMake must not be nil")
 	cacheOnSaleVehiclesIfNeeded()
-	return t._cachedOnSaleVehiclesMap[p1] == true
+	return SaleShared._cachedOnSaleVehiclesMap[vehicleMake] == true
 end
-return t
+return SaleShared

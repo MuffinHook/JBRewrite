@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local InventoryItemSystem = require(script.Parent.InventoryItemSystem)
 local waitForChild = require(ReplicatedStorage.Std.waitForChild)
@@ -13,28 +12,28 @@ return {
 		InventoryBinder:Start()
 		InventoryItemSystem.init()
 	end,
-	getFor = function(p1)
-		local instance = p1:FindFirstChild(InventoryConsts.CURRENT_INVENTORY_VALUE_NAME)
+	getFor = function(parent)
+		local instance = parent:FindFirstChild(InventoryConsts.CURRENT_INVENTORY_VALUE_NAME)
 		if instance and instance.Value then
 			return InventoryBinder:Get(instance.Value)
 		end
 	end,
-	promiseFor = function(p1)
-		return waitForChild(p1, InventoryConsts.CURRENT_INVENTORY_VALUE_NAME):andThen(function(p1)
-			local instance = Maid.new()
-			local instance2 = Promise.new(function(p12, p2)
-				instance:GiveTask(RxInstanceUtils.observeProperty(p1, "Value", function(p1)
-					if p1 then
-						p12(BinderUtils.promiseBoundClass(InventoryBinder, p1))
+	promiseFor = function(parent)
+		return waitForChild(parent, InventoryConsts.CURRENT_INVENTORY_VALUE_NAME):andThen(function(inventoryValueInstance)
+			local maid = Maid.new()
+			local inventoryPromise = Promise.new(function(resolvePromise, rejectPromise)
+				maid:GiveTask(RxInstanceUtils.observeProperty(inventoryValueInstance, "Value", function(currentValue)
+					if currentValue then
+						resolvePromise(BinderUtils.promiseBoundClass(InventoryBinder, currentValue))
 					else
-						p2()
+						rejectPromise()
 					end
 				end))
 			end)
-			instance2:finally(function()
-				instance:Destroy()
+			inventoryPromise:finally(function()
+				maid:Destroy()
 			end)
-			return instance2
+			return inventoryPromise
 		end)
 	end
 }

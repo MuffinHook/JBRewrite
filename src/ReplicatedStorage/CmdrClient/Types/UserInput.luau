@@ -1,24 +1,23 @@
--- Reviewed by Claude
 local Util = require(script.Parent.Parent.Shared.Util)
-local v1 = Enum.UserInputType:GetEnumItems()
+local validInputTypes = Enum.UserInputType:GetEnumItems()
 for k, v in pairs(Enum.KeyCode:GetEnumItems()) do
-	v1[#v1 + 1] = v
+	validInputTypes[#validInputTypes + 1] = v
 end
-local t = {
-	Transform = function(p1)
-		return Util.MakeFuzzyFinder(v1)(p1)
+local userInputType = {
+	Transform = function(input)
+		return Util.MakeFuzzyFinder(validInputTypes)(input)
 	end,
-	Validate = function(p1)
-		return #p1 > 0
+	Validate = function(input)
+		return #input > 0
 	end,
-	Autocomplete = function(p1)
-		return Util.GetNames(p1)
+	Autocomplete = function(input)
+		return Util.GetNames(input)
 	end,
-	Parse = function(p1)
-		return p1[1]
+	Parse = function(input)
+		return input[1]
 	end
 }
-return function(p1)
-	p1:RegisterType("userInput", t)
-	p1:RegisterType("userInputs", Util.MakeListableType(t))
+return function(cmdr)
+	cmdr:RegisterType("userInput", userInputType)
+	cmdr:RegisterType("userInputs", Util.MakeListableType(userInputType))
 end

@@ -1,18 +1,17 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(rootContainer)
+	local AppComponent = Roact.Component:extend("App")
 	local store = require(ReplicatedStorage.App.store)
 	local SpawnSelection = require(script.Parent.SpawnSelection)
-	function v1.init(p1)
-		local v1, v2 = Roact.createBinding(Vector3.new(0, 0, 0))
-		p1.worldPosition = v1
-		p1.updateWorldPosition = v2
-		local v3, v4 = Roact.createBinding((Vector3.new(1, 0, 1)).Unit)
-		p1.worldDirection = v3
-		p1.updateWorldDirection = v4
+	function AppComponent.init(rootContainer)
+		local positionBinding, updatePosition = Roact.createBinding(Vector3.new(0, 0, 0))
+		rootContainer.worldPosition = positionBinding
+		rootContainer.updateWorldPosition = updatePosition
+		local directionBinding, updateDirection = Roact.createBinding((Vector3.new(1, 0, 1)).Unit)
+		rootContainer.worldDirection = directionBinding
+		rootContainer.updateWorldDirection = updateDirection
 		store:dispatch({
 			type = "minimapSetSpawns",
 			spawns = {
@@ -22,8 +21,8 @@ return function(p1)
 					position = Vector3.new(2428.203, 20.751, -3775.428),
 					backgroundColor = Color3.fromRGB(252, 40, 47),
 					numEnemies = {
-						map = function(p1, p2)
-							return p2(2)
+						map = function(index, mapArray)
+							return mapArray(2)
 						end
 					}
 				},
@@ -32,8 +31,8 @@ return function(p1)
 					position = Vector3.new(-428.203, 20.751, 1475.428),
 					backgroundColor = Color3.fromRGB(252, 40, 47),
 					numEnemies = {
-						map = function(p1, p2)
-							return p2(2)
+						map = function(index, mapArray)
+							return mapArray(2)
 						end
 					}
 				},
@@ -45,15 +44,15 @@ return function(p1)
 					position = Vector3.new(-1315.371, 14.684, -1675.214),
 					backgroundColor = Color3.fromRGB(253, 123, 49),
 					numEnemies = {
-						map = function(p1, p2)
-							return p2(2)
+						map = function(index, mapArray)
+							return mapArray(2)
 						end
 					}
 				}
 			}
 		})
 	end
-	function v1.render(p1)
+	function AppComponent.render(rootContainer)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(SpawnSelection, {
@@ -64,16 +63,16 @@ return function(p1)
 				mapWorldCenterY = -1550,
 				mapImageWidth = 1024,
 				mapImageHeight = 1024,
-				worldPosition = p1.worldPosition,
-				worldDirection = p1.worldDirection,
+				worldPosition = rootContainer.worldPosition,
+				worldDirection = rootContainer.worldDirection,
 				size = UDim2.new(1, 0, 0.75, 0),
 				color = Color3.new(255/255, 0/255, 0/255),
 				square = true
 			}) })
 	end
-	function v1.willUnmount(p1)  end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(rootContainer)  end
+	local componentInstance = Roact.mount(Roact.createElement(AppComponent), rootContainer)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(componentInstance)
 	end
 end

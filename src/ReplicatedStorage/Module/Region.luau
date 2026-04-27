@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -12,16 +11,16 @@ local insert = table.insert
 local remove = table.remove
 local function MakePrism()
 	return {
-		c = nil,
-		s = nil
+		cframe = nil,
+		size = nil
 	}
 end
-local function MakePrismA(p1, p2)
+local function MakePrismA(cframe, size)
 	return {
-		c = nil,
-		s = nil,
-		c = p1,
-		s = p2
+		cframe = nil,
+		size = nil,
+		cframe = cframe,
+		size = size
 	}
 end
 local function MakeRegion()
@@ -36,23 +35,23 @@ local function MakeRegion()
 		IsInRegion = nil
 	}
 end
-local function CastPoint(p1, p2)
-	local s = p1.s
-	local module = pointToObjectSpace(p1.c, p2) + s * 0.5
-	return if module.x >= 0 and (module.x < s.x and (module.y >= 0 and (module.y < s.y and module.z >= 0))) then module.z < s.z else false
+local function CastPoint(prism, position)
+	local size = prism.size
+	local relativePosition = pointToObjectSpace(prism.cframe, position) + size * 0.5
+	return if relativePosition.x >= 0 and (relativePosition.x < size.x and (relativePosition.y >= 0 and (relativePosition.y < size.y and relativePosition.z >= 0))) then relativePosition.z < size.z else false
 end
-local function RegionCastPoint(p1, p2)
-	local Prisms = p1.Prisms
+local function RegionCastPoint(region, position)
+	local Prisms = region.Prisms
 	for i = 1, #Prisms do
-		if CastPoint(Prisms[i], p2) then
+		if CastPoint(Prisms[i], position) then
 			return true
 		end
 	end
 	return false
 end
 local Players = game:GetService("Players")
-local function IsInRegionPlayerName(p1, p2)
-	local localPlayer = Players:FindFirstChild(p2)
+local function IsInRegionPlayerName(region, playerName)
+	local localPlayer = Players:FindFirstChild(playerName)
 	if localPlayer then
 		local Character = localPlayer.Character
 		if Character then
@@ -60,11 +59,11 @@ local function IsInRegionPlayerName(p1, p2)
 			if PrimaryPart then
 				local Humanoid = Character:FindFirstChild("Humanoid")
 				if Humanoid then
-					local cframe2 = module and module.getLastPosition(localPlayer) or PrimaryPart.Position
+					local playerPosition = module and module.getLastPosition(localPlayer) or PrimaryPart.Position
 					if Humanoid.Health > 0 then
-						local Prisms = p1.Prisms
+						local Prisms = region.Prisms
 						for i = 1, #Prisms do
-							if CastPoint(Prisms[i], cframe2) then
+							if CastPoint(Prisms[i], playerPosition) then
 								return true
 							end
 						end
@@ -85,63 +84,63 @@ return {
 	MakePrism = MakePrism,
 	MakePrismA = MakePrismA,
 	MakeRegion = MakeRegion,
-	Update = function(p1, p2)
-		local IsInRegion = p1.IsInRegion
-		local NamesFastIndex = p1.NamesFastIndex
-		local Names = p1.Names
-		local t = {}
-		for i = 1, #p2 do
-			local module = p2[i]
-			local cframe2 = IsInRegion(p1, module)
-			local var3 = NamesFastIndex[module]
-			if cframe2 and not var3 then
-				table.insert(Names, module)
-				NamesFastIndex[module] = true
-				if p1.NameAdded then
-					local v4, v5 = pcall(function()
-						p1.NameAdded(p1, module)
+	Update = function(region, playerNames)
+		local IsInRegion = region.IsInRegion
+		local NamesFastIndex = region.NamesFastIndex
+		local Names = region.Names
+		local processedNames = {}
+		for i = 1, #playerNames do
+			local playerName = playerNames[i]
+			local isInRegion = IsInRegion(region, playerName)
+			local isNameInRegion = NamesFastIndex[playerName]
+			if isInRegion and not isNameInRegion then
+				table.insert(Names, playerName)
+				NamesFastIndex[playerName] = true
+				if region.NameAdded then
+					local success, errorMessage = pcall(function()
+						region.NameAdded(region, playerName)
 					end)
-					if not v4 then
-						warn("REGIONADDED", v5)
+					if not success then
+						warn("REGIONADDED", errorMessage)
 					end
-				elseif p1.NameAddedSignal then
-					p1.NameAddedSignal:Fire(p1, module)
+				elseif region.NameAddedSignal then
+					region.NameAddedSignal:Fire(region, playerName)
 				end
-			elseif not cframe2 and var3 then
-				if p1.NameRemoving then
-					local v6, v7 = pcall(function()
-						p1.NameRemoving(p1, module)
+			elseif not isInRegion and isNameInRegion then
+				if region.NameRemoving then
+					local success, errorMessage = pcall(function()
+						region.NameRemoving(region, playerName)
 					end)
-					if not v6 then
-						warn("REGIONREMOVING", v7)
+					if not success then
+						warn("REGIONREMOVING", errorMessage)
 					end
 				end
-				NamesFastIndex[module] = nil
-				for j = 1, #p1.Names do
-					if p1.Names[j] == module then
-						table.remove(p1.Names, j)
+				NamesFastIndex[playerName] = nil
+				for j = 1, #region.Names do
+					if region.Names[j] == playerName then
+						table.remove(region.Names, j)
 						break
 					end
 				end
-				if p1.NameRemovedSignal then
-					p1.NameRemovedSignal:Fire(p1, module)
+				if region.NameRemovedSignal then
+					region.NameRemovedSignal:Fire(region, playerName)
 				end
 			end
-			t[module] = true
+			processedNames[playerName] = true
 		end
-		for k = #p1.Names, 1, -1 do
-			local var8 = p1.Names[k]
-			if not (t[var8] or IsInRegion(p1, var8)) then
-				if p1.NameRemoving then
-					local v9, v10 = pcall(function()
-						p1.NameRemoving(p1, var8)
+		for k = #region.Names, 1, -1 do
+			local name = region.Names[k]
+			if not (processedNames[name] or IsInRegion(region, name)) then
+				if region.NameRemoving then
+					local success, errorMessage = pcall(function()
+						region.NameRemoving(region, name)
 					end)
-					if not v9 then
-						warn("REGIONREMOVING", v10)
+					if not success then
+						warn("REGIONREMOVING", errorMessage)
 					end
 				end
-				NamesFastIndex[var8] = nil
-				table.remove(p1.Names, k)
+				NamesFastIndex[name] = nil
+				table.remove(region.Names, k)
 			end
 		end
 	end,

@@ -1,11 +1,9 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HumanoidUnloadConsts = require(ReplicatedStorage.HumanoidUnload.HumanoidUnloadConsts)
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Spring = require(ReplicatedStorage.Std.Spring)
-local t = {
+local CharacterUtil = {
 	OnJump = nil,
 	IsCrawling = false,
 	IsCrawlingChanged = Signal.new(),
@@ -38,12 +36,12 @@ local t = {
 		end
 	end
 }
-function t.getAllCharacterPositions()
+function CharacterUtil.getAllCharacterPositions()
 	local characterPositions = {}
 	for i, player in Players:GetPlayers() do
 		local Character = player.Character
 		if Character then
-			local position = t.getPositionFromCharacter(Character)
+			local position = CharacterUtil.getPositionFromCharacter(Character)
 			if position then
 				characterPositions[Character] = position
 			end
@@ -51,4 +49,4 @@ function t.getAllCharacterPositions()
 	end
 	return characterPositions
 end
-return t
+return CharacterUtil

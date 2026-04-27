@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 return function(cmdr)
 	cmdr:RegisterType("mathOperator", cmdr.Cmdr.Util.MakeEnumType("Math Operator", {
 		{

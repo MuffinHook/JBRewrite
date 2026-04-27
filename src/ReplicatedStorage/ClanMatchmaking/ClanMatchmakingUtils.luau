@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClanMatchmakingConsts = require(ReplicatedStorage.ClanMatchmaking.ClanMatchmakingConsts)
 local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
@@ -27,7 +25,7 @@ return {
 			return false
 		end
 	end,
-	observeIsClanReadiedUp = function(p1, p2)
-		return RxInstanceUtils.observeChildrenNamed(ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME), p1, p2)
+	observeIsClanReadiedUp = function(clanId, predicate)
+		return RxInstanceUtils.observeChildrenNamed(ReplicatedStorage:FindFirstChild(ClanMatchmakingConsts.CLAN_IS_READIED_UP_MODEL_NAME), clanId, predicate)
 	end
 }

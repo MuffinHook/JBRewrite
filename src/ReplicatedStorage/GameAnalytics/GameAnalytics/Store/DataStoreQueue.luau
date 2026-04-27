@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local queueModule = {
 	QR = true,
 	Queue = {},
@@ -15,8 +13,8 @@ task.spawn(function()
 			if not timestampCache[queueEntry.Key] then
 				timestampCache[queueEntry.Key] = 0
 			end
-			local v2 = queueModule
-			v2.Process = v2.Process + 1
+			local currentQueueModule = queueModule
+			currentQueueModule.Process = currentQueueModule.Process + 1
 			local delayTime = queueEntry.Delay + timestampCache[queueEntry.Key] - DateTime.now().UnixTimestamp
 			if delayTime <= 0 then
 				delayTime = 0
@@ -24,15 +22,15 @@ task.spawn(function()
 			task.delay(delayTime, function()
 				while true do
 					timestampCache[queueEntry.Key] = DateTime.now().UnixTimestamp
-					local success, v2, v3 = pcall(queueEntry.Func)
+					local success, errorOrResult, callResult = pcall(queueEntry.Func)
 					if not success then
-						warn(v2)
+						warn(errorOrResult)
 					end
-					local v4 = v2
-					if success and v4 then
+					local hasCallResult = errorOrResult
+					if success and hasCallResult then
 						local _2
 						_ = success
-						_2 = v3
+						_2 = callResult
 						break
 					end
 					if not queueEntry.Delay then
@@ -40,7 +38,7 @@ task.spawn(function()
 						break
 					end
 					task.wait(queueEntry.Delay)
-					if success and v4 then
+					if success and hasCallResult then
 						_ = success
 						break
 					end
@@ -57,8 +55,8 @@ function queueModule.AddRequest(key, func, delay)
 		Func = func,
 		Event = event
 	})
-	local v2, v3, v4 = event.Event:Wait()
-	return v2, v3, v4
+	local result1, result2, result3 = event.Event:Wait()
+	return result1, result2, result3
 end
 function queueModule.RemoveKey(key)
 	timestampCache[key] = nil

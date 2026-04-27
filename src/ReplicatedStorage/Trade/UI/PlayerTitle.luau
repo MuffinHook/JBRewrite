@@ -1,107 +1,106 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Spring = require(ReplicatedStorage.Std.Spring)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("PlayerTitle")
-v1.defaultProps = {
+local PlayerTitle = Roact.PureComponent:extend("PlayerTitle")
+PlayerTitle.defaultProps = {
 	size = UDim2.new(1, 0, 1, 0),
 	position = UDim2.new(0, 0, 0, 0),
 	aspectRatio = 1,
 	parentRatio = 1
 }
-function v1.init(p1)
-	p1.maid = Maid.new()
-	p1.spinSpring = Spring.new(0, 0, 0.8, 15)
-	p1.scaleSpring = Spring.new(1, 0, 0.5, 40)
-	local v1, v2 = Roact.createBinding(0)
-	p1.spin = v1
-	p1.updateSpin = v2
-	local v3, v4 = Roact.createBinding(1)
-	p1.scale = v3
-	p1.updateScale = v4
+function PlayerTitle.init(self)
+	self.maid = Maid.new()
+	self.spinSpring = Spring.new(0, 0, 0.8, 15)
+	self.scaleSpring = Spring.new(1, 0, 0.5, 40)
+	local spinBinding, updateSpin = Roact.createBinding(0)
+	self.spin = spinBinding
+	self.updateSpin = updateSpin
+	local scaleBinding, updateScale = Roact.createBinding(1)
+	self.scale = scaleBinding
+	self.updateScale = updateScale
 end
-function v1.render(p1)
-	local aspectRatio = p1.props.aspectRatio
-	assert(p1.props.size.X.Offset == 0, "cannot support nonzero offset")
-	assert(p1.props.size.Y.Offset == 0, "cannot support nonzero offset")
-	local t = {
+function PlayerTitle.render(self)
+	local aspectRatio = self.props.aspectRatio
+	assert(self.props.size.X.Offset == 0, "cannot support nonzero offset")
+	assert(self.props.size.Y.Offset == 0, "cannot support nonzero offset")
+	local frameProps = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		Size = UDim2.new(p1.props.size.X.Scale, 0, p1.props.size.Y.Scale * (p1.props.parentRatio * (p1.props.size.X.Scale / p1.props.size.Y.Scale)) * 1 / aspectRatio, 0),
-		Position = p1.props.position
+		Size = UDim2.new(self.props.size.X.Scale, 0, self.props.size.Y.Scale * (self.props.parentRatio * (self.props.size.X.Scale / self.props.size.Y.Scale)) * 1 / aspectRatio, 0),
+		Position = self.props.position
 	}
-	local t2 = {}
-	local t3 = {
+	local frameChildren = {}
+	local iconProps = {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
 		BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5 / aspectRatio, 0, 0.5, 0),
-		Size = p1.scale:map(function(p1)
-			return UDim2.new(p1 / aspectRatio, 0, p1, 0)
+		Size = self.scale:map(function(scaleValue)
+			return UDim2.new(scaleValue / aspectRatio, 0, scaleValue, 0)
 		end)
 	}
-	t3.Image = if p1.props.ready then "rbxassetid://9474441364" else p1.props.userId and ("rbxthumb://type=AvatarHeadShot&w=150&h=150&id=%d"):format(p1.props.userId)
-	t3.Rotation = p1.spin
-	t2.Icon = createElement("ImageLabel", t3, {
+	iconProps.Image = if self.props.ready then "rbxassetid://9474441364" else self.props.userId and ("rbxthumb://type=AvatarHeadShot&w=150&h=150&id=%d"):format(self.props.userId)
+	iconProps.Rotation = self.spin
+	frameChildren.Icon = createElement("ImageLabel", iconProps, {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(1, 0)
 		})
 	})
-	local t4 = {
+	local titleFrameProps = {
 		BackgroundTransparency = 1,
 		BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
 		Size = UDim2.new(1 - 1 / aspectRatio - 0.0078125, 0, 1, 0),
 		Position = UDim2.new(1 / aspectRatio + 0.0078125, 0, 0, 0)
 	}
-	local t5 = {}
-	local t6 = {
+	local titleFrameChildren = {}
+	local textLabelProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5)
 	}
-	t6.TextColor3 = p1.props.ready and Color3.fromRGB(0, 200, 90) or Color3.new(255/255, 255/255, 255/255)
-	t6.Text = p1.props.displayName
-	t6.TextXAlignment = Enum.TextXAlignment.Left
-	t6.Font = Enum.Font.Bangers
-	t6.LineHeight = 1
-	t6.TextScaled = true
-	t5.Text = createElement("TextLabel", t6)
-	t2.Title = createElement("Frame", t4, t5)
-	return createElement("Frame", t, t2)
+	textLabelProps.TextColor3 = self.props.ready and Color3.fromRGB(0, 200, 90) or Color3.new(255/255, 255/255, 255/255)
+	textLabelProps.Text = self.props.displayName
+	textLabelProps.TextXAlignment = Enum.TextXAlignment.Left
+	textLabelProps.Font = Enum.Font.Bangers
+	textLabelProps.LineHeight = 1
+	textLabelProps.TextScaled = true
+	titleFrameChildren.Text = createElement("TextLabel", textLabelProps)
+	frameChildren.Title = createElement("Frame", titleFrameProps, titleFrameChildren)
+	return createElement("Frame", frameProps, frameChildren)
 end
-function v1.PopIcon(p1)
-	p1.scaleSpring:Accelerate(15)
-	local Target = p1.scaleSpring.Target
-	p1.maid.scaleHeartbeat = RunService.Heartbeat:Connect(function()
-		local v1, v2 = p1.scaleSpring:Update()
-		if math.abs(Target - v1) < 0.001 and math.abs(v2) < 0.001 then
-			p1.maid.scaleHeartbeat = nil
-			v1 = Target
+function PlayerTitle.PopIcon(self)
+	self.scaleSpring:Accelerate(15)
+	local Target = self.scaleSpring.Target
+	self.maid.scaleHeartbeat = RunService.Heartbeat:Connect(function()
+		local scalePosition, scaleVelocity = self.scaleSpring:Update()
+		if math.abs(Target - scalePosition) < 0.001 and math.abs(scaleVelocity) < 0.001 then
+			self.maid.scaleHeartbeat = nil
+			scalePosition = Target
 		end
-		p1.updateScale(v1)
+		self.updateScale(scalePosition)
 	end)
 end
-function v1.SpinIcon(p1)
-	p1.spinSpring:SetTarget(360)
-	p1.spinSpring.p = 0
-	p1.maid.spinHeartbeat = RunService.Heartbeat:Connect(function()
-		local v1, v2 = p1.spinSpring:Update()
-		if math.abs(360 - v1) < 0.001 and math.abs(v2) < 0.001 then
-			p1.maid.spinHeartbeat = nil
-			v1 = 0
+function PlayerTitle.SpinIcon(self)
+	self.spinSpring:SetTarget(360)
+	self.spinSpring.p = 0
+	self.maid.spinHeartbeat = RunService.Heartbeat:Connect(function()
+		local spinPosition, spinVelocity = self.spinSpring:Update()
+		if math.abs(360 - spinPosition) < 0.001 and math.abs(spinVelocity) < 0.001 then
+			self.maid.spinHeartbeat = nil
+			spinPosition = 0
 		end
-		p1.updateSpin(v1)
+		self.updateSpin(spinPosition)
 	end)
 end
-function v1.didUpdate(p1, p2, p3)
-	if p1.props.ready ~= p2.ready and p1.props.ready then
-		p1:SpinIcon()
-		p1:PopIcon()
+function PlayerTitle.didUpdate(self, oldProps, oldState)
+	if self.props.ready ~= oldProps.ready and self.props.ready then
+		self:SpinIcon()
+		self:PopIcon()
 	end
 end
-return v1
+return PlayerTitle

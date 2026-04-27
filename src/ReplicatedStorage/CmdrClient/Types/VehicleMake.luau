@@ -1,26 +1,25 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VehicleData = require(ReplicatedStorage.Game.Garage.VehicleData)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local Util = require(ReplicatedStorage.CmdrClient.Shared.Util)
-local table2 = Util.MakeFuzzyFinder((TableUtils.map(VehicleData, function(p1)
-	return p1.Make
+local vehicleMakeFuzzyFinder = Util.MakeFuzzyFinder((TableUtils.map(VehicleData, function(vehicleEntry)
+	return vehicleEntry.Make
 end)))
-local t = {
-	Transform = function(p1)
-		return table2(p1)
+local vehicleMakeType = {
+	Transform = function(input)
+		return vehicleMakeFuzzyFinder(input)
 	end,
-	Validate = function(p1)
-		return #p1 > 0, "No valid vehicle makes with that name could be found."
+	Validate = function(result)
+		return #result > 0, "No valid vehicle makes with that name could be found."
 	end,
-	Autocomplete = function(p1)
-		return p1
+	Autocomplete = function(matches)
+		return matches
 	end,
-	Parse = function(p1)
-		return p1[1]
+	Parse = function(matches)
+		return matches[1]
 	end
 }
-return function(p1)
-	p1:RegisterType("vehicleMake", t)
-	p1:RegisterType("vehicleMakes", Util.MakeListableType(t))
+return function(registry)
+	registry:RegisterType("vehicleMake", vehicleMakeType)
+	registry:RegisterType("vehicleMakes", Util.MakeListableType(vehicleMakeType))
 end

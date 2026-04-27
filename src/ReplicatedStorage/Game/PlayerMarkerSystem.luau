@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WorldMarker = require(ReplicatedStorage.Game.WorldMarker.WorldMarker)
@@ -26,51 +24,51 @@ local stateColors = {
 	[markerStates.Friend] = Color3.fromRGB(240, 240, 240),
 	[markerStates.Spotted] = Color3.fromRGB(220, 220, 10)
 }
-local t3 = {
+local PlayerMarkerSystem = {
 	_mapPlayerIdPlayerMarker = {},
 	_playerMarkerGroup = nil,
 	_setting = nil
 }
-function t3.init()
-	local v1 = WorldMarkerGroup.new()
-	WorldMarkerSystem.addGroup(v1)
-	t3._playerMarkerGroup = v1
-	RxInstanceUtils.observeChildren(Players, t3._rxChildAdded)
-	RunService.Heartbeat:Connect(t3._draw)
-	local t = {
+function PlayerMarkerSystem.init()
+	local newMarkerGroup = WorldMarkerGroup.new()
+	WorldMarkerSystem.addGroup(newMarkerGroup)
+	PlayerMarkerSystem._playerMarkerGroup = newMarkerGroup
+	RxInstanceUtils.observeChildren(Players, PlayerMarkerSystem._rxChildAdded)
+	RunService.Heartbeat:Connect(PlayerMarkerSystem._draw)
+	local playerMarkerSetting = {
 		name = "playerMarkers",
 		title = "Player Markers",
 		type = gameSettingType.Checkbox,
 		defaultValue = true,
 		order = 42
 	}
-	t3._setting = t
-	GameSettingsService.add(t)
-	t3.updateEnabled()
-	t.onChanged:Connect(t3.updateEnabled)
-	Players.LocalPlayer:GetAttributeChangedSignal("DisablePlayerMarkers"):Connect(t3.updateEnabled)
+	PlayerMarkerSystem._setting = playerMarkerSetting
+	GameSettingsService.add(playerMarkerSetting)
+	PlayerMarkerSystem.updateEnabled()
+	playerMarkerSetting.onChanged:Connect(PlayerMarkerSystem.updateEnabled)
+	Players.LocalPlayer:GetAttributeChangedSignal("DisablePlayerMarkers"):Connect(PlayerMarkerSystem.updateEnabled)
 end
-function t3.updateEnabled()
-	local v1 = t3._setting:getValue()
-	t3._playerMarkerGroup:SetEnabled(v1 and Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") ~= true)
+function PlayerMarkerSystem.updateEnabled()
+	local settingValue = PlayerMarkerSystem._setting:getValue()
+	PlayerMarkerSystem._playerMarkerGroup:SetEnabled(settingValue and Players.LocalPlayer:GetAttribute("DisablePlayerMarkers") ~= true)
 end
-function t3._draw()
+function PlayerMarkerSystem._draw()
 	debug.profilebegin("PlayerMarker draw")
-	for k, v in pairs(t3._mapPlayerIdPlayerMarker) do
-		local _player = v._player
+	for k, markerRecord in pairs(PlayerMarkerSystem._mapPlayerIdPlayerMarker) do
+		local _player = markerRecord._player
 		if _player then
 			local Character = _player.Character
 			if Character then
 				local Humanoid = Character:FindFirstChild("Humanoid")
 				local PrimaryPart = Character.PrimaryPart
-				local _worldMarker = v._worldMarker
+				local _worldMarker = markerRecord._worldMarker
 				if PrimaryPart then
 					_worldMarker:SetPosition(PrimaryPart.Position)
 				elseif Humanoid then
-					local v1 = Humanoid:FindFirstChild(HumanoidUnloadConsts.SERVER_POSITION_OBJ_NAME)
-					if v1 then
-						local v2 = v1.Value
-						_worldMarker:SetPosition(((v._worldMarker:GetPosition() or v2):Lerp(v2, 0.3333333333333333)))
+					local positionObj = Humanoid:FindFirstChild(HumanoidUnloadConsts.SERVER_POSITION_OBJ_NAME)
+					if positionObj then
+						local positionValue = positionObj.Value
+						_worldMarker:SetPosition(((markerRecord._worldMarker:GetPosition() or positionValue):Lerp(positionValue, 0.3333333333333333)))
 					end
 				end
 			end
@@ -78,75 +76,75 @@ function t3._draw()
 	end
 	debug.profileend()
 end
-function t3._rxChildAdded(p1, p2)
-	assert(p1:IsA("Player"))
-	if p1 ~= Players.LocalPlayer then
-		p2:GiveTask(RxInstanceUtils.observeOneChildNamed(p1, "TeamValue", function(p12, p2)
+function PlayerMarkerSystem._rxChildAdded(player, observableTask)
+	assert(player:IsA("Player"))
+	if player ~= Players.LocalPlayer then
+		observableTask:GiveTask(RxInstanceUtils.observeOneChildNamed(player, "TeamValue", function(teamValue, connectionTask)
 			local function update()
-				local v12 = if GameUtil.Team == Settings.EnumTeam.Police then Settings.EnumTeam.Police else Settings.EnumTeam.Criminal
-				local v2 = if p12.Value == Settings.Team.Police then Settings.EnumTeam.Police else Settings.EnumTeam.Criminal
-				local v3 = if v2 == v12 then if v2 == Settings.EnumTeam.Police then markerStates.Police else markerStates.Criminal else nil
-				if FriendsService.getIsFriendsWith(Players.LocalPlayer, p1.UserId, true) and v2 == v12 then
-					v3 = markerStates.Friend
+				local currentPlayerTeam = if GameUtil.Team == Settings.EnumTeam.Police then Settings.EnumTeam.Police else Settings.EnumTeam.Criminal
+				local playerTeam = if teamValue.Value == Settings.Team.Police then Settings.EnumTeam.Police else Settings.EnumTeam.Criminal
+				local markerState = if playerTeam == currentPlayerTeam then if playerTeam == Settings.EnumTeam.Police then markerStates.Police else markerStates.Criminal else nil
+				if FriendsService.getIsFriendsWith(Players.LocalPlayer, player.UserId, true) and playerTeam == currentPlayerTeam then
+					markerState = markerStates.Friend
 				end
-				if p1:GetAttribute("CCTVSpotted") == true then
-					v3 = markerStates.Spotted
+				if player:GetAttribute("CCTVSpotted") == true then
+					markerState = markerStates.Spotted
 				end
-				if v3 then
-					if not t3._doesMarkerExist(p1) then
-						t3._constructMarker(p1)
+				if markerState then
+					if not PlayerMarkerSystem._doesMarkerExist(player) then
+						PlayerMarkerSystem._constructMarker(player)
 					end
-					t3._setColor(p1, stateColors[v3])
-				elseif t3._doesMarkerExist(p1) then
-					t3._destructMarker(p1)
+					PlayerMarkerSystem._setColor(player, stateColors[markerState])
+				elseif PlayerMarkerSystem._doesMarkerExist(player) then
+					PlayerMarkerSystem._destructMarker(player)
 				end
 			end
 			update()
-			p2._listenTeamChange = p12.Changed:Connect(update)
-			p2._listenMyTeamChange = GameUtil.OnTeamChanged:Connect(update)
-			p2._listenMyFriendsChange = FriendsService.friendsUpdated:Connect(update)
-			p2:GiveTask(p1:GetAttributeChangedSignal("CCTVSpotted"):Connect(update))
+			connectionTask._listenTeamChange = teamValue.Changed:Connect(update)
+			connectionTask._listenMyTeamChange = GameUtil.OnTeamChanged:Connect(update)
+			connectionTask._listenMyFriendsChange = FriendsService.friendsUpdated:Connect(update)
+			connectionTask:GiveTask(player:GetAttributeChangedSignal("CCTVSpotted"):Connect(update))
 		end))
-		p2:GiveTask(function()
-			if t3._doesMarkerExist(p1) then
-				t3._destructMarker(p1)
+		observableTask:GiveTask(function()
+			if PlayerMarkerSystem._doesMarkerExist(player) then
+				PlayerMarkerSystem._destructMarker(player)
 			end
 		end)
 	end
 end
-function t3._doesMarkerExist(p1)
-	return t3._mapPlayerIdPlayerMarker[p1.UserId] ~= nil
+function PlayerMarkerSystem._doesMarkerExist(player)
+	return PlayerMarkerSystem._mapPlayerIdPlayerMarker[player.UserId] ~= nil
 end
-function t3._constructMarker(p1)
-	assert(p1 ~= nil)
-	assert(p1 ~= Players.LocalPlayer)
-	if t3._mapPlayerIdPlayerMarker[p1.UserId] then
-		error(("Player marker already exists for: %s"):format(p1.Name))
+function PlayerMarkerSystem._constructMarker(player)
+	assert(player ~= nil)
+	assert(player ~= Players.LocalPlayer)
+	if PlayerMarkerSystem._mapPlayerIdPlayerMarker[player.UserId] then
+		error(("Player marker already exists for: %s"):format(player.Name))
 	end
-	local v2 = WorldMarker.new()
-	v2:SetScreenGui(WorldMarkerSystem.gui)
-	v2:SetSizes(markerSizes)
-	v2:SetIcon(7028057307)
-	t3._playerMarkerGroup:Add(v2)
-	t3._mapPlayerIdPlayerMarker[p1.UserId] = {
-		_worldMarker = v2,
-		_player = p1
+	local newWorldMarker = WorldMarker.new()
+	newWorldMarker:SetScreenGui(WorldMarkerSystem.gui)
+	newWorldMarker:SetSizes(markerSizes)
+	newWorldMarker:SetIcon(7028057307)
+	PlayerMarkerSystem._playerMarkerGroup:Add(newWorldMarker)
+	PlayerMarkerSystem._mapPlayerIdPlayerMarker[player.UserId] = {
+		_worldMarker = newWorldMarker,
+		_player = player
 	}
 end
-function t3._setColor(p1, p2)
-	t3._mapPlayerIdPlayerMarker[p1.UserId]._worldMarker.FrameInner.ImageColor3 = p2
+function PlayerMarkerSystem._setColor(player, color)
+	PlayerMarkerSystem._mapPlayerIdPlayerMarker[player.UserId]._worldMarker.FrameInner.ImageColor3 = color
 end
-function t3._destructMarker(p1)
-	assert(p1 ~= nil)
-	local v2 = t3._mapPlayerIdPlayerMarker[p1.UserId]
-	if v2 then
-		t3._mapPlayerIdPlayerMarker[p1.UserId] = nil
-		t3._playerMarkerGroup:Remove(v2._worldMarker)
-		v2._worldMarker:Destroy()
-		v2._worldMarker = nil
-		v2._player = nil
+function PlayerMarkerSystem._destructMarker(player)
+	assert(player ~= nil)
+	local markerRecord = PlayerMarkerSystem._mapPlayerIdPlayerMarker[player.UserId]
+	if markerRecord then
+		PlayerMarkerSystem._mapPlayerIdPlayerMarker[player.UserId] = nil
+		PlayerMarkerSystem._playerMarkerGroup:Remove(markerRecord._worldMarker)
+		markerRecord._worldMarker:Destroy()
+		markerRecord._worldMarker = nil
+		markerRecord._player = nil
 	else
-		error(("Player marker does not exist for: %s"):format(p1.Name))
+		error(("Player marker does not exist for: %s"):format(player.Name))
 	end
 end
-return t3
+return PlayerMarkerSystem

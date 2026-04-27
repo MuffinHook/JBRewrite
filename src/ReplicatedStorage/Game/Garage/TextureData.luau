@@ -1,4 +1,3 @@
--- Reviewed by Claude
 return {
 	Armor = {
 		ATV = 10039464006,

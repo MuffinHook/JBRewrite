@@ -1,6 +1,4 @@
--- Reviewed by Claude
--- variables reassigned
-local t = {
+local threadingService = {
 	_canSafelyClose = true,
 	_endThread = false,
 	_isRunning = false,
@@ -11,33 +9,33 @@ local t = {
 local Logger = require(script.Parent.Logger)
 local RunService = game:GetService("RunService")
 local function getScheduledBlock()
-	if t._hasScheduledBlockRun or (t._scheduledBlock == nil or not (t._scheduledBlock.deadline <= tick())) then
+	if threadingService._hasScheduledBlockRun or (threadingService._scheduledBlock == nil or not (threadingService._scheduledBlock.deadline <= tick())) then
 		return nil
 	else
-		t._hasScheduledBlockRun = true
-		return t._scheduledBlock
+		threadingService._hasScheduledBlockRun = true
+		return threadingService._scheduledBlock
 	end
 end
 local function run()
 	task.spawn(function()
 		Logger:d("Starting GA thread")
-		while not t._endThread do
+		while not threadingService._endThread do
 			local scheduledBlock
-			t._canSafelyClose = false
-			if #t._blocks ~= 0 then
-				for k, v in pairs(t._blocks) do
-					local pcallSuccess, pcallError = pcall(v.block)
+			threadingService._canSafelyClose = false
+			if #threadingService._blocks ~= 0 then
+				for k, blockEntry in pairs(threadingService._blocks) do
+					local pcallSuccess, pcallError = pcall(blockEntry.block)
 					if not pcallSuccess then
 						Logger:e(pcallError)
 					end
 				end
-				t._blocks = {}
+				threadingService._blocks = {}
 			end
-			if t._hasScheduledBlockRun or (t._scheduledBlock == nil or not (t._scheduledBlock.deadline <= tick())) then
+			if threadingService._hasScheduledBlockRun or (threadingService._scheduledBlock == nil or not (threadingService._scheduledBlock.deadline <= tick())) then
 				scheduledBlock = nil
 			else
-				t._hasScheduledBlockRun = true
-				scheduledBlock = t._scheduledBlock
+				threadingService._hasScheduledBlockRun = true
+				scheduledBlock = threadingService._scheduledBlock
 			end
 			if scheduledBlock ~= nil then
 				local pcallSuccess, pcallError = pcall(scheduledBlock.block)
@@ -45,7 +43,7 @@ local function run()
 					Logger:e(pcallError)
 				end
 			end
-			t._canSafelyClose = true
+			threadingService._canSafelyClose = true
 			task.wait(1)
 		end
 		Logger:d("GA thread stopped")
@@ -53,32 +51,32 @@ local function run()
 	game:BindToClose(function()
 		if not RunService:IsStudio() then
 			task.wait(1)
-			if not t._canSafelyClose then
+			if not threadingService._canSafelyClose then
 				repeat
 					task.wait()
-				until t._canSafelyClose
+				until threadingService._canSafelyClose
 			end
 			task.wait(3)
 		end
 	end)
 end
-function t.scheduleTimer(self, delay, callbackBlock)
+function threadingService.scheduleTimer(self, delay, callbackBlock)
 	if not self._endThread then
 		if not self._isRunning then
 			self._isRunning = true
 			run()
 		end
-		local t = {
+		local scheduledBlockData = {
 			block = callbackBlock,
 			deadline = tick() + delay
 		}
 		if self._hasScheduledBlockRun then
-			self._scheduledBlock = t
+			self._scheduledBlock = scheduledBlockData
 			self._hasScheduledBlockRun = false
 		end
 	end
 end
-function t.performTaskOnGAThread(self, taskBlock)
+function threadingService.performTaskOnGAThread(self, taskBlock)
 	if not self._endThread then
 		if not self._isRunning then
 			self._isRunning = true
@@ -89,7 +87,7 @@ function t.performTaskOnGAThread(self, taskBlock)
 		}
 	end
 end
-function t.stopThread(self)
+function threadingService.stopThread(self)
 	self._endThread = true
 end
-return t
+return threadingService

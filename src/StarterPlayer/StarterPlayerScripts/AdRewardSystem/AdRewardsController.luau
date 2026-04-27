@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AdService = game:GetService("AdService")
 local Players = game:GetService("Players")
@@ -19,40 +17,39 @@ local ABCheck = AdRewardEvents:WaitForChild("ABCheck")
 local ShowAd = AdRewardEvents:WaitForChild("ShowAd")
 local PromptCashBooster = AdRewardEvents:WaitForChild("PromptCashBooster")
 local AdRewardCashToast = AdRewardSystem:WaitForChild("AdRewardCashToast")
-for mathFunc, v2 in AdRewardCashToast:QueryDescendants("ObjectValue#MoveOnSignal") do
-	v2.Value = PromptCashBooster
+for index, signalValue in AdRewardCashToast:QueryDescendants("ObjectValue#MoveOnSignal") do
+	signalValue.Value = PromptCashBooster
 end
 local CashTimer = AdRewardCashToast:WaitForChild("CashTimer")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local isEnabled = nil
-local mathFunc = nil
-local isEnabled = false
-local isEnabled = false
-local isEnabled = false
-local isEnabled = false
-local v9 = 0
-local isEnabled = false
-local isEnabled = false
-local v12 = nil
-local configTable = {}
-local v13 = nil
+local watchAdButtonController = nil
+local isAdAvailable = false
+local isIneligibleDueToServer = false
+local isServerIneligible = false
+local isClientIneligible = false
+local globalSleepUntilTime = 0
+local isSleepActive = false
+local currentRegionKey = nil
+local ineligibilityCache = {}
+local regionTracker = nil
 local function getCurrentRegionTag()
-	if v13 and v13.GetCurrentRegionTag then
-		return v13:GetCurrentRegionTag()
+	if regionTracker and regionTracker.GetCurrentRegionTag then
+		return regionTracker:GetCurrentRegionTag()
 	else
 		return nil
 	end
 end
-local configTable = {
+local ineligibilityCache = {
 	Enum.AdAvailabilityResult.PlayerIneligible,
 	Enum.AdAvailabilityResult.DeviceIneligible,
 	Enum.AdAvailabilityResult.PublisherIneligible,
 	Enum.AdAvailabilityResult.ExperienceIneligible
 }
-local function isIneligible(p1)
-	for i, v in ipairs(configTable) do
-		if p1 == v then
+local function isIneligible(resultToCheck)
+	for i, v in ipairs(ineligibilityCache) do
+		if resultToCheck == v then
 			return true
 		end
 	end
@@ -67,98 +64,98 @@ local function getCurrentRegionKey()
 	end
 end
 local function checkForAds()
-	if isEnabled or isEnabled then
+	if isAdAvailable or isSleepActive then
 		return
 	end
-	local mathFunc, v2 = pcall(function()
+	local success, adAvailabilityResponse = pcall(function()
 		return AdService:GetAdAvailabilityNowAsync(Enum.AdFormat.RewardedVideo)
 	end)
-	if mathFunc and v2 then
-		isEnabled = v2.AdAvailabilityResult == Enum.AdAvailabilityResult.IsAvailable
-		local AdAvailabilityResult = v2.AdAvailabilityResult
-		local isEnabled = false
-		for i, v in ipairs(configTable) do
+	if success and adAvailabilityResponse then
+		isAdAvailable = adAvailabilityResponse.AdAvailabilityResult == Enum.AdAvailabilityResult.IsAvailable
+		local AdAvailabilityResult = adAvailabilityResponse.AdAvailabilityResult
+		local foundIneligibility = false
+		for i, v in ipairs(ineligibilityCache) do
 			if AdAvailabilityResult == v then
-				isEnabled = true
+				foundIneligibility = true
 				break
 			end
 		end
-		isEnabled = not isEnabled
+		isServerIneligible = not foundIneligibility
 	else
-		isEnabled = false
-		isEnabled = false
-		isEnabled = true
+		isAdAvailable = false
+		isClientIneligible = false
+		isSleepActive = true
 	end
 end
 local function startGlobalSleep()
-	v9 = os.time() + 180
-	isEnabled = false
-	isEnabled = false
+	globalSleepUntilTime = os.time() + 180
+	isAdAvailable = false
+	isSleepActive = false
 end
 local configTable = {
 	TriggerPromptInteracted = function()
-		v9 = os.time() + 180
-		isEnabled = false
-		isEnabled = false
+		globalSleepUntilTime = os.time() + 180
+		isAdAvailable = false
+		isSleepActive = false
 	end
 }
-local function PlayRewardedAd(p1)
-	if isEnabled then
+local function PlayRewardedAd(itemIdParam)
+	if isSleepActive then
 		return false
 	else
-		if p1 then
-			p1 = tonumber(p1)
+		if itemIdParam then
+			itemIdParam = tonumber(itemIdParam)
 		end
-		isEnabled = true
-		isEnabled = false
-		ShowAd:FireServer(p1 or 1095222383857795, "generic_watch_to_claim")
+		isSleepActive = true
+		isClientIneligible = false
+		ShowAd:FireServer(itemIdParam or 1095222383857795, "generic_watch_to_claim")
 		return true
 	end
 end
-local function tweenGuiPosition(p1, p2, p3)
-	TweenService:Create(p1, TweenInfo.new(p3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
-		Position = p2
+local function tweenGuiPosition(targetFrame, targetPosition, duration)
+	TweenService:Create(targetFrame, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
+		Position = targetPosition
 	}):Play()
 end
-local function setupClickToMoveFrame(p1)
-	if p1:GetAttribute("__AdRewardsBound") then
+local function setupClickToMoveFrame(objectValueInstance)
+	if objectValueInstance:GetAttribute("__AdRewardsBound") then
 		return
 	end
-	p1:SetAttribute("__AdRewardsBound", true)
-	local mathFunc = p1.Parent
-	local v2 = p1.Value
-	if mathFunc and v2 then
-		if mathFunc:IsA("GuiButton") then
-			if v2:IsA("GuiObject") then
-				local isEnabled = p1:GetAttribute("Pos")
-				local mathFunc = p1:GetAttribute("MoveTime")
-				if typeof(isEnabled) == "UDim2" and (typeof(mathFunc) == "number" and not (mathFunc <= 0)) then
-					local isEnabled = v2.Name
-					mathFunc.MouseButton1Down:Connect(function()
-						tweenGuiPosition(v2, isEnabled, mathFunc)
-						Telemetry.send("DeclineAd_" .. isEnabled)
-						local mathFunc = if v13 and v13.GetCurrentRegionTag then v13:GetCurrentRegionTag() else nil
-						if mathFunc then
-							Telemetry.send("DeclineAdRegion_" .. mathFunc)
+	objectValueInstance:SetAttribute("__AdRewardsBound", true)
+	local parentButton = objectValueInstance.Parent
+	local targetFrame = objectValueInstance.Value
+	if parentButton and targetFrame then
+		if parentButton:IsA("GuiButton") then
+			if targetFrame:IsA("GuiObject") then
+				local positionAttribute = objectValueInstance:GetAttribute("Pos")
+				local moveTimeDuration = objectValueInstance:GetAttribute("MoveTime")
+				if typeof(positionAttribute) == "UDim2" and (typeof(moveTimeDuration) == "number" and not (moveTimeDuration <= 0)) then
+					local targetGuiName = targetFrame.Name
+					parentButton.MouseButton1Down:Connect(function()
+						tweenGuiPosition(targetFrame, positionAttribute, moveTimeDuration)
+						Telemetry.send("DeclineAd_" .. targetGuiName)
+						local regionTag = if regionTracker and regionTracker.GetCurrentRegionTag then regionTracker:GetCurrentRegionTag() else nil
+						if regionTag then
+							Telemetry.send("DeclineAdRegion_" .. regionTag)
 						end
 						configTable.TriggerPromptInteracted()
 					end)
 				else
-					warn("[AdRewardsController] ClickToMoveFrame has invalid Pos/MoveTime on", p1:GetFullName())
+					warn("[AdRewardsController] ClickToMoveFrame has invalid Pos/MoveTime on", objectValueInstance:GetFullName())
 				end
 			else
-				warn("[AdRewardsController] ClickToMoveFrame value is not a GuiObject:", v2:GetFullName())
+				warn("[AdRewardsController] ClickToMoveFrame value is not a GuiObject:", targetFrame:GetFullName())
 			end
 		else
-			warn("[AdRewardsController] ClickToMoveFrame parent is not a GuiButton:", mathFunc:GetFullName())
+			warn("[AdRewardsController] ClickToMoveFrame parent is not a GuiButton:", parentButton:GetFullName())
 		end
 	else
-		warn("[AdRewardsController] ClickToMoveFrame missing button or target frame:", p1:GetFullName())
+		warn("[AdRewardsController] ClickToMoveFrame missing button or target frame:", objectValueInstance:GetFullName())
 	end
 end
-local function handleAdRewardsUITaggedInstance(p1)
-	if p1:IsA("ObjectValue") and p1.Name == "ClickToMoveFrame" then
-		setupClickToMoveFrame(p1)
+local function handleAdRewardsUITaggedInstance(instanceObject)
+	if instanceObject:IsA("ObjectValue") and instanceObject.Name == "ClickToMoveFrame" then
+		setupClickToMoveFrame(instanceObject)
 	end
 end
 local function initAdRewardsUI()
@@ -170,26 +167,26 @@ local function initAdRewardsUI()
 	CollectionService:GetInstanceAddedSignal("AdRewardsUI"):Connect(handleAdRewardsUITaggedInstance)
 end
 local function InitRewardAdListener()
-	ShowAd.OnClientEvent:Connect(function(p1, p2, p3)
-		if p3 == "generic_watch_to_claim" then
-			isEnabled = false
-			isEnabled = false
-			if mathFunc and mathFunc.OnAdCompleted then
-				mathFunc.OnAdCompleted(p1, p2)
+	ShowAd.OnClientEvent:Connect(function(itemId, itemName, adType)
+		if adType == "generic_watch_to_claim" then
+			isAdAvailable = false
+			isSleepActive = false
+			if watchAdButtonController and watchAdButtonController.OnAdCompleted then
+				watchAdButtonController.OnAdCompleted(itemId, itemName)
 			end
 		end
 	end)
 end
-local v14 = nil
-local v15 = nil
-local isEnabled = false
-local function formatTime(p1)
-	local mathFunc = math.floor(p1)
-	return string.format("%d:%02d", math.floor(mathFunc / 60), mathFunc % 60)
+local timerFrame = nil
+local timerSignalConnection = nil
+local isTimerInitialized = false
+local function formatTime(secondsValue)
+	local floorSeconds = math.floor(secondsValue)
+	return string.format("%d:%02d", math.floor(floorSeconds / 60), floorSeconds % 60)
 end
 local function initCashTimer()
-	if not isEnabled then
-		isEnabled = true
+	if not isTimerInitialized then
+		isTimerInitialized = true
 		local AppUI = PlayerGui:WaitForChild("AppUI")
 		local function getContainer()
 			if AppUI and AppUI.Parent then
@@ -208,22 +205,22 @@ local function initCashTimer()
 				return nil
 			end
 		end
-		local function applyAppearanceForContainer(p1)
-			if v14 and p1 then
-				local UIAspectRatioConstraint = v14:FindFirstChildOfClass("UIAspectRatioConstraint")
+		local function applyAppearanceForContainer(containerFrame)
+			if timerFrame and containerFrame then
+				local UIAspectRatioConstraint = timerFrame:FindFirstChildOfClass("UIAspectRatioConstraint")
 				if not UIAspectRatioConstraint then
-					local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
-					UIAspectRatioConstraint_2.Parent = v14
-					UIAspectRatioConstraint = UIAspectRatioConstraint_2
+					local newConstraint = Instance.new("UIAspectRatioConstraint")
+					newConstraint.Parent = timerFrame
+					UIAspectRatioConstraint = newConstraint
 				end
-				if p1.Name == "Buttons" then
+				if containerFrame.Name == "Buttons" then
 					UIAspectRatioConstraint.AspectRatio = 6
 				else
 					UIAspectRatioConstraint.AspectRatio = 5
 				end
-				local Minimap = p1:FindFirstChild("Minimap")
+				local Minimap = containerFrame:FindFirstChild("Minimap")
 				if Minimap and Minimap:IsA("GuiObject") then
-					local Frame = v14:FindFirstChild("Frame")
+					local Frame = timerFrame:FindFirstChild("Frame")
 					if Frame and Minimap:FindFirstChild("Time") then
 						Frame.BackgroundColor3 = Minimap.Time.ImageColor3
 					end
@@ -231,72 +228,72 @@ local function initCashTimer()
 			end
 		end
 		local function bindTimer()
-			if v15 then
-				v15:Disconnect()
-				v15 = nil
+			if timerSignalConnection then
+				timerSignalConnection:Disconnect()
+				timerSignalConnection = nil
 			end
-			if v14 then
-				v14.Visible = false
-				local function updatetimer(p1)
-					if v14 and v14.Parent then
-						v14.Visible = p1 > 0
-						local isEnabled = math.floor(p1)
-						v14.Frame.Frame.TextLabel.Text = string.format("%d:%02d", math.floor(isEnabled / 60), isEnabled % 60)
-						local isEnabled = getContainer()
-						if isEnabled then
-							applyAppearanceForContainer(isEnabled)
+			if timerFrame then
+				timerFrame.Visible = false
+				local function updatetimer(secondsRemaining)
+					if timerFrame and timerFrame.Parent then
+						timerFrame.Visible = secondsRemaining > 0
+						local flooredSeconds = math.floor(secondsRemaining)
+						timerFrame.Frame.Frame.TextLabel.Text = string.format("%d:%02d", math.floor(flooredSeconds / 60), flooredSeconds % 60)
+						local currentContainer = getContainer()
+						if currentContainer then
+							applyAppearanceForContainer(currentContainer)
 						end
 					end
 				end
-				v15 = LocalPlayer:GetAttributeChangedSignal("CashMultiplierTimer"):Connect(function()
-					local mathFunc = LocalPlayer:GetAttribute("CashMultiplierTimer")
-					if v14 and v14.Parent then
-						v14.Visible = mathFunc > 0
-						local mathFunc = math.floor(mathFunc)
-						v14.Frame.Frame.TextLabel.Text = string.format("%d:%02d", math.floor(mathFunc / 60), mathFunc % 60)
-						local isEnabled = getContainer()
-						if isEnabled then
-							applyAppearanceForContainer(isEnabled)
+				timerSignalConnection = LocalPlayer:GetAttributeChangedSignal("CashMultiplierTimer"):Connect(function()
+					local currentTimerValue = LocalPlayer:GetAttribute("CashMultiplierTimer")
+					if timerFrame and timerFrame.Parent then
+						timerFrame.Visible = currentTimerValue > 0
+						local flooredTimerValue = math.floor(currentTimerValue)
+						timerFrame.Frame.Frame.TextLabel.Text = string.format("%d:%02d", math.floor(flooredTimerValue / 60), flooredTimerValue % 60)
+						local currentContainer = getContainer()
+						if currentContainer then
+							applyAppearanceForContainer(currentContainer)
 						end
 					end
 				end)
-				local mathFunc = LocalPlayer:GetAttribute("CashMultiplierTimer")
-				if typeof(mathFunc) == "number" then
-					if v14 and v14.Parent then
-						v14.Visible = mathFunc > 0
-						local mathFunc = math.floor(mathFunc)
-						v14.Frame.Frame.TextLabel.Text = string.format("%d:%02d", math.floor(mathFunc / 60), mathFunc % 60)
-						local isEnabled = getContainer()
-						if isEnabled then
-							applyAppearanceForContainer(isEnabled)
+				local initialTimerValue = LocalPlayer:GetAttribute("CashMultiplierTimer")
+				if typeof(initialTimerValue) == "number" then
+					if timerFrame and timerFrame.Parent then
+						timerFrame.Visible = initialTimerValue > 0
+						local flooredInitialValue = math.floor(initialTimerValue)
+						timerFrame.Frame.Frame.TextLabel.Text = string.format("%d:%02d", math.floor(flooredInitialValue / 60), flooredInitialValue % 60)
+						local currentContainer = getContainer()
+						if currentContainer then
+							applyAppearanceForContainer(currentContainer)
 						end
 					end
-				elseif v14 and v14.Parent then
-					v14.Visible = false
-					local isEnabled = math.floor(0)
-					v14.Frame.Frame.TextLabel.Text = string.format("%d:%02d", math.floor(isEnabled / 60), isEnabled % 60)
-					local v9 = getContainer()
-					if v9 then
-						applyAppearanceForContainer(v9)
+				elseif timerFrame and timerFrame.Parent then
+					timerFrame.Visible = false
+					local zeroFloor = math.floor(0)
+					timerFrame.Frame.Frame.TextLabel.Text = string.format("%d:%02d", math.floor(zeroFloor / 60), zeroFloor % 60)
+					local fallbackContainer = getContainer()
+					if fallbackContainer then
+						applyAppearanceForContainer(fallbackContainer)
 					end
 				end
 			end
 		end
 		local function ensureTimer()
-			if isEnabled and isEnabled.Parent then
-				local mathFunc = getContainer()
-				if mathFunc and (v14 and (v14.Parent and v14.Parent ~= mathFunc)) then
-					v14.Parent = mathFunc
-					applyAppearanceForContainer(mathFunc)
-				elseif mathFunc and not (v14 and v14.Parent) then
-					local CashTimer_2 = mathFunc:FindFirstChild("CashTimer")
-					if CashTimer_2 and CashTimer_2 ~= v14 then
-						CashTimer_2:Destroy()
+			if isTimerInitialized and AppUI and AppUI.Parent then
+				local targetContainer = getContainer()
+				if targetContainer and (timerFrame and (timerFrame.Parent and timerFrame.Parent ~= targetContainer)) then
+					timerFrame.Parent = targetContainer
+					applyAppearanceForContainer(targetContainer)
+				elseif targetContainer and not (timerFrame and timerFrame.Parent) then
+					local existingTimer = targetContainer:FindFirstChild("CashTimer")
+					if existingTimer and existingTimer ~= timerFrame then
+						existingTimer:Destroy()
 					end
-					v14 = CashTimer:Clone()
-					v14.Name = "CashTimer"
-					v14.Parent = mathFunc
-					applyAppearanceForContainer(mathFunc)
+					timerFrame = CashTimer:Clone()
+					timerFrame.Name = "CashTimer"
+					timerFrame.Parent = targetContainer
+					applyAppearanceForContainer(targetContainer)
 					bindTimer()
 				end
 			end
@@ -312,50 +309,50 @@ end
 local function connectCustomTelemetry()  end
 local function startRegionLoop()
 	while true do
-		local mathFunc, v2
+		local currentTime, currentRegionKeyValue
 		repeat
 			task.wait(10)
-			mathFunc = os.time()
-		until not (mathFunc < v9)
-		if v13 and v13:IsInAnyTeamMatchedRegion() then
-			if not isEnabled then
+			currentTime = os.time()
+		until not (currentTime < globalSleepUntilTime)
+		if regionTracker and regionTracker:IsInAnyTeamMatchedRegion() then
+			if not isAdAvailable then
 				checkForAds()
-				if isEnabled and isEnabled then
-					isEnabled = true
+				if isAdAvailable and isServerIneligible then
+					isServerIneligible = true
 				end
 			end
-			if isEnabled then
+			if isAdAvailable then
 				local Team = LocalPlayer.Team
-				v2 = if Team then Team.Name else nil
-				if v2 then
-					local isEnabled = configTable[v2]
+				currentRegionKeyValue = if Team then Team.Name else nil
+				if currentRegionKeyValue then
+					local cachedRegionValue = ineligibilityCache[currentRegionKeyValue]
 				end
-				if PromptCashBooster and isEnabled then
+				if PromptCashBooster and isServerIneligible then
 					PromptCashBooster:Fire(nil)
 				end
-				isEnabled = false
-				v12 = nil
+				isAdAvailable = false
+				currentRegionKey = nil
 			end
-		elseif isEnabled then
-			local v42 = v12
-			if v42 then
-				configTable[v42] = mathFunc + 30
+		elseif isSleepActive then
+			local previousRegionKey = currentRegionKey
+			if previousRegionKey then
+				ineligibilityCache[previousRegionKey] = currentTime + 30
 			end
 			if PromptCashBooster then
 				PromptCashBooster:Fire(nil)
 			end
-			isEnabled = false
-			v12 = nil
+			isSleepActive = false
+			currentRegionKey = nil
 		end
 	end
 end
 local function initNotifications()
 	local Notification_2 = AdRewardEvents:FindFirstChild("Notification")
 	if Notification_2 then
-		Notification_2.OnClientEvent:Connect(function(p1)
+		Notification_2.OnClientEvent:Connect(function(notificationText)
 			task.wait(2)
 			Notification.new({
-				Text = p1,
+				Text = notificationText,
 				Style = "Gift"
 			})
 		end)
@@ -363,29 +360,29 @@ local function initNotifications()
 end
 local function boot()
 	task.wait(1)
-	local mathFunc = AdRewardCashToast:Clone()
-	mathFunc.Parent = PlayerGui
-	isEnabled = mathFunc
-	local CashTimer = mathFunc:FindFirstChild("CashTimer")
+	local clonedToastUI = AdRewardCashToast:Clone()
+	clonedToastUI.Parent = PlayerGui
+	isEnabled = clonedToastUI
+	local CashTimer = clonedToastUI:FindFirstChild("CashTimer")
 	if CashTimer then
 		CashTimer:Destroy()
 	end
 	local RobloxAdServicesTeamRegions = AdRewardSystem:WaitForChild("RobloxAdServicesTeamRegions")
-	v13 = require(script.Parent:WaitForChild("PlayerRegionTracker")).new(LocalPlayer, RobloxAdServicesTeamRegions)
-	v13:Start()
-	if mathFunc then
-		local v2, v32 = pcall(function()
-			mathFunc.Init({
+	regionTracker = require(script.Parent:WaitForChild("PlayerRegionTracker")).new(LocalPlayer, RobloxAdServicesTeamRegions)
+	regionTracker:Start()
+	if clonedToastUI then
+		local initSuccess, initError = pcall(function()
+			clonedToastUI.Init({
 				PlayerGui = PlayerGui,
 				PlayAd = PlayRewardedAd,
 				GetAdState = function()
-					return isEnabled, isEnabled, isEnabled
+					return isAdAvailable, isClientIneligible, isServerIneligible
 				end,
 				GetCurrentRegionTag = getCurrentRegionTag
 			})
 		end)
-		if not v2 then
-			warn("[AdRewardsController] WatchAdButtonController.Init failed:", v32)
+		if not initSuccess then
+			warn("[AdRewardsController] WatchAdButtonController.Init failed:", initError)
 		end
 	else
 		warn("[AdRewardsController] WatchAdButtonControllerModule is nil at boot")
@@ -394,34 +391,34 @@ local function boot()
 	initCashTimer()
 	local Notification_2 = AdRewardEvents:FindFirstChild("Notification")
 	if Notification_2 then
-		Notification_2.OnClientEvent:Connect(function(p1)
+		Notification_2.OnClientEvent:Connect(function(notificationText)
 			task.wait(2)
 			Notification.new({
-				Text = p1,
+				Text = notificationText,
 				Style = "Gift"
 			})
 		end)
 	end
 	task.spawn(startRegionLoop)
-	ShowAd.OnClientEvent:Connect(function(p1, p2, p3)
-		if p3 == "generic_watch_to_claim" then
-			isEnabled = false
-			isEnabled = false
-			if mathFunc and mathFunc.OnAdCompleted then
-				mathFunc.OnAdCompleted(p1, p2)
+	ShowAd.OnClientEvent:Connect(function(itemId, itemName, adType)
+		if adType == "generic_watch_to_claim" then
+			isAdAvailable = false
+			isSleepActive = false
+			if clonedToastUI and clonedToastUI.OnAdCompleted then
+				clonedToastUI.OnAdCompleted(itemId, itemName)
 			end
 		end
 	end)
 end
-function configTable.Init(p1)
+function configTable.Init(moduleInstance)
 	checkForAds()
-	if isEnabled then
-		mathFunc = p1 or mathFunc
-		local v2, isEnabled = pcall(function()
+	if isAdAvailable then
+		watchAdButtonController = moduleInstance or watchAdButtonController
+		local checkSuccess, abCheckResult = pcall(function()
 			return ABCheck:InvokeServer()
 		end)
-		isEnabled = v2 and isEnabled == true and true or false
-		if isEnabled == true then
+		abCheckResult = checkSuccess and abCheckResult == true and true or false
+		if abCheckResult == true then
 			boot()
 		end
 	else

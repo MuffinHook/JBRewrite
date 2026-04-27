@@ -1,8 +1,7 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local EnumRarity = require(script.Parent.EnumRarity)
-local t = {
+local RARITY_DEFINITIONS = {
 	{
 		id = EnumRarity.Common,
 		name = "Common",
@@ -29,14 +28,14 @@ local t = {
 		color = Color3.fromRGB(144, 85, 254)
 	}
 }
-local tbl = {}
-for v1, v2 in t do
-	v2.index = v1
-	tbl[v2.id] = v2
+local rarityIdToRarity = {}
+for rarityIndex, rarityEntry in RARITY_DEFINITIONS do
+	rarityEntry.index = rarityIndex
+	rarityIdToRarity[rarityEntry.id] = rarityEntry
 end
 return TableUtils.requireValidIndexAndFreeze({
 	COLLECT_REWARD_REMOTE_NAME = "RewardSpinnerCollectReward",
 	SPIN_REMOTE_NAME = "RewardSpinnerSpin",
-	RARITIES = t,
-	RARITY_ID_TO_RARITY = tbl
+	RARITIES = RARITY_DEFINITIONS,
+	RARITY_ID_TO_RARITY = rarityIdToRarity
 })

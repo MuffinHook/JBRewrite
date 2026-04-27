@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local store = require(ReplicatedStorage.App.store)
 local OtherTradeServerItem = require(script.Parent.OtherTradeServerItem)
@@ -7,20 +6,20 @@ local createElement = Roact.createElement
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 require(ReplicatedStorage.EzUi.ScrollingGrid)
 local paddedScrollingGrid = require(ReplicatedStorage.EzUi.paddedScrollingGrid)
-local v1 = Roact.PureComponent:extend("OtherTradeServerList")
-v1.defaultProps = {
+local OtherTradeServerListComponent = Roact.PureComponent:extend("OtherTradeServerList")
+OtherTradeServerListComponent.defaultProps = {
 	verticalPaddingRatio = 96,
 	aspectRatio = 1.7777777777777777
 }
-function v1.render(p1)
-	if p1.props.visible then
-		local t = {}
-		if p1.props.otherTradeServerInfo then
-			local v1 = table.clone(p1.props.otherTradeServerInfo)
-			table.sort(v1, function(p1, p2)
-				return #p1.userIds < #p2.userIds
+function OtherTradeServerListComponent.render(selfComponent)
+	if selfComponent.props.visible then
+		local uiElements = {}
+		if selfComponent.props.otherTradeServerInfo then
+			local sortedServerInfo = table.clone(selfComponent.props.otherTradeServerInfo)
+			table.sort(sortedServerInfo, function(serverA, serverB)
+				return #serverA.userIds < #serverB.userIds
 			end)
-			t.Header = createElement(PaddedContainer, {
+			uiElements.Header = createElement(PaddedContainer, {
 				backgroundColor = Color3.fromRGB(57, 58, 65),
 				backgroundTransparency = 0,
 				size = UDim2.new(1, 0, 0.15, 0),
@@ -78,7 +77,7 @@ function v1.render(p1)
 					})
 				})
 			})
-			t.Body = createElement(PaddedContainer, {
+			uiElements.Body = createElement(PaddedContainer, {
 				backgroundColor = Color3.new(51/255, 51/255, 51/255),
 				backgroundTransparency = 0,
 				position = UDim2.new(0, 0, 0.15, 0),
@@ -95,33 +94,33 @@ function v1.render(p1)
 					rowsPerPage = 7,
 					colsPerRow = 1,
 					component = OtherTradeServerItem,
-					items = v1,
+					items = sortedServerInfo,
 					itemDefaults = {
-						onJoinOtherTradeServer = p1.props.onJoinOtherTradeServer
+						onJoinOtherTradeServer = selfComponent.props.onJoinOtherTradeServer
 					}
 				})
 			})
-			local v2 = createElement(PaddedContainer, {
+			local containerElement = createElement(PaddedContainer, {
 				backgroundTransparency = 1,
-				aspectRatio = p1.props.aspectRatio,
-				verticalPaddingRatio = p1.props.verticalPaddingRatio,
+				aspectRatio = selfComponent.props.aspectRatio,
+				verticalPaddingRatio = selfComponent.props.verticalPaddingRatio,
 				exposePaddedContainerProps = true
-			}, t)
+			}, uiElements)
 			return createElement("Frame", {
 				BackgroundTransparency = 1,
-				Size = p1.props.size,
-				Position = p1.props.position,
+				Size = selfComponent.props.size,
+				Position = selfComponent.props.position,
 				AnchorPoint = Vector2.new(0.5, 0.5)
 			}, {
 				AspectRatio = createElement("UIAspectRatioConstraint", {
-					AspectRatio = p1.props.aspectRatio
+					AspectRatio = selfComponent.props.aspectRatio
 				}),
 				UICorner = createElement("UICorner", {
 					CornerRadius = UDim.new(0, 4)
 				}),
-				Container = v2
+				Container = containerElement
 			})
 		end
 	end
 end
-return v1
+return OtherTradeServerListComponent

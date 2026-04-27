@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -23,41 +21,41 @@ function SliderClass.new(self)
 	return sliderInstance
 end
 function SliderClass.Setup(self)
-	local function StartDragger(p12)
+	local function StartDragger(inputObject)
 		self.Maid.DragHeartbeat = RunService.Heartbeat:Connect(function()
-			local v1 = self.Value
+			local actualValue = self.Value
 			self.Value = self:GetMouseValue()
-			if v1 ~= self.Value then
+			if actualValue ~= self.Value then
 				self.OnValueChanged:Fire(self.Value)
 				if self.Maid.PositionHeartbeat == nil then
 					self:StartUpdateThread()
 				end
 			end
 		end)
-		if p12 then
-			self.Maid.DragEnd = p12:GetPropertyChangedSignal("UserInputState"):Connect(function()
-				if p12.UserInputState == Enum.UserInputState.End then
+		if inputObject then
+			self.Maid.DragEnd = inputObject:GetPropertyChangedSignal("UserInputState"):Connect(function()
+				if inputObject.UserInputState == Enum.UserInputState.End then
 					self.Maid.DragHeartbeat = nil
 					self.Maid.DragEnd = nil
 				end
 			end)
 		else
-			self.Maid.DragEnd = UserInputService.InputEnded:Connect(function(p12)
-				if p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch then
+			self.Maid.DragEnd = UserInputService.InputEnded:Connect(function(inputEvent)
+				if inputEvent.UserInputType == Enum.UserInputType.MouseButton1 or inputEvent.UserInputType == Enum.UserInputType.Touch then
 					self.Maid.DragHeartbeat = nil
 					self.Maid.DragEnd = nil
 				end
 			end)
 		end
 	end
-	self.Maid:GiveTask(self.Gui.ContainerKnob.Knob.InputBegan:Connect(function(p12, p2)
-		if not p2 and (p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch) then
+	self.Maid:GiveTask(self.Gui.ContainerKnob.Knob.InputBegan:Connect(function(inputObject, gameProcessed)
+		if not gameProcessed and (inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch) then
 			self.Value = self:GetMouseValue()
 			self.OnValueChanged:Fire(self.Value)
 			if self.Maid.PositionHeartbeat == nil then
 				self:StartUpdateThread()
 			end
-			StartDragger(p12)
+			StartDragger(inputObject)
 		end
 	end))
 end
@@ -65,25 +63,25 @@ function SliderClass.GetMouseValue(self)
 	local ContainerKnob = self.Gui.ContainerKnob
 	return math.clamp(math.floor(((UserInputService:GetMouseLocation() - ContainerKnob.AbsolutePosition - GuiService:GetGuiInset()) / ContainerKnob.AbsoluteSize).X * 24 + 0.5) / 24, 0, 1)
 end
-function SliderClass.SetValue(self, p2)
-	self.Value = p2
-	self.SpringSlider.p = p2
-	self.SpringSlider:SetTarget(p2)
-	self:UpdatePosition(p2)
-	self.OnValueChanged:Fire(p2)
+function SliderClass.SetValue(self, position)
+	self.Value = position
+	self.SpringSlider.p = position
+	self.SpringSlider:SetTarget(position)
+	self:UpdatePosition(position)
+	self.OnValueChanged:Fire(position)
 end
 function SliderClass.StartUpdateThread(self)
 	assert(self.Maid.PositionHeartbeat == nil)
 	self.Maid.PositionHeartbeat = RunService.Heartbeat:Connect(function()
-		local v1, velocity = self.SpringSlider:SetTarget(self.Value)
-		self:UpdatePosition(v1)
-		if math.abs(self.Value - v1) < 0.001 and math.abs(velocity) < 0.001 then
+		local actualPosition, velocity = self.SpringSlider:SetTarget(self.Value)
+		self:UpdatePosition(actualPosition)
+		if math.abs(self.Value - actualPosition) < 0.001 and math.abs(velocity) < 0.001 then
 			self.Maid.PositionHeartbeat = nil
 		end
 	end)
 end
-function SliderClass.UpdatePosition(self, p2)
-	self.Gui.ContainerKnob.Knob.Position = UDim2.new(p2, 0, 0.5, 0)
+function SliderClass.UpdatePosition(self, position)
+	self.Gui.ContainerKnob.Knob.Position = UDim2.new(position, 0, 0.5, 0)
 end
 function SliderClass.Destroy(self)
 	self.Gui = nil

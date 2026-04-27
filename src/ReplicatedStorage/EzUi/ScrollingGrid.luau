@@ -1,43 +1,42 @@
--- Reviewed by Claude
-local v1 = script:FindFirstAncestor("EzUi")
-local Roact = require(v1.Parent.Roact)
-local Dictionary = require(v1.Dictionary)
-local Grid = require(v1.Grid)
+local ezUiModule = script:FindFirstAncestor("EzUi")
+local Roact = require(ezUiModule.Parent.Roact)
+local Dictionary = require(ezUiModule.Dictionary)
+local Grid = require(ezUiModule.Grid)
 local createElement = Roact.createElement
-local v2 = Roact.PureComponent:extend("ScrollingGrid")
-v2.defaultProps = {
+local ScrollingGridComponent = Roact.PureComponent:extend("ScrollingGrid")
+ScrollingGridComponent.defaultProps = {
 	rowsPerPage = 3,
 	colsPerRow = 9
 }
-function v2.init(p1)  end
-function v2.render(p1)
-	local aspectRatio = p1.props.aspectRatio
-	if p1.props.paddingRatio then
+function ScrollingGridComponent.init(self)  end
+function ScrollingGridComponent.render(self)
+	local aspectRatio = self.props.aspectRatio
+	if self.props.paddingRatio then
 		assert(aspectRatio, "aspectRatio is required when using paddingRatio.")
-		assert(p1.props.verticalPaddingRatio == nil, "cannot use paddingRatio & verticalPaddingRatio simultaneously.")
-		p1.props.verticalPaddingRatio = p1.props.paddingRatio / aspectRatio
-		p1.props.paddingRatio = nil
+		assert(self.props.verticalPaddingRatio == nil, "cannot use paddingRatio & verticalPaddingRatio simultaneously.")
+		self.props.verticalPaddingRatio = self.props.paddingRatio / aspectRatio
+		self.props.paddingRatio = nil
 	end
-	local colsPerRow = p1.props.colsPerRow
-	local rowsPerPage = p1.props.rowsPerPage
-	if p1.props.itemAspectRatio then
-		p1.props.rowsPerPage = colsPerRow / aspectRatio * p1.props.itemAspectRatio
+	local colsPerRow = self.props.colsPerRow
+	local rowsPerPage = self.props.rowsPerPage
+	if self.props.itemAspectRatio then
+		self.props.rowsPerPage = colsPerRow / aspectRatio * self.props.itemAspectRatio
 	end
-	local v4 = (math.floor((#p1.props.items - 1) / p1.props.colsPerRow) + 1) / p1.props.rowsPerPage
-	local v5 = math.max(1, v4 - aspectRatio / (p1.props.verticalPaddingRatio * aspectRatio) * (v4 - 1))
+	local totalPages = (math.floor((#self.props.items - 1) / self.props.colsPerRow) + 1) / self.props.rowsPerPage
+	local canvasHeight = math.max(1, totalPages - aspectRatio / (self.props.verticalPaddingRatio * aspectRatio) * (totalPages - 1))
 	return createElement("ScrollingFrame", {
 		BackgroundTransparency = 1,
 		BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
 		BorderSizePixel = 0,
 		ScrollBarThickness = 4,
 		ScrollBarImageColor3 = Color3.new(255/255, 255/255, 255/255),
-		CanvasSize = UDim2.new(0, 0, v5 - 0.0001, 0),
+		CanvasSize = UDim2.new(0, 0, canvasHeight - 0.0001, 0),
 		Size = UDim2.new(1, 0, 1, 0),
 		ElasticBehavior = Enum.ElasticBehavior.WhenScrollable,
 		ScrollingDirection = Enum.ScrollingDirection.Y,
 		Selectable = false
 	}, createElement(Grid, Dictionary.merge({
-		canvasHeight = v5
-	}, p1.props)))
+		canvasHeight = canvasHeight
+	}, self.props)))
 end
-return v2
+return ScrollingGridComponent

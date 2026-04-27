@@ -1,12 +1,10 @@
--- Reviewed by Claude
--- variables reassigned
 local MilitaryTurretBinder = require(script.Parent.MilitaryTurretBinder)
 return {
-	init = function(p1)
-		local event = p1.Event
-		MilitaryTurretBinder:GetClassAddedSignal():Connect(function(p1)
-			p1._maid:GiveTask(p1.onBulletHit:Connect(function(p1)
-				event:FireServer("x" .. ("n16ep"):sub(3, 4):reverse():reverse():reverse() .. "" .. "" .. ("kk1vcv"):sub(3, 4):reverse():reverse():reverse():reverse():reverse() .. "us6", p1, "Shot")
+	init = function(gameServices)
+		local event = gameServices.Event
+		MilitaryTurretBinder:GetClassAddedSignal():Connect(function(turretInstance)
+			turretInstance._maid:GiveTask(turretInstance.onBulletHit:Connect(function(bulletData)
+				event:FireServer("xe6v1us6", bulletData, "Shot")
 			end))
 		end)
 		MilitaryTurretBinder:Start()

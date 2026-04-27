@@ -1,64 +1,62 @@
--- Reviewed by Claude
--- variables reassigned
-local function parsePath(p1)
-	local v1 = string.split(p1, "/")
-	for i = #v1, 1, -1 do
-		if v1[i] == "" then
-			table.remove(v1, i)
+local function parsePath(pathString)
+	local pathSegments = string.split(pathString, "/")
+	for i = #pathSegments, 1, -1 do
+		if pathSegments[i] == "" then
+			table.remove(pathSegments, i)
 		end
 	end
-	return v1
+	return pathSegments
 end
-local function isManifestResolved(p1, p2)
+local function isManifestResolved(manifestDict, expectedCount)
 	local count = 0
-	for k in pairs(p1) do
+	for k in pairs(manifestDict) do
 		count = count + 1
 	end
-	assert(count <= p2, count)
-	return count == p2
+	assert(count <= expectedCount, count)
+	return count == expectedCount
 end
-local function v1(p1, p2)
-	if p1.instance ~= nil then
-		p1.instance = nil
-		local connections = p1.connections
+local function clearAtomicNode(nodeData, aliasTable)
+	if nodeData.instance ~= nil then
+		nodeData.instance = nil
+		local connections = nodeData.connections
 		if connections then
-			for i, v in ipairs(connections) do
-				v:Disconnect()
+			for i, connection in ipairs(connections) do
+				connection:Disconnect()
 			end
 			table.clear(connections)
 		end
-		if p2 and p1.alias then
-			p2[p1.alias] = nil
+		if aliasTable and nodeData.alias then
+			aliasTable[nodeData.alias] = nil
 		end
-		local children = p1.children
+		local children = nodeData.children
 		if children then
-			for k, v in pairs(children) do
-				v1(v, p2)
+			for k, childNode in pairs(children) do
+				clearAtomicNode(childNode, aliasTable)
 			end
 		end
 	end
 end
-return function(p1, p2, p3)
+return function(rootInstance, manifestDict, boundFnCallback)
 	local count = 1
-	for k in pairs(p2) do
+	for k in pairs(manifestDict) do
 		count = count + 1
 	end
-	local t = {}
-	local v12 = nil
+	local resultTable = {}
+	local boundFnOrConnection = nil
 	local function stopBoundFn()
-		local v1 = v12
-		if v1 then
-			v12 = nil
-			if typeof(v1) == "function" then
-				v1()
+		local boundValue = boundFnOrConnection
+		if boundValue then
+			boundFnOrConnection = nil
+			if typeof(boundValue) == "function" then
+				boundValue()
 				return
 			end
 			if typeof(task) == "RBXScriptConnection" then
-				v1:Disconnect()
+				boundValue:Disconnect()
 				return
 			end
-			if v1.Destroy then
-				v1:Destroy()
+			if boundValue.Destroy then
+				boundValue:Destroy()
 				return
 			end
 			warn("Unknown dtor return value")
@@ -66,109 +64,109 @@ return function(p1, p2, p3)
 	end
 	local function startBoundFn()
 		stopBoundFn()
-		local v1 = p3(t)
-		if v1 then
-			v12 = v1
+		local boundValue = boundFnCallback(resultTable)
+		if boundValue then
+			boundFnOrConnection = boundValue
 		end
 	end
 	debug.profilebegin("initializeBoundTree")
-	local t2 = {
+	local rootNode = {
 		alias = "root",
-		instance = p1
+		instance = rootInstance
 	}
-	if next(p2) then
-		t2.children = {}
-		t2.connections = {}
+	if next(manifestDict) then
+		rootNode.children = {}
+		rootNode.connections = {}
 	end
-	for k, v in pairs(p2) do
-		local v2 = parsePath(v)
-		local v3 = t2
-		for i, v5 in ipairs(v2) do
-			local v4
-			v4 = i == #v2
-			local v52 = v3.children[v5] or {}
-			if v4 then
-				if v52.alias ~= nil then
+	for k, v in pairs(manifestDict) do
+		local pathSegments = parsePath(v)
+		local currentNode = rootNode
+		for i, pathSegment in ipairs(pathSegments) do
+			local isLastSegment
+			isLastSegment = i == #pathSegments
+			local childNode = currentNode.children[pathSegment] or {}
+			if isLastSegment then
+				if childNode.alias ~= nil then
 					error("Multiple aliases assigned to one instance")
 				end
-				v52.alias = k
+				childNode.alias = k
 			else
-				v52.children = v52.children or {}
-				v52.connections = v52.connections or {}
+				childNode.children = childNode.children or {}
+				childNode.connections = childNode.connections or {}
 			end
-			v3.children[v5] = v52
-			v3 = v52
+			currentNode.children[pathSegment] = childNode
+			currentNode = childNode
 		end
 	end
 	debug.profileend()
-	local function v8(p1)
-		local v13 = assert(p1.instance)
-		local children = p1.children
-		local alias = p1.alias
-		local v2 = not children
+	local function resolveTreeNode(nodeData)
+		local nodeInstance = assert(nodeData.instance)
+		local children = nodeData.children
+		local alias = nodeData.alias
+		local isLeaf = not children
 		if alias then
-			t[alias] = v13
+			resultTable[alias] = nodeInstance
 		end
-		if not v2 then
-			local function processAddChild(p1)
-				local v1 = children[p1.Name]
-				if v1 and v1.instance == nil then
-					v1.instance = p1
-					v8(v1)
+		if not isLeaf then
+			local function processAddChild(childInstance)
+				local foundChild = children[childInstance.Name]
+				if foundChild and foundChild.instance == nil then
+					foundChild.instance = childInstance
+					resolveTreeNode(foundChild)
 				end
 			end
-			local function processDeleteChild(p1)
-				local v12 = p1.Name
-				local v2 = children[v12]
-				if v2 and v2.instance == p1 then
+			local function processDeleteChild(deletedInstance)
+				local deletedName = deletedInstance.Name
+				local targetChild = children[deletedName]
+				if targetChild and targetChild.instance == deletedInstance then
 					stopBoundFn()
-					v1(v2, t)
-					assert(v2.instance == nil)
-					local v3 = v13:FindFirstChild(v12)
-					if v3 then
-						local v4 = children[v3.Name]
-						if v4 and v4.instance == nil then
-							v4.instance = v3
-							v8(v4)
+					clearAtomicNode(targetChild, resultTable)
+					assert(targetChild.instance == nil)
+					local replacementChild = nodeInstance:FindFirstChild(deletedName)
+					if replacementChild then
+						local replacementData = children[replacementChild.Name]
+						if replacementData and replacementData.instance == nil then
+							replacementData.instance = replacementChild
+							resolveTreeNode(replacementData)
 						end
 					end
 				end
 			end
-			for i, v in ipairs(v13:GetChildren()) do
-				local v3 = children[v.Name]
-				if v3 and v3.instance == nil then
-					v3.instance = v
-					v8(v3)
+			for i, childInstance in ipairs(nodeInstance:GetChildren()) do
+				local foundChild = children[childInstance.Name]
+				if foundChild and foundChild.instance == nil then
+					foundChild.instance = childInstance
+					resolveTreeNode(foundChild)
 				end
 			end
-			table.insert(p1.connections, v13.ChildAdded:Connect(processAddChild))
-			table.insert(p1.connections, v13.ChildRemoved:Connect(processDeleteChild))
+			table.insert(nodeData.connections, nodeInstance.ChildAdded:Connect(processAddChild))
+			table.insert(nodeData.connections, nodeInstance.ChildRemoved:Connect(processDeleteChild))
 		end
-		if v2 then
-			local v5 = count
-			local count_2 = 0
-			for k in pairs(t) do
-				count_2 = count_2 + 1
+		if isLeaf then
+			local expectedCount = count
+			local resolvedCount = 0
+			for k in pairs(resultTable) do
+				resolvedCount = resolvedCount + 1
 			end
-			assert(count_2 <= v5, count_2)
-			if count_2 == v5 then
+			assert(resolvedCount <= expectedCount, resolvedCount)
+			if resolvedCount == expectedCount then
 				stopBoundFn()
-				local v82 = p3(t)
-				if v82 then
-					v12 = v82
+				local boundValue = boundFnCallback(resultTable)
+				if boundValue then
+					boundFnOrConnection = boundValue
 				end
 			end
 		end
 	end
 	debug.profilebegin("resolveBoundTree")
-	v8(t2)
+	resolveTreeNode(rootNode)
 	debug.profileend()
 	return function()
 		stopBoundFn()
-		if t2 then
-			v1(t2, t)
-			t2 = nil
+		if rootNode then
+			clearAtomicNode(rootNode, resultTable)
+			rootNode = nil
 		end
-		t = nil
+		resultTable = nil
 	end
 end

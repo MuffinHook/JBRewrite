@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Basic = require(script.Parent.Basic)
 local motionConfig = {
 	Motion = {

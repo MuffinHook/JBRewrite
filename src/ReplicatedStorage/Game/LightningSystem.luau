@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -7,7 +5,7 @@ local Audio = require(ReplicatedStorage.Std.Audio)
 local Anim = require(ReplicatedStorage.Module.Anim)
 local LightningUtils = require(ReplicatedStorage.Game.LightningUtils)
 local lastStrikeTime = 0
-local t = {
+local LightningModule = {
 	StrikePosition = function(origin, target)
 		local lightningModel = LightningUtils.strikePosition({
 			Origin = origin,
@@ -66,8 +64,8 @@ local t = {
 			local animator = Anim.new(4)
 			local animConnection = RunService.Heartbeat:Connect(function()
 				local progress = animator:Update()
-				for i, v in ipairs(lightningParts) do
-					v.Transparency = 0.6 * (1 - progress) + 1 * progress
+				for i, lightningPart in ipairs(lightningParts) do
+					lightningPart.Transparency = 0.6 * (1 - progress) + 1 * progress
 				end
 			end)
 			animator.OnCompleted:Connect(function()
@@ -79,9 +77,9 @@ local t = {
 		end)
 	end
 }
-function t.Init(target)
-	function target.em.tqftmpkl(target, attackerPosition)
-		t.StrikePosition(target, attackerPosition)
+function LightningModule.Init(target)
+	function target.em.OnLightningStrike(target, attackerPosition)
+		LightningModule.StrikePosition(target, attackerPosition)
 	end
 end
-return t
+return LightningModule

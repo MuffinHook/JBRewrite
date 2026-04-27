@@ -1,13 +1,12 @@
--- Reviewed by Claude
 game:GetService("ReplicatedStorage")
 local TrappedTrapUtils = require(script.Parent.TrappedTrapUtils)
-local v1 = nil
+local trapEventHandler = nil
 return {
-	init = function(p1)
-		v1 = p1.Event
+	init = function(eventConfig)
+		trapEventHandler = eventConfig.Event
 	end,
-	setup = function(p1)
-		TrappedTrapUtils.setup(p1, {
+	setup = function(trapSetupConfig)
+		TrappedTrapUtils.setup(trapSetupConfig, {
 			doorName = "FakeDoor",
 			spikesName = "Spikes",
 			referenceName = "Shelving",
@@ -18,6 +17,6 @@ return {
 			damageAmount = 36,
 			audioId = 6909242121,
 			doorCloseDelay = 1
-		}, v1)
+		}, trapEventHandler)
 	end
 }

@@ -1,164 +1,163 @@
--- Reviewed by Claude
-local t = {
-	FrameDelta = function(p1, p2)
-		return 1 - (1 - p1) ^ (p2 * 60)
+local Mathf = {
+	FrameDelta = function(deltaTime, timeScale)
+		return 1 - (1 - deltaTime) ^ (timeScale * 60)
 	end,
-	SafeLerp = function(p1, p2, p3)
-		if p1 == nil or p3 >= 1 then
-			return p2
-		elseif p2 == nil or p3 <= 0 then
-			return p1
-		elseif typeof(p1) == "Color3" then
-			local cframe = 1 - p3
-			return Color3.new((p1.R ^ 2 * cframe + p2.R ^ 2 * p3) ^ 0.5, (p1.G ^ 2 * cframe + p2.G ^ 2 * p3) ^ 0.5, (p1.B ^ 2 * cframe + p2.B ^ 2 * p3) ^ 0.5)
+	SafeLerp = function(startValue, endValue, progress)
+		if startValue == nil or progress >= 1 then
+			return endValue
+		elseif endValue == nil or progress <= 0 then
+			return startValue
+		elseif typeof(startValue) == "Color3" then
+			local inverseProgress = 1 - progress
+			return Color3.new((startValue.R ^ 2 * inverseProgress + endValue.R ^ 2 * progress) ^ 0.5, (startValue.G ^ 2 * inverseProgress + endValue.G ^ 2 * progress) ^ 0.5, (startValue.B ^ 2 * inverseProgress + endValue.B ^ 2 * progress) ^ 0.5)
 		else
-			return p1 * (1 - p3) + p2 * p3
+			return startValue * (1 - progress) + endValue * progress
 		end
 	end,
-	PercentBetween = function(p1, p2, p3)
-		if p3 - p2 == 0 then
+	PercentBetween = function(value, min, max)
+		if max - min == 0 then
 			return 1
 		else
-			return math.clamp((p1 - p2) / (p3 - p2), 0, 1)
+			return math.clamp((value - min) / (max - min), 0, 1)
 		end
 	end,
-	Round = function(p1, p2, p3)
-		return math.floor(p1 / p2 + (p3 or 0.5)) * p2
+	Round = function(value, increment, roundOffset)
+		return math.floor(value / increment + (roundOffset or 0.5)) * increment
 	end,
-	RoundNumber = function(p1)
-		return p1 >= 0 and math.floor(p1 + 0.5) or math.ceil(p1 - 0.5)
+	RoundNumber = function(value)
+		return value >= 0 and math.floor(value + 0.5) or math.ceil(value - 0.5)
 	end,
-	Lerp = function(p1, p2, p3)
-		return p1 * (1 - p3) + p2 * p3
+	Lerp = function(startValue, endValue, progress)
+		return startValue * (1 - progress) + endValue * progress
 	end,
-	SmoothLerp = function(p1, p2, p3, p4)
-		local cframe = 1 - math.pow(1 - p3, p4)
-		if type(p1) == "number" then
-			return (1 - cframe) * p1 + p2 * cframe
+	SmoothLerp = function(startValue, endValue, progress, smoothness)
+		local easeProgress = 1 - math.pow(1 - progress, smoothness)
+		if type(startValue) == "number" then
+			return (1 - easeProgress) * startValue + endValue * easeProgress
 		else
-			return p1:Lerp(p2, cframe)
+			return startValue:Lerp(endValue, easeProgress)
 		end
 	end,
-	LerpTowards = function(p1, p2, p3)
-		if p1 < p2 then
-			return math.clamp(p1 + p3, p1, p2)
+	LerpTowards = function(currentValue, targetValue, step)
+		if currentValue < targetValue then
+			return math.clamp(currentValue + step, currentValue, targetValue)
 		else
-			return math.clamp(p1 - p3, p2, p1)
+			return math.clamp(currentValue - step, targetValue, currentValue)
 		end
 	end,
-	Wrap = function(p1, p2, p3)
-		return p2 + (p1 - p2) % (p3 - p2)
+	Wrap = function(value, min, max)
+		return min + (value - min) % (max - min)
 	end,
-	Cubic_Interpolate = function(p1, p2, p3, p4, p5)
-		local cframe = p4 - p3 - (p1 - p2)
-		return cframe * p5 ^ 3 + (p1 - p2 - cframe) * p5 ^ 2 + (p3 - p1) * p5 + p2
+	Cubic_Interpolate = function(p0, p1, p2, p3, progression)
+		local cubicCoeff = p3 - p2 - (p0 - p1)
+		return cubicCoeff * progression ^ 3 + (p0 - p1 - cubicCoeff) * progression ^ 2 + (p2 - p0) * progression + p1
 	end,
-	SlerpVector = function(p1, p2, p3)
-		return CFrame.new(Vector3.new(0, 0, 0), p1):Lerp(CFrame.new(Vector3.new(0, 0, 0), p2), p3).LookVector
+	SlerpVector = function(startVector, endVector, progress)
+		return CFrame.new(Vector3.new(0, 0, 0), startVector):Lerp(CFrame.new(Vector3.new(0, 0, 0), endVector), progress).LookVector
 	end,
-	RandomizeVector = function(p1, p2, p3)
-		local cframe = CFrame.new(Vector3.new(), p2) * CFrame.Angles(0, 0, p1:NextNumber(0, 6.283185307179586))
+	RandomizeVector = function(randomGenerator, magnitude, maxAngle)
+		local orientedFrame = CFrame.new(Vector3.new(), magnitude) * CFrame.Angles(0, 0, randomGenerator:NextNumber(0, 6.283185307179586))
 		local Angles = CFrame.Angles
-		return (cframe * Angles(math.acos((p1:NextNumber(math.cos(p3), 1))), 0, 0)).LookVector * p2.Magnitude
+		return (orientedFrame * Angles(math.acos((randomGenerator:NextNumber(math.cos(maxAngle), 1))), 0, 0)).LookVector * magnitude.Magnitude
 	end,
-	LerpColor3 = function(p1, p2, p3)
-		local cframe = 1 - p3
-		return Color3.new((p1.R ^ 2 * cframe + p2.R ^ 2 * p3) ^ 0.5, (p1.G ^ 2 * cframe + p2.G ^ 2 * p3) ^ 0.5, (p1.B ^ 2 * cframe + p2.B ^ 2 * p3) ^ 0.5)
+	LerpColor3 = function(startColor, endColor, progress)
+		local inverseProgress = 1 - progress
+		return Color3.new((startColor.R ^ 2 * inverseProgress + endColor.R ^ 2 * progress) ^ 0.5, (startColor.G ^ 2 * inverseProgress + endColor.G ^ 2 * progress) ^ 0.5, (startColor.B ^ 2 * inverseProgress + endColor.B ^ 2 * progress) ^ 0.5)
 	end,
-	InPart = function(p1, p2, p3)
-		local cframe = p1.CFrame:PointToObjectSpace(p2)
-		local v2 = p1.Size * (p3 or 1)
-		if math.abs(cframe.x) <= v2.x / 2 and (math.abs(cframe.y) <= v2.y / 2 and math.abs(cframe.z) <= v2.z / 2) then
+	InPart = function(part, point, scale)
+		local localPoint = part.CFrame:PointToObjectSpace(point)
+		local scaledSize = part.Size * (scale or 1)
+		if math.abs(localPoint.x) <= scaledSize.x / 2 and (math.abs(localPoint.y) <= scaledSize.y / 2 and math.abs(localPoint.z) <= scaledSize.z / 2) then
 			return true
 		else
 			return false
 		end
 	end,
-	IK = function(p1, p2, p3, p4)
-		if p3 + p4 <= (p1 - p2).magnitude then
-			return CFrame.new(p1, p2), 0, 0
-		elseif (p1 - p2).magnitude < math.max(p3, p4) - math.min(p3, p4) then
-			return CFrame.new(p1, p2), 0, math.pi
+	IK = function(startPos, endPos, boneALength, boneBLength)
+		if boneALength + boneBLength <= (startPos - endPos).magnitude then
+			return CFrame.new(startPos, endPos), 0, 0
+		elseif (startPos - endPos).magnitude < math.max(boneALength, boneBLength) - math.min(boneALength, boneBLength) then
+			return CFrame.new(startPos, endPos), 0, math.pi
 		else
-			local cframe = CFrame.new(p1, p2)
-			local v2 = cframe:pointToObjectSpace(p2)
-			local var3 = (v2.z ^ 2 - p4 ^ 2 + p3 ^ 2) / (2 * v2.z)
-			local var4 = math.sqrt(1 - (var3 / p3) ^ 2) * p3
-			local var5 = -math.asin(var4 / (var3 ^ 2 + var4 ^ 2) ^ 0.5)
-			local v6, v7
-			if var3 < v2.z then
-				v6 = -3.141592653589793 + math.asin(-var4 / ((v2.z - var3) ^ 2 + var4 ^ 2) ^ 0.5)
-				if not v6 then
-					v7 = -var4 / ((v2.z - var3) ^ 2 + var4 ^ 2) ^ 0.5
-					v6 = -math.asin(v7)
+			local baseCFrame = CFrame.new(startPos, endPos)
+			local objectSpacePoint = baseCFrame:pointToObjectSpace(endPos)
+			local jointX = (objectSpacePoint.z ^ 2 - boneBLength ^ 2 + boneALength ^ 2) / (2 * objectSpacePoint.z)
+			local jointY = math.sqrt(1 - (jointX / boneALength) ^ 2) * boneALength
+			local angleA = -math.asin(jointY / (jointX ^ 2 + jointY ^ 2) ^ 0.5)
+			local angleB, sinComponent
+			if jointX < objectSpacePoint.z then
+				angleB = -3.141592653589793 + math.asin(-jointY / ((objectSpacePoint.z - jointX) ^ 2 + jointY ^ 2) ^ 0.5)
+				if not angleB then
+					sinComponent = -jointY / ((objectSpacePoint.z - jointX) ^ 2 + jointY ^ 2) ^ 0.5
+					angleB = -math.asin(sinComponent)
 				end
 			else
-				v7 = -var4 / ((v2.z - var3) ^ 2 + var4 ^ 2) ^ 0.5
-				v6 = -math.asin(v7)
+				sinComponent = -jointY / ((objectSpacePoint.z - jointX) ^ 2 + jointY ^ 2) ^ 0.5
+				angleB = -math.asin(sinComponent)
 			end
-			return cframe, var5, v6 - var5
+			return baseCFrame, angleA, angleB - angleA
 		end
 	end,
-	Vector3ToPixel = function(p1, p2, p3)
-		local X = p3.AbsoluteSize.X
-		local Y = p3.AbsoluteSize.Y
-		local cframe = (p2.CoordinateFrame * CFrame.Angles(0, 0, -p2:GetRoll())):inverse() * p1
-		local var3 = 1 / math.tan(math.rad(p2.FieldOfView) / 2)
-		local var4 = X / 2 * (1 + cframe.x / -cframe.z * var3 * Y / X)
-		local var5 = Y / 2 * (1 + cframe.y / -cframe.z * var3)
-		if cframe.z > 0 then
-			var4 = 20000
-			var5 = 20000
+	Vector3ToPixel = function(worldPosition, camera, viewport)
+		local screenWidth = viewport.AbsoluteSize.X
+		local screenHeight = viewport.AbsoluteSize.Y
+		local cameraSpacePos = (camera.CoordinateFrame * CFrame.Angles(0, 0, -camera:GetRoll())):inverse() * worldPosition
+		local focalLength = 1 / math.tan(math.rad(camera.FieldOfView) / 2)
+		local pixelX = screenWidth / 2 * (1 + cameraSpacePos.x / -cameraSpacePos.z * focalLength * screenHeight / screenWidth)
+		local pixelY = screenHeight / 2 * (1 + cameraSpacePos.y / -cameraSpacePos.z * focalLength)
+		if cameraSpacePos.z > 0 then
+			pixelX = 20000
+			pixelY = 20000
 		end
-		return var4, Y - var5 - 36
+		return pixelX, screenHeight - pixelY - 36
 	end,
-	LerpAngle = function(p1, p2, p3)
-		return (if p1 - p2 < 180 then p1 + (p2 - p1) * p3 else p1 + (360 + p2 - p1) * p3 - 180) % 360 - 180
+	LerpAngle = function(startAngle, endAngle, progress)
+		return (if startAngle - endAngle < 180 then startAngle + (endAngle - startAngle) * progress else startAngle + (360 + endAngle - startAngle) * progress - 180) % 360 - 180
 	end
 }
-function t.LerpTowardsAngle(p1, p2, p3)
-	if math.abs(p2 - p1) > 180 then
-		if p2 < p1 then
-			p1 = p1 + 360
+function Mathf.LerpTowardsAngle(currentAngle, targetAngle, step)
+	if math.abs(targetAngle - currentAngle) > 180 then
+		if targetAngle < currentAngle then
+			currentAngle = currentAngle + 360
 		else
-			p2 = p2 + 360
+			targetAngle = targetAngle + 360
 		end
 	end
-	return t.LerpTowards(p1, p2, p3)
+	return Mathf.LerpTowards(currentAngle, targetAngle, step)
 end
-function t.LerpAngle2(p1, p2, p3)
-	local sum = p1 + 180
-	local sum_2 = p2 + 180
-	difference = math.abs(sum_2 - sum)
-	if difference > 180 then
-		if sum < sum_2 then
-			sum_2 = sum_2 - 360
+function Mathf.LerpAngle2(startAngle, endAngle, progress)
+	local normalizedStart = startAngle + 180
+	local normalizedEnd = endAngle + 180
+	local angleDifference = math.abs(normalizedEnd - normalizedStart)
+	if angleDifference > 180 then
+		if normalizedStart < normalizedEnd then
+			normalizedEnd = normalizedEnd - 360
 		else
-			sum = sum - 360
+			normalizedStart = normalizedStart - 360
 		end
 	end
-	return t.Wrap(t.Lerp(sum - 180, sum_2 - 180, p3), -180, 180)
+	return Mathf.Wrap(Mathf.Lerp(normalizedStart - 180, normalizedEnd - 180, progress), -180, 180)
 end
-function t.AngleDistance(p1, p2)
-	local cframe = math.deg(p1)
-	local v2 = math.deg(p2)
-	difference = math.abs(v2 - cframe)
-	local var3, var4
-	if difference > 180 then
-		if v2 < cframe then
-			var3 = cframe
-			var4 = v2 + 360
+function Mathf.AngleDistance(angleA, angleB)
+	local degreesA = math.deg(angleA)
+	local degreesB = math.deg(angleB)
+	local angleDifference = math.abs(degreesB - degreesA)
+	local resultA, resultB
+	if angleDifference > 180 then
+		if degreesB < degreesA then
+			resultA = degreesA
+			resultB = degreesB + 360
 		else
-			var3 = cframe + 360
-			var4 = v2
+			resultA = degreesA + 360
+			resultB = degreesB
 		end
 	else
-		var3 = cframe
-		var4 = v2
+		resultA = degreesA
+		resultB = degreesB
 	end
-	return math.rad(var3 - var4)
+	return math.rad(resultA - resultB)
 end
-function t.InterpolateCFrame(p1, p2, p3)
-	return if p3 < 0.001 and p1 then p1 elseif p3 > 0.999 and p2 then p2 else p1:lerp(p2, p3)
+function Mathf.InterpolateCFrame(startFrame, endFrame, progress)
+	return if progress < 0.001 and startFrame then startFrame elseif progress > 0.999 and endFrame then endFrame else startFrame:lerp(endFrame, progress)
 end
-return t
+return Mathf

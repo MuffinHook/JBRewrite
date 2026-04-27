@@ -1,50 +1,49 @@
--- Reviewed by Claude
-local obj = Ray.new
+local RayConstructor = Ray.new
 local FindPartOnRay = workspace.FindPartOnRay
 local FindPartOnRayWithIgnoreList = workspace.FindPartOnRayWithIgnoreList
-local function RayIgnoreNonCollideSpecial(p1, p2, p3, p4, p5, p6, p7, p8)
-	if p6 then
-		assert(not p8)
+local function RayIgnoreNonCollideSpecial(rayOrigin, rayDirection, remainingDistance, returnOnFirst, ignoreList, returnSurface, filterFunction)
+	if returnSurface then
+		assert(not filterFunction)
 	end
-	local table12 = if p5 then if type(p5) == "table" then table.clone(p5) else { p5 } else {}
-	local count, v3, v4, v5, v6, v7 = 0, p1, -p2, nil, true, nil
-	while p3 > 0.01 do
-		if count >= 5 then
-			return nil, v3, v4, v5
+	local ignoreTable = if ignoreList then if type(ignoreList) == "table" then table.clone(ignoreList) else { ignoreList } else {}
+	local iterationCount, lastHitPosition, surface, normal, shouldUseIgnoreList, hitPart = 0, rayOrigin, -rayDirection, nil, true, nil
+	while remainingDistance > 0.01 do
+		if iterationCount >= 5 then
+			return nil, lastHitPosition, surface, normal
 		end
-		local var8 = obj(p1, p2 * p3)
-		if v6 then
-			local v9, v10, v11, v122 = FindPartOnRayWithIgnoreList(workspace, var8, table12, false, not p7)
-			v3 = v10
-			v7 = v9
-			v4 = v11
-			v5 = v122
+		local currentRay = RayConstructor(rayOrigin, rayDirection * remainingDistance)
+		if shouldUseIgnoreList then
+			local hitPartIgnore, hitPositionIgnore, surfaceIgnore, normalIgnore = FindPartOnRayWithIgnoreList(workspace, currentRay, ignoreTable, false, not returnSurface)
+			lastHitPosition = hitPositionIgnore
+			hitPart = hitPartIgnore
+			surface = surfaceIgnore
+			normal = normalIgnore
 		else
-			local v13, v14, v15, v16 = FindPartOnRay(workspace, var8, table12, false, not p7)
-			v3 = v14
-			v7 = v13
-			v4 = v15
-			v5 = v16
+			local hitPartDirect, hitPositionDirect, surfaceDirect, normalDirect = FindPartOnRay(workspace, currentRay, ignoreTable, false, not returnSurface)
+			lastHitPosition = hitPositionDirect
+			hitPart = hitPartDirect
+			surface = surfaceDirect
+			normal = normalDirect
 		end
-		local Magnitude = (p1 - v3).Magnitude
-		if v7 then
-			if p6 or not p8 and v7.CanCollide or p8 and p8(v7) then
-				return v7, v3, v4, v5
+		local distanceTraveled = (rayOrigin - lastHitPosition).Magnitude
+		if hitPart then
+			if returnSurface or not filterFunction and hitPart.CanCollide or filterFunction and filterFunction(hitPart) then
+				return hitPart, lastHitPosition, surface, normal
 			end
-			table.insert(table12, v7)
+			table.insert(ignoreTable, hitPart)
 		else
-			p3, p1 = p3 - Magnitude, v3
+			remainingDistance, rayOrigin = remainingDistance - distanceTraveled, lastHitPosition
 		end
-		count = count + 1
+		iterationCount = iterationCount + 1
 	end
-	return v7, v3, v4, v5
+	return hitPart, lastHitPosition, surface, normal
 end
-local function RayIgnoreNonCollideWithIgnoreList(p1, p2, p3, p4, p5, p6, p7)
-	return RayIgnoreNonCollideSpecial(p1, p2, p3, true, p4, p5, p6, p7)
+local function RayIgnoreNonCollideWithIgnoreList(rayOrigin, rayDirection, remainingDistance, ignoreList, returnSurface, filterFunction)
+	return RayIgnoreNonCollideSpecial(rayOrigin, rayDirection, remainingDistance, true, ignoreList, returnSurface, filterFunction)
 end
 return {
-	RayIgnoreNonCollide = function(p1, p2, p3, p4, p5, p6, p7)
-		return RayIgnoreNonCollideSpecial(p1, p2, p3, false, p4, p5, p6, p7)
+	RayIgnoreNonCollide = function(rayOrigin, rayDirection, remainingDistance, ignoreList, returnSurface, filterFunction)
+		return RayIgnoreNonCollideSpecial(rayOrigin, rayDirection, remainingDistance, false, ignoreList, returnSurface, filterFunction)
 	end,
 	RayIgnoreNonCollideWithIgnoreList = RayIgnoreNonCollideWithIgnoreList
 }

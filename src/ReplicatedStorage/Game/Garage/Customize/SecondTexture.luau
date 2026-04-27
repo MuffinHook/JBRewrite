@@ -1,19 +1,17 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SpecialTextureData = require(ReplicatedStorage.Game.Garage.SpecialTextureData)
 local TextureData = require(ReplicatedStorage.Game.Garage.TextureData)
-return function(p1, p2)
-	local Make = p2.Make
-	local Model = p2.Model
+return function(selectedTexture, carData)
+	local Make = carData.Make
+	local Model = carData.Model
 	local list = {}
-	for v1, part in Model:GetDescendants() do
+	for index, part in Model:GetDescendants() do
 		if part:IsA("BasePart") and (part.Name == "SecondBody" and (Make ~= "Expeditioner" or not part:IsDescendantOf(Model.Preset.Doors.Back))) then
 			table.insert(list, part)
 		end
 	end
-	if p1 and not p1.None then
-		local textureName = p1.Name
+	if selectedTexture and not selectedTexture.None then
+		local textureName = selectedTexture.Name
 		local textureId = nil
 		if TextureData[textureName] == nil then
 			if SpecialTextureData[textureName] then
@@ -23,22 +21,22 @@ return function(p1, p2)
 			textureId = TextureData[textureName][Make]
 		end
 		if textureId == nil then
-			for i, v in ipairs(list) do
-				if v:IsA("MeshPart") then
-					v.TextureID = ""
+			for i, part in ipairs(list) do
+				if part:IsA("MeshPart") then
+					part.TextureID = ""
 				end
 			end
 		else
-			for i, v in ipairs(list) do
-				if v:IsA("MeshPart") then
-					v.TextureID = ("rbxassetid://%d"):format(textureId)
+			for i, part in ipairs(list) do
+				if part:IsA("MeshPart") then
+					part.TextureID = ("rbxassetid://%d"):format(textureId)
 				end
 			end
 		end
 	else
-		for i, v in ipairs(list) do
-			if v:IsA("MeshPart") then
-				v.TextureID = ""
+		for i, part in ipairs(list) do
+			if part:IsA("MeshPart") then
+				part.TextureID = ""
 			end
 		end
 	end

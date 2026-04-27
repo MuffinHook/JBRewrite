@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local function immutableAppend(sourceTable, ...)
 	local count = #sourceTable
 	local tbl = {}

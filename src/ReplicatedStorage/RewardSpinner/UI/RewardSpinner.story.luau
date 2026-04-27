@@ -1,54 +1,53 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local EnumRarity = require(ReplicatedStorage.RewardSpinner.EnumRarity)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(parent)
+	local AppComponent = Roact.Component:extend("App")
 	local RewardSpinner = require(script.Parent.RewardSpinner)
 	local store = require(ReplicatedStorage.App.store)
-	local tbl = {}
-	local v2 = 0
+	local rewardItems = {}
+	local spinCount = 0
 	for i = 1, 80 do
-		local v3
-		local t2 = {
+		local randomAmount
+		local spinConfig = {
 			Type = "Cash"
 		}
-		v3 = if math.random() > 0.5 then 1000 else 0
-		t2.Amount = v3
-		t2.RarityId = EnumRarity.Epic
-		table.insert(tbl, t2)
+		randomAmount = if math.random() > 0.5 then 1000 else 0
+		spinConfig.Amount = randomAmount
+		spinConfig.RarityId = EnumRarity.Epic
+		table.insert(rewardItems, spinConfig)
 	end
-	function v1.init(p1)
-		local t2 = {
+	function AppComponent.init(parent)
+		local spinConfig = {
 			type = "setRewardSpinnerConfig",
-			items = tbl,
+			items = rewardItems,
 			duration = 5,
 			winIndex = 77
 		}
-		t2.extraText = "Spin num: " .. tostring(v2)
-		store:dispatch(t2)
+		spinConfig.extraText = "Spin num: " .. tostring(spinCount)
+		store:dispatch(spinConfig)
 	end
-	function v1.render(p1)
+	function AppComponent.render(parent)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(RewardSpinner, {
 				onFinished = function()
-					v2 = v2 + 1
-					local t2 = {
+					spinCount = spinCount + 1
+					local spinConfig = {
 						type = "setRewardSpinnerConfig",
-						items = tbl,
+						items = rewardItems,
 						duration = 5,
 						winIndex = 77
 					}
-					t2.extraText = "Spin num: " .. tostring(v2)
-					store:dispatch(t2)
+					spinConfig.extraText = "Spin num: " .. tostring(spinCount)
+					store:dispatch(spinConfig)
 				end
 			}) })
 	end
-	function v1.willUnmount(p1)  end
-	local var4 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(parent)  end
+	local mountedComponent = Roact.mount(Roact.createElement(AppComponent), parent)
 	return function()
-		Roact.unmount(var4)
+		Roact.unmount(mountedComponent)
 	end
 end

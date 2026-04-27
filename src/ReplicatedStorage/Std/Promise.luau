@@ -39,8 +39,8 @@ local function makeEnum(enumName, members)
 	end
 
 	return setmetatable(enum, {
-		__index = function(_, k)
-			error(string.format("%s is not in %s!", k, enumName), 2)
+		__index = function(_, fieldName)
+			error(string.format("%s is not in %s!", fieldName, enumName), 2)
 		end,
 		__newindex = function()
 			error(string.format("Creating new members in %s is not allowed!", enumName), 2)
@@ -194,8 +194,8 @@ local function createAdvancer(traceback, callback, resolve, reject)
 	end
 end
 
-local function isEmpty(t)
-	return next(t) == nil
+local function isEmpty(possibleTable)
+	return next(possibleTable) == nil
 end
 
 --[=[

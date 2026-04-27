@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 game:GetService("MaterialService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -61,12 +59,12 @@ function module.getPlaceType()
 		return RunConsts.PLACE_ID_TO_PLACE_TYPE_MAP[if RunService:IsStudio() and game.PlaceId == 0 then RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[RunConsts.STUDIO_NAME][MAIN_WORLD_NAME].Default else game.PlaceId]
 	end
 end
-function module.getPlaceIdFromEnvWorld(p1, p2, p3)
-	local envMap = RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[p1]
+function module.getPlaceIdFromEnvWorld(environment, world, placeType)
+	local envMap = RunConsts.ENV_TO_WORLD_TO_PLACE_IDS_MAP[environment]
 	assert(envMap, "Invalid env given")
-	local placeType = p3 or "Default"
-	assert(placeType == "Default" or (placeType == "VoiceChat" or placeType == "Hang") or placeType == "Pro", "Invalid place type: " .. tostring(placeType))
-	local placeId = envMap[p2][placeType]
+	local resolvedPlaceType = placeType or "Default"
+	assert(resolvedPlaceType == "Default" or (resolvedPlaceType == "VoiceChat" or resolvedPlaceType == "Hang") or resolvedPlaceType == "Pro", "Invalid place type: " .. tostring(resolvedPlaceType))
+	local placeId = envMap[world][resolvedPlaceType]
 	assert(placeId, "Invalid world or no place id")
 	return placeId
 end

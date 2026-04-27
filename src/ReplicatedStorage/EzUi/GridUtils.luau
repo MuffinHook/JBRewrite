@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local GridUtils = {
 	getRowRatio = function(config)
 		local paddingScale = config.verticalPaddingRatio * config.aspectRatio

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CurrentCamera = workspace.CurrentCamera
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
@@ -28,7 +27,7 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local TeamSelectConsts = require(ReplicatedStorage.TeamSelect.TeamSelectConsts)
 local TeamSelect = require(ReplicatedStorage.TeamSelect.UI.TeamSelect)
 local createElement = Roact.createElement
-local t = {
+local cameraPositions = {
 	City2_Start = {
 		p = Vector3.new(-93.27, 62.17, 431.17),
 		LookVector = Vector3.new(0.17, -0.26, 0.95)
@@ -74,177 +73,177 @@ local t = {
 		LookVector = Vector3.new(-0.81, 0.09, -0.57)
 	}
 }
-local t2 = {}
-for instance2, var3 in t do
-	t2[instance2] = {
+local studioCameraPositions = {}
+for locationName, cameraData in cameraPositions do
+	studioCameraPositions[locationName] = {
 		p = Vector3.new(0, 0, 0),
 		LookVector = Vector3.new(0, 0, -1)
 	}
 end
-local function SelectIfGamepad(p1)
-	EzUtils.selectIfGamepad(p1)
+local function SelectIfGamepad(uiElement)
+	EzUtils.selectIfGamepad(uiElement)
 end
-local function Ease_InOutQuad(p1)
-	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
+local function Ease_InOutQuad(progress)
+	return progress < 0.5 and 2 * progress * progress or -1 - 2 * (progress - 2) * progress
 end
-local var4 = nil
-local var5 = nil
-local var6 = nil
-local t3 = {
+local jumpEvent = nil
+local eventEmitter = nil
+local onJumpCallback = nil
+local TeamChooseUI = {
 	ColorCorrection = nil,
 	Maid = Maid.new()
 }
-function t3.Init(p1)
-	var4 = p1.Event
-	var5 = p1.em
-	var6 = p1.OnJump
-	t3.ColorCorrection = Lighting:FindFirstChild("ColorCorrection")
-	function var5.rh1aeent()
-		t3.Hide()
+function TeamChooseUI.Init(config)
+	jumpEvent = config.Event
+	eventEmitter = config.em
+	onJumpCallback = config.OnJump
+	TeamChooseUI.ColorCorrection = Lighting:FindFirstChild("ColorCorrection")
+	function eventEmitter.onHideUI()
+		TeamChooseUI.Hide()
 	end
-	function var5.zijzuhxq(p1)
+	function eventEmitter.onShowUI(shouldShow)
 		if TeamShared.isTeamSwitchingEnabled() then
-			t3.Show(p1)
+			TeamChooseUI.Show(shouldShow)
 		end
 	end
 	if not localPlayer or Settings.Test.ChooseTeamInitially then
-		var5.zijzuhxq(true)
+		eventEmitter.onShowUI(true)
 	end
 end
-function t3.Show(p1)
-	local Maid = t3.Maid
-	local ColorCorrection = t3.ColorCorrection
+function TeamChooseUI.Show(shouldSkipFade)
+	local Maid = TeamChooseUI.Maid
+	local ColorCorrection = TeamChooseUI.ColorCorrection
 	assert(ColorCorrection)
-	local localPlayer = nil
-	local instance2 = ScreenFade.new()
-	local var3 = 0
-	local var42 = 0
-	local var52 = CinematicCamera.MakeCinematicCamera()
+	local selectedTeam = nil
+	local screenFade = ScreenFade.new()
+	local cityIndex = 0
+	local frameCount = 0
+	local cinematicCam = CinematicCamera.MakeCinematicCamera()
 	local function UpdateCamera()
-		var42 = var42 + 1
+		frameCount = frameCount + 1
 		ColorCorrection.TintColor = Color3.new(255/255, 255/255, 255/255)
-		local localPlayer = if RunUtils.isStudio() then t2 else t
-		var3 = var3 % 3 + 1
-		local instance2 = localPlayer["City" .. var3 .. "_Start"]
-		local var32 = localPlayer["City" .. var3 .. "_Stop"]
-		local var4 = CFrame.new(Vector3.new(), instance2.LookVector) + instance2.p
-		local var5 = CFrame.new(Vector3.new(), var32.LookVector) + var32.p
-		var52.StartPosition = var4.p
-		var52.TargetPosition = var5.p
-		var52.LookVector = var4.LookVector
-		var52.TargetLookVector = nil
+		local activeCameraPositions = if RunUtils.isStudio() then studioCameraPositions else cameraPositions
+		cityIndex = cityIndex % 3 + 1
+		local startPosition = activeCameraPositions["City" .. cityIndex .. "_Start"]
+		local stopPosition = activeCameraPositions["City" .. cityIndex .. "_Stop"]
+		local startCFrame = CFrame.new(Vector3.new(), startPosition.LookVector) + startPosition.p
+		local stopCFrame = CFrame.new(Vector3.new(), stopPosition.LookVector) + stopPosition.p
+		cinematicCam.StartPosition = startCFrame.p
+		cinematicCam.TargetPosition = stopCFrame.p
+		cinematicCam.LookVector = startCFrame.LookVector
+		cinematicCam.TargetLookVector = nil
 	end
-	local var62 = tick()
-	local var7 = p1 ~= nil
-	local function RenderStepped(p1)
-		local localPlayer = tick()
-		local instance2 = localPlayer - var62
+	local lastUpdateTime = tick()
+	local shouldShowAnimation = shouldSkipFade ~= nil
+	local function RenderStepped(deltaTime)
+		local currentTime = tick()
+		local elapsedTime = currentTime - lastUpdateTime
 		if CurrentCamera.CameraType ~= Enum.CameraType.Scriptable then
 			CurrentCamera.CameraType = Enum.CameraType.Scriptable
 		end
-		if var7 then
-			if instance2 >= 24 then
+		if shouldShowAnimation then
+			if elapsedTime >= 24 then
 				UpdateCamera()
-				var62 = localPlayer
+				lastUpdateTime = currentTime
 			end
-			local var3 = instance2 / 24
-			if var3 <= 0.1 and var42 ~= 1 then
-				local var4 = var3 / 0.1
-				local var5, var6
-				if var4 < 0.5 then
-					var5 = 2 * var4 * var4
-					if not var5 then
-						var6 = var4
-						var5 = -1 - 2 * (var4 - 2) * var4
+			local progressRatio = elapsedTime / 24
+			if progressRatio <= 0.1 and frameCount ~= 1 then
+				local easedValue = progressRatio / 0.1
+				local easeOutResult, easeOutFallback
+				if easedValue < 0.5 then
+					easeOutResult = 2 * easedValue * easedValue
+					if not easeOutResult then
+						easeOutFallback = easedValue
+						easeOutResult = -1 - 2 * (easedValue - 2) * easedValue
 					end
 				else
-					var6 = var4
-					var5 = -1 - 2 * (var4 - 2) * var4
+					easeOutFallback = easedValue
+					easeOutResult = -1 - 2 * (easedValue - 2) * easedValue
 				end
-				ColorCorrection.TintColor = Color3.new(var5, var5, var5)
-			elseif var3 >= 0.9 then
-				local var72 = 1 - (var3 - 0.9) / 0.1
-				local var8, var9
-				if var72 < 0.5 then
-					var8 = 2 * var72 * var72
-					if not var8 then
-						var9 = var72
-						var8 = -1 - 2 * (var72 - 2) * var72
+				ColorCorrection.TintColor = Color3.new(easeOutResult, easeOutResult, easeOutResult)
+			elseif progressRatio >= 0.9 then
+				local reverseProgress = 1 - (progressRatio - 0.9) / 0.1
+				local fadeOutResult, fadeOutFallback
+				if reverseProgress < 0.5 then
+					fadeOutResult = 2 * reverseProgress * reverseProgress
+					if not fadeOutResult then
+						fadeOutFallback = reverseProgress
+						fadeOutResult = -1 - 2 * (reverseProgress - 2) * reverseProgress
 					end
 				else
-					var9 = var72
-					var8 = -1 - 2 * (var72 - 2) * var72
+					fadeOutFallback = reverseProgress
+					fadeOutResult = -1 - 2 * (reverseProgress - 2) * reverseProgress
 				end
-				ColorCorrection.TintColor = Color3.new(var8, var8, var8)
+				ColorCorrection.TintColor = Color3.new(fadeOutResult, fadeOutResult, fadeOutResult)
 			end
-			CinematicCamera.StepCinematicCamera(p1, var52, 0.1, var3)
+			CinematicCamera.StepCinematicCamera(deltaTime, cinematicCam, 0.1, progressRatio)
 		end
 	end
 	Maid:GiveTask(RunService.RenderStepped:Connect(RenderStepped))
 	UpdateCamera()
-	local var8 = false
+	local isPlaying = false
 	local function play()
-		if var8 then
-		elseif TeamShared.isTeamFull(localPlayer) then
-			localPlayer = nil
+		if isPlaying then
+		elseif TeamShared.isTeamFull(selectedTeam) then
+			selectedTeam = nil
 			Notification.new({
 				Text = Localization:FormatByKey("Teams.TeamFull")
 			})
 		else
-			var8 = true
-			instance2:FadeToLinear(0, 0.3)
-			var4:FireServer("c" .. "" .. ("bds94b"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("wfb5itc"):sub(3, 6):reverse():reverse():reverse():reverse():reverse() .. "x", localPlayer)
+			isPlaying = true
+			screenFade:FadeToLinear(0, 0.3)
+			jumpEvent:FireServer("c49ti5bx", selectedTeam)
 			Maid:GiveTask(task.delay(2, function()
-				instance2:Set(1)
-				var8 = false
+				screenFade:Set(1)
+				isPlaying = false
 			end))
 		end
 	end
-	local var9 = Roact.createRef()
+	local criminalButtonRef = Roact.createRef()
 	local function getComponent()
 		EzUtils.isSmallScreen()
-		local sum = 0
-		local sum_2 = 0
-		for instance2, var3 in Teams:GetChildren() do
-			if var3.Name == "Police" then
-				sum_2 = sum_2 + #var3:GetPlayers()
+		local criminalCount = 0
+		local policeCount = 0
+		for teamName, teamInstance in Teams:GetChildren() do
+			if teamInstance.Name == "Police" then
+				policeCount = policeCount + #teamInstance:GetPlayers()
 			else
-				sum = sum + #var3:GetPlayers()
+				criminalCount = criminalCount + #teamInstance:GetPlayers()
 			end
 		end
-		local var4 = RunUtils.getPlaceType() == "Default"
+		local isDefaultServer = RunUtils.getPlaceType() == "Default"
 		local _ = RunUtils.getPlaceType() == "VoiceChat"
-		local var5 = RunUtils.getPlaceType() == "Pro"
-		local t = {}
-		local t2 = {
+		local isProServer = RunUtils.getPlaceType() == "Pro"
+		local serverButtons = {}
+		local defaultServerButton = {
 			onClicked = function()
-				local localPlayer = if var4 then "VoiceChat" else "Default"
-				local instance2, var3 = pcall(function()
+				local targetServerType = if isDefaultServer then "VoiceChat" else "Default"
+				local isVoiceEnabled, voiceCheckResult = pcall(function()
 					return VoiceChatService:IsVoiceEnabledForUserIdAsync(Players.LocalPlayer.UserId)
 				end)
-				if var4 and not (instance2 and var3) then
+				if isDefaultServer and not (isVoiceEnabled and voiceCheckResult) then
 					Notification.new({
 						Text = "Enable voice chat to join voice chat servers!"
 					})
 				else
-					ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(localPlayer)
+					ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(targetServerType)
 				end
 			end
 		}
-		t2.text = if var4 then "VOICECHAT SERVERS" else "MAIN SERVERS"
-		local t3 = {
+		defaultServerButton.text = if isDefaultServer then "VOICECHAT SERVERS" else "MAIN SERVERS"
+		local proServerButton = {
 			onClicked = function()
-				local localPlayer = if var5 then "VoiceChat" else "Pro"
-				local instance2, var3 = pcall(function()
+				local targetServerType = if isProServer then "VoiceChat" else "Pro"
+				local isVoiceEnabled, voiceCheckResult = pcall(function()
 					return VoiceChatService:IsVoiceEnabledForUserIdAsync(Players.LocalPlayer.UserId)
 				end)
-				if var5 and not (instance2 and var3) then
+				if isProServer and not (isVoiceEnabled and voiceCheckResult) then
 					Notification.new({
 						Text = "Enable voice chat to join voice chat servers!"
 					})
-				elseif var5 or not (Players.LocalPlayer.AccountAge < 60) then
-					if var5 or Players.LocalPlayer:GetAttribute("ProServerAccess") then
-						ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(localPlayer)
+				elseif isProServer or not (Players.LocalPlayer.AccountAge < 60) then
+					if isProServer or Players.LocalPlayer:GetAttribute("ProServerAccess") then
+						ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer(targetServerType)
 					else
 						Notification.new({
 							Text = "You need $5 million to enter High Roller servers!"
@@ -257,10 +256,10 @@ function t3.Show(p1)
 				end
 			end
 		}
-		t3.text = if var5 then "VOICECHAT SERVERS" else "HIGH ROLLER SERVERS"
-		t[1] = t2
-		t[2] = t3
-		t[3] = {
+		proServerButton.text = if isProServer then "VOICECHAT SERVERS" else "HIGH ROLLER SERVERS"
+		serverButtons[1] = defaultServerButton
+		serverButtons[2] = proServerButton
+		serverButtons[3] = {
 			onClicked = function()
 				if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then
 					ReplicatedStorage:FindFirstChild(WorldTeleportConsts.TELEPORT_TO_WORLD_FROM_TEAM_SWITCH_NAME):FireServer(RunConsts.TRADE_WORLD_NAME)
@@ -271,7 +270,7 @@ function t3.Show(p1)
 			text = "TRADE WORLD"
 		}
 		if workspace:GetServerTimeNow() < TeamSelectConsts.OG_JB_END_TIME then
-			table.insert(t, 1, {
+			table.insert(serverButtons, 1, {
 				onClicked = function()
 					ReplicatedStorage.TeamSelect:FindFirstChild(TeamSelectConsts.TELEPORT_PLACE_TYPE_REMOTE_NAME):FireServer("Hang")
 				end,
@@ -279,62 +278,62 @@ function t3.Show(p1)
 				textColor = Color3.fromHex("e88839")
 			})
 		end
-		local var8 = Players.LocalPlayer:GetAttribute("AllowCriminalSpawn")
+		local allowCriminalSpawn = Players.LocalPlayer:GetAttribute("AllowCriminalSpawn")
 		return createElement("ScreenGui", {
 			IgnoreGuiInset = true,
-			Enabled = var7
+			Enabled = shouldShowAnimation
 		}, {
 			TeamSelect = createElement(TeamSelect, {
 				size = UDim2.fromScale(1, 1),
-				numPolice = sum_2,
-				numCriminals = sum,
-				criminalButtonRef = var9,
-				allowCriminal = if var8 == nil then false else var8,
-				onTeamSelected = function(p1)
-					localPlayer = p1
+				numPolice = policeCount,
+				numCriminals = criminalCount,
+				criminalButtonRef = criminalButtonRef,
+				allowCriminal = if allowCriminalSpawn == nil then false else allowCriminalSpawn,
+				onTeamSelected = function(teamChoice)
+					selectedTeam = teamChoice
 					play()
 				end,
-				serverButtons = t
+				serverButtons = serverButtons
 			})
 		})
 	end
-	local localPlayer = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "TeamSelectGui")
-	if var9:getValue() then
-		EzUtils.selectIfGamepad((var9:getValue()))
+	local guiInstance = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "TeamSelectGui")
+	if criminalButtonRef:getValue() then
+		EzUtils.selectIfGamepad((criminalButtonRef:getValue()))
 	end
 	Maid:GiveTask(function()
-		Roact.unmount(localPlayer)
+		Roact.unmount(guiInstance)
 	end)
 	local function update()
-		Roact.update(localPlayer, getComponent())
+		Roact.update(guiInstance, getComponent())
 	end
-	for v12, v13 in Teams:GetChildren() do
-		Maid:GiveTask(v13.PlayerAdded:Connect(update))
-		Maid:GiveTask(v13.PlayerRemoved:Connect(update))
+	for teamName, teamInstance in Teams:GetChildren() do
+		Maid:GiveTask(teamInstance.PlayerAdded:Connect(update))
+		Maid:GiveTask(teamInstance.PlayerRemoved:Connect(update))
 	end
 	Maid:GiveTask(function()
 		CurrentCamera.CameraType = Enum.CameraType.Custom
-		local localPlayer = CharacterUtils.getHumanoid(Players.LocalPlayer.Character)
-		if localPlayer then
-			CurrentCamera.CameraSubject = localPlayer
+		local humanoid = CharacterUtils.getHumanoid(Players.LocalPlayer.Character)
+		if humanoid then
+			CurrentCamera.CameraSubject = humanoid
 		end
-		instance2:FadeToLinear(1, 0.3)
+		screenFade:FadeToLinear(1, 0.3)
 		task.delay(0.3, function()
-			instance2:Destroy()
+			screenFade:Destroy()
 		end)
 	end)
 	InventoryItemSystem.unequipAll()
-	var6()
-	var5.dmg39zpa(true)
+	onJumpCallback()
+	eventEmitter.onTeamSelected(true)
 	Maid:GiveTask(function()
 		ColorCorrection.TintColor = Color3.new(255/255, 255/255, 255/255)
 	end)
-	if not p1 then
-		instance2:FadeToLinear(0, 0.3)
+	if not shouldSkipFade then
+		screenFade:FadeToLinear(0, 0.3)
 		Maid:GiveTask(task.delay(0.4, function()
-			var7 = true
-			Roact.update(localPlayer, getComponent())
-			instance2:FadeToLinear(1, 0.3)
+			shouldShowAnimation = true
+			Roact.update(guiInstance, getComponent())
+			screenFade:FadeToLinear(1, 0.3)
 		end))
 	end
 	local gui = WorldMarkerSystem.gui
@@ -345,7 +344,7 @@ function t3.Show(p1)
 		end)
 	end
 end
-function t3.Hide()
-	t3.Maid:DoCleaning()
+function TeamChooseUI.Hide()
+	TeamChooseUI.Maid:DoCleaning()
 end
-return t3
+return TeamChooseUI

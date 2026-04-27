@@ -1,13 +1,12 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local DuffelBagBinder = require(script.Parent.DuffelBagBinder)
 return {
-	getBag = function(p1)
-		assert(p1)
-		assert(p1.Parent == Players)
-		for i, v in ipairs(DuffelBagBinder:GetAll()) do
-			if v:GetOwner() == p1 then
-				return v
+	getBag = function(player)
+		assert(player)
+		assert(player.Parent == Players)
+		for i, bag in ipairs(DuffelBagBinder:GetAll()) do
+			if bag:GetOwner() == player then
+				return bag
 			end
 		end
 	end

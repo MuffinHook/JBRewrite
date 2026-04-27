@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
 local function testComponent(parent)

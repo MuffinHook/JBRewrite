@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local CollectionService = game:GetService("CollectionService")
 local function parsePath(path)
 	local parts = string.split(path, "/")
@@ -19,204 +17,204 @@ local function isManifestResolved(manifest, expectedCount)
 	return count == expectedCount
 end
 local function cleanupNode(node, manifest)
-	if p1.instance ~= nil then
-		p1.instance = nil
-		local connections = p1.connections
+	if node.instance ~= nil then
+		node.instance = nil
+		local connections = node.connections
 		if connections then
 			for i, v in ipairs(connections) do
 				v:Disconnect()
 			end
 			table.clear(connections)
 		end
-		if p2 and p1.alias then
-			p2[p1.alias] = nil
+		if manifest and node.alias then
+			manifest[node.alias] = nil
 		end
-		local children = p1.children
+		local children = node.children
 		if children then
 			for k, v in pairs(children) do
-				v1(v, p2)
+				cleanupNode(v, manifest)
 			end
 		end
 	end
 end
-local t = {}
-t.__index = t
-function t.new(p1, p2, p3)
+local AtomicBinding = {}
+AtomicBinding.__index = AtomicBinding
+function AtomicBinding.new(tagName, manifestDict, destructorFn)
 	debug.profilebegin("AtomicBinding.new")
 	local count = 1
-	local t2 = {}
-	local t3 = {}
-	local t4 = {}
-	local t5 = {}
-	for k in pairs(p2) do
+	local dtorMap = {}
+	local rootInstToManifest = {}
+	local rootInstToRootNode = {}
+	local connections = {}
+	for k in pairs(manifestDict) do
 		count = count + 1
 	end
-	local function stopBoundFn(p1)
-		local v1 = t2[p1]
-		if v1 then
-			v1:Destroy()
-			t2[p1] = nil
+	local function stopBoundFn(key)
+		local dtor = dtorMap[key]
+		if dtor then
+			dtor:Destroy()
+			dtorMap[key] = nil
 		end
 	end
-	local function startBoundFn(p1, p2)
-		local v1 = t2[p1]
-		if v1 then
-			v1:Destroy()
-			t2[p1] = nil
+	local function startBoundFn(key, manifestEntry)
+		local dtor = dtorMap[key]
+		if dtor then
+			dtor:Destroy()
+			dtorMap[key] = nil
 		end
-		local v2 = p3(p2)
-		if v2 then
-			t2[p1] = v2
+		local newDtor = destructorFn(manifestEntry)
+		if newDtor then
+			dtorMap[key] = newDtor
 		end
 	end
-	local function bindRoot(p1)
-		assert(t3[p1] == nil)
-		local t = {}
-		t3[p1] = t
+	local function bindRoot(rootInst)
+		assert(rootInstToManifest[rootInst] == nil)
+		local manifest = {}
+		rootInstToManifest[rootInst] = manifest
 		debug.profilebegin("initializeBoundTree")
-		local t4 = {
+		local rootNode = {
 			alias = "root",
-			instance = p1
+			instance = rootInst
 		}
-		if next(p2) then
-			t4.children = {}
-			t4.connections = {}
+		if next(manifestDict) then
+			rootNode.children = {}
+			rootNode.connections = {}
 		end
-		for k, v in pairs(p2) do
-			local v2 = parsePath(v)
-			local v3 = t4
-			for i, v5 in ipairs(v2) do
-				local v4
-				v4 = i == #v2
-				local v52 = v3.children[v5] or {}
-				if v4 then
-					if v52.alias ~= nil then
+		for k, v in pairs(manifestDict) do
+			local pathParts = parsePath(v)
+			local currentNode = rootNode
+			for i, pathSegment in ipairs(pathParts) do
+				local isLeaf
+				isLeaf = i == #pathParts
+				local nextNode = currentNode.children[pathSegment] or {}
+				if isLeaf then
+					if nextNode.alias ~= nil then
 						error("Multiple aliases assigned to one instance")
 					end
-					v52.alias = k
+					nextNode.alias = k
 				else
-					v52.children = v52.children or {}
-					v52.connections = v52.connections or {}
+					nextNode.children = nextNode.children or {}
+					nextNode.connections = nextNode.connections or {}
 				end
-				v3.children[v5] = v52
-				v3 = v52
+				currentNode.children[pathSegment] = nextNode
+				currentNode = nextNode
 			end
 		end
 		debug.profileend()
-		local function v8(p12)
-			local v12 = assert(p12.instance)
-			local children = p12.children
-			local alias = p12.alias
-			local v2 = not children
+		local function resolveBoundTree(node)
+			local nodeInstance = assert(node.instance)
+			local children = node.children
+			local alias = node.alias
+			local isLeafNode = not children
 			if alias then
-				t[alias] = v12
+				manifest[alias] = nodeInstance
 			end
-			if not v2 then
-				local function processAddChild(p1)
-					local v1 = children[p1.Name]
-					if v1 and v1.instance == nil then
-						v1.instance = p1
-						v8(v1)
+			if not isLeafNode then
+				local function processAddChild(childInst)
+					local childNode = children[childInst.Name]
+					if childNode and childNode.instance == nil then
+						childNode.instance = childInst
+						resolveBoundTree(childNode)
 					end
 				end
-				local function processDeleteChild(p12)
-					local v13 = p12.Name
-					local v2 = children[v13]
-					if v2 and v2.instance == p12 then
-						local v3 = p1
-						local v4 = t2[v3]
-						if v4 then
-							v4:Destroy()
-							t2[v3] = nil
+				local function processDeleteChild(deletedChild)
+					local childName = deletedChild.Name
+					local childNode = children[childName]
+					if childNode and childNode.instance == deletedChild then
+						local rootKey = rootInst
+						local rootDtor = dtorMap[rootKey]
+						if rootDtor then
+							rootDtor:Destroy()
+							dtorMap[rootKey] = nil
 						end
-						v1(v2, t)
-						assert(v2.instance == nil)
-						local v6 = v12:FindFirstChild(v13)
-						if v6 then
-							local v7 = children[v6.Name]
-							if v7 and v7.instance == nil then
-								v7.instance = v6
-								v8(v7)
+						cleanupNode(childNode, manifest)
+						assert(childNode.instance == nil)
+						local sibling = nodeInstance:FindFirstChild(childName)
+						if sibling then
+							local siblingNode = children[sibling.Name]
+							if siblingNode and siblingNode.instance == nil then
+								siblingNode.instance = sibling
+								resolveBoundTree(siblingNode)
 							end
 						end
 					end
 				end
-				for i, v in ipairs(v12:GetChildren()) do
-					local v3 = children[v.Name]
-					if v3 and v3.instance == nil then
-						v3.instance = v
-						v8(v3)
+				for i, v in ipairs(nodeInstance:GetChildren()) do
+					local childNode = children[v.Name]
+					if childNode and childNode.instance == nil then
+						childNode.instance = v
+						resolveBoundTree(childNode)
 					end
 				end
-				table.insert(p12.connections, v12.ChildAdded:Connect(processAddChild))
-				table.insert(p12.connections, v12.ChildRemoved:Connect(processDeleteChild))
+				table.insert(node.connections, nodeInstance.ChildAdded:Connect(processAddChild))
+				table.insert(node.connections, nodeInstance.ChildRemoved:Connect(processDeleteChild))
 			end
-			if v2 then
-				local v5 = count
-				local count_2 = 0
-				for k in pairs(t) do
-					count_2 = count_2 + 1
+			if isLeafNode then
+				local expectedCount = count
+				local resolvedCount = 0
+				for k in pairs(manifest) do
+					resolvedCount = resolvedCount + 1
 				end
-				assert(count_2 <= v5, count_2)
-				if count_2 == v5 then
-					local v82 = p1
-					local v10 = t2[v82]
-					if v10 then
-						v10:Destroy()
-						t2[v82] = nil
+				assert(resolvedCount <= expectedCount, resolvedCount)
+				if resolvedCount == expectedCount then
+					local rootKey = rootInst
+					local rootDtor = dtorMap[rootKey]
+					if rootDtor then
+						rootDtor:Destroy()
+						dtorMap[rootKey] = nil
 					end
-					local v11 = p3(t)
-					if v11 then
-						t2[v82] = v11
+					local newDtor = destructorFn(manifest)
+					if newDtor then
+						dtorMap[rootKey] = newDtor
 					end
 				end
 			end
 		end
 		debug.profilebegin("resolveBoundTree")
-		v8(t4)
+		resolveBoundTree(rootNode)
 		debug.profileend()
 	end
-	local function unbindRoot(p1)
-		local v12 = t2[p1]
-		if v12 then
-			v12:Destroy()
-			t2[p1] = nil
+	local function unbindRoot(rootInst)
+		local rootDtor = dtorMap[rootInst]
+		if rootDtor then
+			rootDtor:Destroy()
+			dtorMap[rootInst] = nil
 		end
-		local v2 = t4[p1]
-		if v2 then
-			v1(v2, (assert(t3[p1])))
-			t4[p1] = nil
+		local rootNode = rootInstToRootNode[rootInst]
+		if rootNode then
+			cleanupNode(rootNode, (assert(rootInstToManifest[rootInst])))
+			rootInstToRootNode[rootInst] = nil
 		end
-		t3[p1] = nil
+		rootInstToManifest[rootInst] = nil
 	end
-	for i, v in ipairs(CollectionService:GetTagged(p1)) do
+	for i, v in ipairs(CollectionService:GetTagged(tagName)) do
 		task.spawn(bindRoot, v)
 	end
-	table.insert(t5, CollectionService:GetInstanceAddedSignal(p1):Connect(bindRoot))
-	table.insert(t5, CollectionService:GetInstanceRemovedSignal(p1):Connect(unbindRoot))
+	table.insert(connections, CollectionService:GetInstanceAddedSignal(tagName):Connect(bindRoot))
+	table.insert(connections, CollectionService:GetInstanceRemovedSignal(tagName):Connect(unbindRoot))
 	return setmetatable({
-		_dtorMap = t2,
-		_connections = t5,
-		_rootInstToRootNode = t4,
-		_rootInstToManifest = t3
-	}, t)
+		_dtorMap = dtorMap,
+		_connections = connections,
+		_rootInstToRootNode = rootInstToRootNode,
+		_rootInstToManifest = rootInstToManifest
+	}, AtomicBinding)
 end
-function t.Destroy(p1)
+function AtomicBinding.Destroy(self)
 	debug.profilebegin("AtomicBinding:Destroy")
-	for k, v in pairs(p1._dtorMap) do
+	for k, v in pairs(self._dtorMap) do
 		v:Destroy()
 	end
-	table.clear(p1._dtorMap)
-	for i, v in ipairs(p1._connections) do
+	table.clear(self._dtorMap)
+	for i, v in ipairs(self._connections) do
 		v:Disconnect()
 	end
-	table.clear(p1._connections)
-	local _rootInstToManifest = p1._rootInstToManifest
-	for k, v in pairs(p1._rootInstToRootNode) do
-		v1(v, (assert(_rootInstToManifest[k])))
+	table.clear(self._connections)
+	local manifest = self._rootInstToManifest
+	for k, v in pairs(self._rootInstToRootNode) do
+		cleanupNode(v, (assert(manifest[k])))
 	end
-	table.clear(p1._rootInstToManifest)
-	table.clear(p1._rootInstToRootNode)
+	table.clear(self._rootInstToManifest)
+	table.clear(self._rootInstToRootNode)
 	debug.profileend()
 end
-return t
+return AtomicBinding

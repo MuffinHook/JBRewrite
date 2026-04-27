@@ -1,21 +1,20 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("LicensePlate")
-v1.defaultProps = {
+local LicensePlate = Roact.PureComponent:extend("LicensePlate")
+LicensePlate.defaultProps = {
 	text = "JAILBRK"
 }
-function v1.init(p1)
-	p1.boxRef = Roact.createRef()
+function LicensePlate.init(self)
+	self.boxRef = Roact.createRef()
 end
-function v1.render(p1)
+function LicensePlate.render(self)
 	return createElement("Frame", {
 		BackgroundTransparency = 0.6666666666666666,
 		BackgroundColor3 = Color3.new(51/255, 51/255, 51/255),
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Size = p1.props.size,
-		Position = p1.props.position
+		Size = self.props.size,
+		Position = self.props.position
 	}, {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = 3
@@ -35,7 +34,7 @@ function v1.render(p1)
 			Position = UDim2.new(0, 0, 0),
 			Size = UDim2.new(0.2, 0, 0.2, 0),
 			Selectable = true,
-			[Roact.Event.MouseButton1Down] = p1.props.onClickClose
+			[Roact.Event.MouseButton1Down] = self.props.onClickClose
 		}, {
 			AspectRatio = createElement("UIAspectRatioConstraint", {
 				AspectRatio = 1
@@ -63,11 +62,11 @@ function v1.render(p1)
 				TextScaled = true,
 				Font = Enum.Font.LuckiestGuy,
 				TextColor3 = Color3.new(255/255, 255/255, 255/255),
-				PlaceholderText = p1.props.text .. "...",
+				PlaceholderText = self.props.text .. "...",
 				Text = "",
-				[Roact.Ref] = p1.boxRef,
-				[Roact.Change.Text] = function(p1)
-					p1.Text = p1.Text:upper():gsub("[^%w%s]", ""):sub(1, 7)
+				[Roact.Ref] = self.boxRef,
+				[Roact.Change.Text] = function(textbox)
+					textbox.Text = textbox.Text:upper():gsub("[^%w%s]", ""):sub(1, 7)
 				end
 			})
 		}),
@@ -79,8 +78,8 @@ function v1.render(p1)
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Text = "",
 			[Roact.Event.MouseButton1Down] = function()
-				if p1.props.onClickApply then
-					p1.props.onClickApply(p1.boxRef:getValue().Text)
+				if self.props.onClickApply then
+					self.props.onClickApply(self.boxRef:getValue().Text)
 				end
 			end
 		}, {
@@ -105,4 +104,4 @@ function v1.render(p1)
 		})
 	})
 end
-return v1
+return LicensePlate

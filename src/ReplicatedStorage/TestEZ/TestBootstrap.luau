@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local TestPlanner = require(script.Parent.TestPlanner)
 local TestRunner = require(script.Parent.TestRunner)
 local TextReporter = require(script.Parent.Reporters.TextReporter)

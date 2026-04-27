@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Rodux).createReducer({}, {
 	addReceiptItem = function(state, action)
@@ -15,9 +13,9 @@ return require(ReplicatedStorage.Rodux).createReducer({}, {
 			end
 		end
 		local newReceiptItem = {}
-		for k, v in pairs(action) do
-			if k ~= "type" then
-				newReceiptItem[k] = v
+		for propertyName, propertyValue in pairs(action) do
+			if propertyName ~= "type" then
+				newReceiptItem[propertyName] = propertyValue
 			end
 		end
 		table.insert(newState, newReceiptItem)

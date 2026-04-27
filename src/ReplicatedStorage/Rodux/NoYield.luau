@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local function resultHandler(coroutineThread, resumeSuccess, ...)
 	if not resumeSuccess then
  error(debug.traceback(coroutineThread, (...)), 2)

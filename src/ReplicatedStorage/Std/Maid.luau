@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Maid = {
 	ClassName = "Maid"
 }
@@ -86,10 +84,10 @@ function Maid.GivePromise(self, promise)
 end
 function Maid.DoCleaning(self)
 	local _tasks = self._tasks
-	for k, v in pairs(_tasks) do
-		if typeof(v) == "RBXScriptConnection" or typeof(v) == "thread" then
-			_tasks[k] = nil
-			self:_doTask(v)
+	for taskKey, taskValue in pairs(_tasks) do
+		if typeof(taskValue) == "RBXScriptConnection" or typeof(taskValue) == "thread" then
+			_tasks[taskKey] = nil
+			self:_doTask(taskValue)
 		end
 	end
 	local key, value = next(_tasks)

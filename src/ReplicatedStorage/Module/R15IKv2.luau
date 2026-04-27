@@ -1,126 +1,125 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SolveIK = require(ReplicatedStorage.Module.Logic).SolveIK
 CFrame.new()
 local cframe = CFrame.new(-0.1, -0.2, -0.05)
 local cframe2 = CFrame.new(0.1, -0.2, -0.05)
 local cframe3 = CFrame.Angles(1.5707963267948966, 0, 0)
-local function isNanV3(p1)
-	return if p1.x == p1.x and p1.y == p1.y then p1.z ~= p1.z else true
+local function isNanV3(vector)
+	return if vector.x == vector.x and vector.y == vector.y then vector.z ~= vector.z else true
 end
-local function isNanCf(p1)
-	local lookVector = p1.lookVector
-	local cframe = if lookVector.x == lookVector.x and lookVector.y == lookVector.y then lookVector.z ~= lookVector.z else true
-	if not cframe then
-		local rightVector = p1.rightVector
-		cframe = if rightVector.x == rightVector.x and rightVector.y == rightVector.y then rightVector.z ~= rightVector.z else true
-		if not cframe then
-			local upVector = p1.upVector
-			cframe = if upVector.x == upVector.x and upVector.y == upVector.y then upVector.z ~= upVector.z else true
+local function isNanCf(cframeInput)
+	local lookVector = cframeInput.lookVector
+	local isNaN = if lookVector.x == lookVector.x and lookVector.y == lookVector.y then lookVector.z ~= lookVector.z else true
+	if not isNaN then
+		local rightVector = cframeInput.rightVector
+		isNaN = if rightVector.x == rightVector.x and rightVector.y == rightVector.y then rightVector.z ~= rightVector.z else true
+		if not isNaN then
+			local upVector = cframeInput.upVector
+			isNaN = if upVector.x == upVector.x and upVector.y == upVector.y then upVector.z ~= upVector.z else true
 		end
 	end
-	return cframe
+	return isNaN
 end
-local function ComputeRawArm(p1, p2, p3, p4, p5, p6)
-	local Part0 = p1.Part0
-	local cframe = Part0.CFrame * p1.C0 * p1.C1:inverse()
-	local cframe2 = cframe * p2.C0 * p2.C1:inverse()
-	local cframe32 = cframe * CFrame.new(0, p1.Part1.Size.Y * 0.5, 0) * p6
-	local var4 = (cframe.p + cframe2.p) * 0.5
-	local p_2 = (cframe2 * p3.C0 * p3.C1:inverse()).p
-	local Magnitude = (cframe32.p - var4).Magnitude
-	local Magnitude_2 = (var4 - p_2).Magnitude
-	local v5, v6 = SolveIK(Magnitude, Magnitude_2, cframe32, p4, p5)
-	if v6 then
-		local lookVector = v6.lookVector
-		local var7 = if lookVector.x == lookVector.x and lookVector.y == lookVector.y then lookVector.z ~= lookVector.z else true
-		if not var7 then
-			local rightVector = v6.rightVector
-			var7 = if rightVector.x == rightVector.x and rightVector.y == rightVector.y then rightVector.z ~= rightVector.z else true
-			if not var7 then
-				local upVector = v6.upVector
-				var7 = if upVector.x == upVector.x and upVector.y == upVector.y then upVector.z ~= upVector.z else true
+local function ComputeRawArm(shoulderJoint, elbowJoint, wristJoint, armTarget, armAngle, armOffset)
+	local Part0 = shoulderJoint.Part0
+	local shoulderCFrame = Part0.CFrame * shoulderJoint.C0 * shoulderJoint.C1:inverse()
+	local elbowCFrame = shoulderCFrame * elbowJoint.C0 * elbowJoint.C1:inverse()
+	local targetCFrame = shoulderCFrame * CFrame.new(0, shoulderJoint.Part1.Size.Y * 0.5, 0) * armOffset
+	local midpointPosition = (shoulderCFrame.p + elbowCFrame.p) * 0.5
+	local wristPosition = (elbowCFrame * wristJoint.C0 * wristJoint.C1:inverse()).p
+	local upperArmLength = (targetCFrame.p - midpointPosition).Magnitude
+	local lowerArmLength = (midpointPosition - wristPosition).Magnitude
+	local upperCFrame, lowerCFrame = SolveIK(upperArmLength, lowerArmLength, targetCFrame, armTarget, armAngle)
+	if lowerCFrame then
+		local lookVector = lowerCFrame.lookVector
+		local lowerIsNaN = if lookVector.x == lookVector.x and lookVector.y == lookVector.y then lookVector.z ~= lookVector.z else true
+		if not lowerIsNaN then
+			local rightVector = lowerCFrame.rightVector
+			lowerIsNaN = if rightVector.x == rightVector.x and rightVector.y == rightVector.y then rightVector.z ~= rightVector.z else true
+			if not lowerIsNaN then
+				local upVector = lowerCFrame.upVector
+				lowerIsNaN = if upVector.x == upVector.x and upVector.y == upVector.y then upVector.z ~= upVector.z else true
 			end
 		end
-		if var7 then
-		elseif v5 then
-			local lookVector_2 = v5.lookVector
-			local var8 = if lookVector_2.x == lookVector_2.x and lookVector_2.y == lookVector_2.y then lookVector_2.z ~= lookVector_2.z else true
-			if not var8 then
-				local rightVector = v5.rightVector
-				var8 = if rightVector.x == rightVector.x and rightVector.y == rightVector.y then rightVector.z ~= rightVector.z else true
-				if not var8 then
-					local upVector = v5.upVector
-					var8 = if upVector.x == upVector.x and upVector.y == upVector.y then upVector.z ~= upVector.z else true
+		if lowerIsNaN then
+		elseif upperCFrame then
+			local lookVector_2 = upperCFrame.lookVector
+			local upperIsNaN = if lookVector_2.x == lookVector_2.x and lookVector_2.y == lookVector_2.y then lookVector_2.z ~= lookVector_2.z else true
+			if not upperIsNaN then
+				local rightVector = upperCFrame.rightVector
+				upperIsNaN = if rightVector.x == rightVector.x and rightVector.y == rightVector.y then rightVector.z ~= rightVector.z else true
+				if not upperIsNaN then
+					local upVector = upperCFrame.upVector
+					upperIsNaN = if upVector.x == upVector.x and upVector.y == upVector.y then upVector.z ~= upVector.z else true
 				end
 			end
-			if not var8 then
-				local cframe9 = p1.C0:inverse() * Part0.CFrame:inverse() * (v6 * CFrame.new(0, 0, -Magnitude * 0.5) * cframe3) * p1.C1
-				local cframe10 = Part0.CFrame * p1.C0 * cframe9 * p1.C1:inverse()
-				return cframe9, p2.C0:inverse() * cframe10:inverse() * (v5 * CFrame.new(0, 0, -Magnitude_2 * 0.5) * cframe3) * p2.C1
+			if not upperIsNaN then
+				local shoulderTransform = shoulderJoint.C0:inverse() * Part0.CFrame:inverse() * (lowerCFrame * CFrame.new(0, 0, -upperArmLength * 0.5) * cframe3) * shoulderJoint.C1
+				local shoulderCFrameAdjusted = Part0.CFrame * shoulderJoint.C0 * shoulderTransform * shoulderJoint.C1:inverse()
+				return shoulderTransform, elbowJoint.C0:inverse() * shoulderCFrameAdjusted:inverse() * (upperCFrame * CFrame.new(0, 0, -lowerArmLength * 0.5) * cframe3) * elbowJoint.C1
 			end
 		end
 	end
 end
-local function BuildPacketArms(p1)
+local function BuildPacketArms(humanoid)
 	return {
-		RightShoulder = p1.RightUpperArm.RightShoulder,
-		RightElbow = p1.RightLowerArm.RightElbow,
-		RightWrist = p1.RightHand.RightWrist,
-		LeftShoulder = p1.LeftUpperArm.LeftShoulder,
-		LeftElbow = p1.LeftLowerArm.LeftElbow,
-		LeftWrist = p1.LeftHand.LeftWrist
+		RightShoulder = humanoid.RightUpperArm.RightShoulder,
+		RightElbow = humanoid.RightLowerArm.RightElbow,
+		RightWrist = humanoid.RightHand.RightWrist,
+		LeftShoulder = humanoid.LeftUpperArm.LeftShoulder,
+		LeftElbow = humanoid.LeftLowerArm.LeftElbow,
+		LeftWrist = humanoid.LeftHand.LeftWrist
 	}
 end
-local function ComputeArms(p1)
-	local RightArm = p1.RightArm
+local function ComputeArms(humanoid)
+	local RightArm = humanoid.RightArm
 	if RightArm then
-		local v12, v22 = ComputeRawArm(p1.RightShoulder, p1.RightElbow, p1.RightWrist, RightArm, p1.RightAngle, cframe)
-		if v12 then
-			p1.RightShoulderTransform = v12
+		local rightShoulderTransform, rightElbowTransform = ComputeRawArm(humanoid.RightShoulder, humanoid.RightElbow, humanoid.RightWrist, RightArm, humanoid.RightAngle, cframe)
+		if rightShoulderTransform then
+			humanoid.RightShoulderTransform = rightShoulderTransform
 		end
-		if v22 then
-			p1.RightElbowTransform = v22
+		if rightElbowTransform then
+			humanoid.RightElbowTransform = rightElbowTransform
 		end
 	else
-		p1.RightShoulderTransform = nil
-		p1.RightElbowTransform = nil
+		humanoid.RightShoulderTransform = nil
+		humanoid.RightElbowTransform = nil
 	end
-	local LeftArm = p1.LeftArm
+	local LeftArm = humanoid.LeftArm
 	if LeftArm then
-		local cframe3, var4 = ComputeRawArm(p1.LeftShoulder, p1.LeftElbow, p1.LeftWrist, LeftArm, p1.LeftAngle, cframe2)
-		if cframe3 then
-			p1.LeftShoulderTransform = cframe3
+		local leftShoulderTransform, leftElbowTransform = ComputeRawArm(humanoid.LeftShoulder, humanoid.LeftElbow, humanoid.LeftWrist, LeftArm, humanoid.LeftAngle, cframe2)
+		if leftShoulderTransform then
+			humanoid.LeftShoulderTransform = leftShoulderTransform
 		end
-		if var4 then
-			p1.LeftElbowTransform = var4
+		if leftElbowTransform then
+			humanoid.LeftElbowTransform = leftElbowTransform
 		end
 	else
-		p1.LeftShoulderTransform = nil
-		p1.LeftElbowTransform = nil
+		humanoid.LeftShoulderTransform = nil
+		humanoid.LeftElbowTransform = nil
 	end
 end
-local function ApplyArms(p1)
-	if p1.RightShoulderTransform then
-		p1.RightShoulder.Transform = p1.RightShoulderTransform
-		p1.RightElbow.Transform = p1.RightElbowTransform
+local function ApplyArms(humanoid)
+	if humanoid.RightShoulderTransform then
+		humanoid.RightShoulder.Transform = humanoid.RightShoulderTransform
+		humanoid.RightElbow.Transform = humanoid.RightElbowTransform
 	end
-	if p1.LeftShoulderTransform then
-		p1.LeftShoulder.Transform = p1.LeftShoulderTransform
-		p1.LeftElbow.Transform = p1.LeftElbowTransform
+	if humanoid.LeftShoulderTransform then
+		humanoid.LeftShoulder.Transform = humanoid.LeftShoulderTransform
+		humanoid.LeftElbow.Transform = humanoid.LeftElbowTransform
 	end
 end
 return {
 	BuildPacketArms = BuildPacketArms,
-	Arms = function(p1)
-		ComputeArms(p1)
-		if p1.RightShoulderTransform then
-			p1.RightShoulder.Transform = p1.RightShoulderTransform
-			p1.RightElbow.Transform = p1.RightElbowTransform
+	Arms = function(humanoid)
+		ComputeArms(humanoid)
+		if humanoid.RightShoulderTransform then
+			humanoid.RightShoulder.Transform = humanoid.RightShoulderTransform
+			humanoid.RightElbow.Transform = humanoid.RightElbowTransform
 		end
-		if p1.LeftShoulderTransform then
-			p1.LeftShoulder.Transform = p1.LeftShoulderTransform
-			p1.LeftElbow.Transform = p1.LeftElbowTransform
+		if humanoid.LeftShoulderTransform then
+			humanoid.LeftShoulder.Transform = humanoid.LeftShoulderTransform
+			humanoid.LeftElbow.Transform = humanoid.LeftElbowTransform
 		end
 	end,
 	ComputeArms = ComputeArms,

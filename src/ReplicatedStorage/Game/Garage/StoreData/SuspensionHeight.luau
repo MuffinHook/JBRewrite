@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
 	Items = {
@@ -33,17 +32,17 @@ return {
 			Height = 1.5
 		}
 	},
-	GetInstance = function(p1)
-		local v1 = ReplicatedStorage.Resource.Suspension:FindFirstChild(p1.Name)
-		if not v1 then
-			error("No Suspension named: " .. p1.Name)
+	GetInstance = function(suspensionItem)
+		local suspensionAsset = ReplicatedStorage.Resource.Suspension:FindFirstChild(suspensionItem.Name)
+		if not suspensionAsset then
+			error("No Suspension named: " .. suspensionItem.Name)
 		end
-		local v2 = v1:Clone()
-		v2.CFrame = CFrame.new(0, 0, 0)
-		return v2
+		local suspensionClone = suspensionAsset:Clone()
+		suspensionClone.CFrame = CFrame.new(0, 0, 0)
+		return suspensionClone
 	end,
-	Update = function(p1, p2)
-		local v1 = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.5 - 0.2, 0, 0) * CFrame.new(0, 0, p2.Size.Magnitude)
+	Update = function(suspension, suspensionDimensions)
+		local elapsedTime = os.clock() / 2
+		suspension.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5 - 0.2, 0, 0) * CFrame.new(0, 0, suspensionDimensions.Size.Magnitude)
 	end
 }

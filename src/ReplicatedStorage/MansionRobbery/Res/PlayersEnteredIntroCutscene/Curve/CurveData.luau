@@ -1,4 +1,3 @@
--- Reviewed by Claude
 return {
 	Attributes = {
 		GraphMaxSpeed = 1,

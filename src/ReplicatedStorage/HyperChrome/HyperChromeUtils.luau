@@ -1,51 +1,50 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConsts)
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
-local t = {
-	getName = function(p1, p2)
-		return HyperChromeConsts.HYPERCHROME_PREFIX .. p1 .. HyperChromeConsts.LEVEL_PREFIX .. p2
+local HyperChromeUtils = {
+	getName = function(colorName, levelNumber)
+		return HyperChromeConsts.HYPERCHROME_PREFIX .. colorName .. HyperChromeConsts.LEVEL_PREFIX .. levelNumber
 	end,
-	getItemGroupName = function(p1)
-		return HyperChromeConsts.HYPERCHROME_PREFIX .. p1
+	getItemGroupName = function(colorName)
+		return HyperChromeConsts.HYPERCHROME_PREFIX .. colorName
 	end,
-	getLevelFromName = function(p1)
+	getLevelFromName = function(itemName)
 		local match = string.match
-		return tonumber(match(p1, HyperChromeConsts.LEVEL_PREFIX .. "(.*)"))
+		return tonumber(match(itemName, HyperChromeConsts.LEVEL_PREFIX .. "(.*)"))
 	end,
-	getColorFromName = function(p1)
-		return string.match(p1, HyperChromeConsts.HYPERCHROME_PREFIX .. "(.*)" .. HyperChromeConsts.LEVEL_PREFIX)
+	getColorFromName = function(itemName)
+		return string.match(itemName, HyperChromeConsts.HYPERCHROME_PREFIX .. "(.*)" .. HyperChromeConsts.LEVEL_PREFIX)
 	end
 }
 local MAX_LEVEL = HyperChromeConsts.MAX_LEVEL
-local t2 = {}
-local t3 = {}
-local t4 = {}
-for v1, v2 in HyperChromeConsts.COLOR_TO_INFO_MAP do
+local allHyperChromeNames = {}
+local colorSet = {}
+local colorList = {}
+for colorName, colorInfo in HyperChromeConsts.COLOR_TO_INFO_MAP do
 	for i = 1, MAX_LEVEL do
-		table.insert(t2, (t.getName(v1, i)))
-		t3[v1] = true
+		table.insert(allHyperChromeNames, (HyperChromeUtils.getName(colorName, i)))
+		colorSet[colorName] = true
 	end
 end
-for v4, v5 in t3 do
-	table.insert(t4, v4)
+for color, colorIsValid in colorSet do
+	table.insert(colorList, color)
 end
-function t.getListOfHyperChromeNames()
-	return t2
+function HyperChromeUtils.getListOfHyperChromeNames()
+	return allHyperChromeNames
 end
-local t5 = {
+local hyperChromeNameLookup = {
 	[HyperChromeConsts.COLOR_SHIFT_NAME] = true
 }
-for v6, v7 in t2 do
-	t5[v7] = true
+for index, hyperChromeName in allHyperChromeNames do
+	hyperChromeNameLookup[hyperChromeName] = true
 end
-function t.isHyperChromeName(p1)
-	return t5[p1] == true
+function HyperChromeUtils.isHyperChromeName(itemName)
+	return hyperChromeNameLookup[itemName] == true
 end
-function t.isHyperChromeItem(p1)
-	return p1.ItemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE and (p1.CategoryName == "Color" and t.isHyperChromeName(p1.ItemName)) and true or false
+function HyperChromeUtils.isHyperChromeItem(itemData)
+	return itemData.ItemType == PlayerDataConsts.VEHICLE_CUSTOMIZATION_ITEM_TYPE and (itemData.CategoryName == "Color" and HyperChromeUtils.isHyperChromeName(itemData.ItemName)) and true or false
 end
-function t.getColors()
-	return t4
+function HyperChromeUtils.getColors()
+	return colorList
 end
-return t
+return HyperChromeUtils

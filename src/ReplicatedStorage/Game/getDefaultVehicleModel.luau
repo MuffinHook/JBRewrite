@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PartUtils = require(ReplicatedStorage.Std.PartUtils)
 local Customize = require(ReplicatedStorage.Game.Garage.Customize)
@@ -13,7 +11,7 @@ return function(vehicleMake, vehicleType)
 	if vehicleModel then
 		local clonedModel = vehicleModel:Clone()
 		local resultModel = clonedModel
-		for v7, descendant in clonedModel:GetDescendants() do
+		for descendantIndex, descendant in clonedModel:GetDescendants() do
 			local wheelRootFound
 			if descendant:IsA("Model") and (descendant.Name:sub(1, 5) == "Wheel" and (descendant.Name ~= "Wheels" and descendant.Name ~= "WheelModels")) then
 				local wheelRoot = descendant:FindFirstChild("Wheel") or descendant:FindFirstChild("WheelRoot")
@@ -27,7 +25,7 @@ return function(vehicleMake, vehicleType)
 		end
 		local WheelModels = resultModel:FindFirstChild("WheelModels")
 		if WheelModels then
-			for v11, wheelModel in WheelModels:GetChildren() do
+			for wheelModelIndex, wheelModel in WheelModels:GetChildren() do
 				local wheelFound
 				if wheelModel:IsA("Model") then
 					local Wheel = wheelModel:FindFirstChild("Wheel")

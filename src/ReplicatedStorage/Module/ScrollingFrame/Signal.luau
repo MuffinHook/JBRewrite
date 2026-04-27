@@ -1,34 +1,33 @@
--- Reviewed by Claude
 return {
 	new = function()
-		local t = {}
+		local signal = {}
 		local instance = Instance.new("BindableEvent")
-		local v2 = nil
-		local var3 = nil
-		function t.fire(p1, ...)
-			v2 = { ... }
-			var3 = select("#", ...)
+		local args = nil
+		local argCount = nil
+		function signal.fire(self, ...)
+			args = { ... }
+			argCount = select("#", ...)
 			instance:Fire()
 		end
-		function t.connect(p1, p2)
-			if not p2 then
+		function signal.connect(self, callback)
+			if not callback then
 				error("connect(nil)", 2)
 			end
 			return instance.Event:connect(function()
-				p2(unpack(v2, 1, var3))
+				callback(unpack(args, 1, argCount))
 			end)
 		end
-		function t.wait(p1)
+		function signal.wait(self)
 			instance.Event:wait()
-			assert(v2, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
-			return unpack(v2, 1, var3)
+			assert(args, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
+			return unpack(args, 1, argCount)
 		end
-		function t.Destroy(p1)
+		function signal.Destroy(self)
 			instance:Destroy()
-			v2 = nil
-			var3 = nil
+			args = nil
+			argCount = nil
 			instance = nil
 		end
-		return t
+		return signal
 	end
 }

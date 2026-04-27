@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Util = require(script.Parent.Parent.Shared.Util)
 local keyPatterns = { "^%a[%w_]*$", "^%$%a[%w_]*$", "^%.%a[%w_]*$", "^%$%.%a[%w_]*$" }
 return function(cmdrConfig)
@@ -8,8 +6,8 @@ return function(cmdrConfig)
 			return cmdrConfig.Cmdr.Util.MakeFuzzyFinder(cmdrConfig.Cmdr.Util.DictionaryKeys(cmdrConfig:GetStore("vars_used") or {}))(inputValue)
 		end,
 		Validate = function(inputKey)
-			for i, v in ipairs(keyPatterns) do
-				if inputKey:match(v) then
+			for i, pattern in ipairs(keyPatterns) do
+				if inputKey:match(pattern) then
 					return true
 				end
 			end

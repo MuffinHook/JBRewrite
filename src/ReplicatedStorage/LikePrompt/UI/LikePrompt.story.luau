@@ -1,36 +1,35 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(storybook)
+	local AppComponent = Roact.Component:extend("App")
 	local LikePrompt = require(script.Parent.LikePrompt)
-	function v1.init(p1)
-		p1:setState({
+	function AppComponent.init(self)
+		self:setState({
 			visible = true
 		})
 	end
-	function v1.render(p1)
+	function AppComponent.render(self)
 		return createElement(LikePrompt, {
-			visible = p1.state.visible,
+			visible = self.state.visible,
 			countdownTil = workspace:GetServerTimeNow() + 20,
 			onClickDone = function()
 				print("clicked done..")
-				p1:setState({
+				self:setState({
 					visible = false
 				})
 			end,
 			onExpired = function()
 				print("expired..")
-				p1:setState({
+				self:setState({
 					visible = false
 				})
 			end
 		})
 	end
-	function v1.willUnmount(p1) end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(self) end
+	local mountedComponent = Roact.mount(Roact.createElement(AppComponent), storybook)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedComponent)
 	end
 end

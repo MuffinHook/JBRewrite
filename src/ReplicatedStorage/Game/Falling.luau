@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -72,10 +71,10 @@ local function getRootPart()
 end
 local function getTotalMass(instance)
 	assert(instance)
-	local v1 = next
-	local v2, v3 = instance:GetChildren()
+	local nextFunc = next
+	local childrenTable, initialKey = instance:GetChildren()
 	local sum = 0
-	for _, child in v1, v2, v3 do
+	for _, child in nextFunc, childrenTable, initialKey do
 		if child:IsA("BasePart") then
 			sum = sum + child:GetMass()
 		end
@@ -198,7 +197,7 @@ local function StartRagdolling(duration)
 			ragdollStartTime = tick()
 			AlexRagdoll.Ragdoll(humanoid.Parent)
 			OnRagdolled:Fire()
-			remoteEvent:FireServer("l" .. ("as81bo"):sub(5, 5):reverse():reverse():reverse() .. "wt9cvb")
+			remoteEvent:FireServer("lbwt9cvb")
 			return true
 		end
 		return false
@@ -229,7 +228,7 @@ local function StopFalling(landY)
 			local Character = LocalPlayer.Character
 			local rootPart = if Character then Character.PrimaryPart else nil
 			if rootPart and not TagUtils.isPointInTag(rootPart.Position, "NoFallDamage") then
-				remoteEvent:FireServer("u" .. ("tv52x"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("q36iwcx"):sub(2, 5):reverse() .. "hk", fallDistance)
+				remoteEvent:FireServer("u2wi63hk", fallDistance)
 			end
 		end
 	end
@@ -334,7 +333,7 @@ local function Heartbeat()
 	end
 	if isRagdolling == true and (ragdollTimerFired == false and ragdollDuration < now - ragdollStartTime) then
 		ragdollTimerFired = true
-		remoteEvent:FireServer("s" .. "" .. ("ygnwz1j"):sub(4, 4):reverse():reverse():reverse() .. "" .. "" .. ("s1rmwu"):sub(2, 5):reverse() .. "" .. "" .. ("wm21tsffq"):sub(5, 5):reverse() .. "z")
+		remoteEvent:FireServer("swwmr1tz")
 	end
 end
 local function AttemptUseParachute()

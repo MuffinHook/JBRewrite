@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
 local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
@@ -7,47 +5,47 @@ local Rodux = require(ReplicatedStorage.Rodux)
 local GarageConsts = require(ReplicatedStorage.Garage.GarageConsts)
 local GarageUtils = require(ReplicatedStorage.Garage.GarageUtils)
 return Rodux.createReducer({}, {
-	setSaveSlot = function(p1, p2)
-		assert(p2.name, "missing slot name")
-		assert(p2.equipped, "missing slot equipped")
+	setSaveSlot = function(currentState, action)
+		assert(action.name, "missing slot name")
+		assert(action.equipped, "missing slot equipped")
 		local stateCopy = {}
-		for k, v in pairs(p1) do
-			stateCopy[k] = v
+		for slotKey, slotConfig in pairs(currentState) do
+			stateCopy[slotKey] = slotConfig
 		end
-		local name_2 = p2.name
-		local equipped_2 = p2.equipped
-		if GarageUtils.getIsSaveSlotValid(tonumber(name_2:match("%d+")), (GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.VIP))) then
-			stateCopy[name_2] = equipped_2
+		local slotName = action.name
+		local equippedConfig = action.equipped
+		if GarageUtils.getIsSaveSlotValid(tonumber(slotName:match("%d+")), (GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.VIP))) then
+			stateCopy[slotName] = equippedConfig
 		end
 		local slotSaveRemote = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_SAVE_REMOTE_NAME)
 		if slotSaveRemote then
-			slotSaveRemote:FireServer(name_2)
+			slotSaveRemote:FireServer(slotName)
 		end
 		return stateCopy
 	end,
-	deleteSaveSlot = function(p1, p2)
-		assert(p2.name, "missing slot name")
+	deleteSaveSlot = function(currentState, action)
+		assert(action.name, "missing slot name")
 		local stateCopy = {}
-		for k, v in pairs(p1) do
-			stateCopy[k] = v
+		for slotKey, slotConfig in pairs(currentState) do
+			stateCopy[slotKey] = slotConfig
 		end
-		stateCopy[p2.name] = nil
+		stateCopy[action.name] = nil
 		local slotDeleteRemote = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_DELETE_REMOTE_NAME)
 		if slotDeleteRemote then
-			slotDeleteRemote:FireServer(p2.name)
+			slotDeleteRemote:FireServer(action.name)
 		end
 		return stateCopy
 	end,
-	loadSaveSlot = function(p1, p2)
-		assert(p2.name, "missing slot name")
+	loadSaveSlot = function(currentState, action)
+		assert(action.name, "missing slot name")
 		local slotLoadRemote = ReplicatedStorage:FindFirstChild(GarageConsts.SLOT_LOAD_REMOTE_NAME)
 		if slotLoadRemote then
-			slotLoadRemote:FireServer(p2.name)
+			slotLoadRemote:FireServer(action.name)
 		end
-		return p1
+		return currentState
 	end,
-	setSavesRaw = function(p1, p2)
-		assert(p2.saves ~= nil, "missing saves table")
-		return p2.saves
+	setSavesRaw = function(currentState, action)
+		assert(action.saves ~= nil, "missing saves table")
+		return action.saves
 	end
 })

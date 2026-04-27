@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
@@ -12,42 +11,42 @@ local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local createElement = Roact.createElement
 local MinimapUtils = require(script.Parent.MinimapUtils)
 local Minimap = require(script.Parent.Minimap)
-local v1 = Roact.PureComponent:extend("BigMinimap")
-v1.defaultProps = {
+local BigMinimap = Roact.PureComponent:extend("BigMinimap")
+BigMinimap.defaultProps = {
 	visible = true,
 	mapScale = 1
 }
-function v1.init(p1)
-	p1.horizontalRef = Roact.createRef()
-	p1.verticalRef = Roact.createRef()
-	p1.maid = Maid.new()
-	if p1.props.containerSize then
-		local updateContainerSize = p1.props.updateContainerSize
-		p1.containerSize = p1.props.containerSize
-		p1.updateContainerSize = updateContainerSize
+function BigMinimap.init(self)
+	self.horizontalRef = Roact.createRef()
+	self.verticalRef = Roact.createRef()
+	self.maid = Maid.new()
+	if self.props.containerSize then
+		local updateContainerSize = self.props.updateContainerSize
+		self.containerSize = self.props.containerSize
+		self.updateContainerSize = updateContainerSize
 	else
-		local v1, v2 = Roact.createBinding(Vector2.new(512, 512))
-		p1.containerSize = v1
-		p1.updateContainerSize = v2
+		local containerSize, updateContainerSize = Roact.createBinding(Vector2.new(512, 512))
+		self.containerSize = containerSize
+		self.updateContainerSize = updateContainerSize
 	end
-	if p1.props.containerRef then
-		p1.containerRef = p1.props.containerRef
+	if self.props.containerRef then
+		self.containerRef = self.props.containerRef
 	else
-		p1.containerRef = Roact.createRef()
+		self.containerRef = Roact.createRef()
 	end
-	p1:setState({
+	self:setState({
 		crossHairEnabled = false,
 		inputType = Enum.UserInputType.Keyboard
 	})
-	p1.x = 0
-	p1.y = 0
+	self.x = 0
+	self.y = 0
 end
-function v1.render(p1)
-	if p1.props.visible then
-		local v3 = Dictionary.merge(p1.props, {
-			containerSize = p1.containerSize,
-			updateContainerSize = p1.updateContainerSize,
-			containerRef = p1.containerRef,
+function BigMinimap.render(self)
+	if self.props.visible then
+		local mergedProps = Dictionary.merge(self.props, {
+			containerSize = self.containerSize,
+			updateContainerSize = self.updateContainerSize,
+			containerRef = self.containerRef,
 			containerChildren = {
 				LineHorizontal = createElement("Frame", {
 					BackgroundTransparency = 0,
@@ -57,8 +56,8 @@ function v1.render(p1)
 					BorderSizePixel = 1,
 					BorderColor3 = Color3.new(102/255, 102/255, 102/255),
 					ZIndex = 4,
-					Visible = p1.state.crossHairEnabled,
-					[Roact.Ref] = p1.horizontalRef
+					Visible = self.state.crossHairEnabled,
+					[Roact.Ref] = self.horizontalRef
 				}),
 				LineVertical = createElement("Frame", {
 					BackgroundTransparency = 0,
@@ -68,19 +67,19 @@ function v1.render(p1)
 					BorderSizePixel = 1,
 					BorderColor3 = Color3.new(102/255, 102/255, 102/255),
 					ZIndex = 4,
-					Visible = p1.state.crossHairEnabled,
-					[Roact.Ref] = p1.verticalRef
+					Visible = self.state.crossHairEnabled,
+					[Roact.Ref] = self.verticalRef
 				})
 			}
 		})
-		local t = {}
-		local t2 = {
+		local containerChildren = {}
+		local buttonsFrameProps = {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0.05, 0),
 			Position = UDim2.new(0, 0, 1, 4)
 		}
-		local t3 = {
+		local buttonsChildren = {
 			ListLayout = createElement("UIListLayout", {
 				HorizontalAlignment = Enum.HorizontalAlignment.Left,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
@@ -89,181 +88,181 @@ function v1.render(p1)
 				Padding = UDim.new(0, 4)
 			})
 		}
-		local t4 = {
-			BackgroundColor3 = p1.props.color,
+		local waypointButtonProps = {
+			BackgroundColor3 = self.props.color,
 			Size = UDim2.new(1, 0, 1, 0),
 			Text = "",
 			LayoutOrder = 1,
 			Selectable = true,
 			[Roact.Event.Activated] = function()
-				if #p1.props.waypoints == 0 then
-					p1:setState({
+				if #self.props.waypoints == 0 then
+					self:setState({
 						crossHairEnabled = true
 					})
-					if p1.state.inputType == Enum.UserInputType.Gamepad1 then
+					if self.state.inputType == Enum.UserInputType.Gamepad1 then
 						GuiService.SelectedObject = nil
-						local AbsoluteSize = p1.containerRef:getValue().AbsoluteSize
-						p1:_setXY(AbsoluteSize.X * 0.5, AbsoluteSize.Y * 0.5)
+						local AbsoluteSize = self.containerRef:getValue().AbsoluteSize
+						self:_setXY(AbsoluteSize.X * 0.5, AbsoluteSize.Y * 0.5)
 					end
 				else
-					p1.props.onSetWaypoint(nil)
+					self.props.onSetWaypoint(nil)
 				end
 			end
 		}
-		local t5 = {}
-		local t6 = {
+		local waypointButtonChildren = {}
+		local titleProps = {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(0.9, 0, 0.9, 0),
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5)
 		}
-		t6.Text = if #p1.props.waypoints == 0 then "Add Waypoint" else "Remove Waypoint"
-		t6.Font = Enum.Font.LuckiestGuy
-		t6.LineHeight = 0.7
-		t6.TextScaled = true
-		t6.TextXAlignment = Enum.TextXAlignment.Center
-		t6.TextYAlignment = Enum.TextYAlignment.Center
-		t6.TextColor3 = Color3.fromRGB(255, 255, 255)
-		t6.ZIndex = 10
-		t5.Title = createElement("TextLabel", t6)
-		t5.AspectRatio = createElement("UIAspectRatioConstraint", {
+		titleProps.Text = if #self.props.waypoints == 0 then "Add Waypoint" else "Remove Waypoint"
+		titleProps.Font = Enum.Font.LuckiestGuy
+		titleProps.LineHeight = 0.7
+		titleProps.TextScaled = true
+		titleProps.TextXAlignment = Enum.TextXAlignment.Center
+		titleProps.TextYAlignment = Enum.TextYAlignment.Center
+		titleProps.TextColor3 = Color3.fromRGB(255, 255, 255)
+		titleProps.ZIndex = 10
+		waypointButtonChildren.Title = createElement("TextLabel", titleProps)
+		waypointButtonChildren.AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = 8
 		})
-		t5.UICorner = createElement("UICorner", {
+		waypointButtonChildren.UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0.25, 0)
 		})
-		t3.Waypoint = createElement("TextButton", t4, t5)
-		t.Buttons = createElement("Frame", t2, t3)
-		return createElement(Minimap, v3, t)
+		buttonsChildren.Waypoint = createElement("TextButton", waypointButtonProps, waypointButtonChildren)
+		containerChildren.Buttons = createElement("Frame", buttonsFrameProps, buttonsChildren)
+		return createElement(Minimap, mergedProps, containerChildren)
 	end
 end
-function v1._setXY(p1, p2, p3)
-	local AbsoluteSize = p1.containerRef:getValue().AbsoluteSize
-	p1.x = math.clamp(p2, 0, AbsoluteSize.X)
-	p1.y = math.clamp(p3, 0, AbsoluteSize.Y)
-	local v1 = p1.horizontalRef:getValue()
-	local v2 = p1.verticalRef:getValue()
-	if p1.state.crossHairEnabled then
-		v1.Position = UDim2.new(0, 0, 0, p1.y)
-		v2.Position = UDim2.new(0, p1.x, 0, 0)
+function BigMinimap._setXY(self, x, y)
+	local AbsoluteSize = self.containerRef:getValue().AbsoluteSize
+	self.x = math.clamp(x, 0, AbsoluteSize.X)
+	self.y = math.clamp(y, 0, AbsoluteSize.Y)
+	local horizontalRefFrame = self.horizontalRef:getValue()
+	local verticalRefFrame = self.verticalRef:getValue()
+	if self.state.crossHairEnabled then
+		horizontalRefFrame.Position = UDim2.new(0, 0, 0, self.y)
+		verticalRefFrame.Position = UDim2.new(0, self.x, 0, 0)
 	end
 end
-function v1._hookVisible(p1, p2)
-	if p2 then
-		local v1 = Maid.new()
-		p1.maid.visibleMaid = v1
-		local v2 = GuiService:GetGuiInset()
-		v1:GiveTask(RunService.Heartbeat:Connect(function()
-			local v1 = p1.containerRef:getValue()
-			if p1.state.inputType == Enum.UserInputType.Keyboard then
-				local v22 = UserInputService:GetMouseLocation() - v2
-				local AbsolutePosition = v1.AbsolutePosition
-				p1:_setXY(v22.X - AbsolutePosition.X, v22.Y - AbsolutePosition.Y)
+function BigMinimap._hookVisible(self, isVisible)
+	if isVisible then
+		local visibleMaid = Maid.new()
+		self.maid.visibleMaid = visibleMaid
+		local guiInset = GuiService:GetGuiInset()
+		visibleMaid:GiveTask(RunService.Heartbeat:Connect(function()
+			local containerFrame = self.containerRef:getValue()
+			if self.state.inputType == Enum.UserInputType.Keyboard then
+				local adjustedMouseLocation = UserInputService:GetMouseLocation() - guiInset
+				local AbsolutePosition = containerFrame.AbsolutePosition
+				self:_setXY(adjustedMouseLocation.X - AbsolutePosition.X, adjustedMouseLocation.Y - AbsolutePosition.Y)
 			end
 		end))
-		v1:GiveTask(UserInputService.InputBegan:Connect(function(p12)
-			if p1.state.crossHairEnabled and (p12.UserInputType == Enum.UserInputType.MouseButton1 or (p12.UserInputType == Enum.UserInputType.Touch or p12.UserInputType == Enum.UserInputType.Gamepad1 and p12.KeyCode == Enum.KeyCode.ButtonA)) then
-				local v1 = p1.containerRef:getValue()
-				local AbsoluteSize = v1.AbsoluteSize
-				if p12.UserInputType == Enum.UserInputType.Touch then
-					local AbsolutePosition = v1.AbsolutePosition
-					p1.x = p12.Position.X - AbsolutePosition.X
-					p1.y = p12.Position.Y - AbsolutePosition.Y
+		visibleMaid:GiveTask(UserInputService.InputBegan:Connect(function(inputEvent)
+			if self.state.crossHairEnabled and (inputEvent.UserInputType == Enum.UserInputType.MouseButton1 or (inputEvent.UserInputType == Enum.UserInputType.Touch or inputEvent.UserInputType == Enum.UserInputType.Gamepad1 and inputEvent.KeyCode == Enum.KeyCode.ButtonA)) then
+				local containerFrame = self.containerRef:getValue()
+				local AbsoluteSize = containerFrame.AbsoluteSize
+				if inputEvent.UserInputType == Enum.UserInputType.Touch then
+					local AbsolutePosition = containerFrame.AbsolutePosition
+					self.x = inputEvent.Position.X - AbsolutePosition.X
+					self.y = inputEvent.Position.Y - AbsolutePosition.Y
 				end
-				local x = p1.x
-				local y = p1.y
+				local x = self.x
+				local y = self.y
 				if not (x < 0 or (y < 0 or (AbsoluteSize.X < x or AbsoluteSize.Y < y))) then
-					local v2, v3 = MinimapUtils.computeWorldXY(x, y, p1.props.worldPosition:getValue(), p1.containerSize:getValue(), p1.props.mapWorldWidth, p1.props.mapWorldHeight, p1.props.mapWorldCenterX, p1.props.mapWorldCenterY, p1.props.mapImageWidth, p1.props.mapImageHeight, p1.props.mapScale)
-					if p1.props.onSetWaypoint then
-						p1.props.onSetWaypoint((Vector3.new(v2, 50, v3)))
+					local worldX, worldY = MinimapUtils.computeWorldXY(x, y, self.props.worldPosition:getValue(), self.containerSize:getValue(), self.props.mapWorldWidth, self.props.mapWorldHeight, self.props.mapWorldCenterX, self.props.mapWorldCenterY, self.props.mapImageWidth, self.props.mapImageHeight, self.props.mapScale)
+					if self.props.onSetWaypoint then
+						self.props.onSetWaypoint((Vector3.new(worldX, 50, worldY)))
 					end
-					if p1.props.onToggle then
-						p1.props.onToggle(false)
+					if self.props.onToggle then
+						self.props.onToggle(false)
 					end
-					p1:setState({
+					self:setState({
 						crossHairEnabled = false
 					})
 				end
 			end
 		end))
 	else
-		p1.maid.visibleMaid = nil
+		self.maid.visibleMaid = nil
 	end
 end
-function v1.didMount(p1)
+function BigMinimap.didMount(self)
 	local function updateInputType()
-		local v1 = UserInputService:GetLastInputType()
-		if (v1 == Enum.UserInputType.Gamepad1 or (v1 == Enum.UserInputType.Keyboard or v1 == Enum.UserInputType.Touch)) and p1.state.inputType ~= v1 then
-			p1:setState({
-				inputType = v1
+		local lastInputType = UserInputService:GetLastInputType()
+		if (lastInputType == Enum.UserInputType.Gamepad1 or (lastInputType == Enum.UserInputType.Keyboard or lastInputType == Enum.UserInputType.Touch)) and self.state.inputType ~= lastInputType then
+			self:setState({
+				inputType = lastInputType
 			})
 		end
 	end
 	updateInputType()
-	p1.maid:GiveTask(UserInputService.LastInputTypeChanged:Connect(updateInputType))
+	self.maid:GiveTask(UserInputService.LastInputTypeChanged:Connect(updateInputType))
 end
-function v1.didUpdate(p1, p2, p3)
-	if p1.state.crossHairEnabled ~= p3.crossHairEnabled then
-		p1:_hookGamepad(p1.state.crossHairEnabled)
+function BigMinimap.didUpdate(self, previousProps, previousState)
+	if self.state.crossHairEnabled ~= previousState.crossHairEnabled then
+		self:_hookGamepad(self.state.crossHairEnabled)
 	end
-	if p1.props.visible ~= p2.visible then
-		p1:_hookVisible(p1.props.visible)
+	if self.props.visible ~= previousProps.visible then
+		self:_hookVisible(self.props.visible)
 	end
 end
-function v1._hookGamepad(p1, p2)
-	if p2 then
+function BigMinimap._hookGamepad(self, isEnabled)
+	if isEnabled then
 		ContextActionService:BindActionAtPriority("sinkThumb1", function()
 			return Enum.ContextActionResult.Sink
 		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.Thumbstick1)
 		ContextActionService:BindActionAtPriority("sinkJump", function()
 			return Enum.ContextActionResult.Sink
 		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.ButtonA)
-		local v1 = nil
-		p1.maid.selectionDragListen = UserInputService.InputChanged:Connect(function(p1)
-			if p1.UserInputType == Enum.UserInputType.Gamepad1 and p1.KeyCode == Enum.KeyCode.Thumbstick1 then
-				v1 = p1
+		local lastInputEvent = nil
+		self.maid.selectionDragListen = UserInputService.InputChanged:Connect(function(inputEvent)
+			if inputEvent.UserInputType == Enum.UserInputType.Gamepad1 and inputEvent.KeyCode == Enum.KeyCode.Thumbstick1 then
+				lastInputEvent = inputEvent
 			end
 		end)
-		p1.maid.dragHeartbeat = RunService.Heartbeat:Connect(function(p12)
-			if v1 then
-				local X = v1.Position.X
-				local Y = v1.Position.Y
+		self.maid.dragHeartbeat = RunService.Heartbeat:Connect(function(deltaTime)
+			if lastInputEvent then
+				local X = lastInputEvent.Position.X
+				local Y = lastInputEvent.Position.Y
 				if math.abs(X) > 0.1 or math.abs(Y) > 0.1 then
-					p1:_setXY(p1.x + X * 10, p1.y - Y * 10, true)
+					self:_setXY(self.x + X * 10, self.y - Y * 10, true)
 				end
 			end
 		end)
 	else
 		ContextActionService:UnbindAction("sinkThumb1")
 		ContextActionService:UnbindAction("sinkJump")
-		p1.maid.selectionDragListen = nil
-		p1.maid.dragHeartbeat = nil
+		self.maid.selectionDragListen = nil
+		self.maid.dragHeartbeat = nil
 	end
 end
-function v1.willUnmount(p1)
-	p1:_hookGamepad(false)
-	p1.maid:DoCleaning()
+function BigMinimap.willUnmount(self)
+	self:_hookGamepad(false)
+	self.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(state, dispatch)
 	return {
-		labels = p1.minimapLabels,
-		waypoints = p1.minimapWaypoints,
-		points = p1.minimapPoints,
-		circles = p1.minimapCircles
+		labels = state.minimapLabels,
+		waypoints = state.minimapWaypoints,
+		points = state.minimapPoints,
+		circles = state.minimapCircles
 	}
-end, function(p1)
+end, function(dispatch)
 	return {
-		onSetWaypoint = function(p12)
-			if p12 then
+		onSetWaypoint = function(waypoint)
+			if waypoint then
 				if MinimapService._addWaypointRemote then
-					MinimapService._addWaypointRemote:FireServer(p12.X, p12.Z)
+					MinimapService._addWaypointRemote:FireServer(waypoint.X, waypoint.Z)
 				end
 			else
-				p1({
+				dispatch({
 					type = "removeWaypointCurrent"
 				})
 			end
 		end
 	}
-end)(v1)
+end)(BigMinimap)

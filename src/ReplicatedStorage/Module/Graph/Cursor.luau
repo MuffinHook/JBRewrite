@@ -1,33 +1,32 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
-local t = {}
-t.__index = t
-function t.new(p1, p2)
-	assert(p1)
-	assert(p2)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.Graph = p1
-	t2.Node = p2
-	return t2
+local CursorClass = {}
+CursorClass.__index = CursorClass
+function CursorClass.new(graph, node)
+	assert(graph)
+	assert(node)
+	local cursorInstance = {}
+	setmetatable(cursorInstance, CursorClass)
+	cursorInstance.Graph = graph
+	cursorInstance.Node = node
+	return cursorInstance
 end
-function t.GetOnWalkedSignal(p1)
-	if p1._onWalkedSignal == nil then
-		p1._onWalkedSignal = Signal.new()
+function CursorClass.GetOnWalkedSignal(self)
+	if self._onWalkedSignal == nil then
+		self._onWalkedSignal = Signal.new()
 	end
-	return p1._onWalkedSignal
+	return self._onWalkedSignal
 end
-function t.WalkTo(p1, p2)
-	assert(p2)
-	if p1.Graph:HasEdge(p1.Node, p2) then
-		p1.Node = p2
-		if p1._onWalkedSignal then
-			p1._onWalkedSignal:Fire(p2)
+function CursorClass.WalkTo(self, targetNode)
+	assert(targetNode)
+	if self.Graph:HasEdge(self.Node, targetNode) then
+		self.Node = targetNode
+		if self._onWalkedSignal then
+			self._onWalkedSignal:Fire(targetNode)
 		end
 		return true
 	else
 		return false
 	end
 end
-return t
+return CursorClass

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local RadioConfig = require(script.Parent.RadioConfig)
@@ -21,32 +19,32 @@ function RadioUI.new(guiElement)
 	radioUiInstance.Gui.Enabled = true
 	return radioUiInstance
 end
-function RadioUI.ConnectPlayer(p1)
-	local Player = p1.Gui.Container.Player
+function RadioUI.ConnectPlayer(self)
+	local Player = self.Gui.Container.Player
 	local TextBox = Player.Left.SongId.TextBox
-	p1.Maid:GiveTask(TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+	self.Maid:GiveTask(TextBox:GetPropertyChangedSignal("Text"):Connect(function()
 		if TextBox.Text:find("%D+") then
 			TextBox.Text = TextBox.Text:gsub("%D+", "")
 		end
 	end))
-	p1.Maid:GiveTask(Player.Left.Toggle.MouseButton1Down:Connect(function()
+	self.Maid:GiveTask(Player.Left.Toggle.MouseButton1Down:Connect(function()
 		if RadioPlayer.IsPlaying() then
-			p1:StopSong()
+			self:StopSong()
 		else
-			p1:PlayCustomSong()
+			self:PlayCustomSong()
 		end
 	end))
-	p1.Maid:GiveTask(RadioPlayer.OnSongStarted:Connect(function()
-		p1:UpdatePlayButton()
+	self.Maid:GiveTask(RadioPlayer.OnSongStarted:Connect(function()
+		self:UpdatePlayButton()
 	end))
-	p1.Maid:GiveTask(RadioPlayer.OnSongStopped:Connect(function()
-		p1:UpdatePlayButton()
+	self.Maid:GiveTask(RadioPlayer.OnSongStopped:Connect(function()
+		self:UpdatePlayButton()
 	end))
-	p1.Maid:GiveTask(RadioPlayer.OnSongEnded:Connect(function()
-		p1:UpdatePlayButton()
+	self.Maid:GiveTask(RadioPlayer.OnSongEnded:Connect(function()
+		self:UpdatePlayButton()
 	end))
 	local bassSlider = Slider.new(Player.Right.SliderBass)
-	p1.Maid:GiveTask(bassSlider)
+	self.Maid:GiveTask(bassSlider)
 	bassSlider.OnValueChanged:Connect(function(bassValue)
 		RadioConfig.Bass = bassValue
 		RadioPlayer.SetBass(bassValue)
@@ -58,39 +56,39 @@ function RadioUI.ConnectPlayer(p1)
 		RadioPlayer.SetVolume(volumeValue)
 	end)
 	volumeSlider:SetValue(RadioConfig.Volume)
-	p1.Maid:GiveTask(volumeSlider)
+	self.Maid:GiveTask(volumeSlider)
 end
-function RadioUI.ConnectStations(p1)
-	for i, v in ipairs(p1.Gui.Container.Stations.ContainerStations:GetChildren()) do
-		if v:IsA("Frame") then
-			p1.Maid:GiveTask(v.Button.MouseButton1Down:Connect(function()
-				RadioConfig.Playlist = v.Name
+function RadioUI.ConnectStations(self)
+	for i, stationFrame in ipairs(self.Gui.Container.Stations.ContainerStations:GetChildren()) do
+		if stationFrame:IsA("Frame") then
+			self.Maid:GiveTask(stationFrame.Button.MouseButton1Down:Connect(function()
+				RadioConfig.Playlist = stationFrame.Name
 				RadioPlayer.PlayRandomSongAfter = true
 				RadioPlayer.PlayRandomSong()
-				p1:OpenSidebar(RadioConfig.Playlist)
+				self:OpenSidebar(RadioConfig.Playlist)
 			end))
 		end
 	end
 	if RadioConfig.Playlist then
-		p1:OpenSidebar(RadioConfig.Playlist)
+		self:OpenSidebar(RadioConfig.Playlist)
 	end
 end
-function RadioUI.OpenSidebar(p1, p2)
-	if p1.mRadioList ~= nil then
-		p1.mRadioList:Destroy()
-		p1.mRadioList = nil
+function RadioUI.OpenSidebar(self, playlistName)
+	if self.mRadioList ~= nil then
+		self.mRadioList:Destroy()
+		self.mRadioList = nil
 	end
-	p1.mRadioList = RadioList.new(p1.Gui)
-	p1.mRadioList:Populate(RadioPlayer.GetPlaylist(p2))
-	p1.mRadioList.Maid:GiveTask(p1.mRadioList.OnRefreshRequested:Connect(function()
-		p1:OpenSidebar(p2)
+	self.mRadioList = RadioList.new(self.Gui)
+	self.mRadioList:Populate(RadioPlayer.GetPlaylist(playlistName))
+	self.mRadioList.Maid:GiveTask(self.mRadioList.OnRefreshRequested:Connect(function()
+		self:OpenSidebar(playlistName)
 	end))
 end
-function RadioUI.StopSong(p1)
+function RadioUI.StopSong(self)
 	RadioPlayer.Stop()
 end
-function RadioUI.PlayCustomSong(p1)
-	local songId = tonumber(p1.Gui.Container.Player.Left.SongId.TextBox.Text)
+function RadioUI.PlayCustomSong(self)
+	local songId = tonumber(self.Gui.Container.Player.Left.SongId.TextBox.Text)
 	if songId == nil and RadioConfig.Playlist ~= nil then
 		RadioPlayer.PlayRandomSongAfter = true
 		RadioPlayer.PlayRandomSong()
@@ -108,17 +106,17 @@ function RadioUI.PlayCustomSong(p1)
 		RadioPlayer.PlayId(songId, nil, isThirdPerson)
 	end
 end
-function RadioUI.UpdatePlayButton(p1)
-	p1.Gui.Container.Player.Left.Toggle.TextLabel.Text = if RadioPlayer.IsPlaying() then "PAUSE" else "PLAY"
+function RadioUI.UpdatePlayButton(self)
+	self.Gui.Container.Player.Left.Toggle.TextLabel.Text = if RadioPlayer.IsPlaying() then "PAUSE" else "PLAY"
 end
-function RadioUI.Destroy(p1)
-	p1.Gui.Enabled = false
-	p1.Gui = nil
-	if p1.mRadioList then
-		p1.mRadioList:Destroy()
-		p1.mRadioList = nil
+function RadioUI.Destroy(self)
+	self.Gui.Enabled = false
+	self.Gui = nil
+	if self.mRadioList then
+		self.mRadioList:Destroy()
+		self.mRadioList = nil
 	end
-	p1.Maid:Destroy()
-	p1.Maid = nil
+	self.Maid:Destroy()
+	self.Maid = nil
 end
 return RadioUI

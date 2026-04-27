@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local function CalculateSegment(train, offset)
 	local currentSegment = train.SegmentsById[train.SegmentId]
 	if not (offset < currentSegment.Length) then
@@ -20,34 +18,34 @@ local function CalculateDistanceAhead(train, fromSegmentId, fromDistance, toSegm
 		return toDistance - fromDistance
 	end
 	local currentSegment = train.SegmentsById[fromSegmentId]
-	local sum = currentSegment.Length - fromDistance
-	local segmentId = fromSegmentId
+	local forwardSum = currentSegment.Length - fromDistance
+	local forwardSegmentId = fromSegmentId
 	for i = 1, 3 do
-		local nextSegments = train.SegmentsNext[segmentId]
-		if not nextSegments then
+		local forwardNextSegments = train.SegmentsNext[forwardSegmentId]
+		if not forwardNextSegments then
 			return false
 		end
-		segmentId = nextSegments[currentSegment.BranchIndex]
-		currentSegment = train.SegmentsById[segmentId]
-		if segmentId == toSegmentId then
-			return sum + toDistance
+		forwardSegmentId = forwardNextSegments[currentSegment.BranchIndex]
+		currentSegment = train.SegmentsById[forwardSegmentId]
+		if forwardSegmentId == toSegmentId then
+			return forwardSum + toDistance
 		end
-		sum = sum + currentSegment.Length
+		forwardSum = forwardSum + currentSegment.Length
 	end
 	local targetSegment = train.SegmentsById[toSegmentId]
-	local sum_2 = targetSegment.Length - toDistance
-	local segmentId_2 = toSegmentId
+	local backwardSum = targetSegment.Length - toDistance
+	local backwardSegmentId = toSegmentId
 	for j = 1, 3 do
-		local nextSegments_2 = train.SegmentsNext[segmentId_2]
-		if not nextSegments_2 then
+		local backwardNextSegments = train.SegmentsNext[backwardSegmentId]
+		if not backwardNextSegments then
 			break
 		end
-		segmentId_2 = nextSegments_2[targetSegment.BranchIndex]
-		targetSegment = train.SegmentsById[segmentId_2]
-		if segmentId_2 == fromSegmentId then
-			return -sum_2 - fromDistance
+		backwardSegmentId = backwardNextSegments[targetSegment.BranchIndex]
+		targetSegment = train.SegmentsById[backwardSegmentId]
+		if backwardSegmentId == fromSegmentId then
+			return -backwardSum - fromDistance
 		end
-		sum_2 = sum_2 + targetSegment.Length
+		backwardSum = backwardSum + targetSegment.Length
 	end
 	return false
 end
@@ -56,8 +54,8 @@ return {
 	CalculatePosition = function(train, offset)
 		local currentSegment, offsetRemainder = CalculateSegment(train, offset)
 		if currentSegment then
-			local CF = currentSegment.CF
-			return CF * Vector3.new(0, 0, currentSegment.Length * 0.5 - offsetRemainder), CF - CF.p
+			local segmentCFrame = currentSegment.CF
+			return segmentCFrame * Vector3.new(0, 0, currentSegment.Length * 0.5 - offsetRemainder), segmentCFrame - segmentCFrame.p
 		else
 			return false
 		end

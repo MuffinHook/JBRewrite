@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local _allAirDropData = require(ReplicatedStorage.AirDrop.Data._allAirDropData)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)

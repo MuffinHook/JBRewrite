@@ -1,94 +1,93 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Trove = require(script.Trove)
-local instance = Random.new()
-local table2 = 0
-local t = {}
-t.__index = t
-function t.new()
-	local table2 = setmetatable({}, t)
-	table2.Amplitude = 1
-	table2.Frequency = 1
-	table2.FadeInTime = 1
-	table2.FadeOutTime = 1
-	table2.SustainTime = 0
-	table2.Sustain = false
-	table2.PositionInfluence = Vector3.new(1, 1, 1)
-	table2.RotationInfluence = Vector3.new(1, 1, 1)
-	table2.TimeFunction = if RunService:IsRunning() then time else os.clock
-	table2._timeOffset = instance:NextNumber(-1000000000, 1000000000)
-	table2._startTime = 0
-	table2._trove = Trove.new()
-	table2._running = false
-	return table2
+local randomGenerator = Random.new()
+local renderNameCounter = 0
+local ShakeClass = {}
+ShakeClass.__index = ShakeClass
+function ShakeClass.new()
+	local shakeInstance = setmetatable({}, ShakeClass)
+	shakeInstance.Amplitude = 1
+	shakeInstance.Frequency = 1
+	shakeInstance.FadeInTime = 1
+	shakeInstance.FadeOutTime = 1
+	shakeInstance.SustainTime = 0
+	shakeInstance.Sustain = false
+	shakeInstance.PositionInfluence = Vector3.new(1, 1, 1)
+	shakeInstance.RotationInfluence = Vector3.new(1, 1, 1)
+	shakeInstance.TimeFunction = if RunService:IsRunning() then time else os.clock
+	shakeInstance._timeOffset = randomGenerator:NextNumber(-1000000000, 1000000000)
+	shakeInstance._startTime = 0
+	shakeInstance._trove = Trove.new()
+	shakeInstance._running = false
+	return shakeInstance
 end
-function t.InverseSquare(p1, p2)
-	if p2 < 1 then
-		p2 = 1
+function ShakeClass.InverseSquare(distance, falloff)
+	if falloff < 1 then
+		falloff = 1
 	end
-	return p1 * (1 / (p2 * p2))
+	return distance * (1 / (falloff * falloff))
 end
-function t.NextRenderName()
-	table2 = table2 + 1
-	return ("__shake_%.4i__"):format(table2)
+function ShakeClass.NextRenderName()
+	renderNameCounter = renderNameCounter + 1
+	return ("__shake_%.4i__"):format(renderNameCounter)
 end
-function t.Start(p1)
-	p1._startTime = p1.TimeFunction()
-	p1._running = true
-	p1._trove:Add(function()
-		p1._running = false
+function ShakeClass.Start(shakeInstance)
+	shakeInstance._startTime = shakeInstance.TimeFunction()
+	shakeInstance._running = true
+	shakeInstance._trove:Add(function()
+		shakeInstance._running = false
 	end)
 end
-function t.Stop(p1)
-	p1._trove:Clean()
+function ShakeClass.Stop(shakeInstance)
+	shakeInstance._trove:Clean()
 end
-function t.IsShaking(p1)
-	return p1._running
+function ShakeClass.IsShaking(shakeInstance)
+	return shakeInstance._running
 end
-function t.StopSustain(p1)
-	local instance = p1.TimeFunction()
-	p1.Sustain = false
-	p1.SustainTime = instance - p1._startTime - p1.FadeInTime
+function ShakeClass.StopSustain(shakeInstance)
+	local currentTime = shakeInstance.TimeFunction()
+	shakeInstance.Sustain = false
+	shakeInstance.SustainTime = currentTime - shakeInstance._startTime - shakeInstance.FadeInTime
 end
-function t.Update(p1)
-	local instance = false
-	local table2 = p1.TimeFunction()
-	local var3 = table2 - p1._startTime
-	local var4 = (table2 + p1._timeOffset) / p1.Frequency % 1000000
-	local var5 = 1
-	local var6 = if var3 < p1.FadeInTime then var3 / p1.FadeInTime else 1
-	if not p1.Sustain and p1.FadeInTime + p1.SustainTime < var3 then
-		if p1.FadeOutTime == 0 then
-			instance = true
+function ShakeClass.Update(shakeInstance)
+	local shouldStop = false
+	local currentTime = shakeInstance.TimeFunction()
+	local elapsedTime = currentTime - shakeInstance._startTime
+	local noisePhase = (currentTime + shakeInstance._timeOffset) / shakeInstance.Frequency % 1000000
+	local fadeOutMultiplier = 1
+	local fadeInMultiplier = if elapsedTime < shakeInstance.FadeInTime then elapsedTime / shakeInstance.FadeInTime else 1
+	if not shakeInstance.Sustain and shakeInstance.FadeInTime + shakeInstance.SustainTime < elapsedTime then
+		if shakeInstance.FadeOutTime == 0 then
+			shouldStop = true
 		else
-			var5 = 1 - (var3 - p1.FadeInTime - p1.SustainTime) / p1.FadeOutTime
-			if not p1.Sustain and p1.FadeInTime + p1.SustainTime + p1.FadeOutTime <= var3 then
-				instance = true
+			fadeOutMultiplier = 1 - (elapsedTime - shakeInstance.FadeInTime - shakeInstance.SustainTime) / shakeInstance.FadeOutTime
+			if not shakeInstance.Sustain and shakeInstance.FadeInTime + shakeInstance.SustainTime + shakeInstance.FadeOutTime <= elapsedTime then
+				shouldStop = true
 			end
 		end
 	end
-	local var7 = math.noise(var4, 0) / 2
-	local var8 = math.noise(0, var4) / 2
-	local var9 = math.noise(var4, var4) / 2
-	local vector10 = Vector3.new(var7, var8, var9) * p1.Amplitude * math.min(var6, var5)
-	if instance then
-		p1:Stop()
+	local noiseX = math.noise(noisePhase, 0) / 2
+	local noiseY = math.noise(0, noisePhase) / 2
+	local noiseZ = math.noise(noisePhase, noisePhase) / 2
+	local noiseVector = Vector3.new(noiseX, noiseY, noiseZ) * shakeInstance.Amplitude * math.min(fadeInMultiplier, fadeOutMultiplier)
+	if shouldStop then
+		shakeInstance:Stop()
 	end
-	return p1.PositionInfluence * vector10, p1.RotationInfluence * vector10, instance
+	return shakeInstance.PositionInfluence * noiseVector, shakeInstance.RotationInfluence * noiseVector, shouldStop
 end
-function t.OnSignal(p1, p2, p3)
-	return p1._trove:Connect(p2, function()
-		p3(p1:Update())
+function ShakeClass.OnSignal(shakeInstance, signal, callback)
+	return shakeInstance._trove:Connect(signal, function()
+		callback(shakeInstance:Update())
 	end)
 end
-function t.BindToRenderStep(p1, p2, p3, p4)
-	p1._trove:BindToRenderStep(p2, p3, function()
-		p4(p1:Update())
+function ShakeClass.BindToRenderStep(shakeInstance, renderStepName, priority, callback)
+	shakeInstance._trove:BindToRenderStep(renderStepName, priority, function()
+		callback(shakeInstance:Update())
 	end)
 end
-function t.Clone(p1)
-	local instance = t.new()
-	for table2, var3 in {
+function ShakeClass.Clone(shakeInstance)
+	local clonedInstance = ShakeClass.new()
+	for propertyIndex, propertyName in {
 		"Amplitude",
 		"Frequency",
 		"FadeInTime",
@@ -99,11 +98,11 @@ function t.Clone(p1)
 		"RotationInfluence",
 		"TimeFunction"
 	} do
-		instance[var3] = p1[var3]
+		clonedInstance[propertyName] = shakeInstance[propertyName]
 	end
-	return instance
+	return clonedInstance
 end
-function t.Destroy(p1)
-	p1:Stop()
+function ShakeClass.Destroy(shakeInstance)
+	shakeInstance:Stop()
 end
-return t
+return ShakeClass

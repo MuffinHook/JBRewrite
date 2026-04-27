@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
 local Signal = require(ReplicatedStorage.Std.Signal)
@@ -44,24 +43,24 @@ function t.GetName(self)
 	return InventoryItemUtils.getName(self.obj)
 end
 function t.GetOwner(self)
-	local v1 = self.obj.Parent.Parent
-	if v1 then
-		local v2 = InventoryItemOwnerBinder:Get(v1)
-		if v2 then
-			return v2
+	local ownerContainer = self.obj.Parent.Parent
+	if ownerContainer then
+		local boundOwner = InventoryItemOwnerBinder:Get(ownerContainer)
+		if boundOwner then
+			return boundOwner
 		end
-		if v1.Parent == game:GetService("Players") then
-			return v1
+		if ownerContainer.Parent == game:GetService("Players") then
+			return ownerContainer
 		end
 	end
 end
 function t.PromiseOwner(self)
-	local v1 = self.obj.Parent.Parent
-	if v1 then
-		if v1.Parent == game:GetService("Players") then
-			return Promise.resolve(v1)
+	local ownerContainer = self.obj.Parent.Parent
+	if ownerContainer then
+		if ownerContainer.Parent == game:GetService("Players") then
+			return Promise.resolve(ownerContainer)
 		else
-			return InventoryItemOwnerBinder:Promise(v1)
+			return InventoryItemOwnerBinder:Promise(ownerContainer)
 		end
 	end
 end
@@ -80,10 +79,10 @@ end
 function t.GetEquippedSignal(self)
 	return InventoryItemUtils.getEquippedSignal(self.obj)
 end
-function t.AttemptSetEquipped(self, p2)
-	assert(p2 ~= nil, "missing value")
-	InventoryItemUtils.setEquipped(self.obj, p2)
-	self.obj:FindFirstChild(InventoryItemConsts.EQUIP_REMOTE_NAME):FireServer(p2)
+function t.AttemptSetEquipped(self, equippedValue)
+	assert(equippedValue ~= nil, "missing value")
+	InventoryItemUtils.setEquipped(self.obj, equippedValue)
+	self.obj:FindFirstChild(InventoryItemConsts.EQUIP_REMOTE_NAME):FireServer(equippedValue)
 end
 function t.AttemptSelect(self)
 	self.onAttemptSelect:Fire()

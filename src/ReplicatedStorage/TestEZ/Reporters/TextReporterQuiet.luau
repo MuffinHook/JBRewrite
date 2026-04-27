@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local TestService = game:GetService("TestService")
 local TestEnum = require(script.Parent.Parent.TestEnum)
 local indentation = (" "):rep(3)

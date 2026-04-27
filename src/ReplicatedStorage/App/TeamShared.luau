@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Std.Promise)
@@ -18,8 +16,8 @@ local module = {
 	end
 }
 function module.isTeamSwitchingEnabled()
-	local v1, v2 = module.promiseIsTeamSwitchingEnabled():await()
-	return v1 and v2
+	local succeeded, isEnabled = module.promiseIsTeamSwitchingEnabled():await()
+	return succeeded and isEnabled
 end
 function module.isTeamFull(teamToCheck)
 	local playersList = Players:GetPlayers()

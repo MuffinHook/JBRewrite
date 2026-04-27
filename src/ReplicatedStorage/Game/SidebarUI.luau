@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
@@ -26,31 +25,31 @@ local t = {
 	onDevPanelToggle = Signal.new(),
 	onGarageToggle = Signal.new()
 }
-local v1, v2 = Roact.createBinding("4:00 PM")
-t.time = v1
-t.updateTime = v2
-function t.Init(p1)
-	local em = p1.em
-	local v1 = p1.Event
+local timeBinding, updateTimeBinding = Roact.createBinding("4:00 PM")
+t.time = timeBinding
+t.updateTime = updateTimeBinding
+function t.Init(initConfig)
+	local em = initConfig.em
+	local switchTeamEvent = initConfig.Event
 	local CashBuyUI = require(ReplicatedStorage.Game.CashBuyUI)
-	local v2 = Roact.createRef()
+	local garageButtonRef = Roact.createRef()
 	BigButtonService.add({
 		name = "Garage",
 		imageId = 8733342027,
 		displayOrder = 10,
-		ref = v2,
+		ref = garageButtonRef,
 		onClick = function()
 			t.onGarageToggle:Fire()
 		end
 	})
-	UserInputService.InputBegan:Connect(function(p1, p2)
-		if not p2 and p1.KeyCode == Enum.KeyCode.DPadUp then
+	UserInputService.InputBegan:Connect(function(input, isGamepad)
+		if not isGamepad and input.KeyCode == Enum.KeyCode.DPadUp then
 			t.onGarageToggle:Fire()
 		end
 	end)
-	local v3 = nil
-	TeamShared.promiseIsTeamSwitchingEnabled():andThen(function(p1)
-		if p1 then
+	local teamSwitchConfirmation = nil
+	TeamShared.promiseIsTeamSwitchingEnabled():andThen(function(isTeamSwitchEnabled)
+		if isTeamSwitchEnabled then
 			BigButtonService.add({
 				name = "TeamSwitch",
 				imageId = 4912231691,
@@ -58,18 +57,18 @@ function t.Init(p1)
 				onClick = function()
 					local ChoosingTeam = Players.LocalPlayer:FindFirstChild("ChoosingTeam")
 					if ChoosingTeam and ChoosingTeam.Value then
-					elseif v3 == nil then
-						v3 = Confirmation.new("Are you sure you want to switch teams?")
-						v3.OnYes:Connect(function()
-							v3 = nil
-							v1:FireServer("l" .. "" .. ("y29g6ufpx"):sub(4, 7):reverse() .. "" .. "" .. ("g1brs4r"):sub(5, 6):reverse() .. "2")
+					elseif teamSwitchConfirmation == nil then
+						teamSwitchConfirmation = Confirmation.new("Are you sure you want to switch teams?")
+						teamSwitchConfirmation.OnYes:Connect(function()
+							teamSwitchConfirmation = nil
+							switchTeamEvent:FireServer("lfu6g4s2")
 						end)
-						v3.OnNo:Connect(function()
-							v3 = nil
+						teamSwitchConfirmation.OnNo:Connect(function()
+							teamSwitchConfirmation = nil
 						end)
 					else
-						v3:Destroy()
-						v3 = nil
+						teamSwitchConfirmation:Destroy()
+						teamSwitchConfirmation = nil
 					end
 				end
 			})
@@ -144,7 +143,7 @@ function t.Init(p1)
 		local function doesHaveVIP()
 			return GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP)
 		end
-		local t2 = {
+		local goHomeButtonConfig = {
 			name = "GoHome",
 			displayOrder = 70,
 			onClick = function()
@@ -154,18 +153,18 @@ function t.Init(p1)
 					})
 				end
 				if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then
-					if v3 == nil then
-						v3 = Confirmation.new("Are you sure you want to return to Jailbreak?")
-						v3.OnYes:Connect(function()
-							v3 = nil
+					if teamSwitchConfirmation == nil then
+						teamSwitchConfirmation = Confirmation.new("Are you sure you want to return to Jailbreak?")
+						teamSwitchConfirmation.OnYes:Connect(function()
+							teamSwitchConfirmation = nil
 							ReplicatedStorage:FindFirstChild(WorldTeleportConsts.TELEPORT_TO_WORLD_FROM_TEAM_SWITCH_NAME):FireServer(RunConsts.MAIN_WORLD_NAME)
 						end)
-						v3.OnNo:Connect(function()
-							v3 = nil
+						teamSwitchConfirmation.OnNo:Connect(function()
+							teamSwitchConfirmation = nil
 						end)
 					else
-						v3:Destroy()
-						v3 = nil
+						teamSwitchConfirmation:Destroy()
+						teamSwitchConfirmation = nil
 					end
 				else
 					GamepassUtils.PromptGamepass(GamepassUtils.EnumGamepass.TradingVIP)
@@ -173,72 +172,72 @@ function t.Init(p1)
 			end
 		}
 		local function updateProps()
-			t2.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
+			goHomeButtonConfig.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
 		end
-		t2.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
-		BigButtonService.add(t2)
+		goHomeButtonConfig.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
+		BigButtonService.add(goHomeButtonConfig)
 		GamepassSystem.GetGamepassOwnedSignal(GamepassUtils.EnumGamepass.TradingVIP):Connect(function()
-			t2.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
+			goHomeButtonConfig.imageId = if GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.TradingVIP) then 10087230550 else 10087230159
 			BigButtonService.triggerUpdate:Fire()
 		end)
 	end
 	local GameUtil = require(ReplicatedStorage.Game.GameUtil)
-	function em.zyfagb6d(p1)
-		if not (p1 == "Criminal") then
+	function em.zyfagb6d(role)
+		if not (role == "Criminal") then
 			GameUtil.bounty = 0
 			GameUtil.onBountyChanged:Fire(GameUtil.bounty)
 		end
 	end
-	function em.rglritaz(p1)
-		GameUtil.bounty = p1
+	function em.rglritaz(bountyAmount)
+		GameUtil.bounty = bountyAmount
 		GameUtil.onBountyChanged:Fire(GameUtil.bounty)
 	end
 	t.SetSafeCount(0)
-	store.changed:connect(function(p1, p2)
-		if p1.safesInventoryItems ~= p2.safesInventoryItems then
-			t.SetSafeCount(#p1.safesInventoryItems)
+	store.changed:connect(function(newState, previousState)
+		if newState.safesInventoryItems ~= previousState.safesInventoryItems then
+			t.SetSafeCount(#newState.safesInventoryItems)
 		end
 	end)
-	UserInputService.InputBegan:Connect(function(p1)
-		if p1.UserInputType == Enum.UserInputType.Gamepad1 and (p1.KeyCode == Enum.KeyCode.ButtonSelect and GuiService.SelectedObject ~= nil) then
-			Utils.selectIfGamepad(v2:getValue())
+	UserInputService.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.Gamepad1 and (input.KeyCode == Enum.KeyCode.ButtonSelect and GuiService.SelectedObject ~= nil) then
+			Utils.selectIfGamepad(garageButtonRef:getValue())
 		end
 	end)
 	local function getComponent()
-		local v2 = Utils.isSmallScreen()
-		local t = {
+		local isSmallScreen = Utils.isSmallScreen()
+		local screenGuiProps = {
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 			ScreenInsets = Enum.ScreenInsets.TopbarSafeInsets,
 			ResetOnSpawn = false
 		}
-		local t2 = {}
-		t2.Buttons = if v2 then createElement(TopbarHolder, {
+		local screenGuiChildren = {}
+		screenGuiChildren.Buttons = if isSmallScreen then createElement(TopbarHolder, {
 	color = Settings.TeamColor[GameUtil.Team],
 	buttons = BigButtonService.active
 }) else nil
-		return createElement("ScreenGui", t, t2)
+		return createElement("ScreenGui", screenGuiProps, screenGuiChildren)
 	end
-	local v5 = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "SidebarGui")
-	local v6 = nil
+	local mountedGui = Roact.mount(getComponent(), Players.LocalPlayer.PlayerGui, "SidebarGui")
+	local resizeDebounceTask = nil
 	Utils.getViewportSizeChangedSignal():Connect(function()
-		if v6 then
-			task.cancel(v6)
+		if resizeDebounceTask then
+			task.cancel(resizeDebounceTask)
 		end
-		v6 = task.delay(0.1, function()
-			Roact.update(v5, getComponent())
-			v6 = nil
+		resizeDebounceTask = task.delay(0.1, function()
+			Roact.update(mountedGui, getComponent())
+			resizeDebounceTask = nil
 		end)
 	end)
-	GameUtil.OnTeamChanged:Connect(function(p1)
-		Roact.update(v5, getComponent())
+	GameUtil.OnTeamChanged:Connect(function(newTeam)
+		Roact.update(mountedGui, getComponent())
 	end)
 end
-function t.SetTime(p1)
-	t.updateTime(p1)
+function t.SetTime(timeString)
+	t.updateTime(timeString)
 end
-function t.SetSafeCount(p1)
+function t.SetSafeCount(safeCount)
 	if t.safesButton then
-		t.safesButton.count = p1
+		t.safesButton.count = safeCount
 		BigButtonService.triggerUpdate:Fire()
 	end
 end

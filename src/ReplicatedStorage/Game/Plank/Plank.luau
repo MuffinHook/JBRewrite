@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -8,11 +6,11 @@ local Joint = require(ReplicatedStorage.Std.Joint)
 require(ReplicatedStorage.Std.Audio)
 local PlankConsts = require(script.Parent.PlankConsts)
 local DoorUtils = require(ReplicatedStorage.Door2.DoorUtils)
-local t = {}
-t.__index = t
-function t.new(door)
+local Plank = {}
+Plank.__index = Plank
+function Plank.new(door)
 	local instance = {}
-	setmetatable(instance, t)
+	setmetatable(instance, Plank)
 	instance._maid = Maid.new()
 	instance._obj = door
 	instance._maid:GiveTask(function()
@@ -26,9 +24,9 @@ function t.new(door)
 			clonedParts = {}
 			regenerationPromise = Promise.delay(DoorUtils.getDuration(door)):andThen(function()
 				local Model = Instance.new("Model")
-				for i, v in ipairs(door:GetDescendants()) do
-					if v:IsA("BasePart") then
-						local clonedPart = v:Clone()
+				for i, descendant in ipairs(door:GetDescendants()) do
+					if descendant:IsA("BasePart") then
+						local clonedPart = descendant:Clone()
 						clonedPart.Parent = Model
 						local heartbeatConnection = nil
 						heartbeatConnection = RunService.Heartbeat:Connect(function()
@@ -45,20 +43,20 @@ function t.new(door)
 							end
 						end)
 						table.insert(clonedParts, clonedPart)
-						transparencyMap[v] = v.Transparency
-						v.Transparency = 1
+						transparencyMap[descendant] = descendant.Transparency
+						descendant.Transparency = 1
 					end
 				end
 				Model.Parent = workspace
 				Joint.WeldAllTo(Model, Model:GetChildren()[1])
 			end):andThenCall(Promise.delay, PlankConsts.REGEN_DURATION):finally(function()
-				for i, v in ipairs(door:GetDescendants()) do
-					if transparencyMap[v] then
-						v.Transparency = transparencyMap[v]
+				for i, descendant in ipairs(door:GetDescendants()) do
+					if transparencyMap[descendant] then
+						descendant.Transparency = transparencyMap[descendant]
 					end
 				end
-				for i, v in ipairs(clonedParts) do
-					v:Destroy()
+				for i, clonedPart in ipairs(clonedParts) do
+					clonedPart:Destroy()
 				end
 				clonedParts = nil
 			end):finally(function()
@@ -68,9 +66,9 @@ function t.new(door)
 	end))
 	return instance
 end
-function t.Destroy(p1)
-	local _maid = p1._maid
-	p1._maid = nil
+function Plank.Destroy(plankInstance)
+	local _maid = plankInstance._maid
+	plankInstance._maid = nil
 	_maid:Destroy()
 end
-return t
+return Plank

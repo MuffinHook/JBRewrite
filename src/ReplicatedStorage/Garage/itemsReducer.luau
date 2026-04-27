@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("ServerStorage")
 local GarageItemUtils = require(script.Parent.GarageItemUtils)
@@ -18,218 +17,218 @@ local VehicleConf = require(ReplicatedStorage.Game.Garage.VehicleConf)
 local SaleConsts = require(ReplicatedStorage.Sale.SaleConsts)
 local SaleShared = require(ReplicatedStorage.Sale.SaleShared)
 local CreatorValues = require(ReplicatedStorage.Trade.CreatorValues)
-local function updateVehicleCamera(p1, p2)
-	local v1 = os.clock() / 2
-	p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1 * 0.5) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, p2.BoundingBox.Size.Magnitude * 0.8)
+local function updateVehicleCamera(camera, model)
+	local rotationTime = os.clock() / 2
+	camera.CFrame = CFrame.Angles(0, rotationTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(rotationTime * 0.5) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, model.BoundingBox.Size.Magnitude * 0.8)
 end
-local function cleanup(p1)
-	if p1.inst then
-		p1.inst:Destroy()
-		p1.inst = nil
+local function cleanup(vehicleData)
+	if vehicleData.inst then
+		vehicleData.inst:Destroy()
+		vehicleData.inst = nil
 	end
-	p1.updateCamera = nil
+	vehicleData.updateCamera = nil
 end
-local function setPageSpawn(p1, p2)
-	local t = {}
-	for i, v in ipairs(p1) do
-		if v.inst then
-			v.inst:Destroy()
-			v.inst = nil
+local function setPageSpawn(vehicles, sortOptions)
+	local spawnItems = {}
+	for i, vehicle in ipairs(vehicles) do
+		if vehicle.inst then
+			vehicle.inst:Destroy()
+			vehicle.inst = nil
 		end
-		v.updateCamera = nil
+		vehicle.updateCamera = nil
 	end
-	local v1 = PopularSort.getRaw()
+	local popularData = PopularSort.getRaw()
 	for i = 1, #VehicleData do
-		local v2, v3
-		local v4 = VehicleData[i]
-		if not (v4.NoGarageUI or v4.NoMainWorldGarageSpawn and RunUtils.isMainWorld() or v4.NoTradeWorldGarageSpawn and RunUtils.isTradeWorld()) then
-			local v5 = v1.Vehicles[v4.Make]
-			if v4.Make == "Camaro" then
-				v5 = 0
+		local offSalePrice, vehicleConfig
+		local vehicleDataEntry = VehicleData[i]
+		if not (vehicleDataEntry.NoGarageUI or vehicleDataEntry.NoMainWorldGarageSpawn and RunUtils.isMainWorld() or vehicleDataEntry.NoTradeWorldGarageSpawn and RunUtils.isTradeWorld()) then
+			local salesIndex = popularData.Vehicles[vehicleDataEntry.Make]
+			if vehicleDataEntry.Make == "Camaro" then
+				salesIndex = 0
 			end
-			local v6 = ItemUtils.createVehicleItemTable(v4.Make)
-			local v7 = ItemUtils.getFullNameFromTable(v6)
-			local Price = v4.Price
-			if SaleShared.isVehicleOnSale(v4.Make) then
-				v5, v2, Price = -i, Price, math.floor(Price * SaleConsts.VEHICLE_PRICE_MULTIPLIER)
+			local vehicleItemTable = ItemUtils.createVehicleItemTable(vehicleDataEntry.Make)
+			local fullItemName = ItemUtils.getFullNameFromTable(vehicleItemTable)
+			local Price = vehicleDataEntry.Price
+			if SaleShared.isVehicleOnSale(vehicleDataEntry.Make) then
+				salesIndex, offSalePrice, Price = -i, Price, math.floor(Price * SaleConsts.VEHICLE_PRICE_MULTIPLIER)
 			else
-				v2 = nil
+				offSalePrice = nil
 			end
-			local t2 = {
+			local vehicleItem = {
 				primaryIndex = i,
-				salesIndex = v5,
-				vehicleType = v4.Type,
-				vehicleMake = v4.Make,
-				hiddenAll = v4.HiddenAll,
-				limited = GarageUtils.isVehicleLimited(v4)
+				salesIndex = salesIndex,
+				vehicleType = vehicleDataEntry.Type,
+				vehicleMake = vehicleDataEntry.Make,
+				hiddenAll = vehicleDataEntry.HiddenAll,
+				limited = GarageUtils.isVehicleLimited(vehicleDataEntry)
 			}
-			t2.lite = v4.Lite or SaleShared.isVehicleOnSale(v4.Make)
-			t2.name = v4.Make
-			t2.title = ItemUtils.getTranslatedTitleFromItemTable(v6)
-			t2.offSalePrice = v2
-			t2.price = Price
-			t2.level = v4.Level
-			t2.season = v4.Season
-			function t2.getInst()
-				return getDefaultVehicleModel(v4.Make, v4.Type)
+			vehicleItem.lite = vehicleDataEntry.Lite or SaleShared.isVehicleOnSale(vehicleDataEntry.Make)
+			vehicleItem.name = vehicleDataEntry.Make
+			vehicleItem.title = ItemUtils.getTranslatedTitleFromItemTable(vehicleItemTable)
+			vehicleItem.offSalePrice = offSalePrice
+			vehicleItem.price = Price
+			vehicleItem.level = vehicleDataEntry.Level
+			vehicleItem.season = vehicleDataEntry.Season
+			function vehicleItem.getInst()
+				return getDefaultVehicleModel(vehicleDataEntry.Make, vehicleDataEntry.Type)
 			end
-			t2.updateCamera = updateVehicleCamera
-			t2.creatorName = CreatorValues[v7] and CreatorValues[v7].CreatorName
-			t2.aerialOnly = v4.AerialSpawn
-			if v4.NoMainWorldGarageSpawn then
-				v3 = not RunUtils.isMainWorld()
-				if v3 then
-					v3 = if v4.NoTradeWorldGarageSpawn then not RunUtils.isTradeWorld() and not t2.limited else not t2.limited
+			vehicleItem.updateCamera = updateVehicleCamera
+			vehicleItem.creatorName = CreatorValues[fullItemName] and CreatorValues[fullItemName].CreatorName
+			vehicleItem.aerialOnly = vehicleDataEntry.AerialSpawn
+			if vehicleDataEntry.NoMainWorldGarageSpawn then
+				vehicleConfig = not RunUtils.isMainWorld()
+				if vehicleConfig then
+					vehicleConfig = if vehicleDataEntry.NoTradeWorldGarageSpawn then not RunUtils.isTradeWorld() and not vehicleItem.limited else not vehicleItem.limited
 				end
 			else
-				v3 = if v4.NoTradeWorldGarageSpawn then not RunUtils.isTradeWorld() and not t2.limited else not t2.limited
+				vehicleConfig = if vehicleDataEntry.NoTradeWorldGarageSpawn then not RunUtils.isTradeWorld() and not vehicleItem.limited else not vehicleItem.limited
 			end
-			t2.available = v3
-			table.insert(t, t2)
+			vehicleItem.available = vehicleConfig
+			table.insert(spawnItems, vehicleItem)
 		end
 	end
-	if p2.sortId then
-		table.sort(t, SortUtils.getSortFunc(p2.sortId))
+	if sortOptions.sortId then
+		table.sort(spawnItems, SortUtils.getSortFunc(sortOptions.sortId))
 	end
-	return t
+	return spawnItems
 end
-local function setCategory(p1, p2)
-	assert(p2.categoryName ~= nil, "missing category Name")
-	for i, v in ipairs(p1) do
-		if v.inst then
-			v.inst:Destroy()
-			v.inst = nil
+local function setCategory(items, categoryOptions)
+	assert(categoryOptions.categoryName ~= nil, "missing category Name")
+	for i, item in ipairs(items) do
+		if item.inst then
+			item.inst:Destroy()
+			item.inst = nil
 		end
-		v.updateCamera = nil
+		item.updateCamera = nil
 	end
-	local categoryName = p2.categoryName
-	local v2 = StoreData.GetCategoryByName(categoryName)
-	local t = {}
-	local v3 = VehicleUtils.GetLocalVehiclePacket()
-	local v4 = PopularSort.getRaw()
-	local v6
-	for v9, v10 in if v2.GetItems then v2.GetItems() else v2.Items do
-		local v7, v8
-		local v11 = v10.CategoryName or categoryName
-		v6 = if v11 == categoryName then v2 else StoreData.GetCategoryByName(v11)
-		local v12 = not v10.NoGarageUI
-		if v3 then
-			if v10.Makes and not v10.Makes[v3.Make] then
-				v12 = false
+	local categoryName = categoryOptions.categoryName
+	local categoryData = StoreData.GetCategoryByName(categoryName)
+	local categoryItems = {}
+	local playerVehiclePacket = VehicleUtils.GetLocalVehiclePacket()
+	local popularData = PopularSort.getRaw()
+	local categoryReference
+	for itemIndex, itemEntry in if categoryData.GetItems then categoryData.GetItems() else categoryData.Items do
+		local onItemSelectedCallback, isItemValid
+		local itemCategoryName = itemEntry.CategoryName or categoryName
+		categoryReference = if itemCategoryName == categoryName then categoryData else StoreData.GetCategoryByName(itemCategoryName)
+		local isItemEligible = not itemEntry.NoGarageUI
+		if playerVehiclePacket then
+			if itemEntry.Makes and not itemEntry.Makes[playerVehiclePacket.Make] then
+				isItemEligible = false
 			end
-			if v2.IsValidForMake and not v2.IsValidForMake(v10) then
-				v12 = false
+			if categoryData.IsValidForMake and not categoryData.IsValidForMake(itemEntry) then
+				isItemEligible = false
 			end
-			local v13 = VehicleConf.MAP_CATEGORY_TO_FUNC[v11]
-			if v13 and not v13(v3) then
-				v12 = false
+			local categoryValidator = VehicleConf.MAP_CATEGORY_TO_FUNC[itemCategoryName]
+			if categoryValidator and not categoryValidator(playerVehiclePacket) then
+				isItemEligible = false
 			end
 		end
-		if v12 then
-			local v14 = v10.Name
-			local v15 = v4[v11] and v4[v11][v14]
-			local v16 = GarageItemUtils.getVehicleCustomizationItemOwned(v11, v14)
-			local Price = v10.Price
-			if SaleShared.isVehicleCustomizationOnSale(v11, v14) then
-				v15, v7, Price = -v9, Price, math.floor(Price * SaleConsts.VEHICLE_CUSTOMIZATION_PRICE_MULTIPLIER)
+		if isItemEligible then
+			local itemName = itemEntry.Name
+			local itemPopularityIndex = popularData[itemCategoryName] and popularData[itemCategoryName][itemName]
+			local customizationItemData = GarageItemUtils.getVehicleCustomizationItemOwned(itemCategoryName, itemName)
+			local Price = itemEntry.Price
+			if SaleShared.isVehicleCustomizationOnSale(itemCategoryName, itemName) then
+				itemPopularityIndex, onItemSelectedCallback, Price = -itemIndex, Price, math.floor(Price * SaleConsts.VEHICLE_CUSTOMIZATION_PRICE_MULTIPLIER)
 			else
-				v7 = nil
+				onItemSelectedCallback = nil
 			end
-			if v10.FakeLimited then
-				v15 = -v9
+			if itemEntry.FakeLimited then
+				itemPopularityIndex = -itemIndex
 			end
-			local v19 = ItemUtils.getFullNameFromTable(v16)
-			local v20 = ItemUtils.getTranslatedTitleFromItemTable(v16)
-			local t2 = {
-				id = v19,
-				primaryIndex = v9,
-				salesIndex = v15,
-				name = v10.Name,
-				title = v20,
-				offSalePrice = v7,
+			local customizationFullName = ItemUtils.getFullNameFromTable(customizationItemData)
+			local customizationTitle = ItemUtils.getTranslatedTitleFromItemTable(customizationItemData)
+			local customizationItem = {
+				id = customizationFullName,
+				primaryIndex = itemIndex,
+				salesIndex = itemPopularityIndex,
+				name = itemEntry.Name,
+				title = customizationTitle,
+				offSalePrice = onItemSelectedCallback,
 				price = Price,
-				hiddenAll = v10.HiddenAll,
-				limited = GarageUtils.isVehicleCustomizationLimited(v10),
-				isNone = v10.None,
-				level = v10.Level,
-				season = v10.Season,
-				topPct = v10.TopPct,
-				vip = v10.VIP,
-				categoryName = v11,
+				hiddenAll = itemEntry.HiddenAll,
+				limited = GarageUtils.isVehicleCustomizationLimited(itemEntry),
+				isNone = itemEntry.None,
+				level = itemEntry.Level,
+				season = itemEntry.Season,
+				topPct = itemEntry.TopPct,
+				vip = itemEntry.VIP,
+				categoryName = itemCategoryName,
 				getInst = function()
-					return v6.GetInstance(v10)
+					return categoryReference.GetInstance(itemEntry)
 				end,
-				updateCamera = v6.Update
+				updateCamera = categoryReference.Update
 			}
-			v8 = if v6.onItemSelected == nil then false else function()
-	return v6.onItemSelected(v10)
-end
-			t2.onItemSelected = v8
-			t2.creatorName = CreatorValues[v19] and CreatorValues[v19].CreatorName
-			t2.fakeLimited = v10.FakeLimited
-			t2.available = not t2.limited
-			table.insert(t, t2)
+			isItemValid = if categoryReference.onItemSelected == nil then false else function()
+		return categoryReference.onItemSelected(itemEntry)
+	end
+			customizationItem.onItemSelected = isItemValid
+			customizationItem.creatorName = CreatorValues[customizationFullName] and CreatorValues[customizationFullName].CreatorName
+			customizationItem.fakeLimited = itemEntry.FakeLimited
+			customizationItem.available = not customizationItem.limited
+			table.insert(categoryItems, customizationItem)
 		end
 	end
-	if p2.sortId then
-		table.sort(t, SortUtils.getSortFunc(p2.sortId))
+	if categoryOptions.sortId then
+		table.sort(categoryItems, SortUtils.getSortFunc(categoryOptions.sortId))
 	end
-	return t
+	return categoryItems
 end
 local function setPageSaves()
-	local t = {}
+	local saveSlots = {}
 	for i = 1, GarageConsts.NUM_SAVE_SLOTS do
-		local v1
-		local t2 = {
+		local isVipSlot
+		local saveSlot = {
 			name = "s" .. i,
 			title = ("Save #%d"):format(i)
 		}
-		v1 = GarageConsts.NUM_FREE_SAVE_SLOTS < i
-		t2.vip = v1
-		t2.available = true
-		function t2.getInstForSelection(p1)
-			local v1 = VehicleUtils.GetLocalVehiclePacket()
-			local v2 = getDefaultVehicleModel(v1.Make, v1.Type)
-			local v3 = StoreData.GetMapFromSelection(p1)
-			Customize.ApplyAll(v3, {
-				Model = v2,
-				Make = v1.Make,
-				Type = v1.Type
-			}, p1)
-			return v2
+		isVipSlot = GarageConsts.NUM_FREE_SAVE_SLOTS < i
+		saveSlot.vip = isVipSlot
+		saveSlot.available = true
+		function saveSlot.getInstForSelection(selectionData)
+			local playerVehicle = VehicleUtils.GetLocalVehiclePacket()
+			local vehicleModel = getDefaultVehicleModel(playerVehicle.Make, playerVehicle.Type)
+			local mapData = StoreData.GetMapFromSelection(selectionData)
+			Customize.ApplyAll(mapData, {
+				Model = vehicleModel,
+				Make = playerVehicle.Make,
+				Type = playerVehicle.Type
+			}, selectionData)
+			return vehicleModel
 		end
-		t2.updateCamera = updateVehicleCamera
-		table.insert(t, t2)
+		saveSlot.updateCamera = updateVehicleCamera
+		table.insert(saveSlots, saveSlot)
 	end
-	return t
+	return saveSlots
 end
 return Rodux.createReducer({}, {
-	setCategory = function(p1, p2)
-		return setCategory(p1, p2)
+	setCategory = function(items, categoryOptions)
+		return setCategory(items, categoryOptions)
 	end,
 	setSaveSlot = function()
 		return setPageSaves()
 	end,
-	setPage = function(p1, p2)
-		local pageName = p2.pageName
+	setPage = function(items, pageOptions)
+		local pageName = pageOptions.pageName
 		if pageName == "Spawn" then
-			return setPageSpawn(p1, p2)
+			return setPageSpawn(items, pageOptions)
 		end
 		if pageName == "Customize" then
-			return setCategory(p1, p2)
+			return setCategory(items, pageOptions)
 		end
 		if pageName == "Saves" then
 			return setPageSaves()
 		end
 		error("Page not handled by itemsReducer")
 	end,
-	setSort = function(p1, p2)
-		assert(p2.id ~= nil, "missing sort id")
-		local t = {}
-		for i = 1, #p1 do
-			table.insert(t, p1[i])
+	setSort = function(items, sortOptions)
+		assert(sortOptions.id ~= nil, "missing sort id")
+		local sortedItems = {}
+		for i = 1, #items do
+			table.insert(sortedItems, items[i])
 		end
-		table.sort(t, SortUtils.getSortFunc(p2.id))
-		return t
+		table.sort(sortedItems, SortUtils.getSortFunc(sortOptions.id))
+		return sortedItems
 	end
 })

@@ -1,8 +1,6 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-local t = {
+local testTable1 = {
 	best = 1,
 	best2 = 2,
 	history = {
@@ -13,7 +11,7 @@ local t = {
 		}
 	}
 }
-local t2 = {
+local testTable2 = {
 	best2 = 2,
 	best = 1,
 	history = {
@@ -24,7 +22,7 @@ local t2 = {
 		}
 	}
 }
-local t3 = {
+local testTable3 = {
 	best = 1,
 	history = {
 		user2 = "1231",
@@ -35,7 +33,7 @@ local t3 = {
 	},
 	best2 = 2
 }
-local t4 = {
+local testTable4 = {
 	best = 1,
 	history = {
 		user2 = "1231",
@@ -46,7 +44,7 @@ local t4 = {
 	},
 	best4 = 2
 }
-local t5 = {
+local testTable5 = {
 	best = "1",
 	best2 = 2,
 	history = {
@@ -57,7 +55,7 @@ local t5 = {
 		}
 	}
 }
-local t6 = {
+local testTable6 = {
 	best = 1,
 	best2 = 2,
 	history = {
@@ -66,7 +64,7 @@ local t6 = {
 		user3 = {}
 	}
 }
-local t7 = {
+local testTable7 = {
 	best = 1,
 	best2 = 2,
 	history = {
@@ -75,7 +73,7 @@ local t7 = {
 		user3 = {}
 	}
 }
-local t8 = {
+local testTable8 = {
 	best = 1,
 	best2 = 2,
 	history = {
@@ -86,7 +84,7 @@ local t8 = {
 		}
 	}
 }
-local t9 = {
+local testTable9 = {
 	History = {
 		{
 			TradeTime = 1651798785,
@@ -98,7 +96,7 @@ local t9 = {
 	Name = "Level 1",
 	SubItemType = "Brakes"
 }
-local t10 = {
+local testTable10 = {
 	History = {
 		{
 			TradeTime = 1651794488,
@@ -114,7 +112,7 @@ local t10 = {
 	Name = "Level 1",
 	SubItemType = "Brakes"
 }
-local t11 = {
+local testTable11 = {
 	History = {
 		{
 			TradeTime = 1651798785,
@@ -130,7 +128,7 @@ local t11 = {
 	Name = "Level 1",
 	SubItemType = "Brakes"
 }
-local t12 = {
+local testTable12 = {
 	History = {
 		{
 			TradeTime = 1651794488,
@@ -146,7 +144,7 @@ local t12 = {
 	Name = "Level 1",
 	SubItemType = "Brakes"
 }
-local t13 = {
+local testTable13 = {
 	History = {
 		{
 			TradeTime = 1651794488,
@@ -162,7 +160,7 @@ local t13 = {
 	Name = "Level 1",
 	SubItemType = "Brakes"
 }
-local t14 = {
+local testTable14 = {
 	CreationTime = 109123,
 	History = {
 		{
@@ -175,7 +173,7 @@ local t14 = {
 	Name = "Level 1",
 	SubItemType = "Brakes"
 }
-local t15 = {
+local testTable15 = {
 	CreationTime = 1652224741,
 	History = {
 		{
@@ -189,7 +187,7 @@ local t15 = {
 	Make = "Roadster",
 	Miles = 0
 }
-local t16 = {
+local testTable16 = {
 	CreationTime = 1652224741,
 	History = {
 		{
@@ -203,7 +201,7 @@ local t16 = {
 	Make = "Roadster",
 	Miles = 0
 }
-local t17 = {
+local testTable17 = {
 	CreationTime = 1652224741,
 	History = {
 		{
@@ -217,7 +215,7 @@ local t17 = {
 	Make = "Roadster",
 	Miles = 0
 }
-local t18 = {
+local testTable18 = {
 	CreationTime = 1652224741,
 	History = {
 		{
@@ -231,7 +229,7 @@ local t18 = {
 	Make = "Roadster",
 	Miles = 0
 }
-local t19 = {
+local testTable19 = {
 	CreationTime = 1652422808,
 	History = {
 		{
@@ -243,7 +241,7 @@ local t19 = {
 	ItemType = "Vehicle",
 	Make = "Roadster"
 }
-local t20 = {
+local testTable20 = {
 	CreationTime = 1652422808,
 	History = {
 		{
@@ -260,90 +258,90 @@ local t20 = {
 return function()
 	describe("CheckTableDeepCompare", function()
 		it("should identify different tables", function()
-			expect((TableUtils.deepCompareTables(t, t2))).to.equal(false)
+			expect((TableUtils.deepCompareTables(testTable1, testTable2))).to.equal(false)
 		end)
 		it("should identify same tables", function()
-			expect((TableUtils.deepCompareTables(t, t3))).to.equal(true)
+			expect((TableUtils.deepCompareTables(testTable1, testTable3))).to.equal(true)
 		end)
 		it("should identify exact same tables", function()
-			expect((TableUtils.deepCompareTables(t15, t16, false, true))).to.equal(true)
+			expect((TableUtils.deepCompareTables(testTable15, testTable16, false, true))).to.equal(true)
 		end)
 		it("should identify same tables with arrays", function()
-			expect((TableUtils.deepCompareTables(t9, t11, true, false))).to.equal(true)
+			expect((TableUtils.deepCompareTables(testTable9, testTable11, true, false))).to.equal(true)
 		end)
 		it("should identify same tables with arrays reversed", function()
-			expect((TableUtils.deepCompareTables(t11, t9, true, false))).to.equal(true)
+			expect((TableUtils.deepCompareTables(testTable11, testTable9, true, false))).to.equal(true)
 		end)
 		it("should identify different tables with arrays on format", function()
-			expect((TableUtils.deepCompareTables(t9, t10, true, false))).to.equal(false)
+			expect((TableUtils.deepCompareTables(testTable9, testTable10, true, false))).to.equal(false)
 		end)
 		it("should identify different tables with arrays on value", function()
-			expect((TableUtils.deepCompareTables(t12, t13, false, true))).to.equal(false)
+			expect((TableUtils.deepCompareTables(testTable12, testTable13, false, true))).to.equal(false)
 		end)
 		it("should identify same tables with arrays on format including array length matching", function()
-			expect((TableUtils.deepCompareTables(t12, t13, true, true))).to.equal(true)
+			expect((TableUtils.deepCompareTables(testTable12, testTable13, true, true))).to.equal(true)
 		end)
 		it("should identify diff tables with arrays on format with wrong array lengths", function()
-			expect((TableUtils.deepCompareTables(t12, t14, true, true))).to.equal(false)
+			expect((TableUtils.deepCompareTables(testTable12, testTable14, true, true))).to.equal(false)
 		end)
 		it("should identify arrays with inconsistent formatting", function()
-			expect((TableUtils.deepCompareTables(t17, t18, true, true))).to.equal(false)
+			expect((TableUtils.deepCompareTables(testTable17, testTable18, true, true))).to.equal(false)
 		end)
 		it("should identify arrays with inconsistent formatting when comparing values", function()
-			expect((TableUtils.deepCompareTables(t17, t18, false, true))).to.equal(false)
+			expect((TableUtils.deepCompareTables(testTable17, testTable18, false, true))).to.equal(false)
 		end)
 	end)
 	describe("CheckTableDeepCompareFormat", function()
 		it("should identify same table formats", function()
-			expect((TableUtils.deepCompareTables(t, t2, true))).to.equal(true)
+			expect((TableUtils.deepCompareTables(testTable1, testTable2, true))).to.equal(true)
 		end)
 		it("should identify diff table formats based on keys", function()
-			expect((TableUtils.deepCompareTables(t, t4, true))).to.equal(false)
+			expect((TableUtils.deepCompareTables(testTable1, testTable4, true))).to.equal(false)
 		end)
 		it("should identify diff table formats based on types", function()
-			expect((TableUtils.deepCompareTables(t, t5, true))).to.equal(false)
+			expect((TableUtils.deepCompareTables(testTable1, testTable5, true))).to.equal(false)
 		end)
 		it("should identify diff table formats based on missing key", function()
-			expect((TableUtils.deepCompareTables(t9, t14, true))).to.equal(false)
+			expect((TableUtils.deepCompareTables(testTable9, testTable14, true))).to.equal(false)
 		end)
 	end)
 	describe("CheckTableDeepCheckSubset", function()
 		it("should identify subsets with same value", function()
-			expect((TableUtils.deepCheckSubset(t, t6, false))).to.equal(true)
+			expect((TableUtils.deepCheckSubset(testTable1, testTable6, false))).to.equal(true)
 		end)
 		it("should identify subsets with same formats", function()
-			expect((TableUtils.deepCheckSubset(t, t7, true))).to.equal(true)
+			expect((TableUtils.deepCheckSubset(testTable1, testTable7, true))).to.equal(true)
 		end)
 		it("should identify subsets with diff values", function()
-			expect((TableUtils.deepCheckSubset(t, t7, false))).to.equal(false)
+			expect((TableUtils.deepCheckSubset(testTable1, testTable7, false))).to.equal(false)
 		end)
 		it("should identify non-subsets format only", function()
-			expect((TableUtils.deepCheckSubset(t, t8, true))).to.equal(false)
+			expect((TableUtils.deepCheckSubset(testTable1, testTable8, true))).to.equal(false)
 		end)
 		it("should identify non-subsets", function()
-			expect((TableUtils.deepCheckSubset(t, t8, false))).to.equal(false)
+			expect((TableUtils.deepCheckSubset(testTable1, testTable8, false))).to.equal(false)
 		end)
 		it("should identify subsets with same formats same values", function()
-			expect((TableUtils.deepCheckSubset(t20, t19, false))).to.equal(true)
+			expect((TableUtils.deepCheckSubset(testTable20, testTable19, false))).to.equal(true)
 		end)
 	end)
 	describe("hasDesiredValuesShallow", function()
-		local t = {
+		local haystack = {
 			a = 1,
 			b = 2,
 			c = 3
 		}
-		local t2 = {
+		local needleMatch = {
 			a = 1
 		}
-		local t3 = {
+		local needleMismatch = {
 			c = 2
 		}
 		it("should be true when needle in haystack", function()
-			expect((TableUtils.hasDesiredValuesShallow(t, t2))).to.equal(true)
+			expect((TableUtils.hasDesiredValuesShallow(haystack, needleMatch))).to.equal(true)
 		end)
 		it("should be false when needle in haystack", function()
-			expect((TableUtils.hasDesiredValuesShallow(t, t3))).to.equal(false)
+			expect((TableUtils.hasDesiredValuesShallow(haystack, needleMismatch))).to.equal(false)
 		end)
 	end)
 	describe("canTellSequentialArrays", function()

@@ -1,54 +1,52 @@
--- Reviewed by Claude
--- variables reassigned
 local insert = table.insert
-return function(p1)
-	if p1 == nil then
+return function(inputTable)
+	if inputTable == nil then
 		return "nil"
 	end
-	if typeof(p1) == "table" then
-		local t = {}
-		local function v1(p1, p2, p3)
-			local v12 = ("\t"):rep(p2)
-			if p3 then
-				if typeof(p3) == "string" and (not p3:find("\"") and (not p3:find("\'") and p3:sub(1, 1):match("[%w_]"))) then
-					insert(t, ("%s%s = {"):format(v12, p3))
+	if typeof(inputTable) == "table" then
+		local resultLines = {}
+		local function formatTableRecursively(sourceTable, indentLevel, keyName)
+			local indentString = ("\t"):rep(indentLevel)
+			if keyName then
+				if typeof(keyName) == "string" and (not keyName:find("\"") and (not keyName:find("\'") and keyName:sub(1, 1):match("[%w_]"))) then
+					insert(resultLines, ("%s%s = {"):format(indentString, keyName))
 				else
-					insert(t, ("%s[%q] = {"):format(v12, p3))
+					insert(resultLines, ("%s[%q] = {"):format(indentString, keyName))
 				end
 			else
-				insert(t, ("%s{"):format(v12))
+				insert(resultLines, ("%s{"):format(indentString))
 			end
-			local t2 = {}
-			for v2, v3 in p1 do
-				table.insert(t2, {
-					k = v2,
-					v = v3
+			local sortedEntries = {}
+			for iteratorKey, iteratorValue in sourceTable do
+				table.insert(sortedEntries, {
+					k = iteratorKey,
+					v = iteratorValue
 				})
 			end
-			table.sort(t2, function(p1, p2)
-				return p1.k < p2.k
+			table.sort(sortedEntries, function(entryA, entryB)
+				return entryA.k < entryB.k
 			end)
-			for v5, v6 in t2 do
-				local v4
-				local k = v6.k
-				local v = v6.v
-				if type(v) == "table" then
-					v1(v, p2 + 1, k)
+			for entryIndex, currentEntry in sortedEntries do
+				local formattedValue
+				local entryKey = currentEntry.k
+				local entryValue = currentEntry.v
+				if type(entryValue) == "table" then
+					formatTableRecursively(entryValue, indentLevel + 1, entryKey)
 				else
-					v4 = if typeof(v) == "Vector3" then ("Vector3.new(%s)"):format((tostring(v))) elseif typeof(v) == "string" then ("%q"):format(v) elseif typeof(v) == "Instance" then ("[%s]"):format(v:GetFullName()) else tostring(v)
-					if typeof(k) == "string" and (not k:find("\"") and (not k:find("\'") and k:sub(1, 1):match("[%w_]"))) then
-						insert(t, ("\t%s%s = %s,"):format(v12, k, v4))
+					formattedValue = if typeof(entryValue) == "Vector3" then ("Vector3.new(%s)"):format((tostring(entryValue))) elseif typeof(entryValue) == "string" then ("%q"):format(entryValue) elseif typeof(entryValue) == "Instance" then ("[%s]"):format(entryValue:GetFullName()) else tostring(entryValue)
+					if typeof(entryKey) == "string" and (not entryKey:find("\"") and (not entryKey:find("\'") and entryKey:sub(1, 1):match("[%w_]"))) then
+						insert(resultLines, ("\t%s%s = %s,"):format(indentString, entryKey, formattedValue))
 					else
-						insert(t, ("\t%s[%q] = %s"):format(v12, k, v4))
+						insert(resultLines, ("\t%s[%q] = %s"):format(indentString, entryKey, formattedValue))
 					end
 				end
 			end
-			insert(t, ("%s},"):format(v12))
+			insert(resultLines, ("%s},"):format(indentString))
 		end
-		v1(p1, 0)
-		table.remove(t)
-		insert(t, "}")
-		return table.concat(t, "\n")
+		formatTableRecursively(inputTable, 0)
+		table.remove(resultLines)
+		insert(resultLines, "}")
+		return table.concat(resultLines, "\n")
 	end
-	warn("table2Lua: t must be a table, currently of type: " .. typeof(p1))
+	warn("table2Lua: t must be a table, currently of type: " .. typeof(inputTable))
 end

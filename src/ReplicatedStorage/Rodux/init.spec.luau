@@ -1,4 +1,3 @@
--- Reviewed by Claude
 return function()
 	describe("Rodux", function()
  it("should load", function()

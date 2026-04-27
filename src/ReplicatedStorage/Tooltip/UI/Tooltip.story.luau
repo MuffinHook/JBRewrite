@@ -1,23 +1,22 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(targetComponent)
+	local AppComponent = Roact.Component:extend("App")
 	local Tooltip = require(script.Parent.Tooltip)
-	function v1.init(p1)
-		p1:setState({
+	function AppComponent.init(targetComponent)
+		targetComponent:setState({
 			visible = true
 		})
 	end
-	function v1.render(p1)
+	function AppComponent.render(targetComponent)
 		return createElement(Tooltip, {
 			text = "noice"
 		})
 	end
-	function v1.willUnmount(p1)  end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(targetComponent)  end
+	local mountedInstance = Roact.mount(Roact.createElement(AppComponent), targetComponent)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedInstance)
 	end
 end

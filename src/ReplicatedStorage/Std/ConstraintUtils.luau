@@ -1,39 +1,37 @@
--- Reviewed by Claude
--- variables reassigned
 local t = {
-	customWeld = function(p1, p2, p3, p4)
+	customWeld = function(basePart, targetPart, c0Offset, c1Offset)
 		local Weld = Instance.new("Weld")
-		Weld.Name = ("%s->%s"):format(p1.Name, p2.Name)
-		Weld.Part0 = p1
-		Weld.Part1 = p2
-		if p3 then
-			Weld.C0 = p3
+		Weld.Name = ("%s->%s"):format(basePart.Name, targetPart.Name)
+		Weld.Part0 = basePart
+		Weld.Part1 = targetPart
+		if c0Offset then
+			Weld.C0 = c0Offset
 		end
-		if p4 then
-			Weld.C1 = p4
+		if c1Offset then
+			Weld.C1 = c1Offset
 		end
-		Weld.Parent = p1
+		Weld.Parent = basePart
 		return Weld
 	end
 }
-function t.blankWeld(p1, p2)
-	return t.customWeld(p1, p2, nil, nil)
+function t.blankWeld(basePart, targetPart)
+	return t.customWeld(basePart, targetPart, nil, nil)
 end
-function t.weld(p1, p2)
-	return t.customWeld(p1, p2, p1.CFrame:ToObjectSpace(p2.CFrame), nil)
+function t.weld(basePart, targetPart)
+	return t.customWeld(basePart, targetPart, basePart.CFrame:ToObjectSpace(targetPart.CFrame), nil)
 end
-function t.weldModel(p1, p2)
-	local PrimaryPart = p1.PrimaryPart
+function t.weldModel(basePart, skipChildren)
+	local PrimaryPart = basePart.PrimaryPart
 	if PrimaryPart == nil then
 		error("Missing `PrimaryPart` of root model.")
 	end
-	for i, v in ipairs(p1:GetChildren()) do
+	for i, v in ipairs(basePart:GetChildren()) do
 		if v:IsA("BasePart") then
 			if v ~= PrimaryPart then
 				t.weld(v, PrimaryPart)
 				v.Anchored = false
 			end
-		elseif v:IsA("Model") and not p2 then
+		elseif v:IsA("Model") and not skipChildren then
 			if v.PrimaryPart then
 				t.weldModel(v)
 				t.weld(v.PrimaryPart, PrimaryPart)
@@ -44,37 +42,37 @@ function t.weldModel(p1, p2)
 	end
 	PrimaryPart.Anchored = false
 end
-function t.customMotor(p1, p2, p3, p4)
+function t.customMotor(basePart, targetPart, c0Offset, c1Offset)
 	local Motor = Instance.new("Motor")
-	Motor.Name = ("%s->%s"):format(p1.Name, p2.Name)
-	Motor.Part0 = p1
-	Motor.Part1 = p2
-	if p3 then
-		Motor.C0 = p3
+	Motor.Name = ("%s->%s"):format(basePart.Name, targetPart.Name)
+	Motor.Part0 = basePart
+	Motor.Part1 = targetPart
+	if c0Offset then
+		Motor.C0 = c0Offset
 	end
-	if p4 then
-		Motor.C1 = p4
+	if c1Offset then
+		Motor.C1 = c1Offset
 	end
-	Motor.Parent = p1
+	Motor.Parent = basePart
 	return Motor
 end
-function t.blankMotor(p1, p2)
-	return t.customMotor(p1, p2, nil, nil)
+function t.blankMotor(basePart, targetPart)
+	return t.customMotor(basePart, targetPart, nil, nil)
 end
-function t.motor(p1, p2)
-	return t.customMotor(p1, p2, p1.CFrame:ToObjectSpace(p2.CFrame), nil)
+function t.motor(basePart, targetPart)
+	return t.customMotor(basePart, targetPart, basePart.CFrame:ToObjectSpace(targetPart.CFrame), nil)
 end
-local function setJointOffset(p1, p2, p3)
-	if p1.ClassName == "AnimationConstraint" then
-		p1["Attachment" .. p2].CFrame = p3
+local function setJointOffset(joint, axisIndex, offsetCFrame)
+	if joint.ClassName == "AnimationConstraint" then
+		joint["Attachment" .. axisIndex].CFrame = offsetCFrame
 	else
-		p1["C" .. p2] = p3
+		joint["C" .. axisIndex] = offsetCFrame
 	end
 end
-function t.setJointC0(p1, p2)
-	return setJointOffset(p1, "0", p2)
+function t.setJointC0(joint, offsetCFrame)
+	return setJointOffset(joint, "0", offsetCFrame)
 end
-function t.setJointC1(p1, p2)
-	return setJointOffset(p1, "1", p2)
+function t.setJointC1(joint, offsetCFrame)
+	return setJointOffset(joint, "1", offsetCFrame)
 end
 return t

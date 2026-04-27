@@ -1,64 +1,63 @@
--- Reviewed by Claude
 game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 require(ReplicatedStorage.Inventory.InventoryItemSystem)
 local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
 local ItemSystem = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
-local v1 = nil
+local uiModule = nil
 local t = {}
-function t.Init(p1)
-	local v12 = p1.Event
-	v1 = require(ReplicatedStorage.Game.ItemSkin.UI.UI)
-	function p1.em.efbs1qej(p1)
-		assert(p1)
-		t.ItemSkinsOwned = p1
-		v1.UpdateOwned()
+function t.Init(serverEvent)
+	local serverEvent = serverEvent.Event
+	uiModule = require(ReplicatedStorage.Game.ItemSkin.UI.UI)
+	function serverEvent.em.efbs1qej(skinData)
+		assert(skinData)
+		t.ItemSkinsOwned = skinData
+		uiModule.UpdateOwned()
 	end
-	v1.OnSkinClick:Connect(function(p1)
-		local v1 = ItemSystem.GetLocalEquipped()
-		if v1 == nil then
+	uiModule.OnSkinClick:Connect(function(skinName)
+		local equippedItem = ItemSystem.GetLocalEquipped()
+		if equippedItem == nil then
 			error("Player has no item equipped.")
 		end
-		if v1.ApplySkin == nil then
-			error(("Item %s does not suppory skins."):format(v1.__ClassName))
+		if equippedItem.ApplySkin == nil then
+			error(("Item %s does not suppory skins."):format(equippedItem.__ClassName))
 		end
-		if t.DoesPlayerOwn(p1.Name) then
-			v1:ApplySkin(p1.Name)
+		if t.DoesPlayerOwn(skinName.Name) then
+			equippedItem:ApplySkin(skinName.Name)
 		else
-			v1:ApplySkinLocal(p1.Name)
+			equippedItem:ApplySkinLocal(skinName.Name)
 		end
-		Audio.ObjectLocal(v1.Model.Skeleton.BoundingBox, 4761679152)
+		Audio.ObjectLocal(equippedItem.Model.Skeleton.BoundingBox, 4761679152)
 	end)
-	v1.OnSkinBuyClick:Connect(function(p1)
-		local v1 = ItemSystem.GetLocalEquipped()
-		if v1 == nil then
+	uiModule.OnSkinBuyClick:Connect(function(skinName)
+		local equippedItem = ItemSystem.GetLocalEquipped()
+		if equippedItem == nil then
 			error("Player has no item equipped.")
 		end
-		if v1.ApplySkin == nil then
-			error(("Item %s does not suppory skins."):format(v1.__ClassName))
+		if equippedItem.ApplySkin == nil then
+			error(("Item %s does not suppory skins."):format(equippedItem.__ClassName))
 		end
-		v12:FireServer("o" .. ("jfjtfr"):sub(2, 3):reverse() .. "" .. "" .. ("t1n6l5n"):sub(3, 4):reverse() .. "" .. "" .. ("bgszyfh"):sub(3, 3):reverse():reverse():reverse() .. "2g", v1.inventoryItemValue, p1.Name)
-		Audio.ObjectLocal(v1.Model.Skeleton.BoundingBox, 4761679547)
+		serverEvent:FireServer("ojf6ns2g", equippedItem.inventoryItemValue, skinName.Name)
+		Audio.ObjectLocal(equippedItem.Model.Skeleton.BoundingBox, 4761679547)
 	end)
-	v1.OnClosed:Connect(function()
-		local v1 = ItemSystem.GetLocalEquipped()
-		if v1 ~= nil then
-			if v1.ApplySkin == nil then
-				error(("Item %s does not suppory skins."):format(v1.__ClassName))
+	uiModule.OnClosed:Connect(function()
+		local equippedItem = ItemSystem.GetLocalEquipped()
+		if equippedItem ~= nil then
+			if equippedItem.ApplySkin == nil then
+				error(("Item %s does not suppory skins."):format(equippedItem.__ClassName))
 			end
-			v1:ApplySkinLocal((InventoryItemUtils.getAttr(v1.inventoryItemValue, "SkinName")))
+			equippedItem:ApplySkinLocal((InventoryItemUtils.getAttr(equippedItem.inventoryItemValue, "SkinName")))
 		end
 	end)
 end
-function t.DoesPlayerOwn(p1)
-	if p1 == "None" then
+function t.DoesPlayerOwn(skinName)
+	if skinName == "None" then
 		return true
 	else
 		if t.ItemSkinsOwned == nil then
 			error("Item skins have not been synced on client yet.")
 		end
-		return t.ItemSkinsOwned[p1]
+		return t.ItemSkinsOwned[skinName]
 	end
 end
 return t

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.App.RunUtils)
 local TextureData = require(ReplicatedStorage.Game.Garage.TextureData)

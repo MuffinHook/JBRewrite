@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
 local StoreData = require(ReplicatedStorage.Game.Garage.StoreData)
@@ -14,9 +12,9 @@ local function updateVehicleCamera(model, boundingBox)
 	model.CFrame = CFrame.Angles(0, animationTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(animationTime * 0.5) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, boundingBox.BoundingBox.Size.Magnitude * 0.8)
 end
 local function getVehicleDataForMake(make)
-	for i, v in ipairs(VehicleData) do
-		if v.Make == make then
-			return v
+	for i, vehicleDataEntry in ipairs(VehicleData) do
+		if vehicleDataEntry.Make == make then
+			return vehicleDataEntry
 		end
 	end
 end
@@ -41,9 +39,9 @@ return function(itemConfig)
 		if itemConfig.ItemType == PlayerDataConsts.VEHICLE_ITEM_TYPE then
 			local Make = itemConfig.Make
 			local vehicleData = nil
-			for i, v in ipairs(VehicleData) do
-				if v.Make == Make then
-					vehicleData = v
+			for i, vehicleDataEntry in ipairs(VehicleData) do
+				if vehicleDataEntry.Make == Make then
+					vehicleData = vehicleDataEntry
 					break
 				end
 			end
@@ -75,8 +73,8 @@ return function(itemConfig)
 			localTable.image = "rbxassetid://" .. tostring(ConsumablesData[ItemName].ImageId)
 			localTable.getInstCompare = "Consumable" .. ItemName
 		else
-			local errorFunc = error
-			errorFunc("Invalid ItemType: " .. tostring(itemConfig.ItemType))
+			local errorFunction = error
+			errorFunction("Invalid ItemType: " .. tostring(itemConfig.ItemType))
 		end
 		return localTable
 	end

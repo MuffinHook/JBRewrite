@@ -1,13 +1,11 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 return function(self)
-	local local1 = Roact.Component:extend("App")
+	local AppComponent = Roact.Component:extend("App")
 	local Info = require(script.Parent.Info)
 	local persistentCrewStore = require(ReplicatedStorage.PersistentCrew.persistentCrewStore)
-	function local1.init(self)
+	function AppComponent.init(self)
 		self.members = {
 			{
 				id = 2025110,
@@ -61,7 +59,7 @@ return function(self)
 			}
 		}
 	end
-	function local1.render(self)
+	function AppComponent.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement(Info, {
@@ -91,8 +89,8 @@ return function(self)
 				playerDisplayRating = "1600"
 			}) })
 	end
-	local local2 = Roact.mount(Roact.createElement(local1), self)
+	local mountedInstance = Roact.mount(Roact.createElement(AppComponent), self)
 	return function()
-		Roact.unmount(local2)
+		Roact.unmount(mountedInstance)
 	end
 end

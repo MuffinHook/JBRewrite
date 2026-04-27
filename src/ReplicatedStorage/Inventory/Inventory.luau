@@ -1,15 +1,14 @@
--- Reviewed by Claude
 local InventoryUtils = require(script.Parent.InventoryUtils)
-local t = {}
-t.__index = t
-function t.new(p1)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2.obj = p1
-	return t2
+local InventoryClass = {}
+InventoryClass.__index = InventoryClass
+function InventoryClass.new(objectReference)
+	local newInstance = {}
+	setmetatable(newInstance, InventoryClass)
+	newInstance.obj = objectReference
+	return newInstance
 end
-function t.HasItem(p1, p2)
-	return InventoryUtils.doesInventoryValueHave(p1.obj, p2)
+function InventoryClass.HasItem(self, itemValue)
+	return InventoryUtils.doesInventoryValueHave(self.obj, itemValue)
 end
-function t.Destroy(p1) end
-return t
+function InventoryClass.Destroy(self) end
+return InventoryClass

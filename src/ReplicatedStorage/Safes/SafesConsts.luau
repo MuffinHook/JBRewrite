@@ -1,28 +1,27 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local Enumer = require(ReplicatedStorage.Std.Enumer)
 local EnumRarity = require(ReplicatedStorage.RewardSpinner.EnumRarity)
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)
-local v1 = Enumer({ "Tier1v1", "Tier2v1", "Tier3v1", "Tier4v1", "Tier5v1" })
-local t = {
+local SafeType = Enumer({ "Tier1v1", "Tier2v1", "Tier3v1", "Tier4v1", "Tier5v1" })
+local constants = {
 	SAFE_OPEN_DURATION = 2.5,
 	FIREWORK_FX_REMOTE_NAME = "SafeFireworksFx",
 	SAFE_PURCHASE_REMOTE_NAME = "SafePurchaseRemote",
 	SAFE_OPEN_REMOTE_NAME = "SafeOpenRemote",
 	UPDATE_SAFES_INVENTORY_REMOTE_NAME = "SafeUpdateInventoryRemote",
 	SPINNER_TOTAL_NUM_CARDS = 30,
-	TYPE_ENUM = v1,
+	TYPE_ENUM = SafeType,
 	MIN_CASH_REPLACEMENT_VALUE_MULTIPLIER = 0.4,
 	CASH_REPLACEMENT_MULTIPLIER_DESIRED_MEAN = 0.5,
 	MAX_POSSIBLE_CASH_REPLACEMENT = 1000000,
-	NEW_PLAYER_SAFE_REWARDS = { v1.Tier1v1, v1.Tier1v1, v1.Tier2v1 },
+	NEW_PLAYER_SAFE_REWARDS = { SafeType.Tier1v1, SafeType.Tier1v1, SafeType.Tier2v1 },
 	SAFE_REWARD_SPINNER_TOPIC = "SafeOpen",
 	PITY_REWARD_MULTIPLIER = 1.25
 }
-t.SPINNER_STOP_INDEX = t.SPINNER_TOTAL_NUM_CARDS - 4
-t.SAFE_DATA = {
-	[v1.Tier1v1] = {
+constants.SPINNER_STOP_INDEX = constants.SPINNER_TOTAL_NUM_CARDS - 4
+constants.SAFE_DATA = {
+	[SafeType.Tier1v1] = {
  Title = "Common",
  OnSale = true,
  Price = 6000,
@@ -105,7 +104,7 @@ t.SAFE_DATA = {
  }
  }
 	},
-	[v1.Tier2v1] = {
+	[SafeType.Tier2v1] = {
  Title = "Rare",
  OnSale = true,
  Price = 16000,
@@ -187,7 +186,7 @@ t.SAFE_DATA = {
  }
  }
 	},
-	[v1.Tier3v1] = {
+	[SafeType.Tier3v1] = {
  Title = "Ultra Rare",
  OnSale = true,
  Price = 37500,
@@ -269,7 +268,7 @@ t.SAFE_DATA = {
  }
  }
 	},
-	[v1.Tier4v1] = {
+	[SafeType.Tier4v1] = {
  Title = "Epic",
  OnSale = true,
  Price = 75000,
@@ -353,7 +352,7 @@ t.SAFE_DATA = {
  }
  }
 	},
-	[v1.Tier5v1] = {
+	[SafeType.Tier5v1] = {
  Title = "Legendary",
  OnSale = true,
  Price = 100000,
@@ -437,49 +436,49 @@ t.SAFE_DATA = {
  }
 	}
 }
-for v2, v3 in t.SAFE_DATA do
-	local t2 = {}
-	for v4, v5 in v3.RewardData do
- if not t2[v5.RarityId] then
- t2[v5.RarityId] = 0
+for safeType, safeData in constants.SAFE_DATA do
+	local rarityItemCounts = {}
+	for rewardIndex, rewardItem in safeData.RewardData do
+ if not rarityItemCounts[rewardItem.RarityId] then
+ rarityItemCounts[rewardItem.RarityId] = 0
  end
- local RarityId = v5.RarityId
- t2[RarityId] = t2[RarityId] + 1
+ local RarityId = rewardItem.RarityId
+ rarityItemCounts[RarityId] = rarityItemCounts[RarityId] + 1
 	end
-	local t3 = {}
+	local rarityProbabilityPerItem = {}
 	local sum = 0
-	for v7, v8 in v3.RarityProbabilities do
- local v6
- v6 = if v8 >= 0 then v8 <= 100 else false
- assert(v6, "Invalid rarity probability")
- if v8 ~= 0 and not t2[v7] then
- error("No items of rarity exist: " .. v7)
+	for rarityType, rarityProbability in safeData.RarityProbabilities do
+ local isValidProbability
+ isValidProbability = if rarityProbability >= 0 then rarityProbability <= 100 else false
+ assert(isValidProbability, "Invalid rarity probability")
+ if rarityProbability ~= 0 and not rarityItemCounts[rarityType] then
+ error("No items of rarity exist: " .. rarityType)
  end
- if t2[v7] and v8 == 0 then
- warn("Items of rarity " .. v7 .. " exist but that rarity has 0 probability")
+ if rarityItemCounts[rarityType] and rarityProbability == 0 then
+ warn("Items of rarity " .. rarityType .. " exist but that rarity has 0 probability")
  end
- if t2[v7] then
- t3[v7] = v8 / t2[v7]
- sum = sum + v8
+ if rarityItemCounts[rarityType] then
+ rarityProbabilityPerItem[rarityType] = rarityProbability / rarityItemCounts[rarityType]
+ sum = sum + rarityProbability
  end
 	end
 	if math.abs(sum - 100) > 0.0001 then
- error("Invalid total rarity probabilities: " .. sum .. ", safeName: " .. v3.Title)
+ error("Invalid total rarity probabilities: " .. sum .. ", safeName: " .. safeData.Title)
 	end
-	for v9, v10 in v3.RewardData do
- local var11 = t3[v10.RarityId]
- local RarityId = v10.RarityId
- if var11 then
- if var11 == 0 then
+	for rewardIndex, rewardItem in safeData.RewardData do
+ local itemRarityProbability = rarityProbabilityPerItem[rewardItem.RarityId]
+ local RarityId = rewardItem.RarityId
+ if itemRarityProbability then
+ if itemRarityProbability == 0 then
  warn("Rarity has 0 probability but a reward with given rarity exists: " .. RarityId)
  end
  else
  error("No probability for rarity: " .. RarityId)
  end
- v10.AbsoluteProbability = var11
+ rewardItem.AbsoluteProbability = itemRarityProbability
 	end
 end
-for v12, v13 in v1:GetEnumItems() do
-	assert(t.SAFE_DATA[v1[v13]], "No safe data for safe " .. v13)
+for enumIndex, safeTierName in SafeType:GetEnumItems() do
+	assert(constants.SAFE_DATA[SafeType[safeTierName]], "No safe data for safe " .. safeTierName)
 end
-return TableUtils.requireValidIndexAndFreeze(t)
+return TableUtils.requireValidIndexAndFreeze(constants)

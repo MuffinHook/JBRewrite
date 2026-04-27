@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Resource.Settings)
@@ -6,18 +5,18 @@ local HyperChromeConsts = require(ReplicatedStorage.HyperChrome.HyperChromeConst
 local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local PaintUtils = require(ReplicatedStorage.Game.Garage.PaintUtils)
-return function(p1, p2)
-	local Model = p2.Model
-	local Type = p2.Type
-	local Make = p2.Make
+return function(colorData, vehicleData)
+	local Model = vehicleData.Model
+	local Type = vehicleData.Type
+	local Make = vehicleData.Make
 	if Make == "MCL36FREE" then
 		Make = "MCL36"
 	end
-	local v1 = p1 and p1.Name
+	local colorName = colorData and colorData.Name
 	local list = {}
-	for i, v in ipairs(Model:GetDescendants()) do
-		if v.Name == "SecondBody" then
-			table.insert(list, v)
+	for i, part in ipairs(Model:GetDescendants()) do
+		if part.Name == "SecondBody" then
+			table.insert(list, part)
 		end
 	end
 	if Make == "Tank" then
@@ -45,26 +44,26 @@ return function(p1, p2)
 		table.insert(list, SteeringWheel_2:FindFirstChild("Wheel"))
 		table.insert(list, Model.Visual:FindFirstChild("Floorboards"))
 	end
-	for i, v in ipairs(list) do
-		local v2 = PaintUtils.GetDefaultVehiclePart(v)
-		local t = {
-			DefaultReflectance = v2.Reflectance,
-			DefaultMaterial = v2.Material
+	for i, part in ipairs(list) do
+		local defaultPart = PaintUtils.GetDefaultVehiclePart(part)
+		local defaultProperties = {
+			DefaultReflectance = defaultPart.Reflectance,
+			DefaultMaterial = defaultPart.Material
 		}
-		if v1 then
-			Paint.Part(v, v1, t)
+		if colorName then
+			Paint.Part(part, colorName, defaultProperties)
 		else
-			v.Color = v2.Color
-			v.Material = v2.Material
-			v.Reflectance = v2.Reflectance
+			part.Color = defaultPart.Color
+			part.Material = defaultPart.Material
+			part.Reflectance = defaultPart.Reflectance
 		end
-		if not CollectionService:HasTag(v, "VehicleColorPart") then
-			CollectionService:AddTag(v, "VehicleColorPart")
+		if not CollectionService:HasTag(part, "VehicleColorPart") then
+			CollectionService:AddTag(part, "VehicleColorPart")
 		end
-		if HyperChromeUtils.isHyperChromeName(v1) then
-			v:SetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME, v1)
+		if HyperChromeUtils.isHyperChromeName(colorName) then
+			part:SetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME, colorName)
 		else
-			v:SetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME, nil)
+			part:SetAttribute(HyperChromeConsts.HYPERCHROME_NAME_ATTRIBUTE_NAME, nil)
 		end
 	end
 end

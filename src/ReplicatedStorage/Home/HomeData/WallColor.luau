@@ -1,52 +1,51 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local Color = require(ReplicatedStorage.Game.Garage.StoreData.Color)
-local t = {}
-local t2 = {
+local WallColorModule = {}
+local PaintConfig = {
 	DefaultReflectance = 0,
 	DefaultMaterial = Enum.Material.SmoothPlastic,
 	DisableReflectance = true
 }
-function t.getInstance(p1)
+function WallColorModule.getInstance(colorItem)
 	local Part = Instance.new("Part")
 	Part.Shape = Enum.PartType.Ball
 	Part.Size = Vector3.new(4, 4, 4)
 	Part.TopSurface = 0
 	Part.BottomSurface = 0
-	if p1.None then
+	if colorItem.None then
 		Part.Color = Color3.new(255/255, 255/255, 255/255)
 	else
-		Part.Color = Paint.GetColor(p1.Name)
+		Part.Color = Paint.GetColor(colorItem.Name)
 	end
 	Part.Anchored = true
 	Part.CFrame = CFrame.new()
 	return Part
 end
-function t.updateCamera(p1, p2)
-	local tbl = os.clock() / 2
-	p1.CFrame = CFrame.Angles(0, tbl % 6.283185307179586, 0) * CFrame.Angles(math.sin(tbl) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+function WallColorModule.updateCamera(camera, parent)
+	local elapsedTime = os.clock() / 2
+	camera.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 end
-local tbl = table.clone(Color.Items)
-table.insert(tbl, 1, {
+local colorItems = table.clone(Color.Items)
+table.insert(colorItems, 1, {
 	Name = "Default",
 	None = true
 })
-function t.getItems()
-	return tbl
+function WallColorModule.getItems()
+	return colorItems
 end
-function t.apply(p1, p2)
-	local WallColor = p2:FindFirstChild("WallColor")
+function WallColorModule.apply(colorItem, parentModel)
+	local WallColor = parentModel:FindFirstChild("WallColor")
 	if WallColor then
 		local count = 0
-		for tbl, v2 in WallColor:GetChildren() do
-			if v2:IsA("BasePart") then
+		for _, part in WallColor:GetChildren() do
+			if part:IsA("BasePart") then
 				count = count + 1
-				if p1 and not p1.None then
-					t2.DefaultMaterial = v2.Material
-					Paint.Part(v2, p1.Name, t2)
+				if colorItem and not colorItem.None then
+					PaintConfig.DefaultMaterial = part.Material
+					Paint.Part(part, colorItem.Name, PaintConfig)
 				else
-					v2.Color = v2:GetAttribute("OriginalColor")
+					part.Color = part:GetAttribute("OriginalColor")
 				end
 			end
 		end
@@ -55,4 +54,4 @@ function t.apply(p1, p2)
 		warn("Missing subModel")
 	end
 end
-return t
+return WallColorModule

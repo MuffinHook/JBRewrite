@@ -1,47 +1,46 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
-local t = {}
-function t.getGunner(p1)
-	local t2 = {}
-	for v1, v2 in p1:GetChildren() do
-		if v2.Name == "Seat" or v2.Name == "Passenger" then
-			local ControlGunPriority = v2:FindFirstChild("ControlGunPriority")
+local TankUtils = {}
+function TankUtils.getGunner(tank)
+	local gunnerCandidates = {}
+	for index, seat in tank:GetChildren() do
+		if seat.Name == "Seat" or seat.Name == "Passenger" then
+			local ControlGunPriority = seat:FindFirstChild("ControlGunPriority")
 			if ControlGunPriority and ControlGunPriority:IsA("IntValue") then
-				local var3 = ControlGunPriority.Value
-				local PlayerName = v2:FindFirstChild("PlayerName")
+				local priority = ControlGunPriority.Value
+				local PlayerName = seat:FindFirstChild("PlayerName")
 				if PlayerName then
-					local localPlayer = Players:FindFirstChild(PlayerName.Value)
-					if localPlayer then
-						table.insert(t2, {
-							player = localPlayer,
-							priority = var3
+					local foundPlayer = Players:FindFirstChild(PlayerName.Value)
+					if foundPlayer then
+						table.insert(gunnerCandidates, {
+							player = foundPlayer,
+							priority = priority
 						})
 					end
 				end
 			end
 		end
 	end
-	table.sort(t2, function(p1, p2)
-		return p1.priority > p2.priority
+	table.sort(gunnerCandidates, function(candidateA, candidateB)
+		return candidateA.priority > candidateB.priority
 	end)
-	if #t2 > 0 then
-		return t2[1].player
+	if #gunnerCandidates > 0 then
+		return gunnerCandidates[1].player
 	else
-		return t.getDriver(p1)
+		return TankUtils.getDriver(tank)
 	end
 end
-function t.getDriver(p1)
-	for v1, v2 in p1:GetChildren() do
-		if v2.Name == "Seat" then
-			local PlayerName = v2:FindFirstChild("PlayerName")
+function TankUtils.getDriver(tank)
+	for index, seat in tank:GetChildren() do
+		if seat.Name == "Seat" then
+			local PlayerName = seat:FindFirstChild("PlayerName")
 			if PlayerName then
-				local var3 = Players:FindFirstChild(PlayerName.Value)
-				if var3 then
-					return var3
+				local driverPlayer = Players:FindFirstChild(PlayerName.Value)
+				if driverPlayer then
+					return driverPlayer
 				end
 			end
 		end
 	end
 	return nil
 end
-return t
+return TankUtils

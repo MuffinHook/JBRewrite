@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -17,8 +15,8 @@ local t = {
 		local characterRootPart = CharacterUtils.getRootPart(player.Character)
 		if characterRootPart then
 			local Position = characterRootPart.Position
-			for i, v in ipairs(garageRegions) do
-				local Region = v:FindFirstChild("Region")
+			for i, garageRegionInstance in ipairs(garageRegions) do
+				local Region = garageRegionInstance:FindFirstChild("Region")
 				if Region and RegionUtils.CastPoint(RegionUtils.getPrism(Region.CFrame, Region.Size), Position) then
 					isInGarage = true
 				end

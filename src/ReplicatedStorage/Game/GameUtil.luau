@@ -1,9 +1,8 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Settings = require(ReplicatedStorage.Resource.Settings)
 local Signal = require(ReplicatedStorage.Std.Signal)
 local WindowGroup = require(ReplicatedStorage.Module.Window.WindowGroup)
-local t = {
+local GameModule = {
 	OnTeamChanged = Signal.new(),
 	Team = Settings.EnumTeam.Prisoner,
 	Schedule = nil,
@@ -12,8 +11,8 @@ local t = {
 	removeDeathGui = nil,
 	removeDeathLighting = nil
 }
-local v1 = WindowGroup.new()
-function t.getCenterWindowGroup()
-	return v1
+local centerWindowGroup = WindowGroup.new()
+function GameModule.getCenterWindowGroup()
+	return centerWindowGroup
 end
-return t
+return GameModule

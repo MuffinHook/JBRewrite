@@ -1,21 +1,19 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Binder = require(ReplicatedStorage.Std.Binder)
 local Time = require(ReplicatedStorage.Module.Time)
 local Audio = require(ReplicatedStorage.Std.Audio)
 local LocalPlayer = game:GetService("Players").LocalPlayer
-local function Round(p1)
-	return math.floor(p1 / 50 + 0.5) * 50
+local function Round(value)
+	return math.floor(value / 50 + 0.5) * 50
 end
-local function comma(p1)
-	local currencyPrefix, mainDigits, currencySuffix = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
+local function comma(currencyText)
+	local currencyPrefix, mainDigits, currencySuffix = string.match(currencyText, "^([^%d]*%d)(%d*)(.-)$")
 	return currencyPrefix .. mainDigits:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. currencySuffix
 end
 return {
-	Init = function(p1)
-		local _ = p1.Event
-		local em = p1.em
+	Init = function(config)
+		local _ = config.Event
+		local eventManager = config.em
 		local ambientSound = Audio.ObjectLocal(LocalPlayer.PlayerGui, 3280045064, {
 			Looped = true,
 			DoNotPlay = true
@@ -50,7 +48,7 @@ return {
 		end
 		Binder.new("PowerPlantCore", require(script.Parent.Core)):Start()
 		local musicFadeConnection = nil
-		function em.kvcs1mf0()
+		function eventManager.kvcs1mf0()
 			Audio.ObjectLocal(LocalPlayer, 1837831244)
 			delay(1, function()
 				Audio.ObjectLocal(LocalPlayer, 1843025542)
@@ -66,7 +64,7 @@ return {
 			musicSound:Play()
 			musicFadeConnection = Audio.FadeTo(musicSound, 0.3, 2)
 		end
-		function em.ffymvi2b()
+		function eventManager.ffymvi2b()
 			if musicFadeConnection ~= nil then
 				musicFadeConnection:Disconnect()
 				musicFadeConnection = nil
@@ -80,18 +78,18 @@ return {
 				end)
 			end
 		end
-		function em.i544lupv(p1)
+		function eventManager.i544lupv(newRobberyData)
 			Audio.ObjectLocal(LocalPlayer, 3280045717)
-			robberyData = p1
+			robberyData = newRobberyData
 			assert(isRunning == false)
 			isRunning = true
 			PowerPlantRobberyGui.Parent = LocalPlayer.PlayerGui
 			spawn(StartRuntime)
 		end
-		function em.q6l39vgi()
+		function eventManager.q6l39vgi()
 			Audio.ObjectLocal(script, 1988476450)
 		end
-		function em.uz8khf2b()
+		function eventManager.uz8khf2b()
 			Audio.FadeTo(musicSound, 0, 2, function()
 				musicSound:Stop()
 			end)

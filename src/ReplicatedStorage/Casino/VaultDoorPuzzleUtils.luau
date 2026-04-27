@@ -1,33 +1,32 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 return {
-	getHacker = function(p1)
-		local v1 = p1:GetAttribute("VaultHackerId")
-		if v1 then
-			return Players:GetPlayerByUserId(v1)
+	getHacker = function(vaultObject)
+		local hackerId = vaultObject:GetAttribute("VaultHackerId")
+		if hackerId then
+			return Players:GetPlayerByUserId(hackerId)
 		else
 			return nil
 		end
 	end,
-	setHacker = function(p1, p2)
-		p1:SetAttribute("VaultHackerId", if p2 then p2.UserId else nil)
+	setHacker = function(vaultObject, player)
+		vaultObject:SetAttribute("VaultHackerId", if player then player.UserId else nil)
 	end,
-	getHackerChangedSignal = function(p1)
-		return p1:GetAttributeChangedSignal("VaultHackerId")
+	getHackerChangedSignal = function(vaultObject)
+		return vaultObject:GetAttributeChangedSignal("VaultHackerId")
 	end,
-	getDirection = function(p1)
-		return p1:GetAttribute("VaultDirection")
+	getDirection = function(vaultObject)
+		return vaultObject:GetAttribute("VaultDirection")
 	end,
-	setDirection = function(p1, p2)
-		p1:SetAttribute("VaultDirection", p2)
+	setDirection = function(vaultObject, direction)
+		vaultObject:SetAttribute("VaultDirection", direction)
 	end,
-	getDirectionChangedSignal = function(p1)
-		return p1:GetAttributeChangedSignal("VaultDirection")
+	getDirectionChangedSignal = function(vaultObject)
+		return vaultObject:GetAttributeChangedSignal("VaultDirection")
 	end,
-	getDisabled = function(p1)
-		return p1:GetAttribute("VaultDisabled")
+	getDisabled = function(vaultObject)
+		return vaultObject:GetAttribute("VaultDisabled")
 	end,
-	setDisabled = function(p1, p2)
-		p1:SetAttribute("VaultDisabled", p2)
+	setDisabled = function(vaultObject, disabled)
+		vaultObject:SetAttribute("VaultDisabled", disabled)
 	end
 }

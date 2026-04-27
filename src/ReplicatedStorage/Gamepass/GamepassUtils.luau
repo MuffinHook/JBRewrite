@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Enumer = require(ReplicatedStorage.Std.Enumer)
 local GamepassData = require(ReplicatedStorage.Gamepass.GamepassData)

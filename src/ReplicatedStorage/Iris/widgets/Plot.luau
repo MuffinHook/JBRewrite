@@ -1,7 +1,6 @@
--- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2)
-	p1.WidgetConstructor("ProgressBar", {
+return function(iris, irisUtils)
+	iris.WidgetConstructor("ProgressBar", {
 		hasState = true,
 		hasChildren = false,
 		Args = {
@@ -9,54 +8,54 @@ return function(p1, p2)
 			Format = 2
 		},
 		Events = {
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance
+			hovered = irisUtils.EVENTS.hover(function(widget)
+				return widget.Instance
 			end),
 			changed = {
-				Init = function(p1) end,
-				Get = function(p12)
-					return p12.lastChangedTick == p1._cycleTick
+				Init = function(widget) end,
+				Get = function(widget)
+					return widget.lastChangedTick == iris._cycleTick
 				end
 			}
 		},
-		Generate = function(p12)
+		Generate = function(widget)
 			local Iris_ProgressBar = Instance.new("Frame")
 			Iris_ProgressBar.Name = "Iris_ProgressBar"
 			Iris_ProgressBar.AutomaticSize = Enum.AutomaticSize.Y
-			Iris_ProgressBar.Size = UDim2.new(p1._config.ItemWidth, UDim.new())
+			Iris_ProgressBar.Size = UDim2.new(iris._config.ItemWidth, UDim.new())
 			Iris_ProgressBar.BackgroundTransparency = 1
-			p2.UIListLayout(Iris_ProgressBar, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
+			irisUtils.UIListLayout(Iris_ProgressBar, Enum.FillDirection.Horizontal, UDim.new(0, iris._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
 			local Bar = Instance.new("Frame")
 			Bar.Name = "Bar"
 			Bar.AutomaticSize = Enum.AutomaticSize.Y
-			Bar.Size = UDim2.new(p1._config.ContentWidth, p1._config.ContentHeight)
-			Bar.BackgroundColor3 = p1._config.FrameBgColor
-			Bar.BackgroundTransparency = p1._config.FrameBgTransparency
+			Bar.Size = UDim2.new(iris._config.ContentWidth, iris._config.ContentHeight)
+			Bar.BackgroundColor3 = iris._config.FrameBgColor
+			Bar.BackgroundTransparency = iris._config.FrameBgTransparency
 			Bar.BorderSizePixel = 0
 			Bar.ClipsDescendants = true
-			p2.applyFrameStyle(Bar, true)
+			irisUtils.applyFrameStyle(Bar, true)
 			Bar.Parent = Iris_ProgressBar
 			local Progress = Instance.new("TextLabel")
 			Progress.Name = "Progress"
 			Progress.AutomaticSize = Enum.AutomaticSize.Y
-			Progress.Size = UDim2.new(UDim.new(0, 0), p1._config.ContentHeight)
-			Progress.BackgroundColor3 = p1._config.PlotHistogramColor
-			Progress.BackgroundTransparency = p1._config.PlotHistogramTransparency
+			Progress.Size = UDim2.new(UDim.new(0, 0), iris._config.ContentHeight)
+			Progress.BackgroundColor3 = iris._config.PlotHistogramColor
+			Progress.BackgroundTransparency = iris._config.PlotHistogramTransparency
 			Progress.BorderSizePixel = 0
-			p2.applyTextStyle(Progress)
-			p2.UIPadding(Progress, p1._config.FramePadding)
-			p2.UICorner(Progress, p1._config.FrameRounding)
+			irisUtils.applyTextStyle(Progress)
+			irisUtils.UIPadding(Progress, iris._config.FramePadding)
+			irisUtils.UICorner(Progress, iris._config.FrameRounding)
 			Progress.Text = ""
 			Progress.Parent = Bar
 			local Value = Instance.new("TextLabel")
 			Value.Name = "Value"
 			Value.AutomaticSize = Enum.AutomaticSize.XY
-			Value.Size = UDim2.new(UDim.new(0, 0), p1._config.ContentHeight)
+			Value.Size = UDim2.new(UDim.new(0, 0), iris._config.ContentHeight)
 			Value.BackgroundTransparency = 1
 			Value.BorderSizePixel = 0
 			Value.ZIndex = 1
-			p2.applyTextStyle(Value)
-			p2.UIPadding(Value, p1._config.FramePadding)
+			irisUtils.applyTextStyle(Value)
+			irisUtils.UIPadding(Value, iris._config.FramePadding)
 			Value.Parent = Bar
 			local TextLabel = Instance.new("TextLabel")
 			TextLabel.Name = "TextLabel"
@@ -65,100 +64,100 @@ return function(p1, p2)
 			TextLabel.BackgroundTransparency = 1
 			TextLabel.BorderSizePixel = 0
 			TextLabel.LayoutOrder = 1
-			p2.applyTextStyle(TextLabel)
-			p2.UIPadding(Value, p1._config.FramePadding)
+			irisUtils.applyTextStyle(TextLabel)
+			irisUtils.UIPadding(Value, iris._config.FramePadding)
 			TextLabel.Parent = Iris_ProgressBar
 			return Iris_ProgressBar
 		end,
-		GenerateState = function(p12)
-			if p12.state.progress == nil then
-				p12.state.progress = p1._widgetState(p12, "Progress", 0)
+		GenerateState = function(widget)
+			if widget.state.progress == nil then
+				widget.state.progress = iris._widgetState(widget, "Progress", 0)
 			end
 		end,
-		Update = function(p1)
-			local instance = p1.Instance
+		Update = function(widget)
+			local instance = widget.Instance
 			local Bar = instance.Bar.Value
-			if p1.arguments.Format ~= nil and typeof(p1.arguments.Format) == "string" then
-				Bar.Text = p1.arguments.Format
+			if widget.arguments.Format ~= nil and typeof(widget.arguments.Format) == "string" then
+				Bar.Text = widget.arguments.Format
 			end
-			instance.TextLabel.Text = p1.arguments.Text or "Progress Bar"
+			instance.TextLabel.Text = widget.arguments.Text or "Progress Bar"
 		end,
-		UpdateState = function(p12)
-			local Bar = p12.Instance.Bar
+		UpdateState = function(widget)
+			local Bar = widget.Instance.Bar
 			local Progress = Bar.Progress
 			local instance = Bar.Value
-			local v2 = math.clamp(p12.state.progress.value, 0, 1)
-			if Bar.AbsoluteSize.X * (1 - v2) < instance.AbsoluteSize.X then
+			local progressValue = math.clamp(widget.state.progress.value, 0, 1)
+			if Bar.AbsoluteSize.X * (1 - progressValue) < instance.AbsoluteSize.X then
 				instance.AnchorPoint = Vector2.xAxis
 				instance.Position = UDim2.fromScale(1, 0)
 			else
 				instance.AnchorPoint = Vector2.zero
-				instance.Position = UDim2.fromScale(v2, 0)
+				instance.Position = UDim2.fromScale(progressValue, 0)
 			end
-			Progress.Size = UDim2.new(UDim.new(v2, 0), Progress.Size.Height)
-			if p12.arguments.Format == nil then
-				instance.Text = string.format("%d%%", v2 * 100)
+			Progress.Size = UDim2.new(UDim.new(progressValue, 0), Progress.Size.Height)
+			if widget.arguments.Format == nil then
+				instance.Text = string.format("%d%%", progressValue * 100)
 			else
-				if typeof(p12.arguments.Format) == "string" then
-					instance.Text = p12.arguments.Format
+				if typeof(widget.arguments.Format) == "string" then
+					instance.Text = widget.arguments.Format
 				else
-					instance.Text = string.format("%d%%", v2 * 100)
+					instance.Text = string.format("%d%%", progressValue * 100)
 				end
 			end
-			p12.lastChangedTick = p1._cycleTick + 1
+			widget.lastChangedTick = iris._cycleTick + 1
 		end,
-		Discard = function(p1)
-			p1.Instance:Destroy()
-			p2.discardState(p1)
+		Discard = function(widget)
+			widget.Instance:Destroy()
+			irisUtils.discardState(widget)
 		end
 	})
-	local function createLine(p12, p2)
+	local function createLine(parent, lineIndex)
 		local Frame = Instance.new("Frame")
-		Frame.Name = tostring(p2)
+		Frame.Name = tostring(lineIndex)
 		Frame.AnchorPoint = Vector2.new(0.5, 0.5)
-		Frame.BackgroundColor3 = p1._config.PlotLinesColor
-		Frame.BackgroundTransparency = p1._config.PlotLinesTransparency
+		Frame.BackgroundColor3 = iris._config.PlotLinesColor
+		Frame.BackgroundTransparency = iris._config.PlotLinesTransparency
 		Frame.BorderSizePixel = 0
-		Frame.Parent = p12
+		Frame.Parent = parent
 		return Frame
 	end
-	local function clearLine(p12)
-		if p12.HoveredLine then
-			p12.HoveredLine.BackgroundColor3 = p1._config.PlotLinesColor
-			p12.HoveredLine.BackgroundTransparency = p1._config.PlotLinesTransparency
-			p12.HoveredLine = false
-			p12.state.hovered:set(nil)
+	local function clearLine(widget)
+		if widget.HoveredLine then
+			widget.HoveredLine.BackgroundColor3 = iris._config.PlotLinesColor
+			widget.HoveredLine.BackgroundTransparency = iris._config.PlotLinesTransparency
+			widget.HoveredLine = false
+			widget.state.hovered:set(nil)
 		end
 	end
-	local function updateLine(p12, p22)
-		local Plot = p12.Instance.Background.Plot
-		local var4 = math.ceil((p2.getMouseLocation().X - (Plot.AbsolutePosition - p2.GuiOffset).X) / Plot.AbsoluteSize.X * #p12.Lines)
-		local var5 = p12.Lines[var4]
-		if var5 then
-			if var5 ~= p12.HoveredLine and (not p22 and p12.HoveredLine) then
-				p12.HoveredLine.BackgroundColor3 = p1._config.PlotLinesColor
-				p12.HoveredLine.BackgroundTransparency = p1._config.PlotLinesTransparency
-				p12.HoveredLine = false
-				p12.state.hovered:set(nil)
+	local function updateLine(widget, skipStateSet)
+		local Plot = widget.Instance.Background.Plot
+		local lineIndex = math.ceil((irisUtils.getMouseLocation().X - (Plot.AbsolutePosition - irisUtils.GuiOffset).X) / Plot.AbsoluteSize.X * #widget.Lines)
+		local line = widget.Lines[lineIndex]
+		if line then
+			if line ~= widget.HoveredLine and (not skipStateSet and widget.HoveredLine) then
+				widget.HoveredLine.BackgroundColor3 = iris._config.PlotLinesColor
+				widget.HoveredLine.BackgroundTransparency = iris._config.PlotLinesTransparency
+				widget.HoveredLine = false
+				widget.state.hovered:set(nil)
 			end
-			local var6 = p12.state.values.value[var4]
-			local var7 = p12.state.values.value[var4 + 1]
-			if var6 and var7 and (math.floor(var6) == var6 and math.floor(var7) == var7) then
-				p12.Tooltip.Text = ("%d: %d\n%d: %d"):format(var4, var6, var4 + 1, var7)
-			elseif var6 and var7 then
-				p12.Tooltip.Text = ("%d: %.3f\n%d: %.3f"):format(var4, var6, var4 + 1, var7)
+			local x = widget.state.values.value[lineIndex]
+			local y = widget.state.values.value[lineIndex + 1]
+			if x and y and (math.floor(x) == x and math.floor(y) == y) then
+				widget.Tooltip.Text = ("%d: %d\n%d: %d"):format(lineIndex, x, lineIndex + 1, y)
+			elseif x and y then
+				widget.Tooltip.Text = ("%d: %.3f\n%d: %.3f"):format(lineIndex, x, lineIndex + 1, y)
 			end
-			p12.HoveredLine = var5
-			var5.BackgroundColor3 = p1._config.PlotLinesHoveredColor
-			var5.BackgroundTransparency = p1._config.PlotLinesHoveredTransparency
-			if p22 then
-				p12.state.hovered.value = { var6, var7 }
+			widget.HoveredLine = line
+			line.BackgroundColor3 = iris._config.PlotLinesHoveredColor
+			line.BackgroundTransparency = iris._config.PlotLinesHoveredTransparency
+			if skipStateSet then
+				widget.state.hovered.value = { x, y }
 				return
 			end
-			p12.state.hovered:set({ var6, var7 })
+			widget.state.hovered:set({ x, y })
 		end
 	end
-	p1.WidgetConstructor("PlotLines", {
+	iris.WidgetConstructor("PlotLines", {
 		hasState = true,
 		hasChildren = false,
 		Args = {
@@ -169,23 +168,23 @@ return function(p1, p2)
 			TextOverlay = 5
 		},
 		Events = {
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance
+			hovered = irisUtils.EVENTS.hover(function(widget)
+				return widget.Instance
 			end)
 		},
-		Generate = function(p12)
+		Generate = function(widget)
 			local Iris_PlotLines = Instance.new("Frame")
 			Iris_PlotLines.Name = "Iris_PlotLines"
-			Iris_PlotLines.Size = UDim2.new(p1._config.ItemWidth, UDim.new())
+			Iris_PlotLines.Size = UDim2.new(iris._config.ItemWidth, UDim.new())
 			Iris_PlotLines.BackgroundTransparency = 1
 			Iris_PlotLines.BorderSizePixel = 0
-			p2.UIListLayout(Iris_PlotLines, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
+			irisUtils.UIListLayout(Iris_PlotLines, Enum.FillDirection.Horizontal, UDim.new(0, iris._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
 			local Background = Instance.new("Frame")
 			Background.Name = "Background"
-			Background.Size = UDim2.new(p1._config.ContentWidth, UDim.new(1, 0))
-			Background.BackgroundColor3 = p1._config.FrameBgColor
-			Background.BackgroundTransparency = p1._config.FrameBgTransparency
-			p2.applyFrameStyle(Background)
+			Background.Size = UDim2.new(iris._config.ContentWidth, UDim.new(1, 0))
+			Background.BackgroundColor3 = iris._config.FrameBgColor
+			Background.BackgroundTransparency = iris._config.FrameBgTransparency
+			irisUtils.applyFrameStyle(Background)
 			Background.Parent = Iris_PlotLines
 			local Plot = Instance.new("Frame")
 			Plot.Name = "Plot"
@@ -194,8 +193,8 @@ return function(p1, p2)
 			Plot.BorderSizePixel = 0
 			Plot.ClipsDescendants = true
 			Plot:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-				p12.state.values.lastChangeTick = p1._cycleTick
-				p1._widgets.PlotLines.UpdateState(p12)
+				widget.state.values.lastChangeTick = iris._cycleTick
+				iris._widgets.PlotLines.UpdateState(widget)
 			end)
 			local OverlayText = Instance.new("TextLabel")
 			OverlayText.Name = "OverlayText"
@@ -206,40 +205,40 @@ return function(p1, p2)
 			OverlayText.BackgroundTransparency = 1
 			OverlayText.BorderSizePixel = 0
 			OverlayText.ZIndex = 2
-			p2.applyTextStyle(OverlayText)
+			irisUtils.applyTextStyle(OverlayText)
 			OverlayText.Parent = Plot
 			local Iris_Tooltip = Instance.new("TextLabel")
 			Iris_Tooltip.Name = "Iris_Tooltip"
 			Iris_Tooltip.AutomaticSize = Enum.AutomaticSize.XY
 			Iris_Tooltip.Size = UDim2.fromOffset(0, 0)
-			Iris_Tooltip.BackgroundColor3 = p1._config.PopupBgColor
-			Iris_Tooltip.BackgroundTransparency = p1._config.PopupBgTransparency
+			Iris_Tooltip.BackgroundColor3 = iris._config.PopupBgColor
+			Iris_Tooltip.BackgroundTransparency = iris._config.PopupBgTransparency
 			Iris_Tooltip.BorderSizePixel = 0
 			Iris_Tooltip.Visible = false
-			p2.applyTextStyle(Iris_Tooltip)
-			p2.UIStroke(Iris_Tooltip, p1._config.PopupBorderSize, p1._config.BorderActiveColor, p1._config.BorderActiveTransparency)
-			p2.UIPadding(Iris_Tooltip, p1._config.WindowPadding)
-			if p1._config.PopupRounding > 0 then
-				p2.UICorner(Iris_Tooltip, p1._config.PopupRounding)
+			irisUtils.applyTextStyle(Iris_Tooltip)
+			irisUtils.UIStroke(Iris_Tooltip, iris._config.PopupBorderSize, iris._config.BorderActiveColor, iris._config.BorderActiveTransparency)
+			irisUtils.UIPadding(Iris_Tooltip, iris._config.WindowPadding)
+			if iris._config.PopupRounding > 0 then
+				irisUtils.UICorner(Iris_Tooltip, iris._config.PopupRounding)
 			end
-			local instance = p1._rootInstance and p1._rootInstance:FindFirstChild("PopupScreenGui")
+			local instance = iris._rootInstance and iris._rootInstance:FindFirstChild("PopupScreenGui")
 			Iris_Tooltip.Parent = instance and instance:FindFirstChild("TooltipContainer")
-			p12.Tooltip = Iris_Tooltip
-			p2.applyMouseMoved(Plot, function()
-				updateLine(p12)
+			widget.Tooltip = Iris_Tooltip
+			irisUtils.applyMouseMoved(Plot, function()
+				updateLine(widget)
 			end)
-			p2.applyMouseLeave(Plot, function()
-				local instance = p12
+			irisUtils.applyMouseLeave(Plot, function()
+				local instance = widget
 				if instance.HoveredLine then
-					instance.HoveredLine.BackgroundColor3 = p1._config.PlotLinesColor
-					instance.HoveredLine.BackgroundTransparency = p1._config.PlotLinesTransparency
+					instance.HoveredLine.BackgroundColor3 = iris._config.PlotLinesColor
+					instance.HoveredLine.BackgroundTransparency = iris._config.PlotLinesTransparency
 					instance.HoveredLine = false
 					instance.state.hovered:set(nil)
 				end
 			end)
 			Plot.Parent = Background
-			p12.Lines = {}
-			p12.HoveredLine = false
+			widget.Lines = {}
+			widget.HoveredLine = false
 			local TextLabel = Instance.new("TextLabel")
 			TextLabel.Name = "TextLabel"
 			TextLabel.AutomaticSize = Enum.AutomaticSize.XY
@@ -248,128 +247,128 @@ return function(p1, p2)
 			TextLabel.BorderSizePixel = 0
 			TextLabel.ZIndex = 3
 			TextLabel.LayoutOrder = 3
-			p2.applyTextStyle(TextLabel)
+			irisUtils.applyTextStyle(TextLabel)
 			TextLabel.Parent = Iris_PlotLines
 			return Iris_PlotLines
 		end,
-		GenerateState = function(p12)
-			if p12.state.values == nil then
-				p12.state.values = p1._widgetState(p12, "values", { 0, 1 })
+		GenerateState = function(widget)
+			if widget.state.values == nil then
+				widget.state.values = iris._widgetState(widget, "values", { 0, 1 })
 			end
-			if p12.state.hovered == nil then
-				p12.state.hovered = p1._widgetState(p12, "hovered", nil)
+			if widget.state.hovered == nil then
+				widget.state.hovered = iris._widgetState(widget, "hovered", nil)
 			end
 		end,
-		Update = function(p1)
-			local instance = p1.Instance
-			instance.TextLabel.Text = p1.arguments.Text or "Plot Lines"
-			instance.Background.Plot.OverlayText.Text = p1.arguments.TextOverlay or ""
-			instance.Size = UDim2.new(1, 0, 0, p1.arguments.Height or 0)
+		Update = function(widget)
+			local instance = widget.Instance
+			instance.TextLabel.Text = widget.arguments.Text or "Plot Lines"
+			instance.Background.Plot.OverlayText.Text = widget.arguments.TextOverlay or ""
+			instance.Size = UDim2.new(1, 0, 0, widget.arguments.Height or 0)
 		end,
-		UpdateState = function(p12)
-			if p12.state.hovered.lastChangeTick == p1._cycleTick then
-				if p12.state.hovered.value then
-					p12.Tooltip.Visible = true
+		UpdateState = function(widget)
+			if widget.state.hovered.lastChangeTick == iris._cycleTick then
+				if widget.state.hovered.value then
+					widget.Tooltip.Visible = true
 				else
-					p12.Tooltip.Visible = false
+					widget.Tooltip.Visible = false
 				end
 			end
-			if p12.state.values.lastChangeTick == p1._cycleTick then
-				local Plot = p12.Instance.Background.Plot
-				local value = p12.state.values.value
-				local instance = #value - 1
-				local v2 = #p12.Lines
-				local var3 = p12.arguments.Min or (1 / 0)
-				local var4 = p12.arguments.Max or (-1 / 0)
-				if var3 == nil or var4 == nil then
-					for var5, var6 in value do
-						local var7 = math.min(var3, var6)
-						var3, var4 = var7, math.max(var4, var6)
+			if widget.state.values.lastChangeTick == iris._cycleTick then
+				local Plot = widget.Instance.Background.Plot
+				local value = widget.state.values.value
+				local valueCount = #value - 1
+				local lineCount = #widget.Lines
+				local minValue = widget.arguments.Min or (1 / 0)
+				local maxValue = widget.arguments.Max or (-1 / 0)
+				if minValue == nil or maxValue == nil then
+					for valueIndex, valueData in value do
+						local minResult = math.min(minValue, valueData)
+						minValue, maxValue = minResult, math.max(maxValue, valueData)
 					end
 				end
-				if v2 < instance then
-					for i = v2 + 1, instance do
+				if lineCount < valueCount then
+					for i = lineCount + 1, valueCount do
 						local Frame = Instance.new("Frame")
 						Frame.Name = tostring(i)
 						Frame.AnchorPoint = Vector2.new(0.5, 0.5)
-						Frame.BackgroundColor3 = p1._config.PlotLinesColor
-						Frame.BackgroundTransparency = p1._config.PlotLinesTransparency
+						Frame.BackgroundColor3 = iris._config.PlotLinesColor
+						Frame.BackgroundTransparency = iris._config.PlotLinesTransparency
 						Frame.BorderSizePixel = 0
 						Frame.Parent = Plot
-						table.insert(p12.Lines, Frame)
+						table.insert(widget.Lines, Frame)
 					end
-				elseif instance < v2 then
-					for j = instance + 1, v2 do
-						local table9 = table.remove(p12.Lines)
-						if table9 then
-							table9:Destroy()
+				elseif valueCount < lineCount then
+					for j = valueCount + 1, lineCount do
+						local removedLine = table.remove(widget.Lines)
+						if removedLine then
+							removedLine:Destroy()
 						end
 					end
 				end
-				local AbsoluteSize = Plot.AbsoluteSize
-				local var10 = var4 - var3
-				for k = 1, instance do
-					local instance13 = AbsoluteSize * Vector2.new((k - 1) / instance, (var4 - value[k]) / var10)
-					local instance14 = AbsoluteSize * Vector2.new(k / instance, (var4 - value[k + 1]) / var10)
-					local var15 = (instance13 + instance14) / 2
-					p12.Lines[k].Size = UDim2.fromOffset((instance14 - instance13).Magnitude + 1, 1)
-					p12.Lines[k].Position = UDim2.fromOffset(var15.X, var15.Y)
-					p12.Lines[k].Rotation = math.atan2(instance14.Y - instance13.Y, instance14.X - instance13.X) * 57.29577951308232
+				local PlotSize = Plot.AbsoluteSize
+				local heightRange = maxValue - minValue
+				for k = 1, valueCount do
+					local startPoint = PlotSize * Vector2.new((k - 1) / valueCount, (maxValue - value[k]) / heightRange)
+					local endPoint = PlotSize * Vector2.new(k / valueCount, (maxValue - value[k + 1]) / heightRange)
+					local centerPoint = (startPoint + endPoint) / 2
+					widget.Lines[k].Size = UDim2.fromOffset((endPoint - startPoint).Magnitude + 1, 1)
+					widget.Lines[k].Position = UDim2.fromOffset(centerPoint.X, centerPoint.Y)
+					widget.Lines[k].Rotation = math.atan2(endPoint.Y - startPoint.Y, endPoint.X - startPoint.X) * 57.29577951308232
 				end
-				if p12.HoveredLine then
-					updateLine(p12, true)
+				if widget.HoveredLine then
+					updateLine(widget, true)
 				end
 			end
 		end,
-		Discard = function(p1)
-			p1.Instance:Destroy()
-			p1.Tooltip:Destroy()
-			p2.discardState(p1)
+		Discard = function(widget)
+			widget.Instance:Destroy()
+			widget.Tooltip:Destroy()
+			irisUtils.discardState(widget)
 		end
 	})
-	local function createBlock(p12, p2)
+	local function createBlock(parent, blockIndex)
 		local Frame = Instance.new("Frame")
-		Frame.Name = tostring(p2)
-		Frame.BackgroundColor3 = p1._config.PlotHistogramColor
-		Frame.BackgroundTransparency = p1._config.PlotHistogramTransparency
+		Frame.Name = tostring(blockIndex)
+		Frame.BackgroundColor3 = iris._config.PlotHistogramColor
+		Frame.BackgroundTransparency = iris._config.PlotHistogramTransparency
 		Frame.BorderSizePixel = 0
-		Frame.Parent = p12
+		Frame.Parent = parent
 		return Frame
 	end
-	local function clearBlock(p12)
-		if p12.HoveredBlock then
-			p12.HoveredBlock.BackgroundColor3 = p1._config.PlotHistogramColor
-			p12.HoveredBlock.BackgroundTransparency = p1._config.PlotHistogramTransparency
-			p12.HoveredBlock = false
-			p12.state.hovered:set(nil)
+	local function clearBlock(widget)
+		if widget.HoveredBlock then
+			widget.HoveredBlock.BackgroundColor3 = iris._config.PlotHistogramColor
+			widget.HoveredBlock.BackgroundTransparency = iris._config.PlotHistogramTransparency
+			widget.HoveredBlock = false
+			widget.state.hovered:set(nil)
 		end
 	end
-	local function updateBlock(p12, p22)
-		local Plot = p12.Instance.Background.Plot
-		local var4 = math.ceil((p2.getMouseLocation().X - (Plot.AbsolutePosition - p2.GuiOffset).X) / Plot.AbsoluteSize.X * #p12.Blocks)
-		local var5 = p12.Blocks[var4]
-		if var5 then
-			if var5 ~= p12.HoveredBlock and (not p22 and p12.HoveredBlock) then
-				p12.HoveredBlock.BackgroundColor3 = p1._config.PlotHistogramColor
-				p12.HoveredBlock.BackgroundTransparency = p1._config.PlotHistogramTransparency
-				p12.HoveredBlock = false
-				p12.state.hovered:set(nil)
+	local function updateBlock(widget, skipStateSet)
+		local Plot = widget.Instance.Background.Plot
+		local blockIndex = math.ceil((irisUtils.getMouseLocation().X - (Plot.AbsolutePosition - irisUtils.GuiOffset).X) / Plot.AbsoluteSize.X * #widget.Blocks)
+		local block = widget.Blocks[blockIndex]
+		if block then
+			if block ~= widget.HoveredBlock and (not skipStateSet and widget.HoveredBlock) then
+				widget.HoveredBlock.BackgroundColor3 = iris._config.PlotHistogramColor
+				widget.HoveredBlock.BackgroundTransparency = iris._config.PlotHistogramTransparency
+				widget.HoveredBlock = false
+				widget.state.hovered:set(nil)
 			end
-			local var6 = p12.state.values.value[var4]
-			if var6 then
-				p12.Tooltip.Text = if math.floor(var6) == var6 then ("%d: %d"):format(var4, var6) else ("%d: %.3f"):format(var4, var6)
+			local blockValue = widget.state.values.value[blockIndex]
+			if blockValue then
+				widget.Tooltip.Text = if math.floor(blockValue) == blockValue then ("%d: %d"):format(blockIndex, blockValue) else ("%d: %.3f"):format(blockIndex, blockValue)
 			end
-			p12.HoveredBlock = var5
-			var5.BackgroundColor3 = p1._config.PlotHistogramHoveredColor
-			var5.BackgroundTransparency = p1._config.PlotHistogramHoveredTransparency
-			if p22 then
-				p12.state.hovered.value = var6
+			widget.HoveredBlock = block
+			block.BackgroundColor3 = iris._config.PlotHistogramHoveredColor
+			block.BackgroundTransparency = iris._config.PlotHistogramHoveredTransparency
+			if skipStateSet then
+				widget.state.hovered.value = blockValue
 				return
 			end
-			p12.state.hovered:set(var6)
+			widget.state.hovered:set(blockValue)
 		end
 	end
-	p1.WidgetConstructor("PlotHistogram", {
+	iris.WidgetConstructor("PlotHistogram", {
 		hasState = true,
 		hasChildren = false,
 		Args = {
@@ -381,24 +380,24 @@ return function(p1, p2)
 			BaseLine = 6
 		},
 		Events = {
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance
+			hovered = irisUtils.EVENTS.hover(function(widget)
+				return widget.Instance
 			end)
 		},
-		Generate = function(p12)
+		Generate = function(widget)
 			local Iris_PlotHistogram = Instance.new("Frame")
 			Iris_PlotHistogram.Name = "Iris_PlotHistogram"
-			Iris_PlotHistogram.Size = UDim2.new(p1._config.ItemWidth, UDim.new())
+			Iris_PlotHistogram.Size = UDim2.new(iris._config.ItemWidth, UDim.new())
 			Iris_PlotHistogram.BackgroundTransparency = 1
 			Iris_PlotHistogram.BorderSizePixel = 0
-			p2.UIListLayout(Iris_PlotHistogram, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
+			irisUtils.UIListLayout(Iris_PlotHistogram, Enum.FillDirection.Horizontal, UDim.new(0, iris._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
 			local Background = Instance.new("Frame")
 			Background.Name = "Background"
-			Background.Size = UDim2.new(p1._config.ContentWidth, UDim.new(1, 0))
-			Background.BackgroundColor3 = p1._config.FrameBgColor
-			Background.BackgroundTransparency = p1._config.FrameBgTransparency
-			p2.applyFrameStyle(Background)
-			Background.UIPadding.PaddingRight = UDim.new(0, p1._config.FramePadding.X - 1)
+			Background.Size = UDim2.new(iris._config.ContentWidth, UDim.new(1, 0))
+			Background.BackgroundColor3 = iris._config.FrameBgColor
+			Background.BackgroundTransparency = iris._config.FrameBgTransparency
+			irisUtils.applyFrameStyle(Background)
+			Background.UIPadding.PaddingRight = UDim.new(0, iris._config.FramePadding.X - 1)
 			Background.Parent = Iris_PlotHistogram
 			local Plot = Instance.new("Frame")
 			Plot.Name = "Plot"
@@ -415,40 +414,40 @@ return function(p1, p2)
 			OverlayText.BackgroundTransparency = 1
 			OverlayText.BorderSizePixel = 0
 			OverlayText.ZIndex = 2
-			p2.applyTextStyle(OverlayText)
+			irisUtils.applyTextStyle(OverlayText)
 			OverlayText.Parent = Plot
 			local Iris_Tooltip = Instance.new("TextLabel")
 			Iris_Tooltip.Name = "Iris_Tooltip"
 			Iris_Tooltip.AutomaticSize = Enum.AutomaticSize.XY
 			Iris_Tooltip.Size = UDim2.fromOffset(0, 0)
-			Iris_Tooltip.BackgroundColor3 = p1._config.PopupBgColor
-			Iris_Tooltip.BackgroundTransparency = p1._config.PopupBgTransparency
+			Iris_Tooltip.BackgroundColor3 = iris._config.PopupBgColor
+			Iris_Tooltip.BackgroundTransparency = iris._config.PopupBgTransparency
 			Iris_Tooltip.BorderSizePixel = 0
 			Iris_Tooltip.Visible = false
-			p2.applyTextStyle(Iris_Tooltip)
-			p2.UIStroke(Iris_Tooltip, p1._config.PopupBorderSize, p1._config.BorderActiveColor, p1._config.BorderActiveTransparency)
-			p2.UIPadding(Iris_Tooltip, p1._config.WindowPadding)
-			if p1._config.PopupRounding > 0 then
-				p2.UICorner(Iris_Tooltip, p1._config.PopupRounding)
+			irisUtils.applyTextStyle(Iris_Tooltip)
+			irisUtils.UIStroke(Iris_Tooltip, iris._config.PopupBorderSize, iris._config.BorderActiveColor, iris._config.BorderActiveTransparency)
+			irisUtils.UIPadding(Iris_Tooltip, iris._config.WindowPadding)
+			if iris._config.PopupRounding > 0 then
+				irisUtils.UICorner(Iris_Tooltip, iris._config.PopupRounding)
 			end
-			local instance = p1._rootInstance and p1._rootInstance:FindFirstChild("PopupScreenGui")
+			local instance = iris._rootInstance and iris._rootInstance:FindFirstChild("PopupScreenGui")
 			Iris_Tooltip.Parent = instance and instance:FindFirstChild("TooltipContainer")
-			p12.Tooltip = Iris_Tooltip
-			p2.applyMouseMoved(Plot, function()
-				updateBlock(p12)
+			widget.Tooltip = Iris_Tooltip
+			irisUtils.applyMouseMoved(Plot, function()
+				updateBlock(widget)
 			end)
-			p2.applyMouseLeave(Plot, function()
-				local instance = p12
+			irisUtils.applyMouseLeave(Plot, function()
+				local instance = widget
 				if instance.HoveredBlock then
-					instance.HoveredBlock.BackgroundColor3 = p1._config.PlotHistogramColor
-					instance.HoveredBlock.BackgroundTransparency = p1._config.PlotHistogramTransparency
+					instance.HoveredBlock.BackgroundColor3 = iris._config.PlotHistogramColor
+					instance.HoveredBlock.BackgroundTransparency = iris._config.PlotHistogramTransparency
 					instance.HoveredBlock = false
 					instance.state.hovered:set(nil)
 				end
 			end)
 			Plot.Parent = Background
-			p12.Blocks = {}
-			p12.HoveredBlock = false
+			widget.Blocks = {}
+			widget.HoveredBlock = false
 			local TextLabel = Instance.new("TextLabel")
 			TextLabel.Name = "TextLabel"
 			TextLabel.AutomaticSize = Enum.AutomaticSize.XY
@@ -457,85 +456,85 @@ return function(p1, p2)
 			TextLabel.BorderSizePixel = 0
 			TextLabel.ZIndex = 3
 			TextLabel.LayoutOrder = 3
-			p2.applyTextStyle(TextLabel)
+			irisUtils.applyTextStyle(TextLabel)
 			TextLabel.Parent = Iris_PlotHistogram
 			return Iris_PlotHistogram
 		end,
-		GenerateState = function(p12)
-			if p12.state.values == nil then
-				p12.state.values = p1._widgetState(p12, "values", { 1 })
+		GenerateState = function(widget)
+			if widget.state.values == nil then
+				widget.state.values = iris._widgetState(widget, "values", { 1 })
 			end
-			if p12.state.hovered == nil then
-				p12.state.hovered = p1._widgetState(p12, "hovered", nil)
+			if widget.state.hovered == nil then
+				widget.state.hovered = iris._widgetState(widget, "hovered", nil)
 			end
 		end,
-		Update = function(p1)
-			local instance = p1.Instance
-			instance.TextLabel.Text = p1.arguments.Text or "Plot Histogram"
-			instance.Background.Plot.OverlayText.Text = p1.arguments.TextOverlay or ""
-			instance.Size = UDim2.new(1, 0, 0, p1.arguments.Height or 0)
+		Update = function(widget)
+			local instance = widget.Instance
+			instance.TextLabel.Text = widget.arguments.Text or "Plot Histogram"
+			instance.Background.Plot.OverlayText.Text = widget.arguments.TextOverlay or ""
+			instance.Size = UDim2.new(1, 0, 0, widget.arguments.Height or 0)
 		end,
-		UpdateState = function(p12)
-			if p12.state.hovered.lastChangeTick == p1._cycleTick then
-				if p12.state.hovered.value then
-					p12.Tooltip.Visible = true
+		UpdateState = function(widget)
+			if widget.state.hovered.lastChangeTick == iris._cycleTick then
+				if widget.state.hovered.value then
+					widget.Tooltip.Visible = true
 				else
-					p12.Tooltip.Visible = false
+					widget.Tooltip.Visible = false
 				end
 			end
-			if p12.state.values.lastChangeTick == p1._cycleTick then
-				local Plot = p12.Instance.Background.Plot
-				local value = p12.state.values.value
-				local instance = #value
-				local v2 = #p12.Blocks
-				local var3 = p12.arguments.Min or (1 / 0)
-				local var4 = p12.arguments.Max or (-1 / 0)
-				local var5 = p12.arguments.BaseLine or 0
-				if var3 == nil or var4 == nil then
-					for var6, var7 in value do
-						local var8 = math.min(var3 or var7, var7)
-						var3, var4 = var8, math.max(var4 or var7, var7)
+			if widget.state.values.lastChangeTick == iris._cycleTick then
+				local Plot = widget.Instance.Background.Plot
+				local value = widget.state.values.value
+				local valueCount = #value
+				local blockCount = #widget.Blocks
+				local minValue = widget.arguments.Min or (1 / 0)
+				local maxValue = widget.arguments.Max or (-1 / 0)
+				local baselineValue = widget.arguments.BaseLine or 0
+				if minValue == nil or maxValue == nil then
+					for valueIndex, valueData in value do
+						local minResult = math.min(minValue or valueData, valueData)
+						minValue, maxValue = minResult, math.max(maxValue or valueData, valueData)
 					end
 				end
-				if v2 < instance then
-					for i = v2 + 1, instance do
+				if blockCount < valueCount then
+					for i = blockCount + 1, valueCount do
 						local Frame = Instance.new("Frame")
 						Frame.Name = tostring(i)
-						Frame.BackgroundColor3 = p1._config.PlotHistogramColor
-						Frame.BackgroundTransparency = p1._config.PlotHistogramTransparency
+						Frame.BackgroundColor3 = iris._config.PlotHistogramColor
+						Frame.BackgroundTransparency = iris._config.PlotHistogramTransparency
 						Frame.BorderSizePixel = 0
 						Frame.Parent = Plot
-						table.insert(p12.Blocks, Frame)
+						table.insert(widget.Blocks, Frame)
 					end
-				elseif instance < v2 then
-					for j = instance + 1, v2 do
-						local var10 = table.remove(p12.Blocks)
-						if var10 then
-							var10:Destroy()
+				elseif valueCount < blockCount then
+					for j = valueCount + 1, blockCount do
+						local removedBlock = table.remove(widget.Blocks)
+						if removedBlock then
+							removedBlock:Destroy()
 						end
 					end
 				end
-				local instance11 = UDim.new(1 / instance, -1)
-				local var12 = var4 - var3
-				for k = 1, instance do
-					local instance13 = value[k]
-					if instance13 >= 0 then
-						p12.Blocks[k].Size = UDim2.new(instance11, UDim.new((instance13 - var5) / var12))
-						p12.Blocks[k].Position = UDim2.fromScale((k - 1) / instance, (var4 - instance13) / var12)
+				local blockWidth = UDim.new(1 / valueCount, -1)
+				local heightRange = maxValue - minValue
+				for k = 1, valueCount do
+					local blockValue = value[k]
+					if blockValue >= 0 then
+						widget.Blocks[k].Size = UDim2.new(blockWidth, UDim.new((blockValue - baselineValue) / heightRange))
+						widget.Blocks[k].Position = UDim2.fromScale((k - 1) / valueCount, (maxValue - blockValue) / heightRange)
 					else
-						p12.Blocks[k].Size = UDim2.new(instance11, UDim.new((var5 - instance13) / var12))
-						p12.Blocks[k].Position = UDim2.fromScale((k - 1) / instance, (var4 - var5) / var12)
+						widget.Blocks[k].Size = UDim2.new(blockWidth, UDim.new((baselineValue - blockValue) / heightRange))
+						widget.Blocks[k].Position = UDim2.fromScale((k - 1) / valueCount, (maxValue - baselineValue) / heightRange)
 					end
 				end
-				if p12.HoveredBlock then
-					updateBlock(p12, true)
+				if widget.HoveredBlock then
+					updateBlock(widget, true)
 				end
 			end
 		end,
-		Discard = function(p1)
-			p1.Instance:Destroy()
-			p1.Tooltip:Destroy()
-			p2.discardState(p1)
+		Discard = function(widget)
+			widget.Instance:Destroy()
+			widget.Tooltip:Destroy()
+			irisUtils.discardState(widget)
 		end
 	})
 end

@@ -1,41 +1,40 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
-local t = {}
-t.__index = t
-function t.new()
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._maid = Maid.new()
-	t2._listWindow = {}
-	t2._maid:GiveTask(function()
-		for i, v in ipairs(t2._listWindow) do
-			v:Destroy()
+local WindowGroup = {}
+WindowGroup.__index = WindowGroup
+function WindowGroup.new()
+	local instance = {}
+	setmetatable(instance, WindowGroup)
+	instance._maid = Maid.new()
+	instance._listWindow = {}
+	instance._maid:GiveTask(function()
+		for i, listedWindow in ipairs(instance._listWindow) do
+			listedWindow:Destroy()
 		end
-		t2._listWindow = nil
+		instance._listWindow = nil
 	end)
-	return t2
+	return instance
 end
-function t.Add(self, p2)
-	assert(p2.__ClassName == "Window")
-	for i, v in ipairs(self._listWindow) do
-		if p2 == v then
+function WindowGroup.Add(self, window)
+	assert(window.__ClassName == "Window")
+	for i, listedWindow in ipairs(self._listWindow) do
+		if window == listedWindow then
 			error("Window already exists in group.")
 		end
 	end
-	table.insert(self._listWindow, p2)
-	function p2._beforeOpenFun()
-		for i, v in ipairs(self._listWindow) do
-			if v ~= p2 and v:IsOpen() then
-				v:Close()
+	table.insert(self._listWindow, window)
+	function window._beforeOpenFun()
+		for i, listedWindow in ipairs(self._listWindow) do
+			if listedWindow ~= window and listedWindow:IsOpen() then
+				listedWindow:Close()
 			end
 		end
 	end
 end
-function t.Destroy(self)
+function WindowGroup.Destroy(self)
 	assert(self._maid)
-	local _maid_2 = self._maid
+	local maidToDestroy = self._maid
 	self._maid = nil
-	_maid_2:Destroy()
+	maidToDestroy:Destroy()
 end
-return t
+return WindowGroup

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 return function(actionName, actionCreatorFn)
 	assert(type(actionName) == "string", "Bad argument #1: Expected a string name for the action creator")
 	assert(type(actionCreatorFn) == "function", "Bad argument #2: Expected a function that creates action objects")

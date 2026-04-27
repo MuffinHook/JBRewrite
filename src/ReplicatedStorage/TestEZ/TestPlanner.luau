@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local TestPlan = require(script.Parent.TestPlan)
 return {
 	createPlan = function(modules, testNamePattern, extraEnvironment)

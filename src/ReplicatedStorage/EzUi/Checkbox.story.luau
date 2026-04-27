@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 return function(story)
 	local AppComponent = Roact.Component:extend("App")

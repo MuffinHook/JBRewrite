@@ -1,6 +1,5 @@
--- Reviewed by Claude
 local Basic = require(script.Parent.Basic)
-local t = {
+local motionConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -14,18 +13,18 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local t2 = {
+local ShieldSWAT = {
 	__ClassName = "ShieldSWAT"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	return v1
+ShieldSWAT.__index = ShieldSWAT
+setmetatable(ShieldSWAT, Basic)
+function ShieldSWAT.new(itemInstance, userData, customConfig)
+	local shieldInstance = Basic.new(itemInstance, userData, motionConfig, customConfig)
+	setmetatable(shieldInstance, ShieldSWAT)
+	return shieldInstance
 end
-function t2.InputBegan(p1, ...)
-	Basic.InputBegan(p1, ...)
+function ShieldSWAT.InputBegan(itemInstance, ...)
+	Basic.InputBegan(itemInstance, ...)
 end
-function t2.InputEnded(p1)  end
-return t2
+function ShieldSWAT.InputEnded(itemInstance)  end
+return ShieldSWAT

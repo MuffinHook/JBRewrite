@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -53,8 +51,8 @@ return {
 					ReplicatedStorage:FindFirstChild("SetTradeDesireRemote"):FireServer(TextBox.Text)
 				end
 				characterMaid:GiveTask(editGui.Bar.Submit.MouseButton1Down:Connect(attemptSetDesire))
-				characterMaid:GiveTask(editGui.Bar.TextBox.FocusLost:Connect(function(p1)
-					if p1 then
+				characterMaid:GiveTask(editGui.Bar.TextBox.FocusLost:Connect(function(enterPressed)
+					if enterPressed then
 						editGui.Enabled = false
 						ReplicatedStorage:FindFirstChild("SetTradeDesireRemote"):FireServer(TextBox.Text)
 					end
@@ -68,8 +66,8 @@ return {
 				characterMaid:GiveTask(desireGui.Bar.MouseButton1Down:Connect(toggleDesireEdit))
 				characterMaid:GiveTask(desireGui.Blank.MouseButton1Down:Connect(toggleDesireEdit))
 			end
-			characterMaid:GiveTask(Head.AncestryChanged:Connect(function(p1, p2)
-				if not p2 then
+			characterMaid:GiveTask(Head.AncestryChanged:Connect(function(child, parent)
+				if not parent then
 					characterMaid:DoCleaning()
 				end
 			end))

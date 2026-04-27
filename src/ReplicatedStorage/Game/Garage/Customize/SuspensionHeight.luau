@@ -1,8 +1,7 @@
--- Reviewed by Claude
-return function(p1, p2)
-	if p1 then
-		p2.Model:SetAttribute("GarageSuspensionHeight", p1.Height)
+return function(suspensionData, targetModel)
+	if suspensionData then
+		targetModel.Model:SetAttribute("GarageSuspensionHeight", suspensionData.Height)
 	else
-		p2.Model:SetAttribute("GarageSuspensionHeight", 0)
+		targetModel.Model:SetAttribute("GarageSuspensionHeight", 0)
 	end
 end

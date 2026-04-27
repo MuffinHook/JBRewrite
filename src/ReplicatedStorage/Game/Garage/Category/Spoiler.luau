@@ -1,4 +1,3 @@
--- Reviewed by Claude
-return function(p1)
-	return p1.Model:FindFirstChild("Spoiler")
+return function(part)
+	return part.Model:FindFirstChild("Spoiler")
 end

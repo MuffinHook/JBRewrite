@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EnvironmentConsts = require(ReplicatedStorage.Environment.EnvironmentConsts)

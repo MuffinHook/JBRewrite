@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Basic = require(script.Parent.Basic)
 local Handcuffs = require(ReplicatedStorage.Game.ItemConfig.Handcuffs)

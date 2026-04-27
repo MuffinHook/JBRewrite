@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local randomGenerator = Random.new()
 local TableUtils = {
 	copyKeysSafe = function(destination, source)
@@ -13,8 +11,8 @@ local TableUtils = {
 	end
 }
 local strictMetatable = {
-	__index = function(p1, p2)
-		error(("Table does not contain key `%s`"):format(p2), 2)
+	__index = function(targetTable, requestedKey)
+		error(("Table does not contain key `%s`"):format(requestedKey), 2)
 	end
 }
 function TableUtils.requireValidIndex(tbl)
@@ -176,7 +174,7 @@ function TableUtils.deepCopy(value, memoTable)
 		return value
 	end
 end
-local function acceptAll(p1, p2)
+local function acceptAll(key, value)
 	return true
 end
 local typeToInstanceMap = {

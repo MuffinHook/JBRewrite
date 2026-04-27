@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Basic = require(script.Parent.Basic)
 local motionConfig = {
 	Motion = {
@@ -24,40 +22,40 @@ local motionConfig = {
 	}
 }
 local event = nil
-local t2 = {
+local DonutClass = {
 	__ClassName = "Donut"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.Init(p1)
-	event = p1.Event
+DonutClass.__index = DonutClass
+setmetatable(DonutClass, Basic)
+function DonutClass.Init(self)
+	event = self.Event
 end
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, motionConfig, p3)
-	setmetatable(v1, t2)
-	v1:DefaultDisableCamLock()
-	return v1
+function DonutClass.new(self, p2, config)
+	local newInstance = Basic.new(self, p2, motionConfig, config)
+	setmetatable(newInstance, DonutClass)
+	newInstance:DefaultDisableCamLock()
+	return newInstance
 end
-function t2.InputBegan(p1, p2, p3)
-	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
-		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Eat.Springs.ItemRotation)
+function DonutClass.InputBegan(self, userInputData, p3)
+	if if userInputData.UserInputType == Enum.UserInputType.MouseButton1 then true elseif userInputData.UserInputType == Enum.UserInputType.Gamepad1 then userInputData.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		self.SpringItemRotation:SetTarget(self.Config.Motion.Eat.Springs.ItemRotation)
 		delay(0.3, function()
-			p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
-			if p1.Local then
+			self.SpringItemRotation:SetTarget(self.Config.Motion.Hip.Springs.ItemRotation)
+			if self.Local then
 				local currentTime = tick()
-				local lastConsumedTime = p1.LastConsumed or 0
-				p1.LastConsumed = currentTime
+				local lastConsumedTime = self.LastConsumed or 0
+				self.LastConsumed = currentTime
 				if currentTime - lastConsumedTime < 5 then
 					return false
 				end
-				event:FireServer("o" .. ("ftcjupr"):sub(3, 4):reverse() .. "" .. "" .. ("z1rdcuc"):sub(2, 5):reverse():reverse():reverse():reverse():reverse() .. "3")
+				event:FireServer("ojccdr13")
 			end
 		end)
-		if p1.Local then
-			p1:BroadcastInputBegan(p2)
+		if self.Local then
+			self:BroadcastInputBegan(userInputData)
 		end
 	end
-	Basic.InputBegan(p1, p2, p3)
+	Basic.InputBegan(self, userInputData, p3)
 end
-function t2.InputEnded(p1)  end
-return t2
+function DonutClass.InputEnded(self)  end
+return DonutClass

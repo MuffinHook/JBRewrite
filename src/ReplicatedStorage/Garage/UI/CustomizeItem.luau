@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local String = require(ReplicatedStorage.Std.String)
@@ -6,107 +5,107 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local Roact = require(ReplicatedStorage.Roact)
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local createElement = Roact.createElement
-local v1 = Roact.PureComponent:extend("CustomizeItem")
-v1.defaultProps = {
+local CustomizeItemComponent = Roact.PureComponent:extend("CustomizeItem")
+CustomizeItemComponent.defaultProps = {
 	faved = false,
 	canFavorite = true,
 	favHeight = 0.165,
 	cashHeight = 0.08,
 	accentColor = Color3.fromRGB(98, 222, 253)
 }
-function v1.init(p1)
-	p1:setState({
+function CustomizeItemComponent.init(self)
+	self:setState({
 		hover = false,
 		favHover = false
 	})
-	p1.cameraRef = Roact.createRef()
-	p1.viewportRef = Roact.createRef()
-	p1.maid = Maid.new()
-	p1.mountCount = 0
+	self.cameraRef = Roact.createRef()
+	self.viewportRef = Roact.createRef()
+	self.maid = Maid.new()
+	self.mountCount = 0
 end
-function v1.render(p1)
-	local aspectRatio = p1.props.aspectRatio
-	local cornerPixel = p1.props.cornerPixel
-	local paddingRatio = p1.props.paddingRatio
-	local v1 = if p1.props.equipped then "EQUIPPED" elseif p1.props.owned then "OWNED" else p1.props.price and p1.props.price > 0 and "$" .. String.comma(p1.props.price) or "FREE"
-	local v2 = if p1.props.offSalePrice and not (p1.props.equipped or p1.props.owned) then "$" .. String.comma(p1.props.offSalePrice) else nil
-	local cashHeight = p1.props.cashHeight
-	local v3 = p1.props.favHeight * aspectRatio
-	local t = {}
-	t.Size = p1.props.size or UDim2.new(1, 0, 1, 0)
-	t.Position = p1.props.position
-	t.BackgroundTransparency = 0
-	t.BorderSizePixel = 0
-	t.Selectable = true
-	t.AutoButtonColor = false
-	t.Text = ""
-	t.BackgroundColor3 = p1.props.equipped and Color3.new(255/255, 255/255, 255/255) or (p1.props.selected and Color3.new(0.05, 0.05, 0.05) or Color3.new(0.1, 0.1, 0.1))
-	t.LayoutOrder = p1.props.layoutOrder
-	t[Roact.Event.MouseEnter] = function()
-		p1:setState({
+function CustomizeItemComponent.render(self)
+	local aspectRatio = self.props.aspectRatio
+	local cornerPixel = self.props.cornerPixel
+	local paddingRatio = self.props.paddingRatio
+	local statusText = if self.props.equipped then "EQUIPPED" elseif self.props.owned then "OWNED" else self.props.price and self.props.price > 0 and "$" .. String.comma(self.props.price) or "FREE"
+	local offSalePriceText = if self.props.offSalePrice and not (self.props.equipped or self.props.owned) then "$" .. String.comma(self.props.offSalePrice) else nil
+	local cashHeight = self.props.cashHeight
+	local favHeightScaled = self.props.favHeight * aspectRatio
+	local buttonProps = {}
+	buttonProps.Size = self.props.size or UDim2.new(1, 0, 1, 0)
+	buttonProps.Position = self.props.position
+	buttonProps.BackgroundTransparency = 0
+	buttonProps.BorderSizePixel = 0
+	buttonProps.Selectable = true
+	buttonProps.AutoButtonColor = false
+	buttonProps.Text = ""
+	buttonProps.BackgroundColor3 = self.props.equipped and Color3.new(255/255, 255/255, 255/255) or (self.props.selected and Color3.new(0.05, 0.05, 0.05) or Color3.new(0.1, 0.1, 0.1))
+	buttonProps.LayoutOrder = self.props.layoutOrder
+	buttonProps[Roact.Event.MouseEnter] = function()
+		self:setState({
 			hover = true
 		})
 	end
-	t[Roact.Event.MouseLeave] = function()
-		p1:setState({
+	buttonProps[Roact.Event.MouseLeave] = function()
+		self:setState({
 			hover = false
 		})
 	end
-	t[Roact.Event.SelectionGained] = function()
-		p1:setState({
+	buttonProps[Roact.Event.SelectionGained] = function()
+		self:setState({
 			hover = true
 		})
 	end
-	t[Roact.Event.SelectionLost] = function()
-		p1:setState({
+	buttonProps[Roact.Event.SelectionLost] = function()
+		self:setState({
 			hover = false
 		})
 	end
-	t[Roact.Event.Activated] = p1.props.onSelect or p1.props.onClick
-	local t2 = {}
-	local t3 = {
+	buttonProps[Roact.Event.Activated] = self.props.onSelect or self.props.onClick
+	local childElements = {}
+	local strokeProps = {
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	}
-	t3.Color = p1.state.hover and p1.props.accentColor or (p1.props.equipped and Color3.new(204/255, 204/255, 204/255) or (p1.props.selected and Color3.fromRGB(134, 195, 81) or (v2 and Color3.new(255/255, 0/255, 0/255) or Color3.new(1, 0.1, 0.1))))
-	t3.Thickness = if p1.props.equipped then 2 else 1
-	t3.Enabled = (p1.props.owned and p1.props.equipped or (p1.props.selected or (p1.state.hover or p1.props.offSalePrice))) and true or false
-	t2.UIStroke = createElement("UIStroke", t3)
-	t2.UICorner = createElement("UICorner", {
+	strokeProps.Color = self.state.hover and self.props.accentColor or (self.props.equipped and Color3.new(204/255, 204/255, 204/255) or (self.props.selected and Color3.fromRGB(134, 195, 81) or (offSalePriceText and Color3.new(255/255, 0/255, 0/255) or Color3.new(1, 0.1, 0.1))))
+	strokeProps.Thickness = if self.props.equipped then 2 else 1
+	strokeProps.Enabled = (self.props.owned and self.props.equipped or (self.props.selected or (self.state.hover or self.props.offSalePrice))) and true or false
+	childElements.UIStroke = createElement("UIStroke", strokeProps)
+	childElements.UICorner = createElement("UICorner", {
 		CornerRadius = UDim.new(0, cornerPixel)
 	})
-	t2.Viewport = createElement("ViewportFrame", {
+	childElements.Viewport = createElement("ViewportFrame", {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Position = UDim2.new(0, 0, paddingRatio + 0.1, 0),
-		Size = UDim2.new(1, 0, 1 - (paddingRatio + 0.1) - 0.5 * paddingRatio * 2 - v3 - paddingRatio * 0.5, 0),
+		Size = UDim2.new(1, 0, 1 - (paddingRatio + 0.1) - 0.5 * paddingRatio * 2 - favHeightScaled - paddingRatio * 0.5, 0),
 		Ambient = Color3.new(255/255, 255/255, 255/255),
 		LightColor = Color3.new(255/255, 255/255, 255/255),
-		CurrentCamera = p1.cameraRef,
-		[Roact.Ref] = p1.viewportRef
+		CurrentCamera = self.cameraRef,
+		[Roact.Ref] = self.viewportRef
 	}, {
 		Camera = createElement("Camera", {
-			FieldOfView = p1.props.fieldOfView,
-			[Roact.Ref] = p1.cameraRef
+			FieldOfView = self.props.fieldOfView,
+			[Roact.Ref] = self.cameraRef
 		})
 	})
-	local t4 = {
+	local maskProps = {
 		BackgroundTransparency = 0.4,
 		BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 		BorderSizePixel = 0,
 		Size = UDim2.new(1, 0, 1, 0),
 		ZIndex = 3
 	}
-	local v16 = if p1.props.masked == nil then false else p1.props.masked
-	if not v16 then
-		v16 = if p1.props.masked == nil then p1.props.owned == false else false
+	local shouldShowMask = if self.props.masked == nil then false else self.props.masked
+	if not shouldShowMask then
+		shouldShowMask = if self.props.masked == nil then self.props.owned == false else false
 	end
-	t4.Visible = v16
-	t2.Mask = createElement("Frame", t4, {
+	maskProps.Visible = shouldShowMask
+	childElements.Mask = createElement("Frame", maskProps, {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, cornerPixel)
 		})
 	})
-	t2.Locked = p1.props.locked and createElement("ImageLabel", {
+	childElements.Locked = self.props.locked and createElement("ImageLabel", {
 		BackgroundTransparency = 1,
 		BackgroundColor3 = Color3.new(0/255, 0/255, 0/255),
 		BorderSizePixel = 0,
@@ -117,31 +116,31 @@ function v1.render(p1)
 		Visible = true,
 		Image = "rbxassetid://8715708455"
 	})
-	local t5 = {
+	local titleProps = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Size = UDim2.new(1 - paddingRatio * 2, 0, 0.1, 0),
 		Position = UDim2.new(0.5, 0, 0.5 * paddingRatio * 2, 0),
 		AnchorPoint = Vector2.new(0.5, 0),
-		Text = p1.props.title,
+		Text = self.props.title,
 		Font = Enum.Font.LuckiestGuy,
 		LineHeight = 0.7,
 		TextScaled = true,
 		TextXAlignment = Enum.TextXAlignment.Center,
 		TextYAlignment = Enum.TextYAlignment.Top
 	}
-	t5.TextColor3 = p1.props.equipped and Color3.new(0.1, 0.1, 0.1) or Color3.new(255/255, 255/255, 255/255)
-	t5.ZIndex = 10
-	t2.Title = createElement("TextLabel", t5)
-	local v21
-	if v2 then
-		local t6 = {
+	titleProps.TextColor3 = self.props.equipped and Color3.new(0.1, 0.1, 0.1) or Color3.new(255/255, 255/255, 255/255)
+	titleProps.ZIndex = 10
+	childElements.Title = createElement("TextLabel", titleProps)
+	local offSalePriceLabelElement
+	if offSalePriceText then
+		local offSalePriceProps = {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1 - paddingRatio / aspectRatio * 2, 0, cashHeight * 0.8, 0),
-			Position = UDim2.new(0.5, 0, 1 - 0.5 * paddingRatio * 2 - v3 - paddingRatio * 0.5 - cashHeight - paddingRatio, 0),
+			Position = UDim2.new(0.5, 0, 1 - 0.5 * paddingRatio * 2 - favHeightScaled - paddingRatio * 0.5 - cashHeight - paddingRatio, 0),
 			AnchorPoint = Vector2.new(0.5, 1),
-			Text = v2,
+			Text = offSalePriceText,
 			Font = Enum.Font.LuckiestGuy,
 			LineHeight = 0.7,
 			TextScaled = true,
@@ -149,9 +148,9 @@ function v1.render(p1)
 			TextYAlignment = Enum.TextYAlignment.Center,
 			TextColor3 = Color3.new(255/255, 204/255, 204/255)
 		}
-		t6.Visible = not p1.props.limited or p1.props.owned or p1.props.equipped or false
-		t6.ZIndex = 10
-		v21 = createElement("TextLabel", t6, {
+		offSalePriceProps.Visible = not self.props.limited or self.props.owned or self.props.equipped or false
+		offSalePriceProps.ZIndex = 10
+		offSalePriceLabelElement = createElement("TextLabel", offSalePriceProps, {
 			CrossOut = createElement("Frame", {
 				BackgroundColor3 = Color3.fromRGB(230, 0, 0),
 				BorderSizePixel = 0,
@@ -161,28 +160,28 @@ function v1.render(p1)
 			})
 		})
 	else
-		v21 = nil
+		offSalePriceLabelElement = nil
 	end
-	t2.OffSalePrice = v21
-	local t6 = {
+	childElements.OffSalePrice = offSalePriceLabelElement
+	local priceProps = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Size = UDim2.new(1 - paddingRatio / aspectRatio * 2, 0, cashHeight, 0),
-		Position = UDim2.new(0.5, 0, 1 - 0.5 * paddingRatio * 2 - v3 - paddingRatio * 0.5, 0),
+		Position = UDim2.new(0.5, 0, 1 - 0.5 * paddingRatio * 2 - favHeightScaled - paddingRatio * 0.5, 0),
 		AnchorPoint = Vector2.new(0.5, 1),
-		Text = v1,
+		Text = statusText,
 		Font = Enum.Font.LuckiestGuy,
 		LineHeight = 0.7,
 		TextScaled = true,
 		TextXAlignment = Enum.TextXAlignment.Center,
 		TextYAlignment = Enum.TextYAlignment.Center
 	}
-	t6.TextColor3 = p1.props.equipped and Color3.new(0.1, 0.1, 0.1) or (p1.props.owned and Color3.new(255/255, 255/255, 255/255) or (v2 and Color3.new(1, 0.1, 0.1) or Color3.fromRGB(134, 195, 81)))
-	t6.Visible = not p1.props.limited or p1.props.owned or p1.props.equipped or false
-	t6.ZIndex = 10
-	t2.Price = createElement("TextLabel", t6)
-	t2.CreatorName = if p1.state.creatorVisible then createElement("TextLabel", {
-	Text = ("by: %*"):format(p1.props.creatorName),
+	priceProps.TextColor3 = self.props.equipped and Color3.new(0.1, 0.1, 0.1) or (self.props.owned and Color3.new(255/255, 255/255, 255/255) or (offSalePriceText and Color3.new(1, 0.1, 0.1) or Color3.fromRGB(134, 195, 81)))
+	priceProps.Visible = not self.props.limited or self.props.owned or self.props.equipped or false
+	priceProps.ZIndex = 10
+	childElements.Price = createElement("TextLabel", priceProps)
+	childElements.CreatorName = if self.state.creatorVisible then createElement("TextLabel", {
+	Text = ("by: %*"):format(self.props.creatorName),
 	TextColor3 = Color3.new(255/255, 255/255, 255/255),
 	Size = UDim2.new(0.8, 0, 0.3, 0),
 	AnchorPoint = Vector2.new(0.5, 0.5),
@@ -196,8 +195,8 @@ function v1.render(p1)
 	BackgroundTransparency = 1,
 	BorderSizePixel = 0,
 	ZIndex = 10
-}) else p1.state.creatorHover and createElement("TextLabel", {
-	Text = ("by: %*"):format(p1.props.creatorName),
+}) else self.state.creatorHover and createElement("TextLabel", {
+	Text = ("by: %*"):format(self.props.creatorName),
 	TextColor3 = Color3.new(255/255, 255/255, 255/255),
 	Size = UDim2.new(0.8, 0, 0.3, 0),
 	AnchorPoint = Vector2.new(0.5, 0.5),
@@ -212,43 +211,43 @@ function v1.render(p1)
 	BorderSizePixel = 0,
 	ZIndex = 10
 })
-	local creatorName = p1.props.creatorName
+	local creatorName = self.props.creatorName
 	if creatorName then
-		local t7 = {
-			Size = UDim2.new(v3 / aspectRatio, 0, v3, 0),
-			Position = UDim2.new(1 - 0.5 * paddingRatio / aspectRatio * 2 - v3 / aspectRatio - paddingRatio / aspectRatio, 0, 1 - 0.5 * paddingRatio * 2, 0),
+		local creatorToggleProps = {
+			Size = UDim2.new(favHeightScaled / aspectRatio, 0, favHeightScaled, 0),
+			Position = UDim2.new(1 - 0.5 * paddingRatio / aspectRatio * 2 - favHeightScaled / aspectRatio - paddingRatio / aspectRatio, 0, 1 - 0.5 * paddingRatio * 2, 0),
 			AnchorPoint = Vector2.new(1, 1),
 			BackgroundTransparency = 0
 		}
-		t7.BackgroundColor3 = p1.state.creatorHover and Color3.new(0.5, 0.5, 0.5) or Color3.new(0.7, 0.7, 0.7)
-		t7.Text = ""
-		t7.ZIndex = 10
-		t7[Roact.Event.MouseEnter] = function()
-			p1:setState({
+		creatorToggleProps.BackgroundColor3 = self.state.creatorHover and Color3.new(0.5, 0.5, 0.5) or Color3.new(0.7, 0.7, 0.7)
+		creatorToggleProps.Text = ""
+		creatorToggleProps.ZIndex = 10
+		creatorToggleProps[Roact.Event.MouseEnter] = function()
+			self:setState({
 				creatorHover = true
 			})
 		end
-		t7[Roact.Event.MouseLeave] = function()
-			p1:setState({
+		creatorToggleProps[Roact.Event.MouseLeave] = function()
+			self:setState({
 				creatorHover = false
 			})
 		end
-		t7[Roact.Event.SelectionGained] = function()
-			p1:setState({
+		creatorToggleProps[Roact.Event.SelectionGained] = function()
+			self:setState({
 				creatorHover = true
 			})
 		end
-		t7[Roact.Event.SelectionLost] = function()
-			p1:setState({
+		creatorToggleProps[Roact.Event.SelectionLost] = function()
+			self:setState({
 				creatorHover = false
 			})
 		end
-		t7[Roact.Event.Activated] = function()
-			p1:setState({
-				creatorVisible = not p1.state.creatorVisible
+		creatorToggleProps[Roact.Event.Activated] = function()
+			self:setState({
+				creatorVisible = not self.state.creatorVisible
 			})
 		end
-		creatorName = createElement("TextButton", t7, {
+		creatorName = createElement("TextButton", creatorToggleProps, {
 			Corner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
 			}),
@@ -263,100 +262,100 @@ function v1.render(p1)
 			})
 		})
 	end
-	t2.CreatorToggle = creatorName
-	local canFavorite = p1.props.canFavorite
+	childElements.CreatorToggle = creatorName
+	local canFavorite = self.props.canFavorite
 	if canFavorite then
-		local t7 = {
+		local favoriteButtonProps = {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			Size = UDim2.new(v3 / aspectRatio, 0, v3, 0),
+			Size = UDim2.new(favHeightScaled / aspectRatio, 0, favHeightScaled, 0),
 			Position = UDim2.new(1 - 0.5 * paddingRatio / aspectRatio * 2, 0, 1 - 0.5 * paddingRatio * 2, 0),
 			AnchorPoint = Vector2.new(1, 1)
 		}
-		t7.ImageColor3 = (p1.props.faved or p1.state.favHover) and Color3.fromRGB(255, 251, 0) or Color3.new(0.7, 0.7, 0.7)
-		t7.Image = "rbxassetid://8552830996"
-		t7.ZIndex = 10
-		t7[Roact.Event.MouseEnter] = function()
-			p1:setState({
+		favoriteButtonProps.ImageColor3 = (self.props.faved or self.state.favHover) and Color3.fromRGB(255, 251, 0) or Color3.new(0.7, 0.7, 0.7)
+		favoriteButtonProps.Image = "rbxassetid://8552830996"
+		favoriteButtonProps.ZIndex = 10
+		favoriteButtonProps[Roact.Event.MouseEnter] = function()
+			self:setState({
 				favHover = true
 			})
 		end
-		t7[Roact.Event.MouseLeave] = function()
-			p1:setState({
+		favoriteButtonProps[Roact.Event.MouseLeave] = function()
+			self:setState({
 				favHover = false
 			})
 		end
-		t7[Roact.Event.SelectionGained] = function()
-			p1:setState({
+		favoriteButtonProps[Roact.Event.SelectionGained] = function()
+			self:setState({
 				favHover = true
 			})
 		end
-		t7[Roact.Event.SelectionLost] = function()
-			p1:setState({
+		favoriteButtonProps[Roact.Event.SelectionLost] = function()
+			self:setState({
 				favHover = false
 			})
 		end
-		t7[Roact.Event.Activated] = function()
-			if p1.props.onFavorite then
-				p1.props.onFavorite(not p1.props.faved)
+		favoriteButtonProps[Roact.Event.Activated] = function()
+			if self.props.onFavorite then
+				self.props.onFavorite(not self.props.faved)
 			end
 		end
-		canFavorite = createElement("ImageButton", t7)
+		canFavorite = createElement("ImageButton", favoriteButtonProps)
 	end
-	t2.Star = canFavorite
-	t2.CustomContainer = p1.props.customComponent and createElement("Frame", {
+	childElements.Star = canFavorite
+	childElements.CustomContainer = self.props.customComponent and createElement("Frame", {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		Size = UDim2.new(v3 / aspectRatio, 0, v3, 0),
+		Size = UDim2.new(favHeightScaled / aspectRatio, 0, favHeightScaled, 0),
 		Position = UDim2.new(1 - 0.5 * paddingRatio / aspectRatio * 2, 0, 1 - 0.5 * paddingRatio * 2, 0),
 		AnchorPoint = Vector2.new(1, 1),
 		ZIndex = 5
 	}, {
-		CustomComponent = p1.props.customComponent
+		CustomComponent = self.props.customComponent
 	})
-	local t7 = {
+	local tagsContainerProps = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0
 	}
-	t7.Size = p1.props.canFavorite and UDim2.new(1 + (-paddingRatio * 2 - v3 - paddingRatio * 0.5) / aspectRatio, 0, v3, 0) or UDim2.new(1 + -paddingRatio * 2 / aspectRatio, 0, v3, 0)
-	t7.Position = UDim2.new(paddingRatio / aspectRatio, 0, 1 - 0.5 * paddingRatio * 2, 0)
-	t7.AnchorPoint = Vector2.new(0, 1)
-	t7.ZIndex = 10
-	local t8 = {}
-	local t9 = {
+	tagsContainerProps.Size = self.props.canFavorite and UDim2.new(1 + (-paddingRatio * 2 - favHeightScaled - paddingRatio * 0.5) / aspectRatio, 0, favHeightScaled, 0) or UDim2.new(1 + -paddingRatio * 2 / aspectRatio, 0, favHeightScaled, 0)
+	tagsContainerProps.Position = UDim2.new(paddingRatio / aspectRatio, 0, 1 - 0.5 * paddingRatio * 2, 0)
+	tagsContainerProps.AnchorPoint = Vector2.new(0, 1)
+	tagsContainerProps.ZIndex = 10
+	local tagsElements = {}
+	local seasonLevelBadgeProps = {
 		Size = UDim2.new(0.7 - 0.5 * paddingRatio * 0.5 / aspectRatio, 0, 1, 0)
 	}
-	t9.BackgroundColor3 = if p1.props.fakeLimited then Color3.fromRGB(253, 212, 98) else p1.props.accentColor
-	t9.Visible = (p1.props.season or (p1.props.level or (p1.props.limited or p1.props.fakeLimited))) and true or false
-	local t10 = {
+	seasonLevelBadgeProps.BackgroundColor3 = if self.props.fakeLimited then Color3.fromRGB(253, 212, 98) else self.props.accentColor
+	seasonLevelBadgeProps.Visible = (self.props.season or (self.props.level or (self.props.limited or self.props.fakeLimited))) and true or false
+	local seasonLevelBadgeChildren = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0.25, 0)
 		})
 	}
-	local t11 = {
+	local seasonLevelTextProps = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Size = UDim2.new(0.9, 0, 0.8, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5)
 	}
-	t11.Text = p1.props.season and p1.props.level and ("S%d-L%d"):format(p1.props.season, p1.props.level) or (p1.props.season and p1.props.topPct and ("S%d-%d%%"):format(p1.props.season, p1.props.topPct) or (p1.props.season and ("S%d"):format(p1.props.season) or (p1.props.level and ("L%d"):format(p1.props.level) or if p1.props.limited or p1.props.fakeLimited then "LIMITED" else "")))
-	t11.Font = Enum.Font.LuckiestGuy
-	t11.LineHeight = 0.7
-	t11.TextScaled = true
-	t11.TextXAlignment = Enum.TextXAlignment.Center
-	t11.TextYAlignment = Enum.TextYAlignment.Center
-	t11.TextColor3 = ColorUtils.brightenBy(p1.props.accentColor, -0.7)
-	t11.ZIndex = 10
-	t10.Title = createElement("TextLabel", t11)
-	t8.SeasonLevel = createElement("Frame", t9, t10)
-	local t12 = {
+	seasonLevelTextProps.Text = self.props.season and self.props.level and ("S%d-L%d"):format(self.props.season, self.props.level) or (self.props.season and self.props.topPct and ("S%d-%d%%"):format(self.props.season, self.props.topPct) or (self.props.season and ("S%d"):format(self.props.season) or (self.props.level and ("L%d"):format(self.props.level) or if self.props.limited or self.props.fakeLimited then "LIMITED" else "")))
+	seasonLevelTextProps.Font = Enum.Font.LuckiestGuy
+	seasonLevelTextProps.LineHeight = 0.7
+	seasonLevelTextProps.TextScaled = true
+	seasonLevelTextProps.TextXAlignment = Enum.TextXAlignment.Center
+	seasonLevelTextProps.TextYAlignment = Enum.TextYAlignment.Center
+	seasonLevelTextProps.TextColor3 = ColorUtils.brightenBy(self.props.accentColor, -0.7)
+	seasonLevelTextProps.ZIndex = 10
+	seasonLevelBadgeChildren.Title = createElement("TextLabel", seasonLevelTextProps)
+	tagsElements.SeasonLevel = createElement("Frame", seasonLevelBadgeProps, seasonLevelBadgeChildren)
+	local vipBadgeProps = {
 		Position = UDim2.new(0.7 + 0.5 * paddingRatio * 0.5 / aspectRatio, 0, 0, 0),
 		Size = UDim2.new(0.3 - 0.5 * paddingRatio * 0.5 / aspectRatio, 0, 1, 0),
-		BackgroundColor3 = p1.props.accentColor
+		BackgroundColor3 = self.props.accentColor
 	}
-	t12.Visible = p1.props.vip and true or false
-	t8.VIP = createElement("Frame", t12, {
+	vipBadgeProps.Visible = self.props.vip and true or false
+	tagsElements.VIP = createElement("Frame", vipBadgeProps, {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0.25, 0)
 		}),
@@ -376,46 +375,46 @@ function v1.render(p1)
 			ZIndex = 10
 		})
 	})
-	t2.Tags = createElement("Frame", t7, t8)
-	return createElement("TextButton", t, t2)
+	childElements.Tags = createElement("Frame", tagsContainerProps, tagsElements)
+	return createElement("TextButton", buttonProps, childElements)
 end
-function v1._updateViewport(p1)
-	local v1 = p1.cameraRef:getValue()
-	local inst = p1.maid.inst
+function CustomizeItemComponent._updateViewport(self)
+	local camera = self.cameraRef:getValue()
+	local inst = self.maid.inst
 	if inst and inst.Parent ~= nil then
-		p1.props.updateCamera(v1, inst)
+		self.props.updateCamera(camera, inst)
 	end
 end
-function v1._reparent(p1)
-	local v1 = p1.viewportRef:getValue()
-	p1.maid.inst = nil
-	if p1.props.getInst then
-		local mountCount = p1.mountCount
+function CustomizeItemComponent._reparent(self)
+	local viewport = self.viewportRef:getValue()
+	self.maid.inst = nil
+	if self.props.getInst then
+		local mountCount = self.mountCount
 		task.delay(math.random() * 0.3, function()
-			if p1.mounted and p1.mountCount == mountCount then
-				local v12 = p1.props.getInst()
-				p1.maid.inst = v12
-				v12.Parent = v1
+			if self.mounted and self.mountCount == mountCount then
+				local newInstance = self.props.getInst()
+				self.maid.inst = newInstance
+				newInstance.Parent = viewport
 			end
 		end)
 	end
-	p1:_updateViewport()
+	self:_updateViewport()
 end
-function v1.didMount(p1)
-	p1.mounted = true
-	p1.mountCount = p1.mountCount + 1
-	p1:_reparent()
-	p1.maid.updateCamera = RunService.Heartbeat:Connect(function()
-		p1:_updateViewport()
+function CustomizeItemComponent.didMount(self)
+	self.mounted = true
+	self.mountCount = self.mountCount + 1
+	self:_reparent()
+	self.maid.updateCamera = RunService.Heartbeat:Connect(function()
+		self:_updateViewport()
 	end)
 end
-function v1.didUpdate(p1, p2, p3)
-	if p1.props.getInstCompare and p1.props.getInstCompare ~= p2.getInstCompare or not p1.props.getInstCompare and p1.props.getInst ~= p2.getInst then
-		p1:_reparent()
+function CustomizeItemComponent.didUpdate(self, prevProps, prevState)
+	if self.props.getInstCompare and self.props.getInstCompare ~= prevProps.getInstCompare or not self.props.getInstCompare and self.props.getInst ~= prevProps.getInst then
+		self:_reparent()
 	end
 end
-function v1.willUnmount(p1)
-	p1.mounted = false
-	p1.maid:DoCleaning()
+function CustomizeItemComponent.willUnmount(self)
+	self.mounted = false
+	self.maid:DoCleaning()
 end
-return v1
+return CustomizeItemComponent

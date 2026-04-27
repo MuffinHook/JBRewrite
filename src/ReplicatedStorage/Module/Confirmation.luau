@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
@@ -8,100 +7,100 @@ local Maid = require(ReplicatedStorage.Std.Maid)
 local Signal = require(ReplicatedStorage.Std.Signal)
 local Localization = require(ReplicatedStorage.Module.Localization)
 local instance = false
-local t = {}
+local confirmationQueue = {}
 local function ProcessQueue()
-	if #t > 0 then
+	if #confirmationQueue > 0 then
 		instance = true
-		table.remove(t, 1):Hook()
+		table.remove(confirmationQueue, 1):Hook()
 	else
 		instance = false
 	end
 end
-local function SelectIfGamepad(p1)
-	EzUtils.selectIfGamepad(p1)
+local function SelectIfGamepad(button)
+	EzUtils.selectIfGamepad(button)
 end
-local t2 = {}
-t2.__index = t2
-function t2.Init(p1)
+local Confirmation = {}
+Confirmation.__index = Confirmation
+function Confirmation.Init(settings)
 	local ConfirmationGui = ReplicatedStorage.StarterGui:FindFirstChild("ConfirmationGui")
 	ConfirmationGui.Parent = LocalPlayer.PlayerGui
-	t2.Gui = ConfirmationGui
+	Confirmation.Gui = ConfirmationGui
 	ConfirmationGui.Confirmation.Background.ContainerButtons.ContainerYes.Button.Message.Text = Localization:FormatByKey("General.Yes")
 	ConfirmationGui.Confirmation.Background.ContainerButtons.ContainerNo.Button.Message.Text = Localization:FormatByKey("General.No")
-	function p1.em.p4rz6ffg(p1, p2)
-		local instance = t2.new(p1, p2)
-		instance.OnYes:Connect(function()
-			instance = nil
+	function settings.em.p4rz6ffg(player, options)
+		local confirmationDialog = Confirmation.new(player, options)
+		confirmationDialog.OnYes:Connect(function()
+			confirmationDialog = nil
 		end)
-		instance.OnNo:Connect(function()
-			instance = nil
+		confirmationDialog.OnNo:Connect(function()
+			confirmationDialog = nil
 		end)
 	end
-	GameUtil.OnTeamChanged:Connect(function(p1)
-		t2.SetColor(Settings.TeamColor[p1])
+	GameUtil.OnTeamChanged:Connect(function(newTeam)
+		Confirmation.SetColor(Settings.TeamColor[newTeam])
 	end)
-	t2.SetColor(Settings.TeamColor[GameUtil.Team])
+	Confirmation.SetColor(Settings.TeamColor[GameUtil.Team])
 end
-function t2.SetColor(p1)
-	local Gui = t2.Gui
-	Gui.Confirmation.Background.ImageColor3 = p1
-	Gui.Confirmation.Background.ContainerButtons.ContainerYes.Button.ImageColor3 = p1
-	Gui.Confirmation.Background.ContainerButtons.ContainerNo.Button.ImageColor3 = p1
+function Confirmation.SetColor(teamColor)
+	local Gui = Confirmation.Gui
+	Gui.Confirmation.Background.ImageColor3 = teamColor
+	Gui.Confirmation.Background.ContainerButtons.ContainerYes.Button.ImageColor3 = teamColor
+	Gui.Confirmation.Background.ContainerButtons.ContainerNo.Button.ImageColor3 = teamColor
 end
-function t2.new(p1, p2)
-	local t3 = {}
-	setmetatable(t3, t2)
-	t3.OptionSingleChoice = if p2 == nil then false else p2.SingleChoice
-	t3.Maid = Maid.new()
-	t3.OnYes = Signal.new()
-	t3.Maid:GiveTask(t3.OnYes)
-	if not t3.OptionSingleChoice then
-		t3.OnNo = Signal.new()
-		t3.Maid:GiveTask(t3.OnNo)
+function Confirmation.new(messageText, dialogOptions)
+	local dialogInstance = {}
+	setmetatable(dialogInstance, Confirmation)
+	dialogInstance.OptionSingleChoice = if dialogOptions == nil then false else dialogOptions.SingleChoice
+	dialogInstance.Maid = Maid.new()
+	dialogInstance.OnYes = Signal.new()
+	dialogInstance.Maid:GiveTask(dialogInstance.OnYes)
+	if not dialogInstance.OptionSingleChoice then
+		dialogInstance.OnNo = Signal.new()
+		dialogInstance.Maid:GiveTask(dialogInstance.OnNo)
 	end
-	t3.Text = p1
-	table.insert(t, t3)
+	dialogInstance.Text = messageText
+	table.insert(confirmationQueue, dialogInstance)
 	if instance == false then
-		if #t > 0 then
+		if #confirmationQueue > 0 then
 			instance = true
-			table.remove(t, 1):Hook()
-			return t3
+			table.remove(confirmationQueue, 1):Hook()
+			return dialogInstance
 		end
 		instance = false
 	end
-	return t3
+	return dialogInstance
 end
-function t2.Hook(p1)
-	local Gui = t2.Gui
+function Confirmation.Hook(dialogInstance)
+	local Gui = Confirmation.Gui
 	Gui.Enabled = true
-	Gui.Confirmation.Background.ContainerMessage.Message.Text = p1.Text
+	Gui.Confirmation.Background.ContainerMessage.Message.Text = dialogInstance.Text
 	local Button = Gui.Confirmation.Background.ContainerButtons.ContainerYes.Button
 	EzUtils.selectIfGamepad(Button)
-	p1.Maid:GiveTask(Button.MouseButton1Down:Connect(function()
-		p1.OnYes:Fire()
-		p1:Destroy()
+	dialogInstance.Maid:GiveTask(Button.MouseButton1Down:Connect(function()
+		dialogInstance.OnYes:Fire()
+		dialogInstance:Destroy()
 	end))
 	local ContainerNo = Gui.Confirmation.Background.ContainerButtons.ContainerNo
-	ContainerNo.Visible = not p1.OptionSingleChoice
-	local Button_2 = ContainerNo.Button
-	if not p1.OptionSingleChoice then
-		p1.Maid:GiveTask(Button_2.MouseButton1Down:Connect(function()
-			p1.OnNo:Fire()
-			p1:Destroy()
+	ContainerNo.Visible = not dialogInstance.OptionSingleChoice
+	local NoButton = ContainerNo.Button
+	if not dialogInstance.OptionSingleChoice then
+		dialogInstance.Maid:GiveTask(NoButton.MouseButton1Down:Connect(function()
+			dialogInstance.OnNo:Fire()
+			dialogInstance:Destroy()
 		end))
 	end
 end
-function t2.Destroy(p1)
-	if p1.Maid ~= nil then
-		t2.Gui.Enabled = false
-		p1.Maid:Destroy()
-		p1.Maid = nil
-		if #t > 0 then
+function Confirmation.Destroy(dialogInstance)
+	if dialogInstance.Maid ~= nil then
+		Confirmation.Gui.Enabled = false
+		dialogInstance.Maid:Destroy()
+		dialogInstance.Maid = nil
+		if #confirmationQueue > 0 then
 			instance = true
-			table.remove(t, 1):Hook()
+			table.remove(confirmationQueue, 1):Hook()
 			return
 		end
 		instance = false
 	end
 end
-return t2
+return Confirmation

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -16,179 +15,179 @@ local Taser = require(ReplicatedStorage.Game.ItemConfig.Taser)
 local GunSystemConsts = require(ReplicatedStorage.Game.ItemSystem.GunSystemConsts)
 local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
 local Raycast = require(ReplicatedStorage.Std.Raycast)
-local v2 = nil
-local t = {
+local eventDispatcher = nil
+local TaserClass = {
 	__ClassName = "Taser"
 }
-t.__index = t
-setmetatable(t, Basic)
-function t.Init(p1)
-	v2 = p1.Event
-	function p1.em.enmm5zqj(p1, p2)
-		local v1 = ItemSystem.GetEquipped(p1)
-		if v1 ~= nil and v1.Draw then
-			v1:Draw(p2)
+TaserClass.__index = TaserClass
+setmetatable(TaserClass, Basic)
+function TaserClass.Init(self)
+	eventDispatcher = self.Event
+	function self.em.enmm5zqj(self, eventData)
+		local equippedItem = ItemSystem.GetEquipped(self)
+		if equippedItem ~= nil and equippedItem.Draw then
+			equippedItem:Draw(eventData)
 		end
 	end
 end
-function t.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, Taser, p3)
-	setmetatable(v1, t)
-	v1.Tip = v1.Model.Skeleton.Tip
-	v1.IgnoreList = { v1.Character, v1.Model }
-	if not InventoryItemUtils.getAttr(v1.inventoryItemValue, "NextUse") then
-		InventoryItemUtils.setAttr(v1.inventoryItemValue, "NextUse", os.clock())
-		InventoryItemUtils.setAttr(v1.inventoryItemValue, "LastUsedAt", 0)
+function TaserClass.new(self, itemConfig, additionalConfig)
+	local instance = Basic.new(self, itemConfig, Taser, additionalConfig)
+	setmetatable(instance, TaserClass)
+	instance.Tip = instance.Model.Skeleton.Tip
+	instance.IgnoreList = { instance.Character, instance.Model }
+	if not InventoryItemUtils.getAttr(instance.inventoryItemValue, "NextUse") then
+		InventoryItemUtils.setAttr(instance.inventoryItemValue, "NextUse", os.clock())
+		InventoryItemUtils.setAttr(instance.inventoryItemValue, "LastUsedAt", 0)
 	end
-	if v1.Local then
-		v1:SetupCrossHair()
+	if instance.Local then
+		instance:SetupCrossHair()
 	end
-	v1._customCollidableFunc = v1:_buildCustomCollidableFunc()
-	if v1.Local then
-		local v3 = GunUtils.getShouldAddEquipTime(v1)
-		local v4 = InventoryItemUtils.getAttr(v1.inventoryItemValue, "NextUse") or 0
-		local v5 = InventoryItemUtils.getAttr(v1.inventoryItemValue, "LastUsedAt") or 0
-		local v6 = os.clock()
-		if v6 < v4 then
-			v1:StartReloadProgressCircle(v4 - v5, os.clock() - (v6 - v5))
-			return v1
-		elseif v3 then
-			v1.IsEquipping = true
-			v1:StartReloadProgressCircle(GunSystemConsts.GUN_EQUIP_TIME)
-			v1.maid:GiveTask(task.delay(GunSystemConsts.GUN_EQUIP_TIME, function()
-				v1.IsEquipping = false
+	instance._customCollidableFunc = instance:_buildCustomCollidableFunc()
+	if instance.Local then
+		local shouldAddEquipTime = GunUtils.getShouldAddEquipTime(instance)
+		local nextUseTime = InventoryItemUtils.getAttr(instance.inventoryItemValue, "NextUse") or 0
+		local lastUsedAt = InventoryItemUtils.getAttr(instance.inventoryItemValue, "LastUsedAt") or 0
+		local currentTime = os.clock()
+		if currentTime < nextUseTime then
+			instance:StartReloadProgressCircle(nextUseTime - lastUsedAt, os.clock() - (currentTime - lastUsedAt))
+			return instance
+		elseif shouldAddEquipTime then
+			instance.IsEquipping = true
+			instance:StartReloadProgressCircle(GunSystemConsts.GUN_EQUIP_TIME)
+			instance.maid:GiveTask(task.delay(GunSystemConsts.GUN_EQUIP_TIME, function()
+				instance.IsEquipping = false
 			end))
 		end
 	end
-	return v1
+	return instance
 end
-function t._buildCustomCollidableFunc(p1)
-	return function(p12)
-		if not p12.CanCollide and p1._lastListCharacter then
-			for i, v in ipairs(p1._lastListCharacter) do
-				local _ = p12:IsDescendantOf(v)
+function TaserClass._buildCustomCollidableFunc(self)
+	return function(part)
+		if not part.CanCollide and self._lastListCharacter then
+			for i, v in ipairs(self._lastListCharacter) do
+				local _ = part:IsDescendantOf(v)
 			end
 		end
 		return true
 	end
 end
-function t.UpdateCrossHair(p1)
-	p1.CrossHair:Update(p1:GetMouseLocation())
+function TaserClass.UpdateCrossHair(self)
+	self.CrossHair:Update(self:GetMouseLocation())
 end
-function t.SetupCrossHair(p1)
-	p1.CrossHair = CrossHair.Make()
-	p1.CrossHair.Gui.Parent = p1.Player.PlayerGui
-	p1.Maid:GiveTask(function()
-		p1.CrossHair:Destroy()
-		p1.CrossHair = nil
+function TaserClass.SetupCrossHair(self)
+	self.CrossHair = CrossHair.Make()
+	self.CrossHair.Gui.Parent = self.Player.PlayerGui
+	self.Maid:GiveTask(function()
+		self.CrossHair:Destroy()
+		self.CrossHair = nil
 	end)
 end
-function t.Heartbeat(p1)
-	Basic.Heartbeat(p1)
-	if p1.Local then
-		p1:UpdateCrossHair()
+function TaserClass.Heartbeat(self)
+	Basic.Heartbeat(self)
+	if self.Local then
+		self:UpdateCrossHair()
 	end
 end
-function t.GetLeftArmPosition(p1)
+function TaserClass.GetLeftArmPosition(self)
 	return nil
 end
-function t.Draw(p1, p2)
-	local v1 = os.clock()
-	if not (p1._lastDraw and v1 - p1._lastDraw < 1) then
-		p1._lastDraw = v1
-		local v22 = LightningUtils.strikePosition({
-			Origin = p1.Tip.Position,
-			Target = p2,
+function TaserClass.Draw(self, targetPosition)
+	local currentTime = os.clock()
+	if not (self._lastDraw and currentTime - self._lastDraw < 1) then
+		self._lastDraw = currentTime
+		local lightningEffect = LightningUtils.strikePosition({
+			Origin = self.Tip.Position,
+			Target = targetPosition,
 			NumSegments = 10,
 			OffsetRadius = 2,
 			PartWidth = 0.1,
 			Transparency = 0,
 			Color = Color3.fromRGB(175, 130, 90)
 		})
-		game:GetService("Debris"):AddItem(v22, 0.1)
-		if p1.Local then
-			v2:FireServer("e" .. ("auynrozj"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ppemmyz"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "5zqj", p2)
+		game:GetService("Debris"):AddItem(lightningEffect, 0.1)
+		if self.Local then
+			eventDispatcher:FireServer("enmm5zqj", targetPosition)
 		end
 	end
 end
-function t.Tase(p1, p2)
-	if not p1.IsEquipping then
-		local v1 = os.clock()
-		if not (v1 - InventoryItemUtils.getAttr(p1.inventoryItemValue, "NextUse") < 0) then
+function TaserClass.Tase(self, keycode)
+	if not self.IsEquipping then
+		local currentTime = os.clock()
+		if not (currentTime - InventoryItemUtils.getAttr(self.inventoryItemValue, "NextUse") < 0) then
 			local Character = Players.LocalPlayer.Character
 			if Character and TagUtils.isPointInTag(Character.PrimaryPart.Position, "NoTaser") then
-				if p1.Local then
+				if self.Local then
 					Notification.new({
 						Text = "Tasers not allowed here."
 					})
 				end
 			elseif Character then
-				Audio.ObjectLocal(p1.Tip, p1.Config.Sound.taser_buzz)
-				p1:UpdateMousePosition()
-				if p1.Local then
-					p1.CrossHair.Spring:Accelerate(600)
-					local t = {}
-					for v22, v3 in Players:GetPlayers() do
-						if v3 ~= LocalPlayer and v3.Character then
-							table.insert(t, v3.Character)
+				Audio.ObjectLocal(self.Tip, self.Config.Sound.taser_buzz)
+				self:UpdateMousePosition()
+				if self.Local then
+					self.CrossHair.Spring:Accelerate(600)
+					local otherCharactersList = {}
+					for index, player in Players:GetPlayers() do
+						if player ~= LocalPlayer and player.Character then
+							table.insert(otherCharactersList, player.Character)
 						end
 					end
-					p1._lastListCharacter = t
-					local Position = p1.Tip.Position
-					local v4 = p1.MousePosition - p1.Tip.Position
-					RaycastParams.new().FilterDescendantsInstances = p1.IgnoreList
-					local v5 = Raycast.collidable(Position, v4.Unit, p1.Config.Range)
-					local v6 = nil
-					local v7
-					if v5 then
-						v7 = v5.Position
-						v6 = v5.Instance
+					self._lastListCharacter = otherCharactersList
+					local tipPosition = self.Tip.Position
+					local directionVector = self.MousePosition - self.Tip.Position
+					RaycastParams.new().FilterDescendantsInstances = self.IgnoreList
+					local raycastHit = Raycast.collidable(tipPosition, directionVector.Unit, self.Config.Range)
+					local hitInstance = nil
+					local targetPosition
+					if raycastHit then
+						targetPosition = raycastHit.Position
+						hitInstance = raycastHit.Instance
 					else
-						v7 = Position + v4.Unit * p1.Config.Range
+						targetPosition = tipPosition + directionVector.Unit * self.Config.Range
 					end
-					if not v6 then
-						for v8, v9 in t do
-							local PrimaryPart = v9.PrimaryPart
+					if not hitInstance then
+						for i, character in otherCharactersList do
+							local PrimaryPart = character.PrimaryPart
 							if PrimaryPart then
-								local v10 = GeomUtils.calcRayIntersectSphere(Position, Position + v4, PrimaryPart.Position, 3)
-								if v10 then
-									v6 = v9.PrimaryPart
-									v7 = v10
+								local intersectionPoint = GeomUtils.calcRayIntersectSphere(tipPosition, tipPosition + directionVector, PrimaryPart.Position, 3)
+								if intersectionPoint then
+									hitInstance = character.PrimaryPart
+									targetPosition = intersectionPoint
 								end
 							end
 						end
 					end
-					p1:Draw(v7)
-					local ReloadTime = p1.Config.ReloadTime
-					local v11 = v1 + ReloadTime
-					if v6 then
-						local v12 = PlayerUtils.getPlayerFromDescendant(v6)
-						if v12 then
-							v2:FireServer("q" .. ("upskomtezlii"):sub(4, 9):reverse():reverse():reverse():reverse():reverse() .. "e", v12.Character:FindFirstChild("Humanoid"), v6, v7)
-							v11 = v1 + p1.Config.ReloadTimeHit
-							p1.CrossHair:Flare()
-							ReloadTime = p1.Config.ReloadTimeHit
+					self:Draw(targetPosition)
+					local reloadTime = self.Config.ReloadTime
+					local nextUseTime = currentTime + reloadTime
+					if hitInstance then
+						local hitPlayer = PlayerUtils.getPlayerFromDescendant(hitInstance)
+						if hitPlayer then
+							eventDispatcher:FireServer("qzetmoke", hitPlayer.Character:FindFirstChild("Humanoid"), hitInstance, targetPosition)
+							nextUseTime = currentTime + self.Config.ReloadTimeHit
+							self.CrossHair:Flare()
+							reloadTime = self.Config.ReloadTimeHit
 						end
 					end
-					if p1.Local then
-						p1:StartReloadProgressCircle(ReloadTime)
+					if self.Local then
+						self:StartReloadProgressCircle(reloadTime)
 					end
-					InventoryItemUtils.setAttr(p1.inventoryItemValue, "LastUsedAt", v1)
-					InventoryItemUtils.setAttr(p1.inventoryItemValue, "NextUse", v11)
-					p1:BroadcastInputBegan(p2)
+					InventoryItemUtils.setAttr(self.inventoryItemValue, "LastUsedAt", currentTime)
+					InventoryItemUtils.setAttr(self.inventoryItemValue, "NextUse", nextUseTime)
+					self:BroadcastInputBegan(keycode)
 				end
-				GunUtils.setLastShotTime(p1.Player, workspace:GetServerTimeNow())
+				GunUtils.setLastShotTime(self.Player, workspace:GetServerTimeNow())
 				return true
 			end
 		end
 	end
 	return false
 end
-function t.InputBegan(p1, p2, p3)
-	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
-		p1:Tase(p2)
+function TaserClass.InputBegan(self, inputData, gameProcessed)
+	if if inputData.UserInputType == Enum.UserInputType.MouseButton1 then true elseif inputData.UserInputType == Enum.UserInputType.Gamepad1 then inputData.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		self:Tase(inputData)
 	end
-	Basic.InputBegan(p1, p2, p3)
+	Basic.InputBegan(self, inputData, gameProcessed)
 end
-function t.InputEnded(p1)  end
-return t
+function TaserClass.InputEnded(self)  end
+return TaserClass

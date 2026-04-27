@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local _ = Vector3.new
 local identityCFrame = CFrame.new(0, 0, 0)
 local toObjectSpace = identityCFrame.toObjectSpace

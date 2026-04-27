@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Game.ItemSystem.GunSystemConsts)
 local Settings = require(ReplicatedStorage.Resource.Settings)
@@ -40,9 +39,9 @@ return {
 	MobileMouseHeightScalar = 0.5,
 	MaxDamageDist = 3072,
 	EquipTime = 0.5,
-	DamageFun = function(p1)
-		local v1 = math.clamp(p1 / 500, 0, 1)
-		return (1 - v1) * 22 + v1 * 80
+	DamageFun = function(distance)
+		local distanceRatio = math.clamp(distance / 500, 0, 1)
+		return (1 - distanceRatio) * 22 + distanceRatio * 80
 	end,
 	Price = 50000,
 	ImageId = Settings.Images.Sniper

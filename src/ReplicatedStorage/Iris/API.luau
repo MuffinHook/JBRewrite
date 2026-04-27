@@ -1,4 +1,3 @@
--- Reviewed by Claude
 require(script.Parent.Types)
 return function(irisModule)
 	local function wrapper(widgetType)

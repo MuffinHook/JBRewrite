@@ -1,4 +1,3 @@
--- Reviewed by Claude
 game:GetService("GuiService")
 local Players = game:GetService("Players")
 local CurrentCamera = workspace.CurrentCamera
@@ -226,7 +225,7 @@ function TankBinder._handleSeatedGunner(self, gunner, seatMaid)
 			if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton1 then
 				isFiring = false
 			elseif not gameProcessed and input.UserInputType == Enum.UserInputType.Touch then
-				local is_mobileInputObject = self._mobileInputObject == input
+				local isMobileInputMatched = self._mobileInputObject == input
 			end
 		end))
 		gunnerMaid:GiveTask(ActionButtonService.add({

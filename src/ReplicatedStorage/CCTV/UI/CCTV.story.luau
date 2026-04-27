@@ -1,17 +1,16 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
-return function(p1)
+return function(guiParent)
 	local CCTV = require(script.Parent.CCTV)
-	local v1 = Roact.mount(Roact.createElement(CCTV, {
+	local cctvInstance = Roact.mount(Roact.createElement(CCTV, {
 		size = UDim2.new(0.5, 0, 0.5, 0),
 		position = UDim2.new(0.5, 0, 0.5, 0),
 		distance = 96,
 		aspectRatio = 1.7777777777777777,
 		cameraCFrame = workspace.CurrentCamera.CFrame,
 		fieldOfView = 70
-	}), p1)
+	}), guiParent)
 	return function()
-		Roact.unmount(v1)
+		Roact.unmount(cctvInstance)
 	end
 end

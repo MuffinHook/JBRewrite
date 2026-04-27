@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return function()
 	local SafesConsts = require(script.Parent.SafesConsts)
@@ -6,13 +5,13 @@ return function()
 	describe("safe items", function()
  it("all exist", function()
  local count = 0
- for v1, v2 in SafesConsts.SAFE_DATA do
- for v3, v4 in v2.RewardData do
- local v5, v6 = pcall(function()
- getItemPropsFromRewardData(v4)
+ for safeId, safeData in SafesConsts.SAFE_DATA do
+ for rewardId, rewardData in safeData.RewardData do
+ local didSucceed, errorMessage = pcall(function()
+ getItemPropsFromRewardData(rewardData)
  end)
- if not v5 then
- warn(v6)
+ if not didSucceed then
+ warn(errorMessage)
  count = count + 1
  end
  end

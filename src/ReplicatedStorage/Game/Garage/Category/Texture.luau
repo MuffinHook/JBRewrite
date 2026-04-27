@@ -1,6 +1,5 @@
--- Reviewed by Claude
-return function(p1)
-	local Model = p1.Model
+return function(props)
+	local Model = props.Model
 	if Model then
 		return Model:FindFirstChild("Body", true)
 	end

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Joint = require(ReplicatedStorage.Std.Joint)
 local TireSticker = require(ReplicatedStorage.Game.Garage.Customize.TireSticker)
@@ -90,15 +88,15 @@ return function(tireConfig, vehicleData, customizationOptions)
 		end
 	end
 	if Model:FindFirstChild("WheelModels") then
-		for v2, v3 in Model.WheelModels:GetChildren() do
-			if v3:IsA("Model") then
-				updateWheelModel(v3)
+		for _, wheelChild in Model.WheelModels:GetChildren() do
+			if wheelChild:IsA("Model") then
+				updateWheelModel(wheelChild)
 			end
 		end
 	else
-		for v4, v5 in Model:GetDescendants() do
-			if v5:IsA("Model") and (v5.Name:sub(1, 5) == "Wheel" and (v5.Name ~= "Wheels" and v5.Name ~= "WheelModels")) then
-				updateWheelModel(v5)
+		for _, descendant in Model:GetDescendants() do
+			if descendant:IsA("Model") and (descendant.Name:sub(1, 5) == "Wheel" and (descendant.Name ~= "Wheels" and descendant.Name ~= "WheelModels")) then
+				updateWheelModel(descendant)
 			end
 		end
 	end

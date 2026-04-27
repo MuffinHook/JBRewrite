@@ -1,68 +1,67 @@
--- Reviewed by Claude
 local TextService = game:GetService("TextService")
 local t = {
-	MakeDictionary = function(p1)
-		local t = {}
-		for i = 1, #p1 do
-			t[p1[i]] = true
+	MakeDictionary = function(items)
+		local result = {}
+		for i = 1, #items do
+			result[items[i]] = true
 		end
-		return t
+		return result
 	end,
-	DictionaryKeys = function(p1)
-		local t = {}
-		for k in pairs(p1) do
-			table.insert(t, k)
+	DictionaryKeys = function(dictionary)
+		local keys = {}
+		for k in pairs(dictionary) do
+			table.insert(keys, k)
 		end
-		return t
+		return keys
 	end
 }
-local function transformInstanceSet(p1)
-	local t = {}
-	for i = 1, #p1 do
-		t[i] = p1[i].Name
+local function transformInstanceSet(instances)
+	local names = {}
+	for i = 1, #instances do
+		names[i] = instances[i].Name
 	end
-	return t, p1
+	return names, instances
 end
-function t.MakeFuzzyFinder(p1)
-	local v1 = nil
-	local t = {}
-	if typeof(p1) == "Enum" then
-		p1 = p1:GetEnumItems()
+function t.MakeFuzzyFinder(source)
+	local namesTable = nil
+	local objectsTable = {}
+	if typeof(source) == "Enum" then
+		source = source:GetEnumItems()
 	end
-	if typeof(p1) == "Instance" then
-		local v3 = p1:GetChildren()
-		local t2 = {}
-		for i = 1, #v3 do
-			t2[i] = v3[i].Name
+	if typeof(source) == "Instance" then
+		local children = source:GetChildren()
+		local childNames = {}
+		for i = 1, #children do
+			childNames[i] = children[i].Name
 		end
-		t = v3
-		v1 = t2
-	elseif typeof(p1) == "table" then
-		local v5, v6
-		if typeof(p1[1]) == "Instance" then
-			v5 = p1
-			v6 = {}
-			for j = 1, #p1 do
-				v6[j] = v5[j].Name
+		objectsTable = children
+		namesTable = childNames
+	elseif typeof(source) == "table" then
+		local instances, instanceNames
+		if typeof(source[1]) == "Instance" then
+			instances = source
+			instanceNames = {}
+			for j = 1, #source do
+				instanceNames[j] = instances[j].Name
 			end
-			t = v5
-			v1 = v6
+			objectsTable = instances
+			namesTable = instanceNames
 		else
-			if typeof(p1[1]) == "EnumItem" or typeof(p1[1]) == "table" and typeof(p1[1].Name) == "string" then
-				v5 = p1
-				v6 = {}
-				for j = 1, #p1 do
-					v6[j] = v5[j].Name
+			if typeof(source[1]) == "EnumItem" or typeof(source[1]) == "table" and typeof(source[1].Name) == "string" then
+				instances = source
+				instanceNames = {}
+				for j = 1, #source do
+					instanceNames[j] = instances[j].Name
 				end
-				t = v5
-				v1 = v6
+				objectsTable = instances
+				namesTable = instanceNames
 			else
-				local v9
-				v9 = p1[1]
-				if type(v9) == "string" then
-					v1 = p1
-				elseif p1[1] == nil then
-					v1 = {}
+				local firstElement
+				firstElement = source[1]
+				if type(firstElement) == "string" then
+					namesTable = source
+				elseif source[1] == nil then
+					namesTable = {}
 				else
 					error("[Cmdr] MakeFuzzyFinder only accepts tables of instances or strings.")
 				end
@@ -71,379 +70,379 @@ function t.MakeFuzzyFinder(p1)
 	else
 		error("[Cmdr] MakeFuzzyFinder only accepts a table, Enum, or Instance.")
 	end
-	return function(p1, p2, p3)
-		local t2 = {}
-		for k, v in pairs(v1) do
-			local v12 = t and t[k] or v
-			if v:lower() == p1:lower() then
-				if p2 then
-					return v12
+	return function(query, exactOnly, prefixOnly)
+		local matchResults = {}
+		for k, v in pairs(namesTable) do
+			local matchValue = objectsTable and objectsTable[k] or v
+			if v:lower() == query:lower() then
+				if exactOnly then
+					return matchValue
 				end
-				table.insert(t2, 1, v12)
-			elseif p3 then
-				if v:lower():sub(1, #p1) == p1:lower() then
-					t2[#t2 + 1] = v12
+				table.insert(matchResults, 1, matchValue)
+			elseif prefixOnly then
+				if v:lower():sub(1, #query) == query:lower() then
+					matchResults[#matchResults + 1] = matchValue
 				end
-			elseif v:lower():find(p1:lower(), 1, true) then
-				t2[#t2 + 1] = v12
+			elseif v:lower():find(query:lower(), 1, true) then
+				matchResults[#matchResults + 1] = matchValue
 			end
 		end
-		if p2 then
-			return t2[1]
+		if exactOnly then
+			return matchResults[1]
 		else
-			return t2
+			return matchResults
 		end
 	end
 end
-function t.GetNames(p1)
-	local t = {}
-	for i = 1, #p1 do
-		local v1 = p1[i].Name
-		if not v1 then
-			v1 = tostring(p1[i])
+function t.GetNames(instances)
+	local names = {}
+	for i = 1, #instances do
+		local name = instances[i].Name
+		if not name then
+			name = tostring(instances[i])
 		end
-		t[i] = v1
+		names[i] = name
 	end
-	return t
+	return names
 end
-function t.SplitStringSimple(p1, p2)
-	if p2 == nil then
-		p2 = "%s"
+function t.SplitStringSimple(str, delimiter)
+	if delimiter == nil then
+		delimiter = "%s"
 	end
-	local t = {}
+	local result = {}
 	local count = 1
-	for v1 in string.gmatch(p1, "([^" .. p2 .. "]+)") do
-		t[count] = v1
+	for token in string.gmatch(str, "([^" .. delimiter .. "]+)") do
+		result[count] = token
 		count = count + 1
 	end
-	return t
+	return result
 end
-local function charCode(p1)
-	return utf8.char((tonumber(p1, 16)))
+local function charCode(hexString)
+	return utf8.char((tonumber(hexString, 16)))
 end
-function t.ParseEscapeSequences(p1)
-	return p1:gsub("\\(.)", {
+function t.ParseEscapeSequences(str)
+	return str:gsub("\\(.)", {
 		t = "\t",
 		n = "\n"
 	}):gsub("\\u(%x%x%x%x)", charCode):gsub("\\x(%x%x)", charCode)
 end
-function t.EncodeEscapedOperator(p1, p2)
-	return p1:gsub("(" .. ("%" .. p2:sub(1, 1)) .. "+)(" .. p2:gsub(".", "%%%1") .. ")", function(p1, p2)
-		return (p1:sub(1, #p1 - 1) .. p2):gsub(".", function(p1)
-			return "\\u" .. string.format("%04x", string.byte(p1), 16)
+function t.EncodeEscapedOperator(str, operator)
+	return str:gsub("(" .. ("%" .. operator:sub(1, 1)) .. "+)(" .. operator:gsub(".", "%%%1") .. ")", function(captured, replacement)
+		return (captured:sub(1, #captured - 1) .. replacement):gsub(".", function(char)
+			return "\\u" .. string.format("%04x", string.byte(char), 16)
 		end)
 	end)
 end
-local t2 = { "&&", "||", ";" }
-function t.EncodeEscapedOperators(p1)
-	for i, v in ipairs(t2) do
-		p1 = t.EncodeEscapedOperator(p1, v)
+local operatorsList = { "&&", "||", ";" }
+function t.EncodeEscapedOperators(str)
+	for i, v in ipairs(operatorsList) do
+		str = t.EncodeEscapedOperator(str, v)
 	end
-	return p1
+	return str
 end
-local function encodeControlChars(p1)
-	return p1:gsub("\\\\", "___!CMDR_ESCAPE!___"):gsub("\\\"", "___!CMDR_QUOTE!___"):gsub("\\\'", "___!CMDR_SQUOTE!___"):gsub("\\\n", "___!CMDR_NL!___")
+local function encodeControlChars(str)
+	return str:gsub("\\\\", "___!CMDR_ESCAPE!___"):gsub("\\\"", "___!CMDR_QUOTE!___"):gsub("\\\'", "___!CMDR_SQUOTE!___"):gsub("\\\n", "___!CMDR_NL!___")
 end
-local function decodeControlChars(p1)
-	return p1:gsub("___!CMDR_ESCAPE!___", "\\"):gsub("___!CMDR_QUOTE!___", "\""):gsub("___!CMDR_NL!___", "\n")
+local function decodeControlChars(str)
+	return str:gsub("___!CMDR_ESCAPE!___", "\\"):gsub("___!CMDR_QUOTE!___", "\""):gsub("___!CMDR_NL!___", "\n")
 end
-function t.SplitString(p1, p2)
-	local v1 = nil
-	local v2 = nil
-	local t2 = {}
-	local v3 = p2 or (1 / 0)
-	for v5 in p1:gsub("\\\\", "___!CMDR_ESCAPE!___"):gsub("\\\"", "___!CMDR_QUOTE!___"):gsub("\\\'", "___!CMDR_SQUOTE!___"):gsub("\\\n", "___!CMDR_NL!___"):gmatch("[^ ]+") do
-		local v4
-		local v6 = t.ParseEscapeSequences(v5)
-		local v7 = v6:match("^([\'\"])")
-		local v8 = v6:match("([\'\"])$")
-		local v9 = v6:match("(\\*)[\'\"]$")
-		if v7 and not (v1 or v8) then
-			v2 = v6
-			v1 = v7
-			v5 = v6
-		elseif v2 and (v8 == v1 and #v9 % 2 == 0) then
-			v2 = nil
-			v1 = nil
-			v5 = v2 .. " " .. v6
-		elseif v2 then
-			v2, v5 = v2 .. " " .. v6, v6
+function t.SplitString(str, maxTokensParam)
+	local currentQuote = nil
+	local isQuoted = nil
+	local tokens = {}
+	local maxTokens = maxTokensParam or (1 / 0)
+	for token in str:gsub("\\\\", "___!CMDR_ESCAPE!___"):gsub("\\\"", "___!CMDR_QUOTE!___"):gsub("\\\'", "___!CMDR_SQUOTE!___"):gsub("\\\n", "___!CMDR_NL!___"):gmatch("[^ ]+") do
+		local shouldInsert
+		local parsed = t.ParseEscapeSequences(token)
+		local openQuote = parsed:match("^([\'\"])")
+		local closeQuote = parsed:match("([\'\"])$")
+		local escapeSequence = parsed:match("(\\*)[\'\"]$")
+		if openQuote and not (currentQuote or closeQuote) then
+			isQuoted = parsed
+			currentQuote = openQuote
+			token = parsed
+		elseif isQuoted and (closeQuote == currentQuote and #escapeSequence % 2 == 0) then
+			isQuoted = nil
+			currentQuote = nil
+			token = isQuoted .. " " .. parsed
+		elseif isQuoted then
+			isQuoted, token = isQuoted .. " " .. parsed, parsed
 		else
-			v5 = v6
+			token = parsed
 		end
-		if not v2 then
-			v4 = if v3 < #t2 then 0 else 1
-			t2[#t2 + v4] = v5:gsub("^([\'\"])", ""):gsub("([\'\"])$", ""):gsub("___!CMDR_ESCAPE!___", "\\"):gsub("___!CMDR_QUOTE!___", "\""):gsub("___!CMDR_NL!___", "\n")
+		if not isQuoted then
+			shouldInsert = if maxTokens < #tokens then 0 else 1
+			tokens[#tokens + shouldInsert] = token:gsub("^([\'\"])", ""):gsub("([\'\"])$", ""):gsub("___!CMDR_ESCAPE!___", "\\"):gsub("___!CMDR_QUOTE!___", "\""):gsub("___!CMDR_NL!___", "\n")
 		end
 	end
-	if v2 then
-		t2[#t2 + if v3 < #t2 then 0 else 1] = v2:gsub("___!CMDR_ESCAPE!___", "\\"):gsub("___!CMDR_QUOTE!___", "\""):gsub("___!CMDR_NL!___", "\n")
+	if isQuoted then
+		tokens[#tokens + if maxTokens < #tokens then 0 else 1] = isQuoted:gsub("___!CMDR_ESCAPE!___", "\\"):gsub("___!CMDR_QUOTE!___", "\""):gsub("___!CMDR_NL!___", "\n")
 	end
-	return t2
+	return tokens
 end
-function t.MashExcessArguments(p1, p2)
-	local t = {}
-	for i = 1, #p1 do
-		if p2 < i then
-			t[p2] = ("%s %s"):format(t[p2] or "", p1[i])
+function t.MashExcessArguments(args, maxIndex)
+	local result = {}
+	for i = 1, #args do
+		if maxIndex < i then
+			result[maxIndex] = ("%s %s"):format(result[maxIndex] or "", args[i])
 		else
-			t[i] = p1[i]
+			result[i] = args[i]
 		end
 	end
-	return t
+	return result
 end
-function t.TrimString(p1)
-	local _, v1 = string.find(p1, "^%s*")
-	if v1 == #p1 then
+function t.TrimString(str)
+	local _, firstNonWhitespaceIndex = string.find(str, "^%s*")
+	if firstNonWhitespaceIndex == #str then
 		return ""
 	else
-		return string.match(p1, ".*%S", v1 + 1)
+		return string.match(str, ".*%S", firstNonWhitespaceIndex + 1)
 	end
 end
-function t.GetTextSize(p1, p2, p3)
-	return TextService:GetTextSize(p1, p2.TextSize, p2.Font, p3 or Vector2.new(p2.AbsoluteSize.X, 0))
+function t.GetTextSize(str, guiObject, constraintSize)
+	return TextService:GetTextSize(str, guiObject.TextSize, guiObject.Font, constraintSize or Vector2.new(guiObject.AbsoluteSize.X, 0))
 end
-function t.MakeEnumType(p1, p2)
-	local v1 = t.MakeFuzzyFinder(p2)
+function t.MakeEnumType(typeName, sourceTable)
+	local fuzzyFinder = t.MakeFuzzyFinder(sourceTable)
 	return {
-		Validate = function(p12)
-			return v1(p12, true) ~= nil, ("Value %q is not a valid %s."):format(p12, p1)
+		Validate = function(value)
+			return fuzzyFinder(value, true) ~= nil, ("Value %q is not a valid %s."):format(value, typeName)
 		end,
-		Autocomplete = function(p1)
-			local v12 = v1(p1)
-			return if type(v12[1]) == "string" then v12 else t.GetNames(v12) or v12
+		Autocomplete = function(input)
+			local results = fuzzyFinder(input)
+			return if type(results[1]) == "string" then results else t.GetNames(results) or results
 		end,
-		Parse = function(p1)
-			return v1(p1, true)
+		Parse = function(input)
+			return fuzzyFinder(input, true)
 		end
 	}
 end
-function t.ParsePrefixedUnionType(p1, p2)
-	local v1 = t.SplitStringSimple(p1)
-	local t2 = {}
-	for i = 1, #v1, 2 do
-		t2[#t2 + 1] = {
-			prefix = v1[i - 1] or "",
-			type = v1[i]
+function t.ParsePrefixedUnionType(str, input)
+	local parts = t.SplitStringSimple(str)
+	local typeList = {}
+	for i = 1, #parts, 2 do
+		typeList[#typeList + 1] = {
+			prefix = parts[i - 1] or "",
+			type = parts[i]
 		}
 	end
-	table.sort(t2, function(p1, p2)
-		return #p1.prefix > #p2.prefix
+	table.sort(typeList, function(a, b)
+		return #a.prefix > #b.prefix
 	end)
-	for j = 1, #t2 do
-		local v2 = t2[j]
-		if p2:sub(1, #v2.prefix) == v2.prefix then
-			return v2.type, p2:sub(#v2.prefix + 1), v2.prefix
+	for j = 1, #typeList do
+		local typeEntry = typeList[j]
+		if input:sub(1, #typeEntry.prefix) == typeEntry.prefix then
+			return typeEntry.type, input:sub(#typeEntry.prefix + 1), typeEntry.prefix
 		end
 	end
 end
-function t.MakeListableType(p1, p2)
-	local t = {
+function t.MakeListableType(baseType, overrides)
+	local result = {
 		Listable = true,
-		Transform = p1.Transform,
-		Validate = p1.Validate,
-		ValidateOnce = p1.ValidateOnce,
-		Autocomplete = p1.Autocomplete,
-		Default = p1.Default,
-		ArgumentOperatorAliases = p1.ArgumentOperatorAliases,
+		Transform = baseType.Transform,
+		Validate = baseType.Validate,
+		ValidateOnce = baseType.ValidateOnce,
+		Autocomplete = baseType.Autocomplete,
+		Default = baseType.Default,
+		ArgumentOperatorAliases = baseType.ArgumentOperatorAliases,
 		Parse = function(...)
-			return { p1.Parse(...) }
+			return { baseType.Parse(...) }
 		end
 	}
-	if p2 then
-		for k, v in pairs(p2) do
-			t[k] = v
+	if overrides then
+		for k, v in pairs(overrides) do
+			result[k] = v
 		end
 	end
-	return t
+	return result
 end
-local function encodeCommandEscape(p1)
-	return p1:gsub("\\%$", "___!CMDR_DOLLAR!___")
+local function encodeCommandEscape(str)
+	return str:gsub("\\%$", "___!CMDR_DOLLAR!___")
 end
-local function decodeCommandEscape(p1)
-	return p1:gsub("___!CMDR_DOLLAR!___", "$")
+local function decodeCommandEscape(str)
+	return str:gsub("___!CMDR_DOLLAR!___", "$")
 end
-function t.RunCommandString(p1, p2)
-	local v2 = t.EncodeEscapedOperators((t.ParseEscapeSequences(p2))):split("&&")
-	local v3 = ""
-	for i, v in ipairs(v2) do
-		local v4 = v3:gsub("%$", "\\x24"):gsub("%%", "%%%%")
-		local v9 = tostring(p1:EvaluateAndRun((t.RunEmbeddedCommands(p1, (v:gsub("||", v3:find("%s") and ("%q"):format(v4) or v4))))))
-		if i == #v2 then
-			return v9
+function t.RunCommandString(dispatcher, command)
+	local commands = t.EncodeEscapedOperators((t.ParseEscapeSequences(command))):split("&&")
+	local lastResult = ""
+	for i, v in ipairs(commands) do
+		local escapedResult = lastResult:gsub("%$", "\\x24"):gsub("%%", "%%%%")
+		local currentResult = tostring(dispatcher:EvaluateAndRun((t.RunEmbeddedCommands(dispatcher, (v:gsub("||", lastResult:find("%s") and ("%q"):format(escapedResult) or escapedResult))))))
+		if i == #commands then
+			return currentResult
 		end
-		v3 = v9
+		lastResult = currentResult
 	end
 end
-function t.RunEmbeddedCommands(p1, p2)
-	local v1 = p2:gsub("\\%$", "___!CMDR_DOLLAR!___")
-	local t2, v2 = {}, v1
-	for v4 in v1:gmatch("$(%b{})") do
-		local v3
-		local v5 = v4:sub(2, #v4 - 1)
-		if v5:match("^{.+}$") then
-			v5, v3 = v5:sub(2, #v5 - 1), false
+function t.RunEmbeddedCommands(dispatcher, str)
+	local encoded = str:gsub("\\%$", "___!CMDR_DOLLAR!___")
+	local substitutions, result = {}, encoded
+	for placeholder in encoded:gmatch("$(%b{})") do
+		local isQuoted
+		local content = placeholder:sub(2, #placeholder - 1)
+		if content:match("^{.+}$") then
+			content, isQuoted = content:sub(2, #content - 1), false
 		else
-			v3 = true
+			isQuoted = true
 		end
-		t2[v4] = t.RunCommandString(p1, v5)
-		if v3 and (t2[v4]:find("%s") or t2[v4] == "") then
-			t2[v4] = string.format("%q", t2[v4])
+		substitutions[placeholder] = t.RunCommandString(dispatcher, content)
+		if isQuoted and (substitutions[placeholder]:find("%s") or substitutions[placeholder] == "") then
+			substitutions[placeholder] = string.format("%q", substitutions[placeholder])
 		end
 	end
-	return v2:gsub("$(%b{})", t2):gsub("___!CMDR_DOLLAR!___", "$")
+	return result:gsub("$(%b{})", substitutions):gsub("___!CMDR_DOLLAR!___", "$")
 end
-function t.SubstituteArgs(p1, p2)
-	local v1 = p1:gsub("\\%$", "___!CMDR_DOLLAR!___")
-	local v2
-	if type(p2) == "table" then
-		v2 = v1
-		for i = 1, #p2 do
-			local v3 = tostring(i)
-			p2[v3] = p2[i]
-			if p2[v3]:find("%s") then
-				p2[v3] = string.format("%q", p2[v3])
+function t.SubstituteArgs(str, argsTable)
+	local encoded = str:gsub("\\%$", "___!CMDR_DOLLAR!___")
+	local result
+	if type(argsTable) == "table" then
+		result = encoded
+		for i = 1, #argsTable do
+			local indexStr = tostring(i)
+			argsTable[indexStr] = argsTable[i]
+			if argsTable[indexStr]:find("%s") then
+				argsTable[indexStr] = string.format("%q", argsTable[indexStr])
 			end
 		end
 	else
-		v2 = v1
+		result = encoded
 	end
-	return v2:gsub("($%d+)%b{}", "%1"):gsub("$(%w+)", p2):gsub("___!CMDR_DOLLAR!___", "$")
+	return result:gsub("($%d+)%b{}", "%1"):gsub("$(%w+)", argsTable):gsub("___!CMDR_DOLLAR!___", "$")
 end
-function t.MakeAliasCommand(p1, p2)
-	local v1, v2 = unpack(p1:split("|"))
-	local v3 = t.EncodeEscapedOperators(p2)
-	local t2 = {}
-	local t3 = {}
-	for v10 in v3:gmatch("$(%d+)") do
-		local v4, v5, v6, v7, v8, v9
-		if t2[v10] == nil then
-			t2[v10] = true
-			local v11 = v3:match((("$%*(%%b{})"):format(v10)))
-			if v11 then
-				local v13, v14, v15 = unpack(v11:sub(2, #v11 - 1):split("|"))
-				v4 = v13
-				v5 = v14
-				v6 = v15
+function t.MakeAliasCommand(header, body)
+	local name, aliases = unpack(header:split("|"))
+	local encoded = t.EncodeEscapedOperators(body)
+	local processedParams = {}
+	local arguments = {}
+	for paramNum in encoded:gmatch("$(%d+)") do
+		local paramType, paramName, paramDesc, isOptional, paramTypeName, defaultDesc
+		if processedParams[paramNum] == nil then
+			processedParams[paramNum] = true
+			local paramSpec = encoded:match((("$%*(%%b{})"):format(paramNum)))
+			if paramSpec then
+				local specType, specName, specDesc = unpack(paramSpec:sub(2, #paramSpec - 1):split("|"))
+				paramType = specType
+				paramName = specName
+				paramDesc = specDesc
 			else
-				v4 = nil
-				v5 = nil
-				v6 = nil
+				paramType = nil
+				paramName = nil
+				paramDesc = nil
 			end
-			v7 = v4 and (v4:match("%?$") and true or false)
-			v8 = if v4 then v4:match("^%w+") else "string"
-			v9 = v5 or ("Argument %*"):format(v10)
-			table.insert(t3, {
-				Type = v8,
-				Name = v9,
-				Description = v6 or "",
-				Optional = v7
+			isOptional = paramType and (paramType:match("%?$") and true or false)
+			paramTypeName = if paramType then paramType:match("^%w+") else "string"
+			defaultDesc = paramName or ("Argument %*"):format(paramNum)
+			table.insert(arguments, {
+				Type = paramTypeName,
+				Name = defaultDesc,
+				Description = paramDesc or "",
+				Optional = isOptional
 			})
 		end
 	end
 	return {
-		Name = v1,
+		Name = name,
 		Aliases = {},
-		Description = ("<Alias> %*"):format(v2 or v3),
+		Description = ("<Alias> %*"):format(aliases or encoded),
 		Group = "UserAlias",
-		Args = t3,
-		ClientRun = function(p1)
-			return t.RunCommandString(p1.Dispatcher, t.SubstituteArgs(v3, p1.RawArguments))
+		Args = arguments,
+		ClientRun = function(context)
+			return t.RunCommandString(context.Dispatcher, t.SubstituteArgs(encoded, context.RawArguments))
 		end
 	}
 end
-function t.MakeSequenceType(p1)
-	local v2 = p1 or {}
-	assert(if v2.Parse == nil then v2.Constructor ~= nil else true, "[Cmdr] MakeSequenceType: Must provide one of: Constructor, Parse")
-	v2.TransformEach = v2.TransformEach or function(...)
+function t.MakeSequenceType(config)
+	local sequenceConfig = config or {}
+	assert(if sequenceConfig.Parse == nil then sequenceConfig.Constructor ~= nil else true, "[Cmdr] MakeSequenceType: Must provide one of: Constructor, Parse")
+	sequenceConfig.TransformEach = sequenceConfig.TransformEach or function(...)
 		return ...
 	end
-	v2.ValidateEach = v2.ValidateEach or function()
+	sequenceConfig.ValidateEach = sequenceConfig.ValidateEach or function()
 		return true
 	end
-	local t2 = {
-		Prefixes = v2.Prefixes,
-		Transform = function(p1)
-			return t.Map(t.SplitPrioritizedDelimeter(p1, { ",", "%s" }), function(p1)
-				return v2.TransformEach(p1)
+	local sequenceType = {
+		Prefixes = sequenceConfig.Prefixes,
+		Transform = function(value)
+			return t.Map(t.SplitPrioritizedDelimeter(value, { ",", "%s" }), function(item)
+				return sequenceConfig.TransformEach(item)
 			end)
 		end,
-		Validate = function(p1)
-			if v2.Length and #p1 > v2.Length then
-				return false, ("Maximum of %d values allowed in sequence"):format(v2.Length)
+		Validate = function(value)
+			if sequenceConfig.Length and #value > sequenceConfig.Length then
+				return false, ("Maximum of %d values allowed in sequence"):format(sequenceConfig.Length)
 			else
-				for i = 1, v2.Length or #p1 do
-					local v3, v4 = v2.ValidateEach(p1[i], i)
-					if not v3 then
-						return false, v4
+				for i = 1, sequenceConfig.Length or #value do
+					local isValid, errorMsg = sequenceConfig.ValidateEach(value[i], i)
+					if not isValid then
+						return false, errorMsg
 					end
 				end
 				return true
 			end
 		end
 	}
-	t2.Parse = v2.Parse or function(p1)
-		return v2.Constructor(unpack(p1))
+	sequenceType.Parse = sequenceConfig.Parse or function(value)
+		return sequenceConfig.Constructor(unpack(value))
 	end
-	return t2
+	return sequenceType
 end
-function t.SplitPrioritizedDelimeter(p1, p2)
-	for i, v in ipairs(p2) do
-		if p1:find(v) or i == #p2 then
-			return t.SplitStringSimple(p1, v)
+function t.SplitPrioritizedDelimeter(str, delimiters)
+	for i, v in ipairs(delimiters) do
+		if str:find(v) or i == #delimiters then
+			return t.SplitStringSimple(str, v)
 		end
 	end
 end
-function t.Map(p1, p2)
-	local t = {}
-	for i, v in ipairs(p1) do
-		t[i] = p2(v, i)
+function t.Map(array, fn)
+	local result = {}
+	for i, v in ipairs(array) do
+		result[i] = fn(v, i)
 	end
-	return t
+	return result
 end
-function t.Each(p1, ...)
-	local t = {}
+function t.Each(fn, ...)
+	local result = {}
 	for i, v in ipairs({ ... }) do
-		t[i] = p1(v)
+		result[i] = fn(v)
 	end
-	return unpack(t)
+	return unpack(result)
 end
-function t.EmulateTabstops(p1, p2)
-	local v1 = #p1
-	local v2 = table.create(v1)
-	local sum = 0
-	for i = 1, v1 do
-		local v3 = string.sub(p1, i, i)
-		if v3 == "\t" then
-			local v4 = p2 - sum % p2
-			table.insert(v2, string.rep(" ", v4))
-			sum = sum + v4
+function t.EmulateTabstops(str, tabSize)
+	local length = #str
+	local output = table.create(length)
+	local columnPos = 0
+	for i = 1, length do
+		local char = string.sub(str, i, i)
+		if char == "\t" then
+			local spacesNeeded = tabSize - columnPos % tabSize
+			table.insert(output, string.rep(" ", spacesNeeded))
+			columnPos = columnPos + spacesNeeded
 		else
-			table.insert(v2, v3)
-			if v3 == "\n" then
-				sum = 0
-			elseif v3 ~= "\r" then
-				sum = sum + 1
+			table.insert(output, char)
+			if char == "\n" then
+				columnPos = 0
+			elseif char ~= "\r" then
+				columnPos = columnPos + 1
 			end
 		end
 	end
-	return table.concat(v2)
+	return table.concat(output)
 end
 function t.Mutex()
-	local t = {}
-	local v1 = false
+	local queue = {}
+	local locked = false
 	return function()
-		if v1 then
-			table.insert(t, coroutine.running())
+		if locked then
+			table.insert(queue, coroutine.running())
 			coroutine.yield()
 		else
-			v1 = true
+			locked = true
 		end
 		return function()
-			if #t > 0 then
-				coroutine.resume(table.remove(t, 1))
+			if #queue > 0 then
+				coroutine.resume(table.remove(queue, 1))
 			else
-				v1 = false
+				locked = false
 			end
 		end
 	end

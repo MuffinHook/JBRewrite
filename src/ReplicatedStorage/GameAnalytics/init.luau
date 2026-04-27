@@ -1,4 +1,3 @@
--- Reviewed by Claude
 if game:GetService("RunService"):IsServer() then
 	return require(script.GameAnalytics)
 else

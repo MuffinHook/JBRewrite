@@ -1,18 +1,17 @@
--- Reviewed by Claude
 local Roact = require(script:FindFirstAncestor("EzUi").Parent.Roact)
 local createElement = Roact.createElement
-local function testComponent(p1)
+local function testComponent(props)
 	return createElement("TextLabel", {
 		BackgroundTransparency = 0.5,
-		BackgroundColor3 = p1.color,
-		Size = p1.size,
-		Position = p1.position,
-		Text = p1.title
+		BackgroundColor3 = props.color,
+		Size = props.size,
+		Position = props.position,
+		Text = props.title
 	})
 end
-return function(p1)
+return function(parent)
 	local Grid = require(script.Parent.Grid)
-	local v1 = Roact.mount(createElement("Frame", {
+	local componentInstance = Roact.mount(createElement("Frame", {
 		BackgroundTransparency = 0.5,
 		Size = UDim2.new(0.9, 0, 0.9, 0),
 		Position = UDim2.new(0.05, 0, 0.05, 0)
@@ -36,8 +35,8 @@ return function(p1)
 				title = "3"
 			}
 		}
-	})), p1)
+	})), parent)
 	return function()
-		Roact.unmount(v1)
+		Roact.unmount(componentInstance)
 	end
 end

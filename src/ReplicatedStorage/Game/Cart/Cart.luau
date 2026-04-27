@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -13,21 +11,21 @@ local CartConsts = require(script.Parent.CartConsts)
 local CartUtils = require(script.Parent.CartUtils)
 local GraphUtils = require(script.Parent.GraphUtils)
 local OwnedPartBinder = require(ReplicatedStorage.Game.OwnedPart.OwnedPartBinder)
-local t = {}
-t.__index = t
-t.__ClassName = "Cart"
-function t.new(p1)
+local Cart = {}
+Cart.__index = Cart
+Cart.__ClassName = "Cart"
+function Cart.new(cartObject)
 	local instance = {}
-	setmetatable(instance, t)
-	RxInstanceUtils.yieldForProperty(p1, "PrimaryPart")
+	setmetatable(instance, Cart)
+	RxInstanceUtils.yieldForProperty(cartObject, "PrimaryPart")
 	instance._maid = Maid.new()
-	instance._obj = p1
-	instance._firstSegmentValue = p1:WaitForChild(CartConsts.FIRST_SEGMENT_VALUE_NAME)
-	instance._secondSegmentValue = p1:WaitForChild(CartConsts.SECOND_SEGMENT_VALUE_NAME)
-	instance._graphValue = p1:WaitForChild(CartConsts.GRAPH_VALUE_NAME)
-	instance._offsetValue = p1:WaitForChild(CartConsts.OFFSET_VALUE_NAME)
-	instance._updatedAtValue = p1:WaitForChild(CartConsts.UPDATED_AT_VALUE_NAME)
-	instance._seatOwnedPartValue = p1:WaitForChild(CartConsts.SEAT_OWNED_PART_VALUE_NAME)
+	instance._obj = cartObject
+	instance._firstSegmentValue = cartObject:WaitForChild(CartConsts.FIRST_SEGMENT_VALUE_NAME)
+	instance._secondSegmentValue = cartObject:WaitForChild(CartConsts.SECOND_SEGMENT_VALUE_NAME)
+	instance._graphValue = cartObject:WaitForChild(CartConsts.GRAPH_VALUE_NAME)
+	instance._offsetValue = cartObject:WaitForChild(CartConsts.OFFSET_VALUE_NAME)
+	instance._updatedAtValue = cartObject:WaitForChild(CartConsts.UPDATED_AT_VALUE_NAME)
+	instance._seatOwnedPartValue = cartObject:WaitForChild(CartConsts.SEAT_OWNED_PART_VALUE_NAME)
 	instance._yOffset = 1
 	instance._graph = nil
 	local function decodeGraphStr()
@@ -54,14 +52,14 @@ function t.new(p1)
 	instance:_onSegmentUpdate()
 	instance._maid._seatMaid = Maid.new()
 	local seatPromise = nil
-	local function onOwnedPart(p1)
+	local function onOwnedPart(seatOwnedPart)
 		if seatPromise then
 			seatPromise:cancel()
 			seatPromise = nil
 		end
 		instance._ownedPartSeat = nil
-		if p1 then
-			instance._maid._onSeated = RxInstanceUtils.observeOneChildNamed(p1, "SeatWeld", function(weld, maid)
+		if seatOwnedPart then
+			instance._maid._onSeated = RxInstanceUtils.observeOneChildNamed(seatOwnedPart, "SeatWeld", function(weld, maid)
 				local character
 				if weld then
 					local Part0 = weld.Part0
@@ -78,8 +76,8 @@ function t.new(p1)
 				instance._maid._seatMaid:DoCleaning()
 				instance:_onSeated(character, instance._maid._seatMaid)
 			end)
-			seatPromise = BinderUtils.promiseBoundClass(OwnedPartBinder, p1):andThen(function(p1)
-				instance._ownedPartSeat = p1
+			seatPromise = BinderUtils.promiseBoundClass(OwnedPartBinder, seatOwnedPart):andThen(function(boundClass)
+				instance._ownedPartSeat = boundClass
 			end)
 		else
 			instance._maid._onSeated = nil
@@ -89,94 +87,94 @@ function t.new(p1)
 	instance._maid:GiveTask(instance._seatOwnedPartValue.Changed:Connect(onOwnedPart))
 	return instance
 end
-function t.GetOnSeatedSignal(p1)
-	if not p1._onSeatedSignal then
-		p1._onSeatedSignal = Signal.new()
-		p1._maid:GiveTask(p1._onSeatedSignal)
+function Cart.GetOnSeatedSignal(self)
+	if not self._onSeatedSignal then
+		self._onSeatedSignal = Signal.new()
+		self._maid:GiveTask(self._onSeatedSignal)
 	end
-	return p1._onSeatedSignal
+	return self._onSeatedSignal
 end
-function t._onSeated(p1, p2, p3)
-	if p2 then
-		local Humanoid = p2:FindFirstChild("Humanoid")
+function Cart._onSeated(self, character, maid)
+	if character then
+		local Humanoid = character:FindFirstChild("Humanoid")
 		CharacterUtil.stopAnims(Humanoid)
 		Humanoid.Sit = true
 		local animation = Humanoid:FindFirstChildOfClass("Animator"):LoadAnimation(ReplicatedStorage.Resource.CartSitAnimation)
 		CharacterUtil.setHumanoidEnabled(Humanoid, false)
 		animation:AdjustSpeed(0)
 		animation:Play()
-		p3:GiveTask(function()
+		maid:GiveTask(function()
 			Humanoid.Sit = false
 		end)
-		p3:GiveTask(function()
+		maid:GiveTask(function()
 			animation:Stop()
 		end)
-		p3:GiveTask(animation)
-		p3:GiveTask(function()
+		maid:GiveTask(animation)
+		maid:GiveTask(function()
 			CharacterUtil.setHumanoidEnabled(Humanoid, true)
 		end)
 	end
-	p1._occupant = p2
-	if p1._onSeatedSignal then
-		p1._onSeatedSignal:Fire(p2, p3)
+	self._occupant = character
+	if self._onSeatedSignal then
+		self._onSeatedSignal:Fire(character, maid)
 	end
 end
-function t.GetOccupant(p1)
-	return p1._occupant
+function Cart.GetOccupant(self)
+	return self._occupant
 end
-function t.GetFirstSegment(p1)
-	return p1._firstSegmentValue.Value
+function Cart.GetFirstSegment(self)
+	return self._firstSegmentValue.Value
 end
-function t.GetSecondSegment(p1)
-	return p1._secondSegmentValue.Value
+function Cart.GetSecondSegment(self)
+	return self._secondSegmentValue.Value
 end
-function t._startUpdate(p1)
-	p1._maid._updateLoop = RunService.Heartbeat:Connect(function()
-		local elapsedTime = Time.GetNowSync() - p1:GetUpdatedAt()
-		local distance = GraphUtils.calculateDist(p1._graph, elapsedTime) + p1:GetOffset()
-		local segment1Index, segment1Progress = CartUtils.calculateSegment(p1._rail, distance - 1.5)
-		local backPos = CartUtils.calculatePosition(p1._rail, segment1Index, segment1Progress)
-		local segment2Index, segment2Progress = CartUtils.calculateSegment(p1._rail, distance + 1.5)
-		local frontPos = CartUtils.calculatePosition(p1._rail, segment2Index, segment2Progress)
-		p1._obj.PrimaryPart.CFrame = CFrame.lookAt(Vector3.new(), frontPos - backPos) * CFrame.new(0, p1._yOffset, 0) + (backPos + frontPos) * 0.5
-		if p1._ownedPartSeat then
-			p1._ownedPartSeat._obj.CFrame = p1._obj:FindFirstChild("Seat").CFrame
-			p1._ownedPartSeat._obj.AssemblyLinearVelocity = Vector3.new()
+function Cart._startUpdate(self)
+	self._maid._updateLoop = RunService.Heartbeat:Connect(function()
+		local elapsedTime = Time.GetNowSync() - self:GetUpdatedAt()
+		local distance = GraphUtils.calculateDist(self._graph, elapsedTime) + self:GetOffset()
+		local segment1Index, segment1Progress = CartUtils.calculateSegment(self._rail, distance - 1.5)
+		local backPos = CartUtils.calculatePosition(self._rail, segment1Index, segment1Progress)
+		local segment2Index, segment2Progress = CartUtils.calculateSegment(self._rail, distance + 1.5)
+		local frontPos = CartUtils.calculatePosition(self._rail, segment2Index, segment2Progress)
+		self._obj.PrimaryPart.CFrame = CFrame.lookAt(Vector3.new(), frontPos - backPos) * CFrame.new(0, self._yOffset, 0) + (backPos + frontPos) * 0.5
+		if self._ownedPartSeat then
+			self._ownedPartSeat._obj.CFrame = self._obj:FindFirstChild("Seat").CFrame
+			self._ownedPartSeat._obj.AssemblyLinearVelocity = Vector3.new()
 		end
 	end)
 end
-function t._onSegmentUpdate(p1)
-	local firstSegment = p1:GetFirstSegment()
+function Cart._onSegmentUpdate(self)
+	local firstSegment = self:GetFirstSegment()
 	if firstSegment then
-		local secondSegment = p1:GetSecondSegment()
+		local secondSegment = self:GetSecondSegment()
 		if secondSegment then
-			p1._rail = CartUtils.computeRail(firstSegment, secondSegment)
-			p1:_startUpdate()
-			p1._maid.railUpdateMaid = Maid.new()
-			for i, segment in ipairs(p1._rail.listSegment) do
-				p1._maid.railUpdateMaid:GiveTask(segment._front.Changed:Connect(function()
-					p1:_onSegmentUpdate()
+			self._rail = CartUtils.computeRail(firstSegment, secondSegment)
+			self:_startUpdate()
+			self._maid.railUpdateMaid = Maid.new()
+			for i, segment in ipairs(self._rail.listSegment) do
+				self._maid.railUpdateMaid:GiveTask(segment._front.Changed:Connect(function()
+					self:_onSegmentUpdate()
 				end))
-				p1._maid.railUpdateMaid:GiveTask(segment._back.Changed:Connect(function()
-					p1:_onSegmentUpdate()
+				self._maid.railUpdateMaid:GiveTask(segment._back.Changed:Connect(function()
+					self:_onSegmentUpdate()
 				end))
 			end
 		end
 	end
 end
-function t.GetUpdatedAt(p1)
-	return p1._updatedAtValue.Value
+function Cart.GetUpdatedAt(self)
+	return self._updatedAtValue.Value
 end
-function t.GetGraph(p1)
-	return p1._graphValue.Value
+function Cart.GetGraph(self)
+	return self._graphValue.Value
 end
-function t.GetOffset(p1)
-	return p1._offsetValue.Value
+function Cart.GetOffset(self)
+	return self._offsetValue.Value
 end
-function t.Destroy(p1)
-	local _maid = p1._maid
-	p1._maid = nil
-	setmetatable(p1, nil)
-	_maid:Destroy()
+function Cart.Destroy(self)
+	local maidToDestroy = self._maid
+	self._maid = nil
+	setmetatable(self, nil)
+	maidToDestroy:Destroy()
 end
-return t
+return Cart

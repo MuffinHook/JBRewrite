@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Basic = require(script.Parent.Basic)
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -35,9 +33,9 @@ local Juice = {
 }
 Juice.__index = Juice
 setmetatable(Juice, Basic)
-function Juice.Init(p1)
-	eventObject = p1.Event
-	function p1.em.l2x2ypvi()
+function Juice.Init(juiceItem)
+	eventObject = juiceItem.Event
+	function juiceItem.em.l2x2ypvi()
 		CharacterUtil.IsJuiced = true
 		CharacterUtil.WalkSpeedSpring:Accelerate(20)
 		local shockwaveFx = ShockwaveScreenFx.new()
@@ -53,42 +51,42 @@ function Juice.Init(p1)
 		end)
 	end
 end
-function Juice.new(p1, p2, p3)
-	local juiceInstance = Basic.new(p1, p2, motionConfig, p3)
+function Juice.new(baseCharacter, basePart, baseConfig)
+	local juiceInstance = Basic.new(baseCharacter, basePart, motionConfig, baseConfig)
 	setmetatable(juiceInstance, Juice)
 	juiceInstance:DefaultDisableCamLock()
 	return juiceInstance
 end
-function Juice.UpdateArmIK(p1)
-	local IK = p1.IK
-	IK.RightArm = p1.Model.Skeleton.RightArm.Position
-	IK.RightAngle = p1.Config.Motion.RightElbowAngle
+function Juice.UpdateArmIK(juiceItem)
+	local IK = juiceItem.IK
+	IK.RightArm = juiceItem.Model.Skeleton.RightArm.Position
+	IK.RightAngle = juiceItem.Config.Motion.RightElbowAngle
 end
-function Juice.InputBegan(p1, p2, p3)
-	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
-		p1.SpringItemOffset:SetTarget(p1.Config.Motion.Eat.Springs.ItemOffset)
-		p1.SpringItemRotation:SetTarget(p1.Config.Motion.Eat.Springs.ItemRotation)
-		Audio.ObjectLocal(p1.Character.PrimaryPart, 7209853095, {
+function Juice.InputBegan(juiceItem, inputObject, p3)
+	if if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then true elseif inputObject.UserInputType == Enum.UserInputType.Gamepad1 then inputObject.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		juiceItem.SpringItemOffset:SetTarget(juiceItem.Config.Motion.Eat.Springs.ItemOffset)
+		juiceItem.SpringItemRotation:SetTarget(juiceItem.Config.Motion.Eat.Springs.ItemRotation)
+		Audio.ObjectLocal(juiceItem.Character.PrimaryPart, 7209853095, {
 			Volume = 0.3
 		})
 		delay(0.3, function()
-			p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
-			p1.SpringItemRotation:SetTarget(p1.Config.Motion.Hip.Springs.ItemRotation)
-			if p1.Local then
+			juiceItem.SpringItemOffset:SetTarget(juiceItem.Config.Motion.Hip.Springs.ItemOffset)
+			juiceItem.SpringItemRotation:SetTarget(juiceItem.Config.Motion.Hip.Springs.ItemRotation)
+			if juiceItem.Local then
 				local now = tick()
-				local lastConsumedTime = p1.LastConsumed or 0
-				p1.LastConsumed = now
+				local lastConsumedTime = juiceItem.LastConsumed or 0
+				juiceItem.LastConsumed = now
 				if now - lastConsumedTime < 5 then
 					return false
 				end
-				eventObject:FireServer("l" .. "" .. ("ux2m3"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "2ypvi")
+				eventObject:FireServer("l2x2ypvi")
 			end
 		end)
-		if p1.Local then
-			p1:BroadcastInputBegan(p2)
+		if juiceItem.Local then
+			juiceItem:BroadcastInputBegan(inputObject)
 		end
 	end
-	Basic.InputBegan(p1, p2, p3)
+	Basic.InputBegan(juiceItem, inputObject, p3)
 end
-function Juice.InputEnded(p1)  end
+function Juice.InputEnded(juiceItem)  end
 return Juice

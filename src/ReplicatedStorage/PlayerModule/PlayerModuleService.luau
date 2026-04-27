@@ -1,21 +1,20 @@
--- Reviewed by Claude
 local PlayerModule = game:GetService("Players").LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")
 local ManualJump = PlayerModule:WaitForChild("ControlModule"):WaitForChild("ManualJump")
 local CameraSensitivity = PlayerModule:WaitForChild("CameraModule"):WaitForChild("CameraSensitivity")
 local module = require(PlayerModule)
-local v2 = module:GetControls()
-local t = {
-	setIsJumping = function(p1)
-		ManualJump.Value = p1
+local controls = module:GetControls()
+local playerModuleService = {
+	setIsJumping = function(isJumping)
+		ManualJump.Value = isJumping
 	end,
-	setCameraSensitivity = function(p1)
-		CameraSensitivity.Value = p1
+	setCameraSensitivity = function(sensitivity)
+		CameraSensitivity.Value = sensitivity
 	end
 }
 local function getCameraController()
-	local var12 = module:GetCameras()
-	if var12 then
-		local activeCameraController = var12.activeCameraController
+	local cameraModule = module:GetCameras()
+	if cameraModule then
+		local activeCameraController = cameraModule.activeCameraController
 		if activeCameraController then
 			return activeCameraController
 		else
@@ -25,26 +24,26 @@ local function getCameraController()
 		return nil
 	end
 end
-function t.getCameraToSubjectDistance()
-	local var12 = module:GetCameras()
-	local v2 = var12 and var12.activeCameraController or nil
-	if v2 then
-		return v2:GetCameraToSubjectDistance()
+function playerModuleService.getCameraToSubjectDistance()
+	local cameraModule = module:GetCameras()
+	local activeCameraController = cameraModule and cameraModule.activeCameraController or nil
+	if activeCameraController then
+		return activeCameraController:GetCameraToSubjectDistance()
 	else
 		return nil
 	end
 end
-function t.setCameraToSubjectDistance(p1)
-	local var12 = module:GetCameras()
-	local v2 = var12 and var12.activeCameraController or nil
-	if v2 then
-		v2:SetCameraToSubjectDistance(p1)
+function playerModuleService.setCameraToSubjectDistance(distance)
+	local cameraModule = module:GetCameras()
+	local activeCameraController = cameraModule and cameraModule.activeCameraController or nil
+	if activeCameraController then
+		activeCameraController:SetCameraToSubjectDistance(distance)
 		return true
 	else
 		return false
 	end
 end
-function t.getMoveVector()
-	return v2:GetMoveVector()
+function playerModuleService.getMoveVector()
+	return controls:GetMoveVector()
 end
-return t
+return playerModuleService

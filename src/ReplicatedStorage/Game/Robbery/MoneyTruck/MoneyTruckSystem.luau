@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Std.Signal)
 local waitForChild = require(ReplicatedStorage.Std.waitForChild)
@@ -27,21 +25,21 @@ function moneyTruckSystem.init()
 	end):andThen(moneyTruckSystem._setup):catch(warn)
 end
 function moneyTruckSystem._setup(robberyFolder)
-	waitForChild(robberyFolder, MoneyTruckConsts.RUNNING_VALUE_NAME, 30):andThen(function(p1)
-		moneyTruckSystem.onRunningChanged:Fire(p1.Value)
-		p1.Changed:Connect(function(p1)
-			moneyTruckSystem.onRunningChanged:Fire(p1)
+	waitForChild(robberyFolder, MoneyTruckConsts.RUNNING_VALUE_NAME, 30):andThen(function(runningValue)
+		moneyTruckSystem.onRunningChanged:Fire(runningValue.Value)
+		runningValue.Changed:Connect(function(isRunning)
+			moneyTruckSystem.onRunningChanged:Fire(isRunning)
 		end)
 	end):catch(warn)
-	waitForChild(robberyFolder, MoneyTruckConsts.VEHICLE_MODEL_VALUE_NAME, 30):andThen(function(p1)
-		moneyTruckSystem._vehicleModelValue = p1
-		moneyTruckSystem.onVehicleModelChanged:Fire(p1.Value)
-		p1.Changed:Connect(function(p1)
-			moneyTruckSystem.onVehicleModelChanged:Fire(p1)
+	waitForChild(robberyFolder, MoneyTruckConsts.VEHICLE_MODEL_VALUE_NAME, 30):andThen(function(vehicleModelValue)
+		moneyTruckSystem._vehicleModelValue = vehicleModelValue
+		moneyTruckSystem.onVehicleModelChanged:Fire(vehicleModelValue.Value)
+		vehicleModelValue.Changed:Connect(function(newVehicleModel)
+			moneyTruckSystem.onVehicleModelChanged:Fire(newVehicleModel)
 		end)
 	end):catch(warn)
-	waitForChild(robberyFolder, MoneyTruckConsts.HIDE_CASH_REMOTE_NAME, 30):andThen(function(p1)
-		p1.OnClientEvent:Connect(onClientEvent)
+	waitForChild(robberyFolder, MoneyTruckConsts.HIDE_CASH_REMOTE_NAME, 30):andThen(function(hideCashRemote)
+		hideCashRemote.OnClientEvent:Connect(onClientEvent)
 	end):catch(warn)
 end
 function moneyTruckSystem.getVehicleModel()

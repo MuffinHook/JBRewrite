@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local CharacterUtil = require(ReplicatedStorage.Game.CharacterUtil)
@@ -49,7 +47,7 @@ function BatonClass.SwingLunge(self)
 		})
 		if self.Local then
 			CharacterUtil.WalkSpeedSpring:Accelerate(35)
-			batonEvent:FireServer("m" .. ("e5mr6r1"):sub(3, 5):reverse() .. "" .. "" .. ("xpxxmq"):sub(2, 2):reverse() .. "" .. "" .. ("j3xdzc"):sub(4, 4):reverse():reverse():reverse() .. "" .. "" .. ("uddnfbq"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "6", 2)
+			batonEvent:FireServer("m6rmpdf6", 2)
 		end
 	end)
 end
@@ -62,7 +60,7 @@ function BatonClass.SwingSwoosh(self)
 	self.SpringWaistRotation:Accelerate(Vector3.new(-3.1415927, 15.707964, 0))
 	self.SpringNeckRotation:Accelerate(Vector3.new(1.2566371, -3.1415927, 0))
 	if self.Local then
-		batonEvent:FireServer("m" .. ("g1rzpmr6y"):sub(5, 8):reverse() .. "" .. "" .. ("yfdk"):sub(2, 3):reverse() .. "6", 1)
+		batonEvent:FireServer("m6rmpdf6", 1)
 	end
 end
 return BatonClass

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TypeWriteLabel = require(ReplicatedStorage.Game.TypeWriteLabel)
@@ -13,58 +11,58 @@ local DialogueContainer = GlobalEventGui:FindFirstChild("DialogueContainer")
 local Sound = Instance.new("Sound")
 Sound.SoundId = "rbxassetid://215658476"
 Sound.Parent = DialogueContainer
-local function ThumbnailBust(p1)
-	return ("https://www.roblox.com/bust-thumbnail/image?width=420&height=420&format=png&userId=%d"):format(p1)
+local function ThumbnailBust(userId)
+	return ("https://www.roblox.com/bust-thumbnail/image?width=420&height=420&format=png&userId=%d"):format(userId)
 end
 local isEnabled = false
 local configTable = {}
 local function ProcessQueue()
 	if #configTable > 0 then
 		isEnabled = true
-		local v12 = table.remove(configTable, 1)
+		local queuedEvent = table.remove(configTable, 1)
 		GlobalEventGui.Enabled = true
-		Hook(v12)
+		Hook(queuedEvent)
 	else
 		isEnabled = false
 		GlobalEventGui.Enabled = false
 	end
 end
-function Hook(p1)
+function Hook(eventData)
 	Audio.ObjectLocal(GlobalEventGui, 4838933194, {
 		Volume = 0.3,
 		TimePosition = 0.15
 	})
-	DialogueContainer.Icon.Icon.Image = ("https://www.roblox.com/bust-thumbnail/image?width=420&height=420&format=png&userId=%d"):format(p1.UserId)
-	TypeWriteLabel(p1.Text, Bio, 18, function(p1)
-		if p1 % 2 == 0 then
+	DialogueContainer.Icon.Icon.Image = ("https://www.roblox.com/bust-thumbnail/image?width=420&height=420&format=png&userId=%d"):format(eventData.UserId)
+	TypeWriteLabel(eventData.Text, Bio, 18, function(characterIndex)
+		if characterIndex % 2 == 0 then
 			Sound:Play()
 		end
 	end)
-	task.wait(utf8.len(p1.Text) / 18)
-	task.wait(p1.Duration)
+	task.wait(utf8.len(eventData.Text) / 18)
+	task.wait(eventData.Duration)
 	if #configTable > 0 then
 		isEnabled = true
-		local v12 = table.remove(configTable, 1)
+		local queuedEvent = table.remove(configTable, 1)
 		GlobalEventGui.Enabled = true
-		Hook(v12)
+		Hook(queuedEvent)
 	else
 		isEnabled = false
 		GlobalEventGui.Enabled = false
 	end
 end
-RxInstanceUtils.observeOneChildNamed(ReplicatedStorage, "GlobalEventRemote", function(p1)
-	p1.OnClientEvent:Connect(function(p1, p2, p3)
+RxInstanceUtils.observeOneChildNamed(ReplicatedStorage, "GlobalEventRemote", function(globalEventRemote)
+	globalEventRemote.OnClientEvent:Connect(function(userId, messageText, displayDuration)
 		table.insert(configTable, {
-			UserId = p1,
-			Text = p2,
-			Duration = p3
+			UserId = userId,
+			Text = messageText,
+			Duration = displayDuration
 		})
 		if isEnabled == false then
 			if #configTable > 0 then
 				isEnabled = true
-				local v2 = table.remove(configTable, 1)
+				local queuedEvent = table.remove(configTable, 1)
 				GlobalEventGui.Enabled = true
-				Hook(v2)
+				Hook(queuedEvent)
 				return
 			end
 			isEnabled = false

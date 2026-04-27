@@ -1,6 +1,5 @@
--- Reviewed by Claude
-return function(p1)
-	local Model = p1.Model
+return function(garageItem)
+	local Model = garageItem.Model
 	if Model then
 		local Preset = Model:FindFirstChild("Preset")
 		if Preset then

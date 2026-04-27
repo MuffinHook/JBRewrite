@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TrackService = {}
 local screenTextValue, updateScreenText = require(ReplicatedStorage.Roact).createBinding("")

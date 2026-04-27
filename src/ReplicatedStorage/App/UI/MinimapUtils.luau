@@ -1,39 +1,38 @@
--- Reviewed by Claude
-local t = {
-	computeOffsetXY = function(p1, p2, p3, p4, p5, p6, p7, p8, p9)
-		if not p2 then
-			p2 = Vector2.new(512, 512)
+local MinimapUtils = {
+	computeOffsetXY = function(position, screenSize, rangeX, rangeY, centerX, centerZ, canvasWidth, canvasHeight, zoomScale)
+		if not screenSize then
+			screenSize = Vector2.new(512, 512)
 		end
-		local v2 = p9 * p2.Y / p7
-		local v3 = p2.X * v2
-		local v4 = p2.Y * v2
-		local v7 = p7 * v2 - v3 - (1 - v2) * p2.X
-		local v8 = p8 * v2 - v4 - (1 - v2) * p2.Y
-		local v9 = p7 * v2 * (0.5 + (p1.X - p5) / p3) - v3 * 0.5 - 0.5 * (1 - v2) * p2.X
-		local v10 = p8 * v2 * (0.5 + (p1.Z - p6) / p4) - v4 * 0.5 - 0.5 * (1 - v2) * p2.Y
-		if v7 < v9 then
-			v9 = v7
+		local scaleFactor = zoomScale * screenSize.Y / canvasHeight
+		local scaledCanvasWidth = screenSize.X * scaleFactor
+		local scaledCanvasHeight = screenSize.Y * scaleFactor
+		local offsetLeft = canvasWidth * scaleFactor - scaledCanvasWidth - (1 - scaleFactor) * screenSize.X
+		local offsetTop = canvasHeight * scaleFactor - scaledCanvasHeight - (1 - scaleFactor) * screenSize.Y
+		local offsetX = canvasWidth * scaleFactor * (0.5 + (position.X - centerX) / rangeX) - scaledCanvasWidth * 0.5 - 0.5 * (1 - scaleFactor) * screenSize.X
+		local offsetY = canvasHeight * scaleFactor * (0.5 + (position.Z - centerZ) / rangeY) - scaledCanvasHeight * 0.5 - 0.5 * (1 - scaleFactor) * screenSize.Y
+		if offsetLeft < offsetX then
+			offsetX = offsetLeft
 		end
-		if v9 < 0 then
-			v9 = 0
+		if offsetX < 0 then
+			offsetX = 0
 		end
-		if v8 < v10 then
-			v10 = v8
+		if offsetTop < offsetY then
+			offsetY = offsetTop
 		end
-		if v10 < 0 then
-			v10 = 0
+		if offsetY < 0 then
+			offsetY = 0
 		end
-		return v9 < 0 or (v10 < 0 or v7 < v9) or v8 < v10, v9, v10, v2
+		return offsetX < 0 or (offsetY < 0 or offsetLeft < offsetX) or offsetTop < offsetY, offsetX, offsetY, scaleFactor
 	end
 }
-function t.computeWorldXY(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
-	local _, v1, v2, v3 = t.computeOffsetXY(p3, p4, p5, p6, p7, p8, p9, p10, p11)
-	return ((p1 + v1) / p9 / v3 - 0.5) * p5 + p7, ((p2 + v2) / p10 / v3 - 0.5) * p6 + p8
+function MinimapUtils.computeWorldXY(screenX, screenY, position, screenSize, rangeX, rangeY, centerX, centerZ, canvasWidth, canvasHeight, zoomScale)
+	local _, offsetX, offsetY, scaleFactor = MinimapUtils.computeOffsetXY(position, screenSize, rangeX, rangeY, centerX, centerZ, canvasWidth, canvasHeight, zoomScale)
+	return ((screenX + offsetX) / canvasWidth / scaleFactor - 0.5) * rangeX + centerX, ((screenY + offsetY) / canvasHeight / scaleFactor - 0.5) * rangeY + centerZ
 end
-function t.worldToScale(p1, p2, p3, p4, p5, p6)
-	return UDim2.fromScale(0.5 + (p1 - p3) / p5, 0.5 + (p2 - p4) / p6)
+function MinimapUtils.worldToScale(worldX, worldY, minX, minY, rangeX, rangeY)
+	return UDim2.fromScale(0.5 + (worldX - minX) / rangeX, 0.5 + (worldY - minY) / rangeY)
 end
-function t.relativeWorldToScale(p1, p2, p3, p4)
-	return UDim2.fromScale(p1 / p3, p2 / p4)
+function MinimapUtils.relativeWorldToScale(relativeX, relativeY, widthSize, heightSize)
+	return UDim2.fromScale(relativeX / widthSize, relativeY / heightSize)
 end
-return t
+return MinimapUtils

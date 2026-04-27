@@ -1,106 +1,105 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local OilRigConsts = require(ReplicatedStorage.OilRig.OilRigConsts)
 require(ReplicatedStorage.Std.Region.RegionUtils)
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-local t = {}
-local function validateObj(p1)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+local OilRigUtils = {}
+local function validateObj(oilRig)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
 end
-function t.setLastClosedTime(p1, p2)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	p1:SetAttribute(OilRigConsts.LAST_CLOSED_TIME_ATTR_NAME, p2)
+function OilRigUtils.setLastClosedTime(oilRig, closedTime)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	oilRig:SetAttribute(OilRigConsts.LAST_CLOSED_TIME_ATTR_NAME, closedTime)
 	return true
 end
-function t.getLastClosedTime(p1)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	return p1:GetAttribute(OilRigConsts.LAST_CLOSED_TIME_ATTR_NAME)
+function OilRigUtils.getLastClosedTime(oilRig)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	return oilRig:GetAttribute(OilRigConsts.LAST_CLOSED_TIME_ATTR_NAME)
 end
-function t.setLastStartedTime(p1, p2)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	p1:SetAttribute(OilRigConsts.LAST_STARTED_TIME_ATTR_NAME, p2)
+function OilRigUtils.setLastStartedTime(oilRig, startedTime)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	oilRig:SetAttribute(OilRigConsts.LAST_STARTED_TIME_ATTR_NAME, startedTime)
 	return true
 end
-function t.getLastStartedTime(p1)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	return p1:GetAttribute(OilRigConsts.LAST_STARTED_TIME_ATTR_NAME)
+function OilRigUtils.getLastStartedTime(oilRig)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	return oilRig:GetAttribute(OilRigConsts.LAST_STARTED_TIME_ATTR_NAME)
 end
-function t.getProgressionState(p1)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	return p1:GetAttribute(OilRigConsts.PROGRESSION_STATE_ATTR_NAME)
+function OilRigUtils.getProgressionState(oilRig)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	return oilRig:GetAttribute(OilRigConsts.PROGRESSION_STATE_ATTR_NAME)
 end
-function t.setProgressionState(p1, p2)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	p1:SetAttribute(OilRigConsts.PROGRESSION_STATE_ATTR_NAME, p2)
+function OilRigUtils.setProgressionState(oilRig, progressionState)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	oilRig:SetAttribute(OilRigConsts.PROGRESSION_STATE_ATTR_NAME, progressionState)
 	return true
 end
-function t.getProgressionStateChangedSignal(p1)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	return p1:GetAttributeChangedSignal(OilRigConsts.PROGRESSION_STATE_ATTR_NAME)
+function OilRigUtils.getProgressionStateChangedSignal(oilRig)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	return oilRig:GetAttributeChangedSignal(OilRigConsts.PROGRESSION_STATE_ATTR_NAME)
 end
-function t.getNPCSpawnLocations(p1, p2, p3)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	return TableUtils.filter(p1:FindFirstChild(OilRigConsts.NPC_SPAWNS_FOLDER_NAME):FindFirstChild(p2):GetChildren(), function(p1)
-		return p1.Name == p3
+function OilRigUtils.getNPCSpawnLocations(oilRig, npcType, locationName)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	return TableUtils.filter(oilRig:FindFirstChild(OilRigConsts.NPC_SPAWNS_FOLDER_NAME):FindFirstChild(npcType):GetChildren(), function(spawnLocation)
+		return spawnLocation.Name == locationName
 	end)
 end
-function t.getFloor2GuardInRoomSpawnLocations(p1)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	return TableUtils.filter(p1:FindFirstChild("NPCSpawns"):FindFirstChild("Floor2"):GetDescendants(), function(p1)
-		return p1:IsA("BasePart")
+function OilRigUtils.getFloor2GuardInRoomSpawnLocations(oilRig)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	return TableUtils.filter(oilRig:FindFirstChild("NPCSpawns"):FindFirstChild("Floor2"):GetDescendants(), function(descendant)
+		return descendant:IsA("BasePart")
 	end)
 end
-function t.getIsPlayerInRobbery(p1, p2)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	local var3 = p1:FindFirstChild(OilRigConsts.PLAYERS_IN_ROBBERY_FOLDER_NAME):FindFirstChild(p2.UserId)
-	return var3 and var3.Value == true
+function OilRigUtils.getIsPlayerInRobbery(oilRig, player)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	local playerFolder = oilRig:FindFirstChild(OilRigConsts.PLAYERS_IN_ROBBERY_FOLDER_NAME):FindFirstChild(player.UserId)
+	return playerFolder and playerFolder.Value == true
 end
-function t.getTNTModel(p1)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	local var3 = ReplicatedStorage.OilRig.Res.TNT:Clone()
-	CollectionService:AddTag(var3, OilRigConsts.TNT_MODEL_TAG_NAME)
-	return var3
+function OilRigUtils.getTNTModel(oilRig)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	local tntModel = ReplicatedStorage.OilRig.Res.TNT:Clone()
+	CollectionService:AddTag(tntModel, OilRigConsts.TNT_MODEL_TAG_NAME)
+	return tntModel
 end
-function t.updateTNTTimers(p1, p2)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	for var3, v4 in TableUtils.filter(CollectionService:GetTagged(OilRigConsts.TNT_MODEL_TAG_NAME), function(p12)
-		return p12:IsDescendantOf(p1)
+function OilRigUtils.updateTNTTimers(oilRig, timerText)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	for var3, tntModel in TableUtils.filter(CollectionService:GetTagged(OilRigConsts.TNT_MODEL_TAG_NAME), function(tntInstance)
+		return tntInstance:IsDescendantOf(oilRig)
 	end) do
-		local TextLabel = v4:FindFirstChild("Timer"):FindFirstChild("SurfaceGui"):FindFirstChild("TextLabel")
+		local TextLabel = tntModel:FindFirstChild("Timer"):FindFirstChild("SurfaceGui"):FindFirstChild("TextLabel")
 		TextLabel.TextScaled = true
-		TextLabel.Text = p2
+		TextLabel.Text = timerText
 	end
 end
-function t.getExteriorCountdown(p1)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	if p1:FindFirstChild("ExteriorCountdown") and (p1.ExteriorCountdown:FindFirstChild("SurfaceGui") and p1.ExteriorCountdown.SurfaceGui:FindFirstChild("TextLabel")) then
-		return p1.ExteriorCountdown.SurfaceGui, p1.ExteriorCountdown.SurfaceGui.TextLabel
+function OilRigUtils.getExteriorCountdown(oilRig)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	if oilRig:FindFirstChild("ExteriorCountdown") and (oilRig.ExteriorCountdown:FindFirstChild("SurfaceGui") and oilRig.ExteriorCountdown.SurfaceGui:FindFirstChild("TextLabel")) then
+		return oilRig.ExteriorCountdown.SurfaceGui, oilRig.ExteriorCountdown.SurfaceGui.TextLabel
 	end
 end
-function t.getActiveRobberyRegionPart(p1)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	return p1:FindFirstChild("ActiveRobberyRegion")
+function OilRigUtils.getActiveRobberyRegionPart(oilRig)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	return oilRig:FindFirstChild("ActiveRobberyRegion")
 end
-function t.getTNTPlacementParts(p1)
-	assert(typeof(p1) == "Instance", "Invalid obj passed")
-	assert(CollectionService:HasTag(p1, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
-	return p1:FindFirstChild("TNTPlantLocations"):GetChildren()
+function OilRigUtils.getTNTPlacementParts(oilRig)
+	assert(typeof(oilRig) == "Instance", "Invalid obj passed")
+	assert(CollectionService:HasTag(oilRig, OilRigConsts.TAG_NAME), "Obj does not have oil rig robbery tag")
+	return oilRig:FindFirstChild("TNTPlantLocations"):GetChildren()
 end
-return t
+return OilRigUtils

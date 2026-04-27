@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -9,49 +7,49 @@ local Audio = require(ReplicatedStorage.Std.Audio)
 local RobberyMoneyUI = require(ReplicatedStorage.Game.RobberyMoneyUI.RobberyMoneyUI)
 local Settings = require(ReplicatedStorage.Resource.Settings)
 local DuffelBagConsts = require(script.Parent.DuffelBagConsts)
-local function GetDevProdByTier(p1)
-	for i, v in ipairs(Settings.DevProduct) do
-		if v.Type == "DuffelBagUpgrade" and v.Tier == p1 then
-			return v
+local function GetDevProdByTier(tier)
+	for i, product in ipairs(Settings.DevProduct) do
+		if product.Type == "DuffelBagUpgrade" and product.Tier == tier then
+			return product
 		end
 	end
 end
-local t = {}
-t.__index = t
-function t.new(p1)
+local DuffelBag = {}
+DuffelBag.__index = DuffelBag
+function DuffelBag.new(duffelBagObject)
 	local instance = {}
-	setmetatable(instance, t)
-	instance._obj = p1
+	setmetatable(instance, DuffelBag)
+	instance._obj = duffelBagObject
 	instance._maid = Maid.new()
 	instance._ownerMaid = Maid.new()
 	instance._maid:GiveTask(instance._ownerMaid)
-	instance._ownerObj = p1:WaitForChild(DuffelBagConsts.OWNER_VALUE_NAME, 2)
+	instance._ownerObj = duffelBagObject:WaitForChild(DuffelBagConsts.OWNER_VALUE_NAME, 2)
 	instance._maid:GiveTask(instance._ownerObj.Changed:Connect(function()
 		instance:_handleOwner()
 	end))
 	instance:_handleOwner()
-	local function updateParent(p1)
+	local function updateParent(parent)
 		instance:_handleOwner()
 	end
-	instance._maid:GiveTask(p1.AncestryChanged:Connect(function(p1, p2)
+	instance._maid:GiveTask(duffelBagObject.AncestryChanged:Connect(function(parent, grandparent)
 		instance:_handleOwner()
 	end))
-	local remoteEvent = p1:WaitForChild(DuffelBagConsts.REMOTE_EVENT_NAME, 2)
+	local remoteEvent = duffelBagObject:WaitForChild(DuffelBagConsts.REMOTE_EVENT_NAME, 2)
 	instance._maid:GiveTask(remoteEvent.OnClientEvent:Connect(function(...)
 		instance:_onClientEvent(...)
 	end))
 	instance._remoteEvent = remoteEvent
-	instance._robberyEnumValue = p1:WaitForChild(DuffelBagConsts.ROBBERY_ENUM_VALUE_NAME, 2)
+	instance._robberyEnumValue = duffelBagObject:WaitForChild(DuffelBagConsts.ROBBERY_ENUM_VALUE_NAME, 2)
 	return instance
 end
-function t._handleOwner(p1)
-	p1._ownerMaid:DoCleaning()
-	if p1:IsHeld() and p1:GetOwner() == LocalPlayer then
+function DuffelBag._handleOwner(self)
+	self._ownerMaid:DoCleaning()
+	if self:IsHeld() and self:GetOwner() == LocalPlayer then
 		RobberyMoneyUI.Show()
-		p1._ownerMaid:GiveTask(function()
+		self._ownerMaid:GiveTask(function()
 			RobberyMoneyUI.Hide()
 		end)
-		local _obj = p1._obj
+		local _obj = self._obj
 		local amountValue = _obj:WaitForChild(DuffelBagConsts.AMOUNT_VALUE_NAME)
 		local maximumValue = _obj:WaitForChild(DuffelBagConsts.MAXIMUM_VALUE_NAME)
 		local multValue = _obj:WaitForChild(DuffelBagConsts.MULT_VALUE_NAME)
@@ -59,100 +57,100 @@ function t._handleOwner(p1)
 		local tierValue = _obj:WaitForChild(DuffelBagConsts.TIER_VALUE_NAME)
 		local robberyEnumValue = _obj:WaitForChild(DuffelBagConsts.ROBBERY_ENUM_VALUE_NAME)
 		local function setAmountValue()
-			p1:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
+			self:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
 		end
 		local formatterValue = _obj:WaitForChild(DuffelBagConsts.FORMATTER_VALUE_NAME)
-		p1:_setFormatter(formatterValue.Value)
-		p1._ownerMaid:GiveTask(formatterValue:GetPropertyChangedSignal("Value"):Connect(function()
-			p1:_setFormatter(formatterValue.Value)
-			p1:_setTier(tierValue.Value, multEnabledValue.Value)
-			p1:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
+		self:_setFormatter(formatterValue.Value)
+		self._ownerMaid:GiveTask(formatterValue:GetPropertyChangedSignal("Value"):Connect(function()
+			self:_setFormatter(formatterValue.Value)
+			self:_setTier(tierValue.Value, multEnabledValue.Value)
+			self:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
 		end))
-		p1._ownerMaid:GiveTask(amountValue:GetPropertyChangedSignal("Value"):Connect(setAmountValue))
-		p1._ownerMaid:GiveTask(maximumValue:GetPropertyChangedSignal("Value"):Connect(setAmountValue))
+		self._ownerMaid:GiveTask(amountValue:GetPropertyChangedSignal("Value"):Connect(setAmountValue))
+		self._ownerMaid:GiveTask(maximumValue:GetPropertyChangedSignal("Value"):Connect(setAmountValue))
 		local timeValue = _obj:WaitForChild(DuffelBagConsts.TIME_VALUE_NAME)
-		p1:_setTime(timeValue.Value)
-		p1._ownerMaid:GiveTask(timeValue:GetPropertyChangedSignal("Value"):Connect(function()
-			p1:_setTime(timeValue.Value)
+		self:_setTime(timeValue.Value)
+		self._ownerMaid:GiveTask(timeValue:GetPropertyChangedSignal("Value"):Connect(function()
+			self:_setTime(timeValue.Value)
 		end))
-		p1:_setTier(tierValue.Value, multEnabledValue.Value)
-		p1._ownerMaid:GiveTask(tierValue:GetPropertyChangedSignal("Value"):Connect(function()
-			p1:_setTier(tierValue.Value, multEnabledValue.Value)
-			p1:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
+		self:_setTier(tierValue.Value, multEnabledValue.Value)
+		self._ownerMaid:GiveTask(tierValue:GetPropertyChangedSignal("Value"):Connect(function()
+			self:_setTier(tierValue.Value, multEnabledValue.Value)
+			self:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
 		end))
-		p1._ownerMaid:GiveTask(multValue:GetPropertyChangedSignal("Value"):Connect(function()
-			p1:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
+		self._ownerMaid:GiveTask(multValue:GetPropertyChangedSignal("Value"):Connect(function()
+			self:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
 		end))
-		p1._ownerMaid:GiveTask(multEnabledValue:GetPropertyChangedSignal("Value"):Connect(function()
-			p1:_setTier(tierValue.Value, multEnabledValue.Value)
-			p1:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
+		self._ownerMaid:GiveTask(multEnabledValue:GetPropertyChangedSignal("Value"):Connect(function()
+			self:_setTier(tierValue.Value, multEnabledValue.Value)
+			self:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
 		end))
 		local messageValue = _obj:WaitForChild(DuffelBagConsts.MESSAGE_VALUE_NAME)
-		p1:_setMessage(messageValue.Value)
-		p1._ownerMaid:GiveTask(messageValue:GetPropertyChangedSignal("Value"):Connect(function()
-			p1:_setMessage(messageValue.Value)
+		self:_setMessage(messageValue.Value)
+		self._ownerMaid:GiveTask(messageValue:GetPropertyChangedSignal("Value"):Connect(function()
+			self:_setMessage(messageValue.Value)
 		end))
-		p1._ownerMaid:GiveTask(RobberyMoneyUI.getUpgradeButton().MouseButton1Down:Connect(function()
+		self._ownerMaid:GiveTask(RobberyMoneyUI.getUpgradeButton().MouseButton1Down:Connect(function()
 			local nextTier = tierValue.Value + 1
 			local devProduct = nil
-			for i, v in ipairs(Settings.DevProduct) do
-				if v.Type == "DuffelBagUpgrade" and v.Tier == nextTier then
-					devProduct = v
+			for i, product in ipairs(Settings.DevProduct) do
+				if product.Type == "DuffelBagUpgrade" and product.Tier == nextTier then
+					devProduct = product
 					break
 				end
 			end
 			assert(devProduct)
 			MarketplaceService:PromptProductPurchase(LocalPlayer, devProduct.Id)
 		end))
-		p1:_setRobbery(robberyEnumValue.Value)
-		p1._ownerMaid:GiveTask(robberyEnumValue:GetPropertyChangedSignal("Value"):Connect(function()
-			p1:_setRobbery(robberyEnumValue.Value)
+		self:_setRobbery(robberyEnumValue.Value)
+		self._ownerMaid:GiveTask(robberyEnumValue:GetPropertyChangedSignal("Value"):Connect(function()
+			self:_setRobbery(robberyEnumValue.Value)
 		end))
-		p1:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
+		self:_setAmount(amountValue.Value, multEnabledValue.Value and math.ceil(maximumValue.Value * multValue.Value) or maximumValue.Value)
 	end
 end
-function t._setAmount(p1, p2, p3)
-	RobberyMoneyUI.SetMoney(p2, p3)
+function DuffelBag._setAmount(self, currentAmount, maximumAmount)
+	RobberyMoneyUI.SetMoney(currentAmount, maximumAmount)
 end
-function t._setFormatter(p1, p2)
-	RobberyMoneyUI.SetFormatter((assert(RobberyMoneyUI.Formatter[p2])))
+function DuffelBag._setFormatter(self, formatterValue)
+	RobberyMoneyUI.SetFormatter((assert(RobberyMoneyUI.Formatter[formatterValue])))
 end
-function t._setTime(p1, p2)
-	if p2 <= 0.001 then
-		p2 = nil
+function DuffelBag._setTime(self, timeValue)
+	if timeValue <= 0.001 then
+		timeValue = nil
 	end
-	RobberyMoneyUI.SetTime(p2)
+	RobberyMoneyUI.SetTime(timeValue)
 end
-function t._setTier(p1, p2, p3)
-	assert(p2 ~= nil)
-	assert(p3 ~= nil)
-	RobberyMoneyUI.SetTier(p2, p3)
+function DuffelBag._setTier(self, tier, multEnabled)
+	assert(tier ~= nil)
+	assert(multEnabled ~= nil)
+	RobberyMoneyUI.SetTier(tier, multEnabled)
 end
-function t._setMessage(p1, p2)
-	RobberyMoneyUI.SetMessage(p2)
+function DuffelBag._setMessage(self, messageValue)
+	RobberyMoneyUI.SetMessage(messageValue)
 end
-function t._setRobbery(p1, p2)
-	RobberyMoneyUI.SetRobbery(p2)
+function DuffelBag._setRobbery(self, robberyValue)
+	RobberyMoneyUI.SetRobbery(robberyValue)
 end
-function t._onClientEvent(p1, p2)
-	if p2 == DuffelBagConsts.net.PLAY_AWARD_SOUND then
+function DuffelBag._onClientEvent(self, eventType)
+	if eventType == DuffelBagConsts.net.PLAY_AWARD_SOUND then
 		Audio.ObjectLocal(script, 1988476450)
 	end
 end
-function t.IsHeld(p1)
-	return p1:GetOwner() and p1._obj:IsDescendantOf(Players)
+function DuffelBag.IsHeld(self)
+	return self:GetOwner() and self._obj:IsDescendantOf(Players)
 end
-function t.GetOwner(p1)
-	return p1._ownerObj.Value
+function DuffelBag.GetOwner(self)
+	return self._ownerObj.Value
 end
-function t.GetRobbery(p1)
-	return p1._robberyEnumValue.Value
+function DuffelBag.GetRobbery(self)
+	return self._robberyEnumValue.Value
 end
-function t.GetRobberyChangedSignal(p1)
-	return p1._robberyEnumValue.Changed
+function DuffelBag.GetRobberyChangedSignal(self)
+	return self._robberyEnumValue.Changed
 end
-function t.Destroy(p1)
-	p1._maid:Destroy()
-	p1._maid = nil
+function DuffelBag.Destroy(self)
+	self._maid:Destroy()
+	self._maid = nil
 end
-return t
+return DuffelBag

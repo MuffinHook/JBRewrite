@@ -1,19 +1,18 @@
--- Reviewed by Claude
-local t = {
-	getInstance = function(p1)
+local FloorMaterialModule = {
+	getInstance = function(materialConfig)
 		local Part = Instance.new("Part")
 		Part.Shape = Enum.PartType.Ball
 		Part.Size = Vector3.new(4, 4, 4)
 		Part.TopSurface = 0
 		Part.BottomSurface = 0
 		Part.Color = Color3.new(255/255, 255/255, 255/255)
-		if p1.Material then
-			Part.Material = p1.Material
+		if materialConfig.Material then
+			Part.Material = materialConfig.Material
 		else
 			Part.Material = Enum.Material.SmoothPlastic
 		end
-		if p1.MaterialVariant then
-			Part.MaterialVariant = p1.MaterialVariant
+		if materialConfig.MaterialVariant then
+			Part.MaterialVariant = materialConfig.MaterialVariant
 		else
 			Part.MaterialVariant = ""
 		end
@@ -21,12 +20,12 @@ local t = {
 		Part.CFrame = CFrame.new()
 		return Part
 	end,
-	updateCamera = function(p1, p2)
+	updateCamera = function(camera, p2)
 		local progress = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, progress % 6.283185307179586, 0) * CFrame.Angles(math.sin(progress) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+		camera.CFrame = CFrame.Angles(0, progress % 6.283185307179586, 0) * CFrame.Angles(math.sin(progress) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 	end
 }
-local t2 = {
+local floorMaterials = {
 	{
 		Name = "Smooth",
 		None = true,
@@ -66,28 +65,28 @@ local t2 = {
 		Price = 30000
 	}
 }
-function t.getItems()
-	return t2
+function FloorMaterialModule.getItems()
+	return floorMaterials
 end
-function t.apply(p1, p2)
-	local FlooringMaterial = p2:FindFirstChild("FlooringMaterial")
+function FloorMaterialModule.apply(materialConfig, model)
+	local FlooringMaterial = model:FindFirstChild("FlooringMaterial")
 	if FlooringMaterial then
 		local count = 0
-		for v2, v3 in FlooringMaterial:GetChildren() do
-			local progress
-			if v3:IsA("BasePart") then
+		for index, part in FlooringMaterial:GetChildren() do
+			local materialValue
+			if part:IsA("BasePart") then
 				count = count + 1
-				progress = p1 and p1.Material
-				if progress then
-					v3.Material = progress
+				materialValue = materialConfig and materialConfig.Material
+				if materialValue then
+					part.Material = materialValue
 				else
-					v3.Material = v3:GetAttribute("OriginalMaterial") or Enum.Material.SmoothPlastic
+					part.Material = part:GetAttribute("OriginalMaterial") or Enum.Material.SmoothPlastic
 				end
-				if p1 and p1.MaterialVariant then
-					assert(progress, "MaterialVariant requires Material")
-					v3.MaterialVariant = p1.MaterialVariant
+				if materialConfig and materialConfig.MaterialVariant then
+					assert(materialValue, "MaterialVariant requires Material")
+					part.MaterialVariant = materialConfig.MaterialVariant
 				else
-					v3.MaterialVariant = v3:GetAttribute("OriginalMaterialVariant") or ""
+					part.MaterialVariant = part:GetAttribute("OriginalMaterialVariant") or ""
 				end
 			end
 		end
@@ -96,4 +95,4 @@ function t.apply(p1, p2)
 		warn("Missing subModel")
 	end
 end
-return t
+return FloorMaterialModule

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
 local HyperChromeUtils = require(ReplicatedStorage.HyperChrome.HyperChromeUtils)
@@ -237,9 +235,9 @@ local colorsList = {
 		Hidden = true
 	}
 }
-for v1, v2 in HyperChromeUtils.getListOfHyperChromeNames() do
+for _, hyperchrromeName in HyperChromeUtils.getListOfHyperChromeNames() do
 	table.insert(colorsList, 1, {
-		Name = v2,
+		Name = hyperchrromeName,
 		Hidden = true,
 		HiddenAll = true
 	})
@@ -256,13 +254,13 @@ local function Update(colorPart, p2)
 end
 return {
 	Items = colorsList,
-	GetInstance = function(p1)
+	GetInstance = function(colorItem)
 		local Part = Instance.new("Part")
 		Part.Shape = Enum.PartType.Ball
 		Part.Size = Vector3.new(4, 4, 4)
 		Part.TopSurface = 0
 		Part.BottomSurface = 0
-		Part.Color = Paint.GetColor(p1.Name)
+		Part.Color = Paint.GetColor(colorItem.Name)
 		Part.Anchored = true
 		Part.CFrame = CFrame.new()
 		return Part

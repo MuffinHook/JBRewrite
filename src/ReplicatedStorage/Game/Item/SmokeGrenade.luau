@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Module.R15IKv2)
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -8,17 +6,17 @@ local SmokeGrenadeBinder = require(ReplicatedStorage.Game.SmokeGrenade.SmokeGren
 local Notification = require(ReplicatedStorage.Game.Notification)
 require(ReplicatedStorage.Inventory.InventoryItemUtils)
 local Gun = require(script.Parent.Gun)
-local function getThrowableSmokeGrenade(p1)
-	for i, v in ipairs((SmokeGrenadeBinder:GetAll())) do
-		if v:GetCreator() == p1 and not v:GetThrown() then
-			return v
+local function getThrowableSmokeGrenade(player)
+	for i, grenade in ipairs((SmokeGrenadeBinder:GetAll())) do
+		if grenade:GetCreator() == player and not grenade:GetThrown() then
+			return grenade
 		end
 	end
 end
-local function getNumActiveSmokeGrenade(p1)
+local function getNumActiveSmokeGrenade(player)
 	local count = 0
-	for i, v in ipairs((SmokeGrenadeBinder:GetAll())) do
-		if v:GetCreator() == p1 and v:GetThrown() then
+	for i, grenade in ipairs((SmokeGrenadeBinder:GetAll())) do
+		if grenade:GetCreator() == player and grenade:GetThrown() then
 			count = count + 1
 		end
 	end
@@ -30,42 +28,42 @@ local function randomVector()
 	return Vector3.new(randomX, randomY, math.random() * 2 - 1).Unit
 end
 local eventSignal = nil
-local t = {
+local SmokeGrenade = {
 	__ClassName = "SmokeGrenade"
 }
-t.__index = t
-setmetatable(t, Gun)
-function t.Init(p1)
-	eventSignal = p1.Event
+SmokeGrenade.__index = SmokeGrenade
+setmetatable(SmokeGrenade, Gun)
+function SmokeGrenade.Init(eventProvider)
+	eventSignal = eventProvider.Event
 end
-function t.new(p1, p2, p3)
-	local gun = Gun.new(p1, p2, p3)
-	setmetatable(gun, t)
-	gun:Setup(p3)
+function SmokeGrenade.new(self, config, setupConfig)
+	local gun = Gun.new(self, config, setupConfig)
+	setmetatable(gun, SmokeGrenade)
+	gun:Setup(setupConfig)
 	return gun
 end
-t.ApplySkin = false
-function t.SetupArmWelds(p1)  end
-function t.UpdateArmIK(p1)
-	local IK = p1.IK
-	IK.RightArm = p1.Model.Model.Hold.Position
-	IK.RightAngle = p1.Config.Motion.RightElbowAngle
+SmokeGrenade.ApplySkin = false
+function SmokeGrenade.SetupArmWelds(self)  end
+function SmokeGrenade.UpdateArmIK(self)
+	local IK = self.IK
+	IK.RightArm = self.Model.Model.Hold.Position
+	IK.RightAngle = self.Config.Motion.RightElbowAngle
 end
-function t.SetupTip(p1)
-	p1.TipOffset = Vector3.new()
+function SmokeGrenade.SetupTip(self)
+	self.TipOffset = Vector3.new()
 end
-function t.BulletEmitterOnLocalHitPlayer(p1)  end
-function t.ShootBegin(p1, p2)
+function SmokeGrenade.BulletEmitterOnLocalHitPlayer(self)  end
+function SmokeGrenade.ShootBegin(self, input)
 	tick()
 	local grenadeInstance
-	if p1.Local then
-		if getNumActiveSmokeGrenade(p1.Player) >= 1 then
+	if self.Local then
+		if getNumActiveSmokeGrenade(self.Player) >= 1 then
 			Notification.new({
 				Text = "Only one active smoke grenade allowed at a time."
 			})
 			error("Too many SmokeGrenade, detonate before launching more.")
 		end
-		local throwableGrenade = getThrowableSmokeGrenade(p1.Player)
+		local throwableGrenade = getThrowableSmokeGrenade(self.Player)
 		if not throwableGrenade then
 			error("No throwable SmokeGrenade left in pool")
 		end
@@ -73,12 +71,12 @@ function t.ShootBegin(p1, p2)
 	else
 		grenadeInstance = nil
 	end
-	if not p1:ShootCheckConditions() then
+	if not self:ShootCheckConditions() then
 		return false
 	end
-	if p1.Local then
-		local launchOrigin = p1.UpperTorso.CFrame * Vector3.new(0, 0, -2)
-		local launchVelocity, _ = SimulatedPhysicsProjectile.CalculateVelocityToHitTargetWithSpeed(launchOrigin, p1.MousePosition, 100, workspace.Gravity, false)
+	if self.Local then
+		local launchOrigin = self.UpperTorso.CFrame * Vector3.new(0, 0, -2)
+		local launchVelocity, _ = SimulatedPhysicsProjectile.CalculateVelocityToHitTargetWithSpeed(launchOrigin, self.MousePosition, 100, workspace.Gravity, false)
 		grenadeInstance._obj.PrimaryPart.Anchored = false
 		grenadeInstance._obj:SetPrimaryPartCFrame(CFrame.new(launchOrigin, launchOrigin + launchVelocity))
 		grenadeInstance:SetVelocity(launchVelocity)
@@ -86,32 +84,32 @@ function t.ShootBegin(p1, p2)
 		grenadeInstance:SetRotVelocity(rotationAxis + Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1).Unit * 5)
 		grenadeInstance:SetThrown(true)
 		grenadeInstance._maid:GiveTask(function()  end)
-		p1:SetNextShotPossible()
-		p1:DecrementAmmo()
-		eventSignal:FireServer("i" .. ("v3p4ig"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("tpzkady"):sub(2, 3):reverse():reverse():reverse() .. "6p5r")
-		p1:ReloadDropAmmoVisual()
+		self:SetNextShotPossible()
+		self:DecrementAmmo()
+		eventSignal:FireServer("i4zp6p5r")
+		self:ReloadDropAmmoVisual()
 		delay(0.1, function()
-			if p1.Destroyed then
+			if self.Destroyed then
 				return false
 			end
-			p1:ReloadRefillAmmoVisual()
+			self:ReloadRefillAmmoVisual()
 		end)
 	end
-	if p1.Local then
-		p1:BroadcastInputBegan(p2)
+	if self.Local then
+		self:BroadcastInputBegan(input)
 	end
 end
-function t.ShootEnd(p1, p2)
-	if p1.Local then
-		p1:BroadcastInputEnded(p2)
+function SmokeGrenade.ShootEnd(self, input)
+	if self.Local then
+		self:BroadcastInputEnded(input)
 	end
 end
-function t.ShootSound(p1, p2)
-	if p2 then
-		Audio.ObjectLocal(p1.Model.Skeleton.BoundingBox, 2121005402)
+function SmokeGrenade.ShootSound(self, shouldPlay)
+	if shouldPlay then
+		Audio.ObjectLocal(self.Model.Skeleton.BoundingBox, 2121005402)
 	end
 end
-t.ScopeBegin = false
-t.ScopeEnd = false
-t.Reload = false
-return t
+SmokeGrenade.ScopeBegin = false
+SmokeGrenade.ScopeEnd = false
+SmokeGrenade.Reload = false
+return SmokeGrenade

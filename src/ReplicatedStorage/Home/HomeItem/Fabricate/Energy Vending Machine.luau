@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local _VendingMachine = require(script.Parent._VendingMachine)
 return {
 	setup = function(self)

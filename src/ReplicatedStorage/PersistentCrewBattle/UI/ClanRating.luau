@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
@@ -13,35 +11,35 @@ local function colorCompAvg(self)
 		return 0
 	end
 end
-local local1 = Roact.PureComponent:extend("ClanRating")
-function local1.render(self)
+local ClanRatingComponent = Roact.PureComponent:extend("ClanRating")
+function ClanRatingComponent.render(self)
 	local aspectRatio = self.props.aspectRatio
 	if typeof(self.props.clanRating) ~= "string" then
-		local local1 = error
-		local local2 = typeof(self.props.clanRating)
-		local1("clanRating must be a string but is: " .. local2 .. " " .. tostring(self.props.clanRating))
+		local throwError = error
+		local actualType = typeof(self.props.clanRating)
+		throwError("clanRating must be a string but is: " .. actualType .. " " .. tostring(self.props.clanRating))
 	end
 	local clanFlagColor = self.props.clanFlagColor
-	local local4
+	local textColor
 	if if clanFlagColor then (clanFlagColor.R + clanFlagColor.G + clanFlagColor.B) / 3 else 0 < 0.2 then
-		local4 = Color3.new(255/255, 255/255, 255/255)
+		textColor = Color3.new(255/255, 255/255, 255/255)
 	else
-		local local6 = if clanFlagColor then (clanFlagColor.R + clanFlagColor.G + clanFlagColor.B) / 3 else 0
-		local4 = if local6 > 0.8 then Color3.new(0/255, 0/255, 0/255) else ColorUtils.brightenBy(clanFlagColor, -0.5)
+		local brightness = if clanFlagColor then (clanFlagColor.R + clanFlagColor.G + clanFlagColor.B) / 3 else 0
+		textColor = if brightness > 0.8 then Color3.new(0/255, 0/255, 0/255) else ColorUtils.brightenBy(clanFlagColor, -0.5)
 	end
-	local t = {
+	local containerProps = {
 		BorderSizePixel = 0,
 		BackgroundColor3 = Color3.fromRGB(55, 57, 62),
 		Size = self.props.size,
 		Position = self.props.position
 	}
-	local table2 = {
+	local frameChildren = {
 		UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
 		})
 	}
-	local table4 = {}
-	local table5 = {
+	local mainChildren = {}
+	local rankPaddingProps = {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(1 / aspectRatio, 1),
 		paddingTop = 1,
@@ -49,8 +47,8 @@ function local1.render(self)
 		paddingRight = 0.5,
 		paddingBottom = 1
 	}
-	local table6 = {}
-	local table7 = {
+	local rankTextChildren = {}
+	local rankTextProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -58,12 +56,12 @@ function local1.render(self)
 		Font = Enum.Font.FredokaOne,
 		TextXAlignment = Enum.TextXAlignment.Center
 	}
-	table7.Text = tostring(self.props.index)
-	table7.TextScaled = true
-	table7.TextColor3 = Color3.new(255/255, 255/255, 255/255)
-	table6.Text = createElement("TextLabel", table7)
-	table4.Rank = createElement(PaddedContainer, table5, table6)
-	table4.FlagContainer = createElement(PaddedContainer, {
+	rankTextProps.Text = tostring(self.props.index)
+	rankTextProps.TextScaled = true
+	rankTextProps.TextColor3 = Color3.new(255/255, 255/255, 255/255)
+	rankTextChildren.Text = createElement("TextLabel", rankTextProps)
+	mainChildren.Rank = createElement(PaddedContainer, rankPaddingProps, rankTextChildren)
+	mainChildren.FlagContainer = createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(1.5 / aspectRatio, 1),
 		position = UDim2.fromScale(1 / aspectRatio, 0),
@@ -82,7 +80,7 @@ function local1.render(self)
 			Thickness = 2
 		})
 	})
-	table4.ClanName2 = createElement(PaddedContainer, {
+	mainChildren.ClanName2 = createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(1 - 2.5 / aspectRatio - 0.2, 1),
 		position = UDim2.fromScale(2.5 / aspectRatio, 0),
@@ -104,11 +102,11 @@ function local1.render(self)
 			UIStroke = createElement("UIStroke", {
 				Transparency = 0.6,
 				Thickness = 2,
-				Color = local4
+				Color = textColor
 			})
 		})
 	})
-	table4.CrewView = self.props.showCrewView and createElement("Frame", {
+	mainChildren.CrewView = self.props.showCrewView and createElement("Frame", {
 		BackgroundTransparency = 1,
 		BackgroundColor3 = Color3.new(255/255, 0/255, 0/255),
 		Size = UDim2.new(0.1, 0, 1, 0),
@@ -138,7 +136,7 @@ function local1.render(self)
 			end
 		})
 	})
-	table4.Right = createElement("Frame", {
+	mainChildren.Right = createElement("Frame", {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0.1, 0, 1, 0),
 		Position = UDim2.new(0.9, 0, 0, 0)
@@ -194,7 +192,7 @@ function local1.render(self)
 			})
 		})
 	})
-	table2.Container = createElement(PaddedContainer, {
+	frameChildren.Container = createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		aspectRatio = self.props.aspectRatio,
 		verticalPaddingRatio = 1 / self.props.paddingRatio,
@@ -202,7 +200,7 @@ function local1.render(self)
 		paddingBottom = 0,
 		paddingLeft = 0,
 		paddingRight = 0
-	}, table4)
-	return createElement("Frame", t, table2)
+	}, mainChildren)
+	return createElement("Frame", containerProps, frameChildren)
 end
-return local1
+return ClanRatingComponent

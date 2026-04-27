@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -85,20 +83,20 @@ local function AnimateDoor(doorModel, distance, duration)
 end
 
 return {
-	Init = function(p1)
-		local em = p1.em
+	Init = function(config)
+		local eventManager = config.em
 
-		function em.AnimateDoor(doorModel, distance, duration)
+		function eventManager.AnimateDoor(doorModel, distance, duration)
 			return AnimateDoor(doorModel, distance, duration)
 		end
 
-		function em.OpenDoor(doorModel, open)
+		function eventManager.OpenDoor(doorModel, open)
 			DoorUtils.setOpen(doorModel, open)
 		end
 
 		local isAnimating = false
 
-		function em.AnimateModelLift(model, targetCFrame)
+		function eventManager.AnimateModelLift(model, targetCFrame)
 			if isAnimating then
 				return false
 			end

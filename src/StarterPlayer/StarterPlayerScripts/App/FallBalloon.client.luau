@@ -1,88 +1,86 @@
--- Reviewed by Claude
--- variables reassigned
 game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
 require(ReplicatedStorage.App.RunUtils)
-local function _(p1, p2)
-	for v1, v2 in p1.Part:GetChildren() do
-		local ParticleEmitter = v2:FindFirstChildOfClass("ParticleEmitter")
-		local Sound = v2:FindFirstChildOfClass("Sound")
+local function toggleBalloonEmitters(balloon, isEnabled)
+	for index, part in balloon.Part:GetChildren() do
+		local ParticleEmitter = part:FindFirstChildOfClass("ParticleEmitter")
+		local Sound = part:FindFirstChildOfClass("Sound")
 		if ParticleEmitter then
-			ParticleEmitter.Enabled = p2
+			ParticleEmitter.Enabled = isEnabled
 		end
 		if Sound then
-			Sound.Playing = p2
+			Sound.Playing = isEnabled
 		end
 	end
 end
-local function _()
-	if not (v1 <= 0) then
-		local v12 = workspace:GetServerTimeNow()
-		for v22, v32 in v2 do
-			local v42 = (v12 + v32.Offset) % v3.Total
-			if v42 < v3.RestingTime then
-				if v32.Phase == "Resting" then
-					_ = v22
-					_2 = v32
+local function updateBalloonPhases()
+	if not (isPhaseUpdateEnabled <= 0) then
+		local currentTime = workspace:GetServerTimeNow()
+		for balloonIndex, balloonConfig in balloonConfigs do
+			local elapsedTime = (currentTime + balloonConfig.Offset) % timingConfig.Total
+			if elapsedTime < timingConfig.RestingTime then
+				if balloonConfig.Phase == "Resting" then
+					_ = balloonIndex
+					_2 = balloonConfig
 					break
 				end
-				v32.Phase = "Resting"
-				v4(v32, false)
-				v32.Part.CFrame = v32.Origin
-			elseif v42 < v3.RestingTime + v3.ActivatingTime then
-				if v32.Phase == "Activating" then
-					_ = v22
-					_2 = v32
+				balloonConfig.Phase = "Resting"
+				toggleBalloonEmitters(balloonConfig, false)
+				balloonConfig.Part.CFrame = balloonConfig.Origin
+			elseif elapsedTime < timingConfig.RestingTime + timingConfig.ActivatingTime then
+				if balloonConfig.Phase == "Activating" then
+					_ = balloonIndex
+					_2 = balloonConfig
 					break
 				end
-				v32.Phase = "Activating"
-				v4(v32, true)
-			elseif v42 < v3.RestingTime + v3.ActivatingTime + v3.UpTime then
-				if v32.Phase ~= "Up" then
-					v4(v32, true)
-					v32.Phase = "Up"
+				balloonConfig.Phase = "Activating"
+				toggleBalloonEmitters(balloonConfig, true)
+			elseif elapsedTime < timingConfig.RestingTime + timingConfig.ActivatingTime + timingConfig.UpTime then
+				if balloonConfig.Phase ~= "Up" then
+					toggleBalloonEmitters(balloonConfig, true)
+					balloonConfig.Phase = "Up"
 				end
-				v32.Part.CFrame = v32.Origin:Lerp(v32.Up, (v42 - (v3.RestingTime + v3.ActivatingTime)) / v3.UpTime)
-			elseif v42 < v3.RestingTime + v3.ActivatingTime + v3.UpTime + v3.AirTime then
-				if v32.Phase ~= "Air" then
-					v4(v32, false)
-					v32.Phase = "Air"
+				balloonConfig.Part.CFrame = balloonConfig.Origin:Lerp(balloonConfig.Up, (elapsedTime - (timingConfig.RestingTime + timingConfig.ActivatingTime)) / timingConfig.UpTime)
+			elseif elapsedTime < timingConfig.RestingTime + timingConfig.ActivatingTime + timingConfig.UpTime + timingConfig.AirTime then
+				if balloonConfig.Phase ~= "Air" then
+					toggleBalloonEmitters(balloonConfig, false)
+					balloonConfig.Phase = "Air"
 				end
-				local mathFunc = math.noise(v12 * v3.SwaySpeed * v3.SwayAmount)
-				local mathFunc = math.noise(v12 * v3.SwaySpeed * 0.8 * v3.SwayAmount * 0.5)
-				local mathFunc = math.sin(v12 * v3.SwaySpeed)
-				local mathFunc = mathFunc * math.rad(v3.SwayTilt)
-				local mathFunc = math.cos(v12 * v3.SwaySpeed * 0.8)
-				local mathFunc = mathFunc * math.rad(v3.SwayTilt)
-				v32.Part.CFrame = v32.Pivot * CFrame.Angles(mathFunc, 0, mathFunc) * CFrame.new(mathFunc, 0, mathFunc) * v32.Pivot:ToObjectSpace(v32.Up)
+				local swayNoiseX = math.noise(currentTime * timingConfig.SwaySpeed * timingConfig.SwayAmount)
+				local swayNoiseZ = math.noise(currentTime * timingConfig.SwaySpeed * 0.8 * timingConfig.SwayAmount * 0.5)
+				local swayRotationX = math.sin(currentTime * timingConfig.SwaySpeed)
+				local swayRotationX = swayRotationX * math.rad(timingConfig.SwayTilt)
+				local swayRotationZ = math.cos(currentTime * timingConfig.SwaySpeed * 0.8)
+				local swayRotationZ = swayRotationZ * math.rad(timingConfig.SwayTilt)
+				balloonConfig.Part.CFrame = balloonConfig.Pivot * CFrame.Angles(swayRotationX, 0, swayRotationZ) * CFrame.new(swayNoiseX, 0, swayNoiseZ) * balloonConfig.Pivot:ToObjectSpace(balloonConfig.Up)
 			else
-				if v32.Phase ~= "Down" then
-					v32.Phase = "Down"
+				if balloonConfig.Phase ~= "Down" then
+					balloonConfig.Phase = "Down"
 				end
-				v32.Part.CFrame = v32.Up:Lerp(v32.Origin, (v42 - (v3.RestingTime + v3.ActivatingTime + v3.UpTime + v3.AirTime)) / v3.DownTime)
+				balloonConfig.Part.CFrame = balloonConfig.Up:Lerp(balloonConfig.Origin, (elapsedTime - (timingConfig.RestingTime + timingConfig.ActivatingTime + timingConfig.UpTime + timingConfig.AirTime)) / timingConfig.DownTime)
 			end
 		end
 	end
 end
-local function _(p1)
+local function initializeBalloonConfig(balloonInstance)
 	local configTable = {
-		Offset = p1:GetAttribute("Offset") or 0,
-		Part = p1:WaitForChild("Main"),
-		Origin = p1.Main.CFrame
+		Offset = balloonInstance:GetAttribute("Offset") or 0,
+		Part = balloonInstance:WaitForChild("Main"),
+		Origin = balloonInstance.Main.CFrame
 	}
-	configTable.Up = p1.Main.CFrame + Vector3.new(0, mathFunc.UpDist, 0)
-	configTable.Pivot = p1.Main.CFrame + Vector3.new(0, mathFunc.UpDist + mathFunc.UpPivot, 0)
+	configTable.Up = balloonInstance.Main.CFrame + Vector3.new(0, balloonCount.UpDist, 0)
+	configTable.Pivot = balloonInstance.Main.CFrame + Vector3.new(0, balloonCount.UpDist + balloonCount.UpPivot, 0)
 	configTable.Phase = "Resting"
-	v5[p1] = configTable
-	mathFunc = mathFunc + 1
+	balloonConfigsByInstance[balloonInstance] = configTable
+	balloonCount = balloonCount + 1
 end
-local function _(p1)
-	if v8[p1] then
-		if v8[p1].Part then
-			v8[p1].Part.CFrame = v8[p1].Origin
+local function cleanupBalloonConfig(balloonInstance)
+	if balloonConfigsByInstance[balloonInstance] then
+		if balloonConfigsByInstance[balloonInstance].Part then
+			balloonConfigsByInstance[balloonInstance].Part.CFrame = balloonConfigsByInstance[balloonInstance].Origin
 		end
-		v8[p1] = nil
-		mathFunc = mathFunc - 1
+		balloonConfigsByInstance[balloonInstance] = nil
+		balloonCount = balloonCount - 1
 	end
 end

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Enumer = require(ReplicatedStorage.Std.Enumer)
 return require(ReplicatedStorage.Std.TableUtils).requireValidIndexAndFreeze({

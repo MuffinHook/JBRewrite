@@ -1,45 +1,44 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlaneConsts = require(ReplicatedStorage.Plane.PlaneConsts)
 return {
-	getOrigin = function(p1)
-		return p1:GetAttribute(PlaneConsts.ORIGIN_ATTR_NAME)
+	getOrigin = function(instance)
+		return instance:GetAttribute(PlaneConsts.ORIGIN_ATTR_NAME)
 	end,
-	setOrigin = function(p1, p2)
-		p1:SetAttribute(PlaneConsts.ORIGIN_ATTR_NAME, p2)
+	setOrigin = function(instance, originValue)
+		instance:SetAttribute(PlaneConsts.ORIGIN_ATTR_NAME, originValue)
 	end,
-	getTarget = function(p1)
-		return p1:GetAttribute(PlaneConsts.TARGET_ATTR_NAME)
+	getTarget = function(instance)
+		return instance:GetAttribute(PlaneConsts.TARGET_ATTR_NAME)
 	end,
-	setTarget = function(p1, p2)
-		p1:SetAttribute(PlaneConsts.TARGET_ATTR_NAME, p2)
+	setTarget = function(instance, targetValue)
+		instance:SetAttribute(PlaneConsts.TARGET_ATTR_NAME, targetValue)
 	end,
-	setTypeEnum = function(p1, p2)
-		p1:SetAttribute(PlaneConsts.AIR_DROP_TYPE_ENUM_ATTRIBUTE_NAME, p2)
+	setTypeEnum = function(instance, typeEnumValue)
+		instance:SetAttribute(PlaneConsts.AIR_DROP_TYPE_ENUM_ATTRIBUTE_NAME, typeEnumValue)
 		return true
 	end,
-	getTypeEnum = function(p1)
-		local v1 = p1:GetAttribute(PlaneConsts.AIR_DROP_TYPE_ENUM_ATTRIBUTE_NAME)
-		assert(v1, "Airdrop has no type")
-		return v1
+	getTypeEnum = function(instance)
+		local typeEnum = instance:GetAttribute(PlaneConsts.AIR_DROP_TYPE_ENUM_ATTRIBUTE_NAME)
+		assert(typeEnum, "Airdrop has no type")
+		return typeEnum
 	end,
-	getBornAt = function(p1)
-		return p1:GetAttribute(PlaneConsts.BORN_AT_ATTR_NAME)
+	getBornAt = function(instance)
+		return instance:GetAttribute(PlaneConsts.BORN_AT_ATTR_NAME)
 	end,
-	setBornAt = function(p1, p2)
-		p1:SetAttribute(PlaneConsts.BORN_AT_ATTR_NAME, p2)
+	setBornAt = function(instance, bornAtValue)
+		instance:SetAttribute(PlaneConsts.BORN_AT_ATTR_NAME, bornAtValue)
 	end,
-	getSpeed = function(p1)
-		return p1:GetAttribute(PlaneConsts.SPEED_ATTR_NAME)
+	getSpeed = function(instance)
+		return instance:GetAttribute(PlaneConsts.SPEED_ATTR_NAME)
 	end,
-	setSpeed = function(p1, p2)
-		p1:SetAttribute(PlaneConsts.SPEED_ATTR_NAME, p2)
+	setSpeed = function(instance, speedValue)
+		instance:SetAttribute(PlaneConsts.SPEED_ATTR_NAME, speedValue)
 	end,
-	getDuration = function(p1, p2, p3)
-		return (p2 - p1).Magnitude / p3
+	getDuration = function(startPosition, endPosition, speed)
+		return (endPosition - startPosition).Magnitude / speed
 	end,
-	getPositionAt = function(p1, p2, p3, p4, p5)
-		local v1 = p3 - p2
-		return p2 + v1 * (p1 / p5) + v1.Unit:Cross(Vector3.new(0, 1, 0)) * p4 * math.cos(p1)
+	getPositionAt = function(progress, startPosition, endPosition, amplitude, duration)
+		local directionVector = endPosition - startPosition
+		return startPosition + directionVector * (progress / duration) + directionVector.Unit:Cross(Vector3.new(0, 1, 0)) * amplitude * math.cos(progress)
 	end
 }

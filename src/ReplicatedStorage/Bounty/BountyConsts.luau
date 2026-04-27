@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RobberyConsts = require(ReplicatedStorage.Robbery.RobberyConsts)
 return require(ReplicatedStorage.Std.TableUtils).requireValidIndexAndFreeze({

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
 local Binder = require(ReplicatedStorage.Std.Binder)

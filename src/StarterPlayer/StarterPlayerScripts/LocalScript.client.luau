@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
 local MarketplaceService = game:GetService("MarketplaceService")
@@ -64,39 +62,39 @@ if not RunUtils.isStudio() then
 	print("Build:", "22 Apr @ 08:27 PM EDT @0ec1e2e")
 end
 local vector = waitForChild(ReplicatedStorage, "GenericRemoteEvent", 30):catch(warn)
-local configTable, t2, EventFireServer, ConnectEvents
+local eventMap, eventBridge, EventFireServer, ConnectEvents
 do
-	local cframe = nil
-	configTable = {}
+	local remoteEvent = nil
+	eventMap = {}
 	for i = 1, 10 do
 		local RemoteEvent = Instance.new("RemoteEvent")
 		RemoteEvent.Name = Math.GUID()
 		RemoteEvent.Parent = ReplicatedStorage.Resource
 	end
-	local vector = nil
-	t2 = {}
+	local remoteEventCache = nil
+	eventBridge = {}
 	local FireServer = Instance.new("RemoteEvent").FireServer
 	EventFireServer = function(p1, ...)
-		FireServer(cframe, vector and vector[p1] or p1, ...)
+		FireServer(remoteEvent, remoteEventCache and remoteEventCache[p1] or p1, ...)
 	end
-	function t2.FireServer(p1, p2, ...)
+	function eventBridge.FireServer(p1, p2, ...)
 		return EventFireServer(p2, ...)
 	end
-	function configTable.yeo69ls9(p1)
-		configTable.hems = true
-		vector = p1
+	function eventMap.yeo69ls9(p1)
+		eventMap.hems = true
+		remoteEventCache = p1
 	end
 	local function OnClientEvent(p1, ...)
-		assert(configTable[p1], p1)(...)
+		assert(eventMap[p1], p1)(...)
 	end
 	ConnectEvents = function()
-		local isEnabled, isEnabled = vector:await()
-		if not isEnabled then
+		local result, isInitialized = remoteEventCache:await()
+		if not isInitialized then
 			error("Bad error... could not find `GenericGameEvent`")
 		end
-		isEnabled.Name = Math.GUID()
-		cframe = isEnabled
-		isEnabled.OnClientEvent:Connect(OnClientEvent)
+		isInitialized.Name = Math.GUID()
+		remoteEvent = isInitialized
+		isInitialized.OnClientEvent:Connect(OnClientEvent)
 	end
 end
 StarterGui.ResetPlayerGuiOnSpawn = false
@@ -146,7 +144,7 @@ do
 	ItemSystem = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
 	ItemSystem.Init({
 		em = configTable,
-		Event = t2
+		Event = eventBridge
 	})
 	require(ReplicatedStorage.Game.AmmoGui).Init({
 		GetScreenGui = GetScreenGui
@@ -157,7 +155,7 @@ do
 			local isEnabled = require(p1)
 			if rawget(isEnabled, "Init") then
 				isEnabled.Init({
-					Event = t2,
+					Event = eventBridge,
 					em = configTable,
 					ScreenGui = isEnabled
 				})
@@ -165,13 +163,13 @@ do
 			ItemSystem.Register(isEnabled)
 		end
 	end
-	for v13, v14 in ReplicatedStorage.Game.Item:GetChildren() do
+	for v13, targetPlayer in ReplicatedStorage.Game.Item:GetChildren() do
 		childAdded(v14)
 	end
 	ReplicatedStorage.Game.Item.ChildAdded:Connect(childAdded)
 	require(ReplicatedStorage.Game.ItemSystem.ItemCamera).Init()
 	require(ReplicatedStorage.Game.ItemSkin.ItemSkin).Init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	require(ReplicatedStorage.Game.ItemSkin.UI.UI).Init()
@@ -205,7 +203,7 @@ do
 	end
 	RunService.Heartbeat:Connect(Stepped)
 end
-local v16, CharacterBinder, CharacterUtil, configTable, v17, t5, v18, v19, v20, v21, EzUtils, t6, VehicleUtils, VehicleStateBinder, Classes, PromptPurchase
+local windowGroup, CharacterBinder, CharacterUtil, eventMap, currentVehiclePacket, nitroState, cameraTargetOffset, isSprinting, isCrawling, isStunned, EzUtils, gameContext, VehicleUtils, VehicleStateBinder, Classes, PromptPurchase
 do
 	local function HasPerm(p1)
 		local isEnabled = false
@@ -231,7 +229,7 @@ do
 		end
 		return isEnabled and isEnabled
 	end
-	v16 = AlexWM.MakeWindowGroup()
+	windowGroup = AlexWM.MakeWindowGroup()
 	CharacterBinder = require(ReplicatedStorage.App.CharacterBinder)
 	CharacterBinder:Start()
 	CharacterUtil = require(ReplicatedStorage.Game.CharacterUtil)
@@ -245,9 +243,9 @@ do
 		HotbarSystem.setColor(Settings.TeamColor[GameUtil.Team])
 	end)
 	Binder.new("BarbedWireClient", function(p1)
-		local isEnabled = Maid.new()
-		local isEnabled = 0
-		isEnabled:GiveTask(p1.Touched:Connect(function(p12)
+		local maidInstance = Maid.new()
+		local lastTouchTime = 0
+		maidInstance:GiveTask(p1.Touched:Connect(function(p12)
 			local Character = LocalPlayer.Character
 			if Character and p12.Parent == Character then
 				local Humanoid = Character:FindFirstChild("Humanoid")
@@ -255,58 +253,58 @@ do
 					if Humanoid:GetLimb(p12) == Enum.Limb.Unknown then
 						return
 					end
-					local isEnabled = os.clock()
-					if not (isEnabled - isEnabled < 0.3) then
-						isEnabled = isEnabled
-						local v22 = p1:GetAttribute("BarbedWireDamage")
-						local func
-						if v22 then
-							assert(typeof(v22) == "number")
-							func = v22
+					local currentTime = os.clock()
+					if not (currentTime - lastTouchTime < 0.3) then
+						lastTouchTime = currentTime
+						local damageAmount = p1:GetAttribute("BarbedWireDamage")
+						local damageValue
+						if damageAmount then
+							assert(typeof(damageAmount) == "number")
+							damageValue = damageAmount
 						else
-							func = 30
+							damageValue = 30
 						end
-						t2:FireServer("xe6v1us6", func, "Wire")
+						eventBridge:FireServer("xe6v1us6", damageValue, "Wire")
 					end
 				end
 			end
 		end))
-		return isEnabled
+		return maidInstance
 	end):Start()
-	configTable = {}
-	v17 = nil
-	t5 = {
+	eventMap = {}
+	currentVehiclePacket = nil
+	nitroState = {
 		VehiclesOwned = {},
 		VehiclesRented = {},
 		Nitro = 50,
 		NitroLastMax = 50
 	}
-	v18 = Vector3.new(0, 0, 0)
-	v19 = false
-	v20 = false
+	cameraTargetOffset = Vector3.new(0, 0, 0)
+	isSprinting = false
+	isCrawling = false
 	GameUtil.Schedule = "Yard"
-	v21 = false
+	isStunned = false
 	EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
-	t6 = {
-		MainWindowGroup = v16,
+	gameContext = {
+		MainWindowGroup = windowGroup,
 		ScreenGui = isEnabled,
 		ProductGui = cframe,
-		Event = t2,
+		Event = eventBridge,
 		em = configTable,
 		UI = UI,
 		SelectIfGamepad = function(p1)
 			EzUtils.selectIfGamepad(p1)
 		end,
 		GetVehiclePacket = function()
-			return v17
+			return currentVehiclePacket
 		end
 	}
 	VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 	VehicleUtils.Init({
-		GetVehiclePacket = t6.GetVehiclePacket,
-		em = configTable,
-		Event = t2,
-		nitroState = t5
+		GetVehiclePacket = gameContext.GetVehiclePacket,
+		em = eventMap,
+		Event = eventBridge,
+		nitroState = nitroState
 	})
 	VehicleStateBinder = require(ReplicatedStorage.Game.VehicleStateBinder)
 	VehicleStateBinder:Start()
@@ -315,21 +313,21 @@ do
 	Classes.Chassis.init({
 		ScreenGui = isEnabled
 	})
-	Classes.Chassis.SetEvent(t2)
+	Classes.Chassis.SetEvent(eventBridge)
 	Classes.Chassis2 = require(ReplicatedStorage.Module.AlexChassis2)
-	Classes.Chassis2.SetEvent(t2)
+	Classes.Chassis2.SetEvent(eventBridge)
 	Classes.Volt = require(ReplicatedStorage.Game.Vehicle.Volt)
 	Classes.Volt.Init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	Classes.Tank = require(ReplicatedStorage.Tank.TankService)
 	Classes.Tank.init()
-	local v22 = 0
+	local passPromptCounter = 0
 	PromptPurchase = function(p1)
 		local PassId = p1.PassId
-		local isEnabled = v22 + 1
-		v22 = isEnabled
+		local nextCounter = passPromptCounter + 1
+		passPromptCounter = nextCounter
 		if p1.OldPassId then
 			MarketplaceService:PromptPurchase(LocalPlayer, p1.OldPassId)
 		else
@@ -337,13 +335,13 @@ do
 		end
 		cframe.Gamepass.ContainerFrame.TextLabel.Text = p1.Text
 		task.delay(0.4, function()
-			if v22 == isEnabled then
+			if passPromptCounter == nextCounter then
 				cframe.Gamepass.Visible = true
 			end
 		end)
 	end
 	local function PromptGamePassPurchaseFinished(p1, p2, p3)
-		v22 = v22 + 1
+		passPromptCounter = passPromptCounter + 1
 		cframe.Gamepass.Visible = false
 	end
 	MarketplaceService.PromptGamePassPurchaseFinished:Connect(PromptGamePassPurchaseFinished)
@@ -358,15 +356,15 @@ local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
 GamepassUtils.Init({
 	PromptPurchase = PromptPurchase
 })
-t6.PromptPurchase = PromptPurchase
+gameContext.PromptPurchase = PromptPurchase
 local Notification = require(ReplicatedStorage.Game.Notification)
 Notification.Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 local SidebarUI = require(ReplicatedStorage.Game.SidebarUI)
 SidebarUI.Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 require(ReplicatedStorage.GameAnalytics).initClient()
@@ -375,26 +373,26 @@ require(ReplicatedStorage.CmdrExt.CmdrExtSystem).init()
 local Time = require(ReplicatedStorage.Module.Time)
 Time.Init()
 require(ReplicatedStorage.Module.Confirmation).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 require(ReplicatedStorage.Game.DisplayDamage).init()
 require(ReplicatedStorage.Game.CharacterAnim).init()
 require(ReplicatedStorage.Module.NetSync).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 require(ReplicatedStorage.Game.OwnedPart.OwnedPartSystem).init()
 require(ReplicatedStorage.Game.TrainSystem).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 require(ReplicatedStorage.Game.TrackSwitch).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
-Classes.Heli = require(ReplicatedStorage.Game.Vehicle.Heli)(t6)
-require(ReplicatedStorage.Game.Museum)(t6, ItemSystem)
+Classes.Heli = require(ReplicatedStorage.Game.Vehicle.Heli)(gameContext)
+require(ReplicatedStorage.Game.Museum)(gameContext, ItemSystem)
 require(ReplicatedStorage.Game.L18n)({
 	ScreenGui = isEnabled
 })
@@ -405,37 +403,37 @@ require(ReplicatedStorage.Plane.PlaneBinder):Start()
 require(ReplicatedStorage.Game.Hologram).Init()
 require(ReplicatedStorage.Game.Codes).Init({
 	MainWindowGroup = v16,
-	Event = t2
+	Event = eventBridge
 })
 require(ReplicatedStorage.Game.SecretBases).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 require(ReplicatedStorage.Game.Robbery.RobberyBank.RobberyBank).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 require(ReplicatedStorage.Jewelry.RobberyJewelry).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 require(ReplicatedStorage.Game.Robbery.RobberyCargoTrain).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 require(ReplicatedStorage.Game.Robbery.RobberyPassengerTrain).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable,
 	ScreenGui = isEnabled
 })
 require(ReplicatedStorage.Game.Robbery.RobberyCargoPlane).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable,
 	Team = TeamValue,
 	ScreenGui = isEnabled
 })
 require(ReplicatedStorage.Game.Cell).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable,
 	ScreenGui = isEnabled
 })
@@ -446,13 +444,13 @@ do
 	require(ReplicatedStorage.Game.Plane.BaseUserControlledPlane).Init()
 	local Jet = require(ReplicatedStorage.Game.Plane.Jet)
 	Jet.Init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	local Stunt = require(ReplicatedStorage.Game.Plane.Stunt)
 	VehicleSystem = require(ReplicatedStorage.Game.VehicleSystem)
 	VehicleSystem.Init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	VehicleSystem.RegisterModule(JetSki)
@@ -470,16 +468,16 @@ do
 		Missile.LaunchMissile(p1, p2, p3, p4)
 	end
 	require(ReplicatedStorage.Game.Robbery.PuzzleFlow).Init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	require(ReplicatedStorage.Game.Robbery.PowerPlant.PowerPlant).Init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	local JetPack = require(ReplicatedStorage.Game.JetPack.JetPack)
 	JetPack.Init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	JetPack.Signal.OnEquipped:Connect(function()
@@ -495,7 +493,7 @@ do
 	end
 	require(ReplicatedStorage.App.MinimapService).init()
 	require(ReplicatedStorage.Game.RoadSpikeSystem).Init({
-		Event = t2
+		Event = eventBridge
 	})
 	require(ReplicatedStorage.Game.WorldMarker.WorldMarkerSystem).init()
 	require(ReplicatedStorage.Game.RobberyMarkerSystem).init()
@@ -503,7 +501,7 @@ do
 		em = configTable
 	})
 	require(ReplicatedStorage.Game.April2020LiveEventLoader).Init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	require(ReplicatedStorage.Game.Boat.Boat).Init()
@@ -519,22 +517,22 @@ do
 		em = configTable
 	})
 	require(ReplicatedStorage.Game.NukeControl).Init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	require(ReplicatedStorage.Game.Robbery.CargoShip.CargoShipCoordinator).Init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	require(ReplicatedStorage.Game.Radio.RadioPlayer).Init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	require(ReplicatedStorage.Game.RobberyMoneyUI.RobberyMoneyUI).Init()
 	require(ReplicatedStorage.Game.DuffelBag.DuffelBagBinder):Start()
 	require(ReplicatedStorage.Game.GunShop.GunShopSystem).init()
 	require(ReplicatedStorage.Game.GunShop.GunShopUI).init({
-		Event = t2,
+		Event = eventBridge,
 		em = configTable
 	})
 	require(ReplicatedStorage.Game.ContextMessage.ContextMessageUI).init()
@@ -558,16 +556,16 @@ do
 	require(ReplicatedStorage.Home.Surface.SurfaceSystem).init()
 	require(ReplicatedStorage.Home.HomeItem.HomeItemSystem).init()
 	require(ReplicatedStorage.Home.HomeItem.Fabricate.Turret).init({
-		Event = t2
+		Event = eventBridge
 	})
 	require(ReplicatedStorage.Home.HomeItem.Fabricate["Trapped Bookshelf"]).init({
-		Event = t2
+		Event = eventBridge
 	})
 	require(ReplicatedStorage.Home.HomeItem.Fabricate["Trapped Spikes"]).init({
-		Event = t2
+		Event = eventBridge
 	})
 	require(ReplicatedStorage.Game.Robbery.TombRobbery.TombRobberySystem).init({
-		Event = t2
+		Event = eventBridge
 	})
 	require(ReplicatedStorage.Game.Cart.CartSystem).init()
 	require(ReplicatedStorage.Game.ProximityCamShake.ProximityCamShakeSystem).init()
@@ -575,7 +573,7 @@ do
 	require(ReplicatedStorage.Game.DartDispenser.DartDispenserSystem).init()
 	require(ReplicatedStorage.Game.Plank.PlankSystem).init()
 	require(ReplicatedStorage.Game.MilitaryTurret.MilitaryTurretSystem).init({
-		Event = t2
+		Event = eventBridge
 	})
 	require(ReplicatedStorage.Game.Destructible.DestructibleSystem).init()
 	require(ReplicatedStorage.Game.PlayerMarkerSystem).init()
@@ -613,7 +611,7 @@ do
 				configTable[p1.name] = p12
 				task.delay(0.25, function()
 					if configTable[p1.name] == isEnabled then
-						t2:FireServer("a" .. ("q6ry9dqsq"):sub(3, 6):reverse():reverse():reverse():reverse():reverse() .. "gu1", p1.name, p12)
+						eventBridge:FireServer("ad9yrgu1", p1.name, p12)
 					end
 				end)
 			end
@@ -667,19 +665,19 @@ do
 end
 local CashBuyUI = require(ReplicatedStorage.Game.CashBuyUI)
 CashBuyUI.Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 require(ReplicatedStorage.Game.Radio.Radio).Init()
 Settings.FetchProducts()
 local Falling = require(ReplicatedStorage.Game.Falling)
 Falling.Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 local Paraglide = require(ReplicatedStorage.Game.Paraglide)
 Paraglide.Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable
 })
 local LerpTable, PlaySound, StopSound
@@ -709,7 +707,7 @@ do
 		if p2.Source then
 			p2.Play = true
 			if not p3 then
-				t2:FireServer("x" .. ("nakxwot"):sub(3, 3):reverse() .. "" .. "" .. ("x2b8dne6"):sub(4, 4):reverse():reverse():reverse() .. "" .. "" .. ("la1tpebt"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("jk649fn4m"):sub(4, 6):reverse():reverse():reverse() .. "p", p1, p2)
+				eventBridge:FireServer("xk8pf94p", p1, p2)
 			end
 			configTable.xk8pf94p(LocalPlayer.Name, p1, p2)
 		end
@@ -717,11 +715,11 @@ do
 	StopSound = function(p1, p2)
 		local configTable = {}
 		if not p2 then
-			t2:FireServer("x" .. "" .. ("c2jkm0y6"):sub(4, 4):reverse() .. "" .. "" .. ("jgg8h1ta"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("dvptpvz"):sub(5, 5):reverse() .. "f94p", p1, configTable)
+			eventBridge:FireServer("xk8pf94p", p1, configTable)
 		end
 		configTable.xk8pf94p(LocalPlayer.Name, p1, configTable)
 	end
-	local v23 = 0
+	local questionCounter = 0
 	function configTable.xk8pf94p(p1, p2, p3)
 		local Source = p3.Source
 		local isEnabled = p3.Volume or 0.5
@@ -822,14 +820,14 @@ function configTable.l2atqdos(p1)
 	assert(p1 <= 50)
 	Fireworks(p1)
 end
-t6.Fireworks = Fireworks
+gameContext.Fireworks = Fireworks
 require(ReplicatedStorage.Game.Party).Init({
 	Fireworks = Fireworks
 })
 local AttemptPickPocket, AttemptBreakout, AttemptTrade, AttemptVehicleEject, AttemptVehicleHotwire, v24, StartNitro, StopNitro
 do
 	local function AttemptArrest(p1)
-		t2:FireServer("w5ln1uc8", p1)
+		eventBridge:FireServer("w5ln1uc8", p1)
 	end
 	function configTable.ghtu2z6w(p1)
 		if p1.Bribed then
@@ -840,10 +838,10 @@ do
 		end
 	end
 	AttemptPickPocket = function(p1)
-		t2:FireServer("w" .. "" .. ("oxlv"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("mfb6dr3"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("tlbouao8"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "5vm", p1.Name)
+		eventBridge:FireServer("wld6u5vm", p1.Name)
 	end
 	AttemptBreakout = function(p1)
-		t2:FireServer("z" .. "" .. ("jf1mbab"):sub(4, 5):reverse() .. "" .. "" .. ("vdm"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "vqfs", p1.Name)
+		eventBridge:FireServer("zbmdvqfs", p1.Name)
 	end
 	function configTable.bkiczp52(p1)
 		if p1.Cooldown then
@@ -861,83 +859,83 @@ do
 		end
 	end
 	AttemptVehicleEject = function(p1)
-		t2:FireServer("h" .. ("ny0zwqy"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("zjh1ohx"):sub(5, 5):reverse():reverse():reverse() .. "8k1vm", p1)
+		eventBridge:FireServer("hwo8k1vm", p1)
 	end
 	AttemptVehicleHotwire = function(p1, p2)
-		t2:FireServer("z" .. ("ynwee"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("kc0h"):sub(3, 3):reverse() .. "" .. "" .. ("firs1vz5vyzd"):sub(5, 8):reverse() .. "l", p1, p2)
+		eventBridge:FireServer("zw05zv1l", p1, p2)
 	end
-	v24 = nil
-	local v25 = tick()
+	timeOfDayState = nil
+	local lastDeltaCalcTime = tick()
 	local isEnabled = false
 	local function CalculateDelta()
 		if isEnabled and RunUtils.isMainWorld() then
 			isEnabled = false
-			local isEnabled = tick() - v25
-			t2:FireServer("v" .. "" .. ("xblrw8"):sub(2, 2):reverse() .. "" .. "" .. ("uz3pai3fc"):sub(5, 8):reverse() .. "8t", isEnabled)
+			local isEnabled = tick() - lastDeltaCalcTime
+			eventBridge:FireServer("vbf3ia8t", isEnabled)
 		end
 	end
-	local v27 = tick()
-	local v28 = nil
+	local lastNitroStartTime = tick()
+	local nitroConnection = nil
 	StartNitro = function()
-		if not (tick() - v27 < 0.1) then
-			v27 = tick()
+		if not (tick() - lastNitroStartTime < 0.1) then
+			lastNitroStartTime = tick()
 			if isEnabled then
 				CalculateDelta()
 			end
 			isEnabled = true
-			v25 = tick()
-			if v17 and (not v17.Passenger and #v17.Nitrous > 0) then
-				v17.Nitro = true
+			lastDeltaCalcTime = tick()
+			if currentVehiclePacket and (not currentVehiclePacket.Passenger and #currentVehiclePacket.Nitrous > 0) then
+				currentVehiclePacket.Nitro = true
 				PlaySound("Nitro1", {
-					Source = v17.Nitrous[1].Parent,
+					Source = currentVehiclePacket.Nitrous[1].Parent,
 					TimeStart = 0.5,
 					Volume = 0.7
 				})
 				PlaySound("NitroLoop", {
-					Source = v17.Nitrous[1].Parent,
+					Source = currentVehiclePacket.Nitrous[1].Parent,
 					Looped = true,
 					MaxTime = 30,
 					Volume = 0.7,
 					Delay = 0.3
 				})
-				for isEnabled, isEnabled in next, v17.Nitrous do
+				for isEnabled, isEnabled in next, currentVehiclePacket.Nitrous do
 					isEnabled.Enabled = true
 				end
-				t2:FireServer("b" .. ("tsaru"):sub(4, 4):reverse() .. "cx9whl")
-				if v28 then
-					v28:Destroy()
+				eventBridge:FireServer("brcx9whl")
+				if nitroConnection then
+					nitroConnection:Destroy()
 				end
-				v28 = HapticEffect.basic(1, (1 / 0))
+				nitroConnection = HapticEffect.basic(1, (1 / 0))
 			end
-			if t5.Nitro / t5.NitroLastMax <= 0.01 then
+			if v17.Nitro / nitroState.NitroLastMax <= 0.01 then
 				configTable.n8cinotq(true, true)
 			end
 		end
 	end
 	StopNitro = function()
 		StopSound("NitroLoop")
-		if v28 then
-			v28:Destroy()
-			v28 = nil
+		if nitroConnection then
+			nitroConnection:Destroy()
+			nitroConnection = nil
 		end
-		if v17 and not v17.Passenger then
-			v17.Nitro = false
-			if v17.Nitrous then
-				for isEnabled, isEnabled in next, v17.Nitrous do
+		if currentVehiclePacket and not currentVehiclePacket.Passenger then
+			currentVehiclePacket.Nitro = false
+			if currentVehiclePacket.Nitrous then
+				for isEnabled, isEnabled in next, currentVehiclePacket.Nitrous do
 					isEnabled.Enabled = false
 				end
 			end
 		end
 		CalculateDelta()
-		t2:FireServer("j" .. ("qziz8g"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("afp6xku"):sub(3, 4):reverse() .. "q4h")
+		eventBridge:FireServer("jiz6pq4h")
 	end
 	function configTable.dwv05uez(p1, p2)
 		if RunUtils.isTradeWorld() then
 			p1 = Settings.Scalar.NitroMax
 		end
-		t5.Nitro = p1
-		t5.NitroLastMax = p2
-		t5.NitroForceUIUpdate = true
+		nitroState.Nitro = p1
+		nitroState.NitroLastMax = p2
+		nitroState.NitroForceUIUpdate = true
 		local isEnabled = v24
 		isEnabled.Container.Container.ContainerBar.Value.Size = UDim2.new(p1 / Settings.Scalar.NitroMax, 0, 1, 0)
 		isEnabled.Container.Container.ContainerFuel.Amount.Text = ("%d/%d"):format(p1, Settings.Scalar.NitroMax)
@@ -945,7 +943,7 @@ do
 end
 local UpdateAllLowQuality, UpdateChassisLowQuality, UpdateChassisStepped, UpdateHeliLowQuality, HornStart, HornStop
 do
-	local v29 = 0
+	local eventCounter_v29 = 0
 	local vector = Vector3.new(0, 0, 0)
 	RunService.Heartbeat:Connect(function(p1)
 		debug.profilebegin("CircleAction (logic, heartbeat)")
@@ -958,10 +956,10 @@ do
 		debug.profileend()
 	end)
 	RunService.Stepped:Connect(function()
-		if v17 and not v17.Passenger then
-			if v17.Type == "Chassis" then
+		if currentVehiclePacket and not currentVehiclePacket.Passenger then
+			if currentVehiclePacket.Type == "Chassis" then
 				Classes.Chassis.UpdateStepped(v17)
-			elseif v17.Type == "Motorcycle" or v17.Type == "DuneBuggy" then
+			elseif currentVehiclePacket.Type == "Motorcycle" or currentVehiclePacket.Type == "DuneBuggy" then
 				Classes.Chassis2.UpdateStepped(v17)
 			end
 		end
@@ -969,25 +967,25 @@ do
 	local isEnabled = false
 	RunService.Heartbeat:Connect(function(p1)
 		debug.profilebegin("Vehicle Heartbeat")
-		if v17 and not v17.Passenger then
-			if v17.Type == "Chassis" then
+		if currentVehiclePacket and not currentVehiclePacket.Passenger then
+			if currentVehiclePacket.Type == "Chassis" then
 				Classes.Chassis.Update(v17, p1)
-			elseif v17.Type == "Heli" then
+			elseif currentVehiclePacket.Type == "Heli" then
 				Classes.Heli.Update(v17, p1)
-			elseif v17.Type == "Custom" then
+			elseif currentVehiclePacket.Type == "Custom" then
 				if v17.Make == "Volt" then
 					Classes.Volt.Update(v17, p1)
 				end
-			elseif v17.Type == "Motorcycle" or v17.Type == "DuneBuggy" then
+			elseif currentVehiclePacket.Type == "Motorcycle" or currentVehiclePacket.Type == "DuneBuggy" then
 				Classes.Chassis2.UpdateHQ(v17, p1)
 			end
 		end
 		debug.profileend()
-		if v17 and (not v17.Passenger and (v17.Type ~= "Heli" and v17.Type ~= "Chassis3")) then
+		if currentVehiclePacket and (not currentVehiclePacket.Passenger and (currentVehiclePacket.Type ~= "Heli" and currentVehiclePacket.Type ~= "Chassis3")) then
 			local AreTiresPopped = v17.AreTiresPopped
 			local isEnabled
-			if t5.NitroForceUIUpdate then
-				t5.NitroForceUIUpdate = false
+			if nitroState.NitroForceUIUpdate then
+				nitroState.NitroForceUIUpdate = false
 				isEnabled = true
 			else
 				isEnabled = false
@@ -996,12 +994,12 @@ do
 				VehicleUtils._forceUpdateNitroBar = false
 				isEnabled = true
 			end
-			if v17.Nitro and RunUtils.isMainWorld() then
-				t5.Nitro = t5.Nitro - p1 * 5
+			if currentVehiclePacket.Nitro and RunUtils.isMainWorld() then
+				nitroState.Nitro = v17.Nitro - p1 * 5
 				isEnabled = true
 			end
-			if t5.Nitro < 0 then
-				t5.Nitro = 0
+			if v17.Nitro < 0 then
+				nitroState.Nitro = 0
 				StopNitro()
 				isEnabled = true
 			end
@@ -1016,8 +1014,8 @@ do
 				isEnabled = AreTiresPopped
 			end
 			if isEnabled then
-				local isEnabled = t5.Nitro / Settings.Scalar.NitroMax
-				if v17.Model and v17.Model:GetAttribute("DisableNitro") then
+				local isEnabled = v17.Nitro / Settings.Scalar.NitroMax
+				if currentVehiclePacket.Model and currentVehiclePacket.Model:GetAttribute("DisableNitro") then
 					isEnabled = 0
 				end
 				VehicleUtils.updateSpdBarRatio(isEnabled)
@@ -1047,8 +1045,8 @@ do
 							local isEnabled = 0
 							local func = 0
 							debug.profilebegin("Calculate looking")
-							local v42, vector
-							if v20 then
+							local cameraRotationFrame, neckRotationFrame
+							if isCrawling then
 								v42 = CFrame.identity
 								vector = CFrame.identity
 							else
@@ -1058,7 +1056,7 @@ do
 								end
 								local cframe = RootPart.CFrame.lookVector:Dot(LookVector:Cross(Vector3.new(0, 1, 0)))
 								local RemoteEvent = math.asin(LookVector.Y)
-								if v17 and (not v17.Passenger or v17.NoLook) or ItemSystem.GetLocalEquipped() then
+								if currentVehiclePacket and (not currentVehiclePacket.Passenger or v17.NoLook) or ItemSystem.GetLocalEquipped() then
 									isEnabled = 0
 									func = 0
 								else
@@ -1097,7 +1095,7 @@ do
 									func = 0
 								end
 								if configTable.hems then
-									t2:FireServer("g" .. ("upwh1oztv"):sub(3, 7):reverse():reverse():reverse() .. "wh", isEnabled, func)
+									eventBridge:FireServer("gzo1hwwh", isEnabled, func)
 								end
 							end
 							debug.profileend()
@@ -1113,8 +1111,8 @@ do
 				local cframe, _2 = Math.Spring(v.PitchSpring)
 				local Waist = v.Waist
 				if Waist then
-					local v13 = Angles(-cframe * 0.2, -cframe * 0.5, 0)
-					vector = if Math.IsNaNcf(v13) then cframe else v13
+					local waistRotation = Angles(-cframe * 0.2, -cframe * 0.5, 0)
+					vector = if Math.IsNaNcf(waistRotation) then cframe else waistRotation
 					if Waist.Transform == v.LastWaistTransform then
 						Waist.Transform = vector
 					else
@@ -1124,8 +1122,8 @@ do
 				end
 				local Neck = v.Neck
 				if Neck then
-					local v14 = Angles(-cframe * 0.5, -cframe * 0.5, 0)
-					isEnabled = if Math.IsNaNcf(v14) then cframe else v14
+					local neckRotation = Angles(-cframe * 0.5, -cframe * 0.5, 0)
+					isEnabled = if Math.IsNaNcf(neckRotation) then cframe else neckRotation
 					if Neck.Transform == v.LastNeckTransform then
 						Neck.Transform = isEnabled
 					else
@@ -1292,7 +1290,7 @@ do
 			end
 		end
 	end
-	local v33 = 0
+	local eventCounter_v33 = 0
 	local function playHorn(p1, p2, p3, p4, p5, p6)
 		local isEnabled = p5 or 16
 		local _HornSound = p1:FindFirstChild("_HornSound")
@@ -1319,27 +1317,27 @@ do
 		local isEnabled = os.clock()
 		if not (isEnabled - v33 < 0.05) then
 			v33 = isEnabled
-			if v17 and not v17.Passenger then
-				local Model = v17.Model
+			if currentVehiclePacket and not currentVehiclePacket.Passenger then
+				local Model = currentVehiclePacket.Model
 				playHorn(Model:FindFirstChild("BoundingBox"), true, Model:GetAttribute("VehicleHornId"), Model:GetAttribute("VehicleHornLoopable"), nil, (Model:GetAttribute("VehicleHornVolume")))
-				t2:FireServer("y" .. ("wemdp2pj"):sub(3, 4):reverse() .. "" .. "" .. ("vslnqwl"):sub(3, 4):reverse():reverse():reverse() .. "yuf", true)
+				eventBridge:FireServer("ydmnlyuf", true)
 			end
 		end
 	end
 	HornStop = function()
-		if v17 and not v17.Passenger then
-			local _HornSound = v17.Model:FindFirstChild("BoundingBox"):FindFirstChild("_HornSound")
+		if currentVehiclePacket and not currentVehiclePacket.Passenger then
+			local _HornSound = currentVehiclePacket.Model:FindFirstChild("BoundingBox"):FindFirstChild("_HornSound")
 			if _HornSound then
 				_HornSound:Destroy()
 			end
-			t2:FireServer("y" .. ("tdirl"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("bwdmj"):sub(4, 4):reverse() .. "" .. "" .. ("anyk"):sub(2, 2):reverse() .. "lyuf", false)
+			eventBridge:FireServer("ydmnlyuf", false)
 		end
 	end
 	function configTable.ydmnlyuf(p1, p2, p3, p4, p5, p6)
 		playHorn(p2, p3, p4, p5, 10, p6)
 	end
 end
-local v34, toggleCrawling, OnJump
+local crawlAnimationTrack, toggleCrawling, OnJump
 do
 	local Animation = Instance.new("Animation")
 	if RunUtils.getEnv() == RunConsts.QA_NAME then
@@ -1347,7 +1345,7 @@ do
 	else
 		Animation.AnimationId = "rbxassetid://685258011"
 	end
-	v34 = nil
+	crawlAnimationTrack = nil
 	local configTable = {}
 	local Animation_2 = Instance.new("Animation")
 	Animation_2.AnimationId = "rbxassetid://758003506"
@@ -1355,16 +1353,16 @@ do
 	local Animation_3 = Instance.new("Animation")
 	Animation_3.AnimationId = "rbxassetid://758005053"
 	table.insert(configTable, Animation_3)
-	local v37 = nil
-	local v38 = tick()
-	local v39 = tick()
+	local unequipDelayConnection = nil
+	local deathSequenceStartTime = tick()
+	local deathScreenShowTime = tick()
 	local configTable = { 0, 0, 0 }
 	toggleCrawling = function()
 		local Character = LocalPlayer.Character
 		local Humanoid = Character:FindFirstChild("Humanoid")
 		local PrimaryPart = Character.PrimaryPart
-		v20 = not v34
-		CharacterUtil.IsCrawling = v20
+		isCrawling = not crawlAnimation
+		CharacterUtil.IsCrawling = isCrawling
 		CharacterUtil.IsCrawlingChanged:Fire(CharacterUtil.IsCrawling)
 		local UpperTorso = Character:FindFirstChild("UpperTorso")
 		local LowerTorso = Character:FindFirstChild("LowerTorso")
@@ -1386,7 +1384,7 @@ do
 			end
 		end
 		isEnabled(Character)
-		if v20 then
+		if isCrawling then
 			local Ball = Instance.new("Part")
 			Ball.Shape = Enum.PartType.Ball
 			Ball.Size = Vector3.new(2, 1, 4)
@@ -1408,19 +1406,19 @@ do
 			v.Motor.Part1 = v.Part1
 		end
 		Character.HumanoidRootPart.CanCollide = not v20
-		if v34 then
-			v34:Stop()
-			v34 = nil
+		if crawlAnimationTrack then
+			crawlAnimationTrack:Stop()
+			crawlAnimationTrack = nil
 		else
-			v34 = Humanoid:LoadAnimation(Animation)
-			v34:Play()
+			crawlAnimationTrack = Humanoid:LoadAnimation(Animation)
+			crawlAnimationTrack:Play()
 		end
 	end
 	local function _setSprinting(p1)
-		v19 = p1
+		isSprinting = p1
 	end
 	local function setSprinting(p1)
-		v19 = p1
+		isSprinting = p1
 		if (p1 and true or false) ~= (DefaultActions.sprintButton._pressed and true or false) and DefaultActions.sprintButton._pressState then
 			DefaultActions.sprintButton._pressState()
 		end
@@ -1429,7 +1427,7 @@ do
 		local Character = LocalPlayer.Character
 		if Character then
 			local Humanoid = Character:FindFirstChild("Humanoid")
-			if Humanoid and ((v34 or not Humanoid.Sit) and ((v34 or not Humanoid.PlatformStand) and Character.PrimaryPart)) then
+			if Humanoid and ((crawlAnimationTrack or not Humanoid.Sit) and ((crawlAnimationTrack or not Humanoid.PlatformStand) and Character.PrimaryPart)) then
 				if Classes.Heli.Roped or Falling.IsRagdolling() then
 				elseif Paraglide.IsFlying() then
 					return false
@@ -1438,7 +1436,7 @@ do
 					if isEnabled and isEnabled.ItemData.Locked or tick() - v39 < 0.1 then
 					elseif not (tick() - configTable[#configTable] < 2) then
 						v39 = tick()
-						if v34 then
+						if crawlAnimationTrack then
 							table.remove(configTable)
 							table.insert(configTable, 1, v39)
 						end
@@ -1465,7 +1463,7 @@ do
 					v37 = Humanoid:LoadAnimation(isEnabled)
 					v37:Play()
 					v38 = tick()
-					t2:FireServer("s" .. ("dh5fds"):sub(2, 4):reverse():reverse():reverse() .. "" .. "" .. ("btqxgl8l"):sub(3, 5):reverse() .. "m")
+					eventBridge:FireServer("sf5hgxqm")
 				end
 			end
 		end
@@ -1524,12 +1522,12 @@ do
 				return
 			end
 			VehicleUtils.OnVehicleJumpExited:Fire(v17)
-			t2:FireServer("j" .. ("rgylaxc0z"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("vf85b0g"):sub(3, 6):reverse() .. "yb")
+			eventBridge:FireServer("ja0b58yb")
 			VehicleUtils.LastVehicleExit = tick()
 		else
 			for i, v in ipairs(CartBinder:GetAll()) do
 				if LocalPlayer.Character ~= nil and v:GetOccupant() == LocalPlayer.Character then
-					t2:FireServer("ja0b58yb")
+					eventBridge:FireServer("ja0b58yb")
 					break
 				end
 			end
@@ -1547,18 +1545,18 @@ do
 	BlurEffect.Size = 0
 	BlurEffect.Enabled = false
 	BlurEffect.Parent = Lighting
-	local v40 = nil
-	local v41 = nil
-	local v42 = nil
+	local startLightingConfig = nil
+	local endLightingConfig = nil
+	local lightingFadeConnection = nil
 	local function removeDeathLighting()
-		if v41 then
+		if endLightingConfig then
 			local isEnabled = 0
 			local isEnabled = nil
 			local function Finish()
 				if isEnabled then
 					isEnabled:Disconnect()
 				end
-				local isEnabled = LerpTable(v41, v40, 1)
+				local isEnabled = LerpTable(endLightingConfig, startLightingConfig, 1)
 				ColorCorrectionEffect.Saturation = isEnabled.Saturation
 				BlurEffect.Size = isEnabled.Blur
 				BlurEffect.Enabled = false
@@ -1570,15 +1568,15 @@ do
 					if isEnabled then
 						isEnabled:Disconnect()
 					end
-					local cframe = LerpTable(v41, v40, 1)
+					local cframe = LerpTable(endLightingConfig, startLightingConfig, 1)
 					ColorCorrectionEffect.Saturation = cframe.Saturation
 					BlurEffect.Size = cframe.Blur
 					BlurEffect.Enabled = false
 					ColorCorrectionEffect.Enabled = false
 				else
-					local v22 = LerpTable(v41, v40, 1)
-					ColorCorrectionEffect.Saturation = v22.Saturation
-					BlurEffect.Size = v22.Blur
+					local effectLerpResult = LerpTable(endLightingConfig, startLightingConfig, 1)
+					ColorCorrectionEffect.Saturation = effectLerpResult.Saturation
+					BlurEffect.Size = effectLerpResult.Blur
 				end
 			end
 			isEnabled = RunService.RenderStepped:connect(Stepped)
@@ -1604,14 +1602,14 @@ do
 				end)
 				Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 				removeDeathGui()
-				if v41 then
+				if endLightingConfig then
 					local isEnabled = 0
 					local isEnabled = nil
 					local function Finish()
 						if isEnabled then
 							isEnabled:Disconnect()
 						end
-						local isEnabled = LerpTable(v41, v40, 1)
+						local isEnabled = LerpTable(endLightingConfig, startLightingConfig, 1)
 						ColorCorrectionEffect.Saturation = isEnabled.Saturation
 						BlurEffect.Size = isEnabled.Blur
 						BlurEffect.Enabled = false
@@ -1623,15 +1621,15 @@ do
 							if isEnabled then
 								isEnabled:Disconnect()
 							end
-							local cframe = LerpTable(v41, v40, 1)
+							local cframe = LerpTable(endLightingConfig, startLightingConfig, 1)
 							ColorCorrectionEffect.Saturation = cframe.Saturation
 							BlurEffect.Size = cframe.Blur
 							BlurEffect.Enabled = false
 							ColorCorrectionEffect.Enabled = false
 						else
-							local v22 = LerpTable(v41, v40, 1)
-							ColorCorrectionEffect.Saturation = v22.Saturation
-							BlurEffect.Size = v22.Blur
+							local effectLerpResult = LerpTable(endLightingConfig, startLightingConfig, 1)
+							ColorCorrectionEffect.Saturation = effectLerpResult.Saturation
+							BlurEffect.Size = effectLerpResult.Blur
 						end
 					end
 					isEnabled = RunService.RenderStepped:connect(Stepped)
@@ -1655,7 +1653,7 @@ do
 		if (DefaultActions.sprintButton._pressed and true or false) ~= false and DefaultActions.sprintButton._pressState then
 			DefaultActions.sprintButton._pressState()
 		end
-		v21 = false
+		isStunned = false
 		OnJump()
 		store:dispatch({
 			type = "setLastDiedAt",
@@ -1713,11 +1711,11 @@ do
 	function configTable.e9kobedq(p1)
 		p1 = p1 or Settings.Time.Stunned
 		HapticEffect.basic(1, 1)
-		v21 = true
+		isStunned = true
 		Falling.StartRagdolling(p1)
 		JetPack_2.Stunned()
 		task.wait(p1)
-		v21 = false
+		isStunned = false
 	end
 	function configTable.mq92d5a8(p1)
 		assert(p1 ~= nil)
@@ -1732,7 +1730,7 @@ do
 		assert(p1 ~= nil)
 		Notification.notifyBoss(p1, p2)
 	end
-	t6.Notification = configTable.mq92d5a8
+	gameContext.Notification = configTable.mq92d5a8
 	function configTable.ekwtxejw(p1, p2)
 		if p2 then
 			p1 = RichTextUtils.addColorToText(p1, p2)
@@ -1743,12 +1741,12 @@ do
 	end
 	local store_2 = require(ReplicatedStorage.App.store)
 	local homeStore = require(ReplicatedStorage.Home.homeStore)
-	local v43 = require(ReplicatedStorage.App.VehicleBuyUI)()
+	local vehicleBuyUI = require(ReplicatedStorage.App.VehicleBuyUI)()
 	local MilestoneEffects = require(ReplicatedStorage.App.MilestoneEffects)
 	MilestoneEffects.init(Fireworks)
 	function configTable.akp6xj5f(p1)
 		assert(p1 ~= nil)
-		v43.setCash(p1.Cash)
+		vehicleBuyUI.setCash(p1.Cash)
 		MilestoneEffects.cashUpdate(p1.Cash)
 		CashBuyUI.SetCash(p1.Cash)
 		store_2:dispatch({
@@ -1760,10 +1758,10 @@ do
 			cash = p1.Cash
 		})
 	end
-	local v44 = 0
+	local cashPopupCounter = 0
 	function configTable.bpp8cyi1(p1, p2)
-		local isEnabled = v44 + 1
-		v44 = isEnabled
+		local isEnabled = cashPopupCounter + 1
+		cashPopupCounter = isEnabled
 		if p1 > 0 then
 			task.spawn(Fireworks, 2)
 			isEnabled.PlusCash.TextColor3 = Color3.fromRGB(68, 194, 93)
@@ -1786,12 +1784,12 @@ do
 			isEnabled.PlusCash.Text = isEnabled.PlusCash.Text .. ("<font color=\"#FFFFFF\"><stroke color=\"#111111\" thickness=\"0.75\">%s: </stroke></font><b>%s</b>\n"):format(p2, if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", configTable))
 		else
 			local configTable = {}
-			local v13, v14, cframe = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
-			configTable[1] = v13 .. v14:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. cframe
+			local prefix, numericPart, suffix = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
+			configTable[1] = prefix ..  numericPart:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. cframe
 			isEnabled.PlusCash.Text = isEnabled.PlusCash.Text .. ("<b>%s</b>\n"):format(if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", configTable))
 		end
 		task.delay(3, function()
-			if v44 == isEnabled then
+			if cashPopupCounter == isEnabled then
 				isEnabled.PlusCash.Visible = false
 			end
 		end)
@@ -1817,7 +1815,7 @@ do
 	function configTable.q53280n2(p1)
 		configTable[p1] = nil
 	end
-	local v47 = nil
+	local connectionVariable_v47 = nil
 	pcall(function()
 		v47 = require(LocalPlayer.PlayerScripts.PlayerModule.CameraModule:WaitForChild("ZoomController"))
 	end)
@@ -1857,7 +1855,7 @@ do
 		isEnabled:GiveTask(RunService.RenderStepped:Connect(Update))
 		return isEnabled
 	end
-	local v48 = nil
+	local connectionVariable_v48 = nil
 	v43.Frame.Parent = isEnabled
 	local function Cancel()
 		v43.setEnabled(false)
@@ -1865,7 +1863,7 @@ do
 	end
 	local function Buy()
 		if v48 then
-			t2:FireServer("o" .. ("o4i1wf"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("gimf512rz"):sub(3, 7):reverse():reverse():reverse() .. "r", v48)
+			eventBridge:FireServer("ow215fmr", v48)
 		else
 			v43.setEnabled(false)
 			OnJump()
@@ -1874,7 +1872,7 @@ do
 	local function Rent()
 		if v48 then
 			MarketplaceService:PromptProductPurchase(LocalPlayer, 437705749)
-			t2:FireServer("n" .. "" .. ("ps8ppqr6"):sub(2, 4):reverse():reverse():reverse() .. "" .. "" .. ("ff3gntgd9"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("d9bxivl"):sub(3, 4):reverse() .. "4", v48)
+			eventBridge:FireServer("np8snxb4", v48)
 		else
 			v43.setEnabled(false)
 			OnJump()
@@ -1919,11 +1917,11 @@ do
 	end
 	waitForChild(ReplicatedStorage, "UpdateOwnedCashBillboard"):andThen(function(p1)
 		p1.OnClientEvent:Connect(function(p1)
-			t5.VehiclesOwned = p1
+			nitroState.VehiclesOwned = p1
 		end)
 	end)
 	function configTable.ef31t4k2(p1)
-		t5.VehiclesRented = p1
+		nitroState.VehiclesRented = p1
 	end
 	function configTable.ykwtg5cz(p1, p2, p3)
 		v48 = p1
@@ -1982,8 +1980,8 @@ do
 		defaultValue = false,
 		order = 51
 	})
-	local v50 = if RunUtils.isStudio() then 0.1 else 15
-	local v51 = 0
+	local maxSpawnWaitTime = if RunUtils.isStudio() then 0.1 else 15
+	local eventCounter_v51 = 0
 	local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
 	local VehicleLinkBinder = require(ReplicatedStorage.VehicleLink.VehicleLinkBinder)
 	local Promise = require(ReplicatedStorage.Std.Promise)
@@ -1997,7 +1995,7 @@ do
 		TableUtils.mergeDeepInPlace(TableUtils.createTableFromObjectValues(_Packet), p2)
 		configTable.vwyylbie(p2)
 	end
-	local v52 = nil
+	local seatPromise = nil
 	function configTable.vwyylbie(p1)
 		local configTable = {}
 		for isEnabled, isEnabled in p1.Model:GetChildren() do
@@ -2010,8 +2008,8 @@ do
 				end
 			end
 		end
-		v52 = Promise.race(configTable):timeout(5)
-		local cframe, vector = v52:await()
+		seatPromise = Promise.race(configTable):timeout(5)
+		local cframe, vector = seatPromise:await()
 		if cframe then
 			p1.Seat = vector
 			if CharacterUtil.IsCrawling then
@@ -2117,7 +2115,7 @@ do
 									if isEnabled and RegionUtils.isPointInPart(isEnabled, Position) then
 										p1.Model:PivotTo(CFrame.new(Position) * isEnabled.CFrame.Rotation)
 									else
-										t2:FireServer("l" .. ("kbwlw"):sub(2, 4):reverse() .. "" .. "" .. ("xvi2q"):sub(2, 4):reverse() .. "8")
+										eventBridge:FireServer("llwb2iv8")
 									end
 								end
 							}))
@@ -2355,9 +2353,9 @@ do
 							vector:GiveTask(PartUtils.setPropertyWithRollback(Character, "CollisionGroup", "NoOtherVehicles"))
 						end
 					end
-					local v14 = Classes[Make]
-					if v14 and v14.vehicleEnter then
-						v14.vehicleEnter(p1)
+					local vehicleClass = Classes[Make]
+					if targetPlayer and vehicleClass.vehicleEnter then
+						vehicleClass.vehicleEnter(p1)
 					elseif p1.Type == "Chassis" then
 						Classes.Chassis.VehicleEnter(p1)
 					elseif p1.Type == "Heli" then
@@ -2374,7 +2372,7 @@ do
 					if v17.Seats ~= nil then
 						local cframe = VehicleSystem.GetPlayerSeat(v17, LocalPlayer)
 						if cframe then
-							v17.Passenger = cframe.Driver ~= true
+							currentVehiclePacket.Passenger = cframe.Driver ~= true
 						end
 					end
 					VehicleUtils.OnVehicleEntered:Fire(p1, p1.Passenger)
@@ -2539,17 +2537,17 @@ do
 	end
 	function configTable.d41xtwyc()
 		if v17 then
-			if v17.Type == "Heli" then
+			if currentVehiclePacket.Type == "Heli" then
 				Classes.Heli.FallOutOfSky(v17)
 			end
 		end
 	end
 	function configTable.plgep10a(p1)
 		if v17 then
-			if v17.Type == "Chassis" then
+			if currentVehiclePacket.Type == "Chassis" then
 				Classes.Chassis.SpinOut(v17, p1)
 			else
-				error(("Cannot spin-out vehicle type: %s"):format(v17.Type))
+				error(("Cannot spin-out vehicle type: %s"):format(currentVehiclePacket.Type))
 			end
 		else
 			error("no vehicle packet")
@@ -2595,7 +2593,7 @@ function configTable.y3fq4f5f()
 	wait(4)
 	isEnabled.FaultyAction.Visible = false
 end
-local t17
+local proximityQueue
 do
 	local function Ease_inOutQuad(p1, p2, p3, p4)
 		local isEnabled = p1 / p4 * 2
@@ -2605,11 +2603,11 @@ do
 			return -p3 * 0.5 * ((isEnabled - 1) * (isEnabled - 3) - 1) + p2
 		end
 	end
-	t17 = {}
+	proximityQueue = {}
 	local insert = table.insert
 	local remove = table.remove
 	local configTable = {}
-	function t17.AddPart(p1, p2, p3, p4)
+	function proximityQueue.AddPart(p1, p2, p3, p4)
 		local configTable = {
 			Part = p1,
 			Distance = p2,
@@ -2619,7 +2617,7 @@ do
 		table.insert(configTable, configTable)
 		return configTable
 	end
-	function t17.RemoveTag(p1)
+	function proximityQueue.RemoveTag(p1)
 		for i = #configTable, 1, -1 do
 			if configTable[i].Meta.Tag == p1 then
 				table.remove(configTable, i)
@@ -2638,20 +2636,20 @@ do
 				local Humanoid = Character:FindFirstChild("Humanoid")
 				if Humanoid then
 					if not (Humanoid.Health <= 0) then
-						t17.UpdateInterest(PrimaryPart.Position)
+						proximityQueue.UpdateInterest(PrimaryPart.Position)
 					end
 				end
 			end
 		end
 	end
-	function t17.UpdateInterest(p1)
+	function proximityQueue.UpdateInterest(p1)
 		local Character = LocalPlayer.Character
 		if Character then
 			local PrimaryPart = Character.PrimaryPart
 			if PrimaryPart then
 				local Humanoid = Character:FindFirstChild("Humanoid")
 				if Humanoid and not (Humanoid.Health <= 0) then
-					t17.UpdateInterest(PrimaryPart.Position)
+					proximityQueue.UpdateInterest(PrimaryPart.Position)
 				end
 			end
 		end
@@ -2690,13 +2688,13 @@ do
 			isEnabled:f(isEnabled.Loaded)
 		end
 	end
-	function t17.Run(p1)
+	function proximityQueue.Run(p1)
 		ThreadLoopAdd(p1, ProcessQueue, "Proximity Queue")
 	end
-	t17.Run(0.1)
+	proximityQueue.Run(0.1)
 end
 do
-	local v53 = ReplicatedStorage.Resource.ButtonY:Clone()
+	local buttonYClone = ReplicatedStorage.Resource.ButtonY:Clone()
 	local configTable = {}
 	local function ProximityUpdate(p1, p2)
 		if p2 then
@@ -2717,13 +2715,13 @@ do
 		end
 	end
 	local function AddContextButton(p1, p2, p3, p4)
-		return t17.AddPart(p1, p2, ProximityUpdate, {
+		return proximityQueue.AddPart(p1, p2, ProximityUpdate, {
 			Callback = p3,
 			Tag = p4
 		})
 	end
 	local function RemoveContextButtonByTag(p1)
-		return t17.RemoveTag(p1)
+		return proximityQueue.RemoveTag(p1)
 	end
 	local function ContextProcessInput(p1)
 		local isEnabled = false
@@ -2896,7 +2894,7 @@ do
 				p1.AwaitingDoorOpen = true
 				p1.AwaitingDoorClose = false
 			end
-			t2:FireServer("j" .. ("zasvz"):sub(2, 4):reverse():reverse():reverse() .. "" .. "" .. ("qtvnpd1p"):sub(4, 5):reverse():reverse():reverse() .. "a5", p1)
+			eventBridge:FireServer("jvsapna5", p1)
 		end
 	end
 	local function HasPerm_2(p1, p2, p3, p4)
@@ -2946,9 +2944,9 @@ do
 				if p1.State.Open or os.time() - p1.State.CloseTime < p1.Settings.Duration then
 					return
 				end
-				local v22 = HasPerm_2(p1, LocalPlayer, Character, p12)
+				local hasPermission = HasPerm_2(p1, LocalPlayer, Character, p12)
 				if p1.Settings.Character then
-					if v22 then
+					if hasPermission then
 						PlaySound("Door", {
 							Source = Model.Closed,
 							TimeStart = 1,
@@ -2963,7 +2961,7 @@ do
 						})
 					end
 				end
-				if v22 then
+				if hasPermission then
 					if p1.Settings.Type == "Swing" then
 						p1.State.Direction = if (p1.Model.Closed.Position - Character.HumanoidRootPart.Position).unit:Dot(p1.Model.Closed.CFrame.lookVector) > 0 then 1 else -1
 					end
@@ -3038,7 +3036,7 @@ do
 				table.remove(configTable, i)
 			end
 		end
-		t17.RemoveTag(Tag)
+		proximityQueue.RemoveTag(Tag)
 		if p1.doorMaid then
 			p1.doorMaid:DoCleaning()
 			p1.doorMaid = nil
@@ -3051,7 +3049,7 @@ do
 			Fun = function(p12)
 				if not (tick() - isEnabled < 1) then
 					isEnabled = tick()
-					t2:FireServer("i" .. "" .. ("vgt1zki"):sub(5, 6):reverse():reverse():reverse() .. "" .. "" .. ("qpik2up"):sub(3, 5):reverse():reverse():reverse() .. "8m", p1)
+					eventBridge:FireServer("ikz2ki8m", p1)
 				end
 			end,
 			_DEBUG = "OtherTrigger"
@@ -3066,10 +3064,10 @@ do
 		end
 		return true
 	end
-	local v54 = next
-	local v55, v56 = CollectionService:GetTagged("TouchTrigger")
+	local touchTriggerIterator = next
+	local touchTriggers, _ = CollectionService:GetTagged("TouchTrigger")
 	local configTable = {}
-	for v57, v58 in v54, v55, v56 do
+	for v57, v58 in touchTriggerIterator, v55, for _, door in touchTriggers do
 		AddedFun(v58)
 	end
 	CollectionService:GetInstanceAddedSignal("TouchTrigger"):Connect(AddedFun)
@@ -3080,7 +3078,7 @@ do
 		local isEnabled = assert(SewerHatch, "missing SewerHatch")
 		local function Action(p1, p2)
 			if p2 then
-				t2:FireServer("configTable" .. "" .. ("rg1esitbk"):sub(5, 7):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("nbok"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("jyza6lm"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "6", "SewerHatch", isEnabled)
+				eventBridge:FireServer("configTabletisol66", "SewerHatch", isEnabled)
 			end
 			return true
 		end
@@ -3112,9 +3110,9 @@ do
 			end
 		end
 	end
-	local v59 = next
-	local v60, v61 = CollectionService:GetTagged("SewerHatch")
-	for v62, v63 in v59, v60, v61 do
+	local sewerHatchIterator = next
+	local sewerHatches, _ = CollectionService:GetTagged("SewerHatch")
+	for v62, v63 in sewerHatchIterator, v60, for _, hatch in sewerHatches do
 		AddHatch(v63)
 	end
 	CollectionService:GetInstanceAddedSignal("SewerHatch"):Connect(AddHatch)
@@ -3186,9 +3184,9 @@ do
 		end
 		return false
 	end
-	local v64 = next
-	local v65, v66 = CollectionService:GetTagged("Door")
-	for v67, v68 in v64, v65, v66 do
+	local doorIterator = next
+	local doors, _ = CollectionService:GetTagged("Door")
+	for v67, v68 in doorIterator, v65, for _, door in doors do
 		task.spawn(AddedFun_2, v68)
 	end
 	CollectionService:GetInstanceAddedSignal("Door"):Connect(AddedFun_2)
@@ -3437,9 +3435,9 @@ do
 		local cframe = os.clock()
 		local function Heartbeat()
 			local cframe = os.clock()
-			local v22 = cframe - cframe
+			local rainfallOffset = cframe - cframe
 			cframe = cframe
-			isEnabled = isEnabled + v22 * 1 / 4
+			isEnabled = isEnabled + rainfallOffset * 1 / 4
 			if isEnabled >= 1 then
 				isEnabled = 1
 				func:disconnect()
@@ -3454,11 +3452,11 @@ do
 		func = RunService.Heartbeat:Connect(Heartbeat)
 	end
 	local SNOW = EnvironmentConsts.SNOW
-	local v72 = not SNOW
+	local isSnowing = not SNOW
 	local Rain = SNOW and ReplicatedStorage.Resource.RainSnow or ReplicatedStorage.Resource.Rain
 	Rain.Name = "Rain"
-	local v73 = nil
-	local v74 = 0
+	local rainThread = nil
+	local rainIterationCounter = 0
 	local isEnabled = false
 	local function StartRainThread()
 		local isEnabled = Vector3.new()
@@ -3497,8 +3495,8 @@ do
 			if FogFall then
 				FogFall.CFrame = CFrame.new(isEnabled) + Vector3.new(0, 37, 0)
 			end
-			local cframe, v22 = workspace:FindPartOnRayWithIgnoreList(Ray.new(isEnabled, Vector3.new(0, -10, 0)), { workspace.Vehicles, LocalPlayer.Character, Rain })
-			Rain.RainDroplets.CFrame = CFrame.new(v22) + Vector3.new(0, 1.5, 0)
+			local rayHitPosition, rayHitPart = workspace:FindPartOnRayWithIgnoreList(Ray.new(isEnabled, Vector3.new(0, -10, 0)), { workspace.Vehicles, LocalPlayer.Character, Rain })
+			Rain.RainDroplets.CFrame = CFrame.new(rayHitPart) + Vector3.new(0, 1.5, 0)
 			local func = RaycastParams.new()
 			func.FilterDescendantsInstances = {
 				workspace.Vehicles,
@@ -3539,21 +3537,21 @@ do
 			v73 = nil
 		end
 	end
-	local v76 = "Day"
+	local currentTimeOfDay = "Day"
 	function configTable.gf5qw0na(p1)
-		if p1 ~= v76 then
+		if p1 ~= currentTimeOfDay then
 			if p1 == "Day" then
-				SetSettings(Settings.Ambient[v76], Settings.Ambient.Day)
+				SetSettings(Settings.Ambient[currentTimeOfDay], Settings.Ambient.Day)
 			elseif p1 == "Night" then
-				SetSettings(Settings.Ambient[v76], Settings.Ambient.Night)
+				SetSettings(Settings.Ambient[currentTimeOfDay], Settings.Ambient.Night)
 			end
-			v76 = p1
+			currentTimeOfDay = p1
 		end
 	end
 	local function UpdateStorm()
 		if EnvironmentUtils.getPrecipitation() == EnvironmentConsts.PRECIPITATION_ENUM.Rain then
 			StartRainThread()
-			SetSettings(Settings.Ambient[v76], Settings.Ambient.Storm)
+			SetSettings(Settings.Ambient[currentTimeOfDay], Settings.Ambient.Storm)
 			v76 = "Storm"
 		else
 			StopRainThread()
@@ -3564,7 +3562,7 @@ do
 end
 v24 = ReplicatedStorage.StarterGui.NitroShopGui
 do
-	local v77 = v24
+	local ambienceValue = v24
 	v77.Parent = LocalPlayer.PlayerGui
 	local function OpenNitroProd()
 		v77.Enabled = true
@@ -3573,23 +3571,23 @@ do
 	local function CloseNitroProd()
 		v77.Enabled = false
 	end
-	local v78 = AlexWM.MakeWindow()
+	local settingsWindow = AlexWM.MakeWindow()
 	v78.OpenFun = OpenNitroProd
 	v78.CloseFun = CloseNitroProd
 	AlexWM.WindowGroupAdd(v16, v78)
 	v77.Container.Close.MouseButton1Down:connect(function()
 		AlexWM.WindowClose(v78)
 	end)
-	t5.AtGasStation = false
+	v17.AtGasStation = false
 	function configTable.n8cinotq(p1, p2)
 		if RunUtils.isTradeWorld() then
 		elseif p1 then
 			if not p2 then
-				t5.AtGasStation = true
+				v17.AtGasStation = true
 			end
 			AlexWM.WindowOpen(v78)
 		else
-			t5.AtGasStation = false
+			v17.AtGasStation = false
 			AlexWM.WindowClose(v78)
 		end
 	end
@@ -3602,14 +3600,14 @@ do
 					if cframe then
 						cframe.Button.Title.Text = ("+%d"):format(isEnabled.Fuel)
 						cframe.Button.MouseButton1Down:connect(function()
-							if t5.Nitro >= Settings.Scalar.NitroMax - 25 then
+							if v17.Nitro >= Settings.Scalar.NitroMax - 25 then
 								configTable.mq92d5a8({
 									Title = "Rocket Fuel",
 									Text = "You have a lot of fuel, go use it!"
 								})
 							else
 								local isEnabled
-								if t5.AtGasStation or GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.PremiumGarage) then
+								if v17.AtGasStation or GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.PremiumGarage) then
 									isEnabled = true
 								else
 									PromptPurchase(Settings.Gamepass.PremiumGarage)
@@ -3654,10 +3652,10 @@ do
 	end
 	function configTable.ecg6j4mm()
 		if v17 then
-			VehicleUtils.setTireHealth(v17.Model, 0)
+			VehicleUtils.setTireHealth(currentVehiclePacket.Model, 0)
 		end
 	end
-	local v79 = 1
+	local opacityOrScale_v79 = 1
 	local function CycleMessage()
 		local isEnabled = nil
 		local isEnabled = nil
@@ -3679,15 +3677,15 @@ end
 function configTable.n8yqy49q(p1, ...)
 	if p1 == "ems" then
 		delay(0.5, function()
-			t2:FireServer("n" .. ("hfc494yqy8d"):sub(5, 10):reverse():reverse():reverse() .. "q", p1)
+			eventBridge:FireServer("n8yqy49q", p1)
 		end)
 	else
-		t2:FireServer("n" .. ("rt2y8t"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("a50qyms"):sub(4, 5):reverse() .. "" .. "" .. ("wy24ylu"):sub(4, 5):reverse():reverse():reverse() .. "9q", p1)
+		eventBridge:FireServer("n8yqy49q", p1)
 	end
 	assert(configTable[p1], p1)(...)
 end
 require(ReplicatedStorage.TeamSelect.TeamChooseUI).Init({
-	Event = t2,
+	Event = eventBridge,
 	em = configTable,
 	OnJump = OnJump
 })
@@ -3740,9 +3738,9 @@ do
 							if magnitude < 50 then
 								vector = not Player.Value
 								if vector then
-									local isEnabled = t5.VehiclesOwned[Make.Value]
+									local isEnabled = nitroState.VehiclesOwned[Make.Value]
 									if not isEnabled then
-										isEnabled = t5.VehiclesRented[Make.Value]
+										isEnabled = nitroState.VehiclesRented[Make.Value]
 										if not isEnabled then
 											isEnabled = vector and GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass[vector])
 										end
@@ -3761,7 +3759,7 @@ do
 	end)
 	AttemptVehicleEnter = function(p1)
 		if not v17 then
-			t2:FireServer("a" .. ("hcf2ljfg1"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("fs32pjls"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("fqmbd"):sub(3, 4):reverse() .. "" .. "" .. ("gi1q6w2o"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "bx", p1.Parent, p1)
+			eventBridge:FireServer("alpbm6bx", p1.Parent, p1)
 		end
 	end
 	function configTable.rtxoql4k()
@@ -3787,7 +3785,7 @@ do
 					isEnabled = 0
 				end
 				local sum = isEnabled * 16
-				if v20 then
+				if isCrawling then
 					sum = sum * 0.4
 				end
 				if Falling.IsSkydiving() then
@@ -3825,10 +3823,10 @@ do
 				if abs(vector - Humanoid.WalkSpeed) > 0.1 then
 					Humanoid.WalkSpeed = vector
 				end
-				if v34 then
+				if crawlAnimationTrack then
 					local PrimaryPart = Character.PrimaryPart
 					if PrimaryPart then
-						v34:AdjustSpeed(-Character.HumanoidRootPart.CFrame:vectorToObjectSpace(PrimaryPart.Velocity).Z / 6)
+						crawlAnimationTrack:AdjustSpeed(-Character.HumanoidRootPart.CFrame:vectorToObjectSpace(PrimaryPart.Velocity).Z / 6)
 					end
 				end
 			end
@@ -3935,8 +3933,8 @@ do
 			end
 		end
 		if not vector and (not func and (cframe and (cframe.__ClassName == "Handcuffs" and TeamValue.Value == Settings.Team.Police))) then
-			local v14 = Players:FindFirstChild(p1.PlayerName)
-			if v14 and (v14.TeamValue.Value == Settings.Team.Prisoner and (v14.Character and (not v14.Character:GetAttribute("HasHandcuffs") and (not v14.Character:GetAttribute("InVehicle") and v14.Character:FindFirstChild("Humanoid"))))) then
+			local targetPlayer = Players:FindFirstChild(p1.PlayerName)
+			if targetPlayer and (vehicleClass.TeamValue.Value == Settings.Team.Prisoner and (vehicleClass.Character and (not vehicleClass.Character:GetAttribute("HasHandcuffs") and (not vehicleClass.Character:GetAttribute("InVehicle") and vehicleClass.Character:FindFirstChild("Humanoid"))))) then
 				isEnabled = true
 			end
 		end
@@ -3989,7 +3987,7 @@ do
 			p1.Dist = 10
 			p1.Name = Localization:FormatByKey("Action.Trade")
 		end
-		local v16 = isEnabled or (isEnabled or (func or (cframe or vector)))
+		local conditionResult = isEnabled or (isEnabled or (func or (cframe or vector)))
 		if v16 ~= p1.Enabled then
 			p1.Enabled = v16
 		end
@@ -4126,8 +4124,8 @@ do
 		end
 		debug.profileend()
 	end)
-	local v80 = 0
-	local v81 = 0
+	local loopCounter_v80 = 0
+	local loopCounter_v81 = 0
 	RunService.Heartbeat:Connect(function(p1)
 		UpdateCircleActions()
 		local isEnabled = TeamValue.Value
@@ -4171,11 +4169,11 @@ do
 end
 do
 	local function InputChanged(p1)
-		if v17 and v17.Type == "Chassis" then
+		if currentVehiclePacket and currentVehiclePacket.Type == "Chassis" then
 			Classes.Chassis.InputChanged(p1, nil)
-		elseif v17 and v17.Type == "Heli" then
+		elseif currentVehiclePacket and currentVehiclePacket.Type == "Heli" then
 			Classes.Heli.InputChanged(p1, nil)
-		elseif v17 and (v17.Type == "Custom" and v17.Make == "Volt") then
+		elseif currentVehiclePacket and (currentVehiclePacket.Type == "Custom" and v17.Make == "Volt") then
 			Classes.Volt.InputChanged(p1, nil)
 		end
 		if p1.UserInputType == Enum.UserInputType.MouseMovement then
@@ -4185,26 +4183,26 @@ do
 	local function InputBegan_2(p1, p2)
 		if p2 and (p1.UserInputType ~= Enum.UserInputType.Gamepad1 or p1.KeyCode ~= Enum.KeyCode.ButtonA) then
 			if p1.KeyCode == Enum.KeyCode.Left or p1.KeyCode == Enum.KeyCode.Right then
-				if v17 and v17.Type == "Chassis" then
+				if currentVehiclePacket and currentVehiclePacket.Type == "Chassis" then
 					Classes.Chassis.InputBegan(p1)
-				elseif v17 and v17.Type == "Heli" then
+				elseif currentVehiclePacket and currentVehiclePacket.Type == "Heli" then
 					Classes.Heli.InputBegan(p1)
-				elseif v17 and (v17.Type == "Custom" and v17.Make == "Volt") then
+				elseif currentVehiclePacket and (currentVehiclePacket.Type == "Custom" and v17.Make == "Volt") then
 					Classes.Volt.InputBegan(p1)
 				end
-				if p1.UserInputType == Enum.UserInputType.Keyboard and (p1.KeyCode == Enum.KeyCode.E and (v17 and v17.Type ~= "Heli")) then
+				if p1.UserInputType == Enum.UserInputType.Keyboard and (p1.KeyCode == Enum.KeyCode.E and (v17 and currentVehiclePacket.Type ~= "Heli")) then
 					OnJump()
 				end
 			end
 		else
-			if v17 and v17.Type == "Chassis" then
+			if currentVehiclePacket and currentVehiclePacket.Type == "Chassis" then
 				Classes.Chassis.InputBegan(p1)
-			elseif v17 and v17.Type == "Heli" then
+			elseif currentVehiclePacket and currentVehiclePacket.Type == "Heli" then
 				Classes.Heli.InputBegan(p1)
-			elseif v17 and (v17.Type == "Custom" and v17.Make == "Volt") then
+			elseif currentVehiclePacket and (currentVehiclePacket.Type == "Custom" and v17.Make == "Volt") then
 				Classes.Volt.InputBegan(p1)
 			end
-			if p1.UserInputType == Enum.UserInputType.Keyboard and (p1.KeyCode == Enum.KeyCode.E and (v17 and v17.Type ~= "Heli")) then
+			if p1.UserInputType == Enum.UserInputType.Keyboard and (p1.KeyCode == Enum.KeyCode.E and (v17 and currentVehiclePacket.Type ~= "Heli")) then
 				OnJump()
 			end
 		end
@@ -4212,19 +4210,19 @@ do
 	local function InputEnded(p1, p2)
 		if p2 and (p1.UserInputType ~= Enum.UserInputType.Gamepad1 or p1.KeyCode ~= Enum.KeyCode.ButtonA) then
 			if p1.KeyCode == Enum.KeyCode.Left or p1.KeyCode == Enum.KeyCode.Right then
-				if v17 and v17.Type == "Chassis" then
+				if currentVehiclePacket and currentVehiclePacket.Type == "Chassis" then
 					Classes.Chassis.InputEnded(p1)
-				elseif v17 and v17.Type == "Heli" then
+				elseif currentVehiclePacket and currentVehiclePacket.Type == "Heli" then
 					Classes.Heli.InputEnded(p1)
-				elseif v17 and (v17.Type == "Custom" and v17.Make == "Volt") then
+				elseif currentVehiclePacket and (currentVehiclePacket.Type == "Custom" and v17.Make == "Volt") then
 					Classes.Volt.InputEnded(p1)
 				end
 			end
-		elseif v17 and v17.Type == "Chassis" then
+		elseif currentVehiclePacket and currentVehiclePacket.Type == "Chassis" then
 			Classes.Chassis.InputEnded(p1)
-		elseif v17 and v17.Type == "Heli" then
+		elseif currentVehiclePacket and currentVehiclePacket.Type == "Heli" then
 			Classes.Heli.InputEnded(p1)
-		elseif v17 and (v17.Type == "Custom" and v17.Make == "Volt") then
+		elseif currentVehiclePacket and (currentVehiclePacket.Type == "Custom" and v17.Make == "Volt") then
 			Classes.Volt.InputEnded(p1)
 		end
 	end
@@ -4266,9 +4264,9 @@ do
 	local function RemovedFun_3(p1)
 		CircleAction_2.Remove(p1)
 	end
-	local v82 = next
-	local v83, v84 = CollectionService:GetTagged("VehicleSeat")
-	for v85, v86 in v82, v83, v84 do
+	local vehicleSeatIterator = next
+	local vehicleSeats, _ = CollectionService:GetTagged("VehicleSeat")
+	for v85, v86 in vehicleSeatIterator, v83, for _, seat in vehicleSeats do
 		AddedFun_3(v86)
 	end
 	CollectionService:GetInstanceAddedSignal("VehicleSeat"):Connect(AddedFun_3)
@@ -4288,7 +4286,7 @@ do
 						if Character then
 							local Humanoid = Character:FindFirstChild("Humanoid")
 							if Humanoid and not (Humanoid.Health <= 0) then
-								t2:FireServer("w5ln1uc8", isEnabled)
+								eventBridge:FireServer("w5ln1uc8", isEnabled)
 								return true
 							end
 						end
@@ -4323,7 +4321,7 @@ do
 			local isEnabled = Players:FindFirstChild(p1.PlayerName)
 			if isEnabled and not isEnabled:GetAttribute("SentBreakoutRequest") then
 				isEnabled:SetAttribute("SentBreakoutRequest", true)
-				t2:FireServer("configTable" .. ("ckcbo"):sub(3, 3):reverse() .. "" .. "" .. ("o3ewrgemnz2p"):sub(5, 8):reverse():reverse():reverse():reverse():reverse() .. "be", isEnabled.Name)
+				eventBridge:FireServer("configTablecmegrbe", isEnabled.Name)
 				task.delay(10, function()
 					isEnabled:SetAttribute("SentBreakoutRequest", nil)
 				end)
@@ -4401,9 +4399,9 @@ do
 	local CircleAction_4 = UI.CircleAction
 	local function Action_3(p1, p2)
 		if p2 then
-			t2:FireServer("w" .. ("e4xwimovrvk"):sub(2, 7):reverse():reverse():reverse():reverse():reverse() .. "r", p1.Part)
+			eventBridge:FireServer("womiwx4r", p1.Part)
 		else
-			t2:FireServer("f" .. ("mo2bwsa"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("nvdlq"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("vzytd2as"):sub(3, 6):reverse() .. "m", p1.Part)
+			eventBridge:FireServer("fwl2dtym", p1.Part)
 		end
 		return true
 	end
@@ -4421,9 +4419,9 @@ do
 	local function RemovedFun_5(p1)
 		CircleAction_4.Remove(p1)
 	end
-	local v89 = next
-	local v90, v91 = CollectionService:GetTagged("SmallStore")
-	for v92, v93 in v89, v90, v91 do
+	local iterator_v89 = next
+	local smallStores, _ = CollectionService:GetTagged("SmallStore")
+	for v92, v93 in v89, v90, for _, store in smallStores do
 		AddedFun_5(v93)
 	end
 	CollectionService:GetInstanceAddedSignal("SmallStore"):Connect(AddedFun_5)
@@ -4432,7 +4430,7 @@ do
 	local function Action_4(p1, p2)
 		local isEnabled = p1.Part.Parent
 		if p2 then
-			t2:FireServer("z" .. ("hc5fs"):sub(2, 3):reverse() .. "" .. "" .. ("f1cb"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "8gcj", isEnabled)
+			eventBridge:FireServer("z5c18gcj", isEnabled)
 			return true
 		end
 	end
@@ -4450,14 +4448,14 @@ do
 		}, p1)
 	end
 	local ItemDropConsts = require(ReplicatedStorage.Game.ItemSystem.ItemDropConsts)
-	local v94 = next
-	local v95, v96 = CollectionService:GetTagged(ItemDropConsts.DROPPED_ITEM_TAG)
-	for v97, v98 in v94, v95, v96 do
+	local iterator_v94 = next
+	local droppedItems, _ = CollectionService:GetTagged(ItemDropConsts.DROPPED_ITEM_TAG)
+	for v97, v98 in v94, v95, for _, item in droppedItems do
 		AddedFun_6(v98)
 	end
 	CollectionService:GetInstanceAddedSignal(ItemDropConsts.DROPPED_ITEM_TAG):Connect(AddedFun_6)
 	CollectionService:GetInstanceRemovedSignal(ItemDropConsts.DROPPED_ITEM_TAG):Connect(CircleAction_5.Remove)
-	local v99 = tick()
+	local startTime = tick()
 	local function onJumpDebounce()
 		local isEnabled = tick()
 		if isEnabled - v99 < 0.1 then
@@ -4483,7 +4481,7 @@ do
 	LocalPlayer.CharacterAdded:Connect(CharacterAdded)
 	local BindableEvent = Instance.new("BindableEvent")
 	BindableEvent.Event:connect(function()
-		t2:FireServer("n" .. ("turjmyflsalj"):sub(5, 9):reverse():reverse():reverse():reverse():reverse() .. "cz")
+		eventBridge:FireServer("nslfymcz")
 	end)
 	delay(2, function()
 		local isEnabled, isEnabled = pcall(function()
@@ -4514,9 +4512,9 @@ do
 		end
 	end)
 	local isEnabled = false
-	local v102 = nil
-	local v103 = 0
-	local v104 = 0
+	local pcallResult = nil
+	local pcallCounter = 0
+	local pcallCounter2 = 0
 	local isEnabled = false
 	local function CharacterAdded_2(p1)
 		local Humanoid = p1:WaitForChild("Humanoid", 1)
@@ -4535,7 +4533,7 @@ do
 							v103 = 0
 							if not isEnabled then
 								isEnabled = true
-								EventFireServer("k" .. "" .. ("m0mlut"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("hpzulftr"):sub(4, 5):reverse():reverse():reverse() .. "" .. "" .. ("zo5iatyt"):sub(2, 4):reverse():reverse():reverse() .. "s", "NoClip StrafingNoPhysics", false)
+								EventFireServer("kului5os", "NoClip StrafingNoPhysics", false)
 							end
 						end
 					end
@@ -4552,7 +4550,7 @@ do
 			LocalPlayer:WaitForChild("Backpack", 20).ChildAdded:Connect(function(p1)
 				if p1:IsA("BackpackItem") and not isEnabled then
 					isEnabled = true
-					EventFireServer("k" .. ("ir4vlub"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("bliun3rz"):sub(3, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("hhq5sopz"):sub(4, 4):reverse() .. "os", "BackpackTool", false)
+					EventFireServer("kului5os", "BackpackTool", false)
 				end
 			end)
 		end)
@@ -4561,7 +4559,7 @@ do
 		end
 	end)
 	local FindFirstChildWhichIsA = Instance.new("Model").FindFirstChildWhichIsA
-	local v106 = xpcall
+	local xpcallFunction = xpcall
 	local configTable = {}
 	local function CheatCheck()
 		if not isEnabled then
@@ -4607,10 +4605,10 @@ do
 							configTable[isEnabled] = true
 						end
 					end
-					local v102, _ = pcall(function()
+					local pcallSuccess, _ = pcall(function()
 						local GetObjects = game.GetObjects
 					end)
-					if not RunService:IsStudio() and v102 then
+					if not RunService:IsStudio() and pcallSuccess then
 						isEnabled = true
 						isEnabled = "game.GetObjects"
 					end
@@ -4638,7 +4636,7 @@ do
 					end
 					if isEnabled then
 						isEnabled = true
-						EventFireServer("k" .. ("ll5lusg0"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("tc1tuq4c"):sub(5, 5):reverse() .. "" .. "" .. ("u3ie6k"):sub(3, 3):reverse() .. "5os", isEnabled, false)
+						EventFireServer("kului5os", isEnabled, false)
 					end
 				end
 			end
@@ -4648,7 +4646,7 @@ do
 		local isEnabled, _ = pcall(CheatCheck)
 		if not isEnabled then
 			isEnabled = true
-			EventFireServer("k" .. ("dgumr1i"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("le5iulh4"):sub(3, 6):reverse():reverse():reverse() .. "os", "FailedPcall", false)
+			EventFireServer("kului5os", "FailedPcall", false)
 		end
 	end)
 end

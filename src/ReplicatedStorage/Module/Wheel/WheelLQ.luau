@@ -1,9 +1,8 @@
--- Reviewed by Claude
 local Wheel = require(script.Parent.Wheel)
-local t = {}
-t.__index = t
-setmetatable(t, Wheel)
-function t.new(p1)
-	return Wheel.new(p1, true)
+local WheelLQ = {}
+WheelLQ.__index = WheelLQ
+setmetatable(WheelLQ, Wheel)
+function WheelLQ.new(config)
+	return Wheel.new(config, true)
 end
-return t
+return WheelLQ

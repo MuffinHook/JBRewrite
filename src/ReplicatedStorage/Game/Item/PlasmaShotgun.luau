@@ -1,29 +1,28 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Gun = require(script.Parent.Gun)
 local PlasmaGun = require(ReplicatedStorage.Game.Item.PlasmaGun)
 local Audio = require(ReplicatedStorage.Std.Audio)
-local t = {
+local PlasmaShotgunClass = {
 	__ClassName = "PlasmaShotgun"
 }
-t.__index = t
-setmetatable(t, PlasmaGun)
-function t.Init(p1)  end
-function t.new(p1, p2, p3)
-	local v1 = PlasmaGun.new(p1, p2, p3)
-	setmetatable(v1, t)
-	v1:Setup(p3)
-	return v1
+PlasmaShotgunClass.__index = PlasmaShotgunClass
+setmetatable(PlasmaShotgunClass, PlasmaGun)
+function PlasmaShotgunClass.Init(self)  end
+function PlasmaShotgunClass.new(self, itemTemplate, config)
+	local plasmaGunInstance = PlasmaGun.new(self, itemTemplate, config)
+	setmetatable(plasmaGunInstance, PlasmaShotgunClass)
+	plasmaGunInstance:Setup(config)
+	return plasmaGunInstance
 end
-function t.SetupModel(p1)
-	Gun.SetupModel(p1)
+function PlasmaShotgunClass.SetupModel(self)
+	Gun.SetupModel(self)
 end
-function t.ShootSound(p1, p2)
-	if not p2 then
-		Audio.ObjectLocal(p1.Tip, 17183453324, {
+function PlasmaShotgunClass.ShootSound(self, suppressSound)
+	if not suppressSound then
+		Audio.ObjectLocal(self.Tip, 17183453324, {
 			Volume = 0.35,
 			TimePosition = 0.05
 		})
 	end
 end
-return t
+return PlasmaShotgunClass

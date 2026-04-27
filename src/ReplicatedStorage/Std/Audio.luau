@@ -1,140 +1,138 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Std.Promise)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local RunService = game:GetService("RunService")
 local ContentProvider = game:GetService("ContentProvider")
-local function Preload(p1)
-	local t = {}
-	for v1, v2 in next, p1 do
+local function Preload(audioIds)
+	local soundsToPreload = {}
+	for _, soundId in next, audioIds do
 		local Sound = Instance.new("Sound")
-		Sound.SoundId = "rbxassetid://" .. v2
-		table.insert(t, Sound)
+		Sound.SoundId = "rbxassetid://" .. soundId
+		table.insert(soundsToPreload, Sound)
 	end
 	spawn(function()
-		ContentProvider:PreloadAsync(t)
-		for v1, v2 in next, t do
-			v2:Destroy()
+		ContentProvider:PreloadAsync(soundsToPreload)
+		for _, sound in next, soundsToPreload do
+			sound:Destroy()
 		end
 	end)
 	return true
 end
-local function PreloadHash(p1)
-	local t = {}
-	for v1, v2 in next, p1 do
-		table.insert(t, v2)
+local function PreloadHash(audioIdsHash)
+	local audioIdsList = {}
+	for _, soundId in next, audioIdsHash do
+		table.insert(audioIdsList, soundId)
 	end
-	return Preload(t)
+	return Preload(audioIdsList)
 end
-local function ObjectLocal(p1, p2, p3)
-	assert(p1, "SourceObject cannot be nil")
-	assert(typeof(p1) == "Instance", "SourceObject must be an Instance")
-	if p1:IsDescendantOf(workspace) and not (p1:IsA("BasePart") or p1:IsA("Attachment")) then
-		warn("SourceObject should be a BasePart or Attachment, but was a: " .. p1.ClassName .. " (Name: " .. p1:GetFullName() .. ")")
+local function ObjectLocal(sourceObject, soundId, options)
+	assert(sourceObject, "SourceObject cannot be nil")
+	assert(typeof(sourceObject) == "Instance", "SourceObject must be an Instance")
+	if sourceObject:IsDescendantOf(workspace) and not (sourceObject:IsA("BasePart") or sourceObject:IsA("Attachment")) then
+		warn("SourceObject should be a BasePart or Attachment, but was a: " .. sourceObject.ClassName .. " (Name: " .. sourceObject:GetFullName() .. ")")
 	end
 	local Sound = Instance.new("Sound")
 	Sound.RollOffMode = Enum.RollOffMode.InverseTapered
 	Sound.RollOffMaxDistance = 512
-	if type(p2) == "number" then
-		Sound.SoundId = "rbxassetid://" .. p2
+	if type(soundId) == "number" then
+		Sound.SoundId = "rbxassetid://" .. soundId
 	else
-		Sound.SoundId = p2
+		Sound.SoundId = soundId
 	end
-	Sound.Name = tostring(p2)
-	local v2 = nil
-	local v3 = false
-	if p3 then
-		if p3.Volume then
-			Sound.Volume = p3.Volume
+	Sound.Name = tostring(soundId)
+	local maxPlaybackTime = nil
+	local shouldNotPlay = false
+	if options then
+		if options.Volume then
+			Sound.Volume = options.Volume
 		end
-		if p3.Pitch then
-			Sound.PlaybackSpeed = p3.Pitch
+		if options.Pitch then
+			Sound.PlaybackSpeed = options.Pitch
 		end
-		if p3.TimePosition then
-			Sound.TimePosition = p3.TimePosition
+		if options.TimePosition then
+			Sound.TimePosition = options.TimePosition
 		end
-		if p3.EmitterSize then
-			Sound.EmitterSize = p3.EmitterSize
+		if options.EmitterSize then
+			Sound.EmitterSize = options.EmitterSize
 		end
-		if p3.MaxDistance then
-			Sound.MaxDistance = p3.MaxDistance
+		if options.MaxDistance then
+			Sound.MaxDistance = options.MaxDistance
 		end
-		if p3.RollOffMode then
-			Sound.RollOffMode = p3.RollOffMode
+		if options.RollOffMode then
+			Sound.RollOffMode = options.RollOffMode
 		end
-		if p3.RollOffMinDistance then
-			Sound.RollOffMinDistance = p3.RollOffMinDistance
+		if options.RollOffMinDistance then
+			Sound.RollOffMinDistance = options.RollOffMinDistance
 		end
-		if p3.RollOffMaxDistance then
-			Sound.RollOffMaxDistance = p3.RollOffMaxDistance
+		if options.RollOffMaxDistance then
+			Sound.RollOffMaxDistance = options.RollOffMaxDistance
 		end
-		if p3.Looped then
+		if options.Looped then
 			Sound.Looped = true
 		end
-		if p3.MaxPlaybackTime then
-			v2 = p3.MaxPlaybackTime
+		if options.MaxPlaybackTime then
+			maxPlaybackTime = options.MaxPlaybackTime
 		end
-		if p3.DoNotPlay then
-			v3 = true
+		if options.DoNotPlay then
+			shouldNotPlay = true
 		end
-		if p3.Group then
-			Sound.SoundGroup = p3.Group
+		if options.Group then
+			Sound.SoundGroup = options.Group
 		end
-		if p3.SoundGroup then
-			Sound.SoundGroup = p3.SoundGroup
+		if options.SoundGroup then
+			Sound.SoundGroup = options.SoundGroup
 		end
-		if p3.GroupName then
-			Sound.SoundGroup = game:GetService("SoundService"):FindFirstChild(p3.GroupName)
+		if options.GroupName then
+			Sound.SoundGroup = game:GetService("SoundService"):FindFirstChild(options.GroupName)
 		end
-		if p3.SoundGroupName then
-			Sound.SoundGroup = game:GetService("SoundService"):FindFirstChild(p3.SoundGroupName)
+		if options.SoundGroupName then
+			Sound.SoundGroup = game:GetService("SoundService"):FindFirstChild(options.SoundGroupName)
 		end
 	end
-	Sound.Parent = p1
-	if p3 and (p3.YieldForLoaded and not Sound.IsLoaded) then
+	Sound.Parent = sourceObject
+	if options and (options.YieldForLoaded and not Sound.IsLoaded) then
 		Sound.Loaded:Wait()
 	end
-	if not v3 then
+	if not shouldNotPlay then
 		Sound:Play()
 		if not Sound.Looped then
 			task.spawn(function()
-				local v1 = v2
-				if v1 == nil then
+				local delayDuration = maxPlaybackTime
+				if delayDuration == nil then
 					if not Sound.IsLoaded then
 						Sound.Loaded:Wait()
 					end
-					v1 = Sound.TimeLength + 1
+					delayDuration = Sound.TimeLength + 1
 				end
-				game:GetService("Debris"):AddItem(Sound, v1)
+				game:GetService("Debris"):AddItem(Sound, delayDuration)
 			end)
 		end
 	end
 	return Sound
 end
-local function WorldPositionLocal(p1, p2, p3)
+local function WorldPositionLocal(position, soundId, options)
 	local SoundPart = Instance.new("Part")
 	SoundPart.Anchored = true
 	SoundPart.CanCollide = false
 	SoundPart.Size = Vector3.new(0.1, 0.1, 0.1)
-	SoundPart.Position = p1
+	SoundPart.Position = position
 	SoundPart.Transparency = 1
 	SoundPart.Name = "SoundPart"
 	SoundPart.Parent = workspace
-	return ObjectLocal(SoundPart, p2, p3)
+	return ObjectLocal(SoundPart, soundId, options)
 end
-local function FadeOut(p1, p2)
+local function FadeOut(sound, fadeDuration)
 	spawn(function()
-		local Volume = p1.Volume
-		for i = 1, 0, -0.03 / p2 do
-			p1.Volume = Volume * i
+		local Volume = sound.Volume
+		for i = 1, 0, -0.03 / fadeDuration do
+			sound.Volume = Volume * i
 			wait()
 		end
-		p1.Volume = 0
+		sound.Volume = 0
 	end)
 end
-local function Ease_InOutQuad(p1)
-	return p1 < 0.5 and 2 * p1 * p1 or -1 - 2 * (p1 - 2) * p1
+local function Ease_InOutQuad(progress)
+	return progress < 0.5 and 2 * progress * progress or -1 - 2 * (progress - 2) * progress
 end
 return {
 	ObjectLocal = ObjectLocal,
@@ -142,78 +140,78 @@ return {
 	Preload = Preload,
 	PreloadHash = PreloadHash,
 	FadeOut = FadeOut,
-	FadeTo = function(p1, p2, p3, p4)
-		assert(p1)
-		assert(p2)
-		assert(p3)
-		local Volume = p1.Volume
-		local v1 = tick()
-		local v2 = nil
-		v2 = RunService.Heartbeat:Connect(function()
-			if p1.Parent == nil then
-				v2:Disconnect()
+	FadeTo = function(sound, targetVolume, fadeDuration, onComplete)
+		assert(sound)
+		assert(targetVolume)
+		assert(fadeDuration)
+		local Volume = sound.Volume
+		local startTime = tick()
+		local connection = nil
+		connection = RunService.Heartbeat:Connect(function()
+			if sound.Parent == nil then
+				connection:Disconnect()
 			else
-				local v12 = (tick() - v1) / p3
-				if v12 >= 1 then
-					v2:Disconnect()
-					v12 = 1
+				local progress = (tick() - startTime) / fadeDuration
+				if progress >= 1 then
+					connection:Disconnect()
+					progress = 1
 				end
-				local v22, v3
-				if v12 < 0.5 then
-					v22 = 2 * v12 * v12
-					if not v22 then
-						v3 = v12
-						v22 = -1 - 2 * (v12 - 2) * v12
+				local easedProgress, _
+				if progress < 0.5 then
+					easedProgress = 2 * progress * progress
+					if not easedProgress then
+						_ = progress
+						easedProgress = -1 - 2 * (progress - 2) * progress
 					end
 				else
-					v3 = v12
-					v22 = -1 - 2 * (v12 - 2) * v12
+					_ = progress
+					easedProgress = -1 - 2 * (progress - 2) * progress
 				end
-				p1.Volume = Volume * (1 - v22) + p2 * v22
-				if v22 == 1 and p4 ~= nil then
-					p4()
+				sound.Volume = Volume * (1 - easedProgress) + targetVolume * easedProgress
+				if easedProgress == 1 and onComplete ~= nil then
+					onComplete()
 				end
 			end
 		end)
-		return v2
+		return connection
 	end,
-	promiseFadeTo = function(p1, p2, p3)
-		assert(p1)
-		assert(p2)
-		assert(p3)
-		local v1 = os.clock()
-		return Promise.new(function(p12, p22, p32)
-			local v12 = Maid.new()
-			if not p32(function()
-				v12:Destroy()
-				v12 = nil
+	promiseFadeTo = function(sound, targetVolume, fadeDuration)
+		assert(sound)
+		assert(targetVolume)
+		assert(fadeDuration)
+		local startTime = os.clock()
+		return Promise.new(function(resolve, reject, onCancel)
+			local maid = Maid.new()
+			if not onCancel(function()
+				maid:Destroy()
+				maid = nil
 			end) then
-				local Volume = p1.Volume
-				v12:GiveTask(RunService.Heartbeat:Connect(function()
-					local v13 = (os.clock() - v1) / p3
-					if v13 >= 1 then
-						v13 = 1
+				local Volume = sound.Volume
+				maid:GiveTask(RunService.Heartbeat:Connect(function()
+					local progress = (os.clock() - startTime) / fadeDuration
+					if progress >= 1 then
+						progress = 1
 					end
-					local v2, v3
-					if v13 < 0.5 then
-						v2 = 2 * v13 * v13
-						if not v2 then
-							v3 = v13
-							v2 = -1 - 2 * (v13 - 2) * v13
+					local easedProgress, _
+					if progress < 0.5 then
+						easedProgress = 2 * progress * progress
+						if not easedProgress then
+							_ = progress
+							easedProgress = -1 - 2 * (progress - 2) * progress
 						end
 					else
-						v3 = v13
-						v2 = -1 - 2 * (v13 - 2) * v13
+						_ = progress
+						easedProgress = -1 - 2 * (progress - 2) * progress
 					end
-					if p1.Parent then
-						p1.Volume = Volume * (1 - v2) + p2 * v2
-						if v2 == 1 then
-							v12:Destroy()
-							p12()
+					if sound.Parent then
+						sound.Volume = Volume * (1 - easedProgress) + targetVolume * easedProgress
+						if easedProgress == 1 then
+							maid:Destroy()
+							resolve()
 						end
 					else
-						v12:Destroy()
-						p22("No Parent to sound")
+						maid:Destroy()
+						reject("No Parent to sound")
 					end
 				end))
 			end

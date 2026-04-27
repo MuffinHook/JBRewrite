@@ -1,7 +1,6 @@
--- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2)
-	local t = {
+return function(iris, utils)
+	local imageWidgetConfig = {
 		hasState = false,
 		hasChildren = false,
 		Args = {
@@ -14,122 +13,122 @@ return function(p1, p2)
 			SliceCenter = 7,
 			SliceScale = 8
 		},
-		Discard = function(p1)
-			p1.Instance:Destroy()
+		Discard = function(widgetContext)
+			widgetContext.Instance:Destroy()
 		end
 	}
-	p1.WidgetConstructor("Image", p2.extend(t, {
+	iris.WidgetConstructor("Image", utils.extend(imageWidgetConfig, {
 		Events = {
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance
+			hovered = utils.EVENTS.hover(function(eventContext)
+				return eventContext.Instance
 			end)
 		},
-		Generate = function(p12)
+		Generate = function(widgetContext)
 			local Iris_Image = Instance.new("ImageLabel")
 			Iris_Image.Name = "Iris_Image"
 			Iris_Image.BackgroundTransparency = 1
 			Iris_Image.BorderSizePixel = 0
-			Iris_Image.ImageColor3 = p1._config.ImageColor
-			Iris_Image.ImageTransparency = p1._config.ImageTransparency
-			p2.applyFrameStyle(Iris_Image, true)
+			Iris_Image.ImageColor3 = iris._config.ImageColor
+			Iris_Image.ImageTransparency = iris._config.ImageTransparency
+			utils.applyFrameStyle(Iris_Image, true)
 			return Iris_Image
 		end,
-		Update = function(p1)
-			local instance = p1.Instance
-			instance.Image = p1.arguments.Image or p2.ICONS.UNKNOWN_TEXTURE
-			instance.Size = p1.arguments.Size
-			if p1.arguments.ScaleType then
-				instance.ScaleType = p1.arguments.ScaleType
-				if p1.arguments.ScaleType == Enum.ScaleType.Tile and p1.arguments.TileSize then
-					instance.TileSize = p1.arguments.TileSize
-				elseif p1.arguments.ScaleType == Enum.ScaleType.Slice then
-					if p1.arguments.SliceCenter then
-						instance.SliceCenter = p1.arguments.SliceCenter
+		Update = function(widgetContext)
+			local instance = widgetContext.Instance
+			instance.Image = widgetContext.arguments.Image or utils.ICONS.UNKNOWN_TEXTURE
+			instance.Size = widgetContext.arguments.Size
+			if widgetContext.arguments.ScaleType then
+				instance.ScaleType = widgetContext.arguments.ScaleType
+				if widgetContext.arguments.ScaleType == Enum.ScaleType.Tile and widgetContext.arguments.TileSize then
+					instance.TileSize = widgetContext.arguments.TileSize
+				elseif widgetContext.arguments.ScaleType == Enum.ScaleType.Slice then
+					if widgetContext.arguments.SliceCenter then
+						instance.SliceCenter = widgetContext.arguments.SliceCenter
 					end
-					if p1.arguments.SliceScale then
-						instance.SliceScale = p1.arguments.SliceScale
+					if widgetContext.arguments.SliceScale then
+						instance.SliceScale = widgetContext.arguments.SliceScale
 					end
 				end
 			end
-			if p1.arguments.Rect then
-				instance.ImageRectOffset = p1.arguments.Rect.Min
-				instance.ImageRectSize = Vector2.new(p1.arguments.Rect.Width, p1.arguments.Rect.Height)
+			if widgetContext.arguments.Rect then
+				instance.ImageRectOffset = widgetContext.arguments.Rect.Min
+				instance.ImageRectSize = Vector2.new(widgetContext.arguments.Rect.Width, widgetContext.arguments.Rect.Height)
 			end
-			if p1.arguments.ResampleMode then
-				instance.ResampleMode = p1.arguments.ResampleMode
+			if widgetContext.arguments.ResampleMode then
+				instance.ResampleMode = widgetContext.arguments.ResampleMode
 			end
 		end
 	}))
-	p1.WidgetConstructor("ImageButton", p2.extend(t, {
+	iris.WidgetConstructor("ImageButton", utils.extend(imageWidgetConfig, {
 		Events = {
-			clicked = p2.EVENTS.click(function(p1)
-				return p1.Instance
+			clicked = utils.EVENTS.click(function(eventContext)
+				return eventContext.Instance
 			end),
-			rightClicked = p2.EVENTS.rightClick(function(p1)
-				return p1.Instance
+			rightClicked = utils.EVENTS.rightClick(function(eventContext)
+				return eventContext.Instance
 			end),
-			doubleClicked = p2.EVENTS.doubleClick(function(p1)
-				return p1.Instance
+			doubleClicked = utils.EVENTS.doubleClick(function(eventContext)
+				return eventContext.Instance
 			end),
-			ctrlClicked = p2.EVENTS.ctrlClick(function(p1)
-				return p1.Instance
+			ctrlClicked = utils.EVENTS.ctrlClick(function(eventContext)
+				return eventContext.Instance
 			end),
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance
+			hovered = utils.EVENTS.hover(function(eventContext)
+				return eventContext.Instance
 			end)
 		},
-		Generate = function(p12)
+		Generate = function(widgetContext)
 			local Iris_ImageButton = Instance.new("ImageButton")
 			Iris_ImageButton.Name = "Iris_ImageButton"
 			Iris_ImageButton.AutomaticSize = Enum.AutomaticSize.XY
-			Iris_ImageButton.BackgroundColor3 = p1._config.FrameBgColor
-			Iris_ImageButton.BackgroundTransparency = p1._config.FrameBgTransparency
+			Iris_ImageButton.BackgroundColor3 = iris._config.FrameBgColor
+			Iris_ImageButton.BackgroundTransparency = iris._config.FrameBgTransparency
 			Iris_ImageButton.BorderSizePixel = 0
 			Iris_ImageButton.Image = ""
 			Iris_ImageButton.ImageTransparency = 1
 			Iris_ImageButton.AutoButtonColor = false
-			p2.applyFrameStyle(Iris_ImageButton, true)
-			p2.UIPadding(Iris_ImageButton, Vector2.new(p1._config.ImageBorderSize, p1._config.ImageBorderSize))
+			utils.applyFrameStyle(Iris_ImageButton, true)
+			utils.UIPadding(Iris_ImageButton, Vector2.new(iris._config.ImageBorderSize, iris._config.ImageBorderSize))
 			local ImageLabel = Instance.new("ImageLabel")
 			ImageLabel.Name = "ImageLabel"
 			ImageLabel.BackgroundTransparency = 1
 			ImageLabel.BorderSizePixel = 0
-			ImageLabel.ImageColor3 = p1._config.ImageColor
-			ImageLabel.ImageTransparency = p1._config.ImageTransparency
+			ImageLabel.ImageColor3 = iris._config.ImageColor
+			ImageLabel.ImageTransparency = iris._config.ImageTransparency
 			ImageLabel.Parent = Iris_ImageButton
-			p2.applyInteractionHighlights("Background", Iris_ImageButton, Iris_ImageButton, {
-				Color = p1._config.FrameBgColor,
-				Transparency = p1._config.FrameBgTransparency,
-				HoveredColor = p1._config.FrameBgHoveredColor,
-				HoveredTransparency = p1._config.FrameBgHoveredTransparency,
-				ActiveColor = p1._config.FrameBgActiveColor,
-				ActiveTransparency = p1._config.FrameBgActiveTransparency
+			utils.applyInteractionHighlights("Background", Iris_ImageButton, Iris_ImageButton, {
+				Color = iris._config.FrameBgColor,
+				Transparency = iris._config.FrameBgTransparency,
+				HoveredColor = iris._config.FrameBgHoveredColor,
+				HoveredTransparency = iris._config.FrameBgHoveredTransparency,
+				ActiveColor = iris._config.FrameBgActiveColor,
+				ActiveTransparency = iris._config.FrameBgActiveTransparency
 			})
 			return Iris_ImageButton
 		end,
-		Update = function(p1)
-			local ImageLabel = p1.Instance.ImageLabel
-			ImageLabel.Image = p1.arguments.Image or p2.ICONS.UNKNOWN_TEXTURE
-			ImageLabel.Size = p1.arguments.Size
-			if p1.arguments.ScaleType then
-				ImageLabel.ScaleType = p1.arguments.ScaleType
-				if p1.arguments.ScaleType == Enum.ScaleType.Tile and p1.arguments.TileSize then
-					ImageLabel.TileSize = p1.arguments.TileSize
-				elseif p1.arguments.ScaleType == Enum.ScaleType.Slice then
-					if p1.arguments.SliceCenter then
-						ImageLabel.SliceCenter = p1.arguments.SliceCenter
+		Update = function(widgetContext)
+			local ImageLabel = widgetContext.Instance.ImageLabel
+			ImageLabel.Image = widgetContext.arguments.Image or utils.ICONS.UNKNOWN_TEXTURE
+			ImageLabel.Size = widgetContext.arguments.Size
+			if widgetContext.arguments.ScaleType then
+				ImageLabel.ScaleType = widgetContext.arguments.ScaleType
+				if widgetContext.arguments.ScaleType == Enum.ScaleType.Tile and widgetContext.arguments.TileSize then
+					ImageLabel.TileSize = widgetContext.arguments.TileSize
+				elseif widgetContext.arguments.ScaleType == Enum.ScaleType.Slice then
+					if widgetContext.arguments.SliceCenter then
+						ImageLabel.SliceCenter = widgetContext.arguments.SliceCenter
 					end
-					if p1.arguments.SliceScale then
-						ImageLabel.SliceScale = p1.arguments.SliceScale
+					if widgetContext.arguments.SliceScale then
+						ImageLabel.SliceScale = widgetContext.arguments.SliceScale
 					end
 				end
 			end
-			if p1.arguments.Rect then
-				ImageLabel.ImageRectOffset = p1.arguments.Rect.Min
-				ImageLabel.ImageRectSize = Vector2.new(p1.arguments.Rect.Width, p1.arguments.Rect.Height)
+			if widgetContext.arguments.Rect then
+				ImageLabel.ImageRectOffset = widgetContext.arguments.Rect.Min
+				ImageLabel.ImageRectSize = Vector2.new(widgetContext.arguments.Rect.Width, widgetContext.arguments.Rect.Height)
 			end
-			if p1.arguments.ResampleMode then
-				ImageLabel.ResampleMode = p1.arguments.ResampleMode
+			if widgetContext.arguments.ResampleMode then
+				ImageLabel.ResampleMode = widgetContext.arguments.ResampleMode
 			end
 		end
 	}))

@@ -1,10 +1,9 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local Maid = require(ReplicatedStorage.Std.Maid)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(storyTarget)
+	local AppComponent = Roact.Component:extend("App")
 	local store = require(ReplicatedStorage.App.store)
 	store:dispatch({
 		type = "setLocalVehiclePacket",
@@ -41,34 +40,34 @@ return function(p1)
 			categoryTitle = "categoryTitle" .. tostring(i)
 		})
 	end
-	function v1.init(p1)
-		p1.maid = Maid.new()
+	function AppComponent.init(self)
+		self.maid = Maid.new()
 	end
-	local v2 = os.clock()
-	function v1.render(p1)
+	local initialTime = os.clock()
+	function AppComponent.render(self)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = store
 		}, { Roact.createElement(require(script.Parent.Garage), {
 				disabled = false,
-				attemptBuyItem = function(p1, p2)
+				attemptBuyItem = function(category, itemName)
 					store:dispatch({
 						type = "setCategoryItemOwned",
-						category = p1,
-						name = p2
+						category = category,
+						name = itemName
 					})
 				end,
 				getRemainingDebounce = function()
-					return 10 - (os.clock() - v2)
+					return 10 - (os.clock() - initialTime)
 				end,
 				colsPerRow = 7,
 				rowsPerPage = 2.5
 			}) })
 	end
-	function v1.willUnmount(p1)
-		p1.maid:Destroy()
+	function AppComponent.willUnmount(self)
+		self.maid:Destroy()
 	end
-	local v3 = Roact.mount(Roact.createElement(v1), p1)
+	local mountedComponent = Roact.mount(Roact.createElement(AppComponent), storyTarget)
 	return function()
-		Roact.unmount(v3)
+		Roact.unmount(mountedComponent)
 	end
 end

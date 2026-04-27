@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -23,132 +22,132 @@ local function GetRootPart()
 		end
 	end
 end
-local t = {}
-t.__index = t
-setmetatable(t, Silo)
-function t.new(p1)
-	local v1 = Silo.new(p1)
-	setmetatable(v1, t)
-	v1.BayMaid = Maid.new()
-	v1._door1Part = v1.Model:WaitForChild("Door1")
-	v1._door2Part = v1.Model:WaitForChild("Door2")
-	v1.Size = v1._door1Part.Size
-	v1.BayMaid:GiveTask(Interval.every(0.5):Connect(function()
+local CargoShipBay = {}
+CargoShipBay.__index = CargoShipBay
+setmetatable(CargoShipBay, Silo)
+function CargoShipBay.new(model)
+	local bay = Silo.new(model)
+	setmetatable(bay, CargoShipBay)
+	bay.BayMaid = Maid.new()
+	bay._door1Part = bay.Model:WaitForChild("Door1")
+	bay._door2Part = bay.Model:WaitForChild("Door2")
+	bay.Size = bay._door1Part.Size
+	bay.BayMaid:GiveTask(Interval.every(0.5):Connect(function()
 		local Character = LocalPlayer.Character
 		if Character ~= nil then
 			local Humanoid = Character:FindFirstChild("Humanoid")
 			if Humanoid ~= nil then
 				local RootPart = Humanoid.RootPart
 				if RootPart ~= nil then
-					local v12 = (RootPart.Position - v1.Model.Door1.Position).Magnitude < 128
-					if v12 ~= v1.IsOpen then
-						if v12 then
-							v1:Open(2)
+					local isWithinRange = (RootPart.Position - bay.Model.Door1.Position).Magnitude < 128
+					if isWithinRange ~= bay.IsOpen then
+						if isWithinRange then
+							bay:Open(2)
 							return
 						end
-						v1:Close(2)
+						bay:Close(2)
 					end
 				end
 			end
 		end
 	end))
-	return v1
+	return bay
 end
-function t.SetDoorOpen(p1, p2)
-	local _door1Part = p1._door1Part
-	local v1 = -p1.Size.Z * p2
-	_door1Part.Size = Vector3.new(p1.Size.X, p1.Size.Y, p1.Size.Z + v1)
-	_door1Part.CFrame = p1.Door1CF * CFrame.new(0, 0, v1 * 0.5)
-	local _door2Part = p1._door2Part
-	local v3 = -p1.Size.Z * p2
-	_door2Part.Size = Vector3.new(p1.Size.X, p1.Size.Y, p1.Size.Z + v3)
-	_door2Part.CFrame = p1.Door2CF * CFrame.new(0, 0, v3 * 0.5)
+function CargoShipBay.SetDoorOpen(bay, openAmount)
+	local _door1Part = bay._door1Part
+	local depthOffset = -bay.Size.Z * openAmount
+	_door1Part.Size = Vector3.new(bay.Size.X, bay.Size.Y, bay.Size.Z + depthOffset)
+	_door1Part.CFrame = bay.Door1CF * CFrame.new(0, 0, depthOffset * 0.5)
+	local _door2Part = bay._door2Part
+	local depthOffset2 = -bay.Size.Z * openAmount
+	_door2Part.Size = Vector3.new(bay.Size.X, bay.Size.Y, bay.Size.Z + depthOffset2)
+	_door2Part.CFrame = bay.Door2CF * CFrame.new(0, 0, depthOffset2 * 0.5)
 end
-function t.Destroy(p1)
-	p1:SetDoorOpen(0)
-	Silo.Destroy(p1)
-	p1.BayMaid:DoCleaning()
-	p1.BayMaid = nil
+function CargoShipBay.Destroy(bay)
+	bay:SetDoorOpen(0)
+	Silo.Destroy(bay)
+	bay.BayMaid:DoCleaning()
+	bay.BayMaid = nil
 end
-local v2 = Binder.new("CargoShip", CargoShip)
+local cargoShipBinder = Binder.new("CargoShip", CargoShip)
 return {
-	Init = function(p1)
-		local v1 = p1.Event
-		local em = p1.em
-		local function OnRocketExploded(p1)
+	Init = function(replicatorRef)
+		local event = replicatorRef.Event
+		local em = replicatorRef.em
+		local function OnRocketExploded(explosionPosition)
 			local Character = LocalPlayer.Character
-			local v12
+			local rootPart
 			if Character == nil then
-				v12 = nil
+				rootPart = nil
 			else
 				local Humanoid = Character:FindFirstChild("Humanoid")
-				v12 = if Humanoid == nil then nil else Humanoid.RootPart
+				rootPart = if Humanoid == nil then nil else Humanoid.RootPart
 			end
-			if v12 ~= nil and (p1 - v12.Position).Magnitude < 64 then
-				v1:FireServer("p" .. ("kmko"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("fw1zvj"):sub(2, 3):reverse() .. "8s32", p1)
+			if rootPart ~= nil and (explosionPosition - rootPart.Position).Magnitude < 64 then
+				event:FireServer("pk1w8s32", explosionPosition)
 			end
 		end
-		v2:GetClassAddedSignal():Connect(function(p1)
-			for i, v in ipairs(p1.ListTurret) do
-				v.Maid:GiveTask(v.RocketWorld.OnRocketExploded:Connect(OnRocketExploded))
+		cargoShipBinder:GetClassAddedSignal():Connect(function(cargoShip)
+			for i, turret in ipairs(cargoShip.ListTurret) do
+				turret.Maid:GiveTask(turret.RocketWorld.OnRocketExploded:Connect(OnRocketExploded))
 			end
 		end)
-		v2:Start()
-		function em.kzlkcvqh(p1, p2)
-			for v1, v22 in v2:GetAll() do
-				if v22:GetId() == p1 then
-					v22:SetTurretSeek(p2)
+		cargoShipBinder:Start()
+		function em.kzlkcvqh(shipId, targetPosition)
+			for _index, cargoShip in cargoShipBinder:GetAll() do
+				if cargoShip:GetId() == shipId then
+					cargoShip:SetTurretSeek(targetPosition)
 				end
 			end
 		end
-		local v22 = nil
-		local function AddedFun(p1)
-			assert(v22 == nil, "Cargo bay already exists!")
-			v22 = t.new(p1)
+		local currentBay = nil
+		local function AddedFun(part)
+			assert(currentBay == nil, "Cargo bay already exists!")
+			currentBay = CargoShipBay.new(part)
 		end
 		local function RemovedFun()
-			assert(v22 ~= nil, "Cargo bay already destroyed!")
-			v22:Destroy()
-			v22 = nil
+			assert(currentBay ~= nil, "Cargo bay already destroyed!")
+			currentBay:Destroy()
+			currentBay = nil
 		end
-		for i, v in ipairs(CollectionService:GetTagged("CargoDepotDoor")) do
-			assert(v22 == nil, "Cargo bay already exists!")
-			v22 = t.new(v)
+		for i, cargoDepotDoorPart in ipairs(CollectionService:GetTagged("CargoDepotDoor")) do
+			assert(currentBay == nil, "Cargo bay already exists!")
+			currentBay = CargoShipBay.new(cargoDepotDoorPart)
 		end
 		CollectionService:GetInstanceAddedSignal("CargoDepotDoor"):Connect(AddedFun)
 		CollectionService:GetInstanceRemovedSignal("CargoDepotDoor"):Connect(RemovedFun)
-		local v4 = nil
-		local v5 = nil
-		function em.gk9ob559(p1)
-			if v5 ~= nil then
-				v5:Disconnect()
-				v5 = nil
+		local soundInstance = nil
+		local fadeTask = nil
+		function em.gk9ob559(shouldPlay)
+			if fadeTask ~= nil then
+				fadeTask:Disconnect()
+				fadeTask = nil
 			end
-			if p1 then
-				if v4 == nil then
-					v4 = Audio.ObjectLocal(LocalPlayer.PlayerGui, 1837327837, {
+			if shouldPlay then
+				if soundInstance == nil then
+					soundInstance = Audio.ObjectLocal(LocalPlayer.PlayerGui, 1837327837, {
 						Looped = true,
 						Volume = 0
 					})
-					v4.SoundGroup = game.SoundService.RobberyMusic
+					soundInstance.SoundGroup = game.SoundService.RobberyMusic
 				end
-				v5 = Audio.FadeTo(v4, 0.7, 2, function()
-					v5 = nil
+				fadeTask = Audio.FadeTo(soundInstance, 0.7, 2, function()
+					fadeTask = nil
 				end)
 			else
-				v5 = Audio.FadeTo(v4, 0, 4, function()
-					v4:Destroy()
-					v4 = nil
-					v5 = nil
+				fadeTask = Audio.FadeTo(soundInstance, 0, 4, function()
+					soundInstance:Destroy()
+					soundInstance = nil
+					fadeTask = nil
 				end)
 			end
 		end
-		function em.s98gnbty(p1)
-			if p1 then
-				if v22 ~= nil then
+		function em.s98gnbty(shouldShow)
+			if shouldShow then
+				if currentBay ~= nil then
 					MinimapService.addWaypoint({
 						name = "CargoShip",
-						position = (v22.Door1CF.p + v22.Door2CF.p) * 0.5,
+						position = (currentBay.Door1CF.p + currentBay.Door2CF.p) * 0.5,
 						priority = 1000,
 						minDist = 0
 					})

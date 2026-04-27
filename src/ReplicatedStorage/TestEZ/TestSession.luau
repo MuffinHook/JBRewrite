@@ -1,29 +1,28 @@
--- Reviewed by Claude
 local TestEnum = require(script.Parent.TestEnum)
 local TestResults = require(script.Parent.TestResults)
 local Context = require(script.Parent.Context)
 local ExpectationContext = require(script.Parent.ExpectationContext)
-local t = {}
-t.__index = t
-function t.new(p1)
-	local t2 = {
-		results = TestResults.new(p1),
+local TestSession = {}
+TestSession.__index = TestSession
+function TestSession.new(nodeResults)
+	local newSession = {
+		results = TestResults.new(nodeResults),
 		nodeStack = {},
 		contextStack = {},
 		expectationContextStack = {},
 		hasFocusNodes = false
 	}
-	setmetatable(t2, t)
-	return t2
+	setmetatable(newSession, TestSession)
+	return newSession
 end
-function t.calculateTotals(p1)
-	local results = p1.results
+function TestSession.calculateTotals(self)
+	local results = self.results
 	results.successCount = 0
 	results.failureCount = 0
 	results.skippedCount = 0
-	results:visitAllNodes(function(p1)
-		local status = p1.status
-		if p1.planNode.type == TestEnum.NodeType.It then
+	results:visitAllNodes(function(resultNode)
+		local status = resultNode.status
+		if resultNode.planNode.type == TestEnum.NodeType.It then
 			if status == TestEnum.TestStatus.Success then
 				results.successCount = results.successCount + 1
 			elseif status == TestEnum.TestStatus.Failure then
@@ -34,105 +33,105 @@ function t.calculateTotals(p1)
 		end
 	end)
 end
-function t.gatherErrors(p1)
-	local results = p1.results
+function TestSession.gatherErrors(self)
+	local results = self.results
 	results.errors = {}
-	results:visitAllNodes(function(p1)
-		if #p1.errors > 0 then
-			for i, v in ipairs(p1.errors) do
-				table.insert(results.errors, v)
+	results:visitAllNodes(function(resultNode)
+		if #resultNode.errors > 0 then
+			for i, error in ipairs(resultNode.errors) do
+				table.insert(results.errors, error)
 			end
 		end
 	end)
 end
-function t.finalize(p1)
-	if #p1.nodeStack ~= 0 then
+function TestSession.finalize(self)
+	if #self.nodeStack ~= 0 then
 		error("Cannot finalize TestResults with nodes still on the stack!", 2)
 	end
-	p1:calculateTotals()
-	p1:gatherErrors()
-	return p1.results
+	self:calculateTotals()
+	self:gatherErrors()
+	return self.results
 end
-function t.pushNode(p1, p2)
-	local v1 = TestResults.createNode(p2)
-	table.insert((p1.nodeStack[#p1.nodeStack] or p1.results).children, v1)
-	table.insert(p1.nodeStack, v1)
-	table.insert(p1.contextStack, (Context.new(p1.contextStack[#p1.contextStack])))
-	table.insert(p1.expectationContextStack, (ExpectationContext.new(p1.expectationContextStack[#p1.expectationContextStack])))
+function TestSession.pushNode(self, nodeDefinition)
+	local newNode = TestResults.createNode(nodeDefinition)
+	table.insert((self.nodeStack[#self.nodeStack] or self.results).children, newNode)
+	table.insert(self.nodeStack, newNode)
+	table.insert(self.contextStack, (Context.new(self.contextStack[#self.contextStack])))
+	table.insert(self.expectationContextStack, (ExpectationContext.new(self.expectationContextStack[#self.expectationContextStack])))
 end
-function t.popNode(p1)
-	assert(#p1.nodeStack > 0, "Tried to pop from an empty node stack!")
-	table.remove(p1.nodeStack, #p1.nodeStack)
-	table.remove(p1.contextStack, #p1.contextStack)
-	table.remove(p1.expectationContextStack, #p1.expectationContextStack)
+function TestSession.popNode(self)
+	assert(#self.nodeStack > 0, "Tried to pop from an empty node stack!")
+	table.remove(self.nodeStack, #self.nodeStack)
+	table.remove(self.contextStack, #self.contextStack)
+	table.remove(self.expectationContextStack, #self.expectationContextStack)
 end
-function t.getContext(p1)
-	assert(#p1.contextStack > 0, "Tried to get context from an empty stack!")
-	return p1.contextStack[#p1.contextStack]
+function TestSession.getContext(self)
+	assert(#self.contextStack > 0, "Tried to get context from an empty stack!")
+	return self.contextStack[#self.contextStack]
 end
-function t.getExpectationContext(p1)
-	assert(#p1.expectationContextStack > 0, "Tried to get expectationContext from an empty stack!")
-	return p1.expectationContextStack[#p1.expectationContextStack]
+function TestSession.getExpectationContext(self)
+	assert(#self.expectationContextStack > 0, "Tried to get expectationContext from an empty stack!")
+	return self.expectationContextStack[#self.expectationContextStack]
 end
-function t.shouldSkip(p1)
-	if p1.hasFocusNodes then
-		for i = #p1.nodeStack, 1, -1 do
-			local v1 = p1.nodeStack[i]
-			if v1.planNode.modifier == TestEnum.NodeModifier.Skip then
+function TestSession.shouldSkip(self)
+	if self.hasFocusNodes then
+		for i = #self.nodeStack, 1, -1 do
+			local currentNode = self.nodeStack[i]
+			if currentNode.planNode.modifier == TestEnum.NodeModifier.Skip then
 				return true
 			end
-			if v1.planNode.modifier == TestEnum.NodeModifier.Focus then
+			if currentNode.planNode.modifier == TestEnum.NodeModifier.Focus then
 				return false
 			end
 		end
 		return true
 	end
-	for j = #p1.nodeStack, 1, -1 do
-		if p1.nodeStack[j].planNode.modifier == TestEnum.NodeModifier.Skip then
+	for j = #self.nodeStack, 1, -1 do
+		if self.nodeStack[j].planNode.modifier == TestEnum.NodeModifier.Skip then
 			return true
 		end
 	end
 	return false
 end
-function t.setSuccess(p1)
-	assert(#p1.nodeStack > 0, "Attempting to set success status on empty stack")
-	p1.nodeStack[#p1.nodeStack].status = TestEnum.TestStatus.Success
+function TestSession.setSuccess(self)
+	assert(#self.nodeStack > 0, "Attempting to set success status on empty stack")
+	self.nodeStack[#self.nodeStack].status = TestEnum.TestStatus.Success
 end
-function t.setSkipped(p1)
-	assert(#p1.nodeStack > 0, "Attempting to set skipped status on empty stack")
-	p1.nodeStack[#p1.nodeStack].status = TestEnum.TestStatus.Skipped
+function TestSession.setSkipped(self)
+	assert(#self.nodeStack > 0, "Attempting to set skipped status on empty stack")
+	self.nodeStack[#self.nodeStack].status = TestEnum.TestStatus.Skipped
 end
-function t.setError(p1, p2)
-	assert(#p1.nodeStack > 0, "Attempting to set error status on empty stack")
-	local v2 = p1.nodeStack[#p1.nodeStack]
-	v2.status = TestEnum.TestStatus.Failure
-	table.insert(v2.errors, p2)
+function TestSession.setError(self, errorMessage)
+	assert(#self.nodeStack > 0, "Attempting to set error status on empty stack")
+	local currentNode = self.nodeStack[#self.nodeStack]
+	currentNode.status = TestEnum.TestStatus.Failure
+	table.insert(currentNode.errors, errorMessage)
 end
-function t.addDummyError(p1, p2, p3)
-	p1:pushNode({
+function TestSession.addDummyError(self, errorPhrase, errorMessage)
+	self:pushNode({
 		type = TestEnum.NodeType.It,
-		phrase = p2
+		phrase = errorPhrase
 	})
-	p1:setError(p3)
-	p1:popNode()
-	p1.nodeStack[#p1.nodeStack].status = TestEnum.TestStatus.Failure
+	self:setError(errorMessage)
+	self:popNode()
+	self.nodeStack[#self.nodeStack].status = TestEnum.TestStatus.Failure
 end
-function t.setStatusFromChildren(p1)
-	assert(#p1.nodeStack > 0, "Attempting to set status from children on empty stack")
-	local v2 = p1.nodeStack[#p1.nodeStack]
-	local Success = TestEnum.TestStatus.Success
-	local var3 = true
-	for i, v in ipairs(v2.children) do
-		if v.status ~= TestEnum.TestStatus.Skipped then
-			var3 = false
-			if v.status == TestEnum.TestStatus.Failure then
-				Success = TestEnum.TestStatus.Failure
+function TestSession.setStatusFromChildren(self)
+	assert(#self.nodeStack > 0, "Attempting to set status from children on empty stack")
+	local currentNode = self.nodeStack[#self.nodeStack]
+	local nodeStatus = TestEnum.TestStatus.Success
+	local allChildrenSkipped = true
+	for i, child in ipairs(currentNode.children) do
+		if child.status ~= TestEnum.TestStatus.Skipped then
+			allChildrenSkipped = false
+			if child.status == TestEnum.TestStatus.Failure then
+				nodeStatus = TestEnum.TestStatus.Failure
 			end
 		end
 	end
-	if var3 then
-		Success = TestEnum.TestStatus.Skipped
+	if allChildrenSkipped then
+		nodeStatus = TestEnum.TestStatus.Skipped
 	end
-	v2.status = Success
+	currentNode.status = nodeStatus
 end
-return t
+return TestSession

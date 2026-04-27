@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CurrentCamera = workspace.CurrentCamera
@@ -12,66 +10,66 @@ local DestructibleConsts = require(script.Parent.DestructibleConsts)
 local spawnFolder = Instance.new("Folder")
 spawnFolder.Parent = workspace
 local rateLimiter = RateLimiter.new(50)
-local t = {}
-t.__index = t
-function t.new(p1)
+local DestructibleSpawn = {}
+DestructibleSpawn.__index = DestructibleSpawn
+function DestructibleSpawn.new(destructibleObj)
 	local instance = {}
-	setmetatable(instance, t)
-	instance._obj = p1
-	instance._objName = p1.Name
+	setmetatable(instance, DestructibleSpawn)
+	instance._obj = destructibleObj
+	instance._objName = destructibleObj.Name
 	instance._maid = Maid.new()
-	instance:_setup(p1, instance._maid)
+	instance:_setup(destructibleObj, instance._maid)
 	return instance
 end
-function t.GetOnHitSignal(p1)
-	if not p1._onHitSignal then
-		p1._onHitSignal = Signal.new()
-		p1._maid:GiveTask(p1._onHitSignal)
+function DestructibleSpawn.GetOnHitSignal(self)
+	if not self._onHitSignal then
+		self._onHitSignal = Signal.new()
+		self._maid:GiveTask(self._onHitSignal)
 	end
-	return p1._onHitSignal
+	return self._onHitSignal
 end
-function t.GetInst(p1)
-	return p1._instValue.Value
+function DestructibleSpawn.GetInst(self)
+	return self._instValue.Value
 end
-function t.GetPrefab(p1)
-	return ReplicatedStorage:FindFirstChild(DestructibleConsts.PREFAB_FOLDER_NAME):FindFirstChild(p1._objName)
+function DestructibleSpawn.GetPrefab(self)
+	return ReplicatedStorage:FindFirstChild(DestructibleConsts.PREFAB_FOLDER_NAME):FindFirstChild(self._objName)
 end
-function t._setup(p1, p2, p3)
-	local instValueObj = p2:FindFirstChild(DestructibleConsts.INSTANCE_VALUE_NAME)
+function DestructibleSpawn._setup(self, parent, maid)
+	local instValueObj = parent:FindFirstChild(DestructibleConsts.INSTANCE_VALUE_NAME)
 	if not instValueObj then
 		local newValueObj = Instance.new("ObjectValue")
 		newValueObj.Name = DestructibleConsts.INSTANCE_VALUE_NAME
 		newValueObj.Value = nil
-		newValueObj.Parent = p2
+		newValueObj.Parent = parent
 		instValueObj = newValueObj
 	end
-	p1._instValue = instValueObj
-	p1._wasTouched = false
-	p3:GiveTask(RxInstanceUtils.observeOneChildNamed(p2, DestructibleConsts.BROADCAST_COLLIDE_REMOTE_NAME, function(p12, p2)
-		p1._broadcastCollideRemote = p12
-		p2:GiveTask(p12.OnClientEvent:Connect(function(p12)
-			if not p1._wasTouched then
-				p1:_handleHitPosition(p12)
+	self._instValue = instValueObj
+	self._wasTouched = false
+	maid:GiveTask(RxInstanceUtils.observeOneChildNamed(parent, DestructibleConsts.BROADCAST_COLLIDE_REMOTE_NAME, function(remote, maidForRemote)
+		self._broadcastCollideRemote = remote
+		maidForRemote:GiveTask(remote.OnClientEvent:Connect(function(hitPosition)
+			if not self._wasTouched then
+				self:_handleHitPosition(hitPosition)
 			end
 		end))
 	end))
-	p3:GiveTask(instValueObj.Changed:Connect(function()
-		p1:_handleInst()
+	maid:GiveTask(instValueObj.Changed:Connect(function()
+		self:_handleInst()
 	end))
-	p1:_handleInst()
+	self:_handleInst()
 end
-function t._handleHitPosition(p1, p2)
-	local _instValue = p1._instValue
-	p1._wasTouched = true
+function DestructibleSpawn._handleHitPosition(self, hitPosition)
+	local _instValue = self._instValue
+	self._wasTouched = true
 	local instValue = _instValue.Value
 	if instValue then
-		if p1._onHitSignal then
-			p1._onHitSignal:Fire()
+		if self._onHitSignal then
+			self._onHitSignal:Fire()
 		end
 		local PrimaryPart = instValue.PrimaryPart
 		PrimaryPart.Anchored = false
-		local impulseMidpoint = (p2 + PrimaryPart.Position) * 0.5
-		local Unit = (PrimaryPart.Position - p2).Unit
+		local impulseMidpoint = (hitPosition + PrimaryPart.Position) * 0.5
+		local Unit = (PrimaryPart.Position - hitPosition).Unit
 		PrimaryPart:ApplyImpulseAtPosition(Unit * PrimaryPart.AssemblyMass * 30, impulseMidpoint)
 		local CrashParticles = Instance.new("Part")
 		CrashParticles.Name = "CrashParticles"
@@ -96,11 +94,11 @@ function t._handleHitPosition(p1, p2)
 		instValue:Destroy()
 	end
 end
-function t._handleInst(p1)
+function DestructibleSpawn._handleInst(self)
 	debug.profilebegin("DestructibleSpawn.handleInst")
-	local _instValue = p1._instValue
-	local _obj = p1._obj
-	local _maid = p1._maid
+	local _instValue = self._instValue
+	local _obj = self._obj
+	local _maid = self._maid
 	local loadedInst = _instValue.Value
 	if rateLimiter:CanUseBudget(1) then
 		local Magnitude = (CurrentCamera.CFrame.p - _obj.Value.p).Magnitude
@@ -114,25 +112,25 @@ function t._handleInst(p1)
 			local instMaid = Maid.new()
 			_maid._instMaid = instMaid
 			instMaid:GiveTask(function()
-				p1._wasTouched = false
+				self._wasTouched = false
 			end)
 			local clonedPrefab = ReplicatedStorage:FindFirstChild(DestructibleConsts.PREFAB_FOLDER_NAME):FindFirstChild(_obj.Name):Clone()
 			clonedPrefab:SetPrimaryPartCFrame(_obj.Value)
 			clonedPrefab.Parent = spawnFolder
 			_instValue.Value = clonedPrefab
-			instMaid:GiveTask(clonedPrefab.PrimaryPart.Touched:Connect(function(p12)
-				if p12:IsDescendantOf(spawnFolder) then
-				elseif p12:IsDescendantOf(workspace:FindFirstChild("Vehicles")) then
-					if not p1._wasTouched then
-						p1._wasTouched = true
-						local Position = p12.Position
-						p1._broadcastCollideRemote:FireServer(Position)
-						p1:_handleHitPosition(Position)
+			instMaid:GiveTask(clonedPrefab.PrimaryPart.Touched:Connect(function(touchedPart)
+				if touchedPart:IsDescendantOf(spawnFolder) then
+				elseif touchedPart:IsDescendantOf(workspace:FindFirstChild("Vehicles")) then
+					if not self._wasTouched then
+						self._wasTouched = true
+						local Position = touchedPart.Position
+						self._broadcastCollideRemote:FireServer(Position)
+						self:_handleHitPosition(Position)
 					end
 				end
 			end))
-			instMaid:GiveTask(clonedPrefab.AncestryChanged:Connect(function(p1, p2)
-				if not p2 then
+			instMaid:GiveTask(clonedPrefab.AncestryChanged:Connect(function(child, parent)
+				if not parent then
 					_instValue.Value = nil
 				end
 			end))
@@ -140,11 +138,11 @@ function t._handleInst(p1)
 		debug.profileend()
 	end
 end
-t.Update = t._handleInst
-function t.Destroy(p1)
-	local _maid = p1._maid
-	p1._maid = nil
+DestructibleSpawn.Update = DestructibleSpawn._handleInst
+function DestructibleSpawn.Destroy(self)
+	local _maid = self._maid
+	self._maid = nil
 	_maid:Destroy()
-	setmetatable(p1, nil)
+	setmetatable(self, nil)
 end
-return t
+return DestructibleSpawn

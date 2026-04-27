@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EnumRarity = require(ReplicatedStorage.RewardSpinner.EnumRarity)
 local PlayerDataConsts = require(ReplicatedStorage.PlayerData.PlayerDataConsts)

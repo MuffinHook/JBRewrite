@@ -1,17 +1,16 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Rodux = require(ReplicatedStorage.Rodux)
 local SaleConsts = require(ReplicatedStorage.Sale.SaleConsts)
 return Rodux.createReducer(SaleConsts.CATEGORY_NAME, {
-	setCategory = function(p1, p2)
-		assert(p2.categoryName ~= nil, "missing category Name")
-		return p2.categoryName
+	setCategory = function(state, action)
+		assert(action.categoryName ~= nil, "missing category Name")
+		return action.categoryName
 	end,
-	setPage = function(p1, p2)
-		if p2.categoryName then
-			return p2.categoryName
+	setPage = function(state, action)
+		if action.categoryName then
+			return action.categoryName
 		else
-			return p1
+			return state
 		end
 	end
 })

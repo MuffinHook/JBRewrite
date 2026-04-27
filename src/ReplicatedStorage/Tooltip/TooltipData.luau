@@ -1,4 +1,3 @@
--- Reviewed by Claude
 return {
 	"Visit the Glider shop for a free Glider!",
 	"Everyday you earn free rocket fuel.",

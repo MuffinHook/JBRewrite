@@ -1,13 +1,12 @@
--- Reviewed by Claude
 local BoxCar = require(script.Parent.BoxCar)
 return {
-	MakeCar = function(p1)
-		return BoxCar.MakeCar(p1)
+	MakeCar = function(player)
+		return BoxCar.MakeCar(player)
 	end,
-	MoveCar = function(p1, p2, p3, p4)
-		return BoxCar.MoveCar(p1, p2, p3, p4)
+	MoveCar = function(player, p2, p3, p4)
+		return BoxCar.MoveCar(player, p2, p3, p4)
 	end,
-	DestroyCar = function(p1)
-		return BoxCar.DestroyCar(p1)
+	DestroyCar = function(player)
+		return BoxCar.DestroyCar(player)
 	end
 }

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 return {
 	NumPoints = 30,
 	data = {

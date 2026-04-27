@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Lighting = game:GetService("Lighting")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 game:GetService("UserInputService")

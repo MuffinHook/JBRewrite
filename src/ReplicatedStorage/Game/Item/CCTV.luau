@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BountyBoardService = require(ReplicatedStorage.Bounty.BountyBoardService)
@@ -24,8 +22,8 @@ local CCTVClass = {
 }
 CCTVClass.__index = CCTVClass
 setmetatable(CCTVClass, Basic)
-function CCTVClass.new(p1, p2, p3)
-	local instance = Basic.new(p1, p2, motionConfig, p3)
+function CCTVClass.new(player, tool, config)
+	local instance = Basic.new(player, tool, motionConfig, config)
 	setmetatable(instance, CCTVClass)
 	instance:DefaultDisableCamLock()
 	if instance.Local then
@@ -101,8 +99,8 @@ end
 function CCTVClass.GetLeftArmPosition(self)
 	return nil
 end
-function CCTVClass.InputBegan(self, p2, p3)
-	Basic.InputBegan(self, p2, p3)
+function CCTVClass.InputBegan(self, inputObject, inputState)
+	Basic.InputBegan(self, inputObject, inputState)
 end
 function CCTVClass.InputEnded(self) end
 return CCTVClass

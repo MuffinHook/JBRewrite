@@ -1,28 +1,26 @@
--- Reviewed by Claude
--- variables reassigned
 local TreeClass = {
 	ClassName = "Tree"
 }
 TreeClass.__index = TreeClass
 function TreeClass.new()
-	local v2 = setmetatable({}, TreeClass)
-	v2.Root = true
-	v2.Depth = 1
-	v2.Branches = {}
-	v2.Leaf = nil
-	return v2
+	local treeNode = setmetatable({}, TreeClass)
+	treeNode.Root = true
+	treeNode.Depth = 1
+	treeNode.Branches = {}
+	treeNode.Leaf = nil
+	return treeNode
 end
-function TreeClass.AddBranch(p1, p2)
-	assert(p2.ClassName == TreeClass.ClassName)
-	assert(p2.Root)
-	p2.Root = false
-	p2.Depth = p1.Depth + 1
-	table.insert(p1.Branches, p2)
+function TreeClass.AddBranch(parentNode, childNode)
+	assert(childNode.ClassName == TreeClass.ClassName)
+	assert(childNode.Root)
+	childNode.Root = false
+	childNode.Depth = parentNode.Depth + 1
+	table.insert(parentNode.Branches, childNode)
 end
-function TreeClass.Complete(p1)
-	p1.State = 4
-	for i = 1, #p1.Branches do
-		p1.Branches[i].State = 2
+function TreeClass.Complete(node)
+	node.State = 4
+	for i = 1, #node.Branches do
+		node.Branches[i].State = 2
 	end
 end
 local tutorialTree = {
@@ -83,78 +81,78 @@ tutorialTree.GetCar:AddBranch(tutorialTree.GetCarDone)
 tutorialTree.GetCar:AddBranch(tutorialTree.BankRobbery)
 tutorialTree.BankRobbery:AddBranch(tutorialTree.BankRobberyDone)
 tutorialTree.GetCar:AddBranch(tutorialTree.CustomizeCar)
-local function CompleteTree(p1)
-	p1.State = 4
-	for i = 1, #p1.Branches do
-		p1.Branches[i].State = 2
+local function CompleteTree(node)
+	node.State = 4
+	for i = 1, #node.Branches do
+		node.Branches[i].State = 2
 	end
 end
-local function findNextActiveNode(p1)
-	assert(p1.State == 4 or p1.State == 2)
-	if p1.State == 2 then
-		return p1
+local function findNextActiveNode(node)
+	assert(node.State == 4 or node.State == 2)
+	if node.State == 2 then
+		return node
 	else
-		if p1.State == 4 then
-			for i = 1, #p1.Branches do
-				local v2 = p1.Branches[i]
-				if v2.State == 2 and v2.Leaf.OneShot then
-					return v2
+		if node.State == 4 then
+			for i = 1, #node.Branches do
+				local branchNode = node.Branches[i]
+				if branchNode.State == 2 and branchNode.Leaf.OneShot then
+					return branchNode
 				end
 			end
 		end
-		local v3 = 0
-		local v4 = nil
-		for j = 1, #p1.Branches do
-			local v5 = p1.Branches[j]
-			if v5.State == 4 or v5.State == 2 then
-				local v6 = findNextActiveNode(v5)
-				if v6 then
-					local Depth = v6.Depth
-					if v3 < Depth then
-						v3 = Depth
-						v4 = v6
+		local maxDepth = 0
+		local deepestNode = nil
+		for j = 1, #node.Branches do
+			local branchNode = node.Branches[j]
+			if branchNode.State == 4 or branchNode.State == 2 then
+				local foundNode = findNextActiveNode(branchNode)
+				if foundNode then
+					local Depth = foundNode.Depth
+					if maxDepth < Depth then
+						maxDepth = Depth
+						deepestNode = foundNode
 					end
 				end
 			end
 		end
-		return v4
+		return deepestNode
 	end
 end
-local v2 = nil
-local t3 = {}
+local screenGui = nil
+local messageQueue = {}
 local isQueueProcessing = false
-local function ProcessMessage(p1)
-	v2.Message.Inner.Title.Text = p1.Title
-	v2.Message.Inner.Body.Text = p1.Body
+local function ProcessMessage(messageData)
+	screenGui.Message.Inner.Title.Text = messageData.Title
+	screenGui.Message.Inner.Body.Text = messageData.Body
 end
 local function ProcessQueue()
 	isQueueProcessing = true
-	if v2.Icon.Visible then
-		v2.Icon:TweenPosition(UDim2.new(1, 0, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function()
-			v2.Icon.Visible = false
+	if screenGui.Icon.Visible then
+		screenGui.Icon:TweenPosition(UDim2.new(1, 0, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function()
+			screenGui.Icon.Visible = false
 		end)
 		wait(0.5)
 	else
-		v2.Icon.Position = UDim2.new(1, 0, 1, -266)
+		screenGui.Icon.Position = UDim2.new(1, 0, 1, -266)
 	end
-	v2.Message.Visible = true
-	v2.Message:TweenPosition(UDim2.new(1, -200, 1, -300), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
-	while #t3 > 0 do
-		local v1 = table.remove(t3, 1)
-		v2.Message.Inner.Title.Text = v1.Title
-		v2.Message.Inner.Body.Text = v1.Body
-		wait(v1.Duration)
+	screenGui.Message.Visible = true
+	screenGui.Message:TweenPosition(UDim2.new(1, -200, 1, -300), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
+	while #messageQueue > 0 do
+		local messageData = table.remove(messageQueue, 1)
+		screenGui.Message.Inner.Title.Text = messageData.Title
+		screenGui.Message.Inner.Body.Text = messageData.Body
+		wait(messageData.Duration)
 	end
-	v2.Message:TweenPosition(UDim2.new(1, 0, 1, -300), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function()
-		v2.Message.Visible = false
+	screenGui.Message:TweenPosition(UDim2.new(1, 0, 1, -300), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function()
+		screenGui.Message.Visible = false
 	end)
 	wait(0.5)
-	v2.Icon.Visible = true
-	v2.Icon:TweenPosition(UDim2.new(1, -40, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
+	screenGui.Icon.Visible = true
+	screenGui.Icon:TweenPosition(UDim2.new(1, -40, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
 	isQueueProcessing = false
 end
-local function ShowMessage(p1)
-	table.insert(t3, p1)
+local function ShowMessage(messageData)
+	table.insert(messageQueue, messageData)
 	if not isQueueProcessing then
 		isQueueProcessing = true
 		spawn(ProcessQueue)
@@ -162,78 +160,78 @@ local function ShowMessage(p1)
 end
 local function ShowNextMessage()
 	local Leaf = findNextActiveNode(tutorialTree.Welcome).Leaf
-	table.insert(t3, Leaf)
+	table.insert(messageQueue, Leaf)
 	if not isQueueProcessing then
 		isQueueProcessing = true
 		spawn(ProcessQueue)
 	end
 end
-local function Complete(p1)
-	p1:Complete()
+local function Complete(node)
+	node:Complete()
 	local Leaf = findNextActiveNode(tutorialTree.Welcome).Leaf
-	table.insert(t3, Leaf)
+	table.insert(messageQueue, Leaf)
 	if not isQueueProcessing then
 		isQueueProcessing = true
 		spawn(ProcessQueue)
 	end
 end
 return {
-	Init = function(p1)
-		local _ = p1.Event
-		v2 = p1.GetScreenGui("Tutorial")
-		table.insert(t3, tutorialTree.Welcome.Leaf)
+	Init = function(config)
+		local _ = config.Event
+		screenGui = config.GetScreenGui("Tutorial")
+		table.insert(messageQueue, tutorialTree.Welcome.Leaf)
 		if not isQueueProcessing then
 			isQueueProcessing = true
 			spawn(ProcessQueue)
 		end
 		tutorialTree.Welcome:Complete()
 		local Leaf_2 = findNextActiveNode(tutorialTree.Welcome).Leaf
-		table.insert(t3, Leaf_2)
+		table.insert(messageQueue, Leaf_2)
 		if not isQueueProcessing then
 			isQueueProcessing = true
 			spawn(ProcessQueue)
 		end
-		local v32 = tick()
-		local function IconInputBegan(p1)
-			if p1.UserInputType == Enum.UserInputType.MouseButton1 then
-				local v12 = tick()
-				if v12 - v32 < 0.5 then
+		local lastClickTime = tick()
+		local function IconInputBegan(inputEvent)
+			if inputEvent.UserInputType == Enum.UserInputType.MouseButton1 then
+				local currentTime = tick()
+				if currentTime - lastClickTime < 0.5 then
 					return false
 				end
-				v32 = v12
+				lastClickTime = currentTime
 				local Leaf = findNextActiveNode(tutorialTree.Welcome).Leaf
-				table.insert(t3, Leaf)
+				table.insert(messageQueue, Leaf)
 				if not isQueueProcessing then
 					isQueueProcessing = true
 					spawn(ProcessQueue)
 				end
 			end
 		end
-		local function IconMouseEnter(p1)
-			local v12 = tick()
-			if v12 - v32 < 0.5 then
+		local function IconMouseEnter(inputEvent)
+			local currentTime = tick()
+			if currentTime - lastClickTime < 0.5 then
 				return false
 			end
-			v32 = v12
+			lastClickTime = currentTime
 			local Leaf = findNextActiveNode(tutorialTree.Welcome).Leaf
-			table.insert(t3, Leaf)
+			table.insert(messageQueue, Leaf)
 			if not isQueueProcessing then
 				isQueueProcessing = true
 				spawn(ProcessQueue)
 			end
 		end
-		v2.Icon.InputBegan:Connect(IconInputBegan)
-		v2.Icon.MouseEnter:Connect(IconMouseEnter)
-		function p1.em.nvyrkw5r(p1, p2)
-			for v12, v2 in next, p1 do
-				local v32 = tutorialTree[v12]
-				if v32 and v32.State ~= 4 then
-					if p2 then
+		screenGui.Icon.InputBegan:Connect(IconInputBegan)
+		screenGui.Icon.MouseEnter:Connect(IconMouseEnter)
+		function config.em.nvyrkw5r(stateTable, shouldSkip)
+			for stateName, v2 in next, stateTable do
+				local tutorialNode = tutorialTree[stateName]
+				if tutorialNode and tutorialNode.State ~= 4 then
+					if shouldSkip then
 						TreeClass:Complete()
 					else
 						TreeClass:Complete()
 						local Leaf = findNextActiveNode(tutorialTree.Welcome).Leaf
-						table.insert(t3, Leaf)
+						table.insert(messageQueue, Leaf)
 						if not isQueueProcessing then
 							isQueueProcessing = true
 							spawn(ProcessQueue)

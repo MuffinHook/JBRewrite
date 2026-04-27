@@ -1,12 +1,11 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-return function(p1)
-	local v1 = Roact.Component:extend("App")
+return function(rootParent)
+	local AppComponent = Roact.Component:extend("App")
 	local TradeCard = require(script.Parent.TradeCard)
-	function v1.init(p1)  end
-	function v1.render(p1)
+	function AppComponent.init(self)  end
+	function AppComponent.render(self)
 		return Roact.createElement("Frame", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0)
@@ -41,9 +40,9 @@ return function(p1)
 			})
 		})
 	end
-	function v1.willUnmount(p1)  end
-	local v2 = Roact.mount(Roact.createElement(v1), p1)
+	function AppComponent.willUnmount(self)  end
+	local mountedInstance = Roact.mount(Roact.createElement(AppComponent), rootParent)
 	return function()
-		Roact.unmount(v2)
+		Roact.unmount(mountedInstance)
 	end
 end

@@ -1,279 +1,278 @@
--- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2)
-	local instance = false
-	local v2 = nil
-	local t = {}
-	local function EmptyMenuStack(p12)
-		for i = #t, p12 and p12 + 1 or 1, -1 do
-			local var3 = t[i]
-			var3.state.isOpened:set(false)
-			var3.Instance.BackgroundColor3 = p1._config.HeaderColor
-			var3.Instance.BackgroundTransparency = 1
-			table.remove(t, i)
+return function(irisConfig, irisUtils)
+	local isMenuOpen = false
+	local currentOpenedMenu = nil
+	local menuStack = {}
+	local function EmptyMenuStack(clearIndex)
+		for i = #menuStack, clearIndex and clearIndex + 1 or 1, -1 do
+			local menuItem = menuStack[i]
+			menuItem.state.isOpened:set(false)
+			menuItem.Instance.BackgroundColor3 = irisConfig._config.HeaderColor
+			menuItem.Instance.BackgroundTransparency = 1
+			table.remove(menuStack, i)
 		end
-		if #t == 0 then
-			instance = false
-			v2 = nil
+		if #menuStack == 0 then
+			isMenuOpen = false
+			currentOpenedMenu = nil
 		end
 	end
-	local function UpdateChildContainerTransform(p12)
-		local isType = p12.parentWidget.type == "Menu"
-		local instance = p12.Instance
-		local ChildContainer = p12.ChildContainer
+	local function UpdateChildContainerTransform(menuWidget)
+		local isType = menuWidget.parentWidget.type == "Menu"
+		local instance = menuWidget.Instance
+		local ChildContainer = menuWidget.ChildContainer
 		ChildContainer.Size = UDim2.fromOffset(instance.AbsoluteSize.X, 0)
 		if ChildContainer.Parent ~= nil then
-			local v2 = instance.AbsolutePosition - p2.GuiOffset
+			local menuPosition = instance.AbsolutePosition - irisUtils.GuiOffset
 			local AbsoluteSize = instance.AbsoluteSize
 			local AbsoluteSize_2 = ChildContainer.AbsoluteSize
-			local PopupBorderSize = p1._config.PopupBorderSize
+			local PopupBorderSize = irisConfig._config.PopupBorderSize
 			local AbsoluteSize_3 = ChildContainer.Parent.AbsoluteSize
-			local X = v2.X
+			local X = menuPosition.X
 			local zero = Vector2.zero
-			if isType and v2.X + AbsoluteSize_2.X > AbsoluteSize_3.X then
+			if isType and menuPosition.X + AbsoluteSize_2.X > AbsoluteSize_3.X then
 				zero = Vector2.xAxis
 			elseif isType then
-				X = v2.X + AbsoluteSize.X
+				X = menuPosition.X + AbsoluteSize.X
 			end
-			local var3
-			if v2.Y + AbsoluteSize_2.Y > AbsoluteSize_3.Y then
+			local offsetY
+			if menuPosition.Y + AbsoluteSize_2.Y > AbsoluteSize_3.Y then
 				zero = zero + Vector2.yAxis
-				var3 = v2.Y - PopupBorderSize + (isType and AbsoluteSize.Y or 0)
+				offsetY = menuPosition.Y - PopupBorderSize + (isType and AbsoluteSize.Y or 0)
 			else
-				var3 = v2.Y + PopupBorderSize + if isType then 0 else AbsoluteSize.Y
+				offsetY = menuPosition.Y + PopupBorderSize + if isType then 0 else AbsoluteSize.Y
 			end
-			ChildContainer.Position = UDim2.fromOffset(X, var3)
+			ChildContainer.Position = UDim2.fromOffset(X, offsetY)
 			ChildContainer.AnchorPoint = zero
 		end
 	end
-	p2.registerEvent("InputBegan", function(p12)
-		if p1._started and ((p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.MouseButton2) and (instance ~= false and v2 ~= nil)) then
-			local var12 = p2.getMouseLocation()
-			local var22 = false
-			for var3, var4 in t do
-				for v5, v6 in { var4.ChildContainer, var4.Instance } do
-					local var7 = v6.AbsolutePosition - p2.GuiOffset
-					if p2.isPosInsideRect(var12, var7, var7 + v6.AbsoluteSize) then
-						var22 = true
+	irisUtils.registerEvent("InputBegan", function(inputData)
+		if irisConfig._started and ((inputData.UserInputType == Enum.UserInputType.MouseButton1 or inputData.UserInputType == Enum.UserInputType.MouseButton2) and (isMenuOpen ~= false and currentOpenedMenu ~= nil)) then
+			local mouseLocation = irisUtils.getMouseLocation()
+			local isMouseInside = false
+			for stackIndex, menuItem in menuStack do
+				for elementIndex, element in { menuItem.ChildContainer, menuItem.Instance } do
+					local elementPosition = element.AbsolutePosition - irisUtils.GuiOffset
+					if irisUtils.isPosInsideRect(mouseLocation, elementPosition, elementPosition + element.AbsoluteSize) then
+						isMouseInside = true
 						break
 					end
 				end
-				if var22 then
+				if isMouseInside then
 					break
 				end
 			end
-			if not var22 then
+			if not isMouseInside then
 				EmptyMenuStack()
 			end
 		end
 	end)
-	p1.WidgetConstructor("MenuBar", {
+	irisConfig.WidgetConstructor("MenuBar", {
 		hasState = false,
 		hasChildren = true,
 		Args = {},
 		Events = {},
-		Generate = function(p12)
+		Generate = function(menuWidget)
 			local Iris_MenuBar = Instance.new("Frame")
 			Iris_MenuBar.Name = "Iris_MenuBar"
 			Iris_MenuBar.AutomaticSize = Enum.AutomaticSize.Y
 			Iris_MenuBar.Size = UDim2.fromScale(1, 0)
-			Iris_MenuBar.BackgroundColor3 = p1._config.MenubarBgColor
-			Iris_MenuBar.BackgroundTransparency = p1._config.MenubarBgTransparency
+			Iris_MenuBar.BackgroundColor3 = irisConfig._config.MenubarBgColor
+			Iris_MenuBar.BackgroundTransparency = irisConfig._config.MenubarBgTransparency
 			Iris_MenuBar.BorderSizePixel = 0
 			Iris_MenuBar.ClipsDescendants = true
-			p2.UIPadding(Iris_MenuBar, Vector2.new(p1._config.WindowPadding.X, 1))
-			p2.UIListLayout(Iris_MenuBar, Enum.FillDirection.Horizontal, UDim.new()).VerticalAlignment = Enum.VerticalAlignment.Center
-			p2.applyFrameStyle(Iris_MenuBar, true, true)
+			irisUtils.UIPadding(Iris_MenuBar, Vector2.new(irisConfig._config.WindowPadding.X, 1))
+			irisUtils.UIListLayout(Iris_MenuBar, Enum.FillDirection.Horizontal, UDim.new()).VerticalAlignment = Enum.VerticalAlignment.Center
+			irisUtils.applyFrameStyle(Iris_MenuBar, true, true)
 			return Iris_MenuBar
 		end,
-		Update = function(p1) end,
-		ChildAdded = function(p1, p2)
-			return p1.Instance
+		Update = function(irisConfig) end,
+		ChildAdded = function(irisConfig, irisUtils)
+			return irisConfig.Instance
 		end,
-		Discard = function(p1)
-			p1.Instance:Destroy()
+		Discard = function(irisConfig)
+			irisConfig.Instance:Destroy()
 		end
 	})
-	p1.WidgetConstructor("Menu", {
+	irisConfig.WidgetConstructor("Menu", {
 		hasState = true,
 		hasChildren = true,
 		Args = {
 			Text = 1
 		},
 		Events = {
-			clicked = p2.EVENTS.click(function(p1)
-				return p1.Instance
+			clicked = irisUtils.EVENTS.click(function(irisConfig)
+				return irisConfig.Instance
 			end),
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance
+			hovered = irisUtils.EVENTS.hover(function(irisConfig)
+				return irisConfig.Instance
 			end),
 			opened = {
-				Init = function(p1) end,
-				Get = function(p12)
-					return p12.lastOpenedTick == p1._cycleTick
+				Init = function(irisConfig) end,
+				Get = function(menuWidget)
+					return menuWidget.lastOpenedTick == irisConfig._cycleTick
 				end
 			},
 			closed = {
-				Init = function(p1) end,
-				Get = function(p12)
-					return p12.lastClosedTick == p1._cycleTick
+				Init = function(irisConfig) end,
+				Get = function(menuWidget)
+					return menuWidget.lastClosedTick == irisConfig._cycleTick
 				end
 			}
 		},
-		Generate = function(p12)
-			p12.ButtonColors = {
-				Color = p1._config.HeaderColor,
+		Generate = function(menuWidget)
+			menuWidget.ButtonColors = {
+				Color = irisConfig._config.HeaderColor,
 				Transparency = 1,
-				HoveredColor = p1._config.HeaderHoveredColor,
-				HoveredTransparency = p1._config.HeaderHoveredTransparency,
-				ActiveColor = p1._config.HeaderHoveredColor,
-				ActiveTransparency = p1._config.HeaderHoveredTransparency
+				HoveredColor = irisConfig._config.HeaderHoveredColor,
+				HoveredTransparency = irisConfig._config.HeaderHoveredTransparency,
+				ActiveColor = irisConfig._config.HeaderHoveredColor,
+				ActiveTransparency = irisConfig._config.HeaderHoveredTransparency
 			}
-			local var12
-			if p12.parentWidget.type == "Menu" then
+			local menuButtonFrame
+			if menuWidget.parentWidget.type == "Menu" then
 				local Menu = Instance.new("TextButton")
 				Menu.Name = "Menu"
 				Menu.AutomaticSize = Enum.AutomaticSize.Y
 				Menu.Size = UDim2.fromScale(1, 0)
-				Menu.BackgroundColor3 = p1._config.HeaderColor
+				Menu.BackgroundColor3 = irisConfig._config.HeaderColor
 				Menu.BackgroundTransparency = 1
 				Menu.BorderSizePixel = 0
 				Menu.Text = ""
 				Menu.AutoButtonColor = false
-				local var22 = p2.UIPadding(Menu, p1._config.FramePadding)
-				var22.PaddingTop = var22.PaddingTop - UDim.new(0, 1)
-				p2.UIListLayout(Menu, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
+				local menuPadding = irisUtils.UIPadding(Menu, irisConfig._config.FramePadding)
+				menuPadding.PaddingTop = menuPadding.PaddingTop - UDim.new(0, 1)
+				irisUtils.UIListLayout(Menu, Enum.FillDirection.Horizontal, UDim.new(0, irisConfig._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
 				local TextLabel = Instance.new("TextLabel")
 				TextLabel.Name = "TextLabel"
 				TextLabel.AutomaticSize = Enum.AutomaticSize.XY
 				TextLabel.BackgroundTransparency = 1
 				TextLabel.BorderSizePixel = 0
-				p2.applyTextStyle(TextLabel)
+				irisUtils.applyTextStyle(TextLabel)
 				TextLabel.Parent = Menu
-				local var3 = p1._config.TextSize + 2 * p1._config.FramePadding.Y
-				local var4 = var3 - math.round(0.2 * var3) * 2
+				local baseSize = irisConfig._config.TextSize + 2 * irisConfig._config.FramePadding.Y
+				local iconSize = baseSize - math.round(0.2 * baseSize) * 2
 				local Icon = Instance.new("ImageLabel")
 				Icon.Name = "Icon"
-				Icon.Size = UDim2.fromOffset(var4, var4)
+				Icon.Size = UDim2.fromOffset(iconSize, iconSize)
 				Icon.BackgroundTransparency = 1
 				Icon.BorderSizePixel = 0
-				Icon.ImageColor3 = p1._config.TextColor
-				Icon.ImageTransparency = p1._config.TextTransparency
-				Icon.Image = p2.ICONS.RIGHT_POINTING_TRIANGLE
+				Icon.ImageColor3 = irisConfig._config.TextColor
+				Icon.ImageTransparency = irisConfig._config.TextTransparency
+				Icon.Image = irisUtils.ICONS.RIGHT_POINTING_TRIANGLE
 				Icon.LayoutOrder = 1
 				Icon.Parent = Menu
-				var12 = Menu
+				menuButtonFrame = Menu
 			else
 				local Menu = Instance.new("TextButton")
 				Menu.Name = "Menu"
 				Menu.AutomaticSize = Enum.AutomaticSize.XY
 				Menu.Size = UDim2.fromScale(0, 0)
-				Menu.BackgroundColor3 = p1._config.HeaderColor
+				Menu.BackgroundColor3 = irisConfig._config.HeaderColor
 				Menu.BackgroundTransparency = 1
 				Menu.BorderSizePixel = 0
 				Menu.Text = ""
 				Menu.AutoButtonColor = false
 				Menu.ClipsDescendants = true
-				p2.applyTextStyle(Menu)
-				p2.UIPadding(Menu, Vector2.new(p1._config.ItemSpacing.X, p1._config.FramePadding.Y))
-				var12 = Menu
+				irisUtils.applyTextStyle(Menu)
+				irisUtils.UIPadding(Menu, Vector2.new(irisConfig._config.ItemSpacing.X, irisConfig._config.FramePadding.Y))
+				menuButtonFrame = Menu
 			end
-			p2.applyInteractionHighlights("Background", var12, var12, p12.ButtonColors)
-			p2.applyButtonClick(var12, function()
-				local var12 = if #t <= 1 then not p12.state.isOpened.value else true
-				p12.state.isOpened:set(var12)
-				instance = var12
-				v2 = var12 and p12 or nil
-				if #t <= 1 then
-					if var12 then
-						table.insert(t, p12)
+			irisUtils.applyInteractionHighlights("Background", menuButtonFrame, menuButtonFrame, menuWidget.ButtonColors)
+			irisUtils.applyButtonClick(menuButtonFrame, function()
+				local shouldOpen = if #menuStack <= 1 then not menuWidget.state.isOpened.value else true
+				menuWidget.state.isOpened:set(shouldOpen)
+				isMenuOpen = shouldOpen
+				currentOpenedMenu = shouldOpen and menuWidget or nil
+				if #menuStack <= 1 then
+					if shouldOpen then
+						table.insert(menuStack, menuWidget)
 						return
 					end
-					table.remove(t)
+					table.remove(menuStack)
 				end
 			end)
-			p2.applyMouseEnter(var12, function()
-				if instance and (v2 and v2 ~= p12) then
-					EmptyMenuStack((table.find(t, p12.parentWidget)))
-					p12.state.isOpened:set(true)
-					v2 = p12
-					instance = true
-					table.insert(t, p12)
+			irisUtils.applyMouseEnter(menuButtonFrame, function()
+				if isMenuOpen and (currentOpenedMenu and currentOpenedMenu ~= menuWidget) then
+					EmptyMenuStack((table.find(menuStack, menuWidget.parentWidget)))
+					menuWidget.state.isOpened:set(true)
+					currentOpenedMenu = menuWidget
+					isMenuOpen = true
+					table.insert(menuStack, menuWidget)
 				end
 			end)
 			local MenuContainer = Instance.new("ScrollingFrame")
 			MenuContainer.Name = "MenuContainer"
 			MenuContainer.AutomaticSize = Enum.AutomaticSize.XY
 			MenuContainer.Size = UDim2.fromOffset(0, 0)
-			MenuContainer.BackgroundColor3 = p1._config.PopupBgColor
-			MenuContainer.BackgroundTransparency = p1._config.PopupBgTransparency
+			MenuContainer.BackgroundColor3 = irisConfig._config.PopupBgColor
+			MenuContainer.BackgroundTransparency = irisConfig._config.PopupBgTransparency
 			MenuContainer.BorderSizePixel = 0
 			MenuContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
-			MenuContainer.ScrollBarImageTransparency = p1._config.ScrollbarGrabTransparency
-			MenuContainer.ScrollBarImageColor3 = p1._config.ScrollbarGrabColor
-			MenuContainer.ScrollBarThickness = p1._config.ScrollbarSize
+			MenuContainer.ScrollBarImageTransparency = irisConfig._config.ScrollbarGrabTransparency
+			MenuContainer.ScrollBarImageColor3 = irisConfig._config.ScrollbarGrabColor
+			MenuContainer.ScrollBarThickness = irisConfig._config.ScrollbarSize
 			MenuContainer.CanvasSize = UDim2.fromScale(0, 0)
 			MenuContainer.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
-			MenuContainer.TopImage = p2.ICONS.BLANK_SQUARE
-			MenuContainer.MidImage = p2.ICONS.BLANK_SQUARE
-			MenuContainer.BottomImage = p2.ICONS.BLANK_SQUARE
+			MenuContainer.TopImage = irisUtils.ICONS.BLANK_SQUARE
+			MenuContainer.MidImage = irisUtils.ICONS.BLANK_SQUARE
+			MenuContainer.BottomImage = irisUtils.ICONS.BLANK_SQUARE
 			MenuContainer.ZIndex = 6
 			MenuContainer.LayoutOrder = 6
 			MenuContainer.ClipsDescendants = true
-			p2.UIStroke(MenuContainer, p1._config.WindowBorderSize, p1._config.BorderColor, p1._config.BorderTransparency)
-			p2.UIPadding(MenuContainer, Vector2.new(2, p1._config.WindowPadding.Y - p1._config.ItemSpacing.Y))
-			p2.UIListLayout(MenuContainer, Enum.FillDirection.Vertical, UDim.new(0, 1)).VerticalAlignment = Enum.VerticalAlignment.Top
-			MenuContainer.Parent = p1._rootInstance and p1._rootInstance:FindFirstChild("PopupScreenGui")
-			p12.ChildContainer = MenuContainer
-			return var12
+			irisUtils.UIStroke(MenuContainer, irisConfig._config.WindowBorderSize, irisConfig._config.BorderColor, irisConfig._config.BorderTransparency)
+			irisUtils.UIPadding(MenuContainer, Vector2.new(2, irisConfig._config.WindowPadding.Y - irisConfig._config.ItemSpacing.Y))
+			irisUtils.UIListLayout(MenuContainer, Enum.FillDirection.Vertical, UDim.new(0, 1)).VerticalAlignment = Enum.VerticalAlignment.Top
+			MenuContainer.Parent = irisConfig._rootInstance and irisConfig._rootInstance:FindFirstChild("PopupScreenGui")
+			menuWidget.ChildContainer = MenuContainer
+			return menuButtonFrame
 		end,
-		Update = function(p1)
-			local instance = p1.Instance;
-			(if p1.parentWidget.type == "Menu" then instance.TextLabel else instance).Text = p1.arguments.Text or "Menu"
+		Update = function(irisConfig)
+			local instance = irisConfig.Instance;
+			(if irisConfig.parentWidget.type == "Menu" then instance.TextLabel else instance).Text = irisConfig.arguments.Text or "Menu"
 		end,
-		ChildAdded = function(p1, p2)
-			UpdateChildContainerTransform(p1)
-			return p1.ChildContainer
+		ChildAdded = function(irisConfig, irisUtils)
+			UpdateChildContainerTransform(irisConfig)
+			return irisConfig.ChildContainer
 		end,
-		ChildDiscarded = function(p1, p2)
-			UpdateChildContainerTransform(p1)
+		ChildDiscarded = function(irisConfig, irisUtils)
+			UpdateChildContainerTransform(irisConfig)
 		end,
-		GenerateState = function(p12)
-			if p12.state.isOpened == nil then
-				p12.state.isOpened = p1._widgetState(p12, "isOpened", false)
+		GenerateState = function(menuWidget)
+			if menuWidget.state.isOpened == nil then
+				menuWidget.state.isOpened = irisConfig._widgetState(menuWidget, "isOpened", false)
 			end
 		end,
-		UpdateState = function(p12)
-			local ChildContainer = p12.ChildContainer
-			if p12.state.isOpened.value then
-				p12.lastOpenedTick = p1._cycleTick + 1
-				p12.ButtonColors.Transparency = p1._config.HeaderTransparency
+		UpdateState = function(menuWidget)
+			local ChildContainer = menuWidget.ChildContainer
+			if menuWidget.state.isOpened.value then
+				menuWidget.lastOpenedTick = irisConfig._cycleTick + 1
+				menuWidget.ButtonColors.Transparency = irisConfig._config.HeaderTransparency
 				ChildContainer.Visible = true
-				UpdateChildContainerTransform(p12)
+				UpdateChildContainerTransform(menuWidget)
 			else
-				p12.lastClosedTick = p1._cycleTick + 1
-				p12.ButtonColors.Transparency = 1
+				menuWidget.lastClosedTick = irisConfig._cycleTick + 1
+				menuWidget.ButtonColors.Transparency = 1
 				ChildContainer.Visible = false
 			end
 		end,
-		Discard = function(p1)
-			if instance then
-				local parentWidget = p1.parentWidget
-				local var12 = table.find(t, parentWidget)
-				if var12 then
-					EmptyMenuStack(var12)
-					if #t ~= 0 then
-						v2 = parentWidget
-						instance = true
+		Discard = function(irisConfig)
+			if isMenuOpen then
+				local parentWidget = irisConfig.parentWidget
+				local stackIndex = table.find(menuStack, parentWidget)
+				if stackIndex then
+					EmptyMenuStack(stackIndex)
+					if #menuStack ~= 0 then
+						currentOpenedMenu = parentWidget
+						isMenuOpen = true
 					end
 				end
 			end
-			p1.Instance:Destroy()
-			p1.ChildContainer:Destroy()
-			p2.discardState(p1)
+			irisConfig.Instance:Destroy()
+			irisConfig.ChildContainer:Destroy()
+			irisUtils.discardState(irisConfig)
 		end
 	})
-	p1.WidgetConstructor("MenuItem", {
+	irisConfig.WidgetConstructor("MenuItem", {
 		hasState = false,
 		hasChildren = false,
 		Args = {
@@ -282,14 +281,14 @@ return function(p1, p2)
 			ModifierKey = 3
 		},
 		Events = {
-			clicked = p2.EVENTS.click(function(p1)
-				return p1.Instance
+			clicked = irisUtils.EVENTS.click(function(irisConfig)
+				return irisConfig.Instance
 			end),
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance
+			hovered = irisUtils.EVENTS.hover(function(irisConfig)
+				return irisConfig.Instance
 			end)
 		},
-		Generate = function(p12)
+		Generate = function(menuWidget)
 			local Iris_MenuItem = Instance.new("TextButton")
 			Iris_MenuItem.Name = "Iris_MenuItem"
 			Iris_MenuItem.AutomaticSize = Enum.AutomaticSize.Y
@@ -298,26 +297,26 @@ return function(p1, p2)
 			Iris_MenuItem.BorderSizePixel = 0
 			Iris_MenuItem.Text = ""
 			Iris_MenuItem.AutoButtonColor = false
-			local var12 = p2.UIPadding(Iris_MenuItem, p1._config.FramePadding)
-			var12.PaddingTop = var12.PaddingTop - UDim.new(0, 1)
-			p2.UIListLayout(Iris_MenuItem, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X))
-			p2.applyInteractionHighlights("Background", Iris_MenuItem, Iris_MenuItem, {
-				Color = p1._config.HeaderColor,
+			local menuItemPadding = irisUtils.UIPadding(Iris_MenuItem, irisConfig._config.FramePadding)
+			menuItemPadding.PaddingTop = menuItemPadding.PaddingTop - UDim.new(0, 1)
+			irisUtils.UIListLayout(Iris_MenuItem, Enum.FillDirection.Horizontal, UDim.new(0, irisConfig._config.ItemInnerSpacing.X))
+			irisUtils.applyInteractionHighlights("Background", Iris_MenuItem, Iris_MenuItem, {
+				Color = irisConfig._config.HeaderColor,
 				Transparency = 1,
-				HoveredColor = p1._config.HeaderHoveredColor,
-				HoveredTransparency = p1._config.HeaderHoveredTransparency,
-				ActiveColor = p1._config.HeaderHoveredColor,
-				ActiveTransparency = p1._config.HeaderHoveredTransparency
+				HoveredColor = irisConfig._config.HeaderHoveredColor,
+				HoveredTransparency = irisConfig._config.HeaderHoveredTransparency,
+				ActiveColor = irisConfig._config.HeaderHoveredColor,
+				ActiveTransparency = irisConfig._config.HeaderHoveredTransparency
 			})
-			p2.applyButtonClick(Iris_MenuItem, function()
+			irisUtils.applyButtonClick(Iris_MenuItem, function()
 				EmptyMenuStack()
 			end)
-			p2.applyMouseEnter(Iris_MenuItem, function()
-				local parentWidget = p12.parentWidget
-				if instance and (v2 and v2 ~= parentWidget) then
-					EmptyMenuStack((table.find(t, parentWidget)))
-					v2 = parentWidget
-					instance = true
+			irisUtils.applyMouseEnter(Iris_MenuItem, function()
+				local parentWidget = menuWidget.parentWidget
+				if isMenuOpen and (currentOpenedMenu and currentOpenedMenu ~= parentWidget) then
+					EmptyMenuStack((table.find(menuStack, parentWidget)))
+					currentOpenedMenu = parentWidget
+					isMenuOpen = true
 				end
 			end)
 			local TextLabel = Instance.new("TextLabel")
@@ -325,7 +324,7 @@ return function(p1, p2)
 			TextLabel.AutomaticSize = Enum.AutomaticSize.XY
 			TextLabel.BackgroundTransparency = 1
 			TextLabel.BorderSizePixel = 0
-			p2.applyTextStyle(TextLabel)
+			irisUtils.applyTextStyle(TextLabel)
 			TextLabel.Parent = Iris_MenuItem
 			local Shortcut = Instance.new("TextLabel")
 			Shortcut.Name = "Shortcut"
@@ -333,30 +332,30 @@ return function(p1, p2)
 			Shortcut.BackgroundTransparency = 1
 			Shortcut.BorderSizePixel = 0
 			Shortcut.LayoutOrder = 1
-			p2.applyTextStyle(Shortcut)
+			irisUtils.applyTextStyle(Shortcut)
 			Shortcut.Text = ""
-			Shortcut.TextColor3 = p1._config.TextDisabledColor
-			Shortcut.TextTransparency = p1._config.TextDisabledTransparency
+			Shortcut.TextColor3 = irisConfig._config.TextDisabledColor
+			Shortcut.TextTransparency = irisConfig._config.TextDisabledTransparency
 			Shortcut.Parent = Iris_MenuItem
 			return Iris_MenuItem
 		end,
-		Update = function(p1)
-			local instance = p1.Instance
+		Update = function(irisConfig)
+			local instance = irisConfig.Instance
 			local Shortcut = instance.Shortcut
-			instance.TextLabel.Text = p1.arguments.Text
-			if p1.arguments.KeyCode then
-				if p1.arguments.ModifierKey then
-					Shortcut.Text = p1.arguments.ModifierKey.Name .. " + " .. p1.arguments.KeyCode.Name
+			instance.TextLabel.Text = irisConfig.arguments.Text
+			if irisConfig.arguments.KeyCode then
+				if irisConfig.arguments.ModifierKey then
+					Shortcut.Text = irisConfig.arguments.ModifierKey.Name .. " + " .. irisConfig.arguments.KeyCode.Name
 					return
 				end
-				Shortcut.Text = p1.arguments.KeyCode.Name
+				Shortcut.Text = irisConfig.arguments.KeyCode.Name
 			end
 		end,
-		Discard = function(p1)
-			p1.Instance:Destroy()
+		Discard = function(irisConfig)
+			irisConfig.Instance:Destroy()
 		end
 	})
-	p1.WidgetConstructor("MenuToggle", {
+	irisConfig.WidgetConstructor("MenuToggle", {
 		hasState = true,
 		hasChildren = false,
 		Args = {
@@ -366,22 +365,22 @@ return function(p1, p2)
 		},
 		Events = {
 			checked = {
-				Init = function(p1) end,
-				Get = function(p12)
-					return p12.lastCheckedTick == p1._cycleTick
+				Init = function(irisConfig) end,
+				Get = function(menuWidget)
+					return menuWidget.lastCheckedTick == irisConfig._cycleTick
 				end
 			},
 			unchecked = {
-				Init = function(p1) end,
-				Get = function(p12)
-					return p12.lastUncheckedTick == p1._cycleTick
+				Init = function(irisConfig) end,
+				Get = function(menuWidget)
+					return menuWidget.lastUncheckedTick == irisConfig._cycleTick
 				end
 			},
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance
+			hovered = irisUtils.EVENTS.hover(function(irisConfig)
+				return irisConfig.Instance
 			end)
 		},
-		Generate = function(p12)
+		Generate = function(menuWidget)
 			local Iris_MenuToggle = Instance.new("TextButton")
 			Iris_MenuToggle.Name = "Iris_MenuToggle"
 			Iris_MenuToggle.AutomaticSize = Enum.AutomaticSize.Y
@@ -390,27 +389,27 @@ return function(p1, p2)
 			Iris_MenuToggle.BorderSizePixel = 0
 			Iris_MenuToggle.Text = ""
 			Iris_MenuToggle.AutoButtonColor = false
-			local var12 = p2.UIPadding(Iris_MenuToggle, p1._config.FramePadding)
-			var12.PaddingTop = var12.PaddingTop - UDim.new(0, 1)
-			p2.UIListLayout(Iris_MenuToggle, Enum.FillDirection.Horizontal, UDim.new(0, p1._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
-			p2.applyInteractionHighlights("Background", Iris_MenuToggle, Iris_MenuToggle, {
-				Color = p1._config.HeaderColor,
+			local togglePadding = irisUtils.UIPadding(Iris_MenuToggle, irisConfig._config.FramePadding)
+			togglePadding.PaddingTop = togglePadding.PaddingTop - UDim.new(0, 1)
+			irisUtils.UIListLayout(Iris_MenuToggle, Enum.FillDirection.Horizontal, UDim.new(0, irisConfig._config.ItemInnerSpacing.X)).VerticalAlignment = Enum.VerticalAlignment.Center
+			irisUtils.applyInteractionHighlights("Background", Iris_MenuToggle, Iris_MenuToggle, {
+				Color = irisConfig._config.HeaderColor,
 				Transparency = 1,
-				HoveredColor = p1._config.HeaderHoveredColor,
-				HoveredTransparency = p1._config.HeaderHoveredTransparency,
-				ActiveColor = p1._config.HeaderHoveredColor,
-				ActiveTransparency = p1._config.HeaderHoveredTransparency
+				HoveredColor = irisConfig._config.HeaderHoveredColor,
+				HoveredTransparency = irisConfig._config.HeaderHoveredTransparency,
+				ActiveColor = irisConfig._config.HeaderHoveredColor,
+				ActiveTransparency = irisConfig._config.HeaderHoveredTransparency
 			})
-			p2.applyButtonClick(Iris_MenuToggle, function()
-				p12.state.isChecked:set(not p12.state.isChecked.value)
+			irisUtils.applyButtonClick(Iris_MenuToggle, function()
+				menuWidget.state.isChecked:set(not menuWidget.state.isChecked.value)
 				EmptyMenuStack()
 			end)
-			p2.applyMouseEnter(Iris_MenuToggle, function()
-				local parentWidget = p12.parentWidget
-				if instance and (v2 and v2 ~= parentWidget) then
-					EmptyMenuStack((table.find(t, parentWidget)))
-					v2 = parentWidget
-					instance = true
+			irisUtils.applyMouseEnter(Iris_MenuToggle, function()
+				local parentWidget = menuWidget.parentWidget
+				if isMenuOpen and (currentOpenedMenu and currentOpenedMenu ~= parentWidget) then
+					EmptyMenuStack((table.find(menuStack, parentWidget)))
+					currentOpenedMenu = parentWidget
+					isMenuOpen = true
 				end
 			end)
 			local TextLabel = Instance.new("TextLabel")
@@ -418,7 +417,7 @@ return function(p1, p2)
 			TextLabel.AutomaticSize = Enum.AutomaticSize.XY
 			TextLabel.BackgroundTransparency = 1
 			TextLabel.BorderSizePixel = 0
-			p2.applyTextStyle(TextLabel)
+			irisUtils.applyTextStyle(TextLabel)
 			TextLabel.Parent = Iris_MenuToggle
 			local Shortcut = Instance.new("TextLabel")
 			Shortcut.Name = "Shortcut"
@@ -426,55 +425,55 @@ return function(p1, p2)
 			Shortcut.BackgroundTransparency = 1
 			Shortcut.BorderSizePixel = 0
 			Shortcut.LayoutOrder = 1
-			p2.applyTextStyle(Shortcut)
+			irisUtils.applyTextStyle(Shortcut)
 			Shortcut.Text = ""
-			Shortcut.TextColor3 = p1._config.TextDisabledColor
-			Shortcut.TextTransparency = p1._config.TextDisabledTransparency
+			Shortcut.TextColor3 = irisConfig._config.TextDisabledColor
+			Shortcut.TextTransparency = irisConfig._config.TextDisabledTransparency
 			Shortcut.Parent = Iris_MenuToggle
-			local var22 = p1._config.TextSize + 2 * p1._config.FramePadding.Y
-			local var3 = var22 - math.round(0.2 * var22) * 2
+			local baseToggleSize = irisConfig._config.TextSize + 2 * irisConfig._config.FramePadding.Y
+			local toggleIconSize = baseToggleSize - math.round(0.2 * baseToggleSize) * 2
 			local Icon = Instance.new("ImageLabel")
 			Icon.Name = "Icon"
-			Icon.Size = UDim2.fromOffset(var3, var3)
+			Icon.Size = UDim2.fromOffset(toggleIconSize, toggleIconSize)
 			Icon.BackgroundTransparency = 1
 			Icon.BorderSizePixel = 0
-			Icon.ImageColor3 = p1._config.TextColor
-			Icon.ImageTransparency = p1._config.TextTransparency
-			Icon.Image = p2.ICONS.CHECK_MARK
+			Icon.ImageColor3 = irisConfig._config.TextColor
+			Icon.ImageTransparency = irisConfig._config.TextTransparency
+			Icon.Image = irisUtils.ICONS.CHECK_MARK
 			Icon.LayoutOrder = 2
 			Icon.Parent = Iris_MenuToggle
 			return Iris_MenuToggle
 		end,
-		GenerateState = function(p12)
-			if p12.state.isChecked == nil then
-				p12.state.isChecked = p1._widgetState(p12, "isChecked", false)
+		GenerateState = function(menuWidget)
+			if menuWidget.state.isChecked == nil then
+				menuWidget.state.isChecked = irisConfig._widgetState(menuWidget, "isChecked", false)
 			end
 		end,
-		Update = function(p1)
-			local instance = p1.Instance
+		Update = function(irisConfig)
+			local instance = irisConfig.Instance
 			local Shortcut = instance.Shortcut
-			instance.TextLabel.Text = p1.arguments.Text
-			if p1.arguments.KeyCode then
-				if p1.arguments.ModifierKey then
-					Shortcut.Text = p1.arguments.ModifierKey.Name .. " + " .. p1.arguments.KeyCode.Name
+			instance.TextLabel.Text = irisConfig.arguments.Text
+			if irisConfig.arguments.KeyCode then
+				if irisConfig.arguments.ModifierKey then
+					Shortcut.Text = irisConfig.arguments.ModifierKey.Name .. " + " .. irisConfig.arguments.KeyCode.Name
 					return
 				end
-				Shortcut.Text = p1.arguments.KeyCode.Name
+				Shortcut.Text = irisConfig.arguments.KeyCode.Name
 			end
 		end,
-		UpdateState = function(p12)
-			local Icon = p12.Instance.Icon
-			if p12.state.isChecked.value then
-				Icon.ImageTransparency = p1._config.TextTransparency
-				p12.lastCheckedTick = p1._cycleTick + 1
+		UpdateState = function(menuWidget)
+			local Icon = menuWidget.Instance.Icon
+			if menuWidget.state.isChecked.value then
+				Icon.ImageTransparency = irisConfig._config.TextTransparency
+				menuWidget.lastCheckedTick = irisConfig._cycleTick + 1
 			else
 				Icon.ImageTransparency = 1
-				p12.lastUncheckedTick = p1._cycleTick + 1
+				menuWidget.lastUncheckedTick = irisConfig._cycleTick + 1
 			end
 		end,
-		Discard = function(p1)
-			p1.Instance:Destroy()
-			p2.discardState(p1)
+		Discard = function(irisConfig)
+			irisConfig.Instance:Destroy()
+			irisUtils.discardState(irisConfig)
 		end
 	})
 end

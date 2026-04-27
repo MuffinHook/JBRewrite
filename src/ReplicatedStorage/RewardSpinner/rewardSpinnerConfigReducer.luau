@@ -1,23 +1,22 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Rodux = require(ReplicatedStorage.Rodux)
 local getItemPropsFromRewardData = require(ReplicatedStorage.RewardSpinner.getItemPropsFromRewardData)
 return Rodux.createReducer(nil, {
-	setRewardSpinnerConfig = function(p1, p2)
-		if p2.items then
-			local tbl = {}
-			for v1, v2 in p2.items do
-				table.insert(tbl, (getItemPropsFromRewardData(v2)))
+	setRewardSpinnerConfig = function(state, action)
+		if action.items then
+			local processedItems = {}
+			for index, itemData in action.items do
+				table.insert(processedItems, (getItemPropsFromRewardData(itemData)))
 			end
 			return {
-				items = tbl,
-				duration = p2.duration,
-				winIndex = p2.winIndex,
-				title = p2.title,
-				iconImageId = p2.iconImageId,
-				primaryColor = p2.primaryColor,
-				topic = p2.topic,
-				extraText = p2.extraText
+				items = processedItems,
+				duration = action.duration,
+				winIndex = action.winIndex,
+				title = action.title,
+				iconImageId = action.iconImageId,
+				primaryColor = action.primaryColor,
+				topic = action.topic,
+				extraText = action.extraText
 			}
 		else
 			return nil

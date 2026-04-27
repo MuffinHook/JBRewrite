@@ -1,6 +1,5 @@
--- Reviewed by Claude
 local Basic = require(script.Parent.Basic)
-local t = {
+local defaultMotionConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -14,25 +13,25 @@ local t = {
 		LeftWristRotation = CFrame.new()
 	}
 }
-local t2 = {
+local BagClass = {
 	__ClassName = "Bag"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	v1.SpringItemOffset:SetTarget(Vector3.new(1, 2, 0))
-	v1.SpringNeckRotation:SetTarget(Vector3.new(0.35, 0, 0))
-	v1.SpringWaistRotation:SetTarget(Vector3.new(-0.35, 0, 0))
-	v1:DefaultDisableCamLock()
-	return v1
+BagClass.__index = BagClass
+setmetatable(BagClass, Basic)
+function BagClass.new(itemModel, parent, bagConfig)
+	local bagInstance = Basic.new(itemModel, parent, defaultMotionConfig, bagConfig)
+	setmetatable(bagInstance, BagClass)
+	bagInstance.SpringItemOffset:SetTarget(Vector3.new(1, 2, 0))
+	bagInstance.SpringNeckRotation:SetTarget(Vector3.new(0.35, 0, 0))
+	bagInstance.SpringWaistRotation:SetTarget(Vector3.new(-0.35, 0, 0))
+	bagInstance:DefaultDisableCamLock()
+	return bagInstance
 end
-function t2.GetLeftArmPosition(p1)
+function BagClass.GetLeftArmPosition(self)
 	return nil
 end
-function t2.InputBegan(p1, ...)
-	Basic.InputBegan(p1, ...)
+function BagClass.InputBegan(self, ...)
+	Basic.InputBegan(self, ...)
 end
-function t2.InputEnded(p1) end
-return t2
+function BagClass.InputEnded(self) end
+return BagClass

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Basic = require(script.Parent.Basic)
 local defaultMotion = {
 	Motion = {

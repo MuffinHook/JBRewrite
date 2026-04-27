@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local PlayerModule = LocalPlayer.PlayerScripts.PlayerModule
 local CameraSensitivity = PlayerModule:FindFirstChild("CameraModule"):FindFirstChild("CameraSensitivity")
@@ -22,36 +20,36 @@ local module = {
 	Locked = true
 }
 local function GetLocalAccessoryParts()
-	local t = {}
+	local accessoryParts = {}
 	if LocalPlayer.Character then
-		for v1, v2 in LocalPlayer.Character:QueryDescendants("BasePart#Handle") do
-			if v2.Parent:IsA("Accessory") and (v2:FindFirstChild("BodyBackAttachment") or v2:FindFirstChild("NeckAttachment")) then
-				table.insert(t, v2)
+		for index, part in LocalPlayer.Character:QueryDescendants("BasePart#Handle") do
+			if part.Parent:IsA("Accessory") and (part:FindFirstChild("BodyBackAttachment") or part:FindFirstChild("NeckAttachment")) then
+				table.insert(accessoryParts, part)
 			end
 		end
 	end
-	return t
+	return accessoryParts
 end
 local function HideAccessories()
-	for v1, v2 in GetLocalAccessoryParts() do
-		v2.LocalTransparencyModifier = 0.8
+	for index, accessoryPart in GetLocalAccessoryParts() do
+		accessoryPart.LocalTransparencyModifier = 0.8
 	end
 end
 local function ShowAccessories()
-	local v1 = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")
-	for v3, v4 in GetLocalAccessoryParts() do
-		local v2
-		v2 = if v1 then v1.LocalTransparencyModifier else 0
-		v4.LocalTransparencyModifier = v2
+	local head = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")
+	for index, accessoryPart in GetLocalAccessoryParts() do
+		local transparency
+		transparency = if head then head.LocalTransparencyModifier else 0
+		accessoryPart.LocalTransparencyModifier = transparency
 	end
 end
 local fovSpring = nil
 local recoilSpring = nil
-local function InputChanged(p1)
-	if p1.UserInputType == Enum.UserInputType.MouseMovement then
-		local Delta = p1.Delta
-		yaw = yaw - Delta.X * 0.005
-		pitch = pitch - Delta.Y * 0.005
+local function InputChanged(inputData)
+	if inputData.UserInputType == Enum.UserInputType.MouseMovement then
+		local mouseDelta = inputData.Delta
+		yaw = yaw - mouseDelta.X * 0.005
+		pitch = pitch - mouseDelta.Y * 0.005
 		pitch = math.clamp(pitch, -1.4, 1.2)
 	end
 end
@@ -77,8 +75,8 @@ function module.Init()
 		order = 200
 	}
 	GameSettingsService.add(weaponCamLockSetting)
-	local function handleSetting(p1)
-		module.setLocked(p1)
+	local function handleSetting(isWeaponCamLocked)
+		module.setLocked(isWeaponCamLocked)
 	end
 	module.setLocked((weaponCamLockSetting:getValue()))
 	weaponCamLockSetting.onChanged:Connect(handleSetting)
@@ -88,24 +86,24 @@ local currentRecoilSpring = nil
 local ignoreParts = nil
 local isAimingDown = false
 module.equipped = false
-function module.Adjust(p1)
-	yaw = yaw + p1.Y
-	pitch = pitch + p1.X
+function module.Adjust(recoilVector)
+	yaw = yaw + recoilVector.Y
+	pitch = pitch + recoilVector.X
 end
-function module.SetRecoilSpring(p1)
-	assert(p1)
-	currentRecoilSpring = p1
+function module.SetRecoilSpring(spring)
+	assert(spring)
+	currentRecoilSpring = spring
 end
-function module.setLocked(p1)
-	module.Locked = p1
+function module.setLocked(locked)
+	module.Locked = locked
 	module.updateMouseLock()
 end
 function module.updateMouseLock()
-	local v12 = PlayerUtils.getHumanoid(LocalPlayer)
+	local humanoid = PlayerUtils.getHumanoid(LocalPlayer)
 	local activeMouseLockController = cameras.activeMouseLockController
 	if activeMouseLockController then
-		local v2 = UserInputService:GetLastInputType()
-		if (module.Locked or (InputUtils.isTouch() or v2 == Enum.UserInputType.Gamepad1)) and (module.equipped and not (v12.Sit or v12.PlatformStand)) then
+		local lastInputType = UserInputService:GetLastInputType()
+		if (module.Locked or (InputUtils.isTouch() or lastInputType == Enum.UserInputType.Gamepad1)) and (module.equipped and not (humanoid.Sit or humanoid.PlatformStand)) then
 			if not activeMouseLockController:GetIsMouseLocked() then
 				activeMouseLockController:OnMouseLockToggled()
 			end
@@ -113,9 +111,9 @@ function module.updateMouseLock()
 			activeMouseLockController:OnMouseLockToggled()
 		end
 	end
-	local v3 = not module.getMouseLocked()
-	if v12 and v12.AutoRotate ~= v3 then
-		v12.AutoRotate = v3
+	local shouldDisableAutoRotate = not module.getMouseLocked()
+	if humanoid and humanoid.AutoRotate ~= shouldDisableAutoRotate then
+		humanoid.AutoRotate = shouldDisableAutoRotate
 	end
 end
 function module.getMouseLocked()
@@ -125,33 +123,33 @@ end
 function module.getSensitivity()
 	return CameraSensitivity.Value
 end
-function module.setSensitivity(p1)
-	local v1 = module.getSensitivity()
-	CameraSensitivity.Value = p1
+function module.setSensitivity(newSensitivity)
+	local previousSensitivity = module.getSensitivity()
+	CameraSensitivity.Value = newSensitivity
 	return function()
-		CameraSensitivity.Value = v1
+		CameraSensitivity.Value = previousSensitivity
 	end
 end
 local lastUpdateTime = os.clock()
 function module.Update()
-	local v1 = os.clock()
-	local v2 = v1 - lastUpdateTime
-	lastUpdateTime = v1
+	local currentTime = os.clock()
+	local deltaTime = currentTime - lastUpdateTime
+	lastUpdateTime = currentTime
 	module.updateMouseLock()
 	if module.getMouseLocked() and not MovementRollService.isPlayerRolling(LocalPlayer) then
-		local v3 = PlayerUtils.getRootPart(LocalPlayer)
-		if v3 then
-			v3.CFrame = CFrame.lookAt(Vector3.new(), (CurrentCamera.CFrame.LookVector * Vector3.new(1, 0, 1)).Unit) + v3.CFrame.p
+		local rootPart = PlayerUtils.getRootPart(LocalPlayer)
+		if rootPart then
+			rootPart.CFrame = CFrame.lookAt(Vector3.new(), (CurrentCamera.CFrame.LookVector * Vector3.new(1, 0, 1)).Unit) + rootPart.CFrame.p
 		end
 	end
 	CurrentCamera.FieldOfView = fovSpring:Update()
-	local v5 = if currentRecoilSpring then currentRecoilSpring:Update() else nil
-	if v5 then
-		CurrentCamera.CFrame = CurrentCamera.CFrame * CFrame.Angles(0, v5.Y * v2 * 60, 0) * CFrame.Angles(v5.X * v2 * 60, 0, 0)
+	local recoilOffset = if currentRecoilSpring then currentRecoilSpring:Update() else nil
+	if recoilOffset then
+		CurrentCamera.CFrame = CurrentCamera.CFrame * CFrame.Angles(0, recoilOffset.Y * deltaTime * 60, 0) * CFrame.Angles(recoilOffset.X * deltaTime * 60, 0, 0)
 	end
 end
-function module.Zoom(p1)
-	fovSpring:SetTarget(p1)
+function module.Zoom(targetFOV)
+	fovSpring:SetTarget(targetFOV)
 end
 function module.GetCameraDistance()
 	local activeCameraController = cameras.activeCameraController
@@ -161,31 +159,31 @@ function module.GetCameraDistance()
 		return 0
 	end
 end
-function module.SetCameraDistance(p1)
+function module.SetCameraDistance(distanceValue)
 	local activeCameraController = cameras.activeCameraController
 	if activeCameraController then
-		return activeCameraController:SetCameraToSubjectDistance(p1)
+		return activeCameraController:SetCameraToSubjectDistance(distanceValue)
 	else
 		return 0
 	end
 end
-function module.OnItemEquipped(p1, p2)
+function module.OnItemEquipped(isAiming, hideAccessories)
 	module.equipped = true
 	local Character = LocalPlayer.Character
 	assert(Character)
 	local Humanoid = Character:FindFirstChild("Humanoid")
 	assert(Humanoid)
-	local v1
-	if p1 then
+	local spring
+	if isAiming then
 		if not (math.abs(recoilSpring.Target - 2) <= 0.01) then
-			v1 = recoilSpring
+			spring = recoilSpring
 			recoilSpring.p = 0
 			recoilSpring.v = 0
 			recoilSpring.t = tick()
 			recoilSpring:SetTarget(2)
 		end
 	else
-		v1 = recoilSpring
+		spring = recoilSpring
 		recoilSpring.p = 0
 		recoilSpring.v = 0
 		recoilSpring.t = tick()
@@ -193,9 +191,9 @@ function module.OnItemEquipped(p1, p2)
 	end
 	isAimingDown = true
 	ignoreParts = { Character, workspace.Items }
-	if not p2 then
-		for v3, v4 in GetLocalAccessoryParts() do
-			v4.LocalTransparencyModifier = 0.8
+	if not hideAccessories then
+		for index, accessoryPart in GetLocalAccessoryParts() do
+			accessoryPart.LocalTransparencyModifier = 0.8
 		end
 	end
 	module.Update()
@@ -207,11 +205,11 @@ function module.OnItemUnequipped()
 	fovSpring.Target = fovSpring.p
 	CurrentCamera.FieldOfView = 70
 	assert(LocalPlayer.Character)
-	local v1 = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")
-	for v3, v42 in GetLocalAccessoryParts() do
-		local v2
-		v2 = if v1 then v1.LocalTransparencyModifier else 0
-		v42.LocalTransparencyModifier = v2
+	local head = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")
+	for index, accessoryPart in GetLocalAccessoryParts() do
+		local transparency
+		transparency = if head then head.LocalTransparencyModifier else 0
+		accessoryPart.LocalTransparencyModifier = transparency
 	end
 	module.updateMouseLock()
 	PlayerModule:FindFirstChild("CameraModule"):FindFirstChild("DisableAutoRotate").Value = false

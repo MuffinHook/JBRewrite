@@ -1,22 +1,20 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ColorUtils = require(ReplicatedStorage.Std.ColorUtils)
 local RobberyConsts = require(ReplicatedStorage.Robbery.RobberyConsts)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local identityColor = Color3.fromRGB(127, 249, 82)
-local local2 = Roact.PureComponent:extend("BattleRobberyStatus")
-function local2.render(self)
+local BattleRobberyStatusComponent = Roact.PureComponent:extend("BattleRobberyStatus")
+function BattleRobberyStatusComponent.render(self)
 	local rowIndex = self.props.rowIndex
-	local t = {
+	local statusFrameProps = {
 		BorderSizePixel = 0
 	}
-	t.BackgroundColor3 = if self.props.robberyCompleted then ColorUtils.brightenBy(identityColor, -0.1) else self.props.backgroundColor
-	t.Size = UDim2.new(1, 0, 0.6666666666666666, 0)
-	t.AnchorPoint = Vector2.new(0, 0)
-	t.Position = UDim2.new(0, 0, 0.6666666666666666 * (rowIndex - 1) + 1, 2.6666666666666665 * rowIndex)
-	local table2 = {
+	statusFrameProps.BackgroundColor3 = if self.props.robberyCompleted then ColorUtils.brightenBy(identityColor, -0.1) else self.props.backgroundColor
+	statusFrameProps.Size = UDim2.new(1, 0, 0.6666666666666666, 0)
+	statusFrameProps.AnchorPoint = Vector2.new(0, 0)
+	statusFrameProps.Position = UDim2.new(0, 0, 0.6666666666666666 * (rowIndex - 1) + 1, 2.6666666666666665 * rowIndex)
+	local statusContainerChildren = {
 		UICorners = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
 		}),
@@ -38,20 +36,20 @@ function local2.render(self)
 			})
 		})
 	}
-	local table3 = {
+	local statusIndicatorContainerProps = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0.2, 0, 1, 0),
 		AnchorPoint = Vector2.new(1, 0),
 		Position = UDim2.new(1, 0, 0, 0)
 	}
-	local table4 = {}
-	local table5 = {}
-	table5.BackgroundColor3 = if self.props.robberyCompleted then identityColor else ColorUtils.brightenBy(self.props.backgroundColor, -0.8)
-	table5.BackgroundTransparency = 0
-	table5.Size = UDim2.fromScale(0.75, 0.75)
-	table5.AnchorPoint = Vector2.new(0.5, 0.5)
-	table5.Position = UDim2.fromScale(0.5, 0.5)
-	table4.Status = createElement("Frame", table5, {
+	local statusIndicatorChildren = {}
+	local statusIndicatorProps = {}
+	statusIndicatorProps.BackgroundColor3 = if self.props.robberyCompleted then identityColor else ColorUtils.brightenBy(self.props.backgroundColor, -0.8)
+	statusIndicatorProps.BackgroundTransparency = 0
+	statusIndicatorProps.Size = UDim2.fromScale(0.75, 0.75)
+	statusIndicatorProps.AnchorPoint = Vector2.new(0.5, 0.5)
+	statusIndicatorProps.Position = UDim2.fromScale(0.5, 0.5)
+	statusIndicatorChildren.Status = createElement("Frame", statusIndicatorProps, {
 		UICorners = createElement("UICorner", {
 			CornerRadius = UDim.new(1, 0)
 		}),
@@ -59,7 +57,7 @@ function local2.render(self)
 			AspectRatio = 3
 		})
 	})
-	table2.StatusContainer = createElement("Frame", table3, table4)
-	return createElement("Frame", t, table2)
+	statusContainerChildren.StatusContainer = createElement("Frame", statusIndicatorContainerProps, statusIndicatorChildren)
+	return createElement("Frame", statusFrameProps, statusContainerChildren)
 end
-return local2
+return BattleRobberyStatusComponent

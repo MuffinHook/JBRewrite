@@ -1,7 +1,6 @@
--- Reviewed by Claude
 require(script.Parent.Parent.Types)
-return function(p1, p2)
-	local t = {
+return function(Iris, utilities)
+	local buttonConfig = {
 		hasState = false,
 		hasChildren = false,
 		Args = {
@@ -9,62 +8,62 @@ return function(p1, p2)
 			Size = 2
 		},
 		Events = {
-			clicked = p2.EVENTS.click(function(p1)
-				return p1.Instance
+			clicked = utilities.EVENTS.click(function(eventData)
+				return eventData.Instance
 			end),
-			rightClicked = p2.EVENTS.rightClick(function(p1)
-				return p1.Instance
+			rightClicked = utilities.EVENTS.rightClick(function(eventData)
+				return eventData.Instance
 			end),
-			doubleClicked = p2.EVENTS.doubleClick(function(p1)
-				return p1.Instance
+			doubleClicked = utilities.EVENTS.doubleClick(function(eventData)
+				return eventData.Instance
 			end),
-			ctrlClicked = p2.EVENTS.ctrlClick(function(p1)
-				return p1.Instance
+			ctrlClicked = utilities.EVENTS.ctrlClick(function(eventData)
+				return eventData.Instance
 			end),
-			hovered = p2.EVENTS.hover(function(p1)
-				return p1.Instance
+			hovered = utilities.EVENTS.hover(function(eventData)
+				return eventData.Instance
 			end)
 		},
-		Generate = function(p12)
+		Generate = function(context)
 			local TextButton = Instance.new("TextButton")
 			TextButton.AutomaticSize = Enum.AutomaticSize.XY
 			TextButton.Size = UDim2.fromOffset(0, 0)
-			TextButton.BackgroundColor3 = p1._config.ButtonColor
-			TextButton.BackgroundTransparency = p1._config.ButtonTransparency
+			TextButton.BackgroundColor3 = Iris._config.ButtonColor
+			TextButton.BackgroundTransparency = Iris._config.ButtonTransparency
 			TextButton.AutoButtonColor = false
-			p2.applyTextStyle(TextButton)
+			utilities.applyTextStyle(TextButton)
 			TextButton.TextXAlignment = Enum.TextXAlignment.Center
-			p2.applyFrameStyle(TextButton)
-			p2.applyInteractionHighlights("Background", TextButton, TextButton, {
-				Color = p1._config.ButtonColor,
-				Transparency = p1._config.ButtonTransparency,
-				HoveredColor = p1._config.ButtonHoveredColor,
-				HoveredTransparency = p1._config.ButtonHoveredTransparency,
-				ActiveColor = p1._config.ButtonActiveColor,
-				ActiveTransparency = p1._config.ButtonActiveTransparency
+			utilities.applyFrameStyle(TextButton)
+			utilities.applyInteractionHighlights("Background", TextButton, TextButton, {
+				Color = Iris._config.ButtonColor,
+				Transparency = Iris._config.ButtonTransparency,
+				HoveredColor = Iris._config.ButtonHoveredColor,
+				HoveredTransparency = Iris._config.ButtonHoveredTransparency,
+				ActiveColor = Iris._config.ButtonActiveColor,
+				ActiveTransparency = Iris._config.ButtonActiveTransparency
 			})
 			return TextButton
 		end,
-		Update = function(p1)
-			local instance = p1.Instance
-			instance.Text = p1.arguments.Text or "Button"
-			instance.Size = p1.arguments.Size or UDim2.fromOffset(0, 0)
+		Update = function(state)
+			local instance = state.Instance
+			instance.Text = state.arguments.Text or "Button"
+			instance.Size = state.arguments.Size or UDim2.fromOffset(0, 0)
 		end,
-		Discard = function(p1)
-			p1.Instance:Destroy()
+		Discard = function(state)
+			state.Instance:Destroy()
 		end
 	}
-	p2.abstractButton = t
-	p1.WidgetConstructor("Button", p2.extend(t, {
-		Generate = function(p1)
-			local Iris_Button = t.Generate(p1)
+	utilities.abstractButton = buttonConfig
+	Iris.WidgetConstructor("Button", utilities.extend(buttonConfig, {
+		Generate = function(context)
+			local Iris_Button = buttonConfig.Generate(context)
 			Iris_Button.Name = "Iris_Button"
 			return Iris_Button
 		end
 	}))
-	p1.WidgetConstructor("SmallButton", p2.extend(t, {
-		Generate = function(p1)
-			local Iris_SmallButton = t.Generate(p1)
+	Iris.WidgetConstructor("SmallButton", utilities.extend(buttonConfig, {
+		Generate = function(context)
+			local Iris_SmallButton = buttonConfig.Generate(context)
 			Iris_SmallButton.Name = "Iris_SmallButton"
 			local UIPadding = Iris_SmallButton.UIPadding
 			UIPadding.PaddingLeft = UDim.new(0, 2)

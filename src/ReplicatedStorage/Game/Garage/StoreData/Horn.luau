@@ -1,17 +1,16 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local function GetInstance(p1)
-	local v1 = ReplicatedStorage.Resource:FindFirstChild("GarageHornVisual"):Clone()
-	v1:PivotTo(CFrame.new(0, 0, 0))
-	return v1
+	local hornVisual = ReplicatedStorage.Resource:FindFirstChild("GarageHornVisual"):Clone()
+	hornVisual:PivotTo(CFrame.new(0, 0, 0))
+	return hornVisual
 end
-local function Update(p1, p2)
-	local v1 = os.clock() / 2
-	p1.CFrame = CFrame.Angles(0, v1 % 6.283185307179586, 0) * CFrame.Angles(math.sin(v1) * 0.1 - 0.3, 0, 0) * CFrame.new(0, 0, p2.PrimaryPart.Size.Magnitude)
+local function Update(hornInstance, vehicleModel)
+	local elapsedTime = os.clock() / 2
+	hornInstance.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.1 - 0.3, 0, 0) * CFrame.new(0, 0, vehicleModel.PrimaryPart.Size.Magnitude)
 end
-local v1 = nil
+local currentAudio = nil
 return {
 	Items = {
 		{
@@ -144,19 +143,19 @@ return {
 	},
 	GetInstance = GetInstance,
 	Update = Update,
-	onItemSelected = function(p1)
-		if v1 then
-			v1:Destroy()
-			v1 = nil
+	onItemSelected = function(hornItem)
+		if currentAudio then
+			currentAudio:Destroy()
+			currentAudio = nil
 		end
 		if Players.LocalPlayer then
-			local t = {
+			local audioConfig = {
 				Volume = 0.25
 			}
-			if p1.MaxPlaybackTime then
-				t.MaxPlaybackTime = p1.MaxPlaybackTime
+			if hornItem.MaxPlaybackTime then
+				audioConfig.MaxPlaybackTime = hornItem.MaxPlaybackTime
 			end
-			v1 = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, p1.SoundId, t)
+			currentAudio = Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, hornItem.SoundId, audioConfig)
 		end
 	end
 }

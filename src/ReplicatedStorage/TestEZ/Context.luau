@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 return {
 	new = function(parentContext)
 		local contextMeta = {}

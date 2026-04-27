@@ -1,22 +1,21 @@
--- Reviewed by Claude
-local function v1(p1)
-	if type(p1) == "table" then
-		local t = {}
-		for v12, v2 in next, p1 do
-			t[v1(v12)] = v1(v2)
+local function deepCopy(inputTable)
+	if type(inputTable) == "table" then
+		local copiedTable = {}
+		for key, value in next, inputTable do
+			copiedTable[deepCopy(key)] = deepCopy(value)
 		end
-		setmetatable(t, v1((getmetatable(p1))))
-		return t
+		setmetatable(copiedTable, deepCopy((getmetatable(inputTable))))
+		return copiedTable
 	else
-		return p1
+		return inputTable
 	end
 end
 return {
-	DeepCopy = v1,
-	Concat = function(p1, p2)
-		for i = 1, #p2 do
-			p1[#p1 + 1] = p2[i]
+	DeepCopy = deepCopy,
+	Concat = function(targetArray, sourceArray)
+		for i = 1, #sourceArray do
+			targetArray[#targetArray + 1] = sourceArray[i]
 		end
-		return p1
+		return targetArray
 	end
 }

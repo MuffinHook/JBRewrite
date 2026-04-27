@@ -1,8 +1,7 @@
--- Reviewed by Claude
-return function(p1, p2)
-	if p1 then
-		p2.GarageEngineSpeed = p1.Speed
+return function(engine, playerConfig)
+	if engine then
+		playerConfig.GarageEngineSpeed = engine.Speed
 	else
-		p2.GarageEngineSpeed = 0
+		playerConfig.GarageEngineSpeed = 0
 	end
 end

@@ -1,10 +1,9 @@
--- Reviewed by Claude
-return function(p1)
-	local Model = p1.Model
+return function(vehicleConfig)
+	local Model = vehicleConfig.Model
 	if Model then
 		local SecondBody = Model:FindFirstChild("SecondBody", true)
 		if not SecondBody then
-			SecondBody = if p1.Make == "Tank" or (p1.Make == "TheRattler" or (p1.Make == "MCL36" or p1.Make == "MCL36FREE")) then true else p1.Make == "Sloop"
+			SecondBody = if vehicleConfig.Make == "Tank" or (vehicleConfig.Make == "TheRattler" or (vehicleConfig.Make == "MCL36" or vehicleConfig.Make == "MCL36FREE")) then true else vehicleConfig.Make == "Sloop"
 		end
 		return SecondBody
 	end

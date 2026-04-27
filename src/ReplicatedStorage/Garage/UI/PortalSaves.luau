@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -6,67 +5,67 @@ local Roact = require(ReplicatedStorage.Roact)
 local RoactRodux = require(ReplicatedStorage.RoactRodux)
 local createElement = Roact.createElement
 local PortalBase = require(script.Parent.PortalBase)
-local v1 = Roact.PureComponent:extend("PortalSaves")
-function v1.render(p1)
-	local t = {}
-	local t2 = {}
-	for i, v in ipairs(p1.props.receipt) do
-		t[v.name] = true
+local PortalSavesComponent = Roact.PureComponent:extend("PortalSaves")
+function PortalSavesComponent.render(self)
+	local receiptLookup = {}
+	local itemMetadata = {}
+	for i, receiptItem in ipairs(self.props.receipt) do
+		receiptLookup[receiptItem.name] = true
 	end
-	for i = 1, #p1.props.items do
-		local v1, v2
-		local v3 = p1.props.items[i]
-		local v4 = p1.props.saves[v3.name]
-		local t3 = {
-			selected = t[v3.name]
+	for i = 1, #self.props.items do
+		local isFilled, getInstFunction
+		local currentItem = self.props.items[i]
+		local saveData = self.props.saves[currentItem.name]
+		local itemEntry = {
+			selected = receiptLookup[currentItem.name]
 		}
-		v1 = v4 ~= nil
-		t3.filled = v1
-		t3.getInstCompare = v4
-		v2 = v4 and function()
-			return v3.getInstForSelection(v4)
+		isFilled = saveData ~= nil
+		itemEntry.filled = isFilled
+		itemEntry.getInstCompare = saveData
+		getInstFunction = saveData and function()
+			return currentItem.getInstForSelection(saveData)
 		end
-		t3.getInst = v2
-		function t3.onSelect()
-			if v3.available then
-				p1.props.onSelectItem(v3)
+		itemEntry.getInst = getInstFunction
+		function itemEntry.onSelect()
+			if currentItem.available then
+				self.props.onSelectItem(currentItem)
 			end
 		end
-		t2[i] = t3
+		itemMetadata[i] = itemEntry
 	end
 	return createElement(PortalBase, {
 		title = "SAVES",
-		items = p1.props.items,
-		metadata = t2,
-		sortId = p1.props.sortId,
+		items = self.props.items,
+		metadata = itemMetadata,
+		sortId = self.props.sortId,
 		colsPerRow = 5,
 		rowsPerPage = 2,
-		cornerPixel = p1.props.cornerPixel,
-		portalRatio = p1.props.portalRatio,
-		paddingRatio = p1.props.paddingRatio,
-		onSelectSort = p1.props.onSelectSort
+		cornerPixel = self.props.cornerPixel,
+		portalRatio = self.props.portalRatio,
+		paddingRatio = self.props.paddingRatio,
+		onSelectSort = self.props.onSelectSort
 	})
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(state, dispatch)
 	return {
-		receipt = p1.garageReceipt
+		receipt = state.garageReceipt
 	}
-end, function(p1)
+end, function(dispatch)
 	return {
-		onSelectItem = function(p12)
+		onSelectItem = function(selectedItem)
 			if Players.LocalPlayer.PlayerGui then
 				Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6105461542, {
 					Volume = 0.25
 				})
 			end
-			p1({
+			dispatch({
 				type = "addReceiptItem",
 				category = "Saves",
 				categoryTitle = "Save",
-				name = p12.name,
-				title = p12.title,
-				filled = p12.filled
+				name = selectedItem.name,
+				title = selectedItem.title,
+				filled = selectedItem.filled
 			})
 		end
 	}
-end)(v1)
+end)(PortalSavesComponent)

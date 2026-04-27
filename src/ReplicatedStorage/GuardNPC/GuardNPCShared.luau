@@ -1,63 +1,62 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Raycast = require(ReplicatedStorage.Std.Raycast)
 local GuardNPCConsts = require(ReplicatedStorage.GuardNPC.GuardNPCConsts)
 local GuardNPCUtils = require(ReplicatedStorage.GuardNPC.GuardNPCUtils)
-local t = {}
-local function collidableFunc(p1)
-	if p1.Transparency >= 0.999 then
+local GuardNPCShared = {}
+local function collidableFunc(instance)
+	if instance.Transparency >= 0.999 then
 		return false
 	else
-		return p1.CanCollide
+		return instance.CanCollide
 	end
 end
-function t.canSeeTarget(p1, p2, p3)
-	if typeof(p2) == "Vector3" then
+function GuardNPCShared.canSeeTarget(guardNPC, targetCharacter, ignoreList)
+	if typeof(targetCharacter) == "Vector3" then
 		return false
 	else
-		local Position = p1.HumanoidRootPart.Position
-		local v1 = GuardNPCUtils.getMaxShootDist(p1) or GuardNPCConsts.MAX_SHOOT_DIST
-		local v2 = GuardNPCUtils.getMaxAllowedShootDistanceFromDefenseTarget(p1)
-		local v3, v4, v5, v6, v7, v8
-		if GuardNPCUtils.getIsTargetingInvolvedPlayer(p1) or not v2 then
-			v3 = p2.Position - Position
-			v4 = v3.Magnitude
-			v5 = math.min(v4, v1)
-			v6 = Raycast.collidable(Position, v3.Unit, v5, p3, collidableFunc)
-			if v6 then
-				v7 = v6.Instance
-				v8 = v6.Position
+		local Position = guardNPC.HumanoidRootPart.Position
+		local maxShootDistance = GuardNPCUtils.getMaxShootDist(guardNPC) or GuardNPCConsts.MAX_SHOOT_DIST
+		local maxDefenseDistance = GuardNPCUtils.getMaxAllowedShootDistanceFromDefenseTarget(guardNPC)
+		local directionVector, distance, raycastDistance, raycastHit, hitInstance, hitPosition
+		if GuardNPCUtils.getIsTargetingInvolvedPlayer(guardNPC) or not maxDefenseDistance then
+			directionVector = targetCharacter.Position - Position
+			distance = directionVector.Magnitude
+			raycastDistance = math.min(distance, maxShootDistance)
+			raycastHit = Raycast.collidable(Position, directionVector.Unit, raycastDistance, ignoreList, collidableFunc)
+			if raycastHit then
+				hitInstance = raycastHit.Instance
+				hitPosition = raycastHit.Position
 			else
-				v8 = Position + v3.Unit * v5
-				v7 = nil
+				hitPosition = Position + directionVector.Unit * raycastDistance
+				hitInstance = nil
 			end
-			if v7 and (v7:IsDescendantOf(p2.Parent) or v7:IsDescendantOf(workspace.Vehicles)) then
+			if hitInstance and (hitInstance:IsDescendantOf(targetCharacter.Parent) or hitInstance:IsDescendantOf(workspace.Vehicles)) then
 				return true
 			else
-				return (v8 - p2.Position).Magnitude < 1
+				return (hitPosition - targetCharacter.Position).Magnitude < 1
 			end
 		else
-			if v2 < (p2.Position - GuardNPCUtils.getDefenseTargetPos(p1)).Magnitude then
+			if maxDefenseDistance < (targetCharacter.Position - GuardNPCUtils.getDefenseTargetPos(guardNPC)).Magnitude then
 				return false
 			else
-				v3 = p2.Position - Position
-				v4 = v3.Magnitude
-				v5 = math.min(v4, v1)
-				v6 = Raycast.collidable(Position, v3.Unit, v5, p3, collidableFunc)
-				if v6 then
-					v7 = v6.Instance
-					v8 = v6.Position
+				directionVector = targetCharacter.Position - Position
+				distance = directionVector.Magnitude
+				raycastDistance = math.min(distance, maxShootDistance)
+				raycastHit = Raycast.collidable(Position, directionVector.Unit, raycastDistance, ignoreList, collidableFunc)
+				if raycastHit then
+					hitInstance = raycastHit.Instance
+					hitPosition = raycastHit.Position
 				else
-					v8 = Position + v3.Unit * v5
-					v7 = nil
+					hitPosition = Position + directionVector.Unit * raycastDistance
+					hitInstance = nil
 				end
-				if v7 and (v7:IsDescendantOf(p2.Parent) or v7:IsDescendantOf(workspace.Vehicles)) then
+				if hitInstance and (hitInstance:IsDescendantOf(targetCharacter.Parent) or hitInstance:IsDescendantOf(workspace.Vehicles)) then
 					return true
 				else
-					return (v8 - p2.Position).Magnitude < 1
+					return (hitPosition - targetCharacter.Position).Magnitude < 1
 				end
 			end
 		end
 	end
 end
-return t
+return GuardNPCShared

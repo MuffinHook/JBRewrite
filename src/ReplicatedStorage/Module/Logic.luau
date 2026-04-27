@@ -1,114 +1,113 @@
--- Reviewed by Claude
 local t = {}
 local exp = math.exp
 local cos = math.cos
 local sin = math.sin
-local function SpringUpdate(p1)
-	local cframe = tick() - p1.t
-	local Freq = p1.Freq
-	local Damp = p1.Damp
-	local v = p1.v
-	local Target = p1.Target
-	local v2 = p1.p - Target
+local function SpringUpdate(springConfig)
+	local elapsed = tick() - springConfig.lastUpdateTime
+	local Freq = springConfig.Freq
+	local Damp = springConfig.Damp
+	local velocity = springConfig.velocity
+	local Target = springConfig.Target
+	local displacement = springConfig.position - Target
 	if Damp > 1 then
-		local var3 = -Freq * Damp
-		local var4 = Freq * (Damp * Damp - 1) ^ 0.5
-		local var5 = var3 - var4
-		local var6 = var3 + var4
-		local var7 = exp(var5 * cframe)
-		local var8 = exp(var6 * cframe)
-		local var9 = (v - v2 * var6) / (-2 * var4)
-		local var10 = v2 - var9
-		return Target + var9 * var7 + var10 * var8, var9 * var5 * var7 + var10 * var6 * var8
+		local decayBase = -Freq * Damp
+		local oscillationFreq = Freq * (Damp * Damp - 1) ^ 0.5
+		local root1 = decayBase - oscillationFreq
+		local root2 = decayBase + oscillationFreq
+		local expRoot1 = exp(root1 * elapsed)
+		local expRoot2 = exp(root2 * elapsed)
+		local c1 = (velocity - displacement * root2) / (-2 * oscillationFreq)
+		local c2 = displacement - c1
+		return Target + c1 * expRoot1 + c2 * expRoot2, c1 * root1 * expRoot1 + c2 * root2 * expRoot2
 	elseif Damp == 1 then
-		local var11 = exp(-Freq * cframe)
-		local var12 = v + Freq * v2
-		local var13 = (var12 * cframe + v2) * var11
-		return Target + var13, var12 * var11 - var13 * Freq
+		local expDecay = exp(-Freq * elapsed)
+		local coeff = velocity + Freq * displacement
+		local solution = (coeff * elapsed + displacement) * expDecay
+		return Target + solution, coeff * expDecay - solution * Freq
 	else
-		local var14 = Freq * Damp
-		local var15 = Freq * (1 - Damp * Damp) ^ 0.5
-		local var16 = exp(-var14 * cframe)
-		local var17 = cos(var15 * cframe)
-		local var18 = sin(var15 * cframe)
-		local var19 = (v + var14 * v2) / var15
-		return Target + var16 * (v2 * var17 + var19 * var18), -var16 * ((v2 * var14 - var19 * var15) * var17 + (v2 * var15 + var19 * var14) * var18)
+		local decayRate = Freq * Damp
+		local oscillationRate = Freq * (1 - Damp * Damp) ^ 0.5
+		local expDecay = exp(-decayRate * elapsed)
+		local cosOscillation = cos(oscillationRate * elapsed)
+		local sinOscillation = sin(oscillationRate * elapsed)
+		local phaseOffset = (velocity + decayRate * displacement) / oscillationRate
+		return Target + expDecay * (displacement * cosOscillation + phaseOffset * sinOscillation), -expDecay * ((displacement * decayRate - phaseOffset * oscillationRate) * cosOscillation + (displacement * oscillationRate + phaseOffset * decayRate) * sinOscillation)
 	end
 end
-local function SpringSetTarget(p1, p2)
-	local cframe, v2 = SpringUpdate(p1)
-	p1.p = cframe
-	p1.v = v2
-	p1.Target = p2
-	p1.t = tick()
-	return cframe, v2
+local function SpringSetTarget(springConfig, newTarget)
+	local newPosition, newVelocity = SpringUpdate(springConfig)
+	springConfig.position = newPosition
+	springConfig.velocity = newVelocity
+	springConfig.Target = newTarget
+	springConfig.lastUpdateTime = tick()
+	return newPosition, newVelocity
 end
-local function SpringAccelerate(p1, p2)
-	local cframe, v2 = SpringUpdate(p1)
-	p1.t = tick()
-	p1.p = cframe
-	p1.v = v2 + p2
+local function SpringAccelerate(springConfig, acceleration)
+	local newPosition, newVelocity = SpringUpdate(springConfig)
+	springConfig.lastUpdateTime = tick()
+	springConfig.position = newPosition
+	springConfig.velocity = newVelocity + acceleration
 end
 function t.MakeSpring()
 	return {
-		p = nil,
-		v = nil,
+		position = nil,
+		velocity = nil,
 		Target = nil,
 		Damp = nil,
 		Freq = nil,
-		t = tick(),
+		lastUpdateTime = tick(),
 		Update = SpringUpdate,
 		SetTarget = SpringSetTarget,
 		Accelerate = SpringAccelerate
 	}
 end
 t.SpringUpdate = SpringUpdate
-local cframe = CFrame.new
-local v2 = cframe()
-local cos_2 = math.cos
-local sin_2 = math.sin
-local pointToObjectSpace = v2.pointToObjectSpace
-local function FromAxisAngle(p1)
-	local x = p1.x
-	local y = p1.y
-	local z = p1.z
-	local var12 = (x * x + y * y + z * z) ^ 0.5
-	if var12 > 0.00001 then
-		local var22 = sin_2(var12 * 0.5) / var12
-		return cframe(0, 0, 0, var22 * x, var22 * y, var22 * z, (cos_2(var12 * 0.5)))
+local cframeConstructor = CFrame.new
+local identityCFrame = cframeConstructor()
+local cosineAngle = math.cos
+local sineAngle = math.sin
+local pointToObjectSpace = identityCFrame.pointToObjectSpace
+local function FromAxisAngle(axisAngleVec)
+	local x = axisAngleVec.x
+	local y = axisAngleVec.y
+	local z = axisAngleVec.z
+	local magnitude = (x * x + y * y + z * z) ^ 0.5
+	if magnitude > 0.00001 then
+		local sinHalf = sineAngle(magnitude * 0.5) / magnitude
+		return cframeConstructor(0, 0, 0, sinHalf * x, sinHalf * y, sinHalf * z, (cosineAngle(magnitude * 0.5)))
 	else
-		return v2
+		return identityCFrame
 	end
 end
-local function SolveIK(p1, p2, p3, p4, p5)
-	local var12 = pointToObjectSpace(p3, p4)
-	local x = var12.x
-	local y = var12.y
-	local z = var12.z
-	local v2 = (x * x + y * y + z * z) ^ 0.5
-	local var3 = x / v2
-	local var4 = y / v2
-	local var5 = z / v2
-	local var6 = p1 + p2 < v2 and p1 + p2 or v2
-	local var7 = (p2 * p2 - p1 * p1 - var6 * var6) / (2 * p1 * var6)
-	local var8 = (1 - var7 * var7) ^ 0.5
-	local var9 = (2 * (1 + var8 * var4 + var7 * var5)) ^ 0.5
-	local var10 = var9 * 0.5
-	local var11 = (var8 * var5 - var7 * var4) / var9
-	local var122 = var7 * var3 / var9
-	local var13 = -var8 * var3 / var9
-	if p5 then
-		local var14 = cos_2(p5 / 2)
-		local var15 = sin_2(p5 / 2)
-		var11 = var14 * var11 + var15 * (var3 * var10 - var5 * var122 + var4 * var13)
-		var13 = var14 * var13 + var15 * (var5 * var10 - var4 * var11 + var3 * var122)
-		var122 = var14 * var122 + var15 * (var4 * var10 + var5 * var11 - var3 * var13)
-		var10 = var14 * var10 - var15 * (var3 * var11 + var4 * var122 + var5 * var13)
+local function SolveIK(upperLength, lowerLength, basePosition, targetPosition, twistAngle)
+	local relativeTarget = pointToObjectSpace(basePosition, targetPosition)
+	local x = relativeTarget.x
+	local y = relativeTarget.y
+	local z = relativeTarget.z
+	local distance = (x * x + y * y + z * z) ^ 0.5
+	local normalX = x / distance
+	local normalY = y / distance
+	local normalZ = z / distance
+	local reachLimit = upperLength + lowerLength < distance and upperLength + lowerLength or distance
+	local cosElbow = (lowerLength * lowerLength - upperLength * upperLength - reachLimit * reachLimit) / (2 * upperLength * reachLimit)
+	local sinElbow = (1 - cosElbow * cosElbow) ^ 0.5
+	local denominator = (2 * (1 + sinElbow * normalY + cosElbow * normalZ)) ^ 0.5
+	local qx = denominator * 0.5
+	local qy = (sinElbow * normalZ - cosElbow * normalY) / denominator
+	local qz = cosElbow * normalX / denominator
+	local qw = -sinElbow * normalX / denominator
+	if twistAngle then
+		local cosHalf = cosineAngle(twistAngle / 2)
+		local sinHalf = sineAngle(twistAngle / 2)
+		qy = cosHalf * qy + sinHalf * (normalX * qx - normalZ * qz + normalY * qw)
+		qw = cosHalf * qw + sinHalf * (normalZ * qx - normalY * qy + normalX * qz)
+		qz = cosHalf * qz + sinHalf * (normalY * qx + normalZ * qy - normalX * qw)
+		qx = cosHalf * qx - sinHalf * (normalX * qy + normalY * qz + normalZ * qw)
 	end
-	local var16 = (var6 * var7 + p1) / (var6 * var6 + 2 * var6 * var7 * p1 + p1 * p1) ^ 0.5
-	local var17 = ((1 - var16) * 0.5) ^ 0.5
-	local var18 = ((1 + var16) * 0.5) ^ 0.5
-	return p3 * cframe(-p1 * 2 * (var11 * var13 + var122 * var10), p1 * 2 * (var11 * var10 - var122 * var13), p1 * (2 * (var11 * var11 + var122 * var122) - 1), var17 * var11 + var18 * var10, var17 * var122 + var18 * var13, var17 * var13 - var18 * var122, var17 * var10 - var18 * var11), p3 * cframe(0, 0, 0, var11, var122, var13, var10)
+	local halfAngleCos = (reachLimit * cosElbow + upperLength) / (reachLimit * reachLimit + 2 * reachLimit * cosElbow * upperLength + upperLength * upperLength) ^ 0.5
+	local halfAngleSinMinus = ((1 - halfAngleCos) * 0.5) ^ 0.5
+	local halfAngleSinPlus = ((1 + halfAngleCos) * 0.5) ^ 0.5
+	return basePosition * cframeConstructor(-upperLength * 2 * (qy * qw + qz * qx), upperLength * 2 * (qy * qx - qz * qw), upperLength * (2 * (qy * qy + qz * qz) - 1), halfAngleSinMinus * qy + halfAngleSinPlus * qx, halfAngleSinMinus * qz + halfAngleSinPlus * qw, halfAngleSinMinus * qw - halfAngleSinPlus * qz, halfAngleSinMinus * qx - halfAngleSinPlus * qy), basePosition * cframeConstructor(0, 0, 0, qy, qz, qw, qx)
 end
 t.FromAxisAngle = FromAxisAngle
 t.SolveIK = SolveIK
@@ -117,187 +116,187 @@ local min = math.min
 local max = math.max
 local components = CFrame.new().components
 local abs = math.abs
-local function SingleAABBRaw(p1, p2, p3, p4, p5)
-	local cframe, v2, var3
-	if p3 then
-		cframe = p3.x
-		v2 = p3.y
-		var3 = p3.z
+local function SingleAABBRaw(cframe, size, rightAxis, upAxis, forwardAxis)
+	local axisRightX, axisUpX, axisForwardX
+	if rightAxis then
+		axisRightX = rightAxis.x
+		axisUpX = rightAxis.y
+		axisForwardX = rightAxis.z
 	else
-		cframe = 1
-		v2 = 0
-		var3 = 0
+		axisRightX = 1
+		axisUpX = 0
+		axisForwardX = 0
 	end
-	local var4, var5, var6
-	if p4 then
-		var4 = p4.x
-		var5 = p4.y
-		var6 = p4.z
+	local axisRightY, axisUpY, axisForwardY
+	if upAxis then
+		axisRightY = upAxis.x
+		axisUpY = upAxis.y
+		axisForwardY = upAxis.z
 	else
-		var5 = 1
-		var6 = 0
-		var4 = 0
+		axisUpY = 1
+		axisForwardY = 0
+		axisRightY = 0
 	end
-	local var7, var8, var9
-	if p5 then
-		var7 = p5.x
-		var8 = p5.y
-		var9 = p5.z
+	local axisRightZ, axisUpZ, axisForwardZ
+	if forwardAxis then
+		axisRightZ = forwardAxis.x
+		axisUpZ = forwardAxis.y
+		axisForwardZ = forwardAxis.z
 	else
-		var7 = 0
-		var8 = 0
-		var9 = 1
+		axisRightZ = 0
+		axisUpZ = 0
+		axisForwardZ = 1
 	end
-	local var10, var11, var12, var13, var14, var15, var16, var17, var18, var19, v20, v21 = components(p1)
-	local var22 = 0.5 * p2.x
-	local var23 = 0.5 * p2.y
-	local var24 = 0.5 * p2.z
-	local var25 = var10 - var13 * var22 - var14 * var23 - var15 * var24
-	local var26 = var11 - var16 * var22 - var17 * var23 - var18 * var24
-	local var27 = var12 - var19 * var22 - v20 * var23 - v21 * var24
-	local var28 = var10 - var13 * var22 - var14 * var23 + var15 * var24
-	local var29 = var11 - var16 * var22 - var17 * var23 + var18 * var24
-	local var30 = var12 - var19 * var22 - v20 * var23 + v21 * var24
-	local var31 = var10 - var13 * var22 + var14 * var23 - var15 * var24
-	local var32 = var11 - var16 * var22 + var17 * var23 - var18 * var24
-	local var33 = var12 - var19 * var22 + v20 * var23 - v21 * var24
-	local var34 = var10 - var13 * var22 + var14 * var23 + var15 * var24
-	local var35 = var11 - var16 * var22 + var17 * var23 + var18 * var24
-	local var36 = var12 - var19 * var22 + v20 * var23 + v21 * var24
-	local var37 = var10 + var13 * var22 - var14 * var23 - var15 * var24
-	local var38 = var11 + var16 * var22 - var17 * var23 - var18 * var24
-	local var39 = var12 + var19 * var22 - v20 * var23 - v21 * var24
-	local var40 = var10 + var13 * var22 - var14 * var23 + var15 * var24
-	local var41 = var11 + var16 * var22 - var17 * var23 + var18 * var24
-	local var42 = var12 + var19 * var22 - v20 * var23 + v21 * var24
-	local var43 = var10 + var13 * var22 + var14 * var23 - var15 * var24
-	local var44 = var11 + var16 * var22 + var17 * var23 - var18 * var24
-	local var45 = var12 + var19 * var22 + v20 * var23 - v21 * var24
-	local var46 = var10 + var13 * var22 + var14 * var23 + var15 * var24
-	local var47 = var11 + var16 * var22 + var17 * var23 + var18 * var24
-	local var48 = var12 + var19 * var22 + v20 * var23 + v21 * var24
-	local var49 = cframe * var25 + v2 * var26 + var3 * var27
-	local var50 = cframe * var28 + v2 * var29 + var3 * var30
-	local var51 = cframe * var31 + v2 * var32 + var3 * var33
-	local var52 = cframe * var34 + v2 * var35 + var3 * var36
-	local var53 = cframe * var37 + v2 * var38 + var3 * var39
-	local var54 = cframe * var40 + v2 * var41 + var3 * var42
-	local var55 = cframe * var43 + v2 * var44 + var3 * var45
-	local var56 = cframe * var46 + v2 * var47 + var3 * var48
-	local var57 = var4 * var25 + var5 * var26 + var6 * var27
-	local var58 = var4 * var28 + var5 * var29 + var6 * var30
-	local var59 = var4 * var31 + var5 * var32 + var6 * var33
-	local var60 = var4 * var34 + var5 * var35 + var6 * var36
-	local var61 = var4 * var37 + var5 * var38 + var6 * var39
-	local var62 = var4 * var40 + var5 * var41 + var6 * var42
-	local var63 = var4 * var43 + var5 * var44 + var6 * var45
-	local var64 = var4 * var46 + var5 * var47 + var6 * var48
-	local var65 = var7 * var25 + var8 * var26 + var9 * var27
-	local var66 = var7 * var28 + var8 * var29 + var9 * var30
-	local var67 = var7 * var31 + var8 * var32 + var9 * var33
-	local var68 = var7 * var34 + var8 * var35 + var9 * var36
-	local var69 = var7 * var37 + var8 * var38 + var9 * var39
-	local var70 = var7 * var40 + var8 * var41 + var9 * var42
-	local var71 = var7 * var43 + var8 * var44 + var9 * var45
-	local var72 = var7 * var46 + var8 * var47 + var9 * var48
-	return min(var49, var50, var51, var52, var53, var54, var55, var56), max(var49, var50, var51, var52, var53, var54, var55, var56), min(var57, var58, var59, var60, var61, var62, var63, var64), max(var57, var58, var59, var60, var61, var62, var63, var64), min(var65, var66, var67, var68, var69, var70, var71, var72), max(var65, var66, var67, var68, var69, var70, var71, var72)
+	local x, y, z, r00, r01, r02, r10, r11, r12, r20, r21, r22 = components(cframe)
+	local halfExtentX = 0.5 * size.x
+	local halfExtentY = 0.5 * size.y
+	local halfExtentZ = 0.5 * size.z
+	local corner000X = x - r00 * halfExtentX - r01 * halfExtentY - r02 * halfExtentZ
+	local corner000Y = y - r10 * halfExtentX - r11 * halfExtentY - r12 * halfExtentZ
+	local corner000Z = z - r20 * halfExtentX - r21 * halfExtentY - r22 * halfExtentZ
+	local corner001X = x - r00 * halfExtentX - r01 * halfExtentY + r02 * halfExtentZ
+	local corner001Y = y - r10 * halfExtentX - r11 * halfExtentY + r12 * halfExtentZ
+	local corner001Z = z - r20 * halfExtentX - r21 * halfExtentY + r22 * halfExtentZ
+	local corner010X = x - r00 * halfExtentX + r01 * halfExtentY - r02 * halfExtentZ
+	local corner010Y = y - r10 * halfExtentX + r11 * halfExtentY - r12 * halfExtentZ
+	local corner010Z = z - r20 * halfExtentX + r21 * halfExtentY - r22 * halfExtentZ
+	local corner011X = x - r00 * halfExtentX + r01 * halfExtentY + r02 * halfExtentZ
+	local corner011Y = y - r10 * halfExtentX + r11 * halfExtentY + r12 * halfExtentZ
+	local corner011Z = z - r20 * halfExtentX + r21 * halfExtentY + r22 * halfExtentZ
+	local corner100X = x + r00 * halfExtentX - r01 * halfExtentY - r02 * halfExtentZ
+	local corner100Y = y + r10 * halfExtentX - r11 * halfExtentY - r12 * halfExtentZ
+	local corner100Z = z + r20 * halfExtentX - r21 * halfExtentY - r22 * halfExtentZ
+	local corner101X = x + r00 * halfExtentX - r01 * halfExtentY + r02 * halfExtentZ
+	local corner101Y = y + r10 * halfExtentX - r11 * halfExtentY + r12 * halfExtentZ
+	local corner101Z = z + r20 * halfExtentX - r21 * halfExtentY + r22 * halfExtentZ
+	local corner110X = x + r00 * halfExtentX + r01 * halfExtentY - r02 * halfExtentZ
+	local corner110Y = y + r10 * halfExtentX + r11 * halfExtentY - r12 * halfExtentZ
+	local corner110Z = z + r20 * halfExtentX + r21 * halfExtentY - r22 * halfExtentZ
+	local corner111X = x + r00 * halfExtentX + r01 * halfExtentY + r02 * halfExtentZ
+	local corner111Y = y + r10 * halfExtentX + r11 * halfExtentY + r12 * halfExtentZ
+	local corner111Z = z + r20 * halfExtentX + r21 * halfExtentY + r22 * halfExtentZ
+	local proj000Right = axisRightX * corner000X + axisUpX * corner000Y + axisForwardX * corner000Z
+	local proj001Right = axisRightX * corner001X + axisUpX * corner001Y + axisForwardX * corner001Z
+	local proj010Right = axisRightX * corner010X + axisUpX * corner010Y + axisForwardX * corner010Z
+	local proj011Right = axisRightX * corner011X + axisUpX * corner011Y + axisForwardX * corner011Z
+	local proj100Right = axisRightX * corner100X + axisUpX * corner100Y + axisForwardX * corner100Z
+	local proj101Right = axisRightX * corner101X + axisUpX * corner101Y + axisForwardX * corner101Z
+	local proj110Right = axisRightX * corner110X + axisUpX * corner110Y + axisForwardX * corner110Z
+	local proj111Right = axisRightX * corner111X + axisUpX * corner111Y + axisForwardX * corner111Z
+	local proj000Up = axisRightY * corner000X + axisUpY * corner000Y + axisForwardY * corner000Z
+	local proj001Up = axisRightY * corner001X + axisUpY * corner001Y + axisForwardY * corner001Z
+	local proj010Up = axisRightY * corner010X + axisUpY * corner010Y + axisForwardY * corner010Z
+	local proj011Up = axisRightY * corner011X + axisUpY * corner011Y + axisForwardY * corner011Z
+	local proj100Up = axisRightY * corner100X + axisUpY * corner100Y + axisForwardY * corner100Z
+	local proj101Up = axisRightY * corner101X + axisUpY * corner101Y + axisForwardY * corner101Z
+	local proj110Up = axisRightY * corner110X + axisUpY * corner110Y + axisForwardY * corner110Z
+	local proj111Up = axisRightY * corner111X + axisUpY * corner111Y + axisForwardY * corner111Z
+	local proj000Forward = axisRightZ * corner000X + axisUpZ * corner000Y + axisForwardZ * corner000Z
+	local proj001Forward = axisRightZ * corner001X + axisUpZ * corner001Y + axisForwardZ * corner001Z
+	local proj010Forward = axisRightZ * corner010X + axisUpZ * corner010Y + axisForwardZ * corner010Z
+	local proj011Forward = axisRightZ * corner011X + axisUpZ * corner011Y + axisForwardZ * corner011Z
+	local proj100Forward = axisRightZ * corner100X + axisUpZ * corner100Y + axisForwardZ * corner100Z
+	local proj101Forward = axisRightZ * corner101X + axisUpZ * corner101Y + axisForwardZ * corner101Z
+	local proj110Forward = axisRightZ * corner110X + axisUpZ * corner110Y + axisForwardZ * corner110Z
+	local proj111Forward = axisRightZ * corner111X + axisUpZ * corner111Y + axisForwardZ * corner111Z
+	return min(proj000Right, proj001Right, proj010Right, proj011Right, proj100Right, proj101Right, proj110Right, proj111Right), max(proj000Right, proj001Right, proj010Right, proj011Right, proj100Right, proj101Right, proj110Right, proj111Right), min(proj000Up, proj001Up, proj010Up, proj011Up, proj100Up, proj101Up, proj110Up, proj111Up), max(proj000Up, proj001Up, proj010Up, proj011Up, proj100Up, proj101Up, proj110Up, proj111Up), min(proj000Forward, proj001Forward, proj010Forward, proj011Forward, proj100Forward, proj101Forward, proj110Forward, proj111Forward), max(proj000Forward, proj001Forward, proj010Forward, proj011Forward, proj100Forward, proj101Forward, proj110Forward, proj111Forward)
 end
-local function SingleAABB(p1, p2)
-	local cframe, v2, var3, var4, var5, var6 = SingleAABBRaw(p1, p2, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 1))
-	return CFrame.new(0.5 * (cframe + v2), 0.5 * (var3 + var4), 0.5 * (var5 + var6), 1, 0, 0, 0, 1, 0, 0, 0, 1), Vector3.new(v2 - cframe, var4 - var3, var6 - var5)
+local function SingleAABB(cframe, size)
+	local minRight, maxRight, minUp, maxUp, minForward, maxForward = SingleAABBRaw(cframe, size, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 1))
+	return CFrame.new(0.5 * (minRight + maxRight), 0.5 * (minUp + maxUp), 0.5 * (minForward + maxForward), 1, 0, 0, 0, 1, 0, 0, 0, 1), Vector3.new(maxRight - minRight, maxUp - minUp, maxForward - minForward)
 end
-local function MultiAABBRaw(p1, p2, p3, p4)
-	local cframe = nil
-	local v2 = nil
-	local var3 = nil
-	local var4 = nil
-	local var5 = nil
-	local var6 = nil
-	for var7, var8 in next, p1 do
-		local var9, var10, var11, var12, var13, var14 = SingleAABBRaw(var8.CFrame, var8.Size, p2, p3, p4)
-		if not var5 or var9 < var5 then
-			var5 = var9
+local function MultiAABBRaw(parts, rightAxis, upAxis, forwardAxis)
+	local minRight = nil
+	local maxRight = nil
+	local minUp = nil
+	local maxUp = nil
+	local minForward = nil
+	local maxForward = nil
+	for partIdx, part in next, parts do
+		local partMinRight, partMaxRight, partMinUp, partMaxUp, partMinForward, partMaxForward = SingleAABBRaw(part.CFrame, part.Size, rightAxis, upAxis, forwardAxis)
+		if not minForward or partMinRight < minForward then
+			minForward = partMinRight
 		end
-		if not var6 or var6 < var10 then
-			var6 = var10
+		if not maxForward or maxForward < partMaxRight then
+			maxForward = partMaxRight
 		end
-		if not cframe or var11 < cframe then
-			cframe = var11
+		if not minRight or partMinUp < minRight then
+			minRight = partMinUp
 		end
-		if not v2 or v2 < var12 then
-			v2 = var12
+		if not maxRight or maxRight < partMaxUp then
+			maxRight = partMaxUp
 		end
-		if not var3 or var13 < var3 then
-			var3 = var13
+		if not minUp or partMinForward < minUp then
+			minUp = partMinForward
 		end
-		if not var4 or var4 < var14 then
-			var4 = var14
+		if not maxUp or maxUp < partMaxForward then
+			maxUp = partMaxForward
 		end
 	end
-	return var5, var6, cframe, v2, var3, var4
+	return minForward, maxForward, minRight, maxRight, minUp, maxUp
 end
-local function MultiAABB(p1)
-	local cframe, v2, var3, var4, var5, var6 = MultiAABBRaw(p1, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 1))
-	return CFrame.new(0.5 * (cframe + v2), 0.5 * (var3 + var4), 0.5 * (var5 + var6), 1, 0, 0, 0, 1, 0, 0, 0, 1), Vector3.new(v2 - cframe, var4 - var3, var6 - var5)
+local function MultiAABB(parts)
+	local minRight, maxRight, minUp, maxUp, minForward, maxForward = MultiAABBRaw(parts, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 1))
+	return CFrame.new(0.5 * (minRight + maxRight), 0.5 * (minUp + maxUp), 0.5 * (minForward + maxForward), 1, 0, 0, 0, 1, 0, 0, 0, 1), Vector3.new(maxRight - minRight, maxUp - minUp, maxForward - minForward)
 end
-local function IntersectAABB(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12)
-	return if p1 <= p8 and (p7 <= p2 and (p3 <= p10 and (p9 <= p4 and p5 <= p12))) then p11 <= p6 else false
+local function IntersectAABB(minX1, maxX1, minY1, maxY1, minZ1, maxZ1, minX2, maxX2, minY2, maxY2, minZ2, maxZ2)
+	return if minX1 <= maxX2 and (minX2 <= maxX1 and (minY1 <= maxY2 and (minY2 <= maxY1 and minZ1 <= maxZ2))) then minZ2 <= maxZ1 else false
 end
-local function IntersectPrism(p1, p2, p3, p4)
-	local cframe, v2, var3, var4, var5, var6 = SingleAABBRaw(p1, p2)
-	local var7, var8, var9, var10, var11, var12 = SingleAABBRaw(p3, p4)
-	return if cframe <= var8 and (var7 <= v2 and (var3 <= var10 and (var9 <= var4 and var5 <= var12))) then var11 <= var6 else false
+local function IntersectPrism(cframe1, size1, cframe2, size2)
+	local minRight1, maxRight1, minUp1, maxUp1, minForward1, maxForward1 = SingleAABBRaw(cframe1, size1)
+	local minRight2, maxRight2, minUp2, maxUp2, minForward2, maxForward2 = SingleAABBRaw(cframe2, size2)
+	return if minRight1 <= maxRight2 and (minRight2 <= maxRight1 and (minUp1 <= maxUp2 and (minUp2 <= maxUp1 and minForward1 <= maxForward2))) then minForward2 <= maxForward1 else false
 end
-local function IntersectMultiPrism(p1)
-	for i = 1, #p1 do
-		local cframe = p1[i]
-		local v2, var3, var4, var5, var6, var7 = SingleAABBRaw(cframe.CFrame, cframe.Size, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 1))
-		for j = i + 1, #p1 do
-			local var8
-			local var9 = p1[j]
-			local var10, var11, var12, var13, var14, var15 = SingleAABBRaw(var9.CFrame, var9.Size, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 1))
-			var8 = if v2 <= var11 and (var10 <= var3 and (var4 <= var13 and (var12 <= var5 and var6 <= var15))) then var14 <= var7 else false
-			if var8 then
+local function IntersectMultiPrism(parts)
+	for i = 1, #parts do
+		local part1 = parts[i]
+		local minRight1, maxRight1, minUp1, maxUp1, minForward1, maxForward1 = SingleAABBRaw(part1.CFrame, part1.Size, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 1))
+		for j = i + 1, #parts do
+			local intersects
+			local part2 = parts[j]
+			local minRight2, maxRight2, minUp2, maxUp2, minForward2, maxForward2 = SingleAABBRaw(part2.CFrame, part2.Size, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, 0, 1))
+			intersects = if maxRight1 <= minRight2 and (minRight2 <= minRight1 and (minUp1 <= maxUp2 and (minUp2 <= maxUp1 and minForward1 <= maxForward2))) then minForward2 <= maxForward1 else false
+			if intersects then
 				return true
 			end
 		end
 	end
 	return false
 end
-local function IntersectRectangleRaw(p1, p2, p3, p4, p5, p6, p7, p8)
-	return if p1 <= p6 and (p5 <= p2 and p3 <= p8) then p7 <= p4 else false
+local function IntersectRectangleRaw(minX1, maxX1, minY1, maxY1, minX2, maxX2, minY2, maxY2)
+	return if minX1 <= maxX2 and (minX2 <= maxX1 and minY1 <= maxY2) then minY2 <= maxY1 else false
 end
-local function ContainRectangleRaw(p1, p2, p3, p4, p5, p6, p7, p8)
-	return if p5 <= p1 and (p2 <= p6 and p7 <= p3) then p4 <= p8 else false
+local function ContainRectangleRaw(minX1, maxX1, minY1, maxY1, minX2, maxX2, minY2, maxY2)
+	return if minX2 <= minX1 and (maxX1 <= maxX2 and minY2 <= minY1) then maxY1 <= maxY2 else false
 end
-local function IsPointInRectangleRaw(p1, p2, p3, p4, p5, p6)
-	return if p3 <= p1 and (p1 <= p4 and p5 <= p2) then p2 <= p6 else false
+local function IsPointInRectangleRaw(px, py, minX, maxX, minY, maxY)
+	return if minX <= px and (px <= maxX and minY <= py) then py <= maxY else false
 end
-local function IntersectRayPlane(p1, p2, p3, p4)
-	local cframe = Dot(p2, p4)
-	if abs(cframe) <= 1e-6 then
+local function IntersectRayPlane(rayOrigin, rayDirection, planePoint, planeNormal)
+	local denom = Dot(rayDirection, planeNormal)
+	if abs(denom) <= 1e-6 then
 		return false
 	else
-		local v2 = Dot(p3 - p1, p4)
-		if v2 > 0 then
+		local numerator = Dot(planePoint - rayOrigin, planeNormal)
+		if numerator > 0 then
 			return false
 		else
-			return true, p1 + p2 * (v2 / cframe)
+			return true, rayOrigin + rayDirection * (numerator / denom)
 		end
 	end
 end
-local function IntersectSegSeg(p1, p2, p3, p4, p5, p6, p7, p8)
-	local cframe = (p8 - p6) * (p3 - p1) - (p7 - p5) * (p4 - p2)
-	local v2 = (p7 - p5) * (p2 - p6) - (p8 - p6) * (p1 - p5)
-	local var3 = (p3 - p1) * (p2 - p6) - (p4 - p2) * (p1 - p5)
-	if abs(v2) < 0.001 and (abs(var3) < 0.001 and abs(cframe) < 0.001) then
+local function IntersectSegSeg(seg1Start, seg1StartY, seg2Start, seg2StartY, seg1End, seg1EndY, seg2End, seg2EndY)
+	local crossProduct = (seg2EndY - seg1EndY) * (seg2Start - seg1Start) - (seg2End - seg1End) * (seg1StartY - seg1EndY)
+	local numeratorS = (seg2End - seg1End) * (seg1StartY - seg1EndY) - (seg2EndY - seg1EndY) * (seg1Start - seg1End)
+	local numeratorT = (seg2Start - seg1Start) * (seg1StartY - seg1EndY) - (seg1StartY - seg2StartY) * (seg1Start - seg1End)
+	if abs(numeratorS) < 0.001 and (abs(numeratorT) < 0.001 and abs(crossProduct) < 0.001) then
 		return true
-	elseif abs(cframe) < 0.001 then
+	elseif abs(crossProduct) < 0.001 then
 		return false
 	else
-		local var4 = v2 / cframe
-		local var5 = var3 / cframe
-		return not (var4 <= 0 or (var4 > 1 or (var5 <= 0 or var5 > 1)))
+		local s = numeratorS / crossProduct
+		local tParam = numeratorT / crossProduct
+		return not (s <= 0 or (s > 1 or (tParam <= 0 or tParam > 1)))
 	end
 end
 t.SingleAABB = SingleAABB
@@ -311,68 +310,68 @@ t.IntersectRectangleRaw = IntersectRectangleRaw
 t.ContainRectangleRaw = ContainRectangleRaw
 t.IsPointInRectangleRaw = IsPointInRectangleRaw
 t.IntersectRayPlane = IntersectRayPlane
-local cos_3 = math.cos
+local cosineAngleOffset = math.cos
 local tan = math.tan
-function t.DoesFixedConeIntersectSphere(p1, p2, p3, p4, p5, p6)
-	local cframe = p5 - p1
-	if p3 <= p2:Dot(cframe) then
+function t.DoesFixedConeIntersectSphere(coneOrigin, coneDirection, coneAngleLimit, coneHalfAngle, sphereCenter, sphereRadius)
+	local rayToSphere = sphereCenter - coneOrigin
+	if coneAngleLimit <= coneDirection:Dot(rayToSphere) then
 		return false
 	else
-		local v2 = cframe:Dot(p2)
-		local var3 = v2 * tan(p4)
-		return ((cframe:Dot(cframe) - v2 * v2) ^ 0.5 - var3) * cos_3(p4) <= p6
+		local projLength = rayToSphere:Dot(coneDirection)
+		local perpDistance = projLength * tan(coneHalfAngle)
+		return ((rayToSphere:Dot(rayToSphere) - projLength * projLength) ^ 0.5 - perpDistance) * cosineAngleOffset(coneHalfAngle) <= sphereRadius
 	end
 end
 local asin = math.asin
 local atan = math.atan
-local cos_4 = math.cos
-local sin_3 = math.sin
-function t.OffsetLookAtTarget(p1, p2, p3, p4, p5, p6)
-	if p4 == 0 or (p5 == 0 or p6 == 0) then
+local cosineAngleLookAt = math.cos
+local sineAngleLookAt = math.sin
+function t.OffsetLookAtTarget(horizAngle, vertAngle, camHeight, targetX, targetY, targetZ)
+	if targetX == 0 or (targetY == 0 or targetZ == 0) then
 		return 0, 0
 	else
-		local cframe = p4 * p4 + p6 * p6
-		local v2 = p6 < 0 and atan(p4 / p6) or math.pi - atan(-p4 / p6)
-		local var4 = v2 + (p1 * p1 < cframe and asin(p1 / cframe ^ 0.5) or asin(cframe ^ 0.5 / p1))
-		local var5 = p6 * cos_4(var4) + p4 * sin_3(var4)
-		local var6 = p5 * p5 + var5 * var5
-		local var7 = var5 < 0 and atan(-p5 / var5) or atan(p5 / var5)
-		return var4, var7 - (p2 * p2 < var6 and asin(p2 / var6 ^ 0.5) or asin(var6 ^ 0.5 / p2))
+		local horizontalDist = targetX * targetX + targetZ * targetZ
+		local azimuthAngle = targetZ < 0 and atan(targetX / targetZ) or math.pi - atan(-targetX / targetZ)
+		local elevationAngle = azimuthAngle + (horizAngle * horizAngle < horizontalDist and asin(horizAngle / horizontalDist ^ 0.5) or asin(horizontalDist ^ 0.5 / horizAngle))
+		local newVertPos = targetZ * cosineAngleLookAt(elevationAngle) + targetX * sineAngleLookAt(elevationAngle)
+		local totalHeight = targetY * targetY + newVertPos * newVertPos
+		local pitchAngle = newVertPos < 0 and atan(-targetY / newVertPos) or atan(targetY / newVertPos)
+		return elevationAngle, pitchAngle - (vertAngle * vertAngle < totalHeight and asin(vertAngle / totalHeight ^ 0.5) or asin(totalHeight ^ 0.5 / vertAngle))
 	end
 end
-local function TraceBounceRay(p1, p2, p3, p4)
-	local count = 0
+local function TraceBounceRay(rayOrigin, rayDirection, rayDistance, ignoreList)
+	local bounceCount = 0
 	while true do
-		count = count + 1
-		local v2, var3, var4 = workspace:FindPartOnRayWithIgnoreList(Ray.new(p1, p2 * p3), p4)
-		local Magnitude = (var3 - p1).Magnitude
-		p3 = p3 - Magnitude
-		if v2 and v2.CanCollide then
-			p2 = p2 - 2 * p2:Dot(var4) * var4
+		bounceCount = bounceCount + 1
+		local hitPart, hitPosition, surfaceNormal = workspace:FindPartOnRayWithIgnoreList(Ray.new(rayOrigin, rayDirection * rayDistance), ignoreList)
+		local travelDistance = (hitPosition - rayOrigin).Magnitude
+		rayDistance = rayDistance - travelDistance
+		if hitPart and hitPart.CanCollide then
+			rayDirection = rayDirection - 2 * rayDirection:Dot(surfaceNormal) * surfaceNormal
 		end
-		if p3 <= 0 or (Magnitude < 0.001 or count > 10) then
-			return var3, p2
+		if rayDistance <= 0 or (travelDistance < 0.001 or bounceCount > 10) then
+			return hitPosition, rayDirection
 		end
-		p1 = var3
+		rayOrigin = hitPosition
 	end
 end
-function t.SinkRay(p1, p2, p3, p4)
-	local count = 0
+function t.SinkRay(rayOrigin, rayDirection, rayDistance, ignoreList)
+	local bounceCount = 0
 	while true do
-		count = count + 1
-		local v2, var3, _ = workspace:FindPartOnRayWithIgnoreList(Ray.new(p1, p2 * p3), p4)
-		local Magnitude = (var3 - p1).Magnitude
-		p3 = p3 - Magnitude
-		if v2 then
-			if v2.CanCollide then
-				return var3, p2, v2
+		bounceCount = bounceCount + 1
+		local hitPart, hitPosition, _ = workspace:FindPartOnRayWithIgnoreList(Ray.new(rayOrigin, rayDirection * rayDistance), ignoreList)
+		local travelDistance = (hitPosition - rayOrigin).Magnitude
+		rayDistance = rayDistance - travelDistance
+		if hitPart then
+			if hitPart.CanCollide then
+				return hitPosition, rayDirection, hitPart
 			end
-			table.insert(p4, v2)
+			table.insert(ignoreList, hitPart)
 		end
-		if p3 <= 0 or (Magnitude < 0.001 or count > 10) then
-			return var3, p2
+		if rayDistance <= 0 or (travelDistance < 0.001 or bounceCount > 10) then
+			return hitPosition, rayDirection
 		end
-		p1 = var3
+		rayOrigin = hitPosition
 	end
 end
 t.TraceBounceRay = TraceBounceRay

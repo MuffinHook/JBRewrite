@@ -1,77 +1,76 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SeekingMissileConsts = require(ReplicatedStorage.SeekingMissile.SeekingMissileConsts)
 return {
-	getAccel = function(p1)
-		return p1:GetAttribute(SeekingMissileConsts.ACCEL_ATTR_NAME)
+	getAccel = function(missile)
+		return missile:GetAttribute(SeekingMissileConsts.ACCEL_ATTR_NAME)
 	end,
-	setAccel = function(p1, p2)
-		p1:SetAttribute(SeekingMissileConsts.ACCEL_ATTR_NAME, p2)
+	setAccel = function(missile, value)
+		missile:SetAttribute(SeekingMissileConsts.ACCEL_ATTR_NAME, value)
 	end,
-	getLifeSpan = function(p1)
-		return p1:GetAttribute(SeekingMissileConsts.LIFE_SPAN_ATTR_NAME)
+	getLifeSpan = function(missile)
+		return missile:GetAttribute(SeekingMissileConsts.LIFE_SPAN_ATTR_NAME)
 	end,
-	setLifeSpan = function(p1, p2)
-		p1:SetAttribute(SeekingMissileConsts.LIFE_SPAN_ATTR_NAME, p2)
+	setLifeSpan = function(missile, value)
+		missile:SetAttribute(SeekingMissileConsts.LIFE_SPAN_ATTR_NAME, value)
 	end,
-	getSeekAfterDuration = function(p1)
-		return p1:GetAttribute(SeekingMissileConsts.SEEK_AFTER_DURATION_ATTR_NAME)
+	getSeekAfterDuration = function(missile)
+		return missile:GetAttribute(SeekingMissileConsts.SEEK_AFTER_DURATION_ATTR_NAME)
 	end,
-	setSeekAfterDuration = function(p1, p2)
-		p1:SetAttribute(SeekingMissileConsts.SEEK_AFTER_DURATION_ATTR_NAME, p2)
+	setSeekAfterDuration = function(missile, value)
+		missile:SetAttribute(SeekingMissileConsts.SEEK_AFTER_DURATION_ATTR_NAME, value)
 	end,
-	getNoImprovementExplodeDuration = function(p1)
-		return p1:GetAttribute(SeekingMissileConsts.NO_IMPROVEMENT_EXPLODE_DURATION_ATTR_NAME)
+	getNoImprovementExplodeDuration = function(missile)
+		return missile:GetAttribute(SeekingMissileConsts.NO_IMPROVEMENT_EXPLODE_DURATION_ATTR_NAME)
 	end,
-	setNoImprovementExplodeDuration = function(p1, p2)
-		p1:SetAttribute(SeekingMissileConsts.NO_IMPROVEMENT_EXPLODE_DURATION_ATTR_NAME, p2)
+	setNoImprovementExplodeDuration = function(missile, value)
+		missile:SetAttribute(SeekingMissileConsts.NO_IMPROVEMENT_EXPLODE_DURATION_ATTR_NAME, value)
 	end,
-	getConnectHitAfterDuration = function(p1)
-		return p1:GetAttribute(SeekingMissileConsts.CONNECT_HIT_AFTER_DURATION_ATTR_NAME)
+	getConnectHitAfterDuration = function(missile)
+		return missile:GetAttribute(SeekingMissileConsts.CONNECT_HIT_AFTER_DURATION_ATTR_NAME)
 	end,
-	setConnectHitAfterDuration = function(p1, p2)
-		p1:SetAttribute(SeekingMissileConsts.CONNECT_HIT_AFTER_DURATION_ATTR_NAME, p2)
+	setConnectHitAfterDuration = function(missile, value)
+		missile:SetAttribute(SeekingMissileConsts.CONNECT_HIT_AFTER_DURATION_ATTR_NAME, value)
 	end,
-	getDropDuration = function(p1)
-		return p1:GetAttribute(SeekingMissileConsts.DROP_DURATION_ATTR_NAME)
+	getDropDuration = function(missile)
+		return missile:GetAttribute(SeekingMissileConsts.DROP_DURATION_ATTR_NAME)
 	end,
-	setDropDuration = function(p1, p2)
-		p1:SetAttribute(SeekingMissileConsts.DROP_DURATION_ATTR_NAME, p2)
+	setDropDuration = function(missile, value)
+		missile:SetAttribute(SeekingMissileConsts.DROP_DURATION_ATTR_NAME, value)
 	end,
-	getApplyingThrust = function(p1)
-		return p1:GetAttribute(SeekingMissileConsts.APPLYING_THRUST_ATTR_NAME)
+	getApplyingThrust = function(missile)
+		return missile:GetAttribute(SeekingMissileConsts.APPLYING_THRUST_ATTR_NAME)
 	end,
-	getApplyingThrustChangedSignal = function(p1)
-		return p1:GetAttributeChangedSignal(SeekingMissileConsts.APPLYING_THRUST_ATTR_NAME)
+	getApplyingThrustChangedSignal = function(missile)
+		return missile:GetAttributeChangedSignal(SeekingMissileConsts.APPLYING_THRUST_ATTR_NAME)
 	end,
-	setApplyingThrust = function(p1, p2)
-		p1:SetAttribute(SeekingMissileConsts.APPLYING_THRUST_ATTR_NAME, p2)
+	setApplyingThrust = function(missile, value)
+		missile:SetAttribute(SeekingMissileConsts.APPLYING_THRUST_ATTR_NAME, value)
 	end,
-	getTargetPos = function(p1)
-		return p1:GetAttribute(SeekingMissileConsts.TARGET_POS_ATTR_NAME)
+	getTargetPos = function(missile)
+		return missile:GetAttribute(SeekingMissileConsts.TARGET_POS_ATTR_NAME)
 	end,
-	getTargetPosChangedSignal = function(p1)
-		return p1:GetAttributeChangedSignal(SeekingMissileConsts.TARGET_POS_ATTR_NAME)
+	getTargetPosChangedSignal = function(missile)
+		return missile:GetAttributeChangedSignal(SeekingMissileConsts.TARGET_POS_ATTR_NAME)
 	end,
-	setTargetPos = function(p1, p2)
-		p1:SetAttribute(SeekingMissileConsts.TARGET_POS_ATTR_NAME, p2)
+	setTargetPos = function(missile, value)
+		missile:SetAttribute(SeekingMissileConsts.TARGET_POS_ATTR_NAME, value)
 	end,
-	getForwardDrag = function(p1)
-		return p1:GetAttribute(SeekingMissileConsts.FORWARD_DRAG_ATTR_NAME)
+	getForwardDrag = function(missile)
+		return missile:GetAttribute(SeekingMissileConsts.FORWARD_DRAG_ATTR_NAME)
 	end,
-	setForwardDrag = function(p1, p2)
-		p1:SetAttribute(SeekingMissileConsts.FORWARD_DRAG_ATTR_NAME, p2)
+	setForwardDrag = function(missile, value)
+		missile:SetAttribute(SeekingMissileConsts.FORWARD_DRAG_ATTR_NAME, value)
 	end,
-	getLateralDrag = function(p1)
-		return p1:GetAttribute(SeekingMissileConsts.LATERAL_DRAG_ATTR_NAME)
+	getLateralDrag = function(missile)
+		return missile:GetAttribute(SeekingMissileConsts.LATERAL_DRAG_ATTR_NAME)
 	end,
-	setLateralDrag = function(p1, p2)
-		p1:SetAttribute(SeekingMissileConsts.LATERAL_DRAG_ATTR_NAME, p2)
+	setLateralDrag = function(missile, value)
+		missile:SetAttribute(SeekingMissileConsts.LATERAL_DRAG_ATTR_NAME, value)
 	end,
-	getAlignResponsiveness = function(p1)
-		return p1:GetAttribute(SeekingMissileConsts.ALIGN_RESPONSIVENESS_ATTR_NAME)
+	getAlignResponsiveness = function(missile)
+		return missile:GetAttribute(SeekingMissileConsts.ALIGN_RESPONSIVENESS_ATTR_NAME)
 	end,
-	setAlignResponsiveness = function(p1, p2)
-		p1:SetAttribute(SeekingMissileConsts.ALIGN_RESPONSIVENESS_ATTR_NAME, p2)
+	setAlignResponsiveness = function(missile, value)
+		missile:SetAttribute(SeekingMissileConsts.ALIGN_RESPONSIVENESS_ATTR_NAME, value)
 	end
 }

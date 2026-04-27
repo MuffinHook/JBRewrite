@@ -1,57 +1,55 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
 local Gun = require(script.Parent.Gun)
-local t = {
+local NerfRevolver = {
 	__ClassName = "NerfRevolver"
 }
-t.__index = t
-setmetatable(t, Gun)
-function t.new(p1, p2, p3)
-	local revolver = Gun.new(p1, p2, p3)
-	setmetatable(revolver, t)
+NerfRevolver.__index = NerfRevolver
+setmetatable(NerfRevolver, Gun)
+function NerfRevolver.new(owner, gunConfig, configData)
+	local revolver = Gun.new(owner, gunConfig, configData)
+	setmetatable(revolver, NerfRevolver)
 	revolver.ApplySkin = false
-	revolver:Setup(p3)
+	revolver:Setup(configData)
 	return revolver
 end
-function t.SetupBulletEmitter(p1)
-	Gun.SetupBulletEmitter(p1)
-	p1.BulletEmitter.Color = Color3.fromRGB(50, 255, 50)
+function NerfRevolver.SetupBulletEmitter(gun)
+	Gun.SetupBulletEmitter(gun)
+	gun.BulletEmitter.Color = Color3.fromRGB(50, 255, 50)
 end
-function t.ShootSound(p1, p2)
-	if not p2 then
-		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.shoot, {
+function NerfRevolver.ShootSound(gun, isLocalShot)
+	if not isLocalShot then
+		Audio.ObjectLocal(gun.Tip, gun.Config.Sound.shoot, {
 			Pitch = 1
 		})
 		delay(0.1, function()
-			Audio.ObjectLocal(p1.Tip, p1.Config.Sound.bullet_case, {
+			Audio.ObjectLocal(gun.Tip, gun.Config.Sound.bullet_case, {
 				Volume = 0.4,
 				Pitch = 1 + math.random() * 0.1 - 0.05
 			})
 		end)
 	end
 end
-function t.ReloadDropAmmoVisual(p1)  end
-function t.ReloadRefillAmmoVisual(p1)  end
-function t.ReloadDropAmmoSound(p1)
-	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.reload_open, {
+function NerfRevolver.ReloadDropAmmoVisual(gun)  end
+function NerfRevolver.ReloadRefillAmmoVisual(gun)  end
+function NerfRevolver.ReloadDropAmmoSound(gun)
+	Audio.ObjectLocal(gun.Tip, gun.Config.Sound.reload_open, {
 		RollOffMaxDistance = 129
 	})
 end
-function t.ReloadRefillAmmoSound(p1)
+function NerfRevolver.ReloadRefillAmmoSound(gun)
 	for i = 1, 4 do
-		Audio.ObjectLocal(p1.Tip, p1.Config.Sound.bullet_insert, {
+		Audio.ObjectLocal(gun.Tip, gun.Config.Sound.bullet_insert, {
 			RollOffMaxDistance = 129
 		})
 		wait(0.2)
 	end
-	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.reload_close, {
+	Audio.ObjectLocal(gun.Tip, gun.Config.Sound.reload_close, {
 		RollOffMaxDistance = 129
 	})
 	wait(0.2)
-	Audio.ObjectLocal(p1.Tip, p1.Config.Sound.cylinder_spin, {
+	Audio.ObjectLocal(gun.Tip, gun.Config.Sound.cylinder_spin, {
 		RollOffMaxDistance = 129
 	})
 end
-return t
+return NerfRevolver

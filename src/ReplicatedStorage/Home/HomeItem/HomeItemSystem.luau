@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BigButtonService = require(ReplicatedStorage.App.BigButtonService)
@@ -21,7 +20,7 @@ local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local HomeItemBinder = require(script.Parent.HomeItemBinder)
 local HomeSystem = require(script.Parent.Parent.HomeSystem)
 local HomeItemConsts = require(script.Parent.HomeItemConsts)
-local t = {
+local HomeItemSystem = {
 	_inventory = {},
 	_maid = Maid.new(),
 	onCustomizeStarted = Signal.new(),
@@ -29,23 +28,23 @@ local t = {
 	onAttemptPlaceItem = Signal.new(),
 	onAttemptDeleteItem = Signal.new()
 }
-function t.init()
+function HomeItemSystem.init()
 	HomeItemBinder:Start()
-	local t2 = {
+	local screenGuiProps = {
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		ResetOnSpawn = false,
 		IgnoreGuiInset = true,
 		DisplayOrder = 8
 	}
-	local t3 = {}
-	local t5 = {}
-	local t6 = {
+	local roactChildren = {}
+	local uiTree = {}
+	local homeFrameProps = {
 		BackgroundTransparency = 1
 	}
-	t6.Size = if Utils.isSmallScreen() then UDim2.fromScale(0.7, 0.5) else UDim2.fromScale(0.6, 0.5)
-	t6.Position = UDim2.fromScale(0.5, 0.08)
-	t6.AnchorPoint = Vector2.new(0.5, 0)
-	t5.HomeContainer = createElement("Frame", t6, {
+	homeFrameProps.Size = if Utils.isSmallScreen() then UDim2.fromScale(0.7, 0.5) else UDim2.fromScale(0.6, 0.5)
+	homeFrameProps.Position = UDim2.fromScale(0.5, 0.08)
+	homeFrameProps.AnchorPoint = Vector2.new(0.5, 0)
+	uiTree.HomeContainer = createElement("Frame", homeFrameProps, {
 		UIAspectRatioConstraint = createElement("UIAspectRatioConstraint", {
 			AspectRatio = 3
 		}),
@@ -54,19 +53,19 @@ function t.init()
 			verticalPaddingRatio = 128,
 			attemptPlaceItem = function(self)
 				if self.module == "HomeItem" then
-					t.onAttemptPlaceItem:Fire(self)
+					HomeItemSystem.onAttemptPlaceItem:Fire(self)
 				else
-					t.attemptEquip(self.module, self.name)
+					HomeItemSystem.attemptEquip(self.module, self.name)
 				end
 			end,
 			attemptPreviewItem = function(self)
-				t.attemptPreview(self.module, self.name)
+				HomeItemSystem.attemptPreview(self.module, self.name)
 			end,
 			attemptPurchaseItem = function(self)
-				t.attemptPurchase(self.module, self.name)
+				HomeItemSystem.attemptPurchase(self.module, self.name)
 			end,
 			attemptDeleteItem = function()
-				t.onAttemptDeleteItem:Fire()
+				HomeItemSystem.onAttemptDeleteItem:Fire()
 			end,
 			promptCashPurchase = function()
 				homeStore:dispatch({
@@ -75,30 +74,30 @@ function t.init()
 				})
 				CashBuyUI.Open()
 			end,
-			onSettingChanged = function(self, p2)
-				HomeSystem.queryCurrentStandingHome():SetSavedSetting(self, p2)
+			onSettingChanged = function(self, settingValue)
+				HomeSystem.queryCurrentStandingHome():SetSavedSetting(self, settingValue)
 			end,
 			exit = function()
 				homeStore:dispatch({
 					type = "setVisible",
 					value = false
 				})
-				local v1 = HomeSystem.queryCurrentStandingHome()
-				if v1 then
-					v1:ReplicateCustomizing(false)
-					t.onCustomizeEnded:Fire(v1)
+				local currentHome = HomeSystem.queryCurrentStandingHome()
+				if currentHome then
+					currentHome:ReplicateCustomizing(false)
+					HomeItemSystem.onCustomizeEnded:Fire(currentHome)
 				end
 			end
 		})
 	})
-	t3[1] = Roact.createElement(RoactRodux.StoreProvider, {
+	roactChildren[1] = Roact.createElement(RoactRodux.StoreProvider, {
 		store = homeStore
-	}, t5)
-	local localPlayer = Roact.mount(createElement("ScreenGui", t2, t3), Players.LocalPlayer.PlayerGui, "HomeItemGui")
-	t._maid:GiveTask(function()
-		Roact.unmount(localPlayer)
+	}, uiTree)
+	local homeItemGui = Roact.mount(createElement("ScreenGui", screenGuiProps, roactChildren), Players.LocalPlayer.PlayerGui, "HomeItemGui")
+	HomeItemSystem._maid:GiveTask(function()
+		Roact.unmount(homeItemGui)
 	end)
-	local t7 = {
+	local bigButtonConfig = {
 		name = "Home",
 		imageId = 13218368809,
 		displayOrder = 100,
@@ -109,33 +108,33 @@ function t.init()
 					Volume = 0.2
 				})
 			end
-			local v1 = not homeStore:getState().visible
+			local isVisible = not homeStore:getState().visible
 			homeStore:dispatch({
 				type = "setVisible",
-				value = v1
+				value = isVisible
 			})
-			local v2 = HomeSystem.queryCurrentStandingHome()
-			if v2 then
-				v2:ReplicateCustomizing(v1)
-				if v1 then
-					t.onCustomizeStarted:Fire()
+			local currentHome = HomeSystem.queryCurrentStandingHome()
+			if currentHome then
+				currentHome:ReplicateCustomizing(isVisible)
+				if isVisible then
+					HomeItemSystem.onCustomizeStarted:Fire()
 					return
 				end
-				t.onCustomizeEnded:Fire(v2)
+				HomeItemSystem.onCustomizeEnded:Fire(currentHome)
 			end
 		end
 	}
-	BigButtonService.add(t7)
-	local function updateButtonVisibility(self)
-		local v1 = HomeSystem.queryCurrentStandingHome()
-		local localPlayer = (v1 and v1:HasPermissionToEdit(Players.LocalPlayer)) == true
-		local enabled = t7.enabled
-		if localPlayer ~= enabled then
-			t7.enabled = localPlayer
+	BigButtonService.add(bigButtonConfig)
+	local function updateButtonVisibility(home)
+		local currentHome = HomeSystem.queryCurrentStandingHome()
+		local canEdit = (currentHome and currentHome:HasPermissionToEdit(Players.LocalPlayer)) == true
+		local isCurrentlyEnabled = bigButtonConfig.enabled
+		if canEdit ~= isCurrentlyEnabled then
+			bigButtonConfig.enabled = canEdit
 			BigButtonService.triggerUpdate:Fire()
-			if enabled and not localPlayer then
-				self:ReplicateCustomizing(false)
-				t.onCustomizeEnded:Fire(self)
+			if isCurrentlyEnabled and not canEdit then
+				home:ReplicateCustomizing(false)
+				HomeItemSystem.onCustomizeEnded:Fire(home)
 				homeStore:dispatch({
 					type = "setVisible",
 					value = false
@@ -143,22 +142,22 @@ function t.init()
 			end
 		end
 	end
-	local instance7 = Maid.new()
-	HomeSystem.onEntered:Connect(function(self)
-		instance7:DoCleaning()
-		updateButtonVisibility(self)
-		instance7:GiveTask(Interval.every(1):Connect(function()
-			updateButtonVisibility(self)
+	local updateMaid = Maid.new()
+	HomeSystem.onEntered:Connect(function(home)
+		updateMaid:DoCleaning()
+		updateButtonVisibility(home)
+		updateMaid:GiveTask(Interval.every(1):Connect(function()
+			updateButtonVisibility(home)
 		end))
 	end)
-	HomeSystem.onExited:Connect(function(self)
-		instance7:DoCleaning()
-		updateButtonVisibility(self)
+	HomeSystem.onExited:Connect(function(home)
+		updateMaid:DoCleaning()
+		updateButtonVisibility(home)
 	end)
-	HomeSystem.onEntered:Connect(function(self)
+	HomeSystem.onEntered:Connect(function(home)
 		homeStore:dispatch({
 			type = "setHome",
-			value = self
+			value = home
 		})
 	end)
 	HomeSystem.onExited:Connect(function()
@@ -167,127 +166,127 @@ function t.init()
 			value = nil
 		})
 	end)
-	t.onCustomizeEnded:Connect(function(self)
-		t.resetHomeCustomizationToEquipped(self)
+	HomeItemSystem.onCustomizeEnded:Connect(function(home)
+		HomeItemSystem.resetHomeCustomizationToEquipped(home)
 	end)
-	HomeSystem.onEntered:Connect(function(self)
-		RxInstanceUtils.observeChildren(self._obj:FindFirstChild(HomeConsts.SETTINGS_FOLDER_NAME), function(self, p2)
+	HomeSystem.onEntered:Connect(function(home)
+		RxInstanceUtils.observeChildren(home._obj:FindFirstChild(HomeConsts.SETTINGS_FOLDER_NAME), function(settingInstance, settingMaid)
 			local function update()
 				homeStore:dispatch({
 					type = "setSavedSetting",
-					key = self.Name,
-					value = self.Value
+					key = settingInstance.Name,
+					value = settingInstance.Value
 				})
 			end
 			homeStore:dispatch({
 				type = "setSavedSetting",
-				key = self.Name,
-				value = self.Value
+				key = settingInstance.Name,
+				value = settingInstance.Value
 			})
-			p2:GiveTask(self:GetPropertyChangedSignal("Value"):Connect(update))
+			settingMaid:GiveTask(settingInstance:GetPropertyChangedSignal("Value"):Connect(update))
 		end)
 	end)
-	waitForChild(ReplicatedStorage, HomeItemConsts.UPDATE_INVENTORY_REMOTE_NAME):andThen(function(self)
-		self.OnClientEvent:Connect(function(self)
+	waitForChild(ReplicatedStorage, HomeItemConsts.UPDATE_INVENTORY_REMOTE_NAME):andThen(function(inventoryRemote)
+		inventoryRemote.OnClientEvent:Connect(function(inventory)
 			homeStore:dispatch({
 				type = "setInventory",
-				value = self
+				value = inventory
 			})
 		end)
 	end):catch(warn)
-	waitForChild(ReplicatedStorage, HomeItemConsts.UPDATE_EQUIPPED_REMOTE_NAME):andThen(function(self)
-		self.OnClientEvent:Connect(function(self)
+	waitForChild(ReplicatedStorage, HomeItemConsts.UPDATE_EQUIPPED_REMOTE_NAME):andThen(function(equippedRemote)
+		equippedRemote.OnClientEvent:Connect(function(equipped)
 			homeStore:dispatch({
 				type = "setEquipped",
-				value = self
+				value = equipped
 			})
 		end)
 	end):catch(warn)
 	local function updateQuantityPlaced()
 		homeStore:dispatch({
 			type = "setQuantityPlaced",
-			value = t.getQuantityPlaced(Players.LocalPlayer)
+			value = HomeItemSystem.getQuantityPlaced(Players.LocalPlayer)
 		})
 	end
 	homeStore:dispatch({
 		type = "setQuantityPlaced",
-		value = t.getQuantityPlaced(Players.LocalPlayer)
+		value = HomeItemSystem.getQuantityPlaced(Players.LocalPlayer)
 	})
-	HomeItemBinder:GetClassAddedSignal():Connect(function(self)
+	HomeItemBinder:GetClassAddedSignal():Connect(function(homeItem)
 		homeStore:dispatch({
 			type = "setQuantityPlaced",
-			value = t.getQuantityPlaced(Players.LocalPlayer)
+			value = HomeItemSystem.getQuantityPlaced(Players.LocalPlayer)
 		})
-		self._maid:GiveTask(updateQuantityPlaced)
+		homeItem._maid:GiveTask(updateQuantityPlaced)
 	end)
 end
-function t.getQuantityPlaced(self)
-	assert(self ~= nil)
-	local t = {}
-	for i, v in ipairs(HomeItemBinder:GetAll()) do
-		if v:GetOwner() == self then
-			local v2 = v._obj.Name
-			t[v2] = (t[v2] or 0) + 1
+function HomeItemSystem.getQuantityPlaced(player)
+	assert(player ~= nil)
+	local quantityTable = {}
+	for i, homeItem in ipairs(HomeItemBinder:GetAll()) do
+		if homeItem:GetOwner() == player then
+			local itemName = homeItem._obj.Name
+			quantityTable[itemName] = (quantityTable[itemName] or 0) + 1
 		end
 	end
-	return t
+	return quantityTable
 end
-function t.attemptPurchase(self, p2)
-	ReplicatedStorage:FindFirstChild(HomeItemConsts.PURCHASE_HOME_ITEM_REMOTE_NAME):FireServer(self, p2)
+function HomeItemSystem.attemptPurchase(moduleName, itemName)
+	ReplicatedStorage:FindFirstChild(HomeItemConsts.PURCHASE_HOME_ITEM_REMOTE_NAME):FireServer(moduleName, itemName)
 end
-local function getItem(self, p2)
-	for v1, v2 in self do
-		if v2.Name == p2 then
-			return v2
+local function getItem(collection, itemName)
+	for key, item in collection do
+		if item.Name == itemName then
+			return item
 		end
 	end
 	return nil
 end
-function t.attemptEquip(self, p2)
-	ReplicatedStorage:FindFirstChild(HomeItemConsts.EQUIP_HOME_ITEM_REMOTE_NAME):FireServer(self, p2)
+function HomeItemSystem.attemptEquip(moduleName, itemName)
+	ReplicatedStorage:FindFirstChild(HomeItemConsts.EQUIP_HOME_ITEM_REMOTE_NAME):FireServer(moduleName, itemName)
 end
-function t.attemptPreview(self, p2)
-	assert(p2, "itemName is nil")
-	assert(self, "moduleName is nil for itemName: " .. tostring(p2))
-	local v2 = ReplicatedStorage.Home.HomeData:FindFirstChild(self)
-	if v2 then
-		assert(v2, "Module path does not exist")
-		local localPlayer = require(v2)
-		assert(localPlayer.getItems ~= nil, "Module does not have a getItems function")
-		assert(localPlayer.apply ~= nil, "Module does not have an apply function")
-		local var5 = nil
-		for localPlayer, instance7 in localPlayer.getItems() do
-			if instance7.Name == p2 then
-				var5 = instance7
+function HomeItemSystem.attemptPreview(moduleName, itemName)
+	assert(itemName, "itemName is nil")
+	assert(moduleName, "moduleName is nil for itemName: " .. tostring(itemName))
+	local moduleFolder = ReplicatedStorage.Home.HomeData:FindFirstChild(moduleName)
+	if moduleFolder then
+		assert(moduleFolder, "Module path does not exist")
+		local moduleScript = require(moduleFolder)
+		assert(moduleScript.getItems ~= nil, "Module does not have a getItems function")
+		assert(moduleScript.apply ~= nil, "Module does not have an apply function")
+		local foundItem = nil
+		for key, item in moduleScript.getItems() do
+			if item.Name == itemName then
+				foundItem = item
 				break
 			end
 		end
-		assert(var5 ~= nil, "Item does not exist")
-		localPlayer.apply(var5, HomeSystem.queryCurrentStandingHome():GetObj())
+		assert(foundItem ~= nil, "Item does not exist")
+		moduleScript.apply(foundItem, HomeSystem.queryCurrentStandingHome():GetObj())
 	end
 end
-function t.resetHomeCustomizationToEquipped(self)
+function HomeItemSystem.resetHomeCustomizationToEquipped(home)
 	local equipped = homeStore:getState().equipped
-	for localPlayer, v4 in ReplicatedStorage.Home.HomeData:GetChildren() do
-		local v1, v2
-		assert(v4, "Module path does not exist")
-		local var5 = require(v4)
-		local localPlayer = equipped[v4.Name]
-		v1 = var5.getItems ~= nil
-		assert(v1, "Module does not have a getItems function")
-		v2 = var5.apply ~= nil
-		assert(v2, "Module does not have an apply function")
-		local instance7 = nil
-		for v8, v9 in var5.getItems() do
-			if v9.Name == localPlayer then
-				instance7 = v9
+	for key, moduleFolder in ReplicatedStorage.Home.HomeData:GetChildren() do
+		local hasGetItems, hasApply
+		assert(moduleFolder, "Module path does not exist")
+		local moduleScript = require(moduleFolder)
+		local equippedItemName = equipped[moduleFolder.Name]
+		hasGetItems = moduleScript.getItems ~= nil
+		assert(hasGetItems, "Module does not have a getItems function")
+		hasApply = moduleScript.apply ~= nil
+		assert(hasApply, "Module does not have an apply function")
+		local itemToApply = nil
+		for key, item in moduleScript.getItems() do
+			if item.Name == equippedItemName then
+				itemToApply = item
 				break
 			end
 		end
-		var5.apply(instance7, self:GetObj())
+		moduleScript.apply(itemToApply, home:GetObj())
 	end
 end
-function t.isCustomizing()
+function HomeItemSystem.isCustomizing()
 	return homeStore:getState().visible
 end
-return t
+return HomeItemSystem

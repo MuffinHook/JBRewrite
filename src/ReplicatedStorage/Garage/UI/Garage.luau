@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.Std.Audio)
@@ -496,19 +495,19 @@ function GarageComponent.render(self)
 			end
 			local cash = self.props.cash
 			local purchasedAny = false
-			for i, v in ipairs(self.props.receipt) do
+			for i, receiptItem in ipairs(self.props.receipt) do
 				local shouldBuy
-				shouldBuy = not (self.props.owned[v.category] and self.props.owned[v.category][v.name])
-				if v.limited then
+				shouldBuy = not (self.props.owned[receiptItem.category] and self.props.owned[receiptItem.category][receiptItem.name])
+				if receiptItem.limited then
 					shouldBuy = false
 				end
 				if shouldBuy then
-					if cash < v.price then
+					if cash < receiptItem.price then
 						self.props.notify("You need more cash to buy this item!")
 						break
 					end
-					cash = cash - v.price
-					self.props.attemptBuyItem(v.category, v.name)
+					cash = cash - receiptItem.price
+					self.props.attemptBuyItem(receiptItem.category, receiptItem.name)
 					purchasedAny = true
 				end
 			end

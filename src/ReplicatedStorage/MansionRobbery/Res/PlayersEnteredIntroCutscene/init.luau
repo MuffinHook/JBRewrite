@@ -1,122 +1,121 @@
--- Reviewed by Claude
 local TweenService = game:GetService("TweenService")
-local function warnf(p1, ...)
-	warn(string.format(p1, ...))
+local function warnf(formatString, ...)
+	warn(string.format(formatString, ...))
 end
-local module = script.Curve:FindFirstChild("CurveData") and require(script.Curve.CurveData)
-local module2 = script:FindFirstChild("CatmullRomSpline") and require(script.CatmullRomSpline)
+local curveData = script.Curve:FindFirstChild("CurveData") and require(script.Curve.CurveData)
+local catmullRomSpline = script:FindFirstChild("CatmullRomSpline") and require(script.CatmullRomSpline)
 local GraphBezier = require(script.GraphBezier)
-local module3 = script:FindFirstChild("Mathf") and require(script.Mathf)
-local module4 = script.Curve:FindFirstChild("UpVectorData") and require(script.Curve.UpVectorData)
-local module5 = script.Curve:FindFirstChild("TransformFunction") and require(script.Curve.TransformFunction)
-local var6
-if module.AnimationKeyframes then
-	local t = {}
-	t[1] = unpack(module.AnimationKeyframes)
-	table.sort(t, function(p1, p2)
-		return p1.pos.X < p2.pos.X
+local mathf = script:FindFirstChild("Mathf") and require(script.Mathf)
+local upVectorData = script.Curve:FindFirstChild("UpVectorData") and require(script.Curve.UpVectorData)
+local transformFunction = script.Curve:FindFirstChild("TransformFunction") and require(script.Curve.TransformFunction)
+local animationCurve
+if curveData.AnimationKeyframes then
+	local keyframeTable = {}
+	keyframeTable[1] = unpack(curveData.AnimationKeyframes)
+	table.sort(keyframeTable, function(keyframeA, keyframeB)
+		return keyframeA.pos.X < keyframeB.pos.X
 	end)
-	if #t == 0 or t[1].pos.X > 0 then
-		table.insert(t, 1, {
+	if #keyframeTable == 0 or keyframeTable[1].pos.X > 0 then
+		table.insert(keyframeTable, 1, {
 			pos = Vector2.new(0, 0),
 			left = Vector2.new(-0.1, 0),
 			right = Vector2.new(0.1, 0)
 		})
 	end
-	if #t == 1 or t[#t].pos.X < 1 then
-		table.insert(t, {
+	if #keyframeTable == 1 or keyframeTable[#keyframeTable].pos.X < 1 then
+		table.insert(keyframeTable, {
 			pos = Vector2.new(1, 1),
 			left = Vector2.new(-0.1, 0),
 			right = Vector2.new(0.1, 0)
 		})
 	end
-	var6 = GraphBezier.new(t)
+	animationCurve = GraphBezier.new(keyframeTable)
 else
-	var6 = nil
+	animationCurve = nil
 end
-local t = {}
-local t2 = {}
-local NumPoints = module.Attributes.NumPoints
-function t2.GetCurveValueAt(p1, p2)
-	return module3.Lerp(p1:_getAttribute("GraphMinSpeed") or 0, p1:_getAttribute("GraphMaxSpeed") or 1, (math.clamp(p1:_getCurveValueAt(p2), 0, 1)))
+local transformationData = {}
+local pathAnimationModule = {}
+local NumPoints = curveData.Attributes.NumPoints
+function pathAnimationModule.GetCurveValueAt(self, progressValue)
+	return mathf.Lerp(self:_getAttribute("GraphMinSpeed") or 0, self:_getAttribute("GraphMaxSpeed") or 1, (math.clamp(self:_getCurveValueAt(progressValue), 0, 1)))
 end
-function t2.GetProgress(p1, p2, p3, p4)
-	local module, module2, module3 = p1:_getProgress(p2, p3)
-	local DeltaTime = p1.DeltaTime
+function pathAnimationModule.GetProgress(self, lengthValue, offsetValue, deltaTimeValue)
+	local positionOffset, directionVector, upVectorResult = self:_getProgress(lengthValue, offsetValue)
+	local DeltaTime = self.DeltaTime
 	if not DeltaTime then
-		DeltaTime = p4 or 1 / 60
+		DeltaTime = deltaTimeValue or 1 / 60
 	end
-	return p1:_getTransformed(module, module2, module3, t, DeltaTime)
+	return self:_getTransformed(positionOffset, directionVector, upVectorResult, transformationData, DeltaTime)
 end
-function t2.GetProgressRaw(p1, p2, p3, p4)
-	local module, module2, module3 = p1:_getProgress(p2, p3)
-	local DeltaTime = p1.DeltaTime
+function pathAnimationModule.GetProgressRaw(self, lengthValue, offsetValue, deltaTimeValue)
+	local positionOffset, directionVector, upVectorResult = self:_getProgress(lengthValue, offsetValue)
+	local DeltaTime = self.DeltaTime
 	if not DeltaTime then
-		DeltaTime = p4 or 1 / 60
+		DeltaTime = deltaTimeValue or 1 / 60
 	end
-	return p1:_getTransformedRaw(module, module2, module3, t, DeltaTime)
+	return self:_getTransformedRaw(positionOffset, directionVector, upVectorResult, transformationData, DeltaTime)
 end
-function t2.CreateTween(p1, p2, p3, p4)
-	local module = Instance.new("NumberValue")
-	local module2 = TweenService:Create(module, p2, {
+function pathAnimationModule.CreateTween(self, tweenInfo, curveValue, onProgressCallback)
+	local numberValue = Instance.new("NumberValue")
+	local createdTween = TweenService:Create(numberValue, tweenInfo, {
 		Value = 1
 	})
-	module2:GetPropertyChangedSignal("PlaybackState"):connect(function()
-		if module2.PlaybackState == Enum.PlaybackState.Playing then
-			p1.LastTick = os.clock()
+	createdTween:GetPropertyChangedSignal("PlaybackState"):connect(function()
+		if createdTween.PlaybackState == Enum.PlaybackState.Playing then
+			self.LastTick = os.clock()
 		end
 	end)
-	module:GetPropertyChangedSignal("Value"):connect(function()
-		local var12 = os.clock()
-		p1.DeltaTime = var12 - p1.LastTick
-		p1.LastTick = var12
-		p4(p1:GetProgress(module.Value, p3))
+	numberValue:GetPropertyChangedSignal("Value"):connect(function()
+		local currentTime = os.clock()
+		self.DeltaTime = currentTime - self.LastTick
+		self.LastTick = currentTime
+		onProgressCallback(self:GetProgress(numberValue.Value, curveValue))
 	end)
-	return module2
+	return createdTween
 end
-function t2.Generate(p1)
-	local ControlPoints = module.ControlPoints
-	local var12
-	if module.Attributes.PathClosed == true then
-		local t = {}
+function pathAnimationModule.Generate(self)
+	local ControlPoints = curveData.ControlPoints
+	local generatedSpline
+	if curveData.Attributes.PathClosed == true then
+		local closedPathPoints = {}
 		for i = 1, #ControlPoints do
-			table.insert(t, ControlPoints[i])
+			table.insert(closedPathPoints, ControlPoints[i])
 		end
-		table.insert(t, ControlPoints[1])
-		table.insert(t, ControlPoints[2])
-		table.insert(t, ControlPoints[3])
-		var12 = module2.new(t, module.Attributes.Tension)
+		table.insert(closedPathPoints, ControlPoints[1])
+		table.insert(closedPathPoints, ControlPoints[2])
+		table.insert(closedPathPoints, ControlPoints[3])
+		generatedSpline = catmullRomSpline.new(closedPathPoints, curveData.Attributes.Tension)
 	else
-		var12 = module2.new(ControlPoints, module.Attributes.Tension)
+		generatedSpline = catmullRomSpline.new(ControlPoints, curveData.Attributes.Tension)
 	end
-	var12.LengthIterations = module.Attributes.LengthIterations or 2000
-	var12:UpdateLength()
-	p1.Spline = var12
-	p1:_generatePointData()
+	generatedSpline.LengthIterations = curveData.Attributes.LengthIterations or 2000
+	generatedSpline:UpdateLength()
+	self.Spline = generatedSpline
+	self:_generatePointData()
 end
-function t2._getAttribute(p1, p2)
-	return module.Attributes[p2]
+function pathAnimationModule._getAttribute(self, attributeName)
+	return curveData.Attributes[attributeName]
 end
-function t2._getCurveValueAt(p1, p2)
-	if var6 then
-		return var6:CalculateValueAt(p2)
+function pathAnimationModule._getCurveValueAt(self, progressValue)
+	if animationCurve then
+		return animationCurve:CalculateValueAt(progressValue)
 	end
 end
-function t2._getProgress(p1, p2, p3)
-	local module = p1:_getAttribute("PathClosed")
-	local module2 = p1.Spline:CalculatePositionRelativeToLength(p2)
-	local module3 = p1.Spline:CalculateDerivativeRelativeToLength(p2)
-	local var42 = p1:_getUpVector(p2, module2, module3)
-	if module4 then
-		var42 = p1:_twistUpvector(var42, module, p2, module3, module4)
+function pathAnimationModule._getProgress(self, lengthValue, offsetValue)
+	local isPathClosed = self:_getAttribute("PathClosed")
+	local splinePosition = self.Spline:CalculatePositionRelativeToLength(lengthValue)
+	local splineDerivative = self.Spline:CalculateDerivativeRelativeToLength(lengthValue)
+	local upVector = self:_getUpVector(lengthValue, splinePosition, splineDerivative)
+	if upVectorData then
+		upVector = self:_twistUpvector(upVector, isPathClosed, lengthValue, splineDerivative, upVectorData)
 	end
-	return module2 + var42 * (p3 or 0), module3, var42
+	return splinePosition + upVector * (offsetValue or 0), splineDerivative, upVector
 end
-function t2._getUpVector(p1, p2, p3, p4)
-	if p1.PointData then
-		local module3 = p1.PointData.points[math.floor(p2 * NumPoints)]
-		if module3 then
-			return CFrame.lookAt(p3, p3 + p4, module3.upVector).UpVector
+function pathAnimationModule._getUpVector(self, lengthValue, splinePosition, splineDerivative)
+	if self.PointData then
+		local pointDataEntry = self.PointData.points[math.floor(lengthValue * NumPoints)]
+		if pointDataEntry then
+			return CFrame.lookAt(splinePosition, splinePosition + splineDerivative, pointDataEntry.upVector).UpVector
 		else
 			return Vector3.new(0, 1, 0)
 		end
@@ -124,117 +123,117 @@ function t2._getUpVector(p1, p2, p3, p4)
 		return Vector3.new(0, 1, 0)
 	end
 end
-function t2._getTwistAt(p1, p2, p3, p4)
-	local module = nil
-	local module2 = nil
-	local var32 = nil
-	local module4 = nil
-	local module5 = nil
-	local var6 = nil
-	for k, v in pairs(p4.data) do
+function pathAnimationModule._getTwistAt(self, isLooped, progressValue, twistData)
+	local firstTwistEntry = nil
+	local lowerTwistDegrees = nil
+	local upperTwistDegrees = nil
+	local upperTwistTValue = nil
+	local matchingTwistEntry = nil
+	local lowerTValue = nil
+	for k, v in pairs(twistData.data) do
 		local degrees = v.degrees
 		local tValue = v.tValue
 		if degrees ~= 0.00001 then
-			module = module or v
-			if not var32 then
-				if tValue <= p3 then
-					var6 = tValue
-					module2 = degrees
+			firstTwistEntry = firstTwistEntry or v
+			if not upperTwistDegrees then
+				if tValue <= progressValue then
+					lowerTValue = tValue
+					lowerTwistDegrees = degrees
 				else
-					var32 = degrees
-					module4 = tValue
+					upperTwistDegrees = degrees
+					upperTwistTValue = tValue
 				end
-				if module2 and var32 then
-					module5 = v
+				if lowerTwistDegrees and upperTwistDegrees then
+					matchingTwistEntry = v
 					break
 				end
 			end
-			module5 = v
+			matchingTwistEntry = v
 		end
 	end
-	if p2 or (not module2 or var32) then
-		if p2 and (var32 and not module2) then
-			module2 = module5.degrees + (p1.PointData.LoopAngleDiff or 0)
-			var6 = module5.tValue - 1
-		elseif p2 and (module2 and not var32) then
-			var32 = module.degrees - (p1.PointData.LoopAngleDiff or 0)
-			module4 = module.tValue + 1
+	if isLooped or (not lowerTwistDegrees or upperTwistDegrees) then
+		if isLooped and (upperTwistDegrees and not lowerTwistDegrees) then
+			lowerTwistDegrees = matchingTwistEntry.degrees + (self.PointData.LoopAngleDiff or 0)
+			lowerTValue = matchingTwistEntry.tValue - 1
+		elseif isLooped and (lowerTwistDegrees and not upperTwistDegrees) then
+			upperTwistDegrees = firstTwistEntry.degrees - (self.PointData.LoopAngleDiff or 0)
+			upperTwistTValue = firstTwistEntry.tValue + 1
 		end
-		if module2 and var32 then
-			return module3.Lerp(module2, module2 + (var32 - module2 + 180) % 360 - 180, module3.PercentBetween(p3, var6, module4))
+		if lowerTwistDegrees and upperTwistDegrees then
+			return mathf.Lerp(lowerTwistDegrees, lowerTwistDegrees + (upperTwistDegrees - lowerTwistDegrees + 180) % 360 - 180, mathf.PercentBetween(progressValue, lowerTValue, upperTwistTValue))
 		else
 			return 0
 		end
 	else
-		return module2
+		return lowerTwistDegrees
 	end
 end
-function t2._twistUpvector(p1, p2, p3, p4, p5, p6)
-	if p1.PointData then
-		local module = p1:_getTwistAt(p3, p4, p6)
-		if module == 0 then
-			return p2
+function pathAnimationModule._twistUpvector(self, baseUpVector, isPathClosed, lengthValue, splineDerivative, upVectorDataParam)
+	if self.PointData then
+		local twistAngle = self:_getTwistAt(isPathClosed, lengthValue, upVectorDataParam)
+		if twistAngle == 0 then
+			return baseUpVector
 		else
-			return CFrame.fromAxisAngle(p5, (math.rad(module))) * p2
+			return CFrame.fromAxisAngle(splineDerivative, (math.rad(twistAngle))) * baseUpVector
 		end
 	end
 end
-function t2._getTransformed(p1, ...)
-	local t = { ... }
-	local module, module2, module3, _
-	if module5 then
-		local module4, v52 = pcall(function()
-			return module5(unpack(t))
+function pathAnimationModule._getTransformed(self, ...)
+	local argumentTable = { ... }
+	local position, direction, upVector, _
+	if transformFunction then
+		local success, transformResult = pcall(function()
+			return transformFunction(unpack(argumentTable))
 		end)
-		if module4 then
-			return v52
+		if success then
+			return transformResult
 		else
-			module, module2, module3, _ = ...
-			return CFrame.lookAt(module, module + module2, module3)
+			position, direction, upVector, _ = ...
+			return CFrame.lookAt(position, position + direction, upVector)
 		end
 	else
-		module, module2, module3, _ = ...
-		return CFrame.lookAt(module, module + module2, module3)
+		position, direction, upVector, _ = ...
+		return CFrame.lookAt(position, position + direction, upVector)
 	end
 end
-function t2._getTransformedRaw(p1, ...)
-	local t = { ... }
-	local module, module2, module3, _
-	if module5 then
-		local module4, v52 = pcall(function()
-			return module5(unpack(t))
+function pathAnimationModule._getTransformedRaw(self, ...)
+	local argumentTable = { ... }
+	local position, direction, upVector, _
+	if transformFunction then
+		local success, transformResult = pcall(function()
+			return transformFunction(unpack(argumentTable))
 		end)
-		if module4 then
-			return v52
+		if success then
+			return transformResult
 		else
-			module, module2, module3, _ = ...
-			return module, module2, module3
+			position, direction, upVector, _ = ...
+			return position, direction, upVector
 		end
 	else
-		module, module2, module3, _ = ...
-		return module, module2, module3
+		position, direction, upVector, _ = ...
+		return position, direction, upVector
 	end
 end
-function t2._generatePointData(p1)
-	local module = Vector3.new(0, 1, 0)
-	local t = {
+function pathAnimationModule._generatePointData(self)
+	local baseUpVector = Vector3.new(0, 1, 0)
+	local pointDataStructure = {
 		points = {}
 	}
 	for i = 1, NumPoints do
-		local module2 = i / NumPoints
-		local module3 = p1.Spline:CalculatePositionRelativeToLength(module2)
-		local module4 = p1.Spline:CalculateDerivativeRelativeToLength(module2)
-		local UpVector = CFrame.lookAt(module3, module3 + module4, module).UpVector
-		t.points[i] = {
-			upVector = module,
-			pos = module3,
-			dir = module4,
-			t = module2
+		local normalizedProgress = i / NumPoints
+		local pointPosition = self.Spline:CalculatePositionRelativeToLength(normalizedProgress)
+		local pointDerivative = self.Spline:CalculateDerivativeRelativeToLength(normalizedProgress)
+		local calculatedUpVector = CFrame.lookAt(pointPosition, pointPosition + pointDerivative, baseUpVector).UpVector
+		pointDataStructure.points[i] = {
+			upVector = baseUpVector,
+			pos = pointPosition,
+			dir = pointDerivative,
+			t = normalizedProgress
 		}
-		module = UpVector
+		baseUpVector = calculatedUpVector
 	end
-	local module5 = math.acos(module.Y) / math.pi * 180
-	t.LoopAngleDiff = module5 * if module:Dot(t.points[#t.points].dir:Cross(Vector3.new(0, 1, 0))) < 0 then -1 else 1
-	p1.PointData = t
+	local loopAngleDifference = math.acos(baseUpVector.Y) / math.pi * 180
+	pointDataStructure.LoopAngleDiff = loopAngleDifference * if baseUpVector:Dot(pointDataStructure.points[#pointDataStructure.points].dir:Cross(Vector3.new(0, 1, 0))) < 0 then -1 else 1
+	self.PointData = pointDataStructure
 end
-return t2
+return pathAnimationModule

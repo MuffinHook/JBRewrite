@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -9,16 +8,16 @@ local createElement = Roact.createElement
 local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 local Customize = require(ReplicatedStorage.Game.Garage.Customize)
 local StoreData = require(ReplicatedStorage.Game.Garage.StoreData)
-local v1 = Roact.PureComponent:extend("CustomizeResult")
-function v1.init(p1)
-	p1:setState({
+local CustomizeResultComponent = Roact.PureComponent:extend("CustomizeResult")
+function CustomizeResultComponent.init(self)
+	self:setState({
 		hover = false
 	})
-	p1.maid = Maid.new()
-	p1.cameraRef = Roact.createRef()
-	p1.viewportRef = Roact.createRef()
+	self.maid = Maid.new()
+	self.cameraRef = Roact.createRef()
+	self.viewportRef = Roact.createRef()
 end
-function v1.render(p1)
+function CustomizeResultComponent.render(self)
 	return createElement("ViewportFrame", {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
@@ -26,87 +25,87 @@ function v1.render(p1)
 		Size = UDim2.new(1, 0, 1, 0),
 		Ambient = Color3.new(255/255, 255/255, 255/255),
 		LightColor = Color3.new(255/255, 255/255, 255/255),
-		CurrentCamera = p1.cameraRef,
-		[Roact.Ref] = p1.viewportRef
+		CurrentCamera = self.cameraRef,
+		[Roact.Ref] = self.viewportRef
 	}, {
 		Camera = createElement("Camera", {
-			FieldOfView = p1.props.fieldOfView,
-			[Roact.Ref] = p1.cameraRef
+			FieldOfView = self.props.fieldOfView,
+			[Roact.Ref] = self.cameraRef
 		})
 	})
 end
-function v1._updateCustomize(p1)
-	if p1.model then
-		local vehiclePacket = p1.props.vehiclePacket
-		local v1 = vehiclePacket.GarageSelection or {}
-		for k, v in pairs(p1.props.equipped) do
-			v1[k] = v
+function CustomizeResultComponent._updateCustomize(self)
+	if self.model then
+		local vehiclePacket = self.props.vehiclePacket
+		local garageSelection = vehiclePacket.GarageSelection or {}
+		for equipmentCategory, equipmentValue in pairs(self.props.equipped) do
+			garageSelection[equipmentCategory] = equipmentValue
 		end
-		for i, v in ipairs(p1.props.receipt) do
-			v1[v.category] = v.name
+		for i, receiptItem in ipairs(self.props.receipt) do
+			garageSelection[receiptItem.category] = receiptItem.name
 		end
-		local v2 = StoreData.GetMapFromSelection(v1)
-		Customize.ApplyAll(v2, {
-			Model = p1.model,
+		local customizationMap = StoreData.GetMapFromSelection(garageSelection)
+		Customize.ApplyAll(customizationMap, {
+			Model = self.model,
 			Make = vehiclePacket.Make,
 			Type = vehiclePacket.Type
-		}, v1)
+		}, garageSelection)
 	end
 end
-function v1._removeModel(p1)
-	if p1.model then
-		p1.model:Destroy()
-		p1.model = nil
+function CustomizeResultComponent._removeModel(self)
+	if self.model then
+		self.model:Destroy()
+		self.model = nil
 	end
 end
-function v1._updateModel(p1)
-	p1:_removeModel()
-	local vehiclePacket = p1.props.vehiclePacket
+function CustomizeResultComponent._updateModel(self)
+	self:_removeModel()
+	local vehiclePacket = self.props.vehiclePacket
 	if vehiclePacket then
 		local Model = vehiclePacket.Model
 		if Model then
-			local v1 = Model:Clone()
-			VehicleUtils.CleanVehicleModel(v1)
-			PartUtils.setAnchored(v1, true)
-			v1.PrimaryPart = v1:FindFirstChild("BoundingBox")
-			v1:SetPrimaryPartCFrame(CFrame.new(0, 0, 0))
-			p1.model = v1
-			v1.Parent = p1.viewportRef:getValue()
+			local clonedModel = Model:Clone()
+			VehicleUtils.CleanVehicleModel(clonedModel)
+			PartUtils.setAnchored(clonedModel, true)
+			clonedModel.PrimaryPart = clonedModel:FindFirstChild("BoundingBox")
+			clonedModel:SetPrimaryPartCFrame(CFrame.new(0, 0, 0))
+			self.model = clonedModel
+			clonedModel.Parent = self.viewportRef:getValue()
 		end
 	end
 end
-function v1.didMount(p1)
-	p1:_updateModel()
-	p1.maid:GiveTask(function()
-		p1:_removeModel()
+function CustomizeResultComponent.didMount(self)
+	self:_updateModel()
+	self.maid:GiveTask(function()
+		self:_removeModel()
 	end)
-	p1:_updateCustomize()
-	local v1 = p1.cameraRef:getValue()
-	p1.maid.moveCamera = RunService.Heartbeat:Connect(function()
-		if p1.model then
-			local v12 = os.clock()
-			local v2 = p1.model:GetExtentsSize()
-			local v3 = v12 / 2
-			v1.CFrame = CFrame.Angles(0, v3 % 6.283185307179586, 0) * CFrame.Angles(-0.18849555921538758 + math.sin(v3 / 2) * math.pi * 0.01, 0, 0) * CFrame.new(0, 0, v2.Magnitude * 0.66 + (math.cos(v3 * 2) * 0.5 + 0.5) * (v2.Z / v2.X) * 1.5)
+	self:_updateCustomize()
+	local camera = self.cameraRef:getValue()
+	self.maid.moveCamera = RunService.Heartbeat:Connect(function()
+		if self.model then
+			local elapsedTime = os.clock()
+			local modelSize = self.model:GetExtentsSize()
+			local rotationTime = elapsedTime / 2
+			camera.CFrame = CFrame.Angles(0, rotationTime % 6.283185307179586, 0) * CFrame.Angles(-0.18849555921538758 + math.sin(rotationTime / 2) * math.pi * 0.01, 0, 0) * CFrame.new(0, 0, modelSize.Magnitude * 0.66 + (math.cos(rotationTime * 2) * 0.5 + 0.5) * (modelSize.Z / modelSize.X) * 1.5)
 		end
 	end)
 end
-function v1.didUpdate(p1, p2, p3)
-	if p2.vehiclePacket ~= p1.props.vehiclePacket then
-		p1:_updateModel()
-		p1:_updateCustomize()
+function CustomizeResultComponent.didUpdate(self, previousProps, previousState)
+	if previousProps.vehiclePacket ~= self.props.vehiclePacket then
+		self:_updateModel()
+		self:_updateCustomize()
 	end
-	if p2.receipt ~= p1.props.receipt or p2.equipped ~= p1.props.equipped then
-		p1:_updateCustomize()
+	if previousProps.receipt ~= self.props.receipt or previousProps.equipped ~= self.props.equipped then
+		self:_updateCustomize()
 	end
 end
-function v1.willUnmount(p1)
-	p1.maid:DoCleaning()
+function CustomizeResultComponent.willUnmount(self)
+	self.maid:DoCleaning()
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(state, dispatch)
 	return {
-		receipt = p1.garageReceipt,
-		equipped = p1.garageEquipped,
-		vehiclePacket = p1.garageVehiclePacket
+		receipt = state.garageReceipt,
+		equipped = state.garageEquipped,
+		vehiclePacket = state.garageVehiclePacket
 	}
-end)(v1)
+end)(CustomizeResultComponent)

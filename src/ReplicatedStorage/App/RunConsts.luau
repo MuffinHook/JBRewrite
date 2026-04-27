@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local ENV_TO_WORLD_TO_PLACE_IDS = TableUtils.requireValidIndexAndFreeze({

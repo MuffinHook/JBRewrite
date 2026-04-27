@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TradeReducerUtils = require(ReplicatedStorage.Trade.TradeReducerUtils)
 return {

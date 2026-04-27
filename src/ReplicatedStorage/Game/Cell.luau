@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -9,80 +7,80 @@ local UI = require(ReplicatedStorage.Module.UI)
 local Settings = require(ReplicatedStorage.Resource.Settings)
 local InventoryItemBinder = require(ReplicatedStorage.Inventory.InventoryItemBinder)
 local InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSystem)
-local v1 = nil
-local v2 = nil
-local v3 = nil
+local InventoryModule = nil
+local EventRemote = nil
+local EventManager = nil
 local CircleAction = UI.CircleAction
 local lastUpdateTime = 0
 local currentCharacter = nil
 local drawerData = {}
-local function ShowFun(p1)
-	local ValidRoot = p1.ValidRoot
+local function ShowFun(drawerRoot)
+	local ValidRoot = drawerRoot.ValidRoot
 	ValidRoot:SetPrimaryPartCFrame(drawerData[ValidRoot.Drawer].Opened)
 end
-local function HideFun(p1)
-	local ValidRoot = p1.ValidRoot
+local function HideFun(drawerRoot)
+	local ValidRoot = drawerRoot.ValidRoot
 	ValidRoot:SetPrimaryPartCFrame(drawerData[ValidRoot.Drawer].Closed)
 end
-local function Update(p1)
-	local v1 = tick()
-	if not (v1 - lastUpdateTime < 0.1) then
-		lastUpdateTime = v1
-		local v2 = InventoryItemSystem.getEquippedFor(LocalPlayer)[1]
-		local ValidRoot = p1.ValidRoot
-		local v3 = currentCharacter
-		if v3 then
-			v3 = currentCharacter.Model == ValidRoot.Parent.Parent
+local function Update(drawerRoot)
+	local currentTime = tick()
+	if not (currentTime - lastUpdateTime < 0.1) then
+		lastUpdateTime = currentTime
+		local equippedItem = InventoryItemSystem.getEquippedFor(LocalPlayer)[1]
+		local ValidRoot = drawerRoot.ValidRoot
+		local isCharacterPresent = currentCharacter
+		if isCharacterPresent then
+			isCharacterPresent = currentCharacter.Model == ValidRoot.Parent.Parent
 		end
 		local actionDuration
-		if v3 then
-			local v52 = BinderUtils.findFirstChild(InventoryItemBinder, ValidRoot)
-			if v2 then
-				if v52 then
-					p1.Name = ("Replace %s with %s"):format(v52:GetName(), v2:GetName())
+		if isCharacterPresent then
+			local drawerItem = BinderUtils.findFirstChild(InventoryItemBinder, ValidRoot)
+			if equippedItem then
+				if drawerItem then
+					drawerRoot.Name = ("Replace %s with %s"):format(drawerItem:GetName(), equippedItem:GetName())
 				else
-					p1.Name = ("Store %s"):format(v2:GetName())
+					drawerRoot.Name = ("Store %s"):format(equippedItem:GetName())
 				end
-			elseif v52 then
-				p1.Name = ("Take out %s"):format(v52:GetName())
+			elseif drawerItem then
+				drawerRoot.Name = ("Take out %s"):format(drawerItem:GetName())
 			else
-				p1.Name = "Inspect Drawer"
+				drawerRoot.Name = "Inspect Drawer"
 			end
 			actionDuration = 0.5
 		else
-			p1.Name = "Inspect Drawer"
+			drawerRoot.Name = "Inspect Drawer"
 			actionDuration = 3
 		end
 		assert(actionDuration)
-		p1.Duration = actionDuration
+		drawerRoot.Duration = actionDuration
 	end
 end
-local function Action(p1, p2)
-	if p2 then
-		local v1 = InventoryItemSystem.getEquippedFor(LocalPlayer)[1]
-		local ValidRoot = p1.ValidRoot
-		local v22 = currentCharacter
-		if v22 then
-			v22 = currentCharacter.Model == ValidRoot.Parent.Parent
+local function Action(drawerRoot, isPressed)
+	if isPressed then
+		local equippedItem = InventoryItemSystem.getEquippedFor(LocalPlayer)[1]
+		local ValidRoot = drawerRoot.ValidRoot
+		local isCharacterPresent = currentCharacter
+		if isCharacterPresent then
+			isCharacterPresent = currentCharacter.Model == ValidRoot.Parent.Parent
 		end
-		if v22 then
-			local v3 = BinderUtils.findFirstChild(InventoryItemBinder, ValidRoot)
-			if v1 then
-				v2:FireServer("e" .. ("toq2s"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("z58gxgqjb"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("e1ax"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("k45p4la3y"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "io", ValidRoot, v1.obj)
-			elseif v3 then
-				v2:FireServer("l" .. ("c18xqfs"):sub(3, 4):reverse() .. "" .. "" .. ("ekbeg"):sub(2, 4):reverse():reverse():reverse() .. "" .. "" .. ("sfcvqbwg9"):sub(5, 5):reverse() .. "c", ValidRoot)
+		if isCharacterPresent then
+			local drawerItem = BinderUtils.findFirstChild(InventoryItemBinder, ValidRoot)
+			if equippedItem then
+				EventRemote:FireServer("eoxa4pio", ValidRoot, equippedItem.obj)
+			elseif drawerItem then
+				EventRemote:FireServer("lx8ebkqc", ValidRoot)
 			end
 		else
-			v2:FireServer("b" .. "" .. ("jp0yh"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("t46s1s13"):sub(3, 5):reverse() .. "" .. "" .. ("tw3g3"):sub(2, 3):reverse():reverse():reverse() .. "c", ValidRoot)
+			EventRemote:FireServer("b01s63wc", ValidRoot)
 		end
 		return true
 	end
 end
-local function AddedFun(p1)
+local function AddedFun(drawerInstance)
 	CircleAction.Add({
-		Part = p1.Parent.Handle,
-		WorldPosition = p1.Parent.Handle.Position,
-		ValidRoot = p1.Parent,
+		Part = drawerInstance.Parent.Handle,
+		WorldPosition = drawerInstance.Parent.Handle.Position,
+		ValidRoot = drawerInstance.Parent,
 		Name = "Inspect Drawer",
 		Timed = true,
 		Duration = 1,
@@ -91,51 +89,51 @@ local function AddedFun(p1)
 		Update = Update,
 		ShowFun = ShowFun,
 		HideFun = HideFun
-	}, p1)
-	drawerData[p1] = {
-		Closed = p1.CFrame,
-		Opened = p1.CFrame * CFrame.new(0, 0, -1.5)
+	}, drawerInstance)
+	drawerData[drawerInstance] = {
+		Closed = drawerInstance.CFrame,
+		Opened = drawerInstance.CFrame * CFrame.new(0, 0, -1.5)
 	}
 end
-local function RemovedFun(p1)
-	drawerData[p1] = nil
-	CircleAction.Remove(p1)
+local function RemovedFun(drawerInstance)
+	drawerData[drawerInstance] = nil
+	CircleAction.Remove(drawerInstance)
 end
 return {
-	Init = function(p1)
-		v1 = p1.Inventory
-		local em = p1.em
-		v2 = p1.Event
-		v3 = em
-		local ScreenGui = p1.ScreenGui
-		function em.aa02dq4j(p1)
-			assert(p1)
-			currentCharacter = p1
+	Init = function(initConfig)
+		InventoryModule = initConfig.Inventory
+		local em = initConfig.em
+		EventRemote = initConfig.Event
+		EventManager = em
+		local ScreenGui = initConfig.ScreenGui
+		function em.aa02dq4j(character)
+			assert(character)
+			currentCharacter = character
 		end
-		local v22 = 0
+		local cellTimerCounter = 0
 		function em.fwrmzn28()
-			local v1 = v22 + 1
-			v22 = v1
+			local timerId = cellTimerCounter + 1
+			cellTimerCounter = timerId
 			local Cell = Settings.Time.Cell
 			local CellTime = ScreenGui.CellTime
 			CellTime.Time.Text = ("%ds"):format(Cell)
 			CellTime.Visible = true
-			local v2 = tick()
+			local startTick = tick()
 			while true do
 				wait(1)
-				if v1 ~= v1 then
+				if timerId ~= timerId then
 					break
 				end
-				CellTime.Time.Text = ("%ds"):format(Settings.Time.Cell - tick() + v2)
-				if Cell <= tick() - v2 and v1 == v1 then
+				CellTime.Time.Text = ("%ds"):format(Settings.Time.Cell - tick() + startTick)
+				if Cell <= tick() - startTick and timerId == timerId then
 					CellTime.Visible = false
 				end
 			end
 		end
-		local v32 = next
-		local v4, v52 = CollectionService:GetTagged("StashDrawer")
-		for v6, v7 in v32, v4, v52 do
-			AddedFun(v7)
+		local nextIterator = next
+		local taggedInstances, iteratorState = CollectionService:GetTagged("StashDrawer")
+		for _, drawerInstance in nextIterator, taggedInstances, iteratorState do
+			AddedFun(drawerInstance)
 		end
 		CollectionService:GetInstanceAddedSignal("StashDrawer"):Connect(AddedFun)
 		CollectionService:GetInstanceRemovedSignal("StashDrawer"):Connect(RemovedFun)

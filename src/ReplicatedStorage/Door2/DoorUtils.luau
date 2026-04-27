@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local DoorConsts = require(script.Parent.DoorConsts)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")

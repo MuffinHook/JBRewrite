@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local waitForChild = require(ReplicatedStorage.Std.waitForChild)
 local AirDropConsts = require(ReplicatedStorage.AirDrop.AirDropConsts)

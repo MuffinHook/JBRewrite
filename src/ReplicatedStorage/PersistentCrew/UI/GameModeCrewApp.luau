@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -23,13 +21,13 @@ local function playClick()
 		})
 	end
 end
-local local1 = Roact.PureComponent:extend("PersistentCrewApp")
-local1.defaultProps = {
+local GameModeCrewApp = Roact.PureComponent:extend("PersistentCrewApp")
+GameModeCrewApp.defaultProps = {
 	size = UDim2.fromScale(0.9, 0.9),
 	position = UDim2.fromScale(0.5, 0.5),
 	anchorPoint = Vector2.new(0.5, 0.5)
 }
-function local1.init(self)
+function GameModeCrewApp.init(self)
 	self.maid = Maid.new()
 	self:setState({
 		showRequests = false,
@@ -52,8 +50,8 @@ function local1.init(self)
 			})
 		end
 	end
-	function self.onCountdownElapsed(param12)
-		if param12 < 0 then
+	function self.onCountdownElapsed(elapsedSeconds)
+		if elapsedSeconds < 0 then
 			self:setState({
 				countdownVisible = false
 			})
@@ -61,48 +59,48 @@ function local1.init(self)
 		end
 	end
 end
-function local1.render(self)
-	local t = {}
+function GameModeCrewApp.render(self)
+	local elements = {}
 	if self.state.welcomeVisible then
-		t.Welcome = createElement(Welcome, {
+		elements.Welcome = createElement(Welcome, {
 			onClickClose = self.onClickCloseWelcome
 		})
 	end
-	local local1 = Players.LocalPlayer:GetAttribute("CrewBattleTeam")
-	local table2 = {}
-	for local2 in self.props.clanName do
-		table.insert(table2, local2)
+	local playerTeamId = Players.LocalPlayer:GetAttribute("CrewBattleTeam")
+	local teamIds = {}
+	for teamId in self.props.clanName do
+		table.insert(teamIds, teamId)
 	end
-	local local3 = if table2[1] == local1 then table2[2] else table2[1]
+	local enemyTeamId = if teamIds[1] == playerTeamId then teamIds[2] else teamIds[1]
 	local attackingClanId = self.props.attackingClanId
 	local identityColor = Color3.fromRGB(121, 251, 177)
-	local identityColor = Color3.fromRGB(255, 49, 49)
+	local enemyColor = Color3.fromRGB(255, 49, 49)
 	local penalty = self.props.penalty
-	local local6 = penalty ~= nil
+	local hasPenalty = penalty ~= nil
 	if self.props.isBattleServer then
-		local table3 = {
+		local containerProps = {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0)
 		}
-		local table4 = {}
-		local table5 = {
+		local containerChildren = {}
+		local outerBorderProps = {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, -48, 1, -48),
 			Position = UDim2.fromOffset(24, 24)
 		}
-		local table6 = {}
-		local table7 = {
+		local outerBorderChildren = {}
+		local outerStrokeProps = {
 			Thickness = 2
 		}
-		table7.Color = if local6 then identityColor else identityColor
-		table7.Transparency = 0.75
-		table6.UIStroke = createElement("UIStroke", table7)
-		table6.UICorner = createElement("UICorner", {
+		outerStrokeProps.Color = if hasPenalty then identityColor else enemyColor
+		outerStrokeProps.Transparency = 0.75
+		outerBorderChildren.UIStroke = createElement("UIStroke", outerStrokeProps)
+		outerBorderChildren.UICorner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 32)
 		})
-		table4.BorderOuter = createElement("Frame", table5, table6)
-		table4.BorderInner = createElement("Frame", {
+		containerChildren.BorderOuter = createElement("Frame", outerBorderProps, outerBorderChildren)
+		containerChildren.BorderInner = createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, -84, 1, -84),
@@ -117,8 +115,8 @@ function local1.render(self)
 				CornerRadius = UDim.new(0, 32)
 			})
 		})
-		t.Container = createElement("Frame", table3, table4)
-		t.Penalty = local6 and createElement("Frame", {
+		elements.Container = createElement("Frame", containerProps, containerChildren)
+		elements.Penalty = hasPenalty and createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0.5, 0, 0, 16),
@@ -149,7 +147,7 @@ function local1.render(self)
 				})
 			})
 		})
-		local table8 = {
+		local topBarProps = {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0.5, 0, 0, 24),
@@ -157,15 +155,15 @@ function local1.render(self)
 			Position = UDim2.new(0.5, 0, 0, 41),
 			ZIndex = 3
 		}
-		local table9 = {}
-		local table10 = {
+		local topBarChildren = {}
+		local timerFrameProps = {
 			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
 			Size = UDim2.fromScale(0.125, 1.5),
 			AnchorPoint = Vector2.new(0.5, 0.25),
 			Position = UDim2.fromScale(0.5, 0.5)
 		}
-		local table11 = {
+		local timerFrameChildren = {
 			UIStroke = createElement("UIStroke", {
 				Thickness = 2,
 				Color = identityColor,
@@ -175,47 +173,47 @@ function local1.render(self)
 				CornerRadius = UDim.new(0.25, 0)
 			})
 		}
-		local table12 = {
+		local timerElapsedProps = {
 			font = Enum.Font.FredokaOne,
 			position = UDim2.fromScale(0.5, 0.5),
 			textColor = ColorUtils.saturateBy(identityColor, 0.8),
 			createdAt = self.props.startedAt[attackingClanId],
 			elapsed = self.props.timeTook[attackingClanId]
 		}
-		table12.disabled = self.props.startedAt[attackingClanId] == nil
-		table11.ElapsedContainer = createElement(Elapsed, table12)
-		table9.Timer = createElement("Frame", table10, table11)
-		local table13 = {
-			clanName = self.props.clanName[local1],
+		timerElapsedProps.disabled = self.props.startedAt[attackingClanId] == nil
+		timerFrameChildren.ElapsedContainer = createElement(Elapsed, timerElapsedProps)
+		topBarChildren.Timer = createElement("Frame", timerFrameProps, timerFrameChildren)
+		local playerCrewProps = {
+			clanName = self.props.clanName[playerTeamId],
 			backgroundColor = identityColor,
 			size = UDim2.fromScale(0.4, 1),
 			position = UDim2.fromScale(0, 0.5),
 			anchorPoint = Vector2.new(0, 0.5),
-			createdAt = self.props.startedAt[local1]
+			createdAt = self.props.startedAt[playerTeamId]
 		}
-		table13.elapsed = if self.props.startedAt[local1] == nil then 0 else self.props.timeTook[local1]
-		table13.disabled = self.props.startedAt[local1] == nil
-		table13.attacking = local1 == attackingClanId
-		table13.robberiesCompleted = self.props.robberiesCompleted
-		table9.CrewOurs = createElement(BattleCrewInfo, table13)
-		local table14 = {
-			clanName = self.props.clanName[local3],
-			backgroundColor = identityColor,
+		playerCrewProps.elapsed = if self.props.startedAt[playerTeamId] == nil then 0 else self.props.timeTook[playerTeamId]
+		playerCrewProps.disabled = self.props.startedAt[playerTeamId] == nil
+		playerCrewProps.attacking = playerTeamId == attackingClanId
+		playerCrewProps.robberiesCompleted = self.props.robberiesCompleted
+		topBarChildren.CrewOurs = createElement(BattleCrewInfo, playerCrewProps)
+		local enemyCrewProps = {
+			clanName = self.props.clanName[enemyTeamId],
+			backgroundColor = enemyColor,
 			size = UDim2.fromScale(0.4, 1),
 			position = UDim2.fromScale(1, 0.5),
 			anchorPoint = Vector2.new(1, 0.5),
-			createdAt = self.props.startedAt[local3]
+			createdAt = self.props.startedAt[enemyTeamId]
 		}
-		table14.elapsed = if self.props.startedAt[local3] == nil then 0 else self.props.timeTook[local3]
-		table14.disabled = self.props.startedAt[local3] == nil
-		table14.attacking = local3 == attackingClanId
-		table14.robberiesCompleted = self.props.robberiesCompleted
-		table9.CrewTheirs = createElement(BattleCrewInfo, table14, {
+		enemyCrewProps.elapsed = if self.props.startedAt[enemyTeamId] == nil then 0 else self.props.timeTook[enemyTeamId]
+		enemyCrewProps.disabled = self.props.startedAt[enemyTeamId] == nil
+		enemyCrewProps.attacking = enemyTeamId == attackingClanId
+		enemyCrewProps.robberiesCompleted = self.props.robberiesCompleted
+		topBarChildren.CrewTheirs = createElement(BattleCrewInfo, enemyCrewProps, {
 			Report = false
 		})
-		t.TopBar = createElement("Frame", table8, table9)
+		elements.TopBar = createElement("Frame", topBarProps, topBarChildren)
 		if self.state.countdownVisible then
-			t.Countdown = createElement(Elapsed, {
+			elements.Countdown = createElement(Elapsed, {
 				createdAt = self.state.countdownTil,
 				countDown = true,
 				onElapsed = self.onCountdownElapsed,
@@ -229,53 +227,53 @@ function local1.render(self)
 			})
 		end
 	end
-	return Roact.createFragment(t)
+	return Roact.createFragment(elements)
 end
-function local1.didMount(self)
+function GameModeCrewApp.didMount(self)
 	self:_updateWelcomeVisible()
 	local function updateCountdown()
-		local local1 = PersistentCrewBattleUtils.getRoundStartsAt()
-		if local1 and workspace:GetServerTimeNow() < local1 then
+		local roundStartTime = PersistentCrewBattleUtils.getRoundStartsAt()
+		if roundStartTime and workspace:GetServerTimeNow() < roundStartTime then
 			self:setState({
 				countdownVisible = true,
-				countdownTil = local1
+				countdownTil = roundStartTime
 			})
 		end
 	end
 	self.maid:GiveTask(PersistentCrewBattleUtils.getRoundStartsAtAttributeChangedSignal():Connect(updateCountdown))
 	updateCountdown()
 end
-function local1._updateWelcomeVisible(self)
+function GameModeCrewApp._updateWelcomeVisible(self)
 	if self.props.isBattleServer then
 		self:setState({
 			welcomeVisible = true
 		})
 	end
 end
-function local1.didUpdate(self, self, param3)
-	if self.props.isBattleServer ~= self.isBattleServer then
+function GameModeCrewApp.didUpdate(self, prevProps, param3)
+	if self.props.isBattleServer ~= prevProps.isBattleServer then
 		self:_updateWelcomeVisible()
 	end
 end
-function local1.willUnmount(self)
+function GameModeCrewApp.willUnmount(self)
 	self.maid:DoCleaning()
 end
-return RoactRodux.connect(function(self, self)
+return RoactRodux.connect(function(state, self)
 	return {
-		timeTook = self.timeTook,
-		startedAt = self.startedAt,
-		isBattleServer = self.isBattleServer,
-		clanName = self.clanName,
-		networkMutexLocked = self.networkMutexLocked,
-		robberiesCompleted = self.robberiesCompleted,
-		attackingClanId = self.attackingClanId,
-		battleResponseData = self.battleResponseData,
-		penalty = self.penalty
+		timeTook = state.timeTook,
+		startedAt = state.startedAt,
+		isBattleServer = state.isBattleServer,
+		clanName = state.clanName,
+		networkMutexLocked = state.networkMutexLocked,
+		robberiesCompleted = state.robberiesCompleted,
+		attackingClanId = state.attackingClanId,
+		battleResponseData = state.battleResponseData,
+		penalty = state.penalty
 	}
-end, function(self)
+end, function(dispatch)
 	return {
 		onClickClose = function()
-			self({
+			dispatch({
 				type = "setGroupVisible",
 				value = false
 			})
@@ -286,14 +284,14 @@ end, function(self)
 			end
 		end,
 		onClickViewMe = function()
-			self({
+			dispatch({
 				type = "setMembers",
 				value = {}
 			})
-			self({
+			dispatch({
 				type = "setViewingClanInfo",
 				value = nil
 			})
 		end
 	}
-end)(local1)
+end)(GameModeCrewApp)

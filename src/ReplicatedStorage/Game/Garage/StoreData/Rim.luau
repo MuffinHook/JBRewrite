@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
 	Items = {
@@ -1153,26 +1152,26 @@ return {
 			OffsetXPct = 0.01
 		}
 	},
-	GetInstance = function(p1)
-		local rimTemplate = ReplicatedStorage.Resource.Rims:FindFirstChild(p1.Name)
+	GetInstance = function(rimConfig)
+		local rimTemplate = ReplicatedStorage.Resource.Rims:FindFirstChild(rimConfig.Name)
 		if not rimTemplate then
-			error("No Rim named: " .. p1.Name)
+			error("No Rim named: " .. rimConfig.Name)
 		end
 		local rimClone = rimTemplate:Clone()
 		rimClone.Color = Color3.new(0.5, 0.5, 0.5)
 		rimClone.CFrame = CFrame.new(0, 0, 0)
 		rimClone.Size = rimClone.Size.Unit * 4
-		if p1.FlipY then
+		if rimConfig.FlipY then
 			rimClone.CFrame = rimClone.CFrame * CFrame.Angles(0, math.pi, 0)
 		end
 		local rimInstance = rimClone
-		if p1.VisualFlipY then
+		if rimConfig.VisualFlipY then
 			rimInstance.CFrame = rimInstance.CFrame * CFrame.Angles(0, math.pi, 0)
 		end
 		return rimInstance
 	end,
-	Update = function(p1, p2)
+	Update = function(rimToUpdate, p2)
 		local elapsedTime = os.clock() / 2
-		p1.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, 3)
+		rimToUpdate.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, 3)
 	end
 }

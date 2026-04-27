@@ -1,28 +1,27 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WallColor = require(script.Parent.WallColor)
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
-local t = {}
-local t2 = {
+local windowColorModule = {}
+local materialConfig = {
 	DefaultReflectance = 0,
 	DefaultMaterial = Enum.Material.SmoothPlastic,
 	DisableReflectance = true
 }
-t.getInstance = WallColor.getInstance
-t.updateCamera = WallColor.updateCamera
-t.getItems = WallColor.getItems
-function t.apply(p1, p2)
-	local Windows = p2:FindFirstChild("Windows")
+windowColorModule.getInstance = WallColor.getInstance
+windowColorModule.updateCamera = WallColor.updateCamera
+windowColorModule.getItems = WallColor.getItems
+function windowColorModule.apply(colorData, targetModel)
+	local Windows = targetModel:FindFirstChild("Windows")
 	if Windows then
 		local count = 0
-		for v1, v2 in Windows:GetChildren() do
-			if v2:IsA("BasePart") then
+		for _, windowPart in Windows:GetChildren() do
+			if windowPart:IsA("BasePart") then
 				count = count + 1
-				if p1 and not p1.None then
-					t2.DefaultMaterial = v2.Material
-					Paint.Part(v2, p1.Name, t2)
+				if colorData and not colorData.None then
+					materialConfig.DefaultMaterial = windowPart.Material
+					Paint.Part(windowPart, colorData.Name, materialConfig)
 				else
-					v2.Color = v2:GetAttribute("OriginalColor")
+					windowPart.Color = windowPart:GetAttribute("OriginalColor")
 				end
 			end
 		end
@@ -31,4 +30,4 @@ function t.apply(p1, p2)
 		warn("Missing subModel")
 	end
 end
-return t
+return windowColorModule

@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -19,7 +18,7 @@ local CircleAction = require(ReplicatedStorage.Module.UI).CircleAction
 local RobberyCargoPlaneShared = require(ReplicatedStorage.Game.Robbery.RobberyCargoPlaneShared)
 local RobberyConsts = require(ReplicatedStorage.Robbery.RobberyConsts)
 local RemoteEvent = nil
-local em = nil
+local eventManager = nil
 local Team = nil
 local SoundIds = {
 	alarm_siren_loop_01 = 4487202760,
@@ -34,11 +33,11 @@ local SoundIds = {
 	lever_sound = 1988476846
 }
 local MetalImpactSounds = { SoundIds.metal_sheet_impacts_01, SoundIds.metal_sheet_impacts_02, SoundIds.metal_sheet_impacts_03 }
-local function Ease_InOutQuad(t)
-	return t < 0.5 and 2 * t * t or -1 - 2 * (t - 2) * t
+local function Ease_InOutQuad(progress)
+	return progress < 0.5 and 2 * progress * progress or -1 - 2 * (progress - 2) * progress
 end
-local function Ease_InOutSine(t)
-	return (math.sin(math.pi * t - 1.5707963267948966) + 1) * 0.5
+local function Ease_InOutSine(progress)
+	return (math.sin(math.pi * progress - 1.5707963267948966) + 1) * 0.5
 end
 local function HideModel(model)
 	for i, v in ipairs(model:GetChildren()) do
@@ -192,10 +191,10 @@ function CargoPlane.new(bornAt)
 		delay(0.1, function()
 			planeModel.ControlPanel.Light.Color = Color3.fromRGB(196, 40, 28)
 		end)
-		RemoteEvent:FireServer("w" .. ("o3jonpri"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("oog1nt"):sub(3, 4):reverse() .. "" .. "" .. ("ohk"):sub(2, 2):reverse():reverse():reverse() .. "xm")
+		RemoteEvent:FireServer("wpn1ghxm")
 	end)
 	self.Lever.OnFail:Connect(function()
-		em.ShowNotification({
+		eventManager.ShowNotification({
 			Title = "CargoPlane",
 			Text = "Keycard required. Search the crates..."
 		})
@@ -220,26 +219,26 @@ function CargoPlane.new(bornAt)
 	PathLeave.ApproxTotalLength = PathLeave:ApproximateLength(1000)
 	self.PathLeave = PathLeave
 	local seqFunctions = {
-		SeqEnter = function(p1)
-			self:SeqEnter(p1)
+		SeqEnter = function(progress)
+			self:SeqEnter(progress)
 		end,
-		SeqCargoOpen = function(p1)
-			self:SeqCargoOpen(p1)
+		SeqCargoOpen = function(progress)
+			self:SeqCargoOpen(progress)
 		end,
-		SeqLoadCrates = function(p1)
-			self:SeqLoadCrates(p1)
+		SeqLoadCrates = function(progress)
+			self:SeqLoadCrates(progress)
 		end,
-		SeqCargoClose = function(p1)
-			self:SeqCargoClose(p1)
+		SeqCargoClose = function(progress)
+			self:SeqCargoClose(progress)
 		end,
-		SeqLeave = function(p1)
-			self:SeqLeave(p1)
+		SeqLeave = function(progress)
+			self:SeqLeave(progress)
 		end,
-		SeqHatchOpen = function(p1)
-			self:SeqHatchOpen(p1)
+		SeqHatchOpen = function(progress)
+			self:SeqHatchOpen(progress)
 		end,
-		SeqHatchClose = function(p1)
-			self:SeqHatchClose(p1)
+		SeqHatchClose = function(progress)
+			self:SeqHatchClose(progress)
 		end,
 		SeqNone = function() end
 	}
@@ -281,8 +280,8 @@ function CargoPlane.new(bornAt)
 			GroupName = "RobberyMusic"
 		})
 		if LocalPlayer.Character then
-			for v1, v2 in LocalPlayer.Character:QueryDescendants("BasePart") do
-				v2.CollisionGroup = "PlayersInTrain"
+			for _index, part in LocalPlayer.Character:QueryDescendants("BasePart") do
+				part.CollisionGroup = "PlayersInTrain"
 			end
 		end
 	end)
@@ -305,8 +304,8 @@ function CargoPlane.new(bornAt)
 			}))
 		end
 		if (not forceFire or forceFire and self.IsPlayerInsidePlane) and LocalPlayer.Character then
-			for v2, v3 in LocalPlayer.Character:QueryDescendants("BasePart") do
-				v3.CollisionGroup = "Players"
+			for _index, part in LocalPlayer.Character:QueryDescendants("BasePart") do
+				part.CollisionGroup = "Players"
 			end
 		end
 	end)
@@ -332,7 +331,7 @@ function CargoPlane.SetupHatch(self)
 					TimePosition = 1,
 					MaxPlaybackTime = 0.6
 				})
-				RemoteEvent:FireServer("u" .. "" .. ("bo2p"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "46rrbe")
+				RemoteEvent:FireServer("u246rrbe")
 			end
 			return true
 		else
@@ -355,34 +354,34 @@ function CargoPlane.SetupHatch(self)
 	CircleAction.Add(spec, self.TopDoorModel.Part)
 	self.SpecHatch = spec
 end
-function CargoPlane.SeqHatchOpen(self, t)
+function CargoPlane.SeqHatchOpen(self, progress)
 	local Part = self.TopDoorModel.Part
-	if t == 0 then
+	if progress == 0 then
 		Audio.ObjectLocal(Part, 1791024087)
 		Part.CanCollide = false
 	end
-	self._topDoorMotor.C1 = self._topDoorMotor.C0:Inverse() * CFrame.new():Lerp(self._hatchOffset, t) * self._topDoorMotor.C0
+	self._topDoorMotor.C1 = self._topDoorMotor.C0:Inverse() * CFrame.new():Lerp(self._hatchOffset, progress) * self._topDoorMotor.C0
 end
-function CargoPlane.SeqHatchClose(self, t)
+function CargoPlane.SeqHatchClose(self, progress)
 	local Part = self.TopDoorModel.Part
-	if t == 0 then
+	if progress == 0 then
 		Audio.ObjectLocal(Part, 1791025004)
-	elseif t == 1 then
+	elseif progress == 1 then
 		Part.CanCollide = true
 	end
-	self._topDoorMotor.C1 = self._topDoorMotor.C0:Inverse() * CFrame.new():Lerp(self._hatchOffset, 1 - t) * self._topDoorMotor.C0
+	self._topDoorMotor.C1 = self._topDoorMotor.C0:Inverse() * CFrame.new():Lerp(self._hatchOffset, 1 - progress) * self._topDoorMotor.C0
 end
 function CargoPlane.SetupCrates(self)
 	local Crates = self.Model.Crates
-	local iterNext = next
-	local iterStart, iterState = Crates:GetChildren()
+	local nextFunc = next
+	local startValue, stateValue = Crates:GetChildren()
 	local crateList = {}
-	for k, v in iterNext, iterStart, iterState do
+	for _index, crateModel in nextFunc, startValue, stateValue do
 		local crateEntry = {
-			Name = v.Name,
-			Model = v
+			Name = crateModel.Name,
+			Model = crateModel
 		}
-		crateEntry.Model.PrimaryPart = v["1"]
+		crateEntry.Model.PrimaryPart = crateModel["1"]
 		table.insert(crateList, crateEntry)
 	end
 	self.Crates = crateList
@@ -414,16 +413,16 @@ end
 function CargoPlane.SetupProps(self)
 	local Model = self.Model
 	local PrimaryPart = Model.PrimaryPart
-	local iterNext = next
-	local iterStart, iterState = Model.Props:GetChildren()
+	local nextFunc = next
+	local startValue, stateValue = Model.Props:GetChildren()
 	local propList = {}
-	for k, v in iterNext, iterStart, iterState do
+	for _index, propContainer in nextFunc, startValue, stateValue do
 		local propEntry = {}
-		local Prop = v.Prop
+		local Prop = propContainer.Prop
 		propEntry.PartProp = Prop
-		propEntry.PartDisc = v.Disc
+		propEntry.PartDisc = propContainer.Disc
 		propEntry.Rotation = math.random()
-		Joint.WeldAllTo(v, Prop)
+		Joint.WeldAllTo(propContainer, Prop)
 		propEntry._motor = Joint.Motor(Prop, PrimaryPart)
 		table.insert(propList, propEntry)
 	end
@@ -574,14 +573,14 @@ function CargoPlane.StepDirection(self, targetDirection)
 		return smoothed
 	end
 end
-function CargoPlane.SeqEnter(self, t)
-	if t == 0 then
+function CargoPlane.SeqEnter(self, progress)
+	if progress == 0 then
 		Audio.FadeTo(self.SoundEngineFlying, 0.75, 0.1)
-	elseif t == 1 then
+	elseif progress == 1 then
 		Audio.FadeTo(self.SoundEngineFlying, 0, 1)
 		Audio.FadeTo(self.SoundEngineIdle, 0.6, 1)
 	end
-	local eased = (math.sin(math.pi * t - 1.5707963267948966) + 1) * 0.5
+	local eased = (math.sin(math.pi * progress - 1.5707963267948966) + 1) * 0.5
 	local Model = self.Model
 	local PathEnter = self.PathEnter
 	local pos, tangent = PathEnter:GetWorldPositionAt(PathEnter.ApproxTotalLength * eased)
@@ -589,16 +588,16 @@ function CargoPlane.SeqEnter(self, t)
 	local smoothRoll = self:StepRoll(if eased > 0.8 then 0 else math.acos((Model.PrimaryPart.CFrame.LookVector:Dot(tangent.Unit))) * 5, if eased > 0.8 then 0.03 else 0.01)
 	Model.PrimaryPart.CFrame = CFrame.new(pos, pos + smoothDir) * CFrame.Angles(0, 0, smoothRoll)
 end
-function CargoPlane.SeqLeave(self, t)
-	if t == 0 then
+function CargoPlane.SeqLeave(self, progress)
+	if progress == 0 then
 		Audio.FadeTo(self.SoundEngineIdle, 0, 1)
 		Audio.FadeTo(self.SoundEngineFlying, 0.75, 1)
 		Audio.FadeTo(self.SoundEngineBackground, 0.6, 1)
 	end
-	if t > 0.2 and not self.CratesEnabled then
+	if progress > 0.2 and not self.CratesEnabled then
 		self:EnableCrates()
 	end
-	local eased = (math.sin(math.pi * t - 1.5707963267948966) + 1) * 0.5
+	local eased = (math.sin(math.pi * progress - 1.5707963267948966) + 1) * 0.5
 	local Model = self.Model
 	local PathLeave = self.PathLeave
 	local pos, tangent = PathLeave:GetWorldPositionAt(PathLeave.ApproxTotalLength * eased)
@@ -612,40 +611,40 @@ function CargoPlane.SeqLeave(self, t)
 		self.ShouldDestroy = true
 	end
 end
-function CargoPlane.SeqLoadCrates(self, t)
-	for i = 1, math.floor(t * (#self.Crates - 1)) + 1 do
+function CargoPlane.SeqLoadCrates(self, progress)
+	for i = 1, math.floor(progress * (#self.Crates - 1)) + 1 do
 		local crate = self.Crates[i]
 		if not crate.HasLoaded then
 			crate.HasLoaded = true
 			ShowModel(crate.Model)
 		end
 	end
-	if t == 1 then
+	if progress == 1 then
 		ShowModel(self.Model.Crates)
 	end
 end
-function CargoPlane.SeqCargoOpen(self, t)
+function CargoPlane.SeqCargoOpen(self, progress)
 	local Door = self.Model.BottomDoor.Door
-	if t == 0 then
+	if progress == 0 then
 		Audio.ObjectLocal(Door.PrimaryPart, SoundIds.hydraulic_strut_air_gas_shock_door_01)
 		Audio.ObjectLocal(activePlane.Lever.Model.PrimaryPart, SoundIds.lever_sound)
 		self.Lever:Pull()
 	end
-	self._bottomDoorMotor.C1 = self._bottomDoorMotor.C0:Inverse() * CFrame.Angles(0, 0, -(t < 0.5 and 2 * t * t or -1 - 2 * (t - 2) * t) * math.pi * 0.15) * self._bottomDoorMotor.C0
-	self.CargoOpenAmount = t
+	self._bottomDoorMotor.C1 = self._bottomDoorMotor.C0:Inverse() * CFrame.Angles(0, 0, -(progress < 0.5 and 2 * progress * progress or -1 - 2 * (progress - 2) * progress) * math.pi * 0.15) * self._bottomDoorMotor.C0
+	self.CargoOpenAmount = progress
 end
-function CargoPlane.SeqCargoClose(self, t)
+function CargoPlane.SeqCargoClose(self, progress)
 	local Door = self.Model.BottomDoor.Door
-	if t == 0 then
+	if progress == 0 then
 		Audio.ObjectLocal(Door.PrimaryPart, SoundIds.hydraulic_strut_air_gas_shock_door_01)
 		Audio.ObjectLocal(activePlane.Lever.Model.PrimaryPart, SoundIds.lever_sound)
 		self.Lever:Reset()
-	elseif t == 1 then
+	elseif progress == 1 then
 		self.CargoOpenedAt = nil
 	end
-	local invT = 1 - t
-	self._bottomDoorMotor.C1 = self._bottomDoorMotor.C0:Inverse() * CFrame.Angles(0, 0, -(invT < 0.5 and 2 * invT * invT or -1 - 2 * (invT - 2) * invT) * math.pi * 0.15) * self._bottomDoorMotor.C0
-	self.CargoOpenAmount = 1 - t
+	local invProgress = 1 - progress
+	self._bottomDoorMotor.C1 = self._bottomDoorMotor.C0:Inverse() * CFrame.Angles(0, 0, -(invProgress < 0.5 and 2 * invProgress * invProgress or -1 - 2 * (invProgress - 2) * invProgress) * math.pi * 0.15) * self._bottomDoorMotor.C0
+	self.CargoOpenAmount = 1 - progress
 end
 function CargoPlane.Destroy(self)
 	self.HeartbeatConn:Disconnect()
@@ -682,12 +681,12 @@ function CargoPlane.Destroy(self)
 	setmetatable(self, nil)
 end
 return {
-	Init = function(p1)
-		local eventManager = p1.em
-		RemoteEvent = p1.Event
+	Init = function(initConfig)
+		local eventManager = initConfig.em
+		RemoteEvent = initConfig.Event
 		em = eventManager
-		Team = p1.Team
-		local ScreenGui = p1.ScreenGui
+		Team = initConfig.Team
+		local ScreenGui = initConfig.ScreenGui
 		local rng = Random.new()
 		function eventManager.OnCargoPlaneStateChanged(state)
 			if state then
@@ -729,8 +728,8 @@ return {
 			activePlane.HatchOpenedAt = Time.GetNowSync()
 			activePlane.Tl_Hatch = Timeline.new(activePlane.SeqsHatch)
 		end
-		for v32, v42 in CollectionService:GetTagged("ReplicateCharacterPlane") do
-			table.insert(replicateCharacterPlaneList, v42)
+		for _index, replicatedCharacterModel in CollectionService:GetTagged("ReplicateCharacterPlane") do
+			table.insert(replicateCharacterPlaneList, replicatedCharacterModel)
 		end
 		local pendingRemovals = {}
 		CollectionService:GetInstanceAddedSignal("ReplicateCharacterPlane"):Connect(function(instance)

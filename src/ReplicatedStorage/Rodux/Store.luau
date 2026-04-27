@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local RunService = game:GetService("RunService")
 local Signal = require(script.Parent.Signal)
 local NoYield = require(script.Parent.NoYield)
@@ -101,8 +99,8 @@ function StoreMetatable.dispatch(self, action)
 	table.insert(self._actionLog, action)
 end
 function StoreMetatable.destruct(self)
-	for i, v in ipairs(self._connections) do
-  v:Disconnect()
+	for i, connection in ipairs(self._connections) do
+  connection:Disconnect()
 	end
 	self._connections = nil
 end

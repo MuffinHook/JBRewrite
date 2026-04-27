@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -269,9 +268,9 @@ function AppComponent.init(self)
 					self:setState(passengerState)
 				end
 				updatePassengers()
-				for i, v in ipairs(vehiclePacket.Model:GetChildren()) do
-					if v.Name == "Seat" or v.Name == "Passenger" then
-						local PlayerName = v:FindFirstChild("PlayerName")
+				for seatIndex, seatChild in ipairs(vehiclePacket.Model:GetChildren()) do
+					if seatChild.Name == "Seat" or seatChild.Name == "Passenger" then
+						local PlayerName = seatChild:FindFirstChild("PlayerName")
 						vehiclePacket.seatMaid:GiveTask(PlayerName.Changed:Connect(updatePassengers))
 					end
 				end
@@ -922,9 +921,9 @@ function AppComponent.didUpdate(self, prevProps, prevState)
 		elseif self.cmdr then
 			self.cmdr:Hide()
 			if self.cmdrFrame then
-				for i, child in self.cmdrFrame:GetChildren() do
-					if child:IsA("TextBox") and child:IsFocused() then
-						child:ReleaseFocus()
+				for childIndex, cmdrChild in self.cmdrFrame:GetChildren() do
+					if cmdrChild:IsA("TextBox") and cmdrChild:IsFocused() then
+						cmdrChild:ReleaseFocus()
 					end
 				end
 			end

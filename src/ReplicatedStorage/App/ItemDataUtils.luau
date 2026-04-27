@@ -1,12 +1,11 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
-	getConfig = function(p1)
-		local v1 = ReplicatedStorage.Game.ItemConfig:FindFirstChild(p1)
-		if v1 == nil then
+	getConfig = function(configId)
+		local configModule = ReplicatedStorage.Game.ItemConfig:FindFirstChild(configId)
+		if configModule == nil then
 			return nil
 		else
-			return require(v1)
+			return require(configModule)
 		end
 	end
 }

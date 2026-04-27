@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
@@ -51,18 +49,18 @@ if script.Parent == ReplicatedFirst then
 		ImageTransparency = 1,
 		Size = UDim2.fromScale(0.4, 0.4)
 	}):Play()
-	local function setTitle(p1)
-		UIAspectRatioConstraint.AspectRatio = p1.aspectRatio
-		ImageLabel.Image = p1.image
+	local function setTitle(imageConfig)
+		UIAspectRatioConstraint.AspectRatio = imageConfig.aspectRatio
+		ImageLabel.Image = imageConfig.image
 	end
 	local LocalPlayer = Players.LocalPlayer
 	local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 	local teleportCounter = 0
-	local function handleTeleport(p1)
+	local function handleTeleport(teleportData)
 		teleportCounter = teleportCounter + 1
 		local currentTeleportId = teleportCounter
-		local isEnabled = p1 == nil
-		local teleportData = p1 or {}
+		local isEnabled = teleportData == nil
+		local teleportData = teleportData or {}
 		TextLabel.Text = ""
 		if teleportData.tradeLoadingScreen or teleportData.worldName == "TRADE_WORLD" then
 			local Trade = configTable.Trade
@@ -108,17 +106,17 @@ if script.Parent == ReplicatedFirst then
 	end
 	isEnabled = true
 	ScreenGui.Parent = nil
-	require(ReplicatedStorage.Std.Maid).new():GiveTask(ReplicatedStorage:WaitForChild(require(ReplicatedStorage.WorldTeleport.WorldTeleportConsts).TELEPORT_HAPPENING_REMOTE).onClientEvent:Connect(function(p1)
-		handleTeleport(p1)
+	require(ReplicatedStorage.Std.Maid).new():GiveTask(ReplicatedStorage:WaitForChild(require(ReplicatedStorage.WorldTeleport.WorldTeleportConsts).TELEPORT_HAPPENING_REMOTE).onClientEvent:Connect(function(teleportData)
+		handleTeleport(teleportData)
 		TeleportService:SetTeleportGui(ScreenGui)
-		if not (p1 and p1.migrationLoadingScreen) then
+		if not (teleportData and teleportData.migrationLoadingScreen) then
 			task.delay(10, function()
 				ScreenGui.Parent = nil
 			end)
 		end
 	end))
-	TeleportService.TeleportInitFailed:Connect(function(p1)
-		if p1 == LocalPlayer then
+	TeleportService.TeleportInitFailed:Connect(function(player)
+		if player == LocalPlayer then
 			ScreenGui.Parent = nil
 		end
 	end)

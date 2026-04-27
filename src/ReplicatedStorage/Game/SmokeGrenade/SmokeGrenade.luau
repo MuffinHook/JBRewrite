@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
@@ -11,119 +10,119 @@ local Anim = require(ReplicatedStorage.Module.Anim)
 local CamShaker = require(ReplicatedStorage.Game.CamShaker.CamShaker)
 local Promise = require(ReplicatedStorage.Std.Promise)
 local SmokeGrenadeConsts = require(script.Parent.SmokeGrenadeConsts)
-local t = {}
-t.__index = t
-t.__ClassName = "SmokeGrenade"
-function t.new(p1)
-	local t2 = {}
-	setmetatable(t2, t)
-	t2._maid = Maid.new()
-	t2.maid = t2._maid
-	t2._obj = p1
-	t2.obj = t2._obj
-	t2._thrownRemote = p1:WaitForChild(SmokeGrenadeConsts.THROWN_REMOTE_NAME)
-	t2._thrownValue = p1:WaitForChild(SmokeGrenadeConsts.THROWN_VALUE_NAME)
-	t2._maid:GiveTask(p1:WaitForChild(SmokeGrenadeConsts.EXPLODE_REMOTE_NAME).OnClientEvent:Connect(function()
-		t2:_playExplosionFx()
+local SmokeGrenade = {}
+SmokeGrenade.__index = SmokeGrenade
+SmokeGrenade.__ClassName = "SmokeGrenade"
+function SmokeGrenade.new(grenadeObj)
+	local instance = {}
+	setmetatable(instance, SmokeGrenade)
+	instance._maid = Maid.new()
+	instance.maid = instance._maid
+	instance._obj = grenadeObj
+	instance.obj = instance._obj
+	instance._thrownRemote = grenadeObj:WaitForChild(SmokeGrenadeConsts.THROWN_REMOTE_NAME)
+	instance._thrownValue = grenadeObj:WaitForChild(SmokeGrenadeConsts.THROWN_VALUE_NAME)
+	instance._maid:GiveTask(grenadeObj:WaitForChild(SmokeGrenadeConsts.EXPLODE_REMOTE_NAME).OnClientEvent:Connect(function()
+		instance:_playExplosionFx()
 	end))
-	t2._creatorIdValue = p1:WaitForChild(SmokeGrenadeConsts.CREATOR_ID_VALUE_NAME)
-	return t2
+	instance._creatorIdValue = grenadeObj:WaitForChild(SmokeGrenadeConsts.CREATOR_ID_VALUE_NAME)
+	return instance
 end
-local v1 = Color3.new(255/255, 255/255, 255/255)
-function t._getJ(p1, p2)
-	local v1 = (p1._obj.PrimaryPart.Position - p2).Magnitude / SmokeGrenadeConsts.BLAST_RADIUS
-	if v1 < 0.001 then
-		v1 = 0
+local whiteColor = Color3.new(255/255, 255/255, 255/255)
+function SmokeGrenade._getJ(self, targetPosition)
+	local distanceRatio = (self._obj.PrimaryPart.Position - targetPosition).Magnitude / SmokeGrenadeConsts.BLAST_RADIUS
+	if distanceRatio < 0.001 then
+		distanceRatio = 0
 	end
-	if v1 > 0.999 then
-		v1 = 1
+	if distanceRatio > 0.999 then
+		distanceRatio = 1
 	end
-	return 1 - v1
+	return 1 - distanceRatio
 end
-function t._playExplosionFx(p1)
+function SmokeGrenade._playExplosionFx(self)
 	local FX_DURATION = SmokeGrenadeConsts.FX_DURATION
-	local v12 = Maid.new()
-	Promise.delay(FX_DURATION):andThenCall(v12.Destroy, v12)
-	local v2 = PlayerUtils.getHumanoid(LocalPlayer)
-	local v3 = PlayerUtils.getRootPart(LocalPlayer)
-	if (p1._obj.PrimaryPart.Position - v3.Position).Magnitude < SmokeGrenadeConsts.BLAST_RADIUS then
-		local v4 = CamShaker.new(Enum.RenderPriority.Camera.Value + 2, function(p1)
-			CurrentCamera.CFrame = CurrentCamera.CFrame * p1
+	local maidInstance = Maid.new()
+	Promise.delay(FX_DURATION):andThenCall(maidInstance.Destroy, maidInstance)
+	local playerHumanoid = PlayerUtils.getHumanoid(LocalPlayer)
+	local playerRootPart = PlayerUtils.getRootPart(LocalPlayer)
+	if (self._obj.PrimaryPart.Position - playerRootPart.Position).Magnitude < SmokeGrenadeConsts.BLAST_RADIUS then
+		local cameraShaker = CamShaker.new(Enum.RenderPriority.Camera.Value + 2, function(shakeCFrame)
+			CurrentCamera.CFrame = CurrentCamera.CFrame * shakeCFrame
 		end)
-		v4:Start()
-		v4:Shake(CamShaker.Presets.Explosion)
-		Promise.delay(2):andThenCall(v4.Stop, v4)
-		v2.NameDisplayDistance = 0
-		v12:GiveTask(function()
-			v2.NameDisplayDistance = 100
+		cameraShaker:Start()
+		cameraShaker:Shake(CamShaker.Presets.Explosion)
+		Promise.delay(2):andThenCall(cameraShaker.Stop, cameraShaker)
+		playerHumanoid.NameDisplayDistance = 0
+		maidInstance:GiveTask(function()
+			playerHumanoid.NameDisplayDistance = 100
 		end)
 	end
 	local BlurEffect = Instance.new("BlurEffect")
 	BlurEffect.Size = 0
 	BlurEffect.Parent = Lighting
-	v12:GiveTask(BlurEffect)
+	maidInstance:GiveTask(BlurEffect)
 	local ColorCorrectionEffect = Instance.new("ColorCorrectionEffect")
-	ColorCorrectionEffect.TintColor = v1
+	ColorCorrectionEffect.TintColor = whiteColor
 	ColorCorrectionEffect.Parent = Lighting
-	v12:GiveTask(ColorCorrectionEffect)
-	local v5 = Anim.new(0.1)
-	v5.OnCompleted:Connect(function()
-		v5:Destroy()
+	maidInstance:GiveTask(ColorCorrectionEffect)
+	local animationInitial = Anim.new(0.1)
+	animationInitial.OnCompleted:Connect(function()
+		animationInitial:Destroy()
 	end)
-	v12:GiveTask(v5)
-	v5.Maid:GiveTask(RunService.Heartbeat:Connect(function()
-		local v12 = v5:Update()
-		local v2 = p1:_getJ(v3.Position)
-		BlurEffect.Size = v12 * v2 * SmokeGrenadeConsts.FX_BLUR_SIZE
-		ColorCorrectionEffect.TintColor = v1:lerp(SmokeGrenadeConsts.FX_COLOR, v12 * v2)
+	maidInstance:GiveTask(animationInitial)
+	animationInitial.Maid:GiveTask(RunService.Heartbeat:Connect(function()
+		local progressRatio = animationInitial:Update()
+		local distanceRatio = self:_getJ(playerRootPart.Position)
+		BlurEffect.Size = progressRatio * distanceRatio * SmokeGrenadeConsts.FX_BLUR_SIZE
+		ColorCorrectionEffect.TintColor = whiteColor:lerp(SmokeGrenadeConsts.FX_COLOR, progressRatio * distanceRatio)
 	end))
-	v5.Maid:GiveTask(function()
-		v12.distanceRuntime = RunService.Heartbeat:Connect(function()
-			v3 = PlayerUtils.getRootPart(LocalPlayer)
-			local v12 = p1:_getJ(v3.Position)
-			BlurEffect.Size = v12 * SmokeGrenadeConsts.FX_BLUR_SIZE
-			ColorCorrectionEffect.TintColor = v1:lerp(SmokeGrenadeConsts.FX_COLOR, v12)
+	animationInitial.Maid:GiveTask(function()
+		maidInstance.distanceRuntime = RunService.Heartbeat:Connect(function()
+			playerRootPart = PlayerUtils.getRootPart(LocalPlayer)
+			local distanceRatio = self:_getJ(playerRootPart.Position)
+			BlurEffect.Size = distanceRatio * SmokeGrenadeConsts.FX_BLUR_SIZE
+			ColorCorrectionEffect.TintColor = whiteColor:lerp(SmokeGrenadeConsts.FX_COLOR, distanceRatio)
 		end)
 	end)
 	Promise.delay(FX_DURATION - 0.1 - 1):andThen(function()
-		v12.distanceRuntime = nil
-		local v13 = Anim.new(1)
-		v12:GiveTask(v13)
-		v13.Maid:GiveTask(RunService.Heartbeat:Connect(function()
-			local v12 = v13:Update()
-			local v2 = p1:_getJ(v3.Position)
-			BlurEffect.Size = (1 - v12) * v2 * SmokeGrenadeConsts.FX_BLUR_SIZE
-			ColorCorrectionEffect.TintColor = v1:lerp(SmokeGrenadeConsts.FX_COLOR, (1 - v12) * v2)
+		maidInstance.distanceRuntime = nil
+		local animationFadeOut = Anim.new(1)
+		maidInstance:GiveTask(animationFadeOut)
+		animationFadeOut.Maid:GiveTask(RunService.Heartbeat:Connect(function()
+			local progressRatio = animationFadeOut:Update()
+			local distanceRatio = self:_getJ(playerRootPart.Position)
+			BlurEffect.Size = (1 - progressRatio) * distanceRatio * SmokeGrenadeConsts.FX_BLUR_SIZE
+			ColorCorrectionEffect.TintColor = whiteColor:lerp(SmokeGrenadeConsts.FX_COLOR, (1 - progressRatio) * distanceRatio)
 		end))
 	end)
 	Promise.delay(FX_DURATION):andThen(function()
-		v12:Destroy()
-		v12 = nil
+		maidInstance:Destroy()
+		maidInstance = nil
 	end)
 end
-function t.SetThrown(p1)
-	p1._thrownValue.Value = true
-	p1._thrownRemote:FireServer()
+function SmokeGrenade.SetThrown(self)
+	self._thrownValue.Value = true
+	self._thrownRemote:FireServer()
 end
-function t.GetThrown(p1)
-	return p1._thrownValue.Value
+function SmokeGrenade.GetThrown(self)
+	return self._thrownValue.Value
 end
-function t.GetCreator(p1)
-	return Players:GetPlayerByUserId(p1._creatorIdValue.Value)
+function SmokeGrenade.GetCreator(self)
+	return Players:GetPlayerByUserId(self._creatorIdValue.Value)
 end
-function t.SetVelocity(p1, p2)
-	assert(p2 ~= nil)
-	p1._obj.PrimaryPart.Velocity = p2
+function SmokeGrenade.SetVelocity(self, velocityVector)
+	assert(velocityVector ~= nil)
+	self._obj.PrimaryPart.Velocity = velocityVector
 end
-function t.SetRotVelocity(p1, p2)
-	assert(p2 ~= nil)
-	p1._obj.PrimaryPart.RotVelocity = p2
+function SmokeGrenade.SetRotVelocity(self, rotationalVelocityVector)
+	assert(rotationalVelocityVector ~= nil)
+	self._obj.PrimaryPart.RotVelocity = rotationalVelocityVector
 end
-function t.Destroy(p1)
-	assert(p1._maid)
-	local _maid_2 = p1._maid
-	p1._maid = nil
+function SmokeGrenade.Destroy(self)
+	assert(self._maid)
+	local _maid_2 = self._maid
+	self._maid = nil
 	_maid_2:Destroy()
-	setmetatable(p1, nil)
+	setmetatable(self, nil)
 end
-return t
+return SmokeGrenade

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local t = {
 	getAll = function(itemsCollection, player)
 		assert(itemsCollection ~= nil)

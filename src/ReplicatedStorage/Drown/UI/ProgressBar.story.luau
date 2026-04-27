@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ProgressBar = require(script.Parent.ProgressBar)
 local Roact = require(ReplicatedStorage.Roact)

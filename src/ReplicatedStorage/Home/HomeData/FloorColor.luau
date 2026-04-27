@@ -1,28 +1,27 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WallColor = require(script.Parent.WallColor)
 local Paint = require(ReplicatedStorage.Game.Garage.Paint)
-local t = {}
-local t2 = {
+local FloorColorModule = {}
+local paintConfig = {
 	DefaultReflectance = 0,
 	DefaultMaterial = Enum.Material.SmoothPlastic,
 	DisableReflectance = true
 }
-t.getInstance = WallColor.getInstance
-t.updateCamera = WallColor.updateCamera
-t.getItems = WallColor.getItems
-function t.apply(p1, p2)
-	local FlooringMaterial = p2:FindFirstChild("FlooringMaterial")
+FloorColorModule.getInstance = WallColor.getInstance
+FloorColorModule.updateCamera = WallColor.updateCamera
+FloorColorModule.getItems = WallColor.getItems
+function FloorColorModule.apply(colorData, model)
+	local FlooringMaterial = model:FindFirstChild("FlooringMaterial")
 	if FlooringMaterial then
 		local count = 0
-		for v1, v2 in FlooringMaterial:GetChildren() do
-			if v2:IsA("BasePart") then
+		for v1, flooringPart in FlooringMaterial:GetChildren() do
+			if flooringPart:IsA("BasePart") then
 				count = count + 1
-				if p1 and not p1.None then
-					t2.DefaultMaterial = v2.Material
-					Paint.Part(v2, p1.Name, t2)
+				if colorData and not colorData.None then
+					paintConfig.DefaultMaterial = flooringPart.Material
+					Paint.Part(flooringPart, colorData.Name, paintConfig)
 				else
-					v2.Color = v2:GetAttribute("OriginalColor")
+					flooringPart.Color = flooringPart:GetAttribute("OriginalColor")
 				end
 			end
 		end
@@ -31,4 +30,4 @@ function t.apply(p1, p2)
 		warn("Missing subModel")
 	end
 end
-return t
+return FloorColorModule

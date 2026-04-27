@@ -1,17 +1,15 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PaddedContainer = require(ReplicatedStorage.EzUi.PaddedContainer)
 local PersistentCrewBattleConsts = require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleConsts)
 require(ReplicatedStorage.Std.Maid)
 local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
-local local1 = Roact.PureComponent:extend("ReportCrew")
-local1.defaultProps = {
+local ReportCrewComponent = Roact.PureComponent:extend("ReportCrew")
+ReportCrewComponent.defaultProps = {
 	position = UDim2.fromScale(0.5, 0.5),
 	size = UDim2.fromScale(0.9, 0.9)
 }
-function local1.init(self)
+function ReportCrewComponent.init(self)
 	self.explainBoxRef = Roact.createRef()
 	self.reportButtons = PersistentCrewBattleConsts.CLAN_REPORT_OPTIONS
 	self:setState({
@@ -32,8 +30,8 @@ function local1.init(self)
 		end
 	end
 end
-function local1.render(self)
-	local local1 = Color3.new(51/255, 51/255, 51/255)
+function ReportCrewComponent.render(self)
+	local darkGrayColor = Color3.new(51/255, 51/255, 51/255)
 	local function button(self)
 		return createElement(PaddedContainer, {
 			size = self.size,
@@ -88,39 +86,39 @@ function local1.render(self)
 			})
 		})
 	end
-	local t = {}
-	for local4, local5 in self.reportButtons do
-		local local2, local3
-		local2 = self.state.selectedButton == local5
-		local table2 = {
+	local buttonsList = {}
+	for buttonIndex, reportOption in self.reportButtons do
+		local isSelected, buttonColor
+		isSelected = self.state.selectedButton == reportOption
+		local buttonConfig = {
 			size = UDim2.fromScale(1, 1 / #self.reportButtons),
-			position = UDim2.fromScale(0, 1 / #self.reportButtons * (local4 - 1)),
-			text = local5.title,
+			position = UDim2.fromScale(0, 1 / #self.reportButtons * (buttonIndex - 1)),
+			text = reportOption.title,
 			font = Enum.Font.FredokaOne
 		}
-		local3 = if local2 then Color3.fromRGB(251, 121, 121) else Color3.fromRGB(88, 172, 246)
-		table2.bgColor = local3
-		function table2.onClicked()
+		buttonColor = if isSelected then Color3.fromRGB(251, 121, 121) else Color3.fromRGB(88, 172, 246)
+		buttonConfig.bgColor = buttonColor
+		function buttonConfig.onClicked()
 			self:setState({
-				selectedButton = local5
+				selectedButton = reportOption
 			})
 		end
-		table.insert(t, button(table2))
+		table.insert(buttonsList, button(buttonConfig))
 	end
-	local table2 = {
+	local mainFrameProps = {
 		BackgroundTransparency = 1,
 		Size = self.props.size,
 		Position = self.props.position,
 		AnchorPoint = Vector2.new(0.5, 0.5)
 	}
-	local table3 = {
+	local mainFrameChildren = {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
 			AspectRatio = 0.75
 		})
 	}
-	local table5 = {
+	local containerChildren = {
 		Header = createElement(PaddedContainer, {
-			backgroundColor = local1,
+			backgroundColor = darkGrayColor,
 			size = UDim2.fromScale(1, 0.15),
 			paddingBottom = 0.5
 		}, {
@@ -149,7 +147,7 @@ function local1.render(self)
 			})
 		}),
 		Body = createElement(PaddedContainer, {
-			backgroundColor = local1,
+			backgroundColor = darkGrayColor,
 			size = UDim2.fromScale(1, 0.7),
 			position = UDim2.fromScale(0, 0.15),
 			paddingTop = 0.5,
@@ -172,7 +170,7 @@ function local1.render(self)
 					paddingTop = 0.5,
 					paddingRight = 0.5,
 					paddingLeft = 0.5
-				}, t),
+				}, buttonsList),
 				Explain = createElement(PaddedContainer, {
 					backgroundTransparency = 0,
 					backgroundColor = Color3.fromRGB(150, 150, 150),
@@ -215,18 +213,18 @@ function local1.render(self)
 			})
 		})
 	}
-	local table6 = {
-		backgroundColor = local1,
+	local footerProps = {
+		backgroundColor = darkGrayColor,
 		size = UDim2.fromScale(1, 0.15),
 		position = UDim2.fromScale(0, 0.85),
 		paddingTop = 0.5
 	}
-	local table7 = {
+	local footerChildren = {
 		Corner = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
 		})
 	}
-	local table8 = {
+	local buttonsContainerProps = {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(1, 0.7),
 		paddingTop = 0.5,
@@ -234,7 +232,7 @@ function local1.render(self)
 		paddingLeft = 0.5,
 		paddingRight = 0.5
 	}
-	local table9 = {
+	local buttonElements = {
 		NevermindButton = button({
 			text = "Nevermind",
 			size = UDim2.fromScale(0.6, 1),
@@ -244,19 +242,19 @@ function local1.render(self)
 			onClicked = self.close
 		})
 	}
-	local table10 = {
+	local submitButtonConfig = {
 		text = "Submit",
 		size = UDim2.fromScale(0.4, 1),
 		position = UDim2.fromScale(0.6, 0),
 		font = Enum.Font.LuckiestGuy,
 		lineHeight = 0.7
 	}
-	table10.disabled = self.state.selectedButton == nil
-	table10.bgColor = if self.state.selectedButton == nil then Color3.new(0.5, 0.5, 0.5) else Color3.fromRGB(251, 121, 121)
-	table10.onClicked = self.attemptSubmit
-	table9.SubmitButton = button(table10)
-	table7.Buttons = createElement(PaddedContainer, table8, table9)
-	table7.Help = createElement(PaddedContainer, {
+	submitButtonConfig.disabled = self.state.selectedButton == nil
+	submitButtonConfig.bgColor = if self.state.selectedButton == nil then Color3.new(0.5, 0.5, 0.5) else Color3.fromRGB(251, 121, 121)
+	submitButtonConfig.onClicked = self.attemptSubmit
+	buttonElements.SubmitButton = button(submitButtonConfig)
+	footerChildren.Buttons = createElement(PaddedContainer, buttonsContainerProps, buttonElements)
+	footerChildren.Help = createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		size = UDim2.fromScale(1, 0.3),
 		position = UDim2.fromScale(0, 0.7),
@@ -279,13 +277,13 @@ function local1.render(self)
 			})
 		})
 	})
-	table5.Footer = createElement(PaddedContainer, table6, table7)
-	table3.Container = createElement(PaddedContainer, {
+	containerChildren.Footer = createElement(PaddedContainer, footerProps, footerChildren)
+	mainFrameChildren.Container = createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		aspectRatio = 0.75,
 		verticalPaddingRatio = 85.33333333333333,
 		paddingNone = true
-	}, table5)
-	return createElement("Frame", table2, table3)
+	}, containerChildren)
+	return createElement("Frame", mainFrameProps, mainFrameChildren)
 end
-return local1
+return ReportCrewComponent

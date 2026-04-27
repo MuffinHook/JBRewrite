@@ -1,11 +1,10 @@
--- Reviewed by Claude
-local t = {
+local popularSortModule = {
 	_value = require(script.Parent.fallbackPopularSortData)
 }
-function t.setRaw(p1)
-	t._value = p1
+function popularSortModule.setRaw(rawData)
+	popularSortModule._value = rawData
 end
-function t.getRaw()
-	return t._value
+function popularSortModule.getRaw()
+	return popularSortModule._value
 end
-return t
+return popularSortModule

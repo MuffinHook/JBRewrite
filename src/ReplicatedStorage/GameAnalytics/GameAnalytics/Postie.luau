@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -19,89 +17,89 @@ local isServer = RunService:IsServer()
 local callbacks = {}
 local responseHandlers = {}
 local module = {
-	invokeClient = function(p1, p2, p3, ...)
+	invokeClient = function(callbackName, player, timeout, ...)
 		assert(isServer, "Postie.invokeClient can only be called from the server")
 		local currentCoroutine = coroutine.running()
 		local responseReceived = false
 		local guid = HttpService:GenerateGUID(false)
-		responseHandlers[guid] = function(p1, p22, ...)
-			if p1 == p2 then
+		responseHandlers[guid] = function(incomingGuid, success, ...)
+			if incomingGuid == player then
 				responseReceived = true
 				responseHandlers[guid] = nil
-				if p22 then
+				if success then
 					task.spawn(currentCoroutine, true, ...)
 				else
 					task.spawn(currentCoroutine, false)
 				end
 			end
 		end
-		task.delay(p3, function()
+		task.delay(timeout, function()
 			if not responseReceived then
 				responseHandlers[guid] = nil
 				task.spawn(currentCoroutine, false)
 			end
 		end)
-		PostieSent:FireClient(p2, p1, guid, ...)
+		PostieSent:FireClient(player, callbackName, guid, ...)
 		return coroutine.yield()
 	end,
-	invokeServer = function(p1, p2, ...)
+	invokeServer = function(callbackName, timeout, ...)
 		assert(not isServer, "Postie.invokeServer can only be called from the client")
 		local currentCoroutine = coroutine.running()
 		local responseReceived = false
 		local guid = HttpService:GenerateGUID(false)
-		responseHandlers[guid] = function(p1, ...)
+		responseHandlers[guid] = function(success, ...)
 			responseReceived = true
 			responseHandlers[guid] = nil
-			if p1 then
+			if success then
 				task.spawn(currentCoroutine, true, ...)
 			else
 				task.spawn(currentCoroutine, false)
 			end
 		end
-		task.delay(p2, function()
+		task.delay(timeout, function()
 			if not responseReceived then
 				responseHandlers[guid] = nil
 				task.spawn(currentCoroutine, false)
 			end
 		end)
-		PostieSent:FireServer(p1, guid, ...)
+		PostieSent:FireServer(callbackName, guid, ...)
 		return coroutine.yield()
 	end,
-	setCallback = function(p1, p2)
-		callbacks[p1] = p2
+	setCallback = function(callbackName, callbackFunction)
+		callbacks[callbackName] = callbackFunction
 	end,
-	getCallback = function(p1)
-		return callbacks[p1]
+	getCallback = function(callbackName)
+		return callbacks[callbackName]
 	end
 }
 if isServer then
-	PostieReceived.OnServerEvent:Connect(function(p1, p2, p3, ...)
-		local responseHandler = responseHandlers[p2]
+	PostieReceived.OnServerEvent:Connect(function(player, guid, success, ...)
+		local responseHandler = responseHandlers[guid]
 		if responseHandler then
-			responseHandler(p1, p3, ...)
+			responseHandler(player, success, ...)
 		end
 	end)
-	PostieSent.OnServerEvent:Connect(function(p1, p2, p3, ...)
-		local callback = callbacks[p2]
+	PostieSent.OnServerEvent:Connect(function(player, callbackName, guid, ...)
+		local callback = callbacks[callbackName]
 		if callback then
-			PostieReceived:FireClient(p1, p3, true, callback(p1, ...))
+			PostieReceived:FireClient(player, guid, true, callback(player, ...))
 		else
-			PostieReceived:FireClient(p1, p3, false)
+			PostieReceived:FireClient(player, guid, false)
 		end
 	end)
 else
-	PostieReceived.OnClientEvent:Connect(function(p1, p2, ...)
-		local responseHandler = responseHandlers[p1]
+	PostieReceived.OnClientEvent:Connect(function(guid, success, ...)
+		local responseHandler = responseHandlers[guid]
 		if responseHandler then
-			responseHandler(p2, ...)
+			responseHandler(success, ...)
 		end
 	end)
-	PostieSent.OnClientEvent:Connect(function(p1, p2, ...)
-		local callback = callbacks[p1]
+	PostieSent.OnClientEvent:Connect(function(callbackName, guid, ...)
+		local callback = callbacks[callbackName]
 		if callback then
-			PostieReceived:FireServer(p2, true, callback(...))
+			PostieReceived:FireServer(guid, true, callback(...))
 		else
-			PostieReceived:FireServer(p2, false)
+			PostieReceived:FireServer(guid, false)
 		end
 	end)
 end

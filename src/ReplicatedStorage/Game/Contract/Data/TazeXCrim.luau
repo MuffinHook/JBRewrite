@@ -1,9 +1,8 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return {
 	teamId = require(ReplicatedStorage.Resource.Settings).EnumTeam.Police,
-	message = function(p1)
-		return ("Taze %d criminals."):format(p1:GetGoal())
+	message = function(contract)
+		return ("Taze %d criminals."):format(contract:GetGoal())
 	end,
 	goal = 6,
 	rewardExp = 30

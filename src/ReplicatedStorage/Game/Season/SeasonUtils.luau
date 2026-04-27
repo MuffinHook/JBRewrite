@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Std.Promise)

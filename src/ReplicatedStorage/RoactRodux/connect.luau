@@ -24,8 +24,8 @@ type MapDispatchToPropsOrActionCreator<StoreState, PartialProps> = types.MapDisp
 --[[
 	Formats a multi-line message with printf-style placeholders.
 ]]
-local function formatMessage(lines, parameters)
-	return table.concat(lines, "\n"):format(unpack(parameters or {}))
+local function formatMessage(messageLines, formatParameters)
+	return table.concat(messageLines, "\n"):format(unpack(formatParameters or {}))
 end
 
 local function noop()
@@ -35,9 +35,9 @@ end
 --[[
 	Returns `true` if the value can be called i.e. you can write `value(...)`.
 ]]
-local function isCallable(value: any): boolean
-	return type(value) == "function"
-		or (type(value) == "table" and getmetatable(value) and getmetatable(value).__call ~= nil)
+local function isCallable(potentialFunction: any): boolean
+	return type(potentialFunction) == "function"
+		or (type(potentialFunction) == "table" and getmetatable(potentialFunction) and getmetatable(potentialFunction).__call ~= nil)
 		or false
 end
 

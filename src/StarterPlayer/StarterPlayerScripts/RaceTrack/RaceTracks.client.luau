@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
@@ -12,31 +10,31 @@ local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
 local Board = require(ReplicatedStorage.RaceTrack.UI.Board)
 local TrackService = require(ReplicatedStorage.RaceTrack.TrackService)
 RxInstanceUtils.waitForChild(ReplicatedStorage, "RaceTrackScreenText"):andThen(function(self)
-	local v1 = nil
+	local screenTextPromise = nil
 	self.OnClientEvent:Connect(function(self)
 		TrackService.updateScreenText(self)
 		Audio.ObjectLocal(Players.LocalPlayer.PlayerGui, 6874682609, {
 			Volume = 0.8
 		})
-		if v1 then
-			v1:cancel()
-			v1 = nil
+		if screenTextPromise then
+			screenTextPromise:cancel()
+			screenTextPromise = nil
 		end
-		v1 = Promise.delay(3):andThen(function()
+		screenTextPromise = Promise.delay(3):andThen(function()
 			TrackService.updateScreenText("")
 		end)
 	end)
 end)
-local v1 = Roact.PureComponent:extend("Board")
-function v1.init(self)
+local BoardComponent = Roact.PureComponent:extend("Board")
+function BoardComponent.init(self)
 	self._maid = Maid.new()
 end
-function v1._fetch(self)
+function BoardComponent._fetch(self)
 	self:setState({
 		numEntries = #self.props.dataFolder:GetChildren()
 	})
 end
-function v1.didMount(self)
+function BoardComponent.didMount(self)
 	self:_fetch()
 	self._maid:GiveTask(self.props.dataFolder.ChildAdded:Connect(function()
 		self:_fetch()
@@ -45,26 +43,26 @@ function v1.didMount(self)
 		self:_fetch()
 	end))
 end
-function v1.render(self)
+function BoardComponent.render(self)
 	local configTable = {}
-	for i, v in ipairs(self.props.dataFolder:GetChildren()) do
-		local v1
-		local v2 = v:GetAttribute("Time")
-		v1 = typeof(v2) == "number"
-		assert(v1, "time was not a number")
-		local mathFunc = math.floor(v2 % 3600000 / 60000)
-		local mathFunc = math.floor(v2 % 60000 / 1000)
-		local mathFunc = math.floor(v2 % 1000)
-		local configTable = {
-			name = v.Value
+	for i, entryInstance in ipairs(self.props.dataFolder:GetChildren()) do
+		local isValidTime
+		local raceTime = entryInstance:GetAttribute("Time")
+		isValidTime = typeof(raceTime) == "number"
+		assert(isValidTime, "time was not a number")
+		local minutes = math.floor(raceTime % 3600000 / 60000)
+		local seconds = math.floor(raceTime % 60000 / 1000)
+		local milliseconds = math.floor(raceTime % 1000)
+		local entryConfig = {
+			name = entryInstance.Value
 		}
-		configTable.userId = tonumber(v.Name)
-		configTable.time = v2
-		configTable.message = ("%d:%02d.%03d"):format(mathFunc, mathFunc, mathFunc)
-		table.insert(configTable, configTable)
+		entryConfig.userId = tonumber(entryInstance.Name)
+		entryConfig.time = raceTime
+		entryConfig.message = ("%d:%02d.%03d"):format(minutes, seconds, milliseconds)
+		table.insert(configTable, entryConfig)
 	end
-	table.sort(configTable, function(self, p2)
-		return self.time < p2.time
+	table.sort(configTable, function(self, otherEntry)
+		return self.time < otherEntry.time
 	end)
 	return createElement("SurfaceGui", {
 		ResetOnSpawn = false,
@@ -78,27 +76,27 @@ function v1.render(self)
 		})
 	})
 end
-function v1.willUnmount(self)
+function BoardComponent.willUnmount(self)
 	self._maid:DoCleaning()
 end
-local configTable = {}
-configTable.__index = configTable
-function configTable.new(self)
-	local configTable = {}
-	setmetatable(configTable, configTable)
-	configTable._maid = Maid.new()
-	configTable._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(self.Parent.Parent, "Data", function(p12, p2)
-		local var12 = Roact.mount(createElement(v1, {
+local BoardBinder = {}
+BoardBinder.__index = BoardBinder
+function BoardBinder.new(self)
+	local binderInstance = {}
+	setmetatable(binderInstance, BoardBinder)
+	binderInstance._maid = Maid.new()
+	binderInstance._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(self.Parent.Parent, "Data", function(dataFolder, maidTask)
+		local mountedComponent = Roact.mount(createElement(BoardComponent, {
 			adornee = self,
-			dataFolder = p12
+			dataFolder = dataFolder
 		}), Players.LocalPlayer.PlayerGui, "BoardGui")
-		p2:GiveTask(function()
-			Roact.unmount(var12)
+		maidTask:GiveTask(function()
+			Roact.unmount(mountedComponent)
 		end)
 	end))
-	return configTable
+	return binderInstance
 end
-function configTable.Destroy(self)
+function BoardBinder.Destroy(self)
 	self._maid:Destroy()
 end
-Binder.new("RaceTrackBoard", configTable):Start()
+Binder.new("RaceTrackBoard", BoardBinder):Start()

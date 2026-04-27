@@ -1,37 +1,35 @@
--- Reviewed by Claude
--- variables reassigned
-local t = {}
-function t.__index(p1, p2)
-	if t[p2] then
-		return t[p2]
+local EnumClass = {}
+function EnumClass.__index(enumInstance, itemName)
+	if EnumClass[itemName] then
+		return EnumClass[itemName]
 	end
-	if p1._map[p2] then
-		return p1._map[p2]
+	if enumInstance._map[itemName] then
+		return enumInstance._map[itemName]
 	end
-	error(("Enum does not contain item: `%s`"):format(p2))
+	error(("Enum does not contain item: `%s`"):format(itemName))
 end
-function t.GetEnumItems(p1)
-	return p1._array
+function EnumClass.GetEnumItems(enumInstance)
+	return enumInstance._array
 end
-function t.GetValueFromEnum(p1, p2)
-	return p1._array[p2]
+function EnumClass.GetValueFromEnum(enumInstance, itemName)
+	return enumInstance._array[itemName]
 end
-function t.__iter(p1)
+function EnumClass.__iter(enumInstance)
 	error("Cannot iter enum")
 end
-return function(p1)
-	local t2 = {
-		_array = p1,
+return function(enumItemsArray)
+	local enumInstance = {
+		_array = enumItemsArray,
 		_map = {}
 	}
-	for v1, v2 in p1 do
-		t2._map[v2] = v1
+	for index, itemName in enumItemsArray do
+		enumInstance._map[itemName] = index
 	end
-	table.freeze(t2._map)
-	if not table.isfrozen(t2._array) then
-		table.freeze(t2._array)
+	table.freeze(enumInstance._map)
+	if not table.isfrozen(enumInstance._array) then
+		table.freeze(enumInstance._array)
 	end
-	setmetatable(t2, t)
-	table.freeze(t2)
-	return t2
+	setmetatable(enumInstance, EnumClass)
+	table.freeze(enumInstance)
+	return enumInstance
 end

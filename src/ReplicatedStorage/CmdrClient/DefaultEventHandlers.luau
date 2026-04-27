@@ -1,19 +1,18 @@
--- Reviewed by Claude
 local StarterGui = game:GetService("StarterGui")
 local TextChatService = game:GetService("TextChatService")
 local Window = require(script.Parent.CmdrInterface.Window)
-return function(p1)
-	p1:HandleEvent("Message", function(p1)
+return function(cmdr)
+	cmdr:HandleEvent("Message", function(message)
 		if TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService then
 			StarterGui:SetCore("ChatMakeSystemMessage", {
-				Text = ("[Announcement] %s"):format(p1),
+				Text = ("[Announcement] %s"):format(message),
 				Color = Color3.fromRGB(249, 217, 56)
 			})
 		else
-			TextChatService.TextChannels.RBXSystem:DisplaySystemMessage((("<font color=\"rgb(249, 217, 56)\">[Announcement] %*</font>"):format(p1)))
+			TextChatService.TextChannels.RBXSystem:DisplaySystemMessage((("<font color=\"rgb(249, 217, 56)\">[Announcement] %*</font>"):format(message)))
 		end
 	end)
-	p1:HandleEvent("AddLine", function(...)
+	cmdr:HandleEvent("AddLine", function(...)
 		Window:AddLine(...)
 	end)
 end

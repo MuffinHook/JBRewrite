@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 return require(ReplicatedStorage.Std.TableUtils).requireValidIndexAndFreeze({
 	KEY_CHANGE_MESSAGING_SUBSCRIPTION_TOPIC = "GlobalDataStore",

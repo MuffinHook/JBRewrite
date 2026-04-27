@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local TestEnum = require(script.Parent.TestEnum)
 local lifecycleHooksClass = {}
 lifecycleHooksClass.__index = lifecycleHooksClass

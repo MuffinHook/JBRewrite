@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
@@ -89,7 +88,7 @@ function t.attemptRoll()
 		end
 	end
 end
-function t.isPlayerRolling(p1)
-	return t.mapPlayerRolling[p1] == true
+function t.isPlayerRolling(player)
+	return t.mapPlayerRolling[player] == true
 end
 return t

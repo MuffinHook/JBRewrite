@@ -1,77 +1,75 @@
--- Reviewed by Claude
--- variables reassigned
-local t = {
-	fromArray = function(p1)
-		local t = {}
-		for i, v in ipairs(p1) do
-			t[v] = true
+local setUtils = {
+	fromArray = function(firstSet)
+		local resultSet = {}
+		for i, element in ipairs(firstSet) do
+			resultSet[element] = true
 		end
-		return t
+		return resultSet
 	end,
-	subtract = function(p1, p2)
-		if #p1 ~= 0 then
+	subtract = function(firstSet, secondSet)
+		if #firstSet ~= 0 then
 			error("`first` has nonzero length, is it a set?")
 		end
-		if #p2 ~= 0 then
+		if #secondSet ~= 0 then
 			error("`second` has nonzero length, is it a set?")
 		end
-		local t = {}
-		for k in pairs(p1) do
-			if not p2[k] then
-				t[k] = true
+		local resultSet = {}
+		for element in pairs(firstSet) do
+			if not secondSet[element] then
+				resultSet[element] = true
 			end
 		end
-		return t
+		return resultSet
 	end,
-	intersect = function(p1, p2)
-		if #p1 ~= 0 then
+	intersect = function(firstSet, secondSet)
+		if #firstSet ~= 0 then
 			error("`first` has nonzero length, is it a set?")
 		end
-		if #p2 ~= 0 then
+		if #secondSet ~= 0 then
 			error("`second` has nonzero length, is it a set?")
 		end
-		local t = {}
-		for k in pairs(p1) do
-			if p2[k] then
-				t[k] = true
+		local resultSet = {}
+		for element in pairs(firstSet) do
+			if secondSet[element] then
+				resultSet[element] = true
 			end
 		end
-		return t
+		return resultSet
 	end,
-	union = function(p1, p2)
-		if #p1 ~= 0 then
+	union = function(firstSet, secondSet)
+		if #firstSet ~= 0 then
 			error("`first` has nonzero length, is it a set?")
 		end
-		if #p2 ~= 0 then
+		if #secondSet ~= 0 then
 			error("`second` has nonzero length, is it a set?")
 		end
-		local t = {}
-		for k in pairs(p1) do
-			t[k] = true
+		local resultSet = {}
+		for element in pairs(firstSet) do
+			resultSet[element] = true
 		end
-		for k in pairs(p2) do
-			t[k] = true
+		for element in pairs(secondSet) do
+			resultSet[element] = true
 		end
-		return t
+		return resultSet
 	end
 }
-function t.symmetricDiff(p1, p2)
-	if #p1 ~= 0 then
+function setUtils.symmetricDiff(firstSet, secondSet)
+	if #firstSet ~= 0 then
 		error("`first` has nonzero length, is it a set?")
 	end
-	if #p2 ~= 0 then
+	if #secondSet ~= 0 then
 		error("`second` has nonzero length, is it a set?")
 	end
-	return t.union(t.subtract(p1, p2), t.subtract(p2, p1))
+	return setUtils.union(setUtils.subtract(firstSet, secondSet), setUtils.subtract(secondSet, firstSet))
 end
-function t.toArray(p1)
-	if #p1 ~= 0 then
+function setUtils.toArray(firstSet)
+	if #firstSet ~= 0 then
 		error("`set` has nonzero length, is it a set?")
 	end
-	local t = {}
-	for k in pairs(p1) do
-		t[#t + 1] = k
+	local resultSet = {}
+	for element in pairs(firstSet) do
+		resultSet[#resultSet + 1] = element
 	end
-	return t
+	return resultSet
 end
-return t
+return setUtils

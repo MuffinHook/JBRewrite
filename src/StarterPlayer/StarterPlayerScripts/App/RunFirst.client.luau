@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
@@ -51,24 +49,24 @@ if script.Parent == ReplicatedFirst then
 		ImageTransparency = 1,
 		Size = UDim2.fromScale(0.4, 0.4)
 	}):Play()
-	local function setTitle(p1)
-		UIAspectRatioConstraint.AspectRatio = p1.aspectRatio
-		ImageLabel.Image = p1.image
+	local function setTitle(configData)
+		UIAspectRatioConstraint.AspectRatio = configData.aspectRatio
+		ImageLabel.Image = configData.image
 	end
 	local LocalPlayer = Players.LocalPlayer
 	local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-	local v1 = 0
-	local function handleTeleport(p1)
-		v1 = v1 + 1
-		local v12 = v1
-		local isEnabled = p1 == nil
-		local v3 = p1 or {}
+	local teleportCallCounter = 0
+	local function handleTeleport(teleportInfo)
+		teleportCallCounter = teleportCallCounter + 1
+		local currentCallId = teleportCallCounter
+		local teleportNotRequested = teleportInfo == nil
+		local screenConfig = teleportInfo or {}
 		TextLabel.Text = ""
-		if v3.tradeLoadingScreen or v3.worldName == "TRADE_WORLD" then
+		if screenConfig.tradeLoadingScreen or screenConfig.worldName == "TRADE_WORLD" then
 			local Trade = configTable.Trade
 			UIAspectRatioConstraint.AspectRatio = Trade.aspectRatio
 			ImageLabel.Image = Trade.image
-		elseif v3.battleLoadingScreen then
+		elseif screenConfig.battleLoadingScreen then
 			local Battle = configTable.Battle
 			UIAspectRatioConstraint.AspectRatio = Battle.aspectRatio
 			ImageLabel.Image = Battle.image
@@ -76,11 +74,11 @@ if script.Parent == ReplicatedFirst then
 			local Jailbreak = configTable.Jailbreak
 			UIAspectRatioConstraint.AspectRatio = Jailbreak.aspectRatio
 			ImageLabel.Image = Jailbreak.image
-			if v3.migrationLoadingScreen then
+			if screenConfig.migrationLoadingScreen then
 				TextLabel.Text = "Server Updating... Please wait!"
-			elseif isEnabled then
+			elseif teleportNotRequested then
 				task.delay(7, function()
-					if ScreenGui.Parent ~= nil and v12 == v1 then
+					if ScreenGui.Parent ~= nil and currentCallId == teleportCallCounter then
 						TextLabel.Text = "Roblox is taking a while to load your data. Please wait."
 					end
 				end)
@@ -88,14 +86,14 @@ if script.Parent == ReplicatedFirst then
 		end
 		ScreenGui.Parent = PlayerGui
 	end
-	local isEnabled = false
-	local v3 = TeleportService:GetLocalPlayerTeleportData()
-	if v3 then
+	local screenShown = false
+	local teleportData = TeleportService:GetLocalPlayerTeleportData()
+	if teleportData then
 		ReplicatedFirst:RemoveDefaultLoadingScreen()
-		handleTeleport(v3)
+		handleTeleport(teleportData)
 	else
 		task.delay(3, function()
-			if not isEnabled then
+			if not screenShown then
 				handleTeleport()
 			end
 		end)
@@ -107,17 +105,17 @@ if script.Parent == ReplicatedFirst then
 		LocalPlayer.CharacterAdded:Wait()
 	end
 	ScreenGui.Parent = nil
-	require(ReplicatedStorage.Std.Maid).new():GiveTask(ReplicatedStorage:WaitForChild(require(ReplicatedStorage.WorldTeleport.WorldTeleportConsts).TELEPORT_HAPPENING_REMOTE).onClientEvent:Connect(function(p1)
-		handleTeleport(p1)
+	require(ReplicatedStorage.Std.Maid).new():GiveTask(ReplicatedStorage:WaitForChild(require(ReplicatedStorage.WorldTeleport.WorldTeleportConsts).TELEPORT_HAPPENING_REMOTE).onClientEvent:Connect(function(teleportInfo)
+		handleTeleport(teleportInfo)
 		TeleportService:SetTeleportGui(ScreenGui)
-		if not (p1 and p1.migrationLoadingScreen) then
+		if not (teleportInfo and teleportInfo.migrationLoadingScreen) then
 			task.delay(10, function()
 				ScreenGui.Parent = nil
 			end)
 		end
 	end))
-	TeleportService.TeleportInitFailed:Connect(function(p1)
-		if p1 == LocalPlayer then
+	TeleportService.TeleportInitFailed:Connect(function(failedPlayer)
+		if failedPlayer == LocalPlayer then
 			ScreenGui.Parent = nil
 		end
 	end)

@@ -1,5 +1,3 @@
--- Reviewed by Claude
--- variables reassigned
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
 local Maid = require(ReplicatedStorage.Std.Maid)
@@ -7,24 +5,24 @@ local Roact = require(ReplicatedStorage.Roact)
 local createElement = Roact.createElement
 local BigButton = require(script.Parent.BigButton)
 local BigButtonService = require(ReplicatedStorage.App.BigButtonService)
-local v1 = Roact.PureComponent:extend("TopbarHolder")
-function v1.init(component)
+local TopbarHolder = Roact.PureComponent:extend("TopbarHolder")
+function TopbarHolder.init(component)
 	component:setState({
 		counter = 0
 	})
 	component._maid = Maid.new()
 end
-function v1.didMount(component)
+function TopbarHolder.didMount(component)
 	component._maid:GiveTask(BigButtonService.triggerUpdate:Connect(function()
 		component:_fetchState()
 	end))
 end
-function v1._fetchState(component)
+function TopbarHolder._fetchState(component)
 	component:setState({
 		counter = component.state.counter + 1
 	})
 end
-function v1.render(component)
+function TopbarHolder.render(component)
 	local buttonElements = {}
 	for i, button in ipairs(component.props.buttons) do
 		buttonElements[button.name] = createElement(BigButton, {
@@ -75,7 +73,7 @@ function v1.render(component)
 		}, buttonElements))
 	})
 end
-function v1.willUnmount(component)
+function TopbarHolder.willUnmount(component)
 	component._maid:DoCleaning()
 end
-return v1
+return TopbarHolder

@@ -1,8 +1,7 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtils = require(ReplicatedStorage.Std.TableUtils)
 local RobberyConsts = require(ReplicatedStorage.Robbery.RobberyConsts)
-local t = {
+local HYPERCHROME_CONSTS = {
 	COLOR_TO_INFO_MAP = {
 		Green = {
 			LevelToColor = {
@@ -119,13 +118,13 @@ local t = {
 	RAINBOW_ANIMATION_CYCLE_TIME = 5,
 	WILDCARD_HYPERCHROME_IMAGE_ID = 11815685831
 }
-t.MAX_LEVEL = #t.LEVEL_TO_INFO_MAP
-t.COLOR_SHIFT_NAME = t.HYPERCHROME_PREFIX .. "Shift"
-t.ROBBERY_TO_HYPERCHROME_COLOR_MAP = {}
-t.HYPERSHIFT_REFLECTANCE = t.LEVEL_TO_INFO_MAP[4].Reflectance
-for v1, v2 in t.COLOR_TO_INFO_MAP do
-	for v3, v4 in v2.Robberies do
-		t.ROBBERY_TO_HYPERCHROME_COLOR_MAP[v4] = v1
+HYPERCHROME_CONSTS.MAX_LEVEL = #HYPERCHROME_CONSTS.LEVEL_TO_INFO_MAP
+HYPERCHROME_CONSTS.COLOR_SHIFT_NAME = HYPERCHROME_CONSTS.HYPERCHROME_PREFIX .. "Shift"
+HYPERCHROME_CONSTS.ROBBERY_TO_HYPERCHROME_COLOR_MAP = {}
+HYPERCHROME_CONSTS.HYPERSHIFT_REFLECTANCE = HYPERCHROME_CONSTS.LEVEL_TO_INFO_MAP[4].Reflectance
+for colorName, colorInfo in HYPERCHROME_CONSTS.COLOR_TO_INFO_MAP do
+	for _, robberyType in colorInfo.Robberies do
+		HYPERCHROME_CONSTS.ROBBERY_TO_HYPERCHROME_COLOR_MAP[robberyType] = colorName
 	end
 end
-return TableUtils.requireValidIndexAndFreeze(t)
+return TableUtils.requireValidIndexAndFreeze(HYPERCHROME_CONSTS)

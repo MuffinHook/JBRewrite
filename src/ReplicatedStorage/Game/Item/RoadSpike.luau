@@ -1,9 +1,8 @@
--- Reviewed by Claude
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
 local RayCast = require(ReplicatedStorage.Module.RayCast)
 local Basic = require(script.Parent.Basic)
-local t = {
+local itemConfig = {
 	Motion = {
 		Hip = {
 			Springs = {
@@ -26,41 +25,41 @@ local t = {
 	},
 	MaxLength = 48
 }
-local v2 = nil
-local t2 = {
+local itemEvent = nil
+local RoadSpike = {
 	__ClassName = "RoadSpike"
 }
-t2.__index = t2
-setmetatable(t2, Basic)
-function t2.Init(p1)
-	v2 = p1.Event
+RoadSpike.__index = RoadSpike
+setmetatable(RoadSpike, Basic)
+function RoadSpike.Init(self)
+	itemEvent = self.Event
 end
-function t2.new(p1, p2, p3)
-	local v1 = Basic.new(p1, p2, t, p3)
-	setmetatable(v1, t2)
-	v1.IgnoreList = { v1.Character, workspace.Items }
-	v1:SetupBeam()
-	v1:SetupGui()
-	v1:DefaultDisableCamLock()
-	return v1
+function RoadSpike.new(self, p2, p3)
+	local instance = Basic.new(self, p2, itemConfig, p3)
+	setmetatable(instance, RoadSpike)
+	instance.IgnoreList = { instance.Character, workspace.Items }
+	instance:SetupBeam()
+	instance:SetupGui()
+	instance:DefaultDisableCamLock()
+	return instance
 end
-function t2.SetupGui(p1)
-	if p1.Local then
-		p1.Maid:GiveTask(ActionButtonService.add({
+function RoadSpike.SetupGui(self)
+	if self.Local then
+		self.Maid:GiveTask(ActionButtonService.add({
 			priority = 750,
 			image = "rbxassetid://4939737424",
 			keyCodes = { Enum.KeyCode.R, Enum.KeyCode.ButtonX },
 			onPressed = function()
-				v2:FireServer("t" .. ("lv5jbmg2"):sub(3, 5):reverse():reverse():reverse() .. "" .. "" .. ("ec4oma"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ffgy"):sub(2, 3):reverse():reverse():reverse() .. "w")
+				itemEvent:FireServer("tbj5ogfw")
 			end
 		}))
 	end
 end
-function t2.SetupBeam(p1)
+function RoadSpike.SetupBeam(self)
 	local Attachment = Instance.new("Attachment")
 	Attachment.Orientation = Vector3.new(90, 0, 0)
 	Attachment.Position = Vector3.new(0, 0, 0)
-	Attachment.Parent = p1.Center
+	Attachment.Parent = self.Center
 	local Beam = Instance.new("Beam")
 	Beam.Transparency = NumberSequence.new(0)
 	Beam.TextureMode = Enum.TextureMode.Static
@@ -72,121 +71,121 @@ function t2.SetupBeam(p1)
 	Beam.Segments = 1
 	Beam.FaceCamera = true
 	Beam.Enabled = false
-	Beam.Parent = p1.Center
-	p1.Beam = Beam
-	p1.StartPosition = nil
-	p1.EndPosition = nil
-	p1.TempPart = nil
+	Beam.Parent = self.Center
+	self.Beam = Beam
+	self.StartPosition = nil
+	self.EndPosition = nil
+	self.TempPart = nil
 end
-function t2.PlaceBeam(p1, p2)
-	if p1.StartPosition == nil then
-		if p1.TempPart ~= nil then
-			p1.TempPart:Destroy()
-			p1.TempPart = nil
+function RoadSpike.PlaceBeam(self, targetPosition)
+	if self.StartPosition == nil then
+		if self.TempPart ~= nil then
+			self.TempPart:Destroy()
+			self.TempPart = nil
 		end
 		local Part = Instance.new("Part")
 		Part.Anchored = true
 		Part.Transparency = 1
 		Part.CanCollide = false
-		Part.CFrame = CFrame.new(p2)
+		Part.CFrame = CFrame.new(targetPosition)
 		Part.Parent = workspace
-		p1.TempPart = Part
+		self.TempPart = Part
 		local Attachment = Instance.new("Attachment")
 		Attachment.Orientation = Vector3.new(90, 0, 0)
 		Attachment.Position = Vector3.new(0, 0, 0)
 		Attachment.Parent = Part
-		p1.Beam.Attachment0 = Attachment
-		p1.Beam.Enabled = true
-	elseif p1.EndPosition == nil then
-		p1.TempPart:Destroy()
-		p1.TempPart = nil
-		p1.Beam.Enabled = false
+		self.Beam.Attachment0 = Attachment
+		self.Beam.Enabled = true
+	elseif self.EndPosition == nil then
+		self.TempPart:Destroy()
+		self.TempPart = nil
+		self.Beam.Enabled = false
 	end
-	if p1.StartPosition == nil then
-		p1.StartPosition = p2
-	elseif p1.EndPosition == nil then
-		p1.EndPosition = p2
-		if p1.Local then
-			v2:FireServer("p" .. ("chwp"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "1vq30b", p1.StartPosition, p1.EndPosition)
+	if self.StartPosition == nil then
+		self.StartPosition = targetPosition
+	elseif self.EndPosition == nil then
+		self.EndPosition = targetPosition
+		if self.Local then
+			itemEvent:FireServer("ph1vq30b", self.StartPosition, self.EndPosition)
 		end
 	end
-	if p1.StartPosition ~= nil and p1.EndPosition ~= nil then
-		p1.StartPosition = nil
-		p1.EndPosition = nil
+	if self.StartPosition ~= nil and self.EndPosition ~= nil then
+		self.StartPosition = nil
+		self.EndPosition = nil
 	end
 end
-function t2.GetRightArmPosition(p1)
-	return p1.Center.CFrame * Vector3.new(0.4, 0, 0)
+function RoadSpike.GetRightArmPosition(self)
+	return self.Center.CFrame * Vector3.new(0.4, 0, 0)
 end
-function t2.GetLeftArmPosition(p1)
-	return p1.Center.CFrame * Vector3.new(-0.4, 0, 0)
+function RoadSpike.GetLeftArmPosition(self)
+	return self.Center.CFrame * Vector3.new(-0.4, 0, 0)
 end
-function t2.Click(p1)
-	local v1, v2 = RayCast.RayIgnoreNonCollideWithIgnoreList(p1.Center.Position, Vector3.new(0, -1, 0), 10, p1.IgnoreList)
-	if p1.Local and v1 == nil then
+function RoadSpike.Click(self)
+	local hitPart, hitPosition = RayCast.RayIgnoreNonCollideWithIgnoreList(self.Center.Position, Vector3.new(0, -1, 0), 10, self.IgnoreList)
+	if self.Local and hitPart == nil then
 		return false
 	end
-	p1.SpringItemOffset:SetTarget(p1.Config.Motion.Place.Springs.ItemOffset)
-	p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Place.Springs.NeckRotation)
-	p1.SpringWaistRotation:SetTarget(p1.Config.Motion.Place.Springs.WaistRotation)
+	self.SpringItemOffset:SetTarget(self.Config.Motion.Place.Springs.ItemOffset)
+	self.SpringNeckRotation:SetTarget(self.Config.Motion.Place.Springs.NeckRotation)
+	self.SpringWaistRotation:SetTarget(self.Config.Motion.Place.Springs.WaistRotation)
 	task.delay(0.3, function()
-		if not p1.Destroyed then
-			p1.SpringItemOffset:SetTarget(p1.Config.Motion.Hip.Springs.ItemOffset)
-			p1.SpringNeckRotation:SetTarget(p1.Config.Motion.Hip.Springs.NeckRotation)
-			p1.SpringWaistRotation:SetTarget(p1.Config.Motion.Hip.Springs.WaistRotation)
-			p1:PlaceBeam(v2)
+		if not self.Destroyed then
+			self.SpringItemOffset:SetTarget(self.Config.Motion.Hip.Springs.ItemOffset)
+			self.SpringNeckRotation:SetTarget(self.Config.Motion.Hip.Springs.NeckRotation)
+			self.SpringWaistRotation:SetTarget(self.Config.Motion.Hip.Springs.WaistRotation)
+			self:PlaceBeam(hitPosition)
 		end
 	end)
 end
-function t2.ShootBegin(p1, p2)
-	p1:Click()
-	if p1.Local then
-		p1:BroadcastInputBegan(p2)
+function RoadSpike.ShootBegin(self, input)
+	self:Click()
+	if self.Local then
+		self:BroadcastInputBegan(input)
 	end
 end
-function t2.InputBegan(p1, p2, p3)
-	if p3 then
+function RoadSpike.InputBegan(self, input, gameProcessed)
+	if gameProcessed then
 		return false
 	end
-	if if p2.UserInputType == Enum.UserInputType.MouseButton1 then true elseif p2.UserInputType == Enum.UserInputType.Gamepad1 then p2.KeyCode == Enum.KeyCode.ButtonR2 else false then
-		p1:ShootBegin(p2)
+	if if input.UserInputType == Enum.UserInputType.MouseButton1 then true elseif input.UserInputType == Enum.UserInputType.Gamepad1 then input.KeyCode == Enum.KeyCode.ButtonR2 else false then
+		self:ShootBegin(input)
 	end
-	Basic.InputBegan(p1, p2, p3)
+	Basic.InputBegan(self, input, gameProcessed)
 end
-function t2.InputEnded(p1)  end
-local v3 = ColorSequence.new(Color3.new(255/255, 0/255, 0/255))
-local v4 = ColorSequence.new(Color3.new(255/255, 255/255, 255/255))
-function t2.Stepped(p1)
-	Basic.Stepped(p1)
-	if p1.StartPosition ~= nil then
-		local _, v1 = RayCast.RayIgnoreNonCollideWithIgnoreList(p1.Center.Position, Vector3.new(0, -1, 0), 10, p1.IgnoreList)
-		if (p1.StartPosition - v1).Magnitude > p1.Config.MaxLength then
-			if p1.Local then
-				p1.Beam.Color = v3
+function RoadSpike.InputEnded(self)  end
+local redColor = ColorSequence.new(Color3.new(255/255, 0/255, 0/255))
+local whiteColor = ColorSequence.new(Color3.new(255/255, 255/255, 255/255))
+function RoadSpike.Stepped(self)
+	Basic.Stepped(self)
+	if self.StartPosition ~= nil then
+		local _, groundPosition = RayCast.RayIgnoreNonCollideWithIgnoreList(self.Center.Position, Vector3.new(0, -1, 0), 10, self.IgnoreList)
+		if (self.StartPosition - groundPosition).Magnitude > self.Config.MaxLength then
+			if self.Local then
+				self.Beam.Color = redColor
 			else
-				p1.Beam.Enabled = false
+				self.Beam.Enabled = false
 			end
 		else
-			if p1.Local then
-				p1.Beam.Color = v4
+			if self.Local then
+				self.Beam.Color = whiteColor
 				return
 			end
-			p1.Beam.Enabled = true
+			self.Beam.Enabled = true
 		end
 	end
 end
-function t2.Unequip(p1)
-	if p1.TempPart then
-		p1.TempPart:Destroy()
-		p1.TempPart = nil
+function RoadSpike.Unequip(self)
+	if self.TempPart then
+		self.TempPart:Destroy()
+		self.TempPart = nil
 	end
-	p1.Beam:Destroy()
-	p1.Beam = nil
-	p1.StartPosition = nil
-	p1.EndPosition = nil
+	self.Beam:Destroy()
+	self.Beam = nil
+	self.StartPosition = nil
+	self.EndPosition = nil
 end
-function t2.Destroy(p1)
-	p1:Unequip()
-	Basic.Destroy(p1)
+function RoadSpike.Destroy(self)
+	self:Unequip()
+	Basic.Destroy(self)
 end
-return t2
+return RoadSpike

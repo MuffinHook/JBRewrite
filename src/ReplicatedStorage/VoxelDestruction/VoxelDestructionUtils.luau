@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Terrain = workspace:FindFirstChild("Terrain")
 local CollectionService = game:GetService("CollectionService")
 game:GetService("Debris")
@@ -17,89 +16,89 @@ local instance = Pool.new(function()
 	Part.TopSurface = SmoothNoOutlines
 	Part.BottomSurface = SmoothNoOutlines_2
 	return Part
-end, function(p1)
-	p1:Destroy()
+end, function(partToDestroy)
+	partToDestroy:Destroy()
 end)
 instance:Populate(5000)
-local function vec3Func(p1, p2)
-	local instance = p1(p2.X)
-	local vector2 = p1(p2.Y)
-	return Vector3.new(instance, vector2, p1(p2.Z))
+local function vec3Func(transformFunc, vector)
+	local transformedX = transformFunc(vector.X)
+	local transformedY = transformFunc(vector.Y)
+	return Vector3.new(transformedX, transformedY, transformFunc(vector.Z))
 end
-local function slice(p1, p2, p3)
-	local Size = p1.Size
-	local instance = p1.CFrame
-	local vector2 = instance - instance.Position
-	local var3 = p3:Dot(Size)
-	local var4 = Size - p3 * var3
-	local var5 = var3 / 2
-	local var6 = -var3 / 2
-	local var7 = p3:Dot(instance:PointToObjectSpace(p2))
-	local var8 = var5 - var7
-	local var9 = var7 - var6
-	if var6 <= var7 and (var7 <= var5 and (var8 > 0.001 and var9 > 0.001)) then
-		p1.CFrame = CFrame.new(instance * (p3 * (var8 / 2 + var7))) * vector2
-		p1.Size = var4 + p3 * var8
-		local var10 = p1:Clone()
-		var10.CFrame = CFrame.new(instance * (p3 * (-var9 / 2 + var7))) * vector2
-		var10.Size = var4 + p3 * var9
-		var10.Parent = p1.Parent
-		return p1, var10
+local function slice(targetPart, cutPoint, sliceAxis)
+	local Size = targetPart.Size
+	local currentCFrame = targetPart.CFrame
+	local rotationOnly = currentCFrame - currentCFrame.Position
+	local axisExtent = sliceAxis:Dot(Size)
+	local perpendiculars = Size - sliceAxis * axisExtent
+	local halfExtent = axisExtent / 2
+	local negHalfExtent = -axisExtent / 2
+	local localCutPosition = sliceAxis:Dot(currentCFrame:PointToObjectSpace(cutPoint))
+	local distanceAboveCut = halfExtent - localCutPosition
+	local distanceBelowCut = localCutPosition - negHalfExtent
+	if negHalfExtent <= localCutPosition and (localCutPosition <= halfExtent and (distanceAboveCut > 0.001 and distanceBelowCut > 0.001)) then
+		targetPart.CFrame = CFrame.new(currentCFrame * (sliceAxis * (distanceAboveCut / 2 + localCutPosition))) * rotationOnly
+		targetPart.Size = perpendiculars + sliceAxis * distanceAboveCut
+		local clonedPart = targetPart:Clone()
+		clonedPart.CFrame = CFrame.new(currentCFrame * (sliceAxis * (-distanceBelowCut / 2 + localCutPosition))) * rotationOnly
+		clonedPart.Size = perpendiculars + sliceAxis * distanceBelowCut
+		clonedPart.Parent = targetPart.Parent
+		return targetPart, clonedPart
 	else
 		return nil, nil
 	end
 end
-local function cut(p1, p2, p3)
-	local instance = p3[1].CFrame
-	local t = {}
-	local vector2 = p2 / 2
-	local t2 = {}
-	for i = 1, #p3 do
-		t[p3[i]] = true
+local function cut(cutFrame, sphereRadius, partsToSlice)
+	local baseCFrame = partsToSlice[1].CFrame
+	local processedParts = {}
+	local radiusHalf = sphereRadius / 2
+	local newParts = {}
+	for i = 1, #partsToSlice do
+		processedParts[partsToSlice[i]] = true
 	end
-	for var3, var4 in Enum.Axis:GetEnumItems() do
-		local var5 = Vector3.FromAxis(var4)
-		local var6 = instance:VectorToObjectSpace(p1:VectorToWorldSpace(var5))
-		local v14, v15, v16 = p1 * (var5 * vector2), Vector3.new(math.min(1, (math.abs(var6.X))), math.min(1, (math.abs(var6.Y))), (math.min(1, (math.abs(var6.Z))))), p1 * (-var5 * vector2)
-		for j = 1, #p3 do
-			local vector17, vector18 = slice(p3[j], v14, v15)
-			if vector17 == nil or vector18 == nil then
-				local instance19, instance20 = slice(p3[j], v16, v15)
-				if instance19 ~= nil and instance20 ~= nil then
-					p3[j] = instance19
-					if not t[instance20] then
-						t[instance20] = true
-						table.insert(t2, instance20)
+	for axisIndex, axisEnum in Enum.Axis:GetEnumItems() do
+		local axisDirection = Vector3.FromAxis(axisEnum)
+		local localAxisDir = baseCFrame:VectorToObjectSpace(cutFrame:VectorToWorldSpace(axisDirection))
+		local positiveCutPoint, axisAlignment, negativeCutPoint = cutFrame * (axisDirection * radiusHalf), Vector3.new(math.min(1, (math.abs(localAxisDir.X))), math.min(1, (math.abs(localAxisDir.Y))), (math.min(1, (math.abs(localAxisDir.Z))))), cutFrame * (-axisDirection * radiusHalf)
+		for j = 1, #partsToSlice do
+			local sliceResult1, sliceResult2 = slice(partsToSlice[j], positiveCutPoint, axisAlignment)
+			if sliceResult1 == nil or sliceResult2 == nil then
+				local sliceFromNeg1, sliceFromNeg2 = slice(partsToSlice[j], negativeCutPoint, axisAlignment)
+				if sliceFromNeg1 ~= nil and sliceFromNeg2 ~= nil then
+					partsToSlice[j] = sliceFromNeg1
+					if not processedParts[sliceFromNeg2] then
+						processedParts[sliceFromNeg2] = true
+						table.insert(newParts, sliceFromNeg2)
 					end
 				end
 			else
-				if not t[vector18] then
-					t[vector18] = true
-					table.insert(t2, vector18)
+				if not processedParts[sliceResult2] then
+					processedParts[sliceResult2] = true
+					table.insert(newParts, sliceResult2)
 				end
-				local vector21, var22 = slice(vector18, v16, v15)
-				if vector21 == nil or var22 == nil then
-					p3[j] = vector18
+				local sliceFromResult2First, sliceFromResult2Second = slice(sliceResult2, negativeCutPoint, axisAlignment)
+				if sliceFromResult2First == nil or sliceFromResult2Second == nil then
+					partsToSlice[j] = sliceResult2
 				else
-					p3[j] = vector21
-					if not t[var22] then
-						t[var22] = true
-						table.insert(t2, var22)
+					partsToSlice[j] = sliceFromResult2First
+					if not processedParts[sliceFromResult2Second] then
+						processedParts[sliceFromResult2Second] = true
+						table.insert(newParts, sliceFromResult2Second)
 					end
 				end
 			end
 		end
 	end
-	return t2
+	return newParts
 end
-local function voxelizeToXYZ(p1, p2, p3)
+local function voxelizeToXYZ(partCFrame, partSize, voxelSize)
 	local ceil = math.ceil
-	local instance = p2 / p3
-	local var5 = Vector3.new(ceil(instance.X), ceil(instance.Y), (ceil(instance.Z)))
+	local gridDimensions = partSize / voxelSize
+	local voxelGridSize = Vector3.new(ceil(gridDimensions.X), ceil(gridDimensions.Y), (ceil(gridDimensions.Z)))
 	local function f()
-		for i = 1, var5.X do
-			for j = 1, var5.Y do
-				for k = 1, var5.Z do
+		for i = 1, voxelGridSize.X do
+			for j = 1, voxelGridSize.Y do
+				for k = 1, voxelGridSize.Z do
 					coroutine.yield(i, j, k)
 				end
 			end
@@ -107,100 +106,100 @@ local function voxelizeToXYZ(p1, p2, p3)
 	end
 	return coroutine.wrap(f)
 end
-local function voxelizeToRelativeVoxelV3(p1, p2, p3)
+local function voxelizeToRelativeVoxelV3(partCFrame, partSize, voxelSize)
 	local ceil = math.ceil
-	local instance = p2 / p3
-	local var5 = Vector3.new(ceil(instance.X), ceil(instance.Y), (ceil(instance.Z)))
-	local var6 = -(p3 + var5 * p3) / 2
+	local gridDimensions = partSize / voxelSize
+	local voxelGridSize = Vector3.new(ceil(gridDimensions.X), ceil(gridDimensions.Y), (ceil(gridDimensions.Z)))
+	local gridOffset = -(voxelSize + voxelGridSize * voxelSize) / 2
 	local function f()
-		for i = 1, var5.X do
-			for j = 1, var5.Y do
-				for k = 1, var5.Z do
-					coroutine.yield(Vector3.new(i, j, k) * p3 + var6)
+		for i = 1, voxelGridSize.X do
+			for j = 1, voxelGridSize.Y do
+				for k = 1, voxelGridSize.Z do
+					coroutine.yield(Vector3.new(i, j, k) * voxelSize + gridOffset)
 				end
 			end
 		end
 	end
 	return coroutine.wrap(f)
 end
-local function vec3Hash(p1)
-	return (p1.X * 73856093 + p1.Y * 19351301 + p1.Z * 83492791) % 100000000
+local function vec3Hash(vector)
+	return (vector.X * 73856093 + vector.Y * 19351301 + vector.Z * 83492791) % 100000000
 end
-local function xyzHash(p1, p2, p3)
-	return (p1 * 73856093 + p2 * 19351301 + p3 * 83492791) % 100000000
+local function xyzHash(x, y, z)
+	return (x * 73856093 + y * 19351301 + z * 83492791) % 100000000
 end
-local function greedyMesh(p1, p2, p3, p4)
-	local t = {}
-	local function isXFilled(p1, p2, p3, p42)
-		for i = p1, p2 do
-			local instance = (i * 73856093 + p3 * 19351301 + p42 * 83492791) % 100000000
-			if t[instance] or not p4(instance, i, p3, p42) then
+local function greedyMesh(gridWidth, gridHeight, gridDepth, isFilled)
+	local processedHashes = {}
+	local function isXFilled(startX, endX, y, z)
+		for i = startX, endX do
+			local cellHash = (i * 73856093 + y * 19351301 + z * 83492791) % 100000000
+			if processedHashes[cellHash] or not isFilled(cellHash, i, y, z) then
 				return false
 			end
 		end
 		return true
 	end
-	local function isXZFilled(p1, p2, p3, p42, p5)
-		for i = p42, p5 do
-			for j = p1, p2 do
-				local instance = (j * 73856093 + p3 * 19351301 + i * 83492791) % 100000000
-				if t[instance] or not p4(instance, j, p3, i) then
+	local function isXZFilled(startX, endX, y, startZ, endZ)
+		for i = startZ, endZ do
+			for j = startX, endX do
+				local cellHash = (j * 73856093 + y * 19351301 + i * 83492791) % 100000000
+				if processedHashes[cellHash] or not isFilled(cellHash, j, y, i) then
 					return false
 				end
 			end
 		end
 		return true
 	end
-	local function getChunkSize(p12, p22, p32)
-		local instance = p2
-		local vector2 = p3
-		local count = 0
-		local count_2 = 0
-		local count_3 = 0
-		for i = p12 + 1, p1 do
-			local var3 = (i * 73856093 + p22 * 19351301 + p32 * 83492791) % 100000000
-			if t[var3] or not p4(var3, i, p22, p32) then
+	local function getChunkSize(startCellX, startCellY, startCellZ)
+		local gridHeightVal = gridHeight
+		local gridDepthVal = gridDepth
+		local chunkWidthX = 0
+		local chunkDepthZ = 0
+		local chunkHeightY = 0
+		for i = startCellX + 1, gridWidth do
+			local cellHash = (i * 73856093 + startCellY * 19351301 + startCellZ * 83492791) % 100000000
+			if processedHashes[cellHash] or not isFilled(cellHash, i, startCellY, startCellZ) then
 				break
 			end
-			t[var3] = true
-			count = count + 1
+			processedHashes[cellHash] = true
+			chunkWidthX = chunkWidthX + 1
 		end
-		local var4 = (p12 * 73856093 + p22 * 19351301 + (p32 + 1) * 83492791) % 100000000
-		if not t[var4] and p4(var4, p12, p22, p32 + 1) then
-			for j = p32 + 1, vector2 do
-				if not isXFilled(p12, p12 + count, p22, j) then
+		local checkBelowHash = (startCellX * 73856093 + startCellY * 19351301 + (startCellZ + 1) * 83492791) % 100000000
+		if not processedHashes[checkBelowHash] and isFilled(checkBelowHash, startCellX, startCellY, startCellZ + 1) then
+			for j = startCellZ + 1, gridDepthVal do
+				if not isXFilled(startCellX, startCellX + chunkWidthX, startCellY, j) then
 					break
 				end
-				for k = p12, p12 + count do
-					t[(k * 73856093 + p22 * 19351301 + j * 83492791) % 100000000] = true
+				for k = startCellX, startCellX + chunkWidthX do
+					processedHashes[(k * 73856093 + startCellY * 19351301 + j * 83492791) % 100000000] = true
 				end
-				count_3 = count_3 + 1
+				chunkDepthZ = chunkDepthZ + 1
 			end
 		end
-		local var5 = (p12 * 73856093 + (p22 + 1) * 19351301 + p32 * 83492791) % 100000000
-		if not t[var5] and p4(var5, p12, p22 + 1, p32) then
-			for n = p22 + 1, instance do
-				if not isXZFilled(p12, p12 + count, n, p32, p32 + count_3) then
+		local checkAboveHash = (startCellX * 73856093 + (startCellY + 1) * 19351301 + startCellZ * 83492791) % 100000000
+		if not processedHashes[checkAboveHash] and isFilled(checkAboveHash, startCellX, startCellY + 1, startCellZ) then
+			for n = startCellY + 1, gridHeightVal do
+				if not isXZFilled(startCellX, startCellX + chunkWidthX, n, startCellZ, startCellZ + chunkDepthZ) then
 					break
 				end
-				for m = p32, p32 + count_3 do
-					for i = p12, p12 + count do
-						t[(i * 73856093 + n * 19351301 + m * 83492791) % 100000000] = true
+				for m = startCellZ, startCellZ + chunkDepthZ do
+					for i = startCellX, startCellX + chunkWidthX do
+						processedHashes[(i * 73856093 + n * 19351301 + m * 83492791) % 100000000] = true
 					end
 				end
-				count_2 = count_2 + 1
+				chunkHeightY = chunkHeightY + 1
 			end
 		end
-		return count, count_2, count_3
+		return chunkWidthX, chunkHeightY, chunkDepthZ
 	end
 	local function f()
-		for i = 1, p1 do
-			for j = 1, p2 do
-				for k = 1, p3 do
-					local instance = (i * 73856093 + j * 19351301 + k * 83492791) % 100000000
-					if not t[instance] and p4(instance, i, j, k) then
-						local vector2, var3, var4 = getChunkSize(i, j, k)
-						coroutine.yield(i, j, k, vector2 + 1, var3 + 1, var4 + 1)
+		for i = 1, gridWidth do
+			for j = 1, gridHeight do
+				for k = 1, gridDepth do
+					local cellHash = (i * 73856093 + j * 19351301 + k * 83492791) % 100000000
+					if not processedHashes[cellHash] and isFilled(cellHash, i, j, k) then
+						local chunkX, chunkY, chunkZ = getChunkSize(i, j, k)
+						coroutine.yield(i, j, k, chunkX + 1, chunkY + 1, chunkZ + 1)
 					end
 				end
 			end
@@ -211,127 +210,127 @@ end
 local VoxelDestructionDebris = Instance.new("Model")
 VoxelDestructionDebris.Name = "VoxelDestructionDebris"
 VoxelDestructionDebris.Parent = workspace
-local function tossDebris(p1, p2, p3, p4)
-	local var12 = instance:Get()
-	var12.CastShadow = false
-	var12.Size = Vector3.new(math.min(p3.X, p4.Size.X), math.min(p3.Y, p4.Size.Y), (math.min(p3.Z, p4.Size.Z)))
-	var12.Material = p4.Material
-	var12.Color = p4.Color
-	var12.Transparency = p4.Transparency
-	var12.CanTouch = false
-	var12.CanCollide = math.random() < 0.1
-	var12.CollisionGroup = "NoCollide"
-	var12.CanQuery = false
-	var12.Anchored = false
-	var12.Position = p2
-	var12.Parent = VoxelDestructionDebris
-	var12.AssemblyLinearVelocity = ((p2 - p1).Unit * 0.5 + GeomUtils.randomPointInSphere() * 0.5 + Vector3.new(0, 1, 0)) * 100
-	var12.AssemblyAngularVelocity = GeomUtils.randomPointInSphere() * 100
+local function tossDebris(damageOrigin, debrisPosition, debrisSize, sourceBlock)
+	local debrisBlock = instance:Get()
+	debrisBlock.CastShadow = false
+	debrisBlock.Size = Vector3.new(math.min(debrisSize.X, sourceBlock.Size.X), math.min(debrisSize.Y, sourceBlock.Size.Y), (math.min(debrisSize.Z, sourceBlock.Size.Z)))
+	debrisBlock.Material = sourceBlock.Material
+	debrisBlock.Color = sourceBlock.Color
+	debrisBlock.Transparency = sourceBlock.Transparency
+	debrisBlock.CanTouch = false
+	debrisBlock.CanCollide = math.random() < 0.1
+	debrisBlock.CollisionGroup = "NoCollide"
+	debrisBlock.CanQuery = false
+	debrisBlock.Anchored = false
+	debrisBlock.Position = debrisPosition
+	debrisBlock.Parent = VoxelDestructionDebris
+	debrisBlock.AssemblyLinearVelocity = ((debrisPosition - damageOrigin).Unit * 0.5 + GeomUtils.randomPointInSphere() * 0.5 + Vector3.new(0, 1, 0)) * 100
+	debrisBlock.AssemblyAngularVelocity = GeomUtils.randomPointInSphere() * 100
 	task.delay(math.random(), function()
-		var12.Parent = nil
-		instance:Free(var12)
+		debrisBlock.Parent = nil
+		instance:Free(debrisBlock)
 	end)
 end
-local function decompose(p1, p2, p3, p4, p5, p6, p7)
-	local t = {}
-	local instance = 0
+local function decompose(partCFrame, partSize, voxelSize, sphereCenter, sphereRadius, sourceBlock, enableFx)
+	local voxelLookup = {}
+	local filledVoxelCount = 0
 	local round = math.round
-	local vector2 = p2 / p3
-	local var6 = Vector3.new(round(vector2.X), round(vector2.Y), (round(vector2.Z)))
-	local var7 = -(p3 + var6 * p3) / 2
-	local function hasVoxelAt(p12, p2, p32)
-		local instance = Vector3.new(p12, p2, p32) * p3 + var7
-		return (p1 * instance - p4).Magnitude > p5 + math.noise(instance.X * 10 + 3845.013130122367, instance.Y * 10 + 10782.895910767973, instance.Z * 10 + 6047.444858337303) * 0.5
+	local gridDimensions = partSize / voxelSize
+	local voxelGridSize = Vector3.new(round(gridDimensions.X), round(gridDimensions.Y), (round(gridDimensions.Z)))
+	local gridOffset = -(voxelSize + voxelGridSize * voxelSize) / 2
+	local function hasVoxelAt(gridX, gridY, gridZ)
+		local voxelWorldPos = Vector3.new(gridX, gridY, gridZ) * voxelSize + gridOffset
+		return (partCFrame * voxelWorldPos - sphereCenter).Magnitude > sphereRadius + math.noise(voxelWorldPos.X * 10 + 3845.013130122367, voxelWorldPos.Y * 10 + 10782.895910767973, voxelWorldPos.Z * 10 + 6047.444858337303) * 0.5
 	end
-	local var8 = 0.2 * (p3.Magnitude * 0.5773502691896257)
-	local function cachedHasVoxelAt(p12, p2, p32, p42)
-		if t[p12] then
-			return t[p12]
+	local voxelErosionThreshold = 0.2 * (voxelSize.Magnitude * 0.5773502691896257)
+	local function cachedHasVoxelAt(cellHash, gridX, gridY, gridZ)
+		if voxelLookup[cellHash] then
+			return voxelLookup[cellHash]
 		else
-			local var12 = hasVoxelAt(p2, p32, p42)
-			t[p12] = var12
-			if p7 and (not var12 and math.random() < var8) then
-				local vector2 = p1 * (Vector3.new(p2, p32, p42) * p3 + var7)
+			local hasVoxel = hasVoxelAt(gridY, gridZ, gridX)
+			voxelLookup[cellHash] = hasVoxel
+			if enableFx and (not hasVoxel and math.random() < voxelErosionThreshold) then
+				local voxelWorldPos = partCFrame * (Vector3.new(gridY, gridZ, gridX) * voxelSize + gridOffset)
 				task.delay(math.random() * 0.2, function()
-					tossDebris(p4, vector2, p3, p6)
+					tossDebris(sphereCenter, voxelWorldPos, voxelSize, sourceBlock)
 				end)
 			end
-			if var12 then
-				instance = instance + 1
+			if hasVoxel then
+				filledVoxelCount = filledVoxelCount + 1
 			end
-			return var12
+			return hasVoxel
 		end
 	end
-	local Model = Instance.new("Model")
-	Model.Parent = p6.Parent
-	local var9 = p6:IsA("BasePart")
-	local count = 0
-	for v11, var12, v13, v14, v15, v16 in greedyMesh(var6.X, var6.Y, var6.Z, cachedHasVoxelAt) do
-		local var10
-		local vector17 = Vector3.new(v14, v15, v16)
-		local vector18 = (Vector3.new(v11 - 0.5, var12 - 0.5, v13 - 0.5) + vector17 * 0.5) * p3 + var7
-		if var9 then
-			local instance19 = Instance.new(p6.ClassName)
-			instance19.Anchored = p6.Anchored
-			instance19.CanCollide = p6.CanCollide
-			instance19.CastShadow = false
-			instance19.Material = p6.Material
-			instance19.MaterialVariant = p6.MaterialVariant
-			instance19.Color = p6.Color
-			instance19.Transparency = p6.Transparency
-			instance19.Size = vector17 * p3
-			instance19.CFrame = p1 * CFrame.new(vector18)
-			instance19.TopSurface = p6.TopSurface
-			instance19.BottomSurface = p6.BottomSurface
-			var10 = instance19
+	local DecomposedModel = Instance.new("Model")
+	DecomposedModel.Parent = sourceBlock.Parent
+	local isBasePart = sourceBlock:IsA("BasePart")
+	local meshBlockCount = 0
+	for gridX, gridY, gridZ, chunkWidth, chunkHeight, chunkDepth in greedyMesh(voxelGridSize.X, voxelGridSize.Y, voxelGridSize.Z, cachedHasVoxelAt) do
+		local newMeshBlock
+		local chunkSize = Vector3.new(chunkWidth, chunkHeight, chunkDepth)
+		local chunkWorldPos = (Vector3.new(gridX - 0.5, gridY - 0.5, gridZ - 0.5) + chunkSize * 0.5) * voxelSize + gridOffset
+		if isBasePart then
+			local newBlock = Instance.new(sourceBlock.ClassName)
+			newBlock.Anchored = sourceBlock.Anchored
+			newBlock.CanCollide = sourceBlock.CanCollide
+			newBlock.CastShadow = false
+			newBlock.Material = sourceBlock.Material
+			newBlock.MaterialVariant = sourceBlock.MaterialVariant
+			newBlock.Color = sourceBlock.Color
+			newBlock.Transparency = sourceBlock.Transparency
+			newBlock.Size = chunkSize * voxelSize
+			newBlock.CFrame = partCFrame * CFrame.new(chunkWorldPos)
+			newBlock.TopSurface = sourceBlock.TopSurface
+			newBlock.BottomSurface = sourceBlock.BottomSurface
+			newMeshBlock = newBlock
 		else
-			var10 = nil
+			newMeshBlock = nil
 		end
-		var10.Parent = Model
-		count = count + 1
+		newMeshBlock.Parent = DecomposedModel
+		meshBlockCount = meshBlockCount + 1
 	end
-	return Model
+	return DecomposedModel
 end
-local function getBoundingBoxParts(p1, p2)
+local function getBoundingBoxParts(boundingCFrame, boundingSize)
 	local CollisionDetectionDummyPart = Instance.new("Part")
 	CollisionDetectionDummyPart.Name = "CollisionDetectionDummyPart"
-	CollisionDetectionDummyPart.Size = p2
-	CollisionDetectionDummyPart.CFrame = p1
+	CollisionDetectionDummyPart.Size = boundingSize
+	CollisionDetectionDummyPart.CFrame = boundingCFrame
 	CollisionDetectionDummyPart.Anchored = false
 	CollisionDetectionDummyPart.CanCollide = true
 	CollisionDetectionDummyPart.Parent = workspace
-	local instance = CollisionDetectionDummyPart.Touched:Connect(function()  end)
-	local vector2 = CollisionDetectionDummyPart:GetTouchingParts()
-	instance:Disconnect()
+	local touchConnection = CollisionDetectionDummyPart.Touched:Connect(function()  end)
+	local touchingParts = CollisionDetectionDummyPart:GetTouchingParts()
+	touchConnection:Disconnect()
 	CollisionDetectionDummyPart:Destroy()
-	return vector2
+	return touchingParts
 end
-local function alignToVoxelGrid(p1, p2, p3, p4)
+local function alignToVoxelGrid(partCFrame, partSize, voxelSize, gridOffset)
 	local round = math.round
-	local instance = (p1 * (-p2 / 2 + p3 / 2) + p4) / p3
-	local var5 = Vector3.new(round(instance.X), round(instance.Y), (round(instance.Z))) * p3 - p4 - p3 / 2
+	local alignedMin = (partCFrame * (-partSize / 2 + voxelSize / 2) + gridOffset) / voxelSize
+	local alignedMinSnapped = Vector3.new(round(alignedMin.X), round(alignedMin.Y), (round(alignedMin.Z))) * voxelSize - gridOffset - voxelSize / 2
 	local round_2 = math.round
-	local var6 = (p1 * (p2 / 2 - p3 / 2) + p4) / p3
-	local var10 = Vector3.new(round_2(var6.X), round_2(var6.Y), (round_2(var6.Z))) * p3 - p4 + p3 / 2
-	return CFrame.new((var5 + var10) / 2), var10 - var5
+	local alignedMax = (partCFrame * (partSize / 2 - voxelSize / 2) + gridOffset) / voxelSize
+	local alignedMaxSnapped = Vector3.new(round_2(alignedMax.X), round_2(alignedMax.Y), (round_2(alignedMax.Z))) * voxelSize - gridOffset + voxelSize / 2
+	return CFrame.new((alignedMinSnapped + alignedMaxSnapped) / 2), alignedMaxSnapped - alignedMinSnapped
 end
-local function getVoxelSize(p1, p2)
-	local instance = p2:GetAttribute(VoxelDestructionConsts.VOXEL_SIZE_ATTR_NAME)
-	if instance then
-		return instance
-	elseif p1.voxelSize then
-		return p1.voxelSize
+local function getVoxelSize(config, targetBlock)
+	local storedVoxelSize = targetBlock:GetAttribute(VoxelDestructionConsts.VOXEL_SIZE_ATTR_NAME)
+	if storedVoxelSize then
+		return storedVoxelSize
+	elseif config.voxelSize then
+		return config.voxelSize
 	else
 		return Vector3.new(1, 1, 1)
 	end
 end
-local function isWaterAroundPosition(p1, p2)
-	local instance = Terrain:ReadVoxels(Region3.new(p1 - Vector3.new(1, 1, 1) * p2 * 4, p1 + Vector3.new(1, 1, 1) * p2 * 4), 4)
-	local Size = instance.Size
-	for i = 1, Size.X do
-		for j = 1, Size.Y do
-			for k = 1, Size.Z do
-				if instance[i][j][k] == Enum.Material.Water then
+local function isWaterAroundPosition(checkPosition, searchRadius)
+	local voxelData = Terrain:ReadVoxels(Region3.new(checkPosition - Vector3.new(1, 1, 1) * searchRadius * 4, checkPosition + Vector3.new(1, 1, 1) * searchRadius * 4), 4)
+	local voxelGridSize = voxelData.Size
+	for i = 1, voxelGridSize.X do
+		for j = 1, voxelGridSize.Y do
+			for k = 1, voxelGridSize.Z do
+				if voxelData[i][j][k] == Enum.Material.Water then
 					return true
 				end
 			end
@@ -340,95 +339,95 @@ local function isWaterAroundPosition(p1, p2)
 	return false
 end
 local t = {
-	subtractSphere = function(p1)
-		if not p1.fx then
-			p1.fx = false
+	subtractSphere = function(destructionConfig)
+		if not destructionConfig.fx then
+			destructionConfig.fx = false
 		end
-		assert(p1.fx ~= nil)
-		if not p1.copy then
-			p1.copy = false
+		assert(destructionConfig.fx ~= nil)
+		if not destructionConfig.copy then
+			destructionConfig.copy = false
 		end
-		if not (p1.terrainDamageDisabled or isWaterAroundPosition(p1.spherePosition, p1.sphereRadius * 0.4)) then
-			Terrain:FillBall(p1.spherePosition, p1.sphereRadius, Enum.Material.Air)
+		if not (destructionConfig.terrainDamageDisabled or isWaterAroundPosition(destructionConfig.spherePosition, destructionConfig.sphereRadius * 0.4)) then
+			Terrain:FillBall(destructionConfig.spherePosition, destructionConfig.sphereRadius, Enum.Material.Air)
 		end
-		local t = {}
-		local t2 = {}
-		for var4, var5 in workspace:GetPartBoundsInRadius(p1.spherePosition, p1.sphereRadius, p1.overlapParams) do
-			local vector2, var3
-			if not CollectionService:HasTag(var5, VoxelDestructionConsts.VOXEL_INDESTRUCTIBLE_TAG_NAME) and (not p1.partsOnly or var5:IsA("Part")) and (var5.CanCollide and var5.Transparency ~= 1) then
-				vector2 = var5:GetAttribute(VoxelDestructionConsts.VOXEL_SIZE_ATTR_NAME) or (p1.voxelSize or Vector3.new(1, 1, 1))
-				if var5.Size.Magnitude <= vector2.Magnitude + 0.1 then
-					if p1.fx then
-						tossDebris(p1.spherePosition, var5.Position, vector2, var5)
+		local originalParents = {}
+		local destructibleParts = {}
+		for boundsIndex, checkPart in workspace:GetPartBoundsInRadius(destructionConfig.spherePosition, destructionConfig.sphereRadius, destructionConfig.overlapParams) do
+			local blockVoxelSize, processedPart
+			if not CollectionService:HasTag(checkPart, VoxelDestructionConsts.VOXEL_INDESTRUCTIBLE_TAG_NAME) and (not destructionConfig.partsOnly or checkPart:IsA("Part")) and (checkPart.CanCollide and checkPart.Transparency ~= 1) then
+				blockVoxelSize = checkPart:GetAttribute(VoxelDestructionConsts.VOXEL_SIZE_ATTR_NAME) or (destructionConfig.voxelSize or Vector3.new(1, 1, 1))
+				if checkPart.Size.Magnitude <= blockVoxelSize.Magnitude + 0.1 then
+					if destructionConfig.fx then
+						tossDebris(destructionConfig.spherePosition, checkPart.Position, blockVoxelSize, checkPart)
 					end
-					if p1.copy then
-						table.insert(t, { var5, var5.Parent })
-						var5.Parent = nil
+					if destructionConfig.copy then
+						table.insert(originalParents, { checkPart, checkPart.Parent })
+						checkPart.Parent = nil
 					else
-						var5:Destroy()
+						checkPart:Destroy()
 					end
 				else
-					local var7 = var5.CFrame
+					local partCFrame = checkPart.CFrame
 					local round = math.round
-					local var8 = var5.Size / vector2
-					local var12 = -(vector2 + Vector3.new(round(var8.X), round(var8.Y), (round(var8.Z))) * vector2) / 2
-					local v15, v16 = alignToVoxelGrid(var7:ToObjectSpace(var7 - var7.Position + p1.spherePosition), Vector3.new(1, 1, 1) * p1.sphereRadius * 2 + vector2 * 2, vector2, var12)
-					local vector17 = var7:ToWorldSpace(v15)
-					if p1.copy then
-						local vector18 = var5:Clone()
-						vector18.Parent = var5.Parent
-						table.insert(t, { var5, var5.Parent })
-						var5.Parent = nil
-						var3 = vector18
+					local gridDimensions = checkPart.Size / blockVoxelSize
+					local gridOffset = -(blockVoxelSize + Vector3.new(round(gridDimensions.X), round(gridDimensions.Y), (round(gridDimensions.Z))) * blockVoxelSize) / 2
+					local cutCFrame, cutSize = alignToVoxelGrid(partCFrame:ToObjectSpace(partCFrame - partCFrame.Position + destructionConfig.spherePosition), Vector3.new(1, 1, 1) * destructionConfig.sphereRadius * 2 + blockVoxelSize * 2, blockVoxelSize, gridOffset)
+					local cutCFrameWorld = partCFrame:ToWorldSpace(cutCFrame)
+					if destructionConfig.copy then
+						local copiedPart = checkPart:Clone()
+						copiedPart.Parent = checkPart.Parent
+						table.insert(originalParents, { checkPart, checkPart.Parent })
+						checkPart.Parent = nil
+						processedPart = copiedPart
 					else
-						var3 = var5
+						processedPart = checkPart
 					end
-					local t3 = { var3 }
-					local instance19 = cut(vector17, v16, t3)
-					table.insert(t2, var3)
-					TableUtils.concatInPlace(t2, instance19)
-					local instance20 = OverlapParams.new()
-					instance20.FilterType = Enum.RaycastFilterType.Include
-					instance20.FilterDescendantsInstances = t3
-					local vector21 = workspace:GetPartBoundsInBox(vector17, v16 - Vector3.new(0.1, 0.1, 0.1), instance20)
-					for i = 1, #vector21 do
-						local var22 = vector21[i]
-						local v24, v25 = alignToVoxelGrid(var7:ToObjectSpace(var22.CFrame), var22.Size, vector2, var12)
-						table.insert(t2, (decompose(var7:ToWorldSpace(v24), v25, vector2, p1.spherePosition, p1.sphereRadius, var3, p1.fx)))
-						var22:Destroy()
+					local partsToDecompose = { processedPart }
+					local newPiecesFromCut = cut(cutCFrameWorld, cutSize, partsToDecompose)
+					table.insert(destructibleParts, processedPart)
+					TableUtils.concatInPlace(destructibleParts, newPiecesFromCut)
+					local decompositionParams = OverlapParams.new()
+					decompositionParams.FilterType = Enum.RaycastFilterType.Include
+					decompositionParams.FilterDescendantsInstances = partsToDecompose
+					local partsInCutBox = workspace:GetPartBoundsInBox(cutCFrameWorld, cutSize - Vector3.new(0.1, 0.1, 0.1), decompositionParams)
+					for i = 1, #partsInCutBox do
+						local overlappingPart = partsInCutBox[i]
+						local decomposedCFrame, decomposedSize = alignToVoxelGrid(partCFrame:ToObjectSpace(overlappingPart.CFrame), overlappingPart.Size, blockVoxelSize, gridOffset)
+						table.insert(destructibleParts, (decompose(partCFrame:ToWorldSpace(decomposedCFrame), decomposedSize, blockVoxelSize, destructionConfig.spherePosition, destructionConfig.sphereRadius, processedPart, destructionConfig.fx)))
+						overlappingPart:Destroy()
 					end
 				end
 			end
 		end
 		return function()
-			for instance, vector2 in t do
+			for originalPart, originalParent in originalParents do
 				pcall(function()
-					vector2[1].Parent = vector2[2]
+					originalParent[1].Parent = originalParent[2]
 				end)
 			end
-			for var3, var4 in t2 do
-				var4:Destroy()
+			for destroyIndex, destroyPart in destructibleParts do
+				destroyPart:Destroy()
 			end
 		end
 	end
 }
-local t2 = {}
-local vector2 = nil
-function t.addToRestoreVoxelDestructionQueue(p1)
-	if vector2 then
-		task.cancel(vector2)
-		vector2 = nil
+local restoreQueue = {}
+local restoreTask = nil
+function t.addToRestoreVoxelDestructionQueue(restoreFunction)
+	if restoreTask then
+		task.cancel(restoreTask)
+		restoreTask = nil
 	end
-	table.insert(t2, p1)
-	local var22 = Players.LocalPlayer:GetNetworkPing()
+	table.insert(restoreQueue, restoreFunction)
+	local networkPing = Players.LocalPlayer:GetNetworkPing()
 	if RunService:IsStudio() then
-		var22 = math.max(var22, 0.15)
+		networkPing = math.max(networkPing, 0.15)
 	end
-	vector2 = task.delay(2 * var22 + 0.1, function()
-		for i = #t2, 1, -1 do
-			t2[i]()
+	restoreTask = task.delay(2 * networkPing + 0.1, function()
+		for i = #restoreQueue, 1, -1 do
+			restoreQueue[i]()
 		end
-		table.clear(t2)
+		table.clear(restoreQueue)
 	end)
 end
 return t

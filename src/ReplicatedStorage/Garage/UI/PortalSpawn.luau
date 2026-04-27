@@ -1,4 +1,3 @@
--- Reviewed by Claude
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Roact)
@@ -7,41 +6,41 @@ local createElement = Roact.createElement
 local PortalBase = require(script.Parent.PortalBase)
 local GarageConsts = require(script.Parent.Parent.GarageConsts)
 local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
-local v1 = Roact.PureComponent:extend("PortalSpawn")
-function v1.render(p1)
-	local t = {}
-	local t2 = {}
-	for i, v in ipairs(p1.props.receipt) do
-		t[v.name] = true
+local PortalSpawnComponent = Roact.PureComponent:extend("PortalSpawn")
+function PortalSpawnComponent.render(props)
+	local receiptItems = {}
+	local vehicleMetadata = {}
+	for i, receiptItem in ipairs(props.props.receipt) do
+		receiptItems[receiptItem.name] = true
 	end
-	local t3 = {}
-	local Vehicles = p1.props.owned.Vehicles
+	local ownedVehicles = {}
+	local Vehicles = props.props.owned.Vehicles
 	if Vehicles then
-		for k, v in pairs(Vehicles) do
-			if v == true then
-				t3[k] = true
+		for k, isOwned in pairs(Vehicles) do
+			if isOwned == true then
+				ownedVehicles[k] = true
 			end
 		end
 	end
-	local t4 = {}
-	local Vehicles_2 = p1.props.favorited.Vehicles
-	if Vehicles_2 then
-		for k, v in pairs(Vehicles_2) do
-			if v == true then
-				t4[k] = true
+	local favoritedVehicles = {}
+	local favoritedVehiclesTable = props.props.favorited.Vehicles
+	if favoritedVehiclesTable then
+		for k, isFavorited in pairs(favoritedVehiclesTable) do
+			if isFavorited == true then
+				favoritedVehicles[k] = true
 			end
 		end
 	end
-	for i = 1, #p1.props.items do
-		local v1, v2
-		local v3 = p1.props.items[i]
-		local v4 = t3[v3.name] or false
-		v1 = v4 or (not v3.price or v3.price == 0)
-		local premium = p1.props.premium
+	for i = 1, #props.props.items do
+		local isUnlocked, isAvailable
+		local currentVehicle = props.props.items[i]
+		local isOwned = ownedVehicles[currentVehicle.name] or false
+		isUnlocked = isOwned or (not currentVehicle.price or currentVehicle.price == 0)
+		local premium = props.props.premium
 		if not premium then
-			premium = p1.props.inPhysical
+			premium = props.props.inPhysical
 			if not premium then
-				premium = v3.lite
+				premium = currentVehicle.lite
 				if not premium then
 					premium = Players.LocalPlayer
 					if premium then
@@ -50,77 +49,77 @@ function v1.render(p1)
 				end
 			end
 		end
-		local v5 = premium
-		if not v5 then
-			v5 = p1.props.gamepassOwned[GamepassUtils.EnumGamepass.BOSS]
-			if v5 then
-				v5 = v3.name == "Wraith"
+		local isAccessible = premium
+		if not isAccessible then
+			isAccessible = props.props.gamepassOwned[GamepassUtils.EnumGamepass.BOSS]
+			if isAccessible then
+				isAccessible = currentVehicle.name == "Wraith"
 			end
 		end
-		if not v5 then
-			v5 = p1.props.gamepassOwned[GamepassUtils.EnumGamepass.SWAT]
-			if v5 then
-				v5 = v3.name == "SWATVan"
+		if not isAccessible then
+			isAccessible = props.props.gamepassOwned[GamepassUtils.EnumGamepass.SWAT]
+			if isAccessible then
+				isAccessible = currentVehicle.name == "SWATVan"
 			end
 		end
-		local t5 = {
-			selected = t[v3.name],
-			owned = v4,
-			faved = t4[v3.name] or false
+		local vehicleEntry = {
+			selected = receiptItems[currentVehicle.name],
+			owned = isOwned,
+			faved = favoritedVehicles[currentVehicle.name] or false
 		}
-		v2 = v4 or v1 and v3.available
-		t5.masked = not v2
-		t5.locked = not v5
-		function t5.onSelect()
-			if t5.masked then
-				p1.props.onAttemptPurchaseVehicle(v3, t5)
+		isAvailable = isOwned or isUnlocked and currentVehicle.available
+		vehicleEntry.masked = not isAvailable
+		vehicleEntry.locked = not isAccessible
+		function vehicleEntry.onSelect()
+			if vehicleEntry.masked then
+				props.props.onAttemptPurchaseVehicle(currentVehicle, vehicleEntry)
 			else
-				p1.props.onClickSpawnVehicle(v3)
+				props.props.onClickSpawnVehicle(currentVehicle)
 			end
 		end
-		function t5.onFavorite(p12)
-			if p1.props.attemptFavoriteItem then
-				p1.props.attemptFavoriteItem("Vehicles", v3.name, p12)
+		function vehicleEntry.onFavorite(category)
+			if props.props.attemptFavoriteItem then
+				props.props.attemptFavoriteItem("Vehicles", currentVehicle.name, category)
 			end
-			p1.props.onFavoriteItem("Vehicles", v3.name, p12)
+			props.props.onFavoriteItem("Vehicles", currentVehicle.name, category)
 		end
-		t2[i] = t5
+		vehicleMetadata[i] = vehicleEntry
 	end
 	return createElement(PortalBase, {
 		title = "SPAWN",
-		items = p1.props.items,
-		metadata = t2,
-		sortId = p1.props.sortId,
-		cornerPixel = p1.props.cornerPixel,
-		portalRatio = p1.props.portalRatio,
-		paddingRatio = p1.props.paddingRatio,
-		onSelectSort = p1.props.onSelectSort,
+		items = props.props.items,
+		metadata = vehicleMetadata,
+		sortId = props.props.sortId,
+		cornerPixel = props.props.cornerPixel,
+		portalRatio = props.props.portalRatio,
+		paddingRatio = props.props.paddingRatio,
+		onSelectSort = props.props.onSelectSort,
 		sortEnabled = true,
-		showFavorited = p1.props.showFavorited,
-		onToggleFavorited = p1.props.onToggleFavorited,
-		showAll = p1.props.showAll,
-		onToggleAll = p1.props.onToggleAll,
-		colsPerRow = p1.props.colsPerRow,
-		rowsPerPage = p1.props.rowsPerPage
+		showFavorited = props.props.showFavorited,
+		onToggleFavorited = props.props.onToggleFavorited,
+		showAll = props.props.showAll,
+		onToggleAll = props.props.onToggleAll,
+		colsPerRow = props.props.colsPerRow,
+		rowsPerPage = props.props.rowsPerPage
 	})
 end
-return RoactRodux.connect(function(p1, p2)
+return RoactRodux.connect(function(state, dispatch)
 	return {
-		receipt = p1.garageReceipt,
-		inPhysical = p1.garageInPhysical,
-		favorited = p1.garageFavorited,
-		gamepassOwned = p1.gamepassOwned,
-		premium = p1.garagePremium
+		receipt = state.garageReceipt,
+		inPhysical = state.garageInPhysical,
+		favorited = state.garageFavorited,
+		gamepassOwned = state.gamepassOwned,
+		premium = state.garagePremium
 	}
-end, function(p1)
+end, function(dispatch)
 	return {
-		onFavoriteItem = function(p12, p2, p3)
-			p1({
+		onFavoriteItem = function(category, itemName, isFavorited)
+			dispatch({
 				type = "setCategoryItemFavorited",
-				category = p12,
-				name = p2,
-				favorited = p3
+				category = category,
+				name = itemName,
+				favorited = isFavorited
 			})
 		end
 	}
-end)(v1)
+end)(PortalSpawnComponent)
