@@ -1,3 +1,4 @@
+-- https://lua.expert/
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("UserInputService")
@@ -6,7 +7,7 @@ local TweenService = game:GetService("TweenService")
 local UI = require(ReplicatedStorage.Module.UI)
 local RunService = game:GetService("RunService")
 game:GetService("Lighting")
-local isStudio = require(ReplicatedStorage.App.RunUtils).isStudio()
+local v1 = require(ReplicatedStorage.App.RunUtils).isStudio()
 local CurrentCamera = workspace.CurrentCamera
 local CharacterUtils = require(ReplicatedStorage.Std.CharacterUtils)
 local R15IKv2 = require(ReplicatedStorage.Module.R15IKv2)
@@ -35,46 +36,48 @@ local SpeedometerUtils = require(ReplicatedStorage.Speedometer.SpeedometerUtils)
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 require(ReplicatedStorage.Std.PartUtils)
 local Vehicles = workspace:WaitForChild("Vehicles")
-local function GetMoveVector()
+local function GetMoveVector() --[[ GetMoveVector | Line: 43 ]]
 	return Vector3.new()
 end
 local ControlModule = LocalPlayer.PlayerScripts:WaitForChild("PlayerModule", 5).ControlModule
 if ControlModule then
-	local controlModuleInstance = require(ControlModule)
-	GetMoveVector = function()
-		return controlModuleInstance:GetMoveVector()
+	local v2 = require(ControlModule)
+	GetMoveVector = function() --[[ GetMoveVector | Line: 50 | Upvalues: v2 (ref) ]]
+		return v2:GetMoveVector()
 	end
 end
-local Vector3New = Vector3.new
+local v3 = CFrame.new
+local v4 = Vector3.new
 local Angles = CFrame.Angles
-local RayNew = Ray.new
+local v5 = v3(0, 0, 0)
+local v6 = Ray.new
 local FindPartOnRayWithIgnoreList = workspace.FindPartOnRayWithIgnoreList
 local min = math.min
 local max = math.max
 local abs = math.abs
 local tanh = math.tanh
 local exp = math.exp
-local raycastParamsMobile = RaycastParams.new()
-raycastParamsMobile.RespectCanCollide = true
-raycastParamsMobile.FilterType = Enum.RaycastFilterType.Exclude
-raycastParamsMobile.FilterDescendantsInstances = { Vehicles }
-local raycastParamsDefault = RaycastParams.new()
-raycastParamsDefault.RespectCanCollide = true
-raycastParamsDefault.FilterType = Enum.RaycastFilterType.Exclude
-raycastParamsDefault.FilterDescendantsInstances = { Vehicles }
-local remoteEventServer = nil
-local _screenGui = nil
-local soundEffectLibrary = {
+local v7 = RaycastParams.new()
+v7.RespectCanCollide = true
+v7.FilterType = Enum.RaycastFilterType.Exclude
+v7.FilterDescendantsInstances = { Vehicles }
+local v8 = RaycastParams.new()
+v8.RespectCanCollide = true
+v8.FilterType = Enum.RaycastFilterType.Exclude
+v8.FilterDescendantsInstances = { Vehicles }
+local v9 = nil
+local v10 = nil
+local t = {
 	Echo = SoundService.Chassis.EchoSoundEffect,
 	Equalizer = SoundService.Chassis.EqualizerSoundEffect,
 	Reverb = SoundService.Chassis.ReverbSoundEffect
 }
-local soundEffectProperties = {
+local t2 = {
 	Echo = { "Delay", "DryLevel", "Feedback", "WetLevel" },
 	Equalizer = { "HighGain", "LowGain", "MidGain" },
 	Reverb = { "DecayTime", "Density", "Diffusion", "DryLevel", "WetLevel" }
 }
-local environmentSoundProfiles = {
+local t3 = {
 	Tunnel = {
 		Echo = {
 			Delay = 0.35,
@@ -136,392 +139,456 @@ local environmentSoundProfiles = {
 		}
 	}
 }
-local engineSoundCounter = 0
-local function gaussianDistribution(x, mean, sigma)
-	return exp(-(x - mean) ^ 2 / (2 * sigma * sigma))
+local v11 = 0
+local function f(p1, p2, p3) --[[ f | Line: 150 ]]
+	return math.exp(-(p1 - p2) ^ 2 / (2 * p3 * p3))
 end
-local function setVolume(sound, volume)
-	if math.abs(sound.Volume - volume) > 0.001 then
-		sound.Volume = volume
+local function setVolume(p1, p2) --[[ setVolume | Line: 153 ]]
+	if math.abs(p1.Volume - p2) > 0.001 then
+		p1.Volume = p2
 	end
 end
-local function setPlaybackSpeed(sound, speed)
-	if math.abs(sound.PlaybackSpeed - speed) > 0.001 then
-		sound.PlaybackSpeed = speed
+local function setPlaybackSpeed(p1, p2) --[[ setPlaybackSpeed | Line: 158 ]]
+	if math.abs(p1.PlaybackSpeed - p2) > 0.001 then
+		p1.PlaybackSpeed = p2
 	end
 end
-local function IsNaN(num)
-	return num ~= num
-end
-local function SetRPM3(sounds, rpm, throttle, makeId)
-	local baseVolume = 0.2
-	local idleVolumeScale = 1
-	local onLowSpeed, onMidSpeed, onHighSpeed, offLowSpeed, idleSpeed
-	if makeId == EnumMake.Lamborghini or (makeId == EnumMake.Bugatti or (makeId == EnumMake.Chiron or (makeId == EnumMake.Surus or (makeId == EnumMake.Challenger or (makeId == EnumMake.Beignet or (makeId == EnumMake.Macaron or (makeId == EnumMake.Monster or (makeId == EnumMake.Goliath or (makeId == EnumMake.ShellMark5 or (makeId == EnumMake.Power1 or (makeId == EnumMake.Successor or (makeId == EnumMake.OGLaMatador or (makeId == EnumMake.Maverick or (makeId == EnumMake.Wedge or makeId == EnumMake.Revox)))))))))))))) then
-		onLowSpeed = rpm / 12000 + 0.5 + 0.07 - 0.1
-		onMidSpeed = 1 + rpm / 12000 - 0.5 + 0.07 - 0.1
-		onHighSpeed = 1 + rpm / 12000 - 0.3 + 0.25 - 0.1
-		offLowSpeed = rpm / 12000 + 0.6 + 0.1 - 0.1
-		idleVolumeScale = 0.5
-		idleSpeed = (rpm + 2000) / 5500 + 0.8
-	elseif makeId == EnumMake.OrionM42 then
-		onLowSpeed = rpm / 5500 + 0.2295
-		onMidSpeed = 1 + rpm / 6000 - 0.991
-		onHighSpeed = 1 + rpm / 6000 - 1.218
-		offLowSpeed = rpm / 5500 + 0.2295
-		baseVolume = baseVolume * 2.25
-		idleSpeed = (rpm + 6500) / 7500
-	elseif makeId == EnumMake.Blackbeard or makeId == EnumMake.BlackWidow then
-		onLowSpeed = rpm / 10500 + 0.085
-		onMidSpeed = 1 + rpm / 12000 - 0.911
-		onHighSpeed = 1 + rpm / 20500 - 0.818
-		offLowSpeed = rpm / 10500 + 0.085
-		baseVolume = baseVolume * 3.75
-		idleSpeed = (rpm + 2700) / 6500
-	elseif makeId == EnumMake.Katana then
-		onLowSpeed = rpm / 3500 + 0.09
-		onMidSpeed = rpm / 6200 + 0.05
-		onHighSpeed = rpm / 6700 - 0.012
-		offLowSpeed = rpm / 3500 + 0.09
-		baseVolume = 1
-		idleSpeed = (rpm + 9500) / 9500 - 0.1
-	elseif makeId == EnumMake.WYNDR then
-		onLowSpeed = rpm / 6500 + 0.4
-		onMidSpeed = 1 + rpm / 6500 - 0.28
-		onHighSpeed = 1 + rpm / 7500 - 0.45
-		offLowSpeed = rpm / 6500 + 0.4
-		idleSpeed = (rpm + 1800) / 1800 + 0.3
-	elseif makeId == EnumMake.Carbonara then
-		onLowSpeed = rpm / 3600 + 0.04
-		onMidSpeed = rpm / 4100 - 0.1
-		onHighSpeed = rpm / 6200 + 0.022
-		offLowSpeed = rpm / 3600 + 0.04
-		idleSpeed = (rpm + 4900) / 4900 - 0.05
-	elseif makeId == EnumMake.Aperture then
-		onLowSpeed = rpm / 8500 + 0.22
-		onMidSpeed = rpm / 9300 + 0.33
-		onHighSpeed = rpm / 16500 + 0.31
-		offLowSpeed = rpm / 8500 + 0.22
-		idleSpeed = (rpm + 10800) / 10800 - 0.12
-	elseif makeId == EnumMake.SWATVan or makeId == EnumMake.Sentinel then
-		onLowSpeed = rpm / 10000 + 0.205
-		onMidSpeed = rpm / 13000 + 0.175
-		onHighSpeed = rpm / 11500 - 0.15
-		offLowSpeed = rpm / 10000 + 0.205
-		idleSpeed = (rpm + 12500) / 12500 - 0.83
-	elseif makeId == EnumMake.Polaire then
-		onLowSpeed = rpm / 3500 + 0.235
-		onMidSpeed = rpm / 6000 + 0.145
-		onHighSpeed = rpm / 9500 + 0.315
-		offLowSpeed = rpm / 3500 + 0.235
-		idleSpeed = (rpm + 4300) / 4300 - 0.02
-	elseif makeId == EnumMake.Bluebird then
-		onLowSpeed = rpm / 4500 + 0.165
-		onMidSpeed = rpm / 7500 + 0.145
-		onHighSpeed = rpm / 10500 + 0.155
-		offLowSpeed = rpm / 4500 + 0.165
-		idleSpeed = (rpm + 7300) / 7300 - 0.2
+local function SetRPM3(p1, p2, p3, p4) --[[ SetRPM3 | Line: 163 | Upvalues: EnumMake (copy) ]]
+	local v1 = 0.2
+	local v2 = 1
+	local v3, v4, v5, v6, v7
+	if p4 == EnumMake.Lamborghini or (p4 == EnumMake.Bugatti or (p4 == EnumMake.Chiron or (p4 == EnumMake.Surus or (p4 == EnumMake.Challenger or (p4 == EnumMake.Beignet or (p4 == EnumMake.Macaron or (p4 == EnumMake.Monster or (p4 == EnumMake.Goliath or (p4 == EnumMake.ShellMark5 or (p4 == EnumMake.Power1 or (p4 == EnumMake.Successor or (p4 == EnumMake.OGLaMatador or (p4 == EnumMake.Maverick or (p4 == EnumMake.Wedge or p4 == EnumMake.Revox)))))))))))))) then
+		v3 = p2 / 12000 + 0.5 + 0.07 - 0.1
+		v4 = 1 + p2 / 12000 - 0.5 + 0.07 - 0.1
+		v5 = 1 + p2 / 12000 - 0.3 + 0.25 - 0.1
+		v6 = p2 / 12000 + 0.6 + 0.1 - 0.1
+		v2 = 0.5
+		v7 = (p2 + 2000) / 5500 + 0.8
+	elseif p4 == EnumMake.OrionM42 then
+		v3 = p2 / 5500 + 0.2295
+		v4 = 1 + p2 / 6000 - 0.991
+		v5 = 1 + p2 / 6000 - 1.218
+		v6 = p2 / 5500 + 0.2295
+		v1 = v1 * 2.25
+		v7 = (p2 + 6500) / 7500
+	elseif p4 == EnumMake.Blackbeard or p4 == EnumMake.BlackWidow then
+		v3 = p2 / 10500 + 0.085
+		v4 = 1 + p2 / 12000 - 0.911
+		v5 = 1 + p2 / 20500 - 0.818
+		v6 = p2 / 10500 + 0.085
+		v1 = v1 * 3.75
+		v7 = (p2 + 2700) / 6500
+	elseif p4 == EnumMake.Katana then
+		v3 = p2 / 3500 + 0.09
+		v4 = p2 / 6200 + 0.05
+		v5 = p2 / 6700 - 0.012
+		v6 = p2 / 3500 + 0.09
+		v1 = 1
+		v7 = (p2 + 9500) / 9500 - 0.1
+	elseif p4 == EnumMake.WYNDR then
+		v3 = p2 / 6500 + 0.4
+		v4 = 1 + p2 / 6500 - 0.28
+		v5 = 1 + p2 / 7500 - 0.45
+		v6 = p2 / 6500 + 0.4
+		v7 = (p2 + 1800) / 1800 + 0.3
+	elseif p4 == EnumMake.Carbonara then
+		v3 = p2 / 3600 + 0.04
+		v4 = p2 / 4100 - 0.1
+		v5 = p2 / 6200 + 0.022
+		v6 = p2 / 3600 + 0.04
+		v7 = (p2 + 4900) / 4900 - 0.05
+	elseif p4 == EnumMake.Aperture then
+		v3 = p2 / 8500 + 0.22
+		v4 = p2 / 9300 + 0.33
+		v5 = p2 / 16500 + 0.31
+		v6 = p2 / 8500 + 0.22
+		v7 = (p2 + 10800) / 10800 - 0.12
+	elseif p4 == EnumMake.SWATVan or p4 == EnumMake.Sentinel then
+		v3 = p2 / 10000 + 0.205
+		v4 = p2 / 13000 + 0.175
+		v5 = p2 / 11500 - 0.15
+		v6 = p2 / 10000 + 0.205
+		v7 = (p2 + 12500) / 12500 - 0.83
+	elseif p4 == EnumMake.Polaire then
+		v3 = p2 / 3500 + 0.235
+		v4 = p2 / 6000 + 0.145
+		v5 = p2 / 9500 + 0.315
+		v6 = p2 / 3500 + 0.235
+		v7 = (p2 + 4300) / 4300 - 0.02
+	elseif p4 == EnumMake.Bluebird then
+		v3 = p2 / 4500 + 0.165
+		v4 = p2 / 7500 + 0.145
+		v5 = p2 / 10500 + 0.155
+		v6 = p2 / 4500 + 0.165
+		v7 = (p2 + 7300) / 7300 - 0.2
 	else
-		onLowSpeed = rpm / 10000 + 0.2
-		onMidSpeed = 1 + rpm / 10000 - 0.7
-		onHighSpeed = 1 + rpm / 10000 - 1
-		offLowSpeed = rpm / 10000 + 0.2
-		idleVolumeScale = 0.6
-		idleSpeed = (rpm + 1000) / 6000 + 0.8
+		v3 = p2 / 10000 + 0.2
+		v4 = 1 + p2 / 10000 - 0.7
+		v5 = 1 + p2 / 10000 - 1
+		v6 = p2 / 10000 + 0.2
+		v2 = 0.6
+		v7 = (p2 + 1000) / 6000 + 0.8
 	end
-	local drivePitchOffset = 0
-	local idlePitchOffset = 0
-	if makeId == EnumMake.TheRattler or (makeId == EnumMake.ShellClassic or (makeId == EnumMake.Bandit or (makeId == EnumMake.Longhorn or (makeId == EnumMake.Laviolette or (makeId == EnumMake.Hammerhead or (makeId == EnumMake.Delorean or makeId == EnumMake.TowTruck)))))) then
-		idlePitchOffset = -0.3
-		drivePitchOffset = -0.3
-	elseif makeId == EnumMake.MCL36 or makeId == EnumMake.MCL36FREE then
-		idlePitchOffset = 0.45
-		drivePitchOffset = 0.45
-	elseif makeId == EnumMake.Power1 then
-		idlePitchOffset = -0.3
-		drivePitchOffset = -0.3
-	elseif makeId == EnumMake.Blackbeard then
-		idlePitchOffset = 0
-		drivePitchOffset = -0.15
+	local v8 = 0
+	local v9 = 0
+	if p4 == EnumMake.TheRattler or (p4 == EnumMake.ShellClassic or (p4 == EnumMake.Bandit or (p4 == EnumMake.Longhorn or (p4 == EnumMake.Laviolette or (p4 == EnumMake.Hammerhead or (p4 == EnumMake.Delorean or p4 == EnumMake.TowTruck)))))) then
+		v9 = -0.3
+		v8 = -0.3
+	elseif p4 == EnumMake.MCL36 or p4 == EnumMake.MCL36FREE then
+		v9 = 0.45
+		v8 = 0.45
+	elseif p4 == EnumMake.Power1 then
+		v9 = -0.3
+		v8 = -0.3
+	elseif p4 == EnumMake.Blackbeard then
+		v9 = 0
+		v8 = -0.15
 	end
-	local idleSound = sounds.Idle
-	local idlePlaybackSpeed = idleSpeed + idlePitchOffset
-	setPlaybackSpeed(idleSound, idlePlaybackSpeed)
-	local onLowSound = sounds.OnLow
-	local onLowPlaybackSpeed = onLowSpeed + drivePitchOffset
-	setPlaybackSpeed(onLowSound, onLowPlaybackSpeed)
-	local onMidSound = sounds.OnMid
-	local onMidPlaybackSpeed = onMidSpeed + drivePitchOffset
-	setPlaybackSpeed(onMidSound, onMidPlaybackSpeed)
-	local onHighSound = sounds.OnHigh
-	local onHighPlaybackSpeed = onHighSpeed + drivePitchOffset
-	setPlaybackSpeed(onHighSound, onHighPlaybackSpeed)
-	local offLowSound = sounds.OffLow
-	local offLowPlaybackSpeed = offLowSpeed + drivePitchOffset
-	setPlaybackSpeed(offLowSound, offLowPlaybackSpeed)
-	local rpmNormalized = rpm / 8000
-	local idleVolume = gaussianDistribution(rpmNormalized, -0.1, 0.2) * baseVolume * idleVolumeScale
-	local onLowVolume = gaussianDistribution(rpmNormalized, 0.3, 0.1) * baseVolume
-	local onMidVolume = gaussianDistribution(rpmNormalized, 0.6, 0.2) * baseVolume
-	local onHighVolume = (rpmNormalized < 0.9 and gaussianDistribution(rpmNormalized, 0.9, 0.15) or 1) * baseVolume
-	setVolume(idleSound, idleVolume)
-	if throttle > 0 then
-		setVolume(onLowSound, onLowVolume)
-		setVolume(onMidSound, onMidVolume)
-		setVolume(onHighSound, onHighVolume)
-		setVolume(offLowSound, 0)
-	else
-		local onLowCoastVolume = onLowVolume * 0.5
-		setVolume(onLowSound, onLowCoastVolume)
-		setVolume(onMidSound, onMidVolume)
-		setVolume(onHighSound, onHighVolume)
-		local offLowCoastVolume = onLowVolume * 0.5
-		setVolume(offLowSound, offLowCoastVolume)
+	local Idle = p1.Idle
+	local v10 = v7 + v9
+	if math.abs(Idle.PlaybackSpeed - v10) > 0.001 then
+		Idle.PlaybackSpeed = v10
 	end
-end
-local function SetRPM1(sounds, rpm, throttle, makeId)
-	local idleVolumeOverride = nil
-	local rpmNormalized = rpm / if makeId == EnumMake.Volt or makeId == EnumMake.Volt4x4 then 10000 elseif makeId == EnumMake.Roadster then 12000 else 6000
-	local playbackScale = 1
-	local playbackOffset = 0
-	if makeId == EnumMake.DesertCrawler then
-		playbackScale = 1.4
-		playbackOffset = 0.1
-	elseif makeId == EnumMake.BrickKar then
-		playbackScale = 1.3
-		playbackOffset = 0.4
-		idleVolumeOverride = 1.4
-	elseif makeId == EnumMake.AdminNuke then
-		playbackScale = 1.3
-		playbackOffset = -0.4
-		idleVolumeOverride = 1.4
+	local OnLow = p1.OnLow
+	local v12 = v3 + v8
+	if math.abs(OnLow.PlaybackSpeed - v12) > 0.001 then
+		OnLow.PlaybackSpeed = v12
 	end
-	local idleSound = sounds.Idle
-	local idlePlaybackSpeed = playbackOffset + playbackScale * (rpm + 3000) / 8000
-	setPlaybackSpeed(idleSound, idlePlaybackSpeed)
-	if not idleVolumeOverride then
-		idleVolumeOverride = gaussianDistribution(rpmNormalized, 1.1, 0.5) * 0.2
+	local OnMid = p1.OnMid
+	local v14 = v4 + v8
+	if math.abs(OnMid.PlaybackSpeed - v14) > 0.001 then
+		OnMid.PlaybackSpeed = v14
 	end
-	setVolume(idleSound, idleVolumeOverride)
-end
-local function SetRPMNew(sounds, rpm, throttle, makeId, gear, soundConfig)
-	local gearNormalized = gear / 6
-	local rpmNormalized = rpm / 6300
-	local bandPosition = 5 * rpmNormalized
-	local idleBandScale = 0.2
-	local driveBandScale = 0.2
-	if makeId == EnumMake.Venom or (makeId == EnumMake.Cobra or makeId == EnumMake.Polaire) then
-		idleBandScale = idleBandScale * 2
-		driveBandScale = driveBandScale * 2
+	local OnHigh = p1.OnHigh
+	local v16 = v5 + v8
+	if math.abs(OnHigh.PlaybackSpeed - v16) > 0.001 then
+		OnHigh.PlaybackSpeed = v16
 	end
-	local idleVolume = gaussianDistribution(bandPosition, 0, 2) * idleBandScale
-	local onLowVolume = gaussianDistribution(bandPosition, 1.5, 1) * driveBandScale
-	local onMidVolume = gaussianDistribution(bandPosition, 3.25, 1) * driveBandScale
-	local onHighVolume = (bandPosition <= 5 and gaussianDistribution(bandPosition, 5, 1) or 1) * driveBandScale
-	local basePlaybackSpeed = 0.1 + 1.15 * ((1 + gearNormalized) * (rpmNormalized - 0.4 * gearNormalized))
-	local onLowPlaybackSpeed = basePlaybackSpeed * 2 ^ (-soundConfig.low / 12)
-	local onMidPlaybackSpeed = basePlaybackSpeed * 2 ^ (-soundConfig.mid / 12)
-	local onHighPlaybackSpeed = basePlaybackSpeed * 2 ^ (-soundConfig.high / 12)
-	local idlePlaybackSpeed = basePlaybackSpeed * 0.75 + 1
-	local idleSound = sounds.Idle
-	setVolume(idleSound, idleVolume)
-	local onLowSound = sounds.OnLow
-	setVolume(onLowSound, onLowVolume)
-	local onMidSound = sounds.OnMid
-	setVolume(onMidSound, onMidVolume)
-	local onHighSound = sounds.OnHigh
-	setVolume(onHighSound, onHighVolume)
-	setPlaybackSpeed(idleSound, idlePlaybackSpeed)
-	setPlaybackSpeed(onLowSound, onLowPlaybackSpeed)
-	setPlaybackSpeed(onMidSound, onMidPlaybackSpeed)
-	setPlaybackSpeed(onHighSound, onHighPlaybackSpeed)
-end
-local function SetRPM(soundType, makeId, sounds, rpm, throttle, gear, soundConfig)
-	if soundType == "Electric" or (soundType == "BrickKar" or soundType == "AdminNuke") then
-		SetRPM1(sounds, rpm, throttle, makeId)
-	elseif soundConfig then
-		SetRPMNew(sounds, rpm, throttle, makeId, gear, soundConfig)
-	else
-		SetRPM3(sounds, rpm, throttle, makeId)
+	local OffLow = p1.OffLow
+	local v18 = v6 + v8
+	if math.abs(OffLow.PlaybackSpeed - v18) > 0.001 then
+		OffLow.PlaybackSpeed = v18
 	end
-end
-local function UpdateGearsAndRPM(chassis, gears, speed, forwardInput, dt)
-	local Gear = chassis.Gear
-	local LastGear = chassis.LastGear
-	local gearBlend = chassis.gearBlendProgress
-	local LastRPM = chassis.LastRPM
-	if chassis.ManualGear then
-		if chassis._shiftUp then
-			chassis.Gear = chassis.Gear + 1
-			chassis._shiftUp = nil
+	local v20 = p2 / 8000
+	local v21 = math.exp(-(-0.1 - v20) ^ 2 / 0.08000000000000002) * v1 * v2 * 1
+	local v22 = math.exp(-(0.3 - v20) ^ 2 / 0.020000000000000004) * v1 * 1
+	local v23 = math.exp(-(0.6 - v20) ^ 2 / 0.08000000000000002) * v1 * 1
+	local v25 = (v20 < 0.9 and math.exp(-(0.9 - v20) ^ 2 / 0.045) or 1) * v1 * 1
+	local Idle_2 = p1.Idle
+	if math.abs(Idle_2.Volume - v21) > 0.001 then
+		Idle_2.Volume = v21
+	end
+	if p3 > 0 then
+		local OnLow_2 = p1.OnLow
+		if math.abs(OnLow_2.Volume - v22) > 0.001 then
+			OnLow_2.Volume = v22
 		end
-		if chassis._shiftDown then
-			chassis.Gear = chassis.Gear - 1
-			chassis._shiftDown = nil
+		local OnMid_2 = p1.OnMid
+		if math.abs(OnMid_2.Volume - v23) > 0.001 then
+			OnMid_2.Volume = v23
 		end
-		chassis.Gear = math.clamp(chassis.Gear, 1, #gears - 2)
-		Gear = chassis.Gear
+		local OnHigh_2 = p1.OnHigh
+		if math.abs(OnHigh_2.Volume - v25) > 0.001 then
+			OnHigh_2.Volume = v25
+		end
+		local OffLow_2 = p1.OffLow
+		if math.abs(OffLow_2.Volume - 0) > 0.001 then
+			OffLow_2.Volume = 0
+		end
+	else
+		local OnLow_2 = p1.OnLow
+		local v31 = v22 * 0.5
+		if math.abs(OnLow_2.Volume - v31) > 0.001 then
+			OnLow_2.Volume = v31
+		end
+		local OnMid_2 = p1.OnMid
+		local v33 = v23 * 1
+		if math.abs(OnMid_2.Volume - v33) > 0.001 then
+			OnMid_2.Volume = v33
+		end
+		local OnHigh_2 = p1.OnHigh
+		local v35 = v25 * 1
+		if math.abs(OnHigh_2.Volume - v35) > 0.001 then
+			OnHigh_2.Volume = v35
+		end
+		local OffLow_2 = p1.OffLow
+		local v37 = v22 * 0.5
+		if math.abs(OffLow_2.Volume - v37) > 0.001 then
+			OffLow_2.Volume = v37
+		end
 	end
-	local wheelAngularSpeed = speed / (chassis.Wheels[1].Model.PrimaryPart.Size.Y / 2.9) * 1000 / 3600 / 0.34
-	local blendedGearRatio
+end
+local function SetRPM1(p1, p2, p3, p4) --[[ SetRPM1 | Line: 408 | Upvalues: EnumMake (copy) ]]
+	local v1 = nil
+	local v3 = p2 / if p4 == EnumMake.Volt or p4 == EnumMake.Volt4x4 then 10000 elseif p4 == EnumMake.Roadster then 12000 else 6000
+	local v4 = 1
+	local v5 = 0
+	if p4 == EnumMake.DesertCrawler then
+		v4 = 1.4
+		v5 = 0.1
+	elseif p4 == EnumMake.BrickKar then
+		v4 = 1.3
+		v5 = 0.4
+		v1 = 1.4
+	elseif p4 == EnumMake.AdminNuke then
+		v4 = 1.3
+		v5 = -0.4
+		v1 = 1.4
+	end
+	local Idle = p1.Idle
+	local v6 = v5 + v4 * (p2 + 3000) / 8000
+	if math.abs(Idle.PlaybackSpeed - v6) > 0.001 then
+		Idle.PlaybackSpeed = v6
+	end
+	if not v1 then
+		v1 = math.exp(-(1.1 - v3) ^ 2 / 0.5) * 0.2
+	end
+	local Idle_2 = p1.Idle
+	if math.abs(Idle_2.Volume - v1) > 0.001 then
+		Idle_2.Volume = v1
+	end
+end
+local function SetRPMNew(p1, p2, p3, p4, p5, p6) --[[ SetRPMNew | Line: 439 | Upvalues: EnumMake (copy) ]]
+	local v1 = p5 / 6
+	local v2 = p2 / 6300
+	local v3 = 5 * v2
+	local v4 = 0.2
+	local v5 = 0.2
+	if p4 == EnumMake.Venom or (p4 == EnumMake.Cobra or p4 == EnumMake.Polaire) then
+		v4 = v4 * 2
+		v5 = v5 * 2
+	end
+	local v6 = math.exp(-(v3 - 0) ^ 2 / 8) * v4
+	local v7 = math.exp(-(v3 - 1.5) ^ 2 / 2) * v5
+	local v8 = math.exp(-(v3 - 3.25) ^ 2 / 2) * v5
+	local v10 = (v3 <= 5 and math.exp(-(v3 - 5) ^ 2 / 2) or 1) * v5
+	local v11 = 0.1 + 1.15 * ((1 + v1) * (v2 - 0.4 * v1))
+	local v12 = v11 * 2 ^ (-p6.low / 12)
+	local v13 = v11 * 2 ^ (-p6.mid / 12)
+	local v14 = v11 * 2 ^ (-p6.high / 12)
+	local v15 = v11 * 0.75 + 1
+	local Idle = p1.Idle
+	if math.abs(Idle.Volume - v6) > 0.001 then
+		Idle.Volume = v6
+	end
+	local OnLow = p1.OnLow
+	if math.abs(OnLow.Volume - v7) > 0.001 then
+		OnLow.Volume = v7
+	end
+	local OnMid = p1.OnMid
+	if math.abs(OnMid.Volume - v8) > 0.001 then
+		OnMid.Volume = v8
+	end
+	local OnHigh = p1.OnHigh
+	if math.abs(OnHigh.Volume - v10) > 0.001 then
+		OnHigh.Volume = v10
+	end
+	local Idle_2 = p1.Idle
+	if math.abs(Idle_2.PlaybackSpeed - v15) > 0.001 then
+		Idle_2.PlaybackSpeed = v15
+	end
+	local OnLow_2 = p1.OnLow
+	if math.abs(OnLow_2.PlaybackSpeed - v12) > 0.001 then
+		OnLow_2.PlaybackSpeed = v12
+	end
+	local OnMid_2 = p1.OnMid
+	if math.abs(OnMid_2.PlaybackSpeed - v13) > 0.001 then
+		OnMid_2.PlaybackSpeed = v13
+	end
+	local OnHigh_2 = p1.OnHigh
+	if math.abs(OnHigh_2.PlaybackSpeed - v14) > 0.001 then
+		OnHigh_2.PlaybackSpeed = v14
+	end
+end
+local function SetRPM(p1, p2, p3, p4, p5, p6, p7) --[[ SetRPM | Line: 492 | Upvalues: SetRPM1 (copy), SetRPMNew (copy), SetRPM3 (copy) ]]
+	if p1 == "Electric" or (p1 == "BrickKar" or p1 == "AdminNuke") then
+		SetRPM1(p3, p4, p5, p2)
+	elseif p7 then
+		SetRPMNew(p3, p4, p5, p2, p6, p7)
+	else
+		SetRPM3(p3, p4, p5, p2)
+	end
+end
+local function UpdateGearsAndRPM(p1, p2, p3, p4, p5) --[[ UpdateGearsAndRPM | Line: 503 | Upvalues: SetRPM (ref) ]]
+	local Gear = p1.Gear
+	local LastGear = p1.LastGear
+	local t3 = p1.t3
+	local LastRPM = p1.LastRPM
+	if p1.ManualGear then
+		if p1._shiftUp then
+			p1.Gear = p1.Gear + 1
+			p1._shiftUp = nil
+		end
+		if p1._shiftDown then
+			p1.Gear = p1.Gear - 1
+			p1._shiftDown = nil
+		end
+		p1.Gear = math.clamp(p1.Gear, 1, #p2 - 2)
+		Gear = p1.Gear
+	end
+	local v1 = p3 / (p1.Wheels[1].Model.PrimaryPart.Size.Y / 2.9) * 1000 / 3600 / 0.34
+	local v2
 	if LastGear == Gear then
-		blendedGearRatio = gears[2 + Gear]
+		v2 = p2[2 + Gear]
 	else
-		blendedGearRatio = gears[2 + LastGear] * (1 - gearBlend * gearBlend) + gears[2 + Gear] * gearBlend * gearBlend
-		local nextGearBlend = gearBlend + dt / 0.26
-		chassis.gearBlendProgress = nextGearBlend
-		if nextGearBlend >= 1 then
-			chassis.LastGear = Gear
-			chassis.gearBlendProgress = 0
+		v2 = p2[2 + LastGear] * (1 - t3 * t3) + p2[2 + Gear] * t3 * t3
+		local v3 = t3 + p5 * 1 / 0.26
+		p1.t3 = v3
+		if v3 >= 1 then
+			p1.LastGear = Gear
+			p1.t3 = 0
 		end
 	end
-	local visualRpm = wheelAngularSpeed * gears[1] * blendedGearRatio * 60 / 6.283185307179586
-	local targetRpm = wheelAngularSpeed * gears[1] * gears[2 + Gear] * 60 / 6.283185307179586
-	local rpmDelta = targetRpm - LastRPM
-	if not (chassis.NoGears or chassis.ManualGear) then
-		if forwardInput > 0 and (rpmDelta > 0 and (targetRpm > 6000 and Gear < #gears - 2)) then
-			chassis.Gear = Gear + 1
-			if chassis.onGearShift then
-				chassis:onGearShift(chassis.Gear, Gear)
+	local v4 = v1 * p2[1] * v2 * 60 / 6.283185307179586
+	local v5 = v1 * p2[1] * p2[2 + Gear] * 60 / 6.283185307179586
+	local v6 = v5 - LastRPM
+	if not (p1.NoGears or p1.ManualGear) then
+		if p4 > 0 and (v6 > 0 and (v5 > 6000 and Gear < #p2 - 2)) then
+			p1.Gear = Gear + 1
+			if p1.onGearShift then
+				p1:onGearShift(p1.Gear, Gear)
 			end
-		elseif rpmDelta < 0 and (targetRpm < 3400 and Gear > 1) then
-			chassis.Gear = Gear - 1
-			if chassis.onGearShift then
-				chassis:onGearShift(chassis.Gear, Gear)
+		elseif v6 < 0 and (v5 < 3400 and Gear > 1) then
+			p1.Gear = Gear - 1
+			if p1.onGearShift then
+				p1:onGearShift(p1.Gear, Gear)
 			end
 		end
 	end
-	SetRPM(chassis.SoundType, chassis.EnumMakeId, chassis.Sounds, visualRpm, forwardInput, Gear, chassis.engineSoundConfig)
-	chassis.rpmVisual = visualRpm
-	chassis.rpmVisualMax = 7000
-	chassis.LastRPM = targetRpm
-	if chassis.ManualGear then
-		local rpmLimit = chassis._rpmLimit or 6000
-		chassis._rpmLimitMult = if targetRpm <= rpmLimit then 1 else math.clamp(rpmLimit / targetRpm, 0, 1)
+	SetRPM(p1.SoundType, p1.EnumMakeId, p1.Sounds, v4, p4, Gear, p1.engineSoundConfig)
+	p1.rpmVisual = v4
+	p1.rpmVisualMax = 7000
+	p1.LastRPM = v5
+	if p1.ManualGear then
+		local v7 = p1._rpmLimit or 6000
+		p1._rpmLimitMult = if v5 <= v7 then 1 else math.clamp(v7 / v5, 0, 1)
 	end
-	if chassis.turboIntakeSound then
-		local turboIntakeVolume = math.clamp(chassis.rpmVisual / chassis.rpmVisualMax, 0, 1) ^ 3
-		if forwardInput <= 0 then
-			turboIntakeVolume = 0
+	if p1.turboIntakeSound then
+		local v10 = math.clamp(p1.rpmVisual / p1.rpmVisualMax, 0, 1) ^ 3
+		if p4 <= 0 then
+			v10 = 0
 		end
-		chassis.turboIntakeSound.Volume = chassis.turboIntakeSound.Volume + (turboIntakeVolume * chassis.maxTurboIntakeSoundVolume - chassis.turboIntakeSound.Volume) * 0.1
-		if Gear < chassis.Gear and chassis.turboBlowOff then
-			chassis.turboBlowOff.PlaybackSpeed = 1 + (math.random() * 0.15 - 0.075)
-			chassis.turboBlowOff:Play()
+		p1.turboIntakeSound.Volume = p1.turboIntakeSound.Volume + (v10 * p1.maxTurboIntakeSoundVolume - p1.turboIntakeSound.Volume) * 0.1
+		if Gear < p1.Gear and p1.turboBlowOff then
+			p1.turboBlowOff.PlaybackSpeed = 1 + (math.random() * 0.15 - 0.075)
+			p1.turboBlowOff:Play()
 		end
 	end
-	return Gear, blendedGearRatio
+	return Gear, v2
 end
-local function updateFOV(chassis)
-	local rawFovScale = (chassis.LastFakeGear or 1) ^ 0.5 * (chassis.Model.Engine.AssemblyLinearVelocity.Magnitude / 120)
-	if IsNaN(rawFovScale) then
-		rawFovScale = 0
+local function updateFOV(p1) --[[ updateFOV | Line: 578 | Upvalues: CurrentCamera (copy) ]]
+	local v1 = (p1.LastFakeGear or 1) ^ 0.5 * (p1.Model.Engine.AssemblyLinearVelocity.Magnitude / 120)
+	if v1 ~= v1 then
+		v1 = 0
 	end
-	local clampedFovScale = math.clamp(rawFovScale, 0, 3)
-	local fovOffsetScale
-	if clampedFovScale < 0.825155 then
-		fovOffsetScale = clampedFovScale * clampedFovScale * clampedFovScale
+	local v2 = math.clamp(v1, 0, 3)
+	local v3, v4
+	if v2 < 0.825155 then
+		v3 = v2 * v2 * v2
+		if not v3 then
+			v4 = v2
+			v3 = 1 - math.exp(-v2)
+		end
 	else
-		fovOffsetScale = 1 - exp(-clampedFovScale)
+		v4 = v2
+		v3 = 1 - math.exp(-v2)
 	end
-	local currentFieldOfView = CurrentCamera.FieldOfView
-	CurrentCamera.FieldOfView = currentFieldOfView + (fovOffsetScale * 30 + 70 - currentFieldOfView) * 0.7
+	local FieldOfView = CurrentCamera.FieldOfView
+	CurrentCamera.FieldOfView = FieldOfView + (v3 * 30 + 70 - FieldOfView) * 0.7
 end
-local chassisInputTable: { [string]: any } = {}
-local chassisInput = chassisInputTable
-local inputMovementState = { 0, 0, 0, 0, 0, 0 }
-local handbrakeEnabled = false
-local sirenEnabled = false
-local headlightsEnabled = false
-local policeMode = false
-local function GetMass(model)
+local t4 = {}
+local t5 = { 0, 0, 0, 0, 0, 0 }
+local v12 = false
+local v13 = false
+local v14 = false
+local v15 = false
+local function GetMass(p1) --[[ GetMass | Line: 600 ]]
 	local sum = 0
-	for i, v in ipairs(model:GetDescendants()) do
+	for i, v in ipairs(p1:GetDescendants()) do
 		if v:IsA("BasePart") then
 			sum = sum + v:GetMass()
 		end
 	end
 	return sum
 end
-function chassisInputTable.setForward(isForward)
-	inputMovementState[1] = if isForward then 1 else 0
+function t4.setForward(p1) --[[ setForward | Line: 609 | Upvalues: t5 (ref) ]]
+	t5[1] = if p1 then 1 else 0
 end
-function chassisInputTable.setBackward(isBackward)
-	inputMovementState[3] = if isBackward then 1 else 0
+function t4.setBackward(p1) --[[ setBackward | Line: 612 | Upvalues: t5 (ref) ]]
+	t5[3] = if p1 then 1 else 0
 end
-function chassisInputTable.onGearShift(chassis, newGear, oldGear)
-	if chassis.EnumMakeId == EnumMake.Venom or chassis.EnumMakeId == EnumMake.Polaire then
-		Audio.ObjectLocal(chassis.Model.PrimaryPart, 18128231812, {
+function t4.onGearShift(p1, p2, p3) --[[ onGearShift | Line: 615 | Upvalues: EnumMake (copy), Audio (copy) ]]
+	if p1.EnumMakeId == EnumMake.Venom or p1.EnumMakeId == EnumMake.Polaire then
+		Audio.ObjectLocal(p1.Model.PrimaryPart, 18128231812, {
 			Volume = 0.5,
 			Pitch = 1
 		})
-		for modelIndex, metalPart in chassis.Model.Model.Metal:GetChildren() do
-			if metalPart:IsA("Attachment") then
-				local particleEmitter = metalPart:FindFirstChildWhichIsA("ParticleEmitter")
-				if particleEmitter then
-					particleEmitter:Emit(3)
+		for v1, v2 in p1.Model.Model.Metal:GetChildren() do
+			if v2:IsA("Attachment") then
+				local v3 = v2:FindFirstChildWhichIsA("ParticleEmitter")
+				if v3 then
+					v3:Emit(3)
 				end
 			end
 		end
 	end
-	local GearShiftRemote = chassis.Model:FindFirstChild("GearShiftRemote")
+	local GearShiftRemote = p1.Model:FindFirstChild("GearShiftRemote")
 	if GearShiftRemote then
-		GearShiftRemote:FireServer(newGear, oldGear)
+		GearShiftRemote:FireServer(p2, p3)
 	end
 end
-function chassisInputTable.toggleSirens()
-	policeMode = not policeMode
-	remoteEventServer:FireServer("sgcbalmd", "PoliceLights", policeMode)
+function t4.toggleSirens() --[[ toggleSirens | Line: 649 | Upvalues: v15 (ref), v9 (ref) ]]
+	v15 = not v15
+	v9:FireServer("x" .. "" .. ("a9dgjpwa"):sub(4, 5):reverse():reverse():reverse() .. "" .. "" .. ("wrojjmbi"):sub(5, 6):reverse() .. "" .. "" .. ("erkpbewqh"):sub(5, 6):reverse() .. "2", "PoliceLights", v15)
 end
-function chassisInputTable.toggleHeadlights()
-	remoteEventServer:FireServer("sgcbalmd", "Lights")
+function t4.toggleHeadlights() --[[ toggleHeadlights | Line: 653 | Upvalues: v9 (ref) ]]
+	v9:FireServer("x" .. ("tjp"):sub(2, 2):reverse() .. "" .. "" .. ("c3giejmgrz"):sub(5, 8):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ok29bhk"):sub(5, 5):reverse():reverse():reverse() .. "2", "Lights")
 end
-function chassisInputTable.setHandbrakeEnabled(enabled)
-	handbrakeEnabled = enabled
-	ChassisShared.HandBrake = enabled
+function t4.setHandbrakeEnabled(p1) --[[ setHandbrakeEnabled | Line: 656 | Upvalues: v12 (ref), ChassisShared (copy) ]]
+	v12 = p1
+	ChassisShared.HandBrake = p1
 end
-function chassisInputTable.DriveToPosition(chassis, targetPosition, options)
-local driveOptions = options or {}
-chassis.DriveToPosition = targetPosition
-chassis.DriveToPositionArrivalRadius = driveOptions.arrivalRadius or 4
-chassis.DriveToPositionOnReached = driveOptions.onReached
+function t4.DriveToPosition(p1, p2, p3) --[[ DriveToPosition | Line: 668 ]]
+	local v1 = p3 or {}
+	p1.DriveToPosition = p2
+	p1.DriveToPositionArrivalRadius = v1.arrivalRadius or 4
+	p1.DriveToPositionOnReached = v1.onReached
 end
-function chassisInputTable.StopDriveToPosition(chassis)
-chassis.DriveToPosition = nil
-chassis.DriveToPositionOnReached = nil
+function t4.StopDriveToPosition(p1) --[[ StopDriveToPosition | Line: 676 ]]
+	p1.DriveToPosition = nil
+	p1.DriveToPositionOnReached = nil
 end
-function chassisInputTable.runAction(action)
-	if action then
-		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
-		if vehiclePacket.Make == "Firetruck" then
-			remoteEventServer:FireServer("sgcbalmd", "FiretruckWater", true)
-		elseif vehiclePacket.Make == "TheAgent" then
-			chassisInputTable.AttemptFireMissile(vehiclePacket)
-		elseif action == "Jump" then
-			if not vehiclePacket.AreTiresPopped then
-				local Engine = vehiclePacket.Model.Engine
-				local currentSpeed = SpeedometerUtils.sToH(SpeedometerUtils.studsToMi((math.abs((Engine.Velocity:Dot(Engine.CFrame.LookVector))))))
-				local maxJumpForce = vehiclePacket.jumpMaxAmount or 75
-				Engine:ApplyImpulse(Vector3.new(0, maxJumpForce - (maxJumpForce - (vehiclePacket.jumpBaseAmount or 40)) * math.clamp(currentSpeed / (vehiclePacket.jumpMaxMph or 500), 0, 1), 0) * Engine.AssemblyMass)
-				VehicleUtils.vehicleEffect("Jump", vehiclePacket.Model)
-				remoteEventServer:FireServer("sgcbalmd", "Jump")
-				vehiclePacket._lastJumpAt = os.clock()
+function t4.runAction(p1) --[[ runAction | Line: 680 | Upvalues: VehicleUtils (copy), v9 (ref), t4 (copy), SpeedometerUtils (copy), ChassisShared (copy) ]]
+	if p1 then
+		local v1 = VehicleUtils.GetLocalVehiclePacket()
+		if v1.Make == "Firetruck" then
+			v9:FireServer("x" .. "" .. ("ajn"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("cgmho"):sub(2, 2):reverse() .. "" .. "" .. ("npwljmgt"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "eb2", "FiretruckWater", true)
+		elseif v1.Make == "TheAgent" then
+			t4.AttemptFireMissile(v1)
+		elseif p1 == "Jump" then
+			if not v1.AreTiresPopped then
+				local Engine = v1.Model.Engine
+				local v4 = SpeedometerUtils.sToH(SpeedometerUtils.studsToMi((math.abs((Engine.Velocity:Dot(Engine.CFrame.LookVector))))))
+				local v7 = v1.jumpMaxAmount or 75
+				Engine:ApplyImpulse(Vector3.new(0, v7 - (v7 - (v1.jumpBaseAmount or 40)) * math.clamp(v4 / (v1.jumpMaxMph or 500), 0, 1), 0) * Engine.AssemblyMass)
+				VehicleUtils.vehicleEffect("Jump", v1.Model)
+				v9:FireServer("x" .. ("bvz4jmgjbdq8"):sub(5, 8):reverse() .. "" .. "" .. ("wzudbeli"):sub(5, 6):reverse() .. "2", "Jump")
+				v1._lastJumpAt = os.clock()
 				return true
 			end
 		else
-			remoteEventServer:FireServer("sgcbalmd", "Action")
+			v9:FireServer("xjgmjeb2", "Action")
 		end
 	elseif ChassisShared.VehicleMake == "Firetruck" then
-		remoteEventServer:FireServer("sgcbalmd", "FiretruckWater", false)
+		v9:FireServer("x" .. ("djmgjn4af"):sub(2, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("xqeqg8"):sub(3, 3):reverse() .. "b2", "FiretruckWater", false)
 	end
-	return
 end
-local function getTransparencyPredicateForHumanoid(humanoid)
-	assert(humanoid, "missing humanoid")
-	return function(part)
-		if part.Parent == humanoid.Parent then
-			local limb = humanoid:GetLimb(part)
-			if limb == Enum.Limb.LeftArm or limb == Enum.Limb.RightArm then
+local function getTransparencyPredicateForHumanoid(p1) --[[ getTransparencyPredicateForHumanoid | Line: 720 ]]
+	assert(p1, "missing humanoid")
+	return function(p12) --[[ Line: 723 | Upvalues: p1 (copy) ]]
+		if p12.Parent == p1.Parent then
+			local v1 = p1:GetLimb(p12)
+			if v1 == Enum.Limb.LeftArm or v1 == Enum.Limb.RightArm then
 				return false
 			else
 				return true
@@ -531,48 +598,59 @@ local function getTransparencyPredicateForHumanoid(humanoid)
 		end
 	end
 end
-function chassisInput.toggleInsideCamera(chassisPacket)
-	local vehiclePacket = chassisPacket or VehicleUtils.GetLocalVehiclePacket()
-	if vehiclePacket and not vehiclePacket.Passenger then
-		local wasCameraLocked = vehiclePacket.IsCameraLocked
-		if wasCameraLocked then
-			chassisInput.UnlockCamera(vehiclePacket)
+function t4.toggleInsideCamera(p1) --[[ toggleInsideCamera | Line: 733 | Upvalues: VehicleUtils (copy), t4 (copy), LocalPlayer (copy), CharacterUtils (copy) ]]
+	local v1 = p1 or VehicleUtils.GetLocalVehiclePacket()
+	if v1 and not v1.Passenger then
+		local IsCameraLocked = v1.IsCameraLocked
+		if IsCameraLocked then
+			t4.UnlockCamera(v1)
 		else
-			chassisInput.LockCamera(vehiclePacket)
+			t4.LockCamera(v1)
 		end
-		local character = LocalPlayer.Character
-		if character then
-			local humanoid = character:FindFirstChild("Humanoid")
-			assert(humanoid, "missing humanoid")
-			local transparencyPredicate = getTransparencyPredicateForHumanoid(humanoid)
-			if wasCameraLocked then
-				CharacterUtils.popInvisible(LocalPlayer.Character, transparencyPredicate)
+		local Character = LocalPlayer.Character
+		if Character then
+			local Humanoid = Character:FindFirstChild("Humanoid")
+			assert(Humanoid, "missing humanoid")
+			local function f2(p1) --[[ Line: 723 | Upvalues: Humanoid (copy) ]]
+				if p1.Parent == Humanoid.Parent then
+					local v1 = Humanoid:GetLimb(p1)
+					if v1 == Enum.Limb.LeftArm or v1 == Enum.Limb.RightArm then
+						return false
+					else
+						return true
+					end
+				else
+					return true
+				end
+			end
+			if IsCameraLocked then
+				CharacterUtils.popInvisible(LocalPlayer.Character, f2)
 				return
 			end
-			CharacterUtils.setInvisible(LocalPlayer.Character, transparencyPredicate)
+			CharacterUtils.setInvisible(LocalPlayer.Character, f2)
 		end
 	end
 end
-function chassisInput.init(uiConfig)
-	_screenGui = uiConfig.ScreenGui
+function t4.init(p1) --[[ init | Line: 754 | Upvalues: v10 (ref) ]]
+	v10 = p1.ScreenGui
 end
-function chassisInput.SetGravity(chassis, gravityPct)
-	local gravityForce = chassis.Model:FindFirstChild("Engine").AssemblyMass * 9.81 * 20
-	local gravityScale = 1 - gravityPct / 196.20000000000002
-	if IsNaN(gravityForce) then
-		gravityForce = 0
+function t4.SetGravity(p1, p2) --[[ SetGravity | Line: 757 ]]
+	local v1 = p1.Model:FindFirstChild("Engine").AssemblyMass * 9.81 * 20
+	local v2 = 1 - p2 / 196.20000000000002
+	if v1 ~= v1 then
+		v1 = 0
 	end
-	if IsNaN(gravityScale) then
-		gravityScale = 0
+	if v2 ~= v2 then
+		v2 = 0
 	end
-	chassis.gravityOffset = gravityForce * gravityScale
+	p1.gravityOffset = v1 * v2
 end
-function chassisInput.VehicleEnter(chassis)
-	local Passenger = chassis.Passenger
+function t4.VehicleEnter(p1) --[[ VehicleEnter | Line: 773 | Upvalues: LocalPlayer (copy), RunService (copy), updateFOV (copy), EnumMake (copy), CharacterAnim (copy), ChassisShared (copy), t5 (ref), v12 (ref), v13 (ref), v14 (ref), v15 (ref), t4 (copy), v4 (copy), R15IKv2 (copy), Spring (copy), Audio (copy), v7 (copy) ]]
+	local Passenger = p1.Passenger
 	local Character = LocalPlayer.Character
 	local Humanoid = Character.Humanoid
-	local seatMaid = chassis.seatMaid
-	seatMaid:GiveTask(function()
+	local seatMaid = p1.seatMaid
+	seatMaid:GiveTask(function() --[[ Line: 779 | Upvalues: Character (copy) ]]
 		if Character then
 			local Head = Character:FindFirstChild("Head")
 			if Head then
@@ -583,42 +661,42 @@ function chassisInput.VehicleEnter(chassis)
 			end
 		end
 	end)
-	seatMaid:GiveTask(RunService.Heartbeat:Connect(function()
-		updateFOV(chassis)
+	seatMaid:GiveTask(RunService.Heartbeat:Connect(function() --[[ Line: 792 | Upvalues: updateFOV (ref), p1 (copy) ]]
+		updateFOV(p1)
 	end))
-	chassis.EnumMakeId = EnumMake[chassis.Make]
-	local shouldPlaySeatAnimation = true
-	if chassis.EnumMakeId == EnumMake.ATV or chassis.EnumMakeId == EnumMake.Volt then
-		chassis.NoLook = true
-	elseif chassis.Seat:FindFirstChild("Turret") then
-		task.delay(0.1, function()
+	p1.EnumMakeId = EnumMake[p1.Make]
+	local v1 = true
+	if p1.EnumMakeId == EnumMake.ATV or p1.EnumMakeId == EnumMake.Volt then
+		p1.NoLook = true
+	elseif p1.Seat:FindFirstChild("Turret") then
+		task.delay(0.1, function() --[[ Line: 803 | Upvalues: Humanoid (copy), CharacterAnim (ref), seatMaid (copy) ]]
 			for i, v in ipairs(Humanoid:GetPlayingAnimationTracks()) do
 				v:Stop()
 			end
-			local idleTrack = CharacterAnim.getIdleTrack()
-			idleTrack:Play()
-			seatMaid:GiveTask(function()
-				idleTrack:Stop()
+			local v1 = CharacterAnim.getIdleTrack()
+			v1:Play()
+			seatMaid:GiveTask(function() --[[ Line: 809 | Upvalues: v1 (copy) ]]
+				v1:Stop()
 			end)
 		end)
-		shouldPlaySeatAnimation = false
+		v1 = false
 	end
-	if shouldPlaySeatAnimation then
-		local sitTrack = CharacterAnim.getCarSitTrack()
-		sitTrack:Play()
-		seatMaid:GiveTask(function()
-			sitTrack:Stop()
+	if v1 then
+		local v2 = CharacterAnim.getCarSitTrack()
+		v2:Play()
+		seatMaid:GiveTask(function() --[[ Line: 817 | Upvalues: v2 (copy) ]]
+			v2:Stop()
 		end)
 	end
-	local Steer = chassis.Model:FindFirstChild("Steer")
+	local Steer = p1.Model:FindFirstChild("Steer")
 	if Steer then
 		local Offset = Steer:FindFirstChild("Offset")
 		if Offset then
-			chassis.SteerOffset = Offset.Value
+			p1.SteerOffset = Offset.Value
 		end
 	end
-	local Model = chassis.Model
-	if not chassis.Seat:FindFirstChild("Visible") then
+	local Model = p1.Model
+	if not p1.Seat:FindFirstChild("Visible") then
 		local Head = Character:FindFirstChild("Head")
 		if Head then
 			local Decal = Head:FindFirstChildOfClass("Decal")
@@ -627,319 +705,316 @@ function chassisInput.VehicleEnter(chassis)
 			end
 		end
 	end
-	ChassisShared.VehicleMake = chassis.Make
+	ChassisShared.VehicleMake = p1.Make
 	if not Passenger then
-		inputMovementState = { 0, 0, 0, 0, 0, 0 }
-		handbrakeEnabled = false
-		sirenEnabled = false
+		t5 = { 0, 0, 0, 0, 0, 0 }
+		v12 = false
+		v13 = false
 		ChassisShared.HandBrake = false
-		headlightsEnabled = false
-		policeMode = chassis.PoliceLights
-		chassisInput.SetGravity(chassis, 100)
+		v14 = false
+		v15 = p1.PoliceLights
+		t4.SetGravity(p1, 100)
 		local BodyAngularVelocity = Instance.new("BodyAngularVelocity")
 		BodyAngularVelocity.AngularVelocity = Vector3.new(0, 0, 0)
-		BodyAngularVelocity.MaxTorque = Vector3New(chassis.Mass, (1 / 0), chassis.Mass)
+		BodyAngularVelocity.MaxTorque = v4(p1.Mass, (1 / 0), p1.Mass)
 		BodyAngularVelocity.Parent = Model.Engine
-		chassis.Rotate = BodyAngularVelocity
-		chassis.Traction = 1
-		chassis.LastForward = 0
-		chassis.RotY = 0
-		chassis.LastDrift = 0
-		chassis.vHeading = 0
-		chassis.vGrass = 0
-		chassis.vAsphalt = 0
-		chassis.vSandstone = 0
-		chassis.Gear = 1
-		chassis.LastGear = 1
-		chassis.LastRPM = 0
-		chassis.gearBlendProgress = 0
-		chassis.AreTiresPopped = false
-		chassis.PopTires = chassisInput.PopTires
-		chassis._flagBrakelightsEnabled = false
-		chassis._flagHeadlightsEnabled = false
-		if chassis.Make ~= "Volt" then
-			chassis.IK = R15IKv2.BuildPacketArms(Character)
+		p1.Rotate = BodyAngularVelocity
+		p1.Traction = 1
+		p1.LastForward = 0
+		p1.RotY = 0
+		p1.LastDrift = 0
+		p1.vHeading = 0
+		p1.vGrass = 0
+		p1.vAsphalt = 0
+		p1.vSandstone = 0
+		p1.Gear = 1
+		p1.LastGear = 1
+		p1.LastRPM = 0
+		p1.t3 = 0
+		p1.AreTiresPopped = false
+		p1.PopTires = t4.PopTires
+		p1._flagBrakelightsEnabled = false
+		p1._flagHeadlightsEnabled = false
+		if p1.Make ~= "Volt" then
+			p1.IK = R15IKv2.BuildPacketArms(Character)
 		end
-		if chassis.Make == "TheRattler" then
-			chassis.SpringEngineRattle = Spring.new(Vector3.new(), Vector3.new(), 0.6, 30)
-			chassis.SpringEngineFlaps = Spring.new(0, 0, 0.8, 15)
-			chassis.LastEngineRattle = os.clock()
-			chassis.RattleFire = {}
-			chassis.RattleSmoke = {}
+		if p1.Make == "TheRattler" then
+			p1.SpringEngineRattle = Spring.new(Vector3.new(), Vector3.new(), 0.6, 30)
+			p1.SpringEngineFlaps = Spring.new(0, 0, 0.8, 15)
+			p1.LastEngineRattle = os.clock()
+			p1.RattleFire = {}
+			p1.RattleSmoke = {}
 			for i, v in ipairs(Model.Preset.RattlerEngine.EngineGold:GetChildren()) do
 				if v:IsA("Attachment") then
-					table.insert(chassis.RattleFire, v.Fire)
-					table.insert(chassis.RattleSmoke, v.Smoke)
+					table.insert(p1.RattleFire, v.Fire)
+					table.insert(p1.RattleSmoke, v.Smoke)
 					v.Fire.Enabled = false
 					v.Smoke.Enabled = false
 				end
 			end
-		elseif chassis.Make == "Blackbeard" then
-			chassis.LastEngineRattle = os.clock()
-			chassis.RattleMotors = {}
-			chassis.SpringEngineRattle = Spring.new(Vector3.new(), Vector3.new(), 0.6, 30)
-			chassis.RattleParticles = {}
-			for index, enginePart in Model.Preset.RattlerEngine:GetChildren() do
-				local Motor = enginePart:FindFirstChildOfClass("Motor")
+		elseif p1.Make == "Blackbeard" then
+			p1.LastEngineRattle = os.clock()
+			p1.RattleMotors = {}
+			p1.SpringEngineRattle = Spring.new(Vector3.new(), Vector3.new(), 0.6, 30)
+			p1.RattleParticles = {}
+			for v3, v42 in Model.Preset.RattlerEngine:GetChildren() do
+				local Motor = v42:FindFirstChildOfClass("Motor")
 				if Motor and Motor.Name:match("Engine$") then
-					table.insert(chassis.RattleMotors, {
+					table.insert(p1.RattleMotors, {
 						motor = Motor
 					})
 				end
 			end
-			for currentTime, sideSign in Model.Preset.RattlerEngine.SecondBody:GetChildren() do
-				if sideSign:IsA("Attachment") then
-					local wheelRotationOffset = sideSign:FindFirstChildWhichIsA("ParticleEmitter")
-					if wheelRotationOffset then
-						table.insert(chassis.RattleParticles, wheelRotationOffset)
-						wheelRotationOffset.Enabled = false
+			for v5, v6 in Model.Preset.RattlerEngine.SecondBody:GetChildren() do
+				if v6:IsA("Attachment") then
+					local v72 = v6:FindFirstChildWhichIsA("ParticleEmitter")
+					if v72 then
+						table.insert(p1.RattleParticles, v72)
+						v72.Enabled = false
 					end
 				end
 			end
-		elseif chassis.Make == "Shogun" then
-			chassis.LastEngineRattle = os.clock()
-			chassis.RattleMotors = {}
-			chassis.SpringEngineRattle = Spring.new(Vector3.new(), Vector3.new(), 0.6, 30)
-			for lateralOffset, raycastCFrame in Model.Preset.RattlerEngine:GetChildren() do
-				local Motor = raycastCFrame:FindFirstChildOfClass("Motor")
+		elseif p1.Make == "Shogun" then
+			p1.LastEngineRattle = os.clock()
+			p1.RattleMotors = {}
+			p1.SpringEngineRattle = Spring.new(Vector3.new(), Vector3.new(), 0.6, 30)
+			for v8, v9 in Model.Preset.RattlerEngine:GetChildren() do
+				local Motor = v9:FindFirstChildOfClass("Motor")
 				if Motor and Motor.Name:match("Engine$") then
-					table.insert(chassis.RattleMotors, {
+					table.insert(p1.RattleMotors, {
 						motor = Motor
 					})
 				end
 			end
-			chassis.RattleParticles = {}
-			for thrustForce, suspensionForce in Model.Model:FindFirstChild("SecondBody"):GetDescendants() do
-				if suspensionForce:IsA("ParticleEmitter") then
-					table.insert(chassis.RattleParticles, suspensionForce)
-					suspensionForce.Enabled = false
+			p1.RattleParticles = {}
+			for v10, v11 in Model.Model:FindFirstChild("SecondBody"):GetDescendants() do
+				if v11:IsA("ParticleEmitter") then
+					table.insert(p1.RattleParticles, v11)
+					v11.Enabled = false
 				end
 			end
-			chassis.BrakeTrails = {}
-			for dampingCoefficient, steerDirection in Model.Model:FindFirstChild("BrakelightGlass"):GetChildren() do
-				if steerDirection:IsA("Trail") then
-					table.insert(chassis.BrakeTrails, steerDirection)
-					steerDirection.Enabled = false
+			p1.BrakeTrails = {}
+			for v122, v132 in Model.Model:FindFirstChild("BrakelightGlass"):GetChildren() do
+				if v132:IsA("Trail") then
+					table.insert(p1.BrakeTrails, v132)
+					v132.Enabled = false
 				end
 			end
-		elseif chassis.Make == "BlackWidow" then
-			chassis.LastEngineRattle = os.clock()
-			chassis.RattleMotors = {}
-			chassis.SpringEngineRattle = Spring.new(Vector3.new(), Vector3.new(), 0.6, 30)
-			for _, child in Model.Preset.RattlerEngine:GetChildren() do
-				local Motor = child:FindFirstChildOfClass("Motor")
+		elseif p1.Make == "BlackWidow" then
+			p1.LastEngineRattle = os.clock()
+			p1.RattleMotors = {}
+			p1.SpringEngineRattle = Spring.new(Vector3.new(), Vector3.new(), 0.6, 30)
+			for v142, v152 in Model.Preset.RattlerEngine:GetChildren() do
+				local Motor = v152:FindFirstChildOfClass("Motor")
 				if Motor and Motor.Name:match("Engine$") then
-					table.insert(chassis.RattleMotors, {
+					table.insert(p1.RattleMotors, {
 						motor = Motor
 					})
 				end
 			end
-			chassis.RattleParticles = {}
-			for interpolatedHeightOffset, rayDistance in Model.Preset.RattlerEngine.Metal:QueryDescendants("ParticleEmitter") do
-				table.insert(chassis.RattleParticles, rayDistance)
-				rayDistance.Enabled = false
+			p1.RattleParticles = {}
+			for v16, v17 in Model.Preset.RattlerEngine.Metal:QueryDescendants("ParticleEmitter") do
+				table.insert(p1.RattleParticles, v17)
+				v17.Enabled = false
 			end
-		elseif chassis.Make == "Bluebird" then
-			chassis.SpringEngineRattle = Spring.new(Vector3.new(), Vector3.new(), 0.6, 30)
-			chassis.SpringEngineFlaps = Spring.new(0, 0, 0.8, 15)
-			chassis.LastEngineRattle = os.clock()
-			chassis.RattleFire = {}
+		elseif p1.Make == "Bluebird" then
+			p1.SpringEngineRattle = Spring.new(Vector3.new(), Vector3.new(), 0.6, 30)
+			p1.SpringEngineFlaps = Spring.new(0, 0, 0.8, 15)
+			p1.LastEngineRattle = os.clock()
+			p1.RattleFire = {}
 			for i, v in ipairs(Model.Preset.RattlerEngine.EngineMetal:GetChildren()) do
 				if v:IsA("Attachment") then
 					local Fire = v:FindFirstChild("Fire")
 					if Fire then
-						table.insert(chassis.RattleFire, Fire)
+						table.insert(p1.RattleFire, Fire)
 						Fire.Enabled = false
 					end
 				end
 			end
-			chassis.BluebirdSupercharger = Audio.ObjectLocal(Model.Engine, 78492749956905, {
+			p1.BluebirdSupercharger = Audio.ObjectLocal(Model.Engine, 78492749956905, {
 				Volume = 0,
 				Looped = true,
 				RollOffMaxDistance = 352
 			})
-			seatMaid:GiveTask(function()
-				if chassis.BluebirdSupercharger then
-					chassis.BluebirdSupercharger:Destroy()
+			seatMaid:GiveTask(function() --[[ Line: 984 | Upvalues: p1 (copy) ]]
+				if p1.BluebirdSupercharger then
+					p1.BluebirdSupercharger:Destroy()
 				end
 			end)
-		elseif chassis.Make == "JBX0031" then
-			chassis.ThrusterFlames = true
-			chassisInput.UpdateThrusterFlames(Model, 0, 0, 0, {
+		elseif p1.Make == "JBX0031" then
+			p1.ThrusterFlames = true
+			t4.UpdateThrusterFlames(Model, 0, 0, 0, {
 				vehicleEnter = true
 			})
-		elseif chassis.Make == "Wedge" or (chassis.Make == "Manta" or (chassis.Make == "Katana" or (chassis.Make == "WYNDR" or chassis.Make == "Polaire"))) then
-			local raycastResult = Audio.ObjectLocal(Model.Engine, 132884974895700, {
+		elseif p1.Make == "Wedge" or (p1.Make == "Manta" or (p1.Make == "Katana" or (p1.Make == "WYNDR" or p1.Make == "Polaire"))) then
+			local v18 = Audio.ObjectLocal(Model.Engine, 132884974895700, {
 				Volume = 0,
 				Looped = true,
 				RollOffMinDistance = 16,
 				RollOffMaxDistance = 512,
 				RollOffMode = Enum.RollOffMode.InverseTapered
 			})
-			chassis.maxTurboIntakeSoundVolume = 0.2
-			if chassis.Make == "Manta" or chassis.Make == "Polaire" then
-				chassis.maxTurboIntakeSoundVolume = 0.1
+			p1.maxTurboIntakeSoundVolume = 0.2
+			if p1.Make == "Manta" or p1.Make == "Polaire" then
+				p1.maxTurboIntakeSoundVolume = 0.1
 			end
-			local hitInstance = Audio.ObjectLocal(Model.Engine, 118282536530342, {
+			local v19 = Audio.ObjectLocal(Model.Engine, 118282536530342, {
 				Volume = 0.2,
 				DoNotPlay = true,
 				RollOffMinDistance = 16,
 				RollOffMaxDistance = 512,
 				RollOffMode = Enum.RollOffMode.InverseTapered
 			})
-			chassis.turboIntakeSound = raycastResult
-			chassis.turboBlowOff = hitInstance
-			seatMaid:GiveTask(function()
-				raycastResult:Destroy()
-				hitInstance:Destroy()
+			p1.turboIntakeSound = v18
+			p1.turboBlowOff = v19
+			seatMaid:GiveTask(function() --[[ Line: 1015 | Upvalues: v18 (copy), v19 (copy) ]]
+				v18:Destroy()
+				v19:Destroy()
 			end)
 		end
-		chassis.Sounds.DriftSqueal.Volume = 0
-		for k, v in pairs(chassis.Sounds) do
+		p1.Sounds.DriftSqueal.Volume = 0
+		for k, v in pairs(p1.Sounds) do
 			if not v.IsPlaying then
 				v:Play()
 			end
 		end
-		chassis.setForward = chassisInput.setForward
-		chassis.setBackward = chassisInput.setBackward
-		chassis.onGearShift = chassisInput.onGearShift
-		local ignoreWater = if chassis.EnumMakeId == EnumMake.Delorean then false else chassis.EnumMakeId ~= EnumMake.Blackbeard
-		raycastParamsDefault.IgnoreWater = ignoreWater
-		raycastParamsMobile.IgnoreWater = ignoreWater
+		p1.setForward = t4.setForward
+		p1.setBackward = t4.setBackward
+		p1.onGearShift = t4.onGearShift
+		v7.IgnoreWater = if p1.EnumMakeId == EnumMake.Delorean then false else p1.EnumMakeId ~= EnumMake.Blackbeard
 	end
 end
-function chassisInput.VehicleLeave(chassis)
+function t4.VehicleLeave(p1) --[[ VehicleLeave | Line: 1079 | Upvalues: CurrentCamera (copy), t3 (copy), t2 (copy), t (copy), t4 (copy), VehicleUtils (copy), DoorUtils (copy) ]]
 	CurrentCamera.FieldOfView = 70
-	if chassis.Sounds then
-		local outsideProfile = environmentSoundProfiles.Outside
-		for effectName, properties in next, soundEffectProperties do
-			for index, value in next, properties do
-				soundEffectLibrary[effectName][value] = outsideProfile[effectName][value]
+	if p1.Sounds then
+		local Outside = t3.Outside
+		for v1, v2 in next, t2 do
+			for v3, v4 in next, v2 do
+				t[v1][v4] = Outside[v1][v4]
 			end
 		end
-		for k, v in pairs(chassis.Sounds) do
+		for k, v in pairs(p1.Sounds) do
 			v.Volume = 0
 		end
-		chassis.Sounds.DriftSqueal:Stop()
+		p1.Sounds.DriftSqueal:Stop()
 	end
-	if chassis.IsCameraLocked then
-		chassisInput.UnlockCamera(chassis)
+	if p1.IsCameraLocked then
+		t4.UnlockCamera(p1)
 	end
-	if not chassis.Passenger then
-		chassis.Rotate:Destroy()
-		chassis.Lift.Force = Vector3.new(0, 0, 0)
-		for sideSign, thruster in chassis.EngineThrusters do
-			thruster.Drive.Force = Vector3.new(0, 0, 0)
-			thruster.Friction.Force = Vector3.new(0, 0, 0)
+	if not p1.Passenger then
+		p1.Rotate:Destroy()
+		p1.Lift.Force = Vector3.new(0, 0, 0)
+		for v6, v7 in p1.EngineThrusters do
+			v7.Drive.Force = Vector3.new(0, 0, 0)
+			v7.Friction.Force = Vector3.new(0, 0, 0)
 		end
-		chassis.IK = nil
-		for lateralOffset, raycastCFrame in chassis.Wheels do
-			raycastCFrame.Thruster.Force = Vector3.new(0, 0, 0)
+		p1.IK = nil
+		for v8, v9 in p1.Wheels do
+			v9.Thruster.Force = Vector3.new(0, 0, 0)
 		end
-		if chassis.RattleSmoke then
-			for thrustForce, suspensionForce in chassis.RattleSmoke do
-				suspensionForce.Enabled = false
+		if p1.RattleSmoke then
+			for v10, v11 in p1.RattleSmoke do
+				v11.Enabled = false
 			end
 		end
-		if chassis.RattleFire then
-			for index, fireParticle in chassis.RattleFire do
-				fireParticle.Enabled = false
+		if p1.RattleFire then
+			for v12, v13 in p1.RattleFire do
+				v13.Enabled = false
 			end
 		end
-		if chassis.RattleParticles then
-			for suspensionHeightOffset, heightOffsetBase in chassis.RattleParticles do
-				heightOffsetBase.Enabled = false
+		if p1.RattleParticles then
+			for v14, v15 in p1.RattleParticles do
+				v15.Enabled = false
 			end
 		end
-		if chassis.ThrusterFlames then
-			chassisInput.UpdateThrusterFlames(chassis.Model, 0, 0, 0, {
+		if p1.ThrusterFlames then
+			t4.UpdateThrusterFlames(p1.Model, 0, 0, 0, {
 				vehicleLeave = true
 			})
 		end
-		if chassis.BrakeTrails then
-			for interpolatedHeightOffset, rayDistance in chassis.BrakeTrails do
-				rayDistance.Enabled = false
+		if p1.BrakeTrails then
+			for v16, v17 in p1.BrakeTrails do
+				v17.Enabled = false
 			end
 		end
-		VehicleUtils.setBrakelightsEnabled(chassis.Model, false)
-		local rudder = chassis.Model.Parent and chassis.Model.Preset:FindFirstChild("Rudder")
-		if rudder then
-			DoorUtils.setPctOpen(rudder, 0.5)
+		VehicleUtils.setBrakelightsEnabled(p1.Model, false)
+		local v18 = p1.Model.Parent and p1.Model.Preset:FindFirstChild("Rudder")
+		if v18 then
+			DoorUtils.setPctOpen(v18, 0.5)
 		end
-		if chassis._haptic then
-			chassis._haptic:Destroy()
-			chassis._haptic = nil
+		if p1._haptic then
+			p1._haptic:Destroy()
+			p1._haptic = nil
 		end
 	end
 end
-local thrusterLightsActiveColor = Color3.fromRGB(204, 142, 105)
-local thrusterLightsInactiveColor = Color3.fromRGB(68, 54, 43)
-local vehicleThrusterLightsStates = {}
-local function getThrusterLightsState(vehicle)
-	local thrusterLightsState = vehicleThrusterLightsStates[vehicle]
-	if not thrusterLightsState then
-		local newState = {
+local v16 = Color3.fromRGB(204, 142, 105)
+local v17 = Color3.fromRGB(68, 54, 43)
+local t6 = {}
+local function getThrusterLightsState(p1) --[[ getThrusterLightsState | Line: 1152 | Upvalues: t6 (copy) ]]
+	local v1 = t6[p1]
+	if not v1 then
+		local t = {
 			part = nil,
 			activeTween = nil,
 			isOn = false,
 			hotUntil = 0
 		}
-		vehicleThrusterLightsStates[vehicle] = newState
-		thrusterLightsState = newState
+		t6[p1] = t
+		v1 = t
 	end
-	if thrusterLightsState.part == nil or thrusterLightsState.part.Parent == nil then
-		local thrusterLightsPart = vehicle.Model:FindFirstChild("ThrusterLights")
-		if thrusterLightsPart and thrusterLightsPart:IsA("BasePart") then
-			thrusterLightsState.part = thrusterLightsPart
-			return thrusterLightsState
+	if v1.part == nil or v1.part.Parent == nil then
+		local ThrusterLights = p1.Model:FindFirstChild("ThrusterLights")
+		if ThrusterLights and ThrusterLights:IsA("BasePart") then
+			v1.part = ThrusterLights
+			return v1
 		end
-		thrusterLightsState.part = nil
+		v1.part = nil
 	end
-	return thrusterLightsState
+	return v1
 end
-local function setThrusterLightsEnabled(vehicle, isEnabled)
-	local thrusterLightsState = getThrusterLightsState(vehicle)
-	local part = thrusterLightsState.part
+local function setThrusterLightsEnabled(p1, p2) --[[ setThrusterLightsEnabled | Line: 1174 | Upvalues: getThrusterLightsState (copy), TweenService (copy), v16 (copy), v17 (copy) ]]
+	local v1 = getThrusterLightsState(p1)
+	local part = v1.part
 	if part then
-		if thrusterLightsState.isOn ~= isEnabled then
-			if thrusterLightsState.activeTween then
-				thrusterLightsState.activeTween:Cancel()
-				thrusterLightsState.activeTween = nil
+		if v1.isOn ~= p2 then
+			if v1.activeTween then
+				v1.activeTween:Cancel()
+				v1.activeTween = nil
 			end
-			thrusterLightsState.isOn = isEnabled
-			local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-			local tweenGoal = {
-				Color = isEnabled and thrusterLightsActiveColor or thrusterLightsInactiveColor
-			}
-			thrusterLightsState.activeTween = TweenService:Create(part, tweenInfo, tweenGoal)
-			thrusterLightsState.activeTween:Play()
+			v1.isOn = p2
+			local v3 = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+			local t = {}
+			t.Color = p2 and v16 or v17
+			v1.activeTween = TweenService:Create(part, v3, t)
+			v1.activeTween:Play()
 		end
 	end
 end
-local vehicleThrusterStates = {}
-function chassisInput.UpdateThrusterFlames(model, forwardInput, strafeInput, zVelocity, options)
-	local thrusterOptions = options or {}
-	local thrusterState = vehicleThrusterStates[model]
-	if not thrusterState then
-		local thrustersFolder = model.Model:FindFirstChild("Thrusters")
-		if thrustersFolder then
-			local centerAttachment = thrustersFolder:FindFirstChild("CenterAttachment")
-			local rightAttachment = thrustersFolder:FindFirstChild("RightAttachment")
-			local leftAttachment = thrustersFolder:FindFirstChild("LeftAttachment")
-			if centerAttachment and (rightAttachment and leftAttachment) then
-				local centerFlame = centerAttachment:FindFirstChild("Flame")
-				local rightFlame = rightAttachment:FindFirstChild("Flame")
-				local leftFlame = leftAttachment:FindFirstChild("Flame")
-				if centerFlame and (rightFlame and leftFlame) then
-					local newThrusterState = {
-						thrusters = thrustersFolder,
-						centerFlame = centerFlame,
-						rightFlame = rightFlame,
-						leftFlame = leftFlame,
-						thrusterSound = thrustersFolder:FindFirstChild("ThrusterSound")
+local t7 = {}
+function t4.UpdateThrusterFlames(p1, p2, p3, p4, p5) --[[ UpdateThrusterFlames | Line: 1201 | Upvalues: t7 (copy), t5 (ref), getThrusterLightsState (copy), setThrusterLightsEnabled (copy), t6 (copy) ]]
+	local v1 = p5 or {}
+	local v2 = t7[p1]
+	if not v2 then
+		local Thrusters = p1.Model:FindFirstChild("Thrusters")
+		if Thrusters then
+			local CenterAttachment = Thrusters:FindFirstChild("CenterAttachment")
+			local RightAttachment = Thrusters:FindFirstChild("RightAttachment")
+			local LeftAttachment = Thrusters:FindFirstChild("LeftAttachment")
+			if CenterAttachment and (RightAttachment and LeftAttachment) then
+				local Flame = CenterAttachment:FindFirstChild("Flame")
+				local Flame_2 = RightAttachment:FindFirstChild("Flame")
+				local Flame_3 = LeftAttachment:FindFirstChild("Flame")
+				if Flame and (Flame_2 and Flame_3) then
+					local t = {
+						thrusters = Thrusters,
+						centerFlame = Flame,
+						rightFlame = Flame_2,
+						leftFlame = Flame_3,
+						thrusterSound = Thrusters:FindFirstChild("ThrusterSound")
 					}
-					vehicleThrusterStates[model] = newThrusterState
-					thrusterState = newThrusterState
+					t7[p1] = t
+					v2 = t
 				else
 					return 0
 				end
@@ -950,236 +1025,245 @@ function chassisInput.UpdateThrusterFlames(model, forwardInput, strafeInput, zVe
 			return 0
 		end
 	end
-	local rightFlame = thrusterState.rightFlame
-	local leftFlame = thrusterState.leftFlame
+	local thrusters = v2.thrusters
+	local rightFlame = v2.rightFlame
+	local leftFlame = v2.leftFlame
 	local count = 0
-	local centerFlameEnabled = nil
-	local rightFlameEnabled = nil
-	local optionsTable, leftFlameEnabled
-	if strafeInput > 0 or thrusterOptions.client and inputMovementState[2] > 0 then
-		optionsTable = thrusterOptions
-		leftFlameEnabled = true
+	local v3 = nil
+	local v4 = nil
+	local v5, v6
+	if p3 > 0 or v1.client and t5[2] > 0 then
+		v5 = v1
+		v6 = true
 		count = count + 1
 	else
-		leftFlameEnabled = nil
-		optionsTable = thrusterOptions
+		v6 = nil
+		v5 = v1
 	end
-	if strafeInput < 0 or optionsTable.client and inputMovementState[4] > 0 then
+	if p3 < 0 or v5.client and t5[4] > 0 then
 		count = count + 1
-		rightFlameEnabled = true
+		v4 = true
 	end
-	if forwardInput > 0 then
-		centerFlameEnabled = true
+	if p2 > 0 then
+		v3 = true
 		count = count + 1
-	elseif zVelocity < 1 and zVelocity > -1 then
-		rightFlameEnabled = nil
-		leftFlameEnabled = nil
+	elseif p4 < 1 and p4 > -1 then
+		v4 = nil
+		v6 = nil
 		count = 0
 	end
-	thrusterState.centerFlame.Enabled = centerFlameEnabled == true
-	if forwardInput > 0 or zVelocity < 0 then
-		rightFlame.Enabled = rightFlameEnabled == true
-		leftFlame.Enabled = leftFlameEnabled == true
+	v2.centerFlame.Enabled = v3 == true
+	if p2 > 0 or p4 < 0 then
+		rightFlame.Enabled = v4 == true
+		leftFlame.Enabled = v6 == true
 	else
-		rightFlame.Enabled = leftFlameEnabled == true
-		leftFlame.Enabled = rightFlameEnabled == true
+		rightFlame.Enabled = v6 == true
+		leftFlame.Enabled = v4 == true
 	end
-	local thrusterSound = thrusterState.thrusterSound
+	local thrusterSound = v2.thrusterSound
 	if thrusterSound then
-		local targetVolume = if count > 0 then 0.175 else 0
-		setVolume(thrusterSound, targetVolume)
-		local targetPlaybackSpeed = (count - 1) * 0.1 + 0.7
-		setPlaybackSpeed(thrusterSound, targetPlaybackSpeed)
+		local v12 = if count > 0 then 0.175 else 0
+		if math.abs(thrusterSound.Volume - v12) > 0.001 then
+			thrusterSound.Volume = v12
+		end
+		local v14 = (count - 1) * 0.1 + 0.7
+		if math.abs(thrusterSound.PlaybackSpeed - v14) > 0.001 then
+			thrusterSound.PlaybackSpeed = v14
+		end
 	end
-	local thrusterLightsState = getThrusterLightsState(model)
-	if optionsTable.vehicleLeave then
-		vehicleThrusterStates[model] = nil
-		thrusterLightsState.hotUntil = 0
-		setThrusterLightsEnabled(model, false)
-		task.delay(0.25, function()
-			if vehicleThrusterLightsStates[model] == thrusterLightsState and not thrusterLightsState.isOn then
-				vehicleThrusterLightsStates[model] = nil
+	local v16 = getThrusterLightsState(p1)
+	if v5.vehicleLeave then
+		t7[p1] = nil
+		v16.hotUntil = 0
+		setThrusterLightsEnabled(p1, false)
+		task.delay(0.25, function() --[[ Line: 1282 | Upvalues: t6 (ref), p1 (copy), v16 (copy) ]]
+			if t6[p1] == v16 and not v16.isOn then
+				t6[p1] = nil
 			end
 		end)
-	elseif optionsTable.vehicleEnter then
-		thrusterLightsState.hotUntil = os.clock() + 2.5
-		setThrusterLightsEnabled(model, true)
+	elseif v5.vehicleEnter then
+		v16.hotUntil = os.clock() + 2.5
+		setThrusterLightsEnabled(p1, true)
 	else
-		local now = os.clock()
+		local v17 = os.clock()
 		if count > 0 then
-			thrusterLightsState.hotUntil = now + 2.5
+			v16.hotUntil = v17 + 2.5
 		end
-		setThrusterLightsEnabled(model, if count > 0 then true else now < thrusterLightsState.hotUntil)
+		setThrusterLightsEnabled(p1, if count > 0 then true else v17 < v16.hotUntil)
 	end
 	return count
 end
-function chassisInput.UpdateWheelLowQuality(raycastParams, rayDistance, wheelData, wheelRotation)
-	local Engine = wheelData.Engine
-	local Part = wheelData.Part
-	local wheelCFrame = Part.CFrame
-	local engineLocalWheelCFrame = Engine.CFrame:ToObjectSpace(wheelCFrame)
-	local sideSign = if engineLocalWheelCFrame.X > 0 then 1 else -1
-	local wheelRotationOffset = CFrame.new((wheelData.lateralRotateOffset or 0) * sideSign, 0, 0)
-	local raycastWheelCFrame = wheelCFrame * CFrame.new((wheelData.lateralOffset or 0) * sideSign, 0, 0) * wheelRotationOffset
-	local rayOrigin = raycastWheelCFrame.p
+function t4.UpdateWheelLowQuality(p1, p2, p3, p4) --[[ UpdateWheelLowQuality | Line: 1303 | Upvalues: v8 (copy), min (copy), v3 (copy), Angles (copy) ]]
+	local Engine = p3.Engine
+	local Part = p3.Part
+	local v2 = Part.CFrame
+	local v32 = Engine.CFrame:ToObjectSpace(v2)
+	local v6 = if v32.X > 0 then 1 else -1
+	local v7 = CFrame.new((p3.lateralRotateOffset or 0) * v6, 0, 0)
+	local v82 = v2 * CFrame.new((p3.lateralOffset or 0) * v6, 0, 0) * v7
+	local p = v82.p
 	local Motor = Part.Motor
-	local raycastResult = workspace:Raycast(rayOrigin, raycastWheelCFrame:VectorToWorldSpace(Vector3.new(0, -1, 0)) * rayDistance, raycastParams or raycastParamsMobile)
-	local hitPosition = if raycastResult then raycastResult.Position else nil
-	local suspensionOffsetY = -min(if hitPosition then (hitPosition - rayOrigin).magnitude else rayDistance, rayDistance) + Motor.Part0.Size.Y * 0.5
-	local motorOffset = CFrame.new(0, suspensionOffsetY, 0)
-	if engineLocalWheelCFrame.Z < 0 then
-		motorOffset = motorOffset * Angles(0, Engine.AssemblyAngularVelocity.Y * 0.5, 0)
+	local v9 = workspace:Raycast(p, v82:VectorToWorldSpace(Vector3.new(0, -1, 0)) * p2, v8)
+	local v10 = if v9 then v9.Position else nil
+	local v12 = -min(if v10 then (v10 - p).magnitude else p2, p2) + Motor.Part0.Size.Y * 0.5
+	local v13 = v3(0, v12, 0)
+	if v32.Z < 0 then
+		v13 = v13 * Angles(0, Engine.AssemblyAngularVelocity.Y * 0.5, 0)
 	end
-	Motor.C1 = motorOffset * wheelRotationOffset * Angles(wheelRotation, 0, 0)
+	Motor.C1 = v13 * v7 * Angles(p4, 0, 0)
 	local BridgeMotor = Part:FindFirstChild("BridgeMotor")
 	if BridgeMotor then
-		local bridgeLocalYOffset = wheelData.bridgeLocalYOffset or 0
-		local bridgeOffset = CFrame.new((wheelData.bridgeXOffset or 0) * sideSign, (wheelData.bridgeYOffset or 0) + bridgeLocalYOffset, 0)
-		BridgeMotor.C1 = bridgeOffset * CFrame.lookAt(Vector3.new(0, 0, 0), (Vector3.new(engineLocalWheelCFrame.X, suspensionOffsetY - bridgeLocalYOffset, 0)))
+		local v16 = p3.bridgeLocalYOffset or 0
+		local v17 = CFrame.new((p3.bridgeXOffset or 0) * v6, (p3.bridgeYOffset or 0) + v16, 0)
+		BridgeMotor.C1 = v17 * CFrame.lookAt(Vector3.new(0, 0, 0), (Vector3.new(v32.X, v12 - v16, 0)))
 	end
 end
-function chassisInput.UpdateSoundLowQuality(chassis, gears, velocity)
-	if chassis.EnumMakeId == nil then
-		chassis.EnumMakeId = EnumMake[chassis.Make]
+function t4.UpdateSoundLowQuality(p1, p2, p3) --[[ UpdateSoundLowQuality | Line: 1345 | Upvalues: EnumMake (copy), UpdateGearsAndRPM (copy) ]]
+	if p1.EnumMakeId == nil then
+		p1.EnumMakeId = EnumMake[p1.Make]
 	end
-	UpdateGearsAndRPM(chassis, gears, math.abs(velocity.Z), -math.sign(velocity.Z), 1 / 60)
+	UpdateGearsAndRPM(p1, p2, math.abs(p3.Z), -math.sign(p3.Z), 1 / 60)
 end
-local function UpdateThruster(chassis, wheelData, engineThruster, dt)
-	local Part = wheelData.Part
-	local Engine = wheelData.Engine
-	local wheelCFrame = Part.CFrame
-	local engineLocalWheelCFrame = Engine.CFrame:ToObjectSpace(wheelCFrame)
-	local sideSign = if engineLocalWheelCFrame.X > 0 then 1 else -1
-	local wheelRotationOffset = CFrame.new((wheelData.lateralRotateOffset or 0) * sideSign, 0, 0)
-	local lateralOffset = CFrame.new((wheelData.lateralOffset or 0) * sideSign, 0, 0)
-	local raycastCFrame = wheelCFrame * lateralOffset * wheelRotationOffset
-	local rayOrigin = raycastCFrame.p
+local function IsNaN(p1) --[[ IsNaN | Line: 1351 ]]
+	return p1 ~= p1
+end
+local function UpdateThruster(p1, p2, p3, p4) --[[ UpdateThruster | Line: 1355 | Upvalues: v7 (copy), min (copy), v3 (copy), Angles (copy), v12 (ref), abs (copy), v5 (copy), PhysicsLagService (copy), v4 (copy) ]]
+	local Part = p2.Part
+	local Engine = p2.Engine
+	local v2 = Part.CFrame
+	local v32 = Engine.CFrame:ToObjectSpace(v2)
+	local v6 = if v32.X > 0 then 1 else -1
+	local v72 = CFrame.new((p2.lateralRotateOffset or 0) * v6, 0, 0)
+	local v8 = CFrame.new((p2.lateralOffset or 0) * v6, 0, 0)
+	local v9 = v2 * v8 * v72
+	local p = v9.p
 	local Motor = Part.Motor
-	local Thruster = wheelData.Thruster
-	local thrustForce = Part.AssemblyMass * 9.81 * 20
-	local suspensionForce = thrustForce * chassis.Suspension
-	if IsNaN(suspensionForce) then
-		suspensionForce = 0
+	local Thruster = p2.Thruster
+	local v10 = Part.AssemblyMass * 9.81 * 20
+	local v11 = v10 * p1.Suspension
+	if v11 ~= v11 then
+		v11 = 0
 	end
-	local dampingCoefficient = suspensionForce / chassis.Bounce
-	if IsNaN(dampingCoefficient) then
-		dampingCoefficient = 0
+	local v122 = v11 / p1.Bounce
+	if v122 ~= v122 then
+		v122 = 0
 	end
-	local localWheelVelocity = raycastCFrame:VectorToObjectSpace(Part.Velocity)
-	local Height = chassis.Height
-	local suspensionHeightOffset = chassis.Model:GetAttribute("GarageSuspensionHeight")
-	if suspensionHeightOffset then
-		Height = Height + suspensionHeightOffset
+	local v13 = v9:VectorToObjectSpace(Part.Velocity)
+	local Height = p1.Height
+	local v14 = p1.Model:GetAttribute("GarageSuspensionHeight")
+	if v14 then
+		Height = Height + v14
 	end
-	local heightOffsetBase = wheelData._heightOffset or 0
-	local interpolatedHeightOffset = heightOffsetBase + ((Part:GetAttribute("ThrusterHeightOffset") or 0) - heightOffsetBase) * 0.1
-	wheelData._heightOffset = interpolatedHeightOffset
-	local rayDistance = if chassis.AreTiresPopped then chassis.Height - 0.5 else Height + interpolatedHeightOffset
-	local raycastResult = workspace:Raycast(p, raycastCFrame:VectorToWorldSpace(Vector3.new(0, -1, 0)) * rayDistance, raycastParamsDefault)
-	local hitInstance, hitPosition
-	if raycastResult then
-		hitInstance = raycastResult.Instance
-		hitPosition = raycastResult.Position
+	local v15 = p2._heightOffset or 0
+	local v16 = v15 + ((Part:GetAttribute("ThrusterHeightOffset") or 0) - v15) * 0.1
+	p2._heightOffset = v16
+	local v17 = if p1.AreTiresPopped then p1.Height - 0.5 else Height + v16
+	local v18 = workspace:Raycast(p, v9:VectorToObjectSpace(Vector3.new(0, -1, 0)) * v17, v7)
+	local v19, v20
+	if v18 then
+		v19 = v18.Instance
+		v20 = v18.Position
 	else
-		hitPosition = nil
-		hitInstance = nil
+		v20 = nil
+		v19 = nil
 	end
-	local distanceToHit = if hitPosition then (hitPosition - rayOrigin).Magnitude else rayDistance
-	local tirePart = chassis.AreTiresPopped and Part.Parent:FindFirstChild("Rim") or Part.Parent:FindFirstChild("TireMesh")
-	local tireHeight = if tirePart then tirePart.Size.Y else 0
-	local motorYOffset = -min(distanceToHit, rayDistance) + tireHeight * 0.5
+	local v21 = if v20 then (v20 - p).Magnitude else v17
+	local v22 = p1.AreTiresPopped and Part.Parent:FindFirstChild("Rim") or Part.Parent:FindFirstChild("TireMesh")
+	local v23 = if v22 then v22.Size.Y else 0
+	local v24 = -min(v21, v17) + v23 * 0.5
 	local Y = Motor.C1.Y
-	local interpolatedMotorY = Y + (motorYOffset - Y) * 0.5
-	local motorCFrame = CFrame.new(0, interpolatedMotorY, 0) * lateralOffset
-	local previousMotorC1 = Motor.C1
+	local v25 = Y + (v24 - Y) * 0.5
+	local v26 = v3(0, v25, 0) * v8
 	local Drift = Part:FindFirstChild("Drift")
-	if engineLocalWheelCFrame.Z < 0 then
-		motorCFrame = motorCFrame * Angles(0, chassis.RotY * 0.4 + Engine.RotVelocity.Y * 0.2, 0)
-	elseif Drift and (hitInstance and (handbrakeEnabled or chassis.Drift)) then
-		chassis._didAnyWheelDrift = true
-		Drift.C0 = CFrame.new(0, -interpolatedMotorY + tireHeight * 0.5, 0)
-		for _, driftChild in Drift.Part0:GetChildren() do
-			if driftChild:IsA("ParticleEmitter") then
-				local driftAccumulation = (driftChild:GetAttribute("DriftAccum") or 0) + driftChild.Rate * dt
-				local driftEmitCount = math.floor(driftAccumulation)
-				if driftEmitCount > 0 then
-					driftChild:Emit(driftEmitCount)
+	if v32.Z < 0 then
+		v26 = v26 * Angles(0, p1.RotY * 0.4 + Engine.RotVelocity.Y * 0.2, 0)
+	elseif Drift and (v19 and (v12 or p1.Drift)) then
+		p1._didAnyWheelDrift = true
+		Drift.C0 = CFrame.new(0, -v25 + v23 * 0.5, 0)
+		for v27, v28 in Drift.Part0:GetChildren() do
+			if v28:IsA("ParticleEmitter") then
+				local v29 = (v28:GetAttribute("DriftAccum") or 0) + v28.Rate * p4
+				local v30 = math.floor(v29)
+				if v30 > 0 then
+					v28:Emit(v30)
 				end
-				driftChild:SetAttribute("DriftAccum", driftAccumulation - driftEmitCount)
+				v28:SetAttribute("DriftAccum", v29 - v30)
 			end
 		end
 	end
-	local finalMotorCFrame = motorCFrame * wheelRotationOffset * Angles(engineThruster.WheelRotation or 0, 0, 0)
-	if finalMotorCFrame.x ~= finalMotorCFrame.x or (finalMotorCFrame.y ~= finalMotorCFrame.y or (finalMotorCFrame.z ~= finalMotorCFrame.z or abs(finalMotorCFrame.x + finalMotorCFrame.y + finalMotorCFrame.z) > 100)) then
-		finalMotorCFrame = previousMotorC1
+	local v31 = v26 * v72 * Angles(p3.WheelRotation or 0, 0, 0)
+	if v31.x ~= v31.x or (v31.y ~= v31.y or (v31.z ~= v31.z or abs(v31.x + v31.y + v31.z) > 100)) then
+		v31 = v5
 	end
-	Motor.C1 = finalMotorCFrame
-	local forceDivisor = 4 / wheelData.NumWheels
-	if hitInstance then
-		local dampingForce = localWheelVelocity * dampingCoefficient
-		local maxThrustForce = thrustForce * 0.5
-		local minThrustForce = -thrustForce * 0.5
-		local sum = (rayDistance - min(distanceToHit, rayDistance)) ^ 2 * (suspensionForce / rayDistance ^ 2)
-		if localWheelVelocity.magnitude > 0.01 then
-			sum = sum - dampingForce.Y
+	Motor.C1 = v31
+	local v322 = 4 / p2.NumWheels
+	if v19 then
+		local v33 = v13 * v122
+		local v34 = v10 * 0.5
+		local v35 = -v10 * 0.5
+		local sum = (v17 - min(v21, v17)) ^ 2 * (v11 / v17 ^ 2)
+		if v13.magnitude > 0.01 then
+			sum = sum - v33.Y
 		end
-		if IsNaN(sum) then
+		if sum ~= sum then
 			sum = 0
 		end
-		local physicsMultiplier = 1
-		local physicsStepsMult = PhysicsLagService.getEstimatedPhysicsStepsMult()
-		if physicsStepsMult >= 1 then
-			physicsMultiplier = physicsMultiplier / physicsStepsMult
+		local v37 = 1
+		local v38 = PhysicsLagService.getEstimatedPhysicsStepsMult()
+		if v38 >= 1 then
+			v37 = v37 / v38
 		end
-		Thruster.Force = Vector3New(0, if maxThrustForce < sum then maxThrustForce elseif sum < minThrustForce then minThrustForce else sum * math.clamp(physicsMultiplier, 0, 1) * forceDivisor, 0)
+		Thruster.Force = v4(0, if v34 < sum then v34 elseif sum < v35 then v35 else sum * math.clamp(v37, 0, 1) * v322, 0)
 	else
 		Thruster.Force = Vector3.new(0, 0, 0)
 	end
 	local BridgeMotor = Part:FindFirstChild("BridgeMotor")
 	if BridgeMotor then
-		local bridgeLocalYOffset = wheelData.bridgeLocalYOffset or 0
-		local bridgeCFrame = CFrame.new((wheelData.bridgeXOffset or 0) * sideSign, (wheelData.bridgeYOffset or 0) + bridgeLocalYOffset, 0)
-		BridgeMotor.C1 = bridgeCFrame * CFrame.lookAt(Vector3.new(0, 0, 0), (Vector3.new(engineLocalWheelCFrame.X, interpolatedMotorY - bridgeLocalYOffset, 0)))
+		local v41 = p2.bridgeLocalYOffset or 0
+		local v422 = CFrame.new((p2.bridgeXOffset or 0) * v6, (p2.bridgeYOffset or 0) + v41, 0)
+		BridgeMotor.C1 = v422 * CFrame.lookAt(Vector3.new(0, 0, 0), (Vector3.new(v32.X, v25 - v41, 0)))
 	end
 end
-local function fpor2Autopilot(origin, rayVec, ignoreModel)
-	local magnitude = rayVec.magnitude
-	local unit = rayVec.unit
-	local hitCount = 0
-	local currentOrigin = origin
-	local traveledDistance = 0
-	local ignoreList = { ignoreModel }
+local function fpor2Autopilot(p1, p2, p3) --[[ fpor2Autopilot | Line: 1489 | Upvalues: v6 (copy), FindPartOnRayWithIgnoreList (copy) ]]
+	local magnitude = p2.magnitude
+	local unit = p2.unit
+	local count, v1, v2, v3 = 0, p1, 0, { p3 }
 	while true do
-		local hitPart, hitPosition, hitNormal
-		hitCount = hitCount + 1
-		local candidatePart, candidatePosition, candidateNormal = FindPartOnRayWithIgnoreList(workspace, RayNew(currentOrigin, unit * (magnitude - traveledDistance)), ignoreList, false, true)
-		if candidatePart then
-			if candidatePart.CanCollide then
-				if candidatePart.Material == Enum.Material.Asphalt then
-					hitPart = candidatePart
+		local v4, v5, v62, v7, v8, v9
+		count = count + 1
+		v4, v5, v62 = FindPartOnRayWithIgnoreList(workspace, v6(v1, unit * (magnitude - v2)), v3, false, true)
+		if v4 then
+			v4 = v4.CanCollide
+			if v4 then
+				if v4.Material == Enum.Material.Asphalt then
+					v4, v7 = true, v4
 				else
-					hitPart = nil
+					v4, v7 = false, v4
 				end
-			end
-		end
-		if not hitPart then
-			table.insert(ignoreList, candidatePart)
-		end
-		traveledDistance = (origin - candidatePosition).magnitude
-		if hitPart or (magnitude - traveledDistance <= 0.001 or hitCount > 4) then
-			if hitPart then
-				hitPosition = candidatePosition
-				hitNormal = candidateNormal
 			else
-				hitPosition = origin + unit * magnitude
-				hitNormal = Vector3.new(0, -1, 0)
+				v7 = v4
 			end
-			return hitPart, hitPosition, hitNormal
+		else
+			v7 = v4
 		end
-		currentOrigin = candidatePosition
+		if not v4 then
+			table.insert(v3, v7)
+		end
+		v2 = (p1 - v5).magnitude
+		if v4 or (magnitude - v2 <= 0.001 or count > 4) then
+			if v7 then
+				v8 = v5
+				v9 = v62
+			else
+				v8 = p1 + unit * magnitude
+				v9 = Vector3.new(0, -1, 0)
+			end
+			return v7, v8, v9
+		end
+		v1 = v5
 	end
 end
-local largeVehicleWhitelist = {
+local t8 = {
 	[EnumMake.Proto8] = true,
 	[EnumMake.Parisian] = true,
 	[EnumMake.Semi] = true,
@@ -1187,7 +1271,7 @@ local largeVehicleWhitelist = {
 	[EnumMake.Aperture] = true,
 	[EnumMake.Fiasco] = true
 }
-local vehicleMaxHornPitch = {
+local t9 = {
 	[EnumMake.Firetruck] = 450,
 	[EnumMake.Surus] = 450,
 	[EnumMake.BankTruck] = 450,
@@ -1241,166 +1325,166 @@ local vehicleMaxHornPitch = {
 	[EnumMake.TheCamper] = 300,
 	[EnumMake.AdminNuke] = 900
 }
-function chassisInput.UpdateEngine(chassis, engineThruster, dt)
-	local Model = chassis.Model
-	local CanDrive = engineThruster.CanDrive
-	local Engine = engineThruster.Engine
-	local engineCFrame = Engine.CFrame
-	local engineHalfSize = Engine.Size * 0.5
-	local Rotate = chassis.Rotate
-	local Height = chassis.Height
-	local gravityForce = Engine.AssemblyMass * 9.81 * 20
-	local TurnSpeed = chassis.TurnSpeed
-	local EnumMakeId = chassis.EnumMakeId
-	local localVelocity = engineCFrame:VectorToObjectSpace(Engine.AssemblyLinearVelocity)
-	local Magnitude = localVelocity.Magnitude
-	local currentTime = os.clock()
-	local _spinOutAt = chassis._spinOutAt
+function t4.UpdateEngine(p1, p2, p3) --[[ UpdateEngine | Line: 1588 | Upvalues: t5 (ref), InputUtils (copy), GetMoveVector (ref), abs (copy), v12 (ref), v4 (copy), fpor2Autopilot (copy), Time (copy), EnumMake (copy), HapticEffect (copy), t4 (copy), tanh (copy), EnvironmentUtils (copy), EnvironmentConsts (copy), UpdateGearsAndRPM (copy), v7 (copy), Audio (copy), t9 (copy), t8 (copy), max (copy), VehicleUtils (copy), v9 (ref), v1 (copy), Settings (copy), Region (copy), v11 (ref), t2 (copy), t (copy), t3 (copy), DoorUtils (copy) ]]
+	local Model = p1.Model
+	local CanDrive = p2.CanDrive
+	local Engine = p2.Engine
+	local v13 = Engine.CFrame
+	local v2 = Engine.Size * 0.5
+	local Rotate = p1.Rotate
+	local Height = p1.Height
+	local v3 = Engine.AssemblyMass * 9.81 * 20
+	local TurnSpeed = p1.TurnSpeed
+	local EnumMakeId = p1.EnumMakeId
+	local v42 = v13:VectorToObjectSpace(Engine.AssemblyLinearVelocity)
+	local Magnitude = v42.Magnitude
+	local v5 = os.clock()
+	local _spinOutAt = p1._spinOutAt
 	if _spinOutAt then
-		_spinOutAt = currentTime - chassis._spinOutAt < 3
+		_spinOutAt = v5 - p1._spinOutAt < 3
 	end
-	local forwardInput = inputMovementState[1] - inputMovementState[3]
-	local steerInput = inputMovementState[2] - inputMovementState[4]
+	local v6 = t5[1] - t5[3]
+	local v72 = t5[2] - t5[4]
 	if InputUtils.isTouch() then
 		local X = GetMoveVector().X
-		local lateralOffset = math.clamp(X, -1, 1)
-		steerInput = -lateralOffset * abs(lateralOffset)
+		local v8 = math.clamp(X, -1, 1)
+		v72 = -v8 * abs(v8)
 	end
 	if _spinOutAt then
-		forwardInput = forwardInput * 0.5
-		if chassis.AreTiresPopped and chassis._spinOutLeft ~= nil then
-			TurnSpeed = chassis._pitTurnSpeed or 2
-			steerInput = if chassis._spinOutLeft then 1 else -1
+		v6 = v6 * 0.5
+		if p1.AreTiresPopped and p1._spinOutLeft ~= nil then
+			TurnSpeed = p1._pitTurnSpeed or 2
+			v72 = if p1._spinOutLeft then 1 else -1
 		end
 	end
-	local forceHardBraking = Model:GetAttribute("ForceHardBraking") == true
-	if forceHardBraking then
-		handbrakeEnabled = true
+	local v92 = Model:GetAttribute("ForceHardBraking") == true
+	if v92 then
+		v12 = true
 	end
-	if chassis.LockMovement or Model:GetAttribute("LockMovement") then
-		forwardInput = 0
-		steerInput = 0
+	if p1.LockMovement or Model:GetAttribute("LockMovement") then
+		v6 = 0
+		v72 = 0
 	end
-	if chassis.DriveToPosition and (forwardInput == 0 and steerInput == 0) then
-		local DriveToPosition = chassis.DriveToPosition
-		local enginePosition = engineCFrame.p
-		local driveDirection = Vector3New(DriveToPosition.X - enginePosition.X, 0, DriveToPosition.Z - enginePosition.Z)
-		if driveDirection.Magnitude <= (chassis.DriveToPositionArrivalRadius or 4) then
-			local DriveToPositionOnReached = chassis.DriveToPositionOnReached
-			chassis.DriveToPosition = nil
-			chassis.DriveToPositionOnReached = nil
+	if p1.DriveToPosition and (v6 == 0 and v72 == 0) then
+		local DriveToPosition = p1.DriveToPosition
+		local p = v13.p
+		local v10 = v4(DriveToPosition.X - p.X, 0, DriveToPosition.Z - p.Z)
+		if v10.Magnitude <= (p1.DriveToPositionArrivalRadius or 4) then
+			local DriveToPositionOnReached = p1.DriveToPositionOnReached
+			p1.DriveToPosition = nil
+			p1.DriveToPositionOnReached = nil
 			if DriveToPositionOnReached then
 				DriveToPositionOnReached:Fire()
 			end
-			forwardInput = 0
-			steerInput = 0
+			v6 = 0
+			v72 = 0
 		else
-			local LookVector = engineCFrame.LookVector
-			local Unit = Vector3New(LookVector.X, 0, LookVector.Z).Unit
-			local Unit_2 = driveDirection.Unit
-			local directionAlignment = Unit:Dot(Unit_2)
-			local steerDirection = math.clamp(-(Unit.X * Unit_2.Z - Unit.Z * Unit_2.X) * 2.5, -1, 1)
-			if directionAlignment > 0.3 then
-				forwardInput, steerInput = math.min(1, 0.3 + 0.7 * directionAlignment), steerDirection
-			elseif directionAlignment < -0.3 then
-				forwardInput, steerInput = math.max(-1, -0.3 + 0.7 * directionAlignment), steerDirection
+			local LookVector = v13.LookVector
+			local Unit = v4(LookVector.X, 0, LookVector.Z).Unit
+			local Unit_2 = v10.Unit
+			local v112 = Unit:Dot(Unit_2)
+			local v132 = math.clamp(-(Unit.X * Unit_2.Z - Unit.Z * Unit_2.X) * 2.5, -1, 1)
+			if v112 > 0.3 then
+				v6, v72 = math.min(1, 0.3 + 0.7 * v112), v132
+			elseif v112 < -0.3 then
+				v6, v72 = math.max(-1, -0.3 + 0.7 * v112), v132
 			else
-				forwardInput = 0
-				steerInput = steerDirection
+				v6 = 0
+				v72 = v132
 			end
 		end
-	elseif chassis.Autopilot then
-		local headingDirection = engineCFrame.lookVector:Cross(Vector3.new(0, 1, 0))
-		local laneDetectionResult = fpor2Autopilot(engineCFrame * Vector3New(0, 0, -engineHalfSize.Z - abs(localVelocity.Z) * 16 * dt), Vector3.new(0, -10, 0), Model)
-		if laneDetectionResult then
-			local laneAlignment = (laneDetectionResult.CFrame * Vector3New(-laneDetectionResult.Size.X * 0.5 + math.floor((laneDetectionResult.CFrame:toObjectSpace(engineCFrame).X + laneDetectionResult.Size.X * 0.5) / 12) * 12 + 6, 0, -laneDetectionResult.Size.Z * 0.5 * if engineCFrame.lookVector:Dot(laneDetectionResult.CFrame.lookVector) > 0 then 1 else -1) - engineCFrame.p).unit:Dot(headingDirection)
-			local alignmentStrength = laneAlignment * 4
-			local steerAdjustment = steerInput - if alignmentStrength < -1 then -1 elseif alignmentStrength > 1 then 1 else alignmentStrength
-			local forwardAdjustment = forwardInput + (1 - abs(laneAlignment) ^ 0.16666666666666666) - abs(laneAlignment) ^ 4 * 0.3
-			forwardInput = if forwardAdjustment > 1 then 1 elseif forwardAdjustment < -1 then -1 else forwardAdjustment
-			steerInput = if steerAdjustment > 1 then 1 elseif steerAdjustment < -1 then -1 else steerAdjustment
+	elseif p1.Autopilot then
+		local v16 = v13.lookVector:Cross(Vector3.new(0, 1, 0))
+		local v17 = fpor2Autopilot(v13 * v4(0, 0, -v2.Z - abs(v42.Z) * 16 * p3), Vector3.new(0, -10, 0), Model)
+		if v17 then
+			local v22 = (v17.CFrame * v4(-v17.Size.X * 0.5 + math.floor((v17.CFrame:toObjectSpace(v13).X + v17.Size.X * 0.5) / 12) * 12 + 6, 0, -v17.Size.Z * 0.5 * if v13.lookVector:Dot(v17.CFrame.lookVector) > 0 then 1 else -1) - v13.p).unit:Dot(v16)
+			local v23 = v22 * 4
+			local v25 = v72 - if v23 < -1 then -1 elseif v23 > 1 then 1 else v23
+			local v26 = v6 + (1 - abs(v22) ^ 0.16666666666666666) - abs(v22) ^ 4 * 0.3
+			v6 = if v26 > 1 then 1 elseif v26 < -1 then -1 else v26
+			v72 = if v25 > 1 then 1 elseif v25 < -1 then -1 else v25
 		end
 	end
-	local vHeading = chassis.vHeading
-	local calculatedHeading = vHeading + steerInput * dt * 60 - vHeading * if steerInput == 0 then 0.3 else 0.16 * dt * 60
-	chassis.vHeading = calculatedHeading
-	local engineLocalWheelCFrame = calculatedHeading * 0.16
-	local Cd = chassis.Cd
-	local Crr = chassis.Crr
-	local Cb = chassis.Cb
-	local dampingForce = nil
-	local TirePopProportion = chassis.TirePopProportion
-	local maxThrustForce = Model:GetAttribute("VehicleTiresLastPop") or 0
-	local popRecoveryProgress = math.min((Time.GetNowSync() - maxThrustForce) / chassis.DisableDuration, 1)
-	local physicsMultiplier = if popRecoveryProgress < 0.999 then chassis.Make ~= "AdminNuke" else false
-	if physicsMultiplier then
-		local physicsStepsMult = if popRecoveryProgress < TirePopProportion then 0 else (popRecoveryProgress - TirePopProportion) / (1 - TirePopProportion)
-		dampingForce = gravityForce * ((Vector3.new(0, 0, 0) - localVelocity) / ((1 - physicsStepsMult) * 200 + physicsStepsMult * 500))
-		forwardInput = 0
+	local vHeading = p1.vHeading
+	local v31 = vHeading + v72 * p3 * 60 - vHeading * if v72 == 0 then 0.3 else 0.16 * p3 * 60
+	p1.vHeading = v31
+	local v32 = v31 * 0.16
+	local Cd = p1.Cd
+	local Crr = p1.Crr
+	local Cb = p1.Cb
+	local v33 = nil
+	local TirePopProportion = p1.TirePopProportion
+	local v34 = Model:GetAttribute("VehicleTiresLastPop") or 0
+	local v36 = math.min((Time.GetNowSync() - v34) / p1.DisableDuration, 1)
+	local v37 = if v36 < 0.999 then p1.Make ~= "AdminNuke" else false
+	if v37 then
+		local v38 = if v36 < TirePopProportion then 0 else (v36 - TirePopProportion) / (1 - TirePopProportion)
+		v33 = v3 * ((Vector3.new(0, 0, 0) - v42) / ((1 - v38) * 200 + v38 * 500))
+		v6 = 0
 		if Magnitude > 30 then
-			chassis.LastDrift = tick()
+			p1.LastDrift = tick()
 		end
 	end
-	chassis.AreTiresPopped = physicsMultiplier
-	if steerInput ~= 0 and (steerInput / abs(steerInput) ~= localVelocity.X / abs(localVelocity.X) and abs(localVelocity.X) > 8) then
-		chassis.LastDrift = tick()
+	p1.AreTiresPopped = v37
+	if v72 ~= 0 and (v72 / abs(v72) ~= v42.X / abs(v42.X) and abs(v42.X) > 8) then
+		p1.LastDrift = tick()
 	end
-	local isRecentDrift = tick() - chassis.LastDrift < 0.3
+	local v39 = tick() - p1.LastDrift < 0.3
 	if EnumMakeId == EnumMake.Volt then
-		handbrakeEnabled = false
-		isRecentDrift = false
+		v12 = false
+		v39 = false
 	end
-	chassis.Drift = isRecentDrift
-	local isDriftActive = if Magnitude > 50 then handbrakeEnabled or chassis.Drift else false
-	if isDriftActive and chassis._haptic == nil then
-		chassis._haptic = HapticEffect.basic(0.2, (1 / 0))
-	elseif chassis._haptic and not isDriftActive then
-		chassis._haptic:Destroy()
-		chassis._haptic = nil
+	p1.Drift = v39
+	local v40 = if Magnitude > 50 then v12 or p1.Drift else false
+	if v40 and p1._haptic == nil then
+		p1._haptic = HapticEffect.basic(0.2, (1 / 0))
+	elseif p1._haptic and not v40 then
+		p1._haptic:Destroy()
+		p1._haptic = nil
 	end
-	local Volume = chassis.Sounds.DriftSqueal.Volume
-	chassis.Sounds.DriftSqueal.Volume = if Magnitude > 30 and (isRecentDrift or handbrakeEnabled and steerInput ~= 0) or (_spinOutAt or chassis.LaunchSpeedMult) then Volume + (0.3 - Volume) * 0.06 else Volume + (0 - Volume) * 0.1
-	chassisInput.UpdateForces(chassis, engineThruster, dt)
-	local forwardVelocityFrame = localVelocity.Z * dt
-	if IsNaN(forwardVelocityFrame) then
-		forwardVelocityFrame = 0
+	local Volume = p1.Sounds.DriftSqueal.Volume
+	p1.Sounds.DriftSqueal.Volume = if Magnitude > 30 and (v39 or v12 and v72 ~= 0) or (_spinOutAt or p1.LaunchSpeedMult) then Volume + (0.3 - Volume) * 0.06 else Volume + (0 - Volume) * 0.1
+	t4.UpdateForces(p1, p2, p3)
+	local v43 = v42.Z * p3
+	if v43 ~= v43 then
+		v43 = 0
 	end
-	engineThruster.WheelRotation = ((engineThruster.WheelRotation or 0) + forwardVelocityFrame / (chassis.Wheels[1].Model.PrimaryPart.Size.Y * 0.5)) % 6.283185307179586
-	local velocityDampingFactor = tanh(abs(localVelocity.magnitude) * 0.03)
-	local Traction = chassis.Traction
-	local tractionScale = (handbrakeEnabled or isRecentDrift) and (1 - velocityDampingFactor) ^ 2 or 1
+	p2.WheelRotation = ((p2.WheelRotation or 0) + v43 / (p1.Wheels[1].Model.PrimaryPart.Size.Y * 0.5)) % 6.283185307179586
+	local v44 = tanh(abs(v42.magnitude) * 0.03)
+	local Traction = p1.Traction
+	local v45 = (v12 or v39) and (1 - v44) ^ 2 or 1
 	if EnvironmentUtils.getPrecipitation() == EnvironmentConsts.PRECIPITATION_ENUM.Rain then
-		tractionScale = tractionScale * 0.4
+		v45 = v45 * 0.4
 	end
 	if _spinOutAt then
-		tractionScale = tractionScale * 0.6
+		v45 = v45 * 0.6
 	end
-	local smoothedTraction = if tractionScale < 0.07 then 0.07 else tractionScale
-	local currentTraction = Traction + (smoothedTraction - Traction) * if smoothedTraction < Traction then 0.2 else 0.01 * dt * 60
-	if currentTraction < 0 then
-		currentTraction = 0
+	local v46 = if v45 < 0.07 then 0.07 else v45
+	local v48 = Traction + (v46 - Traction) * if v46 < Traction then 0.2 else 0.01 * p3 * 60
+	if v48 < 0 then
+		v48 = 0
 	end
-	chassis.Traction = currentTraction
-	local Gears = chassis.Gears
-	local forwardSpeed = math.abs(localVelocity.Z)
-	local currentGear, gearRatioMult = UpdateGearsAndRPM(chassis, Gears, forwardSpeed, forwardInput, dt)
-	chassis.LastFakeGear = gearRatioMult
-	local vector52 = workspace:Raycast(engineCFrame * Vector3New(0, 0, engineHalfSize.Z - 1), engineCFrame:vectorToWorldSpace(Vector3.new(0, -1, 0)) * Height * 2, raycastParamsDefault)
-	local groundHit, groundMaterial
-	if vector52 then
-		groundHit = vector52.Instance
-		groundMaterial = vector52.Material
+	p1.Traction = v48
+	local Gears = p1.Gears
+	local v49 = math.abs(v42.Z)
+	local v50, v51 = UpdateGearsAndRPM(p1, Gears, v49, v6, p3)
+	p1.LastFakeGear = v51
+	local v52 = workspace:Raycast(v13 * v4(0, 0, v2.Z - 1), v13:vectorToWorldSpace(Vector3.new(0, -1, 0)) * Height * 2, v7)
+	local v53, v54
+	if v52 then
+		v53 = v52.Instance
+		v54 = v52.Material
 	else
-		groundMaterial = nil
-		groundHit = nil
+		v53 = nil
+		v54 = nil
 	end
-	local hasLaunchControl = chassis.CanLaunchControl == true
-	if hasLaunchControl and (inputMovementState[1] == 1 and (inputMovementState[3] == 1 and (forwardSpeed < 10 and not (chassis.LaunchSpeedMult or chassis.AreTiresPopped)))) then
-		if chassis.LaunchHeldSince == nil then
-			chassis.LaunchHeldSince = os.clock()
+	local v55 = p1.CanLaunchControl == true
+	if v55 and (t5[1] == 1 and (t5[3] == 1 and (v49 < 10 and not (p1.LaunchSpeedMult or p1.AreTiresPopped)))) then
+		if p1.LaunchHeldSince == nil then
+			p1.LaunchHeldSince = os.clock()
 		end
-		if chassis.LaunchHoldSound == nil then
-			chassis.LaunchHoldSound = Audio.ObjectLocal(Model.Engine, 115412433949268, {
+		if p1.LaunchHoldSound == nil then
+			p1.LaunchHoldSound = Audio.ObjectLocal(Model.Engine, 115412433949268, {
 				Volume = 0,
 				Looped = true,
 				RollOffMinDistance = 16,
@@ -1408,528 +1492,527 @@ function chassisInput.UpdateEngine(chassis, engineThruster, dt)
 				RollOffMode = Enum.RollOffMode.InverseTapered
 			})
 		end
-		chassis.LaunchHoldSound.Volume = math.clamp(chassis.LaunchHoldSound.Volume + dt * 0.8, 0, 0.6)
-		chassis.LastDrift = tick()
-	elseif hasLaunchControl and (chassis.LaunchHeldSince and (os.clock() - chassis.LaunchHeldSince >= 2 and forwardInput == 1)) then
+		p1.LaunchHoldSound.Volume = math.clamp(p1.LaunchHoldSound.Volume + p3 * 0.8, 0, 0.6)
+		p1.LastDrift = tick()
+	elseif v55 and (p1.LaunchHeldSince and (os.clock() - p1.LaunchHeldSince >= 2 and v6 == 1)) then
 		print("LAUNCH!")
-		chassis.LaunchHeldSince = nil
-		chassis.LaunchStartedAt = os.clock()
-		chassis.LaunchSpeedMult = 4
+		p1.LaunchHeldSince = nil
+		p1.LaunchStartedAt = os.clock()
+		p1.LaunchSpeedMult = 4
 		Audio.ObjectLocal(Model.Engine, 15684233147, {
 			Volume = 1.5,
 			RollOffMaxDistance = 128,
 			RollOffMinDistance = 32
 		})
-	elseif hasLaunchControl then
-		chassis.LaunchHeldSince = nil
-		if chassis.LaunchHoldSound then
-			chassis.LaunchHoldSound.Volume = 0
+	elseif v55 then
+		p1.LaunchHeldSince = nil
+		if p1.LaunchHoldSound then
+			p1.LaunchHoldSound.Volume = 0
 		end
-		if chassis.LaunchSpeedMult then
-			chassis.LaunchSpeedMult = chassis.LaunchSpeedMult - dt * 3
-			if chassis.LaunchSpeedMult < 1 then
-				chassis.LaunchSpeedMult = nil
+		if p1.LaunchSpeedMult then
+			p1.LaunchSpeedMult = p1.LaunchSpeedMult - p3 * 3
+			if p1.LaunchSpeedMult < 1 then
+				p1.LaunchSpeedMult = nil
 			end
 		end
 	end
-	if not chassis.TractionMag then
-		chassis.TractionMag = vehicleMaxHornPitch[EnumMakeId] or 300
+	if not p1.TractionMag then
+		p1.TractionMag = t9[EnumMakeId] or 300
 	end
-	local dragForce = -Cd * localVelocity * Magnitude * Vector3New(0, 0, if forwardInput < 0 then 80 else 1)
-	local vector63 = -Crr * localVelocity * Vector3.new(0, 0, 1)
-	local lateralFrictionForce = -Vector3New(math.clamp(localVelocity.X, -150, 150), 0, 0) * chassis.TractionMag * currentTraction * 150 / 588600 * gravityForce
-	if EnumMakeId == EnumMake.ATV and gravityForce * 0.05 < math.abs(vector63.X) then
-		vector63 = Vector3.new(math.clamp(vector63.X, -gravityForce * 0.05, gravityForce * 0.05), 0, vector63.Z)
+	local v62 = -Cd * v42 * Magnitude * v4(0, 0, if v6 < 0 then 80 else 1)
+	local v63 = -Crr * v42 * Vector3.new(0, 0, 1)
+	local v64 = -v4(math.clamp(v42.X, -150, 150), 0, 0) * p1.TractionMag * v48 * 150 / 588600 * v3
+	if EnumMakeId == EnumMake.ATV and v3 * 0.05 < math.abs(v63.X) then
+		v63 = Vector3.new(math.clamp(v63.X, -v3 * 0.05, v3 * 0.05), 0, v63.Z)
 	end
-	local gravityNormalized = gravityForce / 196.20000000000002
-	local brakingForce = -(Cb * (1 + chassis.GarageBrakes)) * localVelocity.Z / abs(localVelocity.Z)
-	if IsNaN(brakingForce) then
-		brakingForce = 0
+	local v67 = v3 / 196.20000000000002
+	local v68 = -(Cb * (1 + p1.GarageBrakes)) * v42.Z / abs(v42.Z)
+	if v68 ~= v68 then
+		v68 = 0
 	end
-	local vector69 = brakingForce / 18000 * gravityNormalized * Vector3.new(0, 0, 1)
-	if forceHardBraking then
-		vector69 = vector69 * 40
+	local v69 = v68 / 18000 * v67 * Vector3.new(0, 0, 1)
+	if v92 then
+		v69 = v69 * 40
 	end
-	local vector70 = -Cb * 0.3 * localVelocity * Vector3.new(1, 0, 0)
-	local Nitro = chassis.Nitro
-	local _lastJumpAt = chassis._lastJumpAt
+	local v70 = -Cb * 0.3 * v42 * Vector3.new(1, 0, 0)
+	local Nitro = p1.Nitro
+	local _lastJumpAt = p1._lastJumpAt
 	if _lastJumpAt then
-		_lastJumpAt = os.clock() - chassis._lastJumpAt < 2
+		_lastJumpAt = os.clock() - p1._lastJumpAt < 2
 	end
-	if Nitro and not (chassis.Nitrof1 or _lastJumpAt) then
-		chassis.Nitrof1 = true
-		chassisInput.SetGravity(chassis, 20)
-	elseif (not Nitro or _lastJumpAt) and chassis.Nitrof1 then
-		chassis.Nitrof1 = false
-		chassisInput.SetGravity(chassis, 100)
+	if Nitro and not (p1.Nitrof1 or _lastJumpAt) then
+		p1.Nitrof1 = true
+		t4.SetGravity(p1, 20)
+	elseif (not Nitro or _lastJumpAt) and p1.Nitrof1 then
+		p1.Nitrof1 = false
+		t4.SetGravity(p1, 100)
 	end
-	local finalGearRatio = if chassis.NoGears then forwardInput > 0 and Gears[1] or Gears[2] else forwardInput > 0 and Gears[2 + currentGear] or Gears[2]
-	local rotationFactor = 4.4
+	local v74 = if p1.NoGears then v6 > 0 and Gears[1] or Gears[2] else v6 > 0 and Gears[2 + v50] or Gears[2]
+	local v77 = 4.4
 	if EnumMakeId == EnumMake.Lamborghini or (EnumMakeId == EnumMake.OGLaMatador or EnumMakeId == EnumMake.Hammerhead) then
-		rotationFactor = 5.5
+		v77 = 5.5
 	elseif EnumMakeId == EnumMake.Ambulance then
-		rotationFactor = 5
+		v77 = 5
 	elseif EnumMakeId == EnumMake.Bandit then
-		rotationFactor = 11.399999999999999 * gravityNormalized / 4300
+		v77 = 11.399999999999999 * v67 / 4300
 	elseif EnumMakeId == EnumMake.FrostCrawler then
-		rotationFactor = 2.485 * gravityNormalized / 4600
+		v77 = 2.485 * v67 / 4600
 	elseif EnumMakeId == EnumMake.Laviolette then
-		rotationFactor = 3 * gravityNormalized / 4300
+		v77 = 3 * v67 / 4300
 	elseif EnumMakeId == EnumMake.Crown then
-		rotationFactor = 11.2 * gravityNormalized / 3304
+		v77 = 11.2 * v67 / 3304
 	elseif EnumMakeId == EnumMake.DesertCrawler then
-		rotationFactor = 9 * gravityNormalized / 3894
+		v77 = 9 * v67 / 3894
 	elseif EnumMakeId == EnumMake.ShellMark5 then
-		rotationFactor = 6.6 * gravityNormalized / 3089
+		v77 = 6.6 * v67 / 3089
 	elseif EnumMakeId == EnumMake.Goliath then
-		rotationFactor = 2.6 * gravityNormalized / 12720 * 4
+		v77 = 2.6 * v67 / 12720 * 4
 	elseif EnumMakeId == EnumMake.Bloxy then
-		rotationFactor = 6.6 * gravityNormalized / 3948
+		v77 = 6.6 * v67 / 3948
 	elseif EnumMakeId == EnumMake.TinyToy then
-		rotationFactor = 1.02 * gravityNormalized / 720
+		v77 = 1.02 * v67 / 720
 	elseif EnumMakeId == EnumMake.ShellClassic then
-		rotationFactor = 5.5 * gravityNormalized / 2250
+		v77 = 5.5 * v67 / 2250
 	elseif EnumMakeId == EnumMake.Snake then
-		rotationFactor = 13.3 * gravityNormalized / 5449 * 1.39
+		v77 = 13.3 * v67 / 5449 * 1.39
 	elseif EnumMakeId == EnumMake.Scorpio then
-		rotationFactor = 25.27 * gravityNormalized / 12583
+		v77 = 25.27 * v67 / 12583
 	elseif EnumMakeId == EnumMake.Successor then
-		rotationFactor = 9.545689999999999 * gravityNormalized / 3018
+		v77 = 9.545689999999999 * v67 / 3018
 	elseif EnumMakeId == EnumMake.Macaron then
-		rotationFactor = 9.182440218957073 * gravityNormalized / 5543 * 1.6
+		v77 = 9.182440218957073 * v67 / 5543 * 1.6
 	elseif EnumMakeId == EnumMake.JackRabbit then
-		rotationFactor = 3.331709741550696 * gravityNormalized / 3047
+		v77 = 3.331709741550696 * v67 / 3047
 	elseif EnumMakeId == EnumMake.Poseidon then
-		rotationFactor = 5.43452380952381 * gravityNormalized / 3024
+		v77 = 5.43452380952381 * v67 / 3024
 	elseif EnumMakeId == EnumMake.MCL36 or EnumMakeId == EnumMake.MCL36FREE then
-		rotationFactor = 132500 / gravityNormalized
+		v77 = 132500 / v67
 	elseif EnumMakeId == EnumMake.TowTruck then
-		rotationFactor = 6.6 * gravityNormalized / 4000 * 2
+		v77 = 6.6 * v67 / 4000 * 2
 	elseif EnumMakeId == EnumMake.NASCAR1 then
-		rotationFactor = 11.407
+		v77 = 11.407
 	elseif EnumMakeId == EnumMake.NASCAR2 or EnumMakeId == EnumMake.NASCAR75th then
-		rotationFactor = 6.039
+		v77 = 6.039
 	elseif EnumMakeId == EnumMake.Trailblazer then
-		rotationFactor = 12.552631578947368
+		v77 = 12.552631578947368
 	elseif EnumMakeId == EnumMake.Concept then
-		rotationFactor = 9.636363636363637
+		v77 = 9.636363636363637
 	elseif EnumMakeId == EnumMake.Torero then
-		rotationFactor = 15.847
+		v77 = 15.847
 	elseif EnumMakeId == EnumMake.Beignet then
-		rotationFactor = 10.794242074927956
+		v77 = 10.794242074927956
 	elseif EnumMakeId == EnumMake.Ray9 then
-		rotationFactor = 5.4
+		v77 = 5.4
 	elseif EnumMakeId == EnumMake.TheRattler then
-		rotationFactor = 5.5
+		v77 = 5.5
 	elseif EnumMakeId == EnumMake.Ferrari then
-		rotationFactor = 6
+		v77 = 6
 	elseif EnumMakeId == EnumMake.BananaCar then
-		rotationFactor = 18
+		v77 = 18
 	elseif EnumMakeId == EnumMake.Challenger then
-		rotationFactor = 5.459999999999999
+		v77 = 5.459999999999999
 	elseif EnumMakeId == EnumMake.Surus then
-		rotationFactor = 6
+		v77 = 6
 	elseif EnumMakeId == EnumMake.MoltenM12 then
-		rotationFactor = 6.56
+		v77 = 6.56
 	elseif EnumMakeId == EnumMake.Bugatti then
-		rotationFactor = 8
+		v77 = 8
 	elseif EnumMakeId == EnumMake.Parisian then
-		rotationFactor = 24.8
+		v77 = 24.8
 	elseif EnumMakeId == EnumMake.Chiron then
-		rotationFactor = 8.8 * gravityNormalized / 3303
+		v77 = 8.8 * v67 / 3303
 	elseif EnumMakeId == EnumMake.Model3 then
-		rotationFactor = 4.2
+		v77 = 4.2
 	elseif EnumMakeId == EnumMake.Roadster then
-		rotationFactor = 9
+		v77 = 9
 	elseif EnumMakeId == EnumMake.IceBreaker then
-		rotationFactor = 8.5
+		v77 = 8.5
 	elseif EnumMakeId == EnumMake.Proto8 then
-		rotationFactor = 6.73
+		v77 = 6.73
 	elseif EnumMakeId == EnumMake.Monster then
-		rotationFactor = 5.75
+		v77 = 5.75
 	elseif EnumMakeId == EnumMake.OGMonster then
-		rotationFactor = 5
+		v77 = 5
 	elseif EnumMakeId == EnumMake.Firetruck then
-		rotationFactor = 10 * gravityNormalized / 10418
+		v77 = 10 * v67 / 10418
 	elseif EnumMakeId == EnumMake.ATV then
-		rotationFactor = 1.5
+		v77 = 1.5
 	elseif EnumMakeId == EnumMake.BankTruck then
-		rotationFactor = 16.8
+		v77 = 16.8
 	elseif EnumMakeId == EnumMake.BeamHybrid then
-		rotationFactor = 6.5
+		v77 = 6.5
 	elseif EnumMakeId == EnumMake.AirTail then
-		rotationFactor = 7.5
+		v77 = 7.5
 	elseif EnumMakeId == EnumMake.Volt4x4 then
-		rotationFactor = 20
+		v77 = 20
 	elseif EnumMakeId == EnumMake.TheAgent then
-		rotationFactor = 8.5
+		v77 = 8.5
 	elseif EnumMakeId == EnumMake.Interrogator then
-		rotationFactor = 6
+		v77 = 6
 	elseif EnumMakeId == EnumMake.Sentinel then
-		rotationFactor = 7
+		v77 = 7
 	elseif EnumMakeId == EnumMake.TheCamper then
-		rotationFactor = 18.974999999999998
+		v77 = 18.974999999999998
 	elseif EnumMakeId == EnumMake.R8 then
-		rotationFactor = 6.072
+		v77 = 6.072
 	elseif EnumMakeId == EnumMake.Semi then
-		rotationFactor = 4.928000000000001
+		v77 = 4.928000000000001
 	elseif EnumMakeId == EnumMake.Stormrider then
-		rotationFactor = 19.712000000000003
+		v77 = 19.712000000000003
 	elseif EnumMakeId == EnumMake.Shogun then
-		rotationFactor = 4.95 * gravityNormalized / 3010 * 1.8
+		v77 = 4.95 * v67 / 3010 * 1.8
 	elseif EnumMakeId == EnumMake.PrisonBus then
-		rotationFactor = 5
+		v77 = 5
 	elseif EnumMakeId == EnumMake.Power1 then
-		rotationFactor = 7.700000000000001 * gravityNormalized / 2267 * 0.95
+		v77 = 7.700000000000001 * v67 / 2267 * 0.95
 	elseif EnumMakeId == EnumMake.Aperture then
-		rotationFactor = 7.2 * gravityNormalized / 2242
+		v77 = 7.2 * v67 / 2242
 	elseif EnumMakeId == EnumMake.Fiasco then
-		rotationFactor = 12.32
+		v77 = 12.32
 	elseif EnumMakeId == EnumMake.Longhorn then
-		rotationFactor = 10.26
+		v77 = 10.26
 	elseif EnumMakeId == EnumMake.Carbonara then
-		rotationFactor = 7.6 * gravityNormalized / 2601
+		v77 = 7.6 * v67 / 2601
 	elseif EnumMakeId == EnumMake.XRK then
-		rotationFactor = rotationFactor * 1.44256
+		v77 = v77 * 1.44256
 	elseif EnumMakeId == EnumMake.Striker then
-		rotationFactor = rotationFactor * 0.7
+		v77 = v77 * 0.7
 	elseif EnumMakeId == EnumMake.SWATVan then
-		rotationFactor = rotationFactor * 1.32
+		v77 = v77 * 1.32
 	elseif EnumMakeId == EnumMake.Wedge then
-		rotationFactor = rotationFactor * 1.3
+		v77 = v77 * 1.3
 	elseif EnumMakeId == EnumMake.Manta then
-		rotationFactor = rotationFactor * 9.2
+		v77 = v77 * 9.2
 	elseif EnumMakeId == EnumMake.Iceborn then
-		rotationFactor = rotationFactor * (gravityNormalized / 2250 * 1.0093333333333334 * 1.05)
+		v77 = v77 * (v67 / 2250 * 1.0093333333333334 * 1.05)
 	elseif EnumMakeId == EnumMake.Tanker then
-		rotationFactor = rotationFactor * 3
+		v77 = v77 * 3
 	elseif EnumMakeId == EnumMake.Revox then
-		rotationFactor = rotationFactor * 1.830907534246575
+		v77 = v77 * 1.830907534246575
 	elseif EnumMakeId == EnumMake.Deja then
-		rotationFactor = rotationFactor * 2
+		v77 = v77 * 2
 	elseif EnumMakeId == EnumMake.McLaren then
-		rotationFactor = rotationFactor * 1.3
+		v77 = v77 * 1.3
 	elseif EnumMakeId == EnumMake.Cobra then
-		rotationFactor = rotationFactor * 1.7
+		v77 = v77 * 1.7
 	elseif EnumMakeId == EnumMake.Expeditioner then
-		rotationFactor = rotationFactor * 1.6
+		v77 = v77 * 1.6
 	elseif EnumMakeId == EnumMake.Wraith then
-		rotationFactor = rotationFactor * 1.3
+		v77 = v77 * 1.3
 	elseif EnumMakeId == EnumMake.Badger then
-		rotationFactor = rotationFactor * 1.5
+		v77 = v77 * 1.5
 	elseif EnumMakeId == EnumMake.Mustang then
-		rotationFactor = rotationFactor * 1.25
+		v77 = v77 * 1.25
 	elseif EnumMakeId == EnumMake.Blackbeard then
-		rotationFactor = rotationFactor * 2.508
+		v77 = v77 * 2.508
 	elseif EnumMakeId == EnumMake.OrionM42 then
-		rotationFactor = rotationFactor * 0.768
+		v77 = v77 * 0.768
 	elseif EnumMakeId == EnumMake.Maverick then
-		rotationFactor = rotationFactor * 1.6
+		v77 = v77 * 1.6
 	elseif EnumMakeId == EnumMake.Katana then
-		rotationFactor = rotationFactor * 2.3
+		v77 = v77 * 2.3
 	elseif EnumMakeId == EnumMake.WYNDR then
-		rotationFactor = rotationFactor * 1.6
+		v77 = v77 * 1.6
 	elseif EnumMakeId == EnumMake.PizzaDelivery then
-		rotationFactor = rotationFactor * 10
+		v77 = v77 * 10
 	elseif EnumMakeId == EnumMake.BrickKar then
-		rotationFactor = rotationFactor * 6.8
+		v77 = v77 * 6.8
 	elseif EnumMakeId == EnumMake.Polaire then
-		rotationFactor = rotationFactor * 5.7
+		v77 = v77 * 5.7
 	elseif EnumMakeId == EnumMake.BlackWidow then
-		rotationFactor = rotationFactor * 1.55
+		v77 = v77 * 1.55
 	elseif EnumMakeId == EnumMake.AdminNuke then
-		rotationFactor = 60
+		v77 = 60
 	elseif EnumMakeId == EnumMake.Bluebird then
-		rotationFactor = 44.6
+		v77 = 44.6
 	end
-	if chassis.EngineSpeedMult then
-		rotationFactor = rotationFactor * chassis.EngineSpeedMult
+	if p1.EngineSpeedMult then
+		v77 = v77 * p1.EngineSpeedMult
 	end
-	if chassis.LaunchSpeedMult then
-		rotationFactor = rotationFactor * chassis.LaunchSpeedMult
+	if p1.LaunchSpeedMult then
+		v77 = v77 * p1.LaunchSpeedMult
 	end
-	local sum = rotationFactor + chassis.GarageEngineSpeed
-	if not largeVehicleWhitelist[EnumMakeId] then
+	local sum = v77 + p1.GarageEngineSpeed
+	if not t8[EnumMakeId] then
 		sum = sum + 0.5
 	end
-	chassis.TrueEngineSpeed = sum
-	local vector78 = forwardInput * Vector3.new(0, 0, -1) * Gears[1] * 1 / 0.34 * 750 * finalGearRatio * sum
-	if groundMaterial and (groundMaterial == Enum.Material.Water and raycastParamsDefault.IgnoreWater) then
-		vector78 = vector78 * 0.625
+	p1.TrueEngineSpeed = sum
+	local v78 = v6 * Vector3.new(0, 0, -1) * Gears[1] * 1 / 0.34 * 750 * v74 * sum
+	if v54 and (v54 == Enum.Material.Water and v7.IgnoreWater) then
+		v78 = v78 * 0.625
 	end
-	if chassis.ManualGear and chassis._rpmLimitMult then
-		vector78 = vector78 * chassis._rpmLimitMult
+	if p1.ManualGear and p1._rpmLimitMult then
+		v78 = v78 * p1._rpmLimitMult
 	end
-	local sum_2 = dragForce + vector63
-	if forwardInput ~= 0 and forwardInput == forwardInput then
-		chassis.LastForward = forwardInput / abs(forwardInput)
-		sum_2 = sum_2 + vector78
+	local sum_2 = v62 + v63
+	if v6 ~= 0 and v6 == v6 then
+		p1.LastForward = v6 / abs(v6)
+		sum_2 = sum_2 + v78
 	end
-	if forwardInput == 0 and Magnitude <= 1 then
+	if v6 == 0 and Magnitude <= 1 then
 		Engine.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-	elseif forwardInput == 0 then
-		sum_2 = sum_2 + vector69
+	elseif v6 == 0 then
+		sum_2 = sum_2 + v69
 	end
-	if handbrakeEnabled and (steerInput == 0 and forwardInput == 0) then
-		sum_2 = sum_2 + vector69 * 3 + vector70
+	if v12 and (v72 == 0 and v6 == 0) then
+		sum_2 = sum_2 + v69 * 3 + v70
 	end
-	local torqueRoll = 0
-	local torquePitch = 0
-	local torqueYaw = 0
-	local RotY = chassis.RotY
-	chassis.RotY = RotY + (steerInput - RotY) * 0.1
-	if chassis.driveInAir then
-		groundMaterial = Enum.Material.SmoothPlastic
+	local v79 = 0
+	local v80 = 0
+	local v81 = 0
+	local RotY = p1.RotY
+	p1.RotY = RotY + (v72 - RotY) * 0.1
+	if p1.driveInAir then
+		v54 = Enum.Material.SmoothPlastic
 	end
-	if groundHit or chassis.driveInAir then
-		if groundMaterial == Enum.Material.Grass then
-			torqueRoll = 0.4
-		elseif groundMaterial == Enum.Material.Concrete or (groundMaterial == Enum.Material.Basalt or groundMaterial == Enum.Material.Asphalt) then
-			torquePitch = 0.94
-		elseif groundMaterial == Enum.Material.Sandstone or groundMaterial == Enum.Material.Sand then
-			torqueYaw = 0.5
+	if v53 or p1.driveInAir then
+		if v54 == Enum.Material.Grass then
+			v79 = 0.4
+		elseif v54 == Enum.Material.Concrete or (v54 == Enum.Material.Basalt or v54 == Enum.Material.Asphalt) then
+			v80 = 0.94
+		elseif v54 == Enum.Material.Sandstone or v54 == Enum.Material.Sand then
+			v81 = 0.5
 		end
-		local driftDamping = exp(-max(localVelocity.magnitude, 120) / 400) * if handbrakeEnabled then 1.5 else 1.2
-		local driftDirection = -localVelocity.Z / abs(localVelocity.Z)
-		if IsNaN(driftDirection) then
-			driftDirection = 0
+		local v85 = math.exp(-max(v42.magnitude, 120) / 400) * if v12 then 1.5 else 1.2
+		local v86 = -v42.Z / abs(v42.Z)
+		if v86 ~= v86 then
+			v86 = 0
 		end
-		if chassis.LastForward ~= driftDirection and (abs(localVelocity.Z) > 2 and not handbrakeEnabled) then
-			chassis.LastForward = driftDirection
+		if p1.LastForward ~= v86 and (abs(v42.Z) > 2 and not v12) then
+			p1.LastForward = v86
 		end
-		if steerInput == 0 then
-			if localVelocity.Z < 0 and not handbrakeEnabled then
-				Rotate.MaxTorque = Vector3New(0, gravityForce * 2, 0)
+		if v72 == 0 then
+			if v42.Z < 0 and not v12 then
+				Rotate.MaxTorque = v4(0, v3 * 2, 0)
 			end
 		else
-			Rotate.MaxTorque = Vector3New(0, gravityForce * 30, 0)
+			Rotate.MaxTorque = v4(0, v3 * 30, 0)
 		end
-		Rotate.AngularVelocity = Vector3New(0, engineLocalWheelCFrame * TurnSpeed * chassis.LastForward * driftDamping * velocityDampingFactor, 0)
+		Rotate.AngularVelocity = v4(0, v32 * TurnSpeed * p1.LastForward * v85 * v44, 0)
 	else
-		Rotate.MaxTorque = Vector3New(gravityForce * 0.5, gravityForce, gravityForce * 0.5)
-		lateralFrictionForce = Vector3.new(0, 0, 0)
+		Rotate.MaxTorque = v4(v3 * 0.5, v3, v3 * 0.5)
 		sum_2 = Vector3.new(0, 0, 0)
+		v64 = Vector3.new(0, 0, 0)
 	end
-	local sum_3 = sum_2 + (Nitro and 0.17 * gravityForce or 0) * Vector3.new(0, -0.1, -1)
-	if dampingForce ~= nil then
-		sum_3 = sum_3 + dampingForce
+	local sum_3 = sum_2 + (Nitro and 0.17 * v3 or 0) * Vector3.new(0, -0.1, -1)
+	if v33 ~= nil then
+		sum_3 = sum_3 + v33
 	end
-	local Grass = chassis.Sounds.Grass
-	local Asphalt = chassis.Sounds.Asphalt
-	local Sandstone = chassis.Sounds.Sandstone
-	chassis.vGrass = chassis.vGrass + (torqueRoll - chassis.vGrass) * 0.03
-	chassis.vAsphalt = chassis.vAsphalt + (torquePitch - chassis.vAsphalt) * 0.03
-	chassis.vSandstone = chassis.vSandstone + (torqueYaw - chassis.vSandstone) * 0.03
-	local downforceScale = (Magnitude < 60 and Magnitude / 60 or 1) * 0.25
-	Grass.Volume = chassis.vGrass * downforceScale
-	Asphalt.Volume = chassis.vAsphalt * downforceScale
-	Sandstone.Volume = chassis.vSandstone * downforceScale
-	local speedNormalized = Magnitude > 0 and (Magnitude / 120) ^ 0.5 or 0
-	Grass.PlaybackSpeed = speedNormalized
-	Asphalt.PlaybackSpeed = speedNormalized
-	Sandstone.PlaybackSpeed = speedNormalized
-	local brakeActive = handbrakeEnabled
-	if not brakeActive then
-		brakeActive = forwardInput < 1e-6
+	local Grass = p1.Sounds.Grass
+	local Asphalt = p1.Sounds.Asphalt
+	local Sandstone = p1.Sounds.Sandstone
+	p1.vGrass = p1.vGrass + (v79 - p1.vGrass) * 0.03
+	p1.vAsphalt = p1.vAsphalt + (v80 - p1.vAsphalt) * 0.03
+	p1.vSandstone = p1.vSandstone + (v81 - p1.vSandstone) * 0.03
+	local v88 = (Magnitude < 60 and Magnitude / 60 or 1) * 0.25
+	Grass.Volume = p1.vGrass * v88
+	Asphalt.Volume = p1.vAsphalt * v88
+	Sandstone.Volume = p1.vSandstone * v88
+	local v89 = Magnitude > 0 and (Magnitude / 120) ^ 0.5 or 0
+	Grass.PlaybackSpeed = v89
+	Asphalt.PlaybackSpeed = v89
+	Sandstone.PlaybackSpeed = v89
+	local v90 = v12
+	if not v90 then
+		v90 = v6 < 1e-6
 	end
-	if chassis._flagBrakelightsEnabled ~= brakeActive then
-		chassis._flagBrakelightsEnabled = brakeActive
-		VehicleUtils.setBrakelightsEnabled(chassis.Model, brakeActive)
+	if p1._flagBrakelightsEnabled ~= v90 then
+		p1._flagBrakelightsEnabled = v90
+		VehicleUtils.setBrakelightsEnabled(p1.Model, v90)
 	end
 	if CanDrive then
-		engineThruster.Drive.Force = sum_3
+		p2.Drive.Force = sum_3
 	end
-	engineThruster.Friction.Force = engineCFrame:VectorToWorldSpace(lateralFrictionForce)
-	local _, _2, _3, _4, _5, _6, _7, upY, _8, _9, _10, _11 = engineCFrame:GetComponents()
-	if upY < -0.25 then
-		if chassis.UpsideDownTime then
-			if tick() - chassis.UpsideDownTime > 2 then
-				chassis.UpsideDownTime = nil
-				remoteEventServer:FireServer("llwb2iv8")
+	p2.Friction.Force = v13:VectorToWorldSpace(v64)
+	local _, _2, _3, _4, _5, _6, _7, v91, _8, _9, _10, _11 = v13:GetComponents()
+	if v91 < -0.25 then
+		if p1.UpsideDownTime then
+			if tick() - p1.UpsideDownTime > 2 then
+				p1.UpsideDownTime = nil
+				v9:FireServer("h" .. ("qz2irc1mrr35"):sub(5, 9):reverse():reverse():reverse():reverse():reverse() .. "55")
 			end
 		else
-			chassis.UpsideDownTime = tick()
+			p1.UpsideDownTime = tick()
 		end
 	else
-		chassis.UpsideDownTime = nil
+		p1.UpsideDownTime = nil
 	end
-	local engineSoundProfile = nil
-	if (not isStudio or isStudio and Settings.Test.RegionSounds) and Region.CastPoint(Settings.Prism.City, Engine.Position) then
-		engineSoundProfile = "City"
+	local v922 = nil
+	if (not v1 or v1 and Settings.Test.RegionSounds) and Region.CastPoint(Settings.Prism.City, Engine.Position) then
+		v922 = "City"
 	end
-	local vector93 = if workspace:Raycast(engineCFrame * Vector3New(0, 0, engineHalfSize.Z - 1), engineCFrame:VectorToWorldSpace(Vector3.new(0, 1, 0)) * 20, raycastParamsDefault) then "Tunnel" else engineSoundProfile or "Outside"
-	if chassis.LastEnvironment ~= vector93 then
-		chassis.TransitionSpeed = 1 / if vector93 == "Tunnel" or chassis.LastEnvironment == "Tunnel" then 0.5 else 4
-		chassis.EnvironmentTransition = true
-		chassis.LastEnvironment = vector93
-		chassis.EnvironmentTransitionAlpha = 0
-		for k, v in pairs(soundEffectProperties) do
-			chassis[k] = {}
-			for k2, lateralOffset in pairs(v) do
-				chassis[k][lateralOffset] = soundEffectLibrary[k][lateralOffset]
+	local v93 = if workspace:Raycast(v13 * v4(0, 0, v2.Z - 1), v13:VectorToWorldSpace(Vector3.new(0, 1, 0)) * 20, v7) then "Tunnel" else v922 or "Outside"
+	if p1.LastEnvironment ~= v93 then
+		p1.TransitionSpeed = 1 / if v93 == "Tunnel" or p1.LastEnvironment == "Tunnel" then 0.5 else 4
+		p1.EnvironmentTransition = true
+		p1.LastEnvironment = v93
+		v11 = 0
+		for k, v in pairs(t2) do
+			p1[k] = {}
+			for k2, v8 in pairs(v) do
+				p1[k][v8] = t[k][v8]
 			end
 		end
 	end
-	if chassis.EnvironmentTransition then
-		local soundProfile = environmentSoundProfiles[vector93]
-		local transitionAlpha = (chassis.EnvironmentTransitionAlpha or 0) + dt * chassis.TransitionSpeed
-		chassis.EnvironmentTransitionAlpha = transitionAlpha
-		for k, v in pairs(soundEffectProperties) do
-			for k2, lateralOffset in pairs(v) do
-				soundEffectLibrary[k][lateralOffset] = chassis[k][lateralOffset] * (1 - transitionAlpha) + soundProfile[k][lateralOffset] * transitionAlpha
+	if p1.EnvironmentTransition then
+		local v95 = t3[v93]
+		v11 = v11 + p3 * p1.TransitionSpeed
+		for k, v in pairs(t2) do
+			for k2, v8 in pairs(v) do
+				t[k][v8] = p1[k][v8] * (1 - v11) + v95[k][v8] * v11
 			end
 		end
-		if transitionAlpha >= 1 then
-			chassis.EnvironmentTransition = false
+		if v11 >= 1 then
+			p1.EnvironmentTransition = false
 		end
 	end
 	if EnumMakeId == EnumMake.Bluebird then
-		local currentTime = os.clock()
-		local isMovingForward = forwardInput > 0.01
-		if if isMovingForward then 0.1 else 0.2 < currentTime - chassis.LastEngineRattle then
-			chassis.LastEngineRattle = currentTime
-			chassis.SpringEngineRattle:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1) * if isMovingForward then 4 else 2)
+		local v98 = os.clock()
+		local v99 = v6 > 0.01
+		if if v99 then 0.1 else 0.2 < v98 - p1.LastEngineRattle then
+			p1.LastEngineRattle = v98
+			p1.SpringEngineRattle:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1) * if v99 then 4 else 2)
 		end
-		local engineFlapTarget = if isMovingForward then chassis.SpringEngineFlaps:SetTarget(1) else chassis.SpringEngineFlaps:SetTarget(0)
-		Model.Preset.RattlerEngine.EngineMetal["EngineMetal->Engine"].C1 = CFrame.new((chassis.SpringEngineRattle:Update()))
-		local engineFlapMotor = Model.Preset.RattlerEngine.EngineFlaps["EngineFlaps->Engine"]
-		engineFlapMotor.C1 = engineFlapMotor.C0:Inverse() * CFrame.Angles(engineFlapTarget * -3.141592653589793 * 0.45, 0, 0) * engineFlapMotor.C0
-		for i, v in ipairs(chassis.RattleFire) do
-			v.Enabled = isMovingForward
+		local v107 = if v99 then p1.SpringEngineFlaps:SetTarget(1) else p1.SpringEngineFlaps:SetTarget(0)
+		Model.Preset.RattlerEngine.EngineMetal["EngineMetal->Engine"].C1 = CFrame.new((p1.SpringEngineRattle:Update()))
+		local v111 = Model.Preset.RattlerEngine.EngineFlaps["EngineFlaps->Engine"]
+		v111.C1 = v111.C0:Inverse() * CFrame.Angles(v107 * -3.141592653589793 * 0.45, 0, 0) * v111.C0
+		for i, v in ipairs(p1.RattleFire) do
+			v.Enabled = v99
 		end
-		if chassis.BluebirdSupercharger then
-			local directionAlignment = chassis.rpmVisual or 0
-			if forwardInput > 0 then
-				chassis.BluebirdSupercharger.Volume = math.clamp(directionAlignment / 4000 * 0.15, 0, 0.15)
-				chassis.BluebirdSupercharger.PlaybackSpeed = math.clamp(directionAlignment / 8000 * 0.8, 0, 0.8)
-			elseif chassis.BluebirdSupercharger.Volume > 0 then
-				chassis.BluebirdSupercharger.Volume = math.max(0, chassis.BluebirdSupercharger.Volume - dt * 0.3)
+		if p1.BluebirdSupercharger then
+			local v112 = p1.rpmVisual or 0
+			if v6 > 0 then
+				p1.BluebirdSupercharger.Volume = math.clamp(v112 / 4000 * 0.15, 0, 0.15)
+				p1.BluebirdSupercharger.PlaybackSpeed = math.clamp(v112 / 8000 * 0.8, 0, 0.8)
+			elseif p1.BluebirdSupercharger.Volume > 0 then
+				p1.BluebirdSupercharger.Volume = math.max(0, p1.BluebirdSupercharger.Volume - p3 * 0.3)
 			end
 		end
 	elseif EnumMakeId == EnumMake.TheRattler then
-		local rattleTime = os.clock()
-		local hasInput = math.abs(forwardInput) > 0.01
-		if if hasInput then 0.1 else 0.2 < rattleTime - chassis.LastEngineRattle then
-			chassis.LastEngineRattle = rattleTime
-			chassis.SpringEngineRattle:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1) * if hasInput then 4 else 2)
+		local v116 = os.clock()
+		local v117 = math.abs(v6) > 0.01
+		if if v117 then 0.1 else 0.2 < v116 - p1.LastEngineRattle then
+			p1.LastEngineRattle = v116
+			p1.SpringEngineRattle:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1) * if v117 then 4 else 2)
 		end
-		local flapAngle = if hasInput then chassis.SpringEngineFlaps:SetTarget(1) else chassis.SpringEngineFlaps:SetTarget(0)
-		Model.Preset.RattlerEngine.EngineBody["EngineBody->Engine"].C1 = CFrame.new((chassis.SpringEngineRattle:Update()))
-		local flapMotor = Model.Preset.RattlerEngine.EngineFlaps["EngineFlaps->Engine"]
-		flapMotor.C1 = flapMotor.C0:Inverse() * CFrame.Angles(flapAngle * -3.141592653589793 * 0.45, 0, 0) * flapMotor.C0
-		for i, v in ipairs(chassis.RattleSmoke) do
-			v.Enabled = not hasInput
+		local v125 = if v117 then p1.SpringEngineFlaps:SetTarget(1) else p1.SpringEngineFlaps:SetTarget(0)
+		Model.Preset.RattlerEngine.EngineBody["EngineBody->Engine"].C1 = CFrame.new((p1.SpringEngineRattle:Update()))
+		local v129 = Model.Preset.RattlerEngine.EngineFlaps["EngineFlaps->Engine"]
+		v129.C1 = v129.C0:Inverse() * CFrame.Angles(v125 * -3.141592653589793 * 0.45, 0, 0) * v129.C0
+		for i, v in ipairs(p1.RattleSmoke) do
+			v.Enabled = not v117
 		end
-		for i, v in ipairs(chassis.RattleFire) do
-			v.Enabled = hasInput
+		for i, v in ipairs(p1.RattleFire) do
+			v.Enabled = v117
 		end
 	end
 	if EnumMakeId == EnumMake.Polaire then
 		local TiltWing = Model.Preset:FindFirstChild("TiltWing")
 		if TiltWing then
-			DoorUtils.setPctOpen(TiltWing, if steerInput < -0.5 then -1 elseif steerInput > 0.5 then 1 else 0)
+			DoorUtils.setPctOpen(TiltWing, if v72 < -0.5 then -1 elseif v72 > 0.5 then 1 else 0)
 		end
 	end
-	local Rudder = chassis.Model.Preset:FindFirstChild("Rudder")
+	local Rudder = p1.Model.Preset:FindFirstChild("Rudder")
 	if Rudder then
-		DoorUtils.setPctOpen(Rudder, if math.abs(steerInput) > 0.5 then if steerInput > 0 then 0 else 1 else 0.5)
+		DoorUtils.setPctOpen(Rudder, if math.abs(v72) > 0.5 then if v72 > 0 then 0 else 1 else 0.5)
 	end
-	if chassis.RattleMotors then
-		local steerDirection = os.clock()
-		local isInputActive = math.abs(forwardInput) > 0.01
-		if if isInputActive then 0.05 else 0.1 < steerDirection - chassis.LastEngineRattle then
-			chassis.LastEngineRattle = steerDirection
-			chassis.SpringEngineRattle:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1) * if isInputActive then 3 else 2)
+	if p1.RattleMotors then
+		local v132 = os.clock()
+		local v133 = math.abs(v6) > 0.01
+		if if v133 then 0.05 else 0.1 < v132 - p1.LastEngineRattle then
+			p1.LastEngineRattle = v132
+			p1.SpringEngineRattle:Accelerate(Vector3.new(math.random() * 2 - 1, math.random() * 2 - 1, math.random() * 2 - 1) * if v133 then 3 else 2)
 		end
-		local rattleOffset = chassis.SpringEngineRattle:Update()
-		for _, rattleMotor in chassis.RattleMotors do
-			rattleMotor.motor.C1 = CFrame.new(rattleOffset)
-		end
-	end
-	if chassis.RattleParticles then
-		local shouldEmit = math.abs(forwardInput) > 0.01
-		for _, particleEmitter in chassis.RattleParticles do
-			particleEmitter.Enabled = shouldEmit
+		local v141 = p1.SpringEngineRattle:Update()
+		for v142, v143 in p1.RattleMotors do
+			v143.motor.C1 = CFrame.new(v141)
 		end
 	end
-	if chassis.ThrusterFlames then
-		chassisInput.UpdateThrusterFlames(chassis.Model, forwardInput, steerInput, localVelocity.Z, {
+	if p1.RattleParticles then
+		local v144 = math.abs(v6) > 0.01
+		for v145, v146 in p1.RattleParticles do
+			v146.Enabled = v144
+		end
+	end
+	if p1.ThrusterFlames then
+		t4.UpdateThrusterFlames(p1.Model, v6, v72, v42.Z, {
 			client = true
 		})
 	end
-	if chassis.BrakeTrails then
-		for _, brakeTrail in chassis.BrakeTrails do
-			brakeTrail.Enabled = chassis._flagBrakelightsEnabled
+	if p1.BrakeTrails then
+		for v147, v148 in p1.BrakeTrails do
+			v148.Enabled = p1._flagBrakelightsEnabled
 		end
 	end
-	local gravityOffset = chassis.gravityOffset
-	if chassis.Model:FindFirstChild("IsPickedUp") then
+	local gravityOffset = p1.gravityOffset
+	if p1.Model:FindFirstChild("IsPickedUp") then
 		gravityOffset = 0
 	end
-	chassis.Lift.Force = Vector3New(0, gravityOffset, 0)
+	p1.Lift.Force = v4(0, gravityOffset, 0)
 end
-function chassisInput.Update(chassis, dt)
-	chassis._didAnyWheelDrift = false
-	local isAccelHeld = inputMovementState[1] - inputMovementState[3] > 0
-	if not isAccelHeld and (chassis.isAccelHeld ~= isAccelHeld and chassis.Model.PrimaryPart.AssemblyLinearVelocity.Magnitude > 50) then
-		local now = os.clock()
-		if chassis.turboBlowOff and now - (chassis.lastTurboBlowOff or 0) > 1 then
-			chassis.lastTurboBlowOff = now
-			chassis.turboBlowOff.PlaybackSpeed = 1 + (math.random() * 0.1 - 0.05)
-			chassis.turboBlowOff:Play()
+function t4.Update(p1, p2) --[[ Update | Line: 2434 | Upvalues: t5 (ref), t4 (copy) ]]
+	p1._didAnyWheelDrift = false
+	local v1 = t5[1] - t5[3] > 0
+	if not v1 and (p1.isAccelHeld ~= v1 and p1.Model.PrimaryPart.AssemblyLinearVelocity.Magnitude > 50) then
+		local v2 = os.clock()
+		if p1.turboBlowOff and v2 - (p1.lastTurboBlowOff or 0) > 1 then
+			p1.lastTurboBlowOff = v2
+			p1.turboBlowOff.PlaybackSpeed = 1 + (math.random() * 0.1 - 0.05)
+			p1.turboBlowOff:Play()
 		end
 	end
-	chassis.isAccelHeld = isAccelHeld
-	for index, value in chassis.EngineThrusters do
-		chassisInput.UpdateEngine(chassis, value, dt)
+	p1.isAccelHeld = v1
+	for v3, v4 in p1.EngineThrusters do
+		t4.UpdateEngine(p1, v4, p2)
 	end
-	if chassis.Model:GetAttribute("VehicleIsDrifting") ~= chassis._didAnyWheelDrift then
-		chassis.Model:SetAttribute("VehicleIsDrifting", chassis._didAnyWheelDrift)
-		chassis.Model:FindFirstChild("RelayDriftingRemote"):FireServer(chassis._didAnyWheelDrift)
+	if p1.Model:GetAttribute("VehicleIsDrifting") ~= p1._didAnyWheelDrift then
+		p1.Model:SetAttribute("VehicleIsDrifting", p1._didAnyWheelDrift)
+		p1.Model:FindFirstChild("RelayDriftingRemote"):FireServer(p1._didAnyWheelDrift)
 	end
 end
-function chassisInput.UpdateStepped(chassis)
-	local Model = chassis.Model
-	if chassis.IK then
-		local steerAngle = 0.6 * chassis.RotY
-		chassis.WeldSteer.C0 = Angles(0, steerAngle, 0)
-		local steerCFrame = Model.Steer.CFrame
-		local handOffsetX = Model.Steer.Size.X * 0.5 - 0.2
-		local SteerOffset = chassis.SteerOffset
-		local IK = chassis.IK
-		local rightHandOffset = Vector3New(handOffsetX, 0.1, 0)
+function t4.UpdateStepped(p1) --[[ UpdateStepped | Line: 2464 | Upvalues: Angles (copy), v4 (copy), R15IKv2 (copy) ]]
+	local Model = p1.Model
+	if p1.IK then
+		local v1 = 0.6 * p1.RotY
+		p1.WeldSteer.C0 = Angles(0, v1, 0)
+		local v2 = Model.Steer.CFrame
+		local v3 = Model.Steer.Size.X * 0.5 - 0.2
+		local SteerOffset = p1.SteerOffset
+		local IK = p1.IK
+		local sum = v4(v3, 0.1, 0)
 		if SteerOffset then
-			rightHandOffset = rightHandOffset + SteerOffset
+			sum = sum + SteerOffset
 		end
-		local leftHandOffset = Vector3New(-handOffsetX, 0.1, 0)
+		local sum_2 = v4(-v3, 0.1, 0)
 		if SteerOffset then
-			leftHandOffset = leftHandOffset + SteerOffset
+			sum_2 = sum_2 + SteerOffset
 		end
-		IK.RightArm = steerCFrame * rightHandOffset
-		IK.LeftArm = steerCFrame * leftHandOffset
-		IK.RightAngle = -steerAngle - 0.6
-		IK.LeftAngle = -steerAngle + 0.6
+		IK.RightArm = v2 * sum
+		IK.LeftArm = v2 * sum_2
+		IK.RightAngle = -v1 - 0.6
+		IK.LeftAngle = -v1 + 0.6
 		R15IKv2.Arms(IK)
 	end
 end
-function chassisInput.UpdateForces(chassis, engineThruster, dt)
-	for _, wheelData in chassis.Wheels do
-		UpdateThruster(chassis, wheelData, engineThruster, dt)
+function t4.UpdateForces(p1, p2, p3) --[[ UpdateForces | Line: 2495 | Upvalues: UpdateThruster (copy) ]]
+	for v1, v2 in p1.Wheels do
+		UpdateThruster(p1, v2, p2, p3)
 	end
 end
-function chassisInput.Halt(chassis)
-	for _, engineForce in chassis.EngineThrusters do
-		engineForce.Drive.Force = Vector3.new(0, 0, 0)
-		engineForce.Friction.Force = Vector3.new(0, 0, 0)
+function t4.Halt(p1) --[[ Halt | Line: 2501 ]]
+	for v1, v2 in p1.EngineThrusters do
+		v2.Drive.Force = Vector3.new(0, 0, 0)
+		v2.Friction.Force = Vector3.new(0, 0, 0)
 	end
-	chassis.Rotate.MaxTorque = Vector3.new(0, 0, 0)
+	p1.Rotate.MaxTorque = Vector3.new(0, 0, 0)
 end
-function chassisInput.SpinOut(chassis, spinLeft)
-	chassis._spinOutLeft = spinLeft
-	chassis._spinOutAt = os.clock()
+function t4.SpinOut(p1, p2) --[[ SpinOut | Line: 2508 ]]
+	p1._spinOutLeft = p2
+	p1._spinOutAt = os.clock()
 end
-function chassisInput.AttemptFireMissile(vehiclePacket)
-	local Missiles = vehiclePacket.Missiles
+function t4.AttemptFireMissile(p1) --[[ AttemptFireMissile | Line: 2513 | Upvalues: LocalPlayer (copy), VehicleUtils (copy), RayCast (copy), Time (copy), v9 (ref), Missile (copy) ]]
+	local Missiles = p1.Missiles
 	if not Missiles then
 		return false
 	end
@@ -1937,31 +2020,30 @@ function chassisInput.AttemptFireMissile(vehiclePacket)
 		VehicleUtils.promptMissileBuy()
 		return false
 	end
-	local fireTime = tick()
-	local timeSinceLastFire = fireTime - Missiles.LastFire
-	if timeSinceLastFire < 2 and timeSinceLastFire > 0 then
+	local v1 = tick()
+	local v2 = v1 - Missiles.LastFire
+	if v2 < 2 and v2 > 0 then
 		return false
 	end
-	Missiles.LastFire = fireTime
-	local missilePart = Missiles.Parts[Missiles.i]
-	missilePart.Transparency = 1
-	task.delay(2, function()
-		missilePart.Transparency = 0
+	Missiles.LastFire = v1
+	local v3 = Missiles.Parts[Missiles.i]
+	v3.Transparency = 1
+	delay(2, function() --[[ Line: 2536 | Upvalues: v3 (copy) ]]
+		v3.Transparency = 0
 	end)
-	local missileCFrame = missilePart.CFrame
-	local missileVelocity = missilePart.Velocity
-	if missileVelocity.Magnitude < 0.01 then
-		missileVelocity = Vector3.new(0, 0, 0)
+	local v4 = v3.CFrame
+	local Velocity = v3.Velocity
+	if Velocity.Magnitude < 0.01 then
+		Velocity = Vector3.new(0, 0, 0)
 	end
-	local ignoreList = { vehiclePacket.Model, LocalPlayer.Character }
-	local _, targetPosition = RayCast.RayIgnoreNonCollideWithIgnoreList(missileCFrame.p, (vehiclePacket.Model.Engine.CFrame.LookVector * 60 - Vector3.new(0, 2, 0)).Unit, 999, ignoreList)
-	local launchTime = Time.GetNowSync()
-	remoteEventServer:FireServer("exva0l4q", missileCFrame, missileVelocity, targetPosition, launchTime, "RocketPart2", 0)
-	Missile.LaunchMissile(missileCFrame, missileVelocity, targetPosition, launchTime, "RocketPart2", 0, ignoreList)
+	local t = { p1.Model, LocalPlayer.Character }
+	local _, v5 = RayCast.RayIgnoreNonCollideWithIgnoreList(v4.p, (p1.Model.Engine.CFrame.LookVector * 60 - Vector3.new(0, 2, 0)).Unit, 999, t)
+	local v6 = Time.GetNowSync()
+	v9:FireServer("a" .. "" .. ("nn5new"):sub(3, 5):reverse():reverse():reverse() .. "zwf0", v4, Velocity, v5, v6, "RocketPart2", 0)
+	Missile.LaunchMissile(v4, Velocity, v5, v6, "RocketPart2", 0, t)
 	Missiles.i = Missiles.i % #Missiles.Parts + 1
-	return true
 end
-local keyCodeToInputIndexMap = {
+local t10 = {
 	[Enum.KeyCode.A] = 2,
 	[Enum.KeyCode.D] = 4,
 	[Enum.KeyCode.Q] = 5,
@@ -1971,108 +2053,101 @@ local keyCodeToInputIndexMap = {
 	[Enum.KeyCode.Left] = 2,
 	[Enum.KeyCode.Right] = 4
 }
-function chassisInput.LockCamera(chassis)
-	assert(not chassis.IsCameraLocked)
-	local Model = chassis.Model
+function t4.LockCamera(p1) --[[ LockCamera | Line: 2569 | Upvalues: CurrentCamera (copy), RunService (copy) ]]
+	assert(not p1.IsCameraLocked)
+	local Model = p1.Model
 	local InsideCamera = Model:FindFirstChild("InsideCamera")
 	if InsideCamera ~= nil then
-		chassis.IsCameraLocked = true
+		p1.IsCameraLocked = true
 		Model:SetAttribute("IsCameraLocked", true)
 		CurrentCamera.CameraType = Enum.CameraType.Scriptable
-		chassis.seatMaid.cameraLockRenderStepped = RunService.RenderStepped:Connect(function()
+		p1.seatMaid.cameraLockRenderStepped = RunService.RenderStepped:Connect(function() --[[ Line: 2579 | Upvalues: CurrentCamera (ref), InsideCamera (copy) ]]
 			CurrentCamera.CFrame = InsideCamera.CFrame
 		end)
-		function chassis.seatMaid.cameraUnlock()
+		function p1.seatMaid.cameraUnlock() --[[ Line: 2582 | Upvalues: CurrentCamera (ref) ]]
 			CurrentCamera.CameraType = Enum.CameraType.Custom
 		end
 	end
 end
-function chassisInput.UnlockCamera(chassis)
-	assert(chassis.IsCameraLocked)
-	chassis.IsCameraLocked = false
-	chassis.Model:SetAttribute("IsCameraLocked", false)
+function t4.UnlockCamera(p1) --[[ UnlockCamera | Line: 2586 | Upvalues: CurrentCamera (copy) ]]
+	assert(p1.IsCameraLocked)
+	p1.IsCameraLocked = false
+	p1.Model:SetAttribute("IsCameraLocked", false)
 	CurrentCamera.CameraType = Enum.CameraType.Custom
-	chassis.seatMaid.cameraLockRenderStepped = nil
-	chassis.seatMaid.cameraUnlock = nil
+	p1.seatMaid.cameraLockRenderStepped = nil
+	p1.seatMaid.cameraUnlock = nil
 end
-function chassisInput.InputBegan(inputObject)
-	if inputObject.UserInputType == Enum.UserInputType.Keyboard then
-		local KeyCode = inputObject.KeyCode
-		if keyCodeToInputIndexMap[KeyCode] then
-			inputMovementState[keyCodeToInputIndexMap[KeyCode]] = 1
+function t4.InputBegan(p1) --[[ InputBegan | Line: 2594 | Upvalues: t10 (copy), t5 (ref) ]]
+	if p1.UserInputType == Enum.UserInputType.Keyboard then
+		local KeyCode = p1.KeyCode
+		if t10[KeyCode] then
+			t5[t10[KeyCode]] = 1
 		end
 	end
 end
-function chassisInput.InputEnded(inputObject)
-	if inputObject.UserInputType == Enum.UserInputType.Keyboard then
-		local KeyCode = inputObject.KeyCode
-		if keyCodeToInputIndexMap[KeyCode] then
-			inputMovementState[keyCodeToInputIndexMap[KeyCode]] = 0
+function t4.InputEnded(p1) --[[ InputEnded | Line: 2602 | Upvalues: t10 (copy), t5 (ref) ]]
+	if p1.UserInputType == Enum.UserInputType.Keyboard then
+		local KeyCode = p1.KeyCode
+		if t10[KeyCode] then
+			t5[t10[KeyCode]] = 0
 		end
-	elseif inputObject.UserInputType == Enum.UserInputType.Gamepad1 then
-		local KeyCode = inputObject.KeyCode
+	elseif p1.UserInputType == Enum.UserInputType.Gamepad1 then
+		local KeyCode = p1.KeyCode
 		if KeyCode == Enum.KeyCode.ButtonR2 or KeyCode == Enum.KeyCode.ButtonL2 then
-			inputMovementState[keyCodeToInputIndexMap[KeyCode]] = 0
+			t5[t10[KeyCode]] = 0
 		end
 	end
 end
-function chassisInput.InputChanged(inputObject)
-	if inputObject.UserInputType == Enum.UserInputType.Gamepad1 then
-		local KeyCode = inputObject.KeyCode
+function t4.InputChanged(p1) --[[ InputChanged | Line: 2615 | Upvalues: t5 (ref), t10 (copy) ]]
+	if p1.UserInputType == Enum.UserInputType.Gamepad1 then
+		local KeyCode = p1.KeyCode
 		if KeyCode == Enum.KeyCode.Thumbstick1 then
-			local Position = inputObject.Position
+			local Position = p1.Position
 			local X = Position.X
-			--local Y = Position.Y
-			inputMovementState[2] = X < -0.24 and (-X) ^ 2 or 0
-			inputMovementState[4] = X > 0.24 and X ^ 2 or 0
+			local Y = Position.Y
+			t5[2] = X < -0.24 and (-X) ^ 2 or 0
+			t5[4] = X > 0.24 and X ^ 2 or 0
 		elseif KeyCode == Enum.KeyCode.ButtonR2 or KeyCode == Enum.KeyCode.ButtonL2 then
-			local Z = inputObject.Position.Z
-			inputMovementState[keyCodeToInputIndexMap[KeyCode]] = Z > 0.05 and Z ^ 0.5 or 0
+			local Z = p1.Position.Z
+			t5[t10[KeyCode]] = Z > 0.05 and Z ^ 0.5 or 0
 		end
 	end
 end
-function chassisInput.SetEvent(remoteEvent)
-	remoteEventServer = remoteEvent
+function t4.SetEvent(p1) --[[ SetEvent | Line: 2636 | Upvalues: v9 (ref) ]]
+	v9 = p1
 end
 local CircleAction = UI.CircleAction
-local function Action(action, activated)
-	if activated then
-		remoteEventServer:FireServer("euh8hf92", action.Part)
+local function Action(p1, p2) --[[ Action | Line: 2642 | Upvalues: v9 (ref) ]]
+	if p2 then
+		v9:FireServer("t" .. ("neg29oovf"):sub(5, 5):reverse():reverse():reverse() .. "" .. "" .. ("hboehowv"):sub(5, 5):reverse() .. "" .. "" .. ("fpfc4"):sub(2, 2):reverse() .. "" .. "" .. ("kdu"):sub(2, 2):reverse() .. "4o4", p1.Part)
 	end
 	return true
 end
-local function AddedFun(part)
+local function AddedFun(p1) --[[ AddedFun | Line: 2649 | Upvalues: Action (copy), CircleAction (copy) ]]
 	CircleAction.Add({
-		Part = part,
 		Name = "Move Ladder",
 		NoRay = true,
 		Timed = true,
 		Duration = 0.25,
 		Dist = 10,
+		Part = p1,
 		Callback = Action
-	}, part)
+	}, p1)
 end
-local function RemovedFun(part)
-	CircleAction.Remove(part)
+local function RemovedFun(p1) --[[ RemovedFun | Line: 2661 | Upvalues: CircleAction (copy) ]]
+	CircleAction.Remove(p1)
 end
 for i, v in ipairs(CollectionService:GetTagged("Firetruck_Ladder")) do
 	CircleAction.Add({
-		Part = v,
 		Name = "Move Ladder",
 		NoRay = true,
 		Timed = true,
 		Duration = 0.25,
 		Dist = 10,
+		Part = v,
 		Callback = Action
 	}, v)
 end
 CollectionService:GetInstanceAddedSignal("Firetruck_Ladder"):Connect(AddedFun)
 CollectionService:GetInstanceRemovedSignal("Firetruck_Ladder"):Connect(RemovedFun)
-return chassisInput
-
-
-
-
-
-
-
+return t4

@@ -1,8 +1,9 @@
+-- https://lua.expert/
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunUtils = require(ReplicatedStorage.App.RunUtils)
 local MarketplaceService = game:GetService("MarketplaceService")
 local RunService = game:GetService("RunService")
-local isStudio = RunUtils.isStudio()
+local v1 = RunUtils.isStudio()
 local UserInputService = game:GetService("UserInputService")
 game:GetService("GuiService")
 local SoundService = game:GetService("SoundService")
@@ -49,93 +50,93 @@ require(ReplicatedStorage.Std.RateLimiter)
 local HapticEffect = require(ReplicatedStorage.App.HapticEffect)
 local RegionUtils = require(ReplicatedStorage.Std.Region.RegionUtils)
 local ConstraintUtils = require(ReplicatedStorage.Std.ConstraintUtils)
-local CFrameNew = CFrame.new
+local v2 = CFrame.new
 local Angles = CFrame.Angles
-local Vector3New = Vector3.new
-local zeroOriginCFrame = CFrameNew(0, 0, 0)
+local v3 = Vector3.new
+local v4 = v2(0, 0, 0)
 local sin = math.sin
 local floor = math.floor
 local abs = math.abs
 local log = math.log
 local max = math.max
 if not RunUtils.isStudio() then
-	print("Build:", "22 Apr @ 08:27 PM EDT @0ec1e2e")
+	print("Build:", "27 Apr @ 12:55 PM EDT @942a23f")
 end
-local vector = waitForChild(ReplicatedStorage, "GenericRemoteEvent", 30):catch(warn)
-local eventMap, eventBridge, EventFireServer, ConnectEvents
+local v5 = waitForChild(ReplicatedStorage, "GenericRemoteEvent", 30):catch(warn)
+local t, t2, EventFireServer, ConnectEvents
 do
-	local remoteEvent = nil
-	eventMap = {}
+	local v6 = nil
+	t = {}
 	for i = 1, 10 do
-		local RemoteEvent = Instance.new("RemoteEvent")
-		RemoteEvent.Name = Math.GUID()
-		RemoteEvent.Parent = ReplicatedStorage.Resource
+		local v7 = Instance.new("RemoteEvent")
+		v7.Name = Math.GUID()
+		v7.Parent = ReplicatedStorage.Resource
 	end
-	local remoteEventCache = nil
-	eventBridge = {}
+	local v8 = nil
+	t2 = {}
 	local FireServer = Instance.new("RemoteEvent").FireServer
-	EventFireServer = function(p1, ...)
-		FireServer(remoteEvent, remoteEventCache and remoteEventCache[p1] or p1, ...)
+	EventFireServer = function(p1, ...) --[[ EventFireServer | Line: 86 | Upvalues: FireServer (copy), v6 (ref), v8 (ref) ]]
+		FireServer(v6, v8 and v8[p1] or p1, ...)
 	end
-	function eventBridge.FireServer(p1, p2, ...)
+	function t2.FireServer(p1, p2, ...) --[[ FireServer | Line: 89 | Upvalues: EventFireServer (ref) ]]
 		return EventFireServer(p2, ...)
 	end
-	function eventMap.yeo69ls9(p1)
-		eventMap.hems = true
-		remoteEventCache = p1
+	function t.yil2co26(p1) --[[ yil2co26 | Line: 92 | Upvalues: t (copy), v8 (ref) ]]
+		t.hems = true
+		v8 = p1
 	end
-	local function OnClientEvent(p1, ...)
-		assert(eventMap[p1], p1)(...)
+	local function OnClientEvent(p1, ...) --[[ OnClientEvent | Line: 96 | Upvalues: t (copy) ]]
+		assert(t[p1], p1)(...)
 	end
-	ConnectEvents = function()
-		local result, isInitialized = remoteEventCache:await()
-		if not isInitialized then
+	ConnectEvents = function() --[[ ConnectEvents | Line: 99 | Upvalues: v5 (copy), Math (copy), v6 (ref), OnClientEvent (copy) ]]
+		local v1, v2 = v5:await()
+		if not v1 then
 			error("Bad error... could not find `GenericGameEvent`")
 		end
-		isInitialized.Name = Math.GUID()
-		remoteEvent = isInitialized
-		isInitialized.OnClientEvent:Connect(OnClientEvent)
+		v2.Name = Math.GUID()
+		v6 = v2
+		v2.OnClientEvent:Connect(OnClientEvent)
 	end
 end
 StarterGui.ResetPlayerGuiOnSpawn = false
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local TeamValue = LocalPlayer:WaitForChild("TeamValue")
-local isEnabled, cframe, cframe, cframe, PlayerUtils, InventoryItemUtils, InventoryItemSystem, ItemSystem, ThreadLoopAdd
+local v9, v10, v11, v12, PlayerUtils, InventoryItemUtils, InventoryItemSystem, ItemSystem, ThreadLoopAdd
 do
-	local function GetScreenGui(p1)
-		local isEnabled = PlayerGui:FindFirstChild(p1)
-		if not isEnabled then
-			local isEnabled = ReplicatedStorage.StarterGui:FindFirstChild(p1):Clone()
-			isEnabled.Parent = PlayerGui
-			isEnabled = isEnabled
+	local function GetScreenGui(p1) --[[ GetScreenGui | Line: 132 | Upvalues: PlayerGui (copy), ReplicatedStorage (copy) ]]
+		local v1 = PlayerGui:FindFirstChild(p1)
+		if not v1 then
+			local v2 = ReplicatedStorage.StarterGui:FindFirstChild(p1):Clone()
+			v2.Parent = PlayerGui
+			v1 = v2
 		end
-		return isEnabled
+		return v1
 	end
 	local MainGui = PlayerGui:FindFirstChild("MainGui")
 	if not MainGui then
 		MainGui = ReplicatedStorage.StarterGui:FindFirstChild("MainGui"):Clone()
 		MainGui.Parent = PlayerGui
 	end
-	isEnabled = MainGui
+	v9 = MainGui
 	local ProductGui = PlayerGui:FindFirstChild("ProductGui")
 	if not ProductGui then
 		ProductGui = ReplicatedStorage.StarterGui:FindFirstChild("ProductGui"):Clone()
 		ProductGui.Parent = PlayerGui
 	end
-	cframe = ProductGui
+	v10 = ProductGui
 	local Particles = PlayerGui:FindFirstChild("Particles")
 	if not Particles then
 		Particles = ReplicatedStorage.StarterGui:FindFirstChild("Particles"):Clone()
 		Particles.Parent = PlayerGui
 	end
-	cframe = Particles
+	v11 = Particles
 	local DeathGui = PlayerGui:FindFirstChild("DeathGui")
 	if not DeathGui then
 		DeathGui = ReplicatedStorage.StarterGui:FindFirstChild("DeathGui"):Clone()
 		DeathGui.Parent = PlayerGui
 	end
-	cframe = DeathGui
-	UI.CircleAction.Frame = isEnabled.CircleAction
+	v12 = DeathGui
+	UI.CircleAction.Frame = v9.CircleAction
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
 	PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
 	PlayerUtils.init()
@@ -143,109 +144,109 @@ do
 	InventoryItemSystem = require(ReplicatedStorage.Inventory.InventoryItemSystem)
 	ItemSystem = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
 	ItemSystem.Init({
-		em = configTable,
-		Event = eventBridge
+		em = t,
+		Event = t2
 	})
 	require(ReplicatedStorage.Game.AmmoGui).Init({
 		GetScreenGui = GetScreenGui
 	})
-	local function childAdded(p1)
+	local function childAdded(p1) --[[ childAdded | Line: 163 | Upvalues: t2 (ref), t (copy), v9 (copy), ItemSystem (ref) ]]
 		if not p1:GetAttribute("Required") then
 			p1:SetAttribute("Required", true)
-			local isEnabled = require(p1)
-			if rawget(isEnabled, "Init") then
-				isEnabled.Init({
-					Event = eventBridge,
-					em = configTable,
-					ScreenGui = isEnabled
+			local v1 = require(p1)
+			if rawget(v1, "Init") then
+				v1.Init({
+					Event = t2,
+					em = t,
+					ScreenGui = v9
 				})
 			end
-			ItemSystem.Register(isEnabled)
+			ItemSystem.Register(v1)
 		end
 	end
-	for v13, targetPlayer in ReplicatedStorage.Game.Item:GetChildren() do
+	for v13, v14 in ReplicatedStorage.Game.Item:GetChildren() do
 		childAdded(v14)
 	end
 	ReplicatedStorage.Game.Item.ChildAdded:Connect(childAdded)
 	require(ReplicatedStorage.Game.ItemSystem.ItemCamera).Init()
 	require(ReplicatedStorage.Game.ItemSkin.ItemSkin).Init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
 	require(ReplicatedStorage.Game.ItemSkin.UI.UI).Init()
 	local PoliceReportUI = require(ReplicatedStorage.Game.PoliceReportUI.PoliceReportUI)
 	PoliceReportUI.Init()
-	function configTable.b1wty5u4(p1)
+	function t.j1pilk8h(p1) --[[ j1pilk8h | Line: 190 | Upvalues: PoliceReportUI (copy) ]]
 		PoliceReportUI.Display(p1)
 	end
-	local configTable = {}
-	ThreadLoopAdd = function(p1, p2)
-		table.insert(configTable, {
-			configTable = 0,
+	local t3 = {}
+	ThreadLoopAdd = function(p1, p2) --[[ ThreadLoopAdd | Line: 198 | Upvalues: t3 (copy) ]]
+		table.insert(t3, {
+			t = 0,
 			i = p1,
 			c = p2
 		})
 	end
-	local cframe = os.clock()
-	local function Stepped()
-		local isEnabled = os.clock()
-		local isEnabled = isEnabled - cframe
-		cframe = isEnabled
+	local v15 = os.clock()
+	local function Stepped() --[[ Stepped | Line: 207 | Upvalues: v15 (ref), t3 (copy) ]]
+		local v1 = os.clock()
+		local v2 = v1 - v15
+		v15 = v1
 		debug.profilebegin("Thread Loop")
-		for i = 1, #configTable do
-			local func = configTable[i]
-			if isEnabled - func.configTable > func.i then
-				func.configTable = isEnabled
-				func.c(isEnabled, isEnabled)
+		for i = 1, #t3 do
+			local v3 = t3[i]
+			if v1 - v3.t > v3.i then
+				v3.t = v1
+				v3.c(v1, v2)
 			end
 		end
 		debug.profileend()
 	end
 	RunService.Heartbeat:Connect(Stepped)
 end
-local windowGroup, CharacterBinder, CharacterUtil, eventMap, currentVehiclePacket, nitroState, cameraTargetOffset, isSprinting, isCrawling, isStunned, EzUtils, gameContext, VehicleUtils, VehicleStateBinder, Classes, PromptPurchase
+local v16, CharacterBinder, CharacterUtil, t4, v17, t5, v18, v19, v20, v21, EzUtils, t6, VehicleUtils, VehicleStateBinder, Classes, PromptPurchase
 do
-	local function HasPerm(p1)
-		local isEnabled = false
-		local isEnabled, func = pcall(function()
+	local function HasPerm(p1) --[[ HasPerm | Line: 224 | Upvalues: LocalPlayer (copy) ]]
+		local v1 = false
+		local v2, v3 = pcall(function() --[[ Line: 226 | Upvalues: p1 (copy), v1 (ref), LocalPlayer (ref) ]]
 			if p1.Group then
-				isEnabled = true
-				isEnabled = isEnabled and LocalPlayer:IsInGroup(p1.Group)
+				v1 = true
+				v1 = v1 and LocalPlayer:IsInGroup(p1.Group)
 				if p1.Rank then
-					isEnabled = isEnabled and LocalPlayer:GetRankInGroup(p1.Group) >= p1.Rank
+					v1 = v1 and LocalPlayer:GetRankInGroup(p1.Group) >= p1.Rank
 				end
 			end
-			if not isEnabled and p1.Id then
-				isEnabled = true
-				local func = isEnabled
-				if func then
-					func = p1.Id[tostring(LocalPlayer.UserId)]
+			if not v1 and p1.Id then
+				v1 = true
+				local v3 = v1
+				if v3 then
+					v3 = p1.Id[tostring(LocalPlayer.UserId)]
 				end
-				isEnabled = func
+				v1 = v3
 			end
 		end)
-		if not isEnabled then
-			print(func)
+		if not v2 then
+			print(v3)
 		end
-		return isEnabled and isEnabled
+		return v2 and v1
 	end
-	windowGroup = AlexWM.MakeWindowGroup()
+	v16 = AlexWM.MakeWindowGroup()
 	CharacterBinder = require(ReplicatedStorage.App.CharacterBinder)
 	CharacterBinder:Start()
 	CharacterUtil = require(ReplicatedStorage.Game.CharacterUtil)
 	require(ReplicatedStorage.Inventory.InventorySystem).init()
 	local HotbarSystem = require(ReplicatedStorage.Hotbar.HotbarSystem)
 	HotbarSystem.init()
-	GameUtil.OnTeamChanged:Connect(function(p1)
+	GameUtil.OnTeamChanged:Connect(function(p1) --[[ Line: 261 | Upvalues: HotbarSystem (copy), Settings (copy) ]]
 		HotbarSystem.setColor(Settings.TeamColor[p1])
 	end)
-	require(ReplicatedStorage.Hotbar.HotbarItemBinder):GetClassAddedSignal():Connect(function()
+	require(ReplicatedStorage.Hotbar.HotbarItemBinder):GetClassAddedSignal():Connect(function() --[[ Line: 267 | Upvalues: HotbarSystem (copy), Settings (copy), GameUtil (copy) ]]
 		HotbarSystem.setColor(Settings.TeamColor[GameUtil.Team])
 	end)
-	Binder.new("BarbedWireClient", function(p1)
-		local maidInstance = Maid.new()
-		local lastTouchTime = 0
-		maidInstance:GiveTask(p1.Touched:Connect(function(p12)
+	Binder.new("BarbedWireClient", function(p1) --[[ Line: 273 | Upvalues: Maid (copy), LocalPlayer (copy), t2 (ref) ]]
+		local v1 = Maid.new()
+		local v2 = 0
+		v1:GiveTask(p1.Touched:Connect(function(p12) --[[ Line: 276 | Upvalues: LocalPlayer (ref), v2 (ref), p1 (copy), t2 (ref) ]]
 			local Character = LocalPlayer.Character
 			if Character and p12.Parent == Character then
 				local Humanoid = Character:FindFirstChild("Humanoid")
@@ -253,101 +254,101 @@ do
 					if Humanoid:GetLimb(p12) == Enum.Limb.Unknown then
 						return
 					end
-					local currentTime = os.clock()
-					if not (currentTime - lastTouchTime < 0.3) then
-						lastTouchTime = currentTime
-						local damageAmount = p1:GetAttribute("BarbedWireDamage")
-						local damageValue
-						if damageAmount then
-							assert(typeof(damageAmount) == "number")
-							damageValue = damageAmount
+					local v1 = os.clock()
+					if not (v1 - v2 < 0.3) then
+						v2 = v1
+						local v22 = p1:GetAttribute("BarbedWireDamage")
+						local v3
+						if v22 then
+							assert(typeof(v22) == "number")
+							v3 = v22
 						else
-							damageValue = 30
+							v3 = 30
 						end
-						eventBridge:FireServer("xe6v1us6", damageValue, "Wire")
+						t2:FireServer("p" .. ("znu03kj5jp"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("qnj"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("z1vmmo6"):sub(3, 5):reverse():reverse():reverse() .. "u", v3, "Wire")
 					end
 				end
 			end
 		end))
-		return maidInstance
+		return v1
 	end):Start()
-	eventMap = {}
-	currentVehiclePacket = nil
-	nitroState = {
-		VehiclesOwned = {},
-		VehiclesRented = {},
+	t4 = {}
+	v17 = nil
+	t5 = {
 		Nitro = 50,
-		NitroLastMax = 50
+		NitroLastMax = 50,
+		VehiclesOwned = {},
+		VehiclesRented = {}
 	}
-	cameraTargetOffset = Vector3.new(0, 0, 0)
-	isSprinting = false
-	isCrawling = false
+	v18 = Vector3.new(0, 0, 0)
+	v19 = false
+	v20 = false
 	GameUtil.Schedule = "Yard"
-	isStunned = false
+	v21 = false
 	EzUtils = require(ReplicatedStorage.EzUi.EzUtils)
-	gameContext = {
-		MainWindowGroup = windowGroup,
-		ScreenGui = isEnabled,
-		ProductGui = cframe,
-		Event = eventBridge,
-		em = configTable,
+	t6 = {
+		MainWindowGroup = v16,
+		ScreenGui = v9,
+		ProductGui = v10,
+		Event = t2,
+		em = t,
 		UI = UI,
-		SelectIfGamepad = function(p1)
+		SelectIfGamepad = function(p1) --[[ SelectIfGamepad | Line: 337 | Upvalues: EzUtils (copy) ]]
 			EzUtils.selectIfGamepad(p1)
 		end,
-		GetVehiclePacket = function()
-			return currentVehiclePacket
+		GetVehiclePacket = function() --[[ GetVehiclePacket | Line: 352 | Upvalues: v17 (ref) ]]
+			return v17
 		end
 	}
 	VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
 	VehicleUtils.Init({
-		GetVehiclePacket = gameContext.GetVehiclePacket,
-		em = eventMap,
-		Event = eventBridge,
-		nitroState = nitroState
+		GetVehiclePacket = t6.GetVehiclePacket,
+		em = t,
+		Event = t2,
+		nitroState = t5
 	})
 	VehicleStateBinder = require(ReplicatedStorage.Game.VehicleStateBinder)
 	VehicleStateBinder:Start()
 	Classes = VehicleUtils.Classes
 	Classes.Chassis = require(ReplicatedStorage.Module.AlexChassis)
 	Classes.Chassis.init({
-		ScreenGui = isEnabled
+		ScreenGui = v9
 	})
-	Classes.Chassis.SetEvent(eventBridge)
+	Classes.Chassis.SetEvent(t2)
 	Classes.Chassis2 = require(ReplicatedStorage.Module.AlexChassis2)
-	Classes.Chassis2.SetEvent(eventBridge)
+	Classes.Chassis2.SetEvent(t2)
 	Classes.Volt = require(ReplicatedStorage.Game.Vehicle.Volt)
 	Classes.Volt.Init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
 	Classes.Tank = require(ReplicatedStorage.Tank.TankService)
 	Classes.Tank.init()
-	local passPromptCounter = 0
-	PromptPurchase = function(p1)
+	local v22 = 0
+	PromptPurchase = function(p1) --[[ PromptPurchase | Line: 416 | Upvalues: v22 (ref), MarketplaceService (copy), LocalPlayer (copy), v10 (copy) ]]
 		local PassId = p1.PassId
-		local nextCounter = passPromptCounter + 1
-		passPromptCounter = nextCounter
+		local v1 = v22 + 1
+		v22 = v1
 		if p1.OldPassId then
 			MarketplaceService:PromptPurchase(LocalPlayer, p1.OldPassId)
 		else
 			MarketplaceService:PromptGamePassPurchase(LocalPlayer, PassId)
 		end
-		cframe.Gamepass.ContainerFrame.TextLabel.Text = p1.Text
-		task.delay(0.4, function()
-			if passPromptCounter == nextCounter then
-				cframe.Gamepass.Visible = true
+		v10.Gamepass.ContainerFrame.TextLabel.Text = p1.Text
+		task.delay(0.4, function() --[[ Line: 426 | Upvalues: v22 (ref), v1 (copy), v10 (ref) ]]
+			if v22 == v1 then
+				v10.Gamepass.Visible = true
 			end
 		end)
 	end
-	local function PromptGamePassPurchaseFinished(p1, p2, p3)
-		passPromptCounter = passPromptCounter + 1
-		cframe.Gamepass.Visible = false
+	local function PromptGamePassPurchaseFinished(p1, p2, p3) --[[ PromptGamePassPurchaseFinished | Line: 433 | Upvalues: v22 (ref), v10 (copy) ]]
+		v22 = v22 + 1
+		v10.Gamepass.Visible = false
 	end
 	MarketplaceService.PromptGamePassPurchaseFinished:Connect(PromptGamePassPurchaseFinished)
 	MarketplaceService.PromptPurchaseFinished:Connect(PromptGamePassPurchaseFinished)
 end
-function configTable.n4fjwklv(p1)
+function t.o8anuzn3(p1) --[[ o8anuzn3 | Line: 441 | Upvalues: PromptPurchase (ref) ]]
 	PromptPurchase(p1)
 end
 local GamepassSystem = require(ReplicatedStorage.Gamepass.GamepassSystem)
@@ -356,16 +357,16 @@ local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
 GamepassUtils.Init({
 	PromptPurchase = PromptPurchase
 })
-gameContext.PromptPurchase = PromptPurchase
+t6.PromptPurchase = PromptPurchase
 local Notification = require(ReplicatedStorage.Game.Notification)
 Notification.Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 local SidebarUI = require(ReplicatedStorage.Game.SidebarUI)
 SidebarUI.Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 require(ReplicatedStorage.GameAnalytics).initClient()
 local DefaultActions = require(ReplicatedStorage.Game.DefaultActions)
@@ -373,28 +374,28 @@ require(ReplicatedStorage.CmdrExt.CmdrExtSystem).init()
 local Time = require(ReplicatedStorage.Module.Time)
 Time.Init()
 require(ReplicatedStorage.Module.Confirmation).Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 require(ReplicatedStorage.Game.DisplayDamage).init()
 require(ReplicatedStorage.Game.CharacterAnim).init()
 require(ReplicatedStorage.Module.NetSync).Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 require(ReplicatedStorage.Game.OwnedPart.OwnedPartSystem).init()
 require(ReplicatedStorage.Game.TrainSystem).Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 require(ReplicatedStorage.Game.TrackSwitch).Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
-Classes.Heli = require(ReplicatedStorage.Game.Vehicle.Heli)(gameContext)
-require(ReplicatedStorage.Game.Museum)(gameContext, ItemSystem)
+Classes.Heli = require(ReplicatedStorage.Game.Vehicle.Heli)(t6)
+require(ReplicatedStorage.Game.Museum)(t6, ItemSystem)
 require(ReplicatedStorage.Game.L18n)({
-	ScreenGui = isEnabled
+	ScreenGui = v9
 })
 require(ReplicatedStorage.Game.Level2.LevelSystem).init()
 require(ReplicatedStorage.Game.TurbineSystem).init()
@@ -403,39 +404,39 @@ require(ReplicatedStorage.Plane.PlaneBinder):Start()
 require(ReplicatedStorage.Game.Hologram).Init()
 require(ReplicatedStorage.Game.Codes).Init({
 	MainWindowGroup = v16,
-	Event = eventBridge
+	Event = t2
 })
 require(ReplicatedStorage.Game.SecretBases).Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 require(ReplicatedStorage.Game.Robbery.RobberyBank.RobberyBank).Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 require(ReplicatedStorage.Jewelry.RobberyJewelry).Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 require(ReplicatedStorage.Game.Robbery.RobberyCargoTrain).Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 require(ReplicatedStorage.Game.Robbery.RobberyPassengerTrain).Init({
-	Event = eventBridge,
-	em = configTable,
-	ScreenGui = isEnabled
+	Event = t2,
+	em = t,
+	ScreenGui = v9
 })
 require(ReplicatedStorage.Game.Robbery.RobberyCargoPlane).Init({
-	Event = eventBridge,
-	em = configTable,
+	Event = t2,
+	em = t,
 	Team = TeamValue,
-	ScreenGui = isEnabled
+	ScreenGui = v9
 })
 require(ReplicatedStorage.Game.Cell).Init({
-	Event = eventBridge,
-	em = configTable,
-	ScreenGui = isEnabled
+	Event = t2,
+	em = t,
+	ScreenGui = v9
 })
 require(ReplicatedStorage.Game.MilitaryIsland).Init()
 local VehicleSystem
@@ -444,65 +445,65 @@ do
 	require(ReplicatedStorage.Game.Plane.BaseUserControlledPlane).Init()
 	local Jet = require(ReplicatedStorage.Game.Plane.Jet)
 	Jet.Init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
 	local Stunt = require(ReplicatedStorage.Game.Plane.Stunt)
 	VehicleSystem = require(ReplicatedStorage.Game.VehicleSystem)
 	VehicleSystem.Init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
 	VehicleSystem.RegisterModule(JetSki)
 	VehicleSystem.RegisterModule(Jet)
 	VehicleSystem.RegisterModule(Stunt)
-	function configTable.orasjip0(p1, p2)
-		local isEnabled, _ = VehicleSystem.WaitForVehiclePacket(LocalPlayer)
-		if isEnabled == nil then
+	function t.emnmgnrg(p1, p2) --[[ emnmgnrg | Line: 540 | Upvalues: VehicleSystem (ref), LocalPlayer (copy) ]]
+		local v1, _ = VehicleSystem.WaitForVehiclePacket(LocalPlayer)
+		if v1 == nil then
 			error("No vehicle exists for LocalPlayer")
 		end
-		isEnabled:UpdateMissileUI(p1, p2)
+		v1:UpdateMissileUI(p1, p2)
 	end
 	local Missile = require(ReplicatedStorage.Game.Missile)
-	function configTable.usqlew42(p1, p2, p3, p4)
+	function t.dzy6thim(p1, p2, p3, p4) --[[ dzy6thim | Line: 548 | Upvalues: Missile (copy) ]]
 		Missile.LaunchMissile(p1, p2, p3, p4)
 	end
 	require(ReplicatedStorage.Game.Robbery.PuzzleFlow).Init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
 	require(ReplicatedStorage.Game.Robbery.PowerPlant.PowerPlant).Init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
 	local JetPack = require(ReplicatedStorage.Game.JetPack.JetPack)
 	JetPack.Init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
-	JetPack.Signal.OnEquipped:Connect(function()
+	JetPack.Signal.OnEquipped:Connect(function() --[[ Line: 560 | Upvalues: InventoryItemSystem (copy) ]]
 		InventoryItemSystem.unequipAll()
 	end)
 	local Streetlights = require(ReplicatedStorage.Game.Streetlights)
 	Streetlights.init()
-	function configTable.uudh9xbm()
+	function t.ogr1c6kj() --[[ ogr1c6kj | Line: 567 | Upvalues: Streetlights (copy) ]]
 		Streetlights.Flicker()
 	end
-	function configTable.m26e2x2p(p1)
+	function t.lzqrfdxm(p1) --[[ lzqrfdxm | Line: 570 | Upvalues: Streetlights (copy) ]]
 		Streetlights.SetEnabled(p1)
 	end
 	require(ReplicatedStorage.App.MinimapService).init()
 	require(ReplicatedStorage.Game.RoadSpikeSystem).Init({
-		Event = eventBridge
+		Event = t2
 	})
 	require(ReplicatedStorage.Game.WorldMarker.WorldMarkerSystem).init()
 	require(ReplicatedStorage.Game.RobberyMarkerSystem).init()
 	require(ReplicatedStorage.Game.LightningSystem).Init({
-		em = configTable
+		em = t
 	})
 	require(ReplicatedStorage.Game.April2020LiveEventLoader).Init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
 	require(ReplicatedStorage.Game.Boat.Boat).Init()
 	local Sloop = require(ReplicatedStorage.Game.Boat.Sloop)
@@ -514,30 +515,30 @@ do
 	end
 	require(ReplicatedStorage.Game.Lighthouse).Init()
 	require(ReplicatedStorage.Game.Drawbridge).Init({
-		em = configTable
+		em = t
 	})
 	require(ReplicatedStorage.Game.NukeControl).Init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
 	require(ReplicatedStorage.Game.Robbery.CargoShip.CargoShipCoordinator).Init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
 	require(ReplicatedStorage.Game.Radio.RadioPlayer).Init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
 	require(ReplicatedStorage.Game.RobberyMoneyUI.RobberyMoneyUI).Init()
 	require(ReplicatedStorage.Game.DuffelBag.DuffelBagBinder):Start()
 	require(ReplicatedStorage.Game.GunShop.GunShopSystem).init()
 	require(ReplicatedStorage.Game.GunShop.GunShopUI).init({
-		Event = eventBridge,
-		em = configTable
+		Event = t2,
+		em = t
 	})
 	require(ReplicatedStorage.Game.ContextMessage.ContextMessageUI).init()
 	require(ReplicatedStorage.Game.C4.C4System).init({
-		em = configTable
+		em = t
 	})
 	require(ReplicatedStorage.Game.SmokeGrenade.SmokeGrenadeSystem).init()
 	require(ReplicatedStorage.Game.Level2.LevelUISystem).init()
@@ -556,16 +557,16 @@ do
 	require(ReplicatedStorage.Home.Surface.SurfaceSystem).init()
 	require(ReplicatedStorage.Home.HomeItem.HomeItemSystem).init()
 	require(ReplicatedStorage.Home.HomeItem.Fabricate.Turret).init({
-		Event = eventBridge
+		Event = t2
 	})
 	require(ReplicatedStorage.Home.HomeItem.Fabricate["Trapped Bookshelf"]).init({
-		Event = eventBridge
+		Event = t2
 	})
 	require(ReplicatedStorage.Home.HomeItem.Fabricate["Trapped Spikes"]).init({
-		Event = eventBridge
+		Event = t2
 	})
 	require(ReplicatedStorage.Game.Robbery.TombRobbery.TombRobberySystem).init({
-		Event = eventBridge
+		Event = t2
 	})
 	require(ReplicatedStorage.Game.Cart.CartSystem).init()
 	require(ReplicatedStorage.Game.ProximityCamShake.ProximityCamShakeSystem).init()
@@ -573,45 +574,45 @@ do
 	require(ReplicatedStorage.Game.DartDispenser.DartDispenserSystem).init()
 	require(ReplicatedStorage.Game.Plank.PlankSystem).init()
 	require(ReplicatedStorage.Game.MilitaryTurret.MilitaryTurretSystem).init({
-		Event = eventBridge
+		Event = t2
 	})
 	require(ReplicatedStorage.Game.Destructible.DestructibleSystem).init()
 	require(ReplicatedStorage.Game.PlayerMarkerSystem).init()
 	require(ReplicatedStorage.Game.TopExpBoard.TopExpBoardSystem).init()
 	require(ReplicatedStorage.Game.CatalogPurchaseSystem).init()
 	require(ReplicatedStorage.CCTV.CCTVService).init()
-	local configTable = {}
-	local configTable = {}
-	local configTable = {}
-	function configTable.c12ouosh(p1)
-		configTable = p1
+	local t7 = {}
+	local t8 = {}
+	local t9 = {}
+	function t.ygdwzgcv(p1) --[[ ygdwzgcv | Line: 680 | Upvalues: t8 (ref), GameSettingsService (copy), t7 (copy) ]]
+		t8 = p1
 		for k, v in pairs(p1) do
-			local isEnabled = GameSettingsService.getSettingByName(k)
-			if isEnabled then
-				if not isEnabled.noSave then
-					GameSettingsService.setValue(isEnabled, v)
+			local v1 = GameSettingsService.getSettingByName(k)
+			if v1 then
+				if not v1.noSave then
+					GameSettingsService.setValue(v1, v)
 				end
 			else
-				configTable[k] = v
+				t7[k] = v
 			end
 		end
 	end
-	local function handleSetting(p1)
-		local isEnabled = configTable[p1.name]
-		if isEnabled ~= nil then
-			configTable[p1.name] = nil
+	local function handleSetting(p1) --[[ handleSetting | Line: 693 | Upvalues: t7 (copy), GameSettingsService (copy), t9 (copy), t8 (ref), t2 (ref) ]]
+		local v1 = t7[p1.name]
+		if v1 ~= nil then
+			t7[p1.name] = nil
 			if not p1.noSave then
-				GameSettingsService.setValue(p1, isEnabled)
+				GameSettingsService.setValue(p1, v1)
 			end
 		end
-		p1.onChanged:Connect(function(p12)
-			local isEnabled = (configTable[p1.name] or 0) + 1
-			configTable[p1.name] = isEnabled
-			if configTable[p1.name] ~= p12 then
-				configTable[p1.name] = p12
-				task.delay(0.25, function()
-					if configTable[p1.name] == isEnabled then
-						eventBridge:FireServer("ad9yrgu1", p1.name, p12)
+		p1.onChanged:Connect(function(p12) --[[ Line: 702 | Upvalues: t9 (ref), p1 (copy), t8 (ref), t2 (ref) ]]
+			local v1 = (t9[p1.name] or 0) + 1
+			t9[p1.name] = v1
+			if t8[p1.name] ~= p12 then
+				t8[p1.name] = p12
+				task.delay(0.25, function() --[[ Line: 712 | Upvalues: t9 (ref), p1 (ref), v1 (ref), t2 (ref), p12 (copy) ]]
+					if t9[p1.name] == v1 then
+						t2:FireServer("x" .. ("j5jlyyl9"):sub(2, 6):reverse() .. "ov", p1.name, p12)
 					end
 				end)
 			end
@@ -627,7 +628,7 @@ do
 	require(ReplicatedStorage.TransportJet.TransportJetService).init()
 	require(ReplicatedStorage.DamageIndicator.DamageIndicatorService).init()
 	require(ReplicatedStorage.Trade.TradeService).init({
-		em = configTable
+		em = t
 	})
 	if RunUtils.isTradeWorld() then
 		require(ReplicatedStorage.Trade.TradeDesireService).init()
@@ -635,14 +636,14 @@ do
 	require(ReplicatedStorage.RewardSpinner.RewardSpinnerService).init()
 	require(ReplicatedStorage.HyperChrome.HyperChromeService).init()
 	require(ReplicatedStorage.RobberyBonus.RobberyBonusService).init({
-		em = configTable
+		em = t
 	})
 	require(ReplicatedStorage.Safes.SafesService).init({
-		em = configTable
+		em = t
 	})
 	require(ReplicatedStorage.GuardNPC.GuardNPCBinder):Start()
 	require(ReplicatedStorage.AirDrop.AirDropService).init({
-		em = configTable
+		em = t
 	})
 	require(ReplicatedStorage.App.HoldEService).init()
 	require(ReplicatedStorage.TargetingIndicator.TargetingIndicatorService).init()
@@ -652,7 +653,7 @@ do
 	require(ReplicatedStorage.PersistentCrewBattle.PersistentCrewBattleService).init()
 	require(ReplicatedStorage.TrackingSpotlight.TrackingSpotlightService).init()
 	require(ReplicatedStorage.GameMode.GameModeService).init({
-		em = configTable
+		em = t
 	})
 	require(ReplicatedStorage.DragStrip.DragStripService).init()
 	require(ReplicatedStorage.App.CircleActionBinder):Start()
@@ -665,371 +666,374 @@ do
 end
 local CashBuyUI = require(ReplicatedStorage.Game.CashBuyUI)
 CashBuyUI.Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 require(ReplicatedStorage.Game.Radio.Radio).Init()
 Settings.FetchProducts()
 local Falling = require(ReplicatedStorage.Game.Falling)
 Falling.Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 local Paraglide = require(ReplicatedStorage.Game.Paraglide)
 Paraglide.Init({
-	Event = eventBridge,
-	em = configTable
+	Event = t2,
+	em = t
 })
 local LerpTable, PlaySound, StopSound
 do
-	local function comma(p1)
-		local isEnabled, isEnabled, func = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
-		return isEnabled .. isEnabled:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. func
+	local function comma(p1) --[[ comma | Line: 789 ]]
+		local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
+		return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
 	end
-	local function FormatMoney(p1)
-		local configTable = {}
-		local cframe, vector, cframe = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
-		configTable[1] = cframe .. vector:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. cframe
-		return if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", configTable)
+	local function FormatMoney(p1) --[[ FormatMoney | Line: 793 | Upvalues: Localization (copy), abs (copy) ]]
+		local t = {}
+		local v4, v5, v6 = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
+		t[1] = v4 .. v5:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v6
+		return if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", t)
 	end
-	LerpTable = function(p1, p2, p3)
-		local configTable = {}
-		for isEnabled, func in next, p2 do
-			local isEnabled
-			local cframe = p1[isEnabled]
-			isEnabled = if type(func) == "number" then (1 - p3) * cframe + p3 * func else cframe:lerp(func, p3)
-			configTable[isEnabled] = isEnabled
+	LerpTable = function(p1, p2, p3) --[[ LerpTable | Line: 798 ]]
+		local t = {}
+		for v2, v3 in next, p2 do
+			local v1
+			local v4 = p1[v2]
+			v1 = if type(v3) == "number" then (1 - p3) * v4 + p3 * v3 else v4:lerp(v3, p3)
+			t[v2] = v1
 		end
-		return configTable
+		return t
 	end
-	local configTable = {}
-	PlaySound = function(p1, p2, p3)
+	local t10 = {}
+	PlaySound = function(p1, p2, p3) --[[ PlaySound | Line: 818 | Upvalues: t2 (ref), t (copy), LocalPlayer (copy) ]]
 		if p2.Source then
 			p2.Play = true
 			if not p3 then
-				eventBridge:FireServer("xk8pf94p", p1, p2)
+				t2:FireServer("i531zmrk", p1, p2)
 			end
-			configTable.xk8pf94p(LocalPlayer.Name, p1, p2)
+			t.i531zmrk(LocalPlayer.Name, p1, p2)
 		end
 	end
-	StopSound = function(p1, p2)
-		local configTable = {}
+	StopSound = function(p1, p2) --[[ StopSound | Line: 828 | Upvalues: t2 (ref), t (copy), LocalPlayer (copy) ]]
+		local t3 = {}
 		if not p2 then
-			eventBridge:FireServer("xk8pf94p", p1, configTable)
+			t2:FireServer("i" .. ("yrg5n4h3"):sub(4, 4):reverse():reverse():reverse() .. "" .. "" .. ("c13dso"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("jzu"):sub(2, 2):reverse() .. "" .. "" .. ("khnxmkno"):sub(5, 5):reverse():reverse():reverse() .. "rk", p1, t3)
 		end
-		configTable.xk8pf94p(LocalPlayer.Name, p1, configTable)
+		t.i531zmrk(LocalPlayer.Name, p1, t3)
 	end
-	local questionCounter = 0
-	function configTable.xk8pf94p(p1, p2, p3)
+	local v23 = 0
+	function t.i531zmrk(p1, p2, p3) --[[ i531zmrk | Line: 836 | Upvalues: v23 (ref), t10 (copy), Settings (copy) ]]
 		local Source = p3.Source
-		local isEnabled = p3.Volume or 0.5
-		if isEnabled > 2 then
-			isEnabled = 2
+		local v1 = p3.Volume or 0.5
+		if v1 > 2 then
+			v1 = 2
 		end
-		if isEnabled ~= isEnabled then
-			isEnabled = 0.5
+		if v1 ~= v1 then
+			v1 = 0.5
 		end
-		local isEnabled = p3.Pitch or 1
-		local func = p3.MaxTime or 1
+		local v2 = p3.Pitch or 1
+		local v3 = p3.MaxTime or 1
 		local Looped = p3.Looped
 		local TimeStart = p3.TimeStart
 		local Delay = p3.Delay
-		local cframe = p3.EmitterSize or 10
+		local v4 = p3.EmitterSize or 10
 		if p3.TimeStop then
-			func = TimeStart + p3.TimeStop
+			v3 = TimeStart + p3.TimeStop
 		end
-		local vector = v23 + 1
-		v23 = vector
-		local cframe = p3.Multi and ("%s_%s_%d"):format(p1, p2, vector) or ("%s_%s"):format(p1, p2)
-		local RemoteEvent = configTable[cframe]
-		if RemoteEvent then
-			RemoteEvent.Object:Stop()
-			RemoteEvent.Object:Destroy()
-			configTable[cframe] = nil
+		local v5 = v23 + 1
+		v23 = v5
+		local v6 = p3.Multi and ("%s_%s_%d"):format(p1, p2, v5) or ("%s_%s"):format(p1, p2)
+		local v7 = t10[v6]
+		if v7 then
+			v7.Object:Stop()
+			v7.Object:Destroy()
+			t10[v6] = nil
 		end
 		if p3.Play and Source then
-			local vector = Settings.Sounds[p2]
-			if vector then
+			local v8 = Settings.Sounds[p2]
+			if v8 then
 				local Sound = Instance.new("Sound")
-				Sound.SoundId = "rbxassetid://" .. vector
+				Sound.SoundId = "rbxassetid://" .. v8
 				if TimeStart then
 					Sound.TimePosition = TimeStart
 				end
 				if p3.SoundGroup then
 					Sound.SoundGroup = p3.SoundGroup
 				end
-				Sound.Name = cframe
+				Sound.Name = v6
 				Sound.Looped = Looped
-				Sound.Volume = isEnabled
-				Sound.PlaybackSpeed = isEnabled
-				Sound.EmitterSize = cframe
+				Sound.Volume = v1
+				Sound.PlaybackSpeed = v2
+				Sound.EmitterSize = v4
 				Sound.MaxDistance = 400
 				Sound.Parent = Source
 				if Delay then
-					delay(Delay, function()
+					delay(Delay, function() --[[ Line: 892 | Upvalues: Sound (copy) ]]
 						Sound:Play()
 					end)
 				else
 					Sound:Play()
 				end
-				configTable[cframe] = {
+				t10[v6] = {
 					Object = Sound,
-					Proxy = vector
+					Proxy = v5
 				}
-				local function Expire()
-					local isEnabled = configTable[cframe]
-					if isEnabled then
-						if not (vector < isEnabled.Proxy) then
-							isEnabled.Object:Stop()
-							isEnabled.Object:Destroy()
-							configTable[cframe] = nil
+				local function Expire() --[[ Expire | Line: 901 | Upvalues: t10 (ref), v6 (copy), v5 (copy) ]]
+					local v1 = t10[v6]
+					if v1 then
+						if not (v5 < v1.Proxy) then
+							v1.Object:Stop()
+							v1.Object:Destroy()
+							t10[v6] = nil
 						end
 					end
 				end
-				delay(func, Expire)
+				delay(v3, Expire)
 			end
 		end
 	end
 end
-local function Fireworks(p1)
-	local isEnabled = AlexParticles.MakeState()
-	isEnabled.Frame = cframe.Particles
-	AlexParticles.EasySimulate(isEnabled, 4)
-	local AbsoluteSize = isEnabled.Frame.AbsoluteSize
+local function Fireworks(p1) --[[ Fireworks | Line: 916 | Upvalues: AlexParticles (copy), v11 (copy), PlaySound (ref), v9 (copy), Math (copy), v3 (copy) ]]
+	local v1 = AlexParticles.MakeState()
+	v1.Frame = v11.Particles
+	AlexParticles.EasySimulate(v1, 4)
+	local AbsoluteSize = v1.Frame.AbsoluteSize
 	local X = AbsoluteSize.X
 	local Y = AbsoluteSize.Y
-	local function OnDestroy(p12)
+	local function OnDestroy(p12) --[[ OnDestroy | Line: 922 | Upvalues: p1 (copy), PlaySound (ref), v9 (ref) ]]
 		if p1 <= 4 or math.random() > 0.2 then
 			PlaySound("FireworkBang", {
-				Source = isEnabled,
-				Volume = 0.2 + math.random() * 0.3,
-				Multi = true
+				Multi = true,
+				Source = v9,
+				Volume = 0.2 + math.random() * 0.3
 			}, true)
 		end
 	end
 	for i = 1, p1 do
-		local isEnabled = Y * 0.3 + Y * 0.6 * math.random()
-		local vector = Vector3.new(0, -400, 0) + Math.Uniform2D(150)
-		local vector = AlexParticles.Firework(isEnabled, func(math.random() * X, Y, 0), vector, Vector3.new(0, 0, 0))
-		vector.ttl = (Y - isEnabled) / vector.magnitude
-		vector.OnDestroy = OnDestroy
+		local v2 = Y * 0.3 + Y * 0.6 * math.random()
+		local v32 = Vector3.new(0, -400, 0) + Math.Uniform2D(150)
+		local v5 = AlexParticles.Firework(v1, v3(math.random() * X, Y, 0), v32, Vector3.new(0, 0, 0))
+		v5.ttl = (Y - v2) / v32.magnitude
+		v5.OnDestroy = OnDestroy
 		wait(0.1 + math.random() * 0.1 * 0.5)
 	end
 end
-function configTable.l2atqdos(p1)
+function t.hksqoez6(p1) --[[ hksqoez6 | Line: 937 | Upvalues: Fireworks (copy) ]]
 	assert(p1 <= 50)
 	Fireworks(p1)
 end
-gameContext.Fireworks = Fireworks
+t6.Fireworks = Fireworks
 require(ReplicatedStorage.Game.Party).Init({
 	Fireworks = Fireworks
 })
-local AttemptPickPocket, AttemptBreakout, AttemptTrade, AttemptVehicleEject, AttemptVehicleHotwire, v24, StartNitro, StopNitro
+local function AttemptArrest(p1) --[[ AttemptArrest | Line: 947 | Upvalues: t2 (ref) ]]
+	t2:FireServer("i" .. "" .. ("nioceoh"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("mbbvra"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("kfftool"):sub(2, 4):reverse():reverse():reverse() .. "g", p1)
+end
+function t.g088vlii(p1) --[[ g088vlii | Line: 950 | Upvalues: t (copy) ]]
+	if p1.Bribed then
+		t.vbey8zy6({
+			Title = "Arrest",
+			Text = ("You are bribed! Wait %d seconds."):format(p1.Bribed)
+		})
+	end
+end
+local function AttemptPickPocket(p1) --[[ AttemptPickPocket | Line: 955 | Upvalues: t2 (ref) ]]
+	t2:FireServer("l" .. ("eatxuv8"):sub(2, 3):reverse():reverse():reverse() .. "" .. "" .. ("zfzwida"):sub(3, 4):reverse():reverse():reverse():reverse():reverse() .. "2m1", p1.Name)
+end
+local function AttemptBreakout(p1) --[[ AttemptBreakout | Line: 958 | Upvalues: t2 (ref) ]]
+	t2:FireServer("j" .. ("ri1pafs0"):sub(2, 6):reverse():reverse():reverse() .. "" .. "" .. ("vrmg"):sub(2, 2):reverse() .. "6", p1.Name)
+end
+function t.sm4jlcui(p1) --[[ sm4jlcui | Line: 961 | Upvalues: t (copy) ]]
+	if p1.Cooldown then
+		t.vbey8zy6({
+			Title = "Breakout",
+			Text = ("Wait %d seconds."):format(p1.Cooldown)
+		})
+	end
+end
+local function AttemptTrade(p1) --[[ AttemptTrade | Line: 968 | Upvalues: TradeService (copy), LocalPlayer (copy) ]]
+	if TradeService.checkAlreadyInitiated(p1, LocalPlayer) then
+		TradeService.acceptInitiation(p1.UserId)
+	else
+		TradeService.sendInitiation(p1.UserId)
+	end
+end
+local function AttemptVehicleEject(p1) --[[ AttemptVehicleEject | Line: 976 | Upvalues: t2 (ref) ]]
+	t2:FireServer("s" .. ("wfmg"):sub(2, 3):reverse():reverse():reverse() .. "" .. "" .. ("w1wsfv61u"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ov0zopd20"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("d2gtyph"):sub(3, 4):reverse():reverse():reverse() .. "q", p1)
+end
+local function AttemptVehicleHotwire(p1, p2) --[[ AttemptVehicleHotwire | Line: 979 | Upvalues: t2 (ref) ]]
+	t2:FireServer("x" .. "" .. ("kvtg3"):sub(2, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("jqlcs"):sub(4, 4):reverse():reverse():reverse() .. "" .. "" .. ("mrecbztpf"):sub(4, 6):reverse():reverse():reverse():reverse():reverse() .. "m", p1, p2)
+end
+local v24 = nil
+local StartNitro, StopNitro
 do
-	local function AttemptArrest(p1)
-		eventBridge:FireServer("w5ln1uc8", p1)
-	end
-	function configTable.ghtu2z6w(p1)
-		if p1.Bribed then
-			configTable.mq92d5a8({
-				Title = "Arrest",
-				Text = ("You are bribed! Wait %d seconds."):format(p1.Bribed)
-			})
+	local v25 = tick()
+	local v26 = false
+	local function CalculateDelta() --[[ CalculateDelta | Line: 992 | Upvalues: v26 (ref), RunUtils (copy), v25 (ref), t2 (ref) ]]
+		if v26 and RunUtils.isMainWorld() then
+			v26 = false
+			t2:FireServer("w8pg3yyi", tick() - v25)
 		end
 	end
-	AttemptPickPocket = function(p1)
-		eventBridge:FireServer("wld6u5vm", p1.Name)
-	end
-	AttemptBreakout = function(p1)
-		eventBridge:FireServer("zbmdvqfs", p1.Name)
-	end
-	function configTable.bkiczp52(p1)
-		if p1.Cooldown then
-			configTable.mq92d5a8({
-				Title = "Breakout",
-				Text = ("Wait %d seconds."):format(p1.Cooldown)
-			})
-		end
-	end
-	AttemptTrade = function(p1)
-		if TradeService.checkAlreadyInitiated(p1, LocalPlayer) then
-			TradeService.acceptInitiation(p1.UserId)
-		else
-			TradeService.sendInitiation(p1.UserId)
-		end
-	end
-	AttemptVehicleEject = function(p1)
-		eventBridge:FireServer("hwo8k1vm", p1)
-	end
-	AttemptVehicleHotwire = function(p1, p2)
-		eventBridge:FireServer("zw05zv1l", p1, p2)
-	end
-	timeOfDayState = nil
-	local lastDeltaCalcTime = tick()
-	local isEnabled = false
-	local function CalculateDelta()
-		if isEnabled and RunUtils.isMainWorld() then
-			isEnabled = false
-			local isEnabled = tick() - lastDeltaCalcTime
-			eventBridge:FireServer("vbf3ia8t", isEnabled)
-		end
-	end
-	local lastNitroStartTime = tick()
-	local nitroConnection = nil
-	StartNitro = function()
-		if not (tick() - lastNitroStartTime < 0.1) then
-			lastNitroStartTime = tick()
-			if isEnabled then
-				CalculateDelta()
+	local v27 = tick()
+	local v28 = nil
+	StartNitro = function() --[[ StartNitro | Line: 1001 | Upvalues: v27 (ref), v26 (ref), RunUtils (copy), v25 (ref), t2 (ref), v17 (ref), PlaySound (ref), v28 (ref), HapticEffect (copy), t5 (copy), t (copy) ]]
+		if not (tick() - v27 < 0.1) then
+			v27 = tick()
+			if v26 and (v26 and RunUtils.isMainWorld()) then
+				v26 = false
+				t2:FireServer("w8pg3yyi", tick() - v25)
 			end
-			isEnabled = true
-			lastDeltaCalcTime = tick()
-			if currentVehiclePacket and (not currentVehiclePacket.Passenger and #currentVehiclePacket.Nitrous > 0) then
-				currentVehiclePacket.Nitro = true
+			v26 = true
+			v25 = tick()
+			if v17 and (not v17.Passenger and #v17.Nitrous > 0) then
+				v17.Nitro = true
 				PlaySound("Nitro1", {
-					Source = currentVehiclePacket.Nitrous[1].Parent,
 					TimeStart = 0.5,
-					Volume = 0.7
+					Volume = 0.7,
+					Source = v17.Nitrous[1].Parent
 				})
 				PlaySound("NitroLoop", {
-					Source = currentVehiclePacket.Nitrous[1].Parent,
 					Looped = true,
 					MaxTime = 30,
 					Volume = 0.7,
-					Delay = 0.3
+					Delay = 0.3,
+					Source = v17.Nitrous[1].Parent
 				})
-				for isEnabled, isEnabled in next, currentVehiclePacket.Nitrous do
-					isEnabled.Enabled = true
+				for v1, v2 in next, v17.Nitrous do
+					v2.Enabled = true
 				end
-				eventBridge:FireServer("brcx9whl")
-				if nitroConnection then
-					nitroConnection:Destroy()
+				t2:FireServer("j" .. ("jpup0rp"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("kzi0h2"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "frqe6")
+				if v28 then
+					v28:Destroy()
 				end
-				nitroConnection = HapticEffect.basic(1, (1 / 0))
+				v28 = HapticEffect.basic(1, (1 / 0))
 			end
-			if v17.Nitro / nitroState.NitroLastMax <= 0.01 then
-				configTable.n8cinotq(true, true)
+			if t5.Nitro / t5.NitroLastMax <= 0.01 then
+				t.mi2puuba(true, true)
 			end
 		end
 	end
-	StopNitro = function()
+	StopNitro = function() --[[ StopNitro | Line: 1032 | Upvalues: StopSound (ref), v28 (ref), v17 (ref), v26 (ref), RunUtils (copy), v25 (ref), t2 (ref) ]]
 		StopSound("NitroLoop")
-		if nitroConnection then
-			nitroConnection:Destroy()
-			nitroConnection = nil
+		if v28 then
+			v28:Destroy()
+			v28 = nil
 		end
-		if currentVehiclePacket and not currentVehiclePacket.Passenger then
-			currentVehiclePacket.Nitro = false
-			if currentVehiclePacket.Nitrous then
-				for isEnabled, isEnabled in next, currentVehiclePacket.Nitrous do
-					isEnabled.Enabled = false
+		if v17 and not v17.Passenger then
+			v17.Nitro = false
+			if v17.Nitrous then
+				for v1, v2 in next, v17.Nitrous do
+					v2.Enabled = false
 				end
 			end
 		end
-		CalculateDelta()
-		eventBridge:FireServer("jiz6pq4h")
+		if v26 and RunUtils.isMainWorld() then
+			v26 = false
+			t2:FireServer("w8pg3yyi", tick() - v25)
+		end
+		t2:FireServer("p" .. "" .. ("pq2ch8h1a"):sub(5, 8):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("prxvdp"):sub(3, 4):reverse() .. "i")
 	end
-	function configTable.dwv05uez(p1, p2)
+	function t.kiqdl2al(p1, p2) --[[ kiqdl2al | Line: 1049 | Upvalues: RunUtils (copy), Settings (copy), t5 (copy), v24 (ref) ]]
 		if RunUtils.isTradeWorld() then
 			p1 = Settings.Scalar.NitroMax
 		end
-		nitroState.Nitro = p1
-		nitroState.NitroLastMax = p2
-		nitroState.NitroForceUIUpdate = true
-		local isEnabled = v24
-		isEnabled.Container.Container.ContainerBar.Value.Size = UDim2.new(p1 / Settings.Scalar.NitroMax, 0, 1, 0)
-		isEnabled.Container.Container.ContainerFuel.Amount.Text = ("%d/%d"):format(p1, Settings.Scalar.NitroMax)
+		t5.Nitro = p1
+		t5.NitroLastMax = p2
+		t5.NitroForceUIUpdate = true
+		local v1 = v24
+		v1.Container.Container.ContainerBar.Value.Size = UDim2.new(p1 / Settings.Scalar.NitroMax, 0, 1, 0)
+		v1.Container.Container.ContainerFuel.Amount.Text = ("%d/%d"):format(p1, Settings.Scalar.NitroMax)
 	end
 end
 local UpdateAllLowQuality, UpdateChassisLowQuality, UpdateChassisStepped, UpdateHeliLowQuality, HornStart, HornStop
 do
-	local eventCounter_v29 = 0
-	local vector = Vector3.new(0, 0, 0)
-	RunService.Heartbeat:Connect(function(p1)
+	local v29 = 0
+	local v30 = Vector3.new(0, 0, 0)
+	RunService.Heartbeat:Connect(function(p1) --[[ Line: 1069 | Upvalues: UI (copy) ]]
 		debug.profilebegin("CircleAction (logic, heartbeat)")
 		UI.CircleAction.UpdateLogic(p1)
 		debug.profileend()
 	end)
-	RunService.RenderStepped:Connect(function(p1)
+	RunService.RenderStepped:Connect(function(p1) --[[ Line: 1074 | Upvalues: UI (copy) ]]
 		debug.profilebegin("CircleAction (position, renderstepped)")
 		UI.CircleAction.UpdateVisual(p1)
 		debug.profileend()
 	end)
-	RunService.Stepped:Connect(function()
-		if currentVehiclePacket and not currentVehiclePacket.Passenger then
-			if currentVehiclePacket.Type == "Chassis" then
+	RunService.Stepped:Connect(function() --[[ Line: 1079 | Upvalues: v17 (ref), Classes (copy) ]]
+		if v17 and not v17.Passenger then
+			if v17.Type == "Chassis" then
 				Classes.Chassis.UpdateStepped(v17)
-			elseif currentVehiclePacket.Type == "Motorcycle" or currentVehiclePacket.Type == "DuneBuggy" then
+			elseif v17.Type == "Motorcycle" or v17.Type == "DuneBuggy" then
 				Classes.Chassis2.UpdateStepped(v17)
 			end
 		end
 	end)
-	local isEnabled = false
-	RunService.Heartbeat:Connect(function(p1)
+	local v31 = false
+	RunService.Heartbeat:Connect(function(p1) --[[ Line: 1090 | Upvalues: v17 (ref), Classes (copy), t5 (copy), VehicleUtils (ref), RunUtils (copy), StopNitro (ref), v31 (ref), StartNitro (ref), Settings (copy) ]]
 		debug.profilebegin("Vehicle Heartbeat")
-		if currentVehiclePacket and not currentVehiclePacket.Passenger then
-			if currentVehiclePacket.Type == "Chassis" then
+		if v17 and not v17.Passenger then
+			if v17.Type == "Chassis" then
 				Classes.Chassis.Update(v17, p1)
-			elseif currentVehiclePacket.Type == "Heli" then
+			elseif v17.Type == "Heli" then
 				Classes.Heli.Update(v17, p1)
-			elseif currentVehiclePacket.Type == "Custom" then
+			elseif v17.Type == "Custom" then
 				if v17.Make == "Volt" then
 					Classes.Volt.Update(v17, p1)
 				end
-			elseif currentVehiclePacket.Type == "Motorcycle" or currentVehiclePacket.Type == "DuneBuggy" then
+			elseif v17.Type == "Motorcycle" or v17.Type == "DuneBuggy" then
 				Classes.Chassis2.UpdateHQ(v17, p1)
 			end
 		end
 		debug.profileend()
-		if currentVehiclePacket and (not currentVehiclePacket.Passenger and (currentVehiclePacket.Type ~= "Heli" and currentVehiclePacket.Type ~= "Chassis3")) then
+		if v17 and (not v17.Passenger and (v17.Type ~= "Heli" and v17.Type ~= "Chassis3")) then
 			local AreTiresPopped = v17.AreTiresPopped
-			local isEnabled
-			if nitroState.NitroForceUIUpdate then
-				nitroState.NitroForceUIUpdate = false
-				isEnabled = true
+			local v1
+			if t5.NitroForceUIUpdate then
+				t5.NitroForceUIUpdate = false
+				v1 = true
 			else
-				isEnabled = false
+				v1 = false
 			end
 			if VehicleUtils._forceUpdateNitroBar then
 				VehicleUtils._forceUpdateNitroBar = false
-				isEnabled = true
+				v1 = true
 			end
-			if currentVehiclePacket.Nitro and RunUtils.isMainWorld() then
-				nitroState.Nitro = v17.Nitro - p1 * 5
-				isEnabled = true
+			if v17.Nitro and RunUtils.isMainWorld() then
+				t5.Nitro = t5.Nitro - p1 * 5
+				v1 = true
 			end
-			if v17.Nitro < 0 then
-				nitroState.Nitro = 0
+			if t5.Nitro < 0 then
+				t5.Nitro = 0
 				StopNitro()
-				isEnabled = true
+				v1 = true
 			end
 			if AreTiresPopped then
 				StopNitro()
-				isEnabled = true
-			elseif AreTiresPopped ~= isEnabled and v17._isNitroPressed then
+				v1 = true
+			elseif AreTiresPopped ~= v31 and v17._isNitroPressed then
 				StartNitro()
-				isEnabled = true
+				v1 = true
 			end
-			if AreTiresPopped ~= isEnabled then
-				isEnabled = AreTiresPopped
+			if AreTiresPopped ~= v31 then
+				v31 = AreTiresPopped
 			end
-			if isEnabled then
-				local isEnabled = v17.Nitro / Settings.Scalar.NitroMax
-				if currentVehiclePacket.Model and currentVehiclePacket.Model:GetAttribute("DisableNitro") then
-					isEnabled = 0
+			if v1 then
+				local v2 = t5.Nitro / Settings.Scalar.NitroMax
+				if v17.Model and v17.Model:GetAttribute("DisableNitro") then
+					v2 = 0
 				end
-				VehicleUtils.updateSpdBarRatio(isEnabled)
+				VehicleUtils.updateSpdBarRatio(v2)
 			end
 		end
 	end)
-	local configTable = {
+	local t11 = {
 		Waist = CFrame.new(),
 		Neck = CFrame.new()
 	}
-	RunService.Stepped:Connect(function()
+	RunService.Stepped:Connect(function() --[[ Line: 1180 | Upvalues: v30 (ref), CurrentCamera (copy), LocalPlayer (copy), v17 (ref), v20 (ref), Angles (copy), Math (copy), ItemSystem (ref), t11 (copy), v29 (ref), t (copy), t2 (ref), t4 (copy), Players (copy), v4 (copy) ]]
 		debug.profilebegin("Camera Looking")
-		local isEnabled = tick()
-		vector = vector + (CurrentCamera.CFrame.Position + CurrentCamera.CFrame.LookVector * 30 - vector) * 0.2
+		local v1 = tick()
+		v30 = v30 + (CurrentCamera.CFrame.Position + CurrentCamera.CFrame.LookVector * 30 - v30) * 0.2
 		local Character = LocalPlayer.Character
 		if Character then
 			local Humanoid = Character:FindFirstChild("Humanoid")
@@ -1042,60 +1046,60 @@ do
 						local Waist = UpperTorso:FindFirstChild("Waist")
 						local Neck = Head:FindFirstChild("Neck")
 						if Waist and Neck then
-							local isEnabled = 0
-							local func = 0
+							local v2 = 0
+							local v3 = 0
 							debug.profilebegin("Calculate looking")
-							local cameraRotationFrame, neckRotationFrame
-							if isCrawling then
+							local v42, v5
+							if v20 then
 								v42 = CFrame.identity
-								vector = CFrame.identity
+								v5 = CFrame.identity
 							else
 								local LookVector = (CurrentCamera.CFrame * Angles(0.2, 0, 0)).LookVector
 								if Math.IsNaNv3(LookVector) then
 									LookVector = Vector3.new(0, 0, -1)
 								end
-								local cframe = RootPart.CFrame.lookVector:Dot(LookVector:Cross(Vector3.new(0, 1, 0)))
-								local RemoteEvent = math.asin(LookVector.Y)
-								if currentVehiclePacket and (not currentVehiclePacket.Passenger or v17.NoLook) or ItemSystem.GetLocalEquipped() then
-									isEnabled = 0
-									func = 0
+								local v6 = RootPart.CFrame.lookVector:Dot(LookVector:Cross(Vector3.new(0, 1, 0)))
+								local v7 = math.asin(LookVector.Y)
+								if v17 and (not v17.Passenger or v17.NoLook) or ItemSystem.GetLocalEquipped() then
+									v2 = 0
+									v3 = 0
 								else
-									isEnabled = cframe
-									func = RemoteEvent
+									v2 = v6
+									v3 = v7
 								end
-								if Math.IsNaN(isEnabled) then
-									isEnabled = 0
+								if Math.IsNaN(v2) then
+									v2 = 0
 								end
-								if Math.IsNaN(func) then
-									func = 0
+								if Math.IsNaN(v3) then
+									v3 = 0
 								end
-								v42 = Angles(0, -isEnabled * 0.5 * 1, 0) * Angles(-func * 0.2 * 1, 0, 0)
-								vector = Angles(-func * 0.5 * 1, 0, 0) * Angles(0, -isEnabled * 0.5 * 1, 0)
+								v42 = Angles(0, -v2 * 0.5 * 1, 0) * Angles(-v3 * 0.2 * 1, 0, 0)
+								v5 = Angles(-v3 * 0.5 * 1, 0, 0) * Angles(0, -v2 * 0.5 * 1, 0)
 							end
 							if Math.IsNaNcf(v42) then
 								v42 = CFrame.identity
 							end
-							if Math.IsNaNcf(vector) then
-								vector = CFrame.identity
+							if Math.IsNaNcf(v5) then
+								v5 = CFrame.identity
 							end
-							if Waist.Transform ~= configTable.Waist then
+							if Waist.Transform ~= t11.Waist then
 								Waist.Transform = Waist.Transform * v42:Inverse()
-								configTable.Waist = Waist.Transform
+								t11.Waist = Waist.Transform
 							end
-							if Neck.Transform ~= configTable.Neck then
-								Neck.Transform = Neck.Transform * vector:Inverse()
-								configTable.Neck = Neck.Transform
+							if Neck.Transform ~= t11.Neck then
+								Neck.Transform = Neck.Transform * v5:Inverse()
+								t11.Neck = Neck.Transform
 							end
-							if isEnabled - v29 >= 0.4 then
-								v29 = isEnabled
-								if Math.IsNaN(isEnabled) then
-									isEnabled = 0
+							if v1 - v29 >= 0.4 then
+								v29 = v1
+								if Math.IsNaN(v2) then
+									v2 = 0
 								end
-								if Math.IsNaN(func) then
-									func = 0
+								if Math.IsNaN(v3) then
+									v3 = 0
 								end
-								if configTable.hems then
-									eventBridge:FireServer("gzo1hwwh", isEnabled, func)
+								if t.hems then
+									t2:FireServer("m" .. ("wigcb"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("b1ykyo4"):sub(3, 4):reverse():reverse():reverse() .. "" .. "" .. ("ps1vs1bw"):sub(5, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("avza8"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "1", v2, v3)
 								end
 							end
 							debug.profileend()
@@ -1104,30 +1108,30 @@ do
 				end
 			end
 		end
-		for k, v in pairs(configTable) do
-			local vector, isEnabled
+		for k, v in pairs(t4) do
+			local v8, v9
 			if not ItemSystem.GetEquipped((Players:FindFirstChild(k))) then
-				local cframe, _ = Math.Spring(v.HeadingSpring)
-				local cframe, _2 = Math.Spring(v.PitchSpring)
+				local v11, _ = Math.Spring(v.HeadingSpring)
+				local v12, _2 = Math.Spring(v.PitchSpring)
 				local Waist = v.Waist
 				if Waist then
-					local waistRotation = Angles(-cframe * 0.2, -cframe * 0.5, 0)
-					vector = if Math.IsNaNcf(waistRotation) then cframe else waistRotation
+					local v13 = Angles(-v12 * 0.2, -v11 * 0.5, 0)
+					v8 = if Math.IsNaNcf(v13) then v4 else v13
 					if Waist.Transform == v.LastWaistTransform then
-						Waist.Transform = vector
+						Waist.Transform = v8
 					else
-						Waist.Transform = Waist.Transform * vector:Inverse()
+						Waist.Transform = Waist.Transform * v8:Inverse()
 					end
 					v.LastWaistTransform = Waist.Transform
 				end
 				local Neck = v.Neck
 				if Neck then
-					local neckRotation = Angles(-cframe * 0.5, -cframe * 0.5, 0)
-					isEnabled = if Math.IsNaNcf(neckRotation) then cframe else neckRotation
+					local v14 = Angles(-v12 * 0.5, -v11 * 0.5, 0)
+					v9 = if Math.IsNaNcf(v14) then v4 else v14
 					if Neck.Transform == v.LastNeckTransform then
-						Neck.Transform = isEnabled
+						Neck.Transform = v9
 					else
-						Neck.Transform = Neck.Transform * isEnabled:Inverse()
+						Neck.Transform = Neck.Transform * v9:Inverse()
 					end
 					v.LastNeckTransform = Neck.Transform
 				end
@@ -1135,42 +1139,42 @@ do
 		end
 		debug.profileend()
 	end)
-	local configTable = {
+	local t12 = {
 		tire_pop = 4534995816,
 		tire_leak = 4534995685
 	}
-	local vector = RaycastParams.new()
-	vector.IgnoreWater = true
-	UpdateAllLowQuality = function(p1, p2, p3)
+	local v32 = RaycastParams.new()
+	v32.IgnoreWater = true
+	UpdateAllLowQuality = function(p1, p2, p3) --[[ UpdateAllLowQuality | Line: 1322 | Upvalues: abs (copy), v32 (copy), Raycast (copy), Classes (copy), VehicleUtils (ref) ]]
 		local Model = p1.Model
 		if Model then
 			local Engine = Model:FindFirstChild("Engine")
 			if Engine then
-				local isEnabled = Engine.CFrame:vectorToObjectSpace(Engine.Velocity)
-				local isEnabled = Model:GetAttribute("VehicleIsDrifting")
+				local v1 = Engine.CFrame:vectorToObjectSpace(Engine.Velocity)
+				local v2 = Model:GetAttribute("VehicleIsDrifting")
 				if p1.Sounds and p1.Sounds.DriftSqueal then
-					local func = if p1.Type == "Motorcycle" then 2 else 10
-					local cframe = abs(isEnabled.X)
-					if func < cframe then
-						p1.Sounds.DriftSqueal.Volume = math.min((cframe - func) / 6, 1) * 0.3
+					local v3 = if p1.Type == "Motorcycle" then 2 else 10
+					local v4 = abs(v1.X)
+					if v3 < v4 then
+						p1.Sounds.DriftSqueal.Volume = math.min((v4 - v3) / 6, 1) * 0.3
 					else
 						p1.Sounds.DriftSqueal.Volume = 0
 					end
 				end
-				vector.FilterDescendantsInstances = { Model }
-				local vector = vector
+				v32.FilterDescendantsInstances = { Model }
+				local v5 = v32
 				local Preset = Model:FindFirstChild("Preset")
 				if Preset then
-					for cframe, RemoteEvent in Preset:GetChildren() do
-						if RemoteEvent.Name == "Drift" and (Raycast.collidable(RemoteEvent.Position + Vector3.new(0, 4, 0), Vector3.new(-0, -1, -0), 8, vector) and isEnabled) then
-							for vector, isEnabled in RemoteEvent:GetChildren() do
-								if isEnabled:IsA("ParticleEmitter") then
-									local cframe = (isEnabled:GetAttribute("DriftAccum") or 0) + isEnabled.Rate * p2
-									local cframe = math.floor(cframe)
-									if cframe > 0 then
-										isEnabled:Emit(cframe)
+					for v6, v7 in Preset:GetChildren() do
+						if v7.Name == "Drift" and (Raycast.collidable(v7.Position + Vector3.new(0, 4, 0), Vector3.new(-0, -1, -0), 8, v5) and v2) then
+							for v8, v9 in v7:GetChildren() do
+								if v9:IsA("ParticleEmitter") then
+									local v10 = (v9:GetAttribute("DriftAccum") or 0) + v9.Rate * p2
+									local v11 = math.floor(v10)
+									if v11 > 0 then
+										v9:Emit(v11)
 									end
-									isEnabled:SetAttribute("DriftAccum", cframe - cframe)
+									v9:SetAttribute("DriftAccum", v10 - v11)
 								end
 							end
 						end
@@ -1178,17 +1182,17 @@ do
 				end
 				if p1.Make == "JBX0031" then
 					local Y = Engine.AssemblyAngularVelocity.Y
-					Classes.Chassis.UpdateThrusterFlames(Model, if -isEnabled.Z > 2 then 1 else 0, if Y > 0.3 then 1 elseif Y < -0.3 then -1 else 0, isEnabled.Z)
+					Classes.Chassis.UpdateThrusterFlames(Model, if -v1.Z > 2 then 1 else 0, if Y > 0.3 then 1 elseif Y < -0.3 then -1 else 0, v1.Z)
 				end
 				if p1.Type == "Chassis" or (p1.Type == "Chassis2" or p1.Type == "Heli") then
 					if p3.Brakelight == nil then
-						function p3.Brakelight()
+						function p3.Brakelight() --[[ Line: 1388 | Upvalues: VehicleUtils (ref), Model (copy) ]]
 							VehicleUtils.setBrakelightsEnabled(Model, false)
 						end
 					end
-					local cframe = (isEnabled or Engine.AssemblyLinearVelocity:Dot(Engine.CFrame.LookVector) < 20) and true or false
-					if VehicleUtils.getBrakelightsEnabled(Model) ~= cframe then
-						VehicleUtils.setBrakelightsEnabled(Model, cframe)
+					local v15 = (v2 or Engine.AssemblyLinearVelocity:Dot(Engine.CFrame.LookVector) < 20) and true or false
+					if VehicleUtils.getBrakelightsEnabled(Model) ~= v15 then
+						VehicleUtils.setBrakelightsEnabled(Model, v15)
 					end
 				end
 			else
@@ -1198,39 +1202,39 @@ do
 			warn("No model exists to update LowQuality")
 		end
 	end
-	UpdateChassisLowQuality = function(p1, p2)
+	UpdateChassisLowQuality = function(p1, p2) --[[ UpdateChassisLowQuality | Line: 1407 | Upvalues: Classes (copy), Time (ref), Audio (copy), t12 (copy) ]]
 		local Model = p1.Model
 		local Height = p1.Height
 		if Model then
 			local Engine = Model:FindFirstChild("Engine")
 			if Engine then
-				local isEnabled = Engine.CFrame:vectorToObjectSpace(Engine.Velocity)
+				local v1 = Engine.CFrame:vectorToObjectSpace(Engine.Velocity)
 				local _cachedWheelRadius = p1._cachedWheelRadius
 				if not _cachedWheelRadius then
 					_cachedWheelRadius = p1.Wheels[1].Model.PrimaryPart.Size.Y / 2
 					p1._cachedWheelRadius = _cachedWheelRadius
 				end
-				local func = (p1.WheelRotation + isEnabled.Z * p2 / _cachedWheelRadius) % 6.283185307179586
-				p1.WheelRotation = func
-				local cframe = Model:GetAttribute("GarageSuspensionHeight")
-				if cframe then
-					Height = Height + cframe
+				local v3 = (p1.WheelRotation + v1.Z * p2 / _cachedWheelRadius) % 6.283185307179586
+				p1.WheelRotation = v3
+				local v4 = Model:GetAttribute("GarageSuspensionHeight")
+				if v4 then
+					Height = Height + v4
 				end
 				for k, v in pairs(p1.Wheels) do
-					Classes.Chassis.UpdateWheelLowQuality(Model, Height, v, func)
+					Classes.Chassis.UpdateWheelLowQuality(Model, Height, v, v3)
 				end
-				Classes.Chassis.UpdateSoundLowQuality(p1, p1.Gears, isEnabled)
-				local vector = Model:GetAttribute("VehicleTiresLastPop")
-				local RemoteEvent = math.min((Time.GetNowSync() - vector) / p1.DisableDuration, 1) < 0.999
-				if p1.AreTiresPopped ~= RemoteEvent then
-					if RemoteEvent then
-						local configTable = {
+				Classes.Chassis.UpdateSoundLowQuality(p1, p1.Gears, v1)
+				local v5 = Model:GetAttribute("VehicleTiresLastPop")
+				local v7 = math.min((Time.GetNowSync() - v5) / p1.DisableDuration, 1) < 0.999
+				if p1.AreTiresPopped ~= v7 then
+					if v7 then
+						local t = {
 							Volume = 1
 						}
-						Audio.ObjectLocal(Engine, configTable.tire_pop, configTable)
-						Audio.ObjectLocal(Engine, configTable.tire_leak, configTable)
+						Audio.ObjectLocal(Engine, t12.tire_pop, t)
+						Audio.ObjectLocal(Engine, t12.tire_leak, t)
 					end
-					p1.AreTiresPopped = RemoteEvent
+					p1.AreTiresPopped = v7
 				end
 			else
 				warn("No engine exists to update LowQuality")
@@ -1239,21 +1243,21 @@ do
 			warn("No model exists to update LowQuality")
 		end
 	end
-	UpdateChassisStepped = function(p1)
+	UpdateChassisStepped = function(p1) --[[ UpdateChassisStepped | Line: 1457 | Upvalues: Players (copy), R15IKv2 (copy), Angles (copy), v3 (copy) ]]
 		local IKP = p1.IKP
 		local Model = p1.Model
 		local Engine = Model:FindFirstChild("Engine")
 		if Engine then
 			if not IKP then
-				local isEnabled = Players:FindFirstChild(p1.PlayerName)
-				if isEnabled then
-					local Character = isEnabled.Character
+				local v1 = Players:FindFirstChild(p1.PlayerName)
+				if v1 then
+					local Character = v1.Character
 					if Character then
 						local Humanoid = Character:FindFirstChild("Humanoid")
 						if Humanoid and Humanoid.RootPart then
-							local isEnabled = R15IKv2.BuildPacketArms(Character)
-							p1.IKP = isEnabled
-							IKP = isEnabled
+							local v2 = R15IKv2.BuildPacketArms(Character)
+							p1.IKP = v2
+							IKP = v2
 						else
 							return false
 						end
@@ -1264,20 +1268,20 @@ do
 					return
 				end
 			end
-			local vector = 0.5 * Engine.RotVelocity.Y
+			local v32 = 0.5 * Engine.RotVelocity.Y
 			if p1.WeldSteer and IKP then
-				p1.WeldSteer.C0 = Angles(0, vector, 0)
-				local cframe = Model.Steer.Size.X * 0.5 - 0.2
-				local vector = Model.Steer.CFrame
-				IKP.RightArm = vector * func(cframe, 0.1, 0)
-				IKP.RightAngle = -vector - 0.6
-				IKP.LeftArm = vector * func(-cframe, 0.1, 0)
-				IKP.LeftAngle = -vector + 0.6
+				p1.WeldSteer.C0 = Angles(0, v32, 0)
+				local v4 = Model.Steer.Size.X * 0.5 - 0.2
+				local v5 = Model.Steer.CFrame
+				IKP.RightArm = v5 * v3(v4, 0.1, 0)
+				IKP.RightAngle = -v32 - 0.6
+				IKP.LeftArm = v5 * v3(-v4, 0.1, 0)
+				IKP.LeftAngle = -v32 + 0.6
 				R15IKv2.Arms(IKP)
 			end
 		end
 	end
-	UpdateHeliLowQuality = function(p1, p2)
+	UpdateHeliLowQuality = function(p1, p2) --[[ UpdateHeliLowQuality | Line: 1503 | Upvalues: Classes (copy) ]]
 		if p1.Model then
 			if p1.HasProp then
 				Classes.Heli.SpinProp(p1, p2)
@@ -1290,9 +1294,9 @@ do
 			end
 		end
 	end
-	local eventCounter_v33 = 0
-	local function playHorn(p1, p2, p3, p4, p5, p6)
-		local isEnabled = p5 or 16
+	local v33 = 0
+	local function playHorn(p1, p2, p3, p4, p5, p6) --[[ playHorn | Line: 1524 | Upvalues: Audio (copy) ]]
+		local v1 = p5 or 16
 		local _HornSound = p1:FindFirstChild("_HornSound")
 		if _HornSound then
 			_HornSound:Destroy()
@@ -1306,38 +1310,38 @@ do
 				_HornSound_2.Volume = p6
 			end
 			_HornSound_2.Parent = p1
-			task.delay(isEnabled, function()
+			task.delay(v1, function() --[[ Line: 1539 | Upvalues: _HornSound_2 (ref), p1 (copy) ]]
 				if _HornSound_2.Parent == p1 then
 					_HornSound_2:Destroy()
 				end
 			end)
 		end
 	end
-	HornStart = function()
-		local isEnabled = os.clock()
-		if not (isEnabled - v33 < 0.05) then
-			v33 = isEnabled
-			if currentVehiclePacket and not currentVehiclePacket.Passenger then
-				local Model = currentVehiclePacket.Model
+	HornStart = function() --[[ HornStart | Line: 1546 | Upvalues: v33 (ref), v17 (ref), playHorn (copy), t2 (ref) ]]
+		local v1 = os.clock()
+		if not (v1 - v33 < 0.05) then
+			v33 = v1
+			if v17 and not v17.Passenger then
+				local Model = v17.Model
 				playHorn(Model:FindFirstChild("BoundingBox"), true, Model:GetAttribute("VehicleHornId"), Model:GetAttribute("VehicleHornLoopable"), nil, (Model:GetAttribute("VehicleHornVolume")))
-				eventBridge:FireServer("ydmnlyuf", true)
+				t2:FireServer("i" .. ("mdp35fqlmg"):sub(3, 8):reverse():reverse():reverse() .. "r", true)
 			end
 		end
 	end
-	HornStop = function()
-		if currentVehiclePacket and not currentVehiclePacket.Passenger then
-			local _HornSound = currentVehiclePacket.Model:FindFirstChild("BoundingBox"):FindFirstChild("_HornSound")
+	HornStop = function() --[[ HornStop | Line: 1562 | Upvalues: v17 (ref), t2 (ref) ]]
+		if v17 and not v17.Passenger then
+			local _HornSound = v17.Model:FindFirstChild("BoundingBox"):FindFirstChild("_HornSound")
 			if _HornSound then
 				_HornSound:Destroy()
 			end
-			eventBridge:FireServer("ydmnlyuf", false)
+			t2:FireServer("i" .. ("d3jflpaxl"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "qf53pr", false)
 		end
 	end
-	function configTable.ydmnlyuf(p1, p2, p3, p4, p5, p6)
+	function t.ilqf53pr(p1, p2, p3, p4, p5, p6) --[[ ilqf53pr | Line: 1570 | Upvalues: playHorn (copy) ]]
 		playHorn(p2, p3, p4, p5, 10, p6)
 	end
 end
-local crawlAnimationTrack, toggleCrawling, OnJump
+local v34, toggleCrawling, OnJump
 do
 	local Animation = Instance.new("Animation")
 	if RunUtils.getEnv() == RunConsts.QA_NAME then
@@ -1345,46 +1349,48 @@ do
 	else
 		Animation.AnimationId = "rbxassetid://685258011"
 	end
-	crawlAnimationTrack = nil
-	local configTable = {}
+	v34 = nil
+	local t13 = {}
 	local Animation_2 = Instance.new("Animation")
 	Animation_2.AnimationId = "rbxassetid://758003506"
-	table.insert(configTable, Animation_2)
+	local v35 = t13
+	table.insert(v35, Animation_2)
 	local Animation_3 = Instance.new("Animation")
 	Animation_3.AnimationId = "rbxassetid://758005053"
-	table.insert(configTable, Animation_3)
-	local unequipDelayConnection = nil
-	local deathSequenceStartTime = tick()
-	local deathScreenShowTime = tick()
-	local configTable = { 0, 0, 0 }
-	toggleCrawling = function()
+	local v36 = t13
+	table.insert(v36, Animation_3)
+	local v37 = nil
+	local v38 = tick()
+	local v39 = tick()
+	local t14 = { 0, 0, 0 }
+	toggleCrawling = function() --[[ toggleCrawling | Line: 1599 | Upvalues: LocalPlayer (copy), v20 (ref), v34 (ref), CharacterUtil (copy), Joint (copy), v4 (copy), Animation (copy) ]]
 		local Character = LocalPlayer.Character
 		local Humanoid = Character:FindFirstChild("Humanoid")
 		local PrimaryPart = Character.PrimaryPart
-		isCrawling = not crawlAnimation
-		CharacterUtil.IsCrawling = isCrawling
+		v20 = not v34
+		CharacterUtil.IsCrawling = v20
 		CharacterUtil.IsCrawlingChanged:Fire(CharacterUtil.IsCrawling)
 		local UpperTorso = Character:FindFirstChild("UpperTorso")
 		local LowerTorso = Character:FindFirstChild("LowerTorso")
 		local list = {}
-		local function isEnabled(p1)
-			local cframe = next
-			local isEnabled, func = p1:GetChildren()
-			for cframe, vector in cframe, isEnabled, func do
-				if vector:IsA("JointInstance") and (vector.Part1 == UpperTorso or (vector.Part1 == LowerTorso or (vector.Part0 == UpperTorso or vector.Part0 == LowerTorso))) then
+		local function v1(p1) --[[ Recurse | Line: 1610 | Upvalues: UpperTorso (copy), LowerTorso (copy), list (copy), v1 (copy) ]]
+			local v12 = next
+			local v2, v3 = p1:GetChildren()
+			for v4, v5 in v12, v2, v3 do
+				if v5:IsA("JointInstance") and (v5.Part1 == UpperTorso or (v5.Part1 == LowerTorso or (v5.Part0 == UpperTorso or v5.Part0 == LowerTorso))) then
 					table.insert(list, {
-						Motor = vector,
-						Part0 = vector.Part0,
-						Part1 = vector.Part1
+						Motor = v5,
+						Part0 = v5.Part0,
+						Part1 = v5.Part1
 					})
-					vector.Part0 = nil
-					vector.Part1 = nil
+					v5.Part0 = nil
+					v5.Part1 = nil
 				end
-				isEnabled(vector)
+				v1(v5)
 			end
 		end
-		isEnabled(Character)
-		if isCrawling then
+		v1(Character)
+		if v20 then
 			local Ball = Instance.new("Part")
 			Ball.Shape = Enum.PartType.Ball
 			Ball.Size = Vector3.new(2, 1, 4)
@@ -1394,7 +1400,7 @@ do
 			Ball.CFrame = PrimaryPart.CFrame * CFrame.new(0, 0, 1)
 			Ball.Transparency = 1
 			Ball.Parent = Character
-			Joint.CustomWeld(Ball, PrimaryPart, CFrame.new(0, 1, 0), cframe)
+			Joint.CustomWeld(Ball, PrimaryPart, CFrame.new(0, 1, 0), v4)
 		else
 			local Ball = Character:FindFirstChild("Ball")
 			if Ball then
@@ -1406,39 +1412,39 @@ do
 			v.Motor.Part1 = v.Part1
 		end
 		Character.HumanoidRootPart.CanCollide = not v20
-		if crawlAnimationTrack then
-			crawlAnimationTrack:Stop()
-			crawlAnimationTrack = nil
+		if v34 then
+			v34:Stop()
+			v34 = nil
 		else
-			crawlAnimationTrack = Humanoid:LoadAnimation(Animation)
-			crawlAnimationTrack:Play()
+			v34 = Humanoid:LoadAnimation(Animation)
+			v34:Play()
 		end
 	end
-	local function _setSprinting(p1)
-		isSprinting = p1
+	local function _setSprinting(p1) --[[ _setSprinting | Line: 1657 | Upvalues: v19 (ref) ]]
+		v19 = p1
 	end
-	local function setSprinting(p1)
-		isSprinting = p1
+	local function setSprinting(p1) --[[ setSprinting | Line: 1660 | Upvalues: v19 (ref), DefaultActions (copy) ]]
+		v19 = p1
 		if (p1 and true or false) ~= (DefaultActions.sprintButton._pressed and true or false) and DefaultActions.sprintButton._pressState then
 			DefaultActions.sprintButton._pressState()
 		end
 	end
-	local function attemptToggleCrawling()
+	local function attemptToggleCrawling() --[[ attemptToggleCrawling | Line: 1668 | Upvalues: LocalPlayer (copy), v34 (ref), Classes (copy), Falling (copy), Paraglide (copy), InventoryItemSystem (copy), ItemSystem (ref), v39 (ref), t14 (copy), toggleCrawling (copy) ]]
 		local Character = LocalPlayer.Character
 		if Character then
 			local Humanoid = Character:FindFirstChild("Humanoid")
-			if Humanoid and ((crawlAnimationTrack or not Humanoid.Sit) and ((crawlAnimationTrack or not Humanoid.PlatformStand) and Character.PrimaryPart)) then
+			if Humanoid and ((v34 or not Humanoid.Sit) and ((v34 or not Humanoid.PlatformStand) and Character.PrimaryPart)) then
 				if Classes.Heli.Roped or Falling.IsRagdolling() then
 				elseif Paraglide.IsFlying() then
 					return false
 				elseif InventoryItemSystem.unequipAll() then
-					local isEnabled = ItemSystem.GetLocalEquipped()
-					if isEnabled and isEnabled.ItemData.Locked or tick() - v39 < 0.1 then
-					elseif not (tick() - configTable[#configTable] < 2) then
+					local v1 = ItemSystem.GetLocalEquipped()
+					if v1 and v1.ItemData.Locked or tick() - v39 < 0.1 then
+					elseif not (tick() - t14[#t14] < 2) then
 						v39 = tick()
-						if crawlAnimationTrack then
-							table.remove(configTable)
-							table.insert(configTable, 1, v39)
+						if v34 then
+							table.remove(t14)
+							table.insert(t14, 1, v39)
 						end
 						toggleCrawling()
 					end
@@ -1446,7 +1452,7 @@ do
 			end
 		end
 	end
-	local function attemptPunch()
+	local function attemptPunch() --[[ attemptPunch | Line: 1716 | Upvalues: v38 (ref), LocalPlayer (copy), ItemSystem (ref), v37 (ref), t13 (ref), t2 (ref) ]]
 		if tick() - v38 < 0.5 then
 			return
 		end
@@ -1458,12 +1464,12 @@ do
 					if v37 then
 						v37:Stop()
 					end
-					local isEnabled = table.remove(configTable, 1)
-					table.insert(configTable, isEnabled)
-					v37 = Humanoid:LoadAnimation(isEnabled)
+					local v1 = table.remove(t13, 1)
+					table.insert(t13, v1)
+					v37 = Humanoid:LoadAnimation(v1)
 					v37:Play()
 					v38 = tick()
-					eventBridge:FireServer("sf5hgxqm")
+					t2:FireServer("s" .. ("qfgl1tv"):sub(4, 6):reverse():reverse():reverse() .. "" .. "" .. ("z4ylmxq"):sub(2, 3):reverse() .. "8j")
 				end
 			end
 		end
@@ -1473,61 +1479,61 @@ do
 		attemptToggleCrawling = attemptToggleCrawling,
 		attemptPunch = attemptPunch
 	})
-	function configTable.mkrp0wlk(p1, p2)
+	function t.w8fu5s1f(p1, p2) --[[ w8fu5s1f | Line: 1747 | Upvalues: GameUtil (copy), Settings (copy), RunUtils (copy), t (copy), Localization (copy) ]]
 		GameUtil.Schedule = p1
 		if GameUtil.Team == Settings.EnumTeam.Prisoner and RunUtils.isMainWorld() then
-			configTable.mq92d5a8({
+			t.vbey8zy6({
 				Text = Localization:FormatByKey("Schedule." .. p1)
 			})
 		end
 	end
-	function configTable.gzo1hwwh(p1, p2, p3)
-		local isEnabled = configTable[p1]
-		if not isEnabled then
-			isEnabled = {
+	function t.mcky1sz1(p1, p2, p3) --[[ mcky1sz1 | Line: 1753 | Upvalues: t4 (copy), Math (copy), Players (copy) ]]
+		local v1 = t4[p1]
+		if not v1 then
+			v1 = {
 				HeadingSpring = Math.MakeSpring(0, 10, 0.8),
 				PitchSpring = Math.MakeSpring(0, 10, 0.8)
 			}
-			configTable[p1] = isEnabled
+			t4[p1] = v1
 		end
-		local isEnabled = Players:FindFirstChild(p1)
-		if isEnabled then
-			local Character = isEnabled.Character
+		local v2 = Players:FindFirstChild(p1)
+		if v2 then
+			local Character = v2.Character
 			if Character then
 				local UpperTorso = Character:FindFirstChild("UpperTorso")
 				if UpperTorso then
 					local Waist = UpperTorso:FindFirstChild("Waist")
 					local Neck = Character.Head:FindFirstChild("Neck")
-					isEnabled.Waist = Waist
-					isEnabled.Neck = Neck
-					Math.SpringSetTarget(isEnabled.HeadingSpring, p2)
-					Math.SpringSetTarget(isEnabled.PitchSpring, p3)
+					v1.Waist = Waist
+					v1.Neck = Neck
+					Math.SpringSetTarget(v1.HeadingSpring, p2)
+					Math.SpringSetTarget(v1.PitchSpring, p3)
 				else
-					configTable[p1] = nil
+					t4[p1] = nil
 				end
 			else
-				configTable[p1] = nil
+				t4[p1] = nil
 			end
 		else
-			configTable[p1] = nil
+			t4[p1] = nil
 		end
 	end
 	local CartBinder = require(ReplicatedStorage.Game.Cart.CartBinder)
-	OnJump = function()
+	OnJump = function() --[[ OnJump | Line: 1787 | Upvalues: v17 (ref), LocalPlayer (copy), t (copy), VehicleUtils (ref), t2 (ref), CartBinder (copy), Classes (copy) ]]
 		if v17 then
 			if LocalPlayer.Character and LocalPlayer.Character:GetAttribute("TankRoyaleAlive") then
-				configTable.mq92d5a8({
+				t.vbey8zy6({
 					Text = "You cannot exit Tanks in this gamemode."
 				})
 				return
 			end
 			VehicleUtils.OnVehicleJumpExited:Fire(v17)
-			eventBridge:FireServer("ja0b58yb")
+			t2:FireServer("f" .. "" .. ("leumgacb4v"):sub(5, 6):reverse() .. "" .. "" .. ("h20b91l2rt"):sub(5, 6):reverse() .. "" .. "" .. ("wxw0s4"):sub(4, 4):reverse() .. "" .. "" .. ("zmr"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "d")
 			VehicleUtils.LastVehicleExit = tick()
 		else
 			for i, v in ipairs(CartBinder:GetAll()) do
 				if LocalPlayer.Character ~= nil and v:GetOccupant() == LocalPlayer.Character then
-					eventBridge:FireServer("ja0b58yb")
+					t2:FireServer("f" .. ("nkgabi"):sub(3, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ry1u"):sub(3, 3):reverse():reverse():reverse() .. "" .. "" .. ("hpm09r"):sub(3, 5):reverse():reverse():reverse():reverse():reverse() .. "d")
 					break
 				end
 			end
@@ -1545,94 +1551,94 @@ do
 	BlurEffect.Size = 0
 	BlurEffect.Enabled = false
 	BlurEffect.Parent = Lighting
-	local startLightingConfig = nil
-	local endLightingConfig = nil
-	local lightingFadeConnection = nil
-	local function removeDeathLighting()
-		if endLightingConfig then
-			local isEnabled = 0
-			local isEnabled = nil
-			local function Finish()
-				if isEnabled then
-					isEnabled:Disconnect()
+	local v40 = nil
+	local v41 = nil
+	local v42 = nil
+	local function removeDeathLighting() --[[ removeDeathLighting | Line: 1825 | Upvalues: v41 (ref), LerpTable (copy), v40 (ref), ColorCorrectionEffect (copy), BlurEffect (copy), RunService (copy) ]]
+		if v41 then
+			local v1 = 0
+			local v2 = nil
+			local function Finish() --[[ Finish | Line: 1828 | Upvalues: v2 (ref), LerpTable (ref), v41 (ref), v40 (ref), ColorCorrectionEffect (ref), BlurEffect (ref) ]]
+				if v2 then
+					v2:Disconnect()
 				end
-				local isEnabled = LerpTable(endLightingConfig, startLightingConfig, 1)
-				ColorCorrectionEffect.Saturation = isEnabled.Saturation
-				BlurEffect.Size = isEnabled.Blur
+				local v1 = LerpTable(v41, v40, 1)
+				ColorCorrectionEffect.Saturation = v1.Saturation
+				BlurEffect.Size = v1.Blur
 				BlurEffect.Enabled = false
 				ColorCorrectionEffect.Enabled = false
 			end
-			local function Stepped(p1)
-				isEnabled = isEnabled + p1 * 2
-				if isEnabled >= 1 then
-					if isEnabled then
-						isEnabled:Disconnect()
+			local function Stepped(p1) --[[ Stepped | Line: 1838 | Upvalues: v1 (ref), v2 (ref), LerpTable (ref), v41 (ref), v40 (ref), ColorCorrectionEffect (ref), BlurEffect (ref) ]]
+				v1 = v1 + p1 * 2
+				if v1 >= 1 then
+					if v2 then
+						v2:Disconnect()
 					end
-					local cframe = LerpTable(endLightingConfig, startLightingConfig, 1)
-					ColorCorrectionEffect.Saturation = cframe.Saturation
-					BlurEffect.Size = cframe.Blur
+					local v12 = LerpTable(v41, v40, 1)
+					ColorCorrectionEffect.Saturation = v12.Saturation
+					BlurEffect.Size = v12.Blur
 					BlurEffect.Enabled = false
 					ColorCorrectionEffect.Enabled = false
 				else
-					local effectLerpResult = LerpTable(endLightingConfig, startLightingConfig, 1)
-					ColorCorrectionEffect.Saturation = effectLerpResult.Saturation
-					BlurEffect.Size = effectLerpResult.Blur
+					local v22 = LerpTable(v41, v40, 1)
+					ColorCorrectionEffect.Saturation = v22.Saturation
+					BlurEffect.Size = v22.Blur
 				end
 			end
-			isEnabled = RunService.RenderStepped:connect(Stepped)
+			v2 = RunService.RenderStepped:connect(Stepped)
 		end
 	end
-	local function removeDeathGui()
-		cframe.Frame:TweenSizeAndPosition(UDim2.new(1, 40, 0, 0), UDim2.new(0, -20, 0.5, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true, function()
-			cframe.Frame.Visible = false
+	local function removeDeathGui() --[[ removeDeathGui | Line: 1851 | Upvalues: v12 (copy) ]]
+		v12.Frame:TweenSizeAndPosition(UDim2.new(1, 40, 0, 0), UDim2.new(0, -20, 0.5, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true, function() --[[ Line: 1859 | Upvalues: v12 (ref) ]]
+			v12.Frame.Visible = false
 		end)
 	end
 	GameUtil.removeDeathGui = removeDeathGui
 	GameUtil.removeDeathLighting = removeDeathLighting
-	function configTable.f49gnwdv()
+	function t.ixwaw5f5() --[[ ixwaw5f5 | Line: 1866 | Upvalues: LocalPlayer (copy), CharacterUtil (copy), toggleCrawling (copy), removeDeathGui (copy), v41 (ref), LerpTable (copy), v40 (ref), ColorCorrectionEffect (copy), BlurEffect (copy), RunService (copy), InputUtils (copy), v19 (ref), DefaultActions (copy), v42 (ref) ]]
 		wait()
 		local Character = LocalPlayer.Character
 		if Character then
 			local Humanoid = Character:FindFirstChild("Humanoid")
 			if Humanoid then
-				Humanoid.Seated:connect(function(p1)
+				Humanoid.Seated:connect(function(p1) --[[ Line: 1877 | Upvalues: CharacterUtil (ref), toggleCrawling (ref) ]]
 					if p1 and CharacterUtil.IsCrawling then
 						toggleCrawling()
 					end
 				end)
 				Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 				removeDeathGui()
-				if endLightingConfig then
-					local isEnabled = 0
-					local isEnabled = nil
-					local function Finish()
-						if isEnabled then
-							isEnabled:Disconnect()
+				if v41 then
+					local v1 = 0
+					local v2 = nil
+					local function Finish() --[[ Finish | Line: 1828 | Upvalues: v2 (ref), LerpTable (ref), v41 (ref), v40 (ref), ColorCorrectionEffect (ref), BlurEffect (ref) ]]
+						if v2 then
+							v2:Disconnect()
 						end
-						local isEnabled = LerpTable(endLightingConfig, startLightingConfig, 1)
-						ColorCorrectionEffect.Saturation = isEnabled.Saturation
-						BlurEffect.Size = isEnabled.Blur
+						local v1 = LerpTable(v41, v40, 1)
+						ColorCorrectionEffect.Saturation = v1.Saturation
+						BlurEffect.Size = v1.Blur
 						BlurEffect.Enabled = false
 						ColorCorrectionEffect.Enabled = false
 					end
-					local function Stepped(p1)
-						isEnabled = isEnabled + p1 * 2
-						if isEnabled >= 1 then
-							if isEnabled then
-								isEnabled:Disconnect()
+					local function Stepped(p1) --[[ Stepped | Line: 1838 | Upvalues: v1 (ref), v2 (ref), LerpTable (ref), v41 (ref), v40 (ref), ColorCorrectionEffect (ref), BlurEffect (ref) ]]
+						v1 = v1 + p1 * 2
+						if v1 >= 1 then
+							if v2 then
+								v2:Disconnect()
 							end
-							local cframe = LerpTable(endLightingConfig, startLightingConfig, 1)
-							ColorCorrectionEffect.Saturation = cframe.Saturation
-							BlurEffect.Size = cframe.Blur
+							local v12 = LerpTable(v41, v40, 1)
+							ColorCorrectionEffect.Saturation = v12.Saturation
+							BlurEffect.Size = v12.Blur
 							BlurEffect.Enabled = false
 							ColorCorrectionEffect.Enabled = false
 						else
-							local effectLerpResult = LerpTable(endLightingConfig, startLightingConfig, 1)
-							ColorCorrectionEffect.Saturation = effectLerpResult.Saturation
-							BlurEffect.Size = effectLerpResult.Blur
+							local v22 = LerpTable(v41, v40, 1)
+							ColorCorrectionEffect.Saturation = v22.Saturation
+							BlurEffect.Size = v22.Blur
 						end
 					end
-					isEnabled = RunService.RenderStepped:connect(Stepped)
+					v2 = RunService.RenderStepped:connect(Stepped)
 				end
 				if InputUtils.isTouch() then
 					v19 = true
@@ -1645,7 +1651,7 @@ do
 		end
 	end
 	local store = require(ReplicatedStorage.App.store)
-	function configTable.dmg39zpa(p1)
+	function t.q8i3i1kg(p1) --[[ q8i3i1kg | Line: 1902 | Upvalues: v20 (ref), CharacterUtil (copy), v19 (ref), DefaultActions (copy), v21 (ref), OnJump (ref), store (copy), v12 (copy), v42 (ref), Localization (copy), BlurEffect (copy), ColorCorrectionEffect (copy), v40 (ref), v41 (ref), LerpTable (copy), RunService (copy) ]]
 		v20 = false
 		CharacterUtil.IsCrawling = false
 		CharacterUtil.IsCrawlingChanged:Fire(CharacterUtil.IsCrawling)
@@ -1653,14 +1659,16 @@ do
 		if (DefaultActions.sprintButton._pressed and true or false) ~= false and DefaultActions.sprintButton._pressState then
 			DefaultActions.sprintButton._pressState()
 		end
-		isStunned = false
+		v21 = false
 		OnJump()
 		store:dispatch({
 			type = "setLastDiedAt",
 			lastDiedAt = workspace:GetServerTimeNow()
 		})
 		if not p1 then
-			cframe.Frame.TextLabel.Text = v42 or Localization:FormatByKey("DeathMessage." .. math.random(0, 13))
+			local v1 = math.random(0, 13)
+			local TextLabel = v12.Frame.TextLabel
+			TextLabel.Text = v42 or Localization:FormatByKey("DeathMessage." .. v1)
 			BlurEffect.Enabled = true
 			ColorCorrectionEffect.Enabled = true
 			v40 = {
@@ -1671,53 +1679,53 @@ do
 				Blur = 8,
 				Saturation = -1
 			}
-			local func = 0
-			local cframe = nil
-			local function Finish()
-				if cframe then
-					cframe:Disconnect()
+			local v3 = 0
+			local v4 = nil
+			local function Finish() --[[ Finish | Line: 1929 | Upvalues: v4 (ref), LerpTable (ref), v40 (ref), v41 (ref), ColorCorrectionEffect (ref), BlurEffect (ref) ]]
+				if v4 then
+					v4:Disconnect()
 				end
-				local isEnabled = LerpTable(v40, v41, 1)
-				ColorCorrectionEffect.Saturation = isEnabled.Saturation
-				BlurEffect.Size = isEnabled.Blur
+				local v1 = LerpTable(v40, v41, 1)
+				ColorCorrectionEffect.Saturation = v1.Saturation
+				BlurEffect.Size = v1.Blur
 			end
-			local function Stepped(p1)
-				func = func + p1 * 1
-				if func >= 1 then
+			local function Stepped(p1) --[[ Stepped | Line: 1937 | Upvalues: v3 (ref), Finish (copy), LerpTable (ref), v40 (ref), v41 (ref), ColorCorrectionEffect (ref), BlurEffect (ref) ]]
+				v3 = v3 + p1 * 1
+				if v3 >= 1 then
 					return Finish()
 				end
-				local isEnabled = LerpTable(v40, v41, func)
-				ColorCorrectionEffect.Saturation = isEnabled.Saturation
-				BlurEffect.Size = isEnabled.Blur
+				local v1 = LerpTable(v40, v41, v3)
+				ColorCorrectionEffect.Saturation = v1.Saturation
+				BlurEffect.Size = v1.Blur
 			end
-			cframe = RunService.RenderStepped:connect(Stepped)
-			delay(0.5, function()
-				cframe.Frame.Size = UDim2.new(1, 40, 0, 0)
-				cframe.Frame.Position = UDim2.new(0, -20, 0.5, 0)
-				cframe.Frame:TweenSizeAndPosition(UDim2.new(1, 40, 0, 150), UDim2.new(0, -20, 0.5, -75), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
-				cframe.Frame.Visible = true
+			v4 = RunService.RenderStepped:connect(Stepped)
+			delay(0.5, function() --[[ Line: 1948 | Upvalues: v12 (ref) ]]
+				v12.Frame.Size = UDim2.new(1, 40, 0, 0)
+				v12.Frame.Position = UDim2.new(0, -20, 0.5, 0)
+				v12.Frame:TweenSizeAndPosition(UDim2.new(1, 40, 0, 150), UDim2.new(0, -20, 0.5, -75), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
+				v12.Frame.Visible = true
 			end)
 		end
 	end
-	waitForChild(ReplicatedStorage, "UpdateDeathMessage"):andThen(function(p1)
-		p1.OnClientEvent:Connect(function(p1)
+	waitForChild(ReplicatedStorage, "UpdateDeathMessage"):andThen(function(p1) --[[ Line: 1962 | Upvalues: v42 (ref), v12 (copy) ]]
+		p1.OnClientEvent:Connect(function(p1) --[[ Line: 1963 | Upvalues: v42 (ref), v12 (ref) ]]
 			v42 = p1
-			cframe.Frame.TextLabel.Text = p1
+			v12.Frame.TextLabel.Text = p1
 		end)
 	end)
 end
 do
 	local JetPack_2 = require(ReplicatedStorage.Game.JetPack.JetPack)
-	function configTable.e9kobedq(p1)
+	function t.epf0mf5t(p1) --[[ epf0mf5t | Line: 1970 | Upvalues: Settings (copy), HapticEffect (copy), v21 (ref), Falling (copy), JetPack_2 (copy) ]]
 		p1 = p1 or Settings.Time.Stunned
 		HapticEffect.basic(1, 1)
-		isStunned = true
+		v21 = true
 		Falling.StartRagdolling(p1)
 		JetPack_2.Stunned()
 		task.wait(p1)
-		isStunned = false
+		v21 = false
 	end
-	function configTable.mq92d5a8(p1)
+	function t.vbey8zy6(p1) --[[ vbey8zy6 | Line: 1985 | Upvalues: Notification (copy) ]]
 		assert(p1 ~= nil)
 		assert(p1.Text ~= nil)
 		Notification.new({
@@ -1726,27 +1734,27 @@ do
 			Style = p1.Style
 		})
 	end
-	function configTable.pehxjhoy(p1, p2)
+	function t.sh4ur5v1(p1, p2) --[[ sh4ur5v1 | Line: 1990 | Upvalues: Notification (copy) ]]
 		assert(p1 ~= nil)
 		Notification.notifyBoss(p1, p2)
 	end
-	gameContext.Notification = configTable.mq92d5a8
-	function configTable.ekwtxejw(p1, p2)
+	t6.Notification = t.vbey8zy6
+	function t.gi351x45(p1, p2) --[[ gi351x45 | Line: 1995 | Upvalues: RichTextUtils (copy), TextChatService (copy) ]]
 		if p2 then
 			p1 = RichTextUtils.addColorToText(p1, p2)
 		end
-		pcall(function()
+		pcall(function() --[[ Line: 1999 | Upvalues: TextChatService (ref), p1 (ref) ]]
 			TextChatService.TextChannels.RBXGeneral:DisplaySystemMessage(p1, "BadimoSystemMessage")
 		end)
 	end
 	local store_2 = require(ReplicatedStorage.App.store)
 	local homeStore = require(ReplicatedStorage.Home.homeStore)
-	local vehicleBuyUI = require(ReplicatedStorage.App.VehicleBuyUI)()
+	local v43 = require(ReplicatedStorage.App.VehicleBuyUI)()
 	local MilestoneEffects = require(ReplicatedStorage.App.MilestoneEffects)
 	MilestoneEffects.init(Fireworks)
-	function configTable.akp6xj5f(p1)
+	function t.dch6fgph(p1) --[[ dch6fgph | Line: 2009 | Upvalues: v43 (copy), MilestoneEffects (copy), CashBuyUI (copy), store_2 (copy), homeStore (copy) ]]
 		assert(p1 ~= nil)
-		vehicleBuyUI.setCash(p1.Cash)
+		v43.setCash(p1.Cash)
 		MilestoneEffects.cashUpdate(p1.Cash)
 		CashBuyUI.SetCash(p1.Cash)
 		store_2:dispatch({
@@ -1758,48 +1766,48 @@ do
 			cash = p1.Cash
 		})
 	end
-	local cashPopupCounter = 0
-	function configTable.bpp8cyi1(p1, p2)
-		local isEnabled = cashPopupCounter + 1
-		cashPopupCounter = isEnabled
+	local v44 = 0
+	function t.tox6zamj(p1, p2) --[[ tox6zamj | Line: 2026 | Upvalues: v44 (ref), Fireworks (copy), v9 (copy), Localization (copy), abs (copy) ]]
+		local v1 = v44 + 1
+		v44 = v1
 		if p1 > 0 then
 			task.spawn(Fireworks, 2)
-			isEnabled.PlusCash.TextColor3 = Color3.fromRGB(68, 194, 93)
-			isEnabled.PlusCash.TextStrokeColor3 = Color3.fromRGB(33, 97, 44)
+			v9.PlusCash.TextColor3 = Color3.fromRGB(68, 194, 93)
+			v9.PlusCash.TextStrokeColor3 = Color3.fromRGB(33, 97, 44)
 		else
-			isEnabled.PlusCash.TextColor3 = Color3.fromRGB(240, 30, 30)
-			isEnabled.PlusCash.TextStrokeColor3 = Color3.fromRGB(180, 0, 0)
+			v9.PlusCash.TextColor3 = Color3.fromRGB(240, 30, 30)
+			v9.PlusCash.TextStrokeColor3 = Color3.fromRGB(180, 0, 0)
 		end
-		if not isEnabled.PlusCash.Visible then
-			isEnabled.PlusCash.Text = ""
+		if not v9.PlusCash.Visible then
+			v9.PlusCash.Text = ""
 		end
-		isEnabled.PlusCash.Visible = true
-		isEnabled.PlusCash.TextSize = 28
-		isEnabled.PlusCash.Font = Enum.Font.SourceSansBold
-		isEnabled.PlusCash.RichText = true
+		v9.PlusCash.Visible = true
+		v9.PlusCash.TextSize = 28
+		v9.PlusCash.Font = Enum.Font.SourceSansBold
+		v9.PlusCash.RichText = true
 		if p2 then
-			local configTable = {}
-			local cframe, RemoteEvent, vector = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
-			configTable[1] = cframe .. RemoteEvent:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. vector
-			isEnabled.PlusCash.Text = isEnabled.PlusCash.Text .. ("<font color=\"#FFFFFF\"><stroke color=\"#111111\" thickness=\"0.75\">%s: </stroke></font><b>%s</b>\n"):format(p2, if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", configTable))
+			local t = {}
+			local v6, v7, v8 = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
+			t[1] = v6 .. v7:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v8
+			v9.PlusCash.Text = v9.PlusCash.Text .. ("<font color=\"#FFFFFF\"><stroke color=\"#111111\" thickness=\"0.75\">%s: </stroke></font><b>%s</b>\n"):format(p2, if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", t))
 		else
-			local configTable = {}
-			local prefix, numericPart, suffix = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
-			configTable[1] = prefix ..  numericPart:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. cframe
-			isEnabled.PlusCash.Text = isEnabled.PlusCash.Text .. ("<b>%s</b>\n"):format(if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", configTable))
+			local t = {}
+			local v13, v14, v15 = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
+			t[1] = v13 .. v14:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v15
+			v9.PlusCash.Text = v9.PlusCash.Text .. ("<b>%s</b>\n"):format(if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", t))
 		end
-		task.delay(3, function()
-			if cashPopupCounter == isEnabled then
-				isEnabled.PlusCash.Visible = false
+		task.delay(3, function() --[[ Line: 2053 | Upvalues: v44 (ref), v1 (copy), v9 (ref) ]]
+			if v44 == v1 then
+				v9.PlusCash.Visible = false
 			end
 		end)
 	end
-	local function _added(p1)
-		p1.maid:GiveTask(function()
+	local function _added(p1) --[[ _added | Line: 2061 | Upvalues: UpdateHeliLowQuality (copy) ]]
+		p1.maid:GiveTask(function() --[[ Line: 2062 | Upvalues: p1 (copy), UpdateHeliLowQuality (ref) ]]
 			local packet = p1.packet
 			if packet and packet.Sounds then
-				for isEnabled, isEnabled in next, packet.Sounds do
-					isEnabled.Volume = 0
+				for v1, v2 in next, packet.Sounds do
+					v2.Volume = 0
 				end
 			end
 			if packet and packet.Type == "Heli" then
@@ -1812,78 +1820,78 @@ do
 		_added(v46)
 	end
 	VehicleStateBinder:GetClassAddedSignal():Connect(_added)
-	function configTable.q53280n2(p1)
-		configTable[p1] = nil
+	function t.c56kft4s(p1) --[[ c56kft4s | Line: 2082 | Upvalues: t4 (copy) ]]
+		t4[p1] = nil
 	end
-	local connectionVariable_v47 = nil
-	pcall(function()
+	local v47 = nil
+	pcall(function() --[[ Line: 2091 | Upvalues: v47 (ref), LocalPlayer (copy) ]]
 		v47 = require(LocalPlayer.PlayerScripts.PlayerModule.CameraModule:WaitForChild("ZoomController"))
 	end)
 	local CinematicCamera = require(ReplicatedStorage.Module.CinematicCamera)
-	local function TransitionCamera(p1, p2, p3, p4, p5, p6, p7)
-		local isEnabled = Maid.new()
-		local isEnabled = CinematicCamera.MakeCinematicCamera()
-		isEnabled.Position = CurrentCamera.CFrame.Position
-		isEnabled.LookVector = CurrentCamera.CFrame.LookVector
+	local function TransitionCamera(p1, p2, p3, p4, p5, p6, p7) --[[ TransitionCamera | Line: 2096 | Upvalues: Maid (copy), CinematicCamera (copy), CurrentCamera (copy), PlayerModuleService (copy), v47 (ref), RunService (copy) ]]
+		local v1 = Maid.new()
+		local v2 = CinematicCamera.MakeCinematicCamera()
+		v2.Position = CurrentCamera.CFrame.Position
+		v2.LookVector = CurrentCamera.CFrame.LookVector
 		CurrentCamera.CameraType = Enum.CameraType.Scriptable
-		isEnabled:GiveTask(function()
+		v1:GiveTask(function() --[[ Line: 2102 | Upvalues: CurrentCamera (ref) ]]
 			CurrentCamera.CameraType = Enum.CameraType.Custom
 		end)
-		local func = 0
-		local function Finish()
-			isEnabled:Destroy()
+		local v3 = 0
+		local function Finish() --[[ Finish | Line: 2106 | Upvalues: v1 (copy), PlayerModuleService (ref), p5 (copy), v47 (ref) ]]
+			v1:Destroy()
 			PlayerModuleService.setCameraToSubjectDistance(p5)
 			if v47 then
 				v47.ReleaseSpring()
 			end
 		end
-		local cframe = p7 or p1.CFrame - p1.CFrame.p
-		local function Update(p12)
-			func = func + p12 * (1 / p2)
-			local cframe = if p6 then cframe + p1.CFrame.p else p1.CFrame
-			isEnabled.TargetPosition = cframe * p3
-			isEnabled.TargetFocus = cframe * p4
-			CinematicCamera.StepCinematicCamera(p12, isEnabled, func * 50 * func + 10, func * 50 * func + 6)
-			if func >= 1 then
-				isEnabled:Destroy()
+		local v4 = p7 or p1.CFrame - p1.CFrame.p
+		local function Update(p12) --[[ Update | Line: 2114 | Upvalues: v3 (ref), p2 (copy), p6 (copy), v4 (copy), p1 (copy), v2 (copy), p3 (copy), p4 (copy), CinematicCamera (ref), v1 (copy), PlayerModuleService (ref), p5 (copy), v47 (ref) ]]
+			v3 = v3 + p12 * (1 / p2)
+			local v12 = if p6 then v4 + p1.CFrame.p else p1.CFrame
+			v2.TargetPosition = v12 * p3
+			v2.TargetFocus = v12 * p4
+			CinematicCamera.StepCinematicCamera(p12, v2, v3 * 50 * v3 + 10, v3 * 50 * v3 + 6)
+			if v3 >= 1 then
+				v1:Destroy()
 				PlayerModuleService.setCameraToSubjectDistance(p5)
 				if v47 then
 					v47.ReleaseSpring()
 				end
 			end
 		end
-		isEnabled:GiveTask(RunService.RenderStepped:Connect(Update))
-		return isEnabled
+		v1:GiveTask(RunService.RenderStepped:Connect(Update))
+		return v1
 	end
-	local connectionVariable_v48 = nil
-	v43.Frame.Parent = isEnabled
-	local function Cancel()
+	local v48 = nil
+	v43.Frame.Parent = v9
+	local function Cancel() --[[ Cancel | Line: 2135 | Upvalues: v43 (copy), OnJump (ref) ]]
 		v43.setEnabled(false)
 		OnJump()
 	end
-	local function Buy()
+	local function Buy() --[[ Buy | Line: 2139 | Upvalues: v48 (ref), v43 (copy), OnJump (ref), t2 (ref) ]]
 		if v48 then
-			eventBridge:FireServer("ow215fmr", v48)
+			t2:FireServer("c" .. "" .. ("ng1w3xg8"):sub(3, 6):reverse():reverse():reverse() .. "u1k", v48)
 		else
 			v43.setEnabled(false)
 			OnJump()
 		end
 	end
-	local function Rent()
+	local function Rent() --[[ Rent | Line: 2146 | Upvalues: v48 (ref), v43 (copy), OnJump (ref), MarketplaceService (copy), LocalPlayer (copy), t2 (ref) ]]
 		if v48 then
 			MarketplaceService:PromptProductPurchase(LocalPlayer, 437705749)
-			eventBridge:FireServer("np8snxb4", v48)
+			t2:FireServer("z" .. ("rgczp4t1"):sub(4, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ivya1mffyb"):sub(4, 6):reverse() .. "h", v48)
 		else
 			v43.setEnabled(false)
 			OnJump()
 		end
 	end
-	local function BuyCash()
+	local function BuyCash() --[[ BuyCash | Line: 2154 | Upvalues: v43 (copy), OnJump (ref), CashBuyUI (copy) ]]
 		v43.setEnabled(false)
 		OnJump()
 		CashBuyUI.Open()
 	end
-	v43.onAction:Connect(function(p1)
+	v43.onAction:Connect(function(p1) --[[ Line: 2158 | Upvalues: Buy (copy), v43 (copy), OnJump (ref), CashBuyUI (copy), Rent (copy) ]]
 		if p1 == "Buy" then
 			Buy()
 		elseif p1 == "Cancel" then
@@ -1897,7 +1905,7 @@ do
 			Rent()
 		end
 	end)
-	function configTable.ow215fmr(p1)
+	function t.cx3w1u1k(p1) --[[ cx3w1u1k | Line: 2169 | Upvalues: v43 (copy), Fireworks (copy), OnJump (ref), CashBuyUI (copy), t (copy) ]]
 		if p1.Success then
 			v43.setEnabled(false)
 			Fireworks(5)
@@ -1906,7 +1914,7 @@ do
 			OnJump()
 			CashBuyUI.Open()
 		elseif p1.LowLevel then
-			configTable.mq92d5a8({
+			t.vbey8zy6({
 				Title = "Vehicle",
 				Text = ("This requires level %d."):format(p1.LowLevel)
 			})
@@ -1915,103 +1923,103 @@ do
 			OnJump()
 		end
 	end
-	waitForChild(ReplicatedStorage, "UpdateOwnedCashBillboard"):andThen(function(p1)
-		p1.OnClientEvent:Connect(function(p1)
-			nitroState.VehiclesOwned = p1
+	waitForChild(ReplicatedStorage, "UpdateOwnedCashBillboard"):andThen(function(p1) --[[ Line: 2181 | Upvalues: t5 (copy) ]]
+		p1.OnClientEvent:Connect(function(p1) --[[ Line: 2182 | Upvalues: t5 (ref) ]]
+			t5.VehiclesOwned = p1
 		end)
 	end)
-	function configTable.ef31t4k2(p1)
-		nitroState.VehiclesRented = p1
+	function t.rgz09bce(p1) --[[ rgz09bce | Line: 2186 | Upvalues: t5 (copy) ]]
+		t5.VehiclesRented = p1
 	end
-	function configTable.ykwtg5cz(p1, p2, p3)
+	function t.h0x9hkw6(p1, p2, p3) --[[ h0x9hkw6 | Line: 2189 | Upvalues: v48 (ref), Settings (copy), PromptPurchase (ref), ItemUtils (copy), v43 (copy), EzUtils (copy), t (copy) ]]
 		v48 = p1
-		local isEnabled = Settings.Price[p1]
+		local v1 = Settings.Price[p1]
 		if p2 then
 			PromptPurchase(p2)
-		elseif isEnabled then
+		elseif v1 then
 			v43.setVehicle(ItemUtils.getTranslatedTitleFromItemTable((ItemUtils.createVehicleItemTable(p1))), Settings.Price[p1], p3)
 			v43.setEnabled(true)
 			EzUtils.selectIfGamepad(v43.BuyButton)
 		elseif p1 == "EscapeBot" then
-			configTable.mq92d5a8({
+			t.vbey8zy6({
 				Text = "Roll the Legendary EscapeBot from a CEO Battle to fly"
 			})
 		else
-			configTable.mq92d5a8({
+			t.vbey8zy6({
 				Text = "This vehicle cannot be purchased!"
 			})
 		end
 	end
-	function configTable.jj4fw9mg()
-		local SimpleMessage = isEnabled.SimpleMessage
+	function t.pc1r9du3() --[[ pc1r9du3 | Line: 2208 | Upvalues: v9 (copy), Localization (copy) ]]
+		local SimpleMessage = v9.SimpleMessage
 		SimpleMessage.Visible = true
 		SimpleMessage.Text = Localization:FormatByKey("Vehicle.Locked")
-		local function Finished()
+		local function Finished() --[[ Finished | Line: 2212 | Upvalues: SimpleMessage (copy) ]]
 			SimpleMessage.Visible = false
 		end
 		delay(1, Finished)
 	end
-	local configTable = {
+	local t15 = {
 		name = "useVehicleFollowCamera",
 		title = "Vehicle Follow Camera",
+		order = 50,
 		type = gameSettingType.Checkbox
 	}
-	configTable.defaultValue = not isEnabled
-	configTable.order = 50
-	GameSettingsService.add(configTable)
-	local function handleSetting_2(p1)
+	t15.defaultValue = not v1
+	GameSettingsService.add(t15)
+	local function handleSetting_2(p1) --[[ handleSetting | Line: 2226 | Upvalues: v17 (ref), VehicleUtils (ref), CurrentCamera (copy) ]]
 		if v17 then
-			local isEnabled = VehicleUtils.prepareCameraSubject(v17, p1)
+			local v1 = VehicleUtils.prepareCameraSubject(v17, p1)
 			if CurrentCamera.CameraType == Enum.CameraType.Custom then
 				CurrentCamera.CameraType = Enum.CameraType.Scriptable
 				CurrentCamera.CameraType = Enum.CameraType.Custom
 			end
-			if isEnabled then
-				CurrentCamera.CameraSubject = isEnabled
+			if v1 then
+				CurrentCamera.CameraSubject = v1
 			end
 		end
 	end
-	handleSetting_2(configTable:getValue())
-	configTable.onChanged:Connect(handleSetting_2)
+	handleSetting_2(t15:getValue())
+	t15.onChanged:Connect(handleSetting_2)
 	GameSettingsService.add({
 		name = "autoLockVehicle",
 		title = "Lock/Unlock Vehicle On Enter/Exit",
-		type = gameSettingType.Checkbox,
 		defaultValue = false,
-		order = 51
+		order = 51,
+		type = gameSettingType.Checkbox
 	})
-	local maxSpawnWaitTime = if RunUtils.isStudio() then 0.1 else 15
-	local eventCounter_v51 = 0
+	local v50 = if RunUtils.isStudio() then 0.1 else 15
+	local v51 = 0
 	local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
 	local VehicleLinkBinder = require(ReplicatedStorage.VehicleLink.VehicleLinkBinder)
 	local Promise = require(ReplicatedStorage.Std.Promise)
-	local function predicateWaitForMe(p1)
+	local function predicateWaitForMe(p1) --[[ predicateWaitForMe | Line: 2260 | Upvalues: LocalPlayer (copy) ]]
 		return p1 == LocalPlayer.Name
 	end
-	function configTable.mh8gxu5l(p1, p2, p3)
+	function t.v4hwqnz2(p1, p2, p3) --[[ v4hwqnz2 | Line: 2263 | Upvalues: StreamingHelperUtils (copy), TableUtils (copy), t (copy) ]]
 		StreamingHelperUtils.yieldForObjValuePopulated(p1)
 		local _Packet = p1.Value:WaitForChild("_Packet")
 		StreamingHelperUtils.yieldForAllValuesPopulated(_Packet)
 		TableUtils.mergeDeepInPlace(TableUtils.createTableFromObjectValues(_Packet), p2)
-		configTable.vwyylbie(p2)
+		t.habtn9qv(p2)
 	end
-	local seatPromise = nil
-	function configTable.vwyylbie(p1)
-		local configTable = {}
-		for isEnabled, isEnabled in p1.Model:GetChildren() do
-			if isEnabled:IsA("BasePart") and (isEnabled.Name == "Seat" or isEnabled.Name == "Passenger") then
-				local PlayerName = isEnabled:FindFirstChild("PlayerName")
+	local v52 = nil
+	function t.habtn9qv(p1) --[[ habtn9qv | Line: 2275 | Upvalues: RxInstanceUtils (copy), predicateWaitForMe (copy), v52 (ref), Promise (copy), CharacterUtil (copy), toggleCrawling (copy), InventoryItemSystem (copy), LocalPlayer (copy), Maid (copy), v19 (ref), UserInputService (copy), ActionButtonService (copy), DefaultActions (copy), VehicleUtils (ref), t15 (copy), TransitionCamera (ref), CurrentCamera (copy), PlayerModuleService (copy), Classes (copy), RunUtils (copy), RegionUtils (copy), t2 (ref), StartNitro (ref), v17 (ref), StopNitro (ref), HornStart (ref), HornStop (ref), v50 (copy), v51 (ref), RunService (copy), VehicleLinkBinder (copy), Players (copy), PartUtils (copy), VehicleSystem (ref) ]]
+		local t = {}
+		for v1, v2 in p1.Model:GetChildren() do
+			if v2:IsA("BasePart") and (v2.Name == "Seat" or v2.Name == "Passenger") then
+				local PlayerName = v2:FindFirstChild("PlayerName")
 				if PlayerName then
-					table.insert(configTable, RxInstanceUtils.waitForProperty(PlayerName, "Value", predicateWaitForMe):andThen(function()
-						return isEnabled
+					table.insert(t, RxInstanceUtils.waitForProperty(PlayerName, "Value", predicateWaitForMe):andThen(function() --[[ Line: 2284 | Upvalues: v2 (copy) ]]
+						return v2
 					end))
 				end
 			end
 		end
-		seatPromise = Promise.race(configTable):timeout(5)
-		local cframe, vector = seatPromise:await()
-		if cframe then
-			p1.Seat = vector
+		v52 = Promise.race(t):timeout(5)
+		local v4, v5 = v52:await()
+		if v4 then
+			p1.Seat = v5
 			if CharacterUtil.IsCrawling then
 				toggleCrawling()
 			end
@@ -2024,12 +2032,12 @@ do
 				local Humanoid = Character:FindFirstChild("Humanoid")
 				if Humanoid then
 					assert(not p1.seatMaid, "packet already has seat maid")
-					local vector = Maid.new()
-					p1.seatMaid = vector
+					local v8 = Maid.new()
+					p1.seatMaid = v8
 					p1.wasSprintingBeforeEnteringVehicle = v19 and not UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
 					ActionButtonService.setButtonEnabled(DefaultActions.crawlButton, false)
 					ActionButtonService.setButtonEnabled(DefaultActions.sprintButton, false)
-					vector:GiveTask(function()
+					v8:GiveTask(function() --[[ Line: 2326 | Upvalues: ActionButtonService (ref), DefaultActions (ref), p1 (copy), v19 (ref) ]]
 						ActionButtonService.setButtonEnabled(DefaultActions.crawlButton, true)
 						ActionButtonService.setButtonEnabled(DefaultActions.sprintButton, true)
 						if p1.wasSprintingBeforeEnteringVehicle then
@@ -2039,99 +2047,99 @@ do
 							end
 						end
 					end)
-					local cframe, cframe, cframe = VehicleUtils.prepareCameraSubject(p1, configTable:getValue(), true)
-					if cframe then
-						vector:GiveTask(TransitionCamera(cframe, 0.5, cframe, Vector3.new(0, 0, 0), cframe))
-						CurrentCamera.CameraSubject = cframe
-						vector:GiveTask(function()
-							local isEnabled = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-							if isEnabled then
-								CurrentCamera.CameraSubject = isEnabled
+					local v10, v11, v12 = VehicleUtils.prepareCameraSubject(p1, t15:getValue(), true)
+					if v10 then
+						v8:GiveTask(TransitionCamera(v10, 0.5, v11, Vector3.new(0, 0, 0), v12))
+						CurrentCamera.CameraSubject = v10
+						v8:GiveTask(function() --[[ Line: 2340 | Upvalues: LocalPlayer (ref), CurrentCamera (ref) ]]
+							local v1 = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+							if v1 then
+								CurrentCamera.CameraSubject = v1
 							else
 								CurrentCamera.CameraSubject = nil
 							end
 						end)
 					end
-					vector:GiveTask(function()
+					v8:GiveTask(function() --[[ Line: 2350 | Upvalues: PlayerModuleService (ref) ]]
 						PlayerModuleService.setCameraToSubjectDistance(15)
 					end)
 					if not p1.Passenger then
 						if p1.Type == "Chassis" or (p1.Type == "Motorcycle" or (p1.Type == "DuneBuggy" or p1.Make == "Volt")) then
-							vector:GiveTask(ActionButtonService.add({
+							v8:GiveTask(ActionButtonService.add({
 								primary = true,
 								priority = 1000,
 								saturateTo = 0,
 								image = "rbxassetid://7858765663",
 								keyCodes = { Enum.KeyCode.W, Enum.KeyCode.Up, Enum.KeyCode.ButtonR2 },
-								onPressed = function(p12)
+								onPressed = function(p12) --[[ onPressed | Line: 2363 | Upvalues: p1 (copy) ]]
 									if p12 ~= Enum.UserInputType.Gamepad1 then
 										p1.setForward(true)
 									end
 								end,
-								onReleased = function(p12)
+								onReleased = function(p12) --[[ onReleased | Line: 2369 | Upvalues: p1 (copy) ]]
 									if p12 ~= Enum.UserInputType.Gamepad1 then
 										p1.setForward(false)
 									end
 								end
 							}))
-							vector:GiveTask(ActionButtonService.add({
+							v8:GiveTask(ActionButtonService.add({
 								primary = true,
 								priority = 700,
 								saturateTo = 0,
 								image = "rbxassetid://7858764373",
 								keyCodes = { Enum.KeyCode.S, Enum.KeyCode.Down, Enum.KeyCode.ButtonL2 },
-								onPressed = function(p12)
+								onPressed = function(p12) --[[ onPressed | Line: 2382 | Upvalues: p1 (copy) ]]
 									if p12 ~= Enum.UserInputType.Gamepad1 then
 										p1.setBackward(true)
 									end
 								end,
-								onReleased = function(p12)
+								onReleased = function(p12) --[[ onReleased | Line: 2388 | Upvalues: p1 (copy) ]]
 									if p12 ~= Enum.UserInputType.Gamepad1 then
 										p1.setBackward(false)
 									end
 								end
 							}))
 							if p1.Make ~= "Volt" then
-								vector:GiveTask(ActionButtonService.add({
+								v8:GiveTask(ActionButtonService.add({
 									priority = 600,
 									allowTouchSlide = true,
 									image = "rbxassetid://4939737110",
 									keyCodes = { Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonX },
-									onPressed = function()
+									onPressed = function() --[[ onPressed | Line: 2402 | Upvalues: Classes (ref) ]]
 										Classes.Chassis.setHandbrakeEnabled(true)
 									end,
-									onReleased = function()
+									onReleased = function() --[[ onReleased | Line: 2405 | Upvalues: Classes (ref) ]]
 										Classes.Chassis.setHandbrakeEnabled(false)
 									end
 								}))
 							end
-							vector:GiveTask(ActionButtonService.add({
+							v8:GiveTask(ActionButtonService.add({
 								priority = 850,
 								image = "rbxassetid://4939737424",
 								keyCodes = { Enum.KeyCode.V, Enum.KeyCode.ButtonR1 },
-								onPressed = function()
-									local isEnabled = RunUtils.isTradeWorld() and workspace:FindFirstChild("DragStripAlignZone")
+								onPressed = function() --[[ onPressed | Line: 2415 | Upvalues: RunUtils (ref), p1 (copy), RegionUtils (ref), t2 (ref) ]]
+									local v1 = RunUtils.isTradeWorld() and workspace:FindFirstChild("DragStripAlignZone")
 									local Position = p1.Model:GetPivot().Position
-									if isEnabled and RegionUtils.isPointInPart(isEnabled, Position) then
-										p1.Model:PivotTo(CFrame.new(Position) * isEnabled.CFrame.Rotation)
+									if v1 and RegionUtils.isPointInPart(v1, Position) then
+										p1.Model:PivotTo(CFrame.new(Position) * v1.CFrame.Rotation)
 									else
-										eventBridge:FireServer("llwb2iv8")
+										t2:FireServer("h" .. "" .. ("sztrf8"):sub(4, 4):reverse():reverse():reverse() .. "m1cr55")
 									end
 								end
 							}))
 							if not p1.Model:GetAttribute("DisableNitro") then
-								vector:GiveTask(ActionButtonService.add({
+								v8:GiveTask(ActionButtonService.add({
 									priority = 500,
 									allowTouchSlide = true,
 									image = "rbxassetid://4939740976",
 									keyCodes = { Enum.KeyCode.Q, Enum.KeyCode.ButtonL1 },
-									onPressed = function()
+									onPressed = function() --[[ onPressed | Line: 2433 | Upvalues: StartNitro (ref), v17 (ref) ]]
 										StartNitro()
 										if v17 then
 											v17._isNitroPressed = true
 										end
 									end,
-									onReleased = function()
+									onReleased = function() --[[ onReleased | Line: 2439 | Upvalues: StopNitro (ref), v17 (ref) ]]
 										StopNitro()
 										if v17 then
 											v17._isNitroPressed = false
@@ -2140,86 +2148,86 @@ do
 								}))
 							end
 						elseif p1.Type == "Heli" then
-							vector:GiveTask(ActionButtonService.add({
+							v8:GiveTask(ActionButtonService.add({
 								primary = true,
 								priority = 1000,
 								saturateTo = 0,
 								image = "rbxassetid://4939737716",
 								keyCodes = { Enum.KeyCode.E, Enum.KeyCode.ButtonR2 },
-								onPressed = function()
+								onPressed = function() --[[ onPressed | Line: 2454 | Upvalues: Classes (ref) ]]
 									Classes.Heli.setUp(true)
 								end,
-								onReleased = function()
+								onReleased = function() --[[ onReleased | Line: 2457 | Upvalues: Classes (ref) ]]
 									Classes.Heli.setUp(false)
 								end
 							}))
-							vector:GiveTask(ActionButtonService.add({
+							v8:GiveTask(ActionButtonService.add({
 								primary = true,
 								priority = 950,
 								saturateTo = 0,
 								image = "rbxassetid://4939738083",
 								keyCodes = { Enum.KeyCode.Q, Enum.KeyCode.ButtonL2 },
-								onPressed = function()
+								onPressed = function() --[[ onPressed | Line: 2467 | Upvalues: Classes (ref) ]]
 									Classes.Heli.setDown(true)
 								end,
-								onReleased = function()
+								onReleased = function() --[[ onReleased | Line: 2470 | Upvalues: Classes (ref) ]]
 									Classes.Heli.setDown(false)
 								end
 							}))
 							if p1.Make ~= "UFO" and p1.Make ~= "CrewCapsule" then
-								vector:GiveTask(ActionButtonService.add({
+								v8:GiveTask(ActionButtonService.add({
 									priority = 700,
 									image = "rbxassetid://4939738413",
 									keyCodes = { Enum.KeyCode.L, Enum.KeyCode.ButtonL1 },
-									onPressed = function()
+									onPressed = function() --[[ onPressed | Line: 2479 | Upvalues: Classes (ref), p1 (copy) ]]
 										Classes.Heli.toggleHeadlights(p1)
 									end
 								}))
 							end
 						end
 						if p1.Model and (p1.Model:FindFirstChild("Model") and (p1.Model.Model:FindFirstChild("Headlights") and p1.Type ~= "Heli")) then
-							vector:GiveTask(ActionButtonService.add({
+							v8:GiveTask(ActionButtonService.add({
 								priority = 450,
 								image = "rbxassetid://4939738413",
 								keyCodes = { Enum.KeyCode.L, Enum.KeyCode.ButtonY },
-								onPressed = function()
+								onPressed = function() --[[ onPressed | Line: 2496 | Upvalues: Classes (ref) ]]
 									Classes.Chassis.toggleHeadlights()
 								end
 							}))
 						end
 						if p1.Model and p1.Model:FindFirstChild("BoundingBox") then
-							vector:GiveTask(ActionButtonService.add({
+							v8:GiveTask(ActionButtonService.add({
 								priority = 800,
 								image = "rbxassetid://4939742186",
 								keyCodes = { Enum.KeyCode.H, Enum.KeyCode.ButtonL3 },
-								onPressed = function()
+								onPressed = function() --[[ onPressed | Line: 2507 | Upvalues: HornStart (ref) ]]
 									HornStart()
 								end,
-								onReleased = function()
+								onReleased = function() --[[ onReleased | Line: 2510 | Upvalues: HornStop (ref) ]]
 									HornStop()
 								end
 							}))
 						end
 						if Make == "Ambulance" or (Make == "Firetruck" or (Make == "Jeep" or (Make == "Boxer" or (Make == "PrisonBus" or (Make == "Longhorn" or (Make == "Laviolette" or (Make == "SWATVan" or (Make == "Tanker" or Make == "AdminNuke")))))))) then
-							vector:GiveTask(ActionButtonService.add({
+							v8:GiveTask(ActionButtonService.add({
 								priority = 400,
 								image = "rbxassetid://4939741296",
 								keyCodes = { Enum.KeyCode.G, Enum.KeyCode.DPadDown },
-								onPressed = function()
+								onPressed = function() --[[ onPressed | Line: 2534 | Upvalues: Classes (ref) ]]
 									Classes.Chassis.runAction(true)
 								end,
-								onReleased = function()
+								onReleased = function() --[[ onReleased | Line: 2537 | Upvalues: Classes (ref) ]]
 									Classes.Chassis.runAction(false)
 								end
 							}))
 						end
 						if p1.CanJump then
-							local configTable = {
+							local t3 = {
 								priority = 400,
-								useEvery = v50,
 								image = "rbxassetid://4939741296",
+								useEvery = v50,
 								keyCodes = { Enum.KeyCode.G, Enum.KeyCode.DPadDown },
-								onPressed = function()
+								onPressed = function() --[[ onPressed | Line: 2549 | Upvalues: Classes (ref), v51 (ref) ]]
 									if Classes.Chassis.runAction("Jump") == true then
 										v51 = os.clock()
 										return true
@@ -2228,96 +2236,96 @@ do
 									end
 								end
 							}
-							vector:GiveTask(ActionButtonService.add(configTable))
+							v8:GiveTask(ActionButtonService.add(t3))
 							if os.clock() - v51 < v50 then
-								configTable._lastUsed = v51
-								configTable._maid.progress = RunService.Heartbeat:Connect(function()
-									local isEnabled = (os.clock() - configTable._lastUsed) / configTable.useEvery
-									if isEnabled >= 1 then
-										configTable._maid.progress = nil
-										configTable.updateProgressBinding(0)
+								t3._lastUsed = v51
+								t3._maid.progress = RunService.Heartbeat:Connect(function() --[[ Line: 2560 | Upvalues: t3 (copy) ]]
+									local v1 = (os.clock() - t3._lastUsed) / t3.useEvery
+									if v1 >= 1 then
+										t3._maid.progress = nil
+										t3.updateProgressBinding(0)
 									else
-										configTable.updateProgressBinding(isEnabled)
+										t3.updateProgressBinding(v1)
 									end
 								end)
-								vector:GiveTask(configTable._maid.progress)
+								v8:GiveTask(t3._maid.progress)
 							end
 						end
 						if p1.Type == "Chassis" or p1.Type == "Heli" then
 							if p1.Missiles and p1.Rockets then
-								local configTable = {
+								local t3 = {
 									priority = 350,
 									image = "rbxassetid://4939740665"
 								}
-								local configTable = {}
-								configTable[1] = p1.Type == "Chassis" and Enum.KeyCode.G or Enum.KeyCode.F
-								configTable[2] = Enum.KeyCode.ButtonX
-								configTable.keyCodes = configTable
-								function configTable.onPressed()
+								local t4 = {}
+								t4[1] = p1.Type == "Chassis" and Enum.KeyCode.G or Enum.KeyCode.F
+								t4[2] = Enum.KeyCode.ButtonX
+								t3.keyCodes = t4
+								function t3.onPressed() --[[ onPressed | Line: 2580 | Upvalues: p1 (copy), Classes (ref), v17 (ref) ]]
 									if p1.Type == "Chassis" then
 										Classes.Chassis.AttemptFireMissile(v17)
 									else
 										Classes.Heli.attemptFireMissile()
 									end
 								end
-								vector:GiveTask(ActionButtonService.add(configTable))
+								v8:GiveTask(ActionButtonService.add(t3))
 							end
 							if p1.Missiles and p1.Bombs then
-								vector:GiveTask(ActionButtonService.add({
+								v8:GiveTask(ActionButtonService.add({
 									priority = 300,
 									image = "rbxassetid://7893992893",
 									keyCodes = { Enum.KeyCode.B, Enum.KeyCode.ButtonB },
-									onPressed = function()
+									onPressed = function() --[[ onPressed | Line: 2594 | Upvalues: Classes (ref) ]]
 										Classes.Heli.attemptDropBomb()
 									end
 								}))
 							end
 						end
 						if p1.Make == "TowTruck" or p1.Make == "FrostCrawler" then
-							vector:GiveTask(ActionButtonService.add({
+							v8:GiveTask(ActionButtonService.add({
 								priority = 250,
 								image = "rbxassetid://4939739616",
 								keyCodes = { Enum.KeyCode.G, Enum.KeyCode.DPadDown },
-								onPressed = function()
+								onPressed = function() --[[ onPressed | Line: 2606 | Upvalues: p1 (copy), VehicleLinkBinder (ref) ]]
 									VehicleLinkBinder:Get((p1.Model:FindFirstChild("Preset"):FindFirstChild("Crane"):FindFirstChild("MetalHook"))):Unattach()
 								end
 							}))
 						end
 					end
 					if p1.Model and p1.Model:FindFirstChild("Winch") then
-						vector:GiveTask(ActionButtonService.add({
+						v8:GiveTask(ActionButtonService.add({
 							priority = 750,
 							image = "rbxassetid://4939739616",
 							keyCodes = { Enum.KeyCode.G, Enum.KeyCode.ButtonY },
-							onPressed = function()
+							onPressed = function() --[[ onPressed | Line: 2622 | Upvalues: Classes (ref) ]]
 								Classes.Heli.attemptDropRope()
 							end
 						}))
 					end
 					Humanoid.Sit = true
-					vector:GiveTask(Humanoid:GetPropertyChangedSignal("Sit"):Connect(function()
+					v8:GiveTask(Humanoid:GetPropertyChangedSignal("Sit"):Connect(function() --[[ Line: 2629 | Upvalues: Humanoid (copy) ]]
 						if not Humanoid.Sit and Humanoid.Health > 0 then
 							Humanoid.Sit = true
 						end
 					end))
-					vector:GiveTask(function()
+					v8:GiveTask(function() --[[ Line: 2634 | Upvalues: Humanoid (copy) ]]
 						Humanoid.Sit = false
 					end)
 					Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
-					vector:GiveTask(function()
+					v8:GiveTask(function() --[[ Line: 2640 | Upvalues: Humanoid (copy) ]]
 						Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
 					end)
-					vector:GiveTask(task.delay(0, function()
-						local configTable = {}
-						for isEnabled, isEnabled in Character:GetChildren() do
-							if isEnabled:IsA("BasePart") and (isEnabled.CanCollide and (isEnabled.Name == "LowerTorso" or (isEnabled.Name == "UpperTorso" or isEnabled.Name == "HumanoidRootPart"))) then
-								table.insert(configTable, isEnabled)
-								isEnabled.CanCollide = false
+					v8:GiveTask(task.delay(0, function() --[[ Line: 2645 | Upvalues: Character (copy), v8 (copy) ]]
+						local t = {}
+						for v1, v2 in Character:GetChildren() do
+							if v2:IsA("BasePart") and (v2.CanCollide and (v2.Name == "LowerTorso" or (v2.Name == "UpperTorso" or v2.Name == "HumanoidRootPart"))) then
+								table.insert(t, v2)
+								v2.CanCollide = false
 							end
 						end
-						vector:GiveTask(function()
-							for isEnabled, isEnabled in configTable do
-								isEnabled.CanCollide = true
+						v8:GiveTask(function() --[[ Line: 2657 | Upvalues: t (copy) ]]
+							for v1, v2 in t do
+								v2.CanCollide = true
 							end
 						end)
 					end))
@@ -2325,37 +2333,37 @@ do
 						for i, v in ipairs(p1.Model:GetChildren()) do
 							local PlayerName = v:FindFirstChild("PlayerName")
 							if PlayerName then
-								local function handleSeat(p12)
-									local isEnabled = Players:FindFirstChild(p12)
-									if isEnabled and isEnabled ~= LocalPlayer then
-										local isEnabled = Maid.new()
-										vector[v] = isEnabled
-										local Humanoid = isEnabled.Character:FindFirstChild("Humanoid")
+								local function handleSeat(p12) --[[ handleSeat | Line: 2671 | Upvalues: Players (ref), LocalPlayer (ref), Maid (ref), v8 (copy), v (copy), p1 (copy), PartUtils (ref) ]]
+									local v1 = Players:FindFirstChild(p12)
+									if v1 and v1 ~= LocalPlayer then
+										local v2 = Maid.new()
+										v8[v] = v2
+										local Humanoid = v1.Character:FindFirstChild("Humanoid")
 										Humanoid.Sit = true
-										isEnabled:GiveTask(Humanoid:GetPropertyChangedSignal("Sit"):Connect(function()
+										v2:GiveTask(Humanoid:GetPropertyChangedSignal("Sit"):Connect(function() --[[ Line: 2679 | Upvalues: Humanoid (copy) ]]
 											if not Humanoid.Sit and Humanoid.Health > 0 then
 												Humanoid.Sit = true
 											end
 										end))
 										if p1.Make == "Hammerhead" then
-											isEnabled:GiveTask(PartUtils.setPropertyWithRollback(isEnabled.Character, "CollisionGroup", "NoOtherVehicles"))
+											v2:GiveTask(PartUtils.setPropertyWithRollback(v1.Character, "CollisionGroup", "NoOtherVehicles"))
 										end
 									else
-										vector[v] = nil
+										v8[v] = nil
 									end
 								end
 								handleSeat(PlayerName.Value)
-								vector:GiveTask(PlayerName.Changed:Connect(handleSeat))
+								v8:GiveTask(PlayerName.Changed:Connect(handleSeat))
 							end
 						end
 						if p1.Make == "Hammerhead" then
-							vector:GiveTask(PartUtils.setPropertyWithRollback(p1.Model, "CollisionGroup", "NoOtherVehicles"))
-							vector:GiveTask(PartUtils.setPropertyWithRollback(Character, "CollisionGroup", "NoOtherVehicles"))
+							v8:GiveTask(PartUtils.setPropertyWithRollback(p1.Model, "CollisionGroup", "NoOtherVehicles"))
+							v8:GiveTask(PartUtils.setPropertyWithRollback(Character, "CollisionGroup", "NoOtherVehicles"))
 						end
 					end
-					local vehicleClass = Classes[Make]
-					if targetPlayer and vehicleClass.vehicleEnter then
-						vehicleClass.vehicleEnter(p1)
+					local v14 = Classes[Make]
+					if v14 and v14.vehicleEnter then
+						v14.vehicleEnter(p1)
 					elseif p1.Type == "Chassis" then
 						Classes.Chassis.VehicleEnter(p1)
 					elseif p1.Type == "Heli" then
@@ -2370,9 +2378,9 @@ do
 					end
 					v17 = p1
 					if v17.Seats ~= nil then
-						local cframe = VehicleSystem.GetPlayerSeat(v17, LocalPlayer)
-						if cframe then
-							currentVehiclePacket.Passenger = cframe.Driver ~= true
+						local v15 = VehicleSystem.GetPlayerSeat(v17, LocalPlayer)
+						if v15 then
+							v17.Passenger = v15.Driver ~= true
 						end
 					end
 					VehicleUtils.OnVehicleEntered:Fire(p1, p1.Passenger)
@@ -2382,16 +2390,16 @@ do
 			warn("failed to find vehicle seat. aborting.")
 		end
 	end
-	VehicleUtils.OnVehicleEntered:Connect(function(p1)
+	VehicleUtils.OnVehicleEntered:Connect(function(p1) --[[ Line: 2739 | Upvalues: ActionButtonService (copy), Classes (copy), RxInstanceUtils (copy) ]]
 		local seatMaid = p1.seatMaid
 		if not p1.Passenger then
-			local function handleLights(p1)
+			local function handleLights(p1) --[[ handleLights | Line: 2743 | Upvalues: seatMaid (copy), ActionButtonService (ref), Classes (ref) ]]
 				if p1 then
 					seatMaid.sirensButton = ActionButtonService.add({
 						priority = 450,
 						image = "rbxassetid://4939739355",
 						keyCodes = { Enum.KeyCode.F, Enum.KeyCode.ButtonB },
-						onPressed = function()
+						onPressed = function() --[[ onPressed | Line: 2749 | Upvalues: Classes (ref) ]]
 							Classes.Chassis.toggleSirens()
 						end
 					})
@@ -2405,13 +2413,13 @@ do
 			end
 		end
 		if not p1.Passenger then
-			local function handleCamToggle(p1)
+			local function handleCamToggle(p1) --[[ handleCamToggle | Line: 2764 | Upvalues: seatMaid (copy), ActionButtonService (ref), Classes (ref) ]]
 				if p1 then
 					seatMaid.camToggleButton = ActionButtonService.add({
 						priority = 550,
 						image = "rbxassetid://4939741662",
 						keyCodes = { Enum.KeyCode.C, Enum.KeyCode.ButtonR3 },
-						onPressed = function()
+						onPressed = function() --[[ onPressed | Line: 2770 | Upvalues: Classes (ref) ]]
 							Classes.Chassis.toggleInsideCamera()
 						end
 					})
@@ -2423,47 +2431,47 @@ do
 			seatMaid:GiveTask(RxInstanceUtils.observeOneChildNamed(p1.Model, "InsideCamera", handleCamToggle))
 		end
 	end)
-	function configTable.iokrerkc()
+	function t.n9jysnxj() --[[ n9jysnxj | Line: 2782 | Upvalues: v52 (ref), v17 (ref), VehicleUtils (ref), StopNitro (ref), Classes (copy), ItemSystem (ref), InputUtils (copy), v19 (ref), DefaultActions (copy) ]]
 		if v52 then
 			v52:cancel()
 		end
 		if v17 then
 			VehicleUtils.OnVehicleJumpExited:Fire(v17)
-			local isEnabled = v17
-			local Type = isEnabled.Type
-			local Make = isEnabled.Make
+			local v1 = v17
+			local Type = v1.Type
+			local Make = v1.Make
 			v17 = nil
-			if isEnabled.Nitro then
+			if v1.Nitro then
 				StopNitro()
 			end
-			isEnabled.Nitro = false
-			if isEnabled.Nitrous then
-				for isEnabled, func in next, isEnabled.Nitrous do
-					func.Enabled = false
+			v1.Nitro = false
+			if v1.Nitrous then
+				for v2, v3 in next, v1.Nitrous do
+					v3.Enabled = false
 				end
 			end
-			if isEnabled.IsCameraLocked then
-				Classes.Chassis.toggleInsideCamera(isEnabled)
+			if v1.IsCameraLocked then
+				Classes.Chassis.toggleInsideCamera(v1)
 			end
-			local cframe = Classes[Make]
-			if cframe and cframe.vehicleLeave then
-				cframe.vehicleLeave(isEnabled)
+			local v4 = Classes[Make]
+			if v4 and v4.vehicleLeave then
+				v4.vehicleLeave(v1)
 			elseif Type == "Chassis" then
-				Classes.Chassis.VehicleLeave(isEnabled)
+				Classes.Chassis.VehicleLeave(v1)
 			elseif Type == "Heli" then
-				Classes.Heli.VehicleLeave(isEnabled)
+				Classes.Heli.VehicleLeave(v1)
 			elseif Type == "Motorcycle" or Type == "DuneBuggy" then
-				Classes.Chassis2.VehicleLeave(isEnabled)
+				Classes.Chassis2.VehicleLeave(v1)
 			elseif Type == "Custom" and Make == "Volt" then
-				Classes.Volt.VehicleLeave(isEnabled)
+				Classes.Volt.VehicleLeave(v1)
 			end
-			isEnabled.seatMaid:Destroy()
-			isEnabled.seatMaid = nil
-			local vector = ItemSystem.GetLocalEquipped()
-			if vector and vector.IsLeaning then
-				vector:SetLeaning(false)
+			v1.seatMaid:Destroy()
+			v1.seatMaid = nil
+			local v5 = ItemSystem.GetLocalEquipped()
+			if v5 and v5.IsLeaning then
+				v5:SetLeaning(false)
 			end
-			VehicleUtils.OnVehicleExited:Fire(isEnabled, isEnabled.Passenger)
+			VehicleUtils.OnVehicleExited:Fire(v1, v1.Passenger)
 			if InputUtils.isTouch() then
 				v19 = true
 				if (DefaultActions.sprintButton._pressed and true or false) ~= true and DefaultActions.sprintButton._pressState then
@@ -2473,18 +2481,18 @@ do
 			VehicleUtils.fixNetworkingCharacters()
 		end
 	end
-	VehicleUtils.OnVehicleJumpExited:Connect(function(p1)
+	VehicleUtils.OnVehicleJumpExited:Connect(function(p1) --[[ Line: 2840 | Upvalues: LocalPlayer (copy), ConstraintUtils (copy), Players (copy) ]]
 		local Character = LocalPlayer.Character
 		if Character then
-			for isEnabled, isEnabled in Character:GetDescendants() do
-				if isEnabled:IsA("JointInstance") or isEnabled:IsA("AnimationConstraint") then
-					local JointC0 = isEnabled:FindFirstChild("JointC0")
+			for v1, v2 in Character:GetDescendants() do
+				if v2:IsA("JointInstance") or v2:IsA("AnimationConstraint") then
+					local JointC0 = v2:FindFirstChild("JointC0")
 					if JointC0 then
-						ConstraintUtils.setJointC0(isEnabled, JointC0.Value)
+						ConstraintUtils.setJointC0(v2, JointC0.Value)
 					end
-					local JointC1 = isEnabled:FindFirstChild("JointC1")
+					local JointC1 = v2:FindFirstChild("JointC1")
 					if JointC1 then
-						ConstraintUtils.setJointC1(isEnabled, JointC1.Value)
+						ConstraintUtils.setJointC1(v2, JointC1.Value)
 					end
 				end
 			end
@@ -2497,14 +2505,14 @@ do
 			if Character then
 				local Humanoid = Character:FindFirstChild("Humanoid")
 				if Humanoid and Character.PrimaryPart then
-					local func = Humanoid:GetPropertyChangedSignal("Sit"):Connect(function()
+					local v3 = Humanoid:GetPropertyChangedSignal("Sit"):Connect(function() --[[ Line: 2881 | Upvalues: Humanoid (copy) ]]
 						if not Humanoid.Sit then
 							Humanoid.Sit = true
 						end
 					end)
 					Humanoid.Sit = true
-					task.delay(0.3, function()
-						func:Disconnect()
+					task.delay(0.3, function() --[[ Line: 2887 | Upvalues: v3 (ref), Humanoid (copy) ]]
+						v3:Disconnect()
 						Humanoid.Sit = false
 						Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
 					end)
@@ -2516,44 +2524,44 @@ do
 			end
 			local BoundingBox = p1.Model:FindFirstChild("BoundingBox")
 			if Character and Character.PrimaryPart then
-				local cframe = if p1.Model and BoundingBox then Character.PrimaryPart.CFrame:ToObjectSpace(BoundingBox.CFrame * CFrame.new(0, BoundingBox.Size.Y * 0.5, 0)).Y else 0
-				local vector = RaycastParams.new()
-				local configTable = { workspace:FindFirstChild("Vehicles") }
-				for cframe, RemoteEvent in Players:GetPlayers() do
-					table.insert(configTable, RemoteEvent.Character)
+				local v4 = if p1.Model and BoundingBox then Character.PrimaryPart.CFrame:ToObjectSpace(BoundingBox.CFrame * CFrame.new(0, BoundingBox.Size.Y * 0.5, 0)).Y else 0
+				local v5 = RaycastParams.new()
+				local t = { workspace:FindFirstChild("Vehicles") }
+				for v6, v7 in Players:GetPlayers() do
+					table.insert(t, v7.Character)
 				end
-				vector.FilterDescendantsInstances = configTable
-				local vector = workspace:Raycast(Character.PrimaryPart.Position, Vector3.new(0, cframe + 6, 0), vector)
-				Character:SetPrimaryPartCFrame(Character.PrimaryPart.CFrame + Vector3.new(0, if vector then math.max(0, vector.Distance - 2) else cframe + 6, 0))
+				v5.FilterDescendantsInstances = t
+				local v8 = workspace:Raycast(Character.PrimaryPart.Position, Vector3.new(0, v4 + 6, 0), v5)
+				Character:SetPrimaryPartCFrame(Character.PrimaryPart.CFrame + Vector3.new(0, if v8 then math.max(0, v8.Distance - 2) else v4 + 6, 0))
 			end
 		end
 	end)
-	function configTable.bmel6swz(p1)
+	function t.l5eif40v(p1) --[[ l5eif40v | Line: 2928 | Upvalues: v17 (ref) ]]
 		if v17 then
-			for isEnabled, isEnabled in next, p1 do
-				v17[isEnabled] = isEnabled
+			for v1, v2 in next, p1 do
+				v17[v1] = v2
 			end
 		end
 	end
-	function configTable.d41xtwyc()
+	function t.kjdkog8c() --[[ kjdkog8c | Line: 2936 | Upvalues: v17 (ref), Classes (copy) ]]
 		if v17 then
-			if currentVehiclePacket.Type == "Heli" then
+			if v17.Type == "Heli" then
 				Classes.Heli.FallOutOfSky(v17)
 			end
 		end
 	end
-	function configTable.plgep10a(p1)
+	function t.v9hoomtb(p1) --[[ v9hoomtb | Line: 2945 | Upvalues: v17 (ref), Classes (copy) ]]
 		if v17 then
-			if currentVehiclePacket.Type == "Chassis" then
+			if v17.Type == "Chassis" then
 				Classes.Chassis.SpinOut(v17, p1)
 			else
-				error(("Cannot spin-out vehicle type: %s"):format(currentVehiclePacket.Type))
+				error(("Cannot spin-out vehicle type: %s"):format(v17.Type))
 			end
 		else
 			error("no vehicle packet")
 		end
 	end
-	function configTable.rptw1jn9(p1)
+	function t.y1wd0kw8(p1) --[[ y1wd0kw8 | Line: 2957 | Upvalues: ReplicatedStorage (copy) ]]
 		local CrashParticles = Instance.new("Part")
 		CrashParticles.Name = "CrashParticles"
 		CrashParticles.Transparency = 1
@@ -2562,17 +2570,17 @@ do
 		CrashParticles.CFrame = p1.CFrame + p1.Parent.Engine.CFrame.LookVector * 5
 		CrashParticles.Size = p1.Size
 		CrashParticles.Parent = workspace
-		local isEnabled = ReplicatedStorage.Resource.CrashParticle:Clone()
-		isEnabled.Parent = CrashParticles
-		isEnabled:Emit(8)
+		local v1 = ReplicatedStorage.Resource.CrashParticle:Clone()
+		v1.Parent = CrashParticles
+		v1:Emit(8)
 		wait()
-		isEnabled:Emit(8)
+		v1:Emit(8)
 		wait()
-		isEnabled:Emit(8)
+		v1:Emit(8)
 		wait()
 		game.Debris:AddItem(CrashParticles, 5)
 	end
-	function configTable.g98unpiy()
+	function t.cper3x9v() --[[ cper3x9v | Line: 2975 | Upvalues: LocalPlayer (copy), v17 (ref) ]]
 		local Character = LocalPlayer.Character
 		if Character then
 			local PrimaryPart = Character.PrimaryPart
@@ -2588,47 +2596,47 @@ do
 		end
 	end
 end
-function configTable.y3fq4f5f()
-	isEnabled.FaultyAction.Visible = true
+function t.mpmbq2g9() --[[ mpmbq2g9 | Line: 2993 | Upvalues: v9 (copy) ]]
+	v9.FaultyAction.Visible = true
 	wait(4)
-	isEnabled.FaultyAction.Visible = false
+	v9.FaultyAction.Visible = false
 end
-local proximityQueue
+local t17
 do
-	local function Ease_inOutQuad(p1, p2, p3, p4)
-		local isEnabled = p1 / p4 * 2
-		if isEnabled < 1 then
-			return p3 * 0.5 * isEnabled * isEnabled + p2
+	local function Ease_inOutQuad(p1, p2, p3, p4) --[[ Ease_inOutQuad | Line: 3014 ]]
+		local v1 = p1 / p4 * 2
+		if v1 < 1 then
+			return p3 * 0.5 * v1 * v1 + p2
 		else
-			return -p3 * 0.5 * ((isEnabled - 1) * (isEnabled - 3) - 1) + p2
+			return -p3 * 0.5 * ((v1 - 1) * (v1 - 3) - 1) + p2
 		end
 	end
-	proximityQueue = {}
+	t17 = {}
 	local insert = table.insert
 	local remove = table.remove
-	local configTable = {}
-	function proximityQueue.AddPart(p1, p2, p3, p4)
-		local configTable = {
+	local t18 = {}
+	function t17.AddPart(p1, p2, p3, p4) --[[ AddPart | Line: 3040 | Upvalues: t18 (copy) ]]
+		local t = {
 			Part = p1,
 			Distance = p2,
 			f = p3,
 			Meta = p4
 		}
-		table.insert(configTable, configTable)
-		return configTable
+		table.insert(t18, t)
+		return t
 	end
-	function proximityQueue.RemoveTag(p1)
-		for i = #configTable, 1, -1 do
-			if configTable[i].Meta.Tag == p1 then
-				table.remove(configTable, i)
+	function t17.RemoveTag(p1) --[[ RemoveTag | Line: 3050 | Upvalues: t18 (copy) ]]
+		for i = #t18, 1, -1 do
+			if t18[i].Meta.Tag == p1 then
+				table.remove(t18, i)
 				return true
 			end
 		end
 		return false
 	end
-	local configTable = {}
-	local configTable = {}
-	local function UpdateInterest()
+	local t19 = {}
+	local t20 = {}
+	local function UpdateInterest() --[[ UpdateInterest | Line: 3062 | Upvalues: LocalPlayer (copy), t17 (ref) ]]
 		local Character = LocalPlayer.Character
 		if Character then
 			local PrimaryPart = Character.PrimaryPart
@@ -2636,122 +2644,122 @@ do
 				local Humanoid = Character:FindFirstChild("Humanoid")
 				if Humanoid then
 					if not (Humanoid.Health <= 0) then
-						proximityQueue.UpdateInterest(PrimaryPart.Position)
+						t17.UpdateInterest(PrimaryPart.Position)
 					end
 				end
 			end
 		end
 	end
-	function proximityQueue.UpdateInterest(p1)
+	function t17.UpdateInterest(p1) --[[ UpdateInterest | Line: 3081 | Upvalues: LocalPlayer (copy), t17 (ref), t19 (ref), t20 (ref), t18 (copy), insert (copy) ]]
 		local Character = LocalPlayer.Character
 		if Character then
 			local PrimaryPart = Character.PrimaryPart
 			if PrimaryPart then
 				local Humanoid = Character:FindFirstChild("Humanoid")
 				if Humanoid and not (Humanoid.Health <= 0) then
-					proximityQueue.UpdateInterest(PrimaryPart.Position)
+					t17.UpdateInterest(PrimaryPart.Position)
 				end
 			end
 		end
-		configTable = {}
-		configTable = {}
-		for i = #configTable, 1, -1 do
-			if not configTable[i].Part then
-				table.remove(configTable, i)
+		t19 = {}
+		t20 = {}
+		for i = #t18, 1, -1 do
+			if not t18[i].Part then
+				table.remove(t18, i)
 			end
 		end
-		for isEnabled, isEnabled in next, configTable do
-			isEnabled.Center = isEnabled.Part.Position
-			local magnitude = (isEnabled.Center - p1).magnitude
-			isEnabled.Sort = magnitude
-			local func = magnitude < isEnabled.Distance
-			if isEnabled.Locked then
-				func = true
+		for v1, v2 in next, t18 do
+			v2.Center = v2.Part.Position
+			local magnitude = (v2.Center - p1).magnitude
+			v2.Sort = magnitude
+			local v3 = magnitude < v2.Distance
+			if v2.Locked then
+				v3 = true
 			end
-			local Loaded = isEnabled.Loaded
-			if func and not Loaded then
-				insert(configTable, isEnabled)
-			elseif not func and Loaded then
-				insert(configTable, isEnabled)
+			local Loaded = v2.Loaded
+			if v3 and not Loaded then
+				insert(t19, v2)
+			elseif not v3 and Loaded then
+				insert(t20, v2)
 			end
 		end
 	end
-	local function ProcessQueue()
-		while #configTable > 0 do
-			local isEnabled = remove(configTable, 1)
-			isEnabled.Loaded = true
-			isEnabled:f(isEnabled.Loaded)
+	local function ProcessQueue() --[[ ProcessQueue | Line: 3108 | Upvalues: t19 (ref), remove (copy), t20 (ref) ]]
+		while #t19 > 0 do
+			local v1 = remove(t19, 1)
+			v1.Loaded = true
+			v1:f(v1.Loaded)
 		end
-		while #configTable > 0 do
-			local isEnabled = remove(configTable)
-			isEnabled.Loaded = false
-			isEnabled:f(isEnabled.Loaded)
+		while #t20 > 0 do
+			local v2 = remove(t20)
+			v2.Loaded = false
+			v2:f(v2.Loaded)
 		end
 	end
-	function proximityQueue.Run(p1)
+	function t17.Run(p1) --[[ Run | Line: 3120 | Upvalues: ThreadLoopAdd (ref), ProcessQueue (copy) ]]
 		ThreadLoopAdd(p1, ProcessQueue, "Proximity Queue")
 	end
-	proximityQueue.Run(0.1)
+	t17.Run(0.1)
 end
 do
-	local buttonYClone = ReplicatedStorage.Resource.ButtonY:Clone()
-	local configTable = {}
-	local function ProximityUpdate(p1, p2)
+	local v53 = ReplicatedStorage.Resource.ButtonY:Clone()
+	local t21 = {}
+	local function ProximityUpdate(p1, p2) --[[ ProximityUpdate | Line: 3129 | Upvalues: Math (copy), t21 (copy), v53 (copy) ]]
 		if p2 then
-			table.insert(configTable, Math.BinaryFind(configTable, p1.Sort), p1)
+			table.insert(t21, Math.BinaryFind(t21, p1.Sort), p1)
 		else
-			for i = #configTable, 1, -1 do
-				if configTable[i] == p1 then
-					table.remove(configTable, i)
+			for i = #t21, 1, -1 do
+				if t21[i] == p1 then
+					table.remove(t21, i)
 					break
 				end
 			end
 		end
-		local func = configTable[1]
-		if func and Enum.UserInputType.Gamepad1 == nil then
-			v53.Parent = func.Meta.Button
+		local v3 = t21[1]
+		if v3 and Enum.UserInputType.Gamepad1 == nil then
+			v53.Parent = v3.Meta.Button
 		else
 			v53.Parent = nil
 		end
 	end
-	local function AddContextButton(p1, p2, p3, p4)
-		return proximityQueue.AddPart(p1, p2, ProximityUpdate, {
+	local function AddContextButton(p1, p2, p3, p4) --[[ AddContextButton | Line: 3148 | Upvalues: t17 (ref), ProximityUpdate (copy) ]]
+		return t17.AddPart(p1, p2, ProximityUpdate, {
 			Callback = p3,
 			Tag = p4
 		})
 	end
-	local function RemoveContextButtonByTag(p1)
-		return proximityQueue.RemoveTag(p1)
+	local function RemoveContextButtonByTag(p1) --[[ RemoveContextButtonByTag | Line: 3153 | Upvalues: t17 (ref) ]]
+		return t17.RemoveTag(p1)
 	end
-	local function ContextProcessInput(p1)
-		local isEnabled = false
+	local function ContextProcessInput(p1) --[[ ContextProcessInput | Line: 3156 | Upvalues: t21 (copy), LocalPlayer (copy) ]]
+		local v1 = false
 		if p1.UserInputType == Enum.UserInputType.Gamepad1 then
 			if p1.KeyCode == Enum.KeyCode.ButtonY then
-				isEnabled = true
+				v1 = true
 			end
 		elseif p1.UserInputType == Enum.UserInputType.Keyboard and p1.KeyCode == Enum.KeyCode.Y then
-			isEnabled = true
+			v1 = true
 		end
-		if isEnabled then
-			local isEnabled = configTable[1]
-			if isEnabled then
-				for func, cframe in next, configTable do
-					if cframe.Meta.Button == isEnabled.Meta.Button then
-						coroutine.resume(coroutine.create(function()
-							cframe.Meta.Callback(LocalPlayer)
+		if v1 then
+			local v2 = t21[1]
+			if v2 then
+				for v3, v4 in next, t21 do
+					if v4.Meta.Button == v2.Meta.Button then
+						coroutine.resume(coroutine.create(function() --[[ Line: 3180 | Upvalues: v4 (copy), LocalPlayer (ref) ]]
+							v4.Meta.Callback(LocalPlayer)
 						end))
 					end
 				end
 			end
 		end
 	end
-	local function InputBegan(p1, p2)
+	local function InputBegan(p1, p2) --[[ InputBegan | Line: 3187 | Upvalues: ContextProcessInput (ref) ]]
 		if not p2 then
 			ContextProcessInput(p1)
 		end
 	end
 	UserInputService.InputBegan:connect(InputBegan)
-	local function FindDoorLight(p1)
+	local function FindDoorLight(p1) --[[ FindDoorLight | Line: 3195 ]]
 		local Model = p1:FindFirstChild("Model")
 		local Light = p1:FindFirstChild("Light")
 		if Light and (Light:IsA("ObjectValue") and (Light.Value and Light.Value:IsA("BasePart"))) then
@@ -2761,20 +2769,20 @@ do
 			return Model.Light
 		end
 	end
-	local function FunSlide(p1)
+	local function FunSlide(p1) --[[ FunSlide | Line: 3206 | Upvalues: RxInstanceUtils (copy), FindDoorLight (copy), RunService (copy) ]]
 		local Open = p1.State.Open
 		local Model = p1.Model
 		RxInstanceUtils.yieldForProperty(Model.Model, "PrimaryPart")
-		local isEnabled = FindDoorLight(Model)
+		local v1 = FindDoorLight(Model)
 		local OpenCFrame = p1.OpenCFrame
 		local ClosedCFrame = p1.ClosedCFrame
-		local function Finished()
+		local function Finished() --[[ Finished | Line: 3212 | Upvalues: Open (copy), Model (copy), OpenCFrame (copy), ClosedCFrame (copy), v1 (copy) ]]
 			if Open then
 				Model.Model:SetPrimaryPartCFrame(OpenCFrame)
 			else
 				Model.Model:SetPrimaryPartCFrame(ClosedCFrame)
-				if isEnabled then
-					isEnabled.Color = Color3.fromRGB(163, 75, 75)
+				if v1 then
+					v1.Color = Color3.fromRGB(163, 75, 75)
 				end
 			end
 		end
@@ -2782,49 +2790,49 @@ do
 			p1.State.NoAnimate = false
 			return Finished()
 		end
-		if Open and isEnabled then
-			isEnabled.Color = Color3.fromRGB(102, 137, 172)
+		if Open and v1 then
+			v1.Color = Color3.fromRGB(102, 137, 172)
 		end
 		local doorMaid = p1.doorMaid
-		local isEnabled = 0
+		local v2 = 0
 		local Duration = p1.Settings.Duration
-		local function onHeartbeat(p1)
-			isEnabled = isEnabled + p1 * 1 / Duration
-			local cframe = isEnabled / 1 * 2
-			local count = if cframe < 1 then 0.5 * cframe * cframe + 0 else -0.5 * ((cframe - 1) * (cframe - 3) - 1) + 0
+		local function onHeartbeat(p1) --[[ onHeartbeat | Line: 3231 | Upvalues: v2 (ref), Duration (copy), Open (copy), Model (copy), ClosedCFrame (copy), OpenCFrame (copy), doorMaid (copy), v1 (copy) ]]
+			v2 = v2 + p1 * 1 / Duration
+			local v12 = v2 / 1 * 2
+			local count = if v12 < 1 then 0.5 * v12 * v12 + 0 else -0.5 * ((v12 - 1) * (v12 - 3) - 1) + 0
 			if not Open then
 				count = 1 - count
 			end
 			Model.Model:SetPrimaryPartCFrame(ClosedCFrame:lerp(OpenCFrame, count))
-			if isEnabled >= 1 then
+			if v2 >= 1 then
 				doorMaid.Stepped = nil
 				if Open then
 					Model.Model:SetPrimaryPartCFrame(OpenCFrame)
 					return
 				end
 				Model.Model:SetPrimaryPartCFrame(ClosedCFrame)
-				if isEnabled then
-					isEnabled.Color = Color3.fromRGB(163, 75, 75)
+				if v1 then
+					v1.Color = Color3.fromRGB(163, 75, 75)
 				end
 			end
 		end
 		doorMaid.Stepped = RunService.Heartbeat:connect(onHeartbeat)
 	end
-	local function FunSwing(p1)
+	local function FunSwing(p1) --[[ FunSwing | Line: 3245 | Upvalues: RxInstanceUtils (copy), FindDoorLight (copy), v3 (copy), Math (copy), RunService (copy) ]]
 		local Open = p1.State.Open
 		local Model = p1.Model
 		RxInstanceUtils.yieldForProperty(Model.Model, "PrimaryPart")
-		local isEnabled = FindDoorLight(Model)
+		local v1 = FindDoorLight(Model)
 		local ClosedCFrame = p1.ClosedCFrame
 		local HingeRelativeCFrame = p1.HingeRelativeCFrame
-		local vector = func(0, 1.7278759594743864 * (p1.State.Direction * p1.Direction), 0)
-		local function Finished()
+		local v32 = v3(0, 1.7278759594743864 * (p1.State.Direction * p1.Direction), 0)
+		local function Finished() --[[ Finished | Line: 3253 | Upvalues: Open (copy), Model (copy), ClosedCFrame (copy), HingeRelativeCFrame (copy), Math (ref), v32 (copy), v1 (copy) ]]
 			if Open then
-				Model.Model:SetPrimaryPartCFrame(ClosedCFrame * HingeRelativeCFrame * Math.CFrameFromAxisAngle(vector) * HingeRelativeCFrame:inverse())
+				Model.Model:SetPrimaryPartCFrame(ClosedCFrame * HingeRelativeCFrame * Math.CFrameFromAxisAngle(v32) * HingeRelativeCFrame:inverse())
 			else
 				Model.Model:SetPrimaryPartCFrame(ClosedCFrame)
-				if isEnabled then
-					isEnabled.Color = Color3.fromRGB(163, 75, 75)
+				if v1 then
+					v1.Color = Color3.fromRGB(163, 75, 75)
 				end
 			end
 		end
@@ -2832,28 +2840,28 @@ do
 			p1.State.NoAnimate = false
 			return Finished()
 		end
-		if Open and isEnabled then
-			isEnabled.Color = Color3.fromRGB(102, 137, 172)
+		if Open and v1 then
+			v1.Color = Color3.fromRGB(102, 137, 172)
 		end
 		local doorMaid = p1.doorMaid
-		local cframe = 0
+		local v4 = 0
 		local Duration = p1.Settings.Duration
-		local function onHeartbeat(p1)
-			cframe = cframe + p1 * 1 / Duration
-			local isEnabled = cframe / 1 * 2
-			local count = if isEnabled < 1 then 0.5 * isEnabled * isEnabled + 0 else -0.5 * ((isEnabled - 1) * (isEnabled - 3) - 1) + 0
+		local function onHeartbeat(p1) --[[ onHeartbeat | Line: 3277 | Upvalues: v4 (ref), Duration (copy), Open (copy), Model (copy), ClosedCFrame (copy), HingeRelativeCFrame (copy), Math (ref), v32 (copy), doorMaid (copy), Finished (copy) ]]
+			v4 = v4 + p1 * 1 / Duration
+			local v1 = v4 / 1 * 2
+			local count = if v1 < 1 then 0.5 * v1 * v1 + 0 else -0.5 * ((v1 - 1) * (v1 - 3) - 1) + 0
 			if not Open then
 				count = 1 - count
 			end
-			Model.Model:SetPrimaryPartCFrame(ClosedCFrame * HingeRelativeCFrame * Math.CFrameFromAxisAngle((Vector3.new(0, 0, 0)):lerp(vector, count)) * HingeRelativeCFrame:inverse())
-			if cframe >= 1 then
+			Model.Model:SetPrimaryPartCFrame(ClosedCFrame * HingeRelativeCFrame * Math.CFrameFromAxisAngle((Vector3.new(0, 0, 0)):lerp(v32, count)) * HingeRelativeCFrame:inverse())
+			if v4 >= 1 then
 				doorMaid.Stepped = nil
 				return Finished()
 			end
 		end
 		doorMaid.Stepped = RunService.Heartbeat:connect(onHeartbeat)
 	end
-	local function OpenDoor(p1, p2)
+	local function OpenDoor(p1, p2) --[[ OpenDoor | Line: 3298 ]]
 		if p1.Resolved then
 			if p2 then
 				p1.State.NoAnimate = true
@@ -2867,7 +2875,7 @@ do
 			p1.AwaitingDoorClose = false
 		end
 	end
-	local function CloseDoor(p1, p2)
+	local function CloseDoor(p1, p2) --[[ CloseDoor | Line: 3313 ]]
 		if p1.Resolved then
 			if p2 then
 				p1.State.NoAnimate = true
@@ -2882,8 +2890,8 @@ do
 			p1.AwaitingDoorClose = true
 		end
 	end
-	local configTable = {}
-	local function DoorSequence(p1)
+	local t22 = {}
+	local function DoorSequence(p1) --[[ DoorSequence | Line: 3332 | Upvalues: t2 (ref) ]]
 		if not (p1.Settings.SequenceRequireState and p1.State.Open) then
 			if p1.Resolved then
 				p1.State.Open = true
@@ -2894,89 +2902,101 @@ do
 				p1.AwaitingDoorOpen = true
 				p1.AwaitingDoorClose = false
 			end
-			eventBridge:FireServer("jvsapna5", p1)
+			t2:FireServer("s" .. ("q4w0v46aj9g"):sub(2, 7):reverse() .. "r", p1)
 		end
 	end
-	local function HasPerm_2(p1, p2, p3, p4)
+	local function HasPerm_2(p1, p2, p3, p4) --[[ HasPerm | Line: 3341 | Upvalues: PlayerUtils (copy), InventoryItemSystem (copy) ]]
 		if p1.Settings.ServerOnly or p1.Settings.Locked then
 			return false
 		else
-			local isEnabled = (p3:FindFirstChild("Humanoid").Sit or p3:GetAttribute("InVehicle")) and true or false
-			local isEnabled = false
+			local v1 = (p3:FindFirstChild("Humanoid").Sit or p3:GetAttribute("InVehicle")) and true or false
+			local v2 = false
 			if p1.Settings.Vehicle and not p1.Settings.Character then
-				isEnabled = isEnabled
+				v2 = v1
 			elseif p1.Settings.Character and not p1.Settings.Vehicle then
-				isEnabled = not isEnabled
+				v2 = not v1
 			elseif p1.Settings.Character and p1.Settings.Vehicle then
-				isEnabled = true
+				v2 = true
 			end
 			if p4 then
-				isEnabled = true
+				v2 = true
 			end
-			local func = PlayerUtils.hasKey()
+			local v3 = PlayerUtils.hasKey()
 			if p1.Settings.Key then
-				isEnabled = isEnabled and func
+				v2 = v2 and v3
 			end
 			if p1.Settings.Team and p1.Settings.Team == "Prisoner" then
-				isEnabled = isEnabled and if p2.TeamValue.Value == p1.Settings.Team then true else InventoryItemSystem.playerHasItem(p2, "CrimeKey")
+				v2 = v2 and if p2.TeamValue.Value == p1.Settings.Team then true else InventoryItemSystem.playerHasItem(p2, "CrimeKey")
 			elseif p1.Settings.Team then
-				isEnabled = isEnabled and p2.TeamValue.Value == p1.Settings.Team
+				v2 = v2 and p2.TeamValue.Value == p1.Settings.Team
 			end
 			if p1.Settings.TeamBlacklist then
-				isEnabled = isEnabled and p2.TeamValue.Value ~= p1.Settings.TeamBlacklist
+				v2 = v2 and p2.TeamValue.Value ~= p1.Settings.TeamBlacklist
 			end
-			return isEnabled
+			return v2
 		end
 	end
-	local function RegisterDoor(p1)
+	local function RegisterDoor(p1) --[[ RegisterDoor | Line: 3380 | Upvalues: LocalPlayer (copy), HasPerm_2 (copy), PlaySound (ref), t2 (ref), Maid (copy), t22 (copy), AddContextButton (ref), RemoveContextButtonByTag (ref) ]]
 		assert(p1.Resolved)
 		local Model = p1.Model
-		local isEnabled = tick()
-		local isEnabled = tick()
-		local function DoorPlayer(p12)
-			local isEnabled = tick()
+		local v1 = tick()
+		local v2 = tick()
+		local function DoorPlayer(p12) --[[ DoorPlayer | Line: 3384 | Upvalues: LocalPlayer (ref), v2 (ref), p1 (copy), HasPerm_2 (ref), PlaySound (ref), Model (copy), t2 (ref) ]]
+			local v1 = tick()
 			local Character = LocalPlayer.Character
 			if Character and Character.PrimaryPart then
-				if isEnabled - isEnabled < 0.1 then
+				if v1 - v2 < 0.1 then
 					return
 				end
-				isEnabled = isEnabled
+				v2 = v1
 				if p1.State.Open or os.time() - p1.State.CloseTime < p1.Settings.Duration then
 					return
 				end
-				local hasPermission = HasPerm_2(p1, LocalPlayer, Character, p12)
+				local v22 = HasPerm_2(p1, LocalPlayer, Character, p12)
 				if p1.Settings.Character then
-					if hasPermission then
+					if v22 then
 						PlaySound("Door", {
-							Source = Model.Closed,
 							TimeStart = 1,
-							Volume = 0.2
+							Volume = 0.2,
+							Source = Model.Closed
 						})
 					else
 						PlaySound("Door", {
-							Source = Model.Closed,
 							TimeStart = 0,
 							MaxTime = 0.6,
-							Volume = 0.2
+							Volume = 0.2,
+							Source = Model.Closed
 						})
 					end
 				end
-				if hasPermission then
+				if v22 then
 					if p1.Settings.Type == "Swing" then
 						p1.State.Direction = if (p1.Model.Closed.Position - Character.HumanoidRootPart.Position).unit:Dot(p1.Model.Closed.CFrame.lookVector) > 0 then 1 else -1
 					end
-					DoorSequence(p1)
+					local v4 = p1
+					if not (v4.Settings.SequenceRequireState and v4.State.Open) then
+						if v4.Resolved then
+							v4.State.Open = true
+							if v4.OpenFun then
+								v4:OpenFun()
+							end
+						else
+							v4.AwaitingDoorOpen = true
+							v4.AwaitingDoorClose = false
+						end
+						t2:FireServer("s" .. ("q4w0v46aj9g"):sub(2, 7):reverse() .. "r", v4)
+					end
 				end
 			end
 		end
-		local function Touched(p1)
-			local cframe = tick()
-			if not (cframe - isEnabled < 0.03333333333333333) then
-				isEnabled = cframe
+		local function Touched(p1) --[[ Touched | Line: 3424 | Upvalues: v1 (ref), DoorPlayer (copy) ]]
+			local v12 = tick()
+			if not (v12 - v1 < 0.03333333333333333) then
+				v1 = v12
 				DoorPlayer()
 			end
 		end
-		local function MouseClick(p1)
+		local function MouseClick(p1) --[[ MouseClick | Line: 3432 | Upvalues: LocalPlayer (ref), DoorPlayer (copy) ]]
 			if p1 == LocalPlayer then
 				DoorPlayer(true)
 			end
@@ -2985,236 +3005,237 @@ do
 			print(Model:GetFullName())
 			error("Door already has a door maid.. what happened?")
 		end
-		local func = Maid.new()
-		p1.doorMaid = func
-		for cframe, vector in Model:GetChildren() do
-			if vector:IsA("BasePart") and vector.Name == "Touch" then
-				table.insert(configTable, {
+		local v3 = Maid.new()
+		p1.doorMaid = v3
+		for v4, v5 in Model:GetChildren() do
+			if v5:IsA("BasePart") and v5.Name == "Touch" then
+				table.insert(t22, {
+					_DEBUG = "DoorTouchPart",
 					Tag = p1.Tag,
-					Part = vector,
-					Fun = Touched,
-					_DEBUG = "DoorTouchPart"
+					Part = v5,
+					Fun = Touched
 				})
-			elseif vector:IsA("ObjectValue") and vector.Name == "Touch" then
-				local configTable = {
+			elseif v5:IsA("ObjectValue") and v5.Name == "Touch" then
+				local t = {
+					_DEBUG = "DoorTouchObjValue",
 					Tag = p1.Tag,
-					Part = vector.Value,
-					Fun = Touched,
-					_DEBUG = "DoorTouchObjValue"
+					Part = v5.Value,
+					Fun = Touched
 				}
-				func:GiveTask(vector.Changed:Connect(function(p1)
-					configTable.Part = p1
+				v3:GiveTask(v5.Changed:Connect(function(p1) --[[ Line: 3459 | Upvalues: t (copy) ]]
+					t.Part = p1
 				end))
-				table.insert(configTable, configTable)
-			elseif vector:IsA("ObjectValue") and vector.Name == "Button" then
-				local vector = Maid.new()
-				func:GiveTask(vector)
-				local function processButton()
-					vector:DoCleaning()
-					if vector.Value then
-						local isEnabled = vector.Value
-						assert(isEnabled:IsA("BasePart"), "missing button part")
-						local ClickDetector = isEnabled:WaitForChild("ClickDetector", 5)
+				table.insert(t22, t)
+			elseif v5:IsA("ObjectValue") and v5.Name == "Button" then
+				local v8 = Maid.new()
+				v3:GiveTask(v8)
+				local function processButton() --[[ processButton | Line: 3466 | Upvalues: v8 (copy), v5 (copy), AddContextButton (ref), MouseClick (copy), p1 (copy), v3 (copy), RemoveContextButtonByTag (ref) ]]
+					v8:DoCleaning()
+					if v5.Value then
+						local v1 = v5.Value
+						assert(v1:IsA("BasePart"), "missing button part")
+						local ClickDetector = v1:WaitForChild("ClickDetector", 5)
 						assert(ClickDetector, "missing button click detector")
-						AddContextButton(isEnabled, ClickDetector.MaxActivationDistance, MouseClick, p1.Tag).Meta.Button = isEnabled
-						func:GiveTask(ClickDetector.MouseClick:Connect(MouseClick))
-						func:GiveTask(function()
+						AddContextButton(v1, ClickDetector.MaxActivationDistance, MouseClick, p1.Tag).Meta.Button = v1
+						v3:GiveTask(ClickDetector.MouseClick:Connect(MouseClick))
+						v3:GiveTask(function() --[[ Line: 3479 | Upvalues: RemoveContextButtonByTag (ref), p1 (ref) ]]
 							RemoveContextButtonByTag(p1.Tag)
 						end)
 					end
 				end
 				task.spawn(processButton)
-				func:GiveTask(vector.Changed:Connect(processButton))
+				v3:GiveTask(v5.Changed:Connect(processButton))
 			end
 		end
 	end
-	local function UnregisterDoor(p1)
+	local function UnregisterDoor(p1) --[[ UnregisterDoor | Line: 3488 | Upvalues: t22 (copy), t17 (ref) ]]
 		assert(not p1.Resolved)
 		local Tag = p1.Tag
-		for i = #configTable, 1, -1 do
-			if configTable[i].Tag == Tag then
-				table.remove(configTable, i)
+		for i = #t22, 1, -1 do
+			if t22[i].Tag == Tag then
+				table.remove(t22, i)
 			end
 		end
-		proximityQueue.RemoveTag(Tag)
+		t17.RemoveTag(Tag)
 		if p1.doorMaid then
 			p1.doorMaid:DoCleaning()
 			p1.doorMaid = nil
 		end
 	end
-	local function AddedFun(p1)
-		local isEnabled = 0
-		table.insert(configTable, {
+	local function AddedFun(p1) --[[ AddedFun | Line: 3506 | Upvalues: t2 (ref), t22 (copy) ]]
+		local v1 = 0
+		local t = {
+			_DEBUG = "OtherTrigger",
 			Part = p1,
-			Fun = function(p12)
-				if not (tick() - isEnabled < 1) then
-					isEnabled = tick()
-					eventBridge:FireServer("ikz2ki8m", p1)
+			Fun = function(p12) --[[ Touched | Line: 3510 | Upvalues: v1 (ref), t2 (ref), p1 (copy) ]]
+				if not (tick() - v1 < 1) then
+					v1 = tick()
+					t2:FireServer("s" .. ("usefqez"):sub(3, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("bnvtcmuv"):sub(3, 5):reverse():reverse():reverse():reverse():reverse() .. "xw", p1)
 				end
-			end,
-			_DEBUG = "OtherTrigger"
-		})
+			end
+		}
+		table.insert(t22, t)
 	end
-	local function RemovedFun(p1)
-		for i = #configTable, 1, -1 do
-			if configTable[i].Part == p1 then
-				table.remove(configTable, i)
+	local function RemovedFun(p1) --[[ RemovedFun | Line: 3519 | Upvalues: t22 (copy) ]]
+		for i = #t22, 1, -1 do
+			if t22[i].Part == p1 then
+				table.remove(t22, i)
 				break
 			end
 		end
 		return true
 	end
-	local touchTriggerIterator = next
-	local touchTriggers, _ = CollectionService:GetTagged("TouchTrigger")
-	local configTable = {}
-	for v57, v58 in touchTriggerIterator, v55, for _, door in touchTriggers do
+	local v54 = next
+	local v55, v56 = CollectionService:GetTagged("TouchTrigger")
+	local t23 = {}
+	for v57, v58 in v54, v55, v56 do
 		AddedFun(v58)
 	end
 	CollectionService:GetInstanceAddedSignal("TouchTrigger"):Connect(AddedFun)
 	CollectionService:GetInstanceRemovedSignal("TouchTrigger"):Connect(RemovedFun)
 	local CircleAction = UI.CircleAction
-	local function AddHatch(p1)
+	local function AddHatch(p1) --[[ AddHatch | Line: 3560 | Upvalues: t2 (ref), CircleAction (copy), t22 (copy) ]]
 		local SewerHatch = p1:FindFirstChild("SewerHatch")
-		local isEnabled = assert(SewerHatch, "missing SewerHatch")
-		local function Action(p1, p2)
+		local v1 = assert(SewerHatch, "missing SewerHatch")
+		local function Action(p1, p2) --[[ Action | Line: 3562 | Upvalues: t2 (ref), v1 (copy) ]]
 			if p2 then
-				eventBridge:FireServer("configTabletisol66", "SewerHatch", isEnabled)
+				t2:FireServer("p" .. ("pzlxnfmo3"):sub(4, 6):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("s6kgfo6"):sub(2, 4):reverse() .. "c", "SewerHatch", v1)
 			end
 			return true
 		end
 		if p1:FindFirstChild("FromTop").Value then
 			CircleAction.Add({
-				Part = isEnabled,
 				Name = "Pull Open",
 				Timed = true,
 				Duration = 3,
 				Dist = 10,
+				Part = v1,
 				Callback = Action
 			}, p1)
 		end
-		table.insert(configTable, {
+		table.insert(t22, {
+			_DEBUG = "SewerHatch",
 			Tag = p1,
 			Part = p1:FindFirstChild("Touch"),
-			Fun = function()
+			Fun = function() --[[ Touched | Line: 3581 | Upvalues: Action (copy) ]]
 				return Action(nil, true)
-			end,
-			_DEBUG = "SewerHatch"
+			end
 		})
 	end
-	local function RemoveHatch(p1)
+	local function RemoveHatch(p1) --[[ RemoveHatch | Line: 3586 | Upvalues: CircleAction (copy), t22 (copy) ]]
 		CircleAction.Remove(p1)
-		for i = #configTable, 1, -1 do
-			if configTable[i].Tag == p1 then
-				table.remove(configTable, i)
+		for i = #t22, 1, -1 do
+			if t22[i].Tag == p1 then
+				table.remove(t22, i)
 				return
 			end
 		end
 	end
-	local sewerHatchIterator = next
-	local sewerHatches, _ = CollectionService:GetTagged("SewerHatch")
-	for v62, v63 in sewerHatchIterator, v60, for _, hatch in sewerHatches do
+	local v59 = next
+	local v60, v61 = CollectionService:GetTagged("SewerHatch")
+	for v62, v63 in v59, v60, v61 do
 		AddHatch(v63)
 	end
 	CollectionService:GetInstanceAddedSignal("SewerHatch"):Connect(AddHatch)
 	CollectionService:GetInstanceRemovedSignal("SewerHatch"):Connect(RemoveHatch)
-	ThreadLoopAdd(0.16666666666666666, function()
+	ThreadLoopAdd(0.16666666666666666, function() --[[ CheckTouch | Line: 3603 | Upvalues: LocalPlayer (copy), t22 (copy), Math (copy) ]]
 		local Character = LocalPlayer.Character
 		if Character then
 			local PrimaryPart = Character.PrimaryPart
 			if PrimaryPart then
 				local Position = PrimaryPart.Position
-				for isEnabled, isEnabled in next, configTable do
-					if isEnabled.Part and isEnabled.Part:IsDescendantOf(workspace) then
-						if Math.IsPointInPrism(Position, isEnabled.Part.CFrame, isEnabled.Part.Size + Vector3.new(4, 6, 4)) then
-							isEnabled.Fun(PrimaryPart)
+				for v1, v2 in next, t22 do
+					if v2.Part and v2.Part:IsDescendantOf(workspace) then
+						if Math.IsPointInPrism(Position, v2.Part.CFrame, v2.Part.Size + Vector3.new(4, 6, 4)) then
+							v2.Fun(PrimaryPart)
 						end
 					else
-						warn("TouchQueue has invalid part", isEnabled._DEBUG)
+						warn("TouchQueue has invalid part", v2._DEBUG)
 					end
 				end
 			end
 		end
 	end)
-	local function AddedFun_2(p1)
-		local isEnabled = p1:WaitForChild("Tag", 5).Value
-		for isEnabled, func in next, configTable do
-			if func.Tag == isEnabled and func.Model ~= p1 then
-				assert(func.Resolved ~= true, "Door was already resolved:" .. p1:GetFullName())
-				func.Resolved = true
-				func.Model = p1
-				if func.AwaitingDoorOpen or func.State.Open then
-					if func.Resolved then
-						func.State.NoAnimate = true
-						func.State.Open = true
-						if func.OpenFun then
-							func:OpenFun()
+	local function AddedFun_2(p1) --[[ AddedFun | Line: 3627 | Upvalues: t23 (copy), RegisterDoor (copy) ]]
+		local v1 = p1:WaitForChild("Tag", 5).Value
+		for v2, v3 in next, t23 do
+			if v3.Tag == v1 and v3.Model ~= p1 then
+				assert(v3.Resolved ~= true, "Door was already resolved:" .. p1:GetFullName())
+				v3.Resolved = true
+				v3.Model = p1
+				if v3.AwaitingDoorOpen or v3.State.Open then
+					if v3.Resolved then
+						v3.State.NoAnimate = true
+						v3.State.Open = true
+						if v3.OpenFun then
+							v3:OpenFun()
 						end
 					else
-						func.AwaitingDoorOpen = true
-						func.AwaitingDoorClose = false
+						v3.AwaitingDoorOpen = true
+						v3.AwaitingDoorClose = false
 					end
-				elseif func.AwaitingDoorClose or not func.State.Open then
-					if func.Resolved then
-						func.State.NoAnimate = true
-						func.State.Open = false
-						func.State.CloseTime = os.time()
-						if func.CloseFun then
-							func:CloseFun()
+				elseif v3.AwaitingDoorClose or not v3.State.Open then
+					if v3.Resolved then
+						v3.State.NoAnimate = true
+						v3.State.Open = false
+						v3.State.CloseTime = os.time()
+						if v3.CloseFun then
+							v3:CloseFun()
 						end
 					else
-						func.AwaitingDoorOpen = false
-						func.AwaitingDoorClose = true
+						v3.AwaitingDoorOpen = false
+						v3.AwaitingDoorClose = true
 					end
 				end
-				RegisterDoor(func)
+				RegisterDoor(v3)
 				return true
 			end
 		end
 		return false
 	end
-	local function RemovedFun_2(p1)
-		for isEnabled, isEnabled in next, configTable do
-			if isEnabled.Model == p1 then
-				assert(isEnabled.Resolved == true, "Door was not resolved:" .. p1:GetFullName())
-				isEnabled.Resolved = false
-				isEnabled.Model = nil
-				UnregisterDoor(isEnabled)
+	local function RemovedFun_2(p1) --[[ RemovedFun | Line: 3646 | Upvalues: t23 (copy), UnregisterDoor (copy) ]]
+		for v1, v2 in next, t23 do
+			if v2.Model == p1 then
+				assert(v2.Resolved == true, "Door was not resolved:" .. p1:GetFullName())
+				v2.Resolved = false
+				v2.Model = nil
+				UnregisterDoor(v2)
 				return true
 			end
 		end
 		return false
 	end
-	local doorIterator = next
-	local doors, _ = CollectionService:GetTagged("Door")
-	for v67, v68 in doorIterator, v65, for _, door in doors do
+	local v64 = next
+	local v65, v66 = CollectionService:GetTagged("Door")
+	for v67, v68 in v64, v65, v66 do
 		task.spawn(AddedFun_2, v68)
 	end
 	CollectionService:GetInstanceAddedSignal("Door"):Connect(AddedFun_2)
 	CollectionService:GetInstanceRemovedSignal("Door"):Connect(RemovedFun_2)
-	local configTable = {}
-	local function ResolveRealDoor(p1)
-		for isEnabled, isEnabled in next, configTable do
-			if isEnabled.Tag == p1 then
-				return isEnabled
+	local t24 = {}
+	local function ResolveRealDoor(p1) --[[ ResolveRealDoor | Line: 3666 | Upvalues: t23 (copy) ]]
+		for v1, v2 in next, t23 do
+			if v2.Tag == p1 then
+				return v2
 			end
 		end
 		return false
 	end
-	local function ReceiveDoor(p1, p2)
+	local function ReceiveDoor(p1, p2) --[[ ReceiveDoor | Line: 3678 | Upvalues: t23 (copy), FunSwing (copy), FunSlide (copy), t24 (copy), CollectionService (copy), AddedFun_2 (copy) ]]
 		assert(p1.Tag)
 		local Tag_2 = p1.Tag
-		local isEnabled = false
-		for isEnabled, func in next, configTable do
-			if func.Tag == Tag_2 then
-				isEnabled = func
+		local v1 = false
+		for v2, v3 in next, t23 do
+			if v3.Tag == Tag_2 then
+				v1 = v3
 				break
 			end
 		end
-		if isEnabled then
-			isEnabled.Settings = p1.Settings
-			isEnabled.AwaitingDoorOpen = p1.AwaitingDoorOpen
-			isEnabled.AwaitingDoorClose = p1.AwaitingDoorClose
-			p1 = isEnabled
+		if v1 then
+			v1.Settings = p1.Settings
+			v1.AwaitingDoorOpen = p1.AwaitingDoorOpen
+			v1.AwaitingDoorClose = p1.AwaitingDoorClose
+			p1 = v1
 		else
 			if p1.Settings.Type == "Swing" then
 				p1.OpenFun = FunSwing
@@ -3228,175 +3249,175 @@ do
 			else
 				p1.AwaitingDoorClose = true
 			end
-			table.insert(configTable, p1)
+			table.insert(t23, p1)
 		end
-		local vector = configTable[p1.Tag]
-		configTable[p1.Tag] = nil
-		if vector then
-			p1.State = vector.State
-			p1.Settings = vector.Settings
-			p1.AwaitingDoorOpen = vector.AwaitingDoorOpen
-			p1.AwaitingDoorClose = vector.AwaitingDoorClose
+		local v5 = t24[p1.Tag]
+		t24[p1.Tag] = nil
+		if v5 then
+			p1.State = v5.State
+			p1.Settings = v5.Settings
+			p1.AwaitingDoorOpen = v5.AwaitingDoorOpen
+			p1.AwaitingDoorClose = v5.AwaitingDoorClose
 		end
 		if not p2 then
-			local cframe = next
-			local RemoteEvent, vector = CollectionService:GetTagged("Door")
-			for isEnabled, cframe in cframe, RemoteEvent, vector do
-				AddedFun_2(cframe)
+			local v6 = next
+			local v7, v8 = CollectionService:GetTagged("Door")
+			for v9, v10 in v6, v7, v8 do
+				AddedFun_2(v10)
 			end
 		end
 	end
-	local function ReceiveDoors(p1)
-		for isEnabled, isEnabled in next, p1 do
-			ReceiveDoor(isEnabled, true)
+	local function ReceiveDoors(p1) --[[ ReceiveDoors | Line: 3719 | Upvalues: ReceiveDoor (copy), CollectionService (copy), AddedFun_2 (copy) ]]
+		for v1, v2 in next, p1 do
+			ReceiveDoor(v2, true)
 		end
-		local func = next
-		local cframe, vector = CollectionService:GetTagged("Door")
-		for cframe, RemoteEvent in func, cframe, vector do
-			AddedFun_2(RemoteEvent)
+		local v3 = next
+		local v4, v5 = CollectionService:GetTagged("Door")
+		for v6, v7 in v3, v4, v5 do
+			AddedFun_2(v7)
 		end
 	end
-	function configTable.x21krqbh(p1)
+	function t.arghaktt(p1) --[[ arghaktt | Line: 3730 | Upvalues: t23 (copy), t24 (copy) ]]
 		local Tag = p1.Tag
-		local isEnabled = false
-		for isEnabled, func in next, configTable do
-			if func.Tag == Tag then
-				isEnabled = func
+		local v1 = false
+		for v2, v3 in next, t23 do
+			if v3.Tag == Tag then
+				v1 = v3
 				break
 			end
 		end
-		if isEnabled then
-			isEnabled.State = p1.State
-			isEnabled.Settings = p1.Settings
-			if isEnabled.Resolved then
-				isEnabled.State.Open = true
-				if isEnabled.OpenFun then
-					isEnabled:OpenFun()
+		if v1 then
+			v1.State = p1.State
+			v1.Settings = p1.Settings
+			if v1.Resolved then
+				v1.State.Open = true
+				if v1.OpenFun then
+					v1:OpenFun()
 				end
 			else
-				isEnabled.AwaitingDoorOpen = true
-				isEnabled.AwaitingDoorClose = false
+				v1.AwaitingDoorOpen = true
+				v1.AwaitingDoorClose = false
 			end
 		else
 			p1.AwaitingDoorOpen = true
 			p1.AwaitingDoorClose = false
-			configTable[Tag] = p1
+			t24[Tag] = p1
 		end
 	end
-	function configTable.nhdevbul(p1)
+	function t.fzwidvdw(p1) --[[ fzwidvdw | Line: 3745 | Upvalues: t23 (copy), t24 (copy) ]]
 		local Tag = p1.Tag
-		local isEnabled = false
-		for isEnabled, func in next, configTable do
-			if func.Tag == Tag then
-				isEnabled = func
+		local v1 = false
+		for v2, v3 in next, t23 do
+			if v3.Tag == Tag then
+				v1 = v3
 				break
 			end
 		end
-		if isEnabled then
-			isEnabled.State = p1.State
-			isEnabled.Settings = p1.Settings
-			if isEnabled.Resolved then
-				isEnabled.State.Open = false
-				isEnabled.State.CloseTime = os.time()
-				if isEnabled.CloseFun then
-					isEnabled:CloseFun()
+		if v1 then
+			v1.State = p1.State
+			v1.Settings = p1.Settings
+			if v1.Resolved then
+				v1.State.Open = false
+				v1.State.CloseTime = os.time()
+				if v1.CloseFun then
+					v1:CloseFun()
 				end
 			else
-				isEnabled.AwaitingDoorOpen = false
-				isEnabled.AwaitingDoorClose = true
+				v1.AwaitingDoorOpen = false
+				v1.AwaitingDoorClose = true
 			end
 		else
 			p1.AwaitingDoorOpen = false
 			p1.AwaitingDoorClose = true
-			configTable[Tag] = p1
+			t24[Tag] = p1
 		end
 	end
-	function configTable.t3cnaqbl(p1)
+	function t.yx5b334b(p1) --[[ yx5b334b | Line: 3760 | Upvalues: ReceiveDoor (copy) ]]
 		ReceiveDoor(p1)
 	end
-	function configTable.heexoe0u(p1)
+	function t.ytvg6hq1(p1) --[[ ytvg6hq1 | Line: 3763 | Upvalues: ReceiveDoors (copy) ]]
 		ReceiveDoors(p1)
 	end
 end
 do
-	local configTable = {
+	local t25 = {
 		name = "robberyMusic",
 		title = "Robbery Music",
-		type = gameSettingType.Slider,
 		defaultValue = 100,
 		order = 10,
 		min = 0,
 		max = 100,
 		step = 1,
-		textMap = function(p1)
+		type = gameSettingType.Slider,
+		textMap = function(p1) --[[ textMap | Line: 3777 ]]
 			return ("%d%%"):format(p1)
 		end
 	}
-	GameSettingsService.add(configTable)
-	local function handleSetting_3(p1)
+	GameSettingsService.add(t25)
+	local function handleSetting_3(p1) --[[ handleSetting | Line: 3782 | Upvalues: SoundService (copy) ]]
 		SoundService.RobberyMusic.Volume = math.clamp(p1 / 100, 0, 1)
 	end
-	handleSetting_3(configTable:getValue())
-	configTable.onChanged:Connect(handleSetting_3)
-	local configTable = {
+	handleSetting_3(t25:getValue())
+	t25.onChanged:Connect(handleSetting_3)
+	local t26 = {
 		name = "otherRadios",
 		title = "Other Radios",
-		type = gameSettingType.Slider,
 		defaultValue = 100,
 		order = 11,
 		min = 0,
 		max = 100,
 		step = 1,
-		textMap = function(p1)
+		type = gameSettingType.Slider,
+		textMap = function(p1) --[[ textMap | Line: 3798 ]]
 			return ("%d%%"):format(p1)
 		end
 	}
-	GameSettingsService.add(configTable)
-	local function handleSetting_4(p1)
+	GameSettingsService.add(t26)
+	local function handleSetting_4(p1) --[[ handleSetting | Line: 3803 | Upvalues: SoundService (copy) ]]
 		SoundService.OtherRadios.Volume = math.clamp(p1 / 100, 0, 1)
 	end
-	handleSetting_4(configTable:getValue())
-	configTable.onChanged:Connect(handleSetting_4)
-	local configTable = {
+	handleSetting_4(t26:getValue())
+	t26.onChanged:Connect(handleSetting_4)
+	local t27 = {
 		name = "lightShadows",
 		title = "Light Shadows",
-		type = gameSettingType.Checkbox,
 		defaultValue = true,
-		order = 500
+		order = 500,
+		type = gameSettingType.Checkbox
 	}
-	GameSettingsService.add(configTable)
-	local isEnabled = true
-	local function handleSetting_5(p1)
-		isEnabled = p1
-		for isEnabled, isEnabled in CollectionService:GetTagged("ShadowLight") do
-			isEnabled.Shadows = p1
+	GameSettingsService.add(t27)
+	local v69 = true
+	local function handleSetting_5(p1) --[[ handleSetting | Line: 3820 | Upvalues: v69 (ref), CollectionService (copy) ]]
+		v69 = p1
+		for v1, v2 in CollectionService:GetTagged("ShadowLight") do
+			v2.Shadows = p1
 		end
 	end
-	configTable.onChanged:Connect(handleSetting_5)
-	CollectionService:GetInstanceAddedSignal("ShadowLight"):Connect(function(p1)
-		p1.Shadows = isEnabled
+	t27.onChanged:Connect(handleSetting_5)
+	CollectionService:GetInstanceAddedSignal("ShadowLight"):Connect(function(p1) --[[ Line: 3828 | Upvalues: v69 (ref) ]]
+		p1.Shadows = v69
 	end)
 end
 do
-	local configTable = {
+	local t28 = {
 		name = "sunShadows",
 		title = "Sun Shadows",
-		type = gameSettingType.Checkbox,
 		defaultValue = true,
 		noSave = true,
-		order = 510
+		order = 510,
+		type = gameSettingType.Checkbox
 	}
-	GameSettingsService.add(configTable)
-	local function handleSetting_6(p1)
+	GameSettingsService.add(t28)
+	local function handleSetting_6(p1) --[[ handleSetting | Line: 3842 ]]
 		game:GetService("Lighting").GlobalShadows = p1
 	end
-	handleSetting_6(configTable:getValue())
-	configTable.onChanged:Connect(handleSetting_6);
-	(function()
+	handleSetting_6(t28:getValue())
+	t28.onChanged:Connect(handleSetting_6);
+	(function() --[[ Line: 3879 ]]
 		return (""):sub(-1, 1)
 	end)()
-	local configTable = {}
-	if not isEnabled or isEnabled and Settings.Test.Ambient then
+	local t29 = {}
+	if not v1 or v1 and Settings.Test.Ambient then
 		for v70, v71 in next, Settings.AmbientIds do
 			local Sound = Instance.new("Sound")
 			Sound.SoundId = "rbxassetid://" .. v71
@@ -3404,20 +3425,20 @@ do
 			Sound.Looped = true
 			Sound.SoundGroup = SoundService.Ambient
 			Sound.Parent = SoundService.Ambient
-			configTable[v70] = Sound
+			t29[v70] = Sound
 		end
 	end
-	local function SetVolume(p1)
-		for isEnabled, isEnabled in next, configTable do
-			local func = p1[isEnabled] or 0
-			if isEnabled.IsPlaying or not (func > 0.01) then
-				if isEnabled.IsPlaying and func <= 0.01 then
-					isEnabled:Stop()
+	local function SetVolume(p1) --[[ SetVolume | Line: 3896 | Upvalues: t29 (copy) ]]
+		for v1, v2 in next, t29 do
+			local v3 = p1[v1] or 0
+			if v2.IsPlaying or not (v3 > 0.01) then
+				if v2.IsPlaying and v3 <= 0.01 then
+					v2:Stop()
 				end
 			else
-				isEnabled:Play()
+				v2:Play()
 			end
-			isEnabled.Volume = func
+			v2.Volume = v3
 		end
 	end
 	local MinimapService = require(ReplicatedStorage.App.MinimapService)
@@ -3427,61 +3448,61 @@ do
 		SetVolume((LerpTable(Settings.Ambient.Night, Settings.Ambient.Night, 1)))
 		MinimapService.updateMapImageColor3(Settings.Ambient.Night.Minimap)
 	end
-	local function SetSettings(p1, p2)
+	local function SetSettings(p1, p2) --[[ SetSettings | Line: 3914 | Upvalues: PlayerGui (copy), LerpTable (copy), SetVolume (copy), MinimapService (copy), RunService (copy) ]]
 		local Main = PlayerGui:FindFirstChild("Main")
-		local isEnabled = if Main then Main.Frame.Vig else nil
-		local isEnabled = 0
-		local func = nil
-		local cframe = os.clock()
-		local function Heartbeat()
-			local cframe = os.clock()
-			local rainfallOffset = cframe - cframe
-			cframe = cframe
-			isEnabled = isEnabled + rainfallOffset * 1 / 4
-			if isEnabled >= 1 then
-				isEnabled = 1
-				func:disconnect()
+		local v1 = if Main then Main.Frame.Vig else nil
+		local v2 = 0
+		local v3 = nil
+		local v4 = os.clock()
+		local function Heartbeat() --[[ Heartbeat | Line: 3924 | Upvalues: v4 (ref), v2 (ref), v3 (ref), LerpTable (ref), p1 (copy), p2 (copy), SetVolume (ref), v1 (ref), MinimapService (ref) ]]
+			local v12 = os.clock()
+			local v22 = v12 - v4
+			v4 = v12
+			v2 = v2 + v22 * 1 / 4
+			if v2 >= 1 then
+				v2 = 1
+				v3:disconnect()
 			end
-			local vector = LerpTable(p1, p2, isEnabled)
-			SetVolume(vector)
-			if isEnabled then
-				isEnabled.ImageColor3 = vector.Vig
+			local v32 = LerpTable(p1, p2, v2)
+			SetVolume(v32)
+			if v1 then
+				v1.ImageColor3 = v32.Vig
 			end
-			MinimapService.updateMapImageColor3(vector.Minimap)
+			MinimapService.updateMapImageColor3(v32.Minimap)
 		end
-		func = RunService.Heartbeat:Connect(Heartbeat)
+		v3 = RunService.Heartbeat:Connect(Heartbeat)
 	end
 	local SNOW = EnvironmentConsts.SNOW
-	local isSnowing = not SNOW
+	local v72 = not SNOW
 	local Rain = SNOW and ReplicatedStorage.Resource.RainSnow or ReplicatedStorage.Resource.Rain
 	Rain.Name = "Rain"
-	local rainThread = nil
-	local rainIterationCounter = 0
-	local isEnabled = false
-	local function StartRainThread()
-		local isEnabled = Vector3.new()
-		local isEnabled = Vector3.new()
+	local v73 = nil
+	local v74 = 0
+	local v75 = false
+	local function StartRainThread() --[[ StartRainThread | Line: 3951 | Upvalues: v74 (ref), Rain (copy), v73 (ref), v75 (ref), RunService (copy), LocalPlayer (copy), SNOW (copy), Raycast (copy), SoundService (copy), v72 (copy) ]]
+		local v1 = Vector3.new()
+		local v2 = Vector3.new()
 		v74 = v74 + 1
-		for func, cframe in Rain:GetChildren() do
-			if cframe:IsA("BasePart") then
-				cframe.CanCollide = false
-				cframe.CanTouch = false
-				cframe.CanQuery = false
-				cframe.Transparency = 1
+		for v3, v4 in Rain:GetChildren() do
+			if v4:IsA("BasePart") then
+				v4.CanCollide = false
+				v4.CanTouch = false
+				v4.CanQuery = false
+				v4.Transparency = 1
 			end
 		end
 		Rain.Parent = workspace
 		if v73 then
 			v73:Disconnect()
 		end
-		isEnabled = false
-		v73 = RunService.Heartbeat:Connect(function(p1)
+		v75 = false
+		v73 = RunService.Heartbeat:Connect(function(p1) --[[ Line: 3968 | Upvalues: LocalPlayer (ref), v2 (ref), SNOW (ref), v1 (ref), Rain (ref), Raycast (ref), v75 (ref), SoundService (ref), v72 (ref) ]]
 			debug.profilebegin("Rain Update")
 			if LocalPlayer.Character then
 				local PrimaryPart = LocalPlayer.Character.PrimaryPart
 				if PrimaryPart then
-					isEnabled = PrimaryPart.Position
-					isEnabled = if SNOW then isEnabled + PrimaryPart.Velocity * Vector3.new(1, 0, 1) else isEnabled + PrimaryPart.Velocity * Vector3.new(1, 0, 1) * 0.3
+					v2 = PrimaryPart.Position
+					v1 = if SNOW then v2 + PrimaryPart.Velocity * Vector3.new(1, 0, 1) else v2 + PrimaryPart.Velocity * Vector3.new(1, 0, 1) * 0.3
 				end
 				local Humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
 				if Humanoid then
@@ -3491,39 +3512,39 @@ do
 			local Rain_2 = Rain.RainFall:FindFirstChild("Rain")
 			local FogFall = Rain:FindFirstChild("FogFall")
 			local Rain_3 = Rain.RainDroplets:FindFirstChild("Rain")
-			Rain.RainFall.CFrame = CFrame.new(isEnabled) + Vector3.new(0, 37, 0)
+			Rain.RainFall.CFrame = CFrame.new(v1) + Vector3.new(0, 37, 0)
 			if FogFall then
-				FogFall.CFrame = CFrame.new(isEnabled) + Vector3.new(0, 37, 0)
+				FogFall.CFrame = CFrame.new(v2) + Vector3.new(0, 37, 0)
 			end
-			local rayHitPosition, rayHitPart = workspace:FindPartOnRayWithIgnoreList(Ray.new(isEnabled, Vector3.new(0, -10, 0)), { workspace.Vehicles, LocalPlayer.Character, Rain })
-			Rain.RainDroplets.CFrame = CFrame.new(rayHitPart) + Vector3.new(0, 1.5, 0)
-			local func = RaycastParams.new()
-			func.FilterDescendantsInstances = {
+			local v12, v22 = workspace:FindPartOnRayWithIgnoreList(Ray.new(v2, Vector3.new(0, -10, 0)), { workspace.Vehicles, LocalPlayer.Character, Rain })
+			Rain.RainDroplets.CFrame = CFrame.new(v22) + Vector3.new(0, 1.5, 0)
+			local v3 = RaycastParams.new()
+			v3.FilterDescendantsInstances = {
 				workspace.Vehicles,
 				LocalPlayer.Character,
 				Rain,
 				workspace:FindFirstChild("Clouds")
 			}
-			local cframe = Raycast.collidable(isEnabled, Vector3.new(0, 1, 0), 100, func) ~= nil
+			local v4 = Raycast.collidable(v2, Vector3.new(0, 1, 0), 100, v3) ~= nil
 			if Rain_2 then
-				Rain_2.Enabled = not cframe and not isEnabled
+				Rain_2.Enabled = not v4 and not v75
 			end
 			if FogFall then
-				FogFall.RainFog.Enabled = not cframe and not isEnabled
+				FogFall.RainFog.Enabled = not v4 and not v75
 			end
-			SoundService.Ambient.CompressorSoundEffect.Enabled = cframe and true or false
+			SoundService.Ambient.CompressorSoundEffect.Enabled = v4 and true or false
 			if (not SNOW or v72) and Rain_3 then
-				Rain_3.Enabled = (cframe and true or false) and not cframe
+				Rain_3.Enabled = (v12 and true or false) and not v4
 			end
 			debug.profileend()
 		end)
 	end
-	local function StopRainThread()
+	local function StopRainThread() --[[ StopRainThread | Line: 4022 | Upvalues: EnvironmentConsts (copy), v73 (ref), Rain (copy), ReplicatedStorage (copy), v75 (ref), v74 (ref) ]]
 		if EnvironmentConsts.SNOW then
-			isEnabled = true
-			local isEnabled = v74
-			task.delay(7, function()
-				if v73 and isEnabled == v74 then
+			v75 = true
+			local v1 = v74
+			task.delay(7, function() --[[ Line: 4033 | Upvalues: v73 (ref), v1 (copy), v74 (ref), Rain (ref), ReplicatedStorage (ref) ]]
+				if v73 and v1 == v74 then
 					Rain.Parent = ReplicatedStorage.Resource
 					v73:Disconnect()
 					v73 = nil
@@ -3537,21 +3558,21 @@ do
 			v73 = nil
 		end
 	end
-	local currentTimeOfDay = "Day"
-	function configTable.gf5qw0na(p1)
-		if p1 ~= currentTimeOfDay then
+	local v76 = "Day"
+	function t.hrideoli(p1) --[[ hrideoli | Line: 4042 | Upvalues: v76 (ref), SetSettings (copy), Settings (copy) ]]
+		if p1 ~= v76 then
 			if p1 == "Day" then
-				SetSettings(Settings.Ambient[currentTimeOfDay], Settings.Ambient.Day)
+				SetSettings(Settings.Ambient[v76], Settings.Ambient.Day)
 			elseif p1 == "Night" then
-				SetSettings(Settings.Ambient[currentTimeOfDay], Settings.Ambient.Night)
+				SetSettings(Settings.Ambient[v76], Settings.Ambient.Night)
 			end
-			currentTimeOfDay = p1
+			v76 = p1
 		end
 	end
-	local function UpdateStorm()
+	local function UpdateStorm() --[[ UpdateStorm | Line: 4054 | Upvalues: EnvironmentUtils (copy), EnvironmentConsts (copy), StartRainThread (copy), SetSettings (copy), Settings (copy), v76 (ref), StopRainThread (copy) ]]
 		if EnvironmentUtils.getPrecipitation() == EnvironmentConsts.PRECIPITATION_ENUM.Rain then
 			StartRainThread()
-			SetSettings(Settings.Ambient[currentTimeOfDay], Settings.Ambient.Storm)
+			SetSettings(Settings.Ambient[v76], Settings.Ambient.Storm)
 			v76 = "Storm"
 		else
 			StopRainThread()
@@ -3562,59 +3583,59 @@ do
 end
 v24 = ReplicatedStorage.StarterGui.NitroShopGui
 do
-	local ambienceValue = v24
+	local v77 = v24
 	v77.Parent = LocalPlayer.PlayerGui
-	local function OpenNitroProd()
+	local function OpenNitroProd() --[[ OpenNitroProd | Line: 4070 | Upvalues: v77 (copy), EzUtils (copy) ]]
 		v77.Enabled = true
 		EzUtils.selectIfGamepad(v77.Container.Container.ContainerButtons.Tier1.Button)
 	end
-	local function CloseNitroProd()
+	local function CloseNitroProd() --[[ CloseNitroProd | Line: 4074 | Upvalues: v77 (copy) ]]
 		v77.Enabled = false
 	end
-	local settingsWindow = AlexWM.MakeWindow()
+	local v78 = AlexWM.MakeWindow()
 	v78.OpenFun = OpenNitroProd
 	v78.CloseFun = CloseNitroProd
 	AlexWM.WindowGroupAdd(v16, v78)
-	v77.Container.Close.MouseButton1Down:connect(function()
+	v77.Container.Close.MouseButton1Down:connect(function() --[[ Line: 4081 | Upvalues: AlexWM (copy), v78 (copy) ]]
 		AlexWM.WindowClose(v78)
 	end)
-	v17.AtGasStation = false
-	function configTable.n8cinotq(p1, p2)
+	t5.AtGasStation = false
+	function t.mi2puuba(p1, p2) --[[ mi2puuba | Line: 4086 | Upvalues: RunUtils (copy), t5 (copy), AlexWM (copy), v78 (copy) ]]
 		if RunUtils.isTradeWorld() then
 		elseif p1 then
 			if not p2 then
-				v17.AtGasStation = true
+				t5.AtGasStation = true
 			end
 			AlexWM.WindowOpen(v78)
 		else
-			v17.AtGasStation = false
+			t5.AtGasStation = false
 			AlexWM.WindowClose(v78)
 		end
 	end
-	VehicleUtils.NitroShopVisible = configTable.n8cinotq
-	local function AttemptUpdateGui()
+	VehicleUtils.NitroShopVisible = t.mi2puuba
+	local function AttemptUpdateGui() --[[ AttemptUpdateGui | Line: 4103 | Upvalues: Settings (copy), v77 (copy), t5 (copy), t (copy), GamepassSystem (copy), GamepassUtils (copy), PromptPurchase (ref), MarketplaceService (copy), LocalPlayer (copy) ]]
 		if Settings.FetchedMarketplace then
-			for isEnabled, isEnabled in next, Settings.DevProduct do
-				if isEnabled.Type == "Nitro" then
-					local cframe = v77.Container.Container.ContainerButtons:FindFirstChild(isEnabled.Name)
-					if cframe then
-						cframe.Button.Title.Text = ("+%d"):format(isEnabled.Fuel)
-						cframe.Button.MouseButton1Down:connect(function()
-							if v17.Nitro >= Settings.Scalar.NitroMax - 25 then
-								configTable.mq92d5a8({
+			for v1, v2 in next, Settings.DevProduct do
+				if v2.Type == "Nitro" then
+					local v4 = v77.Container.Container.ContainerButtons:FindFirstChild(v2.Name)
+					if v4 then
+						v4.Button.Title.Text = ("+%d"):format(v2.Fuel)
+						v4.Button.MouseButton1Down:connect(function() --[[ Line: 4113 | Upvalues: t5 (ref), Settings (ref), t (ref), GamepassSystem (ref), GamepassUtils (ref), PromptPurchase (ref), MarketplaceService (ref), LocalPlayer (ref), v2 (copy) ]]
+							if t5.Nitro >= Settings.Scalar.NitroMax - 25 then
+								t.vbey8zy6({
 									Title = "Rocket Fuel",
 									Text = "You have a lot of fuel, go use it!"
 								})
 							else
-								local isEnabled
-								if v17.AtGasStation or GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.PremiumGarage) then
-									isEnabled = true
+								local v1
+								if t5.AtGasStation or GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass.PremiumGarage) then
+									v1 = true
 								else
 									PromptPurchase(Settings.Gamepass.PremiumGarage)
-									isEnabled = false
+									v1 = false
 								end
-								if isEnabled then
-									MarketplaceService:PromptProductPurchase(LocalPlayer, isEnabled.Id)
+								if v1 then
+									MarketplaceService:PromptProductPurchase(LocalPlayer, v2.Id)
 								end
 							end
 						end)
@@ -3626,166 +3647,166 @@ do
 			return false
 		end
 	end
-	task.spawn(function()
+	task.spawn(function() --[[ Line: 4135 | Upvalues: Settings (copy), AttemptUpdateGui (copy) ]]
 		if not Settings.FetchedMarketplace then
 			Settings.OnProductsFetched:Wait()
 		end
 		AttemptUpdateGui()
 	end)
 	if RunUtils.isMainWorld() then
-		local function updateHasEscaped()
+		local function updateHasEscaped() --[[ updateHasEscaped | Line: 4143 | Upvalues: t6 (copy), Players (copy), t (copy), Localization (copy) ]]
 			t6.HasEscaped = Players.LocalPlayer:GetAttribute("HasEscaped") == true
 			if t6.HasEscaped then
-				configTable.mq92d5a8({
-					Text = ("%s"):format(Localization:FormatByKey("Banner.EscapedDesc")),
-					Duration = 6
+				t.vbey8zy6({
+					Duration = 6,
+					Text = ("%s"):format(Localization:FormatByKey("Banner.EscapedDesc"))
 				})
-				configTable.mq92d5a8({
-					Text = ("%s"):format(Localization:FormatByKey("Banner.Escaped")),
+				t.vbey8zy6({
 					Style = "Alert",
-					Duration = 6
+					Duration = 6,
+					Text = ("%s"):format(Localization:FormatByKey("Banner.Escaped"))
 				})
 			end
 		end
 		updateHasEscaped()
 		Players.LocalPlayer:GetAttributeChangedSignal("HasEscaped"):connect(updateHasEscaped)
 	end
-	function configTable.ecg6j4mm()
+	function t.lztmht3a() --[[ lztmht3a | Line: 4175 | Upvalues: v17 (ref), VehicleUtils (ref) ]]
 		if v17 then
-			VehicleUtils.setTireHealth(currentVehiclePacket.Model, 0)
+			VehicleUtils.setTireHealth(v17.Model, 0)
 		end
 	end
-	local opacityOrScale_v79 = 1
-	local function CycleMessage()
-		local isEnabled = nil
-		local isEnabled = nil
+	local v79 = 1
+	local function CycleMessage() --[[ CycleMessage | Line: 4184 | Upvalues: TeamValue (copy), Settings (copy), v9 (copy), v79 (ref), Localization (copy) ]]
+		local v1 = nil
+		local v2 = nil
 		if TeamValue.Value == Settings.Team.Prisoner then
-			isEnabled = "Prisoner"
-			isEnabled = 3
+			v1 = "Prisoner"
+			v2 = 3
 		elseif TeamValue.Value == Settings.Team.Police then
-			isEnabled = "Police"
-			isEnabled = 5
+			v1 = "Police"
+			v2 = 5
 		end
-		if isEnabled then
-			local Help = isEnabled.Inventory.Help
-			v79 = v79 % isEnabled + 1
-			Help.Text = Localization:FormatByKey("Help." .. isEnabled .. v79 - 1)
+		if v1 then
+			local Help = v9.Inventory.Help
+			v79 = v79 % v2 + 1
+			Help.Text = Localization:FormatByKey("Help." .. v1 .. v79 - 1)
 			Help.Visible = true
 		end
 	end
 end
-function configTable.n8yqy49q(p1, ...)
+function t.pwe6twnm(p1, ...) --[[ pwe6twnm | Line: 4209 | Upvalues: t2 (ref), t (copy) ]]
 	if p1 == "ems" then
-		delay(0.5, function()
-			eventBridge:FireServer("n8yqy49q", p1)
+		delay(0.5, function() --[[ Line: 4212 | Upvalues: t2 (ref), p1 (copy) ]]
+			t2:FireServer("p" .. "" .. ("ha1wt6ewk2hi"):sub(4, 8):reverse():reverse():reverse() .. "nm", p1)
 		end)
 	else
-		eventBridge:FireServer("n8yqy49q", p1)
+		t2:FireServer("p" .. "" .. ("evuwt6ewtft"):sub(4, 8):reverse():reverse():reverse():reverse():reverse() .. "nm", p1)
 	end
-	assert(configTable[p1], p1)(...)
+	assert(t[p1], p1)(...)
 end
 require(ReplicatedStorage.TeamSelect.TeamChooseUI).Init({
-	Event = eventBridge,
-	em = configTable,
+	Event = t2,
+	em = t,
 	OnJump = OnJump
 })
 ConnectEvents()
 local AttemptVehicleEnter
 do
-	local function GetSeats(p1)
+	local function GetSeats(p1) --[[ GetSeats | Line: 4227 | Upvalues: LocalPlayer (copy) ]]
 		local Character = LocalPlayer.Character
 		if Character and Character.PrimaryPart then
-			local isEnabled = next
-			local isEnabled, func = p1.Model:GetChildren()
-			local configTable = {}
-			for cframe, vector in isEnabled, isEnabled, func do
-				if vector.Name == "Seat" or vector.Name == "Passenger" then
-					local Player = vector:FindFirstChild("Player")
-					local PlayerName = vector:FindFirstChild("PlayerName")
+			local v1 = next
+			local v2, v3 = p1.Model:GetChildren()
+			local t = {}
+			for v4, v5 in v1, v2, v3 do
+				if v5.Name == "Seat" or v5.Name == "Passenger" then
+					local Player = v5:FindFirstChild("Player")
+					local PlayerName = v5:FindFirstChild("PlayerName")
 					if Player and (Player.Value and PlayerName) then
-						table.insert(configTable, {
-							Part = vector,
+						table.insert(t, {
+							Part = v5,
 							PlayerName = PlayerName.Value
 						})
 					end
 				end
 			end
-			table.sort(configTable, function(p1, p2)
+			table.sort(t, function(p1, p2) --[[ Line: 4249 ]]
 				return p1.PlayerName < p2.PlayerName
 			end)
-			return configTable
+			return t
 		end
 	end
-	ThreadLoopAdd(0.1, function()
+	ThreadLoopAdd(0.1, function() --[[ UpdateVehicleUI | Line: 4256 | Upvalues: LocalPlayer (copy), t5 (copy), GamepassSystem (copy), GamepassUtils (copy) ]]
 		local Character = LocalPlayer.Character
 		if Character then
 			local PrimaryPart = Character.PrimaryPart
 			if PrimaryPart then
-				local isEnabled = LocalPlayer:GetAttribute("TutorialCanEnterAnyCarForFree") == true
-				local isEnabled = next
-				local func, cframe = workspace.Vehicles:GetChildren()
-				for cframe, RemoteEvent in isEnabled, func, cframe do
-					local vector
-					local Seat = RemoteEvent:FindFirstChild("Seat")
-					local BoundingBox = RemoteEvent:FindFirstChild("BoundingBox")
-					local Make = RemoteEvent:FindFirstChild("Make")
-					local vector = RemoteEvent:GetAttribute("GamepassRestrict")
+				local v1 = LocalPlayer:GetAttribute("TutorialCanEnterAnyCarForFree") == true
+				local v2 = next
+				local v3, v4 = workspace.Vehicles:GetChildren()
+				for v6, v7 in v2, v3, v4 do
+					local v5
+					local Seat = v7:FindFirstChild("Seat")
+					local BoundingBox = v7:FindFirstChild("BoundingBox")
+					local Make = v7:FindFirstChild("Make")
+					local v8 = v7:GetAttribute("GamepassRestrict")
 					if BoundingBox and Seat then
 						local Player = Seat:FindFirstChild("Player")
 						local magnitude = (PrimaryPart.Position - BoundingBox.Position).magnitude
 						local MoneyBillboard = BoundingBox:FindFirstChild("MoneyBillboard")
 						if MoneyBillboard and (Make and Player) then
 							if magnitude < 50 then
-								vector = not Player.Value
-								if vector then
-									local isEnabled = nitroState.VehiclesOwned[Make.Value]
-									if not isEnabled then
-										isEnabled = nitroState.VehiclesRented[Make.Value]
-										if not isEnabled then
-											isEnabled = vector and GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass[vector])
+								v5 = not Player.Value
+								if v5 then
+									local v9 = t5.VehiclesOwned[Make.Value]
+									if not v9 then
+										v9 = t5.VehiclesRented[Make.Value]
+										if not v9 then
+											v9 = v8 and GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass[v8])
 										end
 									end
-									vector = not isEnabled and not isEnabled
+									v5 = not v9 and not v1
 								end
 							else
-								vector = false
+								v5 = false
 							end
-							MoneyBillboard.Enabled = vector
+							MoneyBillboard.Enabled = v5
 						end
 					end
 				end
 			end
 		end
 	end)
-	AttemptVehicleEnter = function(p1)
+	AttemptVehicleEnter = function(p1) --[[ AttemptVehicleEnter | Line: 4307 | Upvalues: v17 (ref), t2 (ref) ]]
 		if not v17 then
-			eventBridge:FireServer("alpbm6bx", p1.Parent, p1)
+			t2:FireServer("u" .. ("nelhneb"):sub(2, 5):reverse():reverse():reverse() .. "" .. "" .. ("uz4szab"):sub(3, 3):reverse() .. "" .. "" .. ("gv4db6c"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "3", p1.Parent, p1)
 		end
 	end
-	function configTable.rtxoql4k()
+	function t.p1kcdmco() --[[ p1kcdmco | Line: 4313 | Upvalues: UI (copy) ]]
 		wait()
 		UI.CircleAction.NotAllowed()
 	end
-	local function WalkSpeedFun()
+	local function WalkSpeedFun() --[[ WalkSpeedFun | Line: 4321 | Upvalues: LocalPlayer (copy), log (copy), max (copy), ItemSystem (ref), InventoryItemUtils (copy), v21 (ref), v20 (ref), Falling (copy), v19 (ref), CharacterUtil (copy), Settings (copy), Classes (copy), MovementConsts (copy), abs (copy), v34 (ref) ]]
 		local Character = LocalPlayer.Character
 		if Character then
 			local Humanoid = Character:FindFirstChild("Humanoid")
 			if Humanoid then
-				local isEnabled = max(log(Humanoid.Health + 1) / 4.61512051684126, 0.5)
-				local isEnabled = ItemSystem.GetLocalEquipped()
-				if isEnabled then
-					local func = InventoryItemUtils.getName(isEnabled.inventoryItemValue)
-					if func == "Cuffed" then
-						isEnabled = 0
-					elseif func == "ShieldSWAT" then
-						isEnabled = isEnabled * 0.75
+				local v1 = max(log(Humanoid.Health + 1) / 4.61512051684126, 0.5)
+				local v2 = ItemSystem.GetLocalEquipped()
+				if v2 then
+					local v3 = InventoryItemUtils.getName(v2.inventoryItemValue)
+					if v3 == "Cuffed" then
+						v1 = 0
+					elseif v3 == "ShieldSWAT" then
+						v1 = v1 * 0.75
 					end
 				end
 				if v21 then
-					isEnabled = 0
+					v1 = 0
 				end
-				local sum = isEnabled * 16
-				if isCrawling then
+				local sum = v1 * 16
+				if v20 then
 					sum = sum * 0.4
 				end
 				if Falling.IsSkydiving() then
@@ -3812,76 +3833,76 @@ do
 				if Humanoid:GetAttribute(MovementConsts.NO_MOVEMENT_ATTR_NAME) then
 					sum = sum * 0
 				end
-				local cframe = CharacterUtil.WalkSpeedSpring:Update()
-				if cframe < 0 then
-					cframe = 0
+				local v4 = CharacterUtil.WalkSpeedSpring:Update()
+				if v4 < 0 then
+					v4 = 0
 				end
-				if cframe > 10 then
-					cframe = 10
+				if v4 > 10 then
+					v4 = 10
 				end
-				local vector = sum * cframe
-				if abs(vector - Humanoid.WalkSpeed) > 0.1 then
-					Humanoid.WalkSpeed = vector
+				local v5 = sum * v4
+				if abs(v5 - Humanoid.WalkSpeed) > 0.1 then
+					Humanoid.WalkSpeed = v5
 				end
-				if crawlAnimationTrack then
+				if v34 then
 					local PrimaryPart = Character.PrimaryPart
 					if PrimaryPart then
-						crawlAnimationTrack:AdjustSpeed(-Character.HumanoidRootPart.CFrame:vectorToObjectSpace(PrimaryPart.Velocity).Z / 6)
+						v34:AdjustSpeed(-Character.HumanoidRootPart.CFrame:vectorToObjectSpace(PrimaryPart.Velocity).Z / 6)
 					end
 				end
 			end
 		end
 	end
-	local function getUpdateRate(p1, p2, p3)
+	local function getUpdateRate(p1, p2, p3) --[[ getUpdateRate | Line: 4401 ]]
 		if p1 < p2 then
 			return 0
 		else
 			return (p1 - p2) / (p3 - p2)
 		end
 	end
-	local function UpdateVehicle(p1)
-		local isEnabled = not v17
+	local function UpdateVehicle(p1) --[[ UpdateVehicle | Line: 4416 | Upvalues: v17 (ref), TeamValue (copy), Settings (copy), GamepassSystem (copy), GamepassUtils (copy), ItemSystem (ref), Localization (copy) ]]
+		local v1 = not v17
 		local Part = p1.Part
 		if Part and Part.Parent then
-			local isEnabled = nil
-			local func = nil
-			local cframe = nil
+			local v2 = nil
+			local v3 = nil
+			local v4 = nil
 			if TeamValue.Value == Settings.Team.Prisoner then
-				local vector = Part.Parent:GetAttribute("TeamRestrict")
-				local cframe = Part.Parent:GetAttribute("GamepassRestrict")
-				if vector and (Part.Name == "Seat" and vector ~= TeamValue.Value) then
-					isEnabled = if cframe then GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass[cframe]) else true
+				local v5 = Part.Parent:GetAttribute("TeamRestrict")
+				local v6 = Part.Parent:GetAttribute("GamepassRestrict")
+				if v5 and (Part.Name == "Seat" and v5 ~= TeamValue.Value) then
+					v2 = if v6 then GamepassSystem.DoesPlayerOwn(GamepassUtils.EnumGamepass[v6]) else true
 				end
 			elseif TeamValue.Value == Settings.Team.Police then
-				local vector = ItemSystem.GetLocalEquipped()
-				if vector and vector.__ClassName == "Handcuffs" then
-					func = true
+				local v8 = ItemSystem.GetLocalEquipped()
+				if v8 and v8.__ClassName == "Handcuffs" then
+					v3 = true
 				end
 			end
-			if not (isEnabled or func) then
-				cframe = true
+			if not (v2 or v3) then
+				v4 = true
 			end
-			local isEnabled = 10
-			if p1.ShouldHotwire ~= isEnabled then
-				p1.ShouldHotwire = isEnabled
-				if isEnabled then
+			local v9 = 10
+			if p1.ShouldHotwire ~= v2 then
+				p1.ShouldHotwire = v2
+				if v2 then
 					p1.Name = Localization:FormatByKey("Action.Hijack")
 					p1.Timed = true
 					p1.Duration = 5.6
 				end
 			end
-			if p1.ShouldEject ~= func then
-				p1.ShouldEject = func
-				if func then
+			if p1.ShouldEject ~= v3 then
+				p1.ShouldEject = v3
+				if v3 then
 					p1.Name = Localization:FormatByKey("Action.Eject")
 					p1.Timed = false
 					p1.Duration = 1
-					isEnabled = 12
+					v9 = 12
 				end
 			end
-			if p1.ShouldAllowEntry ~= cframe then
-				p1.ShouldAllowEntry = cframe
-				if cframe then
+			if p1.ShouldAllowEntry ~= v4 then
+				p1.ShouldAllowEntry = v4
+				if v4 then
 					p1.Timed = false
 					p1.Name = if Part.Name == "Seat" then Localization:FormatByKey("Action.EnterDriver") elseif Part:FindFirstChild("Turret") then "Enter Turret" else Localization:FormatByKey("Action.EnterPassenger")
 				end
@@ -3889,125 +3910,125 @@ do
 			if p1.ShouldAllowEntry or p1.ShouldHotwire then
 				local Player = Part:FindFirstChild("Player")
 				if Player and Player.Value then
-					isEnabled = false
+					v1 = false
 				end
 			end
-			p1.Dist = isEnabled
+			p1.Dist = v9
 		end
-		if isEnabled ~= p1.Enabled then
-			p1.Enabled = isEnabled
+		if v1 ~= p1.Enabled then
+			p1.Enabled = v1
 		end
 	end
-	local function UpdatePlayer(p1)
-		local isEnabled = nil
-		local isEnabled = nil
-		local func = nil
-		local cframe = nil
-		local vector = nil
-		local cframe = ItemSystem.GetLocalEquipped()
+	local function UpdatePlayer(p1) --[[ UpdatePlayer | Line: 4484 | Upvalues: ItemSystem (ref), RunUtils (copy), Players (copy), LocalPlayer (copy), TradeUtils (copy), TradeService (copy), PlayerUtils (copy), Settings (copy), TeamValue (copy), Localization (copy), Handcuffs (copy) ]]
+		local v1 = nil
+		local v2 = nil
+		local v3 = nil
+		local v4 = nil
+		local v5 = nil
+		local v6 = ItemSystem.GetLocalEquipped()
 		if RunUtils.isTradingEnabled() then
-			local RemoteEvent = Players:FindFirstChild(p1.PlayerName)
-			if RemoteEvent and (RemoteEvent ~= LocalPlayer and (TradeUtils.getPlayerTradeRequestsEnabled(RemoteEvent) and (TradeUtils.getPlayerTradeRequestsEnabled(LocalPlayer) and (not TradeService.checkAlreadyInitiated(LocalPlayer, RemoteEvent) and (RemoteEvent.Character and RemoteEvent.Character:FindFirstChild("Humanoid")))))) then
-				cframe = true
+			local v7 = Players:FindFirstChild(p1.PlayerName)
+			if v7 and (v7 ~= LocalPlayer and (TradeUtils.getPlayerTradeRequestsEnabled(v7) and (TradeUtils.getPlayerTradeRequestsEnabled(LocalPlayer) and (not TradeService.checkAlreadyInitiated(LocalPlayer, v7) and (v7.Character and v7.Character:FindFirstChild("Humanoid")))))) then
+				v4 = true
 			end
 		end
-		local vector = Players:FindFirstChild(p1.PlayerName)
-		if vector and (vector.Character and LocalPlayer.Character) then
-			local isEnabled = if PlayerUtils.getTeamId(vector) == Settings.EnumTeam.Criminal then vector.Character:GetAttribute("HasHandcuffs") else false
-			if vector.TeamValue.Value == Settings.Team.Police and TeamValue.Value == Settings.Team.Prisoner then
+		local v8 = Players:FindFirstChild(p1.PlayerName)
+		if v8 and (v8.Character and LocalPlayer.Character) then
+			local v9 = if PlayerUtils.getTeamId(v8) == Settings.EnumTeam.Criminal then v8.Character:GetAttribute("HasHandcuffs") else false
+			if v8.TeamValue.Value == Settings.Team.Police and TeamValue.Value == Settings.Team.Prisoner then
 				local Humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
 				local PrimaryPart = LocalPlayer.Character.PrimaryPart
-				local PrimaryPart_2 = vector.Character.PrimaryPart
+				local PrimaryPart_2 = v8.Character.PrimaryPart
 				if PrimaryPart and (PrimaryPart_2 and (Humanoid and not (Humanoid.Sit or Humanoid.PlatformStand))) then
-					local cframe = PrimaryPart.CFrame
-					local cframe = PrimaryPart_2.CFrame
-					local cframe = cframe.lookVector:Dot(cframe.lookVector) >= 0.3333333333333333
-					if cframe and cframe.lookVector:Dot((cframe.p - cframe.p).unit) >= 0.3333333333333333 then
-						isEnabled = true
+					local v10 = PrimaryPart.CFrame
+					local v11 = PrimaryPart_2.CFrame
+					local v12 = v10.lookVector:Dot(v11.lookVector) >= 0.3333333333333333
+					if v12 and v11.lookVector:Dot((v11.p - v10.p).unit) >= 0.3333333333333333 then
+						v2 = true
 					end
 				end
-			elseif TeamValue.Value == Settings.Team.Police and isEnabled then
-				vector = true
-			elseif TeamValue.Value == Settings.Team.Prisoner and (vector.TeamValue.Value == Settings.Team.Prisoner and (vector.Character and LocalPlayer.Character)) and (vector.Character:GetAttribute("HasHandcuffs") and not LocalPlayer.Character:GetAttribute("HasHandcuffs")) then
-				func = true
+			elseif TeamValue.Value == Settings.Team.Police and v9 then
+				v5 = true
+			elseif TeamValue.Value == Settings.Team.Prisoner and (v8.TeamValue.Value == Settings.Team.Prisoner and (v8.Character and LocalPlayer.Character)) and (v8.Character:GetAttribute("HasHandcuffs") and not LocalPlayer.Character:GetAttribute("HasHandcuffs")) then
+				v3 = true
 			end
 		end
-		if not vector and (not func and (cframe and (cframe.__ClassName == "Handcuffs" and TeamValue.Value == Settings.Team.Police))) then
-			local targetPlayer = Players:FindFirstChild(p1.PlayerName)
-			if targetPlayer and (vehicleClass.TeamValue.Value == Settings.Team.Prisoner and (vehicleClass.Character and (not vehicleClass.Character:GetAttribute("HasHandcuffs") and (not vehicleClass.Character:GetAttribute("InVehicle") and vehicleClass.Character:FindFirstChild("Humanoid"))))) then
-				isEnabled = true
+		if not v5 and (not v3 and (v6 and (v6.__ClassName == "Handcuffs" and TeamValue.Value == Settings.Team.Police))) then
+			local v14 = Players:FindFirstChild(p1.PlayerName)
+			if v14 and (v14.TeamValue.Value == Settings.Team.Prisoner and (v14.Character and (not v14.Character:GetAttribute("HasHandcuffs") and (not v14.Character:GetAttribute("InVehicle") and v14.Character:FindFirstChild("Humanoid"))))) then
+				v1 = true
 			end
 		end
-		local cframe
-		if isEnabled == p1.ShouldArrest then
-			cframe = false
+		local v15
+		if v1 == p1.ShouldArrest then
+			v15 = false
 		else
-			p1.ShouldArrest = isEnabled
-			cframe = true
+			p1.ShouldArrest = v1
+			v15 = true
 		end
-		if isEnabled ~= p1.ShouldPickpocket then
-			p1.ShouldPickpocket = isEnabled
-			cframe = true
+		if v2 ~= p1.ShouldPickpocket then
+			p1.ShouldPickpocket = v2
+			v15 = true
 		end
-		if vector ~= p1.ShouldCrimSearch then
-			p1.ShouldCrimSearch = vector
-			cframe = true
+		if v5 ~= p1.ShouldCrimSearch then
+			p1.ShouldCrimSearch = v5
+			v15 = true
 		end
-		if func ~= p1.ShouldBreakout then
-			p1.ShouldBreakout = func
-			cframe = true
+		if v3 ~= p1.ShouldBreakout then
+			p1.ShouldBreakout = v3
+			v15 = true
 		end
-		if cframe ~= p1.ShouldTrade then
-			p1.ShouldTrade = cframe
-			cframe = true
+		if v4 ~= p1.ShouldTrade then
+			p1.ShouldTrade = v4
+			v15 = true
 		end
-		if cframe and func then
+		if v15 and v3 then
 			p1.Duration = 2
 			p1.Timed = true
 			p1.Dist = 10
 			p1.Name = Localization:FormatByKey("Action.Breakout")
-		elseif cframe and (isEnabled or vector) then
+		elseif v15 and (v2 or v5) then
 			p1.Duration = 2
 			p1.Timed = true
 			p1.Dist = 10
-			if vector then
+			if v5 then
 				p1.Name = Localization:FormatByKey("Action.CrimSearch")
 			else
 				p1.Name = Localization:FormatByKey("Action.Pickpocket")
 			end
-		elseif cframe and isEnabled then
+		elseif v15 and v1 then
 			p1.Duration = 0.5
 			p1.Timed = true
 			p1.Dist = nil
 			p1.HorizontalDist = Handcuffs.ArrestDistance
 			p1.VerticalDist = Handcuffs.ArrestDistance * 1.4
 			p1.Name = Localization:FormatByKey("Action.Arrest")
-		elseif cframe and cframe then
+		elseif v15 and v4 then
 			p1.Timed = false
 			p1.Dist = 10
 			p1.Name = Localization:FormatByKey("Action.Trade")
 		end
-		local conditionResult = isEnabled or (isEnabled or (func or (cframe or vector)))
+		local v16 = v1 or (v2 or (v3 or (v4 or v5)))
 		if v16 ~= p1.Enabled then
 			p1.Enabled = v16
 		end
 	end
-	local function UpdateRob(p1)
-		local isEnabled = TeamValue.Value == Settings.Team.Prisoner
-		if p1.Enabled ~= isEnabled then
-			p1.Enabled = isEnabled
+	local function UpdateRob(p1) --[[ UpdateRob | Line: 4614 | Upvalues: TeamValue (copy), Settings (copy) ]]
+		local v1 = TeamValue.Value == Settings.Team.Prisoner
+		if p1.Enabled ~= v1 then
+			p1.Enabled = v1
 		end
 	end
-	local function UpdateCircleActions()
+	local function UpdateCircleActions() --[[ UpdateCircleActions | Line: 4635 | Upvalues: LocalPlayer (copy), UI (copy), UpdateVehicle (copy), UpdatePlayer (copy), TeamValue (copy), Settings (copy) ]]
 		debug.profilebegin("UpdateCircleActions (game)")
 		local Character = LocalPlayer.Character
 		if Character then
 			local PrimaryPart = Character.PrimaryPart
 			if PrimaryPart then
 				local Position = PrimaryPart.Position
-				local isEnabled = os.clock()
+				local v1 = os.clock()
 				for i, v in ipairs((UI.CircleAction.SpecOctree:QueryRadius(Position, 64))) do
-					local func
+					local v3
 					if not v.Kill then
 						local Part = v.Part
 						local WorldPosition = v.WorldPosition
@@ -4015,9 +4036,9 @@ do
 							WorldPosition = Part and Part.Position or Vector3.new(0, 0, 0)
 						end
 						local Magnitude = (WorldPosition - Position).Magnitude
-						func = if Magnitude < 16 then 0 else (Magnitude - 16) / 48
-						if func < isEnabled - (v._lastUpdateCheck or 0) then
-							v._lastUpdateCheck = isEnabled
+						v3 = if Magnitude < 16 then 0 else (Magnitude - 16) / 48
+						if v3 < v1 - (v._lastUpdateCheck or 0) then
+							v._lastUpdateCheck = v1
 							if v.IsVehicle then
 								UpdateVehicle(v)
 							elseif v.IsPlayer then
@@ -4035,36 +4056,36 @@ do
 			end
 		end
 	end
-	RunService.Stepped:Connect(function()
+	RunService.Stepped:Connect(function() --[[ Line: 4672 | Upvalues: CurrentCamera (copy), LocalPlayer (copy), VehicleStateBinder (copy), Players (copy), UpdateChassisStepped (ref), R15IKv2 (copy), Classes (copy) ]]
 		debug.profilebegin("LQVehicle Stepped")
-		local isEnabled = os.clock()
+		local v1 = os.clock()
 		local p = CurrentCamera.CFrame.p
 		if LocalPlayer.Character then
-			for func in VehicleStateBinder:GetAllSet() do
-				local isEnabled
-				local packet = func.packet
+			for v3 in VehicleStateBinder:GetAllSet() do
+				local v2
+				local packet = v3.packet
 				if packet then
-					local cframe = Players:GetPlayerByUserId(func.obj:GetAttribute("VehicleStateUserId"))
-					if cframe ~= LocalPlayer then
-						local vector = false
+					local v4 = Players:GetPlayerByUserId(v3.obj:GetAttribute("VehicleStateUserId"))
+					if v4 ~= LocalPlayer then
+						local v5 = false
 						local Model = packet.Model
 						if Model then
 							local BoundingBox = Model:FindFirstChild("BoundingBox")
 							if BoundingBox then
 								local Magnitude = (BoundingBox.Position - p).Magnitude
-								isEnabled = if Magnitude < 256 then 0 else (Magnitude - 256) / 3840
-								if isEnabled < isEnabled - (packet._lastUpdateStepped or 0) then
-									packet._lastUpdateStepped = isEnabled
-									vector = true
+								v2 = if Magnitude < 256 then 0 else (Magnitude - 256) / 3840
+								if v2 < v1 - (packet._lastUpdateStepped or 0) then
+									packet._lastUpdateStepped = v1
+									v5 = true
 								end
 							end
 						end
-						if vector and packet.Type == "Chassis" then
+						if v5 and packet.Type == "Chassis" then
 							UpdateChassisStepped(packet)
-						elseif vector and (packet.Type == "Motorcycle" or packet.Type == "DuneBuggy") then
+						elseif v5 and (packet.Type == "Motorcycle" or packet.Type == "DuneBuggy") then
 							if not packet.IKP then
-								if cframe then
-									local Character = cframe.Character
+								if v4 then
+									local Character = v4.Character
 									if Character then
 										local Humanoid = Character:FindFirstChild("Humanoid")
 										if Humanoid and Humanoid.RootPart then
@@ -4087,29 +4108,29 @@ do
 		end
 		debug.profileend()
 	end)
-	RunService.Heartbeat:Connect(function(p1)
+	RunService.Heartbeat:Connect(function(p1) --[[ Line: 4731 | Upvalues: CurrentCamera (copy), LocalPlayer (copy), VehicleStateBinder (copy), Players (copy), UpdateHeliLowQuality (copy), UpdateChassisLowQuality (ref), Classes (copy), UpdateAllLowQuality (ref) ]]
 		debug.profilebegin("LQVehicle Heartbeat")
-		local isEnabled = os.clock()
+		local v1 = os.clock()
 		local p = CurrentCamera.CFrame.p
 		if LocalPlayer.Character then
-			for func in VehicleStateBinder:GetAllSet() do
-				local isEnabled
-				local packet = func.packet
-				if packet and Players:GetPlayerByUserId(func.obj:GetAttribute("VehicleStateUserId")) ~= LocalPlayer then
-					local cframe = false
+			for v3 in VehicleStateBinder:GetAllSet() do
+				local v2
+				local packet = v3.packet
+				if packet and Players:GetPlayerByUserId(v3.obj:GetAttribute("VehicleStateUserId")) ~= LocalPlayer then
+					local v4 = false
 					local Model = packet.Model
 					if Model then
 						local BoundingBox = Model:FindFirstChild("BoundingBox")
 						if BoundingBox then
 							local Magnitude = (BoundingBox.Position - p).Magnitude
-							isEnabled = if Magnitude < 768 then 0 else (Magnitude - 768) / 3328
-							if isEnabled < isEnabled - (packet._lastUpdateHeartbeat or 0) then
-								packet._lastUpdateHeartbeat = isEnabled
-								cframe = true
+							v2 = if Magnitude < 768 then 0 else (Magnitude - 768) / 3328
+							if v2 < v1 - (packet._lastUpdateHeartbeat or 0) then
+								packet._lastUpdateHeartbeat = v1
+								v4 = true
 							end
 						end
 					end
-					if cframe then
+					if v4 then
 						if packet.Type == "Heli" then
 							UpdateHeliLowQuality(packet, p1)
 						elseif packet.Type == "Chassis" then
@@ -4117,37 +4138,37 @@ do
 						elseif packet.Type == "Motorcycle" or packet.Type == "DuneBuggy" then
 							Classes.Chassis2.UpdateLQ(packet, p1)
 						end
-						UpdateAllLowQuality(packet, p1, func.maid)
+						UpdateAllLowQuality(packet, p1, v3.maid)
 					end
 				end
 			end
 		end
 		debug.profileend()
 	end)
-	local loopCounter_v80 = 0
-	local loopCounter_v81 = 0
-	RunService.Heartbeat:Connect(function(p1)
+	local v80 = 0
+	local v81 = 0
+	RunService.Heartbeat:Connect(function(p1) --[[ Line: 4777 | Upvalues: UpdateCircleActions (copy), TeamValue (copy), Settings (copy), t6 (copy), GameUtil (copy), WalkSpeedFun (ref), floor (copy), v80 (ref), v81 (ref), SidebarUI (copy) ]]
 		UpdateCircleActions()
-		local isEnabled = TeamValue.Value
-		local isEnabled = nil
-		if isEnabled == Settings.Team.Prisoner then
-			isEnabled = if t6.HasEscaped then Settings.EnumTeam.Criminal else Settings.EnumTeam.Prisoner
-		elseif isEnabled == Settings.Team.Police then
-			isEnabled = Settings.EnumTeam.Police
+		local v1 = TeamValue.Value
+		local v2 = nil
+		if v1 == Settings.Team.Prisoner then
+			v2 = if t6.HasEscaped then Settings.EnumTeam.Criminal else Settings.EnumTeam.Prisoner
+		elseif v1 == Settings.Team.Police then
+			v2 = Settings.EnumTeam.Police
 		end
-		if GameUtil.Team ~= isEnabled then
-			GameUtil.Team = isEnabled
-			GameUtil.OnTeamChanged:Fire(isEnabled)
+		if GameUtil.Team ~= v2 then
+			GameUtil.Team = v2
+			GameUtil.OnTeamChanged:Fire(v2)
 		end
 		WalkSpeedFun()
 		debug.profilebegin("Time/UI")
 		local Time = workspace:FindFirstChild("Time")
 		if Time then
-			local func = Time.Value
-			local cframe = func >= 12
-			local vector = func % 1
-			local sum = func - vector
-			local sum_2 = floor(floor(vector * 60 + 0.5) / 15) * 15
+			local v3 = Time.Value
+			local v4 = v3 >= 12
+			local v5 = v3 % 1
+			local sum = v3 - v5
+			local sum_2 = floor(floor(v5 * 60 + 0.5) / 15) * 15
 			if sum_2 >= 60 then
 				sum = sum + 1
 				sum_2 = sum_2 - 60
@@ -4161,68 +4182,68 @@ do
 			if sum ~= v80 or sum_2 ~= v81 then
 				v80 = sum
 				v81 = sum_2
-				SidebarUI.SetTime((("%d:%02d %s"):format(sum, sum_2, if cframe then "PM" else "AM")))
+				SidebarUI.SetTime((("%d:%02d %s"):format(sum, sum_2, if v4 then "PM" else "AM")))
 			end
 		end
 		debug.profileend()
 	end)
 end
 do
-	local function InputChanged(p1)
-		if currentVehiclePacket and currentVehiclePacket.Type == "Chassis" then
+	local function InputChanged(p1) --[[ InputChanged | Line: 4829 | Upvalues: v17 (ref), Classes (copy), v18 (ref) ]]
+		if v17 and v17.Type == "Chassis" then
 			Classes.Chassis.InputChanged(p1, nil)
-		elseif currentVehiclePacket and currentVehiclePacket.Type == "Heli" then
+		elseif v17 and v17.Type == "Heli" then
 			Classes.Heli.InputChanged(p1, nil)
-		elseif currentVehiclePacket and (currentVehiclePacket.Type == "Custom" and v17.Make == "Volt") then
+		elseif v17 and (v17.Type == "Custom" and v17.Make == "Volt") then
 			Classes.Volt.InputChanged(p1, nil)
 		end
 		if p1.UserInputType == Enum.UserInputType.MouseMovement then
 			v18 = p1.Position
 		end
 	end
-	local function InputBegan_2(p1, p2)
+	local function InputBegan_2(p1, p2) --[[ InputBegan | Line: 4845 | Upvalues: v17 (ref), Classes (copy), OnJump (ref) ]]
 		if p2 and (p1.UserInputType ~= Enum.UserInputType.Gamepad1 or p1.KeyCode ~= Enum.KeyCode.ButtonA) then
 			if p1.KeyCode == Enum.KeyCode.Left or p1.KeyCode == Enum.KeyCode.Right then
-				if currentVehiclePacket and currentVehiclePacket.Type == "Chassis" then
+				if v17 and v17.Type == "Chassis" then
 					Classes.Chassis.InputBegan(p1)
-				elseif currentVehiclePacket and currentVehiclePacket.Type == "Heli" then
+				elseif v17 and v17.Type == "Heli" then
 					Classes.Heli.InputBegan(p1)
-				elseif currentVehiclePacket and (currentVehiclePacket.Type == "Custom" and v17.Make == "Volt") then
+				elseif v17 and (v17.Type == "Custom" and v17.Make == "Volt") then
 					Classes.Volt.InputBegan(p1)
 				end
-				if p1.UserInputType == Enum.UserInputType.Keyboard and (p1.KeyCode == Enum.KeyCode.E and (v17 and currentVehiclePacket.Type ~= "Heli")) then
+				if p1.UserInputType == Enum.UserInputType.Keyboard and (p1.KeyCode == Enum.KeyCode.E and (v17 and v17.Type ~= "Heli")) then
 					OnJump()
 				end
 			end
 		else
-			if currentVehiclePacket and currentVehiclePacket.Type == "Chassis" then
+			if v17 and v17.Type == "Chassis" then
 				Classes.Chassis.InputBegan(p1)
-			elseif currentVehiclePacket and currentVehiclePacket.Type == "Heli" then
+			elseif v17 and v17.Type == "Heli" then
 				Classes.Heli.InputBegan(p1)
-			elseif currentVehiclePacket and (currentVehiclePacket.Type == "Custom" and v17.Make == "Volt") then
+			elseif v17 and (v17.Type == "Custom" and v17.Make == "Volt") then
 				Classes.Volt.InputBegan(p1)
 			end
-			if p1.UserInputType == Enum.UserInputType.Keyboard and (p1.KeyCode == Enum.KeyCode.E and (v17 and currentVehiclePacket.Type ~= "Heli")) then
+			if p1.UserInputType == Enum.UserInputType.Keyboard and (p1.KeyCode == Enum.KeyCode.E and (v17 and v17.Type ~= "Heli")) then
 				OnJump()
 			end
 		end
 	end
-	local function InputEnded(p1, p2)
+	local function InputEnded(p1, p2) --[[ InputEnded | Line: 4874 | Upvalues: v17 (ref), Classes (copy) ]]
 		if p2 and (p1.UserInputType ~= Enum.UserInputType.Gamepad1 or p1.KeyCode ~= Enum.KeyCode.ButtonA) then
 			if p1.KeyCode == Enum.KeyCode.Left or p1.KeyCode == Enum.KeyCode.Right then
-				if currentVehiclePacket and currentVehiclePacket.Type == "Chassis" then
+				if v17 and v17.Type == "Chassis" then
 					Classes.Chassis.InputEnded(p1)
-				elseif currentVehiclePacket and currentVehiclePacket.Type == "Heli" then
+				elseif v17 and v17.Type == "Heli" then
 					Classes.Heli.InputEnded(p1)
-				elseif currentVehiclePacket and (currentVehiclePacket.Type == "Custom" and v17.Make == "Volt") then
+				elseif v17 and (v17.Type == "Custom" and v17.Make == "Volt") then
 					Classes.Volt.InputEnded(p1)
 				end
 			end
-		elseif currentVehiclePacket and currentVehiclePacket.Type == "Chassis" then
+		elseif v17 and v17.Type == "Chassis" then
 			Classes.Chassis.InputEnded(p1)
-		elseif currentVehiclePacket and currentVehiclePacket.Type == "Heli" then
+		elseif v17 and v17.Type == "Heli" then
 			Classes.Heli.InputEnded(p1)
-		elseif currentVehiclePacket and (currentVehiclePacket.Type == "Custom" and v17.Make == "Volt") then
+		elseif v17 and (v17.Type == "Custom" and v17.Make == "Volt") then
 			Classes.Volt.InputEnded(p1)
 		end
 	end
@@ -4230,7 +4251,7 @@ do
 	UserInputService.InputEnded:connect(InputEnded)
 	UserInputService.InputChanged:connect(InputChanged)
 	local CircleAction_2 = UI.CircleAction
-	local function Action(p1, p2)
+	local function Action(p1, p2) --[[ Action | Line: 4910 | Upvalues: AttemptVehicleHotwire (copy), AttemptVehicleEject (copy), AttemptVehicleEnter (ref), t (copy) ]]
 		if p2 then
 			if p1.ShouldHotwire then
 				AttemptVehicleHotwire(p1.Part.Parent, true)
@@ -4243,50 +4264,50 @@ do
 		end
 		if p1.ShouldHotwire then
 			AttemptVehicleHotwire(p1.Part.Parent)
-			configTable.mq92d5a8({
+			t.vbey8zy6({
 				Title = "Vehicle",
 				Text = "Vehicle protected. Hold to hijack."
 			})
 		end
 	end
-	local function AddedFun_3(p1)
+	local function AddedFun_3(p1) --[[ AddedFun | Line: 4930 | Upvalues: Action (copy), CircleAction_2 (copy) ]]
 		CircleAction_2.Add({
-			Part = p1,
-			ValidRoot = p1.Parent,
 			Name = "Enter",
 			Timed = false,
 			Duration = 1,
 			Dist = 10,
+			Part = p1,
+			ValidRoot = p1.Parent,
 			Callback = Action,
 			IsVehicle = true
 		}, p1)
 	end
-	local function RemovedFun_3(p1)
+	local function RemovedFun_3(p1) --[[ RemovedFun | Line: 4943 | Upvalues: CircleAction_2 (copy) ]]
 		CircleAction_2.Remove(p1)
 	end
-	local vehicleSeatIterator = next
-	local vehicleSeats, _ = CollectionService:GetTagged("VehicleSeat")
-	for v85, v86 in vehicleSeatIterator, v83, for _, seat in vehicleSeats do
+	local v82 = next
+	local v83, v84 = CollectionService:GetTagged("VehicleSeat")
+	for v85, v86 in v82, v83, v84 do
 		AddedFun_3(v86)
 	end
 	CollectionService:GetInstanceAddedSignal("VehicleSeat"):Connect(AddedFun_3)
 	CollectionService:GetInstanceRemovedSignal("VehicleSeat"):Connect(RemovedFun_3)
 	local CircleAction_3 = UI.CircleAction
-	local function UseHandcuffs(p1)
-		local isEnabled = ItemSystem.GetLocalEquipped()
-		if isEnabled and isEnabled.__ClassName == "Handcuffs" then
-			if isEnabled.Reloading then
+	local function UseHandcuffs(p1) --[[ UseHandcuffs | Line: 4954 | Upvalues: ItemSystem (ref), TeamValue (copy), Settings (copy), Players (copy), v17 (ref), LocalPlayer (copy), AttemptArrest (copy) ]]
+		local v1 = ItemSystem.GetLocalEquipped()
+		if v1 and v1.__ClassName == "Handcuffs" then
+			if v1.Reloading then
 			elseif TeamValue.Value == Settings.Team.Police then
-				local isEnabled = Players:FindFirstChild(p1.PlayerName)
-				if isEnabled then
-					local TeamValue_2 = isEnabled.TeamValue.Value
+				local v2 = Players:FindFirstChild(p1.PlayerName)
+				if v2 then
+					local TeamValue_2 = v2.TeamValue.Value
 					if v17 then
 					elseif TeamValue_2 == Settings.Team.Prisoner then
 						local Character = LocalPlayer.Character
 						if Character then
 							local Humanoid = Character:FindFirstChild("Humanoid")
 							if Humanoid and not (Humanoid.Health <= 0) then
-								eventBridge:FireServer("w5ln1uc8", isEnabled)
+								AttemptArrest(v2)
 								return true
 							end
 						end
@@ -4295,97 +4316,97 @@ do
 			end
 		end
 	end
-	local function UsePickpocket(p1)
-		local isEnabled = Players:FindFirstChild(p1.PlayerName)
-		if isEnabled then
-			AttemptPickPocket(isEnabled)
+	local function UsePickpocket(p1) --[[ UsePickpocket | Line: 4995 | Upvalues: Players (copy), AttemptPickPocket (copy) ]]
+		local v1 = Players:FindFirstChild(p1.PlayerName)
+		if v1 then
+			AttemptPickPocket(v1)
 			return true
 		end
 	end
-	local function UseBreakout(p1)
-		local isEnabled = Players:FindFirstChild(p1.PlayerName)
-		if isEnabled then
-			AttemptBreakout(isEnabled)
+	local function UseBreakout(p1) --[[ UseBreakout | Line: 5003 | Upvalues: Players (copy), AttemptBreakout (copy) ]]
+		local v1 = Players:FindFirstChild(p1.PlayerName)
+		if v1 then
+			AttemptBreakout(v1)
 			return true
 		end
 	end
-	local function UseTrade(p1)
-		local isEnabled = Players:FindFirstChild(p1.PlayerName)
-		if isEnabled then
-			AttemptTrade(isEnabled)
+	local function UseTrade(p1) --[[ UseTrade | Line: 5011 | Upvalues: Players (copy), AttemptTrade (ref) ]]
+		local v1 = Players:FindFirstChild(p1.PlayerName)
+		if v1 then
+			AttemptTrade(v1)
 			return true
 		end
 	end
-	local function Action_2(p1, p2)
+	local function Action_2(p1, p2) --[[ Action | Line: 5019 | Upvalues: Players (copy), t2 (ref), UseHandcuffs (copy), AttemptPickPocket (copy), AttemptBreakout (copy), RunUtils (copy), AttemptTrade (ref) ]]
 		if p1.ShouldBreakout and not p2 then
-			local isEnabled = Players:FindFirstChild(p1.PlayerName)
-			if isEnabled and not isEnabled:GetAttribute("SentBreakoutRequest") then
-				isEnabled:SetAttribute("SentBreakoutRequest", true)
-				eventBridge:FireServer("configTablecmegrbe", isEnabled.Name)
-				task.delay(10, function()
-					isEnabled:SetAttribute("SentBreakoutRequest", nil)
+			local v1 = Players:FindFirstChild(p1.PlayerName)
+			if v1 and not v1:GetAttribute("SentBreakoutRequest") then
+				v1:SetAttribute("SentBreakoutRequest", true)
+				t2:FireServer("x" .. "" .. ("oj0jegc"):sub(3, 3):reverse() .. "" .. "" .. ("khvm"):sub(2, 2):reverse():reverse():reverse() .. "" .. "" .. ("rpmczqbt"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "zjd5", v1.Name)
+				task.delay(10, function() --[[ Line: 5026 | Upvalues: v1 (copy) ]]
+					v1:SetAttribute("SentBreakoutRequest", nil)
 				end)
 			end
 		end
 		if p2 then
-			local isEnabled = nil
+			local v2 = nil
 			if p1.ShouldArrest then
-				isEnabled = UseHandcuffs(p1)
+				v2 = UseHandcuffs(p1)
 			elseif p1.ShouldPickpocket or p1.ShouldCrimSearch then
-				local func = Players:FindFirstChild(p1.PlayerName)
-				if func then
-					AttemptPickPocket(func)
-					isEnabled = true
+				local v3 = Players:FindFirstChild(p1.PlayerName)
+				if v3 then
+					AttemptPickPocket(v3)
+					v2 = true
 				else
-					isEnabled = nil
+					v2 = nil
 				end
 			elseif p1.ShouldBreakout then
-				local cframe = Players:FindFirstChild(p1.PlayerName)
-				if cframe then
-					AttemptBreakout(cframe)
-					isEnabled = true
+				local v4 = Players:FindFirstChild(p1.PlayerName)
+				if v4 then
+					AttemptBreakout(v4)
+					v2 = true
 				else
-					isEnabled = nil
+					v2 = nil
 				end
 			end
-			if p1.ShouldTrade and (RunUtils.isTradeWorld() or not isEnabled) then
-				local vector = Players:FindFirstChild(p1.PlayerName)
-				if vector then
-					AttemptTrade(vector)
-					isEnabled = true
+			if p1.ShouldTrade and (RunUtils.isTradeWorld() or not v2) then
+				local v5 = Players:FindFirstChild(p1.PlayerName)
+				if v5 then
+					AttemptTrade(v5)
+					v2 = true
 				else
 					return nil
 				end
 			end
-			return isEnabled
+			return v2
 		else
 			return true
 		end
 	end
-	local function AddedFun_4(p1)
+	local function AddedFun_4(p1) --[[ AddedFun | Line: 5051 | Upvalues: LocalPlayer (copy), Action_2 (copy), CircleAction_3 (copy) ]]
 		if p1 ~= LocalPlayer.Character then
 			CircleAction_3.Add({
-				Part = p1:WaitForChild("UpperTorso", 3),
-				ValidRoot = p1,
 				Name = "Player",
 				Timed = true,
 				Duration = 0.5,
 				Dist = 15,
 				Priority = 2,
+				Part = p1:WaitForChild("UpperTorso", 3),
+				ValidRoot = p1,
 				Callback = Action_2,
 				PlayerName = p1.Name,
 				IsPlayer = true
 			}, p1)
 		end
 	end
-	local function RemovedFun_4(p1)
+	local function RemovedFun_4(p1) --[[ RemovedFun | Line: 5068 | Upvalues: LocalPlayer (copy), CircleAction_3 (copy) ]]
 		if p1 ~= LocalPlayer.Character then
 			CircleAction_3.Remove(p1)
 		end
 	end
-	local function onCharacterAdded(p1)
+	local function onCharacterAdded(p1) --[[ onCharacterAdded | Line: 5074 | Upvalues: AddedFun_4 (copy), LocalPlayer (copy), CircleAction_3 (copy) ]]
 		AddedFun_4(p1.obj)
-		p1.maid:GiveTask(function()
+		p1.maid:GiveTask(function() --[[ Line: 5076 | Upvalues: p1 (copy), LocalPlayer (ref), CircleAction_3 (ref) ]]
 			local obj = p1.obj
 			if obj ~= LocalPlayer.Character then
 				CircleAction_3.Remove(obj)
@@ -4397,99 +4418,99 @@ do
 	end
 	CharacterBinder:GetClassAddedSignal():Connect(onCharacterAdded)
 	local CircleAction_4 = UI.CircleAction
-	local function Action_3(p1, p2)
+	local function Action_3(p1, p2) --[[ Action | Line: 5087 | Upvalues: t2 (ref) ]]
 		if p2 then
-			eventBridge:FireServer("womiwx4r", p1.Part)
+			t2:FireServer("i" .. "" .. ("gxnk2a6i36gqv"):sub(5, 10):reverse() .. "8", p1.Part)
 		else
-			eventBridge:FireServer("fwl2dtym", p1.Part)
+			t2:FireServer("k" .. "" .. ("jqrm2bink"):sub(4, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("uu6ozkh"):sub(3, 6):reverse() .. "6", p1.Part)
 		end
 		return true
 	end
-	local function AddedFun_5(p1)
+	local function AddedFun_5(p1) --[[ AddedFun | Line: 5095 | Upvalues: Action_3 (copy), CircleAction_4 (copy) ]]
 		CircleAction_4.Add({
-			Part = p1,
 			Name = "Rob",
 			Timed = true,
 			Duration = 10,
 			Dist = 8,
+			Part = p1,
 			Callback = Action_3,
 			IsRob = true
 		}, p1)
 	end
-	local function RemovedFun_5(p1)
+	local function RemovedFun_5(p1) --[[ RemovedFun | Line: 5107 | Upvalues: CircleAction_4 (copy) ]]
 		CircleAction_4.Remove(p1)
 	end
-	local iterator_v89 = next
-	local smallStores, _ = CollectionService:GetTagged("SmallStore")
-	for v92, v93 in v89, v90, for _, store in smallStores do
+	local v89 = next
+	local v90, v91 = CollectionService:GetTagged("SmallStore")
+	for v92, v93 in v89, v90, v91 do
 		AddedFun_5(v93)
 	end
 	CollectionService:GetInstanceAddedSignal("SmallStore"):Connect(AddedFun_5)
 	CollectionService:GetInstanceRemovedSignal("SmallStore"):Connect(RemovedFun_5)
 	local CircleAction_5 = UI.CircleAction
-	local function Action_4(p1, p2)
-		local isEnabled = p1.Part.Parent
+	local function Action_4(p1, p2) --[[ Action | Line: 5118 | Upvalues: t2 (ref) ]]
+		local v1 = p1.Part.Parent
 		if p2 then
-			eventBridge:FireServer("z5c18gcj", isEnabled)
+			t2:FireServer("a" .. ("mzvopg"):sub(4, 4):reverse() .. "" .. "" .. ("b5zswvv"):sub(3, 3):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("jhen"):sub(2, 2):reverse():reverse():reverse():reverse():reverse() .. "hbru", v1)
 			return true
 		end
 	end
 	local GunShopUtils = require(ReplicatedStorage.Game.GunShop.GunShopUtils)
-	local function AddedFun_6(p1)
-		local isEnabled = p1.Parent
+	local function AddedFun_6(p1) --[[ AddedFun | Line: 5126 | Upvalues: GunShopUtils (copy), Action_4 (copy), CircleAction_5 (copy) ]]
+		local v1 = p1.Parent
 		CircleAction_5.Add({
-			Part = p1,
-			ValidRoot = isEnabled,
-			Name = ("Pick up %s"):format(GunShopUtils.getTranslatedTitleFromName(isEnabled.Name)),
 			Timed = true,
 			Duration = 0.5,
 			Dist = 5,
+			Part = p1,
+			ValidRoot = v1,
+			Name = ("Pick up %s"):format(GunShopUtils.getTranslatedTitleFromName(v1.Name)),
 			Callback = Action_4
 		}, p1)
 	end
 	local ItemDropConsts = require(ReplicatedStorage.Game.ItemSystem.ItemDropConsts)
-	local iterator_v94 = next
-	local droppedItems, _ = CollectionService:GetTagged(ItemDropConsts.DROPPED_ITEM_TAG)
-	for v97, v98 in v94, v95, for _, item in droppedItems do
+	local v94 = next
+	local v95, v96 = CollectionService:GetTagged(ItemDropConsts.DROPPED_ITEM_TAG)
+	for v97, v98 in v94, v95, v96 do
 		AddedFun_6(v98)
 	end
 	CollectionService:GetInstanceAddedSignal(ItemDropConsts.DROPPED_ITEM_TAG):Connect(AddedFun_6)
 	CollectionService:GetInstanceRemovedSignal(ItemDropConsts.DROPPED_ITEM_TAG):Connect(CircleAction_5.Remove)
-	local startTime = tick()
-	local function onJumpDebounce()
-		local isEnabled = tick()
-		if isEnabled - v99 < 0.1 then
+	local v99 = tick()
+	local function onJumpDebounce() --[[ onJumpDebounce | Line: 5148 | Upvalues: v99 (ref), OnJump (ref) ]]
+		local v1 = tick()
+		if v1 - v99 < 0.1 then
 			return false
 		end
-		v99 = isEnabled
+		v99 = v1
 		OnJump()
 	end
 	require(ReplicatedStorage.Game.DefaultActions).onJumpPressed:Connect(onJumpDebounce)
 end
 do
-	local function CharacterDied()
+	local function CharacterDied() --[[ CharacterDied | Line: 5161 | Upvalues: Falling (copy) ]]
 		Falling.StartRagdolling(10)
 	end
-	local function CharacterAdded(p1)
+	local function CharacterAdded(p1) --[[ CharacterAdded | Line: 5164 | Upvalues: Falling (copy) ]]
 		local Humanoid = p1:WaitForChild("Humanoid")
-		local isEnabled = nil
-		isEnabled = Humanoid.Died:Connect(function()
-			isEnabled:Disconnect()
+		local v1 = nil
+		v1 = Humanoid.Died:Connect(function() --[[ Line: 5167 | Upvalues: v1 (ref), Falling (ref) ]]
+			v1:Disconnect()
 			Falling.StartRagdolling(10)
 		end)
 	end
 	LocalPlayer.CharacterAdded:Connect(CharacterAdded)
-	local BindableEvent = Instance.new("BindableEvent")
-	BindableEvent.Event:connect(function()
-		eventBridge:FireServer("nslfymcz")
+	local v100 = Instance.new("BindableEvent")
+	v100.Event:connect(function() --[[ Line: 5177 | Upvalues: t2 (ref) ]]
+		t2:FireServer("y" .. ("eastkslw4js"):sub(3, 7):reverse():reverse():reverse() .. "xo")
 	end)
-	delay(2, function()
-		local isEnabled, isEnabled = pcall(function()
-			StarterGui:SetCore("ResetButtonCallback", BindableEvent)
+	delay(2, function() --[[ Line: 5180 | Upvalues: StarterGui (copy), v100 (copy) ]]
+		local v1, v2 = pcall(function() --[[ Line: 5181 | Upvalues: StarterGui (ref), v100 (ref) ]]
+			StarterGui:SetCore("ResetButtonCallback", v100)
 		end)
-		if not isEnabled then
+		if not v1 then
 			print("MANUAL RESET ERROR")
-			print(isEnabled)
+			print(v2)
 		end
 	end)
 	local Part = Instance.new("Part")
@@ -4499,41 +4520,41 @@ do
 	Part.Size = Vector3.new(1, 1, 1)
 	Part.Archivable = false
 	Part.Parent = workspace
-	local function c()
+	local function c() --[[ c | Line: 5199 ]]
 		while true do
 
 		end
 	end
 	Part:GetPropertyChangedSignal("Archivable"):connect(c)
-	delay(10, function()
+	delay(10, function() --[[ Line: 5207 | Upvalues: LocalPlayer (copy) ]]
 		local KreeksTimeMachine = workspace:FindFirstChild("KreeksTimeMachine")
 		if KreeksTimeMachine and LocalPlayer.UserId == 140258990 then
 			KreeksTimeMachine:Destroy()
 		end
 	end)
-	local isEnabled = false
-	local pcallResult = nil
-	local pcallCounter = 0
-	local pcallCounter2 = 0
-	local isEnabled = false
-	local function CharacterAdded_2(p1)
+	local v101 = false
+	local v102 = nil
+	local v103 = 0
+	local v104 = 0
+	local v105 = false
+	local function CharacterAdded_2(p1) --[[ CharacterAdded | Line: 5222 | Upvalues: v105 (ref), v104 (ref), Math (copy), v102 (ref), v103 (ref), v101 (ref), EventFireServer (ref) ]]
 		local Humanoid = p1:WaitForChild("Humanoid", 1)
 		if Humanoid then
 			if p1:WaitForChild("HumanoidRootPart", 1) then
-				isEnabled = false
+				v105 = false
 				v104 = Math.TimeAccumAdd(v104, 2)
 				if v102 then
 					v102:Disconnect()
 					v102 = nil
 				end
-				v102 = Humanoid.StateChanged:Connect(function(p1, p2)
+				v102 = Humanoid.StateChanged:Connect(function(p1, p2) --[[ Line: 5253 | Upvalues: v103 (ref), Math (ref), v101 (ref), EventFireServer (ref) ]]
 					if p2 == Enum.HumanoidStateType.StrafingNoPhysics then
 						v103 = Math.TimeAccumAdd(v103, 1)
 						if Math.TimeAccumDiff(v103) > 10 then
 							v103 = 0
-							if not isEnabled then
-								isEnabled = true
-								EventFireServer("kului5os", "NoClip StrafingNoPhysics", false)
+							if not v101 then
+								v101 = true
+								EventFireServer("e" .. ("pxtrk8h0ckrp"):sub(4, 9):reverse():reverse():reverse():reverse():reverse() .. "x", "NoClip StrafingNoPhysics", false)
 							end
 						end
 					end
@@ -4545,108 +4566,108 @@ do
 		CharacterAdded_2(LocalPlayer.Character)
 	end
 	LocalPlayer.CharacterAdded:Connect(CharacterAdded_2)
-	spawn(function()
-		local isEnabled, isEnabled = pcall(function()
-			LocalPlayer:WaitForChild("Backpack", 20).ChildAdded:Connect(function(p1)
-				if p1:IsA("BackpackItem") and not isEnabled then
-					isEnabled = true
-					EventFireServer("kului5os", "BackpackTool", false)
+	spawn(function() --[[ Line: 5272 | Upvalues: LocalPlayer (copy), v101 (ref), EventFireServer (ref) ]]
+		local v1, v2 = pcall(function() --[[ Line: 5273 | Upvalues: LocalPlayer (ref), v101 (ref), EventFireServer (ref) ]]
+			LocalPlayer:WaitForChild("Backpack", 20).ChildAdded:Connect(function(p1) --[[ Line: 5275 | Upvalues: v101 (ref), EventFireServer (ref) ]]
+				if p1:IsA("BackpackItem") and not v101 then
+					v101 = true
+					EventFireServer("e" .. ("wh0cqf22"):sub(2, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("ipaa8ye"):sub(5, 5):reverse() .. "" .. "" .. ("bzkyat4"):sub(3, 3):reverse() .. "rx", "BackpackTool", false)
 				end
 			end)
 		end)
-		if not isEnabled then
-			warn("BACKPACK FAIL", isEnabled)
+		if not v1 then
+			warn("BACKPACK FAIL", v2)
 		end
 	end)
 	local FindFirstChildWhichIsA = Instance.new("Model").FindFirstChildWhichIsA
-	local xpcallFunction = xpcall
-	local configTable = {}
-	local function CheatCheck()
-		if not isEnabled then
+	local v106 = xpcall
+	local t30 = {}
+	local function CheatCheck() --[[ CheatCheck | Line: 5296 | Upvalues: v101 (ref), LocalPlayer (copy), v105 (ref), v104 (ref), Math (copy), PlayerGui (copy), v10 (copy), t30 (copy), RunService (copy), v106 (copy), EventFireServer (ref) ]]
+		if not v101 then
 			local Character = LocalPlayer.Character
 			if Character then
 				local Humanoid = Character:FindFirstChild("Humanoid")
 				if Humanoid then
 					if Humanoid.Health <= 0.001 then
-						if not isEnabled then
+						if not v105 then
 							v104 = Math.TimeAccumAdd(v104, 3)
 						end
-						isEnabled = true
+						v105 = true
 						return
 					end
-					local isEnabled, isEnabled
+					local v1, v2
 					if Humanoid.JumpPower > 60 then
-						isEnabled = true
-						isEnabled = "JumpPower"
+						v1 = true
+						v2 = "JumpPower"
 					else
-						isEnabled = false
-						isEnabled = nil
+						v1 = false
+						v2 = nil
 					end
-					for func, cframe in next, {
+					for v3, v4 in next, {
 						{ "MainNitro", PlayerGui:FindFirstChild("Nitro"), "Inf Nitro" },
-						{ "ProductNitro", cframe:FindFirstChild("Nitro"), "Inf Nitro" }
+						{ "ProductNitro", v10:FindFirstChild("Nitro"), "Inf Nitro" }
 					} do
-						local vector = cframe[1]
-						local RemoteEvent = cframe[3]
-						if cframe[2] then
-							configTable[vector] = true
-						elseif configTable[vector] then
-							isEnabled = true
-							isEnabled = RemoteEvent
+						local v5 = v4[1]
+						local v7 = v4[3]
+						if v4[2] then
+							t30[v5] = true
+						elseif t30[v5] then
+							v1 = true
+							v2 = v7
 						end
 					end
-					for vector, isEnabled in next, { "Workspace", "Players", "ReplicatedStorage" } do
-						if game:GetService(isEnabled).Name == isEnabled then
-							if configTable[isEnabled] then
-								isEnabled = true
-								isEnabled = "Renamed Service"
+					for v8, v9 in next, { "Workspace", "Players", "ReplicatedStorage" } do
+						if game:GetService(v9).Name == v9 then
+							if t30[v9] then
+								v1 = true
+								v2 = "Renamed Service"
 							end
 						else
-							configTable[isEnabled] = true
+							t30[v9] = true
 						end
 					end
-					local pcallSuccess, _ = pcall(function()
+					local v102, _ = pcall(function() --[[ Line: 5397 ]]
 						local GetObjects = game.GetObjects
 					end)
-					if not RunService:IsStudio() and pcallSuccess then
-						isEnabled = true
-						isEnabled = "game.GetObjects"
+					if not RunService:IsStudio() and v102 then
+						v1 = true
+						v2 = "game.GetObjects"
 					end
 					if _G.antiarrest ~= nil then
-						isEnabled = true
-						isEnabled = "_G.antiarrest"
+						v1 = true
+						v2 = "_G.antiarrest"
 					end
 					if xpcall ~= v106 then
-						isEnabled = true
-						isEnabled = "Xpcall pointer changed"
+						v1 = true
+						v2 = "Xpcall pointer changed"
 					end
-					local cframe = false
-					xpcall(function()
+					local v11 = false
+					xpcall(function() --[[ Line: 5420 ]]
 						return game[{}]
-					end, function()
-						cframe = true
+					end, function() --[[ Line: 5422 | Upvalues: v11 (ref) ]]
+						v11 = true
 					end)
-					if not cframe then
-						isEnabled = true
-						isEnabled = "VisDetect"
+					if not v11 then
+						v1 = true
+						v2 = "VisDetect"
 					end
 					if debug.getupvalues then
-						isEnabled = true
-						isEnabled = "Getupvalues"
+						v1 = true
+						v2 = "Getupvalues"
 					end
-					if isEnabled then
-						isEnabled = true
-						EventFireServer("kului5os", isEnabled, false)
+					if v1 then
+						v101 = true
+						EventFireServer("e" .. ("emrco8r5"):sub(4, 4):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("gz69rk8h0wb2y"):sub(5, 9):reverse() .. "x", v2, false)
 					end
 				end
 			end
 		end
 	end
-	ThreadLoopAdd(1, function()
-		local isEnabled, _ = pcall(CheatCheck)
-		if not isEnabled then
-			isEnabled = true
-			EventFireServer("kului5os", "FailedPcall", false)
+	ThreadLoopAdd(1, function() --[[ CheatCheck0 | Line: 5443 | Upvalues: CheatCheck (copy), v101 (ref), EventFireServer (ref) ]]
+		local v1, _ = pcall(CheatCheck)
+		if not v1 then
+			v101 = true
+			EventFireServer("e" .. "" .. ("ddrqca"):sub(5, 5):reverse():reverse():reverse():reverse():reverse() .. "" .. "" .. ("s48h0r0"):sub(3, 5):reverse():reverse():reverse() .. "" .. "" .. ("srkc9pz"):sub(2, 3):reverse() .. "x", "FailedPcall", false)
 		end
 	end)
 end
